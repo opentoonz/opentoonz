@@ -73,7 +73,7 @@ QColor PBBaseColor       = QColor(235, 235, 235);
 QColor PBNotStartedColor = QColor(210, 40, 40);
 QColor PBStartedColor    = QColor(220, 160, 160);
 QColor PBFinishedColor   = QColor(235, 235, 235);
-}
+}  // namespace
 
 //-----------------------------------------------------------------------------
 
@@ -172,11 +172,11 @@ void PlaybackExecutor::run() {
   TUINT32 loadedInstant, nextSampleInstant = timeResolution;
   TUINT32 sampleTotalLoadingTime = 0;
 
-  TUINT32 lastFrameCounts[4] = {0, 0, 0,
+  TUINT32 lastFrameCounts[4]    = {0, 0, 0,
                                 0};  // Keep the last 4 'played frames' counts.
   TUINT32 lastSampleInstants[4] = {0, 0, 0,
                                    0};  // Same for the last sampling instants
-  TUINT32 lastLoadingTimes[4] = {0, 0, 0,
+  TUINT32 lastLoadingTimes[4]   = {0, 0, 0,
                                  0};  // Same for total sample loading times
 
   double targetFrameTime =
@@ -320,15 +320,17 @@ void FlipSlider::paintEvent(QPaintEvent *ev) {
 
   p.drawImage(QRect(0, 0, PBColorMarginLeft, height()), PBOverlay,
               QRect(0, 0, PBColorMarginLeft, PBOverlay.height()));
-  p.drawImage(QRect(PBColorMarginLeft, 0,
-                    sliderRect.width() - PBColorMarginLeft - PBColorMarginRight,
-                    height()),
-              PBOverlay, QRect(PBColorMarginLeft, 0, overlayInnerWidth,
-                               PBOverlay.height()));
+  p.drawImage(
+      QRect(PBColorMarginLeft, 0,
+            sliderRect.width() - PBColorMarginLeft - PBColorMarginRight,
+            height()),
+      PBOverlay,
+      QRect(PBColorMarginLeft, 0, overlayInnerWidth, PBOverlay.height()));
   p.drawImage(
       QRect(width() - PBColorMarginRight, 0, PBColorMarginRight, height()),
-      PBOverlay, QRect(PBOverlay.width() - PBColorMarginRight, 0,
-                       PBColorMarginRight, PBOverlay.height()));
+      PBOverlay,
+      QRect(PBOverlay.width() - PBColorMarginRight, 0, PBColorMarginRight,
+            PBOverlay.height()));
 
   // Draw the position marker
   currPos = sliderPositionFromValue(minimum(), maxValuePlusStep, value(),
@@ -481,7 +483,7 @@ FlipConsole::FlipConsole(QVBoxLayout *mainLayout, UINT gadgetsMask,
     , m_fpsLabel(0)
     , m_consoleOwner(consoleOwner)
     , m_enableBlankFrameButton(0) {
-  QString s                    = QSettings().value(m_customizeId).toString();
+  QString s = QSettings().value(m_customizeId).toString();
   if (s != "") m_customizeMask = s.toUInt();
 
   if (m_gadgetsMask == 0) return;
@@ -672,7 +674,6 @@ protected:
 //-----------------------------------------------------------------------------
 
 void FlipConsole::enableButton(UINT button, bool enable, bool doShowHide) {
-
   if (!m_playToolBar) return;
 
   QList<QAction *> list = m_playToolBar->actions();
@@ -756,9 +757,8 @@ bool FlipConsole::drawBlanks(int from, int to) {
   if (m_blanksToDraw > 1 ||
       (m_blanksToDraw == 0 &&
        ((m_reverse && m_currentFrame - m_step < from) ||
-        (!m_reverse &&
-         m_currentFrame + m_step >
-             to))))  // we are on the last frame of the loop
+        (!m_reverse && m_currentFrame + m_step >
+                           to))))  // we are on the last frame of the loop
   {
     m_blanksToDraw = (m_blanksToDraw == 0 ? m_blanksCount : m_blanksToDraw - 1);
     m_settings.m_blankColor     = m_blankColor;
@@ -861,7 +861,7 @@ void FlipConsole::setCurrentFPS(int val) {
   if (m_fps == val) return;
 
   if (val == 0) val = 1;
-  m_fps             = val;
+  m_fps = val;
   m_fpsField->setValue(m_fps);
 
   if (m_playbackExecutor.isRunning() || m_isLinkedPlaying)
@@ -1278,7 +1278,7 @@ void FlipConsole::enableBlanks(bool state) {
 
 //-----------------------------------------------------------------------------
 /*! call consoleOwner->onDrawFrame() intead of emitting drawFrame signal
-*/
+ */
 void FlipConsole::showCurrentFrame() {
   m_consoleOwner->onDrawFrame(m_currentFrame, m_settings);
 }
@@ -1364,19 +1364,17 @@ void FlipConsole::onButtonPressed(int button) {
 
 //-----------------------------------------------------------------------------
 void FlipConsole::pressButton(EGadget buttonId) {
+  FlipConsole *console = this;
   if (m_visibleConsoles.indexOf(this) < 0 && m_visibleConsoles.size() > 0) {
-    FlipConsole *console = m_visibleConsoles.at(0);
+    console = m_visibleConsoles.at(0);
     console->makeCurrent();
-    if (console->m_buttons.contains(buttonId)) {
-      console->m_buttons[buttonId]->click();
-    } else if (console->m_actions.contains(buttonId))
-      console->m_actions[buttonId]->trigger();
-  } else {
-    if (m_buttons.contains(buttonId)) {
-      m_buttons[buttonId]->click();
-    } else if (m_actions.contains(buttonId))
-      m_actions[buttonId]->trigger();
   }
+  if (console->m_buttons.contains(buttonId) &&
+      console->m_buttons[buttonId]->isEnabled())
+    console->m_buttons[buttonId]->click();
+  else if (console->m_actions.contains(buttonId) &&
+           console->m_actions[buttonId]->isEnabled())
+    console->m_actions[buttonId]->trigger();
 }
 
 //-----------------------------------------------------------------------------
@@ -1474,7 +1472,7 @@ void FlipConsole::doButtonPressed(UINT button) {
       if (m_currentFrame <= from ||
           m_currentFrame >=
               to)  // the first frame of the playback is drawn right now
-        m_currentFrame               = m_reverse ? to : from;
+        m_currentFrame = m_reverse ? to : from;
       m_settings.m_recomputeIfNeeded = true;
       m_consoleOwner->onDrawFrame(m_currentFrame, m_settings);
     }
@@ -1549,7 +1547,7 @@ void FlipConsole::doButtonPressed(UINT button) {
     if (isChecked(eGreen) || isChecked(eGGreen))
       colorMask = colorMask | TRop::GChan;
     if (isChecked(eBlue) || isChecked(eGBlue))
-      colorMask                      = colorMask | TRop::BChan;
+      colorMask = colorMask | TRop::BChan;
     if (isChecked(eMatte)) colorMask = colorMask | TRop::MChan;
 
     if (colorMask == (TRop::RChan | TRop::GChan | TRop::BChan) ||

@@ -1,0 +1,70 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[a4paper, total={180mm, 272mm}]{geometry}
+
+\usepackage{fontspec}
+\setmainfont[Path=fonts/, Extension=.ttf]{ipaexm}
+
+\setlength\parindent{3.5em}
+\setlength\parskip{0em}
+\renewcommand{\baselinestretch}{1.247}
+
+\begin{document}
+
+\thispagestyle{empty}
+
+\Large
+\noindent \\
+Median Ino\medskip
+\par
+\normalsize
+Reduce noise, and erode majority of middle colors, rounds the contour of the picture\\
+\\
+-{-}- \ Inputs \ -{-}-\\
+Source\par
+Connect the image to process.\\
+Reference\par
+Connect the reference image to put the strength of the effect into each Pixel.\\
+\\
+-{-}- \ Settings \ -{-}-\\
+Radius\par
+Specify the range to be eroded by a circle radius.\par
+The unit is mm.\\
+\par
+Specify a value greater than or equal to 0. The maximum is 100mm.\par
+A value smaller than the pixel width (because you do not include the Pixel around)\par
+will do nothing.\\
+\par
+The default value is 0.35mm.\\
+\\
+Channel\par
+Specify the color channel to apply the median.\\
+\par
+\textquotedbl Red\textquotedbl\par
+\textquotedbl Green\textquotedbl\par
+\textquotedbl Blue\textquotedbl\par
+\textquotedbl Alpha\textquotedbl\par
+If you choose, to process over the specified color channel,\par
+it will store the results in the RGBA channel.\par
+In a black-and-white image, using this method, of single-channel processing,\par
+the speed of processing will be faster.\\
+\par
+\textquotedbl All\textquotedbl\par
+Using this, will multiply the processing to each RGBA channel.\\
+\par
+The default setting is \textquotedbl All\textquotedbl .\\
+\\
+Reference\par
+Choose how Reference image values put the strength of the effect into each Pixel.\par
+An image is connected to the \textquotedbl Reference\textquotedbl \ of the input,\par
+Choose from Red/Green/Blue/Alpha/Luminance/Nothing.
+
+\newpage
+
+\thispagestyle{empty}
+
+\ \vspace{-0.2em}
+\par
+Choose Nothing when you do not want this effect, it will turn off the connection.\par
+The default setting is Red.
+
+\end{document}

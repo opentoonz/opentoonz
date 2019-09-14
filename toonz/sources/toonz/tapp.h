@@ -160,7 +160,7 @@ public:
 
   int getCurrentLevelStyleIndex() const override;
 
-  void setCurrentLevelStyleIndex(int index) override;
+  void setCurrentLevelStyleIndex(int index, bool forceUpdate = false) override;
 
   void setMainWindow(QMainWindow *mainWindow) { m_mainWindow = mainWindow; }
   /*!

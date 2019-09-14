@@ -41,6 +41,7 @@ const std::map<std::string, std::string> systemPathMap{
 class EnvGlobals {  // singleton
 
   ToonzVersion m_version;
+  std::string m_applicationFileName;  // May differ from application name
   std::string m_applicationVersion;
   std::string m_applicationFullName;
   std::string m_moduleName;
@@ -76,7 +77,7 @@ public:
     QString settingsPath;
 
 #ifdef MACOSX
-    settingsPath = QString::fromStdString(getApplicationName()) +
+    settingsPath = QString::fromStdString(getApplicationFileName()) +
                    QString(".app") +
                    QString("/Contents/Resources/SystemVar.ini");
 #else /* Generic Unix */
@@ -181,6 +182,11 @@ public:
     updateEnvFile();
   }
 
+  void setApplicationFileName(std::string appFileName) {
+    m_applicationFileName = appFileName;
+    setWorkingDirectory();
+  }
+  std::string getApplicationFileName() { return m_applicationFileName; }
   std::string getApplicationName() { return m_version.getAppName(); }
   std::string getApplicationVersion() { return m_applicationVersion; }
   std::string getApplicationVersionWithoutRevision() {
@@ -223,6 +229,24 @@ public:
         TFilePath(m_workingDirectory + "\\portablestuff\\");
     TFileStatus portableStatus(portableCheck);
     m_isPortable = portableStatus.doesExist();
+
+#ifdef MACOSX
+    // macOS 10.12 (Sierra) translocates applications before running them
+    // depending on how it was installed. This separates the app from the
+    // portablestuff folder and we don't know where it is so we stop treating it
+    // as a portable. Placing portablestuff inside OpenToonz.app will keep
+    // everything together when it translocates.
+    if (!m_isPortable) {
+      portableCheck =
+          TFilePath(m_workingDirectory + "\\" + getApplicationFileName() +
+                    ".app\\portablestuff\\");
+      portableStatus = TFileStatus(portableCheck);
+      m_isPortable   = portableStatus.doesExist();
+      if (m_isPortable)
+        m_workingDirectory =
+            portableCheck.getParentDir().getQString().toStdString();
+    }
+#endif
   }
   std::string getWorkingDirectory() { return m_workingDirectory; }
 
@@ -475,6 +499,22 @@ void Variable::assignValue(std::string value) {
 }
 
 //===================================================================
+
+void TEnv::setApplicationFileName(std::string appFileName) {
+  TFilePath fp(appFileName);
+#ifdef MACOSX
+  if (fp.getWideName().find(L".app"))
+    for (int i = 0; i < 3; i++) fp = fp.getParentDir();
+#elif LINUX
+  if (fp.getWideName().find(L".appimage"))
+    for (int i = 0; i < 2; i++) fp = fp.getParentDir();
+#endif
+  EnvGlobals::instance()->setApplicationFileName(fp.getName());
+}
+
+std::string TEnv::getApplicationFileName() {
+  return EnvGlobals::instance()->getApplicationFileName();
+}
 
 std::string TEnv::getApplicationName() {
   return EnvGlobals::instance()->getApplicationName();

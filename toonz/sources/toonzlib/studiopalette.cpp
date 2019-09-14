@@ -579,6 +579,13 @@ void StudioPalette::setStylesGlobalNames(TPalette *palette) {
 //-------------------------------------------------------------------
 
 void StudioPalette::save(const TFilePath &path, TPalette *palette) {
+  TFileStatus fs(path);
+  if (fs.doesExist() && !fs.isWritable()) {
+    throw TSystemException(path,
+                           "The studio palette cannot be saved: it is a read "
+                           "only studio palette.");
+  }
+
   TOStream os(path);
   std::map<std::string, std::string> attr;
   attr["name"] = ::to_string(palette->getGlobalName());

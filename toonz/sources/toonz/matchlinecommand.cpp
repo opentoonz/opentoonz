@@ -49,10 +49,9 @@ void MergeCmappedDialog::accept() {
 
   if (TSystem::doesExistFileOrLevel(fp)) {
     if (DVGui::MsgBox(
-            QObject::tr("Level ") +
-                QString::fromStdWString(m_levelPath.getWideString()) +
-                QObject::tr(
-                    " already exists! Are you sure you want to overwrite it?"),
+            tr("Level %1 already exists! Are you sure you want to overwrite "
+               "it?")
+                .arg(QString::fromStdWString(m_levelPath.getWideString())),
             tr("Ok"), tr("Cancel")) != 1)
       return;
     else {
@@ -112,16 +111,16 @@ public:
         selection ? selection->getIndices() : std::set<int>();
 
     if (indices.empty()) {
-      DVGui::warning(
-          tr("It is not possible to execute the merge column command because "
-             "no column was selected."));
+      DVGui::warning(QObject::tr(
+          "It is not possible to execute the merge column command because "
+          "no column was selected."));
       return;
     }
 
     if (indices.size() == 1) {
-      DVGui::warning(
-          tr("It is not possible to execute the merge column command  because "
-             "only one columns is  selected."));
+      DVGui::warning(QObject::tr(
+          "It is not possible to execute the merge column command because "
+          "only one columns is selected."));
       return;
     }
 
@@ -143,18 +142,18 @@ public:
     TColumnSelection *selection =
         dynamic_cast<TColumnSelection *>(TSelection::getCurrent());
     if (!selection) {
-      DVGui::warning(
-          tr("It is not possible to apply the match lines because no column "
-             "was selected."));
+      DVGui::warning(QObject::tr(
+          "It is not possible to apply the match lines because no column "
+          "was selected."));
       return;
     }
 
     std::set<int> indices = selection->getIndices();
 
     if (indices.size() != 2) {
-      DVGui::warning(
-          tr("It is not possible to apply the match lines because two columns "
-             "have to be selected."));
+      DVGui::warning(QObject::tr(
+          "It is not possible to apply the match lines because two columns "
+          "have to be selected."));
       return;
     }
 
@@ -263,9 +262,8 @@ public:
   }
 
   int getSize() const override {
-    return sizeof *this +
-           (sizeof(TXshLevelP) + sizeof(TXshSimpleLevel *)) *
-               m_createdLevels.size();
+    return sizeof *this + (sizeof(TXshLevelP) + sizeof(TXshSimpleLevel *)) *
+                              m_createdLevels.size();
   }
 };
 
@@ -420,18 +418,18 @@ public:
     TColumnSelection *selection =
         dynamic_cast<TColumnSelection *>(TSelection::getCurrent());
     if (!selection) {
-      DVGui::warning(
-          tr("It is not possible to merge tlv columns because no column was "
-             "selected."));
+      DVGui::warning(QObject::tr(
+          "It is not possible to merge tlv columns because no column was "
+          "selected."));
       return;
     }
 
     std::set<int> indices = selection->getIndices();
 
     if (indices.size() < 2) {
-      DVGui::warning(
-          tr("It is not possible to merge tlv columns because at least two "
-             "columns have to be selected."));
+      DVGui::warning(QObject::tr(
+          "It is not possible to merge tlv columns because at least two "
+          "columns have to be selected."));
       return;
     }
 
@@ -459,11 +457,11 @@ public:
     for (; it != indices.end(); ++it)
       if (!checkColumnValidity(*it)) return;
 
-    DVGui::ProgressDialog progress(tr("Merging Tlv Levels..."), QString(), 0,
-                                   indices.size() - 1,
+    DVGui::ProgressDialog progress(QObject::tr("Merging Tlv Levels..."),
+                                   QString(), 0, indices.size() - 1,
                                    TApp::instance()->getMainWindow());
     progress.setWindowModality(Qt::WindowModal);
-    progress.setWindowTitle(tr("Merging Tlv Levels..."));
+    progress.setWindowTitle(QObject::tr("Merging Tlv Levels..."));
     progress.setValue(0);
     progress.show();
 

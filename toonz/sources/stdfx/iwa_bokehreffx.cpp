@@ -43,7 +43,7 @@ void releaseAllRastersAndPlans(QList<TRasterGR8P>& rasterList,
   releaseAllRasters(rasterList);
   for (int p = 0; p < planList.size(); p++) kiss_fft_free(planList.at(p));
 }
-};
+};  // namespace
 
 //------------------------------------
 BokehRefThread::BokehRefThread(int channel, kiss_fft_cpx* fftcpx_channel_before,
@@ -608,7 +608,9 @@ void Iwa_BokehRefFx::retrieveLayer(const float4* source_buff,
   TRasterGR8P generation_buff_ras = allocateRasterAndLock<unsigned char>(
       &generation_buff, TDimensionI(lx, ly));
 
-  for (int gen = 0; gen < margin; gen++) {
+  // extend (margin * 2) pixels in order to enough cover when two adjacent
+  // layers are both blurred in the maximum radius
+  for (int gen = 0; gen < margin * 2; gen++) {
     // apply single median filter
     doSingleMedian(source_buff, segment_layer_buff, indexMap_mainSub, index, lx,
                    ly, generation_buff, gen + 1);

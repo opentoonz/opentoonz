@@ -185,6 +185,10 @@ void SVNLockFrameRangeDialog::onPropGetDone(const QString &xmlResponse) {
     }
   }
 
+  int height =
+      180 + (m_lockInfos.isEmpty() ? 0 : ((m_lockInfos.size() - 1) * 25));
+  setMinimumSize(300, height);
+
   m_lockButton->show();
 
   m_cancelButton->show();
@@ -304,10 +308,10 @@ void SVNLockFrameRangeDialog::onLockDone() {
 
     // Step 2: propget
     QStringList args;
-    args << "propget";
-    args << "partial-lock";
+    args << "proplist";
     args << m_file;
     args << "--xml";
+    args << "-v";
 
     m_thread.disconnect(SIGNAL(done(const QString &)));
     connect(&m_thread, SIGNAL(done(const QString &)), this,
@@ -531,6 +535,10 @@ void SVNLockMultiFrameRangeDialog::onStatusRetrieved(
     m_textLabel->setText(temp);
   }
 
+  int height =
+      180 + (m_lockInfos.isEmpty() ? 0 : ((m_lockInfos.size() - 1) * 25));
+  setMinimumSize(300, height);
+
   m_lockButton->show();
 
   m_cancelButton->show();
@@ -736,10 +744,10 @@ void SVNUnlockFrameRangeDialog::onLockDone() {
 
   // Step 3: propget
   QStringList args;
-  args << "propget";
-  args << "partial-lock";
+  args << "proplist";
   args << m_file;
   args << "--xml";
+  args << "-v";
 
   m_thread.disconnect(SIGNAL(done(const QString &)));
   connect(&m_thread, SIGNAL(done(const QString &)), this,
@@ -1074,10 +1082,10 @@ SVNFrameRangeLockInfoDialog::SVNFrameRangeLockInfoDialog(
 
   // 1. propget
   QStringList args;
-  args << "propget";
-  args << "partial-lock";
+  args << "proplist";
   args << m_file;
   args << "--xml";
+  args << "-v";
 
   connect(&m_thread, SIGNAL(done(const QString &)), this,
           SLOT(onPropGetDone(const QString &)));
@@ -1115,6 +1123,9 @@ void SVNFrameRangeLockInfoDialog::onPropGetDone(const QString &xmlResponse) {
                         .arg(lock.m_from)
                         .arg(lock.m_to));
       }
+      int height = 100 + ((lockInfos.size() - 1) * 25);
+      setMinimumSize(300, height);
+
       m_textLabel->setText(temp);
     }
   }
@@ -1224,6 +1235,9 @@ void SVNMultiFrameRangeLockInfoDialog::onStatusRetrieved(
                       .arg(lock.m_from)
                       .arg(lock.m_to));
     }
+    int height = 100 + ((lockInfos.size() - 1) * 25);
+    setMinimumSize(300, height);
+
     m_textLabel->setText(temp);
   }
 }

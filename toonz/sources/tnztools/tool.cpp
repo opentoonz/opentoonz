@@ -948,16 +948,10 @@ QString TTool::updateEnabled() {
     // Check TTool::ImageType tools
     if (toolType == TTool::LevelWriteTool) {
       // Check level against read-only status
-      if (sl->isReadOnly()) {
-        const std::set<TFrameId> &editableFrames = sl->getEditableRange();
-        TFrameId currentFid                      = getCurrentFid();
-
-        if (editableFrames.find(currentFid) == editableFrames.end())
-          return (
-              enable(false),
-              QObject::tr(
-                  "The current frame is locked: any editing is forbidden."));
-      }
+      if (sl->isFrameReadOnly(getCurrentFid()))
+        return (enable(false),
+                QObject::tr(
+                    "The current frame is locked: any editing is forbidden."));
 
       // Check level type write support
       if (sl->getPath().getType() ==

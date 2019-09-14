@@ -109,7 +109,7 @@ public:
   typedef std::list<ContourNode *> IndexColumn;
 
   std::vector<IndexColumn>
-      m_columns;  //!< Countours set by 'column identifier'.
+      m_columns;  //!< Contours set by 'column identifier'.
   std::vector<int>
       m_identifiers;  //!< Column identifiers by original contour index.
 
@@ -1385,7 +1385,7 @@ inline void Event::processSplitEvent() {
   m_generator->m_next->m_prev = newLeftNode;
   newLeftNode->m_next         = m_generator->m_next;
 
-  // Assign and calculate the new nodes' informations
+  // Assign and calculate the new nodes' information
   newLeftNode->m_edge  = m_generator->m_edge;
   newRightNode->m_edge = m_coGenerator->m_edge;
 
@@ -1491,7 +1491,7 @@ inline void Event::processVertexEvent() {
   m_generator->m_next->m_prev   = newLeftNode;
   newLeftNode->m_next           = m_generator->m_next;
 
-  // Assign and calculate the new nodes' informations
+  // Assign and calculate the new nodes' information
   newLeftNode->m_edge  = m_generator->m_edge;
   newRightNode->m_edge = m_coGenerator->m_edge;
 

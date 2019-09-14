@@ -22,6 +22,7 @@
 
 // TnzCore includes
 #include "tconvert.h"
+#include "tsystem.h"
 
 // Qt includes
 #include <QVBoxLayout>
@@ -39,40 +40,40 @@ using namespace PaletteViewerGUI;
 
 //=============================================================================
 /*! \class PaletteViewer
-                \brief The PaletteViewer class provides an object to view and
-   manage palette view.
+\brief The PaletteViewer class provides an object to view and
+manage palette view.
 
-                Inherits \b QWidget.
+Inherits \b QWidget.
 
-                This object allows to show and manage palette; it's possible
-   distinguish three
-                view type, class can show: current level palette, current studio
-   palette or
-                current cleanup palette, using setPalette() to set palette
-   viewer.
-                The object is composed of a vertical layout with three widget:
-                \li a tab bar \b PaletteViewerGUI::TabBar in which are displayed
-   palette page
-                \b createTabBar();
-                \li a central frame \b PaletteViewerGUI::PageViewer in which are
-   displayed
-                all style of current page in palette
-                \li a button bar, \b createToolBar(), \b createPaletteToolBar()
-                and \b createSavePaletteToolBar();
+This object allows to show and manage palette; it's possible
+distinguish three
+view type, class can show: current level palette, current studio
+palette or
+current cleanup palette, using setPalette() to set palette
+viewer.
+The object is composed of a vertical layout with three widget:
+\li a tab bar \b PaletteViewerGUI::TabBar in which are displayed
+palette page
+\b createTabBar();
+\li a central frame \b PaletteViewerGUI::PageViewer in which are
+displayed
+all style of current page in palette
+\li a button bar, \b createToolBar(), \b createPaletteToolBar()
+and \b createSavePaletteToolBar();
 
-                A collection of method allows you to manage this object and its
-   interaction
-                with palette.
-                */
+A collection of method allows you to manage this object and its
+interaction
+with palette.
+*/
 /*!	\fn const TPaletteP PaletteViewer::&getPalette() const
-                Return current viewer palette.
-                */
+Return current viewer palette.
+*/
 /*!	\fn void PaletteViewer::createToolBar()
-                Create down button bar.
-                */
+Create down button bar.
+*/
 /*!	\fn void PaletteViewer::updateToolBar()
-                Update button bar.
-                */
+Update button bar.
+*/
 PaletteViewer::PaletteViewer(QWidget *parent, PaletteViewType viewType,
                              bool hasSaveToolBar, bool hasPageCommand,
                              bool hasPasteColors)
@@ -115,7 +116,7 @@ PaletteViewer::PaletteViewer(QWidget *parent, PaletteViewType viewType,
 
   toolbarScrollWidget->setObjectName(
       "ToolBarContainer");  // Toonz's qss files are instructed to leave a
-  // 1px grey margin on top for scroll buttons
+                            // 1px grey margin on top for scroll buttons
   QWidget *toolBarWidget = new QWidget;  // children of this parent name.
   toolbarScrollWidget->setWidget(toolBarWidget);
   toolBarWidget->setSizePolicy(QSizePolicy::MinimumExpanding,
@@ -169,6 +170,8 @@ PaletteViewer::PaletteViewer(QWidget *parent, PaletteViewType viewType,
           SLOT(movePage(int, int)));
   connect(m_pageViewer, SIGNAL(changeWindowTitleSignal()), this,
           SLOT(changeWindowTitle()));
+  connect(m_pageViewer, SIGNAL(switchToPage(int)), this,
+          SLOT(onSwitchToPage(int)));
 
   changeWindowTitle();
 
@@ -235,7 +238,7 @@ void PaletteViewer::setXsheetHandle(TXsheetHandle *xsheetHandle) {
 
 //-----------------------------------------------------------------------------
 /*!for clearing level cache after "paste style" command called from style
- * selection
+* selection
 */
 void PaletteViewer::setLevelHandle(TXshLevelHandle *levelHandle) {
   m_pageViewer->setLevelHandle(levelHandle);
@@ -437,8 +440,8 @@ void PaletteViewer::createPaletteToolBar() {
 
 //-----------------------------------------------------------------------------
 /*! Create left part of button bar; insert different actions in according to
-                current viewer palette type.
-                */
+current viewer palette type.
+*/
 void PaletteViewer::createSavePaletteToolBar() {
   m_savePaletteToolBar->clear();
   m_savePaletteToolBar->setMovable(false);
@@ -515,7 +518,7 @@ void PaletteViewer::updateTabBar() {
 
 //-----------------------------------------------------------------------------
 /*! Update right button bar, enable its action if current viewer palette is
- * empty.
+* empty.
 */
 void PaletteViewer::updatePaletteToolBar() {
   if (!m_paletteToolBar) return;
@@ -541,7 +544,7 @@ void PaletteViewer::updatePaletteToolBar() {
 
 //-----------------------------------------------------------------------------
 /*! Update left button bar, enable its action if current viewer palette is
- * empty.
+* empty.
 */
 void PaletteViewer::updateSavePaletteToolBar() {
   if (!m_savePaletteToolBar) return;
@@ -669,8 +672,8 @@ void PaletteViewer::hideEvent(QHideEvent *) {
 
 //-----------------------------------------------------------------------------
 /*! If currente palette viewer exist verify event data, if is a PaletteData or
-                has urls accept event.
-                */
+has urls accept event.
+*/
 void PaletteViewer::dragEnterEvent(QDragEnterEvent *event) {
   TPalette *palette = getPalette();
   if (!palette || m_viewType == CLEANUP_PALETTE) return;
@@ -682,7 +685,7 @@ void PaletteViewer::dragEnterEvent(QDragEnterEvent *event) {
     // Sto "draggando" stili.
     if (paletteData->hasStyleIndeces()) {
       m_pageViewer->createDropPage();
-      if (!palette) m_pagesBar->setCurrentIndex(palette->getPageCount() - 1);
+      if (!palette) onSwitchToPage(palette->getPageCount() - 1);
     }
     // Accetto l'evento
     event->acceptProposedAction();
@@ -735,8 +738,11 @@ void PaletteViewer::dropEvent(QDropEvent *event) {
           if (ret == 0) return;
         }
         StudioPaletteCmd::loadIntoCurrentPalette(m_paletteHandle, path);
-      } else
+      } else {
+        int nextPageIndex = m_paletteHandle->getPalette()->getPageCount();
         StudioPaletteCmd::mergeIntoCurrentPalette(m_paletteHandle, path);
+        if (!i) onSwitchToPage(nextPageIndex);
+      }
 
       if (loadPalette) {
         TFilePath refImagePath =
@@ -770,8 +776,11 @@ void PaletteViewer::dropEvent(QDropEvent *event) {
         if (ret == 0) return;
       }
       StudioPaletteCmd::loadIntoCurrentPalette(m_paletteHandle, palette);
-    } else
+    } else {
+      int nextPageIndex = m_paletteHandle->getPalette()->getPageCount();
       StudioPaletteCmd::mergeIntoCurrentPalette(m_paletteHandle, palette);
+      onSwitchToPage(nextPageIndex);
+    }
   }
 }
 
@@ -812,8 +821,8 @@ void PaletteViewer::setPageView(int currentIndexPage) {
 
 //-----------------------------------------------------------------------------
 /*! If current palette viewer is not empty create emit a signal to create new
-                palette page.
-                */
+palette page.
+*/
 void PaletteViewer::addNewPage() {
   TPalette *palette = getPalette();
   if (palette) {
@@ -821,14 +830,15 @@ void PaletteViewer::addNewPage() {
 
     updateTabBar();
     PaletteCmd::addPage(m_paletteHandle);
+    onSwitchToPage(m_paletteHandle->getPalette()->getPageCount() - 1);
   }
 }
 
 //-----------------------------------------------------------------------------
 /*! Create a new style in current page view of current palette viewer emit a
-   signal
-                to create a new style.
-                */
+signal
+to create a new style.
+*/
 void PaletteViewer::addNewColor() {
   if (!getPalette() || getPalette()->isLocked()) return;
 
@@ -867,8 +877,8 @@ void PaletteViewer::deletePage() {
 
 //-----------------------------------------------------------------------------
 /*! If current palette view is studio palette and palette has a global name
-                save current viewer palette in studio palette.
-                */
+save current viewer palette in studio palette.
+*/
 void PaletteViewer::saveStudioPalette() {
   StudioPalette *sp = StudioPalette::instance();
   TPalette *palette = getPalette();
@@ -894,8 +904,15 @@ void PaletteViewer::saveStudioPalette() {
         int ret = DVGui::MsgBox(question, QObject::tr("Overwrite"),
                                 QObject::tr("Don't Overwrite"), 0);
         if (ret == 2 || ret == 0) return;
-        StudioPalette::instance()->save(palettePath, palette);
-        palette->setDirtyFlag(false);
+        try {
+          StudioPalette::instance()->save(palettePath, palette);
+          palette->setDirtyFlag(false);
+        } catch (TSystemException se) {
+          QApplication::restoreOverrideCursor();
+          DVGui::warning(QString::fromStdWString(se.getMessage()));
+          return;
+        } catch (...) {
+        }
       }
     }
     return;
@@ -941,7 +958,7 @@ void PaletteViewer::onColorStyleSwitched() {
   if (indexInPage == -1) {
     if (!palette->getStylePage(styleIndex)) return;
     int pageIndex = palette->getStylePage(styleIndex)->getIndex();
-    m_pagesBar->setCurrentIndex(pageIndex);
+    onSwitchToPage(pageIndex);
     indexInPage = m_pageViewer->getPage()->search(styleIndex);
   }
 
@@ -959,7 +976,7 @@ void PaletteViewer::onColorStyleSwitched() {
 void PaletteViewer::onPaletteChanged() {
   int index = m_pagesBar->currentIndex();
   updateTabBar();
-  m_pagesBar->setCurrentIndex(index);
+  onSwitchToPage(index);
 
   m_pageViewer->update();
 
@@ -972,6 +989,17 @@ void PaletteViewer::onPaletteChanged() {
 
 void PaletteViewer::onPaletteSwitched() {
   updateView();
+
+  int pageIndex = 0;
+  if (m_paletteHandle) {
+    TPalette *palette = m_paletteHandle->getPalette();
+    if (palette) {
+      int currentStyleId   = palette->getCurrentStyleId();
+      TPalette::Page *page = palette->getStylePage(currentStyleId);
+      if (page) pageIndex  = page->getIndex();
+    }
+  }
+  onSwitchToPage(pageIndex);
 
   // update GUI according to the "lock" property
   if (getPalette() && m_viewType != CLEANUP_PALETTE &&
@@ -1031,8 +1059,8 @@ void PaletteViewer::onNameDisplayMode(QAction *action) {
 
 //-----------------------------------------------------------------------------
 /*! If current view type is LEVEL_PALETTE add to window title current level
-                name and current frame.
-                */
+name and current frame.
+*/
 void PaletteViewer::changeWindowTitle() {
   QString name = tr("Palette");
   QWidget *titleOwner;
@@ -1074,11 +1102,11 @@ void PaletteViewer::changeWindowTitle() {
 
 //-----------------------------------------------------------------------------
 /*! Move palette view page from \b srcIndex page index to \b dstIndex page
- * index.
+* index.
 */
 void PaletteViewer::movePage(int srcIndex, int dstIndex) {
   PaletteCmd::movePalettePage(m_paletteHandle, srcIndex, dstIndex);
-  m_pagesBar->setCurrentIndex(dstIndex);
+  onSwitchToPage(dstIndex);
 }
 
 //-----------------------------------------------------------------------------
@@ -1092,4 +1120,8 @@ void PaletteViewer::setIsLocked(bool lock) {
   m_pageViewer->updateCommandLocks();
   // notify for updating the style editor
   m_paletteHandle->notifyPaletteLockChanged();
+}
+
+void PaletteViewer::onSwitchToPage(int pageIndex) {
+  m_pagesBar->setCurrentIndex(pageIndex);
 }

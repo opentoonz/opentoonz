@@ -226,6 +226,8 @@ protected:
                        bool horizontal, bool isDecimal);
   static void drawEmptyCircle(TPointD point, int thick, bool isLxEven,
                               bool isLyEven, bool isPencil);
+
+  TPointD getCenteredCursorPos(const TPointD &originalCursorPos);
 };
 
 //------------------------------------------------------------

@@ -1531,8 +1531,8 @@ void ColumnArea::paintEvent(QPaintEvent *event) {  // AREA
   c0 = cellRange.from().layer();
   c1 = cellRange.to().layer();
   if (!m_viewer->orientation()->isVerticalTimeline()) {
-    int colCount = qMax(1, xsh->getColumnCount());
-    c1           = qMin(c1, colCount - 1);
+    int colCount = std::max(1, xsh->getColumnCount());
+    c1           = std::min(c1, colCount - 1);
   }
 
   ColumnFan *columnFan = xsh->getColumnFan(m_viewer->orientation());

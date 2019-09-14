@@ -1087,53 +1087,37 @@ QMenuBar *StackedMenuBar::createFullMenuBar() {
   addMenuItem(fileMenu, MI_LoadFolder);
   addMenuItem(fileMenu, MI_LoadSubSceneFile);
   fileMenu->addSeparator();
-  addMenuItem(fileMenu, MI_NewLevel);
-  addMenuItem(fileMenu, MI_LoadLevel);
-  addMenuItem(fileMenu, MI_SaveAllLevels);
-  addMenuItem(fileMenu, MI_SaveLevel);
-  addMenuItem(fileMenu, MI_SaveLevelAs);
-  addMenuItem(fileMenu, MI_ExportLevel);
-  addMenuItem(fileMenu, MI_OpenRecentLevel);
-  fileMenu->addSeparator();
   addMenuItem(fileMenu, MI_ConvertFileWithInput);
   fileMenu->addSeparator();
   addMenuItem(fileMenu, MI_LoadColorModel);
   fileMenu->addSeparator();
-  addMenuItem(fileMenu, MI_ImportMagpieFile);
+  QMenu *projectManagementMenu = fileMenu->addMenu(tr("Project Management"));
+  {
+    addMenuItem(projectManagementMenu, MI_NewProject);
+    addMenuItem(projectManagementMenu, MI_ProjectSettings);
+    projectManagementMenu->addSeparator();
+    addMenuItem(projectManagementMenu, MI_SaveDefaultSettings);
+  }
   fileMenu->addSeparator();
-  addMenuItem(fileMenu, MI_NewProject);
-  addMenuItem(fileMenu, MI_ProjectSettings);
-  addMenuItem(fileMenu, MI_SaveDefaultSettings);
-  fileMenu->addSeparator();
-  addMenuItem(fileMenu, MI_PreviewSettings);
-  addMenuItem(fileMenu, MI_Preview);
-  // addMenuItem(fileMenu, MI_SavePreview);
-  fileMenu->addSeparator();
-  addMenuItem(fileMenu, MI_OutputSettings);
-  addMenuItem(fileMenu, MI_Render);
-  addMenuItem(fileMenu, MI_FastRender);
-  addMenuItem(fileMenu, MI_SoundTrack);
-  //  addMenuItem(fileMenu, MI_SavePreviewedFrames);
+  QMenu *importMenu = fileMenu->addMenu(tr("Import"));
+  { addMenuItem(importMenu, MI_ImportMagpieFile); }
+  QMenu *exportMenu = fileMenu->addMenu(tr("Export"));
+  { addMenuItem(exportMenu, MI_SoundTrack); }
   fileMenu->addSeparator();
   addMenuItem(fileMenu, MI_PrintXsheet);
   addMenuItem(fileMenu, MI_Print);
+  addMenuItem(fileMenu, MI_Export);
+  fileMenu->addSeparator();
+  QMenu *scriptMenu = fileMenu->addMenu(tr("Script"));
+  {
+    addMenuItem(scriptMenu, "MI_RunScript");
+    addMenuItem(scriptMenu, "MI_OpenScriptConsole");
+  }
   fileMenu->addSeparator();
   addMenuItem(fileMenu, MI_Preferences);
   addMenuItem(fileMenu, MI_ShortcutPopup);
   fileMenu->addSeparator();
-  // addMenuItem(fileMenu, MI_Export);
-  // addMenuItem(fileMenu, MI_TestAnimation);
-  // fileMenu->addSeparator();
-
-  addMenuItem(fileMenu, "MI_RunScript");
-  addMenuItem(fileMenu, "MI_OpenScriptConsole");
-
-  fileMenu->addSeparator();
   addMenuItem(fileMenu, MI_Quit);
-
-#ifndef NDEBUG
-  addMenuItem(fileMenu, "MI_ReloadStyle");
-#endif
 
   // Menu' EDIT
   QMenu *editMenu = addMenu(tr("Edit"), fullMenuBar);
@@ -1146,29 +1130,28 @@ QMenuBar *StackedMenuBar::createFullMenuBar() {
   addMenuItem(editMenu, MI_PasteAbove);
   // addMenuItem(editMenu, MI_PasteNew);
   addMenuItem(editMenu, MI_PasteInto);
-  editMenu->addSeparator();
-  addMenuItem(editMenu, MI_Clear);
   addMenuItem(editMenu, MI_Insert);
   addMenuItem(editMenu, MI_InsertAbove);
+  addMenuItem(editMenu, MI_Clear);
   editMenu->addSeparator();
   addMenuItem(editMenu, MI_SelectAll);
   addMenuItem(editMenu, MI_InvertSelection);
   editMenu->addSeparator();
-  addMenuItem(editMenu, MI_RemoveEndpoints);
+  QMenu *groupMenu = editMenu->addMenu(tr("Group"));
+  {
+    addMenuItem(groupMenu, MI_Group);
+    addMenuItem(groupMenu, MI_Ungroup);
+    addMenuItem(groupMenu, MI_EnterGroup);
+    addMenuItem(groupMenu, MI_ExitGroup);
+  }
   editMenu->addSeparator();
-  addMenuItem(editMenu, MI_Group);
-  addMenuItem(editMenu, MI_Ungroup);
-  addMenuItem(editMenu, MI_EnterGroup);
-  addMenuItem(editMenu, MI_ExitGroup);
-  editMenu->addSeparator();
-
-  addMenuItem(editMenu, MI_BringToFront);
-  addMenuItem(editMenu, MI_BringForward);
-  addMenuItem(editMenu, MI_SendBack);
-  addMenuItem(editMenu, MI_SendBackward);
-
-  editMenu->addSeparator();
-  addMenuItem(editMenu, MI_TouchGestureControl);
+  QMenu *arrangeMenu = editMenu->addMenu(tr("Arrange"));
+  {
+    addMenuItem(arrangeMenu, MI_BringToFront);
+    addMenuItem(arrangeMenu, MI_BringForward);
+    addMenuItem(arrangeMenu, MI_SendBack);
+    addMenuItem(arrangeMenu, MI_SendBackward);
+  }
 
 // Menu' SCAN CLEANUP
 #ifdef LINETEST
@@ -1176,16 +1159,11 @@ QMenuBar *StackedMenuBar::createFullMenuBar() {
 #else
   QMenu *scanCleanupMenu = addMenu(tr("Scan && Cleanup"), fullMenuBar);
 #endif
-
   addMenuItem(scanCleanupMenu, MI_DefineScanner);
   addMenuItem(scanCleanupMenu, MI_ScanSettings);
   addMenuItem(scanCleanupMenu, MI_Scan);
   addMenuItem(scanCleanupMenu, MI_SetScanCropbox);
   addMenuItem(scanCleanupMenu, MI_ResetScanCropbox);
-#ifdef LINETEST
-  scanCleanupMenu->addSeparator();
-  addMenuItem(scanCleanupMenu, MI_Autocenter);
-#else
   scanCleanupMenu->addSeparator();
   addMenuItem(scanCleanupMenu, MI_CleanupSettings);
   addMenuItem(scanCleanupMenu, MI_CleanupPreview);
@@ -1193,33 +1171,63 @@ QMenuBar *StackedMenuBar::createFullMenuBar() {
   addMenuItem(scanCleanupMenu, MI_Cleanup);
   scanCleanupMenu->addSeparator();
   addMenuItem(scanCleanupMenu, MI_PencilTest);
+#ifdef LINETEST
+  scanCleanupMenu->addSeparator();
+  addMenuItem(scanCleanupMenu, MI_Autocenter);
 #endif
 
   // Menu' LEVEL
   QMenu *levelMenu = addMenu(tr("Level"), fullMenuBar);
+  QMenu *newMenu   = levelMenu->addMenu(tr("New"));
+  {
+    addMenuItem(newMenu, MI_NewLevel);
+    newMenu->addSeparator();
+    addMenuItem(newMenu, MI_NewToonzRasterLevel);
+    addMenuItem(newMenu, MI_NewVectorLevel);
+    addMenuItem(newMenu, MI_NewRasterLevel);
+    addMenuItem(newMenu, MI_NewNoteLevel);
+  }
+  addMenuItem(levelMenu, MI_LoadLevel);
+  addMenuItem(levelMenu, MI_SaveLevel);
+  addMenuItem(levelMenu, MI_SaveLevelAs);
+  addMenuItem(levelMenu, MI_SaveAllLevels);
+  addMenuItem(levelMenu, MI_OpenRecentLevel);
+  addMenuItem(levelMenu, MI_ExportLevel);
+  levelMenu->addSeparator();
   addMenuItem(levelMenu, MI_AddFrames);
   addMenuItem(levelMenu, MI_Renumber);
   addMenuItem(levelMenu, MI_ReplaceLevel);
   addMenuItem(levelMenu, MI_RevertToCleanedUp);
   addMenuItem(levelMenu, MI_RevertToLastSaved);
-  addMenuItem(levelMenu, MI_ConvertToVectors);
-  addMenuItem(levelMenu, MI_ConvertToToonzRaster);
-  addMenuItem(levelMenu, MI_ConvertVectorToVector);
   addMenuItem(levelMenu, MI_Tracking);
+  levelMenu->addSeparator();
+  QMenu *adjustMenu = levelMenu->addMenu(tr("Adjust"));
+  {
+    addMenuItem(adjustMenu, MI_BrightnessAndContrast);
+    addMenuItem(adjustMenu, MI_AdjustLevels);
+    addMenuItem(adjustMenu, MI_AdjustThickness);
+    addMenuItem(adjustMenu, MI_Antialias);
+    addMenuItem(adjustMenu, MI_Binarize);
+    addMenuItem(adjustMenu, MI_LinesFade);
+  }
+  QMenu *optimizeMenu = levelMenu->addMenu(tr("Optimize"));
+  {
+    addMenuItem(optimizeMenu, MI_RemoveEndpoints);
+    addMenuItem(optimizeMenu, MI_ConvertVectorToVector);
+  }
+  QMenu *convertMenu = levelMenu->addMenu(tr("Convert"));
+  {
+    addMenuItem(convertMenu, MI_ConvertToVectors);
+    addMenuItem(convertMenu, MI_ConvertToToonzRaster);
+  }
   levelMenu->addSeparator();
   addMenuItem(levelMenu, MI_ExposeResource);
   addMenuItem(levelMenu, MI_EditLevel);
   levelMenu->addSeparator();
+  addMenuItem(levelMenu, MI_CanvasSize);
   addMenuItem(levelMenu, MI_LevelSettings);
   addMenuItem(levelMenu, MI_FileInfo);
-  levelMenu->addSeparator();
-  addMenuItem(levelMenu, MI_AdjustLevels);
-  addMenuItem(levelMenu, MI_AdjustThickness);
-  addMenuItem(levelMenu, MI_Antialias);
-  addMenuItem(levelMenu, MI_Binarize);
-  addMenuItem(levelMenu, MI_BrightnessAndContrast);
-  addMenuItem(levelMenu, MI_CanvasSize);
-  addMenuItem(levelMenu, MI_LinesFade);
+  addMenuItem(levelMenu, MI_ReplaceParentDirectory);
   levelMenu->addSeparator();
   addMenuItem(levelMenu, MI_RemoveUnused);
 #ifdef LINETEST
@@ -1245,29 +1253,20 @@ QMenuBar *StackedMenuBar::createFullMenuBar() {
   addMenuItem(xsheetMenu, MI_MergeCmapped);
   xsheetMenu->addSeparator();
   addMenuItem(xsheetMenu, MI_MergeColumns);
-
   addMenuItem(xsheetMenu, MI_DeleteMatchLines);
   addMenuItem(xsheetMenu, MI_DeleteInk);
   xsheetMenu->addSeparator();
   addMenuItem(xsheetMenu, MI_InsertFx);
   addMenuItem(xsheetMenu, MI_NewOutputFx);
-  addMenuItem(xsheetMenu, MI_NewNoteLevel);
-  addMenuItem(xsheetMenu, MI_RemoveEmptyColumns);
   xsheetMenu->addSeparator();
   addMenuItem(xsheetMenu, MI_InsertSceneFrame);
   addMenuItem(xsheetMenu, MI_RemoveSceneFrame);
   addMenuItem(xsheetMenu, MI_InsertGlobalKeyframe);
   addMenuItem(xsheetMenu, MI_RemoveGlobalKeyframe);
   xsheetMenu->addSeparator();
-  addMenuItem(xsheetMenu, MI_NextFrame);
-  addMenuItem(xsheetMenu, MI_PrevFrame);
-  addMenuItem(xsheetMenu, MI_FirstFrame);
-  addMenuItem(xsheetMenu, MI_LastFrame);
-  addMenuItem(xsheetMenu, MI_NextDrawing);
-  addMenuItem(xsheetMenu, MI_PrevDrawing);
-  addMenuItem(xsheetMenu, MI_NextStep);
-  addMenuItem(xsheetMenu, MI_PrevStep);
   addMenuItem(xsheetMenu, MI_LipSyncPopup);
+  xsheetMenu->addSeparator();
+  addMenuItem(xsheetMenu, MI_RemoveEmptyColumns);
 
   // Menu' CELLS
   QMenu *cellsMenu = addMenu(tr("Cells"), fullMenuBar);
@@ -1277,41 +1276,90 @@ QMenuBar *StackedMenuBar::createFullMenuBar() {
   addMenuItem(cellsMenu, MI_Increment);
   addMenuItem(cellsMenu, MI_Dup);
   cellsMenu->addSeparator();
-  addMenuItem(cellsMenu, MI_ResetStep);
-  addMenuItem(cellsMenu, MI_IncreaseStep);
-  addMenuItem(cellsMenu, MI_DecreaseStep);
-  addMenuItem(cellsMenu, MI_Step2);
-  addMenuItem(cellsMenu, MI_Step3);
-  addMenuItem(cellsMenu, MI_Step4);
-  addMenuItem(cellsMenu, MI_Each2);
-  addMenuItem(cellsMenu, MI_Each3);
-  addMenuItem(cellsMenu, MI_Each4);
+  QMenu *reframeMenu = cellsMenu->addMenu(tr("Reframe"));
+  {
+    addMenuItem(reframeMenu, MI_Reframe1);
+    addMenuItem(reframeMenu, MI_Reframe2);
+    addMenuItem(reframeMenu, MI_Reframe3);
+    addMenuItem(reframeMenu, MI_Reframe4);
+    addMenuItem(reframeMenu, MI_ReframeWithEmptyInbetweens);
+  }
+  QMenu *stepMenu = cellsMenu->addMenu(tr("Step"));
+  {
+    addMenuItem(stepMenu, MI_IncreaseStep);
+    addMenuItem(stepMenu, MI_DecreaseStep);
+    addMenuItem(stepMenu, MI_ResetStep);
+    addMenuItem(stepMenu, MI_Step2);
+    addMenuItem(stepMenu, MI_Step3);
+    addMenuItem(stepMenu, MI_Step4);
+  }
+  QMenu *eachMenu = cellsMenu->addMenu(tr("Each"));
+  {
+    addMenuItem(eachMenu, MI_Each2);
+    addMenuItem(eachMenu, MI_Each3);
+    addMenuItem(eachMenu, MI_Each4);
+  }
   addMenuItem(cellsMenu, MI_Rollup);
   addMenuItem(cellsMenu, MI_Rolldown);
   addMenuItem(cellsMenu, MI_TimeStretch);
-  addMenuItem(cellsMenu, MI_FillEmptyCell);
+  addMenuItem(cellsMenu, MI_AutoInputCellNumber);
   cellsMenu->addSeparator();
-  addMenuItem(cellsMenu, MI_DrawingSubForward);
-  addMenuItem(cellsMenu, MI_DrawingSubBackward);
-  addMenuItem(cellsMenu, MI_DrawingSubGroupForward);
-  addMenuItem(cellsMenu, MI_DrawingSubGroupBackward);
+  QMenu *drawingSubMenu = cellsMenu->addMenu(tr("Drawing Substitution"));
+  {
+    addMenuItem(drawingSubMenu, MI_DrawingSubForward);
+    addMenuItem(drawingSubMenu, MI_DrawingSubBackward);
+    addMenuItem(drawingSubMenu, MI_DrawingSubGroupForward);
+    addMenuItem(drawingSubMenu, MI_DrawingSubGroupBackward);
+  }
   cellsMenu->addSeparator();
   addMenuItem(cellsMenu, MI_Autorenumber);
   addMenuItem(cellsMenu, MI_Duplicate);
   addMenuItem(cellsMenu, MI_MergeFrames);
   addMenuItem(cellsMenu, MI_CloneLevel);
+  cellsMenu->addSeparator();
+  addMenuItem(cellsMenu, MI_FillEmptyCell);
+
+  // Menu' PLAY
+  QMenu *playMenu = addMenu(tr("Play"), fullMenuBar);
+  addMenuItem(playMenu, MI_Play);
+  addMenuItem(playMenu, MI_Pause);
+  addMenuItem(playMenu, MI_Loop);
+  playMenu->addSeparator();
+  addMenuItem(playMenu, MI_FirstFrame);
+  addMenuItem(playMenu, MI_LastFrame);
+  addMenuItem(playMenu, MI_PrevFrame);
+  addMenuItem(playMenu, MI_NextFrame);
+  addMenuItem(playMenu, MI_PrevStep);
+  addMenuItem(playMenu, MI_NextStep);
+  playMenu->addSeparator();
+  addMenuItem(playMenu, MI_NextDrawing);
+  addMenuItem(playMenu, MI_PrevDrawing);
+  playMenu->addSeparator();
+  addMenuItem(playMenu, MI_Link);
+
+  // Menu' RENDER
+  QMenu *renderMenu = addMenu(tr("Render"), fullMenuBar);
+  addMenuItem(renderMenu, MI_PreviewSettings);
+  addMenuItem(renderMenu, MI_Preview);
+  // addMenuItem(renderMenu, MI_SavePreview);
+  addMenuItem(renderMenu, MI_SavePreviewedFrames);
+  renderMenu->addSeparator();
+  addMenuItem(renderMenu, MI_OutputSettings);
+  addMenuItem(renderMenu, MI_Render);
+  renderMenu->addSeparator();
+  addMenuItem(renderMenu, MI_FastRender);
 
   // Menu' VIEW
   QMenu *viewMenu = addMenu(tr("View"), fullMenuBar);
-
-  addMenuItem(viewMenu, MI_ViewCamera);
   addMenuItem(viewMenu, MI_ViewTable);
-  addMenuItem(viewMenu, MI_FieldGuide);
-  addMenuItem(viewMenu, MI_SafeArea);
-  addMenuItem(viewMenu, MI_ViewBBox);
+  addMenuItem(viewMenu, MI_ViewCamera);
   addMenuItem(viewMenu, MI_ViewColorcard);
-  addMenuItem(viewMenu, MI_ViewGuide);
+  addMenuItem(viewMenu, MI_ViewBBox);
+  viewMenu->addSeparator();
+  addMenuItem(viewMenu, MI_SafeArea);
+  addMenuItem(viewMenu, MI_FieldGuide);
   addMenuItem(viewMenu, MI_ViewRuler);
+  addMenuItem(viewMenu, MI_ViewGuide);
   viewMenu->addSeparator();
   addMenuItem(viewMenu, MI_TCheck);
   addMenuItem(viewMenu, MI_ICheck);
@@ -1328,54 +1376,69 @@ QMenuBar *StackedMenuBar::createFullMenuBar() {
   addMenuItem(viewMenu, MI_ResetShift);
   viewMenu->addSeparator();
   addMenuItem(viewMenu, MI_RasterizePli);
-  viewMenu->addSeparator();
-  addMenuItem(viewMenu, MI_Link);
 #ifdef LINETEST
   viewMenu->addSeparator();
   addMenuItem(viewMenu, MI_CapturePanelFieldGuide);
 #endif
 
   // Menu' WINDOWS
-  QMenu *windowsMenu = addMenu(tr("Windows"), fullMenuBar);
-  addMenuItem(windowsMenu, MI_DockingCheck);
+  QMenu *windowsMenu   = addMenu(tr("Windows"), fullMenuBar);
+  QMenu *workspaceMenu = windowsMenu->addMenu(tr("Workspace"));
+  {
+    addMenuItem(workspaceMenu, MI_DockingCheck);
+    workspaceMenu->addSeparator();
+    addMenuItem(workspaceMenu, MI_ResetRoomLayout);
+  }
+  addMenuItem(windowsMenu, MI_OpenCommandToolbar);
+  addMenuItem(windowsMenu, MI_OpenToolbar);
+  addMenuItem(windowsMenu, MI_OpenToolOptionBar);
   windowsMenu->addSeparator();
-  addMenuItem(windowsMenu, MI_OpenBatchServers);
-  addMenuItem(windowsMenu, MI_OpenCleanupSettings);
+  addMenuItem(windowsMenu, MI_OpenStyleControl);
+  addMenuItem(windowsMenu, MI_OpenPalette);
+  addMenuItem(windowsMenu, MI_OpenStudioPalette);
   addMenuItem(windowsMenu, MI_OpenColorModel);
-#ifdef LINETEST
-  addMenuItem(windowsMenu, MI_OpenExport);
-#endif
-  addMenuItem(windowsMenu, MI_OpenFileBrowser);
+  windowsMenu->addSeparator();
+  addMenuItem(windowsMenu, MI_OpenComboViewer);
+  addMenuItem(windowsMenu, MI_OpenLevelView);
   addMenuItem(windowsMenu, MI_OpenFileViewer);
+  windowsMenu->addSeparator();
+  addMenuItem(windowsMenu, MI_OpenXshView);
+  addMenuItem(windowsMenu, MI_OpenTimelineView);
   addMenuItem(windowsMenu, MI_OpenFunctionEditor);
+  addMenuItem(windowsMenu, MI_OpenSchematic);
   addMenuItem(windowsMenu, MI_OpenFilmStrip);
+  windowsMenu->addSeparator();
+  addMenuItem(windowsMenu, MI_OpenFileBrowser);
+  addMenuItem(windowsMenu, MI_OpenFileBrowser2);
+  windowsMenu->addSeparator();
+  addMenuItem(windowsMenu, MI_OpenCleanupSettings);
+  addMenuItem(windowsMenu, MI_OpenTasks);
+  addMenuItem(windowsMenu, MI_OpenBatchServers);
+  addMenuItem(windowsMenu, MI_OpenTMessage);
+  addMenuItem(windowsMenu, MI_OpenHistoryPanel);
+  addMenuItem(windowsMenu, MI_AudioRecording);
+  addMenuItem(windowsMenu, MI_StartupPopup);
 #ifdef LINETEST
+  windowsMenu->addSeparator();
+  addMenuItem(windowsMenu, MI_OpenExport);
   addMenuItem(windowsMenu, MI_OpenLineTestCapture);
   addMenuItem(windowsMenu, MI_OpenLineTestView);
 #endif
-  addMenuItem(windowsMenu, MI_OpenPalette);
-  addMenuItem(windowsMenu, MI_OpenFileBrowser2);
-  addMenuItem(windowsMenu, MI_OpenSchematic);
-  addMenuItem(windowsMenu, MI_OpenStudioPalette);
-  addMenuItem(windowsMenu, MI_OpenStyleControl);
-  addMenuItem(windowsMenu, MI_OpenTasks);
-  addMenuItem(windowsMenu, MI_OpenTMessage);
-  addMenuItem(windowsMenu, MI_OpenToolbar);
-  addMenuItem(windowsMenu, MI_OpenCommandToolbar);
-  addMenuItem(windowsMenu, MI_OpenToolOptionBar);
-  addMenuItem(windowsMenu, MI_OpenLevelView);
-  addMenuItem(windowsMenu, MI_OpenComboViewer);
-  addMenuItem(windowsMenu, MI_OpenXshView);
-  addMenuItem(windowsMenu, MI_OpenTimelineView);
-  addMenuItem(windowsMenu, MI_OpenHistoryPanel);
-  addMenuItem(windowsMenu, MI_AudioRecording);
   windowsMenu->addSeparator();
-  addMenuItem(windowsMenu, MI_ResetRoomLayout);
+  addMenuItem(windowsMenu, MI_MaximizePanel);
+  addMenuItem(windowsMenu, MI_FullScreenWindow);
 
-  //---Help Menu
+  // Menu' HELP
   QMenu *helpMenu = addMenu(tr("Help"), fullMenuBar);
-  addMenuItem(helpMenu, MI_StartupPopup);
+  addMenuItem(helpMenu, MI_OpenOnlineManual);
+  helpMenu->addSeparator();
   addMenuItem(helpMenu, MI_About);
+
+// addMenuItem(fileMenu, MI_TestAnimation);
+// fileMenu->addSeparator();
+#ifndef NDEBUG
+  addMenuItem(fileMenu, "MI_ReloadStyle");
+#endif
 
   return fullMenuBar;
 }

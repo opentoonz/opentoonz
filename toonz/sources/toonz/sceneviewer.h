@@ -22,6 +22,7 @@
 #include "pane.h"
 #include "previewer.h"
 
+#include <array>
 #include <QMatrix4x4>
 #include <QTouchDevice>
 
@@ -98,11 +99,11 @@ class SceneViewer final : public GLWidgetForHighDpi,
   bool m_isMouseEntered, m_forceGlFlush;
   bool m_isFlippedX = false, m_isFlippedY = false;
   /*!  FreezedStatus:
-*  \li NO_FREEZED freezed is not active;
-*  \li NORMAL_FREEZED freezed is active: show grab image;
-*  \li UPDATE_FREEZED freezed is active: draw last unfreezed image and grab
-* view;
-*/
+   *  \li NO_FREEZED freezed is not active;
+   *  \li NORMAL_FREEZED freezed is active: show grab image;
+   *  \li UPDATE_FREEZED freezed is active: draw last unfreezed image and grab
+   * view;
+   */
   enum FreezedStatus {
     NO_FREEZED     = 0,
     NORMAL_FREEZED = 1,
@@ -124,7 +125,7 @@ class SceneViewer final : public GLWidgetForHighDpi,
 
   // current pan/zoom matrix (two different matrices are used for editing scenes
   // and leves)
-  TAffine m_viewAff[2];
+  std::array<TAffine, 2> m_viewAff;
   int m_viewMode;
 
   TPointD m_dpiScale;
@@ -177,6 +178,10 @@ class SceneViewer final : public GLWidgetForHighDpi,
   // used for updating viewer where the animated guide appears
   // updated in drawScene() and used in GLInvalidateRect()
   TRectD m_guidedDrawingBBox;
+
+  double m_rotationAngle[2];
+
+  bool m_firstInitialized = true;
 
 public:
   enum ReferenceMode {
@@ -394,6 +399,9 @@ protected:
 public slots:
 
   void resetSceneViewer();
+  void resetZoom();
+  void resetRotation();
+  void resetPosition();
   void setActualPixelSize();
   void flipX();
   void flipY();

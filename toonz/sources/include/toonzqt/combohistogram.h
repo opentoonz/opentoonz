@@ -43,6 +43,7 @@ class QLabel;
 //-----------------------------------------------------------------------------
 
 class DVAPI ComboHistoRGBLabel final : public QWidget {
+  Q_OBJECT
   QColor m_color;
 
 public:

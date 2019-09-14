@@ -172,11 +172,11 @@ FunctionViewer::FunctionViewer(QWidget *parent, Qt::WFlags flags)
   bool ret = true;
   ret      = ret && connect(m_toolbar, SIGNAL(numericalColumnToggled()), this,
                        SLOT(toggleMode()));
-  ret = ret && connect(ftModel, SIGNAL(activeChannelsChanged()),
+  ret      = ret && connect(ftModel, SIGNAL(activeChannelsChanged()),
                        m_functionGraph, SLOT(update()));
-  ret = ret && connect(ftModel, SIGNAL(activeChannelsChanged()),
+  ret      = ret && connect(ftModel, SIGNAL(activeChannelsChanged()),
                        m_numericalColumns, SLOT(updateAll()));
-  ret = ret && connect(ftModel, SIGNAL(curveChanged(bool)), m_treeView,
+  ret      = ret && connect(ftModel, SIGNAL(curveChanged(bool)), m_treeView,
                        SLOT(update()));
   ret = ret && connect(ftModel, SIGNAL(curveChanged(bool)), m_functionGraph,
                        SLOT(update()));
@@ -582,7 +582,10 @@ void FunctionViewer::onStageObjectChanged(bool isDragging) {
   static_cast<FunctionTreeModel *>(m_treeView->model())
       ->setCurrentStageObject(obj);
 
-  if (!isDragging) m_treeView->updateAll();
+  if (!isDragging) {
+    m_treeView->updateAll();
+    m_numericalColumns->updateAll();
+  }
 
   m_functionGraph->update();
 }
@@ -592,7 +595,7 @@ void FunctionViewer::onStageObjectChanged(bool isDragging) {
 void FunctionViewer::onFxSwitched() {
   TFx *fx              = m_fxHandle->getFx();
   TZeraryColumnFx *zfx = dynamic_cast<TZeraryColumnFx *>(fx);
-  if (zfx) fx          = zfx->getZeraryFx();
+  if (zfx) fx = zfx->getZeraryFx();
   static_cast<FunctionTreeModel *>(m_treeView->model())->setCurrentFx(fx);
   m_treeView->updateAll();
   m_functionGraph->update();
@@ -712,6 +715,8 @@ bool FunctionViewer::isExpressionPageActive() {
 
 void FunctionViewer::save(QSettings &settings) const {
   settings.setValue("toggleStatus", m_toggleStatus);
+  settings.setValue("showIbtwnValuesInSheet",
+                    m_numericalColumns->isIbtwnValueVisible());
 }
 
 //----------------------------------------------------------------------------
@@ -721,4 +726,10 @@ void FunctionViewer::load(QSettings &settings) {
   if (toggleStatus.canConvert(QVariant::Int)) {
     m_toggleStatus = toggleStatus.toInt();
   }
+
+  bool ibtwnVisible = settings
+                          .value("showIbtwnValuesInSheet",
+                                 m_numericalColumns->isIbtwnValueVisible())
+                          .toBool();
+  m_numericalColumns->setIbtwnValueVisible(ibtwnVisible);
 }

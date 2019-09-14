@@ -1,0 +1,43 @@
+<html lang="ja">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+      <title>MotionBlurFx Iwa</title>
+    </head>
+<body bgcolor="#f5f5f5" text="#220011">
+<h1><img src = ".\img\fx_iwa_motionblur.png" width = 30 height = 30 >   MotionBlurFx Iwa</h1>
+
+<h4>● 概要</h4>
+モーションブラーを生成するためのエフェクトです。<br>
+「現在のフレームの前後の、シャッターを開放している時間」を指定すると、<br>
+その間のオブジェクトの軌跡に合わせてブラーをかけます。<br>
+iwa_BokehFxと同様、RGB値を露光値に変換してからブラーをかけますので、<br>
+ハイライトの部分はぼかしても明るさを損なうことがありません。
+
+<h4>● 入力ポート</h4>
+<UL>
+<LI><b>Source</b> : 入力画像を接続します。</LI>
+</UL>
+<h4>● パラメータ</h4>
+<img src = ".\img\motionblur.png">
+<UL>
+<LI><b>Reference Object, Index</b> : 動きを追うオブジェクトを指定します。<br>
+"Own Motion"に指定している場合は、入力画像のカラムの動きを追跡します。</LI>
+<LI><b>Shutter Start</b> : 現フレームのどれくらい前からシャッターを開放するかを指定します。<br>
+単位はフレームです。値が大きいほど、大きくブラーがかかります。</LI>
+<LI><b>Start Value</b> : シャッター開放時のブラーフィルタの強度を指定します。</LI>
+<LI><b>Start Curve</b> : シャッター開放時から現フレームまでのブラーのかかりかたを指定します。<br>
+デフォルト値は１で、ブラーフィルタはリニアに変化します。</LI><br>
+<LI><b>Shutter End</b> : 現フレームのどれくらい後にシャッターを閉じるかを指定します。<br>
+単位はフレームです。値が大きいほど、大きくブラーがかかります。</LI>
+<LI><b>End Value</b> : シャッター閉鎖時のブラーフィルタの強度を指定します。</LI>
+<LI><b>End Curve</b> : 現フレームからシャッター閉鎖時までのブラーのかかりかたを指定します。<br>
+デフォルト値は１で、ブラーフィルタはリニアに変化します。</LI><br>
+<LI><b>Trace Resolution</b> : シャッターの開いている間の、オブジェクトの軌跡をを追跡する細かさを指定します。<br>
+この値が1だと、曲線で移動しているオブジェクトでも、軌跡は直線になります。</LI>
+<LI><b>Hardness</b> : フィルムのガンマ値。RGB値と露光量の変換に用います。この値が大きいほど、ハイライトが強調されます。</LI>
+<LI><b>Zanzo Mode</b> : ONのとき、滑らかなブラーの代わりに、"Trace Resolution"の細かさで追跡した位置に、<br>
+飛び飛びに残像を描画します。</LI>
+</UL>
+</body>
+
+</html>

@@ -372,7 +372,7 @@ struct import_Locals {
         m_scene.getImportedLevelPath(path.absoluteResourcePath())
             .getParentDir()            // E.g. +drawings/
         + path.m_rootFp.getWideName()  // Root dir name
-        );
+    );
   }
 
   static void copy(const TFilePath &srcDir, const TFilePath &dstDir,
@@ -464,11 +464,11 @@ void import(const ToonzScene &scene, std::vector<Resource> &resources,
 
 OverwriteDialog::OverwriteDialog(QWidget *parent)
     : ValidatedChoiceDialog(parent, ValidatedChoiceDialog::APPLY_TO_ALL) {
-  setWindowTitle(tr("Warning!"));
+  setWindowTitle(QObject::tr("Warning!", "OverwriteDialog"));
 
   // Option 1: OVERWRITE
   QRadioButton *radioButton = new QRadioButton;
-  radioButton->setText(tr("Overwrite"));
+  radioButton->setText(QObject::tr("Overwrite", "OverwriteDialog"));
   radioButton->setFixedHeight(20);
   radioButton->setChecked(true);  // initial option: OVERWRITE
 
@@ -477,7 +477,7 @@ OverwriteDialog::OverwriteDialog(QWidget *parent)
 
   // Option 2: SKIP
   radioButton = new QRadioButton;
-  radioButton->setText(tr("Skip"));
+  radioButton->setText(QObject::tr("Skip", "OverwriteDialog"));
   radioButton->setFixedHeight(20);
 
   m_buttonGroup->addButton(radioButton, SKIP);
@@ -511,7 +511,9 @@ QString OverwriteDialog::acceptResolution(void *obj_, int resolution,
   if (resolution == NO_RESOLUTION) {
     // Test existence of any resource components
     if (locals::existsResource(obj.m_dstDir, obj.m_rsrc))
-      error = tr("File \"%1\" already exists.\nDo you want to overwrite it?")
+      error = QObject::tr(
+                  "File \"%1\" already exists.\nDo you want to overwrite it?",
+                  "OverwriteDialog")
                   .arg(obj.m_rsrc.m_path.m_relFp.getQString());
   }
 

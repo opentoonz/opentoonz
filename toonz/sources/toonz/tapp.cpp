@@ -267,8 +267,9 @@ int TApp::getCurrentLevelStyleIndex() const {
 
 //-----------------------------------------------------------------------------
 
-void TApp::setCurrentLevelStyleIndex(int index) {
-  m_paletteController->getCurrentLevelPalette()->setStyleIndex(index);
+void TApp::setCurrentLevelStyleIndex(int index, bool forceUpdate) {
+  m_paletteController->getCurrentLevelPalette()->setStyleIndex(index,
+                                                               forceUpdate);
 }
 
 //-----------------------------------------------------------------------------

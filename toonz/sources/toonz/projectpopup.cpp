@@ -145,7 +145,7 @@ DvDirModelNode *ProjectDirModel::getNode(const QModelIndex &index) const {
 QModelIndex ProjectDirModel::index(int row, int column,
                                    const QModelIndex &parent) const {
   if (column != 0) return QModelIndex();
-  DvDirModelNode *parentNode       = m_root;
+  DvDirModelNode *parentNode = m_root;
   if (parent.isValid()) parentNode = getNode(parent);
   if (row < 0 || row >= parentNode->getChildCount()) return QModelIndex();
   DvDirModelNode *node = parentNode->getChild(row);
@@ -321,19 +321,20 @@ ProjectPopup::ProjectPopup(bool isModal)
                              Qt::AlignRight | Qt::AlignVCenter);
       upperLayout->addWidget(ff, i + 2, 1);
     }
-    struct {
-      QString name;
-      std::string folderName;
-    } cbs[] = {{tr("Append $scenepath to +drawings"), TProject::Drawings},
-               {tr("Append $scenepath to +inputs"), TProject::Inputs},
-               {tr("Append $scenepath to +extras"), TProject::Extras}};
+    std::vector<std::tuple<QString, std::string>> cbs = {
+        std::make_tuple(tr("Append $scenepath to +drawings"),
+                        TProject::Drawings),
+        std::make_tuple(tr("Append $scenepath to +inputs"), TProject::Inputs),
+        std::make_tuple(tr("Append $scenepath to +extras"), TProject::Extras)};
     int currentRow = upperLayout->rowCount();
 
-    for (i = 0; i < tArrayCount(cbs); i++) {
-      CheckBox *cb = new CheckBox(cbs[i].name);
+    for (int i = 0; i < cbs.size(); ++i) {
+      auto const &name       = std::get<0>(cbs[i]);
+      auto const &folderName = std::get<1>(cbs[i]);
+      CheckBox *cb           = new CheckBox(name);
       cb->setMaximumHeight(WidgetHeight);
       upperLayout->addWidget(cb, currentRow + i, 1);
-      m_useScenePathCbs.append(qMakePair(cbs[i].folderName, cb));
+      m_useScenePathCbs.append(qMakePair(folderName, cb));
     }
     m_topLayout->addLayout(upperLayout);
   }

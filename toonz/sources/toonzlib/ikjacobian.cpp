@@ -167,7 +167,7 @@ void MatrixRmn::SetSequence(const VectorRn &d, long startRow, long startCol,
 }
 
 // The matrix A is loaded, in into "this" matrix, based at (0,0).
-//  The size of "this" matrix must be large enough to accomodate A.
+//  The size of "this" matrix must be large enough to accommodate A.
 //	The rest of "this" matrix is left unchanged.  It is not filled with
 // zeroes!
 
@@ -188,7 +188,7 @@ void MatrixRmn::LoadAsSubmatrix(const MatrixRmn &A) {
 
 // The matrix A is loaded, in transposed order into "this" matrix, based at
 // (0,0).
-//  The size of "this" matrix must be large enough to accomodate A.
+//  The size of "this" matrix must be large enough to accommodate A.
 //	The rest of "this" matrix is left unchanged.  It is not filled with
 // zeroes!
 void MatrixRmn::LoadAsSubmatrixTranspose(const MatrixRmn &A) {
@@ -412,7 +412,7 @@ void MatrixRmn::Solve(const VectorRn &b, VectorRn *xVec) const {
 // The "NoFree" version operates on the assumption that no free variable will be
 // found.
 // Algorithm uses row operations and row pivoting (only).
-// Augmented matrix is correctly accomodated.  Only the first square part
+// Augmented matrix is correctly accommodated.  Only the first square part
 // participates
 //		in the main work of row operations.
 void MatrixRmn::ConvertToRefNoFree() {
@@ -1546,7 +1546,7 @@ void Jacobian::CalcDeltaThetasSDLS() {
 
     double gamma = MaxAngleSDLS;
     if (N < M) {
-      gamma *= N / M;  // Scale back maximum permissable joint angle
+      gamma *= N / M;  // Scale back maximum permissible joint angle
     }
 
     // Calculate the dTheta from pure pseudoinverse considerations

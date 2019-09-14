@@ -27,6 +27,7 @@
 #include "toonz/tonionskinmaskhandle.h"
 #include "toutputproperties.h"
 #include "toonz/preferences.h"
+#include "toonz/tproject.h"
 
 // TnzQt includes
 #include "toonzqt/menubarcommand.h"
@@ -521,10 +522,12 @@ void SceneViewerPanel::changeWindowTitle() {
   int frame = app->getCurrentFrame()->getFrame();
   QString name;
   if (app->getCurrentFrame()->isEditingScene()) {
-    QString sceneName = QString::fromStdWString(scene->getSceneName());
+    TProject *project   = scene->getProject();
+    QString projectName = QString::fromStdString(project->getName().getName());
+    QString sceneName   = QString::fromStdWString(scene->getSceneName());
     if (sceneName.isEmpty()) sceneName = tr("Untitled");
     if (app->getCurrentScene()->getDirtyFlag()) sceneName += QString("*");
-    name = tr("Scene: ") + sceneName;
+    name = tr("Scene: ") + sceneName + tr("   ::   Project: ") + projectName;
     if (frame >= 0)
       name =
           name + tr("   ::   Frame: ") + tr(std::to_string(frame + 1).c_str());

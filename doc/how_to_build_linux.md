@@ -18,7 +18,7 @@ Building OpenToonz from source requires the following dependencies:
 ### Installing Dependencies on Debian / Ubuntu
 
 ```
-$ sudo apt-get install build-essential git cmake pkg-config libboost-all-dev qt5-default qtbase5-dev libqt5svg5-dev qtscript5-dev qttools5-dev qttools5-dev-tools libqt5opengl5-dev qtmultimedia5-dev libsuperlu-dev liblz4-dev libusb-1.0-0-dev liblzo2-dev libpng-dev libjpeg-dev libglew-dev freeglut3-dev libsdl2-dev libfreetype6-dev libjson-c-dev
+$ sudo apt-get install build-essential git cmake pkg-config libboost-all-dev qt5-default qtbase5-dev libqt5svg5-dev qtscript5-dev qttools5-dev qttools5-dev-tools libqt5opengl5-dev qtmultimedia5-dev libsuperlu-dev liblz4-dev libusb-1.0-0-dev liblzo2-dev libpng-dev libjpeg-dev libglew-dev freeglut3-dev libsdl2-dev libfreetype6-dev libjson-c-dev qtwayland5
 ```
 
 For newest versions of OS you may install libmypaint from repository and don't need to build it from source:
@@ -171,7 +171,8 @@ If you need to debug the application, you should be able to use `cmake -DCMAKE_B
 You can now run the application:
 
 ```
-$ LD_LIBRARY_PATH=./lib/opentoonz:$LD_LIBRARY_PATH ./bin/OpenToonz
+$ LD_LIBRARY_PATH=./lib/opentoonz:$LD_LIBRARY_PATH
+$ ./bin/OpenToonz
 ```
 
 ### Performing a System Installation

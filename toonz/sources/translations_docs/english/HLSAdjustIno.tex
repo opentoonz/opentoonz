@@ -1,0 +1,98 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[a4paper, total={180mm, 272mm}]{geometry}
+
+\usepackage{fontspec}
+\setmainfont[Path=fonts/, Extension=.ttf]{ipaexm}
+
+\setlength\parindent{3.5em}
+\setlength\parskip{0em}
+\renewcommand{\baselinestretch}{1.247}
+
+\begin{document}
+
+\thispagestyle{empty}
+
+\Large
+\noindent \\
+HLS Adjust Ino\medskip
+\par
+\normalsize
+Hue (H), Lightness (L), Saturation (S), is multiplied by the Scale, then Shifted.\\
+\\
+-{-}- \ Inputs \ -{-}-\\
+Source\par
+Connect the image to process.\\
+Reference\par
+Connect the reference image to put the strength of the effect into each Pixel.\\
+\\
+-{-}- \ Settings \ -{-}-\\
+Pivot\par
+\noindent \ \ \, Specify the central value of where to apply the Scale.\\
+\par
+\noindent \ \ \, Hue\par
+Specify the central value of the Scale for the color (Hue).\par
+Minimum value is 0.0, maximum value is 360.0.\par
+The default value is 0.0.\par
+\noindent \ \ \, Lightness\par
+Specify the central value of the Scale for the brightness (Lightness).\par
+Minimum value is 0.0, maximum value is 1.0.\par
+The default value is 0.0.\par
+\noindent \ \ \, Saturation\par
+Specify the central value of the Scale for the chroma (Saturation).\par
+Minimum value is 0.0, maximum value is 1.0.\par
+The default value is 0.0.\\
+\\
+Scale\par
+\noindent \ \ \, Multiplies the Scale to enlarge or reduce the range of HLS around the Pivot value.\par
+\noindent \ \ \, Hue value will be applied recursively around the top of the circle,\par
+\noindent \ \ \, Lightness, Saturation value is greater than or equal to 0, and can go up to 1.\\
+\par
+\noindent \ \ \, Hue\par
+Multiplied by the Scale for the color (Hue).\par
+The minimum value is 0.0.\par
+The default value is 1.0.\par
+\noindent \ \ \, Lightness\par
+Multiplied by the Scale for the brightness (Lightness).\par
+The minimum value is 0.0.\par
+The default value is 1.0.\par
+\noindent \ \ \, Saturation\par
+Multiplied by the Scale for the chroma (Saturation).
+
+\newpage
+
+\thispagestyle{empty}
+
+\ \vspace{-0.2em}
+\par
+The minimum value is 0.0.\par
+The default value is 1.0.\\
+\\
+Shift\par
+\noindent \ \ \, This will Shift the values of the HLS.\par
+\noindent \ \ \, Hue value will be multiplied recursively around the top of the circle,\par
+\noindent \ \ \, Lightness, Saturation value is greater than or equal to 0, and can go up to 1.\\
+\par
+\noindent \ \ \, Hue\par
+Shift for the color (Hue).\par
+The default value is 0.0.\par
+\noindent \ \ \, Lightness\par
+Shift for the brightness (Lightness).\par
+The default value is 0.0.\par
+\noindent \ \ \, Saturation\par
+Shift for the chroma (Saturation).\par
+The default value is 0.0.\\
+\\
+Premultiplied\par
+When ON, RGB is already set to Premultiply\par
+(The value of Alpha channel is multiplied in advance RGB channels)\par
+and processes as an image.\par
+The default setting is ON.\\
+\\
+Reference\par
+Choose how Reference image values put the strength of the effect into each Pixel.\par
+An image is connected to the \textquotedbl Reference\textquotedbl \ of the input,\par
+Choose from Red/Green/Blue/Alpha/Luminance/Nothing.\par
+Choose Nothing when you do not want this effect, it will turn off the connection.\par
+The default setting is Red.
+
+\end{document}

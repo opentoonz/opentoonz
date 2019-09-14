@@ -53,6 +53,7 @@
 #include "toonzqt/tselectionhandle.h"
 #include "toonzqt/tmessageviewer.h"
 #include "toonzqt/scriptconsole.h"
+#include "toonzqt/fxsettings.h"
 
 // TnzLib includes
 #include "toonz/palettecontroller.h"
@@ -1358,3 +1359,52 @@ public:
 OpenFloatingPanel openHistoryPanelCommand(MI_OpenHistoryPanel, "HistoryPanel",
                                           QObject::tr("History"));
 //=============================================================================
+
+//=============================================================================
+// FxSettings
+//-----------------------------------------------------------------------------
+
+FxSettingsPanel::FxSettingsPanel(QWidget *parent) : TPanel(parent) {
+  TApp *app            = TApp::instance();
+  TSceneHandle *hScene = app->getCurrentScene();
+  TPixel32 col1, col2;
+  Preferences::instance()->getChessboardColors(col1, col2);
+
+  m_fxSettings = new FxSettings(this, col1, col2);
+  m_fxSettings->setSceneHandle(hScene);
+  m_fxSettings->setFxHandle(app->getCurrentFx());
+  m_fxSettings->setFrameHandle(app->getCurrentFrame());
+  m_fxSettings->setXsheetHandle(app->getCurrentXsheet());
+  m_fxSettings->setLevelHandle(app->getCurrentLevel());
+  m_fxSettings->setObjectHandle(app->getCurrentObject());
+
+  m_fxSettings->setCurrentFx();
+
+  setWidget(m_fxSettings);
+}
+
+//=============================================================================
+// FxSettingsFactory
+//-----------------------------------------------------------------------------
+
+class FxSettingsFactory final : public TPanelFactory {
+public:
+  FxSettingsFactory() : TPanelFactory("FxSettings") {}
+
+  TPanel *createPanel(QWidget *parent) override {
+    FxSettingsPanel *panel = new FxSettingsPanel(parent);
+    panel->move(qApp->desktop()->screenGeometry(panel).center());
+    panel->setObjectName(getPanelType());
+    panel->setWindowTitle(QObject::tr("Fx Settings"));
+    panel->setMinimumSize(390, 85);
+    panel->allowMultipleInstances(false);
+    return panel;
+  }
+
+  void initialize(TPanel *panel) override { assert(0); }
+
+} FxSettingsFactory;
+
+//=============================================================================
+OpenFloatingPanel openFxSettingsCommand(MI_FxParamEditor, "FxSettings",
+                                        QObject::tr("Fx Settings"));

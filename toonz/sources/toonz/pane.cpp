@@ -6,6 +6,7 @@
 #include "tapp.h"
 #include "mainwindow.h"
 #include "tenv.h"
+#include "saveloadqsettings.h"
 
 #include "toonzqt/gutil.h"
 
@@ -29,6 +30,7 @@
 #include <QFile>
 #include <qdrawutil.h>
 #include <assert.h>
+#include <QDesktopWidget>
 
 extern TEnv::StringVar EnvSafeAreaName;
 
@@ -60,7 +62,22 @@ TPanel::TPanel(QWidget *parent, Qt::WindowFlags flags,
 
 //-----------------------------------------------------------------------------
 
-TPanel::~TPanel() {}
+TPanel::~TPanel() {
+  // On quitting, save the floating panel's geomtry and state in order to
+  // restore them when opening the floating panel next time
+  if (isFloating()) {
+    TFilePath savePath =
+        ToonzFolder::getMyModuleDir() + TFilePath("popups.ini");
+    QSettings settings(QString::fromStdWString(savePath.getWideString()),
+                       QSettings::IniFormat);
+    settings.beginGroup("Panels");
+    settings.beginGroup(QString::fromStdString(m_panelType));
+    settings.setValue("geometry", geometry());
+    if (SaveLoadQSettings *persistent =
+            dynamic_cast<SaveLoadQSettings *>(widget()))
+      persistent->save(settings);
+  }
+}
 
 //-----------------------------------------------------------------------------
 
@@ -104,7 +121,7 @@ void TPanel::onCloseButtonPressed() {
 
 //-----------------------------------------------------------------------------
 /*! activate the panel and set focus specified widget when mouse enters
-*/
+ */
 void TPanel::enterEvent(QEvent *event) {
   // Only when Toonz application is active
   if (qApp->activeWindow()) {
@@ -120,8 +137,34 @@ void TPanel::enterEvent(QEvent *event) {
 
 //-----------------------------------------------------------------------------
 /*! clear focus when mouse leaves
-*/
+ */
 void TPanel::leaveEvent(QEvent *event) { widgetClearFocusOnLeave(); }
+
+//-----------------------------------------------------------------------------
+/*! load and restore previous geometry and state of the floating panel.
+    called from the function OpenFloatingPanel::getOrOpenFloatingPanel()
+    in floatingpanelcommand.cpp
+*/
+void TPanel::restoreFloatingPanelState() {
+  TFilePath savePath = ToonzFolder::getMyModuleDir() + TFilePath("popups.ini");
+  QSettings settings(QString::fromStdWString(savePath.getWideString()),
+                     QSettings::IniFormat);
+  settings.beginGroup("Panels");
+
+  if (!settings.childGroups().contains(QString::fromStdString(m_panelType)))
+    return;
+
+  settings.beginGroup(QString::fromStdString(m_panelType));
+
+  QRect geom = settings.value("geometry", saveGeometry()).toRect();
+  // check if it can be visible in the current screen
+  if (!(geom & QApplication::desktop()->availableGeometry(this)).isEmpty())
+    setGeometry(geom);
+  // load optional settings
+  if (SaveLoadQSettings *persistent =
+          dynamic_cast<SaveLoadQSettings *>(widget()))
+    persistent->load(settings);
+}
 
 //=============================================================================
 // TPanelTitleBarButton
@@ -181,9 +224,10 @@ void TPanelTitleBarButton::setPressed(bool pressed) {
 
 void TPanelTitleBarButton::paintEvent(QPaintEvent *event) {
   QPainter painter(this);
-  painter.drawPixmap(
-      0, 0, m_pressed ? m_pressedPixmap : m_rollover ? m_rolloverPixmap
-                                                     : m_standardPixmap);
+  painter.drawPixmap(0, 0,
+                     m_pressed
+                         ? m_pressedPixmap
+                         : m_rollover ? m_rolloverPixmap : m_standardPixmap);
   painter.end();
 }
 

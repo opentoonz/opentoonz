@@ -121,7 +121,8 @@ SVNRevertDialog::SVNRevertDialog(QWidget *parent, const QString &workingDir,
 
 void SVNRevertDialog::onStatusRetrieved(const QString &xmlResponse) {
   SVNStatusReader sr(xmlResponse);
-  m_status = sr.getStatus();
+  m_status   = sr.getStatus();
+  int height = 50;
 
   checkFiles();
 
@@ -140,6 +141,10 @@ void SVNRevertDialog::onStatusRetrieved(const QString &xmlResponse) {
     m_textLabel->setText(msg);
     switchToCloseButton();
   } else {
+    if (m_treeWidget->isVisible()) height += (m_filesToRevert.size() * 50);
+
+    setMinimumSize(300, min(height, 350));
+
     QString msg = QString(tr("%1 items to revert."))
                       .arg(m_filesToRevert.size() == 1
                                ? 1

@@ -109,11 +109,11 @@
     <name>ApplyMatchlinesCommand</name>
     <message>
         <source>It is not possible to apply the match lines because no column was selected.</source>
-        <translation>Il n&apos;est pas possible d&apos;appliquer les lignes de correspondance, car aucune colonne a été sélectionné.</translation>
+        <translation type="vanished">Il n&apos;est pas possible d&apos;appliquer les lignes de correspondance, car aucune colonne a été sélectionné.</translation>
     </message>
     <message>
         <source>It is not possible to apply the match lines because two columns have to be selected.</source>
-        <translation>Il n&apos;est pas possible d&apos;appliquer les lignes de match parce que les deux colonnes doivent être sélectionnés.</translation>
+        <translation type="vanished">Il n&apos;est pas possible d&apos;appliquer les lignes de match parce que les deux colonnes doivent être sélectionnés.</translation>
     </message>
 </context>
 <context>
@@ -1054,11 +1054,11 @@ Que voulez-vous faire?</translation>
     <name>CloneLevelUndo::LevelNamePopup</name>
     <message>
         <source>Clone Level</source>
-        <translation>Cloner Niveau</translation>
+        <translation type="vanished">Cloner Niveau</translation>
     </message>
     <message>
         <source>Level Name:</source>
-        <translation>Nom du Niveau:</translation>
+        <translation type="vanished">Nom du Niveau:</translation>
     </message>
 </context>
 <context>
@@ -1233,6 +1233,10 @@ Que voulez-vous faire?</translation>
     </message>
     <message>
         <source> (Flipped)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>   ::   Project: </source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1848,11 +1852,11 @@ contain the dpi information, then the current camera dpi will be used.
     <name>ExportCurvePopup</name>
     <message>
         <source>Export Curve</source>
-        <translation>Exporter la Courbe</translation>
+        <translation type="vanished">Exporter la Courbe</translation>
     </message>
     <message>
         <source>Export</source>
-        <translation>Exporter</translation>
+        <translation type="vanished">Exporter</translation>
     </message>
 </context>
 <context>
@@ -2249,26 +2253,26 @@ contain the dpi information, then the current camera dpi will be used.
     <name>FileData</name>
     <message>
         <source>It is not possible to find the %1 level.</source>
-        <translation>Il n&apos;est pas possible de trouver le niveau %1.</translation>
+        <translation type="vanished">Il n&apos;est pas possible de trouver le niveau %1.</translation>
     </message>
     <message>
         <source>There was an error copying %1</source>
-        <translation>Il y avait une erreur de copie de %1</translation>
+        <translation type="vanished">Il y avait une erreur de copie de %1</translation>
     </message>
 </context>
 <context>
     <name>FileSelection</name>
     <message>
         <source>Abort</source>
-        <translation>Avorter</translation>
+        <translation type="vanished">Avorter</translation>
     </message>
     <message>
         <source>Collecting assets...</source>
-        <translation>Recueil des éléments en cours.</translation>
+        <translation type="vanished">Recueil des éléments en cours.</translation>
     </message>
     <message>
         <source>Importing scenes...</source>
-        <translation>Importation des scenes en cours.</translation>
+        <translation type="vanished">Importation des scenes en cours.</translation>
     </message>
 </context>
 <context>
@@ -3161,6 +3165,10 @@ Please use the frame numbers for reference.</source>
         <source>Invalid data file.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Drawing: </source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>LoadBoardPresetFilePopup</name>
@@ -3192,11 +3200,11 @@ Please use the frame numbers for reference.</source>
     <name>LoadCurvePopup</name>
     <message>
         <source>Load Curve</source>
-        <translation>Charger une Courbe</translation>
+        <translation type="vanished">Charger une Courbe</translation>
     </message>
     <message>
         <source>Load</source>
-        <translation>Charger</translation>
+        <translation type="vanished">Charger</translation>
     </message>
 </context>
 <context>
@@ -3339,15 +3347,15 @@ Please use the frame numbers for reference.</source>
     <name>LoadSettingsPopup</name>
     <message>
         <source>Load Cleanup Settings</source>
-        <translation>Charger les Paramètres de Nettoyage</translation>
+        <translation type="vanished">Charger les Paramètres de Nettoyage</translation>
     </message>
     <message>
         <source>Load</source>
-        <translation>Charger</translation>
+        <translation type="vanished">Charger</translation>
     </message>
     <message>
         <source>%1 does not exist.</source>
-        <translation>%1 n&apos;existe pas.</translation>
+        <translation type="vanished">%1 n&apos;existe pas.</translation>
     </message>
 </context>
 <context>
@@ -3701,7 +3709,7 @@ Please use the frame numbers for reference.</source>
     </message>
     <message>
         <source>&amp;Send Back</source>
-        <translation>&amp;Arrière-plan</translation>
+        <translation type="vanished">&amp;Arrière-plan</translation>
     </message>
     <message>
         <source>&amp;Send Backward</source>
@@ -5375,6 +5383,30 @@ Please use the frame numbers for reference.</source>
         <source>Flip Viewer Horizontally</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>&amp;Send to Back</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reset Zoom</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reset Rotation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reset Position</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Brush Tool - Eraser (Raster option)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Brush Tool - Lock Alpha</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MatchlinesDialog</name>
@@ -5502,15 +5534,15 @@ N.B. Duplicated commands will be ignored. Only the last one will appear in the m
     <name>MergeCmappedCommand</name>
     <message>
         <source>It is not possible to merge tlv columns because no column was selected.</source>
-        <translation>Il n&apos;est pas possible de fusionner les colonnes tlv car aucune colonne a été sélectionné.</translation>
+        <translation type="vanished">Il n&apos;est pas possible de fusionner les colonnes tlv car aucune colonne a été sélectionné.</translation>
     </message>
     <message>
         <source>It is not possible to merge tlv columns because at least two columns have to be selected.</source>
-        <translation>Il n&apos;est pas possible de fusionner les colonnes tlv parce qu&apos;au moins deux colonnes doivent être sélectionnés.</translation>
+        <translation type="vanished">Il n&apos;est pas possible de fusionner les colonnes tlv parce qu&apos;au moins deux colonnes doivent être sélectionnés.</translation>
     </message>
     <message>
         <source>Merging Tlv Levels...</source>
-        <translation>Fusion des niveaux TLV  en cours...</translation>
+        <translation type="vanished">Fusion des niveaux TLV  en cours...</translation>
     </message>
 </context>
 <context>
@@ -5539,16 +5571,20 @@ N.B. Duplicated commands will be ignored. Only the last one will appear in the m
         <source>Apply</source>
         <translation>Appliquer</translation>
     </message>
+    <message>
+        <source>Level %1 already exists! Are you sure you want to overwrite it?</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MergeColumnsCommand</name>
     <message>
         <source>It is not possible to execute the merge column command because no column was selected.</source>
-        <translation>Il n&apos;est pas possible d&apos;exécuter le commande de fusion de niveaux parce que pas de colonnes ont été sélectionné.</translation>
+        <translation type="vanished">Il n&apos;est pas possible d&apos;exécuter le commande de fusion de niveaux parce que pas de colonnes ont été sélectionné.</translation>
     </message>
     <message>
         <source>It is not possible to execute the merge column command  because only one columns is  selected.</source>
-        <translation>Il n&apos;est pas possible d&apos;exécuter le commande de fusion de niveaux parce que seulement une colonnes a été sélectionné.</translation>
+        <translation type="vanished">Il n&apos;est pas possible d&apos;exécuter le commande de fusion de niveaux parce que seulement une colonnes a été sélectionné.</translation>
     </message>
 </context>
 <context>
@@ -5632,7 +5668,7 @@ Que voulez-vous faire?</translation>
     </message>
 </context>
 <context>
-    <name>MyViewFinder</name>
+    <name>MyVideoWidget</name>
     <message>
         <source>Camera is not available</source>
         <translation type="unfinished"></translation>
@@ -6024,16 +6060,16 @@ Que voulez-vous faire?
     </message>
     <message>
         <source>Overwrite</source>
-        <translation>Remplacer</translation>
+        <translation type="vanished">Remplacer</translation>
     </message>
     <message>
         <source>Skip</source>
-        <translation>Sauter</translation>
+        <translation type="vanished">Sauter</translation>
     </message>
     <message>
         <source>File &quot;%1&quot; already exists.
 Do you want to overwrite it?</source>
-        <translation>Le fichier &quot;%1&quot; existe déjà.
+        <translation type="vanished">Le fichier &quot;%1&quot; existe déjà.
 Que voulez-vous faire?</translation>
     </message>
     <message>
@@ -6344,6 +6380,10 @@ WARNING : Image size mismatch. The size of level with the same name is is %1 x %
     <message>
         <source>
 WARNING : Image size mismatch. The size of level with the same path is %1 x %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Subcamera</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7490,13 +7530,13 @@ in non alpha-enabled image format.</source>
     <name>Previewer</name>
     <message>
         <source>The file name cannot be empty or contain any of the following characters:(new line)  \ / : * ? &quot;  |</source>
-        <translation>Le nom du fichier ne peut pas être vide ou contenir aucun des caractères suivants:
+        <translation type="vanished">Le nom du fichier ne peut pas être vide ou contenir aucun des caractères suivants:
  \ /: *? &quot;|</translation>
     </message>
     <message>
         <source>File %1 already exists.
 Do you want to overwrite it?</source>
-        <translation>Le fichier %1 existe déjà.
+        <translation type="vanished">Le fichier %1 existe déjà.
 Voulez-vous le remplacer?</translation>
     </message>
 </context>
@@ -7659,6 +7699,38 @@ Voulez-vous le remplacer?</translation>
     <message>
         <source>Level Name:</source>
         <translation type="unfinished">Nom du Niveau:</translation>
+    </message>
+    <message>
+        <source>Single Image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Frames</source>
+        <translation type="unfinished">Images</translation>
+    </message>
+    <message>
+        <source>Columns</source>
+        <translation type="unfinished">Colonnes</translation>
+    </message>
+    <message>
+        <source>Flatten visible document layers into a single image. Layer styles are maintained.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Load document layers as frames into a single xsheet column.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Load document layers as xhseet columns.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished">OK</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Annuler</translation>
     </message>
 </context>
 <context>
@@ -8596,11 +8668,11 @@ Voulez-vous l&apos;écraser?</translation>
     </message>
     <message>
         <source>Level </source>
-        <translation>Niveau</translation>
+        <translation type="vanished">Niveau</translation>
     </message>
     <message>
         <source> already exists! Are you sure you want to overwrite it?</source>
-        <translation>existe déjà! Êtes-vous sûr de vouloir l&apos;écraser?</translation>
+        <translation type="vanished">existe déjà! Êtes-vous sûr de vouloir l&apos;écraser?</translation>
     </message>
     <message>
         <source>It is not possible to merge tlv columns containing more than one level</source>
@@ -9363,6 +9435,240 @@ to use the duplicate command in the xsheet / timeline.</source>
         <source>Clear All Relative Onion Skin Markers</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Always Overwrite in This Scene</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>    + %1 more level(s) 
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fx Settings</source>
+        <translation type="unfinished">Paramètres de l&apos;Effet Spécial</translation>
+    </message>
+    <message>
+        <source>Save Curve</source>
+        <translation type="unfinished">Enregistrer la Courbe</translation>
+    </message>
+    <message>
+        <source>Load Curve</source>
+        <translation type="unfinished">Charger une Courbe</translation>
+    </message>
+    <message>
+        <source>Export Curve</source>
+        <translation type="unfinished">Exporter la Courbe</translation>
+    </message>
+    <message>
+        <source>Rendering frame %1 / %2</source>
+        <comment>RenderListener</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Precomputing %1 Frames</source>
+        <comment>RenderListener</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> of %1</source>
+        <comment>RenderListener</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Finalizing render, please wait.</source>
+        <comment>RenderListener</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Aborting render...</source>
+        <comment>RenderListener</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Building Schematic...</source>
+        <comment>RenderCommand</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>column </source>
+        <comment>MultimediaProgressBar label (mode name)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>layer </source>
+        <comment>MultimediaProgressBar label (mode name)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rendering %1%2, frame %3 / %4</source>
+        <comment>MultimediaProgressBar label</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rendering %1 frames of %2</source>
+        <comment>MultimediaProgressBar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 of %2</source>
+        <comment>MultimediaProgressBar - [totalframe] of [path]</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Aborting render...</source>
+        <comment>MultimediaProgressBar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>It is not possible to write the output:  the file</source>
+        <comment>RenderCommand</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>s are read only.</source>
+        <comment>RenderCommand</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> is read only.</source>
+        <comment>RenderCommand</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save Cleanup Settings</source>
+        <translation type="unfinished">Enregistrer les Paramètres de Nettoyage</translation>
+    </message>
+    <message>
+        <source>Load Cleanup Settings</source>
+        <translation type="unfinished">Charger les Paramètres de Nettoyage</translation>
+    </message>
+    <message>
+        <source>It is not possible to find the %1 level.</source>
+        <comment>FileData</comment>
+        <translation type="unfinished">Il n&apos;est pas possible de trouver le niveau %1.</translation>
+    </message>
+    <message>
+        <source>There was an error copying %1</source>
+        <comment>FileData</comment>
+        <translation type="unfinished">Il y avait une erreur de copie de %1</translation>
+    </message>
+    <message>
+        <source>Clone Level</source>
+        <comment>CloneLevelUndo::LevelNamePopup</comment>
+        <translation type="unfinished">Cloner Niveau</translation>
+    </message>
+    <message>
+        <source>Level Name:</source>
+        <comment>CloneLevelUndo::LevelNamePopup</comment>
+        <translation type="unfinished">Nom du Niveau:</translation>
+    </message>
+    <message>
+        <source>Collecting assets...</source>
+        <translation type="unfinished">Recueil des éléments en cours.</translation>
+    </message>
+    <message>
+        <source>Abort</source>
+        <translation type="unfinished">Avorter</translation>
+    </message>
+    <message>
+        <source>Importing scenes...</source>
+        <translation type="unfinished">Importation des scenes en cours.</translation>
+    </message>
+    <message>
+        <source>It is not possible to execute the merge column command because no column was selected.</source>
+        <translation type="unfinished">Il n&apos;est pas possible d&apos;exécuter le commande de fusion de niveaux parce que pas de colonnes ont été sélectionné.</translation>
+    </message>
+    <message>
+        <source>It is not possible to execute the merge column command because only one columns is selected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>It is not possible to apply the match lines because no column was selected.</source>
+        <translation type="unfinished">Il n&apos;est pas possible d&apos;appliquer les lignes de correspondance, car aucune colonne a été sélectionné.</translation>
+    </message>
+    <message>
+        <source>It is not possible to apply the match lines because two columns have to be selected.</source>
+        <translation type="unfinished">Il n&apos;est pas possible d&apos;appliquer les lignes de match parce que les deux colonnes doivent être sélectionnés.</translation>
+    </message>
+    <message>
+        <source>It is not possible to merge tlv columns because no column was selected.</source>
+        <translation type="unfinished">Il n&apos;est pas possible de fusionner les colonnes tlv car aucune colonne a été sélectionné.</translation>
+    </message>
+    <message>
+        <source>It is not possible to merge tlv columns because at least two columns have to be selected.</source>
+        <translation type="unfinished">Il n&apos;est pas possible de fusionner les colonnes tlv parce qu&apos;au moins deux colonnes doivent être sélectionnés.</translation>
+    </message>
+    <message>
+        <source>Merging Tlv Levels...</source>
+        <translation type="unfinished">Fusion des niveaux TLV  en cours...</translation>
+    </message>
+    <message>
+        <source>Save Previewed Images</source>
+        <translation type="unfinished">Enregistrer les Images de Preview</translation>
+    </message>
+    <message>
+        <source>The file name cannot be empty or contain any of the following characters:(new line)  \ / : * ? &quot;  |</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unsopporter raster format, cannot save</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot create %1 : %2</source>
+        <comment>Previewer warning %1:path %2:message</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot create %1</source>
+        <comment>Previewer warning %1:path</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Saved %1 frames out of %2 in %3</source>
+        <comment>Previewer %1:savedframes %2:framecount %3:filepath</comment>
+        <translation type="unfinished">Enregistré %1 images sur %2 dans %3</translation>
+    </message>
+    <message>
+        <source>Canceled! </source>
+        <comment>Previewer</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No frame to save!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Already saving!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning!</source>
+        <comment>OverwriteDialog</comment>
+        <translation type="unfinished">Alerte!</translation>
+    </message>
+    <message>
+        <source>Overwrite</source>
+        <comment>OverwriteDialog</comment>
+        <translation type="unfinished">Remplacer</translation>
+    </message>
+    <message>
+        <source>Skip</source>
+        <comment>OverwriteDialog</comment>
+        <translation type="unfinished">Sauter</translation>
+    </message>
+    <message>
+        <source>File &quot;%1&quot; already exists.
+Do you want to overwrite it?</source>
+        <comment>OverwriteDialog</comment>
+        <translation type="unfinished">Le fichier &quot;%1&quot; existe déjà.
+Que voulez-vous faire?</translation>
+    </message>
+    <message>
+        <source>%1 does not exist.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ReframePopup</name>
@@ -9464,13 +9770,6 @@ Les fichiers audio ne seront pas inclus dans le clip rendu.</translation>
                            The output result may differ from what you expect. What do you want to do?</source>
         <translation>La scène %1  a une résolution différente de la scène %2.
 	Le résultat de sortie peut différer de ce que vous attendez. Que voulez-vous faire?</translation>
-    </message>
-</context>
-<context>
-    <name>RenderListener</name>
-    <message>
-        <source>Finalizing render, please wait.</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -10360,11 +10659,11 @@ S&apos;il vous plaît commettre ou annuler les modifications avant.</translation
     <name>SaveCurvePopup</name>
     <message>
         <source>Save Curve</source>
-        <translation>Enregistrer la Courbe</translation>
+        <translation type="vanished">Enregistrer la Courbe</translation>
     </message>
     <message>
         <source>Save</source>
-        <translation>Enregistrer</translation>
+        <translation type="vanished">Enregistrer</translation>
     </message>
 </context>
 <context>
@@ -10439,11 +10738,11 @@ S&apos;il vous plaît commettre ou annuler les modifications avant.</translation
     <name>SavePreviewedPopup</name>
     <message>
         <source>Save Previewed Images</source>
-        <translation>Enregistrer les Images de Preview</translation>
+        <translation type="vanished">Enregistrer les Images de Preview</translation>
     </message>
     <message>
         <source>Save</source>
-        <translation>Enregistrer</translation>
+        <translation type="vanished">Enregistrer</translation>
     </message>
 </context>
 <context>
@@ -10461,11 +10760,11 @@ S&apos;il vous plaît commettre ou annuler les modifications avant.</translation
     <name>SaveSettingsPopup</name>
     <message>
         <source>Save Cleanup Settings</source>
-        <translation>Enregistrer les Paramètres de Nettoyage</translation>
+        <translation type="vanished">Enregistrer les Paramètres de Nettoyage</translation>
     </message>
     <message>
         <source>Save</source>
-        <translation>Enregistrer</translation>
+        <translation type="vanished">Enregistrer</translation>
     </message>
 </context>
 <context>
@@ -10686,6 +10985,14 @@ S&apos;il vous plaît commettre ou annuler les modifications avant.</translation
         <source>Select %1</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Flip View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reset View</source>
+        <translation type="unfinished">Réinitialiser l&apos;Affichage</translation>
+    </message>
 </context>
 <context>
     <name>SceneViewerPanel</name>
@@ -10747,6 +11054,10 @@ S&apos;il vous plaît commettre ou annuler les modifications avant.</translation
     </message>
     <message>
         <source> (Flipped)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>   ::   Project: </source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -11249,15 +11560,7 @@ Attribuer à  &apos;3%&apos;?</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Choose Project</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Create a New Scene</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Open Scene</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -11399,6 +11702,18 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>The height must be greater than zero.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current Project</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recent Scenes [Project]</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The selected scene project &apos;%1&apos; is not in the Current Project list and may not open automatically.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -12429,6 +12744,14 @@ Hold F3 Key on the Viewer to Show This Frame Only</source>
     </message>
     <message>
         <source> columns</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>   ::   Project: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> Frame</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

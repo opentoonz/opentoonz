@@ -45,6 +45,7 @@ set(MOC_HEADERS
     ../include/toonzqt/paletteviewer.h
     ../include/toonzqt/paletteviewergui.h
     ../include/toonzqt/paramfield.h
+    ../include/toonzqt/planeviewer.h
     ../include/toonzqt/popupbutton.h
     ../include/toonzqt/schematicgroupeditor.h
     ../include/toonzqt/schematicnode.h
@@ -91,7 +92,6 @@ set(HEADERS
     ../include/toonzqt/lutcalibrator.h
     ../include/toonzqt/multipleselection.h
     ../include/toonzqt/pickrgbutils.h
-    ../include/toonzqt/planeviewer.h
     ../include/toonzqt/rasterimagedata.h
     ../include/toonzqt/selection.h
     ../include/toonzqt/selectioncommandids.h

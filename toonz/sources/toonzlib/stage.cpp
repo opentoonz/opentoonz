@@ -111,7 +111,7 @@ bool descending(int i, int j) { return (i > j); }
 }
 
 //=============================================================================
-/*! The ZPlacement class preserve camera position informations.
+/*! The ZPlacement class preserve camera position information.
 */
 //=============================================================================
 
@@ -207,11 +207,11 @@ public:
   StageBuilder();
   virtual ~StageBuilder();
 
-  /*! Add in \b players vector informations about specify cell.
+  /*! Add in \b players vector information about specify cell.
   \n	Analyze cell in row \b row and column \b col of xsheet \b xsh. If level
                   containing this cell is a simple level, \b TXshSimpleLevel,
   create a Pleyer
-                  object with informations of the cell. Else if level is a child
+                  object with information of the cell. Else if level is a child
   level,
                   \b TXshChildLevel, recall \b addFrame().
   */
@@ -232,7 +232,7 @@ public:
   void addFrame(PlayerSet &players, ToonzScene *scene, TXsheet *xsh, int row,
                 int level, bool includeUnvisible, bool checkPreviewVisibility);
 
-  /*! Add in \b players vector informations about \b level cell with \b TFrameId
+  /*! Add in \b players vector information about \b level cell with \b TFrameId
   \b fid.
   \n	Compute information for all cell with active onion-skin, if onion-skin
   is not active

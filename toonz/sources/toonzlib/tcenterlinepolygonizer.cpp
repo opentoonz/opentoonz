@@ -257,7 +257,7 @@ void Signaturemap::readRasterData(const TRasterPT<T> &ras, int threshold) {
 
 //--------------------------------------------------------------------------
 
-// Minority check for amiguous turning directions
+// Minority check for ambiguous turning directions
 inline bool getMinorityCheck(const Signaturemap &ras, int x, int y) {
   // Assumes (x,y) is ambiguous case: 2 immediate surrounding pixels are white
   // and 2 black

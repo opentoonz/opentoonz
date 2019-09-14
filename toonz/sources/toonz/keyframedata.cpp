@@ -10,6 +10,7 @@
 #include "toonz/tstageobjecttree.h"
 #include "toonz/tstageobjectkeyframe.h"
 #include "toonz/txshcolumn.h"
+#include "toonz/preferences.h"
 
 #include <assert.h>
 
@@ -84,9 +85,20 @@ bool TKeyframeData::getKeyframes(std::set<Position> &positions,
   std::set<TKeyframeSelection::Position>::iterator it2 = positions.begin();
   int r0                                               = it2->first;
   int c0                                               = it2->second;
+  std::map<int, int> firstRowCol, lastRowCol;
+  firstRowCol.insert(std::pair<int, int>(c0, r0));
+  lastRowCol.insert(std::pair<int, int>(c0, r0));
   for (++it2; it2 != positions.end(); ++it2) {
     r0 = std::min(r0, it2->first);
     c0 = std::min(c0, it2->second);
+    std::map<int, int>::iterator itF = firstRowCol.find(it2->second);
+    std::map<int, int>::iterator itL = lastRowCol.find(it2->second);
+    if (itF == firstRowCol.end())
+      firstRowCol.insert(std::pair<int, int>(it2->second, it2->first));
+    if (itL == lastRowCol.end())
+      lastRowCol.insert(std::pair<int, int>(it2->second, it2->first));
+    else
+      itL->second = c0;
   }
 
   XsheetViewer *viewer = TApp::instance()->getCurrentXsheetViewer();
@@ -109,7 +121,63 @@ bool TKeyframeData::getKeyframes(std::set<Position> &positions,
       continue;
     keyFrameChanged = true;
     assert(pegbar);
+
+    int kF, kL, kP, kN;
+    double e0, e1;
+    pegbar->getKeyframeRange(kF, kL);
     pegbar->setKeyframeWithoutUndo(row, it->second);
+
+    std::map<int, int>::iterator itF = firstRowCol.find(col);
+    std::map<int, int>::iterator itL = lastRowCol.find(col);
+    TStageObject::Keyframe newKey = pegbar->getKeyframe(row);
+    // Process 1st key added in column
+    if (itF != firstRowCol.end() && itF->second == row) {
+      if (row > kL) {
+        // If new key was added after the existing last one, create new
+        // interpolation between them using preference setting
+        TStageObject::Keyframe prevKey = pegbar->getKeyframe(kL);
+        for (int i = 0; i < TStageObject::T_ChannelCount; i++) {
+          prevKey.m_channels[i].m_type =
+              TDoubleKeyframe::Type(Preferences::instance()->getKeyframeType());
+          newKey.m_channels[i].m_prevType = prevKey.m_channels[i].m_type;
+        }
+        pegbar->setKeyframeWithoutUndo(kL, prevKey);
+        pegbar->setKeyframeWithoutUndo(row, newKey);
+      } else if (row > kF) {
+        // If new key was added between existing keys, sync new key's previous
+        // interpolation to key just before it
+        if (!pegbar->getKeyframeSpan(row - 1, kP, e0, kN, e1)) kP = row - 1;
+        TStageObject::Keyframe prevKey = pegbar->getKeyframe(kP);
+        for (int i = 0; i < TStageObject::T_ChannelCount; i++) {
+          newKey.m_channels[i].m_prevType = prevKey.m_channels[i].m_type;
+        }
+        pegbar->setKeyframeWithoutUndo(row, newKey);
+      }
+    }
+    // Process last key added in column
+    if (itL != lastRowCol.end() && itL->second == row) {
+      if (row < kF) {
+        // If new key was added before the existing 1st one, create new
+        // interpolation between them using preference setting
+        TStageObject::Keyframe nextKey = pegbar->getKeyframe(kF);
+        for (int i = 0; i < TStageObject::T_ChannelCount; i++) {
+          newKey.m_channels[i].m_type =
+              TDoubleKeyframe::Type(Preferences::instance()->getKeyframeType());
+          nextKey.m_channels[i].m_prevType = newKey.m_channels[i].m_type;
+        }
+        pegbar->setKeyframeWithoutUndo(row, newKey);
+        pegbar->setKeyframeWithoutUndo(kF, nextKey);
+      } else if (row < kL) {
+        // If new key was added between existing keys, sync new key to the next
+        // key's previous interpolation
+        if (!pegbar->getKeyframeSpan(row + 1, kP, e0, kN, e1)) kN = row + 1;
+        TStageObject::Keyframe nextKey = pegbar->getKeyframe(kN);
+        for (int i = 0; i < TStageObject::T_ChannelCount; i++) {
+          newKey.m_channels[i].m_type = nextKey.m_channels[i].m_prevType;
+        }
+        pegbar->setKeyframeWithoutUndo(row, newKey);
+      }
+    }
   }
   if (!keyFrameChanged) return false;
 

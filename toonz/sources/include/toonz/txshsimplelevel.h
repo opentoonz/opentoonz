@@ -302,6 +302,8 @@ The oldFp is used when the current scene path change...
   //! must have the same size).
   void renumber(const std::vector<TFrameId> &fids);
 
+  bool isFrameReadOnly(TFrameId fid);
+
 public:
   // Auxiliary files management: hooks, tpl, etc.
   // May throw; copy and rename perform touchparentdir

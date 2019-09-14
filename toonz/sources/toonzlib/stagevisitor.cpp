@@ -1176,7 +1176,7 @@ void OpenGlPainter::onRasterImage(TRasterImage *ri,
 
   bool premultiplied = tlvFlag;  // xD
   static std::vector<char>
-      matteChan;  // Wtf this is criminal. Altough probably this
+      matteChan;  // Wtf this is criminal. Although probably this
                   // stuff is used only in the main thread... hmmm....
   TRaster32P r = (TRaster32P)ri->getRaster();
   r->lock();

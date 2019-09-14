@@ -18,10 +18,12 @@
 
 #include <QFileInfo>
 #include <QDir>
+#include <QDirIterator>
 
 #ifdef _WIN32
 #include <shlobj.h>
 #include <winnetwk.h>
+#include <wctype.h>
 #endif
 #ifdef MACOSX
 #include <Cocoa/Cocoa.h>
@@ -49,7 +51,9 @@ TFilePath getMyDocumentsPath() {
   return TFilePath((const char *)[documentsDirectory
       cStringUsingEncoding:NSASCIIStringEncoding]);
 #else
-  return TFilePath();
+  QDir dir = QDir::home();
+  if (!dir.cd("Documents")) return TFilePath();
+  return TFilePath(dir.absolutePath().toStdString());
 #endif
 }
 
@@ -71,7 +75,9 @@ TFilePath getDesktopPath() {
   return TFilePath((const char *)[desktopDirectory
       cStringUsingEncoding:NSASCIIStringEncoding]);
 #else
-  return TFilePath();
+  QDir dir = QDir::home();
+  if (!dir.cd("Desktop")) return TFilePath();
+  return TFilePath(dir.absolutePath().toStdString());
 #endif
 }
 }
@@ -250,13 +256,11 @@ bool DvDirModelFileFolderNode::hasChildren() {
   if (m_childrenValid) return m_hasChildren;
 
   if (m_peeks) {
-    // Using QDir directly rather than
-    // DvDirModelFileFolderNode::refreshChildren() due to
-    // performance issues
-    QDir dir(QString::fromStdWString(m_path.getWideString()));
+    // Using QDirIterator and only checking existence of the first item
+    QDir dir(m_path.getQString());
     dir.setFilter(QDir::AllDirs | QDir::NoDotAndDotDot);
-
-    return (dir.count() > 0);
+    QDirIterator it(dir);
+    return (it.hasNext());
   } else
     return true;  // Not peeking nodes allow users to actively scan for
                   // sub-folders
@@ -314,16 +318,13 @@ void DvDirModelFileFolderNode::getChildrenNames(
   TFileStatus folderPathStatus(m_path);
   if (folderPathStatus.isLink()) return;
 
-  QStringList entries;
-  if (folderPathStatus.isDirectory()) {
-    QDir dir(toQString(m_path));
+  if (!folderPathStatus.isDirectory()) return;
 
-    entries = dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot,
-                            QDir::Name | QDir::LocaleAware);
-  }
+  QStringList dirItems;
+  TSystem::readDirectory_DirItems(dirItems, m_path);
+  for (const QString &name : dirItems) names.push_back(name.toStdWString());
 
-  int e, eCount = entries.size();
-  for (e = 0; e != eCount; ++e) names.push_back(entries[e].toStdWString());
+  QDir dir(toQString(m_path));
 }
 
 //-----------------------------------------------------------------------------

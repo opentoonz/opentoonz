@@ -396,6 +396,10 @@ FullColorEraserTool::FullColorEraserTool(std::string name)
   m_eraseType.addValue(RECTERASE);
   m_eraseType.addValue(FREEHANDERASE);
   m_eraseType.addValue(POLYLINEERASE);
+
+  m_eraseType.setId("Type");
+  m_invertOption.setId("Invert");
+  m_multi.setId("FrameRange");
 }
 
 //---------------------------------------------------------------------------------------------------

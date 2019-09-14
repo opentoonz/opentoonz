@@ -146,6 +146,7 @@ public:
   void add(const TRasterP &ras, TRect rect) override;
 
   const Tile *getTile(int index) const;
+  Tile *editTile(int index) const;
 
   TTileSetFullColor *clone() const override;
 };

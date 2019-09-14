@@ -135,7 +135,7 @@ const int TAG_IMAGE_UNIQUE_ID    = 0xA420;
 
 typedef struct {
   unsigned short Tag;
-  char *Desc;
+  const char *Desc;
 } TagTable_t;
 
 const TagTable_t TagTable[] = {
@@ -253,7 +253,7 @@ const int TAG_TABLE_SIZE = (sizeof(TagTable) / sizeof(TagTable_t));
 
 const int TRUE  = 1;
 const int FALSE = 0;
-}
+}  // namespace
 
 //--------------------------------------------------------------------------
 // Convert a 16 bit unsigned value from file's native byte order
@@ -633,7 +633,7 @@ void JpgExifReader::ProcessExifDir(unsigned char *DirStart,
         break;
 
       case FMT_UNDEFINED:
-      // Undefined is typically an ascii string.
+        // Undefined is typically an ascii string.
 
       case FMT_STRING:
         // String arrays printed without function call (different from int
@@ -683,7 +683,7 @@ void JpgExifReader::ProcessExifDir(unsigned char *DirStart,
     case TAG_DATETIME_ORIGINAL:
       // If we get a DATETIME_ORIGINAL, we use that one.
       strncpy(ImageInfo.DateTime, (char *)ValuePtr, 19);
-    // Fallthru...
+      // Fallthru...
 
     case TAG_DATETIME_DIGITIZED:
     case TAG_DATETIME:
@@ -737,7 +737,7 @@ void JpgExifReader::ProcessExifDir(unsigned char *DirStart,
 
       // Copy the comment
       {
-        int msiz                   = ExifLength - (ValuePtr - OffsetBase);
+        int msiz = ExifLength - (ValuePtr - OffsetBase);
         if (msiz > ByteCount) msiz = ByteCount;
         if (msiz > MAX_COMMENT_SIZE - 1) msiz = MAX_COMMENT_SIZE - 1;
         if (msiz > 5 && memcmp(ValuePtr, "ASCII", 5) == 0) {

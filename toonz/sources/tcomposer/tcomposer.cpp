@@ -400,7 +400,7 @@ static std::pair<int, int> generateMovie(ToonzScene *scene, const TFilePath &fp,
   r0 = r0 - 1;
   r1 = r1 - 1;
 
-  if (r0 < 0) r0                                 = 0;
+  if (r0 < 0) r0 = 0;
   if (r1 < 0 || r1 >= scene->getFrameCount()) r1 = scene->getFrameCount() - 1;
   string msg;
   assert(r1 >= r0);
@@ -561,6 +561,61 @@ static std::pair<int, int> generateMovie(ToonzScene *scene, const TFilePath &fp,
 DV_IMPORT_API void initStdFx();
 DV_IMPORT_API void initColorFx();
 int main(int argc, char *argv[]) {
+  TCli::UsageLine usageLine;
+  //  setCurrentModule("tcomposer");
+  TCli::FilePathArgument srcName("srcName", "Source file");
+  FilePathQualifier dstName("-o dstName", "Target file");
+  RangeQualifier range;
+  IntQualifier stepOpt("-step n", "Step");
+  IntQualifier shrinkOpt("-shrink n", "Shrink");
+  IntQualifier multimedia("-multimedia n", "Multimedia rendering mode");
+  StringQualifier farmData("-farm data", "TFarm Controller");
+  StringQualifier idq("-id n", "id");
+  StringQualifier nthreads("-nthreads n", "Number of rendering threads");
+  StringQualifier tileSize("-maxtilesize n",
+                           "Enable tile rendering of max n MB per tile");
+  StringQualifier tmsg("-tmsg val", "only internal use");
+  usageLine = srcName + dstName + range + stepOpt + shrinkOpt + multimedia +
+              farmData + idq + nthreads + tileSize + tmsg;
+
+  // system path qualifiers
+  std::map<QString, std::unique_ptr<TCli::QualifierT<TFilePath>>>
+      systemPathQualMap;
+  QString qualKey  = QString("%1ROOT").arg(systemVarPrefix);
+  QString qualName = QString("-%1 folderpath").arg(qualKey);
+  QString qualHelp =
+      QString(
+          "%1 path. It will automatically set other system paths to %1 "
+          "unless individually specified with other qualifiers.")
+          .arg(qualKey);
+  systemPathQualMap[qualKey].reset(new TCli::QualifierT<TFilePath>(
+      qualName.toStdString(), qualHelp.toStdString()));
+  usageLine = usageLine + *systemPathQualMap[qualKey];
+
+  const std::map<std::string, std::string> &spm = TEnv::getSystemPathMap();
+  for (auto itr = spm.begin(); itr != spm.end(); ++itr) {
+    qualKey = QString("%1%2")
+                  .arg(systemVarPrefix)
+                  .arg(QString::fromStdString((*itr).first));
+    qualName = QString("-%1 folderpath").arg(qualKey);
+    qualHelp = QString("%1 path.").arg(qualKey);
+    systemPathQualMap[qualKey].reset(new TCli::QualifierT<TFilePath>(
+        qualName.toStdString(), qualHelp.toStdString()));
+    usageLine = usageLine + *systemPathQualMap[qualKey];
+  }
+
+  Usage usage(argv[0]);
+  usage.add(usageLine);
+  if (!usage.parse(argc, argv)) exit(1);
+
+  QHash<QString, QString> argumentPathValues;
+  for (auto q_itr = systemPathQualMap.begin(); q_itr != systemPathQualMap.end();
+       ++q_itr) {
+    if (q_itr->second->isSelected())
+      argumentPathValues.insert(q_itr->first,
+                                q_itr->second->getValue().getQString());
+  }
+
   QApplication app(argc, argv);
 
   // Create a QObject destroyed just before app - see Tnz6's main.cpp for
@@ -602,6 +657,17 @@ int main(int argc, char *argv[]) {
   // questo definisce la registry root e inizializza TEnv
   TEnv::setRootVarName(rootVarName);
   TEnv::setSystemVarPrefix(systemVarPrefix);
+
+  QHash<QString, QString>::const_iterator argItr =
+      argumentPathValues.constBegin();
+  while (argItr != argumentPathValues.constEnd()) {
+    if (!TEnv::setArgPathValue(argItr.key().toStdString(),
+                               argItr.value().toStdString()))
+      cerr << "The qualifier " << argItr.key().toStdString()
+           << " is not a valid key name. Skipping." << endl;
+    ++argItr;
+  }
+
   TSystem::hasMainLoop(true);
 
   // QMessageBox::information(0, QString("eccolo"), QString("composer!"));
@@ -647,29 +713,10 @@ int main(int argc, char *argv[]) {
   TVectorBrushStyle::setRootDir(libraryFolder);
   TPalette::setRootDir(libraryFolder);
   TImageStyle::setLibraryDir(libraryFolder);
-  TFilePath cacheRoot                = ToonzFolder::getCacheRootFolder();
+  TFilePath cacheRoot = ToonzFolder::getCacheRootFolder();
   if (cacheRoot.isEmpty()) cacheRoot = TEnv::getStuffDir() + "cache";
   TImageCache::instance()->setRootDir(cacheRoot);
   // #endif
-
-  //  setCurrentModule("tcomposer");
-  TCli::FilePathArgument srcName("srcName", "Source file");
-  FilePathQualifier dstName("-o dstName", "Target file");
-  RangeQualifier range;
-  IntQualifier stepOpt("-step n", "Step");
-  IntQualifier shrinkOpt("-shrink n", "Shrink");
-  IntQualifier multimedia("-multimedia n", "Multimedia rendering mode");
-  StringQualifier farmData("-farm data", "TFarm Controller");
-  StringQualifier idq("-id n", "id");
-  StringQualifier nthreads("-nthreads n", "Number of rendering threads");
-  StringQualifier tileSize("-maxtilesize n",
-                           "Enable tile rendering of max n MB per tile");
-  StringQualifier tmsg("-tmsg val", "only internal use");
-
-  Usage usage(argv[0]);
-  usage.add(srcName + dstName + range + stepOpt + shrinkOpt + multimedia +
-            farmData + idq + nthreads + tileSize + tmsg);
-  if (!usage.parse(argc, argv)) exit(1);
 
   TaskId       = QString::fromStdString(idq.getValue());
   string fdata = farmData.getValue();
@@ -933,8 +980,8 @@ int main(int argc, char *argv[]) {
     DVGui::info(QString::fromStdString(msg));
     TImageCache::instance()->clear(true);
   } catch (TException &e) {
-    msg = "Untrapped exception: " + ::to_string(e.getMessage()), cout << msg
-                                                                      << endl;
+    msg = "Untrapped exception: " + ::to_string(e.getMessage()),
+    cout << msg << endl;
     m_userLog->error(msg);
     TImageCache::instance()->clear(true);
   } catch (...) {

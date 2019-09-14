@@ -70,9 +70,8 @@ void doUpdateXSheet(TXshSimpleLevel *sl, std::vector<TFrameId> oldFids,
             cells[i].m_level->getType() == CHILD_XSHLEVEL) {
           TXshChildLevel *level = cells[i].m_level->getChildLevel();
           // make sure we haven't already checked the level
-          if (level &&
-              std::find(childLevels.begin(), childLevels.end(), level) ==
-                  childLevels.end()) {
+          if (level && std::find(childLevels.begin(), childLevels.end(),
+                                 level) == childLevels.end()) {
             childLevels.push_back(level);
             TXsheet *subXsh = level->getXsheet();
             doUpdateXSheet(sl, oldFids, newFids, subXsh, childLevels);
@@ -101,8 +100,8 @@ void doUpdateXSheet(TXshSimpleLevel *sl, std::vector<TFrameId> oldFids,
 
 //-----------------------------------------------------------------------------
 
-void updateXSheet(TXshSimpleLevel *sl, std::vector<TFrameId> oldFids,
-                  std::vector<TFrameId> newFids) {
+static void updateXSheet(TXshSimpleLevel *sl, std::vector<TFrameId> oldFids,
+                         std::vector<TFrameId> newFids) {
   std::vector<TXshChildLevel *> childLevels;
   TXsheet *xsh =
       TApp::instance()->getCurrentScene()->getScene()->getTopXsheet();
@@ -145,7 +144,7 @@ void makeSpaceForFids(TXshSimpleLevel *sl,
     if (Preferences::instance()->isSyncLevelRenumberWithXsheetEnabled())
       updateXSheet(sl, oldFids, fids);
     sl->renumber(fids);
-	sl->setDirtyFlag(true);
+    sl->setDirtyFlag(true);
   }
 }
 
@@ -250,10 +249,10 @@ bool pasteAreasWithoutUndo(const QMimeData *data, TXshSimpleLevel *sl,
         affine *= sc;
         int i;
         TRectD boxD;
-        if (rects.size() > 0) boxD   = rects[0];
+        if (rects.size() > 0) boxD = rects[0];
         if (strokes.size() > 0) boxD = strokes[0].getBBox();
         for (i = 0; i < rects.size(); i++) boxD += rects[i];
-        for (i     = 0; i < strokes.size(); i++) boxD += strokes[i].getBBox();
+        for (i = 0; i < strokes.size(); i++) boxD += strokes[i].getBBox();
         boxD       = affine * boxD;
         TRect box  = ToonzImageUtils::convertWorldToRaster(boxD, ti);
         TPoint pos = box.getP00();
@@ -309,10 +308,10 @@ bool pasteAreasWithoutUndo(const QMimeData *data, TXshSimpleLevel *sl,
         affine *= sc;
         int i;
         TRectD boxD;
-        if (rects.size() > 0) boxD   = rects[0];
+        if (rects.size() > 0) boxD = rects[0];
         if (strokes.size() > 0) boxD = strokes[0].getBBox();
         for (i = 0; i < rects.size(); i++) boxD += rects[i];
-        for (i     = 0; i < strokes.size(); i++) boxD += strokes[i].getBBox();
+        for (i = 0; i < strokes.size(); i++) boxD += strokes[i].getBBox();
         boxD       = affine * boxD;
         TRect box  = TRasterImageUtils::convertWorldToRaster(boxD, ri);
         TPoint pos = box.getP00();
@@ -604,13 +603,13 @@ public:
 
         int i;
         TRectD boxD;
-        if (rects.size() > 0) boxD   = rects[0];
+        if (rects.size() > 0) boxD = rects[0];
         if (strokes.size() > 0) boxD = strokes[0].getBBox();
         for (i = 0; i < rects.size(); i++) boxD += rects[i];
-        for (i     = 0; i < strokes.size(); i++) boxD += strokes[i].getBBox();
-        boxD       = affine * boxD;
-        TRect box  = ToonzImageUtils::convertWorldToRaster(boxD, ti);
-        TPoint pos = box.getP00();
+        for (i = 0; i < strokes.size(); i++) boxD += strokes[i].getBBox();
+        boxD             = affine * boxD;
+        TRect box        = ToonzImageUtils::convertWorldToRaster(boxD, ti);
+        TPoint pos       = box.getP00();
         TRasterCM32P app = ras;
         TRop::over(ti->getRaster(), app, pos, affine);
         ToolUtils::updateSaveBox(m_level, *it);
@@ -639,13 +638,13 @@ public:
         affine *= sc;
         int i;
         TRectD boxD;
-        if (rects.size() > 0) boxD   = rects[0];
+        if (rects.size() > 0) boxD = rects[0];
         if (strokes.size() > 0) boxD = strokes[0].getBBox();
         for (i = 0; i < rects.size(); i++) boxD += rects[i];
-        for (i     = 0; i < strokes.size(); i++) boxD += strokes[i].getBBox();
-        boxD       = affine * boxD;
-        TRect box  = TRasterImageUtils::convertWorldToRaster(boxD, ri);
-        TPoint pos = box.getP00();
+        for (i = 0; i < strokes.size(); i++) boxD += strokes[i].getBBox();
+        boxD             = affine * boxD;
+        TRect box        = TRasterImageUtils::convertWorldToRaster(boxD, ri);
+        TPoint pos       = box.getP00();
         TRasterCM32P app = ras;
         if (app)
           TRop::over(ri->getRaster(), app, ri->getPalette(), pos, affine);
@@ -985,7 +984,7 @@ public:
         updateXSheet(m_sl.getPointer(), newFrames, m_oldLevelFrameId);
       }
       m_sl->renumber(m_oldLevelFrameId);
-	  m_sl->setDirtyFlag(true);
+      m_sl->setDirtyFlag(true);
       TApp::instance()
           ->getPaletteController()
           ->getCurrentLevelPalette()
@@ -1309,8 +1308,8 @@ public:
     m_level->renumber(fids);
     TSelection *selection = TSelection::getCurrent();
     if (selection) selection->selectNone();
-	m_level->setDirtyFlag(true);
-	TApp::instance()->getCurrentLevel()->notifyLevelChange();
+    m_level->setDirtyFlag(true);
+    TApp::instance()->getCurrentLevel()->notifyLevelChange();
   }
   void undo() const override {
     std::vector<TFrameId> fids;
@@ -1725,7 +1724,7 @@ public:
         // TImageCache::instance()->add("UndoInsertEmptyFrames"+QString::number((UINT)this),
         // img);
         TImageCache::instance()->add(
-            "UndoInsertEmptyFrames" + QString::number((uintptr_t) this), img);
+            "UndoInsertEmptyFrames" + QString::number((uintptr_t)this), img);
       }
     }
     m_updateXSheet =
@@ -1735,7 +1734,7 @@ public:
   ~UndoInsertEmptyFrames() {
     // TImageCache::instance()->remove("UndoInsertEmptyFrames"+QString::number((UINT)this));
     TImageCache::instance()->remove("UndoInsertEmptyFrames" +
-                                    QString::number((uintptr_t) this));
+                                    QString::number((uintptr_t)this));
   }
 
   void undo() const override {
@@ -1747,7 +1746,7 @@ public:
       updateXSheet(m_level.getPointer(), newFrames, m_oldFrames);
     }
     m_level->renumber(m_oldFrames);
-	m_level->setDirtyFlag(true);
+    m_level->setDirtyFlag(true);
     TApp::instance()->getCurrentLevel()->notifyLevelChange();
   }
 
@@ -1762,7 +1761,7 @@ public:
       // (TToonzImageP)TImageCache::instance()->get("UndoInsertEmptyFrames"+QString::number((UINT)this),
       // true);
       TToonzImageP image = (TToonzImageP)TImageCache::instance()->get(
-          "UndoInsertEmptyFrames" + QString::number((uintptr_t) this), true);
+          "UndoInsertEmptyFrames" + QString::number((uintptr_t)this), true);
       if (!image) return;
       for (it = m_frames.begin(); it != m_frames.end(); ++it)
         m_level->setFrame(*it, image);
@@ -2039,7 +2038,7 @@ public:
     m_level->renumber(m_oldFrames);
     TSelection *selection = TSelection::getCurrent();
     if (selection) selection->selectNone();
-	m_level->setDirtyFlag(true);
+    m_level->setDirtyFlag(true);
     TApp::instance()->getCurrentLevel()->notifyLevelChange();
   }
   void redo() const override {
@@ -2205,7 +2204,7 @@ public:
       updateXSheet(m_level.getPointer(), newFrames, m_oldFrames);
     }
     m_level->renumber(m_oldFrames);
-	m_level->setDirtyFlag(true);
+    m_level->setDirtyFlag(true);
     TApp::instance()->getCurrentLevel()->notifyLevelChange();
   }
   void redo() const override {

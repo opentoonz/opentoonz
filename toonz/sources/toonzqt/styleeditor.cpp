@@ -577,7 +577,7 @@ void HexagonalColorWheel::initializeGL() {
   initializeOpenGLFunctions();
 
   // to be computed once through the software
-  if (m_lutCalibrator) {
+  if (m_lutCalibrator && !m_lutCalibrator->isInitialized()) {
     m_lutCalibrator->initialize();
     connect(context(), SIGNAL(aboutToBeDestroyed()), this,
             SLOT(onContextAboutToBeDestroyed()));
@@ -585,6 +585,15 @@ void HexagonalColorWheel::initializeGL() {
 
   QColor const color = getBGColor();
   glClearColor(color.redF(), color.greenF(), color.blueF(), color.alphaF());
+
+  // Without the following lines, the wheel in a floating style editor
+  // dissapears on switching the room due to context switching.
+  if (m_firstInitialized)
+    m_firstInitialized = false;
+  else {
+    resizeGL(width(), height());
+    update();
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -813,7 +822,7 @@ void HexagonalColorWheel::mouseReleaseEvent(QMouseEvent *event) {
 
 //-----------------------------------------------------------------------------
 /*! compute hue and saturation position. saturation value must be clamped
-*/
+ */
 void HexagonalColorWheel::clickLeftWheel(const QPoint &pos) {
   QLineF p(m_wp[0] + m_wheelPosition, QPointF(pos));
   QLineF horizontal(0, 0, 1, 0);
@@ -824,7 +833,7 @@ void HexagonalColorWheel::clickLeftWheel(const QPoint &pos) {
   // d is a length from center to edge of the wheel when saturation = 100
   float d = m_triHeight / cosf(phi / 180.0f * 3.1415f);
 
-  int h          = (int)theta;
+  int h = (int)theta;
   if (h > 359) h = 359;
   // clamping
   int s = (int)(std::min(p.length() / d, 1.0) * 100.0f);
@@ -1880,7 +1889,8 @@ else return false;
   void drawChip(QPainter &p, QRect rect, int index) override {
     assert(0 <= index && index < getChipCount());
     CustomStyleManager::PatternData pattern = styleManager()->getPattern(index);
-    p.drawImage(rect, *pattern.m_image);
+    if (pattern.m_image && !pattern.m_image->isNull())
+      p.drawImage(rect, *pattern.m_image);
   }
   void onSelect(int index) override;
 };
@@ -1991,7 +2001,9 @@ bool VectorBrushStyleChooserPage::event(QEvent *e) {
     QToolTip::showText(he->globalPos(),
                        QString::fromStdString(pattern.m_patternName));
   } else
-    QToolTip::showText(he->globalPos(), tr("Plain color"));
+    QToolTip::showText(
+        he->globalPos(),
+        QObject::tr("Plain color", "VectorBrushStyleChooserPage"));
 
   return true;
 }
@@ -2165,8 +2177,11 @@ bool TextureStyleChooserPage::event(QEvent *e) {
     int index  = posToIndex(pos);
     if (index >= 0 && index < (int)m_textures.size()) {
       toolTip = m_textures[index].m_name;
-      QToolTip::showText(helpEvent->globalPos(),
-                         toolTip != QString() ? toolTip : "Custom Texture");
+      QToolTip::showText(
+          helpEvent->globalPos(),
+          toolTip != QString()
+              ? toolTip
+              : QObject::tr("Custom Texture", "TextureStyleChooserPage"));
     }
     e->accept();
   }
@@ -2232,7 +2247,7 @@ public:
       QPoint pos = helpEvent->pos();
       int index  = posToIndex(pos);
       if (index == 0) {
-        toolTip = tr("Plain color");
+        toolTip = QObject::tr("Plain color", "MyPaintBrushStyleChooserPage");
       } else if (index > 0 && index <= (int)m_brushes.size()) {
         toolTip = m_brushes[index - 1].getPath().getQString();
       }
@@ -2325,7 +2340,7 @@ void SpecialStyleChooserPage::loadItems() {
         tagId == 2002 ||  // ??
         tagId == 3000 ||  // vector brush
         tagId == 4001     // mypaint brush
-        )
+    )
       continue;
 
     TColorStyle *style = TColorStyle::create(tagId);
@@ -2381,7 +2396,7 @@ bool SpecialStyleChooserPage::event(QEvent *e) {
     QPoint pos = helpEvent->pos();
     int index  = posToIndex(pos);
     if (index == 0)
-      toolTip = tr("Plain color");
+      toolTip = QObject::tr("Plain color", "SpecialStyleChooserPage");
     else {
       int j = index - 1;
       if (0 <= j && j < (int)m_customStyles.size()) {
@@ -3127,7 +3142,7 @@ QFrame *StyleEditor::createBottomWidget() {
   bool ret = true;
   ret      = ret && connect(m_applyButton, SIGNAL(clicked()), this,
                        SLOT(applyButtonClicked()));
-  ret = ret && connect(m_autoButton, SIGNAL(toggled(bool)), this,
+  ret      = ret && connect(m_autoButton, SIGNAL(toggled(bool)), this,
                        SLOT(autoCheckChanged(bool)));
   ret = ret && connect(m_oldColor, SIGNAL(clicked(const TColorStyle &)), this,
                        SLOT(onOldStyleClicked(const TColorStyle &)));
@@ -3190,9 +3205,9 @@ QFrame *StyleEditor::createVectorPage() {
   bool ret = true;
   ret      = ret && connect(specialButton, SIGNAL(toggled(bool)), this,
                        SLOT(onSpecialButtonToggled(bool)));
-  ret = ret && connect(customButton, SIGNAL(toggled(bool)), this,
+  ret      = ret && connect(customButton, SIGNAL(toggled(bool)), this,
                        SLOT(onCustomButtonToggled(bool)));
-  ret = ret && connect(vectorBrushButton, SIGNAL(toggled(bool)), this,
+  ret      = ret && connect(vectorBrushButton, SIGNAL(toggled(bool)), this,
                        SLOT(onVectorBrushButtonToggled(bool)));
   assert(ret);
   return vectorOutsideFrame;
@@ -3229,9 +3244,9 @@ void StyleEditor::showEvent(QShowEvent *) {
   bool ret = true;
   ret      = ret && connect(m_paletteHandle, SIGNAL(colorStyleSwitched()),
                        SLOT(onStyleSwitched()));
-  ret = ret && connect(m_paletteHandle, SIGNAL(colorStyleChanged(bool)),
+  ret      = ret && connect(m_paletteHandle, SIGNAL(colorStyleChanged(bool)),
                        SLOT(onStyleChanged(bool)));
-  ret = ret && connect(m_paletteHandle, SIGNAL(paletteSwitched()), this,
+  ret      = ret && connect(m_paletteHandle, SIGNAL(paletteSwitched()), this,
                        SLOT(onStyleSwitched()));
   if (m_cleanupPaletteHandle)
     ret =
@@ -3380,10 +3395,9 @@ void StyleEditor::copyEditedStyleToPalette(bool isDragging) {
     m_editedStyle->setIsEditedFlag(true);
   }
 
-  palette->setStyle(
-      styleIndex,
-      m_editedStyle->clone());  // Must be done *before* setting the eventual
-                                // palette keyframe
+  palette->setStyle(styleIndex,
+                    m_editedStyle->clone());  // Must be done *before* setting
+                                              // the eventual palette keyframe
   if (!isDragging) {
     if (!(*m_oldStyle == *m_editedStyle)) {
       // do not register undo if the edited color is special one (e.g. changing

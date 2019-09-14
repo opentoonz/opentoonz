@@ -46,7 +46,7 @@ void TXshSoundTextColumn::createSoundTextLevel(int row,
 //-----------------------------------------------------------------------------
 
 bool TXshSoundTextColumn::canSetCell(const TXshCell &cell) const {
-  return true;
+  return cell.isEmpty() || cell.m_level->getSoundTextLevel() != 0;
 }
 
 //-----------------------------------------------------------------------------

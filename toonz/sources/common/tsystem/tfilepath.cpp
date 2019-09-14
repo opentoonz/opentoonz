@@ -687,12 +687,12 @@ TFrameId TFilePath::getFrame() const {
   }
   char letter                  = '\0';
   if (iswalpha(str[k])) letter = str[k++] + ('a' - L'a');
-
-  if (number == 0 || k < i)  // || letter!='\0')
-    throw TMalformedFrameException(
-        *this,
-        str + L": " + QObject::tr("Malformed frame name").toStdWString());
-
+  /*
+    if (number == 0 || k < i)  // || letter!='\0')
+      throw TMalformedFrameException(
+          *this,
+          str + L": " + QObject::tr("Malformed frame name").toStdWString());
+  */
   int padding = 0;
 
   if (str[j + 1] == '0') padding = digits;

@@ -192,7 +192,7 @@ void ToolOptionSlider::onValueChanged(bool isDragging) {
 
 //-----------------------------------------------------------------------------
 
-void ToolOptionSlider::increase() {
+void ToolOptionSlider::increase(double step) {
   if (m_toolHandle && m_toolHandle->getTool() != m_tool) return;
   // active only if the belonging combo-viewer is visible
   if (!isInVisibleViewer(this)) return;
@@ -201,7 +201,7 @@ void ToolOptionSlider::increase() {
   double minValue, maxValue;
   getRange(minValue, maxValue);
 
-  value += 1;
+  value += step;
   if (value > maxValue) value = maxValue;
 
   setValue(value);
@@ -213,7 +213,11 @@ void ToolOptionSlider::increase() {
 
 //-----------------------------------------------------------------------------
 
-void ToolOptionSlider::decrease() {
+void ToolOptionSlider::increaseFractional() { increase(0.06); }
+
+//-----------------------------------------------------------------------------
+
+void ToolOptionSlider::decrease(double step) {
   if (m_toolHandle && m_toolHandle->getTool() != m_tool) return;
   // active only if the belonging combo-viewer is visible
   if (!isInVisibleViewer(this)) return;
@@ -222,7 +226,7 @@ void ToolOptionSlider::decrease() {
   double minValue, maxValue;
   getRange(minValue, maxValue);
 
-  value -= 1;
+  value -= step;
   if (value < minValue) value = minValue;
 
   setValue(value);
@@ -231,6 +235,10 @@ void ToolOptionSlider::decrease() {
   // update the interface
   repaint();
 }
+
+//-----------------------------------------------------------------------------
+
+void ToolOptionSlider::decreaseFractional() { decrease(0.06); }
 
 //=============================================================================
 

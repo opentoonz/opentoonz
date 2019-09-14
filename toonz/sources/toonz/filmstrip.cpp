@@ -539,10 +539,6 @@ void FilmstripFrames::paintEvent(QPaintEvent *evt) {
 
   int frameCount = (int)fids.size();
 
-  std::set<TFrameId> editableFrameRange;
-
-  if (sl) editableFrameRange = sl->getEditableRange();
-
   bool isReadOnly    = false;
   if (sl) isReadOnly = sl->isReadOnly();
 
@@ -619,9 +615,7 @@ void FilmstripFrames::paintEvent(QPaintEvent *evt) {
 
       // Read-only frames (lock)
       if (0 <= i && i < frameCount) {
-        if ((editableFrameRange.empty() && isReadOnly) ||
-            (isReadOnly && (!editableFrameRange.empty() &&
-                            editableFrameRange.count(fids[i]) == 0))) {
+        if (sl->isFrameReadOnly(fids[i])) {
           static QPixmap lockPixmap(":Resources/forbidden.png");
           p.drawPixmap(tmp_frameRect.bottomLeft() + QPoint(3, -13), lockPixmap);
         }

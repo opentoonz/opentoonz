@@ -31,6 +31,7 @@ class TXshSoundLevel;
 class ToonzScene;
 class TCamera;
 class TPropertyGroup;
+class TXsheet;
 
 namespace DVGui {
 class ProgressDialog;
@@ -221,9 +222,8 @@ int loadResources(
             //!  access and finalization.
             //!< Loads a group of resources by path.
             //!  \return  The actually loaded levels count.
-    int xFrom = -1,
-    int xTo = -1, std::wstring levelName = L"", int step = -1, int inc = -1,
-    int frameCount = -1, bool doesFileActuallyExist = true,
+    int xFrom = -1, int xTo = -1, std::wstring levelName = L"", int step = -1,
+    int inc = -1, int frameCount = -1, bool doesFileActuallyExist = true,
     CacheTlvBehavior cachingBehavior = ON_DEMAND);
 
 int loadResourceFolders(
@@ -231,7 +231,7 @@ int loadResourceFolders(
     LoadResourceArguments::ScopedBlock *sb =
         0  //!< Load block. May be nonzero in order to extend block data
            //!  access and finalization.
-    );     //!< Loads the specified folders in current xsheet.
+);         //!< Loads the specified folders in current xsheet.
            //!  \return  The actually loaded levels count.
 bool exposeLevel(TXshSimpleLevel *sl, int row, int col, bool insert = false,
                  bool overWrite = false);
@@ -256,8 +256,9 @@ bool importLipSync(TFilePath levelPath, QList<TFrameId> frameList,
 // cast.
 // if the cast contains the level specified with $scenefolder alias,
 // open a warning popup notifying that such level will lose link.
-bool takeCareSceneFolderItemsOnSaveSceneAs(ToonzScene *scene,
-                                           const TFilePath &newPath);
+bool takeCareSceneFolderItemsOnSaveSceneAs(
+    ToonzScene *scene, const TFilePath &newPath, TXsheet *subxsh,
+    QHash<TXshLevel *, TFilePath> &orgLevelPaths);
 
 }  // namespace IoCmd
 

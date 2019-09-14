@@ -19,7 +19,7 @@
 // MACOSX includes
 #ifdef _WIN32
 #include <winsock.h>
-#elif MACOSX
+#elif defined(MACOSX)
 #include "tversion.h"
 using namespace TVER;
 #include <netdb.h>      // gethostbyname
@@ -361,12 +361,12 @@ void TFarmTask::saveData(TOStream &os) {
 //------------------------------------------------------------------------------
 
 namespace {
-QString getExeName(bool isComposer) {
+static QString getExeName(bool isComposer) {
   QString name = isComposer ? "tcomposer" : "tcleanup";
 
 #ifdef _WIN32
   return name + ".exe ";
-#elif MACOSX
+#elif defined(MACOSX)
   TVER::ToonzVersion tver;
   return "\"./" + QString::fromStdString(tver.getAppName()) + "_" +
          QString::fromStdString(tver.getAppVersionString()) +
@@ -380,7 +380,7 @@ QString getExeName(bool isComposer) {
 
 QString toString(int value, int w, char c = ' ') {
   QString s = QString::number(value);
-  while (s.size() < w) s= c + s;
+  while (s.size() < w) s = c + s;
   return s;
 }
 
@@ -642,7 +642,7 @@ TFarmTaskGroup::TFarmTaskGroup(const QString &id, const QString &name,
                 threadsIndex, maxTileSizeIndex, Overwrite_Off, false)
     , m_imp(new Imp()) {
   int subCount = 0;
-  if (chunksize > 0) subCount= tceil((to - from + 1) / (double)chunksize);
+  if (chunksize > 0) subCount = tceil((to - from + 1) / (double)chunksize);
 
   int ra = from;
   if (subCount > 1) {

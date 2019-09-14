@@ -32,7 +32,6 @@ using namespace std;
 #include <winnt.h>
 #endif
 
-
 namespace {
 
 inline QString toQString(const TFilePath &path) {
@@ -437,29 +436,63 @@ public:
 };
 
 //------------------------------------------------------------
-/*! return the file list which is readable and executable
+/*! return the folder path list which is readable and executable
 */
 void TSystem::readDirectory_Dir_ReadExe(TFilePathSet &dst,
                                         const TFilePath &path) {
+  QStringList dirItems;
+  readDirectory_DirItems(dirItems, path);
+
+  for (const QString &item : dirItems) {
+    TFilePath son = path + TFilePath(item.toStdWString());
+    dst.push_back(son);
+  }
+}
+
+//------------------------------------------------------------
+// return the folder item list which is readable and executable
+// (returns only names, not full path)
+void TSystem::readDirectory_DirItems(QStringList &dst, const TFilePath &path) {
   if (!TFileStatus(path).isDirectory())
     throw TSystemException(path, " is not a directory");
 
-  std::set<TFilePath, CaselessFilepathLess> fileSet;
+  QDir dir(toQString(path));
 
-  QStringList fil =
-      QDir(toQString(path))
-          .entryList(QDir::Dirs | QDir::NoDotAndDotDot | QDir::Readable);
+#ifdef _WIN32
+  // equivalent to sorting with QDir::LocaleAware
+  struct strCompare {
+    bool operator()(const QString &s1, const QString &s2) {
+      return QString::localeAwareCompare(s1, s2) < 0;
+    }
+  };
 
-  int i;
-  for (i = 0; i < fil.size(); i++) {
-    QString fi = fil.at(i);
+  std::set<QString, strCompare> entries;
 
-    TFilePath son = path + TFilePath(fi.toStdWString());
-
-    fileSet.insert(son);
+  WIN32_FIND_DATA find_dir_data;
+  QString dir_search_path = dir.absolutePath() + "\\*";
+  auto addEntry           = [&]() {
+    // QDir::NoDotAndDotDot condition
+    if (wcscmp(find_dir_data.cFileName, L".") != 0 &&
+        wcscmp(find_dir_data.cFileName, L"..") != 0) {
+      // QDir::AllDirs condition
+      if (find_dir_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY &&
+          (find_dir_data.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN) == 0) {
+        entries.insert(QString::fromWCharArray(find_dir_data.cFileName));
+      }
+    }
+  };
+  HANDLE hFind =
+      FindFirstFile((const wchar_t *)dir_search_path.utf16(), &find_dir_data);
+  if (hFind != INVALID_HANDLE_VALUE) {
+    addEntry();
+    while (FindNextFile(hFind, &find_dir_data)) addEntry();
   }
+  for (const QString &name : entries) dst.push_back(QString(name));
 
-  dst.insert(dst.end(), fileSet.begin(), fileSet.end());
+#else
+  dst = dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot | QDir::Readable,
+                      QDir::Name | QDir::LocaleAware);
+#endif
 }
 
 //------------------------------------------------------------
@@ -473,10 +506,31 @@ void TSystem::readDirectory(TFilePathSet &groupFpSet, TFilePathSet &allFpSet,
   std::set<TFilePath, CaselessFilepathLess> fileSet_group;
   std::set<TFilePath, CaselessFilepathLess> fileSet_all;
 
-  QStringList fil =
-      QDir(toQString(path))
-          .entryList(QDir::Files | QDir::NoDotAndDotDot | QDir::Readable);
-
+  QStringList fil;
+#ifdef _WIN32
+  WIN32_FIND_DATA find_dir_data;
+  QString dir_search_path = QDir(toQString(path)).absolutePath() + "\\*";
+  auto addEntry           = [&]() {
+    // QDir::NoDotAndDotDot condition
+    if (wcscmp(find_dir_data.cFileName, L".") != 0 &&
+        wcscmp(find_dir_data.cFileName, L"..") != 0) {
+      // QDir::Files condition
+      if ((find_dir_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0 &&
+          (find_dir_data.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN) == 0) {
+        fil.append(QString::fromWCharArray(find_dir_data.cFileName));
+      }
+    }
+  };
+  HANDLE hFind =
+      FindFirstFile((const wchar_t *)dir_search_path.utf16(), &find_dir_data);
+  if (hFind != INVALID_HANDLE_VALUE) {
+    addEntry();
+    while (FindNextFile(hFind, &find_dir_data)) addEntry();
+  }
+#else
+  fil = QDir(toQString(path))
+            .entryList(QDir::Files | QDir::NoDotAndDotDot | QDir::Readable);
+#endif
   if (fil.size() == 0) return;
 
   for (int i = 0; i < fil.size(); i++) {
@@ -506,8 +560,70 @@ void TSystem::readDirectory(TFilePathSet &dst, const QDir &dir,
   if (!(dir.exists() && QFileInfo(dir.path()).isDir()))
     throw TSystemException(TFilePath(dir.path().toStdWString()),
                            " is not a directory");
+  QStringList entries;
+#ifdef _WIN32
+  WIN32_FIND_DATA find_dir_data;
+  QString dir_search_path = dir.absolutePath() + "\\*";
+  QDir::Filters filter    = dir.filter();
 
-  QStringList entries(dir.entryList(dir.filter() | QDir::NoDotAndDotDot));
+  // store name filters
+  bool hasNameFilter = false;
+  QList<QRegExp> nameFilters;
+  for (const QString &nameFilter : dir.nameFilters()) {
+    if (nameFilter == "*") {
+      hasNameFilter = false;
+      break;
+    }
+    QRegExp regExp(nameFilter);
+    regExp.setPatternSyntax(QRegExp::Wildcard);
+    nameFilters.append(regExp);
+    hasNameFilter = true;
+  }
+
+  auto addEntry = [&]() {
+    // QDir::NoDotAndDotDot condition
+    if (wcscmp(find_dir_data.cFileName, L".") != 0 &&
+        wcscmp(find_dir_data.cFileName, L"..") != 0) {
+      // QDir::Files condition
+      if ((filter & QDir::Files) == 0 &&
+          (find_dir_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0)
+        return;
+      // QDir::Dirs condition
+      if ((filter & QDir::Dirs) == 0 &&
+          (find_dir_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
+        return;
+      // QDir::Hidden condition
+      if ((filter & QDir::Hidden) == 0 &&
+          (find_dir_data.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN))
+        return;
+
+      QString fileName = QString::fromWCharArray(find_dir_data.cFileName);
+
+      // name filter
+      if (hasNameFilter) {
+        bool matched = false;
+        for (const QRegExp &regExp : nameFilters) {
+          if (regExp.exactMatch(fileName)) {
+            matched = true;
+            break;
+          }
+        }
+        if (!matched) return;
+      }
+
+      entries.append(fileName);
+    }
+  };
+  HANDLE hFind =
+      FindFirstFile((const wchar_t *)dir_search_path.utf16(), &find_dir_data);
+  if (hFind != INVALID_HANDLE_VALUE) {
+    addEntry();
+    while (FindNextFile(hFind, &find_dir_data)) addEntry();
+  }
+#else
+  entries    = (dir.entryList(dir.filter() | QDir::NoDotAndDotDot));
+#endif
+
   TFilePath dirPath(dir.path().toStdWString());
 
   std::set<TFilePath, CaselessFilepathLess> fpSet;

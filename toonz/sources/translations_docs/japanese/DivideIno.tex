@@ -1,0 +1,46 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[a4paper, total={180mm, 272mm}]{geometry}
+
+\usepackage{fontspec}
+\setmainfont[Path=fonts/, Extension=.ttf]{ipaexm}
+
+\setlength\parindent{3.5em}
+\setlength\parskip{0em}
+\renewcommand{\baselinestretch}{1.247}
+
+\begin{document}
+
+\thispagestyle{empty}
+
+\Large
+\noindent \\
+Divide Ino\medskip
+\par
+\normalsize
+割算\par
+割って明るくする\par
+式 = Back / Fore\par
+式は RGB 各値をゼロから1とした場合の値で示しています。\\
+\\
+-{-}- \ 入力 \ -{-}-\par
+両方とも接続していれば合成処理します。\par
+動作スイッチ OFF のとき Back を表示します。\par
+片方のみ繋がっていればそれを表示します。\\
+Fore\par
+上に重ねる画像を接続します。\\
+Back\par
+下に置く画像を接続します。\\
+\\
+-{-}- \ 設定 \ -{-}-\\
+Opacity\par
+上に重ねる画像の不透明度を指定します。\par
+0の時は Fore 画像は透明になります。\par
+初期値は\textquotedbl 1.0\textquotedbl で Fore 画像は不透明として合成します。\par
+0から1.0の間の値を指定します。\\
+\\
+Clipping Mask\par
+ON にすると、\par
+素材(Back)の存在しない(Alpha 値がゼロ)場所は、透明のままにします。\par
+初期設定は ON です。
+
+\end{document}

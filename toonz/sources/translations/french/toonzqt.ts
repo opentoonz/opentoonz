@@ -289,11 +289,11 @@ Possibly the preset file has been corrupted</source>
     <name>DVGui</name>
     <message>
         <source>OK</source>
-        <translation>OK</translation>
+        <translation type="vanished">OK</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Annuler</translation>
+        <translation type="vanished">Annuler</translation>
     </message>
 </context>
 <context>
@@ -1019,6 +1019,30 @@ Possibly the preset file has been corrupted</source>
         <source>Step 4</source>
         <translation>Pas 4</translation>
     </message>
+    <message>
+        <source>Activate Cycle</source>
+        <translation type="unfinished">Activer le Cycle</translation>
+    </message>
+    <message>
+        <source>Deactivate Cycle</source>
+        <translation type="unfinished">Deactiver le Cycle</translation>
+    </message>
+    <message>
+        <source>Show Inbetween Values</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hide Inbetween Values</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Interpolation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Step</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>FunctionToolbar</name>
@@ -1372,13 +1396,6 @@ Sélectionnez les nœuds FX et les liens connexes avant de copier ou couper la s
     </message>
 </context>
 <context>
-    <name>MyPaintBrushStyleChooserPage</name>
-    <message>
-        <source>Plain color</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>NewWordDialog</name>
     <message>
         <source>OK</source>
@@ -1587,6 +1604,17 @@ Sélectionnez les nœuds FX et les liens connexes avant de copier ou couper la s
     </message>
 </context>
 <context>
+    <name>PlaneViewer</name>
+    <message>
+        <source>Reset View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fit To Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>PointParamField</name>
     <message>
         <source>Y:</source>
@@ -1666,19 +1694,19 @@ Sélectionnez les nœuds FX et les liens connexes avant de copier ou couper la s
     </message>
     <message>
         <source>Save</source>
-        <translation>Enregistrer</translation>
+        <translation type="vanished">Enregistrer</translation>
     </message>
     <message>
         <source>Discard</source>
-        <translation>Jeter</translation>
+        <translation type="vanished">Jeter</translation>
     </message>
     <message>
         <source>Yes</source>
-        <translation>Oui</translation>
+        <translation type="vanished">Oui</translation>
     </message>
     <message>
         <source>No</source>
-        <translation>Non</translation>
+        <translation type="vanished">Non</translation>
     </message>
     <message>
         <source>Stage Schematic</source>
@@ -2000,10 +2028,6 @@ Are you sure?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Replace</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Modify Fx Param : %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2125,8 +2149,36 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>OpenToonz 1.2</source>
+        <source>Custom Texture</source>
+        <comment>TextureStyleChooserPage</comment>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current Frame: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File History</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Plain color</source>
+        <comment>VectorBrushStyleChooserPage</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Plain color</source>
+        <comment>MyPaintBrushStyleChooserPage</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Plain color</source>
+        <comment>SpecialStyleChooserPage</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished">OK</translation>
     </message>
 </context>
 <context>
@@ -2224,7 +2276,7 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     <name>SpecialStyleChooserPage</name>
     <message>
         <source>Plain color</source>
-        <translation>Couleur plan</translation>
+        <translation type="vanished">Couleur plan</translation>
     </message>
 </context>
 <context>
@@ -2357,6 +2409,50 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     <message>
         <source>Cancel</source>
         <translation type="unfinished">Annuler</translation>
+    </message>
+    <message>
+        <source>The current palette %1
+in the studio palette has been modified. Do you want to save your changes?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation type="unfinished">Enregistrer</translation>
+    </message>
+    <message>
+        <source>Discard</source>
+        <translation type="unfinished">Jeter</translation>
+    </message>
+    <message>
+        <source>Convert %1 to Studio Palette and Overwrite. 
+Are you sure ?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation type="obsolete">Oui</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation type="obsolete">Non</translation>
+    </message>
+    <message>
+        <source>Replacing all selected palettes with the palette &quot;%1&quot;. 
+Are you sure ?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Replacing the palette &quot;%1&quot; with the palette &quot;%2&quot;. 
+Are you sure ?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Replace</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Convert</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2575,6 +2671,17 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     </message>
 </context>
 <context>
+    <name>SwatchViewer</name>
+    <message>
+        <source>Reset View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fit To Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>TMessageViewer</name>
     <message>
         <source>Errors</source>
@@ -2623,7 +2730,7 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     <name>VectorBrushStyleChooserPage</name>
     <message>
         <source>Plain color</source>
-        <translation>Il est impossible de supprimer %1.</translation>
+        <translation type="vanished">Il est impossible de supprimer %1.</translation>
     </message>
 </context>
 <context>

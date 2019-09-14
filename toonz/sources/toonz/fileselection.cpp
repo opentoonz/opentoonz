@@ -185,7 +185,7 @@ public:
   }
 };
 //-----------------------------------------------------------------------------
-}
+}  // namespace
 
 //------------------------------------------------------------------------
 
@@ -463,8 +463,8 @@ void FileSelection::collectAssets() {
 
   if (count > 1) {
     QMainWindow *mw = TApp::instance()->getMainWindow();
-    ProgressDialog progress(tr("Collecting assets..."), tr("Abort"), 0, count,
-                            mw);
+    ProgressDialog progress(QObject::tr("Collecting assets..."),
+                            QObject::tr("Abort"), 0, count, mw);
     progress.setWindowModality(Qt::WindowModal);
 
     int i;
@@ -552,8 +552,8 @@ void FileSelection::importScenes() {
 
   if (count > 1) {
     QMainWindow *mw = TApp::instance()->getMainWindow();
-    ProgressDialog progress(tr("Importing scenes..."), tr("Abort"), 0, count,
-                            mw);
+    ProgressDialog progress(QObject::tr("Importing scenes..."),
+                            QObject::tr("Abort"), 0, count, mw);
     progress.setWindowModality(Qt::WindowModal);
 
     int i;
@@ -599,6 +599,6 @@ void FileSelection::selectAll() {
     QString name =
         getModel()->getItemData(*it, DvItemListModel::FullPath).toString();
     TFilePath fp(name.toStdWString());
-    FileBrowser::refreshFolder(fp.getParentDir());
+    FileBrowser::updateItemViewerPanel();
   }
 }

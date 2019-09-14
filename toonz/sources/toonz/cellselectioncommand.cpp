@@ -599,7 +599,7 @@ ReframeUndo::ReframeUndo(int r0, int r1, std::vector<int> columnIndeces,
   assert(m_cells);
   int k = 0;
   for (int r = r0; r <= r1; r++)
-    for (int c     = 0; c < (int)m_columnIndeces.size(); c++)
+    for (int c = 0; c < (int)m_columnIndeces.size(); c++)
       m_cells[k++] = TApp::instance()->getCurrentXsheet()->getXsheet()->getCell(
           r, m_columnIndeces[c]);
 
@@ -719,7 +719,7 @@ void TCellSelection::reframeWithEmptyInbetweens() {
 
   // destruction of m_reframePopup will be done along with the main window
   if (!m_reframePopup) m_reframePopup = new ReframePopup();
-  int ret                             = m_reframePopup->exec();
+  int ret = m_reframePopup->exec();
   if (ret == QDialog::Rejected) return;
 
   int step, blank;
@@ -762,7 +762,7 @@ void TColumnSelection::reframeWithEmptyInbetweens() {
     colIndeces.push_back(*it);
 
   if (!m_reframePopup) m_reframePopup = new ReframePopup();
-  int ret                             = m_reframePopup->exec();
+  int ret = m_reframePopup->exec();
   if (ret == QDialog::Rejected) return;
 
   int step, blank;
@@ -1294,9 +1294,8 @@ public:
   void undo() const override;
 
   int getSize() const override {
-    return sizeof *this +
-           (sizeof(TXshLevelP) + sizeof(TXshSimpleLevel *)) *
-               m_insertedLevels.size();
+    return sizeof *this + (sizeof(TXshLevelP) + sizeof(TXshSimpleLevel *)) *
+                              m_insertedLevels.size();
   }
 
   QString getHistoryString() override {
@@ -1366,11 +1365,13 @@ public:
   LevelNamePopup(const std::wstring &defaultLevelName)
       : DVGui::Dialog(TApp::instance()->getMainWindow(), true, true,
                       "Clone Level") {
-    setWindowTitle(tr("Clone Level"));
+    setWindowTitle(
+        QObject::tr("Clone Level", "CloneLevelUndo::LevelNamePopup"));
 
     beginHLayout();
 
-    QLabel *label = new QLabel(tr("Level Name:"));
+    QLabel *label = new QLabel(
+        QObject::tr("Level Name:", "CloneLevelUndo::LevelNamePopup"));
     addWidget(label);
 
     m_name = new DVGui::LineEdit;

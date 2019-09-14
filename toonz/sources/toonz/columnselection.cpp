@@ -130,7 +130,8 @@ void TColumnSelection::explodeChild() {
 static bool canMergeColumns(int column, int mColumn, bool forMatchlines) {
   TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
 
-  if (xsh->getColumn(column)->isLocked()) return false;
+  if (!xsh || !xsh->getColumn(column) || xsh->getColumn(column)->isLocked())
+    return false;
 
   int start, end;
   xsh->getCellRange(column, start, end);

@@ -32,6 +32,7 @@
 #include "toonz/txshnoteset.h"
 #include "toonz/childstack.h"
 #include "toonz/txshlevelhandle.h"
+#include "toonz/tproject.h"
 #include "tconvert.h"
 
 #include "tenv.h"
@@ -649,7 +650,7 @@ void XsheetViewer::timerEvent(QTimerEvent *) {
 bool XsheetViewer::refreshContentSize(int dx, int dy) {
   QSize viewportSize = m_cellScrollArea->viewport()->size();
   QPoint offset      = m_cellArea->pos();
-  offset = QPoint(qMin(0, offset.x() - dx), qMin(0, offset.y() - dy));  // what?
+  offset = QPoint(std::min(0, offset.x() - dx), std::min(0, offset.y() - dy));  // what?
 
   TXsheet *xsh    = getXsheet();
   int frameCount  = xsh ? xsh->getFrameCount() : 0;
@@ -744,7 +745,7 @@ int XsheetViewer::colToTimelineLayerAxis(int layer) const {
   int yBottom = o->colToLayerAxis(layer, fan) +
                 (fan->isActive(layer) ? o->cellHeight() : o->foldedCellSize()) -
                 1;
-  int columnCount = qMax(1, xsh->getColumnCount());
+  int columnCount = std::max(1, xsh->getColumnCount());
   int layerHeightActual =
       m_columnArea->height() - 2;  // o->colToLayerAxis(columnCount, fan) - 1;
 
@@ -770,7 +771,7 @@ CellPosition XsheetViewer::xyToPosition(const QPoint &point) const {
   // For timeline mode, we need to base the Y axis on the bottom of the column
   // area
   // since the layers are flipped
-  int columnCount   = qMax(1, xsh->getColumnCount());
+  int columnCount   = std::max(1, xsh->getColumnCount());
   int colAreaHeight = o->colToLayerAxis(columnCount, fan);
 
   usePoint.setY(colAreaHeight - usePoint.y());
@@ -810,7 +811,7 @@ QPoint XsheetViewer::positionToXY(const CellPosition &pos) const {
   usePoint.setY(usePoint.y() + (fan->isActive(pos.layer())
                                     ? o->cellHeight()
                                     : o->foldedCellSize()));
-  int columnCount = qMax(1, xsh->getColumnCount());
+  int columnCount = std::max(1, xsh->getColumnCount());
   int colsHeight  = o->colToLayerAxis(columnCount, fan);
 
   if (colsHeight)
@@ -1244,9 +1245,12 @@ void XsheetViewer::keyPressEvent(QKeyEvent *event) {
       if (orientation()->isVerticalTimeline())
         locals.scrollVertTo((frameCount + 1) * orientation()->cellHeight(),
                             visibleRect);
-      else
-        locals.scrollHorizTo((frameCount + 1) * orientation()->cellWidth(),
-                             visibleRect);
+      else {
+        int x = (((frameCount + 1) * orientation()->cellWidth()) *
+                 getFrameZoomFactor()) /
+                100;
+        locals.scrollHorizTo(x, visibleRect);
+      }
       break;
     }
     break;
@@ -1367,8 +1371,11 @@ void XsheetViewer::scrollToColumn(int col) {
 
   if (orientation()->isVerticalTimeline())
     scrollToHorizontalRange(x0, x1);
-  else
+  else {
+    if (colNext == col) x1 += m_orientation->cellHeight();
+
     scrollToVerticalRange(x0, x1);
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -1381,13 +1388,19 @@ void XsheetViewer::scrollToHorizontalRange(int x0, int x1) {
 
   if (visibleLeft > x0) {  // If they are out of left visible region
     int deltaX = x0 - visibleLeft;
-    scroll(QPoint(deltaX, 0));
-    return;
+    if (!TApp::instance()->getCurrentFrame()->isPlaying() ||
+        Preferences::instance()->isXsheetAutopanEnabled()) {
+      scroll(QPoint(deltaX, 0));
+      return;
+    }
   }
   if (visibleRight < x1) {  // If they are out of right visible region
     int deltaX = x1 + 2 - visibleRight;
-    scroll(QPoint(deltaX, 0));
-    return;
+    if (!TApp::instance()->getCurrentFrame()->isPlaying() ||
+        Preferences::instance()->isXsheetAutopanEnabled()) {
+      scroll(QPoint(deltaX, 0));
+      return;
+    }
   }
   if (orientation()->isVerticalTimeline())
     updateCellColumnAree();
@@ -1591,13 +1604,16 @@ void XsheetViewer::changeWindowTitle() {
   TApp *app         = TApp::instance();
   ToonzScene *scene = app->getCurrentScene()->getScene();
   if (!scene || !app->getCurrentFrame()->isEditingScene()) return;
-  QString sceneName = QString::fromStdWString(scene->getSceneName());
+  TProject *project   = scene->getProject();
+  QString projectName = QString::fromStdString(project->getName().getName());
+  QString sceneName   = QString::fromStdWString(scene->getSceneName());
   if (sceneName.isEmpty()) sceneName = tr("Untitled");
   if (app->getCurrentScene()->getDirtyFlag()) sceneName += QString("*");
-  QString name   = tr("Scene: ") + sceneName;
+  QString name =
+      tr("Scene: ") + sceneName + tr("   ::   Project: ") + projectName;
   int frameCount = scene->getFrameCount();
   name           = name + "   ::   " + tr(std::to_string(frameCount).c_str()) +
-         tr(" Frames");
+         (frameCount == 1 ? tr(" Frame") : tr(" Frames"));
 
   // subXsheet or not
   ChildStack *childStack = scene->getChildStack();
@@ -1731,7 +1747,7 @@ int XsheetViewer::getFrameZoomAdjustment() {
   int adj         = frameRect.width() -
             ((frameRect.width() * getFrameZoomFactor()) / 100) - 1;
 
-  return qMax(0, adj);
+  return std::max(0, adj);
 }
 
 void XsheetViewer::zoomOnFrame(int frame, int factor) {

@@ -371,7 +371,7 @@ void SequenceConverter::lengthOfTriplet(unsigned int i, Length &len) {
   T3DPointD B = middleAddedSequence[i + 1];
   T3DPointD C = middleAddedSequence[i + 2];
 
-  // We assume that this convertion is faithful, avoiding length penalty
+  // We assume that this conversion is faithful, avoiding length penalty
   len.l    = 0;
   double d = tdistance(B, C - A, A);
   if (d <= 2) {
@@ -684,7 +684,7 @@ bool SequenceConverter::penalty(unsigned int a, unsigned int b, Length &len) {
 //--------------------------------------------------------------------------
 
 //-----------------------------
-//      Convertion Mains
+//      Conversion Mains
 //-----------------------------
 
 inline TStroke *convert(const Sequence &s, double penalty) {

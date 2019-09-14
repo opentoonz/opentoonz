@@ -409,6 +409,8 @@ int main(int argc, char *argv[]) {
   }
 #endif
 
+  TEnv::setApplicationFileName(argv[0]);
+
   // splash screen
   QPixmap splashPixmap = QIcon(":Resources/splash.svg").pixmap(QSize(610, 344));
   splashPixmap.setDevicePixelRatio(QApplication::desktop()->devicePixelRatio());

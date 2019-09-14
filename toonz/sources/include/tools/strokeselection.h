@@ -79,6 +79,8 @@ public:
 
   void enableCommands() override;
 
+  void selectAll();
+
 private:
   TVectorImageP m_vi;          //!< Selected vector image.
   IndexesContainer m_indexes;  //!< Selected stroke indexes in m_vi.

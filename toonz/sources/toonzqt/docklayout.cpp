@@ -423,10 +423,26 @@ void DockLayout::applyTransform(const QTransform &transform) {
 //------------------------------------------------------
 
 void DockLayout::redistribute() {
+  std::vector<QWidget *> widgets;
   if (!m_regions.empty()) {
     // Recompute extremal region sizes
     // NOTA: Sarebbe da fare solo se un certo flag lo richiede; altrimenti tipo
     // per resize events e' inutile...
+
+    // let's force the width of the film strip not to change
+
+    for (int i = 0; i < m_items.size(); i++) {
+      if (m_items.at(i)->widget() != 0) {
+        QWidget *widget = m_items.at(i)->widget();
+        if (widget) {
+          std::string name = widget->objectName().toStdString();
+          if (widget->objectName() == "FilmStrip") {
+            widgets.push_back(widget);
+            widget->setFixedWidth(widget->width());
+          }
+        }
+      }
+    }
     m_regions.front()->calculateExtremalSizes();
 
     int parentWidth  = contentsRect().width();
@@ -447,6 +463,10 @@ void DockLayout::redistribute() {
 
   // Finally, apply Region geometries found
   applyGeometry();
+  for (QWidget *widget : widgets) {
+    widget->setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
+    widget->setMinimumSize(0, 0);
+  }
 }
 
 //======================================================================

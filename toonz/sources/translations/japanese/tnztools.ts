@@ -638,6 +638,20 @@
     </message>
 </context>
 <context>
+    <name>FullColorFillTool</name>
+    <message>
+        <source>Fill Depth</source>
+        <translation>塗りの浸透度</translation>
+    </message>
+</context>
+<context>
+    <name>HandToolOptionsBox</name>
+    <message>
+        <source>Reset Position</source>
+        <translation>表示位置をリセット</translation>
+    </message>
+</context>
+<context>
     <name>HookTool</name>
     <message>
         <source>Snap</source>
@@ -1260,6 +1274,13 @@ Do you want to proceed?</source>
     </message>
 </context>
 <context>
+    <name>RotateToolOptionsBox</name>
+    <message>
+        <source>Reset Rotation</source>
+        <translation>回転をリセット</translation>
+    </message>
+</context>
+<context>
     <name>RulerToolOptionsBox</name>
     <message>
         <source>X:</source>
@@ -1657,6 +1678,13 @@ moved to the end of the first page of the palette.</source>
     <message>
         <source>Rectangular</source>
         <translation>長方形</translation>
+    </message>
+</context>
+<context>
+    <name>ZoomToolOptionsBox</name>
+    <message>
+        <source>Reset Zoom</source>
+        <translation>ズームをリセット</translation>
     </message>
 </context>
 </TS>

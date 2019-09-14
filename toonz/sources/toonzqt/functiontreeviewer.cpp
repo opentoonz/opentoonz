@@ -64,31 +64,6 @@ public:
 
 //=============================================================================
 
-class StageObjectChannelGroup final : public FunctionTreeModel::ChannelGroup {
-public:
-  TStageObject *m_stageObject;  //!< (not owned) Referenced stage object
-  FunctionTreeModel::ChannelGroup
-      *m_plasticGroup;  //!< (not owned) Eventual plastic channels group
-
-public:
-  StageObjectChannelGroup(TStageObject *pegbar);
-  ~StageObjectChannelGroup();
-
-  QString getShortName() const override;
-  QString getLongName() const override;
-
-  QString getIdName() const override;
-
-  void *getInternalPointer() const override {
-    return static_cast<void *>(m_stageObject);
-  }
-
-  TStageObject *getStageObject() const { return m_stageObject; }
-  QVariant data(int role) const override;
-};
-
-//=============================================================================
-
 class SkVDChannelGroup final : public FunctionTreeModel::ChannelGroup {
 public:
   StageObjectChannelGroup *m_stageObjectGroup;  //!< Parent stage object group

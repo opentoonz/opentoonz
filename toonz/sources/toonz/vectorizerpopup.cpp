@@ -190,6 +190,17 @@ void getSelectedFids(std::vector<TFrameId> &fids, TXshSimpleLevel *level,
   for (fst = fidsSet.begin(); fst != fsEnd; ++fst) fids.push_back(*fst);
 }
 
+// Toonz Raster Level may have palette including MyPaint styles,
+// which cannot be rendered in vector levels.
+// In such case replace MyPaint styles by solid color styles.
+void replaceMyPaintBrushStyles(TPalette *palette) {
+  for (int s = 0; s < palette->getStyleCount(); s++) {
+    TColorStyle *style = palette->getStyle(s);
+    if (style->getTagId() == 4001)  // TMyPaintBrushStyle
+      palette->setStyle(s, style->getMainColor());
+  }
+}
+
 }  // namespace
 
 //*****************************************************************************
@@ -288,10 +299,12 @@ void Vectorizer::setLevel(const TXshSimpleLevelP &level) {
     vl->setName(levelName);
   }
 
-  TPalette *palette                          = 0;
-  if (sl->getType() == TZP_XSHLEVEL) palette = sl->getPalette();
-
-  palette = palette ? palette->clone() : new TPalette;
+  TPalette *palette = 0;
+  if (sl->getType() == TZP_XSHLEVEL) {
+    palette = sl->getPalette()->clone();
+    replaceMyPaintBrushStyles(palette);
+  } else
+    palette = new TPalette;
 
   palette->setPaletteName(vl->getName());
   vl->setPalette(palette);

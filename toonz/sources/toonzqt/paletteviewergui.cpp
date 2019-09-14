@@ -212,7 +212,12 @@ TFrameHandle *PageViewer::getFrameHandle() const { return m_frameHandle; }
 //-----------------------------------------------------------------------------
 
 void PageViewer::setCurrentStyleIndex(int index) {
-  getPaletteHandle()->setStyleIndex(index);
+  // When clicking and switching between studio palette and level palette, the
+  // signal broadcastColorStyleSwitched is not emitted if the clicked style is
+  // previously selected one.
+  // Therefore here I introduced the "forceEmit" flag here in order to emit the
+  // signal whenever the style is clicked.
+  getPaletteHandle()->setStyleIndex(index, true);
 }
 
 //-----------------------------------------------------------------------------
@@ -1042,7 +1047,10 @@ void PageViewer::addNewColor() {
 //-----------------------------------------------------------------------------
 
 void PageViewer::addNewPage() {
-  PaletteCmd::addPage(getPaletteHandle());
+  TPaletteHandle *paletteHandle = getPaletteHandle();
+  PaletteCmd::addPage(paletteHandle);
+  if (paletteHandle)
+    emit switchToPage(paletteHandle->getPalette()->getPageCount() - 1);
   update();
 }
 

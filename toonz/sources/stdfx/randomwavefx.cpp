@@ -191,10 +191,10 @@ public:
     TRasterP rasIn = tileIn.getRaster();
 
     // Compute the warper tile
-    TSpectrum::ColorKey colors[] = {TSpectrum::ColorKey(0, TPixel32::White),
-                                    TSpectrum::ColorKey(1, TPixel32::Black)};
-
-    TSpectrumParamP cloudscolors = TSpectrumParamP(tArrayCount(colors), colors);
+    std::vector<TSpectrum::ColorKey> colors = {
+        TSpectrum::ColorKey(0, TPixel32::White),
+        TSpectrum::ColorKey(1, TPixel32::Black)};
+    TSpectrumParamP cloudscolors = TSpectrumParamP(colors);
 
     // Build the warper
     warperInfo.m_affine = warperInfo.m_affine;

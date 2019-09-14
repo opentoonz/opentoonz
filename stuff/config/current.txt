@@ -240,6 +240,7 @@
   <item>"STD_linearGradientFx.wave_phase"		"Phase"		</item>
   <item>"STD_linearGradientFx.color1"		"Color 1"		</item>
   <item>"STD_linearGradientFx.color2"		"Color 2"		</item>
+  <item>"STD_linearGradientFx.curveType"		"Type"		</item>
 
   <item>"STD_linearWaveFx"		"Linear Wave"	</item>
   <item>"STD_linearWaveFx.period"		"Period"		</item>
@@ -267,6 +268,7 @@
   <item>"STD_multiLinearGradientFx.wave_frequency"	"Frequency"		</item>
   <item>"STD_multiLinearGradientFx.wave_phase"	"Phase"			</item>
   <item>"STD_multiLinearGradientFx.colors"		"Colors"			</item>
+  <item>"STD_multiLinearGradientFx.curveType"		"Type"		</item>
 
   <item>"STD_localBlurFx"		"Local Blur"		</item>
   <item>"STD_localBlurFx.value"		"Intensity"		</item>
@@ -324,6 +326,7 @@
   <item>"STD_radialGradientFx.innerperiod"		"Inner Size"		</item>
   <item>"STD_radialGradientFx.color1"		"Color 1"		</item>
   <item>"STD_radialGradientFx.color2"		"Color 2"		</item>
+  <item>"STD_radialGradientFx.curveType"		"Type"		</item>
 
 
   <item>"STD_randomWaveFx"		"Random Wave"	</item>
@@ -358,6 +361,7 @@
   <item>"STD_multiRadialGradientFx.count"	"Quantity"		</item>
   <item>"STD_multiRadialGradientFx.cycle"	"Cycle"			</item>
   <item>"STD_multiRadialGradientFx.colors"	"Colors"			</item>
+  <item>"STD_multiRadialGradientFx.curveType"		"Type"		</item>
 
   <item>"STD_raylitFx"			"Raylit"	</item>
   <item>"STD_raylitFx.p"		"Center X"	</item>

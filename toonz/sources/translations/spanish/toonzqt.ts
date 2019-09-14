@@ -289,11 +289,11 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     <name>DVGui</name>
     <message>
         <source>OK</source>
-        <translation>Aceptar</translation>
+        <translation type="vanished">Aceptar</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Cancelar</translation>
+        <translation type="vanished">Cancelar</translation>
     </message>
 </context>
 <context>
@@ -1019,6 +1019,30 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
         <source>Step 4</source>
         <translation>Exposición x4</translation>
     </message>
+    <message>
+        <source>Activate Cycle</source>
+        <translation type="unfinished">Activar ciclo</translation>
+    </message>
+    <message>
+        <source>Deactivate Cycle</source>
+        <translation type="unfinished">Desactivar ciclo</translation>
+    </message>
+    <message>
+        <source>Show Inbetween Values</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hide Inbetween Values</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Interpolation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Step</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>FunctionToolbar</name>
@@ -1383,7 +1407,7 @@ Seleccionar los nodos de efecto y sus vínculos relacionados antes de copiar o c
     <name>MyPaintBrushStyleChooserPage</name>
     <message>
         <source>Plain color</source>
-        <translation>Color pleno</translation>
+        <translation type="vanished">Color pleno</translation>
     </message>
 </context>
 <context>
@@ -1607,6 +1631,17 @@ Seleccionar los nodos de efecto y sus vínculos relacionados antes de copiar o c
     </message>
 </context>
 <context>
+    <name>PlaneViewer</name>
+    <message>
+        <source>Reset View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fit To Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>PointParamField</name>
     <message>
         <source>Y:</source>
@@ -1685,19 +1720,19 @@ Seleccionar los nodos de efecto y sus vínculos relacionados antes de copiar o c
     </message>
     <message>
         <source>Save</source>
-        <translation>Guardar</translation>
+        <translation type="vanished">Guardar</translation>
     </message>
     <message>
         <source>Discard</source>
-        <translation>Descartar</translation>
+        <translation type="vanished">Descartar</translation>
     </message>
     <message>
         <source>Yes</source>
-        <translation>Sí</translation>
+        <translation type="vanished">Sí</translation>
     </message>
     <message>
         <source>No</source>
-        <translation>No</translation>
+        <translation type="vanished">No</translation>
     </message>
     <message>
         <source>Stage Schematic</source>
@@ -2025,7 +2060,7 @@ Are you sure?</source>
     </message>
     <message>
         <source>Replace</source>
-        <translation>Reemplazar</translation>
+        <translation type="vanished">Reemplazar</translation>
     </message>
     <message>
         <source>Modify Fx Param : %1</source>
@@ -2156,7 +2191,43 @@ La segunda línea debería tener la forma &quot;Mesh [profundidad de bits de ent
     </message>
     <message>
         <source>OpenToonz 1.2</source>
-        <translation>OpenToonz 1.2</translation>
+        <translation type="vanished">OpenToonz 1.2</translation>
+    </message>
+    <message>
+        <source>Custom Texture</source>
+        <comment>TextureStyleChooserPage</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current Frame: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File History</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OpenToonz 1.3</source>
+        <translation type="obsolete">OpenToonz 1.3</translation>
+    </message>
+    <message>
+        <source>Plain color</source>
+        <comment>VectorBrushStyleChooserPage</comment>
+        <translation type="unfinished">Color pleno</translation>
+    </message>
+    <message>
+        <source>Plain color</source>
+        <comment>MyPaintBrushStyleChooserPage</comment>
+        <translation type="unfinished">Color pleno</translation>
+    </message>
+    <message>
+        <source>Plain color</source>
+        <comment>SpecialStyleChooserPage</comment>
+        <translation type="unfinished">Color pleno</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished">Aceptar</translation>
     </message>
 </context>
 <context>
@@ -2254,7 +2325,7 @@ La segunda línea debería tener la forma &quot;Mesh [profundidad de bits de ent
     <name>SpecialStyleChooserPage</name>
     <message>
         <source>Plain color</source>
-        <translation>Color pleno</translation>
+        <translation type="vanished">Color pleno</translation>
     </message>
 </context>
 <context>
@@ -2387,6 +2458,50 @@ La segunda línea debería tener la forma &quot;Mesh [profundidad de bits de ent
     <message>
         <source>Cancel</source>
         <translation>Cancelar</translation>
+    </message>
+    <message>
+        <source>The current palette %1
+in the studio palette has been modified. Do you want to save your changes?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation type="unfinished">Guardar</translation>
+    </message>
+    <message>
+        <source>Discard</source>
+        <translation type="unfinished">Descartar</translation>
+    </message>
+    <message>
+        <source>Convert %1 to Studio Palette and Overwrite. 
+Are you sure ?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation type="obsolete">Sí</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation type="obsolete">No</translation>
+    </message>
+    <message>
+        <source>Replacing all selected palettes with the palette &quot;%1&quot;. 
+Are you sure ?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Replacing the palette &quot;%1&quot; with the palette &quot;%2&quot;. 
+Are you sure ?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Replace</source>
+        <translation type="unfinished">Reemplazar</translation>
+    </message>
+    <message>
+        <source>Convert</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2646,6 +2761,17 @@ Autom</translation>
     </message>
 </context>
 <context>
+    <name>SwatchViewer</name>
+    <message>
+        <source>Reset View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fit To Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>TMessageViewer</name>
     <message>
         <source>Errors</source>
@@ -2694,7 +2820,7 @@ Autom</translation>
     <name>VectorBrushStyleChooserPage</name>
     <message>
         <source>Plain color</source>
-        <translation>Color pleno</translation>
+        <translation type="vanished">Color pleno</translation>
     </message>
 </context>
 <context>

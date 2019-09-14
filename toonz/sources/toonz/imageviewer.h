@@ -6,6 +6,8 @@
 #include "toonz/imagepainter.h"
 #include "toonzqt/glwidget_for_highdpi.h"
 
+#include <QTouchDevice>
+
 //-----------------------------------------------------------------------------
 
 //  Forward declarations
@@ -13,7 +15,8 @@ class FlipBook;
 class HistogramPopup;
 class QOpenGLFramebufferObject;
 class LutCalibrator;
-
+class QTouchEvent;
+class QGestureEvent;
 //-----------------------------------------------------------------------------
 
 //====================
@@ -50,6 +53,7 @@ class ImageViewer final : public GLWidgetForHighDpi {
   QPoint m_pos;
   bool m_isHistogramEnable;
   HistogramPopup *m_histogramPopup;
+  bool m_firstImage;
 
   bool m_isColorModel;
   // when fx parameter is modified with showing the fx preview,
@@ -60,6 +64,16 @@ class ImageViewer final : public GLWidgetForHighDpi {
   QOpenGLFramebufferObject *m_fbo = NULL;
   LutCalibrator *m_lutCalibrator  = NULL;
 
+  bool m_touchActive                     = false;
+  bool m_gestureActive                   = false;
+  QTouchDevice::DeviceType m_touchDevice = QTouchDevice::TouchScreen;
+  bool m_zooming                         = false;
+  bool m_panning                         = false;
+  double m_scaleFactor;  // used for zoom gesture
+
+  bool m_stylusUsed       = false;
+  bool m_firstInitialized = true;
+
   int getDragType(const TPoint &pos, const TRect &loadBox);
   void updateLoadbox(const TPoint &curPos);
   void updateCursor(const TPoint &curPos);
@@ -68,6 +82,8 @@ class ImageViewer final : public GLWidgetForHighDpi {
   void pickColor(QMouseEvent *event, bool putValueToStyleEditor = false);
   void rectPickColor(bool putValueToStyleEditor = false);
   void setPickedColorToStyleEditor(const TPixel32 &color);
+  // get the image (m_image or the snapshot) to be picked.
+  TImageP getPickedImage(QPointF mousePos);
 
 public:
   ImageViewer(QWidget *parent, FlipBook *flipbook, bool showHistogram);
@@ -96,6 +112,7 @@ public:
    */
   void hideHistogram();
   void zoomQt(bool forward, bool reset);
+  void resetZoom();
 
   void setIsRemakingPreviewFx(bool on) {
     m_isRemakingPreviewFx = on;
@@ -127,6 +144,11 @@ protected:
 
   void dragCompare(const QPoint &dp);
 
+  void tabletEvent(QTabletEvent *e);
+  void touchEvent(QTouchEvent *e, int type);
+  void gestureEvent(QGestureEvent *e);
+  bool event(QEvent *e);
+
 public slots:
 
   void updateImageViewer();
@@ -135,6 +157,9 @@ public slots:
   void showHistogram();
   void swapCompared();
   void onContextAboutToBeDestroyed();
+
+private:
+  QPointF m_firstPanPoint;
 };
 
 #endif  // IMAGEVIEWER_INCLUDE

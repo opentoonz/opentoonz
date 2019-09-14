@@ -211,6 +211,7 @@ private:
 
 signals:
   void changeWindowTitleSignal();
+  void switchToPage(int);
 };
 
 //****************************************************************************

@@ -33,7 +33,7 @@
 
 using namespace DVGui;
 
-QString DialogTitle = QObject::tr("OpenToonz 1.3");
+QString DialogTitle = "OpenToonz 1.3";
 
 //=============================================================================
 namespace {
@@ -210,7 +210,10 @@ clearButtonBar(). You can also
 setButtonBarSpacing() functions.
 */
 //-----------------------------------------------------------------------------
-QSettings *Dialog::m_settings = 0;
+
+namespace {
+QString settingsPath;
+};
 
 Dialog::Dialog(QWidget *parent, bool hasButton, bool hasFixedSize,
                const QString &name)
@@ -274,17 +277,17 @@ Dialog::Dialog(QWidget *parent, bool hasButton, bool hasFixedSize,
   setWindowFlags(Qt::Tool);
 #endif
 
-  if (!m_settings) {
-    TFilePath layoutDir = ToonzFolder::getMyModuleDir();
-    TFilePath savePath  = layoutDir + TFilePath("popups.ini");
-    m_settings =
-        new QSettings(QString::fromStdWString(savePath.getWideString()),
-                      QSettings::IniFormat);
+  if (settingsPath.isEmpty()) {
+    TFilePath savePath =
+        ToonzFolder::getMyModuleDir() + TFilePath("popups.ini");
+    settingsPath = QString::fromStdWString(savePath.getWideString());
   }
+
+  QSettings settings(settingsPath, QSettings::IniFormat);
 
   if (name == QString()) return;
   m_name      = name + "DialogGeometry";
-  QString geo = m_settings->value(m_name).toString();
+  QString geo = settings.value(m_name).toString();
   if (geo != QString()) {
     QStringList values = geo.split(" ");
     assert(values.size() == 4);
@@ -312,31 +315,28 @@ Dialog::Dialog(QWidget *parent, bool hasButton, bool hasFixedSize,
     // on another monitor by default, but this is better than
     // a user thinking the program is broken because they didn't notice
     // the popup on another monitor
-    if (x > screen.right() - 50) x  = screen.right() - 50;
-    if (x < screen.left()) x        = screen.left();
+    if (x > screen.right() - 50) x = screen.right() - 50;
+    if (x < screen.left()) x = screen.left();
     if (y > screen.bottom() - 90) y = screen.bottom() - 90;
-    if (y < screen.top()) y         = screen.top();
+    if (y < screen.top()) y = screen.top();
     setGeometry(x, y, values.at(2).toInt(), values.at(3).toInt());
-    m_settings->setValue(m_name,
-                         QString::number(x) + " " + QString::number(y) + " " +
-                             QString::number(values.at(2).toInt()) + " " +
-                             QString::number(values.at(3).toInt()));
+    settings.setValue(m_name, QString::number(x) + " " + QString::number(y) +
+                                  " " + QString::number(values.at(2).toInt()) +
+                                  " " + QString::number(values.at(3).toInt()));
   }
 }
 
 //-----------------------------------------------------------------------------
 
-Dialog::~Dialog() {}
-//-----------------------------------------------------------------------------
-
-void Dialog::moveEvent(QMoveEvent *e) {
+Dialog::~Dialog() {
   if (m_name == QString()) return;
 
   QRect r = geometry();
-  m_settings->setValue(m_name, QString::number(r.left()) + " " +
-                                   QString::number(r.top()) + " " +
-                                   QString::number(r.width()) + " " +
-                                   QString::number(r.height()));
+  QSettings settings(settingsPath, QSettings::IniFormat);
+  settings.setValue(m_name, QString::number(r.left()) + " " +
+                                QString::number(r.top()) + " " +
+                                QString::number(r.width()) + " " +
+                                QString::number(r.height()));
 }
 
 //---------------------------------------------------------------------------------
@@ -344,17 +344,8 @@ void Dialog::moveEvent(QMoveEvent *e) {
 void Dialog::resizeEvent(QResizeEvent *e) {
   if (Preferences::instance()->getCurrentLanguage() != "English") {
     QSize t = this->size();
-    for (QLabel *s : m_labelList)
-      s->setFixedWidth(t.width() * .35);
+    for (QLabel *s : m_labelList) s->setFixedWidth(t.width() * .35);
   }
-
-  if (m_name == QString()) return;
-
-  QRect r = geometry();
-  m_settings->setValue(m_name, QString::number(r.left()) + " " +
-                                   QString::number(r.top()) + " " +
-                                   QString::number(r.width()) + " " +
-                                   QString::number(r.height()));
 }
 
 //-----------------------------------------------------------------------------
@@ -380,23 +371,24 @@ void Dialog::hideEvent(QHideEvent *event) {
   }
   QRect screen = QApplication::desktop()->availableGeometry(currentScreen);
 
-  if (x > screen.right() - 50) x  = screen.right() - 50;
-  if (x < screen.left()) x        = screen.left();
+  if (x > screen.right() - 50) x = screen.right() - 50;
+  if (x < screen.left()) x = screen.left();
   if (y > screen.bottom() - 90) y = screen.bottom() - 90;
-  if (y < screen.top()) y         = screen.top();
+  if (y < screen.top()) y = screen.top();
   move(QPoint(x, y));
   resize(size());
   QRect r = geometry();
-  m_settings->setValue(m_name, QString::number(r.left()) + " " +
-                                   QString::number(r.top()) + " " +
-                                   QString::number(r.width()) + " " +
-                                   QString::number(r.height()));
+  QSettings settings(settingsPath, QSettings::IniFormat);
+  settings.setValue(m_name, QString::number(r.left()) + " " +
+                                QString::number(r.top()) + " " +
+                                QString::number(r.width()) + " " +
+                                QString::number(r.height()));
   emit dialogClosed();
 }
 
 //-----------------------------------------------------------------------------
 /*! Create the new layouts (2 Vertical) for main part of dialog.
-*/
+ */
 void Dialog::beginVLayout() {
   m_isMainVLayout = true;
 
@@ -435,7 +427,7 @@ void Dialog::endVLayout() {
 
 //-----------------------------------------------------------------------------
 /*! Create a new Horizontal Layout for main part of dialog.
-*/
+ */
 void Dialog::beginHLayout() {
   m_isMainHLayout = true;
   m_mainHLayout   = new QHBoxLayout;
@@ -445,7 +437,7 @@ void Dialog::beginHLayout() {
 
 //-----------------------------------------------------------------------------
 /*! Add to main part of dialog the Horizontal Layout  and set it to 0.
-*/
+ */
 void Dialog::endHLayout() {
   m_isMainHLayout = false;
   if (!m_mainHLayout) return;
@@ -647,7 +639,7 @@ void Dialog::addLayouts(QLayout *firstL, QLayout *secondL) {
 
 //-----------------------------------------------------------------------------
 /*! Add spacing \b spacing to main part of dialog.
-*/
+ */
 void Dialog::addSpacing(int spacing) {
   if (m_isMainVLayout) {
     assert(m_leftVLayout && m_rightVLayout);
@@ -686,14 +678,14 @@ void Dialog::addSeparator(QString name) {
 
 //-----------------------------------------------------------------------------
 /*! Set the alignement of the main layout
-*/
+ */
 void Dialog::setAlignment(Qt::Alignment alignment) {
   m_mainFrame->layout()->setAlignment(alignment);
 }
 
 //-----------------------------------------------------------------------------
 /*! Set to \b spacing spacing of main part of dialog.
-*/
+ */
 void Dialog::setTopSpacing(int spacing) {
   m_layoutSpacing = spacing;
   m_topLayout->setSpacing(spacing);
@@ -718,26 +710,26 @@ int Dialog::getLayoutInsertedSpacing() { return m_layoutSpacing; }
 
 //-----------------------------------------------------------------------------
 /*! Set to \b margin margin of main part of dialog.
-*/
+ */
 void Dialog::setTopMargin(int margin) { m_topLayout->setMargin(margin); }
 
 //-----------------------------------------------------------------------------
 /*! Set to \b margin margin of button part of dialog.
-*/
+ */
 void Dialog::setButtonBarMargin(int margin) {
   m_buttonLayout->setMargin(margin);
 }
 
 //-----------------------------------------------------------------------------
 /*! Set to \b spacing spacing of button part of dialog.
-*/
+ */
 void Dialog::setButtonBarSpacing(int spacing) {
   m_buttonLayout->setSpacing(spacing);
 }
 
 //-----------------------------------------------------------------------------
 /*! Add a widget to the button part of dialog.
-*/
+ */
 void Dialog::addButtonBarWidget(QWidget *widget) {
   widget->setMinimumSize(65, 25);
   assert(m_hasButton);
@@ -749,7 +741,7 @@ void Dialog::addButtonBarWidget(QWidget *widget) {
 
 //-----------------------------------------------------------------------------
 /*! Remove all widget from the button part of dialog.
-*/
+ */
 void Dialog::clearButtonBar() {
   for (int i = 0; i < (int)m_buttonBarWidgets.size(); i++) {
     m_buttonLayout->removeWidget(m_buttonBarWidgets[i]);
@@ -759,7 +751,7 @@ void Dialog::clearButtonBar() {
 
 //-----------------------------------------------------------------------------
 /*! Add two widget to the button part of dialog.
-*/
+ */
 void Dialog::addButtonBarWidget(QWidget *first, QWidget *second) {
   first->setMinimumSize(65, 25);
   second->setMinimumSize(65, 25);
@@ -772,7 +764,7 @@ void Dialog::addButtonBarWidget(QWidget *first, QWidget *second) {
 
 //-----------------------------------------------------------------------------
 /*! Add three widget to the button part of dialog.
-*/
+ */
 void Dialog::addButtonBarWidget(QWidget *first, QWidget *second,
                                 QWidget *third) {
   first->setMinimumSize(65, 25);
@@ -788,7 +780,7 @@ void Dialog::addButtonBarWidget(QWidget *first, QWidget *second,
 
 //-----------------------------------------------------------------------------
 /*! Add four widget to the button part of dialog.
-*/
+ */
 void Dialog::addButtonBarWidget(QWidget *first, QWidget *second, QWidget *third,
                                 QWidget *fourth) {
   first->setMinimumSize(65, 25);
@@ -1348,15 +1340,15 @@ QString DVGui::getText(const QString &title, const QString &labelText,
   LineEdit *nameFld = new LineEdit(text, &dialog);
   layout->addWidget(nameFld);
 
-  QPushButton *okBtn = new QPushButton(dialog.tr("OK"), &dialog);
+  QPushButton *okBtn = new QPushButton(QObject::tr("OK"), &dialog);
   okBtn->setDefault(true);
-  QPushButton *cancelBtn = new QPushButton(dialog.tr("Cancel"), &dialog);
+  QPushButton *cancelBtn = new QPushButton(QObject::tr("Cancel"), &dialog);
   QObject::connect(okBtn, SIGNAL(clicked()), &dialog, SLOT(accept()));
   QObject::connect(cancelBtn, SIGNAL(clicked()), &dialog, SLOT(reject()));
 
   dialog.addButtonBarWidget(okBtn, cancelBtn);
 
-  int ret     = dialog.exec();
+  int ret = dialog.exec();
   if (ok) *ok = (ret == QDialog::Accepted);
 
   return nameFld->text();
@@ -1377,7 +1369,7 @@ bool isStyleIdInPalette(int styleId, const TPalette *palette) {
   }
   return false;
 }
-}
+}  // namespace
 
 //-----------------------------------------------------------------------------
 

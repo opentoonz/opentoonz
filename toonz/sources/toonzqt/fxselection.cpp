@@ -417,6 +417,7 @@ Link FxSelection::getBoundingFxs(SchematicLink *link) {
 Link FxSelection::getBoundingFxs(SchematicPort *inputPort,
                                  SchematicPort *outputPort) {
   Link boundingFxs;
+  if (!inputPort || !outputPort) return boundingFxs;
   FxSchematicNode *inputNode =
       dynamic_cast<FxSchematicNode *>(outputPort->getNode());
   FxSchematicNode *outputNode =

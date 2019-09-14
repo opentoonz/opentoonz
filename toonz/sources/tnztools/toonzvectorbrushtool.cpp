@@ -625,6 +625,12 @@ void ToonzVectorBrushTool::onDeactivate() {
   /*---
   * ドラッグ中にツールが切り替わった場合に備え、onDeactivateにもMouseReleaseと同じ処理を行う
   * ---*/
+
+  // End current stroke.
+  if (m_active && m_enabled) {
+      leftButtonUp(m_lastDragPos, m_lastDragEvent);
+  }
+
   if (m_tileSaver && !m_isPath) {
     m_enabled = false;
   }
@@ -718,6 +724,10 @@ void ToonzVectorBrushTool::leftButtonDrag(const TPointD &pos,
     m_brushPos = m_mousePos = pos;
     return;
   }
+
+  m_lastDragPos = pos;
+  m_lastDragEvent = e;
+
   double thickness = (m_pressure.getValue() || m_isPath)
                          ? computeThickness(e.m_pressure, m_thickness, m_isPath)
                          : m_thickness.getValue().second * 0.5;

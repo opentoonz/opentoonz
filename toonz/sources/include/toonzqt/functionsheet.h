@@ -48,6 +48,8 @@ class FunctionSheetColumnHeadViewer final : public Spreadsheet::ColumnPanel {
   QPoint m_dragStartPosition;
   FunctionTreeModel::Channel *m_draggingChannel;
 
+  int m_clickedColumn = -1;
+
 public:
   FunctionSheetColumnHeadViewer(FunctionSheet *parent);
 
@@ -96,6 +98,7 @@ private slots:
 
 class FunctionSheet final : public SpreadsheetViewer {
   Q_OBJECT
+  bool m_showIbtwnValue = true;
 
 public:
   FunctionSheet(QWidget *parent = 0, bool isFloating = false);
@@ -123,6 +126,17 @@ public:
   QString getSelectedParamName();
   int getColumnIndexByCurve(TDoubleParam *param) const;
   bool anyWidgetHasFocus();
+
+  // Obtains a pointer to the stage object containing the
+  // parameter of specified column. Returns nullptr for
+  // fx parameter columns.
+  TStageObject *getStageObject(int column);
+
+  bool isIbtwnValueVisible() { return m_showIbtwnValue; }
+  void setIbtwnValueVisible(bool visible) {
+    m_showIbtwnValue = visible;
+    update();
+  }
 
 protected:
   void showEvent(QShowEvent *e) override;

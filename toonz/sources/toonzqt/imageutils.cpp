@@ -215,7 +215,7 @@ void premultiply(const TFilePath &levelPath) {
     /*
 if (!isMovie && lr->getImageInfo()->m_samplePerPixel!=4)
 {
-QMessageBox::information(0, QString("ERROR"), QString("Only rgbm images can be
+QMessageBox::information(0, QString("ERROR"), QString("Only rgba images can be
 premultiplied!"));
 return;
 }
@@ -801,16 +801,17 @@ double getQuantizedZoomFactor(double zf, bool forward) {
 
 namespace {
 
-void getViewerShortcuts(int &zoomIn, int &zoomOut, int &zoomReset, int &zoomFit,
+void getViewerShortcuts(int &zoomIn, int &zoomOut, int &viewReset, int &zoomFit,
                         int &showHideFullScreen, int &actualPixelSize,
-                        int &flipX, int &flipY) {
+                        int &flipX, int &flipY, int &zoomReset,
+                        int &rotateReset, int &positionReset) {
   CommandManager *cManager = CommandManager::instance();
 
   zoomIn = cManager->getKeyFromShortcut(cManager->getShortcutFromId(V_ZoomIn));
   zoomOut =
       cManager->getKeyFromShortcut(cManager->getShortcutFromId(V_ZoomOut));
-  zoomReset =
-      cManager->getKeyFromShortcut(cManager->getShortcutFromId(V_ZoomReset));
+  viewReset =
+      cManager->getKeyFromShortcut(cManager->getShortcutFromId(V_ViewReset));
   zoomFit =
       cManager->getKeyFromShortcut(cManager->getShortcutFromId(V_ZoomFit));
   showHideFullScreen = cManager->getKeyFromShortcut(
@@ -819,6 +820,12 @@ void getViewerShortcuts(int &zoomIn, int &zoomOut, int &zoomReset, int &zoomFit,
       cManager->getShortcutFromId(V_ActualPixelSize));
   flipX = cManager->getKeyFromShortcut(cManager->getShortcutFromId(V_FlipX));
   flipY = cManager->getKeyFromShortcut(cManager->getShortcutFromId(V_FlipY));
+  zoomReset =
+      cManager->getKeyFromShortcut(cManager->getShortcutFromId(V_ZoomReset));
+  rotateReset =
+      cManager->getKeyFromShortcut(cManager->getShortcutFromId(V_RotateReset));
+  positionReset = cManager->getKeyFromShortcut(
+      cManager->getShortcutFromId(V_PositionReset));
 }
 
 }  // namespace
@@ -833,10 +840,11 @@ ShortcutZoomer::ShortcutZoomer(QWidget *zoomingWidget)
 //--------------------------------------------------------------------------
 
 bool ShortcutZoomer::exec(QKeyEvent *event) {
-  int zoomInKey, zoomOutKey, zoomResetKey, zoomFitKey, showHideFullScreenKey,
-      actualPixelSize, flipX, flipY;
-  getViewerShortcuts(zoomInKey, zoomOutKey, zoomResetKey, zoomFitKey,
-                     showHideFullScreenKey, actualPixelSize, flipX, flipY);
+  int zoomInKey, zoomOutKey, viewResetKey, zoomFitKey, showHideFullScreenKey,
+      actualPixelSize, flipX, flipY, zoomReset, rotateReset, positionReset;
+  getViewerShortcuts(zoomInKey, zoomOutKey, viewResetKey, zoomFitKey,
+                     showHideFullScreenKey, actualPixelSize, flipX, flipY,
+                     zoomReset, rotateReset, positionReset);
 
   int key = event->key();
   if (key == Qt::Key_Control || key == Qt::Key_Shift || key == Qt::Key_Alt)
@@ -855,13 +863,22 @@ bool ShortcutZoomer::exec(QKeyEvent *event) {
                          : (key == zoomFitKey)
                                ? fit()
                                : (key == zoomInKey || key == zoomOutKey ||
-                                  key == zoomResetKey)
+                                  key == viewResetKey)
                                      ? zoom(key == zoomInKey,
-                                            key == zoomResetKey)
+                                            key == viewResetKey)
                                      : (key == flipX)
                                            ? setFlipX()
-                                           : (key == flipY) ? setFlipY()
-                                                            : false;
+                                           : (key == flipY)
+                                                 ? setFlipY()
+                                                 : (key == zoomReset)
+                                                       ? resetZoom()
+                                                       : (key == rotateReset)
+                                                             ? resetRotation()
+                                                             : (key ==
+                                                                positionReset)
+                                                                   ? resetPosition()
+                                                                   : false;
+  ;
 }
 
 //*********************************************************************************************

@@ -156,6 +156,8 @@ void SVNUpdateAndLockDialog::onStatusRetrieved(const QString &xmlResponse) {
     m_commentLabel->show();
     switchToCloseButton();
   } else {
+    setMinimumSize(300, 150);
+
     m_waitingLabel->hide();
 
     m_textLabel->setText(

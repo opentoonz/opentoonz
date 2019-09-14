@@ -699,64 +699,93 @@ private:
   int m_row;
   int m_col;
   int m_count;
+  bool m_selected;
+  TCellSelection::Range m_range;
+  std::vector<std::pair<int, int>> emptyCells;
+  typedef std::map<std::pair<int, int>, int> FramesMap;
+  FramesMap m_frameRanges;
 
 public:
-  DrawingSubtitutionGroupUndo(int dir, int row, int col)
-      : m_direction(dir), m_col(col), m_row(row) {
-    m_count       = 1;
-    TXshCell cell = TTool::getApplication()
-                        ->getCurrentScene()
-                        ->getScene()
-                        ->getXsheet()
-                        ->getCell(m_row, m_col);
-    if (!cell.m_level ||
-        !(cell.m_level->getSimpleLevel() || cell.m_level->getChildLevel() ||
-          cell.m_level->getSoundTextLevel()))
-      return;
+  DrawingSubtitutionGroupUndo(int dir, int row, int col, bool selected,
+                              TCellSelection::Range range)
+      : m_direction(dir)
+      , m_col(col)
+      , m_row(row)
+      , m_selected(selected)
+      , m_range(range) {
+    TXsheet *xsh =
+        TTool::getApplication()->getCurrentScene()->getScene()->getXsheet();
 
-    TFrameId id = cell.m_frameId;
+    if (!selected) {
+      m_range.m_c0 = col;
+      m_range.m_r0 = row;
+      m_range.m_c1 = col;
+      m_range.m_r1 = row;
+    }
 
-    TXshCell nextCell = TTool::getApplication()
-                            ->getCurrentScene()
-                            ->getScene()
-                            ->getXsheet()
-                            ->getCell(m_row + m_count, m_col);
-    if (!nextCell.m_level ||
-        !(nextCell.m_level->getSimpleLevel() ||
-          nextCell.m_level->getChildLevel() ||
-          nextCell.m_level->getSoundTextLevel()))
-      return;
+    for (int c = m_range.m_c0; c <= m_range.m_c1; c++) {
+      for (int r = m_range.m_r0; r <= m_range.m_r1; r++) {
+        TXshCell baseCell = xsh->getCell(r, c);
 
-    TFrameId nextId = nextCell.m_frameId;
+        // Find the 1st populated cell in the column
+        if (baseCell.isEmpty()) continue;
 
-    while (id == nextId) {
-      m_count++;
-      nextCell = TTool::getApplication()
-                     ->getCurrentScene()
-                     ->getScene()
-                     ->getXsheet()
-                     ->getCell(m_row + m_count, m_col);
-      nextId = nextCell.m_frameId;
+        FramesMap::key_type frameBaseKey(r, c);
+        int frameCount    = 1;
+        TXshCell nextCell = xsh->getCell((r + frameCount), c);
+        while (nextCell == baseCell ||
+               (nextCell.isEmpty() && (r + frameCount) <= m_range.m_r1)) {
+          if (nextCell.isEmpty())
+            emptyCells.push_back(std::make_pair((r + frameCount), c));
+
+          frameCount++;
+          nextCell = xsh->getCell((r + frameCount), c);
+        }
+        m_frameRanges.insert(std::make_pair(frameBaseKey, 0));
+        m_frameRanges[frameBaseKey] = frameCount;
+        r = r + (frameCount - 1);  // Skip frames in range we've processed
+      }
     }
   }
 
   void undo() const override {
-    int n = 1;
-    DrawingSubtitutionUndo::changeDrawing(-m_direction, m_row, m_col);
-    while (n < m_count) {
-      DrawingSubtitutionUndo::changeDrawing(-m_direction, m_row + n, m_col);
-      n++;
+    TXsheet *xsh =
+        TTool::getApplication()->getCurrentScene()->getScene()->getXsheet();
+    FramesMap::const_iterator ct;
+    for (ct = m_frameRanges.begin(); ct != m_frameRanges.end(); ++ct) {
+      int n = 0;
+      while (n < ct->second) {
+        int row = ct->first.first + n;
+        int col = ct->first.second;
+        std::vector<std::pair<int, int>>::const_iterator it;
+        bool found = false;
+        for (it = emptyCells.begin(); it != emptyCells.end(); ++it) {
+          if (it->first == row && it->second == col) {
+            xsh->clearCells(row, col);
+            found = true;
+          }
+        }
+
+        if (!found)
+          DrawingSubtitutionUndo::changeDrawing(-m_direction, row, col);
+        n++;
+      }
     }
+
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
     TApp::instance()->getCurrentScene()->setDirtyFlag(true);
   }
 
   void redo() const override {
-    int n = 1;
-    DrawingSubtitutionUndo::changeDrawing(m_direction, m_row, m_col);
-    while (n < m_count) {
-      DrawingSubtitutionUndo::changeDrawing(m_direction, m_row + n, m_col);
-      n++;
+    FramesMap::const_iterator ct;
+    for (ct = m_frameRanges.begin(); ct != m_frameRanges.end(); ++ct) {
+      int n = 0;
+      while (n < ct->second) {
+        int row = ct->first.first + n;
+        int col = ct->first.second;
+        DrawingSubtitutionUndo::changeDrawing(m_direction, row, col);
+        n++;
+      }
     }
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
     TApp::instance()->getCurrentScene()->setDirtyFlag(true);
@@ -885,15 +914,19 @@ static void drawingSubstituion(int dir) {
 }
 
 static void drawingSubstituionGroup(int dir) {
+  TCellSelection *selection = dynamic_cast<TCellSelection *>(
+      TTool::getApplication()->getCurrentSelection()->getSelection());
+  TCellSelection::Range range;
+  bool selected = false;
+  if (selection) {
+    range                            = selection->getSelectedCells();
+    if (!(range.isEmpty())) selected = true;
+  }
   int row = TTool::getApplication()->getCurrentFrame()->getFrame();
   int col = TTool::getApplication()->getCurrentColumn()->getColumnIndex();
-  TXshCell cell =
-      TApp::instance()->getCurrentScene()->getScene()->getXsheet()->getCell(
-          row, col);
-  bool isEmpty = cell.isEmpty();
-  if (isEmpty) return;
+
   DrawingSubtitutionGroupUndo *undo =
-      new DrawingSubtitutionGroupUndo(dir, row, col);
+      new DrawingSubtitutionGroupUndo(dir, row, col, selected, range);
   TUndoManager::manager()->add(undo);
   undo->redo();
 }

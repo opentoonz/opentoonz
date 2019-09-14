@@ -3,6 +3,7 @@
 #ifndef FUNCTION_SEGMENT_VIEWER_H
 #define FUNCTION_SEGMENT_VIEWER_H
 
+#include <array>
 #include <QLabel>
 #include <QComboBox>
 
@@ -31,7 +32,7 @@ namespace DVGui {
 class MeasuredDoubleLineEdit;
 class ExpressionField;
 class FileField;
-}
+}  // namespace DVGui
 
 //-----------------------------------------------------------------------------
 
@@ -51,8 +52,8 @@ class FunctionSegmentViewer final : public QFrame, public TParamObserver {
   DVGui::LineEdit *m_stepFld;
   QStackedWidget *m_parametersPanel;
 
-  FunctionSegmentPage *m_pages[9];
-  int m_typeId[9];
+  std::array<FunctionSegmentPage *, 9> m_pages;
+  std::array<int, 9> m_typeId;
 
   FunctionSheet *m_sheet;
   TXsheetHandle *m_xshHandle;

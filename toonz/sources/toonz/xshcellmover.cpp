@@ -183,10 +183,7 @@ bool CellsMover::canMoveCells(const TPoint &pos) {
     while (i < m_rowCount * m_colCount) {
       TXshColumn::ColumnType srcType = getColumnTypeFromCell(i);
       int dstIndex                   = c + i;
-      if (!m_orientation->isVerticalTimeline() &&
-          dstIndex >= xsh->getColumnCount())
-        return false;
-      TXshColumn *dstColumn = xsh->getColumn(dstIndex);
+      TXshColumn *dstColumn          = xsh->getColumn(dstIndex);
       if (srcType == TXshColumn::eZeraryFxType ||
           srcType == TXshColumn::eSoundTextType)
         return false;
@@ -663,8 +660,8 @@ void LevelMoverTool::drawCellsArea(QPainter &p) {
         CellRange(CellPosition(rect.y0, rect.x0),
                   CellPosition(rect.y1 + 1, rect.x1 + 1)));
   else {
-    int newY0 = qMax(rect.y0, rect.y1);
-    int newY1 = qMin(rect.y0, rect.y1);
+    int newY0 = std::max(rect.y0, rect.y1);
+    int newY1 = std::min(rect.y0, rect.y1);
     screen    = getViewer()->rangeToXYRect(CellRange(
         CellPosition(rect.x0, newY0), CellPosition(rect.x1 + 1, newY1 - 1)));
   }

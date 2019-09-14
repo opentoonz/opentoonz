@@ -21,7 +21,7 @@ namespace DVGui {
 class FileField;
 class ColorField;
 class IntLineEdit;
-}
+}  // namespace DVGui
 
 //=============================================================================
 
@@ -155,6 +155,7 @@ protected slots:
 //=============================================================================
 
 class SaveBoardPresetFilePopup final : public GenericSaveFilePopup {
+  Q_OBJECT
 public:
   SaveBoardPresetFilePopup();
 
@@ -165,6 +166,7 @@ protected:
 //=============================================================================
 
 class LoadBoardPresetFilePopup final : public GenericLoadFilePopup {
+  Q_OBJECT
 public:
   LoadBoardPresetFilePopup();
 

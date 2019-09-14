@@ -1,0 +1,41 @@
+<html lang="ja">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+      <title>PN PerspectiveFx Iwa</title>
+    </head>
+<body bgcolor="#f5f5f5" text="#220011">
+<h1><img src = ".\img\fx_iwa_pn_perspective.png" width = 30 height = 30 >   PN PerspectiveFx Iwa</h1>
+
+<h4>● 概要</h4>
+水平面上に奥行きのあるPerlinノイズパターンを生成するためのエフェクトです。<br>
+通常のノイズパターンだけではなく、inoWarpHVFxのオフセット参照画像として出力するモードや、<br>
+ノイズパターンを水面の波の高さとしたとき、カメラから見た水面のフレネル反射強度を出力するモードを
+選択することができます。
+
+<h4>● パラメータ</h4>
+<UL>
+<LI><b>Mode</b> : 描画モード指定します。選べるモードは以下の４つです。</LI>
+	<UL>
+	<LI><I>Noise</I>：Perlinノイズパターンを描画します。1ピクセルを100分割したサンプル点毎にノイズ値を計算します。</LI>
+	<LI><I>Noise (no resampled)</I>：Perlinノイズパターンを描画します。サブピクセル処理を行わないので高速に結果が得られますが、水平線近くのノイズパターンが不規則になります。</LI>
+	<LI><I>Warp HV offset</I>：ノイズパターンを水面の高低としたとき、水面で反射した光が水平/垂直方向にどれくらいずれるかを、それぞれ赤チャンネル/緑チャンネルで表したものを描画します。Warp HV Fx Inoの"Hori","Vert"ポートに接続することで、水面の映りこみのゆがみをそれなりに再現することができます。後述の"Wave Height"パラメータによって、パターンの濃淡の度合いを調整できます。<br>
+※Warp HV Fx Inoのポートは、"Hori","Vert"とも赤チャンネルを参照するので、"Vert"ポート側では、Channel Selector Fx等で、チャンネルの変換が必要です。</LI>
+	<LI><I>Fresnel reflectivity</I>：ノイズパターンを水面の高低としたとき、カメラから見た水面のフレネル反射強度を濃淡にして出力します。カメラ枠下辺での反射強度を明るさ０として正規化して表示されます。後述の"Wave Height"パラメータによって、パターンの濃淡の度合いを調整できます。</LI>
+	
+</UL>
+<LI><b>Size</b> : 1代目のランダムパターンのサイズを指定します。</LI>
+<LI><b>Evolution</b> : 1代目のランダムパターンの展開を指定します。</LI>
+<LI><b>Octaves</b> : ランダムパターンを何代 合成するかを指定します。</LI>
+<LI><b>Offset</b> : 1代目のランダムパターンのオフセット位置を指定します。カメラ右方向がX軸に正、カメラ奥方向がY軸に正です。</LI>
+<LI><b>p_Intensity</b> : 現在の世代と、次の世代とのパターンの強度比を指定します。</LI>
+<LI><b>p_Size</b> : 現在の世代と、次の世代とのパターンのサイズ比を指定します。</LI>
+<LI><b>p_Evolution</b> : 現在の世代と、次の世代とのパターンの展開周期の比を指定します。</LI>
+<LI><b>p_Offset</b> : 現在の世代と、次の世代とのパターンのオフセット比を指定します。</LI>
+<LI><b>Fov</b> : カメラの縦方向の画角をdegreeで指定します。画角が大きいと、遠近が強調され（広角）、画角が小さいと、遠近が圧縮されたようになります（望遠）。</LI>
+<LI><b>Eye Level</b> : カメラの消失点（水平線）の位置を指定します。</LI>
+<LI><b>Alpha Rendering</b> : ノイズの強度値を、アルファチャンネルにも格納するかどうかを指定します。</LI>
+<LI><b>Wave Height</b> : ノイズパターンを水面の高低としたとき、ノイズの最大位置と最小位置との波の高さの差を指定します。"Warp HV offset" モードと "Fresnel reflectivity"モードでのみ有効です。</LI>
+</UL>
+</body>
+
+</html>

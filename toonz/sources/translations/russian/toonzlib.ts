@@ -214,113 +214,113 @@
         <translation>Обновление цветов с использованием выбранных расположений в палитре %1</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="906"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="905"/>
         <source>Add Fx  : </source>
         <translation>Добавить эффект  : </translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="907"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="906"/>
         <source>Insert Fx  : </source>
         <translation>Вставить Fx  : </translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="1060"/>
-        <location filename="../../toonzlib/fxcommand.cpp" line="1063"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="1059"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="1062"/>
         <source>Create Linked Fx  : %1</source>
         <translation>Создать связанный Fx : %1</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="1285"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="1284"/>
         <source>Replace Fx  : </source>
         <translation>Заменить Fx  : </translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="1351"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="1350"/>
         <source>Unlink Fx  : %1 - - %2</source>
         <translation>Разъединить Fx  : %1 - - %2</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="1392"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="1391"/>
         <source>Make Macro Fx  : %1</source>
         <translation>Сделать Makro Fx  : %1</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="1535"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="1534"/>
         <source>Explode Macro Fx  : %1</source>
         <translation>Разбить Macro Fx  : %1</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="1598"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="1597"/>
         <source>Create Output Fx</source>
         <translation>Создать выход Fx</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="1689"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="1688"/>
         <source>Connect to Xsheet  : </source>
         <translation>Подключить к Xsheet  : </translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="1749"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="1748"/>
         <source>Disconnect from Xsheet  : </source>
         <translation>Отключить от Xsheet  : </translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="2020"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="2019"/>
         <source>Delete Link</source>
         <translation>Удалить связь</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="2305"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="2304"/>
         <source>Delete Fx Node : %1</source>
         <translation>Удалить Fx-узел : %1</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="2724"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="2721"/>
         <source>Paste Fx  :  </source>
         <translation>Вставить Fx :</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="3090"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="3087"/>
         <source>Disconnect Fx</source>
         <translation>Отключить Fx</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="3347"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="3334"/>
         <source>Connect Fx : %1 - %2</source>
         <translation>Подключить Fx : %1 - %2</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="3529"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="3516"/>
         <source>Rename Fx : %1 &gt; %2</source>
         <translation>Переименовать Fx : %1 - %2</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="3581"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="3568"/>
         <source>Group Fx</source>
         <translation>Сгруппировать Fx</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="3685"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="3672"/>
         <source>Ungroup Fx</source>
         <translation>Разгруппировать Fx</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="3787"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="3774"/>
         <source>Rename Group  : %1 &gt; %2</source>
         <translation>Переименовать группу  : %1 &gt; %2</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/doubleparamcmd.cpp" line="72"/>
+        <location filename="../../toonzlib/doubleparamcmd.cpp" line="73"/>
         <source>Set Keyframe</source>
         <translation>Установить ключевой кадр</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/doubleparamcmd.cpp" line="815"/>
+        <location filename="../../toonzlib/doubleparamcmd.cpp" line="816"/>
         <source>Remove Keyframe</source>
         <translation>Удалить ключевой кадр</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/doubleparamcmd.cpp" line="845"/>
+        <location filename="../../toonzlib/doubleparamcmd.cpp" line="856"/>
         <source>Cycle</source>
         <translation>Цикл</translation>
     </message>

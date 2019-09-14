@@ -203,7 +203,7 @@ elseif(BUILD_ENV_UNIXLIKE)
 
     find_package(Qt5Widgets)
 
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive -lstdc++ -std=c++11")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lstdc++ -std=c++11")
 endif()
 
 add_definitions(
@@ -541,7 +541,7 @@ if(BUILD_ENV_MSVC AND MSVC_VERSION EQUAL 1800)
 endif()
 
 # generate Qt translations and messages
-set(LANGUAGES japanese italian french spanish chinese german russian korean)
+set(LANGUAGES japanese italian french spanish chinese german russian korean czech)
 
 function(add_translation module)
     set(translation)
@@ -602,8 +602,6 @@ if(BUILD_ENV_APPLE)
     set_target_properties(OpenToonz PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/../cmake/BundleInfo.plist.in)
 endif()
 
-if(BUILD_ENV_UNIXLIKE)
-    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/xdg-data/io.github.OpenToonz.appdata.xml DESTINATION ${CMAKE_INSTALL_PREFIX}/share/metainfo)
-    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/xdg-data/io.github.OpenToonz.desktop DESTINATION ${CMAKE_INSTALL_PREFIX}/share/applications)
-    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/xdg-data/io.github.OpenToonz.png DESTINATION ${CMAKE_INSTALL_PREFIX}/share/icons/hicolor/256x256/apps)
+if(BUILD_ENV_UNIXLIKE AND NOT BUILD_TARGET_WIN)
+    add_subdirectory(xdg-data)
 endif()

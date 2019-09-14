@@ -168,8 +168,6 @@ inline std::ostream &operator<<(std::ostream &out, const std::string &s) {
   return out << s.c_str();
 }
 
-#define tArrayCount(ARRAY) (sizeof(ARRAY) / sizeof(ARRAY[0]))
-
 const std::string styleNameEasyInputWordsFileName = "stylename_easyinput.ini";
 
 #endif  //__T_COMMON_INCLUDED

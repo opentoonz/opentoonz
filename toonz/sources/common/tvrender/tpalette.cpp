@@ -193,7 +193,8 @@ TPalette::TPalette()
     , m_mutex(QMutex::Recursive)
     , m_isLocked(false)
     , m_askOverwriteFlag(false)
-    , m_shortcutScopeIndex(0) {
+    , m_shortcutScopeIndex(0)
+    , m_currentStyleId(1) {
   QString tempName(QObject::tr("colors"));
   std::wstring pageName = tempName.toStdWString();
   Page *page            = addPage(pageName);

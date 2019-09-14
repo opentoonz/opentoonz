@@ -1526,8 +1526,8 @@ void ToolUtils::drawBalloon(const TPointD &pos, std::string text,
   delta.x *= devPixRatio;
   delta.y *= devPixRatio;
 
-  textRect.moveTo(qMax(delta.x, 10 * devPixRatio + mrg),
-                  qMax(mrg + 2 * devPixRatio, -delta.y - baseLine));
+  textRect.moveTo(std::max(delta.x, 10 * devPixRatio + mrg),
+                  std::max(mrg + 2 * devPixRatio, -delta.y - baseLine));
 
   int y  = textRect.top() + baseLine;
   int x0 = textRect.left() - mrg;
@@ -1577,7 +1577,7 @@ void ToolUtils::drawBalloon(const TPointD &pos, std::string text,
   }
 
   QSize size(textRect.width() + textRect.left() + mrg,
-             qMax(textRect.bottom() + mrg, y + delta.y) + 3 * devPixRatio);
+             std::max(textRect.bottom() + mrg, y + delta.y) + 3 * devPixRatio);
 
   QImage label(size.width(), size.height(), QImage::Format_ARGB32);
   label.fill(Qt::transparent);

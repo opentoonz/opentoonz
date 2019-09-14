@@ -295,11 +295,11 @@ Possibly the preset file has been corrupted</source>
     <name>DVGui</name>
     <message>
         <source>OK</source>
-        <translation>确定</translation>
+        <translation type="vanished">确定</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>取消</translation>
+        <translation type="vanished">取消</translation>
     </message>
 </context>
 <context>
@@ -1025,6 +1025,30 @@ Possibly the preset file has been corrupted</source>
         <source>Step 4</source>
         <translation>第 4 步</translation>
     </message>
+    <message>
+        <source>Activate Cycle</source>
+        <translation type="unfinished">启用循环</translation>
+    </message>
+    <message>
+        <source>Deactivate Cycle</source>
+        <translation type="unfinished">禁用循环</translation>
+    </message>
+    <message>
+        <source>Show Inbetween Values</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hide Inbetween Values</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Interpolation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Step</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>FunctionToolbar</name>
@@ -1389,7 +1413,7 @@ Select FX nodes and related links before copying or cutting the selection you wa
     <name>MyPaintBrushStyleChooserPage</name>
     <message>
         <source>Plain color</source>
-        <translation>纯色</translation>
+        <translation type="vanished">纯色</translation>
     </message>
 </context>
 <context>
@@ -1640,6 +1664,17 @@ Select FX nodes and related links before copying or cutting the selection you wa
     </message>
 </context>
 <context>
+    <name>PlaneViewer</name>
+    <message>
+        <source>Reset View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fit To Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>PointParamField</name>
     <message>
         <source>Y:</source>
@@ -1719,19 +1754,19 @@ Select FX nodes and related links before copying or cutting the selection you wa
     </message>
     <message>
         <source>Save</source>
-        <translation>保存</translation>
+        <translation type="vanished">保存</translation>
     </message>
     <message>
         <source>Discard</source>
-        <translation>放弃更改</translation>
+        <translation type="vanished">放弃更改</translation>
     </message>
     <message>
         <source>Yes</source>
-        <translation>是</translation>
+        <translation type="vanished">是</translation>
     </message>
     <message>
         <source>No</source>
-        <translation>否</translation>
+        <translation type="vanished">否</translation>
     </message>
     <message>
         <source>Stage Schematic</source>
@@ -2053,7 +2088,7 @@ Are you sure?</source>
     </message>
     <message>
         <source>Replace</source>
-        <translation>替换</translation>
+        <translation type="vanished">替换</translation>
     </message>
     <message>
         <source>Modify Fx Param : %1</source>
@@ -2194,7 +2229,43 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     </message>
     <message>
         <source>OpenToonz 1.2</source>
-        <translation>OpenToonz 1.2</translation>
+        <translation type="vanished">OpenToonz 1.2</translation>
+    </message>
+    <message>
+        <source>Custom Texture</source>
+        <comment>TextureStyleChooserPage</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current Frame: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File History</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OpenToonz 1.3</source>
+        <translation type="obsolete">OpenToonz 1.3</translation>
+    </message>
+    <message>
+        <source>Plain color</source>
+        <comment>VectorBrushStyleChooserPage</comment>
+        <translation type="unfinished">纯色</translation>
+    </message>
+    <message>
+        <source>Plain color</source>
+        <comment>MyPaintBrushStyleChooserPage</comment>
+        <translation type="unfinished">纯色</translation>
+    </message>
+    <message>
+        <source>Plain color</source>
+        <comment>SpecialStyleChooserPage</comment>
+        <translation type="unfinished">纯色</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished">确定</translation>
     </message>
 </context>
 <context>
@@ -2303,7 +2374,7 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     <name>SpecialStyleChooserPage</name>
     <message>
         <source>Plain color</source>
-        <translation>纯色</translation>
+        <translation type="vanished">纯色</translation>
     </message>
 </context>
 <context>
@@ -2436,6 +2507,50 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     <message>
         <source>Cancel</source>
         <translation>取消</translation>
+    </message>
+    <message>
+        <source>The current palette %1
+in the studio palette has been modified. Do you want to save your changes?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation type="unfinished">保存</translation>
+    </message>
+    <message>
+        <source>Discard</source>
+        <translation type="unfinished">放弃更改</translation>
+    </message>
+    <message>
+        <source>Convert %1 to Studio Palette and Overwrite. 
+Are you sure ?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation type="obsolete">是</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation type="obsolete">否</translation>
+    </message>
+    <message>
+        <source>Replacing all selected palettes with the palette &quot;%1&quot;. 
+Are you sure ?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Replacing the palette &quot;%1&quot; with the palette &quot;%2&quot;. 
+Are you sure ?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Replace</source>
+        <translation type="unfinished">替换</translation>
+    </message>
+    <message>
+        <source>Convert</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2701,6 +2816,17 @@ Apply</source>
     </message>
 </context>
 <context>
+    <name>SwatchViewer</name>
+    <message>
+        <source>Reset View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fit To Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>TMessageViewer</name>
     <message>
         <source>Errors</source>
@@ -2749,7 +2875,7 @@ Apply</source>
     <name>VectorBrushStyleChooserPage</name>
     <message>
         <source>Plain color</source>
-        <translation>纯色</translation>
+        <translation type="vanished">纯色</translation>
     </message>
 </context>
 <context>

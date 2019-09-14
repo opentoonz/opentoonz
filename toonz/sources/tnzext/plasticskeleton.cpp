@@ -13,7 +13,6 @@
 #include "tcg/tcg_misc.h"
 #include "tcg/tcg_pool.h"
 #include "tcg/tcg_function_types.h"
-#include "tcg/tcg_iterator_ops.h"
 
 #include "ext/plasticskeleton.h"
 
@@ -573,16 +572,9 @@ int PlasticSkeleton::closestEdge(const TPointD &pos, double *dist) const {
 //-------------------------------------------------------------------------------
 
 std::vector<PlasticHandle> PlasticSkeleton::verticesToHandles() const {
-  // Someway, PlasticHandle's EXPLICIT unary constructors are not enough
-  // to disambiguate the direct construction of a vector of PlasticHandles
-  // from m_vertices, at least with *gcc*. I guess it could be a compiler bug.
-
-  // So, we'll convert them using an explicit casting iterator...
-
-  typedef tcg::function < PlasticHandle (PlasticSkeletonVertex::*)() const,
-      &PlasticSkeletonVertex::operator PlasticHandle> Func;
-
-  return std::vector<PlasticHandle>(
-      tcg::make_cast_it(m_vertices.begin(), Func()),
-      tcg::make_cast_it(m_vertices.end(), Func()));
+  std::vector<PlasticHandle> v;
+  for (auto const &e : m_vertices) {
+    v.push_back(e);
+  }
+  return v;
 }

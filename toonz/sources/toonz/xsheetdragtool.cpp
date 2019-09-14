@@ -325,15 +325,17 @@ class LevelExtenderUndo final : public TUndo {
   int m_col, m_row, m_deltaRow;
   std::vector<TXshCell> m_cells;  // righe x colonne
 
+  bool m_insert;
   bool m_invert;  // upper-directional
 
 public:
-  LevelExtenderUndo(bool invert = false)
+  LevelExtenderUndo(bool insert = true, bool invert = false)
       : m_colCount(0)
       , m_rowCount(0)
       , m_col(0)
       , m_row(0)
       , m_deltaRow(0)
+      , m_insert(insert)
       , m_invert(invert) {}
 
   void setCells(TXsheet *xsh, int row, int col, int rowCount, int colCount) {
@@ -388,6 +390,7 @@ public:
   }
 
   // for upper-directional smart tab
+  // also used for non-insert(overwriting) extension
   void clearCells() const {
     assert(m_deltaRow != 0);
     TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
@@ -395,21 +398,33 @@ public:
     for (int c = m_col; c < m_col + m_colCount; c++) {
       TXshColumn *column = xsh->getColumn(c);
       if (column && column->getSoundColumn()) continue;
-      xsh->clearCells(m_row, c, count);
+      if (m_invert)
+        xsh->clearCells(m_row, c, count);
+      else
+        xsh->clearCells(m_row + m_rowCount - count, c, count);
     }
   }
 
   // for upper-directional smart tab
+  // also used for non-insert(overwriting) extension
   void setCells() const {
     assert(m_deltaRow != 0);
     TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
     int count    = abs(m_deltaRow);
-    int r1       = m_row + count - 1;
+
+    int r0, r1;
+    if (m_invert) {
+      r0 = m_row;
+      r1 = m_row + count - 1;
+    } else {
+      r0 = m_row + m_rowCount - count - 1;
+      r1 = m_row + m_rowCount - 1;
+    }
     for (int c = 0; c < m_colCount; c++) {
       TXshColumn *column = xsh->getColumn(c);
       if (column && column->getSoundColumn()) continue;
       int col = m_col + c;
-      for (int r = m_row; r <= r1; r++) {
+      for (int r = r0; r <= r1; r++) {
         int k = (r - m_row) * m_colCount + c;
         xsh->setCell(r, col, m_cells[k]);
       }
@@ -418,10 +433,10 @@ public:
 
   void undo() const override {
     // undo for shrinking operation -> revert cells
-    if (m_deltaRow < 0) (m_invert) ? setCells() : insertCells();
+    if (m_deltaRow < 0) (m_insert) ? insertCells() : setCells();
     // undo for stretching operation -> remove cells
     else if (m_deltaRow > 0)
-      (m_invert) ? clearCells() : removeCells();
+      (m_insert) ? removeCells() : clearCells();
     else {
       assert(0);
     }
@@ -433,10 +448,10 @@ public:
 
   void redo() const override {
     // redo for shrinking operation -> remove cells
-    if (m_deltaRow < 0) (m_invert) ? clearCells() : removeCells();
+    if (m_deltaRow < 0) (m_insert) ? removeCells() : clearCells();
     // redo for stretching operation -> revert cells
     else if (m_deltaRow > 0)
-      (m_invert) ? setCells() : insertCells();
+      (m_insert) ? insertCells() : setCells();
     else {
       assert(0);
     }
@@ -626,12 +641,15 @@ class LevelExtenderTool final : public XsheetGUI::DragTool {
   LevelExtenderUndo *m_undo;
 
   bool m_invert;  // upper directional smart tab
+  bool m_insert;
 
 public:
-  LevelExtenderTool(XsheetViewer *viewer, bool invert = false)
+  LevelExtenderTool(XsheetViewer *viewer, bool insert = true,
+                    bool invert = false)
       : XsheetGUI::DragTool(viewer)
       , m_colCount(0)
       , m_undo(0)
+      , m_insert(insert)
       , m_invert(invert) {}
 
   // called when the smart tab is clicked
@@ -649,11 +667,26 @@ public:
     m_colCount = c1 - c0 + 1;
     m_rowCount = r1 - r0 + 1;
     if (m_colCount <= 0 || m_rowCount <= 0) return;
+
+    // if m_insert is false but there are no empty rows under the tab,
+    // then switch m_insert to true so that the operation works anyway
+    if (!m_insert && !m_invert) {
+      TXsheet *xsh = getViewer()->getXsheet();
+      for (int c = c0; c <= c1; c++) {
+        TXshColumn *column = xsh->getColumn(c);
+        if (!column || column->getSoundColumn()) continue;
+        if (!column->isCellEmpty(r1 + 1)) {
+          m_insert = true;  // switch the behavior
+          break;
+        }
+      }
+    }
+
     m_columns.reserve(m_colCount);
     TXsheet *xsh = getViewer()->getXsheet();
     for (int c = c0; c <= c1; c++)
       m_columns.push_back(CellBuilder(xsh, r0, c, m_rowCount, m_invert));
-    m_undo = new LevelExtenderUndo(m_invert);
+    m_undo = new LevelExtenderUndo(m_insert, m_invert);
     m_undo->setCells(xsh, r0, c0, m_rowCount, m_colCount);
   }
 
@@ -680,16 +713,41 @@ public:
         // Se e' una colonna sound l'extender non deve fare nulla.
         TXshColumn *column = xsh->getColumn(m_c0 + c);
         if (column && column->getSoundColumn()) continue;
-        xsh->removeCells(row, m_c0 + c, -dr);
+        if (m_insert)
+          xsh->removeCells(row, m_c0 + c, -dr);
+        else {
+          for (int r = row; r <= m_r1; r++)
+            xsh->setCell(r, m_c0 + c, TXshCell());
+        }
       }
     }
     // extend
     else {
+      // check how many vacant rows
+      if (!m_insert) {
+        int tmp_dr;
+        bool found = false;
+        for (tmp_dr = 1; tmp_dr <= dr; tmp_dr++) {
+          for (int c = 0; c < m_colCount; c++) {
+            TXshColumn *column = xsh->getColumn(m_c0 + c);
+            if (!column || column->getSoundColumn()) continue;
+            if (!column->isCellEmpty(m_r1 + tmp_dr)) {
+              found = true;
+              break;
+            }
+          }
+          if (found) break;
+        }
+        if (tmp_dr == 1) return;
+        dr = tmp_dr - 1;
+        r1 = m_r1 + dr;
+      }
+
       for (int c = 0; c < m_colCount; c++) {
         // Se e' una colonna sound l'extender non deve fare nulla.
         TXshColumn *column = xsh->getColumn(m_c0 + c);
         if (column && column->getSoundColumn()) continue;
-        xsh->insertCells(m_r1 + 1, m_c0 + c, dr);
+        if (m_insert) xsh->insertCells(m_r1 + 1, m_c0 + c, dr);
         for (int r = m_r1 + 1; r <= r1; r++)
           xsh->setCell(r, m_c0 + c, m_columns[c].generate(r));
       }
@@ -776,8 +834,8 @@ public:
 //-----------------------------------------------------------------------------
 
 XsheetGUI::DragTool *XsheetGUI::DragTool::makeLevelExtenderTool(
-    XsheetViewer *viewer, bool invert) {
-  return new LevelExtenderTool(viewer, invert);
+    XsheetViewer *viewer, bool insert, bool invert) {
+  return new LevelExtenderTool(viewer, insert, invert);
 }
 
 //=============================================================================
@@ -2085,8 +2143,8 @@ public:
           CellRange(CellPosition(rect.y0, rect.x0),
                     CellPosition(rect.y1 + 1, rect.x1 + 1)));
     else {
-      int newY0  = qMax(rect.y0, rect.y1);
-      int newY1  = qMin(rect.y0, rect.y1);
+      int newY0  = std::max(rect.y0, rect.y1);
+      int newY1  = std::min(rect.y0, rect.y1);
       screenCell = getViewer()->rangeToXYRect(CellRange(
           CellPosition(rect.x0, newY0), CellPosition(rect.x1 + 1, newY1 - 1)));
     }

@@ -257,6 +257,8 @@ void SVNUpdateDialog::updateFiles() {
     return;
   }
 
+  setMinimumSize(300, 200);
+
   if (m_updateSceneContentsCheckBox) m_updateSceneContentsCheckBox->hide();
   m_updateButton->setEnabled(false);
   m_waitingLabel->hide();

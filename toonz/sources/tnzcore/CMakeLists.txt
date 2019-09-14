@@ -290,6 +290,13 @@ add_definitions(
     -DTSTREAM_EXPORTS
 )
 
+if(BUILD_TARGET_WIN)
+    add_definitions(
+        -DUNICODE
+        -D_UNICODE
+    )
+endif()
+
 message("subdir: tnzcore")
 #message("Sources:" ${SOURCES})
 
