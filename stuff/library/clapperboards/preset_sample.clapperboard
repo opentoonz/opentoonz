@@ -1,0 +1,190 @@
+<clapperboardSettingsPreset>
+  <duration>
+    24 
+  </duration>
+  <boardItems>
+    <item>
+      <type>
+        ScenePath_Full 
+      </type>
+      <name>
+        "Scene file path"
+      </name>
+      <rect>
+        0.15 0.566708 0.7 0.0433166 
+      </rect>
+      <maximumFontSize>
+        300 
+      </maximumFontSize>
+      <color>
+        0 0 0 255 
+      </color>
+      <font>
+        Verdana 0 0 
+      </font>
+      </item>
+    <item>
+      <type>
+        UserName 
+      </type>
+      <name>
+        "User name"
+      </name>
+      <rect>
+        0.7 0.9 0.2 0.05 
+      </rect>
+      <maximumFontSize>
+        300 
+      </maximumFontSize>
+      <color>
+        0 128 0 255 
+      </color>
+      <font>
+        Verdana 0 1 
+      </font>
+      </item>
+    <item>
+      <type>
+        CurrentDate 
+      </type>
+      <name>
+        "Rendering date"
+      </name>
+      <rect>
+        0.1 0.9 0.2 0.05 
+      </rect>
+      <maximumFontSize>
+        300 
+      </maximumFontSize>
+      <color>
+        0 0 0 255 
+      </color>
+      <font>
+        Verdana 0 0 
+      </font>
+      </item>
+    <item>
+      <type>
+        FreeText 
+      </type>
+      <name>
+        "Type some description here"
+      </name>
+      <rect>
+        0.15 0.629176 0.55 0.248329 
+      </rect>
+      <text>
+        "" 
+      </text>
+      <maximumFontSize>
+        40 
+      </maximumFontSize>
+      <color>
+        0 0 64 255 
+      </color>
+      <font>
+        Verdana 0 0 
+      </font>
+      </item>
+    <item>
+      <type>
+        Duration_SecFrame 
+      </type>
+      <name>
+        "Scene duration"
+      </name>
+      <rect>
+        0.351376 0.424454 0.3 0.125546 
+      </rect>
+      <maximumFontSize>
+        300 
+      </maximumFontSize>
+      <color>
+        0 0 0 255 
+      </color>
+      <font>
+        Verdana 0 0 
+      </font>
+      </item>
+    <item>
+      <type>
+        SceneName 
+      </type>
+      <name>
+        Scene 
+      </name>
+      <rect>
+        0.35 0.25 0.3 0.2 
+      </rect>
+      <maximumFontSize>
+        300 
+      </maximumFontSize>
+      <color>
+        0 0 0 255 
+      </color>
+      <font>
+        Verdana 1 0 
+      </font>
+      </item>
+    <item>
+      <type>
+        FreeText 
+      </type>
+      <name>
+        "Episode #"
+      </name>
+      <rect>
+        0.15 0.3 0.2 0.2 
+      </rect>
+      <text>
+        "#"
+      </text>
+      <maximumFontSize>
+        120 
+      </maximumFontSize>
+      <color>
+        0 0 0 255 
+      </color>
+      <font>
+        Verdana 0 0 
+      </font>
+      </item>
+    <item>
+      <type>
+        ProjectName 
+      </type>
+      <name>
+        Title 
+      </name>
+      <rect>
+        0.15 0.1 0.7 0.15 
+      </rect>
+      <maximumFontSize>
+        300 
+      </maximumFontSize>
+      <color>
+        0 0 0 255 
+      </color>
+      <font>
+        Verdana 1 0 
+      </font>
+      </item>
+    <item>
+      <type>
+        Image 
+      </type>
+      <name>
+        Background 
+      </name>
+      <rect>
+        0 0 1 1 
+      </rect>
+      <imgPath>
+        1 "clapperboards\\images\\board1.png"
+      </imgPath>
+      <imgARMode>
+        0 
+      </imgARMode>
+      </item>
+    </boardItems>
+  </clapperboardSettingsPreset>

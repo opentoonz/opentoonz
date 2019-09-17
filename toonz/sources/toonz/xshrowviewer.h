@@ -48,6 +48,7 @@ class RowArea final : public QWidget {
   void drawPlayRangeBackground(QPainter &p, int r0, int r1);
   void drawPlayRange(QPainter &p, int r0, int r1);
   void drawCurrentRowGadget(QPainter &p, int r0, int r1);
+  void drawOnionSkinBackground(QPainter &p, int r0, int r1);
   void drawOnionSkinSelection(QPainter &p);
   void drawPinnedCenterKeys(QPainter &p, int r0, int r1);
   void drawCurrentTimeIndicator(QPainter &p);

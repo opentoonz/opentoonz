@@ -131,7 +131,6 @@ protected:
   void stopAutoPanning();
   void timerEvent(QTimerEvent *) override;
   TFrameId getCurrentFrameId();
-  void getViewer();
   void contextMenuEvent(QContextMenuEvent *event) override;
 
   void startDragDrop();
@@ -145,6 +144,7 @@ protected slots:
   void onLevelChanged();
   void onLevelSwitched(TXshLevel *);
   void onFrameSwitched();
+  void getViewer();
 
 private:
   // QSS Properties
@@ -166,7 +166,6 @@ private:
   FilmstripFrameHeadGadget *m_frameHeadGadget;
   InbetweenDialog *m_inbetweenDialog;
   SceneViewer *m_viewer;
-  bool m_isGhibli              = false;
   bool m_justStartedSelection  = false;
   int m_indexForResetSelection = -1;
   bool m_allowResetSelection   = false;

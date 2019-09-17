@@ -420,7 +420,7 @@ inline TSpectrumParam *param_factory_(const toonz_param_desc_t *desc) {
       keys[i].second = toPixel32(
           TPixelD(t.array[i].c0, t.array[i].c1, t.array[i].c2, t.array[i].m));
     }
-    return new TSpectrumParam(t.points, keys.data());
+    return new TSpectrumParam(keys);
   } else {
     return new TSpectrumParam(); /* use default constructor: デフォルトでは
                                     [black:white] の単純なものが設定される */

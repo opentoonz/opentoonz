@@ -46,6 +46,8 @@
 // TnzCore includes
 #include "tconst.h"
 
+#include "../toonz/menubarcommandids.h"
+
 // Qt includes
 #include <QAction>
 #include <QApplication>
@@ -690,7 +692,7 @@ void FxPainter::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) {
   QMenu *addMenu = fxScene->getAddFxMenu();
 
   QAction *fxEditorPopup =
-      CommandManager::instance()->getAction("MI_FxParamEditor");
+      CommandManager::instance()->getAction(MI_FxParamEditor);
   QAction *copy    = CommandManager::instance()->getAction("MI_Copy");
   QAction *cut     = CommandManager::instance()->getAction("MI_Cut");
   QAction *group   = CommandManager::instance()->getAction("MI_Group");
@@ -1579,7 +1581,7 @@ void FxSchematicPort::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) {
             SLOT(onConnectToXSheet()));
 
     QAction *fxEditorPopup =
-        CommandManager::instance()->getAction("MI_FxParamEditor");
+        CommandManager::instance()->getAction(MI_FxParamEditor);
 
     menu.addMenu(fxScene->getAddFxMenu());
     menu.addAction(fxEditorPopup);
@@ -1755,7 +1757,8 @@ assert(linkedFx);*/
       TUndoManager::manager()->endBlock();
       emit sceneChanged();
       emit xsheetChanged();
-    }
+    } else
+      SchematicPort::mouseReleaseEvent(me);
   } else
     SchematicPort::mouseReleaseEvent(me);
 }
@@ -1884,15 +1887,18 @@ void FxSchematicNode::setSchematicNodePos(const QPointF &pos) const {
   TPointD p(pos.x(), pos.y());
   if (!m_fx->getAttributes()->isGrouped() ||
       m_fx->getAttributes()->isGroupEditing()) {
+    TPointD oldFxPos = m_fx->getAttributes()->getDagNodePos();
     m_fx->getAttributes()->setDagNodePos(p);
     TMacroFx *macro = dynamic_cast<TMacroFx *>(m_fx.getPointer());
     if (macro) {
-      TPointD delta = p - macro->getRoot()->getAttributes()->getDagNodePos();
+      TPointD delta =
+          p - (oldFxPos != TConst::nowhere ? oldFxPos : TPointD(0, 0));
       std::vector<TFxP> fxs = macro->getFxs();
       int i;
       for (i = 0; i < (int)fxs.size(); i++) {
         TPointD oldPos = fxs[i]->getAttributes()->getDagNodePos();
-        fxs[i]->getAttributes()->setDagNodePos(oldPos + delta);
+        if (oldPos != TConst::nowhere)
+          fxs[i]->getAttributes()->setDagNodePos(oldPos + delta);
       }
     }
   } else {
@@ -2234,6 +2240,15 @@ void FxSchematicOutputNode::mouseDoubleClickEvent(
   outputSettingsPopup->trigger();
 }
 
+void FxSchematicOutputNode::mousePressEvent(QGraphicsSceneMouseEvent *me) {
+  FxSchematicNode::mousePressEvent(me);
+
+  QAction *fxEditorPopup =
+      CommandManager::instance()->getAction(MI_FxParamEditor);
+  // this signal cause the update the contents of the FxSettings
+  if (fxEditorPopup->isVisible()) emit fxNodeDoubleClicked();
+}
+
 //*****************************************************
 //
 // FxSchematicXSheetNode
@@ -2300,6 +2315,15 @@ void FxSchematicXSheetNode::mouseDoubleClickEvent(
   QAction *sceneSettingsPopup =
       CommandManager::instance()->getAction("MI_SceneSettings");
   sceneSettingsPopup->trigger();
+}
+
+void FxSchematicXSheetNode::mousePressEvent(QGraphicsSceneMouseEvent *me) {
+  FxSchematicNode::mousePressEvent(me);
+
+  QAction *fxEditorPopup =
+      CommandManager::instance()->getAction(MI_FxParamEditor);
+  // this signal cause the update the contents of the FxSettings
+  if (fxEditorPopup->isVisible()) emit fxNodeDoubleClicked();
 }
 
 //*****************************************************
@@ -2616,12 +2640,23 @@ void FxSchematicNormalFxNode::mouseDoubleClickEvent(
     m_nameItem->setFocus();
     setFlag(QGraphicsItem::ItemIsSelectable, false);
   } else {
-    QAction *fxEitorPopup =
-        CommandManager::instance()->getAction("MI_FxParamEditor");
-    fxEitorPopup->trigger();
+    QAction *fxEditorPopup =
+        CommandManager::instance()->getAction(MI_FxParamEditor);
+    fxEditorPopup->trigger();
     // this signal cause the update the contents of the FxSettings
     emit fxNodeDoubleClicked();
   }
+}
+
+//-----------------------------------------------------
+
+void FxSchematicNormalFxNode::mousePressEvent(QGraphicsSceneMouseEvent *me) {
+  FxSchematicNode::mousePressEvent(me);
+
+  QAction *fxEditorPopup =
+      CommandManager::instance()->getAction(MI_FxParamEditor);
+  // this signal cause the update the contents of the FxSettings
+  if (fxEditorPopup->isVisible()) emit fxNodeDoubleClicked();
 }
 
 //-----------------------------------------------------
@@ -2852,12 +2887,23 @@ void FxSchematicZeraryNode::mouseDoubleClickEvent(
     setFlag(QGraphicsItem::ItemIsSelectable, false);
   } else {
     QAction *fxEditorPopup =
-        CommandManager::instance()->getAction("MI_FxParamEditor");
+        CommandManager::instance()->getAction(MI_FxParamEditor);
     fxEditorPopup->trigger();
 
     // this signal cause the update the contents of the FxSettings
     emit fxNodeDoubleClicked();
   }
+}
+
+//-----------------------------------------------------
+
+void FxSchematicZeraryNode::mousePressEvent(QGraphicsSceneMouseEvent *me) {
+  FxSchematicNode::mousePressEvent(me);
+
+  QAction *fxEditorPopup =
+      CommandManager::instance()->getAction(MI_FxParamEditor);
+  // this signal cause the update the contents of the FxSettings
+  if (fxEditorPopup->isVisible()) emit fxNodeDoubleClicked();
 }
 
 //-----------------------------------------------------
@@ -3113,6 +3159,7 @@ void FxSchematicColumnNode::onChangedSize(bool expand) {
   m_height = (m_isNormalIconView) ? 32 : 50;
   updateLinksGeometry();
   update();
+  emit nodeChangedSize();
 }
 
 //-----------------------------------------------------
@@ -3159,7 +3206,24 @@ void FxSchematicColumnNode::mouseDoubleClickEvent(
     m_nameItem->show();
     m_nameItem->setFocus();
     setFlag(QGraphicsItem::ItemIsSelectable, false);
+  } else {
+    QAction *fxEditorPopup =
+        CommandManager::instance()->getAction(MI_FxParamEditor);
+    fxEditorPopup->trigger();
+    // this signal cause the update the contents of the FxSettings
+    emit fxNodeDoubleClicked();
   }
+}
+
+//-----------------------------------------------------
+
+void FxSchematicColumnNode::mousePressEvent(QGraphicsSceneMouseEvent *me) {
+  FxSchematicNode::mousePressEvent(me);
+
+  QAction *fxEditorPopup =
+      CommandManager::instance()->getAction(MI_FxParamEditor);
+  // this signal cause the update the contents of the FxSettings
+  if (fxEditorPopup->isVisible()) emit fxNodeDoubleClicked();
 }
 
 //-----------------------------------------------------
@@ -3330,10 +3394,21 @@ void FxSchematicPaletteNode::mouseDoubleClickEvent(
     m_nameItem->setFocus();
     setFlag(QGraphicsItem::ItemIsSelectable, false);
   } else {
-    QAction *fxEitorPopup =
-        CommandManager::instance()->getAction("MI_FxParamEditor");
-    fxEitorPopup->trigger();
+    QAction *fxEditorPopup =
+        CommandManager::instance()->getAction(MI_FxParamEditor);
+    fxEditorPopup->trigger();
   }
+}
+
+//-----------------------------------------------------
+
+void FxSchematicPaletteNode::mousePressEvent(QGraphicsSceneMouseEvent *me) {
+  FxSchematicNode::mousePressEvent(me);
+
+  QAction *fxEditorPopup =
+      CommandManager::instance()->getAction(MI_FxParamEditor);
+  // this signal cause the update the contents of the FxSettings
+  if (fxEditorPopup->isVisible()) emit fxNodeDoubleClicked();
 }
 
 //-----------------------------------------------------
@@ -3460,16 +3535,17 @@ void FxGroupNode::updateFxsDagPosition(const TPointD &pos) const {
     // placeNode() function.
     // if (m_groupedFxs[i]->getAttributes()->getDagNodePos() != TConst::nowhere)
     {
-      m_groupedFxs[i]->getAttributes()->setDagNodePos(
-          m_groupedFxs[i]->getAttributes()->getDagNodePos() + delta);
+      TPointD groupPos = m_groupedFxs[i]->getAttributes()->getDagNodePos();
+      if (groupPos != TConst::nowhere)
+        m_groupedFxs[i]->getAttributes()->setDagNodePos(groupPos + delta);
       TMacroFx *macro = dynamic_cast<TMacroFx *>(m_groupedFxs[i].getPointer());
       if (macro) {
         std::vector<TFxP> fxs = macro->getFxs();
         int i;
         for (i = 0; i < (int)fxs.size(); i++) {
           TPointD oldP = fxs[i]->getAttributes()->getDagNodePos();
-          // if (oldP != TConst::nowhere)
-          fxs[i]->getAttributes()->setDagNodePos(oldP + delta);
+          if (oldP != TConst::nowhere)
+            fxs[i]->getAttributes()->setDagNodePos(oldP + delta);
         }
       }
     }
@@ -3486,6 +3562,15 @@ void FxGroupNode::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *me) {
     m_nameItem->setFocus();
     setFlag(QGraphicsItem::ItemIsSelectable, false);
   }
+}
+
+void FxGroupNode::mousePressEvent(QGraphicsSceneMouseEvent *me) {
+  FxSchematicNode::mousePressEvent(me);
+
+  QAction *fxEditorPopup =
+      CommandManager::instance()->getAction(MI_FxParamEditor);
+  // this signal cause the update the contents of the FxSettings
+  if (fxEditorPopup->isVisible()) emit fxNodeDoubleClicked();
 }
 
 //-----------------------------------------------------

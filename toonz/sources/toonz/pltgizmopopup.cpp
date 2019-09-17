@@ -361,6 +361,11 @@ void modifyColor(const T &modifier) {
   TPaletteHandle *paletteHandle =
       TApp::instance()->getPaletteController()->getCurrentLevelPalette();
   TPaletteP palette = paletteHandle->getPalette();
+  if (!palette) {
+    QMessageBox::warning(0, QObject::tr("Error"),
+                         QObject::tr("No Palette loaded."));
+    return;
+  }
   if (palette->isLocked()) {
     QMessageBox::warning(0, QObject::tr("Warning"),
                          QObject::tr("Palette is locked."));

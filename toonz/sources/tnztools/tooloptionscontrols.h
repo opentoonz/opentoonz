@@ -119,8 +119,10 @@ public:
 protected slots:
 
   void onValueChanged(bool isDragging);
-  void increase();
-  void decrease();
+  void increase(double step = 1.0);
+  void decrease(double step = 1.0);
+  void increaseFractional();
+  void decreaseFractional();
 };
 
 //-----------------------------------------------------------------------------
@@ -603,7 +605,7 @@ protected:
   void mouseReleaseEvent(QMouseEvent *) override;
 
 public:
-  ClickableLabel(const QString &text, QWidget *parent = Q_NULLPTR,
+  ClickableLabel(const QString &text, QWidget *parent = nullptr,
                  Qt::WindowFlags f = Qt::WindowFlags());
   ~ClickableLabel();
 

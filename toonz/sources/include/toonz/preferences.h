@@ -121,8 +121,11 @@ public:
     return m_autosaveOtherFilesEnabled;
   }
 
-  void enableLevelsBackup(bool enabled);
-  bool isLevelsBackupEnabled() const { return m_levelsBackupEnabled; }
+  void enableBackup(bool enabled);
+  bool isBackupEnabled() const { return m_backupEnabled; }
+
+  void setBackupKeepCount(int count);
+  int getBackupKeepCount() { return m_backupKeepCount; }
 
   void enableSceneNumbering(bool enabled);
   bool isSceneNumberingEnabled() const { return m_sceneNumberingEnabled; }
@@ -305,6 +308,11 @@ public:
 
   void setIgnoreImageDpi(bool on);
   bool isIgnoreImageDpiEnabled() const { return m_ignoreImageDpi; }
+
+  // Saving tab
+
+  void setRasterBackgroundColor(const TPixel32 &color);
+  TPixel getRasterBackgroundColor() const { return m_rasterBackgroundColor; }
 
   // Drawing  tab
 
@@ -630,9 +638,8 @@ private:
       m_expandFunctionHeader, m_showColumnNumbers, m_animatedGuidedDrawing;
   bool m_rasterOptimizedMemory, m_saveUnpaintedInCleanup,
       m_askForOverrideRender, m_automaticSVNFolderRefreshEnabled, m_SVNEnabled,
-      m_levelsBackupEnabled, m_minimizeSaveboxAfterEditing,
-      m_sceneNumberingEnabled, m_animationSheetEnabled, m_inksOnly,
-      m_startupPopupEnabled;
+      m_backupEnabled, m_minimizeSaveboxAfterEditing, m_sceneNumberingEnabled,
+      m_animationSheetEnabled, m_inksOnly, m_startupPopupEnabled;
   bool m_fillOnlySavebox, m_show0ThickLines, m_regionAntialias;
   bool m_onionSkinDuringPlayback, m_ignoreImageDpi,
       m_syncLevelRenumberWithXsheet;
@@ -714,10 +721,12 @@ private:
   QString m_cursorBrushStyle;
   bool m_cursorOutlineEnabled = false;
 
-  TPixel32 m_currentColumnColor;
+  TPixel32 m_currentColumnColor, m_rasterBackgroundColor;
 
   bool m_enableWinInk                         = false;
   bool m_useOnionColorsForShiftAndTraceGhosts = false;
+
+  int m_backupKeepCount;
 
 private:
   Preferences();

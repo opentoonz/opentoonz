@@ -50,9 +50,7 @@ TimelineWidget::TimelineWidget(QWidget *parent) : QWidget(parent) {
   QLabel *label = new QLabel(tr("Recent Version"));
   label->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
   label->setAlignment(Qt::AlignHCenter);
-  label->setStyleSheet(
-      "background-color: rgb(220,220,220); border: 1px solid "
-      "rgb(150,150,150);");
+  label->setStyleSheet("border: 1px solid rgb(150,150,150);");
 
   mainLayout->addWidget(label);
 
@@ -72,9 +70,7 @@ TimelineWidget::TimelineWidget(QWidget *parent) : QWidget(parent) {
   label = new QLabel(tr("Older Version"));
   label->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
   label->setAlignment(Qt::AlignHCenter);
-  label->setStyleSheet(
-      "background-color: rgb(220,220,220); border: 1px solid "
-      "rgb(150,150,150); ");
+  label->setStyleSheet("border: 1px solid rgb(150,150,150); ");
 
   mainLayout->addWidget(label);
 
@@ -93,7 +89,7 @@ int TimelineWidget::getCurrentIndex() const {
 
 SVNTimeline::SVNTimeline(QWidget *parent, const QString &workingDir,
                          const QString &fileName, const QStringList &auxFiles)
-    : Dialog(TApp::instance()->getMainWindow(), true, true)
+    : Dialog(TApp::instance()->getMainWindow(), true, false)
     , m_workingDir(workingDir)
     , m_auxFiles(auxFiles)
     , m_fileName(fileName)
@@ -121,9 +117,7 @@ SVNTimeline::SVNTimeline(QWidget *parent, const QString &workingDir,
   hLayout->addStretch();
 
   m_timelineWidget = new TimelineWidget;
-  m_timelineWidget->setStyleSheet(
-      "QListWidget { background-color: white; } QListWidget:item { margin: "
-      "5px; }");
+  m_timelineWidget->setStyleSheet("QListWidget:item { margin: 5px; }");
   m_timelineWidget->hide();
   connect(m_timelineWidget->getListWidget(), SIGNAL(itemSelectionChanged()),
           this, SLOT(onSelectionChanged()));
@@ -185,7 +179,7 @@ SVNTimeline::SVNTimeline(QWidget *parent, const QString &workingDir,
 SVNTimeline::~SVNTimeline() {
   removeTempFiles();
   // Delete, if exist the sceneIcons folder
-  QDir d;
+  QDir d(QDir::tempPath());
   d.rmdir("sceneIcons");
 }
 
@@ -269,8 +263,10 @@ void SVNTimeline::onLogDone(const QString &xmlResponse) {
     lwi->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
     lwi->setToolTip(tooltip);
     lwi->setTextAlignment(Qt::AlignLeft);
-    m_tempFiles.append(new QTemporaryFile("svn_temp_img_" + QString::number(i) +
-                                          "." + fileNameType));
+    QString tmpFileName = QDir::tempPath() + "/svn_temp_img_" +
+                          QString::number(i) + "." + fileNameType;
+    m_tempFiles.append(new QTemporaryFile());
+    m_tempFiles.last()->setFileName(tmpFileName);
 
     // Add also auxiliary files
     TFilePath fp(TFilePath(m_workingDir.toStdWString()) +
@@ -283,10 +279,13 @@ void SVNTimeline::onLogDone(const QString &xmlResponse) {
       TFilePathSet::iterator it;
       for (it = fpset.begin(); it != fpset.end(); ++it) {
         TFilePath fp = *it;
-        if (fp.getType() == "tpl")
-          m_auxTempFiles.append(
-              new QTemporaryFile("svn_temp_img_" + QString::number(i) + "." +
-                                 QString::fromStdString(fp.getType())));
+        if (fp.getType() == "tpl") {
+          QString tmpFileName = QDir::tempPath() + "/svn_temp_img_" +
+                                QString::number(i) + "." +
+                                QString::fromStdString(fp.getType());
+          m_auxTempFiles.append(new QTemporaryFile());
+          m_auxTempFiles.last()->setFileName(tmpFileName);
+        }
       }
     }
     // Add sceneIcon (only for scene files)
@@ -296,16 +295,19 @@ void SVNTimeline::onLogDone(const QString &xmlResponse) {
         QDir dir(toQString(fp.getParentDir()));
 
         // Create the sceneIcons folder
-        QDir d;
+        QDir d(QDir::tempPath());
         d.mkdir("sceneIcons");
-        m_auxTempFiles.append(
-            new QTemporaryFile(QDir::tempPath() + QString("/sceneicons/") +
-                               "svn_temp_img_" + QString::number(i) + " .png"));
+        QString tmpFileName = QDir::tempPath() + QString("/sceneicons/") +
+                              "svn_temp_img_" + QString::number(i) + " .png";
+        m_auxTempFiles.append(new QTemporaryFile());
+        m_auxTempFiles.at(m_auxTempFiles.size() - 1)->setFileName(tmpFileName);
       }
     }
 
     m_listWidgetitems.append(lwi);
   }
+
+  setMinimumSize(430, 450);
 
   m_timelineWidget->getListWidget()->update();
   m_timelineWidget->show();
@@ -389,14 +391,13 @@ void SVNTimeline::exportToTemporaryFile(int index, bool isAuxFile) {
 
   // SceneIcons (pay attention to add a space at the fileName end)
   if (isAuxFile && fi.completeSuffix() == "png") {
-    args << "sceneIcons/" + fileName + " ." + extension + "@" +
-                m_log.at(index).m_revision;
+    args << "sceneIcons/" + fileName + " .png@" + m_log.at(index).m_revision;
     args << fi.absoluteFilePath();
   } else {
-    args << fileName + "." + fi.completeSuffix() + "@" +
-                m_log.at(index).m_revision;
+    args << m_fileName + "@" + m_log.at(index).m_revision;
     args << fi.absoluteFilePath();
   }
+  args << "--force";
 
   // Export to temporary file...
   m_thread.executeCommand(m_workingDir, "svn", args, true);

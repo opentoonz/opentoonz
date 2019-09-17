@@ -24,6 +24,9 @@ class SchematicViewer;
 class FunctionViewer;
 class FlipBook;
 class ToolOptions;
+class ComboViewerPanel;
+class FxSettings;
+
 //=========================================================
 // PaletteViewerPanel
 //---------------------------------------------------------
@@ -68,6 +71,9 @@ class StudioPaletteViewerPanel final : public TPanel {
 
 public:
   StudioPaletteViewerPanel(QWidget *parent);
+
+  void setViewType(int viewType) override;
+  int getViewType() override;
 
 protected:
   bool isActivatableOnEnter() override { return true; }
@@ -242,6 +248,38 @@ public:
 
 protected slots:
   void onMinimizeButtonToggled(bool);
+};
+
+//=========================================================
+// ComboViewerPanel
+//---------------------------------------------------------
+
+class ComboViewerPanelContainer final : public StyleShortcutSwitchablePanel {
+  Q_OBJECT
+  ComboViewerPanel *m_comboViewer;
+
+public:
+  ComboViewerPanelContainer(QWidget *parent);
+  // reimplementation of TPanel::widgetInThisPanelIsFocused
+  bool widgetInThisPanelIsFocused() override;
+
+protected:
+  // reimplementation of TPanel::widgetFocusOnEnter
+  void widgetFocusOnEnter() override;
+  void widgetClearFocusOnLeave() override;
+};
+
+//=========================================================
+// FxSettingsPanel
+//---------------------------------------------------------
+
+class FxSettingsPanel final : public TPanel {
+  Q_OBJECT
+
+  FxSettings *m_fxSettings;
+
+public:
+  FxSettingsPanel(QWidget *parent);
 };
 
 #endif

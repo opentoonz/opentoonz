@@ -96,7 +96,7 @@ class DVAPI ChannelField final : public QWidget {
 public:
   ChannelField(QWidget *parent = 0, const QString &string = "", int value = 0,
                int maxValue = 255, bool horizontal = false, int labelWidth = 13,
-               int sliderWidth = 40);
+               int sliderWidth = -1);
 
   ~ChannelField() {}
 
@@ -145,7 +145,7 @@ public:
 
   ColorField(QWidget *parent = 0, bool isAlphaActive = true,
              TPixel32 color = TPixel32(0, 0, 0, 255), int squareSize = 40,
-             bool useStyleEditor = true);
+             bool useStyleEditor = true, int sliderWidth = -1);
 
   ~ColorField() {}
 

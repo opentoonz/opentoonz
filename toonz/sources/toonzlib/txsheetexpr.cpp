@@ -82,7 +82,7 @@ public:
     TMeasure *measure = m_param->getMeasure();
     if (measure) {
       const TUnit *unit = measure->getCurrentUnit();
-      if (unit) value   = unit->convertTo(value);
+      if (unit) value = unit->convertTo(value);
     }
     return value;
   }
@@ -256,9 +256,8 @@ public:
 
   void getAcceptableKeywords(
       std::vector<std::string> &keywords) const override {
-    const std::string ks[] = {"table",  "tab", "col",   "cam",
-                              "camera", "peg", "pegbar"};
-    for (int i = 0; i < tArrayCount(ks); i++) keywords.push_back(ks[i]);
+    keywords.insert(keywords.end(),
+                    {"table", "tab", "col", "cam", "camera", "peg", "pegbar"});
   }
 
   void createNode(Calculator *calc, std::vector<CalculatorNode *> &stack,
@@ -543,9 +542,8 @@ public:
         const QString &vertexName =
             QString::fromStdString(tokens[VERTEX_NAME].getText());
         if (SkVD *skvd = skdp->vertexDeformation(vertexName)) {
-          const Component *componentsEnd =
-                              m_components +
-                              sizeof(m_components) / sizeof(Component),
+          const Component *componentsEnd = m_components + sizeof(m_components) /
+                                                              sizeof(Component),
                           *component = std::find(m_components, componentsEnd,
                                                  tokens[COMPONENT].getText());
 

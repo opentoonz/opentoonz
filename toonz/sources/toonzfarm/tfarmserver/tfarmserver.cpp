@@ -378,12 +378,12 @@ private:
 };
 
 //-------------------------------------------------------------------
-QString getExeName(bool isComposer) {
+static QString getExeName(bool isComposer) {
   QString name = isComposer ? "tcomposer" : "tcleanup";
 
 #ifdef _WIN32
   return name + ".exe ";
-#elif MACOSX
+#elif defined(MACOSX)
   TVER::ToonzVersion tver;
   return "\"./" + QString::fromStdString(tver.getAppName()) + "_" +
          QString::fromStdString(tver.getAppVersionString()) +
@@ -433,7 +433,7 @@ void Task::run() {
 
   m_log->info(logMsg);
 
-// ===========
+  // ===========
 
 #ifdef _WIN32
   if (m_cmdline.contains("runcasm")) service.mountDisks();
@@ -994,8 +994,8 @@ void FarmServerService::onStop() {
   } catch (TException & /*e*/) {
   }
 
-// i dischi vengono montati al primo task di tipo "runcasm"
-// e smontati allo stop del servizio
+  // i dischi vengono montati al primo task di tipo "runcasm"
+  // e smontati allo stop del servizio
 
 #ifdef _WIN32
   unmountDisks();

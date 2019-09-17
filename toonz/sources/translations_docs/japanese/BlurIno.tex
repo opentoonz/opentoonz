@@ -1,0 +1,46 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[a4paper, total={180mm, 272mm}]{geometry}
+
+\usepackage{fontspec}
+\setmainfont[Path=fonts/, Extension=.ttf]{ipaexm}
+
+\setlength\parindent{3.5em}
+\setlength\parskip{0em}
+\renewcommand{\baselinestretch}{1.247}
+
+\begin{document}
+
+\thispagestyle{empty}
+
+\Large
+\noindent \\
+Blur Ino\medskip
+\par
+\normalsize
+ぼかします。\\
+\par
+手法として、ガウス分布を使います。\par
+そのため、結果画像に指向性はありません。\\
+\par
+Alphaチャンネルも処理します。\\
+\\
+-{-}- \ 入力 \ -{-}-\\
+Source\par
+処理をする画像を接続します。\\
+\\
+Reference\par
+Pixel 毎に効果の強弱をつけるための参照画像を接続します。\\
+\\
+-{-}- \ 設定 \ -{-}-\\
+Radius\par
+ぼかしの半径を指定します。\par
+単位は mm です。\\
+\\
+Reference\par
+Pixel 毎に効果の強弱をつけるための参照画像の値の取り方を選択します。\par
+入力の\textquotedbl Reference\textquotedbl に画像を接続し、\par
+Red/Green/Blue/Alpha/Luminance/Nothingから選びます。\par
+この効果をつけたくないときは Nothingを選ぶか、接続を切ります。\par
+初期値は Red です。
+
+\end{document}

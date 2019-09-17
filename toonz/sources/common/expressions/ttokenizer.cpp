@@ -101,8 +101,7 @@ void Tokenizer::setBuffer(std::string buffer) {
 
         const std::string ss[] = {"==", "!=", ">=", "<=", "||", "&&"};
 
-        const int m = tArrayCount(ss);
-        if (std::find(ss, ss + m, token) != ss + m)
+        if (std::find(std::begin(ss), std::end(ss), token) != std::end(ss))
           i += 2;
         else
           token = std::string(1, s[i++]);
@@ -167,4 +166,4 @@ Token Tokenizer::getTokenFromPos(int pos) const {
 
 //===================================================================
 
-}  // TSyntax
+}  // namespace TSyntax

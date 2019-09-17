@@ -5,7 +5,6 @@
 #include "tools/cursors.h"
 #include "tools/toolcommandids.h"
 #include "tools/toolutils.h"
-#include "tools/toolutils.h"
 #include "tools/toolhandle.h"
 
 #include "historytypes.h"
@@ -397,6 +396,10 @@ FullColorEraserTool::FullColorEraserTool(std::string name)
   m_eraseType.addValue(RECTERASE);
   m_eraseType.addValue(FREEHANDERASE);
   m_eraseType.addValue(POLYLINEERASE);
+
+  m_eraseType.setId("Type");
+  m_invertOption.setId("Invert");
+  m_multi.setId("FrameRange");
 }
 
 //---------------------------------------------------------------------------------------------------
@@ -527,6 +530,8 @@ void FullColorEraserTool::leftButtonDown(const TPointD &pos,
 
 void FullColorEraserTool::leftButtonDrag(const TPointD &pos,
                                          const TMouseEvent &e) {
+  if (!m_mousePressed) return;
+
   m_brushPos = m_mousePos = pos;
   m_mouseEvent            = e;
   double pixelSize2       = getPixelSize() * getPixelSize();

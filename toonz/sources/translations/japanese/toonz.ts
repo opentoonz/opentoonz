@@ -109,11 +109,11 @@
     <name>ApplyMatchlinesCommand</name>
     <message>
         <source>It is not possible to apply the match lines because no column was selected.</source>
-        <translation>列が選択されていないので、マッチラインを合成できません。</translation>
+        <translation type="vanished">列が選択されていないので、マッチラインを合成できません。</translation>
     </message>
     <message>
         <source>It is not possible to apply the match lines because two columns have to be selected.</source>
-        <translation>二つの列が選択されていないので、マッチラインを合成できません。</translation>
+        <translation type="vanished">二つの列が選択されていないので、マッチラインを合成できません。</translation>
     </message>
 </context>
 <context>
@@ -364,6 +364,92 @@ Stop it or wait for its completion before removing it.</source>
     <message>
         <source>Cancel</source>
         <translation>キャンセル</translation>
+    </message>
+</context>
+<context>
+    <name>BoardSettingsPopup</name>
+    <message>
+        <source>Clapperboard Settings</source>
+        <translation>カットボールド設定</translation>
+    </message>
+    <message>
+        <source>Load Preset</source>
+        <translation>プリセットを読み込む</translation>
+    </message>
+    <message>
+        <source>Save as Preset</source>
+        <translation>プリセットとして保存</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation>閉じる</translation>
+    </message>
+    <message>
+        <source>Duration (frames):</source>
+        <translation>時間（フレーム）：</translation>
+    </message>
+    <message>
+        <source>Text</source>
+        <translation>テキスト</translation>
+    </message>
+    <message>
+        <source>Project name</source>
+        <translation>プロジェクト名</translation>
+    </message>
+    <message>
+        <source>Scene name</source>
+        <translation>シーン名</translation>
+    </message>
+    <message>
+        <source>Duration : Frame</source>
+        <translation>カットの尺：フレーム</translation>
+    </message>
+    <message>
+        <source>Duration : Sec + Frame</source>
+        <translation>カットの尺：秒＋コマ</translation>
+    </message>
+    <message>
+        <source>Duration : HH:MM:SS:FF</source>
+        <translation>カットの尺：時:分:秒:コマ</translation>
+    </message>
+    <message>
+        <source>Current date</source>
+        <translation>日付</translation>
+    </message>
+    <message>
+        <source>Current date and time</source>
+        <translation>日付と時刻</translation>
+    </message>
+    <message>
+        <source>User name</source>
+        <translation>ユーザー名</translation>
+    </message>
+    <message>
+        <source>Scene location : Aliased path</source>
+        <translation>シーンファイルのパス：エイリアス</translation>
+    </message>
+    <message>
+        <source>Scene location : Full path</source>
+        <translation>シーンファイルのパス：フルパス</translation>
+    </message>
+    <message>
+        <source>Output location : Aliased path</source>
+        <translation>出力ファイルのパス：エイリアス</translation>
+    </message>
+    <message>
+        <source>Output location : Full path</source>
+        <translation>出力ファイルのパス：フルパス</translation>
+    </message>
+    <message>
+        <source>Image</source>
+        <translation>画像</translation>
+    </message>
+</context>
+<context>
+    <name>BoardView</name>
+    <message>
+        <source>Please set the duration more than 0 frame first, or the clapperboard settings will not be saved in the scene at all!</source>
+        <translation>カットボールドを有効にするには、まず時間（フレーム）を１以上に設定してください。0が設定されている場合カットボールド設定はシーンファイルに保存されません！</translation>
     </message>
 </context>
 <context>
@@ -966,11 +1052,11 @@ What do you want to do?</source>
     <name>CloneLevelUndo::LevelNamePopup</name>
     <message>
         <source>Clone Level</source>
-        <translation>レベルのクローンを作る</translation>
+        <translation type="vanished">レベルのクローンを作る</translation>
     </message>
     <message>
         <source>Level Name:</source>
-        <translation>レベル名：</translation>
+        <translation type="vanished">レベル名：</translation>
     </message>
 </context>
 <context>
@@ -1146,6 +1232,10 @@ What do you want to do? </source>
     <message>
         <source> (Flipped)</source>
         <translation> （反転表示）</translation>
+    </message>
+    <message>
+        <source>   ::   Project: </source>
+        <translation>   ：：   プロジェクト： </translation>
     </message>
 </context>
 <context>
@@ -1764,11 +1854,11 @@ contain the dpi information, then the current camera dpi will be used.
     <name>ExportCurvePopup</name>
     <message>
         <source>Export Curve</source>
-        <translation>パラメータの書き出し</translation>
+        <translation type="vanished">パラメータの書き出し</translation>
     </message>
     <message>
         <source>Export</source>
-        <translation>書き出し</translation>
+        <translation type="vanished">書き出し</translation>
     </message>
 </context>
 <context>
@@ -2164,26 +2254,26 @@ contain the dpi information, then the current camera dpi will be used.
     <name>FileData</name>
     <message>
         <source>It is not possible to find the %1 level.</source>
-        <translation>レベル %1 を見つけることができません。</translation>
+        <translation type="vanished">レベル %1 を見つけることができません。</translation>
     </message>
     <message>
         <source>There was an error copying %1</source>
-        <translation>%1 をコピーする時、エラーが発生しました</translation>
+        <translation type="vanished">%1 をコピーする時、エラーが発生しました</translation>
     </message>
 </context>
 <context>
     <name>FileSelection</name>
     <message>
         <source>Abort</source>
-        <translation>中断</translation>
+        <translation type="vanished">中断</translation>
     </message>
     <message>
         <source>Collecting assets...</source>
-        <translation>素材を集めています...</translation>
+        <translation type="vanished">素材を集めています...</translation>
     </message>
     <message>
         <source>Importing scenes...</source>
-        <translation>シーンを読み込み中...</translation>
+        <translation type="vanished">シーンを読み込み中...</translation>
     </message>
 </context>
 <context>
@@ -2225,6 +2315,28 @@ contain the dpi information, then the current camera dpi will be used.
     <message>
         <source>Drag to Extend Onion Skin, Double Click to Toggle All</source>
         <translation>[ドラッグ] オニオンスキン範囲を設定 [ダブルクリック] 全フレーム切り替え</translation>
+    </message>
+    <message>
+        <source>Click to Reset Shift &amp; Trace Markers to Neighbor Frames
+Hold F2 Key on the Viewer to Show This Frame Only</source>
+        <translation>[クリック] ライトテーブルマーカーを隣接するフレームにリセット
+[ビューア上でF2キー] このフレームのみ表示する</translation>
+    </message>
+    <message>
+        <source>Click to Hide This Frame from Shift &amp; Trace
+Hold F1 Key on the Viewer to Show This Frame Only</source>
+        <translation>[クリック] このフレームをライトテーブルから除く
+[ビューア上でF1キー] このフレームのみ表示する</translation>
+    </message>
+    <message>
+        <source>Click to Hide This Frame from Shift &amp; Trace
+Hold F3 Key on the Viewer to Show This Frame Only</source>
+        <translation>[クリック] このフレームをライトテーブルから除く
+[ビューア上でF3キー] このフレームのみ表示する</translation>
+    </message>
+    <message>
+        <source>Click to Move Shift &amp; Trace Marker</source>
+        <translation>[クリック] ライトテーブルマーカーを移動</translation>
     </message>
 </context>
 <context>
@@ -2489,6 +2601,76 @@ Do you want to overwrite it?</source>
     <message>
         <source>It is not possible to delete %1.</source>
         <translation>%1 を削除できません。</translation>
+    </message>
+</context>
+<context>
+    <name>ItemInfoView</name>
+    <message>
+        <source>Bold</source>
+        <translation>太字</translation>
+    </message>
+    <message>
+        <source>Italic</source>
+        <translation>斜体</translation>
+    </message>
+    <message>
+        <source>Ignore</source>
+        <translation>無視する</translation>
+    </message>
+    <message>
+        <source>Keep</source>
+        <translation>維持する</translation>
+    </message>
+    <message>
+        <source>Name:</source>
+        <translation>名前：</translation>
+    </message>
+    <message>
+        <source>Type:</source>
+        <translation>タイプ：</translation>
+    </message>
+    <message>
+        <source>Path:</source>
+        <translation>パス：</translation>
+    </message>
+    <message>
+        <source>Aspect Ratio:</source>
+        <translation>縦横比：</translation>
+    </message>
+    <message>
+        <source>Font:</source>
+        <translation>フォント：</translation>
+    </message>
+    <message>
+        <source>Max Size:</source>
+        <translation>最大サイズ：</translation>
+    </message>
+    <message>
+        <source>No item selected.</source>
+        <translation>項目が選択されていません。</translation>
+    </message>
+    <message>
+        <source>Item</source>
+        <translation>項目</translation>
+    </message>
+</context>
+<context>
+    <name>ItemListView</name>
+    <message>
+        <source>Add</source>
+        <translation>追加</translation>
+    </message>
+    <message>
+        <source>Remove</source>
+        <translation>削除</translation>
+    </message>
+    <message>
+        <source>Move Up</source>
+        <translation>上に移動</translation>
+    </message>
+    <message>
+        <source>Move Down</source>
+        <translation>下に移動</translation>
     </message>
 </context>
 <context>
@@ -2992,6 +3174,17 @@ Please use the frame numbers for reference.</source>
         <source>Invalid data file.</source>
         <translation>無効なデータファイルです。</translation>
     </message>
+    <message>
+        <source>Drawing: </source>
+        <translation>画像： </translation>
+    </message>
+</context>
+<context>
+    <name>LoadBoardPresetFilePopup</name>
+    <message>
+        <source>Load Clapperboard Settings Preset</source>
+        <translation>カットボールド設定のプリセットを読み込む</translation>
+    </message>
 </context>
 <context>
     <name>LoadColorModelPopup</name>
@@ -3016,11 +3209,11 @@ Please use the frame numbers for reference.</source>
     <name>LoadCurvePopup</name>
     <message>
         <source>Load Curve</source>
-        <translation>エフェクトパラメータを読み込み</translation>
+        <translation type="vanished">エフェクトパラメータを読み込み</translation>
     </message>
     <message>
         <source>Load</source>
-        <translation>読み込み</translation>
+        <translation type="vanished">読み込み</translation>
     </message>
 </context>
 <context>
@@ -3163,15 +3356,15 @@ Please use the frame numbers for reference.</source>
     <name>LoadSettingsPopup</name>
     <message>
         <source>Load Cleanup Settings</source>
-        <translation>トレース設定の読み込み</translation>
+        <translation type="vanished">トレース設定の読み込み</translation>
     </message>
     <message>
         <source>Load</source>
-        <translation>読み込み</translation>
+        <translation type="vanished">読み込み</translation>
     </message>
     <message>
         <source>%1 does not exist.</source>
-        <translation>%1 は存在しません。</translation>
+        <translation type="vanished">%1 は存在しません。</translation>
     </message>
 </context>
 <context>
@@ -3525,7 +3718,7 @@ Please use the frame numbers for reference.</source>
     </message>
     <message>
         <source>&amp;Send Back</source>
-        <translation>最背面へ移動 (&amp;S)</translation>
+        <translation type="vanished">最背面へ移動 (&amp;S)</translation>
     </message>
     <message>
         <source>&amp;Send Backward</source>
@@ -4309,7 +4502,7 @@ Please use the frame numbers for reference.</source>
     </message>
     <message>
         <source>Reset View</source>
-        <translation>ズームをリセット</translation>
+        <translation>表示をリセット</translation>
     </message>
     <message>
         <source>Fit to Window</source>
@@ -5113,7 +5306,7 @@ Please use the frame numbers for reference.</source>
     </message>
     <message>
         <source>Flip Viewer Horiontally</source>
-        <translation>ビューアを水平方向に反転</translation>
+        <translation type="vanished">ビューアを水平方向に反転</translation>
     </message>
     <message>
         <source>Flip Viewer Vertically</source>
@@ -5166,6 +5359,74 @@ Please use the frame numbers for reference.</source>
     <message>
         <source>Active Axis - All</source>
         <translation>編集ツール - 軸 - 全て</translation>
+    </message>
+    <message>
+        <source>&amp;Timeline</source>
+        <translation>タイムライン （&amp;T）</translation>
+    </message>
+    <message>
+        <source>Linear Interpolation</source>
+        <translation>線形</translation>
+    </message>
+    <message>
+        <source>Speed In / Speed Out Interpolation</source>
+        <translation>スピードイン/スピードアウト</translation>
+    </message>
+    <message>
+        <source>Ease In / Ease Out Interpolation</source>
+        <translation>スローイン/スローアウト</translation>
+    </message>
+    <message>
+        <source>Ease In / Ease Out (%) Interpolation</source>
+        <translation>スローイン/スローアウト （%）</translation>
+    </message>
+    <message>
+        <source>Exponential Interpolation</source>
+        <translation>指数関数</translation>
+    </message>
+    <message>
+        <source>Expression Interpolation</source>
+        <translation>エクスプレッション</translation>
+    </message>
+    <message>
+        <source>File Interpolation</source>
+        <translation>ファイル</translation>
+    </message>
+    <message>
+        <source>Constant Interpolation</source>
+        <translation>定数</translation>
+    </message>
+    <message>
+        <source>Separate Colors...</source>
+        <translation>色線を分ける...</translation>
+    </message>
+    <message>
+        <source>Flip Viewer Horizontally</source>
+        <translation>ビューアを水平方向に反転</translation>
+    </message>
+    <message>
+        <source>&amp;Send to Back</source>
+        <translation>最背面へ移動 (&amp;S)</translation>
+    </message>
+    <message>
+        <source>Reset Zoom</source>
+        <translation>ズームをリセット</translation>
+    </message>
+    <message>
+        <source>Reset Rotation</source>
+        <translation>回転をリセット</translation>
+    </message>
+    <message>
+        <source>Reset Position</source>
+        <translation>表示位置をリセット</translation>
+    </message>
+    <message>
+        <source>Brush Tool - Eraser (Raster option)</source>
+        <translation>ブラシツール（ラスターMyPaintブラシ） - 消しゴムモード</translation>
+    </message>
+    <message>
+        <source>Brush Tool - Lock Alpha</source>
+        <translation>ブラシツール（ラスターMyPaintブラシ） - 透明部分の保護</translation>
     </message>
 </context>
 <context>
@@ -5299,15 +5560,15 @@ N.B. Duplicated commands will be ignored. Only the last one will appear in the m
     <name>MergeCmappedCommand</name>
     <message>
         <source>It is not possible to merge tlv columns because no column was selected.</source>
-        <translation>列が選択されていないため、TLVレベル列を結合できません。</translation>
+        <translation type="vanished">列が選択されていないため、TLVレベル列を結合できません。</translation>
     </message>
     <message>
         <source>It is not possible to merge tlv columns because at least two columns have to be selected.</source>
-        <translation>少なくとも2列以上を選択しなくてはいけません。TLVレベル列を結合できません。</translation>
+        <translation type="vanished">少なくとも2列以上を選択しなくてはいけません。TLVレベル列を結合できません。</translation>
     </message>
     <message>
         <source>Merging Tlv Levels...</source>
-        <translation>TLVレベルを結合中...</translation>
+        <translation type="vanished">TLVレベルを結合中...</translation>
     </message>
 </context>
 <context>
@@ -5336,16 +5597,20 @@ N.B. Duplicated commands will be ignored. Only the last one will appear in the m
         <source> Merge Tlv Levels</source>
         <translation>TLVレベルを結合</translation>
     </message>
+    <message>
+        <source>Level %1 already exists! Are you sure you want to overwrite it?</source>
+        <translation>レベル %1 は既に存在します。上書きしてもよろしいですか？</translation>
+    </message>
 </context>
 <context>
     <name>MergeColumnsCommand</name>
     <message>
         <source>It is not possible to execute the merge column command because no column was selected.</source>
-        <translation>列が選択されていないので、列を結合できません。</translation>
+        <translation type="vanished">列が選択されていないので、列を結合できません。</translation>
     </message>
     <message>
         <source>It is not possible to execute the merge column command  because only one columns is  selected.</source>
-        <translation>2つの列が選択されていないので、列を結合できません。</translation>
+        <translation type="vanished">2つの列が選択されていないので、列を結合できません。</translation>
     </message>
 </context>
 <context>
@@ -5430,10 +5695,17 @@ What do you want to do?</source>
     </message>
 </context>
 <context>
-    <name>MyViewFinder</name>
+    <name>MyVideoWidget</name>
     <message>
         <source>Camera is not available</source>
         <translation>使用できるカメラがありません</translation>
+    </message>
+</context>
+<context>
+    <name>MyViewFinder</name>
+    <message>
+        <source>Camera is not available</source>
+        <translation type="vanished">使用できるカメラがありません</translation>
     </message>
 </context>
 <context>
@@ -5746,6 +6018,32 @@ What do you want to do?</source>
         <source>Render</source>
         <translation>レンダリング</translation>
     </message>
+    <message>
+        <source>Add Clapperboard</source>
+        <translation>カットボールドを追加する</translation>
+    </message>
+    <message>
+        <source>Edit Clapperboard...</source>
+        <translation>カットボールドを編集...</translation>
+    </message>
+    <message>
+        <source>Save current output settings.
+The parameters to be saved are:
+- Camera settings
+- Project folder to be saved in
+- File format
+- File options
+- Resample Balance
+- Channel width</source>
+        <translation>現在の出力設定を保存します。
+プリセットには以下の値が保存されます：
+- カメラ設定
+- 保存先となるプロジェクトフォルダ
+- ファイル拡張子
+- ファイル形式オプション
+- 画像補間方式
+- チャンネル幅</translation>
+    </message>
 </context>
 <context>
     <name>OverwriteDialog</name>
@@ -5808,16 +6106,16 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Overwrite</source>
-        <translation>上書き</translation>
+        <translation type="vanished">上書き</translation>
     </message>
     <message>
         <source>Skip</source>
-        <translation>飛ばす</translation>
+        <translation type="vanished">飛ばす</translation>
     </message>
     <message>
         <source>File &quot;%1&quot; already exists.
 Do you want to overwrite it?</source>
-        <translation>ファイル&quot;%1&quot;は既に存在します。
+        <translation type="vanished">ファイル&quot;%1&quot;は既に存在します。
 上書きしますか？ </translation>
     </message>
 </context>
@@ -6149,6 +6447,10 @@ WARNING : Image size mismatch. The saved image size is %1 x %2.</source>
     <message>
         <source>Black &amp; White</source>
         <translation>白黒二値</translation>
+    </message>
+    <message>
+        <source>Subcamera</source>
+        <translation>サブカメラ</translation>
     </message>
 </context>
 <context>
@@ -7201,7 +7503,7 @@ if both are possible on coding file path.</source>
     </message>
     <message>
         <source>Weight *:</source>
-        <translation>文字の太さ *：</translation>
+        <translation type="vanished">文字の太さ *：</translation>
     </message>
     <message>
         <source>OpenToonz can use FFmpeg for additional file formats.
@@ -7309,6 +7611,56 @@ Also the initial output destination for new scenes will be set to $scenefolder a
         <source>Compact</source>
         <translation>コンパクト</translation>
     </message>
+    <message>
+        <source>Saving</source>
+        <translation>保存</translation>
+    </message>
+    <message>
+        <source>Use Onion Skin Colors for Reference Drawings of Shift and Trace</source>
+        <translation>ライトテーブルの前後フレームにもオニオンスキンの色を用いる</translation>
+    </message>
+    <message>
+        <source>Tablet Settings</source>
+        <translation>タブレット</translation>
+    </message>
+    <message>
+        <source>Enable Windows Ink Support* (EXPERIMENTAL)</source>
+        <translation>Windows Inkを用いる* （試験運用中の機能です）</translation>
+    </message>
+    <message>
+        <source>Constant</source>
+        <translation>定数</translation>
+    </message>
+    <message>
+        <source>Exponential</source>
+        <translation>指数関数</translation>
+    </message>
+    <message>
+        <source>Expression </source>
+        <translation>エクスプレッション</translation>
+    </message>
+    <message>
+        <source>File</source>
+        <translation>ファイル</translation>
+    </message>
+    <message>
+        <source>Style *:</source>
+        <translation>スタイル *：</translation>
+    </message>
+    <message>
+        <source>Matte color is used for background when overwriting raster levels with transparent pixels
+in non alpha-enabled image format.</source>
+        <translation>マット色は、透明なピクセルを含む画像を、アルファチャンネル非対応のファイル形式で
+上書き保存するときの背景に用いられます。</translation>
+    </message>
+    <message>
+        <source>Matte color: </source>
+        <translation>マット色： </translation>
+    </message>
+    <message>
+        <source>Current Column Color:</source>
+        <translation>現在の列の文字色：</translation>
+    </message>
 </context>
 <context>
     <name>PreferencesPopup::FormatProperties</name>
@@ -7333,12 +7685,12 @@ Also the initial output destination for new scenes will be set to $scenefolder a
     <name>Previewer</name>
     <message>
         <source>The file name cannot be empty or contain any of the following characters:(new line)  \ / : * ? &quot;  |</source>
-        <translation>ファイル名は空であることができません。また、次の記号のどれかを含むことができません： \ / : * ? &quot;  |</translation>
+        <translation type="vanished">ファイル名は空であることができません。また、次の記号のどれかを含むことができません： \ / : * ? &quot;  |</translation>
     </message>
     <message>
         <source>File %1 already exists.
 Do you want to overwrite it?</source>
-        <translation>ファイル %1 は、既に存在します。
+        <translation type="vanished">ファイル %1 は、既に存在します。
 上書きしてもよろしいですか？</translation>
     </message>
 </context>
@@ -7501,6 +7853,38 @@ Do you want to overwrite it?</source>
     <message>
         <source>Level Name:</source>
         <translation>レベル名：</translation>
+    </message>
+    <message>
+        <source>Single Image</source>
+        <translation>1枚の画像にまとめる</translation>
+    </message>
+    <message>
+        <source>Frames</source>
+        <translation>フレームに分ける</translation>
+    </message>
+    <message>
+        <source>Columns</source>
+        <translation>列に分ける</translation>
+    </message>
+    <message>
+        <source>Flatten visible document layers into a single image. Layer styles are maintained.</source>
+        <translation>レイヤーを1枚の画像に統合します。レイヤーのスタイルは維持されます。</translation>
+    </message>
+    <message>
+        <source>Load document layers as frames into a single xsheet column.</source>
+        <translation>各レイヤーをフレームに分けてタイムシートの１つの列に読み込みます。</translation>
+    </message>
+    <message>
+        <source>Load document layers as xhseet columns.</source>
+        <translation>各レイヤーをタイムシートの列に分けて読み込みます。</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation>OK</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>キャンセル</translation>
     </message>
 </context>
 <context>
@@ -8164,7 +8548,7 @@ Some levels have not been loaded because their version is not supported</source>
     </message>
     <message>
         <source>The Revert to Last Saved command is not supported for the current selection.</source>
-        <translation>「最後に保存されたバージョンに戻す」コマンドは、現在の選択範囲に対応していません。</translation>
+        <translation type="vanished">「最後に保存されたバージョンに戻す」コマンドは、現在の選択範囲に対応していません。</translation>
     </message>
     <message>
         <source>The selected column is empty.</source>
@@ -8439,11 +8823,11 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Level </source>
-        <translation>レベル</translation>
+        <translation type="vanished">レベル</translation>
     </message>
     <message>
         <source> already exists! Are you sure you want to overwrite it?</source>
-        <translation>は既に存在します! 上書きしてもよろしいですか？</translation>
+        <translation type="vanished">は既に存在します! 上書きしてもよろしいですか？</translation>
     </message>
     <message>
         <source>It is not possible to merge tlv columns containing more than one level</source>
@@ -9192,6 +9576,304 @@ Allow duplicate?</source>
         <source>Nothing to replace: no cells or columns selected.</source>
         <translation>置き換えることができません：選択されているコマまたは列がありません。</translation>
     </message>
+    <message>
+        <source>Couldn&apos;t load %1</source>
+        <translation>%1 を読み込めませんでした</translation>
+    </message>
+    <message>
+        <source>Apply Antialias</source>
+        <translation>アンチエイリアスを適用</translation>
+    </message>
+    <message>
+        <source>The Reload command is not supported for the current selection.</source>
+        <translation>「再読み込み」コマンドは、現在の選択範囲に対応していません。</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>エラー</translation>
+    </message>
+    <message>
+        <source>No Palette loaded.</source>
+        <translation>パレットが読み込まれていません。</translation>
+    </message>
+    <message>
+        <source>A separation task is in progress! wait until it stops or cancel it</source>
+        <translation>色線を分けるタスクの処理中です! 完了まで待つか、またはキャンセルして下さい</translation>
+    </message>
+    <message>
+        <source>Duplicate Frame in XSheet</source>
+        <translation>タイムシート内で動画を複製</translation>
+    </message>
+    <message>
+        <source>Please enable &quot;Sync Level Strip Drawing Number Changes with the XSheet&quot; preference option
+to use the duplicate command in the xsheet / timeline.</source>
+        <translation>タイムシート/タイムライン上で動画を複製コマンドを使用するには、
+環境設定 ＞ タイムシート ＞ 「レベルビューア上の動画番号の変更を、タイムシートに同期する」
+オプションを有効にしてください。</translation>
+    </message>
+    <message>
+        <source>Please select only one layer to duplicate a frame.</source>
+        <translation>このコマンドは１つのコマだけ選択して使用して下さい。</translation>
+    </message>
+    <message>
+        <source>Please select only one frame to duplicate.</source>
+        <translation>このコマンドは１つのコマだけ選択して使用して下さい。</translation>
+    </message>
+    <message>
+        <source>Timeline</source>
+        <translation>タイムライン</translation>
+    </message>
+    <message>
+        <source>The qualifier %1 is not a valid key name. Skipping.</source>
+        <translation>修飾子 %1 は有効なキー名ではありません。スキップします。</translation>
+    </message>
+    <message>
+        <source>Clear All Onion Skin Markers</source>
+        <translation>全てのオニオンスキンをクリア</translation>
+    </message>
+    <message>
+        <source>Clear All Fixed Onion Skin Markers</source>
+        <translation>全ての固定オニオンスキンをクリア</translation>
+    </message>
+    <message>
+        <source>Clear All Relative Onion Skin Markers</source>
+        <translation>全ての連結オニオンスキンをクリア</translation>
+    </message>
+    <message>
+        <source>Always Overwrite in This Scene</source>
+        <translation>このシーンでは常に上書き</translation>
+    </message>
+    <message>
+        <source>    + %1 more level(s) 
+</source>
+        <translation>    + %1 個のレベル 
+</translation>
+    </message>
+    <message>
+        <source>Fx Settings</source>
+        <translation>エフェクト設定</translation>
+    </message>
+    <message>
+        <source>Save Curve</source>
+        <translation>パラメータを保存</translation>
+    </message>
+    <message>
+        <source>Load Curve</source>
+        <translation>パラメータを読み込み</translation>
+    </message>
+    <message>
+        <source>Export Curve</source>
+        <translation>パラメータの書き出し</translation>
+    </message>
+    <message>
+        <source>Rendering frame %1 / %2</source>
+        <comment>RenderListener</comment>
+        <translation>レンダリング中： フレーム %1 / %2</translation>
+    </message>
+    <message>
+        <source>Precomputing %1 Frames</source>
+        <comment>RenderListener</comment>
+        <translation>前計算中： %1 フレーム</translation>
+    </message>
+    <message>
+        <source> of %1</source>
+        <comment>RenderListener</comment>
+        <translation> / %1</translation>
+    </message>
+    <message>
+        <source>Finalizing render, please wait.</source>
+        <comment>RenderListener</comment>
+        <translation>ファイナライズ中です。お待ちください。</translation>
+    </message>
+    <message>
+        <source>Aborting render...</source>
+        <comment>RenderListener</comment>
+        <translation>レンダリングを中断しています...</translation>
+    </message>
+    <message>
+        <source>Building Schematic...</source>
+        <comment>RenderCommand</comment>
+        <translation>スキマティックを構築しています...</translation>
+    </message>
+    <message>
+        <source>column </source>
+        <comment>MultimediaProgressBar label (mode name)</comment>
+        <translation>列 </translation>
+    </message>
+    <message>
+        <source>layer </source>
+        <comment>MultimediaProgressBar label (mode name)</comment>
+        <translation>レイヤー </translation>
+    </message>
+    <message>
+        <source>Rendering %1%2, frame %3 / %4</source>
+        <comment>MultimediaProgressBar label</comment>
+        <translation>レンダリング中： %1%2, フレーム %3 /%4</translation>
+    </message>
+    <message>
+        <source>Rendering %1 frames of %2</source>
+        <comment>MultimediaProgressBar</comment>
+        <translation>レンダリング中： フレーム %1 / %2</translation>
+    </message>
+    <message>
+        <source>%1 of %2</source>
+        <comment>MultimediaProgressBar - [totalframe] of [path]</comment>
+        <translation>%1 [出力先] %2</translation>
+    </message>
+    <message>
+        <source>Aborting render...</source>
+        <comment>MultimediaProgressBar</comment>
+        <translation>レンダリングを中断しています...</translation>
+    </message>
+    <message>
+        <source>It is not possible to write the output:  the file</source>
+        <comment>RenderCommand</comment>
+        <translation>出力ファイルを保存できません。：ファイル</translation>
+    </message>
+    <message>
+        <source>s are read only.</source>
+        <comment>RenderCommand</comment>
+        <translation>は読み取り専用です。</translation>
+    </message>
+    <message>
+        <source> is read only.</source>
+        <comment>RenderCommand</comment>
+        <translation> は読み取り専用です。</translation>
+    </message>
+    <message>
+        <source>Save Cleanup Settings</source>
+        <translation>トレース設定を保存</translation>
+    </message>
+    <message>
+        <source>Load Cleanup Settings</source>
+        <translation>トレース設定の読み込み</translation>
+    </message>
+    <message>
+        <source>It is not possible to find the %1 level.</source>
+        <comment>FileData</comment>
+        <translation>レベル %1 を見つけることができません。</translation>
+    </message>
+    <message>
+        <source>There was an error copying %1</source>
+        <comment>FileData</comment>
+        <translation>%1 をコピーする時、エラーが発生しました</translation>
+    </message>
+    <message>
+        <source>Clone Level</source>
+        <comment>CloneLevelUndo::LevelNamePopup</comment>
+        <translation>レベルのクローンを作る</translation>
+    </message>
+    <message>
+        <source>Level Name:</source>
+        <comment>CloneLevelUndo::LevelNamePopup</comment>
+        <translation>レベル名：</translation>
+    </message>
+    <message>
+        <source>Collecting assets...</source>
+        <translation>素材を集めています...</translation>
+    </message>
+    <message>
+        <source>Abort</source>
+        <translation>中断</translation>
+    </message>
+    <message>
+        <source>Importing scenes...</source>
+        <translation>シーンをインポート中...</translation>
+    </message>
+    <message>
+        <source>It is not possible to execute the merge column command because no column was selected.</source>
+        <translation>列が選択されていないため、列を結合できません。</translation>
+    </message>
+    <message>
+        <source>It is not possible to execute the merge column command because only one columns is selected.</source>
+        <translation>１つの列しか選択されていないため、列を結合できません。</translation>
+    </message>
+    <message>
+        <source>It is not possible to apply the match lines because no column was selected.</source>
+        <translation>列が選択されていないため、マッチラインを合成できません。</translation>
+    </message>
+    <message>
+        <source>It is not possible to apply the match lines because two columns have to be selected.</source>
+        <translation>２つの列が選択されていないため、マッチラインを合成できません。</translation>
+    </message>
+    <message>
+        <source>It is not possible to merge tlv columns because no column was selected.</source>
+        <translation>列が選択されていないため、TLVレベル列を結合できません。</translation>
+    </message>
+    <message>
+        <source>It is not possible to merge tlv columns because at least two columns have to be selected.</source>
+        <translation>少なくとも２列以上を選択しなくてはいけません。TLVレベル列を結合できません。</translation>
+    </message>
+    <message>
+        <source>Merging Tlv Levels...</source>
+        <translation>TLVレベルを結合中...</translation>
+    </message>
+    <message>
+        <source>Save Previewed Images</source>
+        <translation>プレビュー画像を保存</translation>
+    </message>
+    <message>
+        <source>The file name cannot be empty or contain any of the following characters:(new line)  \ / : * ? &quot;  |</source>
+        <translation>ファイル名は空であることができません。また、次の記号のどれかを含むことができません： :(new line)  \ / : * ? &quot;  |</translation>
+    </message>
+    <message>
+        <source>Unsopporter raster format, cannot save</source>
+        <translation>サポートされていないラスター形式です。保存できません</translation>
+    </message>
+    <message>
+        <source>Cannot create %1 : %2</source>
+        <comment>Previewer warning %1:path %2:message</comment>
+        <translation>%1を作成できません： %2 </translation>
+    </message>
+    <message>
+        <source>Cannot create %1</source>
+        <comment>Previewer warning %1:path</comment>
+        <translation>%1 を作成できません</translation>
+    </message>
+    <message>
+        <source>Saved %1 frames out of %2 in %3</source>
+        <comment>Previewer %1:savedframes %2:framecount %3:filepath</comment>
+        <translation>%2 フレーム中 %1 フレームが %3 に保存されました</translation>
+    </message>
+    <message>
+        <source>Canceled! </source>
+        <comment>Previewer</comment>
+        <translation>キャンセルされました。 </translation>
+    </message>
+    <message>
+        <source>No frame to save!</source>
+        <translation>保存するフレームがありません！</translation>
+    </message>
+    <message>
+        <source>Already saving!</source>
+        <translation>すでに保存中です！</translation>
+    </message>
+    <message>
+        <source>Warning!</source>
+        <comment>OverwriteDialog</comment>
+        <translation>警告!</translation>
+    </message>
+    <message>
+        <source>Overwrite</source>
+        <comment>OverwriteDialog</comment>
+        <translation>上書き</translation>
+    </message>
+    <message>
+        <source>Skip</source>
+        <comment>OverwriteDialog</comment>
+        <translation>スキップ</translation>
+    </message>
+    <message>
+        <source>File &quot;%1&quot; already exists.
+Do you want to overwrite it?</source>
+        <comment>OverwriteDialog</comment>
+        <translation>ファイル&quot;%1&quot;は既に存在します。
+上書きしますか？ </translation>
+    </message>
+    <message>
+        <source>%1 does not exist.</source>
+        <translation>%1 は存在しません。</translation>
+    </message>
 </context>
 <context>
     <name>ReframePopup</name>
@@ -9299,7 +9981,7 @@ The audio file will not be included in the rendered clip.</source>
     <name>RenderListener</name>
     <message>
         <source>Finalizing render, please wait.</source>
-        <translation>ファイナライズ中です。お待ちください。</translation>
+        <translation type="vanished">ファイナライズ中です。お待ちください。</translation>
     </message>
 </context>
 <context>
@@ -10184,14 +10866,21 @@ Please commit or revert changes first.</source>
     </message>
 </context>
 <context>
+    <name>SaveBoardPresetFilePopup</name>
+    <message>
+        <source>Save Clapperboard Settings As Preset</source>
+        <translation>現在のカットボールド設定をプリセットに保存</translation>
+    </message>
+</context>
+<context>
     <name>SaveCurvePopup</name>
     <message>
         <source>Save Curve</source>
-        <translation>パラメータを保存</translation>
+        <translation type="vanished">パラメータを保存</translation>
     </message>
     <message>
         <source>Save</source>
-        <translation>保存</translation>
+        <translation type="vanished">保存</translation>
     </message>
 </context>
 <context>
@@ -10266,11 +10955,11 @@ Please commit or revert changes first.</source>
     <name>SavePreviewedPopup</name>
     <message>
         <source>Save Previewed Images</source>
-        <translation>プレビュー画像を保存</translation>
+        <translation type="vanished">プレビュー画像を保存</translation>
     </message>
     <message>
         <source>Save</source>
-        <translation>保存</translation>
+        <translation type="vanished">保存</translation>
     </message>
 </context>
 <context>
@@ -10288,11 +10977,11 @@ Please commit or revert changes first.</source>
     <name>SaveSettingsPopup</name>
     <message>
         <source>Save Cleanup Settings</source>
-        <translation>トレース設定を保存</translation>
+        <translation type="vanished">トレース設定を保存</translation>
     </message>
     <message>
         <source>Save</source>
-        <translation>保存</translation>
+        <translation type="vanished">保存</translation>
     </message>
 </context>
 <context>
@@ -10525,6 +11214,14 @@ Please commit or revert changes first.</source>
         <source>Select %1</source>
         <translation>%1 を選択</translation>
     </message>
+    <message>
+        <source>Flip View</source>
+        <translation>表示を反転</translation>
+    </message>
+    <message>
+        <source>Reset View</source>
+        <translation>表示をリセット</translation>
+    </message>
 </context>
 <context>
     <name>SceneViewerPanel</name>
@@ -10587,6 +11284,176 @@ Please commit or revert changes first.</source>
     <message>
         <source> (Flipped)</source>
         <translation> (反転表示)</translation>
+    </message>
+    <message>
+        <source>   ::   Project: </source>
+        <translation>   ：：   プロジェクト： </translation>
+    </message>
+</context>
+<context>
+    <name>SeparateColorsPopup</name>
+    <message>
+        <source>Auto</source>
+        <translation>自動更新</translation>
+    </message>
+    <message>
+        <source>Preview</source>
+        <translation>プレビュー</translation>
+    </message>
+    <message>
+        <source>Separate</source>
+        <translation>色分けを実行</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation>閉じる</translation>
+    </message>
+    <message>
+        <source>Sub Color 3:</source>
+        <translation>色線 3 の色：</translation>
+    </message>
+    <message>
+        <source>Alpha Matting</source>
+        <translation>アルファマット</translation>
+    </message>
+    <message>
+        <source>Main</source>
+        <translation>実線</translation>
+    </message>
+    <message>
+        <source>Sub1</source>
+        <translation>色線1</translation>
+    </message>
+    <message>
+        <source>Sub2</source>
+        <translation>色線2</translation>
+    </message>
+    <message>
+        <source>Sub3</source>
+        <translation>色線3</translation>
+    </message>
+    <message>
+        <source>Pick Color</source>
+        <translation>色を拾う</translation>
+    </message>
+    <message>
+        <source>Show Mask</source>
+        <translation>マスク領域</translation>
+    </message>
+    <message>
+        <source>Show Alpha</source>
+        <translation>アルファチャンネル</translation>
+    </message>
+    <message>
+        <source>Preview Frame:</source>
+        <translation>プレビューするフレーム：</translation>
+    </message>
+    <message>
+        <source>Paper Color:</source>
+        <translation>紙の色：</translation>
+    </message>
+    <message>
+        <source>Main Color:</source>
+        <translation>実線の色：</translation>
+    </message>
+    <message>
+        <source>Sub Color 1:</source>
+        <translation>色線 1 の色：</translation>
+    </message>
+    <message>
+        <source>Sub Color 2:</source>
+        <translation>色線 2 の色：</translation>
+    </message>
+    <message>
+        <source>Sub Adjust:</source>
+        <translation>色線の強さ：</translation>
+    </message>
+    <message>
+        <source>Border Smooth:</source>
+        <translation>境界をなじませる：</translation>
+    </message>
+    <message>
+        <source>Mask Threshold:</source>
+        <translation>しきい値：</translation>
+    </message>
+    <message>
+        <source>Mask Radius:</source>
+        <translation>マスクの半径：</translation>
+    </message>
+    <message>
+        <source>Start:</source>
+        <translation>開始フレーム：</translation>
+    </message>
+    <message>
+        <source>End:</source>
+        <translation>終了フレーム：</translation>
+    </message>
+    <message>
+        <source>Format:</source>
+        <translation>ファイル形式：</translation>
+    </message>
+    <message>
+        <source>Save in:</source>
+        <translation>保存先：</translation>
+    </message>
+    <message>
+        <source>File Suffix:</source>
+        <translation>ファイル接尾子：</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>キャンセル</translation>
+    </message>
+    <message>
+        <source>Separate by colors ... </source>
+        <translation>色線を分ける ... </translation>
+    </message>
+    <message>
+        <source>Separate 1 Level</source>
+        <translation>レベル内の色線を分ける</translation>
+    </message>
+    <message>
+        <source>Separate %1 Levels</source>
+        <translation>%1 個のレベルの色線を分ける</translation>
+    </message>
+    <message>
+        <source>Critical</source>
+        <translation>警告</translation>
+    </message>
+    <message>
+        <source>Failed to access the destination folder!</source>
+        <translation>保存先フォルダのアクセスに失敗しました！</translation>
+    </message>
+    <message>
+        <source>Separating %1</source>
+        <translation>%1 の色分けを実行中</translation>
+    </message>
+    <message>
+        <source>Converting level %1 of %2: %3</source>
+        <translation>%1 / %2 レベルを変換中： %3</translation>
+    </message>
+</context>
+<context>
+    <name>SeparateSwatch</name>
+    <message>
+        <source>Sub Color 3</source>
+        <translation>色線 3</translation>
+    </message>
+    <message>
+        <source>Original</source>
+        <translation>元画像</translation>
+    </message>
+    <message>
+        <source>Main Color</source>
+        <translation>実線</translation>
+    </message>
+    <message>
+        <source>Sub Color 1</source>
+        <translation>色線 1</translation>
+    </message>
+    <message>
+        <source>Sub Color 2</source>
+        <translation>色線 2</translation>
     </message>
 </context>
 <context>
@@ -10923,7 +11790,7 @@ Assign to &apos;%3&apos;?</source>
     </message>
     <message>
         <source>Choose Project</source>
-        <translation>プロジェクトを選択</translation>
+        <translation type="vanished">プロジェクトを選択</translation>
     </message>
     <message>
         <source>Create a New Scene</source>
@@ -10931,7 +11798,7 @@ Assign to &apos;%3&apos;?</source>
     </message>
     <message>
         <source>Open Scene</source>
-        <translation>シーンを開く</translation>
+        <translation type="vanished">シーンを開く</translation>
     </message>
     <message>
         <source>Scene Name:</source>
@@ -11082,6 +11949,18 @@ Possibly the preset file has been corrupted</source>
     <message>
         <source>Minutes</source>
         <translation>分間隔</translation>
+    </message>
+    <message>
+        <source>Current Project</source>
+        <translation>現在のプロジェクト</translation>
+    </message>
+    <message>
+        <source>Recent Scenes [Project]</source>
+        <translation>最近開いたシーン [プロジェクト]</translation>
+    </message>
+    <message>
+        <source>The selected scene project &apos;%1&apos; is not in the Current Project list and may not open automatically.</source>
+        <translation>選択したシーンのプロジェクト &apos;%1&apos; は現在のプロジェクトリストにはありません。自動的に開かない場合があります。</translation>
     </message>
 </context>
 <context>
@@ -11970,6 +12849,10 @@ Please refer to the user guide for details.</source>
         <source>Filter:</source>
         <translation>フィルタ：</translation>
     </message>
+    <message>
+        <source>Opacity:</source>
+        <translation>不透明度：</translation>
+    </message>
 </context>
 <context>
     <name>XsheetGUI::NoteArea</name>
@@ -11988,6 +12871,22 @@ Please refer to the user guide for details.</source>
     <message>
         <source>3sec Sheet</source>
         <translation>3秒シート</translation>
+    </message>
+    <message>
+        <source>Toggle Xsheet/Timeline</source>
+        <translation>タイムシート/タイムライン切り替え</translation>
+    </message>
+    <message>
+        <source>Add New Memo</source>
+        <translation>新規メモを追加</translation>
+    </message>
+    <message>
+        <source>Previous Memo</source>
+        <translation>前のメモ</translation>
+    </message>
+    <message>
+        <source>Next Memo</source>
+        <translation>次のメモ</translation>
     </message>
 </context>
 <context>
@@ -12063,6 +12962,35 @@ Please refer to the user guide for details.</source>
         <source>Set Auto Markers</source>
         <translation>素材の範囲にマーカーを自動設定</translation>
     </message>
+    <message>
+        <source>Click to Reset Shift &amp; Trace Markers to Neighbor Frames
+Hold F2 Key on the Viewer to Show This Frame Only</source>
+        <translation>[クリック] ライトテーブルマーカーを隣接するフレームにリセット
+[ビューア上でF2キー] このフレームのみ表示する</translation>
+    </message>
+    <message>
+        <source>Click to Hide This Frame from Shift &amp; Trace
+Hold F1 Key on the Viewer to Show This Frame Only</source>
+        <translation>[クリック] このフレームをライトテーブルから除く
+[ビューア上でF1キー] このフレームのみ表示する</translation>
+    </message>
+    <message>
+        <source>Click to Hide This Frame from Shift &amp; Trace
+Hold F3 Key on the Viewer to Show This Frame Only</source>
+        <translation>[クリック] このフレームをライトテーブルから除く
+[ビューア上でF3キー] このフレームのみ表示する</translation>
+    </message>
+    <message>
+        <source>Click to Move Shift &amp; Trace Marker</source>
+        <translation>[クリック] ライトテーブルマーカーを移動</translation>
+    </message>
+</context>
+<context>
+    <name>XsheetGUI::SoundColumnPopup</name>
+    <message>
+        <source>Volume:</source>
+        <translation>音量：</translation>
+    </message>
 </context>
 <context>
     <name>XsheetGUI::Toolbar</name>
@@ -12131,6 +13059,14 @@ Please refer to the user guide for details.</source>
     <message>
         <source>Zoom in/out of timeline</source>
         <translation type="vanished">タイムラインの拡大/縮小</translation>
+    </message>
+    <message>
+        <source>   ::   Project: </source>
+        <translation>   ：：   プロジェクト： </translation>
+    </message>
+    <message>
+        <source> Frame</source>
+        <translation> フレーム</translation>
     </message>
 </context>
 </TS>

@@ -228,6 +228,8 @@ protected slots:
 
   void onIconifyNodesToggled(bool iconified);
 
+  void onNodeChangedSize();
+
 private:
   void setEnableCache(bool toggle);
 

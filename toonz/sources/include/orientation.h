@@ -122,6 +122,10 @@ enum class PredefinedRect {
   PREVIEW_FRAME_AREA,
   SHIFTTRACE_DOT,
   SHIFTTRACE_DOT_AREA,
+  PANEL_EYE,
+  PANEL_PREVIEW_LAYER,
+  PANEL_LOCK,
+  PANEL_LAYER_NAME,
   SUBLAYER_NAME,       //! area to draw sublayer name
   SUBLAYER_ACTIVATOR,  //! activator key icon placement
   SUBLAYER_KEY_ICON    //! cell key icon for sublayers

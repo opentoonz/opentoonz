@@ -96,7 +96,7 @@
     </message>
     <message>
         <source>Hardness:</source>
-        <translation>Durezza:</translation>
+        <translation type="vanished">Durezza:</translation>
     </message>
     <message>
         <source>Accuracy:</source>
@@ -140,10 +140,6 @@
     </message>
     <message>
         <source>Break</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Pencil</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -220,22 +216,6 @@
     </message>
     <message>
         <source>Med</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Draw Order:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Over All</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Under All</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Palette Order</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -634,6 +614,20 @@
     </message>
     <message>
         <source>Polyline</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>FullColorFillTool</name>
+    <message>
+        <source>Fill Depth</source>
+        <translation type="unfinished">Profondità di Riempimento</translation>
+    </message>
+</context>
+<context>
+    <name>HandToolOptionsBox</name>
+    <message>
+        <source>Reset Position</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1259,6 +1253,13 @@ Procedere?</translation>
     </message>
 </context>
 <context>
+    <name>RotateToolOptionsBox</name>
+    <message>
+        <source>Reset Rotation</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>RulerToolOptionsBox</name>
     <message>
         <source>X:</source>
@@ -1340,6 +1341,33 @@ Procedere?</translation>
         <source>Link</source>
         <translation>Vincola</translation>
     </message>
+    <message>
+        <source>Scale</source>
+        <translation type="unfinished">Scala</translation>
+    </message>
+    <message>
+        <source>Position</source>
+        <translation type="unfinished">Posizione</translation>
+    </message>
+</context>
+<context>
+    <name>ShiftTraceToolOptionBox</name>
+    <message>
+        <source>Reset Previous</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reset Following</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previous Drawing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Following Drawing</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SkeletonTool</name>
@@ -1416,6 +1444,53 @@ Procedere?</translation>
     <message>
         <source>With this option being activated, the picked style will be
 moved to the end of the first page of the palette.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ToonzRasterBrushTool</name>
+    <message>
+        <source>Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hardness:</source>
+        <translation type="unfinished">Durezza:</translation>
+    </message>
+    <message>
+        <source>Smooth:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Draw Order:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Over All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Under All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Palette Order</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preset:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;custom&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pencil</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pressure</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1580,6 +1655,13 @@ moved to the end of the first page of the palette.</source>
     </message>
     <message>
         <source>Rectangular</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ZoomToolOptionsBox</name>
+    <message>
+        <source>Reset Zoom</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

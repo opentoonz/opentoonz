@@ -171,10 +171,10 @@ void SelectionDragTool::click(int row, int col, QMouseEvent *e) {
 }
 
 void SelectionDragTool::drag(int row, int col, QMouseEvent *e) {
-  int r0 = qMin(row, m_firstRow);
-  int r1 = qMax(row, m_firstRow);
-  int c0 = qMin(col, m_firstCol);
-  int c1 = qMax(col, m_firstCol);
+  int r0 = std::min(row, m_firstRow);
+  int r1 = std::max(row, m_firstRow);
+  int c0 = std::min(col, m_firstCol);
+  int c1 = std::max(col, m_firstCol);
   QRect selectedCells(c0, r0, c1 - c0 + 1, r1 - r0 + 1);
   m_viewer->selectCells(selectedCells);
 }
@@ -708,7 +708,7 @@ bool SpreadsheetViewer::refreshContentSize(int scrollDx, int scrollDy) {
   QSize viewportSize = m_cellScrollArea->viewport()->size();
   QPoint offset      = m_cellScrollArea->widget()->pos();
   offset =
-      QPoint(qMin(0, offset.x() - scrollDx), qMin(0, offset.y() - scrollDy));
+      QPoint(std::min(0, offset.x() - scrollDx), std::min(0, offset.y() - scrollDy));
 
   QSize contentSize(columnToX(m_columnCount + 1), rowToY(m_rowCount + 1));
 
@@ -736,7 +736,7 @@ void SpreadsheetViewer::showEvent(QShowEvent *) {
   int viewportHeight      = m_cellScrollArea->height();
   int contentHeight       = rowToY(m_rowCount * 0 + 50);
   QScrollBar *vSc         = m_cellScrollArea->verticalScrollBar();
-  int actualContentHeight = qMax(contentHeight, vSc->value() + viewportHeight);
+  int actualContentHeight = std::max(contentHeight, vSc->value() + viewportHeight);
   m_rowScrollArea->widget()->setFixedHeight(actualContentHeight);
   m_cellScrollArea->widget()->setFixedHeight(actualContentHeight);
   if (m_frameHandle)

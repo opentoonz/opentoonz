@@ -770,6 +770,11 @@ public:
   void flush() override;
 
   Tiio::RowOrder getRowOrder() const override { return m_rowOrder; }
+
+  // m_bpp is set to "Bits Per Pixel" property value in the function open()
+  bool writeAlphaSupported() const override {
+    return (m_bpp == 32 || m_bpp == 64);
+  }
 };
 
 //------------------------------------------------------------

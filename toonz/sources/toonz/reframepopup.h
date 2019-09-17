@@ -32,6 +32,9 @@ public:
   ReframePopup();
   void getValues(int& step, int& blank);
 
+protected:
+  void showEvent(QShowEvent* event) override;
+
 public slots:
   void updateBlankCellCount();
 };

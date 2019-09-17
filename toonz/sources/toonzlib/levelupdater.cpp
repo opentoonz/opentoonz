@@ -246,7 +246,7 @@ void LevelUpdater::open(const TFilePath &fp, TPropertyGroup *pg) {
       m_lwPath = fp;
     }
   } catch (...) {
-    // In this case, TLevelWriterP(..) failed, that object was never contructed,
+    // In this case, TLevelWriterP(..) failed, that object was never constructed,
     // the assignment m_lw never took place. And m_lw == 0.
 
     // Reset state and rethrow
@@ -342,7 +342,9 @@ TFilePath LevelUpdater::getNewTemporaryFilePath(const TFilePath &fp) {
   int count = 1;
 
   for (;;) {
-    fp2 = fp.withName(fp.getWideName() + L"__" + std::to_wstring(count++));
+    // changed the temporary name as the previous naming (like
+    // "filename__1.png") had been misteken as sequential images
+    fp2 = fp.withName(fp.getWideName() + L"_ottmp" + std::to_wstring(count++));
     if (!TSystem::doesExistFileOrLevel(fp2)) break;
   }
 

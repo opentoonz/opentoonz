@@ -29,7 +29,8 @@ class QOpenGLContext;
 class QColor;
 
 class DVAPI LutCalibrator : public QOpenGLFunctions {
-  bool m_isValid = false;
+  bool m_isValid       = false;
+  bool m_isInitialized = false;
 
   struct LutTextureShader {
     QOpenGLShader* vert           = nullptr;
@@ -58,6 +59,7 @@ public:
   void initialize();
 
   bool isValid() { return m_isValid; }
+  bool isInitialized() { return m_isInitialized; }
 
   ~LutCalibrator() {}
 

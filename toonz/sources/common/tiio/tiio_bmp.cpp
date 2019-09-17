@@ -598,6 +598,9 @@ public:
   void flush() override { fflush(m_chan); }
 
   void writeLine(char *buffer) override;
+
+  // for now opentoonz does not support bmp format with alpha channel
+  bool writeAlphaSupported() const override { return false; }
 };
 
 //---------------------------------------------------------

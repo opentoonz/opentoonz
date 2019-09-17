@@ -1,5 +1,3 @@
-#pragma once
-
 #ifndef igs_line_blur_h
 #define igs_line_blur_h
 
@@ -20,7 +18,8 @@ IGS_LINE_BLUR_EXPORT void convert(
     ,
     const int width  // no_margin
     ,
-    const int channels, const int bits
+    const int channels,
+    const int bits
 
     /* Action Geometry */
     ,
@@ -48,19 +47,19 @@ IGS_LINE_BLUR_EXPORT void convert(
     const int v_near_len /* min=2   def=160  incr=1   max=1000 */
 
     ,
-    const int mv_sw /* 0 =OFF */
+    const bool mv_sw /* false=OFF */
     ,
-    const int pv_sw /* 0 =OFF */
+    const bool pv_sw /* false=OFF */
     ,
-    const int cv_sw /* 0 =OFF */
+    const bool cv_sw /* false=OFF */
     ,
     const long reference_channel /* 3 =Alpha:RGBA orBGRA */
     ,
-    const int debug_save_sw /* 0 =OFF */
+    const bool debug_save_sw /* false=OFF */
     ,
     const int brush_action /* 0 =Curve Blur ,1=Smudge Brush */
-    );
+);
 }
-}
+}  // namespace igs
 
 #endif /* !igs_line_blur_h */

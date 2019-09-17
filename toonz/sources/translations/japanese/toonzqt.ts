@@ -256,7 +256,7 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>&amp;Open Subxsheet</source>
-        <translation>サブシートを開く (&amp;O)</translation>
+        <translation type="vanished">サブシートを開く (&amp;O)</translation>
     </message>
 </context>
 <context>
@@ -289,11 +289,11 @@ Possibly the preset file has been corrupted</source>
     <name>DVGui</name>
     <message>
         <source>OK</source>
-        <translation>OK</translation>
+        <translation type="vanished">OK</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>キャンセル</translation>
+        <translation type="vanished">キャンセル</translation>
     </message>
 </context>
 <context>
@@ -697,6 +697,17 @@ Possibly the preset file has been corrupted</source>
     </message>
 </context>
 <context>
+    <name>FontParamField</name>
+    <message>
+        <source>Style:</source>
+        <translation>スタイル：</translation>
+    </message>
+    <message>
+        <source>Size:</source>
+        <translation>サイズ：</translation>
+    </message>
+</context>
+<context>
     <name>FrameNavigator</name>
     <message>
         <source>Previous Frame</source>
@@ -1008,6 +1019,30 @@ Possibly the preset file has been corrupted</source>
         <source>Step 4</source>
         <translation>ステップ4</translation>
     </message>
+    <message>
+        <source>Activate Cycle</source>
+        <translation>サイクルを有効化</translation>
+    </message>
+    <message>
+        <source>Deactivate Cycle</source>
+        <translation>サイクルを無効化</translation>
+    </message>
+    <message>
+        <source>Show Inbetween Values</source>
+        <translation>キー以外の値を表示する</translation>
+    </message>
+    <message>
+        <source>Hide Inbetween Values</source>
+        <translation>キー以外の値を隠す</translation>
+    </message>
+    <message>
+        <source>Change Interpolation</source>
+        <translation>補間形式を変更</translation>
+    </message>
+    <message>
+        <source>Change Step</source>
+        <translation>ステップを変更</translation>
+    </message>
 </context>
 <context>
     <name>FunctionToolbar</name>
@@ -1086,7 +1121,7 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>&amp;Open Subxsheet</source>
-        <translation>サブシートを開く (&amp;O)</translation>
+        <translation type="vanished">サブシートを開く (&amp;O)</translation>
     </message>
     <message>
         <source>&amp;Uncache Fx</source>
@@ -1206,6 +1241,13 @@ Possibly the preset file has been corrupted</source>
     </message>
 </context>
 <context>
+    <name>FxSchematicOutputNode</name>
+    <message>
+        <source>Output</source>
+        <translation>出力</translation>
+    </message>
+</context>
+<context>
     <name>FxSchematicPort</name>
     <message>
         <source>&amp;Disconnect from Xsheet</source>
@@ -1235,6 +1277,13 @@ Select FX nodes and related links before copying or cutting the selection you wa
 Select FX nodes and related links before copying or cutting the selection you want to paste.</source>
         <translation>接続されていない複数のエフェクトノードを「貼り付けて置換」できません。
 コピーまたは切り取りを行う前に、FXノードと関連するリンクを選択してください。</translation>
+    </message>
+</context>
+<context>
+    <name>FxSchematicXSheetNode</name>
+    <message>
+        <source>XSheet</source>
+        <translation>タイムシート</translation>
     </message>
 </context>
 <context>
@@ -1358,7 +1407,7 @@ Select FX nodes and related links before copying or cutting the selection you wa
     <name>MyPaintBrushStyleChooserPage</name>
     <message>
         <source>Plain color</source>
-        <translation>通常の色</translation>
+        <translation type="vanished">単色</translation>
     </message>
 </context>
 <context>
@@ -1582,6 +1631,17 @@ Select FX nodes and related links before copying or cutting the selection you wa
     </message>
 </context>
 <context>
+    <name>PlaneViewer</name>
+    <message>
+        <source>Reset View</source>
+        <translation>表示をリセット</translation>
+    </message>
+    <message>
+        <source>Fit To Window</source>
+        <translation>ウィンドウに全体を表示</translation>
+    </message>
+</context>
+<context>
     <name>PointParamField</name>
     <message>
         <source>Y:</source>
@@ -1657,19 +1717,19 @@ Select FX nodes and related links before copying or cutting the selection you wa
     </message>
     <message>
         <source>Save</source>
-        <translation>保存</translation>
+        <translation type="vanished">保存</translation>
     </message>
     <message>
         <source>Discard</source>
-        <translation>変更を破棄</translation>
+        <translation type="vanished">変更を破棄</translation>
     </message>
     <message>
         <source>Yes</source>
-        <translation>はい</translation>
+        <translation type="vanished">はい</translation>
     </message>
     <message>
         <source>No</source>
-        <translation>いいえ</translation>
+        <translation type="vanished">いいえ</translation>
     </message>
     <message>
         <source>Stage Schematic</source>
@@ -1993,7 +2053,7 @@ Are you sure?</source>
     </message>
     <message>
         <source>Replace</source>
-        <translation>置き換え</translation>
+        <translation type="vanished">置き換え</translation>
     </message>
     <message>
         <source>Modify Fx Param : %1</source>
@@ -2129,8 +2189,36 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
         <translation>3DLUTファイルの読み込みに失敗しました。</translation>
     </message>
     <message>
-        <source>OpenToonz 1.2</source>
-        <translation></translation>
+        <source>Custom Texture</source>
+        <comment>TextureStyleChooserPage</comment>
+        <translation>カスタムテクスチャ</translation>
+    </message>
+    <message>
+        <source>Current Frame: </source>
+        <translation>現在のフレーム： </translation>
+    </message>
+    <message>
+        <source>File History</source>
+        <translation>更新履歴</translation>
+    </message>
+    <message>
+        <source>Plain color</source>
+        <comment>VectorBrushStyleChooserPage</comment>
+        <translation>単色</translation>
+    </message>
+    <message>
+        <source>Plain color</source>
+        <comment>MyPaintBrushStyleChooserPage</comment>
+        <translation>単色</translation>
+    </message>
+    <message>
+        <source>Plain color</source>
+        <comment>SpecialStyleChooserPage</comment>
+        <translation>単色</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation>OK</translation>
     </message>
 </context>
 <context>
@@ -2193,6 +2281,10 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
         <source>&amp;Swtich output port display mode</source>
         <translation>ポートの表示を切り替える (&amp;S)</translation>
     </message>
+    <message>
+        <source>&amp;Toggle node icons</source>
+        <translation>アイコン表示切り替え （&amp;T）</translation>
+    </message>
 </context>
 <context>
     <name>SchematicWindowEditor</name>
@@ -2224,7 +2316,7 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     <name>SpecialStyleChooserPage</name>
     <message>
         <source>Plain color</source>
-        <translation>通常の色</translation>
+        <translation type="vanished">単色</translation>
     </message>
 </context>
 <context>
@@ -2357,6 +2449,54 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     <message>
         <source>Cancel</source>
         <translation>キャンセル</translation>
+    </message>
+    <message>
+        <source>The current palette %1
+in the studio palette has been modified. Do you want to save your changes?</source>
+        <translation>スタジオパレット内のパレット %1 は変更されました。
+変更を保存しますか？</translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation>保存</translation>
+    </message>
+    <message>
+        <source>Discard</source>
+        <translation>変更を破棄</translation>
+    </message>
+    <message>
+        <source>Convert %1 to Studio Palette and Overwrite. 
+Are you sure ?</source>
+        <translation>%1 をスタジオパレットに変換して上書き保存します。
+よろしいですか？</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation type="obsolete">はい</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation type="obsolete">いいえ</translation>
+    </message>
+    <message>
+        <source>Replacing all selected palettes with the palette &quot;%1&quot;. 
+Are you sure ?</source>
+        <translation>選択中の全てのパレットをパレット &quot;%1&quot; と置き換えます。
+よろしいですか？</translation>
+    </message>
+    <message>
+        <source>Replacing the palette &quot;%1&quot; with the palette &quot;%2&quot;. 
+Are you sure ?</source>
+        <translation>パレット &quot;%1&quot; をパレット &quot;%2&quot; に置き換えます。
+よろしいですか？</translation>
+    </message>
+    <message>
+        <source>Replace</source>
+        <translation>置き換える</translation>
+    </message>
+    <message>
+        <source>Convert</source>
+        <translation>変換する</translation>
     </message>
 </context>
 <context>
@@ -2616,6 +2756,17 @@ Apply</source>
     </message>
 </context>
 <context>
+    <name>SwatchViewer</name>
+    <message>
+        <source>Reset View</source>
+        <translation>表示をリセット</translation>
+    </message>
+    <message>
+        <source>Fit To Window</source>
+        <translation>ウィンドウに全体を表示</translation>
+    </message>
+</context>
+<context>
     <name>TMessageViewer</name>
     <message>
         <source>Errors</source>
@@ -2664,7 +2815,7 @@ Apply</source>
     <name>VectorBrushStyleChooserPage</name>
     <message>
         <source>Plain color</source>
-        <translation>通常の色</translation>
+        <translation type="vanished">通常の色</translation>
     </message>
 </context>
 <context>

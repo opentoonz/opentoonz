@@ -5,15 +5,6 @@
 #include <mypaint-surface.h>
 #include <mypaint-config.h>
 
-typedef enum {
-    MYPAINT_SYMMETRY_TYPE_VERTICAL,
-    MYPAINT_SYMMETRY_TYPE_HORIZONTAL,
-    MYPAINT_SYMMETRY_TYPE_VERTHORZ,
-    MYPAINT_SYMMETRY_TYPE_ROTATIONAL,
-    MYPAINT_SYMMETRY_TYPE_SNOWFLAKE,
-    MYPAINT_SYMMETRY_TYPES_COUNT
-} MyPaintSymmetryType;
-
 G_BEGIN_DECLS
 
 typedef struct MyPaintTiledSurface MyPaintTiledSurface;
@@ -49,10 +40,7 @@ struct MyPaintTiledSurface {
     MyPaintTileRequestStartFunction tile_request_start;
     MyPaintTileRequestEndFunction tile_request_end;
     gboolean surface_do_symmetry;
-    MyPaintSymmetryType symmetry_type;
     float surface_center_x;
-    float surface_center_y;
-    int rot_symmetry_lines;
     struct OperationQueue *operation_queue;
     MyPaintRectangle dirty_bbox;
     gboolean threadsafe_tile_requests;
@@ -68,10 +56,7 @@ void
 mypaint_tiled_surface_destroy(MyPaintTiledSurface *self);
 
 void
-mypaint_tiled_surface_set_symmetry_state(MyPaintTiledSurface *self, gboolean active,
-                                         float center_x, float center_y,
-                                         MyPaintSymmetryType symmetry_type,
-                                         int rot_symmetry_lines);
+mypaint_tiled_surface_set_symmetry_state(MyPaintTiledSurface *self, gboolean active, float center_x);
 float
 mypaint_tiled_surface_get_alpha (MyPaintTiledSurface *self, float x, float y, float radius);
 

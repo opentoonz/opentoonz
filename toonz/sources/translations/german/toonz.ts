@@ -109,11 +109,11 @@
     <name>ApplyMatchlinesCommand</name>
     <message>
         <source>It is not possible to apply the match lines because no column was selected.</source>
-        <translation>Es ist nicht möglich die Anpassungslinien anzuweden, da keine Spalte gewählt wurde.</translation>
+        <translation type="vanished">Es ist nicht möglich die Anpassungslinien anzuweden, da keine Spalte gewählt wurde.</translation>
     </message>
     <message>
         <source>It is not possible to apply the match lines because two columns have to be selected.</source>
-        <translation>Es ist nicht möglich die Anpassungslinien anzuwenden, da zwei Spalten gewählt sein müssen.</translation>
+        <translation type="vanished">Es ist nicht möglich die Anpassungslinien anzuwenden, da zwei Spalten gewählt sein müssen.</translation>
     </message>
 </context>
 <context>
@@ -359,6 +359,92 @@ Halten Sie sie an oder warten Sie auf ihre Beendung bevor Sie sie entwenden.</tr
     <message>
         <source>Cancel</source>
         <translation>Abbrechen</translation>
+    </message>
+</context>
+<context>
+    <name>BoardSettingsPopup</name>
+    <message>
+        <source>Clapperboard Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Load Preset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save as Preset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation type="unfinished">Schließen</translation>
+    </message>
+    <message>
+        <source>Duration (frames):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Text</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Project name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scene name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Duration : Frame</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Duration : Sec + Frame</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Duration : HH:MM:SS:FF</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current date</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current date and time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scene location : Aliased path</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scene location : Full path</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Output location : Aliased path</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Output location : Full path</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Image</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>BoardView</name>
+    <message>
+        <source>Please set the duration more than 0 frame first, or the clapperboard settings will not be saved in the scene at all!</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -972,11 +1058,11 @@ What do you want to do?</source>
     <name>CloneLevelUndo::LevelNamePopup</name>
     <message>
         <source>Clone Level</source>
-        <translation type="unfinished">Ebene duplizieren</translation>
+        <translation type="obsolete">Ebene duplizieren</translation>
     </message>
     <message>
         <source>Level Name:</source>
-        <translation type="unfinished">Name der Ebene:</translation>
+        <translation type="obsolete">Name der Ebene:</translation>
     </message>
 </context>
 <context>
@@ -1151,6 +1237,10 @@ Was möchten Sie tun?</translation>
     </message>
     <message>
         <source> (Flipped)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>   ::   Project: </source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1774,11 +1864,11 @@ contain the dpi information, then the current camera dpi will be used.
     <name>ExportCurvePopup</name>
     <message>
         <source>Export Curve</source>
-        <translation>Kurve exportieren</translation>
+        <translation type="vanished">Kurve exportieren</translation>
     </message>
     <message>
         <source>Export</source>
-        <translation>Exportieren</translation>
+        <translation type="vanished">Exportieren</translation>
     </message>
 </context>
 <context>
@@ -2245,26 +2335,26 @@ contain the dpi information, then the current camera dpi will be used.
     <name>FileData</name>
     <message>
         <source>It is not possible to find the %1 level.</source>
-        <translation>Ebene %1 kann nicht gefunden werden.</translation>
+        <translation type="vanished">Ebene %1 kann nicht gefunden werden.</translation>
     </message>
     <message>
         <source>There was an error copying %1</source>
-        <translation>Beim kopieren von %1 trat ein Fehler ein.</translation>
+        <translation type="vanished">Beim kopieren von %1 trat ein Fehler ein.</translation>
     </message>
 </context>
 <context>
     <name>FileSelection</name>
     <message>
         <source>Abort</source>
-        <translation>Unterbrechen</translation>
+        <translation type="vanished">Unterbrechen</translation>
     </message>
     <message>
         <source>Collecting assets...</source>
-        <translation>Sammle Material...</translation>
+        <translation type="vanished">Sammle Material...</translation>
     </message>
     <message>
         <source>Importing scenes...</source>
-        <translation>Importiere Szenen...</translation>
+        <translation type="vanished">Importiere Szenen...</translation>
     </message>
 </context>
 <context>
@@ -2306,6 +2396,25 @@ contain the dpi information, then the current camera dpi will be used.
     <message>
         <source>Drag to Extend Onion Skin, Double Click to Toggle All</source>
         <translation>Ziehen Sie um die Onion Skin zu erweitern, Doppel-Klicken Sie um Alle umzuschalten</translation>
+    </message>
+    <message>
+        <source>Click to Reset Shift &amp; Trace Markers to Neighbor Frames
+Hold F2 Key on the Viewer to Show This Frame Only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click to Hide This Frame from Shift &amp; Trace
+Hold F1 Key on the Viewer to Show This Frame Only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click to Hide This Frame from Shift &amp; Trace
+Hold F3 Key on the Viewer to Show This Frame Only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click to Move Shift &amp; Trace Marker</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2618,6 +2727,76 @@ Do you want to overwrite it?</source>
     <message>
         <source>It is not possible to delete %1.</source>
         <translation>%1 kann nicht gelöscht werden.</translation>
+    </message>
+</context>
+<context>
+    <name>ItemInfoView</name>
+    <message>
+        <source>Bold</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Italic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ignore</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keep</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Name:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Type:</source>
+        <translation type="unfinished">Typ:</translation>
+    </message>
+    <message>
+        <source>Path:</source>
+        <translation type="unfinished">Pfad:</translation>
+    </message>
+    <message>
+        <source>Aspect Ratio:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Font:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Max Size:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No item selected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Item</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ItemListView</name>
+    <message>
+        <source>Add</source>
+        <translation type="unfinished">Hinzufügen</translation>
+    </message>
+    <message>
+        <source>Remove</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move Up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move Down</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3119,6 +3298,17 @@ Please use the frame numbers for reference.</source>
         <source>Invalid data file.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Drawing: </source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>LoadBoardPresetFilePopup</name>
+    <message>
+        <source>Load Clapperboard Settings Preset</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>LoadColorModelPopup</name>
@@ -3143,11 +3333,11 @@ Please use the frame numbers for reference.</source>
     <name>LoadCurvePopup</name>
     <message>
         <source>Load Curve</source>
-        <translation>Effekt-Parameter importieren</translation>
+        <translation type="vanished">Effekt-Parameter importieren</translation>
     </message>
     <message>
         <source>Load</source>
-        <translation>Laden</translation>
+        <translation type="vanished">Laden</translation>
     </message>
 </context>
 <context>
@@ -3290,15 +3480,15 @@ Please use the frame numbers for reference.</source>
     <name>LoadSettingsPopup</name>
     <message>
         <source>Load Cleanup Settings</source>
-        <translation>Säuberungs-Einstellungen laden</translation>
+        <translation type="vanished">Säuberungs-Einstellungen laden</translation>
     </message>
     <message>
         <source>Load</source>
-        <translation>Laden</translation>
+        <translation type="vanished">Laden</translation>
     </message>
     <message>
         <source>%1 does not exist.</source>
-        <translation>%1 existiert nicht.</translation>
+        <translation type="vanished">%1 existiert nicht.</translation>
     </message>
 </context>
 <context>
@@ -3652,7 +3842,7 @@ Please use the frame numbers for reference.</source>
     </message>
     <message>
         <source>&amp;Send Back</source>
-        <translation>Nach Hinten schicken (&amp;S)</translation>
+        <translation type="vanished">Nach Hinten schicken (&amp;S)</translation>
     </message>
     <message>
         <source>&amp;Send Backward</source>
@@ -5247,10 +5437,6 @@ Please use the frame numbers for reference.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Flip Viewer Horiontally</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Flip Viewer Vertically</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5308,6 +5494,74 @@ Please use the frame numbers for reference.</source>
     </message>
     <message>
         <source>Active Axis - All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Timeline</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Linear Interpolation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Speed In / Speed Out Interpolation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ease In / Ease Out Interpolation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ease In / Ease Out (%) Interpolation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exponential Interpolation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Expression Interpolation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File Interpolation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Constant Interpolation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Separate Colors...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Flip Viewer Horizontally</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Send to Back</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reset Zoom</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reset Rotation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reset Position</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Brush Tool - Eraser (Raster option)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Brush Tool - Lock Alpha</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5439,15 +5693,15 @@ N.B. Duplicated commands will be ignored. Only the last one will appear in the m
     <name>MergeCmappedCommand</name>
     <message>
         <source>It is not possible to merge tlv columns because no column was selected.</source>
-        <translation>TLV-Spalten können nicht vereint werden, da keine Spalten gewählt wurden.</translation>
+        <translation type="vanished">TLV-Spalten können nicht vereint werden, da keine Spalten gewählt wurden.</translation>
     </message>
     <message>
         <source>It is not possible to merge tlv columns because at least two columns have to be selected.</source>
-        <translation>TLV-Spalten können nicht vereint werden, da mindestens zwei Spalten gewählt werden müssen.</translation>
+        <translation type="vanished">TLV-Spalten können nicht vereint werden, da mindestens zwei Spalten gewählt werden müssen.</translation>
     </message>
     <message>
         <source>Merging Tlv Levels...</source>
-        <translation>TLV-Ebenen weden vereint...</translation>
+        <translation type="vanished">TLV-Ebenen weden vereint...</translation>
     </message>
 </context>
 <context>
@@ -5476,16 +5730,20 @@ N.B. Duplicated commands will be ignored. Only the last one will appear in the m
         <source> Merge Tlv Levels</source>
         <translation>TLV-Ebenen vereinen</translation>
     </message>
+    <message>
+        <source>Level %1 already exists! Are you sure you want to overwrite it?</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MergeColumnsCommand</name>
     <message>
         <source>It is not possible to execute the merge column command because no column was selected.</source>
-        <translation>Es können keine Spalten vereint werden, da keine Spalten gewählt wurden.</translation>
+        <translation type="vanished">Es können keine Spalten vereint werden, da keine Spalten gewählt wurden.</translation>
     </message>
     <message>
         <source>It is not possible to execute the merge column command  because only one columns is  selected.</source>
-        <translation>Es können keine Spalten vereint werden, da nur eine Spalte gewählt wurde.</translation>
+        <translation type="vanished">Es können keine Spalten vereint werden, da nur eine Spalte gewählt wurde.</translation>
     </message>
 </context>
 <context>
@@ -5570,7 +5828,7 @@ Was möchten Sie tun?</translation>
     </message>
 </context>
 <context>
-    <name>MyViewFinder</name>
+    <name>MyVideoWidget</name>
     <message>
         <source>Camera is not available</source>
         <translation type="unfinished"></translation>
@@ -5886,6 +6144,25 @@ Was möchten Sie tun?</translation>
         <source>Render</source>
         <translation type="unfinished">Render</translation>
     </message>
+    <message>
+        <source>Add Clapperboard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit Clapperboard...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save current output settings.
+The parameters to be saved are:
+- Camera settings
+- Project folder to be saved in
+- File format
+- File options
+- Resample Balance
+- Channel width</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>OverwriteDialog</name>
@@ -5948,16 +6225,16 @@ Was möchten Sie tun?</translation>
     </message>
     <message>
         <source>Overwrite</source>
-        <translation>Überschreiben</translation>
+        <translation type="vanished">Überschreiben</translation>
     </message>
     <message>
         <source>Skip</source>
-        <translation>Überspringen</translation>
+        <translation type="vanished">Überspringen</translation>
     </message>
     <message>
         <source>File &quot;%1&quot; already exists.
 Do you want to overwrite it?</source>
-        <translation>Datei &quot;%1&quot;existiert bereits.
+        <translation type="vanished">Datei &quot;%1&quot;existiert bereits.
 Überschreiben?</translation>
     </message>
 </context>
@@ -6258,6 +6535,10 @@ WARNING : Image size mismatch. The size of level with the same name is is %1 x %
     <message>
         <source>
 WARNING : Image size mismatch. The size of level with the same path is %1 x %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Subcamera</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7281,10 +7562,6 @@ if both are possible on coding file path.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Weight *:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>OpenToonz can use FFmpeg for additional file formats.
 </source>
         <translation type="unfinished"></translation>
@@ -7387,6 +7664,55 @@ Also the initial output destination for new scenes will be set to $scenefolder a
         <source>Compact</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Saving</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use Onion Skin Colors for Reference Drawings of Shift and Trace</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tablet Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable Windows Ink Support* (EXPERIMENTAL)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Constant</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exponential</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Expression </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File</source>
+        <translation type="unfinished">Datei</translation>
+    </message>
+    <message>
+        <source>Style *:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Matte color is used for background when overwriting raster levels with transparent pixels
+in non alpha-enabled image format.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Matte color: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current Column Color:</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>PreferencesPopup:: FormatProperties</name>
@@ -7430,12 +7756,12 @@ Also the initial output destination for new scenes will be set to $scenefolder a
     <name>Previewer</name>
     <message>
         <source>The file name cannot be empty or contain any of the following characters:(new line)  \ / : * ? &quot;  |</source>
-        <translation>Der Dateiname darf nicht leer sein oder folgende Zeichen enthalten: (new line)  \ / : * ? &quot;  |</translation>
+        <translation type="vanished">Der Dateiname darf nicht leer sein oder folgende Zeichen enthalten: (new line)  \ / : * ? &quot;  |</translation>
     </message>
     <message>
         <source>File %1 already exists.
 Do you want to overwrite it?</source>
-        <translation>Datei %1 existiert bereits. 
+        <translation type="vanished">Datei %1 existiert bereits. 
 Möchte Sie sie überschreiben?</translation>
     </message>
 </context>
@@ -7605,6 +7931,38 @@ Möchte Sie sie überschreiben?</translation>
     <message>
         <source>Level Name:</source>
         <translation type="unfinished">Name der Ebene:</translation>
+    </message>
+    <message>
+        <source>Single Image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Frames</source>
+        <translation type="unfinished">Frame</translation>
+    </message>
+    <message>
+        <source>Columns</source>
+        <translation type="unfinished">Spalten</translation>
+    </message>
+    <message>
+        <source>Flatten visible document layers into a single image. Layer styles are maintained.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Load document layers as frames into a single xsheet column.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Load document layers as xhseet columns.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Abbrechen</translation>
     </message>
 </context>
 <context>
@@ -8273,7 +8631,7 @@ Einige Ebenen wurden nicht geladen, da ihre Version nicht unterstützt wird</tra
     </message>
     <message>
         <source>The Revert to Last Saved command is not supported for the current selection.</source>
-        <translation>Der &quot;Zur zuletzt gespeicherten Version zurücksetzen&quot; Befehl wird nicht für die aktuelle Auswahl unterstützt.</translation>
+        <translation type="vanished">Der &quot;Zur zuletzt gespeicherten Version zurücksetzen&quot; Befehl wird nicht für die aktuelle Auswahl unterstützt.</translation>
     </message>
     <message>
         <source>The selected column is empty.</source>
@@ -8548,11 +8906,11 @@ Möchten Sie sie überschreiben?</translation>
     </message>
     <message>
         <source>Level </source>
-        <translation>Ebene</translation>
+        <translation type="vanished">Ebene</translation>
     </message>
     <message>
         <source> already exists! Are you sure you want to overwrite it?</source>
-        <translation> existiert bereits! Sind Sie sich sicher, dass Sie überschreiben möchten?</translation>
+        <translation type="vanished"> existiert bereits! Sind Sie sich sicher, dass Sie überschreiben möchten?</translation>
     </message>
     <message>
         <source>It is not possible to merge tlv columns containing more than one level</source>
@@ -9305,6 +9663,301 @@ Allow duplicate?</source>
         <source>Nothing to replace: no cells or columns selected.</source>
         <translation type="unfinished">Es gibt  nichts zum ersetzen: Es wurden weder Cells noch Spalten gewählt.</translation>
     </message>
+    <message>
+        <source>Couldn&apos;t load %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Apply Antialias</source>
+        <translation type="unfinished">Kantenglättung anwenden</translation>
+    </message>
+    <message>
+        <source>The Reload command is not supported for the current selection.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No Palette loaded.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A separation task is in progress! wait until it stops or cancel it</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Duplicate Frame in XSheet</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please enable &quot;Sync Level Strip Drawing Number Changes with the XSheet&quot; preference option
+to use the duplicate command in the xsheet / timeline.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please select only one layer to duplicate a frame.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please select only one frame to duplicate.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Timeline</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The qualifier %1 is not a valid key name. Skipping.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear All Onion Skin Markers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear All Fixed Onion Skin Markers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear All Relative Onion Skin Markers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Always Overwrite in This Scene</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>    + %1 more level(s) 
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fx Settings</source>
+        <translation type="unfinished">Effekt-Einstellungen</translation>
+    </message>
+    <message>
+        <source>Save Curve</source>
+        <translation type="unfinished">Die Kurve speichern</translation>
+    </message>
+    <message>
+        <source>Load Curve</source>
+        <translation type="unfinished">Effekt-Parameter importieren</translation>
+    </message>
+    <message>
+        <source>Export Curve</source>
+        <translation type="unfinished">Kurve exportieren</translation>
+    </message>
+    <message>
+        <source>Rendering frame %1 / %2</source>
+        <comment>RenderListener</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Precomputing %1 Frames</source>
+        <comment>RenderListener</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> of %1</source>
+        <comment>RenderListener</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Finalizing render, please wait.</source>
+        <comment>RenderListener</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Aborting render...</source>
+        <comment>RenderListener</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Building Schematic...</source>
+        <comment>RenderCommand</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>column </source>
+        <comment>MultimediaProgressBar label (mode name)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>layer </source>
+        <comment>MultimediaProgressBar label (mode name)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rendering %1%2, frame %3 / %4</source>
+        <comment>MultimediaProgressBar label</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rendering %1 frames of %2</source>
+        <comment>MultimediaProgressBar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 of %2</source>
+        <comment>MultimediaProgressBar - [totalframe] of [path]</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Aborting render...</source>
+        <comment>MultimediaProgressBar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>It is not possible to write the output:  the file</source>
+        <comment>RenderCommand</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>s are read only.</source>
+        <comment>RenderCommand</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> is read only.</source>
+        <comment>RenderCommand</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save Cleanup Settings</source>
+        <translation type="unfinished">Säuberungs-Einstellungen speichern</translation>
+    </message>
+    <message>
+        <source>Load Cleanup Settings</source>
+        <translation type="unfinished">Säuberungs-Einstellungen laden</translation>
+    </message>
+    <message>
+        <source>It is not possible to find the %1 level.</source>
+        <comment>FileData</comment>
+        <translation type="unfinished">Ebene %1 kann nicht gefunden werden.</translation>
+    </message>
+    <message>
+        <source>There was an error copying %1</source>
+        <comment>FileData</comment>
+        <translation type="unfinished">Beim kopieren von %1 trat ein Fehler ein.</translation>
+    </message>
+    <message>
+        <source>Clone Level</source>
+        <comment>CloneLevelUndo::LevelNamePopup</comment>
+        <translation type="unfinished">Ebene duplizieren</translation>
+    </message>
+    <message>
+        <source>Level Name:</source>
+        <comment>CloneLevelUndo::LevelNamePopup</comment>
+        <translation type="unfinished">Name der Ebene:</translation>
+    </message>
+    <message>
+        <source>Collecting assets...</source>
+        <translation type="unfinished">Sammle Material...</translation>
+    </message>
+    <message>
+        <source>Abort</source>
+        <translation type="unfinished">Unterbrechen</translation>
+    </message>
+    <message>
+        <source>Importing scenes...</source>
+        <translation type="unfinished">Importiere Szenen...</translation>
+    </message>
+    <message>
+        <source>It is not possible to execute the merge column command because no column was selected.</source>
+        <translation type="unfinished">Es können keine Spalten vereint werden, da keine Spalten gewählt wurden.</translation>
+    </message>
+    <message>
+        <source>It is not possible to execute the merge column command because only one columns is selected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>It is not possible to apply the match lines because no column was selected.</source>
+        <translation type="unfinished">Es ist nicht möglich die Anpassungslinien anzuweden, da keine Spalte gewählt wurde.</translation>
+    </message>
+    <message>
+        <source>It is not possible to apply the match lines because two columns have to be selected.</source>
+        <translation type="unfinished">Es ist nicht möglich die Anpassungslinien anzuwenden, da zwei Spalten gewählt sein müssen.</translation>
+    </message>
+    <message>
+        <source>It is not possible to merge tlv columns because no column was selected.</source>
+        <translation type="unfinished">TLV-Spalten können nicht vereint werden, da keine Spalten gewählt wurden.</translation>
+    </message>
+    <message>
+        <source>It is not possible to merge tlv columns because at least two columns have to be selected.</source>
+        <translation type="unfinished">TLV-Spalten können nicht vereint werden, da mindestens zwei Spalten gewählt werden müssen.</translation>
+    </message>
+    <message>
+        <source>Merging Tlv Levels...</source>
+        <translation type="unfinished">TLV-Ebenen weden vereint...</translation>
+    </message>
+    <message>
+        <source>Save Previewed Images</source>
+        <translation type="unfinished">Vorgeschaute Bilder speichern</translation>
+    </message>
+    <message>
+        <source>The file name cannot be empty or contain any of the following characters:(new line)  \ / : * ? &quot;  |</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unsopporter raster format, cannot save</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot create %1 : %2</source>
+        <comment>Previewer warning %1:path %2:message</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot create %1</source>
+        <comment>Previewer warning %1:path</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Saved %1 frames out of %2 in %3</source>
+        <comment>Previewer %1:savedframes %2:framecount %3:filepath</comment>
+        <translation type="unfinished">%1 Frames von %2 wurden in %3 gespeichert</translation>
+    </message>
+    <message>
+        <source>Canceled! </source>
+        <comment>Previewer</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No frame to save!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Already saving!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning!</source>
+        <comment>OverwriteDialog</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Overwrite</source>
+        <comment>OverwriteDialog</comment>
+        <translation type="unfinished">Überschreiben</translation>
+    </message>
+    <message>
+        <source>Skip</source>
+        <comment>OverwriteDialog</comment>
+        <translation type="unfinished">Überspringen</translation>
+    </message>
+    <message>
+        <source>File &quot;%1&quot; already exists.
+Do you want to overwrite it?</source>
+        <comment>OverwriteDialog</comment>
+        <translation type="unfinished">Datei &quot;%1&quot;existiert bereits.
+Überschreiben?</translation>
+    </message>
+    <message>
+        <source>%1 does not exist.</source>
+        <translation type="unfinished">%1 existiert nicht.</translation>
+    </message>
 </context>
 <context>
     <name>ReframePopup</name>
@@ -9406,13 +10059,6 @@ Die Audio-Datei wird nicht im gerenderten Clip enthalten sein.</translation>
                            The output result may differ from what you expect. What do you want to do?</source>
         <translation>Szene %1 hat eine andere Auflösung als Szene %2.
 Das Ergebnis des Outputs könnte anders sein als erwartet. Was möchten Sie tun?</translation>
-    </message>
-</context>
-<context>
-    <name>RenderListener</name>
-    <message>
-        <source>Finalizing render, please wait.</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -10305,14 +10951,21 @@ Bitte tragen Sie die Änderungen ein oder setzen sie zurück.</translation>
     </message>
 </context>
 <context>
+    <name>SaveBoardPresetFilePopup</name>
+    <message>
+        <source>Save Clapperboard Settings As Preset</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>SaveCurvePopup</name>
     <message>
         <source>Save Curve</source>
-        <translation>Die Kurve speichern</translation>
+        <translation type="vanished">Die Kurve speichern</translation>
     </message>
     <message>
         <source>Save</source>
-        <translation>Speichern</translation>
+        <translation type="vanished">Speichern</translation>
     </message>
 </context>
 <context>
@@ -10391,11 +11044,11 @@ Bitte tragen Sie die Änderungen ein oder setzen sie zurück.</translation>
     <name>SavePreviewedPopup</name>
     <message>
         <source>Save Previewed Images</source>
-        <translation>Vorgeschaute Bilder speichern</translation>
+        <translation type="vanished">Vorgeschaute Bilder speichern</translation>
     </message>
     <message>
         <source>Save</source>
-        <translation>Speichern</translation>
+        <translation type="vanished">Speichern</translation>
     </message>
 </context>
 <context>
@@ -10413,11 +11066,11 @@ Bitte tragen Sie die Änderungen ein oder setzen sie zurück.</translation>
     <name>SaveSettingsPopup</name>
     <message>
         <source>Save Cleanup Settings</source>
-        <translation>Säuberungs-Einstellungen speichern</translation>
+        <translation type="vanished">Säuberungs-Einstellungen speichern</translation>
     </message>
     <message>
         <source>Save</source>
-        <translation>Speichern</translation>
+        <translation type="vanished">Speichern</translation>
     </message>
 </context>
 <context>
@@ -10638,6 +11291,14 @@ Bitte tragen Sie die Änderungen ein oder setzen sie zurück.</translation>
         <source>Select %1</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Flip View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reset View</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SceneViewerPanel</name>
@@ -10699,6 +11360,176 @@ Bitte tragen Sie die Änderungen ein oder setzen sie zurück.</translation>
     </message>
     <message>
         <source> (Flipped)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>   ::   Project: </source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SeparateColorsPopup</name>
+    <message>
+        <source>Auto</source>
+        <translation type="unfinished">Automatisch</translation>
+    </message>
+    <message>
+        <source>Preview</source>
+        <translation type="unfinished">Vorschau</translation>
+    </message>
+    <message>
+        <source>Separate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation type="unfinished">Schließen</translation>
+    </message>
+    <message>
+        <source>Sub Color 3:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alpha Matting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sub1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sub2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sub3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pick Color</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Mask</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Alpha</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preview Frame:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Paper Color:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Main Color:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sub Color 1:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sub Color 2:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sub Adjust:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Border Smooth:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mask Threshold:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mask Radius:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start:</source>
+        <translation type="unfinished">Start:</translation>
+    </message>
+    <message>
+        <source>End:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Format:</source>
+        <translation type="unfinished">Format:</translation>
+    </message>
+    <message>
+        <source>Save in:</source>
+        <translation type="unfinished">Speichern in:</translation>
+    </message>
+    <message>
+        <source>File Suffix:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Abbrechen</translation>
+    </message>
+    <message>
+        <source>Separate by colors ... </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Separate 1 Level</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Separate %1 Levels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Critical</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to access the destination folder!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Separating %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Converting level %1 of %2: %3</source>
+        <translation type="unfinished">Wandle Ebene %1 von %2 um: %3</translation>
+    </message>
+</context>
+<context>
+    <name>SeparateSwatch</name>
+    <message>
+        <source>Sub Color 3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Original</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Main Color</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sub Color 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sub Color 2</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -11035,15 +11866,7 @@ Zu &apos;%3&apos; zuweisen?</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Choose Project</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Create a New Scene</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Open Scene</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -11185,6 +12008,18 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>The height must be greater than zero.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current Project</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recent Scenes [Project]</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The selected scene project &apos;%1&apos; is not in the Current Project list and may not open automatically.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -12042,6 +12877,10 @@ Genaueres können Sie aus der Nutzerhilfe entnehmen.</translation>
         <source>Filter:</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Opacity:</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>XsheetGUI::NoteArea</name>
@@ -12060,6 +12899,22 @@ Genaueres können Sie aus der Nutzerhilfe entnehmen.</translation>
     <message>
         <source>3sec Sheet</source>
         <translation>3 Sekunden Xsheet</translation>
+    </message>
+    <message>
+        <source>Toggle Xsheet/Timeline</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add New Memo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previous Memo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next Memo</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -12135,6 +12990,32 @@ Genaueres können Sie aus der Nutzerhilfe entnehmen.</translation>
         <source>Set Auto Markers</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Click to Reset Shift &amp; Trace Markers to Neighbor Frames
+Hold F2 Key on the Viewer to Show This Frame Only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click to Hide This Frame from Shift &amp; Trace
+Hold F1 Key on the Viewer to Show This Frame Only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click to Hide This Frame from Shift &amp; Trace
+Hold F3 Key on the Viewer to Show This Frame Only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click to Move Shift &amp; Trace Marker</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>XsheetGUI::SoundColumnPopup</name>
+    <message>
+        <source>Volume:</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>XsheetGUI::XSheetToolbar</name>
@@ -12184,6 +13065,14 @@ Genaueres können Sie aus der Nutzerhilfe entnehmen.</translation>
     <message>
         <source> columns</source>
         <translation> Spalte</translation>
+    </message>
+    <message>
+        <source>   ::   Project: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> Frame</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

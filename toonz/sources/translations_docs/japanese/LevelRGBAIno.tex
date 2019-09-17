@@ -1,0 +1,80 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[a4paper, total={180mm, 272mm}]{geometry}
+
+\usepackage{fontspec}
+\setmainfont[Path=fonts/, Extension=.ttf]{ipaexm}
+
+\setlength\parindent{3.5em}
+\setlength\parskip{0em}
+\renewcommand{\baselinestretch}{1.247}
+
+\begin{document}
+
+\thispagestyle{empty}
+
+\Large
+\noindent \\
+Level RGBA Ino\medskip
+\par
+\normalsize
+RGBA 個別にレベル補正をします。\par
+RGB まとめて補正したい時は\textquotedbl Level Master\textquotedbl を使用してください。\\
+\\
+-{-}- \ 入力 \ -{-}-\\
+Source\par
+処理をする画像を接続します。\\
+Reference\par
+Pixel 毎に効果の強弱をつけるための参照画像を接続します。\\
+\\
+-{-}- \ 設定 \ -{-}-\\
+Red In\\
+Green In\\
+Blue In\\
+Alpha In\par
+入力 Pixel 値の Min(最小)値と Max(最大)値を指定します。\par
+Min より小さい値は Min に、Max より大きい値は Max に制限します。\par
+最小は0、最大は1です。\par
+初期値は、Min が0、Max が1、です。\par
+小数点以下4桁までの入力になります。\\
+\\
+Red Out\\
+Green Out\\
+Blue Out\\
+Alpha Out\par
+\textquotedbl In\textquotedbl で指定した範囲を、\par
+ここで指定する Min(最小)値と Max(最大)値の範囲に当てはめます。\par
+最小は0、最大は1です。\par
+初期値は、Min が0、Max が1、です。\par
+小数点以下4桁までの入力になります。\\
+\\
+Red Gamma\\
+Green Gamma\\
+Blue Gamma\\
+Alpha Gamma\par
+\textquotedbl Out Min\textquotedbl と\textquotedbl Out Max\textquotedbl の間で gamma 補正します。\par
+0.1から1.0の間だと、画像が暗くなります。\par
+1.0を指定すると補正しません。\par
+1.0から10.0の間では、明るくなります。\par
+初期値は1です。
+
+\newpage
+
+\thispagestyle{empty}
+
+\ \vspace{-0.2em}
+\par
+\noindent Premultiplied\par
+ON なら、RGB に対して Premultiply 済の\par
+（Alpha チャンネルの値があらかじめ RGB チャンネルに乗算されている)\par
+画像として処理します。\par
+そのとき、Alpha にも処理を加えてしまうと、正しい画像にならない場合があります。\par
+初期値は ON です。\\
+\\
+Reference\par
+Pixel 毎に効果の強弱をつけるための参照画像の値の取り方を選択します。\par
+入力の\textquotedbl Reference\textquotedbl に画像を接続し、\par
+Red/Green/Blue/Alpha/Luminance/Nothing から選びます。\par
+この効果をつけたくないときは Nothing を選ぶか、接続を切ります。\par
+初期値は Red です。
+
+\end{document}

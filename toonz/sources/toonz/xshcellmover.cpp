@@ -17,7 +17,6 @@
 #include "toonzqt/tselectionhandle.h"
 #include "toonzqt/selection.h"
 #include "toonzqt/stageobjectsdata.h"
-#include "toonzqt/selection.h"
 #include "historytypes.h"
 
 // TnzLib includes
@@ -184,10 +183,7 @@ bool CellsMover::canMoveCells(const TPoint &pos) {
     while (i < m_rowCount * m_colCount) {
       TXshColumn::ColumnType srcType = getColumnTypeFromCell(i);
       int dstIndex                   = c + i;
-      if (!m_orientation->isVerticalTimeline() &&
-          dstIndex >= xsh->getColumnCount())
-        return false;
-      TXshColumn *dstColumn = xsh->getColumn(dstIndex);
+      TXshColumn *dstColumn          = xsh->getColumn(dstIndex);
       if (srcType == TXshColumn::eZeraryFxType ||
           srcType == TXshColumn::eSoundTextType)
         return false;
@@ -379,7 +375,8 @@ bool LevelMoverTool::isTotallyEmptyColumn(int col) const {
   TXshColumn *column = xsh->getColumn(col);
   if (!column) return true;
   if (!column->isEmpty()) return false;
-  if (column->getFx()->getOutputConnectionCount() != 0) return false;
+  TFx *fx = column->getFx();
+  if (fx && fx->getOutputConnectionCount() != 0) return false;
   // bisogna controllare lo stage object
   return true;
 }
@@ -663,8 +660,8 @@ void LevelMoverTool::drawCellsArea(QPainter &p) {
         CellRange(CellPosition(rect.y0, rect.x0),
                   CellPosition(rect.y1 + 1, rect.x1 + 1)));
   else {
-    int newY0 = qMax(rect.y0, rect.y1);
-    int newY1 = qMin(rect.y0, rect.y1);
+    int newY0 = std::max(rect.y0, rect.y1);
+    int newY1 = std::min(rect.y0, rect.y1);
     screen    = getViewer()->rangeToXYRect(CellRange(
         CellPosition(rect.x0, newY0), CellPosition(rect.x1 + 1, newY1 - 1)));
   }

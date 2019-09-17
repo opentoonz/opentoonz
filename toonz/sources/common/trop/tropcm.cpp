@@ -34,7 +34,7 @@ extern "C" {
 
 namespace {
 
-DV_ALIGNED(16) class TPixelFloat {
+class alignas(16) TPixelFloat {
 public:
   TPixelFloat() : b(0), g(0), r(0), m(0) {}
 

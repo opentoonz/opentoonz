@@ -38,10 +38,10 @@ qreal distanceBetweenPointandRect(const QRect &rect, const QPoint &point) {
       sqrt(pow((double)(point.x() - rect.bottomRight().x()), 2) +
            pow((double)(point.y() - rect.bottomRight().y()), 2));
 
-  qreal topMax    = qMin(topLeftDistance, topRightDistance);
-  qreal bottomMax = qMin(bottomLeftDistance, bottomRightDistance);
+  qreal topMax    = std::min(topLeftDistance, topRightDistance);
+  qreal bottomMax = std::min(bottomLeftDistance, bottomRightDistance);
 
-  return qMin(topMax, bottomMax);
+  return std::min(topMax, bottomMax);
 }
 }
 
@@ -208,7 +208,7 @@ void DvTextEdit::createMiniToolBar() {
   m_sizeComboBox->setMinimumWidth(44);
 
   QFontDatabase db;
-  foreach (int size, db.standardSizes())
+  for (int size : db.standardSizes())
     m_sizeComboBox->addItem(QString::number(size));
 
   connect(m_sizeComboBox, SIGNAL(activated(const QString &)), this,

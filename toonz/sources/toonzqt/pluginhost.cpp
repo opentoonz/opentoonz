@@ -10,7 +10,6 @@
 #else
 #include <dlfcn.h>
 #endif
-#include <string>
 #include <map>
 #include <type_traits>
 #include <functional>
@@ -32,7 +31,6 @@
 #include "plugin_param_view_interface.h"
 #include "plugin_ui_page_interface.h"
 #include "plugin_utilities.h"
-#include "toonz_params.h"
 #include <QFileInfo>
 #include <QDir>
 #include <QLabel>

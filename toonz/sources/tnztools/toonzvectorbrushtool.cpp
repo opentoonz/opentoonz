@@ -57,6 +57,7 @@ TEnv::IntVar V_BrushPressureSensitivity("InknpaintBrushPressureSensitivity", 1);
 TEnv::IntVar V_VectorBrushFrameRange("VectorBrushFrameRange", 0);
 TEnv::IntVar V_VectorBrushSnap("VectorBrushSnap", 0);
 TEnv::IntVar V_VectorBrushSnapSensitivity("VectorBrushSnapSensitivity", 0);
+TEnv::StringVar V_VectorBrushPreset("VectorBrushPreset", "<custom>");
 
 //-------------------------------------------------------------------
 
@@ -587,33 +588,16 @@ void ToonzVectorBrushTool::updateTranslation() {
 
 void ToonzVectorBrushTool::onActivate() {
   if (m_firstTime) {
-    m_thickness.setValue(
-        TDoublePairProperty::Value(V_VectorBrushMinSize, V_VectorBrushMaxSize));
-
-    m_capStyle.setIndex(V_VectorCapStyle);
-    m_joinStyle.setIndex(V_VectorJoinStyle);
-    m_miterJoinLimit.setValue(V_VectorMiterValue);
-    m_breakAngles.setValue(V_BrushBreakSharpAngles ? 1 : 0);
-    m_accuracy.setValue(V_BrushAccuracy);
-
-    m_pressure.setValue(V_BrushPressureSensitivity ? 1 : 0);
     m_firstTime = false;
-    m_smooth.setValue(V_BrushSmooth);
 
-    m_frameRange.setIndex(V_VectorBrushFrameRange);
-    m_snap.setValue(V_VectorBrushSnap);
-    m_snapSensitivity.setIndex(V_VectorBrushSnapSensitivity);
-    switch (V_VectorBrushSnapSensitivity) {
-    case 0:
-      m_minDistance2 = SNAPPING_LOW;
-      break;
-    case 1:
-      m_minDistance2 = SNAPPING_MEDIUM;
-      break;
-    case 2:
-      m_minDistance2 = SNAPPING_HIGH;
-      break;
-    }
+    std::wstring wpreset =
+        QString::fromStdString(V_VectorBrushPreset.getValue()).toStdWString();
+    if (wpreset != CUSTOM_WSTR) {
+      initPresets();
+      m_preset.setValue(wpreset);
+      loadPreset();
+    } else
+      loadLastBrush();
   }
   resetFrameRange();
   // TODO:app->editImageOrSpline();
@@ -625,6 +609,12 @@ void ToonzVectorBrushTool::onDeactivate() {
   /*---
   * ドラッグ中にツールが切り替わった場合に備え、onDeactivateにもMouseReleaseと同じ処理を行う
   * ---*/
+
+  // End current stroke.
+  if (m_active && m_enabled) {
+    leftButtonUp(m_lastDragPos, m_lastDragEvent);
+  }
+
   if (m_tileSaver && !m_isPath) {
     m_enabled = false;
   }
@@ -718,6 +708,10 @@ void ToonzVectorBrushTool::leftButtonDrag(const TPointD &pos,
     m_brushPos = m_mousePos = pos;
     return;
   }
+
+  m_lastDragPos   = pos;
+  m_lastDragEvent = e;
+
   double thickness = (m_pressure.getValue() || m_isPath)
                          ? computeThickness(e.m_pressure, m_thickness, m_isPath)
                          : m_thickness.getValue().second * 0.5;
@@ -1320,8 +1314,8 @@ void ToonzVectorBrushTool::checkGuideSnapping(bool beforeMousePress,
         snapPoint.x = hGuide;
       }
       beforeMousePress ? m_foundFirstSnap = true : m_foundLastSnap = true;
-      beforeMousePress ? m_firstSnapPoint                          = snapPoint
-                       : m_lastSnapPoint                           = snapPoint;
+      beforeMousePress ? m_firstSnapPoint = snapPoint : m_lastSnapPoint =
+                                                            snapPoint;
     }
   }
 }
@@ -1444,11 +1438,26 @@ void ToonzVectorBrushTool::resetFrameRange() {
 //------------------------------------------------------------------
 
 bool ToonzVectorBrushTool::onPropertyChanged(std::string propertyName) {
+  if (m_propertyUpdating) return true;
+
   // Set the following to true whenever a different piece of interface must
   // be refreshed - done once at the end.
   bool notifyTool = false;
 
-  /*--- 変更されたPropertyに合わせて処理を分ける ---*/
+  if (propertyName == m_preset.getName()) {
+    if (m_preset.getValue() != CUSTOM_WSTR)
+      loadPreset();
+    else  // Chose <custom>, go back to last saved brush settings
+      loadLastBrush();
+
+    V_VectorBrushPreset = m_preset.getValueAsString();
+    m_propertyUpdating  = true;
+    getApplication()->getCurrentTool()->notifyToolChanged();
+    m_propertyUpdating = false;
+    return true;
+  }
+
+  /*--- Divide the process according to the changed Property ---*/
 
   /*--- determine which type of brush to be modified ---*/
   if (propertyName == m_thickness.getName()) {
@@ -1460,9 +1469,6 @@ bool ToonzVectorBrushTool::onPropertyChanged(std::string propertyName) {
     V_BrushAccuracy = m_accuracy.getValue();
   } else if (propertyName == m_smooth.getName()) {
     V_BrushSmooth = m_smooth.getValue();
-  } else if (propertyName == m_preset.getName()) {
-    loadPreset();
-    notifyTool = true;
   } else if (propertyName == m_breakAngles.getName()) {
     V_BrushBreakSharpAngles = m_breakAngles.getValue();
   } else if (propertyName == m_pressure.getName()) {
@@ -1497,13 +1503,17 @@ bool ToonzVectorBrushTool::onPropertyChanged(std::string propertyName) {
 
   if (propertyName == m_joinStyle.getName()) notifyTool = true;
 
-  if (propertyName != m_preset.getName() &&
-      m_preset.getValue() != CUSTOM_WSTR) {
+  if (m_preset.getValue() != CUSTOM_WSTR) {
     m_preset.setValue(CUSTOM_WSTR);
-    notifyTool = true;
+    V_VectorBrushPreset = m_preset.getValueAsString();
+    notifyTool          = true;
   }
 
-  if (notifyTool) getApplication()->getCurrentTool()->notifyToolChanged();
+  if (notifyTool) {
+    m_propertyUpdating = true;
+    getApplication()->getCurrentTool()->notifyToolChanged();
+    m_propertyUpdating = false;
+  }
 
   return true;
 }
@@ -1593,6 +1603,37 @@ void ToonzVectorBrushTool::removePreset() {
 
   // No parameter change, and set the preset value to custom
   m_preset.setValue(CUSTOM_WSTR);
+}
+
+//------------------------------------------------------------------
+
+void ToonzVectorBrushTool::loadLastBrush() {
+  m_thickness.setValue(
+      TDoublePairProperty::Value(V_VectorBrushMinSize, V_VectorBrushMaxSize));
+
+  m_capStyle.setIndex(V_VectorCapStyle);
+  m_joinStyle.setIndex(V_VectorJoinStyle);
+  m_miterJoinLimit.setValue(V_VectorMiterValue);
+  m_breakAngles.setValue(V_BrushBreakSharpAngles ? 1 : 0);
+  m_accuracy.setValue(V_BrushAccuracy);
+
+  m_pressure.setValue(V_BrushPressureSensitivity ? 1 : 0);
+  m_smooth.setValue(V_BrushSmooth);
+
+  m_frameRange.setIndex(V_VectorBrushFrameRange);
+  m_snap.setValue(V_VectorBrushSnap);
+  m_snapSensitivity.setIndex(V_VectorBrushSnapSensitivity);
+  switch (V_VectorBrushSnapSensitivity) {
+  case 0:
+    m_minDistance2 = SNAPPING_LOW;
+    break;
+  case 1:
+    m_minDistance2 = SNAPPING_MEDIUM;
+    break;
+  case 2:
+    m_minDistance2 = SNAPPING_HIGH;
+    break;
+  }
 }
 
 //------------------------------------------------------------------

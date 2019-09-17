@@ -28,6 +28,8 @@
 #include "toonz/hook.h"
 #include "toonz/levelproperties.h"
 #include "toonz/childstack.h"
+#include "toonz/tframehandle.h"
+#include "toonz/tcolumnhandle.h"
 
 // TnzCore includes
 #include "tsystem.h"
@@ -43,7 +45,6 @@
 
 // tcg includes
 #include "tcg/tcg_macros.h"
-#include "tcg/tcg_unique_ptr.h"
 
 // STD includes
 #include <ctime>
@@ -352,7 +353,7 @@ class StepUndo final : public TUndo {
   int m_step;
   int m_newRows;
 
-  tcg::unique_ptr<TXshCell[]> m_cells;
+  std::unique_ptr<TXshCell[]> m_cells;
 
 public:
   StepUndo(int r0, int c0, int r1, int c1, int step);
@@ -381,7 +382,7 @@ StepUndo::StepUndo(int r0, int c0, int r1, int c1, int step)
     , m_newRows(m_rowsCount * (step - 1))
     , m_cells(new TXshCell[m_rowsCount * m_colsCount]) {
   assert(m_rowsCount > 0 && m_colsCount > 0 && step > 0);
-  assert(m_cells.get());
+  assert(m_cells);
 
   int k = 0;
   for (int r = r0; r <= r1; ++r)
@@ -405,7 +406,7 @@ void StepUndo::redo() const {
 //-----------------------------------------------------------------------------
 
 void StepUndo::undo() const {
-  TCG_ASSERT(m_rowsCount > 0 && m_colsCount > 0 && m_cells.get(), return );
+  TCG_ASSERT(m_rowsCount > 0 && m_colsCount > 0 && m_cells, return );
 
   TApp *app    = TApp::instance();
   TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
@@ -453,7 +454,7 @@ class EachUndo final : public TUndo {
   int m_each;
   int m_newRows;
 
-  tcg::unique_ptr<TXshCell[]> m_cells;
+  std::unique_ptr<TXshCell[]> m_cells;
 
 public:
   EachUndo(int r0, int c0, int r1, int c1, int each);
@@ -483,7 +484,7 @@ EachUndo::EachUndo(int r0, int c0, int r1, int c1, int each)
                                      : m_rowsCount / each)
     , m_cells(new TXshCell[m_rowsCount * m_colsCount]) {
   assert(m_rowsCount > 0 && m_colsCount > 0 && each > 0);
-  assert(m_cells.get());
+  assert(m_cells);
 
   int k = 0;
   for (int r = r0; r <= r1; ++r)
@@ -507,7 +508,7 @@ void EachUndo::redo() const {
 //-----------------------------------------------------------------------------
 
 void EachUndo::undo() const {
-  TCG_ASSERT(m_rowsCount > 0 && m_colsCount > 0 && m_cells.get(), return );
+  TCG_ASSERT(m_rowsCount > 0 && m_colsCount > 0 && m_cells, return );
 
   TApp *app    = TApp::instance();
   TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
@@ -598,7 +599,7 @@ ReframeUndo::ReframeUndo(int r0, int r1, std::vector<int> columnIndeces,
   assert(m_cells);
   int k = 0;
   for (int r = r0; r <= r1; r++)
-    for (int c     = 0; c < (int)m_columnIndeces.size(); c++)
+    for (int c = 0; c < (int)m_columnIndeces.size(); c++)
       m_cells[k++] = TApp::instance()->getCurrentXsheet()->getXsheet()->getCell(
           r, m_columnIndeces[c]);
 
@@ -718,7 +719,7 @@ void TCellSelection::reframeWithEmptyInbetweens() {
 
   // destruction of m_reframePopup will be done along with the main window
   if (!m_reframePopup) m_reframePopup = new ReframePopup();
-  int ret                             = m_reframePopup->exec();
+  int ret = m_reframePopup->exec();
   if (ret == QDialog::Rejected) return;
 
   int step, blank;
@@ -761,7 +762,7 @@ void TColumnSelection::reframeWithEmptyInbetweens() {
     colIndeces.push_back(*it);
 
   if (!m_reframePopup) m_reframePopup = new ReframePopup();
-  int ret                             = m_reframePopup->exec();
+  int ret = m_reframePopup->exec();
   if (ret == QDialog::Rejected) return;
 
   int step, blank;
@@ -798,7 +799,7 @@ class ResetStepUndo final : public TUndo {
   int m_r0, m_c0, m_r1, m_c1;
   int m_rowsCount, m_colsCount;
 
-  tcg::unique_ptr<TXshCell[]> m_cells;
+  std::unique_ptr<TXshCell[]> m_cells;
   QMap<int, int> m_insertedCells;  //!< Count of inserted cells, by column
 
 public:
@@ -821,7 +822,7 @@ ResetStepUndo::ResetStepUndo(int r0, int c0, int r1, int c1)
     , m_colsCount(m_c1 - m_c0 + 1)
     , m_cells(new TXshCell[m_rowsCount * m_colsCount]) {
   assert(m_rowsCount > 0 && m_colsCount > 0);
-  assert(m_cells.get());
+  assert(m_cells);
 
   TApp *app = TApp::instance();
 
@@ -897,7 +898,7 @@ class IncreaseStepUndo final : public TUndo {
   int m_r0, m_c0, m_r1, m_c1;
   int m_rowsCount, m_colsCount;
 
-  tcg::unique_ptr<TXshCell[]> m_cells;
+  std::unique_ptr<TXshCell[]> m_cells;
   QMap<int, int> m_insertedCells;
 
 public:
@@ -923,7 +924,7 @@ IncreaseStepUndo::IncreaseStepUndo(int r0, int c0, int r1, int c1)
     , m_colsCount(m_c1 - m_c0 + 1)
     , m_cells(new TXshCell[m_rowsCount * m_colsCount])
     , m_newR1(m_r1) {
-  assert(m_cells.get());
+  assert(m_cells);
 
   int k = 0;
   for (int c = c0; c <= c1; ++c) {
@@ -977,7 +978,19 @@ void IncreaseStepUndo::undo() const {
 //=============================================================================
 
 void TCellSelection::increaseStepCells() {
-  if (isEmpty() || areAllColSelectedLocked()) return;
+  if (isEmpty()) {
+    int row = TTool::getApplication()->getCurrentFrame()->getFrame();
+    int col = TTool::getApplication()->getCurrentColumn()->getColumnIndex();
+    TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
+    m_range.m_r0 = row;
+    m_range.m_r1 = row;
+    m_range.m_c0 = col;
+    m_range.m_c1 = col;
+    TXshCell cell;
+    cell = xsh->getCell(row, col);
+    if (cell.isEmpty()) return;
+  }
+  if (areAllColSelectedLocked()) return;
 
   IncreaseStepUndo *undo = new IncreaseStepUndo(m_range.m_r0, m_range.m_c0,
                                                 m_range.m_r1, m_range.m_c1);
@@ -1001,7 +1014,7 @@ class DecreaseStepUndo final : public TUndo {
   int m_r0, m_c0, m_r1, m_c1;
   int m_rowsCount, m_colsCount;
 
-  tcg::unique_ptr<TXshCell[]> m_cells;
+  std::unique_ptr<TXshCell[]> m_cells;
   QMap<int, int> m_removedCells;
 
 public:
@@ -1027,7 +1040,7 @@ DecreaseStepUndo::DecreaseStepUndo(int r0, int c0, int r1, int c1)
     , m_colsCount(m_c1 - m_c0 + 1)
     , m_cells(new TXshCell[m_rowsCount * m_colsCount])
     , m_newR1(m_r1) {
-  assert(m_cells.get());
+  assert(m_cells);
 
   int k = 0;
   for (int c = c0; c <= c1; ++c) {
@@ -1090,6 +1103,31 @@ void DecreaseStepUndo::undo() const {
 //=============================================================================
 
 void TCellSelection::decreaseStepCells() {
+  if (isEmpty()) {
+    int row = TTool::getApplication()->getCurrentFrame()->getFrame();
+    int col = TTool::getApplication()->getCurrentColumn()->getColumnIndex();
+    int r1  = row;
+    TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
+    TXshCell cell;
+    TXshCell nextCell;
+    bool sameCells = true;
+    cell           = xsh->getCell(row, col);
+    if (cell.isEmpty()) return;
+
+    for (int i = 1; sameCells; i++) {
+      nextCell = xsh->getCell(row + i, col);
+      if (nextCell.m_frameId == cell.m_frameId &&
+          nextCell.m_level == cell.m_level) {
+        r1 = row + i;
+      } else
+        sameCells = false;
+    }
+    m_range.m_r0 = row;
+    m_range.m_r1 = r1;
+    m_range.m_c0 = col;
+    m_range.m_c1 = col;
+    TApp::instance()->getCurrentSelection()->notifySelectionChanged();
+  }
   DecreaseStepUndo *undo = new DecreaseStepUndo(m_range.m_r0, m_range.m_c0,
                                                 m_range.m_r1, m_range.m_c1);
   TUndoManager::manager()->add(undo);
@@ -1256,9 +1294,8 @@ public:
   void undo() const override;
 
   int getSize() const override {
-    return sizeof *this +
-           (sizeof(TXshLevelP) + sizeof(TXshSimpleLevel *)) *
-               m_insertedLevels.size();
+    return sizeof *this + (sizeof(TXshLevelP) + sizeof(TXshSimpleLevel *)) *
+                              m_insertedLevels.size();
   }
 
   QString getHistoryString() override {
@@ -1328,11 +1365,13 @@ public:
   LevelNamePopup(const std::wstring &defaultLevelName)
       : DVGui::Dialog(TApp::instance()->getMainWindow(), true, true,
                       "Clone Level") {
-    setWindowTitle(tr("Clone Level"));
+    setWindowTitle(
+        QObject::tr("Clone Level", "CloneLevelUndo::LevelNamePopup"));
 
     beginHLayout();
 
-    QLabel *label = new QLabel(tr("Level Name:"));
+    QLabel *label = new QLabel(
+        QObject::tr("Level Name:", "CloneLevelUndo::LevelNamePopup"));
     addWidget(label);
 
     m_name = new DVGui::LineEdit;

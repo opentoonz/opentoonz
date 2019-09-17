@@ -126,11 +126,11 @@ void TSpectrumParam::removeObserver(TParamObserver *obs) {
 
 //---------------------------------------------------------
 
-TSpectrumParam::TSpectrumParam(int keyCount, TSpectrum::ColorKey keys[])
+TSpectrumParam::TSpectrumParam(std::vector<TSpectrum::ColorKey> const &keys)
     : m_imp(new TSpectrumParamImp(this)) {
-  for (int i = 0; i < keyCount; i++) {
-    double v     = keys[i].first;
-    TPixel32 pix = keys[i].second;
+  for (auto const &key : keys) {
+    double v     = key.first;
+    TPixel32 pix = key.second;
     TDoubleParamP dp(v);
     TPixelParamP pp(pix);
     pp->enableMatte(m_imp->m_isMatteEnabled);

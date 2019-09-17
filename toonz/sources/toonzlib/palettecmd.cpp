@@ -13,11 +13,9 @@
 #include "toonz/txshlevelcolumn.h"
 #include "toonz/txshsimplelevel.h"
 #include "toonz/cleanupcolorstyles.h"
-#include "toonz/studiopalette.h"
 #include "toonz/txshlevel.h"
 #include "toonz/toonzscene.h"
 #include "toonz/toonzimageutils.h"
-#include "toonz/cleanupcolorstyles.h"
 #include "toonz/preferences.h"
 
 // TnzCore includes
@@ -923,7 +921,7 @@ int loadRefImage(TPaletteHandle *paletteHandle,
           // values
           std::set<TPixel32> colors;
           if (config.rasterPickType == PaletteCmd::PickEveryColors) {
-            // different colors will become sparate styles
+            // different colors will become separate styles
             TColorUtils::buildPrecisePalette(colors, raster,
                                              availableColorCount);
           } else {  //  config.rasterPickType ==

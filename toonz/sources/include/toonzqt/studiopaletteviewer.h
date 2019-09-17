@@ -5,6 +5,7 @@
 
 #include "toonz/studiopalette.h"
 #include "toonz/tproject.h"
+#include "toonzqt/dvdialog.h"
 
 #include <QTreeWidget>
 #include <QSplitter>
@@ -26,6 +27,10 @@ class TFrameHandle;
 class PalettesScanPopup;
 class TXsheetHandle;
 class TXshLevelHandle;
+class PaletteViewer;
+namespace DVGui {
+class IntField;
+}
 
 //=============================================================================
 //!	The StudioPaletteTreeViewer class provides an object to view and manage
@@ -207,6 +212,7 @@ class DVAPI StudioPaletteViewer final : public QSplitter {
   Q_OBJECT
 
   StudioPaletteTreeViewer *m_studioPaletteTreeViewer;
+  PaletteViewer *m_studioPaletteViewer;
 
 public:
   StudioPaletteViewer(QWidget *parent, TPaletteHandle *studioPaletteHandle,
@@ -217,6 +223,21 @@ public:
 
   /*! In order to save current palette from the tool button in the PageViewer.*/
   TFilePath getCurrentItemPath();
+
+  int getViewMode() const;
+  void setViewMode(int mode);
+};
+
+//-----------------------------------------------------------------------------
+
+class AdjustPaletteDialog final : public DVGui::Dialog {
+  Q_OBJECT
+private:
+  DVGui::IntField *m_tolerance;
+
+public:
+  int getTolerance();
+  AdjustPaletteDialog();
 };
 
 #endif  // STUDIOPALETTEVIEWER_H

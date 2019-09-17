@@ -8,6 +8,7 @@ PERSIST_IDENTIFIER(TBoolParam, "boolParam")
 PERSIST_IDENTIFIER(TFilePathParam, "filePathParam")
 PERSIST_IDENTIFIER(TStringParam, "stringParam")
 PERSIST_IDENTIFIER(TNADoubleParam, "naDoubleParam")
+PERSIST_IDENTIFIER(TFontParam, "fontParam")
 // PERSIST_IDENTIFIER(TIntEnumParam, "intEnumParam")
 
 TPersistDeclarationT<TEnumParam> TEnumParam::m_declaration("intEnumParam");
@@ -94,6 +95,17 @@ void TNADoubleParam::saveData(TOStream &os) {
   os << getDefaultValue();
   os << getValue();
 }
+
+//=========================================================
+
+void TFontParam::loadData(TIStream &is) {
+  std::wstring str;
+  is >> str;
+  setValue(str, false);
+}
+
+void TFontParam::saveData(TOStream &os) { os << getValue(); }
+
 //=========================================================
 
 //=========================================================

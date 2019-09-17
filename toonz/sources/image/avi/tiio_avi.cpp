@@ -344,7 +344,7 @@ void TLevelWriterAvi::save(const TImageP &img, int frameIndex) {
   CoInitializeEx(0, COINIT_MULTITHREADED);
 
   if (m_firstframe < 0) m_firstframe = frameIndex;
-  int index                          = frameIndex - m_firstframe;
+  int index = frameIndex - m_firstframe;
   TRasterImageP image(img);
   int lx = image->getRaster()->getLx();
   int ly = image->getRaster()->getLy();
@@ -503,11 +503,11 @@ void TLevelWriterAvi::save(const TImageP &img, int frameIndex) {
 int TLevelWriterAvi::compressFrame(BITMAPINFOHEADER *outHeader,
                                    void **bufferOut, int frameIndex,
                                    DWORD flagsIn, DWORD &flagsOut) {
-  *bufferOut            = _aligned_malloc(m_maxDataSize, 128);
-  *outHeader            = m_outputFmt->bmiHeader;
-  DWORD chunkId         = 0;
+  *bufferOut    = _aligned_malloc(m_maxDataSize, 128);
+  *outHeader    = m_outputFmt->bmiHeader;
+  DWORD chunkId = 0;
   if (flagsIn) flagsOut = AVIIF_KEYFRAME;
-  int res               = ICCompress(m_hic, flagsIn, outHeader, *bufferOut,
+  int res = ICCompress(m_hic, flagsIn, outHeader, *bufferOut,
                        &m_bitmapinfo->bmiHeader, m_buffer, &chunkId, &flagsOut,
                        frameIndex, frameIndex ? 0 : 0xFFFFFF, 0, NULL, NULL);
   return res;
@@ -1108,7 +1108,7 @@ LRESULT safe_ICCompressQuery(hic_t const &hic, BITMAPINFO *lpbiInput,
   return ICCompressQuery(hic.get(), lpbiInput, lpbiOutput);
 #endif
 }
-}
+}  // namespace
 
 Tiio::AviWriterProperties::AviWriterProperties() : m_codec("Codec") {
   if (m_defaultCodec.getRange().empty()) {
@@ -1150,6 +1150,9 @@ Tiio::AviWriterProperties::AviWriterProperties() : m_codec("Codec") {
             ((strstr(name, "IR32") != 0) && (bpp == 24))) {
           continue;
         }
+        // Give up to load codecs once the blackmagic codec is found -
+        // as it seems to cause crash for unknown reasons (issue #138)
+        if (strstr(descr, "Blackmagic") != 0) break;
 
         std::string compressorName;
         compressorName = std::string(name) + " '" + std::to_string(bpp) + "' " +

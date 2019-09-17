@@ -423,7 +423,7 @@ TypeTool::TypeTool()
     , m_vertical("Vertical Orientation", false)  // W_ToolOptions_Vertical
     , m_size("Size:")                            // W_ToolOptions_Size
     , m_undo(0) {
-  bind(TTool::CommonLevels | TTool::EmptyTarget);
+  bind(TTool::VectorImage | TTool::ToonzImage | TTool::EmptyTarget);
   m_prop[0].bind(m_fontFamilyMenu);
   // Su mac non e' visibile il menu dello style perche' e' stato inserito nel
   // nome

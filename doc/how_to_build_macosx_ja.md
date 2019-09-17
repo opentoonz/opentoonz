@@ -29,10 +29,10 @@ $ git clone https://github.com/opentoonz/opentoonz
 
 ### stuff ディレクトリの設置 (任意)
 
-`/Applications/OpenToonz/OpenToonz_1.2_stuff` というディレクトリが存在していない場合は以下のコマンド等でリポジトリのひな形を設置する必要があります。
+`/Applications/OpenToonz/OpenToonz_stuff` というディレクトリが存在していない場合は以下のコマンド等でリポジトリのひな形を設置する必要があります。
 
 ```
-$ sudo cp -r opentoonz/stuff /Applications/OpenToonz/OpenToonz_1.2_stuff
+$ sudo cp -r opentoonz/stuff /Applications/OpenToonz/OpenToonz_stuff
 ```
 
 ### thirdparty 下の tiff をビルド
@@ -67,5 +67,5 @@ $ make
 ### 完成
 
 ```
-$ open ./toonz/OpenToonz_1.2.app
+$ open ./toonz/OpenToonz.app
 ```

@@ -15,14 +15,15 @@
 
 #include "tapp.h"
 #include "toonz/tscenehandle.h"
-#include "toonz/toonzscene.h"
 
 #include <QFileInfo>
 #include <QDir>
+#include <QDirIterator>
 
 #ifdef _WIN32
 #include <shlobj.h>
 #include <winnetwk.h>
+#include <wctype.h>
 #endif
 #ifdef MACOSX
 #include <Cocoa/Cocoa.h>
@@ -50,7 +51,9 @@ TFilePath getMyDocumentsPath() {
   return TFilePath((const char *)[documentsDirectory
       cStringUsingEncoding:NSASCIIStringEncoding]);
 #else
-  return TFilePath();
+  QDir dir = QDir::home();
+  if (!dir.cd("Documents")) return TFilePath();
+  return TFilePath(dir.absolutePath().toStdString());
 #endif
 }
 
@@ -72,7 +75,9 @@ TFilePath getDesktopPath() {
   return TFilePath((const char *)[desktopDirectory
       cStringUsingEncoding:NSASCIIStringEncoding]);
 #else
-  return TFilePath();
+  QDir dir = QDir::home();
+  if (!dir.cd("Desktop")) return TFilePath();
+  return TFilePath(dir.absolutePath().toStdString());
 #endif
 }
 }
@@ -251,13 +256,11 @@ bool DvDirModelFileFolderNode::hasChildren() {
   if (m_childrenValid) return m_hasChildren;
 
   if (m_peeks) {
-    // Using QDir directly rather than
-    // DvDirModelFileFolderNode::refreshChildren() due to
-    // performance issues
-    QDir dir(QString::fromStdWString(m_path.getWideString()));
+    // Using QDirIterator and only checking existence of the first item
+    QDir dir(m_path.getQString());
     dir.setFilter(QDir::AllDirs | QDir::NoDotAndDotDot);
-
-    return (dir.count() > 0);
+    QDirIterator it(dir);
+    return (it.hasNext());
   } else
     return true;  // Not peeking nodes allow users to actively scan for
                   // sub-folders
@@ -315,16 +318,13 @@ void DvDirModelFileFolderNode::getChildrenNames(
   TFileStatus folderPathStatus(m_path);
   if (folderPathStatus.isLink()) return;
 
-  QStringList entries;
-  if (folderPathStatus.isDirectory()) {
-    QDir dir(toQString(m_path));
+  if (!folderPathStatus.isDirectory()) return;
 
-    entries = dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot,
-                            QDir::Name | QDir::LocaleAware);
-  }
+  QStringList dirItems;
+  TSystem::readDirectory_DirItems(dirItems, m_path);
+  for (const QString &name : dirItems) names.push_back(name.toStdWString());
 
-  int e, eCount = entries.size();
-  for (e = 0; e != eCount; ++e) names.push_back(entries[e].toStdWString());
+  QDir dir(toQString(m_path));
 }
 
 //-----------------------------------------------------------------------------
@@ -1061,16 +1061,19 @@ void DvDirModelRootNode::refreshChildren() {
     child = new DvDirModelSpecialFileFolderNode(this, L"My Documents",
                                                 getMyDocumentsPath());
     child->setPixmap(svgToPixmap(":Resources/my_documents.svg"));
+    m_specialNodes.push_back(child);
     addChild(child);
 
     child =
         new DvDirModelSpecialFileFolderNode(this, L"Desktop", getDesktopPath());
     child->setPixmap(svgToPixmap(":Resources/desktop.svg"));
+    m_specialNodes.push_back(child);
     addChild(child);
 
     child = new DvDirModelSpecialFileFolderNode(
         this, L"Library", ToonzFolder::getLibraryFolder());
     child->setPixmap(svgToPixmap(":Resources/library.svg"));
+    m_specialNodes.push_back(child);
     addChild(child);
 
     addChild(new DvDirModelHistoryNode(this));
@@ -1188,6 +1191,12 @@ DvDirModelNode *DvDirModelRootNode::getNodeByPath(const TFilePath &path) {
   if (priority == Preferences::ProjectFolderAliases &&
       !m_sceneFolderNode->getPath().isEmpty()) {
     node = m_sceneFolderNode->getNodeByPath(path);
+    if (node) return node;
+  }
+
+  // check for the special folders (My Documents / Desktop / Library)
+  for (DvDirModelSpecialFileFolderNode *specialNode : m_specialNodes) {
+    DvDirModelNode *node = specialNode->getNodeByPath(path);
     if (node) return node;
   }
 

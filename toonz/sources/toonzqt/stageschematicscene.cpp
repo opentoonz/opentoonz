@@ -106,6 +106,8 @@ void keepSubgroup(QMap<int, QList<SchematicNode *>> &editedGroup) {
   }
 }
 
+bool resizingNodes = false;
+bool updatingScene = false;
 }  // namespace
 
 //==================================================================
@@ -194,6 +196,8 @@ void StageSchematicScene::onSelectionSwitched(TSelection *oldSel,
 //------------------------------------------------------------------
 
 void StageSchematicScene::updateScene() {
+  if (updatingScene) return;
+  updatingScene = true;
   clearAllItems();
 
   QPointF firstPos = sceneRect().center();
@@ -351,6 +355,7 @@ void StageSchematicScene::updateScene() {
     }
   }
   m_nodesToPlace.clear();
+  updatingScene = false;
 }
 
 //------------------------------------------------------------------
@@ -367,6 +372,7 @@ StageSchematicNode *StageSchematicScene::addStageSchematicNode(
   connect(node, SIGNAL(currentColumnChanged(int)), this,
           SLOT(onCurrentColumnChanged(int)));
   connect(node, SIGNAL(editObject()), this, SIGNAL(editObject()));
+  connect(node, SIGNAL(nodeChangedSize()), this, SLOT(onNodeChangedSize()));
 
   // specify the node position
   if (pegbar->getDagNodePos() == TConst::nowhere) {
@@ -539,6 +545,7 @@ void StageSchematicScene::updateNestedGroupEditors(StageSchematicNode *node,
 //------------------------------------------------------------------
 
 void StageSchematicScene::resizeNodes(bool maximizedNode) {
+  resizingNodes             = true;
   m_gridDimension           = maximizedNode ? eLarge : eSmall;
   TStageObjectTree *pegTree = m_xshHandle->getXsheet()->getStageObjectTree();
   pegTree->setDagGridDimension(m_gridDimension);
@@ -578,6 +585,7 @@ void StageSchematicScene::resizeNodes(bool maximizedNode) {
   for (it2 = m_groupEditorTable.begin(); it2 != m_groupEditorTable.end(); it2++)
     it2.value()->resizeNodes(maximizedNode);
   updateScene();
+  resizingNodes = false;
 }
 
 //------------------------------------------------------------------
@@ -585,6 +593,7 @@ void StageSchematicScene::resizeNodes(bool maximizedNode) {
 void StageSchematicScene::updatePositionOnResize(TStageObject *obj,
                                                  bool maximizedNode) {
   TPointD oldPos = obj->getDagNodePos();
+  if (oldPos == TConst::nowhere) return;
   double oldPosY = oldPos.y - 25500;
   double newPosY = maximizedNode ? oldPosY * 2 : oldPosY * 0.5;
   obj->setDagNodePos(TPointD(oldPos.x, newPosY + 25500));
@@ -595,6 +604,7 @@ void StageSchematicScene::updatePositionOnResize(TStageObject *obj,
 void StageSchematicScene::updateSplinePositionOnResize(TStageObjectSpline *spl,
                                                        bool maximizedNode) {
   TPointD oldPos = spl->getDagNodePos();
+  if (oldPos == TConst::nowhere) return;
   double oldPosY = oldPos.y - 25500;
   double newPosY = maximizedNode ? oldPosY * 2 : oldPosY * 0.5;
   spl->setDagNodePos(TPointD(oldPos.x, newPosY + 25500));
@@ -1248,4 +1258,11 @@ void StageSchematicScene::onEditGroup() {
 
 TStageObjectId StageSchematicScene::getCurrentObject() {
   return m_objHandle->getObjectId();
+}
+
+//------------------------------------------------------------------
+
+void StageSchematicScene::onNodeChangedSize() {
+  if (resizingNodes) return;
+  updateScene();
 }

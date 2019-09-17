@@ -162,6 +162,8 @@ protected slots:
 
   void onNameDisplayMode(QAction *);
   void setIsLocked(bool lock);
+
+  void onSwitchToPage(int pageIndex);
 };
 
 #endif  // PALETTEVIEWER_H

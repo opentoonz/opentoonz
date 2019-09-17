@@ -263,13 +263,11 @@ FunctionPanel::FunctionPanel(QWidget *parent, bool isFloating)
 
   if (m_isFloating) {
     // load the dialog size
-    TFilePath fp(ToonzFolder::getMyModuleDir() + TFilePath(mySettingsFileName));
-    QSettings mySettings(toQString(fp), QSettings::IniFormat);
+    TFilePath fp(ToonzFolder::getMyModuleDir() + TFilePath("popups.ini"));
+    QSettings settings(toQString(fp), QSettings::IniFormat);
 
-    mySettings.beginGroup("Dialogs");
     setGeometry(
-        mySettings.value("FunctionCurves", QRect(500, 500, 400, 300)).toRect());
-    mySettings.endGroup();
+        settings.value("FunctionCurves", QRect(500, 500, 400, 300)).toRect());
   }
 }
 
@@ -278,12 +276,10 @@ FunctionPanel::FunctionPanel(QWidget *parent, bool isFloating)
 FunctionPanel::~FunctionPanel() {
   if (m_isFloating) {
     // save the dialog size
-    TFilePath fp(ToonzFolder::getMyModuleDir() + TFilePath(mySettingsFileName));
-    QSettings mySettings(toQString(fp), QSettings::IniFormat);
+    TFilePath fp(ToonzFolder::getMyModuleDir() + TFilePath("popups.ini"));
+    QSettings settings(toQString(fp), QSettings::IniFormat);
 
-    mySettings.beginGroup("Dialogs");
-    mySettings.setValue("FunctionCurves", geometry());
-    mySettings.endGroup();
+    settings.setValue("FunctionCurves", geometry());
   }
 
   delete m_dragTool;
@@ -1470,8 +1466,8 @@ void FunctionPanel::fitGraphToWindow(bool currentCurveOnly) {
         f0 = fa;
         f1 = fb;
       } else {
-        f0 = qMin(f0, fa);
-        f1 = qMax(f1, fb);
+        f0 = std::min(f0, fa);
+        f1 = std::max(f1, fb);
       }
       double v        = curve->getValue(fa);
       if (unit) v     = unit->convertTo(v);
@@ -1481,8 +1477,8 @@ void FunctionPanel::fitGraphToWindow(bool currentCurveOnly) {
         double t    = (double)j / (double)(m - 1);
         double v    = curve->getValue((1 - t) * fa + t * fb);
         if (unit) v = unit->convertTo(v);
-        v0          = qMin(v0, v);
-        v1          = qMax(v1, v);
+        v0          = std::min(v0, v);
+        v1          = std::max(v1, v);
       }
     }
   }

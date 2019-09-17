@@ -344,7 +344,7 @@ void Naa2TlvConverter::findBackgroundRegions() {
   for (int i = 0; i < m_colors.count(); i++) {
     TPixel color = m_colors.at(i);
     int v        = color.r + color.g + color.b;
-    int a        = qMin(color.r, qMin(color.g, color.b));
+    int a        = std::min({color.r, color.g, color.b});
     if (a < 230) continue;
     if (v > maxV) {
       bgColorIndex = i;
@@ -477,7 +477,7 @@ void Naa2TlvConverter::findMainInks() {
     double ap2 =
         100000.0 * (double)region.pixelCount / pow((double)region.perimeter, 2);
     if (ap2 > 100) continue;
-    foreach (int c, region.links.keys()) {
+    for (int c : region.links.keys()) {
       if (c >= 0 && (m_regions[c].isBackground() ||
                      m_regions[c].type == RegionInfo::LargePaint)) {
         int strength = region.links[c];
@@ -567,7 +567,7 @@ void Naa2TlvConverter::findPaints() {
   for (int i = 0; i < m_regions.count(); i++) {
     RegionInfo &region = m_regions[i];
     if (region.type != RegionInfo::Unknown) continue;
-    foreach (int c, m_regions[i].links.keys()) {
+    for (int c : m_regions[i].links.keys()) {
       if (c >= 0 && m_regions[c].isInk()) {
         m_regions[i].type = RegionInfo::Paint;
         break;
@@ -630,7 +630,7 @@ void Naa2TlvConverter::findThinPaints() {
     if (inkBoundary * 100 > region.perimeter * 80) regions.append(i);
   }
 
-  foreach (int c, regions)
+  for (int c : regions)
     m_regions[c].type = RegionInfo::SmallPaint;
 }
 
@@ -682,8 +682,8 @@ void Naa2TlvConverter::findSuspectInks() {
     if (region.isInk() && 10 <= region.pixelCount && region.pixelCount < 100) {
       int lx = region.x1 - region.x0 + 1;
       int ly = region.y1 - region.y0 + 1;
-      int d  = qMax(lx, ly);
-      if (qMin(lx, ly) * 2 > qMax(lx, ly) && region.pixelCount > d * d / 2) {
+      int d  = std::max(lx, ly);
+      if (std::min(lx, ly) * 2 > std::max(lx, ly) && region.pixelCount > d * d / 2) {
         region.type = RegionInfo::Paint;
       }
     }

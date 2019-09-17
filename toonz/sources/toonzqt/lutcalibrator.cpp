@@ -20,7 +20,7 @@ inline bool execWarning(const QString& s) {
   DVGui::MsgBox(DVGui::WARNING, s);
   return false;
 }
-};
+};  // namespace
 
 #ifdef WIN32
 
@@ -161,13 +161,14 @@ QStringList getMonitorNames() {
 
   return nameList;
 }
-};
+};  // namespace
 #endif
 
 //-----------------------------------------------------------------------------
 
 void LutCalibrator::initialize() {
   initializeOpenGLFunctions();
+  m_isInitialized = true;
 
   if (!LutManager::instance()->isValid()) return;
 
@@ -191,6 +192,7 @@ void LutCalibrator::initialize() {
 //-----------------------------------------------------------------------------
 
 void LutCalibrator::cleanup() {
+  m_isInitialized = false;
   if (!isValid()) return;
   // release shader
   if (m_shader.program) {
@@ -213,6 +215,7 @@ void LutCalibrator::cleanup() {
     delete m_lutTex;
     m_lutTex = NULL;
   }
+  m_isValid = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -321,10 +324,10 @@ void LutCalibrator::onEndDraw(QOpenGLFramebufferObject* fbo) {
   GLuint textureId = fbo->texture();
 
   glEnable(GL_TEXTURE_2D);
-  glActiveTexture(GL_TEXTURE4);
+  glActiveTexture(GL_TEXTURE1);
   glBindTexture(GL_TEXTURE_2D, textureId);
 
-  glActiveTexture(GL_TEXTURE5);
+  glActiveTexture(GL_TEXTURE2);
   m_lutTex->bind();
 
   glPushMatrix();
@@ -332,9 +335,9 @@ void LutCalibrator::onEndDraw(QOpenGLFramebufferObject* fbo) {
 
   m_shader.program->bind();
   m_shader.program->setUniformValue(m_shader.texUniform,
-                                    4);  // use texture unit 4
+                                    1);  // use texture unit 1
   m_shader.program->setUniformValue(m_shader.lutUniform,
-                                    5);  // use texture unit 5
+                                    2);  // use texture unit 2
   GLfloat size = (GLfloat)LutManager::instance()->meshSize();
   m_shader.program->setUniformValue(m_shader.lutSizeUniform, size, size, size);
 
@@ -355,6 +358,8 @@ void LutCalibrator::onEndDraw(QOpenGLFramebufferObject* fbo) {
   m_shader.program->release();
 
   glPopMatrix();
+
+  glActiveTexture(GL_TEXTURE0);  // reset the active texture unit to 0
   glDisable(GL_TEXTURE_2D);
 
   assert((glGetError()) == GL_NO_ERROR);
@@ -558,7 +563,7 @@ void LutManager::convert(float& r, float& g, float& b) {
       for (int bb = 0; bb < 2; bb++) {
         float* val = &m_lut.data[locals::getCoord(
             index[0][rr], index[1][gg], index[2][bb], m_lut.meshSize)];
-        for (int chan                    = 0; chan < 3; chan++, val++)
+        for (int chan = 0; chan < 3; chan++, val++)
           vertex_color[rr][gg][bb][chan] = *val;
       }
   float result[3];

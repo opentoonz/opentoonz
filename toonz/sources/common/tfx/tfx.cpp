@@ -61,6 +61,7 @@ void skipChild(TIStream &is) {
       if (is.isBeginEndTag()) is.matchTag(tagName);
       is.closeChild();
     }
+    if (is.isBeginEndTag()) is.matchTag(tagName);
   }
 }
 

@@ -1,7 +1,8 @@
-# moc の数が多いので全部食わせる
+# moc ?????????????
 set(MOC_HEADERS
     autoadjust.h
     ../include/toonz/autoclose.h
+    ../include/toonz/boardsettings.h
     ../include/convert2tlv.h
     autopos.h
     ../include/toonz/captureparameters.h
@@ -319,6 +320,7 @@ set(SOURCES
     plasticdeformerfx.cpp
     txshmeshcolumn.cpp
     textureutils.cpp
+	boardsettings.cpp
 )
 
 if(BUILD_TARGET_WIN)

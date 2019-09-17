@@ -9,7 +9,6 @@
 #include "toonz/txshlevelhandle.h"
 #include "toonz/pathanimations.h"
 #include "tools/strokeselection.h"
-#include "tools/tool.h"
 
 #include "tmathutil.h"
 #include "tstroke.h"

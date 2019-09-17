@@ -52,8 +52,16 @@ class SchematicZoomer final : public ImageUtils::ShortcutZoomer {
 public:
   SchematicZoomer(QWidget *parent) : ShortcutZoomer(parent) {}
 
-  bool zoom(bool zoomin, bool resetZoom) override {
-    static_cast<SchematicSceneViewer *>(getWidget())->zoomQt(zoomin, resetZoom);
+  bool zoom(bool zoomin, bool resetView) override {
+    static_cast<SchematicSceneViewer *>(getWidget())->zoomQt(zoomin, resetView);
+    return true;
+  }
+  bool resetZoom() override {
+    static_cast<SchematicSceneViewer *>(getWidget())->normalizeScene();
+    return true;
+  }
+  bool fit() override {
+    static_cast<SchematicSceneViewer *>(getWidget())->fitScene();
     return true;
   }
 };
@@ -95,7 +103,7 @@ void SchematicScene::hideEvent(QHideEvent *se) {
 //------------------------------------------------------------------
 
 /*! Removes and then deletes all item in the scene.
-*/
+ */
 
 void SchematicScene::clearAllItems() {
   clearSelection();
@@ -143,7 +151,7 @@ void SchematicScene::clearAllItems() {
 
 //------------------------------------------------------------------
 /*! check if any item exists in the rect
-*/
+ */
 bool SchematicScene::isAnEmptyZone(const QRectF &rect) {
   QList<QGraphicsItem *> allItems = items();
   for (auto const level : allItems) {
@@ -207,7 +215,7 @@ SchematicSceneViewer::~SchematicSceneViewer() {}
 //------------------------------------------------------------------
 
 /*! Reimplemets the QGraphicsView::mousePressEvent()
-*/
+ */
 void SchematicSceneViewer::mousePressEvent(QMouseEvent *me) {
   m_buttonState = me->button();
   m_oldWinPos   = me->pos();
@@ -233,7 +241,7 @@ void SchematicSceneViewer::mousePressEvent(QMouseEvent *me) {
 //------------------------------------------------------------------
 
 /*! Reimplemets the QGraphicsView::mouseMoveEvent()
-*/
+ */
 void SchematicSceneViewer::mouseMoveEvent(QMouseEvent *me) {
   QPoint currWinPos    = me->pos();
   QPointF currScenePos = mapToScene(currWinPos);
@@ -257,7 +265,7 @@ void SchematicSceneViewer::mouseMoveEvent(QMouseEvent *me) {
 //------------------------------------------------------------------
 
 /*! Reimplemets the QGraphicsView::mouseReleaseEvent()
-*/
+ */
 void SchematicSceneViewer::mouseReleaseEvent(QMouseEvent *me) {
   m_buttonState = Qt::NoButton;
   QGraphicsView::mouseReleaseEvent(me);
@@ -276,7 +284,7 @@ void SchematicSceneViewer::keyPressEvent(QKeyEvent *ke) {
 //------------------------------------------------------------------
 
 /*! Reimplemets the QGraphicsView::wheelEvent()
-*/
+ */
 void SchematicSceneViewer::wheelEvent(QWheelEvent *me) {
   me->accept();
   double factor = exp(me->delta() * 0.001);
@@ -285,33 +293,38 @@ void SchematicSceneViewer::wheelEvent(QWheelEvent *me) {
 
 //------------------------------------------------------------------
 
-void SchematicSceneViewer::zoomQt(bool zoomin, bool resetZoom) {
+void SchematicSceneViewer::zoomQt(bool zoomin, bool resetView) {
+  if (resetView) {
+    resetMatrix();
+    // reseting will set view to the center of items bounding
+    centerOn(scene()->itemsBoundingRect().center());
+    return;
+  }
+
 #if QT_VERSION >= 0x050000
   double scale2 = matrix().determinant();
 #else
   double scale2 = matrix().det();
 #endif
-  if (resetZoom ||
-      ((scale2 < 100000 || !zoomin) && (scale2 > 0.001 * 0.05 || zoomin))) {
+  if ((scale2 < 100000 || !zoomin) && (scale2 > 0.001 * 0.05 || zoomin)) {
     double oldZoomScale = sqrt(scale2);
-    double zoomScale    = resetZoom ? 1 : ImageUtils::getQuantizedZoomFactor(
-                                           oldZoomScale, zoomin);
+    double zoomScale =
+        resetView ? 1
+                  : ImageUtils::getQuantizedZoomFactor(oldZoomScale, zoomin);
     QMatrix scale =
         QMatrix().scale(zoomScale / oldZoomScale, zoomScale / oldZoomScale);
 
     // See QGraphicsView::mapToScene()'s doc for details
-    QRect rect(0, 0, width(), height());
-    QRectF sceneCenterRect(
-        mapToScene(QRect(rect.center(), QSize(2, 2))).boundingRect());
+    QPointF sceneCenter(mapToScene(rect().center()));
     setMatrix(scale, true);
-    centerOn(sceneCenterRect.center());
+    centerOn(sceneCenter);
   }
 }
 
 //------------------------------------------------------------------
 
 /*! The view is scaled around the point \b winPos by \b scaleFactor;
-*/
+ */
 void SchematicSceneViewer::changeScale(const QPoint &winPos,
                                        qreal scaleFactor) {
   QPointF startScenePos = mapToScene(winPos);
@@ -350,14 +363,12 @@ void SchematicSceneViewer::reorderScene() {
 
 void SchematicSceneViewer::normalizeScene() {
   // See QGraphicsView::mapToScene()'s doc for details
-  QRect rect(0, 0, width(), height());
-  QRectF sceneCenterRect(
-      mapToScene(QRect(rect.center(), QSize(2, 2))).boundingRect());
+  QPointF sceneCenter(mapToScene(rect().center()));
   resetMatrix();
 #if defined(MACOSX)
   scale(1.32, 1.32);
 #endif
-  centerOn(sceneCenterRect.center());
+  centerOn(sceneCenter);
 }
 
 //------------------------------------------------------------------
@@ -587,10 +598,10 @@ void SchematicViewer::createActions() {
 
     QIcon nodeSizeIcon = createQIconOnOff(
         m_maximizedNode ? "minimizenodes" : "maximizenodes", false);
-    m_nodeSize =
-        new QAction(nodeSizeIcon, m_maximizedNode ? tr("&Minimize Nodes")
-                                                  : tr("&Maximize Nodes"),
-                    m_commonToolbar);
+    m_nodeSize = new QAction(
+        nodeSizeIcon,
+        m_maximizedNode ? tr("&Minimize Nodes") : tr("&Maximize Nodes"),
+        m_commonToolbar);
     connect(m_nodeSize, SIGNAL(triggered()), this, SLOT(changeNodeSize()));
 
     if (m_fullSchematic) {

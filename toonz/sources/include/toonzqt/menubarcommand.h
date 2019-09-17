@@ -60,7 +60,8 @@ enum CommandType {
   ToolModifierCommandType,
   ZoomCommandType,
   MiscCommandType,
-  MenuCommandType
+  MenuCommandType,
+  VisualizationButtonCommandType
 };
 
 //-----------------------------------------------------------------------------

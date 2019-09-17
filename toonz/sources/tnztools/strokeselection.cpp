@@ -461,6 +461,27 @@ void StrokeSelection::removeEndpoints() {
   m_updateSelectionBBox = false;
 }
 
+
+//=============================================================================
+//
+// selectAll
+//
+//-----------------------------------------------------------------------------
+
+void StrokeSelection::selectAll() {
+  if (!m_vi) return;
+
+  int sCount = int(m_vi->getStrokeCount());
+
+  for (int s = 0; s < sCount; ++s) {
+     m_indexes.insert(s);
+  }
+
+  StrokeSelection *selection = dynamic_cast<StrokeSelection *>(
+      TTool::getApplication()->getCurrentSelection()->getSelection());
+  if (selection) selection->notifyView();
+}
+
 //=============================================================================
 //
 // deleteStrokes
@@ -622,6 +643,7 @@ void StrokeSelection::enableCommands() {
   enableCommand(m_groupCommand.get(), MI_ExitGroup, &TGroupCommand::exitGroup);
 
   enableCommand(this, MI_RemoveEndpoints, &StrokeSelection::removeEndpoints);
+  enableCommand(this, MI_SelectAll, &StrokeSelection::selectAll);
 }
 
 //===================================================================

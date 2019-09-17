@@ -32,6 +32,7 @@
 #include "toonz/tscenehandle.h"
 #include "toonz/toonzscene.h"
 #include "toonz/txshleveltypes.h"
+#include "toonz/tproject.h"
 
 // TnzBase includes
 #include "tenv.h"
@@ -56,8 +57,6 @@
 #include <QButtonGroup>
 #include <QPushButton>
 #include <QLabel>
-
-extern const char *applicationFullName;
 
 TEnv::IntVar ViewCameraToggleAction("ViewCameraToggleAction", 1);
 TEnv::IntVar ViewTableToggleAction("ViewTableToggleAction", 1);
@@ -348,10 +347,6 @@ void Room::load(const TFilePath &fp) {
       dynamic_cast<FlipBook *>(pane->widget())->setPoolIndex(index);
     }
 
-    /*-- もしRoomにComboViewerがロードされたら、centralWidgetとして登録する --*/
-    if (paneObjectName == "ComboViewer")
-      setCentralViewerPanel(qobject_cast<ComboViewerPanel *>(pane));
-
     settings.endGroup();
   }
 
@@ -455,6 +450,7 @@ centralWidget->setLayout(centralWidgetLayout);*/
   setCommandHandler(MI_PickStyleLines, this, &MainWindow::togglePickStyleLines);
 
   setCommandHandler(MI_About, this, &MainWindow::onAbout);
+  setCommandHandler(MI_OpenOnlineManual, this, &MainWindow::onOpenOnlineManual);
   setCommandHandler(MI_MaximizePanel, this, &MainWindow::maximizePanel);
   setCommandHandler(MI_FullScreenWindow, this, &MainWindow::fullScreenWindow);
   setCommandHandler("MI_NewVectorLevel", this,
@@ -490,14 +486,19 @@ void MainWindow::changeWindowTitle() {
   ToonzScene *scene = app->getCurrentScene()->getScene();
   if (!scene) return;
 
-  QString name = QString::fromStdWString(scene->getSceneName());
+  TProject *project   = scene->getProject();
+  QString projectName = QString::fromStdString(project->getName().getName());
+
+  QString sceneName = QString::fromStdWString(scene->getSceneName());
+
+  if (sceneName.isEmpty()) sceneName = tr("Untitled");
+  if (app->getCurrentScene()->getDirtyFlag()) sceneName += QString("*");
 
   /*--- レイアウトファイル名を頭に表示させる ---*/
-  if (!m_layoutName.isEmpty()) name.prepend(m_layoutName + " : ");
+  if (!m_layoutName.isEmpty()) sceneName.prepend(m_layoutName + " : ");
 
-  if (name.isEmpty()) name = tr("Untitled");
-
-  name += " : " + QString::fromLatin1(applicationFullName);
+  QString name = sceneName + " [" + projectName + "] : " +
+                 QString::fromStdString(TEnv::getApplicationFullName());
 
   setWindowTitle(name);
 }
@@ -527,7 +528,7 @@ Room *MainWindow::getRoom(int index) const {
 
 //-----------------------------------------------------------------------------
 /*! Roomを名前から探す
-*/
+ */
 Room *MainWindow::getRoomByName(QString &roomName) {
   for (int i = 0; i < getRoomCount(); i++) {
     Room *room = dynamic_cast<Room *>(m_stackedWidget->widget(i));
@@ -549,20 +550,6 @@ void MainWindow::refreshWriteSettings() { writeSettings(); }
 //-----------------------------------------------------------------------------
 
 void MainWindow::readSettings(const QString &argumentLayoutFileName) {
-  TFilePath fp(ToonzFolder::getMyModuleDir() + TFilePath(mySettingsFileName));
-  QSettings mySettings(toQString(fp), QSettings::IniFormat);
-  /*-- Palette-PageViewerのチップサイズのロード --*/
-  mySettings.beginGroup("PaletteChipSizes");
-  {
-    PaletteViewerGUI::ChipSizeManager::instance()->chipSize_Palette =
-        mySettings.value("PaletteViewer", 2).toInt();
-    PaletteViewerGUI::ChipSizeManager::instance()->chipSize_Cleanup =
-        mySettings.value("CleanupSettings", 0).toInt();
-    PaletteViewerGUI::ChipSizeManager::instance()->chipSize_Studio =
-        mySettings.value("StudioPalette", 1).toInt();
-  }
-  mySettings.endGroup();
-
   QTabBar *roomTabWidget = m_topBar->getRoomTabWidget();
 
   /*-- Pageを追加すると同時にMenubarを追加する --*/
@@ -656,7 +643,7 @@ void MainWindow::readSettings(const QString &argumentLayoutFileName) {
   writeRoomList(rooms);
 
   // Imposto la stanza corrente
-  fp = ToonzFolder::getRoomsFile(currentRoomFileName);
+  TFilePath fp = ToonzFolder::getRoomsFile(currentRoomFileName);
   Tifstream is(fp);
   std::string currentRoomName;
   is >> currentRoomName;
@@ -673,38 +660,6 @@ void MainWindow::readSettings(const QString &argumentLayoutFileName) {
   }
 
   RecentFiles::instance()->loadRecentFiles();
-
-  QStringList roomNames;
-  roomNames << "InknPaint"
-            << "Cleanup"
-            << "PltEdit"
-            << "Schematic"
-            << "QAR";
-  /*--- ComboViewerのパーツのShow/Hideの再現 ---*/
-  mySettings.beginGroup("ComboViewerPartsVisible");
-  {
-    for (int r = 0; r < roomNames.size(); r++) {
-      QString tmpRoomName = roomNames.at(r);
-      Room *tmpRoom       = getRoomByName(tmpRoomName);
-      if (tmpRoom) {
-        ComboViewerPanel *cvp = tmpRoom->getCentralViewerPanel();
-        if (cvp) {
-          if (r == 0)  // InknPaintRoom
-            TApp::instance()->setInknPaintViewerPanel(cvp);
-          mySettings.beginGroup(tmpRoomName);
-          cvp->setShowHideFlag(CVPARTS_TOOLBAR,
-                               mySettings.value("Toolbar", true).toBool());
-          cvp->setShowHideFlag(CVPARTS_TOOLOPTIONS,
-                               mySettings.value("ToolOptions", true).toBool());
-          cvp->setShowHideFlag(CVPARTS_FLIPCONSOLE,
-                               mySettings.value("Console", true).toBool());
-          cvp->updateShowHide();
-          mySettings.endGroup();
-        }
-      }
-    }
-  }
-  mySettings.endGroup();
 }
 
 //-----------------------------------------------------------------------------
@@ -748,56 +703,6 @@ void MainWindow::writeSettings() {
   QSettings settings(toQString(fp), QSettings::IniFormat);
 
   settings.setValue("MainWindowGeometry", saveGeometry());
-
-  // Recent Files
-  // RecentFiles::instance()->saveRecentFiles();
-
-  fp = ToonzFolder::getMyModuleDir() + TFilePath(mySettingsFileName);
-  QSettings mySettings(toQString(fp), QSettings::IniFormat);
-
-  /*--- Palette-PageViewerのチップサイズの保存 ---*/
-  mySettings.beginGroup("PaletteChipSizes");
-  {
-    mySettings.setValue(
-        "PaletteViewer",
-        PaletteViewerGUI::ChipSizeManager::instance()->chipSize_Palette);
-    mySettings.setValue(
-        "CleanupSettings",
-        PaletteViewerGUI::ChipSizeManager::instance()->chipSize_Cleanup);
-    mySettings.setValue(
-        "StudioPalette",
-        PaletteViewerGUI::ChipSizeManager::instance()->chipSize_Studio);
-  }
-  mySettings.endGroup();
-
-  QStringList roomNames;
-  roomNames << "InknPaint"
-            << "Cleanup"
-            << "PltEdit"
-            << "Schematic"
-            << "QAR";
-  /*--- ComboViewerのパーツのShow/Hideの保存 ---*/
-  mySettings.beginGroup("ComboViewerPartsVisible");
-  {
-    for (int r = 0; r < roomNames.size(); r++) {
-      QString tmpRoomName = roomNames.at(r);
-      Room *tmpRoom       = getRoomByName(tmpRoomName);
-      if (tmpRoom) {
-        ComboViewerPanel *cvp = tmpRoom->getCentralViewerPanel();
-        if (cvp) {
-          mySettings.beginGroup(tmpRoomName);
-          mySettings.setValue("Toolbar", cvp->getShowHideFlag(CVPARTS_TOOLBAR));
-          mySettings.setValue("ToolOptions",
-                              cvp->getShowHideFlag(CVPARTS_TOOLOPTIONS));
-          mySettings.setValue("Console",
-                              cvp->getShowHideFlag(CVPARTS_FLIPCONSOLE));
-          cvp->updateShowHide();
-          mySettings.endGroup();
-        }
-      }
-    }
-  }
-  mySettings.endGroup();
 }
 
 //-----------------------------------------------------------------------------
@@ -817,15 +722,9 @@ Room *MainWindow::createCleanupRoom() {
     cleanupRoom->addDockWidget(viewer);
     layout->dockItem(viewer);
     ComboViewerPanel *cvp = qobject_cast<ComboViewerPanel *>(viewer);
-    if (cvp) {
-      /*- UI隠す -*/
-      cvp->setShowHideFlag(CVPARTS_TOOLBAR, false);
-      cvp->setShowHideFlag(CVPARTS_TOOLOPTIONS, false);
-      cvp->setShowHideFlag(CVPARTS_FLIPCONSOLE, false);
-      cvp->updateShowHide();
-
-      cleanupRoom->setCentralViewerPanel(cvp);
-    }
+    if (cvp)
+      // hide all parts
+      cvp->setVisiblePartsFlag(CVPARTS_None);
   }
 
   // CleanupSettings
@@ -864,11 +763,7 @@ Room *MainWindow::createPltEditRoom() {
     layout->dockItem(viewer);
 
     ComboViewerPanel *cvp = qobject_cast<ComboViewerPanel *>(viewer);
-    if (cvp) {
-      cvp->setShowHideFlag(CVPARTS_FLIPCONSOLE, false);
-      cvp->updateShowHide();
-      pltEditRoom->setCentralViewerPanel(cvp);
-    }
+    if (cvp) cvp->setVisiblePartsFlag(CVPARTS_TOOLBAR | CVPARTS_TOOLOPTIONS);
   }
 
   // Palette
@@ -920,12 +815,6 @@ Room *MainWindow::createInknPaintRoom() {
   if (viewer) {
     inknPaintRoom->addDockWidget(viewer);
     layout->dockItem(viewer);
-
-    ComboViewerPanel *cvp = qobject_cast<ComboViewerPanel *>(viewer);
-    if (cvp) {
-      inknPaintRoom->setCentralViewerPanel(cvp);
-      TApp::instance()->setInknPaintViewerPanel(cvp);
-    }
   }
 
   // Palette
@@ -1101,6 +990,12 @@ void MainWindow::onAbout() {
 
 //-----------------------------------------------------------------------------
 
+void MainWindow::onOpenOnlineManual() {
+  QDesktopServices::openUrl(QUrl(tr("http://opentoonz.readthedocs.io")));
+}
+
+//-----------------------------------------------------------------------------
+
 void MainWindow::autofillToggle() {
   TPaletteHandle *h = TApp::instance()->getCurrentPalette();
   h->toggleAutopaint();
@@ -1168,7 +1063,6 @@ void MainWindow::onCurrentRoomChanged(int newRoomIndex) {
     TPanel *pane = paneList.at(i);
     if (pane->isFloating() && !pane->isHidden()) {
       QRect oldGeometry = pane->geometry();
-
       // Just setting the new parent is not enough for the new layout manager.
       // Must be removed from the old and added to the new.
       oldRoom->removeDockWidget(pane);
@@ -1546,6 +1440,13 @@ QAction *MainWindow::createViewerAction(const char *id, const QString &name,
 
 //-----------------------------------------------------------------------------
 
+QAction *MainWindow::createVisualizationButtonAction(const char *id,
+                                                     const QString &name) {
+  return createAction(id, name, "", VisualizationButtonCommandType);
+}
+
+//-----------------------------------------------------------------------------
+
 QAction *MainWindow::createMiscAction(const char *id, const QString &name,
                                       const char *defaultShortcut) {
   QAction *action = new DVAction(name, this);
@@ -1728,14 +1629,14 @@ void MainWindow::defineActions() {
   createMenuEditAction(MI_Ungroup, tr("&Ungroup"), "Ctrl+Shift+G");
   createMenuEditAction(MI_BringToFront, tr("&Bring to Front"), "Ctrl+]");
   createMenuEditAction(MI_BringForward, tr("&Bring Forward"), "]");
-  createMenuEditAction(MI_SendBack, tr("&Send Back"), "Ctrl+[");
+  createMenuEditAction(MI_SendBack, tr("&Send to Back"), "Ctrl+[");
   createMenuEditAction(MI_SendBackward, tr("&Send Backward"), "[");
   createMenuEditAction(MI_EnterGroup, tr("&Enter Group"), "");
   createMenuEditAction(MI_ExitGroup, tr("&Exit Group"), "");
   createMenuEditAction(MI_RemoveEndpoints, tr("&Remove Vector Overflow"), "");
   QAction *touchToggle =
       createToggle(MI_TouchGestureControl, tr("&Touch Gesture Control"), "",
-                   TouchGestureControl ? 1 : 0, MenuEditCommandType);
+                   TouchGestureControl ? 1 : 0, MiscCommandType);
   touchToggle->setEnabled(true);
   touchToggle->setIcon(QIcon(":Resources/touch.svg"));
 
@@ -1788,7 +1689,7 @@ void MainWindow::defineActions() {
                         tr("&Brightness and Contrast..."), "");
   createMenuLevelAction(MI_LinesFade, tr("&Color Fade..."), "");
 #ifdef LINETEST
-  createMenuLevelAction(MI_Capture, tr("&Capture"), "Space");
+  createMenuLevelAction(MI_Capture, tr("&Capture"), "");
 #endif
   QAction *action =
       createMenuLevelAction(MI_CanvasSize, tr("&Canvas Size..."), "");
@@ -1840,7 +1741,7 @@ void MainWindow::defineActions() {
   mergeLevelsAction->setIcon(QIcon(":Resources/merge.svg"));
   createMenuXsheetAction(MI_InsertFx, tr("&New FX..."), "Ctrl+F");
   QAction *newOutputAction =
-      createMenuXsheetAction(MI_NewOutputFx, tr("&New Output"), "Ctrl+F");
+      createMenuXsheetAction(MI_NewOutputFx, tr("&New Output"), "Alt+O");
   newOutputAction->setIcon(createQIconOnOff("output", false));
 
   createRightClickMenuAction(MI_FxParamEditor, tr("&Edit FX..."), "Ctrl+K");
@@ -1959,15 +1860,17 @@ void MainWindow::defineActions() {
                MenuViewCommandType);
   createToggle(MI_ACheck, tr("&Gap Check"), "", ACheckToggleAction ? 1 : 0,
                MenuViewCommandType);
-  QAction* shiftTraceAction = createToggle(MI_ShiftTrace, tr("Shift and Trace"), "", false,
-               MenuViewCommandType);
+  QAction *shiftTraceAction = createToggle(MI_ShiftTrace, tr("Shift and Trace"),
+                                           "", false, MenuViewCommandType);
   shiftTraceAction->setIcon(QIcon(":Resources/shift_and_trace.svg"));
-  shiftTraceAction = createToggle(MI_EditShift, tr("Edit Shift"), "", false, MenuViewCommandType);
+  shiftTraceAction = createToggle(MI_EditShift, tr("Edit Shift"), "", false,
+                                  MenuViewCommandType);
   shiftTraceAction->setIcon(QIcon(":Resources/shift_and_trace_edit.svg"));
   createToggle(MI_NoShift, tr("No Shift"), "", false, MenuViewCommandType);
   CommandManager::instance()->enable(MI_EditShift, false);
   CommandManager::instance()->enable(MI_NoShift, false);
-  shiftTraceAction = createAction(MI_ResetShift, tr("Reset Shift"), "", MenuViewCommandType);
+  shiftTraceAction =
+      createAction(MI_ResetShift, tr("Reset Shift"), "", MenuViewCommandType);
   shiftTraceAction->setIcon(QIcon(":Resources/shift_and_trace_reset.svg"));
 
   if (QGLPixelBuffer::hasOpenGLPbuffers())
@@ -2062,6 +1965,7 @@ void MainWindow::defineActions() {
                           "Ctrl+`");
   createMenuWindowsAction(MI_About, tr("&About OpenToonz..."), "");
   createMenuWindowsAction(MI_StartupPopup, tr("&Startup Popup..."), "Alt+S");
+  createMenuWindowsAction(MI_OpenOnlineManual, tr("&Online Manual..."), "F1");
 
   createRightClickMenuAction(MI_BlendColors, tr("&Blend colors"), "");
 
@@ -2127,6 +2031,23 @@ void MainWindow::defineActions() {
   createRightClickMenuAction(MI_ResetInterpolation, tr("Reset Interpolation"),
                              "");
 
+  createRightClickMenuAction(MI_UseLinearInterpolation,
+                             tr("Linear Interpolation"), "");
+  createRightClickMenuAction(MI_UseSpeedInOutInterpolation,
+                             tr("Speed In / Speed Out Interpolation"), "");
+  createRightClickMenuAction(MI_UseEaseInOutInterpolation,
+                             tr("Ease In / Ease Out Interpolation"), "");
+  createRightClickMenuAction(MI_UseEaseInOutPctInterpolation,
+                             tr("Ease In / Ease Out (%) Interpolation"), "");
+  createRightClickMenuAction(MI_UseExponentialInterpolation,
+                             tr("Exponential Interpolation"), "");
+  createRightClickMenuAction(MI_UseExpressionInterpolation,
+                             tr("Expression Interpolation"), "");
+  createRightClickMenuAction(MI_UseFileInterpolation, tr("File Interpolation"),
+                             "");
+  createRightClickMenuAction(MI_UseConstantInterpolation,
+                             tr("Constant Interpolation"), "");
+
   createRightClickMenuAction(MI_FoldColumns, tr("Fold Column"), "");
 
   createRightClickMenuAction(MI_ActivateThisColumnOnly, tr("Show This Only"),
@@ -2160,6 +2081,8 @@ void MainWindow::defineActions() {
   createRightClickMenuAction(MI_DeactivateUpperColumns,
                              tr("Hide Upper Columns"), "");
 
+  createRightClickMenuAction(MI_SeparateColors, tr("Separate Colors..."), "");
+
   createToolAction(T_Edit, "edit", tr("Animate Tool"), "A");
   createToolAction(T_Selection, "selection", tr("Selection Tool"), "S");
   createToolAction(T_Brush, "brush", tr("Brush Tool"), "B");
@@ -2191,16 +2114,34 @@ void MainWindow::defineActions() {
 
   createViewerAction(V_ZoomIn, tr("Zoom In"), "+");
   createViewerAction(V_ZoomOut, tr("Zoom Out"), "-");
-  createViewerAction(V_ZoomReset, tr("Reset View"), "Alt+0");
+  createViewerAction(V_ViewReset, tr("Reset View"), "Alt+0");
   createViewerAction(V_ZoomFit, tr("Fit to Window"), "Alt+9");
+  createViewerAction(V_ZoomReset, tr("Reset Zoom"), "");
+  createViewerAction(V_RotateReset, tr("Reset Rotation"), "");
+  createViewerAction(V_PositionReset, tr("Reset Position"), "");
   createViewerAction(V_ActualPixelSize, tr("Actual Pixel Size"), "N");
-  createViewerAction(V_FlipX, tr("Flip Viewer Horiontally"), "");
+  createViewerAction(V_FlipX, tr("Flip Viewer Horizontally"), "");
   createViewerAction(V_FlipY, tr("Flip Viewer Vertically"), "");
   createViewerAction(V_ShowHideFullScreen, tr("Show//Hide Full Screen"),
                      "Alt+F");
   CommandManager::instance()->setToggleTexts(V_ShowHideFullScreen,
                                              tr("Full Screen Mode"),
                                              tr("Exit Full Screen Mode"));
+
+  // Following actions are for adding "Visualization" menu items to the command
+  // bar. They are separated from the original actions in order to avoid
+  // assigning shortcut keys. They must be triggered only from pressing buttons
+  // in the command bar. Assinging shortcut keys and registering as MenuItem
+  // will break a logic of ShortcutZoomer. So here we register separate items
+  // and bypass the command.
+  createVisualizationButtonAction(VB_ViewReset, tr("Reset View"));
+  createVisualizationButtonAction(VB_ZoomFit, tr("Fit to Window"));
+  createVisualizationButtonAction(VB_ZoomReset, tr("Reset Zoom"));
+  createVisualizationButtonAction(VB_RotateReset, tr("Reset Rotation"));
+  createVisualizationButtonAction(VB_PositionReset, tr("Reset Position"));
+  createVisualizationButtonAction(VB_ActualPixelSize, tr("Actual Pixel Size"));
+  createVisualizationButtonAction(VB_FlipX, tr("Flip Viewer Horizontally"));
+  createVisualizationButtonAction(VB_FlipY, tr("Flip Viewer Vertically"));
 
   QAction *refreshAct =
       createMiscAction(MI_RefreshTree, tr("Refresh Folder Tree"), "");
@@ -2249,6 +2190,10 @@ void MainWindow::defineActions() {
   createToolOptionsAction("A_ToolOption_JoinVectors", tr("Join Vectors"), "");
   createToolOptionsAction("A_ToolOption_ShowOnlyActiveSkeleton",
                           tr("Show Only Active Skeleton"), "");
+  createToolOptionsAction("A_ToolOption_RasterEraser",
+                          tr("Brush Tool - Eraser (Raster option)"), "");
+  createToolOptionsAction("A_ToolOption_LockAlpha",
+                          tr("Brush Tool - Lock Alpha"), "");
 
   // Option Menu
   createToolOptionsAction("A_ToolOption_BrushPreset", tr("Brush Preset"), "");
@@ -2410,7 +2355,8 @@ void MainWindow::onQuit() { close(); }
 // RecentFiles
 //=============================================================================
 
-RecentFiles::RecentFiles() : m_recentScenes(), m_recentLevels() {}
+RecentFiles::RecentFiles()
+    : m_recentScenes(), m_recentSceneProjects(), m_recentLevels() {}
 
 //-----------------------------------------------------------------------------
 
@@ -2425,17 +2371,25 @@ RecentFiles::~RecentFiles() {}
 
 //-----------------------------------------------------------------------------
 
-void RecentFiles::addFilePath(QString path, FileType fileType) {
+void RecentFiles::addFilePath(QString path, FileType fileType,
+                              QString projectName) {
   QList<QString> files =
-      (fileType == Scene)
-          ? m_recentScenes
-          : (fileType == Level) ? m_recentLevels : m_recentFlipbookImages;
+      (fileType == Scene) ? m_recentScenes : (fileType == Level)
+                                                 ? m_recentLevels
+                                                 : m_recentFlipbookImages;
   int i;
   for (i = 0; i < files.size(); i++)
-    if (files.at(i) == path) files.removeAt(i);
+    if (files.at(i) == path) {
+      files.removeAt(i);
+      if (fileType == Scene) m_recentSceneProjects.removeAt(i);
+    }
   files.insert(0, path);
+  if (fileType == Scene) m_recentSceneProjects.insert(0, projectName);
   int maxSize = 10;
-  if (files.size() > maxSize) files.removeAt(maxSize);
+  if (files.size() > maxSize) {
+    files.removeAt(maxSize);
+    if (fileType == Scene) m_recentSceneProjects.removeAt(maxSize);
+  }
 
   if (fileType == Scene)
     m_recentScenes = files;
@@ -2451,9 +2405,10 @@ void RecentFiles::addFilePath(QString path, FileType fileType) {
 //-----------------------------------------------------------------------------
 
 void RecentFiles::moveFilePath(int fromIndex, int toIndex, FileType fileType) {
-  if (fileType == Scene)
+  if (fileType == Scene) {
     m_recentScenes.move(fromIndex, toIndex);
-  else if (fileType == Level)
+    m_recentSceneProjects.move(fromIndex, toIndex);
+  } else if (fileType == Level)
     m_recentLevels.move(fromIndex, toIndex);
   else
     m_recentFlipbookImages.move(fromIndex, toIndex);
@@ -2463,9 +2418,10 @@ void RecentFiles::moveFilePath(int fromIndex, int toIndex, FileType fileType) {
 //-----------------------------------------------------------------------------
 
 void RecentFiles::removeFilePath(int index, FileType fileType) {
-  if (fileType == Scene)
+  if (fileType == Scene) {
     m_recentScenes.removeAt(index);
-  else if (fileType == Level)
+    m_recentSceneProjects.removeAt(index);
+  } else if (fileType == Level)
     m_recentLevels.removeAt(index);
   saveRecentFiles();
 }
@@ -2481,10 +2437,26 @@ QString RecentFiles::getFilePath(int index, FileType fileType) const {
 
 //-----------------------------------------------------------------------------
 
+QString RecentFiles::getFileProject(int index) const {
+  if (index >= m_recentScenes.size() || index >= m_recentSceneProjects.size())
+    return "-";
+  return m_recentSceneProjects[index];
+}
+
+QString RecentFiles::getFileProject(QString fileName) const {
+  for (int index = 0; index < m_recentScenes.size(); index++)
+    if (m_recentScenes[index] == fileName) return m_recentSceneProjects[index];
+
+  return "-";
+}
+
+//-----------------------------------------------------------------------------
+
 void RecentFiles::clearRecentFilesList(FileType fileType) {
-  if (fileType == Scene)
+  if (fileType == Scene) {
     m_recentScenes.clear();
-  else if (fileType == Level)
+    m_recentSceneProjects.clear();
+  } else if (fileType == Level)
     m_recentLevels.clear();
   else
     m_recentFlipbookImages.clear();
@@ -2508,6 +2480,22 @@ void RecentFiles::loadRecentFiles() {
     QString scene = settings.value(QString("Scenes")).toString();
     if (!scene.isEmpty()) m_recentScenes.append(scene);
   }
+
+  // Load scene's projects info. This is for display purposes only. For
+  // backwards compatibility it is stored and maintained separately.
+  QList<QVariant> sceneProjects =
+      settings.value(QString("SceneProjects")).toList();
+  if (!sceneProjects.isEmpty()) {
+    for (i = 0; i < sceneProjects.size(); i++)
+      m_recentSceneProjects.append(sceneProjects.at(i).toString());
+  } else {
+    QString sceneProject = settings.value(QString("SceneProjects")).toString();
+    if (!sceneProject.isEmpty()) m_recentSceneProjects.append(sceneProject);
+  }
+  // Should be 1-to-1. If we're short, append projects list with "-".
+  while (m_recentSceneProjects.size() < m_recentScenes.size())
+    m_recentSceneProjects.append("-");
+
   QList<QVariant> levels = settings.value(QString("Levels")).toList();
   if (!levels.isEmpty()) {
     for (i = 0; i < levels.size(); i++) {
@@ -2545,6 +2533,7 @@ void RecentFiles::saveRecentFiles() {
   TFilePath fp = ToonzFolder::getMyModuleDir() + TFilePath("RecentFiles.ini");
   QSettings settings(toQString(fp), QSettings::IniFormat);
   settings.setValue(QString("Scenes"), QVariant(m_recentScenes));
+  settings.setValue(QString("SceneProjects"), QVariant(m_recentSceneProjects));
   settings.setValue(QString("Levels"), QVariant(m_recentLevels));
   settings.setValue(QString("FlipbookImages"),
                     QVariant(m_recentFlipbookImages));
@@ -2554,9 +2543,9 @@ void RecentFiles::saveRecentFiles() {
 
 QList<QString> RecentFiles::getFilesNameList(FileType fileType) {
   QList<QString> files =
-      (fileType == Scene)
-          ? m_recentScenes
-          : (fileType == Level) ? m_recentLevels : m_recentFlipbookImages;
+      (fileType == Scene) ? m_recentScenes : (fileType == Level)
+                                                 ? m_recentLevels
+                                                 : m_recentFlipbookImages;
   QList<QString> names;
   int i;
   for (i = 0; i < files.size(); i++) {
@@ -2583,9 +2572,9 @@ void RecentFiles::refreshRecentFilesMenu(FileType fileType) {
     menu->setEnabled(false);
   else {
     CommandId clearActionId =
-        (fileType == Scene)
-            ? MI_ClearRecentScene
-            : (fileType == Level) ? MI_ClearRecentLevel : MI_ClearRecentImage;
+        (fileType == Scene) ? MI_ClearRecentScene : (fileType == Level)
+                                                        ? MI_ClearRecentLevel
+                                                        : MI_ClearRecentImage;
     menu->setActions(names);
     menu->addSeparator();
     QAction *clearAction = CommandManager::instance()->getAction(clearActionId);

@@ -469,15 +469,15 @@ TXshColumn::ColumnType TXshColumn::toColumnType(int levelType) {
   else if (levelType == MESH_XSHLEVEL)
     colType = TXshColumn::eMeshType;
   else
-    assert(!"Unkown level type!");
+    assert(!"Unknown level type!");
 
   return colType;
 }
 
 //-----------------------------------------------------------------------------
 bool TXshColumn::isRendered() const {
-//  if (!getXsheet() || !getFx()) return false;
-//  if (!isPreviewVisible()) return false;
+  //  if (!getXsheet() || !getFx()) return false;
+  //  if (!isPreviewVisible()) return false;
   if (!getXsheet() || !isPreviewVisible()) return false;
   if (getColumnType() == eSoundType) return true;
   if (!getFx()) return false;
@@ -650,4 +650,13 @@ QPair<QString, TPixel32> TXshColumn::getFilterInfo(
   if (!filterColors.contains(key))
     return QPair<QString, TPixel32>(QObject::tr("None"), TPixel::Black);
   return filterColors.value(key);
+}
+
+//-----------------------------------------------------------------------------
+
+void TXshColumn::resetColumnProperties() {
+  setStatusWord(0);
+  setOpacity(255);
+  setColorTag(0);
+  setFilterColorId(FilterNone);
 }

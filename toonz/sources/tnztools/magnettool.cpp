@@ -170,16 +170,7 @@ public:
     else
       m_cursorId = ToolCursor::CURSOR_NO;
 
-    double x = m_toolSize.getValue();
-
-    double minRange = 1;
-    double maxRange = 100;
-
-    double minSize = 10;
-    double maxSize = 100;
-
-    m_pointSize =
-        (x - minRange) / (maxRange - minRange) * (maxSize - minSize) + minSize;
+    updatePointSize();
   }
 
   void onLeave() override {
@@ -492,6 +483,31 @@ public:
 
   int getCursorId() const override { return m_cursorId; }
 
+  bool onPropertyChanged(std::string propertyName) override
+  {
+    if(propertyName == m_toolSize.getName()) {
+      updatePointSize();
+      invalidate();
+    }
+
+    return true;
+  }
+
+private:
+  /// Update point size based on property.
+  void updatePointSize()
+  {
+    double x = m_toolSize.getValue();
+
+    double minRange = 1;
+    double maxRange = 100;
+
+    double minSize = 10;
+    double maxSize = 100;
+
+    m_pointSize =
+        (x - minRange) / (maxRange - minRange) * (maxSize - minSize) + minSize;
+  }
   ToonzExt::Selector *getSelector() {
     return (m_draw ? &m_selector : (ToonzExt::Selector *)0);
   }

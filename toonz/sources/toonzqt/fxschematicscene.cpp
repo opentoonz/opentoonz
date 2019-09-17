@@ -162,6 +162,8 @@ QList<TFxP> getRoots(const QList<TFxP> &fxs, TFxSet *terminals) {
   return roots;
 }
 
+bool resizingNodes = false;
+bool updatingScene = false;
 }  // namespace
 
 //==================================================================
@@ -353,6 +355,8 @@ void FxSchematicScene::setApplication(TApplication *app) {
 //------------------------------------------------------------------
 
 void FxSchematicScene::updateScene() {
+  if (updatingScene) return;
+  updatingScene = true;
   if (!views().empty()) m_disconnectionLinks.clearAll();
   m_connectionLinks.clearAll();
   m_selectionOldPos.clear();
@@ -443,6 +447,23 @@ void FxSchematicScene::updateScene() {
     SchematicNode *node = addFxSchematicNode(fx);
     if (fx->getAttributes()->isGrouped())
       editedGroup[fx->getAttributes()->getEditingGroupId()].append(node);
+    // If adding an unedited macro and nodes are not yet set, let's position the
+    // internal nodes now
+    if (macro) {
+      double minY           = macro->getAttributes()->getDagNodePos().y;
+      double maxX           = macro->getAttributes()->getDagNodePos().x;
+      double y              = minY;
+      double x              = maxX;
+      std::vector<TFxP> fxs = macro->getFxs();
+      for (int j = 0; j < (int)fxs.size(); j++) {
+        TFx *macroFx = fxs[j].getPointer();
+        if (macroFx && !m_placedFxs.contains(macroFx)) {
+          placeNodeAndParents(macroFx, x, maxX, minY);
+          y -= (m_gridDimension == eLarge ? 100 : 50);
+          minY = std::min(y, minY);
+        }
+      }
+    }
   }
 
   // grouped node
@@ -460,6 +481,7 @@ void FxSchematicScene::updateScene() {
   updateEditedMacros(editedMacro);
   updateLink();
   m_nodesToPlace.clear();
+  updatingScene = false;
 }
 
 //------------------------------------------------------------------
@@ -528,6 +550,9 @@ FxSchematicNode *FxSchematicScene::addFxSchematicNode(TFx *fx) {
 
   connect(node, SIGNAL(fxNodeDoubleClicked()), this,
           SLOT(onFxNodeDoubleClicked()));
+
+  connect(node, SIGNAL(nodeChangedSize()), this, SLOT(onNodeChangedSize()));
+
   if (fx->getAttributes()->getDagNodePos() == TConst::nowhere) {
     node->resize(m_gridDimension == 0);
     placeNode(node);
@@ -553,6 +578,8 @@ FxSchematicNode *FxSchematicScene::addGroupedFxSchematicNode(
           SLOT(onSwitchCurrentFx(TFx *)));
   connect(node, SIGNAL(currentColumnChanged(int)), this,
           SLOT(onCurrentColumnChanged(int)));
+  connect(node, SIGNAL(fxNodeDoubleClicked()), this,
+          SLOT(onFxNodeDoubleClicked()));
   m_groupedTable[groupId] = node;
   return node;
 }
@@ -682,9 +709,51 @@ void FxSchematicScene::placeNode(FxSchematicNode *node) {
     node->getFx()->getAttributes()->setDagNodePos(TPointD(pos.x(), pos.y()));
     node->setPos(pos);
     return;
-  } else if (node->isA(eMacroFx) || node->isA(eNormalFx) ||
-             node->isA(eNormalLayerBlendingFx) || node->isA(eNormalMatteFx) ||
-             node->isA(eNormalImageAdjustFx)) {
+  } else if (node->isA(eMacroFx)) {
+    double minX = TConst::nowhere.x, minY = TConst::nowhere.y, maxY;
+    QPointF pos;
+    TMacroFx *macroFx     = dynamic_cast<TMacroFx *>(node->getFx());
+    std::vector<TFxP> fxs = macroFx->getFxs();
+    int k;
+    for (k = 0; k < (int)fxs.size(); k++) {
+      TFx *fx = fxs[k].getPointer();
+      if (fx->getAttributes()->getDagNodePos() == TConst::nowhere) continue;
+      if (QPointF(minX, minY) ==
+          QPointF(TConst::nowhere.x, TConst::nowhere.y)) {
+        minX = fx->getAttributes()->getDagNodePos().x;
+        minY = maxY = fx->getAttributes()->getDagNodePos().y;
+        continue;
+      }
+      minX = std::min(fx->getAttributes()->getDagNodePos().x, minX);
+      minY = std::min(fx->getAttributes()->getDagNodePos().y, minY);
+      maxY = std::max(fx->getAttributes()->getDagNodePos().y, maxY);
+    }
+    if (QPointF(minX, minY) == QPointF(TConst::nowhere.x, TConst::nowhere.y)) {
+      TFx *inputFx = node->getFx()->getInputPort(0)->getFx();
+      if (inputFx &&
+          inputFx->getAttributes()->getDagNodePos() != TConst::nowhere) {
+        TPointD dagPos =
+            inputFx->getAttributes()->getDagNodePos() + TPointD(150, 0);
+        pos = QPointF(dagPos.x, dagPos.y);
+      } else
+        pos = sceneRect().center();
+      nodeRect.moveTopLeft(pos);
+      while (!isAnEmptyZone(nodeRect)) nodeRect.translate(0, -step);
+      pos = nodeRect.topLeft();
+    } else {
+      pos.setX(minX);
+      pos.setY((maxY + minY) / 2);
+    }
+    node->getFx()->getAttributes()->setDagNodePos(TPointD(pos.x(), pos.y()));
+    node->setPos(QPointF(pos));
+    if (m_nodesToPlace.contains(node->getFx())) {
+      QList<FxSchematicNode *> nodes = m_nodesToPlace[node->getFx()];
+      int i;
+      for (i = 0; i < nodes.size(); i++) placeNode(nodes[i]);
+    }
+    return;
+  } else if (node->isA(eNormalFx) || node->isA(eNormalLayerBlendingFx) ||
+             node->isA(eNormalMatteFx) || node->isA(eNormalImageAdjustFx)) {
     // I'm placing an effect or a macro
     TFx *inputFx = node->getFx()->getInputPort(0)->getFx();
     QPointF pos;
@@ -1118,6 +1187,40 @@ void FxSchematicScene::reorderScene() {
 
   TXsheet *xsh = m_xshHandle->getXsheet();
   int i        = 0;
+
+  FxDag *fxDag  = xsh->getFxDag();
+  TFxSet *fxSet = fxDag->getInternalFxs();
+
+  //  Let's reset every position to nowhere first
+  fxDag->getXsheetFx()->getAttributes()->setDagNodePos(TConst::nowhere);
+
+  for (i = 0; i < fxDag->getOutputFxCount(); i++) {
+    TOutputFx *fx = fxDag->getOutputFx(i);
+    if (!fx) continue;
+    fx->getAttributes()->setDagNodePos(TConst::nowhere);
+  }
+
+  for (i = 0; i < xsh->getColumnCount(); i++) {
+    TXshColumn *column = xsh->getColumn(i);
+    TFx *fx            = column->getFx();
+    if (!fx) continue;
+    fx->getAttributes()->setDagNodePos(TConst::nowhere);
+  }
+
+  for (i = 0; i < fxSet->getFxCount(); i++) {
+    TFx *fx = fxSet->getFx(i);
+    fx->getAttributes()->setDagNodePos(TConst::nowhere);
+    TMacroFx *macro = dynamic_cast<TMacroFx *>(fx);
+    if (macro && macro->isEditing()) {
+      std::vector<TFxP> fxs = macro->getFxs();
+      int j;
+      for (j = 0; j < (int)fxs.size(); j++) {
+        fxs[j]->getAttributes()->setDagNodePos(TConst::nowhere);
+      }
+    }
+  }
+
+  // Let's start placing them now
   for (i = 0; i < xsh->getColumnCount(); i++) {
     TXshColumn *column = xsh->getColumn(i);
     TFx *fx            = column->getFx();
@@ -1160,15 +1263,16 @@ void FxSchematicScene::reorderScene() {
 
   double middleY = (sceneCenter.y() + minY + step) * 0.5;
   placeNodeAndParents(xsh->getFxDag()->getXsheetFx(), maxX, maxX, middleY);
+  y -= step;
+  minY = std::min(y, minY);
 
-  FxDag *fxDag  = xsh->getFxDag();
-  TFxSet *fxSet = fxDag->getInternalFxs();
   for (i = 0; i < fxSet->getFxCount(); i++) {
     TFx *fx = fxSet->getFx(i);
     if (m_placedFxs.contains(fx)) continue;
 
-    fx->getAttributes()->setDagNodePos(TPointD(sceneCenter.x() + 120, minY));
-    minY -= step;
+    placeNodeAndParents(fx, (sceneCenter.x() + 120), maxX, minY);
+    y -= step;
+    minY = std::min(y, minY);
   }
   updateScene();
 }
@@ -1182,7 +1286,8 @@ void FxSchematicScene::removeRetroLinks(TFx *fx, double &maxX) {
     if (!inFx) continue;
     TPointD inFxPos = inFx->getAttributes()->getDagNodePos();
     TPointD fxPos   = fx->getAttributes()->getDagNodePos();
-    if (fxPos.x <= inFxPos.x) {
+    if (inFxPos != TConst::nowhere && fxPos != TConst::nowhere &&
+        fxPos.x <= inFxPos.x) {
       while (fxPos.x <= inFxPos.x) fxPos.x += 150;
       maxX = std::max(fxPos.x + 150, maxX);
       fx->getAttributes()->setDagNodePos(fxPos);
@@ -1214,8 +1319,23 @@ void FxSchematicScene::placeNodeAndParents(TFx *fx, double x, double &maxX,
       }
     }
   }
-  double y = minY;
-  fx->getAttributes()->setDagNodePos(TPointD(x, y));
+  double y        = minY;
+  TMacroFx *macro = dynamic_cast<TMacroFx *>(fx);
+  if (macro) {
+    int tmpY              = y;
+    std::vector<TFxP> fxs = macro->getFxs();
+    for (int j = 0; j < (int)fxs.size(); j++) {
+      TFx *macroFx = fxs[j].getPointer();
+      if (macroFx && !m_placedFxs.contains(macroFx)) {
+        placeNodeAndParents(macroFx, x, maxX, minY);
+        y -= step;
+        minY = std::min(y, minY);
+      }
+    }
+    tmpY = (minY + tmpY + step) * 0.5;
+    fx->getAttributes()->setDagNodePos(TPointD(x, tmpY));
+  } else
+    fx->getAttributes()->setDagNodePos(TPointD(x, y));
   if (fx->getOutputConnectionCount() == 0) minY -= step;
   x += 120;
   maxX = std::max(maxX, x);
@@ -1964,6 +2084,8 @@ void FxSchematicScene::closeInnerMacroEditor(int groupId) {
 //------------------------------------------------------------------
 
 void FxSchematicScene::resizeNodes(bool maximizedNode) {
+  resizingNodes = true;
+
   // resize nodes
   m_gridDimension = maximizedNode ? eLarge : eSmall;
   m_xshHandle->getXsheet()->getFxDag()->setDagGridDimension(m_gridDimension);
@@ -1990,13 +2112,23 @@ void FxSchematicScene::resizeNodes(bool maximizedNode) {
     it3.value()->resizeNodes(maximizedNode);
   }
   updateScene();
+
+  resizingNodes = false;
 }
 
 //------------------------------------------------------------------
 
 void FxSchematicScene::updatePositionOnResize(TFx *fx, bool maximizedNode) {
   TPointD oldPos = fx->getAttributes()->getDagNodePos();
+  if (oldPos == TConst::nowhere) return;
   double oldPosY = oldPos.y - 25000;
   double newPosY = maximizedNode ? oldPosY * 2 : oldPosY * 0.5;
   fx->getAttributes()->setDagNodePos(TPointD(oldPos.x, newPosY + 25000));
+}
+
+//------------------------------------------------------------------
+
+void FxSchematicScene::onNodeChangedSize() {
+  if (resizingNodes) return;
+  updateScene();
 }

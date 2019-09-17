@@ -18,7 +18,6 @@
 #include "STColSelPic.h"
 #include "BlurMatrix.h"
 #include "SDef.h"
-#include "STColSelPic.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

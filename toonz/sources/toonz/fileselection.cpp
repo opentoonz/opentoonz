@@ -11,6 +11,7 @@
 #include "flipbook.h"
 #include "filebrowsermodel.h"
 #include "exportscenepopup.h"
+#include "separatecolorspopup.h"
 #include "tapp.h"
 
 #include "batches.h"
@@ -184,7 +185,7 @@ public:
   }
 };
 //-----------------------------------------------------------------------------
-}
+}  // namespace
 
 //------------------------------------------------------------------------
 
@@ -225,6 +226,7 @@ void FileSelection::enableCommands() {
   enableCommand(this, MI_ImportScenes, &FileSelection::importScenes);
   enableCommand(this, MI_ExportScenes, &FileSelection::exportScenes);
   enableCommand(this, MI_SelectAll, &FileSelection::selectAll);
+  enableCommand(this, MI_SeparateColors, &FileSelection::separateFilesByColors);
 }
 
 //------------------------------------------------------------------------
@@ -461,8 +463,8 @@ void FileSelection::collectAssets() {
 
   if (count > 1) {
     QMainWindow *mw = TApp::instance()->getMainWindow();
-    ProgressDialog progress(tr("Collecting assets..."), tr("Abort"), 0, count,
-                            mw);
+    ProgressDialog progress(QObject::tr("Collecting assets..."),
+                            QObject::tr("Abort"), 0, count, mw);
     progress.setWindowModality(Qt::WindowModal);
 
     int i;
@@ -483,6 +485,25 @@ void FileSelection::collectAssets() {
     DVGui::info(QObject::tr("%1 assets imported").arg(collectedAssets));
   DvDirModel::instance()->refreshFolder(
       TProjectManager::instance()->getCurrentProjectPath().getParentDir());
+}
+
+//------------------------------------------------------------------------
+
+void FileSelection::separateFilesByColors() {
+  std::vector<TFilePath> files;
+  getSelectedFiles(files);
+  if (files.empty()) return;
+
+  static SeparateColorsPopup *popup = new SeparateColorsPopup();
+  if (popup->isConverting()) {
+    DVGui::MsgBox(INFORMATION, QObject::tr("A separation task is in progress! "
+                                           "wait until it stops or cancel it"));
+    return;
+  }
+  popup->setFiles(files);
+  popup->show();
+  popup->raise();
+  // popup->exec();
 }
 
 //------------------------------------------------------------------------
@@ -531,8 +552,8 @@ void FileSelection::importScenes() {
 
   if (count > 1) {
     QMainWindow *mw = TApp::instance()->getMainWindow();
-    ProgressDialog progress(tr("Importing scenes..."), tr("Abort"), 0, count,
-                            mw);
+    ProgressDialog progress(QObject::tr("Importing scenes..."),
+                            QObject::tr("Abort"), 0, count, mw);
     progress.setWindowModality(Qt::WindowModal);
 
     int i;
@@ -578,6 +599,6 @@ void FileSelection::selectAll() {
     QString name =
         getModel()->getItemData(*it, DvItemListModel::FullPath).toString();
     TFilePath fp(name.toStdWString());
-    FileBrowser::refreshFolder(fp.getParentDir());
+    FileBrowser::updateItemViewerPanel();
   }
 }

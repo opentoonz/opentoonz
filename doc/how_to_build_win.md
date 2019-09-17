@@ -74,8 +74,8 @@ Rename the following files:
 ### Setting Up the Program's Path
 1. Copy the entire contents of `$opentoonz/toonz/build/Release` to an appropriate folder.
 
-2. Open a Command Prompt and navigate to `QT_DIR/msvc2015_64/bin`. Run the Qt program `windeployqt.exe` with the path for `OpenToonz_1.2.exe` as an argument.
-  - The necessary Qt library files should be in the same folder as `OpenToonz_1.2.exe`
+2. Open a Command Prompt and navigate to `QT_DIR/msvc2015_64/bin`. Run the Qt program `windeployqt.exe` with the path for `OpenToonz.exe` as an argument.
+  - The necessary Qt library files should be in the same folder as `OpenToonz.exe`
   - These include:
     - `Qt5Core.dll`
     - `Qt5Gui.dll`
@@ -86,7 +86,7 @@ Rename the following files:
     - `Qt5Svg.dll`
     - `Qt5Widgets.dll`
     - `Qt5Multimedia.dll`
-  - These files should be in the corresponding folders in the same folder `OpenToonz_1.2.exe`
+  - These files should be in the corresponding folders in the same folder `OpenToonz.exe`
     - `/bearer/qgenericbearer.dll`
     - `/bearer/qnativewifibearer.dll`
     - `/iconengines/qsvgicon.dll`
@@ -102,11 +102,11 @@ Rename the following files:
     - `/imageformats/qwebp.dll`
     - `/platforms/qwindows.dll`
 
-3. Copy the following files to the same folder as `OpenToonz_1.2.exe`
+3. Copy the following files to the same folder as `OpenToonz.exe`
   - `$opentoonz/thirdparty/glut/3.7.6/lib/glut64.dll`
   - `$opentoonz/thirdparty/glew/glew-1.9.0/bin/64bit/glew32.dll`
 
-4. Copy the `srv` folder from the previous OpenToonz installation to the same folder as `OpenToonz_1.2.exe`
+4. Copy the `srv` folder from the previous OpenToonz installation to the same folder as `OpenToonz.exe`
   - If there is no `srv` folder, OpenToonz can still be used.  However, various file formats such as `mov` cannot be used.
   - Creating the files for `srv` is discussed later.
 
@@ -117,13 +117,13 @@ If a previous binary of OpenToonz was already installed, this step and the follo
 
 ### Creating Registry Keys
 1. Using the registry editor, create the following key and copy the path of the `$opentoonz/stuff` folder from above to it.
-  - HKEY_LOCAL_MACHINE\SOFTWARE\OpenToonz\OpenToonz\1.2\TOONZROOT
+  - HKEY_LOCAL_MACHINE\SOFTWARE\OpenToonz\OpenToonz\TOONZROOT
 
 ### Running
-`OpenToonz_1.2.exe` can now be run.  Congratulations!
+`OpenToonz.exe` can now be run.  Congratulations!
 
 ## Debugging
-1. In the Solution Explorer, select the OpenToonz_1.2 project within the OpenToonz solution.
+1. In the Solution Explorer, select the OpenToonz project within the OpenToonz solution.
 2. In the Project menu, choose Set as StartUp Project.
 
 ## Creating the Files for the `srv` Folder

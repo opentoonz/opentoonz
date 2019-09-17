@@ -476,6 +476,21 @@ protected slots:
 
 //=============================================================================
 //
+// FullColorFillToolOptionsBox
+//
+//=============================================================================
+
+class FullColorFillToolOptionsBox final : public ToolOptionsBox {
+  Q_OBJECT
+
+public:
+  FullColorFillToolOptionsBox(QWidget *parent, TTool *tool,
+                              TPaletteHandle *pltHandle,
+                              ToolHandle *toolHandle);
+};
+
+//=============================================================================
+//
 // FillToolOptionsBox
 //
 //=============================================================================
@@ -698,6 +713,48 @@ protected slots:
   void onPrevRadioBtnClicked();
   void onAfterRadioBtnClicked();
   void updateColors();
+};
+
+//=============================================================================
+//
+// ZoomToolOptionsBox
+//
+//=============================================================================
+
+class ZoomToolOptionsBox final : public ToolOptionsBox {
+  Q_OBJECT
+
+public:
+  ZoomToolOptionsBox(QWidget *parent, TTool *tool, TPaletteHandle *pltHandle,
+                     ToolHandle *toolHandle);
+};
+
+//=============================================================================
+//
+// RotateToolOptionsBox
+//
+//=============================================================================
+
+class RotateToolOptionsBox final : public ToolOptionsBox {
+  Q_OBJECT
+
+public:
+  RotateToolOptionsBox(QWidget *parent, TTool *tool, TPaletteHandle *pltHandle,
+                       ToolHandle *toolHandle);
+};
+
+//=============================================================================
+//
+// HandToolOptionsBox
+//
+//=============================================================================
+
+class HandToolOptionsBox final : public ToolOptionsBox {
+  Q_OBJECT
+
+public:
+  HandToolOptionsBox(QWidget *parent, TTool *tool, TPaletteHandle *pltHandle,
+                     ToolHandle *toolHandle);
 };
 
 //-----------------------------------------------------------------------------

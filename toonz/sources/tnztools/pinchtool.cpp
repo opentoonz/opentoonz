@@ -47,7 +47,6 @@
 #include "ext/Selector.h"
 #include "ext/CornerDeformation.h"
 #include "ext/StraightCornerDeformation.h"
-#include "ext/StrokeDeformation.h"
 
 #include <memory>
 #include <algorithm>

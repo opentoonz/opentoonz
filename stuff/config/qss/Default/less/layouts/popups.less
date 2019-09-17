@@ -46,7 +46,7 @@ QDialog {
     background-color: @prefs-tree-bg-color;
     alternate-background-color: @prefs-tree-bg-color;
     border: 1 solid @accent;
-    font-size: 13;
+    font-size: 13px;
     &::item {
       border: 0; // remove indent on hover
       padding: 3;
@@ -101,4 +101,12 @@ PencilTestPopup {
 
 #SubfolderButton {
   qproperty-icon: url('@{img-url}/subfolder.svg');
+  padding-left: 6px;
+  padding-right: 6px;
+}
+
+#SubcameraButton {
+  qproperty-icon: url('@{img-url}/subcamera.svg');
+  padding-left: 6px;
+  padding-right: 6px;
 }

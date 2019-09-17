@@ -469,7 +469,8 @@ void SVNCommitDialog::onResourcesStatusRetrieved(const QString &xmlResponse) {
 
 void SVNCommitDialog::onStatusRetrieved(const QString &xmlResponse) {
   SVNStatusReader sr(xmlResponse);
-  m_status = sr.getStatus();
+  m_status   = sr.getStatus();
+  int height = 160;
 
   m_thread.disconnect(SIGNAL(statusRetrieved(const QString &)));
 
@@ -508,6 +509,10 @@ void SVNCommitDialog::onStatusRetrieved(const QString &xmlResponse) {
         }
       }
 
+      if (m_treeWidget->isVisible()) height += (filesToPutCount * 25);
+
+      setMinimumSize(350, min(height, 350));
+
       m_waitingLabel->hide();
       m_commentLabel->show();
       m_commentTextEdit->show();
@@ -530,6 +535,10 @@ void SVNCommitDialog::onStatusRetrieved(const QString &xmlResponse) {
       m_selectionCheckBox->show();
       m_selectionLabel->show();
     }
+
+    if (m_treeWidget->isVisible()) height += (m_items.size() * 25);
+
+    setMinimumSize(350, min(height, 350));
 
     m_waitingLabel->hide();
     m_textLabel->hide();
@@ -630,7 +639,7 @@ void SVNCommitDialog::addUnversionedItem(const QString &relativePath) {
         item = new QTreeWidgetItem(m_treeWidget, QStringList(list.at(i)));
 
       if (fi.isDir()) item->setIcon(0, folderIcon);
-      if (relativePath == tempString) {
+      if ((i + 1) == levelCount) {
         item->setCheckState(0, m_folderOnly ? Qt::Unchecked : Qt::Checked);
         item->setData(0, Qt::UserRole, tempString);
         item->setData(0, Qt::UserRole + 1, true);
@@ -916,7 +925,7 @@ SVNCommitFrameRangeDialog::SVNCommitFrameRangeDialog(QWidget *parent,
 
   setWindowTitle(tr("Version Control: Put"));
 
-  setMinimumSize(300, 150);
+  setMinimumSize(350, 150);
   QWidget *container = new QWidget;
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
@@ -1041,10 +1050,10 @@ void SVNCommitFrameRangeDialog::onLockDone() {
 
   // Step 3: propget
   QStringList args;
-  args << "propget";
-  args << "partial-lock";
+  args << "proplist";
   args << m_file;
   args << "--xml";
+  args << "-v";
 
   m_thread.disconnect(SIGNAL(done(const QString &)));
   connect(&m_thread, SIGNAL(done(const QString &)), this,

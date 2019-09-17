@@ -132,13 +132,13 @@ public:
     //! \return The insertion index in the page, or \p -1 on failure
     int addStyle(int styleId);  //!< Adds the specified style Id to the page (at
                                 //! the \a back
-    //!  of the page).
-    /*!
-\warning  The supplied style must have been allocated with \a new.
-\warning  Style ownership is surrendered to the palette.
-\return   The insertion index in the page, or \p -1 on failure.
-    In case of failure, the supplied style is \a deleted.
-*/
+                                //!  of the page).
+                                /*!
+                            \warning  The supplied style must have been allocated with \a new.
+                            \warning  Style ownership is surrendered to the palette.
+                            \return   The insertion index in the page, or \p -1 on failure.
+                                In case of failure, the supplied style is \a deleted.
+                            */
     int addStyle(TColorStyle *style);  //!< Adds the specified style to the
                                        //! palette, and assigns it
     //!  to this page.
@@ -213,6 +213,8 @@ private:
   //! even if the palette's dirtyflag is true.
 
   int m_shortcutScopeIndex;
+
+  int m_currentStyleId;
 
 public:
   TPalette();
@@ -424,6 +426,9 @@ between RGBA color components.
                              // picked pos value
 
   void nextShortcutScope(bool invert);
+
+  void setCurrentStyleId(int id) { m_currentStyleId = id; }
+  int getCurrentStyleId() const { return m_currentStyleId; }
 
 public:
   // Deprecated functions

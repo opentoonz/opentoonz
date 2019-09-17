@@ -109,6 +109,28 @@ public:
   void doDelete();
   void insertCells();
 
+  // if inclusive == true, consider all segments overlapping the selection
+  void setStep(int, bool inclusive = true);
+  void setStep1() { setStep(1); }
+  void setStep2() { setStep(2); }
+  void setStep3() { setStep(3); }
+  void setStep4() { setStep(4); }
+
+  // return step if all the selected segments has the same value.
+  // return -1 if the selection does not overlap any segments
+  // return 0 if the step value is uneven in the selection
+  // if inclusive == true, consider all segments overlapping the selection
+  int getCommonStep(bool inclusive = true);
+
+  void setSegmentType(TDoubleKeyframe::Type type, bool inclusive = true);
+
+  // return TDoubleKeyframe::Type value if the selected segments has the same
+  // interpolation type. return -1 if the selection does not overlap any
+  // segments return 0 (TDoubleKeyframe::None) if the interpolation is not
+  // identical in the selection if inclusive == true, consider all segments
+  // overlapping the selection
+  int getCommonSegmentType(bool inclusive = true);
+
 signals:
   void selectionChanged();
 };

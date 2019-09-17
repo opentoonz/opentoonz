@@ -351,7 +351,7 @@ bool ExpressionField::updateCompleterPopup() {
   int w = m_completerPopup->sizeHintForColumn(0) +
           m_completerPopup->verticalScrollBar()->sizeHint().width() + 5;
   int h =
-      (m_completerPopup->sizeHintForRow(0) * qMin(7, model->rowCount()) + 3) +
+      (m_completerPopup->sizeHintForRow(0) * std::min(7, model->rowCount()) + 3) +
       3;
 
   QSize size(w, h);

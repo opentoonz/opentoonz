@@ -71,7 +71,9 @@ void TCellKeyframeSelection::copyCellsKeyframes() {
     QClipboard *clipboard       = QApplication::clipboard();
     TXsheet *xsh                = m_xsheetHandle->getXsheet();
     TKeyframeData *keyframeData = new TKeyframeData();
-    keyframeData->setKeyframes(m_keyframeSelection->getSelection(), xsh);
+    TKeyframeData::Position startPos(r0, c0);
+    keyframeData->setKeyframes(m_keyframeSelection->getSelection(), xsh,
+                               startPos);
     data->setKeyframeData(keyframeData);
   }
   // Set the cliboard

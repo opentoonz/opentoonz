@@ -192,7 +192,7 @@ void ToolOptionSlider::onValueChanged(bool isDragging) {
 
 //-----------------------------------------------------------------------------
 
-void ToolOptionSlider::increase() {
+void ToolOptionSlider::increase(double step) {
   if (m_toolHandle && m_toolHandle->getTool() != m_tool) return;
   // active only if the belonging combo-viewer is visible
   if (!isInVisibleViewer(this)) return;
@@ -201,7 +201,7 @@ void ToolOptionSlider::increase() {
   double minValue, maxValue;
   getRange(minValue, maxValue);
 
-  value += 1;
+  value += step;
   if (value > maxValue) value = maxValue;
 
   setValue(value);
@@ -213,7 +213,11 @@ void ToolOptionSlider::increase() {
 
 //-----------------------------------------------------------------------------
 
-void ToolOptionSlider::decrease() {
+void ToolOptionSlider::increaseFractional() { increase(0.06); }
+
+//-----------------------------------------------------------------------------
+
+void ToolOptionSlider::decrease(double step) {
   if (m_toolHandle && m_toolHandle->getTool() != m_tool) return;
   // active only if the belonging combo-viewer is visible
   if (!isInVisibleViewer(this)) return;
@@ -222,7 +226,7 @@ void ToolOptionSlider::decrease() {
   double minValue, maxValue;
   getRange(minValue, maxValue);
 
-  value -= 1;
+  value -= step;
   if (value < minValue) value = minValue;
 
   setValue(value);
@@ -231,6 +235,10 @@ void ToolOptionSlider::decrease() {
   // update the interface
   repaint();
 }
+
+//-----------------------------------------------------------------------------
+
+void ToolOptionSlider::decreaseFractional() { decrease(0.06); }
 
 //=============================================================================
 
@@ -868,15 +876,16 @@ void StyleIndexFieldAndChip::onValueChanged(const QString &changedText) {
   // Aware of both "current" and translated string
   if (!QString("current").contains(changedText) &&
       !StyleIndexLineEdit::tr("current").contains(changedText)) {
-    int index      = changedText.toInt();
-    TPalette *plt  = m_pltHandle->getPalette();
-    int indexCount = plt->getStyleCount();
-    if (index > indexCount)
-      style = QString::number(indexCount - 1);
+    int index     = changedText.toInt();
+    TPalette *plt = m_pltHandle->getPalette();
+    if (plt && index > plt->getStyleCount())
+      style = QString::number(plt->getStyleCount() - 1);
     else
       style = text();
-  }
-  m_property->setValue(style.toStdWString());
+    m_property->setValue(style.toStdWString());
+  } else
+    m_property->setValue(changedText.toStdWString());
+
   repaint();
   // synchronize the state with the same widgets in other tool option bars
   if (m_toolHandle) m_toolHandle->notifyToolChanged();

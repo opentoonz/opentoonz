@@ -92,17 +92,10 @@ TEnv::IntVar EnvSoftwareCurrentFontSize("SoftwareCurrentFontSize", 12);
 const char *applicationFullName = "LineTest 6.4 Beta";
 const char *rootVarName         = "LINETESTROOT";
 const char *systemVarPrefix     = "LINETEST";
-#else
-const char *applicationName     = "OpenToonz";
-const char *applicationVersion  = "1.2";
-const char *applicationRevision = "1";
-const char *dllRelativePath     = "./toonz6.app/Contents/Frameworks";
 #endif
 
 TEnv::IntVar EnvSoftwareCurrentFontSize("SoftwareCurrentFontSize", 12);
 
-const char *applicationFullName =
-    "OpenToonz 1.2.1";  // next will be 1.3 (not 1.3.0)
 const char *rootVarName     = "TOONZROOT";
 const char *systemVarPrefix = "TOONZ";
 
@@ -118,9 +111,10 @@ void qt_mac_set_menubar_merge(bool enable);
 
 static void fatalError(QString msg) {
   DVGui::MsgBoxInPopup(
-      CRITICAL, msg + "\n" +
-                    QObject::tr("Installing %1 again could fix the problem.")
-                        .arg(applicationFullName));
+      CRITICAL,
+      msg + "\n" +
+          QObject::tr("Installing %1 again could fix the problem.")
+              .arg(QString::fromStdString(TEnv::getApplicationFullName())));
   exit(0);
 }
 //-----------------------------------------------------------------------------
@@ -157,12 +151,8 @@ DV_IMPORT_API void initColorFx();
 */
 static void initToonzEnv(QHash<QString, QString> &argPathValues) {
   StudioPalette::enable(true);
-
-  TEnv::setApplication(applicationName, applicationVersion,
-                       applicationRevision);
   TEnv::setRootVarName(rootVarName);
   TEnv::setSystemVarPrefix(systemVarPrefix);
-  TEnv::setDllRelativeDir(TFilePath(dllRelativePath));
 
   QHash<QString, QString>::const_iterator i = argPathValues.constBegin();
   while (i != argPathValues.constEnd()) {
@@ -175,9 +165,8 @@ static void initToonzEnv(QHash<QString, QString> &argPathValues) {
 
   QCoreApplication::setOrganizationName("OpenToonz");
   QCoreApplication::setOrganizationDomain("");
-  QString fullApplicationNameQStr =
-      QString(applicationName) + " " + applicationVersion;
-  QCoreApplication::setApplicationName(fullApplicationNameQStr);
+  QCoreApplication::setApplicationName(
+      QString::fromStdString(TEnv::getApplicationFullName()));
 
   /*-- TOONZROOTのPathの確認 --*/
   // controllo se la xxxroot e' definita e corrisponde ad un folder esistente
@@ -420,6 +409,8 @@ int main(int argc, char *argv[]) {
   }
 #endif
 
+  TEnv::setApplicationFileName(argv[0]);
+
   // splash screen
   QPixmap splashPixmap = QIcon(":Resources/splash.svg").pixmap(QSize(610, 344));
   splashPixmap.setDevicePixelRatio(QApplication::desktop()->devicePixelRatio());
@@ -634,7 +625,7 @@ int main(int argc, char *argv[]) {
   QString currentStyle = Preferences::instance()->getCurrentStyleSheetPath();
   a.setStyleSheet(currentStyle);
 
-  w.setWindowTitle(applicationFullName);
+  w.setWindowTitle(QString::fromStdString(TEnv::getApplicationFullName()));
   if (TEnv::getIsPortable()) {
     splash.showMessage(offsetStr + "Starting OpenToonz Portable ...",
                        Qt::AlignCenter, Qt::white);

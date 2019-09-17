@@ -59,8 +59,11 @@ TXshColumn *TXshMeshColumn::clone() const {
   TXshMeshColumn *column = new TXshMeshColumn();
 
   column->setStatusWord(getStatusWord());
+  column->setOpacity(getOpacity());
   column->m_cells = m_cells;
   column->m_first = m_first;
+  column->setColorTag(getColorTag());
+  column->setFilterColorId(getFilterColorId());
 
   return column;
 }

@@ -120,6 +120,7 @@ bool isAreadOnlyLevel(const TFilePath &path) {
   if (path.getDots() == "." ||
       (path.getDots() == ".." &&
        (path.getType() == "tlv" || path.getType() == "tpl"))) {
+    if (path.getType() == "psd") return true;
     if (!TSystem::doesExistFileOrLevel(path)) return false;
     TFileStatus fs(path);
     return !fs.isWritable();
@@ -178,7 +179,7 @@ void getIndexesRangefromFids(TXshSimpleLevel *level,
 }  // namespace
 
 //******************************************************************************************
-//    TXshSimpleLevel  impementation
+//    TXshSimpleLevel  implementation
 //******************************************************************************************
 
 bool TXshSimpleLevel::m_rasterizePli        = false;
@@ -1143,7 +1144,7 @@ void TXshSimpleLevel::load() {
       if (info && info->m_samplePerPixel >= 5) {
         QString msg = QString(
                           "Failed to open %1.\nSamples per pixel is more than "
-                          "4. It may containt more than one alpha channel.")
+                          "4. It may contain more than one alpha channel.")
                           .arg(QString::fromStdWString(m_path.getWideString()));
         QMessageBox::warning(0, "Image format not supported", msg);
         return;
@@ -1379,8 +1380,38 @@ void TXshSimpleLevel::save() {
 //-----------------------------------------------------------------------------
 
 static void saveBackup(TFilePath path) {
+  // The additional .bak extension keeps it from being detected as a sequence.
+  // If the original path is a sequence, find the individual files and back it
+  // up individually
+  if (path.isLevelName()) {
+    TFilePathSet files =
+        TSystem::readDirectory(path.getParentDir(), false, true);
+    for (TFilePathSet::iterator file = files.begin(); file != files.end();
+         file++) {
+      if (file->getLevelName() == path.getLevelName()) saveBackup(*file);
+    }
+    return;
+  }
+
+  int totalBackups = Preferences::instance()->getBackupKeepCount();
+  totalBackups -= 1;
+  TFilePath backup = path.withType(path.getType() + ".bak");
+  TFilePath prevBackup =
+      path.withType(path.getType() + ".bak" + std::to_string(totalBackups));
+  while (--totalBackups >= 0) {
+    std::string bakExt =
+        ".bak" + (totalBackups > 0 ? std::to_string(totalBackups) : "");
+    backup = path.withType(path.getType() + bakExt);
+    if (TSystem::doesExistFileOrLevel(backup)) {
+      try {
+        TSystem::copyFileOrLevel_throw(prevBackup, backup);
+      } catch (...) {
+      }
+    }
+    prevBackup = backup;
+  }
+
   try {
-    TFilePath backup = path.withName(path.getName() + "_backup");
     if (TSystem::doesExistFileOrLevel(backup))
       TSystem::removeFileOrLevel_throw(backup);
     TSystem::copyFileOrLevel_throw(backup, path);
@@ -1396,16 +1427,19 @@ void TXshSimpleLevel::save(const TFilePath &fp, const TFilePath &oldFp,
       (!oldFp.isEmpty()) ? oldFp : getScene()->decodeFilePath(m_path);
 
   TFilePath dDstPath = getScene()->decodeFilePath(fp);
-  TSystem::touchParentDir(dDstPath);
+  if (!TSystem::touchParentDir(dDstPath))
+    throw TSystemException(
+        dDstPath,
+        "The level cannot be saved: failed to access the target folder.");
 
   // backup
-  if (Preferences::instance()->isLevelsBackupEnabled() &&
-      dOldPath == dDstPath && TSystem::doesExistFileOrLevel(dDstPath))
+  if (Preferences::instance()->isBackupEnabled() && dOldPath == dDstPath &&
+      TSystem::doesExistFileOrLevel(dDstPath))
     saveBackup(dDstPath);
 
   if (isAreadOnlyLevel(dDstPath)) {
     if (m_editableRange.empty() &&
-        !m_temporaryHookMerged)  // file interaly locked
+        !m_temporaryHookMerged)  // file internally locked
       throw TSystemException(
           dDstPath, "The level cannot be saved: it is a read only level.");
     else if (getType() != OVL_XSHLEVEL) {
@@ -1432,8 +1466,11 @@ void TXshSimpleLevel::save(const TFilePath &fp, const TFilePath &oldFp,
       sl->setPalette(getPalette());
       sl->setPath(getScene()->codeFilePath(app));
       sl->setType(getType());
+      sl->setDirtyFlag(getDirtyFlag());
+      sl->addRef();  // Needed so levelUpdater doesn't destroy it right away
+                     // when its done writing
 
-      std::set<TFrameId>::iterator eft, efEnd;
+      std::set<TFrameId>::iterator eft, efEnd = m_editableRange.end();
       for (eft = m_editableRange.begin(); eft != efEnd; ++eft) {
         const TFrameId &fid = *eft;
         sl->setFrame(fid, getFrame(fid, false));
@@ -1450,6 +1487,8 @@ void TXshSimpleLevel::save(const TFilePath &fp, const TFilePath &oldFp,
         if (m_editableRange.find(fid) == m_editableRange.end())
           hookSet->eraseFrame(fid);
       }
+
+      sl->setRenumberTable();
 
       // Copy mesh level
       sl->save(app);
@@ -1640,7 +1679,7 @@ void TXshSimpleLevel::saveSimpleLevel(const TFilePath &decodedFp,
         lw = TLevelWriterP();  // TLevelWriterP's destructor saves the palette
       } else if (isPaletteModified && overwritePalette) {
         TFilePath palettePath = decodedFp.withNoFrame().withType("tpl");
-        if (Preferences::instance()->isLevelsBackupEnabled() &&
+        if (Preferences::instance()->isBackupEnabled() &&
             TSystem::doesExistFileOrLevel(palettePath))
           saveBackup(palettePath);
         TOStream os(palettePath);
@@ -2248,4 +2287,25 @@ TRectD TXshSimpleLevel::getBBox(const TFrameId &fid) const {
 
   // Get the frame's dpi and traduce the bbox to inch coordinates
   return TScale(1.0 / dpiX, 1.0 / dpiY) * bbox;
+}
+
+bool TXshSimpleLevel::isFrameReadOnly(TFrameId fid) {
+  // For Raster and mesh files, check to see if files are marked as read-only at
+  // the OS level
+  if (getType() == OVL_XSHLEVEL || getType() == TZI_XSHLEVEL ||
+      getType() == MESH_XSHLEVEL) {
+    TFilePath fullPath = getScene()->decodeFilePath(m_path);
+    TFilePath path =
+        fullPath.getDots() == ".." ? fullPath.withFrame(fid) : fullPath;
+    if (!TSystem::doesExistFileOrLevel(path)) return false;
+    TFileStatus fs(path);
+    return !fs.isWritable();
+  }
+
+  // If Level is marked read only, check for editable frames
+  if (m_isReadOnly && !m_editableRange.empty() &&
+      m_editableRange.count(fid) != 0)
+    return false;
+
+  return m_isReadOnly;
 }

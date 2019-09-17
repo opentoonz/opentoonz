@@ -24,7 +24,6 @@
 #include "toonz/tscenehandle.h"
 #include "toonz/txshlevelhandle.h"
 #include "toonz/txshleveltypes.h"
-#include "toonz/tscenehandle.h"
 #include "toonz/toonzscene.h"
 #include "toonz/tcamera.h"
 #include "toonz/levelproperties.h"
@@ -261,10 +260,10 @@ void PreferencesPopup::onPixelsOnlyChanged(int index) {
     QString tempUnit;
     int unitIndex;
     tempUnit  = m_pref->getOldUnits();
-    unitIndex = m_unitOm->findText(tempUnit);
+    unitIndex = std::find(::units, ::units + ::unitsCount, tempUnit) - ::units;
     m_unitOm->setCurrentIndex(unitIndex);
     tempUnit  = m_pref->getOldCameraUnits();
-    unitIndex = m_cameraUnitOm->findText(tempUnit);
+    unitIndex = std::find(::units, ::units + ::unitsCount, tempUnit) - ::units;
     m_cameraUnitOm->setCurrentIndex(unitIndex);
     m_unitOm->setDisabled(false);
     m_cameraUnitOm->setDisabled(false);
@@ -382,7 +381,7 @@ void PreferencesPopup::onInterfaceFontChanged(int index) {
   QString oldTypeface = m_interfaceFontStyle->currentText();
   rebuilldFontStyleList();
   if (!oldTypeface.isEmpty()) {
-    int newIndex               = m_interfaceFontStyle->findText(oldTypeface);
+    int newIndex = m_interfaceFontStyle->findText(oldTypeface);
     if (newIndex < 0) newIndex = 0;
     m_interfaceFontStyle->setCurrentIndex(newIndex);
   }
@@ -505,7 +504,7 @@ void PreferencesPopup::onTranspCheckDataChanged(const TPixel32 &,
 
 void PreferencesPopup::onOnionDataChanged(const TPixel32 &, bool isDragging) {
   if (isDragging) return;
-  bool inksOnly            = false;
+  bool inksOnly = false;
   if (m_inksOnly) inksOnly = m_inksOnly->isChecked();
   m_pref->setOnionData(m_frontOnionColor->getColor(),
                        m_backOnionColor->getColor(), inksOnly);
@@ -518,7 +517,7 @@ void PreferencesPopup::onOnionDataChanged(const TPixel32 &, bool isDragging) {
 //-----------------------------------------------------------------------------
 
 void PreferencesPopup::onOnionDataChanged(int) {
-  bool inksOnly            = false;
+  bool inksOnly = false;
   if (m_inksOnly) inksOnly = m_inksOnly->isChecked();
   m_pref->setOnionData(m_frontOnionColor->getColor(),
                        m_backOnionColor->getColor(), inksOnly);
@@ -712,7 +711,7 @@ void PreferencesPopup::onStartupPopupChanged(int index) {
 //-----------------------------------------------------------------------------
 
 void PreferencesPopup::onKeyframeTypeChanged(int index) {
-  m_pref->setKeyframeType(index + 2);
+  m_pref->setKeyframeType(index + 1);
 }
 //-----------------------------------------------------------------------------
 
@@ -928,8 +927,14 @@ void PreferencesPopup::onLineTestFpsCapture(int index) {
 
 //-----------------------------------------------------------------------------
 
-void PreferencesPopup::onLevelsBackupChanged(int index) {
-  m_pref->enableLevelsBackup(index == Qt::Checked);
+void PreferencesPopup::onBackupChanged(bool enabled) {
+  m_pref->enableBackup(enabled);
+}
+
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onBackupKeepCountChanged() {
+  m_pref->setBackupKeepCount(m_backupKeepCount->getValue());
 }
 
 //-----------------------------------------------------------------------------
@@ -1241,8 +1246,30 @@ void PreferencesPopup::onCurrentColumnDataChanged(const TPixel32 &,
 
 //---------------------------------------------------------------------------------------
 
+void PreferencesPopup::onEnableTouchGesturesChanged(int index) {
+  QAction *action =
+      CommandManager::instance()->getAction(MI_TouchGestureControl);
+  action->setChecked(index == Qt::Checked);
+}
+
+//---------------------------------------------------------------------------------------
+
+void PreferencesPopup::onEnableTouchGesturesTriggered(bool checked) {
+  m_enableTouchGestures->setChecked(checked);
+}
+
+//---------------------------------------------------------------------------------------
+
 void PreferencesPopup::onEnableWinInkChanged(int index) {
   m_pref->enableWinInk(index == Qt::Checked);
+}
+
+//---------------------------------------------------------------------------------------
+
+void PreferencesPopup::onRasterBackgroundColorChanged(const TPixel32 &color,
+                                                      bool isDragging) {
+  if (isDragging) return;
+  m_pref->setRasterBackgroundColor(color);
 }
 
 //**********************************************************************************
@@ -1255,10 +1282,10 @@ PreferencesPopup::PreferencesPopup()
     , m_inksOnly(0)
     , m_blanksCount(0)
     , m_blankColor(0) {
-  bool showTabletSettings = false;
+  bool winInkAvailable = false;
 
 #ifdef _WIN32
-  showTabletSettings = KisTabletSupportWin8::isAvailable();
+  winInkAvailable = KisTabletSupportWin8::isAvailable();
 #endif
 
   setWindowTitle(tr("Preferences"));
@@ -1291,7 +1318,10 @@ PreferencesPopup::PreferencesPopup()
 
   m_undoMemorySize =
       new DVGui::IntLineEdit(this, m_pref->getUndoMemorySize(), 0, 2000);
-  m_levelsBackup = new CheckBox(tr("Backup Animation Levels when Saving"));
+  m_backup = new QGroupBox(tr("Backup Scene and Animation Levels when Saving"));
+  m_backup->setCheckable(true);
+  m_backupKeepCount =
+      new DVGui::IntLineEdit(this, m_pref->getBackupKeepCount(), 1);
   m_chunkSizeFld =
       new DVGui::IntLineEdit(this, m_pref->getDefaultTaskChunkSize(), 1, 2000);
   CheckBox *sceneNumberingCB = new CheckBox(tr("Show Info in Rendered Frames"));
@@ -1399,6 +1429,12 @@ PreferencesPopup::PreferencesPopup()
   m_editLevelFormat   = new QPushButton(tr("Edit"));
 
   m_importPolicy = new QComboBox;
+
+  //--- Saving ------------------------------
+  categoryList->addItem(tr("Saving"));
+
+  ColorField *rasterBackgroundColor =
+      new ColorField(this, false, m_pref->getRasterBackgroundColor());
 
   //--- Import/Export ------------------------------
   categoryList->addItem(tr("Import/Export"));
@@ -1592,9 +1628,13 @@ PreferencesPopup::PreferencesPopup()
 
   QLabel *note_tablet;
   //--- Tablet Settings ------------------------------
-  if (showTabletSettings) {
-    categoryList->addItem(tr("Tablet Settings"));
 
+  categoryList->addItem(tr("Touch/Tablet Settings"));
+
+  m_enableTouchGestures =
+      new DVGui::CheckBox(tr("Enable Touch Gesture Controls"));
+
+  if (winInkAvailable) {
     m_enableWinInk =
         new DVGui::CheckBox(tr("Enable Windows Ink Support* (EXPERIMENTAL)"));
 
@@ -1618,7 +1658,7 @@ PreferencesPopup::PreferencesPopup()
   replaceAfterSaveLevelAsCB->setChecked(
       m_pref->isReplaceAfterSaveLevelAsEnabled());
 
-  m_levelsBackup->setChecked(m_pref->isLevelsBackupEnabled());
+  m_backup->setChecked(m_pref->isBackupEnabled());
   sceneNumberingCB->setChecked(m_pref->isSceneNumberingEnabled());
   watchFileSystemCB->setChecked(m_pref->isWatchFileSystemEnabled());
 
@@ -1889,11 +1929,12 @@ PreferencesPopup::PreferencesPopup()
 
   //--- Animation ------------------------------
   QStringList list;
-  list << tr("Linear") << tr("Speed In / Speed Out") << tr("Ease In / Ease Out")
-       << tr("Ease In / Ease Out %");
+  list << tr("Constant") << tr("Linear") << tr("Speed In / Speed Out")
+       << tr("Ease In / Ease Out") << tr("Ease In / Ease Out %")
+       << tr("Exponential") << tr("Expression ") << tr("File");
   m_keyframeType->addItems(list);
   int keyframeType = m_pref->getKeyframeType();
-  m_keyframeType->setCurrentIndex(keyframeType - 2);
+  m_keyframeType->setCurrentIndex(keyframeType - 1);
   m_animationStepField->setValue(m_pref->getAnimationStep());
 
   //--- Preview ------------------------------
@@ -1929,7 +1970,11 @@ PreferencesPopup::PreferencesPopup()
   checkForTheLatestVersionCB->setChecked(m_pref->isLatestVersionCheckEnabled());
 
   //--- Tablet Settings ------------------------------
-  if (showTabletSettings) m_enableWinInk->setChecked(m_pref->isWinInkEnabled());
+  m_enableTouchGestures->setChecked(CommandManager::instance()
+                                        ->getAction(MI_TouchGestureControl)
+                                        ->isChecked());
+
+  if (winInkAvailable) m_enableWinInk->setChecked(m_pref->isWinInkEnabled());
 
   /*--- layout ---*/
 
@@ -2003,8 +2048,24 @@ PreferencesPopup::PreferencesPopup()
 
       generalFrameLay->addWidget(replaceAfterSaveLevelAsCB, 0,
                                  Qt::AlignLeft | Qt::AlignVCenter);
-      generalFrameLay->addWidget(m_levelsBackup, 0,
-                                 Qt::AlignLeft | Qt::AlignVCenter);
+
+      QVBoxLayout *backupLay = new QVBoxLayout();
+      backupLay->setMargin(10);
+      {
+        QHBoxLayout *backupCountLay = new QHBoxLayout();
+        backupCountLay->setMargin(0);
+        backupCountLay->setSpacing(5);
+        {
+          backupCountLay->addWidget(
+              new QLabel(tr("# of backups to keep: "), this));
+          backupCountLay->addWidget(m_backupKeepCount, 0);
+          backupCountLay->addStretch(1);
+        }
+        backupLay->addLayout(backupCountLay, 0);
+      }
+      m_backup->setLayout(backupLay);
+      generalFrameLay->addWidget(m_backup);
+
       generalFrameLay->addWidget(sceneNumberingCB, 0,
                                  Qt::AlignLeft | Qt::AlignVCenter);
       generalFrameLay->addWidget(watchFileSystemCB, 0,
@@ -2246,6 +2307,37 @@ PreferencesPopup::PreferencesPopup()
     }
     loadingBox->setLayout(loadingFrameLay);
     stackedWidget->addWidget(loadingBox);
+
+    //--- Saving --------------------------
+    QWidget *savingBox          = new QWidget(this);
+    QVBoxLayout *savingFrameLay = new QVBoxLayout();
+    savingFrameLay->setMargin(15);
+    savingFrameLay->setSpacing(10);
+    {
+      QLabel *matteColorLabel =
+          new QLabel(tr("Matte color is used for background when overwriting "
+                        "raster levels with transparent pixels\nin non "
+                        "alpha-enabled image format."),
+                     this);
+      savingFrameLay->addWidget(matteColorLabel, 0, Qt::AlignLeft);
+
+      QGridLayout *savingGridLay = new QGridLayout();
+      savingGridLay->setVerticalSpacing(10);
+      savingGridLay->setHorizontalSpacing(15);
+      savingGridLay->setMargin(0);
+      {
+        savingGridLay->addWidget(new QLabel(tr("Matte color: "), this), 0, 0,
+                                 Qt::AlignRight);
+        savingGridLay->addWidget(rasterBackgroundColor, 0, 1, Qt::AlignLeft);
+      }
+      savingGridLay->setColumnStretch(0, 0);
+      savingGridLay->setColumnStretch(1, 1);
+      savingFrameLay->addLayout(savingGridLay, 0);
+
+      savingFrameLay->addStretch(1);
+    }
+    savingBox->setLayout(savingFrameLay);
+    stackedWidget->addWidget(savingBox);
 
     //--- Import/Export --------------------------
     QWidget *ioBox     = new QWidget(this);
@@ -2672,21 +2764,23 @@ PreferencesPopup::PreferencesPopup()
     stackedWidget->addWidget(versionControlBox);
 
     //--- Tablet Settings --------------------------
-    if (showTabletSettings) {
-      QWidget *tabletSettingsBox = new QWidget(this);
-      QVBoxLayout *tsLay         = new QVBoxLayout();
-      tsLay->setMargin(15);
-      tsLay->setSpacing(10);
-      {
+    QWidget *tabletSettingsBox = new QWidget(this);
+    QVBoxLayout *tsLay         = new QVBoxLayout();
+    tsLay->setMargin(15);
+    tsLay->setSpacing(10);
+    {
+      tsLay->addWidget(m_enableTouchGestures, 0,
+                       Qt::AlignLeft | Qt::AlignVCenter);
+
+      if (winInkAvailable)
         tsLay->addWidget(m_enableWinInk, 0, Qt::AlignLeft | Qt::AlignVCenter);
 
-        tsLay->addStretch(1);
+      tsLay->addStretch(1);
 
-        tsLay->addWidget(note_tablet, 0);
-      }
-      tabletSettingsBox->setLayout(tsLay);
-      stackedWidget->addWidget(tabletSettingsBox);
+      if (winInkAvailable) tsLay->addWidget(note_tablet, 0);
     }
+    tabletSettingsBox->setLayout(tsLay);
+    stackedWidget->addWidget(tabletSettingsBox);
 
     mainLayout->addWidget(stackedWidget, 1);
   }
@@ -2723,8 +2817,10 @@ PreferencesPopup::PreferencesPopup()
                        SLOT(onDragCellsBehaviourChanged(int)));
   ret = ret && connect(m_undoMemorySize, SIGNAL(editingFinished()),
                        SLOT(onUndoMemorySizeChanged()));
-  ret = ret && connect(m_levelsBackup, SIGNAL(stateChanged(int)),
-                       SLOT(onLevelsBackupChanged(int)));
+  ret = ret &&
+        connect(m_backup, SIGNAL(toggled(bool)), SLOT(onBackupChanged(bool)));
+  ret = ret && connect(m_backupKeepCount, SIGNAL(editingFinished()), this,
+                       SLOT(onBackupKeepCountChanged()));
   ret = ret && connect(sceneNumberingCB, SIGNAL(stateChanged(int)),
                        SLOT(onSceneNumberingChanged(int)));
   ret = ret && connect(watchFileSystemCB, SIGNAL(stateChanged(int)),
@@ -2838,6 +2934,12 @@ PreferencesPopup::PreferencesPopup()
   ret = ret && connect(TApp::instance()->getCurrentScene(),
                        SIGNAL(importPolicyChanged(int)), this,
                        SLOT(onImportPolicyExternallyChanged(int)));
+
+  //--- Saving ----------------------
+  ret = ret &&
+        connect(rasterBackgroundColor,
+                SIGNAL(colorChanged(const TPixel32 &, bool)),
+                SLOT(onRasterBackgroundColorChanged(const TPixel32 &, bool)));
 
   //--- Import/Export ----------------------
   ret = ret && connect(m_ffmpegPathFileFld, SIGNAL(pathChanged()), this,
@@ -3016,8 +3118,16 @@ PreferencesPopup::PreferencesPopup()
   ret = ret && connect(checkForTheLatestVersionCB, SIGNAL(clicked(bool)),
                        SLOT(onCheckLatestVersionChanged(bool)));
 
-  //--- Tablet Settings ----------------------
-  if (showTabletSettings)
+  //--- Touch/Tablet Settings ----------------------
+  ret = ret && connect(m_enableTouchGestures, SIGNAL(stateChanged(int)),
+                       SLOT(onEnableTouchGesturesChanged(int)));
+
+  QAction *action =
+      CommandManager::instance()->getAction(MI_TouchGestureControl);
+  ret = ret && connect(action, SIGNAL(triggered(bool)),
+                       SLOT(onEnableTouchGesturesTriggered(bool)));
+
+  if (winInkAvailable)
     ret = ret && connect(m_enableWinInk, SIGNAL(stateChanged(int)),
                          SLOT(onEnableWinInkChanged(int)));
 

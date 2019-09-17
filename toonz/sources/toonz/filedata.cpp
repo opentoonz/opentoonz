@@ -41,7 +41,7 @@ void FileData::getFiles(TFilePath folder,
 
     if (!TSystem::doesExistFileOrLevel(oldPath)) {
       DVGui::warning(
-          tr("It is not possible to find the %1 level.")
+          QObject::tr("It is not possible to find the %1 level.", "FileData")
               .arg(QString::fromStdWString(oldPath.getWideString())));
       return;
     }
@@ -58,7 +58,8 @@ void FileData::getFiles(TFilePath folder,
     if (TSystem::copyFileOrLevel(levelPathOut, oldPath))
       newFiles.push_back(levelPathOut);
     else {
-      QString msg = tr("There was an error copying %1").arg(toQString(oldPath));
+      QString msg = QObject::tr("There was an error copying %1", "FileData")
+                        .arg(toQString(oldPath));
       DVGui::error(msg);
       return;
     }

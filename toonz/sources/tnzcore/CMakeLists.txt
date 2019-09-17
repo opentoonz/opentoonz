@@ -113,6 +113,7 @@ set(HEADERS ${MOC_HEADERS}
     ../include/tiio_bmp.h
     ../include/tiio_jpg.h
     ../include/tiio_jpg_util.h
+    ../include/tiio_jpg_exif.h
     ../include/tiio_std.h
     ../include/ttoonzimage.h
     ../include/tipc.h
@@ -227,6 +228,7 @@ set(SOURCES
     ../common/tiio/tiio_bmp.cpp
     ../common/tiio/tiio_jpg.cpp
     ../common/tiio/tiio_jpg_util.cpp
+    ../common/tiio/tiio_jpg_exif.cpp
     ../common/tiio/tiio_std.cpp
     ../common/tiio/movsettings.cpp
     ../common/tiio/compatibility/tfile_io.c
@@ -288,6 +290,13 @@ add_definitions(
     -DTROP_EXPORTS
     -DTSTREAM_EXPORTS
 )
+
+if(BUILD_TARGET_WIN)
+    add_definitions(
+        -DUNICODE
+        -D_UNICODE
+    )
+endif()
 
 message("subdir: tnzcore")
 #message("Sources:" ${SOURCES})

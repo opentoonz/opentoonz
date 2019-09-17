@@ -14,9 +14,6 @@
 #include "borders_extractor.h"
 #define INCLUDE_HPP
 
-// tcg includes
-#include "tcg/deleter_types.h"
-
 // STL includes
 #include <deque>
 
@@ -273,7 +270,7 @@ public:
 //---------------------------------------------------------------------------------------------
 
 DespecklingReader::~DespecklingReader() {
-  std::for_each(m_borders.begin(), m_borders.end(), tcg::deleter<Border>());
+  std::for_each(m_borders.begin(), m_borders.end(), std::default_delete<Border>());
 }
 
 //---------------------------------------------------------------------------------------------

@@ -4,7 +4,7 @@
 #include <algorithm>
 
 // Euclid's algorithm
-int greatestCommonDivisor(int a, int b) {
+static int greatestCommonDivisor(int a, int b) {
   a     = std::abs(a);
   b     = std::abs(b);
   int c = std::max(a, b);
@@ -18,12 +18,14 @@ int greatestCommonDivisor(int a, int b) {
   return c;
 }
 
+#if 0 /* UNUSED */
 int leastCommonMultiple(int a, int b) {
   return a * b / greatestCommonDivisor(a, b);
 }
+#endif
 
 void Ratio::normalize() {
-  int gcd              = greatestCommonDivisor(m_num, m_denom);
+  int gcd = greatestCommonDivisor(m_num, m_denom);
   if (m_denom < 0) gcd = -gcd;
   m_num /= gcd;
   m_denom /= gcd;

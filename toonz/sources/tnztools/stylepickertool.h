@@ -36,7 +36,7 @@ public:
 
   void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) override;
 
-  void pick(const TPointD &pos, const TMouseEvent &e);
+  void pick(const TPointD &pos, const TMouseEvent &e, bool isDragging = true);
 
   void mouseMove(const TPointD &pos, const TMouseEvent &e) override;
 

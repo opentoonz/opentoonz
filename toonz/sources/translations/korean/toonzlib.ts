@@ -4,17 +4,17 @@
 <context>
     <name>Preferences</name>
     <message>
-        <location filename="../../toonzlib/preferences.cpp" line="110"/>
+        <location filename="../../toonzlib/preferences.cpp" line="111"/>
         <source>Retas Level Format</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/preferences.cpp" line="116"/>
+        <location filename="../../toonzlib/preferences.cpp" line="117"/>
         <source>Adobe Photoshop</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/preferences.cpp" line="121"/>
+        <location filename="../../toonzlib/preferences.cpp" line="122"/>
         <source>PNG</source>
         <translation type="unfinished"></translation>
     </message>
@@ -153,173 +153,173 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/palettecmd.cpp" line="253"/>
+        <location filename="../../toonzlib/palettecmd.cpp" line="251"/>
         <source>Arrange Styles  in Palette %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/palettecmd.cpp" line="324"/>
+        <location filename="../../toonzlib/palettecmd.cpp" line="322"/>
         <source>Create Style#%1  in Palette %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/palettecmd.cpp" line="455"/>
+        <location filename="../../toonzlib/palettecmd.cpp" line="453"/>
         <source>Add Style  to Palette %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/palettecmd.cpp" line="673"/>
+        <location filename="../../toonzlib/palettecmd.cpp" line="671"/>
         <source>Add Page %1 to Palette %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/palettecmd.cpp" line="738"/>
+        <location filename="../../toonzlib/palettecmd.cpp" line="736"/>
         <source>Delete Page %1 from Palette %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/palettecmd.cpp" line="793"/>
+        <location filename="../../toonzlib/palettecmd.cpp" line="791"/>
         <source>Load Color Model %1  to Palette %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/palettecmd.cpp" line="891"/>
+        <location filename="../../toonzlib/palettecmd.cpp" line="889"/>
         <source>color model</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/palettecmd.cpp" line="1059"/>
+        <location filename="../../toonzlib/palettecmd.cpp" line="1057"/>
         <source>Move Page</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/palettecmd.cpp" line="1110"/>
+        <location filename="../../toonzlib/palettecmd.cpp" line="1108"/>
         <source>Rename Page  %1 &gt; %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/palettecmd.cpp" line="1174"/>
+        <location filename="../../toonzlib/palettecmd.cpp" line="1172"/>
         <source>Rename Style#%1 in Palette%2  : %3 &gt; %4</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/palettecmd.cpp" line="1239"/>
+        <location filename="../../toonzlib/palettecmd.cpp" line="1237"/>
         <source>Set Picked Position of Style#%1 in Palette%2 : %3,%4</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/palettecmd.cpp" line="1318"/>
+        <location filename="../../toonzlib/palettecmd.cpp" line="1316"/>
         <source>Update Colors by Using Picked Positions in Palette %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="906"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="905"/>
         <source>Add Fx  : </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="907"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="906"/>
         <source>Insert Fx  : </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="1060"/>
-        <location filename="../../toonzlib/fxcommand.cpp" line="1063"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="1059"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="1062"/>
         <source>Create Linked Fx  : %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="1275"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="1284"/>
         <source>Replace Fx  : </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="1341"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="1350"/>
         <source>Unlink Fx  : %1 - - %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="1382"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="1391"/>
         <source>Make Macro Fx  : %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="1525"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="1534"/>
         <source>Explode Macro Fx  : %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="1588"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="1597"/>
         <source>Create Output Fx</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="1678"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="1688"/>
         <source>Connect to Xsheet  : </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="1738"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="1748"/>
         <source>Disconnect from Xsheet  : </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="2009"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="2019"/>
         <source>Delete Link</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="2294"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="2304"/>
         <source>Delete Fx Node : %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="2712"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="2721"/>
         <source>Paste Fx  :  </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="3078"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="3087"/>
         <source>Disconnect Fx</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="3335"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="3334"/>
         <source>Connect Fx : %1 - %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="3517"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="3516"/>
         <source>Rename Fx : %1 &gt; %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="3569"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="3568"/>
         <source>Group Fx</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="3673"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="3672"/>
         <source>Ungroup Fx</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="3775"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="3774"/>
         <source>Rename Group  : %1 &gt; %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/doubleparamcmd.cpp" line="72"/>
+        <location filename="../../toonzlib/doubleparamcmd.cpp" line="73"/>
         <source>Set Keyframe</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/doubleparamcmd.cpp" line="815"/>
+        <location filename="../../toonzlib/doubleparamcmd.cpp" line="816"/>
         <source>Remove Keyframe</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/doubleparamcmd.cpp" line="845"/>
+        <location filename="../../toonzlib/doubleparamcmd.cpp" line="856"/>
         <source>Cycle</source>
         <translation type="unfinished"></translation>
     </message>
@@ -452,7 +452,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding_level.cpp" line="237"/>
+        <location filename="../../toonzlib/scriptbinding_level.cpp" line="235"/>
         <source>Argument &apos;%1&apos; does not look like a FrameId</source>
         <translation type="unfinished"></translation>
     </message>
@@ -467,22 +467,22 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding.cpp" line="76"/>
+        <location filename="../../toonzlib/scriptbinding.cpp" line="75"/>
         <source>%1-%2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding.cpp" line="78"/>
+        <location filename="../../toonzlib/scriptbinding.cpp" line="77"/>
         <source>%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding.cpp" line="80"/>
+        <location filename="../../toonzlib/scriptbinding.cpp" line="79"/>
         <source>Expected %1 argument(s) in %2, got %3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding.cpp" line="96"/>
+        <location filename="../../toonzlib/scriptbinding.cpp" line="95"/>
         <source>%1 is not a valid color (valid color names are &apos;red&apos;, &apos;transparent&apos;, &apos;#FF8800&apos;, ecc.)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -537,12 +537,12 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/orientation.cpp" line="67"/>
+        <location filename="../../toonzlib/orientation.cpp" line="68"/>
         <source>Xsheet</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/orientation.cpp" line="127"/>
+        <location filename="../../toonzlib/orientation.cpp" line="132"/>
         <source>Timeline</source>
         <translation type="unfinished"></translation>
     </message>
@@ -653,77 +653,77 @@
 <context>
     <name>TScriptBinding::Level</name>
     <message>
-        <location filename="../../toonzlib/scriptbinding_level.cpp" line="69"/>
+        <location filename="../../toonzlib/scriptbinding_level.cpp" line="67"/>
         <source>%1 frames</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding_level.cpp" line="124"/>
+        <location filename="../../toonzlib/scriptbinding_level.cpp" line="122"/>
         <source>Bad argument (%1). It should be FilePath or string</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding_level.cpp" line="132"/>
+        <location filename="../../toonzlib/scriptbinding_level.cpp" line="130"/>
         <source>Exception loading level (%1)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding_level.cpp" line="153"/>
+        <location filename="../../toonzlib/scriptbinding_level.cpp" line="151"/>
         <source>File %1 doesn&apos;t exist</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding_level.cpp" line="163"/>
+        <location filename="../../toonzlib/scriptbinding_level.cpp" line="161"/>
         <source>File %1 is unsupported</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding_level.cpp" line="172"/>
+        <location filename="../../toonzlib/scriptbinding_level.cpp" line="170"/>
         <source>Exception reading %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding_level.cpp" line="178"/>
+        <location filename="../../toonzlib/scriptbinding_level.cpp" line="176"/>
         <source>Can&apos;t save an empty level</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding_level.cpp" line="198"/>
+        <location filename="../../toonzlib/scriptbinding_level.cpp" line="196"/>
         <source>Unrecognized file type :</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding_level.cpp" line="202"/>
+        <location filename="../../toonzlib/scriptbinding_level.cpp" line="200"/>
         <source>Can&apos;t save a %1 level to this file type : %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding_level.cpp" line="211"/>
+        <location filename="../../toonzlib/scriptbinding_level.cpp" line="209"/>
         <source>Exception writing %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding_level.cpp" line="270"/>
+        <location filename="../../toonzlib/scriptbinding_level.cpp" line="268"/>
         <source>frame index (%1) must be a number</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding_level.cpp" line="274"/>
+        <location filename="../../toonzlib/scriptbinding_level.cpp" line="272"/>
         <source>frame index (%1) is out of range (0-%2)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding_level.cpp" line="297"/>
+        <location filename="../../toonzlib/scriptbinding_level.cpp" line="295"/>
         <source>second argument (%1) is not an image</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding_level.cpp" line="310"/>
+        <location filename="../../toonzlib/scriptbinding_level.cpp" line="308"/>
         <source>can not insert a %1 image into a level</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding_level.cpp" line="331"/>
+        <location filename="../../toonzlib/scriptbinding_level.cpp" line="329"/>
         <source>can not insert a %1 image to a %2 level</source>
         <translation type="unfinished"></translation>
     </message>

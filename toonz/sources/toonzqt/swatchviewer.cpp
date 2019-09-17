@@ -2,9 +2,14 @@
 
 #include "toonzqt/swatchviewer.h"
 #include "toonzqt/gutil.h"
+#include "toonzqt/menubarcommand.h"
+#include "toonzqt/viewcommandids.h"
+
+#include "../toonz/menubarcommandids.h"
 
 #include <QPainter>
 #include <QMouseEvent>
+#include <QGestureEvent>
 #include <QResizeEvent>
 
 #include "trasterfx.h"
@@ -19,6 +24,8 @@
 
 #include <QEventLoop>
 #include <QCoreApplication>
+
+#include <QDebug>
 
 using namespace TFxUtil;
 
@@ -255,7 +262,8 @@ SwatchViewer::SwatchViewer(QWidget *parent, Qt::WFlags flags)
     , m_firstPos(TPoint())
     , m_oldContent()
     , m_curContent()
-    , m_executor() {
+    , m_executor()
+    , m_firstEnabled(true) {
   // setMinimumSize(150,150);
   setMinimumHeight(150);
   setFixedWidth(150);
@@ -268,6 +276,11 @@ SwatchViewer::SwatchViewer(QWidget *parent, Qt::WFlags flags)
   m_executor.setMaxActiveTasks(1);
 
   m_renderer.enablePrecomputing(false);
+
+  setAttribute(Qt::WA_AcceptTouchEvents);
+  grabGesture(Qt::SwipeGesture);
+  grabGesture(Qt::PanGesture);
+  grabGesture(Qt::PinchGesture);
 }
 
 //-----------------------------------------------------------------------------
@@ -363,9 +376,13 @@ void SwatchViewer::updateFrame(int frame) {
 void SwatchViewer::setEnable(bool enabled) {
   if (m_enabled == enabled) return;
   m_enabled = enabled;
-  if (m_enabled)
+  if (m_enabled) {
+    if (m_firstEnabled) {
+      m_firstEnabled = false;
+      fitView();
+    }
     computeContent();
-  else
+  } else
     update();
 }
 
@@ -425,6 +442,26 @@ void SwatchViewer::zoom(const TPoint &pos, double factor) {
 
 //-----------------------------------------------------------------------------
 
+void SwatchViewer::resetView() { setAff(TAffine()); }
+
+//-----------------------------------------------------------------------------
+
+void SwatchViewer::fitView() {
+  if (m_cameraRect.isEmpty()) return;
+
+  double imageScale = std::min(
+      width() / ((double)getCameraSize().lx * (m_cameraMode ? 1 : 0.44)),
+      height() / ((double)getCameraSize().ly * (m_cameraMode ? 1 : 0.44)));
+
+  TAffine fitAffine = TScale(imageScale, imageScale);
+  fitAffine.a13     = 0;
+  fitAffine.a23     = 0;
+
+  setAff(fitAffine);
+}
+
+//-----------------------------------------------------------------------------
+
 void SwatchViewer::zoom(bool forward, bool reset) {
   double scale2 = m_aff.det();
   if (reset || ((scale2 < 2000 || !forward) && (scale2 > 0.004 || forward))) {
@@ -437,6 +474,11 @@ void SwatchViewer::zoom(bool forward, bool reset) {
   }
 }
 
+void SwatchViewer::pan(const TPoint &delta) {
+  TPointD step = convert(delta);
+  setAff(TTranslation(step.x, -step.y) * m_aff);
+}
+
 //-----------------------------------------------------------------------------
 
 void SwatchViewer::computeContent() {
@@ -447,7 +489,7 @@ void SwatchViewer::computeContent() {
   // Clear the swatch cache when the zoom scale has changed (cache results are
   // not compatible
   // between different scale levels)
-  if (m_aff.a11 != m_contentAff.a11)
+  if (m_aff.a11 != m_contentAff.a11 || m_panning)
     SwatchCacheManager::instance()->clearSwatchResults();
 
   TRect rect(0, 0, width() - 1, height() - 1);
@@ -593,6 +635,12 @@ void SwatchViewer::resizeEvent(QResizeEvent *re) {
 //-----------------------------------------------------------------------------
 
 void SwatchViewer::mousePressEvent(QMouseEvent *event) {
+  // qDebug() << "[mousePressEvent]";
+  if (m_gestureActive && m_touchDevice == QTouchDevice::TouchScreen &&
+      !m_stylusUsed) {
+    return;
+  }
+
   TPoint pos    = TPoint(event->pos().x(), event->pos().y());
   m_mouseButton = event->button();
   if (m_mouseButton == Qt::LeftButton) {
@@ -651,6 +699,11 @@ void SwatchViewer::mousePressEvent(QMouseEvent *event) {
 //-----------------------------------------------------------------------------
 
 void SwatchViewer::mouseMoveEvent(QMouseEvent *event) {
+  if (m_gestureActive && m_touchDevice == QTouchDevice::TouchScreen &&
+      !m_stylusUsed) {
+    return;
+  }
+
   TPoint pos = TPoint(event->pos().x(), event->pos().y());
   if (m_mouseButton == Qt::LeftButton) {
     if (m_selectedPoint < 0 || m_selectedPoint >= (int)m_points.size()) return;
@@ -671,15 +724,8 @@ void SwatchViewer::mouseMoveEvent(QMouseEvent *event) {
 
     QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
   } else if (m_mouseButton == Qt::MidButton) {
-    if (!m_oldContent || !m_curContent) return;
-    m_curContent->fill(TPixel32::Transparent);
-    TPointD step = convert(pos - m_pos);
-    // Devo aggiornare l'affine per riposizionare la camera.
-    m_aff    = TTranslation(step.x, -step.y) * m_aff;
-    m_pos    = pos;
-    TPoint p = pos - m_firstPos;
-    m_curContent->copy(m_oldContent, TPoint(p.x, -p.y));
-    setContent(m_curContent, TTranslation(step.x, -step.y) * m_contentAff);
+    pan(pos - m_pos);
+    m_pos = pos;
   }
 }
 
@@ -695,20 +741,78 @@ void SwatchViewer::mouseReleaseEvent(QMouseEvent *event) {
     setAff(TTranslation(p.x, -p.y) * m_aff);
     update();
   }
+  m_gestureActive = false;
+  m_zooming       = false;
+  m_panning       = false;
+  m_stylusUsed    = false;
 }
 
 //-----------------------------------------------------------------------------
 
 void SwatchViewer::wheelEvent(QWheelEvent *event) {
-  TPoint center(event->pos().x() - width() / 2,
-                -event->pos().y() + height() / 2);
-  zoom(center, exp(0.001 * event->delta()));
+  int delta = 0;
+  switch (event->source()) {
+  case Qt::MouseEventNotSynthesized: {
+    if (event->modifiers() & Qt::AltModifier)
+      delta = event->angleDelta().x();
+    else
+      delta = event->angleDelta().y();
+    break;
+  }
+
+  case Qt::MouseEventSynthesizedBySystem: {
+    QPoint numPixels  = event->pixelDelta();
+    QPoint numDegrees = event->angleDelta() / 8;
+    if (!numPixels.isNull()) {
+      delta = event->pixelDelta().y();
+    } else if (!numDegrees.isNull()) {
+      QPoint numSteps = numDegrees / 15;
+      delta           = numSteps.y();
+    }
+    break;
+  }
+
+  default:  // Qt::MouseEventSynthesizedByQt,
+            // Qt::MouseEventSynthesizedByApplication
+    {
+      std::cout << "not supported event: Qt::MouseEventSynthesizedByQt, "
+                   "Qt::MouseEventSynthesizedByApplication"
+                << std::endl;
+      break;
+    }
+
+  }  // end switch
+
+  if (abs(delta) > 0) {
+    if ((m_gestureActive == true &&
+         m_touchDevice == QTouchDevice::TouchScreen) ||
+        m_gestureActive == false) {
+      TPoint center(event->pos().x() - width() / 2,
+                    -event->pos().y() + height() / 2);
+      zoom(center, exp(0.001 * event->delta()));
+    }
+  }
+  event->accept();
 }
 
 //-----------------------------------------------------------------------------
 
 void SwatchViewer::keyPressEvent(QKeyEvent *event) {
   int key = event->key();
+  std::string keyStr =
+      QKeySequence(key + event->modifiers()).toString().toStdString();
+  QAction *action = CommandManager::instance()->getActionFromShortcut(keyStr);
+  if (action) {
+    std::string actionId = CommandManager::instance()->getIdFromAction(action);
+    if (actionId == V_ZoomFit) {
+      fitView();
+      return;
+    } else if (actionId == V_ZoomReset) {
+      resetView();
+      return;
+    }
+  }
+
   if (key == '+' || key == '-' || key == '0') {
     zoom(key == '+', key == '0');
   }
@@ -719,6 +823,212 @@ void SwatchViewer::keyPressEvent(QKeyEvent *event) {
 void SwatchViewer::hideEvent(QHideEvent *event) {
   // Clear the swatch cache
   ::setFxForCaching(0);
+}
+
+//-------------------------------------------------------------------------------
+
+void SwatchViewer::mouseDoubleClickEvent(QMouseEvent *event) {
+  // qDebug() << "[mouseDoubleClickEvent]";
+  if (m_gestureActive && !m_stylusUsed) {
+    m_gestureActive = false;
+    fitView();
+    return;
+  }
+}
+
+//------------------------------------------------------------------
+
+void SwatchViewer::contextMenuEvent(QContextMenuEvent *event) {
+  QMenu *menu = new QMenu(this);
+
+  QAction *reset = menu->addAction(tr("Reset View"));
+  reset->setShortcut(
+      QKeySequence(CommandManager::instance()->getKeyFromId(V_ZoomReset)));
+  connect(reset, SIGNAL(triggered()), SLOT(resetView()));
+
+  QAction *fit = menu->addAction(tr("Fit To Window"));
+  fit->setShortcut(
+      QKeySequence(CommandManager::instance()->getKeyFromId(V_ZoomFit)));
+  connect(fit, SIGNAL(triggered()), SLOT(fitView()));
+
+  menu->exec(event->globalPos());
+
+  delete menu;
+  update();
+}
+
+//------------------------------------------------------------------
+
+void SwatchViewer::tabletEvent(QTabletEvent *e) {
+  // qDebug() << "[tabletEvent]";
+  if (e->type() == QTabletEvent::TabletPress) {
+    m_stylusUsed = e->pointerType() ? true : false;
+  } else if (e->type() == QTabletEvent::TabletRelease) {
+    m_stylusUsed = false;
+  }
+
+  e->accept();
+}
+
+//------------------------------------------------------------------
+
+void SwatchViewer::gestureEvent(QGestureEvent *e) {
+  // qDebug() << "[gestureEvent]";
+  m_gestureActive = false;
+  if (QGesture *swipe = e->gesture(Qt::SwipeGesture)) {
+    m_gestureActive = true;
+  } else if (QGesture *pan = e->gesture(Qt::PanGesture)) {
+    m_gestureActive = true;
+  }
+  if (QGesture *pinch = e->gesture(Qt::PinchGesture)) {
+    QPinchGesture *gesture = static_cast<QPinchGesture *>(pinch);
+    QPinchGesture::ChangeFlags changeFlags = gesture->changeFlags();
+    QPoint firstCenter                     = gesture->centerPoint().toPoint();
+    if (m_touchDevice == QTouchDevice::TouchScreen)
+      firstCenter = mapFromGlobal(firstCenter);
+
+    if (gesture->state() == Qt::GestureStarted) {
+      m_gestureActive = true;
+    } else if (gesture->state() == Qt::GestureFinished) {
+      m_gestureActive = false;
+      m_zooming       = false;
+      m_scaleFactor   = 0.0;
+    } else {
+      if (changeFlags & QPinchGesture::ScaleFactorChanged) {
+        double scaleFactor = gesture->scaleFactor();
+        // the scale factor makes for too sensitive scaling
+        // divide the change in half
+        if (scaleFactor > 1) {
+          double decimalValue = scaleFactor - 1;
+          decimalValue /= 1.5;
+          scaleFactor = 1 + decimalValue;
+        } else if (scaleFactor < 1) {
+          double decimalValue = 1 - scaleFactor;
+          decimalValue /= 1.5;
+          scaleFactor = 1 - decimalValue;
+        }
+        if (!m_zooming) {
+          double delta = scaleFactor - 1;
+          m_scaleFactor += delta;
+          if (m_scaleFactor > .2 || m_scaleFactor < -.2) {
+            m_zooming = true;
+          }
+        }
+        if (m_zooming) {
+          TPoint center(firstCenter.x() - width() / 2,
+                        -firstCenter.y() + height() / 2);
+          zoom(center, scaleFactor);
+          m_panning = false;
+        }
+        m_gestureActive = true;
+      }
+
+      if (changeFlags & QPinchGesture::CenterPointChanged) {
+        QPointF centerDelta =
+            (gesture->centerPoint()) - (gesture->lastCenterPoint());
+        if (centerDelta.manhattanLength() > 1) {
+          // panQt(centerDelta.toPoint());
+        }
+        m_gestureActive = true;
+      }
+    }
+  }
+  e->accept();
+}
+
+void SwatchViewer::touchEvent(QTouchEvent *e, int type) {
+  // qDebug() << "[touchEvent]";
+  if (type == QEvent::TouchBegin) {
+    m_touchActive   = true;
+    m_firstPanPoint = e->touchPoints().at(0).pos();
+    // obtain device type
+    m_touchDevice = e->device()->type();
+  } else if (m_touchActive) {
+    // touchpads must have 2 finger panning for tools and navigation to be
+    // functional on other devices, 1 finger panning is preferred
+    if ((e->touchPoints().count() == 2 &&
+         m_touchDevice == QTouchDevice::TouchPad) ||
+        (e->touchPoints().count() == 1 &&
+         m_touchDevice == QTouchDevice::TouchScreen)) {
+      QTouchEvent::TouchPoint panPoint = e->touchPoints().at(0);
+      if (!m_panning) {
+        QPointF deltaPoint = panPoint.pos() - m_firstPanPoint;
+        // minimize accidental and jerky zooming/rotating during 2 finger
+        // panning
+        if ((deltaPoint.manhattanLength() > 100) && !m_zooming) {
+          m_panning = true;
+        }
+      }
+      if (m_panning) {
+        QPoint curPos  = panPoint.pos().toPoint();
+        QPoint lastPos = panPoint.lastPos().toPoint();
+        TPoint centerDelta =
+            TPoint(curPos.x(), curPos.y()) - TPoint(lastPos.x(), lastPos.y());
+        pan(centerDelta);
+      }
+    }
+  }
+  if (type == QEvent::TouchEnd || type == QEvent::TouchCancel) {
+    m_touchActive = false;
+    m_panning     = false;
+  }
+  e->accept();
+}
+
+bool SwatchViewer::event(QEvent *e) {
+  /*
+  switch (e->type()) {
+  case QEvent::TabletPress: {
+  QTabletEvent *te = static_cast<QTabletEvent *>(e);
+  qDebug() << "[event] TabletPress: pointerType(" << te->pointerType()
+  << ") device(" << te->device() << ")";
+  } break;
+  case QEvent::TabletRelease:
+  qDebug() << "[event] TabletRelease";
+  break;
+  case QEvent::TouchBegin:
+  qDebug() << "[event] TouchBegin";
+  break;
+  case QEvent::TouchEnd:
+  qDebug() << "[event] TouchEnd";
+  break;
+  case QEvent::TouchCancel:
+  qDebug() << "[event] TouchCancel";
+  break;
+  case QEvent::MouseButtonPress:
+  qDebug() << "[event] MouseButtonPress";
+  break;
+  case QEvent::MouseButtonDblClick:
+  qDebug() << "[event] MouseButtonDblClick";
+  break;
+  case QEvent::MouseButtonRelease:
+  qDebug() << "[event] MouseButtonRelease";
+  break;
+  case QEvent::Gesture:
+  qDebug() << "[event] Gesture";
+  break;
+  default:
+  break;
+  }
+  */
+
+  if (e->type() == QEvent::Gesture &&
+      CommandManager::instance()
+          ->getAction(MI_TouchGestureControl)
+          ->isChecked()) {
+    gestureEvent(static_cast<QGestureEvent *>(e));
+    return true;
+  }
+  if ((e->type() == QEvent::TouchBegin || e->type() == QEvent::TouchEnd ||
+       e->type() == QEvent::TouchCancel || e->type() == QEvent::TouchUpdate) &&
+      CommandManager::instance()
+          ->getAction(MI_TouchGestureControl)
+          ->isChecked()) {
+    touchEvent(static_cast<QTouchEvent *>(e), e->type());
+    m_gestureActive = true;
+    return true;
+  }
+  return QWidget::event(e);
 }
 
 //=============================================================================

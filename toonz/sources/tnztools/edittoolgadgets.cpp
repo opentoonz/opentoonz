@@ -13,7 +13,6 @@
 #include "toonz/tcolumnfx.h"
 #include "tdoubleparam.h"
 #include "tparamset.h"
-#include "toonz/stage.h"
 #include "tundo.h"
 #include "tparamuiconcept.h"
 

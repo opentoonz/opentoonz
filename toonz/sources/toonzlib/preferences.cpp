@@ -19,6 +19,7 @@
 #include "tundo.h"
 #include "tbigmemorymanager.h"
 #include "tfilepath.h"
+#include "timage_io.h"
 
 // Qt includes
 #include <QSettings>
@@ -285,7 +286,7 @@ Preferences::Preferences()
     , m_automaticSVNFolderRefreshEnabled(true)
     , m_SVNEnabled(false)
     , m_minimizeSaveboxAfterEditing(true)
-    , m_levelsBackupEnabled(false)
+    , m_backupEnabled(true)
     , m_sceneNumberingEnabled(false)
     , m_animationSheetEnabled(false)
     , m_inksOnly(false)
@@ -345,7 +346,9 @@ Preferences::Preferences()
     , m_cursorOutlineEnabled(true)
     , m_currentColumnColor(TPixel::Black)
     , m_enableWinInk(false)
-    , m_useOnionColorsForShiftAndTraceGhosts(false) {
+    , m_useOnionColorsForShiftAndTraceGhosts(false)
+    , m_rasterBackgroundColor(TPixel::White)
+    , m_backupKeepCount(1) {
   TCamera camera;
   m_defLevelType   = PLI_XSHLEVEL;
   m_defLevelWidth  = camera.getSize().lx;
@@ -388,7 +391,8 @@ Preferences::Preferences()
   getValue(*m_settings, "SVNEnabled", m_SVNEnabled);
   getValue(*m_settings, "minimizeSaveboxAfterEditing",
            m_minimizeSaveboxAfterEditing);
-  getValue(*m_settings, "levelsBackupEnabled", m_levelsBackupEnabled);
+  getValue(*m_settings, "backupEnabled", m_backupEnabled);
+  getValue(*m_settings, "backupKeepCount", m_backupKeepCount);
   getValue(*m_settings, "sceneNumberingEnabled", m_sceneNumberingEnabled);
   getValue(*m_settings, "animationSheetEnabled", m_animationSheetEnabled);
   getValue(*m_settings, "autosaveEnabled", m_autosaveEnabled);
@@ -721,6 +725,9 @@ Preferences::Preferences()
   m_currentColumnColor = TPixel32(r, g, b);
 
   getValue(*m_settings, "winInkEnabled", m_enableWinInk);
+
+  getValue(*m_settings, "rasterBackgroundColor", m_rasterBackgroundColor);
+  TImageWriter::setBackgroundColor(m_rasterBackgroundColor);
 }
 
 //-----------------------------------------------------------------
@@ -1428,9 +1435,16 @@ void Preferences::setDownArrowLevelStripNewFrame(bool on) {
 
 //-----------------------------------------------------------------
 
-void Preferences::enableLevelsBackup(bool enabled) {
-  m_levelsBackupEnabled = enabled;
-  m_settings->setValue("levelsBackupEnabled", enabled ? "1" : "0");
+void Preferences::enableBackup(bool enabled) {
+  m_backupEnabled = enabled;
+  m_settings->setValue("backupEnabled", enabled ? "1" : "0");
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::setBackupKeepCount(int count) {
+  m_backupKeepCount = count;
+  m_settings->setValue("backupKeepCount", count);
 }
 
 //-----------------------------------------------------------------
@@ -1754,4 +1768,17 @@ void Preferences::setCurrentColumnData(const TPixel &currentColumnColor) {
 void Preferences::enableWinInk(bool on) {
   m_enableWinInk = on;
   m_settings->setValue("winInkEnabled", on ? "1" : "0");
+}
+
+void Preferences::setRasterBackgroundColor(const TPixel32 &color) {
+  m_rasterBackgroundColor = color;
+  TImageWriter::setBackgroundColor(m_rasterBackgroundColor);
+  m_settings->setValue("rasterBackgroundColor_R",
+                       QString::number((int)color.r));
+  m_settings->setValue("rasterBackgroundColor_G",
+                       QString::number((int)color.g));
+  m_settings->setValue("rasterBackgroundColor_B",
+                       QString::number((int)color.b));
+  m_settings->setValue("rasterBackgroundColor_M",
+                       QString::number((int)color.m));
 }

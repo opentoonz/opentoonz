@@ -316,7 +316,7 @@ CommandBarListTree::CommandBarListTree(QWidget* parent) : QTreeWidget(parent) {
   addFolder(ShortcutTree::tr("Right-click Menu Commands"),
             RightClickMenuCommandType);
   addFolder(ShortcutTree::tr("Tool Modifiers"), ToolModifierCommandType);
-  addFolder(ShortcutTree::tr("Visualization"), ZoomCommandType);
+  addFolder(ShortcutTree::tr("Visualization"), VisualizationButtonCommandType);
   addFolder(ShortcutTree::tr("Misc"), MiscCommandType);
   addFolder(ShortcutTree::tr("RGBA Channels"), RGBACommandType);
 

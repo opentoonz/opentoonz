@@ -77,12 +77,12 @@ public:
 
 class SaveSettingsPopup final : public IOSettingsPopup {
 public:
-  SaveSettingsPopup() : IOSettingsPopup(tr("Save Cleanup Settings")) {
+  SaveSettingsPopup() : IOSettingsPopup(QObject::tr("Save Cleanup Settings")) {
     // addFilterType("tif");
     // addFilterType("tga");
     // addFilterType("png");
 
-    setOkText(tr("Save"));
+    setOkText(QObject::tr("Save"));
   }
 
   bool execute() override {
@@ -113,8 +113,8 @@ public:
 
 class LoadSettingsPopup final : public IOSettingsPopup {
 public:
-  LoadSettingsPopup() : IOSettingsPopup(tr("Load Cleanup Settings")) {
-    setOkText(tr("Load"));
+  LoadSettingsPopup() : IOSettingsPopup(QObject::tr("Load Cleanup Settings")) {
+    setOkText(QObject::tr("Load"));
   }
 
   bool execute() override {
@@ -124,7 +124,7 @@ public:
     if (loadPath.isEmpty()) return false;
 
     if (!TSystem::doesExistFileOrLevel(loadPath)) {
-      DVGui::error(tr("%1 does not exist.").arg(toQString(loadPath)));
+      DVGui::error(QObject::tr("%1 does not exist.").arg(toQString(loadPath)));
       return false;
     }
 
@@ -361,7 +361,7 @@ void CleanupSettingsModel::commitChanges(int action) {
   // Perform actions
   int maxAction =
       std::max(action, m_action);  // Add previuosly required actions
-  action = std::min(maxAction,
+  action   = std::min(maxAction,
                     m_allowedActions);  // But only up to the allowed action
   m_action = (action == maxAction)
                  ? NONE
@@ -691,7 +691,7 @@ bool CleanupSettingsModel::loadSettings(const TFilePath &clnPath) {
 
 void CleanupSettingsModel::promptSave() {
   static SaveSettingsPopup *savePopup = 0;
-  if (!savePopup) savePopup           = new SaveSettingsPopup;
+  if (!savePopup) savePopup = new SaveSettingsPopup;
 
   savePopup->setPath(getClnPath(m_sl));
   savePopup->exec();
@@ -701,7 +701,7 @@ void CleanupSettingsModel::promptSave() {
 
 void CleanupSettingsModel::promptLoad() {
   static LoadSettingsPopup *loadPopup = 0;
-  if (!loadPopup) loadPopup           = new LoadSettingsPopup;
+  if (!loadPopup) loadPopup = new LoadSettingsPopup;
 
   loadPopup->setPath(getClnPath(m_sl));
   loadPopup->exec();

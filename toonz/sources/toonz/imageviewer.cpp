@@ -39,6 +39,7 @@
 #include <QMouseEvent>
 #include <QWheelEvent>
 #include <QOpenGLFramebufferObject>
+#include <QGestureEvent>
 
 //===================================================================================
 
@@ -118,13 +119,18 @@ class FlipZoomer final : public ImageUtils::ShortcutZoomer {
 public:
   FlipZoomer(ImageViewer *parent) : ShortcutZoomer(parent) {}
 
-  bool zoom(bool zoomin, bool resetZoom) override {
-    static_cast<ImageViewer *>(getWidget())->zoomQt(zoomin, resetZoom);
+  bool zoom(bool zoomin, bool resetView) override {
+    static_cast<ImageViewer *>(getWidget())->zoomQt(zoomin, resetView);
     return true;
   }
 
   bool fit() override {
     static_cast<ImageViewer *>(getWidget())->fitView();
+    return true;
+  }
+
+  bool resetZoom() override {
+    static_cast<ImageViewer *>(getWidget())->resetZoom();
     return true;
   }
 
@@ -218,7 +224,8 @@ ImageViewer::ImageViewer(QWidget *parent, FlipBook *flipbook,
     , m_isColorModel(false)
     , m_histogramPopup(0)
     , m_isRemakingPreviewFx(false)
-    , m_rectRGBPick(false) {
+    , m_rectRGBPick(false)
+    , m_firstImage(true) {
   m_visualSettings.m_sceneProperties =
       TApp::instance()->getCurrentScene()->getScene()->getProperties();
   m_visualSettings.m_drawExternalBG = true;
@@ -226,6 +233,11 @@ ImageViewer::ImageViewer(QWidget *parent, FlipBook *flipbook,
   setFocusPolicy(Qt::StrongFocus);
 
   setMouseTracking(true);
+
+  setAttribute(Qt::WA_AcceptTouchEvents);
+  grabGesture(Qt::SwipeGesture);
+  grabGesture(Qt::PanGesture);
+  grabGesture(Qt::PinchGesture);
 
   if (m_isHistogramEnable)
     m_histogramPopup = new HistogramPopup(tr("Flipbook Histogram"));
@@ -237,8 +249,6 @@ ImageViewer::ImageViewer(QWidget *parent, FlipBook *flipbook,
 //-----------------------------------------------------------------------------
 
 void ImageViewer::contextMenuEvent(QContextMenuEvent *event) {
-  if (!m_flipbook) return;
-
   QAction *action;
 
   if (m_isColorModel) {
@@ -248,56 +258,59 @@ void ImageViewer::contextMenuEvent(QContextMenuEvent *event) {
 
   QMenu *menu = new QMenu(this);
 
-  if (m_flipbook->getPreviewedFx()) {
-    if (!(windowState() & Qt::WindowFullScreen)) {
-      action = menu->addAction(tr("Clone Preview"));
+  if (m_flipbook) {
+    if (m_flipbook->getPreviewedFx()) {
+      if (!(windowState() & Qt::WindowFullScreen)) {
+        action = menu->addAction(tr("Clone Preview"));
+        action->setShortcut(QKeySequence(
+            CommandManager::instance()->getKeyFromId(MI_ClonePreview)));
+        connect(action, SIGNAL(triggered()), m_flipbook, SLOT(clonePreview()));
+      }
+
+      if (m_flipbook->isFreezed()) {
+        action = menu->addAction(tr("Unfreeze Preview"));
+        action->setShortcut(QKeySequence(
+            CommandManager::instance()->getKeyFromId(MI_FreezePreview)));
+        connect(action, SIGNAL(triggered()), m_flipbook,
+                SLOT(unfreezePreview()));
+      } else {
+        action = menu->addAction(tr("Freeze Preview"));
+        action->setShortcut(QKeySequence(
+            CommandManager::instance()->getKeyFromId(MI_FreezePreview)));
+        connect(action, SIGNAL(triggered()), m_flipbook, SLOT(freezePreview()));
+      }
+
+      action = menu->addAction(tr("Regenerate Preview"));
       action->setShortcut(QKeySequence(
-          CommandManager::instance()->getKeyFromId(MI_ClonePreview)));
-      connect(action, SIGNAL(triggered()), m_flipbook, SLOT(clonePreview()));
+          CommandManager::instance()->getKeyFromId(MI_RegeneratePreview)));
+      connect(action, SIGNAL(triggered()), m_flipbook, SLOT(regenerate()));
+
+      action = menu->addAction(tr("Regenerate Frame Preview"));
+      action->setShortcut(QKeySequence(
+          CommandManager::instance()->getKeyFromId(MI_RegenerateFramePr)));
+      connect(action, SIGNAL(triggered()), m_flipbook, SLOT(regenerateFrame()));
+
+      menu->addSeparator();
     }
 
-    if (m_flipbook->isFreezed()) {
-      action = menu->addAction(tr("Unfreeze Preview"));
-      action->setShortcut(QKeySequence(
-          CommandManager::instance()->getKeyFromId(MI_FreezePreview)));
-      connect(action, SIGNAL(triggered()), m_flipbook, SLOT(unfreezePreview()));
-    } else {
-      action = menu->addAction(tr("Freeze Preview"));
-      action->setShortcut(QKeySequence(
-          CommandManager::instance()->getKeyFromId(MI_FreezePreview)));
-      connect(action, SIGNAL(triggered()), m_flipbook, SLOT(freezePreview()));
+    action = menu->addAction(tr("Load / Append Images"));
+    connect(action, SIGNAL(triggered()), m_flipbook, SLOT(loadImages()));
+
+    // history of the loaded paths of flipbook
+    action = CommandManager::instance()->getAction(MI_LoadRecentImage);
+    menu->addAction(action);
+    action->setParent(m_flipbook);
+
+    if (m_flipbook->isSavable()) {
+      action = menu->addAction(tr("Save Images"));
+      connect(action, SIGNAL(triggered()), m_flipbook, SLOT(saveImages()));
     }
-
-    action = menu->addAction(tr("Regenerate Preview"));
-    action->setShortcut(QKeySequence(
-        CommandManager::instance()->getKeyFromId(MI_RegeneratePreview)));
-    connect(action, SIGNAL(triggered()), m_flipbook, SLOT(regenerate()));
-
-    action = menu->addAction(tr("Regenerate Frame Preview"));
-    action->setShortcut(QKeySequence(
-        CommandManager::instance()->getKeyFromId(MI_RegenerateFramePr)));
-    connect(action, SIGNAL(triggered()), m_flipbook, SLOT(regenerateFrame()));
-
     menu->addSeparator();
   }
 
-  action = menu->addAction(tr("Load / Append Images"));
-  connect(action, SIGNAL(triggered()), m_flipbook, SLOT(loadImages()));
-
-  // history of the loaded paths of flipbook
-  action = CommandManager::instance()->getAction(MI_LoadRecentImage);
-  menu->addAction(action);
-  action->setParent(m_flipbook);
-
-  if (m_flipbook->isSavable()) {
-    action = menu->addAction(tr("Save Images"));
-    connect(action, SIGNAL(triggered()), m_flipbook, SLOT(saveImages()));
-  }
-  menu->addSeparator();
-
   QAction *reset = menu->addAction(tr("Reset View"));
   reset->setShortcut(
-      QKeySequence(CommandManager::instance()->getKeyFromId(V_ZoomReset)));
+      QKeySequence(CommandManager::instance()->getKeyFromId(V_ViewReset)));
   connect(reset, SIGNAL(triggered()), SLOT(resetView()));
 
   QAction *fit = menu->addAction(tr("Fit To Window"));
@@ -305,42 +318,45 @@ void ImageViewer::contextMenuEvent(QContextMenuEvent *event) {
       QKeySequence(CommandManager::instance()->getKeyFromId(V_ZoomFit)));
   connect(fit, SIGNAL(triggered()), SLOT(fitView()));
 
+  if (m_flipbook) {
 #ifdef _WIN32
+    if (ImageUtils::FullScreenWidget *fsWidget =
+            dynamic_cast<ImageUtils::FullScreenWidget *>(parentWidget())) {
+      bool isFullScreen = (fsWidget->windowState() & Qt::WindowFullScreen) != 0;
 
-  if (ImageUtils::FullScreenWidget *fsWidget =
-          dynamic_cast<ImageUtils::FullScreenWidget *>(parentWidget())) {
-    bool isFullScreen = (fsWidget->windowState() & Qt::WindowFullScreen) != 0;
+      action = menu->addAction(isFullScreen ? tr("Exit Full Screen Mode")
+                                            : tr("Full Screen Mode"));
 
-    action = menu->addAction(isFullScreen ? tr("Exit Full Screen Mode")
-                                          : tr("Full Screen Mode"));
-
-    action->setShortcut(QKeySequence(
-        CommandManager::instance()->getKeyFromId(V_ShowHideFullScreen)));
-    connect(action, SIGNAL(triggered()), fsWidget, SLOT(toggleFullScreen()));
-  }
+      action->setShortcut(QKeySequence(
+          CommandManager::instance()->getKeyFromId(V_ShowHideFullScreen)));
+      connect(action, SIGNAL(triggered()), fsWidget, SLOT(toggleFullScreen()));
+    }
 
 #endif
 
-  bool addedSep = false;
+    bool addedSep = false;
 
-  if (m_isHistogramEnable &&
-      visibleRegion().contains(event->pos() * getDevPixRatio())) {
-    menu->addSeparator();
-    addedSep = true;
-    action   = menu->addAction(tr("Show Histogram"));
-    connect(action, SIGNAL(triggered()), SLOT(showHistogram()));
-  }
+    if (m_isHistogramEnable &&
+        visibleRegion().contains(event->pos() * getDevPixRatio())) {
+      menu->addSeparator();
+      addedSep = true;
+      action   = menu->addAction(tr("Show Histogram"));
+      connect(action, SIGNAL(triggered()), SLOT(showHistogram()));
+    }
 
-  if (m_visualSettings.m_doCompare) {
-    if (!addedSep) menu->addSeparator();
-    action = menu->addAction(tr("Swap Compared Images"));
-    connect(action, SIGNAL(triggered()), SLOT(swapCompared()));
+    if (m_visualSettings.m_doCompare) {
+      if (!addedSep) menu->addSeparator();
+      action = menu->addAction(tr("Swap Compared Images"));
+      connect(action, SIGNAL(triggered()), SLOT(swapCompared()));
+    }
   }
 
   menu->exec(event->globalPos());
 
-  action = CommandManager::instance()->getAction(MI_LoadRecentImage);
-  action->setParent(0);
+  if (m_flipbook) {
+    action = CommandManager::instance()->getAction(MI_LoadRecentImage);
+    action->setParent(0);
+  }
 
   delete menu;
   update();
@@ -372,9 +388,18 @@ ImageViewer::~ImageViewer() {
 //-----------------------------------------------------------------------------
 /*! Set current image to \b image and update. If Histogram is visible set its
  * image.
-*/
+ */
 void ImageViewer::setImage(TImageP image) {
   m_image = image;
+
+  if (m_image && m_firstImage) {
+    m_firstImage = false;
+    fitView();
+    // when the viewer size is large enough, limit the zoom ratio to 100% so
+    // that the image is shown in actual pixel size without jaggies due to
+    // resampling.
+    if (fabs(m_viewAff.det()) > 1.0) resetView();
+  }
 
   if (m_isHistogramEnable && m_histogramPopup->isVisible())
     m_histogramPopup->setImage(image);
@@ -417,7 +442,7 @@ void ImageViewer::initializeGL() {
   initializeOpenGLFunctions();
 
   // to be computed once through the software
-  if (m_lutCalibrator) {
+  if (m_lutCalibrator && !m_lutCalibrator->isInitialized()) {
     m_lutCalibrator->initialize();
     connect(context(), SIGNAL(aboutToBeDestroyed()), this,
             SLOT(onContextAboutToBeDestroyed()));
@@ -425,6 +450,13 @@ void ImageViewer::initializeGL() {
 
   // glClearColor(1.0,1.0,1.0,1);
   glClear(GL_COLOR_BUFFER_BIT);
+
+  if (m_firstInitialized)
+    m_firstInitialized = false;
+  else {
+    resizeGL(width(), height());
+    update();
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -557,7 +589,7 @@ void ImageViewer::paintGL() {
   } else if (m_draggingZoomSelection || m_rectRGBPick) {
     fromPos = TPoint(m_pressedMousePos.x - width() * 0.5,
                      height() * 0.5 - m_pressedMousePos.y);
-    toPos = TPoint(m_pos.x() - width() * 0.5, height() * 0.5 - m_pos.y());
+    toPos   = TPoint(m_pos.x() - width() * 0.5, height() * 0.5 - m_pos.y());
   }
   if (fromPos != TPoint() || toPos != TPoint()) {
     if (m_rectRGBPick) {
@@ -596,7 +628,7 @@ void ImageViewer::paintGL() {
 
 //------------------------------------------------------------------------------
 /*! Add to current trasformation matrix a \b delta traslation.
-*/
+ */
 void ImageViewer::panQt(const QPoint &delta) {
   if (delta == QPoint()) return;
 
@@ -655,6 +687,14 @@ void ImageViewer::zoomQt(bool forward, bool reset) {
         reset ? 1 : ImageUtils::getQuantizedZoomFactor(oldZoomScale, forward);
     setViewAff(TScale(zoomScale / oldZoomScale) * m_viewAff);
   }
+  update();
+}
+
+//-----------------------------------------------------------------------------
+
+void ImageViewer::resetZoom() {
+  double oldZoomScale = sqrt(m_viewAff.det());
+  setViewAff(TScale(1.0 / oldZoomScale) * m_viewAff);
   update();
 }
 
@@ -730,9 +770,15 @@ void ImageViewer::updateCursor(const TPoint &curPos) {
 
 //---------------------------------------------------------------------------------------------
 /*! If middle button is pressed pan the image. Update current mouse position.
-*/
+ */
 void ImageViewer::mouseMoveEvent(QMouseEvent *event) {
   if (!m_image) return;
+
+  if (m_gestureActive && m_touchDevice == QTouchDevice::TouchScreen &&
+      !m_stylusUsed) {
+    return;
+  }
+
   QPoint curQPos = event->pos() * getDevPixRatio();
 
   TPoint curPos = TPoint(curQPos.x(), curQPos.y());
@@ -819,7 +865,7 @@ void ImageViewer::mouseMoveEvent(QMouseEvent *event) {
 
 //---------------------------------------------------------------------------------------------
 /*! notify the color picked by rgb picker to palette controller
-*/
+ */
 void ImageViewer::setPickedColorToStyleEditor(const TPixel32 &color) {
   // do not modify the style #0
   TPaletteHandle *ph =
@@ -830,38 +876,68 @@ void ImageViewer::setPickedColorToStyleEditor(const TPixel32 &color) {
 }
 
 //---------------------------------------------------------------------------------------------
+
+TImageP ImageViewer::getPickedImage(QPointF mousePos) {
+  bool cursorIsInSnapShot = false;
+  if (m_visualSettings.m_doCompare) {
+    if (m_compareSettings.m_compareY == ImagePainter::DefaultCompareValue)
+      cursorIsInSnapShot =
+          m_compareSettings.m_swapCompared ==
+          (mousePos.x() > width() * m_compareSettings.m_compareX);
+    else
+      cursorIsInSnapShot =
+          m_compareSettings.m_swapCompared ==
+          (height() - mousePos.y() > height() * m_compareSettings.m_compareY);
+  }
+  if (cursorIsInSnapShot)
+    return TImageCache::instance()->get(QString("TnzCompareImg"), false);
+  else
+    return m_image;
+}
+
+//---------------------------------------------------------------------------------------------
 /*! rgb picking
-*/
+ */
 void ImageViewer::pickColor(QMouseEvent *event, bool putValueToStyleEditor) {
   if (!m_isHistogramEnable) return;
   if (!m_histogramPopup->isVisible()) return;
 
-  QPoint curPos = event->pos() * getDevPixRatio();
+  QPointF curPos = event->localPos() * getDevPixRatio();
 
   // avoid to pick outside of the flip
-  if ((!m_image) || !rect().contains(curPos)) {
+  if ((!m_image) || !rect().contains(curPos.toPoint())) {
     // throw transparent color
     m_histogramPopup->updateInfo(TPixel32::Transparent, TPointD(-1, -1));
     return;
   }
 
-  StylePicker picker(m_image);
+  TImageP img = getPickedImage(curPos);
+  if (!img) {
+    m_histogramPopup->updateInfo(TPixel32::Transparent, TPointD(-1, -1));
+    return;
+  }
 
-  TPoint mousePos = TPoint(curPos.x(), height() - 1 - curPos.y());
-  TRectD area     = TRectD(mousePos.x, mousePos.y, mousePos.x, mousePos.y);
+  StylePicker picker(img);
 
-  if (m_lutCalibrator && m_lutCalibrator->isValid()) m_fbo->bind();
+  TPointD mousePos = TPointD(curPos.x(), height() - 1 - curPos.y());
+  TRectD area      = TRectD(mousePos.x, mousePos.y, mousePos.x, mousePos.y);
 
-  const TPixel32 pix = picker.pickColor(area);
+  TPointD pos =
+      getViewAff().inv() * TPointD(curPos.x() - (qreal)(width()) / 2,
+                                   -curPos.y() + (qreal)(height()) / 2);
 
-  if (m_lutCalibrator && m_lutCalibrator->isValid()) m_fbo->release();
+  TRectD imgRect = (img->raster()) ? convert(TRect(img->raster()->getSize()))
+                                   : img->getBBox();
+  TPointD imagePos =
+      TPointD(0.5 * imgRect.getLx() + pos.x, 0.5 * imgRect.getLy() + pos.y);
 
-  QPoint viewP = mapFrom(this, curPos);
-  TPointD pos  = getViewAff().inv() *
-                TPointD(viewP.x() - width() / 2, -viewP.y() + height() / 2);
-  TPointD imagePos = TPointD(0.5 * m_image->getBBox().getLx() + pos.x,
-                             0.5 * m_image->getBBox().getLy() + pos.y);
-  if (m_image->getBBox().contains(imagePos)) {
+  TPixel32 pix;
+  if (m_lutCalibrator && m_lutCalibrator->isValid())
+    pix = picker.pickColor(pos + TPointD(-0.5, -0.5));
+  else
+    pix = picker.pickColor(area);
+
+  if (!img->raster() || imgRect.contains(imagePos)) {
     // throw the picked color to the histogram
     m_histogramPopup->updateInfo(pix, imagePos);
     // throw it to the style editor as well
@@ -875,12 +951,26 @@ void ImageViewer::pickColor(QMouseEvent *event, bool putValueToStyleEditor) {
 //---------------------------------------------------------------------------------------------
 /*! rectangular rgb picking. The picked color will be an average of pixels in
  * specified rectangle
-*/
+ */
 void ImageViewer::rectPickColor(bool putValueToStyleEditor) {
+  auto isRas32 = [this](TImageP img) -> bool {
+    TRasterImageP ri = img;
+    if (!ri) return false;
+    TRaster32P ras32 = ri->getRaster();
+    if (!ras32) return false;
+    return true;
+  };
+
   if (!m_isHistogramEnable) return;
   if (!m_histogramPopup->isVisible()) return;
 
-  StylePicker picker(m_image);
+  TImageP img = getPickedImage(m_pos);
+  if (!img) {
+    m_histogramPopup->updateAverageColor(TPixel32::Transparent);
+    return;
+  }
+
+  StylePicker picker(img);
 
   TPoint startPos =
       TPoint(m_pressedMousePos.x, height() - 1 - m_pressedMousePos.y);
@@ -892,11 +982,15 @@ void ImageViewer::rectPickColor(bool putValueToStyleEditor) {
     return;
   }
 
-  if (m_lutCalibrator && m_lutCalibrator->isValid() && m_fbo) m_fbo->bind();
-
-  const TPixel32 pix = picker.pickColor(area.enlarge(-1, -1));
-
-  if (m_lutCalibrator && m_lutCalibrator->isValid() && m_fbo) m_fbo->release();
+  TPixel32 pix;
+  if (m_lutCalibrator && m_lutCalibrator->isValid() && isRas32(img)) {
+    TPointD start = getViewAff().inv() * TPointD(startPos.x - width() / 2,
+                                                 startPos.y - height() / 2);
+    TPointD end   = getViewAff().inv() *
+                  TPointD(endPos.x - width() / 2, endPos.y - height() / 2);
+    pix = picker.pickAverageColor(TRectD(start, end));
+  } else
+    pix = picker.pickColor(area.enlarge(-1, -1));
 
   // throw the picked color to the histogram
   m_histogramPopup->updateAverageColor(pix);
@@ -939,6 +1033,13 @@ int ImageViewer::getDragType(const TPoint &pos, const TRect &loadbox) {
 //-------------------------------------------------------------------------------
 void ImageViewer::mouseDoubleClickEvent(QMouseEvent *event) {
   if (!m_image) return;
+  // qDebug() << "[mouseDoubleClickEvent]";
+  if (m_gestureActive && !m_stylusUsed) {
+    m_gestureActive = false;
+    fitView();
+    return;
+  }
+
   if (m_visualSettings.m_defineLoadbox && m_flipbook) {
     m_flipbook->setLoadbox(TRect());
     update();
@@ -950,6 +1051,13 @@ void ImageViewer::mouseDoubleClickEvent(QMouseEvent *event) {
 
 void ImageViewer::mousePressEvent(QMouseEvent *event) {
   if (!m_image) return;
+
+  // qDebug() << "[mousePressEvent]";
+  if (m_gestureActive && m_touchDevice == QTouchDevice::TouchScreen &&
+      !m_stylusUsed) {
+    return;
+  }
+
   m_pos                   = event->pos() * getDevPixRatio();
   m_pressedMousePos       = TPoint(m_pos.x(), m_pos.y());
   m_mouseButton           = event->button();
@@ -995,7 +1103,7 @@ void ImageViewer::mousePressEvent(QMouseEvent *event) {
 
 //-----------------------------------------------------------------------------
 /*! Reset current mouse position and current mouse button event.
-*/
+ */
 void ImageViewer::mouseReleaseEvent(QMouseEvent *event) {
   if (!m_image) return;
   if (m_draggingZoomSelection && !m_visualSettings.m_defineLoadbox) {
@@ -1026,19 +1134,64 @@ void ImageViewer::mouseReleaseEvent(QMouseEvent *event) {
   m_mouseButton                    = Qt::NoButton;
   m_compareSettings.m_dragCompareX = m_compareSettings.m_dragCompareY = false;
 
+  m_gestureActive = false;
+  m_zooming       = false;
+  m_panning       = false;
+  m_stylusUsed    = false;
+
   event->ignore();
 }
 
 //-----------------------------------------------------------------------------
 /*! Apply zoom.
-*/
+ */
 void ImageViewer::wheelEvent(QWheelEvent *event) {
   if (!m_image) return;
   if (event->orientation() == Qt::Horizontal) return;
-  int delta = event->delta() > 0 ? 120 : -120;
-  QPoint center(event->pos().x() * getDevPixRatio() - width() / 2,
-                -event->pos().y() * getDevPixRatio() + height() / 2);
-  zoomQt(center, exp(0.001 * delta));
+  int delta = 0;
+  switch (event->source()) {
+  case Qt::MouseEventNotSynthesized: {
+    if (event->modifiers() & Qt::AltModifier)
+      delta = event->angleDelta().x();
+    else
+      delta = event->angleDelta().y();
+    break;
+  }
+
+  case Qt::MouseEventSynthesizedBySystem: {
+    QPoint numPixels  = event->pixelDelta();
+    QPoint numDegrees = event->angleDelta() / 8;
+    if (!numPixels.isNull()) {
+      delta = event->pixelDelta().y();
+    } else if (!numDegrees.isNull()) {
+      QPoint numSteps = numDegrees / 15;
+      delta           = numSteps.y();
+    }
+    break;
+  }
+
+  default:  // Qt::MouseEventSynthesizedByQt,
+            // Qt::MouseEventSynthesizedByApplication
+  {
+    std::cout << "not supported event: Qt::MouseEventSynthesizedByQt, "
+                 "Qt::MouseEventSynthesizedByApplication"
+              << std::endl;
+    break;
+  }
+
+  }  // end switch
+
+  if (abs(delta) > 0) {
+    if ((m_gestureActive == true &&
+         m_touchDevice == QTouchDevice::TouchScreen) ||
+        m_gestureActive == false) {
+      int delta = event->delta() > 0 ? 120 : -120;
+      QPoint center(event->pos().x() * getDevPixRatio() - width() / 2,
+                    -event->pos().y() * getDevPixRatio() + height() / 2);
+      zoomQt(center, exp(0.001 * delta));
+    }
+  }
+  event->accept();
 }
 
 //-----------------------------------------------------------------------------
@@ -1110,6 +1263,8 @@ TAffine ImageViewer::getImgToWidgetAffine(const TRectD &geom) const {
 void ImageViewer::adaptView(const TRect &imgRect, const TRect &viewRect) {
   QRect viewerRect(rect());
 
+  if (viewerRect.isEmpty()) return;
+
   double imageScale = std::min(viewerRect.width() / (double)viewRect.getLx(),
                                viewerRect.height() / (double)viewRect.getLy());
 
@@ -1168,9 +1323,182 @@ void ImageViewer::onContextAboutToBeDestroyed() {
   doneCurrent();
 }
 
+//------------------------------------------------------------------
+
+void ImageViewer::tabletEvent(QTabletEvent *e) {
+  // qDebug() << "[tabletEvent]";
+  if (e->type() == QTabletEvent::TabletPress) {
+    m_stylusUsed = e->pointerType() ? true : false;
+  } else if (e->type() == QTabletEvent::TabletRelease) {
+    m_stylusUsed = false;
+  }
+
+  e->accept();
+}
+
+//------------------------------------------------------------------
+
+void ImageViewer::gestureEvent(QGestureEvent *e) {
+  // qDebug() << "[gestureEvent]";
+  m_gestureActive = false;
+  if (QGesture *swipe = e->gesture(Qt::SwipeGesture)) {
+    m_gestureActive = true;
+  } else if (QGesture *pan = e->gesture(Qt::PanGesture)) {
+    m_gestureActive = true;
+  }
+  if (QGesture *pinch = e->gesture(Qt::PinchGesture)) {
+    QPinchGesture *gesture = static_cast<QPinchGesture *>(pinch);
+    QPinchGesture::ChangeFlags changeFlags = gesture->changeFlags();
+    QPoint firstCenter                     = gesture->centerPoint().toPoint();
+    if (m_touchDevice == QTouchDevice::TouchScreen)
+      firstCenter = mapFromGlobal(firstCenter);
+
+    if (gesture->state() == Qt::GestureStarted) {
+      m_gestureActive = true;
+    } else if (gesture->state() == Qt::GestureFinished) {
+      m_gestureActive = false;
+      m_zooming       = false;
+      m_scaleFactor   = 0.0;
+    } else {
+      if (changeFlags & QPinchGesture::ScaleFactorChanged) {
+        double scaleFactor = gesture->scaleFactor();
+        // the scale factor makes for too sensitive scaling
+        // divide the change in half
+        if (scaleFactor > 1) {
+          double decimalValue = scaleFactor - 1;
+          decimalValue /= 1.5;
+          scaleFactor = 1 + decimalValue;
+        } else if (scaleFactor < 1) {
+          double decimalValue = 1 - scaleFactor;
+          decimalValue /= 1.5;
+          scaleFactor = 1 - decimalValue;
+        }
+        if (!m_zooming) {
+          double delta = scaleFactor - 1;
+          m_scaleFactor += delta;
+          if (m_scaleFactor > .2 || m_scaleFactor < -.2) {
+            m_zooming = true;
+          }
+        }
+        if (m_zooming) {
+          const QPoint center(
+              firstCenter.x() * getDevPixRatio() - width() / 2,
+              -firstCenter.y() * getDevPixRatio() + height() / 2);
+          zoomQt(center, scaleFactor);
+          m_panning = false;
+        }
+        m_gestureActive = true;
+      }
+
+      if (changeFlags & QPinchGesture::CenterPointChanged) {
+        QPointF centerDelta = (gesture->centerPoint() * getDevPixRatio()) -
+                              (gesture->lastCenterPoint() * getDevPixRatio());
+        if (centerDelta.manhattanLength() > 1) {
+          // panQt(centerDelta.toPoint());
+        }
+        m_gestureActive = true;
+      }
+    }
+  }
+  e->accept();
+}
+
+void ImageViewer::touchEvent(QTouchEvent *e, int type) {
+  // qDebug() << "[touchEvent]";
+  if (type == QEvent::TouchBegin) {
+    m_touchActive   = true;
+    m_firstPanPoint = e->touchPoints().at(0).pos();
+    // obtain device type
+    m_touchDevice = e->device()->type();
+  } else if (m_touchActive) {
+    // touchpads must have 2 finger panning for tools and navigation to be
+    // functional on other devices, 1 finger panning is preferred
+    if ((e->touchPoints().count() == 2 &&
+         m_touchDevice == QTouchDevice::TouchPad) ||
+        (e->touchPoints().count() == 1 &&
+         m_touchDevice == QTouchDevice::TouchScreen)) {
+      QTouchEvent::TouchPoint panPoint = e->touchPoints().at(0);
+      if (!m_panning) {
+        QPointF deltaPoint = panPoint.pos() - m_firstPanPoint;
+        // minimize accidental and jerky zooming/rotating during 2 finger
+        // panning
+        if ((deltaPoint.manhattanLength() > 100) && !m_zooming) {
+          m_panning = true;
+        }
+      }
+      if (m_panning) {
+        QPoint curPos      = panPoint.pos().toPoint() * getDevPixRatio();
+        QPoint lastPos     = panPoint.lastPos().toPoint() * getDevPixRatio();
+        QPoint centerDelta = curPos - lastPos;
+        panQt(centerDelta);
+      }
+    }
+  }
+  if (type == QEvent::TouchEnd || type == QEvent::TouchCancel) {
+    m_touchActive = false;
+    m_panning     = false;
+  }
+  e->accept();
+}
+
+bool ImageViewer::event(QEvent *e) {
+  /*
+  switch (e->type()) {
+  case QEvent::TabletPress: {
+  QTabletEvent *te = static_cast<QTabletEvent *>(e);
+  qDebug() << "[event] TabletPress: pointerType(" << te->pointerType()
+  << ") device(" << te->device() << ")";
+  } break;
+  case QEvent::TabletRelease:
+  qDebug() << "[event] TabletRelease";
+  break;
+  case QEvent::TouchBegin:
+  qDebug() << "[event] TouchBegin";
+  break;
+  case QEvent::TouchEnd:
+  qDebug() << "[event] TouchEnd";
+  break;
+  case QEvent::TouchCancel:
+  qDebug() << "[event] TouchCancel";
+  break;
+  case QEvent::MouseButtonPress:
+  qDebug() << "[event] MouseButtonPress";
+  break;
+  case QEvent::MouseButtonDblClick:
+  qDebug() << "[event] MouseButtonDblClick";
+  break;
+  case QEvent::MouseButtonRelease:
+  qDebug() << "[event] MouseButtonRelease";
+  break;
+  case QEvent::Gesture:
+  qDebug() << "[event] Gesture";
+  break;
+  default:
+  break;
+  }
+  */
+
+  if (e->type() == QEvent::Gesture && CommandManager::instance()
+                                          ->getAction(MI_TouchGestureControl)
+                                          ->isChecked()) {
+    gestureEvent(static_cast<QGestureEvent *>(e));
+    return true;
+  }
+  if ((e->type() == QEvent::TouchBegin || e->type() == QEvent::TouchEnd ||
+       e->type() == QEvent::TouchCancel || e->type() == QEvent::TouchUpdate) &&
+      CommandManager::instance()
+          ->getAction(MI_TouchGestureControl)
+          ->isChecked()) {
+    touchEvent(static_cast<QTouchEvent *>(e), e->type());
+    m_gestureActive = true;
+    return true;
+  }
+  return GLWidgetForHighDpi::event(e);
+}
+
 //-----------------------------------------------------------------------------
 /*! load image from history
-*/
+ */
 class LoadRecentFlipbookImagesCommandHandler final : public MenuItemHandler {
 public:
   LoadRecentFlipbookImagesCommandHandler()
@@ -1198,7 +1526,7 @@ public:
 
 //-----------------------------------------------------------------------------
 /*! clear the history
-*/
+ */
 class ClearRecentFlipbookImagesCommandHandler final : public MenuItemHandler {
 public:
   ClearRecentFlipbookImagesCommandHandler()

@@ -56,16 +56,22 @@ TAffine TAffine::operator*=(const TAffine &b) { return *this = *this * b; }
 //--------------------------------------------------------------------------------------------------
 TAffine TAffine::inv() const {
   if (a12 == 0.0 && a21 == 0.0) {
-    assert(a11 != 0.0);
-    assert(a22 != 0.0);
-    double inv_a11 = 1.0 / a11;
-    double inv_a22 = 1.0 / a22;
+    double inv_a11 =
+        (a11 == 0.0 ? std::numeric_limits<double>::max() / (1 << 16)
+                    : 1.0 / a11);
+    double inv_a22 =
+        (a22 == 0.0 ? std::numeric_limits<double>::max() / (1 << 16)
+                    : 1.0 / a22);
     return TAffine(inv_a11, 0, -a13 * inv_a11, 0, inv_a22, -a23 * inv_a22);
   } else if (a11 == 0.0 && a22 == 0.0) {
     assert(a12 != 0.0);
     assert(a21 != 0.0);
-    double inv_a21 = 1.0 / a21;
-    double inv_a12 = 1.0 / a12;
+    double inv_a21 =
+        (a21 == 0.0 ? std::numeric_limits<double>::max() / (1 << 16)
+                    : 1.0 / a21);
+    double inv_a12 =
+        (a12 == 0.0 ? std::numeric_limits<double>::max() / (1 << 16)
+                    : 1.0 / a12);
     return TAffine(0, inv_a21, -a23 * inv_a21, inv_a12, 0, -a13 * inv_a12);
   } else {
     double d = 1. / det();

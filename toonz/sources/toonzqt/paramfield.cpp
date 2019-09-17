@@ -20,6 +20,8 @@
 #include <QLabel>
 #include <QPainter>
 #include <QComboBox>
+#include <QFontComboBox>
+#include <QKeyEvent>
 
 using namespace DVGui;
 
@@ -443,6 +445,38 @@ public:
                       .arg(m_name)
                       .arg(QString::fromStdWString(m_oldValue))
                       .arg(QString::fromStdWString(m_newValue));
+    return str;
+  }
+};
+
+//-----------------------------------------------------------------------------
+/*! FontParamFieldUndo
+*/
+class FontParamFieldUndo final : public FxSettingsUndo {
+  TFontParamP m_param;
+  std::wstring m_oldValue, m_newValue;
+
+public:
+  FontParamFieldUndo(const TFontParamP param, QString name, TFxHandle *fxHandle)
+      : FxSettingsUndo(name, fxHandle), m_param(param) {
+    m_oldValue = param->getValue();
+    m_newValue = m_oldValue;
+  }
+
+  void onAdd() override { m_newValue = m_param->getValue(); }
+
+  void undo() const override {
+    m_param->setValue(m_oldValue);
+    if (m_fxHandle) m_fxHandle->notifyFxChanged();
+  }
+
+  void redo() const override {
+    m_param->setValue(m_newValue);
+    if (m_fxHandle) m_fxHandle->notifyFxChanged();
+  }
+
+  QString getHistoryString() override {
+    QString str = QObject::tr("Modify Fx Param : %1").arg(m_name);
     return str;
   }
 };
@@ -1395,17 +1429,42 @@ void IntParamField::update(int frame) {
 // StringParamField
 //-----------------------------------------------------------------------------
 
+namespace component {
+
+void MyTextEdit::keyPressEvent(QKeyEvent *event) {
+  QTextEdit::keyPressEvent(event);
+  if (event->key() == Qt::Key_Return) emit edited();
+}
+
+void MyTextEdit::focusOutEvent(QFocusEvent *event) {
+  QTextEdit::focusOutEvent(event);
+  emit edited();
+}
+};
+
 StringParamField::StringParamField(QWidget *parent, QString name,
                                    const TStringParamP &param)
     : ParamField(parent, name, param) {
   QString str;
   m_paramName = str.fromStdString(param->getName());
-  m_textFld   = new LineEdit(name, this);
-  m_textFld->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
-  bool ret =
-      connect(m_textFld, SIGNAL(editingFinished()), this, SLOT(onChange()));
-  m_layout->addWidget(m_textFld);
 
+  bool ret = true;
+  if (param->isMultiLineEnabled()) {
+    m_multiTextFld = new component::MyTextEdit(name, this);
+    m_multiTextFld->setFixedHeight(80);
+    m_multiTextFld->setAcceptRichText(false);
+    m_multiTextFld->setStyleSheet(
+        "background:white;\ncolor:black;\nborder:1 solid black;");
+    ret = ret &&
+          connect(m_multiTextFld, SIGNAL(edited()), this, SLOT(onChange()));
+    m_layout->addWidget(m_multiTextFld);
+  } else {
+    m_textFld = new LineEdit(name, this);
+    m_textFld->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+    ret = ret &&
+          connect(m_textFld, SIGNAL(editingFinished()), this, SLOT(onChange()));
+    m_layout->addWidget(m_textFld);
+  }
   setLayout(m_layout);
   assert(ret);
 }
@@ -1413,12 +1472,17 @@ StringParamField::StringParamField(QWidget *parent, QString name,
 //-----------------------------------------------------------------------------
 
 void StringParamField::onChange() {
-  std::wstring value = m_textFld->text().toStdWString();
-  TUndo *undo        = 0;
+  std::wstring value;
+  if (m_multiTextFld)
+    value = m_multiTextFld->toPlainText().toStdWString();
+  else
+    value     = m_textFld->text().toStdWString();
+  TUndo *undo = 0;
 
-  TStringParamP stringParam = m_actualParam;
-  if (stringParam && stringParam->getValue() != value)
-    undo = new StringParamFieldUndo(stringParam, m_interfaceName,
+  if (!m_actualParam || m_actualParam->getValue() == value) return;
+
+  if (m_actualParam->getValue() != value)
+    undo = new StringParamFieldUndo(m_actualParam, m_interfaceName,
                                     ParamField::m_fxHandleStat);
 
   m_actualParam->setValue(value);
@@ -1447,13 +1511,146 @@ void StringParamField::update(int frame) {
   if (!m_actualParam || !m_currentParam) return;
   QString str;
   QString strValue = str.fromStdWString(m_actualParam->getValue());
-  if (m_textFld->text() == strValue) return;
-  m_textFld->setText(strValue);
 
-  // Faccio in modo che il cursore sia sulla prima cifra, cosi' se la stringa
-  // da visualizzare e' piu' lunga del campo le cifre che vengono troncate sono
-  // le ultime e non le prime (dovrebbero essere quelle dopo la virgola).
-  m_textFld->setCursorPosition(0);
+  if (m_textFld) {
+    if (m_textFld->text() == strValue) return;
+    m_textFld->setText(strValue);
+
+    // Faccio in modo che il cursore sia sulla prima cifra, cosi' se la stringa
+    // da visualizzare e' piu' lunga del campo le cifre che vengono troncate
+    // sono
+    // le ultime e non le prime (dovrebbero essere quelle dopo la virgola).
+    m_textFld->setCursorPosition(0);
+  } else {
+    if (m_multiTextFld->toPlainText() == strValue) return;
+    m_multiTextFld->setPlainText(strValue);
+  }
+}
+
+//=============================================================================
+// FontParamField
+//-----------------------------------------------------------------------------
+
+FontParamField::FontParamField(QWidget *parent, QString name,
+                               const TFontParamP &param)
+    : ParamField(parent, name, param) {
+  m_paramName = QString::fromStdString(param->getName());
+
+  m_fontCombo  = new QFontComboBox(this);
+  m_styleCombo = new QComboBox(this);
+  m_sizeField  = new IntField(this, false);
+
+  m_sizeField->setRange(1, 500);
+  m_sizeField->enableSlider(false);
+
+  m_layout->addWidget(m_fontCombo);
+  m_layout->addSpacing(5);
+  m_layout->addWidget(new QLabel(tr("Style:"), this), 0,
+                      Qt::AlignRight | Qt::AlignVCenter);
+  m_layout->addWidget(m_styleCombo);
+  m_layout->addSpacing(5);
+  m_layout->addWidget(new QLabel(tr("Size:"), this), 0,
+                      Qt::AlignRight | Qt::AlignVCenter);
+  m_layout->addWidget(m_sizeField);
+
+  m_layout->addStretch();
+
+  setLayout(m_layout);
+
+  bool ret = true;
+  ret = ret && connect(m_fontCombo, &QFontComboBox::currentFontChanged, this,
+                       &FontParamField::findStyles);
+  ret = ret && connect(m_fontCombo, &QFontComboBox::currentFontChanged, this,
+                       &FontParamField::onChange);
+  ret = ret && connect(m_styleCombo, SIGNAL(activated(const QString &)), this,
+                       SLOT(onChange()));
+  ret = ret && connect(m_sizeField, SIGNAL(valueChanged(bool)), this,
+                       SLOT(onSizeChange(bool)));
+  assert(ret);
+
+  findStyles(m_fontCombo->currentFont());
+}
+
+//-----------------------------------------------------------------------------
+
+void FontParamField::findStyles(const QFont &font) {
+  QFontDatabase fontDatabase;
+  QString currentItem = m_styleCombo->currentText();
+  m_styleCombo->clear();
+
+  for (const QString &style : fontDatabase.styles(font.family()))
+    m_styleCombo->addItem(style);
+
+  int styleIndex = m_styleCombo->findText(currentItem);
+
+  if (styleIndex == -1)
+    m_styleCombo->setCurrentIndex(0);
+  else
+    m_styleCombo->setCurrentIndex(styleIndex);
+}
+
+//-----------------------------------------------------------------------------
+
+void FontParamField::onSizeChange(bool isDragging) {
+  if (isDragging) return;
+  onChange();
+}
+
+//-----------------------------------------------------------------------------
+
+void FontParamField::onChange() {
+  QString family = m_fontCombo->currentFont().family();
+  QString style  = m_styleCombo->currentText();
+
+  int size = m_sizeField->getValue();
+  int min, max;
+  m_sizeField->getRange(min, max);
+  if (size < min) size = min;
+
+  QFontDatabase fontDatabase;
+  QFont font = fontDatabase.font(family, style, 10);
+  font.setPixelSize(size);
+
+  TUndo *undo = 0;
+
+  TFontParamP fontParam = m_actualParam;
+  QFont currentFont;
+  currentFont.fromString(QString::fromStdWString(fontParam->getValue()));
+  if (fontParam && currentFont != font)
+    undo = new FontParamFieldUndo(fontParam, m_interfaceName,
+                                  ParamField::m_fxHandleStat);
+
+  m_actualParam->setValue(font.toString().toStdWString());
+  emit currentParamChanged();
+  m_currentParam->setValue(font.toString().toStdWString());
+  emit actualParamChanged();
+
+  if (undo) TUndoManager::manager()->add(undo);
+}
+
+//-----------------------------------------------------------------------------
+
+void FontParamField::setParam(const TParamP &current, const TParamP &actual,
+                              int frame) {
+  m_currentParam = current;
+  m_actualParam  = actual;
+  assert(m_currentParam);
+  assert(m_actualParam);
+  update(frame);
+}
+
+//-----------------------------------------------------------------------------
+
+void FontParamField::update(int frame) {
+  if (!m_actualParam || !m_currentParam) return;
+  QFont font;
+  font.fromString(QString::fromStdWString(m_actualParam->getValue()));
+
+  if (m_fontCombo->currentText() != font.family())
+    m_fontCombo->setCurrentFont(font);
+
+  m_styleCombo->setCurrentText(font.styleName());
+  m_sizeField->setValue(font.pixelSize());
 }
 
 //=============================================================================
@@ -1660,6 +1857,8 @@ ParamField *ParamField::create(QWidget *parent, QString name,
     return new StringParamField(parent, name, stringParam);
   else if (TToneCurveParamP toneCurveParam = param)
     return new ToneCurveParamField(parent, name, toneCurveParam);
+  else if (TFontParamP fontParam = param)
+    return new FontParamField(parent, name, fontParam);
   else
     return 0;
 }

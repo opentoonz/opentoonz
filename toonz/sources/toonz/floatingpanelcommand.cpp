@@ -137,6 +137,7 @@ TPanel *OpenFloatingPanel::getOrOpenFloatingPanel(
                                              QString::fromStdString(panelType));
   if (!panel) return 0;  // it should never happen
   // panel->setWindowTitle(QObject::tr(m_title.toStdString().c_str()));
+  panel->restoreFloatingPanelState();
   panel->setFloating(true);
   panel->show();
   panel->raise();

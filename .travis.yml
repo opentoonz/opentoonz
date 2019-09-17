@@ -1,17 +1,21 @@
 language: cpp
+
+git:
+  depth: 1
+  
 sudo: required
 dist: trusty
+
 install:
-    - if [[ $TRAVIS_OS_NAME == "osx" ]];   then bash ci-scripts/osx/travis-install.sh; fi
-    - if [[ $TRAVIS_OS_NAME == "linux" ]]; then bash ci-scripts/linux/travis-install.sh; fi
+    - bash ci-scripts/$TRAVIS_OS_NAME/travis-install.sh
 script:
-    - if [[ $TRAVIS_OS_NAME == "osx" ]];   then bash ci-scripts/osx/travis-build.sh; fi
-    - if [[ $TRAVIS_OS_NAME == "linux" ]]; then bash ci-scripts/linux/travis-build.sh; fi
+    - bash ci-scripts/$TRAVIS_OS_NAME/travis-build.sh
 
 matrix:
     include:
         - os: linux
           compiler: gcc
+          cache: ccache
         - os: linux
           compiler: clang
         - os: osx

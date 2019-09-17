@@ -92,7 +92,7 @@ void StyleShortcutSwitchablePanel::updateTabFocus() {
   QList<QWidget *> widgets = findChildren<QWidget *>();
   if (Preferences::instance()->isUseNumpadForSwitchingStylesEnabled()) {
     // disable tab focus
-    foreach (QWidget *widget, widgets) {
+    for (QWidget *widget : widgets) {
       Qt::FocusPolicy policy = widget->focusPolicy();
       if (policy == Qt::TabFocus || policy == Qt::StrongFocus ||
           policy == Qt::WheelFocus) {

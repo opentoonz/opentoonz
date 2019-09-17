@@ -11,7 +11,7 @@
 
 class GLWidgetForHighDpi : public QOpenGLWidget, protected QOpenGLFunctions {
 public:
-  GLWidgetForHighDpi(QWidget *parent   = Q_NULLPTR,
+  GLWidgetForHighDpi(QWidget *parent   = nullptr,
                      Qt::WindowFlags f = Qt::WindowFlags())
       : QOpenGLWidget(parent, f) {}
 
