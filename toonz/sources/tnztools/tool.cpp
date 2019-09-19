@@ -843,7 +843,7 @@ QString TTool::updateEnabled() {
     return (enable(true), QString());
 
   // Check against camera column
-  if (columnIndex < 0 && (targetType & TTool::EmptyTarget) &&
+  if (!filmstrip && columnIndex < 0 && (targetType & TTool::EmptyTarget) &&
       (m_name == T_Type || m_name == T_Geometric || m_name == T_Brush))
     return (enable(false), QString());
 
