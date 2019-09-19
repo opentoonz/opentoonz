@@ -645,7 +645,7 @@ void ToonzVectorBrushTool::leftButtonDown(const TPointD &pos,
 
   int col   = app->getCurrentColumn()->getColumnIndex();
   m_isPath  = app->getCurrentObject()->isSpline();
-  m_enabled = col >= 0 || m_isPath;
+  m_enabled = col >= 0 || m_isPath || app->getCurrentFrame()->isEditingLevel();
   // todo: gestire autoenable
   if (!m_enabled) return;
   if (!m_isPath) {

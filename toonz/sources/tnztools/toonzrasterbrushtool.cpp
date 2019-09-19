@@ -1201,7 +1201,7 @@ void ToonzRasterBrushTool::leftButtonDown(const TPointD &pos,
   if (!app) return;
 
   int col   = app->getCurrentColumn()->getColumnIndex();
-  m_enabled = col >= 0;
+  m_enabled = col >= 0 || app->getCurrentFrame()->isEditingLevel();
   // todo: gestire autoenable
   if (!m_enabled) return;
 
