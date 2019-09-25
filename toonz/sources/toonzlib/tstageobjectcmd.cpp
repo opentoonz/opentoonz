@@ -793,7 +793,8 @@ void removeStageObjectNode(const TStageObjectId &id, TXsheetHandle *xshHandle,
     return;
 
   if (id.isCamera() && xsh->getCameraColumnIndex() == id.getIndex())
-    xsh->setCameraColumnIndex(0);
+    xsh->setCameraColumnIndex(
+        xsh->getStageObjectTree()->getCurrentCameraId().getIndex());
 
   // stacco tutti i figli e li attacco al padre
   QList<TStageObjectId> linkedObjects;
