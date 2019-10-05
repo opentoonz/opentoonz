@@ -1,3 +1,5 @@
+!! This repository is for creating a version of opentoonz for old computers!!
+
 # OpenToonz
 
 [日本語](./doc/README_ja.md)
