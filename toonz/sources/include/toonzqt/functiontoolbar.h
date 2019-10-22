@@ -95,6 +95,9 @@ public slots:
   void setCurve(TDoubleParam *curve);
   void setFrame(double frame);
 
+  void onNextKeyframe(QWidget *panel);
+  void onPrevKeyframe(QWidget *panel);
+
 private slots:
 
   void onValueFieldChanged();

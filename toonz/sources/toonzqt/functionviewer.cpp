@@ -172,11 +172,11 @@ FunctionViewer::FunctionViewer(QWidget *parent, Qt::WFlags flags)
   bool ret = true;
   ret      = ret && connect(m_toolbar, SIGNAL(numericalColumnToggled()), this,
                        SLOT(toggleMode()));
-  ret      = ret && connect(ftModel, SIGNAL(activeChannelsChanged()),
+  ret = ret && connect(ftModel, SIGNAL(activeChannelsChanged()),
                        m_functionGraph, SLOT(update()));
-  ret      = ret && connect(ftModel, SIGNAL(activeChannelsChanged()),
+  ret = ret && connect(ftModel, SIGNAL(activeChannelsChanged()),
                        m_numericalColumns, SLOT(updateAll()));
-  ret      = ret && connect(ftModel, SIGNAL(curveChanged(bool)), m_treeView,
+  ret = ret && connect(ftModel, SIGNAL(curveChanged(bool)), m_treeView,
                        SLOT(update()));
   ret = ret && connect(ftModel, SIGNAL(curveChanged(bool)), m_functionGraph,
                        SLOT(update()));
@@ -241,10 +241,18 @@ void FunctionViewer::showEvent(QShowEvent *) {
           ret;
   }
 
-  if (m_frameHandle)
+  if (m_frameHandle) {
     ret = connect(m_frameHandle, SIGNAL(frameSwitched()), this,
                   SLOT(propagateExternalSetFrame())) &&
           ret;
+
+    ret = connect(m_frameHandle, SIGNAL(triggerNextKeyframe(QWidget *)),
+                  m_toolbar, SLOT(onNextKeyframe(QWidget *))) &&
+          ret;
+    ret = connect(m_frameHandle, SIGNAL(triggerPrevKeyframe(QWidget *)),
+                  m_toolbar, SLOT(onPrevKeyframe(QWidget *))) &&
+          ret;
+  }
 
   if (m_objectHandle) {
     ret = connect(m_objectHandle, SIGNAL(objectSwitched()), this,
@@ -303,7 +311,10 @@ void FunctionViewer::showEvent(QShowEvent *) {
 
 void FunctionViewer::hideEvent(QHideEvent *) {
   if (m_xshHandle) m_xshHandle->disconnect(this);
-  if (m_frameHandle) m_frameHandle->disconnect(this);
+  if (m_frameHandle) {
+    m_frameHandle->disconnect(this);
+    m_frameHandle->disconnect(m_toolbar);
+  }
   if (m_objectHandle) m_objectHandle->disconnect(this);
   if (m_fxHandle) m_fxHandle->disconnect(this);
   if (m_sceneHandle) m_sceneHandle->disconnect(this);
@@ -595,7 +606,7 @@ void FunctionViewer::onStageObjectChanged(bool isDragging) {
 void FunctionViewer::onFxSwitched() {
   TFx *fx              = m_fxHandle->getFx();
   TZeraryColumnFx *zfx = dynamic_cast<TZeraryColumnFx *>(fx);
-  if (zfx) fx = zfx->getZeraryFx();
+  if (zfx) fx          = zfx->getZeraryFx();
   static_cast<FunctionTreeModel *>(m_treeView->model())->setCurrentFx(fx);
   m_treeView->updateAll();
   m_functionGraph->update();

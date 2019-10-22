@@ -45,7 +45,6 @@ public:
   void cloneChild();
 
   void hideColumns();
-  void toggleCameraColumn();
 
   void reframeCells(int count);
   void reframe1Cells() { reframeCells(1); }

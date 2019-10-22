@@ -1334,8 +1334,10 @@ QMenuBar *StackedMenuBar::createFullMenuBar() {
   addMenuItem(playMenu, MI_PrevStep);
   addMenuItem(playMenu, MI_NextStep);
   playMenu->addSeparator();
-  addMenuItem(playMenu, MI_NextDrawing);
   addMenuItem(playMenu, MI_PrevDrawing);
+  addMenuItem(playMenu, MI_NextDrawing);
+  addMenuItem(playMenu, MI_PrevKeyframe);
+  addMenuItem(playMenu, MI_NextKeyframe);
   playMenu->addSeparator();
   addMenuItem(playMenu, MI_Link);
 

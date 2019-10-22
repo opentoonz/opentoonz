@@ -1763,7 +1763,7 @@ void MainWindow::defineActions() {
   createRightClickMenuAction(MI_ToggleXSheetToolbar,
                              tr("Toggle XSheet Toolbar"), "");
   createRightClickMenuAction(MI_ToggleXsheetCameraColumn,
-                             tr("Show/Hide Xsheet Camera Column"), "");
+                         tr("Show/Hide Xsheet Camera Column"), "");
   createMenuCellsAction(MI_Reverse, tr("&Reverse"), "");
   createMenuCellsAction(MI_Swing, tr("&Swing"), "");
   createMenuCellsAction(MI_Random, tr("&Random"), "");
@@ -1903,6 +1903,9 @@ void MainWindow::defineActions() {
   createAction(MI_PrevDrawing, tr("Prev Drawing"), ",", PlaybackCommandType);
   createAction(MI_NextStep, tr("Next Step"), "", PlaybackCommandType);
   createAction(MI_PrevStep, tr("Prev Step"), "", PlaybackCommandType);
+
+  createAction(MI_NextKeyframe, tr("Next Key"), "Ctrl+.", MenuXsheetCommandType);
+  createAction(MI_PrevKeyframe, tr("Prev Key"), "Ctrl+,", MenuXsheetCommandType);
 
   createRGBAAction(MI_RedChannel, tr("Red Channel"), "");
   createRGBAAction(MI_GreenChannel, tr("Green Channel"), "");

@@ -698,18 +698,21 @@ TAffine TTool::getColumnMatrix(int columnIndex) const {
 
   TFrameHandle *fh = m_application->getCurrentFrame();
   if (fh->isEditingLevel()) return TAffine();
-  int frame               = fh->getFrame();
-  TXsheet *xsh            = m_application->getCurrentXsheet()->getXsheet();
-  TStageObjectId columnId = TStageObjectId::ColumnId(columnIndex);
-  TAffine columnPlacement = xsh->getPlacement(columnId, frame);
-  double columnZ          = xsh->getZ(columnId, frame);
+  int frame    = fh->getFrame();
+  TXsheet *xsh = m_application->getCurrentXsheet()->getXsheet();
+  TStageObjectId columnObjId =
+      (columnIndex >= 0)
+          ? TStageObjectId::ColumnId(columnIndex)
+          : TStageObjectId::CameraId(xsh->getCameraColumnIndex());
+  TAffine columnPlacement = xsh->getPlacement(columnObjId, frame);
+  double columnZ          = xsh->getZ(columnObjId, frame);
 
   TStageObjectId cameraId = xsh->getStageObjectTree()->getCurrentCameraId();
   TStageObject *camera    = xsh->getStageObject(cameraId);
   TAffine cameraPlacement = camera->getPlacement(frame);
   double cameraZ          = camera->getZ(frame);
 
-  TStageObject *object = xsh->getStageObject(columnId);
+  TStageObject *object = xsh->getStageObject(columnObjId);
   TAffine placement;
   TStageObject::perspective(placement, cameraPlacement, cameraZ,
                             columnPlacement, columnZ,
@@ -831,8 +834,6 @@ QString TTool::updateEnabled() {
     }
   }
 
-  TStageObject *obj =
-      xsh->getStageObject(TStageObjectId::ColumnId(columnIndex));
   bool spline = m_application->getCurrentObject()->isSpline();
 
   bool filmstrip = m_application->getCurrentFrame()->isEditingLevel();
@@ -947,7 +948,9 @@ QString TTool::updateEnabled() {
     }
 
     // Check against impossibly traceable movements on the column
-    if ((levelType & LEVELCOLUMN_XSHLEVEL) && !filmstrip) {
+    if ((levelType & LEVELCOLUMN_XSHLEVEL) && !filmstrip && columnIndex >= 0) {
+      TStageObject *obj =
+          xsh->getStageObject(TStageObjectId::ColumnId(columnIndex));
       // Test for Mesh-deformed levels
       const TStageObjectId &parentId = obj->getParent();
       if (parentId.isColumn() && obj->getParentHandle()[0] != 'H') {

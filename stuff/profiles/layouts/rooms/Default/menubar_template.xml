@@ -232,6 +232,8 @@
         <separator/>
         <command>MI_PrevDrawing</command>
         <command>MI_NextDrawing</command>
+        <command>MI_PrevKeyframe</command>
+        <command>MI_NextKeyframe</command>
         <separator/>
         <command>MI_Link</command>
     </menu>

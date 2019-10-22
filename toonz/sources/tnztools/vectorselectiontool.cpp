@@ -1500,6 +1500,7 @@ void VectorSelectionTool::modifySelectionOnClick(TImageP image,
 
   if (selectionChanged) {
     m_deformValues.reset();  // Resets selection values shown in the toolbar
+    m_centers.clear();
 
     finalizeSelection();
     notifySelectionChanged();
@@ -1597,7 +1598,10 @@ void VectorSelectionTool::leftButtonDrag(const TPointD &pos,
         selectionChanged = (selectStroke(s, false) || selectionChanged);
     }
 
-    if (selectionChanged) finalizeSelection();
+    if (selectionChanged) {
+      m_centers.clear();
+      finalizeSelection();
+    }
 
     invalidate();
   }
@@ -1939,6 +1943,7 @@ void VectorSelectionTool::onImageChanged() {
         vi->getPalette() !=
             selectedImg->getPalette())  // if palettes still match
       selectedStyles().clear();
+    m_centers.clear();
   } else {
     // Remove any eventual stroke index outside the valid range
     if (!m_strokeSelection.isEmpty()) {
@@ -1965,6 +1970,7 @@ void VectorSelectionTool::doOnDeactivate() {
   m_deformValues.reset();
 
   m_polyline.clear();
+  m_centers.clear();
 
   TTool::getApplication()->getCurrentSelection()->setSelection(0);
 
@@ -2153,6 +2159,7 @@ void VectorSelectionTool::selectRegionVectorImage() {
   }
 
   if (selectionChanged) {
+    m_centers.clear();
     finalizeSelection();
     notifySelectionChanged();
     invalidate();

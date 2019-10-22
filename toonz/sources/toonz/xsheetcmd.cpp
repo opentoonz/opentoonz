@@ -2131,3 +2131,25 @@ void PrintXsheetCommand::execute() {
 
   TSystem::showDocument(fp);
 }
+
+//-----------------------------------------------------------------------------
+
+class ToggleXsheetCameraColumnCommand final : public MenuItemHandler {
+public:
+  ToggleXsheetCameraColumnCommand()
+      : MenuItemHandler(MI_ToggleXsheetCameraColumn) {}
+
+  void execute() override {
+    Preferences *pref = Preferences::instance();
+    if (!pref->isShowKeyframesOnXsheetCellAreaEnabled()) {
+      DVGui::warning(
+          QObject::tr("Please enable \"Show Keyframes on Cell Area\" to show "
+                      "or hide the camera column."));
+      return;
+    }
+
+    pref->enableXsheetCameraColumn(!pref->isXsheetCameraColumnVisible());
+    TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+  }
+
+} ToggleXsheetCameraColumnCommand;

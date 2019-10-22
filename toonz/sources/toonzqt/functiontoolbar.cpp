@@ -150,6 +150,16 @@ void FunctionToolbar::setFrame(double frame) {
     m_valueFld->setValue(0);
 }
 
+void FunctionToolbar::onNextKeyframe(QWidget *panel) {
+  m_keyframeNavigator->onNextKeyframe(panel);
+}
+
+//-------------------------------------------------------------------
+
+void FunctionToolbar::onPrevKeyframe(QWidget *panel) {
+  m_keyframeNavigator->onPrevKeyframe(panel);
+}
+
 //-------------------------------------------------------------------
 
 void FunctionToolbar::onValueFieldChanged() {
