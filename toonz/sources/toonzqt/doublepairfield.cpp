@@ -39,7 +39,8 @@ DoubleValuePairField::DoubleValuePairField(QWidget *parent,
     , m_rightMargin(72)
     , m_isMaxRangeLimited(isMaxRangeLimited)
     , m_leftLineEdit(leftLineEdit)
-    , m_rightLineEdit(rightLineEdit) {
+    , m_rightLineEdit(rightLineEdit)
+    , m_isLinear(true) {
   assert(m_leftLineEdit);
   assert(m_rightLineEdit);
   setObjectName("DoublePairField");
@@ -76,16 +77,45 @@ DoubleValuePairField::DoubleValuePairField(QWidget *parent,
 //-----------------------------------------------------------------------------
 
 double DoubleValuePairField::pos2value(int x) const {
-  int xMin = m_leftMargin, xMax = width() - m_rightMargin;
-  return m_minValue + (m_maxValue - m_minValue) * (x - xMin) / (xMax - xMin);
+  int xMin = m_leftMargin, xMax = width() - m_rightMargin - 1;
+  if (m_isLinear)
+    return m_minValue + (m_maxValue - m_minValue) * (x - xMin) / (xMax - xMin);
+
+  // nonlinear slider case
+  double posRatio = (double)(x - xMin) / (double)(xMax - xMin);
+  double t;
+  if (posRatio <= 0.5)
+    t = 0.04 * posRatio;
+  else if (posRatio <= 0.75)
+    t = -0.02 + 0.08 * posRatio;
+  else if (posRatio <= 0.9)
+    t = -0.26 + 0.4 * posRatio;
+  else
+    t = -8.0 + 9.0 * posRatio;
+  return m_minValue + (m_maxValue - m_minValue) * t;
 }
 
 //-----------------------------------------------------------------------------
 
 int DoubleValuePairField::value2pos(double v) const {
-  int xMin = m_leftMargin, xMax = width() - m_rightMargin;
-  return xMin +
-         (int)(((xMax - xMin) * (v - m_minValue)) / (m_maxValue - m_minValue));
+  int xMin = m_leftMargin, xMax = width() - m_rightMargin - 1;
+  if (m_isLinear)
+    return xMin + (int)(((xMax - xMin) * (v - m_minValue)) /
+                        (m_maxValue - m_minValue));
+
+  // nonlinear slider case
+  double valueRatio =
+      (v - (double)m_minValue) / (double)(m_maxValue - m_minValue);
+  double t;
+  if (valueRatio <= 0.02)
+    t = valueRatio / 0.04;
+  else if (valueRatio <= 0.04)
+    t = (valueRatio + 0.02) / 0.08;
+  else if (valueRatio <= 0.1)
+    t = (valueRatio + 0.26) / 0.4;
+  else
+    t = (valueRatio + 8.0) / 9.0;
+  return xMin + (int)(t * (double)(xMax - xMin));
 }
 
 //-----------------------------------------------------------------------------

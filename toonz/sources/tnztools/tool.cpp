@@ -603,7 +603,7 @@ void TTool::notifyImageChanged() {
 //-----------------------------------------------------------------------------
 
 /*! Notify change of image in \b fid: update icon and notify level change.
-*/
+ */
 void TTool::notifyImageChanged(const TFrameId &fid) {
   onImageChanged();
 
@@ -842,6 +842,30 @@ QString TTool::updateEnabled() {
       Preferences::instance()->isMultiLayerStylePickerEnabled())
     return (enable(true), QString());
 
+  // Check against camera column
+  if (!filmstrip && columnIndex < 0 && (targetType & TTool::EmptyTarget) &&
+      (m_name == T_Type || m_name == T_Geometric || m_name == T_Brush))
+    return (enable(false), QString());
+
+  // In case of Animate Tool
+  if (m_name == T_Edit && !filmstrip) {
+    // if an object other than column is selected, then enable the tool
+    // regardless of the current column state
+    if (!m_application->getCurrentObject()->getObjectId().isColumn())
+      return (enable(true), QString());
+    // if a column object is selected, switch the inspected column to it
+    column = xsh->getColumn(
+        m_application->getCurrentObject()->getObjectId().getIndex());
+  }
+
+  // Check against splines
+  if (spline && (toolType & TTool::LevelTool)) {
+    return (targetType & Splines)
+               ? (enable(true), QString())
+               : (enable(false), QObject::tr("The current tool cannot be "
+                                             "used to edit a motion path."));
+  }
+
   // Check against unplaced columns (not in filmstrip mode)
   if (column && !filmstrip) {
     if (column->isLocked())
@@ -887,14 +911,6 @@ QString TTool::updateEnabled() {
 
   // Check LevelRead & LevelWrite tools
   if (toolType & TTool::LevelTool) {
-    // Check against splines
-    if (spline) {
-      return (targetType & Splines)
-                 ? (enable(true), QString())
-                 : (enable(false), QObject::tr("The current tool cannot be "
-                                               "used to edit a motion path."));
-    }
-
     // Check against empty levels
     if (!xl)
       return (targetType & EmptyTarget) ? (enable(true), QString())

@@ -308,12 +308,24 @@ StrokeId PathAnimations::appStrokeId(const TApplication *app, TStroke *stroke) {
   TXshCell cell    = xsheet->getCell(CellPosition(frame, layer));
   return StrokeId{xsheet, cell, stroke};
 }
+StrokeId PathAnimations::appStrokeId(TXsheet *xsheet, int frame, int layer,
+                                     TStroke *stroke) {
+  TXshCell cell = xsheet->getCell(CellPosition(frame, layer));
+  return StrokeId{xsheet, cell, stroke};
+}
 
 shared_ptr<PathAnimation> PathAnimations::appStroke(const TApplication *app,
                                                     TStroke *stroke) {
   return appAnimations(app)->addStroke(appStrokeId(app, stroke));
 }
 
+shared_ptr<PathAnimation> PathAnimations::appStroke(const TApplication *app,
+                                                    TXsheet *xsheet, int frame,
+                                                    int layer,
+                                                    TStroke *stroke) {
+  return appAnimations(app)->addStroke(
+      appStrokeId(xsheet, frame, layer, stroke));
+}
 void PathAnimations::appSnapshot(const TApplication *app, TStroke *stroke) {
   shared_ptr<PathAnimation> animation = appStroke(app, stroke);
   animation->takeSnapshot(app->getCurrentFrame()->getFrame());

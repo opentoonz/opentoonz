@@ -73,6 +73,7 @@
 #include "toonz/palettecmd.h"
 #include "toonz/preferences.h"
 #include "tw/stringtable.h"
+#include "toonz/toonzfolders.h"
 
 // TnzBase includes
 #include "trasterfx.h"
@@ -1381,6 +1382,26 @@ FxSettingsPanel::FxSettingsPanel(QWidget *parent) : TPanel(parent) {
   m_fxSettings->setCurrentFx();
 
   setWidget(m_fxSettings);
+}
+
+// FxSettings will adjust its size according to the current fx
+// so we only restore position of the panel.
+void FxSettingsPanel::restoreFloatingPanelState() {
+  TFilePath savePath = ToonzFolder::getMyModuleDir() + TFilePath("popups.ini");
+  QSettings settings(QString::fromStdWString(savePath.getWideString()),
+                     QSettings::IniFormat);
+  settings.beginGroup("Panels");
+
+  if (!settings.childGroups().contains("FxSettings")) return;
+
+  settings.beginGroup("FxSettings");
+
+  QRect geom = settings.value("geometry", saveGeometry()).toRect();
+  // check if it can be visible in the current screen
+  if (!(geom & QApplication::desktop()->availableGeometry(this)).isEmpty())
+    move(geom.topLeft());
+
+  // FxSettings has no optional settings (SaveLoadQSettings) to load
 }
 
 //=============================================================================

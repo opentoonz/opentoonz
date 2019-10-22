@@ -112,6 +112,7 @@ public:
   void onNewVectorLevelButtonPressed();
   void onNewToonzRasterLevelButtonPressed();
   void onNewRasterLevelButtonPressed();
+  void clearCacheFolder();
 
   QString getLayoutName() { return m_layoutName; }
 

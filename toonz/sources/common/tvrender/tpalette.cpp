@@ -54,6 +54,58 @@ const TColorStyle::PickedPosition stringToPoint(const std::string &string) {
   return {TPoint(x, y), frame};
 }
 
+// convert refLevelFids to string for saving
+std::string fidsToString(const std::vector<TFrameId> &fids) {
+  std::string str;
+  QList<int> numList;
+
+  for (const auto fid : fids) {
+    int num = fid.getNumber();
+    if (numList.isEmpty() || num == numList.last() + 1) {
+      numList.push_back(num);
+      continue;
+    }
+    // print
+    if (numList.count() == 1)
+      str += std::to_string(numList[0]) + ",";
+    else if (numList.count() == 2)
+      str +=
+          std::to_string(numList[0]) + "," + std::to_string(numList[1]) + ",";
+    else
+      str += std::to_string(numList[0]) + "-" + std::to_string(numList.last()) +
+             ",";
+
+    numList.clear();
+    numList.push_back(num);
+  }
+  if (numList.count() == 1)
+    str += std::to_string(numList[0]);
+  else if (numList.count() == 2)
+    str += std::to_string(numList[0]) + "," + std::to_string(numList[1]);
+  else
+    str += std::to_string(numList[0]) + "-" + std::to_string(numList.last());
+  return str;
+}
+
+// convert loaded string to refLevelFids
+std::vector<TFrameId> strToFids(std::string fidsStr) {
+  std::vector<TFrameId> ret;
+  QString str        = QString::fromStdString(fidsStr);
+  QStringList chunks = str.split(',', QString::SkipEmptyParts);
+  for (const auto &chunk : chunks) {
+    QStringList nums = chunk.split('-', QString::SkipEmptyParts);
+    assert(nums.count() > 0 && nums.count() <= 2);
+    if (nums.count() == 1)
+      ret.push_back(TFrameId(nums[0].toInt()));
+    else {  // nums.count() == 2
+      assert(nums[0].toInt() < nums[1].toInt());
+      for (int i = nums[0].toInt(); i <= nums[1].toInt(); i++)
+        ret.push_back(TFrameId(i));
+    }
+  }
+  return ret;
+}
+
 }  // namespace
 
 //===================================================================
@@ -258,7 +310,7 @@ int TPalette::getFirstUnpagedStyle() const {
 //-------------------------------------------------------------------
 /*! Adding style with new styleId. Even if there are deleted styles in the
  * palette, the new style will be appended to the end of the list.
-*/
+ */
 int TPalette::addStyle(TColorStyle *style) {
   // limit the number of cleanup style to 7
   if (isCleanupPalette() && getStyleInPagesCount() >= 8) return -1;
@@ -582,9 +634,16 @@ void TPalette::saveData(TOStream &os) {
   os.child("version") << 71 << 0;  // Inserting the version tag at this level.
   // This is necessary to support the tpl format
   if (m_refImgPath !=
-      TFilePath())  // since it performs *untagged* stream output
-    os.child("refImgPath")
-        << m_refImgPath;  // (the palette is streamed directly).
+      TFilePath()) {  // since it performs *untagged* stream output
+    if (m_areRefLevelFidsSpecified) {
+      std::map<std::string, std::string> attr;
+      attr["fids"] = fidsToString(m_refLevelFids);
+      os.openChild("refImgPath", attr);
+    } else
+      os.openChild("refImgPath");
+    os << m_refImgPath;  // (the palette is streamed directly).
+    os.closeChild();
+  }
 
   os.openChild("styles");
   {
@@ -650,9 +709,9 @@ void TPalette::saveData(TOStream &os) {
             attributes.clear();
             attributes["frame"] = std::to_string(frame);
 
-            /*os.openChild("keycolor", attributes);                       // Up to Toonz 7.0, animations saved
-              os << cs->getMainColor();                                   // the main color only
-            os.closeChild();*/  //
+            /*os.openChild("keycolor", attributes);                       // Up
+            to Toonz 7.0, animations saved os << cs->getMainColor(); // the main
+            color only os.closeChild();*/  //
 
             os.openChild("keyframe", attributes);
             {
@@ -749,9 +808,17 @@ void TPalette::loadData(TIStream &is) {
         }
         is.closeChild();
       }
-    } else if (tagName == "refImgPath")
+    } else if (tagName == "refImgPath") {
+      std::string fidsStr;
+      if (is.getTagParam("fids", fidsStr)) {
+        m_areRefLevelFidsSpecified = true;
+        m_refLevelFids             = strToFids(fidsStr);
+      } else {
+        m_areRefLevelFidsSpecified = false;
+        m_refLevelFids.clear();
+      }
       is >> m_refImgPath;
-    else if (tagName == "animation") {
+    } else if (tagName == "animation") {
       while (!is.eos()) {
         if (!is.openChild(tagName) || tagName != "style")
           throw TException("palette, expected tag <style>");
@@ -827,7 +894,7 @@ void TPalette::loadData(TIStream &is) {
 
 /*! if the palette is copied from studio palette, this function will modify the
  * original names.
-*/
+ */
 void TPalette::assign(const TPalette *src, bool isFromStudioPalette) {
   if (src == this) return;
   int i;
@@ -898,7 +965,7 @@ void TPalette::assign(const TPalette *src, bool isFromStudioPalette) {
 //-------------------------------------------------------------------
 /*!if the palette is merged from studio palette, this function will modify the
  * original names.
-*/
+ */
 void TPalette::merge(const TPalette *src, bool isFromStudioPalette) {
   std::map<int, int> table;
   int i;
@@ -958,8 +1025,10 @@ void TPalette::setRefImg(const TImageP &img) {
 
 //-------------------------------------------------------------------
 
-void TPalette::setRefLevelFids(const std::vector<TFrameId> fids) {
-  m_refLevelFids = fids;
+void TPalette::setRefLevelFids(const std::vector<TFrameId> fids,
+                               bool specified) {
+  m_refLevelFids             = fids;
+  m_areRefLevelFidsSpecified = specified;
 }
 
 //-------------------------------------------------------------------

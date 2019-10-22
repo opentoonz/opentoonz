@@ -22,6 +22,7 @@
 #include "toonzqt/intfield.h"
 
 // TnzLib includes
+#include "toonz/txshcolumn.h"
 #include "toonz/tscenehandle.h"
 #include "toonz/txsheethandle.h"
 #include "toonz/txshlevelhandle.h"
@@ -48,6 +49,8 @@
 #include "toonz/txshlevelcolumn.h"
 #include "toonz/txshmeshcolumn.h"
 #include "toonz/tfxhandle.h"
+#include "toonz/tcamera.h"
+#include "toonz/tcolumnhandle.h"
 
 // TnzCore includes
 #include "tconvert.h"
@@ -63,6 +66,7 @@
 #include <QTimer>
 #include <QLabel>
 #include <QComboBox>
+#include <QPushButton>
 
 #include <QBitmap>
 
@@ -119,7 +123,7 @@ const QIcon getColorChipIcon(TPixel32 color) {
 }
 
 bool isCtrlPressed = false;
-}
+}  // namespace
 
 //-----------------------------------------------------------------------------
 
@@ -485,9 +489,12 @@ void RenameColumnField::show(const QRect &rect, int col) {
   setFont(font);
   m_col = col;
 
-  TXsheet *xsh = m_xsheetHandle->getXsheet();
+  TXsheet *xsh    = m_xsheetHandle->getXsheet();
+  int cameraIndex = xsh->getCameraColumnIndex();
   std::string name =
-      xsh->getStageObject(TStageObjectId::ColumnId(col))->getName();
+      col >= 0 ? xsh->getStageObject(TStageObjectId::ColumnId(col))->getName()
+               : xsh->getStageObject(TStageObjectId::CameraId(cameraIndex))
+                     ->getName();
   TXshColumn *column          = xsh->getColumn(col);
   TXshZeraryFxColumn *zColumn = dynamic_cast<TXshZeraryFxColumn *>(column);
   if (zColumn)
@@ -504,7 +511,9 @@ void RenameColumnField::show(const QRect &rect, int col) {
 
 void RenameColumnField::renameColumn() {
   std::string newName     = text().toStdString();
-  TStageObjectId columnId = TStageObjectId::ColumnId(m_col);
+  int cameraIndex         = m_xsheetHandle->getXsheet()->getCameraColumnIndex();
+  TStageObjectId columnId = m_col >= 0 ? TStageObjectId::ColumnId(m_col)
+                                       : TStageObjectId::CameraId(cameraIndex);
   TXshColumn *column =
       m_xsheetHandle->getXsheet()->getColumn(columnId.getIndex());
   TXshZeraryFxColumn *zColumn = dynamic_cast<TXshZeraryFxColumn *>(column);
@@ -550,19 +559,20 @@ ColumnArea::DrawHeader::DrawHeader(ColumnArea *nArea, QPainter &nP, int nCol)
   o        = m_viewer->orientation();
   app      = TApp::instance();
   xsh      = m_viewer->getXsheet();
-  column   = col >= 0 ? xsh->getColumn(col) : 0;
-  isEmpty  = col >= 0 && xsh->isColumnEmpty(col);
+  column   = xsh->getColumn(col);
+  isEmpty  = col >= 0 ? xsh->isColumnEmpty(col) : false;
 
   TStageObjectId currentColumnId = app->getCurrentObject()->getObjectId();
 
   // check if the column is current
   isCurrent = false;
-  if (currentColumnId == TStageObjectId::CameraId(0))  // CAMERA
+  if (currentColumnId ==
+      TStageObjectId::CameraId(xsh->getCameraColumnIndex()))  // CAMERA
     isCurrent = col == -1;
   else
     isCurrent = m_viewer->getCurrentColumn() == col;
 
-  orig = m_viewer->positionToXY(CellPosition(0, max(col, 0)));
+  orig = m_viewer->positionToXY(CellPosition(0, max(col, -1)));
 }
 
 void ColumnArea::DrawHeader::prepare() const {
@@ -604,6 +614,17 @@ const QPixmap &ColumnArea::Pixmaps::activatorInactive() {
 
 void ColumnArea::DrawHeader::levelColors(QColor &columnColor,
                                          QColor &dragColor) const {
+  if (col < 0) {
+    TStageObjectId cameraId =
+        m_viewer->getXsheet()->getStageObjectTree()->getCurrentCameraId();
+    bool isActive =
+        cameraId.getIndex() == m_viewer->getXsheet()->getCameraColumnIndex();
+    columnColor = isActive ? m_viewer->getActiveCameraColor()
+                           : m_viewer->getOtherCameraColor();
+    dragColor = isActive ? m_viewer->getActiveCameraColor()
+                         : m_viewer->getOtherCameraColor();
+    return;
+  }
   enum { Normal, Reference, Control } usage = Reference;
   if (column) {
     if (column->isControl()) usage                             = Control;
@@ -642,7 +663,9 @@ void ColumnArea::DrawHeader::drawBaseFill(const QColor &columnColor,
   // check if the column is reference
   bool isEditingSpline = app->getCurrentObject()->isSpline();
 
-  QRect rect = o->rect(PredefinedRect::LAYER_HEADER).translated(orig);
+  QRect rect = o->rect((col < 0) ? PredefinedRect::CAMERA_LAYER_HEADER
+                                 : PredefinedRect::LAYER_HEADER)
+                   .translated(orig);
   if (!o->isVerticalTimeline()) {
     bool showSubLayers =
         !m_viewer->screenMapper()->subLayers()->layer(column)->isFolded();
@@ -661,8 +684,10 @@ void ColumnArea::DrawHeader::drawBaseFill(const QColor &columnColor,
   int y1 = rect.bottom();
 
   // fill base color
-  if (isEmpty || col < 0)
+  if (isEmpty)
     p.fillRect(rect, m_viewer->getEmptyColumnHeadColor());
+  else if (col < 0)
+    p.fillRect(rect, columnColor);
   else {
     p.fillRect(rect, columnColor);
 
@@ -684,7 +709,7 @@ void ColumnArea::DrawHeader::drawBaseFill(const QColor &columnColor,
   p.setPen(m_viewer->getVerticalLineColor());
   QLine vertical =
       o->verticalLine(m_viewer->columnToLayerAxis(col), o->frameSide(rect));
-  if (isEmpty || col < 0 || o->isVerticalTimeline()) p.drawLine(vertical);
+  if (isEmpty || o->isVerticalTimeline()) p.drawLine(vertical);
 
   // highlight selection
   bool isSelected =
@@ -696,12 +721,13 @@ void ColumnArea::DrawHeader::drawBaseFill(const QColor &columnColor,
 
   QColor colorSelection(m_viewer->getSelectedColumnHead());
   colorSelection.setAlpha(170);
-  p.fillRect(rect,
-             (isSelected || isCameraSelected) ? colorSelection : pastelizer);
+  p.fillRect(rect, isSelected ? colorSelection : pastelizer);
 }
 
 void ColumnArea::DrawHeader::drawEye() const {
-  if (col < 0 || isEmpty || !o->flag(PredefinedFlag::EYE_AREA_VISIBLE)) return;
+  if (isEmpty || !o->flag(PredefinedFlag::EYE_AREA_VISIBLE)) return;
+  if (col < 0 && o->isVerticalTimeline())
+    return;  // no preview eye in the camera column
   QColor bgColor;
   QImage icon;
   int buttonType = !column->isPreviewVisible() ? PREVIEW_OFF_XSHBUTTON
@@ -713,7 +739,7 @@ void ColumnArea::DrawHeader::drawEye() const {
   // preview visible toggle
   p.setPen(m_viewer->getVerticalLineColor());
 
-  if (column->getSoundTextColumn()) {
+  if (col < 0 || column->getSoundTextColumn()) {
     if (o->flag(PredefinedFlag::EYE_AREA_BORDER)) p.drawRect(prevViewRect);
     return;
   }
@@ -731,9 +757,9 @@ void ColumnArea::DrawHeader::drawEye() const {
 }
 
 void ColumnArea::DrawHeader::drawPreviewToggle(int opacity) const {
-  if (col < 0 || isEmpty ||
-      !o->flag(PredefinedFlag::PREVIEW_LAYER_AREA_VISIBLE))
-    return;
+  if (isEmpty || !o->flag(PredefinedFlag::PREVIEW_LAYER_AREA_VISIBLE)) return;
+  if (col < 0 && o->isVerticalTimeline())
+    return;  // no camstand toggle in the camera column
   // camstand visible toggle
   QColor bgColor;
   QImage icon;
@@ -750,7 +776,7 @@ void ColumnArea::DrawHeader::drawPreviewToggle(int opacity) const {
 
   p.setPen(m_viewer->getVerticalLineColor());
 
-  if (column->getPaletteColumn() || column->getSoundTextColumn()) {
+  if (col < 0 || column->getPaletteColumn() || column->getSoundTextColumn()) {
     if (o->flag(PredefinedFlag::PREVIEW_LAYER_AREA_BORDER))
       p.drawRect(tableViewRect);
     return;
@@ -769,14 +795,18 @@ void ColumnArea::DrawHeader::drawPreviewToggle(int opacity) const {
 }
 
 void ColumnArea::DrawHeader::drawLock() const {
-  if (col < 0 || isEmpty || !o->flag(PredefinedFlag::LOCK_AREA_VISIBLE)) return;
+  if (isEmpty || !o->flag(PredefinedFlag::LOCK_AREA_VISIBLE)) return;
   QColor bgColor;
   QImage icon;
   int buttonType = !column->isLocked() ? LOCK_OFF_XSHBUTTON : LOCK_ON_XSHBUTTON;
   m_viewer->getButton(buttonType, bgColor, icon, !o->isVerticalTimeline());
 
-  QRect lockModeRect    = o->rect(PredefinedRect::LOCK_AREA).translated(orig);
-  QRect lockModeImgRect = o->rect(PredefinedRect::LOCK).translated(orig);
+  QRect lockModeRect = o->rect((col < 0) ? PredefinedRect::CAMERA_LOCK_AREA
+                                         : PredefinedRect::LOCK_AREA)
+                           .translated(orig);
+  QRect lockModeImgRect =
+      o->rect((col < 0) ? PredefinedRect::CAMERA_LOCK : PredefinedRect::LOCK)
+          .translated(orig);
 
   if (o->isVerticalTimeline() &&
       m_viewer->getXsheetLayout() == QString("Classic") &&
@@ -785,6 +815,7 @@ void ColumnArea::DrawHeader::drawLock() const {
 
   // lock button
   p.setPen(m_viewer->getVerticalLineColor());
+
   p.fillRect(lockModeRect, bgColor);
   if (o->flag(PredefinedFlag::LOCK_AREA_BORDER)) p.drawRect(lockModeRect);
 
@@ -797,20 +828,27 @@ void ColumnArea::DrawHeader::drawLock() const {
 }
 
 void ColumnArea::DrawHeader::drawConfig() const {
-  if (col < 0 || isEmpty || !o->flag(PredefinedFlag::CONFIG_AREA_VISIBLE))
+  if (isEmpty || (col >= 0 && !o->flag(PredefinedFlag::CONFIG_AREA_VISIBLE)) ||
+      (col < 0 && !o->flag(PredefinedFlag::CAMERA_CONFIG_AREA_VISIBLE)))
     return;
   QColor bgColor;
   QImage icon;
   int buttonType = CONFIG_XSHBUTTON;
   m_viewer->getButton(buttonType, bgColor, icon, !o->isVerticalTimeline());
 
-  QRect configRect    = o->rect(PredefinedRect::CONFIG_AREA).translated(orig);
-  QRect configImgRect = o->rect(PredefinedRect::CONFIG).translated(orig);
+  QRect configRect = o->rect((col < 0) ? PredefinedRect::CAMERA_CONFIG_AREA
+                                       : PredefinedRect::CONFIG_AREA)
+                         .translated(orig);
+  QRect configImgRect = o->rect((col < 0) ? PredefinedRect::CAMERA_CONFIG
+                                          : PredefinedRect::CONFIG)
+                            .translated(orig);
 
   // config button
   p.setPen(m_viewer->getVerticalLineColor());
   p.fillRect(configRect, bgColor);
-  if (o->flag(PredefinedFlag::CONFIG_AREA_BORDER)) p.drawRect(configRect);
+  if (o->flag((col < 0) ? PredefinedFlag::CAMERA_CONFIG_AREA_BORDER
+                        : PredefinedFlag::CONFIG_AREA_BORDER))
+    p.drawRect(configRect);
 
   TXshZeraryFxColumn *zColumn = dynamic_cast<TXshZeraryFxColumn *>(column);
 
@@ -892,14 +930,16 @@ void ColumnArea::DrawHeader::drawColumnName() const {
 
   // Build column name
   std::string name(columnObject->getName());
-  if (col < 0) name = std::string("Camera");
+  //  if (col < 0) name = std::string("Camera");
 
   // ZeraryFx columns store name elsewhere
   TXshZeraryFxColumn *zColumn = dynamic_cast<TXshZeraryFxColumn *>(column);
   if (zColumn)
     name = ::to_string(zColumn->getZeraryColumnFx()->getZeraryFx()->getName());
 
-  QRect columnName = o->rect(PredefinedRect::LAYER_NAME).translated(orig);
+  QRect columnName = o->rect((col < 0) ? PredefinedRect::CAMERA_LAYER_NAME
+                                       : PredefinedRect::LAYER_NAME)
+                         .translated(orig);
 
   bool nameBacklit = false;
   int rightadj     = -2;
@@ -911,7 +951,7 @@ void ColumnArea::DrawHeader::drawColumnName() const {
         m_viewer->getXsheetLayout() !=
             QString("Classic"))  // Legacy - No background
     {
-      if (columnName.contains(area->m_pos)) {
+      if (columnName.contains(area->m_pos) && col >= 0) {
         p.fillRect(columnName,
                    m_viewer->getXsheetDragBarHighlightColor());  // Qt::yellow);
         nameBacklit = true;
@@ -927,7 +967,7 @@ void ColumnArea::DrawHeader::drawColumnName() const {
       rightadj = -20;
 
       if (column->isPreviewVisible() && !column->getSoundTextColumn() &&
-          !column->getPaletteColumn())
+          !column->getPaletteColumn() && col >= 0)
         nameBacklit = true;
     } else if (Preferences::instance()->isShowColumnNumbersEnabled()) {
       if (o->isVerticalTimeline())
@@ -947,16 +987,30 @@ void ColumnArea::DrawHeader::drawColumnName() const {
     p.setPen((isCurrent) ? m_viewer->getSelectedColumnTextColor()
                          : m_viewer->getTextColor());
 
+  if (o->isVerticalTimeline() && col < 0) {
+    QString cameraName = QString::fromStdString(name);
+    p.save();
+    p.translate(columnName.topRight());
+    p.rotate(90);
+    p.drawText(columnName.translated(-columnName.topLeft())
+                   .transposed()
+                   .adjusted(5, 0, 0, 0),
+               Qt::AlignLeft | valign, cameraName);
+    p.restore();
+    return;
+  }
+
   p.drawText(columnName.adjusted(leftadj, 0, rightadj, 0),
              Qt::AlignLeft | valign | Qt::TextSingleLine,
              QString(name.c_str()));
 }
 
 void ColumnArea::DrawHeader::drawThumbnail(QPixmap &iconPixmap) const {
-  if (col < 0 || isEmpty) return;
+  if (isEmpty) return;
 
-  QRect thumbnailRect =
-      o->rect(PredefinedRect::THUMBNAIL_AREA).translated(orig);
+  QRect thumbnailRect = o->rect((col < 0) ? PredefinedRect::CAMERA_ICON_AREA
+                                          : PredefinedRect::THUMBNAIL_AREA)
+                            .translated(orig);
   p.setPen(m_viewer->getVerticalLineColor());
   if (o->flag(PredefinedFlag::THUMBNAIL_AREA_BORDER)) p.drawRect(thumbnailRect);
 
@@ -973,10 +1027,12 @@ void ColumnArea::DrawHeader::drawThumbnail(QPixmap &iconPixmap) const {
     return;
   }
 
-  if (!o->flag(PredefinedFlag::THUMBNAIL_AREA_VISIBLE)) return;
-
-  QRect thumbnailImageRect =
-      o->rect(PredefinedRect::THUMBNAIL).translated(orig);
+  if (!o->flag((col < 0) ? PredefinedFlag::CAMERA_ICON_VISIBLE
+                         : PredefinedFlag::THUMBNAIL_AREA_VISIBLE))
+    return;
+  QRect thumbnailImageRect = o->rect((col < 0) ? PredefinedRect::CAMERA_ICON
+                                               : PredefinedRect::THUMBNAIL)
+                                 .translated(orig);
 
   // pallete thumbnail
   if (column->getPaletteColumn()) {
@@ -1012,7 +1068,8 @@ void ColumnArea::DrawHeader::drawThumbnail(QPixmap &iconPixmap) const {
     if (Preferences::instance()->getColumnIconLoadingPolicy() ==
             Preferences::LoadOnDemand &&
         ((levelColumn && !levelColumn->isIconVisible()) ||
-         (meshColumn && !meshColumn->isIconVisible()))) {
+         (meshColumn && !meshColumn->isIconVisible())) &&
+        col >= 0) {
       // display nothing
     } else {
       if (!iconPixmap.isNull()) {
@@ -1028,8 +1085,9 @@ void ColumnArea::DrawHeader::drawThumbnail(QPixmap &iconPixmap) const {
 }
 
 void ColumnArea::DrawHeader::drawPegbarName() const {
-  if (col < 0 || isEmpty || !o->flag(PredefinedFlag::PEGBAR_NAME_VISIBLE))
-    return;
+  if (isEmpty || !o->flag(PredefinedFlag::PEGBAR_NAME_VISIBLE)) return;
+  // the camera column may have parent pegbar, but it is not displayed for now
+  if (col < 0) return;
 
   TStageObjectId columnId = m_viewer->getObjectId(col);
   TStageObjectId parentId = xsh->getStageObjectParent(columnId);
@@ -1289,7 +1347,8 @@ ColumnArea::ColumnArea(XsheetViewer *parent, Qt::WFlags flags)
 
   connect(actionGroup, SIGNAL(triggered(QAction *)), this,
           SLOT(onSubSampling(QAction *)));
-
+  connect(xsheetHandle, SIGNAL(xsheetCameraChange(int)), this,
+          SLOT(onXsheetCameraChange(int)));
   setMouseTracking(true);
 }
 
@@ -1436,7 +1495,8 @@ void ColumnArea::drawLevelColumnHead(QPainter &p, int col) {
 
   // check if the column is current
   bool isCurrent = false;
-  if (currentColumnId == TStageObjectId::CameraId(0))  // CAMERA
+  if (currentColumnId ==
+      TStageObjectId::CameraId(xsh->getCameraColumnIndex()))  // CAMERA
     isCurrent = col == -1;
   else
     isCurrent = m_viewer->getCurrentColumn() == col;
@@ -1528,7 +1588,7 @@ void ColumnArea::drawPaletteColumnHead(QPainter &p, int col) {  // AREA
   TColumnSelection *selection = m_viewer->getColumnSelection();
   const Orientation *o        = m_viewer->orientation();
 
-  QPoint orig = m_viewer->positionToXY(CellPosition(0, max(col, 0)));
+  QPoint orig = m_viewer->positionToXY(CellPosition(0, max(col, -1)));
 
   QString fontName = Preferences::instance()->getInterfaceFont();
   if (fontName == "") {
@@ -1637,9 +1697,13 @@ QPixmap ColumnArea::getColumnIcon(int columnIndex) {
   const Orientation *o = m_viewer->orientation();
 
   if (columnIndex == -1) {  // Indice colonna = -1 -> CAMERA
-    TApp *app             = TApp::instance();
-    static QPixmap camera = QPixmap(":Resources/camera.png");
-    return camera;
+    if (o->isVerticalTimeline()) {
+      static QPixmap camera = svgToPixmap(":Resources/camera_small.svg");
+      return camera;
+    } else {
+      static QPixmap camera = svgToPixmap(":Resources/camera.svg");
+      return camera;
+    }
   }
   TXsheet *xsh = m_viewer->getXsheet();
   if (!xsh) return QPixmap();
@@ -1697,7 +1761,7 @@ void ColumnArea::paintEvent(QPaintEvent *event) {  // AREA
     // draw column fan (collapsed columns)
     if (!columnFan->isActive(col)) {
       drawFoldedColumnHead(p, col);
-    } else if (col >= 0) {
+    } else {
       TXshColumn *column = m_viewer->getXsheet()->getColumn(col);
 
       int colType = (column && !column->isEmpty()) ? column->getColumnType()
@@ -1714,7 +1778,7 @@ void ColumnArea::paintEvent(QPaintEvent *event) {  // AREA
         drawSoundTextColumnHead(p, col);
         break;
       default:
-        drawLevelColumnHead(p, col);
+        drawLevelColumnHead(p, col);  // camera column is also painted here
         break;
       }
     }
@@ -2009,6 +2073,46 @@ void ColumnArea::openSoundColumnPopup() {
   m_soundColumnPopup->show();
 }
 
+void ColumnArea::openCameraColumnPopup(QPoint pos) {
+  QMenu menu(this);
+
+  TXsheet *xsh           = TApp::instance()->getCurrentXsheet()->getXsheet();
+  TStageObjectTree *tree = xsh->getStageObjectTree();
+  int i, objCount = tree->getStageObjectCount();
+  for (i = 0; i < objCount; i++) {
+    TStageObject *obj = tree->getStageObject(i);
+    if (!obj || !obj->getId().isCamera()) continue;
+    TStageObjectId objId = obj->getId();
+    std::string objName  = obj->getName();
+    QAction *action      = new QAction(QString::fromStdString(objName), this);
+    action->setData(objId.getIndex());
+    connect(action, SIGNAL(triggered()), this,
+            SLOT(onCameraColumnChangedTriggered()));
+    menu.addAction(action);
+  }
+
+  menu.exec(pos);
+}
+
+void ColumnArea::onCameraColumnChangedTriggered() {
+  int newIndex = qobject_cast<QAction *>(sender())->data().toInt();
+  onXsheetCameraChange(newIndex);
+}
+
+//----------------------------------------------------------------
+
+void ColumnArea::onXsheetCameraChange(int newIndex) {
+  int oldIndex = m_viewer->getXsheet()->getCameraColumnIndex();
+  if (newIndex == oldIndex) return;
+
+  TXsheetHandle *xsheetHandle = TApp::instance()->getCurrentXsheet();
+
+  CameraColumnSwitchUndo *undo =
+      new CameraColumnSwitchUndo(oldIndex, newIndex, xsheetHandle);
+  undo->redo();
+  TUndoManager::manager()->add(undo);
+}
+
 //----------------------------------------------------------------
 
 void ColumnArea::startTransparencyPopupTimer(QMouseEvent *e) {  // AREA
@@ -2052,17 +2156,11 @@ void ColumnArea::mousePressEvent(QMouseEvent *event) {
   TXsheet *xsh   = m_viewer->getXsheet();
   ColumnFan *fan = m_viewer->screenMapper()->columnFan();
   m_col          = m_viewer->xyToPosition(event->pos()).layer();
-  // do nothing for the camera column
-  if (m_col < 0)  // CAMERA
-  {
-    TApp::instance()->getCurrentSelection()->getSelection()->makeNotCurrent();
-    m_viewer->getColumnSelection()->selectNone();
-  }
   // when clicking the column fan
-  else if (m_col >= 0 && !fan->isActive(m_col))  // column Fan
+  if (!fan->isActive(m_col))  // column Fan
   {
     fan = xsh->getColumnFan();
-    for (int i = m_col; i >= 0 && !fan->isActive(i); i--) fan->activate(i);
+    for (int i = m_col; !fan->isActive(i); i--) fan->activate(i);
 
     xsh->notifyColumnFanFoldedUnfolded();
     TApp::instance()->getCurrentScene()->setDirtyFlag(true);
@@ -2097,7 +2195,29 @@ void ColumnArea::mousePressEvent(QMouseEvent *event) {
     }
   }
 
-  if (!isEmpty && m_col >= 0) {
+  // clicking on the camera column
+  if (m_col < 0) {
+    // lock button
+    if (o->rect(PredefinedRect::CAMERA_LOCK_AREA).contains(mouseInCell) &&
+        event->button() == Qt::LeftButton)
+      m_doOnRelease = isCtrlPressed ? ToggleAllLock : ToggleLock;
+    // config button
+    else if (o->rect(PredefinedRect::CAMERA_CONFIG_AREA)
+                 .contains(mouseInCell) &&
+             event->button() == Qt::LeftButton)
+      m_doOnRelease = OpenSettings;
+    // clicking another area means column selection
+    else {
+      if (m_viewer->getColumnSelection()->isColumnSelected(m_col) &&
+          event->button() == Qt::RightButton)
+        return;
+      setDragTool(XsheetGUI::DragTool::makeColumnSelectionTool(m_viewer));
+    }
+    // synchronize the current column and the current fx
+    if (column) TApp::instance()->getCurrentFx()->setFx(column->getFx());
+  }
+  // clicking on the normal columns
+  else if (!isEmpty) {
     int leftadj = 0;
     if (!o->isVerticalTimeline() &&
         Preferences::instance()->isShowColumnNumbersEnabled())
@@ -2148,8 +2268,8 @@ void ColumnArea::mousePressEvent(QMouseEvent *event) {
              event->button() == Qt::LeftButton) {
       TXshZeraryFxColumn *zColumn = dynamic_cast<TXshZeraryFxColumn *>(column);
 
-      if (zColumn || column->getPaletteColumn() ||
-          column->getSoundTextColumn()) {
+      if (column && (zColumn || column->getPaletteColumn() ||
+                     column->getSoundTextColumn())) {
         // do nothing
       } else
         m_doOnRelease = OpenSettings;
@@ -2185,7 +2305,7 @@ void ColumnArea::mousePressEvent(QMouseEvent *event) {
         }
         update();
       } else if (!o->flag(PredefinedFlag::CONFIG_AREA_VISIBLE) &&
-		         o->rect(PredefinedRect::VOLUME_AREA).contains(mouseInCell))
+                 o->rect(PredefinedRect::VOLUME_AREA).contains(mouseInCell))
         setDragTool(XsheetGUI::DragTool::makeVolumeDragTool(m_viewer));
       else
         setDragTool(XsheetGUI::DragTool::makeColumnSelectionTool(m_viewer));
@@ -2198,21 +2318,23 @@ void ColumnArea::mousePressEvent(QMouseEvent *event) {
 
       setDragTool(XsheetGUI::DragTool::makeColumnSelectionTool(m_viewer));
 
-      // toggle columnIcon visibility with alt+click
-      TXshLevelColumn *levelColumn = column->getLevelColumn();
-      TXshMeshColumn *meshColumn   = column->getMeshColumn();
-      if (Preferences::instance()->getColumnIconLoadingPolicy() ==
-              Preferences::LoadOnDemand &&
-          (event->modifiers() & Qt::AltModifier)) {
-        if (levelColumn)
-          levelColumn->setIconVisible(!levelColumn->isIconVisible());
-        else if (meshColumn)
-          meshColumn->setIconVisible(!meshColumn->isIconVisible());
+      if (column) {
+        // toggle columnIcon visibility with alt+click
+        TXshLevelColumn *levelColumn = column->getLevelColumn();
+        TXshMeshColumn *meshColumn   = column->getMeshColumn();
+        if (Preferences::instance()->getColumnIconLoadingPolicy() ==
+                Preferences::LoadOnDemand &&
+            (event->modifiers() & Qt::AltModifier)) {
+          if (levelColumn)
+            levelColumn->setIconVisible(!levelColumn->isIconVisible());
+          else if (meshColumn)
+            meshColumn->setIconVisible(!meshColumn->isIconVisible());
+        }
       }
     }
     // synchronize the current column and the current fx
-    TApp::instance()->getCurrentFx()->setFx(column->getFx());
-  } else if (m_col >= 0) {
+    if (column) TApp::instance()->getCurrentFx()->setFx(column->getFx());
+  } else {
     if (m_viewer->getColumnSelection()->isColumnSelected(m_col) &&
         event->button() == Qt::RightButton)
       return;
@@ -2370,7 +2492,7 @@ void ColumnArea::mouseReleaseEvent(QMouseEvent *event) {
   TApp *app    = TApp::instance();
   TXsheet *xsh = m_viewer->getXsheet();
   int col, totcols = xsh->getColumnCount();
-  if (m_doOnRelease != 0 && m_col != -1) {
+  if (m_doOnRelease != 0) {
     TXshColumn *column = xsh->getColumn(m_col);
     if (m_doOnRelease == ToggleTransparency) {
       column->setCamstandVisible(!column->isCamstandVisible());
@@ -2381,11 +2503,12 @@ void ColumnArea::mouseReleaseEvent(QMouseEvent *event) {
     else if (m_doOnRelease == ToggleLock)
       column->lock(!column->isLocked());
     else if (m_doOnRelease == OpenSettings) {
-      // Align popup to be below to CONFIG button
-      QRect configRect =
-          m_viewer->orientation()->rect(PredefinedRect::CONFIG_AREA);
       QPoint pos = event->pos();
       int col    = m_viewer->xyToPosition(pos).layer();
+      // Align popup to be below to CONFIG button
+      QRect configRect = m_viewer->orientation()->rect(
+          (col < 0) ? PredefinedRect::CAMERA_CONFIG_AREA
+                    : PredefinedRect::CONFIG_AREA);
       CellPosition cellPosition(0, col);
       QPoint topLeft     = m_viewer->positionToXY(cellPosition);
       QPoint mouseInCell = pos - topLeft;
@@ -2395,7 +2518,10 @@ void ColumnArea::mouseReleaseEvent(QMouseEvent *event) {
           mouseInCell.y() -
           configRect.bottom();  // distance from bottum edge of CONFIG button
 
-      if (column->getSoundColumn()) {
+      if (col < 0) {
+        openCameraColumnPopup(
+            QPoint(event->globalPos().x() + x, event->globalPos().y() - y));
+      } else if (column->getSoundColumn()) {
         if (!m_soundColumnPopup)
           m_soundColumnPopup = new SoundColumnPopup(this);
 
@@ -2435,7 +2561,9 @@ void ColumnArea::mouseReleaseEvent(QMouseEvent *event) {
         app->getCurrentXsheet()->notifyXsheetSoundChanged();
       }
     } else if (m_doOnRelease == ToggleAllLock) {
-      for (col = 0; col < totcols; col++) {
+      int startCol =
+          Preferences::instance()->isXsheetCameraColumnVisible() ? -1 : 0;
+      for (col = startCol; col < totcols; col++) {
         TXshColumn *column = xsh->getColumn(col);
         if (!xsh->isColumnEmpty(col)) {
           column->lock(!column->isLocked());
@@ -2465,21 +2593,23 @@ void ColumnArea::mouseDoubleClickEvent(QMouseEvent *event) {
 
   QPoint pos = event->pos();
   int col    = m_viewer->xyToPosition(pos).layer();
+  CellPosition cellPosition(0, col);
+  QPoint topLeft     = m_viewer->positionToXY(cellPosition);
+  QPoint mouseInCell = pos - topLeft;
 
 #ifdef LINETEST
   // Camera column
   if (col == -1) return;
 #endif
 
+  QRect nameRect = o->rect((col < 0) ? PredefinedRect::CAMERA_LAYER_NAME
+                                     : PredefinedRect::LAYER_NAME);
+  if (!nameRect.contains(mouseInCell)) return;
+
   TXsheet *xsh = m_viewer->getXsheet();
   if (col >= 0 && xsh->isColumnEmpty(col)) return;
 
-  CellPosition cellPosition(0, col);
-  QPoint topLeft     = m_viewer->positionToXY(cellPosition);
-  QPoint mouseInCell = pos - topLeft;
-
-  QRect nameRect = o->rect(PredefinedRect::LAYER_NAME);
-  int leftadj    = 0;
+  int leftadj = 0;
   if (!o->isVerticalTimeline()) {
     if (Preferences::instance()->isShowColumnNumbersEnabled()) leftadj = 20;
     leftadj += o->rect(PredefinedRect::FOLD_UNFOLD_AREA).width();
@@ -2487,8 +2617,10 @@ void ColumnArea::mouseDoubleClickEvent(QMouseEvent *event) {
   nameRect.adjust(leftadj, 0, 0, 0);
   if (!nameRect.contains(mouseInCell)) return;
 
+  QPoint fieldPos =
+      (col < 0 && o->isVerticalTimeline()) ? nameRect.topLeft() : topLeft;
   QRect renameRect = o->rect(PredefinedRect::RENAME_COLUMN)
-                         .translated(topLeft)
+                         .translated(fieldPos)
                          .adjusted(leftadj, 0, 0, 0);
   m_renameColumnField->show(renameRect, col);
 }
@@ -2508,8 +2640,9 @@ void ColumnArea::contextMenuEvent(QContextMenuEvent *event) {
   const Orientation *o = m_viewer->orientation();
 
   int col = m_viewer->xyToPosition(event->pos()).layer();
-  if (col < 0)  // CAMERA
-    return;
+
+  bool isCamera = col < 0;
+
   m_viewer->setCurrentColumn(col);
   TXsheet *xsh       = m_viewer->getXsheet();
   QPoint topLeft     = m_viewer->positionToXY(CellPosition(0, col));
@@ -2519,7 +2652,7 @@ void ColumnArea::contextMenuEvent(QContextMenuEvent *event) {
   CommandManager *cmdManager = CommandManager::instance();
 
   //---- Preview
-  if (!xsh->isColumnEmpty(col) &&
+  if (((isCamera && !o->isVerticalTimeline()) || !xsh->isColumnEmpty(col)) &&
       o->rect(PredefinedRect::EYE_AREA).contains(mouseInCell)) {
     menu.setObjectName("xsheetColumnAreaMenu_Preview");
 
@@ -2531,8 +2664,10 @@ void ColumnArea::contextMenuEvent(QContextMenuEvent *event) {
     menu.addAction(cmdManager->getAction("MI_SwapEnabledColumns"));
   }
   //---- Lock
-  else if (!xsh->isColumnEmpty(col) &&
-           o->rect(PredefinedRect::LOCK_AREA).contains(mouseInCell)) {
+  else if ((isCamera || !xsh->isColumnEmpty(col)) &&
+           o->rect((isCamera) ? PredefinedRect::CAMERA_LOCK_AREA
+                              : PredefinedRect::LOCK_AREA)
+               .contains(mouseInCell)) {
     menu.setObjectName("xsheetColumnAreaMenu_Lock");
 
     menu.addAction(cmdManager->getAction("MI_LockThisColumnOnly"));
@@ -2543,7 +2678,8 @@ void ColumnArea::contextMenuEvent(QContextMenuEvent *event) {
     menu.addAction(cmdManager->getAction("MI_ToggleColumnLocks"));
   }
   //---- Camstand
-  else if (!xsh->isColumnEmpty(col) &&
+  else if (((isCamera && !o->isVerticalTimeline()) ||
+            !xsh->isColumnEmpty(col)) &&
            o->rect(PredefinedRect::PREVIEW_LAYER_AREA).contains(mouseInCell)) {
     menu.setObjectName("xsheetColumnAreaMenu_Camstand");
 
@@ -2558,42 +2694,60 @@ void ColumnArea::contextMenuEvent(QContextMenuEvent *event) {
   }
   // right clicking another area / right clicking empty column head
   else {
-    int r0, r1;
-    xsh->getCellRange(col, r0, r1);
-    TXshCell cell = xsh->getCell(r0, col);
-    menu.addAction(cmdManager->getAction(MI_Cut));
-    menu.addAction(cmdManager->getAction(MI_Copy));
-    menu.addAction(cmdManager->getAction(MI_Paste));
-    menu.addAction(cmdManager->getAction(MI_PasteAbove));
-    menu.addAction(cmdManager->getAction(MI_Clear));
-    menu.addAction(cmdManager->getAction(MI_Insert));
-    menu.addAction(cmdManager->getAction(MI_InsertAbove));
-    menu.addSeparator();
-    menu.addAction(cmdManager->getAction(MI_InsertFx));
-    menu.addAction(cmdManager->getAction(MI_NewNoteLevel));
-    menu.addAction(cmdManager->getAction(MI_RemoveEmptyColumns));
-    menu.addSeparator();
-    if (m_viewer->getXsheet()->isColumnEmpty(col) ||
-        (cell.m_level && cell.m_level->getChildLevel()))
-      menu.addAction(cmdManager->getAction(MI_OpenChild));
+    if (!isCamera) {
+      int r0, r1;
+      xsh->getCellRange(col, r0, r1);
+      TXshCell cell = xsh->getCell(r0, col);
+      menu.addAction(cmdManager->getAction(MI_Cut));
+      menu.addAction(cmdManager->getAction(MI_Copy));
+      menu.addAction(cmdManager->getAction(MI_Paste));
+      menu.addAction(cmdManager->getAction(MI_PasteAbove));
+      menu.addAction(cmdManager->getAction(MI_Clear));
+      menu.addAction(cmdManager->getAction(MI_Insert));
+      menu.addAction(cmdManager->getAction(MI_InsertAbove));
+      menu.addSeparator();
+      menu.addAction(cmdManager->getAction(MI_InsertFx));
+      menu.addAction(cmdManager->getAction(MI_NewNoteLevel));
+      menu.addAction(cmdManager->getAction(MI_RemoveEmptyColumns));
+      menu.addSeparator();
+      if (m_viewer->getXsheet()->isColumnEmpty(col) ||
+          (cell.m_level && cell.m_level->getChildLevel()))
+        menu.addAction(cmdManager->getAction(MI_OpenChild));
 
-    // Close sub xsheet and move to parent sheet
-    ToonzScene *scene      = TApp::instance()->getCurrentScene()->getScene();
-    ChildStack *childStack = scene->getChildStack();
-    if (childStack && childStack->getAncestorCount() > 0) {
-      menu.addAction(cmdManager->getAction(MI_CloseChild));
-    }
+      // Close sub xsheet and move to parent sheet
+      ToonzScene *scene      = TApp::instance()->getCurrentScene()->getScene();
+      ChildStack *childStack = scene->getChildStack();
+      if (childStack && childStack->getAncestorCount() > 0) {
+        menu.addAction(cmdManager->getAction(MI_CloseChild));
+      }
 
-    menu.addAction(cmdManager->getAction(MI_Collapse));
-    if (cell.m_level && cell.m_level->getChildLevel()) {
-      menu.addAction(cmdManager->getAction(MI_Resequence));
-      menu.addAction(cmdManager->getAction(MI_CloneChild));
-      menu.addAction(cmdManager->getAction(MI_ExplodeChild));
+      menu.addAction(cmdManager->getAction(MI_Collapse));
+      if (cell.m_level && cell.m_level->getChildLevel()) {
+        menu.addAction(cmdManager->getAction(MI_Resequence));
+        menu.addAction(cmdManager->getAction(MI_CloneChild));
+        menu.addAction(cmdManager->getAction(MI_ExplodeChild));
+      }
+      menu.addSeparator();
     }
-    menu.addSeparator();
     menu.addAction(cmdManager->getAction(MI_FoldColumns));
+    if (Preferences::instance()->isShowKeyframesOnXsheetCellAreaEnabled()) {
+      QAction *cameraToggle =
+          cmdManager->getAction(MI_ToggleXsheetCameraColumn);
+      bool cameraVisible =
+          Preferences::instance()->isXsheetCameraColumnVisible();
+      if (cameraVisible)
+        cameraToggle->setText(tr("Hide Camera Column"));
+      else
+        cameraToggle->setText(tr("Show Camera Column"));
+      menu.addAction(cameraToggle);
+    }
     menu.addSeparator();
     menu.addAction(cmdManager->getAction(MI_ToggleXSheetToolbar));
+
+    if (isCamera) {
+      menu.exec(event->globalPos());
+      return;
+    }
 
     // force the selected cells placed in n-steps
     if (!xsh->isColumnEmpty(col)) {
@@ -2675,6 +2829,7 @@ void ColumnArea::onSubSampling(QAction *action) {
   const set<int> indexes = selection->getIndices();
   set<int>::const_iterator it;
   for (it = indexes.begin(); it != indexes.end(); it++) {
+    if (*it < 0) continue;  // Ignore camera column
     TXshColumn *column          = xsh->getColumn(*it);
     TXshColumn::ColumnType type = column->getColumnType();
     if (type != TXshColumn::eLevelType) continue;

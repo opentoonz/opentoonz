@@ -34,8 +34,8 @@ public:
     return CellPosition(_frame * mult._frame, _layer * mult._layer);
   }
   void ensureValid() {
-    if (_frame < 0) _frame = 0;
-    if (_layer < 0) _layer = 0;
+    if (_frame < 0) _frame  = 0;
+    if (_layer < -1) _layer = -1;
   }
 };
 

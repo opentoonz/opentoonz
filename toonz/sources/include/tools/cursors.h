@@ -32,6 +32,7 @@ enum {
   MagnetCursor,
   PanCursor,
   PickerCursor,
+  PointingHandCursor,
   PumpCursor,
   RotCursor,
   RotTopLeft,

@@ -1214,10 +1214,35 @@ void TXshSimpleLevel::load() {
           if (img && getPalette()) {
             img->setPalette(0);
             getPalette()->setRefImg(img);
-            std::vector<TFrameId> fids;
-            for (TLevel::Iterator it = level->begin(); it != level->end(); ++it)
-              fids.push_back(it->first);
-            getPalette()->setRefLevelFids(fids);
+            std::vector<TFrameId> fids = getPalette()->getRefLevelFids();
+            // in case the fids are specified by user
+            if (fids.size() > 0) {
+              // check existence of each fid
+              auto itr = fids.begin();
+              while (itr != fids.end()) {
+                bool found = false;
+                for (TLevel::Iterator it = level->begin(); it != level->end();
+                     ++it) {
+                  if (itr->getNumber() == it->first.getNumber()) {
+                    found = true;
+                    break;
+                  }
+                }
+                if (!found)  // remove the fid if it does not exist in the level
+                  itr = fids.erase(itr);
+                else
+                  itr++;
+              }
+            }
+            // in case the fids are not specified, or all specified fids are
+            // absent
+            if (fids.size() == 0) {
+              for (TLevel::Iterator it = level->begin(); it != level->end();
+                   ++it)
+                fids.push_back(it->first);
+              getPalette()->setRefLevelFids(fids, false);
+            } else if (fids.size() != getPalette()->getRefLevelFids().size())
+              getPalette()->setRefLevelFids(fids, true);
           }
         }
       }

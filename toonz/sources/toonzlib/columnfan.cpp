@@ -1,4 +1,5 @@
 #include "toonz/columnfan.h"
+#include "toonz/preferences.h"
 
 // TnzCore includes
 #include "tstream.h"
@@ -9,84 +10,38 @@
 using std::vector;
 
 //=============================================================================
-// ColumnFanFoldData
-
-void ColumnFanFoldData::activate(int col) {
-  int m                       = m_columns.size();
-  if (col < m) m_columns[col] = true;
-}
-void ColumnFanFoldData::deactivate(int col) {
-  while ((int)m_columns.size() <= col) m_columns.push_back(true);
-  m_columns[col] = false;
-}
-bool ColumnFanFoldData::isActive(int col) const {
-  return 0 <= col && col < (int)m_columns.size() ? m_columns[col] : true;
-}
-
-void ColumnFanFoldData::trim() {
-  int m = m_columns.size();
-  int i;
-  for (i = m - 1; i >= 0 && m_columns[i]; i--)
-    ;
-  i++;
-  if (i < m) m_columns.erase(m_columns.begin() + i, m_columns.end());
-}
-
-//-----------------------------------------------------------------------------
-
-void ColumnFanFoldData::saveData(TOStream &os) {
-  int index, n = (int)m_columns.size();
-  for (index = 0; index < n;) {
-    while (index < n && m_columns[index]) index++;
-    if (index < n) {
-      int firstIndex = index;
-      os << index;
-      index++;
-      while (index < n && !m_columns[index]) index++;
-      os << index - firstIndex;
-    }
-  }
-}
-
-//-----------------------------------------------------------------------------
-
-void ColumnFanFoldData::loadData(TIStream &is) {
-  m_columns.clear();
-  while (!is.eos()) {
-    int index = 0, count = 0;
-    is >> index >> count;
-    int j;
-    for (j = 0; j < count; j++) deactivate(index + j);
-  }
-}
-
-//=============================================================================
-// ColumnFanGeometry
+// ColumnFan
 
 namespace {
 const int FOLDED_SIZE = 9;
 }
 
-int ColumnFanGeometry::Column::width(int unfolded) const {
+int ColumnFan::Column::width(int unfolded) const {
   if (m_active)
     return unfolded + m_extra;
   else
     return FOLDED_SIZE;
 }
 
-ColumnFanGeometry::ColumnFanGeometry() : m_firstFreePos(0), m_unfolded(74) {}
+ColumnFan::ColumnFan()
+    : m_firstFreePos(0)
+    , m_unfolded(74)
+    , m_folded(9)
+    , m_cameraActive(true)
+    , m_cameraColumnDim(22) {}
 
 //-----------------------------------------------------------------------------
 
-void ColumnFanGeometry::setDimension(int unfolded) {
-  m_unfolded = unfolded;
+void ColumnFan::setDimensions(int unfolded, int cameraColumn) {
+  m_unfolded        = unfolded;
+  m_cameraColumnDim = cameraColumn;
   // folded always 9
   update();
 }
 
 //-----------------------------------------------------------------------------
 
-void ColumnFanGeometry::update() {
+void ColumnFan::update() {
   //???  int lastPos     = -m_unfolded;
   //???  bool lastActive = true;
   int from = 0, to;
@@ -124,7 +79,15 @@ void ColumnFanGeometry::update() {
 
 //-----------------------------------------------------------------------------
 
-int ColumnFanGeometry::layerAxisToCol(int coord) const {
+int ColumnFan::layerAxisToCol(int coord) const {
+  if (Preferences::instance()->isXsheetCameraColumnVisible()) {
+    int firstCol =
+        m_cameraActive
+            ? m_cameraColumnDim
+            : ((m_columns.size() > 0 && !m_columns[0].m_active) ? 0 : m_folded);
+    if (coord < firstCol) return -1;
+    coord -= firstCol;
+  }
   if (coord < m_firstFreePos) {
     std::map<int, int>::const_iterator it = m_table.lower_bound(coord);
     if (it == m_table.end()) return -3;
@@ -136,18 +99,31 @@ int ColumnFanGeometry::layerAxisToCol(int coord) const {
 
 //-----------------------------------------------------------------------------
 
-int ColumnFanGeometry::colToLayerAxis(int col) const {
-  int m = m_columns.size();
+int ColumnFan::colToLayerAxis(int col) const {
+  int m        = m_columns.size();
+  int firstCol = 0;
+  if (col < -1) return -m_cameraColumnDim;
+  if (col < 0) return 0;
+  if (Preferences::instance()->isXsheetCameraColumnVisible()) {
+    firstCol =
+        m_cameraActive
+            ? m_cameraColumnDim
+            : ((m_columns.size() > 0 && !m_columns[0].m_active) ? 0 : m_folded);
+  }
   if (col >= 0 && col < m)
-    return m_columns[col].m_pos;
+    return firstCol + m_columns[col].m_pos;
   else
-    return m_firstFreePos + (col - m) * m_unfolded;
+    return firstCol + m_firstFreePos + (col - m) * m_unfolded;
 }
 
 //-----------------------------------------------------------------------------
 
-void ColumnFanGeometry::activate(int col) {
+void ColumnFan::activate(int col) {
   int m = m_columns.size();
+  if (col < 0) {
+    m_cameraActive = true;
+    return;
+  }
   if (col < m)  //{
     m_columns[col].m_active = true;
   /*???
@@ -166,7 +142,11 @@ void ColumnFanGeometry::activate(int col) {
 
 //-----------------------------------------------------------------------------
 
-void ColumnFanGeometry::deactivate(int col) {
+void ColumnFan::deactivate(int col) {
+  if (col < 0) {
+    m_cameraActive = false;
+    return;
+  }
   while ((int)m_columns.size() <= col) m_columns.push_back(Column());
   m_columns[col].m_active = false;
   update();
@@ -174,9 +154,10 @@ void ColumnFanGeometry::deactivate(int col) {
 
 //-----------------------------------------------------------------------------
 
-bool ColumnFanGeometry::isActive(int col) const {
-  return 0 <= col && col < (int)m_columns.size() ? m_columns[col].m_active
-                                                 : true;
+bool ColumnFan::isActive(int col) const {
+  return 0 <= col && col < (int)m_columns.size()
+             ? m_columns[col].m_active
+             : col < 0 ? m_cameraActive : true;
 }
 
 //-----------------------------------------------------------------------------
@@ -185,8 +166,8 @@ bool ColumnFanGeometry::isActive(int col) const {
 
 //-----------------------------------------------------------------------------
 
-void ColumnFanGeometry::updateExtras(const ColumnFan *from,
-                                     const vector<int> &extras) {
+void ColumnFan::updateExtras(const ColumnFan *from, const vector<int> &extras) {
+  m_cameraActive = from->m_cameraActive;
   /* ???
     for (int i = 0, n = (int)from.m_columns.size(); i < n; i++)
       if (!from.isActive(i)) deactivate(i);
@@ -208,8 +189,41 @@ void ColumnFanGeometry::updateExtras(const ColumnFan *from,
 
 //-----------------------------------------------------------------------------
 
-void ColumnFanGeometry::saveData(TOStream &os) {}
+void ColumnFan::trim() {
+  int m = m_columns.size();
+  int i;
+  for (i = m - 1; i >= 0 && m_columns[i].m_active; i--)
+    ;
+  i++;
+  if (i < m) m_columns.erase(m_columns.begin() + i, m_columns.end());
+}
 
 //-----------------------------------------------------------------------------
 
-void ColumnFanGeometry::loadData(TIStream &is) {}
+void ColumnFan::saveData(TOStream &os) {
+  int index, n = (int)m_columns.size();
+  for (index = 0; index < n;) {
+    while (index < n && m_columns[index].m_active) index++;
+    if (index < n) {
+      int firstIndex = index;
+      os << index;
+      index++;
+      while (index < n && !m_columns[index].m_active) index++;
+      os << index - firstIndex;
+    }
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+void ColumnFan::loadData(TIStream &is) {
+  m_columns.clear();
+  m_table.clear();
+  m_firstFreePos = 0;
+  while (!is.eos()) {
+    int index = 0, count = 0;
+    is >> index >> count;
+    int j;
+    for (j = 0; j < count; j++) deactivate(index + j);
+  }
+}

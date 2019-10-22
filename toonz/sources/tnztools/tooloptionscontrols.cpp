@@ -148,6 +148,7 @@ ToolOptionSlider::ToolOptionSlider(TTool *tool, TDoubleProperty *property,
     : DoubleField()
     , ToolOptionControl(tool, property->getName(), toolHandle)
     , m_property(property) {
+  setLinearSlider(property->isLinearSlider());
   m_property->addListener(this);
   TDoubleProperty::Range range = property->getRange();
   setRange(range.first, range.second);
@@ -250,6 +251,7 @@ ToolOptionPairSlider::ToolOptionPairSlider(TTool *tool,
     : DoublePairField(0, property->isMaxRangeLimited())
     , ToolOptionControl(tool, property->getName(), toolHandle)
     , m_property(property) {
+  setLinearSlider(property->isLinearSlider());
   m_property->addListener(this);
   TDoublePairProperty::Value value = property->getValue();
   TDoublePairProperty::Range range = property->getRange();
@@ -377,6 +379,7 @@ ToolOptionIntPairSlider::ToolOptionIntPairSlider(TTool *tool,
     : IntPairField(0, property->isMaxRangeLimited())
     , ToolOptionControl(tool, property->getName(), toolHandle)
     , m_property(property) {
+  setLinearSlider(property->isLinearSlider());
   setLeftText(leftName);
   setRightText(rightName);
   m_property->addListener(this);
@@ -491,6 +494,7 @@ ToolOptionIntSlider::ToolOptionIntSlider(TTool *tool, TIntProperty *property,
     : IntField(0, property->isMaxRangeLimited())
     , ToolOptionControl(tool, property->getName(), toolHandle)
     , m_property(property) {
+  setLinearSlider(property->isLinearSlider());
   m_property->addListener(this);
   TIntProperty::Range range = property->getRange();
   setRange(range.first, range.second);

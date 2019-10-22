@@ -94,7 +94,7 @@ struct TXsheet::TXsheetImp {
   int m_viewColumn;
 
   TSoundTrackP m_mixedSound;
-  ColumnFanFoldData m_columnFan;
+  ColumnFan m_columnFan;
   XshHandleManager *m_handleManager;
   ToonzScene *m_scene;
 
@@ -168,12 +168,18 @@ TXsheet::TXsheet()
     : TSmartObject(m_classCode)
     , m_player(0)
     , m_imp(new TXsheet::TXsheetImp)
-    , m_notes(new TXshNoteSet()) {
+    , m_notes(new TXshNoteSet())
+    , m_cameraColumnIndex(0) {
   // extern TSyntax::Grammar *createXsheetGrammar(TXsheet*);
   m_soundProperties      = new TXsheet::SoundProperties();
   m_imp->m_handleManager = new XshHandleManager(this);
   m_imp->m_pegTree->setHandleManager(m_imp->m_handleManager);
   m_imp->m_pegTree->createGrammar(this);
+
+  // Dummy camera column
+  m_cameraColumn          = TXshColumn::createEmpty(0);
+  m_cameraColumn->m_index = -1;
+  m_cameraColumn->setXsheet(this);
   m_imp->m_pathAnimations = new PathAnimations(this);
 }
 
@@ -322,7 +328,8 @@ bool TXsheet::setCells(int row, int col, int rowCount, const TXshCell cells[]) {
     else if (levelType == MESH_XSHLEVEL)
       type = TXshColumn::eMeshType;
   }
-  bool wasColumnEmpty    = isColumnEmpty(col);
+  bool wasColumnEmpty = isColumnEmpty(col);
+  if (col < 0) return false;
   TXshCellColumn *column = touchColumn(col, type)->getCellColumn();
   if (!column) return false;
 
@@ -756,7 +763,7 @@ void TXsheet::increaseStepCells(int r0, int c0, int &r1, int c1) {
   // controllo se devo cambiare la selezione
   bool allIncreaseIsEqual = true;
   for (c = 0; c < ends.size() - 1 && allIncreaseIsEqual; c++)
-    allIncreaseIsEqual = allIncreaseIsEqual && ends[c] == ends[c + 1];
+    allIncreaseIsEqual       = allIncreaseIsEqual && ends[c] == ends[c + 1];
   if (allIncreaseIsEqual) r1 = ends[0];
 }
 
@@ -790,7 +797,7 @@ void TXsheet::decreaseStepCells(int r0, int c0, int &r1, int c1) {
   // controllo se devo cambiare la selezione
   bool allDecreaseIsEqual = true;
   for (c = 0; c < ends.size() - 1 && allDecreaseIsEqual; c++)
-    allDecreaseIsEqual = allDecreaseIsEqual && ends[c] == ends[c + 1];
+    allDecreaseIsEqual       = allDecreaseIsEqual && ends[c] == ends[c + 1];
   if (allDecreaseIsEqual) r1 = ends[0];
 }
 
@@ -1190,7 +1197,7 @@ void TXsheet::loadData(TIStream &is) {
       }
     } else if (tagName == "pegbars") {
       TPersist *p = m_imp->m_pegTree;
-      is >> *p;
+      m_imp->m_pegTree->loadData(is, this);
     } else if (tagName == "pathanimations") {
       m_imp->m_pathAnimations->loadData(is);
     } else if (tagName == "fxnodes") {
@@ -1247,7 +1254,7 @@ void TXsheet::saveData(TOStream &os) {
   }
   os.closeChild();
   os.openChild("pegbars");
-  m_imp->m_pegTree->saveData(os, getFirstFreeColumnIndex());
+  m_imp->m_pegTree->saveData(os, getFirstFreeColumnIndex(), this);
   // os << *(m_imp->m_pegTree);
   os.closeChild();
 
@@ -1256,7 +1263,7 @@ void TXsheet::saveData(TOStream &os) {
   fxDag->saveData(os, getFirstFreeColumnIndex());
   os.closeChild();
 
-  ColumnFanFoldData *columnFan = &m_imp->m_columnFan;
+  ColumnFan *columnFan = &m_imp->m_columnFan;
   columnFan->trim();
   if (!columnFan->isEmpty()) {
     os.openChild("columnFan");
@@ -1292,6 +1299,7 @@ void TXsheet::insertColumn(int col, TXshColumn::ColumnType type) {
 //-----------------------------------------------------------------------------
 
 void TXsheet::insertColumn(int col, TXshColumn *column) {
+  if (col < 0) col = 0;
   column->setXsheet(this);
   m_imp->m_columnSet.insertColumn(col, column);
   m_imp->m_pegTree->insertColumn(col);
@@ -1359,6 +1367,7 @@ void TXsheet::moveColumn(int srcIndex, int dstIndex) {
 //-----------------------------------------------------------------------------
 
 TXshColumn *TXsheet::getColumn(int col) const {
+  if (col < 0) return m_cameraColumn;
   return m_imp->m_columnSet.getColumn(col).getPointer();
 }
 
@@ -1380,7 +1389,7 @@ int TXsheet::getFirstFreeColumnIndex() const {
 
 TXshColumn *TXsheet::touchColumn(int index, TXshColumn::ColumnType type) {
   TXshColumn *column = m_imp->m_columnSet.touchColumn(index, type).getPointer();
-  if (!column) return 0;
+  if (index < 0 || !column) return 0;
 
   // NOTE (Daniele): The following && should be a bug... but I fear I'd break
   // something changing it.

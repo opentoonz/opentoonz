@@ -792,6 +792,10 @@ void removeStageObjectNode(const TStageObjectId &id, TXsheetHandle *xshHandle,
       (id.isCamera() && xsh->getStageObjectTree()->getCurrentCameraId() == id))
     return;
 
+  if (id.isCamera() && xsh->getCameraColumnIndex() == id.getIndex())
+    xsh->setCameraColumnIndex(
+        xsh->getStageObjectTree()->getCurrentCameraId().getIndex());
+
   // stacco tutti i figli e li attacco al padre
   QList<TStageObjectId> linkedObjects;
   int pegbarsCount = xsh->getStageObjectTree()->getStageObjectCount();

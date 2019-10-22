@@ -1,6 +1,6 @@
 #!/bin/bash
 pushd thirdparty/tiff-4.0.3
-./configure && make
+./configure --disable-lzma && make
 popd
 cd toonz && mkdir build && cd build
 QTVERSION=`ls /usr/local/Cellar/qt`

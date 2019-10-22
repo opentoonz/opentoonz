@@ -113,7 +113,7 @@ public:
 
 FullColorBrushTool::FullColorBrushTool(std::string name)
     : TTool(name)
-    , m_thickness("Size", 1, 100, 1, 5, false)
+    , m_thickness("Size", 1, 1000, 1, 5, false)
     , m_pressure("Pressure", true)
     , m_opacity("Opacity", 0, 100, 100, 100, true)
     , m_hardness("Hardness:", 0, 100, 100)
@@ -132,6 +132,8 @@ FullColorBrushTool::FullColorBrushTool(std::string name)
     , m_presetsLoaded(false)
     , m_firstTime(true) {
   bind(TTool::RasterImage | TTool::EmptyTarget);
+
+  m_thickness.setNonLinearSlider();
 
   m_prop.bind(m_thickness);
   m_prop.bind(m_hardness);
@@ -318,7 +320,13 @@ void FullColorBrushTool::leftButtonDown(const TPointD &pos,
 
   TPointD rasCenter = ras->getCenterD();
   TPointD point(pos + rasCenter);
-  double pressure = m_enabledPressure && e.isTablet() ? e.m_pressure : 0.5;
+
+  double pressure;
+  if (getApplication()->getCurrentLevelStyle()->getTagId() ==
+      4001)  // mypaint brush case
+    pressure = m_enabledPressure && e.isTablet() ? e.m_pressure : 0.5;
+  else
+    pressure = m_enabledPressure ? e.m_pressure : 1.0;
 
   m_tileSet   = new TTileSetFullColor(ras->getSize());
   m_tileSaver = new TTileSaverFullColor(ras, m_tileSet);
@@ -358,7 +366,12 @@ void FullColorBrushTool::leftButtonDrag(const TPointD &pos,
   TRasterP ras      = ri->getRaster();
   TPointD rasCenter = ras->getCenterD();
   TPointD point(pos + rasCenter);
-  double pressure = m_enabledPressure && e.isTablet() ? e.m_pressure : 0.5;
+  double pressure;
+  if (getApplication()->getCurrentLevelStyle()->getTagId() ==
+      4001)  // mypaint brush case
+    pressure = m_enabledPressure && e.isTablet() ? e.m_pressure : 0.5;
+  else
+    pressure = m_enabledPressure ? e.m_pressure : 1.0;
 
   m_strokeSegmentRect.empty();
   m_toonz_brush->strokeTo(point, pressure, restartBrushTimer());
@@ -389,7 +402,12 @@ void FullColorBrushTool::leftButtonUp(const TPointD &pos,
   TRasterP ras      = ri->getRaster();
   TPointD rasCenter = ras->getCenterD();
   TPointD point(pos + rasCenter);
-  double pressure = m_enabledPressure && e.isTablet() ? e.m_pressure : 0.5;
+  double pressure;
+  if (getApplication()->getCurrentLevelStyle()->getTagId() ==
+      4001)  // mypaint brush case
+    pressure = m_enabledPressure && e.isTablet() ? e.m_pressure : 0.5;
+  else
+    pressure = m_enabledPressure ? e.m_pressure : 1.0;
 
   m_strokeSegmentRect.empty();
   m_toonz_brush->strokeTo(point, pressure, restartBrushTimer());
@@ -747,13 +765,7 @@ void FullColorBrushTool::updateCurrentStyle() {
     m_minCursorThick = std::max(m_thickness.getValue().first, 1);
     m_maxCursorThick =
         std::max(m_thickness.getValue().second, m_minCursorThick);
-    if (!m_enabledPressure) {
-      double minRadiusLog = log(0.5 * m_minCursorThick);
-      double maxRadiusLog = log(0.5 * m_maxCursorThick);
-      double avgRadiusLog = 0.5 * (minRadiusLog + maxRadiusLog);
-      double avgRadius    = exp(avgRadiusLog);
-      m_minCursorThick = m_maxCursorThick = (int)round(2.0 * avgRadius);
-    }
+    if (!m_enabledPressure) m_minCursorThick = m_maxCursorThick;
   }
 
   // if this function is called from onEnter(), the clipping rect will not be

@@ -523,12 +523,16 @@ bool LevelCreatePopup::apply() {
   bool areColumnsShifted = false;
   TXshCell cell          = xsh->getCell(row, col);
   bool isInRange         = true;
-  for (i = row; i < row + numFrames; i++) {
-    if (!cell.isEmpty()) {
-      isInRange = false;
-      break;
+  if (col < 0)
+    isInRange = false;
+  else {
+    for (i = row; i < row + numFrames; i++) {
+      if (!cell.isEmpty()) {
+        isInRange = false;
+        break;
+      }
+      cell = xsh->getCell(i, col);
     }
-    cell = xsh->getCell(i, col);
   }
   if (!validColumn) {
     isInRange = false;

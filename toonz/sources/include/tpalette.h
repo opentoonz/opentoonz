@@ -216,6 +216,8 @@ private:
 
   int m_currentStyleId;
 
+  bool m_areRefLevelFidsSpecified = false;
+
 public:
   TPalette();
   ~TPalette();
@@ -318,10 +320,11 @@ between RGBA color components.
     m_version = v;
   }  //!< Sets the palette's version number
 
-  void setRefLevelFids(const std::vector<TFrameId> fids);  //!< Associates the
-                                                           //! list of frames \e
-  //! fids to this
-  //! palette.
+  void setRefLevelFids(const std::vector<TFrameId> fids,
+                       bool specified);  //!< Associates the
+                                         //! list of frames \e
+  //! fids to this palette.
+  //! When specified == true fids were specified by user on loading.
   std::vector<TFrameId> getRefLevelFids();  //!< Returns the list of frames
                                             //! associated to this palette.
 

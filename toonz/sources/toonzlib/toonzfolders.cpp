@@ -6,6 +6,7 @@
 #include "tconvert.h"
 #include "toonz/preferences.h"
 #include <QStandardPaths>
+#include <QDir>
 
 using namespace TEnv;
 
@@ -23,7 +24,7 @@ TFilePath getDesktopPath() {
       QStandardPaths::standardLocations(QStandardPaths::DesktopLocation)[0];
   return TFilePath(desktopPath);
 }
-}
+}  // namespace
 //-------------------------------------------------------------------
 
 TFilePath ToonzFolder::getModulesDir() {
@@ -107,10 +108,16 @@ TFilePath ToonzFolder::getFxPresetFolder() {
 }
 
 TFilePath ToonzFolder::getCacheRootFolder() {
-  TFilePath fp = getSystemVarPathValue(getSystemVarPrefix() + "CACHEROOT");
-  if (fp == TFilePath())
-    fp = getStuffDir() + TEnv::getSystemPathMap().at("CACHEROOT");
-  return fp;
+  static enum STATE { FIRSTTIME, OK, NG } state = FIRSTTIME;
+  QString cacheDir =
+      QStandardPaths::writableLocation(QStandardPaths::CacheLocation);
+  if (state == FIRSTTIME) {
+    if (QDir(cacheDir).mkpath("."))
+      state = OK;
+    else
+      state = NG;
+  }
+  return (state == OK) ? TFilePath(cacheDir) : TFilePath();
 }
 
 TFilePath ToonzFolder::getProfileFolder() {

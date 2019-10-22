@@ -280,6 +280,9 @@ class FxSettingsPanel final : public TPanel {
 
 public:
   FxSettingsPanel(QWidget *parent);
+  // FxSettings will adjust its size according to the current fx
+  // so we only restore position of the panel.
+  void restoreFloatingPanelState() override;
 };
 
 #endif

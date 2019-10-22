@@ -203,7 +203,10 @@ elseif(BUILD_ENV_UNIXLIKE)
 
     find_package(Qt5Widgets)
 
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lstdc++ -std=c++11")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+    if (NOT (CMAKE_CXX_COMPILER_ID STREQUAL "Clang"))
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lstdc++")
+    endif()
 endif()
 
 add_definitions(
@@ -277,7 +280,7 @@ macro(_find_toonz_library OUT_LIB_LIST IN_LIB_LIST)
         unset(COREPATH CACHE)
         # find しても cmake が走るときにはできていないので完全なパス名を生成して返すだけ
         if(BUILD_ENV_APPLE)
-            set(LIBPATH ${CMAKE_CURRENT_BINARY_DIR}/../${arg}/lib${arg}${CMAKE_SHARED_LIBRARY_SUFFIX})
+            set(LIBPATH "\$<TARGET_FILE:${arg}>")
         else()
             set(LIBPATH ${arg})
         endif()

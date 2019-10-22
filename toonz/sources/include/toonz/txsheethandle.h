@@ -38,11 +38,13 @@ public:
   void notifyXsheetChanged() { emit xsheetChanged(); }
   void notifyXsheetSwitched() { emit xsheetSwitched(); }
   void notifyXsheetSoundChanged() { emit xsheetSoundChanged(); }
+  void changeXsheetCamera(int index) { emit xsheetCameraChange(index); }
 
 signals:
   void xsheetSwitched();
   void xsheetChanged();
   void xsheetSoundChanged();
+  void xsheetCameraChange(int);
 };
 
 #endif  // TXSHEETHANDLE_H

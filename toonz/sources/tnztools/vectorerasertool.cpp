@@ -374,11 +374,11 @@ private:
 
 EraserTool::EraserTool()
     : TTool("T_Eraser")
-    , m_eraseType("Type:")             // "W_ToolOptions_Erasetype"
-    , m_toolSize("Size:", 1, 100, 10)  // "W_ToolOptions_EraserToolSize"
-    , m_selective("Selective", false)  // "W_ToolOptions_Selective"
-    , m_invertOption("Invert", false)  // "W_ToolOptions_Invert"
-    , m_multi("Frame Range", false)    // "W_ToolOptions_FrameRange"
+    , m_eraseType("Type:")              // "W_ToolOptions_Erasetype"
+    , m_toolSize("Size:", 1, 1000, 10)  // "W_ToolOptions_EraserToolSize"
+    , m_selective("Selective", false)   // "W_ToolOptions_Selective"
+    , m_invertOption("Invert", false)   // "W_ToolOptions_Invert"
+    , m_multi("Frame Range", false)     // "W_ToolOptions_FrameRange"
     , m_pointSize(-1)
     , m_undo(0)
     , m_currCell(-1, -1)
@@ -390,6 +390,8 @@ EraserTool::EraserTool()
     , m_selector(500, 10, 1000)
     , m_strokeLocked(false) {
   bind(TTool::VectorImage);
+
+  m_toolSize.setNonLinearSlider();
 
   m_prop.bind(m_toolSize);
   m_prop.bind(m_eraseType);
@@ -1437,7 +1439,7 @@ void EraserTool::multiEreserRegion(TStroke *stroke, const TMouseEvent &e) {
 
 //-----------------------------------------------------------------------------
 /*! When the tool is switched during dragging, Erase end processing is performed
-*/
+ */
 void EraserTool::onDeactivate() {
   if (!m_active) return;
 

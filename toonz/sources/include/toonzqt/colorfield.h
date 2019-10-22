@@ -110,6 +110,7 @@ protected slots:
   void onSliderChanged(int value);
   void onSliderReleased();
   void onEditChanged(const QString &str);
+  void onEditFinished();
 };
 
 //=============================================================================

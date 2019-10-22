@@ -859,10 +859,10 @@ public:
   void leftButtonDown(const TPointD &p, const TMouseEvent &e) override {
     /* m_active = getApplication()->getCurrentObject()->isSpline() ||
    (bool) getImage(true);*/
-
-    m_active = touchImage();  // NEEDS to be done even if(m_active), due
-    if (!m_active)            // to the HORRIBLE m_frameCreated / m_levelCreated
-      return;                 // mechanism. touchImage() is the ONLY function
+    if (!getApplication()->getCurrentObject()->isSpline())
+      m_active = touchImage();  // NEEDS to be done even if(m_active), due
+    if (!m_active)  // to the HORRIBLE m_frameCreated / m_levelCreated
+      return;       // mechanism. touchImage() is the ONLY function
     // resetting them to false...                       >_<
     if (m_primitive) m_primitive->leftButtonDown(p, e);
     invalidate();
@@ -1099,11 +1099,11 @@ public:
           m_primitive->setIsPrompting(false);
           if (ret == 2 || ret == 0) return;
         }
+        QMutexLocker lock(vi->getMutex());
         TUndo *undo = new UndoPath(
             getXsheet()->getStageObject(getObjectId())->getSpline());
         while (vi->getStrokeCount() > 0) vi->deleteStroke(0);
         vi->addStroke(stroke, false);
-        notifyImageChanged();
         TUndoManager::manager()->add(undo);
       } else {
         int styleId = TTool::getApplication()->getCurrentLevelStyleIndex();

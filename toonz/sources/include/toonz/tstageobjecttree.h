@@ -6,6 +6,7 @@
 #include <memory>
 
 #include "toonz/tstageobject.h"
+#include "toonz/txsheet.h"
 
 #undef DVAPI
 #undef DVVAR
@@ -141,14 +142,15 @@ TStageObjectId \b \e id.
           Retrieves  object's data from a tagged data stream \b \e is.
   \sa saveData()
   */
-  void loadData(TIStream &is) override;
-  /*!
-          Saves object's data (name, center coords, etc ) to a tagged data
-     stream \b \e os saved on a file.
-          This method call iteratively all stage objects in the tree and save
-     their data.
-  */
-  void saveData(TOStream &os, int occupiedColumnCount);
+  void loadData(TIStream &is, TXsheet *xsh);
+  void loadData(TIStream &is) override{};  // not used
+                                           /*!
+                                                   Saves object's data (name, center coords, etc ) to a tagged data
+                                              stream \b \e os saved on a file.
+                                                   This method call iteratively all stage objects in the tree and save
+                                              their data.
+                                           */
+  void saveData(TOStream &os, int occupiedColumnCount, TXsheet *xsh);
   void saveData(TOStream &os) override{};  // not used
   /*!
 Returns the numbers of the objects in the tree.

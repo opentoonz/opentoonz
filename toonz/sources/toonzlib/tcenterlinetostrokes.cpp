@@ -425,7 +425,7 @@ bool SequenceConverter::parametrize(unsigned int a, unsigned int b) {
 //==========================================================================
 
 //------------------------
-//    CP construcion
+//    CP construction
 //------------------------
 
 // NOTE: Check my thesis for variable meanings (int_ stands for 'integral').

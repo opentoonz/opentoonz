@@ -224,7 +224,7 @@ int FarmControllerPort;
 TFarmController *FarmController = 0;
 
 string TaskId;
-}
+}  // namespace
 //========================================================================
 //
 // searchLevelsToCleanup
@@ -491,6 +491,12 @@ int main(int argc, char *argv[]) {
   // questo definisce la registry root e inizializza TEnv
   TEnv::setRootVarName(rootVarName);
   TEnv::setSystemVarPrefix(systemVarPrefix);
+
+  QCoreApplication::setOrganizationName("OpenToonz");
+  QCoreApplication::setOrganizationDomain("");
+  QCoreApplication::setApplicationName(
+      QString::fromStdString(TEnv::getApplicationName()));
+
   TSystem::hasMainLoop(false);
   int i;
   for (i = 0; i < argc; i++)  // tmsg must be set as soon as it's possible

@@ -53,7 +53,7 @@ class ColorField;
 class SpectrumField;
 class ToneCurveField;
 class CheckBox;
-}
+}  // namespace DVGui
 
 //=============================================================================
 /*! \brief ParamField.
@@ -385,16 +385,17 @@ protected slots:
 // RGB Link Button
 //-----------------------------------------------------------------------------
 
-class DVAPI RgbLinkButton final : public QPushButton {
+class DVAPI RgbLinkButtons final : public QWidget {
   Q_OBJECT
   PixelParamField *m_field1, *m_field2;
 
 public:
-  RgbLinkButton(QString str, QWidget *parent, PixelParamField *field1,
-                PixelParamField *field2);
+  RgbLinkButtons(QString str1, QString str2, QWidget *parent,
+                 PixelParamField *field1, PixelParamField *field2);
 
 protected slots:
-  void onButtonClicked();
+  void onCopyButtonClicked();
+  void onSwapButtonClicked();
 };
 
 //=============================================================================
@@ -517,7 +518,7 @@ protected:
 signals:
   void edited();
 };
-};
+};  // namespace component
 
 class DVAPI StringParamField final : public ParamField {
   Q_OBJECT
@@ -659,7 +660,7 @@ public:
 protected slots:
   void update_value(double);
 };
-}
+}  // namespace component
 
 namespace component {
 class DVAPI LineEdit_int final : public ParamField {

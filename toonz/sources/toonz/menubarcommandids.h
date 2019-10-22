@@ -306,6 +306,7 @@
 #define MI_ToggleColumnLocks "MI_ToggleColumnLocks"
 #define MI_ToggleXSheetToolbar "MI_ToggleXSheetToolbar"
 #define MI_FoldColumns "MI_FoldColumns"
+#define MI_ToggleXsheetCameraColumn "MI_ToggleXsheetCameraColumn"
 #define MI_ToggleCurrentTimeIndicator "MI_ToggleCurrentTimeIndicator"
 
 #define MI_LoadIntoCurrentPalette "MI_LoadIntoCurrentPalette"
@@ -345,5 +346,5 @@
 #define MI_SeparateColors "MI_SeparateColors"
 
 #define MI_OpenOnlineManual "MI_OpenOnlineManual"
-
+#define MI_ClearCacheFolder "MI_ClearCacheFolder"
 #endif

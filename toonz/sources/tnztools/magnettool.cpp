@@ -122,7 +122,6 @@ class MagnetTool final : public TTool {
   DoublePair m_extremes;
   int m_cursorId;
 
-  double m_pointSize;
   TUndo *m_undo;
 
   typedef struct {
@@ -149,12 +148,14 @@ public:
   MagnetTool()
       : TTool("T_Magnet")
       , m_active(false)
-      , m_pointSize(-1)
       , m_oldStrokesArray()
-      , m_toolSize("Size:", 0, 100, 20)  // W_ToolOptions_MagnetTool
+      , m_toolSize("Size:", 10, 500, 20)  // W_ToolOptions_MagnetTool
       , m_draw(false)
       , m_selector(500, 10, 1000) {
     bind(TTool::Vectors);
+
+    m_toolSize.setNonLinearSlider();
+
     m_prop.bind(m_toolSize);
   }
 
@@ -169,14 +170,9 @@ public:
       m_cursorId = ToolCursor::MagnetCursor;
     else
       m_cursorId = ToolCursor::CURSOR_NO;
-
-    updatePointSize();
   }
 
-  void onLeave() override {
-    m_draw      = false;
-    m_pointSize = -1;
-  }
+  void onLeave() override { m_draw = false; }
 
   void leftButtonDown(const TPointD &pos, const TMouseEvent &e) override {
     TPointD p(pos);
@@ -203,6 +199,8 @@ public:
     m_hitStrokeCorners.clear();
     m_strokeToModifyCorners.clear();
 
+    double pointSize = m_toolSize.getValue();
+
     UINT i = 0;
     for (; i < vi->getStrokeCount(); ++i) {
       if (!vi->inCurrentGroup(i)) continue;
@@ -211,11 +209,11 @@ public:
       ref             = stroke;
       //  calcola le intersezioni
       std::vector<double> intersections;
-      intersect(*ref, p, m_pointSize, intersections);
+      intersect(*ref, p, pointSize, intersections);
 
       if (intersections.empty()) {
         if (increaseControlPoints(*ref,
-                                  TStrokePointDeformation(p, m_pointSize))) {
+                                  TStrokePointDeformation(p, pointSize))) {
           m_changedStrokes.push_back(i);
           m_strokeHit.push_back(ref);
 
@@ -238,11 +236,11 @@ public:
 
         splitStroke(*sc.m_parent, intersections, sc.m_splitted);
 
-        selectStrokeToMove(sc.m_splitted, p, m_pointSize, sc.m_splittedToMove);
+        selectStrokeToMove(sc.m_splitted, p, pointSize, sc.m_splittedToMove);
         for (UINT ii = 0; ii < sc.m_splittedToMove.size(); ++ii) {
           TStroke *temp = sc.m_splittedToMove[ii];
           bool test     = increaseControlPoints(
-              *temp, TStrokePointDeformation(p, m_pointSize));
+              *temp, TStrokePointDeformation(p, pointSize));
           assert(test);
 
           std::vector<int> *corners = new std::vector<int>;
@@ -295,26 +293,27 @@ public:
     TPointD offset = p - m_pointAtMove;
 
     /*
-    if( tdistance2(m_pointAtMouseDown, p ) > sq(m_pointSize * 0.5) ) //
-    reincremento
-    {
-    leftButtonUp(p);
-    lefrightButtonDown(p);
-    }
-    */
+if( tdistance2(m_pointAtMouseDown, p ) > sq(m_pointSize * 0.5) ) // reincremento
+{
+leftButtonUp(p);
+lefrightButtonDown(p);
+}
+*/
+    double pointSize = m_toolSize.getValue();
+
     UINT i, j;
 
     for (i = 0; i < m_strokeHit.size(); ++i)
-      modifyControlPoints(*m_strokeHit[i],
-                          TStrokePointDeformation(offset, m_pointAtMouseDown,
-                                                  m_pointSize * 0.7));
+      modifyControlPoints(
+          *m_strokeHit[i],
+          TStrokePointDeformation(offset, m_pointAtMouseDown, pointSize * 0.7));
 
     for (i = 0; i < m_strokeToModify.size(); ++i)
       for (j = 0; j < m_strokeToModify[i].m_splittedToMove.size(); ++j) {
         TStroke *temp = m_strokeToModify[i].m_splittedToMove[j];
         modifyControlPoints(*temp,
                             TStrokePointDeformation(offset, m_pointAtMouseDown,
-                                                    m_pointSize * 0.7));
+                                                    pointSize * 0.7));
       }
 
     m_pointAtMove = p;
@@ -443,10 +442,10 @@ public:
     // glPushMatrix();
     // tglMultMatrix(viewMatrix);
 
-    if (m_pointSize > 0) {
-      tglColor(TPixel32::Red);
-      tglDrawCircle(m_pointAtMove, m_pointSize);
-    }
+    double pointSize = m_toolSize.getValue();
+
+    tglColor(TPixel32::Red);
+    tglDrawCircle(m_pointAtMove, pointSize);
 
     if (!m_active) {
       // glPopMatrix();
@@ -483,10 +482,8 @@ public:
 
   int getCursorId() const override { return m_cursorId; }
 
-  bool onPropertyChanged(std::string propertyName) override
-  {
-    if(propertyName == m_toolSize.getName()) {
-      updatePointSize();
+  bool onPropertyChanged(std::string propertyName) override {
+    if (propertyName == m_toolSize.getName()) {
       invalidate();
     }
 
@@ -494,20 +491,6 @@ public:
   }
 
 private:
-  /// Update point size based on property.
-  void updatePointSize()
-  {
-    double x = m_toolSize.getValue();
-
-    double minRange = 1;
-    double maxRange = 100;
-
-    double minSize = 10;
-    double maxSize = 100;
-
-    m_pointSize =
-        (x - minRange) / (maxRange - minRange) * (maxSize - minSize) + minSize;
-  }
   ToonzExt::Selector *getSelector() {
     return (m_draw ? &m_selector : (ToonzExt::Selector *)0);
   }

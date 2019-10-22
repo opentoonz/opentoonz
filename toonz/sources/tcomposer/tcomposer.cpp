@@ -400,7 +400,7 @@ static std::pair<int, int> generateMovie(ToonzScene *scene, const TFilePath &fp,
   r0 = r0 - 1;
   r1 = r1 - 1;
 
-  if (r0 < 0) r0 = 0;
+  if (r0 < 0) r0                                 = 0;
   if (r1 < 0 || r1 >= scene->getFrameCount()) r1 = scene->getFrameCount() - 1;
   string msg;
   assert(r1 >= r0);
@@ -658,6 +658,11 @@ int main(int argc, char *argv[]) {
   TEnv::setRootVarName(rootVarName);
   TEnv::setSystemVarPrefix(systemVarPrefix);
 
+  QCoreApplication::setOrganizationName("OpenToonz");
+  QCoreApplication::setOrganizationDomain("");
+  QCoreApplication::setApplicationName(
+      QString::fromStdString(TEnv::getApplicationName()));
+
   QHash<QString, QString>::const_iterator argItr =
       argumentPathValues.constBegin();
   while (argItr != argumentPathValues.constEnd()) {
@@ -713,7 +718,7 @@ int main(int argc, char *argv[]) {
   TVectorBrushStyle::setRootDir(libraryFolder);
   TPalette::setRootDir(libraryFolder);
   TImageStyle::setLibraryDir(libraryFolder);
-  TFilePath cacheRoot = ToonzFolder::getCacheRootFolder();
+  TFilePath cacheRoot                = ToonzFolder::getCacheRootFolder();
   if (cacheRoot.isEmpty()) cacheRoot = TEnv::getStuffDir() + "cache";
   TImageCache::instance()->setRootDir(cacheRoot);
   // #endif
@@ -980,8 +985,8 @@ int main(int argc, char *argv[]) {
     DVGui::info(QString::fromStdString(msg));
     TImageCache::instance()->clear(true);
   } catch (TException &e) {
-    msg = "Untrapped exception: " + ::to_string(e.getMessage()),
-    cout << msg << endl;
+    msg = "Untrapped exception: " + ::to_string(e.getMessage()), cout << msg
+                                                                      << endl;
     m_userLog->error(msg);
     TImageCache::instance()->clear(true);
   } catch (...) {

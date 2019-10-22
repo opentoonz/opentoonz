@@ -4,7 +4,11 @@
 #include "tools/tool.h"
 #include "tools/cursors.h"
 
+#ifdef TOONZQT_EXPORTS
+#include "toonz/preferences.h"
+#else
 #include "../toonz/preferences.h"
+#endif
 
 #include <QWidget>
 #include <QPixmap>
@@ -49,6 +53,8 @@ const struct {
     {ToolCursor::PickerCursorArea, "", 0, 0, false},
     {ToolCursor::PickerCursorAreaBase, "picker_style", 7, 22, true},
     {ToolCursor::PickerCursor, "picker_style", 7, 22, true},
+
+    {ToolCursor::PointingHandCursor, "pointing_hand", 13, 4, true},
 
     {ToolCursor::PumpCursor, "pump", 16, 23, false},
     {ToolCursor::RotCursor, "rot", 15, 15, false},

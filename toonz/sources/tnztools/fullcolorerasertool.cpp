@@ -368,7 +368,7 @@ private:
 
 FullColorEraserTool::FullColorEraserTool(std::string name)
     : TTool(name)
-    , m_size("Size:", 1, 100, 5, false)
+    , m_size("Size:", 1, 1000, 5, false)
     , m_opacity("Opacity:", 0, 100, 100)
     , m_hardness("Hardness:", 0, 100, 100)
     , m_eraseType("Type:")
@@ -384,6 +384,8 @@ FullColorEraserTool::FullColorEraserTool(std::string name)
     , m_firstFrameSelected(false)
     , m_isXsheetCell(false) {
   bind(TTool::RasterImage);
+
+  m_size.setNonLinearSlider();
 
   m_prop.bind(m_size);
   m_prop.bind(m_hardness);

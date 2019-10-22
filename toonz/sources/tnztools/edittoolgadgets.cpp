@@ -30,7 +30,12 @@ int getDevPixRatio() {
   static int devPixRatio = QApplication::desktop()->devicePixelRatio();
   return devPixRatio;
 }
+
+TPointD hadamard(const TPointD &v1, const TPointD &v2) {
+  return TPointD(v1.x * v2.x, v1.y * v2.y);
 }
+
+}  // namespace
 
 //*************************************************************************************
 //    FxGadgetUndo  definition
@@ -131,13 +136,14 @@ public:
 //    FxGadget  implementation
 //*************************************************************************************
 
-FxGadget::FxGadget(FxGadgetController *controller)
+FxGadget::FxGadget(FxGadgetController *controller, int handleCount)
     : m_id(-1)
-    , m_selected(false)
+    , m_selected(-1)
     , m_controller(controller)
     , m_pixelSize(1)
     , m_undo(0)
-    , m_scaleFactor(1) {
+    , m_scaleFactor(1)
+    , m_handleCount(handleCount) {
   controller->assignId(this);
 }
 
@@ -841,12 +847,11 @@ public:
 
 class VectorFxGadget final : public FxGadget {
   TPointParamP m_pa, m_pb;
-  int m_selected;
 
 public:
   VectorFxGadget(FxGadgetController *controller, const TPointParamP &pa,
                  const TPointParamP &pb)
-      : FxGadget(controller), m_pa(pa), m_pb(pb), m_selected(0) {
+      : FxGadget(controller), m_pa(pa), m_pb(pb) {
     addParam(pa->getX());
     addParam(pa->getY());
     addParam(pb->getX());
@@ -859,7 +864,7 @@ public:
       glColor3dv(m_selectedColor);
     else
       glColor3d(0, 0, 1);
-    glPushName(getId());
+    // glPushName(getId());
     double pixelSize = getPixelSize();
     TPointD pa       = getValue(m_pa);
     TPointD pb       = getValue(m_pb);
@@ -882,11 +887,11 @@ public:
       }
       tglDrawSegment(pbb, pbb - u * a + v * b);
       tglDrawSegment(pbb, pbb - u * a - v * b);
-      drawDot(pa);
-      drawDot(pb);
-    } else
-      drawDot(pa);
-    glPopName();
+      // drawDot(pa);
+      // drawDot(pb);
+    }  // else
+       // drawDot(pa);
+    // glPopName();
   }
 
   void leftButtonDown(const TPointD &pos, const TMouseEvent &) override {}
@@ -897,52 +902,268 @@ public:
 //=============================================================================
 
 class QuadFxGadget final : public FxGadget {
-  TPointParamP m_pa, m_pb, m_pc, m_pd;
+  TPointParamP m_TL, m_TR, m_BR, m_BL;
+
+  enum HANDLE {
+    Body = 0,
+    TopLeft,
+    TopRight,
+    BottomRight,
+    BottomLeft,
+    TopEdge,
+    RightEdge,
+    BottomEdge,
+    LeftEdge,
+    None
+  } m_handle = None;
+
+  TPointD m_pivot;
+  TPointD m_dragStartPos;
+  TPointD m_startTL, m_startTR, m_startBR, m_startBL;
 
 public:
-  QuadFxGadget(FxGadgetController *controller, const TPointParamP &pa,
-               const TPointParamP &pb, const TPointParamP &pc,
-               const TPointParamP &pd)
-      : FxGadget(controller), m_pa(pa), m_pb(pb), m_pc(pc), m_pd(pd) {
-    addParam(pa->getX());
-    addParam(pa->getY());
-    addParam(pb->getX());
-    addParam(pb->getY());
-    addParam(pc->getX());
-    addParam(pc->getY());
-    addParam(pd->getX());
-    addParam(pd->getY());
+  QuadFxGadget(FxGadgetController *controller, const TPointParamP &topLeft,
+               const TPointParamP &topRight, const TPointParamP &bottomRight,
+               const TPointParamP &bottomLeft)
+      : FxGadget(controller, 9)
+      , m_TL(topLeft)
+      , m_TR(topRight)
+      , m_BR(bottomRight)
+      , m_BL(bottomLeft) {
+    addParam(topLeft->getX());
+    addParam(topLeft->getY());
+    addParam(topRight->getX());
+    addParam(topRight->getY());
+    addParam(bottomRight->getX());
+    addParam(bottomRight->getY());
+    addParam(bottomLeft->getX());
+    addParam(bottomLeft->getY());
   }
 
   void draw(bool picking) override {
+    int idBase = getId();
+
+    auto setColorById = [&](int id) {
+      if (isSelected(id))
+        glColor3dv(m_selectedColor);
+      else
+        glColor3d(0, 0, 1);
+    };
+
+    auto id2Str = [](const HANDLE handleId) -> std::string {
+      switch (handleId) {
+      case TopLeft:
+        return "Top Left";
+      case TopRight:
+        return "Top Right";
+      case BottomRight:
+        return "Bottom Right";
+      case BottomLeft:
+        return "Bottom Left";
+      default:
+        return "";
+      }
+    };
+
+    auto drawPoint = [&](const TPointD &pos, int id) {
+      setColorById(id);
+      glPushName(idBase + id);
+      double unit = getPixelSize();
+      glPushMatrix();
+      glTranslated(pos.x, pos.y, 0);
+      double r = unit * 3;
+      tglDrawRect(-r, -r, r, r);
+      glPopMatrix();
+      glPopName();
+
+      if (isSelected(id) && id >= TopLeft && id <= BottomLeft) {
+        drawTooltip(pos + TPointD(7, 3) * unit,
+                    id2Str((HANDLE)id) + getLabel());
+      }
+    };
+
     setPixelSize();
-    if (isSelected())
-      glColor3dv(m_selectedColor);
-    else
-      glColor3d(0, 0, 1);
-    // glPushName(getId());
-    double pixelSize = getPixelSize();
-    TPointD pa       = getValue(m_pa);
-    TPointD pb       = getValue(m_pb);
-    TPointD pc       = getValue(m_pc);
-    TPointD pd       = getValue(m_pd);
+
+    // lines for moving all vertices
+    glPushName(idBase + Body);
+    setColorById(Body);
+    double pixelSize    = getPixelSize();
+    TPointD topLeft     = getValue(m_TL);
+    TPointD topRight    = getValue(m_TR);
+    TPointD bottomRight = getValue(m_BR);
+    TPointD bottomLeft  = getValue(m_BL);
     glLineStipple(1, 0xCCCC);
     glEnable(GL_LINE_STIPPLE);
     glBegin(GL_LINE_STRIP);
-    tglVertex(pa);
-    tglVertex(pb);
-    tglVertex(pc);
-    tglVertex(pd);
-    tglVertex(pa);
+    tglVertex(topLeft);
+    tglVertex(topRight);
+    tglVertex(bottomRight);
+    tglVertex(bottomLeft);
+    tglVertex(topLeft);
     glEnd();
     glDisable(GL_LINE_STIPPLE);
-    // glPopName();
+    glPopName();
+
+    // corners
+    drawPoint(topLeft, TopLeft);
+    drawPoint(topRight, TopRight);
+    drawPoint(bottomRight, BottomRight);
+    drawPoint(bottomLeft, BottomLeft);
+
+    // center of the edges
+    drawPoint((topLeft + topRight) * 0.5, TopEdge);
+    drawPoint((topRight + bottomRight) * 0.5, RightEdge);
+    drawPoint((bottomRight + bottomLeft) * 0.5, BottomEdge);
+    drawPoint((bottomLeft + topLeft) * 0.5, LeftEdge);
   }
 
-  void leftButtonDown(const TPointD &pos, const TMouseEvent &) override {}
-  void leftButtonDrag(const TPointD &pos, const TMouseEvent &) override {}
-  void leftButtonUp(const TPointD &pos, const TMouseEvent &) override {}
+  void leftButtonDown(const TPointD &pos, const TMouseEvent &) override;
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &) override;
+  void leftButtonUp(const TPointD &pos, const TMouseEvent &) override;
 };
+
+//---------------------------------------------------------------------------
+
+void QuadFxGadget::leftButtonDown(const TPointD &pos, const TMouseEvent &) {
+  m_handle       = (HANDLE)m_selected;
+  m_dragStartPos = pos;
+  m_startTL      = getValue(m_TL);
+  m_startTR      = getValue(m_TR);
+  m_startBR      = getValue(m_BR);
+  m_startBL      = getValue(m_BL);
+  m_pivot        = (m_startTL + m_startTR + m_startBR + m_startBL) * 0.25;
+}
+
+//---------------------------------------------------------------------------
+
+void QuadFxGadget::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
+  TPointD offset = pos - m_dragStartPos;
+
+  auto scaleShape = [&](const TPointD &start, const TPointD &pivot) {
+    TPointD startVec = start - pivot;
+    TPointD endVec   = start + offset - pivot;
+    TPointD scaleFac((startVec.x == 0.0) ? 1.0 : endVec.x / startVec.x,
+                     (startVec.y == 0.0) ? 1.0 : endVec.y / startVec.y);
+    if (e.isShiftPressed()) {
+      if (std::abs(scaleFac.x) > std::abs(scaleFac.y))
+        scaleFac.y = scaleFac.x;
+      else
+        scaleFac.x = scaleFac.y;
+    }
+    if (m_startTL != pivot)
+      setValue(m_TL, pivot + hadamard((m_startTL - pivot), scaleFac));
+    if (m_startTR != pivot)
+      setValue(m_TR, pivot + hadamard((m_startTR - pivot), scaleFac));
+    if (m_startBR != pivot)
+      setValue(m_BR, pivot + hadamard((m_startBR - pivot), scaleFac));
+    if (m_startBL != pivot)
+      setValue(m_BL, pivot + hadamard((m_startBL - pivot), scaleFac));
+  };
+
+  auto doCorner = [&](const TPointParamP point, const TPointD &start,
+                      const TPointD &opposite) {
+    if (e.isCtrlPressed())
+      setValue(point, start + offset);
+    else if (e.isAltPressed())
+      scaleShape(start, m_pivot);
+    else
+      scaleShape(start, opposite);
+  };
+
+  auto doEdge = [&](const TPointParamP p1, const TPointParamP p2) {
+    if (e.isShiftPressed()) {
+      if (std::abs(offset.x) > std::abs(offset.y))
+        offset.y = 0;
+      else
+        offset.x = 0;
+    }
+    if (m_TL == p1 || m_TL == p2)
+      setValue(m_TL, m_startTL + offset);
+    else if (e.isAltPressed())
+      setValue(m_TL, m_startTL - offset);
+    if (m_TR == p1 || m_TR == p2)
+      setValue(m_TR, m_startTR + offset);
+    else if (e.isAltPressed())
+      setValue(m_TR, m_startTR - offset);
+    if (m_BR == p1 || m_BR == p2)
+      setValue(m_BR, m_startBR + offset);
+    else if (e.isAltPressed())
+      setValue(m_BR, m_startBR - offset);
+    if (m_BL == p1 || m_BL == p2)
+      setValue(m_BL, m_startBL + offset);
+    else if (e.isAltPressed())
+      setValue(m_BL, m_startBL - offset);
+  };
+
+  auto pointRotate = [&](const TPointD pos, const double angle) {
+    TPointD p = pos - m_pivot;
+    return m_pivot + TPointD(p.x * std::cos(angle) - p.y * std::sin(angle),
+                             p.x * std::sin(angle) + p.y * std::cos(angle));
+  };
+
+  switch (m_handle) {
+  case Body:
+    if (e.isCtrlPressed()) {  // rotate
+      TPointD startVec   = m_dragStartPos - m_pivot;
+      TPointD currentVec = pos - m_pivot;
+      if (currentVec == TPointD()) return;
+      double angle = std::atan2(currentVec.y, currentVec.x) -
+                     std::atan2(startVec.y, startVec.x);
+      if (e.isShiftPressed()) {
+        angle = std::round(angle / (M_PI / 2.0)) * (M_PI / 2.0);
+      }
+      setValue(m_TL, pointRotate(m_startTL, angle));
+      setValue(m_TR, pointRotate(m_startTR, angle));
+      setValue(m_BR, pointRotate(m_startBR, angle));
+      setValue(m_BL, pointRotate(m_startBL, angle));
+    } else {  // translate
+      // move all shapes
+      if (e.isShiftPressed()) {
+        if (std::abs(offset.x) > std::abs(offset.y))
+          offset.y = 0;
+        else
+          offset.x = 0;
+      }
+      setValue(m_TL, m_startTL + offset);
+      setValue(m_TR, m_startTR + offset);
+      setValue(m_BR, m_startBR + offset);
+      setValue(m_BL, m_startBL + offset);
+    }
+    break;
+  case TopLeft:
+    doCorner(m_TL, m_startTL, m_startBR);
+    break;
+  case TopRight:
+    doCorner(m_TR, m_startTR, m_startBL);
+    break;
+  case BottomRight:
+    doCorner(m_BR, m_startBR, m_startTL);
+    break;
+  case BottomLeft:
+    doCorner(m_BL, m_startBL, m_startTR);
+    break;
+  case TopEdge:
+    doEdge(m_TL, m_TR);
+    break;
+  case RightEdge:
+    doEdge(m_TR, m_BR);
+    break;
+  case BottomEdge:
+    doEdge(m_BR, m_BL);
+    break;
+  case LeftEdge:
+    doEdge(m_BL, m_TL);
+    break;
+  default:
+    break;
+  }
+}
+
+//---------------------------------------------------------------------------
+
+void QuadFxGadget::leftButtonUp(const TPointD &pos, const TMouseEvent &) {
+  m_handle = None;
+}
 
 //*************************************************************************************
 //    FxGadgetController  implementation
@@ -981,8 +1202,10 @@ void FxGadgetController::clearGadgets() {
 
 void FxGadgetController::assignId(FxGadget *gadget) {
   gadget->setId(m_nextId);
-  m_idTable[m_nextId] = gadget;
-  ++m_nextId;
+  for (int g = 0; g < gadget->getHandleCount(); g++) {
+    m_idTable[m_nextId] = gadget;
+    ++m_nextId;
+  }
 }
 
 //---------------------------------------------------------------------------
@@ -1009,9 +1232,10 @@ void FxGadgetController::selectById(unsigned int id) {
   it                       = m_idTable.find(id);
   FxGadget *selectedGadget = it != m_idTable.end() ? it->second : 0;
   if (selectedGadget != m_selectedGadget) {
-    if (m_selectedGadget) m_selectedGadget->select(false);
+    if (m_selectedGadget) m_selectedGadget->select(-1);
     m_selectedGadget = selectedGadget;
-    if (m_selectedGadget) m_selectedGadget->select(true);
+    if (m_selectedGadget)
+      m_selectedGadget->select(id - m_selectedGadget->getId());
   }
 }
 
@@ -1128,7 +1352,8 @@ void FxGadgetController::onFxSwitched() {
     if (referenceColumnIndex == -1) {
       TObjectHandle *oh = m_tool->getApplication()->getCurrentObject();
       if (!oh->getObjectId().isCamera()) {
-        oh->setObjectId(TStageObjectId::CameraId(0));
+        TXsheet *xsh = m_tool->getXsheet();
+        oh->setObjectId(TStageObjectId::CameraId(xsh->getCameraColumnIndex()));
       }
       enabled = true;
     } else if (referenceColumnIndex == m_tool->getColumnIndex())

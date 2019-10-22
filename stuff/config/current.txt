@@ -1272,6 +1272,20 @@
   <item>"STD_iwa_TextFx.boxColor" "Box Color"</item>
   <item>"STD_iwa_TextFx.showBorder" "Show Border"</item>
 
+  <item>"STD_iwa_CorridorGradientFx" 			"Corridor Gradient Iwa" 	</item>
+  <item>"STD_iwa_CorridorGradientFx.shape"	"Shape"		</item>
+  <item>"STD_iwa_CorridorGradientFx.curveType"	"Type"		</item>
+  <item>"STD_iwa_CorridorGradientFx.bottom_left_in"	"Bottom Left In"	</item>
+  <item>"STD_iwa_CorridorGradientFx.bottom_left_out"	"Bottom Left Out"		</item>
+  <item>"STD_iwa_CorridorGradientFx.bottom_right_in"	"Bottom Right In"	</item>
+  <item>"STD_iwa_CorridorGradientFx.bottom_right_out"	"Bottom Right Out"		</item>
+  <item>"STD_iwa_CorridorGradientFx.top_right_in"	"Top Right In"	</item>
+  <item>"STD_iwa_CorridorGradientFx.top_right_out"	"Top Right Out"		</item>
+  <item>"STD_iwa_CorridorGradientFx.top_left_in"	"Top Left In"	</item>
+  <item>"STD_iwa_CorridorGradientFx.top_left_out"	"Top Left Out"		</item>
+  <item>"STD_iwa_CorridorGradientFx.inner_color"	"Inner Color"		</item>
+  <item>"STD_iwa_CorridorGradientFx.outer_color"	"Outer Color"		</item>
+
  <!------------------------------ Tiled Particles Iwa ------------------------------------------->
 
   <item>STD_iwa_TiledParticlesFx "Tiled Particles Iwa" </item>

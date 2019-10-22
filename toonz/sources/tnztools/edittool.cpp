@@ -1417,7 +1417,7 @@ void EditTool::draw() {
     tglColor(normalColor);
     glPushMatrix();
     TStageObjectId currentCamId =
-        xsh->getStageObjectTree()->getCurrentCameraId();
+        TStageObjectId::CameraId(xsh->getCameraColumnIndex());
     TAffine camParentAff = xsh->getParentPlacement(currentCamId, frame);
     TAffine camAff       = xsh->getPlacement(currentCamId, frame);
     tglMultMatrix(camParentAff.inv() *
@@ -1553,9 +1553,12 @@ m_foo.setFxHandle(getApplication()->getCurrentFx());
 
   TStageObjectId objId = getObjectId();
   if (objId == TStageObjectId::NoneId) {
-    int index              = getColumnIndex();
-    if (index == -1) objId = TStageObjectId::CameraId(0);
-    objId                  = TStageObjectId::ColumnId(index);
+    int index    = getColumnIndex();
+    TXsheet *xsh = TTool::getApplication()->getCurrentXsheet()->getXsheet();
+    if (index == -1)
+      objId = TStageObjectId::CameraId(xsh->getCameraColumnIndex());
+    else
+      objId = TStageObjectId::ColumnId(index);
   }
   TTool::getApplication()->getCurrentObject()->setObjectId(objId);
 }

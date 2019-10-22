@@ -920,6 +920,9 @@ void TFxCommand::insertFx(TFx *newFx, const QList<TFxP> &fxs,
                           int row) {
   if (!newFx) return;
 
+  if (col < 0)
+    col = 0;  // Normally insert before. In case of camera, insert after
+
   std::unique_ptr<FxCommandUndo> undo(
       new InsertFxUndo(newFx, row, col, fxs, links, app));
   if (undo->isConsistent()) {

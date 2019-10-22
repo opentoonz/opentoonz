@@ -471,7 +471,7 @@ double computeThickness(double pressure, const TDoublePairProperty &property,
 
 ToonzVectorBrushTool::ToonzVectorBrushTool(std::string name, int targetType)
     : TTool(name)
-    , m_thickness("Size", 0, 100, 0, 5)
+    , m_thickness("Size", 0, 1000, 0, 5)
     , m_accuracy("Accuracy:", 1, 100, 20)
     , m_smooth("Smooth:", 0, 50, 0)
     , m_preset("Preset:")
@@ -496,6 +496,9 @@ ToonzVectorBrushTool::ToonzVectorBrushTool(std::string name, int targetType)
     , m_targetType(targetType)
     , m_workingFrameId(TFrameId()) {
   bind(targetType);
+
+  m_thickness.setNonLinearSlider();
+
   m_prop[0].bind(m_thickness);
   m_prop[0].bind(m_accuracy);
   m_prop[0].bind(m_smooth);
@@ -607,8 +610,8 @@ void ToonzVectorBrushTool::onActivate() {
 
 void ToonzVectorBrushTool::onDeactivate() {
   /*---
-  * ドラッグ中にツールが切り替わった場合に備え、onDeactivateにもMouseReleaseと同じ処理を行う
-  * ---*/
+   * ドラッグ中にツールが切り替わった場合に備え、onDeactivateにもMouseReleaseと同じ処理を行う
+   * ---*/
 
   // End current stroke.
   if (m_active && m_enabled) {
@@ -645,7 +648,7 @@ void ToonzVectorBrushTool::leftButtonDown(const TPointD &pos,
 
   int col   = app->getCurrentColumn()->getColumnIndex();
   m_isPath  = app->getCurrentObject()->isSpline();
-  m_enabled = col >= 0 || m_isPath;
+  m_enabled = col >= 0 || m_isPath || app->getCurrentFrame()->isEditingLevel();
   // todo: gestire autoenable
   if (!m_enabled) return;
   if (!m_isPath) {
@@ -1638,7 +1641,7 @@ void ToonzVectorBrushTool::loadLastBrush() {
 
 //------------------------------------------------------------------
 /*!	Brush、PaintBrush、EraserToolがPencilModeのときにTrueを返す
-*/
+ */
 bool ToonzVectorBrushTool::isPencilModeActive() { return false; }
 
 //==========================================================================================================

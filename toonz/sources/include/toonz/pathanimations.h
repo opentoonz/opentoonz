@@ -146,8 +146,13 @@ public:
 
   static PathAnimations *appAnimations(const TApplication *app);
   static StrokeId appStrokeId(const TApplication *app, TStroke *stroke);
+  static StrokeId appStrokeId(TXsheet *xsheet, int frame, int layer,
+                              TStroke *stroke);
   static shared_ptr<PathAnimation> appStroke(const TApplication *app,
                                              TStroke *stroke);
+  static shared_ptr<PathAnimation> appStroke(const TApplication *app,
+                                             TXsheet *xsheet, int frame,
+                                             int layer, TStroke *stroke);
   static void appSnapshot(const TApplication *app, TStroke *stroke);
   static void appClearAndSnapshot(const TApplication *app, TStroke *stroke);
 

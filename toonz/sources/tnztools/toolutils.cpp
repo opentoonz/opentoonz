@@ -374,7 +374,7 @@ QList<TRect> ToolUtils::splitRect(const TRect &first, const TRect &second) {
 
 TRaster32P ToolUtils::convertStrokeToImage(TStroke *stroke,
                                            const TRect &imageBounds,
-                                           TPoint &pos) {
+                                           TPoint &pos, bool pencilMode) {
   int count = stroke->getControlPointCount();
   if (count == 0) return TRaster32P();
   TPointD imgCenter = TPointD((imageBounds.x0 + imageBounds.x1) * 0.5,
@@ -408,7 +408,7 @@ TRaster32P ToolUtils::convertStrokeToImage(TStroke *stroke,
   QPainter p(&img);
   p.setPen(QPen(color, 1, Qt::SolidLine));
   p.setBrush(color);
-  p.setRenderHint(QPainter::Antialiasing, true);
+  p.setRenderHint(QPainter::Antialiasing, !pencilMode);
   QPainterPath path = strokeToPainterPath(&s);
   QRectF pathRect   = path.boundingRect();
   p.translate(-toQPoint(pos));

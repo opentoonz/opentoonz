@@ -179,8 +179,10 @@ public:
   void onDrag(const CellPosition &pos) override {
     TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
     int row = pos.frame(), col = pos.layer();
-    if (col < 0 || (!getViewer()->orientation()->isVerticalTimeline() &&
-                    col >= xsh->getColumnCount()))
+    int firstCol =
+        Preferences::instance()->isXsheetCameraColumnVisible() ? -1 : 0;
+    if (col < firstCol || (!getViewer()->orientation()->isVerticalTimeline() &&
+                           col >= xsh->getColumnCount()))
       return;
     if (row < 0) row = 0;
     if (m_modifier & Qt::ControlModifier)
@@ -1163,12 +1165,13 @@ public:
 
   void onClick(const CellPosition &pos) override {
     int row = pos.frame(), col = pos.layer();
-    m_r0 = m_r1             = row;
-    TXsheet *xsh            = getViewer()->getXsheet();
-    TStageObjectId cameraId = xsh->getStageObjectTree()->getCurrentCameraId();
+    m_r0 = m_r1  = row;
+    TXsheet *xsh = getViewer()->getXsheet();
+    TStageObjectId cameraId =
+        TStageObjectId::CameraId(xsh->getCameraColumnIndex());
 
     TStageObjectId objId = col >= 0 ? TStageObjectId::ColumnId(col) : cameraId;
-    if (col >= 0 && xsh->getColumn(col) && xsh->getColumn(col)->isLocked()) {
+    if (xsh->getColumn(col) && xsh->getColumn(col)->isLocked()) {
       m_enable = false;
       return;
     }
@@ -1546,8 +1549,10 @@ public:
     TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
     int col      = pos.layer();
     if (!m_enabled) return;
-    if (col < 0 || (!getViewer()->orientation()->isVerticalTimeline() &&
-                    col >= xsh->getColumnCount()))
+    int firstCol =
+        Preferences::instance()->isXsheetCameraColumnVisible() ? -1 : 0;
+    if (col < firstCol || (!getViewer()->orientation()->isVerticalTimeline() &&
+                           col >= xsh->getColumnCount()))
       return;
     TColumnSelection *selection = getViewer()->getColumnSelection();
     selection->selectNone();
@@ -1679,6 +1684,7 @@ public:
     TXsheet *xsh                = app->getCurrentXsheet()->getXsheet();
 
     std::set<int> indices = selection->getIndices();
+    indices.erase(-1);  // Ignore camera column
     if (indices.empty()) return;
 
     assert(m_lastCol == *indices.begin());
@@ -1795,12 +1801,12 @@ public:
     TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
     TStageObjectId columnId(getViewer()->getObjectId(m_firstCol));
     if (m_firstCol == -1)
-      columnId =
-          getViewer()->getXsheet()->getStageObjectTree()->getCurrentCameraId();
+      columnId = TStageObjectId::CameraId(
+          getViewer()->getXsheet()->getCameraColumnIndex());
     TStageObjectId parentId(getViewer()->getObjectId(m_lastCol));
     if (m_lastCol == -1)
-      parentId =
-          getViewer()->getXsheet()->getStageObjectTree()->getCurrentCameraId();
+      parentId = TStageObjectId::CameraId(
+          getViewer()->getXsheet()->getCameraColumnIndex());
     if (getViewer()->getXsheet()->getColumn(m_lastCol) &&
         getViewer()->getXsheet()->getColumn(m_lastCol)->getSoundColumn())
       return;

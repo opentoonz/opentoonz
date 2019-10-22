@@ -318,11 +318,13 @@ PaintBrushTool::PaintBrushTool()
     , m_tileSaver(0)
     , m_cursor(ToolCursor::EraserCursor)
     // sostituire i nomi con quelli del current, tipo W_ToolOptions...
-    , m_toolSize("Size:", 1, 100, 10, false)  // W_ToolOptions_BrushToolSize
-    , m_colorType("Mode:")                    // W_ToolOptions_InkOrPaint
-    , m_onlyEmptyAreas("Selective", false)    // W_ToolOptions_Selective
+    , m_toolSize("Size:", 1, 1000, 10, false)  // W_ToolOptions_BrushToolSize
+    , m_colorType("Mode:")                     // W_ToolOptions_InkOrPaint
+    , m_onlyEmptyAreas("Selective", false)     // W_ToolOptions_Selective
     , m_firstTime(true)
     , m_workingFrameId(TFrameId()) {
+  m_toolSize.setNonLinearSlider();
+
   m_colorType.addValue(LINES);
   m_colorType.addValue(AREAS);
   m_colorType.addValue(ALL);
@@ -421,7 +423,7 @@ void PaintBrushTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
   TImageP image(getImage(true));
   if (m_colorType.getValue() == LINES) m_colorTypeBrush = INK;
   if (m_colorType.getValue() == AREAS) m_colorTypeBrush = PAINT;
-  if (m_colorType.getValue() == ALL) m_colorTypeBrush = INKNPAINT;
+  if (m_colorType.getValue() == ALL) m_colorTypeBrush   = INKNPAINT;
 
   if (TToonzImageP ti = image) {
     TRasterCM32P ras = ti->getRaster();

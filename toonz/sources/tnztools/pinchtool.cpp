@@ -85,6 +85,8 @@ PinchTool::PinchTool()
     , m_selector(500, 10, 1000) {
   bind(TTool::Vectors);
 
+  m_toolRange.setNonLinearSlider();
+
   m_prop.bind(m_toolCornerSize);
   m_prop.bind(m_autoOrManual);
   m_prop.bind(m_toolRange);

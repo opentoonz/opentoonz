@@ -903,6 +903,7 @@ bool VectorizerPopup::apply() {
   int r1               = 0;
   int c1               = 0;
   bool isCellSelection = getSelectedLevels(levels, r0, c0, r1, c1);
+  if (c0 < 0) c0       = 0;
   if (levels.empty()) {
     error(tr("The current selection is invalid."));
     return false;

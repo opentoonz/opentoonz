@@ -102,11 +102,19 @@ onSliderChanged(int value),
 class DVAPI DoubleValueField : public QWidget {
   Q_OBJECT
 
+  bool m_isLinearSlider;
+
 protected:
   RollerField *m_roller;
   DoubleValueLineEdit *m_lineEdit;
   QSlider *m_slider;
   QWidget *m_spaceWidget;
+
+  void setLinearSlider(bool linear) { m_isLinearSlider = linear; }
+
+private:
+  double pos2value(int x) const;
+  int value2pos(double v) const;
 
 public:
   DoubleValueField(QWidget *parent, DoubleValueLineEdit *lineEdit);
@@ -158,7 +166,7 @@ signals:
   void valueChanged(bool);
 
   /*! This signal is emitted only when users edited the value by hand
-*/
+   */
   void valueEditedByHand();
 };
 

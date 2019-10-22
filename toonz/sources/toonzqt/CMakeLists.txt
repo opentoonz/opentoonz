@@ -72,6 +72,7 @@ set(MOC_HEADERS
 
 set(HEADERS
     ${MOC_HEADERS}
+    ../include/tools/cursormanager.h
     docklayout.h
     functionpaneltools.h
     fxdata.h
@@ -103,6 +104,7 @@ set(HEADERS
 )
 
 set(SOURCES
+    ../tnztools/cursormanager.cpp
     checkbox.cpp
     colorfield.cpp
     docklayout.cpp

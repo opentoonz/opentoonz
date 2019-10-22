@@ -57,6 +57,7 @@
 #include <QButtonGroup>
 #include <QPushButton>
 #include <QLabel>
+#include <QMessageBox>
 
 TEnv::IntVar ViewCameraToggleAction("ViewCameraToggleAction", 1);
 TEnv::IntVar ViewTableToggleAction("ViewTableToggleAction", 1);
@@ -459,6 +460,7 @@ centralWidget->setLayout(centralWidgetLayout);*/
                     &MainWindow::onNewToonzRasterLevelButtonPressed);
   setCommandHandler("MI_NewRasterLevel", this,
                     &MainWindow::onNewRasterLevelButtonPressed);
+  setCommandHandler(MI_ClearCacheFolder, this, &MainWindow::clearCacheFolder);
   // remove ffmpegCache if still exists from crashed exit
   QString ffmpegCachePath =
       ToonzFolder::getCacheRootFolder().getQString() + "//ffmpeg";
@@ -1556,7 +1558,8 @@ void MainWindow::defineActions() {
   createRightClickMenuAction(MI_SavePaletteAs, tr("&Save Palette As..."), "");
   createRightClickMenuAction(MI_OverwritePalette, tr("&Save Palette"), "");
   createMenuFileAction(MI_LoadColorModel, tr("&Load Color Model..."), "");
-  createMenuFileAction(MI_ImportMagpieFile, tr("&Import Magpie File..."), "");
+  createMenuFileAction(MI_ImportMagpieFile,
+                       tr("&Import Toonz Lip Sync File..."), "");
   createMenuFileAction(MI_NewProject, tr("&New Project..."), "");
   createMenuFileAction(MI_ProjectSettings, tr("&Project Settings..."), "");
   createMenuFileAction(MI_SaveDefaultSettings, tr("&Save Default Settings"),
@@ -1596,6 +1599,7 @@ void MainWindow::defineActions() {
   createMenuAction(MI_LoadRecentImage, tr("&Load Recent Image Files"), files);
   createMenuFileAction(MI_ClearRecentImage,
                        tr("&Clear Recent Flipbook Image List"), "");
+  createMenuFileAction(MI_ClearCacheFolder, tr("&Clear Cache Folder"), "");
 
   createRightClickMenuAction(MI_PreviewFx, tr("Preview Fx"), "");
 
@@ -1758,6 +1762,8 @@ void MainWindow::defineActions() {
                          "Alt+L");
   createRightClickMenuAction(MI_ToggleXSheetToolbar,
                              tr("Toggle XSheet Toolbar"), "");
+  createRightClickMenuAction(MI_ToggleXsheetCameraColumn,
+                             tr("Show/Hide Xsheet Camera Column"), "");
   createMenuCellsAction(MI_Reverse, tr("&Reverse"), "");
   createMenuCellsAction(MI_Swing, tr("&Swing"), "");
   createMenuCellsAction(MI_Random, tr("&Random"), "");
@@ -2332,6 +2338,96 @@ void MainWindow::onNewRasterLevelButtonPressed() {
   Preferences::instance()->setDefLevelType(OVL_XSHLEVEL);
   CommandManager::instance()->execute("MI_NewLevel");
   Preferences::instance()->setDefLevelType(defaultLevelType);
+}
+
+//-----------------------------------------------------------------------------
+// delete unused files / folders in the cache
+void MainWindow::clearCacheFolder() {
+  // currently cache folder is used for following purposes
+  // 1. $CACHE/[ProcessID] : for disk swap of image cache.
+  //    To be deleted on exit. Remains on crash.
+  // 2. $CACHE/ffmpeg : ffmpeg cache.
+  //    To be cleared on the end of rendering, on exist and on launch.
+  // 3. $CACHE/temp : untitled scene data.
+  //    To be deleted on switching or exiting scenes. Remains on crash.
+
+  // So, this function will delete all files / folders in $CACHE
+  // except the following items:
+  // 1. $CACHE/[Current ProcessID]
+  // 2. $CACHE/temp/[Current scene folder] if the current scene is untitled
+
+  TFilePath cacheRoot                = ToonzFolder::getCacheRootFolder();
+  if (cacheRoot.isEmpty()) cacheRoot = TEnv::getStuffDir() + "cache";
+
+  TFilePathSet filesToBeRemoved;
+
+  TSystem::readDirectory(filesToBeRemoved, cacheRoot, false);
+
+  // keep the imagecache folder
+  filesToBeRemoved.remove(cacheRoot + std::to_string(TSystem::getProcessId()));
+  // keep the untitled scene data folder
+  if (TApp::instance()->getCurrentScene()->getScene()->isUntitled()) {
+    filesToBeRemoved.remove(cacheRoot + "temp");
+    TFilePathSet untitledData =
+        TSystem::readDirectory(cacheRoot + "temp", false);
+    untitledData.remove(TApp::instance()
+                            ->getCurrentScene()
+                            ->getScene()
+                            ->getScenePath()
+                            .getParentDir());
+    filesToBeRemoved.insert(filesToBeRemoved.end(), untitledData.begin(),
+                            untitledData.end());
+  }
+
+  // return if there is no files/folders to be deleted
+  if (filesToBeRemoved.size() == 0) {
+    QMessageBox::information(
+        this, tr("Clear Cache Folder"),
+        tr("There are no unused items in the cache folder."));
+    return;
+  }
+
+  QString message(tr("Deleting the following items:\n"));
+  int count = 0;
+  for (const auto &fileToBeRemoved : filesToBeRemoved) {
+    QString dirPrefix =
+        (TFileStatus(fileToBeRemoved).isDirectory()) ? tr("<DIR> ") : "";
+    message +=
+        "   " + dirPrefix + (fileToBeRemoved - cacheRoot).getQString() + "\n";
+    count++;
+    if (count == 5) break;
+  }
+  if (filesToBeRemoved.size() > 5)
+    message +=
+        tr("   ... and %1 more items\n").arg(filesToBeRemoved.size() - 5);
+
+  message +=
+      tr("\nAre you sure?\n\nN.B. Make sure you are not running another "
+         "process of OpenToonz,\nor you may delete necessary files for it.");
+
+  QMessageBox::StandardButton ret = QMessageBox::question(
+      this, tr("Clear Cache Folder"), message,
+      QMessageBox::StandardButtons(QMessageBox::Ok | QMessageBox::Cancel));
+
+  if (ret != QMessageBox::Ok) return;
+
+  for (const auto &fileToBeRemoved : filesToBeRemoved) {
+    try {
+      if (TFileStatus(fileToBeRemoved).isDirectory())
+        TSystem::rmDirTree(fileToBeRemoved);
+      else
+        TSystem::deleteFile(fileToBeRemoved);
+    } catch (TException &e) {
+      QMessageBox::warning(
+          this, tr("Clear Cache Folder"),
+          tr("Can't delete %1 : ").arg(fileToBeRemoved.getQString()) +
+              QString::fromStdWString(e.getMessage()));
+    } catch (...) {
+      QMessageBox::warning(
+          this, tr("Clear Cache Folder"),
+          tr("Can't delete %1 : ").arg(fileToBeRemoved.getQString()));
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------

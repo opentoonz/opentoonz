@@ -177,7 +177,7 @@ inline void doPixBinary(QRgb* pix, int threshold) {
     gray = 255;
   else
     gray = 0;
-  *pix = qRgb(gray, gray, gray);
+  *pix   = qRgb(gray, gray, gray);
 }
 
 //-----------------------------------------------------------------------------
@@ -220,7 +220,7 @@ void onChange(QImage& img, int black, int white, float gamma, bool doGray) {
 void onChangeBW(QImage& img, int threshold) {
   int lx = img.width(), y, ly = img.height();
   for (y = 0; y < ly; ++y) {
-    QRgb *pix = (QRgb*)img.scanLine(y), *endPix = (QRgb*)(pix + lx);
+    QRgb *pix = (QRgb *)img.scanLine(y), *endPix = (QRgb *)(pix + lx);
     while (pix < endPix) {
       doPixBinary(pix, threshold);
       ++pix;
@@ -476,7 +476,7 @@ bool getRasterLevelSize(TXshLevel* level, TDimension& dim) {
 void ApplyLutTask::run() {
   int lx = m_img.width();
   for (int y = m_fromY; y < m_toY; ++y) {
-    QRgb *pix = (QRgb*)m_img.scanLine(y), *endPix = (QRgb*)(pix + lx);
+    QRgb *pix = (QRgb *)m_img.scanLine(y), *endPix = (QRgb *)(pix + lx);
     while (pix < endPix) {
       doPix(pix, m_lut);
       ++pix;
@@ -487,7 +487,7 @@ void ApplyLutTask::run() {
 void ApplyGrayLutTask::run() {
   int lx = m_img.width();
   for (int y = m_fromY; y < m_toY; ++y) {
-    QRgb *pix = (QRgb*)m_img.scanLine(y), *endPix = (QRgb*)(pix + lx);
+    QRgb *pix = (QRgb *)m_img.scanLine(y), *endPix = (QRgb *)(pix + lx);
     while (pix < endPix) {
       doPixGray(pix, m_lut);
       ++pix;
@@ -1426,10 +1426,10 @@ void PencilTestSaveInFolderPopup::updateParentFolder() {
 
 PencilTestPopup::PencilTestPopup()
     // set the parent 0 in order to enable the popup behind the main window
-    : Dialog(0, false, false, "PencilTest")
-    , m_currentCamera(NULL)
-    , m_captureWhiteBGCue(false)
-    , m_captureCue(false) {
+    : Dialog(0, false, false, "PencilTest"),
+      m_currentCamera(NULL),
+      m_captureWhiteBGCue(false),
+      m_captureCue(false) {
   setWindowTitle(tr("Camera Capture"));
 
   // add maximize button to the dialog
@@ -1756,7 +1756,7 @@ PencilTestPopup::PencilTestPopup()
   bool ret = true;
   ret      = ret && connect(refreshCamListButton, SIGNAL(pressed()), this,
                        SLOT(refreshCameraList()));
-  ret      = ret && connect(m_cameraListCombo, SIGNAL(activated(int)), this,
+  ret = ret && connect(m_cameraListCombo, SIGNAL(activated(int)), this,
                        SLOT(onCameraListComboActivated(int)));
   ret = ret && connect(m_resolutionCombo, SIGNAL(activated(const QString&)),
                        this, SLOT(onResolutionComboActivated(const QString&)));
@@ -2553,8 +2553,9 @@ bool PencilTestPopup::importImage(QImage image) {
 
       /* if the loaded level does not match in pixel size, then return */
       sl = level->getSimpleLevel();
-      if (!sl || sl->getProperties()->getImageRes() !=
-                     TDimension(image.width(), image.height())) {
+      if (!sl ||
+          sl->getProperties()->getImageRes() !=
+              TDimension(image.width(), image.height())) {
         error(tr(
             "The captured image size does not match with the existing level."));
         return false;
@@ -2579,7 +2580,7 @@ bool PencilTestPopup::importImage(QImage image) {
     else {
       TXshLevel* level = scene->createNewLevel(OVL_XSHLEVEL, levelName,
                                                TDimension(), 0, levelFp);
-      sl               = level->getSimpleLevel();
+      sl = level->getSimpleLevel();
       sl->setPath(levelFp, true);
       sl->getProperties()->setDpiPolicy(LevelProperties::DP_CustomDpi);
       TPointD dpi;
@@ -2631,7 +2632,7 @@ bool PencilTestPopup::importImage(QImage image) {
 
   // if the level is newly created or imported, then insert a new column
   if (state == NEWLEVEL) {
-    if (!xsh->isColumnEmpty(col)) {
+    if (col < 0 || !xsh->isColumnEmpty(col)) {
       col += 1;
       xsh->insertColumn(col);
     }
@@ -2768,7 +2769,7 @@ void PencilTestPopup::refreshFrameInfo() {
 
   // frame existence
   TFilePath frameFp(actualLevelFp.withFrame(frameNumber));
-  bool frameExist = false;
+  bool frameExist            = false;
   if (levelExist) frameExist = TFileStatus(frameFp).doesExist();
 
   // reset acceptable camera size

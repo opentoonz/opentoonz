@@ -42,7 +42,7 @@ class ScreenMapper final : public QObject {
   XsheetViewer *m_viewer;
 
   const Orientation *m_orientation;
-  ColumnFanGeometry *m_columnFan;
+  ColumnFan *m_columnFan;
   SubLayers *m_subLayers;
   // place for zoom-in variable here
 
@@ -56,7 +56,7 @@ public:
 
   void setOrientation(const Orientation *o);
   const Orientation *orientation() const { return m_orientation; }
-  ColumnFanGeometry *columnFan() const { return m_columnFan; }
+  ColumnFan *columnFan() const { return m_columnFan; }
   SubLayers *subLayers() const { return m_subLayers; }
 
   // orientation

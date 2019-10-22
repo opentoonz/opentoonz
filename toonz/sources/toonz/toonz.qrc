@@ -26,6 +26,8 @@
         <file>Resources/brush.svg</file>
         <file>Resources/brush_rollover.svg</file>
         <file>Resources/camera.png</file>
+        <file>Resources/camera.svg</file>
+        <file>Resources/camera_small.svg</file>
         <file>Resources/camera_selected.png</file>
         <file>Resources/camerastand_toggle.png</file>
         <file>Resources/canvas.svg</file>

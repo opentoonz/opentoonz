@@ -194,7 +194,7 @@ public:
 
 //=========================================================================
 
-//! Birghtness/Contrast color transform data
+//! Brightness/Contrast color transform data
 
 #define MAX_N_PENCILS 8
 
@@ -207,7 +207,7 @@ TPixelRGBM32 Paper = TPixel32::White;
 
 //=========================================================================
 
-//! Birghtness/Contrast color transform structure
+//! Brightness/Contrast color transform structure
 class TransfFunction {
   USHORT TransfFun[(MAX_N_PENCILS + 1) << 8];
 

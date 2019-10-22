@@ -70,7 +70,7 @@ namespace {
 
 void initToonzEvent(TMouseEvent &toonzEvent, QMouseEvent *event,
                     int widgetHeight, double pressure, int devPixRatio) {
-  toonzEvent.m_pos      = TPointD(event->pos().x() * devPixRatio,
+  toonzEvent.m_pos = TPointD(event->pos().x() * devPixRatio,
                              widgetHeight - 1 - event->pos().y() * devPixRatio);
   toonzEvent.m_mousePos = event->pos();
   toonzEvent.m_pressure = 1.0;
@@ -809,17 +809,17 @@ void SceneViewer::onRelease(const TMouseEvent &event) {
 
 quit:
   m_mouseButton = Qt::NoButton;
-  // If m_tabletState is "Touched", we've been called by tabletPress event.
-  // Don't clear it out table state so the tablePress event will process
-  // correctly.
-  if (m_tabletState != Touched) m_tabletState = None;
-  m_mouseState = None;
-  m_tabletMove = false;
-  m_pressure   = 0;
   // Leave m_tabletEvent as-is in order to check whether the onRelease is called
   // from tabletEvent or not in mouseReleaseEvent.
   if (m_tabletState == Released)  // only clear if tabletRelease event
     m_tabletEvent = false;
+  // If m_tabletState is "Touched", we've been called by tabletPress event.
+  // Don't clear it out table state so the tablePress event will process
+  // correctly.
+  if (m_tabletState != Touched) m_tabletState = None;
+  m_mouseState                                = None;
+  m_tabletMove                                = false;
+  m_pressure                                  = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -871,12 +871,12 @@ void SceneViewer::wheelEvent(QWheelEvent *event) {
 
   default:  // Qt::MouseEventSynthesizedByQt,
             // Qt::MouseEventSynthesizedByApplication
-  {
-    std::cout << "not supported event: Qt::MouseEventSynthesizedByQt, "
-                 "Qt::MouseEventSynthesizedByApplication"
-              << std::endl;
-    break;
-  }
+    {
+      std::cout << "not supported event: Qt::MouseEventSynthesizedByQt, "
+                   "Qt::MouseEventSynthesizedByApplication"
+                << std::endl;
+      break;
+    }
 
   }  // end switch
 
@@ -911,6 +911,7 @@ void SceneViewer::wheelEvent(QWheelEvent *event) {
               m_touchDevice == QTouchDevice::TouchScreen) ||
              m_gestureActive == false) {
       zoomQt(event->pos() * getDevPixRatio(), exp(0.001 * delta));
+      m_panning = false;
     }
   }
   event->accept();
@@ -929,6 +930,8 @@ void SceneViewer::gestureEvent(QGestureEvent *e) {
     QPinchGesture *gesture = static_cast<QPinchGesture *>(pinch);
     QPinchGesture::ChangeFlags changeFlags = gesture->changeFlags();
     QPoint firstCenter                     = gesture->centerPoint().toPoint();
+    if (m_touchDevice == QTouchDevice::TouchScreen)
+      firstCenter = mapFromGlobal(firstCenter);
 
     if (gesture->state() == Qt::GestureStarted) {
       m_gestureActive = true;
@@ -961,6 +964,7 @@ void SceneViewer::gestureEvent(QGestureEvent *e) {
         }
         if (m_zooming) {
           zoomQt(firstCenter * getDevPixRatio(), scaleFactor);
+          m_panning = false;
         }
         m_gestureActive = true;
       }
@@ -968,8 +972,8 @@ void SceneViewer::gestureEvent(QGestureEvent *e) {
         qreal rotationDelta =
             gesture->rotationAngle() - gesture->lastRotationAngle();
         if (m_isFlippedX != m_isFlippedY) rotationDelta = -rotationDelta;
-        TAffine aff    = getViewMatrix().inv();
-        TPointD center = aff * TPointD(0, 0);
+        TAffine aff                                     = getViewMatrix().inv();
+        TPointD center                                  = aff * TPointD(0, 0);
         if (!m_rotating && !m_zooming) {
           m_rotationDelta += rotationDelta;
           double absDelta = abs(m_rotationDelta);
@@ -1110,9 +1114,10 @@ bool SceneViewer::event(QEvent *e) {
     break;
   }
   */
-  if (e->type() == QEvent::Gesture && CommandManager::instance()
-                                          ->getAction(MI_TouchGestureControl)
-                                          ->isChecked()) {
+  if (e->type() == QEvent::Gesture &&
+      CommandManager::instance()
+          ->getAction(MI_TouchGestureControl)
+          ->isChecked()) {
     gestureEvent(static_cast<QGestureEvent *>(e));
     return true;
   }
