@@ -258,8 +258,8 @@ ffmpegFileInfo Ffmpeg::getInfo() {
   } else {
     QFile infoText(tempPath);
     getSize();
-    getFrameRate();
     getFrameCount();
+    getFrameRate();
     infoText.open(QIODevice::WriteOnly);
     std::string infoToWrite =
         std::to_string(m_lx) + " " + std::to_string(m_ly) + " " +
@@ -313,7 +313,7 @@ double Ffmpeg::getFrameRate() {
     fpsArgs << "-select_streams";
     fpsArgs << "v:0";
     fpsArgs << "-show_entries";
-    fpsArgs << "stream=avg_frame_rate";
+    fpsArgs << "stream=r_frame_rate";
     fpsArgs << "-of";
     fpsArgs << "default=noprint_wrappers=1:nokey=1";
     fpsArgs << m_path.getQString();
