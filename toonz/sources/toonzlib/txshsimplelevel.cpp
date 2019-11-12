@@ -119,7 +119,9 @@ bool isAreadOnlyLevel(const TFilePath &path) {
   if (path.getDots() == "." ||
       (path.getDots() == ".." &&
        (path.getType() == "tlv" || path.getType() == "tpl"))) {
-    if (path.getType() == "psd") return true;
+    if (path.getType() == "psd" || path.getType() == "gif" ||
+        path.getType() == "mp4" || path.getType() == "webm")
+      return true;
     if (!TSystem::doesExistFileOrLevel(path)) return false;
     TFileStatus fs(path);
     return !fs.isWritable();

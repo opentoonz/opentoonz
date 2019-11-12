@@ -990,6 +990,9 @@ QString TTool::updateEnabled(int rowIndex, int columnIndex) {
       // Check level type write support
       if (sl->getPath().getType() ==
               "psd" ||  // We don't have the API to write psd files
+          sl->getPath().getType() == "gif" ||
+          sl->getPath().getType() == "mp4" ||
+          sl->getPath().getType() == "webm" ||
           sl->is16BitChannelLevel() ||  // Inherited by previous implementation.
                                         // Could be fixed?
           sl->getProperties()->getBpp() ==
