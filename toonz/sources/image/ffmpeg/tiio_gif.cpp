@@ -92,7 +92,7 @@ TLevelWriterGif::~TLevelWriterGif() {
   preIArgs << "-v";
   preIArgs << "warning";
   preIArgs << "-r";
-  preIArgs << QString::number(std::max(m_frameRate, 12.0));
+  preIArgs << QString::number((m_frameRate < 1 ? 12.0 : m_frameRate));
   if (m_palette) {
     postIArgs << "-i";
     postIArgs << palette;
