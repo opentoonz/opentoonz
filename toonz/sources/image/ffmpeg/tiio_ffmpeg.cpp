@@ -258,8 +258,8 @@ ffmpegFileInfo Ffmpeg::getInfo() {
   } else {
     QFile infoText(tempPath);
     getSize();
-    getFrameRate();
     getFrameCount();
+    getFrameRate();
     infoText.open(QIODevice::WriteOnly);
     std::string infoToWrite =
         std::to_string(m_lx) + " " + std::to_string(m_ly) + " " +
@@ -306,24 +306,22 @@ TRasterImageP Ffmpeg::getImage(int frameIndex) {
 }
 
 double Ffmpeg::getFrameRate() {
-  if (m_frameCount > 0) {
-    QStringList fpsArgs;
-    fpsArgs << "-v";
-    fpsArgs << "error";
-    fpsArgs << "-select_streams";
-    fpsArgs << "v:0";
-    fpsArgs << "-show_entries";
-    fpsArgs << "stream=avg_frame_rate";
-    fpsArgs << "-of";
-    fpsArgs << "default=noprint_wrappers=1:nokey=1";
-    fpsArgs << m_path.getQString();
-    QString fpsResults = runFfprobe(fpsArgs);
+  QStringList fpsArgs;
+  fpsArgs << "-v";
+  fpsArgs << "error";
+  fpsArgs << "-select_streams";
+  fpsArgs << "v:0";
+  fpsArgs << "-show_entries";
+  fpsArgs << "stream=r_frame_rate";
+  fpsArgs << "-of";
+  fpsArgs << "default=noprint_wrappers=1:nokey=1";
+  fpsArgs << m_path.getQString();
+  QString fpsResults = runFfprobe(fpsArgs);
 
-    int fpsNum = fpsResults.split("/")[0].toInt();
-    int fpsDen = fpsResults.split("/")[1].toInt();
-    if (fpsDen > 0) {
-      m_frameRate = fpsNum / fpsDen;
-    }
+  int fpsNum = fpsResults.split("/")[0].toInt();
+  int fpsDen = fpsResults.split("/")[1].toInt();
+  if (fpsDen > 0) {
+    m_frameRate = (double)fpsNum / (double)fpsDen;
   }
   return m_frameRate;
 }
@@ -355,13 +353,13 @@ int Ffmpeg::getFrameCount() {
   frameCountArgs << "-select_streams";
   frameCountArgs << "v:0";
   frameCountArgs << "-show_entries";
-  frameCountArgs << "stream=nb_read_frames";
+  frameCountArgs << "stream=duration";
   frameCountArgs << "-of";
   frameCountArgs << "default=nokey=1:noprint_wrappers=1";
   frameCountArgs << m_path.getQString();
 
   QString frameResults = runFfprobe(frameCountArgs);
-  m_frameCount         = frameResults.toInt();
+  m_frameCount         = frameResults.toDouble() * getFrameRate();
   return m_frameCount;
 }
 

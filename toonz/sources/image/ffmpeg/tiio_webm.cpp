@@ -174,8 +174,6 @@ TLevelReaderWebm::TLevelReaderWebm(const TFilePath &path) : TLevelReader(path) {
   m_lx                    = m_size.lx;
   m_ly                    = m_size.ly;
 
-  ffmpegReader->getFramesFromMovie();
-
   // set values
   m_info                   = new TImageInfo();
   m_info->m_frameRate      = fps;
@@ -220,6 +218,10 @@ TDimension TLevelReaderWebm::getSize() { return m_size; }
 //------------------------------------------------
 
 TImageP TLevelReaderWebm::load(int frameIndex) {
+  if (!ffmpegFramesCreated) {
+    ffmpegReader->getFramesFromMovie();
+    ffmpegFramesCreated = true;
+  }
   return ffmpegReader->getImage(frameIndex);
 }
 

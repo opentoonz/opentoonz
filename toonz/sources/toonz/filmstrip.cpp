@@ -1065,7 +1065,10 @@ void FilmstripFrames::contextMenuEvent(QContextMenuEvent *event) {
       menu->addAction(cm->getAction(MI_RevertToCleanedUp));
     if (sl &&
         (sl->getType() == TZP_XSHLEVEL || sl->getType() == PLI_XSHLEVEL ||
-         (sl->getType() == OVL_XSHLEVEL && sl->getPath().getType() != "psd")))
+         (sl->getType() == OVL_XSHLEVEL && sl->getPath().getType() != "psd" &&
+          sl->getPath().getType() != "gif" &&
+          sl->getPath().getType() != "mp4" &&
+          sl->getPath().getType() != "webm")))
       menu->addAction(cm->getAction(MI_RevertToLastSaved));
   }
 

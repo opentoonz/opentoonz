@@ -104,8 +104,8 @@ bool checkCreatorString(const QString &creator) {
     if (pos >= 0 && len >= 4) {
       QString v;
       if (len > 4) v = creator.mid(pos + 3, len - 4);
-      bool ok = true;
-      mask    = v.toInt(&ok, 16);
+      bool ok        = true;
+      mask           = v.toInt(&ok, 16);
     }
   }
   return (mask & compatibility.neededMask) == compatibility.neededMask &&
@@ -119,7 +119,9 @@ bool isAreadOnlyLevel(const TFilePath &path) {
   if (path.getDots() == "." ||
       (path.getDots() == ".." &&
        (path.getType() == "tlv" || path.getType() == "tpl"))) {
-    if (path.getType() == "psd") return true;
+    if (path.getType() == "psd" || path.getType() == "gif" ||
+        path.getType() == "mp4" || path.getType() == "webm")
+      return true;
     if (!TSystem::doesExistFileOrLevel(path)) return false;
     TFileStatus fs(path);
     return !fs.isWritable();
@@ -169,8 +171,8 @@ void getIndexesRangefromFids(TXshSimpleLevel *level,
 
   std::set<TFrameId>::const_iterator it;
   for (it = fids.begin(); it != fids.end(); ++it) {
-    int index = level->guessIndex(*it);
-    if (index > toIndex) toIndex = index;
+    int index                        = level->guessIndex(*it);
+    if (index > toIndex) toIndex     = index;
     if (index < fromIndex) fromIndex = index;
   }
 }
@@ -910,15 +912,16 @@ void TXshSimpleLevel::loadData(TIStream &is) {
         if (is.getTagParam("dpix", v)) xdpi = std::stod(v);
         if (is.getTagParam("dpiy", v)) ydpi = std::stod(v);
         if (xdpi != 0 && ydpi != 0) dpiPolicy = LevelProperties::DP_CustomDpi;
-        std::string dpiType = is.getTagAttribute("dpiType");
-        if (dpiType == "image") dpiPolicy = LevelProperties::DP_ImageDpi;
-        if (is.getTagParam("type", v) && v == "s") type = TZI_XSHLEVEL;
-        if (is.getTagParam("subsampling", v)) subsampling = std::stoi(v);
-        if (is.getTagParam("premultiply", v)) doPremultiply = std::stoi(v);
+        std::string dpiType                   = is.getTagAttribute("dpiType");
+        if (dpiType == "image") dpiPolicy     = LevelProperties::DP_ImageDpi;
+        if (is.getTagParam("type", v) && v == "s") type       = TZI_XSHLEVEL;
+        if (is.getTagParam("subsampling", v)) subsampling     = std::stoi(v);
+        if (is.getTagParam("premultiply", v)) doPremultiply   = std::stoi(v);
         if (is.getTagParam("antialias", v)) antialiasSoftness = std::stoi(v);
         if (is.getTagParam("whiteTransp", v)) whiteTransp     = std::stoi(v);
         if (is.getTagParam("isStopMotionLevel", v))
           isStopMotionLevel = std::stoi(v);
+
 
         m_properties->setDpiPolicy(dpiPolicy);
         m_properties->setDpi(TPointD(xdpi, ydpi));
@@ -1050,8 +1053,9 @@ static TFilePath getLevelPathAndSetNameWithPsdLevelName(
       if (removeFileName) wLevelName = list[1].toStdWString();
 
       TLevelSet *levelSet = xshLevel->getScene()->getLevelSet();
-      if (levelSet && levelSet->hasLevel(
-                          wLevelName))  // levelSet should be asserted instead
+      if (levelSet &&
+          levelSet->hasLevel(
+              wLevelName))  // levelSet should be asserted instead
         levelSet->renameLevel(xshLevel, wLevelName);
 
       xshLevel->setName(wLevelName);
@@ -1587,8 +1591,8 @@ void TXshSimpleLevel::saveSimpleLevel(const TFilePath &decodedFp,
   std::vector<TFrameId> fids;
   getFids(fids);
 
-  bool isLevelModified   = getProperties()->getDirtyFlag();
-  bool isPaletteModified = false;
+  bool isLevelModified                = getProperties()->getDirtyFlag();
+  bool isPaletteModified              = false;
   if (getPalette()) isPaletteModified = getPalette()->getDirtyFlag();
 
   if (isLevelModified || isPaletteModified) {
@@ -1719,6 +1723,9 @@ void TXshSimpleLevel::saveSimpleLevel(const TFilePath &decodedFp,
       // strategia
       LevelUpdater updater(this);
       updater.getLevelWriter()->setCreator(getCreatorString());
+      if (updater.getImageInfo())
+        updater.getLevelWriter()->setFrameRate(
+            updater.getImageInfo()->m_frameRate);
 
       if (isLevelModified) {
         // Apply the level's renumber table, before saving other files.
@@ -1831,11 +1838,11 @@ void TXshSimpleLevel::saveSimpleLevel(const TFilePath &decodedFp,
 std::string TXshSimpleLevel::getImageId(const TFrameId &fid,
                                         int frameStatus) const {
   if (frameStatus < 0) frameStatus = getFrameStatus(fid);
-  std::string prefix = "L";
+  std::string prefix               = "L";
   if (frameStatus & CleanupPreview)
     prefix = "P";
   else if ((frameStatus & (Scanned | Cleanupped)) == Scanned)
-    prefix = "S";
+    prefix            = "S";
   std::string imageId = m_idBase + "_" + prefix + fid.expand();
   return imageId;
 }
@@ -2261,7 +2268,7 @@ TFilePath TXshSimpleLevel::getExistingHookFile(
 
   int f, fCount = hookFiles.size();
   for (f = 0; f != fCount; ++f) {
-    fPattern = locals::getPattern(hookFiles[f]);
+    fPattern            = locals::getPattern(hookFiles[f]);
     if (fPattern < p) p = fPattern, h = f;
   }
 
@@ -2300,8 +2307,8 @@ TRectD TXshSimpleLevel::getBBox(const TFrameId &fid) const {
     if (!info) return TRectD();
 
     bbox = TRectD(TPointD(info->m_x0, info->m_y0),
-		  TPointD(info->m_x1, info->m_y1))
-          - 0.5 * TPointD(info->m_lx, info->m_ly);
+                  TPointD(info->m_x1, info->m_y1)) -
+           0.5 * TPointD(info->m_lx, info->m_ly);
 
     if (info->m_dpix > 0.0 && info->m_dpiy > 0.0)
       dpiX = info->m_dpix, dpiY = info->m_dpiy;

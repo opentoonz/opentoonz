@@ -92,7 +92,7 @@ TLevelWriterGif::~TLevelWriterGif() {
   preIArgs << "-v";
   preIArgs << "warning";
   preIArgs << "-r";
-  preIArgs << QString::number(m_frameRate);
+  preIArgs << QString::number((m_frameRate < 1 ? 12.0 : m_frameRate));
   if (m_palette) {
     postIArgs << "-i";
     postIArgs << palette;
@@ -194,8 +194,6 @@ TLevelReaderGif::TLevelReaderGif(const TFilePath &path)
   m_lx                    = m_size.lx;
   m_ly                    = m_size.ly;
 
-  ffmpegReader->getFramesFromMovie();
-  m_frameCount = ffmpegReader->getGifFrameCount();
   // set values
   m_info                   = new TImageInfo();
   m_info->m_frameRate      = fps;
@@ -239,6 +237,10 @@ TDimension TLevelReaderGif::getSize() { return m_size; }
 //------------------------------------------------
 
 TImageP TLevelReaderGif::load(int frameIndex) {
+  if (!ffmpegFramesCreated) {
+    ffmpegReader->getFramesFromMovie();
+    ffmpegFramesCreated = true;
+  }
   return ffmpegReader->getImage(frameIndex);
 }
 

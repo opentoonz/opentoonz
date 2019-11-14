@@ -173,8 +173,6 @@ TLevelReaderMp4::TLevelReaderMp4(const TFilePath &path) : TLevelReader(path) {
   m_lx                    = m_size.lx;
   m_ly                    = m_size.ly;
 
-  ffmpegReader->getFramesFromMovie();
-
   // set values
   m_info                   = new TImageInfo();
   m_info->m_frameRate      = fps;
@@ -219,6 +217,10 @@ TDimension TLevelReaderMp4::getSize() { return m_size; }
 //------------------------------------------------
 
 TImageP TLevelReaderMp4::load(int frameIndex) {
+  if (!ffmpegFramesCreated) {
+    ffmpegReader->getFramesFromMovie();
+    ffmpegFramesCreated = true;
+  }
   return ffmpegReader->getImage(frameIndex);
 }
 

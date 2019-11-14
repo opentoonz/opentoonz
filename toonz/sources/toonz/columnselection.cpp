@@ -179,7 +179,10 @@ static bool canMergeColumns(int column, int mColumn, bool forMatchlines) {
         return false;
       // Check level type write support. Based on TTool::updateEnabled()
       if (level->getType() == OVL_XSHLEVEL &&
-          (level->getPath().getType() == "psd" ||     // PSD files.
+          (level->getPath().getType() == "psd" ||  // PSD files.
+           level->getPath().getType() == "gif" ||
+           level->getPath().getType() == "mp4" ||
+           level->getPath().getType() == "webm" ||
            level->is16BitChannelLevel() ||            // 16bpc images.
            level->getProperties()->getBpp() == 1)) {  // Black & White images.
         return false;

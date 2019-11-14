@@ -495,7 +495,9 @@ bool pasteStrokesInCellWithoutUndo(
   } else {
     vi = cell.getImage(true);
     sl = cell.getSimpleLevel();
-    if (sl->getType() == OVL_XSHLEVEL && sl->getPath().getType() == "psd")
+    if (sl->getType() == OVL_XSHLEVEL &&
+        (sl->getPath().getType() == "psd" || sl->getPath().getType() == "gif" ||
+         sl->getPath().getType() == "mp4" || sl->getPath().getType() == "webm"))
       return false;
     fid = cell.getFrameId();
     if (!vi) {
@@ -1561,7 +1563,9 @@ static void pasteRasterImageInCell(int row, int col,
     if (sl) oldPalette  = sl->getPalette();
   } else {
     TXshSimpleLevel *sl = cell.getSimpleLevel();
-    if (sl->getType() == OVL_XSHLEVEL && sl->getPath().getType() == "psd")
+    if (sl->getType() == OVL_XSHLEVEL &&
+        (sl->getPath().getType() == "psd" || sl->getPath().getType() == "gif" ||
+         sl->getPath().getType() == "mp4" || sl->getPath().getType() == "webm"))
       return;
     oldPalette = sl->getPalette();
   }

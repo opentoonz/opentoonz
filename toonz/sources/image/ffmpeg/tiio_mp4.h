@@ -61,6 +61,7 @@ public:
   // void *m_decompressedBuffer;
 private:
   Ffmpeg *ffmpegReader;
+  bool ffmpegFramesCreated = false;
   TDimension m_size;
   int m_frameCount, m_lx, m_ly;
 };
