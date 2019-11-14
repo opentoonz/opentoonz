@@ -277,9 +277,9 @@ if(BUILD_ENV_MSVC AND WITH_STOPMOTION)
         ${SDKROOT}/glut/3.7.6/include
         ${SDKROOT}/zlib-1.2.8
         ${SDKROOT}/LibJPEG/jpeg-9
-        ${SDKROOT}/canon
-        ${SDKROOT}/libjpeg-turbo64
-        ${SDKROOT}/opencv2
+        ${SDKROOT}/canon/Header
+        ${SDKROOT}/libjpeg-turbo64/include
+        ${SDKROOT}/opencv2/include
     )
     add_definitions(
         -DGLUT_NO_LIB_PRAGMA
@@ -350,8 +350,8 @@ if(BUILD_ENV_MSVC)
     set(CANON_LIB ${SDKROOT}/canon/library/EDSDK.lib)
     set(TURBOJPEG_LIB ${SDKROOT}/libjpeg-turbo64/lib/turbojpeg.lib)
     set(OPENCV_LIB 
-        optimized ${SDKROOT}/opencv2/lib/opencv_world410.lib
-        debug ${SDKROOT}/opencv2/lib/opencv_world410d.lib
+        optimized ${SDKROOT}/opencv2/lib/opencv_world412.lib
+        debug ${SDKROOT}/opencv2/lib/opencv_world412d.lib
     )
     endif()
     if(PLATFORM EQUAL 32)

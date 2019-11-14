@@ -2246,6 +2246,7 @@ bool StopMotion::toggleLiveView() {
     m_timer->start(40);
     emit(liveViewChanged(true));
     Preferences::instance()->enableRewindAfterPlayback(false);
+	  TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
     return true;
   } else if ((m_sessionOpen || m_usingWebcam) && m_liveViewStatus > 0) {
     if (!m_usingWebcam)
@@ -2257,6 +2258,7 @@ bool StopMotion::toggleLiveView() {
     if (m_turnOnRewind) {
       Preferences::instance()->enableRewindAfterPlayback(true);
     }
+	  TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
     return false;
   } else {
     DVGui::warning(tr("No camera selected."));

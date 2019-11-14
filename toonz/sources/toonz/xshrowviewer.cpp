@@ -852,7 +852,7 @@ void RowArea::paintEvent(QPaintEvent *event) {
 #ifdef WITH_STOPMOTION
   StopMotion *stopMotion = StopMotion::instance();
   if (stopMotion->getPlaceOnXSheet() &&
-      (stopMotion->m_usingWebcam || stopMotion->m_active)) {
+      (stopMotion->m_liveViewStatus > 0)) {
     drawStopMotionCameraIndicator(p);
   }
 

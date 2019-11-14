@@ -1,0 +1,2 @@
+Copy the include folder from opencv2/build into this folder
+Copy the lib folder from opencv2/build/x64/vc15 into this folder
