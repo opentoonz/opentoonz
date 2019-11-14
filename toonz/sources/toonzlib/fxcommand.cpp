@@ -920,6 +920,9 @@ void TFxCommand::insertFx(TFx *newFx, const QList<TFxP> &fxs,
                           int row) {
   if (!newFx) return;
 
+  if (col < 0)
+    col = 0;  // Normally insert before. In case of camera, insert after
+
   std::unique_ptr<FxCommandUndo> undo(
       new InsertFxUndo(newFx, row, col, fxs, links, app));
   if (undo->isConsistent()) {
@@ -1163,7 +1166,7 @@ void ReplaceFxUndo::initialize() {
       m_repColumn = new TXshZeraryFxColumn(*zcfx->getColumn());
       m_repColIdx = m_colIdx;
 
-      // Substitute the column's zerary fx with the subsitute one
+      // Substitute the column's zerary fx with the substitute one
       TZeraryColumnFx *repZcfx =
           static_cast<TZeraryColumnFx *>(m_repColumn->getFx());
       repZcfx->setZeraryFx(repFx);
@@ -2240,7 +2243,7 @@ void DeleteFxOrColumnUndo::redo() const {
             ->getParams());  // However, params stored there are NOT cloned.
   }                          // This is fine since we're deleting the column...
 
-  // Peform operation
+  // Perform operation
   FxCommandUndo::removeFxOrColumn(xsh, m_fx.getPointer(), m_colIdx);
 
   m_xshHandle->notifyXsheetChanged();  // Add the rest...

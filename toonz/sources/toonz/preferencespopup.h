@@ -57,7 +57,8 @@ private:
       *m_columnIconOm, *m_unitOm, *m_cameraUnitOm, *m_importPolicy,
       *m_vectorSnappingTargetCB, *m_dropdownShortcutsCycleOptionsCB,
       *m_guidedDrawingStyle, *m_functionEditorToggle, *m_cursorBrushType,
-      *m_cursorBrushStyle, *m_xsheetLayout, *m_interfaceFontStyle;
+      *m_cursorBrushStyle, *m_xsheetLayout, *m_interfaceFontStyle,
+      *m_levelBasedToolsDisplayCB;
 
   QFontComboBox *m_interfaceFont;
 
@@ -70,27 +71,28 @@ private:
   DVGui::IntLineEdit *m_minuteFld, *m_chunkSizeFld, *m_iconSizeLx,
       *m_iconSizeLy, *m_viewShrink, *m_viewStep, *m_blanksCount,
       *m_onionPaperThickness, *m_animationStepField, *m_undoMemorySize,
-      *m_xsheetStep, *m_ffmpegTimeout;
+      *m_xsheetStep, *m_ffmpegTimeout, *m_backupKeepCount;
 
   QPushButton *m_addLevelFormat, *m_removeLevelFormat, *m_editLevelFormat;
 
-  DVGui::CheckBox *m_inksOnly, *m_enableVersionControl, *m_levelsBackup,
-      *m_onionSkinVisibility, *m_pixelsOnlyCB, *m_projectRootDocuments,
-      *m_projectRootDesktop, *m_projectRootCustom, *m_projectRootStuff,
-      *m_onionSkinDuringPlayback, *m_autoSaveSceneCB, *m_autoSaveOtherFilesCB,
+  DVGui::CheckBox *m_inksOnly, *m_enableVersionControl, *m_onionSkinVisibility,
+      *m_pixelsOnlyCB, *m_projectRootDocuments, *m_projectRootDesktop,
+      *m_projectRootCustom, *m_projectRootStuff, *m_onionSkinDuringPlayback,
+      *m_autoSaveSceneCB, *m_autoSaveOtherFilesCB,
       *m_useNumpadForSwitchingStyles, *m_expandFunctionHeader,
       *m_useHigherDpiOnVectorSimplifyCB, *m_keepFillOnVectorSimplifyCB,
       *m_newLevelToCameraSizeCB, *m_ignoreImageDpiCB,
       *m_syncLevelRenumberWithXsheet, *m_downArrowInLevelStripCreatesNewFrame,
-      *m_enableAutoStretch, *m_enableWinInk,
-      *m_useOnionColorsForShiftAndTraceCB;
+      *m_enableAutoStretch, *m_enableWinInk, *m_enableTouchGestures,
+      *m_useOnionColorsForShiftAndTraceCB, *m_showXsheetCameraColCB;
 
   DVGui::FileField *m_customProjectRootFileField;
 
   DVGui::FileField *m_ffmpegPathFileFld, *m_fastRenderPathFileField,
       *m_lutPathFileField;
 
-  QGroupBox *m_autoSaveGroup, *m_showXSheetToolbar, *m_colorCalibration;
+  QGroupBox *m_autoSaveGroup, *m_showXSheetToolbar, *m_colorCalibration,
+      *m_backup, *m_showKeyframesOnCellAreaCB;
 
   DVGui::ColorField *m_currentColumnColor;
 
@@ -147,7 +149,7 @@ private slots:
   void onSVNEnabledChanged(int);
   void onAutomaticSVNRefreshChanged(int);
   void onDragCellsBehaviourChanged(int);
-  void onLevelsBackupChanged(int);
+  void onBackupChanged(bool enabled);
   void onSceneNumberingChanged(int);
   void onChunkSizeChanged();
   void onDefLevelTypeChanged(int);
@@ -193,7 +195,7 @@ private slots:
   void onRemoveSceneNumberFromLoadedLevelNameChanged(int index);
   void onShowRasterImageDarkenBlendedInViewerChanged(int index);
   void onShowFrameNumberWithLettersChanged(int index);
-  void onShowKeyframesOnCellAreaChanged(int);
+  void onShowKeyframesOnCellAreaChanged(bool);
   void onFfmpegPathChanged();
   void onFfmpegTimeoutChanged();
   void onFastRenderPathChanged();
@@ -219,8 +221,13 @@ private slots:
   void onCursorBrushStyleChanged(int index);
   void onCursorOutlineChanged(int);
   void onCurrentColumnDataChanged(const TPixel32 &, bool isDragging);
+  void onEnableTouchGesturesChanged(int index);
+  void onEnableTouchGesturesTriggered(bool checked);
   void onEnableWinInkChanged(int index);
   void onRasterBackgroundColorChanged(const TPixel32 &, bool isDragging);
+  void onBackupKeepCountChanged();
+  void onShowXsheetCameraColumnChanged(int index);
+  void onLevelBasedToolsDisplayChanged(int);
 };
 
 //**********************************************************************************

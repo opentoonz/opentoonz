@@ -1349,7 +1349,7 @@ void resample_main_rgbm(TRasterPT<T> rout, const TRasterPT<T> &rin,
 
 namespace {
 
-class alignas(16) TPixelFloat {
+DV_ALIGNED(16) class TPixelFloat {
 public:
   TPixelFloat() : b(0), g(0), r(0), m(0) {}
 

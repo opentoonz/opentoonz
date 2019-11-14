@@ -135,7 +135,7 @@ void drawControlPoints(const TVectorRenderData &rd, TStroke *stroke,
 
 //-----------------------------------------------------------------------------
 
-void drawArrows(TStroke *stroke, bool onlyFirstPoint) {
+static void drawArrows(TStroke *stroke, bool onlyFirstPoint) {
   double length = stroke->getLength(0.0, 1.0);
   int points    = length / 20;
   if (points < 2) points += 1;
@@ -179,7 +179,8 @@ void drawArrows(TStroke *stroke, bool onlyFirstPoint) {
 
 //-----------------------------------------------------------------------------
 // Used for Guided Drawing
-void drawFirstControlPoint(const TVectorRenderData &rd, TStroke *stroke) {
+static void drawFirstControlPoint(const TVectorRenderData &rd,
+                                  TStroke *stroke) {
   TPointD p          = stroke->getPoint(0.0);
   double length      = stroke->getLength(0.0, 1.0);
   int msecs          = QTime::currentTime().msec();
@@ -276,8 +277,8 @@ void tglDraw(const TVectorRenderData &rd, TRegion *r, bool pushAttribs) {
   } else {
     visible = false;
     for (j = 0; j < colorCount && !visible; j++) {
-      TPixel32 color            = style->getColorParamValue(j);
-      if (rd.m_cf) color        = (*(rd.m_cf))(color);
+      TPixel32 color = style->getColorParamValue(j);
+      if (rd.m_cf) color = (*(rd.m_cf))(color);
       if (color.m != 0) visible = true;
     }
   }
@@ -434,7 +435,7 @@ bool isOThick(const TStroke *s) {
     if (s->getControlPoint(i).thick != 0) return false;
   return true;
 }
-}
+}  // namespace
 
 void tglDraw(const TVectorRenderData &rd, const TStroke *s, bool pushAttribs) {
   assert(s);
@@ -554,8 +555,8 @@ static void tglDoDraw(const TVectorRenderData &rd, TRegion *r) {
   else {
     visible = false;
     for (int j = 0; j < colorCount && !visible; j++) {
-      TPixel32 color            = style->getColorParamValue(j);
-      if (rd.m_cf) color        = (*(rd.m_cf))(color);
+      TPixel32 color = style->getColorParamValue(j);
+      if (rd.m_cf) color = (*(rd.m_cf))(color);
       if (color.m != 0) visible = true;
     }
   }
@@ -584,8 +585,8 @@ static bool tglDoDraw(const TVectorRenderData &rd, const TStroke *s) {
   else {
     visible = false;
     for (int j = 0; j < style->getColorParamCount() && !visible; j++) {
-      TPixel32 color            = style->getColorParamValue(j);
-      if (rd.m_cf) color        = (*(rd.m_cf))(color);
+      TPixel32 color = style->getColorParamValue(j);
+      if (rd.m_cf) color = (*(rd.m_cf))(color);
       if (color.m != 0) visible = true;
     }
   }
@@ -676,7 +677,7 @@ rdRegions.m_alphaChannel = rdRegions.m_antiAliasing = false;*/
     }
   }
 }
-}
+}  // namespace
 
 //------------------------------------------------------------------------------------
 

@@ -1149,6 +1149,9 @@ void DvItemViewerPanel::paintTableItem(QPainter &p, int index) {
                Qt::AlignLeft | Qt::AlignVCenter,
                elideText(value, p.font(), lx));
     x += lx;
+    // If status icon is show, shift the next column left by the width of the
+    // icon
+    if (i == 0 && !statusPixmap.isNull()) x -= 15;
   }
   if (n > 1) {
     p.setPen(QColor(0, 0, 0, 100));  // column line
@@ -1730,15 +1733,15 @@ void DvItemViewerTitleBar::paintEvent(QPaintEvent *) {
   m_itemViewer->getPanel()->getColumns(columns);
   QRect rect(0, 0, width(), height());
 
-  QBrush nb = QBrush(Qt::NoBrush);
-  QPalette pal =
-      QPalette(nb, nb, QBrush(QColor(255, 255, 255, 30)), QBrush(QColor(0, 0, 0, 110)),
-               QBrush(QColor(Qt::gray)), nb, nb, nb, nb);
+  QBrush nb    = QBrush(Qt::NoBrush);
+  QPalette pal = QPalette(nb, nb, QBrush(QColor(255, 255, 255, 30)),
+                          QBrush(QColor(0, 0, 0, 110)),
+                          QBrush(QColor(Qt::gray)), nb, nb, nb, nb);
 
   p.fillRect(rect, QColor(0, 0, 0, 90));  // bg color
 
   p.setPen(QColor(200, 200, 200, 255));  // text color
-  int h  = 0;  // fontMetrics().descent();
+  int h  = 0;                            // fontMetrics().descent();
   int y  = rect.top();
   int ly = rect.height();
   int lx = rect.width();

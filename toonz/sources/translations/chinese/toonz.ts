@@ -110,11 +110,11 @@
     <name>ApplyMatchlinesCommand</name>
     <message>
         <source>It is not possible to apply the match lines because no column was selected.</source>
-        <translation>无法应用适配线，因为没有列被选中。</translation>
+        <translation type="vanished">无法应用适配线，因为没有列被选中。</translation>
     </message>
     <message>
         <source>It is not possible to apply the match lines because two columns have to be selected.</source>
-        <translation>无法应用适配线，因为有两列同时被选中。</translation>
+        <translation type="vanished">无法应用适配线，因为有两列同时被选中。</translation>
     </message>
 </context>
 <context>
@@ -1061,11 +1061,11 @@ What do you want to do?</source>
     <name>CloneLevelUndo::LevelNamePopup</name>
     <message>
         <source>Clone Level</source>
-        <translation>克隆层级</translation>
+        <translation type="vanished">克隆层级</translation>
     </message>
     <message>
         <source>Level Name:</source>
-        <translation>层级名称:</translation>
+        <translation type="vanished">层级名称:</translation>
     </message>
 </context>
 <context>
@@ -1241,6 +1241,10 @@ What do you want to do? </source>
     <message>
         <source> (Flipped)</source>
         <translation> (已翻转)</translation>
+    </message>
+    <message>
+        <source>   ::   Project: </source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1883,11 +1887,11 @@ contain the dpi information, then the current camera dpi will be used.
     <name>ExportCurvePopup</name>
     <message>
         <source>Export Curve</source>
-        <translation>导出曲线</translation>
+        <translation type="vanished">导出曲线</translation>
     </message>
     <message>
         <source>Export</source>
-        <translation>导出</translation>
+        <translation type="vanished">导出</translation>
     </message>
 </context>
 <context>
@@ -2285,26 +2289,26 @@ contain the dpi information, then the current camera dpi will be used.
     <name>FileData</name>
     <message>
         <source>It is not possible to find the %1 level.</source>
-        <translation>找不到层级 %1。</translation>
+        <translation type="vanished">找不到层级 %1。</translation>
     </message>
     <message>
         <source>There was an error copying %1</source>
-        <translation>拷贝 %1 时发生了错误</translation>
+        <translation type="vanished">拷贝 %1 时发生了错误</translation>
     </message>
 </context>
 <context>
     <name>FileSelection</name>
     <message>
         <source>Abort</source>
-        <translation>中断</translation>
+        <translation type="vanished">中断</translation>
     </message>
     <message>
         <source>Collecting assets...</source>
-        <translation>正在收集素材...</translation>
+        <translation type="vanished">正在收集素材...</translation>
     </message>
     <message>
         <source>Importing scenes...</source>
-        <translation>正在导入场景...</translation>
+        <translation type="vanished">正在导入场景...</translation>
     </message>
 </context>
 <context>
@@ -3209,6 +3213,10 @@ Please use the frame numbers for reference.</source>
         <source>Invalid data file.</source>
         <translation>无效的数据文件。</translation>
     </message>
+    <message>
+        <source>Drawing: </source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>LoadBoardPresetFilePopup</name>
@@ -3240,11 +3248,11 @@ Please use the frame numbers for reference.</source>
     <name>LoadCurvePopup</name>
     <message>
         <source>Load Curve</source>
-        <translation>加载曲线</translation>
+        <translation type="vanished">加载曲线</translation>
     </message>
     <message>
         <source>Load</source>
-        <translation>加载</translation>
+        <translation type="vanished">加载</translation>
     </message>
 </context>
 <context>
@@ -3394,15 +3402,15 @@ Please use the frame numbers for reference.</source>
     <name>LoadSettingsPopup</name>
     <message>
         <source>Load Cleanup Settings</source>
-        <translation>加载清稿设置</translation>
+        <translation type="vanished">加载清稿设置</translation>
     </message>
     <message>
         <source>Load</source>
-        <translation>加载</translation>
+        <translation type="vanished">加载</translation>
     </message>
     <message>
         <source>%1 does not exist.</source>
-        <translation>%1 不存在。</translation>
+        <translation type="vanished">%1 不存在。</translation>
     </message>
 </context>
 <context>
@@ -3756,7 +3764,7 @@ Please use the frame numbers for reference.</source>
     </message>
     <message>
         <source>&amp;Send Back</source>
-        <translation>置于底层(&amp;S)</translation>
+        <translation type="vanished">置于底层(&amp;S)</translation>
     </message>
     <message>
         <source>&amp;Send Backward</source>
@@ -5442,6 +5450,30 @@ Please use the frame numbers for reference.</source>
         <source>Flip Viewer Horizontally</source>
         <translation>水平翻转查看器</translation>
     </message>
+    <message>
+        <source>&amp;Send to Back</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reset Zoom</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reset Rotation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reset Position</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Brush Tool - Eraser (Raster option)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Brush Tool - Lock Alpha</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MatchlinesDialog</name>
@@ -5575,15 +5607,15 @@ N.B. Duplicated commands will be ignored. Only the last one will appear in the m
     <name>MergeCmappedCommand</name>
     <message>
         <source>It is not possible to merge tlv columns because no column was selected.</source>
-        <translation>无法合并 TLV 列，因为未选择任何列。</translation>
+        <translation type="vanished">无法合并 TLV 列，因为未选择任何列。</translation>
     </message>
     <message>
         <source>It is not possible to merge tlv columns because at least two columns have to be selected.</source>
-        <translation>无法合并 TLV 列，因为最少要选定两个列。</translation>
+        <translation type="vanished">无法合并 TLV 列，因为最少要选定两个列。</translation>
     </message>
     <message>
         <source>Merging Tlv Levels...</source>
-        <translation>正在合并 TLV 层级...</translation>
+        <translation type="vanished">正在合并 TLV 层级...</translation>
     </message>
 </context>
 <context>
@@ -5612,16 +5644,20 @@ N.B. Duplicated commands will be ignored. Only the last one will appear in the m
         <source> Merge Tlv Levels</source>
         <translation>合并 TLV 层级</translation>
     </message>
+    <message>
+        <source>Level %1 already exists! Are you sure you want to overwrite it?</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MergeColumnsCommand</name>
     <message>
         <source>It is not possible to execute the merge column command because no column was selected.</source>
-        <translation>无法执行合并列的命令，因为未选定任何列。</translation>
+        <translation type="vanished">无法执行合并列的命令，因为未选定任何列。</translation>
     </message>
     <message>
         <source>It is not possible to execute the merge column command  because only one columns is  selected.</source>
-        <translation>无法执行合并列的命令，因为只选择了一个列。</translation>
+        <translation type="vanished">无法执行合并列的命令，因为只选择了一个列。</translation>
     </message>
 </context>
 <context>
@@ -5705,10 +5741,17 @@ What do you want to do?</source>
     </message>
 </context>
 <context>
+    <name>MyVideoWidget</name>
+    <message>
+        <source>Camera is not available</source>
+        <translation type="unfinished">摄影机不可用</translation>
+    </message>
+</context>
+<context>
     <name>MyViewFinder</name>
     <message>
         <source>Camera is not available</source>
-        <translation>摄影机不可用</translation>
+        <translation type="vanished">摄影机不可用</translation>
     </message>
 </context>
 <context>
@@ -6108,16 +6151,16 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Overwrite</source>
-        <translation>覆盖</translation>
+        <translation type="vanished">覆盖</translation>
     </message>
     <message>
         <source>Skip</source>
-        <translation>跳过</translation>
+        <translation type="vanished">跳过</translation>
     </message>
     <message>
         <source>File &quot;%1&quot; already exists.
 Do you want to overwrite it?</source>
-        <translation>文件“%1”已经存在。
+        <translation type="vanished">文件“%1”已经存在。
 要覆盖它吗？</translation>
     </message>
 </context>
@@ -6450,6 +6493,10 @@ WARNING : Image size mismatch. The saved image size is %1 x %2.</source>
         <source>WARNING : Level path conflicts. There already is a level with the path %1                        
           in the scene with the name %2.</source>
         <translation>警告: 层级路径冲突。在名为 %2 的场景中，已经有个层级位于路径 %1 上。</translation>
+    </message>
+    <message>
+        <source>Subcamera</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7675,13 +7722,13 @@ in non alpha-enabled image format.</source>
     <name>Previewer</name>
     <message>
         <source>The file name cannot be empty or contain any of the following characters:(new line)  \ / : * ? &quot;  |</source>
-        <translation>文件名不能为空也不能包含如下的任一字符:
+        <translation type="vanished">文件名不能为空也不能包含如下的任一字符:
 \ / : * ? &quot;  |</translation>
     </message>
     <message>
         <source>File %1 already exists.
 Do you want to overwrite it?</source>
-        <translation>文件 %1 已经存在。
+        <translation type="vanished">文件 %1 已经存在。
 要覆盖它吗？</translation>
     </message>
 </context>
@@ -7844,6 +7891,38 @@ Do you want to overwrite it?</source>
     <message>
         <source>Level Name:</source>
         <translation>层级名:</translation>
+    </message>
+    <message>
+        <source>Single Image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Frames</source>
+        <translation type="unfinished">帧</translation>
+    </message>
+    <message>
+        <source>Columns</source>
+        <translation type="unfinished">列</translation>
+    </message>
+    <message>
+        <source>Flatten visible document layers into a single image. Layer styles are maintained.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Load document layers as frames into a single xsheet column.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Load document layers as xhseet columns.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished">确定</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">取消</translation>
     </message>
 </context>
 <context>
@@ -8783,11 +8862,11 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Level </source>
-        <translation>层级</translation>
+        <translation type="vanished">层级</translation>
     </message>
     <message>
         <source> already exists! Are you sure you want to overwrite it?</source>
-        <translation>已经存在！您确定要覆盖它吗？</translation>
+        <translation type="vanished">已经存在！您确定要覆盖它吗？</translation>
     </message>
     <message>
         <source>It is not possible to merge tlv columns containing more than one level</source>
@@ -9610,6 +9689,240 @@ to use the duplicate command in the xsheet / timeline.</source>
         <source>Clear All Relative Onion Skin Markers</source>
         <translation>清理全部相关的洋葱皮标记器</translation>
     </message>
+    <message>
+        <source>Always Overwrite in This Scene</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>    + %1 more level(s) 
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fx Settings</source>
+        <translation type="unfinished">特效设置</translation>
+    </message>
+    <message>
+        <source>Save Curve</source>
+        <translation type="unfinished">保存曲线</translation>
+    </message>
+    <message>
+        <source>Load Curve</source>
+        <translation type="unfinished">加载曲线</translation>
+    </message>
+    <message>
+        <source>Export Curve</source>
+        <translation type="unfinished">导出曲线</translation>
+    </message>
+    <message>
+        <source>Rendering frame %1 / %2</source>
+        <comment>RenderListener</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Precomputing %1 Frames</source>
+        <comment>RenderListener</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> of %1</source>
+        <comment>RenderListener</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Finalizing render, please wait.</source>
+        <comment>RenderListener</comment>
+        <translation type="unfinished">完成渲染最后阶段，请稍等。</translation>
+    </message>
+    <message>
+        <source>Aborting render...</source>
+        <comment>RenderListener</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Building Schematic...</source>
+        <comment>RenderCommand</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>column </source>
+        <comment>MultimediaProgressBar label (mode name)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>layer </source>
+        <comment>MultimediaProgressBar label (mode name)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rendering %1%2, frame %3 / %4</source>
+        <comment>MultimediaProgressBar label</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rendering %1 frames of %2</source>
+        <comment>MultimediaProgressBar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 of %2</source>
+        <comment>MultimediaProgressBar - [totalframe] of [path]</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Aborting render...</source>
+        <comment>MultimediaProgressBar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>It is not possible to write the output:  the file</source>
+        <comment>RenderCommand</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>s are read only.</source>
+        <comment>RenderCommand</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> is read only.</source>
+        <comment>RenderCommand</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save Cleanup Settings</source>
+        <translation type="unfinished">保存清稿设置</translation>
+    </message>
+    <message>
+        <source>Load Cleanup Settings</source>
+        <translation type="unfinished">加载清稿设置</translation>
+    </message>
+    <message>
+        <source>It is not possible to find the %1 level.</source>
+        <comment>FileData</comment>
+        <translation type="unfinished">找不到层级 %1。</translation>
+    </message>
+    <message>
+        <source>There was an error copying %1</source>
+        <comment>FileData</comment>
+        <translation type="unfinished">拷贝 %1 时发生了错误</translation>
+    </message>
+    <message>
+        <source>Clone Level</source>
+        <comment>CloneLevelUndo::LevelNamePopup</comment>
+        <translation type="unfinished">克隆层级</translation>
+    </message>
+    <message>
+        <source>Level Name:</source>
+        <comment>CloneLevelUndo::LevelNamePopup</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Collecting assets...</source>
+        <translation type="unfinished">正在收集素材...</translation>
+    </message>
+    <message>
+        <source>Abort</source>
+        <translation type="unfinished">中断</translation>
+    </message>
+    <message>
+        <source>Importing scenes...</source>
+        <translation type="unfinished">正在导入场景...</translation>
+    </message>
+    <message>
+        <source>It is not possible to execute the merge column command because no column was selected.</source>
+        <translation type="unfinished">无法执行合并列的命令，因为未选定任何列。</translation>
+    </message>
+    <message>
+        <source>It is not possible to execute the merge column command because only one columns is selected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>It is not possible to apply the match lines because no column was selected.</source>
+        <translation type="unfinished">无法应用适配线，因为没有列被选中。</translation>
+    </message>
+    <message>
+        <source>It is not possible to apply the match lines because two columns have to be selected.</source>
+        <translation type="unfinished">无法应用适配线，因为有两列同时被选中。</translation>
+    </message>
+    <message>
+        <source>It is not possible to merge tlv columns because no column was selected.</source>
+        <translation type="unfinished">无法合并 TLV 列，因为未选择任何列。</translation>
+    </message>
+    <message>
+        <source>It is not possible to merge tlv columns because at least two columns have to be selected.</source>
+        <translation type="unfinished">无法合并 TLV 列，因为最少要选定两个列。</translation>
+    </message>
+    <message>
+        <source>Merging Tlv Levels...</source>
+        <translation type="unfinished">正在合并 TLV 层级...</translation>
+    </message>
+    <message>
+        <source>Save Previewed Images</source>
+        <translation type="unfinished">保存预览过的图像</translation>
+    </message>
+    <message>
+        <source>The file name cannot be empty or contain any of the following characters:(new line)  \ / : * ? &quot;  |</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unsopporter raster format, cannot save</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot create %1 : %2</source>
+        <comment>Previewer warning %1:path %2:message</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot create %1</source>
+        <comment>Previewer warning %1:path</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Saved %1 frames out of %2 in %3</source>
+        <comment>Previewer %1:savedframes %2:framecount %3:filepath</comment>
+        <translation type="unfinished">保存了 %2 中的 %1 帧到 %3 里</translation>
+    </message>
+    <message>
+        <source>Canceled! </source>
+        <comment>Previewer</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No frame to save!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Already saving!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning!</source>
+        <comment>OverwriteDialog</comment>
+        <translation type="unfinished">警告！</translation>
+    </message>
+    <message>
+        <source>Overwrite</source>
+        <comment>OverwriteDialog</comment>
+        <translation type="unfinished">覆盖</translation>
+    </message>
+    <message>
+        <source>Skip</source>
+        <comment>OverwriteDialog</comment>
+        <translation type="unfinished">跳过</translation>
+    </message>
+    <message>
+        <source>File &quot;%1&quot; already exists.
+Do you want to overwrite it?</source>
+        <comment>OverwriteDialog</comment>
+        <translation type="unfinished">文件“%1”已经存在。
+要覆盖它吗？</translation>
+    </message>
+    <message>
+        <source>%1 does not exist.</source>
+        <translation type="unfinished">%1 不存在。</translation>
+    </message>
 </context>
 <context>
     <name>ReframePopup</name>
@@ -9717,7 +10030,7 @@ The audio file will not be included in the rendered clip.</source>
     <name>RenderListener</name>
     <message>
         <source>Finalizing render, please wait.</source>
-        <translation>完成渲染最后阶段，请稍等。</translation>
+        <translation type="vanished">完成渲染最后阶段，请稍等。</translation>
     </message>
 </context>
 <context>
@@ -10612,11 +10925,11 @@ Please commit or revert changes first.</source>
     <name>SaveCurvePopup</name>
     <message>
         <source>Save Curve</source>
-        <translation>保存曲线</translation>
+        <translation type="vanished">保存曲线</translation>
     </message>
     <message>
         <source>Save</source>
-        <translation>保存</translation>
+        <translation type="vanished">保存</translation>
     </message>
 </context>
 <context>
@@ -10691,11 +11004,11 @@ Please commit or revert changes first.</source>
     <name>SavePreviewedPopup</name>
     <message>
         <source>Save Previewed Images</source>
-        <translation>保存预览过的图像</translation>
+        <translation type="vanished">保存预览过的图像</translation>
     </message>
     <message>
         <source>Save</source>
-        <translation>保存</translation>
+        <translation type="vanished">保存</translation>
     </message>
 </context>
 <context>
@@ -10713,11 +11026,11 @@ Please commit or revert changes first.</source>
     <name>SaveSettingsPopup</name>
     <message>
         <source>Save Cleanup Settings</source>
-        <translation>保存清稿设置</translation>
+        <translation type="vanished">保存清稿设置</translation>
     </message>
     <message>
         <source>Save</source>
-        <translation>保存</translation>
+        <translation type="vanished">保存</translation>
     </message>
 </context>
 <context>
@@ -10950,6 +11263,14 @@ Please commit or revert changes first.</source>
         <source>Select %1</source>
         <translation>选择 %1</translation>
     </message>
+    <message>
+        <source>Flip View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reset View</source>
+        <translation type="unfinished">重置视图</translation>
+    </message>
 </context>
 <context>
     <name>SceneViewerPanel</name>
@@ -11012,6 +11333,10 @@ Please commit or revert changes first.</source>
     <message>
         <source> (Flipped)</source>
         <translation> (已翻转)</translation>
+    </message>
+    <message>
+        <source>   ::   Project: </source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -11514,7 +11839,7 @@ Assign to &apos;%3&apos;?</source>
     </message>
     <message>
         <source>Choose Project</source>
-        <translation>选择项目</translation>
+        <translation type="vanished">选择项目</translation>
     </message>
     <message>
         <source>Create a New Scene</source>
@@ -11522,7 +11847,7 @@ Assign to &apos;%3&apos;?</source>
     </message>
     <message>
         <source>Open Scene</source>
-        <translation>打开场景</translation>
+        <translation type="vanished">打开场景</translation>
     </message>
     <message>
         <source>Scene Name:</source>
@@ -11679,6 +12004,18 @@ Possibly the preset file has been corrupted</source>
     <message>
         <source>Minutes</source>
         <translation>分钟</translation>
+    </message>
+    <message>
+        <source>Current Project</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recent Scenes [Project]</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The selected scene project &apos;%1&apos; is not in the Current Project list and may not open automatically.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -12844,6 +13181,14 @@ Hold F3 Key on the Viewer to Show This Frame Only</source>
     <message>
         <source>Zoom in/out of timeline</source>
         <translation type="vanished">放大/缩小时间轴</translation>
+    </message>
+    <message>
+        <source>   ::   Project: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> Frame</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

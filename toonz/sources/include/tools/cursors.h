@@ -32,6 +32,7 @@ enum {
   MagnetCursor,
   PanCursor,
   PickerCursor,
+  PointingHandCursor,
   PumpCursor,
   RotCursor,
   RotTopLeft,
@@ -95,6 +96,7 @@ enum {
   Ex_StyleArea        = 0x40000,
   Ex_RGB              = 0x80000,
   Ex_HV               = 0x100000,
+  Ex_Precise          = 0x200000,
 
   // This section is for cursors that have fixed text that needs to
   // be handled separately when flipping for left-handed cursors.
@@ -109,6 +111,6 @@ enum {
   ScaleHVCursor    = ScaleHVCursorBase | Ex_HV
 };
 
-}  // namespace
+}  // namespace ToolCursor
 
 #endif

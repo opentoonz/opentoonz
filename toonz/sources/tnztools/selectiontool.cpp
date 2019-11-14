@@ -972,6 +972,12 @@ void SelectionTool::updateAction(TPointD pos, const TMouseEvent &e) {
     }
     maxDist  = 5 * pixelSize;
     maxDist2 = maxDist * maxDist;
+    if (!isLevelType() && !isSelectedFramesType() &&
+        tdistance2(getCenter(), pos) < maxDist2) {
+      m_what     = MOVE_CENTER;
+      m_cursorId = ToolCursor::PointingHandCursor;
+      return;
+    }
     if (tdistance2(bbox.getP00(), pos) < maxDist2 ||
         tdistance2(bbox.getP11(), pos) < maxDist2 ||
         tdistance2(bbox.getP01(), pos) < maxDist2 ||
@@ -1019,11 +1025,6 @@ void SelectionTool::updateAction(TPointD pos, const TMouseEvent &e) {
         m_cursorId = ToolCursor::DistortCursor;
         m_what     = DEFORM;
       }
-      return;
-    }
-    if (!isLevelType() && !isSelectedFramesType() &&
-        tdistance2(getCenter(), pos) < maxDist2) {
-      m_what = MOVE_CENTER;
       return;
     }
     TPointD hpos = bbox.getP10() - TPointD(14 * pixelSize, 15 * pixelSize);
@@ -1214,7 +1215,8 @@ void SelectionTool::drawRectSelection(const TImage *image) {
 
 void SelectionTool::drawCommandHandle(const TImage *image) {
   const TVectorImage *vi = dynamic_cast<const TVectorImage *>(image);
-  TPixel32 frameColor(127, 127, 127);
+  TPixel32 frameColor(210, 210, 210);
+  TPixel32 frameColor2(0, 0, 0);
   FourPoints rect = getBBox();
 
   drawFourPoints(rect, frameColor, 0xffff, true);
@@ -1224,13 +1226,37 @@ void SelectionTool::drawCommandHandle(const TImage *image) {
   if (m_dragTool) m_dragTool->draw();
 
   double pixelSize = getPixelSize();
-  if (!isLevelType() && !isSelectedFramesType())
-    tglDrawCircle(getCenter(), pixelSize * 4);
+  if (!isLevelType() && !isSelectedFramesType()) {
+    TPointD c = getCenter() + TPointD(-pixelSize, +pixelSize);
 
-  drawSquare(rect.getP00(), pixelSize * 4, frameColor);
-  drawSquare(rect.getP01(), pixelSize * 4, frameColor);
-  drawSquare(rect.getP10(), pixelSize * 4, frameColor);
-  drawSquare(rect.getP11(), pixelSize * 4, frameColor);
+    tglColor(frameColor);
+    tglDrawCircle(c, pixelSize * 5);
+    tglDrawSegment(c - TPointD(pixelSize * 15, 0),
+                   c + TPointD(pixelSize * 15, 0));
+    tglDrawSegment(c - TPointD(0, pixelSize * 15),
+                   c + TPointD(0, pixelSize * 15));
+    tglColor(frameColor2);
+    tglDrawCircle(getCenter(), pixelSize * 5);
+    tglDrawSegment(getCenter() - TPointD(pixelSize * 15, 0),
+                   getCenter() + TPointD(pixelSize * 15, 0));
+    tglDrawSegment(getCenter() - TPointD(0, pixelSize * 15),
+                   getCenter() + TPointD(0, pixelSize * 15));
+  }
+
+  TPointD bl(rect.getP00().x - pixelSize, rect.getP00().y + pixelSize);
+  TPointD tl(rect.getP01().x - pixelSize, rect.getP01().y + pixelSize);
+  TPointD br(rect.getP10().x - pixelSize, rect.getP10().y + pixelSize);
+  TPointD tr(rect.getP11().x - pixelSize, rect.getP11().y + pixelSize);
+
+  drawSquare(bl, pixelSize * 4, frameColor);
+  drawSquare(tl, pixelSize * 4, frameColor);
+  drawSquare(br, pixelSize * 4, frameColor);
+  drawSquare(tr, pixelSize * 4, frameColor);
+
+  drawSquare(rect.getP00(), pixelSize * 4, frameColor2);
+  drawSquare(rect.getP01(), pixelSize * 4, frameColor2);
+  drawSquare(rect.getP10(), pixelSize * 4, frameColor2);
+  drawSquare(rect.getP11(), pixelSize * 4, frameColor2);
 
   if (vi && !m_deformValues.m_isSelectionModified) {
     TPointD thickCommandPos =
@@ -1238,10 +1264,15 @@ void SelectionTool::drawCommandHandle(const TImage *image) {
     drawRectWhitArrow(thickCommandPos, pixelSize);
   }
 
-  drawSquare(0.5 * (rect.getP10() + rect.getP11()), pixelSize * 4, frameColor);
-  drawSquare(0.5 * (rect.getP01() + rect.getP11()), pixelSize * 4, frameColor);
-  drawSquare(0.5 * (rect.getP10() + rect.getP00()), pixelSize * 4, frameColor);
-  drawSquare(0.5 * (rect.getP01() + rect.getP00()), pixelSize * 4, frameColor);
+  drawSquare(0.5 * (br + tr), pixelSize * 4, frameColor);
+  drawSquare(0.5 * (tl + tr), pixelSize * 4, frameColor);
+  drawSquare(0.5 * (br + bl), pixelSize * 4, frameColor);
+  drawSquare(0.5 * (tl + bl), pixelSize * 4, frameColor);
+
+  drawSquare(0.5 * (rect.getP10() + rect.getP11()), pixelSize * 4, frameColor2);
+  drawSquare(0.5 * (rect.getP01() + rect.getP11()), pixelSize * 4, frameColor2);
+  drawSquare(0.5 * (rect.getP10() + rect.getP00()), pixelSize * 4, frameColor2);
+  drawSquare(0.5 * (rect.getP01() + rect.getP00()), pixelSize * 4, frameColor2);
 }
 
 //-----------------------------------------------------------------------------

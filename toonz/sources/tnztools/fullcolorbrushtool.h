@@ -76,6 +76,8 @@ public:
   void addPreset(QString name);
   void removePreset();
 
+  void loadLastBrush();
+
   void onCanvasSizeChanged();
   void onColorStyleChanged();
 
@@ -120,6 +122,8 @@ protected:
   bool m_firstTime;
   bool m_mousePressed = false;
   TMouseEvent m_mouseEvent;
+
+  bool m_propertyUpdating = false;
 };
 
 //------------------------------------------------------------

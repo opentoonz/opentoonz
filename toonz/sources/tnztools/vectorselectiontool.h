@@ -306,6 +306,11 @@ public:
 
   TPropertyGroup *getProperties(int targetType) override;
 
+  bool m_resetCenter;
+
+  void setResetCenter(bool update) { m_resetCenter = update; }
+  bool canResetCenter() { return m_resetCenter; }
+
 protected:
   void onActivate() override;
   void onDeactivate() override;

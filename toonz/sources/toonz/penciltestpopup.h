@@ -32,7 +32,7 @@ namespace DVGui {
 class FileField;
 class IntField;
 class IntLineEdit;
-}
+}  // namespace DVGui
 
 class CameraCaptureLevelControl;
 
@@ -190,6 +190,7 @@ class FrameNumberLineEdit : public DVGui::LineEdit {
   QRegExpValidator* m_regexpValidator;
 
   void updateValidator();
+  QString m_textOnFocusIn;
 
 public:
   FrameNumberLineEdit(QWidget* parent = 0, int value = 1);
@@ -203,6 +204,7 @@ public:
 protected:
   /*! If focus is lost and current text value is out of range emit signal
   \b editingFinished.*/
+  void focusInEvent(QFocusEvent*) override;
   void focusOutEvent(QFocusEvent*) override;
   void showEvent(QShowEvent* event) override { updateValidator(); }
 };
@@ -318,6 +320,7 @@ class PencilTestPopup : public DVGui::Dialog {
 
   bool m_captureWhiteBGCue;
   bool m_captureCue;
+  bool m_alwaysOverwrite = false;
 
   void processImage(QImage& procImage);
   bool importImage(QImage image);
@@ -332,8 +335,9 @@ public:
 protected:
   void showEvent(QShowEvent* event);
   void hideEvent(QHideEvent* event);
-
   void keyPressEvent(QKeyEvent* event);
+
+  bool event(QEvent* e) override;
 
 protected slots:
   void refreshCameraList();

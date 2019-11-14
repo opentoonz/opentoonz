@@ -404,7 +404,7 @@ std::pair<bool, int> MovieRenderer::Imp::saveFrame(
         has64bitOutputSupport = writerA->is64bitOutputSupported();
 
       // NOTE: If the writer could not be retrieved, the updater will throw.
-      // Failure will be catched then.
+      // Failure will be caught then.
     }
 
     // Prepare the images to be flushed
@@ -876,7 +876,7 @@ TRenderer *MovieRenderer::getTRenderer() {
   // MovieRenderer instance.
   // Since a TRenderer is already smart-pointer-like, we could just return a
   // copy - however, it really
-  // shouln't be that way. Maybe one day we'll revert that and actually use a
+  // shouldn't be that way. Maybe one day we'll revert that and actually use a
   // smart pointer class.
 
   // For now, no use of this function seems to access the returned pointer

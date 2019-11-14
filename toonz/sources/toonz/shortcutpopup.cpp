@@ -217,8 +217,11 @@ ShortcutTree::ShortcutTree(QWidget *parent) : QTreeWidget(parent) {
   addFolder(tr("Level"), MenuLevelCommandType, menuCommandFolder);
   addFolder(tr("Xsheet"), MenuXsheetCommandType, menuCommandFolder);
   addFolder(tr("Cells"), MenuCellsCommandType, menuCommandFolder);
+  addFolder(tr("Play"), MenuPlayCommandType, menuCommandFolder);
+  addFolder(tr("Render"), MenuRenderCommandType, menuCommandFolder);
   addFolder(tr("View"), MenuViewCommandType, menuCommandFolder);
   addFolder(tr("Windows"), MenuWindowsCommandType, menuCommandFolder);
+  addFolder(tr("Help"), MenuHelpCommandType, menuCommandFolder);
 
   addFolder(tr("Right-click Menu Commands"), RightClickMenuCommandType);
 
@@ -226,7 +229,6 @@ ShortcutTree::ShortcutTree(QWidget *parent) : QTreeWidget(parent) {
   addFolder(tr("Tool Modifiers"), ToolModifierCommandType);
   addFolder(tr("Visualization"), ZoomCommandType);
   addFolder(tr("Misc"), MiscCommandType);
-  addFolder(tr("Playback Controls"), PlaybackCommandType);
   addFolder(tr("RGBA Channels"), RGBACommandType);
 
   sortItems(0, Qt::AscendingOrder);

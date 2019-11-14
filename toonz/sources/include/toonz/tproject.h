@@ -146,6 +146,7 @@ public:
   TFilePath projectNameToProjectPath(const TFilePath &projectName);
   TFilePath projectFolderToProjectPath(const TFilePath &projectFolder);
   TFilePath getProjectPathByName(const TFilePath &projectName);
+  TFilePath getProjectPathByProjectFolder(const TFilePath &projectFolder);
 
   TProjectP loadSceneProject(const TFilePath &scenePath);
   void getFolderNames(std::vector<std::string> &names);

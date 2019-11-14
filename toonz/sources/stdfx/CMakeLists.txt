@@ -76,6 +76,8 @@ set(HEADERS
     iwa_timecodefx.h
     iwa_bokehreffx.h
     iwa_textfx.h
+    iwa_corridorgradientfx.h
+    iwa_spingradientfx.h
 )
 
 set(SOURCES
@@ -258,6 +260,8 @@ set(SOURCES
     iwa_bokehreffx.cpp
     iwa_barreldistortfx.cpp
     iwa_textfx.cpp
+    iwa_corridorgradientfx.cpp
+    iwa_spingradientfx.cpp
 )
 
 set(OBJCSOURCES

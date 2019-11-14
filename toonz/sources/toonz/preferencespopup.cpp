@@ -260,10 +260,10 @@ void PreferencesPopup::onPixelsOnlyChanged(int index) {
     QString tempUnit;
     int unitIndex;
     tempUnit  = m_pref->getOldUnits();
-    unitIndex = m_unitOm->findText(tempUnit);
+    unitIndex = std::find(::units, ::units + ::unitsCount, tempUnit) - ::units;
     m_unitOm->setCurrentIndex(unitIndex);
     tempUnit  = m_pref->getOldCameraUnits();
-    unitIndex = m_cameraUnitOm->findText(tempUnit);
+    unitIndex = std::find(::units, ::units + ::unitsCount, tempUnit) - ::units;
     m_cameraUnitOm->setCurrentIndex(unitIndex);
     m_unitOm->setDisabled(false);
     m_cameraUnitOm->setDisabled(false);
@@ -874,8 +874,9 @@ void PreferencesPopup::onShowFrameNumberWithLettersChanged(int index) {
 
 //-----------------------------------------------------------------------------
 
-void PreferencesPopup::onShowKeyframesOnCellAreaChanged(int index) {
-  m_pref->enableShowKeyframesOnXsheetCellArea(index == Qt::Checked);
+void PreferencesPopup::onShowKeyframesOnCellAreaChanged(bool checked) {
+  m_pref->enableShowKeyframesOnXsheetCellArea(checked);
+  TApp::instance()->getCurrentScene()->notifyPreferenceChanged("XsheetCamera");
 }
 
 //-----------------------------------------------------------------------------
@@ -927,8 +928,14 @@ void PreferencesPopup::onLineTestFpsCapture(int index) {
 
 //-----------------------------------------------------------------------------
 
-void PreferencesPopup::onLevelsBackupChanged(int index) {
-  m_pref->enableLevelsBackup(index == Qt::Checked);
+void PreferencesPopup::onBackupChanged(bool enabled) {
+  m_pref->enableBackup(enabled);
+}
+
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onBackupKeepCountChanged() {
+  m_pref->setBackupKeepCount(m_backupKeepCount->getValue());
 }
 
 //-----------------------------------------------------------------------------
@@ -1240,6 +1247,20 @@ void PreferencesPopup::onCurrentColumnDataChanged(const TPixel32 &,
 
 //---------------------------------------------------------------------------------------
 
+void PreferencesPopup::onEnableTouchGesturesChanged(int index) {
+  QAction *action =
+      CommandManager::instance()->getAction(MI_TouchGestureControl);
+  action->setChecked(index == Qt::Checked);
+}
+
+//---------------------------------------------------------------------------------------
+
+void PreferencesPopup::onEnableTouchGesturesTriggered(bool checked) {
+  m_enableTouchGestures->setChecked(checked);
+}
+
+//---------------------------------------------------------------------------------------
+
 void PreferencesPopup::onEnableWinInkChanged(int index) {
   m_pref->enableWinInk(index == Qt::Checked);
 }
@@ -1252,6 +1273,21 @@ void PreferencesPopup::onRasterBackgroundColorChanged(const TPixel32 &color,
   m_pref->setRasterBackgroundColor(color);
 }
 
+//---------------------------------------------------------------------------------------
+
+void PreferencesPopup::onShowXsheetCameraColumnChanged(int index) {
+  m_pref->enableXsheetCameraColumn(index == Qt::Checked);
+  TApp::instance()->getCurrentScene()->notifyPreferenceChanged("XsheetCamera");
+}
+
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onLevelBasedToolsDisplayChanged(int index) {
+  m_pref->setLevelBasedToolsDisplay(index);
+  TApp::instance()->getCurrentScene()->notifyPreferenceChanged(
+      "ToolbarDisplay");
+}
+
 //**********************************************************************************
 //    PrefencesPopup's  constructor
 //**********************************************************************************
@@ -1262,10 +1298,10 @@ PreferencesPopup::PreferencesPopup()
     , m_inksOnly(0)
     , m_blanksCount(0)
     , m_blankColor(0) {
-  bool showTabletSettings = false;
+  bool winInkAvailable = false;
 
 #ifdef _WIN32
-  showTabletSettings = KisTabletSupportWin8::isAvailable();
+  winInkAvailable = KisTabletSupportWin8::isAvailable();
 #endif
 
   setWindowTitle(tr("Preferences"));
@@ -1298,7 +1334,10 @@ PreferencesPopup::PreferencesPopup()
 
   m_undoMemorySize =
       new DVGui::IntLineEdit(this, m_pref->getUndoMemorySize(), 0, 2000);
-  m_levelsBackup = new CheckBox(tr("Backup Animation Levels when Saving"));
+  m_backup = new QGroupBox(tr("Backup Scene and Animation Levels when Saving"));
+  m_backup->setCheckable(true);
+  m_backupKeepCount =
+      new DVGui::IntLineEdit(this, m_pref->getBackupKeepCount(), 1);
   m_chunkSizeFld =
       new DVGui::IntLineEdit(this, m_pref->getDefaultTaskChunkSize(), 1, 2000);
   CheckBox *sceneNumberingCB = new CheckBox(tr("Show Info in Rendered Frames"));
@@ -1481,6 +1520,13 @@ PreferencesPopup::PreferencesPopup()
   CheckBox *cursorOutlineCB =
       new CheckBox(tr("Show Cursor Size Outlines"), this);
 
+  QStringList leveBasedToolsDisplayTypes;
+  leveBasedToolsDisplayTypes << tr("Default")
+                             << tr("Enable Tools For Level Only")
+                             << tr("Show Tools For Level Only");
+  m_levelBasedToolsDisplayCB = new QComboBox(this);
+  m_levelBasedToolsDisplayCB->addItems(leveBasedToolsDisplayTypes);
+
   //--- Xsheet ------------------------------
   categoryList->addItem(tr("Xsheet"));
 
@@ -1491,8 +1537,9 @@ PreferencesPopup::PreferencesPopup()
   m_cellsDragBehaviour = new QComboBox();
   CheckBox *ignoreAlphaonColumn1CB =
       new CheckBox(tr("Ignore Alpha Channel on Levels in Column 1"), this);
-  CheckBox *showKeyframesOnCellAreaCB =
-      new CheckBox(tr("Show Keyframes on Cell Area"), this);
+  m_showKeyframesOnCellAreaCB =
+      new QGroupBox(tr("Show Keyframes on Cell Area"), this);
+  m_showKeyframesOnCellAreaCB->setCheckable(true);
   CheckBox *useArrowKeyToShiftCellSelectionCB =
       new CheckBox(tr("Use Arrow Key to Shift Cell Selection"), this);
   CheckBox *inputCellsWithoutDoubleClickingCB =
@@ -1530,6 +1577,8 @@ PreferencesPopup::PreferencesPopup()
   TPixel32 currectColumnColor;
   m_pref->getCurrentColumnData(currectColumnColor);
   m_currentColumnColor = new ColorField(this, false, currectColumnColor);
+
+  CheckBox *showXsheetCameraCB = new CheckBox(tr("Show Camera Column"), this);
 
   //--- Animation ------------------------------
   categoryList->addItem(tr("Animation"));
@@ -1605,9 +1654,13 @@ PreferencesPopup::PreferencesPopup()
 
   QLabel *note_tablet;
   //--- Tablet Settings ------------------------------
-  if (showTabletSettings) {
-    categoryList->addItem(tr("Tablet Settings"));
 
+  categoryList->addItem(tr("Touch/Tablet Settings"));
+
+  m_enableTouchGestures =
+      new DVGui::CheckBox(tr("Enable Touch Gesture Controls"));
+
+  if (winInkAvailable) {
     m_enableWinInk =
         new DVGui::CheckBox(tr("Enable Windows Ink Support* (EXPERIMENTAL)"));
 
@@ -1631,7 +1684,7 @@ PreferencesPopup::PreferencesPopup()
   replaceAfterSaveLevelAsCB->setChecked(
       m_pref->isReplaceAfterSaveLevelAsEnabled());
 
-  m_levelsBackup->setChecked(m_pref->isLevelsBackupEnabled());
+  m_backup->setChecked(m_pref->isBackupEnabled());
   sceneNumberingCB->setChecked(m_pref->isSceneNumberingEnabled());
   watchFileSystemCB->setChecked(m_pref->isWatchFileSystemEnabled());
 
@@ -1878,13 +1931,16 @@ PreferencesPopup::PreferencesPopup()
       m_cursorBrushStyle->findData(m_pref->getCursorBrushStyle()));
   cursorOutlineCB->setChecked(m_pref->isCursorOutlineEnabled());
 
+  m_levelBasedToolsDisplayCB->setCurrentIndex(
+      m_pref->getLevelBasedToolsDisplay());
+
   //--- Xsheet ------------------------------
   xsheetAutopanDuringPlaybackCB->setChecked(m_pref->isXsheetAutopanEnabled());
   m_cellsDragBehaviour->addItem(tr("Cells Only"));
   m_cellsDragBehaviour->addItem(tr("Cells and Column Data"));
   m_cellsDragBehaviour->setCurrentIndex(m_pref->getDragCellsBehaviour());
   ignoreAlphaonColumn1CB->setChecked(m_pref->isIgnoreAlphaonColumn1Enabled());
-  showKeyframesOnCellAreaCB->setChecked(
+  m_showKeyframesOnCellAreaCB->setChecked(
       m_pref->isShowKeyframesOnXsheetCellAreaEnabled());
   useArrowKeyToShiftCellSelectionCB->setChecked(
       m_pref->isUseArrowKeyToShiftCellSelectionEnabled());
@@ -1899,6 +1955,7 @@ PreferencesPopup::PreferencesPopup()
       m_pref->isSyncLevelRenumberWithXsheetEnabled());
   showCurrentTimelineCB->setChecked(
       m_pref->isCurrentTimelineIndicatorEnabled());
+  showXsheetCameraCB->setChecked(m_pref->isXsheetCameraColumnEnabled());
 
   //--- Animation ------------------------------
   QStringList list;
@@ -1943,7 +2000,11 @@ PreferencesPopup::PreferencesPopup()
   checkForTheLatestVersionCB->setChecked(m_pref->isLatestVersionCheckEnabled());
 
   //--- Tablet Settings ------------------------------
-  if (showTabletSettings) m_enableWinInk->setChecked(m_pref->isWinInkEnabled());
+  m_enableTouchGestures->setChecked(CommandManager::instance()
+                                        ->getAction(MI_TouchGestureControl)
+                                        ->isChecked());
+
+  if (winInkAvailable) m_enableWinInk->setChecked(m_pref->isWinInkEnabled());
 
   /*--- layout ---*/
 
@@ -2017,8 +2078,24 @@ PreferencesPopup::PreferencesPopup()
 
       generalFrameLay->addWidget(replaceAfterSaveLevelAsCB, 0,
                                  Qt::AlignLeft | Qt::AlignVCenter);
-      generalFrameLay->addWidget(m_levelsBackup, 0,
-                                 Qt::AlignLeft | Qt::AlignVCenter);
+
+      QVBoxLayout *backupLay = new QVBoxLayout();
+      backupLay->setMargin(10);
+      {
+        QHBoxLayout *backupCountLay = new QHBoxLayout();
+        backupCountLay->setMargin(0);
+        backupCountLay->setSpacing(5);
+        {
+          backupCountLay->addWidget(
+              new QLabel(tr("# of backups to keep: "), this));
+          backupCountLay->addWidget(m_backupKeepCount, 0);
+          backupCountLay->addStretch(1);
+        }
+        backupLay->addLayout(backupCountLay, 0);
+      }
+      m_backup->setLayout(backupLay);
+      generalFrameLay->addWidget(m_backup);
+
       generalFrameLay->addWidget(sceneNumberingCB, 0,
                                  Qt::AlignLeft | Qt::AlignVCenter);
       generalFrameLay->addWidget(watchFileSystemCB, 0,
@@ -2460,6 +2537,10 @@ PreferencesPopup::PreferencesPopup()
           cursorStyleGroupBox->setLayout(cursorStylesLay);
         }
         ToolsTopLay->addWidget(cursorStyleGroupBox, 3, 0, 1, 3);
+
+        ToolsTopLay->addWidget(new QLabel(tr("Toolbar Display Behaviour:")), 4,
+                               0, Qt::AlignRight | Qt::AlignVCenter);
+        ToolsTopLay->addWidget(m_levelBasedToolsDisplayCB, 4, 1);
       }
       toolsFrameLay->addLayout(ToolsTopLay, 0);
 
@@ -2497,7 +2578,16 @@ PreferencesPopup::PreferencesPopup()
                                   Qt::AlignLeft | Qt::AlignVCenter);
 
         xsheetFrameLay->addWidget(ignoreAlphaonColumn1CB, 4, 0, 1, 2);
-        xsheetFrameLay->addWidget(showKeyframesOnCellAreaCB, 5, 0, 1, 2);
+
+        QVBoxLayout *showKeyframesOnCellAreaCBLay = new QVBoxLayout();
+        showKeyframesOnCellAreaCBLay->setMargin(11);
+        {
+          showKeyframesOnCellAreaCBLay->addWidget(
+              showXsheetCameraCB, 0, Qt::AlignLeft | Qt::AlignVCenter);
+        }
+        m_showKeyframesOnCellAreaCB->setLayout(showKeyframesOnCellAreaCBLay);
+
+        xsheetFrameLay->addWidget(m_showKeyframesOnCellAreaCB, 5, 0, 1, 2);
         xsheetFrameLay->addWidget(useArrowKeyToShiftCellSelectionCB, 6, 0, 1,
                                   2);
         xsheetFrameLay->addWidget(inputCellsWithoutDoubleClickingCB, 7, 0, 1,
@@ -2717,21 +2807,23 @@ PreferencesPopup::PreferencesPopup()
     stackedWidget->addWidget(versionControlBox);
 
     //--- Tablet Settings --------------------------
-    if (showTabletSettings) {
-      QWidget *tabletSettingsBox = new QWidget(this);
-      QVBoxLayout *tsLay         = new QVBoxLayout();
-      tsLay->setMargin(15);
-      tsLay->setSpacing(10);
-      {
+    QWidget *tabletSettingsBox = new QWidget(this);
+    QVBoxLayout *tsLay         = new QVBoxLayout();
+    tsLay->setMargin(15);
+    tsLay->setSpacing(10);
+    {
+      tsLay->addWidget(m_enableTouchGestures, 0,
+                       Qt::AlignLeft | Qt::AlignVCenter);
+
+      if (winInkAvailable)
         tsLay->addWidget(m_enableWinInk, 0, Qt::AlignLeft | Qt::AlignVCenter);
 
-        tsLay->addStretch(1);
+      tsLay->addStretch(1);
 
-        tsLay->addWidget(note_tablet, 0);
-      }
-      tabletSettingsBox->setLayout(tsLay);
-      stackedWidget->addWidget(tabletSettingsBox);
+      if (winInkAvailable) tsLay->addWidget(note_tablet, 0);
     }
+    tabletSettingsBox->setLayout(tsLay);
+    stackedWidget->addWidget(tabletSettingsBox);
 
     mainLayout->addWidget(stackedWidget, 1);
   }
@@ -2768,8 +2860,10 @@ PreferencesPopup::PreferencesPopup()
                        SLOT(onDragCellsBehaviourChanged(int)));
   ret = ret && connect(m_undoMemorySize, SIGNAL(editingFinished()),
                        SLOT(onUndoMemorySizeChanged()));
-  ret = ret && connect(m_levelsBackup, SIGNAL(stateChanged(int)),
-                       SLOT(onLevelsBackupChanged(int)));
+  ret = ret &&
+        connect(m_backup, SIGNAL(toggled(bool)), SLOT(onBackupChanged(bool)));
+  ret = ret && connect(m_backupKeepCount, SIGNAL(editingFinished()), this,
+                       SLOT(onBackupKeepCountChanged()));
   ret = ret && connect(sceneNumberingCB, SIGNAL(stateChanged(int)),
                        SLOT(onSceneNumberingChanged(int)));
   ret = ret && connect(watchFileSystemCB, SIGNAL(stateChanged(int)),
@@ -2949,6 +3043,9 @@ PreferencesPopup::PreferencesPopup()
                        this, SLOT(onCursorBrushStyleChanged(int)));
   ret = ret && connect(cursorOutlineCB, SIGNAL(stateChanged(int)), this,
                        SLOT(onCursorOutlineChanged(int)));
+  ret = ret &&
+        connect(m_levelBasedToolsDisplayCB, SIGNAL(currentIndexChanged(int)),
+                SLOT(onLevelBasedToolsDisplayChanged(int)));
 
   //--- Xsheet ----------------------
   ret = ret && connect(xsheetAutopanDuringPlaybackCB, SIGNAL(stateChanged(int)),
@@ -2959,8 +3056,8 @@ PreferencesPopup::PreferencesPopup()
                        SLOT(onXsheetStepChanged()));
   ret = ret && connect(m_cellsDragBehaviour, SIGNAL(currentIndexChanged(int)),
                        SLOT(onDragCellsBehaviourChanged(int)));
-  ret = ret && connect(showKeyframesOnCellAreaCB, SIGNAL(stateChanged(int)),
-                       this, SLOT(onShowKeyframesOnCellAreaChanged(int)));
+  ret = ret && connect(m_showKeyframesOnCellAreaCB, SIGNAL(clicked(bool)), this,
+                       SLOT(onShowKeyframesOnCellAreaChanged(bool)));
   ret = ret &&
         connect(useArrowKeyToShiftCellSelectionCB, SIGNAL(stateChanged(int)),
                 SLOT(onUseArrowKeyToShiftCellSelectionClicked(int)));
@@ -2988,6 +3085,9 @@ PreferencesPopup::PreferencesPopup()
       ret && connect(m_currentColumnColor,
                      SIGNAL(colorChanged(const TPixel32 &, bool)),
                      SLOT(onCurrentColumnDataChanged(const TPixel32 &, bool)));
+
+  ret = ret && connect(showXsheetCameraCB, SIGNAL(stateChanged(int)), this,
+                       SLOT(onShowXsheetCameraColumnChanged(int)));
 
   //--- Animation ----------------------
   ret = ret && connect(m_keyframeType, SIGNAL(currentIndexChanged(int)),
@@ -3067,8 +3167,16 @@ PreferencesPopup::PreferencesPopup()
   ret = ret && connect(checkForTheLatestVersionCB, SIGNAL(clicked(bool)),
                        SLOT(onCheckLatestVersionChanged(bool)));
 
-  //--- Tablet Settings ----------------------
-  if (showTabletSettings)
+  //--- Touch/Tablet Settings ----------------------
+  ret = ret && connect(m_enableTouchGestures, SIGNAL(stateChanged(int)),
+                       SLOT(onEnableTouchGesturesChanged(int)));
+
+  QAction *action =
+      CommandManager::instance()->getAction(MI_TouchGestureControl);
+  ret = ret && connect(action, SIGNAL(triggered(bool)),
+                       SLOT(onEnableTouchGesturesTriggered(bool)));
+
+  if (winInkAvailable)
     ret = ret && connect(m_enableWinInk, SIGNAL(stateChanged(int)),
                          SLOT(onEnableWinInkChanged(int)));
 

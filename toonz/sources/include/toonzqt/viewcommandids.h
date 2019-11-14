@@ -15,4 +15,14 @@
 #define V_RotateReset "T_RotateReset"
 #define V_PositionReset "T_PositionReset"
 
+// folloing command ids are for command bar
+#define VB_ViewReset "VB_ViewReset"
+#define VB_ZoomFit "VB_ZoomFit"
+#define VB_ZoomReset "VB_ZoomReset"
+#define VB_RotateReset "VB_RotateReset"
+#define VB_PositionReset "VB_PositionReset"
+#define VB_ActualPixelSize "VB_ActualPixelSize"
+#define VB_FlipX "VB_FlipX"
+#define VB_FlipY "VB_FlipY"
+
 #endif  // VIEWCOMMANDIDS_H

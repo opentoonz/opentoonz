@@ -198,7 +198,7 @@ void ColorModelViewer::loadImage(const TFilePath &fp) {
 
 //-----------------------------------------------------------------------------
 /*! Create and open the Right-click menu color model viewer.
-*/
+ */
 void ColorModelViewer::contextMenuEvent(QContextMenuEvent *event) {
   /*-- Levelが取得できない場合はMenuを出さない --*/
   TApp *app     = TApp::instance();
@@ -258,21 +258,21 @@ void ColorModelViewer::contextMenuEvent(QContextMenuEvent *event) {
 
 //-----------------------------------------------------------------------------
 /*! If left button is pressed recall \b pick() in event pos.
-*/
+ */
 void ColorModelViewer::mousePressEvent(QMouseEvent *event) {
   if (event->button() == Qt::LeftButton) pick(event->pos() * getDevPixRatio());
 }
 
 //-----------------------------------------------------------------------------
 /*! If left button is moved recall \b pick() in event pos.
-*/
+ */
 void ColorModelViewer::mouseMoveEvent(QMouseEvent *event) {
   if (event->buttons() & Qt::LeftButton) pick(event->pos() * getDevPixRatio());
 }
 
 //-----------------------------------------------------------------------------
 /*! Pick color from image and set it as current style.
-*/
+ */
 void ColorModelViewer::pick(const QPoint &p) {
   TImageP img = m_imageViewer->getImage();
   if (!img) return;
@@ -296,7 +296,7 @@ void ColorModelViewer::pick(const QPoint &p) {
           カレントToolに合わせてPickモードを変更
           0=Area, 1=Line, 2=Line&Areas(default)
   ---*/
-  int styleIndex = picker.pickStyleId(pos, 1, m_mode);
+  int styleIndex = picker.pickStyleId(pos + TPointD(-0.5, -0.5), 1, m_mode);
 
   if (styleIndex < 0) return;
 
@@ -366,7 +366,7 @@ void ColorModelViewer::showEvent(QShowEvent *e) {
   ToolHandle *toolHandle        = TApp::instance()->getCurrentTool();
   bool ret = connect(paletteHandle, SIGNAL(paletteSwitched()), this,
                      SLOT(showCurrentImage()));
-  ret = ret && connect(paletteHandle, SIGNAL(paletteChanged()), this,
+  ret      = ret && connect(paletteHandle, SIGNAL(paletteChanged()), this,
                        SLOT(showCurrentImage()));
   ret = ret && connect(paletteHandle, SIGNAL(colorStyleChanged(bool)), this,
                        SLOT(showCurrentImage()));
@@ -487,7 +487,7 @@ void ColorModelViewer::showCurrentImage() {
 
 //-----------------------------------------------------------------------------
 /*! Clone current image and set it in viewer.
-*/
+ */
 void ColorModelViewer::loadCurrentFrame() {
   TApp *app     = TApp::instance();
   TXshLevel *xl = app->getCurrentLevel()->getLevel();
@@ -519,7 +519,7 @@ void ColorModelViewer::loadCurrentFrame() {
 
   std::vector<TFrameId> fids;
   fids.push_back(fid);
-  currentPalette->setRefLevelFids(fids);
+  currentPalette->setRefLevelFids(fids, false);
 
   m_currentRefImgPath = xl->getPath();
 
@@ -535,8 +535,8 @@ void ColorModelViewer::loadCurrentFrame() {
   m_flipConsole->enableProgressBar(false);
   m_flipConsole->setProgressBarStatus(0);
   m_flipConsole->setFrameRange(1, 1, 1);
-  m_title1 = m_viewerTitle + " :: " +
-             m_currentRefImgPath.withoutParentDir().withFrame(fid);
+  m_title1 = m_viewerTitle +
+             " :: " + m_currentRefImgPath.withoutParentDir().withFrame(fid);
   m_title = "  ::  <Use Current Frame>";
 
   m_imageViewer->setImage(refImg);
@@ -585,8 +585,8 @@ void ColorModelViewer::reloadCurrentFrame() {
   m_flipConsole->enableProgressBar(false);
   m_flipConsole->setProgressBarStatus(0);
   m_flipConsole->setFrameRange(1, 1, 1);
-  m_title1 = m_viewerTitle + " :: " +
-             m_currentRefImgPath.withoutParentDir().withFrame(fids[0]);
+  m_title1 = m_viewerTitle +
+             " :: " + m_currentRefImgPath.withoutParentDir().withFrame(fids[0]);
   m_title = "  ::  <Use Current Frame>";
 
   m_imageViewer->setImage(refImg);

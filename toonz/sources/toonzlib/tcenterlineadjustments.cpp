@@ -28,7 +28,7 @@ ContourFamily *currContourFamily;
 //--------------------------------------
 
 // EXPLANATION:  The raw skeleton data obtained from StraightSkeletonizer
-// class need to be grouped in joints and sequences before proceding with
+// class need to be grouped in joints and sequences before proceeding with
 // conversion in quadratics - which works on single sequences.
 
 // NOTE: Due to maxHeight, we have to assume that a single SkeletonGraph can

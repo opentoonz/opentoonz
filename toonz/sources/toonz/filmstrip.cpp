@@ -539,10 +539,6 @@ void FilmstripFrames::paintEvent(QPaintEvent *evt) {
 
   int frameCount = (int)fids.size();
 
-  std::set<TFrameId> editableFrameRange;
-
-  if (sl) editableFrameRange = sl->getEditableRange();
-
   bool isReadOnly    = false;
   if (sl) isReadOnly = sl->isReadOnly();
 
@@ -619,9 +615,7 @@ void FilmstripFrames::paintEvent(QPaintEvent *evt) {
 
       // Read-only frames (lock)
       if (0 <= i && i < frameCount) {
-        if ((editableFrameRange.empty() && isReadOnly) ||
-            (isReadOnly && (!editableFrameRange.empty() &&
-                            editableFrameRange.count(fids[i]) == 0))) {
+        if (sl->isFrameReadOnly(fids[i])) {
           static QPixmap lockPixmap(":Resources/forbidden.png");
           p.drawPixmap(tmp_frameRect.bottomLeft() + QPoint(3, -13), lockPixmap);
         }
@@ -678,6 +672,14 @@ void FilmstripFrames::drawFrameIcon(QPainter &p, const QRect &r, int index,
 
       QPixmap inbetweenPixmap(
           svgToPixmap(":Resources/filmstrip_inbetween.svg"));
+
+      if (r.height() - 6 < inbetweenPixmap.height()) {
+        QSize rectSize(inbetweenPixmap.size());
+        rectSize.setHeight(r.height() - 6);
+        inbetweenPixmap = inbetweenPixmap.scaled(
+            rectSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+      }
+
       p.drawPixmap(
           x0 + 2,
           y1 - inbetweenPixmap.height() / inbetweenPixmap.devicePixelRatio() -
@@ -920,6 +922,15 @@ void FilmstripFrames::mouseMoveEvent(QMouseEvent *e) {
     pos = e->globalPos();
     scroll((m_pos.y() - pos.y()) * 10);
     m_pos = pos;
+  } else {
+    TFrameId fid        = index2fid(index);
+    TXshSimpleLevel *sl = getLevel();
+
+    if (sl && m_selection && sl->getType() == PLI_XSHLEVEL &&
+        m_selection->isInInbetweenRange(fid) &&
+        e->pos().x() > width() - 20 - fs_rightMargin) {
+      setToolTip(tr("Auto Inbetween"));
+    }
   }
 }
 

@@ -145,7 +145,7 @@ DvDirModelNode *ProjectDirModel::getNode(const QModelIndex &index) const {
 QModelIndex ProjectDirModel::index(int row, int column,
                                    const QModelIndex &parent) const {
   if (column != 0) return QModelIndex();
-  DvDirModelNode *parentNode       = m_root;
+  DvDirModelNode *parentNode = m_root;
   if (parent.isValid()) parentNode = getNode(parent);
   if (row < 0 || row >= parentNode->getChildCount()) return QModelIndex();
   DvDirModelNode *node = parentNode->getChild(row);
@@ -321,19 +321,20 @@ ProjectPopup::ProjectPopup(bool isModal)
                              Qt::AlignRight | Qt::AlignVCenter);
       upperLayout->addWidget(ff, i + 2, 1);
     }
-    struct {
-      QString name;
-      std::string folderName;
-    } cbs[] = {{tr("Append $scenepath to +drawings"), TProject::Drawings},
-               {tr("Append $scenepath to +inputs"), TProject::Inputs},
-               {tr("Append $scenepath to +extras"), TProject::Extras}};
+    std::vector<std::tuple<QString, std::string>> cbs = {
+        std::make_tuple(tr("Append $scenepath to +drawings"),
+                        TProject::Drawings),
+        std::make_tuple(tr("Append $scenepath to +inputs"), TProject::Inputs),
+        std::make_tuple(tr("Append $scenepath to +extras"), TProject::Extras)};
     int currentRow = upperLayout->rowCount();
 
-    for (i = 0; i < tArrayCount(cbs); i++) {
-      CheckBox *cb = new CheckBox(cbs[i].name);
+    for (int i = 0; i < cbs.size(); ++i) {
+      auto const &name       = std::get<0>(cbs[i]);
+      auto const &folderName = std::get<1>(cbs[i]);
+      CheckBox *cb           = new CheckBox(name);
       cb->setMaximumHeight(WidgetHeight);
       upperLayout->addWidget(cb, currentRow + i, 1);
-      m_useScenePathCbs.append(qMakePair(cbs[i].folderName, cb));
+      m_useScenePathCbs.append(qMakePair(folderName, cb));
     }
     m_topLayout->addLayout(upperLayout);
   }
@@ -347,13 +348,14 @@ void ProjectPopup::updateChooseProjectCombo() {
   m_projectPaths.clear();
   m_chooseProjectCombo->clear();
 
-  TFilePath sandboxFp = TProjectManager::instance()->getSandboxProjectFolder() +
-                        "sandbox_otprj.xml";
+  TProjectManager *pm = TProjectManager::instance();
+
+  TFilePath sandboxFp = pm->getSandboxProjectFolder() + "sandbox_otprj.xml";
   m_projectPaths.push_back(sandboxFp);
   m_chooseProjectCombo->addItem("sandbox");
 
   std::vector<TFilePath> prjRoots;
-  TProjectManager::instance()->getProjectRoots(prjRoots);
+  pm->getProjectRoots(prjRoots);
   for (int i = 0; i < prjRoots.size(); i++) {
     TFilePathSet fps;
     TSystem::readDirectory_Dir_ReadExe(fps, prjRoots[i]);
@@ -361,17 +363,24 @@ void ProjectPopup::updateChooseProjectCombo() {
     TFilePathSet::iterator it;
     for (it = fps.begin(); it != fps.end(); ++it) {
       TFilePath fp(*it);
-      if (TProjectManager::instance()->isProject(fp)) {
-        m_projectPaths.push_back(
-            TProjectManager::instance()->projectFolderToProjectPath(fp));
-        m_chooseProjectCombo->addItem(QString::fromStdString(fp.getName()));
+      if (pm->isProject(fp)) {
+        m_projectPaths.push_back(pm->projectFolderToProjectPath(fp));
+        TFilePath prjFile = pm->getProjectPathByProjectFolder(fp);
+        m_chooseProjectCombo->addItem(
+            QString::fromStdString(prjFile.getName()));
       }
     }
   }
-
+  // Add in project of current project if outside known Project root folders
+  TProjectP currentProject   = pm->getCurrentProject();
+  TFilePath currentProjectFP = currentProject->getProjectPath();
+  if (m_projectPaths.indexOf(currentProjectFP) == -1) {
+    m_projectPaths.push_back(currentProjectFP);
+    m_chooseProjectCombo->addItem(
+        QString::fromStdString(currentProject->getName().getName()));
+  }
   for (int i = 0; i < m_projectPaths.size(); i++) {
-    if (TProjectManager::instance()->getCurrentProjectPath() ==
-        m_projectPaths[i]) {
+    if (pm->getCurrentProjectPath() == m_projectPaths[i]) {
       m_chooseProjectCombo->setCurrentIndex(i);
       break;
     }
@@ -474,9 +483,18 @@ ProjectSettingsPopup::ProjectSettingsPopup() : ProjectPopup(false) {
 void ProjectSettingsPopup::onChooseProjectChanged(int index) {
   TFilePath projectFp = m_projectPaths[index];
 
-  TProjectManager::instance()->setCurrentProjectPath(projectFp);
+  TProjectManager *pm = TProjectManager::instance();
+  pm->setCurrentProjectPath(projectFp);
+
   TProject *projectP =
       TProjectManager::instance()->getCurrentProject().getPointer();
+
+  // In case the project file was upgraded to current version, save it now
+  if (projectP->getProjectPath() != projectFp) {
+    m_projectPaths[index] = projectP->getProjectPath();
+    projectP->save();
+  }
+
   updateFieldsFromProject(projectP);
   IoCmd::saveSceneIfNeeded("Change project");
   IoCmd::newScene();

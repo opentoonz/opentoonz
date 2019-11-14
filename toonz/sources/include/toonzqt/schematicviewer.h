@@ -12,6 +12,7 @@
 // Qt includes
 #include <QGraphicsScene>
 #include <QGraphicsView>
+#include <QTouchDevice>
 
 #include <QIcon>
 
@@ -51,8 +52,13 @@ class TApplication;
 class QToolBar;
 class QToolButton;
 class QAction;
+class QTouchEvent;
+class QGestureEvent;
 
 //====================================================
+namespace {
+enum CursorMode { Select, Zoom, Hand };
+}
 
 //==================================================================
 //
@@ -102,13 +108,38 @@ protected slots:
 class DVAPI SchematicSceneViewer final : public QGraphicsView {
   Q_OBJECT
 
+  bool m_tabletEvent, m_tabletMove;
+  enum TabletState {
+    None = 0,
+    Touched,
+    StartStroke,  // this state is to detect the first call
+    // of TabletMove just after TabletPress
+    OnStroke,
+    Released
+  } m_tabletState = None;
+
+  bool m_touchActive = false;
+
+  bool m_gestureActive                   = false;
+  QTouchDevice::DeviceType m_touchDevice = QTouchDevice::TouchScreen;
+  bool m_zooming                         = false;
+  bool m_panning                         = false;
+  double m_scaleFactor;  // used for zoom gesture
+
+  bool m_stylusUsed = false;
+
+  CursorMode m_cursorMode;
+
 public:
   SchematicSceneViewer(QWidget *parent);
   ~SchematicSceneViewer();
 
-  void zoomQt(bool zoomin, bool resetZoom);
+  void zoomQt(bool zoomin, bool resetView);
+  void panQt(const QPointF &delta);
 
   QPointF getOldScenePos() { return m_oldScenePos; }
+
+  void setCursorMode(CursorMode mode);
 
 protected:
   void mousePressEvent(QMouseEvent *me) override;
@@ -117,18 +148,32 @@ protected:
   void keyPressEvent(QKeyEvent *ke) override;
   void wheelEvent(QWheelEvent *me) override;
   void showEvent(QShowEvent *se) override;
+  void enterEvent(QEvent *e) override;
+  void leaveEvent(QEvent *e) override;
+  void mouseDoubleClickEvent(QMouseEvent *event);
+
+  void tabletEvent(QTabletEvent *e);
+  void touchEvent(QTouchEvent *e, int type);
+  void gestureEvent(QGestureEvent *e);
+
+  bool event(QEvent *event) override;
 
 protected slots:
 
-  void fitScene();
   void centerOnCurrent();
   void reorderScene();
+
+public slots:
+
   void normalizeScene();
+  void fitScene();
 
 private:
   Qt::MouseButton m_buttonState;
   QPoint m_oldWinPos;
   QPointF m_oldScenePos;
+  QPointF m_firstPanPoint, m_mousePanPoint;
+  QPoint m_zoomPoint;
   bool m_firstShowing;
 
 private:
@@ -451,6 +496,8 @@ public:
 
   QColor getSelectedNodeTextColor();
 
+  void setCursorMode(CursorMode mode);
+
 public slots:
 
   void updateSchematic();
@@ -471,6 +518,10 @@ protected slots:
   void updateScenes();
   void changeNodeSize();
 
+  void selectModeEnabled();
+  void zoomModeEnabled();
+  void handModeEnabled();
+
 private:
   SchematicSceneViewer *m_viewer;
   StageSchematicScene *m_stageScene;
@@ -481,9 +532,11 @@ private:
   QToolBar *m_stageToolbar, *m_commonToolbar, *m_fxToolbar, *m_swapToolbar;
 
   QAction *m_fitSchematic, *m_centerOn, *m_reorder, *m_normalize, *m_nodeSize,
-      *m_changeScene;
+      *m_changeScene, *m_selectMode, *m_zoomMode, *m_handMode;
 
   bool m_fullSchematic, m_maximizedNode;
+
+  CursorMode m_cursorMode;
 
 private:
   void createToolbars();

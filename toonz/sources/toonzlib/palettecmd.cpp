@@ -718,7 +718,7 @@ public:
     assert(page);
     m_pageName = page->getName();
     m_styles.resize(page->getStyleCount());
-    for (int i    = 0; i < page->getStyleCount(); i++)
+    for (int i = 0; i < page->getStyleCount(); i++)
       m_styles[i] = page->getStyleId(i);
   }
   void undo() const override {
@@ -840,7 +840,7 @@ int loadRefImage(TPaletteHandle *paletteHandle,
         }
       }
     }
-    levelPalette->setRefLevelFids(fids);
+    levelPalette->setRefLevelFids(fids, !frames.empty());
 
     const TLevel::Table *table = level->getTable();
 
@@ -921,7 +921,7 @@ int loadRefImage(TPaletteHandle *paletteHandle,
           // values
           std::set<TPixel32> colors;
           if (config.rasterPickType == PaletteCmd::PickEveryColors) {
-            // different colors will become sparate styles
+            // different colors will become separate styles
             TColorUtils::buildPrecisePalette(colors, raster,
                                              availableColorCount);
           } else {  //  config.rasterPickType ==
@@ -1018,7 +1018,7 @@ void PaletteCmd::removeReferenceImage(TPaletteHandle *paletteHandle) {
   levelPalette->setRefImgPath(TFilePath());
 
   std::vector<TFrameId> fids;
-  levelPalette->setRefLevelFids(fids);
+  levelPalette->setRefLevelFids(fids, false);
 
   levelPalette->setDirtyFlag(true);
   paletteHandle->notifyPaletteChanged();
@@ -1242,7 +1242,7 @@ public:
   }
   int getHistoryType() override { return HistoryType::Palette; }
 };
-}
+}  // namespace
 
 void PaletteCmd::organizePaletteStyle(
     TPaletteHandle *paletteHandle, int styleId,
@@ -1335,7 +1335,7 @@ TPixel32 pickColor(TRasterImageP ri, const TPoint &rasterPoint) {
 
   return TPixel32::Transparent;
 }
-}
+}  // namespace
 
 void PaletteCmd::pickColorByUsingPickedPosition(TPaletteHandle *paletteHandle,
                                                 TImageP img, int frame) {

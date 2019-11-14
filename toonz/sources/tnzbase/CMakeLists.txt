@@ -200,7 +200,7 @@ elseif(BUILD_ENV_APPLE)
     find_library(COCOA_LIB Cocoa)
 
     set(EXTRA_LIBS
-        ${CMAKE_CURRENT_BINARY_DIR}/../tnzcore/libtnzcore.dylib
+        "$<TARGET_FILE:tnzcore>"
         ${USB_LIB}
         ${TWAIN_LIB}
         ${IOKIT_LIB}

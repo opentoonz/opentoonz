@@ -93,6 +93,11 @@ protected:
   void removeControlPoint(int index);
   void removeCurrentControlPoint();
 
+  void selectNextControlPoint();
+  void selectPreviousControlPoint();
+  void moveCurrentControlPointUp();
+  void moveCurrentControlPointDown();
+
   QPainterPath getPainterPath();
 
   void paintEvent(QPaintEvent *) override;

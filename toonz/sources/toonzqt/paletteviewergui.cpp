@@ -1047,7 +1047,10 @@ void PageViewer::addNewColor() {
 //-----------------------------------------------------------------------------
 
 void PageViewer::addNewPage() {
-  PaletteCmd::addPage(getPaletteHandle());
+  TPaletteHandle *paletteHandle = getPaletteHandle();
+  PaletteCmd::addPage(paletteHandle);
+  if (paletteHandle)
+    emit switchToPage(paletteHandle->getPalette()->getPageCount() - 1);
   update();
 }
 

@@ -117,8 +117,8 @@ if(BUILD_ENV_MSVC)
     )
 elseif(BUILD_ENV_APPLE)
     set(EXTRA_LIBS
-        ${CMAKE_CURRENT_BINARY_DIR}/../tnzcore/libtnzcore.dylib
-        ${CMAKE_CURRENT_BINARY_DIR}/../tnzbase/libtnzbase.dylib
+	"$<TARGET_FILE:tnzcore>"
+	"$<TARGET_FILE:tnzbase>"
     )
 
     target_link_libraries(tnzext

@@ -1,6 +1,6 @@
 //------------------------------------------------------
 /*! Finger Tool : 線のノイズを埋めるツール
-*/
+ */
 #include "tstroke.h"
 #include "tools/toolutils.h"
 #include "tools/tool.h"
@@ -313,11 +313,13 @@ FingerTool::FingerTool()
     , m_selecting(false)
     , m_tileSaver(0)
     , m_cursor(ToolCursor::EraserCursor)
-    , m_toolSize("Size:", 1, 100, 10, false)
+    , m_toolSize("Size:", 1, 1000, 10, false)
     , m_invert("Invert", false)
     , m_firstTime(true)
     , m_workingFrameId(TFrameId()) {
   bind(TTool::ToonzImage);
+
+  m_toolSize.setNonLinearSlider();
 
   m_prop.bind(m_toolSize);
   m_prop.bind(m_invert);
@@ -504,7 +506,7 @@ void FingerTool::onDeactivate() {
 //-----------------------------------------------------------------------------
 /*!
  * ドラッグ中にツールが切り替わった場合に備え、onDeactivateにもMouseReleaseと同じ処理を行う
-*/
+ */
 void FingerTool::finishBrush() {
   if (TToonzImageP ti = (TToonzImageP)getImage(true)) {
     if (m_rasterTrack) {
@@ -576,9 +578,8 @@ void FingerTool::pick(const TPointD &pos) {
     /*---
      * pickLineモードのとき、PurePaintの部分をクリックしてもカレントStyleを変えない
      * ---*/
-    if (ti &&
-        picker.pickTone(TScale(1.0 / subsampling) * pos +
-                        TPointD(-0.5, -0.5)) == 255)
+    if (ti && picker.pickTone(TScale(1.0 / subsampling) * pos +
+                              TPointD(-0.5, -0.5)) == 255)
       return;
   }
 

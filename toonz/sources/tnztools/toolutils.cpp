@@ -57,7 +57,7 @@ void mapToVector(const std::map<int, VIStroke *> &theMap,
                  std::vector<int> &theVect) {
   assert(theMap.size() == theVect.size());
   std::map<int, VIStroke *>::const_iterator it = theMap.begin();
-  UINT i = 0;
+  UINT i                                       = 0;
   for (; it != theMap.end(); ++it) {
     theVect[i++] = it->first;
   }
@@ -373,7 +373,7 @@ QList<TRect> ToolUtils::splitRect(const TRect &first, const TRect &second) {
 
 TRaster32P ToolUtils::convertStrokeToImage(TStroke *stroke,
                                            const TRect &imageBounds,
-                                           TPoint &pos) {
+                                           TPoint &pos, bool pencilMode) {
   int count = stroke->getControlPointCount();
   if (count == 0) return TRaster32P();
   TPointD imgCenter = TPointD((imageBounds.x0 + imageBounds.x1) * 0.5,
@@ -407,7 +407,7 @@ TRaster32P ToolUtils::convertStrokeToImage(TStroke *stroke,
   QPainter p(&img);
   p.setPen(QPen(color, 1, Qt::SolidLine));
   p.setBrush(color);
-  p.setRenderHint(QPainter::Antialiasing, true);
+  p.setRenderHint(QPainter::Antialiasing, !pencilMode);
   QPainterPath path = strokeToPainterPath(&s);
   QRectF pathRect   = path.boundingRect();
   p.translate(-toQPoint(pos));
@@ -1526,8 +1526,8 @@ void ToolUtils::drawBalloon(const TPointD &pos, std::string text,
   delta.x *= devPixRatio;
   delta.y *= devPixRatio;
 
-  textRect.moveTo(qMax(delta.x, 10 * devPixRatio + mrg),
-                  qMax(mrg + 2 * devPixRatio, -delta.y - baseLine));
+  textRect.moveTo(std::max(delta.x, 10 * devPixRatio + mrg),
+                  std::max(mrg + 2 * devPixRatio, -delta.y - baseLine));
 
   int y  = textRect.top() + baseLine;
   int x0 = textRect.left() - mrg;
@@ -1577,7 +1577,7 @@ void ToolUtils::drawBalloon(const TPointD &pos, std::string text,
   }
 
   QSize size(textRect.width() + textRect.left() + mrg,
-             qMax(textRect.bottom() + mrg, y + delta.y) + 3 * devPixRatio);
+             std::max(textRect.bottom() + mrg, y + delta.y) + 3 * devPixRatio);
 
   QImage label(size.width(), size.height(), QImage::Format_ARGB32);
   label.fill(Qt::transparent);

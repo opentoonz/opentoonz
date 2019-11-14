@@ -70,6 +70,7 @@ public:
 };
 
 class FilmstripFrameHeadGadget final : public FrameHeadGadget {
+  Q_OBJECT
   FilmstripFrames *m_filmstrip;
   int m_dy;
   int m_highlightedghostFrame;

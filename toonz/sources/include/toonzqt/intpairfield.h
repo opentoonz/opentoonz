@@ -112,6 +112,8 @@ class DVAPI IntPairField : public QWidget {
 
   bool m_isMaxRangeLimited;
 
+  bool m_isLinear;
+
 public:
   IntPairField(QWidget *parent = 0, bool isMaxRangeLimited = true);
   ~IntPairField() {}
@@ -166,9 +168,9 @@ public:
 
 protected:
   /*! Return value corresponding \b x position. */
-  double pos2value(int x) const;
+  int pos2value(int x) const;
   /*! Return x position corresponding \b value. */
-  int value2pos(double v) const;
+  int value2pos(int v) const;
 
   /*! Set current value to \b value.
                   Set left or right value, or both, to value depending on
@@ -182,6 +184,7 @@ protected:
   void mouseMoveEvent(QMouseEvent *event) override;
   void mouseReleaseEvent(QMouseEvent *event) override;
 
+  void setLinearSlider(bool linear) { m_isLinear = linear; }
 protected slots:
   /*! Set current left value to value in left text field; if necessary, if left
                   value is greater than right, change also current right value.

@@ -1,0 +1,98 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[a4paper, total={180mm, 272mm}]{geometry}
+
+\usepackage{fontspec}
+\setmainfont[Path=fonts/, Extension=.ttf]{ipaexm}
+
+\setlength\parindent{3.5em}
+\setlength\parskip{0em}
+\renewcommand{\baselinestretch}{1.247}
+
+\begin{document}
+
+\thispagestyle{empty}
+
+\Large
+\noindent \\
+HSV Adjust Ino\medskip
+\par
+\normalsize
+色相(H)、彩度(S)、明度(V)、に scale をかけ、次に、shift をします。\\
+\\
+-{-}- \ 入力 \ -{-}-\\
+Source\par
+処理をする画像を接続します。\\
+Reference\par
+Pixel 毎に効果の強弱をつけるための参照画像を接続します。\\
+\\
+-{-}- \ 設定 \ -{-}-\\
+Pivot\par
+\noindent \ \ \, Scale をかける時の中心値を指定します。\\
+\par
+\noindent \ \ \, Hue\par
+色相(hue)について Scale の中心値を指定します。\par
+最小は0.0、最大は360.0です。\par
+初期値は0.0です。\par
+\noindent \ \ \, Saturation\par
+彩度(saturation)について Scale の中心値を指定します。\par
+最小は0.0、最大は1.0です。\par
+初期値は0.0です。\par
+\noindent \ \ \, Value\par
+明度(brightness Value)について Scale の中心値を指定します。\par
+最小は0.0、最大は1.0です。\par
+初期値は0.0です。\\
+\\
+Scale\par
+\noindent \ \ \, Pivot 値を中心として Scale をかけて HSV の範囲を拡大あるいは縮小します。\par
+\noindent \ \ \, Hue 値は円の上を回るように再帰しますが、\par
+\noindent \ \ \, Saturation,Value 値はゼロ以上はゼロ、1以上は1で固定します。\\
+\par
+\noindent \ \ \, Hue\par
+色相(hue)について Scale をかけます。\par
+最小は0.0です。\par
+初期値は1.0です。\par
+\noindent \ \ \, Saturation\par
+彩度(saturation)について Scale をかけます。\par
+最小は0.0です。\par
+初期値は1.0です。\par
+\noindent \ \ \, Value\par
+明度(brightness Value)について Scale をかけます。
+
+\newpage
+
+\thispagestyle{empty}
+
+\ \vspace{-0.2em}
+\par
+最小は0.0です。\par
+初期値は1.0です。\\
+\\
+Shift\par
+\noindent \ \ \, Shift して HSV の値をずらします。\par
+\noindent \ \ \, Hue 値は円の上を回るように再帰しますが、\par
+\noindent \ \ \, Saturation,Value 値はゼロ以上はゼロ、1以上は1で固定します。\\
+\par
+\noindent \ \ \, Hue\par
+色相(hue)について Shift します。\par
+初期値は0.0です。\par
+\noindent \ \ \, Saturation\par
+彩度(saturation)について Shift します。\par
+初期値は0.0です。\par
+\noindent \ \ \, Value\par
+明度(brightness Value)について Shift します。\par
+初期値は0.0です。\\
+\\
+Premultiplied\par
+ON なら、RGB に対して Premultiply 済の\par
+（Alpha チャンネルの値があらかじめ RGB チャンネルに乗算されている)\par
+画像として処理します。\par
+初期値は ON です。\\
+\\
+Reference\par
+Pixel 毎に効果の強弱をつけるための参照画像の値の取り方を選択します。\par
+入力の\textquotedbl Reference\textquotedbl に画像を接続し、\par
+Red/Green/Blue/Alpha/Luminance/Nothing から選びます。\par
+この効果をつけたくないときは Nothing を選ぶか、接続を切ります。\par
+初期値は Red です。
+
+\end{document}

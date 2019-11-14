@@ -237,7 +237,7 @@ Preferences::Preferences()
     , m_defLevelWidth(0.0)
     , m_defLevelHeight(0.0)
     , m_defLevelDpi(0.0)
-    , m_iconSize(160, 90)
+    , m_iconSize(80, 45)
     , m_blankColor(TPixel32::White)
     , m_frontOnionColor(TPixel::Black)
     , m_backOnionColor(TPixel::Black)
@@ -250,7 +250,7 @@ Preferences::Preferences()
     , m_shrink(1)
     , m_step(1)
     , m_blanksCount(0)
-    , m_keyframeType(3)
+    , m_keyframeType(2)
     , m_animationStep(1)
     , m_textureSize(0)
     , m_xsheetStep(10)
@@ -262,11 +262,11 @@ Preferences::Preferences()
     , m_currentLanguage("English")
     , m_currentStyleSheet("Default")
     , m_undoMemorySize(100)
-    , m_dragCellsBehaviour(0)
+    , m_dragCellsBehaviour(1)
     , m_lineTestFpsCapture(25)
     , m_defLevelType(0)
     , m_vectorSnappingTarget(SnapAll)
-    , m_autocreationType(1)
+    , m_autocreationType(2)
     , m_autoExposeEnabled(true)
     , m_autoCreateEnabled(true)
     , m_subsceneFolderEnabled(true)
@@ -286,7 +286,7 @@ Preferences::Preferences()
     , m_automaticSVNFolderRefreshEnabled(true)
     , m_SVNEnabled(false)
     , m_minimizeSaveboxAfterEditing(true)
-    , m_levelsBackupEnabled(false)
+    , m_backupEnabled(true)
     , m_sceneNumberingEnabled(false)
     , m_animationSheetEnabled(false)
     , m_inksOnly(false)
@@ -295,7 +295,7 @@ Preferences::Preferences()
     , m_regionAntialias(false)
     , m_keepFillOnVectorSimplify(true)
     , m_useHigherDpiOnVectorSimplify(false)
-    , m_downArrowInLevelStripCreatesNewFrame(false)
+    , m_downArrowInLevelStripCreatesNewFrame(true)
     , m_viewerBGColor(128, 128, 128, 255)
     , m_previewBGColor(64, 64, 64, 255)
     , m_chessboardColor1(180, 180, 180)
@@ -312,22 +312,22 @@ Preferences::Preferences()
     , m_moveCurrentFrameByClickCellArea(true)
     , m_onionSkinEnabled(true)
     , m_onionSkinDuringPlayback(false)
-    , m_dropdownShortcutsCycleOptions(false)
+    , m_dropdownShortcutsCycleOptions(true)
     , m_multiLayerStylePickerEnabled(false)
     , m_showKeyframesOnXsheetCellArea(true)
     , m_projectRoot(0x08)
     , m_customProjectRoot("")
     , m_precompute(true)
     , m_fastRenderPath("desktop")
-    , m_ffmpegTimeout(60)
+    , m_ffmpegTimeout(600)
     , m_shortcutPreset("defopentoonz")
     , m_useNumpadForSwitchingStyles(true)
     , m_newLevelSizeToCameraSizeEnabled(false)
-    , m_showXSheetToolbar(false)
-    , m_syncLevelRenumberWithXsheet(false)
+    , m_showXSheetToolbar(true)
+    , m_syncLevelRenumberWithXsheet(true)
     , m_expandFunctionHeader(false)
     , m_showColumnNumbers(false)
-    , m_useArrowKeyToShiftCellSelection(false)
+    , m_useArrowKeyToShiftCellSelection(true)
     , m_inputCellsWithoutDoubleClickingEnabled(false)
     , m_importPolicy(0)
     , m_guidedDrawingType(0)
@@ -346,10 +346,13 @@ Preferences::Preferences()
     , m_cursorOutlineEnabled(true)
     , m_currentColumnColor(TPixel::Black)
     , m_enableWinInk(false)
-    , m_useOnionColorsForShiftAndTraceGhosts(false)
-    , m_rasterBackgroundColor(TPixel::White) {
+    , m_useOnionColorsForShiftAndTraceGhosts(true)
+    , m_rasterBackgroundColor(TPixel::White)
+    , m_backupKeepCount(1)
+    , m_showXsheetCameraColumn(true)
+    , m_levelBasedToolsDisplay(0) {
   TCamera camera;
-  m_defLevelType   = PLI_XSHLEVEL;
+  m_defLevelType   = TZP_XSHLEVEL;
   m_defLevelWidth  = camera.getSize().lx;
   m_defLevelHeight = camera.getSize().ly;
   m_defLevelDpi    = camera.getDpi().x;
@@ -390,7 +393,8 @@ Preferences::Preferences()
   getValue(*m_settings, "SVNEnabled", m_SVNEnabled);
   getValue(*m_settings, "minimizeSaveboxAfterEditing",
            m_minimizeSaveboxAfterEditing);
-  getValue(*m_settings, "levelsBackupEnabled", m_levelsBackupEnabled);
+  getValue(*m_settings, "backupEnabled", m_backupEnabled);
+  getValue(*m_settings, "backupKeepCount", m_backupKeepCount);
   getValue(*m_settings, "sceneNumberingEnabled", m_sceneNumberingEnabled);
   getValue(*m_settings, "animationSheetEnabled", m_animationSheetEnabled);
   getValue(*m_settings, "autosaveEnabled", m_autosaveEnabled);
@@ -726,6 +730,10 @@ Preferences::Preferences()
 
   getValue(*m_settings, "rasterBackgroundColor", m_rasterBackgroundColor);
   TImageWriter::setBackgroundColor(m_rasterBackgroundColor);
+
+  getValue(*m_settings, "showXsheetCameraColumn", m_showXsheetCameraColumn);
+
+  getValue(*m_settings, "levelBasedToolsDisplay", m_levelBasedToolsDisplay);
 }
 
 //-----------------------------------------------------------------
@@ -1433,9 +1441,16 @@ void Preferences::setDownArrowLevelStripNewFrame(bool on) {
 
 //-----------------------------------------------------------------
 
-void Preferences::enableLevelsBackup(bool enabled) {
-  m_levelsBackupEnabled = enabled;
-  m_settings->setValue("levelsBackupEnabled", enabled ? "1" : "0");
+void Preferences::enableBackup(bool enabled) {
+  m_backupEnabled = enabled;
+  m_settings->setValue("backupEnabled", enabled ? "1" : "0");
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::setBackupKeepCount(int count) {
+  m_backupKeepCount = count;
+  m_settings->setValue("backupKeepCount", count);
 }
 
 //-----------------------------------------------------------------
@@ -1772,4 +1787,16 @@ void Preferences::setRasterBackgroundColor(const TPixel32 &color) {
                        QString::number((int)color.b));
   m_settings->setValue("rasterBackgroundColor_M",
                        QString::number((int)color.m));
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::enableXsheetCameraColumn(bool on) {
+  m_showXsheetCameraColumn = on;
+  m_settings->setValue("showXsheetCameraColumn", on ? "1" : "0");
+}
+
+void Preferences::setLevelBasedToolsDisplay(int displayType) {
+  m_levelBasedToolsDisplay = displayType;
+  m_settings->setValue("levelBasedToolsDisplay", displayType);
 }

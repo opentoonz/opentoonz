@@ -2012,7 +2012,7 @@ void ReplaceParentDirectoryPopup::initFolder() {
 // ImportMagpieFilePopup
 
 ImportMagpieFilePopup::ImportMagpieFilePopup()
-    : FileBrowserPopup(tr("Import Magpie File")) {
+    : FileBrowserPopup(tr("Import Toonz Lip Sync File")) {
   setOkText(tr("Load"));
   addFilterType("tls");
 }

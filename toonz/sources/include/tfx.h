@@ -373,7 +373,7 @@ public:
   TFx *clone(TFx *fx, bool recursive) const;
 
   void unlinkParams();
-  void linkParams(TFx *src);
+  virtual void linkParams(TFx *src);
 
   TFx *getLinkedFx() const;
 
@@ -543,7 +543,7 @@ inline std::string TFx::getFxType() const { return getDeclaration()->getId(); }
 //-------------------------------------------------------------------
 
 #define FX_DECLARATION(T)                                                      \
-  \
+                                                                               \
 public:                                                                        \
   const TPersistDeclaration *getDeclaration() const override;
 

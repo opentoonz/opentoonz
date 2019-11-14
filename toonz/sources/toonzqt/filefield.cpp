@@ -38,6 +38,8 @@ FileField::FileField(QWidget *parent, QString path, bool readOnly,
   // if the initial text is not path, set the string here and prevent browsing
   if (doNotBrowseInitialPath) m_descriptionText = path;
 
+  setFocusProxy(m_field);
+
   QHBoxLayout *mainLayout = new QHBoxLayout();
   mainLayout->setMargin(0);
   mainLayout->setSpacing(1);

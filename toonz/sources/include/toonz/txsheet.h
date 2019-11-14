@@ -156,6 +156,9 @@ private:
   TXshNoteSet *m_notes;
   SoundProperties *m_soundProperties;
 
+  int m_cameraColumnIndex;
+  TXshColumn *m_cameraColumn;
+
   DECLARE_CLASS_CODE
 
 public:
@@ -388,13 +391,13 @@ public:
           cells will be inserted by shifting the other down.
   */
   void stepCells(int r0, int c0, int r1, int c1, int type);
-  /*! For each sequenze of frame with same number, contained in rect delimited
+  /*! For each sequence of frame with same number, contained in rect delimited
      by first row \b \e r0, last row \b \e r1 and
           first column \b \e c0, a frame with same number is inserted.
 */
   void increaseStepCells(int r0, int c0, int &r1, int c1);
   /*!
-For each sequenze of frame with same number, contained in rect delimited by
+For each sequence of frame with same number, contained in rect delimited by
 first row \b \e r0, last row \b \e r1 and
           first column \b \e c0, a frame with same number is removed.
 */
@@ -402,7 +405,7 @@ first row \b \e r0, last row \b \e r1 and
   /*!
 The cells, contained in rect delimited by first row \b \e r0, last row \b \e r1
 and
-          first column \b \e c0, are resetted in order to have no sequential
+          first column \b \e c0, are reset in order to have no sequential
 frame duplication.
 */
   void resetStepCells(int r0, int c0, int r1, int c1);
@@ -556,6 +559,12 @@ in TXsheetImp.
                             int from, int to, int r0, int r1, bool isOverwrite,
                             std::vector<int> columnIndices,
                             std::vector<TXshLevelP> levels, int rowsCount);
+
+  void setCameraColumnIndex(int index) { m_cameraColumnIndex = index; }
+  int getCameraColumnIndex() { return m_cameraColumnIndex; }
+
+  void setCameraColumnLocked(bool locked) { m_cameraColumn->lock(locked); }
+  bool isCameraColumnLocked() { return m_cameraColumn->isLocked(); }
 
 protected:
   bool checkCircularReferences(TXsheet *childCandidate);

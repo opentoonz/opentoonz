@@ -155,6 +155,8 @@ reimplementation of the TPersist::loadData() function.
   void skipCurrentTag();  //!< Silently ignores the content of currently opened
                           //! tag up to its end.
 
+  std::string getCurrentTagName();
+
 private:
   // Not copyable
   TIStream(const TIStream &);             //!< Not implemented
@@ -265,6 +267,8 @@ checking the status.
 \return   Whether the stream is in a good state (no fails in writing to).
 */
   bool checkStatus() const;  //!< \b Flushes the stream and checks its validity.
+
+  std::string getCurrentTagName();
 
 private:
   // Not copyable

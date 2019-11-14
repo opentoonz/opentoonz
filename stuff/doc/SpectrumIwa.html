@@ -1,4 +1,4 @@
-<html lang="ja">
+﻿<html lang="ja">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
       <title>SpectrumFx Iwa</title>
@@ -6,42 +6,42 @@
 <body bgcolor="#f5f5f5" text="#220011">
 <h1><img src = ".\img\fx_iwa_spectrum.png" width = 30 height = 30 >   SpectrumFx Iwa</h1>
 
-<h4>● 概要</h4>
-入力画像の輝度に応じて、薄膜干渉による虹色パターンを出力するエフェクトです。<br>
-本当はグレアの虹色は薄膜干渉ではないのですが、グレアの素材としてもそれらしい結果を得ることができます。
+<h4>● Overview</h4>
+Depending on the brightness of the input image, it has the effect of outputing a rainbow color pattern like a thin film interference.<br>
+Real iridescent glare is not a thin film interference, but you can get likely results for the glare of the material.
 
-  <h4>● 入力ポート</h4>
+  <h4>● Input port</h4>
 <UL>
-<LI><b>Source</b> : 入力画像を接続します。入力画像の輝度が、薄膜の厚さに対応します。<br>
-輝度が明るいほど膜厚は薄く、輝度0.0が後述の"Thickness Min"に、輝度1.0が"Thickness Max"にそれぞれ対応します。</LI>
-<LI><b>Light</b> : ライト画像を接続します。<br>
-ライト画像が接続されている場合、出力結果に以下の違いがあります。</LI>
+<LI><b>Source</b> : Connect the input image. The brightness of the input image, corresponds to the thickness of the thin film.<br>
+Thin film thickness is how bright the brightness will be, brightness 0.0 is the "Thickness Min" which will be described later, brightness 1.0 will correspond to the "Thickness Max".</LI>
+<LI><b>Light</b> : Connect the light image.<br>
+If the light image is connected, there is less of a difference in the output.</LI>
 <UL>
-<LI>出力結果のアルファチャンネルは、ライト画像のアルファチャンネルで置き換えられます。</LI>
-<LI>後述の"Light Threshold"パラメータが有効になり、ライト画像と虹色の画像をスクリーン合成して出力することができます。</LI>
+<LI>Alpha channel of output results, will be replaced in the alpha channel of the light image.</LI>
+<LI>If the "Light Threshold" parameters described below are enabled, you can output the image of the light image & the rainbow colors for screen synthesis.</LI>
 </UL>
 </UL>
 
-<h4>● パラメータ</h4>
+<h4>● Parameters</h4>
 <UL>
-<LI><b>Intensity</b> : 光の強度です。高いほど虹色画像が明るくなります。</LI>
-<LI><b>Refractive Index</b> : 媒質の屈折率です。高いほど虹色画像が明るくなります。</LI>
-<LI><b>Thick(ness) Max</b> : 薄膜の厚みの最大値です。入力画像の輝度０の部分の膜厚に相当します。</LI>
-<LI><b>Thick(ness) Min</b> : 薄膜の厚みの最小値です。入力画像の輝度１の部分の膜厚に相当します。</LI><br>
-※ Thicknessは負の値を取ることもできます。その場合、膜厚が負の部分はすべて０として計算されます。<br>
-※ ThicknessのMin,Maxは、値の大小を逆転することもできます。その場合、虹色のパターンが反転します。
-<LI><b>R/G/B Gamma</b> : 虹色パターンの、RGB各チャンネルのガンマ補正値です。</LI><br>
-<LI><b>Lens Factor</b> : 入力画像の輝度から虹色パターンを出力するときに追加できるガンマ補正値です。<br>
-これにより、例えば、同心円状のパターンなら、虹色の周期に凸/凹レンズを通したような歪みをつけることができます。</LI>
-<LI><b>Light Threshold</b> : ライト画像が接続されているとき、虹色画像にライト画像をスクリーン合成することができます。<br>
-Light Thresholdは、スクリーン合成をするのに必要なライト画像のアルファチャンネルの最小値です。<br>
-各ピクセルについて、以下のような処理が行われます。</LI>
+<LI><b>Intensity</b> : The intensity of the light. Rainbow-color image will be brighter when it is set higher.</LI>
+<LI><b>Refractive Index</b> : The medium refractive index. Rainbow-color image will be brighter when it is set higher.</LI>
+<LI><b>Thick(ness) Max</b> : The maximum value of the thin film thickness. This corresponds to the film thickness of the brightness 0 portion of the input image.</LI>
+<LI><b>Thick(ness) Min</b> : The minimum value of the thin film thickness. This corresponds to the film thickness of the brightness 1 portion of the input image.</LI><br>
+※ Thickness can also take a negative value. In that case, the film thickness is calculated as if the negative part is 0.<br>
+※ Thickness of Min, Max, can also reverse the magnitude of the value. In that case, the rainbow colors of the pattern is reversed.
+<LI><b>R/G/B Gamma</b> : Used as a gamma correction value for each of the RGB channels, of the rainbow color pattern.</LI><br>
+<LI><b>Lens Factor</b> : The gamma correction value that can be added to when outputting a rainbow color pattern from the input image brightness.<br>
+As a result, for example, for the concentric pattern, you can put a strain, such as through a convex/concave lens for the period of the rainbow.</LI>
+<LI><b>Light Threshold</b> : When the light image is connected, you can combine the screens of the light image & the rainbow color image.<br>
+Light Threshold is the minimum value of the alpha channel of the light image required for the screen synthesis.<br>
+For each pixel, it will be performed with the following processing.</LI>
 <UL>
-<LI>ライト画像のアルファチャンネルがLight Threshold以下のとき ： スクリーン合成は行われません。</LI>
-<LI>ライト画像のアルファチャンネルが１のとき ： ライト画像が100％でスクリーン合成されます。</LI>
-<LI>ライト画像のアルファチャンネルがLight Thresholdより大きく、１未満のとき ： スクリーン合成の割合は線形補間されます。</LI>
+<LI>When the alpha channel of the light image is following the Light Threshold ： Screen synthesis does not take place.</LI>
+<LI>When the alpha channel of the light image is 1 ： Light image screen is synthesized at 100%.</LI>
+<LI>When the alpha channel of the light image is larger than the Light Threshold, & less than 1 ： The proportion of the screen synthesis is linear interpolation.</LI>
 </UL>
-Light Thresholdの値が小さいほど、ライト画像とのスクリーンの割合は大きくなるので、出力画像は明るくなります。負の値をとることもできます。
+The higher the value of the Light Threshold the brighter the output image will become, a smaller screen ratio makes the writen image become larger. You can also make it a negative value.
 </UL>
 </body>
 

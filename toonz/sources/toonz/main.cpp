@@ -82,6 +82,10 @@
 #include <QLibraryInfo>
 #include <QHash>
 
+#ifdef _WIN32
+#include <QtPlatformHeaders/QWindowsWindowFunctions>
+#endif
+
 using namespace DVGui;
 #if defined LINETEST
 const char *applicationName    = "Toonz LineTest";
@@ -166,7 +170,7 @@ static void initToonzEnv(QHash<QString, QString> &argPathValues) {
   QCoreApplication::setOrganizationName("OpenToonz");
   QCoreApplication::setOrganizationDomain("");
   QCoreApplication::setApplicationName(
-      QString::fromStdString(TEnv::getApplicationFullName()));
+      QString::fromStdString(TEnv::getApplicationName()));
 
   /*-- TOONZROOTのPathの確認 --*/
   // controllo se la xxxroot e' definita e corrisponde ad un folder esistente
@@ -229,7 +233,7 @@ project->setUseScenePath(TProject::Extras, false);
   // Imposto la rootDir per ImageCache
 
   /*-- TOONZCACHEROOTの設定  --*/
-  TFilePath cacheDir               = ToonzFolder::getCacheRootFolder();
+  TFilePath cacheDir = ToonzFolder::getCacheRootFolder();
   if (cacheDir.isEmpty()) cacheDir = TEnv::getStuffDir() + "cache";
   TImageCache::instance()->setRootDir(cacheDir);
 }
@@ -315,11 +319,10 @@ int main(int argc, char *argv[]) {
   QApplication a(argc, argv);
 
 #ifdef MACOSX
-// This workaround is to avoid missing left button problem on Qt5.6.0.
-// To invalidate m_rightButtonClicked in Qt/qnsview.mm, sending NSLeftButtonDown
-// event
-// before NSLeftMouseDragged event propagated to QApplication.
-// See more details in ../mousedragfilter/mousedragfilter.mm.
+  // This workaround is to avoid missing left button problem on Qt5.6.0.
+  // To invalidate m_rightButtonClicked in Qt/qnsview.mm, sending
+  // NSLeftButtonDown event before NSLeftMouseDragged event propagated to
+  // QApplication. See more details in ../mousedragfilter/mousedragfilter.mm.
 
 #include "mousedragfilter.h"
 
@@ -408,6 +411,8 @@ int main(int argc, char *argv[]) {
     assert(ret);
   }
 #endif
+
+  TEnv::setApplicationFileName(argv[0]);
 
   // splash screen
   QPixmap splashPixmap = QIcon(":Resources/splash.svg").pixmap(QSize(610, 344));
@@ -614,6 +619,12 @@ int main(int argc, char *argv[]) {
 
   /*-- Layoutファイル名をMainWindowのctorに渡す --*/
   MainWindow w(argumentLayoutFileName);
+
+#ifdef _WIN32
+  // http://doc.qt.io/qt-5/windows-issues.html#fullscreen-opengl-based-windows
+  if (w.windowHandle())
+    QWindowsWindowFunctions::setHasBorderInFullScreen(w.windowHandle(), true);
+#endif
 
   splash.showMessage(offsetStr + "Loading style sheet ...", Qt::AlignCenter,
                      Qt::white);

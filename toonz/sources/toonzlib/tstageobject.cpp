@@ -513,7 +513,7 @@ void TStageObject::onChange(const class TParamChange &c) {
   // one of its parameters. This means this function gets called A LOT.
 
   // Thus, we're just SCHEDULING for a data refresh. The actual refresh happens
-  // whenever the scheduled datas are accessed.
+  // whenever the scheduled data is accessed.
 
   if (c.m_keyframeChanged)
     m_lazyData.invalidate();  // Both invalidate placement AND keyframes

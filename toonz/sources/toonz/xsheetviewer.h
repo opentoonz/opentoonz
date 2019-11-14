@@ -370,6 +370,21 @@ class XsheetViewer final : public QFrame, public SaveLoadQSettings {
       QColor XsheetDragBarHighlightColor READ getXsheetDragBarHighlightColor
           WRITE setXsheetDragBarHighlightColor)
 
+  // Xsheet Active Camera color
+  QColor m_ActiveCameraColor;
+  QColor m_SelectedActiveCameraColor;
+  Q_PROPERTY(QColor ActiveCameraColor READ getActiveCameraColor WRITE
+                 setActiveCameraColor)
+  Q_PROPERTY(QColor SelectedActiveCameraColor READ getSelectedActiveCameraColor
+                 WRITE setSelectedActiveCameraColor)
+  // Xsheet Other Camera color
+  QColor m_OtherCameraColor;
+  QColor m_SelectedOtherCameraColor;
+  Q_PROPERTY(QColor OtherCameraColor READ getOtherCameraColor WRITE
+                 setOtherCameraColor)
+  Q_PROPERTY(QColor SelectedOtherCameraColor READ getSelectedOtherCameraColor
+                 WRITE setSelectedOtherCameraColor)
+
   // Xsheet Preview Button
   QColor m_xsheetPreviewButtonBgOnColor;
   QImage m_xsheetPreviewButtonOnImage;
@@ -597,6 +612,7 @@ public:
   /*! Return true if selection contain only sound cell.*/
   bool areSoundCellsSelected();
   bool areSoundTextCellsSelected();
+  bool areCameraCellsSelected();
 
   XsheetGUI::DragTool *getDragTool() const { return m_dragTool; };
   void setDragTool(XsheetGUI::DragTool *dragTool);
@@ -915,6 +931,28 @@ public:
   QColor getXsheetDragBarHighlightColor() const {
     return m_xsheetDragBarHighlightColor;
   }
+
+  // Xsheet Active Camera Color
+  void setActiveCameraColor(const QColor &color) {
+    m_ActiveCameraColor = color;
+  }
+  void setSelectedActiveCameraColor(const QColor &color) {
+    m_SelectedActiveCameraColor = color;
+  }
+  QColor getActiveCameraColor() const { return m_ActiveCameraColor; }
+  QColor getSelectedActiveCameraColor() const {
+    return m_SelectedActiveCameraColor;
+  }
+  // Xsheet Other Camera Color
+  void setOtherCameraColor(const QColor &color) { m_OtherCameraColor = color; }
+  void setSelectedOtherCameraColor(const QColor &color) {
+    m_SelectedOtherCameraColor = color;
+  }
+  QColor getOtherCameraColor() const { return m_OtherCameraColor; }
+  QColor getSelectedOtherCameraColor() const {
+    return m_SelectedOtherCameraColor;
+  }
+
   // Xsheet Preview Button
   void setXsheetPreviewButtonBgOnColor(const QColor &color) {
     m_xsheetPreviewButtonBgOnColor = color;

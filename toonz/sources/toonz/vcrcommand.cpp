@@ -3,6 +3,7 @@
 // Tnz6 includes
 #include "menubarcommandids.h"
 #include "tapp.h"
+#include "sceneviewer.h"
 
 // TnzQt includes
 #include "toonzqt/menubarcommand.h"
@@ -15,6 +16,8 @@
 #include "toonz/tframehandle.h"
 #include "toonz/tcolumnhandle.h"
 #include "toonz/preferences.h"
+
+#include <QApplication>
 
 //**********************************************************************************
 //    Commands  definition
@@ -127,6 +130,64 @@ public:
   }
 };
 
+//-----------------------------------------------------------------------------
+
+class NextKeyframeCommand final : public MenuItemHandler {
+public:
+  NextKeyframeCommand() : MenuItemHandler(MI_NextKeyframe) {}
+
+  void execute() override {
+    QString navControlList[6] = {"LevelPalette",   "StudioPalette",
+                                 "FunctionEditor", "FxSettings",
+                                 "ComboViewer",    "SceneViewer"};
+
+    QWidget *panel    = QApplication::focusWidget();
+    if (!panel) panel = TApp::instance()->getActiveViewer();
+    while (panel) {
+      QString pane = panel->objectName();
+      if (panel->windowType() == Qt::WindowType::SubWindow ||
+          panel->windowType() == Qt::WindowType::Tool) {
+        if (std::find(navControlList, navControlList + 6, pane) !=
+            (navControlList + 6)) {
+          TApp::instance()->getCurrentFrame()->emitTriggerNextKeyframe(panel);
+          break;
+        } else
+          panel = TApp::instance()->getActiveViewer()->parentWidget();
+      } else
+        panel = panel->parentWidget();
+    }
+  }
+};
+
+//-----------------------------------------------------------------------------
+
+class PrevKeyframeCommand final : public MenuItemHandler {
+public:
+  PrevKeyframeCommand() : MenuItemHandler(MI_PrevKeyframe) {}
+
+  void execute() override {
+    QString navControlList[6] = {"LevelPalette",   "StudioPalette",
+                                 "FunctionEditor", "FxSettings",
+                                 "ComboViewer",    "SceneViewer"};
+
+    QWidget *panel    = QApplication::focusWidget();
+    if (!panel) panel = TApp::instance()->getActiveViewer();
+    while (panel) {
+      QString pane = panel->objectName();
+      if (panel->windowType() == Qt::WindowType::SubWindow ||
+          panel->windowType() == Qt::WindowType::Tool) {
+        if (std::find(navControlList, navControlList + 6, pane) !=
+            (navControlList + 6)) {
+          TApp::instance()->getCurrentFrame()->emitTriggerPrevKeyframe(panel);
+          break;
+        } else
+          panel = TApp::instance()->getActiveViewer()->parentWidget();
+      } else
+        panel = panel->parentWidget();
+    }
+  }
+};
+
 //**********************************************************************************
 //    Commands  instantiation
 //**********************************************************************************
@@ -154,3 +215,6 @@ NextDrawingCommand nextDrawingCommand;
 PrevDrawingCommand prevDrawingCommand;
 NextStepCommand nextStepCommand;
 PrevStepCommand prevStepCommand;
+
+NextKeyframeCommand nextKeyframeCommand;
+PrevKeyframeCommand prevKeyframeCommand;

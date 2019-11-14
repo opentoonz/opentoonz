@@ -502,6 +502,8 @@ transformation.
 
   QString updateEnabled();  //!< Sets the tool's \a enability and returns a
                             //!  reason in case the tool was disabled.
+  QString updateEnabled(int rowIndex, int columnIndex);
+
   bool isColumnLocked(int columnIndex) const;
 
   void resetInputMethod();  //!< Resets Input Context (IME)

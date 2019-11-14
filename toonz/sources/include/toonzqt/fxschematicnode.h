@@ -70,7 +70,8 @@ protected:
 //    FxPalettePainter
 //*****************************************************
 
-class FxPalettePainter final : public QGraphicsItem, public QObject {
+class FxPalettePainter final : public QObject, public QGraphicsItem {
+  Q_OBJECT
   FxSchematicPaletteNode *m_parent;
   double m_width, m_height;
   QString m_name;
@@ -189,6 +190,7 @@ protected:
 //*****************************************************
 
 class FxSchematicPort final : public SchematicPort {
+  Q_OBJECT
   TFx *m_ownerFx;
   FxSchematicPort *m_currentTargetPort;
   QList<SchematicLink *> m_hiddenLinks;
@@ -353,6 +355,8 @@ signals:
 //*****************************************************
 
 class FxSchematicOutputNode final : public FxSchematicNode {
+  Q_OBJECT
+
   FxOutputPainter *m_outputPainter;
 
 public:
@@ -373,6 +377,8 @@ protected:
 //*****************************************************
 
 class FxSchematicXSheetNode final : public FxSchematicNode {
+  Q_OBJECT
+
   FxXSheetPainter *m_xsheetPainter;
 
 public:

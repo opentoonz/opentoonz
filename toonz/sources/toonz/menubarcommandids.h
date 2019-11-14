@@ -211,6 +211,8 @@
 #define MI_PrevDrawing "MI_PrevDrawing"
 #define MI_NextStep "MI_NextStep"
 #define MI_PrevStep "MI_PrevStep"
+#define MI_NextKeyframe "MI_NextKeyframe"
+#define MI_PrevKeyframe "MI_PrevKeyframe"
 
 #define MI_RedChannel "MI_RedChannel"
 #define MI_GreenChannel "MI_GreenChannel"
@@ -307,6 +309,7 @@
 #define MI_ToggleColumnLocks "MI_ToggleColumnLocks"
 #define MI_ToggleXSheetToolbar "MI_ToggleXSheetToolbar"
 #define MI_FoldColumns "MI_FoldColumns"
+#define MI_ToggleXsheetCameraColumn "MI_ToggleXsheetCameraColumn"
 #define MI_ToggleCurrentTimeIndicator "MI_ToggleCurrentTimeIndicator"
 
 #define MI_LoadIntoCurrentPalette "MI_LoadIntoCurrentPalette"
@@ -354,4 +357,6 @@
 #define MI_StopMotionRaiseSubsampling "MI_StopMotionRaiseSubsampling"
 #define MI_StopMotionJumpToCamera "MI_StopMotionJumpToCamera"
 
+#define MI_OpenOnlineManual "MI_OpenOnlineManual"
+#define MI_ClearCacheFolder "MI_ClearCacheFolder"
 #endif

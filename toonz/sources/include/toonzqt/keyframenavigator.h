@@ -43,6 +43,8 @@ class DVAPI KeyframeNavigator : public QToolBar {
 
   TFrameHandle *m_frameHandle;
 
+  QWidget *m_panel;
+
 public:
   KeyframeNavigator(QWidget *parent = 0, TFrameHandle *frameHandle = 0);
 
@@ -62,6 +64,9 @@ public slots:
     update();
   }
   void update();
+
+  void onNextKeyframe(QWidget *panel);
+  void onPrevKeyframe(QWidget *panel);
 
 protected slots:
   void toggleKeyAct() {

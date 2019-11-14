@@ -238,7 +238,7 @@ bool TXshLevelColumn::setNumbers(int row, int rowCount,
 
   // Find a level to input.
   // If the first target cell is empty, search the upper cells, and lower cells
-  // and use a level of firsty-found ocupied neighbor cell.
+  // and use a level of firsty-found occupied neighbor cell.
   TXshLevelP currentLevel;
   int tmpIndex = std::min(row - m_first, (int)m_cells.size() - 1);
   // search upper cells

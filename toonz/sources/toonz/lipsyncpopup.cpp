@@ -469,7 +469,7 @@ void LipSyncPopup::imageNavClicked(int id) {
   else if (frameIndex == 0 && direction == -1)
     newIndex = m_levelFrameIds.size() - 1;
   else
-    newIndex                    = frameIndex + direction;
+    newIndex = frameIndex + direction;
   m_activeFrameIds[frameNumber] = m_levelFrameIds.at(newIndex);
   TXshCell newCell =
       TApp::instance()->getCurrentScene()->getScene()->getXsheet()->getCell(
@@ -507,7 +507,7 @@ void LipSyncPopup::paintEvent(QPaintEvent *) {
         m_pixmaps[i] = pm;
         m_imageLabels[i]->setPixmap(m_pixmaps[i]);
         m_textLabels[i]->setText(
-            "Drawing: " + QString::number(m_activeFrameIds[i].getNumber()));
+            tr("Drawing: ") + QString::number(m_activeFrameIds[i].getNumber()));
       }
       i++;
     }

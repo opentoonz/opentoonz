@@ -429,7 +429,8 @@ void ControlPointEditorTool::mouseMove(const TPointD &pos,
 void ControlPointEditorTool::leftButtonDown(const TPointD &pos,
                                             const TMouseEvent &e) {
   m_pos           = pos;
-  double maxDist  = 5 * getPixelSize();
+  double pix      = getPixelSize() * 2.0f;
+  double maxDist  = 5 * pix;
   double maxDist2 = maxDist * maxDist;
   double dist2    = 0;
   int pointIndex;

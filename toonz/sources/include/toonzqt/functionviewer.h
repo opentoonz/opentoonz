@@ -120,6 +120,8 @@ public:
   void clearFocusColumnsAndGraph();
   bool columnsOrGraphHasFocus();
   void setSceneHandle(TSceneHandle *sceneHandle);
+  TSceneHandle *getSceneHandle() const { return m_sceneHandle; }
+
   // SaveLoadQSettings
   virtual void save(QSettings &settings) const override;
   virtual void load(QSettings &settings) override;

@@ -334,10 +334,9 @@ void SchematicToggle_SplineOptions::paint(
   if (m_state != 0) {
     QIcon &pix =
         (m_state == 2 && !m_imageOn2.isNull()) ? m_imageOn2 : m_imageOn;
-    QRect sourceRect =
-        scene()->views()[0]->matrix().mapRect(QRect(0, 0, 18, 17));
-    QPixmap redPm = pix.pixmap(sourceRect.size());
-    QRect newRect = QRect(0, 0, sourceRect.width() * getDevPixRatio(),
+    QRect sourceRect = scene()->views()[0]->matrix().mapRect(rect.toRect());
+    QPixmap redPm    = pix.pixmap(sourceRect.size());
+    QRect newRect    = QRect(0, 0, sourceRect.width() * getDevPixRatio(),
                           sourceRect.height() * getDevPixRatio());
     painter->drawPixmap(rect, redPm, newRect);
   }

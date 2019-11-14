@@ -703,11 +703,18 @@ void TFx::setNewIdentifier() { m_imp->m_id = ++m_imp->m_nextId; }
 void TFx::loadData(TIStream &is) {
   std::string tagName;
   VersionNumber tnzVersion = is.getVersion();
-
+  // Prevent to load "params" tag under "super" tag on saving macro fx.
+  // For now "params" tag is no longer saved under "super" tag.
+  // This is for keeping compatibility with older versions.
+  bool isInSuperTag = (is.getCurrentTagName() == "super");
   QList<int> groupIds;
   QList<std::wstring> groupNames;
   while (is.openChild(tagName)) {
     if (tagName == "params") {
+      if (isInSuperTag) {  // skip loading "params" tag under "super" tag
+        is.skipCurrentTag();
+        continue;
+      }
       while (!is.eos()) {
         std::string paramName;
         while (is.openChild(paramName)) {
@@ -829,29 +836,36 @@ void TFx::loadData(TIStream &is) {
 //--------------------------------------------------
 
 void TFx::saveData(TOStream &os) {
+  // Prevent to save "params" tag under "super" tag on saving macro fx.
+  // Parameters for macro fx are saved in "nodes" tag and corrected upon
+  // loading. Therefore, "params" tag is not needed and even causes crash if
+  // macrofx contains CurveFx (See the issue #2424)
+  bool isInSuperTag  = (os.getCurrentTagName() == "super");
   TFx *linkedSetRoot = this;
   if (m_imp->m_next != m_imp) {
     TFxImp *imp = m_imp->m_next;
     int guard   = 0;
     while (guard++ < 1000 && imp != m_imp) {
       if (imp->m_fx < linkedSetRoot) linkedSetRoot = imp->m_fx;
-      imp                                          = imp->m_next;
+      imp = imp->m_next;
     }
     assert(imp == m_imp);
     assert(linkedSetRoot);
   }
   if (linkedSetRoot == this) {
-    os.openChild("params");
-    for (int i = 0; i < getParams()->getParamCount(); i++) {
-      std::string paramName     = getParams()->getParamName(i);
-      const TParamVar *paramVar = getParams()->getParamVar(i);
-      // skip saving for the obsolete parameters
-      if (paramVar->isObsolete()) continue;
-      os.openChild(paramName);
-      paramVar->getParam()->saveData(os);
+    if (!isInSuperTag) {  // skip saving "params" tag under "super" tag
+      os.openChild("params");
+      for (int i = 0; i < getParams()->getParamCount(); i++) {
+        std::string paramName     = getParams()->getParamName(i);
+        const TParamVar *paramVar = getParams()->getParamVar(i);
+        // skip saving for the obsolete parameters
+        if (paramVar->isObsolete()) continue;
+        os.openChild(paramName);
+        paramVar->getParam()->saveData(os);
+        os.closeChild();
+      }
       os.closeChild();
     }
-    os.closeChild();
   } else {
     os.openChild("paramsLinkedTo");
     os << linkedSetRoot;

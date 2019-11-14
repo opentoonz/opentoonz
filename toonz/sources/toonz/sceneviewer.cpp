@@ -453,61 +453,80 @@ public:
   }
 } resetShiftTraceCommand;
 
+//-----------------------------------------------------------------------------
+// Following commands (VB_***) are registered for command bar buttons.
+// They are separatd from the original visalization commands
+// so that they will not break a logic of ShortcutZoomer.
+
 class TViewResetCommand final : public MenuItemHandler {
 public:
-  TViewResetCommand() : MenuItemHandler(V_ViewReset) {}
+  TViewResetCommand() : MenuItemHandler(VB_ViewReset) {}
   void execute() override {
-    TApp::instance()->getActiveViewer()->resetSceneViewer();
+    if (TApp::instance()->getActiveViewer())
+      TApp::instance()->getActiveViewer()->resetSceneViewer();
   }
 } viewResetCommand;
 
 class TZoomResetCommand final : public MenuItemHandler {
 public:
-  TZoomResetCommand() : MenuItemHandler(V_ZoomReset) {}
-  void execute() override { TApp::instance()->getActiveViewer()->resetZoom(); }
+  TZoomResetCommand() : MenuItemHandler(VB_ZoomReset) {}
+  void execute() override {
+    if (TApp::instance()->getActiveViewer())
+      TApp::instance()->getActiveViewer()->resetZoom();
+  }
 } zoomResetCommand;
 
 class TZoomFitCommand final : public MenuItemHandler {
 public:
-  TZoomFitCommand() : MenuItemHandler(V_ZoomFit) {}
+  TZoomFitCommand() : MenuItemHandler(VB_ZoomFit) {}
   void execute() override {
-    TApp::instance()->getActiveViewer()->fitToCamera();
+    if (TApp::instance()->getActiveViewer())
+      TApp::instance()->getActiveViewer()->fitToCamera();
   }
 } zoomFitCommand;
 
 class TActualPixelSizeCommand final : public MenuItemHandler {
 public:
-  TActualPixelSizeCommand() : MenuItemHandler(V_ActualPixelSize) {}
+  TActualPixelSizeCommand() : MenuItemHandler(VB_ActualPixelSize) {}
   void execute() override {
-    TApp::instance()->getActiveViewer()->setActualPixelSize();
+    if (TApp::instance()->getActiveViewer())
+      TApp::instance()->getActiveViewer()->setActualPixelSize();
   }
-} aActualPixelSizeCommand;
+} actualPixelSizeCommand;
 
 class TFlipViewerXCommand final : public MenuItemHandler {
 public:
-  TFlipViewerXCommand() : MenuItemHandler(V_FlipX) {}
-  void execute() override { TApp::instance()->getActiveViewer()->flipX(); }
+  TFlipViewerXCommand() : MenuItemHandler(VB_FlipX) {}
+  void execute() override {
+    if (TApp::instance()->getActiveViewer())
+      TApp::instance()->getActiveViewer()->flipX();
+  }
 } flipViewerXCommand;
 
 class TFlipViewerYCommand final : public MenuItemHandler {
 public:
-  TFlipViewerYCommand() : MenuItemHandler(V_FlipY) {}
-  void execute() override { TApp::instance()->getActiveViewer()->flipY(); }
+  TFlipViewerYCommand() : MenuItemHandler(VB_FlipY) {}
+  void execute() override {
+    if (TApp::instance()->getActiveViewer())
+      TApp::instance()->getActiveViewer()->flipY();
+  }
 } flipViewerYCommand;
 
 class TRotateResetCommand final : public MenuItemHandler {
 public:
-  TRotateResetCommand() : MenuItemHandler(V_RotateReset) {}
+  TRotateResetCommand() : MenuItemHandler(VB_RotateReset) {}
   void execute() override {
-    TApp::instance()->getActiveViewer()->resetRotation();
+    if (TApp::instance()->getActiveViewer())
+      TApp::instance()->getActiveViewer()->resetRotation();
   }
 } rotateResetCommand;
 
 class TPositionResetCommand final : public MenuItemHandler {
 public:
-  TPositionResetCommand() : MenuItemHandler(V_PositionReset) {}
+  TPositionResetCommand() : MenuItemHandler(VB_PositionReset) {}
   void execute() override {
-    TApp::instance()->getActiveViewer()->resetPosition();
+    if (TApp::instance()->getActiveViewer())
+      TApp::instance()->getActiveViewer()->resetPosition();
   }
 } positionResetCommand;
 
@@ -574,7 +593,7 @@ SceneViewer::SceneViewer(ImageUtils::FullScreenWidget *parent)
   this->setTabletTracking(true);
 #endif
 
-  for (int i = 0; i < tArrayCount(m_viewAff); i++) {
+  for (int i = 0; i < m_viewAff.size(); ++i) {
     setViewMatrix(getNormalZoomScale(), i);
     m_rotationAngle[i] = 0.0;
   }
@@ -964,7 +983,7 @@ void SceneViewer::initializeGL() {
   registerContext();
 
   // to be computed once through the software
-  if (m_lutCalibrator) {
+  if (m_lutCalibrator && !m_lutCalibrator->isInitialized()) {
     m_lutCalibrator->initialize();
     connect(context(), SIGNAL(aboutToBeDestroyed()), this,
             SLOT(onContextAboutToBeDestroyed()));
@@ -972,6 +991,13 @@ void SceneViewer::initializeGL() {
 
   // glClearColor(1.0,1.0,1.0,1);
   glClear(GL_COLOR_BUFFER_BIT);
+
+  if (m_firstInitialized)
+    m_firstInitialized = false;
+  else {
+    resizeGL(width(), height());
+    update();
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -1773,7 +1799,7 @@ double SceneViewer::projectToZ(const TPointD &delta) {
   GLint viewport[4];
   double modelview[16], projection[16];
   glGetIntegerv(GL_VIEWPORT, viewport);
-  for (int i      = 0; i < 16; i++)
+  for (int i = 0; i < 16; i++)
     projection[i] = (double)m_projectionMatrix.constData()[i];
   glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
 
@@ -1935,8 +1961,9 @@ void SceneViewer::zoomQt(bool forward, bool reset) {
     if (reset || ((m_zoomScale3D < 500 || !forward) &&
                   (m_zoomScale3D > 0.01 || forward))) {
       double oldZoomScale = m_zoomScale3D;
-      m_zoomScale3D       = reset ? 1 : ImageUtils::getQuantizedZoomFactor(
-                                      m_zoomScale3D, forward);
+      m_zoomScale3D =
+          reset ? 1
+                : ImageUtils::getQuantizedZoomFactor(m_zoomScale3D, forward);
 
       m_pan3D = -(m_zoomScale3D / oldZoomScale) * -m_pan3D;
     }
@@ -1957,17 +1984,18 @@ void SceneViewer::zoomQt(bool forward, bool reset) {
     int i;
 
     for (i = 0; i < 2; i++) {
-      TAffine &viewAff          = m_viewAff[i];
+      TAffine &viewAff = m_viewAff[i];
       if (m_isFlippedX) viewAff = viewAff * TScale(-1, 1);
       if (m_isFlippedX) viewAff = viewAff * TScale(1, -1);
-      double scale2             = std::abs(viewAff.det());
+      double scale2 = std::abs(viewAff.det());
       if (m_isFlippedX) viewAff = viewAff * TScale(-1, 1);
       if (m_isFlippedX) viewAff = viewAff * TScale(1, -1);
       if (reset || ((scale2 < 100000 || !forward) &&
                     (scale2 > 0.001 * 0.05 || forward))) {
         double oldZoomScale = sqrt(scale2) * dpiFactor;
-        double zoomScale    = reset ? 1 : ImageUtils::getQuantizedZoomFactor(
-                                           oldZoomScale, forward);
+        double zoomScale =
+            reset ? 1
+                  : ImageUtils::getQuantizedZoomFactor(oldZoomScale, forward);
 
         // threshold value -0.001 is intended to absorb the error of calculation
         if ((oldZoomScale - zoomScaleFittingWithScreen) *
@@ -2239,9 +2267,9 @@ void SceneViewer::fitToCamera() {
   TPointD P11       = cameraAff * cameraRect.getP11();
   TPointD p0        = TPointD(std::min({P00.x, P01.x, P10.x, P11.x}),
                        std::min({P00.y, P01.y, P10.y, P11.y}));
-  TPointD p1 = TPointD(std::max({P00.x, P01.x, P10.x, P11.x}),
+  TPointD p1        = TPointD(std::max({P00.x, P01.x, P10.x, P11.x}),
                        std::max({P00.y, P01.y, P10.y, P11.y}));
-  cameraRect = TRectD(p0.x, p0.y, p1.x, p1.y);
+  cameraRect        = TRectD(p0.x, p0.y, p1.x, p1.y);
 
   // Pan
   if (!is3DView()) {
@@ -2268,7 +2296,7 @@ void SceneViewer::resetSceneViewer() {
   m_visualSettings.m_sceneProperties =
       TApp::instance()->getCurrentScene()->getScene()->getProperties();
 
-  for (int i = 0; i < tArrayCount(m_viewAff); i++) {
+  for (int i = 0; i < m_viewAff.size(); ++i) {
     setViewMatrix(getNormalZoomScale(), i);
     m_rotationAngle[i] = 0.0;
   }
@@ -2290,8 +2318,8 @@ void SceneViewer::resetZoom() {
   TPointD realCenter(m_viewAff[m_viewMode].a13, m_viewAff[m_viewMode].a23);
   TAffine aff =
       getNormalZoomScale() * TRotation(realCenter, m_rotationAngle[m_viewMode]);
-  aff.a13               = realCenter.x;
-  aff.a23               = realCenter.y;
+  aff.a13 = realCenter.x;
+  aff.a23 = realCenter.y;
   if (m_isFlippedX) aff = aff * TScale(-1, 1);
   if (m_isFlippedY) aff = aff * TScale(1, -1);
   setViewMatrix(aff, m_viewMode);
@@ -2348,16 +2376,17 @@ void SceneViewer::setActualPixelSize() {
   } else
     dpi = sl->getDpi(fid);
 
-  const double inch             = Stage::inch;
-  TAffine tempAff               = getNormalZoomScale();
-  if (m_isFlippedX) tempAff     = tempAff * TScale(-1, 1);
-  if (m_isFlippedY) tempAff     = tempAff * TScale(1, -1);
-  TPointD tempScale             = dpi;
+  const double inch = Stage::inch;
+  TAffine tempAff   = getNormalZoomScale();
+  if (m_isFlippedX) tempAff = tempAff * TScale(-1, 1);
+  if (m_isFlippedY) tempAff = tempAff * TScale(1, -1);
+  TPointD tempScale = dpi;
   if (m_isFlippedX) tempScale.x = -tempScale.x;
   if (m_isFlippedY) tempScale.y = -tempScale.y;
-  for (int i = 0; i < tArrayCount(m_viewAff); i++)
-    setViewMatrix(dpi == TPointD(0, 0) ? tempAff : TScale(tempScale.x / inch,
-                                                          tempScale.y / inch),
+  for (int i = 0; i < m_viewAff.size(); ++i)
+    setViewMatrix(dpi == TPointD(0, 0)
+                      ? tempAff
+                      : TScale(tempScale.x / inch, tempScale.y / inch),
                   i);
 
   m_pos         = QPoint(0, 0);
@@ -2461,8 +2490,8 @@ int SceneViewer::pick(const TPointD &point) {
   assert(glGetError() == GL_NO_ERROR);
   GLint viewport[4];
   glGetIntegerv(GL_VIEWPORT, viewport);
-  GLuint selectBuffer[512];
-  glSelectBuffer(tArrayCount(selectBuffer), selectBuffer);
+  std::array<GLuint, 512> selectBuffer;
+  glSelectBuffer(selectBuffer.size(), selectBuffer.data());
   glRenderMode(GL_SELECT);
 
   // definisco la matrice di proiezione
@@ -2521,7 +2550,7 @@ int SceneViewer::pick(const TPointD &point) {
   // conto gli hits
   int ret      = -1;
   int hitCount = glRenderMode(GL_RENDER);
-  GLuint *p    = selectBuffer;
+  GLuint *p    = selectBuffer.data();
   for (int i = 0; i < hitCount; ++i) {
     GLuint nameCount = *p++;
     GLuint zmin      = *p++;
@@ -2640,7 +2669,7 @@ void drawSpline(const TAffine &viewMatrix, const TRect &clipRect, bool camera3d,
 
   TStageObject *pegbar =
       objId != TStageObjectId::NoneId ? xsh->getStageObject(objId) : 0;
-  const TStroke *stroke                     = 0;
+  const TStroke *stroke = 0;
   if (pegbar && pegbar->getSpline()) stroke = pegbar->getSpline()->getStroke();
   if (!stroke) return;
 

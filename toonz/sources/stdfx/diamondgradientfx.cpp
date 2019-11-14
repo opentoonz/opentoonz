@@ -13,13 +13,14 @@ class DiamondGradientFx final : public TStandardZeraryFx {
 
 public:
   DiamondGradientFx() : m_size(100.0) {
-    TSpectrum::ColorKey colors[] = {TSpectrum::ColorKey(0, TPixel32::White),
-                                    TSpectrum::ColorKey(0.2, TPixel32::Yellow),
-                                    TSpectrum::ColorKey(0.4, TPixel32::Blue),
-                                    TSpectrum::ColorKey(0.6, TPixel32::Green),
-                                    TSpectrum::ColorKey(0.8, TPixel32::Magenta),
-                                    TSpectrum::ColorKey(1, TPixel32::Red)};
-    m_colors = TSpectrumParamP(tArrayCount(colors), colors);
+    std::vector<TSpectrum::ColorKey> colors = {
+        TSpectrum::ColorKey(0, TPixel32::White),
+        TSpectrum::ColorKey(0.2, TPixel32::Yellow),
+        TSpectrum::ColorKey(0.4, TPixel32::Blue),
+        TSpectrum::ColorKey(0.6, TPixel32::Green),
+        TSpectrum::ColorKey(0.8, TPixel32::Magenta),
+        TSpectrum::ColorKey(1, TPixel32::Red)};
+    m_colors = TSpectrumParamP(colors);
     m_size->setMeasureName("fxLength");
     bindParam(this, "colors", m_colors);
     bindParam(this, "size", m_size);

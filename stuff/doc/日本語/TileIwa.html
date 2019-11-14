@@ -1,0 +1,45 @@
+<html lang="ja">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+      <title>TileFx Iwa</title>
+    </head>
+<body bgcolor="#f5f5f5" text="#220011">
+<h1><img src = ".\img\fx_iwa_tile.png" width = 30 height = 30 >   TileFx Iwa</h1>
+
+<h4>● 概要</h4>
+入力画像をタイル状に並べるエフェクトです。<br>
+Toonz既存の「TileFx」の機能を以下の点で強化したものです。
+<UL>
+<LI>繰り返す範囲を、素材のバウンディングボックスに加え、カメラボックスにも指定できるようになりました。</LI>
+<LI>繰り返しの有無と枚数を、上下左右別々に指定できるようになりました。</LI>
+<LI>余白の幅を、水平方向、垂直方向別々に指定できるようになりました。</LI>
+</UL>
+
+<h4>● 入力ポート</h4>
+<UL>
+<LI><b>Source</b> : 入力画像を接続します。</LI>
+</UL>
+
+<h4>● パラメータ</h4>
+<UL>
+<LI><b>Input Size</b> : 繰り返す範囲を指定します。<br>
+"Bounding Box"&nbsp&nbsp入力画像のバウンディングボックス内の領域を繰り返します。<br>
+"Camera Box"&nbsp&nbsp&nbspカメラボックス内の領域を繰り返します。つまり、繰り返された画像はカメラ外に配置されます。
+</LI><br>
+<LI><b>Left Quantity</b> : 左側に繰り返す回数を指定します。<br>
+"No Tile"&nbsp&nbsp繰り返しません。<br>
+"1 Tile"&nbsp&nbsp&nbsp1枚だけ繰り返します。<br>
+"Mutiple Tiles"&nbsp必要な範囲内で無限に繰り返します。
+</LI>
+<LI><b>Right Quantity</b> : 右側に繰り返す回数を指定します。（Left Quantityを参照）</LI>
+<LI><b>Mirror Horizontally</b> : ONのとき、水平方向に並ぶタイルが、1枚おきに左右反転されるようになります。</LI>
+<LI><b>Horizontal Margin</b> : タイルの水平方向のマージンです（単位 Unit）。負の値を持つことができます。</LI>
+<LI><b>Top Quantity</b> : 上側に繰り返す回数を指定します。（Left Quantityを参照）</LI>
+<LI><b>Bottom Quantity</b> : 下側に繰り返す回数を指定します。（Left Quantityを参照）</LI>
+<LI><b>Mirror Vertically</b> : ONのとき、垂直方向に並ぶタイルが、1枚おきに上下反転されるようになります。</LI>
+<LI><b>Vertical Margin</b> : タイルの垂直方向のマージンです（単位 Unit）。負の値を持つことができます。</LI>
+</UL>
+
+</body>
+
+</html>

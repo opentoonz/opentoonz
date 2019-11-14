@@ -1,7 +1,6 @@
 
 
 // TnzCore includes
-#include "tpalette.h"
 #include "trasterimage.h"
 #include "ttoonzimage.h"
 #include "tvectorimage.h"
@@ -108,6 +107,13 @@ struct VectorizationBuilder final : public TThread::Executor {
 
   QList<VectorizerSwatchArea *> m_listeners;
 
+  // Toonz Raster Level may have palette including MyPaint styles,
+  // which cannot be rendered in vector levels.
+  // In such case prepare an alternative palette in which MyPaint styles
+  // are converted to solid color styles.
+  TPaletteP m_substitutePalette;
+  void prepareSupstitutePaletteIfNeeded(int row, int col);
+
 public:
   VectorizationBuilder()
       : m_row(-1), m_col(-1), m_image(), m_done(false), m_submitted(false) {
@@ -159,7 +165,8 @@ bool VectorizationBuilder::update(TImageP &img) {
   if (row != m_row || col != m_col) {
     m_row = row, m_col = col;
     m_done = false;
-    addTask(new VectorizationSwatchTask(row, col));
+    prepareSupstitutePaletteIfNeeded(row, col);
+    addTask(new VectorizationSwatchTask(row, col, m_substitutePalette));
     computing = true;
   }
 
@@ -170,8 +177,9 @@ bool VectorizationBuilder::update(TImageP &img) {
 //-----------------------------------------------------------------------------
 
 bool VectorizationBuilder::invalidate(TImageP &img) {
-  m_row = m_col = -1;
-  m_done        = false;
+  m_row = m_col       = -1;
+  m_done              = false;
+  m_substitutePalette = TPaletteP();
   return update(img);
 }
 
@@ -190,12 +198,31 @@ void VectorizationBuilder::notifyDone(TImageP img) {
   }
 }
 
+//-----------------------------------------------------------------------------
+
+void VectorizationBuilder::prepareSupstitutePaletteIfNeeded(int row, int col) {
+  // Retrieve the image to be vectorized
+  TToonzImageP ti(getXsheetImage(row, col));
+  if (!ti) return;
+  m_substitutePalette = ti->getPalette()->clone();
+  bool found          = false;
+  for (int s = 0; s < m_substitutePalette->getStyleCount(); s++) {
+    TColorStyle *style = m_substitutePalette->getStyle(s);
+    if (style->getTagId() == 4001) {  // TMyPaintBrushStyle
+      found = true;
+      m_substitutePalette->setStyle(s, style->getMainColor());
+    }
+  }
+  if (!found) m_substitutePalette = TPaletteP();
+}
+
 //*****************************************************************************
 //    VectorizationSwatchTask implementation
 //*****************************************************************************
 
-VectorizationSwatchTask::VectorizationSwatchTask(int row, int col)
-    : m_row(row), m_col(col) {
+VectorizationSwatchTask::VectorizationSwatchTask(int row, int col,
+                                                 TPaletteP substitutePalette)
+    : m_row(row), m_col(col), m_substitutePalette(substitutePalette) {
   // Establish connections to default slots; the started one must be blocking,
   // so that run() awaits until it has been performed.
 
@@ -237,7 +264,7 @@ void VectorizationSwatchTask::run() {
   TPointD center, dpi;
 
   if (TToonzImageP ti = m_image) {
-    palette = ti->getPalette();
+    palette = (m_substitutePalette) ? m_substitutePalette : ti->getPalette();
     center  = ti->getRaster()->getCenterD();
     ti->getDpi(dpi.x, dpi.y);
   } else if (TRasterImageP ri = m_image) {

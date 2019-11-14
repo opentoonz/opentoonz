@@ -603,7 +603,7 @@ void TTool::notifyImageChanged() {
 //-----------------------------------------------------------------------------
 
 /*! Notify change of image in \b fid: update icon and notify level change.
-*/
+ */
 void TTool::notifyImageChanged(const TFrameId &fid) {
   onImageChanged();
 
@@ -698,18 +698,21 @@ TAffine TTool::getColumnMatrix(int columnIndex) const {
 
   TFrameHandle *fh = m_application->getCurrentFrame();
   if (fh->isEditingLevel()) return TAffine();
-  int frame               = fh->getFrame();
-  TXsheet *xsh            = m_application->getCurrentXsheet()->getXsheet();
-  TStageObjectId columnId = TStageObjectId::ColumnId(columnIndex);
-  TAffine columnPlacement = xsh->getPlacement(columnId, frame);
-  double columnZ          = xsh->getZ(columnId, frame);
+  int frame    = fh->getFrame();
+  TXsheet *xsh = m_application->getCurrentXsheet()->getXsheet();
+  TStageObjectId columnObjId =
+      (columnIndex >= 0)
+          ? TStageObjectId::ColumnId(columnIndex)
+          : TStageObjectId::CameraId(xsh->getCameraColumnIndex());
+  TAffine columnPlacement = xsh->getPlacement(columnObjId, frame);
+  double columnZ          = xsh->getZ(columnObjId, frame);
 
   TStageObjectId cameraId = xsh->getStageObjectTree()->getCurrentCameraId();
   TStageObject *camera    = xsh->getStageObject(cameraId);
   TAffine cameraPlacement = camera->getPlacement(frame);
   double cameraZ          = camera->getZ(frame);
 
-  TStageObject *object = xsh->getStageObject(columnId);
+  TStageObject *object = xsh->getStageObject(columnObjId);
   TAffine placement;
   TStageObject::perspective(placement, cameraPlacement, cameraZ,
                             columnPlacement, columnZ,
@@ -773,6 +776,13 @@ bool TTool::isColumnLocked(int columnIndex) const {
 //-----------------------------------------------------------------------------
 
 QString TTool::updateEnabled() {
+  int rowIndex    = m_application->getCurrentFrame()->getFrame();
+  int columnIndex = m_application->getCurrentColumn()->getColumnIndex();
+
+  return updateEnabled(rowIndex, columnIndex);
+}
+
+QString TTool::updateEnabled(int rowIndex, int columnIndex) {
   // Disable every tool during playback
   if (m_application->getCurrentFrame()->isPlaying())
     return (enable(false), QString());
@@ -786,13 +796,21 @@ QString TTool::updateEnabled() {
   // Retrieve vars and view modes
   TXsheet *xsh = m_application->getCurrentXsheet()->getXsheet();
 
-  int rowIndex       = m_application->getCurrentFrame()->getFrame();
-  int columnIndex    = m_application->getCurrentColumn()->getColumnIndex();
   TXshColumn *column = (columnIndex >= 0) ? xsh->getColumn(columnIndex) : 0;
 
   TXshLevel *xl       = m_application->getCurrentLevel()->getLevel();
   TXshSimpleLevel *sl = xl ? xl->getSimpleLevel() : 0;
   int levelType       = sl ? sl->getType() : NO_XSHLEVEL;
+
+  // If not in Level editor, let's use our current cell from the xsheet to
+  // find the nearest level before it
+  if (levelType == NO_XSHLEVEL &&
+      !m_application->getCurrentFrame()->isEditingLevel()) {
+    TXshCell cell = xsh->getCell(rowIndex, columnIndex);
+    xl            = cell.isEmpty() ? 0 : (TXshLevel *)(&cell.m_level);
+    sl            = cell.isEmpty() ? 0 : cell.getSimpleLevel();
+    levelType     = cell.isEmpty() ? NO_XSHLEVEL : cell.m_level->getType();
+  }
 
   if (Preferences::instance()->isAutoCreateEnabled() &&
       Preferences::instance()->isAnimationSheetEnabled()) {
@@ -831,8 +849,6 @@ QString TTool::updateEnabled() {
     }
   }
 
-  TStageObject *obj =
-      xsh->getStageObject(TStageObjectId::ColumnId(columnIndex));
   bool spline = m_application->getCurrentObject()->isSpline();
 
   bool filmstrip = m_application->getCurrentFrame()->isEditingLevel();
@@ -841,6 +857,30 @@ QString TTool::updateEnabled() {
   if (m_name == T_StylePicker &&
       Preferences::instance()->isMultiLayerStylePickerEnabled())
     return (enable(true), QString());
+
+  // Check against camera column
+  if (!filmstrip && columnIndex < 0 && (targetType & TTool::EmptyTarget) &&
+      (m_name == T_Type || m_name == T_Geometric || m_name == T_Brush))
+    return (enable(false), QString());
+
+  // In case of Animate Tool
+  if (m_name == T_Edit && !filmstrip) {
+    // if an object other than column is selected, then enable the tool
+    // regardless of the current column state
+    if (!m_application->getCurrentObject()->getObjectId().isColumn())
+      return (enable(true), QString());
+    // if a column object is selected, switch the inspected column to it
+    column = xsh->getColumn(
+        m_application->getCurrentObject()->getObjectId().getIndex());
+  }
+
+  // Check against splines
+  if (spline && (toolType & TTool::LevelTool)) {
+    return (targetType & Splines)
+               ? (enable(true), QString())
+               : (enable(false), QObject::tr("The current tool cannot be "
+                                             "used to edit a motion path."));
+  }
 
   // Check against unplaced columns (not in filmstrip mode)
   if (column && !filmstrip) {
@@ -887,14 +927,6 @@ QString TTool::updateEnabled() {
 
   // Check LevelRead & LevelWrite tools
   if (toolType & TTool::LevelTool) {
-    // Check against splines
-    if (spline) {
-      return (targetType & Splines)
-                 ? (enable(true), QString())
-                 : (enable(false), QObject::tr("The current tool cannot be "
-                                               "used to edit a motion path."));
-    }
-
     // Check against empty levels
     if (!xl)
       return (targetType & EmptyTarget) ? (enable(true), QString())
@@ -931,7 +963,9 @@ QString TTool::updateEnabled() {
     }
 
     // Check against impossibly traceable movements on the column
-    if ((levelType & LEVELCOLUMN_XSHLEVEL) && !filmstrip) {
+    if ((levelType & LEVELCOLUMN_XSHLEVEL) && !filmstrip && columnIndex >= 0) {
+      TStageObject *obj =
+          xsh->getStageObject(TStageObjectId::ColumnId(columnIndex));
       // Test for Mesh-deformed levels
       const TStageObjectId &parentId = obj->getParent();
       if (parentId.isColumn() && obj->getParentHandle()[0] != 'H') {
@@ -948,16 +982,10 @@ QString TTool::updateEnabled() {
     // Check TTool::ImageType tools
     if (toolType == TTool::LevelWriteTool) {
       // Check level against read-only status
-      if (sl->isReadOnly()) {
-        const std::set<TFrameId> &editableFrames = sl->getEditableRange();
-        TFrameId currentFid                      = getCurrentFid();
-
-        if (editableFrames.find(currentFid) == editableFrames.end())
-          return (
-              enable(false),
-              QObject::tr(
-                  "The current frame is locked: any editing is forbidden."));
-      }
+      if (sl->isFrameReadOnly(getCurrentFid()))
+        return (enable(false),
+                QObject::tr(
+                    "The current frame is locked: any editing is forbidden."));
 
       // Check level type write support
       if (sl->getPath().getType() ==

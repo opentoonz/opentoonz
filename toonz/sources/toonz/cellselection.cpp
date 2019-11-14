@@ -244,7 +244,8 @@ public:
   DeleteCellsUndo(TCellSelection *selection, QMimeData *data) : m_data(data) {
     int r0, c0, r1, c1;
     selection->getSelectedCells(r0, c0, r1, c1);
-    m_selection = new TCellSelection();
+    if (c0 < 0) c0 = 0;  // Ignore camera column
+    m_selection    = new TCellSelection();
     m_selection->selectCells(r0, c0, r1, c1);
 
     TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
@@ -331,7 +332,8 @@ public:
   CutCellsUndo(TCellSelection *selection) : m_data() {
     int r0, c0, r1, c1;
     selection->getSelectedCells(r0, c0, r1, c1);
-    m_selection = new TCellSelection();
+    if (c0 < 0) c0 = 0;  // Ignore camera column
+    m_selection    = new TCellSelection();
     m_selection->selectCells(r0, c0, r1, c1);
 
     TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
@@ -1675,7 +1677,7 @@ void TCellSelection::pasteCells() {
     TKeyframeSelection selection;
     if (isEmpty() &&
         TApp::instance()->getCurrentObject()->getObjectId() ==
-            TStageObjectId::CameraId(0))
+            TStageObjectId::CameraId(xsh->getCameraColumnIndex()))
     // Se la selezione e' vuota e l'objectId e' quello della camera sono nella
     // colonna di camera quindi devo selezionare la row corrente e -1.
     {
@@ -1814,7 +1816,8 @@ void TCellSelection::deleteCells() {
   if (isEmpty()) return;
   int r0, c0, r1, c1;
   getSelectedCells(r0, c0, r1, c1);
-  TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
+  if (c0 < 0) c0 = 0;  // Ignore camera column
+  TXsheet *xsh   = TApp::instance()->getCurrentXsheet()->getXsheet();
   // if all the selected cells are already empty, then do nothing
   if (xsh->isRectEmpty(CellPosition(r0, c0), CellPosition(r1, c1))) return;
   TCellData *data = new TCellData();
@@ -1847,6 +1850,7 @@ void TCellSelection::cutCells(bool withoutCopy) {
 
   int r0, c0, r1, c1;
   getSelectedCells(r0, c0, r1, c1);
+  if (c0 < 0) c0 = 0;  // Ignore camera column
 
   undo->setCurrentData(r0, c0, r1, c1);
   if (!withoutCopy) copyCellsWithoutUndo(r0, c0, r1, c1);
@@ -1876,6 +1880,7 @@ void TCellSelection::insertCells() {
 //-----------------------------------------------------------------------------
 
 void TCellSelection::pasteKeyframesInto() {
+  TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
   const TKeyframeData *keyframeData = dynamic_cast<const TKeyframeData *>(
       QApplication::clipboard()->mimeData());
   if (keyframeData) {
@@ -1885,7 +1890,7 @@ void TCellSelection::pasteKeyframesInto() {
     TKeyframeSelection selection;
     if (isEmpty() &&
         TApp::instance()->getCurrentObject()->getObjectId() ==
-            TStageObjectId::CameraId(0))
+            TStageObjectId::CameraId(xsh->getCameraColumnIndex()))
     // Se la selezione e' vuota e l'objectId e' quello della camera sono nella
     // colonna di camera quindi devo selezionare la row corrente e -1.
     {
@@ -2408,6 +2413,7 @@ void TCellSelection::overWritePasteCells() {
 void TCellSelection::overwritePasteNumbers() {
   int r0, c0, r1, c1;
   getSelectedCells(r0, c0, r1, c1);
+  if (c0 < 0) c0 = 0;  // Ignore camera column
 
   QClipboard *clipboard     = QApplication::clipboard();
   const QMimeData *mimeData = clipboard->mimeData();

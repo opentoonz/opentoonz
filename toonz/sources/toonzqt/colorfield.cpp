@@ -70,7 +70,7 @@ StyleSample::~StyleSample() {
 
 //-----------------------------------------------------------------------------
 /*! Return current StyleSample \b TColorStyle style.
-*/
+ */
 TColorStyle *StyleSample::getStyle() const { return m_style; }
 
 //-----------------------------------------------------------------------------
@@ -116,7 +116,7 @@ void StyleSample::setChessboardColors(const TPixel32 &col1,
 
 //-----------------------------------------------------------------------------
 /*! Paint square color.
-*/
+ */
 void StyleSample::paintEvent(QPaintEvent *event) {
   if (!isEnable()) return;
   QPainter painter(this);
@@ -225,9 +225,11 @@ ChannelField::ChannelField(QWidget *parent, const QString &string, int value,
 
   bool ret = connect(m_channelEdit, SIGNAL(textChanged(const QString &)),
                      SLOT(onEditChanged(const QString &)));
-  ret = ret && connect(m_channelSlider, SIGNAL(valueChanged(int)),
+  ret      = ret && connect(m_channelEdit, SIGNAL(editingFinished()),
+                       SLOT(onEditFinished()));
+  ret      = ret && connect(m_channelSlider, SIGNAL(valueChanged(int)),
                        SLOT(onSliderChanged(int)));
-  ret = ret && connect(m_channelSlider, SIGNAL(sliderReleased()),
+  ret      = ret && connect(m_channelSlider, SIGNAL(sliderReleased()),
                        SLOT(onSliderReleased()));
   assert(ret);
 }
@@ -262,14 +264,20 @@ int ChannelField::getChannel() {
                 emit signal valueChanged(int value).
 */
 void ChannelField::onEditChanged(const QString &str) {
-  int value                     = str.toInt();
-  if (value < 0) value          = 0;
+  int value = str.toInt();
+  if (value < 0) value = 0;
   if (value > m_maxValue) value = m_maxValue;
   assert(0 <= value && value <= m_maxValue);
   if (str.toInt() != value) m_channelEdit->setValue(value);
   if (m_channelSlider->value() == value) return;
   m_channelSlider->setValue(value);
-  emit valueChanged(value, false);
+  emit valueChanged(value, true);
+}
+
+//-----------------------------------------------------------------------------
+
+void ChannelField::onEditFinished() {
+  emit valueChanged(m_channelEdit->getValue(), false);
 }
 
 //-----------------------------------------------------------------------------
@@ -422,7 +430,7 @@ void ColorField::setColor(const TPixel32 &color) {
 
 //-----------------------------------------------------------------------------
 /*! Set all \b ChannelField channel value to ColorField current color.
-*/
+ */
 void ColorField::hideChannelsFields(bool hide) {
   if (hide) {
     m_redChannel->hide();
@@ -456,7 +464,7 @@ void ColorField::hideChannelsFields(bool hide) {
 
 //-----------------------------------------------------------------------------
 /*! Set all \b ChannelField channel value to ColorField current color.
-*/
+ */
 void ColorField::updateChannels() {
   m_redChannel->setChannel(m_color.r);
   m_greenChannel->setChannel(m_color.g);

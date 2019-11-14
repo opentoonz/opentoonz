@@ -18,6 +18,7 @@
 #endif
 
 class KeyframesUndo;
+class TSceneHandle;
 
 class DVAPI KeyframeSetter {
   TDoubleParamP m_param;
@@ -101,7 +102,8 @@ public:
   }
   static void removeKeyframeAt(TDoubleParam *curve, double frame);
 
-  static void enableCycle(TDoubleParam *curve, bool enabled);
+  static void enableCycle(TDoubleParam *curve, bool enabled,
+                          TSceneHandle *sceneHandle = nullptr);
 };
 
 #endif

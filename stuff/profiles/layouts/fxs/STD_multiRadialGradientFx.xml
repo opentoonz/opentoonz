@@ -4,6 +4,7 @@
     <control>count</control>
     <control>cycle</control>
     <control>colors</control>
+     <control>curveType</control>
   </page>
   
 </fxlayout>

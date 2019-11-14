@@ -119,7 +119,7 @@ QList<TRect> splitRect(const TRect &first, const TRect &second);
 //! the \b imageBounds.
 //! If this intersection is empty a TRaster32P() is returned.
 TRaster32P convertStrokeToImage(TStroke *stroke, const TRect &imageBounds,
-                                TPoint &pos);
+                                TPoint &pos, bool pencilMode = false);
 
 //-----------------------------------------------------------------------------
 

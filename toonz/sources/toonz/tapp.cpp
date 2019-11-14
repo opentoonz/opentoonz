@@ -267,8 +267,9 @@ int TApp::getCurrentLevelStyleIndex() const {
 
 //-----------------------------------------------------------------------------
 
-void TApp::setCurrentLevelStyleIndex(int index) {
-  m_paletteController->getCurrentLevelPalette()->setStyleIndex(index);
+void TApp::setCurrentLevelStyleIndex(int index, bool forceUpdate) {
+  m_paletteController->getCurrentLevelPalette()->setStyleIndex(index,
+                                                               forceUpdate);
 }
 
 //-----------------------------------------------------------------------------
@@ -508,6 +509,11 @@ void TApp::onColumnIndexSwitched() {
   int columnIndex = m_currentColumn->getColumnIndex();
   if (columnIndex >= 0)
     m_currentObject->setObjectId(TStageObjectId::ColumnId(columnIndex));
+  else {
+    TXsheet *xsh = getCurrentXsheet()->getXsheet();
+    m_currentObject->setObjectId(
+        TStageObjectId::CameraId(xsh->getCameraColumnIndex()));
+  }
 }
 
 //-----------------------------------------------------------------------------

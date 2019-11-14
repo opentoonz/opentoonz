@@ -22,6 +22,7 @@
 #include "toonz/tobjecthandle.h"
 #include "toonz/txshlevelhandle.h"
 #include "toonz/tscenehandle.h"
+#include "toonz/txsheethandle.h"
 
 #include "toonz/tcenterlinevectorizer.h"
 #include "toonz/stage.h"
@@ -196,22 +197,18 @@ public:
 // PasteStrokesUndo
 //-----------------------------------------------------------------------------
 
-class PasteStrokesUndo final : public TUndo {
-  TXshSimpleLevelP m_level;
-  TFrameId m_frameId;
+class PasteStrokesUndo final : public ToolUtils::TToolUndo {
   std::set<int> m_indexes;
-  TPaletteP m_oldPalette;
   QMimeData *m_oldData;
   TSceneHandle *m_sceneHandle;
 
 public:
   PasteStrokesUndo(TXshSimpleLevel *level, const TFrameId &frameId,
                    std::set<int> &indexes, TPaletteP oldPalette,
-                   TSceneHandle *sceneHandle)
-      : m_level(level)
-      , m_frameId(frameId)
+                   TSceneHandle *sceneHandle, bool createdFrame,
+                   bool createdLevel)
+      : TToolUndo(level, frameId, createdFrame, createdLevel, oldPalette)
       , m_indexes(indexes)
-      , m_oldPalette(oldPalette)
       , m_sceneHandle(sceneHandle) {
     QClipboard *clipboard = QApplication::clipboard();
     m_oldData             = cloneData(clipboard->mimeData());
@@ -230,9 +227,16 @@ public:
 
     std::set<int> indexes = m_indexes;
     deleteStrokesWithoutUndo(image, indexes);
+
+    removeLevelAndFrameIfNeeded();
+
+    TTool::getApplication()->getCurrentXsheet()->notifyXsheetChanged();
+    notifyImageChanged();
   }
 
   void redo() const override {
+    insertLevelAndFrameIfNeeded();
+
     TVectorImageP image   = m_level->getFrame(m_frameId, true);
     std::set<int> indexes = m_indexes;
 
@@ -245,6 +249,9 @@ public:
     TTool::getApplication()->getCurrentTool()->getTool()->notifyImageChanged();
 
     clipboard->setMimeData(data, QClipboard::Clipboard);
+
+    TTool::getApplication()->getCurrentXsheet()->notifyXsheetChanged();
+    notifyImageChanged();
   }
 
   int getSize() const override { return sizeof(*this); }
@@ -455,6 +462,27 @@ void StrokeSelection::removeEndpoints() {
   m_updateSelectionBBox = false;
 }
 
+
+//=============================================================================
+//
+// selectAll
+//
+//-----------------------------------------------------------------------------
+
+void StrokeSelection::selectAll() {
+  if (!m_vi) return;
+
+  int sCount = int(m_vi->getStrokeCount());
+
+  for (int s = 0; s < sCount; ++s) {
+     m_indexes.insert(s);
+  }
+
+  StrokeSelection *selection = dynamic_cast<StrokeSelection *>(
+      TTool::getApplication()->getCurrentSelection()->getSelection());
+  if (selection) selection->notifyView();
+}
+
 //=============================================================================
 //
 // deleteStrokes
@@ -545,7 +573,8 @@ void StrokeSelection::paste() {
     TXshSimpleLevel *level =
         TTool::getApplication()->getCurrentLevel()->getSimpleLevel();
     TUndoManager::manager()->add(new PasteStrokesUndo(
-        level, tool->getCurrentFid(), m_indexes, oldPalette, m_sceneHandle));
+        level, tool->getCurrentFid(), m_indexes, oldPalette, m_sceneHandle,
+        tool->m_isFrameCreated, tool->m_isLevelCreated));
     m_updateSelectionBBox = isPaste;
   }
   tool->notifyImageChanged();
@@ -613,6 +642,7 @@ void StrokeSelection::enableCommands() {
   enableCommand(m_groupCommand.get(), MI_ExitGroup, &TGroupCommand::exitGroup);
 
   enableCommand(this, MI_RemoveEndpoints, &StrokeSelection::removeEndpoints);
+  enableCommand(this, MI_SelectAll, &StrokeSelection::selectAll);
 }
 
 //===================================================================

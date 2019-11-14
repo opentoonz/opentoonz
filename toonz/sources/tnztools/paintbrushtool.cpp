@@ -318,11 +318,13 @@ PaintBrushTool::PaintBrushTool()
     , m_tileSaver(0)
     , m_cursor(ToolCursor::EraserCursor)
     // sostituire i nomi con quelli del current, tipo W_ToolOptions...
-    , m_toolSize("Size:", 1, 100, 10, false)  // W_ToolOptions_BrushToolSize
-    , m_colorType("Mode:")                    // W_ToolOptions_InkOrPaint
-    , m_onlyEmptyAreas("Selective", false)    // W_ToolOptions_Selective
+    , m_toolSize("Size:", 1, 1000, 10, false)  // W_ToolOptions_BrushToolSize
+    , m_colorType("Mode:")                     // W_ToolOptions_InkOrPaint
+    , m_onlyEmptyAreas("Selective", false)     // W_ToolOptions_Selective
     , m_firstTime(true)
     , m_workingFrameId(TFrameId()) {
+  m_toolSize.setNonLinearSlider();
+
   m_colorType.addValue(LINES);
   m_colorType.addValue(AREAS);
   m_colorType.addValue(ALL);
@@ -401,18 +403,11 @@ bool PaintBrushTool::onPropertyChanged(std::string propertyName) {
 
   // Selective
   else if (propertyName == m_onlyEmptyAreas.getName()) {
-    if (m_onlyEmptyAreas.getValue() && m_colorType.getValue() == LINES) {
-      m_colorType.setValue(AREAS);
-      PaintBrushColorType = ::to_string(m_colorType.getValue());
-    }
     PaintBrushSelective = (int)(m_onlyEmptyAreas.getValue());
   }
 
   // Areas, Lines etc.
   else if (propertyName == m_colorType.getName()) {
-    if (m_colorType.getValue() == LINES) {
-      PaintBrushSelective = (int)(m_onlyEmptyAreas.getValue());
-    }
     PaintBrushColorType = ::to_string(m_colorType.getValue());
     /*--- ColorModelのCursor更新のためにSIGNALを出す ---*/
     TTool::getApplication()->getCurrentTool()->notifyToolChanged();
@@ -428,7 +423,7 @@ void PaintBrushTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
   TImageP image(getImage(true));
   if (m_colorType.getValue() == LINES) m_colorTypeBrush = INK;
   if (m_colorType.getValue() == AREAS) m_colorTypeBrush = PAINT;
-  if (m_colorType.getValue() == ALL) m_colorTypeBrush   = INKNPAINT;
+  if (m_colorType.getValue() == ALL) m_colorTypeBrush = INKNPAINT;
 
   if (TToonzImageP ti = image) {
     TRasterCM32P ras = ti->getRaster();
@@ -534,7 +529,7 @@ void PaintBrushTool::onDeactivate() {
 //-----------------------------------------------------------------------------
 /*!
  * 描画中にツールが切り替わった場合に備え、onDeactivateでもMouseReleaseと同じ終了処理を行う
-*/
+ */
 void PaintBrushTool::finishBrush() {
   if (TToonzImageP ti = (TToonzImageP)getImage(true)) {
     if (m_rasterTrack) {

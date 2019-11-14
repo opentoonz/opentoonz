@@ -87,7 +87,7 @@ inline bool angleLess(const TPointD &a, const TPointD &b, const TPointD &ref) {
 // Container append (needs reverse iterators)
 // NOTE: Merge could be used... but it requires operator< and we don't...
 
-//! warning: must be I == T::Reverse_iterator; explicited because on Mac it was
+//! warning: must be I == T::Reverse_iterator; explicitly because on Mac it was
 //! not compiling!
 template <class T, class I>
 void append(T &cont1, T &cont2) {
@@ -288,7 +288,7 @@ public:
   // Further node properties
   bool m_concave;             //!< Whether the node represents a concave angle.
   unsigned int m_attributes,  //!< Bitwise signatures of this node
-      m_updateTime,  //!< \a Algoritmic time in which the node was updated.
+      m_updateTime,  //!< \a Algorithmic time in which the node was updated.
       m_ancestor,  //!< Index of the original node from which this one evolved.
       m_ancestorContour;  //!< Contour index of the original node from which
                           //! this one evolved.
@@ -403,7 +403,7 @@ public:
   Sequence() : m_graphHolder(0) {}
   ~Sequence() {}
 
-  // Impose a property dependant only on the extremity we consider first
+  // Impose a property dependent only on the extremity we consider first
   // - so that the same sequence is not considered twice when head and tail
   // are exchanged
   bool isForward() const {
@@ -467,7 +467,7 @@ typedef std::vector<T3DPointD> PointList;
 //! "tcenterline*.cpp"
 // sources. Instead than passing each variable repeatedly, it is easier to
 // define a Global
-// class passed to each file, which gets immediatly pointed in an anonymous
+// class passed to each file, which gets immediately pointed in an anonymous
 // namespace.
 
 class VectorizerCoreGlobals {

@@ -642,6 +642,20 @@
     </message>
 </context>
 <context>
+    <name>FullColorFillTool</name>
+    <message>
+        <source>Fill Depth</source>
+        <translation type="unfinished">填充深度</translation>
+    </message>
+</context>
+<context>
+    <name>HandToolOptionsBox</name>
+    <message>
+        <source>Reset Position</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>HookTool</name>
     <message>
         <source>Snap</source>
@@ -1264,6 +1278,13 @@ Do you want to proceed?</source>
     </message>
 </context>
 <context>
+    <name>RotateToolOptionsBox</name>
+    <message>
+        <source>Reset Rotation</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>RulerToolOptionsBox</name>
     <message>
         <source>X:</source>
@@ -1660,6 +1681,13 @@ moved to the end of the first page of the palette.</source>
     <message>
         <source>Rectangular</source>
         <translation>矩形</translation>
+    </message>
+</context>
+<context>
+    <name>ZoomToolOptionsBox</name>
+    <message>
+        <source>Reset Zoom</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

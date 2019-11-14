@@ -241,10 +241,18 @@ void FunctionViewer::showEvent(QShowEvent *) {
           ret;
   }
 
-  if (m_frameHandle)
+  if (m_frameHandle) {
     ret = connect(m_frameHandle, SIGNAL(frameSwitched()), this,
                   SLOT(propagateExternalSetFrame())) &&
           ret;
+
+    ret = connect(m_frameHandle, SIGNAL(triggerNextKeyframe(QWidget *)),
+                  m_toolbar, SLOT(onNextKeyframe(QWidget *))) &&
+          ret;
+    ret = connect(m_frameHandle, SIGNAL(triggerPrevKeyframe(QWidget *)),
+                  m_toolbar, SLOT(onPrevKeyframe(QWidget *))) &&
+          ret;
+  }
 
   if (m_objectHandle) {
     ret = connect(m_objectHandle, SIGNAL(objectSwitched()), this,
@@ -303,7 +311,10 @@ void FunctionViewer::showEvent(QShowEvent *) {
 
 void FunctionViewer::hideEvent(QHideEvent *) {
   if (m_xshHandle) m_xshHandle->disconnect(this);
-  if (m_frameHandle) m_frameHandle->disconnect(this);
+  if (m_frameHandle) {
+    m_frameHandle->disconnect(this);
+    m_frameHandle->disconnect(m_toolbar);
+  }
   if (m_objectHandle) m_objectHandle->disconnect(this);
   if (m_fxHandle) m_fxHandle->disconnect(this);
   if (m_sceneHandle) m_sceneHandle->disconnect(this);
@@ -582,7 +593,10 @@ void FunctionViewer::onStageObjectChanged(bool isDragging) {
   static_cast<FunctionTreeModel *>(m_treeView->model())
       ->setCurrentStageObject(obj);
 
-  if (!isDragging) m_treeView->updateAll();
+  if (!isDragging) {
+    m_treeView->updateAll();
+    m_numericalColumns->updateAll();
+  }
 
   m_functionGraph->update();
 }
@@ -712,6 +726,8 @@ bool FunctionViewer::isExpressionPageActive() {
 
 void FunctionViewer::save(QSettings &settings) const {
   settings.setValue("toggleStatus", m_toggleStatus);
+  settings.setValue("showIbtwnValuesInSheet",
+                    m_numericalColumns->isIbtwnValueVisible());
 }
 
 //----------------------------------------------------------------------------
@@ -721,4 +737,10 @@ void FunctionViewer::load(QSettings &settings) {
   if (toggleStatus.canConvert(QVariant::Int)) {
     m_toggleStatus = toggleStatus.toInt();
   }
+
+  bool ibtwnVisible = settings
+                          .value("showIbtwnValuesInSheet",
+                                 m_numericalColumns->isIbtwnValueVisible())
+                          .toBool();
+  m_numericalColumns->setIbtwnValueVisible(ibtwnVisible);
 }

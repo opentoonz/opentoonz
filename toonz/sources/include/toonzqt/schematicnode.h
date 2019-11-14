@@ -144,13 +144,13 @@ signals:
 class SchematicToggle_SplineOptions final : public SchematicToggle {
   Q_OBJECT
 public:
-  SchematicToggle_SplineOptions(SchematicNode *parent, const QPixmap &pixmap,
+  SchematicToggle_SplineOptions(SchematicNode *parent, const QIcon &imageIcon,
                                 int flags)
-      : SchematicToggle(parent, QIcon(pixmap), QColor(0, 0, 0, 0), flags) {}
-  SchematicToggle_SplineOptions(SchematicNode *parent, const QPixmap &pixmap1,
-                                const QPixmap &pixmap2, int flags)
-      : SchematicToggle(parent, QIcon(pixmap1), QIcon(pixmap2),
-                        QColor(0, 0, 0, 0), flags) {}
+      : SchematicToggle(parent, imageIcon, QColor(0, 0, 0, 0), flags) {}
+  SchematicToggle_SplineOptions(SchematicNode *parent, const QIcon &imageIcon,
+                                const QIcon &imageIcon2, int flags)
+      : SchematicToggle(parent, imageIcon, imageIcon2, QColor(0, 0, 0, 0),
+                        flags) {}
 
   void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
              QWidget *widget = 0) override;

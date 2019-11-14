@@ -111,6 +111,8 @@ types to be displayed in the file browser.
 
   static void refreshFolder(const TFilePath &folder);
 
+  static void updateItemViewerPanel();
+
   // ritorna true se il file e' stato rinominato. dopo la chiamata fp contiene
   // il nuovo path
   static bool renameFile(TFilePath &fp, QString newName);

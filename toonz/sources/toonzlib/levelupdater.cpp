@@ -246,7 +246,7 @@ void LevelUpdater::open(const TFilePath &fp, TPropertyGroup *pg) {
       m_lwPath = fp;
     }
   } catch (...) {
-    // In this case, TLevelWriterP(..) failed, that object was never contructed,
+    // In this case, TLevelWriterP(..) failed, that object was never constructed,
     // the assignment m_lw never took place. And m_lw == 0.
 
     // Reset state and rethrow

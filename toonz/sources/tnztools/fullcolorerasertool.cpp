@@ -368,7 +368,7 @@ private:
 
 FullColorEraserTool::FullColorEraserTool(std::string name)
     : TTool(name)
-    , m_size("Size:", 1, 100, 5, false)
+    , m_size("Size:", 1, 1000, 5, false)
     , m_opacity("Opacity:", 0, 100, 100)
     , m_hardness("Hardness:", 0, 100, 100)
     , m_eraseType("Type:")
@@ -385,6 +385,8 @@ FullColorEraserTool::FullColorEraserTool(std::string name)
     , m_isXsheetCell(false) {
   bind(TTool::RasterImage);
 
+  m_size.setNonLinearSlider();
+
   m_prop.bind(m_size);
   m_prop.bind(m_hardness);
   m_prop.bind(m_opacity);
@@ -396,6 +398,10 @@ FullColorEraserTool::FullColorEraserTool(std::string name)
   m_eraseType.addValue(RECTERASE);
   m_eraseType.addValue(FREEHANDERASE);
   m_eraseType.addValue(POLYLINEERASE);
+
+  m_eraseType.setId("Type");
+  m_invertOption.setId("Invert");
+  m_multi.setId("FrameRange");
 }
 
 //---------------------------------------------------------------------------------------------------
@@ -983,7 +989,7 @@ void FullColorEraserTool::update(const TRasterImageP &ri, TRectD selArea,
   tileSet->add(raster, TRasterImageUtils::convertWorldToRaster(selArea, ri));
   TUndo *undo;
 
-  undo = new RectFullColorUndo(tileSet, selArea, TStroke(),
+  undo       = new RectFullColorUndo(tileSet, selArea, TStroke(),
                                m_eraseType.getValue(), level.getPointer(),
                                m_invertOption.getValue(), frameId);
   TRect rect = TRasterImageUtils::eraseRect(ri, selArea);

@@ -132,13 +132,13 @@ public:
     //! \return The insertion index in the page, or \p -1 on failure
     int addStyle(int styleId);  //!< Adds the specified style Id to the page (at
                                 //! the \a back
-    //!  of the page).
-    /*!
-\warning  The supplied style must have been allocated with \a new.
-\warning  Style ownership is surrendered to the palette.
-\return   The insertion index in the page, or \p -1 on failure.
-    In case of failure, the supplied style is \a deleted.
-*/
+                                //!  of the page).
+                                /*!
+                            \warning  The supplied style must have been allocated with \a new.
+                            \warning  Style ownership is surrendered to the palette.
+                            \return   The insertion index in the page, or \p -1 on failure.
+                                In case of failure, the supplied style is \a deleted.
+                            */
     int addStyle(TColorStyle *style);  //!< Adds the specified style to the
                                        //! palette, and assigns it
     //!  to this page.
@@ -213,6 +213,10 @@ private:
   //! even if the palette's dirtyflag is true.
 
   int m_shortcutScopeIndex;
+
+  int m_currentStyleId;
+
+  bool m_areRefLevelFidsSpecified = false;
 
 public:
   TPalette();
@@ -316,10 +320,11 @@ between RGBA color components.
     m_version = v;
   }  //!< Sets the palette's version number
 
-  void setRefLevelFids(const std::vector<TFrameId> fids);  //!< Associates the
-                                                           //! list of frames \e
-  //! fids to this
-  //! palette.
+  void setRefLevelFids(const std::vector<TFrameId> fids,
+                       bool specified);  //!< Associates the
+                                         //! list of frames \e
+  //! fids to this palette.
+  //! When specified == true fids were specified by user on loading.
   std::vector<TFrameId> getRefLevelFids();  //!< Returns the list of frames
                                             //! associated to this palette.
 
@@ -424,6 +429,9 @@ between RGBA color components.
                              // picked pos value
 
   void nextShortcutScope(bool invert);
+
+  void setCurrentStyleId(int id) { m_currentStyleId = id; }
+  int getCurrentStyleId() const { return m_currentStyleId; }
 
 public:
   // Deprecated functions

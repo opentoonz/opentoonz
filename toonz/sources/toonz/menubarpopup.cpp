@@ -378,12 +378,17 @@ CommandListTree::CommandListTree(QWidget* parent) : QTreeWidget(parent) {
   addFolder(ShortcutTree::tr("Xsheet"), MenuXsheetCommandType,
             menuCommandFolder);
   addFolder(ShortcutTree::tr("Cells"), MenuCellsCommandType, menuCommandFolder);
+  addFolder(ShortcutTree::tr("Play"), MenuPlayCommandType, menuCommandFolder);
+  addFolder(ShortcutTree::tr("Render"), MenuRenderCommandType,
+            menuCommandFolder);
   addFolder(ShortcutTree::tr("View"), MenuViewCommandType, menuCommandFolder);
   addFolder(ShortcutTree::tr("Windows"), MenuWindowsCommandType,
             menuCommandFolder);
+  addFolder(ShortcutTree::tr("Help"), MenuHelpCommandType, menuCommandFolder);
 
   addFolder(ShortcutTree::tr("Tools"), ToolCommandType);
-  addFolder(ShortcutTree::tr("Playback"), PlaybackCommandType);
+
+  sortItems(0, Qt::AscendingOrder);
 
   MenuBarSeparatorItem* sep = new MenuBarSeparatorItem(0);
   sep->setToolTip(0, QObject::tr("[Drag&Drop] to copy separator to menu bar"));

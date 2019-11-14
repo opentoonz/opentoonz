@@ -45,7 +45,7 @@ centered
 
   Post-processing include despeckling (ie removal or recoloration of little
 blots with
-  uniform color), and tones' brigthness/contrast manipulation.
+  uniform color), and tones' brightness/contrast manipulation.
 
   (*) The image is first overed on top of a white background
 
@@ -194,7 +194,7 @@ public:
 
 //=========================================================================
 
-//! Birghtness/Contrast color transform data
+//! Brightness/Contrast color transform data
 
 #define MAX_N_PENCILS 8
 
@@ -207,7 +207,7 @@ TPixelRGBM32 Paper = TPixel32::White;
 
 //=========================================================================
 
-//! Birghtness/Contrast color transform structure
+//! Brightness/Contrast color transform structure
 class TransfFunction {
   USHORT TransfFun[(MAX_N_PENCILS + 1) << 8];
 
@@ -501,7 +501,7 @@ bool TCleanupper::getResampleValues(const TRasterImageP &image, TAffine &aff,
 //------------------------------------------------------------------------------------
 
 // this one incorporate the preprocessColors and the finalize function; used for
-// swatch.(tipically on very small rasters)
+// swatch.(typically on very small rasters)
 TRasterP TCleanupper::processColors(const TRasterP &rin) {
   if (m_parameters->m_lineProcessingMode == lpNone) return rin;
 

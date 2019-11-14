@@ -57,6 +57,7 @@
 #include <QButtonGroup>
 #include <QPushButton>
 #include <QLabel>
+#include <QMessageBox>
 
 TEnv::IntVar ViewCameraToggleAction("ViewCameraToggleAction", 1);
 TEnv::IntVar ViewTableToggleAction("ViewTableToggleAction", 1);
@@ -450,6 +451,7 @@ centralWidget->setLayout(centralWidgetLayout);*/
   setCommandHandler(MI_PickStyleLines, this, &MainWindow::togglePickStyleLines);
 
   setCommandHandler(MI_About, this, &MainWindow::onAbout);
+  setCommandHandler(MI_OpenOnlineManual, this, &MainWindow::onOpenOnlineManual);
   setCommandHandler(MI_MaximizePanel, this, &MainWindow::maximizePanel);
   setCommandHandler(MI_FullScreenWindow, this, &MainWindow::fullScreenWindow);
   setCommandHandler("MI_NewVectorLevel", this,
@@ -458,6 +460,7 @@ centralWidget->setLayout(centralWidgetLayout);*/
                     &MainWindow::onNewToonzRasterLevelButtonPressed);
   setCommandHandler("MI_NewRasterLevel", this,
                     &MainWindow::onNewRasterLevelButtonPressed);
+  setCommandHandler(MI_ClearCacheFolder, this, &MainWindow::clearCacheFolder);
   // remove ffmpegCache if still exists from crashed exit
   QString ffmpegCachePath =
       ToonzFolder::getCacheRootFolder().getQString() + "//ffmpeg";
@@ -527,7 +530,7 @@ Room *MainWindow::getRoom(int index) const {
 
 //-----------------------------------------------------------------------------
 /*! Roomを名前から探す
-*/
+ */
 Room *MainWindow::getRoomByName(QString &roomName) {
   for (int i = 0; i < getRoomCount(); i++) {
     Room *room = dynamic_cast<Room *>(m_stackedWidget->widget(i));
@@ -989,6 +992,12 @@ void MainWindow::onAbout() {
 
 //-----------------------------------------------------------------------------
 
+void MainWindow::onOpenOnlineManual() {
+  QDesktopServices::openUrl(QUrl(tr("http://opentoonz.readthedocs.io")));
+}
+
+//-----------------------------------------------------------------------------
+
 void MainWindow::autofillToggle() {
   TPaletteHandle *h = TApp::instance()->getCurrentPalette();
   h->toggleAutopaint();
@@ -1056,7 +1065,6 @@ void MainWindow::onCurrentRoomChanged(int newRoomIndex) {
     TPanel *pane = paneList.at(i);
     if (pane->isFloating() && !pane->isHidden()) {
       QRect oldGeometry = pane->geometry();
-
       // Just setting the new parent is not enough for the new layout manager.
       // Must be removed from the old and added to the new.
       oldRoom->removeDockWidget(pane);
@@ -1397,9 +1405,23 @@ QAction *MainWindow::createMenuWindowsAction(const char *id,
 
 //-----------------------------------------------------------------------------
 
-QAction *MainWindow::createPlaybackAction(const char *id, const QString &name,
+QAction *MainWindow::createMenuPlayAction(const char *id, const QString &name,
                                           const QString &defaultShortcut) {
-  return createAction(id, name, defaultShortcut, PlaybackCommandType);
+  return createAction(id, name, defaultShortcut, MenuPlayCommandType);
+}
+
+//-----------------------------------------------------------------------------
+
+QAction *MainWindow::createMenuRenderAction(const char *id, const QString &name,
+                                            const QString &defaultShortcut) {
+  return createAction(id, name, defaultShortcut, MenuRenderCommandType);
+}
+
+//-----------------------------------------------------------------------------
+
+QAction *MainWindow::createMenuHelpAction(const char *id, const QString &name,
+                                          const QString &defaultShortcut) {
+  return createAction(id, name, defaultShortcut, MenuHelpCommandType);
 }
 
 //-----------------------------------------------------------------------------
@@ -1430,6 +1452,13 @@ QAction *MainWindow::createMenuAction(const char *id, const QString &name,
 QAction *MainWindow::createViewerAction(const char *id, const QString &name,
                                         const QString &defaultShortcut) {
   return createAction(id, name, defaultShortcut, ZoomCommandType);
+}
+
+//-----------------------------------------------------------------------------
+
+QAction *MainWindow::createVisualizationButtonAction(const char *id,
+                                                     const QString &name) {
+  return createAction(id, name, "", VisualizationButtonCommandType);
 }
 
 //-----------------------------------------------------------------------------
@@ -1517,45 +1546,47 @@ void MainWindow::defineActions() {
                        "");
   createMenuFileAction(MI_ClearRecentLevel, tr("&Clear Recent level File List"),
                        "");
-  createMenuFileAction(MI_NewLevel, tr("&New Level..."), "Alt+N");
+  createMenuLevelAction(MI_NewLevel, tr("&New Level..."), "Alt+N");
 
   QAction *newVectorLevelAction =
-      createMenuFileAction(MI_NewVectorLevel, tr("&New Vector Level"), "");
+      createMenuLevelAction(MI_NewVectorLevel, tr("&New Vector Level"), "");
   newVectorLevelAction->setIconText(tr("New Vector Level"));
   newVectorLevelAction->setIcon(QIcon(":Resources/new_vector_level.svg"));
-  QAction *newToonzRasterLevelAction = createMenuFileAction(
+  QAction *newToonzRasterLevelAction = createMenuLevelAction(
       MI_NewToonzRasterLevel, tr("&New Toonz Raster Level"), "");
   newToonzRasterLevelAction->setIconText(tr("New Toonz Raster Level"));
   newToonzRasterLevelAction->setIcon(
       QIcon(":Resources/new_toonz_raster_level.svg"));
   QAction *newRasterLevelAction =
-      createMenuFileAction(MI_NewRasterLevel, tr("&New Raster Level"), "");
+      createMenuLevelAction(MI_NewRasterLevel, tr("&New Raster Level"), "");
   newRasterLevelAction->setIconText(tr("New Raster Level"));
   newRasterLevelAction->setIcon(QIcon(":Resources/new_raster_level.svg"));
   QAction *loadLevelAction =
-      createMenuFileAction(MI_LoadLevel, tr("&Load Level..."), "");
+      createMenuLevelAction(MI_LoadLevel, tr("&Load Level..."), "");
   loadLevelAction->setIcon(QIcon(":Resources/load_level.svg"));
-  createMenuFileAction(MI_SaveLevel, tr("&Save Level"), "");
-  createMenuFileAction(MI_SaveAllLevels, tr("&Save All Levels"), "");
-  createMenuFileAction(MI_SaveLevelAs, tr("&Save Level As..."), "");
-  createMenuFileAction(MI_ExportLevel, tr("&Export Level..."), "");
+  createMenuLevelAction(MI_SaveLevel, tr("&Save Level"), "");
+  createMenuLevelAction(MI_SaveAllLevels, tr("&Save All Levels"), "");
+  createMenuLevelAction(MI_SaveLevelAs, tr("&Save Level As..."), "");
+  createMenuLevelAction(MI_ExportLevel, tr("&Export Level..."), "");
   createMenuFileAction(MI_ConvertFileWithInput, tr("&Convert File..."), "");
   createRightClickMenuAction(MI_SavePaletteAs, tr("&Save Palette As..."), "");
   createRightClickMenuAction(MI_OverwritePalette, tr("&Save Palette"), "");
   createMenuFileAction(MI_LoadColorModel, tr("&Load Color Model..."), "");
-  createMenuFileAction(MI_ImportMagpieFile, tr("&Import Magpie File..."), "");
+  createMenuFileAction(MI_ImportMagpieFile,
+                       tr("&Import Toonz Lip Sync File..."), "");
   createMenuFileAction(MI_NewProject, tr("&New Project..."), "");
   createMenuFileAction(MI_ProjectSettings, tr("&Project Settings..."), "");
   createMenuFileAction(MI_SaveDefaultSettings, tr("&Save Default Settings"),
                        "");
-  createMenuFileAction(MI_OutputSettings, tr("&Output Settings..."), "Ctrl+O");
-  createMenuFileAction(MI_PreviewSettings, tr("&Preview Settings..."), "");
-  createMenuFileAction(MI_Render, tr("&Render"), "Ctrl+Shift+R");
-  createMenuFileAction(MI_FastRender, tr("&Fast Render to MP4"), "Alt+R");
-  createMenuFileAction(MI_Preview, tr("&Preview"), "Ctrl+R");
+  createMenuRenderAction(MI_OutputSettings, tr("&Output Settings..."),
+                         "Ctrl+O");
+  createMenuRenderAction(MI_PreviewSettings, tr("&Preview Settings..."), "");
+  createMenuRenderAction(MI_Render, tr("&Render"), "Ctrl+Shift+R");
+  createMenuRenderAction(MI_FastRender, tr("&Fast Render to MP4"), "Alt+R");
+  createMenuRenderAction(MI_Preview, tr("&Preview"), "Ctrl+R");
   createMenuFileAction(MI_SoundTrack, tr("&Export Soundtrack"), "");
-  createRightClickMenuAction(MI_SavePreviewedFrames,
-                             tr("&Save Previewed Frames"), "");
+  createMenuRenderAction(MI_SavePreviewedFrames, tr("&Save Previewed Frames"),
+                         "");
   createRightClickMenuAction(MI_RegeneratePreview, tr("&Regenerate Preview"),
                              "");
   createRightClickMenuAction(MI_RegenerateFramePr,
@@ -1583,6 +1614,7 @@ void MainWindow::defineActions() {
   createMenuAction(MI_LoadRecentImage, tr("&Load Recent Image Files"), files);
   createMenuFileAction(MI_ClearRecentImage,
                        tr("&Clear Recent Flipbook Image List"), "");
+  createMenuFileAction(MI_ClearCacheFolder, tr("&Clear Cache Folder"), "");
 
   createRightClickMenuAction(MI_PreviewFx, tr("Preview Fx"), "");
 
@@ -1620,10 +1652,10 @@ void MainWindow::defineActions() {
   createMenuEditAction(MI_SendBackward, tr("&Send Backward"), "[");
   createMenuEditAction(MI_EnterGroup, tr("&Enter Group"), "");
   createMenuEditAction(MI_ExitGroup, tr("&Exit Group"), "");
-  createMenuEditAction(MI_RemoveEndpoints, tr("&Remove Vector Overflow"), "");
+  createMenuLevelAction(MI_RemoveEndpoints, tr("&Remove Vector Overflow"), "");
   QAction *touchToggle =
       createToggle(MI_TouchGestureControl, tr("&Touch Gesture Control"), "",
-                   TouchGestureControl ? 1 : 0, MenuEditCommandType);
+                   TouchGestureControl ? 1 : 0, MiscCommandType);
   touchToggle->setEnabled(true);
   touchToggle->setIcon(QIcon(":Resources/touch.svg"));
 
@@ -1676,7 +1708,7 @@ void MainWindow::defineActions() {
                         tr("&Brightness and Contrast..."), "");
   createMenuLevelAction(MI_LinesFade, tr("&Color Fade..."), "");
 #ifdef LINETEST
-  createMenuLevelAction(MI_Capture, tr("&Capture"), "Space");
+  createMenuLevelAction(MI_Capture, tr("&Capture"), "");
 #endif
   QAction *action =
       createMenuLevelAction(MI_CanvasSize, tr("&Canvas Size..."), "");
@@ -1710,7 +1742,7 @@ void MainWindow::defineActions() {
   collapseAction->setIcon(createQIconOnOffPNG("collapse"));
 
   toggle = createToggle(MI_ToggleEditInPlace, tr("&Toggle Edit In Place"), "",
-                        EditInPlaceToggleAction ? 1 : 0, MenuViewCommandType);
+                        EditInPlaceToggleAction ? 1 : 0, MenuXsheetCommandType);
   toggle->setIconText(tr("Toggle Edit in Place"));
   toggle->setIcon(QIcon(":Resources/edit_in_place.svg"));
 
@@ -1728,7 +1760,7 @@ void MainWindow::defineActions() {
   mergeLevelsAction->setIcon(QIcon(":Resources/merge.svg"));
   createMenuXsheetAction(MI_InsertFx, tr("&New FX..."), "Ctrl+F");
   QAction *newOutputAction =
-      createMenuXsheetAction(MI_NewOutputFx, tr("&New Output"), "Ctrl+F");
+      createMenuXsheetAction(MI_NewOutputFx, tr("&New Output"), "Alt+O");
   newOutputAction->setIcon(createQIconOnOff("output", false));
 
   createRightClickMenuAction(MI_FxParamEditor, tr("&Edit FX..."), "Ctrl+K");
@@ -1739,12 +1771,14 @@ void MainWindow::defineActions() {
                          "");
   createMenuXsheetAction(MI_RemoveGlobalKeyframe, tr("Remove Multiple Keys"),
                          "");
-  createMenuXsheetAction(MI_NewNoteLevel, tr("New Note Level"), "");
+  createMenuLevelAction(MI_NewNoteLevel, tr("New Note Level"), "");
   createMenuXsheetAction(MI_RemoveEmptyColumns, tr("Remove Empty Columns"), "");
   createMenuXsheetAction(MI_LipSyncPopup, tr("&Apply Lip Sync Data to Column"),
                          "Alt+L");
   createRightClickMenuAction(MI_ToggleXSheetToolbar,
                              tr("Toggle XSheet Toolbar"), "");
+  createRightClickMenuAction(MI_ToggleXsheetCameraColumn,
+                             tr("Show/Hide Xsheet Camera Column"), "");
   createMenuCellsAction(MI_Reverse, tr("&Reverse"), "");
   createMenuCellsAction(MI_Swing, tr("&Swing"), "");
   createMenuCellsAction(MI_Random, tr("&Random"), "");
@@ -1870,20 +1904,23 @@ void MainWindow::defineActions() {
 
   // createToolOptionsAction("A_ToolOption_Link", tr("Link"), "");
   createToggle(MI_Link, tr("Link Flipbooks"), "", LinkToggleAction ? 1 : 0,
-               MenuViewCommandType);
+               MenuPlayCommandType);
 
-  createPlaybackAction(MI_Play, tr("Play"), "P");
-  createPlaybackAction(MI_Loop, tr("Loop"), "L");
-  createPlaybackAction(MI_Pause, tr("Pause"), "");
-  createPlaybackAction(MI_FirstFrame, tr("First Frame"), "Alt+,");
-  createPlaybackAction(MI_LastFrame, tr("Last Frame"), "Alt+.");
-  createPlaybackAction(MI_PrevFrame, tr("Previous Frame"), "Shift+,");
-  createPlaybackAction(MI_NextFrame, tr("Next Frame"), "Shift+.");
+  createMenuPlayAction(MI_Play, tr("Play"), "P");
+  createMenuPlayAction(MI_Loop, tr("Loop"), "L");
+  createMenuPlayAction(MI_Pause, tr("Pause"), "");
+  createMenuPlayAction(MI_FirstFrame, tr("First Frame"), "Alt+,");
+  createMenuPlayAction(MI_LastFrame, tr("Last Frame"), "Alt+.");
+  createMenuPlayAction(MI_PrevFrame, tr("Previous Frame"), "Shift+,");
+  createMenuPlayAction(MI_NextFrame, tr("Next Frame"), "Shift+.");
 
-  createAction(MI_NextDrawing, tr("Next Drawing"), ".", PlaybackCommandType);
-  createAction(MI_PrevDrawing, tr("Prev Drawing"), ",", PlaybackCommandType);
-  createAction(MI_NextStep, tr("Next Step"), "", PlaybackCommandType);
-  createAction(MI_PrevStep, tr("Prev Step"), "", PlaybackCommandType);
+  createMenuPlayAction(MI_NextDrawing, tr("Next Drawing"), ".");
+  createMenuPlayAction(MI_PrevDrawing, tr("Prev Drawing"), ",");
+  createMenuPlayAction(MI_NextStep, tr("Next Step"), "");
+  createMenuPlayAction(MI_PrevStep, tr("Prev Step"), "");
+
+  createMenuPlayAction(MI_NextKeyframe, tr("Next Key"), "Ctrl+.");
+  createMenuPlayAction(MI_PrevKeyframe, tr("Prev Key"), "Ctrl+,");
 
   createRGBAAction(MI_RedChannel, tr("Red Channel"), "");
   createRGBAAction(MI_GreenChannel, tr("Green Channel"), "");
@@ -1955,8 +1992,9 @@ void MainWindow::defineActions() {
   createMenuWindowsAction(MI_FullScreenWindow,
                           tr("Toggle Main Window's Full Screen Mode"),
                           "Ctrl+`");
-  createMenuWindowsAction(MI_About, tr("&About OpenToonz..."), "");
+  createMenuHelpAction(MI_About, tr("&About OpenToonz..."), "");
   createMenuWindowsAction(MI_StartupPopup, tr("&Startup Popup..."), "Alt+S");
+  createMenuHelpAction(MI_OpenOnlineManual, tr("&Online Manual..."), "F1");
 
   createRightClickMenuAction(MI_BlendColors, tr("&Blend colors"), "");
 
@@ -2118,6 +2156,21 @@ void MainWindow::defineActions() {
   CommandManager::instance()->setToggleTexts(V_ShowHideFullScreen,
                                              tr("Full Screen Mode"),
                                              tr("Exit Full Screen Mode"));
+
+  // Following actions are for adding "Visualization" menu items to the command
+  // bar. They are separated from the original actions in order to avoid
+  // assigning shortcut keys. They must be triggered only from pressing buttons
+  // in the command bar. Assinging shortcut keys and registering as MenuItem
+  // will break a logic of ShortcutZoomer. So here we register separate items
+  // and bypass the command.
+  createVisualizationButtonAction(VB_ViewReset, tr("Reset View"));
+  createVisualizationButtonAction(VB_ZoomFit, tr("Fit to Window"));
+  createVisualizationButtonAction(VB_ZoomReset, tr("Reset Zoom"));
+  createVisualizationButtonAction(VB_RotateReset, tr("Reset Rotation"));
+  createVisualizationButtonAction(VB_PositionReset, tr("Reset Position"));
+  createVisualizationButtonAction(VB_ActualPixelSize, tr("Actual Pixel Size"));
+  createVisualizationButtonAction(VB_FlipX, tr("Flip Viewer Horizontally"));
+  createVisualizationButtonAction(VB_FlipY, tr("Flip Viewer Vertically"));
 
   QAction *refreshAct =
       createMiscAction(MI_RefreshTree, tr("Refresh Folder Tree"), "");
@@ -2322,6 +2375,96 @@ void MainWindow::onNewRasterLevelButtonPressed() {
   Preferences::instance()->setDefLevelType(OVL_XSHLEVEL);
   CommandManager::instance()->execute("MI_NewLevel");
   Preferences::instance()->setDefLevelType(defaultLevelType);
+}
+
+//-----------------------------------------------------------------------------
+// delete unused files / folders in the cache
+void MainWindow::clearCacheFolder() {
+  // currently cache folder is used for following purposes
+  // 1. $CACHE/[ProcessID] : for disk swap of image cache.
+  //    To be deleted on exit. Remains on crash.
+  // 2. $CACHE/ffmpeg : ffmpeg cache.
+  //    To be cleared on the end of rendering, on exist and on launch.
+  // 3. $CACHE/temp : untitled scene data.
+  //    To be deleted on switching or exiting scenes. Remains on crash.
+
+  // So, this function will delete all files / folders in $CACHE
+  // except the following items:
+  // 1. $CACHE/[Current ProcessID]
+  // 2. $CACHE/temp/[Current scene folder] if the current scene is untitled
+
+  TFilePath cacheRoot                = ToonzFolder::getCacheRootFolder();
+  if (cacheRoot.isEmpty()) cacheRoot = TEnv::getStuffDir() + "cache";
+
+  TFilePathSet filesToBeRemoved;
+
+  TSystem::readDirectory(filesToBeRemoved, cacheRoot, false);
+
+  // keep the imagecache folder
+  filesToBeRemoved.remove(cacheRoot + std::to_string(TSystem::getProcessId()));
+  // keep the untitled scene data folder
+  if (TApp::instance()->getCurrentScene()->getScene()->isUntitled()) {
+    filesToBeRemoved.remove(cacheRoot + "temp");
+    TFilePathSet untitledData =
+        TSystem::readDirectory(cacheRoot + "temp", false);
+    untitledData.remove(TApp::instance()
+                            ->getCurrentScene()
+                            ->getScene()
+                            ->getScenePath()
+                            .getParentDir());
+    filesToBeRemoved.insert(filesToBeRemoved.end(), untitledData.begin(),
+                            untitledData.end());
+  }
+
+  // return if there is no files/folders to be deleted
+  if (filesToBeRemoved.size() == 0) {
+    QMessageBox::information(
+        this, tr("Clear Cache Folder"),
+        tr("There are no unused items in the cache folder."));
+    return;
+  }
+
+  QString message(tr("Deleting the following items:\n"));
+  int count = 0;
+  for (const auto &fileToBeRemoved : filesToBeRemoved) {
+    QString dirPrefix =
+        (TFileStatus(fileToBeRemoved).isDirectory()) ? tr("<DIR> ") : "";
+    message +=
+        "   " + dirPrefix + (fileToBeRemoved - cacheRoot).getQString() + "\n";
+    count++;
+    if (count == 5) break;
+  }
+  if (filesToBeRemoved.size() > 5)
+    message +=
+        tr("   ... and %1 more items\n").arg(filesToBeRemoved.size() - 5);
+
+  message +=
+      tr("\nAre you sure?\n\nN.B. Make sure you are not running another "
+         "process of OpenToonz,\nor you may delete necessary files for it.");
+
+  QMessageBox::StandardButton ret = QMessageBox::question(
+      this, tr("Clear Cache Folder"), message,
+      QMessageBox::StandardButtons(QMessageBox::Ok | QMessageBox::Cancel));
+
+  if (ret != QMessageBox::Ok) return;
+
+  for (const auto &fileToBeRemoved : filesToBeRemoved) {
+    try {
+      if (TFileStatus(fileToBeRemoved).isDirectory())
+        TSystem::rmDirTree(fileToBeRemoved);
+      else
+        TSystem::deleteFile(fileToBeRemoved);
+    } catch (TException &e) {
+      QMessageBox::warning(
+          this, tr("Clear Cache Folder"),
+          tr("Can't delete %1 : ").arg(fileToBeRemoved.getQString()) +
+              QString::fromStdWString(e.getMessage()));
+    } catch (...) {
+      QMessageBox::warning(
+          this, tr("Clear Cache Folder"),
+          tr("Can't delete %1 : ").arg(fileToBeRemoved.getQString()));
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------

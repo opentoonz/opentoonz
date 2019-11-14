@@ -44,7 +44,7 @@ public:
 
   TColorStyle *getStyle() const;
 
-  void setPalette(TPalette *palette, int styleIndex = 1);
+  void setPalette(TPalette *palette, int styleIndex = -1);
 
   void setStyleIndex(int index, bool forceEmit = false);
 

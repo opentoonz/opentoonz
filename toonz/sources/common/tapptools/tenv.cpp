@@ -33,14 +33,14 @@ using namespace TVER;
 
 namespace {
 const std::map<std::string, std::string> systemPathMap{
-    {"LIBRARY", "library"},   {"STUDIOPALETTE", "studiopalette"},
-    {"FXPRESETS", "fxs"},     {"CACHEROOT", "cache"},
-    {"PROFILES", "profiles"}, {"CONFIG", "config"},
-    {"PROJECTS", "projects"}};
+    {"LIBRARY", "library"}, {"STUDIOPALETTE", "studiopalette"},
+    {"FXPRESETS", "fxs"},   {"PROFILES", "profiles"},
+    {"CONFIG", "config"},   {"PROJECTS", "projects"}};
 
 class EnvGlobals {  // singleton
 
   ToonzVersion m_version;
+  std::string m_applicationFileName;  // May differ from application name
   std::string m_applicationVersion;
   std::string m_applicationFullName;
   std::string m_moduleName;
@@ -76,7 +76,7 @@ public:
     QString settingsPath;
 
 #ifdef MACOSX
-    settingsPath = QString::fromStdString(getApplicationName()) +
+    settingsPath = QString::fromStdString(getApplicationFileName()) +
                    QString(".app") +
                    QString("/Contents/Resources/SystemVar.ini");
 #else /* Generic Unix */
@@ -170,6 +170,9 @@ public:
     }
 
     m_applicationFullName = m_version.getAppName() + " " + m_applicationVersion;
+    if (m_version.hasAppNote())
+      m_applicationFullName += " " + m_version.getAppNote();
+      
     m_moduleName          = m_version.getAppName();
     m_rootVarName         = toUpper(m_version.getAppName()) + "ROOT";
 #ifdef _WIN32
@@ -181,6 +184,11 @@ public:
     updateEnvFile();
   }
 
+  void setApplicationFileName(std::string appFileName) {
+    m_applicationFileName = appFileName;
+    setWorkingDirectory();
+  }
+  std::string getApplicationFileName() { return m_applicationFileName; }
   std::string getApplicationName() { return m_version.getAppName(); }
   std::string getApplicationVersion() { return m_applicationVersion; }
   std::string getApplicationVersionWithoutRevision() {
@@ -223,6 +231,24 @@ public:
         TFilePath(m_workingDirectory + "\\portablestuff\\");
     TFileStatus portableStatus(portableCheck);
     m_isPortable = portableStatus.doesExist();
+
+#ifdef MACOSX
+    // macOS 10.12 (Sierra) translocates applications before running them
+    // depending on how it was installed. This separates the app from the
+    // portablestuff folder and we don't know where it is so we stop treating it
+    // as a portable. Placing portablestuff inside OpenToonz.app will keep
+    // everything together when it translocates.
+    if (!m_isPortable) {
+      portableCheck =
+          TFilePath(m_workingDirectory + "\\" + getApplicationFileName() +
+                    ".app\\portablestuff\\");
+      portableStatus = TFileStatus(portableCheck);
+      m_isPortable   = portableStatus.doesExist();
+      if (m_isPortable)
+        m_workingDirectory =
+            portableCheck.getParentDir().getQString().toStdString();
+    }
+#endif
   }
   std::string getWorkingDirectory() { return m_workingDirectory; }
 
@@ -443,7 +469,7 @@ Variable::Variable(std::string name)
 Variable::Variable(std::string name, std::string defaultValue)
     : m_imp(VariableSet::instance()->getImp(name)) {
   // assert(!m_imp->m_defaultDefined);
-  m_imp->m_defaultDefined              = true;
+  m_imp->m_defaultDefined = true;
   if (!m_imp->m_loaded) m_imp->m_value = defaultValue;
 }
 
@@ -475,6 +501,22 @@ void Variable::assignValue(std::string value) {
 }
 
 //===================================================================
+
+void TEnv::setApplicationFileName(std::string appFileName) {
+  TFilePath fp(appFileName);
+#ifdef MACOSX
+  if (fp.getWideName().find(L".app"))
+    for (int i = 0; i < 3; i++) fp = fp.getParentDir();
+#elif LINUX
+  if (fp.getWideName().find(L".appimage"))
+    for (int i = 0; i < 2; i++) fp = fp.getParentDir();
+#endif
+  EnvGlobals::instance()->setApplicationFileName(fp.getName());
+}
+
+std::string TEnv::getApplicationFileName() {
+  return EnvGlobals::instance()->getApplicationFileName();
+}
 
 std::string TEnv::getApplicationName() {
   return EnvGlobals::instance()->getApplicationName();
@@ -524,11 +566,11 @@ TFilePathSet TEnv::getSystemVarPathSetValue(std::string varName) {
   TFilePathSet lst;
   EnvGlobals *eg = EnvGlobals::instance();
   // if the path is registered by command line argument, then use it
-  std::string value      = eg->getArgPathValue(varName);
+  std::string value = eg->getArgPathValue(varName);
   if (value == "") value = eg->getSystemVarValue(varName);
-  int len                = (int)value.size();
-  int i                  = 0;
-  int j                  = value.find(';');
+  int len = (int)value.size();
+  int i   = 0;
+  int j   = value.find(';');
   while (j != std::string::npos) {
     std::string s = value.substr(i, j - i);
     lst.push_back(TFilePath(s));

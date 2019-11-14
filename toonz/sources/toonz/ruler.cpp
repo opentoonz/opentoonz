@@ -248,36 +248,44 @@ double Ruler::posToValue(const QPoint &p) const {
 //-----------------------------------------------------------------------------
 
 void Ruler::mousePressEvent(QMouseEvent *e) {
-  if (e->button() == Qt::LeftButton) {
-    Guides &guides  = getGuides();
-    double v        = posToValue(e->pos());
-    m_hiding        = false;
-    m_moving        = false;
-    int selected    = -1;
-    double minDist2 = 0;
-    int i;
-    int count = guides.size();
-    for (i = 0; i < count; i++) {
-      double g     = guides[i] / (double)getDevPixRatio();
-      double dist2 = (g - v) * (g - v);
-      if (selected < 0 || dist2 < minDist2) {
-        minDist2 = dist2;
-        selected = i;
-      }
+  if (e->button() != Qt::LeftButton && e->button() != Qt::RightButton) return;
+  Guides &guides  = getGuides();
+  double v        = posToValue(e->pos());
+  m_hiding        = false;
+  m_moving        = false;
+  int selected    = -1;
+  double minDist2 = 0;
+  int i;
+  int count = guides.size();
+  for (i = 0; i < count; i++) {
+    double g     = guides[i] / (double)getDevPixRatio();
+    double dist2 = (g - v) * (g - v);
+    if (selected < 0 || dist2 < minDist2) {
+      minDist2 = dist2;
+      selected = i;
     }
+  }
+  if (e->button() == Qt::LeftButton) {
     if (selected < 0 || minDist2 > 25) {
       // crea una nuova guida
       guides.push_back(v * getDevPixRatio());
       m_viewer->update();
       // aggiorna sprop!!!!
-    } else {
-      // muove la guida vecchia
-      if (selected < count - 1) std::swap(guides[selected], guides.back());
-      // aggiorna sprop!!!!
-    }
+    } else if (selected < count - 1)
+      std::swap(guides[selected], guides.back());
+
     m_moving = true;
     update();
     assert(guides.size() > 0);
+  } else if (e->button() == Qt::RightButton) {
+    if (selected < count - 1) std::swap(guides[selected], guides.back());
+    if (count > 0 && minDist2 <= 25) {
+      assert(!guides.empty());
+      guides.pop_back();
+      update();
+      m_viewer->update();
+      return;
+    }
   }
 }
 
@@ -293,25 +301,26 @@ void Ruler::mouseMoveEvent(QMouseEvent *e) {
     return;
   }
 
-  Guides &guides  = getGuides();
-  double v        = posToValue(e->pos());
-  m_hiding        = false;
-  m_moving        = false;
-  double minDist2 = 5;
-  int i;
+  Guides &guides = getGuides();
+  double v       = posToValue(e->pos());
+  m_hiding       = false;
+  m_moving       = false;
+
   int count = guides.size();
-  for (i = 0; i < count; i++) {
+  for (int i = 0; i < count; i++) {
     double g     = guides[i] / (double)getDevPixRatio();
     double dist2 = (g - v) * (g - v);
-    if (dist2 < minDist2)
-      setToolTip(tr("Click and drag to move guide"));
-    else {
-      if (m_vertical)
-        setToolTip(tr("Click to create an horizontal guide"));
-      else
-        setToolTip(tr("Click to create a vertical guide"));
+    if (dist2 < 25) {
+      setToolTip(
+          tr("Left click and drag to move guide. Right click to delete guide"));
+      return;
     }
   }
+  // in case no guides are found near the cursor
+  if (m_vertical)
+    setToolTip(tr("Click to create an horizontal guide"));
+  else
+    setToolTip(tr("Click to create a vertical guide"));
 }
 
 //-----------------------------------------------------------------------------

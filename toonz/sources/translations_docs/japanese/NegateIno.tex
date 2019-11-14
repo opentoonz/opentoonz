@@ -1,0 +1,48 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[a4paper, total={180mm, 272mm}]{geometry}
+
+\usepackage{fontspec}
+\setmainfont[Path=fonts/, Extension=.ttf]{ipaexm}
+
+\setlength\parindent{3.5em}
+\setlength\parskip{0em}
+\renewcommand{\baselinestretch}{1.247}
+
+\begin{document}
+
+\thispagestyle{empty}
+
+\Large
+\noindent \\
+Negate Ino\medskip
+\par
+\normalsize
+絵の色チャンネルごとに反転します。\\
+\par
+\ \ 8bits 画像: 0-{-}> \ \ \ 255、1-{-}> \ \ \, 254、... \ \ \ \ 254-{-}>1、 \ \ \, 255-{-}>0\par
+16bits 画像: 0-{-}>65535、1-{-}>65534、... 65534-{-}>1、65535-{-}>0\par
+という様に値が反転します。\\
+\par
+Alpha値があるとき、その Alpha値に対して反転します。\par
+Alphaが \ \ \ 0: 0-{-}> \ \ \, 0、1-{-}> \ \ \ 0、... 254-{-}>0、255-{-}>0\par
+Alphaが128: 0-{-}>128、1-{-}>127、... 127-{-}>1、128-{-}>0、...255-{-}>0\par
+Alphaが255: 0-{-}>255、1-{-}>254、... 254-{-}>1、255-{-}>0\par
+となり、これによりセル画像は正常に反転します。\\
+\\
+-{-}- \ 入力 \ -{-}-\\
+Source\par
+処理をする画像を接続します。\\
+\\
+-{-}- \ 設定 \ -{-}-\\
+各色チャンネル毎に反転するかどうか指定します。\\
+\\
+Red \ \ \ \, 赤チャンネル反転スイッチ\\
+Green \ 緑チャンネル反転スイッチ\\
+Blue \ \ \, 青チャンネル反転スイッチ\\
+Alpha \ \ Alphaチャンネル反転スイッチ\\
+\\
+OFF ではそのチャンネルには何もしません。\\
+ON で、対象チャンネルを反転します。\\
+初期値は、Red,Green,Blue が ON、Alphaが OFF、です。
+
+\end{document}

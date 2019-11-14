@@ -221,8 +221,10 @@ void LayerHeaderPanel::mouseReleaseEvent(QMouseEvent *event) {
   bool sound_changed = false;
 
   if (m_doOnRelease != 0 && totcols > 0) {
-    for (col = 0; col < totcols; col++) {
-      if (!xsh->isColumnEmpty(col)) {
+    int startCol =
+        Preferences::instance()->isXsheetCameraColumnVisible() ? -1 : 0;
+    for (col = startCol; col < totcols; col++) {
+      if (startCol < 0 || !xsh->isColumnEmpty(col)) {
         TXshColumn *column = xsh->getColumn(col);
 
         if (m_doOnRelease == ToggleAllPreviewVisible) {

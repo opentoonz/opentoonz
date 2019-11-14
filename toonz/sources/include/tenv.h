@@ -93,6 +93,12 @@ public:
 DVAPI std::string getApplicationName();
 DVAPI std::string getApplicationVersion();
 
+// This are for the case where the file name of application changes and doesn't
+// match actual application name and we want to keep both. We will need that for
+// some stuff
+DVAPI void setApplicationFileName(std::string appFileName);
+DVAPI std::string getApplicationFileName();
+
 DVAPI bool getIsPortable();
 
 // es.: TEnv::setModuleFullName("Toonz 5.0.1 Harlequin");

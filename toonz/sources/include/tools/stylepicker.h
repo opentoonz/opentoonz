@@ -60,11 +60,12 @@ public:
   int pickStyleId(const TPointD &point, double radius2 = 1, int mode = 2) const;
 
   /*--- Toonz Raster LevelのToneを拾う。 ---*/
-  int pickTone(const TPointD &pos);
+  int pickTone(const TPointD &pos) const;
 
   // per pli come sopra, ma ritorna il maincolor
   // per tzp e fullcolor ritorna il colore effettivo del pixel
   TPixel32 pickColor(const TPointD &point, double radius2 = 1) const;
+  TPixel32 pickAverageColor(const TRectD &rect) const;
 
   // ritorna il colore medio presente nell'area della finestra corrente openGL
   TPixel32 pickColor(const TRectD &area) const;

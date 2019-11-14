@@ -469,7 +469,7 @@ TXshColumn::ColumnType TXshColumn::toColumnType(int levelType) {
   else if (levelType == MESH_XSHLEVEL)
     colType = TXshColumn::eMeshType;
   else
-    assert(!"Unkown level type!");
+    assert(!"Unknown level type!");
 
   return colType;
 }

@@ -18,6 +18,7 @@
 #include "toonz/txshcell.h"
 #include "toonz/levelproperties.h"
 #include "orientation.h"
+#include "toonz/preferences.h"
 
 // TnzCore includes
 #include "tvectorimage.h"
@@ -48,7 +49,6 @@ void TColumnSelection::enableCommands() {
   enableCommand(this, MI_Resequence, &TColumnSelection::resequence);
   enableCommand(this, MI_CloneChild, &TColumnSelection::cloneChild);
   enableCommand(this, MI_FoldColumns, &TColumnSelection::hideColumns);
-
   enableCommand(this, MI_Reframe1, &TColumnSelection::reframe1Cells);
   enableCommand(this, MI_Reframe2, &TColumnSelection::reframe2Cells);
   enableCommand(this, MI_Reframe3, &TColumnSelection::reframe3Cells);
@@ -63,7 +63,10 @@ bool TColumnSelection::isEmpty() const { return m_indices.empty(); }
 
 //-----------------------------------------------------------------------------
 
-void TColumnSelection::copyColumns() { ColumnCmd::copyColumns(m_indices); }
+void TColumnSelection::copyColumns() {
+  m_indices.erase(-1);  // Ignore camera column
+  ColumnCmd::copyColumns(m_indices);
+}
 
 //-----------------------------------------------------------------------------
 // pasteColumns will insert columns before the first column in the selection
@@ -71,6 +74,8 @@ void TColumnSelection::pasteColumns() {
   std::set<int> indices;
   if (isEmpty())  // in case that no columns are selected
     indices.insert(0);
+  else if (*m_indices.begin() < 0)  // Do nothing
+    return;
   else
     indices.insert(*m_indices.begin());
   ColumnCmd::pasteColumns(indices);
@@ -114,6 +119,7 @@ void TColumnSelection::insertColumnsAbove() {
 
 //-----------------------------------------------------------------------------
 void TColumnSelection::collapse() {
+  m_indices.erase(-1);  // Ignore camera column
   if (m_indices.empty()) return;
   SubsceneCmd::collapse(m_indices);
 }
@@ -130,7 +136,10 @@ void TColumnSelection::explodeChild() {
 static bool canMergeColumns(int column, int mColumn, bool forMatchlines) {
   TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
 
-  if (xsh->getColumn(column)->isLocked()) return false;
+  if (column < 0 || mColumn < 0) return false;
+
+  if (!xsh || !xsh->getColumn(column) || xsh->getColumn(column)->isLocked())
+    return false;
 
   int start, end;
   xsh->getCellRange(column, start, end);
@@ -196,6 +205,8 @@ void TColumnSelection::selectColumn(int col, bool on) {
 
   std::set<int>::iterator it = m_indices.begin();
   int firstCol               = *it;
+
+  if (firstCol < 0) return;
 
   for (++it; it != m_indices.end(); ++it)
     if (!canMergeColumns(firstCol, *it, false)) break;

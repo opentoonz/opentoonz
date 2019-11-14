@@ -78,9 +78,9 @@ static TPointD rectify(const TPointD &oldPos, const TPointD &pos) {
   const TPointD directions[] = {TPointD(1, 0),  TPointD(h, h),  TPointD(0, 1),
                                 TPointD(-h, h), TPointD(-1, 0), TPointD(-h, -h),
                                 TPointD(0, -1), TPointD(h, -h)};
-  TPointD v        = pos - oldPos;
-  int j            = 0;
-  double bestValue = v * directions[j];
+  TPointD v                  = pos - oldPos;
+  int j                      = 0;
+  double bestValue           = v * directions[j];
   for (int k = 1; k < 8; k++) {
     double value = v * directions[k];
     if (value > bestValue) {
@@ -518,7 +518,7 @@ TPointD Primitive::calculateSnap(TPointD pos) {
         else if (areAlmostEqual(outW, 1.0, 1e-3))
           m_param->m_w1 = 1.0;
         else
-          m_param->m_w1      = outW;
+          m_param->m_w1 = outW;
         TThickPoint point1   = stroke->getPoint(m_param->m_w1);
         snapPoint            = TPointD(point1.x, point1.y);
         m_param->m_foundSnap = true;
@@ -852,10 +852,10 @@ public:
   void leftButtonDown(const TPointD &p, const TMouseEvent &e) override {
     /* m_active = getApplication()->getCurrentObject()->isSpline() ||
    (bool) getImage(true);*/
-
-    m_active = touchImage();  // NEEDS to be done even if(m_active), due
-    if (!m_active)            // to the HORRIBLE m_frameCreated / m_levelCreated
-      return;                 // mechanism. touchImage() is the ONLY function
+    if (!getApplication()->getCurrentObject()->isSpline())
+      m_active = touchImage();  // NEEDS to be done even if(m_active), due
+    if (!m_active)  // to the HORRIBLE m_frameCreated / m_levelCreated
+      return;       // mechanism. touchImage() is the ONLY function
     // resetting them to false...                       >_<
     if (m_primitive) m_primitive->leftButtonDown(p, e);
     invalidate();
@@ -1092,11 +1092,11 @@ public:
           m_primitive->setIsPrompting(false);
           if (ret == 2 || ret == 0) return;
         }
+        QMutexLocker lock(vi->getMutex());
         TUndo *undo = new UndoPath(
             getXsheet()->getStageObject(getObjectId())->getSpline());
         while (vi->getStrokeCount() > 0) vi->deleteStroke(0);
         vi->addStroke(stroke, false);
-        notifyImageChanged();
         TUndoManager::manager()->add(undo);
       } else {
         int styleId = TTool::getApplication()->getCurrentLevelStyleIndex();
@@ -1293,7 +1293,7 @@ void RectanglePrimitive::leftButtonDown(const TPointD &pos,
     else
       m_startPoint = TPointD((int)pos.x + 0.5, (int)pos.y + 0.5);
   } else
-    m_startPoint     = newPos;
+    m_startPoint = newPos;
   m_selectingRect.x0 = m_startPoint.x;
   m_selectingRect.y0 = m_startPoint.y;
   m_selectingRect.x1 = m_startPoint.x;
@@ -1430,7 +1430,7 @@ void RectanglePrimitive::onEnter() {
     m_color = TPixel32::Red;
   else {
     const TColorStyle *style = app->getCurrentLevelStyle();
-    if (style) m_color       = style->getAverageColor();
+    if (style) m_color = style->getAverageColor();
   }
 }
 
@@ -1518,7 +1518,7 @@ void CirclePrimitive::onEnter() {
     m_color = TPixel32::Red;
   else {
     const TColorStyle *style = app->getCurrentLevelStyle();
-    if (style) m_color       = style->getAverageColor();
+    if (style) m_color = style->getAverageColor();
   }
 }
 
@@ -1701,7 +1701,7 @@ void MultiLinePrimitive::leftButtonDown(const TPointD &pos,
   newPos = getSnap(pos);
 
   // Se clicco nell'ultimo vertice chiudo la linea.
-  TPointD _pos       = pos;
+  TPointD _pos = pos;
   if (m_closed) _pos = m_vertex.front();
 
   if (e.isShiftPressed() && !m_vertex.empty())
@@ -1719,9 +1719,8 @@ void MultiLinePrimitive::leftButtonDown(const TPointD &pos,
 void MultiLinePrimitive::leftButtonDrag(const TPointD &pos,
                                         const TMouseEvent &e) {
   if (m_vertex.size() == 0 || m_isSingleLine) return;
-  if (m_speedMoved ||
-      tdistance2(m_vertex[m_vertex.size() - 1], pos) >
-          sq(7.0 * m_tool->getPixelSize())) {
+  if (m_speedMoved || tdistance2(m_vertex[m_vertex.size() - 1], pos) >
+                          sq(7.0 * m_tool->getPixelSize())) {
     moveSpeed(m_mousePosition - pos);
     m_speedMoved = true;
     m_undo->setNewVertex(m_vertex);
@@ -1866,7 +1865,7 @@ void MultiLinePrimitive::onEnter() {
     m_color = TPixel32::Red;
   else {
     const TColorStyle *style = app->getCurrentLevelStyle();
-    if (style) m_color       = style->getAverageColor();
+    if (style) m_color = style->getAverageColor();
   }
 }
 
@@ -2067,8 +2066,9 @@ TStroke *EllipsePrimitive::makeStroke() const {
     return 0;
 
   return makeEllipticStroke(
-      getThickness(), TPointD(0.5 * (m_selectingRect.x0 + m_selectingRect.x1),
-                              0.5 * (m_selectingRect.y0 + m_selectingRect.y1)),
+      getThickness(),
+      TPointD(0.5 * (m_selectingRect.x0 + m_selectingRect.x1),
+              0.5 * (m_selectingRect.y0 + m_selectingRect.y1)),
       fabs(0.5 * (m_selectingRect.x1 - m_selectingRect.x0)),
       fabs(0.5 * (m_selectingRect.y1 - m_selectingRect.y0)));
 }
@@ -2100,7 +2100,7 @@ void EllipsePrimitive::onEnter() {
     m_color = TPixel32::Red;
   } else {
     const TColorStyle *style = app->getCurrentLevelStyle();
-    if (style) m_color       = style->getAverageColor();
+    if (style) m_color = style->getAverageColor();
   }
 }
 
@@ -2250,7 +2250,7 @@ void ArcPrimitive::onEnter() {
     m_color = TPixel32::Red;
   else {
     const TColorStyle *style = app->getCurrentLevelStyle();
-    if (style) m_color       = style->getAverageColor();
+    if (style) m_color = style->getAverageColor();
   }
 }
 

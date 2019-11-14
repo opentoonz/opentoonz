@@ -460,6 +460,64 @@ void ChennelCurveEditor::removeCurrentControlPoint() {
 
 //-----------------------------------------------------------------------------
 
+void ChennelCurveEditor::selectNextControlPoint()
+{
+  int controlPointCount = (int)m_points.size();
+
+  if (controlPointCount == 0)
+    return;
+
+  int firstVisibleControlPoint = 3;
+  int lastVisibleControlPoint = m_points.size() - 4;
+
+  m_currentControlPointIndex++;
+  if (m_currentControlPointIndex < firstVisibleControlPoint || m_currentControlPointIndex > lastVisibleControlPoint)
+    m_currentControlPointIndex = firstVisibleControlPoint;
+
+  update();
+}
+
+//-----------------------------------------------------------------------------
+
+void ChennelCurveEditor::selectPreviousControlPoint()
+{
+  int controlPointCount = (int)m_points.size();
+
+  if (controlPointCount == 0)
+    return;
+
+  int firstVisibleControlPoint = 3;
+  int lastVisibleControlPoint = m_points.size() - 4;
+
+  m_currentControlPointIndex--;
+  if (m_currentControlPointIndex < firstVisibleControlPoint || m_currentControlPointIndex > lastVisibleControlPoint)
+    m_currentControlPointIndex = lastVisibleControlPoint;
+
+  update();
+}
+
+//-----------------------------------------------------------------------------
+
+void ChennelCurveEditor::moveCurrentControlPointUp()
+{
+  if (m_currentControlPointIndex < 0)
+    return;
+
+  moveCurrentControlPoint(QPointF(0, -10));
+}
+
+//-----------------------------------------------------------------------------
+
+void ChennelCurveEditor::moveCurrentControlPointDown()
+{
+  if (m_currentControlPointIndex < 0)
+    return;
+
+  moveCurrentControlPoint(QPointF(0, 10));
+}
+
+//-----------------------------------------------------------------------------
+
 void ChennelCurveEditor::removeControlPoint(int index) {
   // Non posso eliminare il primo punto di controllo visibile quindi lo rimetto
   // in condizione iniziale
@@ -681,6 +739,10 @@ void ChennelCurveEditor::mouseReleaseEvent(QMouseEvent *e) {
 
 void ChennelCurveEditor::keyPressEvent(QKeyEvent *e) {
   if (e->key() == Qt::Key_Delete) removeCurrentControlPoint();
+  if (e->key() == Qt::Key_Right) selectNextControlPoint();
+  if (e->key() == Qt::Key_Left) selectPreviousControlPoint();
+  if (e->key() == Qt::Key_Up) moveCurrentControlPointUp();
+  if (e->key() == Qt::Key_Down) moveCurrentControlPointDown();
 }
 
 //-----------------------------------------------------------------------------

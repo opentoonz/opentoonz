@@ -63,14 +63,15 @@ StylePickerTool::StylePickerTool()
 void StylePickerTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
   m_oldStyleId = m_currentStyleId =
       getApplication()->getCurrentLevelStyleIndex();
-  pick(pos, e);
+  pick(pos, e, false);
 }
 
 void StylePickerTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
   pick(pos, e);
 }
 
-void StylePickerTool::pick(const TPointD &pos, const TMouseEvent &e) {
+void StylePickerTool::pick(const TPointD &pos, const TMouseEvent &e,
+                           bool isDragging) {
   // Area = 0, Line = 1, All = 2
   int modeValue = m_colorType.getIndex();
 
@@ -132,7 +133,8 @@ void StylePickerTool::pick(const TPointD &pos, const TMouseEvent &e) {
                 ->getSelection()
                 ->selectNone();
           /*-- StyleIdの移動 --*/
-          getApplication()->setCurrentLevelStyleIndex(superPicked_StyleId);
+          getApplication()->setCurrentLevelStyleIndex(superPicked_StyleId,
+                                                      !isDragging);
           return;
         }
       }
@@ -181,7 +183,12 @@ void StylePickerTool::pick(const TPointD &pos, const TMouseEvent &e) {
     if (styleSelection) styleSelection->selectNone();
   }
 
-  getApplication()->setCurrentLevelStyleIndex(styleId);
+  // When clicking and switching between studio palette and level palette, the
+  // signal broadcastColorStyleSwitched is not emitted if the picked style is
+  // previously selected one.
+  // Therefore here I set the "forceEmit" flag to true in order to emit the
+  // signal whenever the picking with mouse press.
+  getApplication()->setCurrentLevelStyleIndex(styleId, !isDragging);
 }
 
 void StylePickerTool::mouseMove(const TPointD &pos, const TMouseEvent &e) {

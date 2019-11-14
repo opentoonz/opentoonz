@@ -105,14 +105,16 @@ public:
     m_affine.a13 = m_affine.a23 = 0;
   }
 
-  void leftButtonDrag(const TPointD &pos, const TMouseEvent &) override {
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) override {
     if (m_lockCenterX && m_lockCenterY) return;
     double factor = 1.0 / Stage::inch;
+    // precise control with pressing Alt key
+    if (e.isAltPressed()) factor *= 0.1;
     TPointD delta = pos - m_firstPos;
     if (m_lockCenterX)
       delta = TPointD(0.0, delta.y);
     else if (m_lockCenterY)
-      delta  = TPointD(delta.x, 0.0);
+      delta = TPointD(delta.x, 0.0);
     m_center = m_oldCenter + (m_affine * delta) * factor;
     TTool::getApplication()
         ->getCurrentTool()
@@ -276,6 +278,8 @@ public:
         delta.x = 0;
     }
     double factor = 1.0 / Stage::inch;
+    // precise control with pressing Alt key
+    if (e.isAltPressed()) factor *= 0.1;
     setValues(getOldValue(0) + delta.x * factor,
               getOldValue(1) + delta.y * factor);
   }
@@ -389,7 +393,7 @@ public:
     m_center   = getCenter();
     start();
   }
-  void leftButtonDrag(const TPointD &pos, const TMouseEvent &) override {
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) override {
     if (m_lockRotation) return;
     TPointD a = m_lastPos - m_center;
     TPointD b = pos - m_center;
@@ -408,6 +412,8 @@ a = m_viewer->mouseToTool(gc) - m_curCenter;
     if (a2 < eps || b2 < eps) return;
 
     double dang = asin(cross(a, b) / sqrt(a2 * b2)) * M_180_PI;
+    // precise control with pressing Alt key
+    if (e.isAltPressed()) dang *= 0.1;
     setValue(getValue(0) + dang);
   }
 };
@@ -441,6 +447,8 @@ public:
     // TPointD a = m_firstPos - m_center;
     double r1 = norm(pos - m_center);
     if (r1 < 0.0001) return;
+    // precise control with pressing Alt key
+    if (e.isAltPressed()) r1 = m_r0 + (r1 - m_r0) * 0.1;
     setValue(getOldValue(0) * r1 / m_r0);
   }
 };
@@ -480,9 +488,9 @@ public:
     const double eps = 1e-8;
     if (norm2(a) < eps || norm2(b) < eps) return;
 
-    double fx            = b.x / a.x;
+    double fx = b.x / a.x;
     if (fabs(fx) > 1) fx = tsign(fx) * sqrt(abs(fx));
-    double fy            = b.y / a.y;
+    double fy = b.y / a.y;
     if (fabs(fy) > 1) fy = tsign(fy) * sqrt(abs(fy));
 
     int constraint = m_constraint;
@@ -503,11 +511,15 @@ public:
       fy = byax / bxay;
     }
     if (fabs(fx) > eps && fabs(fy) > eps) {
-      double oldv0                   = getOldValue(0);
-      double oldv1                   = getOldValue(1);
+      double oldv0 = getOldValue(0);
+      double oldv1 = getOldValue(1);
       if (fabs(oldv0) < 0.001) oldv0 = 0.001;
       if (fabs(oldv1) < 0.001) oldv1 = 0.001;
-
+      // precise control with pressing Alt key
+      if (e.isAltPressed()) {
+        fx = 1.0 + (fx - 1.0) * 0.1;
+        fy = 1.0 + (fy - 1.0) * 0.1;
+      }
       double valueX = oldv0 * fx;
       double valueY = oldv1 * fy;
       if (m_lockScaleH)
@@ -560,6 +572,11 @@ public:
       else
         fx = 0;
     }
+    // precise control with pressing Alt key
+    if (e.isAltPressed()) {
+      fx *= 0.1;
+      fy *= 0.1;
+    }
     setValues(getOldValue(0) + 0.01 * fx, getOldValue(1) + 0.01 * fy);
   }
 };
@@ -586,6 +603,8 @@ public:
   }
   void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) override {
     double dz = m_viewer->projectToZ(e.m_pos - m_lastPos);
+    // precise control with pressing Alt key
+    if (e.isAltPressed()) dz *= 0.1;
     m_lastPos = e.m_pos;
     if (dz != 0.0) {
       m_dz += dz;
@@ -638,6 +657,8 @@ class EditTool final : public TTool {
 
   double m_currentScaleFactor;
   FxGadgetController *m_fxGadgetController;
+
+  bool m_isAltPressed;
 
   TEnumProperty m_scaleConstraint;
   TEnumProperty m_autoSelect;
@@ -752,7 +773,8 @@ EditTool::EditTool()
     , m_showCenterPosition("Center Position", true)
     , m_dragTool(0)
     , m_firstTime(true)
-    , m_activeAxis("Active Axis") {
+    , m_activeAxis("Active Axis")
+    , m_isAltPressed(false) {
   bind(TTool::AllTargets);
   m_prop.bind(m_scaleConstraint);
   m_prop.bind(m_autoSelect);
@@ -907,6 +929,9 @@ void EditTool::mouseMove(const TPointD &, const TMouseEvent &e) {
     m_fxGadgetController->selectById(selectedDevice);
     invalidate();
   }
+
+  // for adding decoration to the cursor while pressing Alt key
+  m_isAltPressed = e.isAltPressed();
 }
 
 //-----------------------------------------------------------------------------
@@ -1417,7 +1442,7 @@ void EditTool::draw() {
     tglColor(normalColor);
     glPushMatrix();
     TStageObjectId currentCamId =
-        xsh->getStageObjectTree()->getCurrentCameraId();
+        TStageObjectId::CameraId(xsh->getCameraColumnIndex());
     TAffine camParentAff = xsh->getParentPlacement(currentCamId, frame);
     TAffine camAff       = xsh->getPlacement(currentCamId, frame);
     tglMultMatrix(camParentAff.inv() *
@@ -1553,9 +1578,12 @@ m_foo.setFxHandle(getApplication()->getCurrentFx());
 
   TStageObjectId objId = getObjectId();
   if (objId == TStageObjectId::NoneId) {
-    int index              = getColumnIndex();
-    if (index == -1) objId = TStageObjectId::CameraId(0);
-    objId                  = TStageObjectId::ColumnId(index);
+    int index    = getColumnIndex();
+    TXsheet *xsh = TTool::getApplication()->getCurrentXsheet()->getXsheet();
+    if (index == -1)
+      objId = TStageObjectId::CameraId(xsh->getCameraColumnIndex());
+    else
+      objId = TStageObjectId::ColumnId(index);
   }
   TTool::getApplication()->getCurrentObject()->setObjectId(objId);
 }
@@ -1644,56 +1672,62 @@ bool EditTool::onPropertyChanged(std::string propertyName) {
 //-----------------------------------------------------------------------------
 
 int EditTool::getCursorId() const {
-  /*--- FxParameter操作中のカーソル ---*/
-  if (m_highlightedDevice >= 1000) return ToolCursor::FxGadgetCursor;
-
-  /*--- カーソルをアクティブな軸に応じて選ぶ --*/
-  std::wstring activeAxis = m_activeAxis.getValue();
-  if (activeAxis == L"Position") {
-    if (m_highlightedDevice == ZTranslation)
-      return ToolCursor::MoveZCursor;
-    else if (LockPositionX && LockPositionY)
-      return ToolCursor::DisableCursor;
-    else if (LockPositionX)
-      return ToolCursor::MoveNSCursor;
-    else if (LockPositionY)
-      return ToolCursor::MoveEWCursor;
-    else
-      return ToolCursor::MoveCursor;
-  } else if (activeAxis == L"Rotation") {
-    return ToolCursor::RotCursor;
-  } else if (activeAxis == L"Scale") {
-    if (m_highlightedDevice == ScaleXY) {
-      if (LockScaleH && LockScaleV)
+  int ret;
+  // cursor for controling the fx gadget
+  if (m_highlightedDevice >= 1000)
+    ret = ToolCursor::FxGadgetCursor;
+  else {
+    // switch cursors depending on the active axis
+    std::wstring activeAxis = m_activeAxis.getValue();
+    if (activeAxis == L"Position") {
+      if (m_highlightedDevice == ZTranslation)
+        ret = ToolCursor::MoveZCursor;
+      else if (LockPositionX && LockPositionY)
         return ToolCursor::DisableCursor;
-      else if (LockScaleH)
-        return ToolCursor::ScaleVCursor;
-      else if (LockScaleV)
-        return ToolCursor::ScaleHCursor;
+      else if (LockPositionX)
+        ret = ToolCursor::MoveNSCursor;
+      else if (LockPositionY)
+        ret = ToolCursor::MoveEWCursor;
       else
-        return ToolCursor::ScaleHVCursor;
+        ret = ToolCursor::MoveCursor;
+    } else if (activeAxis == L"Rotation") {
+      ret = ToolCursor::RotCursor;
+    } else if (activeAxis == L"Scale") {
+      if (m_highlightedDevice == ScaleXY) {
+        if (LockScaleH && LockScaleV)
+          return ToolCursor::DisableCursor;
+        else if (LockScaleH)
+          ret = ToolCursor::ScaleVCursor;
+        else if (LockScaleV)
+          ret = ToolCursor::ScaleHCursor;
+        else
+          ret = ToolCursor::ScaleHVCursor;
+      } else
+        ret = ToolCursor::ScaleGlobalCursor;
+    } else if (activeAxis == L"Shear") {
+      if (LockShearH && LockShearV)
+        return ToolCursor::DisableCursor;
+      else if (LockShearH)
+        ret = ToolCursor::ScaleVCursor;
+      else if (LockShearV)
+        ret = ToolCursor::ScaleHCursor;
+      else
+        ret = ToolCursor::ScaleCursor;
+    } else if (activeAxis == L"Center") {
+      if (LockCenterX && LockCenterY)
+        return ToolCursor::DisableCursor;
+      else if (LockCenterX)
+        ret = ToolCursor::MoveNSCursor;
+      else if (LockCenterY)
+        ret = ToolCursor::MoveEWCursor;
+      else
+        ret = ToolCursor::MoveCursor;
     } else
-      return ToolCursor::ScaleGlobalCursor;
-  } else if (activeAxis == L"Shear") {
-    if (LockShearH && LockShearV)
-      return ToolCursor::DisableCursor;
-    else if (LockShearH)
-      return ToolCursor::ScaleVCursor;
-    else if (LockShearV)
-      return ToolCursor::ScaleHCursor;
-    else
-      return ToolCursor::ScaleCursor;
-  } else if (activeAxis == L"Center") {
-    if (LockCenterX && LockCenterY)
-      return ToolCursor::DisableCursor;
-    else if (LockCenterX)
-      return ToolCursor::MoveNSCursor;
-    else if (LockCenterY)
-      return ToolCursor::MoveEWCursor;
-    else
-      return ToolCursor::MoveCursor;
-  } else
-    return ToolCursor::StrokeSelectCursor;
+      ret = ToolCursor::StrokeSelectCursor;
+  }
+  // precise control with pressing Alt key
+  if (m_isAltPressed) ret = ret | ToolCursor::Ex_Precise;
+  return ret;
 }
 
 //=============================================================================

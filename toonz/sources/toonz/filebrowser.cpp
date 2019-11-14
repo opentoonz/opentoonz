@@ -579,6 +579,17 @@ void FileBrowser::refreshCurrentFolderItems() {
     }
     TFilePathSet::iterator it;
     for (it = files.begin(); it != files.end(); ++it) {
+#ifdef _WIN32
+      // include folder shortcut items
+      if (it->getType() == "lnk") {
+        TFileStatus info(*it);
+        if (info.isLink() && info.isDirectory()) {
+          m_items.push_back(
+              Item(*it, true, true, QString::fromStdString((*it).getName())));
+        }
+        continue;
+      }
+#endif
       // skip the plt file (Palette file for TOONZ 4.6 and earlier)
       if (it->getType() == "plt") continue;
 
@@ -733,6 +744,17 @@ void FileBrowser::setUnregisteredFolder(const TFilePath &fp) {
     }
 
     for (it = files.begin(); it != files.end(); ++it) {
+#ifdef _WIN32
+      // include folder shortcut items
+      if (it->getType() == "lnk") {
+        TFileStatus info(*it);
+        if (info.isLink() && info.isDirectory()) {
+          m_items.push_back(
+              Item(*it, true, true, QString::fromStdString((*it).getName())));
+        }
+        continue;
+      }
+#endif
       // skip the plt file (Palette file for TOONZ 4.6 and earlier)
       if (it->getType() == "plt") continue;
 
@@ -1328,6 +1350,10 @@ QMenu *FileBrowser::getContextMenu(QWidget *parent, int index) {
     }
 
     if (status == DvItemListModel::VC_Locked && files.size() == 1) {
+      action = vcMenu->addAction(tr("Unlock"));
+      ret    = ret && connect(action, SIGNAL(triggered()), this,
+                           SLOT(unlockVersionControl()));
+
       action = vcMenu->addAction(tr("Edit Info"));
       ret    = ret && connect(action, SIGNAL(triggered()), this,
                            SLOT(showLockInformation()));
@@ -2083,6 +2109,16 @@ void FileBrowser::refreshFolder(const TFilePath &folderPath) {
     if (browser->getFolder() == folderPath) {
       browser->setFolder(folderPath, false, true);
     }
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+void FileBrowser::updateItemViewerPanel() {
+  std::set<FileBrowser *>::iterator it;
+  for (it = activeBrowsers.begin(); it != activeBrowsers.end(); ++it) {
+    FileBrowser *browser = *it;
+    browser->m_itemViewer->getPanel()->update();
   }
 }
 

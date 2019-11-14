@@ -8,6 +8,7 @@
 #include "toonz/txshcolumn.h"
 #include "toonz/tstageobjectkeyframe.h"
 #include "toonz/stageobjectutil.h"
+#include "toonz/tapplication.h"
 
 #include "tpixelutils.h"
 #include "tfx.h"
@@ -35,7 +36,7 @@ using namespace std;
 //-----------------------------------------------------------------------------
 
 KeyframeNavigator::KeyframeNavigator(QWidget *parent, TFrameHandle *frameHandle)
-    : QToolBar(parent), m_frameHandle(frameHandle) {
+    : QToolBar(parent), m_frameHandle(frameHandle), m_panel(0) {
   setLayoutDirection(Qt::LeftToRight);
 
   setIconSize(QSize(18, 18));
@@ -124,6 +125,22 @@ void KeyframeNavigator::showEvent(QShowEvent *e) {
   update();
   if (!m_frameHandle) return;
   connect(m_frameHandle, SIGNAL(frameSwitched()), this, SLOT(update()));
+
+  connect(m_frameHandle, SIGNAL(triggerNextKeyframe(QWidget *)), this,
+          SLOT(onNextKeyframe(QWidget *)));
+  connect(m_frameHandle, SIGNAL(triggerPrevKeyframe(QWidget *)), this,
+          SLOT(onPrevKeyframe(QWidget *)));
+  if (!m_panel || m_panel == nullptr) {
+    QWidget *panel = this->parentWidget();
+    while (panel) {
+      if (panel->windowType() == Qt::WindowType::SubWindow ||
+          panel->windowType() == Qt::WindowType::Tool) {
+        m_panel = panel;
+        break;
+      }
+      panel = panel->parentWidget();
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -131,6 +148,22 @@ void KeyframeNavigator::showEvent(QShowEvent *e) {
 void KeyframeNavigator::hideEvent(QHideEvent *e) {
   if (!m_frameHandle) return;
   disconnect(m_frameHandle);
+
+  disconnect(m_frameHandle, SIGNAL(triggerNextKeyframe(QWidget *)), this,
+             SLOT(onNextKeyframe(QWidget *)));
+  disconnect(m_frameHandle, SIGNAL(triggerPrevKeyframe(QWidget *)), this,
+             SLOT(onPrevKeyframe(QWidget *)));
+  m_panel = nullptr;
+}
+
+void KeyframeNavigator::onNextKeyframe(QWidget *panel) {
+  if (!m_panel || m_panel != panel) return;
+  toggleNextKeyAct();
+}
+
+void KeyframeNavigator::onPrevKeyframe(QWidget *panel) {
+  if (!m_panel || m_panel != panel) return;
+  togglePrevKeyAct();
 }
 
 //=============================================================================

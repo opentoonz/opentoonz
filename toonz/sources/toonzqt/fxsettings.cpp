@@ -100,7 +100,7 @@ inputFx);
         }
 }
 */
-}
+}  // namespace
 
 //=============================================================================
 // ParamViewer
@@ -319,11 +319,9 @@ void ParamsPage::setPageField(TIStream &is, const TFxP &fx, bool isVertical) {
           QString::fromStdWString(TStringTable::translate(paramName1));
       QString str2 =
           QString::fromStdWString(TStringTable::translate(paramName2));
-      QString buttonStr = QString("Copy RGB : %1 > %2").arg(str1).arg(str2);
 
-      RgbLinkButton *linkBut = new RgbLinkButton(buttonStr, this, ppf1, ppf2);
-      linkBut->setFixedHeight(21);
-      connect(linkBut, SIGNAL(clicked()), linkBut, SLOT(onButtonClicked()));
+      RgbLinkButtons *linkBut =
+          new RgbLinkButtons(str1, str2, this, ppf1, ppf2);
 
       int currentRow = m_mainLayout->rowCount();
       m_mainLayout->addWidget(linkBut, currentRow, 1,
@@ -577,7 +575,7 @@ QSize getItemSize(QLayoutItem *item) {
   Histogram *histo = dynamic_cast<Histogram *>(item->widget());
   if (histo) return QSize(278, 162);
 
-  RgbLinkButton *linkBut = dynamic_cast<RgbLinkButton *>(item->widget());
+  RgbLinkButtons *linkBut = dynamic_cast<RgbLinkButtons *>(item->widget());
   if (linkBut) return QSize(0, 21);
 
   return QSize();
@@ -615,19 +613,19 @@ void updateMaximumPageSize(QGridLayout *layout, int &maxLabelWidth,
   /*-- Widget側の最適な縦サイズおよび横幅の最大値を得る --*/
   for (int r = 0; r < layout->rowCount(); r++) {
     /*-- Column1にある可能性のあるもの：ParamField, Histogram, Layout,
-     * RgbLinkButton --*/
+     * RgbLinkButtons --*/
 
     QLayoutItem *item = layout->itemAtPosition(r, 1);
     if (!item) continue;
 
-    QSize itemSize                                        = getItemSize(item);
+    QSize itemSize = getItemSize(item);
     if (maxWidgetWidth < itemSize.width()) maxWidgetWidth = itemSize.width();
     fieldsHeight += itemSize.height();
   }
 
   if (layout->rowCount() > 1) fieldsHeight += (layout->rowCount() - 1) * 10;
 }
-};
+};  // namespace
 
 QSize ParamsPage::getPreferedSize() {
   int maxLabelWidth  = 0;
@@ -873,7 +871,7 @@ void ParamsPageSet::createPage(TIStream &is, const TFxP &fx, int index) {
   std::string tagName;
   if (!is.matchTag(tagName) || tagName != "page")
     throw TException("expected <page>");
-  std::string pageName         = is.getTagAttribute("name");
+  std::string pageName = is.getTagAttribute("name");
   if (pageName == "") pageName = "page";
 
   ParamsPage *paramsPage = new ParamsPage(this, m_parent);
@@ -1127,7 +1125,7 @@ FxSettings::FxSettings(QWidget *parent, const TPixel32 &checkCol1,
   bool ret = true;
   ret      = ret && connect(m_paramViewer, SIGNAL(currentFxParamChanged()),
                        SLOT(updateViewer()));
-  ret = ret &&
+  ret      = ret &&
         connect(m_viewer, SIGNAL(pointPositionChanged(int, const TPointD &)),
                 SLOT(onPointChanged(int, const TPointD &)));
   ret = ret && connect(m_paramViewer, SIGNAL(preferedSizeChanged(QSize)), this,
@@ -1276,10 +1274,10 @@ void FxSettings::setFx(const TFxP &currentFx, const TFxP &actualFx) {
     TFxUtil::setKeyframe(currentFxWithoutCamera, m_frameHandle->getFrameIndex(),
                          actualFx, m_frameHandle->getFrameIndex());
 
-  ToonzScene *scene        = 0;
+  ToonzScene *scene = 0;
   if (m_sceneHandle) scene = m_sceneHandle->getScene();
 
-  int frameIndex                = 0;
+  int frameIndex = 0;
   if (m_frameHandle) frameIndex = m_frameHandle->getFrameIndex();
 
   m_paramViewer->setFx(currentFxWithoutCamera, actualFx, frameIndex, scene);
@@ -1339,7 +1337,7 @@ void FxSettings::setCurrentFx() {
   if (TZeraryColumnFx *zfx = dynamic_cast<TZeraryColumnFx *>(fx.getPointer()))
     fx = zfx->getZeraryFx();
   else
-    hasEmptyInput   = hasEmptyInputPort(fx);
+    hasEmptyInput = hasEmptyInputPort(fx);
   int frame         = m_frameHandle->getFrame();
   ToonzScene *scene = m_sceneHandle->getScene();
   actualFx          = fx;

@@ -61,10 +61,10 @@ ReframePopup::ReframePopup()
   bool ret = true;
   ret      = ret && connect(m_step, SIGNAL(editingFinished()), this,
                        SLOT(updateBlankCellCount()));
-  ret = ret && connect(m_blank, SIGNAL(editingFinished()), this,
+  ret      = ret && connect(m_blank, SIGNAL(editingFinished()), this,
                        SLOT(updateBlankCellCount()));
-  ret = ret && connect(okBtn, SIGNAL(clicked()), this, SLOT(accept()));
-  ret = ret && connect(cancelBtn, SIGNAL(clicked()), this, SLOT(reject()));
+  ret      = ret && connect(okBtn, SIGNAL(clicked()), this, SLOT(accept()));
+  ret      = ret && connect(cancelBtn, SIGNAL(clicked()), this, SLOT(reject()));
   assert(ret);
 }
 
@@ -81,3 +81,7 @@ void ReframePopup::getValues(int& step, int& blank) {
   step  = m_step->getValue();
   blank = m_blank->getValue();
 }
+
+//-----------------------------------------------------------------------------
+
+void ReframePopup::showEvent(QShowEvent* event) { m_step->selectAll(); }

@@ -154,7 +154,7 @@ public:
             isPreview ? *scene->getProperties()->getPreviewProperties()
                       : *scene->getProperties()->getOutputProperties();
         outputSettings.getRange(r0, r1, step);
-        const TRenderSettings rs    = outputSettings.getRenderSettings();
+        const TRenderSettings rs = outputSettings.getRenderSettings();
         if (r0 == 0 && r1 == -1) r0 = 0, r1 = scene->getFrameCount() - 1;
 
         double timeStretchFactor =
@@ -245,7 +245,7 @@ bool RenderCommand::init(bool isPreview) {
     m_r0 = 0;
     m_r1 = scene->getFrameCount() - 1;
   }
-  if (m_r0 < 0) m_r0                       = 0;
+  if (m_r0 < 0) m_r0 = 0;
   if (m_r1 >= scene->getFrameCount()) m_r1 = scene->getFrameCount() - 1;
   if (m_r1 < m_r0) {
     DVGui::warning(QObject::tr(
@@ -300,7 +300,7 @@ sprop->getOutputProperties()->setRenderSettings(rso);*/
       fp.getType() == "pict")  // pct e' un formato"livello" (ha i settings di
                                // quicktime) ma fatto di diversi frames
     fp = fp.withFrame(TFrameId::EMPTY_FRAME);
-  fp   = scene->decodeFilePath(fp);
+  fp = scene->decodeFilePath(fp);
   if (!TFileStatus(fp.getParentDir()).doesExist()) {
     try {
       TFilePath parent = fp.getParentDir();
@@ -417,8 +417,10 @@ class RenderListener final : public DVGui::ProgressDialog,
       if (m_frame == -1)
         m_pb->hide();
       else {
-        m_pb->setLabelText("Rendering frame " + QString::number(m_frame) + "/" +
-                           m_labelText);
+        m_pb->setLabelText(
+            QObject::tr("Rendering frame %1 / %2", "RenderListener")
+                .arg(m_frame)
+                .arg(m_labelText));
         m_pb->setValue(m_frame);
       }
     }
@@ -428,9 +430,11 @@ public:
   RenderListener(TRenderer *renderer, const TFilePath &path, int steps,
                  bool isPreview)
       : DVGui::ProgressDialog(
-            "Precomputing " + QString::number(steps) + " Frames" +
-                ((isPreview) ? "" : " of " + toQString(path)),
-            "Cancel", 0, steps, TApp::instance()->getMainWindow())
+            QObject::tr("Precomputing %1 Frames", "RenderListener").arg(steps) +
+                ((isPreview) ? ""
+                             : QObject::tr(" of %1", "RenderListener")
+                                   .arg(toQString(path))),
+            QObject::tr("Cancel"), 0, steps, TApp::instance()->getMainWindow())
       , m_renderer(renderer)
       , m_frameCounter(0)
       , m_error(false) {
@@ -443,7 +447,10 @@ public:
 #endif
     setWindowFlags(Qt::Dialog | Qt::WindowTitleHint | Qt::CustomizeWindowHint);
     m_progressBarString =
-        QString::number(steps) + ((isPreview) ? "" : " of " + toQString(path));
+        QString::number(steps) +
+        ((isPreview)
+             ? ""
+             : QObject::tr(" of %1", "RenderListener").arg(toQString(path)));
     // setMinimumDuration (0);
     m_totalFrames = steps;
     show();
@@ -455,7 +462,8 @@ public:
     if (m_frameCounter + 1 < m_totalFrames)
       Message(this, ret ? -1 : ++m_frameCounter, m_progressBarString).send();
     else
-      setLabelText(tr("Finalizing render, please wait."));
+      setLabelText(
+          QObject::tr("Finalizing render, please wait.", "RenderListener"));
     return !ret;
   }
   bool onFrameFailed(int frame, TException &) override {
@@ -471,7 +479,7 @@ public:
 
   void onCancel() override {
     m_isCanceled = true;
-    setLabelText("Aborting render...");
+    setLabelText(QObject::tr("Aborting render...", "RenderListener"));
     reset();
     hide();
     RenderCommand::resetBgColor();
@@ -588,7 +596,8 @@ void RenderCommand::rasterRender(bool isPreview) {
   buildSceneProgressBar->setMaximum(m_numFrames - 1);
   buildSceneProgressBar->setValue(0);
   buildSceneProgressBar->move(600, 500);
-  buildSceneProgressBar->setWindowTitle("Building Schematic...");
+  buildSceneProgressBar->setWindowTitle(
+      QObject::tr("Building Schematic...", "RenderCommand"));
   buildSceneProgressBar->show();
 
   for (int i = 0; i < m_numFrames; ++i, m_r += m_stepd) {
@@ -666,13 +675,18 @@ class MultimediaProgressBar final : public DVGui::ProgressDialog,
       if (m_pbValue == -1)
         m_pb->hide();
       else {
-        QString modeStr(m_pb->m_renderer->getMultimediaMode() ==
-                                MultimediaRenderer::COLUMNS
-                            ? "column "
-                            : "layer ");
-        m_pb->setLabelText("Rendering " + modeStr + QString::number(m_column) +
-                           ", frame " + QString::number(m_frame) + "/" +
-                           m_labelText);
+        QString modeStr(
+            m_pb->m_renderer->getMultimediaMode() == MultimediaRenderer::COLUMNS
+                ? QObject::tr("column ",
+                              "MultimediaProgressBar label (mode name)")
+                : QObject::tr("layer ",
+                              "MultimediaProgressBar label (mode name)"));
+        m_pb->setLabelText(QObject::tr("Rendering %1%2, frame %3 / %4",
+                                       "MultimediaProgressBar label")
+                               .arg(modeStr)
+                               .arg(m_column)
+                               .arg(m_frame)
+                               .arg(m_labelText));
         m_pb->setValue(m_pbValue);
       }
     }
@@ -683,9 +697,10 @@ class MultimediaProgressBar final : public DVGui::ProgressDialog,
 public:
   MultimediaProgressBar(MultimediaRenderer *renderer)
       : ProgressDialog(
-            "Rendering " + QString::number(renderer->getFrameCount()) +
-                " frames " + " of " + toQString(renderer->getFilePath()),
-            "Cancel", 0,
+            QObject::tr("Rendering %1 frames of %2", "MultimediaProgressBar")
+                .arg(renderer->getFrameCount())
+                .arg(toQString(renderer->getFilePath())),
+            QObject::tr("Cancel"), 0,
             renderer->getFrameCount() * renderer->getColumnsCount())
       , m_renderer(renderer)
       , m_frameCounter(0)
@@ -699,8 +714,11 @@ public:
     setWindowModality(Qt::ApplicationModal);
 #endif
     setWindowFlags(Qt::WindowTitleHint | Qt::CustomizeWindowHint);
-    m_progressBarString = QString::number(m_renderer->getFrameCount()) +
-                          " of " + toQString(m_renderer->getFilePath());
+    m_progressBarString =
+        QObject::tr("%1 of %2",
+                    "MultimediaProgressBar - [totalframe] of [path]")
+            .arg(m_renderer->getFrameCount())
+            .arg(toQString(m_renderer->getFilePath()));
     show();
   }
 
@@ -734,7 +752,7 @@ public:
 
   void onCancel() override {
     m_isCanceled = true;
-    setLabelText("Aborting render...");
+    setLabelText(QObject::tr("Aborting render...", "MultimediaProgressBar"));
     TRenderer *trenderer(m_renderer->getTRenderer());
     if (m_renderer) trenderer->stopRendering(true);
     reset();
@@ -879,9 +897,11 @@ void RenderCommand::doRender(bool isPreview) {
     }
   }
   if (!isWritable) {
-    std::string str = "It is not possible to write the output:  the file";
-    str += isMultiFrame ? "s are read only." : " is read only.";
-    DVGui::warning(QString::fromStdString(str));
+    QString str = QObject::tr(
+        "It is not possible to write the output:  the file", "RenderCommand");
+    str += isMultiFrame ? QObject::tr("s are read only.", "RenderCommand")
+                        : QObject::tr(" is read only.", "RenderCommand");
+    DVGui::warning(str);
     return;
   }
 

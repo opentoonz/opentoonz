@@ -23,8 +23,8 @@
 #include <map>
 #include <vector>
 
-using std::vector;
 using std::map;
+using std::vector;
 
 // Defines timeline direction: top to bottom;  left to right.
 // old (vertical timeline) = new (universal)    = old (kept)
@@ -59,8 +59,10 @@ class QPainterPath;
 //! of a cell)
 enum class PredefinedRect {
   CELL,                     //! size of a cell
+  CAMERA_CELL,              //! size of a cell of the camera column
   DRAG_HANDLE_CORNER,       //! area for dragging a cell
   KEY_ICON,                 //! position of key icon
+  CAMERA_KEY_ICON,          //! position of key icon in the camera column
   CELL_NAME,                //! cell name box
   CELL_NAME_WITH_KEYFRAME,  //! cell name box when keyframe is displayed
   END_EXTENDER,             //! bottom / right extender
@@ -77,11 +79,12 @@ enum class PredefinedRect {
   FRAME_HEADER,
   LAYER_HEADER,
   FOLDED_LAYER_HEADER,  //! size of layer header when it is folded
-  PLAY_RANGE,           //! area for play range marker within frame header
-  ONION,                //! onion handle placement
-  ONION_DOT,            //! moveable dot placement
-  ONION_DOT_FIXED,      //! fixed dot placement
-  ONION_AREA,           //! area where mouse events will alter onion
+  CAMERA_LAYER_HEADER,
+  PLAY_RANGE,       //! area for play range marker within frame header
+  ONION,            //! onion handle placement
+  ONION_DOT,        //! moveable dot placement
+  ONION_DOT_FIXED,  //! fixed dot placement
+  ONION_AREA,       //! area where mouse events will alter onion
   ONION_FIXED_DOT_AREA,
   ONION_DOT_AREA,
   PINNED_CENTER_KEY,   //! displays a small blue number
@@ -91,26 +94,34 @@ enum class PredefinedRect {
   PREVIEW_LAYER_AREA,  //! clickable area larger than preview icon, containing
                        //! it
   PREVIEW_LAYER,
-  LOCK_AREA,     //! clickable area larger than lock icon, containing it
-  LOCK,          //! the lock icon itself
-  DRAG_LAYER,    //! draggable area in layer header
-  LAYER_NAME,    //! where to display column name. clicking will rename
-  LAYER_NUMBER,  //! where to display column number.
+  LOCK_AREA,          //! clickable area larger than lock icon, containing it
+  LOCK,               //! the lock icon itself
+  CAMERA_LOCK_AREA,   //! lock area for the camera column
+  CAMERA_LOCK,        //! the lock icon for camera column
+  DRAG_LAYER,         //! draggable area in layer header
+  LAYER_NAME,         //! where to display column name. clicking will rename
+  CAMERA_LAYER_NAME,  //! where to display the camera column name
+  LAYER_NUMBER,       //! where to display column number.
   SOUND_ICON,
   VOLUME_TRACK,        //! area where track is displayed
   VOLUME_AREA,         //! active area for volume control
   LOOP_ICON,           //! area for repeat animation icon
+  CAMERA_LOOP_ICON,    //! area for repeat icon in the camera column
   LAYER_HEADER_PANEL,  //! panel displaying headers for the layer rows in
                        //! timeline mode
   THUMBNAIL_AREA,      //! area for header thumbnails and other icons
   THUMBNAIL,           //! the actual thumbnail, if there is one
+  CAMERA_ICON_AREA,    //! area for the camera column icon
+  CAMERA_ICON,         //! the actual camera column icon
   PEGBAR_NAME,         //! where to display pegbar name
   PARENT_HANDLE_NAME,  //! where to display parent handle number
   FILTER_COLOR,        //! where to show layer's filter color
   CONFIG_AREA,  //! clickable area larger than the config icon, containing it
   CONFIG,       //! the config icon itself
-  FRAME_MARKER_AREA,  //! Cell's frame indicator
-  FRAME_INDICATOR,    //! Row # indicator
+  CAMERA_CONFIG_AREA,  //! config area for the camera column
+  CAMERA_CONFIG,       //! the config icon for camera column
+  FRAME_MARKER_AREA,   //! Cell's frame indicator
+  FRAME_INDICATOR,     //! Row # indicator
   ZOOM_SLIDER_AREA,
   ZOOM_SLIDER,
   ZOOM_IN_AREA,
@@ -142,6 +153,7 @@ enum class PredefinedDimension {
   ONION_TURN,            //! onion handle turn in degrees
   QBOXLAYOUT_DIRECTION,  //! direction of QBoxLayout
   CENTER_ALIGN,          //! horizontal / vertical align
+  CAMERA_LAYER           //! width of a camera column / height of camera row
 };
 enum class PredefinedPath {
   DRAG_HANDLE_CORNER,   //! triangle corner at drag sidebar
@@ -177,13 +189,16 @@ enum class PredefinedFlag {
   PREVIEW_LAYER_AREA_BORDER,
   PREVIEW_LAYER_AREA_VISIBLE,
   CONFIG_AREA_BORDER,
+  CAMERA_CONFIG_AREA_BORDER,
   CONFIG_AREA_VISIBLE,
+  CAMERA_CONFIG_AREA_VISIBLE,
   PEGBAR_NAME_BORDER,
   PEGBAR_NAME_VISIBLE,
   PARENT_HANDLE_NAME_BORDER,
   PARENT_HANDLE_NAME_VISIBILE,
   THUMBNAIL_AREA_BORDER,
   THUMBNAIL_AREA_VISIBLE,
+  CAMERA_ICON_VISIBLE,
   VOLUME_AREA_VERTICAL
 };
 
@@ -200,14 +215,14 @@ protected:
 
 public:
   virtual CellPosition xyToPosition(const QPoint &xy,
-                                    const ColumnFan *fan) const = 0;
+                                    const ColumnFan *fan) const          = 0;
   virtual QPoint positionToXY(const CellPosition &position,
                               const ColumnFan *fan) const                = 0;
   virtual CellPositionRatio xyToPositionRatio(const QPoint &xy) const    = 0;
   virtual QPoint positionRatioToXY(const CellPositionRatio &ratio) const = 0;
 
   virtual int colToLayerAxis(int layer, const ColumnFan *fan) const = 0;
-  virtual int rowToFrameAxis(int frame) const = 0;
+  virtual int rowToFrameAxis(int frame) const                       = 0;
 
   virtual QPoint frameLayerToXY(int frameAxis, int layerAxis) const = 0;
   QRect frameLayerRect(const NumberRange &frameAxis,

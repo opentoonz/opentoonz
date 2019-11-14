@@ -109,11 +109,11 @@
     <name>ApplyMatchlinesCommand</name>
     <message>
         <source>It is not possible to apply the match lines because no column was selected.</source>
-        <translation>Není možné použít dělicí čáry, protože nebyl vybrán žádný sloupec.</translation>
+        <translation type="vanished">Není možné použít dělicí čáry, protože nebyl vybrán žádný sloupec.</translation>
     </message>
     <message>
         <source>It is not possible to apply the match lines because two columns have to be selected.</source>
-        <translation>Je možné použít dělicí čáry, protože musí být vybrány dva sloupce.</translation>
+        <translation type="vanished">Je možné použít dělicí čáry, protože musí být vybrány dva sloupce.</translation>
     </message>
 </context>
 <context>
@@ -801,11 +801,11 @@ Bitte löschen Sie die vorhandene Ebene und erstellen eine Neue wenn Sie den Sä
     </message>
     <message>
         <source>Cleanup all selected drawings overwriting those previously cleaned up.</source>
-        <translation>Vyčistit všechny vybrané kresby a ty vyčištěné předtím přepsat.</translation>
+        <translation type="vanished">Vyčistit všechny vybrané kresby a ty vyčištěné předtím přepsat.</translation>
     </message>
     <message>
         <source>Cleanup only non-cleaned up drawings and keep those previously cleaned up.</source>
-        <translation>Vyčistit jen nevyčištěné kresby a ty vyčištěné předtím zachovat.</translation>
+        <translation type="vanished">Vyčistit jen nevyčištěné kresby a ty vyčištěné předtím zachovat.</translation>
     </message>
     <message>
         <source>Delete existing level and create a new level with selected drawings only.</source>
@@ -1050,22 +1050,22 @@ Co chcete dělat?</translation>
     <name>CloneLevelUndo:: LevelNamePopup</name>
     <message>
         <source>Clone Level</source>
-        <translation>Zdvojit úroveň</translation>
+        <translation type="vanished">Zdvojit úroveň</translation>
     </message>
     <message>
         <source>Level Name:</source>
-        <translation>Název úrovně:</translation>
+        <translation type="vanished">Název úrovně:</translation>
     </message>
 </context>
 <context>
     <name>CloneLevelUndo::LevelNamePopup</name>
     <message>
         <source>Clone Level</source>
-        <translation>Zdvojit úroveň</translation>
+        <translation type="vanished">Zdvojit úroveň</translation>
     </message>
     <message>
         <source>Level Name:</source>
-        <translation>Název úrovně:</translation>
+        <translation type="vanished">Název úrovně:</translation>
     </message>
 </context>
 <context>
@@ -1242,6 +1242,10 @@ Co chcete dělat?</translation>
         <source> (Flipped)</source>
         <translation> (převráceno)</translation>
     </message>
+    <message>
+        <source>   ::   Project: </source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CommandBar</name>
@@ -1397,7 +1401,7 @@ Co chcete dělat?</translation>
     </message>
     <message>
         <source>                      Palette:</source>
-        <translation>　　　　　Paleta:</translation>
+        <translation type="vanished">　　　　　Paleta:</translation>
     </message>
     <message>
         <source>Tolerance:</source>
@@ -1405,7 +1409,7 @@ Co chcete dělat?</translation>
     </message>
     <message>
         <source>End:</source>
-        <translation>Konec:</translation>
+        <translation type="vanished">Konec:</translation>
     </message>
     <message>
         <source>File to convert:</source>
@@ -1413,7 +1417,7 @@ Co chcete dělat?</translation>
     </message>
     <message>
         <source>Output Name:</source>
-        <translation>Název výstupu:</translation>
+        <translation type="vanished">Název výstupu:</translation>
     </message>
     <message>
         <source>Same as Painted</source>
@@ -1501,7 +1505,7 @@ Co chcete dělat?</translation>
     </message>
     <message>
         <source>StrOke Mode:</source>
-        <translation>Převést z PLI na SVG:</translation>
+        <translation type="vanished">Převést z PLI na SVG:</translation>
     </message>
     <message>
         <source>Centerline</source>
@@ -1629,7 +1633,7 @@ contain the dpi information, then the current camera dpi will be used.
     </message>
     <message>
         <source>Ok</source>
-        <translation>OK</translation>
+        <translation type="vanished">OK</translation>
     </message>
     <message>
         <source>OK</source>
@@ -1652,11 +1656,11 @@ contain the dpi information, then the current camera dpi will be used.
     </message>
     <message>
         <source>Style Index: </source>
-        <translation>Číslo stylu:</translation>
+        <translation type="vanished">Číslo stylu:</translation>
     </message>
     <message>
         <source>Apply to Frames: </source>
-        <translation>Použít na oblast snímků: </translation>
+        <translation type="vanished">Použít na oblast snímků: </translation>
     </message>
     <message>
         <source>Style Index:</source>
@@ -1683,7 +1687,7 @@ contain the dpi information, then the current camera dpi will be used.
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Zrušit</translation>
+        <translation type="vanished">Zrušit</translation>
     </message>
     <message>
         <source>Close</source>
@@ -1770,7 +1774,7 @@ contain the dpi information, then the current camera dpi will be used.
     </message>
     <message>
         <source>Thumbnails View</source>
-        <translation>Zobrazení náhledů</translation>
+        <translation type="vanished">Zobrazení náhledů</translation>
     </message>
     <message>
         <source>List View</source>
@@ -1824,50 +1828,50 @@ contain the dpi information, then the current camera dpi will be used.
     <name>DvTopBar</name>
     <message>
         <source>File</source>
-        <translation>Soubor</translation>
+        <translation type="vanished">Soubor</translation>
     </message>
     <message>
         <source>Edit</source>
-        <translation>Upravit</translation>
+        <translation type="vanished">Upravit</translation>
     </message>
     <message>
         <source>Scan &amp;&amp; Cleanup</source>
-        <translation>Skenovat a vyčistit</translation>
+        <translation type="vanished">Skenovat a vyčistit</translation>
     </message>
     <message>
         <source>Level</source>
-        <translation>Úroveň</translation>
+        <translation type="vanished">Úroveň</translation>
     </message>
     <message>
         <source>Xsheet</source>
-        <translation>Xsheet</translation>
+        <translation type="vanished">Xsheet</translation>
     </message>
     <message>
         <source>Cells</source>
-        <translation>Buňky</translation>
+        <translation type="vanished">Buňky</translation>
     </message>
     <message>
         <source>View</source>
-        <translation>Pohled</translation>
+        <translation type="vanished">Pohled</translation>
     </message>
     <message>
         <source>Windows</source>
-        <translation>Okna</translation>
+        <translation type="vanished">Okna</translation>
     </message>
     <message>
         <source>Scan</source>
-        <translation>Skenovat</translation>
+        <translation type="vanished">Skenovat</translation>
     </message>
 </context>
 <context>
     <name>ExportCurvePopup</name>
     <message>
         <source>Export Curve</source>
-        <translation>Vyvést křivku</translation>
+        <translation type="vanished">Vyvést křivku</translation>
     </message>
     <message>
         <source>Export</source>
-        <translation>Vyvést</translation>
+        <translation type="vanished">Vyvést</translation>
     </message>
 </context>
 <context>
@@ -1909,67 +1913,67 @@ contain the dpi information, then the current camera dpi will be used.
     <name>ExportLevelPopup:: ExportOptions</name>
     <message>
         <source>Background Color:</source>
-        <translation>Barva pozadí:</translation>
+        <translation type="vanished">Barva pozadí:</translation>
     </message>
     <message>
         <source>No Antialias</source>
-        <translation>Žádné vyhlazování</translation>
+        <translation type="vanished">Žádné vyhlazování</translation>
     </message>
     <message>
         <source>Vectors Export Box</source>
-        <translation>Nastavení vyvedení vektoru</translation>
+        <translation type="vanished">Nastavení vyvedení vektoru</translation>
     </message>
     <message>
         <source>Width:</source>
-        <translation>Šířka:</translation>
+        <translation type="vanished">Šířka:</translation>
     </message>
     <message>
         <source>Height:</source>
-        <translation>Výška:</translation>
+        <translation type="vanished">Výška:</translation>
     </message>
     <message>
         <source>H Resolution:</source>
-        <translation>Vodorovné rozlišení:</translation>
+        <translation type="vanished">Vodorovné rozlišení:</translation>
     </message>
     <message>
         <source>V Resolution:</source>
-        <translation>Svislé rozlišení:</translation>
+        <translation type="vanished">Svislé rozlišení:</translation>
     </message>
     <message>
         <source>DPI: </source>
-        <translation>DPI:</translation>
+        <translation type="vanished">DPI:</translation>
     </message>
     <message>
         <source>Vectors Thickness</source>
-        <translation>Tloušťka vektorů</translation>
+        <translation type="vanished">Tloušťka vektorů</translation>
     </message>
     <message>
         <source>Mode:</source>
-        <translation>Režim:</translation>
+        <translation type="vanished">Režim:</translation>
     </message>
     <message>
         <source>Scale Thickness</source>
-        <translation>Změnit tloušťku čáry</translation>
+        <translation type="vanished">Změnit tloušťku čáry</translation>
     </message>
     <message>
         <source>Add Thickness</source>
-        <translation>Přidat tloušťku čáry</translation>
+        <translation type="vanished">Přidat tloušťku čáry</translation>
     </message>
     <message>
         <source>Constant Thickness</source>
-        <translation>Stálá tloušťka</translation>
+        <translation type="vanished">Stálá tloušťka</translation>
     </message>
     <message>
         <source>Start:</source>
-        <translation>Začátek:</translation>
+        <translation type="vanished">Začátek:</translation>
     </message>
     <message>
         <source>End:</source>
-        <translation>Konec:</translation>
+        <translation type="vanished">Konec:</translation>
     </message>
     <message>
         <source>Scale:</source>
-        <translation>Změnit velikost:</translation>
+        <translation type="vanished">Změnit velikost:</translation>
     </message>
 </context>
 <context>
@@ -2299,7 +2303,7 @@ contain the dpi information, then the current camera dpi will be used.
     </message>
     <message>
         <source>Ok</source>
-        <translation>OK</translation>
+        <translation type="vanished">OK</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -2311,11 +2315,11 @@ contain the dpi information, then the current camera dpi will be used.
     </message>
     <message>
         <source>From:</source>
-        <translation>Od:</translation>
+        <translation type="vanished">Od:</translation>
     </message>
     <message>
         <source>To:</source>
-        <translation>Do:</translation>
+        <translation type="vanished">Do:</translation>
     </message>
     <message>
         <source>Apply</source>
@@ -2334,26 +2338,26 @@ contain the dpi information, then the current camera dpi will be used.
     <name>FileData</name>
     <message>
         <source>It is not possible to find the %1 level.</source>
-        <translation>Úroveň %1 nelze najít.</translation>
+        <translation type="vanished">Úroveň %1 nelze najít.</translation>
     </message>
     <message>
         <source>There was an error copying %1</source>
-        <translation>Při kopírování %1 se vyskytla chyba</translation>
+        <translation type="vanished">Při kopírování %1 se vyskytla chyba</translation>
     </message>
 </context>
 <context>
     <name>FileSelection</name>
     <message>
         <source>Abort</source>
-        <translation>Zrušit</translation>
+        <translation type="vanished">Zrušit</translation>
     </message>
     <message>
         <source>Collecting assets...</source>
-        <translation>Sbírá se materiál...</translation>
+        <translation type="vanished">Sbírá se materiál...</translation>
     </message>
     <message>
         <source>Importing scenes...</source>
-        <translation>Zavádí se záběry...</translation>
+        <translation type="vanished">Zavádí se záběry...</translation>
     </message>
 </context>
 <context>
@@ -2431,44 +2435,44 @@ Hold F3 Key on the Viewer to Show This Frame Only</source>
     <name>FlipBoOk</name>
     <message>
         <source>FlipboOk</source>
-        <translation>FlipboOk</translation>
+        <translation type="vanished">FlipboOk</translation>
     </message>
     <message>
         <source>Rendered Frames  ::  From %1 To %2  ::  Step %3</source>
-        <translation>Zpracované snímky :: Od %1 do %2 :: Krok %3</translation>
+        <translation type="vanished">Zpracované snímky :: Od %1 do %2 :: Krok %3</translation>
     </message>
     <message>
         <source>  ::  Shrink </source>
-        <translation>:: Zmenšit </translation>
+        <translation type="vanished">:: Zmenšit </translation>
     </message>
     <message>
         <source>It is not possible to save FlipboOk content.</source>
-        <translation>Obsah FlipboOk nelze uložit.</translation>
+        <translation type="vanished">Obsah FlipboOk nelze uložit.</translation>
     </message>
     <message>
         <source>Saved %1 frames out of %2 in %3</source>
-        <translation>%1 snímků z %2 bylo uloženo v %3</translation>
+        <translation type="vanished">%1 snímků z %2 bylo uloženo v %3</translation>
     </message>
     <message>
         <source>The file name cannot be empty or contain any of the following characters:(new line)  \ / : * ? &quot;  |</source>
-        <translation>Název souboru nesmí být prázdný nebo obsahovat následující znaky: (nový řádek)  \ / : * ? &quot;  |</translation>
+        <translation type="vanished">Název souboru nesmí být prázdný nebo obsahovat následující znaky: (nový řádek)  \ / : * ? &quot;  |</translation>
     </message>
     <message>
         <source>It is not possible to save because the selected file format is not supported.</source>
-        <translation>Nelze uložit, protože vybraný formát souboru není podporován.</translation>
+        <translation type="vanished">Nelze uložit, protože vybraný formát souboru není podporován.</translation>
     </message>
     <message>
         <source>There are no rendered images to save.</source>
-        <translation>Nejsou žádné zpracované obrázky k uložení.</translation>
+        <translation type="vanished">Nejsou žádné zpracované obrázky k uložení.</translation>
     </message>
     <message>
         <source>It is not possible to take or compare snapshots for Toonz vector levels.</source>
-        <translation>Není možné vytvořit nebo porovnat ukázky vektorových úrovní Toonz.</translation>
+        <translation type="vanished">Není možné vytvořit nebo porovnat ukázky vektorových úrovní Toonz.</translation>
     </message>
     <message>
         <source>File %1 already exists.
 Do you want to overwrite it?</source>
-        <translation>Soubor %1 již existuje.
+        <translation type="vanished">Soubor %1 již existuje.
 Chcete jej přepsat?</translation>
     </message>
 </context>
@@ -2547,7 +2551,7 @@ Chcete jej přepsat?</translation>
     </message>
     <message>
         <source>Relative Onion Skin Toggle</source>
-        <translation>Přepnout relativní cibulový vzhled</translation>
+        <translation type="vanished">Přepnout relativní cibulový vzhled</translation>
     </message>
     <message>
         <source>Fixed Onion Skin Toggle</source>
@@ -2565,7 +2569,7 @@ Chcete jej přepsat?</translation>
     <name>ImageViewer</name>
     <message>
         <source>FlipboOk Histogram</source>
-        <translation>Histogram FlipboOk</translation>
+        <translation type="vanished">Histogram FlipboOk</translation>
     </message>
     <message>
         <source>Clone Preview</source>
@@ -2605,11 +2609,11 @@ Chcete jej přepsat?</translation>
     </message>
     <message>
         <source>Load Images</source>
-        <translation>Nahrát obrázky</translation>
+        <translation type="vanished">Nahrát obrázky</translation>
     </message>
     <message>
         <source>Append Images</source>
-        <translation>Připojit obrázky</translation>
+        <translation type="vanished">Připojit obrázky</translation>
     </message>
     <message>
         <source>Save Images</source>
@@ -2861,7 +2865,7 @@ Chcete jej přepsat?</translation>
     </message>
     <message>
         <source>Save in:</source>
-        <translation>Uložit v:</translation>
+        <translation type="vanished">Uložit v:</translation>
     </message>
     <message>
         <source>Width:</source>
@@ -2873,7 +2877,7 @@ Chcete jej přepsat?</translation>
     </message>
     <message>
         <source>Create</source>
-        <translation>Vytvořit</translation>
+        <translation type="vanished">Vytvořit</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -2915,7 +2919,7 @@ Chcete ji vytvořit?</translation>
     </message>
     <message>
         <source>Ok</source>
-        <translation>OK</translation>
+        <translation type="vanished">OK</translation>
     </message>
     <message>
         <source>Apply</source>
@@ -2990,7 +2994,7 @@ Chcete ji vytvořit?</translation>
     </message>
     <message>
         <source>Image Resolution:</source>
-        <translation>Rozlišení obrázku:</translation>
+        <translation type="vanished">Rozlišení obrázku:</translation>
     </message>
     <message>
         <source>Premultiply</source>
@@ -3002,7 +3006,7 @@ Chcete ji vytvořit?</translation>
     </message>
     <message>
         <source>      Subsampling:</source>
-        <translation>Podvzorkování:</translation>
+        <translation type="vanished">Podvzorkování:</translation>
     </message>
     <message>
         <source>DPI:</source>
@@ -3298,6 +3302,10 @@ Please use the frame numbers for reference.</source>
         <source>Invalid data file.</source>
         <translation>Neplatný soubor s daty.</translation>
     </message>
+    <message>
+        <source>Drawing: </source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>LoadBoardPresetFilePopup</name>
@@ -3318,7 +3326,7 @@ Please use the frame numbers for reference.</source>
     </message>
     <message>
         <source>Palette from Frame:</source>
-        <translation>Paleta ze snímku:</translation>
+        <translation type="vanished">Paleta ze snímku:</translation>
     </message>
     <message>
         <source>Frames :</source>
@@ -3329,11 +3337,11 @@ Please use the frame numbers for reference.</source>
     <name>LoadCurvePopup</name>
     <message>
         <source>Load Curve</source>
-        <translation>Nahrát křivku (parametr efektu)</translation>
+        <translation type="vanished">Nahrát křivku (parametr efektu)</translation>
     </message>
     <message>
         <source>Load</source>
-        <translation>Nahrát</translation>
+        <translation type="vanished">Nahrát</translation>
     </message>
 </context>
 <context>
@@ -3355,7 +3363,7 @@ Please use the frame numbers for reference.</source>
     </message>
     <message>
         <source>Append Images</source>
-        <translation>Připojit obrázky</translation>
+        <translation type="vanished">Připojit obrázky</translation>
     </message>
     <message>
         <source>From:</source>
@@ -3406,7 +3414,7 @@ Please use the frame numbers for reference.</source>
     </message>
     <message>
         <source>%1 does not exist.</source>
-        <translation>%1 neexistuje.</translation>
+        <translation type="vanished">%1 neexistuje.</translation>
     </message>
     <message>
         <source>TLV Caching Behavior</source>
@@ -3476,15 +3484,15 @@ Please use the frame numbers for reference.</source>
     <name>LoadSettingsPopup</name>
     <message>
         <source>Load Cleanup Settings</source>
-        <translation>Nahrát nastavení vyčištění</translation>
+        <translation type="vanished">Nahrát nastavení vyčištění</translation>
     </message>
     <message>
         <source>Load</source>
-        <translation>Nahrát</translation>
+        <translation type="vanished">Nahrát</translation>
     </message>
     <message>
         <source>%1 does not exist.</source>
-        <translation>%1 neexistuje.</translation>
+        <translation type="vanished">%1 neexistuje.</translation>
     </message>
 </context>
 <context>
@@ -3545,7 +3553,7 @@ Please use the frame numbers for reference.</source>
     </message>
     <message>
         <source>%1 is not a TNZ file.</source>
-        <translation>%1 není soubor TNZ.</translation>
+        <translation type="vanished">%1 není soubor TNZ.</translation>
     </message>
     <message>
         <source> you can load only TNZ files for render task.</source>
@@ -3614,11 +3622,11 @@ Please use the frame numbers for reference.</source>
     </message>
     <message>
         <source>Visit Web Site</source>
-        <translation>Navštívit internetovou stránku</translation>
+        <translation type="vanished">Navštívit internetovou stránku</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Zrušit</translation>
+        <translation type="vanished">Zrušit</translation>
     </message>
     <message>
         <source>&amp;New Scene</source>
@@ -3798,7 +3806,7 @@ Please use the frame numbers for reference.</source>
     </message>
     <message>
         <source>&amp;Paste</source>
-        <translation>&amp;Vložit</translation>
+        <translation type="vanished">&amp;Vložit</translation>
     </message>
     <message>
         <source>&amp;Merge</source>
@@ -3810,7 +3818,7 @@ Please use the frame numbers for reference.</source>
     </message>
     <message>
         <source>Paste RGBA Values</source>
-        <translation>Vložit hodnotu RGBA</translation>
+        <translation type="vanished">Vložit hodnotu RGBA</translation>
     </message>
     <message>
         <source>&amp;Delete</source>
@@ -3838,7 +3846,7 @@ Please use the frame numbers for reference.</source>
     </message>
     <message>
         <source>&amp;Send Back</source>
-        <translation>&amp;Poslat zpět</translation>
+        <translation type="vanished">&amp;Poslat zpět</translation>
     </message>
     <message>
         <source>&amp;Send Backward</source>
@@ -3910,7 +3918,7 @@ Please use the frame numbers for reference.</source>
     </message>
     <message>
         <source>&amp;Revert to Last Saved Version</source>
-        <translation>&amp;Vrátit na naposledy uloženou verzi</translation>
+        <translation type="vanished">&amp;Vrátit na naposledy uloženou verzi</translation>
     </message>
     <message>
         <source>&amp;Expose in Xsheet</source>
@@ -4210,7 +4218,7 @@ Please use the frame numbers for reference.</source>
     </message>
     <message>
         <source>Matte Channel</source>
-        <translation>Alfa</translation>
+        <translation type="vanished">Alfa</translation>
     </message>
     <message>
         <source>Red Channel Greyscale</source>
@@ -4234,7 +4242,7 @@ Please use the frame numbers for reference.</source>
     </message>
     <message>
         <source>&amp;FlipboOk</source>
-        <translation>&amp;Flipbook</translation>
+        <translation type="vanished">&amp;Flipbook</translation>
     </message>
     <message>
         <source>&amp;Function Editor</source>
@@ -4318,7 +4326,7 @@ Please use the frame numbers for reference.</source>
     </message>
     <message>
         <source>Onion Skin</source>
-        <translation>Cibulová slupka</translation>
+        <translation type="vanished">Cibulová slupka</translation>
     </message>
     <message>
         <source>Duplicate</source>
@@ -4346,7 +4354,7 @@ Please use the frame numbers for reference.</source>
     </message>
     <message>
         <source>Premultiply</source>
-        <translation>Přednásobit [černá-pozadí]</translation>
+        <translation type="vanished">Přednásobit [černá-pozadí]</translation>
     </message>
     <message>
         <source>Convert to Vectors...</source>
@@ -4430,79 +4438,79 @@ Please use the frame numbers for reference.</source>
     </message>
     <message>
         <source>Activate this column only</source>
-        <translation>Zapnout jen tento sloupec</translation>
+        <translation type="vanished">Zapnout jen tento sloupec</translation>
     </message>
     <message>
         <source>Activate selected columns</source>
-        <translation>Zapnout vybrané sloupce</translation>
+        <translation type="vanished">Zapnout vybrané sloupce</translation>
     </message>
     <message>
         <source>Activate all columns</source>
-        <translation>Zapnout všechny sloupce</translation>
+        <translation type="vanished">Zapnout všechny sloupce</translation>
     </message>
     <message>
         <source>Deactivate selected columns</source>
-        <translation>Vypnout vybrané sloupce</translation>
+        <translation type="vanished">Vypnout vybrané sloupce</translation>
     </message>
     <message>
         <source>Deactivate all columns</source>
-        <translation>Vypnout všechny sloupce</translation>
+        <translation type="vanished">Vypnout všechny sloupce</translation>
     </message>
     <message>
         <source>Toggle columns activation</source>
-        <translation>Zapnout pohled na sloupce</translation>
+        <translation type="vanished">Zapnout pohled na sloupce</translation>
     </message>
     <message>
         <source>Enable this column only</source>
-        <translation>Zapnout jen tento sloupec</translation>
+        <translation type="vanished">Zapnout jen tento sloupec</translation>
     </message>
     <message>
         <source>Enable selected columns</source>
-        <translation>Povolit vybrané sloupce</translation>
+        <translation type="vanished">Povolit vybrané sloupce</translation>
     </message>
     <message>
         <source>Enable all columns</source>
-        <translation>Povolit všechny sloupce</translation>
+        <translation type="vanished">Povolit všechny sloupce</translation>
     </message>
     <message>
         <source>Disable all columns</source>
-        <translation>Zakázat všechny sloupce</translation>
+        <translation type="vanished">Zakázat všechny sloupce</translation>
     </message>
     <message>
         <source>Disable selected columns</source>
-        <translation>Zakázat vybrané sloupce</translation>
+        <translation type="vanished">Zakázat vybrané sloupce</translation>
     </message>
     <message>
         <source>Swap enabled columns</source>
-        <translation>Vyměnit povolené sloupce</translation>
+        <translation type="vanished">Vyměnit povolené sloupce</translation>
     </message>
     <message>
         <source>Lock this column only</source>
-        <translation>Uzamknout jen tento sloupec</translation>
+        <translation type="vanished">Uzamknout jen tento sloupec</translation>
     </message>
     <message>
         <source>Lock selected columns</source>
-        <translation>Uzamknout vybrané sloupce</translation>
+        <translation type="vanished">Uzamknout vybrané sloupce</translation>
     </message>
     <message>
         <source>Lock all columns</source>
-        <translation>Uzamknout všechny sloupce</translation>
+        <translation type="vanished">Uzamknout všechny sloupce</translation>
     </message>
     <message>
         <source>Unlock selected columns</source>
-        <translation>Odemknout vybrané sloupce</translation>
+        <translation type="vanished">Odemknout vybrané sloupce</translation>
     </message>
     <message>
         <source>Unlock all columns</source>
-        <translation>Odemknout všechny sloupce</translation>
+        <translation type="vanished">Odemknout všechny sloupce</translation>
     </message>
     <message>
         <source>Swap locked columns</source>
-        <translation>Vyměnit uzamknuté sloupce</translation>
+        <translation type="vanished">Vyměnit uzamknuté sloupce</translation>
     </message>
     <message>
         <source>Edit Tool</source>
-        <translation>Nástroj na úpravy</translation>
+        <translation type="vanished">Nástroj na úpravy</translation>
     </message>
     <message>
         <source>Selection Tool</source>
@@ -4598,7 +4606,7 @@ Please use the frame numbers for reference.</source>
     </message>
     <message>
         <source>HoOk Tool</source>
-        <translation>Haken-Tool</translation>
+        <translation type="vanished">Haken-Tool</translation>
     </message>
     <message>
         <source>Zoom Tool</source>
@@ -4650,11 +4658,11 @@ Please use the frame numbers for reference.</source>
     </message>
     <message>
         <source>Increase brush hardness</source>
-        <translation>Zvětšit tvrdost štětce</translation>
+        <translation type="vanished">Zvětšit tvrdost štětce</translation>
     </message>
     <message>
         <source>Decrease brush hardness</source>
-        <translation>Zmenšit tvrdost štětce</translation>
+        <translation type="vanished">Zmenšit tvrdost štětce</translation>
     </message>
     <message>
         <source>Auto Group</source>
@@ -4698,7 +4706,7 @@ Please use the frame numbers for reference.</source>
     </message>
     <message>
         <source>Pressure sensibility</source>
-        <translation>Tlaková citlivost</translation>
+        <translation type="vanished">Tlaková citlivost</translation>
     </message>
     <message>
         <source>Segment Ink</source>
@@ -4750,15 +4758,15 @@ Please use the frame numbers for reference.</source>
     </message>
     <message>
         <source>Areas Mode</source>
-        <translation>Režim oblasti</translation>
+        <translation type="vanished">Režim oblasti</translation>
     </message>
     <message>
         <source>Lines Mode</source>
-        <translation>Režim čáry</translation>
+        <translation type="vanished">Režim čáry</translation>
     </message>
     <message>
         <source>Lines &amp; Areas Mode</source>
-        <translation>Režim čáry a oblasti</translation>
+        <translation type="vanished">Režim čáry a oblasti</translation>
     </message>
     <message>
         <source>Type</source>
@@ -4766,19 +4774,19 @@ Please use the frame numbers for reference.</source>
     </message>
     <message>
         <source>Normal Type</source>
-        <translation>Standardní</translation>
+        <translation type="vanished">Standardní</translation>
     </message>
     <message>
         <source>Rectangular Type</source>
-        <translation>Pravoúhlý</translation>
+        <translation type="vanished">Pravoúhlý</translation>
     </message>
     <message>
         <source>Freehand Type</source>
-        <translation>Kreslení od ruky</translation>
+        <translation type="vanished">Kreslení od ruky</translation>
     </message>
     <message>
         <source>Polyline Type</source>
-        <translation>Lomená čára</translation>
+        <translation type="vanished">Lomená čára</translation>
     </message>
     <message>
         <source>TypeTool Font</source>
@@ -4854,23 +4862,23 @@ Please use the frame numbers for reference.</source>
     </message>
     <message>
         <source>Drawing</source>
-        <translation>Kreslení</translation>
+        <translation type="vanished">Kreslení</translation>
     </message>
     <message>
         <source>Animation</source>
-        <translation>Animace</translation>
+        <translation type="vanished">Animace</translation>
     </message>
     <message>
         <source>Browser</source>
-        <translation>Prohlížeč</translation>
+        <translation type="vanished">Prohlížeč</translation>
     </message>
     <message>
         <source>Pltedit</source>
-        <translation>Paleta</translation>
+        <translation type="vanished">Paleta</translation>
     </message>
     <message>
         <source>Farm</source>
-        <translation>Zpracování</translation>
+        <translation type="vanished">Zpracování</translation>
     </message>
     <message>
         <source>Reload qss</source>
@@ -4930,19 +4938,19 @@ Please use the frame numbers for reference.</source>
     </message>
     <message>
         <source>Increase max brush thickness</source>
-        <translation>Zvětšit největší tloušťku štětce</translation>
+        <translation type="vanished">Zvětšit největší tloušťku štětce</translation>
     </message>
     <message>
         <source>Decrease max brush thickness</source>
-        <translation>Zmenšit největší tloušťku štětce</translation>
+        <translation type="vanished">Zmenšit největší tloušťku štětce</translation>
     </message>
     <message>
         <source>Increase min brush thickness</source>
-        <translation>Zvětšit nejmenší tloušťku štětce</translation>
+        <translation type="vanished">Zvětšit nejmenší tloušťku štětce</translation>
     </message>
     <message>
         <source>Decrease min brush thickness</source>
-        <translation>Zmenšit nejmenší tloušťku štětce</translation>
+        <translation type="vanished">Zmenšit nejmenší tloušťku štětce</translation>
     </message>
     <message>
         <source>&amp;Binarize...</source>
@@ -4958,7 +4966,7 @@ Please use the frame numbers for reference.</source>
     </message>
     <message>
         <source>Linetest</source>
-        <translation>Čárová zkouška</translation>
+        <translation type="vanished">Čárová zkouška</translation>
     </message>
     <message>
         <source>&amp;Load As Sub-xsheet...</source>
@@ -4990,7 +4998,7 @@ Please use the frame numbers for reference.</source>
     </message>
     <message>
         <source>Link FlipboOks</source>
-        <translation>Propojit FlipboOk</translation>
+        <translation type="vanished">Propojit FlipboOk</translation>
     </message>
     <message>
         <source>&amp;Message Center</source>
@@ -5018,7 +5026,7 @@ Please use the frame numbers for reference.</source>
     </message>
     <message>
         <source>Toggle &amp;Opacity Check</source>
-        <translation>Přepnout ověření &amp;neprůhlednosti</translation>
+        <translation type="vanished">Přepnout ověření &amp;neprůhlednosti</translation>
     </message>
     <message>
         <source>&amp;Load Folder...</source>
@@ -5062,7 +5070,7 @@ Please use the frame numbers for reference.</source>
     </message>
     <message>
         <source>&amp;Clear Recent FlipboOk Image List</source>
-        <translation>&amp;Vyprázdnit předchozí seznam obrázků FlipboOk</translation>
+        <translation type="vanished">&amp;Vyprázdnit předchozí seznam obrázků FlipboOk</translation>
     </message>
     <message>
         <source>Preview Fx</source>
@@ -5070,7 +5078,7 @@ Please use the frame numbers for reference.</source>
     </message>
     <message>
         <source>&amp;Insert Paste</source>
-        <translation>Přidat/&amp;Vložit</translation>
+        <translation type="vanished">Přidat/&amp;Vložit</translation>
     </message>
     <message>
         <source>&amp;Paste Color &amp;&amp; Name</source>
@@ -5266,7 +5274,7 @@ Please use the frame numbers for reference.</source>
     </message>
     <message>
         <source>&amp;Abount OpenToonz...</source>
-        <translation>&amp;O programu OpenToonz...</translation>
+        <translation type="vanished">&amp;O programu OpenToonz...</translation>
     </message>
     <message>
         <source>&amp;ComboViewer</source>
@@ -5536,20 +5544,44 @@ Please use the frame numbers for reference.</source>
         <source>Flip Viewer Horizontally</source>
         <translation>Převrátit prohlížeč vodorovně</translation>
     </message>
+    <message>
+        <source>&amp;Send to Back</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reset Zoom</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reset Rotation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reset Position</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Brush Tool - Eraser (Raster option)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Brush Tool - Lock Alpha</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MatchlinesDialog</name>
     <message>
         <source> Apply Match Lines</source>
-        <translation>Použít dělicí čáry</translation>
+        <translation type="vanished">Použít dělicí čáry</translation>
     </message>
     <message>
         <source>Add Match Line Styles</source>
-        <translation>Přidat styl dělicí čáry</translation>
+        <translation type="vanished">Přidat styl dělicí čáry</translation>
     </message>
     <message>
         <source>Use Style: </source>
-        <translation>Použít styl:</translation>
+        <translation type="vanished">Použít styl:</translation>
     </message>
     <message>
         <source>Line Prevalence</source>
@@ -5618,7 +5650,7 @@ Otherwise, a new style will be added to &quot;match lines&quot; page.</source>
     <name>MenuBarPopup</name>
     <message>
         <source>Customize Menu Bar of Room &quot;%1&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Přizpůsobit nabídkový pruh pracovní plochy &quot;%1&quot;</translation>
     </message>
     <message>
         <source>OK</source>
@@ -5665,15 +5697,15 @@ N.B. Duplicated commands will be ignored. Only the last one will appear in the m
     <name>MergeCmappedCommand</name>
     <message>
         <source>It is not possible to merge tlv columns because no column was selected.</source>
-        <translation>Sloupce TLV nelze sloučit, protože nebyly vybrány žádné sloupce.</translation>
+        <translation type="vanished">Sloupce TLV nelze sloučit, protože nebyly vybrány žádné sloupce.</translation>
     </message>
     <message>
         <source>It is not possible to merge tlv columns because at least two columns have to be selected.</source>
-        <translation>Sloupce TLV nelze sloučit, protože musí být vybrány alespoň dva sloupce.</translation>
+        <translation type="vanished">Sloupce TLV nelze sloučit, protože musí být vybrány alespoň dva sloupce.</translation>
     </message>
     <message>
         <source>Merging Tlv Levels...</source>
-        <translation>Slučují se úrovně TLV...</translation>
+        <translation type="vanished">Slučují se úrovně TLV...</translation>
     </message>
 </context>
 <context>
@@ -5702,16 +5734,20 @@ N.B. Duplicated commands will be ignored. Only the last one will appear in the m
         <source> Merge Tlv Levels</source>
         <translation>Sloučit úrovně TLV</translation>
     </message>
+    <message>
+        <source>Level %1 already exists! Are you sure you want to overwrite it?</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MergeColumnsCommand</name>
     <message>
         <source>It is not possible to execute the merge column command because no column was selected.</source>
-        <translation>Sloupce nelze sloučit, protože nebyly vybrány žádné sloupce.</translation>
+        <translation type="vanished">Sloupce nelze sloučit, protože nebyly vybrány žádné sloupce.</translation>
     </message>
     <message>
         <source>It is not possible to execute the merge column command  because only one columns is  selected.</source>
-        <translation>Sloupce nelze sloučit, protože byly vybrán jen jeden sloupec.</translation>
+        <translation type="vanished">Sloupce nelze sloučit, protože byly vybrán jen jeden sloupec.</translation>
     </message>
 </context>
 <context>
@@ -5795,10 +5831,17 @@ Co chcete dělat?</translation>
     </message>
 </context>
 <context>
+    <name>MyVideoWidget</name>
+    <message>
+        <source>Camera is not available</source>
+        <translation type="unfinished">Kamera není dostupná</translation>
+    </message>
+</context>
+<context>
     <name>MyViewFinder</name>
     <message>
         <source>Camera is not available</source>
-        <translation>Kamera není dostupná</translation>
+        <translation type="vanished">Kamera není dostupná</translation>
     </message>
 </context>
 <context>
@@ -5809,11 +5852,11 @@ Co chcete dělat?</translation>
     </message>
     <message>
         <source>File Name:</source>
-        <translation>Název souboru:</translation>
+        <translation type="vanished">Název souboru:</translation>
     </message>
     <message>
         <source>File Format:</source>
-        <translation>Formát souboru:</translation>
+        <translation type="vanished">Formát souboru:</translation>
     </message>
     <message>
         <source>Output Camera:</source>
@@ -5821,11 +5864,11 @@ Co chcete dělat?</translation>
     </message>
     <message>
         <source>To Frame:</source>
-        <translation>Ke snímku:</translation>
+        <translation type="vanished">Ke snímku:</translation>
     </message>
     <message>
         <source>From Frame:</source>
-        <translation>Od snímku:</translation>
+        <translation type="vanished">Od snímku:</translation>
     </message>
     <message>
         <source>Shrink:</source>
@@ -5849,7 +5892,7 @@ Co chcete dělat?</translation>
     </message>
     <message>
         <source>Multiple Rendering: </source>
-        <translation>Vícenásobné zpracování:</translation>
+        <translation type="vanished">Vícenásobné zpracování:</translation>
     </message>
     <message>
         <source>Do stereoscopy</source>
@@ -5893,7 +5936,7 @@ Co chcete dělat?</translation>
     </message>
     <message>
         <source>to FPS:</source>
-        <translation>Posunutí k FPS:</translation>
+        <translation type="vanished">Posunutí k FPS:</translation>
     </message>
     <message>
         <source>Stretch from FPS:</source>
@@ -5953,15 +5996,15 @@ Co chcete dělat?</translation>
     </message>
     <message>
         <source>8 bits</source>
-        <translation>8-bitů</translation>
+        <translation type="vanished">8-bitů</translation>
     </message>
     <message>
         <source>16 bits</source>
-        <translation>16-bitů</translation>
+        <translation type="vanished">16-bitů</translation>
     </message>
     <message>
         <source>Columns</source>
-        <translation>Sloupce</translation>
+        <translation type="vanished">Sloupce</translation>
     </message>
     <message>
         <source>Camera Shift:</source>
@@ -5969,7 +6012,7 @@ Co chcete dělat?</translation>
     </message>
     <message>
         <source>Stereoscopic Render:</source>
-        <translation>Stereoskopické zpracování:</translation>
+        <translation type="vanished">Stereoskopické zpracování:</translation>
     </message>
     <message>
         <source>Camera Settings</source>
@@ -6192,16 +6235,16 @@ Co chcete dělat?</translation>
     </message>
     <message>
         <source>Overwrite</source>
-        <translation>Přepsat</translation>
+        <translation type="vanished">Přepsat</translation>
     </message>
     <message>
         <source>Skip</source>
-        <translation>Přeskočit</translation>
+        <translation type="vanished">Přeskočit</translation>
     </message>
     <message>
         <source>File &quot;%1&quot; already exists.
 Do you want to overwrite it?</source>
-        <translation>Soubor %1 již existuje.
+        <translation type="vanished">Soubor %1 již existuje.
 Chcete jej přepsat?</translation>
     </message>
 </context>
@@ -6516,6 +6559,10 @@ WARNING : Image size mismatch. The size of level with the same path is %1 x %2.<
         <translation>
 VAROVÁNÍ: Nesoulad ve velikosti obrázku. Velikost úrovně se stejnou cestou je %1 x %2.</translation>
     </message>
+    <message>
+        <source>Subcamera</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>PencilTestSaveInFolderPopup</name>
@@ -6634,19 +6681,19 @@ Nastavit cestu k výstupní složce také na podsložku.</translation>
     </message>
     <message>
         <source>Luminance:</source>
-        <translation>Svítivost:</translation>
+        <translation type="vanished">Svítivost:</translation>
     </message>
     <message>
         <source>Saturation:</source>
-        <translation>Sytost:</translation>
+        <translation type="vanished">Sytost:</translation>
     </message>
     <message>
         <source>Hue:</source>
-        <translation>Odstín:</translation>
+        <translation type="vanished">Odstín:</translation>
     </message>
     <message>
         <source>Transparency:</source>
-        <translation>Průhlednost:</translation>
+        <translation type="vanished">Průhlednost:</translation>
     </message>
     <message>
         <source>Fade to Color</source>
@@ -6654,7 +6701,7 @@ Nastavit cestu k výstupní složce také na podsložku.</translation>
     </message>
     <message>
         <source>              Color:</source>
-        <translation>             Barva:</translation>
+        <translation type="vanished">             Barva:</translation>
     </message>
     <message>
         <source>Fade</source>
@@ -6666,11 +6713,11 @@ Nastavit cestu k výstupní složce také na podsložku.</translation>
     </message>
     <message>
         <source>Full Matte</source>
-        <translation>Plné pozadí</translation>
+        <translation type="vanished">Plné pozadí</translation>
     </message>
     <message>
         <source>Zero Matte</source>
-        <translation>Žádné pozadí</translation>
+        <translation type="vanished">Žádné pozadí</translation>
     </message>
     <message>
         <source>Scale (%)</source>
@@ -6694,7 +6741,7 @@ Nastavit cestu k výstupní složce také na podsložku.</translation>
     </message>
     <message>
         <source>Matte</source>
-        <translation>Alfa</translation>
+        <translation type="vanished">Alfa</translation>
     </message>
     <message>
         <source>Color</source>
@@ -6729,11 +6776,11 @@ Nastavit cestu k výstupní složce také na podsložku.</translation>
     </message>
     <message>
         <source>Minimize Raster Memory Fragmentation*</source>
-        <translation>Zmenšit tříštění rastrové paměti*</translation>
+        <translation type="vanished">Zmenšit tříštění rastrové paměti*</translation>
     </message>
     <message>
         <source>Save Automatically Every Minutes</source>
-        <translation>Uložit automaticky po stanoveném počtu minut</translation>
+        <translation type="vanished">Uložit automaticky po stanoveném počtu minut</translation>
     </message>
     <message>
         <source>Backup Animation Levels when Saving</source>
@@ -6749,11 +6796,11 @@ Nastavit cestu k výstupní složce také na podsložku.</translation>
     </message>
     <message>
         <source>Style:</source>
-        <translation>Styl:</translation>
+        <translation type="vanished">Styl:</translation>
     </message>
     <message>
         <source>Open FlipboOk after Rendering</source>
-        <translation>Po zpracování otevřít FlipboOk</translation>
+        <translation type="vanished">Po zpracování otevřít FlipboOk</translation>
     </message>
     <message>
         <source>Unit:</source>
@@ -6765,15 +6812,15 @@ Nastavit cestu k výstupní složce také na podsložku.</translation>
     </message>
     <message>
         <source>FlipboOk Shrink:</source>
-        <translation>Zmenšit FlipboOk:</translation>
+        <translation type="vanished">Zmenšit FlipboOk:</translation>
     </message>
     <message>
         <source>Step:</source>
-        <translation>Krok:</translation>
+        <translation type="vanished">Krok:</translation>
     </message>
     <message>
         <source>Height*:</source>
-        <translation>Výška*:</translation>
+        <translation type="vanished">Výška*:</translation>
     </message>
     <message>
         <source>Loading</source>
@@ -6801,7 +6848,7 @@ Nastavit cestu k výstupní složce také na podsložku.</translation>
     </message>
     <message>
         <source>Default Interpolation: </source>
-        <translation>Výchozí interpolace obrazu:</translation>
+        <translation type="vanished">Výchozí interpolace obrazu:</translation>
     </message>
     <message>
         <source>Linear</source>
@@ -6813,7 +6860,7 @@ Nastavit cestu k výstupní složce také na podsložku.</translation>
     </message>
     <message>
         <source>Ease In / Ease Out</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ease In/Ease Out</translation>
     </message>
     <message>
         <source>Ease In / Ease Out %</source>
@@ -6837,7 +6884,7 @@ Nastavit cestu k výstupní složce také na podsložku.</translation>
     </message>
     <message>
         <source>Display in a New FlipboOk Window</source>
-        <translation>Zobrazit v novém okně FlipboOk</translation>
+        <translation type="vanished">Zobrazit v novém okně FlipboOk</translation>
     </message>
     <message>
         <source>Rewind after Playback</source>
@@ -6849,11 +6896,11 @@ Nastavit cestu k výstupní složce také na podsložku.</translation>
     </message>
     <message>
         <source>   Following Frames Correction: </source>
-        <translation>Nastavení barvy následujících snímků: </translation>
+        <translation type="vanished">Nastavení barvy následujících snímků: </translation>
     </message>
     <message>
         <source>   Previous  Frames Correction: </source>
-        <translation>Nastavení barvy předcházejících snímků: </translation>
+        <translation type="vanished">Nastavení barvy předcházejících snímků: </translation>
     </message>
     <message>
         <source>Display Lines Only </source>
@@ -6877,11 +6924,11 @@ Nastavit cestu k výstupní složce také na podsložku.</translation>
     </message>
     <message>
         <source>Language*:</source>
-        <translation>Jazyk*:</translation>
+        <translation type="vanished">Jazyk*:</translation>
     </message>
     <message>
         <source>Undo Memory Size (MB):</source>
-        <translation>Velikost paměti (MB) pro návrat zpět:</translation>
+        <translation type="vanished">Velikost paměti (MB) pro návrat zpět:</translation>
     </message>
     <message>
         <source>Render Task Chunk Size:</source>
@@ -6893,7 +6940,7 @@ Nastavit cestu k výstupní složce také na podsložku.</translation>
     </message>
     <message>
         <source>*Changes will take effect the next time you run Toonz</source>
-        <translation>*Změny se projeví při příštím spuštění Toonz</translation>
+        <translation type="vanished">*Změny se projeví při příštím spuštění Toonz</translation>
     </message>
     <message>
         <source>cm</source>
@@ -6917,15 +6964,15 @@ Nastavit cestu k výstupní složce také na podsložku.</translation>
     </message>
     <message>
         <source>Level Strip Frames Width*:</source>
-        <translation>Šířka proužku snímků úrovně*:</translation>
+        <translation type="vanished">Šířka proužku snímků úrovně*:</translation>
     </message>
     <message>
         <source>Capture</source>
-        <translation>Zachytávání</translation>
+        <translation type="vanished">Zachytávání</translation>
     </message>
     <message>
         <source>        Frame Rate:</source>
-        <translation>     Snímkování:</translation>
+        <translation type="vanished">     Snímkování:</translation>
     </message>
     <message>
         <source>Scan File Format:</source>
@@ -6937,7 +6984,7 @@ Nastavit cestu k výstupní složce také na podsložku.</translation>
     </message>
     <message>
         <source>Height:</source>
-        <translation>Výška:</translation>
+        <translation type="vanished">Výška:</translation>
     </message>
     <message>
         <source>DPI:</source>
@@ -6957,7 +7004,7 @@ Nastavit cestu k výstupní složce také na podsložku.</translation>
     </message>
     <message>
         <source>Enable Version Control *</source>
-        <translation>Povolit správu verzí *</translation>
+        <translation type="vanished">Povolit správu verzí *</translation>
     </message>
     <message>
         <source>Default Level Type:</source>
@@ -6985,19 +7032,19 @@ Nastavit cestu k výstupní složce také na podsložku.</translation>
     </message>
     <message>
         <source>   Ink Color on White Bg: </source>
-        <translation>　Barva čar a vektorů na bílém pozadí:</translation>
+        <translation type="vanished">　Barva čar a vektorů na bílém pozadí:</translation>
     </message>
     <message>
         <source>   Ink Color on Black Bg: </source>
-        <translation>　Barva čar a vektorů na černém pozadí:</translation>
+        <translation type="vanished">　Barva čar a vektorů na černém pozadí:</translation>
     </message>
     <message>
         <source> Paint Color: </source>
-        <translation>Barva malby:</translation>
+        <translation type="vanished">Barva malby:</translation>
     </message>
     <message>
         <source>Fit to FlipboOk</source>
-        <translation>Ukázat vše ve FlipboOk</translation>
+        <translation type="vanished">Ukázat vše ve FlipboOk</translation>
     </message>
     <message>
         <source>New Level Format</source>
@@ -7049,7 +7096,7 @@ Nastavit cestu k výstupní složce také na podsložku.</translation>
     </message>
     <message>
         <source>Replace Level after SaveLevelAs command</source>
-        <translation>Nahradit úroveň po příkazu Uložit úroveň jako</translation>
+        <translation type="vanished">Nahradit úroveň po příkazu Uložit úroveň jako</translation>
     </message>
     <message>
         <source>* Changes will take effect the next time you run Toonz</source>
@@ -7069,11 +7116,11 @@ Nastavit cestu k výstupní složce také na podsložku.</translation>
     </message>
     <message>
         <source>Show Raster Images Darken Blended in Camstand View</source>
-        <translation>Zobrazit rastrové obrázky v pohledu na stav kamery (tmavě smícháno)</translation>
+        <translation type="vanished">Zobrazit rastrové obrázky v pohledu na stav kamery (tmavě smícháno)</translation>
     </message>
     <message>
         <source>Show &quot;ABC&quot;  to the Frame Number in Xsheet Cell</source>
-        <translation>Ukázat dodatek &quot;ABC&quot; u čísla snímku v buňce Xsheet</translation>
+        <translation type="vanished">Ukázat dodatek &quot;ABC&quot; u čísla snímku v buňce Xsheet</translation>
     </message>
     <message>
         <source>Automatically Remove Scene Number from Loaded Level Name</source>
@@ -7141,11 +7188,11 @@ Nastavit cestu k výstupní složce také na podsložku.</translation>
     </message>
     <message>
         <source>Default TLV Caching Behavior</source>
-        <translation>Výchozí chování ukládání do vyrovnávací paměti TLV</translation>
+        <translation type="vanished">Výchozí chování ukládání do vyrovnávací paměti TLV</translation>
     </message>
     <message>
         <source>Column Icon</source>
-        <translation>Ikona sloupce</translation>
+        <translation type="vanished">Ikona sloupce</translation>
     </message>
     <message>
         <source>  Height:</source>
@@ -7193,15 +7240,15 @@ Nastavit cestu k výstupní složce také na podsložku.</translation>
     </message>
     <message>
         <source>Pick Every Colors as Different Styles</source>
-        <translation>Zvolit každou barvu jako jednotlivý styl</translation>
+        <translation type="vanished">Zvolit každou barvu jako jednotlivý styl</translation>
     </message>
     <message>
         <source>Integrate Similar Colors as One Style</source>
-        <translation>Zvolit podobné barvy jako jeden styl</translation>
+        <translation type="vanished">Zvolit podobné barvy jako jeden styl</translation>
     </message>
     <message>
         <source>Palette Type on Loading Raster Image as Color Model</source>
-        <translation>Typ palety při nahrání rastrového obrázku jako barevný model</translation>
+        <translation type="vanished">Typ palety při nahrání rastrového obrázku jako barevný model</translation>
     </message>
     <message>
         <source>Mouse Cursor</source>
@@ -7694,19 +7741,19 @@ in non alpha-enabled image format.</source>
     <name>PreferencesPopup:: FormatProperties</name>
     <message>
         <source>Level Settings by File Format</source>
-        <translation>Nastavení úrovní podle souborového formátu</translation>
+        <translation type="vanished">Nastavení úrovní podle souborového formátu</translation>
     </message>
     <message>
         <source>Name:</source>
-        <translation>Název:</translation>
+        <translation type="vanished">Název:</translation>
     </message>
     <message>
         <source>Regular Expression:</source>
-        <translation>Formát souboru（regulární výrazy):</translation>
+        <translation type="vanished">Formát souboru（regulární výrazy):</translation>
     </message>
     <message>
         <source>Priority</source>
-        <translation>Přednost</translation>
+        <translation type="vanished">Přednost</translation>
     </message>
 </context>
 <context>
@@ -7732,12 +7779,12 @@ in non alpha-enabled image format.</source>
     <name>Previewer</name>
     <message>
         <source>The file name cannot be empty or contain any of the following characters:(new line)  \ / : * ? &quot;  |</source>
-        <translation>Název souboru nesmí být prázdný nebo obsahovat následující znaky: (nový řádek)  \ / : * ? &quot;  |</translation>
+        <translation type="vanished">Název souboru nesmí být prázdný nebo obsahovat následující znaky: (nový řádek)  \ / : * ? &quot;  |</translation>
     </message>
     <message>
         <source>File %1 already exists.
 Do you want to overwrite it?</source>
-        <translation>Soubor %1 již existuje.
+        <translation type="vanished">Soubor %1 již existuje.
 Chcete jej přepsat?</translation>
     </message>
 </context>
@@ -7800,7 +7847,7 @@ Chcete jej přepsat?</translation>
     </message>
     <message>
         <source>Ok</source>
-        <translation>OK</translation>
+        <translation type="vanished">OK</translation>
     </message>
     <message>
         <source>It is not possible to create the %1 project.</source>
@@ -7814,7 +7861,7 @@ Chcete jej přepsat?</translation>
     </message>
     <message>
         <source>Bad project name: &apos;%1&apos; loOks like an absolute file path</source>
-        <translation>Neplatný název projektu: &apos;%1&apos; vypadá, že je to absolutní cesta</translation>
+        <translation type="vanished">Neplatný název projektu: &apos;%1&apos; vypadá, že je to absolutní cesta</translation>
     </message>
     <message>
         <source>Project &apos;%1&apos; already exists</source>
@@ -7909,6 +7956,38 @@ Chcete jej přepsat?</translation>
         <source>Level Name:</source>
         <translation>Název úrovně:</translation>
     </message>
+    <message>
+        <source>Single Image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Frames</source>
+        <translation type="unfinished">Snímky</translation>
+    </message>
+    <message>
+        <source>Columns</source>
+        <translation type="unfinished">Sloupce</translation>
+    </message>
+    <message>
+        <source>Flatten visible document layers into a single image. Layer styles are maintained.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Load document layers as frames into a single xsheet column.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Load document layers as xhseet columns.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished">OK</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Zrušit</translation>
+    </message>
 </context>
 <context>
     <name>QApplication</name>
@@ -7958,16 +8037,16 @@ Chcete jej přepsat?</translation>
     <message>
         <source>The color model palette is different from the destination palette.
 What do you want to do? </source>
-        <translation>Paleta s barevným modelem se liší od cílové palety.
+        <translation type="vanished">Paleta s barevným modelem se liší od cílové palety.
 Co chcete dělat?</translation>
     </message>
     <message>
         <source>Overwrite the destination palette.</source>
-        <translation>Přepsat cílovou paletu.</translation>
+        <translation type="vanished">Přepsat cílovou paletu.</translation>
     </message>
     <message>
         <source>Keep the destination palette and apply it to the color model.</source>
-        <translation>Ponechat cílovou paletu. a použít ji na barevný model.</translation>
+        <translation type="vanished">Ponechat cílovou paletu. a použít ji na barevný model.</translation>
     </message>
     <message>
         <source>It is not possible to paste the columns: there is a circular reference.</source>
@@ -8103,7 +8182,7 @@ Chcete jej zavést nebo nebo jej nahrát z jeho původního umístění?</transl
     </message>
     <message>
         <source>System date tampered.</source>
-        <translation>Do sytémového data bylo zasáhnuto.</translation>
+        <translation type="vanished">Do sytémového data bylo zasáhnuto.</translation>
     </message>
     <message>
         <source>No more Undo operations available.</source>
@@ -8121,7 +8200,7 @@ Navštivte, prosím, internetové stránky pro více informací.</translation>
     </message>
     <message>
         <source>Quit</source>
-        <translation>Ukončit</translation>
+        <translation type="vanished">Ukončit</translation>
     </message>
     <message>
         <source>Scan</source>
@@ -8133,7 +8212,7 @@ Navštivte, prosím, internetové stránky pro více informací.</translation>
     </message>
     <message>
         <source>Select an empty cell or a sub-xsheet cell.</source>
-        <translation>Vyberte prázdnou buňku nebo buňku pod-Xsheet.</translation>
+        <translation type="vanished">Vyberte prázdnou buňku nebo buňku pod-Xsheet.</translation>
     </message>
     <message>
         <source>Collapsing columns: what you want to do?</source>
@@ -8244,7 +8323,7 @@ the level has to be saved first.</source>
     <message>
         <source>It is not possible to track the level:
 undefinied error.</source>
-        <translation>Nelze sledovat úroveň:
+        <translation type="vanished">Nelze sledovat úroveň:
 Neurčená chyba.</translation>
     </message>
     <message>
@@ -8309,7 +8388,7 @@ Neurčená chyba.</translation>
     </message>
     <message>
         <source>FlipBoOk</source>
-        <translation>FlipBoOk</translation>
+        <translation type="vanished">FlipBoOk</translation>
     </message>
     <message>
         <source>Deactivate Onion Skin</source>
@@ -8356,7 +8435,7 @@ Jste si jistý, že se chcete vrátit k předchozí uložené verzi?</translatio
     <message>
         <source>%1: the current scene has been modified.
 Do you want to save your changes?</source>
-        <translation>%1: Nynější záběr byl změněn.
+        <translation type="vanished">%1: Nynější záběr byl změněn.
 Chcete uložit změny?</translation>
     </message>
     <message>
@@ -8434,7 +8513,7 @@ Co chcete dělat?</translation>
     <message>
         <source>The license validation process was not able to confirm the right to use this software on this computer.
  Please contact [ support@toonz.com ] for assistance.</source>
-        <translation>Licenční schvalovací postup nebyl schopen potvrdit oprávnění k používání software na tomto počítači.
+        <translation type="vanished">Licenční schvalovací postup nebyl schopen potvrdit oprávnění k používání software na tomto počítači.
 Spojte se, prosím, kvůli podpoře s support@toonz.com.</translation>
     </message>
     <message>
@@ -8447,7 +8526,7 @@ Spojte se, prosím, kvůli podpoře s support@toonz.com.</translation>
     </message>
     <message>
         <source>Change project</source>
-        <translation>Změnit projekt</translation>
+        <translation type="vanished">Změnit projekt</translation>
     </message>
     <message>
         <source>It is not possible to delete the selection.</source>
@@ -8539,7 +8618,7 @@ Chcete jej přepsat?</translation>
     </message>
     <message>
         <source>File %1 doesn&apos;t loOk like a TOONZ Scene</source>
-        <translation>Soubor %1 nevypadá jako záběr Toonz</translation>
+        <translation type="vanished">Soubor %1 nevypadá jako záběr Toonz</translation>
     </message>
     <message>
         <source>It is not possible to load the scene %1 because it does not belong to any project.</source>
@@ -8579,7 +8658,7 @@ Některé úrovně nebyly nahrány, protože jejich verze není podporována</tr
     </message>
     <message>
         <source>The Revert to Last Saved command is not supported for the current selection.</source>
-        <translation>Příkaz &quot;Vrátit se k naposledy uložené verzi&quot; není pro nynější výběr podporován.</translation>
+        <translation type="vanished">Příkaz &quot;Vrátit se k naposledy uložené verzi&quot; není pro nynější výběr podporován.</translation>
     </message>
     <message>
         <source>The selected column is empty.</source>
@@ -8829,7 +8908,7 @@ Chcete uložit změny?</translation>
     </message>
     <message>
         <source>The scene %1 was created with Toonz and cannot be loaded in LineTest.</source>
-        <translation>Záběr %1 byl vytvořen s Toonz a nelze jej nahrát do čárové zkoušky.</translation>
+        <translation type="vanished">Záběr %1 byl vytvořen s Toonz a nelze jej nahrát do čárové zkoušky.</translation>
     </message>
     <message>
         <source>File %1 already exists.
@@ -8855,11 +8934,11 @@ Chcete jej přepsat?</translation>
     </message>
     <message>
         <source>Level </source>
-        <translation>Úroveň </translation>
+        <translation type="vanished">Úroveň </translation>
     </message>
     <message>
         <source> already exists! Are you sure you want to overwrite it?</source>
-        <translation> již existuje. Chcete ji přepsat?</translation>
+        <translation type="vanished"> již existuje. Chcete ji přepsat?</translation>
     </message>
     <message>
         <source>It is not possible to merge tlv columns containing more than one level</source>
@@ -8969,19 +9048,19 @@ Jste si jistý?</translation>
         <source> Following file(s) are modified.
 
 </source>
-        <translation>Následující soubor(y) jsou změněny.
+        <translation type="vanished">Následující soubor(y) jsou změněny.
 
 </translation>
     </message>
     <message>
         <source>
 Are you sure to </source>
-        <translation>
+        <translation type="vanished">
 Jste si jistý </translation>
     </message>
     <message>
         <source> anyway ?</source>
-        <translation> přesto?</translation>
+        <translation type="vanished"> přesto?</translation>
     </message>
     <message>
         <source>Overwrite Palette</source>
@@ -8997,7 +9076,7 @@ Jste si jistý </translation>
     </message>
     <message>
         <source>Toonz cannot Save this Level</source>
-        <translation>Tuto úroveň nelze uložit</translation>
+        <translation type="vanished">Tuto úroveň nelze uložit</translation>
     </message>
     <message>
         <source>No Current Scene</source>
@@ -9057,7 +9136,7 @@ Jste si jistý </translation>
     </message>
     <message>
         <source>Inbeteween  : Level %1,  </source>
-        <translation>Mezi to: Úroveň %1</translation>
+        <translation type="vanished">Mezi to: Úroveň %1</translation>
     </message>
     <message>
         <source>Paste Column :  </source>
@@ -9189,7 +9268,7 @@ Jste si jistý </translation>
     </message>
     <message>
         <source>Paste (StrOkes)</source>
-        <translation>Vložit (tah)</translation>
+        <translation type="vanished">Vložit (tah)</translation>
     </message>
     <message>
         <source>Paste</source>
@@ -9227,7 +9306,7 @@ Ve schránce nejsou žádná data k vložení</translation>
     </message>
     <message>
         <source>Set Keyframe  : %1  at Frame %2</source>
-        <translation>nastavit klíčový snímek: %1 snímek %2</translation>
+        <translation type="vanished">nastavit klíčový snímek: %1 snímek %2</translation>
     </message>
     <message>
         <source>Move Columns</source>
@@ -9251,7 +9330,7 @@ Ve schránce nejsou žádná data k vložení</translation>
     </message>
     <message>
         <source>Cleeanup Settings</source>
-        <translation>Nastavení vyčištění</translation>
+        <translation type="vanished">Nastavení vyčištění</translation>
     </message>
     <message>
         <source>Move Level to Cast Folder</source>
@@ -9689,6 +9768,240 @@ to use the duplicate command in the xsheet / timeline.</source>
         <source>Clear All Relative Onion Skin Markers</source>
         <translation>Vyprázdnit všechny relativní značky cibulového vzhledu</translation>
     </message>
+    <message>
+        <source>Always Overwrite in This Scene</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>    + %1 more level(s) 
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fx Settings</source>
+        <translation type="unfinished">Nastavení efektu</translation>
+    </message>
+    <message>
+        <source>Save Curve</source>
+        <translation type="unfinished">Uložit křivku</translation>
+    </message>
+    <message>
+        <source>Load Curve</source>
+        <translation type="unfinished">Nahrát křivku (parametr efektu)</translation>
+    </message>
+    <message>
+        <source>Export Curve</source>
+        <translation type="unfinished">Vyvést křivku</translation>
+    </message>
+    <message>
+        <source>Rendering frame %1 / %2</source>
+        <comment>RenderListener</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Precomputing %1 Frames</source>
+        <comment>RenderListener</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> of %1</source>
+        <comment>RenderListener</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Finalizing render, please wait.</source>
+        <comment>RenderListener</comment>
+        <translation type="unfinished">Dokončuje se zpracování. Počkejte, prosím.</translation>
+    </message>
+    <message>
+        <source>Aborting render...</source>
+        <comment>RenderListener</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Building Schematic...</source>
+        <comment>RenderCommand</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>column </source>
+        <comment>MultimediaProgressBar label (mode name)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>layer </source>
+        <comment>MultimediaProgressBar label (mode name)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rendering %1%2, frame %3 / %4</source>
+        <comment>MultimediaProgressBar label</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rendering %1 frames of %2</source>
+        <comment>MultimediaProgressBar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 of %2</source>
+        <comment>MultimediaProgressBar - [totalframe] of [path]</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Aborting render...</source>
+        <comment>MultimediaProgressBar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>It is not possible to write the output:  the file</source>
+        <comment>RenderCommand</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>s are read only.</source>
+        <comment>RenderCommand</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> is read only.</source>
+        <comment>RenderCommand</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save Cleanup Settings</source>
+        <translation type="unfinished">Uložit nastavení vyčištění</translation>
+    </message>
+    <message>
+        <source>Load Cleanup Settings</source>
+        <translation type="unfinished">Nahrát nastavení vyčištění</translation>
+    </message>
+    <message>
+        <source>It is not possible to find the %1 level.</source>
+        <comment>FileData</comment>
+        <translation type="unfinished">Úroveň %1 nelze najít.</translation>
+    </message>
+    <message>
+        <source>There was an error copying %1</source>
+        <comment>FileData</comment>
+        <translation type="unfinished">Při kopírování %1 se vyskytla chyba</translation>
+    </message>
+    <message>
+        <source>Clone Level</source>
+        <comment>CloneLevelUndo::LevelNamePopup</comment>
+        <translation type="unfinished">Zdvojit úroveň</translation>
+    </message>
+    <message>
+        <source>Level Name:</source>
+        <comment>CloneLevelUndo::LevelNamePopup</comment>
+        <translation type="unfinished">Název úrovně:</translation>
+    </message>
+    <message>
+        <source>Collecting assets...</source>
+        <translation type="unfinished">Sbírá se materiál...</translation>
+    </message>
+    <message>
+        <source>Abort</source>
+        <translation type="unfinished">Zrušit</translation>
+    </message>
+    <message>
+        <source>Importing scenes...</source>
+        <translation type="unfinished">Zavádí se záběry...</translation>
+    </message>
+    <message>
+        <source>It is not possible to execute the merge column command because no column was selected.</source>
+        <translation type="unfinished">Sloupce nelze sloučit, protože nebyly vybrány žádné sloupce.</translation>
+    </message>
+    <message>
+        <source>It is not possible to execute the merge column command because only one columns is selected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>It is not possible to apply the match lines because no column was selected.</source>
+        <translation type="unfinished">Není možné použít dělicí čáry, protože nebyl vybrán žádný sloupec.</translation>
+    </message>
+    <message>
+        <source>It is not possible to apply the match lines because two columns have to be selected.</source>
+        <translation type="unfinished">Je možné použít dělicí čáry, protože musí být vybrány dva sloupce.</translation>
+    </message>
+    <message>
+        <source>It is not possible to merge tlv columns because no column was selected.</source>
+        <translation type="unfinished">Sloupce TLV nelze sloučit, protože nebyly vybrány žádné sloupce.</translation>
+    </message>
+    <message>
+        <source>It is not possible to merge tlv columns because at least two columns have to be selected.</source>
+        <translation type="unfinished">Sloupce TLV nelze sloučit, protože musí být vybrány alespoň dva sloupce.</translation>
+    </message>
+    <message>
+        <source>Merging Tlv Levels...</source>
+        <translation type="unfinished">Slučují se úrovně TLV...</translation>
+    </message>
+    <message>
+        <source>Save Previewed Images</source>
+        <translation type="unfinished">Uložit snímky s náhledem</translation>
+    </message>
+    <message>
+        <source>The file name cannot be empty or contain any of the following characters:(new line)  \ / : * ? &quot;  |</source>
+        <translation type="unfinished">Název souboru nesmí být prázdný nebo obsahovat následující znaky: (nový řádek)  \ / : * ? &quot;  |</translation>
+    </message>
+    <message>
+        <source>Unsopporter raster format, cannot save</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot create %1 : %2</source>
+        <comment>Previewer warning %1:path %2:message</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot create %1</source>
+        <comment>Previewer warning %1:path</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Saved %1 frames out of %2 in %3</source>
+        <comment>Previewer %1:savedframes %2:framecount %3:filepath</comment>
+        <translation type="unfinished">%1 snímků z %2 bylo uloženo v %3</translation>
+    </message>
+    <message>
+        <source>Canceled! </source>
+        <comment>Previewer</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No frame to save!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Already saving!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning!</source>
+        <comment>OverwriteDialog</comment>
+        <translation type="unfinished">Varování!</translation>
+    </message>
+    <message>
+        <source>Overwrite</source>
+        <comment>OverwriteDialog</comment>
+        <translation type="unfinished">Přepsat</translation>
+    </message>
+    <message>
+        <source>Skip</source>
+        <comment>OverwriteDialog</comment>
+        <translation type="unfinished">Přeskočit</translation>
+    </message>
+    <message>
+        <source>File &quot;%1&quot; already exists.
+Do you want to overwrite it?</source>
+        <comment>OverwriteDialog</comment>
+        <translation type="unfinished">Soubor %1 již existuje.
+Chcete jej přepsat?</translation>
+    </message>
+    <message>
+        <source>%1 does not exist.</source>
+        <translation type="unfinished">%1 neexistuje.</translation>
+    </message>
 </context>
 <context>
     <name>ReframePopup</name>
@@ -9795,7 +10108,7 @@ Výsledek výstupu se může lišit od toho, který byl očekáván. Co chcete d
     <name>RenderListener</name>
     <message>
         <source>Finalizing render, please wait.</source>
-        <translation>Dokončuje se zpracování. Počkejte, prosím.</translation>
+        <translation type="vanished">Dokončuje se zpracování. Počkejte, prosím.</translation>
     </message>
 </context>
 <context>
@@ -9829,7 +10142,7 @@ Výsledek výstupu se může lišit od toho, který byl očekáván. Co chcete d
     </message>
     <message>
         <source>Nothing to replace: no cells selected.</source>
-        <translation>Není nic k nahrazenín: Nebyly vybrány žádné buňky.</translation>
+        <translation type="vanished">Není nic k nahrazenín: Nebyly vybrány žádné buňky.</translation>
     </message>
     <message>
         <source>File not found
@@ -9850,7 +10163,7 @@ Výsledek výstupu se může lišit od toho, který byl očekáván. Co chcete d
     </message>
     <message>
         <source>Nothing to replace: no cells or columns selected.</source>
-        <translation>Není nic k nahrazenín: Nebyly vybrány ani buňky ani sloupce.</translation>
+        <translation type="vanished">Není nic k nahrazenín: Nebyly vybrány ani buňky ani sloupce.</translation>
     </message>
 </context>
 <context>
@@ -9861,7 +10174,7 @@ Výsledek výstupu se může lišit od toho, který byl očekáván. Co chcete d
     </message>
     <message>
         <source>Delete Room</source>
-        <translation>Smazat pracovní plochu</translation>
+        <translation type="vanished">Smazat pracovní plochu</translation>
     </message>
     <message>
         <source>Room</source>
@@ -10037,11 +10350,11 @@ Výsledek výstupu se může lišit od toho, který byl očekáván. Co chcete d
     </message>
     <message>
         <source>Adding hoOk file to repository...</source>
-        <translation>Soubor háčku se přidává do úložiště...</translation>
+        <translation type="vanished">Soubor háčku se přidává do úložiště...</translation>
     </message>
     <message>
         <source>Setting the needs-lock property to hoOk file...</source>
-        <translation>Vlastnost &quot;Zámek nutný&quot; se nastavuje v souboru háčku...</translation>
+        <translation type="vanished">Vlastnost &quot;Zámek nutný&quot; se nastavuje v souboru háčku...</translation>
     </message>
     <message>
         <source>Adding hook file to repository...</source>
@@ -10698,18 +11011,18 @@ Nejprve, prosím, změny odešlete, nebo je vraťte zpět.</translation>
     <name>SaveCurvePopup</name>
     <message>
         <source>Save Curve</source>
-        <translation>Uložit křivku</translation>
+        <translation type="vanished">Uložit křivku</translation>
     </message>
     <message>
         <source>Save</source>
-        <translation>Uložit</translation>
+        <translation type="vanished">Uložit</translation>
     </message>
 </context>
 <context>
     <name>SaveImagesPopup</name>
     <message>
         <source>Save FlipboOk Images</source>
-        <translation>Uložit obrázky FlipboOk</translation>
+        <translation type="vanished">Uložit obrázky FlipboOk</translation>
     </message>
     <message>
         <source>Save</source>
@@ -10781,11 +11094,11 @@ Nejprve, prosím, změny odešlete, nebo je vraťte zpět.</translation>
     <name>SavePreviewedPopup</name>
     <message>
         <source>Save Previewed Images</source>
-        <translation>Uložit snímky s náhledem</translation>
+        <translation type="vanished">Uložit snímky s náhledem</translation>
     </message>
     <message>
         <source>Save</source>
-        <translation>Uložit</translation>
+        <translation type="vanished">Uložit</translation>
     </message>
 </context>
 <context>
@@ -10803,11 +11116,11 @@ Nejprve, prosím, změny odešlete, nebo je vraťte zpět.</translation>
     <name>SaveSettingsPopup</name>
     <message>
         <source>Save Cleanup Settings</source>
-        <translation>Uložit nastavení vyčištění</translation>
+        <translation type="vanished">Uložit nastavení vyčištění</translation>
     </message>
     <message>
         <source>Save</source>
-        <translation>Uložit</translation>
+        <translation type="vanished">Uložit</translation>
     </message>
 </context>
 <context>
@@ -10879,7 +11192,7 @@ Nejprve, prosím, změny odešlete, nebo je vraťte zpět.</translation>
     </message>
     <message>
         <source>          Frame Rate:</source>
-        <translation>         Snímkování:</translation>
+        <translation type="vanished">         Snímkování:</translation>
     </message>
     <message>
         <source>Camera BG Color:</source>
@@ -10887,19 +11200,19 @@ Nejprve, prosím, změny odešlete, nebo je vraťte zpět.</translation>
     </message>
     <message>
         <source>Viewer BG Color:</source>
-        <translation>Barva pozadí prohlížeče:</translation>
+        <translation type="vanished">Barva pozadí prohlížeče:</translation>
     </message>
     <message>
         <source>   Preview BG Color:</source>
-        <translation>Barva pozadí náhledu:</translation>
+        <translation type="vanished">Barva pozadí náhledu:</translation>
     </message>
     <message>
         <source>Checkerboard Color 1:</source>
-        <translation>Barva šachovnice 1:</translation>
+        <translation type="vanished">Barva šachovnice 1:</translation>
     </message>
     <message>
         <source>Checkerboard Color 2:</source>
-        <translation>Barva šachovnice 2:</translation>
+        <translation type="vanished">Barva šachovnice 2:</translation>
     </message>
     <message>
         <source>Image Subsampling:</source>
@@ -10907,7 +11220,7 @@ Nejprve, prosím, změny odešlete, nebo je vraťte zpět.</translation>
     </message>
     <message>
         <source>      Marker Interval:</source>
-        <translation>     Interval značky:</translation>
+        <translation type="vanished">     Interval značky:</translation>
     </message>
     <message>
         <source>A/R:</source>
@@ -10915,11 +11228,11 @@ Nejprve, prosím, změny odešlete, nebo je vraťte zpět.</translation>
     </message>
     <message>
         <source>Safe Area Box 2:</source>
-        <translation>Rámeček bezpečné oblasti 2:</translation>
+        <translation type="vanished">Rámeček bezpečné oblasti 2:</translation>
     </message>
     <message>
         <source>Safe Area Box 1:</source>
-        <translation>Rámeček bezpečné oblasti 1:</translation>
+        <translation type="vanished">Rámeček bezpečné oblasti 1:</translation>
     </message>
     <message>
         <source>TLV Subsampling:</source>
@@ -10927,11 +11240,11 @@ Nejprve, prosím, změny odešlete, nebo je vraťte zpět.</translation>
     </message>
     <message>
         <source>Start Frame:</source>
-        <translation>Začáteční snímek:</translation>
+        <translation type="vanished">Začáteční snímek:</translation>
     </message>
     <message>
         <source>Level And Column Icon:</source>
-        <translation>Ikona úrovní a sloupců:</translation>
+        <translation type="vanished">Ikona úrovní a sloupců:</translation>
     </message>
     <message>
         <source>Field Guide Size:</source>
@@ -11028,6 +11341,14 @@ Nejprve, prosím, změny odešlete, nebo je vraťte zpět.</translation>
         <source>Select %1</source>
         <translation>Vybrat %1</translation>
     </message>
+    <message>
+        <source>Flip View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reset View</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SceneViewerPanel</name>
@@ -11090,6 +11411,10 @@ Nejprve, prosím, změny odešlete, nebo je vraťte zpět.</translation>
     <message>
         <source> (Flipped)</source>
         <translation> (převráceno)</translation>
+    </message>
+    <message>
+        <source>   ::   Project: </source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -11593,7 +11918,7 @@ Přiřadit k &apos;%3&apos;?</translation>
     </message>
     <message>
         <source>Choose Project</source>
-        <translation>Vybrat projekt</translation>
+        <translation type="vanished">Vybrat projekt</translation>
     </message>
     <message>
         <source>Create a New Scene</source>
@@ -11601,7 +11926,7 @@ Přiřadit k &apos;%3&apos;?</translation>
     </message>
     <message>
         <source>Open Scene</source>
-        <translation>Otevřít záběr</translation>
+        <translation type="vanished">Otevřít záběr</translation>
     </message>
     <message>
         <source>Scene Name:</source>
@@ -11745,42 +12070,54 @@ Možná byl soubor s přednastavením poškozen</translation>
         <source>The height must be greater than zero.</source>
         <translation>Výška musí být větší než nula.</translation>
     </message>
+    <message>
+        <source>Current Project</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recent Scenes [Project]</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The selected scene project &apos;%1&apos; is not in the Current Project list and may not open automatically.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SubSheetBar</name>
     <message>
         <source>Sub-scene controls: 
 Click the arrow button to create a new sub-xsheet</source>
-        <translation>Ovládání podzáběru: 
+        <translation type="vanished">Ovládání podzáběru: 
 Klepněte na tlačítko pro vytvoření nového pod-Xsheet</translation>
     </message>
     <message>
         <source>Disable Edit in Place</source>
-        <translation>Zakázat úpravy v místě</translation>
+        <translation type="vanished">Zakázat úpravy v místě</translation>
     </message>
     <message>
         <source>Enable Edit in Place</source>
-        <translation>Povolit úpravy v místě</translation>
+        <translation type="vanished">Povolit úpravy v místě</translation>
     </message>
     <message>
         <source>Exit Sub-xsheet (1 Level Up)</source>
-        <translation>Zavřít pod-xsheet (1 úroveň nahoru)</translation>
+        <translation type="vanished">Zavřít pod-xsheet (1 úroveň nahoru)</translation>
     </message>
     <message>
         <source>Exit Sub-xsheet (2 Levels Up)</source>
-        <translation>Zavřít pod-xsheet (2 úrovně nahoru)</translation>
+        <translation type="vanished">Zavřít pod-xsheet (2 úrovně nahoru)</translation>
     </message>
     <message>
         <source>Exit Sub-xsheet (3 or More Levels Up)</source>
-        <translation>Zavřít pod-xsheet (3 úrovně nahoru)</translation>
+        <translation type="vanished">Zavřít pod-xsheet (3 úrovně nahoru)</translation>
     </message>
     <message>
         <source>Enter Sub-xsheet</source>
-        <translation>Upravit pod-xsheet</translation>
+        <translation type="vanished">Upravit pod-xsheet</translation>
     </message>
     <message>
         <source>Current Scene</source>
-        <translation>Nynější záběr</translation>
+        <translation type="vanished">Nynější záběr</translation>
     </message>
 </context>
 <context>
@@ -11798,7 +12135,7 @@ Klepněte na tlačítko pro vytvoření nového pod-Xsheet</translation>
     </message>
     <message>
         <source>It is not possible to save automatically an untitled scene.</source>
-        <translation>Nelze uložit nepojmenovaný záběr.</translation>
+        <translation type="vanished">Nelze uložit nepojmenovaný záběr.</translation>
     </message>
 </context>
 <context>
@@ -11853,7 +12190,7 @@ Klepněte na tlačítko pro vytvoření nového pod-Xsheet</translation>
     </message>
     <message>
         <source>Successfull Steps:</source>
-        <translation>Počet úspěšných kroků:</translation>
+        <translation type="vanished">Počet úspěšných kroků:</translation>
     </message>
     <message>
         <source>Priority:</source>
@@ -11885,7 +12222,7 @@ Klepněte na tlačítko pro vytvoření nového pod-Xsheet</translation>
     </message>
     <message>
         <source>Multiple Rendering:</source>
-        <translation>Vícenásobné zpracování:</translation>
+        <translation type="vanished">Vícenásobné zpracování:</translation>
     </message>
     <message>
         <source>None</source>
@@ -11945,11 +12282,11 @@ Klepněte na tlačítko pro vytvoření nového pod-Xsheet</translation>
     </message>
     <message>
         <source>Remove -&gt;</source>
-        <translation>Odstranit -&gt;</translation>
+        <translation type="vanished">Odstranit -&gt;</translation>
     </message>
     <message>
         <source>&lt;- Add</source>
-        <translation>&lt;- Přidat</translation>
+        <translation type="vanished">&lt;- Přidat</translation>
     </message>
     <message>
         <source>Multimedia:</source>
@@ -12435,7 +12772,7 @@ Please refer to the user guide for details.</source>
     </message>
     <message>
         <source>Replace</source>
-        <translation>Nahradit</translation>
+        <translation type="vanished">Nahradit</translation>
     </message>
     <message>
         <source>Edit Cell Numbers</source>
@@ -12466,11 +12803,11 @@ Please refer to the user guide for details.</source>
     </message>
     <message>
         <source>Camera Stand Toggle</source>
-        <translation>Přepnout stav kamery</translation>
+        <translation type="vanished">Přepnout stav kamery</translation>
     </message>
     <message>
         <source>Render Toggle</source>
-        <translation>Přepnout pohled na zpracování</translation>
+        <translation type="vanished">Přepnout pohled na zpracování</translation>
     </message>
     <message>
         <source>Lock Toggle</source>
@@ -12486,7 +12823,7 @@ Please refer to the user guide for details.</source>
     </message>
     <message>
         <source>Click to select the type of motion path</source>
-        <translation>Klepnout pro vybrání typu cesty pohybu</translation>
+        <translation type="vanished">Klepnout pro vybrání typu cesty pohybu</translation>
     </message>
     <message>
         <source>Click to select column, drag to move it</source>
@@ -12494,15 +12831,15 @@ Please refer to the user guide for details.</source>
     </message>
     <message>
         <source>Click to unlink column</source>
-        <translation>Klepnout pro odpojení sloupce</translation>
+        <translation type="vanished">Klepnout pro odpojení sloupce</translation>
     </message>
     <message>
         <source>Click and drag to link column</source>
-        <translation>Klepnout a táhnout pro spojení sloupce</translation>
+        <translation type="vanished">Klepnout a táhnout pro spojení sloupce</translation>
     </message>
     <message>
         <source>Master column of linked columns</source>
-        <translation>Hlavní sloupec spojených sloupců</translation>
+        <translation type="vanished">Hlavní sloupec spojených sloupců</translation>
     </message>
     <message>
         <source>&amp;Subsampling 1</source>
@@ -12654,7 +12991,7 @@ Please refer to the user guide for details.</source>
     <name>XsheetGUI::RowArea</name>
     <message>
         <source>Onion Skin Toggle</source>
-        <translation>Přepnout cibulový vzhled</translation>
+        <translation type="vanished">Přepnout cibulový vzhled</translation>
     </message>
     <message>
         <source>Current Frame</source>
@@ -12690,7 +13027,7 @@ Please refer to the user guide for details.</source>
     </message>
     <message>
         <source>Curren Frame</source>
-        <translation>Nynější snímek</translation>
+        <translation type="vanished">Nynější snímek</translation>
     </message>
     <message>
         <source>Preview This</source>
@@ -12783,6 +13120,14 @@ Hold F3 Key on the Viewer to Show This Frame Only</source>
     <message>
         <source> columns</source>
         <translation> sloupce</translation>
+    </message>
+    <message>
+        <source>   ::   Project: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> Frame</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

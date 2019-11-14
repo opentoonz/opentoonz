@@ -102,6 +102,8 @@ protected:
 
   bool m_isMaxRangeLimited;
 
+  bool m_isLinear;
+
 public:
   DoubleValuePairField(QWidget *parent, bool isMaxRangeLimited,
                        DoubleValueLineEdit *leftLineEdit,
@@ -174,6 +176,7 @@ protected:
   void mouseMoveEvent(QMouseEvent *event) override;
   void mouseReleaseEvent(QMouseEvent *event) override;
 
+  void setLinearSlider(bool linear) { m_isLinear = linear; }
 protected slots:
   /*! Set current left value to value in left text field; if necessary, if left
                   value is greater than right, change also current right value.

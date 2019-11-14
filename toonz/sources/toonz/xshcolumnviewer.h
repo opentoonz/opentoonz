@@ -3,6 +3,17 @@
 #ifndef XSHCOLUMNVIEWER_H
 #define XSHCOLUMNVIEWER_H
 
+#include "tapp.h"
+
+#include "toonz/tstageobject.h"
+#include "toonz/txsheethandle.h"
+#include "toonz/tscenehandle.h"
+#include "toonz/tcolumnhandle.h"
+#include "toonz/txsheet.h"
+
+#include "../include/tundo.h"
+#include "../include/historytypes.h"
+
 #include <QWidget>
 #include <QListWidget>
 #include <QLineEdit>
@@ -146,6 +157,48 @@ protected:
 
 protected slots:
   void renameColumn();
+};
+
+//=============================================================================
+// CameraColumnSwitchUndo
+//-----------------------------------------------------------------------------
+class CameraColumnSwitchUndo final : public TUndo {
+  int m_oldCameraIndex, m_newCameraIndex;
+  TXsheetHandle *m_xsheetHandle;
+
+public:
+  CameraColumnSwitchUndo(int oldIndex, int newIndex, TXsheetHandle *xshHandle)
+      : m_oldCameraIndex(oldIndex)
+      , m_newCameraIndex(newIndex)
+      , m_xsheetHandle(xshHandle) {}
+  ~CameraColumnSwitchUndo() {}
+
+  void undo() const override {
+    m_xsheetHandle->getXsheet()->setCameraColumnIndex(m_oldCameraIndex);
+    TApp::instance()->getCurrentScene()->notifySceneChanged();
+    TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+    TApp::instance()->getCurrentColumn()->notifyColumnIndexSwitched();
+  }
+
+  void redo() const override {
+    m_xsheetHandle->getXsheet()->setCameraColumnIndex(m_newCameraIndex);
+    TApp::instance()->getCurrentScene()->notifySceneChanged();
+    TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+    TApp::instance()->getCurrentColumn()->notifyColumnIndexSwitched();
+  }
+
+  int getSize() const override { return sizeof(*this); }
+
+  QString getHistoryString() override {
+    TStageObjectId objId = TStageObjectId::CameraId(m_newCameraIndex);
+    TStageObject *obj    = m_xsheetHandle->getXsheet()->getStageObject(objId);
+    std::string objName  = obj->getName();
+    QString str          = QObject::tr("Camera Column Switch :  ") +
+                  QString::fromStdString(objName);
+    return str;
+  }
+
+  int getHistoryType() override { return HistoryType::Xsheet; }
 };
 
 //=============================================================================
@@ -326,6 +379,9 @@ protected slots:
   void onSubSampling(QAction *);
   void openTransparencyPopup();
   void openSoundColumnPopup();
+  void openCameraColumnPopup(QPoint pos);
+  void onCameraColumnChangedTriggered();
+  void onXsheetCameraChange(int);
 };
 
 //-----------------------------------------------------------------------------

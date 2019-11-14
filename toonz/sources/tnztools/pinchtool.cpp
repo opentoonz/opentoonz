@@ -73,13 +73,15 @@ PinchTool::PinchTool()
     , m_draw(false)
     , m_undo(0)
     , m_showSelector(true)
-    , m_toolRange("Size:", 1.0, 1000.0, 500.0)  // W_ToolOptions_PinchTool
+    , m_toolRange("Size:", 1.0, 10000.0, 500.0)  // W_ToolOptions_PinchTool
     , m_toolCornerSize("Corner:", 1.0, 180.0,
                        160.0)          // W_ToolOptions_PinchCorner
     , m_autoOrManual("Manual", false)  // W_ToolOptions_PinchManual
     , m_deformation(new ToonzExt::StrokeDeformation)
     , m_selector(500, 10, 1000) {
   bind(TTool::Vectors);
+
+  m_toolRange.setNonLinearSlider();
 
   m_prop.bind(m_toolCornerSize);
   m_prop.bind(m_autoOrManual);
@@ -138,7 +140,7 @@ void PinchTool::updateInterfaceStatus(const TMouseEvent &event) {
   m_status.key_event_ = ContextStatus::NONE;
 
   // mutual exclusive
-  if (event.isCtrlPressed()) m_status.key_event_  = ContextStatus::CTRL;
+  if (event.isCtrlPressed()) m_status.key_event_ = ContextStatus::CTRL;
   if (event.isShiftPressed()) m_status.key_event_ = ContextStatus::SHIFT;
 
   // TODO:  **DEVE** essere fatto dentro la costruzione di TMouseEvent
@@ -357,7 +359,7 @@ void PinchTool::onEnter() {
 //-----------------------------------------------------------------------------
 
 void PinchTool::onLeave() {
-  if (!m_active) m_draw   = false;
+  if (!m_active) m_draw = false;
   m_status.stroke2change_ = 0;
 
   // Abbiamo dovuto commentarlo perche' stranamente

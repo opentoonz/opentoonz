@@ -277,7 +277,7 @@ bool StageObjectSelection::isConnected() const {
 //-------------------------------------------------------
 
 void StageObjectSelection::groupSelection() {
-  if (m_selectedObjects.size() <= 1 || !isConnected()) return;
+  if (m_selectedObjects.size() <= 1) return;
   TStageObjectCmd::group(m_selectedObjects, m_xshHandle);
   selectNone();
   m_xshHandle->notifyXsheetChanged();

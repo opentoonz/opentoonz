@@ -121,7 +121,7 @@ public:
 
 //=================================================================================
 
-// Bitmap used to store blend color selections and pure color informations.
+// Bitmap used to store blend color selections and pure color information.
 class SelectionRaster {
   SelectionArrayPtr m_selection;
 

@@ -65,7 +65,7 @@ void mapToVector(const std::map<int, VIStroke *> &theMap,
                  std::vector<int> &theVect) {
   assert(theMap.size() == theVect.size());
   std::map<int, VIStroke *>::const_iterator it = theMap.begin();
-  UINT i = 0;
+  UINT i                                       = 0;
   for (; it != theMap.end(); ++it) {
     theVect[i++] = it->first;
   }
@@ -146,7 +146,7 @@ public:
     image->removeStrokes(newStrokeIndex, true, false);
 
     std::map<int, VIStroke *>::const_iterator it = m_originalStrokes.begin();
-    UINT i = 0;
+    UINT i                                       = 0;
     VIStroke *s;
     for (; it != m_originalStrokes.end(); ++it) {
       s = cloneVIStroke(it->second);
@@ -200,7 +200,7 @@ public:
     image->removeStrokes(oldStrokeIndex, true, false);
 
     std::map<int, VIStroke *>::const_iterator it = m_newStrokes.begin();
-    UINT i = 0;
+    UINT i                                       = 0;
     VIStroke *s;
     for (; it != m_newStrokes.end(); ++it) {
       s = cloneVIStroke(it->second);
@@ -357,11 +357,11 @@ private:
 
 EraserTool::EraserTool()
     : TTool("T_Eraser")
-    , m_eraseType("Type:")             // "W_ToolOptions_Erasetype"
-    , m_toolSize("Size:", 1, 100, 10)  // "W_ToolOptions_EraserToolSize"
-    , m_selective("Selective", false)  // "W_ToolOptions_Selective"
-    , m_invertOption("Invert", false)  // "W_ToolOptions_Invert"
-    , m_multi("Frame Range", false)    // "W_ToolOptions_FrameRange"
+    , m_eraseType("Type:")              // "W_ToolOptions_Erasetype"
+    , m_toolSize("Size:", 1, 1000, 10)  // "W_ToolOptions_EraserToolSize"
+    , m_selective("Selective", false)   // "W_ToolOptions_Selective"
+    , m_invertOption("Invert", false)   // "W_ToolOptions_Invert"
+    , m_multi("Frame Range", false)     // "W_ToolOptions_FrameRange"
     , m_pointSize(-1)
     , m_undo(0)
     , m_currCell(-1, -1)
@@ -370,6 +370,8 @@ EraserTool::EraserTool()
     , m_active(false)
     , m_firstTime(true) {
   bind(TTool::VectorImage);
+
+  m_toolSize.setNonLinearSlider();
 
   m_prop.bind(m_toolSize);
   m_prop.bind(m_eraseType);
@@ -1380,7 +1382,7 @@ void EraserTool::multiEreserRegion(TStroke *stroke, const TMouseEvent &e) {
 
 //-----------------------------------------------------------------------------
 /*! When the tool is switched during dragging, Erase end processing is performed
-*/
+ */
 void EraserTool::onDeactivate() {
   if (!m_active) return;
 

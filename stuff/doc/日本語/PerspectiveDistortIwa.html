@@ -1,0 +1,32 @@
+<html lang="ja">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+      <title>Perspective Distort Fx Iwa</title>
+    </head>
+<body bgcolor="#f5f5f5" text="#220011">
+<h1><img src = ".\img\fx_iwa_perspective_distort.png" width = 30 height = 30 >   Perspective Distort Fx Iwa</h1>
+
+<h4>● 概要</h4>
+Follow時の地面の動き（手前が速く、奥が遅く動く＝運動視差）を生成するためのエフェクトです。<br>
+絵を左右に引き伸ばして台形に変形しますので、上下には歪みません。<br>
+つまり、奥行きによる垂直方向の収縮はあらかじめ入力画像に盛り込まれている必要があります。<br>
+また、並行移動する背景にこのエフェクトを適用する場合、背景の移動はSubXsheetの中にたたむ必要があります。<br><br>
+<img src = ".\img\perspective_distort.png">
+
+<h4>● 入力ポート</h4>
+<UL>
+<LI><b>Source</b> : 入力画像を接続します。</LI>
+</UL>
+
+<h4>● パラメータ</h4>
+<UL>
+<LI><b>Vanishing Point</b> : 変形時の中心となる点です。透視投影の場合は、消失点にあたります。</LI>
+<LI><b>Anchor Point</b> : 変形の基準となる垂直位置を決める点です。この点より上のピクセルは描画されません（透明になります）。
+また、この点を通る水平線上の絵は、サイズが変わりません。</LI>
+<LI><b>Precision</b> : 変形は拡大によってのみ行うので、解像度が落ちてしまいます。解像度の劣化を最大限緩和するために、
+あらかじめこの値の倍率だけ細かい解像度で入力画像を計算して変形します。「背景の取り込み解像度」を
+「出力解像度」で割った値よりPrecisionを高くしても意味はありません。</LI>
+</UL>
+</body>
+
+</html>

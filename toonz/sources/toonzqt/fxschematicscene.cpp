@@ -729,7 +729,14 @@ void FxSchematicScene::placeNode(FxSchematicNode *node) {
       maxY = std::max(fx->getAttributes()->getDagNodePos().y, maxY);
     }
     if (QPointF(minX, minY) == QPointF(TConst::nowhere.x, TConst::nowhere.y)) {
-      pos = sceneRect().center();
+      TFx *inputFx = node->getFx()->getInputPort(0)->getFx();
+      if (inputFx &&
+          inputFx->getAttributes()->getDagNodePos() != TConst::nowhere) {
+        TPointD dagPos =
+            inputFx->getAttributes()->getDagNodePos() + TPointD(150, 0);
+        pos = QPointF(dagPos.x, dagPos.y);
+      } else
+        pos = sceneRect().center();
       nodeRect.moveTopLeft(pos);
       while (!isAnEmptyZone(nodeRect)) nodeRect.translate(0, -step);
       pos = nodeRect.topLeft();

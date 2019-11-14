@@ -27,7 +27,7 @@ using namespace DVGui;
 
 //-----------------------------------------------------------------------------
 /*! FxSettingsに共通のUndo
-*/
+ */
 class FxSettingsUndo : public TUndo {
 protected:
   TFxHandle *m_fxHandle;
@@ -62,7 +62,7 @@ public:
 
 //-----------------------------------------------------------------------------
 /*! MeasuredDoubleParamField Undo
-*/
+ */
 class MeasuredDoubleParamFieldUndo final : public AnimatableFxSettingsUndo {
   TDoubleParamP m_param;
   double m_oldValue, m_newValue;
@@ -100,7 +100,7 @@ public:
 
 //-----------------------------------------------------------------------------
 /*! RangeParamField Undo
-*/
+ */
 class RangeParamFieldUndo final : public AnimatableFxSettingsUndo {
   TRangeParamP m_param;
   DoublePair m_oldValue, m_newValue;
@@ -138,7 +138,7 @@ public:
 
 //-----------------------------------------------------------------------------
 /*! PixelParamField Undo
-*/
+ */
 class PixelParamFieldUndo final : public AnimatableFxSettingsUndo {
   TPixelParamP m_param;
   TPixel32 m_oldValue, m_newValue;
@@ -176,7 +176,7 @@ public:
 
 //-----------------------------------------------------------------------------
 /*! PointParamField Undo
-*/
+ */
 class PointParamFieldUndo final : public AnimatableFxSettingsUndo {
   TPointParamP m_param;
   TPointD m_oldValue, m_newValue;
@@ -212,7 +212,7 @@ public:
 
 //-----------------------------------------------------------------------------
 /*! EnumParamField Undo
-*/
+ */
 class EnumParamFieldUndo final : public FxSettingsUndo {
   TIntEnumParamP m_param;
   std::string m_oldString, m_newString;
@@ -246,7 +246,7 @@ public:
 
 //-----------------------------------------------------------------------------
 /*! IntParamFieldのUndo
-*/
+ */
 class IntParamFieldUndo final : public FxSettingsUndo {
   TIntParamP m_param;
   int m_oldValue, m_newValue;
@@ -281,7 +281,7 @@ public:
 
 //-----------------------------------------------------------------------------
 /*! BoolParamFieldのUndo
-*/
+ */
 class BoolParamFieldUndo final : public FxSettingsUndo {
   TBoolParamP m_param;
   bool m_newState;
@@ -314,7 +314,7 @@ public:
 
 //-----------------------------------------------------------------------------
 /*! SpectrumParamFieldのUndo
-*/
+ */
 class SpectrumParamFieldUndo final : public AnimatableFxSettingsUndo {
   TSpectrumParamP m_param;
   TSpectrum m_oldSpectrum, m_newSpectrum;
@@ -415,7 +415,7 @@ public:
 
 //-----------------------------------------------------------------------------
 /*! StringParamField Undo
-*/
+ */
 class StringParamFieldUndo final : public FxSettingsUndo {
   TStringParamP m_param;
   std::wstring m_oldValue, m_newValue;
@@ -451,7 +451,7 @@ public:
 
 //-----------------------------------------------------------------------------
 /*! FontParamFieldUndo
-*/
+ */
 class FontParamFieldUndo final : public FxSettingsUndo {
   TFontParamP m_param;
   std::wstring m_oldValue, m_newValue;
@@ -483,7 +483,7 @@ public:
 
 //-----------------------------------------------------------------------------
 /*! ToneCurveParamField Undo
-*/
+ */
 class ToneCurveParamFieldUndo final : public AnimatableFxSettingsUndo {
   TToneCurveParamP m_param;
   QList<TPointD> m_oldPoints, m_newPoints;
@@ -583,7 +583,7 @@ public:
 
 //-----------------------------------------------------------------------------
 /*! ToneCurveParamField Undo (Linearのトグル)
-*/
+ */
 class ToneCurveParamFieldToggleLinearUndo final : public FxSettingsUndo {
   TToneCurveParamP m_actualParam;
   TToneCurveParamP m_currentParam;
@@ -1057,30 +1057,66 @@ TPixel32 PixelParamField::getColor() { return m_colorField->getColor(); }
 
 void PixelParamField::setColor(TPixel32 value) {
   m_colorField->setColor(value);
-  setValue(value);
+  onChange(value, false);
 }
 
 //=============================================================================
 // RGB Link Button
 //-----------------------------------------------------------------------------
 
-RgbLinkButton::RgbLinkButton(QString str, QWidget *parent,
-                             PixelParamField *field1, PixelParamField *field2)
-    : QPushButton(str, parent), m_field1(field1), m_field2(field2) {}
+RgbLinkButtons::RgbLinkButtons(QString str1, QString str2, QWidget *parent,
+                               PixelParamField *field1, PixelParamField *field2)
+    : QWidget(parent), m_field1(field1), m_field2(field2) {
+  QString copyButtonStr   = tr("Copy RGB : %1 > %2").arg(str1).arg(str2);
+  QString swapButtonStr   = tr("Swap %1 and %2").arg(str1).arg(str2);
+  QPushButton *copyButton = new QPushButton(copyButtonStr, this);
+  QPushButton *swapButton = new QPushButton(swapButtonStr, this);
+
+  copyButton->setFixedHeight(21);
+  swapButton->setFixedHeight(21);
+
+  QHBoxLayout *lay = new QHBoxLayout();
+  lay->setMargin(0);
+  lay->setSpacing(5);
+  {
+    lay->addWidget(copyButton, 0);
+    lay->addWidget(swapButton, 0);
+    lay->addStretch(1);
+  }
+  setLayout(lay);
+
+  connect(copyButton, SIGNAL(clicked()), this, SLOT(onCopyButtonClicked()));
+  connect(swapButton, SIGNAL(clicked()), this, SLOT(onSwapButtonClicked()));
+}
 
 //-----------------------------------------------------------------------------
 
-void RgbLinkButton::onButtonClicked() {
+void RgbLinkButtons::onCopyButtonClicked() {
   if (!m_field1 || !m_field2) return;
   TPixel32 val1 = m_field1->getColor();
   TPixel32 val2 = m_field2->getColor();
 
-  /*-- Alphaは変えない --*/
+  // keep alpha channel unchanged
   val1.m = val2.m;
 
   if (val1 == val2) return;
 
   m_field2->setColor(val1);
+}
+
+//-----------------------------------------------------------------------------
+
+void RgbLinkButtons::onSwapButtonClicked() {
+  if (!m_field1 || !m_field2) return;
+  TPixel32 val1 = m_field1->getColor();
+  TPixel32 val2 = m_field2->getColor();
+
+  if (val1 == val2) return;
+
+  TUndoManager::manager()->beginBlock();
+  m_field2->setColor(val1);
+  m_field1->setColor(val2);
+  TUndoManager::manager()->endBlock();
 }
 
 //=============================================================================
@@ -1440,7 +1476,7 @@ void MyTextEdit::focusOutEvent(QFocusEvent *event) {
   QTextEdit::focusOutEvent(event);
   emit edited();
 }
-};
+};  // namespace component
 
 StringParamField::StringParamField(QWidget *parent, QString name,
                                    const TStringParamP &param)
@@ -1476,7 +1512,7 @@ void StringParamField::onChange() {
   if (m_multiTextFld)
     value = m_multiTextFld->toPlainText().toStdWString();
   else
-    value     = m_textFld->text().toStdWString();
+    value = m_textFld->text().toStdWString();
   TUndo *undo = 0;
 
   if (!m_actualParam || m_actualParam->getValue() == value) return;
@@ -1698,9 +1734,8 @@ ToneCurveParamField::ToneCurveParamField(QWidget *parent, QString name,
 
 void ToneCurveParamField::updateField(const QList<TPointD> value) {
   if (m_actualParam) {
-    assert(m_currentParam &&
-           m_currentParam->getCurrentChannel() ==
-               m_actualParam->getCurrentChannel());
+    assert(m_currentParam && m_currentParam->getCurrentChannel() ==
+                                 m_actualParam->getCurrentChannel());
     m_toneCurveField->setCurrentChannel(m_actualParam->getCurrentChannel());
     assert(m_currentParam &&
            m_currentParam->isLinear() == m_actualParam->isLinear());

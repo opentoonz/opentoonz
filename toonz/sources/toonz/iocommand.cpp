@@ -324,7 +324,7 @@ bool beforeCellsInsert(TXsheet *xsh, int row, int &col, int rowCount,
   }
   int type = column ? column->getColumnType() : newLevelColumnType;
   // If some used cells in range or column type mismatch must insert a column.
-  if (i < rowCount || newLevelColumnType != type) {
+  if (col < 0 || i < rowCount || newLevelColumnType != type) {
     col += 1;
     TApp::instance()->getCurrentColumn()->setColumnIndex(col);
     shiftColumn = true;
@@ -1376,21 +1376,45 @@ bool IoCmd::saveScene(const TFilePath &path, int flags) {
 
   ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
 
+  TXsheet *xsheet = 0;
+  if (saveSubxsheet) xsheet = TApp::instance()->getCurrentXsheet()->getXsheet();
+
   // If the scene will be saved in the different folder, check out the scene
   // cast.
   // if the cast contains the level specified with $scenefolder alias,
   // open a warning popup notifying that such level will lose link.
+
+  // in case of saving subxsheet, the current scene will not be switched to the
+  // saved one
+  // so the level paths are needed to be reverted after saving
+  QHash<TXshLevel *, TFilePath> orgLevelPaths;
+  auto revertOrgLevelPaths = [&] {
+    QHash<TXshLevel *, TFilePath>::const_iterator i =
+        orgLevelPaths.constBegin();
+    while (i != orgLevelPaths.constEnd()) {
+      if (TXshSimpleLevel *sil = i.key()->getSimpleLevel())
+        sil->setPath(i.value(), true);
+      else if (TXshPaletteLevel *pal = i.key()->getPaletteLevel())
+        pal->setPath(i.value());
+      else if (TXshSoundLevel *sol = i.key()->getSoundLevel())
+        sol->setPath(i.value());
+      ++i;
+    }
+  };
+
   if (!overwrite) {
-    bool ret = takeCareSceneFolderItemsOnSaveSceneAs(scene, scenePath);
-    if (!ret) return false;
+    bool ret = takeCareSceneFolderItemsOnSaveSceneAs(scene, scenePath, xsheet,
+                                                     orgLevelPaths);
+    if (!ret) {
+      revertOrgLevelPaths();
+      return false;
+    }
   }
 
   TFilePath oldFullPath = scene->decodeFilePath(scene->getScenePath());
   TFilePath newFullPath = scene->decodeFilePath(scenePath);
 
   QApplication::setOverrideCursor(Qt::WaitCursor);
-  TXsheet *xsheet = 0;
-  if (saveSubxsheet) xsheet = TApp::instance()->getCurrentXsheet()->getXsheet();
   if (app->getCurrentScene()->getDirtyFlag())
     scene->getContentHistory(true)->modifiedNow();
 
@@ -1414,11 +1438,6 @@ bool IoCmd::saveScene(const TFilePath &path, int flags) {
 
   try {
     scene->save(scenePath, xsheet);
-    TApp::instance()
-        ->getPaletteController()
-        ->getCurrentLevelPalette()
-        ->notifyPaletteChanged();  // non toglieva l'asterisco alla
-                                   // paletta...forse non va qua? vinz
   } catch (const TSystemException &se) {
     DVGui::warning(QString::fromStdWString(se.getMessage()));
   } catch (...) {
@@ -1427,7 +1446,11 @@ bool IoCmd::saveScene(const TFilePath &path, int flags) {
 
   cp->assign(&oldCP);
 
-  if (!overwrite) app->getCurrentScene()->notifyNameSceneChange();
+  // in case of saving subxsheet, revert the level paths after saving
+  revertOrgLevelPaths();
+
+  if (!overwrite && !saveSubxsheet)
+    app->getCurrentScene()->notifyNameSceneChange();
   FileBrowser::refreshFolder(scenePath.getParentDir());
   IconGenerator::instance()->invalidate(scenePath);
 
@@ -2579,29 +2602,65 @@ bool IoCmd::importLipSync(TFilePath levelPath, QList<TFrameId> frameList,
 // if the cast contains the level specified with $scenefolder alias,
 // open a warning popup notifying that such level will lose link.
 // return false if cancelled.
-bool IoCmd::takeCareSceneFolderItemsOnSaveSceneAs(ToonzScene *scene,
-                                                  const TFilePath &newPath) {
-  TFilePath oldFullPath = scene->decodeFilePath(scene->getScenePath());
-  TFilePath newFullPath = scene->decodeFilePath(newPath);
+bool IoCmd::takeCareSceneFolderItemsOnSaveSceneAs(
+    ToonzScene *scene, const TFilePath &newPath, TXsheet *subxsh,
+    QHash<TXshLevel *, TFilePath> &orgLevelPaths) {
+  auto setPathToLevel = [&](TXshLevel *level, TFilePath fp) {
+    // in case of saving subxsheet, the current scene will not be switched to
+    // the saved one
+    // so the level paths are needed to be reverted after saving
+    if (subxsh) orgLevelPaths.insert(level, level->getPath());
+    if (TXshSimpleLevel *sil = level->getSimpleLevel())
+      sil->setPath(fp, true);
+    else if (TXshPaletteLevel *pal = level->getPaletteLevel())
+      pal->setPath(fp);
+    else if (TXshSoundLevel *sol = level->getSoundLevel())
+      sol->setPath(fp);
+  };
+
+  TFilePath oldSceneFolder =
+      scene->decodeFilePath(scene->getScenePath()).getParentDir();
+  TFilePath newSceneFolder = scene->decodeFilePath(newPath).getParentDir();
+
   // in case of saving in the same folder
-  if (oldFullPath.getParentDir() == newFullPath.getParentDir()) return true;
+  if (oldSceneFolder == newSceneFolder) return true;
 
   TLevelSet *levelSet = scene->getLevelSet();
   std::vector<TXshLevel *> levels;
+
+  // in case of saving subxsheet, checking only used levels.
+  if (subxsh) {
+    std::set<TXshLevel *> saveSet;
+    subxsh->getUsedLevels(saveSet);
+    levels = std::vector<TXshLevel *>(saveSet.begin(), saveSet.end());
+  }
+  // in case of saving the scene (i.e. top xsheet)
+  else
+    levelSet->listLevels(levels);
+
   QList<TXshLevel *> sceneFolderLevels;
-  levelSet->listLevels(levels);
   QString str;
   int count = 0;
-  for (int i = 0; i < levels.size(); i++) {
-    TXshLevel *level = levels.at(i);
+  for (TXshLevel *level : levels) {
     if (!level->getPath().isEmpty() &&
         TFilePath("$scenefolder").isAncestorOf(level->getPath())) {
-      sceneFolderLevels.append(level);
-      if (count < 10) {
-        str.append("    " + QString::fromStdWString(level->getName()) + " (" +
-                   level->getPath().getQString() + ")\n");
+      TFilePath levelFullPath = scene->decodeFilePath(level->getPath());
+      // check if the path can be re-coded with the new scene folder path
+      if (newSceneFolder.isAncestorOf(levelFullPath)) {
+        // just replace the path without warning
+        TFilePath fp =
+            TFilePath("$scenefolder") + (levelFullPath - newSceneFolder);
+        setPathToLevel(level, fp);
       }
-      count++;
+      // if re-coding is not possible, then it needs to ask user's preference
+      else {
+        sceneFolderLevels.append(level);
+        if (count < 10) {
+          str.append("    " + QString::fromStdWString(level->getName()) + " (" +
+                     level->getPath().getQString() + ")\n");
+        }
+        count++;
+      }
     }
   }
   // list maximum 10 levels
@@ -2629,7 +2688,7 @@ bool IoCmd::takeCareSceneFolderItemsOnSaveSceneAs(ToonzScene *scene,
     for (int i = 0; i < sceneFolderLevels.size(); i++) {
       TXshLevel *level = sceneFolderLevels.at(i);
       TFilePath fp     = level->getPath() - TFilePath("$scenefolder");
-      fp               = fp.withParentDir(newFullPath.getParentDir());
+      fp               = fp.withParentDir(newSceneFolder);
       // check the level existence
       if (TSystem::doesExistFileOrLevel(fp)) {
         bool overwrite = (policy == YES_FOR_ALL);
@@ -2676,15 +2735,7 @@ bool IoCmd::takeCareSceneFolderItemsOnSaveSceneAs(ToonzScene *scene,
       // decode and code again
       TFilePath fp =
           scene->codeFilePath(scene->decodeFilePath(level->getPath()));
-      TXshSimpleLevel *sil  = level->getSimpleLevel();
-      TXshPaletteLevel *pal = level->getPaletteLevel();
-      TXshSoundLevel *sol   = level->getSoundLevel();
-      if (sil)
-        sil->setPath(fp);
-      else if (pal)
-        pal->setPath(fp);
-      else if (sol)
-        sol->setPath(fp);
+      setPathToLevel(level, fp);
     }
     Preferences::instance()->setPathAliasPriority(oldPriority);
   }

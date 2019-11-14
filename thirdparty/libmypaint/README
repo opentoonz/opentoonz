@@ -1,4 +1,4 @@
-Scripts for cross-build libmypaint for Windows (MinGW) under Debian 8 Jessie
+Scripts for cross-build libmypaint for Windows (MinGW) under Debian 8 Jessie and Debian 9 Stretch
 
 1. install mingw toolchain (via apt-get for ex)
 

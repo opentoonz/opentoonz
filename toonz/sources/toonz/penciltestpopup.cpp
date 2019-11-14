@@ -177,7 +177,7 @@ inline void doPixBinary(QRgb* pix, int threshold) {
     gray = 255;
   else
     gray = 0;
-  *pix   = qRgb(gray, gray, gray);
+  *pix = qRgb(gray, gray, gray);
 }
 
 //-----------------------------------------------------------------------------
@@ -220,7 +220,7 @@ void onChange(QImage& img, int black, int white, float gamma, bool doGray) {
 void onChangeBW(QImage& img, int threshold) {
   int lx = img.width(), y, ly = img.height();
   for (y = 0; y < ly; ++y) {
-    QRgb *pix = (QRgb *)img.scanLine(y), *endPix = (QRgb *)(pix + lx);
+    QRgb *pix = (QRgb*)img.scanLine(y), *endPix = (QRgb*)(pix + lx);
     while (pix < endPix) {
       doPixBinary(pix, threshold);
       ++pix;
@@ -476,7 +476,7 @@ bool getRasterLevelSize(TXshLevel* level, TDimension& dim) {
 void ApplyLutTask::run() {
   int lx = m_img.width();
   for (int y = m_fromY; y < m_toY; ++y) {
-    QRgb *pix = (QRgb *)m_img.scanLine(y), *endPix = (QRgb *)(pix + lx);
+    QRgb *pix = (QRgb*)m_img.scanLine(y), *endPix = (QRgb*)(pix + lx);
     while (pix < endPix) {
       doPix(pix, m_lut);
       ++pix;
@@ -487,7 +487,7 @@ void ApplyLutTask::run() {
 void ApplyGrayLutTask::run() {
   int lx = m_img.width();
   for (int y = m_fromY; y < m_toY; ++y) {
-    QRgb *pix = (QRgb *)m_img.scanLine(y), *endPix = (QRgb *)(pix + lx);
+    QRgb *pix = (QRgb*)m_img.scanLine(y), *endPix = (QRgb*)(pix + lx);
     while (pix < endPix) {
       doPixGray(pix, m_lut);
       ++pix;
@@ -950,7 +950,14 @@ int FrameNumberLineEdit::getValue() {
 
 //-----------------------------------------------------------------------------
 
+void FrameNumberLineEdit::focusInEvent(QFocusEvent* e) {
+  m_textOnFocusIn = text();
+}
+
 void FrameNumberLineEdit::focusOutEvent(QFocusEvent* e) {
+  // if the field is empty, then revert the last input
+  if (text().isEmpty()) setText(m_textOnFocusIn);
+
   LineEdit::focusOutEvent(e);
 }
 
@@ -1249,7 +1256,7 @@ QString formatString(QString inStr, int charNum) {
   }
   return numStr.rightJustified(charNum, '0') + postStr;
 }
-};
+};  // namespace
 
 void PencilTestSaveInFolderPopup::updateSubFolderName() {
   if (!m_autoSubNameCB->isChecked()) return;
@@ -1419,10 +1426,10 @@ void PencilTestSaveInFolderPopup::updateParentFolder() {
 
 PencilTestPopup::PencilTestPopup()
     // set the parent 0 in order to enable the popup behind the main window
-    : Dialog(0, false, false, "PencilTest"),
-      m_currentCamera(NULL),
-      m_captureWhiteBGCue(false),
-      m_captureCue(false) {
+    : Dialog(0, false, false, "PencilTest")
+    , m_currentCamera(NULL)
+    , m_captureWhiteBGCue(false)
+    , m_captureCue(false) {
   setWindowTitle(tr("Camera Capture"));
 
   // add maximize button to the dialog
@@ -1749,7 +1756,7 @@ PencilTestPopup::PencilTestPopup()
   bool ret = true;
   ret      = ret && connect(refreshCamListButton, SIGNAL(pressed()), this,
                        SLOT(refreshCameraList()));
-  ret = ret && connect(m_cameraListCombo, SIGNAL(activated(int)), this,
+  ret      = ret && connect(m_cameraListCombo, SIGNAL(activated(int)), this,
                        SLOT(onCameraListComboActivated(int)));
   ret = ret && connect(m_resolutionCombo, SIGNAL(activated(const QString&)),
                        this, SLOT(onResolutionComboActivated(const QString&)));
@@ -2217,7 +2224,10 @@ void PencilTestPopup::showEvent(QShowEvent* event) {
   TSceneHandle* sceneHandle = TApp::instance()->getCurrentScene();
   connect(sceneHandle, SIGNAL(sceneSwitched()), this, SLOT(onSceneSwitched()));
   connect(sceneHandle, SIGNAL(castChanged()), this, SLOT(refreshFrameInfo()));
+
+  bool tmp_alwaysOverwrite = m_alwaysOverwrite;
   onSceneSwitched();
+  m_alwaysOverwrite = tmp_alwaysOverwrite;
 }
 
 //-----------------------------------------------------------------------------
@@ -2256,7 +2266,8 @@ void PencilTestPopup::hideEvent(QHideEvent* event) {
 
 void PencilTestPopup::keyPressEvent(QKeyEvent* event) {
   // override return (or enter) key as shortcut key for capturing
-  if (event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter) {
+  int key = event->key();
+  if (key == Qt::Key_Return || key == Qt::Key_Enter) {
     // show button-clicking animation followed by calling
     // onCaptureButtonClicked()
     m_captureButton->animateClick();
@@ -2265,6 +2276,23 @@ void PencilTestPopup::keyPressEvent(QKeyEvent* event) {
     event->ignore();
 }
 
+//-----------------------------------------------------------------------------
+
+bool PencilTestPopup::event(QEvent* event) {
+  if (event->type() == QEvent::ShortcutOverride) {
+    QKeyEvent* ke = static_cast<QKeyEvent*>(event);
+    int key       = ke->key();
+    if (key >= Qt::Key_0 && key <= Qt::Key_9) {
+      if (!m_frameNumberEdit->hasFocus()) {
+        m_frameNumberEdit->setFocus();
+        m_frameNumberEdit->clear();
+      }
+      event->accept();
+      return true;
+    }
+  }
+  return DVGui::Dialog::event(event);
+}
 //-----------------------------------------------------------------------------
 
 void PencilTestPopup::processImage(QImage& image) {
@@ -2425,7 +2453,7 @@ void PencilTestPopup::onCountDown() {
 
 //-----------------------------------------------------------------------------
 /*! referenced from LevelCreatePopup::apply()
-*/
+ */
 bool PencilTestPopup::importImage(QImage image) {
   TApp* app         = TApp::instance();
   ToonzScene* scene = app->getCurrentScene()->getScene();
@@ -2499,11 +2527,16 @@ bool PencilTestPopup::importImage(QImage image) {
     /* if the level already have the same frame, then ask if overwrite it */
     TFilePath frameFp(actualLevelFp.withFrame(frameNumber));
     if (TFileStatus(frameFp).doesExist()) {
-      QString question = tr("File %1 does exist.\nDo you want to overwrite it?")
-                             .arg(toQString(frameFp));
-      int ret = DVGui::MsgBox(question, QObject::tr("Overwrite"),
-                              QObject::tr("Cancel"));
-      if (ret == 0 || ret == 2) return false;
+      if (!m_alwaysOverwrite) {
+        QString question =
+            tr("File %1 does exist.\nDo you want to overwrite it?")
+                .arg(toQString(frameFp));
+        int ret = DVGui::MsgBox(question, QObject::tr("Overwrite"),
+                                QObject::tr("Always Overwrite in This Scene"),
+                                QObject::tr("Cancel"));
+        if (ret == 0 || ret == 3) return false;
+        if (ret == 2) m_alwaysOverwrite = true;
+      }
       state = OVERWRITE;
     } else
       state = ADDFRAME;
@@ -2520,9 +2553,8 @@ bool PencilTestPopup::importImage(QImage image) {
 
       /* if the loaded level does not match in pixel size, then return */
       sl = level->getSimpleLevel();
-      if (!sl ||
-          sl->getProperties()->getImageRes() !=
-              TDimension(image.width(), image.height())) {
+      if (!sl || sl->getProperties()->getImageRes() !=
+                     TDimension(image.width(), image.height())) {
         error(tr(
             "The captured image size does not match with the existing level."));
         return false;
@@ -2531,19 +2563,23 @@ bool PencilTestPopup::importImage(QImage image) {
       /* confirm overwrite */
       TFilePath frameFp(actualLevelFp.withFrame(frameNumber));
       if (TFileStatus(frameFp).doesExist()) {
-        QString question =
-            tr("File %1 does exist.\nDo you want to overwrite it?")
-                .arg(toQString(frameFp));
-        int ret = DVGui::MsgBox(question, QObject::tr("Overwrite"),
-                                QObject::tr("Cancel"));
-        if (ret == 0 || ret == 2) return false;
+        if (!m_alwaysOverwrite) {
+          QString question =
+              tr("File %1 does exist.\nDo you want to overwrite it?")
+                  .arg(toQString(frameFp));
+          int ret = DVGui::MsgBox(question, QObject::tr("Overwrite"),
+                                  QObject::tr("Always Overwrite in This Scene"),
+                                  QObject::tr("Cancel"));
+          if (ret == 0 || ret == 3) return false;
+          if (ret == 2) m_alwaysOverwrite = true;
+        }
       }
     }
     /* if the file does not exist, then create a new level */
     else {
       TXshLevel* level = scene->createNewLevel(OVL_XSHLEVEL, levelName,
                                                TDimension(), 0, levelFp);
-      sl = level->getSimpleLevel();
+      sl               = level->getSimpleLevel();
       sl->setPath(levelFp, true);
       sl->getProperties()->setDpiPolicy(LevelProperties::DP_CustomDpi);
       TPointD dpi;
@@ -2595,7 +2631,7 @@ bool PencilTestPopup::importImage(QImage image) {
 
   // if the level is newly created or imported, then insert a new column
   if (state == NEWLEVEL) {
-    if (!xsh->isColumnEmpty(col)) {
+    if (col < 0 || !xsh->isColumnEmpty(col)) {
       col += 1;
       xsh->insertColumn(col);
     }
@@ -2732,7 +2768,7 @@ void PencilTestPopup::refreshFrameInfo() {
 
   // frame existence
   TFilePath frameFp(actualLevelFp.withFrame(frameNumber));
-  bool frameExist            = false;
+  bool frameExist = false;
   if (levelExist) frameExist = TFileStatus(frameFp).doesExist();
 
   // reset acceptable camera size
@@ -2958,6 +2994,7 @@ void PencilTestPopup::onSceneSwitched() {
   m_saveInFolderPopup->updateParentFolder();
   m_saveInFileFld->setPath(m_saveInFolderPopup->getParentPath());
   refreshFrameInfo();
+  m_alwaysOverwrite = false;
 }
 
 //-----------------------------------------------------------------------------

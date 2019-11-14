@@ -55,6 +55,7 @@ TEnv::IntVar RasterBrushPencilMode("InknpaintRasterBrushPencilMode", 0);
 TEnv::IntVar BrushPressureSensitivity("InknpaintBrushPressureSensitivity", 1);
 TEnv::DoubleVar RasterBrushHardness("RasterBrushHardness", 100);
 TEnv::DoubleVar RasterBrushModifierSize("RasterBrushModifierSize", 0);
+TEnv::StringVar RasterBrushPreset("RasterBrushPreset", "<custom>");
 
 //-------------------------------------------------------------------
 #define CUSTOM_WSTR L"<custom>"
@@ -250,8 +251,9 @@ static void findMaxCurvPoints(TStroke *stroke, const float &angoloLim,
     double estremo_int = 0;
     double t           = -1;
     if (q != TPointD(0, 0)) {
-      t = 0.25 * (2 * q.x * q.x + 2 * q.y * q.y - q.x * p0.x + q.x * p2.x -
-                  q.y * p0.y + q.y * p2.y) /
+      t = 0.25 *
+          (2 * q.x * q.x + 2 * q.y * q.y - q.x * p0.x + q.x * p2.x -
+           q.y * p0.y + q.y * p2.y) /
           (q.x * q.x + q.y * q.y);
 
       dp  = -p0 + p2 + 2 * q - 4 * t * q;  // First derivate of the curve
@@ -285,7 +287,7 @@ static void findMaxCurvPoints(TStroke *stroke, const float &angoloLim,
     if (estremo_sx >= estremo_dx)
       t_ext = 0;
     else
-      t_ext           = 1;
+      t_ext = 1;
     double maxEstremi = std::max(estremo_dx, estremo_sx);
     if (maxEstremi > estremo_int) {
       t        = t_ext;
@@ -599,9 +601,9 @@ public:
 //=========================================================================================================
 
 double computeThickness(double pressure, const TDoublePairProperty &property) {
-  double t                    = pressure * pressure * pressure;
-  double thick0               = property.getValue().first;
-  double thick1               = property.getValue().second;
+  double t      = pressure * pressure * pressure;
+  double thick0 = property.getValue().first;
+  double thick1 = property.getValue().second;
   if (thick1 < 0.0001) thick0 = thick1 = 0.0;
   return (thick0 + (thick1 - thick0) * t) * 0.5;
 }
@@ -820,7 +822,7 @@ void SmoothStroke::generatePoints() {
 
 ToonzRasterBrushTool::ToonzRasterBrushTool(std::string name, int targetType)
     : TTool(name)
-    , m_rasThickness("Size", 1, 100, 1, 5)
+    , m_rasThickness("Size", 1, 1000, 1, 5)
     , m_smooth("Smooth:", 0, 50, 0)
     , m_hardness("Hardness:", 0, 100, 100)
     , m_preset("Preset:")
@@ -840,6 +842,8 @@ ToonzRasterBrushTool::ToonzRasterBrushTool(std::string name, int targetType)
     , m_workingFrameId(TFrameId())
     , m_notifier(0) {
   bind(targetType);
+
+  m_rasThickness.setNonLinearSlider();
 
   m_prop[0].bind(m_rasThickness);
   m_prop[0].bind(m_hardness);
@@ -1017,6 +1021,27 @@ void ToonzRasterBrushTool::drawEmptyCircle(TPointD pos, int thick,
 
 //-------------------------------------------------------------------------------------------------------
 
+TPointD ToonzRasterBrushTool::getCenteredCursorPos(
+    const TPointD &originalCursorPos) {
+  if (m_isMyPaintStyleSelected) return originalCursorPos;
+  TXshLevelHandle *levelHandle = m_application->getCurrentLevel();
+  TXshSimpleLevel *level = levelHandle ? levelHandle->getSimpleLevel() : 0;
+  TDimension resolution =
+      level ? level->getProperties()->getImageRes() : TDimension(0, 0);
+
+  bool xEven = (resolution.lx % 2 == 0);
+  bool yEven = (resolution.ly % 2 == 0);
+
+  TPointD centeredCursorPos = originalCursorPos;
+
+  if (xEven) centeredCursorPos.x -= 0.5;
+  if (yEven) centeredCursorPos.y -= 0.5;
+
+  return centeredCursorPos;
+}
+
+//-------------------------------------------------------------------------------------------------------
+
 void ToonzRasterBrushTool::updateTranslation() {
   m_rasThickness.setQStringName(tr("Size"));
   m_hardness.setQStringName(tr("Hardness:"));
@@ -1104,17 +1129,16 @@ void ToonzRasterBrushTool::onActivate() {
   if (!m_notifier) m_notifier = new ToonzRasterBrushToolNotifier(this);
 
   if (m_firstTime) {
-    m_rasThickness.setValue(
-        TDoublePairProperty::Value(RasterBrushMinSize, RasterBrushMaxSize));
-
-    m_drawOrder.setIndex(BrushDrawOrder);
-    m_pencil.setValue(RasterBrushPencilMode ? 1 : 0);
-    m_hardness.setValue(RasterBrushHardness);
-
-    m_pressure.setValue(BrushPressureSensitivity ? 1 : 0);
     m_firstTime = false;
-    m_smooth.setValue(BrushSmooth);
-    m_modifierSize.setValue(RasterBrushModifierSize);
+
+    std::wstring wpreset =
+        QString::fromStdString(RasterBrushPreset.getValue()).toStdWString();
+    if (wpreset != CUSTOM_WSTR) {
+      initPresets();
+      m_preset.setValue(wpreset);
+      loadPreset();
+    } else
+      loadLastBrush();
   }
   m_brushPad = ToolUtils::getBrushPad(m_rasThickness.getValue().second,
                                       m_hardness.getValue() * 0.01);
@@ -1180,9 +1204,11 @@ void ToonzRasterBrushTool::leftButtonDown(const TPointD &pos,
   if (!app) return;
 
   int col   = app->getCurrentColumn()->getColumnIndex();
-  m_enabled = col >= 0;
+  m_enabled = col >= 0 || app->getCurrentFrame()->isEditingLevel();
   // todo: gestire autoenable
   if (!m_enabled) return;
+
+  TPointD centeredPos = getCenteredCursorPos(pos);
 
   m_currentColor = TPixel32::Black;
   m_active       = !!getImage(true);
@@ -1221,12 +1247,12 @@ void ToonzRasterBrushTool::leftButtonDown(const TPointD &pos,
                            : maxThick;
 
     /*--- ストロークの最初にMaxサイズの円が描かれてしまう不具合を防止する
-      * ---*/
+     * ---*/
     if (m_pressure.getValue() && e.m_pressure == 1.0)
       thickness = m_rasThickness.getValue().first;
 
     TPointD halfThick(maxThick * 0.5, maxThick * 0.5);
-    TRectD invalidateRect(pos - halfThick, pos + halfThick);
+    TRectD invalidateRect(centeredPos - halfThick, centeredPos + halfThick);
     TPointD dpi;
     ri->getDpi(dpi.x, dpi.y);
     TRectD previousTipRect(m_brushPos - halfThick, m_brushPos + halfThick);
@@ -1244,7 +1270,7 @@ void ToonzRasterBrushTool::leftButtonDown(const TPointD &pos,
 
     // mypaint brush case
     if (m_isMyPaintStyleSelected) {
-      TPointD point(pos + rasCenter);
+      TPointD point(centeredPos + rasCenter);
       double pressure =
           m_pressure.getValue() && e.isTablet() ? e.m_pressure : 0.5;
       updateCurrentStyle();
@@ -1276,15 +1302,17 @@ void ToonzRasterBrushTool::leftButtonDown(const TPointD &pos,
 
       TPointD thickOffset(m_maxCursorThick * 0.5, m_maxCursorThick * 0.5);
       invalidateRect = convert(m_strokeSegmentRect) - rasCenter;
-      invalidateRect += TRectD(pos - thickOffset, pos + thickOffset);
+      invalidateRect +=
+          TRectD(centeredPos - thickOffset, centeredPos + thickOffset);
       invalidateRect +=
           TRectD(m_brushPos - thickOffset, m_brushPos + thickOffset);
     } else if (m_hardness.getValue() == 100 || m_pencil.getValue()) {
       /*-- Pencilモードでなく、Hardness=100 の場合のブラシサイズを1段階下げる
-        * --*/
+       * --*/
       if (!m_pencil.getValue()) thickness -= 1.0;
 
-      TThickPoint thickPoint(pos + convert(ras->getCenter()), thickness);
+      TThickPoint thickPoint(centeredPos + convert(ras->getCenter()),
+                             thickness);
       m_rasterTrack = new RasterStrokeGenerator(
           ras, BRUSH, NONE, m_styleId, thickPoint, drawOrder != OverAll, 0,
           !m_pencil.getValue(), drawOrder == PaletteOrder);
@@ -1305,7 +1333,7 @@ void ToonzRasterBrushTool::leftButtonDown(const TPointD &pos,
       }
     } else {
       m_points.clear();
-      TThickPoint point(pos + rasCenter, thickness);
+      TThickPoint point(centeredPos + rasCenter, thickness);
       m_points.push_back(point);
       m_bluredBrush = new BluredBrush(m_workRas, maxThick, m_brushPad, false);
 
@@ -1335,7 +1363,8 @@ void ToonzRasterBrushTool::leftButtonDown(const TPointD &pos,
     invalidate(invalidateRect.enlarge(2));
   }
   // updating m_brushPos is needed to refresh viewer properly
-  m_brushPos = m_mousePos = pos;
+  m_mousePos = pos;
+  m_brushPos = getCenteredCursorPos(pos);
 }
 
 //-------------------------------------------------------------------------------------------------------------
@@ -1343,9 +1372,12 @@ void ToonzRasterBrushTool::leftButtonDown(const TPointD &pos,
 void ToonzRasterBrushTool::leftButtonDrag(const TPointD &pos,
                                           const TMouseEvent &e) {
   if (!m_enabled || !m_active) {
-    m_brushPos = m_mousePos = pos;
+    m_mousePos = pos;
+    m_brushPos = getCenteredCursorPos(pos);
     return;
   }
+
+  TPointD centeredPos = getCenteredCursorPos(pos);
 
   TToonzImageP ti   = TImageP(getImage(true));
   TPointD rasCenter = ti->getRaster()->getCenterD();
@@ -1356,7 +1388,7 @@ void ToonzRasterBrushTool::leftButtonDrag(const TPointD &pos,
   TRectD invalidateRect;
   if (m_isMyPaintStyleSelected) {
     TRasterP ras = ti->getRaster();
-    TPointD point(pos + rasCenter);
+    TPointD point(centeredPos + rasCenter);
     double pressure =
         m_pressure.getValue() && e.isTablet() ? e.m_pressure : 0.5;
 
@@ -1372,16 +1404,17 @@ void ToonzRasterBrushTool::leftButtonDrag(const TPointD &pos,
 
     TPointD thickOffset(m_maxCursorThick * 0.5, m_maxCursorThick * 0.5);
     invalidateRect = convert(m_strokeSegmentRect) - rasCenter;
-    invalidateRect += TRectD(pos - thickOffset, pos + thickOffset);
+    invalidateRect +=
+        TRectD(centeredPos - thickOffset, centeredPos + thickOffset);
     invalidateRect +=
         TRectD(m_brushPos - thickOffset, m_brushPos + thickOffset);
   } else if (m_rasterTrack &&
              (m_hardness.getValue() == 100 || m_pencil.getValue())) {
     /*-- Pencilモードでなく、Hardness=100 の場合のブラシサイズを1段階下げる
-      * --*/
+     * --*/
     if (!m_pencil.getValue()) thickness -= 1.0;
 
-    TThickPoint thickPoint(pos + rasCenter, thickness);
+    TThickPoint thickPoint(centeredPos + rasCenter, thickness);
     std::vector<TThickPoint> pts;
     if (m_smooth.getValue() == 0) {
       pts.push_back(thickPoint);
@@ -1410,7 +1443,7 @@ void ToonzRasterBrushTool::leftButtonDrag(const TPointD &pos,
   } else {
     // antialiased brush
     assert(m_workRas.getPointer() && m_backupRas.getPointer());
-    TThickPoint thickPoint(pos + rasCenter, thickness);
+    TThickPoint thickPoint(centeredPos + rasCenter, thickness);
     std::vector<TThickPoint> pts;
     if (m_smooth.getValue() == 0) {
       pts.push_back(thickPoint);
@@ -1461,10 +1494,11 @@ void ToonzRasterBrushTool::leftButtonDrag(const TPointD &pos,
   if (m_smooth.getValue() != 0) {
     TPointD halfThick(m_maxThick * 0.5, m_maxThick * 0.5);
     invalidateRect += TRectD(m_brushPos - halfThick, m_brushPos + halfThick);
-    invalidateRect += TRectD(pos - halfThick, pos + halfThick);
+    invalidateRect += TRectD(centeredPos - halfThick, centeredPos + halfThick);
   }
 
-  m_brushPos = m_mousePos = pos;
+  m_mousePos = pos;
+  m_brushPos = getCenteredCursorPos(pos);
 
   invalidate(invalidateRect.enlarge(2));
 }
@@ -1479,14 +1513,15 @@ void ToonzRasterBrushTool::leftButtonUp(const TPointD &pos,
   if (!isValid) {
     return;
   }
+  TPointD centeredPos = getCenteredCursorPos(pos);
   double pressure = m_pressure.getValue() && e.isTablet() ? e.m_pressure : 0.5;
-  finishRasterBrush(pos, pressure);
+  finishRasterBrush(centeredPos, pressure);
 }
 
 //---------------------------------------------------------------------------------------------------------------
 /*!
  * ドラッグ中にツールが切り替わった場合に備え、onDeactivate時とMouseRelease時にと同じ終了処理を行う
-*/
+ */
 void ToonzRasterBrushTool::finishRasterBrush(const TPointD &pos,
                                              double pressureVal) {
   TToonzImageP ti = TImageP(getImage(true));
@@ -1766,7 +1801,7 @@ void ToonzRasterBrushTool::mouseMove(const TPointD &pos, const TMouseEvent &e) {
 
   } else {
     m_mousePos = pos;
-    m_brushPos = pos;
+    m_brushPos = getCenteredCursorPos(pos);
 
     invalidateRect += TRectD(pos - halfThick, pos + halfThick);
   }
@@ -1904,11 +1939,22 @@ void ToonzRasterBrushTool::setWorkAndBackupImages() {
 //------------------------------------------------------------------
 
 bool ToonzRasterBrushTool::onPropertyChanged(std::string propertyName) {
-  // Set the following to true whenever a different piece of interface must
-  // be refreshed - done once at the end.
-  bool notifyTool = false;
+  if (m_propertyUpdating) return true;
 
-  /*--- 変更されたPropertyに合わせて処理を分ける ---*/
+  if (propertyName == m_preset.getName()) {
+    if (m_preset.getValue() != CUSTOM_WSTR)
+      loadPreset();
+    else  // Chose <custom>, go back to last saved brush settings
+      loadLastBrush();
+
+    RasterBrushPreset  = m_preset.getValueAsString();
+    m_propertyUpdating = true;
+    getApplication()->getCurrentTool()->notifyToolChanged();
+    m_propertyUpdating = false;
+    return true;
+  }
+
+  /*--- Divide the process according to the changed Property ---*/
 
   /*--- determine which type of brush to be modified ---*/
   if (propertyName == m_rasThickness.getName()) {
@@ -1919,9 +1965,6 @@ bool ToonzRasterBrushTool::onPropertyChanged(std::string propertyName) {
     m_maxThick = m_rasThickness.getValue().second;
   } else if (propertyName == m_smooth.getName()) {
     BrushSmooth = m_smooth.getValue();
-  } else if (propertyName == m_preset.getName()) {
-    loadPreset();
-    notifyTool = true;
   } else if (propertyName == m_drawOrder.getName()) {
     BrushDrawOrder = m_drawOrder.getIndex();
   } else if (propertyName == m_pencil.getName()) {
@@ -1942,13 +1985,13 @@ bool ToonzRasterBrushTool::onPropertyChanged(std::string propertyName) {
     invalidate(rect);
   }
 
-  if (propertyName != m_preset.getName() &&
-      m_preset.getValue() != CUSTOM_WSTR) {
+  if (m_preset.getValue() != CUSTOM_WSTR) {
     m_preset.setValue(CUSTOM_WSTR);
-    notifyTool = true;
+    RasterBrushPreset  = m_preset.getValueAsString();
+    m_propertyUpdating = true;
+    getApplication()->getCurrentTool()->notifyToolChanged();
+    m_propertyUpdating = false;
   }
-
-  if (notifyTool) getApplication()->getCurrentTool()->notifyToolChanged();
 
   return true;
 }
@@ -2040,8 +2083,23 @@ void ToonzRasterBrushTool::removePreset() {
 }
 
 //------------------------------------------------------------------
+
+void ToonzRasterBrushTool::loadLastBrush() {
+  m_rasThickness.setValue(
+      TDoublePairProperty::Value(RasterBrushMinSize, RasterBrushMaxSize));
+
+  m_drawOrder.setIndex(BrushDrawOrder);
+  m_pencil.setValue(RasterBrushPencilMode ? 1 : 0);
+  m_hardness.setValue(RasterBrushHardness);
+
+  m_pressure.setValue(BrushPressureSensitivity ? 1 : 0);
+  m_smooth.setValue(BrushSmooth);
+  m_modifierSize.setValue(RasterBrushModifierSize);
+}
+
+//------------------------------------------------------------------
 /*!	Brush、PaintBrush、EraserToolがPencilModeのときにTrueを返す
-*/
+ */
 bool ToonzRasterBrushTool::isPencilModeActive() {
   return getTargetType() == TTool::ToonzImage && m_pencil.getValue();
 }

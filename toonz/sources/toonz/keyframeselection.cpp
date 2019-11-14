@@ -48,7 +48,8 @@ bool shiftKeyframesWithoutUndo(int r0, int r1, int c0, int c1, bool cut) {
   int x;
   for (x = c0; x <= c1; x++) {
     TStageObject *stObj = xsh->getStageObject(
-        x >= 0 ? TStageObjectId::ColumnId(x) : TStageObjectId::CameraId(0));
+        x >= 0 ? TStageObjectId::ColumnId(x)
+               : TStageObjectId::CameraId(xsh->getCameraColumnIndex()));
     std::set<int> keyToShift;
     int kr0, kr1;
     stObj->getKeyframeRange(kr0, kr1);
@@ -90,8 +91,9 @@ bool deleteKeyframesWithoutUndo(
     std::set<TKeyframeSelection::Position> *positions) {
   TApp *app = TApp::instance();
   assert(app);
-  TXsheet *xsh            = app->getCurrentXsheet()->getXsheet();
-  TStageObjectId cameraId = xsh->getStageObjectTree()->getCurrentCameraId();
+  TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
+  TStageObjectId cameraId =
+      TStageObjectId::CameraId(xsh->getCameraColumnIndex());
 
   if (positions->empty()) return false;
 
@@ -102,9 +104,7 @@ bool deleteKeyframesWithoutUndo(
     int col              = it->second;
     TStageObject *pegbar = xsh->getStageObject(
         col >= 0 ? TStageObjectId::ColumnId(col) : cameraId);
-    if (pegbar->getId().isColumn() && xsh->getColumn(col) &&
-        xsh->getColumn(col)->isLocked())
-      continue;
+    if (xsh->getColumn(col) && xsh->getColumn(col)->isLocked()) continue;
     areAllColumnLocked = false;
     assert(pegbar);
     pegbar->removeKeyframeWithoutUndo(row);
@@ -208,7 +208,9 @@ public:
   }
 
   void redo() const override {
-    deleteKeyframesWithoutUndo(&m_selection->getSelection());
+    TKeyframeSelection *tempSelection =
+        new TKeyframeSelection(m_selection->getSelection());
+    deleteKeyframesWithoutUndo(&tempSelection->getSelection());
     if (m_r1 - m_r0 + 1 != 0)
       shiftKeyframesWithoutUndo(m_r0, m_r1, m_c0, m_c1, true);
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
@@ -251,10 +253,10 @@ void TKeyframeSelection::unselectLockedColumn() {
   TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
   std::set<Position> positions;
   std::set<Position>::iterator it;
+
   for (it = m_positions.begin(); it != m_positions.end(); ++it) {
     int col = it->second;
-    if (col >= 0 && xsh->getColumn(col) && xsh->getColumn(col)->isLocked())
-      continue;
+    if (xsh->getColumn(col) && xsh->getColumn(col)->isLocked()) continue;
     positions.insert(*it);
   }
   m_positions.swap(positions);
@@ -279,7 +281,8 @@ void TKeyframeSelection::setKeyframes() {
   TApp *app                   = TApp::instance();
   TXsheetHandle *xsheetHandle = app->getCurrentXsheet();
   TXsheet *xsh                = xsheetHandle->getXsheet();
-  TStageObjectId cameraId     = xsh->getStageObjectTree()->getCurrentCameraId();
+  TStageObjectId cameraId =
+      TStageObjectId::CameraId(xsh->getCameraColumnIndex());
   if (isEmpty()) return;
   Position pos         = *m_positions.begin();
   int row              = pos.first;
@@ -314,7 +317,7 @@ void TKeyframeSelection::copyKeyframes() {
 //-----------------------------------------------------------------------------
 
 void TKeyframeSelection::pasteKeyframes() {
-  pasteKeyframesWithShift(0, 0, -1, -1);
+  pasteKeyframesWithShift(0, 0, 0, -1);
 }
 
 //-----------------------------------------------------------------------------
