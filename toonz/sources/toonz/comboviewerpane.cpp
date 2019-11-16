@@ -617,13 +617,12 @@ void ComboViewerPanel::changeWindowTitle() {
 
   // if the frame type is "scene editing"
   if (app->getCurrentFrame()->isEditingScene()) {
-    TProject *project   = scene->getProject();
-    QString projectName = QString::fromStdString(project->getName().getName());
-    QString sceneName   = QString::fromStdWString(scene->getSceneName());
+    TProject *project = scene->getProject();
+    QString sceneName = QString::fromStdWString(scene->getSceneName());
     if (sceneName.isEmpty()) sceneName = tr("Untitled");
 
     if (app->getCurrentScene()->getDirtyFlag()) sceneName += QString("*");
-    name = tr("[SCENE]: ") + sceneName + tr("   ::   Project: ") + projectName;
+    name = tr("[SCENE]: ") + sceneName;
     if (frame >= 0)
       name =
           name + tr("   ::   Frame: ") + tr(std::to_string(frame + 1).c_str());
