@@ -1174,7 +1174,8 @@ void SceneViewer::drawCameraStand() {
 
     TImageP image = tool->getImage(false);
 
-    TToonzImageP ti = image;
+    TToonzImageP ti  = image;
+    TRasterImageP ri = image;
     if (ti) {
       TRect imgRect(0, 0, ti->getSize().lx - 1, ti->getSize().ly - 1);
       TRectD bbox = ToonzImageUtils::convertRasterToWorld(imgRect, ti);
@@ -1184,8 +1185,22 @@ void SceneViewer::drawCameraStand() {
       if (ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg)
         imgRectColor = TPixel::Black;
       else
-        imgRectColor = TPixel::White;
+        imgRectColor = Preferences::instance()->getLevelEditorBoxColor();
       ToolUtils::fillRect(bbox * ti->getSubsampling(), imgRectColor);
+    } else if (ri) {
+      TRectD bbox = ri->getBBox();
+      bbox.x0 -= ri->getBBox().getLx() * 0.5;
+      bbox.x1 -= ri->getBBox().getLx() * 0.5;
+      bbox.y0 -= ri->getBBox().getLy() * 0.5;
+      bbox.y1 -= ri->getBBox().getLy() * 0.5;
+
+      TPixel32 imgRectColor;
+      // draw black rectangle instead, if the BlackBG check is ON
+      if (ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg)
+        imgRectColor = TPixel::Black;
+      else
+        imgRectColor = Preferences::instance()->getLevelEditorBoxColor();
+      ToolUtils::fillRect(bbox * ri->getSubsampling(), imgRectColor);
     }
     glPopMatrix();
   }
@@ -1722,7 +1737,7 @@ double SceneViewer::projectToZ(const TPointD &delta) {
   GLint viewport[4];
   double modelview[16], projection[16];
   glGetIntegerv(GL_VIEWPORT, viewport);
-  for (int i = 0; i < 16; i++)
+  for (int i      = 0; i < 16; i++)
     projection[i] = (double)m_projectionMatrix.constData()[i];
   glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
 
@@ -1884,9 +1899,8 @@ void SceneViewer::zoomQt(bool forward, bool reset) {
     if (reset || ((m_zoomScale3D < 500 || !forward) &&
                   (m_zoomScale3D > 0.01 || forward))) {
       double oldZoomScale = m_zoomScale3D;
-      m_zoomScale3D =
-          reset ? 1
-                : ImageUtils::getQuantizedZoomFactor(m_zoomScale3D, forward);
+      m_zoomScale3D       = reset ? 1 : ImageUtils::getQuantizedZoomFactor(
+                                      m_zoomScale3D, forward);
 
       m_pan3D = -(m_zoomScale3D / oldZoomScale) * -m_pan3D;
     }
@@ -1907,18 +1921,17 @@ void SceneViewer::zoomQt(bool forward, bool reset) {
     int i;
 
     for (i = 0; i < 2; i++) {
-      TAffine &viewAff = m_viewAff[i];
+      TAffine &viewAff          = m_viewAff[i];
       if (m_isFlippedX) viewAff = viewAff * TScale(-1, 1);
       if (m_isFlippedX) viewAff = viewAff * TScale(1, -1);
-      double scale2 = std::abs(viewAff.det());
+      double scale2             = std::abs(viewAff.det());
       if (m_isFlippedX) viewAff = viewAff * TScale(-1, 1);
       if (m_isFlippedX) viewAff = viewAff * TScale(1, -1);
       if (reset || ((scale2 < 100000 || !forward) &&
                     (scale2 > 0.001 * 0.05 || forward))) {
         double oldZoomScale = sqrt(scale2) * dpiFactor;
-        double zoomScale =
-            reset ? 1
-                  : ImageUtils::getQuantizedZoomFactor(oldZoomScale, forward);
+        double zoomScale    = reset ? 1 : ImageUtils::getQuantizedZoomFactor(
+                                           oldZoomScale, forward);
 
         // threshold value -0.001 is intended to absorb the error of calculation
         if ((oldZoomScale - zoomScaleFittingWithScreen) *
@@ -2190,9 +2203,9 @@ void SceneViewer::fitToCamera() {
   TPointD P11       = cameraAff * cameraRect.getP11();
   TPointD p0        = TPointD(std::min({P00.x, P01.x, P10.x, P11.x}),
                        std::min({P00.y, P01.y, P10.y, P11.y}));
-  TPointD p1        = TPointD(std::max({P00.x, P01.x, P10.x, P11.x}),
+  TPointD p1 = TPointD(std::max({P00.x, P01.x, P10.x, P11.x}),
                        std::max({P00.y, P01.y, P10.y, P11.y}));
-  cameraRect        = TRectD(p0.x, p0.y, p1.x, p1.y);
+  cameraRect = TRectD(p0.x, p0.y, p1.x, p1.y);
 
   // Pan
   if (!is3DView()) {
@@ -2241,8 +2254,8 @@ void SceneViewer::resetZoom() {
   TPointD realCenter(m_viewAff[m_viewMode].a13, m_viewAff[m_viewMode].a23);
   TAffine aff =
       getNormalZoomScale() * TRotation(realCenter, m_rotationAngle[m_viewMode]);
-  aff.a13 = realCenter.x;
-  aff.a23 = realCenter.y;
+  aff.a13               = realCenter.x;
+  aff.a23               = realCenter.y;
   if (m_isFlippedX) aff = aff * TScale(-1, 1);
   if (m_isFlippedY) aff = aff * TScale(1, -1);
   setViewMatrix(aff, m_viewMode);
@@ -2299,17 +2312,16 @@ void SceneViewer::setActualPixelSize() {
   } else
     dpi = sl->getDpi(fid);
 
-  const double inch = Stage::inch;
-  TAffine tempAff   = getNormalZoomScale();
-  if (m_isFlippedX) tempAff = tempAff * TScale(-1, 1);
-  if (m_isFlippedY) tempAff = tempAff * TScale(1, -1);
-  TPointD tempScale = dpi;
+  const double inch             = Stage::inch;
+  TAffine tempAff               = getNormalZoomScale();
+  if (m_isFlippedX) tempAff     = tempAff * TScale(-1, 1);
+  if (m_isFlippedY) tempAff     = tempAff * TScale(1, -1);
+  TPointD tempScale             = dpi;
   if (m_isFlippedX) tempScale.x = -tempScale.x;
   if (m_isFlippedY) tempScale.y = -tempScale.y;
   for (int i = 0; i < m_viewAff.size(); ++i)
-    setViewMatrix(dpi == TPointD(0, 0)
-                      ? tempAff
-                      : TScale(tempScale.x / inch, tempScale.y / inch),
+    setViewMatrix(dpi == TPointD(0, 0) ? tempAff : TScale(tempScale.x / inch,
+                                                          tempScale.y / inch),
                   i);
 
   m_pos         = QPoint(0, 0);
@@ -2592,7 +2604,7 @@ void drawSpline(const TAffine &viewMatrix, const TRect &clipRect, bool camera3d,
 
   TStageObject *pegbar =
       objId != TStageObjectId::NoneId ? xsh->getStageObject(objId) : 0;
-  const TStroke *stroke = 0;
+  const TStroke *stroke                     = 0;
   if (pegbar && pegbar->getSpline()) stroke = pegbar->getSpline()->getStroke();
   if (!stroke) return;
 

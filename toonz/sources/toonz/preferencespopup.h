@@ -50,7 +50,7 @@ private:
   DVGui::ColorField *m_blankColor, *m_frontOnionColor, *m_backOnionColor,
       *m_transpCheckBgColor, *m_transpCheckInkColor, *m_transpCheckPaintColor,
       *m_viewerBgColorFld, *m_previewBgColorFld, *m_chessboardColor1Fld,
-      *m_chessboardColor2Fld;
+      *m_chessboardColor2Fld, *m_levelEditorBoxColorFld;
 
   QComboBox *m_keyframeType, *m_cellsDragBehaviour, *m_defScanLevelType,
       *m_defLevelType, *m_autocreationType, *m_levelFormatNames,
@@ -179,6 +179,7 @@ private slots:
   void onMoveCurrentFrameChanged(int index);
   void setViewerBgColor(const TPixel32 &, bool);
   void setPreviewBgColor(const TPixel32 &, bool);
+  void setLevelEditorBoxColor(const TPixel32 &, bool);
   void setChessboardColor1(const TPixel32 &, bool);
   void setChessboardColor2(const TPixel32 &, bool);
   void onColumnIconChange(const QString &);
