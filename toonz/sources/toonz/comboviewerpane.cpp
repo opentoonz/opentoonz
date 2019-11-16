@@ -651,7 +651,7 @@ void ComboViewerPanel::changeWindowTitle() {
         QString::fromStdWString(fp.withFrame(cell.m_frameId).getWideString());
     name = name + tr("   ::   Level: ") + imageName;
 
-    if (m_sceneViewer->isPreviewEnabled() && !m_sceneViewer->is3DView()) {
+    if (!m_sceneViewer->is3DView()) {
       TAffine aff                             = m_sceneViewer->getViewMatrix();
       if (m_sceneViewer->getIsFlippedX()) aff = aff * TScale(-1, 1);
       if (m_sceneViewer->getIsFlippedY()) aff = aff * TScale(1, -1);
