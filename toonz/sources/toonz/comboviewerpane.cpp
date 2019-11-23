@@ -617,13 +617,12 @@ void ComboViewerPanel::changeWindowTitle() {
 
   // if the frame type is "scene editing"
   if (app->getCurrentFrame()->isEditingScene()) {
-    TProject *project   = scene->getProject();
-    QString projectName = QString::fromStdString(project->getName().getName());
-    QString sceneName   = QString::fromStdWString(scene->getSceneName());
+    TProject *project = scene->getProject();
+    QString sceneName = QString::fromStdWString(scene->getSceneName());
     if (sceneName.isEmpty()) sceneName = tr("Untitled");
 
     if (app->getCurrentScene()->getDirtyFlag()) sceneName += QString("*");
-    name = tr("Scene: ") + sceneName + tr("   ::   Project: ") + projectName;
+    name = tr("[SCENE]: ") + sceneName;
     if (frame >= 0)
       name =
           name + tr("   ::   Frame: ") + tr(std::to_string(frame + 1).c_str());
@@ -652,7 +651,7 @@ void ComboViewerPanel::changeWindowTitle() {
         QString::fromStdWString(fp.withFrame(cell.m_frameId).getWideString());
     name = name + tr("   ::   Level: ") + imageName;
 
-    if (m_sceneViewer->isPreviewEnabled() && !m_sceneViewer->is3DView()) {
+    if (!m_sceneViewer->is3DView()) {
       TAffine aff                             = m_sceneViewer->getViewMatrix();
       if (m_sceneViewer->getIsFlippedX()) aff = aff * TScale(-1, 1);
       if (m_sceneViewer->getIsFlippedY()) aff = aff * TScale(1, -1);
@@ -692,7 +691,7 @@ void ComboViewerPanel::changeWindowTitle() {
       QString imageName = QString::fromStdWString(
           fp.withFrame(app->getCurrentFrame()->getFid()).getWideString());
 
-      name = name + tr("Level: ") + imageName;
+      name = name + tr("[LEVEL]: ") + imageName;
       if (!m_sceneViewer->is3DView()) {
         TAffine aff = m_sceneViewer->getViewMatrix();
         if (m_sceneViewer->getIsFlippedX()) aff = aff * TScale(-1, 1);

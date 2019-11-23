@@ -1318,6 +1318,11 @@ void TXsheet::insertColumn(int col, TXshColumn *column) {
     TFx *fx = column->getFx();
     if (fx) getFxDag()->addToXsheet(fx);
   }
+
+  for (ColumnFan &columnFan : m_imp->m_columnFans) {
+    columnFan.rollRightFoldedState(col,
+                                   m_imp->m_columnSet.getColumnCount() - col);
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -1336,6 +1341,11 @@ void TXsheet::removeColumn(int col) {
   }
   m_imp->m_columnSet.removeColumn(col);
   m_imp->m_pegTree->removeColumn(col);
+
+  for (ColumnFan &columnFan : m_imp->m_columnFans) {
+    columnFan.rollLeftFoldedState(col,
+                                  m_imp->m_columnSet.getColumnCount() - col);
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -1363,12 +1373,16 @@ void TXsheet::moveColumn(int srcIndex, int dstIndex) {
     int c1 = dstIndex;
     assert(c0 < c1);
     m_imp->m_columnSet.rollLeft(c0, c1 - c0 + 1);
+    for (ColumnFan &columnFan : m_imp->m_columnFans)
+      columnFan.rollLeftFoldedState(c0, c1 - c0 + 1);
     for (int c = c0; c < c1; ++c) m_imp->m_pegTree->swapColumns(c, c + 1);
   } else {
     int c0 = dstIndex;
     int c1 = srcIndex;
     assert(c0 < c1);
     m_imp->m_columnSet.rollRight(c0, c1 - c0 + 1);
+    for (ColumnFan &columnFan : m_imp->m_columnFans)
+      columnFan.rollRightFoldedState(c0, c1 - c0 + 1);
     for (int c = c1 - 1; c >= c0; --c) m_imp->m_pegTree->swapColumns(c, c + 1);
   }
 }

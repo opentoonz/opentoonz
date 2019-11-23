@@ -236,6 +236,11 @@ public:
   }
 };
 
+// From V1.4 LinearGradientFx becomes obsolete and was replaced by
+// Iwa_LinearGradientFx which has more flexibility. (iwa_lineargradientfx.cpp)
+// This code is kept in order to load the fx made with older OT versions.
+// Nov 14, 2019
+
 class LinearGradientFx final : public TStandardZeraryFx {
   FX_PLUGIN_DECLARATION(LinearGradientFx)
   TDoubleParamP m_period;

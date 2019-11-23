@@ -234,8 +234,11 @@ void SceneLevel::save() {
         // imageBuilder path refresh.
         m_sl->setPath(fp, false);
       } else {
-        m_sl->save(actualFp, oldActualPath);
-
+        try {
+          m_sl->save(actualFp, oldActualPath);
+        } catch (...) {
+          throw;
+        }
         if ((actualFp.getType() == "tlv" || actualFp.getType() == "pli") &&
             actualFp != oldActualPath && m_oldRefImgPath != TFilePath()) {
           // Devo preoccuparmi dell'eventuale livello colormodel
@@ -492,7 +495,20 @@ void SceneResources::getResources() {
 void SceneResources::save(const TFilePath newScenePath) {
   TFilePath oldScenePath = m_scene->getScenePath();
   m_scene->setScenePath(newScenePath);
-  for (int i = 0; i < (int)m_resources.size(); i++) m_resources[i]->save();
+  bool failedSave = false;
+  QString failedList;
+  for (int i = 0; i < (int)m_resources.size(); i++) {
+    m_resources[i]->save();
+    if (m_resources[i]->isDirty())  // didn't save for some reason
+    {
+      failedList += "\n" + m_resources[i]->getResourceName();
+      failedSave = true;
+    }
+  }
+
+  if (failedSave)
+    DVGui::warning(QObject::tr("Failed to save the following resources:\n") +
+                   failedList);
   m_scene->setScenePath(oldScenePath);
 }
 

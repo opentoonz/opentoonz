@@ -1294,6 +1294,16 @@
   <item>"STD_iwa_SpinGradientFx.endAngle"	"End Angle"		</item>
   <item>"STD_iwa_SpinGradientFx.endColor"	"End Color"		</item>
 
+  <item>"STD_iwa_LinearGradientFx" 			"Linear Gradient" 	</item>
+  <item>"STD_iwa_LinearGradientFx.curveType"	"Type"		</item>
+  <item>"STD_iwa_LinearGradientFx.startPoint"	"Start Point"		</item>
+  <item>"STD_iwa_LinearGradientFx.startColor"	"Start Color"		</item>
+  <item>"STD_iwa_LinearGradientFx.endPoint"	"End Point"		</item>
+  <item>"STD_iwa_LinearGradientFx.endColor"	"End Color"		</item>
+  <item>"STD_iwa_LinearGradientFx.wave_amplitude"	"Amplitude"	</item>
+  <item>"STD_iwa_LinearGradientFx.wave_frequency"	"Frequency"	</item>
+  <item>"STD_iwa_LinearGradientFx.wave_phase"		"Phase"		</item>
+
  <!------------------------------ Tiled Particles Iwa ------------------------------------------->
 
   <item>STD_iwa_TiledParticlesFx "Tiled Particles Iwa" </item>

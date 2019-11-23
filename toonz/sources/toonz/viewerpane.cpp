@@ -522,12 +522,11 @@ void SceneViewerPanel::changeWindowTitle() {
   int frame = app->getCurrentFrame()->getFrame();
   QString name;
   if (app->getCurrentFrame()->isEditingScene()) {
-    TProject *project   = scene->getProject();
-    QString projectName = QString::fromStdString(project->getName().getName());
-    QString sceneName   = QString::fromStdWString(scene->getSceneName());
+    TProject *project = scene->getProject();
+    QString sceneName = QString::fromStdWString(scene->getSceneName());
     if (sceneName.isEmpty()) sceneName = tr("Untitled");
     if (app->getCurrentScene()->getDirtyFlag()) sceneName += QString("*");
-    name = tr("Scene: ") + sceneName + tr("   ::   Project: ") + projectName;
+    name = tr("[SCENE]: ") + sceneName;
     if (frame >= 0)
       name =
           name + tr("   ::   Frame: ") + tr(std::to_string(frame + 1).c_str());
@@ -564,7 +563,7 @@ void SceneViewerPanel::changeWindowTitle() {
       TFilePath fp(level->getName());
       QString imageName = QString::fromStdWString(
           fp.withFrame(app->getCurrentFrame()->getFid()).getWideString());
-      name = name + tr("Level: ") + imageName;
+      name = name + tr("[LEVEL]: ") + imageName;
     }
   }
   if (!m_sceneViewer->is3DView()) {

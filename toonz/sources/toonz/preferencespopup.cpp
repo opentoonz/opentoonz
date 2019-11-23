@@ -765,6 +765,14 @@ void PreferencesPopup::setPreviewBgColor(const TPixel32 &color,
 
 //-----------------------------------------------------------------------------
 
+void PreferencesPopup::setLevelEditorBoxColor(const TPixel32 &color,
+                                              bool isDragging) {
+  m_pref->setLevelEditorBoxColor(color, isDragging);
+  TApp::instance()->getCurrentScene()->notifySceneChanged();
+}
+
+//-----------------------------------------------------------------------------
+
 void PreferencesPopup::setChessboardColor1(const TPixel32 &color,
                                            bool isDragging) {
   m_pref->setChessboardColor1(color, isDragging);
@@ -1627,6 +1635,9 @@ PreferencesPopup::PreferencesPopup()
   // Preview BG color
   m_previewBgColorFld =
       new ColorField(this, false, m_pref->getPreviewBgColor());
+  // Level Editor Box color
+  m_levelEditorBoxColorFld =
+      new ColorField(this, false, m_pref->getLevelEditorBoxColor());
   // bg chessboard colors
   TPixel32 col1, col2;
   m_pref->getChessboardColors(col1, col2);
@@ -2744,13 +2755,17 @@ PreferencesPopup::PreferencesPopup()
                           Qt::AlignRight | Qt::AlignVCenter);
       colorLay->addWidget(m_previewBgColorFld, 1, 1);
 
-      colorLay->addWidget(new QLabel(tr("ChessBoard Color 1"), this), 2, 0,
+      colorLay->addWidget(new QLabel(tr("Level Editor Box Color"), this), 2, 0,
                           Qt::AlignRight | Qt::AlignVCenter);
-      colorLay->addWidget(m_chessboardColor1Fld, 2, 1);
+      colorLay->addWidget(m_levelEditorBoxColorFld, 2, 1);
 
-      colorLay->addWidget(new QLabel(tr("Chessboard Color 2"), this), 3, 0,
+      colorLay->addWidget(new QLabel(tr("ChessBoard Color 1"), this), 3, 0,
                           Qt::AlignRight | Qt::AlignVCenter);
-      colorLay->addWidget(m_chessboardColor2Fld, 3, 1);
+      colorLay->addWidget(m_chessboardColor1Fld, 3, 1);
+
+      colorLay->addWidget(new QLabel(tr("Chessboard Color 2"), this), 4, 0,
+                          Qt::AlignRight | Qt::AlignVCenter);
+      colorLay->addWidget(m_chessboardColor2Fld, 4, 1);
 
       QGroupBox *tcBox   = new QGroupBox(tr("Transparency Check"), this);
       QGridLayout *tcLay = new QGridLayout();
@@ -2773,16 +2788,16 @@ PreferencesPopup::PreferencesPopup()
       tcLay->setColumnStretch(1, 0);
       tcLay->setColumnStretch(2, 1);
       for (int i = 0; i <= 2; i++) tcLay->setRowStretch(i, 0);
-      tcLay->setRowStretch(3, 1);
+      tcLay->setRowStretch(5, 1);
       tcBox->setLayout(tcLay);
 
-      colorLay->addWidget(tcBox, 4, 0, 1, 3);
+      colorLay->addWidget(tcBox, 5, 0, 1, 3);
     }
     colorLay->setColumnStretch(0, 0);
     colorLay->setColumnStretch(1, 0);
     colorLay->setColumnStretch(2, 1);
     for (int i = 0; i <= 4; i++) colorLay->setRowStretch(i, 0);
-    colorLay->setRowStretch(5, 1);
+    colorLay->setRowStretch(6, 1);
     colorBox->setLayout(colorLay);
     stackedWidget->addWidget(colorBox);
 
@@ -3142,6 +3157,10 @@ PreferencesPopup::PreferencesPopup()
   ret = ret && connect(m_previewBgColorFld,
                        SIGNAL(colorChanged(const TPixel32 &, bool)), this,
                        SLOT(setPreviewBgColor(const TPixel32 &, bool)));
+  // Level Editor Box color
+  ret = ret && connect(m_levelEditorBoxColorFld,
+                       SIGNAL(colorChanged(const TPixel32 &, bool)), this,
+                       SLOT(setLevelEditorBoxColor(const TPixel32 &, bool)));
   // bg chessboard colors
   ret = ret && connect(m_chessboardColor1Fld,
                        SIGNAL(colorChanged(const TPixel32 &, bool)), this,

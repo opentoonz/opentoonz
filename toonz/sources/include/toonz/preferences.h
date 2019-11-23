@@ -202,6 +202,9 @@ public:
   void setPreviewBGColor(const TPixel32 &color, bool isDragging);
   TPixel getPreviewBgColor() const { return m_previewBGColor; }
 
+  void setLevelEditorBoxColor(const TPixel32 &color, bool isDragging);
+  TPixel getLevelEditorBoxColor() const { return m_levelEditorBoxColor; }
+
   void setChessboardColor1(const TPixel32 &color, bool isDragging);
   void setChessboardColor2(const TPixel32 &color, bool isDragging);
   void getChessboardColors(TPixel32 &col1, TPixel32 &col2) const {
@@ -475,12 +478,10 @@ public:
   }
 
   void enableXsheetCameraColumn(bool on);
-  bool isXsheetCameraColumnEnabled() const {
-    return m_showXsheetCameraColumn;
-  }
+  bool isXsheetCameraColumnEnabled() const { return m_showXsheetCameraColumn; }
 
   bool isXsheetCameraColumnVisible() const {
-	  return m_showXsheetCameraColumn && m_showKeyframesOnXsheetCellArea;
+    return m_showXsheetCameraColumn && m_showKeyframesOnXsheetCellArea;
   }
 
   // Animation  tab
@@ -658,7 +659,7 @@ private:
   bool m_keepFillOnVectorSimplify, m_useHigherDpiOnVectorSimplify;
   bool m_downArrowInLevelStripCreatesNewFrame;
   TPixel32 m_viewerBGColor, m_previewBGColor, m_chessboardColor1,
-      m_chessboardColor2;
+      m_chessboardColor2, m_levelEditorBoxColor;
   bool m_showRasterImagesDarkenBlendedInViewer,
       m_actualPixelViewOnSceneEditingMode;
   bool m_dropdownShortcutsCycleOptions;

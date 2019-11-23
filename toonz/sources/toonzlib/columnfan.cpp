@@ -178,3 +178,56 @@ void ColumnFan::loadData(TIStream &is) {
     for (j = 0; j < count; j++) deactivate(index + j);
   }
 }
+
+//-----------------------------------------------------------------------------
+
+void ColumnFan::rollLeftFoldedState(int index, int count) {
+  assert(index >= 0);
+  int columnCount = m_columns.size();
+  if (columnCount <= index) return;
+  if (index + count - 1 > columnCount) count = columnCount - index + 1;
+  if (count < 2) return;
+
+  int i = index, j = index + count - 1;
+  bool tmp = isActive(i);
+
+  for (int k = i; k < j; ++k) {
+    if (isActive(k) && !isActive(k + 1))
+      deactivate(k);
+    else if (!isActive(k) && isActive(k + 1))
+      activate(k);
+  }
+  if (isActive(j) && !tmp)
+    deactivate(j);
+  else if (!isActive(j) && tmp)
+    activate(j);
+
+  update();
+}
+
+//-----------------------------------------------------------------------------
+
+void ColumnFan::rollRightFoldedState(int index, int count) {
+  assert(index >= 0);
+
+  int columnCount = m_columns.size();
+  if (columnCount <= index) return;
+  if (index + count - 1 > columnCount) count = columnCount - index + 1;
+  if (count < 2) return;
+
+  int i = index, j = index + count - 1;
+  bool tmp = isActive(j);
+
+  for (int k = j; k > i; --k) {
+    if (isActive(k) && !isActive(k - 1))
+      deactivate(k);
+    else if (!isActive(k) && isActive(k - 1))
+      activate(k);
+  }
+  if (isActive(i) && !tmp)
+    deactivate(i);
+  else if (!isActive(i) && tmp)
+    activate(i);
+
+  update();
+}

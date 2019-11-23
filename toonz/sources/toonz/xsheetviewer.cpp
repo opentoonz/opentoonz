@@ -653,7 +653,8 @@ void XsheetViewer::timerEvent(QTimerEvent *) {
 bool XsheetViewer::refreshContentSize(int dx, int dy) {
   QSize viewportSize = m_cellScrollArea->viewport()->size();
   QPoint offset      = m_cellArea->pos();
-  offset = QPoint(std::min(0, offset.x() - dx), std::min(0, offset.y() - dy));  // what?
+  offset             = QPoint(std::min(0, offset.x() - dx),
+                  std::min(0, offset.y() - dy));  // what?
 
   TXsheet *xsh    = getXsheet();
   int frameCount  = xsh ? xsh->getFrameCount() : 0;
@@ -818,8 +819,8 @@ QPoint XsheetViewer::positionToXY(const CellPosition &pos) const {
   // since the layers are flipped
 
   usePoint.setY(usePoint.y() - o->cellHeight() + (fan->isActive(pos.layer())
-                                    ? o->cellHeight()
-                                    : o->foldedCellSize()));
+                                                      ? o->cellHeight()
+                                                      : o->foldedCellSize()));
   int columnCount = std::max(1, xsh->getColumnCount());
   int colsHeight  = o->colToLayerAxis(columnCount, fan);
 
@@ -1628,13 +1629,11 @@ void XsheetViewer::changeWindowTitle() {
   TApp *app         = TApp::instance();
   ToonzScene *scene = app->getCurrentScene()->getScene();
   if (!scene || !app->getCurrentFrame()->isEditingScene()) return;
-  TProject *project   = scene->getProject();
-  QString projectName = QString::fromStdString(project->getName().getName());
-  QString sceneName   = QString::fromStdWString(scene->getSceneName());
+  TProject *project = scene->getProject();
+  QString sceneName = QString::fromStdWString(scene->getSceneName());
   if (sceneName.isEmpty()) sceneName = tr("Untitled");
   if (app->getCurrentScene()->getDirtyFlag()) sceneName += QString("*");
-  QString name =
-      tr("Scene: ") + sceneName + tr("   ::   Project: ") + projectName;
+  QString name   = tr("Scene: ") + sceneName;
   int frameCount = scene->getFrameCount();
   name           = name + "   ::   " + tr(std::to_string(frameCount).c_str()) +
          (frameCount == 1 ? tr(" Frame") : tr(" Frames"));

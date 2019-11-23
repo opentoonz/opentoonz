@@ -38,7 +38,7 @@
   <Gradient>
     STD_diamondGradientFx
     STD_fourPointsGradientFx 
-    STD_linearGradientFx
+    STD_iwa_LinearGradientFx
     STD_multiLinearGradientFx 
     STD_multiRadialGradientFx   
     STD_radialGradientFx

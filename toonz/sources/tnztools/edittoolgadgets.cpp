@@ -1342,6 +1342,193 @@ void QuadFxGadget::leftButtonUp(const TPointD &pos, const TMouseEvent &) {
   m_handle = None;
 }
 
+//=============================================================================
+
+class LinearRangeFxGadget final : public FxGadget {
+  TPointParamP m_start, m_end;
+
+  enum HANDLE { Body = 0, Start, End, None } m_handle = None;
+
+  TPointD m_clickedPos;
+  TPointD m_targetPos, m_anotherPos;
+
+public:
+  LinearRangeFxGadget(FxGadgetController *controller,
+                      const TPointParamP &startPoint,
+                      const TPointParamP &endPoint);
+
+  void draw(bool picking) override;
+
+  void leftButtonDown(const TPointD &pos, const TMouseEvent &) override;
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &) override;
+  void leftButtonUp(const TPointD &pos, const TMouseEvent &) override;
+};
+
+//---------------------------------------------------------------------------
+
+LinearRangeFxGadget::LinearRangeFxGadget(FxGadgetController *controller,
+                                         const TPointParamP &startPoint,
+                                         const TPointParamP &endPoint)
+    : FxGadget(controller, 3), m_start(startPoint), m_end(endPoint) {
+  addParam(startPoint->getX());
+  addParam(startPoint->getY());
+  addParam(endPoint->getX());
+  addParam(endPoint->getY());
+}
+
+//---------------------------------------------------------------------------
+
+void LinearRangeFxGadget::draw(bool picking) {
+  auto setColorById = [&](int id) {
+    if (isSelected(id))
+      glColor3dv(m_selectedColor);
+    else
+      glColor3d(0, 0, 1);
+  };
+
+  auto drawPoint = [&]() {
+    double r = getPixelSize() * 3;
+    double d = getPixelSize() * 6;
+    glBegin(GL_LINES);
+    glVertex2d(-d, 0);
+    glVertex2d(-r, 0);
+    glVertex2d(d, 0);
+    glVertex2d(r, 0);
+    glVertex2d(0, -d);
+    glVertex2d(0, -r);
+    glVertex2d(0, d);
+    glVertex2d(0, r);
+    glEnd();
+    tglDrawRect(-r, -r, r, r);
+  };
+
+  setPixelSize();
+  double r = getPixelSize() * 200;
+  double a = getPixelSize() * 5;
+
+  TPointD start = getValue(m_start);
+  TPointD end   = getValue(m_end);
+
+  glPushMatrix();
+
+  if (start != end) {
+    // draw lines perpendicular to the line between ends
+    double angle = std::atan2(start.x - end.x, end.y - start.y) * M_180_PI;
+    // start
+    setColorById(Start);
+    glPushMatrix();
+    glTranslated(start.x, start.y, 0);
+    glRotated(angle, 0, 0, 1);
+    if (m_handle == Start) glScaled(5.0, 1.0, 1.0);
+    glBegin(GL_LINES);
+    glVertex2d(-r, 0);
+    glVertex2d(r, 0);
+    glEnd();
+    glPopMatrix();
+    // end
+    setColorById(End);
+    glPushMatrix();
+    glTranslated(end.x, end.y, 0);
+    glRotated(angle, 0, 0, 1);
+    if (m_handle == End) glScaled(5.0, 1.0, 1.0);
+    glBegin(GL_LINE_STRIP);
+    glVertex2d(-r, 0);
+    glVertex2d(r, 0);
+    glEnd();
+    glPopMatrix();
+
+    // line body
+    setColorById(Body);
+    glPushName(getId() + Body);
+    glBegin(GL_LINES);
+    glVertex2d(start.x, start.y);
+    glVertex2d(end.x, end.y);
+    glEnd();
+    // small dash at the center
+    glPushMatrix();
+    glTranslated((start.x + end.x) / 2.0, (start.y + end.y) / 2.0, 0);
+    glRotated(angle, 0, 0, 1);
+    glBegin(GL_LINES);
+    glVertex2d(-a, 0);
+    glVertex2d(a, 0);
+    glEnd();
+    glPopMatrix();
+    glPopName();
+  }
+
+  // start point
+  setColorById(Start);
+  glPushName(getId() + Start);
+  glPushMatrix();
+  glTranslated(start.x, start.y, 0);
+  drawPoint();
+  glPopMatrix();
+  glPopName();
+  drawTooltip(start + TPointD(7, 3) * getPixelSize(), "Start");
+
+  // end point
+  setColorById(End);
+  glPushName(getId() + End);
+  glPushMatrix();
+  glTranslated(end.x, end.y, 0);
+  drawPoint();
+  glPopMatrix();
+  glPopName();
+  drawTooltip(end + TPointD(7, 3) * getPixelSize(), "End");
+
+  glPopMatrix();
+}
+
+//---------------------------------------------------------------------------
+
+void LinearRangeFxGadget::leftButtonDown(const TPointD &pos,
+                                         const TMouseEvent &) {
+  m_handle = (HANDLE)m_selected;
+  if (m_handle == None) return;
+  m_clickedPos = pos;
+  m_targetPos  = (m_handle == Start || m_handle == Body) ? getValue(m_start)
+                                                        : getValue(m_end);
+  m_anotherPos = (m_handle == Start || m_handle == Body) ? getValue(m_end)
+                                                         : getValue(m_start);
+}
+
+//---------------------------------------------------------------------------
+
+void LinearRangeFxGadget::leftButtonDrag(const TPointD &pos,
+                                         const TMouseEvent &e) {
+  if (m_handle == None) return;
+  TPointD d = pos - m_clickedPos;
+
+  if (m_handle == Body) {
+    setValue(m_start, m_targetPos + d);
+    setValue(m_end, m_anotherPos + d);
+    return;
+  }
+
+  TPointParamP target = (m_handle == Start) ? m_start : m_end;
+
+  if (m_targetPos != m_anotherPos && e.isShiftPressed()) {
+    TPointD vecA = m_targetPos - m_anotherPos;
+    TPointD vecB = m_targetPos + d - m_anotherPos;
+    d            = vecA * ((vecA.x * vecB.x + vecA.y * vecB.y) /
+                    (vecA.x * vecA.x + vecA.y * vecA.y) -
+                1.0);
+  }
+
+  setValue(target, m_targetPos + d);
+
+  if (e.isCtrlPressed()) {
+    TPointParamP another = (m_handle == Start) ? m_end : m_start;
+    setValue(another, m_anotherPos - d);
+  }
+}
+
+//---------------------------------------------------------------------------
+
+void LinearRangeFxGadget::leftButtonUp(const TPointD &pos,
+                                       const TMouseEvent &) {
+  m_handle = None;
+}
 //*************************************************************************************
 //    FxGadgetController  implementation
 //*************************************************************************************
@@ -1517,6 +1704,13 @@ FxGadget *FxGadgetController::allocateGadget(const TParamUIConcept &uiConcept) {
   case TParamUIConcept::DIAMOND: {
     assert(uiConcept.m_params.size() == 1);
     gadget = new DiamondFxGadget(this, uiConcept.m_params[0]);
+    break;
+  }
+
+  case TParamUIConcept::LINEAR_RANGE: {
+    assert(uiConcept.m_params.size() == 2);
+    gadget = new LinearRangeFxGadget(this, uiConcept.m_params[0],
+                                     uiConcept.m_params[1]);
     break;
   }
   }

@@ -307,6 +307,7 @@ TRasterImageP Ffmpeg::getImage(int frameIndex) {
 
 double Ffmpeg::getFrameRate() {
   QStringList fpsArgs;
+  int fpsNum = 0, fpsDen = 0;
   fpsArgs << "-v";
   fpsArgs << "error";
   fpsArgs << "-select_streams";
@@ -318,8 +319,34 @@ double Ffmpeg::getFrameRate() {
   fpsArgs << m_path.getQString();
   QString fpsResults = runFfprobe(fpsArgs);
 
-  int fpsNum = fpsResults.split("/")[0].toInt();
-  int fpsDen = fpsResults.split("/")[1].toInt();
+  QStringList fpsResultsList = fpsResults.split("/");
+  if (fpsResultsList.size() > 1) {
+    fpsNum = fpsResultsList[0].toInt();
+    fpsDen = fpsResultsList[1].toInt();
+  }
+
+  // if for some reason we don't have enough info to calculate it. Use the
+  // avg_frame_rate
+  if (!fpsDen) {
+    fpsArgs.clear();
+    fpsArgs << "-v";
+    fpsArgs << "error";
+    fpsArgs << "-select_streams";
+    fpsArgs << "v:0";
+    fpsArgs << "-show_entries";
+    fpsArgs << "stream=avg_frame_rate";
+    fpsArgs << "-of";
+    fpsArgs << "default=noprint_wrappers=1:nokey=1";
+    fpsArgs << m_path.getQString();
+    QString fpsResults = runFfprobe(fpsArgs);
+
+    fpsResultsList = fpsResults.split("/");
+    if (fpsResultsList.size() > 1) {
+      fpsNum = fpsResultsList[0].toInt();
+      fpsDen = fpsResultsList[1].toInt();
+    }
+  }
+
   if (fpsDen > 0) {
     m_frameRate = (double)fpsNum / (double)fpsDen;
   }
@@ -346,6 +373,8 @@ TDimension Ffmpeg::getSize() {
 }
 
 int Ffmpeg::getFrameCount() {
+  // nb_read_frames from files may not be accurate. Let's calculate it based on
+  // r_frame_rate * duration
   QStringList frameCountArgs;
   frameCountArgs << "-v";
   frameCountArgs << "error";
@@ -360,6 +389,26 @@ int Ffmpeg::getFrameCount() {
 
   QString frameResults = runFfprobe(frameCountArgs);
   m_frameCount         = frameResults.toDouble() * getFrameRate();
+
+  // if for some reason we don't have enough info to calculate it. Use the
+  // nb_read_frames
+  if (!m_frameCount) {
+    frameCountArgs.clear();
+    frameCountArgs << "-v";
+    frameCountArgs << "error";
+    frameCountArgs << "-count_frames";
+    frameCountArgs << "-select_streams";
+    frameCountArgs << "v:0";
+    frameCountArgs << "-show_entries";
+    frameCountArgs << "stream=nb_read_frames";
+    frameCountArgs << "-of";
+    frameCountArgs << "default=nokey=1:noprint_wrappers=1";
+    frameCountArgs << m_path.getQString();
+
+    frameResults = runFfprobe(frameCountArgs);
+    m_frameCount = frameResults.toInt();
+  }
+
   return m_frameCount;
 }
 

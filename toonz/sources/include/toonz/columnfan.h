@@ -93,6 +93,9 @@ of column identified by \b col.
 
   void saveData(TOStream &os);
   void loadData(TIStream &is);
+
+  void rollLeftFoldedState(int index, int count);
+  void rollRightFoldedState(int index, int count);
 };
 
 #endif

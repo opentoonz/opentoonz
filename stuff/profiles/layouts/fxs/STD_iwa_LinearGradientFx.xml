@@ -1,0 +1,14 @@
+<fxlayout>
+  <page name="Linear Gradient">
+    <control>startPoint</control>
+    <control>endPoint</control>
+    <control>startColor</control>
+    <control>endColor</control>
+    <rgb_link_button>startColor endColor</rgb_link_button>
+    <control>curveType</control>
+<separator label="Distortion Wave"/>
+     <control>wave_amplitude</control>
+     <control>wave_frequency</control>
+     <control>wave_phase</control>
+  </page>
+</fxlayout>

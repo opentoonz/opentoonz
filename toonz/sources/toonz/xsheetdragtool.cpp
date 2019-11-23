@@ -49,6 +49,7 @@
 #include "toonz/txshnoteset.h"
 #include "toutputproperties.h"
 #include "toonz/preferences.h"
+#include "toonz/columnfan.h"
 
 // TnzBase includes
 #include "tfx.h"
@@ -349,7 +350,7 @@ public:
     m_cells.resize(rowCount * colCount, TXshCell());
     int k = 0;
     for (int r = row; r < row + rowCount; r++)
-      for (int c     = col; c < col + colCount; c++)
+      for (int c = col; c < col + colCount; c++)
         m_cells[k++] = xsh->getCell(r, c);
   }
 
@@ -505,7 +506,7 @@ public:
     else {
       std::vector<TXshCell> cells(rowCount, TXshCell());
       xsh->getCells(row, col, rowCount, &cells[0]);
-      for (int r         = 0; r < rowCount; r++)
+      for (int r = 0; r < rowCount; r++)
         m_sourceCells[r] = cells[rowCount - 1 - r];
       // the "first row" becomes the bottom-most row for the upper-directional
       // smart tab
@@ -528,7 +529,7 @@ public:
     int k = i + m_offset;
     // if there is a large cycle
     if (m_count > 0) k = k % m_count;
-    k                  = m_base + (k / m_step) * m_inc;
+    k = m_base + (k / m_step) * m_inc;
     if (m_inc < 0)
       while (k < 1) k += m_base;
     return TFrameId(k);
@@ -706,7 +707,7 @@ public:
     if (row <= m_r0) row = m_r0 + 1;
     int r1 = row - 1;  // r1 e' la riga inferiore della nuova selezione
     if (r1 < m_r0) r1 = m_r0;
-    int dr            = r1 - m_r1;
+    int dr = r1 - m_r1;
     if (dr == 0) return;
     TXsheet *xsh = getViewer()->getXsheet();
     // shrink
@@ -763,8 +764,8 @@ public:
   void onCellChangeInvert(int row, int col) {
     if (m_colCount <= 0 || m_rowCount <= 0) return;
     if (row >= m_r1) row = m_r1 - 1;
-    int r0               = row + 1;
-    if (r0 > m_r1) r0    = m_r1;
+    int r0 = row + 1;
+    if (r0 > m_r1) r0 = m_r1;
 
     if (r0 < 0) r0 = 0;
 
@@ -1222,10 +1223,11 @@ public:
 
 XsheetGUI::DragTool *XsheetGUI::DragTool::makeKeyFrameHandleMoverTool(
     XsheetViewer *viewer, bool isEaseOut, int keyRow) {
-  return new KeyFrameHandleMoverTool(
-      viewer, isEaseOut ? KeyFrameHandleMoverTool::EaseOut
-                        : KeyFrameHandleMoverTool::EaseIn,
-      keyRow);
+  return new KeyFrameHandleMoverTool(viewer,
+                                     isEaseOut
+                                         ? KeyFrameHandleMoverTool::EaseOut
+                                         : KeyFrameHandleMoverTool::EaseIn,
+                                     keyRow);
 }
 
 //=============================================================================
@@ -1343,7 +1345,7 @@ public:
   }
 
   void onDrag(const CellPosition &pos) override {
-    int row          = pos.frame();
+    int row = pos.frame();
     if (row < 0) row = 0;
     onRowChange(row);
     TApp::instance()->getCurrentOnionSkin()->notifyOnionSkinMaskChanged();
@@ -1394,9 +1396,9 @@ public:
   }
 
   void onDrag(const CellPosition &pos) override {
-    int row          = pos.frame();
+    int row = pos.frame();
     if (row < 0) row = 0;
-    int lastRow      = TApp::instance()->getCurrentFrame()->getFrameIndex();
+    int lastRow = TApp::instance()->getCurrentFrame()->getFrameIndex();
     if (lastRow == row) return;
     onRowChange(row);
     refreshRowsArea();
@@ -1450,7 +1452,7 @@ public:
   }
 
   void onDrag(const CellPosition &pos) override {
-    int row          = pos.frame();
+    int row = pos.frame();
     if (row < 0) row = 0;
     onRowChange(row);
     refreshRowsArea();
@@ -1693,11 +1695,22 @@ public:
     if (col < 0)
       col = 0;
     else if (!getViewer()->orientation()->isVerticalTimeline() && col > currEnd)
-      col    = currEnd;
+      col = currEnd;
+
     int dCol = col - (m_lastCol - m_offset);
 
     // ignore if the cursor moves in the drag-starting column
     if (dCol == 0) return;
+
+    if (dCol < 0 &&
+        !xsh->getColumnFan(getViewer()->orientation())->isActive(col)) {
+      while (
+          col != 0 &&
+          !xsh->getColumnFan(getViewer()->orientation())->isActive(col - 1)) {
+        col--;
+        dCol--;
+      }
+    }
 
     int newBegin = *indices.begin() + dCol;
     int newEnd   = *indices.rbegin() + dCol;
@@ -2001,7 +2014,7 @@ public:
     for (i = 0; i < columnCount; i++) {
       std::vector<TFrameId> fids = m_levels[i].second;
       int size                   = fids.size();
-      if (maxRow < size) maxRow  = size;
+      if (maxRow < size) maxRow = size;
     }
     if (!isVertical) return TRect(0, 0, maxRow - 1, columnCount - 1);
 
@@ -2091,7 +2104,7 @@ public:
       m_type = OVERWRITE_CELLS;
     else
       m_valid = canChange(row, col);
-    m_curPos  = pos;
+    m_curPos = pos;
     refreshCellsArea();
   }
   void onRelease(const QDropEvent *e) override {

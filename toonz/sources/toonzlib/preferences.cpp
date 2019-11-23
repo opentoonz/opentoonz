@@ -298,6 +298,7 @@ Preferences::Preferences()
     , m_downArrowInLevelStripCreatesNewFrame(true)
     , m_viewerBGColor(128, 128, 128, 255)
     , m_previewBGColor(64, 64, 64, 255)
+    , m_levelEditorBoxColor(128, 128, 128, 255)
     , m_chessboardColor1(180, 180, 180)
     , m_chessboardColor2(230, 230, 230)
     , m_showRasterImagesDarkenBlendedInViewer(false)
@@ -606,6 +607,7 @@ Preferences::Preferences()
   getValue(*m_settings, "IgnoreImageDpi", m_ignoreImageDpi);
   getValue(*m_settings, "viewerBGColor", m_viewerBGColor);
   getValue(*m_settings, "previewBGColor", m_previewBGColor);
+  getValue(*m_settings, "levelEditorBoxColor", m_levelEditorBoxColor);
   getValue(*m_settings, "chessboardColor1", m_chessboardColor1);
   getValue(*m_settings, "chessboardColor2", m_chessboardColor2);
   getValue(*m_settings, "showRasterImagesDarkenBlendedInViewer",
@@ -1002,6 +1004,23 @@ void Preferences::setPreviewBGColor(const TPixel32 &color, bool isDragging) {
     m_settings->setValue("previewBGColor_G", QString::number((int)color.g));
     m_settings->setValue("previewBGColor_B", QString::number((int)color.b));
     m_settings->setValue("previewBGColor_M", QString::number((int)color.m));
+  }
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::setLevelEditorBoxColor(const TPixel32 &color,
+                                         bool isDragging) {
+  m_levelEditorBoxColor = color;
+  if (!isDragging) {
+    m_settings->setValue("levelEditorBoxColor_R",
+                         QString::number((int)color.r));
+    m_settings->setValue("levelEditorBoxColor_G",
+                         QString::number((int)color.g));
+    m_settings->setValue("levelEditorBoxColor_B",
+                         QString::number((int)color.b));
+    m_settings->setValue("levelEditorBoxColor_M",
+                         QString::number((int)color.m));
   }
 }
 
