@@ -1977,6 +1977,8 @@ void VectorSelectionTool::onImageChanged() {
 //-----------------------------------------------------------------------------
 
 void VectorSelectionTool::doOnDeactivate() {
+  beforeCut();
+
   m_strokeSelection.selectNone();
   m_levelSelection.selectNone();
   m_deformValues.reset();
