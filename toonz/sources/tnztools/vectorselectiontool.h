@@ -312,6 +312,7 @@ public:
   bool canResetCenter() { return m_resetCenter; }
 
   void beforeCut() override;
+  void onLeave() override;
 
 protected:
   void onActivate() override;

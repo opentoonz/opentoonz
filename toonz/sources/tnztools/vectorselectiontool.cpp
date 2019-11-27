@@ -2003,11 +2003,20 @@ TPropertyGroup *VectorSelectionTool::getProperties(int idx) {
   };
 }
 
+//-----------------------------------------------------------------------------
+
 void VectorSelectionTool::beforeCut()
 {
   if(m_leftButtonMousePressed) {
     leftButtonUp(lastDragPos, lastDragEvent);
   }
+}
+
+//-----------------------------------------------------------------------------
+
+void VectorSelectionTool::onLeave()
+{
+  beforeCut();
 }
 
 //-----------------------------------------------------------------------------
