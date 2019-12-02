@@ -2007,7 +2007,7 @@ TPropertyGroup *VectorSelectionTool::getProperties(int idx) {
 
 void VectorSelectionTool::beforeCut()
 {
-  if(m_leftButtonMousePressed) {
+  if(m_enabled && m_leftButtonMousePressed) {
     leftButtonUp(lastDragPos, lastDragEvent);
   }
 }
