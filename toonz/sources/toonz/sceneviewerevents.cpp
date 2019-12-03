@@ -1171,6 +1171,19 @@ bool SceneViewer::event(QEvent *e) {
       e->accept();
     }
 
+    // Ensure the current tool finishes any mouse drag operation
+    // before performing an undo or redo.
+    QKeyEvent *ke = (QKeyEvent *)e;
+    std::string keyStr =
+        QKeySequence(ke->key() + ke->modifiers()).toString().toStdString();
+    QAction *action = CommandManager::instance()->getActionFromShortcut(keyStr);
+    if (action) {
+      std::string actionId = CommandManager::instance()->getIdFromAction(action);
+      if (actionId == "MI_Undo" || actionId == "MI_Redo") {
+        tool->beforeCut();
+      }
+    }
+
     return true;
   }
   if (e->type() == QEvent::KeyRelease) {

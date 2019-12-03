@@ -515,6 +515,8 @@ void StrokeSelection::deleteStrokes() {
     undo = new ToolUtils::UndoPath(
         tool->getXsheet()->getStageObject(tool->getObjectId())->getSpline());
 
+  tool->beforeCut();
+
   StrokesData *data = new StrokesData();
   data->setImage(m_vi, m_indexes);
   std::set<int> oldIndexes = m_indexes;
@@ -628,6 +630,8 @@ void StrokeSelection::cut() {
   if (isSpline)
     undo = new ToolUtils::UndoPath(
         tool->getXsheet()->getStageObject(tool->getObjectId())->getSpline());
+
+  tool->beforeCut();
 
   StrokesData *data = new StrokesData();
   data->setImage(m_vi, m_indexes);

@@ -34,6 +34,9 @@ using namespace DragSelectionTool;
 //    Global variables
 //********************************************************************************
 
+static TPointD lastDragPos; // previous mouse-drag position
+static TMouseEvent lastDragEvent; // previous mouse-drag event
+
 namespace {
 
 VectorSelectionTool l_vectorSelectionTool(TTool::Vectors);
@@ -1555,6 +1558,9 @@ void VectorSelectionTool::leftButtonDoubleClick(const TPointD &pos,
 
 void VectorSelectionTool::leftButtonDrag(const TPointD &pos,
                                          const TMouseEvent &e) {
+  lastDragPos = pos;
+  lastDragEvent = e;
+
   if (m_dragTool) {
     if (!m_strokeSelection.isEditable()) return;
 
@@ -1979,6 +1985,8 @@ void VectorSelectionTool::onImageChanged() {
 //-----------------------------------------------------------------------------
 
 void VectorSelectionTool::doOnDeactivate() {
+  beforeCut();
+
   m_strokeSelection.selectNone();
   m_levelSelection.selectNone();
   m_deformValues.reset();
@@ -1988,6 +1996,22 @@ void VectorSelectionTool::doOnDeactivate() {
   TTool::getApplication()->getCurrentSelection()->setSelection(0);
 
   invalidate();
+}
+
+//-----------------------------------------------------------------------------
+
+void VectorSelectionTool::beforeCut()
+{
+  if(m_enabled && m_leftButtonMousePressed) {
+    leftButtonUp(lastDragPos, lastDragEvent);
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+void VectorSelectionTool::onLeave()
+{
+  beforeCut();
 }
 
 //-----------------------------------------------------------------------------

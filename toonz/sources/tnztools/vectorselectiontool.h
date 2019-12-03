@@ -313,6 +313,9 @@ public:
 
   bool isSelectionEditable() { return m_strokeSelection.isEditable(); }
 
+  void beforeCut() override;
+  void onLeave() override;
+
 protected:
   void onActivate() override;
   void onDeactivate() override;
