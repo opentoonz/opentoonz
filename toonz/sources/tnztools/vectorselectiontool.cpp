@@ -1990,6 +1990,12 @@ void VectorSelectionTool::onImageChanged() {
 
 //-----------------------------------------------------------------------------
 
+bool VectorSelectionTool::isDragging() const {
+  return m_enabled && m_leftButtonMousePressed;
+}
+
+//-----------------------------------------------------------------------------
+
 void VectorSelectionTool::doOnDeactivate() {
   m_strokeSelection.selectNone();
   m_levelSelection.selectNone();

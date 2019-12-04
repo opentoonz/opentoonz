@@ -338,6 +338,8 @@ protected:
     return m_cursorId;
   }
 
+  bool isDragging() const override;
+
 private:
   class AttachedLevelSelection final : public LevelSelection {
     StrokeSelection &m_strokeSelection;  //!< Selection of strokes to be seen at

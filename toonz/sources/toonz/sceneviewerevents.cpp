@@ -1191,6 +1191,12 @@ bool SceneViewer::event(QEvent *e) {
       e->accept();
     }
 
+    // Disable keyboard shortcuts while the tool is busy with a mouse drag
+    // operation.
+    if ( tool->isDragging() ) {
+      e->accept();
+    }
+
     return true;
   }
   if (e->type() == QEvent::KeyRelease) {

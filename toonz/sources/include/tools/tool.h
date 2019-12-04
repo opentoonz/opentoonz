@@ -513,6 +513,9 @@ transformation.
   // Tools.
   virtual bool isPencilModeActive() { return false; }
 
+  // return true if the tool is busy with a mouse drag operation
+  virtual bool isDragging() const { return false; };
+
   void setSelectedFrames(const std::set<TFrameId> &selectedFrames);
   static const std::set<TFrameId> &getSelectedFrames() {
     return m_selectedFrames;
