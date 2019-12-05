@@ -7,9 +7,9 @@ The AppVeyor build can easily be made into a portable version of Opentoonz for e
 Simply rename the included 'Opentoonz stuff' directory as 'portablestuff' and move it into the Opentoonz directory where Opentoonz.exe is located.  If the portablestuff directory is not present the AppVeyor build will utilize the stuff directory located at C:\Opentoonz stuff.  Note that required files may not be present in the default stuff directory and use of portablestuff directory is recommended.
 
 ## Pre-Testing Notes
-- This can only be tested on Windows. There is no OSX or Linux build that can be tested.
-- You need to have OpenToonz already installed.  Do not uninstall.
-- Your current personal preferences and settings will be used.
+- This can only be tested on Windows. There is currently no OSX or Linux build that can be tested.
+- You can have OpenToonz already installed.  There is no need to uninstall.
+- Your current personal preferences and settings will be used unless a portablestuff directory is utilized.
   - Personal settings can change if you change them while testing.
   - It is recommended that you backup your `C:\OpenToonz stuff` folder before testing a PR using that directory.
 - The AppVeyor build now contains an updated `OpenToonz stuff` folder and any PR changes to default configurations (i.e. stylesheets, FXs, brushes, etc) will be located in the accompanying stuff folder.
