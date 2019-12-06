@@ -1763,8 +1763,6 @@ void MainWindow::defineActions() {
       createMenuXsheetAction(MI_NewOutputFx, tr("&New Output"), "Alt+O");
   newOutputAction->setIcon(createQIconOnOff("output", false));
 
-  createRightClickMenuAction(MI_FxParamEditor, tr("&Edit FX..."), "Ctrl+K");
-
   createMenuXsheetAction(MI_InsertSceneFrame, tr("Insert Frame"), "");
   createMenuXsheetAction(MI_RemoveSceneFrame, tr("Remove Frame"), "");
   createMenuXsheetAction(MI_InsertGlobalKeyframe, tr("Insert Multiple Keys"),
@@ -1963,6 +1961,7 @@ void MainWindow::defineActions() {
   createMenuWindowsAction(MI_OpenColorModel, tr("&Color Model"), "");
   createMenuWindowsAction(MI_OpenStudioPalette, tr("&Studio Palette"), "");
   createMenuWindowsAction(MI_OpenSchematic, tr("&Schematic"), "");
+  createMenuWindowsAction(MI_FxParamEditor, tr("&FX Editor"), "Ctrl+K");
   createMenuWindowsAction(MI_OpenCleanupSettings, tr("&Cleanup Settings"), "");
 
   createMenuWindowsAction(MI_OpenFileBrowser2, tr("&Scene Cast"), "");
