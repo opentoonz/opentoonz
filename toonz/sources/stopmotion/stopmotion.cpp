@@ -530,7 +530,7 @@ void StopMotion::toggleNumpadShortcuts(bool on) {
   if (on) {
     // if turning it on, get all old shortcuts
     if (m_numpadForStyleSwitching) {
-      Preferences::instance()->enableUseNumpadForSwitchingStyles(false);
+		Preferences::instance()->setValue(useNumpadForSwitchingStyles, false);
     }
     std::string shortcut;
     QAction *action;
@@ -706,7 +706,7 @@ void StopMotion::toggleNumpadShortcuts(bool on) {
           action = NULL;
         }
       }
-      Preferences::instance()->enableUseNumpadForSwitchingStyles(true);
+	  Preferences::instance()->setValue(useNumpadForSwitchingStyles, true);
     }
   }
 }
@@ -2245,7 +2245,7 @@ bool StopMotion::toggleLiveView() {
     loadLineUpImage();
     m_timer->start(40);
     emit(liveViewChanged(true));
-    Preferences::instance()->enableRewindAfterPlayback(false);
+    Preferences::instance()->setValue(rewindAfterPlayback, false);
 	  TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
     return true;
   } else if ((m_sessionOpen || m_usingWebcam) && m_liveViewStatus > 0) {
@@ -2256,7 +2256,7 @@ bool StopMotion::toggleLiveView() {
     m_timer->stop();
     emit(liveViewChanged(false));
     if (m_turnOnRewind) {
-      Preferences::instance()->enableRewindAfterPlayback(true);
+		Preferences::instance()->setValue(rewindAfterPlayback, true);
     }
 	  TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
     return false;
