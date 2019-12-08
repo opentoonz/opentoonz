@@ -1451,7 +1451,8 @@ bool CloneLevelUndo::chooseLevelName(TFilePath &fp) const {
   if (levelNamePopup->exec() == QDialog::Accepted) {
     const QString &levelName = levelNamePopup->getName();
 
-    if (isValidFileName_message(levelName)) {
+    if (isValidFileName_message(levelName) &&
+        !isReservedFileName_message(levelName)) {
       fp = fp.withName(levelName.toStdWString());
       return true;
     }

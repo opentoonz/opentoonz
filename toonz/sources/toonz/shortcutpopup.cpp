@@ -786,7 +786,7 @@ void ShortcutPopup::showEvent(QShowEvent *se) { getCurrentPresetPref(); }
 //-----------------------------------------------------------------------------
 
 void ShortcutPopup::setCurrentPresetPref(QString name) {
-  Preferences::instance()->setShortcutPreset(name.toStdString());
+  Preferences::instance()->setValue(shortcutPreset, name);
   getCurrentPresetPref();
 }
 

@@ -318,36 +318,46 @@ bool isGlobalKeyFrameWithSameTypeDiffFromLinear(TStageObject *stageObject,
   TDoubleKeyframe::Type type =
       stageObject->getParam(TStageObject::T_Angle)->getKeyframeAt(frame).m_type;
   if (type == TDoubleKeyframe::Linear) return false;
-  if (type != stageObject->getParam(TStageObject::T_X)
-                  ->getKeyframeAt(frame)
-                  .m_type ||
-      type != stageObject->getParam(TStageObject::T_Y)
-                  ->getKeyframeAt(frame)
-                  .m_type ||
-      type != stageObject->getParam(TStageObject::T_Z)
-                  ->getKeyframeAt(frame)
-                  .m_type ||
-      type != stageObject->getParam(TStageObject::T_SO)
-                  ->getKeyframeAt(frame)
-                  .m_type ||
-      type != stageObject->getParam(TStageObject::T_ScaleX)
-                  ->getKeyframeAt(frame)
-                  .m_type ||
-      type != stageObject->getParam(TStageObject::T_ScaleY)
-                  ->getKeyframeAt(frame)
-                  .m_type ||
-      type != stageObject->getParam(TStageObject::T_Scale)
-                  ->getKeyframeAt(frame)
-                  .m_type ||
-      type != stageObject->getParam(TStageObject::T_Path)
-                  ->getKeyframeAt(frame)
-                  .m_type ||
-      type != stageObject->getParam(TStageObject::T_ShearX)
-                  ->getKeyframeAt(frame)
-                  .m_type ||
-      type != stageObject->getParam(TStageObject::T_ShearY)
-                  ->getKeyframeAt(frame)
-                  .m_type)
+  if (type !=
+          stageObject->getParam(TStageObject::T_X)
+              ->getKeyframeAt(frame)
+              .m_type ||
+      type !=
+          stageObject->getParam(TStageObject::T_Y)
+              ->getKeyframeAt(frame)
+              .m_type ||
+      type !=
+          stageObject->getParam(TStageObject::T_Z)
+              ->getKeyframeAt(frame)
+              .m_type ||
+      type !=
+          stageObject->getParam(TStageObject::T_SO)
+              ->getKeyframeAt(frame)
+              .m_type ||
+      type !=
+          stageObject->getParam(TStageObject::T_ScaleX)
+              ->getKeyframeAt(frame)
+              .m_type ||
+      type !=
+          stageObject->getParam(TStageObject::T_ScaleY)
+              ->getKeyframeAt(frame)
+              .m_type ||
+      type !=
+          stageObject->getParam(TStageObject::T_Scale)
+              ->getKeyframeAt(frame)
+              .m_type ||
+      type !=
+          stageObject->getParam(TStageObject::T_Path)
+              ->getKeyframeAt(frame)
+              .m_type ||
+      type !=
+          stageObject->getParam(TStageObject::T_ShearX)
+              ->getKeyframeAt(frame)
+              .m_type ||
+      type !=
+          stageObject->getParam(TStageObject::T_ShearY)
+              ->getKeyframeAt(frame)
+              .m_type)
     return false;
   return true;
 }
@@ -370,36 +380,46 @@ bool isGlobalKeyFrameWithSamePrevTypeDiffFromLinear(TStageObject *stageObject,
                                    ->getKeyframeAt(frame)
                                    .m_prevType;
   if (type == TDoubleKeyframe::Linear) return false;
-  if (type != stageObject->getParam(TStageObject::T_X)
-                  ->getKeyframeAt(frame)
-                  .m_prevType ||
-      type != stageObject->getParam(TStageObject::T_Y)
-                  ->getKeyframeAt(frame)
-                  .m_prevType ||
-      type != stageObject->getParam(TStageObject::T_Z)
-                  ->getKeyframeAt(frame)
-                  .m_prevType ||
-      type != stageObject->getParam(TStageObject::T_SO)
-                  ->getKeyframeAt(frame)
-                  .m_prevType ||
-      type != stageObject->getParam(TStageObject::T_ScaleX)
-                  ->getKeyframeAt(frame)
-                  .m_prevType ||
-      type != stageObject->getParam(TStageObject::T_ScaleY)
-                  ->getKeyframeAt(frame)
-                  .m_prevType ||
-      type != stageObject->getParam(TStageObject::T_Scale)
-                  ->getKeyframeAt(frame)
-                  .m_prevType ||
-      type != stageObject->getParam(TStageObject::T_Path)
-                  ->getKeyframeAt(frame)
-                  .m_prevType ||
-      type != stageObject->getParam(TStageObject::T_ShearX)
-                  ->getKeyframeAt(frame)
-                  .m_prevType ||
-      type != stageObject->getParam(TStageObject::T_ShearY)
-                  ->getKeyframeAt(frame)
-                  .m_prevType)
+  if (type !=
+          stageObject->getParam(TStageObject::T_X)
+              ->getKeyframeAt(frame)
+              .m_prevType ||
+      type !=
+          stageObject->getParam(TStageObject::T_Y)
+              ->getKeyframeAt(frame)
+              .m_prevType ||
+      type !=
+          stageObject->getParam(TStageObject::T_Z)
+              ->getKeyframeAt(frame)
+              .m_prevType ||
+      type !=
+          stageObject->getParam(TStageObject::T_SO)
+              ->getKeyframeAt(frame)
+              .m_prevType ||
+      type !=
+          stageObject->getParam(TStageObject::T_ScaleX)
+              ->getKeyframeAt(frame)
+              .m_prevType ||
+      type !=
+          stageObject->getParam(TStageObject::T_ScaleY)
+              ->getKeyframeAt(frame)
+              .m_prevType ||
+      type !=
+          stageObject->getParam(TStageObject::T_Scale)
+              ->getKeyframeAt(frame)
+              .m_prevType ||
+      type !=
+          stageObject->getParam(TStageObject::T_Path)
+              ->getKeyframeAt(frame)
+              .m_prevType ||
+      type !=
+          stageObject->getParam(TStageObject::T_ShearX)
+              ->getKeyframeAt(frame)
+              .m_prevType ||
+      type !=
+          stageObject->getParam(TStageObject::T_ShearY)
+              ->getKeyframeAt(frame)
+              .m_prevType)
     return false;
   return true;
 }
@@ -758,7 +778,7 @@ void RenameCellField::renameCell() {
         fid = TFrameId(fidRe.cap(1).toInt(),
                        fidRe.cap(2) == "" ? 0 : fidRe.cap(2).toLatin1()[0]);
 #else
-        fid = TFrameId(fidRe.cap(1).toInt(),
+        fid  = TFrameId(fidRe.cap(1).toInt(),
                        fidRe.cap(2) == "" ? 0 : fidRe.cap(2).toAscii()[0]);
 #endif
         FilmstripCmd::renumberDrawing(sl, cell.m_frameId, fid);
@@ -1805,10 +1825,10 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference) {
   nameRect.adjust(0, 0, -frameAdj, 0);
 
   // draw text in red if the file does not exist
-  bool isRed          = false;
-  TXshSimpleLevel *sl = cell.getSimpleLevel();
+  bool isRed                                  = false;
+  TXshSimpleLevel *sl                         = cell.getSimpleLevel();
   if (sl && !sl->isFid(cell.m_frameId)) isRed = true;
-  TXshChildLevel *cl = cell.getChildLevel();
+  TXshChildLevel *cl                          = cell.getChildLevel();
   if (cl && cell.getFrameId().getNumber() - 1 >= cl->getFrameCount())
     isRed = true;
   QColor penColor =
@@ -1908,9 +1928,8 @@ void CellArea::drawSoundTextCell(QPainter &p, int row, int col) {
   bool isSelected                   = cellSelection->isCellSelected(row, col) ||
                     columnSelection->isColumnSelected(col);
 
-  if (row > 0)
-    prevCell = xsh->getCell(row - 1, col);  // cell in previous frame
-                                            // nothing to draw
+  if (row > 0) prevCell = xsh->getCell(row - 1, col);  // cell in previous frame
+                                                       // nothing to draw
 
   bool sameLevel = prevCell.m_level.getPointer() == cell.m_level.getPointer();
 
@@ -2016,7 +2035,7 @@ void CellArea::drawSoundTextCell(QPainter &p, int row, int col) {
 #ifdef _WIN32
     fontName = "Arial";
 #else
-    fontName = "Helvetica";
+    fontName          = "Helvetica";
 #endif
   }
   static QFont font(fontName, -1, QFont::Normal);
@@ -2048,7 +2067,7 @@ void CellArea::drawSoundTextCell(QPainter &p, int row, int col) {
 #if QT_VERSION >= 0x050500
   QString elidaName = elideText(text, metric, nameRect.width(), "~");
 #else
-  QString elidaName = elideText(text, font, nameRect.width(), "~");
+  QString elidaName   = elideText(text, font, nameRect.width(), "~");
 #endif
 
   if (!sameLevel || prevCell.m_frameId != cell.m_frameId)
@@ -2069,7 +2088,7 @@ void CellArea::drawPaletteCell(QPainter &p, int row, int col,
   bool isSelected               = cellSelection->isCellSelected(row, col);
 
   if (row > 0) prevCell = xsh->getCell(row - 1, col);
-  TXshCell nextCell = xsh->getCell(row + 1, col);
+  TXshCell nextCell     = xsh->getCell(row + 1, col);
 
   bool sameLevel = prevCell.m_level.getPointer() == cell.m_level.getPointer();
 
@@ -2080,8 +2099,8 @@ void CellArea::drawPaletteCell(QPainter &p, int row, int col,
   bool isAfterMarkers =
       distance > 0 && ((row - offset) % distance) == 0 && row != 0;
 
-  bool isRed           = false;
-  TXshPaletteLevel *pl = cell.getPaletteLevel();
+  bool isRed                         = false;
+  TXshPaletteLevel *pl               = cell.getPaletteLevel();
   if (pl && !pl->getPalette()) isRed = true;
 
   QPoint xy = m_viewer->positionToXY(CellPosition(row, col));
@@ -2213,7 +2232,7 @@ void CellArea::drawPaletteCell(QPainter &p, int row, int col,
 #ifdef _WIN32
       fontName = "Arial";
 #else
-      fontName = "Helvetica";
+      fontName        = "Helvetica";
 #endif
     }
     static QFont font(fontName, -1, QFont::Normal);
@@ -2772,9 +2791,10 @@ void CellArea::mousePressEvent(QMouseEvent *event) {
         setDragTool(XsheetGUI::DragTool::makeLevelMoverTool(m_viewer));
     } else {
       m_viewer->getKeyframeSelection()->selectNone();
-      if (isSoundColumn && o->rect(PredefinedRect::PREVIEW_TRACK)
-                               .adjusted(0, 0, -frameAdj, 0)
-                               .contains(mouseInCell))
+      if (isSoundColumn &&
+          o->rect(PredefinedRect::PREVIEW_TRACK)
+              .adjusted(0, 0, -frameAdj, 0)
+              .contains(mouseInCell))
         setDragTool(XsheetGUI::DragTool::makeSoundScrubTool(
             m_viewer, column->getSoundColumn()));
       else if (isSoundColumn &&
@@ -2909,9 +2929,10 @@ void CellArea::mouseMoveEvent(QMouseEvent *event) {
                       : QString::fromStdWString(levelName) + QString(" ") +
                             QString::fromStdString(frameNumber));
     }
-  } else if (isSoundColumn && o->rect(PredefinedRect::PREVIEW_TRACK)
-                                  .adjusted(0, 0, -frameAdj, 0)
-                                  .contains(mouseInCell))
+  } else if (isSoundColumn &&
+             o->rect(PredefinedRect::PREVIEW_TRACK)
+                 .adjusted(0, 0, -frameAdj, 0)
+                 .contains(mouseInCell))
     m_tooltip = tr("Click and drag to play");
   else if (m_levelExtenderRect.contains(pos))
     m_tooltip = tr("Click and drag to repeat selected cells");
@@ -2988,8 +3009,12 @@ void CellArea::mouseDoubleClickEvent(QMouseEvent *event) {
   // in modalita' xsheet as animation sheet non deve essere possibile creare
   // livelli con doppio click: se la cella e' vuota non bisogna fare nulla
   if ((Preferences::instance()->isAnimationSheetEnabled() &&
-       m_viewer->getXsheet()->getCell(row, col).isEmpty()))
-    return;
+       m_viewer->getXsheet()->getCell(row, col).isEmpty())) {
+    TXshColumn *column = m_viewer->getXsheet()->getColumn(col);
+    if (!column ||
+        column->getColumnType() != TXshColumn::ColumnType::eSoundTextType)
+      return;
+  }
 
   int colCount = m_viewer->getCellSelection()->getSelectedCells().getColCount();
 
@@ -3090,12 +3115,17 @@ void CellArea::contextMenuEvent(QContextMenuEvent *event) {
 //-----------------------------------------------------------------------------
 
 void CellArea::dragEnterEvent(QDragEnterEvent *e) {
-  if (acceptResourceOrFolderDrop(e->mimeData()->urls()) ||
+  bool isResourceOrFolderDrop =
+      acceptResourceOrFolderDrop(e->mimeData()->urls());
+  if (isResourceOrFolderDrop ||
       e->mimeData()->hasFormat(CastItems::getMimeFormat()) ||
       e->mimeData()->hasFormat("application/vnd.toonz.drawings")) {
     setDragTool(XsheetGUI::DragTool::makeDragAndDropDataTool(m_viewer));
+    // For file dragging force CopyAction
+    if (isResourceOrFolderDrop) e->setDropAction(Qt::CopyAction);
     m_viewer->dragToolClick(e);
-    e->acceptProposedAction();
+    // For files, don't accept original proposed action in case it's a move
+    isResourceOrFolderDrop ? e->accept() : e->acceptProposedAction();
   }
 }
 
@@ -3110,8 +3140,13 @@ void CellArea::dragLeaveEvent(QDragLeaveEvent *e) {
 
 void CellArea::dragMoveEvent(QDragMoveEvent *e) {
   if (!getDragTool()) return;
+  bool isResourceOrFolderDrop =
+      acceptResourceOrFolderDrop(e->mimeData()->urls());
+  // For file dragging force CopyAction
+  if (isResourceOrFolderDrop) e->setDropAction(Qt::CopyAction);
   m_viewer->dragToolDrag(e);
-  e->acceptProposedAction();
+  // For files, don't accept original proposed action in case it's a move
+  isResourceOrFolderDrop ? e->accept() : e->acceptProposedAction();
 }
 
 //-----------------------------------------------------------------------------
@@ -3121,6 +3156,11 @@ void CellArea::dropEvent(QDropEvent *e) {
   m_viewer->dragToolRelease(e);
   if (e->source() == this) {
     e->setDropAction(Qt::MoveAction);
+    e->accept();
+  } else if (acceptResourceOrFolderDrop(e->mimeData()->urls())) {
+    // For file dragging force CopyAction
+    e->setDropAction(Qt::CopyAction);
+    // For files, don't accept original proposed action in case it's a move
     e->accept();
   } else
     e->acceptProposedAction();
@@ -3158,10 +3198,9 @@ const bool CellArea::isControlPressed() { return isCtrlPressed; }
 void CellArea::createCellMenu(QMenu &menu, bool isCellSelected, TXshCell cell) {
   CommandManager *cmdManager = CommandManager::instance();
 
-  bool soundCellsSelected  = m_viewer->areSoundCellsSelected();
-  bool cameraCellsSelected = m_viewer->areCameraCellsSelected();
-
-  if (m_viewer->areSoundTextCellsSelected()) return;  // Magpies stop here
+  bool soundCellsSelected     = m_viewer->areSoundCellsSelected();
+  bool soundTextCellsSelected = m_viewer->areSoundTextCellsSelected();
+  bool cameraCellsSelected    = m_viewer->areCameraCellsSelected();
 
   menu.addSeparator();
 
@@ -3172,13 +3211,17 @@ void CellArea::createCellMenu(QMenu &menu, bool isCellSelected, TXshCell cell) {
   }
 
   if (isCellSelected) {
+    bool addSeparator = false;
     // open fx settings instead of level settings when clicked on zerary fx
     // level
-    if (cell.m_level && cell.m_level->getZeraryFxLevel())
+    if (cell.m_level && cell.m_level->getZeraryFxLevel()) {
       menu.addAction(cmdManager->getAction(MI_FxParamEditor));
-    else
+      addSeparator = true;
+    } else if (!soundTextCellsSelected) {
       menu.addAction(cmdManager->getAction(MI_LevelSettings));
-    menu.addSeparator();
+      addSeparator = true;
+    }
+    if (addSeparator) menu.addSeparator();
 
     if (!soundCellsSelected) {
       QMenu *reframeSubMenu = new QMenu(tr("Reframe"), this);
@@ -3210,74 +3253,81 @@ void CellArea::createCellMenu(QMenu &menu, bool isCellSelected, TXshCell cell) {
       }
       menu.addMenu(eachSubMenu);
 
-      QMenu *editCellNumbersMenu = new QMenu(tr("Edit Cell Numbers"), this);
-      {
-        editCellNumbersMenu->addAction(cmdManager->getAction(MI_Reverse));
-        editCellNumbersMenu->addAction(cmdManager->getAction(MI_Swing));
-        editCellNumbersMenu->addAction(cmdManager->getAction(MI_Random));
-        editCellNumbersMenu->addAction(cmdManager->getAction(MI_Dup));
-        editCellNumbersMenu->addAction(cmdManager->getAction(MI_Rollup));
-        editCellNumbersMenu->addAction(cmdManager->getAction(MI_Rolldown));
-        editCellNumbersMenu->addAction(cmdManager->getAction(MI_TimeStretch));
-        editCellNumbersMenu->addAction(
-            cmdManager->getAction(MI_AutoInputCellNumber));
+      if (!soundTextCellsSelected) {
+        QMenu *editCellNumbersMenu = new QMenu(tr("Edit Cell Numbers"), this);
+        {
+          editCellNumbersMenu->addAction(cmdManager->getAction(MI_Reverse));
+          editCellNumbersMenu->addAction(cmdManager->getAction(MI_Swing));
+          editCellNumbersMenu->addAction(cmdManager->getAction(MI_Random));
+          editCellNumbersMenu->addAction(cmdManager->getAction(MI_Dup));
+          editCellNumbersMenu->addAction(cmdManager->getAction(MI_Rollup));
+          editCellNumbersMenu->addAction(cmdManager->getAction(MI_Rolldown));
+          editCellNumbersMenu->addAction(cmdManager->getAction(MI_TimeStretch));
+          editCellNumbersMenu->addAction(
+              cmdManager->getAction(MI_AutoInputCellNumber));
+        }
+        menu.addMenu(editCellNumbersMenu);
       }
-      menu.addMenu(editCellNumbersMenu);
       menu.addAction(cmdManager->getAction(MI_FillEmptyCell));
 
       menu.addSeparator();
-      menu.addAction(cmdManager->getAction(MI_Autorenumber));
+
+      if (!soundTextCellsSelected)
+        menu.addAction(cmdManager->getAction(MI_Autorenumber));
     }
 
-    QMenu *replaceLevelMenu = new QMenu(tr("Replace Level"), this);
-    menu.addMenu(replaceLevelMenu);
+    if (!soundTextCellsSelected) {
+      QMenu *replaceLevelMenu = new QMenu(tr("Replace Level"), this);
+      menu.addMenu(replaceLevelMenu);
 
-    replaceLevelMenu->addAction(cmdManager->getAction(MI_ReplaceLevel));
+      replaceLevelMenu->addAction(cmdManager->getAction(MI_ReplaceLevel));
 
-    replaceLevelMenu->addAction(
-        cmdManager->getAction(MI_ReplaceParentDirectory));
+      replaceLevelMenu->addAction(
+          cmdManager->getAction(MI_ReplaceParentDirectory));
 
-    {
-      // replace with another level in scene cast
-      std::vector<TXshLevel *> levels;
-      TApp::instance()
-          ->getCurrentScene()
-          ->getScene()
-          ->getLevelSet()
-          ->listLevels(levels);
-      if (!levels.empty()) {
-        QMenu *replaceMenu = replaceLevelMenu->addMenu(tr("Replace with"));
-        connect(replaceMenu, SIGNAL(triggered(QAction *)), this,
-                SLOT(onReplaceByCastedLevel(QAction *)));
-        for (int i = 0; i < (int)levels.size(); i++) {
-          if (!levels[i]->getSimpleLevel() && !levels[i]->getChildLevel())
-            continue;
+      {
+        // replace with another level in scene cast
+        std::vector<TXshLevel *> levels;
+        TApp::instance()
+            ->getCurrentScene()
+            ->getScene()
+            ->getLevelSet()
+            ->listLevels(levels);
+        if (!levels.empty()) {
+          QMenu *replaceMenu = replaceLevelMenu->addMenu(tr("Replace with"));
+          connect(replaceMenu, SIGNAL(triggered(QAction *)), this,
+                  SLOT(onReplaceByCastedLevel(QAction *)));
+          for (int i = 0; i < (int)levels.size(); i++) {
+            if (!levels[i]->getSimpleLevel() && !levels[i]->getChildLevel())
+              continue;
 
-          if (levels[i]->getChildLevel() &&
-              !TApp::instance()->getCurrentXsheet()->getXsheet()->isLevelUsed(
-                  levels[i]))
-            continue;
+            if (levels[i]->getChildLevel() &&
+                !TApp::instance()->getCurrentXsheet()->getXsheet()->isLevelUsed(
+                    levels[i]))
+              continue;
 
-          QString tmpLevelName = QString::fromStdWString(levels[i]->getName());
-          QAction *tmpAction   = new QAction(tmpLevelName, replaceMenu);
-          tmpAction->setData(tmpLevelName);
-          replaceMenu->addAction(tmpAction);
+            QString tmpLevelName =
+                QString::fromStdWString(levels[i]->getName());
+            QAction *tmpAction = new QAction(tmpLevelName, replaceMenu);
+            tmpAction->setData(tmpLevelName);
+            replaceMenu->addAction(tmpAction);
+          }
         }
       }
-    }
 
-    if (!soundCellsSelected) {
-      if (selectionContainTlvImage(m_viewer->getCellSelection(),
-                                   m_viewer->getXsheet()))
-        replaceLevelMenu->addAction(
-            cmdManager->getAction(MI_RevertToCleanedUp));
-      if (selectionContainLevelImage(m_viewer->getCellSelection(),
+      if (!soundCellsSelected && !soundTextCellsSelected) {
+        if (selectionContainTlvImage(m_viewer->getCellSelection(),
                                      m_viewer->getXsheet()))
-        replaceLevelMenu->addAction(
-            cmdManager->getAction(MI_RevertToLastSaved));
-      menu.addAction(cmdManager->getAction(MI_SetKeyframes));
+          replaceLevelMenu->addAction(
+              cmdManager->getAction(MI_RevertToCleanedUp));
+        if (selectionContainLevelImage(m_viewer->getCellSelection(),
+                                       m_viewer->getXsheet()))
+          replaceLevelMenu->addAction(
+              cmdManager->getAction(MI_RevertToLastSaved));
+        menu.addAction(cmdManager->getAction(MI_SetKeyframes));
+      }
+      menu.addSeparator();
     }
-    menu.addSeparator();
 
     menu.addAction(cmdManager->getAction(MI_Cut));
     menu.addAction(cmdManager->getAction(MI_Copy));
@@ -3292,7 +3342,10 @@ void CellArea::createCellMenu(QMenu &menu, bool isCellSelected, TXshCell cell) {
 
     menu.addAction(cmdManager->getAction(MI_Clear));
     menu.addAction(cmdManager->getAction(MI_Insert));
-    menu.addAction(cmdManager->getAction(MI_Duplicate));
+    if (!soundTextCellsSelected) {
+      menu.addAction(cmdManager->getAction(MI_CreateBlankDrawing));
+      menu.addAction(cmdManager->getAction(MI_Duplicate));
+    }
     menu.addSeparator();
 
     TXshSimpleLevel *sl = TApp::instance()->getCurrentLevel()->getSimpleLevel();
@@ -3330,6 +3383,8 @@ void CellArea::createCellMenu(QMenu &menu, bool isCellSelected, TXshCell cell) {
          TApp::instance()->getCurrentLevel()->getLevel()->getChildLevel()))
       menu.addAction(cmdManager->getAction(MI_LipSyncPopup));
   } else {
+    menu.addAction(cmdManager->getAction(MI_CreateBlankDrawing));
+    menu.addSeparator();
     menu.addAction(cmdManager->getAction(MI_FillEmptyCell));
     if (cameraCellsSelected) {
       menu.addSeparator();
@@ -3340,6 +3395,7 @@ void CellArea::createCellMenu(QMenu &menu, bool isCellSelected, TXshCell cell) {
   if (!soundCellsSelected)
     menu.addAction(cmdManager->getAction(MI_ImportMagpieFile));
 }
+
 //-----------------------------------------------------------------------------
 /*! replace level with another level in the cast
  */

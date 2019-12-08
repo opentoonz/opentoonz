@@ -1014,7 +1014,7 @@ void StudioPaletteTreeViewer::dragEnterEvent(QDragEnterEvent *event) {
     for (i = 0; i < count; i++) {
       QUrl url = urls[i];
       TFilePath path(url.toLocalFile().toStdWString());
-      if (!path.isEmpty() &&
+      if (!path.isEmpty() && isInStudioPalette(path) &&
           (path.getType() == "tpl" || path.getType() == "pli" ||
            path.getType() == "tlv" || path.getType() == "tnz")) {
         isPalette = true;
@@ -1120,6 +1120,7 @@ void StudioPaletteTreeViewer::dropEvent(QDropEvent *event) {
   int ret = DVGui::MsgBox(question, tr("Move"), tr("Cancel"));
   if (ret == 0 || ret == 2) return;
 
+  bool paletteMoved = false;
   TUndoManager::manager()->beginBlock();
   for (int i = 0; i < palettePaths.size(); i++) {
     TFilePath path = palettePaths[i];
@@ -1129,6 +1130,7 @@ void StudioPaletteTreeViewer::dropEvent(QDropEvent *event) {
           TFilePath(path.getWideName() + ::to_wstring(path.getDottedType()));
       try {
         StudioPaletteCmd::movePalette(newPalettePath, path);
+        paletteMoved = true;
       } catch (TException &e) {
         error("Can't rename palette: " +
               QString(::to_string(e.getMessage()).c_str()));
@@ -1138,8 +1140,10 @@ void StudioPaletteTreeViewer::dropEvent(QDropEvent *event) {
     }
   }
   TUndoManager::manager()->endBlock();
-  event->setDropAction(Qt::MoveAction);
-  event->accept();
+  if (paletteMoved) {
+    event->setDropAction(Qt::MoveAction);
+    event->accept();
+  }
 }
 
 //-----------------------------------------------------------------------------

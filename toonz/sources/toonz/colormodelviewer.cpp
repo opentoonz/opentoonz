@@ -79,14 +79,19 @@ TPaletteHandle *getPaletteHandle() {
 */
 ColorModelViewer::ColorModelViewer(QWidget *parent)
     : FlipBook(parent, QString(tr("Color Model")),
-               FlipConsole::cFullConsole &
-                   (~(FlipConsole::eFilterRgbm | FlipConsole::cFilterGRgb |
-                      FlipConsole::eRate | FlipConsole::eSound |
-                      FlipConsole::eSaveImg | FlipConsole::eHisto |
-                      FlipConsole::eCompare | FlipConsole::eCustomize |
-                      FlipConsole::eSave | FlipConsole::eFilledRaster |
-                      FlipConsole::eDefineLoadBox | FlipConsole::eUseLoadBox |
-                      FlipConsole::eDefineSubCamera | FlipConsole::eLocator)),
+               std::vector<int>(
+                   {FlipConsole::eRed,          FlipConsole::eGreen,
+                    FlipConsole::eBlue,         FlipConsole::eMatte,
+                    FlipConsole::eGRed,         FlipConsole::eGGreen,
+                    FlipConsole::eGBlue,        FlipConsole::eRate,
+                    FlipConsole::eSound,        FlipConsole::eSaveImg,
+                    FlipConsole::eHisto,        FlipConsole::eCompare,
+                    FlipConsole::eCustomize,    FlipConsole::eSave,
+                    FlipConsole::eFilledRaster, FlipConsole::eDefineLoadBox,
+                    FlipConsole::eUseLoadBox,   FlipConsole::eDefineSubCamera,
+                    FlipConsole::eLocator,      FlipConsole::eZoomIn,
+                    FlipConsole::eZoomOut,      FlipConsole::eFlipHorizontal,
+                    FlipConsole::eFlipVertical, FlipConsole::eResetView}),
                eDontKeepFilesOpened, true)
     , m_mode(0)
     , m_currentRefImgPath(TFilePath()) {
@@ -123,7 +128,10 @@ void ColorModelViewer::dragEnterEvent(QDragEnterEvent *event) {
     std::string type = fp.getType();
     if (type == "scr" || type == "tpl") return;
   }
-  event->acceptProposedAction();
+  // Force CopyAction
+  event->setDropAction(Qt::CopyAction);
+  // For files, don't accept original proposed action in case it's a move
+  event->accept();
 }
 
 //-----------------------------------------------------------------------------
@@ -138,7 +146,10 @@ void ColorModelViewer::dropEvent(QDropEvent *event) {
       loadImage(fp);
       setLevel(fp);
     }
-    event->acceptProposedAction();
+	// Force CopyAction
+	event->setDropAction(Qt::CopyAction);
+	// For files, don't accept original proposed action in case it's a move
+	event->accept();
   }
 }
 

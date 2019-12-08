@@ -472,5 +472,17 @@
       <file>Resources/shift_and_trace_reset.svg</file>
       <file>Resources/up.svg</file>
       <file>Resources/down.svg</file>
+      <file>Resources/zoomin.svg</file>
+      <file>Resources/zoomin_over.svg</file>
+      <file>Resources/zoomout.svg</file>
+      <file>Resources/zoomout_over.svg</file>
+      <file>Resources/fliphoriz_on.svg</file>
+      <file>Resources/fliphoriz_off.svg</file>
+      <file>Resources/fliphoriz_over.svg</file>
+      <file>Resources/flipvert_on.svg</file>
+      <file>Resources/flipvert_off.svg</file>
+      <file>Resources/flipvert_over.svg</file>
+      <file>Resources/reset.svg</file>
+      <file>Resources/reset_over.svg</file>
     </qresource>
 </RCC>

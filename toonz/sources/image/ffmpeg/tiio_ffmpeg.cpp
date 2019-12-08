@@ -33,7 +33,7 @@ bool Ffmpeg::checkFfmpeg() {
   path = path + ".exe";
 #endif
   if (TSystem::doesExistFileOrLevel(TFilePath(path))) {
-    Preferences::instance()->setFfmpegPath(QDir::currentPath().toStdString());
+    Preferences::instance()->setValue(ffmpegPath, QDir::currentPath());
     return true;
   }
 
@@ -55,7 +55,7 @@ bool Ffmpeg::checkFfprobe() {
   path = path + ".exe";
 #endif
   if (TSystem::doesExistFileOrLevel(TFilePath(path))) {
-    Preferences::instance()->setFfmpegPath(QDir::currentPath().toStdString());
+    Preferences::instance()->setValue(ffmpegPath, QDir::currentPath());
     return true;
   }
 
@@ -153,7 +153,7 @@ void Ffmpeg::runFfmpeg(QStringList preIArgs, QStringList postIArgs,
     args << tempName;
   }
   if (m_hasSoundTrack) args = args + m_audioArgs;
-  args                      = args + postIArgs;
+  args = args + postIArgs;
   if (overWriteFiles && !includesOutPath) {  // if includesOutPath is true, you
                                              // need to include the overwrite in
                                              // your postIArgs.
@@ -208,7 +208,7 @@ void Ffmpeg::saveSoundTrack(TSoundTrack *st) {
                 QString::fromStdString(m_path.getName()) + "tempOut.raw";
   m_audioFormat = "s" + QString::number(m_bitsPerSample);
   if (m_bitsPerSample > 8) m_audioFormat = m_audioFormat + "le";
-  std::string strPath                    = m_audioPath.toStdString();
+  std::string strPath = m_audioPath.toStdString();
 
   QByteArray data;
   data.insert(0, (char *)buffer, bufSize);

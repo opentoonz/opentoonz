@@ -1556,6 +1556,8 @@ void VectorSelectionTool::leftButtonDoubleClick(const TPointD &pos,
 void VectorSelectionTool::leftButtonDrag(const TPointD &pos,
                                          const TMouseEvent &e) {
   if (m_dragTool) {
+    if (!m_strokeSelection.isEditable()) return;
+
     m_dragTool->leftButtonDrag(pos, e);
     return;
   }
@@ -1621,6 +1623,12 @@ void VectorSelectionTool::leftButtonUp(const TPointD &pos,
   m_shiftPressed           = false;
 
   if (m_dragTool) {
+    if (!m_strokeSelection.isEditable()) {
+      delete m_dragTool;
+      m_dragTool = 0;
+      return;
+    }
+
     m_dragTool->leftButtonUp(pos, e);
     delete m_dragTool;
     m_dragTool = 0;
@@ -1827,7 +1835,7 @@ void VectorSelectionTool::computeBBox() {
             getFourPointsFromVectorImage(vi, selectedStyles(), maxThickness);
 
         m_bboxs.push_back(p);
-		m_centers.push_back(0.5 * (p.getP00() + p.getP11()));
+        m_centers.push_back(0.5 * (p.getP00() + p.getP11()));
         m_deformValues.m_maxSelectionThickness = maxThickness;
       }
     }
@@ -1998,6 +2006,8 @@ TPropertyGroup *VectorSelectionTool::getProperties(int idx) {
 //-----------------------------------------------------------------------------
 
 bool VectorSelectionTool::onPropertyChanged(std::string propertyName) {
+  if (!m_strokeSelection.isEditable()) return false;
+
   if (SelectionTool::onPropertyChanged(propertyName)) return true;
 
   if (propertyName == m_constantThickness.getName())
@@ -2179,6 +2189,8 @@ void VectorSelectionTool::updateAction(TPointD pos, const TMouseEvent &e) {
 
   SelectionTool::updateAction(pos, e);
   if (m_what != Outside || m_cursorId != ToolCursor::StrokeSelectCursor) return;
+
+  if (!m_strokeSelection.isEditable()) return;
 
   FourPoints bbox = getBBox();
   UINT index      = 0;

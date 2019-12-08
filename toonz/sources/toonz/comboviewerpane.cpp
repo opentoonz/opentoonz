@@ -124,11 +124,9 @@ ComboViewerPanel::ComboViewerPanel(QWidget *parent, Qt::WFlags flags)
   m_keyFrameButton->setXsheetHandle(app->getCurrentXsheet());
 
   // FlipConsole
-  int buttons = FlipConsole::cFullConsole;
-  // buttons &= (~FlipConsole::eSound);
-  buttons &= (~FlipConsole::eFilledRaster);
-  buttons &= (~FlipConsole::eDefineLoadBox);
-  buttons &= (~FlipConsole::eUseLoadBox);
+  std::vector<int> buttonMask = {FlipConsole::eFilledRaster,
+                                 FlipConsole::eDefineLoadBox,
+                                 FlipConsole::eUseLoadBox};
 
   /* --- layout --- */
   QVBoxLayout *mainLayout = new QVBoxLayout();
@@ -148,7 +146,7 @@ ComboViewerPanel::ComboViewerPanel(QWidget *parent, Qt::WFlags flags)
     }
     mainLayout->addLayout(viewerL, 1);
     m_flipConsole =
-        new FlipConsole(mainLayout, buttons, false, m_keyFrameButton,
+        new FlipConsole(mainLayout, buttonMask, false, m_keyFrameButton,
                         "SceneViewerConsole", this, true);
   }
   setLayout(mainLayout);
@@ -189,6 +187,10 @@ ComboViewerPanel::ComboViewerPanel(QWidget *parent, Qt::WFlags flags)
                 m_sceneViewer, SLOT(onButtonPressed(FlipConsole::EGadget)));
   ret = ret && connect(m_sceneViewer, SIGNAL(previewStatusChanged()), this,
                        SLOT(update()));
+  ret = ret && connect(m_sceneViewer, SIGNAL(onFlipHChanged(bool)), this,
+                       SLOT(setFlipHButtonChecked(bool)));
+  ret = ret && connect(m_sceneViewer, SIGNAL(onFlipVChanged(bool)), this,
+                       SLOT(setFlipVButtonChecked(bool)));
   ret = ret && connect(app->getCurrentScene(), SIGNAL(sceneSwitched()), this,
                        SLOT(onSceneSwitched()));
 
@@ -863,6 +865,14 @@ void ComboViewerPanel::onButtonPressed(FlipConsole::EGadget button) {
   if (button == FlipConsole::eSound) {
     m_playSound = !m_playSound;
   }
+}
+
+void ComboViewerPanel::setFlipHButtonChecked(bool checked) {
+  m_flipConsole->setChecked(FlipConsole::eFlipHorizontal, checked);
+}
+
+void ComboViewerPanel::setFlipVButtonChecked(bool checked) {
+  m_flipConsole->setChecked(FlipConsole::eFlipVertical, checked);
 }
 
 //-----------------------------------------------------------------------------

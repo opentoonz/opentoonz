@@ -29,6 +29,9 @@
 #include "toonz/tstageobject.h"
 #include "toonz/toonzscene.h"
 #include "toonz/sceneproperties.h"
+#include "toonz/tframehandle.h"
+#include "toonz/txsheethandle.h"
+#include "toonz/tstageobject.h"
 
 // TnzCore includes
 #include "tthreadmessage.h"
@@ -442,6 +445,12 @@ void StrokeSelection::removeEndpoints() {
   if (!m_vi) return;
   if (m_indexes.empty()) return;
 
+  if (!isEditable()) {
+    DVGui::error(
+        QObject::tr("The selection cannot be updated. It is not editable."));
+    return;
+  }
+
   std::vector<std::pair<int, TStroke *>> undoData;
 
   m_vi->findRegions();
@@ -462,7 +471,6 @@ void StrokeSelection::removeEndpoints() {
   m_updateSelectionBBox = false;
 }
 
-
 //=============================================================================
 //
 // selectAll
@@ -475,7 +483,7 @@ void StrokeSelection::selectAll() {
   int sCount = int(m_vi->getStrokeCount());
 
   for (int s = 0; s < sCount; ++s) {
-     m_indexes.insert(s);
+    m_indexes.insert(s);
   }
 
   StrokeSelection *selection = dynamic_cast<StrokeSelection *>(
@@ -494,6 +502,12 @@ void StrokeSelection::deleteStrokes() {
   if (m_indexes.empty()) return;
   TTool *tool = TTool::getApplication()->getCurrentTool()->getTool();
   if (!tool) return;
+
+  if (!isEditable()) {
+    DVGui::error(
+        QObject::tr("The selection cannot be deleted. It is not editable."));
+    return;
+  }
 
   bool isSpline = tool->getApplication()->getCurrentObject()->isSpline();
   TUndo *undo;
@@ -542,6 +556,12 @@ void StrokeSelection::copy() {
 void StrokeSelection::paste() {
   TTool *tool = TTool::getApplication()->getCurrentTool()->getTool();
   if (!tool) return;
+  if (!isEditable()) {
+    DVGui::error(
+        QObject::tr("The selection cannot be pasted. It is not editable."));
+    return;
+  }
+
   if (TTool::getApplication()->getCurrentObject()->isSpline()) {
     const StrokesData *stData = dynamic_cast<const StrokesData *>(
         QApplication::clipboard()->mimeData());
@@ -596,6 +616,12 @@ void StrokeSelection::cut() {
   if (m_indexes.empty()) return;
   TTool *tool = TTool::getApplication()->getCurrentTool()->getTool();
   if (!tool) return;
+
+  if (!isEditable()) {
+    DVGui::error(
+        QObject::tr("The selection cannot be deleted. It is not editable."));
+    return;
+  }
 
   bool isSpline = tool->getApplication()->getCurrentObject()->isSpline();
   TUndo *undo;
@@ -727,4 +753,40 @@ void StrokeSelection::changeColorStyle(int styleIndex) {
 
   tool->notifyImageChanged();
   TUndoManager::manager()->add(undo);
+}
+
+//-----------------------------------------------------------------------------
+
+bool StrokeSelection::isEditable() {
+  TTool::Application *app = TTool::getApplication();
+  TXshSimpleLevel *level  = app->getCurrentLevel()->getSimpleLevel();
+
+  TFrameHandle *frame = app->getCurrentFrame();
+  bool filmstrip      = frame->isEditingLevel();
+
+  if (level) {
+    if (level->isReadOnly()) return false;
+
+    TFrameId frameId = app->getCurrentTool()->getTool()->getCurrentFid();
+    if (level->isFrameReadOnly(frameId)) return false;
+  }
+
+  if (!filmstrip) {
+    int colIndex = app->getCurrentTool()->getTool()->getColumnIndex();
+    int rowIndex = frame->getFrame();
+    if (app->getCurrentTool()->getTool()->isColumnLocked(colIndex))
+      return false;
+
+    TXsheet *xsh      = app->getCurrentXsheet()->getXsheet();
+    TStageObject *obj = xsh->getStageObject(TStageObjectId::ColumnId(colIndex));
+    // Test for Mesh-deformed levels
+    const TStageObjectId &parentId = obj->getParent();
+    if (parentId.isColumn() && obj->getParentHandle()[0] != 'H') {
+      TXshSimpleLevel *parentSl =
+          xsh->getCell(rowIndex, parentId.getIndex()).getSimpleLevel();
+      if (parentSl && parentSl->getType() == MESH_XSHLEVEL) return false;
+    }
+  }
+
+  return true;
 }

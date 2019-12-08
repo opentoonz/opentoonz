@@ -923,13 +923,18 @@ void StartupPopup::onRecentSceneClicked(int index) {
 void StartupPopup::onCameraUnitChanged(int index) {
   Preferences *pref = Preferences::instance();
   QStringList type;
-  type << tr("pixel") << tr("cm") << tr("mm") << tr("inch") << tr("field");
+  // preference value should not be translated
+  type << "pixel"
+       << "cm"
+       << "mm"
+       << "inch"
+       << "field";
 
   double width  = m_widthFld->getValue();
   double height = m_heightFld->getValue();
   if (index != 0) {
-    pref->setPixelsOnly(false);
-    pref->setCameraUnits(type[index].toStdString());
+    pref->setValue(pixelsOnly, false);
+    pref->setValue(cameraUnits, type[index]);
     m_widthFld->setDecimals(4);
     m_heightFld->setDecimals(4);
     m_resTextLabel->show();
@@ -943,9 +948,9 @@ void StartupPopup::onCameraUnitChanged(int index) {
     m_widthFld->setValue(width);
     m_heightFld->setValue(height);
   } else {
-    pref->setPixelsOnly(true);
-    pref->setUnits("pixel");
-    pref->setCameraUnits("pixel");
+    pref->setValue(pixelsOnly, true);
+    pref->setValue(linearUnits, "pixel");
+    pref->setValue(cameraUnits, "pixel");
     m_widthFld->setDecimals(0);
     m_heightFld->setDecimals(0);
     m_resTextLabel->hide();
@@ -965,20 +970,21 @@ void StartupPopup::onCameraUnitChanged(int index) {
 //-----------------------------------------------------------------------------
 
 void StartupPopup::onShowAtStartChanged(int index) {
-  Preferences::instance()->enableStartupPopup(index);
+  Preferences::instance()->setValue(startupPopupEnabled, index == Qt::Checked);
 }
 
 //-----------------------------------------------------------------------------
 
 void StartupPopup::onAutoSaveOnChanged(int index) {
-  Preferences::instance()->enableAutosave(index);
+  Preferences::instance()->setValue(autosaveEnabled, index == Qt::Checked);
   m_autoSaveTimeFld->setEnabled(index);
 }
 
 //-----------------------------------------------------------------------------
 
 void StartupPopup::onAutoSaveTimeChanged() {
-  Preferences::instance()->setAutosavePeriod(m_autoSaveTimeFld->getValue());
+  Preferences::instance()->setValue(autosavePeriod,
+                                    m_autoSaveTimeFld->getValue());
 }
 
 //-----------------------------------------------------------------------------

@@ -127,7 +127,12 @@ void ConvertPopup::Converter::run() {
 
     m_saveToNopaintOnlyFlag = false;
 
-    if (TSystem::doesExistFileOrLevel(dstFilePath)) {
+    if (dstFilePath == sourceLevelPath) {
+      DVGui::info(tr("Level %1 converting to same file format; skipped.")
+                      .arg(levelName));
+      m_skippedCount++;
+      continue;
+    } else if (TSystem::doesExistFileOrLevel(dstFilePath)) {
       if (m_parent->m_skip->isChecked()) {
         DVGui::info(tr("Level %1 already exists; skipped.").arg(levelName));
         m_skippedCount++;

@@ -148,6 +148,7 @@
 
 #define MI_PasteNew "MI_PasteNew"
 #define MI_Autorenumber "MI_Autorenumber"
+#define MI_CreateBlankDrawing "MI_CreateBlankDrawing"
 #define MI_FillEmptyCell "MI_FillEmptyCell"
 
 #define MI_MergeFrames "MI_MergeFrames"

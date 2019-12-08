@@ -160,6 +160,7 @@ set(HEADERS
     ../include/toonz/txshzeraryfxlevel.h
     ../include/toonz/vectorizerparameters.h
     ../include/toutputproperties.h
+    ../include/toonz/preferencesitemids.h
 )
 
 set(SOURCES

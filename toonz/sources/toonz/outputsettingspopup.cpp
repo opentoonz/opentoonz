@@ -933,6 +933,16 @@ void OutputSettingsPopup::onNameChanged() {
 
     return;
   }
+  if (isReservedFileName_message(name)) {
+    TOutputProperties *prop = getProperties();
+    TFilePath fp = prop->getPath();
+    QString name = QString::fromStdString(fp.getName());
+    if (name.isEmpty())
+      name = QString::fromStdString(scene->getScenePath().getName());
+    m_fileNameFld->setText(name);
+
+    return;
+  }
 
   std::wstring wname = name.toStdWString();
   {

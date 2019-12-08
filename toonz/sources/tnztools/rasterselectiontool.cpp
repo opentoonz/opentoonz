@@ -10,6 +10,7 @@
 #include "toonz/toonzimageutils.h"
 #include "toonzqt/tselectionhandle.h"
 #include "toonzqt/imageutils.h"
+#include "toonz/txshlevelhandle.h"
 
 using namespace ToolUtils;
 using namespace DragSelectionTool;
@@ -485,6 +486,8 @@ void RasterSelectionTool::setNewFreeDeformer() {
   TRasterImageP ri = (TRasterImageP)image;
   if (!ti && !ri) return;
 
+  if (!m_rasterSelection.isEditable()) return;
+
   if (!isFloating()) m_rasterSelection.makeFloating();
   m_freeDeformers.push_back(
       new RasterFreeDeformer(m_rasterSelection.getFloatingSelection()));
@@ -563,6 +566,11 @@ void RasterSelectionTool::modifySelectionOnClick(TImageP image,
       m_selecting = true;
     }
   }
+
+  TTool::getApplication()
+      ->getCurrentTool()
+      ->notifyToolChanged();  // Refreshes toolbar values
+
   invalidate();
 }
 
@@ -598,6 +606,8 @@ void RasterSelectionTool::leftButtonDrag(const TPointD &pos,
     return;
   }
   if (m_dragTool) {
+    if (!m_rasterSelection.isEditable()) return;
+
     m_dragTool->leftButtonDrag(pos, e);
     invalidate();
     return;
@@ -623,6 +633,11 @@ void RasterSelectionTool::leftButtonDrag(const TPointD &pos,
 
       m_selectingRect = rectD;
       m_bboxs.clear();
+
+      TTool::getApplication()
+          ->getCurrentTool()
+          ->notifyToolChanged();  // Refreshes toolbar values
+
       invalidate();
     } else if (m_strokeSelectionType.getValue() == FREEHAND_SELECTION) {
       freehandDrag(pos);
@@ -646,6 +661,11 @@ void RasterSelectionTool::leftButtonDrag(const TPointD &pos,
     bool selectOverlappingStroke = (m_firstPos.x > pos.x);
     TRectD rect(m_firstPos, pos);
     m_selectingRect = rect;
+
+    TTool::getApplication()
+        ->getCurrentTool()
+        ->notifyToolChanged();  // Refreshes toolbar values
+
     invalidate();
   }
 }
@@ -663,6 +683,12 @@ void RasterSelectionTool::leftButtonUp(const TPointD &pos,
   m_shiftPressed           = false;
 
   if (m_dragTool) {
+    if (!m_rasterSelection.isEditable()) {
+      delete m_dragTool;
+      m_dragTool = 0;
+      return;
+    }
+
     m_dragTool->leftButtonUp(pos, e);
     delete m_dragTool;
     m_dragTool = 0;
@@ -719,6 +745,10 @@ void RasterSelectionTool::leftButtonDoubleClick(const TPointD &pos,
     m_selecting = false;
     return;
   }
+
+  TTool::getApplication()
+      ->getCurrentTool()
+      ->notifyToolChanged();  // Refreshes toolbar values
 }
 
 //-----------------------------------------------------------------------------
@@ -878,6 +908,10 @@ void RasterSelectionTool::doOnActivate() {
   m_rasterSelection.selectNone();
   m_noAntialiasing.setValue(NoAntialiasing);
   m_rasterSelection.setNoAntialiasing(m_noAntialiasing.getValue());
+
+  TTool::getApplication()
+      ->getCurrentTool()
+      ->notifyToolChanged();  // Refreshes toolbar values
 }
 
 //-----------------------------------------------------------------------------
@@ -910,6 +944,10 @@ void RasterSelectionTool::onImageChanged() {
 
   if ((!ti && !ri) || image != m_rasterSelection.getCurrentImage())
     m_rasterSelection.selectNone();
+
+  TTool::getApplication()
+      ->getCurrentTool()
+      ->notifyToolChanged();  // Refreshes toolbar values
 }
 
 //-----------------------------------------------------------------------------
@@ -957,6 +995,8 @@ void RasterSelectionTool::onActivate() {
 //-----------------------------------------------------------------------------
 
 bool RasterSelectionTool::onPropertyChanged(std::string propertyName) {
+  if (!m_rasterSelection.isEditable()) return false;
+
   if (SelectionTool::onPropertyChanged(propertyName)) return true;
   if (m_targetType & ToonzImage) {
     ModifySavebox = (int)(m_modifySavebox.getValue());

@@ -33,6 +33,16 @@ std::wstring NameCreator::getNext() {
   }
   std::wstring s;
   for (i = n - 1; i >= 0; i--) s.append(1, (wchar_t)(L'A' + m_s[i]));
+
+#ifdef _WIN32
+  std::vector<std::wstring> invalidNames{L"AUX", L"COM", L"CON",
+                                         L"LPT", L"NUL", L"PRN"};
+  // If we're an invalid combination, let's check the next one
+  if (std::find(invalidNames.begin(), invalidNames.end(), s) !=
+      invalidNames.end())
+    return getNext();
+#endif
+
   return s;
 }
 

@@ -113,20 +113,44 @@ MagpieFileImportPopup::MagpieFileImportPopup()
   QVBoxLayout *frameLayout = new QVBoxLayout(frame);
   frameLayout->setMargin(0);
   frameLayout->setSpacing(0);
-  UINT buttonMask =
-      FlipConsole::cFullConsole &
-      (~(FlipConsole::eRate | FlipConsole::eSound | FlipConsole::eSaveImg |
-         FlipConsole::eHisto | FlipConsole::eCompare | FlipConsole::eCustomize |
-         FlipConsole::eSave | FlipConsole::eBegin | FlipConsole::eEnd |
-         FlipConsole::eFirst | FlipConsole::eNext | FlipConsole::ePause |
-         FlipConsole::ePlay | FlipConsole::ePrev | FlipConsole::eRate |
-         FlipConsole::eWhiteBg | FlipConsole::eCheckBg | FlipConsole::eBlackBg |
-         FlipConsole::eNext | FlipConsole::eLast | FlipConsole::eLoop |
-         FlipConsole::eGRed | FlipConsole::eGGreen | FlipConsole::eGBlue |
-         FlipConsole::eRed | FlipConsole::eGreen | FlipConsole::eBlue |
-         FlipConsole::eMatte | FlipConsole::eDefineSubCamera |
-         FlipConsole::eDefineLoadBox | FlipConsole::eUseLoadBox |
-         FlipConsole::eFilledRaster | FlipConsole::eLocator));
+  std::vector<int> buttonMask = {FlipConsole::eRate,
+                                 FlipConsole::eSound,
+                                 FlipConsole::eSaveImg,
+                                 FlipConsole::eHisto,
+                                 FlipConsole::eCompare,
+                                 FlipConsole::eCustomize,
+                                 FlipConsole::eSave,
+                                 FlipConsole::eBegin,
+                                 FlipConsole::eEnd,
+                                 FlipConsole::eFirst,
+                                 FlipConsole::eNext,
+                                 FlipConsole::ePause,
+                                 FlipConsole::ePlay,
+                                 FlipConsole::ePrev,
+                                 FlipConsole::eRate,
+                                 FlipConsole::eWhiteBg,
+                                 FlipConsole::eCheckBg,
+                                 FlipConsole::eBlackBg,
+                                 FlipConsole::eNext,
+                                 FlipConsole::eLast,
+                                 FlipConsole::eLoop,
+                                 FlipConsole::eGRed,
+                                 FlipConsole::eGGreen,
+                                 FlipConsole::eGBlue,
+                                 FlipConsole::eRed,
+                                 FlipConsole::eGreen,
+                                 FlipConsole::eBlue,
+                                 FlipConsole::eMatte,
+                                 FlipConsole::eDefineSubCamera,
+                                 FlipConsole::eDefineLoadBox,
+                                 FlipConsole::eUseLoadBox,
+                                 FlipConsole::eFilledRaster,
+                                 FlipConsole::eLocator,
+                                 FlipConsole::eZoomIn,
+                                 FlipConsole::eZoomOut,
+                                 FlipConsole::eFlipHorizontal,
+                                 FlipConsole::eFlipVertical,
+                                 FlipConsole::eResetView};
   m_flipbook = new FlipBook(this, tr("Import Toonz Lip Sync File"), buttonMask);
   m_flipbook->setFixedHeight(250);
   frameLayout->addWidget(m_flipbook);

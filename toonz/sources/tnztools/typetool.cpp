@@ -1515,17 +1515,11 @@ bool TypeTool::keyDown(QKeyEvent *event) {
   QString text = event->text();
   if ((event->modifiers() & Qt::ShiftModifier)) text.toUpper();
 
-  std::string keyStr =
-      QKeySequence(event->key() + event->modifiers()).toString().toStdString();
-  QAction *action = CommandManager::instance()->getActionFromShortcut(keyStr);
-  if (action) {
-    std::string actionId = CommandManager::instance()->getIdFromAction(action);
-    if (actionId == "MI_Paste") {
-      QClipboard *clipboard     = QApplication::clipboard();
-      const QMimeData *mimeData = clipboard->mimeData();
-      if (!mimeData->hasText()) return true;
-      text = mimeData->text().replace('\n', '\r');
-    }
+  if (QKeySequence(event->key() + event->modifiers()) == QKeySequence::Paste) {
+    QClipboard *clipboard     = QApplication::clipboard();
+    const QMimeData *mimeData = clipboard->mimeData();
+    if (!mimeData->hasText()) return true;
+    text = mimeData->text().replace('\n', '\r');
   }
 
   std::wstring unicodeChar = text.toStdWString();
@@ -1605,7 +1599,7 @@ bool TypeTool::keyDown(QKeyEvent *event) {
     invalidate();
     break;
 
-    /////////////////// end cursors
+  /////////////////// end cursors
 
   case Qt::Key_Escape:
     resetInputMethod();

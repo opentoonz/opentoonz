@@ -935,6 +935,8 @@ void SelectionTool::updateAction(TPointD pos, const TMouseEvent &e) {
   } else if (m_leftButtonMousePressed)
     return;
 
+  if (!isSelectionEditable()) return;
+
   FourPoints bbox = getBBox();
 
   double pixelSize = getPixelSize();
@@ -1224,6 +1226,8 @@ void SelectionTool::drawCommandHandle(const TImage *image) {
   tglColor(frameColor);
 
   if (m_dragTool) m_dragTool->draw();
+
+  if (!isSelectionEditable()) return;
 
   double pixelSize = getPixelSize();
   if (!isLevelType() && !isSelectedFramesType()) {

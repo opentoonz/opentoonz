@@ -66,6 +66,8 @@ public:
 
   void setSceneHandle(TSceneHandle *tsh) { m_sceneHandle = tsh; }
 
+  bool isEditable();
+
 public:
   // Commands
 

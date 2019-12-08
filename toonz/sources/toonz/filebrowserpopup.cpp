@@ -224,6 +224,7 @@ void FileBrowserPopup::onOkPressed() {
                       "following characters:\n \\ / : * ? \" < > |"));
       return;
     }
+    if (isReservedFileName_message(QFileInfo(str).baseName())) return;
 
     m_selectedPaths.clear();
     if (!m_isDirectoryOnly)

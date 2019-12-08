@@ -703,7 +703,10 @@ void PaletteViewer::dragEnterEvent(QDragEnterEvent *event) {
     if (!path.getType().empty() && path.getType() != "tpl") return;
   }
 
-  event->acceptProposedAction();
+  // Force CopyAction
+  event->setDropAction(Qt::CopyAction);
+  // For files, don't accept original proposed action in case it's a move
+  event->accept();
 }
 
 //-----------------------------------------------------------------------------
@@ -754,7 +757,10 @@ void PaletteViewer::dropEvent(QDropEvent *event) {
         }
       }
     }
-    event->acceptProposedAction();
+    // Force CopyAction
+    event->setDropAction(Qt::CopyAction);
+    // For files, don't accept original proposed action in case it's a move
+    event->accept();
     return;
   }
 

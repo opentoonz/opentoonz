@@ -119,15 +119,13 @@ SceneViewerPanel::SceneViewerPanel(QWidget *parent, Qt::WFlags flags)
   m_keyFrameButton->setObjectHandle(app->getCurrentObject());
   m_keyFrameButton->setXsheetHandle(app->getCurrentXsheet());
 
-  int buttons = FlipConsole::cFullConsole;
+  std::vector<int> buttonMask = {FlipConsole::eFilledRaster,
+                                 FlipConsole::eDefineLoadBox,
+                                 FlipConsole::eUseLoadBox};
 
-  // buttons &= (~FlipConsole::eSound);
-  buttons &= (~FlipConsole::eFilledRaster);
-  buttons &= (~FlipConsole::eDefineLoadBox);
-  buttons &= (~FlipConsole::eUseLoadBox);
-
-  m_flipConsole = new FlipConsole(mainLayout, buttons, false, m_keyFrameButton,
-                                  "SceneViewerConsole", this, true);
+  m_flipConsole =
+      new FlipConsole(mainLayout, buttonMask, false, m_keyFrameButton,
+                      "SceneViewerConsole", this, true);
 
   m_flipConsole->enableButton(FlipConsole::eMatte, false, false);
   m_flipConsole->enableButton(FlipConsole::eSave, false, false);
@@ -157,6 +155,10 @@ SceneViewerPanel::SceneViewerPanel(QWidget *parent, Qt::WFlags flags)
 
   ret = ret && connect(m_sceneViewer, SIGNAL(previewStatusChanged()), this,
                        SLOT(update()));
+  ret = ret && connect(m_sceneViewer, SIGNAL(onFlipHChanged(bool)), this,
+                       SLOT(setFlipHButtonChecked(bool)));
+  ret = ret && connect(m_sceneViewer, SIGNAL(onFlipVChanged(bool)), this,
+                       SLOT(setFlipVButtonChecked(bool)));
 
   ret = ret && connect(app->getCurrentScene(), SIGNAL(sceneSwitched()), this,
                        SLOT(onSceneSwitched()));
@@ -744,4 +746,12 @@ void SceneViewerPanel::onButtonPressed(FlipConsole::EGadget button) {
   if (button == FlipConsole::eSound) {
     m_playSound = !m_playSound;
   }
+}
+
+void SceneViewerPanel::setFlipHButtonChecked(bool checked) {
+  m_flipConsole->setChecked(FlipConsole::eFlipHorizontal, checked);
+}
+
+void SceneViewerPanel::setFlipVButtonChecked(bool checked) {
+  m_flipConsole->setChecked(FlipConsole::eFlipVertical, checked);
 }

@@ -117,6 +117,8 @@ QString DVAPI toQString(const TFilePath &path);
 bool DVAPI isSpaceString(const QString &str);
 bool DVAPI isValidFileName(const QString &fileName);
 bool DVAPI isValidFileName_message(const QString &fileName);
+bool DVAPI isReservedFileName(const QString &fileName);
+bool DVAPI isReservedFileName_message(const QString &fileName);
 
 QString DVAPI elideText(const QString &columnName, const QFont &font,
                         int width);

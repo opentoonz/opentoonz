@@ -457,6 +457,8 @@ public:
 
   // returns true if the pressed key is recognized and processed.
   bool isEventAcceptable(QEvent *e) override;
+
+  virtual bool isSelectionEditable() { return true; }
 };
 
 #endif  // SELECTIONTOOL_INCLUDED

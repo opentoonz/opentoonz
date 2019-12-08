@@ -1696,7 +1696,6 @@ public:
       col = 0;
     else if (!getViewer()->orientation()->isVerticalTimeline() && col > currEnd)
       col = currEnd;
-
     int dCol = col - (m_lastCol - m_offset);
 
     // ignore if the cursor moves in the drag-starting column

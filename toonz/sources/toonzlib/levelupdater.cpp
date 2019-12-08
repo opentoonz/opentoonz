@@ -246,7 +246,8 @@ void LevelUpdater::open(const TFilePath &fp, TPropertyGroup *pg) {
       m_lwPath = fp;
     }
   } catch (...) {
-    // In this case, TLevelWriterP(..) failed, that object was never constructed,
+    // In this case, TLevelWriterP(..) failed, that object was never
+    // constructed,
     // the assignment m_lw never took place. And m_lw == 0.
 
     // Reset state and rethrow
@@ -441,6 +442,10 @@ void LevelUpdater::close() {
         //       in destructors is bad. I'm not sure this is actually guaranteed
         //       in Toonz, however :(
         m_lr = TLevelReaderP(), m_lw = TLevelWriterP();
+
+        // A temp file didn't get created. What happened?  Force failure!
+        if (!TFileStatus(tempPath).doesExist())
+          throw TSystemException(tempPath, "cant find!");
 
         // Rename the level
         TSystem::removeFileOrLevel_throw(finalPath);

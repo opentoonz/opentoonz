@@ -212,6 +212,7 @@
         </menu>
         <separator/>
         <command>MI_Autorenumber</command>
+        <command>MI_CreateBlankDrawing</command>
         <command>MI_Duplicate</command>
         <command>MI_MergeFrames</command>
         <command>MI_CloneLevel</command>
@@ -298,6 +299,7 @@
         <command>MI_OpenTimelineView</command>
         <command>MI_OpenFunctionEditor</command>
         <command>MI_OpenSchematic</command>
+        <command>MI_FxParamEditor</command>
         <command>MI_OpenFilmStrip</command>
         <separator/>
         <command>MI_OpenFileBrowser</command>

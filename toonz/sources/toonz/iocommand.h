@@ -129,9 +129,6 @@ public:
   //! Multiple
   //!               levels \a may be loaded for a single resource data.
 public:
-  /*-
-   * Resourceは常にLoadするように変更（ファイルをプロジェクトフォルダにコピー（=Import）したい場合は、ユーザが手動で行う）
-   * -*/
   LoadResourceArguments()
       : row0(-1)
       , col0(-1)

@@ -314,6 +314,33 @@ bool isValidFileName_message(const QString &fileName) {
 
 //-----------------------------------------------------------------------------
 
+bool isReservedFileName(const QString &fileName) {
+#ifdef _WIN32
+  std::vector<QString> invalidNames{
+      "AUX",  "CON",  "NUL",  "PRN",  "COM1", "COM2", "COM3", "COM4",
+      "COM5", "COM6", "COM7", "COM8", "COM9", "LPT1", "LPT2", "LPT3",
+      "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9"};
+
+  if (std::find(invalidNames.begin(), invalidNames.end(), fileName) !=
+      invalidNames.end())
+    return true;
+#endif
+
+  return false;
+}
+
+//-----------------------------------------------------------------------------
+
+bool isReservedFileName_message(const QString &fileName) {
+  return isReservedFileName(fileName)
+             ? (DVGui::error(QObject::tr(
+                    "That is a reserved file name and cannot be used.")),
+                true)
+             : false;
+}
+
+//-----------------------------------------------------------------------------
+
 QString elideText(const QString &srcText, const QFont &font, int width) {
   QFontMetrics metrix(font);
   int srcWidth = metrix.width(srcText);

@@ -117,6 +117,8 @@ public:
 
   static bool isEnabledCommand(std::string commandId);
 
+  void createBlankDrawing(int row, int col, bool inRange);
+  void createBlankDrawings();
   void fillEmptyCell();
 };
 

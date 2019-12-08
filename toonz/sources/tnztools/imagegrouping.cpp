@@ -12,6 +12,7 @@
 // TnzQt includes
 #include "toonzqt/tselectionhandle.h"
 #include "toonzqt/selectioncommandids.h"
+#include "toonzqt/dvdialog.h"
 
 // TnzLib includes
 #include "toonz/tscenehandle.h"
@@ -478,6 +479,13 @@ void TGroupCommand::group() {
   TVectorImage *vimg = (TVectorImage *)tool->getImage(true);
 
   if (!vimg) return;
+
+  if (!m_sel->isEditable()) {
+    DVGui::error(
+        QObject::tr("The selection cannot be grouped. It is not editable."));
+    return;
+  }
+
   QMutexLocker lock(vimg->getMutex());
   groupWithoutUndo(vimg, m_sel);
   TXshSimpleLevel *level =
@@ -494,6 +502,13 @@ void TGroupCommand::enterGroup() {
   TVectorImage *vimg = (TVectorImage *)tool->getImage(true);
 
   if (!vimg) return;
+
+  if (!m_sel->isEditable()) {
+    DVGui::error(
+        QObject::tr("The selection cannot be entered. It is not editable."));
+    return;
+  }
+
   int index = -1;
 
   for (int i = 0; i < (int)vimg->getStrokeCount(); i++)
@@ -532,6 +547,13 @@ void TGroupCommand::ungroup() {
   if (!tool) return;
   TVectorImage *vimg = (TVectorImage *)tool->getImage(true);
   if (!vimg) return;
+
+  if (!m_sel->isEditable()) {
+    DVGui::error(
+        QObject::tr("The selection cannot be ungrouped. It is not editable."));
+    return;
+  }
+
   QMutexLocker lock(vimg->getMutex());
   ungroupWithoutUndo(vimg, m_sel);
   TXshSimpleLevel *level =
@@ -686,6 +708,12 @@ void TGroupCommand::moveGroup(UCHAR moveType) {
 
   TVectorImage *vimg = (TVectorImage *)tool->getImage(true);
   if (!vimg) return;
+
+  if (!m_sel->isEditable()) {
+    DVGui::error(
+        QObject::tr("The selection cannot be moved. It is not editable."));
+    return;
+  }
 
   std::vector<std::pair<TStroke *, int>> selectedGroups =
       getSelectedGroups(vimg, m_sel);

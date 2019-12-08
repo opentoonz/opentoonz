@@ -2326,7 +2326,11 @@ bool TXshSimpleLevel::isFrameReadOnly(TFrameId fid) {
   // the OS level
   if (getType() == OVL_XSHLEVEL || getType() == TZI_XSHLEVEL ||
       getType() == MESH_XSHLEVEL) {
-    TFilePath fullPath = getScene()->decodeFilePath(m_path);
+    TFilePath fullPath   = getScene()->decodeFilePath(m_path);
+    std::string fileType = fullPath.getType();
+    if (fileType == "psd" || fileType == "gif" || fileType == "mp4" ||
+        fileType == "webm")
+      return true;
     TFilePath path =
         fullPath.getDots() == ".." ? fullPath.withFrame(fid) : fullPath;
     if (!TSystem::doesExistFileOrLevel(path)) return false;

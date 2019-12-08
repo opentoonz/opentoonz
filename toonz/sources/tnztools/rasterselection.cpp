@@ -24,6 +24,10 @@
 #include "toonz/toonzscene.h"
 #include "toonz/tcamera.h"
 #include "toonz/trasterimageutils.h"
+#include "toonz/tcolumnhandle.h"
+#include "toonz/tframehandle.h"
+#include "toonz/txsheethandle.h"
+#include "toonz/tstageobject.h"
 
 #include <QApplication>
 #include <QClipboard>
@@ -1003,6 +1007,9 @@ void RasterSelection::transform(const TAffine &affine) {
 void RasterSelection::makeFloating() {
   if (isEmpty()) return;
   if (!m_currentImage) return;
+
+  if (!isEditable()) return;
+
   m_floatingSelection         = getImageFromSelection(m_currentImage, *this);
   m_originalfloatingSelection = m_floatingSelection->clone();
   deleteSelectionWithoutUndo(m_currentImage, m_strokes);
@@ -1050,6 +1057,12 @@ void RasterSelection::deleteSelection() {
   if (!m_currentImage) return;
   TTool::Application *app = TTool::getApplication();
   TXshSimpleLevel *level  = app->getCurrentLevel()->getSimpleLevel();
+  if (!isEditable()) {
+    DVGui::error(
+        QObject::tr("The selection cannot be deleted. It is not editable."));
+    return;
+  }
+
   // we have to remove all undo transformation and the undo for the makeFloating
   // operation!
   if (isFloating()) {
@@ -1163,6 +1176,12 @@ void RasterSelection::pasteSelection() {
 
   if (!image) return;
 
+  if (!isEditable()) {
+    DVGui::error(
+        QObject::tr("The selection cannot be pasted. It is not editable."));
+    return;
+  }
+
   m_currentImage = image;
   m_fid          = tool->getCurrentFid();
 
@@ -1206,6 +1225,42 @@ void RasterSelection::pasteSelection() {
 //-----------------------------------------------------------------------------
 
 bool RasterSelection::isTransformed() { return !m_affine.isIdentity(); }
+
+//-----------------------------------------------------------------------------
+
+bool RasterSelection::isEditable() {
+  TTool::Application *app = TTool::getApplication();
+  TXshSimpleLevel *level  = app->getCurrentLevel()->getSimpleLevel();
+
+  TFrameHandle *frame = app->getCurrentFrame();
+  bool filmstrip      = frame->isEditingLevel();
+
+  if (level) {
+    if (level->isReadOnly()) return false;
+
+    TFrameId frameId = app->getCurrentTool()->getTool()->getCurrentFid();
+    if (level->isFrameReadOnly(frameId)) return false;
+  }
+
+  if (!filmstrip) {
+    int colIndex = app->getCurrentTool()->getTool()->getColumnIndex();
+    int rowIndex = frame->getFrame();
+    if (app->getCurrentTool()->getTool()->isColumnLocked(colIndex))
+      return false;
+
+    TXsheet *xsh      = app->getCurrentXsheet()->getXsheet();
+    TStageObject *obj = xsh->getStageObject(TStageObjectId::ColumnId(colIndex));
+    // Test for Mesh-deformed levels
+    const TStageObjectId &parentId = obj->getParent();
+    if (parentId.isColumn() && obj->getParentHandle()[0] != 'H') {
+      TXshSimpleLevel *parentSl =
+          xsh->getCell(rowIndex, parentId.getIndex()).getSimpleLevel();
+      if (parentSl && parentSl->getType() == MESH_XSHLEVEL) return false;
+    }
+  }
+
+  return true;
+}
 
 //-----------------------------------------------------------------------------
 

@@ -122,6 +122,8 @@ public slots:
   void onShowHideActionTriggered(QAction *);
   void enableFlipConsoleForCamerastand(bool on);
   void onButtonPressed(FlipConsole::EGadget button);
+  void setFlipHButtonChecked(bool checked);
+  void setFlipVButtonChecked(bool checked);
 
 protected slots:
   void onFrameChanged();

@@ -431,6 +431,10 @@ void DvDirTreeView::dropEvent(QDropEvent *e) {
     TFilePath srcFp(url.toLocalFile().toStdWString());
     TFilePath dstFp = folderNode->getPath();
 
+    // Dropping file in the same directory that already exists should just be
+    // ignored
+    if (srcFp.getParentDir() == dstFp) continue;
+
     TFilePath path = dstFp + TFilePath(srcFp.getLevelNameW());
     NameBuilder *nameBuilder =
         NameBuilder::getBuilder(::to_wstring(path.getName()));

@@ -1315,6 +1315,7 @@ QMenuBar *StackedMenuBar::createFullMenuBar() {
   }
   cellsMenu->addSeparator();
   addMenuItem(cellsMenu, MI_Autorenumber);
+  addMenuItem(cellsMenu, MI_CreateBlankDrawing);
   addMenuItem(cellsMenu, MI_Duplicate);
   addMenuItem(cellsMenu, MI_MergeFrames);
   addMenuItem(cellsMenu, MI_CloneLevel);
@@ -1410,6 +1411,7 @@ QMenuBar *StackedMenuBar::createFullMenuBar() {
   addMenuItem(windowsMenu, MI_OpenTimelineView);
   addMenuItem(windowsMenu, MI_OpenFunctionEditor);
   addMenuItem(windowsMenu, MI_OpenSchematic);
+  addMenuItem(windowsMenu, MI_FxParamEditor);
   addMenuItem(windowsMenu, MI_OpenFilmStrip);
   windowsMenu->addSeparator();
   addMenuItem(windowsMenu, MI_OpenFileBrowser);

@@ -428,10 +428,11 @@ enum {
   eShowFilledRaster    = 0x200,
   eShowDefineLoadBox   = 0x400,
   eShowUseLoadBox      = 0x800,
-  eShowHowMany         = 0x1000
+  eShowViewerControls  = 0x1000,
+  eShowHowMany         = 0x2000
 };
 
-FlipConsole::FlipConsole(QVBoxLayout *mainLayout, UINT gadgetsMask,
+FlipConsole::FlipConsole(QVBoxLayout *mainLayout, std::vector<int> gadgetsMask,
                          bool isLinkable, QWidget *customWidget,
                          const QString &customizeId,
                          FlipConsoleOwner *consoleOwner, bool enableBlanks)
@@ -470,6 +471,7 @@ FlipConsole::FlipConsole(QVBoxLayout *mainLayout, UINT gadgetsMask,
     , m_customizeId(customizeId)
     , m_histoSep(0)
     , m_filledRasterSep(0)
+    , m_viewerSep(0)
     , m_bgSep(0)
     , m_vcrSep(0)
     , m_compareSep(0)
@@ -484,14 +486,14 @@ FlipConsole::FlipConsole(QVBoxLayout *mainLayout, UINT gadgetsMask,
   QString s                    = QSettings().value(m_customizeId).toString();
   if (s != "") m_customizeMask = s.toUInt();
 
-  if (m_gadgetsMask == 0) return;
+  if (m_gadgetsMask.size() == 0) return;
 
   // mainLayout->setMargin(1);
   // mainLayout->setSpacing(0);
 
   // create toolbars other than frame slider
-  if (m_gadgetsMask & (~eFrames)) {
-    createPlayToolBar(customWidget != 0);
+  if (hasButton(m_gadgetsMask, eFrames)) {
+    createPlayToolBar(customWidget);
 
     m_playToolBarContainer = new ToolBarContainer();
 
@@ -505,7 +507,7 @@ FlipConsole::FlipConsole(QVBoxLayout *mainLayout, UINT gadgetsMask,
       hLayout->addWidget(scrollableContainer);
 
       // show fps
-      if (m_gadgetsMask & eRate) {
+      if (hasButton(m_gadgetsMask, eRate)) {
         QFrame *fpsSliderFrame = createFpsSlider();
         hLayout->addWidget(fpsSliderFrame, 1);
       }
@@ -516,14 +518,9 @@ FlipConsole::FlipConsole(QVBoxLayout *mainLayout, UINT gadgetsMask,
   }
 
   // create frame slider
-  if (m_gadgetsMask & eFrames) {
+  if (hasButton(m_gadgetsMask, eFrames)) {
     m_frameSliderFrame = createFrameSlider();
     mainLayout->addWidget(m_frameSliderFrame);
-  }
-
-  if (customWidget) {
-    m_customAction = m_playToolBar->addWidget(customWidget);
-    m_customSep    = m_playToolBar->addSeparator();
   }
 
   applyCustomizeMask();
@@ -1052,13 +1049,21 @@ void FlipConsole::applyCustomizeMask() {
   if (m_filledRasterSep)
     m_filledRasterSep->setVisible(m_customizeMask & eShowFilledRaster);
 
+  enableButton(eZoomIn, m_customizeMask & eShowViewerControls);
+  enableButton(eZoomOut, m_customizeMask & eShowViewerControls);
+  enableButton(eFlipHorizontal, m_customizeMask & eShowViewerControls);
+  enableButton(eFlipVertical, m_customizeMask & eShowViewerControls);
+  enableButton(eResetView, m_customizeMask & eShowViewerControls);
+  if (m_viewerSep)
+    m_viewerSep->setVisible(m_customizeMask & eShowViewerControls);
+
   update();
 }
 
 //----------------------------------------------------------------------------------------------
 
 void FlipConsole::createCustomizeMenu(bool withCustomWidget) {
-  if (m_gadgetsMask & eCustomize) {
+  if (hasButton(m_gadgetsMask, eCustomize)) {
     QIcon icon          = createQIcon("options");
     QToolButton *button = new QToolButton();
     button->setIcon(icon);
@@ -1071,36 +1076,47 @@ void FlipConsole::createCustomizeMenu(bool withCustomWidget) {
     m_playToolBar->addWidget(button);
     m_playToolBar->addSeparator();
 
-    if (m_gadgetsMask & eSave) addMenuItem(eShowSave, tr("Save"), menu);
+    if (hasButton(m_gadgetsMask, eSave))
+      addMenuItem(eShowSave, tr("Save"), menu);
 
-    if (m_gadgetsMask & eSaveImg || m_gadgetsMask & eCompare)
+    if (hasButton(m_gadgetsMask, eSaveImg) ||
+        hasButton(m_gadgetsMask, eCompare))
       addMenuItem(eShowCompare, tr("Snapshot"), menu);
 
-    if (m_gadgetsMask & eDefineSubCamera)
+    if (hasButton(m_gadgetsMask, eDefineSubCamera))
       addMenuItem(eShowDefineSubCamera, tr("Define Sub-camera"), menu);
-    if (m_gadgetsMask & eDefineLoadBox)
+    if (hasButton(m_gadgetsMask, eDefineLoadBox))
       addMenuItem(eShowDefineLoadBox, tr("Define Loading Box"), menu);
-    if (m_gadgetsMask & eUseLoadBox)
+    if (hasButton(m_gadgetsMask, eUseLoadBox))
       addMenuItem(eShowUseLoadBox, tr("Use Loading Box"), menu);
 
-    if (m_gadgetsMask & eWhiteBg || m_gadgetsMask & eBlackBg ||
-        m_gadgetsMask & eCheckBg)
+    if (hasButton(m_gadgetsMask, eWhiteBg) ||
+        hasButton(m_gadgetsMask, eBlackBg) ||
+        hasButton(m_gadgetsMask, eCheckBg))
       addMenuItem(eShowBg, tr("Background Colors"), menu);
-    if (m_gadgetsMask & eRate)
+    if (hasButton(m_gadgetsMask, eRate))
       addMenuItem(eShowFramerate, tr("Framerate"), menu);
 
     addMenuItem(eShowVcr, tr("Playback Controls"), menu);
 
-    if ((m_gadgetsMask & eRed) || (m_gadgetsMask & eGreen) ||
-        (m_gadgetsMask & eBlue) || (m_gadgetsMask & eMatte))
+    if (hasButton(m_gadgetsMask, eRed) || hasButton(m_gadgetsMask, eGreen) ||
+        hasButton(m_gadgetsMask, eBlue) || hasButton(m_gadgetsMask, eMatte))
       addMenuItem(eShowcolorFilter, tr("Color Channels"), menu);
 
     if (withCustomWidget) addMenuItem(eShowCustom, tr("Set Key"), menu);
 
-    if (m_gadgetsMask & eHisto) addMenuItem(eShowHisto, tr("Histogram"), menu);
+    if (hasButton(m_gadgetsMask, eHisto))
+      addMenuItem(eShowHisto, tr("Histogram"), menu);
 
-    if (m_gadgetsMask & eFilledRaster)
+    if (hasButton(m_gadgetsMask, eFilledRaster))
       addMenuItem(eFilledRaster, tr("Display Areas as Filled"), menu);
+
+    if (hasButton(m_gadgetsMask, eZoomIn) ||
+        hasButton(m_gadgetsMask, eZoomOut) ||
+        hasButton(m_gadgetsMask, eFlipHorizontal) ||
+        hasButton(m_gadgetsMask, eFlipVertical) ||
+        hasButton(m_gadgetsMask, eResetView))
+      addMenuItem(eShowViewerControls, tr("Viewer Controls"), menu);
 
     bool ret = connect(menu, SIGNAL(triggered(QAction *)), this,
                        SLOT(onCustomizeButtonPressed(QAction *)));
@@ -1110,8 +1126,9 @@ void FlipConsole::createCustomizeMenu(bool withCustomWidget) {
 
 //-----------------------------------------------------------------------------
 
-void FlipConsole::createPlayToolBar(bool withCustomWidget) {
-  bool ret = true;
+void FlipConsole::createPlayToolBar(QWidget *customWidget) {
+  bool ret              = true;
+  bool withCustomWidget = customWidget != 0;
 
   m_playToolBar = new QToolBar(this);
   m_playToolBar->setMovable(false);
@@ -1123,18 +1140,18 @@ void FlipConsole::createPlayToolBar(bool withCustomWidget) {
 
   createCustomizeMenu(withCustomWidget);
 
-  if (m_gadgetsMask & eSave) {
+  if (hasButton(m_gadgetsMask, eSave)) {
     createButton(eSave, "save", tr("&Save Images"), false);
     // m_saveSep = m_playToolBar->addSeparator();
   }
 
   // snapshot
   bool separator = false;
-  if (m_gadgetsMask & eSaveImg) {
+  if (hasButton(m_gadgetsMask, eSaveImg)) {
     createButton(eSaveImg, "snapshot", tr("&Snapshot"), false);
     separator = true;
   }
-  if (m_gadgetsMask & eCompare) {
+  if (hasButton(m_gadgetsMask, eCompare)) {
     createButton(eCompare, "compare", tr("&Compare to Snapshot"), true);
     separator = true;
   }
@@ -1142,17 +1159,17 @@ void FlipConsole::createPlayToolBar(bool withCustomWidget) {
 
   // sub camera
   separator = false;
-  if (m_gadgetsMask & eDefineSubCamera) {
+  if (hasButton(m_gadgetsMask, eDefineSubCamera)) {
     createButton(eDefineSubCamera, "define_subcamera_preview",
                  tr("&Define Sub-camera"), true);
     separator = true;
   }
-  if (m_gadgetsMask & eDefineLoadBox) {
+  if (hasButton(m_gadgetsMask, eDefineLoadBox)) {
     createButton(eDefineLoadBox, "define_subcamera_preview",
                  tr("&Define Loading Box"), true);
     separator = true;
   }
-  if (m_gadgetsMask & eUseLoadBox) {
+  if (hasButton(m_gadgetsMask, eUseLoadBox)) {
     createButton(eUseLoadBox, "use_subcamera_preview", tr("&Use Loading Box"),
                  true);
     separator = true;
@@ -1161,61 +1178,63 @@ void FlipConsole::createPlayToolBar(bool withCustomWidget) {
 
   // preview BGs
   QActionGroup *group = new QActionGroup(m_playToolBar);
-  if (m_gadgetsMask & eWhiteBg)
+  if (hasButton(m_gadgetsMask, eWhiteBg))
     createOnOffButton(eWhiteBg, "preview_white", tr("&White Background"),
                       group);
-  if (m_gadgetsMask & eBlackBg)
+  if (hasButton(m_gadgetsMask, eBlackBg))
     createOnOffButton(eBlackBg, "preview_black", tr("&Black Background"),
                       group);
-  if (m_gadgetsMask & eCheckBg)
+  if (hasButton(m_gadgetsMask, eCheckBg))
     createOnOffButton(eCheckBg, "preview_checkboard",
                       tr("&Checkered Background"), group);
-  if (m_gadgetsMask & eWhiteBg) m_bgSep = m_playToolBar->addSeparator();
+  if (hasButton(m_gadgetsMask, eWhiteBg))
+    m_bgSep = m_playToolBar->addSeparator();
 
   // VCR buttons
   QActionGroup *playGroup = new QActionGroup(m_playToolBar);
-  if (m_gadgetsMask & eFirst)
+  if (hasButton(m_gadgetsMask, eFirst))
     createButton(eFirst, "framefirst", tr("&First Frame"), false);
-  if (m_gadgetsMask & ePrev)
+  if (hasButton(m_gadgetsMask, ePrev))
     createButton(ePrev, "frameprev", tr("&Previous Frame"), false);
-  if (m_gadgetsMask & ePause)
+  if (hasButton(m_gadgetsMask, ePause))
     createCheckedButtonWithBorderImage(ePause, "pause", tr("Pause"), true,
                                        playGroup, "A_Flip_Pause");
-  if (m_gadgetsMask & ePlay)
+  if (hasButton(m_gadgetsMask, ePlay))
     createCheckedButtonWithBorderImage(ePlay, "play", tr("Play"), true,
                                        playGroup, "A_Flip_Play");
-  if (m_gadgetsMask & eLoop)
+  if (hasButton(m_gadgetsMask, eLoop))
     createCheckedButtonWithBorderImage(eLoop, "loop", tr("Loop"), true,
                                        playGroup, "A_Flip_Loop");
 
-  if (m_gadgetsMask & eNext)
+  if (hasButton(m_gadgetsMask, eNext))
     createButton(eNext, "framenext", tr("&Next frame"), false);
-  if (m_gadgetsMask & eLast)
+  if (hasButton(m_gadgetsMask, eLast))
     createButton(eLast, "framelast", tr("&Last Frame"), false);
 
   // separator
-  if (m_gadgetsMask & ePlay) m_vcrSep = m_playToolBar->addSeparator();
+  if (hasButton(m_gadgetsMask, ePlay)) m_vcrSep = m_playToolBar->addSeparator();
 
   // Channel Selector
   m_colorFilterGroup = new QActionGroup(m_playToolBar);
   m_colorFilterGroup->setExclusive(false);
-  if ((m_gadgetsMask & eRed) && !(m_gadgetsMask & eGRed))
+  if (hasButton(m_gadgetsMask, eRed) && !hasButton(m_gadgetsMask, eGRed))
     createButton(eRed, "channelred", tr("Red Channel"), true);
-  else if ((m_gadgetsMask & eRed) && (m_gadgetsMask & eGRed))
+  else if (hasButton(m_gadgetsMask, eRed) && hasButton(m_gadgetsMask, eGRed))
     m_doubleRedAction = createDoubleButton(
         eRed, eGRed, "half_R", "half_bw", tr("Red Channel"),
         tr("Red Channel in Grayscale"), m_colorFilterGroup, m_doubleRed);
 
-  if ((m_gadgetsMask & eGreen) && !(m_gadgetsMask & eGGreen))
+  if (hasButton(m_gadgetsMask, eGreen) && !hasButton(m_gadgetsMask, eGGreen))
     createButton(eGreen, "channelgreen", tr("Green Channel"), true);
-  else if ((m_gadgetsMask & eGreen) && (m_gadgetsMask & eGGreen))
+  else if (hasButton(m_gadgetsMask, eGreen) &&
+           hasButton(m_gadgetsMask, eGGreen))
     m_doubleGreenAction = createDoubleButton(
         eGreen, eGGreen, "half_G", "half_bw", tr("Green Channel"),
         tr("Green Channel in Grayscale"), m_colorFilterGroup, m_doubleGreen);
 
-  if ((m_gadgetsMask & eBlue) && !(m_gadgetsMask & eGBlue))
+  if (hasButton(m_gadgetsMask, eBlue) && !hasButton(m_gadgetsMask, eGBlue))
     createButton(eBlue, "channelblue", tr("Blue Channel"), true);
-  else if ((m_gadgetsMask & eBlue) && (m_gadgetsMask & eGBlue))
+  else if (hasButton(m_gadgetsMask, eBlue) && hasButton(m_gadgetsMask, eGBlue))
     m_doubleBlueAction = createDoubleButton(
         eBlue, eGBlue, "half_B", "half_bw", tr("Blue Channel"),
         tr("Blue Channel in Grayscale"), m_colorFilterGroup, m_doubleBlue);
@@ -1223,32 +1242,55 @@ void FlipConsole::createPlayToolBar(bool withCustomWidget) {
   ret = ret && connect(m_colorFilterGroup, SIGNAL(triggered(QAction *)), this,
                        SLOT(onButtonPressed(QAction *)));
 
-  if (m_gadgetsMask & eMatte)
+  if (hasButton(m_gadgetsMask, eMatte))
     createButton(eMatte, "channelmatte", tr("Alpha Channel"), true);
 
   // separator
-  if (m_gadgetsMask & eRed || m_gadgetsMask & eGRed)
+  if (hasButton(m_gadgetsMask, eRed) || hasButton(m_gadgetsMask, eGRed))
     m_colorFilterSep = m_playToolBar->addSeparator();
 
   // Sound & Histogram & Locator
-  if (m_gadgetsMask & eSound || m_gadgetsMask & eHisto ||
-      m_gadgetsMask & eLocator) {
-    if (m_gadgetsMask & eSound) {
+  if (hasButton(m_gadgetsMask, eSound) || hasButton(m_gadgetsMask, eHisto) ||
+      hasButton(m_gadgetsMask, eLocator)) {
+    if (hasButton(m_gadgetsMask, eSound)) {
       createButton(eSound, "sound", tr("&Soundtrack "), true);
       m_soundSep = m_playToolBar->addSeparator();
     }
-    if (m_gadgetsMask & eHisto)
+    if (hasButton(m_gadgetsMask, eHisto))
       createButton(eHisto, "histograms", tr("&Histogram"), false);
-    if (m_gadgetsMask & eLocator)
+    if (hasButton(m_gadgetsMask, eLocator))
       createButton(eLocator, "locator", tr("&Locator"), false);
-    if (m_gadgetsMask & eHisto || m_gadgetsMask & eLocator)
+    if (hasButton(m_gadgetsMask, eHisto) || hasButton(m_gadgetsMask, eLocator))
       m_histoSep = m_playToolBar->addSeparator();
   }
 
-  if (m_gadgetsMask & eFilledRaster) {
+  if (hasButton(m_gadgetsMask, eFilledRaster)) {
     createOnOffButton(eFilledRaster, "preview_white",
                       tr("&Display Areas as Filled"), 0);
     m_filledRasterSep = m_playToolBar->addSeparator();
+  }
+
+  if (withCustomWidget) {
+    m_customAction = m_playToolBar->addWidget(customWidget);
+    m_customSep    = m_playToolBar->addSeparator();
+  }
+
+  if (hasButton(m_gadgetsMask, eZoomIn) || hasButton(m_gadgetsMask, eZoomOut) ||
+      hasButton(m_gadgetsMask, eFlipHorizontal) ||
+      hasButton(m_gadgetsMask, eFlipVertical) ||
+      hasButton(m_gadgetsMask, eResetView)) {
+    if (hasButton(m_gadgetsMask, eZoomIn))
+      createButton(eZoomIn, "zoomin", tr("&Zoom In"), false);
+    if (hasButton(m_gadgetsMask, eZoomOut))
+      createButton(eZoomOut, "zoomout", tr("&Zoom Out"), false);
+    if (hasButton(m_gadgetsMask, eFlipHorizontal))
+      createOnOffButton(eFlipHorizontal, "fliphoriz", tr("&Flip Horizontally"),
+                        0);
+    if (hasButton(m_gadgetsMask, eFlipVertical))
+      createOnOffButton(eFlipVertical, "flipvert", tr("&Flip Vertically"), 0);
+    if (hasButton(m_gadgetsMask, eResetView))
+      createButton(eResetView, "reset", tr("&Reset View"), false);
+    m_viewerSep = m_playToolBar->addSeparator();
   }
 
   // for all actions in this toolbar

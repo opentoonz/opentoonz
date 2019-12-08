@@ -658,6 +658,9 @@ bool ExportLevelPopup::execute() {
       return false;
     }
 
+    if (isReservedFileName_message(QString::fromStdString(fp.getName())))
+      return false;
+
     return IoCmd::exportLevel(fp.withType(ext).withFrame(), 0, opts);
   }
 }

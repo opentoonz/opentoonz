@@ -584,6 +584,10 @@ void ProjectCreatePopup::createProject() {
     return;
   }
 
+  if (isReservedFileName_message(fi.baseName())) {
+    return;
+  }
+
   TProjectManager *pm   = TProjectManager::instance();
   TFilePath projectName = TFilePath(m_nameFld->text().toStdWString());
   if (projectName == TFilePath()) {

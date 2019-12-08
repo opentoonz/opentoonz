@@ -219,6 +219,22 @@ void SceneViewer::onButtonPressed(FlipConsole::EGadget button) {
     m_locator->raise();
     m_locator->activateWindow();
     break;
+
+  case FlipConsole::eZoomIn:
+    zoomIn();
+    break;
+  case FlipConsole::eZoomOut:
+    zoomOut();
+    break;
+  case FlipConsole::eFlipHorizontal:
+    flipX();
+    break;
+  case FlipConsole::eFlipVertical:
+    flipY();
+    break;
+  case FlipConsole::eResetView:
+    resetSceneViewer();
+    break;
   }
 }
 
@@ -1598,6 +1614,14 @@ void SceneViewer::dropEvent(QDropEvent *e) {
     }
 
     IoCmd::loadResources(args);
+
+	if (acceptResourceOrFolderDrop(mimeData->urls())) {
+		// Force Copy Action
+		e->setDropAction(Qt::CopyAction);
+		// For files, don't accept original proposed action in case it's a move
+		e->accept();
+		return;
+	}
   }
   e->acceptProposedAction();
 }

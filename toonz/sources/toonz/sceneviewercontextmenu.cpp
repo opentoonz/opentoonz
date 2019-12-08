@@ -50,9 +50,8 @@ SceneViewerContextMenu::SceneViewerContextMenu(SceneViewer *parent)
   /*- サブカメラの消去 -*/
   if (parent->isEditPreviewSubcamera()) {
     action = addAction(tr("Reset Subcamera"));
-    ret =
-        ret &&
-        parent->connect(action, SIGNAL(triggered()), SLOT(doDeleteSubCamera()));
+    ret    = ret && parent->connect(action, SIGNAL(triggered()),
+                                 SLOT(doDeleteSubCamera()));
     addSeparator();
   }
 
@@ -69,9 +68,8 @@ SceneViewerContextMenu::SceneViewerContextMenu(SceneViewer *parent)
     action =
         commandManager->createAction(V_ShowHideFullScreen, this, !isFullScreen);
     addAction(action);
-    ret = ret &&
-          parent->connect(action, SIGNAL(triggered()), fsWidget,
-                          SLOT(toggleFullScreen()));
+    ret = ret && parent->connect(action, SIGNAL(triggered()), fsWidget,
+                                 SLOT(toggleFullScreen()));
   }
 
   // swap compared
@@ -129,9 +127,8 @@ SceneViewerContextMenu::SceneViewerContextMenu(SceneViewer *parent)
   // actual pixel size
   action = commandManager->createAction(V_ActualPixelSize, this);
   addAction(action);
-  ret =
-      ret &&
-      parent->connect(action, SIGNAL(triggered()), SLOT(setActualPixelSize()));
+  ret = ret && parent->connect(action, SIGNAL(triggered()),
+                               SLOT(setActualPixelSize()));
 
   // onion skin
   if (Preferences::instance()->isOnionSkinEnabled() &&
@@ -142,27 +139,23 @@ SceneViewerContextMenu::SceneViewerContextMenu(SceneViewer *parent)
   action                   = guidedDrawingMenu->addAction(tr("Off"));
   action->setCheckable(true);
   action->setChecked(guidedDrawingStatus == 0);
-  ret = ret &&
-        parent->connect(action, SIGNAL(triggered()), this,
-                        SLOT(setGuidedDrawingOff()));
+  ret    = ret && parent->connect(action, SIGNAL(triggered()), this,
+                               SLOT(setGuidedDrawingOff()));
   action = guidedDrawingMenu->addAction(tr("Closest Drawing"));
   action->setCheckable(true);
   action->setChecked(guidedDrawingStatus == 1);
-  ret = ret &&
-        parent->connect(action, SIGNAL(triggered()), this,
-                        SLOT(setGuidedDrawingClosest()));
+  ret    = ret && parent->connect(action, SIGNAL(triggered()), this,
+                               SLOT(setGuidedDrawingClosest()));
   action = guidedDrawingMenu->addAction(tr("Farthest Drawing"));
   action->setCheckable(true);
   action->setChecked(guidedDrawingStatus == 2);
-  ret = ret &&
-        parent->connect(action, SIGNAL(triggered()), this,
-                        SLOT(setGuidedDrawingFarthest()));
+  ret    = ret && parent->connect(action, SIGNAL(triggered()), this,
+                               SLOT(setGuidedDrawingFarthest()));
   action = guidedDrawingMenu->addAction(tr("All Drawings"));
   action->setCheckable(true);
   action->setChecked(guidedDrawingStatus == 3);
-  ret = ret &&
-        parent->connect(action, SIGNAL(triggered()), this,
-                        SLOT(setGuidedDrawingAll()));
+  ret = ret && parent->connect(action, SIGNAL(triggered()), this,
+                               SLOT(setGuidedDrawingAll()));
   // Zero Thick
   if (!parent->isPreviewEnabled())
     ZeroThickToggleGui::addZeroThickCommand(this);
@@ -178,25 +171,22 @@ SceneViewerContextMenu::SceneViewerContextMenu(SceneViewer *parent)
     action = addAction(tr("Save Previewed Frames"));
     action->setShortcut(QKeySequence(
         CommandManager::instance()->getKeyFromId(MI_SavePreviewedFrames)));
-    ret = ret &&
-          parent->connect(action, SIGNAL(triggered()), this,
-                          SLOT(savePreviewedFrames()));
+    ret = ret && parent->connect(action, SIGNAL(triggered()), this,
+                                 SLOT(savePreviewedFrames()));
 
     // regenerate preview
     action = addAction(tr("Regenerate Preview"));
     action->setShortcut(QKeySequence(
         CommandManager::instance()->getKeyFromId(MI_RegeneratePreview)));
-    ret =
-        ret &&
-        parent->connect(action, SIGNAL(triggered()), SLOT(regeneratePreview()));
+    ret = ret && parent->connect(action, SIGNAL(triggered()),
+                                 SLOT(regeneratePreview()));
 
     // regenerate frame preview
     action = addAction(tr("Regenerate Frame Preview"));
     action->setShortcut(QKeySequence(
         CommandManager::instance()->getKeyFromId(MI_RegenerateFramePr)));
-    ret = ret &&
-          parent->connect(action, SIGNAL(triggered()),
-                          SLOT(regeneratePreviewFrame()));
+    ret = ret && parent->connect(action, SIGNAL(triggered()),
+                                 SLOT(regeneratePreviewFrame()));
   }
 
   assert(ret);
@@ -250,9 +240,9 @@ void SceneViewerContextMenu::addSelectCommand(QMenu *menu,
   TXsheet *xsh              = TApp::instance()->getCurrentXsheet()->getXsheet();
   TStageObject *stageObject = xsh->getStageObject(id);
   if (!stageObject) return;
-  QString text           = (id.isTable()) ? tr("Table") : getName(stageObject);
+  QString text = (id.isTable()) ? tr("Table") : getName(stageObject);
   if (menu == this) text = tr("Select %1").arg(text);
-  QAction *action        = new QAction(text, this);
+  QAction *action = new QAction(text, this);
   action->setData(id.getCode());
   connect(action, SIGNAL(triggered()), this, SLOT(onSetCurrent()));
   menu->addAction(action);
@@ -377,22 +367,22 @@ void SceneViewerContextMenu::onSetCurrent() {
 
 //-----------------------------------------------------------------------------
 void SceneViewerContextMenu::setGuidedDrawingOff() {
-  Preferences::instance()->setGuidedDrawing(0);
+  Preferences::instance()->setValue(guidedDrawingType, 0);
 }
 
 //-----------------------------------------------------------------------------
 void SceneViewerContextMenu::setGuidedDrawingClosest() {
-  Preferences::instance()->setGuidedDrawing(1);
+  Preferences::instance()->setValue(guidedDrawingType, 1);
 }
 
 //-----------------------------------------------------------------------------
 void SceneViewerContextMenu::setGuidedDrawingFarthest() {
-  Preferences::instance()->setGuidedDrawing(2);
+  Preferences::instance()->setValue(guidedDrawingType, 2);
 }
 
 //-----------------------------------------------------------------------------
 void SceneViewerContextMenu::setGuidedDrawingAll() {
-  Preferences::instance()->setGuidedDrawing(3);
+  Preferences::instance()->setValue(guidedDrawingType, 3);
 }
 
 //-----------------------------------------------------------------------------
@@ -414,7 +404,7 @@ public:
   }
 
   static void enableZeroThick(bool enable = true) {
-    Preferences::instance()->setShow0ThickLines(enable);
+    Preferences::instance()->setValue(show0ThickLines, enable);
     TApp::instance()->getCurrentScene()->notifySceneChanged();
   }
 } ZeroThickToggle;
@@ -453,7 +443,7 @@ public:
   }
 
   static void enableCursorOutline(bool enable = true) {
-    Preferences::instance()->enableCursorOutline(enable);
+    Preferences::instance()->setValue(cursorOutlineEnabled, enable);
   }
 } CursorOutlineToggle;
 
