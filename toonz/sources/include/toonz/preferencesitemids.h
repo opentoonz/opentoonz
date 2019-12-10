@@ -173,6 +173,8 @@ enum PreferencesItemId {
   shortcutPreset,
   // Viewer context menu
   guidedDrawingType,
+  guidedAutoInbetween,
+  guidedInterpolationType,
   // OSX shared memory settings
   shmmax,
   shmseg,

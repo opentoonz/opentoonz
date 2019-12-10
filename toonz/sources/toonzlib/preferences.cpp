@@ -575,6 +575,10 @@ void Preferences::definePreferenceItems() {
   define(shortcutPreset, "shortcutPreset", QMetaType::QString, "defopentoonz");
   // Viewer context menu
   define(guidedDrawingType, "guidedDrawingType", QMetaType::Int, 0);  // Off
+  define(guidedAutoInbetween, "guidedAutoInbetween", QMetaType::Bool,
+         false);  // Off
+  define(guidedInterpolationType, "guidedInterpolationType", QMetaType::Int,
+         1);  // Linear
 #if defined(MACOSX) && defined(__LP64__)
   // OSX shared memory settings
   define(shmmax, "shmmax", QMetaType::Int, -1);

@@ -451,6 +451,8 @@ public:
   QString getShortcutPreset() { return getStringValue(shortcutPreset); }
   // Viewer context menu
   int getGuidedDrawing() { return getIntValue(guidedDrawingType); }
+  bool getGuidedAutoInbetween() { return getBoolValue(guidedAutoInbetween); }
+  int getGuidedInterpolation() { return getIntValue(guidedInterpolationType); }
 #if defined(MACOSX) && defined(__LP64__)
   int getShmMax() const {
     return getIntValue(shmmax);

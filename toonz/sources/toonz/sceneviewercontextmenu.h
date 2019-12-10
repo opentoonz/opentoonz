@@ -35,6 +35,11 @@ public slots:
   void setGuidedDrawingClosest();
   void setGuidedDrawingFarthest();
   void setGuidedDrawingAll();
+  void setGuidedAutoInbetween();
+  void setGuidedInterpolationLinear();
+  void setGuidedInterpolationEaseIn();
+  void setGuidedInterpolationEaseOut();
+  void setGuidedInterpolationEaseInOut();
 
   void onShowHide();
   void onSetCurrent();

@@ -28,6 +28,7 @@
 #include "toonz/palettecontroller.h"
 #include "toonz/stage2.h"
 #include "toonz/preferences.h"
+#include "toonz/tonionskinmaskhandle.h"
 
 // TnzCore includes
 #include "tstream.h"
@@ -912,9 +913,9 @@ void ToonzVectorBrushTool::leftButtonUp(const TPointD &pos,
         curCol   = application->getCurrentColumn()->getColumnIndex();
         curFrame = application->getCurrentFrame()->getFrame();
       }
-      bool success =
-          doFrameRangeStrokes(m_firstFrameId, m_firstStroke, getFrameId(),
-                              stroke, m_firstFrameRange);
+      bool success = doFrameRangeStrokes(
+          m_firstFrameId, m_firstStroke, getFrameId(), stroke,
+          m_frameRange.getIndex(), m_firstFrameRange);
       if (e.isCtrlPressed()) {
         if (application) {
           if (m_firstFrameId > currentId) {
@@ -950,9 +951,28 @@ void ToonzVectorBrushTool::leftButtonUp(const TPointD &pos,
       stroke->setSelfLoop(true);
       m_snapSelf = false;
     }
-    addStrokeToImage(getApplication(), vi, stroke, m_breakAngles.getValue(),
-                     m_isFrameCreated, m_isLevelCreated);
+
+    bool strokeAdded = false;
+
+    if ((Preferences::instance()->getGuidedDrawing() == 1 ||
+         Preferences::instance()->getGuidedDrawing() == 2) &&
+        Preferences::instance()->getGuidedAutoInbetween()) {
+      int fidx     = getApplication()->getCurrentFrame()->getFrameIndex();
+      TFrameId fId = getFrameId();
+
+      strokeAdded = doGuidedAutoInbetween(fId, vi, stroke);
+
+      if (getApplication()->getCurrentFrame()->isEditingScene())
+        getApplication()->getCurrentFrame()->setFrame(fidx);
+      else
+        getApplication()->getCurrentFrame()->setFid(fId);
+    }
+
+    if (!strokeAdded)
+      addStrokeToImage(getApplication(), vi, stroke, m_breakAngles.getValue(),
+                       m_isFrameCreated, m_isLevelCreated);
     TRectD bbox = stroke->getBBox().enlarge(2) + m_track.getModifiedRegion();
+
     invalidate();  // should use bbox?
   }
   assert(stroke);
@@ -971,11 +991,9 @@ bool ToonzVectorBrushTool::keyDown(QKeyEvent *event) {
 
 //--------------------------------------------------------------------------------------------------
 
-bool ToonzVectorBrushTool::doFrameRangeStrokes(TFrameId firstFrameId,
-                                               TStroke *firstStroke,
-                                               TFrameId lastFrameId,
-                                               TStroke *lastStroke,
-                                               bool drawFirstStroke) {
+bool ToonzVectorBrushTool::doFrameRangeStrokes(
+    TFrameId firstFrameId, TStroke *firstStroke, TFrameId lastFrameId,
+    TStroke *lastStroke, int interpolationType, bool drawFirstStroke) {
   TXshSimpleLevel *sl =
       TTool::getApplication()->getCurrentLevel()->getLevel()->getSimpleLevel();
   TStroke *first           = new TStroke();
@@ -1010,6 +1028,9 @@ bool ToonzVectorBrushTool::doFrameRangeStrokes(TFrameId firstFrameId,
   assert(m > 0);
 
   TUndoManager::manager()->beginBlock();
+  int row = getApplication()->getCurrentFrame()->isEditingScene()
+                ? getApplication()->getCurrentFrame()->getFrameIndex()
+                : -1;
   for (int i = 0; i < m; ++i) {
     TFrameId fid = fids[i];
     assert(firstFrameId <= fid && fid <= lastFrameId);
@@ -1017,7 +1038,7 @@ bool ToonzVectorBrushTool::doFrameRangeStrokes(TFrameId firstFrameId,
     // This is an attempt to divide the tween evenly
     double t = m > 1 ? (double)i / (double)(m - 1) : 0.5;
     double s = t;
-    switch (m_frameRange.getIndex()) {
+    switch (interpolationType) {
     case 1:  // LINEAR_WSTR
       break;
     case 2:  // EASEIN_WSTR
@@ -1032,12 +1053,7 @@ bool ToonzVectorBrushTool::doFrameRangeStrokes(TFrameId firstFrameId,
     }
 
     TTool::Application *app = TTool::getApplication();
-    if (app) {
-      if (app->getCurrentFrame()->isEditingScene())
-        app->getCurrentFrame()->setFrame(fid.getNumber() - 1);
-      else
-        app->getCurrentFrame()->setFid(fid);
-    }
+    if (app) app->getCurrentFrame()->setFid(fid);
 
     TVectorImageP img = sl->getFrame(fid, true);
     if (t == 0) {
@@ -1062,9 +1078,111 @@ bool ToonzVectorBrushTool::doFrameRangeStrokes(TFrameId firstFrameId,
                        m_isLevelCreated, sl, fid);
     }
   }
+  if (row != -1) getApplication()->getCurrentFrame()->setFrame(row);
+
   TUndoManager::manager()->endBlock();
   notifyImageChanged();
   return true;
+}
+
+//--------------------------------------------------------------------------------------------------
+
+bool ToonzVectorBrushTool::doGuidedAutoInbetween(TFrameId cFid,
+                                                 const TVectorImageP &cvi,
+                                                 TStroke *cStroke) {
+  TApplication *app = TTool::getApplication();
+
+  if (cFid.isEmptyFrame() || cFid.isNoFrame() || !cvi || !cStroke) return false;
+
+  TXshSimpleLevel *sl = app->getCurrentLevel()->getLevel()->getSimpleLevel();
+  if (!sl) return false;
+
+  OnionSkinMask osMask       = app->getCurrentOnionSkin()->getOnionSkinMask();
+  TFrameHandle *currentFrame = app->getCurrentFrame();
+
+  int cidx     = currentFrame->getFrameIndex();
+  int mos      = 0;
+  int mosCount = osMask.getMosCount();
+  int fos      = -1;
+  int fosCount = osMask.getFosCount();
+  int os       = -1;
+
+  // Find onion-skinned drawing that is being used for guided auto inbetween
+  if (Preferences::instance()->getGuidedDrawing() == 1) {
+    // Get closest moving unionskin
+    for (int i = 0; i < mosCount; i++) {
+      int cmos = osMask.getMos(i);
+      if (cmos >= 0) continue;  // skip current or next drawings
+      if (!mos || cmos > mos) mos = cmos;
+    }
+    if (mos) os = mos + cidx;
+
+    // Get closest fixed onionskin
+    for (int i = 0; i < fosCount; i++) {
+      int cfos = osMask.getFos(i);
+      if (cfos >= cidx) continue;  // skip current or later drawings
+      if (fos == -1 || cfos < fos) fos = cfos;
+    }
+
+    if (os == -1)
+      os = fos;
+    else if (fos != -1)
+      os = std::max(os, fos);
+  } else if (Preferences::instance()->getGuidedDrawing() ==
+             2) {  // Furthest drawing
+    // Get moving unionskin
+    for (int i = 0; i < mosCount; i++) {
+      int cmos = osMask.getMos(i);
+      if (cmos >= 0) continue;  // skip current or next drawings
+      if (!mos || cmos < mos) mos = cmos;
+    }
+    if (mos) os = mos + cidx;
+
+    // Get fixed onionskin
+    for (int i = 0; i < fosCount; i++) {
+      int cfos = osMask.getFos(i);
+      if (cfos >= cidx) continue;  // skip current or later drawings
+      if (fos == -1 || cfos > fos) fos = cfos;
+    }
+
+    if (os == -1)
+      os = fos;
+    else if (fos != -1)
+      os = std::min(os, fos);
+  } else
+    return false;
+
+  if (os == -1) return false;
+
+  TFrameId oFid;
+  if (currentFrame->isEditingScene()) {
+    TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
+    if (!xsh) return false;
+    int col = app->getCurrentColumn()->getColumnIndex();
+    if (col < 0) return false;
+    TXshCell cell = xsh->getCell(os, col);
+    if (cell.isEmpty()) return false;
+    oFid = cell.getFrameId();
+  } else
+    oFid = sl->getFrameId(os);
+
+  TImageP fimg      = sl->getFrame(oFid, false);
+  TVectorImageP fvi = fimg;
+  if (!fvi) return false;
+
+  // Check if this stroke is a guided stroke
+  int cStrokeCount = cvi->getStrokeCount() + 1;
+  if (!cStrokeCount || !fvi->getStrokeCount() ||
+      cStrokeCount > fvi->getStrokeCount())
+    return false;
+
+  int cStrokeIdx = cvi->getStrokeCount();
+
+  TStroke *fStroke = fvi->getStroke(cStrokeIdx);
+
+  return doFrameRangeStrokes(oFid, fStroke, cFid, cStroke,
+                             Preferences::instance()->getGuidedInterpolation(),
+                             false);
 }
 
 //--------------------------------------------------------------------------------------------------
