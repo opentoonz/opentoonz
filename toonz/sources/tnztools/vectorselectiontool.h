@@ -222,7 +222,7 @@ class VectorScaleTool final : public VectorDeformTool {
   std::unique_ptr<Scale> m_scale;
 
 public:
-  VectorScaleTool(VectorSelectionTool *tool, int type);
+  VectorScaleTool(VectorSelectionTool *tool, ScaleType type);
 
   TPointD transform(int index,
                     TPointD newPos) override;  //!< Returns scale value.

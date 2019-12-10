@@ -167,7 +167,7 @@ class RasterScaleTool final : public RasterDeformTool {
   Scale *m_scale;
 
 public:
-  RasterScaleTool(RasterSelectionTool *tool, int type);
+  RasterScaleTool(RasterSelectionTool *tool, ScaleType type);
   /*! Return scale value. */
   TPointD transform(int index, TPointD newPos) override;
   void leftButtonDown(const TPointD &pos, const TMouseEvent &e) override;

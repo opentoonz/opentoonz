@@ -56,7 +56,7 @@ DragSelectionTool::DragTool *createNewFreeDeformTool(SelectionTool *st) {
 
 //-----------------------------------------------------------------------------
 
-DragSelectionTool::DragTool *createNewScaleTool(SelectionTool *st, int type) {
+DragSelectionTool::DragTool *createNewScaleTool(SelectionTool *st, ScaleType type) {
   VectorSelectionTool *vst = dynamic_cast<VectorSelectionTool *>(st);
   RasterSelectionTool *rst = dynamic_cast<RasterSelectionTool *>(st);
   if (vst)
@@ -559,7 +559,7 @@ void DragSelectionTool::MoveSelection::leftButtonDrag(const TPointD &pos,
 // Scale
 //-----------------------------------------------------------------------------
 
-DragSelectionTool::Scale::Scale(DeformTool *deformTool, int type)
+DragSelectionTool::Scale::Scale(DeformTool *deformTool, ScaleType type)
     : m_deformTool(deformTool)
     , m_startCenter(deformTool->getTool()->getCenter())
     , m_type(type)
@@ -800,7 +800,7 @@ void DragSelectionTool::Scale::leftButtonDrag(const TPointD &pos,
   }
   TPointD newPos    = pos;
   int selectedIndex = tool->getSelectedPoint();
-  if (m_isShiftPressed && m_type == GLOBAL) {
+  if (m_isShiftPressed && m_type == ScaleType::GLOBAL) {
     TPointD point = tool->getBBox().getPoint(selectedIndex);
     TPointD delta;
     if (!isBboxReset)
@@ -1069,11 +1069,11 @@ void SelectionTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
     else if (m_what == MOVE_CENTER)
       m_dragTool = new MoveCenterTool(this);
     else if (m_what == SCALE)
-      m_dragTool = createNewScaleTool(this, 0);
+      m_dragTool = createNewScaleTool(this, ScaleType::GLOBAL);
     else if (m_what == SCALE_X)
-      m_dragTool = createNewScaleTool(this, 1);
+      m_dragTool = createNewScaleTool(this, ScaleType::HORIZONTAL);
     else if (m_what == SCALE_Y)
-      m_dragTool = createNewScaleTool(this, 2);
+      m_dragTool = createNewScaleTool(this, ScaleType::VERTICAL);
     else if (m_what == DEFORM)
       m_dragTool = createNewFreeDeformTool(this);
     else if (m_what == GLOBAL_THICKNESS)

@@ -397,7 +397,7 @@ void DragSelectionTool::RasterMoveSelectionTool::leftButtonDrag(
 //-----------------------------------------------------------------------------
 
 DragSelectionTool::RasterScaleTool::RasterScaleTool(RasterSelectionTool *tool,
-                                                    int type)
+                                                    ScaleType type)
     : RasterDeformTool(tool, true) {
   m_scale = new Scale(this, type);
 }

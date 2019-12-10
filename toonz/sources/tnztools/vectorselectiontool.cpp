@@ -841,7 +841,7 @@ void DragSelectionTool::VectorMoveSelectionTool::leftButtonDrag(
 //-----------------------------------------------------------------------------
 
 DragSelectionTool::VectorScaleTool::VectorScaleTool(VectorSelectionTool *tool,
-                                                    int type)
+                                                    ScaleType type)
     : VectorDeformTool(tool), m_scale(new Scale(this, type)) {}
 
 //-----------------------------------------------------------------------------

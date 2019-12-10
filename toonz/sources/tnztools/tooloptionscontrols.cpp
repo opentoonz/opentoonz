@@ -1595,10 +1595,11 @@ SelectionScaleField::SelectionScaleField(SelectionTool *tool, int id,
 bool SelectionScaleField::applyChange(bool addToUndo) {
   if (!m_tool || (m_tool->isSelectionEmpty() && !m_tool->isLevelType()))
     return false;
-  DragSelectionTool::DragTool *scaleTool = createNewScaleTool(m_tool, 0);
+  using namespace DragSelectionTool;
+  DragTool *scaleTool = createNewScaleTool(m_tool, ScaleType::GLOBAL);
   double p                               = getValue();
   if (p == 0) p = 0.00001;
-  DragSelectionTool::FourPoints points = m_tool->getBBox();
+  FourPoints points = m_tool->getBBox();
   TPointD center                       = m_tool->getCenter();
   TPointD p0M                          = points.getPoint(7);
   TPointD p1M                          = points.getPoint(5);
