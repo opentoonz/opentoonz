@@ -13,6 +13,8 @@
 
 #include <QKeyEvent>
 
+#include <memory>
+
 using namespace ToolUtils;
 using namespace DragSelectionTool;
 
@@ -1150,15 +1152,13 @@ bool SelectionTool::keyDown(QKeyEvent *event) {
 
   if (!ti && !vi && !ri) return false;
 
-  DragTool *dragTool = createNewMoveSelectionTool(this);
+  std::unique_ptr<DragTool> dragTool(createNewMoveSelectionTool(this));
   TAffine aff        = TTranslation(delta);
   dragTool->transform(aff);
   double factor = 1.0 / Stage::inch;
   m_deformValues.m_moveValue += factor * delta;
   dragTool->addTransformUndo();
   TTool::getApplication()->getCurrentTool()->notifyToolChanged();
-  delete dragTool;
-  dragTool = 0;
 
   invalidate();
   return true;
