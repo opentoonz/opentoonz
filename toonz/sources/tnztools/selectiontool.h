@@ -152,10 +152,10 @@ public:
 
   SelectionTool *getTool() const { return m_tool; }
 
-  virtual void transform(TAffine aff, double angle){};
-  virtual void transform(TAffine aff){};
-  virtual TPointD transform(int index, TPointD newPos) { return TPointD(); };
-  virtual void addTransformUndo(){};
+  virtual void transform(TAffine aff, double angle){}
+  virtual void transform(TAffine aff){}
+  virtual TPointD transform(int index, TPointD newPos) { return TPointD(); }
+  virtual void addTransformUndo(){}
 
   virtual void leftButtonDown(const TPointD &pos, const TMouseEvent &) = 0;
   virtual void leftButtonDrag(const TPointD &pos, const TMouseEvent &) = 0;
@@ -353,6 +353,7 @@ protected:
     GLOBAL_THICKNESS,
     ADD_SELECTION
   } m_what;  // RV
+
   enum {
     P00 = 0,
     P10 = 1,
@@ -406,7 +407,7 @@ public:
   DragSelectionTool::DeformValues m_deformValues;
 
   SelectionTool(int targetType);
-  ~SelectionTool();
+  ~SelectionTool() override;
 
   ToolType getToolType() const override { return TTool::LevelWriteTool; }
 
