@@ -2434,16 +2434,16 @@ public:
                       .arg(QString::fromStdWString(m_level->getName()));
     switch (m_interpolation) {
     case FilmstripCmd::II_Linear:
-      str += QString("Linear Interporation");
+      str += QString("Linear Interpolation");
       break;
     case FilmstripCmd::II_EaseIn:
-      str += QString("Ease In Interporation");
+      str += QString("Ease In Interpolation");
       break;
     case FilmstripCmd::II_EaseOut:
-      str += QString("Ease Out Interporation");
+      str += QString("Ease Out Interpolation");
       break;
     case FilmstripCmd::II_EaseInOut:
-      str += QString("Ease In-Out Interporation");
+      str += QString("Ease In-Out Interpolation");
       break;
     }
     return str;
@@ -2486,11 +2486,11 @@ void FilmstripCmd::inbetweenWithoutUndo(
     case II_Linear:
       break;
     case II_EaseIn:
-      s = t * t;
-      break;  // s'(0) = 0
-    case II_EaseOut:
       s = t * (2 - t);
       break;  // s'(1) = 0
+    case II_EaseOut:
+      s = t * t;
+      break;  // s'(0) = 0
     case II_EaseInOut:
       s = t * t * (3 - 2 * t);
       break;  // s'(0) = s'(1) = 0
