@@ -77,7 +77,7 @@ void updateOnionSkinSize(const PlayerSet &players) {
   assert(Player::m_onionSkinFrontSize == 0 && Player::m_onionSkinBackSize == 0);
   int i;
   int maxOnionSkinFrontValue = 0, maxOnionSkinBackValue = 0,
-      firstBackOnionSkin = 0, lastBackVisibleSkin = 0;
+      firstFrontOnionSkin = 0, firstBackOnionSkin = 0, lastBackVisibleSkin = 0;
   for (i = 0; i < (int)players.size(); i++) {
     Player player = players[i];
     if (player.m_onionSkinDistance == c_noOnionSkin) continue;
@@ -87,6 +87,12 @@ void updateOnionSkinSize(const PlayerSet &players) {
     if (player.m_onionSkinDistance < 0 &&
         maxOnionSkinBackValue > player.m_onionSkinDistance)
       maxOnionSkinBackValue = player.m_onionSkinDistance;
+    if (firstFrontOnionSkin == 0 && player.m_onionSkinDistance > 0)
+      firstFrontOnionSkin = player.m_onionSkinDistance;
+    else if (player.m_onionSkinDistance > 0 &&
+             firstFrontOnionSkin > player.m_onionSkinDistance)
+      firstFrontOnionSkin = player.m_onionSkinDistance;
+
     if (firstBackOnionSkin == 0 && player.m_onionSkinDistance < 0)
       firstBackOnionSkin = player.m_onionSkinDistance;
     else if (player.m_onionSkinDistance < 0 &&
@@ -99,6 +105,7 @@ void updateOnionSkinSize(const PlayerSet &players) {
   }
   Player::m_onionSkinFrontSize  = maxOnionSkinFrontValue;
   Player::m_onionSkinBackSize   = maxOnionSkinBackValue;
+  Player::m_firstFrontOnionSkin = firstFrontOnionSkin;
   Player::m_firstBackOnionSkin  = firstBackOnionSkin;
   Player::m_lastBackVisibleSkin = lastBackVisibleSkin;
 }
@@ -844,6 +851,7 @@ void Stage::visit(Visitor &visitor, const VisitArgs &args) {
   sb.m_isGuidedDrawingEnabled = args.m_isGuidedDrawingEnabled;
   Player::m_onionSkinFrontSize     = 0;
   Player::m_onionSkinBackSize      = 0;
+  Player::m_firstFrontOnionSkin    = 0;
   Player::m_firstBackOnionSkin     = 0;
   Player::m_lastBackVisibleSkin    = 0;
   Player::m_isShiftAndTraceEnabled = osm->isShiftTraceEnabled();
@@ -884,6 +892,7 @@ void Stage::visit(Visitor &visitor, TXshSimpleLevel *level, const TFrameId &fid,
   sb.m_isGuidedDrawingEnabled      = isGuidedDrawingEnabled;
   Player::m_onionSkinFrontSize     = 0;
   Player::m_onionSkinBackSize      = 0;
+  Player::m_firstFrontOnionSkin    = 0;
   Player::m_firstBackOnionSkin     = 0;
   Player::m_lastBackVisibleSkin    = 0;
   Player::m_isShiftAndTraceEnabled = osm.isShiftTraceEnabled();

@@ -104,6 +104,7 @@ public:
 
   static double m_onionSkinFrontSize;
   static double m_onionSkinBackSize;
+  static double m_firstFrontOnionSkin;
   static double m_firstBackOnionSkin;
   static double m_lastBackVisibleSkin;
 

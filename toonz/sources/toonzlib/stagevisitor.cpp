@@ -861,13 +861,15 @@ void RasterPainter::onVectorImage(TVectorImage *vi,
   rd.m_show0ThickStrokes     = prefs.getShow0ThickLines();
   rd.m_regionAntialias       = prefs.getRegionAntialias();
   rd.m_animatedGuidedDrawing = prefs.getAnimatedGuidedDrawing();
-  if (player.m_onionSkinDistance < 0 &&
+  if (player.m_onionSkinDistance != 0 &&
       (player.m_isCurrentColumn || player.m_isCurrentXsheetLevel)) {
     if (player.m_isGuidedDrawingEnabled == 3         // show guides on all
         || (player.m_isGuidedDrawingEnabled == 1 &&  // show guides on closest
-            player.m_onionSkinDistance == player.m_firstBackOnionSkin) ||
+            (player.m_onionSkinDistance == player.m_firstBackOnionSkin ||
+             player.m_onionSkinDistance == player.m_firstFrontOnionSkin)) ||
         (player.m_isGuidedDrawingEnabled == 2 &&  // show guides on farthest
-         player.m_onionSkinDistance == player.m_onionSkinBackSize) ||
+         (player.m_onionSkinDistance == player.m_onionSkinBackSize ||
+          player.m_onionSkinDistance == player.m_onionSkinFrontSize)) ||
         (player.m_isEditingLevel &&  // fix for level editing mode sending extra
                                      // players
          player.m_isGuidedDrawingEnabled == 2 &&
