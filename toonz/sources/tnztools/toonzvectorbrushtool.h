@@ -128,7 +128,8 @@ public:
   void flushTrackPoint();
   bool doFrameRangeStrokes(TFrameId firstFrameId, TStroke *firstStroke,
                            TFrameId lastFrameId, TStroke *lastStroke,
-                           int interpolationType, bool drawFirstStroke = true);
+                           int interpolationType, bool drawFirstStroke = true,
+                           bool drawLastStroke = true, bool withUndo = true);
   void checkGuideSnapping(bool beforeMousePress, bool invertCheck);
   void checkStrokeSnapping(bool beforeMousePress, bool invertCheck);
   bool doGuidedAutoInbetween(TFrameId cFid, const TVectorImageP &cvi,

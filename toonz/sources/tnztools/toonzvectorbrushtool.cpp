@@ -993,7 +993,8 @@ bool ToonzVectorBrushTool::keyDown(QKeyEvent *event) {
 
 bool ToonzVectorBrushTool::doFrameRangeStrokes(
     TFrameId firstFrameId, TStroke *firstStroke, TFrameId lastFrameId,
-    TStroke *lastStroke, int interpolationType, bool drawFirstStroke) {
+    TStroke *lastStroke, int interpolationType, bool drawFirstStroke,
+    bool drawLastStroke, bool withUndo) {
   TXshSimpleLevel *sl =
       TTool::getApplication()->getCurrentLevel()->getLevel()->getSimpleLevel();
   TStroke *first           = new TStroke();
@@ -1027,7 +1028,7 @@ bool ToonzVectorBrushTool::doFrameRangeStrokes(
   int m = fids.size();
   assert(m > 0);
 
-  TUndoManager::manager()->beginBlock();
+  if (withUndo) TUndoManager::manager()->beginBlock();
   int row = getApplication()->getCurrentFrame()->isEditingScene()
                 ? getApplication()->getCurrentFrame()->getFrameIndex()
                 : -1;
@@ -1064,7 +1065,7 @@ bool ToonzVectorBrushTool::doFrameRangeStrokes(
                          m_isLevelCreated, sl, fid);
     } else if (t == 1) {
       if (swapped && !drawFirstStroke) {
-      } else
+      } else if (drawLastStroke)
         addStrokeToImage(getApplication(), img, lastImage->getStroke(0),
                          m_breakAngles.getValue(), m_isFrameCreated,
                          m_isLevelCreated, sl, fid);
@@ -1080,7 +1081,7 @@ bool ToonzVectorBrushTool::doFrameRangeStrokes(
   }
   if (row != -1) getApplication()->getCurrentFrame()->setFrame(row);
 
-  TUndoManager::manager()->endBlock();
+  if (withUndo) TUndoManager::manager()->endBlock();
   notifyImageChanged();
   return true;
 }
@@ -1101,88 +1102,133 @@ bool ToonzVectorBrushTool::doGuidedAutoInbetween(TFrameId cFid,
   TFrameHandle *currentFrame = app->getCurrentFrame();
 
   int cidx     = currentFrame->getFrameIndex();
-  int mos      = 0;
+  int mosBack  = 0;
+  int mosFront = 0;
   int mosCount = osMask.getMosCount();
-  int fos      = -1;
+  int fosBack  = -1;
+  int fosFront = -1;
   int fosCount = osMask.getFosCount();
-  int os       = -1;
+  int osBack   = -1;
+  int osFront  = -1;
 
   // Find onion-skinned drawing that is being used for guided auto inbetween
   if (Preferences::instance()->getGuidedDrawing() == 1) {
     // Get closest moving unionskin
     for (int i = 0; i < mosCount; i++) {
       int cmos = osMask.getMos(i);
-      if (cmos >= 0) continue;  // skip current or next drawings
-      if (!mos || cmos > mos) mos = cmos;
+      if (cmos == 0) continue;  // skip current
+      if (cmos < 0 && (!mosBack || cmos > mosBack)) mosBack    = cmos;
+      if (cmos > 0 && (!mosFront || cmos < mosFront)) mosFront = cmos;
     }
-    if (mos) os = mos + cidx;
+    if (mosBack) osBack   = mosBack + cidx;
+    if (mosFront) osFront = mosFront + cidx;
 
     // Get closest fixed onionskin
     for (int i = 0; i < fosCount; i++) {
       int cfos = osMask.getFos(i);
-      if (cfos >= cidx) continue;  // skip current or later drawings
-      if (fos == -1 || cfos < fos) fos = cfos;
+      if (cfos == cidx) continue;  // skip current
+      if (cfos < cidx && (fosBack == -1 || cfos < fosBack)) fosBack    = cfos;
+      if (cfos > cidx && (fosFront == -1 || cfos < fosFront)) fosFront = cfos;
     }
 
-    if (os == -1)
-      os = fos;
-    else if (fos != -1)
-      os = std::max(os, fos);
+    if (osBack == -1)
+      osBack = fosBack;
+    else if (fosBack != -1)
+      osBack = std::max(osBack, fosBack);
+    if (osFront == -1)
+      osFront = fosFront;
+    else if (fosFront != -1)
+      osFront = std::min(osFront, fosFront);
   } else if (Preferences::instance()->getGuidedDrawing() ==
              2) {  // Furthest drawing
     // Get moving unionskin
     for (int i = 0; i < mosCount; i++) {
       int cmos = osMask.getMos(i);
-      if (cmos >= 0) continue;  // skip current or next drawings
-      if (!mos || cmos < mos) mos = cmos;
+      if (cmos == 0) continue;  // skip current
+      if (cmos < 0 && (!mosBack || cmos < mosBack)) mosBack    = cmos;
+      if (cmos > 0 && (!mosFront || cmos > mosFront)) mosFront = cmos;
     }
-    if (mos) os = mos + cidx;
+    if (mosBack) osBack   = mosBack + cidx;
+    if (mosFront) osFront = mosFront + cidx;
 
     // Get fixed onionskin
     for (int i = 0; i < fosCount; i++) {
       int cfos = osMask.getFos(i);
-      if (cfos >= cidx) continue;  // skip current or later drawings
-      if (fos == -1 || cfos > fos) fos = cfos;
+      if (cfos == cidx) continue;  // skip current
+      if (cfos < cidx && (fosBack == -1 || cfos > fosBack)) fosBack    = cfos;
+      if (cfos > cidx && (fosFront == -1 || cfos > fosFront)) fosFront = cfos;
     }
 
-    if (os == -1)
-      os = fos;
-    else if (fos != -1)
-      os = std::min(os, fos);
+    if (osBack == -1)
+      osBack = fosBack;
+    else if (fosBack != -1)
+      osBack = std::min(osBack, fosBack);
+    if (osFront == -1)
+      osFront = fosFront;
+    else if (fosFront != -1)
+      osFront = std::max(osFront, fosFront);
   } else
     return false;
 
-  if (os == -1) return false;
-
+  bool resultBack  = false;
+  bool resultFront = false;
   TFrameId oFid;
-  if (currentFrame->isEditingScene()) {
-    TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
-    if (!xsh) return false;
-    int col = app->getCurrentColumn()->getColumnIndex();
-    if (col < 0) return false;
-    TXshCell cell = xsh->getCell(os, col);
-    if (cell.isEmpty()) return false;
-    oFid = cell.getFrameId();
-  } else
-    oFid = sl->getFrameId(os);
+  int cStrokeIdx   = cvi->getStrokeCount();
+  int cStrokeCount = cStrokeIdx + 1;
 
-  TImageP fimg      = sl->getFrame(oFid, false);
-  TVectorImageP fvi = fimg;
-  if (!fvi) return false;
+  TUndoManager::manager()->beginBlock();
+  if (osBack != -1) {
+    if (currentFrame->isEditingScene()) {
+      TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
+      int col      = app->getCurrentColumn()->getColumnIndex();
+      if (xsh && col >= 0) {
+        TXshCell cell             = xsh->getCell(osBack, col);
+        if (!cell.isEmpty()) oFid = cell.getFrameId();
+      }
+    } else
+      oFid = sl->getFrameId(osBack);
 
-  // Check if this stroke is a guided stroke
-  int cStrokeCount = cvi->getStrokeCount() + 1;
-  if (!cStrokeCount || !fvi->getStrokeCount() ||
-      cStrokeCount > fvi->getStrokeCount())
-    return false;
+    TVectorImageP fvi = sl->getFrame(oFid, false);
+    int fStrokeCount  = fvi ? fvi->getStrokeCount() : 0;
+    if (!oFid.isEmptyFrame() && fvi && cStrokeCount && fStrokeCount &&
+        cStrokeCount <= fStrokeCount) {
+      TStroke *fStroke = fvi->getStroke(cStrokeIdx);
 
-  int cStrokeIdx = cvi->getStrokeCount();
+      resultBack =
+          doFrameRangeStrokes(oFid, fStroke, cFid, cStroke,
+                              Preferences::instance()->getGuidedInterpolation(),
+                              false, true, false);
+    }
+  }
 
-  TStroke *fStroke = fvi->getStroke(cStrokeIdx);
+  if (osFront != -1) {
+    bool drawFirstStroke = (osBack != -1 && resultBack) ? false : true;
 
-  return doFrameRangeStrokes(oFid, fStroke, cFid, cStroke,
-                             Preferences::instance()->getGuidedInterpolation(),
-                             false);
+    if (currentFrame->isEditingScene()) {
+      TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
+      int col      = app->getCurrentColumn()->getColumnIndex();
+      if (xsh && col >= 0) {
+        TXshCell cell             = xsh->getCell(osFront, col);
+        if (!cell.isEmpty()) oFid = cell.getFrameId();
+      }
+    } else
+      oFid = sl->getFrameId(osFront);
+
+    TVectorImageP fvi = sl->getFrame(oFid, false);
+    int fStrokeCount  = fvi ? fvi->getStrokeCount() : 0;
+    if (!oFid.isEmptyFrame() && fvi && cStrokeCount && fStrokeCount &&
+        cStrokeCount <= fStrokeCount) {
+      TStroke *fStroke = fvi->getStroke(cStrokeIdx);
+
+      resultFront =
+          doFrameRangeStrokes(cFid, cStroke, oFid, fStroke,
+                              Preferences::instance()->getGuidedInterpolation(),
+                              drawFirstStroke, false, false);
+    }
+  }
+  TUndoManager::manager()->endBlock();
+
+  return resultBack || resultFront;
 }
 
 //--------------------------------------------------------------------------------------------------
