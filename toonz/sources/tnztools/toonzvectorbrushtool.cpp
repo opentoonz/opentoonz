@@ -1021,11 +1021,11 @@ bool ToonzVectorBrushTool::doFrameRangeStrokes(TFrameId firstFrameId,
     case 1:  // LINEAR_WSTR
       break;
     case 2:  // EASEIN_WSTR
-      s = t * t;
-      break;  // s'(0) = 0
-    case 3:   // EASEOUT_WSTR
       s = t * (2 - t);
       break;  // s'(1) = 0
+    case 3:   // EASEOUT_WSTR
+      s = t * t;
+      break;  // s'(0) = 0
     case 4:   // EASEINOUT_WSTR:
       s = t * t * (3 - 2 * t);
       break;  // s'(0) = s'(1) = 0

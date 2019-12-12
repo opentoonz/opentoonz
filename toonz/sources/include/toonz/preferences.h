@@ -415,7 +415,7 @@ public:
     return getBoolValue(useOnionColorsForShiftAndTraceGhosts);
   }
   bool getAnimatedGuidedDrawing() const {
-    return getBoolValue(animatedGuidedDrawing);
+    return getIntValue(animatedGuidedDrawing) == 1;
   }
 
   // Colors  tab
