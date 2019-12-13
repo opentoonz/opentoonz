@@ -22,50 +22,30 @@ TEnv::StringVar SelectionType("SelectionType", "Rectangular");
 
 //-----------------------------------------------------------------------------
 
-DragSelectionTool::DragTool *createNewMoveSelectionTool(SelectionTool *st) {
+template <typename Tv, typename Tr, typename... Args> DragSelectionTool::DragTool* createNewDragTool(SelectionTool* st, Args... args) {
   VectorSelectionTool *vst = dynamic_cast<VectorSelectionTool *>(st);
   RasterSelectionTool *rst = dynamic_cast<RasterSelectionTool *>(st);
   if (vst)
-    return new DragSelectionTool::VectorMoveSelectionTool(vst);
+    return new Tv(vst, args...);
   else if (rst)
-    return new DragSelectionTool::RasterMoveSelectionTool(rst);
-  return 0;
+    return new Tr(rst, args...);
+  return nullptr;
 }
 
-//-----------------------------------------------------------------------------
+DragSelectionTool::DragTool *createNewMoveSelectionTool(SelectionTool *st) {
+  return createNewDragTool<VectorMoveSelectionTool, RasterMoveSelectionTool>(st);
+}
 
 DragSelectionTool::DragTool *createNewRotationTool(SelectionTool *st) {
-  VectorSelectionTool *vst = dynamic_cast<VectorSelectionTool *>(st);
-  RasterSelectionTool *rst = dynamic_cast<RasterSelectionTool *>(st);
-  if (vst)
-    return new DragSelectionTool::VectorRotationTool(vst);
-  else if (rst)
-    return new DragSelectionTool::RasterRotationTool(rst);
-  return 0;
+  return createNewDragTool<VectorRotationTool, RasterRotationTool>(st);
 }
-
-//-----------------------------------------------------------------------------
 
 DragSelectionTool::DragTool *createNewFreeDeformTool(SelectionTool *st) {
-  VectorSelectionTool *vst = dynamic_cast<VectorSelectionTool *>(st);
-  RasterSelectionTool *rst = dynamic_cast<RasterSelectionTool *>(st);
-  if (vst)
-    return new DragSelectionTool::VectorFreeDeformTool(vst);
-  else if (rst)
-    return new DragSelectionTool::RasterFreeDeformTool(rst);
-  return 0;
+  return createNewDragTool<VectorFreeDeformTool, RasterFreeDeformTool>(st);
 }
 
-//-----------------------------------------------------------------------------
-
 DragSelectionTool::DragTool *createNewScaleTool(SelectionTool *st, ScaleType type) {
-  VectorSelectionTool *vst = dynamic_cast<VectorSelectionTool *>(st);
-  RasterSelectionTool *rst = dynamic_cast<RasterSelectionTool *>(st);
-  if (vst)
-    return new DragSelectionTool::VectorScaleTool(vst, type);
-  else if (rst)
-    return new DragSelectionTool::RasterScaleTool(rst, type);
-  return 0;
+  return createNewDragTool<VectorScaleTool, RasterScaleTool>(st, type);
 }
 
 //=============================================================================
