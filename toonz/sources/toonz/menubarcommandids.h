@@ -350,4 +350,9 @@
 
 #define MI_OpenOnlineManual "MI_OpenOnlineManual"
 #define MI_ClearCacheFolder "MI_ClearCacheFolder"
+
+#define MI_SelectNextGuideStroke "MI_SelectNextGuideStroke"
+#define MI_SelectPrevGuideStroke "MI_SelectPrevGuideStroke"
+#define MI_SelectGuideStrokeReset "MI_SelectGuideStrokeReset"
+
 #endif

@@ -8,6 +8,7 @@
 // TnzTools includes
 #include "tools/strokeselection.h"
 #include "tools/levelselection.h"
+#include "tools/cursors.h"
 
 // TnzCore includes
 #include "tstroke.h"
@@ -318,6 +319,7 @@ protected:
   void onDeactivate() override;
 
   void leftButtonDrag(const TPointD &pos, const TMouseEvent &) override;
+  void leftButtonDown(const TPointD &pos, const TMouseEvent &) override;
   void leftButtonUp(const TPointD &pos, const TMouseEvent &) override;
   void leftButtonDoubleClick(const TPointD &, const TMouseEvent &e) override;
   void addContextMenuItems(QMenu *menu) override;
@@ -329,6 +331,12 @@ protected:
 
   bool onPropertyChanged(std::string propertyName) override;
   void onImageChanged() override;
+
+  int getCursorId() const override {
+    if (m_viewer && m_viewer->getGuidedStrokePickerMode())
+      return m_viewer->getGuidedStrokePickerCursor();
+    return m_cursorId;
+  }
 
 private:
   class AttachedLevelSelection final : public LevelSelection {

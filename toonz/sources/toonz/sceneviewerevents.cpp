@@ -1614,7 +1614,10 @@ void SceneViewer::onToolSwitched() {
   invalidateToolStatus();
 
   TTool *tool = TApp::instance()->getCurrentTool()->getTool();
-  if (tool) tool->updateMatrix();
+  if (tool) {
+	  tool->updateMatrix();
+	  if (tool->getViewer()) tool->getViewer()->setGuidedStrokePickerMode(0);
+  }
 
   onLevelChanged();
   update();

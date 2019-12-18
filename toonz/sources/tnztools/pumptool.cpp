@@ -115,7 +115,11 @@ public:
   void mouseMove(const TPointD &pos, const TMouseEvent &e) override;
   bool moveCursor(const TPointD &pos);
 
-  int getCursorId() const override { return m_cursorId; }
+  int getCursorId() const override {
+    if (m_viewer && m_viewer->getGuidedStrokePickerMode())
+      return m_viewer->getGuidedStrokePickerCursor();
+    return m_cursorId;
+  }
   void invalidateCursorArea();
 
   void onDeactivate() override;
@@ -258,6 +262,11 @@ void PumpTool::draw() {
 //----------------------------------------------------------------------
 
 void PumpTool::leftButtonDown(const TPointD &pos, const TMouseEvent &) {
+  if (getViewer() && getViewer()->getGuidedStrokePickerMode()) {
+    getViewer()->doPickGuideStroke(pos);
+    return;
+  }
+
   if (m_active || !m_enabled) return;
 
   assert(m_undo == 0);

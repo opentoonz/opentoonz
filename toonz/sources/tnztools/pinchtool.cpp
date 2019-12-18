@@ -177,6 +177,9 @@ void PinchTool::updateStrokeStatus(TStroke *stroke, double w) {
 //-----------------------------------------------------------------------------
 
 int PinchTool::updateCursor() const {
+  if (m_viewer && m_viewer->getGuidedStrokePickerMode())
+    return m_viewer->getGuidedStrokePickerCursor();
+
   if (!(TVectorImageP)getImage(false)) return ToolCursor::CURSOR_NO;
 
   return m_deformation->getCursorId();
@@ -185,6 +188,11 @@ int PinchTool::updateCursor() const {
 //---------------------------------------------------------------------------
 
 void PinchTool::leftButtonDown(const TPointD &pos, const TMouseEvent &event) {
+  if (getViewer() && getViewer()->getGuidedStrokePickerMode()) {
+    getViewer()->doPickGuideStroke(pos);
+    return;
+  }
+
   m_curr = m_down = pos;
 
   if (!m_active && !m_selector.isSelected()) {

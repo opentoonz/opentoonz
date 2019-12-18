@@ -188,7 +188,11 @@ public:
     m_hitStrokeCorners.clear();
   }
 
-  int getCursorId() const override { return m_cursor; }
+  int getCursorId() const override {
+    if (m_viewer && m_viewer->getGuidedStrokePickerMode())
+      return m_viewer->getGuidedStrokePickerCursor();
+    return m_cursor;
+  }
 } BenderTool;
 
 //-----------------------------------------------------------------------------
@@ -407,6 +411,11 @@ void BenderTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &) {
 //-----------------------------------------------------------------------------
 
 void BenderTool::leftButtonDown(const TPointD &p, const TMouseEvent &) {
+  if (getViewer() && getViewer()->getGuidedStrokePickerMode()) {
+    getViewer()->doPickGuideStroke(p);
+    return;
+  }
+
   m_active         = false;
   TVectorImageP vi = TImageP(getImage(true));
   if (!vi) return;

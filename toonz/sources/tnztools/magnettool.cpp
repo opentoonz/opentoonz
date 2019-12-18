@@ -165,6 +165,11 @@ public:
   void leftButtonDown(const TPointD &pos, const TMouseEvent &e) override {
     TPointD p(pos);
 
+    if (getViewer() && getViewer()->getGuidedStrokePickerMode()) {
+      getViewer()->doPickGuideStroke(p);
+      return;
+    }
+
     m_oldPos = pos;
 
     m_pointAtMouseDown = p;
@@ -438,7 +443,11 @@ lefrightButtonDown(p);
 
   TPropertyGroup *getProperties(int targetType) override { return &m_prop; }
 
-  int getCursorId() const override { return m_cursorId; }
+  int getCursorId() const override {
+    if (m_viewer && m_viewer->getGuidedStrokePickerMode())
+      return m_viewer->getGuidedStrokePickerCursor();
+    return m_cursorId;
+  }
 
   bool onPropertyChanged(std::string propertyName) override {
     if (propertyName == m_toolSize.getName()) {

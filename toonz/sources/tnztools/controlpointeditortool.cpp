@@ -428,6 +428,11 @@ void ControlPointEditorTool::mouseMove(const TPointD &pos,
 
 void ControlPointEditorTool::leftButtonDown(const TPointD &pos,
                                             const TMouseEvent &e) {
+  if (getViewer() && getViewer()->getGuidedStrokePickerMode()) {
+    getViewer()->doPickGuideStroke(pos);
+    return;
+  }
+
   m_pos           = pos;
   double pix      = getPixelSize() * 2.0f;
   double maxDist  = 5 * pix;
@@ -883,6 +888,9 @@ void ControlPointEditorTool::onImageChanged() {
 //---------------------------------------------------------------------------
 
 int ControlPointEditorTool::getCursorId() const {
+  if (m_viewer && m_viewer->getGuidedStrokePickerMode())
+    return m_viewer->getGuidedStrokePickerCursor();
+
   switch (m_cursorType) {
   case NORMAL:
     return ToolCursor::SplineEditorCursor;

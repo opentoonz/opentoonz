@@ -388,7 +388,11 @@ public:
   void onDeactivate() override;
   void onImageChanged() override;
 
-  int getCursorId() const override { return m_cursorId; }
+  int getCursorId() const override {
+    if (m_viewer && m_viewer->getGuidedStrokePickerMode())
+      return m_viewer->getGuidedStrokePickerCursor();
+    return m_cursorId;
+  }
 
   bool onPropertyChanged(std::string propertyName) override;
 
@@ -1199,6 +1203,11 @@ void TypeTool::mouseMove(const TPointD &pos, const TMouseEvent &) {
 
 void TypeTool::leftButtonDown(const TPointD &pos, const TMouseEvent &) {
   TSelection::setCurrent(0);
+
+  if (getViewer() && getViewer()->getGuidedStrokePickerMode()) {
+    getViewer()->doPickGuideStroke(pos);
+    return;
+  }
 
   if (!m_validFonts) return;
 

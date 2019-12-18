@@ -850,6 +850,11 @@ public:
   }
 
   void leftButtonDown(const TPointD &p, const TMouseEvent &e) override {
+    if (getViewer() && getViewer()->getGuidedStrokePickerMode()) {
+      getViewer()->doPickGuideStroke(p);
+      return;
+    }
+
     /* m_active = getApplication()->getCurrentObject()->isSpline() ||
    (bool) getImage(true);*/
     if (!getApplication()->getCurrentObject()->isSpline())
@@ -953,7 +958,11 @@ public:
     if (m_primitive) m_primitive->draw();
   }
 
-  int getCursorId() const override { return ToolCursor::PenCursor; }
+  int getCursorId() const override {
+    if (m_viewer && m_viewer->getGuidedStrokePickerMode())
+      return m_viewer->getGuidedStrokePickerCursor();
+    return ToolCursor::PenCursor;
+  }
 
   int getColorClass() const { return 1; }
 

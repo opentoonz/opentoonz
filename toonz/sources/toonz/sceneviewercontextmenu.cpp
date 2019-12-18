@@ -193,6 +193,16 @@ SceneViewerContextMenu::SceneViewerContextMenu(SceneViewer *parent)
   action->setEnabled(enableInterpolation);
   ret = ret && parent->connect(action, SIGNAL(triggered()), this,
                             SLOT(setGuidedInterpolationEaseInOut()));
+  guidedDrawingMenu->addSeparator();
+  action = CommandManager::instance()->getAction(MI_SelectPrevGuideStroke);
+  action->setEnabled(enableAutoInbetween);
+  guidedDrawingMenu->addAction(action);
+  action = CommandManager::instance()->getAction(MI_SelectNextGuideStroke);
+  action->setEnabled(enableAutoInbetween);
+  guidedDrawingMenu->addAction(action);
+  action = CommandManager::instance()->getAction(MI_SelectGuideStrokeReset);
+  action->setEnabled(true);
+  guidedDrawingMenu->addAction(action);
 
   // Zero Thick
   if (!parent->isPreviewEnabled())
@@ -457,6 +467,7 @@ void SceneViewerContextMenu::savePreviewedFrames() {
       ->saveRenderedFrames();
 }
 
+//-----------------------------------------------------------------------------
 class ZeroThickToggle : public MenuItemHandler {
 public:
   ZeroThickToggle() : MenuItemHandler(MI_ZeroThick) {}

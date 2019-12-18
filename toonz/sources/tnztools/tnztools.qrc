@@ -83,5 +83,9 @@
       <file>Resources/brush_large.png</file>
       <file>Resources/brush_crosshair.png</file>
       <file>Resources/tracker.png</file>
+      <file>Resources/ex_prev.png</file>
+      <file>Resources/ex_prev_left.png</file>
+      <file>Resources/ex_next.png</file>
+      <file>Resources/ex_next_left.png</file>
     </qresource>
 </RCC>

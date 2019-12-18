@@ -87,6 +87,11 @@ public:
   }
 
   void leftButtonDown(const TPointD &pos, const TMouseEvent &) override {
+    if (getViewer() && getViewer()->getGuidedStrokePickerMode()) {
+      getViewer()->doPickGuideStroke(pos);
+      return;
+    }
+
     if (m_active) return;
     assert(m_undo == 0);
     m_active = false;
@@ -505,7 +510,11 @@ Altrimenti non si fa altro che aumentarli i punti di controllo
 
   void onLeave() override { m_draw = false; }
 
-  int getCursorId() const override { return m_cursorId; }
+  int getCursorId() const override {
+    if (m_viewer && m_viewer->getGuidedStrokePickerMode())
+      return m_viewer->getGuidedStrokePickerCursor();
+    return m_cursorId;
+  }
   void onEnter() override {
     m_draw = true;
     if ((TVectorImageP)getImage(false))

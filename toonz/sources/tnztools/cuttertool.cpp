@@ -195,6 +195,11 @@ public:
   }
 
   void leftButtonDown(const TPointD &pos, const TMouseEvent &) override {
+    if (getViewer() && getViewer()->getGuidedStrokePickerMode()) {
+      getViewer()->doPickGuideStroke(pos);
+      return;
+    }
+
     TVectorImageP vi = TImageP(getImage(true));
     if (!vi) return;
     QMutexLocker sl(vi->getMutex());
@@ -314,7 +319,11 @@ public:
       m_cursorId = ToolCursor::CURSOR_NO;
   }
 
-  int getCursorId() const override { return m_cursorId; }
+  int getCursorId() const override {
+    if (m_viewer && m_viewer->getGuidedStrokePickerMode())
+      return m_viewer->getGuidedStrokePickerCursor();
+    return m_cursorId;
+  }
 
 } cutterTool;
 

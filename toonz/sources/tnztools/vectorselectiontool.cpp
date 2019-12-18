@@ -1617,6 +1617,18 @@ void VectorSelectionTool::leftButtonDrag(const TPointD &pos,
 
 //-----------------------------------------------------------------------------
 
+void VectorSelectionTool::leftButtonDown(const TPointD &pos,
+                                         const TMouseEvent &e) {
+  if (getViewer() && getViewer()->getGuidedStrokePickerMode()) {
+    getViewer()->doPickGuideStroke(pos);
+    return;
+  }
+
+  SelectionTool::leftButtonDown(pos, e);
+}
+
+//-----------------------------------------------------------------------------
+
 void VectorSelectionTool::leftButtonUp(const TPointD &pos,
                                        const TMouseEvent &e) {
   m_leftButtonMousePressed = false;

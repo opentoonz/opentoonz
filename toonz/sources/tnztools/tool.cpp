@@ -32,6 +32,7 @@
 #include "toonz/tstageobjecttree.h"
 #include "toonz/dpiscale.h"
 #include "toonz/palettecontroller.h"
+#include "toonz/tonionskinmaskhandle.h"
 
 // TnzCore includes
 #include "tvectorimage.h"
@@ -1022,4 +1023,141 @@ QString TTool::updateEnabled(int rowIndex, int columnIndex) {
 void TTool::setSelectedFrames(const std::set<TFrameId> &selectedFrames) {
   m_selectedFrames = selectedFrames;
   onSelectedFramesChanged();
+}
+
+//-------------------------------------------------------------------------------------------------------------
+
+void TTool::Viewer::getGuidedFrameIdx(int *backIdx, int *frontIdx) {
+  OnionSkinMask osMask =
+      m_application->getCurrentOnionSkin()->getOnionSkinMask();
+  TFrameHandle *currentFrame = getApplication()->getCurrentFrame();
+
+  int cidx     = currentFrame->getFrameIndex();
+  int mosBack  = 0;
+  int mosFront = 0;
+  int mosCount = osMask.getMosCount();
+  int fosBack  = -1;
+  int fosFront = -1;
+  int fosCount = osMask.getFosCount();
+
+  // Find onion-skinned drawing that is being used for guided auto inbetween
+  if (Preferences::instance()->getGuidedDrawing() == 1) {
+    // Get closest moving unionskin
+    for (int i = 0; i < mosCount; i++) {
+      int cmos = osMask.getMos(i);
+      if (cmos == 0) continue;  // skip current
+      if (cmos < 0 && (!mosBack || cmos > mosBack)) mosBack    = cmos;
+      if (cmos > 0 && (!mosFront || cmos < mosFront)) mosFront = cmos;
+    }
+    if (mosBack) *backIdx   = mosBack + cidx;
+    if (mosFront) *frontIdx = mosFront + cidx;
+
+    // Get closest fixed onionskin
+    for (int i = 0; i < fosCount; i++) {
+      int cfos = osMask.getFos(i);
+      if (cfos == cidx) continue;  // skip current
+      if (cfos < cidx && (fosBack == -1 || cfos < fosBack)) fosBack    = cfos;
+      if (cfos > cidx && (fosFront == -1 || cfos < fosFront)) fosFront = cfos;
+    }
+
+    if (*backIdx == -1)
+      *backIdx = fosBack;
+    else if (fosBack != -1)
+      *backIdx = std::max(*backIdx, fosBack);
+    if (*frontIdx == -1)
+      *frontIdx = fosFront;
+    else if (fosFront != -1)
+      *frontIdx = std::min(*frontIdx, fosFront);
+  } else if (Preferences::instance()->getGuidedDrawing() ==
+             2) {  // Furthest drawing
+                   // Get moving unionskin
+    for (int i = 0; i < mosCount; i++) {
+      int cmos = osMask.getMos(i);
+      if (cmos == 0) continue;  // skip current
+      if (cmos < 0 && (!mosBack || cmos < mosBack)) mosBack    = cmos;
+      if (cmos > 0 && (!mosFront || cmos > mosFront)) mosFront = cmos;
+    }
+    if (mosBack) *backIdx   = mosBack + cidx;
+    if (mosFront) *frontIdx = mosFront + cidx;
+
+    // Get fixed onionskin
+    for (int i = 0; i < fosCount; i++) {
+      int cfos = osMask.getFos(i);
+      if (cfos == cidx) continue;  // skip current
+      if (cfos < cidx && (fosBack == -1 || cfos > fosBack)) fosBack    = cfos;
+      if (cfos > cidx && (fosFront == -1 || cfos > fosFront)) fosFront = cfos;
+    }
+
+    if (*backIdx == -1)
+      *backIdx = fosBack;
+    else if (fosBack != -1)
+      *backIdx = std::min(*backIdx, fosBack);
+    if (*frontIdx == -1)
+      *frontIdx = fosFront;
+    else if (fosFront != -1)
+      *frontIdx = std::max(*frontIdx, fosFront);
+  }
+}
+
+//-------------------------------------------------------------------------------------------------------------
+
+void TTool::Viewer::doPickGuideStroke(const TPointD &pos) {
+  int pickerMode = getGuidedStrokePickerMode();
+  setGuidedStrokePickerMode(0);
+
+  int osBack  = -1;
+  int osFront = -1;
+  int os      = -1;
+
+  getGuidedFrameIdx(&osBack, &osFront);
+
+  if (pickerMode == -1)  // Previous Frame
+    os = osBack;
+  else if (pickerMode == 1)  // Next Frame
+    os = osFront;
+  else
+    return;
+
+  TFrameId fid;
+  TFrameHandle *currentFrame = getApplication()->getCurrentFrame();
+  TXshSimpleLevel *sl =
+      getApplication()->getCurrentLevel()->getLevel()->getSimpleLevel();
+  if (!sl) return;
+
+  if (currentFrame->isEditingScene()) {
+    TXsheet *xsh = getApplication()->getCurrentXsheet()->getXsheet();
+    int col      = getApplication()->getCurrentColumn()->getColumnIndex();
+    if (xsh && col >= 0) {
+      TXshCell cell            = xsh->getCell(os, col);
+      if (!cell.isEmpty()) fid = cell.getFrameId();
+    }
+  } else
+    fid = sl->getFrameId(os);
+
+  if (fid.isEmptyFrame()) return;
+
+  TVectorImageP fvi = sl->getFrame(fid, false);
+  if (!fvi) return;
+
+  UINT index;
+  double t, dist2 = 0;
+  double pixelSize = getPixelSize();
+  TAffine aff      = getViewMatrix();
+  double maxDist   = 5 * pixelSize;
+  double maxDist2  = maxDist * maxDist;
+  double checkDist = maxDist2 * 4;
+
+  if (fvi->getNearestStroke(pos, t, index, dist2)) {
+    TStroke *strokeRef = fvi->getStroke(index);
+    TThickPoint cursor = strokeRef->getThickPoint(t);
+    double len         = cursor.thick * pixelSize * sqrt(aff.det());
+    checkDist          = std::max(checkDist, (len * len));
+  }
+
+  if (dist2 >= checkDist) return;
+
+  if (pickerMode == -1)  // Previous Frame
+    setGuidedBackStroke(index);
+  else if (pickerMode == 1)  // Next Frame
+    setGuidedFrontStroke(index);
 }

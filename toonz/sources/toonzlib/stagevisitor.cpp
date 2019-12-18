@@ -883,7 +883,16 @@ void RasterPainter::onVectorImage(TVectorImage *vi,
         TImageP image          = sl->getFrame(player.m_currentFrameId, false);
         TVectorImageP vecImage = image;
         if (vecImage) currentStrokeCount = vecImage->getStrokeCount();
-        if (currentStrokeCount < totalStrokes)
+        if (currentStrokeCount < 0) currentStrokeCount = 0;
+        if (player.m_guidedFrontStroke != -1 &&
+            (player.m_onionSkinDistance == player.m_onionSkinFrontSize ||
+             player.m_onionSkinDistance == player.m_firstFrontOnionSkin))
+          rd.m_indexToHighlight = player.m_guidedFrontStroke;
+        else if (player.m_guidedBackStroke != -1 &&
+                 (player.m_onionSkinDistance == player.m_onionSkinBackSize ||
+                  player.m_onionSkinDistance == player.m_firstBackOnionSkin))
+          rd.m_indexToHighlight = player.m_guidedBackStroke;
+        else if (currentStrokeCount < totalStrokes)
           rd.m_indexToHighlight = currentStrokeCount;
 
         double guidedM[4] = {1.0, 1.0, 1.0, 1.0}, guidedC[4];

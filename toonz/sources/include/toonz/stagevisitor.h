@@ -133,6 +133,8 @@ struct DVAPI VisitArgs {
   bool m_checkPreviewVisibility;
   bool m_rasterizePli;
   int m_isGuidedDrawingEnabled;
+  int m_guidedFrontStroke;
+  int m_guidedBackStroke;
 
 public:
   VisitArgs()
@@ -147,6 +149,8 @@ public:
       , m_onlyVisible(false)
       , m_checkPreviewVisibility(false)
       , m_isGuidedDrawingEnabled(0)
+      , m_guidedFrontStroke(-1)
+      , m_guidedBackStroke(-1)
       , m_rasterizePli(false) {}
 };
 

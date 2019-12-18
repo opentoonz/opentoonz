@@ -631,6 +631,8 @@ void ToonzVectorBrushTool::onDeactivate() {
 //--------------------------------------------------------------------------------------------------
 
 bool ToonzVectorBrushTool::preLeftButtonDown() {
+  if (getViewer() && getViewer()->getGuidedStrokePickerMode()) return false;
+
   touchImage();
   if (m_isFrameCreated) {
     // When the xsheet frame is selected, whole viewer will be updated from
@@ -647,6 +649,11 @@ void ToonzVectorBrushTool::leftButtonDown(const TPointD &pos,
                                           const TMouseEvent &e) {
   TTool::Application *app = TTool::getApplication();
   if (!app) return;
+
+  if (getViewer() && getViewer()->getGuidedStrokePickerMode()) {
+    getViewer()->doPickGuideStroke(pos);
+    return;
+  }
 
   int col   = app->getCurrentColumn()->getColumnIndex();
   m_isPath  = app->getCurrentObject()->isSpline();
@@ -1032,6 +1039,7 @@ bool ToonzVectorBrushTool::doFrameRangeStrokes(
   int row = getApplication()->getCurrentFrame()->isEditingScene()
                 ? getApplication()->getCurrentFrame()->getFrameIndex()
                 : -1;
+  TFrameId cFid = getApplication()->getCurrentFrame()->getFid();
   for (int i = 0; i < m; ++i) {
     TFrameId fid = fids[i];
     assert(firstFrameId <= fid && fid <= lastFrameId);
@@ -1079,7 +1087,10 @@ bool ToonzVectorBrushTool::doFrameRangeStrokes(
                        m_isLevelCreated, sl, fid);
     }
   }
-  if (row != -1) getApplication()->getCurrentFrame()->setFrame(row);
+  if (row != -1)
+    getApplication()->getCurrentFrame()->setFrame(row);
+  else
+    getApplication()->getCurrentFrame()->setFid(cFid);
 
   if (withUndo) TUndoManager::manager()->endBlock();
   notifyImageChanged();
@@ -1087,7 +1098,6 @@ bool ToonzVectorBrushTool::doFrameRangeStrokes(
 }
 
 //--------------------------------------------------------------------------------------------------
-
 bool ToonzVectorBrushTool::doGuidedAutoInbetween(TFrameId cFid,
                                                  const TVectorImageP &cvi,
                                                  TStroke *cStroke) {
@@ -1098,80 +1108,14 @@ bool ToonzVectorBrushTool::doGuidedAutoInbetween(TFrameId cFid,
   TXshSimpleLevel *sl = app->getCurrentLevel()->getLevel()->getSimpleLevel();
   if (!sl) return false;
 
-  OnionSkinMask osMask       = app->getCurrentOnionSkin()->getOnionSkinMask();
-  TFrameHandle *currentFrame = app->getCurrentFrame();
+  int osBack  = -1;
+  int osFront = -1;
 
-  int cidx     = currentFrame->getFrameIndex();
-  int mosBack  = 0;
-  int mosFront = 0;
-  int mosCount = osMask.getMosCount();
-  int fosBack  = -1;
-  int fosFront = -1;
-  int fosCount = osMask.getFosCount();
-  int osBack   = -1;
-  int osFront  = -1;
+  getViewer()->getGuidedFrameIdx(&osBack, &osFront);
 
-  // Find onion-skinned drawing that is being used for guided auto inbetween
-  if (Preferences::instance()->getGuidedDrawing() == 1) {
-    // Get closest moving unionskin
-    for (int i = 0; i < mosCount; i++) {
-      int cmos = osMask.getMos(i);
-      if (cmos == 0) continue;  // skip current
-      if (cmos < 0 && (!mosBack || cmos > mosBack)) mosBack    = cmos;
-      if (cmos > 0 && (!mosFront || cmos < mosFront)) mosFront = cmos;
-    }
-    if (mosBack) osBack   = mosBack + cidx;
-    if (mosFront) osFront = mosFront + cidx;
-
-    // Get closest fixed onionskin
-    for (int i = 0; i < fosCount; i++) {
-      int cfos = osMask.getFos(i);
-      if (cfos == cidx) continue;  // skip current
-      if (cfos < cidx && (fosBack == -1 || cfos < fosBack)) fosBack    = cfos;
-      if (cfos > cidx && (fosFront == -1 || cfos < fosFront)) fosFront = cfos;
-    }
-
-    if (osBack == -1)
-      osBack = fosBack;
-    else if (fosBack != -1)
-      osBack = std::max(osBack, fosBack);
-    if (osFront == -1)
-      osFront = fosFront;
-    else if (fosFront != -1)
-      osFront = std::min(osFront, fosFront);
-  } else if (Preferences::instance()->getGuidedDrawing() ==
-             2) {  // Furthest drawing
-    // Get moving unionskin
-    for (int i = 0; i < mosCount; i++) {
-      int cmos = osMask.getMos(i);
-      if (cmos == 0) continue;  // skip current
-      if (cmos < 0 && (!mosBack || cmos < mosBack)) mosBack    = cmos;
-      if (cmos > 0 && (!mosFront || cmos > mosFront)) mosFront = cmos;
-    }
-    if (mosBack) osBack   = mosBack + cidx;
-    if (mosFront) osFront = mosFront + cidx;
-
-    // Get fixed onionskin
-    for (int i = 0; i < fosCount; i++) {
-      int cfos = osMask.getFos(i);
-      if (cfos == cidx) continue;  // skip current
-      if (cfos < cidx && (fosBack == -1 || cfos > fosBack)) fosBack    = cfos;
-      if (cfos > cidx && (fosFront == -1 || cfos > fosFront)) fosFront = cfos;
-    }
-
-    if (osBack == -1)
-      osBack = fosBack;
-    else if (fosBack != -1)
-      osBack = std::min(osBack, fosBack);
-    if (osFront == -1)
-      osFront = fosFront;
-    else if (fosFront != -1)
-      osFront = std::max(osFront, fosFront);
-  } else
-    return false;
-
-  bool resultBack  = false;
-  bool resultFront = false;
+  TFrameHandle *currentFrame = getApplication()->getCurrentFrame();
+  bool resultBack            = false;
+  bool resultFront           = false;
   TFrameId oFid;
   int cStrokeIdx   = cvi->getStrokeCount();
   int cStrokeCount = cStrokeIdx + 1;
@@ -1190,9 +1134,14 @@ bool ToonzVectorBrushTool::doGuidedAutoInbetween(TFrameId cFid,
 
     TVectorImageP fvi = sl->getFrame(oFid, false);
     int fStrokeCount  = fvi ? fvi->getStrokeCount() : 0;
-    if (!oFid.isEmptyFrame() && fvi && cStrokeCount && fStrokeCount &&
-        cStrokeCount <= fStrokeCount) {
-      TStroke *fStroke = fvi->getStroke(cStrokeIdx);
+
+    int strokeIdx = getViewer()->getGuidedBackStroke() != -1
+                        ? getViewer()->getGuidedBackStroke()
+                        : cStrokeIdx;
+
+    if (!oFid.isEmptyFrame() && fvi && fStrokeCount &&
+        strokeIdx < fStrokeCount) {
+      TStroke *fStroke = fvi->getStroke(strokeIdx);
 
       resultBack =
           doFrameRangeStrokes(oFid, fStroke, cFid, cStroke,
@@ -1216,9 +1165,14 @@ bool ToonzVectorBrushTool::doGuidedAutoInbetween(TFrameId cFid,
 
     TVectorImageP fvi = sl->getFrame(oFid, false);
     int fStrokeCount  = fvi ? fvi->getStrokeCount() : 0;
-    if (!oFid.isEmptyFrame() && fvi && cStrokeCount && fStrokeCount &&
-        cStrokeCount <= fStrokeCount) {
-      TStroke *fStroke = fvi->getStroke(cStrokeIdx);
+
+    int strokeIdx = getViewer()->getGuidedFrontStroke() != -1
+                        ? getViewer()->getGuidedFrontStroke()
+                        : cStrokeIdx;
+
+    if (!oFid.isEmptyFrame() && fvi && fStrokeCount &&
+        strokeIdx < fStrokeCount) {
+      TStroke *fStroke = fvi->getStroke(strokeIdx);
 
       resultFront =
           doFrameRangeStrokes(cFid, cStroke, oFid, fStroke,
@@ -1538,6 +1492,9 @@ void ToonzVectorBrushTool::draw() {
 
   // If toggled off, don't draw brush outline
   if (!Preferences::instance()->isCursorOutlineEnabled()) return;
+
+  // Don't draw brush outline if picking guiding stroke
+  if (getViewer()->getGuidedStrokePickerMode()) return;
 
   // Draw the brush outline - change color when the Ink / Paint check is
   // activated

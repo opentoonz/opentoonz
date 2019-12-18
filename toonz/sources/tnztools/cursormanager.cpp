@@ -92,6 +92,8 @@ const struct {
     {ToolCursor::FillCursorL, "karasu", 7, 25, true},
     {ToolCursor::RulerModifyCursor, "ruler_modify", 7, 7, true},
     {ToolCursor::RulerNewCursor, "ruler_new", 7, 7, true},
+    {ToolCursor::PickPrevCursor, "", 13, 4, false},
+    {ToolCursor::PickNextCursor, "", 13, 4, false},
     {0, 0, 0, 0, false}};
 
 struct CursorData {
@@ -115,6 +117,8 @@ const struct {
                     {ToolCursor::Ex_RGB, "ex_rgb"},
                     {ToolCursor::Ex_HV, "ex_hv"},
                     {ToolCursor::Ex_Precise, "ex_precise"},
+                    {ToolCursor::Ex_Prev, "ex_prev"},
+                    {ToolCursor::Ex_Next, "ex_next"},
                     {0, 0}};
 };  // namespace
 
