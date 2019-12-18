@@ -518,6 +518,9 @@ transformation.
     return m_selectedFrames;
   }
 
+  void tweenSelectedGuideStrokes();
+  void tweenGuideStrokeToSelected();
+
 public:
   static std::vector<int> m_cellsData;  //!< \deprecated  brutto brutto. fix
                                         //! quick & dirty del baco #6213 (undo

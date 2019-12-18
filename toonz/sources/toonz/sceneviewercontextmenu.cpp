@@ -157,51 +157,55 @@ SceneViewerContextMenu::SceneViewerContextMenu(SceneViewer *parent)
   ret = ret && parent->connect(action, SIGNAL(triggered()), this,
                             SLOT(setGuidedDrawingAll()));
   guidedDrawingMenu->addSeparator();
-  bool enableAutoInbetween =
-      guidedDrawingStatus == 1 || guidedDrawingStatus == 2;
-  action = guidedDrawingMenu->addAction(tr("Auto-Inbetween"));
+  bool enableOption = guidedDrawingStatus == 1 || guidedDrawingStatus == 2;
+  action = guidedDrawingMenu->addAction(tr("Auto Inbetween"));
   action->setCheckable(true);
   action->setChecked(Preferences::instance()->getGuidedAutoInbetween());
-  action->setEnabled(enableAutoInbetween);
+  action->setEnabled(enableOption);
   ret = ret && parent->connect(action, SIGNAL(triggered()), this,
                             SLOT(setGuidedAutoInbetween()));
   guidedDrawingMenu->addSeparator();
-  bool enableInterpolation =
-      enableAutoInbetween && Preferences::instance()->getGuidedAutoInbetween();
   int guidedInterpolation = Preferences::instance()->getGuidedInterpolation();
   action = guidedDrawingMenu->addAction(tr("Linear Interpolation"));
   action->setCheckable(true);
   action->setChecked(guidedInterpolation == 1);
-  action->setEnabled(enableInterpolation);
+  action->setEnabled(enableOption);
   ret = ret && parent->connect(action, SIGNAL(triggered()), this,
                             SLOT(setGuidedInterpolationLinear()));
   action = guidedDrawingMenu->addAction(tr("Ease In Interpolation"));
   action->setCheckable(true);
   action->setChecked(guidedInterpolation == 2);
-  action->setEnabled(enableInterpolation);
+  action->setEnabled(enableOption);
   ret = ret && parent->connect(action, SIGNAL(triggered()), this,
                             SLOT(setGuidedInterpolationEaseIn()));
   action = guidedDrawingMenu->addAction(tr("Ease Out Interpolation"));
   action->setCheckable(true);
   action->setChecked(guidedInterpolation == 3);
-  action->setEnabled(enableInterpolation);
+  action->setEnabled(enableOption);
   ret = ret && parent->connect(action, SIGNAL(triggered()), this,
                             SLOT(setGuidedInterpolationEaseOut()));
   action = guidedDrawingMenu->addAction(tr("Ease In/Out Interpolation"));
   action->setCheckable(true);
   action->setChecked(guidedInterpolation == 4);
-  action->setEnabled(enableInterpolation);
+  action->setEnabled(enableOption);
   ret = ret && parent->connect(action, SIGNAL(triggered()), this,
                             SLOT(setGuidedInterpolationEaseInOut()));
   guidedDrawingMenu->addSeparator();
   action = CommandManager::instance()->getAction(MI_SelectPrevGuideStroke);
-  action->setEnabled(enableAutoInbetween);
+  action->setEnabled(enableOption);
   guidedDrawingMenu->addAction(action);
   action = CommandManager::instance()->getAction(MI_SelectNextGuideStroke);
-  action->setEnabled(enableAutoInbetween);
+  action->setEnabled(enableOption);
   guidedDrawingMenu->addAction(action);
   action = CommandManager::instance()->getAction(MI_SelectGuideStrokeReset);
   action->setEnabled(true);
+  guidedDrawingMenu->addAction(action);
+  guidedDrawingMenu->addSeparator();
+  action = CommandManager::instance()->getAction(MI_TweenGuideStrokes);
+  action->setEnabled(enableOption);
+  guidedDrawingMenu->addAction(action);
+  action = CommandManager::instance()->getAction(MI_TweenGuideStrokeToSelected);
+  action->setEnabled(enableOption);
   guidedDrawingMenu->addAction(action);
 
   // Zero Thick

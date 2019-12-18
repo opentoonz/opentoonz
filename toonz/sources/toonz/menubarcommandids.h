@@ -354,5 +354,7 @@
 #define MI_SelectNextGuideStroke "MI_SelectNextGuideStroke"
 #define MI_SelectPrevGuideStroke "MI_SelectPrevGuideStroke"
 #define MI_SelectGuideStrokeReset "MI_SelectGuideStrokeReset"
+#define MI_TweenGuideStrokes "MI_TweenGuideStrokes"
+#define MI_TweenGuideStrokeToSelected "MI_TweenGuideStrokeToSelected"
 
 #endif

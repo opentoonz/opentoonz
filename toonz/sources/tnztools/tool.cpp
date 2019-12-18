@@ -41,6 +41,10 @@
 #include "tcolorstyles.h"
 #include "ttoonzimage.h"
 #include "trasterimage.h"
+#include "strokeselection.h"
+#include "tundo.h"
+
+#include "toonzvectorbrushtool.h"
 
 //*****************************************************************************************
 //    Local namespace
@@ -1160,4 +1164,198 @@ void TTool::Viewer::doPickGuideStroke(const TPointD &pos) {
     setGuidedBackStroke(index);
   else if (pickerMode == 1)  // Next Frame
     setGuidedFrontStroke(index);
+}
+
+//-------------------------------------------------------------------------------------------------------------
+
+void TTool::tweenSelectedGuideStrokes() {
+  if (!getViewer() || !m_application) return;
+
+  TXshSimpleLevel *sl =
+      m_application->getCurrentLevel()->getLevel()->getSimpleLevel();
+  if (!sl) return;
+
+  int backIdx = -1, frontIdx = -1;
+
+  getViewer()->getGuidedFrameIdx(&backIdx, &frontIdx);
+
+  if (backIdx == -1 || frontIdx == -1) return;
+
+  TFrameHandle *currentFrame = getApplication()->getCurrentFrame();
+  int row                    = currentFrame->getFrameIndex();
+  TFrameId bFid, cFid, fFid;
+
+  cFid = getCurrentFid();
+  if (cFid.isEmptyFrame()) return;
+
+  TVectorImageP cvi = sl->getFrame(cFid, false);
+  if (!cvi) return;
+
+  int cStrokeCount = cvi->getStrokeCount();
+
+  if (currentFrame->isEditingScene()) {
+    TXsheet *xsh = m_application->getCurrentXsheet()->getXsheet();
+    int col      = m_application->getCurrentColumn()->getColumnIndex();
+    if (xsh && col >= 0) {
+      TXshCell cell             = xsh->getCell(backIdx, col);
+      if (!cell.isEmpty()) bFid = cell.getFrameId();
+      cell                      = xsh->getCell(frontIdx, col);
+      if (!cell.isEmpty()) fFid = cell.getFrameId();
+    }
+  } else {
+    bFid = sl->getFrameId(backIdx);
+    fFid = sl->getFrameId(frontIdx);
+  }
+  if (bFid.isEmptyFrame() || fFid.isEmptyFrame()) return;
+
+  TVectorImageP bvi = sl->getFrame(bFid, false);
+  TVectorImageP fvi = sl->getFrame(fFid, false);
+
+  if (!bvi || !fvi) return;
+
+  int bStrokeCount = bvi->getStrokeCount();
+  int fStrokeCount = fvi->getStrokeCount();
+
+  if (!bStrokeCount || !fStrokeCount) return;
+
+  int bStrokeIdx = getViewer()->getGuidedBackStroke() != -1
+                       ? getViewer()->getGuidedBackStroke()
+                       : cStrokeCount;
+  int fStrokeIdx = getViewer()->getGuidedFrontStroke() != -1
+                       ? getViewer()->getGuidedFrontStroke()
+                       : cStrokeCount;
+
+  if (bStrokeIdx >= bStrokeCount || fStrokeIdx >= fStrokeCount) return;
+
+  TStroke *bStroke = bvi->getStroke(bStrokeIdx);
+  TStroke *fStroke = fvi->getStroke(fStrokeIdx);
+
+  if (!bStroke || !fStroke) return;
+
+  const std::string currentTool = getName();
+  if (currentTool != T_Brush) m_application->getCurrentTool()->setTool(T_Brush);
+
+  TTool *tool                  = m_application->getCurrentTool()->getTool();
+  ToonzVectorBrushTool *vbTool = (ToonzVectorBrushTool *)tool;
+  if (vbTool)
+    vbTool->doFrameRangeStrokes(
+        bFid, bStroke, fFid, fStroke,
+        Preferences::instance()->getGuidedInterpolation(), false, false, true);
+
+  if (currentTool != T_Brush)
+    m_application->getCurrentTool()->setTool(
+        QString::fromStdString(currentTool));
+}
+
+//-------------------------------------------------------------------------------------------------------------
+
+void TTool::tweenGuideStrokeToSelected() {
+  if (!getViewer() || !m_application) return;
+
+  TXshSimpleLevel *sl =
+      m_application->getCurrentLevel()->getLevel()->getSimpleLevel();
+  if (!sl) return;
+
+  int backIdx = -1, frontIdx = -1;
+
+  getViewer()->getGuidedFrameIdx(&backIdx, &frontIdx);
+
+  TFrameHandle *currentFrame = getApplication()->getCurrentFrame();
+  int row                    = currentFrame->getFrameIndex();
+  TFrameId bFid, cFid, fFid;
+  TVectorImageP bvi, cvi, fvi;
+
+  cFid = getCurrentFid();
+  if (cFid.isEmptyFrame()) return;
+
+  cvi = sl->getFrame(cFid, false);
+  if (!cvi) return;
+
+  int cStrokeCount = cvi->getStrokeCount();
+  if (!cStrokeCount) return;
+
+  StrokeSelection *strokeSelection =
+      dynamic_cast<StrokeSelection *>(getSelection());
+  if (!strokeSelection || strokeSelection->isEmpty()) return;
+  const std::set<int> &selectedStrokeIdxs = strokeSelection->getSelection();
+  const std::set<int>::iterator it        = selectedStrokeIdxs.begin();
+  int cStrokeIdx                          = *it;
+
+  TStroke *cStroke = cvi->getStroke(cStrokeIdx);
+  if (!cStroke) return;
+
+  if (backIdx != -1) {
+    if (currentFrame->isEditingScene()) {
+      TXsheet *xsh = m_application->getCurrentXsheet()->getXsheet();
+      int col      = m_application->getCurrentColumn()->getColumnIndex();
+      if (xsh && col >= 0) {
+        TXshCell cell             = xsh->getCell(backIdx, col);
+        if (!cell.isEmpty()) bFid = cell.getFrameId();
+      }
+    } else
+      bFid = sl->getFrameId(backIdx);
+
+    if (!bFid.isEmptyFrame()) bvi = sl->getFrame(bFid, false);
+  }
+
+  if (frontIdx != -1) {
+    if (currentFrame->isEditingScene()) {
+      TXsheet *xsh = m_application->getCurrentXsheet()->getXsheet();
+      int col      = m_application->getCurrentColumn()->getColumnIndex();
+      if (xsh && col >= 0) {
+        TXshCell cell             = xsh->getCell(frontIdx, col);
+        if (!cell.isEmpty()) fFid = cell.getFrameId();
+      }
+    } else
+      fFid = sl->getFrameId(frontIdx);
+
+    if (!fFid.isEmptyFrame()) fvi = sl->getFrame(fFid, false);
+  }
+
+  if (!bvi && !fvi) return;
+
+  int bStrokeCount = bvi ? bvi->getStrokeCount() : 0;
+  int fStrokeCount = fvi ? fvi->getStrokeCount() : 0;
+
+  if (!bStrokeCount && !fStrokeCount) return;
+
+  int bStrokeIdx = getViewer()->getGuidedBackStroke() != -1
+                       ? getViewer()->getGuidedBackStroke()
+                       : cStrokeCount;
+  int fStrokeIdx = getViewer()->getGuidedFrontStroke() != -1
+                       ? getViewer()->getGuidedFrontStroke()
+                       : cStrokeCount;
+
+  if ((bStrokeCount && bStrokeIdx >= bStrokeCount) ||
+      (fStrokeCount && fStrokeIdx >= fStrokeCount))
+    return;
+
+  TStroke *bStroke = bvi ? bvi->getStroke(bStrokeIdx) : 0;
+  TStroke *fStroke = fvi ? fvi->getStroke(fStrokeIdx) : 0;
+
+  if (!bStroke && !fStroke) return;
+
+  const std::string currentTool = getName();
+  if (currentTool != T_Brush) m_application->getCurrentTool()->setTool(T_Brush);
+
+  TTool *tool                  = m_application->getCurrentTool()->getTool();
+  ToonzVectorBrushTool *vbTool = (ToonzVectorBrushTool *)tool;
+  if (vbTool) {
+    TUndoManager::manager()->beginBlock();
+    if (bStroke)
+      vbTool->doFrameRangeStrokes(
+          bFid, bStroke, cFid, cStroke,
+          Preferences::instance()->getGuidedInterpolation(), false, false,
+          false);
+    if (fStroke)
+      vbTool->doFrameRangeStrokes(
+          cFid, cStroke, fFid, fStroke,
+          Preferences::instance()->getGuidedInterpolation(), false, false,
+          false);
+    TUndoManager::manager()->endBlock();
+  }
+
+  if (currentTool != T_Brush)
+    m_application->getCurrentTool()->setTool(
+        QString::fromStdString(currentTool));
 }

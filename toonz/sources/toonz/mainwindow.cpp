@@ -2158,6 +2158,10 @@ void MainWindow::defineActions() {
                              tr("Select Previous Frame Guide Stroke"), "");
   createRightClickMenuAction(MI_SelectGuideStrokeReset,
                              tr("Reset Guide Stroke Selections"), "");
+  createRightClickMenuAction(MI_TweenGuideStrokes,
+                             tr("Tween Selected Guide Strokes"), "");
+  createRightClickMenuAction(MI_TweenGuideStrokeToSelected,
+                             tr("Tween Guide Strokes to Selected"), "");
 
   // Following actions are for adding "Visualization" menu items to the command
   // bar. They are separated from the original actions in order to avoid

@@ -585,6 +585,45 @@ public:
   }
 } selectGuideStrokeResetCommand;
 
+class TTweenGuideStrokesCommand final : public MenuItemHandler {
+public:
+  TTweenGuideStrokesCommand() : MenuItemHandler(MI_TweenGuideStrokes) {}
+  void execute() override {
+    TVectorImageP vi = (TVectorImageP)TTool::getImage(false);
+    if (!vi) return;
+
+    Preferences *pref = Preferences::instance();
+    if (!pref->isOnionSkinEnabled() ||
+        (pref->getGuidedDrawing() != 1 && pref->getGuidedDrawing() != 2))
+      return;
+
+    TTool *tool = TApp::instance()->getCurrentTool()->getTool();
+    if (!tool) return;
+
+    tool->tweenSelectedGuideStrokes();
+  }
+} tweenGuideStrokesCommand;
+
+class TTweenGuideStrokeToSelectedCommand final : public MenuItemHandler {
+public:
+  TTweenGuideStrokeToSelectedCommand()
+      : MenuItemHandler(MI_TweenGuideStrokeToSelected) {}
+  void execute() override {
+    TVectorImageP vi = (TVectorImageP)TTool::getImage(false);
+    if (!vi) return;
+
+    Preferences *pref = Preferences::instance();
+    if (!pref->isOnionSkinEnabled() ||
+        (pref->getGuidedDrawing() != 1 && pref->getGuidedDrawing() != 2))
+      return;
+
+    TTool *tool = TApp::instance()->getCurrentTool()->getTool();
+    if (!tool) return;
+
+    tool->tweenGuideStrokeToSelected();
+  }
+} tweenGuideStrokeToSelectedCommand;
+
 //=============================================================================
 // SceneViewer
 //-----------------------------------------------------------------------------
