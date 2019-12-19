@@ -1107,7 +1107,10 @@ void TTool::Viewer::getGuidedFrameIdx(int *backIdx, int *frontIdx) {
 
 void TTool::Viewer::doPickGuideStroke(const TPointD &pos) {
   int pickerMode = getGuidedStrokePickerMode();
-  setGuidedStrokePickerMode(0);
+
+  if (!pickerMode) return;
+
+  if (pickerMode >= -2 && pickerMode <= 2) setGuidedStrokePickerMode(0);
 
   int osBack  = -1;
   int osFront = -1;
@@ -1115,12 +1118,10 @@ void TTool::Viewer::doPickGuideStroke(const TPointD &pos) {
 
   getGuidedFrameIdx(&osBack, &osFront);
 
-  if (pickerMode == -1)  // Previous Frame
+  if (pickerMode < 0)  // Previous Frame
     os = osBack;
-  else if (pickerMode == 1)  // Next Frame
+  else if (pickerMode > 0)  // Next Frame
     os = osFront;
-  else
-    return;
 
   TFrameId fid;
   TFrameHandle *currentFrame = getApplication()->getCurrentFrame();
@@ -1150,20 +1151,41 @@ void TTool::Viewer::doPickGuideStroke(const TPointD &pos) {
   double maxDist   = 5 * pixelSize;
   double maxDist2  = maxDist * maxDist;
   double checkDist = maxDist2 * 4;
-
+  TStroke *strokeRef;
   if (fvi->getNearestStroke(pos, t, index, dist2)) {
-    TStroke *strokeRef = fvi->getStroke(index);
+    strokeRef          = fvi->getStroke(index);
     TThickPoint cursor = strokeRef->getThickPoint(t);
     double len         = cursor.thick * pixelSize * sqrt(aff.det());
     checkDist          = std::max(checkDist, (len * len));
   }
 
-  if (dist2 >= checkDist) return;
+  if (dist2 >= checkDist)
+    index = -1;
+  else {
+    if (pickerMode < 0)  // Previous Frame
+      setGuidedBackStroke(index);
+    else if (pickerMode > 0)  // Next Frame
+      setGuidedFrontStroke(index);
+  }
 
-  if (pickerMode == -1)  // Previous Frame
-    setGuidedBackStroke(index);
-  else if (pickerMode == 1)  // Next Frame
-    setGuidedFrontStroke(index);
+  if (pickerMode <= -2) {
+    if (index != -1) setGuidedStrokePickerMode(pickerMode * -1);
+  } else if (pickerMode >= 2) {
+    if (pickerMode >= 3 && index != -1) {
+      ToolHandle *toolHandle        = m_application->getCurrentTool();
+      const std::string currentTool = toolHandle->getTool()->getName();
+      if (currentTool != T_Brush) toolHandle->setTool(T_Brush);
+
+      TTool *tool                  = toolHandle->getTool();
+      ToonzVectorBrushTool *vbTool = (ToonzVectorBrushTool *)tool;
+      if (vbTool) vbTool->doGuidedAutoInbetween(fid, fvi, strokeRef, false);
+
+      if (currentTool != T_Brush)
+        toolHandle->setTool(QString::fromStdString(currentTool));
+
+      setGuidedStrokePickerMode(pickerMode * -1);
+    }
+  }
 }
 
 //-------------------------------------------------------------------------------------------------------------

@@ -137,7 +137,7 @@ public:
   void checkGuideSnapping(bool beforeMousePress, bool invertCheck);
   void checkStrokeSnapping(bool beforeMousePress, bool invertCheck);
   bool doGuidedAutoInbetween(TFrameId cFid, const TVectorImageP &cvi,
-                             TStroke *cStroke);
+                             TStroke *cStroke, bool drawStroke = true);
 
 protected:
   TPropertyGroup m_prop[2];

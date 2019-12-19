@@ -197,6 +197,9 @@ SceneViewerContextMenu::SceneViewerContextMenu(SceneViewer *parent)
   action = CommandManager::instance()->getAction(MI_SelectNextGuideStroke);
   action->setEnabled(enableOption);
   guidedDrawingMenu->addAction(action);
+  action = CommandManager::instance()->getAction(MI_SelectBothGuideStrokes);
+  action->setEnabled(enableOption);
+  guidedDrawingMenu->addAction(action);
   action = CommandManager::instance()->getAction(MI_SelectGuideStrokeReset);
   action->setEnabled(true);
   guidedDrawingMenu->addAction(action);
@@ -205,6 +208,9 @@ SceneViewerContextMenu::SceneViewerContextMenu(SceneViewer *parent)
   action->setEnabled(enableOption);
   guidedDrawingMenu->addAction(action);
   action = CommandManager::instance()->getAction(MI_TweenGuideStrokeToSelected);
+  action->setEnabled(enableOption);
+  guidedDrawingMenu->addAction(action);
+  action = CommandManager::instance()->getAction(MI_SelectGuidesAndTweenMode);
   action->setEnabled(enableOption);
   guidedDrawingMenu->addAction(action);
 

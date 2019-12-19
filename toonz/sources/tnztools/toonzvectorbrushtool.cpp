@@ -967,7 +967,7 @@ void ToonzVectorBrushTool::leftButtonUp(const TPointD &pos,
       int fidx     = getApplication()->getCurrentFrame()->getFrameIndex();
       TFrameId fId = getFrameId();
 
-      strokeAdded = doGuidedAutoInbetween(fId, vi, stroke);
+      strokeAdded = doGuidedAutoInbetween(fId, vi, stroke, true);
 
       if (getApplication()->getCurrentFrame()->isEditingScene())
         getApplication()->getCurrentFrame()->setFrame(fidx);
@@ -1100,7 +1100,8 @@ bool ToonzVectorBrushTool::doFrameRangeStrokes(
 //--------------------------------------------------------------------------------------------------
 bool ToonzVectorBrushTool::doGuidedAutoInbetween(TFrameId cFid,
                                                  const TVectorImageP &cvi,
-                                                 TStroke *cStroke) {
+                                                 TStroke *cStroke,
+                                                 bool drawStroke) {
   TApplication *app = TTool::getApplication();
 
   if (cFid.isEmptyFrame() || cFid.isNoFrame() || !cvi || !cStroke) return false;
@@ -1139,14 +1140,14 @@ bool ToonzVectorBrushTool::doGuidedAutoInbetween(TFrameId cFid,
                         ? getViewer()->getGuidedBackStroke()
                         : cStrokeIdx;
 
-    if (!oFid.isEmptyFrame() && fvi && fStrokeCount &&
+    if (!oFid.isEmptyFrame() && oFid != cFid && fvi && fStrokeCount &&
         strokeIdx < fStrokeCount) {
       TStroke *fStroke = fvi->getStroke(strokeIdx);
 
       resultBack =
           doFrameRangeStrokes(oFid, fStroke, cFid, cStroke,
                               Preferences::instance()->getGuidedInterpolation(),
-                              false, true, false);
+                              false, drawStroke, false);
     }
   }
 
@@ -1170,7 +1171,7 @@ bool ToonzVectorBrushTool::doGuidedAutoInbetween(TFrameId cFid,
                         ? getViewer()->getGuidedFrontStroke()
                         : cStrokeIdx;
 
-    if (!oFid.isEmptyFrame() && fvi && fStrokeCount &&
+    if (!oFid.isEmptyFrame() && oFid != cFid && fvi && fStrokeCount &&
         strokeIdx < fStrokeCount) {
       TStroke *fStroke = fvi->getStroke(strokeIdx);
 

@@ -356,5 +356,7 @@
 #define MI_SelectGuideStrokeReset "MI_SelectGuideStrokeReset"
 #define MI_TweenGuideStrokes "MI_TweenGuideStrokes"
 #define MI_TweenGuideStrokeToSelected "MI_TweenGuideStrokeToSelected"
+#define MI_SelectBothGuideStrokes "MI_SelectBothGuideStrokes"
+#define MI_SelectGuidesAndTweenMode "MI_SelectGuidesAndTweenMode"
 
 #endif

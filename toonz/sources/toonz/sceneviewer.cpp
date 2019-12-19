@@ -567,6 +567,26 @@ public:
   }
 } selectGuideStrokePrevCommand;
 
+class TSelectBothGuideStrokesCommand final : public MenuItemHandler {
+public:
+  TSelectBothGuideStrokesCommand()
+      : MenuItemHandler(MI_SelectBothGuideStrokes) {}
+  void execute() override {
+    TVectorImageP vi = (TVectorImageP)TTool::getImage(false);
+    if (!vi) return;
+
+    Preferences *pref = Preferences::instance();
+    if (!pref->isOnionSkinEnabled() ||
+        (pref->getGuidedDrawing() != 1 && pref->getGuidedDrawing() != 2))
+      return;
+
+    TTool *tool = TApp::instance()->getCurrentTool()->getTool();
+    if (!tool) return;
+
+    tool->getViewer()->setGuidedStrokePickerMode(-2);
+  }
+} selectBothGuideStrokesCommand;
+
 class TSelectGuideStrokeResetCommand final : public MenuItemHandler {
 public:
   TSelectGuideStrokeResetCommand()
@@ -623,6 +643,26 @@ public:
     tool->tweenGuideStrokeToSelected();
   }
 } tweenGuideStrokeToSelectedCommand;
+
+class TSelectGuidesAndTweenCommand final : public MenuItemHandler {
+public:
+  TSelectGuidesAndTweenCommand()
+      : MenuItemHandler(MI_SelectGuidesAndTweenMode) {}
+  void execute() override {
+    TVectorImageP vi = (TVectorImageP)TTool::getImage(false);
+    if (!vi) return;
+
+    Preferences *pref = Preferences::instance();
+    if (!pref->isOnionSkinEnabled() ||
+        (pref->getGuidedDrawing() != 1 && pref->getGuidedDrawing() != 2))
+      return;
+
+    TTool *tool = TApp::instance()->getCurrentTool()->getTool();
+    if (!tool) return;
+
+    tool->getViewer()->setGuidedStrokePickerMode(-3);
+  }
+} selectGuidesAndTweenCommand;
 
 //=============================================================================
 // SceneViewer
