@@ -922,7 +922,7 @@ void ToonzVectorBrushTool::leftButtonUp(const TPointD &pos,
       }
       bool success = doFrameRangeStrokes(
           m_firstFrameId, m_firstStroke, getFrameId(), stroke,
-          m_frameRange.getIndex(), m_firstFrameRange);
+          m_frameRange.getIndex(), m_breakAngles.getValue(), m_firstFrameRange);
       if (e.isCtrlPressed()) {
         if (application) {
           if (m_firstFrameId > currentId) {
@@ -967,7 +967,8 @@ void ToonzVectorBrushTool::leftButtonUp(const TPointD &pos,
       int fidx     = getApplication()->getCurrentFrame()->getFrameIndex();
       TFrameId fId = getFrameId();
 
-      strokeAdded = doGuidedAutoInbetween(fId, vi, stroke, true);
+      strokeAdded = doGuidedAutoInbetween(fId, vi, stroke,
+                                          m_breakAngles.getValue(), true);
 
       if (getApplication()->getCurrentFrame()->isEditingScene())
         getApplication()->getCurrentFrame()->setFrame(fidx);
@@ -1000,8 +1001,8 @@ bool ToonzVectorBrushTool::keyDown(QKeyEvent *event) {
 
 bool ToonzVectorBrushTool::doFrameRangeStrokes(
     TFrameId firstFrameId, TStroke *firstStroke, TFrameId lastFrameId,
-    TStroke *lastStroke, int interpolationType, bool drawFirstStroke,
-    bool drawLastStroke, bool withUndo) {
+    TStroke *lastStroke, int interpolationType, bool breakAngles,
+    bool drawFirstStroke, bool drawLastStroke, bool withUndo) {
   TXshSimpleLevel *sl =
       TTool::getApplication()->getCurrentLevel()->getLevel()->getSimpleLevel();
   TStroke *first           = new TStroke();
@@ -1069,22 +1070,21 @@ bool ToonzVectorBrushTool::doFrameRangeStrokes(
       if (!swapped && !drawFirstStroke) {
       } else
         addStrokeToImage(getApplication(), img, firstImage->getStroke(0),
-                         m_breakAngles.getValue(), m_isFrameCreated,
-                         m_isLevelCreated, sl, fid);
+                         breakAngles, m_isFrameCreated, m_isLevelCreated, sl,
+                         fid);
     } else if (t == 1) {
       if (swapped && !drawFirstStroke) {
       } else if (drawLastStroke)
         addStrokeToImage(getApplication(), img, lastImage->getStroke(0),
-                         m_breakAngles.getValue(), m_isFrameCreated,
-                         m_isLevelCreated, sl, fid);
+                         breakAngles, m_isFrameCreated, m_isLevelCreated, sl,
+                         fid);
     } else {
       assert(firstImage->getStrokeCount() == 1);
       assert(lastImage->getStrokeCount() == 1);
       TVectorImageP vi = TInbetween(firstImage, lastImage).tween(s);
       assert(vi->getStrokeCount() == 1);
-      addStrokeToImage(getApplication(), img, vi->getStroke(0),
-                       m_breakAngles.getValue(), m_isFrameCreated,
-                       m_isLevelCreated, sl, fid);
+      addStrokeToImage(getApplication(), img, vi->getStroke(0), breakAngles,
+                       m_isFrameCreated, m_isLevelCreated, sl, fid);
     }
   }
   if (row != -1)
@@ -1101,6 +1101,7 @@ bool ToonzVectorBrushTool::doFrameRangeStrokes(
 bool ToonzVectorBrushTool::doGuidedAutoInbetween(TFrameId cFid,
                                                  const TVectorImageP &cvi,
                                                  TStroke *cStroke,
+                                                 bool breakAngles,
                                                  bool drawStroke) {
   TApplication *app = TTool::getApplication();
 
@@ -1147,7 +1148,7 @@ bool ToonzVectorBrushTool::doGuidedAutoInbetween(TFrameId cFid,
       resultBack =
           doFrameRangeStrokes(oFid, fStroke, cFid, cStroke,
                               Preferences::instance()->getGuidedInterpolation(),
-                              false, drawStroke, false);
+                              breakAngles, false, drawStroke, false);
     }
   }
 
@@ -1178,7 +1179,7 @@ bool ToonzVectorBrushTool::doGuidedAutoInbetween(TFrameId cFid,
       resultFront =
           doFrameRangeStrokes(cFid, cStroke, oFid, fStroke,
                               Preferences::instance()->getGuidedInterpolation(),
-                              drawFirstStroke, false, false);
+                              breakAngles, drawFirstStroke, false, false);
     }
   }
   TUndoManager::manager()->endBlock();

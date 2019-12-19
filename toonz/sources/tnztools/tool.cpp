@@ -1178,7 +1178,8 @@ void TTool::Viewer::doPickGuideStroke(const TPointD &pos) {
 
       TTool *tool                  = toolHandle->getTool();
       ToonzVectorBrushTool *vbTool = (ToonzVectorBrushTool *)tool;
-      if (vbTool) vbTool->doGuidedAutoInbetween(fid, fvi, strokeRef, false);
+      if (vbTool)
+        vbTool->doGuidedAutoInbetween(fid, fvi, strokeRef, false, false);
 
       if (currentTool != T_Brush)
         toolHandle->setTool(QString::fromStdString(currentTool));
@@ -1262,7 +1263,8 @@ void TTool::tweenSelectedGuideStrokes() {
   if (vbTool)
     vbTool->doFrameRangeStrokes(
         bFid, bStroke, fFid, fStroke,
-        Preferences::instance()->getGuidedInterpolation(), false, false, true);
+        Preferences::instance()->getGuidedInterpolation(), false, false, false,
+        true);
 
   if (currentTool != T_Brush)
     m_application->getCurrentTool()->setTool(
@@ -1368,12 +1370,12 @@ void TTool::tweenGuideStrokeToSelected() {
       vbTool->doFrameRangeStrokes(
           bFid, bStroke, cFid, cStroke,
           Preferences::instance()->getGuidedInterpolation(), false, false,
-          false);
+          false, false);
     if (fStroke)
       vbTool->doFrameRangeStrokes(
           cFid, cStroke, fFid, fStroke,
           Preferences::instance()->getGuidedInterpolation(), false, false,
-          false);
+          false, false);
     TUndoManager::manager()->endBlock();
   }
 
