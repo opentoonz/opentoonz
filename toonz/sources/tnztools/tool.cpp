@@ -1172,18 +1172,13 @@ void TTool::Viewer::doPickGuideStroke(const TPointD &pos) {
     if (index != -1) setGuidedStrokePickerMode(pickerMode * -1);
   } else if (pickerMode >= 2) {
     if (pickerMode >= 3 && index != -1) {
-      ToolHandle *toolHandle        = m_application->getCurrentTool();
-      const std::string currentTool = toolHandle->getTool()->getName();
-      if (currentTool != T_Brush) toolHandle->setTool(T_Brush);
-
-      TTool *tool                  = toolHandle->getTool();
+      TTool *tool = TTool::getTool(T_Brush, TTool::ToolTargetType::VectorImage);
       ToonzVectorBrushTool *vbTool = (ToonzVectorBrushTool *)tool;
-      if (vbTool)
+      if (vbTool) {
+        vbTool->setViewer(this);
         vbTool->doGuidedAutoInbetween(fid, fvi, strokeRef, false, false, false,
                                       false);
-
-      if (currentTool != T_Brush)
-        toolHandle->setTool(QString::fromStdString(currentTool));
+      }
 
       setGuidedStrokePickerMode(pickerMode * -1);
     }
@@ -1256,20 +1251,15 @@ void TTool::tweenSelectedGuideStrokes() {
 
   if (!bStroke || !fStroke) return;
 
-  const std::string currentTool = getName();
-  if (currentTool != T_Brush) m_application->getCurrentTool()->setTool(T_Brush);
-
-  TTool *tool                  = m_application->getCurrentTool()->getTool();
+  TTool *tool = TTool::getTool(T_Brush, TTool::ToolTargetType::VectorImage);
   ToonzVectorBrushTool *vbTool = (ToonzVectorBrushTool *)tool;
-  if (vbTool)
+  if (vbTool) {
+    vbTool->setViewer(m_viewer);
     vbTool->doFrameRangeStrokes(
         bFid, bStroke, fFid, fStroke,
         Preferences::instance()->getGuidedInterpolation(), false, false, false,
         false, false, true);
-
-  if (currentTool != T_Brush)
-    m_application->getCurrentTool()->setTool(
-        QString::fromStdString(currentTool));
+  }
 }
 
 //-------------------------------------------------------------------------------------------------------------
@@ -1360,12 +1350,10 @@ void TTool::tweenGuideStrokeToSelected() {
 
   if (!bStroke && !fStroke) return;
 
-  const std::string currentTool = getName();
-  if (currentTool != T_Brush) m_application->getCurrentTool()->setTool(T_Brush);
-
-  TTool *tool                  = m_application->getCurrentTool()->getTool();
+  TTool *tool = TTool::getTool(T_Brush, TTool::ToolTargetType::VectorImage);
   ToonzVectorBrushTool *vbTool = (ToonzVectorBrushTool *)tool;
   if (vbTool) {
+    vbTool->setViewer(m_viewer);
     TUndoManager::manager()->beginBlock();
     if (bStroke)
       vbTool->doFrameRangeStrokes(
@@ -1379,8 +1367,4 @@ void TTool::tweenGuideStrokeToSelected() {
           false, false, false, false);
     TUndoManager::manager()->endBlock();
   }
-
-  if (currentTool != T_Brush)
-    m_application->getCurrentTool()->setTool(
-        QString::fromStdString(currentTool));
 }
