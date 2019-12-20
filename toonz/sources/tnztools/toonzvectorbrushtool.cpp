@@ -336,8 +336,9 @@ static void findMaxCurvPoints(TStroke *stroke, const float &angoloLim,
 }
 
 static void addStroke(TTool::Application *application, const TVectorImageP &vi,
-                      TStroke *stroke, bool breakAngles, bool frameCreated,
-                      bool levelCreated, TXshSimpleLevel *sLevel = NULL,
+                      TStroke *stroke, bool breakAngles, bool autoGroup,
+                      bool autoFill, bool frameCreated, bool levelCreated,
+                      TXshSimpleLevel *sLevel = NULL,
                       TFrameId fid = TFrameId::NO_FRAME) {
   QMutexLocker lock(vi->getMutex());
 
@@ -381,7 +382,8 @@ static void addStroke(TTool::Application *application, const TVectorImageP &vi,
       TStroke *str = new TStroke(*strokes[i]);
       vi->addStroke(str);
       TUndoManager::manager()->add(new UndoPencil(str, fillInformation, sl, id,
-                                                  frameCreated, levelCreated));
+                                                  frameCreated, levelCreated,
+                                                  autoGroup, autoFill));
     }
     TUndoManager::manager()->endBlock();
   } else {
@@ -392,7 +394,24 @@ static void addStroke(TTool::Application *application, const TVectorImageP &vi,
     TStroke *str = new TStroke(*stroke);
     vi->addStroke(str);
     TUndoManager::manager()->add(new UndoPencil(str, fillInformation, sl, id,
-                                                frameCreated, levelCreated));
+                                                frameCreated, levelCreated,
+                                                autoGroup, autoFill));
+  }
+
+  if (autoGroup && stroke->isSelfLoop()) {
+    int index = vi->getStrokeCount() - 1;
+    vi->group(index, 1);
+    if (autoFill) {
+      // to avoid filling other strokes, I enter into the new stroke group
+      int currentGroup = vi->exitGroup();
+      vi->enterGroup(index);
+      vi->selectFill(stroke->getBBox().enlarge(1, 1), 0, stroke->getStyle(),
+                     false, true, false);
+      if (currentGroup != -1)
+        vi->enterGroup(currentGroup);
+      else
+        vi->exitGroup();
+    }
   }
 
   // Update regions. It will call roundStroke() in
@@ -424,12 +443,13 @@ namespace {
 //-------------------------------------------------------------------
 
 void addStrokeToImage(TTool::Application *application, const TVectorImageP &vi,
-                      TStroke *stroke, bool breakAngles, bool frameCreated,
-                      bool levelCreated, TXshSimpleLevel *sLevel = NULL,
+                      TStroke *stroke, bool breakAngles, bool autoGroup,
+                      bool autoFill, bool frameCreated, bool levelCreated,
+                      TXshSimpleLevel *sLevel = NULL,
                       TFrameId id = TFrameId::NO_FRAME) {
   QMutexLocker lock(vi->getMutex());
-  addStroke(application, vi.getPointer(), stroke, breakAngles, frameCreated,
-            levelCreated, sLevel, id);
+  addStroke(application, vi.getPointer(), stroke, breakAngles, autoGroup,
+            autoFill, frameCreated, levelCreated, sLevel, id);
   // la notifica viene gia fatta da addStroke!
   // getApplication()->getCurrentTool()->getTool()->notifyImageChanged();
 }
@@ -922,7 +942,8 @@ void ToonzVectorBrushTool::leftButtonUp(const TPointD &pos,
       }
       bool success = doFrameRangeStrokes(
           m_firstFrameId, m_firstStroke, getFrameId(), stroke,
-          m_frameRange.getIndex(), m_breakAngles.getValue(), m_firstFrameRange);
+          m_frameRange.getIndex(), m_breakAngles.getValue(), false, false,
+          m_firstFrameRange);
       if (e.isCtrlPressed()) {
         if (application) {
           if (m_firstFrameId > currentId) {
@@ -967,8 +988,8 @@ void ToonzVectorBrushTool::leftButtonUp(const TPointD &pos,
       int fidx     = getApplication()->getCurrentFrame()->getFrameIndex();
       TFrameId fId = getFrameId();
 
-      strokeAdded = doGuidedAutoInbetween(fId, vi, stroke,
-                                          m_breakAngles.getValue(), true);
+      strokeAdded = doGuidedAutoInbetween(
+          fId, vi, stroke, m_breakAngles.getValue(), false, false, true);
 
       if (getApplication()->getCurrentFrame()->isEditingScene())
         getApplication()->getCurrentFrame()->setFrame(fidx);
@@ -978,7 +999,7 @@ void ToonzVectorBrushTool::leftButtonUp(const TPointD &pos,
 
     if (!strokeAdded)
       addStrokeToImage(getApplication(), vi, stroke, m_breakAngles.getValue(),
-                       m_isFrameCreated, m_isLevelCreated);
+                       false, false, m_isFrameCreated, m_isLevelCreated);
     TRectD bbox = stroke->getBBox().enlarge(2) + m_track.getModifiedRegion();
 
     invalidate();  // should use bbox?
@@ -1002,7 +1023,8 @@ bool ToonzVectorBrushTool::keyDown(QKeyEvent *event) {
 bool ToonzVectorBrushTool::doFrameRangeStrokes(
     TFrameId firstFrameId, TStroke *firstStroke, TFrameId lastFrameId,
     TStroke *lastStroke, int interpolationType, bool breakAngles,
-    bool drawFirstStroke, bool drawLastStroke, bool withUndo) {
+    bool autoGroup, bool autoFill, bool drawFirstStroke, bool drawLastStroke,
+    bool withUndo) {
   TXshSimpleLevel *sl =
       TTool::getApplication()->getCurrentLevel()->getLevel()->getSimpleLevel();
   TStroke *first           = new TStroke();
@@ -1070,21 +1092,22 @@ bool ToonzVectorBrushTool::doFrameRangeStrokes(
       if (!swapped && !drawFirstStroke) {
       } else
         addStrokeToImage(getApplication(), img, firstImage->getStroke(0),
-                         breakAngles, m_isFrameCreated, m_isLevelCreated, sl,
-                         fid);
+                         breakAngles, autoGroup, autoFill, m_isFrameCreated,
+                         m_isLevelCreated, sl, fid);
     } else if (t == 1) {
       if (swapped && !drawFirstStroke) {
       } else if (drawLastStroke)
         addStrokeToImage(getApplication(), img, lastImage->getStroke(0),
-                         breakAngles, m_isFrameCreated, m_isLevelCreated, sl,
-                         fid);
+                         breakAngles, autoGroup, autoFill, m_isFrameCreated,
+                         m_isLevelCreated, sl, fid);
     } else {
       assert(firstImage->getStrokeCount() == 1);
       assert(lastImage->getStrokeCount() == 1);
       TVectorImageP vi = TInbetween(firstImage, lastImage).tween(s);
       assert(vi->getStrokeCount() == 1);
       addStrokeToImage(getApplication(), img, vi->getStroke(0), breakAngles,
-                       m_isFrameCreated, m_isLevelCreated, sl, fid);
+                       autoGroup, autoFill, m_isFrameCreated, m_isLevelCreated,
+                       sl, fid);
     }
   }
   if (row != -1)
@@ -1098,11 +1121,9 @@ bool ToonzVectorBrushTool::doFrameRangeStrokes(
 }
 
 //--------------------------------------------------------------------------------------------------
-bool ToonzVectorBrushTool::doGuidedAutoInbetween(TFrameId cFid,
-                                                 const TVectorImageP &cvi,
-                                                 TStroke *cStroke,
-                                                 bool breakAngles,
-                                                 bool drawStroke) {
+bool ToonzVectorBrushTool::doGuidedAutoInbetween(
+    TFrameId cFid, const TVectorImageP &cvi, TStroke *cStroke, bool breakAngles,
+    bool autoGroup, bool autoFill, bool drawStroke) {
   TApplication *app = TTool::getApplication();
 
   if (cFid.isEmptyFrame() || cFid.isNoFrame() || !cvi || !cStroke) return false;
@@ -1145,10 +1166,10 @@ bool ToonzVectorBrushTool::doGuidedAutoInbetween(TFrameId cFid,
         strokeIdx < fStrokeCount) {
       TStroke *fStroke = fvi->getStroke(strokeIdx);
 
-      resultBack =
-          doFrameRangeStrokes(oFid, fStroke, cFid, cStroke,
-                              Preferences::instance()->getGuidedInterpolation(),
-                              breakAngles, false, drawStroke, false);
+      resultBack = doFrameRangeStrokes(
+          oFid, fStroke, cFid, cStroke,
+          Preferences::instance()->getGuidedInterpolation(), breakAngles,
+          autoGroup, autoFill, false, drawStroke, false);
     }
   }
 
@@ -1176,10 +1197,10 @@ bool ToonzVectorBrushTool::doGuidedAutoInbetween(TFrameId cFid,
         strokeIdx < fStrokeCount) {
       TStroke *fStroke = fvi->getStroke(strokeIdx);
 
-      resultFront =
-          doFrameRangeStrokes(cFid, cStroke, oFid, fStroke,
-                              Preferences::instance()->getGuidedInterpolation(),
-                              breakAngles, drawFirstStroke, false, false);
+      resultFront = doFrameRangeStrokes(
+          cFid, cStroke, oFid, fStroke,
+          Preferences::instance()->getGuidedInterpolation(), breakAngles,
+          autoGroup, autoFill, drawFirstStroke, false, false);
     }
   }
   TUndoManager::manager()->endBlock();

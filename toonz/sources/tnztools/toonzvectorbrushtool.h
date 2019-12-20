@@ -133,12 +133,14 @@ public:
   bool doFrameRangeStrokes(TFrameId firstFrameId, TStroke *firstStroke,
                            TFrameId lastFrameId, TStroke *lastStroke,
                            int interpolationType, bool breakAngles,
+                           bool autoGroup = false, bool autoFill = false,
                            bool drawFirstStroke = true,
                            bool drawLastStroke = true, bool withUndo = true);
   void checkGuideSnapping(bool beforeMousePress, bool invertCheck);
   void checkStrokeSnapping(bool beforeMousePress, bool invertCheck);
   bool doGuidedAutoInbetween(TFrameId cFid, const TVectorImageP &cvi,
                              TStroke *cStroke, bool breakAngles,
+                             bool autoGroup = false, bool autoFill = false,
                              bool drawStroke = true);
 
 protected:
