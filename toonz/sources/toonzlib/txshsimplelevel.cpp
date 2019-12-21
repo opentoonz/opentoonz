@@ -930,6 +930,7 @@ void TXshSimpleLevel::loadData(TIStream &is) {
         m_properties->setDoAntialias(antialiasSoftness);
         m_properties->setWhiteTransp(whiteTransp);
         m_properties->setIsStopMotion(isStopMotionLevel);
+        if (isStopMotionLevel == 1) setIsReadOnly(true);
       } else
         throw TException("unexpected tag " + tagName);
     } else {

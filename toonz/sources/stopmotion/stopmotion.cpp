@@ -1265,6 +1265,7 @@ bool StopMotion::importImage() {
   /* set dirty flag */
   sl->getProperties()->setDirtyFlag(true);
   sl->getProperties()->setIsStopMotion(true);
+  sl->setIsReadOnly(true);
 
   // if (m_saveOnCaptureCB->isChecked()) sl->save();
   // for now always save.  This can be tweaked later
