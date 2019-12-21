@@ -1060,7 +1060,7 @@ void TTool::Viewer::getGuidedFrameIdx(int *backIdx, int *frontIdx) {
     for (int i = 0; i < fosCount; i++) {
       int cfos = osMask.getFos(i);
       if (cfos == cidx) continue;  // skip current
-      if (cfos < cidx && (fosBack == -1 || cfos < fosBack)) fosBack    = cfos;
+      if (cfos < cidx && (fosBack == -1 || cfos > fosBack)) fosBack    = cfos;
       if (cfos > cidx && (fosFront == -1 || cfos < fosFront)) fosFront = cfos;
     }
 
@@ -1088,7 +1088,7 @@ void TTool::Viewer::getGuidedFrameIdx(int *backIdx, int *frontIdx) {
     for (int i = 0; i < fosCount; i++) {
       int cfos = osMask.getFos(i);
       if (cfos == cidx) continue;  // skip current
-      if (cfos < cidx && (fosBack == -1 || cfos > fosBack)) fosBack    = cfos;
+      if (cfos < cidx && (fosBack == -1 || cfos < fosBack)) fosBack    = cfos;
       if (cfos > cidx && (fosFront == -1 || cfos > fosFront)) fosFront = cfos;
     }
 
