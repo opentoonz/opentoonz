@@ -1034,6 +1034,9 @@ void TTool::setSelectedFrames(const std::set<TFrameId> &selectedFrames) {
 void TTool::Viewer::getGuidedFrameIdx(int *backIdx, int *frontIdx) {
   OnionSkinMask osMask =
       m_application->getCurrentOnionSkin()->getOnionSkinMask();
+
+  if (!osMask.isEnabled() || osMask.isEmpty()) return;
+
   TFrameHandle *currentFrame = getApplication()->getCurrentFrame();
 
   int cidx     = currentFrame->getFrameIndex();
