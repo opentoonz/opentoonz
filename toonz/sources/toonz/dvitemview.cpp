@@ -1301,6 +1301,7 @@ void DvItemViewerPanel::mouseReleaseEvent(QMouseEvent *) {}
 void DvItemViewerPanel::mouseDoubleClickEvent(QMouseEvent *event) {
   int index = pos2index(event->pos());
   if (index < 0 || index >= getItemCount()) return;
+  if (m_viewer) m_viewer->notifyDoubleClick(index);
   if (!getModel()->canRenameItem(index)) return;
   QRect captionRect = getCaptionRect(index);
   if (!captionRect.contains(event->pos())) return;

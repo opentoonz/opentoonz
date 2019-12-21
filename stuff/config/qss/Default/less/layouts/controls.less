@@ -151,6 +151,19 @@ QPlainTextEdit
         image: url('@{img-url}/checkmark_disabled.svg');
       }
     }
+    &:indeterminate {
+      background-color: @checkbox-bg-color-checked;
+      border-color: @checkbox-border-color-checked;
+      image: url('@{img-url}/checkpartially.svg');
+      &:hover {
+        &:extend(.CheckBox::indicator:hover);
+      }
+      &:disabled {
+        background-color: @checkbox-bg-color-disabled;
+        border-color: @checkbox-border-color-disabled;
+        image: url('@{img-url}/checkpartially_disabled.svg');
+      }
+    }
     &:disabled {
       background-color: @checkbox-bg-color-disabled;
       border-color: @checkbox-border-color-disabled;

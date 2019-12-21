@@ -144,6 +144,7 @@ protected slots:
   virtual void onFilePathsSelected(
       const std::set<TFilePath> &paths,
       const std::list<std::vector<TFrameId>> &fIds);
+  virtual void onFilePathDoubleClicked(const TFilePath &);
 
   // utility function
 public:
@@ -209,6 +210,9 @@ public:
 
 protected:
   void showEvent(QShowEvent *) override;
+
+protected slots:
+  void onFilePathDoubleClicked(const TFilePath &path);
 };
 
 //-----------------------------------------------------------------------------

@@ -159,6 +159,7 @@ protected slots:
                      const QModelIndex &bottomRight);
   void loadResources();
   void onClickedItem(int index);
+  void onDoubleClickedItem(int index);
   void onSelectedItems(const std::set<int> &indexes);
   void folderUp();
   void newFolder();
@@ -200,6 +201,7 @@ protected slots:
 signals:
 
   void filePathClicked(const TFilePath &);
+  void filePathDoubleClicked(const TFilePath &);
   // reuse the list of TFrameId in order to skip loadInfo() when loading the
   // level with sequencial frames.
   void filePathsSelected(const std::set<TFilePath> &,

@@ -346,6 +346,13 @@ void FileBrowserPopup::onFilePathsSelected(
 
 //-----------------------------------------------------------------------------
 
+void FileBrowserPopup::onFilePathDoubleClicked(const TFilePath &)
+{
+  // do nothing by default
+}
+
+//-----------------------------------------------------------------------------
+
 void FileBrowserPopup::setOkText(const QString &text) {
   m_okButton->setText(text);
 }
@@ -495,6 +502,8 @@ LoadScenePopup::LoadScenePopup() : FileBrowserPopup(tr("Load Scene")) {
 
   // set the initial current path according to the current module
   setInitialFolderByCurrentRoom();
+
+  connect(m_browser, SIGNAL(filePathDoubleClicked(const TFilePath&)), this, SLOT(onFilePathDoubleClicked(const TFilePath&)));
 }
 
 bool LoadScenePopup::execute() {
@@ -533,6 +542,11 @@ void LoadScenePopup::setInitialFolderByCurrentRoom() {
 void LoadScenePopup::showEvent(QShowEvent *e) {
   m_nameField->clear();
   FileBrowserPopup::showEvent(e);
+}
+
+void LoadScenePopup::onFilePathDoubleClicked(const TFilePath& path) {
+  Q_UNUSED(path);
+  onOkPressed();
 }
 
 //=============================================================================

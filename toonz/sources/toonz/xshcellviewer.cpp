@@ -3325,6 +3325,8 @@ void CellArea::createCellMenu(QMenu &menu, bool isCellSelected, TXshCell cell) {
           replaceLevelMenu->addAction(
               cmdManager->getAction(MI_RevertToLastSaved));
         menu.addAction(cmdManager->getAction(MI_SetKeyframes));
+        menu.addAction(cmdManager->getAction(MI_ShiftKeyframesDown));
+        menu.addAction(cmdManager->getAction(MI_ShiftKeyframesUp));
       }
       menu.addSeparator();
     }
@@ -3389,6 +3391,8 @@ void CellArea::createCellMenu(QMenu &menu, bool isCellSelected, TXshCell cell) {
     if (cameraCellsSelected) {
       menu.addSeparator();
       menu.addAction(cmdManager->getAction(MI_SetKeyframes));
+      menu.addAction(cmdManager->getAction(MI_ShiftKeyframesDown));
+      menu.addAction(cmdManager->getAction(MI_ShiftKeyframesUp));
     }
   }
   menu.addSeparator();
@@ -3460,6 +3464,9 @@ void CellArea::createKeyMenu(QMenu &menu) {
   menu.addAction(cmdManager->getAction(MI_Paste));
   menu.addAction(cmdManager->getAction(MI_Clear));
   menu.addSeparator();
+  menu.addAction(cmdManager->getAction(MI_ShiftKeyframesDown));
+  menu.addAction(cmdManager->getAction(MI_ShiftKeyframesUp));
+  menu.addSeparator();
   menu.addAction(cmdManager->getAction(MI_OpenFunctionEditor));
 }
 
@@ -3511,6 +3518,8 @@ void CellArea::createKeyLineMenu(QMenu &menu, int row, int col) {
   if (col < 0) {
     menu.addSeparator();
     menu.addAction(cmdManager->getAction(MI_SetKeyframes));
+    menu.addAction(cmdManager->getAction(MI_ShiftKeyframesDown));
+    menu.addAction(cmdManager->getAction(MI_ShiftKeyframesUp));
   }
 
 #ifdef LINETEST

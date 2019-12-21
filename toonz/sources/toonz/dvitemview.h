@@ -412,6 +412,10 @@ public:
     emit clickedItem(index);
     emit selectedItems(m_panel->getSelectedIndices());
   }
+  void notifyDoubleClick(int index) {
+    emit doubleClickedItem(index);
+    emit selectedItems(m_panel->getSelectedIndices());
+  }
 
   void enableGlobalSelection(bool enabled) {
     m_panel->enableGlobalSelection(enabled);
@@ -425,6 +429,7 @@ protected:
 
 signals:
   void clickedItem(int index);
+  void doubleClickedItem(int index);
   void selectedItems(const std::set<int> &indexes);
 };
 

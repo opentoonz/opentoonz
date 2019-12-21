@@ -276,6 +276,9 @@
 #define MI_SelectFollowingKeysInRow "MI_SelectFollowingKeysInRow"
 #define MI_InvertKeyframeSelection "MI_InvertKeyframeSelection"
 
+#define MI_ShiftKeyframesDown "MI_ShiftKeyframesDown"
+#define MI_ShiftKeyframesUp "MI_ShiftKeyframesUp"
+
 #define MI_SetAcceleration "MI_SetAcceleration"
 #define MI_SetDeceleration "MI_SetDeceleration"
 #define MI_SetConstantSpeed "MI_SetConstantSpeed"

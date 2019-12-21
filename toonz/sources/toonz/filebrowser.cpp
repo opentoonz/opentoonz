@@ -240,6 +240,8 @@ FileBrowser::FileBrowser(QWidget *parent, Qt::WFlags flags, bool noContextMenu,
 
   ret = ret && connect(m_itemViewer, SIGNAL(clickedItem(int)), this,
                        SLOT(onClickedItem(int)));
+  ret = ret && connect(m_itemViewer, SIGNAL(doubleClickedItem(int)), this,
+                       SLOT(onDoubleClickedItem(int)));
   ret =
       ret && connect(m_itemViewer, SIGNAL(selectedItems(const std::set<int> &)),
                      this, SLOT(onSelectedItems(const std::set<int> &)));
@@ -2097,6 +2099,23 @@ void FileBrowser::onClickedItem(int index) {
       if (index.isValid()) m_folderTreeView->scrollTo(index);
     } else
       emit filePathClicked(fp);
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+void FileBrowser::onDoubleClickedItem(int index)
+{
+  // TODO: Avoid duplicate code with onClickedItem().
+  if (0 <= index && index < (int)m_items.size()) {
+    // if the folder is clicked, then move the current folder
+    TFilePath fp = m_items[index].m_path;
+    if (m_items[index].m_isFolder) {
+      setFolder(fp, true);
+      QModelIndex index = m_folderTreeView->currentIndex();
+      if (index.isValid()) m_folderTreeView->scrollTo(index);
+    } else
+      emit filePathDoubleClicked(fp);
   }
 }
 

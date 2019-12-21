@@ -68,9 +68,14 @@ public:
   void pasteKeyframes();
   void deleteKeyframes();
   void cutKeyframes();
+  void shiftKeyframes(int direction);
+  void shiftKeyframesDown() { shiftKeyframes(1); }
+  void shiftKeyframesUp() { shiftKeyframes(-1); }
 
   void pasteKeyframesWithShift(int r0, int r1, int c0, int c1);
   void deleteKeyframesWithShift(int r0, int r1, int c0, int c1);
+  void shiftKeyframes(int r0, int r1, int c0, int c1,
+                      bool shiftFollowing = true);
 };
 
 #endif  // TKEYFRAMESELECTION_H

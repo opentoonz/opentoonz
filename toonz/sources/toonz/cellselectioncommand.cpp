@@ -1,6 +1,9 @@
 #include <memory>
 
 #include "cellselection.h"
+#include "cellkeyframeselection.h"
+#include "keyframeselection.h"
+#include "keyframedata.h"
 
 // Tnz6 includes
 #include "tapp.h"
@@ -1675,4 +1678,48 @@ void TCellSelection::cloneLevel() {
   std::unique_ptr<CloneLevelUndo> undo(new CloneLevelUndo(m_range));
 
   if (undo->redo(), undo->m_ok) TUndoManager::manager()->add(undo.release());
+}
+
+//=============================================================================
+
+void TCellSelection::shiftKeyframes(int direction) {
+  if (isEmpty() || areAllColSelectedLocked()) return;
+
+  int shift = m_range.getRowCount() * direction;
+  if (!shift) return;
+
+  TXsheetHandle *xsheet = TApp::instance()->getCurrentXsheet();
+  TXsheet *xsh          = xsheet->getXsheet();
+  TCellKeyframeSelection *cellKeyframeSelection = new TCellKeyframeSelection(
+      new TCellSelection(), new TKeyframeSelection());
+
+  cellKeyframeSelection->setXsheetHandle(xsheet);
+
+  TUndoManager::manager()->beginBlock();
+  for (int col = m_range.m_c0; col <= m_range.m_c1; col++) {
+    TXshColumn *column = xsh->getColumn(col);
+    if (!column || column->isLocked()) continue;
+
+    TStageObjectId colId =
+        col < 0 ? TStageObjectId::ColumnId(xsh->getCameraColumnIndex())
+                : TStageObjectId::ColumnId(col);
+    TStageObject *colObj = xsh->getStageObject(colId);
+    TStageObject::KeyframeMap keyframes;
+    colObj->getKeyframes(keyframes);
+    if (!keyframes.size()) continue;
+    int row = m_range.m_r0;
+    for (TStageObject::KeyframeMap::iterator it = keyframes.begin();
+         it != keyframes.end(); it++) {
+      if (it->first < m_range.m_r0) continue;
+      row = it->first;
+      cellKeyframeSelection->selectCellsKeyframes(row, col,
+                                                  xsh->getFrameCount(), col);
+      cellKeyframeSelection->getKeyframeSelection()->shiftKeyframes(
+          row, row + shift, col, col);
+      break;
+    }
+  }
+  TUndoManager::manager()->endBlock();
+
+  delete cellKeyframeSelection;
 }

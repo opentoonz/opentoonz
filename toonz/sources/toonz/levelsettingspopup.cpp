@@ -49,6 +49,7 @@
 #include "tfiletype.h"
 #include "tlevel.h"
 #include "tstream.h"
+#include "tundo.h"
 
 // Qt includes
 #include <QHBoxLayout>
@@ -68,6 +69,8 @@ namespace {
 QString dpiToString(const TPointD &dpi) {
   if (dpi.x == 0.0 || dpi.y == 0.0)
     return QString("none");
+  else if (dpi.x < 0.0 || dpi.y < 0.0)
+    return LevelSettingsPopup::tr("[Various]");
   else if (areAlmostEqual(dpi.x, dpi.y, 0.01))
     return QString::number(dpi.x);
   else
@@ -84,52 +87,263 @@ TPointD getCurrentCameraDpi() {
   return TPointD(res.lx / size.lx, res.ly / size.ly);
 }
 
+void uniteValue(QString &oldValue, QString &newValue, bool isFirst) {
+  if (isFirst)
+    oldValue = newValue;
+  else if (oldValue != newValue &&
+           oldValue != LevelSettingsPopup::tr("[Various]"))
+    oldValue = LevelSettingsPopup::tr("[Various]");
+}
+
+void uniteValue(int &oldValue, int &newValue, bool isFirst) {
+  if (isFirst)
+    oldValue = newValue;
+  else if (oldValue != -1 && oldValue != newValue)
+    oldValue = -1;
+}
+
+void uniteValue(TPointD &oldValue, TPointD &newValue, bool isFirst) {
+  if (isFirst)
+    oldValue = newValue;
+  else if (oldValue != TPointD(-1, -1) && oldValue != newValue)
+    oldValue = TPointD(-1, -1);
+}
+
+void uniteValue(Qt::CheckState &oldValue, Qt::CheckState &newValue,
+                bool isFirst) {
+  if (isFirst)
+    oldValue = newValue;
+  else if (oldValue != Qt::PartiallyChecked && oldValue != newValue)
+    oldValue = Qt::PartiallyChecked;
+}
+
+void uniteValue(double &oldValue, double &newValue, bool isFirst) {
+  if (isFirst)
+    oldValue = newValue;
+  else if (oldValue != -1.0 && oldValue != newValue)
+    oldValue = -1.0;
+}
+
+class LevelSettingsUndo final : public TUndo {
+public:
+  enum Type {
+    Name,
+    Path,
+    ScanPath,
+    DpiType,
+    Dpi,
+    DoPremulti,
+    WhiteTransp,
+    Softness,
+    Subsampling,
+    LevelType
+  };
+
+private:
+  TXshLevelP m_xl;
+  const Type m_type;
+  const QVariant m_before;
+  const QVariant m_after;
+
+  void setName(const QString name) const {
+    TLevelSet *levelSet =
+        TApp::instance()->getCurrentScene()->getScene()->getLevelSet();
+    levelSet->renameLevel(m_xl.getPointer(), name.toStdWString());
+    TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+    TApp::instance()->getCurrentScene()->notifyCastChange();
+  }
+
+  void setPath(const TFilePath path) const {
+    TXshSoundLevelP sdl = m_xl->getSoundLevel();
+    if (sdl) {
+      sdl->setPath(path);
+      sdl->loadSoundTrack();
+      TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+      TApp::instance()->getCurrentXsheet()->notifyXsheetSoundChanged();
+      return;
+    }
+
+    TXshSimpleLevelP sl  = m_xl->getSimpleLevel();
+    TXshPaletteLevelP pl = m_xl->getPaletteLevel();
+    if (!sl && !pl) return;
+    if (sl) {
+      sl->setPath(path);
+      TApp::instance()
+          ->getPaletteController()
+          ->getCurrentLevelPalette()
+          ->setPalette(sl->getPalette());
+      sl->invalidateFrames();
+      std::vector<TFrameId> frames;
+      sl->getFids(frames);
+      for (auto const &fid : frames) {
+        IconGenerator::instance()->invalidate(sl.getPointer(), fid);
+      }
+    } else if (pl) {
+      pl->setPath(path);
+      TApp::instance()
+          ->getPaletteController()
+          ->getCurrentLevelPalette()
+          ->setPalette(pl->getPalette());
+      pl->load();
+    }
+    TApp::instance()->getCurrentLevel()->notifyLevelChange();
+    TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+  }
+
+  void setScanPath(const TFilePath path) const {
+    TXshSimpleLevelP sl = m_xl->getSimpleLevel();
+    if (!sl || sl->getType() != TZP_XSHLEVEL) return;
+    sl->setScannedPath(path);
+    TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+  }
+
+  void setDpiType(LevelProperties::DpiPolicy policy) const {
+    TXshSimpleLevelP sl = m_xl->getSimpleLevel();
+    if (!sl || sl->getType() == PLI_XSHLEVEL) return;
+    sl->getProperties()->setDpiPolicy(policy);
+    TApp::instance()->getCurrentScene()->setDirtyFlag(true);
+    TApp::instance()->getCurrentLevel()->notifyLevelChange();
+  }
+
+  void setDpi(TPointD dpi) const {
+    TXshSimpleLevelP sl = m_xl->getSimpleLevel();
+    if (!sl || sl->getType() == PLI_XSHLEVEL) return;
+    sl->getProperties()->setDpi(dpi);
+    TApp::instance()->getCurrentScene()->setDirtyFlag(true);
+    TApp::instance()->getCurrentLevel()->notifyLevelChange();
+  }
+
+  void setSubsampling(int subsampling) const {
+    TXshSimpleLevelP sl = m_xl->getSimpleLevel();
+    if (!sl || sl->getType() == PLI_XSHLEVEL) return;
+    sl->getProperties()->setSubsampling(subsampling);
+    sl->invalidateFrames();
+    TApp::instance()->getCurrentScene()->setDirtyFlag(true);
+    TApp::instance()
+        ->getCurrentXsheet()
+        ->getXsheet()
+        ->getStageObjectTree()
+        ->invalidateAll();
+    TApp::instance()->getCurrentLevel()->notifyLevelChange();
+  }
+
+  void setDoPremulti(bool on) const {
+    TXshSimpleLevelP sl = m_xl->getSimpleLevel();
+    if (!sl || sl->getType() == PLI_XSHLEVEL) return;
+    sl->getProperties()->setDoPremultiply(on);
+    TApp::instance()->getCurrentLevel()->notifyLevelChange();
+  }
+
+  void setSoftness(int softness) const {
+    TXshSimpleLevelP sl = m_xl->getSimpleLevel();
+    if (!sl || sl->getType() == PLI_XSHLEVEL) return;
+    sl->getProperties()->setDoAntialias(softness);
+    TApp::instance()->getCurrentLevel()->notifyLevelChange();
+  }
+
+  void setWhiteTransp(bool on) const {
+    TXshSimpleLevelP sl = m_xl->getSimpleLevel();
+    if (!sl || sl->getType() == PLI_XSHLEVEL) return;
+    sl->getProperties()->setWhiteTransp(on);
+    TApp::instance()->getCurrentLevel()->notifyLevelChange();
+  }
+
+  void setValue(const QVariant value) const {
+    switch (m_type) {
+    case Name:
+      setName(value.toString());
+      break;
+    case Path:
+      setPath(TFilePath(value.toString()));
+      break;
+    case ScanPath:
+      setScanPath(TFilePath(value.toString()));
+      break;
+    case DpiType:
+      setDpiType(LevelProperties::DpiPolicy(value.toInt()));
+      break;
+    case Dpi: {
+      QPointF dpi = value.toPointF();
+      setDpi(TPointD(dpi.x(), dpi.y()));
+      break;
+    }
+    case Subsampling:
+      setSubsampling(value.toInt());
+      break;
+    case DoPremulti:
+      setDoPremulti(value.toBool());
+      break;
+    case Softness:
+      setSoftness(value.toInt());
+      break;
+    case WhiteTransp:
+      setWhiteTransp(value.toBool());
+      break;
+    }
+    // This signal is for updating the level settings
+    TApp::instance()->getCurrentScene()->notifySceneChanged();
+  }
+
+public:
+  LevelSettingsUndo(TXshLevel *xl, Type type, const QVariant before,
+                    const QVariant after)
+      : m_xl(xl), m_type(type), m_before(before), m_after(after) {}
+
+  void undo() const override { setValue(m_before); }
+
+  void redo() const override { setValue(m_after); }
+
+  int getSize() const override { return sizeof *this; }
+
+  QString getHistoryString() override {
+    return QObject::tr("Edit Level Settings : %1")
+        .arg(QString::fromStdWString(m_xl->getName()));
+  }
+};
+
 //-----------------------------------------------------------------------------
 }  // anonymous namespace
 //-----------------------------------------------------------------------------
 
 //=============================================================================
 /*! \class LevelSettingsPopup
-                \brief The LevelSettingsPopup class provides a dialog to show
-   and change
-                                         current level settings.
-
-                Inherits \b Dialog.
+   \brief The LevelSettingsPopup class provides a dialog to show
+   and change current level settings.
+   Inherits \b Dialog.
 */
 //-----------------------------------------------------------------------------
 
 LevelSettingsPopup::LevelSettingsPopup()
     : Dialog(TApp::instance()->getMainWindow(), false, false, "LevelSettings")
     , m_whiteTransp(0)
-    , m_scanPathLabel(0)
     , m_scanPathFld(0) {
   setWindowTitle(tr("Level Settings"));
 
-  m_nameFld       = new LineEdit();
-  m_pathFld       = new FileField();  // Path
-  m_scanPathLabel = new QLabel(tr("Scan Path:"));
-  m_scanPathFld   = new FileField();  // ScanPath
-  m_typeLabel     = new QLabel();     // Level Type
+  m_nameFld             = new LineEdit();
+  m_pathFld             = new FileField();  // Path
+  m_scanPathFld         = new FileField();  // ScanPath
+  QLabel *scanPathLabel = new QLabel(tr("Scan Path:"), this);
+  m_typeLabel           = new QLabel();  // Level Type
   // Type
   m_dpiTypeOm = new QComboBox();
   // DPI
-  m_dpiLabel    = new QLabel(tr("DPI:"));
-  m_dpiFld      = new DoubleLineEdit();
-  m_squarePixCB = new CheckBox(tr("Forced Squared Pixel"));
+  QLabel *dpiLabel = new QLabel(tr("DPI:"));
+  m_dpiFld         = new DoubleLineEdit();
+  m_squarePixCB    = new CheckBox(tr("Forced Squared Pixel"));
 
-  m_widthLabel  = new QLabel(tr("Width:"));
-  m_widthFld    = new MeasuredDoubleLineEdit();
-  m_heightLabel = new QLabel(tr("Height:"));
-  m_heightFld   = new MeasuredDoubleLineEdit();
+  QLabel *widthLabel  = new QLabel(tr("Width:"));
+  m_widthFld          = new MeasuredDoubleLineEdit();
+  QLabel *heightLabel = new QLabel(tr("Height:"));
+  m_heightFld         = new MeasuredDoubleLineEdit();
   // Use Camera Dpi
   m_useCameraDpiBtn = new QPushButton(tr("Use Camera DPI"));
 
-  m_cameraDpiLabel = new QLabel(tr(""));
-  m_imageDpiLabel  = new QLabel(tr(""));
-  m_imageResLabel  = new QLabel(tr(""));
-  m_cameraDpiTitle = new QLabel(tr("Camera DPI:"));
-  m_imageDpiTitle  = new QLabel(tr("Image DPI:"));
-  m_imageResTitle  = new QLabel(tr("Resolution:"));
+  m_cameraDpiLabel       = new QLabel(tr(""));
+  m_imageDpiLabel        = new QLabel(tr(""));
+  m_imageResLabel        = new QLabel(tr(""));
+  QLabel *cameraDpiTitle = new QLabel(tr("Camera DPI:"));
+  QLabel *imageDpiTitle  = new QLabel(tr("Image DPI:"));
+  QLabel *imageResTitle  = new QLabel(tr("Resolution:"));
 
   // subsampling
   m_subsamplingLabel = new QLabel(tr("Subsampling:"));
@@ -140,6 +354,7 @@ LevelSettingsPopup::LevelSettingsPopup()
   m_whiteTransp = new CheckBox(tr("White As Transparent"), this);
 
   m_doAntialias       = new CheckBox(tr("Add Antialiasing"), this);
+  m_softnessLabel     = new QLabel(tr("Antialias Softness:"), this);
   m_antialiasSoftness = new DVGui::IntLineEdit(0, 10, 0, 100);
 
   //----
@@ -150,9 +365,8 @@ LevelSettingsPopup::LevelSettingsPopup()
   m_dpiTypeOm->addItem(tr("Image DPI"), "Image DPI");
   m_dpiTypeOm->addItem(tr("Custom DPI"), "Custom DPI");
 
-  m_squarePixCB->setChecked(true);
+  m_squarePixCB->setCheckState(Qt::Checked);
 
-  /*--- Levelサイズの単位はCameraUnitにする --*/
   m_widthFld->setMeasure("camera.lx");
   m_heightFld->setMeasure("camera.ly");
 
@@ -161,15 +375,52 @@ LevelSettingsPopup::LevelSettingsPopup()
     m_heightFld->setDecimals(0);
   }
 
-  m_doPremultiply->setChecked(false);
+  m_doPremultiply->setTristate();
+  m_doPremultiply->setCheckState(Qt::Unchecked);
 
-  m_doAntialias->setChecked(false);
+  m_doAntialias->setTristate();
+  m_doAntialias->setCheckState(Qt::Unchecked);
   m_antialiasSoftness->setEnabled(false);
 
-  m_whiteTransp->setChecked(false);
+  m_whiteTransp->setTristate();
+  m_whiteTransp->setCheckState(Qt::Unchecked);
+
+  // register activation flags
+  m_activateFlags[m_nameFld]     = AllTypes;
+  m_activateFlags[m_pathFld]     = SimpleLevel | Palette | Sound;
+  m_activateFlags[m_scanPathFld] = ToonzRaster;
+  m_activateFlags[scanPathLabel] = ToonzRaster | MultiSelection;
+  // m_activateFlags[m_typeLabel]   = AllTypes | MultiSelection;
+
+  unsigned int dpiWidgetsFlag  = HasDPILevel | HideOnPixelMode | MultiSelection;
+  m_activateFlags[m_dpiTypeOm] = dpiWidgetsFlag;
+  m_activateFlags[dpiLabel]    = dpiWidgetsFlag;
+  m_activateFlags[m_dpiFld]    = dpiWidgetsFlag;
+  m_activateFlags[m_squarePixCB] = dpiWidgetsFlag;
+
+  unsigned int rasterWidgetsFlag     = ToonzRaster | Raster | MultiSelection;
+  m_activateFlags[widthLabel]        = rasterWidgetsFlag;
+  m_activateFlags[m_widthFld]        = rasterWidgetsFlag;
+  m_activateFlags[heightLabel]       = rasterWidgetsFlag;
+  m_activateFlags[m_heightFld]       = rasterWidgetsFlag;
+  m_activateFlags[m_useCameraDpiBtn] = dpiWidgetsFlag;
+  m_activateFlags[m_cameraDpiLabel] =
+      AllTypes | HideOnPixelMode | MultiSelection;
+  m_activateFlags[m_imageDpiLabel] = dpiWidgetsFlag;
+  m_activateFlags[m_imageResLabel] = dpiWidgetsFlag;
+  m_activateFlags[cameraDpiTitle] = AllTypes | HideOnPixelMode | MultiSelection;
+  m_activateFlags[imageDpiTitle]  = dpiWidgetsFlag;
+  m_activateFlags[imageResTitle]  = dpiWidgetsFlag;
+
+  m_activateFlags[m_doPremultiply]     = Raster | MultiSelection;
+  m_activateFlags[m_whiteTransp]       = Raster | MultiSelection;
+  m_activateFlags[m_doAntialias]       = rasterWidgetsFlag;
+  m_activateFlags[m_softnessLabel]     = rasterWidgetsFlag;
+  m_activateFlags[m_antialiasSoftness] = rasterWidgetsFlag;
+  m_activateFlags[m_subsamplingLabel]  = rasterWidgetsFlag;
+  m_activateFlags[m_subsamplingFld]    = rasterWidgetsFlag;
 
   //----layout
-
   m_topLayout->setMargin(5);
   m_topLayout->setSpacing(5);
   {
@@ -185,7 +436,7 @@ LevelSettingsPopup::LevelSettingsPopup()
       nameLayout->addWidget(new QLabel(tr("Path:"), this), 1, 0,
                             Qt::AlignRight | Qt::AlignVCenter);
       nameLayout->addWidget(m_pathFld, 1, 1);
-      nameLayout->addWidget(m_scanPathLabel, 2, 0,
+      nameLayout->addWidget(scanPathLabel, 2, 0,
                             Qt::AlignRight | Qt::AlignVCenter);
       nameLayout->addWidget(m_scanPathFld, 2, 1);
       nameLayout->addWidget(m_typeLabel, 3, 1);
@@ -201,30 +452,29 @@ LevelSettingsPopup::LevelSettingsPopup()
     if (Preferences::instance()->getUnits() == "pixel")
       dpiBox = new QGroupBox(tr("Resolution"), this);
     else
-      dpiBox               = new QGroupBox(tr("DPI && Resolution"), this);
+      dpiBox = new QGroupBox(tr("DPI && Resolution"), this);
     QGridLayout *dpiLayout = new QGridLayout();
     dpiLayout->setMargin(5);
     dpiLayout->setSpacing(5);
     {
       dpiLayout->addWidget(m_dpiTypeOm, 0, 1, 1, 3);
-      dpiLayout->addWidget(m_dpiLabel, 1, 0, Qt::AlignRight | Qt::AlignVCenter);
+      dpiLayout->addWidget(dpiLabel, 1, 0, Qt::AlignRight | Qt::AlignVCenter);
       dpiLayout->addWidget(m_dpiFld, 1, 1);
       dpiLayout->addWidget(m_squarePixCB, 1, 2, 1, 2,
                            Qt::AlignRight | Qt::AlignVCenter);
-      dpiLayout->addWidget(m_widthLabel, 2, 0,
-                           Qt::AlignRight | Qt::AlignVCenter);
+      dpiLayout->addWidget(widthLabel, 2, 0, Qt::AlignRight | Qt::AlignVCenter);
       dpiLayout->addWidget(m_widthFld, 2, 1);
-      dpiLayout->addWidget(m_heightLabel, 2, 2,
+      dpiLayout->addWidget(heightLabel, 2, 2,
                            Qt::AlignRight | Qt::AlignVCenter);
       dpiLayout->addWidget(m_heightFld, 2, 3);
       dpiLayout->addWidget(m_useCameraDpiBtn, 3, 1, 1, 3);
-      dpiLayout->addWidget(m_cameraDpiTitle, 4, 0,
+      dpiLayout->addWidget(cameraDpiTitle, 4, 0,
                            Qt::AlignRight | Qt::AlignVCenter);
       dpiLayout->addWidget(m_cameraDpiLabel, 4, 1, 1, 3);
-      dpiLayout->addWidget(m_imageDpiTitle, 5, 0,
+      dpiLayout->addWidget(imageDpiTitle, 5, 0,
                            Qt::AlignRight | Qt::AlignVCenter);
       dpiLayout->addWidget(m_imageDpiLabel, 5, 1, 1, 3);
-      dpiLayout->addWidget(m_imageResTitle, 6, 0,
+      dpiLayout->addWidget(imageResTitle, 6, 0,
                            Qt::AlignRight | Qt::AlignVCenter);
       dpiLayout->addWidget(m_imageResLabel, 6, 1, 1, 3);
     }
@@ -247,7 +497,7 @@ LevelSettingsPopup::LevelSettingsPopup()
     bottomLay->setMargin(3);
     bottomLay->setSpacing(3);
     {
-      bottomLay->addWidget(new QLabel(tr("Antialias Softness:"), this), 0, 0);
+      bottomLay->addWidget(m_softnessLabel, 0, 0);
       bottomLay->addWidget(m_antialiasSoftness, 0, 1);
 
       bottomLay->addWidget(m_subsamplingLabel, 1, 0);
@@ -264,28 +514,25 @@ LevelSettingsPopup::LevelSettingsPopup()
   //----signal/slot connections
   connect(m_nameFld, SIGNAL(editingFinished()), SLOT(onNameChanged()));
   connect(m_pathFld, SIGNAL(pathChanged()), SLOT(onPathChanged()));
-  connect(m_dpiTypeOm, SIGNAL(currentIndexChanged(int)),
-          SLOT(onDpiTypeChanged(int)));
+  connect(m_dpiTypeOm, SIGNAL(activated(int)), SLOT(onDpiTypeChanged(int)));
   connect(m_dpiFld, SIGNAL(editingFinished()), SLOT(onDpiFieldChanged()));
   connect(m_squarePixCB, SIGNAL(stateChanged(int)),
           SLOT(onSquarePixelChanged(int)));
-  connect(m_widthFld, SIGNAL(editingFinished()), SLOT(onWidthFieldChanged()));
-  connect(m_heightFld, SIGNAL(editingFinished()), SLOT(onHeightFieldChanged()));
+  connect(m_widthFld, SIGNAL(valueChanged()), SLOT(onWidthFieldChanged()));
+  connect(m_heightFld, SIGNAL(valueChanged()), SLOT(onHeightFieldChanged()));
   connect(m_useCameraDpiBtn, SIGNAL(clicked()), SLOT(useCameraDpi()));
   connect(m_subsamplingFld, SIGNAL(editingFinished()),
           SLOT(onSubsamplingChanged()));
 
   /*--- ScanPathの入力に対応 ---*/
   connect(m_scanPathFld, SIGNAL(pathChanged()), SLOT(onScanPathChanged()));
-  connect(m_doPremultiply, SIGNAL(stateChanged(int)),
-          SLOT(onDoPremultiplyChanged(int)));
-  connect(m_doAntialias, SIGNAL(stateChanged(int)),
-          SLOT(onDoAntialiasChanged(int)));
+  connect(m_doPremultiply, SIGNAL(clicked(bool)),
+          SLOT(onDoPremultiplyClicked()));
+  connect(m_doAntialias, SIGNAL(clicked(bool)), SLOT(onDoAntialiasClicked()));
   connect(m_antialiasSoftness, SIGNAL(editingFinished()),
           SLOT(onAntialiasSoftnessChanged()));
 
-  connect(m_whiteTransp, SIGNAL(stateChanged(int)),
-          SLOT(onWhiteTranspChanged(int)));
+  connect(m_whiteTransp, SIGNAL(clicked(bool)), SLOT(onWhiteTranspClicked()));
 
   updateLevelSettings();
 }
@@ -307,39 +554,16 @@ void LevelSettingsPopup::showEvent(QShowEvent *e) {
     ret = ret && connect(castSelection, SIGNAL(itemSelectionChanged()), this,
                          SLOT(onCastSelectionChanged()));
 
-  /*--- Cleanupが行われたときに表示を更新するため ---*/
+  // update level settings after cleanup by this connection
   ret = ret && connect(TApp::instance()->getCurrentScene(),
                        SIGNAL(sceneChanged()), SLOT(onSceneChanged()));
+  ret = ret && connect(TApp::instance()->getCurrentScene(),
+                       SIGNAL(preferenceChanged(const QString &)),
+                       SLOT(onPreferenceChanged(const QString &)));
 
   assert(ret);
   updateLevelSettings();
-  if (Preferences::instance()->getUnits() == "pixel") {
-    m_dpiTypeOm->hide();
-    m_dpiLabel->hide();
-    m_dpiFld->hide();
-    m_squarePixCB->hide();
-    m_useCameraDpiBtn->hide();
-    m_cameraDpiLabel->hide();
-    m_imageDpiLabel->hide();
-    m_imageDpiTitle->hide();
-    m_cameraDpiTitle->hide();
-    m_widthFld->setDecimals(0);
-    m_heightFld->setDecimals(0);
-  } else {
-    m_dpiTypeOm->show();
-    m_dpiLabel->show();
-    m_dpiFld->show();
-    m_squarePixCB->show();
-    m_useCameraDpiBtn->show();
-    m_cameraDpiLabel->show();
-    m_imageDpiLabel->show();
-    m_imageDpiTitle->show();
-    m_cameraDpiTitle->show();
-    m_imageResTitle->show();
-    m_imageResLabel->show();
-    m_widthFld->setDecimals(4);
-    m_heightFld->setDecimals(4);
-  }
+  onPreferenceChanged("");
 }
 
 //-----------------------------------------------------------------------------
@@ -361,6 +585,9 @@ void LevelSettingsPopup::hideEvent(QHideEvent *e) {
 
   ret = ret && disconnect(TApp::instance()->getCurrentScene(),
                           SIGNAL(sceneChanged()), this, SLOT(onSceneChanged()));
+  ret = ret && disconnect(TApp::instance()->getCurrentScene(),
+                          SIGNAL(preferenceChanged(const QString &)), this,
+                          SLOT(onPreferenceChanged(const QString &)));
 
   assert(ret);
   Dialog::hideEvent(e);
@@ -369,6 +596,21 @@ void LevelSettingsPopup::hideEvent(QHideEvent *e) {
 //-----------------------------------------------------------------------------
 
 void LevelSettingsPopup::onSceneChanged() { updateLevelSettings(); }
+
+//-----------------------------------------------------------------------------
+
+void LevelSettingsPopup::onPreferenceChanged(const QString &propertyName) {
+  if (!propertyName.isEmpty() && propertyName != "pixelsOnly") return;
+  bool pixelsMode = Preferences::instance()->getBoolValue(pixelsOnly);
+  QMap<QWidget *, unsigned int>::iterator i = m_activateFlags.begin();
+  while (i != m_activateFlags.end()) {
+    if (i.value() & HideOnPixelMode) i.key()->setHidden(pixelsMode);
+    ++i;
+  }
+  int decimals = (pixelsMode) ? 0 : 4;
+  m_widthFld->setDecimals(decimals);
+  m_heightFld->setDecimals(decimals);
+}
 
 //-----------------------------------------------------------------------------
 
@@ -391,13 +633,133 @@ void LevelSettingsPopup::onSelectionSwitched(TSelection *oldSelection,
           SLOT(onCastSelectionChanged()));
 }
 
+SelectedLevelType LevelSettingsPopup::getType(TXshLevelP level_p) {
+  if (!level_p) return None;
+  switch (level_p->getType()) {
+  case TZP_XSHLEVEL:
+    return ToonzRaster;
+  case OVL_XSHLEVEL:
+    return Raster;
+  case MESH_XSHLEVEL:
+    return Mesh;
+  case PLI_XSHLEVEL:
+    return ToonzVector;
+  case PLT_XSHLEVEL:
+    return Palette;
+  case CHILD_XSHLEVEL:
+    return SubXsheet;
+  case SND_XSHLEVEL:
+    return Sound;
+  default:  // Other types are not supported
+    return Others;
+  }
+}
+
+LevelSettingsValues LevelSettingsPopup::getValues(TXshLevelP level) {
+  LevelSettingsValues values;
+
+  values.name = QString::fromStdWString(level->getName());
+
+  TXshSimpleLevelP sl         = level->getSimpleLevel();
+  TXshPaletteLevelP pl        = level->getPaletteLevel();
+  TXshChildLevelP cl          = level->getChildLevel();
+  TXshSoundLevelP sdl         = level->getSoundLevel();
+  SelectedLevelType levelType = getType(level);
+  // path
+  if (sl) {
+    values.path     = toQString(sl->getPath());
+    values.scanPath = toQString(sl->getScannedPath());
+  } else if (pl)
+    values.path = toQString(pl->getPath());
+  else if (sdl)
+    values.path = toQString(sdl->getPath());
+
+  // leveltype
+  switch (levelType) {
+  case ToonzRaster:
+    values.typeStr = tr("Toonz Raster level");
+    break;
+  case Raster:
+    values.typeStr = tr("Raster level");
+    break;
+  case Mesh:
+    values.typeStr = tr("Mesh level");
+    break;
+  case ToonzVector:
+    values.typeStr = tr("Toonz Vector level");
+    break;
+  case Palette:
+    values.typeStr = tr("Palette level");
+    break;
+  case SubXsheet:
+    values.typeStr = tr("SubXsheet Level");
+    break;
+  case Sound:
+    values.typeStr = tr("Sound Column");
+    break;
+  default:
+    values.typeStr = tr("Another Level Type");
+    break;
+  }
+
+  // dpi & res & resampling
+  if (levelType & HasDPILevel) {
+    LevelProperties::DpiPolicy dpiPolicy = sl->getProperties()->getDpiPolicy();
+    assert(dpiPolicy == LevelProperties::DP_ImageDpi ||
+           dpiPolicy == LevelProperties::DP_CustomDpi);
+    values.dpiType = (dpiPolicy == LevelProperties::DP_ImageDpi) ? 0 : 1;
+
+    // dpi field
+    values.dpi = sl->getDpi();
+    // image dpi
+    values.imageDpi = dpiToString(sl->getImageDpi());
+
+    if (levelType == ToonzRaster || levelType == Raster) {
+      // size field
+      TDimensionD size(0, 0);
+      TDimension res = sl->getResolution();
+      if (res.lx > 0 && res.ly > 0 && values.dpi.x > 0 && values.dpi.y > 0) {
+        size.lx       = res.lx / values.dpi.x;
+        size.ly       = res.ly / values.dpi.y;
+        values.width  = tround(size.lx * 100.0) / 100.0;
+        values.height = tround(size.ly * 100.0) / 100.0;
+      } else {
+        values.width  = -1.0;
+        values.height = -1.0;
+      }
+
+      // image res
+      TDimension imgRes = sl->getResolution();
+      values.imageRes =
+          QString::number(imgRes.lx) + "x" + QString::number(imgRes.ly);
+
+      // subsampling
+      values.subsampling = sl->getProperties()->getSubsampling();
+
+      values.doPremulti =
+          (sl->getProperties()->doPremultiply()) ? Qt::Checked : Qt::Unchecked;
+      values.whiteTransp =
+          (sl->getProperties()->whiteTransp()) ? Qt::Checked : Qt::Unchecked;
+      values.doAntialias = (sl->getProperties()->antialiasSoftness() > 0)
+                               ? Qt::Checked
+                               : Qt::Unchecked;
+      values.softness = sl->getProperties()->antialiasSoftness();
+    }
+  }
+
+  // gather dirty flags (subsampling is editable for only non-dirty levels)
+  if (sl && sl->getProperties()->getDirtyFlag()) values.isDirty = Qt::Checked;
+
+  return values;
+}
+
 //-----------------------------------------------------------------------------
 /*! Update popup value.
                 Take current level and act on level type set popup value.
 */
 void LevelSettingsPopup::updateLevelSettings() {
   TApp *app = TApp::instance();
-  TXshLevelP selectedLevel;
+  m_selectedLevels.clear();
   CastSelection *castSelection =
       dynamic_cast<CastSelection *>(app->getCurrentSelection()->getSelection());
   TCellSelection *cellSelection = dynamic_cast<TCellSelection *>(
@@ -406,58 +768,46 @@ void LevelSettingsPopup::updateLevelSettings() {
       app->getCurrentSelection()->getSelection());
   FxSelection *fxSelection =
       dynamic_cast<FxSelection *>(app->getCurrentSelection()->getSelection());
-
-  /*--セル選択の場合--*/
+  // - - - Cell Selection
   if (cellSelection) {
     TXsheet *currentXsheet = app->getCurrentXsheet()->getXsheet();
     if (currentXsheet && !cellSelection->isEmpty()) {
-      selectedLevel = 0;
       int r0, c0, r1, c1;
       cellSelection->getSelectedCells(r0, c0, r1, c1);
-      for (int c = c0; c <= c1; c++) {
-        for (int r = r0; r <= r1; r++) {
-          if (currentXsheet->getCell(r, c).m_level) {
-            selectedLevel = currentXsheet->getCell(r, c).m_level;
-            break;
-          }
-        }
-        if (selectedLevel) break;
-      }
+      for (int c = c0; c <= c1; c++)
+        for (int r = r0; r <= r1; r++)
+          if (TXshLevelP level = currentXsheet->getCell(r, c).m_level)
+            m_selectedLevels.insert(level);
     } else
-      selectedLevel = app->getCurrentLevel()->getLevel();
+      m_selectedLevels.insert(app->getCurrentLevel()->getLevel());
   }
-  /*--カラム選択の場合--*/
+  // - - - Column Selection
   else if (columnSelection) {
     TXsheet *currentXsheet = app->getCurrentXsheet()->getXsheet();
     if (currentXsheet && !columnSelection->isEmpty()) {
-      selectedLevel   = 0;
-      int sceneLength = currentXsheet->getFrameCount();
-
+      int sceneLength             = currentXsheet->getFrameCount();
       std::set<int> columnIndices = columnSelection->getIndices();
       std::set<int>::iterator it;
-      /*-- 選択Columnを探索、最初に見つかったLevelの内容を表示 --*/
       for (it = columnIndices.begin(); it != columnIndices.end(); ++it) {
         int columnIndex = *it;
-        for (int r = 0; r < sceneLength; r++) {
-          if (currentXsheet->getCell(r, columnIndex).m_level) {
-            selectedLevel = currentXsheet->getCell(r, columnIndex).m_level;
-            break;
-          }
-        }
-        if (selectedLevel) break;
+        int r0, r1;
+        currentXsheet->getCellRange(columnIndex, r0, r1);
+        if (r1 < 0) continue;  // skip empty column
+        for (int r = r0; r <= r1; r++)
+          if (TXshLevelP level = currentXsheet->getCell(r, columnIndex).m_level)
+            m_selectedLevels.insert(level);
       }
     } else
-      selectedLevel = app->getCurrentLevel()->getLevel();
-  } else if (castSelection) {
+      m_selectedLevels.insert(app->getCurrentLevel()->getLevel());
+  }
+  // - - - Cast Selection
+  else if (castSelection) {
     std::vector<TXshLevel *> levels;
     castSelection->getSelectedLevels(levels);
-
-    int selectedLevelSize                    = levels.size();
-    if (selectedLevelSize > 0) selectedLevel = levels[selectedLevelSize - 1];
+    for (TXshLevel *level : levels) m_selectedLevels.insert(level);
   }
-  /*-- Fx選択（Schematicノード選択）の場合 --*/
+  // - - - Schematic Nodes Selection
   else if (fxSelection) {
-    selectedLevel           = 0;
     TXsheet *currentXsheet  = app->getCurrentXsheet()->getXsheet();
     QList<TFxP> selectedFxs = fxSelection->getFxs();
     if (currentXsheet && !selectedFxs.isEmpty()) {
@@ -465,192 +815,120 @@ void LevelSettingsPopup::updateLevelSettings() {
         TLevelColumnFx *lcfx =
             dynamic_cast<TLevelColumnFx *>(selectedFxs.at(f).getPointer());
         if (lcfx) {
-          int firstRow = lcfx->getXshColumn()->getCellColumn()->getFirstRow();
-          TXshLevelP levelP =
-              lcfx->getXshColumn()->getCellColumn()->getCell(firstRow).m_level;
-          if (levelP) {
-            selectedLevel = levelP;
-            break;
-          }
+          int r0, r1;
+          int firstRow =
+              lcfx->getXshColumn()->getCellColumn()->getRange(r0, r1);
+          for (int r = r0; r <= r1; r++)
+            if (TXshLevelP level =
+                    lcfx->getXshColumn()->getCellColumn()->getCell(r).m_level)
+              m_selectedLevels.insert(level);
         }
       }
-      if (!selectedLevel) selectedLevel = app->getCurrentLevel()->getLevel();
+      if (m_selectedLevels.isEmpty())
+        m_selectedLevels.insert(app->getCurrentLevel()->getLevel());
     } else
-      selectedLevel = app->getCurrentLevel()->getLevel();
-    // std::cout<<"fxSelection is current!"<<std::endl;
+      m_selectedLevels.insert(app->getCurrentLevel()->getLevel());
   } else
-    selectedLevel = app->getCurrentLevel()->getLevel();
+    m_selectedLevels.insert(app->getCurrentLevel()->getLevel());
 
-  m_sl  = dynamic_cast<TXshSimpleLevel *>(selectedLevel.getPointer());
-  m_pl  = dynamic_cast<TXshPaletteLevel *>(selectedLevel.getPointer());
-  m_cl  = dynamic_cast<TXshChildLevel *>(selectedLevel.getPointer());
-  m_sdl = dynamic_cast<TXshSoundLevel *>(selectedLevel.getPointer());
-
-  bool isSimpleLevel = m_sl;
-  bool isChildLevel  = m_cl;
-  bool isRasterLevel = m_sl && (m_sl->getType() & RASTER_TYPE);
-  bool isTzpLevel    = m_sl && (m_sl->getType() == TZP_XSHLEVEL);
-  bool isMeshLevel   = m_sl && (m_sl->getType() == MESH_XSHLEVEL);
-
-  bool hasDpiEditing = (isRasterLevel || isMeshLevel);
-
-  // name
-  if (selectedLevel) {
-    m_nameFld->setText(::to_string(selectedLevel->getName()).c_str());
-    m_nameFld->setEnabled(true);
-  } else {
-    m_nameFld->setText(tr(""));
-    m_nameFld->setEnabled(false);
-  }
-
-  // path
-  if (m_sl) {
-    m_pathFld->setPath(toQString(m_sl->getPath()));
-    if (m_scanPathFld)
-      m_scanPathFld->setPath(toQString(m_sl->getScannedPath()));
-  } else if (m_pl) {
-    m_pathFld->setPath(toQString(m_pl->getPath()));
-    if (m_scanPathFld) m_scanPathFld->setPath(tr(""));
-  } else if (m_sdl) {
-    m_pathFld->setPath(toQString(m_sdl->getPath()));
-    if (m_scanPathFld) m_scanPathFld->setPath(tr(""));
-  } else {
-    m_pathFld->setPath(tr(""));
-    if (m_scanPathFld) m_scanPathFld->setPath(tr(""));
-  }
-
-  // leveltype
-  QString levelTypeString = QString(tr(""));
-  if (m_sl) {
-    switch (m_sl->getType()) {
-    case TZI_XSHLEVEL:
-      levelTypeString = tr("Scan level");
-      break;
-    case PLI_XSHLEVEL:
-      levelTypeString = tr("Toonz Vector level");
-      break;
-    case TZP_XSHLEVEL:
-      levelTypeString = tr("Toonz Raster level");
-      break;
-    case OVL_XSHLEVEL:
-      levelTypeString = tr("Raster level");
-      break;
-    case MESH_XSHLEVEL:
-      levelTypeString = tr("Mesh level");
-      break;
-    default:
-      levelTypeString = "?";
-      break;
+  // Unite flags, Remove unsupported items
+  unsigned int levelTypeFlag         = 0;
+  QSet<TXshLevelP>::iterator lvl_itr = m_selectedLevels.begin();
+  while (lvl_itr != m_selectedLevels.end()) {
+    SelectedLevelType type = getType(*lvl_itr);
+    if (type == None || type == Others)
+      lvl_itr = m_selectedLevels.erase(lvl_itr);
+    else {
+      levelTypeFlag |= type;
+      ++lvl_itr;
     }
-  } else if (m_pl)
-    levelTypeString = tr("Palette level");
-  else if (m_sdl)
-    levelTypeString = tr("Sound Column");
+  }
+  if (m_selectedLevels.count() >= 2)
+    levelTypeFlag |= MultiSelection;
+  else if (m_selectedLevels.isEmpty())
+    levelTypeFlag |= NoSelection;
 
-  m_typeLabel->setText(levelTypeString);
-
-  // dpi & res & resampling
-  if (hasDpiEditing) {
-    LevelProperties::DpiPolicy dpiPolicy =
-        m_sl->getProperties()->getDpiPolicy();
-    assert(dpiPolicy == LevelProperties::DP_ImageDpi ||
-           dpiPolicy == LevelProperties::DP_CustomDpi);
-    m_dpiTypeOm->setCurrentIndex(
-        (dpiPolicy == LevelProperties::DP_ImageDpi) ? 0 : 1);
-
-    // dpi field
-    TPointD dpi = m_sl->getDpi();
-    m_dpiFld->setText(dpiToString(dpi));
-    m_dpiFld->setCursorPosition(0);
-
-    // image dpi
-    m_imageDpiLabel->setText(dpiToString(m_sl->getImageDpi()));
-
-    if (isRasterLevel) {
-      // size field
-      TDimensionD size(0, 0);
-      TDimension res = m_sl->getResolution();
-      if (res.lx > 0 && res.ly > 0 && dpi.x > 0 && dpi.y > 0) {
-        size.lx = res.lx / dpi.x;
-        size.ly = res.ly / dpi.y;
-        m_widthFld->setValue(tround(size.lx * 100.0) / 100.0);
-        m_heightFld->setValue(tround(size.ly * 100.0) / 100.0);
-      } else {
-        m_widthFld->setText(tr(""));
-        m_heightFld->setText(tr(""));
-      }
-
-      // image res
-      TDimension imageRes = m_sl->getResolution();
-      m_imageResLabel->setText(QString::number(imageRes.lx) + "x" +
-                               QString::number(imageRes.ly));
-
-      // subsampling
-      m_subsamplingFld->setValue(m_sl->getProperties()->getSubsampling());
-
-      // doPremultiply
-      m_doPremultiply->setChecked(m_sl->getProperties()->doPremultiply());
-      if (m_whiteTransp)
-        m_whiteTransp->setChecked(m_sl->getProperties()->whiteTransp());
-
-      m_antialiasSoftness->setValue(m_sl->getProperties()->antialiasSoftness());
-      m_doAntialias->setChecked(m_sl->getProperties()->antialiasSoftness() > 0);
-    }
-  } else {
-    m_dpiFld->setText(tr(""));
-    m_widthFld->setText(tr(""));
-    m_heightFld->setText(tr(""));
-
-    m_cameraDpiLabel->setText(tr(""));
-    m_imageDpiLabel->setText(tr(""));
-    m_imageResLabel->setText(tr(""));
-
-    m_subsamplingFld->setText(tr(""));
-
-    m_doPremultiply->setChecked(false);
-    m_doAntialias->setChecked(false);
-    if (m_whiteTransp) m_whiteTransp->setChecked(false);
+  // Enable / Disable all widgets
+  QMap<QWidget *, unsigned int>::iterator w_itr = m_activateFlags.begin();
+  while (w_itr != m_activateFlags.end()) {
+    unsigned int activateFlag = w_itr.value();
+    w_itr.key()->setEnabled((levelTypeFlag & activateFlag) == levelTypeFlag);
+    ++w_itr;
   }
 
-  // camera dpi
+  // Gather values
+  LevelSettingsValues values;
+  lvl_itr = m_selectedLevels.begin();
+  while (lvl_itr != m_selectedLevels.end()) {
+    TXshLevelP level            = *lvl_itr;
+    bool isFirst                = (lvl_itr == m_selectedLevels.begin());
+    LevelSettingsValues new_val = getValues(level);
+
+    uniteValue(values.name, new_val.name, isFirst);
+    uniteValue(values.path, new_val.path, isFirst);
+    uniteValue(values.scanPath, new_val.scanPath, isFirst);
+    uniteValue(values.typeStr, new_val.typeStr, isFirst);
+    uniteValue(values.dpiType, new_val.dpiType, isFirst);
+    uniteValue(values.dpi, new_val.dpi, isFirst);
+    uniteValue(values.width, new_val.width, isFirst);
+    uniteValue(values.height, new_val.height, isFirst);
+    uniteValue(values.imageDpi, new_val.imageDpi, isFirst);
+    uniteValue(values.imageRes, new_val.imageRes, isFirst);
+    uniteValue(values.doPremulti, new_val.doPremulti, isFirst);
+    uniteValue(values.whiteTransp, new_val.whiteTransp, isFirst);
+    uniteValue(values.doAntialias, new_val.doAntialias, isFirst);
+    uniteValue(values.softness, new_val.softness, isFirst);
+    uniteValue(values.subsampling, new_val.subsampling, isFirst);
+    uniteValue(values.isDirty, new_val.isDirty, isFirst);
+
+    ++lvl_itr;
+  }
+
+  m_nameFld->setText(values.name);
+  m_pathFld->setPath(values.path);
+  m_scanPathFld->setPath(values.scanPath);
+  m_typeLabel->setText(values.typeStr);
+  m_dpiTypeOm->setCurrentIndex(values.dpiType);
+  m_dpiFld->setText(dpiToString(values.dpi));
+  if (values.width <= 0.0) {
+    m_widthFld->setValue(0.0);
+    m_widthFld->setText((values.width < 0.0) ? tr("[Various]") : tr(""));
+  } else
+    m_widthFld->setValue(values.width);
+  if (values.height <= 0.0) {
+    m_heightFld->setValue(0.0);
+    m_heightFld->setText((values.height < 0.0) ? tr("[Various]") : tr(""));
+  } else
+    m_heightFld->setValue(values.height);
+
   m_cameraDpiLabel->setText(dpiToString(getCurrentCameraDpi()));
+  m_imageDpiLabel->setText(values.imageDpi);
+  m_imageResLabel->setText(values.imageRes);
 
-  m_nameFld->setEnabled((isSimpleLevel || isChildLevel || !!m_pl || !!m_sdl));
-  m_pathFld->setEnabled((isSimpleLevel || !!m_sdl || !!m_pl));
-  if (m_scanPathLabel) m_scanPathLabel->setEnabled(isTzpLevel);
-  if (m_scanPathFld) m_scanPathFld->setEnabled(isTzpLevel);
-  m_typeLabel->setEnabled(isSimpleLevel || !!m_pl || !!m_sdl);
-  m_dpiTypeOm->setEnabled((isSimpleLevel && m_sl->getImageDpi() != TPointD()));
-  m_squarePixCB->setEnabled(hasDpiEditing);
-  m_dpiLabel->setEnabled(hasDpiEditing);
-  m_dpiFld->setEnabled(hasDpiEditing);
-  m_widthLabel->setEnabled(isRasterLevel);
-  m_widthFld->setEnabled(isRasterLevel);
-  m_heightLabel->setEnabled(isRasterLevel);
-  m_heightFld->setEnabled(isRasterLevel);
-  m_useCameraDpiBtn->setEnabled(hasDpiEditing);
-  m_subsamplingLabel->setEnabled(
-      (isRasterLevel && m_sl && !m_sl->getProperties()->getDirtyFlag()));
-  m_subsamplingFld->setEnabled(
-      (isRasterLevel && m_sl && !m_sl->getProperties()->getDirtyFlag()));
-  m_doPremultiply->setEnabled(m_sl && isRasterLevel && !isTzpLevel);
-  m_doAntialias->setEnabled(m_sl && isRasterLevel);
-  if (m_whiteTransp)
-    m_whiteTransp->setEnabled(m_sl && isRasterLevel && !isTzpLevel);
+  m_doPremultiply->setCheckState(values.doPremulti);
+  m_whiteTransp->setCheckState(values.whiteTransp);
+  m_doAntialias->setCheckState(values.doAntialias);
+  if (values.softness < 0)
+    m_antialiasSoftness->setText("");
+  else
+    m_antialiasSoftness->setValue(values.softness);
+  if (values.subsampling < 0)
+    m_subsamplingFld->setText("");
+  else
+    m_subsamplingFld->setValue(values.subsampling);
+  // disable the softness field when the antialias is not active
+  if (m_doAntialias->checkState() != Qt::Checked)
+    m_antialiasSoftness->setDisabled(true);
+  // disable the subsampling field when dirty level is selected
+  if (values.isDirty != Qt::Unchecked) m_subsamplingFld->setDisabled(true);
 }
 
 //-----------------------------------------------------------------------------
 
 void LevelSettingsPopup::onNameChanged() {
-  QString text     = m_nameFld->text();
-  TXshLevel *level = 0;
-  if (m_sl)
-    level = m_sl.getPointer();
-  else if (m_cl)
-    level = m_cl.getPointer();
-  else
-    return;
-
+  assert(m_selectedLevels.size() == 1);
+  if (m_selectedLevels.size() != 1) return;
+  QString text = m_nameFld->text();
   if (text.length() == 0) {
     error("The name " + text +
           " you entered for the level is not valid.\n Please enter a different "
@@ -659,11 +937,12 @@ void LevelSettingsPopup::onNameChanged() {
     return;
   }
 
-  /*-- Level名に変更がない場合 --*/
-  if (level->getName() == text.toStdWString()) {
-    // warning("Level name unchanged.");
-    return;
-  }
+  TXshLevel *level = m_selectedLevels.begin()->getPointer();
+  if ((getType(level) & (SimpleLevel | SubXsheet)) == 0) return;
+
+  // in case the level name is not changed
+  QString oldName = QString::fromStdWString(level->getName());
+  if (oldName == text) return;
 
   TLevelSet *levelSet =
       TApp::instance()->getCurrentScene()->getScene()->getLevelSet();
@@ -676,6 +955,9 @@ void LevelSettingsPopup::onNameChanged() {
     return;
   }
 
+  TUndoManager::manager()->add(
+      new LevelSettingsUndo(level, LevelSettingsUndo::Name, oldName, text));
+
   TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
   TApp::instance()->getCurrentScene()->notifyCastChange();
 }
@@ -683,21 +965,31 @@ void LevelSettingsPopup::onNameChanged() {
 //-----------------------------------------------------------------------------
 
 void LevelSettingsPopup::onPathChanged() {
+  assert(m_selectedLevels.size() == 1);
+  if (m_selectedLevels.size() != 1) return;
+  TXshLevelP levelP = *m_selectedLevels.begin();
+  if ((m_activateFlags[m_pathFld] & getType(levelP)) == 0) return;
+
   QString text = m_pathFld->getPath();
   TFilePath newPath(text.toStdWString());
   newPath =
       TApp::instance()->getCurrentScene()->getScene()->codeFilePath(newPath);
   m_pathFld->setPath(QString::fromStdWString(newPath.getWideString()));
-  if (!m_sl && !!m_sdl) {
+
+  TXshSoundLevelP sdl = levelP->getSoundLevel();
+  if (sdl) {
     // old level is a sound level
     TFileType::Type levelType = TFileType::getInfo(newPath);
     if (levelType == TFileType::AUDIO_LEVEL) {
-      TFilePath oldPath = m_sdl->getPath();
+      TFilePath oldPath = sdl->getPath();
       if (oldPath == newPath) return;
-      m_sdl->setPath(newPath);
-      m_sdl->loadSoundTrack();
+      sdl->setPath(newPath);
+      sdl->loadSoundTrack();
       TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
       TApp::instance()->getCurrentXsheet()->notifyXsheetSoundChanged();
+      TUndoManager::manager()->add(
+          new LevelSettingsUndo(levelP.getPointer(), LevelSettingsUndo::Path,
+                                oldPath.getQString(), newPath.getQString()));
     } else {
       error(tr("The file %1 is not a sound level.")
                 .arg(QString::fromStdWString(newPath.getLevelNameW())));
@@ -706,36 +998,39 @@ void LevelSettingsPopup::onPathChanged() {
     return;
   }
 
-  if (!m_sl) return;
-  TFilePath oldPath = m_sl->getPath();
+  TXshSimpleLevelP sl  = levelP->getSimpleLevel();
+  TXshPaletteLevelP pl = levelP->getPaletteLevel();
+  if (!sl && !pl) return;
+  TFilePath oldPath = (sl) ? sl->getPath() : pl->getPath();
   if (oldPath == newPath) return;
 
   TLevelSet *levelSet =
       TApp::instance()->getCurrentScene()->getScene()->getLevelSet();
-  TXshSimpleLevel *sl = 0;
+  TXshLevel *lvlWithSamePath = nullptr;
   for (int i = 0; i < levelSet->getLevelCount(); i++) {
-    TXshLevel *xl = levelSet->getLevel(i);
-    if (!xl) continue;
-    sl = xl->getSimpleLevel();
-    if (!sl) continue;
-    if (sl == m_sl.getPointer()) {
-      sl = 0;
-      continue;
+    TXshLevel *tmpLvl = levelSet->getLevel(i);
+    if (!tmpLvl) continue;
+    if (tmpLvl == levelP.getPointer()) continue;
+    TXshSimpleLevelP tmpSl  = tmpLvl->getSimpleLevel();
+    TXshPaletteLevelP tmpPl = tmpLvl->getPaletteLevel();
+    if (!tmpSl && !tmpPl) continue;
+    TFilePath tmpPath = (tmpSl) ? tmpSl->getPath() : tmpPl->getPath();
+    if (tmpPath == newPath) {
+      lvlWithSamePath = tmpLvl;
+      break;
     }
-    if (sl->getPath() == newPath) break;
-    sl = 0;
   }
-  if (sl) {
+  if (lvlWithSamePath) {
     QString question;
 
     question = "The path you entered for the level " +
-               QString(::to_string(sl->getName()).c_str()) +
+               QString(::to_string(lvlWithSamePath->getName()).c_str()) +
                "is already used: this may generate some conflicts in the file "
                "management.\nAre you sure you want to assign the same path to "
                "two different levels?";
     int ret = DVGui::MsgBox(question, QObject::tr("Yes"), QObject::tr("No"));
     if (ret == 0 || ret == 2) {
-      m_pathFld->setPath(toQString(m_sl->getPath()));
+      m_pathFld->setPath(toQString(oldPath));
       return;
     }
   }
@@ -743,65 +1038,91 @@ void LevelSettingsPopup::onPathChanged() {
   TFileType::Type oldType = TFileType::getInfo(oldPath);
   TFileType::Type newType = TFileType::getInfo(newPath);
 
-  if (m_sl->getType() == TZP_XSHLEVEL &&
-      m_sl->getScannedPath() != TFilePath()) {
-    if (newPath == TFilePath() || newPath == m_sl->getScannedPath()) {
-      newPath = m_sl->getScannedPath();
-      m_sl->setType(OVL_XSHLEVEL);
-      m_sl->setScannedPath(TFilePath());
-      m_sl->setPath(newPath);
+  if (sl && sl->getType() == TZP_XSHLEVEL &&
+      sl->getScannedPath() != TFilePath()) {
+    if (newPath == TFilePath() || newPath == sl->getScannedPath()) {
+      newPath = sl->getScannedPath();
+      sl->setType(OVL_XSHLEVEL);
+      sl->setScannedPath(TFilePath());
+      sl->setPath(newPath);
       TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
       TApp::instance()->getCurrentScene()->notifyCastChange();
       updateLevelSettings();
-      m_sl->invalidateFrames();
+      sl->invalidateFrames();
       std::vector<TFrameId> frames;
-      m_sl->getFids(frames);
+      sl->getFids(frames);
       for (auto const &fid : frames) {
-        IconGenerator::instance()->invalidate(m_sl.getPointer(), fid);
+        IconGenerator::instance()->invalidate(sl.getPointer(), fid);
       }
+      TUndoManager::manager()->beginBlock();
+      TUndoManager::manager()->add(
+          new LevelSettingsUndo(levelP.getPointer(), LevelSettingsUndo::Path,
+                                oldPath.getQString(), newPath.getQString()));
+      TUndoManager::manager()->add(new LevelSettingsUndo(
+          levelP.getPointer(), LevelSettingsUndo::ScanPath,
+          newPath.getQString(), QString()));
+      TUndoManager::manager()->add(new LevelSettingsUndo(
+          levelP.getPointer(), LevelSettingsUndo::LevelType, TZP_XSHLEVEL,
+          OVL_XSHLEVEL));
+      TUndoManager::manager()->endBlock();
       return;
     }
   }
 
   if (oldType != newType ||
-      m_sl->getType() == TZP_XSHLEVEL && newPath.getType() != "tlv" ||
-      m_sl->getType() != TZP_XSHLEVEL && newPath.getType() == "tlv") {
+      (sl && sl->getType() == TZP_XSHLEVEL && newPath.getType() != "tlv") ||
+      (sl && sl->getType() != TZP_XSHLEVEL && newPath.getType() == "tlv") ||
+      (pl && newPath.getType() != "tpl")) {
     error("Wrong path");
-    m_pathFld->setPath(toQString(m_sl->getPath()));
+    m_pathFld->setPath(toQString(oldPath));
     return;
   }
-  /*-- ここでPathを更新 --*/
-  m_sl->setPath(newPath);
-  TApp::instance()
-      ->getPaletteController()
-      ->getCurrentLevelPalette()
-      ->setPalette(m_sl->getPalette());
-
+  //-- update the path here
+  if (sl) {
+    sl->setPath(newPath);
+    TApp::instance()
+        ->getPaletteController()
+        ->getCurrentLevelPalette()
+        ->setPalette(sl->getPalette());
+    sl->invalidateFrames();
+    std::vector<TFrameId> frames;
+    sl->getFids(frames);
+    for (auto const &fid : frames) {
+      IconGenerator::instance()->invalidate(sl.getPointer(), fid);
+    }
+  } else if (pl) {
+    pl->setPath(newPath);
+    TApp::instance()
+        ->getPaletteController()
+        ->getCurrentLevelPalette()
+        ->setPalette(pl->getPalette());
+    pl->load();
+  }
   TApp::instance()->getCurrentLevel()->notifyLevelChange();
   TApp::instance()->getCurrentScene()->notifySceneChanged();
   TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
-  m_sl->invalidateFrames();
-  std::vector<TFrameId> frames;
-  m_sl->getFids(frames);
-  for (auto const &fid : frames) {
-    IconGenerator::instance()->invalidate(m_sl.getPointer(), fid);
-  }
   updateLevelSettings();
+  TUndoManager::manager()->add(
+      new LevelSettingsUndo(levelP.getPointer(), LevelSettingsUndo::Path,
+                            oldPath.getQString(), newPath.getQString()));
 }
 
 //-----------------------------------------------------------------------------
 
 void LevelSettingsPopup::onScanPathChanged() {
+  assert(m_selectedLevels.size() == 1);
+  if (m_selectedLevels.size() != 1) return;
+  TXshLevelP levelP   = *m_selectedLevels.begin();
+  TXshSimpleLevelP sl = levelP->getSimpleLevel();
+  if (!sl || sl->getType() != TZP_XSHLEVEL) return;
+
   QString text = m_scanPathFld->getPath();
   TFilePath newScanPath(text.toStdWString());
 
-  /*--対応する拡張子で無い場合は、表示を元に戻してreturn--*/
-  /* TODO:
-   * 他のFormatはDPI情報が無いため省いているが、ラスタ画像なら問題ないか？後で検討のこと
-   * 2016/1/30 shun_iwasawa */
+  // limit the avaiable formats for now
   if (newScanPath.getType() != "tif" && newScanPath.getType() != "tiff" &&
       newScanPath.getType() != "tzi") {
-    m_scanPathFld->setPath(toQString(m_sl->getScannedPath()));
+    m_scanPathFld->setPath(toQString(sl->getScannedPath()));
     return;
   }
 
@@ -809,13 +1130,11 @@ void LevelSettingsPopup::onScanPathChanged() {
       newScanPath);
   m_scanPathFld->setPath(QString::fromStdWString(newScanPath.getWideString()));
 
-  if (!m_sl || m_sl->getType() != TZP_XSHLEVEL) return;
-
-  /*-- 入力されたScanPathに変更がなければreturn--*/
-  TFilePath oldScanPath = m_sl->getScannedPath();
+  TFilePath oldScanPath = sl->getScannedPath();
   if (oldScanPath == newScanPath) return;
 
-  /*-- CleanupSettingsのSaveInが今のLevelと一致しているかどうかをチェック --*/
+  // check if the "Cleanup Settings > SaveIn" value is the same as the current
+  // level
   TFilePath settingsPath =
       (newScanPath.getParentDir() + newScanPath.getName()).withType("cln");
   settingsPath =
@@ -842,8 +1161,8 @@ void LevelSettingsPopup::onScanPathChanged() {
       TFilePath codedCleanupLevelPath =
           TApp::instance()->getCurrentScene()->getScene()->codeFilePath(
               cleanupLevelPath);
-      if (m_sl->getPath().getParentDir() != cleanupLevelPath &&
-          m_sl->getPath().getParentDir() != codedCleanupLevelPath)
+      if (sl->getPath().getParentDir() != cleanupLevelPath &&
+          sl->getPath().getParentDir() != codedCleanupLevelPath)
         DVGui::warning(
             "\"Save In\" path of the Cleanup Settings does not match.");
     } else
@@ -851,30 +1170,43 @@ void LevelSettingsPopup::onScanPathChanged() {
   } else
     DVGui::warning(".cln file for the Scanned Level not found.");
 
-  m_sl->setScannedPath(newScanPath);
+  sl->setScannedPath(newScanPath);
 
   TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
   updateLevelSettings();
+  TUndoManager::manager()->add(new LevelSettingsUndo(
+      levelP.getPointer(), LevelSettingsUndo::ScanPath,
+      oldScanPath.getQString(), newScanPath.getQString()));
 }
 
 //-----------------------------------------------------------------------------
 
 void LevelSettingsPopup::onDpiTypeChanged(int index) {
-  if (!m_sl || m_sl->getType() == PLI_XSHLEVEL) return;
-  QString dpiPolicyStr = m_dpiTypeOm->itemData(index).toString();
-  assert(dpiPolicyStr == "Custom DPI" || dpiPolicyStr == "Image DPI");
-  LevelProperties *prop = m_sl->getProperties();
+  TUndoManager::manager()->beginBlock();
+  QSetIterator<TXshLevelP> levelItr(m_selectedLevels);
+  while (levelItr.hasNext()) {
+    TXshLevelP levelP   = levelItr.next();
+    TXshSimpleLevelP sl = levelP->getSimpleLevel();
+    if (!sl || sl->getType() == PLI_XSHLEVEL) continue;
+    QString dpiPolicyStr = m_dpiTypeOm->itemData(index).toString();
+    assert(dpiPolicyStr == "Custom DPI" || dpiPolicyStr == "Image DPI");
+    LevelProperties *prop = sl->getProperties();
+    // dpiPolicyStr ==> dpiPolicy
+    LevelProperties::DpiPolicy dpiPolicy = dpiPolicyStr == "Custom DPI"
+                                               ? LevelProperties::DP_CustomDpi
+                                               : LevelProperties::DP_ImageDpi;
+    // se ImageDpi, ma l'immagine non ha dpi -> CustomDpi
+    assert(dpiPolicy == LevelProperties::DP_CustomDpi ||
+           sl->getImageDpi().x > 0.0 && sl->getImageDpi().y > 0.0);
 
-  // dpiPolicyStr ==> dpiPolicy
-  LevelProperties::DpiPolicy dpiPolicy = dpiPolicyStr == "Custom DPI"
-                                             ? LevelProperties::DP_CustomDpi
-                                             : LevelProperties::DP_ImageDpi;
-  // se ImageDpi, ma l'immagine non ha dpi -> CustomDpi
-  assert(dpiPolicy == LevelProperties::DP_CustomDpi ||
-         m_sl->getImageDpi().x > 0.0 && m_sl->getImageDpi().y > 0.0);
+    if (prop->getDpiPolicy() == dpiPolicy) continue;
+    LevelProperties::DpiPolicy oldPolicy = prop->getDpiPolicy();
+    prop->setDpiPolicy(dpiPolicy);
+    TUndoManager::manager()->add(new LevelSettingsUndo(
+        levelP.getPointer(), LevelSettingsUndo::DpiType, oldPolicy, dpiPolicy));
+  }
+  TUndoManager::manager()->endBlock();
 
-  if (prop->getDpiPolicy() == dpiPolicy) return;
-  prop->setDpiPolicy(dpiPolicy);
   TApp::instance()->getCurrentScene()->setDirtyFlag(true);
   TApp::instance()->getCurrentLevel()->notifyLevelChange();
 
@@ -884,9 +1216,7 @@ void LevelSettingsPopup::onDpiTypeChanged(int index) {
 //-----------------------------------------------------------------------------
 
 void LevelSettingsPopup::onDpiFieldChanged() {
-  QString w = m_dpiFld->text();
-  if (!m_sl || m_sl->getType() == PLI_XSHLEVEL) return;
-
+  QString w     = m_dpiFld->text();
   std::string s = w.toStdString();
   TPointD dpi;
 
@@ -908,12 +1238,33 @@ void LevelSettingsPopup::onDpiFieldChanged() {
       dpi.y = std::stod(s.substr(i));
     }
   }
-
-  if (dpi.x > 0.0) {
-    if (dpi.y == 0.0) dpi.y = dpi.x;
-    m_sl->getProperties()->setDpiPolicy(LevelProperties::DP_CustomDpi);
-    m_sl->getProperties()->setDpi(dpi);
+  if (dpi.x <= 0.0) {
+    updateLevelSettings();
+    return;
   }
+  if (dpi.y == 0.0) dpi.y = dpi.x;
+
+  TUndoManager::manager()->beginBlock();
+  QSetIterator<TXshLevelP> levelItr(m_selectedLevels);
+  while (levelItr.hasNext()) {
+    TXshLevelP levelP   = levelItr.next();
+    TXshSimpleLevelP sl = levelP->getSimpleLevel();
+    if (!sl || sl->getType() == PLI_XSHLEVEL) continue;
+    TPointD oldDpi = sl->getProperties()->getDpi();
+    if (oldDpi == dpi) continue;
+
+    LevelProperties::DpiPolicy oldPolicy = sl->getProperties()->getDpiPolicy();
+    sl->getProperties()->setDpiPolicy(LevelProperties::DP_CustomDpi);
+    sl->getProperties()->setDpi(dpi);
+
+    TUndoManager::manager()->add(
+        new LevelSettingsUndo(levelP.getPointer(), LevelSettingsUndo::DpiType,
+                              oldPolicy, LevelProperties::DP_CustomDpi));
+    TUndoManager::manager()->add(new LevelSettingsUndo(
+        levelP.getPointer(), LevelSettingsUndo::Dpi,
+        QPointF(oldDpi.x, oldDpi.y), QPointF(dpi.x, dpi.y)));
+  }
+  TUndoManager::manager()->endBlock();
   updateLevelSettings();
   TApp::instance()->getCurrentScene()->setDirtyFlag(true);
   TApp::instance()->getCurrentLevel()->notifyLevelChange();
@@ -922,14 +1273,28 @@ void LevelSettingsPopup::onDpiFieldChanged() {
 //-----------------------------------------------------------------------------
 
 void LevelSettingsPopup::onSquarePixelChanged(int value) {
-  if (!m_sl || m_sl->getType() == PLI_XSHLEVEL) return;
   if (!value) return;
-  TPointD dpi = m_sl->getDpi();
-  if (areAlmostEqual(dpi.x, dpi.y)) return;
-  TDimension res = m_sl->getResolution();
-  dpi.y          = dpi.x;
-  m_sl->getProperties()->setDpiPolicy(LevelProperties::DP_CustomDpi);
-  m_sl->getProperties()->setDpi(dpi);
+  TUndoManager::manager()->beginBlock();
+  QSetIterator<TXshLevelP> levelItr(m_selectedLevels);
+  while (levelItr.hasNext()) {
+    TXshLevelP levelP   = levelItr.next();
+    TXshSimpleLevelP sl = levelP->getSimpleLevel();
+    if (!sl || sl->getType() == PLI_XSHLEVEL) continue;
+    TPointD oldDpi = sl->getDpi();
+    if (areAlmostEqual(oldDpi.x, oldDpi.y)) continue;
+    TPointD dpi(oldDpi.x, oldDpi.x);
+    LevelProperties::DpiPolicy oldPolicy = sl->getProperties()->getDpiPolicy();
+    sl->getProperties()->setDpiPolicy(LevelProperties::DP_CustomDpi);
+    sl->getProperties()->setDpi(dpi);
+
+    TUndoManager::manager()->add(
+        new LevelSettingsUndo(levelP.getPointer(), LevelSettingsUndo::DpiType,
+                              oldPolicy, LevelProperties::DP_CustomDpi));
+    TUndoManager::manager()->add(new LevelSettingsUndo(
+        levelP.getPointer(), LevelSettingsUndo::Dpi,
+        QPointF(oldDpi.x, oldDpi.y), QPointF(dpi.x, dpi.y)));
+  }
+  TUndoManager::manager()->endBlock();
   updateLevelSettings();
   TApp::instance()->getCurrentScene()->setDirtyFlag(true);
   TApp::instance()->getCurrentLevel()->notifyLevelChange();
@@ -938,29 +1303,38 @@ void LevelSettingsPopup::onSquarePixelChanged(int value) {
 //-----------------------------------------------------------------------------
 
 void LevelSettingsPopup::onWidthFieldChanged() {
-  if (!m_sl || m_sl->getType() == PLI_XSHLEVEL) return;
-  TDimension res = m_sl->getResolution();
-  TPointD dpi    = m_sl->getDpi();
-  if (dpi.x <= 0) return;
-  double oldLx = res.lx / dpi.x;
-  double lx    = m_widthFld->getValue();
-  double ly    = m_heightFld->getValue();
+  double lx = m_widthFld->getValue();
   if (lx <= 0) {
-    lx = oldLx;
-    m_widthFld->setValue(oldLx);
+    updateLevelSettings();
+    return;
   }
 
-  if (m_squarePixCB->isChecked()) {
-    ly = (double)(res.ly * lx) / (double)res.lx;
-    m_heightFld->setValue(ly);
+  TUndoManager::manager()->beginBlock();
+  QSetIterator<TXshLevelP> levelItr(m_selectedLevels);
+  while (levelItr.hasNext()) {
+    TXshLevelP levelP   = levelItr.next();
+    TXshSimpleLevelP sl = levelP->getSimpleLevel();
+    if (!sl || sl->getType() == PLI_XSHLEVEL) continue;
+    TPointD dpi = sl->getDpi();
+    if (dpi.x <= 0) continue;
+    TDimension res = sl->getResolution();
+    if (res.lx <= 0) continue;
+    dpi.x = res.lx / lx;
+    if (m_squarePixCB->isChecked()) dpi.y = dpi.x;
+
+    LevelProperties::DpiPolicy oldPolicy = sl->getProperties()->getDpiPolicy();
+    sl->getProperties()->setDpiPolicy(LevelProperties::DP_CustomDpi);
+    TPointD oldDpi = sl->getProperties()->getDpi();
+    sl->getProperties()->setDpi(dpi);
+
+    TUndoManager::manager()->add(
+        new LevelSettingsUndo(levelP.getPointer(), LevelSettingsUndo::DpiType,
+                              oldPolicy, LevelProperties::DP_CustomDpi));
+    TUndoManager::manager()->add(new LevelSettingsUndo(
+        levelP.getPointer(), LevelSettingsUndo::Dpi,
+        QPointF(oldDpi.x, oldDpi.y), QPointF(dpi.x, dpi.y)));
   }
-
-  dpi.x = res.lx / lx;
-  dpi.y = res.ly / ly;
-
-  m_sl->getProperties()->setDpiPolicy(LevelProperties::DP_CustomDpi);
-  m_sl->getProperties()->setDpi(dpi);
-
+  TUndoManager::manager()->endBlock();
   updateLevelSettings();
   TApp::instance()->getCurrentScene()->setDirtyFlag(true);
   TApp::instance()->getCurrentLevel()->notifyLevelChange();
@@ -969,30 +1343,38 @@ void LevelSettingsPopup::onWidthFieldChanged() {
 //-----------------------------------------------------------------------------
 
 void LevelSettingsPopup::onHeightFieldChanged() {
-  if (!m_sl || m_sl->getType() == PLI_XSHLEVEL) return;
-  TDimension res = m_sl->getResolution();
-  if (res.ly == 0 || res.ly <= 0) return;
-  TPointD dpi = m_sl->getDpi();
-  if (dpi.y <= 0) return;
-  double oldLy = res.ly / dpi.y;
-  double lx    = m_widthFld->getValue();
-  double ly    = m_heightFld->getValue();
+  double ly = m_heightFld->getValue();
   if (ly <= 0) {
-    ly = oldLy;
-    m_heightFld->setValue(oldLy);
+    updateLevelSettings();
+    return;
   }
 
-  if (m_squarePixCB->isChecked()) {
-    lx = (double)(res.lx * ly) / (double)res.ly;
-    m_widthFld->setValue(lx);
+  TUndoManager::manager()->beginBlock();
+  QSetIterator<TXshLevelP> levelItr(m_selectedLevels);
+  while (levelItr.hasNext()) {
+    TXshLevelP levelP   = levelItr.next();
+    TXshSimpleLevelP sl = levelP->getSimpleLevel();
+    if (!sl || sl->getType() == PLI_XSHLEVEL) continue;
+    TPointD dpi = sl->getDpi();
+    if (dpi.y <= 0) continue;
+    TDimension res = sl->getResolution();
+    if (res.ly <= 0) continue;
+    dpi.y = res.ly / ly;
+    if (m_squarePixCB->isChecked()) dpi.x = dpi.y;
+
+    LevelProperties::DpiPolicy oldPolicy = sl->getProperties()->getDpiPolicy();
+    sl->getProperties()->setDpiPolicy(LevelProperties::DP_CustomDpi);
+    TPointD oldDpi = sl->getProperties()->getDpi();
+    sl->getProperties()->setDpi(dpi);
+
+    TUndoManager::manager()->add(
+        new LevelSettingsUndo(levelP.getPointer(), LevelSettingsUndo::DpiType,
+                              oldPolicy, LevelProperties::DP_CustomDpi));
+    TUndoManager::manager()->add(new LevelSettingsUndo(
+        levelP.getPointer(), LevelSettingsUndo::Dpi,
+        QPointF(oldDpi.x, oldDpi.y), QPointF(dpi.x, dpi.y)));
   }
-
-  dpi.x = res.lx / lx;
-  dpi.y = res.ly / ly;
-
-  m_sl->getProperties()->setDpiPolicy(LevelProperties::DP_CustomDpi);
-  m_sl->getProperties()->setDpi(dpi);
-
+  TUndoManager::manager()->endBlock();
   updateLevelSettings();
   TApp::instance()->getCurrentScene()->setDirtyFlag(true);
   TApp::instance()->getCurrentLevel()->notifyLevelChange();
@@ -1001,10 +1383,27 @@ void LevelSettingsPopup::onHeightFieldChanged() {
 //-----------------------------------------------------------------------------
 
 void LevelSettingsPopup::useCameraDpi() {
-  if (!m_sl) return;
-  LevelProperties *prop = m_sl->getProperties();
-  prop->setDpiPolicy(LevelProperties::DP_CustomDpi);
-  prop->setDpi(getCurrentCameraDpi());
+  TUndoManager::manager()->beginBlock();
+  QSetIterator<TXshLevelP> levelItr(m_selectedLevels);
+  while (levelItr.hasNext()) {
+    TXshLevelP levelP   = levelItr.next();
+    TXshSimpleLevelP sl = levelP->getSimpleLevel();
+    if (!sl) continue;
+    LevelProperties *prop                = sl->getProperties();
+    LevelProperties::DpiPolicy oldPolicy = prop->getDpiPolicy();
+    prop->setDpiPolicy(LevelProperties::DP_CustomDpi);
+    TPointD oldDpi = prop->getDpi();
+    TPointD dpi    = getCurrentCameraDpi();
+    prop->setDpi(dpi);
+
+    TUndoManager::manager()->add(
+        new LevelSettingsUndo(levelP.getPointer(), LevelSettingsUndo::DpiType,
+                              oldPolicy, LevelProperties::DP_CustomDpi));
+    TUndoManager::manager()->add(new LevelSettingsUndo(
+        levelP.getPointer(), LevelSettingsUndo::Dpi,
+        QPointF(oldDpi.x, oldDpi.y), QPointF(dpi.x, dpi.y)));
+  }
+  TUndoManager::manager()->endBlock();
   TApp::instance()->getCurrentScene()->setDirtyFlag(true);
   TApp::instance()->getCurrentLevel()->notifyLevelChange();
 
@@ -1014,16 +1413,30 @@ void LevelSettingsPopup::useCameraDpi() {
 //-----------------------------------------------------------------------------
 
 void LevelSettingsPopup::onSubsamplingChanged() {
-  if (!m_sl || m_sl->getType() == PLI_XSHLEVEL) return;
-  if (m_sl->getProperties()->getDirtyFlag()) return;
-
-  /*-- subSamplingの値に変更が無い場合はreturn --*/
-  if (m_sl->getProperties()->getSubsampling() ==
-      (int)m_subsamplingFld->getValue())
+  int subsampling = (int)m_subsamplingFld->getValue();
+  if (subsampling <= 0) {
+    updateLevelSettings();
     return;
+  }
 
-  m_sl->getProperties()->setSubsampling((int)m_subsamplingFld->getValue());
-  m_sl->invalidateFrames();
+  TUndoManager::manager()->beginBlock();
+  QSetIterator<TXshLevelP> levelItr(m_selectedLevels);
+  while (levelItr.hasNext()) {
+    TXshLevelP levelP   = levelItr.next();
+    TXshSimpleLevelP sl = levelP->getSimpleLevel();
+    if (!sl || sl->getType() == PLI_XSHLEVEL) continue;
+    if (sl->getProperties()->getDirtyFlag()) continue;
+
+    int oldSubsampling = sl->getProperties()->getSubsampling();
+    if (oldSubsampling == subsampling) continue;
+
+    sl->getProperties()->setSubsampling(subsampling);
+    sl->invalidateFrames();
+    TUndoManager::manager()->add(new LevelSettingsUndo(
+        levelP.getPointer(), LevelSettingsUndo::Subsampling, oldSubsampling,
+        subsampling));
+  }
+  TUndoManager::manager()->endBlock();
 
   TApp::instance()->getCurrentScene()->setDirtyFlag(true);
   TApp::instance()
@@ -1036,45 +1449,107 @@ void LevelSettingsPopup::onSubsamplingChanged() {
 
 //-----------------------------------------------------------------------------
 
-void LevelSettingsPopup::onDoPremultiplyChanged(int value) {
-  if (!m_sl || m_sl->getType() == PLI_XSHLEVEL) return;
-  if (value) {
-    if (m_whiteTransp) m_whiteTransp->setChecked(false);
-    m_sl->getProperties()->setWhiteTransp(false);
+void LevelSettingsPopup::onDoPremultiplyClicked() {
+  Qt::CheckState state = m_doPremultiply->checkState();
+  bool on = (state == Qt::Checked || state == Qt::PartiallyChecked);
+
+  TUndoManager::manager()->beginBlock();
+  QSetIterator<TXshLevelP> levelItr(m_selectedLevels);
+  while (levelItr.hasNext()) {
+    TXshLevelP levelP   = levelItr.next();
+    TXshSimpleLevel *sl = levelP->getSimpleLevel();
+    if (!sl || sl->getType() == PLI_XSHLEVEL) continue;
+    LevelProperties *prop = sl->getProperties();
+    if (on == prop->doPremultiply()) continue;
+    if (on && prop->whiteTransp()) {
+      prop->setWhiteTransp(false);
+      TUndoManager::manager()->add(new LevelSettingsUndo(
+          levelP.getPointer(), LevelSettingsUndo::WhiteTransp, true, false));
+    }
+    prop->setDoPremultiply(on);
+    TUndoManager::manager()->add(new LevelSettingsUndo(
+        levelP.getPointer(), LevelSettingsUndo::DoPremulti, !on, on));
   }
-  m_sl->getProperties()->setDoPremultiply(value);
+  TUndoManager::manager()->endBlock();
   TApp::instance()->getCurrentLevel()->notifyLevelChange();
+  updateLevelSettings();
 }
 
 //-----------------------------------------------------------------------------
 
 void LevelSettingsPopup::onAntialiasSoftnessChanged() {
-  m_sl->getProperties()->setDoAntialias(
-      m_doAntialias->isChecked() ? m_antialiasSoftness->getValue() : 0);
+  int softness = m_antialiasSoftness->getValue();
+  TUndoManager::manager()->beginBlock();
+  QSetIterator<TXshLevelP> levelItr(m_selectedLevels);
+  while (levelItr.hasNext()) {
+    TXshLevelP levelP   = levelItr.next();
+    TXshSimpleLevel *sl = levelP->getSimpleLevel();
+    if (!sl) continue;
+    int oldSoftness = sl->getProperties()->antialiasSoftness();
+    sl->getProperties()->setDoAntialias(softness);
+    TUndoManager::manager()->add(
+        new LevelSettingsUndo(levelP.getPointer(), LevelSettingsUndo::Softness,
+                              oldSoftness, softness));
+  }
+  TUndoManager::manager()->endBlock();
   TApp::instance()->getCurrentLevel()->notifyLevelChange();
 }
 
 //----------------------------
 
-void LevelSettingsPopup::onDoAntialiasChanged(int value) {
-  if (!m_sl || m_sl->getType() == PLI_XSHLEVEL) return;
-  m_antialiasSoftness->setEnabled(value != 0);
+void LevelSettingsPopup::onDoAntialiasClicked() {
+  Qt::CheckState state = m_doAntialias->checkState();
+  bool on      = (state == Qt::Checked || state == Qt::PartiallyChecked);
+  int softness = on ? m_antialiasSoftness->getValue() : 0;
 
-  m_sl->getProperties()->setDoAntialias(
-      value == 0 ? 0 : m_antialiasSoftness->getValue());
+  TUndoManager::manager()->beginBlock();
+  QSetIterator<TXshLevelP> levelItr(m_selectedLevels);
+  while (levelItr.hasNext()) {
+    TXshLevelP levelP   = levelItr.next();
+    TXshSimpleLevel *sl = levelP->getSimpleLevel();
+    if (!sl || sl->getType() == PLI_XSHLEVEL) continue;
+
+    int oldSoftness = sl->getProperties()->antialiasSoftness();
+    sl->getProperties()->setDoAntialias(softness);
+    TUndoManager::manager()->add(
+        new LevelSettingsUndo(levelP.getPointer(), LevelSettingsUndo::Softness,
+                              oldSoftness, softness));
+  }
+  TUndoManager::manager()->endBlock();
   TApp::instance()->getCurrentLevel()->notifyLevelChange();
+  updateLevelSettings();
+  if (on) {
+    m_doAntialias->setCheckState(Qt::Checked);
+    m_antialiasSoftness->setEnabled(true);
+  }
 }
 
 //-----------------------------------------------------------------------------
 
-void LevelSettingsPopup::onWhiteTranspChanged(int value) {
-  if (!m_sl || m_sl->getType() == PLI_XSHLEVEL) return;
-  if (value) {
-    m_doPremultiply->setChecked(false);
-    m_sl->getProperties()->setDoPremultiply(false);
+void LevelSettingsPopup::onWhiteTranspClicked() {
+  Qt::CheckState state = m_whiteTransp->checkState();
+  bool on = (state == Qt::Checked || state == Qt::PartiallyChecked);
+
+  TUndoManager::manager()->beginBlock();
+  QSetIterator<TXshLevelP> levelItr(m_selectedLevels);
+  while (levelItr.hasNext()) {
+    TXshLevelP levelP   = levelItr.next();
+    TXshSimpleLevel *sl = levelP->getSimpleLevel();
+    if (!sl || sl->getType() == PLI_XSHLEVEL) continue;
+    LevelProperties *prop = sl->getProperties();
+    if (on == prop->whiteTransp()) continue;
+    if (on && prop->doPremultiply()) {
+      prop->setDoPremultiply(false);
+      TUndoManager::manager()->add(new LevelSettingsUndo(
+          levelP.getPointer(), LevelSettingsUndo::DoPremulti, true, false));
+    }
+    prop->setWhiteTransp(on);
+    TUndoManager::manager()->add(new LevelSettingsUndo(
+        levelP.getPointer(), LevelSettingsUndo::WhiteTransp, !on, on));
   }
-  m_sl->getProperties()->setWhiteTransp(value);
+  TUndoManager::manager()->endBlock();
   TApp::instance()->getCurrentLevel()->notifyLevelChange();
+  updateLevelSettings();
 }
 
 //-----------------------------------------------------------------------------

@@ -417,6 +417,7 @@ void PreferencesPopup::onPixelsOnlyChanged() {
     defLevelHeight->setDecimals(4);
     defLevelWidth->setDecimals(4);
   }
+  TApp::instance()->getCurrentScene()->notifyPreferenceChanged("pixelsOnly");
 }
 
 //-----------------------------------------------------------------------------

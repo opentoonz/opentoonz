@@ -19,13 +19,4 @@
 #error "TNZ_LITTLE_ENDIAN not defined!"
 #endif
 
-#ifndef WIN32
-#ifdef MACOSX
-#define _finite isfinite
-#else
-// verificare che su sgi sia isfinite
-#define _finite isfinite
-#endif
-#endif
-
 #endif

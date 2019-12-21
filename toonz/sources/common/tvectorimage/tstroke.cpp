@@ -1,6 +1,5 @@
 
 
-#include "tmachine.h"
 #include "tmathutil.h"
 #include "tstrokeutil.h"
 #include "tstrokeoutline.h"
@@ -3109,7 +3108,7 @@ double *reparameterize3D(const TThickCubic &cubic,
 
   for (int i = 0; i < size; i++) {
     uPrime[i] = NewtonRaphsonRootFind3D(cubic, *(pointsArrayBegin + i), u[i]);
-    if (!_finite(uPrime[i])) {
+    if (!std::isfinite(uPrime[i])) {
       delete[] uPrime;
       return NULL;
     }
@@ -3355,17 +3354,17 @@ void computeQuadraticsFromCubic(const TThickCubic &cubic, double error,
 #ifdef _DEBUG
             TThickQuadratic *lastTq = chunkArray.back();
             TThickPoint pDeb        = lastTq->getThickP0();
-            assert(_finite(pDeb.x));
-            assert(_finite(pDeb.y));
-            assert(_finite(pDeb.thick));
+            assert(std::isfinite(pDeb.x));
+            assert(std::isfinite(pDeb.y));
+            assert(std::isfinite(pDeb.thick));
             pDeb = lastTq->getThickP1();
-            assert(_finite(pDeb.x));
-            assert(_finite(pDeb.y));
-            assert(_finite(pDeb.thick));
+            assert(std::isfinite(pDeb.x));
+            assert(std::isfinite(pDeb.y));
+            assert(std::isfinite(pDeb.thick));
             pDeb = lastTq->getThickP2();
-            assert(_finite(pDeb.x));
-            assert(_finite(pDeb.y));
-            assert(_finite(pDeb.thick));
+            assert(std::isfinite(pDeb.x));
+            assert(std::isfinite(pDeb.y));
+            assert(std::isfinite(pDeb.thick));
 #endif
             numSaved++;  //  variabile debug: compatibilita' precedente funzione
             return;
@@ -3404,21 +3403,21 @@ TStroke *computeQuadStroke(const TCubicStroke &cubic) {
 #ifdef _DEBUG
     {
       TThickPoint p = tmp.getThickP0();
-      assert(_finite(p.x));
-      assert(_finite(p.y));
-      assert(_finite(p.thick));
+      assert(std::isfinite(p.x));
+      assert(std::isfinite(p.y));
+      assert(std::isfinite(p.thick));
       p = tmp.getThickP1();
-      assert(_finite(p.x));
-      assert(_finite(p.y));
-      assert(_finite(p.thick));
+      assert(std::isfinite(p.x));
+      assert(std::isfinite(p.y));
+      assert(std::isfinite(p.thick));
       p = tmp.getThickP2();
-      assert(_finite(p.x));
-      assert(_finite(p.y));
-      assert(_finite(p.thick));
+      assert(std::isfinite(p.x));
+      assert(std::isfinite(p.y));
+      assert(std::isfinite(p.thick));
       p = tmp.getThickP3();
-      assert(_finite(p.x));
-      assert(_finite(p.y));
-      assert(_finite(p.thick));
+      assert(std::isfinite(p.x));
+      assert(std::isfinite(p.y));
+      assert(std::isfinite(p.thick));
     }
 #endif
 
@@ -3735,9 +3734,9 @@ TStroke *TStroke::interpolate(const vector<TThickPoint> &points, double error,
   TThickPoint p;
   for (; cpIndex != (UINT)stroke->getControlPointCount(); cpIndex++) {
     p = stroke->getControlPoint(cpIndex);
-    assert(_finite(p.x));
-    assert(_finite(p.y));
-    assert(_finite(p.thick));
+    assert(std::isfinite(p.x));
+    assert(std::isfinite(p.y));
+    assert(std::isfinite(p.thick));
   }
 #endif
 

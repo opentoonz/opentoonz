@@ -852,13 +852,18 @@ QGroupBox::indicator {
 .CheckBox::indicator:hover,
 QMenu::indicator:hover,
 .CheckBox::indicator:checked:hover,
+.CheckBox::indicator:indeterminate:hover,
 QCheckBox::indicator:hover,
 .GroupBox::indicator:hover,
 QMenu::indicator:checked:hover,
+QMenu::indicator:indeterminate:hover,
 QCheckBox::indicator:checked:hover,
+QCheckBox::indicator:indeterminate:hover,
 .GroupBox::indicator:checked:hover,
+.GroupBox::indicator:indeterminate:hover,
 QGroupBox::indicator:hover,
-QGroupBox::indicator:checked:hover {
+QGroupBox::indicator:checked:hover,
+QGroupBox::indicator:indeterminate:hover {
   background-color: #2f2f2f;
   border-color: #5385a6;
 }
@@ -879,6 +884,24 @@ QGroupBox::indicator:checked:disabled {
   background-color: #3b3b3b;
   border-color: #3b3b3b;
   image: url('imgs/white/checkmark_disabled.svg');
+}
+.CheckBox::indicator:indeterminate,
+QMenu::indicator:indeterminate,
+QCheckBox::indicator:indeterminate,
+.GroupBox::indicator:indeterminate,
+QGroupBox::indicator:indeterminate {
+  background-color: #2f2f2f;
+  border-color: #2c2c2c;
+  image: url('imgs/white/checkpartially.svg');
+}
+.CheckBox::indicator:indeterminate:disabled,
+QMenu::indicator:indeterminate:disabled,
+QCheckBox::indicator:indeterminate:disabled,
+.GroupBox::indicator:indeterminate:disabled,
+QGroupBox::indicator:indeterminate:disabled {
+  background-color: #3b3b3b;
+  border-color: #3b3b3b;
+  image: url('imgs/white/checkpartially_disabled.svg');
 }
 .CheckBox::indicator:disabled,
 QMenu::indicator:disabled,

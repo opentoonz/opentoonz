@@ -92,6 +92,10 @@ public:
   void setKeyframes();
   void pasteKeyframesInto();
 
+  void shiftKeyframes(int direction);
+  void shiftKeyframesUp() { shiftKeyframes(-1); }
+  void shiftKeyframesDown() { shiftKeyframes(1); }
+
   void cloneLevel();
   void insertCells();
 
