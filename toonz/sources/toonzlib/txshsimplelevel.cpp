@@ -2326,6 +2326,7 @@ bool TXshSimpleLevel::isFrameReadOnly(TFrameId fid) {
   // the OS level
   if (getType() == OVL_XSHLEVEL || getType() == TZI_XSHLEVEL ||
       getType() == MESH_XSHLEVEL) {
+    if (getProperties()->isStopMotionLevel()) return true;
     TFilePath fullPath   = getScene()->decodeFilePath(m_path);
     std::string fileType = fullPath.getType();
     if (fileType == "psd" || fileType == "gif" || fileType == "mp4" ||
