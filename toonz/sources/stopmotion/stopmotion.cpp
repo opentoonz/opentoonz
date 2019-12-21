@@ -51,16 +51,16 @@
 #include <QTimer>
 
 // Connected camera
-TEnv::IntVar StopMotionUseScaledImages("StopMotionUseScaledImages", 1);
+TEnv::IntVar StopMotionUseScaledImages("StopMotionUseScaledImages", 0);
 TEnv::IntVar StopMotionOpacity("StopMotionOpacity", 100);
 TEnv::IntVar StopMotionUseDirectShow("StopMotionUseDirectShow", 1);
 TEnv::IntVar StopMotionAlwaysLiveView("StopMotionAlwaysLiveView", 0);
 
-TEnv::IntVar StopMotionBlackCapture("StopMotionBlackCapture", 1);
+TEnv::IntVar StopMotionBlackCapture("StopMotionBlackCapture", 0);
 TEnv::IntVar StopMotionPlaceOnXSheet("StopMotionPlaceOnXSheet", 1);
 TEnv::IntVar StopMotionReviewTime("StopMotionReviewTime", 1);
 TEnv::IntVar StopMotionUseMjpg("StopMotionUseMjpg", 1);
-TEnv::IntVar StopMotionUseNumpad("StopMotionUseNumpad", 1);
+TEnv::IntVar StopMotionUseNumpad("StopMotionUseNumpad", 0);
 
 // Connected camera
 TEnv::StringVar StopMotionCameraName("CamCapCameraName", "");
