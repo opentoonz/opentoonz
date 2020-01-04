@@ -645,14 +645,14 @@
     <name>FullColorFillTool</name>
     <message>
         <source>Fill Depth</source>
-        <translation type="unfinished">填充深度</translation>
+        <translation>填充深度</translation>
     </message>
 </context>
 <context>
     <name>HandToolOptionsBox</name>
     <message>
         <source>Reset Position</source>
-        <translation type="unfinished"></translation>
+        <translation>重置位置</translation>
     </message>
 </context>
 <context>
@@ -1179,31 +1179,31 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>The selection cannot be updated. It is not editable.</source>
-        <translation type="unfinished"></translation>
+        <translation>所选择的不能被更新。它不是可编辑的。</translation>
     </message>
     <message>
         <source>The selection cannot be deleted. It is not editable.</source>
-        <translation type="unfinished"></translation>
+        <translation>所选择的不能被删除。它不是可编辑的。</translation>
     </message>
     <message>
         <source>The selection cannot be pasted. It is not editable.</source>
-        <translation type="unfinished"></translation>
+        <translation>所选择的不能被粘贴。它不是可编辑的。</translation>
     </message>
     <message>
         <source>The selection cannot be grouped. It is not editable.</source>
-        <translation type="unfinished"></translation>
+        <translation>所选择的不能被成组。它不是可编辑的。</translation>
     </message>
     <message>
         <source>The selection cannot be entered. It is not editable.</source>
-        <translation type="unfinished"></translation>
+        <translation>所选择的不能被进入。它不是可编辑的。</translation>
     </message>
     <message>
         <source>The selection cannot be ungrouped. It is not editable.</source>
-        <translation type="unfinished"></translation>
+        <translation>所选择的不能被取消群组。它不是可编辑的。</translation>
     </message>
     <message>
         <source>The selection cannot be moved. It is not editable.</source>
-        <translation type="unfinished"></translation>
+        <translation>所选择的不能被移动。它不是可编辑的。</translation>
     </message>
 </context>
 <context>
@@ -1309,7 +1309,7 @@ Do you want to proceed?</source>
     <name>RotateToolOptionsBox</name>
     <message>
         <source>Reset Rotation</source>
-        <translation type="unfinished"></translation>
+        <translation>重置旋转</translation>
     </message>
 </context>
 <context>
@@ -1715,7 +1715,7 @@ moved to the end of the first page of the palette.</source>
     <name>ZoomToolOptionsBox</name>
     <message>
         <source>Reset Zoom</source>
-        <translation type="unfinished"></translation>
+        <translation>重置缩放</translation>
     </message>
 </context>
 </TS>
