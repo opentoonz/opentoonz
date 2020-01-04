@@ -400,7 +400,7 @@
     </message>
     <message>
         <source>Paste Fx  :  </source>
-        <translation>粘贴特效 : </translation>
+        <translation>粘贴特效  :  </translation>
     </message>
     <message>
         <source>Disconnect Fx</source>
@@ -605,6 +605,12 @@
     <message>
         <source>Timeline</source>
         <translation>时间轴</translation>
+    </message>
+    <message>
+        <source>Failed to save the following resources:
+</source>
+        <translation>保存下面的资源失败:
+</translation>
     </message>
 </context>
 <context>
