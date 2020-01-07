@@ -556,7 +556,7 @@ Possibly the preset file has been corrupted</source>
     <message>
         <location filename="../../toonzqt/flipconsole.cpp" line="1119"/>
         <source>Viewer Controls</source>
-        <translation type="unfinished"></translation>
+        <translation>Управление просмотрщиком</translation>
     </message>
     <message>
         <location filename="../../toonzqt/flipconsole.cpp" line="1144"/>
@@ -699,27 +699,27 @@ Possibly the preset file has been corrupted</source>
     <message>
         <location filename="../../toonzqt/flipconsole.cpp" line="1283"/>
         <source>&amp;Zoom In</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Приближение</translation>
     </message>
     <message>
         <location filename="../../toonzqt/flipconsole.cpp" line="1285"/>
         <source>&amp;Zoom Out</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Отдаление</translation>
     </message>
     <message>
         <location filename="../../toonzqt/flipconsole.cpp" line="1287"/>
         <source>&amp;Flip Horizontally</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Отразить по горизонтали</translation>
     </message>
     <message>
         <location filename="../../toonzqt/flipconsole.cpp" line="1290"/>
         <source>&amp;Flip Vertically</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Отразить по вертикали</translation>
     </message>
     <message>
         <location filename="../../toonzqt/flipconsole.cpp" line="1292"/>
         <source>&amp;Reset View</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Восстановить вид по умолчанию</translation>
     </message>
     <message>
         <location filename="../../toonzqt/flipconsole.cpp" line="1501"/>
@@ -1113,7 +1113,7 @@ Possibly the preset file has been corrupted</source>
     <message>
         <location filename="../../toonzqt/functionsheet.cpp" line="954"/>
         <source>Similar Shape Interpolation</source>
-        <translation type="unfinished">Интерполяция аналогичной формы</translation>
+        <translation>Интерполяция аналогичной формы</translation>
     </message>
     <message>
         <location filename="../../toonzqt/functionsheet.cpp" line="948"/>
@@ -1139,32 +1139,32 @@ Possibly the preset file has been corrupted</source>
     <message>
         <location filename="../../toonzqt/functionsheet.cpp" line="955"/>
         <source>Activate Cycle</source>
-        <translation type="unfinished">Активировать цикл</translation>
+        <translation>Включить цикл</translation>
     </message>
     <message>
         <location filename="../../toonzqt/functionsheet.cpp" line="956"/>
         <source>Deactivate Cycle</source>
-        <translation type="unfinished">Деактивировать цикл</translation>
+        <translation>Выключить цикл</translation>
     </message>
     <message>
         <location filename="../../toonzqt/functionsheet.cpp" line="957"/>
         <source>Show Inbetween Values</source>
-        <translation type="unfinished"></translation>
+        <translation>Показать промежуточные значения кадра</translation>
     </message>
     <message>
         <location filename="../../toonzqt/functionsheet.cpp" line="958"/>
         <source>Hide Inbetween Values</source>
-        <translation type="unfinished"></translation>
+        <translation>Скрыть промежуточные значения кадра</translation>
     </message>
     <message>
         <location filename="../../toonzqt/functionsheet.cpp" line="1008"/>
         <source>Change Interpolation</source>
-        <translation type="unfinished"></translation>
+        <translation>Изменить интерполяцию</translation>
     </message>
     <message>
         <location filename="../../toonzqt/functionsheet.cpp" line="1023"/>
         <source>Change Step</source>
-        <translation type="unfinished"></translation>
+        <translation>Изменить шаг</translation>
     </message>
 </context>
 <context>
@@ -1239,7 +1239,7 @@ Possibly the preset file has been corrupted</source>
     <message>
         <location filename="../../toonzqt/functionsheet.cpp" line="512"/>
         <source>Hide Selected</source>
-        <translation type="unfinished"></translation>
+        <translation>Скрыть выбранное</translation>
     </message>
 </context>
 <context>
@@ -1829,12 +1829,12 @@ Select FX nodes and related links before copying or cutting the selection you wa
     <message>
         <location filename="../../toonzqt/planeviewer.cpp" line="303"/>
         <source>Reset View</source>
-        <translation type="unfinished"></translation>
+        <translation>Восстановить вид по умолчанию</translation>
     </message>
     <message>
         <location filename="../../toonzqt/planeviewer.cpp" line="308"/>
         <source>Fit To Window</source>
-        <translation type="unfinished"></translation>
+        <translation>Подогнать к окну</translation>
     </message>
 </context>
 <context>
@@ -2040,25 +2040,25 @@ Are you sure?</source>
         <location filename="../../toonzqt/styleeditor.cpp" line="2006"/>
         <source>Plain color</source>
         <comment>VectorBrushStyleChooserPage</comment>
-        <translation type="unfinished">Простой цвет</translation>
+        <translation>Простой цвет</translation>
     </message>
     <message>
         <location filename="../../toonzqt/styleeditor.cpp" line="2184"/>
         <source>Custom Texture</source>
         <comment>TextureStyleChooserPage</comment>
-        <translation type="unfinished"></translation>
+        <translation>Пользовательская текстура</translation>
     </message>
     <message>
         <location filename="../../toonzqt/styleeditor.cpp" line="2250"/>
         <source>Plain color</source>
         <comment>MyPaintBrushStyleChooserPage</comment>
-        <translation type="unfinished">Простой цвет</translation>
+        <translation>Простой цвет</translation>
     </message>
     <message>
         <location filename="../../toonzqt/styleeditor.cpp" line="2399"/>
         <source>Plain color</source>
         <comment>SpecialStyleChooserPage</comment>
-        <translation type="unfinished">Простой цвет</translation>
+        <translation>Простой цвет</translation>
     </message>
     <message>
         <source>Save</source>
@@ -2164,12 +2164,12 @@ Are you sure?</source>
     <message>
         <location filename="../../toonzqt/infoviewer.cpp" line="174"/>
         <source>Current Frame: </source>
-        <translation type="unfinished"></translation>
+        <translation>Текущий кадр: </translation>
     </message>
     <message>
         <location filename="../../toonzqt/infoviewer.cpp" line="177"/>
         <source>File History</source>
-        <translation type="unfinished"></translation>
+        <translation>История файла</translation>
     </message>
     <message>
         <location filename="../../toonzqt/infoviewer.cpp" line="185"/>
@@ -2394,7 +2394,7 @@ Are you sure?</source>
     <message>
         <location filename="../../toonzqt/gutil.cpp" line="336"/>
         <source>That is a reserved file name and cannot be used.</source>
-        <translation type="unfinished"></translation>
+        <translation>Это зарезервированное имя файла, его нельзя использовать.</translation>
     </message>
     <message>
         <source>OpenToonz 1.1</source>
@@ -2436,7 +2436,7 @@ Are you sure?</source>
     <message>
         <location filename="../../toonzqt/dvdialog.cpp" line="1343"/>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <location filename="../../toonzqt/dvdialog.cpp" line="1424"/>
@@ -2566,12 +2566,12 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     <message>
         <location filename="../../toonzqt/paramfield.cpp" line="1070"/>
         <source>Copy RGB : %1 &gt; %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Копировать RGB : %1 &gt; %2</translation>
     </message>
     <message>
         <location filename="../../toonzqt/paramfield.cpp" line="1071"/>
         <source>Swap %1 and %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Поменять местами %1 и %2</translation>
     </message>
 </context>
 <context>
@@ -2613,17 +2613,17 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     <message>
         <location filename="../../toonzqt/schematicviewer.cpp" line="937"/>
         <source>&amp;Selection Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Режим выделения</translation>
     </message>
     <message>
         <location filename="../../toonzqt/schematicviewer.cpp" line="942"/>
         <source>&amp;Zoom Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Режим приближения</translation>
     </message>
     <message>
         <location filename="../../toonzqt/schematicviewer.cpp" line="947"/>
         <source>&amp;Hand Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Ручной режим</translation>
     </message>
     <message>
         <location filename="../../toonzqt/schematicviewer.cpp" line="955"/>
@@ -2747,12 +2747,12 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     <message>
         <location filename="../../toonzqt/stageschematicnode.cpp" line="1333"/>
         <source>Toggle Autorotate Along Motion Path</source>
-        <translation type="unfinished"></translation>
+        <translation>Переключить автоматическое вращение в соответствии с траекторией движения</translation>
     </message>
     <message>
         <location filename="../../toonzqt/stageschematicnode.cpp" line="1334"/>
         <source>Toggle Link Motion Path to Control Points</source>
-        <translation type="unfinished"></translation>
+        <translation>Переключить соединение траектории движения с контрольными точками</translation>
     </message>
 </context>
 <context>
@@ -2779,23 +2779,25 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
         <location filename="../../toonzqt/studiopaletteviewer.cpp" line="488"/>
         <source>The current palette %1
 in the studio palette has been modified. Do you want to save your changes?</source>
-        <translation type="unfinished"></translation>
+        <translation>Текущая палитра %1
+в Studio Palette была изменена. Сохранить изменения?</translation>
     </message>
     <message>
         <location filename="../../toonzqt/studiopaletteviewer.cpp" line="493"/>
         <source>Save</source>
-        <translation type="unfinished">Сохранить</translation>
+        <translation>Сохранить</translation>
     </message>
     <message>
         <location filename="../../toonzqt/studiopaletteviewer.cpp" line="493"/>
         <source>Discard</source>
-        <translation type="unfinished">Сбросить</translation>
+        <translation>Отменить</translation>
     </message>
     <message>
         <location filename="../../toonzqt/studiopaletteviewer.cpp" line="576"/>
         <source>Convert %1 to Studio Palette and Overwrite. 
 Are you sure ?</source>
-        <translation type="unfinished"></translation>
+        <translation>Конвертировать %1 в Studio Palette и перезаписать.
+Вы уверены?</translation>
     </message>
     <message>
         <source>Yes</source>
@@ -2813,24 +2815,26 @@ Are you sure ?</source>
     <message>
         <location filename="../../toonzqt/studiopaletteviewer.cpp" line="578"/>
         <source>Convert</source>
-        <translation type="unfinished"></translation>
+        <translation>Конвертировать</translation>
     </message>
     <message>
         <location filename="../../toonzqt/studiopaletteviewer.cpp" line="804"/>
         <source>Replacing all selected palettes with the palette &quot;%1&quot;. 
 Are you sure ?</source>
-        <translation type="unfinished"></translation>
+        <translation>Все выбранные палитры заменены на «%1».
+Вы уверены?</translation>
     </message>
     <message>
         <location filename="../../toonzqt/studiopaletteviewer.cpp" line="811"/>
         <source>Replacing the palette &quot;%1&quot; with the palette &quot;%2&quot;. 
 Are you sure ?</source>
-        <translation type="unfinished"></translation>
+        <translation>Палитра &quot;%1&quot; будет заменена палитрой &quot;%2&quot;.
+Вы уверены?</translation>
     </message>
     <message>
         <location filename="../../toonzqt/studiopaletteviewer.cpp" line="817"/>
         <source>Replace</source>
-        <translation type="unfinished">Заменить</translation>
+        <translation>Заменить</translation>
     </message>
     <message>
         <location filename="../../toonzqt/studiopaletteviewer.cpp" line="878"/>
@@ -3192,12 +3196,12 @@ Apply</source>
     <message>
         <location filename="../../toonzqt/swatchviewer.cpp" line="844"/>
         <source>Reset View</source>
-        <translation type="unfinished"></translation>
+        <translation>Восстановить вид по умолчанию</translation>
     </message>
     <message>
         <location filename="../../toonzqt/swatchviewer.cpp" line="849"/>
         <source>Fit To Window</source>
-        <translation type="unfinished"></translation>
+        <translation>Подогнать к окну</translation>
     </message>
 </context>
 <context>

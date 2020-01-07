@@ -769,7 +769,7 @@
     <message>
         <location filename="../../tnztools/fullcolorfilltool.cpp" line="147"/>
         <source>Fill Depth</source>
-        <translation type="unfinished">Глубина заливки</translation>
+        <translation>Глубина заливки</translation>
     </message>
 </context>
 <context>
@@ -777,7 +777,7 @@
     <message>
         <location filename="../../tnztools/tooloptions.cpp" line="2736"/>
         <source>Reset Position</source>
-        <translation type="unfinished"></translation>
+        <translation>Сбросить расположение</translation>
     </message>
 </context>
 <context>
@@ -1230,20 +1230,20 @@ Do you want to proceed?</source>
     <message>
         <location filename="../../tnztools/strokeselection.cpp" line="450"/>
         <source>The selection cannot be updated. It is not editable.</source>
-        <translation type="unfinished"></translation>
+        <translation>Не удается обновить выделенное. Не редактируется.</translation>
     </message>
     <message>
         <location filename="../../tnztools/strokeselection.cpp" line="508"/>
         <location filename="../../tnztools/strokeselection.cpp" line="622"/>
         <location filename="../../tnztools/rasterselection.cpp" line="1062"/>
         <source>The selection cannot be deleted. It is not editable.</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно удалить выделенное. Не редактируется.</translation>
     </message>
     <message>
         <location filename="../../tnztools/strokeselection.cpp" line="561"/>
         <location filename="../../tnztools/rasterselection.cpp" line="1181"/>
         <source>The selection cannot be pasted. It is not editable.</source>
-        <translation type="unfinished"></translation>
+        <translation>Не удается вставить выделенное. Не редактируется.</translation>
     </message>
     <message>
         <location filename="../../tnztools/rasterselection.cpp" line="409"/>
@@ -1326,7 +1326,7 @@ Do you want to proceed?</source>
     <message>
         <location filename="../../tnztools/imagegrouping.cpp" line="485"/>
         <source>The selection cannot be grouped. It is not editable.</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно сгруппировать выделенное. Не редактируется.</translation>
     </message>
     <message>
         <location filename="../../tnztools/imagegrouping.cpp" line="508"/>
@@ -1336,12 +1336,12 @@ Do you want to proceed?</source>
     <message>
         <location filename="../../tnztools/imagegrouping.cpp" line="553"/>
         <source>The selection cannot be ungrouped. It is not editable.</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно рассгруппировать выделенное. Не редактируется.</translation>
     </message>
     <message>
         <location filename="../../tnztools/imagegrouping.cpp" line="714"/>
         <source>The selection cannot be moved. It is not editable.</source>
-        <translation type="unfinished"></translation>
+        <translation>Не удается переместить выделенное. Не редактируется.</translation>
     </message>
     <message>
         <location filename="../../tnztools/toonzvectorbrushtool.cpp" line="844"/>
@@ -1592,7 +1592,7 @@ Do you want to proceed?</source>
     <message>
         <location filename="../../tnztools/tooloptions.cpp" line="2713"/>
         <source>Reset Rotation</source>
-        <translation type="unfinished"></translation>
+        <translation>Сбросить вращение</translation>
     </message>
 </context>
 <context>
@@ -2091,7 +2091,7 @@ moved to the end of the first page of the palette.</source>
     <message>
         <location filename="../../tnztools/tooloptions.cpp" line="2690"/>
         <source>Reset Zoom</source>
-        <translation type="unfinished"></translation>
+        <translation>Сбросить приближение</translation>
     </message>
 </context>
 </TS>

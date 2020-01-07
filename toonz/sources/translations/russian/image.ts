@@ -107,12 +107,12 @@ Please try raising the FFmpeg timeout in Preferences.</source>
     <message>
         <location filename="../../image/sgi/filesgi.cpp" line="1238"/>
         <source>Big Endian</source>
-        <translation type="unfinished"></translation>
+        <translation>От старшего к младшему</translation>
     </message>
     <message>
         <location filename="../../image/sgi/filesgi.cpp" line="1239"/>
         <source>Little Endian</source>
-        <translation type="unfinished"></translation>
+        <translation>От младшего к старшему</translation>
     </message>
     <message>
         <location filename="../../image/sgi/filesgi.cpp" line="1240"/>

@@ -455,7 +455,8 @@
         <location filename="../../toonzlib/sceneresources.cpp" line="510"/>
         <source>Failed to save the following resources:
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Failed to save the following resources:
+</translation>
     </message>
     <message>
         <location filename="../../include/toonz/stageobjectutil.h" line="133"/>
@@ -546,7 +547,7 @@
     <message>
         <location filename="../../toonzlib/orientation.cpp" line="78"/>
         <source>Xsheet</source>
-        <translation type="unfinished"></translation>
+        <translation>Xsheet</translation>
     </message>
     <message>
         <location filename="../../toonzlib/orientation.cpp" line="143"/>
