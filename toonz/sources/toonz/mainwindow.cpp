@@ -452,6 +452,11 @@ centralWidget->setLayout(centralWidgetLayout);*/
 
   setCommandHandler(MI_About, this, &MainWindow::onAbout);
   setCommandHandler(MI_OpenOnlineManual, this, &MainWindow::onOpenOnlineManual);
+  setCommandHandler(MI_OpenWhatsNew, this, &MainWindow::onOpenWhatsNew);
+  setCommandHandler(MI_OpenCommunityForum, this,
+                    &MainWindow::onOpenCommunityForum);
+  setCommandHandler(MI_OpenReportAnIssue, this, &MainWindow::onOpenReportAnIssue);
+
   setCommandHandler(MI_MaximizePanel, this, &MainWindow::maximizePanel);
   setCommandHandler(MI_FullScreenWindow, this, &MainWindow::fullScreenWindow);
   setCommandHandler("MI_NewVectorLevel", this,
@@ -996,6 +1001,26 @@ void MainWindow::onOpenOnlineManual() {
   QDesktopServices::openUrl(QUrl(tr("http://opentoonz.readthedocs.io")));
 }
 
+//-----------------------------------------------------------------------------
+
+void MainWindow::onOpenWhatsNew() {
+  QDesktopServices::openUrl(
+      QUrl("https://github.com/opentoonz/opentoonz/releases/latest"));
+}
+
+//-----------------------------------------------------------------------------
+
+void MainWindow::onOpenCommunityForum() {
+  QDesktopServices::openUrl(
+      QUrl("https://groups.google.com/forum/#!forum/opentoonz_en"));
+}
+
+//-----------------------------------------------------------------------------
+
+void MainWindow::onOpenReportAnIssue() {
+  QDesktopServices::openUrl(
+      QUrl("https://github.com/opentoonz/opentoonz/issues"));
+}
 //-----------------------------------------------------------------------------
 
 void MainWindow::autofillToggle() {
@@ -1912,6 +1937,7 @@ void MainWindow::defineActions() {
                MenuPlayCommandType);
 
   createMenuPlayAction(MI_Play, tr("Play"), "P");
+  createMenuPlayAction(MI_ShortPlay, tr("Short Play"), "Alt+P");
   createMenuPlayAction(MI_Loop, tr("Loop"), "L");
   createMenuPlayAction(MI_Pause, tr("Pause"), "");
   createMenuPlayAction(MI_FirstFrame, tr("First Frame"), "Alt+,");
@@ -2000,7 +2026,11 @@ void MainWindow::defineActions() {
                           "Ctrl+`");
   createMenuHelpAction(MI_About, tr("&About OpenToonz..."), "");
   createMenuWindowsAction(MI_StartupPopup, tr("&Startup Popup..."), "Alt+S");
+
   createMenuHelpAction(MI_OpenOnlineManual, tr("&Online Manual..."), "F1");
+  createMenuHelpAction(MI_OpenWhatsNew, tr("&What's New..."), "");
+  createMenuHelpAction(MI_OpenCommunityForum, tr("&Community Forum..."), "");
+  createMenuHelpAction(MI_OpenReportAnIssue, tr("&Report an Issue..."), "");
 
   createRightClickMenuAction(MI_BlendColors, tr("&Blend colors"), "");
 

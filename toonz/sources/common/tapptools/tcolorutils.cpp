@@ -1043,7 +1043,7 @@ void TColorUtils::buildColorChipPalette(QList<QPair<TPixel32, TPoint>> &palette,
 
   // std::cout << "edgePoints.count = " << edgePoints.count() << std::endl;
   // This may be unnecessary
-  qSort(edgePoints.begin(), edgePoints.end(), lowerLeftThan);
+  std::sort(edgePoints.begin(), edgePoints.end(), lowerLeftThan);
 
   QList<ColorChip> colorChips;
 
@@ -1126,13 +1126,13 @@ void TColorUtils::buildColorChipPalette(QList<QPair<TPixel32, TPoint>> &palette,
     // sort the color chips
     switch (colorChipOrder) {
     case 0:
-      qSort(colorChips.begin(), colorChips.end(), colorChipUpperLeftThan);
+      std::sort(colorChips.begin(), colorChips.end(), colorChipUpperLeftThan);
       break;
     case 1:
-      qSort(colorChips.begin(), colorChips.end(), colorChipLowerLeftThan);
+      std::sort(colorChips.begin(), colorChips.end(), colorChipLowerLeftThan);
       break;
     case 2:
-      qSort(colorChips.begin(), colorChips.end(), colorChipLeftUpperThan);
+      std::sort(colorChips.begin(), colorChips.end(), colorChipLeftUpperThan);
       break;
     }
 

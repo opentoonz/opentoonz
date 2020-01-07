@@ -1239,11 +1239,11 @@ What do you want to do? </source>
     </message>
     <message>
         <source>[SCENE]: </source>
-        <translation type="unfinished"></translation>
+        <translation>[シーン]： </translation>
     </message>
     <message>
         <source>[LEVEL]: </source>
-        <translation type="unfinished"></translation>
+        <translation>[レベル]： </translation>
     </message>
 </context>
 <context>
@@ -1587,7 +1587,7 @@ contain the dpi information, then the current camera dpi will be used.
     </message>
     <message>
         <source>Level %1 converting to same file format; skipped.</source>
-        <translation type="unfinished"></translation>
+        <translation>レベル %1 は変換前と同じファイル形式が指定されているのでスキップします。</translation>
     </message>
 </context>
 <context>
@@ -2363,7 +2363,7 @@ Hold F3 Key on the Viewer to Show This Frame Only</source>
     </message>
     <message>
         <source>Auto Inbetween</source>
-        <translation type="unfinished"></translation>
+        <translation>自動中割り</translation>
     </message>
 </context>
 <context>
@@ -2542,7 +2542,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Import Toonz Lip Sync File</source>
-        <translation type="unfinished"></translation>
+        <translation>Toonzリップシンクファイルを読み込み</translation>
     </message>
 </context>
 <context>
@@ -2972,15 +2972,15 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>[Various]</source>
-        <translation type="unfinished"></translation>
+        <translation>[複数の値]</translation>
     </message>
     <message>
         <source>SubXsheet Level</source>
-        <translation type="unfinished"></translation>
+        <translation>サブシートレベル</translation>
     </message>
     <message>
         <source>Another Level Type</source>
-        <translation type="unfinished"></translation>
+        <translation>その他のレベル形式</translation>
     </message>
 </context>
 <context>
@@ -3366,27 +3366,27 @@ Please use the frame numbers for reference.</source>
     </message>
     <message>
         <source>Level Settings &amp; Arrangement in Xsheet</source>
-        <translation type="unfinished"></translation>
+        <translation>レベル設定とタイムシート内の配置</translation>
     </message>
     <message>
         <source>Premultiply</source>
-        <translation type="unfinished"></translation>
+        <translation>合成チャンネル（黒マット）</translation>
     </message>
     <message>
         <source>White As Transparent</source>
-        <translation type="unfinished">白を透明にする</translation>
+        <translation>白を透明にする</translation>
     </message>
     <message>
         <source>DPI:</source>
-        <translation type="unfinished">DPI：</translation>
+        <translation>DPI：</translation>
     </message>
     <message>
         <source>Antialias Softness:</source>
-        <translation type="unfinished">アンチエイリアスの柔らかさ：</translation>
+        <translation>アンチエイリアスの柔らかさ：</translation>
     </message>
     <message>
         <source>Subsampling:</source>
-        <translation type="unfinished">離散サンプリング:</translation>
+        <translation>離散サンプリング:</translation>
     </message>
 </context>
 <context>
@@ -3543,11 +3543,11 @@ Please use the frame numbers for reference.</source>
     </message>
     <message>
         <source>Import Toonz Lip Sync File</source>
-        <translation type="unfinished"></translation>
+        <translation>Toonzリップシンクファイルを読み込み</translation>
     </message>
     <message>
         <source>To: </source>
-        <translation type="unfinished"></translation>
+        <translation>終了フレーム： </translation>
     </message>
 </context>
 <context>
@@ -4034,7 +4034,7 @@ Please use the frame numbers for reference.</source>
     </message>
     <message>
         <source>&amp;Duplicate Drawing  </source>
-        <translation>動画を複製 (&amp;D) </translation>
+        <translation>動画フレームを複製 (&amp;D) </translation>
     </message>
     <message>
         <source>&amp;Clone</source>
@@ -5494,137 +5494,139 @@ Please use the frame numbers for reference.</source>
     </message>
     <message>
         <source>http://opentoonz.readthedocs.io</source>
-        <translation type="unfinished"></translation>
+        <translation>https://opentoonz.readthedocs.io/ja/latest/</translation>
     </message>
     <message>
         <source>&amp;Import Toonz Lip Sync File...</source>
-        <translation type="unfinished"></translation>
+        <translation>Toonzリップシンクファイルを読み込み (&amp;I)...</translation>
     </message>
     <message>
         <source>Export Exchange Digital Time Sheet (XDTS)</source>
-        <translation type="unfinished"></translation>
+        <translation>デジタルタイムシート情報（XDTS）の書き出し</translation>
     </message>
     <message>
         <source>&amp;Clear Cache Folder</source>
-        <translation type="unfinished"></translation>
+        <translation>キャッシュフォルダのクリア （&amp;C）</translation>
     </message>
     <message>
         <source>Show/Hide Xsheet Camera Column</source>
-        <translation type="unfinished"></translation>
+        <translation>タイムシート内のカメラ列の表示/非表示</translation>
     </message>
     <message>
         <source>&amp;Create Blank Drawing</source>
-        <translation type="unfinished"></translation>
+        <translation>空の動画フレームを作成 (&amp;C)</translation>
     </message>
     <message>
         <source>&amp;Shift Keys Down</source>
-        <translation type="unfinished"></translation>
+        <translation>キーフレームを下にシフト (&amp;S)</translation>
     </message>
     <message>
         <source>&amp;Shift Keys Up</source>
-        <translation type="unfinished"></translation>
+        <translation>キーフレームを上にシフト (&amp;S)</translation>
     </message>
     <message>
         <source>Next Key</source>
-        <translation type="unfinished"></translation>
+        <translation>次のキーフレーム</translation>
     </message>
     <message>
         <source>Prev Key</source>
-        <translation type="unfinished"></translation>
+        <translation>前のキーフレーム</translation>
     </message>
     <message>
         <source>&amp;FX Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>エフェクトエディタ （&amp;F）</translation>
     </message>
     <message>
         <source>&amp;Stop Motion Controls</source>
-        <translation type="unfinished"></translation>
+        <translation>ストップモーション操作パネル (&amp;S)</translation>
     </message>
     <message>
         <source>&amp;Online Manual...</source>
-        <translation type="unfinished"></translation>
+        <translation>オンラインマニュアル (&amp;O)...</translation>
     </message>
     <message>
         <source>Select Next Frame Guide Stroke</source>
-        <translation type="unfinished"></translation>
+        <translation>後の原画描線を選択</translation>
     </message>
     <message>
         <source>Select Previous Frame Guide Stroke</source>
-        <translation type="unfinished"></translation>
+        <translation>前の原画描線を選択</translation>
     </message>
     <message>
         <source>Select Prev &amp;&amp; Next Frame Guide Strokes</source>
-        <translation type="unfinished"></translation>
+        <translation>前後の原画描線を選択</translation>
     </message>
     <message>
         <source>Reset Guide Stroke Selections</source>
-        <translation type="unfinished"></translation>
+        <translation>原画描線の選択を解除</translation>
     </message>
     <message>
         <source>Tween Selected Guide Strokes</source>
-        <translation type="unfinished"></translation>
+        <translation>前後の原画描線の間を中割りする</translation>
     </message>
     <message>
         <source>Tween Guide Strokes to Selected</source>
-        <translation type="unfinished"></translation>
+        <translation>原画描線から選択描線の間を中割りする</translation>
     </message>
     <message>
         <source>Select Guide Strokes &amp;&amp; Tween Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>原画描線の選択 &amp;&amp; 中割りモード</translation>
     </message>
     <message>
         <source>Capture Stop Motion Frame</source>
-        <translation type="unfinished"></translation>
+        <translation>ストップモーションフレームを取り込む</translation>
     </message>
     <message>
         <source>Raise Stop Motion Opacity</source>
-        <translation type="unfinished"></translation>
+        <translation>ストップモーションの不透明度を上げる</translation>
     </message>
     <message>
         <source>Lower Stop Motion Opacity</source>
-        <translation type="unfinished"></translation>
+        <translation>ストップモーションの不透明度を下げる</translation>
     </message>
     <message>
         <source>Toggle Stop Motion Live View</source>
-        <translation type="unfinished"></translation>
+        <translation>ストップモーションのライブビュー表示/非表示</translation>
     </message>
     <message>
         <source>Toggle Stop Motion Zoom</source>
-        <translation type="unfinished"></translation>
+        <translation>ストップモーションのズームのON/OFF</translation>
     </message>
     <message>
         <source>Lower Stop Motion Level Subsampling</source>
-        <translation type="unfinished"></translation>
+        <translation>ストップモーションレベルの表示を高精細化する</translation>
     </message>
     <message>
         <source>Raise Stop Motion Level Subsampling</source>
-        <translation type="unfinished"></translation>
+        <translation>ストップモーションレベルの表示を簡略化する</translation>
     </message>
     <message>
         <source>Go to Stop Motion Insert Frame</source>
-        <translation type="unfinished"></translation>
+        <translation>ストップモーションフレームの挿入先に移動する</translation>
     </message>
     <message>
         <source>Clear Cache Folder</source>
-        <translation type="unfinished"></translation>
+        <translation>キャッシュフォルダのクリア</translation>
     </message>
     <message>
         <source>There are no unused items in the cache folder.</source>
-        <translation type="unfinished"></translation>
+        <translation>キャッシュフォルダ内に不要なアイテムがありません。</translation>
     </message>
     <message>
         <source>Deleting the following items:
 </source>
-        <translation type="unfinished"></translation>
+        <translation>以下のアイテムを削除します。
+</translation>
     </message>
     <message>
         <source>&lt;DIR&gt; </source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;フォルダ&gt; </translation>
     </message>
     <message>
         <source>   ... and %1 more items
 </source>
-        <translation type="unfinished"></translation>
+        <translation>   ... さらに %1 個のファイル
+</translation>
     </message>
     <message>
         <source>
@@ -5632,11 +5634,15 @@ Are you sure?
 
 N.B. Make sure you are not running another process of OpenToonz,
 or you may delete necessary files for it.</source>
-        <translation type="unfinished"></translation>
+        <translation>
+よろしいですか？
+
+注意：OpenToonzを別プロセスで実行中でないことを確認してください。
+必要なファイルを削除してしまう恐れがあります。</translation>
     </message>
     <message>
         <source>Can&apos;t delete %1 : </source>
-        <translation type="unfinished"></translation>
+        <translation>%1 を削除できません：</translation>
     </message>
 </context>
 <context>
@@ -7873,63 +7879,63 @@ in non alpha-enabled image format.</source>
     </message>
     <message>
         <source>Backup Scene and Animation Levels when Saving</source>
-        <translation type="unfinished"></translation>
+        <translation>保存する時にシーンとレベルのバックアップをとる</translation>
     </message>
     <message>
         <source># of backups to keep: </source>
-        <translation type="unfinished"></translation>
+        <translation>保持するバックアップの個数： </translation>
     </message>
     <message>
         <source>Enable Autocreation</source>
-        <translation type="unfinished"></translation>
+        <translation>自動作成を有効にする</translation>
     </message>
     <message>
         <source>Numbering System:</source>
-        <translation type="unfinished"></translation>
+        <translation>動画番号の振り方：</translation>
     </message>
     <message>
         <source>Enable Auto-stretch Frame</source>
-        <translation type="unfinished"></translation>
+        <translation>空コマを埋める</translation>
     </message>
     <message>
         <source>Enable Creation in Hold Cells</source>
-        <translation type="unfinished"></translation>
+        <translation>止め絵のコマに描いたときに新規フレームを作成</translation>
     </message>
     <message>
         <source>Enable Autorenumber</source>
-        <translation type="unfinished"></translation>
+        <translation>動画番号を自動で振りなおす</translation>
     </message>
     <message>
         <source>Toolbar Display Behaviour:</source>
-        <translation type="unfinished"></translation>
+        <translation>ツールバーの表示：</translation>
     </message>
     <message>
         <source>Show Camera Column</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラ列を表示する</translation>
     </message>
     <message>
         <source>Level Editor Box Color</source>
-        <translation type="unfinished"></translation>
+        <translation>レベル編集モードの背景色</translation>
     </message>
     <message>
         <source>Incremental</source>
-        <translation type="unfinished"></translation>
+        <translation>１ずつ増やす</translation>
     </message>
     <message>
         <source>Enable Tools For Level Only</source>
-        <translation type="unfinished"></translation>
+        <translation>使用可能なツールのみ有効化する</translation>
     </message>
     <message>
         <source>Show Tools For Level Only</source>
-        <translation type="unfinished"></translation>
+        <translation>使用可能なツールのみ表示する</translation>
     </message>
     <message>
         <source>Touch/Tablet Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>タッチ操作/タブレット</translation>
     </message>
     <message>
         <source>Enable Touch Gesture Controls</source>
-        <translation type="unfinished"></translation>
+        <translation>タッチジェスチャー操作を有効にする</translation>
     </message>
 </context>
 <context>
@@ -8192,7 +8198,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Save</source>
-        <translation>保存する</translation>
+        <translation>保存</translation>
     </message>
     <message>
         <source>Discard</source>
@@ -10147,96 +10153,98 @@ Do you want to overwrite it?</source>
     <message>
         <source>The file %1 already exists.
 Do you want to overwrite it?</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイル%1は既に存在します。
+上書きしてもよろしいですか？</translation>
     </message>
     <message>
         <source>The file %1 has been exported successfully.</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイル%1の書き出しが完了しました。</translation>
     </message>
     <message>
         <source>Open containing folder</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイルの場所を開く</translation>
     </message>
     <message>
         <source>Please enable &quot;Show Keyframes on Cell Area&quot; to show or hide the camera column.</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラ列の表示/非表示を変更するには「環境設定：タイムシートのコマ領域にキーフレームを表示」を有効にしてください。</translation>
     </message>
     <message>
         <source>The chosen folder path does not exist.
 Do you want to create it?</source>
-        <translation type="unfinished"></translation>
+        <translation>選択されたフォルダは存在しません。
+作成しますか？</translation>
     </message>
     <message>
         <source>Create</source>
-        <translation type="unfinished">作成</translation>
+        <translation>作成</translation>
     </message>
     <message>
         <source>Edit Level Settings : %1</source>
-        <translation type="unfinished"></translation>
+        <translation>レベル設定の変更 ： %1</translation>
     </message>
     <message>
         <source>Shift Key Frames Down</source>
-        <translation type="unfinished"></translation>
+        <translation>キーフレームを下にシフト</translation>
     </message>
     <message>
         <source>Shift Key Frames Up</source>
-        <translation type="unfinished"></translation>
+        <translation>キーフレームを上にシフト</translation>
     </message>
     <message>
         <source>Create Blank Drawing</source>
-        <translation type="unfinished"></translation>
+        <translation>空の動画フレームを作成</translation>
     </message>
     <message>
         <source>Duplicate Drawing</source>
-        <translation type="unfinished"></translation>
+        <translation>動画フレームを複製</translation>
     </message>
     <message>
         <source>Unable to create a blank drawing on the camera column</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラ列に動画フレームを作成することはできません</translation>
     </message>
     <message>
         <source>The current column is locked</source>
-        <translation type="unfinished"></translation>
+        <translation>現在の列はロックされています</translation>
     </message>
     <message>
         <source>Cannot create a blank drawing on the current column</source>
-        <translation type="unfinished"></translation>
+        <translation>現在の列に動画フレームを作成できません</translation>
     </message>
     <message>
         <source>The current level is not editable</source>
-        <translation type="unfinished"></translation>
+        <translation>現在のレベルは編集不可です</translation>
     </message>
     <message>
         <source>Unable to create a blank drawing on the current column</source>
-        <translation type="unfinished"></translation>
+        <translation>現在の列に動画フレームを作成できません</translation>
     </message>
     <message>
         <source>Unable to replace the current drawing with a blank drawing</source>
-        <translation type="unfinished"></translation>
+        <translation>現在の動画フレームを空の動画フレームで置き換えることはできません</translation>
     </message>
     <message>
         <source>There are no drawings in the camera column to duplicate</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラ列で動画フレームの複製を行うことはできません</translation>
     </message>
     <message>
         <source>Cannot duplicate a drawing in the current column</source>
-        <translation type="unfinished"></translation>
+        <translation>現在の列で動画フレームを複製できません</translation>
     </message>
     <message>
         <source>Unable to duplicate a drawing on the current column</source>
-        <translation type="unfinished"></translation>
+        <translation>現在の列で動画フレームを複製できません</translation>
     </message>
     <message>
         <source>Unable to replace the current or next drawing with a duplicate drawing</source>
-        <translation type="unfinished"></translation>
+        <translation>現在または次の動画フレームを複製された動画フレームで置き換えることはできません</translation>
     </message>
     <message>
         <source>Stop Motion Controller</source>
-        <translation type="unfinished"></translation>
+        <translation>ストップモーション操作パネル</translation>
     </message>
     <message>
         <source>Camera Column Switch :  </source>
-        <translation type="unfinished"></translation>
+        <translation>カメラ列を切り替え ：  </translation>
     </message>
 </context>
 <context>
@@ -10446,7 +10454,7 @@ The audio file will not be included in the rendered clip.</source>
     </message>
     <message>
         <source>Left click and drag to move guide. Right click to delete guide</source>
-        <translation type="unfinished"></translation>
+        <translation>[ドラッグ] ガイドを移動 [右クリック] ガイドを削除</translation>
     </message>
 </context>
 <context>
@@ -11592,23 +11600,23 @@ Please commit or revert changes first.</source>
     </message>
     <message>
         <source>Auto Inbetween</source>
-        <translation type="unfinished"></translation>
+        <translation>自動中割り</translation>
     </message>
     <message>
         <source>Linear Interpolation</source>
-        <translation type="unfinished">線形</translation>
+        <translation>均等割り</translation>
     </message>
     <message>
         <source>Ease In Interpolation</source>
-        <translation type="unfinished"></translation>
+        <translation>後詰め</translation>
     </message>
     <message>
         <source>Ease Out Interpolation</source>
-        <translation type="unfinished"></translation>
+        <translation>先詰め</translation>
     </message>
     <message>
         <source>Ease In/Out Interpolation</source>
-        <translation type="unfinished"></translation>
+        <translation>両詰め</translation>
     </message>
 </context>
 <context>
@@ -11679,11 +11687,11 @@ Please commit or revert changes first.</source>
     </message>
     <message>
         <source>[SCENE]: </source>
-        <translation type="unfinished"></translation>
+        <translation>[シーン]： </translation>
     </message>
     <message>
         <source>[LEVEL]: </source>
-        <translation type="unfinished"></translation>
+        <translation>[レベル]： </translation>
     </message>
 </context>
 <context>
@@ -12043,15 +12051,15 @@ Please commit or revert changes first.</source>
     </message>
     <message>
         <source>Play</source>
-        <translation type="unfinished">再生</translation>
+        <translation>再生</translation>
     </message>
     <message>
         <source>Render</source>
-        <translation type="unfinished">レンダリング</translation>
+        <translation>レンダリング</translation>
     </message>
     <message>
         <source>Help</source>
-        <translation type="unfinished">ヘルプ</translation>
+        <translation>ヘルプ</translation>
     </message>
 </context>
 <context>
@@ -12191,55 +12199,55 @@ Assign to &apos;%3&apos;?</source>
     </message>
     <message>
         <source>Project Management</source>
-        <translation type="unfinished"></translation>
+        <translation>プロジェクト管理</translation>
     </message>
     <message>
         <source>Import</source>
-        <translation type="unfinished"></translation>
+        <translation>読み込み</translation>
     </message>
     <message>
         <source>Export</source>
-        <translation type="unfinished">書き出し</translation>
+        <translation>書き出し</translation>
     </message>
     <message>
         <source>Script</source>
-        <translation type="unfinished"></translation>
+        <translation>スクリプト</translation>
     </message>
     <message>
         <source>Group</source>
-        <translation type="unfinished"></translation>
+        <translation>グループ</translation>
     </message>
     <message>
         <source>Arrange</source>
-        <translation type="unfinished"></translation>
+        <translation>重ね順</translation>
     </message>
     <message>
         <source>New</source>
-        <translation type="unfinished">新規フォルダ</translation>
+        <translation>新規作成</translation>
     </message>
     <message>
         <source>Adjust</source>
-        <translation type="unfinished"></translation>
+        <translation>画像補正</translation>
     </message>
     <message>
         <source>Optimize</source>
-        <translation type="unfinished"></translation>
+        <translation>最適化</translation>
     </message>
     <message>
         <source>Convert</source>
-        <translation type="unfinished">変換</translation>
+        <translation>変換</translation>
     </message>
     <message>
         <source>Drawing Substitution</source>
-        <translation type="unfinished"></translation>
+        <translation>動画番号をシフトする</translation>
     </message>
     <message>
         <source>Play</source>
-        <translation type="unfinished">再生</translation>
+        <translation>再生</translation>
     </message>
     <message>
         <source>Workspace</source>
-        <translation type="unfinished"></translation>
+        <translation>ワークスペース</translation>
     </message>
 </context>
 <context>
@@ -12424,7 +12432,7 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>Failed to create the folder.</source>
-        <translation type="unfinished"></translation>
+        <translation>フォルダの作成に失敗しました。</translation>
     </message>
 </context>
 <context>
@@ -12432,405 +12440,406 @@ Possibly the preset file has been corrupted</source>
     <message>
         <source>No</source>
         <comment>frame id</comment>
-        <translation type="unfinished"></translation>
+        <translation>フレームなし</translation>
     </message>
     <message>
         <source>No level name specified: please choose a valid level name</source>
-        <translation type="unfinished"></translation>
+        <translation>レベル名は指定されていません。有効なレベル名を指定して下さい</translation>
     </message>
     <message>
         <source>The level name specified is already used: please choose a different level name.</source>
-        <translation type="unfinished">指定されたレベル名はすでに使用中です：別の名前を指定してください</translation>
+        <translation>指定されたレベル名はすでに使用中です：別の名前を指定してください。</translation>
     </message>
     <message>
         <source>The save in path specified does not match with the existing level.</source>
-        <translation type="unfinished">指定された保存先パスが既存のレベルと異なります。</translation>
+        <translation>指定された保存先パスが既存のレベルと異なります。</translation>
     </message>
     <message>
         <source>The captured image size does not match with the existing level.</source>
-        <translation type="unfinished">取り込まれた画像サイズが既存のレベルと異なります。</translation>
+        <translation>取り込まれた画像サイズが既存のレベルと異なります。</translation>
     </message>
     <message>
         <source>File %1 already exists.
 Do you want to overwrite it?</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイル %1 は既に存在します。
+上書きしてもよろしいですか？</translation>
     </message>
     <message>
         <source>Failed to load %1.</source>
-        <translation type="unfinished">ファイル %1 の読み込みに失敗しました</translation>
+        <translation>ファイル %1 の読み込みに失敗しました。</translation>
     </message>
     <message>
         <source>Folder %1 doesn&apos;t exist.
 Do you want to create it?</source>
-        <translation type="unfinished">フォルダー %1 は存在しません。
+        <translation>フォルダー %1 は存在しません。
 作成しますか？</translation>
     </message>
     <message>
         <source>Unable to create</source>
-        <translation type="unfinished"></translation>
+        <translation>作成できません</translation>
     </message>
     <message>
         <source>UNDEFINED WARNING</source>
-        <translation type="unfinished">※ 未定義の警告 ※</translation>
+        <translation>※ 未定義の警告 ※</translation>
     </message>
     <message>
         <source>The level is not registered in the scene, but exists in the file system.</source>
-        <translation type="unfinished">このレベルは現在のシーンに読み込まれていませんが、ファイルは存在します。</translation>
+        <translation>このレベルは現在のシーンに読み込まれていませんが、ファイルは存在します。</translation>
     </message>
     <message>
         <source>
 WARNING : Image size mismatch. The saved image size is %1 x %2.</source>
-        <translation type="unfinished">
+        <translation>
 警告： 画像サイズの不一致。保存されている画像のサイズは %1 x %2 ピクセルです。</translation>
     </message>
     <message>
         <source>WARNING </source>
-        <translation type="unfinished"></translation>
+        <translation>警告 </translation>
     </message>
     <message>
         <source>
 Frame %1 exists.</source>
-        <translation type="unfinished">
+        <translation>
 以下のコマが撮り込み済です： %1</translation>
     </message>
     <message>
         <source>
 Frames %1 exist.</source>
-        <translation type="unfinished">
+        <translation>
 以下のコマが撮り込み済です： %1</translation>
     </message>
     <message>
         <source>OVERWRITE 1 of</source>
-        <translation type="unfinished">上書き ：</translation>
+        <translation>上書き ：</translation>
     </message>
     <message>
         <source>ADD to</source>
-        <translation type="unfinished">追加 ：</translation>
+        <translation>追加 ：</translation>
     </message>
     <message>
         <source> %1 frame</source>
-        <translation type="unfinished"> %1 コマ撮り込み済</translation>
+        <translation> %1 コマ撮り込み済</translation>
     </message>
     <message>
         <source> %1 frames</source>
-        <translation type="unfinished"> %1 コマ撮り込み済</translation>
+        <translation> %1 コマ撮り込み済</translation>
     </message>
     <message>
         <source>The level will be newly created.</source>
-        <translation type="unfinished">レベルは新規作成されます。</translation>
+        <translation>レベルは新規作成されます。</translation>
     </message>
     <message>
         <source>NEW</source>
-        <translation type="unfinished">新規作成</translation>
+        <translation>新規作成</translation>
     </message>
     <message>
         <source>The level is already registered in the scene.</source>
-        <translation type="unfinished">このレベルは既にシーンに読み込まれています。</translation>
+        <translation>このレベルは既にシーンに読み込まれています。</translation>
     </message>
     <message>
         <source>
 NOTE : The level is not saved.</source>
-        <translation type="unfinished">
+        <translation>
 注意： このレベルはまだファイルに保存されていません。</translation>
     </message>
     <message>
         <source>
 WARNING : Failed to get image size of the existing level %1.</source>
-        <translation type="unfinished">
+        <translation>
 警告： 既存のレベル %1 の画像サイズの取得に失敗しました。</translation>
     </message>
     <message>
         <source>
 WARNING : Image size mismatch. The existing level size is %1 x %2.</source>
-        <translation type="unfinished">
+        <translation>
 警告： 画像サイズの不一致。既存のレベルのサイズは %1 x %2 です。</translation>
     </message>
     <message>
         <source>WARNING : Level name conflicts. There already is a level %1 in the scene with the path                        
           %2.</source>
-        <translation type="unfinished">警告： レベル名の重複。このシーンには、既に %1 という名前のレベルが存在します。
+        <translation>警告： レベル名の重複。このシーンには、既に %1 という名前のレベルが存在します。
 既存のレベルのファイルパスは %2 です。</translation>
     </message>
     <message>
         <source>
 WARNING : Image size mismatch. The size of level with the same name is is %1 x %2.</source>
-        <translation type="unfinished">
+        <translation>
 警告： 画像サイズの不一致。既存の同名のレベルのサイズは %1 x %2 です。</translation>
     </message>
     <message>
         <source>WARNING : Level path conflicts. There already is a level with the path %1                        
           in the scene with the name %2.</source>
-        <translation type="unfinished">警告： ファイルパスの重複。既にこのシーンには %1 から読み込まれている
+        <translation>警告： ファイルパスの重複。既にこのシーンには %1 から読み込まれている
 別名のレベル %2 があります。</translation>
     </message>
     <message>
         <source>
 WARNING : Image size mismatch. The size of level with the same path is %1 x %2.</source>
-        <translation type="unfinished">
+        <translation>
 警告： 画像サイズの不一致。 既存の同じファイルパスのレベルのサイズは %1 x %2 です。</translation>
     </message>
     <message>
         <source>WARNING</source>
-        <translation type="unfinished">警告</translation>
+        <translation>警告</translation>
     </message>
     <message>
         <source>No camera selected.</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラが選択されていません。</translation>
     </message>
 </context>
 <context>
     <name>StopMotionController</name>
     <message>
         <source>Controls</source>
-        <translation type="unfinished"></translation>
+        <translation>コントロール</translation>
     </message>
     <message>
         <source>Settings</source>
-        <translation type="unfinished">設定</translation>
+        <translation>設定</translation>
     </message>
     <message>
         <source>Options</source>
-        <translation type="unfinished"></translation>
+        <translation>オプション</translation>
     </message>
     <message>
         <source>Resolution: </source>
-        <translation type="unfinished"></translation>
+        <translation>ピクセルサイズ： </translation>
     </message>
     <message>
         <source>Refresh</source>
-        <translation type="unfinished"></translation>
+        <translation>更新</translation>
     </message>
     <message>
         <source>File</source>
-        <translation type="unfinished">ファイル</translation>
+        <translation>ファイル</translation>
     </message>
     <message>
         <source>Webcam Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>ウェブカメラ設定...</translation>
     </message>
     <message>
         <source>Capture</source>
-        <translation type="unfinished"></translation>
+        <translation>取り込み</translation>
     </message>
     <message>
         <source>Next Level</source>
-        <translation type="unfinished">次のレベル</translation>
+        <translation>次のレベル</translation>
     </message>
     <message>
         <source>Next New</source>
-        <translation type="unfinished"></translation>
+        <translation>次の新規レベル</translation>
     </message>
     <message>
         <source>Previous Level</source>
-        <translation type="unfinished">前のレベル</translation>
+        <translation>前のレベル</translation>
     </message>
     <message>
         <source>Next Frame</source>
-        <translation type="unfinished">次のフレーム</translation>
+        <translation>次のフレーム</translation>
     </message>
     <message>
         <source>Last Frame</source>
-        <translation type="unfinished">最後のフレーム</translation>
+        <translation>最後のフレーム</translation>
     </message>
     <message>
         <source>Previous Frame</source>
-        <translation type="unfinished">前のフレーム</translation>
+        <translation>前のフレーム</translation>
     </message>
     <message>
         <source>Next XSheet Frame</source>
-        <translation type="unfinished"></translation>
+        <translation>タイムシートの次のフレーム</translation>
     </message>
     <message>
         <source>Previous XSheet Frame</source>
-        <translation type="unfinished"></translation>
+        <translation>タイムシートの前のフレーム</translation>
     </message>
     <message>
         <source>Current Frame</source>
-        <translation type="unfinished">現在のフレーム</translation>
+        <translation>現在のフレーム</translation>
     </message>
     <message>
         <source>Set to the Current Playhead Location</source>
-        <translation type="unfinished"></translation>
+        <translation>現在のフレームに設定</translation>
     </message>
     <message>
         <source>Start Live View</source>
-        <translation type="unfinished"></translation>
+        <translation>ライブビューを開始</translation>
     </message>
     <message>
         <source>Zoom</source>
-        <translation type="unfinished"></translation>
+        <translation>ズーム</translation>
     </message>
     <message>
         <source>Pick Zoom</source>
-        <translation type="unfinished"></translation>
+        <translation>フォーカス位置を指定</translation>
     </message>
     <message>
         <source>&lt;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>&lt;&lt;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>&gt;&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>&lt;&lt;&lt;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>&gt;&gt;&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Camera:</source>
-        <translation type="unfinished">カメラ：</translation>
+        <translation>カメラ：</translation>
     </message>
     <message>
         <source>Name:</source>
-        <translation type="unfinished"></translation>
+        <translation>レベル名：</translation>
     </message>
     <message>
         <source>Frame:</source>
-        <translation type="unfinished">フレーム：</translation>
+        <translation>フレーム：</translation>
     </message>
     <message>
         <source>File Type:</source>
-        <translation type="unfinished">ファイルタイプ：</translation>
+        <translation>ファイルタイプ：</translation>
     </message>
     <message>
         <source>Save In:</source>
-        <translation type="unfinished"></translation>
+        <translation>保存先：</translation>
     </message>
     <message>
         <source>XSheet Frame:</source>
-        <translation type="unfinished"></translation>
+        <translation>タイムシートのフレーム：</translation>
     </message>
     <message>
         <source>Camera Model</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラ型番</translation>
     </message>
     <message>
         <source>Camera Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラモード</translation>
     </message>
     <message>
         <source>Temperature: </source>
-        <translation type="unfinished"></translation>
+        <translation>色温度： </translation>
     </message>
     <message>
         <source>Shutter Speed: </source>
-        <translation type="unfinished"></translation>
+        <translation>シャッタースピード： </translation>
     </message>
     <message>
         <source>Iso: </source>
-        <translation type="unfinished"></translation>
+        <translation>ISO： </translation>
     </message>
     <message>
         <source>Aperture: </source>
-        <translation type="unfinished"></translation>
+        <translation>絞り： </translation>
     </message>
     <message>
         <source>Exposure: </source>
-        <translation type="unfinished"></translation>
+        <translation>露出： </translation>
     </message>
     <message>
         <source>Image Quality: </source>
-        <translation type="unfinished"></translation>
+        <translation>画質： </translation>
     </message>
     <message>
         <source>Picture Style: </source>
-        <translation type="unfinished"></translation>
+        <translation>ピクチャスタイル： </translation>
     </message>
     <message>
         <source>White Balance: </source>
-        <translation type="unfinished"></translation>
+        <translation>ホワイトバランス： </translation>
     </message>
     <message>
         <source>Webcam Options</source>
-        <translation type="unfinished"></translation>
+        <translation>ウェブカメラ設定</translation>
     </message>
     <message>
         <source>DSLR Options</source>
-        <translation type="unfinished"></translation>
+        <translation>デジタル一眼レフ設定</translation>
     </message>
     <message>
         <source>Place the frame in the XSheet</source>
-        <translation type="unfinished"></translation>
+        <translation>取り込んだ画像をタイムシート内に配置する</translation>
     </message>
     <message>
         <source>Use Direct Show Webcam Drivers</source>
-        <translation type="unfinished"></translation>
+        <translation>DirectShowデバイスドライバを使用する</translation>
     </message>
     <message>
         <source>Black Screen for Capture</source>
-        <translation type="unfinished"></translation>
+        <translation>取り込み時に画面を暗くする</translation>
     </message>
     <message>
         <source>Use Reduced Resolution Images</source>
-        <translation type="unfinished"></translation>
+        <translation>低解像度の画像を使用する</translation>
     </message>
     <message>
         <source>Use MJPG with Webcam</source>
-        <translation type="unfinished"></translation>
+        <translation>ウェブカメラの取り込みにMJPGを用いる</translation>
     </message>
     <message>
         <source>Place on XSheet</source>
-        <translation type="unfinished"></translation>
+        <translation>タイムシート内に配置</translation>
     </message>
     <message>
         <source>Use Numpad Shortcuts When Active</source>
-        <translation type="unfinished"></translation>
+        <translation>テンキーのショートカットを用いる</translation>
     </message>
     <message>
         <source>Show Live View on All Frames</source>
-        <translation type="unfinished"></translation>
+        <translation>全てのフレームでライブビューを表示</translation>
     </message>
     <message>
         <source>Capture Review Time: </source>
-        <translation type="unfinished"></translation>
+        <translation>画像を確認する時間： </translation>
     </message>
     <message>
         <source>Level Subsampling: </source>
-        <translation type="unfinished"></translation>
+        <translation>レベルの離散サンプリング: </translation>
     </message>
     <message>
         <source>Opacity:</source>
-        <translation type="unfinished">不透明度：</translation>
+        <translation>不透明度：</translation>
     </message>
     <message>
         <source>No camera detected.</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラが認識されていません。</translation>
     </message>
     <message>
         <source>No camera detected</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラが認識されていません</translation>
     </message>
     <message>
         <source>- Select camera -</source>
-        <translation type="unfinished">- カメラを選択してください -</translation>
+        <translation>- カメラを選択してください -</translation>
     </message>
     <message>
         <source>Mode: </source>
-        <translation type="unfinished"></translation>
+        <translation>モード： </translation>
     </message>
     <message>
         <source>Auto</source>
-        <translation type="unfinished"></translation>
+        <translation>自動</translation>
     </message>
     <message>
         <source>Disabled</source>
-        <translation type="unfinished">無効</translation>
+        <translation>無効</translation>
     </message>
     <message>
         <source>Stop Live View</source>
-        <translation type="unfinished"></translation>
+        <translation>ライブビューを停止</translation>
     </message>
 </context>
 <context>
@@ -13248,11 +13257,11 @@ Click the arrow button to create a new sub-xsheet</source>
     <name>Toolbar</name>
     <message>
         <source>Collapse toolbar</source>
-        <translation type="unfinished"></translation>
+        <translation>ツールバーを畳む</translation>
     </message>
     <message>
         <source>Expand toolbar</source>
-        <translation type="unfinished"></translation>
+        <translation>ツールバーを展開する</translation>
     </message>
 </context>
 <context>
@@ -13490,27 +13499,27 @@ Please refer to the user guide for details.</source>
     <name>XDTSImportPopup</name>
     <message>
         <source>Importing XDTS file %1</source>
-        <translation type="unfinished"></translation>
+        <translation>XDTSファイル %1 の読み込み</translation>
     </message>
     <message>
         <source>Load</source>
-        <translation type="unfinished"></translation>
+        <translation>読み込み</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">キャンセル</translation>
+        <translation>キャンセル</translation>
     </message>
     <message>
         <source>Please specify the level locations. Suggested paths are input in the fields with blue border.</source>
-        <translation type="unfinished"></translation>
+        <translation>レベルのパスを指定してください。パスの候補が自動入力されているフィールドは青い枠が付いています。</translation>
     </message>
     <message>
         <source>Level Name</source>
-        <translation type="unfinished"></translation>
+        <translation>レベル名</translation>
     </message>
     <message>
         <source>Level Path</source>
-        <translation type="unfinished"></translation>
+        <translation>レベルのパス</translation>
     </message>
 </context>
 <context>
@@ -13720,11 +13729,11 @@ Please refer to the user guide for details.</source>
     </message>
     <message>
         <source>Hide Camera Column</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラ列を隠す</translation>
     </message>
     <message>
         <source>Show Camera Column</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラ列を表示する</translation>
     </message>
 </context>
 <context>

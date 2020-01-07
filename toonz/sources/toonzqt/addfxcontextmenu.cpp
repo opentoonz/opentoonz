@@ -344,21 +344,21 @@ void AddFxContextMenu::loadFxPlugins(QMenu *insertFxGroup, QMenu *addFxGroup,
   for (auto &&ins : insVendors) {
     QList<QAction *> actions = ins.second->actions();
     ins.second->clear();
-    qSort(actions.begin(), actions.end(), comp);
+    std::sort(actions.begin(), actions.end(), comp);
     ins.second->addActions(actions);
   }
 
   for (auto &&ins : addVendors) {
     QList<QAction *> actions = ins.second->actions();
     ins.second->clear();
-    qSort(actions.begin(), actions.end(), comp);
+    std::sort(actions.begin(), actions.end(), comp);
     ins.second->addActions(actions);
   }
 
   for (auto &&ins : repVendors) {
     QList<QAction *> actions = ins.second->actions();
     ins.second->clear();
-    qSort(actions.begin(), actions.end(), comp);
+    std::sort(actions.begin(), actions.end(), comp);
     ins.second->addActions(actions);
   }
 }

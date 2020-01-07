@@ -164,7 +164,7 @@
     <message>
         <location filename="../../tnztools/toonzvectorbrushtool.cpp" line="594"/>
         <source>Snap</source>
-        <translation>Zapadnout</translation>
+        <translation>Přichytávání</translation>
     </message>
     <message>
         <location filename="../../tnztools/toonzvectorbrushtool.cpp" line="596"/>
@@ -179,17 +179,18 @@
     <message>
         <location filename="../../tnztools/toonzvectorbrushtool.cpp" line="598"/>
         <source>In</source>
-        <translation type="unfinished"></translation>
+        <translation>Zpomalení na začátku</translation>
     </message>
     <message>
         <location filename="../../tnztools/toonzvectorbrushtool.cpp" line="599"/>
         <source>Out</source>
-        <translation type="unfinished"></translation>
+        <translation>Zpomalení na konci</translation>
     </message>
     <message>
         <location filename="../../tnztools/toonzvectorbrushtool.cpp" line="600"/>
         <source>In&amp;Out</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Na začátku &amp;na konci</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../tnztools/toonzvectorbrushtool.cpp" line="601"/>
@@ -209,32 +210,32 @@
     <message>
         <location filename="../../tnztools/toonzvectorbrushtool.cpp" line="604"/>
         <source>Butt cap</source>
-        <translation type="unfinished"></translation>
+        <translation>Odřezek</translation>
     </message>
     <message>
         <location filename="../../tnztools/toonzvectorbrushtool.cpp" line="605"/>
         <source>Round cap</source>
-        <translation type="unfinished"></translation>
+        <translation>Zakulacený</translation>
     </message>
     <message>
         <location filename="../../tnztools/toonzvectorbrushtool.cpp" line="606"/>
         <source>Projecting cap</source>
-        <translation type="unfinished"></translation>
+        <translation>Rovný klobouček</translation>
     </message>
     <message>
         <location filename="../../tnztools/toonzvectorbrushtool.cpp" line="607"/>
         <source>Miter join</source>
-        <translation type="unfinished"></translation>
+        <translation>Ostrý ohyb</translation>
     </message>
     <message>
         <location filename="../../tnztools/toonzvectorbrushtool.cpp" line="608"/>
         <source>Round join</source>
-        <translation type="unfinished"></translation>
+        <translation>Kulatý ohyb</translation>
     </message>
     <message>
         <location filename="../../tnztools/toonzvectorbrushtool.cpp" line="609"/>
         <source>Bevel join</source>
-        <translation type="unfinished"></translation>
+        <translation>Zkosený ohyb</translation>
     </message>
 </context>
 <context>
@@ -242,7 +243,7 @@
     <message>
         <location filename="../../tnztools/tooloptions.cpp" line="1804"/>
         <source>Preset Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Název přednastavení</translation>
     </message>
     <message>
         <location filename="../../tnztools/tooloptions.cpp" line="1808"/>
@@ -300,12 +301,12 @@
     <message>
         <location filename="../../tnztools/edittool.cpp" line="840"/>
         <source>A/R</source>
-        <translation type="unfinished"></translation>
+        <translation>A/R</translation>
     </message>
     <message>
         <location filename="../../tnztools/edittool.cpp" line="841"/>
         <source>Mass</source>
-        <translation type="unfinished"></translation>
+        <translation>Hmota</translation>
     </message>
     <message>
         <location filename="../../tnztools/edittool.cpp" line="843"/>
@@ -731,7 +732,7 @@
     <message>
         <location filename="../../tnztools/fullcolorfilltool.cpp" line="147"/>
         <source>Fill Depth</source>
-        <translation type="unfinished">Hloubka výplně</translation>
+        <translation>Hloubka výplně</translation>
     </message>
 </context>
 <context>
@@ -739,7 +740,7 @@
     <message>
         <location filename="../../tnztools/tooloptions.cpp" line="2736"/>
         <source>Reset Position</source>
-        <translation type="unfinished"></translation>
+        <translation>Obnovit výchozí polohu</translation>
     </message>
 </context>
 <context>
@@ -747,7 +748,7 @@
     <message>
         <location filename="../../tnztools/hooktool.cpp" line="185"/>
         <source>Snap</source>
-        <translation>Zapadnout</translation>
+        <translation>Přichytávání</translation>
     </message>
 </context>
 <context>
@@ -1108,17 +1109,17 @@ Chcete pokračovat?</translation>
     <message>
         <location filename="../../tnztools/geometrictool.cpp" line="416"/>
         <source>Butt cap</source>
-        <translation type="unfinished"></translation>
+        <translation>Odřezek</translation>
     </message>
     <message>
         <location filename="../../tnztools/geometrictool.cpp" line="417"/>
         <source>Round cap</source>
-        <translation type="unfinished"></translation>
+        <translation>Zakulacený</translation>
     </message>
     <message>
         <location filename="../../tnztools/geometrictool.cpp" line="418"/>
         <source>Projecting cap</source>
-        <translation type="unfinished"></translation>
+        <translation>Rovný klobouček</translation>
     </message>
     <message>
         <location filename="../../tnztools/geometrictool.cpp" line="420"/>
@@ -1128,27 +1129,27 @@ Chcete pokračovat?</translation>
     <message>
         <location filename="../../tnztools/geometrictool.cpp" line="421"/>
         <source>Miter join</source>
-        <translation type="unfinished"></translation>
+        <translation>Ostrý ohyb</translation>
     </message>
     <message>
         <location filename="../../tnztools/geometrictool.cpp" line="422"/>
         <source>Round join</source>
-        <translation type="unfinished"></translation>
+        <translation>Kulatý ohyb</translation>
     </message>
     <message>
         <location filename="../../tnztools/geometrictool.cpp" line="423"/>
         <source>Bevel join</source>
-        <translation type="unfinished"></translation>
+        <translation>Zkosený ohyb</translation>
     </message>
     <message>
         <location filename="../../tnztools/geometrictool.cpp" line="425"/>
         <source>Miter:</source>
-        <translation type="unfinished"></translation>
+        <translation>Zkosení:</translation>
     </message>
     <message>
         <location filename="../../tnztools/geometrictool.cpp" line="426"/>
         <source>Snap</source>
-        <translation>Zapadnout</translation>
+        <translation>Přichytávání</translation>
     </message>
     <message>
         <location filename="../../tnztools/geometrictool.cpp" line="429"/>
@@ -1202,20 +1203,20 @@ Chcete pokračovat?</translation>
     <message>
         <location filename="../../tnztools/strokeselection.cpp" line="450"/>
         <source>The selection cannot be updated. It is not editable.</source>
-        <translation type="unfinished"></translation>
+        <translation>Výběr nelze aktualizovat. Není upravitelný.</translation>
     </message>
     <message>
         <location filename="../../tnztools/strokeselection.cpp" line="508"/>
         <location filename="../../tnztools/strokeselection.cpp" line="622"/>
         <location filename="../../tnztools/rasterselection.cpp" line="1062"/>
         <source>The selection cannot be deleted. It is not editable.</source>
-        <translation type="unfinished"></translation>
+        <translation>Výběr nelze smazat. Není upravitelný.</translation>
     </message>
     <message>
         <location filename="../../tnztools/strokeselection.cpp" line="561"/>
         <location filename="../../tnztools/rasterselection.cpp" line="1181"/>
         <source>The selection cannot be pasted. It is not editable.</source>
-        <translation type="unfinished"></translation>
+        <translation>Výběr nelze vložit. Není upravitelný.</translation>
     </message>
     <message>
         <location filename="../../tnztools/rasterselection.cpp" line="409"/>
@@ -1298,22 +1299,22 @@ Chcete pokračovat?</translation>
     <message>
         <location filename="../../tnztools/imagegrouping.cpp" line="485"/>
         <source>The selection cannot be grouped. It is not editable.</source>
-        <translation type="unfinished"></translation>
+        <translation>Výběr nelze seskupit. Není upravitelný.</translation>
     </message>
     <message>
         <location filename="../../tnztools/imagegrouping.cpp" line="508"/>
         <source>The selection cannot be entered. It is not editable.</source>
-        <translation type="unfinished"></translation>
+        <translation>Výběr nelze zadat. Není upravitelný.</translation>
     </message>
     <message>
         <location filename="../../tnztools/imagegrouping.cpp" line="553"/>
         <source>The selection cannot be ungrouped. It is not editable.</source>
-        <translation type="unfinished"></translation>
+        <translation>Výběr nelze odskupit. Není upravitelný.</translation>
     </message>
     <message>
         <location filename="../../tnztools/imagegrouping.cpp" line="714"/>
         <source>The selection cannot be moved. It is not editable.</source>
-        <translation type="unfinished"></translation>
+        <translation>Výběr nelze přesunout. Není upravitelný.</translation>
     </message>
     <message>
         <location filename="../../tnztools/edittoolgadgets.cpp" line="93"/>
@@ -1540,7 +1541,7 @@ Chcete pokračovat?</translation>
     <message>
         <location filename="../../tnztools/viewtools.h" line="41"/>
         <source>Rotate On Camera Center</source>
-        <translation type="unfinished">Otočit střed na kameře</translation>
+        <translation>Otočit na střed kamey</translation>
     </message>
 </context>
 <context>
@@ -1548,7 +1549,7 @@ Chcete pokračovat?</translation>
     <message>
         <location filename="../../tnztools/tooloptions.cpp" line="2713"/>
         <source>Reset Rotation</source>
-        <translation type="unfinished"></translation>
+        <translation>Obnovit výchozí otočení</translation>
     </message>
 </context>
 <context>
@@ -1952,17 +1953,17 @@ přesunut na konec první strany palety.</translation>
     <message>
         <location filename="../../tnztools/vectorselectiontool.cpp" line="1340"/>
         <source>Butt cap</source>
-        <translation type="unfinished"></translation>
+        <translation>Odřezek</translation>
     </message>
     <message>
         <location filename="../../tnztools/vectorselectiontool.cpp" line="1341"/>
         <source>Round cap</source>
-        <translation type="unfinished"></translation>
+        <translation>Zakulacený</translation>
     </message>
     <message>
         <location filename="../../tnztools/vectorselectiontool.cpp" line="1342"/>
         <source>Projecting cap</source>
-        <translation type="unfinished"></translation>
+        <translation>Rovný klobouček</translation>
     </message>
     <message>
         <location filename="../../tnztools/vectorselectiontool.cpp" line="1344"/>
@@ -1972,22 +1973,22 @@ přesunut na konec první strany palety.</translation>
     <message>
         <location filename="../../tnztools/vectorselectiontool.cpp" line="1345"/>
         <source>Miter join</source>
-        <translation type="unfinished"></translation>
+        <translation>Ostrý ohyb</translation>
     </message>
     <message>
         <location filename="../../tnztools/vectorselectiontool.cpp" line="1346"/>
         <source>Round join</source>
-        <translation type="unfinished"></translation>
+        <translation>Kulatý ohyb</translation>
     </message>
     <message>
         <location filename="../../tnztools/vectorselectiontool.cpp" line="1347"/>
         <source>Bevel join</source>
-        <translation type="unfinished"></translation>
+        <translation>Zkosený ohyb</translation>
     </message>
     <message>
         <location filename="../../tnztools/vectorselectiontool.cpp" line="1349"/>
         <source>Miter:</source>
-        <translation>Zkosení</translation>
+        <translation>Zkosení:</translation>
     </message>
 </context>
 <context>
@@ -2048,7 +2049,7 @@ přesunut na konec první strany palety.</translation>
     <message>
         <location filename="../../tnztools/tooloptions.cpp" line="2690"/>
         <source>Reset Zoom</source>
-        <translation type="unfinished"></translation>
+        <translation>Obnovit výchozí zvětšení</translation>
     </message>
 </context>
 </TS>

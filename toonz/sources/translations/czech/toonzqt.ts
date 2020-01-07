@@ -143,7 +143,7 @@
     <message>
         <location filename="../../toonzqt/camerasettingswidget.cpp" line="290"/>
         <source>A/R</source>
-        <translation type="unfinished"></translation>
+        <translation>A/R</translation>
     </message>
     <message>
         <location filename="../../toonzqt/camerasettingswidget.cpp" line="404"/>
@@ -437,12 +437,12 @@ Možná byl soubor s přednastavením poškozen</translation>
     <message>
         <location filename="../../toonzqt/functionsegmentviewer.cpp" line="380"/>
         <source>Ease In:</source>
-        <translation type="unfinished"></translation>
+        <translation>Zpomalení na začátku:</translation>
     </message>
     <message>
         <location filename="../../toonzqt/functionsegmentviewer.cpp" line="383"/>
         <source>Ease Out:</source>
-        <translation type="unfinished"></translation>
+        <translation>Zpomalení na konci:</translation>
     </message>
 </context>
 <context>
@@ -549,7 +549,7 @@ Možná byl soubor s přednastavením poškozen</translation>
     <message>
         <location filename="../../toonzqt/flipconsole.cpp" line="1119"/>
         <source>Viewer Controls</source>
-        <translation type="unfinished"></translation>
+        <translation>Ovládání pohledu</translation>
     </message>
     <message>
         <location filename="../../toonzqt/flipconsole.cpp" line="1144"/>
@@ -682,7 +682,7 @@ Možná byl soubor s přednastavením poškozen</translation>
     <message>
         <location filename="../../toonzqt/flipconsole.cpp" line="1262"/>
         <source>&amp;Locator</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Polohový maják</translation>
     </message>
     <message>
         <location filename="../../toonzqt/flipconsole.cpp" line="1269"/>
@@ -692,27 +692,27 @@ Možná byl soubor s přednastavením poškozen</translation>
     <message>
         <location filename="../../toonzqt/flipconsole.cpp" line="1283"/>
         <source>&amp;Zoom In</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Přiblížit</translation>
     </message>
     <message>
         <location filename="../../toonzqt/flipconsole.cpp" line="1285"/>
         <source>&amp;Zoom Out</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Oddálit</translation>
     </message>
     <message>
         <location filename="../../toonzqt/flipconsole.cpp" line="1287"/>
         <source>&amp;Flip Horizontally</source>
-        <translation type="unfinished"></translation>
+        <translation>Převrátit &amp;vodorovně</translation>
     </message>
     <message>
         <location filename="../../toonzqt/flipconsole.cpp" line="1290"/>
         <source>&amp;Flip Vertically</source>
-        <translation type="unfinished"></translation>
+        <translation>Převrátit &amp;svisle</translation>
     </message>
     <message>
         <location filename="../../toonzqt/flipconsole.cpp" line="1292"/>
         <source>&amp;Reset View</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Obnovit výchozí pohled</translation>
     </message>
     <message>
         <location filename="../../toonzqt/flipconsole.cpp" line="1501"/>
@@ -830,17 +830,17 @@ Možná byl soubor s přednastavením poškozen</translation>
     <message>
         <location filename="../../toonzqt/functionpanel.cpp" line="1531"/>
         <source>Speed In / Speed Out Interpolation</source>
-        <translation type="unfinished"></translation>
+        <translation>Interpolace zrychlení na začátku/na konci</translation>
     </message>
     <message>
         <location filename="../../toonzqt/functionpanel.cpp" line="1532"/>
         <source>Ease In / Ease Out Interpolation</source>
-        <translation type="unfinished"></translation>
+        <translation>Interpolace zpomalení na začátku/na konci</translation>
     </message>
     <message>
         <location filename="../../toonzqt/functionpanel.cpp" line="1533"/>
         <source>Ease In / Ease Out (%) Interpolation</source>
-        <translation type="unfinished"></translation>
+        <translation>Interpolace zpomalení na začátku/na konci (%)</translation>
     </message>
     <message>
         <location filename="../../toonzqt/functionpanel.cpp" line="1534"/>
@@ -924,17 +924,17 @@ Možná byl soubor s přednastavením poškozen</translation>
     <message>
         <location filename="../../toonzqt/functionsegmentviewer.cpp" line="909"/>
         <source>Speed In / Speed Out</source>
-        <translation type="unfinished"></translation>
+        <translation>Zrychlení na začátku/na konci</translation>
     </message>
     <message>
         <location filename="../../toonzqt/functionsegmentviewer.cpp" line="910"/>
         <source>Ease In / Ease Out</source>
-        <translation type="unfinished">Ease In/Ease Out</translation>
+        <translation>Zpomalení na začátku/na konci</translation>
     </message>
     <message>
         <location filename="../../toonzqt/functionsegmentviewer.cpp" line="911"/>
         <source>Ease In / Ease Out %</source>
-        <translation type="unfinished"></translation>
+        <translation>Zpomalení na začátku/na konci %</translation>
     </message>
     <message>
         <location filename="../../toonzqt/functionsegmentviewer.cpp" line="912"/>
@@ -1007,12 +1007,12 @@ Možná byl soubor s přednastavením poškozen</translation>
     <message>
         <location filename="../../toonzqt/functionsegmentviewer.cpp" line="1413"/>
         <source>Ease</source>
-        <translation type="unfinished"></translation>
+        <translation>Zpomalení</translation>
     </message>
     <message>
         <location filename="../../toonzqt/functionsegmentviewer.cpp" line="1416"/>
         <source>Ease%</source>
-        <translation type="unfinished"></translation>
+        <translation>Zpomalení %</translation>
     </message>
     <message>
         <location filename="../../toonzqt/functionsegmentviewer.cpp" line="1419"/>
@@ -1076,17 +1076,17 @@ Možná byl soubor s přednastavením poškozen</translation>
     <message>
         <location filename="../../toonzqt/functionsheet.cpp" line="949"/>
         <source>Speed In / Speed Out Interpolation</source>
-        <translation type="unfinished"></translation>
+        <translation>Interpolace zrychlení na začátku/na konci</translation>
     </message>
     <message>
         <location filename="../../toonzqt/functionsheet.cpp" line="950"/>
         <source>Ease In / Ease Out Interpolation</source>
-        <translation type="unfinished"></translation>
+        <translation>Interpolace zpomalení na začátku/na konci</translation>
     </message>
     <message>
         <location filename="../../toonzqt/functionsheet.cpp" line="951"/>
         <source>Ease In / Ease Out (%) Interpolation</source>
-        <translation type="unfinished"></translation>
+        <translation>Interpolace zpomalení na začátku/na konci (%)</translation>
     </message>
     <message>
         <location filename="../../toonzqt/functionsheet.cpp" line="952"/>
@@ -1106,7 +1106,7 @@ Možná byl soubor s přednastavením poškozen</translation>
     <message>
         <location filename="../../toonzqt/functionsheet.cpp" line="954"/>
         <source>Similar Shape Interpolation</source>
-        <translation type="unfinished">Interpolace skrze podobné tvary</translation>
+        <translation>Interpolace skrze podobné tvary</translation>
     </message>
     <message>
         <location filename="../../toonzqt/functionsheet.cpp" line="948"/>
@@ -1132,32 +1132,32 @@ Možná byl soubor s přednastavením poškozen</translation>
     <message>
         <location filename="../../toonzqt/functionsheet.cpp" line="955"/>
         <source>Activate Cycle</source>
-        <translation type="unfinished">Zapnout koloběh</translation>
+        <translation>Zapnout koloběh</translation>
     </message>
     <message>
         <location filename="../../toonzqt/functionsheet.cpp" line="956"/>
         <source>Deactivate Cycle</source>
-        <translation type="unfinished">Vypnout koloběh</translation>
+        <translation>Vypnout koloběh</translation>
     </message>
     <message>
         <location filename="../../toonzqt/functionsheet.cpp" line="957"/>
         <source>Show Inbetween Values</source>
-        <translation type="unfinished"></translation>
+        <translation>Ukázat hodnoty mezilehlých snímků</translation>
     </message>
     <message>
         <location filename="../../toonzqt/functionsheet.cpp" line="958"/>
         <source>Hide Inbetween Values</source>
-        <translation type="unfinished"></translation>
+        <translation>Skrýt hodnoty mezilehlých snímků</translation>
     </message>
     <message>
         <location filename="../../toonzqt/functionsheet.cpp" line="1008"/>
         <source>Change Interpolation</source>
-        <translation type="unfinished"></translation>
+        <translation>Změnit interpolaci</translation>
     </message>
     <message>
         <location filename="../../toonzqt/functionsheet.cpp" line="1023"/>
         <source>Change Step</source>
-        <translation type="unfinished"></translation>
+        <translation>Změnit krok</translation>
     </message>
 </context>
 <context>
@@ -1228,7 +1228,7 @@ Možná byl soubor s přednastavením poškozen</translation>
     <message>
         <location filename="../../toonzqt/functionsheet.cpp" line="512"/>
         <source>Hide Selected</source>
-        <translation type="unfinished"></translation>
+        <translation>Skrýt vybrané</translation>
     </message>
 </context>
 <context>
@@ -1814,12 +1814,12 @@ Vyberte uzly efektů a příbuzné odkazy, jež chcete vložit, před kopírová
     <message>
         <location filename="../../toonzqt/planeviewer.cpp" line="303"/>
         <source>Reset View</source>
-        <translation type="unfinished"></translation>
+        <translation>Obnovit výchozí pohled</translation>
     </message>
     <message>
         <location filename="../../toonzqt/planeviewer.cpp" line="308"/>
         <source>Fit To Window</source>
-        <translation type="unfinished"></translation>
+        <translation>Přizpůsobit oknu</translation>
     </message>
 </context>
 <context>
@@ -2091,25 +2091,25 @@ Jste si jistý?</translation>
         <location filename="../../toonzqt/styleeditor.cpp" line="2006"/>
         <source>Plain color</source>
         <comment>VectorBrushStyleChooserPage</comment>
-        <translation type="unfinished">Normální barva</translation>
+        <translation>Normální barva</translation>
     </message>
     <message>
         <location filename="../../toonzqt/styleeditor.cpp" line="2184"/>
         <source>Custom Texture</source>
         <comment>TextureStyleChooserPage</comment>
-        <translation type="unfinished"></translation>
+        <translation>Vlastní textura (povrch)</translation>
     </message>
     <message>
         <location filename="../../toonzqt/styleeditor.cpp" line="2250"/>
         <source>Plain color</source>
         <comment>MyPaintBrushStyleChooserPage</comment>
-        <translation type="unfinished">Normální barva</translation>
+        <translation>Normální barva</translation>
     </message>
     <message>
         <location filename="../../toonzqt/styleeditor.cpp" line="2399"/>
         <source>Plain color</source>
         <comment>SpecialStyleChooserPage</comment>
-        <translation type="unfinished">Normální barva</translation>
+        <translation>Normální barva</translation>
     </message>
     <message>
         <source>Save</source>
@@ -2215,12 +2215,12 @@ Jste si jistý?</translation>
     <message>
         <location filename="../../toonzqt/infoviewer.cpp" line="174"/>
         <source>Current Frame: </source>
-        <translation type="unfinished"></translation>
+        <translation>Nynější snímek: </translation>
     </message>
     <message>
         <location filename="../../toonzqt/infoviewer.cpp" line="177"/>
         <source>File History</source>
-        <translation type="unfinished"></translation>
+        <translation>Historie souboru</translation>
     </message>
     <message>
         <location filename="../../toonzqt/infoviewer.cpp" line="185"/>
@@ -2445,7 +2445,7 @@ Jste si jistý?</translation>
     <message>
         <location filename="../../toonzqt/gutil.cpp" line="336"/>
         <source>That is a reserved file name and cannot be used.</source>
-        <translation type="unfinished"></translation>
+        <translation>Toto je vyhrazený název souboru a nelze jej použít.</translation>
     </message>
     <message>
         <source>OpenToonz 1.3</source>
@@ -2479,7 +2479,7 @@ Jste si jistý?</translation>
     <message>
         <location filename="../../toonzqt/dvdialog.cpp" line="1343"/>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <location filename="../../toonzqt/dvdialog.cpp" line="1424"/>
@@ -2539,12 +2539,12 @@ Jste si jistý?</translation>
     <message>
         <location filename="../../toonzqt/paramfield.cpp" line="1070"/>
         <source>Copy RGB : %1 &gt; %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Kopírovat RGB : %1 &gt; %2</translation>
     </message>
     <message>
         <location filename="../../toonzqt/paramfield.cpp" line="1071"/>
         <source>Swap %1 and %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Prohodit %1 a %2</translation>
     </message>
 </context>
 <context>
@@ -2586,17 +2586,17 @@ Jste si jistý?</translation>
     <message>
         <location filename="../../toonzqt/schematicviewer.cpp" line="937"/>
         <source>&amp;Selection Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Režim &amp;výběru</translation>
     </message>
     <message>
         <location filename="../../toonzqt/schematicviewer.cpp" line="942"/>
         <source>&amp;Zoom Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Režim &amp;zvětšení</translation>
     </message>
     <message>
         <location filename="../../toonzqt/schematicviewer.cpp" line="947"/>
         <source>&amp;Hand Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Ruční režim</translation>
     </message>
     <message>
         <location filename="../../toonzqt/schematicviewer.cpp" line="955"/>
@@ -2720,12 +2720,12 @@ Jste si jistý?</translation>
     <message>
         <location filename="../../toonzqt/stageschematicnode.cpp" line="1333"/>
         <source>Toggle Autorotate Along Motion Path</source>
-        <translation type="unfinished"></translation>
+        <translation>Přepnout automatické otáčení podle cesty pohybu</translation>
     </message>
     <message>
         <location filename="../../toonzqt/stageschematicnode.cpp" line="1334"/>
         <source>Toggle Link Motion Path to Control Points</source>
-        <translation type="unfinished"></translation>
+        <translation>Přepnout spojení cesty pohybu na ovládací body</translation>
     </message>
 </context>
 <context>
@@ -2752,23 +2752,25 @@ Jste si jistý?</translation>
         <location filename="../../toonzqt/studiopaletteviewer.cpp" line="488"/>
         <source>The current palette %1
 in the studio palette has been modified. Do you want to save your changes?</source>
-        <translation type="unfinished"></translation>
+        <translation>Nynější paleta %1
+ve studiové paletě byla změněna. Chcete uložit změny?</translation>
     </message>
     <message>
         <location filename="../../toonzqt/studiopaletteviewer.cpp" line="493"/>
         <source>Save</source>
-        <translation type="unfinished">Uložit</translation>
+        <translation>Uložit</translation>
     </message>
     <message>
         <location filename="../../toonzqt/studiopaletteviewer.cpp" line="493"/>
         <source>Discard</source>
-        <translation type="unfinished">Zahodit</translation>
+        <translation>Zahodit</translation>
     </message>
     <message>
         <location filename="../../toonzqt/studiopaletteviewer.cpp" line="576"/>
         <source>Convert %1 to Studio Palette and Overwrite. 
 Are you sure ?</source>
-        <translation type="unfinished"></translation>
+        <translation>Převést %1 do studiové palety a přepsat.
+Jste si jistý?</translation>
     </message>
     <message>
         <source>Yes</source>
@@ -2786,24 +2788,26 @@ Are you sure ?</source>
     <message>
         <location filename="../../toonzqt/studiopaletteviewer.cpp" line="578"/>
         <source>Convert</source>
-        <translation type="unfinished"></translation>
+        <translation>Převést</translation>
     </message>
     <message>
         <location filename="../../toonzqt/studiopaletteviewer.cpp" line="804"/>
         <source>Replacing all selected palettes with the palette &quot;%1&quot;. 
 Are you sure ?</source>
-        <translation type="unfinished"></translation>
+        <translation>Všechny vybrané palety se nahrazují paletou &quot;%1&quot;.
+Jste si jistý?</translation>
     </message>
     <message>
         <location filename="../../toonzqt/studiopaletteviewer.cpp" line="811"/>
         <source>Replacing the palette &quot;%1&quot; with the palette &quot;%2&quot;. 
 Are you sure ?</source>
-        <translation type="unfinished"></translation>
+        <translation>Paleta &quot;%1&quot; se nahrazuje paletou &quot;%2&quot;.
+Jste si jistý?</translation>
     </message>
     <message>
         <location filename="../../toonzqt/studiopaletteviewer.cpp" line="817"/>
         <source>Replace</source>
-        <translation type="unfinished">Nahradit</translation>
+        <translation>Nahradit</translation>
     </message>
     <message>
         <location filename="../../toonzqt/studiopaletteviewer.cpp" line="878"/>
@@ -3124,12 +3128,12 @@ Are you sure ?</source>
     <message>
         <location filename="../../toonzqt/swatchviewer.cpp" line="844"/>
         <source>Reset View</source>
-        <translation type="unfinished"></translation>
+        <translation>Obnovit výchozí pohled</translation>
     </message>
     <message>
         <location filename="../../toonzqt/swatchviewer.cpp" line="849"/>
         <source>Fit To Window</source>
-        <translation type="unfinished"></translation>
+        <translation>Přizpůsobit oknu</translation>
     </message>
 </context>
 <context>

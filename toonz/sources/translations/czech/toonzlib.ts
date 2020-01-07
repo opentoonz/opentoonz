@@ -496,7 +496,8 @@ Pravděpodobně kodek nemůže pracovat řádně.</translation>
         <location filename="../../toonzlib/sceneresources.cpp" line="510"/>
         <source>Failed to save the following resources:
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Nepodařilo se uložit následující zdroje:
+</translation>
     </message>
     <message>
         <location filename="../../toonzlib/orientation.cpp" line="78"/>

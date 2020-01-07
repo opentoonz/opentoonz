@@ -772,7 +772,7 @@ QList<int> Iwa_BokehFx::getSortedSourceIndices(double frame) {
   if (usedSourceList.empty()) return QList<int>();
 
   // Sort the layers in descending distance order
-  qSort(usedSourceList.begin(), usedSourceList.end(), isFurtherLayer);
+  std::sort(usedSourceList.begin(), usedSourceList.end(), isFurtherLayer);
 
   QList<int> indicesList;
   for (int i = 0; i < usedSourceList.size(); i++) {

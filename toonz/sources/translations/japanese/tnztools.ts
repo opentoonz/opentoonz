@@ -1175,31 +1175,31 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>The selection cannot be updated. It is not editable.</source>
-        <translation type="unfinished"></translation>
+        <translation>選択ストロークを更新できません。レベルまたは列が編集不可に設定されています。</translation>
     </message>
     <message>
         <source>The selection cannot be deleted. It is not editable.</source>
-        <translation type="unfinished"></translation>
+        <translation>選択ストロークを削除できません。レベルまたは列が編集不可に設定されています。</translation>
     </message>
     <message>
         <source>The selection cannot be pasted. It is not editable.</source>
-        <translation type="unfinished"></translation>
+        <translation>選択ストロークを貼り付けできません。レベルまたは列が編集不可に設定されています。</translation>
     </message>
     <message>
         <source>The selection cannot be grouped. It is not editable.</source>
-        <translation type="unfinished"></translation>
+        <translation>選択ストロークをグループ化できません。レベルまたは列が編集不可に設定されています。</translation>
     </message>
     <message>
         <source>The selection cannot be entered. It is not editable.</source>
-        <translation type="unfinished"></translation>
+        <translation>選択グループを開けません。レベルまたは列が編集不可に設定されています。</translation>
     </message>
     <message>
         <source>The selection cannot be ungrouped. It is not editable.</source>
-        <translation type="unfinished"></translation>
+        <translation>選択グループをグループ解除できません。レベルまたは列が編集不可に設定されています。</translation>
     </message>
     <message>
         <source>The selection cannot be moved. It is not editable.</source>
-        <translation type="unfinished"></translation>
+        <translation>選択グループを移動できません。レベルまたは列が編集不可に設定されています。</translation>
     </message>
 </context>
 <context>

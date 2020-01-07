@@ -132,6 +132,24 @@ public:
 
 //-----------------------------------------------------------------------------
 
+class ShortPlayCommand final : public MenuItemHandler {
+public:
+  ShortPlayCommand() : MenuItemHandler(MI_ShortPlay) {}
+
+  void execute() override {
+    int row = TApp::instance()->getCurrentFrame()->getFrame();
+    int shortPlayFrameCount = Preferences::instance()->getShortPlayFrameCount();
+    int count =
+        TApp::instance()->getCurrentXsheet()->getXsheet()->getFrameCount();
+    int newFrame = std::max(
+      0, count - shortPlayFrameCount);
+    TApp::instance()->getCurrentFrame()->setFrame(newFrame);
+    CommandManager::instance()->execute(MI_Play);
+  }
+};
+
+//-----------------------------------------------------------------------------
+
 class NextKeyframeCommand final : public MenuItemHandler {
 public:
   NextKeyframeCommand() : MenuItemHandler(MI_NextKeyframe) {}
@@ -215,6 +233,7 @@ NextDrawingCommand nextDrawingCommand;
 PrevDrawingCommand prevDrawingCommand;
 NextStepCommand nextStepCommand;
 PrevStepCommand prevStepCommand;
+ShortPlayCommand shortPlayCommand;
 
 NextKeyframeCommand nextKeyframeCommand;
 PrevKeyframeCommand prevKeyframeCommand;

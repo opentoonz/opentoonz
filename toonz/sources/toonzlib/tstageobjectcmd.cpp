@@ -1490,9 +1490,15 @@ void TStageObjectCmd::deleteSelection(
     if (it2->isPegbar()) pegbarIndexes.append(it2->getIndex());
     if (it2->isCamera()) cameraIndexes.append(it2->getIndex());
   }
-  if (!columnIndexes.isEmpty()) qSort(columnIndexes);
-  if (!pegbarIndexes.isEmpty()) qSort(pegbarIndexes);
-  if (!cameraIndexes.isEmpty()) qSort(cameraIndexes);
+  if (!columnIndexes.isEmpty()) {
+    std::sort(columnIndexes.begin(), columnIndexes.end());
+  }
+  if (!pegbarIndexes.isEmpty()) {
+    std::sort(pegbarIndexes.begin(), pegbarIndexes.end());
+  }
+  if (!cameraIndexes.isEmpty()) {
+    std::sort(cameraIndexes.begin(), cameraIndexes.end());
+  }
 
   // remove all selected objects
   removeColums(columnIndexes, xshHandle, objHandle, fxHandle, doUndo);

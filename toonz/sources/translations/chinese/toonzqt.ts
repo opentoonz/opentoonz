@@ -703,27 +703,27 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>Viewer Controls</source>
-        <translation type="unfinished"></translation>
+        <translation>查看器控件</translation>
     </message>
     <message>
         <source>&amp;Zoom In</source>
-        <translation type="unfinished"></translation>
+        <translation>放大(&amp;Z)</translation>
     </message>
     <message>
         <source>&amp;Zoom Out</source>
-        <translation type="unfinished"></translation>
+        <translation>缩小(&amp;Z)</translation>
     </message>
     <message>
         <source>&amp;Flip Horizontally</source>
-        <translation type="unfinished"></translation>
+        <translation>水平翻转(&amp;F)</translation>
     </message>
     <message>
         <source>&amp;Flip Vertically</source>
-        <translation type="unfinished"></translation>
+        <translation>垂直翻转(&amp;F)</translation>
     </message>
     <message>
         <source>&amp;Reset View</source>
-        <translation type="unfinished"></translation>
+        <translation>重置视图(&amp;R)</translation>
     </message>
 </context>
 <context>
@@ -1051,31 +1051,31 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>Activate Cycle</source>
-        <translation type="unfinished">启用循环</translation>
+        <translation>启用循环</translation>
     </message>
     <message>
         <source>Deactivate Cycle</source>
-        <translation type="unfinished">禁用循环</translation>
+        <translation>禁用循环</translation>
     </message>
     <message>
         <source>Show Inbetween Values</source>
-        <translation type="unfinished"></translation>
+        <translation>显示中间帧的值</translation>
     </message>
     <message>
         <source>Hide Inbetween Values</source>
-        <translation type="unfinished"></translation>
+        <translation>隐藏中间帧的值</translation>
     </message>
     <message>
         <source>Change Interpolation</source>
-        <translation type="unfinished"></translation>
+        <translation>更改插值方式</translation>
     </message>
     <message>
         <source>Change Step</source>
-        <translation type="unfinished"></translation>
+        <translation>改变步长</translation>
     </message>
     <message>
         <source>Similar Shape Interpolation</source>
-        <translation type="unfinished">相似形状插值</translation>
+        <translation>相似形状插值</translation>
     </message>
 </context>
 <context>
@@ -1136,7 +1136,7 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>Hide Selected</source>
-        <translation type="unfinished"></translation>
+        <translation>隐藏被选中的</translation>
     </message>
 </context>
 <context>
@@ -1699,11 +1699,11 @@ Select FX nodes and related links before copying or cutting the selection you wa
     <name>PlaneViewer</name>
     <message>
         <source>Reset View</source>
-        <translation type="unfinished"></translation>
+        <translation>重置视图</translation>
     </message>
     <message>
         <source>Fit To Window</source>
-        <translation type="unfinished"></translation>
+        <translation>适合到窗口</translation>
     </message>
 </context>
 <context>
@@ -2266,15 +2266,15 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     <message>
         <source>Custom Texture</source>
         <comment>TextureStyleChooserPage</comment>
-        <translation type="unfinished"></translation>
+        <translation>自定纹理</translation>
     </message>
     <message>
         <source>Current Frame: </source>
-        <translation type="unfinished"></translation>
+        <translation>当前帧: </translation>
     </message>
     <message>
         <source>File History</source>
-        <translation type="unfinished"></translation>
+        <translation>文件历史</translation>
     </message>
     <message>
         <source>OpenToonz 1.3</source>
@@ -2283,25 +2283,25 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     <message>
         <source>Plain color</source>
         <comment>VectorBrushStyleChooserPage</comment>
-        <translation type="unfinished">纯色</translation>
+        <translation>纯色</translation>
     </message>
     <message>
         <source>Plain color</source>
         <comment>MyPaintBrushStyleChooserPage</comment>
-        <translation type="unfinished">纯色</translation>
+        <translation>纯色</translation>
     </message>
     <message>
         <source>Plain color</source>
         <comment>SpecialStyleChooserPage</comment>
-        <translation type="unfinished">纯色</translation>
+        <translation>纯色</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished">确定</translation>
+        <translation>确定</translation>
     </message>
     <message>
         <source>That is a reserved file name and cannot be used.</source>
-        <translation type="unfinished"></translation>
+        <translation>被保留的文件名不可使用。</translation>
     </message>
 </context>
 <context>
@@ -2326,11 +2326,11 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     <name>RgbLinkButtons</name>
     <message>
         <source>Copy RGB : %1 &gt; %2</source>
-        <translation type="unfinished"></translation>
+        <translation>拷贝RGB : %1 &gt; %2</translation>
     </message>
     <message>
         <source>Swap %1 and %2</source>
-        <translation type="unfinished"></translation>
+        <translation>互换%1 和 %2</translation>
     </message>
 </context>
 <context>
@@ -2385,15 +2385,15 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     </message>
     <message>
         <source>&amp;Selection Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>选择模式(&amp;S0</translation>
     </message>
     <message>
         <source>&amp;Zoom Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>缩放模式(&amp;Z）</translation>
     </message>
     <message>
         <source>&amp;Hand Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>抓手模式(&amp;H)</translation>
     </message>
 </context>
 <context>
@@ -2486,11 +2486,11 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     <name>StageSchematicNode</name>
     <message>
         <source>Toggle Autorotate Along Motion Path</source>
-        <translation type="unfinished"></translation>
+        <translation>打开/关闭追随移动路径自动旋转</translation>
     </message>
     <message>
         <source>Toggle Link Motion Path to Control Points</source>
-        <translation type="unfinished"></translation>
+        <translation>打开/关闭链接移动路径到控制点</translation>
     </message>
 </context>
 <context>
@@ -2581,20 +2581,22 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     <message>
         <source>The current palette %1
 in the studio palette has been modified. Do you want to save your changes?</source>
-        <translation type="unfinished"></translation>
+        <translation>当前调色板 %1
+在工作室调色板中已经被修改了。您要保存所做的改动吗？</translation>
     </message>
     <message>
         <source>Save</source>
-        <translation type="unfinished">保存</translation>
+        <translation>保存</translation>
     </message>
     <message>
         <source>Discard</source>
-        <translation type="unfinished">放弃更改</translation>
+        <translation>放弃更改</translation>
     </message>
     <message>
         <source>Convert %1 to Studio Palette and Overwrite. 
 Are you sure ?</source>
-        <translation type="unfinished"></translation>
+        <translation>转换 %1 到工作室调色板并覆盖。
+您确定要这样做吗？</translation>
     </message>
     <message>
         <source>Yes</source>
@@ -2607,20 +2609,22 @@ Are you sure ?</source>
     <message>
         <source>Replacing all selected palettes with the palette &quot;%1&quot;. 
 Are you sure ?</source>
-        <translation type="unfinished"></translation>
+        <translation>用调色板 &quot;%1&quot; 替换所有被选中的调色版。
+您确定要这样做吗？</translation>
     </message>
     <message>
         <source>Replacing the palette &quot;%1&quot; with the palette &quot;%2&quot;. 
 Are you sure ?</source>
-        <translation type="unfinished"></translation>
+        <translation>用调色板 &quot;%2&quot; 替换调色板 &quot;%1&quot;。
+您确定要这样做吗？</translation>
     </message>
     <message>
         <source>Replace</source>
-        <translation type="unfinished">替换</translation>
+        <translation>替换</translation>
     </message>
     <message>
         <source>Convert</source>
-        <translation type="unfinished"></translation>
+        <translation>转换</translation>
     </message>
 </context>
 <context>
@@ -2730,11 +2734,11 @@ Apply</source>
     </message>
     <message>
         <source>Generated</source>
-        <translation type="unfinished">已生成的</translation>
+        <translation>已生成的</translation>
     </message>
     <message>
         <source>Trail</source>
-        <translation type="unfinished">轨迹</translation>
+        <translation>轨迹</translation>
     </message>
     <message>
         <source>Color</source>
@@ -2889,11 +2893,11 @@ Apply</source>
     <name>SwatchViewer</name>
     <message>
         <source>Reset View</source>
-        <translation type="unfinished"></translation>
+        <translation>重置视图</translation>
     </message>
     <message>
         <source>Fit To Window</source>
-        <translation type="unfinished"></translation>
+        <translation>适合窗口</translation>
     </message>
 </context>
 <context>

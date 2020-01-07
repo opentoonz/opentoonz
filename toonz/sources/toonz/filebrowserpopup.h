@@ -53,8 +53,12 @@ public:
                           //! construction, surrendering it
     //!  to the user. Observe that sub-widgets creation is still enforced.
     MULTISELECTION = 0x2,  //!< Enable multiple selection in the browser widget.
-    WITH_APPLY_BUTTON = 0x4  //!< Enable if the filebrowser has an apply button
-                             //! next to the OK button
+    WITH_APPLY_BUTTON = 0x4,  //!< Enable if the filebrowser has an apply button
+                              //! next to the OK button
+    FOR_SAVING = 0x8  //!< The popup is for saving. When file selection is
+                      //! released, previously-clicked file name remains so
+                      //! that users can reuse it for inputting the file name.
+                      //! see FileBrowserPopup::onFilePathsSelected
   };
 
 public:
@@ -102,6 +106,7 @@ protected:
   bool m_isDirectoryOnly;
   // bool                  m_checkFrameRange;
   bool m_multiSelectionEnabled;
+  bool m_forSaving;
 
   QSize m_dialogSize;
   QWidget *m_customWidget;

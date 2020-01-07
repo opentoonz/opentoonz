@@ -525,12 +525,12 @@ void StopMotion::toggleNumpadShortcuts(bool on) {
   // can't just return if this feature is off
   // it could have been toggled while the camera was active
   if (!m_useNumpadShortcuts) on = false;
-  CommandManager *comm          = CommandManager::instance();
+  CommandManager *comm = CommandManager::instance();
 
   if (on) {
     // if turning it on, get all old shortcuts
     if (m_numpadForStyleSwitching) {
-		Preferences::instance()->setValue(useNumpadForSwitchingStyles, false);
+      Preferences::instance()->setValue(useNumpadForSwitchingStyles, false);
     }
     std::string shortcut;
     QAction *action;
@@ -706,7 +706,7 @@ void StopMotion::toggleNumpadShortcuts(bool on) {
           action = NULL;
         }
       }
-	  Preferences::instance()->setValue(useNumpadForSwitchingStyles, true);
+      Preferences::instance()->setValue(useNumpadForSwitchingStyles, true);
     }
   }
 }
@@ -1154,9 +1154,8 @@ bool StopMotion::importImage() {
 
       /* if the loaded level does not match in pixel size, then return */
       sl = level->getSimpleLevel();
-      if (!sl ||
-          sl->getProperties()->getImageRes() !=
-              TDimension(m_newImage->getLx(), m_newImage->getLy())) {
+      if (!sl || sl->getProperties()->getImageRes() !=
+                     TDimension(m_newImage->getLx(), m_newImage->getLy())) {
         DVGui::error(
             tr("The captured image size does not match with the existing "
                "level."));
@@ -1178,7 +1177,7 @@ bool StopMotion::importImage() {
     else {
       TXshLevel *level = scene->createNewLevel(OVL_XSHLEVEL, levelName,
                                                TDimension(), 0, levelFp);
-      sl = level->getSimpleLevel();
+      sl               = level->getSimpleLevel();
       sl->setPath(levelFp, true);
       sl->getProperties()->setDpiPolicy(LevelProperties::DP_CustomDpi);
       TPointD dpi;
@@ -1193,7 +1192,7 @@ bool StopMotion::importImage() {
         TDimensionD size  = camera->getSize();
         double minimumDpi = std::min(m_newImage->getLx() / size.lx,
                                      m_newImage->getLy() / size.ly);
-        dpi = TPointD(minimumDpi, minimumDpi);
+        dpi               = TPointD(minimumDpi, minimumDpi);
       }
       sl->getProperties()->setDpi(dpi.x);
       sl->getProperties()->setImageDpi(dpi);
@@ -1361,12 +1360,13 @@ bool StopMotion::importImage() {
 
 void StopMotion::captureImage() {
   if (!m_usingWebcam && !m_sessionOpen) {
-    DVGui::warning("Please start live view before capturing an image.");
+    DVGui::warning(tr("Please start live view before capturing an image."));
     return;
   }
   if (m_usingWebcam) {
     if (!m_hasLiveViewImage) {
-      DVGui::warning("Cannot capture webcam image unless live view is active.");
+      DVGui::warning(
+          tr("Cannot capture webcam image unless live view is active."));
       return;
     }
     if (getReviewTime() > 0) {
@@ -1488,9 +1488,9 @@ bool StopMotion::loadJpg(TFilePath path, TRaster32P &image) {
   if ((jpegFile = fopen(c_path, "rb")) == NULL) success = false;
   if (success && fseek(jpegFile, 0, SEEK_END) < 0 ||
       ((size = ftell(jpegFile)) < 0) || fseek(jpegFile, 0, SEEK_SET) < 0)
-    success                         = false;
+    success = false;
   if (success && size == 0) success = false;
-  jpegSize                          = (unsigned long)size;
+  jpegSize = (unsigned long)size;
   if (success && (jpegBuf = (unsigned char *)tjAlloc(jpegSize)) == NULL)
     success = false;
   if (success && fread(jpegBuf, jpegSize, 1, jpegFile) < 1) success = false;
@@ -1499,9 +1499,8 @@ bool StopMotion::loadJpg(TFilePath path, TRaster32P &image) {
 
   if (success && (tjInstance = tjInitDecompress()) == NULL) success = false;
 
-  if (success &&
-      tjDecompressHeader3(tjInstance, jpegBuf, jpegSize, &width, &height,
-                          &inSubsamp, &inColorspace) < 0)
+  if (success && tjDecompressHeader3(tjInstance, jpegBuf, jpegSize, &width,
+                                     &height, &inSubsamp, &inColorspace) < 0)
     success = false;
 
   int pixelFormat       = TJPF_BGRX;
@@ -1514,9 +1513,8 @@ bool StopMotion::loadJpg(TFilePath path, TRaster32P &image) {
 #ifdef WIN32
   flags |= TJFLAG_BOTTOMUP;
 #endif
-  if (success &&
-      tjDecompress2(tjInstance, jpegBuf, jpegSize, imgBuf, width, 0, height,
-                    pixelFormat, flags) < 0)
+  if (success && tjDecompress2(tjInstance, jpegBuf, jpegSize, imgBuf, width, 0,
+                               height, pixelFormat, flags) < 0)
     success = false;
   tjFree(jpegBuf);
   jpegBuf = NULL;
@@ -1607,7 +1605,7 @@ void StopMotion::refreshFrameInfo() {
 
   // frame existence
   TFilePath frameFp(actualLevelFp.withFrame(frameNumber));
-  bool frameExist            = false;
+  bool frameExist = false;
   if (levelExist) frameExist = TFileStatus(frameFp).doesExist();
 
   // reset acceptable camera size
@@ -2016,9 +2014,9 @@ bool StopMotion::translateIndex(int index) {
 
 #ifdef WIN32
 
-// Thanks to:
-// https://elcharolin.wordpress.com/2017/08/28/webcam-capture-with-the-media-foundation-sdk/
-// for the webcam enumeration here
+  // Thanks to:
+  // https://elcharolin.wordpress.com/2017/08/28/webcam-capture-with-the-media-foundation-sdk/
+  // for the webcam enumeration here
 
 #define CLEAN_ATTRIBUTES()                                                     \
   if (attributes) {                                                            \
@@ -2211,7 +2209,7 @@ void StopMotion::getWebcamImage() {
           TDimension(m_liveViewImage->getLx(), m_liveViewImage->getLy());
       double minimumDpi = std::min(m_liveViewImageDimensions.lx / size.lx,
                                    m_liveViewImageDimensions.ly / size.ly);
-      m_liveViewDpi = TPointD(minimumDpi, minimumDpi);
+      m_liveViewDpi     = TPointD(minimumDpi, minimumDpi);
 
       m_fullImageDimensions = m_liveViewImageDimensions;
 
@@ -2247,7 +2245,7 @@ bool StopMotion::toggleLiveView() {
     m_timer->start(40);
     emit(liveViewChanged(true));
     Preferences::instance()->setValue(rewindAfterPlayback, false);
-	  TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+    TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
     return true;
   } else if ((m_sessionOpen || m_usingWebcam) && m_liveViewStatus > 0) {
     if (!m_usingWebcam)
@@ -2257,9 +2255,9 @@ bool StopMotion::toggleLiveView() {
     m_timer->stop();
     emit(liveViewChanged(false));
     if (m_turnOnRewind) {
-		Preferences::instance()->setValue(rewindAfterPlayback, true);
+      Preferences::instance()->setValue(rewindAfterPlayback, true);
     }
-	  TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+    TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
     return false;
   } else {
     DVGui::warning(tr("No camera selected."));
@@ -2364,7 +2362,7 @@ void StopMotion::closeCanonSDK() {
 
 EdsError StopMotion::openCameraSession() {
   if (m_camera != NULL) {
-    m_error                                  = EdsOpenSession(m_camera);
+    m_error = EdsOpenSession(m_camera);
     if (m_error == EDS_ERR_OK) m_sessionOpen = true;
   }
   m_error =
@@ -2383,8 +2381,8 @@ EdsError StopMotion::openCameraSession() {
   if (getCurrentImageQuality().contains("RAW"))
     setImageQuality("Large Fine Jpeg");
 
-  EdsUInt32 saveto = kEdsSaveTo_Host;
-  m_error          = EdsSetPropertyData(m_camera, kEdsPropID_SaveTo, 0,
+  EdsUInt32 saveto        = kEdsSaveTo_Host;
+  m_error                 = EdsSetPropertyData(m_camera, kEdsPropID_SaveTo, 0,
                                sizeof(EdsUInt32), &saveto);
   EdsCapacity newCapacity = {0x7FFFFFFF, 0x1000, 1};
   m_error                 = EdsSetCapacity(m_camera, newCapacity);
@@ -2516,7 +2514,7 @@ EdsError StopMotion::getAvailableExposureCompensations() {
   EdsError err                  = EDS_ERR_OK;
   m_exposureOptions.clear();
 
-  err = EdsGetPropertyDesc(m_camera, kEdsPropID_ExposureCompensation,
+  err       = EdsGetPropertyDesc(m_camera, kEdsPropID_ExposureCompensation,
                            exposureDesc);
   int count = exposureDesc->numElements;
   if (count > 0) {
@@ -2968,7 +2966,7 @@ EdsError StopMotion::downloadImage(EdsBaseRef object) {
     m_proxyImageDimensions = TDimension(tempWidth, tempHeight);
     double minimumDpi      = std::min(m_proxyImageDimensions.lx / size.lx,
                                  m_proxyImageDimensions.ly / size.ly);
-    m_proxyDpi = TPointD(minimumDpi, minimumDpi);
+    m_proxyDpi             = TPointD(minimumDpi, minimumDpi);
   }
 
   tjDecompress2(tjInstance, data, mySize, imgBuf, tempWidth,
@@ -3233,12 +3231,12 @@ EdsError StopMotion::downloadEVFData() {
           TDimension(m_liveViewImage->getLx(), m_liveViewImage->getLy());
       double minimumDpi = std::min(m_liveViewImageDimensions.lx / size.lx,
                                    m_liveViewImageDimensions.ly / size.ly);
-      m_liveViewDpi = TPointD(minimumDpi, minimumDpi);
+      m_liveViewDpi     = TPointD(minimumDpi, minimumDpi);
 
       m_fullImageDimensions = TDimension(coordSys.width, coordSys.height);
       minimumDpi            = std::min(m_fullImageDimensions.lx / size.lx,
                             m_fullImageDimensions.ly / size.ly);
-      m_fullImageDpi = TPointD(minimumDpi, minimumDpi);
+      m_fullImageDpi        = TPointD(minimumDpi, minimumDpi);
 
       emit(newDimensions());
     }

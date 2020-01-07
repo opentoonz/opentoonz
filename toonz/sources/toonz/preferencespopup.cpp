@@ -1065,6 +1065,7 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
       {blanksCount, tr("Blank Frames:")},
       {blankColor, tr("Blank Frames Color:")},
       {rewindAfterPlayback, tr("Rewind after Playback")},
+      {shortPlayFrameCount, tr("Number of Frames to Play for Short Play")},
       {previewAlwaysOpenNewFlip, tr("Display in a New Flipbook Window")},
       {fitToFlipbook, tr("Fit to Flipbook")},
       {generatedMovieViewEnabled, tr("Open Flipbook after Rendering")},
@@ -1721,6 +1722,7 @@ QWidget* PreferencesPopup::createPreviewPage() {
   insertUI(blanksCount, lay);
   insertUI(blankColor, lay);
   insertUI(rewindAfterPlayback, lay);
+  insertUI(shortPlayFrameCount, lay);
   insertUI(previewAlwaysOpenNewFlip, lay);
   insertUI(fitToFlipbook, lay);
   insertUI(generatedMovieViewEnabled, lay);

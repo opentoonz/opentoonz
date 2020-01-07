@@ -97,8 +97,8 @@ public:
 
 void deleteMatchlines(TXshSimpleLevel *sl, const std::set<TFrameId> &fids);
 void deleteInk(TXshSimpleLevel *sl, const std::set<TFrameId> &fids);
-void mergeColumns(int dstColumn, int srcColumn, bool isRedo);
-void mergeColumns(const std::set<int> &columns);
+void mergeColumns(int dstColumn, int srcColumn, bool isRedo, bool groupLevels);
+void mergeColumns(const std::set<int> &columns, bool groupLevels);
 void doMatchlines(int column, int mColumn, int index, int inkPrevalence,
                   int MatchlineSessionId = 0);
 void mergeCmapped(int dstColumn, int srcColumn, const QString &fullpath,

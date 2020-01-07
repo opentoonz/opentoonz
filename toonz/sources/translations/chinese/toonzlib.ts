@@ -609,7 +609,8 @@
     <message>
         <source>Failed to save the following resources:
 </source>
-        <translation type="unfinished"></translation>
+        <translation>保存下面的资源失败:
+</translation>
     </message>
 </context>
 <context>

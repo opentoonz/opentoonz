@@ -396,6 +396,9 @@ public:
   bool rewindAfterPlaybackEnabled() const {
     return getBoolValue(rewindAfterPlayback);
   }
+  int getShortPlayFrameCount() const {
+    return getIntValue(shortPlayFrameCount);
+  }
   bool previewAlwaysOpenNewFlipEnabled() const {
     return getBoolValue(previewAlwaysOpenNewFlip);
   }

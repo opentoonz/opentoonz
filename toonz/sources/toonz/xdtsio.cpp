@@ -132,7 +132,7 @@ QVector<int> XdtsFieldTrackItem::getCellNumberTrack() const {
   QList<QPair<int, int>> frameCellNumbers;
   for (const XdtsTrackFrameItem &frame : m_frames)
     frameCellNumbers.append(frame.frameCellNumber());
-  qSort(frameCellNumbers.begin(), frameCellNumbers.end(), frameLessThan);
+  std::sort(frameCellNumbers.begin(), frameCellNumbers.end(), frameLessThan);
 
   QVector<int> cells;
   int currentFrame = 0;

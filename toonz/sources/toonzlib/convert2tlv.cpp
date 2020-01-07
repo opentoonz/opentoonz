@@ -561,7 +561,7 @@ TPalette *Convert2Tlv::buildPalette() {
 
   /*- インデックス順にページに格納する -*/
   if (!stylesToBeAddedToPage.isEmpty()) {
-    qSort(stylesToBeAddedToPage.begin(), stylesToBeAddedToPage.end());
+    std::sort(stylesToBeAddedToPage.begin(), stylesToBeAddedToPage.end());
     for (int s = 0; s < stylesToBeAddedToPage.size(); s++)
       page->addStyle(stylesToBeAddedToPage.at(s));
   }

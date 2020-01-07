@@ -5,7 +5,7 @@
     <name>ArrowToolOptionsBox</name>
     <message>
         <source>Pick:</source>
-        <translation>Seleccionar:</translation>
+        <translation>Escoger:</translation>
     </message>
     <message>
         <source>Position</source>
@@ -438,7 +438,7 @@
     </message>
     <message>
         <source>Pencil Mode</source>
-        <translation>Modo lápiz</translation>
+        <translation>Lápiz</translation>
     </message>
     <message>
         <source>Normal</source>
@@ -493,7 +493,7 @@
     </message>
     <message>
         <source>Fill Depth</source>
-        <translation>Profundidad de relleno</translation>
+        <translation>Profundidad</translation>
     </message>
     <message>
         <source>Segment</source>
@@ -641,14 +641,14 @@
     <name>FullColorFillTool</name>
     <message>
         <source>Fill Depth</source>
-        <translation type="unfinished">Profundidad de relleno</translation>
+        <translation>Profundidad</translation>
     </message>
 </context>
 <context>
     <name>HandToolOptionsBox</name>
     <message>
         <source>Reset Position</source>
-        <translation type="unfinished"></translation>
+        <translation>Restablecer posición</translation>
     </message>
 </context>
 <context>
@@ -909,7 +909,7 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Pencil Mode</source>
-        <translation>Modo lápiz</translation>
+        <translation>Lápiz</translation>
     </message>
     <message>
         <source>Cap</source>
@@ -1159,47 +1159,47 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source> to Front</source>
-        <translation>al frente</translation>
+        <translation> al frente</translation>
     </message>
     <message>
         <source> to Forward</source>
-        <translation>hacia adelante</translation>
+        <translation> hacia adelante</translation>
     </message>
     <message>
         <source> to Back</source>
-        <translation>al fondo</translation>
+        <translation> al fondo</translation>
     </message>
     <message>
         <source> to Backward</source>
-        <translation>hacia atrás</translation>
+        <translation> hacia atrás</translation>
     </message>
     <message>
         <source>The selection cannot be updated. It is not editable.</source>
-        <translation type="unfinished"></translation>
+        <translation>La selección no puede ser actualizada. No es editable.</translation>
     </message>
     <message>
         <source>The selection cannot be deleted. It is not editable.</source>
-        <translation type="unfinished"></translation>
+        <translation>La selección no puede ser borrada. No es editable.</translation>
     </message>
     <message>
         <source>The selection cannot be pasted. It is not editable.</source>
-        <translation type="unfinished"></translation>
+        <translation>La selección no puede ser pegada. No es editable.</translation>
     </message>
     <message>
         <source>The selection cannot be grouped. It is not editable.</source>
-        <translation type="unfinished"></translation>
+        <translation>La selección no puede ser agrupada. No es editable.</translation>
     </message>
     <message>
         <source>The selection cannot be entered. It is not editable.</source>
-        <translation type="unfinished"></translation>
+        <translation>No es posible entrar a la selección. No es editable.</translation>
     </message>
     <message>
         <source>The selection cannot be ungrouped. It is not editable.</source>
-        <translation type="unfinished"></translation>
+        <translation>La selección no puede ser desagrupada. No es editable.</translation>
     </message>
     <message>
         <source>The selection cannot be moved. It is not editable.</source>
-        <translation type="unfinished"></translation>
+        <translation>La selección no puede ser movida. No es editable.</translation>
     </message>
 </context>
 <context>
@@ -1305,7 +1305,7 @@ Do you want to proceed?</source>
     <name>RotateToolOptionsBox</name>
     <message>
         <source>Reset Rotation</source>
-        <translation type="unfinished"></translation>
+        <translation>Restablecer rotación</translation>
     </message>
 </context>
 <context>
@@ -1712,7 +1712,7 @@ movido hacia el final de la primera página de la paleta.</translation>
     <name>ZoomToolOptionsBox</name>
     <message>
         <source>Reset Zoom</source>
-        <translation type="unfinished"></translation>
+        <translation>Restablecer zoom</translation>
     </message>
 </context>
 </TS>

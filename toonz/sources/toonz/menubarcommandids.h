@@ -202,6 +202,7 @@
 
 #define MI_Link "MI_Link"
 #define MI_Play "MI_Play"
+#define MI_ShortPlay "MI_ShortPlay"
 #define MI_Loop "MI_Loop"
 #define MI_Pause "MI_Pause"
 #define MI_FirstFrame "MI_FirstFrame"
@@ -362,6 +363,10 @@
 #define MI_StopMotionJumpToCamera "MI_StopMotionJumpToCamera"
 
 #define MI_OpenOnlineManual "MI_OpenOnlineManual"
+#define MI_OpenWhatsNew "MI_OpenWhatsNew"
+#define MI_OpenCommunityForum "MI_OpenCommunityForum"
+#define MI_OpenReportAnIssue "MI_OpenReportAnIssue"
+
 #define MI_ClearCacheFolder "MI_ClearCacheFolder"
 
 #define MI_SelectNextGuideStroke "MI_SelectNextGuideStroke"

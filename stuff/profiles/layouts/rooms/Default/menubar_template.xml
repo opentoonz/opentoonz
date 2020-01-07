@@ -312,6 +312,7 @@
         <command>MI_OpenTMessage</command>
         <command>MI_OpenHistoryPanel</command>
         <command>MI_AudioRecording</command>
+        <command>MI_OpenStopMotionPanel</command>
         <command>MI_StartupPopup</command>
         <separator/>
         <command>MI_MaximizePanel</command>
@@ -319,6 +320,10 @@
     </menu>
     <menu title="Help">
         <command>MI_OpenOnlineManual</command>
+        <command>MI_OpenWhatsNew</command>
+        <command>MI_OpenCommunityForum</command>
+        <separator/>
+        <command>MI_OpenReportAnIssue</command>
         <separator/>
         <command>MI_About</command>     
     </menu>

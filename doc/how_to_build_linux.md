@@ -153,7 +153,14 @@ $ cmake ../sources
 $ make -j$(nproc)
 ```
 
-The build takes a lot of time, be patient.
+The build takes a lot of time, be patient. CMake may not pick up all the required dependencies. On Fedora 30, it can be helpful to use 
+```
+$cmake ../sources/ -DSUPERLU_INCLUDE_DIR=/usr/include/SuperLU
+```
+instead of just
+```
+$cmake ../sources/
+```
 
 ### Troubleshooting Build Errors
 

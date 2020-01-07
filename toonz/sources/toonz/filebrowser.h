@@ -124,6 +124,12 @@ types to be displayed in the file browser.
 
   QSplitter *getMainSplitter() const { return m_mainSplitter; }
 
+  // Enable double-click to open a scene.
+  // This is not always desirable (e.g. if a user double-clicks on a file in
+  // a "Save As" dialog, they expect the file will be saved to, not opened).
+  // So it is disabled by default.
+  void enableDoubleClickToOpenScenes();
+
 protected:
   int findIndexWithPath(TFilePath path);
   void getExpandedFolders(DvDirModelNode *node,
@@ -197,6 +203,9 @@ protected slots:
   void onVersionControlCommandDone(const QStringList &files);
 
   void onFileSystemChanged(const QString &folderPath);
+
+  // If filePath is a valid scene file, open it. Otherwise do nothing.
+  void tryToOpenScene(const TFilePath &filePath);
 
 signals:
 

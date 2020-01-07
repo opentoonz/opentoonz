@@ -6,6 +6,7 @@
 #include "tpalette.h"
 
 // TnzLib includes
+#include "toonz/txsheet.h"
 #include "toonz/toonzscene.h"
 #include "toonz/txshcell.h"
 #include "toonz/txshsimplelevel.h"
@@ -15,6 +16,7 @@
 #include "toonz/txshlevelhandle.h"
 #include "toonz/txsheethandle.h"
 #include "toonz/tscenehandle.h"
+#include "toonz/txshleveltypes.h"
 
 // TnzQt includes
 #include "toonzqt/menubarcommand.h"
@@ -99,6 +101,18 @@ MergeCmappedDialog::MergeCmappedDialog(TFilePath &levelPath)
 //    MergeColumns  command
 //*****************************************************************************
 
+bool isVectorColumn(const std::set<int> &columns) {
+  TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
+  std::set<int>::const_iterator column = columns.begin();
+  int start, end;
+  xsh->getCellRange(*column, start, end);
+
+  if (start > end) return false;
+  // a cell at "start" must be occupied
+  TXshCell cell = xsh->getCell(start, *column);
+  return cell.m_level->getType() == PLI_XSHLEVEL;
+}
+
 class MergeColumnsCommand final : public MenuItemHandler {
 public:
   MergeColumnsCommand() : MenuItemHandler(MI_MergeColumns) {}
@@ -124,7 +138,19 @@ public:
       return;
     }
 
-    mergeColumns(indices);
+    bool groupLevels = true;
+    if (isVectorColumn(indices)) {
+      int opt = DVGui::MsgBox(QObject::tr("Group strokes by vector levels?"),
+                              QObject::tr("Yes"), QObject::tr("No"),
+                              QObject::tr("Cancel"));
+      if (opt == 0 || opt == 3)
+        return;
+      else {
+        groupLevels = (opt == 1);
+      };
+    }
+
+    mergeColumns(indices, groupLevels);
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
   }
 
@@ -309,10 +335,10 @@ void doCloneLevelNoSave(const TCellSelection::Range &range,
       fid = cell.getFrameId();
 
       if (cell.getSimpleLevel() == 0 ||
-          cell.getSimpleLevel()->getPath().getType() == "psd" || 
-		  cell.getSimpleLevel()->getPath().getType() == "gif" || 
-		  cell.getSimpleLevel()->getPath().getType() == "mp4" || 
-		  cell.getSimpleLevel()->getPath().getType() == "webm")
+          cell.getSimpleLevel()->getPath().getType() == "psd" ||
+          cell.getSimpleLevel()->getPath().getType() == "gif" ||
+          cell.getSimpleLevel()->getPath().getType() == "mp4" ||
+          cell.getSimpleLevel()->getPath().getType() == "webm")
         continue;
 
       std::map<TXshSimpleLevel *, TXshLevelP>::iterator it =

@@ -291,7 +291,7 @@ void Iwa_Particles_Engine::roll_particles(
   /*- 背景だけを描画するモードのときは、particlesOriginを更新するだけでOK -*/
   if (values.iw_rendermode_val == Iwa_TiledParticlesFx::REND_BG) {
     /*- インデックスを小さい順にならべる -*/
-    qSort(leavingPartIndex.begin(), leavingPartIndex.end());
+    std::sort(leavingPartIndex.begin(), leavingPartIndex.end());
     /*- インデックス大きい方から消していく -*/
     for (int lp = leavingPartIndex.size() - 1; lp >= 0; lp--)
       particleOrigins.removeAt(leavingPartIndex.at(lp));
@@ -448,7 +448,7 @@ void Iwa_Particles_Engine::roll_particles(
 
   /*- すでに発生したparticleOriginを消去する
           インデックスを小さい順にならべる -*/
-  qSort(leavingPartIndex.begin(), leavingPartIndex.end());
+  std::sort(leavingPartIndex.begin(), leavingPartIndex.end());
   /*- インデックス大きい方から消していく -*/
   for (int lp = leavingPartIndex.size() - 1; lp >= 0; lp--)
     particleOrigins.removeAt(leavingPartIndex.at(lp));
@@ -1447,7 +1447,7 @@ void Iwa_Particles_Engine::initParticleOrigins(
   }
 
   /*- 粒子をランダム値の大きい順に並べる -*/
-  qSort(particleOrigins.begin(), particleOrigins.end(), potentialLessThan);
+  std::sort(particleOrigins.begin(), particleOrigins.end(), potentialLessThan);
 }
 
 //--------------------------------------------------

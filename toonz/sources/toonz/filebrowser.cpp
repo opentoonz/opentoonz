@@ -2127,7 +2127,8 @@ void FileBrowser::refreshFolder(const TFilePath &folderPath) {
   std::set<FileBrowser *>::iterator it;
   for (it = activeBrowsers.begin(); it != activeBrowsers.end(); ++it) {
     FileBrowser *browser = *it;
-    DvDirModel::instance()->refreshFolder(folderPath);
+    DvDirModel::instance()->refreshFolder(
+        folderPath, DvDirModel::instance()->getIndexByPath(folderPath));
     if (browser->getFolder() == folderPath) {
       browser->setFolder(folderPath, false, true);
     }
@@ -2302,6 +2303,22 @@ void FileBrowser::enableGlobalSelection(bool enabled) {
 //-----------------------------------------------------------------------------
 
 void FileBrowser::selectNone() { m_itemViewer->selectNone(); }
+
+//-----------------------------------------------------------------------------
+
+void FileBrowser::enableDoubleClickToOpenScenes() {
+  // perhaps this should disconnect existing signal handlers first
+  connect(this, SIGNAL(filePathDoubleClicked(const TFilePath &)), this,
+          SLOT(tryToOpenScene(const TFilePath &)));
+}
+
+//-----------------------------------------------------------------------------
+
+void FileBrowser::tryToOpenScene(const TFilePath &filePath) {
+  if (filePath.getType() == "tnz") {
+    IoCmd::loadScene(filePath);
+  }
+}
 
 //=============================================================================
 // FCData methods

@@ -92,7 +92,7 @@ void FxSelection::select(TFxP fx) { m_selectedFxs.append(fx); }
 
 void FxSelection::select(int colIndex) {
   m_selectedColIndexes.append(colIndex);
-  qSort(m_selectedColIndexes);
+  std::sort(m_selectedColIndexes.begin(), m_selectedColIndexes.end());
 }
 
 //---------------------------------------------------------

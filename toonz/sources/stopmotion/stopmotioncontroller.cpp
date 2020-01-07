@@ -1070,7 +1070,7 @@ void StopMotionController::refreshCameraList() {
     m_cameraListCombo->setDisabled(true);
     m_captureButton->setDisabled(true);
     m_toggleLiveViewButton->setDisabled(true);
-    m_toggleLiveViewButton->setText("Start Live View");
+    m_toggleLiveViewButton->setText(tr("Start Live View"));
   } else {
     int maxTextLength = 0;
     m_cameraListCombo->addItem(tr("- Select camera -"));
@@ -1327,7 +1327,7 @@ void StopMotionController::onNewCameraSelected(int index, bool useWebcam) {
     m_resolutionLabel->hide();
   }
   if (useWebcam) {
-    if (m_tabBar->tabText(1) == "Settings") {
+    if (m_tabBar->tabText(1) == tr("Settings")) {
       m_tabBar->removeTab(1);
     }
     m_resolutionCombo->show();
@@ -1338,8 +1338,8 @@ void StopMotionController::onNewCameraSelected(int index, bool useWebcam) {
     m_resolutionCombo->hide();
     m_resolutionLabel->hide();
     m_captureFilterSettingsBtn->hide();
-    if (m_tabBar->tabText(1) == "Options") {
-      m_tabBar->insertTab(1, "Settings");
+    if (m_tabBar->tabText(1) == tr("Options")) {
+      m_tabBar->insertTab(1, tr("Settings"));
     }
   }
 }

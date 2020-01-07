@@ -1109,7 +1109,7 @@ TToonzImageP Naa2TlvConverter::makeTlv(bool transparentSyntheticInks,
       locals::addPaint(neighborPaints, bottomScanLine[prev_x].getPaint());
       locals::addPaint(neighborPaints, bottomScanLine[x].getPaint());
       locals::addPaint(neighborPaints, bottomScanLine[next_x].getPaint());
-      qSort(neighborPaints.begin(), neighborPaints.end(), locals::compare);
+      std::sort(neighborPaints.begin(), neighborPaints.end(), locals::compare);
 
       if (!neighborPaints.isEmpty())
         outScanLine[x].setPaint(neighborPaints[0].first);

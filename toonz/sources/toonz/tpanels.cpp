@@ -1089,6 +1089,7 @@ public:
     TFilePath currentProjectFolder =
         TProjectManager::instance()->getCurrentProjectPath().getParentDir();
     browser->setFolder(currentProjectFolder, true);
+    browser->enableDoubleClickToOpenScenes();
   }
 } browserFactory;
 

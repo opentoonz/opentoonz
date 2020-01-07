@@ -144,7 +144,8 @@ bool needTobeGrouped(const TVectorImageP &vimg) {
 
 //---------------------------------------------------------------------------------------
 
-void mergeVectorColumns(const std::vector<MatchlinePair> &matchingLevels) {
+void mergeVectorColumns(const std::vector<MatchlinePair> &matchingLevels,
+                        bool groupLevels) {
   if (matchingLevels.empty()) return;
 
   int i = 0;
@@ -157,9 +158,10 @@ void mergeVectorColumns(const std::vector<MatchlinePair> &matchingLevels) {
       throw TRopException("Cannot merge columns of different image types!");
     // img->lock();
 
-    if (needTobeGrouped(vimg)) vimg->group(0, vimg->getStrokeCount());
+    if (needTobeGrouped(vimg) && groupLevels)
+      vimg->group(0, vimg->getStrokeCount());
     bool ungroup = false;
-    if (needTobeGrouped(vmatch)) {
+    if (needTobeGrouped(vmatch) && groupLevels) {
       ungroup = true;
       vmatch->group(0, vmatch->getStrokeCount());
     }
@@ -184,12 +186,13 @@ class MergeColumnsUndo final : public TUndo {
 
   int m_column, m_mColumn;
   TPalette *m_palette;
+  bool m_groupLevels;
 
 public:
   MergeColumnsUndo(TXshLevelP xl, int matchlineSessionId, int column,
                    TXshSimpleLevel *level,
                    const std::map<TFrameId, QString> &images, int mColumn,
-                   TPalette *palette)
+                   TPalette *palette, bool groupLevels)
       : TUndo()
       , m_xl(xl)
       , m_matchlineSessionId(matchlineSessionId)
@@ -197,7 +200,8 @@ public:
       , m_column(column)
       , m_mColumn(mColumn)
       , m_images(images)
-      , m_palette(palette->clone()) {}
+      , m_palette(palette->clone())
+      , m_groupLevels(groupLevels) {}
 
   void undo() const override {
     QApplication::setOverrideCursor(Qt::WaitCursor);
@@ -225,7 +229,7 @@ public:
   void redo() const override {
     QApplication::setOverrideCursor(Qt::WaitCursor);
 
-    mergeColumns(m_column, m_mColumn, true);
+    mergeColumns(m_column, m_mColumn, true, m_groupLevels);
 
     QApplication::restoreOverrideCursor();
   }
@@ -243,14 +247,17 @@ public:
   }
 
   QString getHistoryString() override {
-    return QObject::tr("Merge Raster Levels");
+    if (m_level->getType() == PLI_XSHLEVEL)
+      return QObject::tr("Merge Vector Levels");
+    else
+      return QObject::tr("Merge Raster Levels");
   }
   int getHistoryType() override { return HistoryType::FilmStrip; }
 };
 
 //-----------------------------------------------------------------------------
 
-void mergeColumns(const std::set<int> &columns) {
+void mergeColumns(const std::set<int> &columns, bool groupLevels) {
   QApplication::setOverrideCursor(Qt::WaitCursor);
 
   std::set<int>::const_iterator it = columns.begin();
@@ -260,7 +267,8 @@ void mergeColumns(const std::set<int> &columns) {
 
   TUndoManager::manager()->beginBlock();
 
-  for (; it != columns.end(); ++it) mergeColumns(dstColumn, *it, false);
+  for (; it != columns.end(); ++it)
+    mergeColumns(dstColumn, *it, false, groupLevels);
 
   TUndoManager::manager()->endBlock();
 
@@ -271,7 +279,7 @@ void mergeColumns(const std::set<int> &columns) {
 
 static int MergeColumnsSessionId = 0;
 
-void mergeColumns(int column, int mColumn, bool isRedo) {
+void mergeColumns(int column, int mColumn, bool isRedo, bool groupLevels) {
   if (!isRedo) MergeColumnsSessionId++;
   TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
   int start, end;
@@ -379,14 +387,10 @@ void mergeColumns(int column, int mColumn, bool isRedo) {
     return;
   }
 
-  ToonzScene *sc = TApp::instance()->getCurrentScene()->getScene();
-  TXshSimpleLevel *simpleLevel =
-      sc->getLevelSet()->getLevel(column)->getSimpleLevel();
-
   if (!isRedo)
     TUndoManager::manager()->add(
         new MergeColumnsUndo(xl, MergeColumnsSessionId, column, level, images,
-                             mColumn, level->getPalette()));
+                             mColumn, level->getPalette(), groupLevels));
 
   if (areRasters) {
     mergeRasterColumns(matchingLevels);
@@ -399,15 +403,10 @@ void mergeColumns(int column, int mColumn, bool isRedo) {
       ToolUtils::updateSaveBox(cell[i].getSimpleLevel(), cell[i].m_frameId);
     }
   } else
-    mergeVectorColumns(matchingLevels);
+    mergeVectorColumns(matchingLevels, groupLevels);
 
-  TXshLevel *sl =
-      TApp::instance()->getCurrentScene()->getScene()->getLevelSet()->getLevel(
-          column);
-  std::vector<TFrameId> fidsss;
-  sl->getFids(fidsss);
-  invalidateIcons(sl, fidsss);
-  sl->setDirtyFlag(true);
+  std::vector<TFrameId> fids(alreadyDoneSet.begin(), alreadyDoneSet.end());
+  invalidateIcons(level, fids);
   level->setDirtyFlag(true);
   TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
 }

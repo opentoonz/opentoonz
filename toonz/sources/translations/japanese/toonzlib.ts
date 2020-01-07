@@ -439,7 +439,8 @@
     <message>
         <source>Failed to save the following resources:
 </source>
-        <translation type="unfinished"></translation>
+        <translation>以下の素材の保存に失敗しました：
+</translation>
     </message>
 </context>
 <context>

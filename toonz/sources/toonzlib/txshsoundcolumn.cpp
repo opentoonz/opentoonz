@@ -880,7 +880,7 @@ bool TXshSoundColumn::isPlaying() const {
 void TXshSoundColumn::insertColumnLevel(ColumnLevel *columnLevel, int index) {
   if (index == -1) index = m_levels.size();
   m_levels.insert(index, columnLevel);
-  qSort(m_levels.begin(), m_levels.end(), lessThan);
+  std::sort(m_levels.begin(), m_levels.end(), lessThan);
 }
 
 //-----------------------------------------------------------------------------

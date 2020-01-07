@@ -527,6 +527,7 @@ void Preferences::definePreferenceItems() {
   define(blanksCount, "blanksCount", QMetaType::Int, 0, 0, 1000);
   define(blankColor, "blankColor", QMetaType::QColor, QColor(Qt::white));
   define(rewindAfterPlayback, "rewindAfterPlayback", QMetaType::Bool, true);
+  define(shortPlayFrameCount, "shortPlayFrameCount", QMetaType::Int, 8, 1, 100);
   define(previewAlwaysOpenNewFlip, "previewAlwaysOpenNewFlip", QMetaType::Bool,
          false);
   define(fitToFlipbook, "fitToFlipbook", QMetaType::Bool, false);
