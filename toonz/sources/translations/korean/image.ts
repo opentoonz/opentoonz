@@ -217,11 +217,11 @@ Please try raising the FFmpeg timeout in Preferences.</source>
     </message>
     <message>
         <source>24(RGB)</source>
-        <translation>24(RGB)</translation>
+        <translation></translation>
     </message>
     <message>
         <source>48(RGB)</source>
-        <translation>48(RGB)</translation>
+        <translation></translation>
     </message>
     <message>
         <source> 1(BW)</source>
@@ -233,11 +233,11 @@ Please try raising the FFmpeg timeout in Preferences.</source>
     </message>
     <message>
         <source>32(RGBM)</source>
-        <translation>32(RGBM)</translation>
+        <translation></translation>
     </message>
     <message>
         <source>64(RGBM)</source>
-        <translation>64(RGBM)</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Orientation</source>

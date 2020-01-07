@@ -5,7 +5,7 @@
     <name>ArrowToolOptionsBox</name>
     <message>
         <source>Z:</source>
-        <translation>Z:</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Position:</source>
@@ -13,15 +13,15 @@
     </message>
     <message>
         <source>E/W:</source>
-        <translation>E/W:</translation>
+        <translation></translation>
     </message>
     <message>
         <source>N/S:</source>
-        <translation>N/S:</translation>
+        <translation></translation>
     </message>
     <message>
         <source>SO:</source>
-        <translation>SO:</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Rotation:</source>
@@ -45,11 +45,11 @@
     </message>
     <message>
         <source>(</source>
-        <translation>(</translation>
+        <translation></translation>
     </message>
     <message>
         <source>)</source>
-        <translation>)</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Rotation</source>
@@ -140,15 +140,15 @@
     </message>
     <message>
         <source>In</source>
-        <translation>안</translation>
+        <translation>가속</translation>
     </message>
     <message>
         <source>Out</source>
-        <translation>밖</translation>
+        <translation>감속</translation>
     </message>
     <message>
         <source>In&amp;Out</source>
-        <translation>안&amp;밖</translation>
+        <translation>가속&amp;감속</translation>
     </message>
     <message>
         <source>Low</source>
@@ -199,7 +199,7 @@
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">취소</translation>
+        <translation>취소</translation>
     </message>
 </context>
 <context>
@@ -224,7 +224,7 @@
     <name>DVGui::StyleIndexLineEdit</name>
     <message>
         <source>current</source>
-        <translation type="unfinished">현재</translation>
+        <translation>현재</translation>
     </message>
 </context>
 <context>
@@ -239,7 +239,7 @@
     </message>
     <message>
         <source>A/R</source>
-        <translation>A/R</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Mass</source>
@@ -311,7 +311,7 @@
     </message>
     <message>
         <source>SO</source>
-        <translation>SO</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Rotation</source>
@@ -806,7 +806,7 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>SO</source>
-        <translation>SO</translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1103,31 +1103,31 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>The selection cannot be updated. It is not editable.</source>
-        <translation type="unfinished"></translation>
+        <translation>선택을 업데이트 할 수 없습니다. 편집 할 수 없습니다.</translation>
     </message>
     <message>
         <source>The selection cannot be deleted. It is not editable.</source>
-        <translation type="unfinished"></translation>
+        <translation>선택항목을 삭제할 수 없습니다. 편집 할 수 없습니다.</translation>
     </message>
     <message>
         <source>The selection cannot be pasted. It is not editable.</source>
-        <translation type="unfinished"></translation>
+        <translation>선택을 붙여 넣을 수 없습니다. 편집 할 수 없습니다.</translation>
     </message>
     <message>
         <source>The selection cannot be grouped. It is not editable.</source>
-        <translation type="unfinished"></translation>
+        <translation>선택 항목을 그룹화할 수 없음. 그것은 편집할 수 없다.</translation>
     </message>
     <message>
         <source>The selection cannot be entered. It is not editable.</source>
-        <translation type="unfinished"></translation>
+        <translation>선택을 입력 할 수 없습니다. 편집 할 수 없습니다.</translation>
     </message>
     <message>
         <source>The selection cannot be ungrouped. It is not editable.</source>
-        <translation type="unfinished"></translation>
+        <translation>선택을 그룹 해제 할 수 없습니다. 편집 할 수 없습니다.</translation>
     </message>
     <message>
         <source>The selection cannot be moved. It is not editable.</source>
-        <translation type="unfinished"></translation>
+        <translation>선택을 이동할 수 없습니다. 편집 할 수 없습니다.</translation>
     </message>
 </context>
 <context>
@@ -1308,11 +1308,11 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>E/W:</source>
-        <translation>E/W:</translation>
+        <translation></translation>
     </message>
     <message>
         <source>N/S:</source>
-        <translation>N/S:</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Scale</source>
@@ -1490,11 +1490,11 @@ moved to the end of the first page of the palette.</source>
     </message>
     <message>
         <source>X:</source>
-        <translation>X:</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Y:</source>
-        <translation>Y:</translation>
+        <translation></translation>
     </message>
 </context>
 <context>

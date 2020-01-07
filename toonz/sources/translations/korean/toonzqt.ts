@@ -85,7 +85,7 @@
     <name>CameraSettingsWidget</name>
     <message>
         <source>DPI</source>
-        <translation>DPI</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Pixels</source>
@@ -93,7 +93,7 @@
     </message>
     <message>
         <source>x</source>
-        <translation>x</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Use Current Level Settings</source>
@@ -113,7 +113,7 @@
     </message>
     <message>
         <source>A/R</source>
-        <translation>A/R</translation>
+        <translation></translation>
     </message>
     <message>
         <source>&lt;custom&gt;</source>
@@ -166,37 +166,37 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>RGBA</source>
-        <translation>RGBA</translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>CleanupCameraSettingsWidget</name>
     <message>
         <source>N/S</source>
-        <translation>N/S</translation>
+        <translation></translation>
     </message>
     <message>
         <source>E/W</source>
-        <translation>E/W</translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>ColorChannelControl</name>
     <message>
         <source>R</source>
-        <translation type="vanished">R</translation>
+        <translation type="vanished"></translation>
     </message>
     <message>
         <source>G</source>
-        <translation type="vanished">G</translation>
+        <translation type="vanished"></translation>
     </message>
     <message>
         <source>B</source>
-        <translation type="vanished">B</translation>
+        <translation type="vanished"></translation>
     </message>
     <message>
         <source>A</source>
-        <translation type="vanished">A</translation>
+        <translation type="vanished"></translation>
     </message>
     <message>
         <source>H</source>
@@ -204,30 +204,30 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>S</source>
-        <translation type="vanished">S</translation>
+        <translation type="vanished"></translation>
     </message>
     <message>
         <source>V</source>
-        <translation type="vanished">V</translation>
+        <translation type="vanished"></translation>
     </message>
 </context>
 <context>
     <name>ColorField</name>
     <message>
         <source>R:</source>
-        <translation type="vanished">R:</translation>
+        <translation type="vanished"></translation>
     </message>
     <message>
         <source>G:</source>
-        <translation type="vanished">G:</translation>
+        <translation type="vanished"></translation>
     </message>
     <message>
         <source>B:</source>
-        <translation type="vanished">B:</translation>
+        <translation type="vanished"></translation>
     </message>
     <message>
         <source>A:</source>
-        <translation type="vanished">A:</translation>
+        <translation type="vanished"></translation>
     </message>
 </context>
 <context>
@@ -241,7 +241,7 @@ Possibly the preset file has been corrupted</source>
     <name>ComboHistoRGBLabel</name>
     <message>
         <source>R:%1 G:%2 B:%3</source>
-        <translation>R:%1 G:%2 B:%3</translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -256,11 +256,11 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>X:</source>
-        <translation>X:</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Y:</source>
-        <translation>Y:</translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -305,88 +305,88 @@ Possibly the preset file has been corrupted</source>
     <name>DVGui::ColorField</name>
     <message>
         <source>R:</source>
-        <translation type="unfinished">R:</translation>
+        <translation></translation>
     </message>
     <message>
         <source>G:</source>
-        <translation type="unfinished">G:</translation>
+        <translation></translation>
     </message>
     <message>
         <source>B:</source>
-        <translation type="unfinished">B:</translation>
+        <translation></translation>
     </message>
     <message>
         <source>A:</source>
-        <translation type="unfinished">A:</translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>DVGui::DvTextEdit</name>
     <message>
         <source>Bold</source>
-        <translation type="unfinished">볼드</translation>
+        <translation>볼드</translation>
     </message>
     <message>
         <source>Italic</source>
-        <translation type="unfinished">이탤릭체</translation>
+        <translation>이탤릭체</translation>
     </message>
     <message>
         <source>Underline</source>
-        <translation type="unfinished">밑줄</translation>
+        <translation>밑줄</translation>
     </message>
     <message>
         <source>Align Left</source>
-        <translation type="unfinished">왼쪽 정렬</translation>
+        <translation>왼쪽 정렬</translation>
     </message>
     <message>
         <source>Align Center</source>
-        <translation type="unfinished">중심 정렬</translation>
+        <translation>중심 정렬</translation>
     </message>
     <message>
         <source>Align Right</source>
-        <translation type="unfinished">오른쪽 정렬</translation>
+        <translation>오른쪽 정렬</translation>
     </message>
 </context>
 <context>
     <name>DVGui::FileField</name>
     <message>
         <source>...</source>
-        <translation type="unfinished">...</translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>DVGui::LineEdit</name>
     <message>
         <source>A file name cannot contains any of the following chracters: /\:*?&quot;&lt;&gt;|.</source>
-        <translation type="unfinished">파일 이름에는 다음 문자 중 어느 것도 포함될 수 없음: /\:*?&quot;&lt;&gt;|.</translation>
+        <translation>파일 이름에는 다음 문자 중 어느 것도 포함될 수 없음: /\:*?&quot;&lt;&gt;|.</translation>
     </message>
 </context>
 <context>
     <name>DVGui::ProgressDialog</name>
     <message>
         <source>OpenToonz</source>
-        <translation type="unfinished">오픈툰즈</translation>
+        <translation>오픈툰즈</translation>
     </message>
 </context>
 <context>
     <name>DVGui::RadioButtonDialog</name>
     <message>
         <source>OpenToonz</source>
-        <translation type="unfinished">오픈툰즈</translation>
+        <translation>오픈툰즈</translation>
     </message>
 </context>
 <context>
     <name>DVGui::StyleIndexLineEdit</name>
     <message>
         <source>current</source>
-        <translation type="unfinished">현재</translation>
+        <translation>현재</translation>
     </message>
 </context>
 <context>
     <name>DVGui::ToneCurveField</name>
     <message>
         <source>Channel:</source>
-        <translation type="unfinished">채널:</translation>
+        <translation>채널:</translation>
     </message>
 </context>
 <context>
@@ -457,7 +457,7 @@ Possibly the preset file has been corrupted</source>
     <name>FileField</name>
     <message>
         <source>...</source>
-        <translation type="vanished">...</translation>
+        <translation type="vanished"></translation>
     </message>
 </context>
 <context>
@@ -479,7 +479,7 @@ Possibly the preset file has been corrupted</source>
     <name>FlipConsole</name>
     <message>
         <source> FPS </source>
-        <translation>FPS</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Save</source>
@@ -639,7 +639,7 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source> FPS	</source>
-        <translation>FPS</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Set the current frame</source>
@@ -655,27 +655,27 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>Viewer Controls</source>
-        <translation type="unfinished"></translation>
+        <translation>뷰어 컨트롤</translation>
     </message>
     <message>
         <source>&amp;Zoom In</source>
-        <translation type="unfinished"></translation>
+        <translation>확대(&amp;Z)</translation>
     </message>
     <message>
         <source>&amp;Zoom Out</source>
-        <translation type="unfinished"></translation>
+        <translation>축소(&amp;Z)</translation>
     </message>
     <message>
         <source>&amp;Flip Horizontally</source>
-        <translation type="unfinished"></translation>
+        <translation>수평으로 뒤집기(&amp;F)</translation>
     </message>
     <message>
         <source>&amp;Flip Vertically</source>
-        <translation type="unfinished"></translation>
+        <translation>수직으로 뒤집기(&amp;F)</translation>
     </message>
     <message>
         <source>&amp;Reset View</source>
-        <translation type="unfinished"></translation>
+        <translation>보기 재설정(&amp;R)</translation>
     </message>
 </context>
 <context>
@@ -755,7 +755,7 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>Speed In / Speed Out Interpolation</source>
-        <translation>속도입력/속도제한 보간</translation>
+        <translation>속도가속/속도감속 중간값</translation>
     </message>
     <message>
         <source>Ease In / Ease Out Interpolation</source>
@@ -830,7 +830,7 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>Speed In / Speed Out</source>
-        <translation>속도 입력/속도 초과</translation>
+        <translation>속도가속/속도감속</translation>
     </message>
     <message>
         <source>Ease In / Ease Out</source>
@@ -882,11 +882,11 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>&lt; </source>
-        <translation>&lt; </translation>
+        <translation></translation>
     </message>
     <message>
         <source> &gt;</source>
-        <translation> &gt;</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Speed</source>
@@ -906,7 +906,7 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>Expr</source>
-        <translation> type=&quot;unfinished&quot;&gt;</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Const</source>
@@ -918,7 +918,7 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>????</source>
-        <translation>????</translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -951,7 +951,7 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>Speed In / Speed Out Interpolation</source>
-        <translation>속도입력/속도제한 보간</translation>
+        <translation>속도가속/속도감속 중간값</translation>
     </message>
     <message>
         <source>Ease In / Ease Out Interpolation</source>
@@ -1041,7 +1041,7 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>FX</source>
-        <translation>FX</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Plastic Skeleton</source>
@@ -1076,7 +1076,7 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>Hide Selected</source>
-        <translation type="unfinished"></translation>
+        <translation>선택한 항목 숨기기</translation>
     </message>
 </context>
 <context>
@@ -1284,7 +1284,7 @@ Select FX nodes and related links before copying or cutting the selection you wa
     </message>
     <message>
         <source> : </source>
-        <translation> : </translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1321,7 +1321,7 @@ Select FX nodes and related links before copying or cutting the selection you wa
     </message>
     <message>
         <source>RGB</source>
-        <translation>RGB</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Red</source>
@@ -1514,7 +1514,7 @@ Select FX nodes and related links before copying or cutting the selection you wa
     </message>
     <message>
         <source>)</source>
-        <translation>)</translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1525,15 +1525,15 @@ Select FX nodes and related links before copying or cutting the selection you wa
     </message>
     <message>
         <source>Name Editor</source>
-        <translation type="unfinished">이름 편집기</translation>
+        <translation>이름 편집기</translation>
     </message>
     <message>
         <source>New Style</source>
-        <translation type="unfinished">새로운 스타일</translation>
+        <translation>새로운 스타일</translation>
     </message>
     <message>
         <source>New Page</source>
-        <translation type="unfinished">새로운 페이지</translation>
+        <translation>새로운 페이지</translation>
     </message>
 </context>
 <context>
@@ -1591,11 +1591,11 @@ Select FX nodes and related links before copying or cutting the selection you wa
     <name>PointParamField</name>
     <message>
         <source>X:</source>
-        <translation>X:</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Y:</source>
-        <translation>Y:</translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2144,7 +2144,7 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     </message>
     <message>
         <source>That is a reserved file name and cannot be used.</source>
-        <translation type="unfinished"></translation>
+        <translation>이것은 예약 된 파일 이름이며 사용할 수 없습니다.</translation>
     </message>
 </context>
 <context>
@@ -2283,7 +2283,7 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     </message>
     <message>
         <source>/</source>
-        <translation>/</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Last Speed:</source>
@@ -2291,7 +2291,7 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     </message>
     <message>
         <source>---</source>
-        <translation>---</translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2466,7 +2466,7 @@ Are you sure ?</source>
     </message>
     <message>
         <source>HSV</source>
-        <translation>HSV</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Alpha</source>
@@ -2474,7 +2474,7 @@ Are you sure ?</source>
     </message>
     <message>
         <source>RGB</source>
-        <translation>RGB</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Toggle orientation of the Color Page.</source>
@@ -2553,19 +2553,19 @@ Are you sure ?</source>
     <name>StyleEditorGUI::ColorChannelControl</name>
     <message>
         <source>R</source>
-        <translation type="unfinished">R</translation>
+        <translation></translation>
     </message>
     <message>
         <source>G</source>
-        <translation type="unfinished">G</translation>
+        <translation></translation>
     </message>
     <message>
         <source>B</source>
-        <translation type="unfinished">B</translation>
+        <translation></translation>
     </message>
     <message>
         <source>A</source>
-        <translation type="unfinished">A</translation>
+        <translation></translation>
     </message>
     <message>
         <source>H</source>
@@ -2573,11 +2573,11 @@ Are you sure ?</source>
     </message>
     <message>
         <source>S</source>
-        <translation type="unfinished">S</translation>
+        <translation></translation>
     </message>
     <message>
         <source>V</source>
-        <translation type="unfinished">V</translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2588,7 +2588,7 @@ Are you sure ?</source>
     </message>
     <message>
         <source>Reset to default</source>
-        <translation type="unfinished">기본값으로 재설정</translation>
+        <translation>기본값으로 재설정</translation>
     </message>
 </context>
 <context>
