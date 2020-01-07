@@ -4,32 +4,27 @@
 <context>
     <name>BmpWriterProperties</name>
     <message>
-        <location filename="../../common/tiio/tiio_bmp.cpp" line="755"/>
         <source>Bits Per Pixel</source>
-        <translation>Битов на пиксель</translation>
+        <translation type="obsolete">Битов на пиксель</translation>
     </message>
     <message>
-        <location filename="../../common/tiio/tiio_bmp.cpp" line="756"/>
         <source>24 bits</source>
-        <translation>24 бита</translation>
+        <translation type="obsolete">24 бита</translation>
     </message>
     <message>
-        <location filename="../../common/tiio/tiio_bmp.cpp" line="757"/>
         <source>8 bits (Greyscale)</source>
-        <translation>8 бит (оттенки серого)</translation>
+        <translation type="obsolete">8 бит (оттенки серого)</translation>
     </message>
 </context>
 <context>
     <name>JpgWriterProperties</name>
     <message>
-        <location filename="../../common/tiio/tiio_jpg.cpp" line="284"/>
         <source>Quality</source>
-        <translation>Качество</translation>
+        <translation type="obsolete">Качество</translation>
     </message>
     <message>
-        <location filename="../../common/tiio/tiio_jpg.cpp" line="285"/>
         <source>Smoothing</source>
-        <translation>Сглаживание</translation>
+        <translation type="obsolete">Сглаживание</translation>
     </message>
 </context>
 <context>
@@ -46,12 +41,11 @@
     </message>
     <message>
         <source>Malformed frame name</source>
-        <translation type="vanished">Неправильное имя файла</translation>
+        <translation type="obsolete">Неправильное имя файла</translation>
     </message>
     <message>
-        <location filename="../../include/tundo.h" line="46"/>
         <source>Unidentified Action</source>
-        <translation>Нераспознанное действие</translation>
+        <translation type="obsolete">Нераспознанное действие</translation>
     </message>
 </context>
 <context>
@@ -91,6 +85,37 @@
         <location filename="../../common/tvrender/tsimplecolorstyles.cpp" line="1472"/>
         <source>Rotation</source>
         <translation>Вращение</translation>
+    </message>
+</context>
+<context>
+    <name>Tiio::BmpWriterProperties</name>
+    <message>
+        <location filename="../../common/tiio/tiio_bmp.cpp" line="755"/>
+        <source>Bits Per Pixel</source>
+        <translation>Битов на пиксель</translation>
+    </message>
+    <message>
+        <location filename="../../common/tiio/tiio_bmp.cpp" line="756"/>
+        <source>24 bits</source>
+        <translation>24 бита</translation>
+    </message>
+    <message>
+        <location filename="../../common/tiio/tiio_bmp.cpp" line="757"/>
+        <source>8 bits (Greyscale)</source>
+        <translation>8 бит (оттенки серого)</translation>
+    </message>
+</context>
+<context>
+    <name>Tiio::JpgWriterProperties</name>
+    <message>
+        <location filename="../../common/tiio/tiio_jpg.cpp" line="284"/>
+        <source>Quality</source>
+        <translation>Качество</translation>
+    </message>
+    <message>
+        <location filename="../../common/tiio/tiio_jpg.cpp" line="285"/>
+        <source>Smoothing</source>
+        <translation>Сглаживание</translation>
     </message>
 </context>
 </TS>
