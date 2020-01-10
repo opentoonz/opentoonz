@@ -4,6 +4,8 @@
 #include "sceneviewer.h"
 
 #include "toonz/preferences.h"
+#include "toonz/tscenehandle.h"
+
 #include "toonzqt/menubarcommand.h"
 
 #include <QComboBox>
@@ -166,6 +168,7 @@ VectorGuidedDrawingPane::VectorGuidedDrawingPane(QWidget *parent,
           SLOT(onGuidedTypeChanged()));
   connect(m_interpolationTypeCB, SIGNAL(currentIndexChanged(int)), this,
           SLOT(onInterpolationTypeChanged()));
+  connect(TApp::instance()->getCurrentScene(), SIGNAL(preferenceChanged(const QString &)), this, SLOT(onPreferenceChanged(const QString &)));
 
   updateStatus();
 }
@@ -210,4 +213,21 @@ void VectorGuidedDrawingPane::onInterpolationTypeChanged() {
   // 1 = Linear, 2 = Ease In, 3 = Ease Out, 4 = Ease In/Out
   Preferences::instance()->setValue(guidedInterpolationType,
                                     interpolationIndex);
+}
+
+//----------------------------------------------------------------------------
+
+void VectorGuidedDrawingPane::onPreferenceChanged(const QString &propertyName) {
+	if (propertyName.isEmpty()) return;
+
+	if (propertyName == "GuidedDrawingFrame")
+		m_guidedTypeCB->setCurrentIndex(Preferences::instance()->getGuidedDrawingType() - 1);
+	else if (propertyName == "GuidedDrawingAutoInbetween")
+		m_autoInbetween->setChecked(Preferences::instance()->getGuidedAutoInbetween());
+	else if (propertyName == "GuidedDrawingInterpolation")
+		m_interpolationTypeCB->setCurrentIndex(Preferences::instance()->getGuidedInterpolation() - 1);
+	else
+		return;
+
+	updateStatus();
 }

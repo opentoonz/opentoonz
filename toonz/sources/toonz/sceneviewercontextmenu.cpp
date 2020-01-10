@@ -130,10 +130,90 @@ SceneViewerContextMenu::SceneViewerContextMenu(SceneViewer *parent)
   ret = ret && parent->connect(action, SIGNAL(triggered()),
                                SLOT(setActualPixelSize()));
 
-  // Zero Thick
-  if (!parent->isPreviewEnabled())
-    ZeroThickToggleGui::addZeroThickCommand(this);
+  // onion skin
+  if (Preferences::instance()->isOnionSkinEnabled() &&
+      !parent->isPreviewEnabled())
+    OnioniSkinMaskGUI::addOnionSkinCommand(this);
 
+  if (tool->getTargetType() & TTool::VectorImage) {
+    auto addOptionAction = [](const QString &label, const int data,
+                              const int currentData, QMenu *menu,
+                              QActionGroup *group) {
+      QAction *action = menu->addAction(label);
+      action->setData(data);
+      action->setCheckable(true);
+      action->setChecked(data == currentData);
+      group->addAction(action);
+    };
+    QMenu *guidedDrawingMenu = addMenu(tr("Vector Guided Drawing"));
+    int guidedDrawingStatus  = Preferences::instance()->isGuidedDrawingEnabled() ? Preferences::instance()->getGuidedDrawingType() : 0;
+
+    QActionGroup *guidedDrawingGroup = new QActionGroup(this);
+    addOptionAction(tr("Off"), 0, guidedDrawingStatus, guidedDrawingMenu,
+                    guidedDrawingGroup);
+    addOptionAction(tr("Closest Drawing"), 1, guidedDrawingStatus,
+                    guidedDrawingMenu, guidedDrawingGroup);
+    addOptionAction(tr("Farthest Drawing"), 2, guidedDrawingStatus,
+                    guidedDrawingMenu, guidedDrawingGroup);
+    addOptionAction(tr("All Drawings"), 3, guidedDrawingStatus,
+                    guidedDrawingMenu, guidedDrawingGroup);
+    ret =
+        ret && parent->connect(guidedDrawingGroup, SIGNAL(triggered(QAction *)),
+                               this, SLOT(setGuidedDrawingType(QAction *)));
+
+    guidedDrawingMenu->addSeparator();
+    bool enableOption = guidedDrawingStatus == 1 || guidedDrawingStatus == 2;
+    action            = guidedDrawingMenu->addAction(tr("Auto Inbetween"));
+    action->setCheckable(true);
+    action->setChecked(Preferences::instance()->getGuidedAutoInbetween());
+    action->setEnabled(enableOption);
+    ret = ret && parent->connect(action, SIGNAL(triggered()), this,
+                                 SLOT(setGuidedAutoInbetween()));
+    guidedDrawingMenu->addSeparator();
+    int guidedInterpolation = Preferences::instance()->getGuidedInterpolation();
+    QActionGroup *interpolationGroup = new QActionGroup(this);
+    addOptionAction(tr("Linear Interpolation"), 1, guidedInterpolation,
+                    guidedDrawingMenu, interpolationGroup);
+    addOptionAction(tr("Ease In Interpolation"), 2, guidedInterpolation,
+                    guidedDrawingMenu, interpolationGroup);
+    addOptionAction(tr("Ease Out Interpolation"), 3, guidedInterpolation,
+                    guidedDrawingMenu, interpolationGroup);
+    addOptionAction(tr("Ease In/Out Interpolation"), 4, guidedInterpolation,
+                    guidedDrawingMenu, interpolationGroup);
+    ret = ret &&
+          parent->connect(interpolationGroup, SIGNAL(triggered(QAction *)),
+                          this, SLOT(setGuidedInterpolationState(QAction *)));
+    interpolationGroup->setEnabled(enableOption);
+/*
+    guidedDrawingMenu->addSeparator();
+    action = CommandManager::instance()->getAction(MI_SelectPrevGuideStroke);
+    action->setEnabled(enableOption);
+    guidedDrawingMenu->addAction(action);
+    action = CommandManager::instance()->getAction(MI_SelectNextGuideStroke);
+    action->setEnabled(enableOption);
+    guidedDrawingMenu->addAction(action);
+    action = CommandManager::instance()->getAction(MI_SelectBothGuideStrokes);
+    action->setEnabled(enableOption);
+    guidedDrawingMenu->addAction(action);
+    action = CommandManager::instance()->getAction(MI_SelectGuideStrokeReset);
+    action->setEnabled(true);
+    guidedDrawingMenu->addAction(action);
+    guidedDrawingMenu->addSeparator();
+    action = CommandManager::instance()->getAction(MI_TweenGuideStrokes);
+    action->setEnabled(enableOption);
+    guidedDrawingMenu->addAction(action);
+    action =
+        CommandManager::instance()->getAction(MI_TweenGuideStrokeToSelected);
+    action->setEnabled(enableOption);
+    guidedDrawingMenu->addAction(action);
+    action = CommandManager::instance()->getAction(MI_SelectGuidesAndTweenMode);
+    action->setEnabled(enableOption);
+    guidedDrawingMenu->addAction(action);
+*/
+    // Zero Thick
+    if (!parent->isPreviewEnabled())
+      ZeroThickToggleGui::addZeroThickCommand(this);
+  }
   // Brush size outline
   CursorOutlineToggleGui::addCursorOutlineCommand(this);
 
@@ -337,6 +417,36 @@ void SceneViewerContextMenu::onSetCurrent() {
     app->getCurrentObject()->setObjectId(id);
     app->getCurrentTool()->setTool(T_Edit);
   }
+}
+
+//-----------------------------------------------------------------------------
+void SceneViewerContextMenu::setGuidedDrawingType(QAction *action) {
+	if (!action->data().toInt()) {
+		Preferences::instance()->setValue(guidedDrawingEnabled, false);
+	}
+	else {
+		Preferences::instance()->setValue(guidedDrawingEnabled, true);
+		Preferences::instance()->setValue(guidedDrawingType, action->data().toInt());
+	}
+
+	QAction *guidedDrawingAction = CommandManager::instance()->getAction(MI_VectorGuidedDrawing);
+	if (guidedDrawingAction) guidedDrawingAction->setChecked(Preferences::instance()->isGuidedDrawingEnabled());
+
+	TApp::instance()->getCurrentScene()->notifyPreferenceChanged("GuidedDrawingFrame");
+}
+
+//-----------------------------------------------------------------------------
+void SceneViewerContextMenu::setGuidedAutoInbetween() {
+  Preferences::instance()->setValue(
+      guidedAutoInbetween, !Preferences::instance()->getGuidedAutoInbetween());
+  TApp::instance()->getCurrentScene()->notifyPreferenceChanged("GuidedDrawingAutoInbetween");
+}
+
+//-----------------------------------------------------------------------------
+void SceneViewerContextMenu::setGuidedInterpolationState(QAction *action) {
+  Preferences::instance()->setValue(guidedInterpolationType,
+                                    action->data().toInt());
+  TApp::instance()->getCurrentScene()->notifyPreferenceChanged("GuidedDrawingInterpolation");
 }
 
 //-----------------------------------------------------------------------------

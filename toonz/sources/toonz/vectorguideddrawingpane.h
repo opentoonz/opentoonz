@@ -38,6 +38,7 @@ protected slots:
   void onGuidedTypeChanged();
   void onAutoInbetweenChanged();
   void onInterpolationTypeChanged();
+  void onPreferenceChanged(const QString &);
 };
 
 #endif  // VECTORGUIDEDDRAWINGPANE_H
