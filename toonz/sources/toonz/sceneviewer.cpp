@@ -537,17 +537,16 @@ public:
   void execute() override {
     CommandManager *cm = CommandManager::instance();
     QAction *action    = cm->getAction(MI_VectorGuidedDrawing);
-    Preferences::instance()->setValue(guidedDrawingEnabled,
-                                      action->isChecked());
-    updateVectorGuidedDrawingStatus();
+    Preferences::instance()->setValue(guidedDrawingType,
+                                      action->isChecked() ? 1 : 0);
+    TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+    TApp::instance()->getCurrentScene()->notifyPreferenceChanged(
+        "GuidedDrawingFrame");
   }
 
   bool isChecked(CommandId id) const {
     QAction *action = CommandManager::instance()->getAction(id);
     return action != 0 && action->isChecked();
-  }
-  void updateVectorGuidedDrawingStatus() {
-    TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
   }
 } vectorGuidedDrawingToggleCommand;
 
@@ -577,9 +576,8 @@ public:
     if (!vi) return;
 
     Preferences *pref = Preferences::instance();
-    if (!pref->isOnionSkinEnabled() || !pref->isGuidedDrawingEnabled() ||
-        (pref->getGuidedDrawingType() != 1 &&
-         pref->getGuidedDrawingType() != 2))
+    if (!pref->isOnionSkinEnabled() || (pref->getGuidedDrawingType() != 1 &&
+                                        pref->getGuidedDrawingType() != 2))
       return;
 
     TTool *tool = TApp::instance()->getCurrentTool()->getTool();
@@ -597,9 +595,8 @@ public:
     if (!vi) return;
 
     Preferences *pref = Preferences::instance();
-    if (!pref->isOnionSkinEnabled() || !pref->isGuidedDrawingEnabled() ||
-        (pref->getGuidedDrawingType() != 1 &&
-         pref->getGuidedDrawingType() != 2))
+    if (!pref->isOnionSkinEnabled() || (pref->getGuidedDrawingType() != 1 &&
+                                        pref->getGuidedDrawingType() != 2))
       return;
 
     TTool *tool = TApp::instance()->getCurrentTool()->getTool();
@@ -618,9 +615,8 @@ public:
     if (!vi) return;
 
     Preferences *pref = Preferences::instance();
-    if (!pref->isOnionSkinEnabled() || !pref->isGuidedDrawingEnabled() ||
-        (pref->getGuidedDrawingType() != 1 &&
-         pref->getGuidedDrawingType() != 2))
+    if (!pref->isOnionSkinEnabled() || (pref->getGuidedDrawingType() != 1 &&
+                                        pref->getGuidedDrawingType() != 2))
       return;
 
     TTool *tool = TApp::instance()->getCurrentTool()->getTool();
@@ -638,9 +634,8 @@ public:
     if (!vi) return;
 
     Preferences *pref = Preferences::instance();
-    if (!pref->isOnionSkinEnabled() || !pref->isGuidedDrawingEnabled() ||
-        (pref->getGuidedDrawingType() != 1 &&
-         pref->getGuidedDrawingType() != 2))
+    if (!pref->isOnionSkinEnabled() || (pref->getGuidedDrawingType() != 1 &&
+                                        pref->getGuidedDrawingType() != 2))
       return;
 
     TTool *tool = TApp::instance()->getCurrentTool()->getTool();
@@ -659,9 +654,8 @@ public:
     if (!vi) return;
 
     Preferences *pref = Preferences::instance();
-    if (!pref->isOnionSkinEnabled() || !pref->isGuidedDrawingEnabled() ||
-        (pref->getGuidedDrawingType() != 1 &&
-         pref->getGuidedDrawingType() != 2))
+    if (!pref->isOnionSkinEnabled() || (pref->getGuidedDrawingType() != 1 &&
+                                        pref->getGuidedDrawingType() != 2))
       return;
 
     TTool *tool = TApp::instance()->getCurrentTool()->getTool();
@@ -680,9 +674,8 @@ public:
     if (!vi) return;
 
     Preferences *pref = Preferences::instance();
-    if (!pref->isOnionSkinEnabled() || !pref->isGuidedDrawingEnabled() ||
-        (pref->getGuidedDrawingType() != 1 &&
-         pref->getGuidedDrawingType() != 2))
+    if (!pref->isOnionSkinEnabled() || (pref->getGuidedDrawingType() != 1 &&
+                                        pref->getGuidedDrawingType() != 2))
       return;
 
     TTool *tool = TApp::instance()->getCurrentTool()->getTool();
@@ -700,9 +693,8 @@ public:
     if (!vi) return;
 
     Preferences *pref = Preferences::instance();
-    if (!pref->isOnionSkinEnabled() || !pref->isGuidedDrawingEnabled() ||
-        (pref->getGuidedDrawingType() != 1 &&
-         pref->getGuidedDrawingType() != 2))
+    if (!pref->isOnionSkinEnabled() || (pref->getGuidedDrawingType() != 1 &&
+                                        pref->getGuidedDrawingType() != 2))
       return;
 
     TTool *tool = TApp::instance()->getCurrentTool()->getTool();
@@ -720,9 +712,8 @@ public:
     if (!vi) return;
 
     Preferences *pref = Preferences::instance();
-    if (!pref->isOnionSkinEnabled() || !pref->isGuidedDrawingEnabled() ||
-        (pref->getGuidedDrawingType() != 1 &&
-         pref->getGuidedDrawingType() != 2))
+    if (!pref->isOnionSkinEnabled() || (pref->getGuidedDrawingType() != 1 &&
+                                        pref->getGuidedDrawingType() != 2))
       return;
 
     TTool *tool = TApp::instance()->getCurrentTool()->getTool();
@@ -1864,9 +1855,7 @@ void SceneViewer::drawScene() {
   TXshSimpleLevel::m_fillFullColorRaster = false;
 
   // Guided Drawing Check
-  int useGuidedDrawing = Preferences::instance()->isGuidedDrawingEnabled()
-                             ? Preferences::instance()->getGuidedDrawingType()
-                             : 0;
+  int useGuidedDrawing  = Preferences::instance()->getGuidedDrawingType();
   TTool *tool           = app->getCurrentTool()->getTool();
   int guidedFrontStroke = tool ? tool->getViewer()->getGuidedFrontStroke() : -1;
   int guidedBackStroke  = tool ? tool->getViewer()->getGuidedBackStroke() : -1;

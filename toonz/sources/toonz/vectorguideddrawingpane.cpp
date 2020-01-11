@@ -32,14 +32,10 @@ VectorGuidedDrawingPane::VectorGuidedDrawingPane(QWidget *parent,
 
   m_guidedTypeCB = new QComboBox();
   QStringList inputs;
-  inputs << tr("Closest") << tr("Farthest") << tr("All");
+  inputs << tr("Off") << tr("Closest") << tr("Farthest") << tr("All");
   m_guidedTypeCB->addItems(inputs);
-  int guidedIndex = Preferences::instance()->getGuidedDrawingType() - 1;
-  if (guidedIndex < 0) {
-    // Was set off, force to Closest
-    Preferences::instance()->setValue(guidedDrawingType, 1);
-    guidedIndex = 0;
-  }
+  int guidedIndex = Preferences::instance()->getGuidedDrawingType();
+
   m_guidedTypeCB->setCurrentIndex(guidedIndex);
 
   m_autoInbetween = new QCheckBox(tr("Auto Inbetween"), this);
@@ -168,16 +164,21 @@ VectorGuidedDrawingPane::VectorGuidedDrawingPane(QWidget *parent,
           SLOT(onGuidedTypeChanged()));
   connect(m_interpolationTypeCB, SIGNAL(currentIndexChanged(int)), this,
           SLOT(onInterpolationTypeChanged()));
-  connect(TApp::instance()->getCurrentScene(), SIGNAL(preferenceChanged(const QString &)), this, SLOT(onPreferenceChanged(const QString &)));
+  connect(TApp::instance()->getCurrentScene(),
+          SIGNAL(preferenceChanged(const QString &)), this,
+          SLOT(onPreferenceChanged(const QString &)));
 
   updateStatus();
 }
 
 void VectorGuidedDrawingPane::updateStatus() {
-  if (m_guidedTypeCB->currentIndex() == 2) {  // All
+  int guidedType = m_guidedTypeCB->currentIndex();
+  if (guidedType == 0 || guidedType == 3) {  // Off or All
     m_selectPrevGuideBtn->setDisabled(true);
     m_selectNextGuideBtn->setDisabled(true);
     m_selectBothGuideBtn->setDisabled(true);
+    m_autoInbetween->setDisabled(true);
+    m_interpolationTypeCB->setDisabled(true);
     m_tweenSelectedGuidesBtn->setDisabled(true);
     m_tweenToSelectedStrokeBtn->setDisabled(true);
     m_SelectAndTweenBtn->setDisabled(true);
@@ -187,6 +188,8 @@ void VectorGuidedDrawingPane::updateStatus() {
     m_selectPrevGuideBtn->setDisabled(false);
     m_selectNextGuideBtn->setDisabled(false);
     m_selectBothGuideBtn->setDisabled(false);
+    m_autoInbetween->setDisabled(false);
+    m_interpolationTypeCB->setDisabled(false);
     m_tweenSelectedGuidesBtn->setDisabled(false);
     m_tweenToSelectedStrokeBtn->setDisabled(false);
     m_SelectAndTweenBtn->setDisabled(false);
@@ -196,9 +199,16 @@ void VectorGuidedDrawingPane::updateStatus() {
 }
 
 void VectorGuidedDrawingPane::onGuidedTypeChanged() {
-  int guidedIndex = m_guidedTypeCB->currentIndex() + 1;
-  // 1 = closest, 2 = farthest, 3 = all
+  int guidedIndex = m_guidedTypeCB->currentIndex();
+  // 0 == Off 1 = closest, 2 = farthest, 3 = all
   Preferences::instance()->setValue(guidedDrawingType, guidedIndex);
+
+  QAction *guidedDrawingAction =
+      CommandManager::instance()->getAction(MI_VectorGuidedDrawing);
+  if (guidedDrawingAction)
+    guidedDrawingAction->setChecked(
+        Preferences::instance()->isGuidedDrawingEnabled());
+
   TApp::instance()->getActiveViewer()->update();
   updateStatus();
 }
@@ -218,16 +228,19 @@ void VectorGuidedDrawingPane::onInterpolationTypeChanged() {
 //----------------------------------------------------------------------------
 
 void VectorGuidedDrawingPane::onPreferenceChanged(const QString &propertyName) {
-	if (propertyName.isEmpty()) return;
+  if (propertyName.isEmpty()) return;
 
-	if (propertyName == "GuidedDrawingFrame")
-		m_guidedTypeCB->setCurrentIndex(Preferences::instance()->getGuidedDrawingType() - 1);
-	else if (propertyName == "GuidedDrawingAutoInbetween")
-		m_autoInbetween->setChecked(Preferences::instance()->getGuidedAutoInbetween());
-	else if (propertyName == "GuidedDrawingInterpolation")
-		m_interpolationTypeCB->setCurrentIndex(Preferences::instance()->getGuidedInterpolation() - 1);
-	else
-		return;
+  if (propertyName == "GuidedDrawingFrame")
+    m_guidedTypeCB->setCurrentIndex(
+        Preferences::instance()->getGuidedDrawingType());
+  else if (propertyName == "GuidedDrawingAutoInbetween")
+    m_autoInbetween->setChecked(
+        Preferences::instance()->getGuidedAutoInbetween());
+  else if (propertyName == "GuidedDrawingInterpolation")
+    m_interpolationTypeCB->setCurrentIndex(
+        Preferences::instance()->getGuidedInterpolation() - 1);
+  else
+    return;
 
-	updateStatus();
+  updateStatus();
 }
