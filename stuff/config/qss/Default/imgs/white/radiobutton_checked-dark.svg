@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="100%" height="100%" viewBox="0 0 11 11" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+<svg width="11px" height="11px" viewBox="0 0 11 11" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
     <circle id="path4484" cx="5.5" cy="5.5" r="4.5" style="fill-opacity:0.45;"/>
     <path id="circle2" d="M5.5,0C2.5,0 0,2.5 0,5.5C0,8.5 2.5,11 5.5,11C8.5,11 11,8.5 11,5.5C11,2.5 8.5,0 5.5,0ZM5.5,1C8,1 10,3 10,5.5C10,8 8,10 5.5,10C3,10 1,8 1,5.5C1,3 3,1 5.5,1Z" style="fill:rgb(120,120,120);fill-rule:nonzero;"/>
     <circle id="circle4486" cx="5.5" cy="5.5" r="2.5" style="fill:rgb(230,230,230);"/>
