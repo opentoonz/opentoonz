@@ -72,6 +72,11 @@
 @checkbox-border-color: @input-border-color;
 @checkbox-border-color-disabled: @input-border-color-disabled;
 
+@checkbox-bg-color-checked: lighten(@bg, 40);
+@checkbox-border-color-checked: darken(@checkbox-bg-color-checked, 0);
+
+@checkbox-bg-color-checked-hover: lighten(@checkbox-bg-color-checked, 15);
+
 // For RadioButton
 @radiobutton-img-unchecked: 'radiobutton_unchecked-dark.svg';
 @radiobutton-img-checked: 'radiobutton_checked-dark.svg';
