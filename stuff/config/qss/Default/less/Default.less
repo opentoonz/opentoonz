@@ -16,7 +16,7 @@
 @accent: darken(@bg, 13);
 
 @text-color: rgb(230, 230, 230);
-@text-color-disabled: rgb(128, 128, 128);
+@text-color-disabled: rgba(230, 230, 230, 0.4);
 
 @hl-bg-color: rgb(83, 133, 166);
 @hl-text-color: rgb(255, 255, 255);
@@ -75,10 +75,12 @@
 // Menu
 // -----------------------------------------------------------------------------
 
-@menu-bg-color: @bg;
+@menu-text-color: @text-color;
+@menu-bg-color: darken(@bg, 0);
 @menu-border-color: @accent;
 @menu-separator-color: @menu-border-color;
 @menu-checkbox-text-color-selected: @text-color;
+@menu-item-bg-color-disabled-hover: lighten(@menu-bg-color, 8);
 
 // -----------------------------------------------------------------------------
 // Titlebars
@@ -188,6 +190,19 @@
 @toolbutton-lock-border-color-checked-hover: @toolbutton-lock-bg-color-checked-hover;
 
 // -----------------------------------------------------------------------------
+// ComboBox
+// -----------------------------------------------------------------------------
+
+@combobox-dropdown-border-size: 0;
+@combobox-dropdown-border-radius: 1;
+@combobox-dropdown-border-color: @button-bg-color;
+@combobox-dropdown-border-color-hover: @button-bg-color-hover;
+
+// For :editable ComboBox with LineEdit
+@combobox-dropdown-bg-color-hover-editable: @button-bg-color-hover;
+@combobox-dropdown-bg-color-disabled-editable: @button-bg-color-disabled;
+
+// -----------------------------------------------------------------------------
 // Textfield
 // -----------------------------------------------------------------------------
 
@@ -221,8 +236,18 @@
 @checkbox-bg-color-checked: @checkbox-bg-color;
 @checkbox-border-color-checked: @checkbox-border-color;
 
+@checkbox-bg-color-checked-hover: @checkbox-bg-color-checked;
+@checkbox-border-color-checked-hover: @checkbox-border-color-hover;
+
 @checkbox-bg-color-disabled: @input-bg-color-disabled;
 @checkbox-border-color-disabled: @checkbox-bg-color-disabled;
+
+@checkbox-bg-color-checked-disabled: @checkbox-bg-color-disabled;
+@checkbox-border-color-checked-disabled: @checkbox-border-color-disabled;
+
+// For RadioButton
+@radiobutton-img-unchecked: 'radiobutton_unchecked.svg';
+@radiobutton-img-checked: 'radiobutton_checked.svg';
 
 // -----------------------------------------------------------------------------
 // Slider

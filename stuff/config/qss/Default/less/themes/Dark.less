@@ -12,9 +12,19 @@
 
 @bg: #303030;
 @accent: darken(@bg, 10);
-@text-color: rgb(206, 206, 206);
+@text-color: rgb(233, 233, 233);
+@text-color-disabled: rgba(233, 233, 233, 0.4);
 @dock-bg-color: darken(@bg, 14);
 @dialogButtonFrame-bg-color: darken(@bg, 3);
+
+// -----------------------------------------------------------------------------
+// Menu
+// -----------------------------------------------------------------------------
+
+@menu-text-color: @text-color;
+@menu-bg-color: darken(@bg, 4);
+@menu-border-color: lighten(@menu-bg-color, 15);
+@menu-separator-color: lighten(@menu-bg-color, 15);
 
 // -----------------------------------------------------------------------------
 // Trees
@@ -43,18 +53,28 @@
 @scrollbar-bg-color: darken(@bg, 4);
 
 // -----------------------------------------------------------------------------
+// Button
+// -----------------------------------------------------------------------------
+
+@button-bg-color: lighten(@bg, 15);
+
+// -----------------------------------------------------------------------------
 // Textfield
 // -----------------------------------------------------------------------------
 
 @input-bg-color: darken(@bg, 8);
-@input-border-color: lighten(@bg, 5);
+@input-border-color: lighten(@bg, 10);
 
 // -----------------------------------------------------------------------------
 // CheckBox
 // -----------------------------------------------------------------------------
 
 @checkbox-border-color: @input-border-color;
-@checkbox-border-color-disabled: darken(@bg, 9);
+@checkbox-border-color-disabled: @input-border-color-disabled;
+
+// For RadioButton
+@radiobutton-img-unchecked: 'radiobutton_unchecked-dark.svg';
+@radiobutton-img-checked: 'radiobutton_checked-dark.svg';
 
 // -----------------------------------------------------------------------------
 // Slider
@@ -80,7 +100,7 @@
 // XSheet
 // -----------------------------------------------------------------------------
 
-@xsheet-bg-color:                           darken(@bg, 3);
+@xsheet-bg-color:                           darken(@bg, 2);
 
 @xsheet-LightLine-color:                    darken(#2c2c2c, 5);
 @xsheet-VerticalLine-color:                 darken(#626262, 35);

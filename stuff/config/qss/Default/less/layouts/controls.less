@@ -57,21 +57,51 @@ QPushButton {
   &:extend(.Button);
   padding: 1 0 1 4;
   margin: 1 0;
+  &:editable {  /* for editable ComboBox */
+    color: @input-text-color;
+    background-color: @input-bg-color;
+    border-color: @input-border-color;
+    padding: 1 0 1 3;
+  }
   &:hover {
-    &:extend(.Button:hover);
+    background-color: @button-bg-color-hover;
+    &:editable {
+      background-color: @input-bg-color;
+    }
+  }
+  &:focus {
+    border-color: @input-border-color-focus;
   }
   &:checked {
     &:extend(.ComboBox);
+    border-color: @input-border-color-focus;
   }
   &:disabled {
     &:extend(.Button:disabled);
   }
   &::drop-down {
+    border: 0;
     image: url('@{img-url}/combo_downarrow.svg');
     image-position: center center;
     width: 16;
+    &:editable {
+      background-color: @button-bg-color;
+      border-left: @combobox-dropdown-border-size solid @button-border-color;
+      border-top-right-radius: @combobox-dropdown-border-radius;
+      border-bottom-right-radius: @combobox-dropdown-border-radius;
+    }
+    &:hover {
+      border-color: @combobox-dropdown-border-color-hover;
+      &:editable {
+        background-color: @button-bg-color-hover;
+        border-color: @button-border-color;
+      }
+    }
     &:disabled {
       image: url('@{img-url}/combo_downarrow_disabled.svg');
+      &:editable {
+        background-color: @combobox-dropdown-bg-color-disabled-editable;
+      }
     }
   }
   & QAbstractItemView {
@@ -144,10 +174,12 @@ QPlainTextEdit
       image: url('@{img-url}/checkmark.svg');
       &:hover {
         &:extend(.CheckBox::indicator:hover);
+        background-color: @checkbox-bg-color-checked-hover;
+        border-color: @checkbox-border-color-checked-hover;
       }
       &:disabled {
-        background-color: @checkbox-bg-color-disabled;
-        border-color: @checkbox-border-color-disabled;
+        background-color: @checkbox-bg-color-checked-disabled;
+        border-color: @checkbox-border-color-checked-disabled;
         image: url('@{img-url}/checkmark_disabled.svg');
       }
     }
@@ -159,8 +191,8 @@ QPlainTextEdit
         &:extend(.CheckBox::indicator:hover);
       }
       &:disabled {
-        background-color: @checkbox-bg-color-disabled;
-        border-color: @checkbox-border-color-disabled;
+        background-color: @checkbox-bg-color-checked-disabled;
+        border-color: @checkbox-border-color-checked-disabled;
         image: url('@{img-url}/checkpartially_disabled.svg');
       }
     }
@@ -185,11 +217,11 @@ QCheckBox {
   }
   &::indicator {
     &:unchecked {
-      image: url('@{img-url}/radiobutton_unchecked.svg');
+      image: url('@{img-url}/@{radiobutton-img-unchecked}');
       image-position: center center;
     }
     &:checked {
-      image: url('@{img-url}/radiobutton_checked.svg');
+      image: url('@{img-url}/@{radiobutton-img-checked}');
       image-position: center center;
     }
   }

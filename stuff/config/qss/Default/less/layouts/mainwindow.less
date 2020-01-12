@@ -134,6 +134,7 @@ QMenuBar {
 QMenu {
   background-color: @menu-bg-color;
   border: 1 solid @menu-border-color;
+  color: @menu-text-color;
   padding: 2 0;
   &::item {
     padding: 3 28;
@@ -150,6 +151,7 @@ QMenu {
       background: none;
       color: @text-color-disabled;
       &:selected {
+        background-color: @menu-item-bg-color-disabled-hover;
         border-color: transparent;
       }
     }
@@ -169,6 +171,12 @@ QMenu {
   }
   &::indicator {
     &:extend(.CheckBox::indicator all);
+    &:non-exclusive {
+      &:extend(.CheckBox::indicator all);
+    }
+    &:exclusive {
+      &:extend(.RadioButton::indicator all);
+    }
     margin-left: 7;
   }
 }

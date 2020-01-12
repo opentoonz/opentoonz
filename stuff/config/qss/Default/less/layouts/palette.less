@@ -96,37 +96,33 @@ PaletteViewer {
   & DvScrollWidget {
     & QPushButton {
       border-top: 0;
-      margin-bottom: 1;
+      margin-bottom: 0;
       max-width: 15;
       min-width: 15;
     }
     & #ScrollLeftButton {
       border-radius: 0;
-      margin-bottom: 1;
+      margin-bottom: 0;
       max-width: 16;
       min-width: 16;
     }
     & #ScrollRightButton {
       border-radius: 0;
       margin-left: 1;
-      margin-bottom: 1;
+      margin-bottom: 0;
       max-width: 16;
       min-width: 16;
     }
   }
   & QToolBar {
-    background: none;
-    border-bottom: 1 solid @accent;
-    padding: 0;
-    margin: 0;
     &::separator:horizontal {
-      margin: 0; // very compact space
-                 // so remove margin
+      margin: 0; // very compact space so we remove margin
     }
     & QToolButton {
       &:extend(.button-flat all); // Use flat button style
-      margin: 0 0 1 0; // Forces extra height to QToolBar
-      padding: 1 0 2 0;
+      margin: 0;
+      padding: 2 0 2 0;
+
     }
   }
 }
@@ -147,7 +143,6 @@ PaletteViewer {
 
 #PaletteLockButton {
   border-radius: 0;
-  margin: 0 0 1 1;
   &:checked {
     background-color: @toolbutton-lock-bg-color-checked;
     border-color: @toolbutton-lock-border-color-checked;
@@ -164,9 +159,7 @@ PaletteViewer {
 
 #WordButton {
   &:extend(.QPushButton all);
-  // remove horizontal padding
-  // otherwise moderate length text
-  // gets clipped
+  // remove horizontal padding otherwise moderate length text gets clipped
   padding-right: 0;
   padding-left: 0;
 }

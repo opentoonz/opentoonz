@@ -53,14 +53,13 @@
 @rooms-tab-bg-color-hover: lighten(@rooms-tab-bg-color, 8);
 @rooms-text-color-hover: #fff;
 
-@rooms-tab-bg-color-selected: lighten(@tab-bg-color-selected, 10);
-
 // -----------------------------------------------------------------------------
 // Right-Click Menu
 // -----------------------------------------------------------------------------
 
-@menu-bg-color: lighten(@bg, 8);
+@menu-bg-color: lighten(@bg, 10);
 @menu-separator-color: darken(@menu-bg-color, 15);
+@menu-item-bg-color-disabled-hover: darken(@menu-bg-color, 8);
 
 // -----------------------------------------------------------------------------
 // Titlebars
@@ -75,34 +74,37 @@
 // -----------------------------------------------------------------------------
 
 // Container
-@scrollbar-bg-color: darken(@bg, 7);
+@scrollbar-bg-color: darken(@bg, 5);
 
 // Handle
-@scrollbar-handle-radius: 2;
-@scrollbar-handle-margin: 2;
-@scrollbar-handle-bg-color: lighten(@bg, 12);
-@scrollbar-handle-border-color: darken(@scrollbar-bg-color, 10);
-@scrollbar-handle-border-color-hover: @accent;
-@scrollbar-handle-border-color-pressed: @accent;
+@scrollbar-handle-radius: 5;
+@scrollbar-handle-margin: 3;
+@scrollbar-handle-bg-color: lighten(@bg, 8);
+@scrollbar-handle-border-color: darken(@scrollbar-bg-color, 5);
+@scrollbar-handle-border-color-hover: @scrollbar-handle-border-color;
+@scrollbar-handle-border-color-pressed: @scrollbar-handle-border-color;
 
 // -----------------------------------------------------------------------------
 // File Browser / Trees
 // -----------------------------------------------------------------------------
 
 // Trees
-@tree-bg-color: lighten(@bg, 8);
-@tree-bg-color-alt: darken(@tree-bg-color, 4);
-@prefs-tree-hl-color: lighten(@tree-bg-color, 8);
+@tree-bg-color: darken(@bg, 5);
+@tree-bg-color-alt: lighten(@tree-bg-color, 3);
+@prefs-tree-bg-color: @tree-bg-color;
+@prefs-tree-hl-color: lighten(@prefs-tree-bg-color, 8);
 
 // All Panes
-@browser-folder-text-color: rgb(7, 27, 155);
+@browser-folder-text-color: #000000;
+@browser-folder-text-color-selected: @hl-text-color;
 
 // Left Pane
-@browser-listview-bg-color: lighten(@bg, 8);
+@browser-listview-bg-color: @tree-bg-color;
+@browser-listview-bg-color-alt: @browser-listview-bg-color;
 
 // Right Pane
-@browser-itemview-bg-color: @tree-bg-color;
-@browser-itemview-bg-color-alt: @tree-bg-color-alt;
+@browser-itemview-bg-color: @bg;
+@browser-itemview-bg-color-alt: darken(@browser-itemview-bg-color, 3);
 
 // -----------------------------------------------------------------------------
 // Button
@@ -122,7 +124,7 @@
 @button-text-color-checked: @tab-text-color;
 
 @button-bg-color-focus: #B5C0D0;
-@button-border-color-focus: darken(@button-bg-color-focus, 40);
+@button-border-color-focus: @input-border-color-focus;
 @button-text-color-focus: @button-text-color;
 
 @button-border-color-disabled: darken(@bg, 5);
@@ -152,17 +154,17 @@
 // ComboBox
 // -----------------------------------------------------------------------------
 
-@combobox-bg-color-pressed: @button-bg-color-focus;
-@combobox-border-color-pressed: @hl-bg-color;
+@combobox-dropdown-border-size: 1;
 
 // -----------------------------------------------------------------------------
 // Textfield
 // -----------------------------------------------------------------------------
 
 @input-bg-color: lighten(@bg, 40);
+@input-text-color: @text-color;
 @input-border-color: darken(@bg, 18);
 
-@input-border-color-focus: @input-border-color;
+@input-border-color-focus: rgb(1, 89, 253);
 
 @input-bg-color-disabled: lighten(@bg, 10);
 
@@ -170,17 +172,24 @@
 // CheckBox
 // -----------------------------------------------------------------------------
 
-@checkbox-bg-color: lighten(@button-bg-color, 15);
+@checkbox-bg-color: @button-bg-color;
 @checkbox-border-color: @button-border-color;
 
 @checkbox-bg-color-hover: lighten(@checkbox-bg-color, 10);
 @checkbox-border-color-hover: @checkbox-border-color;
 @checkbox-text-color-hover: #fff;
 
-@checkbox-border-color-checked: @button-border-color;
+@checkbox-bg-color-checked: @button-bg-color-checked;
+@checkbox-border-color-checked: @button-border-color-checked;
+
+@checkbox-bg-color-checked-hover: @checkbox-bg-color-checked;
+@checkbox-border-color-checked-hover: @checkbox-text-color-hover;
 
 @checkbox-bg-color-disabled: @button-bg-color-disabled;
 @checkbox-border-color-disabled: @button-border-color-disabled;
+
+@checkbox-bg-color-checked-disabled: darken(@bg, 10);
+@checkbox-border-color-checked-disabled: darken(@bg, 15);
 
 // -----------------------------------------------------------------------------
 // Slider
@@ -237,16 +246,16 @@
 
 // XSheet Spreadsheet Viewer
 @xsheet-text-color:                         @text-color;
-@xsheet-bg-color:                           lighten(@bg, 7.12);
+@xsheet-bg-color:                           darken(@bg, 5);
 @xsheet-LightLine-color:                    darken(@bg, 12);
 @xsheet-MarkerLine-color:                   #000; //rgb(0, 255, 246);
-@xsheet-VerticalLine-color:                 darken(@bg, 11);
-@xsheet-VerticalLineHead-color:             darken(@bg, 28);
+@xsheet-VerticalLine-color:                 darken(@bg, 20);
+@xsheet-VerticalLineHead-color:             darken(@bg, 68);
 @xsheet-PreviewFrameText-color:             #000eb6;
 @xsheet-CurrentRowBG-color:                 #B5C0D0;
 @xsheet-OnionSkinAreaBG-color:              lighten(@bg, 2.12);
 
-@xsheet-EmptyColumnHead-color:              @bg;
+@xsheet-EmptyColumnHead-color:              darken(@bg, 10);
 @xsheet-SelectedColumnText-color:           rgb(158, 0, 0);
 
 @xsheet-EmptyCell-color:                    darken(@bg, 1.57);
@@ -302,7 +311,7 @@
 
 // Function Treeview
 @function-treeview-text-color: @text-color;
-@function-treeview-text-color-selected: rgb(167, 0, 0);
+@function-treeview-text-color-selected: #ffe366;
 
 // Function Curve Panel
 @function-panel-bg-color: darken(@bg, 15);
