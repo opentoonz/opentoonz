@@ -212,7 +212,7 @@
 @flipslider-started-color: rgb(0, 168, 8);
 
 // Ruler
-@viewer-ruler-bg-color: lighten(@bg, 25);
+@viewer-ruler-bg-color: lighten(@bg, 15);
 
 // -----------------------------------------------------------------------------
 // Schematic Viewer
@@ -246,20 +246,20 @@
 
 // XSheet Spreadsheet Viewer
 @xsheet-text-color:                         @text-color;
-@xsheet-bg-color:                           darken(@bg, 5);
-@xsheet-LightLine-color:                    darken(@bg, 12);
+@xsheet-bg-color:                           lighten(@bg, 4);
+@xsheet-LightLine-color:                    rgba(0, 0, 0, 0.205);
 @xsheet-MarkerLine-color:                   #000; //rgb(0, 255, 246);
-@xsheet-VerticalLine-color:                 darken(@bg, 20);
+@xsheet-VerticalLine-color:                 rgba(0, 0, 0, 0.404);
 @xsheet-VerticalLineHead-color:             darken(@bg, 68);
 @xsheet-PreviewFrameText-color:             #000eb6;
 @xsheet-CurrentRowBG-color:                 #B5C0D0;
-@xsheet-OnionSkinAreaBG-color:              lighten(@bg, 2.12);
+@xsheet-OnionSkinAreaBG-color:              darken(@bg, 0);
 
 @xsheet-EmptyColumnHead-color:              darken(@bg, 10);
 @xsheet-SelectedColumnText-color:           rgb(158, 0, 0);
 
 @xsheet-EmptyCell-color:                    darken(@bg, 1.57);
-@xsheet-NotEmptyColumn-color:               lighten(@bg, 4);
+@xsheet-NotEmptyColumn-color:               lighten(@bg, 10);
 @xsheet-SelectedEmptyCell-color:            lighten(@bg, 20);
 
 @xsheet-LevelColumn-color:                  rgb(118, 183, 118);

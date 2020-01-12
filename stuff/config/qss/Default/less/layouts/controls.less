@@ -212,17 +212,27 @@ QCheckBox {
 ----------------------------------------------------------------------------- */
 
 .RadioButton {
-  &:hover {
-    &:extend(.CheckBox:hover);
-  }
+  padding: 0;
+  margin: 0;
   &::indicator {
+    @size: 11;
+    width: @size;
+    height: @size;
+    background-color: transparent;
+    border: 0;
+    image-position: center center;
     &:unchecked {
       image: url('@{img-url}/@{radiobutton-img-unchecked}');
-      image-position: center center;
     }
     &:checked {
       image: url('@{img-url}/@{radiobutton-img-checked}');
-      image-position: center center;
+      &:disabled {
+        background-color: transparent;
+        image: url('@{img-url}/@{radiobutton-img-checked-disabled}');
+      }
+    }
+    &:disabled {
+      image: url('@{img-url}/@{radiobutton-img-unchecked-disabled}');
     }
   }
 }

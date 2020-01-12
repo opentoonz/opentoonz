@@ -1,14 +1,1 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Generator: Adobe Illustrator 21.0.2, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<svg version="1.1"
-	 id="svg6" inkscape:version="0.91 r13725" sodipodi:docname="radiobutton_unchecked.svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:svg="http://www.w3.org/2000/svg"
-	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 11 11"
-	 style="enable-background:new 0 0 11 11;" xml:space="preserve">
-<style type="text/css">
-	.st0{fill:#FFFFFF;fill-opacity:0.6463;}
-	.st1{fill-opacity:0.4309;}
-</style>
-<circle id="path4483" class="st0" cx="5.5" cy="5.5" r="4.5"/>
-<path id="circle2" inkscape:connector-curvature="0" class="st1" d="M5.5,0C2.5,0,0,2.5,0,5.5S2.5,11,5.5,11S11,8.5,11,5.5
-	S8.5,0,5.5,0z M5.5,1C8,1,10,3,10,5.5S8,10,5.5,10S1,8,1,5.5S3,1,5.5,1z"/>
-</svg>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg width="11px" height="11px" viewBox="0 0 11 11" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"><circle id="path4483" cx="5.5" cy="5.5" r="4.5" style="fill:#fff;fill-opacity:0.45;"/><path id="circle2" d="M5.5,0c-3,0 -5.5,2.5 -5.5,5.5c0,3 2.5,5.5 5.5,5.5c3,0 5.5,-2.5 5.5,-5.5c0,-3 -2.5,-5.5 -5.5,-5.5Zm0,1c2.5,0 4.5,2 4.5,4.5c0,2.5 -2,4.5 -4.5,4.5c-2.5,0 -4.5,-2 -4.5,-4.5c0,-2.5 2,-4.5 4.5,-4.5Z" style="fill-opacity:0.43;fill-rule:nonzero;"/></svg>

@@ -3,13 +3,8 @@
 ----------------------------------------------------------------------------- */
 
 #StyleEditor {
-  & QPushButton {
-    // Adds spacing to buttons, but this setting may be temporary
-    margin: 2 1;
-    padding: 0;
-  }
   & #TabBarContainer {
-    margin-left: -4; // reset left edge margin
+    margin-left: -5; // reset left edge margin
   }
   & #bottomWidget {
     border-top: 1 solid @accent;
@@ -22,12 +17,11 @@
 }
 
 #StyleEditorTabBar {
+  padding: 0;
+  margin: 0;
   &::tab {
     &:extend(.tab-flat all);
     &::first {
-      // add a border to first item on
-      // the left side due to the spacer
-      // coded in the cpp file
       border-left: 1 solid @accent;
     }
   }

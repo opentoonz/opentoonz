@@ -153,6 +153,7 @@ QMenu {
       &:selected {
         background-color: @menu-item-bg-color-disabled-hover;
         border-color: transparent;
+        color: @text-color-disabled; /* fix for disabled indicator */
       }
     }
   }
@@ -171,13 +172,13 @@ QMenu {
   }
   &::indicator {
     &:extend(.CheckBox::indicator all);
+    margin-left: 7;
     &:non-exclusive {
       &:extend(.CheckBox::indicator all);
     }
     &:exclusive {
       &:extend(.RadioButton::indicator all);
     }
-    margin-left: 7;
   }
 }
 
