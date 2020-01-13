@@ -323,3 +323,21 @@ QSlider {
 	qproperty-HandleLeftGrayPixmap: url("@{img-url}/@{slider-left-handle-disabled}");
   qproperty-HandleRightGrayPixmap: url("@{img-url}/@{slider-right-handle-disabled}");
 }
+
+/* -----------------------------------------------------------------------------
+   Progress Bar
+----------------------------------------------------------------------------- */
+
+QProgressBar {
+  text-align: center;
+  background-color: @progressbar-bg-color;
+  border: 1 solid @progressbar-border-color;
+  border-radius: 3; /* 2 fits inside 3 */
+  padding: 0;
+  &::chunk {
+    margin: -1; /* hide border of chunk except for right side */
+    background-color: @progressbar-chunk-bg-color;
+    border: 1 solid @progressbar-chunk-border-color;
+    border-radius: 2;
+  }
+}
