@@ -24,14 +24,22 @@
 @label-title: rgb(0, 0, 0);
 
 // -----------------------------------------------------------------------------
+// Titlebars
+// -----------------------------------------------------------------------------
+
+@title-bg-color: darken(@bg, 15);
+@title-text-color: lighten(saturate(spin(@bg, 0.0000), 0.0000), 25);
+@title-text-color-active: #fff;
+
+// -----------------------------------------------------------------------------
 // Tabs
 // -----------------------------------------------------------------------------
 
 // Container
-@tabbar-bg-color: darken(@bg, 8);
+@tabbar-bg-color: @title-bg-color;
 
 // Tabs
-@tab-bg-color: darken(@topbar-bg-color, 15);
+@tab-bg-color: @tabbar-bg-color;
 @tab-text-color: lighten(saturate(spin(@bg, 0.0000), 0.0000), 25);
 
 @tab-bg-color-hover: lighten(@rooms-tab-bg-color, 8);
@@ -61,13 +69,6 @@
 @menu-separator-color: darken(@menu-bg-color, 15);
 @menu-item-bg-color-disabled-hover: darken(@menu-bg-color, 8);
 
-// -----------------------------------------------------------------------------
-// Titlebars
-// -----------------------------------------------------------------------------
-
-@title-bg-color: darken(@bg, 15);
-@title-text-color: lighten(saturate(spin(@bg, 0.0000), 0.0000), 25);
-@title-text-color-active: #fff;
 
 // -----------------------------------------------------------------------------
 // Scrollbars
@@ -78,9 +79,9 @@
 
 // Handle
 @scrollbar-handle-radius: 5;
-@scrollbar-handle-margin: 3;
-@scrollbar-handle-bg-color: lighten(@bg, 8);
-@scrollbar-handle-border-color: darken(@scrollbar-bg-color, 5);
+@scrollbar-handle-margin: 2;
+@scrollbar-handle-bg-color: lighten(@bg, 10);
+@scrollbar-handle-border-color: darken(@bg, 15);
 @scrollbar-handle-border-color-hover: @scrollbar-handle-border-color;
 @scrollbar-handle-border-color-pressed: @scrollbar-handle-border-color;
 
