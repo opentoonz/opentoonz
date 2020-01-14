@@ -27,6 +27,7 @@ class FlipBook;
 class ToolOptions;
 class ComboViewerPanel;
 class FxSettings;
+class VectorGuidedDrawingPane;
 
 //=========================================================
 // PaletteViewerPanel
@@ -284,6 +285,17 @@ public:
   // FxSettings will adjust its size according to the current fx
   // so we only restore position of the panel.
   void restoreFloatingPanelState() override;
+};
+
+//=========================================================
+// VectorGuidedDrawingPanel
+//---------------------------------------------------------
+
+class VectorGuidedDrawingPanel final : public TPanel {
+  Q_OBJECT
+
+public:
+  VectorGuidedDrawingPanel(QWidget *parent);
 };
 
 #endif

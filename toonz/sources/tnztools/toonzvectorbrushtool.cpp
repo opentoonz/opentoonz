@@ -982,8 +982,8 @@ void ToonzVectorBrushTool::leftButtonUp(const TPointD &pos,
 
     bool strokeAdded = false;
 
-    if ((Preferences::instance()->getGuidedDrawing() == 1 ||
-         Preferences::instance()->getGuidedDrawing() == 2) &&
+    if ((Preferences::instance()->getGuidedDrawingType() == 1 ||
+         Preferences::instance()->getGuidedDrawingType() == 2) &&
         Preferences::instance()->getGuidedAutoInbetween()) {
       int fidx     = getApplication()->getCurrentFrame()->getFrameIndex();
       TFrameId fId = getFrameId();

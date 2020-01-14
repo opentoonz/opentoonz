@@ -13,35 +13,41 @@
 \thispagestyle{empty}
 
 \Large
-\noindent \\[0.55em]
-Subtract Ino \normalsize \hskip 15.8em : Subtraction of images\medskip
+\noindent \\
+Subtract Ino\medskip
 \par
+\normalsize
+Performs a subtraction between two images.\par
 Images will become darker using subtraction.\par
 Formula = Back - Fore\\
 \\
 -{-}- \ Inputs \ -{-}-\par
-Both the connections are combined in the process.\par
-When the operating switch is OFF it displays the Back.\par
-It will also display if there is only one connection.\\
+When both input ports are connected, they will be combined in the process.\par
+When the node Visibility switch is OFF it will display the Back port content.\par
+If there is only one port connected, it will display its content.\\
 Fore\par
-Connect the image to overlay on top.\\
+Connect the image that will be overlayed on top.\\
 Back\par
-Connect the image to put below.\\
+Connect the base image.\\
 \\
 -{-}- \ Settings \ -{-}-\\
 Opacity\par
 Specifies the opacity of the image overlaid on top.\par
 When 0 the Fore image will be transparent.\par
-The default value is \textquotedbl 1.0\textquotedbl \ for the Fore image and will be synthesized as opaque.\par
+With the default value \textquotedbl 1.0\textquotedbl \ , the Fore image will be composed as opaque.\par
 Specify a value from 0 to 1.0.\\
 \\
 Clipping Mask\par
-When ON,\par
-Material will not exist in the location (Back) (Alpha Value Zero), and remains clear.\par
-The default setting is ON.\\
+When ON, it will take the Back port alpha information to define the alpha of the\par
+resulting image, leaving areas where the Alpha value is zero as transparent.\par
+The default value is ON.\\
 \\
 Alpha Rendering\par
-Switch to process the Alpha channel.\par
-The default setting is ON.
+This option is valid only when there is an Alpha channel.\par
+When inactive, it masks the changes in the RGB values using the original Alpha\par 
+of the image.\par
+When active, the effect will be able to modify the Alpha channel, extending it\par 
+as necessary to reproduce the full span of the effect.\par
+The default setting is ON.\\
 
 \end{document}

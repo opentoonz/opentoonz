@@ -17,30 +17,29 @@
 Blur Ino\medskip
 \par
 \normalsize
-Blurs the image.\\
-\par
-We use a Gaussian distribution, for the blur method.\par
+Blurs the image.\par
+The method used for the blurring is a Gaussian distribution.\par
 Therefore, there is no directional result in the image.\\
 \par
-Alpha channel will be processed.\\
+The image alpha channel will be taken into account.\\
 \\
 -{-}- \ Inputs \ -{-}-\\
 Source\par
-Connect the image to process.\\
+Connect the image to be processed.\\
 \\
 Reference\par
-Connect the reference image to put the strength of the effect into each Pixel.\\
+Connect the reference image to assign the strength of the effect into each pixel.\\
 \\
 -{-}- \ Settings \ -{-}-\\
 Radius\par
 Specifies the radius of the blur.\par
-The unit is mm.\\
+The unit used is mm.\\
 \\
 Reference\par
-Choose how Reference image values put the strength of the effect into each Pixel.\par
-An image is connected to the \textquotedbl Reference\textquotedbl \ of the input,\par
-Choose from Red/Green/Blue/Alpha/Luminance/Nothing.\par
-Choose Nothing when you do not want this effect, it will turn off the connection.\par
-The default setting is Red.
+Choose how the Reference image values are used to set the strength of the effect\par 
+into each pixel.\par
+Choose from Red/Green/Blue/Alpha/Luminance.\par
+Choose Nothing to disable the effect.\par
+The default value is Red.
 
 \end{document}

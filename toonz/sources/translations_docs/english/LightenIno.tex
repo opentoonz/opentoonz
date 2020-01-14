@@ -18,27 +18,28 @@ Lighten Ino\medskip
 \par
 \normalsize
 Lightens the image\par
-Makes the values larger in the Fore and Back images (Seperate RGB)\\
+Increases the values (RGB individually) of the Fore and Back images.\\
 \\
 -{-}- \ Inputs \ -{-}-\par
-Both the connections are combined in the process.\par
-When the operating switch is OFF it displays the Back.\par
-It will also display if there is only one connection.\\
+When both input ports are connected, they will be combined in the process.\par
+When the node Visibility switch is OFF it will display the Back port content.\par
+If there is only one port connected, it will display its content.\\
 Fore\par
-Connect the image to overlay on top.\\
+Connect the image that will be overlaid on top.\\
 Back\par
-Connect the image to put below.\\
+Connect the base image.\\
 \\
 -{-}- \ Settings \ -{-}-\\
 Opacity\par
 Specifies the opacity of the image overlaid on top.\par
 When 0 the Fore image will be transparent.\par
-The default value is \textquotedbl 1.0\textquotedbl \ for the Fore image and will be synthesized as opaque.\par
-Specify a value from 0 to 1.0.\\
+With the default value \textquotedbl 1.0\textquotedbl \ , the Fore image will be composed as opaque.\par
+Usually specified values range from 0 to 1.0.\par
+You can also specify larger values from 1 to 10.0\\
 \\
 Clipping Mask\par
-When ON,\par
-Material will not exist in the location (Back) (Alpha Value Zero), and remains clear.\par
-The default setting is OFF.
+When ON, it will take the Back port alpha information to define the alpha of the\par 
+resulting image, leaving areas where the Alpha value is zero as transparent.\par
+The default value is OFF.
 
 \end{document}

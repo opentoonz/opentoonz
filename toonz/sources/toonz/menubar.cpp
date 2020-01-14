@@ -1380,6 +1380,8 @@ QMenuBar *StackedMenuBar::createFullMenuBar() {
   addMenuItem(viewMenu, MI_NoShift);
   addMenuItem(viewMenu, MI_ResetShift);
   viewMenu->addSeparator();
+  addMenuItem(viewMenu, MI_VectorGuidedDrawing);
+  viewMenu->addSeparator();
   addMenuItem(viewMenu, MI_RasterizePli);
 #ifdef LINETEST
   viewMenu->addSeparator();
@@ -1427,6 +1429,7 @@ QMenuBar *StackedMenuBar::createFullMenuBar() {
   addMenuItem(windowsMenu, MI_OpenStopMotionPanel);
 #endif
   addMenuItem(windowsMenu, MI_StartupPopup);
+  addMenuItem(windowsMenu, MI_OpenGuidedDrawingControls);
 #ifdef LINETEST
   windowsMenu->addSeparator();
   addMenuItem(windowsMenu, MI_OpenExport);

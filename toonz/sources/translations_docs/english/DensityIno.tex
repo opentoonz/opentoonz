@@ -17,32 +17,32 @@
 Density Ino\medskip
 \par
 \normalsize
-Adjusts the concentration of a semi-transparent image.\par
-It was created in order to emphasize the streamlined touch effect for lines.\par
+Adjusts the density of a semi-transparent image.\par
+It allows to emphasize streamlined touch effects.\par
 The Alpha channel requires semi-transparent values.\\
 \\
 -{-}- \ Inputs \ -{-}-\\
 Source\par
-Connect the image to process.\\
+Connect the image to be processed.\\
 Reference\par
-Connect the reference image to put the strength of the effect into each Pixel.\\
+Connect the reference image to assign the strength of the effect into each pixel.\\
 \\
 -{-}- \ Settings \ -{-}-\\
 Density\par
-Specifies the concentration.\par
-Concentration for the semi-transparent Pixel of the image will change.\par
+Specifies the density.\par
+The density will change with the semi-transparent pixels of the image.\par
 Specify a value greater than or equal to 0. The maximum is 10.\par
-When using a value greater than 1, the image will be darker.\par
-It does not change at an equal concentration when above 1.\par
-When using a value greater than 0 and smaller than 1, the image will be thinner.\par
-When using a concentration value of 0 the image will disappear.\par
+A value greater than 1, will make the image more opaque.\par
+While at 1 it will not change the original density of the image.\par
+When values are greater than 0 and smaller than 1, the image will be semi-transparent.\par
+If the value is 0, the image will disappear.\par
 The default value is 1.\\
 \\
 Reference\par
-Choose how Reference image values put the strength of the effect into each Pixel.\par
-An image is connected to the \textquotedbl Reference\textquotedbl \ of the input,\par
-Choose from Red/Green/Blue/Alpha/Luminance/Nothing.\par
-Choose Nothing when you do not want this effect, it will turn off the connection.\par
-The default setting is Red.
+Choose how the Reference image values are used to set the strength of the effect\par 
+into each pixel.\par
+Choose from Red/Green/Blue/Alpha/Luminance.\par
+Choose Nothing to disable the effect.\par
+The default value is Red.
 
 \end{document}

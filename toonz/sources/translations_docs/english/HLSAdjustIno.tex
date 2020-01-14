@@ -17,46 +17,46 @@
 HLS Adjust Ino\medskip
 \par
 \normalsize
-Hue (H), Lightness (L), Saturation (S), is multiplied by the Scale, then Shifted.\\
+Allows to modify the Hue (H), Lightness (L), and Saturation (S) values of the image,\par 
+multiplying them by the Scale parameter, and then Shifted by the specified amount.\\
 \\
 -{-}- \ Inputs \ -{-}-\\
+\\
 Source\par
-Connect the image to process.\\
+Connect the image to be processed.\\
 Reference\par
-Connect the reference image to put the strength of the effect into each Pixel.\\
+Connect the reference image to assign the strength of the effect into each pixel.\\
 \\
 -{-}- \ Settings \ -{-}-\\
+\\
 Pivot\par
-\noindent \ \ \, Specify the central value of where to apply the Scale.\\
-\par
+Specify the central value from where to apply the Scale.\\
+
 \noindent \ \ \, Hue\par
-Specify the central value of the Scale for the color (Hue).\par
-Minimum value is 0.0, maximum value is 360.0.\par
-The default value is 0.0.\par
+Specify the central value for scaling the Hue.\par
+Minimum is 0.0, maximum is 360.0.\par
 \noindent \ \ \, Lightness\par
-Specify the central value of the Scale for the brightness (Lightness).\par
-Minimum value is 0.0, maximum value is 1.0.\par
+Specify the central value for scaling the Lightness.\par
+Minimum is 0.0, maximum is 1.0.\par
 The default value is 0.0.\par
 \noindent \ \ \, Saturation\par
-Specify the central value of the Scale for the chroma (Saturation).\par
-Minimum value is 0.0, maximum value is 1.0.\par
+Specify the central value for scaling the Saturation.\par
+Minimum is 0.0, maximum is 1.0.\par
 The default value is 0.0.\\
 \\
 Scale\par
-\noindent \ \ \, Multiplies the Scale to enlarge or reduce the range of HLS around the Pivot value.\par
-\noindent \ \ \, Hue value will be applied recursively around the top of the circle,\par
-\noindent \ \ \, Lightness, Saturation value is greater than or equal to 0, and can go up to 1.\\
-\par
+\noindent \ \ \, Enlarge or reduce the HLS range by multipliying the Scale around the Pivot value.\par
+\noindent \ \ \, Hue value will be applied recursively around the color circle,\par
+\noindent \ \ \, Lightness and Saturation values will be in the range from 0 to 1.\\
+
 \noindent \ \ \, Hue\par
-Multiplied by the Scale for the color (Hue).\par
-The minimum value is 0.0.\par
+Multiplication factor for the Hue.\par
+Minimum value is 0.0.\par
 The default value is 1.0.\par
 \noindent \ \ \, Lightness\par
-Multiplied by the Scale for the brightness (Lightness).\par
-The minimum value is 0.0.\par
+Multiplication factor for the Lightness.\par
+Minimum value is 0.0.\par
 The default value is 1.0.\par
-\noindent \ \ \, Saturation\par
-Multiplied by the Scale for the chroma (Saturation).
 
 \newpage
 
@@ -64,35 +64,37 @@ Multiplied by the Scale for the chroma (Saturation).
 
 \ \vspace{-0.2em}
 \par
-The minimum value is 0.0.\par
+\noindent \ \ \, Saturation\par
+Multiplication factor for the Saturation.\par
+Minimum value is 0.0.\par
 The default value is 1.0.\\
 \\
 Shift\par
-\noindent \ \ \, This will Shift the values of the HLS.\par
-\noindent \ \ \, Hue value will be multiplied recursively around the top of the circle,\par
-\noindent \ \ \, Lightness, Saturation value is greater than or equal to 0, and can go up to 1.\\
+\noindent \ \ \, This will Shift the values in HLS color space.\par
+\noindent \ \ \, Hue value will be shifted recursively around the color circle.\par
+\noindent \ \ \, Lightness and Saturation values will range from 0 to 1.\\
 \par
 \noindent \ \ \, Hue\par
-Shift for the color (Hue).\par
+Shift for the Hue.\par
 The default value is 0.0.\par
 \noindent \ \ \, Lightness\par
-Shift for the brightness (Lightness).\par
+Shift for the Lightness.\par
 The default value is 0.0.\par
 \noindent \ \ \, Saturation\par
-Shift for the chroma (Saturation).\par
+Shift for the Saturation.\par
 The default value is 0.0.\\
 \\
 Premultiplied\par
-When ON, RGB is already set to Premultiply\par
-(The value of Alpha channel is multiplied in advance RGB channels)\par
-and processes as an image.\par
+When ON, the image will be processed as if having a Premultiplied Alpha channel\par 
+(Alpha value already multiplied by RGB channels).\par
+If image is not premultiplied, the image may not look correct.\par
 The default setting is ON.\\
 \\
 Reference\par
-Choose how Reference image values put the strength of the effect into each Pixel.\par
-An image is connected to the \textquotedbl Reference\textquotedbl \ of the input,\par
-Choose from Red/Green/Blue/Alpha/Luminance/Nothing.\par
-Choose Nothing when you do not want this effect, it will turn off the connection.\par
-The default setting is Red.
+Specify which channel to use from the image connected to the Reference port to\par 
+drive the intensity of the effect.\par
+Choose from Red/Green/Blue/Alpha/Luminance.\par
+Choose Nothing to disable the effect.\par
+The default value is \textquotedbl Red\textquotedbl .
 
 \end{document}

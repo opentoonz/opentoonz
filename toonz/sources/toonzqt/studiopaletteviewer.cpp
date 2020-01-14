@@ -714,6 +714,9 @@ void StudioPaletteTreeViewer::loadInCurrentPaletteAndAdaptLevel() {
   TPalette *palette = m_levelPaletteHandle->getPalette();
   if (!palette) return;
 
+  // prevent crash when the command is applied to the palette level
+  if (!m_currentLevelHandle->getSimpleLevel()) return;
+
   TPalette *newPalette =
       StudioPalette::instance()->getPalette(getItemPath(items[0]), true);
   if (!newPalette) return;

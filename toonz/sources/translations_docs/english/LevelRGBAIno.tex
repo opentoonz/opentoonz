@@ -17,64 +17,66 @@
 Level RGBA Ino\medskip
 \par
 \normalsize
-Add correction to the individual RGBA channels of the level.\par
-Please use \textquotedbl Level Master\textquotedbl \ when you want to correct RGB together.\\
+Allows to perform an individual correction to the RGBA image levels.\par
+For adjusting levels on a global basis, use the \textquotedbl Level Master Ino\textquotedbl \ effect.\\
 \\
 -{-}- \ Inputs \ -{-}-\\
 Source\par
-Connect the image to process.\\
+Connect the image to be processed.\\
+\\
 Reference\par
-Connect the reference image to put the strength of the effect into each Pixel.\\
+Connect the reference image to assign the strength of the effect into each pixel.\\
 \\
 -{-}- \ Settings \ -{-}-\\
 Red In\\
 Green In\\
 Blue In\\
 Alpha In\par
-Specify the Min (Minimum) value and Max (Maximum) value of the input Pixel value.\par
-Min value is less than the Min, Max value is greater than the Max limit.\par
+Allows to define the minimum and maximum values for the input pixel values\par 
+of each channel.\par
+Values less than Min will be limited to Min, values greater than Max will be\par 
+limited to Max.\par
 Minimum value is 0, maximum value is 1.\par
-The default values are, Min is 0, Max is 1.\par
+The default values are Min: 0, Max: 1.\par
 Values can take an input of up to 4 decimal places.\\
 \\
 Red Out\\
 Green Out\\
 Blue Out\\
 Alpha Out\par
-Specify the range for \textquotedbl In\textquotedbl ,\par
-Set to the range of Min (Minimum) value and Max (Maximum) value that you specify.\par
+Allows to fit the range defined by \textquotedbl In\textquotedbl , to the range of\par 
+minimum and maximum values specified here for each channel.\par
 Minimum value is 0, maximum value is 1.\par
-The default values are, Min is 0, Max is 1.\par
+The default values are, Min: 0, Max: 1.\par
 Values can take an input of up to 4 decimal places.\\
-\\
-Red Gamma\\
-Green Gamma\\
-Blue Gamma\\
-Alpha Gamma\par
-Used for the gamma correction between \textquotedbl Out Min\textquotedbl \ and \textquotedbl Out Max\textquotedbl .\par
-A Value between 0.1 and 1.0, will make the image become darker.\par
-It does not compensate when you specify a value of 1.0.\par
-A value between 1.0 and 10.0, will make the image become brighter.\par
-The default value is 1.
 
 \newpage
 
 \thispagestyle{empty}
 
 \ \vspace{-0.2em}
-\par
-\noindent Premultiplied\par
-When ON, RGB is already set to Premultiply\par
-(The value of Alpha channel is multiplied in advance RGB channels)\par
-and processes as an image.\par
-At that time, and added to the Alpha processing, you may not get the correct image.\par
+\\
+Red Gamma\\
+Green Gamma\\
+Blue Gamma\\
+Alpha Gamma\par
+Perform gamma correction between \textquotedbl Out Min\textquotedbl \ and \textquotedbl Out Max\textquotedbl \ on each channel.\par
+A value between 0.1 and 1.0, will make the image become darker.\par
+When the value is 1.0, no correction will be performed.\par
+A value between 1.0 and 10.0, will make the image become brighter.\par
+The default value is 1.\\
+\\
+Premultiplied\par
+When ON, the image will be processed as if having a Premultiplied Alpha channel\par 
+(Alpha value already multiplied by RGB channels).\par
+If image is not premultiplied, the image may not look correct.\par
 The default setting is ON.\\
 \\
 Reference\par
-Choose how Reference image values put the strength of the effect into each Pixel.\par
-An image is connected to the \textquotedbl Reference\textquotedbl \ of the input,\par
-Choose from Red/Green/Blue/Alpha/Luminance/Nothing.\par
-Choose Nothing when you do not want this effect, it will turn off the connection.\par
-The default setting is Red.
+Specify which channel to use from the image connected to the Reference port to\par 
+drive the intensity of the effect.\par
+Choose from Red/Green/Blue/Alpha/Luminance.\par
+Choose Nothing to disable the effect.\par
+The default value is \textquotedbl Red\textquotedbl .
 
 \end{document}

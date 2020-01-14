@@ -1119,8 +1119,8 @@ public:
                                                          stroke->getBBox());
 
         bool strokeAdded = false;
-        if ((Preferences::instance()->getGuidedDrawing() == 1 ||
-             Preferences::instance()->getGuidedDrawing() == 2) &&
+        if ((Preferences::instance()->getGuidedDrawingType() == 1 ||
+             Preferences::instance()->getGuidedDrawingType() == 2) &&
             Preferences::instance()->getGuidedAutoInbetween()) {
           TTool *tool =
               TTool::getTool(T_Brush, TTool::ToolTargetType::VectorImage);

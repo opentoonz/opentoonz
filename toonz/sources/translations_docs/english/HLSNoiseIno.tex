@@ -23,44 +23,43 @@
 HLS Noise Ino\medskip
 \par
 \normalsize
-Add pixel noise to the Hue, Lightness, Saturation, and Alpha.\par
-The addition of noise adjustment to the cell picture, has been developed\par
-for the purpose of adapting the picture of the background.\\
+Add pixel noise to the Hue, Lightness, Saturation, and Alpha of the image.\par
+It allows for adding noise to cell-like images, to blend in with the background.\\
 \par
 The Alpha channel will determine the strength of the noise. Therefore,\par
 smooth edges will remain smooth.\par
-The strength of the Alpha channel itself will also affect noise, check the value.\\
+The strength of the Alpha channel itself will also affect noise.\\
 \par
-When you check the results, please do not use the sub-camera.\par
-This is because in the sub-camera the range of the input image is different,\par
-the noise pattern will change.\\
+When checking the results, sub-camera must not be used.\par
+As the sub-camera uses a different input image range, the noise pattern will\par
+be different.\\
 \\
 -{-}- \ Inputs \ -{-}-\\
 Source\par
-Connect the image to process.\\
+Connect the image to be processed.\\
 Reference\par
-Connect the reference image to put the strength of the effect into each Pixel.\\
+Connect the reference image to assign the strength of the effect into each pixel.\\
 \\
 -{-}- \ Settings \ -{-}-\\
 Hue\par
-Specify the strength of the noise for the color (Hue).\par
-Pixel value (8 or 16bits) specified as a value from 1 to 0.\par
+Specify the strength of the noise for the color tone (Hue).\par
+Pixel value (8 or 16bits) specified as a value from 0 to 1.\par
 Minimum value is 0, maximum value is 1.\par
-It does not apply the noise to the color (Hue) when the value is 0.\par
+When it is 0, no noise will be applied to the hue.\par
 The default value is 0.025.\\
 \\
 Lightness\par
 Specify the strength of the noise for the brightness (Lightness).\par
-Pixel value (8 or 16bits) specified as a value from 1 to 0.\par
+Pixel value (8 or 16bits) specified as a value from 0 to 1.\par
 Minimum value is 0, maximum value is 1.\par
-It does not apply the noise to the brightness (Lightness) when the value is 0.\par
+When it is 0, no noise will be applied to the brightness (Lightness).\par
 The default value is 0.035.\\
 \\
 Saturation\par
 Specify the strength of the noise for the chroma (Saturation).\par
-Pixel value (8 or 16bits) specified as a value from 1 to 0.\par
+Pixel value (8 or 16bits) specified as a value from 0 to 1.\par
 Minimum value is 0, maximum value is 1.\par
-It does not apply the noise for the chroma (Saturation) when the value is 0.\par
+When it is 0, no noise will be applied to the chroma (Saturation).\par
 The default value is 0.0.
 
 \newpage
@@ -71,46 +70,41 @@ The default value is 0.0.
 \par
 \noindent Alpha\par
 Specify the strength of the noise for the Alpha channel.\par
-Pixel value (8 or 16bits) specified as a value from 1 to 0.\par
+Pixel value (8 or 16bits) specified as a value from 0 to 1.\par
 Minimum value is 0, maximum value is 1.\par
-It does not apply the noise to the Alpha channel when the value is 0.\par
+When it is 0, no noise will be applied to the Alpha channel.\par
 The default value is 0.0.\\
 \\
 Seed\par
-The value of the order to determine the random noise pattern of the image.\par
+This value is used to determine the noise pattern to be applied to the image.\par
 Specify an integer value greater than or equal to 0.\par
-If this value is the same, it will reproduce the same pattern.\par
-It will be a different pattern If you add the noise with a different value.\par
+When this value is the same, it will produce the same pattern.\par
+When this value is different, a different noise pattern will be produced.\par
 The default value is 1.\\
 \\
 NBlur\par
-It blurs the noise component, reduces the dot  impression.\par
+It blurs the noise component, reducing the dots presence in the image.\par
 Minimum value is 0, maximum value is 1.\par
 Because it is calculated only in pixels adjacent to the dot,\par
 it will feel like a very light blur.\par
-When the blur value is not 0, it will take the average of the pixels adjacent\par
-to each other up to a value of 1.0.\par
+When at 0, no blur will be applied; when at 1, it will apply an average of\par 
+neighbor pixels.\par
 The default value is 1.\\
 \\
 Limits\par
-The brightness (Lightness), chroma (Saturation), opacity (Alpha),\par
-adjustment to effect the end value (in the vicinity of 0 to 1).\par
-Applying the noise at 0 or near 1, will appear below 1 or more than the value of 0,\par
-so it can not be expressed, because the values are each truncated to 0 or 1.\par
-It is effective to compensate for the truncation.\par
--{-}> \textquotedbl End value of Noise effect adjustment \ \ Figure 1 \ \ comparison\textquotedbl \ reference\par
--{-}> \textquotedbl End value of Noise effect adjustment \ \ Figure 2 \ \ description\textquotedbl \ reference\\
+Adjusts the effect on the extremes (near 0 or 1) of Lightness, Saturation, and\par Alpha changes.\par
+When noise is applied near 0 or 1, values less than 0 or greater than 1 could be\par generated, but since it cannot be expressed, they are truncated to 0 or 1\par 
+respectively. This allows to compensate for the truncation.\par
+-{-}> See Figure 1: \textquotedbl Noise effect adjustments at extremes values\textquotedbl.\par
+-{-}> See Figure 2: \textquotedbl Illustration of noise change range at extreme values\textquotedbl.\\
 \par
 \noindent \ \ \, Effective\par
-Determines the strength of this effect (Limits).\par
-It has no effect if the value is 0. Effect a table using a value greater than 0\par
+Determines the strength of the Limits effect.\par
+When the value is at 0, it has no effect. The effect will be shown when values are\par 
+greater than 0\par
 A value of 1 will have the strongest effect.\par
 The default value is 0.\\
 \par
-\noindent \ \ \, Center\par
-Determines the center of the effect.\par
-Noise range deviation, the effect of the reduction of the noise width, most strongly\par
-at the portion of 0 to 1 of the end value, will have no effect in the center.
 
 \newpage
 
@@ -118,33 +112,36 @@ at the portion of 0 to 1 of the end value, will have no effect in the center.
 
 \ \vspace{-0.2em}
 \par
-Position the center value without this effect.\par
+\noindent \ \ \, Center\par
+Defines the center of the effect.\par
+Allows to shift the range of the Limits effect, with more intensity at the\par 
+extremes, and no intensity at its center.\par
+The center value position will show no limiting effect.\par
 The value must be between 0 and 1.\par
-If the value is 0, it will have no effect on a Pixel with a value of 0.\par
-If the value is 1, it will have no effect on a Pixel with a value of 1.\par
+If is 0, Limits effect will have no effect for pixel values of 0.\par
+If is 1, Limits effect will have no effect for pixel values of 1.\par
 The default Center value is 0.5.\\
 \par
 \noindent \ \ \, Type\par
-Select from the options of the Type of the effect.\par
-If you select \textquotedbl Keep Noise\textquotedbl , it maintains the (overall) noise width shifting of the\par
-noise range, the contrast of the entire image will shrink.\par
-If you select \textquotedbl Keep Contrast\textquotedbl , it maintains the contrast to reduce the noise width\par
-only at the end.\par
+Select the Type of the effect.\par
+When \textquotedbl Keep Noise\textquotedbl\ is selected, the overall noise range is\par 
+shifted, maintaining its width, and reducing the contrast of the image.\par
+When \textquotedbl Keep Contrast\textquotedbl\ is selected, the noise range width is\par 
+reduced only at the extremes, to maintain the contrast of the image.\par
 The default setting is \textquotedbl Keep Noise\textquotedbl .\\
 \\
 Premultiplied\par
-When ON, RGB is already set to Premultiply\par
-(The value of Alpha channel is multiplied in advance RGB channels)\par
-and processes as an image.\par
-At that time, and added to the Alpha processing, you may not get the correct image.\par
+When ON, the image will be processed as if having a Premultiplied Alpha channel\par 
+(Alpha value already multiplied by RGB channels).\par
+If image is not premultiplied, the image may not look correct.\par
 The default setting is ON.\\
 \\
 Reference\par
-Choose how Reference image values put the strength of the effect into each Pixel.\par
-An image is connected to the \textquotedbl Reference\textquotedbl \ of the input,\par
-Choose from Red/Green/Blue/Alpha/Luminance/Nothing.\par
-Choose Nothing when you do not want this effect, it will turn off the connection.\par
-The default setting is Red.
+Specify which channel to use from the image connected to the Reference port to\par 
+drive the intensity of the effect.\par
+Choose from Red/Green/Blue/Alpha/Luminance.\par
+Choose Nothing to disable the effect.\par
+The default value is \textquotedbl Red\textquotedbl .
 
 \newpage
 
@@ -152,11 +149,11 @@ The default setting is Red.
 
 \ \vspace{1.5em}
 \par
-\noindent \hskip 2.2em Figure 1 Noise effect comparison of the values\\[0.4em]
+\noindent \hskip 2.2em Figure 1 Noise effect adjustments at extremes values.\\[0.4em]
 \par
 \scriptsize
 \noindent \hskip 3.4em Original\par
-\noindent \hskip 3.4em Effective Zero\par
+\noindent \hskip 3.4em Effective = 0\par
 \noindent \hskip 3.4em Keep Noise\par
 \noindent \hskip 3.4em Keep Contrast
 
@@ -189,10 +186,10 @@ The default setting is Red.
 \end{picture}\\[3.6em]
 
 \normalsize
-\noindent \hskip 2.2em Figure 2 Noise range change illustration of the values\\[0.5em]
+\noindent \hskip 2.2em Figure 2 Illustration of noise change range at extreme values.\\[0.5em]
 \par
 \footnotesize
-\noindent \hskip 2.65em Effective Zero \ \ The value of the noise is cut (default)
+\noindent \hskip 2.65em Effective = 0: \ \ Noise extreme values are cut. (default)
 
 \large
 \noindent \begin{picture}(0,0)
@@ -228,13 +225,13 @@ The default setting is Red.
 \put(61,-67){\line(3,2){6}}
 \put(61,-67){\line(3,-2){6}}
 \put(52,-70){\scriptsize{0}}
-\put(78,-74){\footnotesize{0 or less of the noise value is limited to 0}}
+\put(78,-74){\footnotesize{Noise values of 0 or less, limited to 0}}
 
 \put(471,-67){\line(-1,0){15}}
 \put(471,-67){\line(-3,2){6}}
 \put(471,-67){\line(-3,-2){6}}
 \put(476,-70){\scriptsize{1.0}}
-\put(312,-74){\footnotesize{1 or more noise is limited to 1}}
+\put(312,-74){\footnotesize{Noise values of 1 or more, limited to 1}}
 
 \linethickness{0.2em}
 \put(54.5,-38){\line(1,0){428}}
@@ -248,7 +245,7 @@ The default setting is Red.
 \end{picture}\\[5.7em]
 
 \footnotesize
-\noindent \hskip 2.65em Keep Noise \ \ Shift to maintain the noise. Contrast is reduced. It shifts the overall noise position
+\noindent \hskip 2.65em Keep Noise: \ \ Shift maintaining noise. Contrast is reduced. Noise position is shifted overall.
 
 \large
 \noindent \begin{picture}(0,0)
@@ -334,7 +331,7 @@ The default setting is Red.
 \end{picture}\\[9.3em]
 
 \footnotesize
-\noindent \hskip 2.65em Keep Contrast \ \ Reduce the noise width. Maintain the contrast. Noise width is reduced only at the end
+\noindent \hskip 2.65em Keep Contrast: \ \ Noise width reduced at extremes. Contrast is maintained.
 
 \large
 \noindent \begin{picture}(0,0)

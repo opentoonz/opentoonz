@@ -17,46 +17,40 @@
 Max Min Ino\medskip
 \par
 \normalsize
-It brightens (dark) portions of the image.\\
+It inflates the brightest (darkest) portions of the image.\\
 \par
-It inflates around (the polygon).\par
-In addition, the change is smooth.\\
+The shape can be round or polygonal.\par
+It produces smooth changes.\\
 \par
 First, it processes the Alpha channel, if specified.\par
-Then, it handles the Pixel RGB if the Alpha channel is not zero.\\
+Then it handles RGB values of pixels, where the Alpha channel is not zero.\\
 \\
 -{-}- \ Inputs \ -{-}-\\
 Source\par
-Connect the image to process.\\
+Connect the image to be processed.\\
+\\
 Reference\par
-Connect the reference image to put the strength of the inflate effect for each Pixel.\\
+Connect the reference image to assign the strength of the effect into each pixel.\\
 \\
 -{-}- \ Settings \ -{-}-\\
 Max Min Select\par
-Specify how to handle the selection.\par
-\textquotedbl Max\textquotedbl \ -> Inflate the bright parts of the image\par
-\textquotedbl Min\textquotedbl \ -> Inflate the dark parts of the image\par
-Using \textquotedbl Min\textquotedbl , ink lines of the cell image outline, the transmission region of the outside\par
-will be painted zero, ink line bulge of the transparent area will continue to disappear.\par
-Also it increases the transmission region Alpha as well.\par
+Specify the processing method.\par
+\textquotedbl Max\textquotedbl \ -> Inflate the bright areas of the image\par
+\textquotedbl Min\textquotedbl \ -> Inflate the dark areas of the image\par
+When using \textquotedbl Min\textquotedbl , black lines in the cell image outline will be painted with 0\par 
+in the transparent area outside them, so transparent area expands and black lines\par 
+dissappear.\par
+It also increases the region defined by the Alpha in the same way.\par
 The default setting is \textquotedbl Max\textquotedbl .\\
 \\
 Radius\par
-The inflate size, specified in the circle radius.\par
+Specify the size of the bulge by a circle radius.\par
 The unit is millimeters.\par
 Specify a number greater than or equal to 0.\par
-By adding Smoothing (in pixels) it does not inflate using a value less than 1.\par
+By adding smoothing (in pixels) it will not inflate with values smaller than 1.\par
 Therefore, if the value is less, there will be an effect with a fine image,\par
-but it may not take effect on a rough image.\par
+but it may not make the effect noticeable on a rough image.\par
 A larger Radius will take more time to process.\\
-\\
-Polygon Number\par
-Other than inflating to a circle, you can specify whether to inflate to a polygon.\par
-Specify an integer value.\par
-A value of 2 will inflate around the circle Radius.\par
-3 or more, will inflate to the number of angles of the polygon. The maximum is 16.\par
-It is a polygon that begins from the true right of the center to inflate.\par
-The default value is 2.
 
 \newpage
 
@@ -64,24 +58,35 @@ The default value is 2.
 
 \ \vspace{-0.2em}
 \\
+Polygon Number\par
+Allows to specify if inflate into a circle or a polygon shape.\par
+Specify an integer value.\par
+A value of 2 will inflate using a circle of the specified Radius.\par
+3 or more, will inflate to the number of sides of the polygon. The maximum is 16.\par
+Polygons begin from the right side of the center of the bulge.\par
+The default value is 2.
+\\
 \par
 \noindent Degree\par
-\textquotedbl Polygon Number\textquotedbl \ value of 3 or more, specify the slope of the inflate polygon.\par
-\textquotedbl Polygon Number\textquotedbl \ value of 2 or less will have no effect.\par
-Specify in Degree units more than 0.\par
-It will rotate in a clockwise direction.\par
+Specifies the angle of the polygon, when \textquotedbl Polygon Number\textquotedbl \ value is 3 or more.\par
+When \textquotedbl Polygon Number\textquotedbl \ value is 2, it will have no effect.\par
+Specify a value of 0 or more degrees.\par
+It will rotate in clockwise direction.\par
 The default value is 0.\\
 \\
 Alpha Rendering\par
-When ON it will also process the Alpha channel.\par
-When OFF it will process only to RGB. It uses the Alpha channel without BG image.\par
+This option is valid only when there is an Alpha channel.\par
+When inactive, it masks the changes in the RGB values using the original Alpha\par 
+of the image.\par
+When active, the effect will be able to modify the Alpha channel, extending it\par 
+as necessary to reproduce the full span of the effect.\par
 The default setting is ON.\\
 \\
 Reference\par
-Choose how Reference image values put the strength of the effect into each Pixel.\par
-An image is connected to the \textquotedbl Reference\textquotedbl \ of the input,\par
-Choose from Red/Green/Blue/Alpha/Luminance/Nothing.\par
-Choose Nothing when you do not want this effect, it will turn off the connection.\par
-The default setting is Red.
+Specify which channel to use from the image connected to the Reference port to\par 
+drive the intensity of the effect.\par
+Choose from Red/Green/Blue/Alpha/Luminance.\par
+Choose Nothing to disable the effect.\par
+The default value is \textquotedbl Red\textquotedbl .
 
 \end{document}

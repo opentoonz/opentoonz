@@ -21,70 +21,67 @@
 Level Auto Ino\medskip
 \par
 \normalsize
-Spread the maximum brightness range of the picture.\\
+Spread the brightness range of the picture.\\
 \par
-Also does automatic level correction such as to brighten the image for a dark mask.\\
+It performs an automatic level correction, useful for increasing the image\par 
+brightness and constrast.\\
 \par
-Based on the brightest value and the darkest value of the input image,\par
-it spreads the brightness range of the darkest value (Out Min) and the\par
-brightest value (Out Max) as a numerical value.\par
--{-}> \textquotedbl Level Auto Figure 1 Calculation View\textquotedbl \ reference\\
+Based on the brightest and darkest values of the input image, the brightness\par 
+range is expanded to the darkest (Out Min) and brightest (Out Max) values.\par
+-{-}> See Figure 1: \textquotedbl Auto Levels - Calculation Diagram\textquotedbl\\
 \par
 Since it expands the range of each RGBA channel, it does not take into account\par
 the RGBA\textquotesingle s balance. Therefore please note that it may change colors, in a colored\par
 image.\\
 \par
-When you check the results, please do not use the sub-camera.\par
-Since the sub-camera in the range of the input image is different, it changes the\par
-darkest and brightest values of the input image, it can not be accurately processed.\\
+When checking the results, sub-camera must not be used.\par
+Since the sub-camera input image range is different, its darkest and brightest\par 
+values are different of those of the input image, and will give different results.\\
 \\
 -{-}- \ Inputs \ -{-}-\\
 Source\par
-Connect the image to process.\\
+Connect the image to be processed.\\
 \\
 -{-}- \ Settings \ -{-}-\\
 In Min Shift\\
 In Max Shift\par
-Minimum and maximum values of the input image Pixel is automatically calculated,\par
- and adjusted by adding to its value.\par
-For example, if there is only one placed bright Pixel, when you want to ignore it,\par
-spread the range by specifying a negative \textquotedbl In Max Shift\textquotedbl \ value.\par
-Pixel value (8 or 16bits) is specified as a value of 0 to 1.\par
+The minimum and maximum values of the input image pixels are automatically\par calculated and adjusted by adding to their values.\par
+For example, if there is only one bright pixel that needs to be ignored,\par
+it is possible to spread the range by specifying a negative value for\par 
+\textquotedbl In Max Shift\textquotedbl \ .\par
+Pixel values (8 or 16 bits) are specified ranging from 0 to 1.\par
 Minimum value is -1, maximum value is 1.\par
 \noindent \hskip 7em Min \ \ \ \ \, 0\par
 \noindent \hskip 7em Max \ \ \ \ -1\par
 These values will make the screen become black.\par
 \noindent \hskip 7em Min \ \ \ \ \, 1\par
 \noindent \hskip 7em Max \ \ \ \ \ 0\par
-If you use these values, the screen will become pure white.\par
-If you use a value of 0 for both, there will be no adjustment by the shift.\par
+These values will make the screen become white.\par
+If both values are set to 0, there will be no adjustment by shift.\par
 The default values for both are 0.\\
-\\
-Out Min
 
 \newpage
 
-\thispagestyle{empty}
-
 \ \vspace{-0.2em}
+
 \par
+\noindent Out Min\par
 \noindent Out Max\par
-Determines the darkest value of the output image (minimum value) and the\par
-brightest value (maximum value).\par
+Determines the darkest (Out Min) and the brightest (Out Max) values of the output\par
+image.\par
 Minimum value is 0, maximum value is 1.\par
-The defaults are\par
-\noindent \hskip 7em Out Min is 0\par
-\noindent \hskip 7em Out Max is 1\par
-for the values.\\
+The defaults values are\par
+\noindent \hskip 7em Out Min: 0\par
+\noindent \hskip 7em Out Max: 1\\
 \\
 Gamma\par
-Used for the gamma correction between \textquotedbl Out Min\textquotedbl \ and \textquotedbl Out Max\textquotedbl .\par
-A Value between 0.1 and 1.0, will make the image become darker.\par
-It does not compensate when you specify a value of 1.0.\par
+Perform gamma correction between \textquotedbl Out Min\textquotedbl \ and \textquotedbl Out Max\textquotedbl .\par
+A value between 0.1 and 1.0, will make the image become darker.\par
+When the value is 1.0, no correction will be performed.\par
 A value between 1.0 and 10.0, will make the image become brighter.\par
 The default value is 1.\\
 \\
-Level Auto Figure 1 \ \ Calculation View
+Figure 1: Auto Levels - Calculation Diagram
 
 \large
 \noindent \begin{picture}(0,0)

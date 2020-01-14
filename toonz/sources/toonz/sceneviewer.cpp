@@ -530,6 +530,44 @@ public:
   }
 } positionResetCommand;
 
+class TVectorGuidedDrawingToggleCommand final : public MenuItemHandler {
+public:
+  TVectorGuidedDrawingToggleCommand()
+      : MenuItemHandler(MI_VectorGuidedDrawing) {}
+  void execute() override {
+    CommandManager *cm = CommandManager::instance();
+    QAction *action    = cm->getAction(MI_VectorGuidedDrawing);
+    Preferences::instance()->setValue(guidedDrawingType,
+                                      action->isChecked() ? 1 : 0);
+    TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+    TApp::instance()->getCurrentScene()->notifyPreferenceChanged(
+        "GuidedDrawingFrame");
+  }
+
+  bool isChecked(CommandId id) const {
+    QAction *action = CommandManager::instance()->getAction(id);
+    return action != 0 && action->isChecked();
+  }
+} vectorGuidedDrawingToggleCommand;
+
+class TSelectGuideStrokeResetCommand final : public MenuItemHandler {
+public:
+  TSelectGuideStrokeResetCommand()
+      : MenuItemHandler(MI_SelectGuideStrokeReset) {}
+  void execute() override {
+    TVectorImageP vi = (TVectorImageP)TTool::getImage(false);
+    if (!vi) return;
+
+    TTool *tool = TApp::instance()->getCurrentTool()->getTool();
+    if (!tool) return;
+
+    tool->getViewer()->setGuidedStrokePickerMode(0);
+    tool->getViewer()->setGuidedBackStroke(-1);
+    tool->getViewer()->setGuidedFrontStroke(-1);
+    tool->getViewer()->invalidateAll();
+  }
+} SelectGuideStrokeResetCommand;
+
 class TSelectGuideStrokeNextCommand final : public MenuItemHandler {
 public:
   TSelectGuideStrokeNextCommand() : MenuItemHandler(MI_SelectNextGuideStroke) {}
@@ -538,8 +576,8 @@ public:
     if (!vi) return;
 
     Preferences *pref = Preferences::instance();
-    if (!pref->isOnionSkinEnabled() ||
-        (pref->getGuidedDrawing() != 1 && pref->getGuidedDrawing() != 2))
+    if (!pref->isOnionSkinEnabled() || (pref->getGuidedDrawingType() != 1 &&
+                                        pref->getGuidedDrawingType() != 2))
       return;
 
     TTool *tool = TApp::instance()->getCurrentTool()->getTool();
@@ -557,8 +595,8 @@ public:
     if (!vi) return;
 
     Preferences *pref = Preferences::instance();
-    if (!pref->isOnionSkinEnabled() ||
-        (pref->getGuidedDrawing() != 1 && pref->getGuidedDrawing() != 2))
+    if (!pref->isOnionSkinEnabled() || (pref->getGuidedDrawingType() != 1 &&
+                                        pref->getGuidedDrawingType() != 2))
       return;
 
     TTool *tool = TApp::instance()->getCurrentTool()->getTool();
@@ -577,8 +615,8 @@ public:
     if (!vi) return;
 
     Preferences *pref = Preferences::instance();
-    if (!pref->isOnionSkinEnabled() ||
-        (pref->getGuidedDrawing() != 1 && pref->getGuidedDrawing() != 2))
+    if (!pref->isOnionSkinEnabled() || (pref->getGuidedDrawingType() != 1 &&
+                                        pref->getGuidedDrawingType() != 2))
       return;
 
     TTool *tool = TApp::instance()->getCurrentTool()->getTool();
@@ -588,24 +626,6 @@ public:
   }
 } selectBothGuideStrokesCommand;
 
-class TSelectGuideStrokeResetCommand final : public MenuItemHandler {
-public:
-  TSelectGuideStrokeResetCommand()
-      : MenuItemHandler(MI_SelectGuideStrokeReset) {}
-  void execute() override {
-    TVectorImageP vi = (TVectorImageP)TTool::getImage(false);
-    if (!vi) return;
-
-    TTool *tool = TApp::instance()->getCurrentTool()->getTool();
-    if (!tool) return;
-
-    tool->getViewer()->setGuidedStrokePickerMode(0);
-    tool->getViewer()->setGuidedBackStroke(-1);
-    tool->getViewer()->setGuidedFrontStroke(-1);
-    tool->getViewer()->invalidateAll();
-  }
-} selectGuideStrokeResetCommand;
-
 class TTweenGuideStrokesCommand final : public MenuItemHandler {
 public:
   TTweenGuideStrokesCommand() : MenuItemHandler(MI_TweenGuideStrokes) {}
@@ -614,8 +634,8 @@ public:
     if (!vi) return;
 
     Preferences *pref = Preferences::instance();
-    if (!pref->isOnionSkinEnabled() ||
-        (pref->getGuidedDrawing() != 1 && pref->getGuidedDrawing() != 2))
+    if (!pref->isOnionSkinEnabled() || (pref->getGuidedDrawingType() != 1 &&
+                                        pref->getGuidedDrawingType() != 2))
       return;
 
     TTool *tool = TApp::instance()->getCurrentTool()->getTool();
@@ -634,8 +654,8 @@ public:
     if (!vi) return;
 
     Preferences *pref = Preferences::instance();
-    if (!pref->isOnionSkinEnabled() ||
-        (pref->getGuidedDrawing() != 1 && pref->getGuidedDrawing() != 2))
+    if (!pref->isOnionSkinEnabled() || (pref->getGuidedDrawingType() != 1 &&
+                                        pref->getGuidedDrawingType() != 2))
       return;
 
     TTool *tool = TApp::instance()->getCurrentTool()->getTool();
@@ -654,8 +674,8 @@ public:
     if (!vi) return;
 
     Preferences *pref = Preferences::instance();
-    if (!pref->isOnionSkinEnabled() ||
-        (pref->getGuidedDrawing() != 1 && pref->getGuidedDrawing() != 2))
+    if (!pref->isOnionSkinEnabled() || (pref->getGuidedDrawingType() != 1 &&
+                                        pref->getGuidedDrawingType() != 2))
       return;
 
     TTool *tool = TApp::instance()->getCurrentTool()->getTool();
@@ -664,6 +684,44 @@ public:
     tool->getViewer()->setGuidedStrokePickerMode(-3);
   }
 } selectGuidesAndTweenCommand;
+
+class TFlipNextStrokeDirectionCommand final : public MenuItemHandler {
+public:
+  TFlipNextStrokeDirectionCommand() : MenuItemHandler(MI_FlipNextGuideStroke) {}
+  void execute() override {
+    TVectorImageP vi = (TVectorImageP)TTool::getImage(false);
+    if (!vi) return;
+
+    Preferences *pref = Preferences::instance();
+    if (!pref->isOnionSkinEnabled() || (pref->getGuidedDrawingType() != 1 &&
+                                        pref->getGuidedDrawingType() != 2))
+      return;
+
+    TTool *tool = TApp::instance()->getCurrentTool()->getTool();
+    if (!tool) return;
+
+    tool->flipGuideStrokeDirection(1);
+  }
+} flipNextStrokeDirectionCommand;
+
+class TFlipPrevStrokeDirectionCommand final : public MenuItemHandler {
+public:
+  TFlipPrevStrokeDirectionCommand() : MenuItemHandler(MI_FlipPrevGuideStroke) {}
+  void execute() override {
+    TVectorImageP vi = (TVectorImageP)TTool::getImage(false);
+    if (!vi) return;
+
+    Preferences *pref = Preferences::instance();
+    if (!pref->isOnionSkinEnabled() || (pref->getGuidedDrawingType() != 1 &&
+                                        pref->getGuidedDrawingType() != 2))
+      return;
+
+    TTool *tool = TApp::instance()->getCurrentTool()->getTool();
+    if (!tool) return;
+
+    tool->flipGuideStrokeDirection(-1);
+  }
+} flipPrevStrokeDirectionCommand;
 
 //=============================================================================
 // SceneViewer
@@ -1797,7 +1855,7 @@ void SceneViewer::drawScene() {
   TXshSimpleLevel::m_fillFullColorRaster = false;
 
   // Guided Drawing Check
-  int useGuidedDrawing  = Preferences::instance()->getGuidedDrawing();
+  int useGuidedDrawing  = Preferences::instance()->getGuidedDrawingType();
   TTool *tool           = app->getCurrentTool()->getTool();
   int guidedFrontStroke = tool ? tool->getViewer()->getGuidedFrontStroke() : -1;
   int guidedBackStroke  = tool ? tool->getViewer()->getGuidedBackStroke() : -1;

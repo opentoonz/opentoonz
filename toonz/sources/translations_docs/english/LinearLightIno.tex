@@ -17,21 +17,21 @@
 Linear Light Ino\medskip
 \par
 \normalsize
-Linear Light the image\par
-Fore is darker for Linear Burn, and lighter for Linear Dodge\par
-Formula = if (Fore < 0.5) then \textquotedbl Linear Burn\textquotedbl \ else \textquotedbl Linear Dodge\textquotedbl\par
-Formula shows the case of RGB values from 0 to 1.\\
+Linear light the image.\par
+If Fore is dark it applies a Linear Burn, if Fore is light it applies a Linear Dodge.\par
+Formula = if (Fore < 0.5) then \textquotedbl Linear Burn\textquotedbl \ else \textquotedbl Linear Dodge\textquotedbl.\par
+The formula results in each RGB value ranging from 0 to 1.\\
 \\
 -{-}- \ Settings \ -{-}-\\
 Opacity\par
 Specifies the opacity of the image overlaid on top.\par
 When 0 the Fore image will be transparent.\par
-The default value is \textquotedbl 1.0\textquotedbl \ for the Fore image and will be synthesized as opaque.\par
+With the default value \textquotedbl 1.0\textquotedbl \ , the Fore image will be composed as opaque.\par
 Specify a value from 0 to 1.0.\\
 \\
 Clipping Mask\par
-When ON,\par
-Material will not exist in the location (Back) (Alpha Value Zero), and remains clear.\par
-The default setting is OFF.
+When ON, it will take the Back port alpha information to define the alpha of the\par
+resulting image, leaving areas where the Alpha value is zero as transparent.\par
+The default value is ON.
 
 \end{document}

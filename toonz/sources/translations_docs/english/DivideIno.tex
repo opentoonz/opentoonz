@@ -17,30 +17,30 @@
 Divide Ino\medskip
 \par
 \normalsize
-Division of images\par
-Images will become brighter using division\par
+Performs a division between two images.\par
+The division operation will increase the brightness of the resultant image.\par
 Formula = Back / Fore\par
-Formula shows the case of RGB values from 0 to 1.\\
+The formula results in each RGB value ranging from 0 to 1.\\
 \\
 -{-}- \ Inputs \ -{-}-\par
-Both the connections are combined in the process.\par
-When the operating switch is OFF it displays the Back.\par
-It will also display if there is only one connection.\\
+When both input ports are connected, they will be combined in the process.\par
+When the node Visibility switch is OFF it will display the Back port content.\par
+If there is only one port connected, it will display its content.\\
 Fore\par
-Connect the image to overlay on top.\\
+Connect the image that will be overlayed on top.\\
 Back\par
-Connect the image to put below.\\
+Connect the base image.\\
 \\
 -{-}- \ Settings \ -{-}-\\
 Opacity\par
 Specifies the opacity of the image overlaid on top.\par
 When 0 the Fore image will be transparent.\par
-The default value is \textquotedbl 1.0\textquotedbl \ for the Fore image and will be synthesized as opaque.\par
+With the default value \textquotedbl 1.0\textquotedbl \ , the Fore image will be composed as opaque.\par
 Specify a value from 0 to 1.0.\\
 \\
 Clipping Mask\par
-When ON,\par
-Material will not exist in the location (Back) (Alpha Value Zero), and remains clear.\par
-The default setting is ON.
+When ON, it will take the Back port alpha information to define the alpha of the\par
+resulting image, leaving areas where the Alpha value is zero as transparent.\par
+The default value is ON.
 
 \end{document}

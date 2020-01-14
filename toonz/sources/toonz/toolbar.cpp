@@ -48,12 +48,12 @@ struct {
                     {T_Pinch, true, 0},        {T_Pump, true, 0},
                     {T_Magnet, true, 0},       {T_Bender, true, 0},
                     {T_Iron, true, 0},         {T_Cutter, true, 0},
-                    {"Separator_5", false, 0}, {T_Skeleton, true, 0},
+                    {"Separator_5", true, 0},  {T_Skeleton, true, 0},
                     {T_Tracker, true, 0},      {T_Hook, true, 0},
                     {T_Plastic, true, 0},      {"Separator_6", false, 0},
                     {T_Zoom, false, 0},        {T_Rotate, true, 0},
                     {T_Hand, false, 0},        {0, false, 0}};
-}
+}  // namespace
 //=============================================================================
 // Toolbar
 //-----------------------------------------------------------------------------
@@ -88,7 +88,7 @@ Toolbar::Toolbar(QWidget *parent, bool isVertical)
 
 //-----------------------------------------------------------------------------
 /*! Layout the tool buttons according to the state of the expandButton
-*/
+ */
 void Toolbar::updateToolbar() {
   TApp *app                 = TApp::instance();
   TFrameHandle *frameHandle = app->getCurrentFrame();
@@ -178,6 +178,8 @@ void Toolbar::updateToolbar() {
         (m_toolbarLevel & LEVELCOLUMN_XSHLEVEL))
       enable = true;
 
+    if (!m_isExpanded && buttonLayout[idx].collapsable) continue;
+
     if (!buttonLayout[idx].action) {
       if (isSeparator)
         buttonLayout[idx].action = addSeparator();
@@ -185,8 +187,6 @@ void Toolbar::updateToolbar() {
         buttonLayout[idx].action =
             CommandManager::instance()->getAction(buttonLayout[idx].toolName);
     }
-
-    if (!m_isExpanded && buttonLayout[idx].collapsable) continue;
 
     if (levelBasedDisplay != 2)
       buttonLayout[idx].action->setEnabled(enable);

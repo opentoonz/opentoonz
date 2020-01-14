@@ -1,4 +1,4 @@
-﻿<html lang="ja">
+<html lang="ja">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
       <title>SpectrumFx Iwa</title>
@@ -7,41 +7,56 @@
 <h1><img src = ".\img\fx_iwa_spectrum.png" width = 30 height = 30 >   SpectrumFx Iwa</h1>
 
 <h4>● Overview</h4>
-Depending on the brightness of the input image, it has the effect of outputing a rainbow color pattern like a thin film interference.<br>
-Real iridescent glare is not a thin film interference, but you can get likely results for the glare of the material.
+This effect produces a rainbow pattern like that of a thin film interference, according to the brightness<br>
+of the input image.<br>
+Even though the rainbow colors generated are not actually a thin film interference, similar results to<br>
+a glare material can be obtained.
 
   <h4>● Input port</h4>
 <UL>
-<LI><b>Source</b> : Connect the input image. The brightness of the input image, corresponds to the thickness of the thin film.<br>
-Thin film thickness is how bright the brightness will be, brightness 0.0 is the "Thickness Min" which will be described later, brightness 1.0 will correspond to the "Thickness Max".</LI>
+<LI><b>Source</b> : Connect the source image. The brightness of the source image, corresponds to the<br>
+thickness of the thin film.<br>
+The brighter the luminosity, the thinner the film thickness will be. A luminosity of 0.0 corresponds to<br>
+"Thickness Min" described later, and a luminosity of 1.0 corresponds to "Thickness Max".</LI>
 <LI><b>Light</b> : Connect the light image.<br>
-If the light image is connected, there is less of a difference in the output.</LI>
+When a light image is connected, the output results are as follows:</LI>
 <UL>
-<LI>Alpha channel of output results, will be replaced in the alpha channel of the light image.</LI>
-<LI>If the "Light Threshold" parameters described below are enabled, you can output the image of the light image & the rainbow colors for screen synthesis.</LI>
+<LI>The Alpha channel of the output result is replaced with the alpha channel of the Light image.</LI>
+<LI>If the "Light Threshold" parameter described below is enabled, the Light image and the generated<br>
+rainbow can be combined and output on the screen.</LI>
 </UL>
 </UL>
 
 <h4>● Parameters</h4>
 <UL>
-<LI><b>Intensity</b> : The intensity of the light. Rainbow-color image will be brighter when it is set higher.</LI>
-<LI><b>Refractive Index</b> : The medium refractive index. Rainbow-color image will be brighter when it is set higher.</LI>
-<LI><b>Thick(ness) Max</b> : The maximum value of the thin film thickness. This corresponds to the film thickness of the brightness 0 portion of the input image.</LI>
-<LI><b>Thick(ness) Min</b> : The minimum value of the thin film thickness. This corresponds to the film thickness of the brightness 1 portion of the input image.</LI><br>
-※ Thickness can also take a negative value. In that case, the film thickness is calculated as if the negative part is 0.<br>
-※ Thickness of Min, Max, can also reverse the magnitude of the value. In that case, the rainbow colors of the pattern is reversed.
-<LI><b>R/G/B Gamma</b> : Used as a gamma correction value for each of the RGB channels, of the rainbow color pattern.</LI><br>
-<LI><b>Lens Factor</b> : The gamma correction value that can be added to when outputting a rainbow color pattern from the input image brightness.<br>
-As a result, for example, for the concentric pattern, you can put a strain, such as through a convex/concave lens for the period of the rainbow.</LI>
-<LI><b>Light Threshold</b> : When the light image is connected, you can combine the screens of the light image & the rainbow color image.<br>
-Light Threshold is the minimum value of the alpha channel of the light image required for the screen synthesis.<br>
-For each pixel, it will be performed with the following processing.</LI>
+<LI><b>Intensity</b> : The light intensity. The higher the value, the brighter the rainbow.</LI>
+<LI><b>Refractive Index</b> : The refractive index of the medium. The higher the value, the brighter the<br>
+rainbow.</LI>
+<LI><b>Thickness Max</b> : Maximum thickness of the thin film. Corresponds to the film thickness of the<br>
+low luminance portion of the Source image.</LI>
+<LI><b>Thickness Min</b> : Minimum thickness of the thin film. Corresponds to the film thickness of the<br>
+high luminance part of the Source image.</LI>
+*Thickness can also take a negative value. In that case, all parts where the film thickness is negative<br>
+are calculated as zero.<br>
+*Thickness Min and Max can be reversed. In that case, the iridescent pattern will be reversed.
+<LI><b>R/G/B Gamma</b> : Gamma correction value for each RGB channel of the rainbow pattern.</LI><br>
+<LI><b>Lens Factor</b> : A gamma correction value that can be added when outputting a rainbow pattern from<br>
+the luminosity of the Source image.<br>
+This allows, for example, concentric patterns to be distorted through a convex / concave lens in the<br>
+iridescent period.</LI>
+<LI><b>Light Threshold</b> : When a Light image is connected, the Light image can be combined with the<br>
+rainbow pattern on the screen.<br>
+Light Threshold is the minimum Alpha channel value of the Light image required for screen composition.<br>
+For each pixel, the following processing will be performed:</LI>
 <UL>
-<LI>When the alpha channel of the light image is following the Light Threshold ： Screen synthesis does not take place.</LI>
-<LI>When the alpha channel of the light image is 1 ： Light image screen is synthesized at 100%.</LI>
-<LI>When the alpha channel of the light image is larger than the Light Threshold, & less than 1 ： The proportion of the screen synthesis is linear interpolation.</LI>
+<LI>When the alpha channel of the Light image is below the Light Threshold: Screen composition is not<br>
+performed.</LI>
+<LI>When the alpha channel of the Light image is 1: The Light image is composited on the screen at 100%.</LI>
+<LI>When the alpha channel of the Light image is greater than the Light Threshold but less than 1: The<br>
+screen composition ratio will be linearly interpolated.</LI>
 </UL>
-The higher the value of the Light Threshold the brighter the output image will become, a smaller screen ratio makes the writen image become larger. You can also make it a negative value.
+The smaller the Light Threshold value, the larger the screen ratio with the Light image, so the output<br>
+image will be brighter. It can also accept negative values.
 </UL>
 </body>
 

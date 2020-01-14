@@ -108,6 +108,7 @@ set(MOC_HEADERS
     toolbar.h
     tpanels.h
     trackerpopup.h
+	vectorguideddrawingpane.h
     vectorizerpopup.h
     vectorizerswatch.h
     versioncontrol.h
@@ -276,6 +277,7 @@ set(SOURCES
     kis_tablet_support_win8.cpp
     timestretchpopup.cpp
     trackerpopup.cpp
+    vectorguideddrawingpane.cpp
     vectorizerpopup.cpp
     vectorizerswatch.cpp
     versioncontrol.cpp

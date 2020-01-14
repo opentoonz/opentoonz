@@ -24,6 +24,8 @@
 #include "historypane.h"
 #include "cleanupsettingspane.h"
 
+#include "vectorguideddrawingpane.h"
+
 #ifdef WITH_STOPMOTION
 #include "stopmotioncontroller.h"
 #endif
@@ -1467,3 +1469,38 @@ public:
 //=============================================================================
 OpenFloatingPanel openFxSettingsCommand(MI_FxParamEditor, "FxSettings",
                                         QObject::tr("Fx Settings"));
+
+//=========================================================
+// VectorGuidedDrawingPanel
+//---------------------------------------------------------
+
+//-----------------------------------------------------------------------------
+VectorGuidedDrawingPanel::VectorGuidedDrawingPanel(QWidget *parent)
+    : TPanel(parent) {
+  VectorGuidedDrawingPane *pane = new VectorGuidedDrawingPane(this);
+  setWidget(pane);
+  setIsMaximizable(false);
+}
+
+//=============================================================================
+// VectorGuidedDrawingFactory
+//-----------------------------------------------------------------------------
+
+class VectorGuidedDrawingFactory final : public TPanelFactory {
+public:
+  VectorGuidedDrawingFactory() : TPanelFactory("VectorGuidedDrawingPanel") {}
+  TPanel *createPanel(QWidget *parent) override {
+    TPanel *panel = new VectorGuidedDrawingPanel(parent);
+    panel->setObjectName(getPanelType());
+    panel->setWindowTitle(QObject::tr("Vector Guided Drawing Controls"));
+    panel->setMinimumSize(387, 265);
+
+    return panel;
+  }
+  void initialize(TPanel *panel) override {}
+} VectorGuidedDrawingFactory;
+
+//=============================================================================
+OpenFloatingPanel openVectorGuidedDrawingPanelCommand(
+    MI_OpenGuidedDrawingControls, "VectorGuidedDrawingPanel",
+    QObject::tr("Vector Guided Drawing"));

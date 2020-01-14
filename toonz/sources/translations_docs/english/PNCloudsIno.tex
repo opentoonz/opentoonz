@@ -19,37 +19,35 @@ PN Clouds Ino\medskip
 \normalsize
 Generates a cloud pattern image.\\
 \par
-pixel value,\par
-\noindent \hskip 7em \ \ 8bits Image 128(0x80)\par
-\noindent \hskip 7em 16bits Image 32768(0x8000)\par
-Will be the center noise value.\par
-It should be noted that this value is greater than the noise value\par
-and a small value will not be necessarily be even.\\
+The pixel values of the noise will be centered at:\par
+\noindent \hskip 7em \ \ 8bits Image: 128 (0x80)\par
+\noindent \hskip 7em 16bits Image: 32768 (0x8000)\par
+Note that larger and smaller values are not necessarily even.\\
 \\
 -{-}- \ Settings \ -{-}-\\
 Size\par
-Specify the size of the noise for the pattern.\par
-Using a reduced value makes a small pattern, a bigger value makes a large pattern.\par
+Defines the size of the pattern.\par
+Smaller values result in a smaller pattern, bigger ones in a bigger pattern.\par
 The unit is mm.\par
 The default value is 10.\\
 \\
 Z\par
-Continuously changes the image.\par
-For example, from 1 to 24 frames it changes from 0 to 1.\par
+Allows for changing the pattern over time.\par
+For example, from frame 1 to 24 it can change from 0 to 1.\par
 The default value is 0.\\
 \\
 Octaves\par
-Determine the detail of the cloud pattern.\par
+Defines the detail level for the cloud pattern.\par
 Specify an integer from 1 to 10.\par
-More detail in the noise will appear as the number increases.\par
+With higher values there will be more detail in the noise.\par
 The default value is 1.\\
 \\
 Persistance\par
-Specify the strength of the details in the noise of the cloud pattern.\\
+Specify the strength of the noise in the cloud pattern.\\
 \\
 Alpha Rendering\par
-When OFF fill in the maximum Alpha value, over the entire surface will be opaque.\par
-When ON it produces the same image as the RGB over the Alpha channel.\par
-The default setting is ON.
+When inactive it fills in the maximum Alpha value, so the entire image will be opaque.\par
+When active, it feeds the same image in the Alpha channel, as in the RGB channels.\par
+The default setting is active.
 
 \end{document}

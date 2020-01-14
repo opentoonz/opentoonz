@@ -274,6 +274,8 @@
         <command>MI_NoShift</command>
         <command>MI_ResetShift</command>
         <separator/>
+        <command>MI_VectorGuidedDrawing</command>
+        <separator/>
         <command>MI_RasterizePli</command>
     </menu>
     <menu title="Windows">
@@ -314,6 +316,7 @@
         <command>MI_AudioRecording</command>
         <command>MI_OpenStopMotionPanel</command>
         <command>MI_StartupPopup</command>
+        <command>MI_OpenGuidedDrawingControls</command>
         <separator/>
         <command>MI_MaximizePanel</command>
         <command>MI_FullScreenWindow</command>

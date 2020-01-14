@@ -17,43 +17,44 @@
 Motion Blur Ino\medskip
 \par
 \normalsize
-Makes a blur of the camera by using a parallel shutter-style movement.\par
-An afterimage shake effect is also possible to specify in the options.\\
+Produces a linear motion blur effect by using translation values.\par
+It is also possible to specify an afterimage shake effect in the options.\\
 \par
-First, it will process the Alpha channel (if ON is specified), then,\par
-it handles RGB pixels that have an Alpha channel not set to zero.\\
+When \textquotedbl Alpha Rendering\textquotedbl \ is ON, Alpha channel will be processed first,\par
+then it will process all RGB pixels where the Alpha channel is not zero.\\
 \par
-The Alpha channel is not processed when (OFF) is specified,\par
-to mask the change in the RGB image. Therefore, smooth edges will\par
-remain smooth.\\
+When \textquotedbl Alpha Rendering\textquotedbl \ is OFF, Alpha channel will not be taken into account,\par
+so the RGB image changes will not be masked, causing defined edges.\\
 \\
 -{-}- \ Inputs \ -{-}-\\
 Source\par
-Connect the image to process.\\
+Connect the image to be processed.\\
 \\
 -{-}- \ Settings \ -{-}-\\
 Depend Move\par
 \noindent \ \ \, P1 -> P2\par
-The following X1,Y1,X2,Y2,\par
-specify the move in a fixed direction and magnitude.\\
+Use the X1,Y1,X2,Y2 parameters to specify movement in a fixed direction and\par 
+magnitude.\\
 \par
 \noindent \ \ \, Motion\par
-In Geometry, it specifies the move E/W, from the H/S on a frame-by-frame basis.\par
-The X1,Y1,X2,Y2 specified values will be ignored.\\
+It will take into account the object movements along the E/W and N/S channels,\par 
+on a frame-by-frame basis.\par
+The X1,Y1,X2,Y2 parameters values will be ignored.\\
 \\
 X1\\
 Y1\\
 X2\\
 Y2\par
-Specifies the start and end point coordinate values of the parallel movement blur.\par
-Coordinate system uses an origin at the lower left corner.\par
+Specifies the start and end coordinate values for the motion blur.\par
+The origin of the used coordinate system is at the lower left corner.\par
 The unit is millimeters.\par
-The following specified points, will give subtle changes in the length.\par
-Distance between the start and end point will have no effect on 1/16 Pixel or more.\par
-The default value is\par
+By specifying values with decimal places, it will be possible to define subtle changes\par 
+in the length.\par
+If the distance between the starting and ending points is less than 1/16 of a pixel,\par 
+it will have no effect.\par
+The default values are\par
 \noindent \hskip 7em X1 Y1 -> 0.0 0.0\par
 \noindent \hskip 7em X2 Y2 -> 1.0 1.0\par
-for the points.
 
 \newpage
 
@@ -62,43 +63,45 @@ for the points.
 \ \vspace{-0.2em}
 \par
 \noindent Scale\par
-Specify the scale adjustment to the length of the parallel movement blur.\par
+Adjusts the scale for the length of the motion blur effect.\par
 For example,\par
 \noindent \hskip 7em X1 Y1 -> 0.0 0.0\par
 \noindent \hskip 7em X2 Y2 -> 1.0 -1.0\par
 \noindent \hskip 7em Scale -> 100\par
-Will become,\par
+Would be equivalent to,\par
 \noindent \hskip 7em X1 Y1 -> 0.0 0.0\par
 \noindent \hskip 7em X2 Y2 -> 100.0 -100.0\par
-It will have the same effect.\par
-If you specify a zero blur it will no longer have an effect.\par
-The default value is 1 which will give no scale.\\
+and will have the same effect.\par
+When Scale is 0, blur will not be applied.\par
+The default value is 1, which will apply no scaling.\\
 \\
 Curve\par
-Specify the adjustments to the strength of the blur.\par
-With a value of 10.0 or less, and larger than 1, the blur becomes stronger,\par
-with a value of 0.1 or more, and smaller than 1, the blur will become weaker.\par
-The default value is 1 which will give equal attenuation.\\
+Allows to adjust the blur strenght.\par
+With a value between 1.0 and 10.0, blur will become stronger.\par
+With a value between 0.1 and 1.0, blur will become lighter.\par
+The default value is 1, which will produce an linear attenuation.\\
 \\
-Zanzo Length\par
-Specify the shift position of the afterimage effect\par
+Afterimage Length\par
+Specify the lenght of the afterimage effect.\par
 The unit is millimeters.\par
 Specify a value greater than or equal to 0.\par
-For example, when you want to shift the afterimage of a line with a width of 3,\par
-specify a value greater than or equal to 3 for the afterimage.\par
-The default value is 0 for no afterimage\\
+For example, to create an afterimage for a line with a width of 3,\par
+specify a value greater than or equal to 3.\par
+The default value is 0, which produces no afterimage.\\
 \\
-Zanzo Power\par
-Determines the strength at the time of issuing the afterimage.\par
-The weakest value is 0, where the afterimage effect will not be applied to the blur.\par
-The larger the value,\par
-the afterimage effect will become stronger, in the blur.\par
-The default value is 1 the strongest. The blur will have the afterimage effect applied.\\
+Afterimage Power\par
+Determines the strength of the afterimage.\par
+At 0, no afterimage effect will be applied.\par
+The larger the value, the less blur and stronger afterimage effect will be applied.\par
+The default value of 1 is the strongest possible one. Where there will be no\par 
+motion blur, but only the afterimage effect applied.\\
 \\
 Alpha Rendering\par
-This is a valid switch only when there is an Alpha channel.\par
-When OFF, it masks the changes in the RGB values using the Alpha value.\par
-When ON, the process is also applied to the Alpha. There is no Mask.\par
-The default setting is ON.
+This option is valid only when there is an Alpha channel.\par
+When inactive, it masks the changes in the RGB values using the original Alpha\par 
+of the image.\par
+When active, the effect will be able to modify the Alpha channel, extending it\par 
+as necessary to reproduce the full span of the effect.\par
+The default setting is active.
 
 \end{document}

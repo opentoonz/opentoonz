@@ -1,4 +1,4 @@
-﻿<html lang="ja">
+<html lang="ja">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
       <title>Perspective Distort Fx Iwa</title>
@@ -7,10 +7,14 @@
 <h1><img src = ".\img\fx_iwa_perspective_distort.png" width = 30 height = 30 >   Perspective Distort Fx Iwa</h1>
 
 <h4>● Overview</h4>
-This effect is for generating the movement of the ground at the time of Follow (Front Moves Fast, Back Moves Slow = Motion Parallax).<br>
-Since the deformed trapezoid is stretching the picture to the left & right, there is no vertical distortion.<br>
-In other words, the contraction in the vertical direction by the depth must be incorporated in the pre-input image.<br>
-Also, if you want to apply this effect to the background to parallel move, the movement of the background must be folded into the SubXsheet.<br><br>
+Allows to generate a motion parallax movement effect on the Source image, where things in<br>
+front move faster than things in the back.<br>
+The image width is stretched to the sides, to transform it into a trapezoid, but it will not<br>
+be stretched vertically.<br>
+In other words, the contraction in the vertical direction caused by depth, should be<br>
+incorporated beforehand in the image.<br>
+Also, if you want to apply this effect to a moving background, the movement of the background<br>
+must be collapsed into a SubXsheet.<br><br>
 <img src = ".\img\perspective_distort.png">
 
 <h4>● Input Port</h4>
@@ -20,12 +24,16 @@ Also, if you want to apply this effect to the background to parallel move, the m
 
 <h4>● Parameters</h4>
 <UL>
-<LI><b>Vanishing Point</b> : The center point at the time of deformation. Used by perspective projection which is based around the vanishing point.</LI>
-<LI><b>Anchor Point</b> : The point that determines the criteria of the vertical position of the deformation. Pixels above this point will not be drawn (Becomes Transparent).<br>
-In addition, a picture with a horizontal line passing through this point, does not change in size.</LI>
-<LI><b>Precision</b> : Since the deformation is carried out only by expansion, the resolution will fall. In order to maximize the resolution of deterioration,<br>
-deform by calculating the input image in advance by a factor of this value with a finer resolution.<br>
-There is no sense to increase the Precision more than the value obtained by dividing the "Capture Resolution of Background" by the "Output Resolution".</LI>
+<LI><b>Vanishing Point</b> : The center point for the deformation. In the case of perspective<br>
+projection, this is the vanishing point.</LI>
+<LI><b>Anchor Point</b> : Defines the vertical position that will be the basis for the deformation.<br>
+Pixels above this point will not be drawn (become transparent).<br>
+It also defines the horizon line for the deformed image, maintaining the original image width.</LI>
+<LI><b>Precision</b> : Since the deformation is carried out only by expansion, the resolution will<br>
+suffer. In order to minimize resolution deterioration, the original image resolution is<br>
+multiplied by this value before being deformed.<br>
+There is no point in making Precision higher than the value obtained by dividing the<br>
+"Capture resolution of the background" by the "Output resolution".</LI>
 </UL>
 </body>
 

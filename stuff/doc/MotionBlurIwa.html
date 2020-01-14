@@ -1,4 +1,4 @@
-﻿<html lang="ja">
+<html lang="ja">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
       <title>MotionBlurFx Iwa</title>
@@ -7,36 +7,38 @@
 <h1><img src = ".\img\fx_iwa_motionblur.png" width = 30 height = 30 >   MotionBlurFx Iwa</h1>
 
 <h4>● Overview</h4>
-This effect is used in order to produce a motion blur.<br>
-If you specify a "before & after for the current frame, for the time you have the shutter open",<br>
-It is blurred in accordance with the trajectory of the intervening object.<br>
-iwa_BokehFx will convert the blur from the RGB value to the exposure value,<br>
-parts of the highlight will not impair the even blurred brightness.
+This effect generates motion blur.<br>
+If you specify "Time during which the shutter is open before and after the current frame",<br>
+the image will be blurred according to the object's path.<br>
+As with iwa_BokehFx, the RGB values are converted into an exposure value before blurring,<br>
+Therefore, even if the highlight part is blurred, the brightness is not impaired.
 
 <h4>● Input Port</h4>
 <UL>
-<LI><b>Source</b> : Connect to the input image.</LI>
+<LI><b>Source</b> : Connect the input image.</LI>
 </UL>
 <h4>● Parameters</h4>
 <img src = ".\img\motionblur.png">
 <UL>
 <LI><b>Reference Object, Index</b> : Specify the object to follow the movement.<br>
-If you specify "Own Motion", it can track the movement of the column of the input image.</LI>
-<LI><b>Shutter Start</b> : Specify the amount of time to open the shutter from before the current frame.<br>
-The unit is in frames. The higher the value, the bigger the blur will become.</LI>
-<LI><b>Start Value</b> : Specify the strength of the blur filter at the time of shutter release.</LI>
-<LI><b>Start Curve</b> : Specify how it will apply the blur from the shutter release until the current frame.<br>
-The default value is 1, blur filter changes to linear.</LI><br>
-<LI><b>Shutter End</b> : Specify the amount of time to close the shutter from after the current frame.<br>
-The unit is in frames. The higher the value, the bigger the blur will become.</LI>
-<LI><b>End Value</b> : Specify the strength of the blur filter at the time of the shutter closure.</LI>
-<LI><b>End Curve</b> : Specify how it will apply the blur from the current frame until the shutter closure.<br>
-The default value is 1, blur filter changes to linear.</LI><br>
-<LI><b>Trace Resolution</b> : While opening the shutter, to specify the granularity to track the trajectory of the object.<br>
-If this value is 1, & an object is moving on a curved path, the trajectory will become a straight line.</LI>
-<LI><b>Hardness</b> : Gamma value of the film. It is used to convert the RGB value & the amount of exposure. The higher the value, the higher it will be highlighted.</LI>
-<LI><b>Zanzo Mode</b> : When ON, instead of a smooth blur, the position will be followed by the granularity of "Trace Resolution",<br>
-drawing a residual image at intervals.</LI>
+When "Own Motion" is specified, the column movement of the input image is tracked.</LI>
+<LI><b>Shutter Start</b> : Specify how long before the current frame the shutter should be opened.<br>
+The unit is in frames. The higher the value, the bigger the blur.</LI>
+<LI><b>Start Value</b> : Specify the strength of the blur when the shutter is opened.</LI>
+<LI><b>Start Curve</b> : Specify how to apply the blur, from the time the shutter is opened up to<br>
+the current frame. The default value is 1, with it the blur changes linearly.</LI>
+<LI><b>Shutter End</b> : Specify how long after the current frame the shutter should be closed.<br>
+The unit is in frames. The higher the value, the bigger the blur.</LI>
+<LI><b>End Value</b> : Specify the strength of the blur when the shutter is closed.</LI>
+<LI><b>End Curve</b> : Specify how to apply the blur, from the current frame up to the time<br>
+the shutter is closed. The default value is 1, with it the blur changes linearly.</LI>
+<LI><b>Trace Resolution</b> : Defines how detailed will be the tracking of the object's trajectory,<br>
+while the shutter is open.<br>
+At 1, the blur trajectory will be a straight line, even if the object is moving along a curve.</LI>
+<LI><b>Hardness</b> : Gamma value of the film. It is used to convert the RGB values and exposure<br>
+amount. The higher the value, the brighter the effect.</LI>
+<LI><b>Afterimage Mode</b> : When active, instead of a smooth blur, an afterimage is drawn at the<br>
+position traced, using the detail set with the "Trace Resolution" parameter.</LI>
 </UL>
 </body>
 

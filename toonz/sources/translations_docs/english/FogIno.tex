@@ -17,43 +17,44 @@
 Fog Ino\medskip
 \par
 \normalsize
-It scatters light.\\
+It scatters light.\par
+Allows for the creation of light scattering effects in water, bath, fog, etc.,\par
+It aims at creating effects like fog and diffusion in optical filters, but it does\par 
+not actually simulate light.\\
 \par
-Used for bath water, and mist, etc.,\par
-A directional Light creates the appearance of the (Light Scattering) effect.\par
-The optical filter, and fog, such as diffusion\par
-can be aimed at by the effect, but it does not have to simulate the light.\\
+Each pixel, is affected by the shining of brighter nearby pixels.\par
+Effect from closer pixels will be stronger, while it will have a weaker impact from\par 
+distant pixels.\\
 \par
-Each pixel, is affected by the shining of a more bright surrounding pixel.\par
-More strongly from nearby pixels, it will have a weaker impact from distant pixels.\\
+When \textquotedbl Alpha Rendering\textquotedbl \ is active, Alpha channel will be processed first,\par
+then it will process all RGB pixels where the Alpha channel is not zero.\\
 \par
-First, \textquotedbl Alpha Rendering\textquotedbl \ processing starts if the Alpha channel is ON,\par
-next, it handles the RGB pixels when the Alpha channel is not zero.\\
-\par
-\textquotedbl Alpha Rendering\textquotedbl \ is not handled when the Alpha channel is OFF,\par
-it does not Mask changes in the RGB image, so you will get jaggies on the mask edge.\\
+When \textquotedbl Alpha Rendering\textquotedbl \ is inactive, Alpha channel will not be taken into account,\par
+so the RGB image changes will not be masked, causing jagged edges.\\
 \\
 -{-}- \ Inputs \ -{-}-\\
 Source\par
-Connect the image to process.\\
+Connect the image to be processed.\\
 \\
 -{-}- \ Settings \ -{-}-\\
 Radius\par
-The extent of which to scatter the light, specified by a circle radius.\par
+The extent to which scatter light, specified as a circle radius.\par
 The unit is millimeters.\par
 Specify a value greater than or equal to 0. The maximum is 100.\par
-When a Pixel is smaller than the width value, it is not affected, Fog will not be applied.\par
-A larger Radius will take more time to process.\par
+When the value is smaller than a pixel, no light will be scattered and fog will not\par 
+be applied.\par
+The larger the Radius, the longer it will take to process.\par
 The default value is 1.\\
 \\
 Curve\par
-The attenuation curve going towards the scattered light.\par
-Specify a value of 0.01 or more. The maximum is 100.\par
-The effect will be weaker on pixels further away,\par
-it represents the change in the Gamma curve.\par
-Brightness in the case of 1.0 is linear attenuated.\par
-The smaller the value the lower the brightness becomes (impact is reduced abruptly),\par
-a larger bulge will produce a higher brightness (impact is emphasized).\par
+The attenuation curve of scattered light.\par
+Specify a value greater than 0.01. The maximum is 100.\par
+The effect will be weaker on farther pixels,\par
+the change is represented by a Gamma curve.\par
+When the value is 1.0 brightness will be linearly attenuated.\par
+The smaller the value, the narrower the brightness becomes (the effects is reduced\par 
+more abruptly),\par
+The larger the value, the broader the brightness becomes (the effect is emphasized).\par
 The default value is 1.
 
 \newpage
@@ -63,41 +64,44 @@ The default value is 1.
 \ \vspace{-0.2em}
 \par
 \noindent Power\par
-Changes the strength to disperse the light.\par
+Changes the intesity of the light.\par
 Specify a value in the range 0 to 1.\par
-You can specify values above 1.0 up to a maximum 2.0, it will emphasize the light.\par
-The emphasis may be useful to emit light from a dark portion such as an ink line.\par
-When the value is 0.0 pixels will not be affected by the light, Fog will not be applied.\par
-You can specify values less than 0.0 down to a minimum of -2.0.\par
-Processing with this is not the scattering of light, it will be the scattering of darkness.\par
+It is possible to specify values above 1.0, up to a maximum 2.0, to emphasize the\par 
+light.\par
+Such an emphasis may prove useful to emit light from dark portions such as ink\par 
+lines.\par
+When the value is 0.0 light will not be scattered, and fog will not be applied.\par
+It is possible to specify negative values, down to a minimum of -2.0.\par
+In such a case there will be no light scattering, but darkness scattering.\par
 The default value is 1.\\
 \\
 Threshold Min\\
 Threshold Max\par
-Specify these values to get more brightness from the emitted Pixel light.\\
+Pixels with this luminosity value or higher will emit light.\\
 \par
-Affected by the brightness from a more bright Pixel, but in addition to that,\par
-using the Pixel value (\textquotedbl Threshold Min\textquotedbl ) can get even more brightness,\par
-to affect the current overall brightness.\par
-Brightness, is determined from the RGB Pixel value (of HLS) from the L value.\\
+In additionn to being affected by the brightness from brighter neraby pixels,\par
+pixels with values higher than (\textquotedbl Threshold Min\textquotedbl ) will emit light themselves.\par
+The brightness, will be determined by the L value (of HLS) of the pixels.\\
 \par
-The following range greater than or equal to 0.0 to 1.01 can be specified as values.\\
+Values specified can range from 0.0 to 1.01.\\
 \par
-If both values are 1.01 Fog will not be applied.\\
+If both values are set to 1.01, fog will not be applied.\\
 \par
-If \textquotedbl Threshold Max\textquotedbl \ is greater than \textquotedbl Threshold Min\textquotedbl ,\par
-it carries out smooth changes in fog by linear interpolation between Min and Max.\\
+When \textquotedbl Threshold Max\textquotedbl \ is greater than \textquotedbl Threshold Min\textquotedbl ,\par
+the fog intensity will change linearly from Min and Max.\\
 \par
-Reversing \textquotedbl Threshold Max\textquotedbl \ (which may be less than Min) but kept above 0,\par
-will suddenly emit light from pixels with \textquotedbl Threshold Min\textquotedbl \ or more of brightness.\par
-\textquotedbl Threshold Min\textquotedbl \ also produces full Fog if set to 0.\\
+By setting \textquotedbl Threshold Max\textquotedbl \ to zero (and less than Min),\par
+light will be emitted from pixels with a brightness of \textquotedbl Threshold Min\textquotedbl \ or more.\par
+Setting \textquotedbl Threshold Min\textquotedbl \ to 0 will produce a full fog.\\
 \par
-The default value is 0 for both.\\
+The default value is 0 for both parameters.\\
 \\
 Alpha Rendering\par
-Switch is only valid when there is an Alpha channel in the image.\par
-When OFF it does not do anything.\par
-When ON it will also process the Alpha channel.\par
-The default setting is OFF.
+This option is valid only when there is an Alpha channel.\par
+When inactive, it masks the changes in the RGB values using the original Alpha\par 
+of the image.\par
+When active, the effect will be able to modify the Alpha channel, extending it\par 
+as necessary to reproduce the full span of the effect.\par
+The default setting is inactive.
 
 \end{document}

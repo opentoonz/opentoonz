@@ -17,85 +17,73 @@
 HLS Add Ino\medskip
 \par
 \normalsize
-Add atmosphere (Noise) using values of the specified channel from reference image.\par
-Hue, Lightness, Saturation, and Alpha will change.\\
+Adds the values of the specified channel of the image connected to the Noise port,\par 
+to the Hue, Lightness, Saturation, or Alpha channels of the image connected\par
+to the Source port.\\
 \par
-The cell image tone, Hue, Lightness, Saturation, and Alpha will have added noise,\par
-use this to be able to adapt the background picture.\par
-When painting with the same image, the noise of each dot will be a single tone.\par
-Otherwise, the user can provide a reference image as noise,\par
-for calculating the noise component of the image, to determine the atmosphere.
-\\
-\par
-Since the processing for a still image is only two-dimensional, if you have the need\par
-for a three-dimensional video, another consideration, processing (?) Is required.\\
-\par
-The Alpha channel will determine the strength of the effect. Thus,\par
-masked edges of Alpha will retain their state if they are smooth.\\
+The specified channel of the image connected to the Reference port will determine\par
+the intensity of the effect.\\
 \\
 -{-}- \ Inputs \ -{-}-\\
 Source\par
-Connect the image to process.\\
+Connect the image to be processed.\\
 Noise\par
-Connect the image for adding the noise by the HLS value for each Pixel.\\
+Connect the image to be added to the source image.\\
 Reference\par
-Connect the reference image to put the strength of the effect into each Pixel.\\
+Connect the image for setting the intensity of the effect.\\
 \\
 -{-}- \ Settings \ -{-}-\\
 From RGBA\par
-Specify whether to use the channel for the (Noise) Reference image.\par
-Choose from one of the \textquotedbl Red\textquotedbl \ \textquotedbl Green\textquotedbl \ \textquotedbl Blue\textquotedbl \ \textquotedbl Alpha\textquotedbl \ channels.\par
+Specify which channel to use from the image connected to the Noise port.\par
+Choose from one of the \textquotedbl Red\textquotedbl, \ \textquotedbl Green\textquotedbl, \ \textquotedbl Blue\textquotedbl  \ or \textquotedbl Alpha\textquotedbl \ channels.\par
 The default value is \textquotedbl Red\textquotedbl .\\
 \\
 Offset\par
-The offset value for the Pixel value of the (Noise) Reference image.\par
-Choose a Pixel value (8 or 16bits) as a value away from zero, you can specify a value\par
-between -1.0 and 1.0.\par
-Pixel values do not change when the same value is specified here.\par
-Depending on the magnitude of the reference Pixel value, values will change.\par
+An offset for the original pixel values of the image connected to the Noise port.\par
+Pixel values for 8 or 16bits images are values ranging from 0 to 1,\par
+you can specify an offset between -1.0 and 1.0.\par
+When the pixel value is the same as the one specified here it will not change.\par
+The rest of the pixel values will change depending on their magnitudes.\par
 The default value is 0.5.\\
 \\
 Hue\par
-It specifies the intensity of the color (Hue) change.\par
-The value will scale with the Offset value.
-
+It specifies the intensity of the Hue change.\par
+The Hue value will scale around the Offset value.\par
+You can use a value from -1.0 to 1.0.\par
+The image Hue will not change when the value is 0.\par
+The default value is 0.0.\\
 \newpage
 
 \thispagestyle{empty}
 
 \ \vspace{-0.2em}
-\par
-You can use a value from -1.0 to 1.0.\par
-The image will not change when the value is 0.\par
-The default value is 0.0.\\
 \\
 Lightness\par
-Specify the strength of the brightness (Lightness) change.\par
+It specifies the intensity of the Lightness change.\par
 The default value is 0.25.\par
-Other options are the same as \textquotedbl Hue\textquotedbl .\\
+Other options are the same as for \textquotedbl Hue\textquotedbl .\\
 \\
 Saturation\par
-Specify the strength of the chroma (Saturation) change.\par
+It specifies the intensity of the Saturation change.\par
 The default value is 0.0.\par
-Other options are the same as \textquotedbl Hue\textquotedbl .\\
+Other options are the same as for \textquotedbl Hue\textquotedbl .\\
 \\
 Alpha\par
-Specify the strength of the opacity (Alpha) change.\par
+It specifies the intensity of the Alpha change.\par
 The default value is 0.0.\par
-Other options are the same as \textquotedbl Hue\textquotedbl .\\
+Other options are the same as for \textquotedbl Hue\textquotedbl .\\
 \\
 Premultiplied\par
-When ON, RGB is already set to Premultiply\par
-(The value of Alpha channel is multiplied in advance RGB channels)\par
-and processes as an image.\par
-At that time, and added to the Alpha processing, you may not get the correct image.\par
+When ON, the image will be processed as if having a Premultiplied Alpha channel\par 
+(Alpha value already multiplied by RGB channels).\par
+If image is not premultiplied, the image may not look correct.\par
 The default setting is ON.\\
 \\
 Reference\par
-Choose how Reference image values put the strength of the effect into each Pixel.\par
-An image is connected to the \textquotedbl Reference\textquotedbl \ of the input,\par
-Choose from Red/Green/Blue/Alpha/Luminance/Nothing.\par
-Choose Nothing when you do not want this effect, it will turn off the connection.\par
-The default setting is Red.
+Specify which channel to use from the image connected to the Reference port to\par 
+drive the intensity of the effect.\par
+Choose from Red/Green/Blue/Alpha/Luminance.\par
+Choose Nothing to disable the effect.\par
+The default value is \textquotedbl Red\textquotedbl .
 
 \end{document}

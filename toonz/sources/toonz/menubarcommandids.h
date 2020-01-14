@@ -369,6 +369,9 @@
 
 #define MI_ClearCacheFolder "MI_ClearCacheFolder"
 
+#define MI_VectorGuidedDrawing "MI_VectorGuidedDrawing"
+#define MI_OpenGuidedDrawingControls "MI_OpenGuidedDrawingControls"
+
 #define MI_SelectNextGuideStroke "MI_SelectNextGuideStroke"
 #define MI_SelectPrevGuideStroke "MI_SelectPrevGuideStroke"
 #define MI_SelectGuideStrokeReset "MI_SelectGuideStrokeReset"
@@ -376,6 +379,9 @@
 #define MI_TweenGuideStrokeToSelected "MI_TweenGuideStrokeToSelected"
 #define MI_SelectBothGuideStrokes "MI_SelectBothGuideStrokes"
 #define MI_SelectGuidesAndTweenMode "MI_SelectGuidesAndTweenMode"
+
+#define MI_FlipNextGuideStroke "MI_FlipNextGuideStroke"
+#define MI_FlipPrevGuideStroke "MI_FlipPrevGuideStroke"
 
 #define MI_ExportXDTS "MI_ExportXDTS"
 #endif
