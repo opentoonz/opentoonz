@@ -212,6 +212,16 @@ QCheckBox {
 ----------------------------------------------------------------------------- */
 
 .RadioButton {
+  color: @text-color;
+  &:hover {
+    color: @checkbox-text-color-hover;
+  }
+  &:checked {
+    color: @text-color;
+  }
+  &:disabled {
+    color: @text-color-disabled;
+  }
   padding: 0;
   margin: 0;
   &::indicator {
@@ -223,6 +233,9 @@ QCheckBox {
     image-position: center center;
     &:unchecked {
       image: url('@{img-url}/@{radiobutton-img-unchecked}');
+      &:hover {
+        image: url('@{img-url}/@{radiobutton-img-unchecked-hover}');
+      }
     }
     &:checked {
       image: url('@{img-url}/@{radiobutton-img-checked}');

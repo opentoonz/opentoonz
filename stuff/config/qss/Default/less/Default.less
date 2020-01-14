@@ -233,11 +233,11 @@
 @checkbox-border-color-hover: lighten(@bg, 50);
 @checkbox-text-color-hover: lighten(@text-color, 25);
 
-@checkbox-bg-color-checked: lighten(@bg, 35);
+@checkbox-bg-color-checked: @hl-bg-color;
 @checkbox-border-color-checked: darken(@checkbox-bg-color-checked, 0);
 
-@checkbox-bg-color-checked-hover: @checkbox-border-color-hover;
-@checkbox-border-color-checked-hover: @checkbox-bg-color-checked-hover;
+@checkbox-bg-color-checked-hover: @checkbox-bg-color-checked;
+@checkbox-border-color-checked-hover: @checkbox-border-color-hover;
 
 @checkbox-bg-color-disabled: @input-bg-color-disabled;
 @checkbox-border-color-disabled: @checkbox-bg-color-disabled;
@@ -247,6 +247,7 @@
 
 // For RadioButton
 @radiobutton-img-unchecked: 'radiobutton_unchecked.svg';
+@radiobutton-img-unchecked-hover: 'radiobutton_unchecked_hover.svg';
 @radiobutton-img-unchecked-disabled: 'radiobutton_unchecked_disabled.svg';
 
 @radiobutton-img-checked: 'radiobutton_checked.svg';

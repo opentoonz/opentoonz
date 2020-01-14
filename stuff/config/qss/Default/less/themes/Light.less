@@ -176,8 +176,8 @@
 @checkbox-bg-color: @button-bg-color;
 @checkbox-border-color: @button-border-color;
 
-@checkbox-bg-color-hover: lighten(@checkbox-bg-color, 10);
-@checkbox-border-color-hover: @checkbox-border-color;
+@checkbox-bg-color-hover: @checkbox-bg-color;
+@checkbox-border-color-hover: lighten(@bg, 50);
 @checkbox-text-color-hover: #fff;
 
 @checkbox-bg-color-checked: @button-bg-color-checked;
@@ -186,8 +186,8 @@
 @checkbox-bg-color-checked-hover: @checkbox-bg-color-checked;
 @checkbox-border-color-checked-hover: @checkbox-text-color-hover;
 
-@checkbox-bg-color-disabled: @button-bg-color-disabled;
-@checkbox-border-color-disabled: @button-border-color-disabled;
+@checkbox-bg-color-disabled: rgba(255, 255, 255, 0.11);
+@checkbox-border-color-disabled: rgba(0, 0, 0, 0.11);
 
 @checkbox-bg-color-checked-disabled: darken(@bg, 10);
 @checkbox-border-color-checked-disabled: darken(@bg, 15);
