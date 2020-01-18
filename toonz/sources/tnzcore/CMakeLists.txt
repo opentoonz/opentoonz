@@ -269,7 +269,7 @@ qt5_wrap_cpp(SOURCES ${MOC_HEADERS})
 add_library(tnzcore SHARED ${HEADERS} ${SOURCES})
 
 if(BUILD_ENV_APPLE)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-install_name,@rpath/libtnzcore.dylib")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-install_name,@rpath/libtnzcore.dylib")
 endif()
 
 add_definitions(
