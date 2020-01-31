@@ -107,7 +107,6 @@ const unsigned short TFileStatus::IfDir = _S_IFDIR;
 #define STAT _stat
 #define UTIME _utime
 #define FTIME _ftime
-using std::filebuf;
 #else  // these are common for IRIX & LINUX
 const int TSystem::MaxPathLen     = MAXPATHLEN;
 const int TSystem::MaxHostNameLen = MAXHOSTNAMELEN;
