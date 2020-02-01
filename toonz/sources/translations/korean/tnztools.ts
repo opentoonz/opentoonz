@@ -1479,6 +1479,113 @@ moved to the end of the first page of the palette.</source>
     </message>
 </context>
 <context>
+    <name>ToonzVectorBrushTool</name>
+    <message>
+        <source>Size</source>
+        <translation>크기</translation>
+    </message>
+    <message>
+        <source>Accuracy:</source>
+        <translation>정확도:</translation>
+    </message>
+    <message>
+        <source>Smooth:</source>
+        <translation>부드러운:</translation>
+    </message>
+    <message>
+        <source>Preset:</source>
+        <translation>사전설정:</translation>
+    </message>
+    <message>
+        <source>&lt;custom&gt;</source>
+        <translation>&lt;사용자 정의&gt;</translation>
+    </message>
+    <message>
+        <source>Break</source>
+        <translation>분리</translation>
+    </message>
+    <message>
+        <source>Pressure</source>
+        <translation>압력</translation>
+    </message>
+    <message>
+        <source>Cap</source>
+        <translation>캡</translation>
+    </message>
+    <message>
+        <source>Join</source>
+        <translation>결합</translation>
+    </message>
+    <message>
+        <source>Miter:</source>
+        <translation>마이터:</translation>
+    </message>
+    <message>
+        <source>Range:</source>
+        <translation>범위:</translation>
+    </message>
+    <message>
+        <source>Snap</source>
+        <translation>스냅</translation>
+    </message>
+    <message>
+        <source>Off</source>
+        <translation>끄기</translation>
+    </message>
+    <message>
+        <source>Linear</source>
+        <translation>선형</translation>
+    </message>
+    <message>
+        <source>In</source>
+        <translation>가속</translation>
+    </message>
+    <message>
+        <source>Out</source>
+        <translation>감속</translation>
+    </message>
+    <message>
+        <source>In&amp;Out</source>
+        <translation>가속&amp;감속</translation>
+    </message>
+    <message>
+        <source>Low</source>
+        <translation>낮은</translation>
+    </message>
+    <message>
+        <source>Med</source>
+        <translation>중간</translation>
+    </message>
+    <message>
+        <source>High</source>
+        <translation>높은</translation>
+    </message>
+    <message>
+        <source>Butt cap</source>
+        <translation>버트 캡</translation>
+    </message>
+    <message>
+        <source>Round cap</source>
+        <translation>라운드 캡</translation>
+    </message>
+    <message>
+        <source>Projecting cap</source>
+        <translation>돌출선 끝</translation>
+    </message>
+    <message>
+        <source>Miter join</source>
+        <translation>마이터 결합</translation>
+    </message>
+    <message>
+        <source>Round join</source>
+        <translation>라운드 결합</translation>
+    </message>
+    <message>
+        <source>Bevel join</source>
+        <translation>베벨 결합</translation>
+    </message>
+</context>
+<context>
     <name>TrackerTool</name>
     <message>
         <source>Width:</source>

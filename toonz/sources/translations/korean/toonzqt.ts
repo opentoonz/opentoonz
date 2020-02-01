@@ -435,11 +435,11 @@ Possibly the preset file has been corrupted</source>
     <name>EaseInOutSegmentPage</name>
     <message>
         <source>Ease In:</source>
-        <translation>이지 인:</translation>
+        <translation>서서히 멈춤:</translation>
     </message>
     <message>
         <source>Ease Out:</source>
-        <translation>이지 아웃:</translation>
+        <translation>서서히 시작:</translation>
     </message>
 </context>
 <context>
@@ -759,11 +759,11 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>Ease In / Ease Out Interpolation</source>
-        <translation>이즈 인/이즈 아웃 보간</translation>
+        <translation>서서히 멈춤/서서히 시작 보간</translation>
     </message>
     <message>
         <source>Ease In / Ease Out (%) Interpolation</source>
-        <translation>이즈 인/이즈 아웃(%)보간</translation>
+        <translation>서서히 멈춤/서서히 시작(%)보간</translation>
     </message>
     <message>
         <source>Exponential Interpolation</source>
@@ -834,11 +834,11 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>Ease In / Ease Out</source>
-        <translation>이즈 인/이즈 아웃</translation>
+        <translation>서서히 멈춤/서서히 시작</translation>
     </message>
     <message>
         <source>Ease In / Ease Out %</source>
-        <translation>이즈 인/이즈 아웃 %</translation>
+        <translation>서서히 멈춤/서서히 시작 %</translation>
     </message>
     <message>
         <source>Exponential</source>
@@ -955,11 +955,11 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>Ease In / Ease Out Interpolation</source>
-        <translation>이즈 인/이즈 아웃 보간</translation>
+        <translation>서서히 멈춤/서서히 시작 보간</translation>
     </message>
     <message>
         <source>Ease In / Ease Out (%) Interpolation</source>
-        <translation>이즈 인/이즈 아웃(%)보간</translation>
+        <translation>서서히 멈춤/서서히 시작(%)보간</translation>
     </message>
     <message>
         <source>Exponential Interpolation</source>
@@ -2145,6 +2145,26 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     <message>
         <source>That is a reserved file name and cannot be used.</source>
         <translation>이것은 예약 된 파일 이름이며 사용할 수 없습니다.</translation>
+    </message>
+    <message>
+        <source>There are no unused styles.</source>
+        <translation>사용하지 않는 스타일이 없습니다.</translation>
+    </message>
+    <message>
+        <source>and %1 more styles.</source>
+        <translation>그리고 % 1 더 많은 스타일.</translation>
+    </message>
+    <message>
+        <source>Erasing unused styles with following indices. Are you sure?
+
+%1</source>
+        <translation>다음 지수로 사용하지 않는 스타일을 지 웁니다. 확실합니까?
+
+%1</translation>
+    </message>
+    <message>
+        <source>Erase</source>
+        <translation>삭제</translation>
     </message>
 </context>
 <context>

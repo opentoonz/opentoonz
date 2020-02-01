@@ -2463,15 +2463,15 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Ease In</source>
-        <translation>서서히 움직임</translation>
-    </message>
-    <message>
-        <source>Ease Out</source>
         <translation>서서히 멈춤</translation>
     </message>
     <message>
+        <source>Ease Out</source>
+        <translation>서서히 시작</translation>
+    </message>
+    <message>
         <source>Ease In / Ease Out</source>
-        <translation>이즈 인/이즈 아웃</translation>
+        <translation>서서히 멈춤/서서히 시작</translation>
     </message>
     <message>
         <source>Interpolation:</source>
@@ -4622,11 +4622,11 @@ Please use the frame numbers for reference.</source>
     </message>
     <message>
         <source>Ease In / Ease Out Interpolation</source>
-        <translation>이즈 인/이즈 아웃 보간</translation>
+        <translation>서서히 멈춤/서서히 시작 보간</translation>
     </message>
     <message>
         <source>Ease In / Ease Out (%) Interpolation</source>
-        <translation>이즈 인/이즈 아웃(%)보간</translation>
+        <translation>서서히 멈춤/서서히 시작(%)보간</translation>
     </message>
     <message>
         <source>Exponential Interpolation</source>
@@ -7028,11 +7028,11 @@ if both are possible on coding file path.</source>
     </message>
     <message>
         <source>Ease In / Ease Out</source>
-        <translation>이즈 인/이즈 아웃</translation>
+        <translation>서서히 멈춤/서서히 시작</translation>
     </message>
     <message>
         <source>Ease In / Ease Out %</source>
-        <translation>이즈 인/이즈 아웃 %</translation>
+        <translation>서서히 멈춤/서서히 시작 %</translation>
     </message>
     <message>
         <source>Exponential</source>
@@ -9604,6 +9604,18 @@ Do you want to create it?</source>
         <source>Close</source>
         <translation>닫기</translation>
     </message>
+    <message>
+        <source>No columns can be exported.</source>
+        <translation>열을 내보낼 수 없습니다.</translation>
+    </message>
+    <message>
+        <source>Export Exchange Digital Time Sheet (XDTS)</source>
+        <translation>타임시트 교환 내보내기(XDTS)</translation>
+    </message>
+    <message>
+        <source>Script file %1 does not exists.</source>
+        <translation>스크립트 파일 % 1이 (가) 없습니다.</translation>
+    </message>
 </context>
 <context>
     <name>ReframePopup</name>
@@ -10905,15 +10917,15 @@ Please commit or revert changes first.</source>
     </message>
     <message>
         <source>Ease In Interpolation</source>
-        <translation>간편한 가속</translation>
+        <translation>서서히 멈춤 보간</translation>
     </message>
     <message>
         <source>Ease Out Interpolation</source>
-        <translation>간편한 감속</translation>
+        <translation>서서히 시작 보간</translation>
     </message>
     <message>
         <source>Ease In/Out Interpolation</source>
-        <translation>간편한 가속/감속</translation>
+        <translation>서서히 멈춤/시작 보간</translation>
     </message>
 </context>
 <context>
@@ -11898,7 +11910,7 @@ WARNING : Image size mismatch. The size of level with the same path is %1 x %2.<
     </message>
     <message>
         <source>Webcam Settings...</source>
-        <translation>웹캡세팅...</translation>
+        <translation>웹캠세팅...</translation>
     </message>
     <message>
         <source>Capture</source>
@@ -12046,7 +12058,7 @@ WARNING : Image size mismatch. The size of level with the same path is %1 x %2.<
     </message>
     <message>
         <source>Webcam Options</source>
-        <translation>웹캡 옵션</translation>
+        <translation>웹캠옵션</translation>
     </message>
     <message>
         <source>DSLR Options</source>
@@ -12620,15 +12632,15 @@ WARNING : Image size mismatch. The size of level with the same path is %1 x %2.<
     </message>
     <message>
         <source>Ease In</source>
-        <translation>서서히 움직임</translation>
-    </message>
-    <message>
-        <source>Ease Out</source>
         <translation>서서히 멈춤</translation>
     </message>
     <message>
+        <source>Ease Out</source>
+        <translation>서서히 시작</translation>
+    </message>
+    <message>
         <source>EaseIn/Out</source>
-        <translation>쉬운 가속/감속</translation>
+        <translation>서서히 멈춤/시작</translation>
     </message>
     <message>
         <source>Previous</source>
