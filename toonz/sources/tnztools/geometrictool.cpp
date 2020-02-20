@@ -476,11 +476,11 @@ public:
   virtual void onActivate(){};
   virtual void onDeactivate(){};
   virtual void onImageChanged(){};
-  TPointD calculateSnap(TPointD pos);
+  TPointD calculateSnap(TPointD pos, bool ctrlPressed);
   void drawSnap();
   TPointD getSnap(TPointD pos);
   void resetSnap();
-  TPointD checkGuideSnapping(TPointD pos);
+  TPointD checkGuideSnapping(TPointD pos, bool ctrlPressed);
 
   virtual TStroke *makeStroke() const = 0;
 };
@@ -495,12 +495,12 @@ void Primitive::resetSnap() {
 
 //-----------------------------------------------------------------------------
 
-TPointD Primitive::calculateSnap(TPointD pos) {
+TPointD Primitive::calculateSnap(TPointD pos, bool ctrlPressed) {
   m_param->m_foundSnap = false;
   if (Preferences::instance()->getVectorSnappingTarget() == 1) return pos;
   TVectorImageP vi(TTool::getImage(false));
   TPointD snapPoint = pos;
-  if (vi && m_param->m_snap.getValue()) {
+  if (vi && (m_param->m_snap.getValue() != ctrlPressed)) {
     double minDistance2     = m_param->m_minDistance2;
     m_param->m_strokeIndex1 = -1;
 
@@ -1189,26 +1189,25 @@ GeometricTool GeometricRasterFullColorTool(TTool::RasterImage |
 
 void Primitive::drawSnap() {
   // snapping
-  if ((m_param->m_targetType & TTool::Vectors) && m_param->m_snap.getValue()) {
+  if ((m_param->m_targetType & TTool::Vectors) && m_param->m_foundSnap) {
     m_param->m_pixelSize = m_tool->getPixelSize();
     double thick         = 6.0 * m_param->m_pixelSize;
-    if (m_param->m_foundSnap) {
-      tglColor(TPixelD(0.1, 0.9, 0.1));
-      tglDrawCircle(m_param->m_snapPoint, thick);
-    }
+    tglColor(TPixelD(0.1, 0.9, 0.1));
+    tglDrawCircle(m_param->m_snapPoint, thick);
   }
 }
 
 //-------------------------------------------------------------------------------------------------------------
 
-TPointD Primitive::checkGuideSnapping(TPointD pos) {
+TPointD Primitive::checkGuideSnapping(TPointD pos, bool ctrlPressed) {
   if (Preferences::instance()->getVectorSnappingTarget() == 0) {
     if (m_param->m_foundSnap)
       return m_param->m_snapPoint;
     else
       return pos;
   }
-  if ((m_param->m_targetType & TTool::Vectors) && m_param->m_snap.getValue()) {
+  if ((m_param->m_targetType & TTool::Vectors) &&
+      (m_param->m_snap.getValue() != ctrlPressed)) {
     int vGuideCount = 0, hGuideCount = 0;
     double guideDistance  = sqrt(m_param->m_minDistance2);
     TTool::Viewer *viewer = m_tool->getViewer();
@@ -1340,8 +1339,8 @@ void RectanglePrimitive::leftButtonDrag(const TPointD &realPos,
     pos.y = (realPos.y > m_startPoint.y) ? m_startPoint.y + distance
                                          : m_startPoint.y - distance;
   } else {
-    pos = calculateSnap(realPos);
-    pos = checkGuideSnapping(realPos);
+    pos = calculateSnap(realPos, e.isCtrlPressed());
+    pos = checkGuideSnapping(realPos, e.isCtrlPressed());
   }
 
   if (m_param->m_pencil.getValue() &&
@@ -1440,8 +1439,8 @@ void RectanglePrimitive::leftButtonUp(const TPointD &pos, const TMouseEvent &) {
 //-----------------------------------------------------------------------------
 
 void RectanglePrimitive::mouseMove(const TPointD &pos, const TMouseEvent &e) {
-  TPointD newPos = calculateSnap(pos);
-  newPos         = checkGuideSnapping(pos);
+  TPointD newPos = calculateSnap(pos, e.isCtrlPressed());
+  newPos         = checkGuideSnapping(pos, e.isCtrlPressed());
   m_pos          = newPos;
   m_tool->invalidate();
 }
@@ -1504,8 +1503,8 @@ void CirclePrimitive::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
   if (!m_isEditing) return;
 
   m_pos    = pos;
-  m_pos    = calculateSnap(pos);
-  m_pos    = checkGuideSnapping(pos);
+  m_pos    = calculateSnap(pos, e.isCtrlPressed());
+  m_pos    = checkGuideSnapping(pos, e.isCtrlPressed());
   m_radius = tdistance(m_centre, m_pos);
 }
 
@@ -1529,8 +1528,8 @@ void CirclePrimitive::leftButtonUp(const TPointD &pos, const TMouseEvent &) {
 //-----------------------------------------------------------------------------
 
 void CirclePrimitive::mouseMove(const TPointD &pos, const TMouseEvent &e) {
-  m_pos = calculateSnap(pos);
-  m_pos = checkGuideSnapping(pos);
+  m_pos = calculateSnap(pos, e.isCtrlPressed());
+  m_pos = checkGuideSnapping(pos, e.isCtrlPressed());
   m_tool->invalidate();
 }
 
@@ -1774,8 +1773,8 @@ void MultiLinePrimitive::leftButtonUp(const TPointD &pos, const TMouseEvent &) {
 void MultiLinePrimitive::mouseMove(const TPointD &pos, const TMouseEvent &e) {
   m_ctrlDown = e.isCtrlPressed();
   TPointD newPos;
-  newPos = calculateSnap(pos);
-  newPos = checkGuideSnapping(pos);
+  newPos = calculateSnap(pos, e.isCtrlPressed());
+  newPos = checkGuideSnapping(pos, e.isCtrlPressed());
 
   if (m_isEditing) {
     if (e.isShiftPressed() && !m_vertex.empty())
@@ -1922,8 +1921,8 @@ void LinePrimitive::draw() {
 //-----------------------------------------------------------------------------
 
 void LinePrimitive::mouseMove(const TPointD &pos, const TMouseEvent &e) {
-  TPointD newPos = calculateSnap(pos);
-  newPos         = checkGuideSnapping(pos);
+  TPointD newPos = calculateSnap(pos, e.isCtrlPressed());
+  newPos         = checkGuideSnapping(pos, e.isCtrlPressed());
   m_tool->invalidate();
 }
 
@@ -1979,8 +1978,8 @@ void LinePrimitive::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
 
 void LinePrimitive::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
   if (!m_isEditing) return;
-  TPointD newPos = calculateSnap(pos);
-  newPos         = checkGuideSnapping(pos);
+  TPointD newPos = calculateSnap(pos, e.isCtrlPressed());
+  newPos         = checkGuideSnapping(pos, e.isCtrlPressed());
 
   m_mousePosition = newPos;
 }
@@ -2068,8 +2067,8 @@ void EllipsePrimitive::leftButtonDrag(const TPointD &realPos,
     pos.y = (realPos.y > m_startPoint.y) ? m_startPoint.y + distance
                                          : m_startPoint.y - distance;
   } else {
-    pos = calculateSnap(realPos);
-    pos = checkGuideSnapping(realPos);
+    pos = calculateSnap(realPos, e.isCtrlPressed());
+    pos = checkGuideSnapping(realPos, e.isCtrlPressed());
   }
   m_pos = pos;
 
@@ -2111,8 +2110,8 @@ void EllipsePrimitive::leftButtonUp(const TPointD &pos, const TMouseEvent &) {
 //-----------------------------------------------------------------------------
 
 void EllipsePrimitive::mouseMove(const TPointD &pos, const TMouseEvent &e) {
-  m_pos = calculateSnap(pos);
-  m_pos = checkGuideSnapping(pos);
+  m_pos = calculateSnap(pos, e.isCtrlPressed());
+  m_pos = checkGuideSnapping(pos, e.isCtrlPressed());
   m_tool->invalidate();
 }
 
@@ -2228,8 +2227,8 @@ void ArcPrimitive::leftButtonUp(const TPointD &pos, const TMouseEvent &) {
 //-----------------------------------------------------------------------------
 
 void ArcPrimitive::mouseMove(const TPointD &pos, const TMouseEvent &e) {
-  TPointD newPos = calculateSnap(pos);
-  newPos         = checkGuideSnapping(pos);
+  TPointD newPos = calculateSnap(pos, e.isCtrlPressed());
+  newPos         = checkGuideSnapping(pos, e.isCtrlPressed());
 
   switch (m_clickNumber) {
   case 1:
@@ -2334,8 +2333,8 @@ void PolygonPrimitive::leftButtonDown(const TPointD &pos, const TMouseEvent &) {
 void PolygonPrimitive::leftButtonDrag(const TPointD &pos,
                                       const TMouseEvent &e) {
   if (!m_isEditing) return;
-  TPointD newPos = calculateSnap(pos);
-  newPos         = checkGuideSnapping(pos);
+  TPointD newPos = calculateSnap(pos, e.isCtrlPressed());
+  newPos         = checkGuideSnapping(pos, e.isCtrlPressed());
   m_radius       = tdistance(m_centre, newPos);
 }
 
@@ -2405,7 +2404,7 @@ void PolygonPrimitive::leftButtonUp(const TPointD &pos, const TMouseEvent &) {
 //-----------------------------------------------------------------------------
 
 void PolygonPrimitive::mouseMove(const TPointD &pos, const TMouseEvent &e) {
-  TPointD newPos = calculateSnap(pos);
-  newPos         = checkGuideSnapping(pos);
+  TPointD newPos = calculateSnap(pos, e.isCtrlPressed());
+  newPos         = checkGuideSnapping(pos, e.isCtrlPressed());
   m_tool->invalidate();
 }

@@ -217,7 +217,7 @@ public:
   // returns true if the pressed key is recognized and processed.
   bool isEventAcceptable(QEvent *e) override;
 
-  TPointD calculateSnap(TPointD pos);
+  TPointD calculateSnap(TPointD pos, bool ctrlPressed);
   void drawSnap();
   TPointD getSnap(TPointD pos);
   void resetSnap();
@@ -226,11 +226,11 @@ public:
 
 //-----------------------------------------------------------------------------
 
-TPointD ControlPointEditorTool::calculateSnap(TPointD pos) {
+TPointD ControlPointEditorTool::calculateSnap(TPointD pos, bool ctrlPressed) {
   m_foundSnap = false;
   TVectorImageP vi(TTool::getImage(false));
   TPointD snapPoint = pos;
-  if (vi && m_snap.getValue()) {
+  if (vi && (m_snap.getValue() != ctrlPressed)) {
     double minDistance = m_snapMinDistance;
 
     int i, strokeNumber = vi->getStrokeCount();
@@ -777,7 +777,7 @@ void ControlPointEditorTool::leftButtonDrag(const TPointD &pos,
 
       cp = m_controlPointEditorStroke.getControlPoint(m_lastPointSelected);
       controlPoint = TPointD(cp.x, cp.y);
-      newPos       = calculateSnap(pos);
+      newPos       = calculateSnap(pos, e.isCtrlPressed());
       delta        = newPos - m_pos + (m_pos - controlPoint);
     }
 
