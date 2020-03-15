@@ -25,6 +25,7 @@
 using namespace ToolUtils;
 
 TEnv::IntVar SnapAtIntersection("CutterToolSnapAtIntersection", 0);
+TEnv::IntVar AutoDelete("CutterToolAutoDelete", 0);
 
 //=============================================================================
 namespace {
@@ -166,15 +167,20 @@ public:
 
   TPropertyGroup m_prop;
   TBoolProperty m_snapAtIntersection;
+  TBoolProperty m_autoDelete;
 
   CutterTool()
       : TTool("T_Cutter")
       , m_mouseDown(false)
       , m_cursorId(ToolCursor::CutterCursor)
-      , m_snapAtIntersection("Snap At Intersection", false) {
+      , m_snapAtIntersection("Snap At Intersection", false)
+      , m_autoDelete("Auto delete", false) {
     bind(TTool::VectorImage);
     m_prop.bind(m_snapAtIntersection);
+    m_prop.bind(m_autoDelete);
+
     m_snapAtIntersection.setId("Snap");
+    m_autoDelete.setId("AutoDelete");
   }
 
   ToolType getToolType() const override { return TTool::LevelWriteTool; }
@@ -428,6 +434,7 @@ public:
 
   void onActivate() override {
     m_snapAtIntersection.setValue(SnapAtIntersection ? 1 : 0);
+    m_autoDelete.setValue(AutoDelete ? 1 : 0);
   }
   void onEnter() override {
     if ((TVectorImageP)getImage(false))
@@ -444,12 +451,19 @@ public:
 
   void updateTranslation() override {
     m_snapAtIntersection.setQStringName(QObject::tr("Snap At Intersection"));
+    m_autoDelete.setQStringName(QObject::tr("Auto Delete"));
   }
 
   TPropertyGroup *getProperties(int targetType) override { return &m_prop; }
 
   bool onPropertyChanged(std::string propertyName) override {
+    if (propertyName == m_snapAtIntersection.getName()) {
+      if (!m_snapAtIntersection.getValue()) m_autoDelete.setValue(false);
+    } else if (propertyName == m_autoDelete.getName()) {
+      if (m_autoDelete.getValue()) m_snapAtIntersection.setValue(true);
+    }
     SnapAtIntersection = (int)(m_snapAtIntersection.getValue());
+    AutoDelete         = (int)(m_autoDelete.getValue());
     return true;
   }
 
