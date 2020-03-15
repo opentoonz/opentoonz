@@ -324,6 +324,7 @@ public:
     if (vi->getNearestStroke(pos, pW, strokeIndex, dist) && pW >= 0 &&
         pW <= 1) {
       double w;
+      double snapW;
 
       strokeRef = vi->getStroke(strokeIndex);
 
@@ -350,21 +351,29 @@ public:
         w = strokeRef->getParameterAtLength(len);
       }
 
+      snapW = w;
       if (m_snapAtIntersection.getValue()) {
-        w = getNearestSnapAtIntersection(strokeRef, w);
+        snapW = getNearestSnapAtIntersection(strokeRef, w);
       }
 
       std::vector<DoublePair> *sortedWRanges = new std::vector<DoublePair>;
 
       if (strokeRef->isSelfLoop()) {
-        sortedWRanges->push_back(std::make_pair(0, w));
-        sortedWRanges->push_back(std::make_pair(w, 1));
+        sortedWRanges->push_back(std::make_pair(0, snapW));
+        sortedWRanges->push_back(std::make_pair(snapW, 1));
       } else {
-        if (w == 0 || w == 1)
+        if (snapW == 0 || snapW == 1)
           sortedWRanges->push_back(std::make_pair(0, 1));
         else {
-          sortedWRanges->push_back(std::make_pair(0, w));
-          sortedWRanges->push_back(std::make_pair(w, 1));
+          if (snapW != w && m_autoDelete.getValue()) {
+            if (snapW < w)
+              sortedWRanges->push_back(std::make_pair(0, snapW));
+            else
+              sortedWRanges->push_back(std::make_pair(snapW, 1));
+          } else {
+            sortedWRanges->push_back(std::make_pair(0, snapW));
+            sortedWRanges->push_back(std::make_pair(snapW, 1));
+          }
         }
       }
 
