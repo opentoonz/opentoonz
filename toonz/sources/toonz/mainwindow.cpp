@@ -1764,19 +1764,19 @@ void MainWindow::defineActions() {
   QAction *openChildAction =
       createMenuXsheetAction(MI_OpenChild, tr("&Open Sub-xsheet"), "");
   openChildAction->setIconText("Open Sub-XSheet");
-  openChildAction->setIcon(createQIconOnOffPNG("sub_enter"));
+  openChildAction->setIcon(createQIconOnOff(":Resources/sub_enter"));
 
   QAction *closeChildAction =
       createMenuXsheetAction(MI_CloseChild, tr("&Close Sub-xsheet"), "");
   closeChildAction->setIconText("Close Sub-XSheet");
-  closeChildAction->setIcon(createQIconOnOffPNG("sub_leave"));
+  closeChildAction->setIcon(createQIconOnOff(":Resources/sub_leave"));
 
   createMenuXsheetAction(MI_ExplodeChild, tr("Explode Sub-xsheet"), "");
 
   QAction *collapseAction =
       createMenuXsheetAction(MI_Collapse, tr("Collapse"), "");
   collapseAction->setIconText("Collapse");
-  collapseAction->setIcon(createQIconOnOffPNG("collapse"));
+  collapseAction->setIcon(createQIconOnOff(":Resources/collapse"));
 
   toggle = createToggle(MI_ToggleEditInPlace, tr("&Toggle Edit In Place"), "",
                         EditInPlaceToggleAction ? 1 : 0, MenuXsheetCommandType);
@@ -1821,7 +1821,7 @@ void MainWindow::defineActions() {
 
   QAction *repeatAction = createMenuCellsAction(MI_Dup, tr("&Repeat..."), "");
   repeatAction->setIconText("Repeat");
-  repeatAction->setIcon(createQIconOnOffPNG("repeat_icon"));
+  repeatAction->setIcon(createQIconOnOff(":Resources/repeat_icon"));
 
   createMenuCellsAction(MI_ResetStep, tr("&Reset Step"), "");
   createMenuCellsAction(MI_IncreaseStep, tr("&Increase Step"), "'");
