@@ -33,3 +33,6 @@ ipch/
 *.creator
 *.files
 *.includes
+
+#macOS
+.DS_Store
