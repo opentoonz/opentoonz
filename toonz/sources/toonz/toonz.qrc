@@ -57,9 +57,9 @@
         <file>Resources/clone.svg</file>
         <file>Resources/pane_close.svg</file>
         <file>Resources/pane_close_rollover.svg</file>
-        <file>Resources/collapse.png</file>
-        <file>Resources/collapse_click.png</file>
-        <file>Resources/collapse_over.png</file>
+        <file>Resources/collapse.svg</file>
+        <file>Resources/collapse_click.svg</file>
+        <file>Resources/collapse_over.svg</file>
         <file>Resources/controlpointeditor.svg</file>
         <file>Resources/controlpointeditor_rollover.svg</file>
         <file>Resources/compare.svg</file>
@@ -216,9 +216,9 @@
         <file>Resources/render_done_with_errors.svg</file>
         <file>Resources/render_computing.svg</file>
         <file>Resources/render_suspended.svg</file>
-        <file>Resources/repeat_icon.png</file>
-        <file>Resources/repeat_icon_click.png</file>
-        <file>Resources/repeat_icon_over.png</file>
+        <file>Resources/repeat_icon.svg</file>
+        <file>Resources/repeat_icon_click.svg</file>
+        <file>Resources/repeat_icon_over.svg</file>
         <file>Resources/resizeColumnNode.svg</file>
         <file>Resources/rightTitle_inactive.png</file>
         <file>Resources/rightTitle.png</file>
@@ -278,12 +278,12 @@
         <file>Resources/sub2.png</file>
         <file>Resources/sub3.png</file>
         <file>Resources/sub4.png</file>
-        <file>Resources/sub_enter.png</file>
-        <file>Resources/sub_enter_over.png</file>
-        <file>Resources/sub_enter_click.png</file>
-        <file>Resources/sub_leave.png</file>
-        <file>Resources/sub_leave_over.png</file>
-        <file>Resources/sub_leave_click.png</file>
+        <file>Resources/sub_enter.svg</file>
+        <file>Resources/sub_enter_over.svg</file>
+        <file>Resources/sub_enter_click.svg</file>
+        <file>Resources/sub_leave.svg</file>
+        <file>Resources/sub_leave_over.svg</file>
+        <file>Resources/sub_leave_click.svg</file>
         <file>Resources/swap_off.svg</file>
         <file>Resources/swap_on.svg</file>
         <file>Resources/svg.svg</file>
@@ -301,7 +301,7 @@
         <file>Resources/toggle_audibility_click.png</file>
         <file>Resources/toggle_audibility_over.png</file>
         <file>Resources/toggle_lock.png</file>
-        <file>Resources/toolbar_arrow.png</file>
+        <file>Resources/toolbar_arrow.svg</file>
         <file>Resources/touch.svg</file>
         <file>Resources/tracker.svg</file>
         <file>Resources/tracker_rollover.svg</file>
