@@ -8450,6 +8450,11 @@ Is it OK to release these shortcuts?</source>
         <translation>Использовать средство просмотра по умолчанию для форматов видео</translation>
     </message>
     <message>
+        <location filename="../../toonz/preferencespopup.cpp" line="924"/>
+        <source>Minimize Raster Memory Fragmentation*</source>
+        <translation>Минимизировать фрагментацию памяти в растре*</translation>
+    </message>
+    <message>
         <location filename="../../toonz/preferencespopup.cpp" line="925"/>
         <source>Save Automatically</source>
         <translation>Сохранять автоматически</translation>
