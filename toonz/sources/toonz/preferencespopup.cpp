@@ -909,7 +909,7 @@ void PreferencesPopup::insertDualUIs(
 
 void PreferencesPopup::insertFootNote(QGridLayout* layout) {
   QLabel* note =
-      new QLabel(tr("* Changes will take effect the next time you run Toonz"));
+      new QLabel(tr("* Changes will take effect the next time you run OpenToonz"));
   note->setStyleSheet("font-size: 10px; font: italic;");
   layout->addWidget(note, layout->rowCount(), 0, 1, 2,
                     Qt::AlignLeft | Qt::AlignVCenter);
@@ -921,9 +921,9 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
   const static QMap<PreferencesItemId, QString> uiStringTable = {
       // General
       {defaultViewerEnabled, tr("Use Default Viewer for Movie Formats")},
-      {rasterOptimizedMemory, tr("Minimize Raster Memory Fragmentation *")},
+      {rasterOptimizedMemory, tr("Minimize Raster Memory Fragmentation*")},
       {autosaveEnabled, tr("Save Automatically")},
-      {autosavePeriod, tr("Interval(Minutes): ")},
+      {autosavePeriod, tr("Interval (Minutes):")},
       {autosaveSceneEnabled, tr("Automatically Save the Scene File")},
       {autosaveOtherFilesEnabled, tr("Automatically Save Non-Scene Files")},
       {startupPopupEnabled, tr("Show Startup Window when OpenToonz Starts")},
@@ -932,12 +932,12 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
       {replaceAfterSaveLevelAs,
        tr("Replace Toonz Level after SaveLevelAs command")},
       {backupEnabled, tr("Backup Scene and Animation Levels when Saving")},
-      {backupKeepCount, tr("# of backups to keep: ")},
+      {backupKeepCount, tr("# of backups to keep:")},
       {sceneNumberingEnabled, tr("Show Info in Rendered Frames")},
       {watchFileSystemEnabled,
        tr("Watch File System and Update File Browser Automatically")},
       //{ projectRoot,               tr("") },
-      {customProjectRoot, tr("Custom Project Path(s): ")},
+      {customProjectRoot, tr("Custom Project Path(s):")},
       {pathAliasPriority, tr("Path Alias Priority:")},
 
       // Interface
@@ -959,17 +959,17 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
        tr("Show Raster Images Darken Blended")},
       {showFrameNumberWithLetters,
        tr("Show \"ABC\" Appendix to the Frame Number in Xsheet Cell")},
-      {iconSize, tr("Icon Size *")},
-      {viewShrink, tr("Viewer  Shrink")},
+      {iconSize, tr("Icon Size*")},
+      {viewShrink, tr("Viewer Shrink")},
       {viewStep, tr("Step")},
       {viewerZoomCenter, tr("Viewer Zoom Center")},
-      {CurrentLanguageName, tr("Language *:")},
-      {interfaceFont, tr("Font *:")},
-      {interfaceFontStyle, tr("Style *:")},
+      {CurrentLanguageName, tr("Language*:")},
+      {interfaceFont, tr("Font*:")},
+      {interfaceFontStyle, tr("Style*:")},
       {colorCalibrationEnabled,
-       tr("Color Calibration using 3D Look-up Table *")},
+       tr("Color Calibration using 3D Look-up Table*")},
       {colorCalibrationLutPaths,
-       tr("3DLUT File for [%1] *:")
+       tr("3DLUT File for [%1]*:")
            .arg(LutManager::instance()->getMonitorName())},
 
       // Visualization
@@ -989,13 +989,13 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
       //{ levelFormats,                           tr("") },
 
       // Saving
-      {rasterBackgroundColor, tr("Matte color: ")},
+      {rasterBackgroundColor, tr("Matte color:")},
       {resetUndoOnSavingLevel, tr("Clear Undo History when Saving Levels")},
 
       // Import / Export
-      {ffmpegPath, tr("FFmpeg Path: ")},
+      {ffmpegPath, tr("FFmpeg Path:")},
       {ffmpegTimeout, tr("FFmpeg Timeout:")},
-      {fastRenderPath, tr("Fast Render Path: ")},
+      {fastRenderPath, tr("Fast Render Path:")},
 
       // Drawing
       {scanLevelType, tr("Scan File Format:")},
@@ -1048,7 +1048,7 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
        tr("Enable to Input Cells without Double Clicking")},
       {shortcutCommandsWhileRenamingCellEnabled,
        tr("Enable OpenToonz Commands' Shortcut Keys While Renaming Cell")},
-      {showXSheetToolbar, tr("Show Toolbar in the XSheet ")},
+      {showXSheetToolbar, tr("Show Toolbar in the Xsheet")},
       {expandFunctionHeader,
        tr("Expand Function Editor Header to Match Xsheet Toolbar Height*")},
       {showColumnNumbers, tr("Show Column Numbers in Column Headers")},
@@ -1076,7 +1076,7 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
       {onionPaperThickness, tr("Paper Thickness:")},
       {backOnionColor, tr("Previous  Frames Correction:")},
       {frontOnionColor, tr("Following Frames Correction:")},
-      {onionInksOnly, tr("Display Lines Only ")},
+      {onionInksOnly, tr("Display Lines Only")},
       {onionSkinDuringPlayback, tr("Show Onion Skin During Playback")},
       {useOnionColorsForShiftAndTraceGhosts,
        tr("Use Onion Skin Colors for Reference Drawings of Shift and Trace")},
@@ -1088,8 +1088,8 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
       {levelEditorBoxColor, tr("Level Editor Box Color")},
       {chessboardColor1, tr("ChessBoard Color 1")},
       {chessboardColor2, tr("Chessboard Color 2")},
-      {transpCheckInkOnWhite, tr("Ink Color on White Bg:")},
-      {transpCheckInkOnBlack, tr("Ink Color on Black Bg:")},
+      {transpCheckInkOnWhite, tr("Ink Color on White BG:")},
+      {transpCheckInkOnBlack, tr("Ink Color on Black BG:")},
       {transpCheckPaint, tr("Paint Color:")},
 
       // Version Control
