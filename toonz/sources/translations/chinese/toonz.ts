@@ -6966,10 +6966,6 @@ Set the output folder path to the subfolder as well.</source>
         <translation>使用默认播放器播放视频格式</translation>
     </message>
     <message>
-        <source>Minimize Raster Memory Fragmentation*</source>
-        <translation type="vanished">最小化光栅内存碎片*</translation>
-    </message>
-    <message>
         <source>Save Automatically Every Minutes</source>
         <translation type="vanished">自动保存间隔(分钟)</translation>
     </message>
@@ -7086,15 +7082,7 @@ Set the output folder path to the subfolder as well.</source>
         <translation>洋葱皮</translation>
     </message>
     <message>
-        <source>   Following Frames Correction: </source>
-        <translation type="vanished">   后面帧的颜色: </translation>
-    </message>
-    <message>
-        <source>   Previous  Frames Correction: </source>
-        <translation type="vanished">   前面帧的颜色: </translation>
-    </message>
-    <message>
-        <source>Display Lines Only </source>
+        <source>Display Lines Only</source>
         <translation>仅显示线条</translation>
     </message>
     <message>
@@ -7114,10 +7102,6 @@ Set the output folder path to the subfolder as well.</source>
         <translation>帧格和列数据</translation>
     </message>
     <message>
-        <source>Language*:</source>
-        <translation type="vanished">语言*:</translation>
-    </message>
-    <message>
         <source>Undo Memory Size (MB):</source>
         <translation type="vanished">分配给撤消的内存大小(MB):</translation>
     </message>
@@ -7128,10 +7112,6 @@ Set the output folder path to the subfolder as well.</source>
     <message>
         <source>Show Info in Rendered Frames</source>
         <translation>在渲染好的帧中显示信息</translation>
-    </message>
-    <message>
-        <source>*Changes will take effect the next time you run Toonz</source>
-        <translation type="vanished">* 更改将在下次启动 OpenToonz 时生效</translation>
     </message>
     <message>
         <source>cm</source>
@@ -7286,7 +7266,7 @@ Set the output folder path to the subfolder as well.</source>
         <translation>像素</translation>
     </message>
     <message>
-        <source>Minimize Raster Memory Fragmentation *</source>
+        <source>Minimize Raster Memory Fragmentation*</source>
         <translation>最小化光栅内存碎片*</translation>
     </message>
     <message>
@@ -7294,7 +7274,7 @@ Set the output folder path to the subfolder as well.</source>
         <translation type="vanished">执行另存层级命令后替换层级</translation>
     </message>
     <message>
-        <source>* Changes will take effect the next time you run Toonz</source>
+        <source>* Changes will take effect the next time you run OpenToonz</source>
         <translation>* 更改将在下次启动 OpenToonz 时生效</translation>
     </message>
     <message>
@@ -7342,7 +7322,7 @@ Set the output folder path to the subfolder as well.</source>
         <translation>分配给撤消的内存大小(MB)</translation>
     </message>
     <message>
-        <source>Icon Size *</source>
+        <source>Icon Size*</source>
         <translation>图标尺寸*</translation>
     </message>
     <message>
@@ -7350,7 +7330,7 @@ Set the output folder path to the subfolder as well.</source>
         <translation type="vanished">X</translation>
     </message>
     <message>
-        <source>Viewer  Shrink</source>
+        <source>Viewer Shrink</source>
         <translation>查看器的收缩</translation>
     </message>
     <message>
@@ -7366,7 +7346,7 @@ Set the output folder path to the subfolder as well.</source>
         <translation>预览背景色</translation>
     </message>
     <message>
-        <source>ChessBoard Color 1</source>
+        <source>Chessboard Color 1</source>
         <translation>棋盘色 1</translation>
     </message>
     <message>
@@ -7378,7 +7358,7 @@ Set the output folder path to the subfolder as well.</source>
         <translation>查看器的缩放中心</translation>
     </message>
     <message>
-        <source>Language *:</source>
+        <source>Language*:</source>
         <translation>语言*:</translation>
     </message>
     <message>
@@ -7402,15 +7382,15 @@ Set the output folder path to the subfolder as well.</source>
         <translation>后面帧的颜色:</translation>
     </message>
     <message>
-        <source>Previous  Frames Correction:</source>
+        <source>Previous Frames Correction:</source>
         <translation>前面帧的颜色:</translation>
     </message>
     <message>
-        <source>Ink Color on White Bg:</source>
+        <source>Ink Color on White BG:</source>
         <translation>白色背景上的描线颜色:</translation>
     </message>
     <message>
-        <source>Ink Color on Black Bg:</source>
+        <source>Ink Color on Black BG:</source>
         <translation>黑色背景上的描线颜色:</translation>
     </message>
     <message>
@@ -7506,7 +7486,7 @@ Set the output folder path to the subfolder as well.</source>
         <translation>自定</translation>
     </message>
     <message>
-        <source>Custom Project Path(s): </source>
+        <source>Custom Project Path(s):</source>
         <translation>自定项目路径:</translation>
     </message>
     <message>
@@ -7526,7 +7506,7 @@ Set the output folder path to the subfolder as well.</source>
         <translation>回放时显示洋葱皮</translation>
     </message>
     <message>
-        <source>Interval(Minutes): </source>
+        <source>Interval (Minutes):</source>
         <translation>间隔(分钟):</translation>
     </message>
     <message>
@@ -7562,7 +7542,7 @@ Set the output folder path to the subfolder as well.</source>
         <translation>请提供您电脑上 FFmpeg 的存放路径。</translation>
     </message>
     <message>
-        <source>FFmpeg Path: </source>
+        <source>FFmpeg Path:</source>
         <translation>FFmpeg 路径:</translation>
     </message>
     <message>
@@ -7611,7 +7591,7 @@ Is it OK to release these shortcuts?</source>
         <translation>请标明快速渲染(MP4)的输出路径。</translation>
     </message>
     <message>
-        <source>Fast Render Path: </source>
+        <source>Fast Render Path:</source>
         <translation>快速输出路径:</translation>
     </message>
     <message>
@@ -7623,7 +7603,7 @@ Is it OK to release these shortcuts?</source>
         <translation>对所有导入的图像都使用摄影机 DPI</translation>
     </message>
     <message>
-        <source>Show Toolbar in the XSheet </source>
+        <source>Show Toolbar in the Xsheet</source>
         <translation>在摄影表显示工具条</translation>
     </message>
     <message>
@@ -7687,12 +7667,8 @@ Is it OK to release these shortcuts?</source>
         <translation>重命名帧格时启用 OpenToonz 命令快捷键</translation>
     </message>
     <message>
-        <source>Font *:</source>
-        <translation>字体 *:</translation>
-    </message>
-    <message>
-        <source>Font Weight *:</source>
-        <translation type="vanished">字体粗细 *:</translation>
+        <source>Font*:</source>
+        <translation>字体*:</translation>
     </message>
     <message>
         <source>Life is too short for Comic Sans</source>
@@ -7816,8 +7792,8 @@ if both are possible on coding file path.</source>
         <translation>列头的布局*:</translation>
     </message>
     <message>
-        <source>Color Calibration using 3D Look-up Table *</source>
-        <translation>使用 3D 查找表进行颜色校准</translation>
+        <source>Color Calibration using 3D Look-up Table*</source>
+        <translation>使用 3D 查找表进行颜色校准*</translation>
     </message>
     <message>
         <source>Enable auto-stretch frame</source>
@@ -7854,7 +7830,7 @@ Also the initial output destination for new scenes will be set to $scenefolder a
         <translation>功能编辑器*:</translation>
     </message>
     <message>
-        <source>3DLUT File for [%1] *:</source>
+        <source>3DLUT File for [%1]*:</source>
         <translation>用于 [%1] 的 3DLUT 文件*:</translation>
     </message>
     <message>
@@ -7938,7 +7914,7 @@ Also the initial output destination for new scenes will be set to $scenefolder a
         <translation>文件方式</translation>
     </message>
     <message>
-        <source>Style *:</source>
+        <source>Style*:</source>
         <translation>样式*：</translation>
     </message>
     <message>
@@ -7947,7 +7923,7 @@ in non alpha-enabled image format.</source>
         <translation>当覆写带透明像素，非透明通道打开的图像格式的光栅层级时，使用不透明颜色做背景。</translation>
     </message>
     <message>
-        <source>Matte color: </source>
+        <source>Matte color:</source>
         <translation></translation>
     </message>
     <message>
@@ -7959,8 +7935,8 @@ in non alpha-enabled image format.</source>
         <translation>保存时备份场景和动画层级</translation>
     </message>
     <message>
-        <source># of backups to keep: </source>
-        <translation># 份的备份要保留: </translation>
+        <source># of backups to keep:</source>
+        <translation># 份的备份要保留:</translation>
     </message>
     <message>
         <source>Enable Autocreation</source>

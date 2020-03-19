@@ -7142,10 +7142,6 @@ Set the output folder path to the subfolder as well.</source>
         <translation>Daten der Spalten und Reihen</translation>
     </message>
     <message>
-        <source>Language*:</source>
-        <translation type="vanished">Sprache*:</translation>
-    </message>
-    <message>
         <source>Undo Memory Size (MB):</source>
         <translation type="vanished">Speichergröße (MB) zurücksetzen:</translation>
     </message>

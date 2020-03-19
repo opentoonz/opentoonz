@@ -6985,7 +6985,7 @@ Set the output folder path to the subfolder as well.</source>
     </message>
     <message>
         <source>Language*:</source>
-        <translation type="vanished">Lingua*:</translation>
+        <translation>Lingua*:</translation>
     </message>
     <message>
         <source>cm</source>
@@ -7205,10 +7205,6 @@ Set the output folder path to the subfolder as well.</source>
     </message>
     <message>
         <source>Viewer Zoom Center</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Language*:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

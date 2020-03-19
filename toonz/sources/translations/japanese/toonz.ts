@@ -7072,10 +7072,6 @@ Set the output folder path to the subfolder as well.</source>
         <translation>タイムシートのコマと列のデータ</translation>
     </message>
     <message>
-        <source>Language*:</source>
-        <translation type="vanished">言語*：</translation>
-    </message>
-    <message>
         <source>Undo Memory Size (MB):</source>
         <translation type="vanished">「元に戻す」のメガバイト記憶容量：</translation>
     </message>

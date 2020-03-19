@@ -7035,10 +7035,6 @@ Nastavit cestu k výstupní složce také na podsložku.</translation>
         <translation>Použít výchozí prohlížeč pro filmové formáty</translation>
     </message>
     <message>
-        <source>Minimize Raster Memory Fragmentation*</source>
-        <translation type="vanished">Zmenšit tříštění rastrové paměti*</translation>
-    </message>
-    <message>
         <source>Save Automatically Every Minutes</source>
         <translation type="vanished">Uložit automaticky po stanoveném počtu minut</translation>
     </message>
@@ -7159,12 +7155,8 @@ Nastavit cestu k výstupní složce také na podsložku.</translation>
         <translation type="vanished">Nastavení barvy následujících snímků: </translation>
     </message>
     <message>
-        <source>   Previous  Frames Correction: </source>
-        <translation type="vanished">Nastavení barvy předcházejících snímků: </translation>
-    </message>
-    <message>
-        <source>Display Lines Only </source>
-        <translation>Zobrazit jen čáry </translation>
+        <source>Display Lines Only</source>
+        <translation>Zobrazit jen čáry</translation>
     </message>
     <message>
         <source>Version Control</source>
@@ -7183,10 +7175,6 @@ Nastavit cestu k výstupní složce také na podsložku.</translation>
         <translation>Data sloupců a buněk</translation>
     </message>
     <message>
-        <source>Language*:</source>
-        <translation type="vanished">Jazyk*:</translation>
-    </message>
-    <message>
         <source>Undo Memory Size (MB):</source>
         <translation type="vanished">Velikost paměti (MB) pro návrat zpět:</translation>
     </message>
@@ -7197,10 +7185,6 @@ Nastavit cestu k výstupní složce také na podsložku.</translation>
     <message>
         <source>Show Info in Rendered Frames</source>
         <translation>Ukázat informace ve zpracovaných snímcích</translation>
-    </message>
-    <message>
-        <source>*Changes will take effect the next time you run Toonz</source>
-        <translation type="vanished">*Změny se projeví při příštím spuštění Toonz</translation>
     </message>
     <message>
         <source>cm</source>
@@ -7291,14 +7275,6 @@ Nastavit cestu k výstupní složce také na podsložku.</translation>
         <translation>Ověření průhlednosti</translation>
     </message>
     <message>
-        <source>   Ink Color on White Bg: </source>
-        <translation type="vanished">　Barva čar a vektorů na bílém pozadí:</translation>
-    </message>
-    <message>
-        <source>   Ink Color on Black Bg: </source>
-        <translation type="vanished">　Barva čar a vektorů na černém pozadí:</translation>
-    </message>
-    <message>
         <source> Paint Color: </source>
         <translation type="vanished">Barva malby:</translation>
     </message>
@@ -7351,15 +7327,15 @@ Nastavit cestu k výstupní složce také na podsložku.</translation>
         <translation>obrazový bod (pixel)</translation>
     </message>
     <message>
-        <source>Minimize Raster Memory Fragmentation *</source>
-        <translation>Zmenšit tříštění rastrové paměti *</translation>
+        <source>Minimize Raster Memory Fragmentation*</source>
+        <translation>Zmenšit tříštění rastrové paměti*</translation>
     </message>
     <message>
         <source>Replace Level after SaveLevelAs command</source>
         <translation type="vanished">Nahradit úroveň po příkazu Uložit úroveň jako</translation>
     </message>
     <message>
-        <source>* Changes will take effect the next time you run Toonz</source>
+        <source>* Changes will take effect the next time you run OpenToonz</source>
         <translation>* Změny se projeví při příštím spuštění Toonz</translation>
     </message>
     <message>
@@ -7407,15 +7383,15 @@ Nastavit cestu k výstupní složce také na podsložku.</translation>
         <translation>Velikost paměti (MB) pro návrat zpět</translation>
     </message>
     <message>
-        <source>Icon Size *</source>
-        <translation>Velikost ikony *</translation>
+        <source>Icon Size*</source>
+        <translation>Velikost Ikony*</translation>
     </message>
     <message>
         <source>X</source>
         <translation type="vanished">X</translation>
     </message>
     <message>
-        <source>Viewer  Shrink</source>
+        <source>Viewer Shrink</source>
         <translation>Zmenšit prohlížeč</translation>
     </message>
     <message>
@@ -7431,7 +7407,7 @@ Nastavit cestu k výstupní složce také na podsložku.</translation>
         <translation>Barva pozadí náhledu</translation>
     </message>
     <message>
-        <source>ChessBoard Color 1</source>
+        <source>Chessboard Color 1</source>
         <translation>Barva šachovnice 1</translation>
     </message>
     <message>
@@ -7443,8 +7419,8 @@ Nastavit cestu k výstupní složce také na podsložku.</translation>
         <translation>Střed přiblížení prohlížeče</translation>
     </message>
     <message>
-        <source>Language *:</source>
-        <translation>Jazyk *:</translation>
+        <source>Language*:</source>
+        <translation>Jazyk*:</translation>
     </message>
     <message>
         <source>Default TLV Caching Behavior</source>
@@ -7467,15 +7443,15 @@ Nastavit cestu k výstupní složce také na podsložku.</translation>
         <translation>Barva následujících snímků:</translation>
     </message>
     <message>
-        <source>Previous  Frames Correction:</source>
+        <source>Previous Frames Correction:</source>
         <translation>Barva předcházejících snímků:</translation>
     </message>
     <message>
-        <source>Ink Color on White Bg:</source>
+        <source>Ink Color on White BG:</source>
         <translation>Barva čáry na bílém pozadí:</translation>
     </message>
     <message>
-        <source>Ink Color on Black Bg:</source>
+        <source>Ink Color on Black BG:</source>
         <translation>Barva čáry na černém pozadí:</translation>
     </message>
     <message>
@@ -7579,8 +7555,8 @@ Nastavit cestu k výstupní složce také na podsložku.</translation>
         <translation>Vlastní*</translation>
     </message>
     <message>
-        <source>Custom Project Path(s): </source>
-        <translation>Cesta(y) k vlastnímu projektu: </translation>
+        <source>Custom Project Path(s):</source>
+        <translation>Cesta(y) k vlastnímu projektu:</translation>
     </message>
     <message>
         <source>Advanced: Multiple paths can be separated by ** (No Spaces)</source>
@@ -7599,8 +7575,8 @@ Nastavit cestu k výstupní složce také na podsložku.</translation>
         <translation>Ukázat během přehrávání cibulový vzhled</translation>
     </message>
     <message>
-        <source>Interval(Minutes): </source>
-        <translation>Interval (minuty): </translation>
+        <source>Interval (Minutes):</source>
+        <translation>Interval (minuty):</translation>
     </message>
     <message>
         <source>Additional Project Locations</source>
@@ -7619,8 +7595,8 @@ Nastavit cestu k výstupní složce také na podsložku.</translation>
         <translation>Poskytněte, prosím, cestu k umístění FFmpeg ve vašem počítači.</translation>
     </message>
     <message>
-        <source>FFmpeg Path: </source>
-        <translation>Cesta k FFmpeg: </translation>
+        <source>FFmpeg Path:</source>
+        <translation>Cesta k FFmpeg:</translation>
     </message>
     <message>
         <source>Number of seconds to wait for FFmpeg to complete processing the output:</source>
@@ -7701,8 +7677,8 @@ Je v pořádku tyto klávesové zkratky uvolnit?</translation>
         <translation>Povolit klávesové zkratky příkazů OpenToonz při přejmenovávání buňky</translation>
     </message>
     <message>
-        <source>Show Toolbar in the XSheet </source>
-        <translation>Ukázat v záběru nástrojový panel </translation>
+        <source>Show Toolbar in the Xsheet</source>
+        <translation>Ukázat v záběru nástrojový panel</translation>
     </message>
     <message>
         <source>Show Column Numbers in Column Headers</source>
@@ -7778,8 +7754,8 @@ if both are possible on coding file path.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Font *:</source>
-        <translation>Písmo *:</translation>
+        <source>Font*:</source>
+        <translation>Písmo*:</translation>
     </message>
     <message>
         <source>Default File Import Behavior:</source>
@@ -7798,8 +7774,8 @@ if both are possible on coding file path.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Fast Render Path: </source>
-        <translation>Cesta pro rychlé zpracování: </translation>
+        <source>Fast Render Path:</source>
+        <translation>Cesta pro rychlé zpracování:</translation>
     </message>
     <message>
         <source>Vector Snapping:</source>
@@ -7858,7 +7834,7 @@ if both are possible on coding file path.</source>
         <translation>Rozvržení záhlaví sloupců*:</translation>
     </message>
     <message>
-        <source>Color Calibration using 3D Look-up Table *</source>
+        <source>Color Calibration using 3D Look-up Table*</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7891,8 +7867,8 @@ Also the initial output destination for new scenes will be set to $scenefolder a
         <translation>Editor funkce*:</translation>
     </message>
     <message>
-        <source>3DLUT File for [%1] *:</source>
-        <translation>Soubor 3DLUT pro [%1] *:</translation>
+        <source>3DLUT File for [%1]*:</source>
+        <translation>Soubor 3DLUT pro [%1]*:</translation>
     </message>
     <message>
         <source>Cursor Options</source>
@@ -7975,8 +7951,8 @@ Also the initial output destination for new scenes will be set to $scenefolder a
         <translation>Soubor</translation>
     </message>
     <message>
-        <source>Style *:</source>
-        <translation>Styl *:</translation>
+        <source>Style*:</source>
+        <translation>Styl*:</translation>
     </message>
     <message>
         <source>Matte color is used for background when overwriting raster levels with transparent pixels
@@ -7985,8 +7961,8 @@ in non alpha-enabled image format.</source>
 v obrázkových formátech, kde není povolen kanál alfa.</translation>
     </message>
     <message>
-        <source>Matte color: </source>
-        <translation>Barva průhlednosti: </translation>
+        <source>Matte color:</source>
+        <translation>Barva průhlednosti:</translation>
     </message>
     <message>
         <source>Current Column Color:</source>
@@ -7997,8 +7973,8 @@ v obrázkových formátech, kde není povolen kanál alfa.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source># of backups to keep: </source>
-        <translation># záloh k uchování: </translation>
+        <source># of backups to keep:</source>
+        <translation># záloh k uchování:</translation>
     </message>
     <message>
         <source>Enable Autocreation</source>
