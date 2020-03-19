@@ -9349,7 +9349,7 @@ in non alpha-enabled image format.</source>
     </message>
     <message>
         <location filename="../../toonz/preferencespopup.cpp" line="1088"/>
-        <source>ChessBoard Color 1</source>
+        <source>Chessboard Color 1</source>
         <translation>Цвет клетки 1</translation>
     </message>
     <message>

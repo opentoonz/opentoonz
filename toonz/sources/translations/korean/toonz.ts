@@ -7153,7 +7153,7 @@ in non alpha-enabled image format.</source>
         <translation>미리보기 BG 색상</translation>
     </message>
     <message>
-        <source>ChessBoard Color 1</source>
+        <source>Chessboard Color 1</source>
         <translation>체스보드 색상 1</translation>
     </message>
     <message>

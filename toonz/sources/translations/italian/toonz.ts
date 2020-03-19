@@ -6829,7 +6829,7 @@ Set the output folder path to the subfolder as well.</source>
     </message>
     <message>
         <source>Minimize Raster Memory Fragmentation*</source>
-        <translation type="vanished">Minimizza la Frammentazione della Memoria Raster*</translation>
+        <translation>Minimizza la Frammentazione della Memoria Raster*</translation>
     </message>
     <message>
         <source>Save Automatically Every Minutes</source>
@@ -6960,11 +6960,7 @@ Set the output folder path to the subfolder as well.</source>
         <translation type="vanished">  Correzione dei Fotogrammi Successivi:</translation>
     </message>
     <message>
-        <source>   Previous  Frames Correction: </source>
-        <translation type="vanished">  Correzione dei Fotogrammi Precedenti:</translation>
-    </message>
-    <message>
-        <source>Display Lines Only </source>
+        <source>Display Lines Only</source>
         <translation>Mostra solo le Linee</translation>
     </message>
     <message>
@@ -6986,10 +6982,6 @@ Set the output folder path to the subfolder as well.</source>
     <message>
         <source>Show Info in Rendered Frames</source>
         <translation>Mostra le Informazioni sui Fotogrammi Renderizzati</translation>
-    </message>
-    <message>
-        <source>*Changes will take effect the next time you run Toonz</source>
-        <translation type="vanished">*I cambiamenti avranno effetto la prossima volta che Toonz verrà avviato.</translation>
     </message>
     <message>
         <source>Language*:</source>
@@ -7076,20 +7068,20 @@ Set the output folder path to the subfolder as well.</source>
         <translation>Spessore Carta:</translation>
     </message>
     <message>
-        <source>Enable Version Control *</source>
-        <translation type="vanished">Abilita Controllo Vesione *</translation>
+        <source>Enable Version Control*</source>
+        <translation>Abilita Controllo Vesione*</translation>
     </message>
     <message>
         <source>Transparency Check</source>
         <translation>Controllo della Trasparenza</translation>
     </message>
     <message>
-        <source>   Ink Color on White Bg: </source>
-        <translation type="vanished">Colore Inchiostro su Fondo Bianco:</translation>
+        <source>Ink Color on White BG:</source>
+        <translation>Colore Inchiostro su Fondo Bianco:</translation>
     </message>
     <message>
-        <source>   Ink Color on Black Bg: </source>
-        <translation type="vanished">Colore Inchiostro su Fondo Nero:</translation>
+        <source>Ink Color on Black BG:</source>
+        <translation>Colore Inchiostro su Fondo Nero:</translation>
     </message>
     <message>
         <source> Paint Color: </source>
@@ -7144,12 +7136,8 @@ Set the output folder path to the subfolder as well.</source>
         <translation>Ignora Canale Alpha su Livelli  Colonna 1</translation>
     </message>
     <message>
-        <source>Minimize Raster Memory Fragmentation *</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>* Changes will take effect the next time you run Toonz</source>
-        <translation type="unfinished"></translation>
+        <source>* Changes will take effect the next time you run OpenToonz</source>
+        <translation>* I cambiamenti avranno effetto la prossima volta che OpenToonz verrà avviato</translation>
     </message>
     <message>
         <source>Move Current Frame by Clicking on Xsheet / Numerical Columns Cell Area</source>
@@ -7180,10 +7168,6 @@ Set the output folder path to the subfolder as well.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Enable Version Control*</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Category</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7192,11 +7176,11 @@ Set the output folder path to the subfolder as well.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Icon Size *</source>
+        <source>Icon Size*</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Viewer  Shrink</source>
+        <source>Viewer Shrink</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7212,7 +7196,7 @@ Set the output folder path to the subfolder as well.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>ChessBoard Color 1</source>
+        <source>Chessboard Color 1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7224,7 +7208,7 @@ Set the output folder path to the subfolder as well.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Language *:</source>
+        <source>Language*:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7240,8 +7224,8 @@ Set the output folder path to the subfolder as well.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Previous  Frames Correction:</source>
-        <translation type="unfinished"></translation>
+        <source>Previous Frames Correction:</source>
+        <translation>Correzione dei Fotogrammi Precedenti:</translation>
     </message>
     <message>
         <source>Ink Color on White Bg:</source>
@@ -7316,7 +7300,7 @@ Set the output folder path to the subfolder as well.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Custom Project Path(s): </source>
+        <source>Custom Project Path(s):</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7340,7 +7324,7 @@ Set the output folder path to the subfolder as well.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Interval(Minutes): </source>
+        <source>Interval (Minutes):</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7360,7 +7344,7 @@ Set the output folder path to the subfolder as well.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>FFmpeg Path: </source>
+        <source>FFmpeg Path:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7441,7 +7425,7 @@ Is it OK to release these shortcuts?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Show Toolbar in the XSheet </source>
+        <source>Show Toolbar in the Xsheet</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7518,7 +7502,7 @@ if both are possible on coding file path.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Font *:</source>
+        <source>Font*:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7538,7 +7522,7 @@ if both are possible on coding file path.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Fast Render Path: </source>
+        <source>Fast Render Path:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7596,7 +7580,7 @@ if both are possible on coding file path.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Color Calibration using 3D Look-up Table *</source>
+        <source>Color Calibration using 3D Look-up Table*</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7629,7 +7613,7 @@ Also the initial output destination for new scenes will be set to $scenefolder a
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>3DLUT File for [%1] *:</source>
+        <source>3DLUT File for [%1]*:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7709,7 +7693,7 @@ Also the initial output destination for new scenes will be set to $scenefolder a
         <translation type="unfinished">File</translation>
     </message>
     <message>
-        <source>Style *:</source>
+        <source>Style*:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7718,7 +7702,7 @@ in non alpha-enabled image format.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Matte color: </source>
+        <source>Matte color:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7730,7 +7714,7 @@ in non alpha-enabled image format.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source># of backups to keep: </source>
+        <source># of backups to keep:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -11255,10 +11239,6 @@ Per favore sottometti o ripristina i cambiamenti prima di proseguire.</translati
         <translation>Sottocampionamento dell&apos;Immagine:</translation>
     </message>
     <message>
-        <source>      Marker Interval:</source>
-        <translation type="vanished">      Intervallo dei Marcatori:</translation>
-    </message>
-    <message>
         <source>A/R:</source>
         <translation>A/R:</translation>
     </message>
@@ -11292,7 +11272,7 @@ Per favore sottometti o ripristina i cambiamenti prima di proseguire.</translati
     </message>
     <message>
         <source>Marker Interval:</source>
-        <translation type="unfinished"></translation>
+        <translation>Intervallo dei Marcatori:</translation>
     </message>
     <message>
         <source>  Start Frame:</source>

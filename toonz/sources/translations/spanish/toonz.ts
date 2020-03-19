@@ -7299,7 +7299,7 @@ También establecer la ruta de salida a esa carpeta.</translation>
         <translation>Fondo previsualización</translation>
     </message>
     <message>
-        <source>ChessBoard Color 1</source>
+        <source>Chessboard Color 1</source>
         <translation>Damero - Color 1</translation>
     </message>
     <message>
