@@ -6932,10 +6932,6 @@ Set the output folder path to the subfolder as well.</source>
         <translation>動画形式を再生するとき、既定のメディアプレーヤーを使用</translation>
     </message>
     <message>
-        <source>Minimize Raster Memory Fragmentation*</source>
-        <translation type="vanished">ラスターメモリのフラグメンテーションを最小化する*</translation>
-    </message>
-    <message>
         <source>Save Automatically Every Minutes</source>
         <translation type="vanished">分間隔で自動保存</translation>
     </message>
@@ -7056,11 +7052,7 @@ Set the output folder path to the subfolder as well.</source>
         <translation type="vanished">先頭フレームの色設定：</translation>
     </message>
     <message>
-        <source>   Previous  Frames Correction: </source>
-        <translation type="vanished">後続フレームの色設定：</translation>
-    </message>
-    <message>
-        <source>Display Lines Only </source>
+        <source>Display Lines Only</source>
         <translation>線のみ表示</translation>
     </message>
     <message>
@@ -7094,10 +7086,6 @@ Set the output folder path to the subfolder as well.</source>
     <message>
         <source>Show Info in Rendered Frames</source>
         <translation>レンダリングされたフレーム内に情報を表示</translation>
-    </message>
-    <message>
-        <source>*Changes will take effect the next time you run Toonz</source>
-        <translation type="vanished">［*］TOONZの再起動が必要</translation>
     </message>
     <message>
         <source>cm</source>
@@ -7188,14 +7176,6 @@ Set the output folder path to the subfolder as well.</source>
         <translation>透明度チェック</translation>
     </message>
     <message>
-        <source>   Ink Color on White Bg: </source>
-        <translation type="vanished">　白背景に線とベクトルの色：</translation>
-    </message>
-    <message>
-        <source>   Ink Color on Black Bg: </source>
-        <translation type="vanished">　黒背景に線とベクトルの色：</translation>
-    </message>
-    <message>
         <source> Paint Color: </source>
         <translation type="vanished">塗りつぶし色：</translation>
     </message>
@@ -7248,7 +7228,7 @@ Set the output folder path to the subfolder as well.</source>
         <translation>pixel</translation>
     </message>
     <message>
-        <source>Minimize Raster Memory Fragmentation *</source>
+        <source>Minimize Raster Memory Fragmentation*</source>
         <translation>ラスターメモリのフラグメンテーションを最小化する*</translation>
     </message>
     <message>
@@ -7256,7 +7236,7 @@ Set the output folder path to the subfolder as well.</source>
         <translation type="vanished">レベルを別名で保存した後、レベルを置き換える</translation>
     </message>
     <message>
-        <source>* Changes will take effect the next time you run Toonz</source>
+        <source>* Changes will take effect the next time you run OpenToonz</source>
         <translation>*印の項目は、次回OpenToonz起動時に反映されます</translation>
     </message>
     <message>
@@ -7304,15 +7284,15 @@ Set the output folder path to the subfolder as well.</source>
         <translation>「元に戻す」の記憶容量（MB）</translation>
     </message>
     <message>
-        <source>Icon Size *</source>
-        <translation>アイコンサイズ *</translation>
+        <source>Icon Size*</source>
+        <translation>アイコンサイズ*</translation>
     </message>
     <message>
         <source>X</source>
         <translation type="vanished">X</translation>
     </message>
     <message>
-        <source>Viewer  Shrink</source>
+        <source>Viewer Shrink</source>
         <translation>メインビューアの画像圧縮</translation>
     </message>
     <message>
@@ -7340,7 +7320,7 @@ Set the output folder path to the subfolder as well.</source>
         <translation>ビューア上のズームの中心位置</translation>
     </message>
     <message>
-        <source>Language *:</source>
+        <source>Language*:</source>
         <translation>言語*：</translation>
     </message>
     <message>
@@ -7364,15 +7344,15 @@ Set the output folder path to the subfolder as well.</source>
         <translation>後フレームの色 :</translation>
     </message>
     <message>
-        <source>Previous  Frames Correction:</source>
+        <source>Previous Frames Correction:</source>
         <translation>前フレームの色 :</translation>
     </message>
     <message>
-        <source>Ink Color on White Bg:</source>
+        <source>Ink Color on White BG:</source>
         <translation>線の色 :</translation>
     </message>
     <message>
-        <source>Ink Color on Black Bg:</source>
+        <source>Ink Color on Black BG:</source>
         <translation>黒背景チェック時の線の色 :</translation>
     </message>
     <message>
@@ -7453,11 +7433,11 @@ Set the output folder path to the subfolder as well.</source>
     </message>
     <message>
         <source>My Documents/OpenToonz*</source>
-        <translation>ドキュメント/OpenToonz *</translation>
+        <translation>ドキュメント/OpenToonz*</translation>
     </message>
     <message>
         <source>Desktop/OpenToonz*</source>
-        <translation>デスクトップ/OpenToonz *</translation>
+        <translation>デスクトップ/OpenToonz*</translation>
     </message>
     <message>
         <source>Stuff Folder*</source>
@@ -7468,7 +7448,7 @@ Set the output folder path to the subfolder as well.</source>
         <translation>カスタム</translation>
     </message>
     <message>
-        <source>Custom Project Path(s): </source>
+        <source>Custom Project Path(s):</source>
         <translation>追加する Project Root パス：</translation>
     </message>
     <message>
@@ -7488,7 +7468,7 @@ Set the output folder path to the subfolder as well.</source>
         <translation>再生中にオニオンスキンを表示する</translation>
     </message>
     <message>
-        <source>Interval(Minutes): </source>
+        <source>Interval (Minutes):</source>
         <translation>間隔(分)：</translation>
     </message>
     <message>
@@ -7524,7 +7504,7 @@ Set the output folder path to the subfolder as well.</source>
         <translation>FFmpegの実行ファイルの保存パスを入力してください。</translation>
     </message>
     <message>
-        <source>FFmpeg Path: </source>
+        <source>FFmpeg Path:</source>
         <translation>FFmpegのパス：</translation>
     </message>
     <message>
@@ -7574,7 +7554,7 @@ Is it OK to release these shortcuts?</source>
         <translation>”MP4ムービーのレンダリング”コマンドの出力先を指定してください。</translation>
     </message>
     <message>
-        <source>Fast Render Path: </source>
+        <source>Fast Render Path:</source>
         <translation>保存先のパス：</translation>
     </message>
     <message>
@@ -7586,7 +7566,7 @@ Is it OK to release these shortcuts?</source>
         <translation>全ての読み込む画像にカメラのDPIを適用する</translation>
     </message>
     <message>
-        <source>Show Toolbar in the XSheet </source>
+        <source>Show Toolbar in the Xsheet</source>
         <translation>タイムシートパネルにツールバーを表示する</translation>
     </message>
     <message>
@@ -7658,8 +7638,8 @@ Is it OK to release these shortcuts?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Font *:</source>
-        <translation>フォント *：</translation>
+        <source>Font*:</source>
+        <translation>フォント*：</translation>
     </message>
     <message>
         <source>Font Weight *:</source>
@@ -7784,8 +7764,8 @@ if both are possible on coding file path.</source>
         <translation>列のヘッダのレイアウト*：</translation>
     </message>
     <message>
-        <source>Color Calibration using 3D Look-up Table *</source>
-        <translation>３Dルックアップテーブルを用いて色補正を行う *</translation>
+        <source>Color Calibration using 3D Look-up Table*</source>
+        <translation>３Dルックアップテーブルを用いて色補正を行う*</translation>
     </message>
     <message>
         <source>Enable auto-stretch frame</source>
@@ -7822,8 +7802,8 @@ Also the initial output destination for new scenes will be set to $scenefolder a
         <translation>パラメータエディタのパネル切替 *:</translation>
     </message>
     <message>
-        <source>3DLUT File for [%1] *:</source>
-        <translation>モニタ [%1] 用の3DLUTファイル* : </translation>
+        <source>3DLUT File for [%1]*:</source>
+        <translation>モニタ [%1] 用の3DLUTファイル*: </translation>
     </message>
     <message>
         <source>Cursor Options</source>
@@ -7906,8 +7886,8 @@ Also the initial output destination for new scenes will be set to $scenefolder a
         <translation>ファイル</translation>
     </message>
     <message>
-        <source>Style *:</source>
-        <translation>スタイル *：</translation>
+        <source>Style*:</source>
+        <translation>スタイル*：</translation>
     </message>
     <message>
         <source>Matte color is used for background when overwriting raster levels with transparent pixels
@@ -7916,8 +7896,8 @@ in non alpha-enabled image format.</source>
 上書き保存するときの背景に用いられます。</translation>
     </message>
     <message>
-        <source>Matte color: </source>
-        <translation>マット色： </translation>
+        <source>Matte color:</source>
+        <translation>マット色：</translation>
     </message>
     <message>
         <source>Current Column Color:</source>
@@ -7928,8 +7908,8 @@ in non alpha-enabled image format.</source>
         <translation>保存する時にシーンとレベルのバックアップをとる</translation>
     </message>
     <message>
-        <source># of backups to keep: </source>
-        <translation>保持するバックアップの個数： </translation>
+        <source># of backups to keep:</source>
+        <translation>保持するバックアップの個数：</translation>
     </message>
     <message>
         <source>Enable Autocreation</source>

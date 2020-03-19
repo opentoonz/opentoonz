@@ -7055,10 +7055,6 @@ También establecer la ruta de salida a esa carpeta.</translation>
         <translation type="vanished">   Color de fotogramas siguientes: </translation>
     </message>
     <message>
-        <source>   Previous  Frames Correction: </source>
-        <translation type="vanished">   Color de fotogramas anteriores: </translation>
-    </message>
-    <message>
         <source>Display Lines Only</source>
         <translation>Sólo mostrar líneas</translation>
     </message>
@@ -7339,7 +7335,7 @@ También establecer la ruta de salida a esa carpeta.</translation>
         <translation>Fotogramas siguientes:</translation>
     </message>
     <message>
-        <source>Previous  Frames Correction:</source>
+        <source>Previous Frames Correction:</source>
         <translation>Fotogramas anteriores:</translation>
     </message>
     <message>

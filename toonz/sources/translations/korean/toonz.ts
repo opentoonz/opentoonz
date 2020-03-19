@@ -7277,7 +7277,7 @@ in non alpha-enabled image format.</source>
         <translation>용지 두께:</translation>
     </message>
     <message>
-        <source>Previous  Frames Correction:</source>
+        <source>Previous Frames Correction:</source>
         <translation>이전 프레임 수정:</translation>
     </message>
     <message>

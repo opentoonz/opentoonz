@@ -1074,7 +1074,7 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
       // Onion Skin
       {onionSkinEnabled, tr("Onion Skin ON")},
       {onionPaperThickness, tr("Paper Thickness:")},
-      {backOnionColor, tr("Previous  Frames Correction:")},
+      {backOnionColor, tr("Previous Frames Correction:")},
       {frontOnionColor, tr("Following Frames Correction:")},
       {onionInksOnly, tr("Display Lines Only")},
       {onionSkinDuringPlayback, tr("Show Onion Skin During Playback")},
