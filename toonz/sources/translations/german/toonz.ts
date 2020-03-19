@@ -6998,10 +6998,6 @@ Set the output folder path to the subfolder as well.</source>
         <translation>Standard-Player für Film-Formate verwenden</translation>
     </message>
     <message>
-        <source>Minimize Raster Memory Fragmentation*</source>
-        <translation type="vanished">Raster-Speicher-Fragmentierung minimieren*</translation>
-    </message>
-    <message>
         <source>Save Automatically Every Minutes</source>
         <translation type="vanished">Nach Anzahl Minuten automatisch speichern</translation>
     </message>
@@ -7122,11 +7118,11 @@ Set the output folder path to the subfolder as well.</source>
         <translation type="vanished">Farb-Einstellungen der folgenden Frames:</translation>
     </message>
     <message>
-        <source>   Previous  Frames Correction: </source>
+        <source>   Previous Frames Correction: </source>
         <translation type="vanished">Farb-Einstellungen der vorherigen Frames:</translation>
     </message>
     <message>
-        <source>Display Lines Only </source>
+        <source>Display Lines Only</source>
         <translation>Nur Linien anzeigen</translation>
     </message>
     <message>
@@ -7160,10 +7156,6 @@ Set the output folder path to the subfolder as well.</source>
     <message>
         <source>Show Info in Rendered Frames</source>
         <translation>Informationen in gerenderten Frames anzeigen</translation>
-    </message>
-    <message>
-        <source>*Changes will take effect the next time you run Toonz</source>
-        <translation type="vanished">*Änderungen werden wirksam beim nächsten Start von Toonz</translation>
     </message>
     <message>
         <source>cm</source>
@@ -7314,7 +7306,7 @@ Set the output folder path to the subfolder as well.</source>
         <translation>pixel</translation>
     </message>
     <message>
-        <source>Minimize Raster Memory Fragmentation *</source>
+        <source>Minimize Raster Memory Fragmentation*</source>
         <translation>Raster-Speicher-Fragmentierung minimieren*</translation>
     </message>
     <message>
@@ -7322,8 +7314,8 @@ Set the output folder path to the subfolder as well.</source>
         <translation type="vanished">Ebene nach dem &quot;Speichern als&quot;-Befehl ersetzen</translation>
     </message>
     <message>
-        <source>* Changes will take effect the next time you run Toonz</source>
-        <translation>*Änderungen werden wirksam beim nächsten Start von Toonz</translation>
+        <source>* Changes will take effect the next time you run OpenToonz</source>
+        <translation>* Änderungen werden wirksam beim nächsten Start von OpenToonz</translation>
     </message>
     <message>
         <source>Move Current Frame by Clicking on Xsheet / Numerical Columns Cell Area</source>
@@ -7370,15 +7362,15 @@ Set the output folder path to the subfolder as well.</source>
         <translation>Speichergröße (MB) zurücksetzen</translation>
     </message>
     <message>
-        <source>Icon Size *</source>
-        <translation>Icon-Größe *</translation>
+        <source>Icon Size*</source>
+        <translation>Icon-Größe*</translation>
     </message>
     <message>
         <source>X</source>
         <translation type="vanished">X</translation>
     </message>
     <message>
-        <source>Viewer  Shrink</source>
+        <source>Viewer Shrink</source>
         <translation>Betrachter schrumpfen</translation>
     </message>
     <message>
@@ -7394,7 +7386,7 @@ Set the output folder path to the subfolder as well.</source>
         <translation>Vorschau Hintergrundfarbe</translation>
     </message>
     <message>
-        <source>ChessBoard Color 1</source>
+        <source>Chessboard Color 1</source>
         <translation>Schachbrett-Farbe 1</translation>
     </message>
     <message>
@@ -7406,7 +7398,7 @@ Set the output folder path to the subfolder as well.</source>
         <translation>Betrachter-Zoom-Zentrum</translation>
     </message>
     <message>
-        <source>Language *:</source>
+        <source>Language*:</source>
         <translation>Sprache*:</translation>
     </message>
     <message>
@@ -7430,15 +7422,15 @@ Set the output folder path to the subfolder as well.</source>
         <translation>Farbe der folgenden Frames:</translation>
     </message>
     <message>
-        <source>Previous  Frames Correction:</source>
+        <source>Previous Frames Correction:</source>
         <translation>Farbe der vorherigen Frames:</translation>
     </message>
     <message>
-        <source>Ink Color on White Bg:</source>
+        <source>Ink Color on White BG:</source>
         <translation>Linien-Farbe auf weißem Hintergrund:</translation>
     </message>
     <message>
-        <source>Ink Color on Black Bg:</source>
+        <source>Ink Color on Black BG:</source>
         <translation>Linien-Farbe auf schwarzem Hintergrund:</translation>
     </message>
     <message>
@@ -7542,7 +7534,7 @@ Set the output folder path to the subfolder as well.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Custom Project Path(s): </source>
+        <source>Custom Project Path(s):</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7562,7 +7554,7 @@ Set the output folder path to the subfolder as well.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Interval(Minutes): </source>
+        <source>Interval (Minutes):</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7582,7 +7574,7 @@ Set the output folder path to the subfolder as well.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>FFmpeg Path: </source>
+        <source>FFmpeg Path:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7663,7 +7655,7 @@ Is it OK to release these shortcuts?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Show Toolbar in the XSheet </source>
+        <source>Show Toolbar in the Xsheet</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7740,7 +7732,7 @@ if both are possible on coding file path.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Font *:</source>
+        <source>Font*:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7760,7 +7752,7 @@ if both are possible on coding file path.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Fast Render Path: </source>
+        <source>Fast Render Path:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7818,7 +7810,7 @@ if both are possible on coding file path.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Color Calibration using 3D Look-up Table *</source>
+        <source>Color Calibration using 3D Look-up Table*</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7851,7 +7843,7 @@ Also the initial output destination for new scenes will be set to $scenefolder a
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>3DLUT File for [%1] *:</source>
+        <source>3DLUT File for [%1]*:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7931,7 +7923,7 @@ Also the initial output destination for new scenes will be set to $scenefolder a
         <translation type="unfinished">Datei</translation>
     </message>
     <message>
-        <source>Style *:</source>
+        <source>Style*:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7940,7 +7932,7 @@ in non alpha-enabled image format.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Matte color: </source>
+        <source>Matte color:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7952,7 +7944,7 @@ in non alpha-enabled image format.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source># of backups to keep: </source>
+        <source># of backups to keep:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
