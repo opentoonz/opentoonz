@@ -6968,10 +6968,6 @@ Set the output folder path to the subfolder as well.</source>
         <translation type="vanished">フリップビューアの縮小：</translation>
     </message>
     <message>
-        <source>Step:</source>
-        <translation type="vanished">ステップ：</translation>
-    </message>
-    <message>
         <source>Height*:</source>
         <translation type="vanished">高さ*：</translation>
     </message>
@@ -7072,10 +7068,6 @@ Set the output folder path to the subfolder as well.</source>
         <translation>タイムシートのコマと列のデータ</translation>
     </message>
     <message>
-        <source>Undo Memory Size (MB):</source>
-        <translation type="vanished">「元に戻す」のメガバイト記憶容量：</translation>
-    </message>
-    <message>
         <source>Render Task Chunk Size:</source>
         <translation>レンダリングタスクのチャンクサイズ：</translation>
     </message>
@@ -7122,10 +7114,6 @@ Set the output folder path to the subfolder as well.</source>
     <message>
         <source>Width:</source>
         <translation>幅：</translation>
-    </message>
-    <message>
-        <source>Height:</source>
-        <translation type="vanished">高さ：</translation>
     </message>
     <message>
         <source>DPI:</source>
@@ -7260,7 +7248,7 @@ Set the output folder path to the subfolder as well.</source>
         <translation>読み込んだレベル名からシーン番号(&quot;c####_&quot;)を自動的に消去する</translation>
     </message>
     <message>
-        <source>Multi Layer Style Picker : Switch Levels by Picking</source>
+        <source>Multi Layer Style Picker: Switch Levels by Picking</source>
         <translation>多層スポイトツールを有効化：スタイルを拾うと同時にカレントレベルを切り替える</translation>
     </message>
     <message>
@@ -7276,44 +7264,44 @@ Set the output folder path to the subfolder as well.</source>
         <translation>カテゴリー</translation>
     </message>
     <message>
-        <source>Undo Memory Size (MB)</source>
-        <translation>「元に戻す」の記憶容量（MB）</translation>
+        <source>Undo Memory Size (MB):</source>
+        <translation>「元に戻す」の記憶容量（MB）：</translation>
     </message>
     <message>
-        <source>Icon Size*</source>
-        <translation>アイコンサイズ*</translation>
+        <source>x</source>
+        <translation>x</translation>
     </message>
     <message>
-        <source>X</source>
-        <translation type="vanished">X</translation>
+        <source>Icon Size*:</source>
+        <translation>アイコンサイズ*：</translation>
     </message>
     <message>
-        <source>Viewer Shrink</source>
-        <translation>メインビューアの画像圧縮</translation>
+        <source>Viewer Shrink:</source>
+        <translation>メインビューアの画像圧縮：</translation>
     </message>
     <message>
-        <source>Step</source>
-        <translation>ステップ</translation>
+        <source>Step:</source>
+        <translation>ステップ：</translation>
     </message>
     <message>
-        <source>Viewer BG Color</source>
-        <translation>メインビューアの背景色</translation>
+        <source>Viewer BG Color:</source>
+        <translation>メインビューアの背景色：</translation>
     </message>
     <message>
-        <source>Preview BG Color</source>
-        <translation>プレビューの背景色</translation>
+        <source>Preview BG Color:</source>
+        <translation>プレビューの背景色：</translation>
     </message>
     <message>
-        <source>Chessboard Color 1</source>
-        <translation>チェックボード色 1</translation>
+        <source>Chessboard Color 1:</source>
+        <translation>チェックボード色 1：</translation>
     </message>
     <message>
-        <source>Chessboard Color 2</source>
-        <translation>チェックボード色 2</translation>
+        <source>Chessboard Color 2:</source>
+        <translation>チェックボード色 2：</translation>
     </message>
     <message>
-        <source>Viewer Zoom Center</source>
-        <translation>ビューア上のズームの中心位置</translation>
+        <source>Viewer Zoom Center:</source>
+        <translation>ビューア上のズームの中心位置：</translation>
     </message>
     <message>
         <source>Language*:</source>
@@ -7328,7 +7316,7 @@ Set the output folder path to the subfolder as well.</source>
         <translation type="vanished">列アイコン表示のタイミング</translation>
     </message>
     <message>
-        <source>  Height:</source>
+        <source>Height:</source>
         <translation>高さ：</translation>
     </message>
     <message>
@@ -7936,8 +7924,8 @@ in non alpha-enabled image format.</source>
         <translation>カメラ列を表示する</translation>
     </message>
     <message>
-        <source>Level Editor Box Color</source>
-        <translation>レベル編集モードの背景色</translation>
+        <source>Level Editor Box Color:</source>
+        <translation>レベル編集モードの背景色：</translation>
     </message>
     <message>
         <source>Incremental</source>
@@ -7960,8 +7948,8 @@ in non alpha-enabled image format.</source>
         <translation>タッチジェスチャー操作を有効にする</translation>
     </message>
     <message>
-        <source>Number of Frames to Play for Short Play</source>
-        <translation>「少し前から再生」のフレーム数</translation>
+        <source>Number of Frames to Play for Short Play:</source>
+        <translation>「少し前から再生」のフレーム数：</translation>
     </message>
 </context>
 <context>
@@ -11484,14 +11472,6 @@ Please commit or revert changes first.</source>
     <message>
         <source>Camera BG Color:</source>
         <translation>カメラ背景色：</translation>
-    </message>
-    <message>
-        <source>Viewer BG Color:</source>
-        <translation type="vanished">メインビューアの背景色：</translation>
-    </message>
-    <message>
-        <source>   Preview BG Color:</source>
-        <translation type="vanished">プレビューの背景色：</translation>
     </message>
     <message>
         <source>Checkerboard Color 1:</source>

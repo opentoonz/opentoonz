@@ -94,7 +94,7 @@ SizeField::SizeField(QSize min, QSize max, QSize value, QWidget* parent)
   lay->setSpacing(5);
   lay->setMargin(0);
   lay->addWidget(m_fieldX, 1);
-  lay->addWidget(new QLabel("X", this), 0);
+  lay->addWidget(new QLabel("x", this), 0);
   lay->addWidget(m_fieldY, 1);
   lay->addStretch(1);
   setLayout(lay);
@@ -927,7 +927,7 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
       {autosaveSceneEnabled, tr("Automatically Save the Scene File")},
       {autosaveOtherFilesEnabled, tr("Automatically Save Non-Scene Files")},
       {startupPopupEnabled, tr("Show Startup Window when OpenToonz Starts")},
-      {undoMemorySize, tr("Undo Memory Size (MB)")},
+      {undoMemorySize, tr("Undo Memory Size (MB):")},
       {taskchunksize, tr("Render Task Chunk Size:")},
       {replaceAfterSaveLevelAs,
        tr("Replace Toonz Level after SaveLevelAs command")},
@@ -959,10 +959,10 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
        tr("Show Raster Images Darken Blended")},
       {showFrameNumberWithLetters,
        tr("Show \"ABC\" Appendix to the Frame Number in Xsheet Cell")},
-      {iconSize, tr("Icon Size*")},
-      {viewShrink, tr("Viewer Shrink")},
-      {viewStep, tr("Step")},
-      {viewerZoomCenter, tr("Viewer Zoom Center")},
+      {iconSize, tr("Icon Size*:")},
+      {viewShrink, tr("Viewer Shrink:")},
+      {viewStep, tr("Step:")},
+      {viewerZoomCenter, tr("Viewer Zoom Center:")},
       {CurrentLanguageName, tr("Language*:")},
       {interfaceFont, tr("Font*:")},
       {interfaceFontStyle, tr("Style*:")},
@@ -1003,7 +1003,7 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
       {newLevelSizeToCameraSizeEnabled,
        tr("New Levels Default to the Current Camera Size")},
       {DefLevelWidth, tr("Width:")},
-      {DefLevelHeight, tr("  Height:")},
+      {DefLevelHeight, tr("Height:")},
       {DefLevelDpi, tr("DPI:")},
       {EnableAutocreation, tr("Enable Autocreation")},
       {NumberingSystem, tr("Numbering System:")},
@@ -1027,7 +1027,7 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
       {dropdownShortcutsCycleOptions, tr("Dropdown Shortcuts:")},
       {FillOnlysavebox, tr("Use the TLV Savebox to Limit Filling Operations")},
       {multiLayerStylePickerEnabled,
-       tr("Multi Layer Style Picker : Switch Levels by Picking")},
+       tr("Multi Layer Style Picker: Switch Levels by Picking")},
       {cursorBrushType, tr("Basic Cursor Type:")},
       {cursorBrushStyle, tr("Cursor Style:")},
       {cursorOutlineEnabled, tr("Show Cursor Size Outlines")},
@@ -1066,7 +1066,7 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
       {blanksCount, tr("Blank Frames:")},
       {blankColor, tr("Blank Frames Color:")},
       {rewindAfterPlayback, tr("Rewind after Playback")},
-      {shortPlayFrameCount, tr("Number of Frames to Play for Short Play")},
+      {shortPlayFrameCount, tr("Number of Frames to Play for Short Play:")},
       {previewAlwaysOpenNewFlip, tr("Display in a New Flipbook Window")},
       {fitToFlipbook, tr("Fit to Flipbook")},
       {generatedMovieViewEnabled, tr("Open Flipbook after Rendering")},
@@ -1083,11 +1083,11 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
       {animatedGuidedDrawing, tr("Vector Guided Style:")},
 
       // Colors
-      {viewerBGColor, tr("Viewer BG Color")},
-      {previewBGColor, tr("Preview BG Color")},
-      {levelEditorBoxColor, tr("Level Editor Box Color")},
-      {chessboardColor1, tr("Chessboard Color 1")},
-      {chessboardColor2, tr("Chessboard Color 2")},
+      {viewerBGColor, tr("Viewer BG Color:")},
+      {previewBGColor, tr("Preview BG Color:")},
+      {levelEditorBoxColor, tr("Level Editor Box Color:")},
+      {chessboardColor1, tr("Chessboard Color 1:")},
+      {chessboardColor2, tr("Chessboard Color 2:")},
       {transpCheckInkOnWhite, tr("Ink Color on White BG:")},
       {transpCheckInkOnBlack, tr("Ink Color on Black BG:")},
       {transpCheckPaint, tr("Paint Color:")},

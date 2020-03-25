@@ -7003,7 +7003,7 @@ Set the output folder path to the subfolder as well.</source>
     </message>
     <message>
         <source>Step:</source>
-        <translation type="vanished">步长:</translation>
+        <translation>步长:</translation>
     </message>
     <message>
         <source>Height*:</source>
@@ -7154,10 +7154,6 @@ Set the output folder path to the subfolder as well.</source>
         <translation>宽度:</translation>
     </message>
     <message>
-        <source>Height:</source>
-        <translation type="vanished">高度:</translation>
-    </message>
-    <message>
         <source>DPI:</source>
         <translation>DPI:</translation>
     </message>
@@ -7302,7 +7298,7 @@ Set the output folder path to the subfolder as well.</source>
         <translation>自动从加载的层级名称中移除场景编号</translation>
     </message>
     <message>
-        <source>Multi Layer Style Picker : Switch Levels by Picking</source>
+        <source>Multi Layer Style Picker: Switch Levels by Picking</source>
         <translation>多层样式拾取器: 拾取时切换层级</translation>
     </message>
     <message>
@@ -7322,40 +7318,36 @@ Set the output folder path to the subfolder as well.</source>
         <translation>分配给撤消的内存大小(MB)</translation>
     </message>
     <message>
-        <source>Icon Size*</source>
-        <translation>图标尺寸*</translation>
+        <source>Icon Size*:</source>
+        <translation>图标尺寸*:</translation>
     </message>
     <message>
-        <source>X</source>
-        <translation type="vanished">X</translation>
+        <source>x</source>
+        <translation>x</translation>
     </message>
     <message>
-        <source>Viewer Shrink</source>
-        <translation>查看器的收缩</translation>
+        <source>Viewer Shrink:</source>
+        <translation>查看器的收缩:</translation>
     </message>
     <message>
-        <source>Step</source>
-        <translation>步长</translation>
+        <source>Viewer BG Color:</source>
+        <translation>查看器背景色:</translation>
     </message>
     <message>
-        <source>Viewer BG Color</source>
-        <translation>查看器背景色</translation>
+        <source>Preview BG Color:</source>
+        <translation>预览背景色:</translation>
     </message>
     <message>
-        <source>Preview BG Color</source>
-        <translation>预览背景色</translation>
+        <source>Chessboard Color 1:</source>
+        <translation>棋盘色 1:</translation>
     </message>
     <message>
-        <source>Chessboard Color 1</source>
-        <translation>棋盘色 1</translation>
+        <source>Chessboard Color 2:</source>
+        <translation>棋盘色 2:</translation>
     </message>
     <message>
-        <source>Chessboard Color 2</source>
-        <translation>棋盘色 2</translation>
-    </message>
-    <message>
-        <source>Viewer Zoom Center</source>
-        <translation>查看器的缩放中心</translation>
+        <source>Viewer Zoom Center:</source>
+        <translation>查看器的缩放中心:</translation>
     </message>
     <message>
         <source>Language*:</source>
@@ -7370,7 +7362,7 @@ Set the output folder path to the subfolder as well.</source>
         <translation type="vanished">列图标</translation>
     </message>
     <message>
-        <source>  Height:</source>
+        <source>Height:</source>
         <translation>高度:</translation>
     </message>
     <message>
@@ -7967,8 +7959,8 @@ in non alpha-enabled image format.</source>
         <translation>显示摄影机列</translation>
     </message>
     <message>
-        <source>Level Editor Box Color</source>
-        <translation>层级编辑器方框颜色</translation>
+        <source>Level Editor Box Color:</source>
+        <translation>层级编辑器方框颜色:</translation>
     </message>
     <message>
         <source>Incremental</source>
@@ -7991,7 +7983,7 @@ in non alpha-enabled image format.</source>
         <translation>启用触控手势控制部件</translation>
     </message>
     <message>
-        <source>Number of Frames to Play for Short Play</source>
+        <source>Number of Frames to Play for Short Play:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -11529,14 +11521,6 @@ Please commit or revert changes first.</source>
     <message>
         <source>Camera BG Color:</source>
         <translation>摄影机背景色:</translation>
-    </message>
-    <message>
-        <source>Viewer BG Color:</source>
-        <translation type="vanished">查看器背景色:</translation>
-    </message>
-    <message>
-        <source>   Preview BG Color:</source>
-        <translation type="vanished">   预览背景色:</translation>
     </message>
     <message>
         <source>Checkerboard Color 1:</source>
