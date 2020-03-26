@@ -7072,7 +7072,7 @@ Nastavit cestu k výstupní složce také na podsložku.</translation>
     </message>
     <message>
         <source>Step:</source>
-        <translation type="vanished">Krok:</translation>
+        <translation>Krok:</translation>
     </message>
     <message>
         <source>Height*:</source>
@@ -7176,7 +7176,7 @@ Nastavit cestu k výstupní složce také na podsložku.</translation>
     </message>
     <message>
         <source>Undo Memory Size (MB):</source>
-        <translation type="vanished">Velikost paměti (MB) pro návrat zpět:</translation>
+        <translation>Velikost paměti (MB) pro návrat zpět:</translation>
     </message>
     <message>
         <source>Render Task Chunk Size:</source>
@@ -7225,10 +7225,6 @@ Nastavit cestu k výstupní složce také na podsložku.</translation>
     <message>
         <source>Width:</source>
         <translation>Šířka:</translation>
-    </message>
-    <message>
-        <source>Height:</source>
-        <translation type="vanished">Výška:</translation>
     </message>
     <message>
         <source>DPI:</source>
@@ -7363,8 +7359,8 @@ Nastavit cestu k výstupní složce také na podsložku.</translation>
         <translation>Odstranit automaticky číslo výjevu z názvu nahrané úrovně</translation>
     </message>
     <message>
-        <source>Multi Layer Style Picker : Switch Levels by Picking</source>
-        <translation>Volič stylu více úrovní : Změnit úrovně zvolením</translation>
+        <source>Multi Layer Style Picker: Switch Levels by Picking</source>
+        <translation>Volič stylu více úrovní: Změnit úrovně zvolením</translation>
     </message>
     <message>
         <source>Onion Skin ON</source>
@@ -7379,44 +7375,28 @@ Nastavit cestu k výstupní složce také na podsložku.</translation>
         <translation>Skupina</translation>
     </message>
     <message>
-        <source>Undo Memory Size (MB)</source>
-        <translation>Velikost paměti (MB) pro návrat zpět</translation>
+        <source>Icon Size*:</source>
+        <translation>Velikost Ikony*:</translation>
     </message>
     <message>
-        <source>Icon Size*</source>
-        <translation>Velikost Ikony*</translation>
+        <source>x</source>
+        <translation>x</translation>
     </message>
     <message>
-        <source>X</source>
-        <translation type="vanished">X</translation>
+        <source>Viewer Shrink:</source>
+        <translation>Zmenšit prohlížeč:</translation>
     </message>
     <message>
-        <source>Viewer Shrink</source>
-        <translation>Zmenšit prohlížeč</translation>
+        <source>Chessboard Color 1:</source>
+        <translation>Barva šachovnice 1:</translation>
     </message>
     <message>
-        <source>Step</source>
-        <translation>Krok</translation>
+        <source>Chessboard Color 2:</source>
+        <translation>Barva šachovnice 2:</translation>
     </message>
     <message>
-        <source>Viewer BG Color</source>
-        <translation>Barva pozadí prohlížeče</translation>
-    </message>
-    <message>
-        <source>Preview BG Color</source>
-        <translation>Barva pozadí náhledu</translation>
-    </message>
-    <message>
-        <source>Chessboard Color 1</source>
-        <translation>Barva šachovnice 1</translation>
-    </message>
-    <message>
-        <source>Chessboard Color 2</source>
-        <translation>Barva šachovnice 2</translation>
-    </message>
-    <message>
-        <source>Viewer Zoom Center</source>
-        <translation>Střed přiblížení prohlížeče</translation>
+        <source>Viewer Zoom Center:</source>
+        <translation>Střed přiblížení prohlížeče:</translation>
     </message>
     <message>
         <source>Language*:</source>
@@ -7431,7 +7411,7 @@ Nastavit cestu k výstupní složce také na podsložku.</translation>
         <translation type="vanished">Ikona sloupce</translation>
     </message>
     <message>
-        <source>  Height:</source>
+        <source>Height:</source>
         <translation>Výška:</translation>
     </message>
     <message>
@@ -7770,7 +7750,7 @@ if both are possible on coding file path.</source>
         <translation>Ikona sloupce:</translation>
     </message>
     <message>
-        <source>Please indicate where you would like exports from Fast Render(MP4) to go.</source>
+        <source>Please indicate where you would like exports from Fast Render (MP4) to go.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8005,8 +7985,8 @@ v obrázkových formátech, kde není povolen kanál alfa.</translation>
         <translation>Ukázat sloupec kamery</translation>
     </message>
     <message>
-        <source>Level Editor Box Color</source>
-        <translation>Barva rámu editoru úrovní</translation>
+        <source>Level Editor Box Color:</source>
+        <translation>Barva rámu editoru úrovní:</translation>
     </message>
     <message>
         <source>Incremental</source>
@@ -8029,7 +8009,7 @@ v obrázkových formátech, kde není povolen kanál alfa.</translation>
         <translation>Povolit ovládání dotykovými gesty</translation>
     </message>
     <message>
-        <source>Number of Frames to Play for Short Play</source>
+        <source>Number of Frames to Play for Short Play:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -11615,11 +11595,11 @@ Nejprve, prosím, změny odešlete, nebo je vraťte zpět.</translation>
     </message>
     <message>
         <source>Viewer BG Color:</source>
-        <translation type="vanished">Barva pozadí prohlížeče:</translation>
+        <translation>Barva pozadí prohlížeče:</translation>
     </message>
     <message>
-        <source>   Preview BG Color:</source>
-        <translation type="vanished">Barva pozadí náhledu:</translation>
+        <source>Preview BG Color:</source>
+        <translation>Barva pozadí náhledu:</translation>
     </message>
     <message>
         <source>Checkerboard Color 1:</source>

@@ -7579,7 +7579,7 @@ Is it OK to release these shortcuts?</source>
         <translation>启用不双击情况下置入帧格</translation>
     </message>
     <message>
-        <source>Please indicate where you would like exports from Fast Render(MP4) to go.</source>
+        <source>Please indicate where you would like exports from Fast Render (MP4) to go.</source>
         <translation>请标明快速渲染(MP4)的输出路径。</translation>
     </message>
     <message>

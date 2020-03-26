@@ -7534,7 +7534,7 @@ Is it OK to release these shortcuts?</source>
         <translation>ダブルクリックなしでシートのコマを入力できるようにする</translation>
     </message>
     <message>
-        <source>Please indicate where you would like exports from Fast Render(MP4) to go.</source>
+        <source>Please indicate where you would like exports from Fast Render (MP4) to go.</source>
         <translation>”MP4ムービーのレンダリング”コマンドの出力先を指定してください。</translation>
     </message>
     <message>

@@ -1568,7 +1568,7 @@ QWidget* PreferencesPopup::createImportExportPage() {
   insertUI(ffmpegTimeout, lay);
 
   putLabel(tr("Please indicate where you would like exports from Fast "
-              "Render(MP4) to go."),
+              "Render (MP4) to go."),
            lay);
   insertUI(fastRenderPath, lay);
 

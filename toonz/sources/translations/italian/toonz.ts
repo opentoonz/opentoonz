@@ -6877,7 +6877,7 @@ Set the output folder path to the subfolder as well.</source>
     </message>
     <message>
         <source>Step:</source>
-        <translation type="vanished">Passo:</translation>
+        <translation>Passo:</translation>
     </message>
     <message>
         <source>Height*:</source>
@@ -6973,7 +6973,7 @@ Set the output folder path to the subfolder as well.</source>
     </message>
     <message>
         <source>Undo Memory Size (MB):</source>
-        <translation type="vanished">Quantità di Memoria Dedicata all&apos;Annullamento (MB):</translation>
+        <translation>Quantità di Memoria Dedicata all&apos;Annullamento (MB):</translation>
     </message>
     <message>
         <source>Render Task Chunk Size:</source>
@@ -7045,7 +7045,7 @@ Set the output folder path to the subfolder as well.</source>
     </message>
     <message>
         <source>Height:</source>
-        <translation type="vanished">Altezza:</translation>
+        <translation>Altezza:</translation>
     </message>
     <message>
         <source>DPI:</source>
@@ -7160,7 +7160,7 @@ Set the output folder path to the subfolder as well.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Multi Layer Style Picker : Switch Levels by Picking</source>
+        <source>Multi Layer Style Picker: Switch Levels by Picking</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7172,43 +7172,23 @@ Set the output folder path to the subfolder as well.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Undo Memory Size (MB)</source>
+        <source>Icon Size*:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Icon Size*</source>
+        <source>Viewer Shrink:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Viewer Shrink</source>
+        <source>Chessboard Color 1:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Step</source>
+        <source>Chessboard Color 2:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Viewer BG Color</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Preview BG Color</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Chessboard Color 1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Chessboard Color 2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Viewer Zoom Center</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>  Height:</source>
+        <source>Viewer Zoom Center:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7514,7 +7494,7 @@ if both are possible on coding file path.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Please indicate where you would like exports from Fast Render(MP4) to go.</source>
+        <source>Please indicate where you would like exports from Fast Render (MP4) to go.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7742,7 +7722,7 @@ in non alpha-enabled image format.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Level Editor Box Color</source>
+        <source>Level Editor Box Color:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7766,7 +7746,7 @@ in non alpha-enabled image format.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Number of Frames to Play for Short Play</source>
+        <source>Number of Frames to Play for Short Play:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -11216,11 +11196,11 @@ Per favore sottometti o ripristina i cambiamenti prima di proseguire.</translati
     </message>
     <message>
         <source>Viewer BG Color:</source>
-        <translation type="vanished">Colore del Fondale del Visualizzatore:</translation>
+        <translation>Colore del Fondale del Visualizzatore:</translation>
     </message>
     <message>
-        <source>   Preview BG Color:</source>
-        <translation type="vanished">Colore del Fondale dell&apos;Anteprima:</translation>
+        <source>Preview BG Color:</source>
+        <translation>Colore del Fondale dell&apos;Anteprima:</translation>
     </message>
     <message>
         <source>Checkerboard Color 1:</source>

@@ -6657,7 +6657,7 @@ Is it OK to release these shortcuts?</source>
         <translation>원본을 정리 한 도면을 백업으로 유지</translation>
     </message>
     <message>
-        <source>Multi Layer Style Picker : Switch Levels by Picking</source>
+        <source>Multi Layer Style Picker: Switch Levels by Picking</source>
         <translation>멀티 레이어 스타일 선택기: 픽싱을 통한 레벨 전환</translation>
     </message>
     <message>
@@ -7063,8 +7063,8 @@ if both are possible on coding file path.</source>
         <translation>간격(분):</translation>
     </message>
     <message>
-        <source>Undo Memory Size (MB)</source>
-        <translation>실행취소 메모리 크기(MB)</translation>
+        <source>Undo Memory Size (MB):</source>
+        <translation>실행취소 메모리 크기(MB):</translation>
     </message>
     <message>
         <source>Render Task Chunk Size:</source>
@@ -7099,16 +7099,16 @@ if both are possible on coding file path.</source>
         <translation>기능 편집기*:</translation>
     </message>
     <message>
-        <source>Icon Size*</source>
-        <translation>아이콘 크기*</translation>
+        <source>Icon Size*:</source>
+        <translation>아이콘 크기*:</translation>
     </message>
     <message>
-        <source>Viewer Shrink</source>
-        <translation>뷰어 축소</translation>
+        <source>Viewer Shrink:</source>
+        <translation>뷰어 축소:</translation>
     </message>
     <message>
-        <source>Step</source>
-        <translation>단계</translation>
+        <source>Step:</source>
+        <translation>단계:</translation>
     </message>
     <message>
         <source>Style*:</source>
@@ -7145,24 +7145,24 @@ in non alpha-enabled image format.</source>
         <translation>현재 열 색상:</translation>
     </message>
     <message>
-        <source>Viewer BG Color</source>
-        <translation>뷰어 BG 색상</translation>
+        <source>Viewer BG Color:</source>
+        <translation>뷰어 BG 색상:</translation>
     </message>
     <message>
-        <source>Preview BG Color</source>
-        <translation>미리보기 BG 색상</translation>
+        <source>Preview BG Color:</source>
+        <translation>미리보기 BG 색상:</translation>
     </message>
     <message>
-        <source>Chessboard Color 1</source>
-        <translation>체스보드 색상 1</translation>
+        <source>Chessboard Color 1:</source>
+        <translation>체스보드 색상 1:</translation>
     </message>
     <message>
-        <source>Chessboard Color 2</source>
-        <translation>체스보드 색상 2</translation>
+        <source>Chessboard Color 2:</source>
+        <translation>체스보드 색상 2:</translation>
     </message>
     <message>
-        <source>Viewer Zoom Center</source>
-        <translation>뷰어 줌 센터</translation>
+        <source>Viewer Zoom Center:</source>
+        <translation>뷰어 줌 센터:</translation>
     </message>
     <message>
         <source>Language*:</source>
@@ -7209,7 +7209,7 @@ in non alpha-enabled image format.</source>
         <translation>FFmpeg 시간초과:</translation>
     </message>
     <message>
-        <source>Please indicate where you would like exports from Fast Render(MP4) to go.</source>
+        <source>Please indicate where you would like exports from Fast Render (MP4) to go.</source>
         <translation>빠른 랜더(MP4)에서 내보낼 위치를 지정하세요.</translation>
     </message>
     <message>
@@ -7229,7 +7229,7 @@ in non alpha-enabled image format.</source>
         <translation>폭:</translation>
     </message>
     <message>
-        <source>  Height:</source>
+        <source>Height:</source>
         <translation>높이:</translation>
     </message>
     <message>
@@ -7345,8 +7345,8 @@ in non alpha-enabled image format.</source>
         <translation>툴바 표시 동작:</translation>
     </message>
     <message>
-        <source>Level Editor Box Color</source>
-        <translation>레벨 편집기 상자 색상</translation>
+        <source>Level Editor Box Color:</source>
+        <translation>레벨 편집기 상자 색상:</translation>
     </message>
     <message>
         <source>Incremental</source>
@@ -7361,8 +7361,8 @@ in non alpha-enabled image format.</source>
         <translation>레벨 전용 도구 표시</translation>
     </message>
     <message>
-        <source>Number of Frames to Play for Short Play</source>
-        <translation>쇼트 플레이에 사용할 프레임 수</translation>
+        <source>Number of Frames to Play for Short Play:</source>
+        <translation>쇼트 플레이에 사용할 프레임 수:</translation>
     </message>
 </context>
 <context>

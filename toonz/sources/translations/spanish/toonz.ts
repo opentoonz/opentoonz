@@ -6972,7 +6972,7 @@ También establecer la ruta de salida a esa carpeta.</translation>
     </message>
     <message>
         <source>Step:</source>
-        <translation type="vanished">Intervalo:</translation>
+        <translation>Intervalo:</translation>
     </message>
     <message>
         <source>Height*:</source>
@@ -7068,7 +7068,7 @@ También establecer la ruta de salida a esa carpeta.</translation>
     </message>
     <message>
         <source>Undo Memory Size (MB):</source>
-        <translation type="vanished">Deshacer - Tamaño de memoria (MB):</translation>
+        <translation>Deshacer - Tamaño de memoria (MB):</translation>
     </message>
     <message>
         <source>Render Task Chunk Size:</source>
@@ -7136,7 +7136,7 @@ También establecer la ruta de salida a esa carpeta.</translation>
     </message>
     <message>
         <source>Height:</source>
-        <translation type="vanished">Altura:</translation>
+        <translation>Altura:</translation>
     </message>
     <message>
         <source>DPI:</source>
@@ -7255,7 +7255,7 @@ También establecer la ruta de salida a esa carpeta.</translation>
         <translation>Eliminar automáticamente el número de escena del nombre de un nivel cargado</translation>
     </message>
     <message>
-        <source>Multi Layer Style Picker : Switch Levels by Picking</source>
+        <source>Multi Layer Style Picker: Switch Levels by Picking</source>
         <translation>Selector de estilos: Cambiar de nivel al seleccionar</translation>
     </message>
     <message>
@@ -7271,44 +7271,28 @@ También establecer la ruta de salida a esa carpeta.</translation>
         <translation>Categorías</translation>
     </message>
     <message>
-        <source>Undo Memory Size (MB)</source>
-        <translation>Deshacer - Tamaño de memoria (MB)</translation>
+        <source>Icon Size*:</source>
+        <translation>Tamaño de íconos*:</translation>
     </message>
     <message>
-        <source>Icon Size*</source>
-        <translation>Tamaño de íconos*</translation>
+        <source>x</source>
+        <translation>x</translation>
     </message>
     <message>
-        <source>X</source>
-        <translation type="vanished">x</translation>
+        <source>Viewer Shrink:</source>
+        <translation>Visor Reducción:</translation>
     </message>
     <message>
-        <source>Viewer Shrink</source>
-        <translation>Visor Reducción</translation>
+        <source>Chessboard Color 1:</source>
+        <translation>Damero - Color 1:</translation>
     </message>
     <message>
-        <source>Step</source>
-        <translation>Intervalo</translation>
+        <source>Chessboard Color 2:</source>
+        <translation>Damero - Color 2:</translation>
     </message>
     <message>
-        <source>Viewer BG Color</source>
-        <translation>Fondo del visor</translation>
-    </message>
-    <message>
-        <source>Preview BG Color</source>
-        <translation>Fondo previsualización</translation>
-    </message>
-    <message>
-        <source>Chessboard Color 1</source>
-        <translation>Damero - Color 1</translation>
-    </message>
-    <message>
-        <source>Chessboard Color 2</source>
-        <translation>Damero - Color 2</translation>
-    </message>
-    <message>
-        <source>Viewer Zoom Center</source>
-        <translation>Centro de zoom en visor</translation>
+        <source>Viewer Zoom Center:</source>
+        <translation>Centro de zoom en visor:</translation>
     </message>
     <message>
         <source>Language*:</source>
@@ -7321,10 +7305,6 @@ También establecer la ruta de salida a esa carpeta.</translation>
     <message>
         <source>Column Icon</source>
         <translation type="vanished">Miniatura de columnas</translation>
-    </message>
-    <message>
-        <source>  Height:</source>
-        <translation>  Altura:</translation>
     </message>
     <message>
         <source>Default Interpolation:</source>
@@ -7529,7 +7509,7 @@ Is it OK to release these shortcuts?</source>
         <translation>Espacios de trabajo*:</translation>
     </message>
     <message>
-        <source>Please indicate where you would like exports from Fast Render(MP4) to go.</source>
+        <source>Please indicate where you would like exports from Fast Render (MP4) to go.</source>
         <translation>Por favor indicar dónde se desea ubicar los archivos generados al usar Procesar rápido a MP4.</translation>
     </message>
     <message>
@@ -7935,8 +7915,8 @@ contengan píxeles transparentes en formatos de imagen sin soporte para canal al
         <translation>Mostrar columna de cámara</translation>
     </message>
     <message>
-        <source>Level Editor Box Color</source>
-        <translation>Fondo del visor (niveles)</translation>
+        <source>Level Editor Box Color:</source>
+        <translation>Fondo del visor (niveles):</translation>
     </message>
     <message>
         <source>Incremental</source>
@@ -7959,8 +7939,8 @@ contengan píxeles transparentes en formatos de imagen sin soporte para canal al
         <translation>Habilitar control mediante gestos táctiles</translation>
     </message>
     <message>
-        <source>Number of Frames to Play for Short Play</source>
-        <translation>Cantidad de fotogramas en Reproducción breve</translation>
+        <source>Number of Frames to Play for Short Play:</source>
+        <translation>Cantidad de fotogramas en Reproducción breve:</translation>
     </message>
 </context>
 <context>
@@ -11480,11 +11460,11 @@ Por favor enviar o revertir los cambios antes.</translation>
     </message>
     <message>
         <source>Viewer BG Color:</source>
-        <translation type="vanished">Color de fondo del visor:</translation>
+        <translation>Color de fondo del visor:</translation>
     </message>
     <message>
-        <source>   Preview BG Color:</source>
-        <translation type="vanished">  Color de fondo previsualización:</translation>
+        <source>Preview BG Color:</source>
+        <translation>Color de fondo previsualización:</translation>
     </message>
     <message>
         <source>Checkerboard Color 1:</source>

@@ -7035,7 +7035,7 @@ Set the output folder path to the subfolder as well.</source>
     </message>
     <message>
         <source>Step:</source>
-        <translation type="vanished">Schritt:</translation>
+        <translation>Schritt:</translation>
     </message>
     <message>
         <source>Height*:</source>
@@ -7143,7 +7143,7 @@ Set the output folder path to the subfolder as well.</source>
     </message>
     <message>
         <source>Undo Memory Size (MB):</source>
-        <translation type="vanished">Speichergröße (MB) zurücksetzen:</translation>
+        <translation>Speichergröße (MB) zurücksetzen:</translation>
     </message>
     <message>
         <source>Render Task Chunk Size:</source>
@@ -7192,10 +7192,6 @@ Set the output folder path to the subfolder as well.</source>
     <message>
         <source>Width:</source>
         <translation>Breite:</translation>
-    </message>
-    <message>
-        <source>Height:</source>
-        <translation type="vanished">Höhe:</translation>
     </message>
     <message>
         <source>DPI:</source>
@@ -7338,8 +7334,8 @@ Set the output folder path to the subfolder as well.</source>
         <translation>Die Szenen-Nummer automatisch von geladenen Ebenen-Namen entfernen</translation>
     </message>
     <message>
-        <source>Multi Layer Style Picker : Switch Levels by Picking</source>
-        <translation>Multi Ebenen-Stil-Wähler : Ebenen durch Wählen wechseln</translation>
+        <source>Multi Layer Style Picker: Switch Levels by Picking</source>
+        <translation>Multi Ebenen-Stil-Wähler: Ebenen durch Wählen wechseln</translation>
     </message>
     <message>
         <source>Onion Skin ON</source>
@@ -7354,44 +7350,28 @@ Set the output folder path to the subfolder as well.</source>
         <translation>Kategorie</translation>
     </message>
     <message>
-        <source>Undo Memory Size (MB)</source>
-        <translation>Speichergröße (MB) zurücksetzen</translation>
+        <source>Icon Size*:</source>
+        <translation>Icon-Größe*:</translation>
     </message>
     <message>
-        <source>Icon Size*</source>
-        <translation>Icon-Größe*</translation>
+        <source>x</source>
+        <translation>x</translation>
     </message>
     <message>
-        <source>X</source>
-        <translation type="vanished">X</translation>
+        <source>Viewer Shrink:</source>
+        <translation>Betrachter schrumpfen:</translation>
     </message>
     <message>
-        <source>Viewer Shrink</source>
-        <translation>Betrachter schrumpfen</translation>
+        <source>Chessboard Color 1:</source>
+        <translation>Schachbrett-Farbe 1:</translation>
     </message>
     <message>
-        <source>Step</source>
-        <translation>Schritt</translation>
+        <source>Chessboard Color 2:</source>
+        <translation>Schachbrett-Farbe 2:</translation>
     </message>
     <message>
-        <source>Viewer BG Color</source>
-        <translation>Betrachter Hintergrundfarbe</translation>
-    </message>
-    <message>
-        <source>Preview BG Color</source>
-        <translation>Vorschau Hintergrundfarbe</translation>
-    </message>
-    <message>
-        <source>Chessboard Color 1</source>
-        <translation>Schachbrett-Farbe 1</translation>
-    </message>
-    <message>
-        <source>Chessboard Color 2</source>
-        <translation>Schachbrett-Farbe 2</translation>
-    </message>
-    <message>
-        <source>Viewer Zoom Center</source>
-        <translation>Betrachter-Zoom-Zentrum</translation>
+        <source>Viewer Zoom Center:</source>
+        <translation>Betrachter-Zoom-Zentrum:</translation>
     </message>
     <message>
         <source>Language*:</source>
@@ -7406,7 +7386,7 @@ Set the output folder path to the subfolder as well.</source>
         <translation type="vanished">Spalten-Icon</translation>
     </message>
     <message>
-        <source>  Height:</source>
+        <source>Height:</source>
         <translation>Höhe:</translation>
     </message>
     <message>
@@ -7744,7 +7724,7 @@ if both are possible on coding file path.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Please indicate where you would like exports from Fast Render(MP4) to go.</source>
+        <source>Please indicate where you would like exports from Fast Render (MP4) to go.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7972,7 +7952,7 @@ in non alpha-enabled image format.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Level Editor Box Color</source>
+        <source>Level Editor Box Color:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7996,7 +7976,7 @@ in non alpha-enabled image format.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Number of Frames to Play for Short Play</source>
+        <source>Number of Frames to Play for Short Play:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -11545,11 +11525,11 @@ Bitte tragen Sie die Änderungen ein oder setzen sie zurück.</translation>
     </message>
     <message>
         <source>Viewer BG Color:</source>
-        <translation type="vanished">Betrachter-Hintergrundfarbe:</translation>
+        <translation>Betrachter-Hintergrundfarbe:</translation>
     </message>
     <message>
-        <source>   Preview BG Color:</source>
-        <translation type="vanished">Vorschau-Hintergrundfarbe:</translation>
+        <source>Preview BG Color:</source>
+        <translation>Vorschau-Hintergrundfarbe:</translation>
     </message>
     <message>
         <source>Checkerboard Color 1:</source>
