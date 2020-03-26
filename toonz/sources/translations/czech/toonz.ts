@@ -7395,6 +7395,14 @@ Nastavit cestu k výstupní složce také na podsložku.</translation>
         <translation>Barva šachovnice 2:</translation>
     </message>
     <message>
+        <source>Viewer BG Color:</source>
+        <translation>Barva pozadí prohlížeče:</translation>
+    </message>
+    <message>
+        <source>Preview BG Color:</source>
+        <translation>Barva pozadí náhledu:</translation>
+    </message>
+    <message>
         <source>Viewer Zoom Center:</source>
         <translation>Střed přiblížení prohlížeče:</translation>
     </message>
@@ -11595,11 +11603,11 @@ Nejprve, prosím, změny odešlete, nebo je vraťte zpět.</translation>
     </message>
     <message>
         <source>Viewer BG Color:</source>
-        <translation>Barva pozadí prohlížeče:</translation>
+        <translation type="vanished">Barva pozadí prohlížeče:</translation>
     </message>
     <message>
-        <source>Preview BG Color:</source>
-        <translation>Barva pozadí náhledu:</translation>
+        <source>   Preview BG Color:</source>
+        <translation type="vanished">Barva pozadí náhledu:</translation>
     </message>
     <message>
         <source>Checkerboard Color 1:</source>

@@ -7354,8 +7354,16 @@ Set the output folder path to the subfolder as well.</source>
         <translation>Icon-Größe*:</translation>
     </message>
     <message>
+        <source>Viewer BG Color:</source>
+        <translation>Betrachter Hintergrundfarbe:</translation>
+    </message>
+    <message>
         <source>x</source>
         <translation>x</translation>
+    </message>
+    <message>
+        <source>Preview BG Color:</source>
+        <translation>Vorschau Hintergrundfarbe:</translation>
     </message>
     <message>
         <source>Viewer Shrink:</source>
@@ -11525,11 +11533,11 @@ Bitte tragen Sie die Änderungen ein oder setzen sie zurück.</translation>
     </message>
     <message>
         <source>Viewer BG Color:</source>
-        <translation>Betrachter-Hintergrundfarbe:</translation>
+        <translation type="vanished">Betrachter-Hintergrundfarbe:</translation>
     </message>
     <message>
-        <source>Preview BG Color:</source>
-        <translation>Vorschau-Hintergrundfarbe:</translation>
+        <source>   Preview BG Color:</source>
+        <translation type="vanished">Vorschau-Hintergrundfarbe:</translation>
     </message>
     <message>
         <source>Checkerboard Color 1:</source>

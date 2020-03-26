@@ -11523,6 +11523,14 @@ Please commit or revert changes first.</source>
         <translation>摄影机背景色:</translation>
     </message>
     <message>
+        <source>Viewer BG Color:</source>
+        <translation type="vanished">查看器背景色:</translation>
+    </message>
+    <message>
+        <source>   Preview BG Color:</source>
+        <translation type="vanished">   预览背景色:</translation>
+    </message>
+    <message>
         <source>Checkerboard Color 1:</source>
         <translation type="vanished">棋盘色 1:</translation>
     </message>

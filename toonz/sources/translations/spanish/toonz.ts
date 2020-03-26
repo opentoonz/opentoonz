@@ -7283,6 +7283,14 @@ También establecer la ruta de salida a esa carpeta.</translation>
         <translation>Visor Reducción:</translation>
     </message>
     <message>
+        <source>Viewer BG Color:</source>
+        <translation>Fondo del visor:</translation>
+    </message>
+    <message>
+        <source>Preview BG Color:</source>
+        <translation>Fondo previsualización:</translation>
+    </message>
+    <message>
         <source>Chessboard Color 1:</source>
         <translation>Damero - Color 1:</translation>
     </message>
@@ -11460,11 +11468,11 @@ Por favor enviar o revertir los cambios antes.</translation>
     </message>
     <message>
         <source>Viewer BG Color:</source>
-        <translation>Color de fondo del visor:</translation>
+        <translation type="vanished">Color de fondo del visor:</translation>
     </message>
     <message>
         <source>Preview BG Color:</source>
-        <translation>Color de fondo previsualización:</translation>
+        <translation type="vanished">Color de fondo previsualización:</translation>
     </message>
     <message>
         <source>Checkerboard Color 1:</source>

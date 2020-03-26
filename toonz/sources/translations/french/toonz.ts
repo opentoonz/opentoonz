@@ -7163,6 +7163,14 @@ Set the output folder path to the subfolder as well.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Viewer BG Color:</source>
+        <translation>Couleur de Fond du Viseur:</translation>
+    </message>
+    <message>
+        <source>Preview BG Color:</source>
+        <translation>Couleur de Fond du Preview:</translation>
+    </message>
+    <message>
         <source>Icon Size*:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -11187,11 +11195,11 @@ S&apos;il vous plaît commettre ou annuler les modifications avant.</translation
     </message>
     <message>
         <source>Viewer BG Color:</source>
-        <translation>Couleur de Fond du Viseur:</translation>
+        <translation type="vanished">Couleur de Fond du Viseur:</translation>
     </message>
     <message>
         <source>Preview BG Color:</source>
-        <translation>Couleur de Fond du Preview:</translation>
+        <translation type="vanished">Couleur de Fond du Preview:</translation>
     </message>
     <message>
         <source>Checkerboard Color 1:</source>

@@ -11474,6 +11474,14 @@ Please commit or revert changes first.</source>
         <translation>カメラ背景色：</translation>
     </message>
     <message>
+        <source>Viewer BG Color:</source>
+        <translation type="vanished">メインビューアの背景色：</translation>
+    </message>
+    <message>
+        <source>   Preview BG Color:</source>
+        <translation type="vanished">プレビューの背景色：</translation>
+    </message>
+    <message>
         <source>Checkerboard Color 1:</source>
         <translation type="vanished">チェックボード色 1：</translation>
     </message>
