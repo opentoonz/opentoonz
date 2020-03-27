@@ -7332,7 +7332,7 @@ Nastavit cestu k výstupní složce také na podsložku.</translation>
     </message>
     <message>
         <source>* Changes will take effect the next time you run OpenToonz</source>
-        <translation>* Změny se projeví při příštím spuštění Toonz</translation>
+        <translation>* Změny se projeví při příštím spuštění OpenToonz</translation>
     </message>
     <message>
         <source>Move Current Frame by Clicking on Xsheet / Numerical Columns Cell Area</source>
@@ -7368,7 +7368,7 @@ Nastavit cestu k výstupní složce také na podsložku.</translation>
     </message>
     <message>
         <source>Enable Version Control*</source>
-        <translation>Povolit správu verzí *</translation>
+        <translation>Povolit správu verzí*</translation>
     </message>
     <message>
         <source>Category</source>

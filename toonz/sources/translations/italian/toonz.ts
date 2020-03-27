@@ -6977,7 +6977,7 @@ Set the output folder path to the subfolder as well.</source>
     </message>
     <message>
         <source>Render Task Chunk Size:</source>
-        <translation>Dimensione degli Spezzoni dei Task di Render</translation>
+        <translation>Dimensione degli Spezzoni dei Task di Render:</translation>
     </message>
     <message>
         <source>Show Info in Rendered Frames</source>

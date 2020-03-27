@@ -8575,7 +8575,7 @@ Is it OK to release these shortcuts?</source>
     <message>
         <location filename="../../toonz/preferencespopup.cpp" line="1052"/>
         <source>Expand Function Editor Header to Match Xsheet Toolbar Height*</source>
-        <translation>Развернуть заголовок редактора функций, чтобы соответствовать высоте панели инструментов XSheet *</translation>
+        <translation>Развернуть заголовок редактора функций, чтобы соответствовать высоте панели инструментов Xsheet*</translation>
     </message>
     <message>
         <location filename="../../toonz/preferencespopup.cpp" line="1071"/>
