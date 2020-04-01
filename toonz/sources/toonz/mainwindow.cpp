@@ -2452,6 +2452,7 @@ void MainWindow::toggleEraserNormal() {
 
 void MainWindow::toggleEraserRectangular() {
   CommandManager::instance()->getAction(T_Eraser)->trigger();
+  CommandManager::instance()->getAction("A_ToolOption_Type:Normal")->trigger();
   CommandManager::instance()
       ->getAction("A_ToolOption_Type:Rectangular")
       ->trigger();
@@ -2459,6 +2460,7 @@ void MainWindow::toggleEraserRectangular() {
 
 void MainWindow::toggleEraserFreehand() {
   CommandManager::instance()->getAction(T_Eraser)->trigger();
+  CommandManager::instance()->getAction("A_ToolOption_Type:Normal")->trigger();
   CommandManager::instance()
       ->getAction("A_ToolOption_Type:Freehand")
       ->trigger();
@@ -2466,6 +2468,7 @@ void MainWindow::toggleEraserFreehand() {
 
 void MainWindow::toggleEraserPolyline() {
   CommandManager::instance()->getAction(T_Eraser)->trigger();
+  CommandManager::instance()->getAction("A_ToolOption_Type:Normal")->trigger();
   CommandManager::instance()
       ->getAction("A_ToolOption_Type:Polyline")
       ->trigger();
@@ -2473,6 +2476,7 @@ void MainWindow::toggleEraserPolyline() {
 
 void MainWindow::toggleEraserSegment() {
   CommandManager::instance()->getAction(T_Eraser)->trigger();
+  CommandManager::instance()->getAction("A_ToolOption_Type:Normal")->trigger();
   CommandManager::instance()->getAction("A_ToolOption_Type:Segment")->trigger();
 }
 
