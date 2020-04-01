@@ -450,6 +450,14 @@ centralWidget->setLayout(centralWidgetLayout);*/
   setCommandHandler(MI_PickStyleAreas, this, &MainWindow::togglePickStyleAreas);
   setCommandHandler(MI_PickStyleLines, this, &MainWindow::togglePickStyleLines);
 
+  /*-- Eraser Tool modes --*/
+  setCommandHandler(MI_EraserNormal, this, &MainWindow::toggleEraserNormal);
+  setCommandHandler(MI_EraserRectangular, this,
+                    &MainWindow::toggleEraserRectangular);
+  setCommandHandler(MI_EraserFreehand, this, &MainWindow::toggleEraserFreehand);
+  setCommandHandler(MI_EraserPolyline, this, &MainWindow::toggleEraserPolyline);
+  setCommandHandler(MI_EraserSegment, this, &MainWindow::toggleEraserSegment);
+
   setCommandHandler(MI_About, this, &MainWindow::onAbout);
   setCommandHandler(MI_OpenOnlineManual, this, &MainWindow::onOpenOnlineManual);
   setCommandHandler(MI_OpenWhatsNew, this, &MainWindow::onOpenWhatsNew);
@@ -2314,6 +2322,8 @@ void MainWindow::defineActions() {
                           "");
   createToolOptionsAction("A_ToolOption_Type:Polyline", tr("Type - Polyline"),
                           "");
+  createToolOptionsAction("A_ToolOption_Type:Segment", tr("Type - Segment"),
+                          "");
   createToolOptionsAction("A_ToolOption_TypeFont", tr("TypeTool Font"), "");
   createToolOptionsAction("A_ToolOption_TypeSize", tr("TypeTool Size"), "");
   createToolOptionsAction("A_ToolOption_TypeStyle", tr("TypeTool Style"), "");
@@ -2360,6 +2370,18 @@ void MainWindow::defineActions() {
   createAction(MI_PickStyleAreas, tr("Style Picker Tool - Areas"), "",
                ToolCommandType);
   createAction(MI_PickStyleLines, tr("Style Picker Tool - Lines"), "",
+               ToolCommandType);
+
+  /*-- Eraser Tool modes --*/
+  createAction(MI_EraserNormal, tr("Eraser Tool - Normal"), "",
+               ToolCommandType);
+  createAction(MI_EraserRectangular, tr("Eraser Tool - Rectangular"), "",
+               ToolCommandType);
+  createAction(MI_EraserFreehand, tr("Eraser Tool - Freehand"), "",
+               ToolCommandType);
+  createAction(MI_EraserPolyline, tr("Eraser Tool - Polyline"), "",
+               ToolCommandType);
+  createAction(MI_EraserSegment, tr("Eraser Tool - Segment"), "",
                ToolCommandType);
 
   createMiscAction("A_FxSchematicToggle", tr("Toggle FX/Stage schematic"), "");
@@ -2419,6 +2441,39 @@ void MainWindow::togglePickStyleAreas() {
 void MainWindow::togglePickStyleLines() {
   CommandManager::instance()->getAction(T_StylePicker)->trigger();
   CommandManager::instance()->getAction("A_ToolOption_Mode:Lines")->trigger();
+}
+
+//---------------------------------------------------------------------------------------
+/*-- eraser tool modes --*/
+void MainWindow::toggleEraserNormal() {
+  CommandManager::instance()->getAction(T_Eraser)->trigger();
+  CommandManager::instance()->getAction("A_ToolOption_Type:Normal")->trigger();
+}
+
+void MainWindow::toggleEraserRectangular() {
+  CommandManager::instance()->getAction(T_Eraser)->trigger();
+  CommandManager::instance()
+      ->getAction("A_ToolOption_Type:Rectangular")
+      ->trigger();
+}
+
+void MainWindow::toggleEraserFreehand() {
+  CommandManager::instance()->getAction(T_Eraser)->trigger();
+  CommandManager::instance()
+      ->getAction("A_ToolOption_Type:Freehand")
+      ->trigger();
+}
+
+void MainWindow::toggleEraserPolyline() {
+  CommandManager::instance()->getAction(T_Eraser)->trigger();
+  CommandManager::instance()
+      ->getAction("A_ToolOption_Type:Polyline")
+      ->trigger();
+}
+
+void MainWindow::toggleEraserSegment() {
+  CommandManager::instance()->getAction(T_Eraser)->trigger();
+  CommandManager::instance()->getAction("A_ToolOption_Type:Segment")->trigger();
 }
 
 //-----------------------------------------------------------------------------

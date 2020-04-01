@@ -112,6 +112,12 @@ public:
   /*-- StylepickerAreas,StylepickerLinesに直接切り替えるコマンド --*/
   void togglePickStyleAreas();
   void togglePickStyleLines();
+  /*-- eraser tool modes --*/
+  void toggleEraserNormal();
+  void toggleEraserRectangular();
+  void toggleEraserFreehand();
+  void toggleEraserPolyline();
+  void toggleEraserSegment();
   void onNewVectorLevelButtonPressed();
   void onNewToonzRasterLevelButtonPressed();
   void onNewRasterLevelButtonPressed();
