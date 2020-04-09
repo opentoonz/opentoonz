@@ -1949,11 +1949,6 @@ void StopMotion::changeCameras(int index) {
     m_webcamDeviceName  = cameras.at(index).deviceName();
     m_webcamDescription = cameras.at(index).description();
 
-#ifdef MACOSX
-    // this line is needed only in macosx
-    m_stopMotion->getWebcam()->setViewfinder(m_dummyViewFinder);
-#endif
-
     // loading new camera
     getWebcam()->load();
 
