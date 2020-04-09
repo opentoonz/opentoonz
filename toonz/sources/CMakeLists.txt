@@ -259,7 +259,7 @@ if(Qt5Core_VERSION VERSION_LESS QT_MINIMUM_VERSION)
 endif()
 unset(QT_MINIMUM_VERSION)
 
-if(BUILD_ENV_MSVC AND NOT WITH_STOPMOTION)
+if(BUILD_ENV_MSVC)
     include_directories(
         SYSTEM
         ${SDKROOT}/glut/3.7.6/include
@@ -271,19 +271,12 @@ if(BUILD_ENV_MSVC AND NOT WITH_STOPMOTION)
     )
 endif()
 
-if(BUILD_ENV_MSVC AND WITH_STOPMOTION)
+if(WITH_STOPMOTION)
     find_package(OpenCV 4.1 REQUIRED)
     include_directories(
-        SYSTEM
-        ${SDKROOT}/glut/3.7.6/include
-        ${SDKROOT}/zlib-1.2.8
-        ${SDKROOT}/LibJPEG/jpeg-9
         ${SDKROOT}/canon/Header
         ${SDKROOT}/libjpeg-turbo64/include
         ${OpenCV_INCLUDE_DIRS}
-    )
-    add_definitions(
-        -DGLUT_NO_LIB_PRAGMA
     )
 endif()
 
@@ -404,6 +397,10 @@ elseif(BUILD_ENV_APPLE)
     message("LZO:" ${LZO_INCLUDE_DIR})
 
     pkg_check_modules(MYPAINT_LIB REQUIRED libmypaint)
+    if (WITH_STOPMOTION)
+        set(CANON_LIB ${SDKROOT}/canon/library/EDSDK.lib)
+        set(TURBOJPEG_LIB ${SDKROOT}/libjpeg-turbo64/lib/turbojpeg.lib)
+    endif()
 elseif(BUILD_ENV_UNIXLIKE)
     if(BUILD_TARGET_WIN)
         find_library(GL_LIB opengl32)
