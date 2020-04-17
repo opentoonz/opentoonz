@@ -6657,7 +6657,7 @@ or you may delete necessary files for it.</source>
     </message>
     <message>
         <location filename="../../toonz/mainwindow.cpp" line="2265"/>
-        <source>SnapSensitivity</source>
+        <source>Snap Sensitivity</source>
         <translation>Чувствительность</translation>
     </message>
     <message>
@@ -6677,7 +6677,7 @@ or you may delete necessary files for it.</source>
     </message>
     <message>
         <location filename="../../toonz/mainwindow.cpp" line="2271"/>
-        <source>Inverse kinematics</source>
+        <source>Inverse Kinematics</source>
         <translation>Инверсная кинематика</translation>
     </message>
     <message>

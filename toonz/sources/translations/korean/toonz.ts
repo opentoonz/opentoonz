@@ -4913,7 +4913,7 @@ Please use the frame numbers for reference.</source>
         <translation>브러쉬 경도-감소</translation>
     </message>
     <message>
-        <source>SnapSensitivity</source>
+        <source>Snap Sensitivity</source>
         <translation>스냅 감도</translation>
     </message>
     <message>
@@ -4929,7 +4929,7 @@ Please use the frame numbers for reference.</source>
         <translation>프레임 범위</translation>
     </message>
     <message>
-        <source>Inverse kinematics</source>
+        <source>Inverse Kinematics</source>
         <translation>역 운동학</translation>
     </message>
     <message>

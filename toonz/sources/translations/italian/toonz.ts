@@ -4594,7 +4594,7 @@ Please use the frame numbers for reference.</source>
         <translation>Intervallo di Fotogrammi</translation>
     </message>
     <message>
-        <source>Inverse kinematics</source>
+        <source>Inverse Kinematics</source>
         <translation>Cinematica Inversa</translation>
     </message>
     <message>
@@ -5343,7 +5343,7 @@ Decrementa lo spessore minimo del pennello</translation>
         <translation type="unfinished">Aggiorna</translation>
     </message>
     <message>
-        <source>SnapSensitivity</source>
+        <source>Snap Sensitivity</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

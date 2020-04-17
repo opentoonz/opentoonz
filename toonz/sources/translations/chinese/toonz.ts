@@ -4655,7 +4655,7 @@ Please use the frame numbers for reference.</source>
         <translation>帧范围</translation>
     </message>
     <message>
-        <source>Inverse kinematics</source>
+        <source>Inverse Kinematics</source>
         <translation>反向动力学(IK)</translation>
     </message>
     <message>
@@ -5335,7 +5335,7 @@ Please use the frame numbers for reference.</source>
         <translation>开关摄影表工具条</translation>
     </message>
     <message>
-        <source>SnapSensitivity</source>
+        <source>Snap Sensitivity</source>
         <translation>吸附灵敏度</translation>
     </message>
     <message>

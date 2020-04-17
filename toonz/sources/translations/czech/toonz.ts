@@ -4738,7 +4738,7 @@ Pro odkaz, prosím, použijte čísla snímků.</translation>
         <translation>Rozsah snímku</translation>
     </message>
     <message>
-        <source>Inverse kinematics</source>
+        <source>Inverse Kinematics</source>
         <translation>Obrácená kinematika</translation>
     </message>
     <message>
@@ -5510,7 +5510,7 @@ Pro odkaz, prosím, použijte čísla snímků.</translation>
         <translation>Obnovit</translation>
     </message>
     <message>
-        <source>SnapSensitivity</source>
+        <source>Snap Sensitivity</source>
         <translation>Citlivost přichytávání</translation>
     </message>
     <message>

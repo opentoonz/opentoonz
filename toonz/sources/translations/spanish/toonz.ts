@@ -4612,7 +4612,7 @@ Usar los números de fotograma como referencia.</translation>
         <translation>Rango de fotogramas</translation>
     </message>
     <message>
-        <source>Inverse kinematics</source>
+        <source>Inverse Kinematics</source>
         <translation>Esqueleto - Cinemática inversa</translation>
     </message>
     <message>
@@ -5292,7 +5292,7 @@ Usar los números de fotograma como referencia.</translation>
         <translation>Barra de herramientas de planilla</translation>
     </message>
     <message>
-        <source>SnapSensitivity</source>
+        <source>Snap Sensitivity</source>
         <translation>Adherencia - Sensibilidad</translation>
     </message>
     <message>

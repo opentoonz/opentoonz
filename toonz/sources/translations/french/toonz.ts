@@ -4592,7 +4592,7 @@ Please use the frame numbers for reference.</source>
         <translation>Intervalle</translation>
     </message>
     <message>
-        <source>Inverse kinematics</source>
+        <source>Inverse Kinematics</source>
         <translation>Cinématique Inverse</translation>
     </message>
     <message>
@@ -5336,7 +5336,7 @@ Please use the frame numbers for reference.</source>
         <translation type="unfinished">Actualiser</translation>
     </message>
     <message>
-        <source>SnapSensitivity</source>
+        <source>Snap Sensitivity</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

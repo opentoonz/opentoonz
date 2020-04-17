@@ -4613,7 +4613,7 @@ Please use the frame numbers for reference.</source>
         <translation>共通 - フレーム範囲</translation>
     </message>
     <message>
-        <source>Inverse kinematics</source>
+        <source>Inverse Kinematics</source>
         <translation>逆運動学(IK)</translation>
     </message>
     <message>
@@ -5293,7 +5293,7 @@ Please use the frame numbers for reference.</source>
         <translation>タイムシートツールバーの表示/非表示</translation>
     </message>
     <message>
-        <source>SnapSensitivity</source>
+        <source>Snap Sensitivity</source>
         <translation>共通 - スナップ感度</translation>
     </message>
     <message>

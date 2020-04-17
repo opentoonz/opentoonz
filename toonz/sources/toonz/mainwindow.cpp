@@ -2373,13 +2373,13 @@ void MainWindow::defineActions() {
                           tr("Brush hardness - Increase"), "");
   createToolOptionsAction("A_DecreaseBrushHardness",
                           tr("Brush hardness - Decrease"), "");
-  createToolOptionsAction("A_ToolOption_SnapSensitivity", tr("SnapSensitivity"),
+  createToolOptionsAction("A_ToolOption_SnapSensitivity", tr("Snap Sensitivity"),
                           "");
   createToolOptionsAction("A_ToolOption_AutoGroup", tr("Auto Group"), "");
   createToolOptionsAction("A_ToolOption_BreakSharpAngles",
                           tr("Break sharp angles"), "");
   createToolOptionsAction("A_ToolOption_FrameRange", tr("Frame range"), "F6");
-  createToolOptionsAction("A_ToolOption_IK", tr("Inverse kinematics"), "");
+  createToolOptionsAction("A_ToolOption_IK", tr("Inverse Kinematics"), "");
   createToolOptionsAction("A_ToolOption_Invert", tr("Invert"), "");
   createToolOptionsAction("A_ToolOption_Manual", tr("Manual"), "");
   createToolOptionsAction("A_ToolOption_OnionSkin", tr("Onion skin"), "");
@@ -2585,7 +2585,7 @@ void MainWindow::defineActions() {
                ToolCommandType);
   createAction(MI_TapeNextMode, tr("Tape Tool - Next Mode"), "",
                ToolCommandType);
-  createAction(MI_TapeEndpointToEndpoint, tr("Tape Tool - Endpoint to Enpoint"),
+  createAction(MI_TapeEndpointToEndpoint, tr("Tape Tool - Endpoint to Endpoint"),
                "", ToolCommandType);
   createAction(MI_TapeEndpointToLine, tr("Tape Tool - Endpoint to Line"), "",
                ToolCommandType);
