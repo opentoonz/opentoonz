@@ -289,7 +289,6 @@ void TMyPaintBrushStyle::loadData(TInputStreamInterface &is) {
   for (int i = 0; i < baseSettingsCount; ++i) {
     std::string key;
     double value    = 0.0;
-    int inputsCount = 0;
     is >> key;
     is >> value;
     const mypaint::Setting *setting = mypaint::Setting::findByKey(key);

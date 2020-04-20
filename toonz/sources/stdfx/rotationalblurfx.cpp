@@ -105,7 +105,6 @@ public:
 template <typename PIXEL, typename CHANNEL_TYPE, int MAX_CHANNEL_VALUE>
 void doSpinBlur(const TRasterPT<PIXEL> rout, const TRasterPT<PIXEL> rin,
                 double blur, double radius, TPointD point) {
-  int maxRange = 0;
   int dx       = (int)point.x;
   int dy       = (int)point.y;
   int i, j;

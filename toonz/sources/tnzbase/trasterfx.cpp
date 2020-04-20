@@ -681,7 +681,6 @@ void TRasterFx::dryCompute(TRectD &rect, double frame,
 
   int renderStatus =
       TRenderer::instance().getRenderStatus(TRenderer::renderId());
-  TFxCacheManager *cacheManager = TFxCacheManager::instance();
 
   if (renderStatus == TRenderer::FIRSTRUN) {
     TRectD bbox;
@@ -924,8 +923,6 @@ void TRasterFx::compute(TTile &tile, double frame,
   QString qPath("C:\\butta\\image_" +
                 QString::number(++iCount).rightJustified(3, '0') + ".tif");
   TImageWriter::save(TFilePath(qPath.toStdWString()), tile.getRaster());
-
-  if (iCount >= 35) int aa = 1;
 #endif
 
   /*

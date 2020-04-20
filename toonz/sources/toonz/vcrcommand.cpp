@@ -137,7 +137,6 @@ public:
   ShortPlayCommand() : MenuItemHandler(MI_ShortPlay) {}
 
   void execute() override {
-    int row = TApp::instance()->getCurrentFrame()->getFrame();
     int shortPlayFrameCount = Preferences::instance()->getShortPlayFrameCount();
     int count =
         TApp::instance()->getCurrentXsheet()->getXsheet()->getFrameCount();

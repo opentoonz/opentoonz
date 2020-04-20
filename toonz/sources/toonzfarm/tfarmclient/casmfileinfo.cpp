@@ -114,6 +114,6 @@ CasmFileInfo::CasmFileInfo(const TFilePath &fp) : m_fp(fp) {}
 
 void CasmFileInfo::getFrameRange(int &startFrame, int &endFrame,
                                  bool &interlaced) {
-  int rc = compute_casm_range(toString(m_fp.getWideString()).c_str(),
-                              startFrame, endFrame, interlaced);
+  compute_casm_range(toString(m_fp.getWideString()).c_str(),
+                     startFrame, endFrame, interlaced);
 }

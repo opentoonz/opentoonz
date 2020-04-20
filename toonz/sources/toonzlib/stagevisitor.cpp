@@ -587,11 +587,11 @@ void RasterPainter::flushRasterImages() {
         /*-- InkCheck, Ink#1Check, PaintCheckはカレントカラムにのみ有効 --*/
         settings.m_inkIndex =
             m_nodes[i].m_isCurrentColumn
-                ? (tc & ToonzCheck::eInk ? index
-                                         : (tc & ToonzCheck::eInk1 ? 1 : -1))
+                ? ((tc & ToonzCheck::eInk) ? index
+                                         : ((tc & ToonzCheck::eInk1) ? 1 : -1))
                 : -1;
         settings.m_paintIndex = m_nodes[i].m_isCurrentColumn
-                                    ? (tc & ToonzCheck::ePaint ? index : -1)
+                                    ? ((tc & ToonzCheck::ePaint) ? index : -1)
                                     : -1;
 
         Preferences::instance()->getTranspCheckData(
@@ -1148,10 +1148,7 @@ void OpenGlPainter::onVectorImage(TVectorImage *vi,
     const TRectD &bbox = player.m_placement * player.m_dpiAff * vi->getBBox();
     draw3DShadow(bbox, player.m_z, m_phi);
   }
-
-  TColorFunction *cf = 0;
   TOnionFader fader;
-
   TPalette *vPalette = vi->getPalette();
 
   int oldFrame = vPalette->getFrame();
@@ -1161,7 +1158,6 @@ void OpenGlPainter::onVectorImage(TVectorImage *vi,
     TPixel32 bgColor = TPixel32::White;
     fader            = TOnionFader(
         bgColor, OnionSkinMask::getOnionSkinFade(player.m_onionSkinDistance));
-    cf = &fader;
   }
 
   TVectorRenderData rd =

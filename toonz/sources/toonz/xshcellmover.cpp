@@ -292,7 +292,6 @@ public:
 
     int ca       = m_cellsMover.getStartPos().x;
     int cb       = m_cellsMover.getPos().x;
-    int colCount = m_cellsMover.getColumnCount();
     if (!m_cellsMover.getOrientation()->isVerticalTimeline()) {
       ca = m_cellsMover.getStartPos().y;
       cb = m_cellsMover.getPos().y;
@@ -320,8 +319,8 @@ public:
     int cb       = m_cellsMover.getPos().x;
     int colCount = m_cellsMover.getColumnCount();
     if (!m_cellsMover.getOrientation()->isVerticalTimeline()) {
-      int ca = m_cellsMover.getStartPos().y;
-      int cb = m_cellsMover.getPos().y;
+      ca = m_cellsMover.getStartPos().y;
+      cb = m_cellsMover.getPos().y;
     }
 
     if (ca != cb) {
@@ -463,7 +462,6 @@ void LevelMoverTool::onClick(const QMouseEvent *e) {
   m_validPos             = true;
   m_undo                 = new LevelMoverUndo();
   CellsMover *cellsMover = m_undo->getCellsMover();
-  XsheetViewer *viewer   = getViewer();
   cellsMover->start(r0, c0, r1, c1, m_qualifiers, o);
   m_undo->m_columnsChanges.resize(c1 - c0 + 1, 0);
 
@@ -486,8 +484,6 @@ void LevelMoverTool::onClick(const QMouseEvent *e) {
   m_lastPos = m_aimedPos = m_startPos;
   m_grabOffset = m_startPos - (o->isVerticalTimeline() ? TPoint(col, row)
                                                        : TPoint(row, col));
-
-  TXsheet *xsh = getViewer()->getXsheet();
 
   // move
   m_validPos                      = true;
@@ -631,11 +627,6 @@ void LevelMoverTool::onRelease(const CellPosition &pos) {
   m_range.ly = 0;
   setToolCursor(getViewer(), ToolCursor::CURSOR_ARROW);
   refreshCellsArea();
-  CellsMover *cellMover = m_undo->getCellsMover();
-  int startX            = cellMover->getStartPos().x;
-  int startY            = cellMover->getStartPos().y;
-  int posX              = cellMover->getPos().x;
-  int posY              = cellMover->getPos().y;
   if (m_lastPos != m_startPos) TUndoManager::manager()->add(m_undo);
   m_undo = 0;
 

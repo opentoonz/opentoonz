@@ -77,8 +77,8 @@ inline void quickput(const TRasterP &rout, const TRasterP &rin,
             tc & (ToonzCheck::eTransparency | ToonzCheck::eGap);
         settings.m_blackBgCheck = tc & ToonzCheck::eBlackBg;
         settings.m_inkIndex =
-            tc & ToonzCheck::eInk ? index : (tc & ToonzCheck::eInk1 ? 1 : -1);
-        settings.m_paintIndex = tc & ToonzCheck::ePaint ? index : -1;
+            (tc & ToonzCheck::eInk) ? index : ((tc & ToonzCheck::eInk1) ? 1 : -1);
+        settings.m_paintIndex = (tc & ToonzCheck::ePaint) ? index : -1;
         Preferences::instance()->getTranspCheckData(
             settings.m_transpCheckBg, settings.m_transpCheckInk,
             settings.m_transpCheckPaint);

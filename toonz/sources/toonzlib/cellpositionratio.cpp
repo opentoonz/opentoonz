@@ -10,7 +10,6 @@ static int greatestCommonDivisor(int a, int b) {
   int c = std::max(a, b);
   int d = std::min(a, b);
   while (d) {
-    int q = c / d;
     int r = c % d;
     c     = d;
     d     = r;

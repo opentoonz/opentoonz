@@ -601,7 +601,6 @@ void PreviewFxInstance::updateFrameRange() {
   // Reset the flipbooks' frame range
   std::set<FlipBook *>::iterator kt;
   int currFrame;
-  bool fullPreview = isFullPreview();
   for (kt = m_flipbooks.begin(); kt != m_flipbooks.end(); ++kt) {
     currFrame = (*kt)->getCurrentFrame() - 1;
     cropAndStep(currFrame);

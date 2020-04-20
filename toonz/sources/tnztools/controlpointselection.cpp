@@ -551,8 +551,6 @@ void ControlPointEditorStroke::setLinearSpeedIn(int index, bool linear,
     else
       return;
   }
-  int precIndex =
-      (index == 0 && isSelfLoop()) ? m_controlPoints.size() - 1 : index - 1;
 
   TThickPoint point     = stroke->getControlPoint(pointIndex);
   TThickPoint precPoint = (pointIndex > 2)
@@ -587,8 +585,6 @@ void ControlPointEditorStroke::setLinearSpeedOut(int index, bool linear,
     else
       return;
   }
-  int nextIndex =
-      (index == m_controlPoints.size() - 1 && isSelfLoop()) ? 0 : index + 1;
 
   TThickPoint point     = stroke->getControlPoint(pointIndex);
   TThickPoint nextPoint = (pointIndex < cpCount - 3)
@@ -634,9 +630,9 @@ bool ControlPointEditorStroke::setControlPointsLinear(std::set<int> points,
                                                       bool isLinear) {
   std::set<int>::iterator it;
   bool isChanged = false;
-  for (it = points.begin(); it != points.end(); it++)
+  for (it = points.begin(); it != points.end(); ++it)
     isChanged = setLinear(*it, isLinear, false) || isChanged;
-  for (it = points.begin(); it != points.end(); it++) updateDependentPoint(*it);
+  for (it = points.begin(); it != points.end(); ++it) updateDependentPoint(*it);
   return isChanged;
 }
 

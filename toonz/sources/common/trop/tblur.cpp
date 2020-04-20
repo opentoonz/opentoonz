@@ -527,10 +527,8 @@ template <class T>
 void store_colGray(T *buffer, int wrap, int r_ly, T *col, int ly, int x, int dy,
                    int backlit, double blur) {
   int i;
-  double ampl;
-  buffer += x;
 
-  ampl = 1.0 + blur / 15.0;
+  buffer += x;
 
   for (i = ((dy >= 0) ? 0 : -dy); i < std::min(ly, r_ly - dy); i++) {
     *buffer = col[i];

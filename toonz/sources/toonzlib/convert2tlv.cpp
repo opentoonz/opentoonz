@@ -174,8 +174,8 @@ int getFramesCount(const TLevelP &l, int from, int to) {
 
   int count           = 0;
   TLevel::Iterator it = l->begin();
-  while (it != l->end() && it->first.getNumber() < from) it++;
-  while (it != l->end() && it->first.getNumber() <= to) it++, count++;
+  while (it != l->end() && it->first.getNumber() < from) ++it;
+  while (it != l->end() && it->first.getNumber() <= to) ++it, count++;
   return count;
 }
 }  // namespace
@@ -362,7 +362,7 @@ void Convert2Tlv::doFill(TRasterCM32P &rout, const TRaster32P &rin) {
         continue;
 
       std::map<TPixel, int>::const_iterator it;
-      int paintIndex;
+      int paintIndex = 0;
       if ((it = m_colorMap.find(*pixin)) == m_colorMap.end()) {
         if (m_colorTolerance > 0) it = findNearestColor(*pixin);
         // if (it==colorMap.end() && (int)colorMap.size()>origColorCount) //se
@@ -780,7 +780,7 @@ bool Convert2Tlv::init(std::string &errorMessage) {
 
       if (ir2) {
         const TImageInfo *info2 = ir2->getImageInfo();
-        if (!info1) {
+        if (!info2) {
           errorMessage = "Error: can't read frame " +
                          std::to_string(it2->first.getNumber()) +
                          " of level  " +

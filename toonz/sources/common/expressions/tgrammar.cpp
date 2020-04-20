@@ -1239,7 +1239,6 @@ void Grammar::addPattern(Pattern *pattern) {
 
 const Pattern *Grammar::getPattern(Position position,
                                    const Token &token) const {
-  Pattern *pattern = 0;
   if (position == ExpressionStart)
     return m_imp->m_prePatterns.getPattern(token);
   else

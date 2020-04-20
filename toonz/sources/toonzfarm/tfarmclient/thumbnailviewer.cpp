@@ -536,7 +536,7 @@ void ThumbnailViewer::loadDirectory(const TFilePath &dirPath,
   fps = TSystem::packLevelNames(fps);
   fps.sort();
 
-  for (TFilePathSet::iterator it = fps.begin(); it != fps.end(); it++) {
+  for (TFilePathSet::iterator it = fps.begin(); it != fps.end(); ++it) {
     try {
       TFilePath fp = *it;
       if (fp.getType() == "bmp" && fp.getName().find("_icon") != string::npos)

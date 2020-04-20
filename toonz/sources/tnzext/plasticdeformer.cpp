@@ -161,7 +161,6 @@ inline void addGValues(int v0x, int v0y, int v1x, int v1y, int v2x, int v2y,
   double a = w * (one_px * one_px + sqPy), b = w * (px * one_px - sqPy),
          c = w * (py * one_px + px * py), d = w * (px * px + sqPy);
 
-  sqPy *= w;
   one_px *= w;
   px *= w;
   py *= w;

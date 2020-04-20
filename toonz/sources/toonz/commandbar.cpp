@@ -100,7 +100,6 @@ void CommandBar::fillToolbar(CommandBar *toolbar, bool isXsheetToolbar) {
 
 void CommandBar::buildDefaultToolbar(CommandBar *toolbar) {
   toolbar->clear();
-  TApp *app = TApp::instance();
   {
     QAction *newVectorLevel =
         CommandManager::instance()->getAction("MI_NewVectorLevel");

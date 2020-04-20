@@ -22,7 +22,7 @@ inline TAtomicVar &getInstanceCounter(TINT32 classCode) {
   if (instanceCountPtr == 0) {
     static TThread::Mutex mutex;
     TThread::MutexLocker g(&mutex);
-    if (instanceCountPtr == 0) instanceCountPtr = new TAtomicVar();
+    instanceCountPtr = new TAtomicVar();
   }
   assert(instanceCountPtr);
   return *instanceCountPtr;
@@ -40,8 +40,7 @@ const TINT32 TSmartObject::m_unknownClassCode = 0;
 
 void TSmartObject::incrementInstanceCount() {
 #ifdef INSTANCE_COUNT_ENABLED
-  TAtomicVar &instanceCount = getInstanceCounter(m_classCodeRef);
-  ++instanceCount;
+  ++getInstanceCounter(m_classCodeRef);
 #else
   assert(0);
 #endif
@@ -51,9 +50,7 @@ void TSmartObject::incrementInstanceCount() {
 
 void TSmartObject::decrementInstanceCount() {
 #ifdef INSTANCE_COUNT_ENABLED
-  TAtomicVar &instanceCount = getInstanceCounter(m_classCodeRef);
-  assert(instanceCount > 0);
-  --instanceCount;
+  --getInstanceCounter(m_classCodeRef);
 #else
   assert(0);
 #endif

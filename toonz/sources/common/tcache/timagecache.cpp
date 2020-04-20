@@ -759,7 +759,7 @@ inline void *getPointer(const TImageP &img) {
 // Returns true or false whether the image or its eventual raster are
 // referenced by someone other than Toonz cache.
 inline TINT32 hasExternalReferences(const TImageP &img) {
-  int refCount;
+  int refCount = 0;
 
   {
     TRasterImageP rimg = img;
@@ -814,7 +814,7 @@ void TImageCache::Imp::doCompress() {
     m_uncompressedItems.erase(it);
 #else
     std::map<TUINT32, std::string>::iterator itu2 = itu;
-    itu++;
+    ++itu;
     m_itemHistory.erase(itu2);
     m_itemsByImagePointer.erase(item->getImage().getPointer());
     m_uncompressedItems.erase(it);
@@ -901,7 +901,7 @@ void TImageCache::Imp::doCompress(std::string id) {
   m_itemsByImagePointer.erase(getPointer(item->getImage()));
 #else
   std::map<TUINT32, std::string>::iterator itu2 = itu;
-  itu++;
+  ++itu;
   m_itemHistory.erase(itu2);
   m_itemsByImagePointer.erase(item->getImage().getPointer());
 #endif
@@ -1018,7 +1018,7 @@ UCHAR *TImageCache::Imp::compressAndMalloc(TUINT32 size) {
     m_uncompressedItems.erase(it);
 #else
     std::map<TUINT32, std::string>::iterator itu2 = itu;
-    itu++;
+    ++itu;
     m_itemHistory.erase(itu2);
     m_itemsByImagePointer.erase(item->getImage().getPointer());
     m_uncompressedItems.erase(it);
@@ -1413,7 +1413,7 @@ void TImageCache::clearSceneImages() {
       ++it;
     else {
       std::map<TUINT32, std::string>::iterator app = it;
-      app++;
+      ++app;
       m_imp->m_itemHistory.erase(it);
       it = app;
     }
@@ -1426,7 +1426,7 @@ void TImageCache::clearSceneImages() {
       ++jt;
     else {
       std::map<void *, std::string>::iterator app = jt;
-      app++;
+      ++app;
       m_imp->m_itemsByImagePointer.erase(jt);
       jt = app;
     }
@@ -1857,7 +1857,6 @@ void TImageCache::Imp::outputMap(UINT chunkRequested, std::string filename) {
   int umcount3 = 0;
   int cmcount  = 0;
   int cdcount  = 0;
-  int umcount  = 0;
   int udcount  = 0;
 
   TUINT64 umsize1 = 0;

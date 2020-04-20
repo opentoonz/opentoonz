@@ -1085,8 +1085,9 @@ name and current frame.
 */
 void PaletteViewer::changeWindowTitle() {
   QString name = tr("Palette");
-  QWidget *titleOwner;
+  QWidget *titleOwner = NULL;
   TPalette *palette = getPalette();
+
   if (m_viewType == LEVEL_PALETTE) {
     name = tr("Level Palette: ");
     if (palette) {
@@ -1119,7 +1120,8 @@ void PaletteViewer::changeWindowTitle() {
     name += cmName;
   }
 
-  titleOwner->setWindowTitle(name);
+  if (NULL != titleOwner)
+    titleOwner->setWindowTitle(name);
 }
 
 //-----------------------------------------------------------------------------

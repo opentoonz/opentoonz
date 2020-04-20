@@ -90,11 +90,10 @@ public:
     // Apply the mask to the cell. 0 pixels are bgColored, GRAY::maxChannelValue
     // ones are cellColored.
     PIXEL *pix, *line    = cellBuffer, *lineEnd;
-    GRAY *grPix, *grLine = m_mask->pixels(y0) + x0, *grLineEnd;
+    GRAY *grPix, *grLine = m_mask->pixels(y0) + x0;
     int x, y, grWrap = m_mask->getWrap(), lx = x1 - x0;
     for (y = y0; y < y1; ++y, line += this->m_wrap, grLine += grWrap) {
       lineEnd   = line + lx;
-      grLineEnd = grLine + lx;
       for (x = x0, pix = line, grPix = grLine; x < x1; ++x, ++pix, ++grPix)
         *pix = blend(bgColor, cellColor,
                      grPix->value / (double)GRAY::maxChannelValue);

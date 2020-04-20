@@ -42,10 +42,6 @@ void enforceBpp(TPropertyGroup *pg, int bpp, bool upgradeOnly) {
   if (bppProp) {
     typedef TEnumProperty::Range Range;
     const Range &range = bppProp->getRange();
-
-    // Retrieve current index
-    int idx = bppProp->getIndex();
-
     // Search for a suitable 32-bit or 64-bit value
     int currentBpp = upgradeOnly ? std::stoi(bppProp->getValueAsString()) : 0;
     int targetBpp = (std::numeric_limits<int>::max)(), targetIdx = -1;
@@ -105,7 +101,7 @@ LevelUpdater::LevelUpdater(const TFilePath &fp, TPropertyGroup *lwProperties)
     , m_currIdx(0)
     , m_opened(false)
     , m_usingTemporaryFile(false) {
-  open(fp, lwProperties);
+  LevelUpdater::open(fp, lwProperties);
 }
 
 //-----------------------------------------------------------------------------

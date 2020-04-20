@@ -668,7 +668,7 @@ void TBigMemoryManager::printLog(TUINT32 size) {
   std::map<UCHAR *, Chunkinfo>::iterator it = m_chunks.begin();
   UCHAR *buffer  = m_theMemory;
   UINT chunkSize = 0;
-  for (; it != m_chunks.end(); it++) {
+  for (; it != m_chunks.end(); ++it) {
     TUINT32 gap = (TUINT32)((it->first) - (buffer + chunkSize));
     if (gap > 0) os << "- gap di " << gap / 1024 << " KB\n";
     if (it->second.m_size > 0)

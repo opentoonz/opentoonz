@@ -121,7 +121,6 @@ void CBlurMatrix::createRandom(const double d, const int nb)
 void CBlurMatrix::createEqual(const double d, const int nb)
 // throw(SBlurMatrixError)
 {
-  int nq = 0;
 
   try {
     {
@@ -138,7 +137,6 @@ void CBlurMatrix::createEqual(const double d, const int nb)
     b         = ceil(b);
     b         = (2.0 * d + 1.0) / b;
     int di    = (int)ceil(d);
-    double d2 = d * d;
     double yd = 0.0;
     for (int y = 0; y <= di;) {
       double xd = 0.0;
@@ -150,28 +148,24 @@ void CBlurMatrix::createEqual(const double d, const int nb)
             SXYD xyd = {x, y, dist};
             bs.push_back(xyd);
             m_m[0].push_back(bs);
-            nq++;
           }
           if (x > 0 && y > 0) {
             BLURSECTION bs;
             SXYD xyd = {-x, -y, dist};
             bs.push_back(xyd);
             m_m[0].push_back(bs);
-            nq++;
           }
           if (x > 0 && y >= 0) {
             BLURSECTION bs;
             SXYD xyd = {-x, y, dist};
             bs.push_back(xyd);
             m_m[0].push_back(bs);
-            nq++;
           }
           if (x >= 0 && y > 0) {
             BLURSECTION bs;
             SXYD xyd = {x, -y, dist};
             bs.push_back(xyd);
             m_m[0].push_back(bs);
-            nq++;
           }
         }
         xd += b;

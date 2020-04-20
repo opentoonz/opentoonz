@@ -144,8 +144,6 @@ void bgReduction(cv::Mat& srcImg, cv::Mat& bgImg, int reduction) {
     reductionAmount[i] = (int)(std::floor((float)(255 - i) * reductionRatio));
   }
   // then, compute for all pixels
-  int lx = srcImg.cols;
-  int ly = srcImg.rows;
   for (int j = 0; j < srcImg.rows; j++) {
     cv::Vec3b* pix   = srcImg.ptr<cv::Vec3b>(j);
     cv::Vec3b* bgPix = bgImg.ptr<cv::Vec3b>(j);

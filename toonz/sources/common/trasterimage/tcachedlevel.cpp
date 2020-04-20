@@ -718,8 +718,6 @@ void TRasterCache::invalidate(int startFrame, int endFrame) {
   Data::Status::iterator hi  = m_data->m_status.upper_bound(endFrame);
 
 #ifdef _DEBUG
-  int count = m_data->m_status.size();
-
   if (low != m_data->m_status.end() && hi != m_data->m_status.end()) {
     int ll = low->first;
     int hh = hi->first;
@@ -1011,7 +1009,6 @@ int ZFile::read(BYTE buf[], int size, TINT64 qwOffset) const {
   assert(size % m_bytesPerSector == 0);
   assert(qwOffset % m_bytesPerSector == 0);
 
-  char msg[2048] = "";
   unsigned long bytesToRead;  // Padded number of bytes to read.
   unsigned long bytesRead;    // count of bytes actually read
 
@@ -1072,7 +1069,6 @@ int ZFile::write(BYTE buf[], int size, TINT64 qwOffset) const {
   assert(size % m_bytesPerSector == 0);
   assert(qwOffset % m_bytesPerSector == 0);
 
-  char msg[2048] = "";
   unsigned long bytesToWrite;      // Padded number of bytes to write.
   unsigned long bytesWritten = 0;  // count of bytes actually writtten
 

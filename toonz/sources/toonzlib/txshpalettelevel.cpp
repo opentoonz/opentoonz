@@ -75,7 +75,6 @@ void TXshPaletteLevel::load() {
   TFilePath path = getScene()->decodeFilePath(m_path);
   if (TSystem::doesExistFileOrLevel(path)) {
     TFileStatus fs(path);
-    TPersist *p = 0;
     TIStream is(path);
     TPalette *palette = nullptr;
 

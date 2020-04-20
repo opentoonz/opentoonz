@@ -441,7 +441,7 @@ void WavehdrQueue::clear() {
   m_items.clear();
   m_lastTrack = TSoundTrackP();
   std::list<WAVEHDR *>::iterator it;
-  for (it = m_queuedItems.begin(); it != m_queuedItems.end(); it++) {
+  for (it = m_queuedItems.begin(); it != m_queuedItems.end(); ++it) {
     WAVEHDR *wvhdr = *it;
     delete[] wvhdr->lpData;
     delete wvhdr;
@@ -454,7 +454,7 @@ void WavehdrQueue::clear() {
 bool WavehdrQueue::isAllQueuedItemsPlayed() {
   std::list<WAVEHDR *>::iterator it;
   bool finished = true;
-  for (it = m_queuedItems.begin(); it != m_queuedItems.end(); it++) {
+  for (it = m_queuedItems.begin(); it != m_queuedItems.end(); ++it) {
     WAVEHDR *wvhdr = *it;
     finished       = finished && (wvhdr->dwFlags & WHDR_DONE);
   }

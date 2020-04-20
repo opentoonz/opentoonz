@@ -61,7 +61,7 @@ public:
   template <class P>
   void drawTest(CSTColSelPic<P> &pic) {
     for (std::vector<SPOINT>::iterator pv = m_pos.begin(); pv != m_pos.end();
-         pv++) {
+         ++pv) {
       int xx = pv->x;
       int yy = pv->y;
       for (int y = yy - 1; y <= (yy + 1); y++)

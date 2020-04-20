@@ -394,7 +394,6 @@ return false;
     I_PIXEL ip;
     int nbPixel = 0;
     double dA2  = dA * dA;
-    int nbCol   = col.size();
 
     for (int y = 0; y < CSTPic<P>::m_lY; y++)
       for (int x = 0; x < CSTPic<P>::m_lX; x++, pPic++, pSel++) {

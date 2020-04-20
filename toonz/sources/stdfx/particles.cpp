@@ -130,7 +130,7 @@ Particle::Particle(int g_lifetime, int seed, std::map<int, TTile *> porttiles,
     }
   }
   if (values.lifetime_ctrl_val) {
-    double lifetimereference = 0.0;
+    double lifetimereference;
     lifetimereference        = imagereferences[values.lifetime_ctrl_val];
     lifetime                 = g_lifetime * lifetimereference;
   } else
@@ -140,7 +140,7 @@ Particle::Particle(int g_lifetime, int seed, std::map<int, TTile *> porttiles,
   genlifetime = lifetime;
   if (values.speed_ctrl_val &&
       (porttiles.find(values.speed_ctrl_val) != porttiles.end())) {
-    double speedreference = 0.0;
+    double speedreference;
     speedreference        = imagereferences[values.speed_ctrl_val];
     random_speed =
         values.speed_val.first + (ranges.speed_range) * speedreference;
@@ -161,7 +161,7 @@ Particle::Particle(int g_lifetime, int seed, std::map<int, TTile *> porttiles,
       else
         random_s_a_range = atan2f(dir_x, -dir_y);
     } else {
-      double speedareference = 0.0;
+      double speedareference;
       speedareference        = imagereferences[values.speeda_ctrl_val];
       random_s_a_range =
           values.speeda_val.first + (ranges.speeda_range) * speedareference;
@@ -179,7 +179,7 @@ Particle::Particle(int g_lifetime, int seed, std::map<int, TTile *> porttiles,
   mass = values.mass_val.first + (ranges.mass_range) * random.getFloat();
   if (values.scale_ctrl_val &&
       (porttiles.find(values.scale_ctrl_val) != porttiles.end())) {
-    double scalereference = 0.0;
+    double scalereference;
     scalereference        = imagereferences[values.scale_ctrl_val];
     scale = values.scale_val.first + (ranges.scale_range) * scalereference;
   } else {
@@ -194,7 +194,7 @@ Particle::Particle(int g_lifetime, int seed, std::map<int, TTile *> porttiles,
   }
   if (values.rot_ctrl_val &&
       (porttiles.find(values.rot_ctrl_val) != porttiles.end())) {
-    double anglereference = 0.0;
+    double anglereference;
     anglereference        = imagereferences[values.rot_ctrl_val];
     angle = -(values.rot_val.first) - (ranges.rot_range) * anglereference;
   } else
@@ -561,7 +561,7 @@ void Particle::get_image_gravity(TTile *ctrl1, const particles_values &values,
   TRaster32P raster32 = ctrl1->getRaster();
   TPointD tmp(x, y);
   tmp -= ctrl1->m_pos;
-  int radius = 4;
+  int radius;
   gx         = 0;
   gy         = 0;
 //#define OLDSTUFF

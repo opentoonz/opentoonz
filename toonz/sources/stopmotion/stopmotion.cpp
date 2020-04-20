@@ -248,17 +248,6 @@ void JpgConverter::convertFromJpg() {
 #ifdef WIN32
   flags |= TJFLAG_BOTTOMUP;
 #endif
-  int factorsNum;
-  tjscalingfactor scalingFactor = {1, 1};
-  tjscalingfactor *factor       = tjGetScalingFactors(&factorsNum);
-  int i                         = 0;
-  int tempWidth, tempHeight;
-  while (i < factorsNum) {
-    scalingFactor = factor[i];
-    i++;
-    tempWidth  = TJSCALED(width, scalingFactor);
-    tempHeight = TJSCALED(height, scalingFactor);
-  }
   tjDecompress2(tjInstance, data, mySize, imgBuf, width,
                 width * tjPixelSize[pixelFormat], height, pixelFormat, flags);
 
@@ -1414,10 +1403,7 @@ void StopMotion::captureImage() {
 
   TApp *app         = TApp::instance();
   ToonzScene *scene = app->getCurrentScene()->getScene();
-
-  int frameNumber        = m_frameNumber;
   std::wstring levelName = m_levelName.toStdWString();
-
   TFilePath parentDir = scene->decodeFilePath(TFilePath(m_filePath));
   TFilePath tempFile  = parentDir + "temp.jpg";
 
@@ -2910,7 +2896,7 @@ EdsError StopMotion::downloadImage(EdsBaseRef object) {
   int inSubsamp, inColorspace;
   // unsigned long jpegSize;
   tjhandle tjInstance   = NULL;
-  unsigned char *imgBuf = NULL;
+  unsigned char *imgBuf;
   tjInstance            = tjInitDecompress();
   tjDecompressHeader3(tjInstance, data, mySize, &width, &height, &inSubsamp,
                       &inColorspace);

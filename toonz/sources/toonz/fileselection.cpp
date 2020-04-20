@@ -109,7 +109,6 @@ public:
     const FileData *data =
         dynamic_cast<const FileData *>(QApplication::clipboard()->mimeData());
     if (!data) return;
-    TApp *app = TApp::instance();
     std::vector<TFilePath> files;
     data->getFiles(m_folder, files);
     FileBrowser::refreshFolder(m_folder);
@@ -305,7 +304,6 @@ void FileSelection::pasteFiles() {
   const FileData *data =
       dynamic_cast<const FileData *>(QApplication::clipboard()->mimeData());
   if (!data) return;
-  TApp *app          = TApp::instance();
   FileBrowser *model = dynamic_cast<FileBrowser *>(getModel());
   if (!model) return;
   TFilePath folder = model->getFolder();

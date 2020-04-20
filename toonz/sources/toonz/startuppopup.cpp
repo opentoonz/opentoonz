@@ -1038,7 +1038,6 @@ StartupLabel::~StartupLabel() {}
 
 void StartupLabel::mousePressEvent(QMouseEvent *event) {
   m_text              = text();
-  std::string strText = m_text.toStdString();
   emit wasClicked(m_index);
 }
 

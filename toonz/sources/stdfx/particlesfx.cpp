@@ -340,10 +340,7 @@ bool ParticlesFx::allowUserCacheOnPort(int portNum) {
 
 void ParticlesFx::doDryCompute(TRectD &rect, double frame,
                                const TRenderSettings &info) {
-  ParticlesManager *pc = ParticlesManager::instance();
-  unsigned long fxId   = getIdentifier();
   int inputPortCount   = getInputPortCount();
-
   int i, j, curr_frame = frame, startframe = startpos_val->getValue();
 
   TRenderSettings infoOnInput(info);
@@ -483,7 +480,6 @@ void ParticlesFx::doCompute(TTile &tile, double frame,
   // the affine will be applied *before* this effect - and we'll multiply
   // geometrical parameters
   // by this dpi mult. in order to compensate.
-  float dpi = sqrt(fabs(ri.m_affine.det())) * 100;
 
   TTile tileIn;
   if (TRaster32P raster32 = tile.getRaster()) {

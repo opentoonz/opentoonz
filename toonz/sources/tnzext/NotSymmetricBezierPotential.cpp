@@ -94,7 +94,7 @@ double ToonzExt::NotSymmetricBezierPotential::compute_value(
   //
 
   // when is near to extreme uses a mix notation
-  double x   = 0.0;
+  double x;
   double res = 0.0;
 
   // length  at parameter

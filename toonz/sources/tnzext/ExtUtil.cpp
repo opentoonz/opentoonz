@@ -906,14 +906,6 @@ TStroke *ToonzExt::rotateControlPoint(const TStroke *stroke,
     }
 
     for (i = 0; i < count; ++i) {
-      if (i < firstDifference)
-        assert((tp1 = stroke->getControlPoint(i)) ==
-               (tp2 = tmpStroke.getControlPoint(i)));
-      else {
-        //        assert( (tp1=stroke->getControlPoint(i)) ==
-        //                (tp2=tmpStroke.getControlPoint(i+2)));
-      }
-
       tp1 = stroke->getControlPoint(i);
       tp2 = tmpStroke.getControlPoint(i);
     }

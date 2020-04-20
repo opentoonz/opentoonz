@@ -347,7 +347,6 @@ void MultimediaRenderer::Imp::start() {
     assert(colFx);
     if (!colFx) continue;
 
-    int columnIndex = colFx->getColumnIndex();
     std::wstring columnName(colFx->getColumnName());
     std::wstring columnId(colFx->getColumnId());
     std::wstring fxName(currFx->getName());
@@ -405,7 +404,7 @@ bool MultimediaRenderer::Imp::onFrameCompleted(int frame) {
   for (unsigned int i = 0; i < m_listeners.size(); ++i)
     m_listeners[i]->onFrameCompleted(*m_currentFrame, m_currentFx);
 
-  m_currentFrame++;
+  ++m_currentFrame;
   return !m_canceled;
 }
 
@@ -416,7 +415,7 @@ bool MultimediaRenderer::Imp::onFrameFailed(int frame, TException &e) {
   for (unsigned int i = 0; i < m_listeners.size(); ++i)
     m_listeners[i]->onFrameFailed(*m_currentFrame, m_currentFx, e);
 
-  m_currentFrame++;
+  ++m_currentFrame;
   return !m_canceled;
 }
 

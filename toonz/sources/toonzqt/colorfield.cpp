@@ -360,8 +360,6 @@ ColorField::ColorField(QWidget *parent, bool isAlphaActive, TPixel32 color,
 
   layout->setSizeConstraint(QLayout::SetFixedSize);
 
-  int h = WidgetHeight;
-
   m_colorSample = new StyleSample(this, squareSize, squareSize);
   m_colorSample->setColor(m_color);
   m_redChannel =

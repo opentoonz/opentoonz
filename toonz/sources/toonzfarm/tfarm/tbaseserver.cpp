@@ -40,7 +40,6 @@ void TBaseServer::start() {
 #else
   int c;
   FILE *fp;
-  register int ns;
 #endif
 
   if ((m_socketId = socket(AF_INET, SOCK_STREAM, 0)) < 0) {

@@ -122,11 +122,9 @@ TRaster::TRaster(int lx, int ly, int pixelSize, int wrap, UCHAR *buffer,
 //------------------------------------------------------------
 
 TRaster::~TRaster() {
-  bool parent = false;
 #ifdef _DEBUG
 // TBigMemoryManager::instance()->checkConsistency();
 #endif
-  // bool ret =
   TBigMemoryManager::instance()->releaseRaster(this);
 #ifdef _DEBUG
 // TBigMemoryManager::instance()->checkConsistency();
@@ -135,7 +133,6 @@ TRaster::~TRaster() {
     assert(!m_bufferOwner);
     m_parent->release();
     m_parent = 0;
-    parent   = true;
   }
 
   // if(m_buffer && m_bufferOwner)
@@ -198,7 +195,6 @@ void TRaster::fillRawData(const UCHAR *color) {
 
   const int wrapSize = m_wrap * m_pixelSize;
   const int rowSize  = m_lx * m_pixelSize;
-  UCHAR *buf1        = m_parent ? m_parent->m_buffer : m_buffer;
   lock();
   unsigned char *firstPixel = getRawData();
   const unsigned char *lastPixel =
@@ -221,7 +217,6 @@ void TRaster::fillRawData(const UCHAR *color) {
     ::memcpy(pixel, firstPixel, rowSize);
     pixel += wrapSize;
   }
-  UCHAR *buf2 = m_parent ? m_parent->m_buffer : m_buffer;
   unlock();
 }
 

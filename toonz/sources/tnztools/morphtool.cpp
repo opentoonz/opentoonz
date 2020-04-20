@@ -86,7 +86,6 @@ public:
 
     TFrameId fid      = app->getCurrentFrame()->getFid();
     TVectorImageP src = xl->getFrame(fid, true);
-    int count         = src->getStrokeCount();
 
     for (int i = 1; i < 10; i++) {
       ++fid;
@@ -97,7 +96,6 @@ public:
       TVectorImageP vi  = xl->getFrame(fid, true);
       TVectorImageP dst = src->clone();
       deform(dst.getPointer(), src.getPointer(), (double)i / (double)9);
-      count = dst->getStrokeCount();
       vi->mergeImage(dst, TAffine());
       app->getCurrentTool()->getTool()->notifyImageChanged(fid);
     }

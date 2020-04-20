@@ -726,9 +726,9 @@ void ToonzImageUtils::eraseImage(const TToonzImageP &ti,
     TPixel32 *inPix       = image->pixels(y);
     for (; outPix != outEndPix; outPix++, inPix++) {
       bool canEraseInk =
-          !selective || (selective && styleId == outPix->getInk());
+          !selective || styleId == outPix->getInk();
       bool canErasePaint =
-          !selective || (selective && styleId == outPix->getPaint());
+          !selective || styleId == outPix->getPaint();
 
       int paint, tone;
       if (!invert) {

@@ -24,7 +24,11 @@ TMsgCore::TMsgCore() : m_tcpServer(0), m_clientSocket(0) {}
 void TMsgCore::OnNewConnection()  // server side
 {
   QTcpSocket *socket;
-  if (m_tcpServer) socket = m_tcpServer->nextPendingConnection();
+
+  if (!m_tcpServer)
+    return;
+
+  socket = m_tcpServer->nextPendingConnection();
   assert(socket);
 
   bool ret = connect(socket, SIGNAL(readyRead()), SLOT(OnReadyRead()));
@@ -80,7 +84,7 @@ void TMsgCore::OnDisconnected()  // server side
     if ((*it)->state() != QTcpSocket::ConnectedState)
       m_sockets.erase(it++);
     else
-      it++;
+      ++it;
   }
 
   // if (m_socketIn)
@@ -93,7 +97,7 @@ void TMsgCore::OnDisconnected()  // server side
 void TMsgCore::OnReadyRead()  // server side
 {
   std::set<QTcpSocket *>::iterator it = m_sockets.begin();
-  for (; it != m_sockets.end(); it++)  // devo scorrerli tutti perche' non so da
+  for (; it != m_sockets.end(); ++it)  // devo scorrerli tutti perche' non so da
                                        // quale socket viene il messaggio...
   {
     if ((*it)->state() == QTcpSocket::ConnectedState &&
@@ -205,7 +209,7 @@ void TMsgCore::connectTo(const QString &address)  // client side
     // std::cout << "cannot connect to "<< address.toStdString() << std::endl;
     // std::cout << "error "<< m_clientSocket->errorString().toStdString() <<
     // std::endl;
-    int err = m_clientSocket->error();
+    //int err = m_clientSocket->error();
   }
 }
 

@@ -43,7 +43,7 @@ void linkFxs(const QMap<TFx *, TFx *> &clonedFxs,
 
 void linkFxs(const QMap<TFx *, TFx *> &clonedFxs) {
   QMap<TFx *, TFx *>::const_iterator it;
-  for (it = clonedFxs.begin(); it != clonedFxs.end(); it++) {
+  for (it = clonedFxs.begin(); it != clonedFxs.end(); ++it) {
     TFx *fx = it.key();
     int j, portCount = fx->getInputPortCount();
     for (j = 0; j < portCount; j++) {
@@ -108,7 +108,7 @@ void FxsData::setFxs(const QList<TFxP> &selectedFxs,
   }
 
   QList<int>::const_iterator it;
-  for (it = columnIndexes.begin(); it != columnIndexes.end(); it++) {
+  for (it = columnIndexes.begin(); it != columnIndexes.end(); ++it) {
     TXshColumn *col    = xsh->getColumn(*it);
     TXshColumn *newCol = col->clone();
     newCol->getFx()->getAttributes()->setDagNodePos(
@@ -143,7 +143,7 @@ void FxsData::getFxs(QList<TFxP> &fxs, QMap<TFx *, int> &zeraryFxColumnSize,
   }
 
   QList<TXshColumnP>::const_iterator it;
-  for (it = m_columns.begin(); it != m_columns.end(); it++) {
+  for (it = m_columns.begin(); it != m_columns.end(); ++it) {
     TXshColumn *col    = it->getPointer();
     TXshColumn *newCol = col->clone();
     newCol->getFx()->getAttributes()->setDagNodePos(
@@ -171,7 +171,7 @@ void FxsData::checkConnectivity() {
   visitFx(m_fxs.at(0).getPointer());
   m_connected = true;
   QMap<TFx *, bool>::const_iterator it;
-  for (it = m_visitedFxs.begin(); it != m_visitedFxs.end(); it++)
+  for (it = m_visitedFxs.begin(); it != m_visitedFxs.end(); ++it)
     m_connected = m_connected && it.value();
 }
 

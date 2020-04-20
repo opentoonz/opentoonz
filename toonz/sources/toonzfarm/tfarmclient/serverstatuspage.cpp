@@ -337,7 +337,7 @@ sl->select((i+1)%sl->getItemCount(), true);
       sl->removeItem(itemId);
     }
   it = newServers.begin();
-  for (; it != newServers.end(); it++)
+  for (; it != newServers.end(); ++it)
     sl->addItem(new TTextListItem(it->m_id, it->m_name));
 
   TTextListItem *item = m_data->m_serverList->getSelectedItem(0);

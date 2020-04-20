@@ -223,7 +223,7 @@ TFilePathSet getPathsToCreate(const TFilePath &path) {
 void setPathsPermissions(const TFilePathSet &pathSet,
                          QFile::Permissions permissions) {
   TFilePathSet::const_iterator it;
-  for (it = pathSet.begin(); it != pathSet.end(); it++) {
+  for (it = pathSet.begin(); it != pathSet.end(); ++it) {
     QFile f(toQString(*it));
     f.setPermissions(permissions);
   }
@@ -863,7 +863,7 @@ void TSystem::renameFileOrLevel_throw(const TFilePath &dst,
     TFilePathSet files;
     files = TSystem::readDirectory(src.getParentDir(), false);
 
-    for (TFilePathSet::iterator it = files.begin(); it != files.end(); it++) {
+    for (TFilePathSet::iterator it = files.begin(); it != files.end(); ++it) {
       if (it->getLevelName() == src.getLevelName()) {
         TFilePath src1 = *it;
         TFilePath dst1 = dst.withFrame(it->getFrame());

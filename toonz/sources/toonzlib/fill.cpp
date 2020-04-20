@@ -582,7 +582,7 @@ void fill(const TRaster32P &ras, const TRaster32P &ref,
   }
 
   std::map<int, std::vector<std::pair<int, int>>>::iterator it;
-  for (it = segments.begin(); it != segments.end(); it++) {
+  for (it = segments.begin(); it != segments.end(); ++it) {
     TPixel32 *line    = ras->pixels(it->first);
     TPixel32 *refLine = 0;
     TPixel32 *refPix;
@@ -777,9 +777,8 @@ void fullColorFill(const TRaster32P &ras, const FillParameters &params,
   TPixel32 premultiColor = premultiply(color);
 
   std::map<int, std::vector<std::pair<int, int>>>::iterator it;
-  for (it = segments.begin(); it != segments.end(); it++) {
+  for (it = segments.begin(); it != segments.end(); ++it) {
     TPixel32 *line    = ras->pixels(it->first);
-    TPixel32 *refLine = 0;
     std::vector<std::pair<int, int>> segmentVector = it->second;
     for (int i = 0; i < (int)segmentVector.size(); i++) {
       std::pair<int, int> segment = segmentVector[i];

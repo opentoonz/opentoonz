@@ -427,10 +427,9 @@ void ControlPointEditorTool::drawControlPoint() {
 
   double pix    = getPixelSize() * 2.0f;
   double pix1_5 = 1.5 * pix, pix2 = pix + pix, pix2_5 = pix1_5 + pix,
-         pix3 = pix2 + pix, pix3_5 = pix2_5 + pix, pix4 = pix3 + pix;
+         pix3 = pix2 + pix, pix3_5 = pix2_5 + pix;
 
   double maxDist2 = sq(5.0 * pix);
-  double dist2    = 0;
   int pointIndex;
   ControlPointEditorStroke::PointType pointType =
       m_controlPointEditorStroke.getPointTypeAt(m_pos, maxDist2, pointIndex);
@@ -735,7 +734,6 @@ void ControlPointEditorTool::rightButtonDown(const TPointD &pos,
   if (!vi) return;
   double maxDist  = 5 * getPixelSize();
   double maxDist2 = maxDist * maxDist;
-  double dist2    = 0;
   int pointIndex;
   ControlPointEditorStroke::PointType pointType =
       m_controlPointEditorStroke.getPointTypeAt(pos, maxDist2, pointIndex);
@@ -964,7 +962,7 @@ void ControlPointEditorTool::unlinkSpeedInOut(int pointIndex) {
 
 bool ControlPointEditorTool::keyDown(QKeyEvent *event) {
   TVectorImageP vi(getImage(true));
-  if (!vi || (vi && m_selection.isEmpty())) return false;
+  if (!vi || m_selection.isEmpty()) return false;
 
   // Inizializzo l'UNDO
   initUndo();
@@ -1000,12 +998,12 @@ bool ControlPointEditorTool::keyDown(QKeyEvent *event) {
 
 void ControlPointEditorTool::onEnter() {
   TVectorImageP vi(getImage(false));
-  int currentStroke = m_controlPointEditorStroke.getStrokeIndex();
   if (m_isMenuViewed) {
     m_isMenuViewed = false;
     return;
   }
-  /*m_draw=true;
+  /*
+  int currentStroke = m_controlPointEditorStroke.getStrokeIndex();
   if(currentStroke==-1 || !vi)
           return;
 
@@ -1078,7 +1076,7 @@ void ControlPointEditorTool::onImageChanged() {
   if (!vi) return;
 
   int currentStroke = m_controlPointEditorStroke.getStrokeIndex();
-  if (!vi || currentStroke == -1 ||
+  if (currentStroke == -1 ||
       m_controlPointEditorStroke.getControlPointCount() == 0 ||
       vi->getStrokeCount() == 0 || (int)vi->getStrokeCount() <= currentStroke) {
     m_controlPointEditorStroke.setStroke((TVectorImage *)0, -1);
@@ -1118,7 +1116,7 @@ int ControlPointEditorTool::getCursorId() const {
 bool ControlPointEditorTool::isEventAcceptable(QEvent *e) {
   if (!isEnabled()) return false;
   TVectorImageP vi(getImage(false));
-  if (!vi || (vi && m_selection.isEmpty())) return false;
+  if (!vi || m_selection.isEmpty()) return false;
   // arrow keys will be used for moving the selected points
   QKeyEvent *keyEvent = static_cast<QKeyEvent *>(e);
   // shift + arrow will not be recognized for now

@@ -156,7 +156,6 @@ namespace {
 
 void copyFramesWithoutUndo(TXshSimpleLevel *sl, std::set<TFrameId> &frames) {
   QClipboard *clipboard = QApplication::clipboard();
-  TXsheet *xsh          = TApp::instance()->getCurrentXsheet()->getXsheet();
   DrawingData *data     = new DrawingData();
   data->setLevelFrames(sl, frames);
   clipboard->setMimeData(data, QClipboard::Clipboard);
@@ -538,7 +537,7 @@ public:
       int i                        = 0;
       TTileSetCM32 *tileSetCM      = dynamic_cast<TTileSetCM32 *>(m_tiles);
       TTileSetFullColor *tileSetFC = dynamic_cast<TTileSetFullColor *>(m_tiles);
-      for (it = m_frames.begin(); it != m_frames.end(); it++, i++) {
+      for (it = m_frames.begin(); it != m_frames.end(); ++it, i++) {
         TImageP image = m_level->getFrame(*it, true);
         if (!image) continue;
         TRasterImageP ri(image);
@@ -582,10 +581,8 @@ public:
       m_level->setFrame(*m_frames.begin(), img);
     }
 
-    std::set<TFrameId> frames = m_frames;
-
     std::set<TFrameId>::const_iterator it;
-    for (it = m_frames.begin(); it != m_frames.end(); it++) {
+    for (it = m_frames.begin(); it != m_frames.end(); ++it) {
       TImageP image    = m_level->getFrame(*it, true);
       TRasterImageP ri = image;
       TToonzImageP ti  = image;
@@ -676,7 +673,7 @@ public:
                       .arg(QString::fromStdWString(m_level->getName()));
 
     std::set<TFrameId>::const_iterator it;
-    for (it = m_frames.begin(); it != m_frames.end(); it++) {
+    for (it = m_frames.begin(); it != m_frames.end(); ++it) {
       if (it != m_frames.begin()) str += QString(", ");
       str += QString::number((*it).getNumber());
     }
@@ -728,7 +725,7 @@ public:
       removeFramesWithoutUndo(m_level, frames);
     } else {
       std::set<TFrameId>::const_iterator it;
-      for (it = m_frames.begin(); it != m_frames.end(); it++) {
+      for (it = m_frames.begin(); it != m_frames.end(); ++it) {
         TVectorImageP img = m_level->getFrame(*it, true);
         assert(img);
         if (!img) continue;
@@ -739,7 +736,7 @@ public:
         ;
         std::set<int>::const_iterator it2 = imageIndices.end();
         while (it2 != imageIndices.begin()) {
-          it2--;
+          --it2;
           img->removeStroke(*it2);
         }
       }
@@ -767,9 +764,8 @@ public:
       m_level->setFrame(*m_frames.begin(), img);
     }
 
-    std::set<TFrameId> frames = m_frames;
     std::set<TFrameId>::const_iterator it;
-    for (it = m_frames.begin(); it != m_frames.end(); it++) {
+    for (it = m_frames.begin(); it != m_frames.end(); ++it) {
       TVectorImageP img = m_level->getFrame(*it, true);
       assert(img);
       if (!img) continue;
@@ -796,7 +792,7 @@ public:
                       .arg(QString::fromStdWString(m_level->getName()));
 
     std::set<TFrameId>::const_iterator it;
-    for (it = m_frames.begin(); it != m_frames.end(); it++) {
+    for (it = m_frames.begin(); it != m_frames.end(); ++it) {
       if (it != m_frames.begin()) str += QString(", ");
       str += QString::number((*it).getNumber());
     }
@@ -830,7 +826,7 @@ isFrameInserted)
                 if(!m_isFrameInserted)
                 {
                         std::set<TFrameId>::iterator it;
-                        for(it=m_frames.begin(); it!=m_frames.end(); it++)
+                        for(it=m_frames.begin(); it!=m_frames.end(); ++it)
                         {
                                 TImageP img = m_level->getFrame(*it,true);
                                 TImageCache::instance()->add("PasteAreasUndoOld"+QString::number((UINT)this)+QString::number((*it).getNumber()),
@@ -843,7 +839,7 @@ img->cloneImage());
         {
                 m_newPalette = m_level->getPalette()->clone();
                 std::set<TFrameId>::iterator it;
-                for(it=m_frames.begin(); it!=m_frames.end(); it++)
+                for(it=m_frames.begin(); it!=m_frames.end(); ++it)
                 {
                         TImageP img = m_level->getFrame(*it,true);
                         TImageCache::instance()->add("PasteAreasUndoNew"+QString::number((UINT)this)+QString::number((*it).getNumber()),
@@ -856,10 +852,10 @@ img->cloneImage());
 
                 if(!m_isFrameInserted)
                 {
-                        for(it=m_frames.begin(); it!=m_frames.end(); it++)
+                        for(it=m_frames.begin(); it!=m_frames.end(); ++it)
                                 TImageCache::instance()->remove("PasteAreasUndoOld"+QString::number((UINT)this)+QString::number((*it).getNumber()));
                 }
-                for(it=m_frames.begin(); it!=m_frames.end(); it++)
+                for(it=m_frames.begin(); it!=m_frames.end(); ++it)
                         TImageCache::instance()->remove("PasteAreasUndoNew"+QString::number((UINT)this)+QString::number((*it).getNumber()));
   }
 
@@ -875,7 +871,7 @@ img->cloneImage());
                 else
                 {
                         std::set<TFrameId>::const_iterator it;
-                        for(it=m_frames.begin(); it!=m_frames.end(); it++)
+                        for(it=m_frames.begin(); it!=m_frames.end(); ++it)
                         {
                                 TImageP img =
 TImageCache::instance()->get("PasteAreasUndoOld"+QString::number((UINT)this)+QString::number((*it).getNumber()),true);
@@ -902,7 +898,7 @@ TImageCache::instance()->get("PasteAreasUndoOld"+QString::number((UINT)this)+QSt
     std::set<TFrameId> frames = m_frames;
 
                 std::set<TFrameId>::const_iterator it;
-                for(it=m_frames.begin(); it!=m_frames.end(); it++)
+                for(it=m_frames.begin(); it!=m_frames.end(); ++it)
                 {
                         TImageP img =
 TImageCache::instance()->get("PasteAreasUndoNew"+QString::number((UINT)this)+QString::number((*it).getNumber()),true);
@@ -1043,7 +1039,7 @@ public:
                       .arg(QString::fromStdWString(m_sl->getName()));
 
     std::set<TFrameId>::const_iterator it;
-    for (it = m_frames.begin(); it != m_frames.end(); it++) {
+    for (it = m_frames.begin(); it != m_frames.end(); ++it) {
       if (it != m_frames.begin()) str += QString(", ");
       str += QString::number((*it).getNumber());
     }
@@ -1096,7 +1092,7 @@ public:
                       .arg(QString::fromStdWString(m_sl->getName()));
 
     std::set<TFrameId>::const_iterator it;
-    for (it = m_frames.begin(); it != m_frames.end(); it++) {
+    for (it = m_frames.begin(); it != m_frames.end(); ++it) {
       if (it != m_frames.begin()) str += QString(", ");
       str += QString::number((*it).getNumber());
     }
@@ -1157,7 +1153,7 @@ public:
                       .arg(QString::fromStdWString(m_sl->getName()));
 
     std::set<TFrameId>::const_iterator it;
-    for (it = m_framesCutted.begin(); it != m_framesCutted.end(); it++) {
+    for (it = m_framesCutted.begin(); it != m_framesCutted.end(); ++it) {
       if (it != m_framesCutted.begin()) str += QString(", ");
       str += QString::number((*it).getNumber());
     }
@@ -1227,7 +1223,7 @@ public:
                       .arg(QString::fromStdWString(m_level->getName()));
 
     std::set<TFrameId>::const_iterator it;
-    for (it = m_insertedFids.begin(); it != m_insertedFids.end(); it++) {
+    for (it = m_insertedFids.begin(); it != m_insertedFids.end(); ++it) {
       if (it != m_insertedFids.begin()) str += QString(", ");
       str += QString::number((*it).getNumber());
     }
@@ -1411,7 +1407,7 @@ int i;
 std::set<TFrameId>::iterator it2;
 it2=frames.begin();
 std::set<TFrameId> newFrames;
-for (i=0; i<frames.size(); i++, it2++)
+for (i=0; i<frames.size(); i++, ++it2)
 newFrames.insert(TFrameId(startFrame+(i*stepFrame),it2->getLetter()));
 assert(frames.size()==newFrames.size());
 frames.swap(newFrames);
@@ -1455,7 +1451,6 @@ void FilmstripCmd::renumber(TXshSimpleLevel *sl, std::set<TFrameId> &frames,
     assert(j != fids.end());
     assert(srcFid == *j);
     if (j == fids.end()) continue;  // per sicurezza
-    int k = std::distance(fids.begin(), j);
     if (srcFid != dstFid) {
       modifiedFids.insert(srcFid);
       modifiedFids.insert(dstFid);
@@ -1474,7 +1469,7 @@ void FilmstripCmd::renumber(TXshSimpleLevel *sl, std::set<TFrameId> &frames,
   std::set<TFrameId>::iterator it2;
   it2 = frames.begin();
   std::set<TFrameId> newFrames;
-  for (i = 0; i < frames.size(); i++, it2++)
+  for (i = 0; i < frames.size(); i++, ++it2)
     newFrames.insert(TFrameId(startFrame + (i * stepFrame), it2->getLetter()));
   assert(frames.size() == newFrames.size());
   frames.swap(newFrames);
@@ -1721,7 +1716,7 @@ public:
       : m_level(level), m_frames(frames), m_oldFrames(oldFrames) {
     if (m_level->getType() == TZP_XSHLEVEL) {
       std::set<TFrameId>::iterator it;
-      for (it = m_frames.begin(); it != m_frames.end(); it++) {
+      for (it = m_frames.begin(); it != m_frames.end(); ++it) {
         TToonzImageP img = m_level->getFrame(*it, true);
         // TImageCache::instance()->add("UndoInsertEmptyFrames"+QString::number((UINT)this),
         // img);
@@ -1919,7 +1914,6 @@ public:
     if (count <= 0) return;  // niente swing con un solo frame
     TFrameId lastFid     = *frames.rbegin();
     TFrameId insertPoint = lastFid + 1;
-    std::set<TFrameId> framesToInsert;
     int i;
     for (i = 0; i < count; i++) m_newFrames.insert(insertPoint + i);
   }
@@ -2031,7 +2025,6 @@ public:
 
   void undo() const override {
     removeFramesWithoutUndo(m_level, m_insertedFrames);
-    std::set<TFrameId>::const_iterator it = m_frames.begin();
     if (m_updateXSheet) {
       std::vector<TFrameId> newFrames;
       m_level->getFids(newFrames);

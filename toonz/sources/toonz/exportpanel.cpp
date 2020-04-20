@@ -112,7 +112,7 @@ void RenderController::setMovieExt(string ext) { m_movieExt = ext; }
 bool RenderController::addScene(MovieGenerator &g, ToonzScene *scene) {
   int frameCount = scene->getFrameCount();
   if (frameCount < 0) return false;
-  int r0 = 0, r1 = frameCount - 1, step = 0;
+  int r0 = 0, r1 = frameCount - 1;
   if (m_useMarkers) {
     int r0M, r1M, step;
     scene->getProperties()->getPreviewProperties()->getRange(r0M, r1M, step);
@@ -316,16 +316,8 @@ you want to do?";*/
           DVGui::warning(msg);
         }
       } else {
-        int r0 = 1, r1 = totalFrameCount, step = 1;
-
+        int step = 1;
         const TRenderSettings rs = m_properties->getRenderSettings();
-
-        double timeStretchFactor;
-        timeStretchFactor = (double)rs.m_timeStretchTo / rs.m_timeStretchFrom;
-        int numFrames     = troundp((r1 - r0 + 1) * timeStretchFactor);
-        r0                = troundp(r0 * timeStretchFactor);
-        r1                = r0 + numFrames - 1;
-
         TXsheet::SoundProperties *prop = new TXsheet::SoundProperties();
         prop->m_frameRate              = m_properties->getFrameRate();
         TSoundTrack *snd =
@@ -525,7 +517,6 @@ QVariant ClipListViewer::getItemData(int index, DataType dataType,
                                      bool isSelected) {
   if (index < 0 || index >= getController()->getClipCount()) return QVariant();
   TFilePath fp      = getController()->getClipPath(index);
-  ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
 
   if (dataType == Name)
     return QString::fromStdString(fp.getName());
@@ -703,8 +694,6 @@ ExportPanel::ExportPanel(QWidget *parent, Qt::WFlags flags)
   setWindowTitle(tr("Export"));
 
   setMinimumWidth(270);
-
-  RenderController *renderController = RenderController::instance();
 
   QFrame *box = new QFrame(this);
   box->setObjectName("exportPanel");

@@ -68,9 +68,9 @@ NewWordDialog::NewWordDialog(QWidget* parent) {
   setLayout(mainLay);
 
   // signal-slot connections
-  bool ret = true;
-  ret      = ret && connect(okBtn, SIGNAL(clicked(bool)), this, SLOT(accept()));
-  ret = ret && connect(cancelBtn, SIGNAL(clicked(bool)), this, SLOT(reject()));
+  bool ret;
+  ret = connect(okBtn, SIGNAL(clicked(bool)), this, SLOT(accept()));
+  ret |= connect(cancelBtn, SIGNAL(clicked(bool)), this, SLOT(reject()));
 }
 
 //-------

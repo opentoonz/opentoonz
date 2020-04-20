@@ -125,7 +125,7 @@ static bool is_num(string word) {
   string::iterator it = word.begin();
   while (it != word.end()) {
     if ((*it < '0' || *it > '9') && *it != '.') return false;
-    it++;
+    ++it;
   }
   return true;
 }

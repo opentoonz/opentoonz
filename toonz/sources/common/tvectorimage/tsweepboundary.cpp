@@ -1541,7 +1541,7 @@ void addBranch(IntersectionData &intData, list<IntersectedStroke> &strokeList,
   UINT added    = 0;
   bool endPoint = (w == 0.0 || w == 1.0);
 
-  for (it = strokeList.begin(); it != strokeList.end(); it++) {
+  for (it = strokeList.begin(); it != strokeList.end(); ++it) {
     tan2 = (((*it).m_gettingOut) ? 1 : -1) *
            (*it).m_edge.m_s->getSpeed((*it).m_edge.m_w0);
     crossVal = cross(tan1, tan2);
@@ -1584,7 +1584,7 @@ void addBranches(IntersectionData &intData, Intersection &intersection,
   assert(!intersection.m_strokeList.empty());
 
   for (it = intersection.m_strokeList.begin();
-       it != intersection.m_strokeList.end(); it++) {
+       it != intersection.m_strokeList.end(); ++it) {
     if ((ii >= 0 && (*it).m_edge.m_s == s[ii])) foundS1 = true;
     if ((jj >= 0 && (*it).m_edge.m_s == s[jj])) foundS2 = true;
   }
@@ -1679,7 +1679,7 @@ void addIntersection(IntersectionData &intData, const vector<TStroke *> &s,
 
   p = s[ii]->getPoint(intersection.first);
 
-  for (it = intData.m_intList.begin(); it != intData.m_intList.end(); it++)
+  for (it = intData.m_intList.begin(); it != intData.m_intList.end(); ++it)
     if (areAlmostEqual((*it).m_intersection,
                        p))  // devono essere rigorosamente uguali, altrimenti
     // il calcolo dell'ordine dei rami con le tangenti sballa
@@ -1712,7 +1712,7 @@ void findNearestIntersection(list<Intersection> &interList) {
 
       for (it1 = i1; it1 != interList.end(); ++it1) {
         if (it1 == i1)
-          it2 = i2, it2++;
+          it2 = i2, ++it2;
         else
           it2 = (*it1).m_strokeList.begin();
 
@@ -1802,7 +1802,7 @@ void computeIntersections(IntersectionData &intData,
   // faccio qui, e non nella eraseIntersection. vedi commento li'.
   // eraseDeadIntersections(intData.m_intList);
 
-  // for (it1=intData.m_intList.begin(); it1!=intData.m_intList.end(); it1++)
+  // for (it1=intData.m_intList.begin(); it1!=intData.m_intList.end(); ++it1)
   //   markDeadIntersections(intData.m_intList, it1);
 
   // checkInterList(intData.m_intList);
@@ -1896,7 +1896,7 @@ TRegion *findRegion(list<Intersection> &intList,
     }
 
     do {
-      it2++;
+      ++it2;
       if (it2 == ((*it1).m_strokeList.end()))  // la lista e' circolare
         it2 = (*it1).m_strokeList.begin();
     } while (it2->m_nextIntersection == intList.end());

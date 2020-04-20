@@ -428,8 +428,7 @@ void TXsheet::clearCells(int row, int col, int rowCount) {
 //-----------------------------------------------------------------------------
 
 void TXsheet::clearAll() {
-  int c0 = 0, c1 = m_imp->m_columnSet.getColumnCount() - 1;
-  int r0 = 0, r1 = getFrameCount() - 1;
+
   m_imp->m_columnSet.clear();
 
   if (m_imp->m_pegTree) {
@@ -759,10 +758,10 @@ void TXsheet::stepCells(int r0, int c0, int r1, int c1, int type) {
 //-----------------------------------------------------------------------------
 
 void TXsheet::increaseStepCells(int r0, int c0, int &r1, int c1) {
-  int c, size = r1 - r0 + 1;
+  int c;
   QList<int> ends;
   for (c = c0; c <= c1; c++) {
-    int r = r0, i = 0, rEnd = r1;
+    int r = r0, rEnd = r1;
     while (r <= rEnd) {
       TXshCell cell = getCell(CellPosition(r, c));
       if (!cell.isEmpty()) {
@@ -773,7 +772,6 @@ void TXsheet::increaseStepCells(int r0, int c0, int &r1, int c1) {
         while (cell == getCell(CellPosition(r, c)) && r <= rEnd) r++;
       } else
         r++;
-      i++;
     }
     ends.append(rEnd);
   }
@@ -788,10 +786,10 @@ void TXsheet::increaseStepCells(int r0, int c0, int &r1, int c1) {
 //-----------------------------------------------------------------------------
 
 void TXsheet::decreaseStepCells(int r0, int c0, int &r1, int c1) {
-  int c, size = r1 - r0 + 1;
+  int c;
   QList<int> ends;
   for (c = c0; c <= c1; c++) {
-    int r = r0, i = 0, rEnd = r1;
+    int r = r0, rEnd = r1;
     while (r <= rEnd) {
       TXshCell cell = getCell(CellPosition(r, c));
       if (!cell.isEmpty()) {
@@ -807,7 +805,6 @@ void TXsheet::decreaseStepCells(int r0, int c0, int &r1, int c1) {
         }
       } else
         r++;
-      i++;
     }
     ends.append(rEnd);
   }
@@ -826,7 +823,7 @@ void TXsheet::eachCells(int r0, int c0, int r1, int c1, int type) {
   int nc = c1 - c0 + 1;
   if (nr < type || nc <= 0) return;
 
-  int newRows = nr % type ? nr / type + 1 : nr / type;
+  int newRows = (nr % type) ? (nr / type + 1) : (nr / type);
 
   int size = newRows * nc;
   assert(size > 0);
@@ -928,7 +925,8 @@ void TXsheet::resetStepCells(int r0, int c0, int r1, int c1) {
   int c, size = r1 - r0 + 1;
   for (c = c0; c <= c1; c++) {
     int r = r0, i = 0;
-    TXshCell *cells = new TXshCell[size];
+    std::unique_ptr<TXshCell[]> cells(new TXshCell[size]);
+    assert(cells);
     while (r <= r1) {
       // mi prendo le celle che mi servono
       cells[i] = getCell(CellPosition(r, c));
@@ -1093,20 +1091,20 @@ int TXsheet::exposeLevel(int row, int col, TXshLevel *xl,
     {
       std::vector<TFrameId>::iterator it;
       it = fids.begin();
-      while (it->getNumber() < xFrom) it++;
+      while (it->getNumber() < xFrom) ++it;
 
       if (step == 0)  // Step = Auto
       {
         std::vector<TFrameId>::iterator next_it;
         next_it = it;
-        next_it++;
+        ++next_it;
 
         int startFrame = it->getNumber();
 
         for (int f = startFrame; f < startFrame + frameCount; f++) {
           if (next_it != fids.end() && f >= next_it->getNumber()) {
-            it++;
-            next_it++;
+            ++it;
+            ++next_it;
           }
           setCell(row++, col, TXshCell(xl, *it));
         }
@@ -1119,7 +1117,7 @@ int TXsheet::exposeLevel(int row, int col, TXshLevel *xl,
           for (int s = 0; s < step; s++) {
             setCell(row++, col, TXshCell(xl, *it));
           }
-          it++;
+          ++it;
         }
       }
 
@@ -1172,7 +1170,6 @@ void TXsheet::updateFrameCount() {
 void TXsheet::loadData(TIStream &is) {
   clearAll();
   TStageObjectId cameraId   = TStageObjectId::CameraId(0);
-  TStageObject *firstCamera = getStageObject(cameraId);
   m_imp->m_pegTree->removeStageObject(cameraId);
 
   int col = 0;
@@ -1214,7 +1211,6 @@ void TXsheet::loadData(TIStream &is) {
         }
       }
     } else if (tagName == "pegbars") {
-      TPersist *p = m_imp->m_pegTree;
       m_imp->m_pegTree->loadData(is, this);
     } else if (tagName == "fxnodes") {
       m_imp->m_fxDag->loadData(is);

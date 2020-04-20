@@ -65,7 +65,7 @@ public:
   RayleighNoise(double sigma, int seed = 0) {
     noise_buf.resize(PIXEL::maxChannelValue + 1);
     TRandom random(seed);
-    sigma = log(sigma * 0.07 + 1);
+    sigma = log1p(sigma * 0.07);
     if (PIXEL::maxChannelValue == 255)
       sigma = 2.0 * sigma * sigma * sigma * sigma;
     else

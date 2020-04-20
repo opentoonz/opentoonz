@@ -504,7 +504,7 @@ void UsageImp::parse(int argc, char *argv[]) {
       if (matchArgCount(ul, 0, ul.getCount() - 1, argc - 1) == false)
         it = usages.erase(it);
       else
-        it++;
+        ++it;
     }
     if (usages.size() == 0) {
       if (argc - 1 < min)

@@ -144,7 +144,7 @@ TFilePath getLocalRoot() {
 //--------------------------------------------------------------------
 
 bool myDoesExists(const TFilePath &fp) {
-  bool exists = false;
+  bool exists;
 #ifdef _WIN32
   TFileStatus fs(fp);
   exists = fs.doesExist();
@@ -158,7 +158,7 @@ bool myDoesExists(const TFilePath &fp) {
 //--------------------------------------------------------------------
 
 bool dirExists(const TFilePath &dirFp) {
-  bool exists = false;
+  bool exists;
 #ifdef _WIN32
   TFileStatus fs(dirFp);
   exists = fs.isDirectory();
@@ -1496,8 +1496,8 @@ void FarmController::removeTask(const QString &id) {
         CtrlFarmTask *subTask = it3->second;
         if (subTask->m_status != Running) {
           it2 = task->m_subTasks.erase(it2);
-          m_tasks.erase(it3);
           delete it3->second;
+          m_tasks.erase(it3);
         } else {
           it2 = task->m_subTasks.erase(it2);
 
@@ -1525,8 +1525,8 @@ void FarmController::removeTask(const QString &id) {
     }
 
     if (task->m_status != Running || !aSubtaskIsRunning) {
-      m_tasks.erase(it);
       delete it->second;
+      m_tasks.erase(it);
     } else
       task->m_toBeDeleted = true;
   }
@@ -1773,7 +1773,7 @@ void FarmController::taskSubmissionError(const QString &taskId, int errCode) {
 
         parentTask->m_status = parentTaskState;
         if (parentTask->m_status == Aborted ||
-            parentTask->m_status == Aborted) {
+            parentTask->m_status == Completed) {
           parentTask->m_completionDate = task->m_completionDate;
           if (parentTask->m_toBeDeleted) m_tasks.erase(itParent);
         }
@@ -2379,10 +2379,6 @@ int main(int argc, char **argv) {
   bool console = false;
 
   if (argc > 1) {
-    string serviceName(
-        "ToonzFarmController");  // Must be the same of the installer's
-    string serviceDisplayName = serviceName;
-
     TCli::SimpleQualifier consoleQualifier("-console", "Run as console app");
     TCli::StringQualifier installQualifier("-install name",
                                            "Install service as 'name'");
@@ -2393,6 +2389,10 @@ int main(int argc, char **argv) {
     if (!usage.parse(argc, argv)) exit(1);
 
 #ifdef _WIN32
+    string serviceName(
+        "ToonzFarmController");  // Must be the same of the installer's
+    string serviceDisplayName = serviceName;
+
     if (installQualifier.isSelected()) {
       char szPath[512];
 

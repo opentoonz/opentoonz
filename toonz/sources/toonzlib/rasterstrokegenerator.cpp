@@ -56,7 +56,6 @@ void RasterStrokeGenerator::generateStroke(bool isPencil) const {
   // Trasla i punti secondo il nuovo sitema di riferimento
   translatePoints(points, newOrigin);
 
-  std::vector<TThickPoint> partialPoints;
   if (size == 1) {
     rasterBrush(rasBuffer, points, m_styleId, !isPencil);
     placeOver(m_raster, rasBuffer, newOrigin);
@@ -94,7 +93,7 @@ void RasterStrokeGenerator::generateStroke(bool isPencil) const {
     if (size > 2) {
       partialPoints.clear();
       std::vector<TThickPoint>::iterator it = points.begin();
-      it++;
+      ++it;
       partialPoints.insert(partialPoints.begin(), it, points.end());
       rasterBrush(rasBuffer, partialPoints, m_styleId, !isPencil);
       placeOver(m_raster, rasBuffer, newOrigin);
@@ -207,12 +206,12 @@ void RasterStrokeGenerator::placeOver(const TRasterCM32P &out,
           if (!m_keepAntiAlias) {
             if (inPix->getTone() == 0 &&
                 (!m_selective ||
-                 (m_selective && outPix->getInk() == m_selectedStyle))) {
+                 outPix->getInk() == m_selectedStyle)) {
               outPix->setTone(255);
             }
           } else if (inPix->getTone() < 255 &&
                      (!m_selective ||
-                      (m_selective && outPix->getInk() == m_selectedStyle))) {
+                      outPix->getInk() == m_selectedStyle)) {
             outPix->setTone(
                 std::max(outPix->getTone(), 255 - inPix->getTone()));
           }
@@ -220,31 +219,28 @@ void RasterStrokeGenerator::placeOver(const TRasterCM32P &out,
         if (m_colorType == PAINT) {
           if (inPix->getTone() == 0 &&
               (!m_selective ||
-               (m_selective && outPix->getPaint() == m_selectedStyle)))
+               outPix->getPaint() == m_selectedStyle))
             outPix->setPaint(0);
         }
         if (m_colorType == INKNPAINT) {
           if (inPix->getTone() < 255 &&
               (!m_selective ||
-               (m_selective && outPix->getPaint() == m_selectedStyle)))
+               outPix->getPaint() == m_selectedStyle))
             outPix->setPaint(0);
           if (!m_keepAntiAlias) {
             if (inPix->getTone() == 0 &&
-                (!m_selective ||
-                 (m_selective && outPix->getInk() == m_selectedStyle))) {
+                (!m_selective || outPix->getInk() == m_selectedStyle)) {
               outPix->setTone(255);
             }
           } else if (inPix->getTone() < 255 &&
-                     (!m_selective ||
-                      (m_selective && outPix->getInk() == m_selectedStyle))) {
+                     (!m_selective || outPix->getInk() == m_selectedStyle)) {
             outPix->setTone(
                 std::max(outPix->getTone(), 255 - inPix->getTone()));
           }
         }
       } else if (m_task == PAINTBRUSH) {
         if (!inPix->isPureInk()) continue;
-        bool changePaint =
-            !m_selective || (m_selective && outPix->getPaint() == 0);
+        bool changePaint = (!m_selective || outPix->getPaint() == 0);
         if (m_colorType == INK)
           *outPix = TPixelCM32(inPix->getInk(), outPix->getPaint(),
                                outPix->getTone());

@@ -307,9 +307,6 @@ BrightnessAndContrastPopup::BrightnessAndContrastPopup()
   addButtonBarWidget(m_okBtn);
 
   //------------------------ Connections --------------------------
-
-  TApp *app = TApp::instance();
-
   bool ret = true;
 
   ret = ret && connect(m_brightnessField, SIGNAL(valueChanged(bool)), this,
@@ -512,7 +509,6 @@ void BrightnessAndContrastPopup::apply() {
         TApp::instance()->getCurrentLevel()->getSimpleLevel();
     if (simpleLevel) {
       std::set<TFrameId> fids         = filmstripSelection->getSelectedFids();
-      std::set<TFrameId>::iterator it = fids.begin();
       bool oneImageChanged            = false;
       for (auto const &fid : fids) {
         TRasterImageP rasImage =

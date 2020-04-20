@@ -284,9 +284,7 @@ void Preferences::initializeOptions() {
       TSystem::readDirectory(lang_fpset, lang_path, true, false);
     }
 
-    int i = 0;
     for (auto const &newPath : lang_fpset) {
-      ++i;
       if (newPath == lang_path) continue;
       if (TFileStatus(newPath).isDirectory()) {
         QString string = QString::fromStdWString(newPath.getWideName());
@@ -301,9 +299,7 @@ void Preferences::initializeOptions() {
   TFilePathSet fpset;
   try {
     TSystem::readDirectory(fpset, path, true, false);
-    int i = -1;
     for (auto const &newPath : fpset) {
-      ++i;
       if (newPath == path) continue;
       QString fpName = QString::fromStdWString(newPath.getWideName());
       m_styleSheetList.append(fpName);
@@ -317,7 +313,7 @@ void Preferences::initializeOptions() {
   try {
     TSystem::readDirectory(room_fpset, room_path, true, false);
     TFilePathSet::iterator it = room_fpset.begin();
-    for (int i = 0; it != room_fpset.end(); it++, i++) {
+    for (int i = 0; it != room_fpset.end(); ++it, i++) {
       TFilePath newPath = *it;
       if (newPath == room_path) continue;
       if (TFileStatus(newPath).isDirectory()) {

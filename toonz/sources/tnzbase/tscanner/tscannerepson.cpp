@@ -415,7 +415,7 @@ fclose(myFile);*/
       throw TScannerExpection(notFatal, "Scanner error (un)loading paper");
     }
     unsigned char p = 0x0C;
-    bool status     = true;
+    bool status;
     send(&p, 1);
     status = expectACK();
   }
@@ -803,7 +803,6 @@ bool TScannerEpson::ESCI_command_2b(char cmd, unsigned char p0,
     unsigned char p[2];
     p[0]        = p0;
     p[1]        = p1;
-    int timeout = 30000;
     send(&(p[0]), 2);
     if (checkACK) status = expectACK();
   }
@@ -819,8 +818,6 @@ bool TScannerEpson::ESCI_command_2w(char cmd, unsigned short p0,
     unsigned short p[2];
     p[0]          = p0;
     p[1]          = p1;
-    const int len = 1;
-    int timeout   = 30000;
     send((unsigned char *)(&(p[0])), 4);
     if (checkACK) status = expectACK();
   }
@@ -868,6 +865,7 @@ bool TScannerEpson::ESCI_doADF(bool on) {
   bool status1        = expectACK();
   return status1;
 
+#if 0
   return 1;
   if (!ESCI_command_1b('e', 0x01, true)) {
     if (on)
@@ -881,6 +879,7 @@ bool TScannerEpson::ESCI_doADF(bool on) {
   send(&p, 1);
   bool status = expectACK();
   return status;
+#endif
 }
 
 void TScannerEpson::scanArea2pix(const TScannerParameters &params,
@@ -919,8 +918,6 @@ void TScannerEpson::ESCI_readLineData(unsigned char &stx, unsigned char &status,
   drow  2,   counter
   drow  4    lines
   */
-  bool fatalError = !!(buffer[1] & 0x80);
-  bool notReady   = !!(buffer[1] & 0x40);
   areaEnd         = !!(buffer[1] & 0x20);
 
   memcpy(&stx, buffer.get(), 1);
@@ -937,6 +934,8 @@ void TScannerEpson::ESCI_readLineData(unsigned char &stx, unsigned char &status,
   status = buffer[1];
 
 #ifdef _DEBUG
+  bool fatalError = !!(buffer[1] & 0x80);
+  bool notReady   = !!(buffer[1] & 0x40);
   std::stringstream os;
 
   os << "fatal=" << fatalError;
@@ -958,8 +957,6 @@ void TScannerEpson::ESCI_readLineData2(unsigned char &stx,
   unsigned long s                         = 4;
   std::unique_ptr<unsigned char[]> buffer = ESCI_read_data2(s);
   if (!buffer) throw TException("Error reading scanner info");
-  bool fatalError = !!(buffer[1] & 0x80);
-  bool notReady   = !!(buffer[1] & 0x40);
 
   memcpy(&stx, buffer.get(), 1);
   memcpy(&counter, &(buffer[2]), 2);
@@ -970,6 +967,8 @@ void TScannerEpson::ESCI_readLineData2(unsigned char &stx,
   status = buffer[1];
 
 #ifdef _DEBUG
+  bool fatalError = !!(buffer[1] & 0x80);
+  bool notReady   = !!(buffer[1] & 0x40);
   std::stringstream os;
 
   os << "fatal=" << fatalError;

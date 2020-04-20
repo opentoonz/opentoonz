@@ -49,7 +49,8 @@ void RubberDeform::deform(const double n) {
 }
 
 double RubberDeform::avgLength() {
-  if (m_polyLoc.size() <= 0) return 0.0;
+
+  if (m_polyLoc.size() == 0) return 0.0;
 
   double avgD                          = 0.0;
   std::vector<T3DPointD>::iterator itb = m_polyLoc.begin();
@@ -62,7 +63,8 @@ double RubberDeform::avgLength() {
 }
 
 void RubberDeform::getBBox(TRectD &bbox) {
-  if (m_polyLoc.size() <= 0) {
+
+  if (m_polyLoc.size() == 0) {
     bbox.x0 = bbox.y0 = 0;
     bbox.x1 = bbox.y1 = -1;
     return;
@@ -220,7 +222,7 @@ void SFlashUtils::drawRegionOutline(TFlash &flash, const bool isRounded) const {
 
   TRegionOutline::Boundary::const_iterator iinter     = m_ro.m_interior.begin();
   TRegionOutline::Boundary::const_iterator iinter_end = m_ro.m_interior.end();
-  for (; iinter != iinter_end; iinter++) {
+  for (; iinter != iinter_end; ++iinter) {
     PointVector2QuadsArray(*iinter, quadArray, toBeDeleted, isRounded);
     quads.push_back(quadArray);
   }
@@ -246,8 +248,8 @@ int SFlashUtils::nbDiffVerts(const std::vector<TPointD> &pv) const {
 
 void SFlashUtils::Triangle2Quad(std::vector<TPointD> &p) const {
   TPointD e;
-  int i, j;
-  i = j = -1;
+  int i = 0, j = 0;
+
   if (p[0] == p[1]) {
     i = 0;
     j = 1;

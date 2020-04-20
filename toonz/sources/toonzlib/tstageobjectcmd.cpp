@@ -506,7 +506,7 @@ public:
       terminalFxs->addFx(m_terminalFx[i]);
     QMap<TStageObjectId, QList<TFxPort *>>::const_iterator it;
     for (it = m_columnFxConnections.begin(); it != m_columnFxConnections.end();
-         it++) {
+         ++it) {
       TStageObjectId id      = it.key();
       QList<TFxPort *> ports = it.value();
       TXshColumnP column     = xsh->getColumn(id.getIndex());
@@ -544,7 +544,7 @@ public:
     QString str = QObject::tr("Remove Column  ");
     QMap<TStageObjectId, QList<TFxPort *>>::const_iterator it;
     for (it = m_columnFxConnections.begin(); it != m_columnFxConnections.end();
-         it++) {
+         ++it) {
       TStageObjectId id = it.key();
       if (it != m_columnFxConnections.begin())
         str += QString::fromStdString(", ");
@@ -1331,7 +1331,6 @@ void TStageObjectCmd::setParent(const TStageObjectId &id,
   stageObject->setParent(parentId);
   stageObject->setParentHandle(parentHandle);
   if (doUndo) {
-    TUndoManager *undoManager = TUndoManager::manager();
     TUndoManager::manager()->add(new SetParentUndo(
         id, xshHandle, oldParentId, oldParentHandle, parentId, parentHandle));
   }
@@ -1485,7 +1484,7 @@ void TStageObjectCmd::deleteSelection(
   QVector<int> cameraIndexes;
 
   std::vector<TStageObjectId>::const_iterator it2;
-  for (it2 = objIds.begin(); it2 != objIds.end(); it2++) {
+  for (it2 = objIds.begin(); it2 != objIds.end(); ++it2) {
     if (it2->isColumn()) columnIndexes.append(it2->getIndex());
     if (it2->isPegbar()) pegbarIndexes.append(it2->getIndex());
     if (it2->isCamera()) cameraIndexes.append(it2->getIndex());
@@ -1511,12 +1510,12 @@ void TStageObjectCmd::deleteSelection(
                           objHandle, fxHandle, doUndo);
 
   std::list<QPair<TStageObjectId, TStageObjectId>>::const_iterator it1;
-  for (it1 = links.begin(); it1 != links.end() && objIds.empty(); it1++)
+  for (it1 = links.begin(); it1 != links.end() && objIds.empty(); ++it1)
     removeLink(*it1, xshHandle, objHandle, doUndo);
 
   std::list<int>::const_iterator it3;
   TStageObjectTree *objTree = xshHandle->getXsheet()->getStageObjectTree();
-  for (it3 = splineIds.begin(); it3 != splineIds.end(); it3++) {
+  for (it3 = splineIds.begin(); it3 != splineIds.end(); ++it3) {
     int splineCount = objTree->getSplineCount();
     int i;
     for (i = 0; i < splineCount; i++) {
@@ -1595,7 +1594,6 @@ void TStageObjectCmd::renameGroup(const QList<TStageObject *> objs,
                                   const std::wstring &name, bool fromEditor,
                                   TXsheetHandle *xshHandle) {
   std::wstring oldName;
-  TStageObjectTree *pegTree = xshHandle->getXsheet()->getStageObjectTree();
   QList<int> positions;
   int i;
   for (i = 0; i < objs.size(); i++) {

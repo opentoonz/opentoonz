@@ -1012,7 +1012,6 @@ void FlipConsole::applyCustomizeMask() {
   enableButton(eDefineLoadBox, m_customizeMask & eShowDefineLoadBox);
   enableButton(eUseLoadBox, m_customizeMask & eShowUseLoadBox);
   if (m_subcamSep) {
-    int count = m_gadgetsMask.size();
     bool hasDefineLoadBox =
         std::find(m_gadgetsMask.begin(), m_gadgetsMask.end(), eDefineLoadBox) ==
         m_gadgetsMask.end();

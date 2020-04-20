@@ -503,7 +503,7 @@ void SceneResources::getResources() {
 void SceneResources::save(const TFilePath newScenePath) {
   TFilePath oldScenePath = m_scene->getScenePath();
   m_scene->setScenePath(newScenePath);
-  bool failedSave = false;
+
   for (int i = 0; i < (int)m_resources.size(); i++) {
     m_resources[i]->save();
   }

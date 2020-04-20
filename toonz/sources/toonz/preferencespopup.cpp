@@ -1839,9 +1839,11 @@ QWidget* PreferencesPopup::createVersionControlPage() {
 //-----------------------------------------------------------------------------
 
 QWidget* PreferencesPopup::createTouchTabletPage() {
-  bool winInkAvailable = false;
+  bool winInkAvailable;
 #ifdef _WIN32
   winInkAvailable = KisTabletSupportWin8::isAvailable();
+#else
+  winInkAvailable = false;
 #endif
 
   QAction* touchAction =

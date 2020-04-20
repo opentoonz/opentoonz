@@ -135,7 +135,6 @@ bool selectionContainLevelImage(TCellSelection *selection, TXsheet *xsheet) {
           cell.isEmpty() ? (TXshSimpleLevel *)0 : cell.getSimpleLevel();
       if (!level) continue;
 
-      std::string ext = level->getPath().getType();
       int type        = level->getType();
       if (type == TZP_XSHLEVEL || type == PLI_XSHLEVEL || type == OVL_XSHLEVEL)
         return true;
@@ -628,8 +627,6 @@ void RenameCellField::showInRowCol(int row, int col, bool multiColumnSelected) {
       if (cell.m_level->getType() == TXshLevelType::SND_TXT_XSHLEVEL) {
         TXshSoundTextLevelP textLevel = cell.m_level->getSoundTextLevel();
         if (textLevel) {
-          std::string frameText =
-              textLevel->getFrameText(fid.getNumber() - 1).toStdString();
           setText(textLevel->getFrameText(fid.getNumber() - 1));
         }
       }
@@ -1129,7 +1126,6 @@ void CellArea::drawCells(QPainter &p, const QRect toBeUpdated) {
 
   drawSelectionBackground(p);
 
-  int currentRow = m_viewer->getCurrentRow();
   int col, row;
 
   int drawLeft  = std::max(1, toBeUpdated.left());
@@ -1154,8 +1150,6 @@ void CellArea::drawCells(QPainter &p, const QRect toBeUpdated) {
           Preferences::instance()->isCurrentTimelineIndicatorEnabled()) {
         row       = m_viewer->getCurrentRow();
         QPoint xy = m_viewer->positionToXY(CellPosition(row, col));
-        int x     = xy.x();
-        int y     = xy.y();
         if (row == 0) {
           if (m_viewer->orientation()->isVerticalTimeline())
             xy.setY(xy.y() + 1);
@@ -1194,8 +1188,6 @@ void CellArea::drawCells(QPainter &p, const QRect toBeUpdated) {
             row == m_viewer->getCurrentRow() &&
             Preferences::instance()->isCurrentTimelineIndicatorEnabled()) {
           QPoint xy = m_viewer->positionToXY(CellPosition(row, col));
-          int x     = xy.x();
-          int y     = xy.y();
           if (row == 0) {
             if (m_viewer->orientation()->isVerticalTimeline())
               xy.setY(xy.y() + 1);
@@ -1328,12 +1320,6 @@ void CellArea::drawExtenderHandles(QPainter &p) {
     int bottomAdj        = columnFan->isActive(selCol1) ? o->cellHeight() : 9;
     selected.adjust(0, topAdj, 0, bottomAdj);
   }
-
-  int x0, y0, x1, y1;
-  x0 = selected.left();
-  x1 = selected.right();
-  y0 = selected.top();
-  y1 = selected.bottom();
 
   // smart tab
   QPoint smartTabPosOffset =
@@ -2585,7 +2571,7 @@ bool CellArea::isKeyFrameArea(int col, int row, QPoint mouseInCell) {
   if (!xsh) return false;
 
   TStageObject *pegbar = xsh->getStageObject(m_viewer->getObjectId(col));
-  int k0, k1;
+  int k0 = 0, k1 = 0;
 
   bool isKeyframeFrame = pegbar && pegbar->getKeyframeRange(k0, k1) &&
                          (k1 > k0 || k0 == row) && k0 <= row && row <= k1 + 1;
@@ -2644,7 +2630,6 @@ void CellArea::mousePressEvent(QMouseEvent *event) {
     int col                   = cellPosition.layer();
     QPoint cellTopLeft        = m_viewer->positionToXY(CellPosition(row, col));
     QPoint mouseInCell        = event->pos() - cellTopLeft;
-    int x                     = mouseInCell.x();  // where in the cell click is
 
     // Check if a note is clicked
     TXshNoteSet *notes = m_viewer->getXsheet()->getNotes();
@@ -2837,7 +2822,6 @@ void CellArea::mouseMoveEvent(QMouseEvent *event) {
   int col                   = cellPosition.layer();
   QPoint cellTopLeft        = m_viewer->positionToXY(CellPosition(row, col));
   int x                     = m_pos.x() - cellTopLeft.x();
-  int y                     = m_pos.y() - cellTopLeft.y();
   QPoint mouseInCell        = m_pos - cellTopLeft;
 
   TXsheet *xsh = m_viewer->getXsheet();
@@ -3477,8 +3461,6 @@ void CellArea::createKeyLineMenu(QMenu &menu, int row, int col) {
     menu.addSeparator();
   } else {
     // Se le due chiavi non sono linear aggiungo il comando ResetInterpolation
-    bool isR0FullK = pegbar->isFullKeyframe(r0);
-    bool isR1FullK = pegbar->isFullKeyframe(r1);
     TDoubleKeyframe::Type r0Type =
         pegbar->getParam(TStageObject::T_X)->getKeyframeAt(r0).m_type;
     TDoubleKeyframe::Type r1Type =
@@ -3540,14 +3522,12 @@ void CellArea::createNoteMenu(QMenu &menu) {
   QAction *openAct   = menu.addAction(tr("Open Memo"));
   QAction *deleteAct = menu.addAction(tr("Delete Memo"));
   bool ret = connect(openAct, SIGNAL(triggered()), this, SLOT(openNote()));
-  ret =
-      ret && connect(deleteAct, SIGNAL(triggered()), this, SLOT(deleteNote()));
+  ret |= connect(deleteAct, SIGNAL(triggered()), this, SLOT(deleteNote()));
 }
 
 //-----------------------------------------------------------------------------
 
 void CellArea::openNote() {
-  TXshNoteSet *notes = m_viewer->getXsheet()->getNotes();
   int currentIndex   = m_viewer->getCurrentNoteIndex();
   m_viewer->getNotesWidget().at(currentIndex)->openNotePopup();
 }

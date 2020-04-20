@@ -132,7 +132,7 @@ std::vector<TStageObjectId> isConnected(
   std::map<TStageObjectId, std::string> parentHandles;
   TStageObjectTree *pegTree = xshHandle->getXsheet()->getStageObjectTree();
   std::set<int>::const_iterator it;
-  for (it = indices.begin(); it != indices.end(); it++) {
+  for (it = indices.begin(); it != indices.end(); ++it) {
     TStageObjectId id        = TStageObjectId::ColumnId(*it);
     TStageObject *obj        = pegTree->getStageObject(id, false);
     TStageObjectId parentId  = obj->getParent();
@@ -147,7 +147,7 @@ std::vector<TStageObjectId> isConnected(
     }
   }
   std::set<TStageObjectId>::const_iterator it2;
-  for (it2 = pegbarIds.begin(); it2 != pegbarIds.end(); it2++) {
+  for (it2 = pegbarIds.begin(); it2 != pegbarIds.end(); ++it2) {
     TStageObject *obj       = pegTree->getStageObject(*it2, false);
     TStageObjectId parentId = obj->getParent();
     bool parentIsColumn     = parentId.isColumn() &&
@@ -171,7 +171,7 @@ std::map<TFx *, std::vector<TFxPort *>> isConnected(
   TXsheet *xsh = xshHandle->getXsheet();
   std::set<int>::const_iterator it;
   std::map<TFx *, std::vector<TFxPort *>> roots;
-  for (it = indices.begin(); it != indices.end(); it++) {
+  for (it = indices.begin(); it != indices.end(); ++it) {
     TFx *fx = xsh->getColumn(*it)->getFx();
     int i, outputCount = fx->getOutputConnectionCount();
     for (i = 0; i < outputCount; i++) {
@@ -181,7 +181,7 @@ std::map<TFx *, std::vector<TFxPort *>> isConnected(
     }
   }
   std::set<TFx *>::const_iterator it2;
-  for (it2 = internalFxs.begin(); it2 != internalFxs.end(); it2++) {
+  for (it2 = internalFxs.begin(); it2 != internalFxs.end(); ++it2) {
     int i, outputCount = (*it2)->getOutputConnectionCount();
     for (i = 0; i < outputCount; i++) {
       TFx *outFx = (*it2)->getOutputConnection(i)->getOwnerFx();
@@ -257,7 +257,7 @@ void getFxConnections(QMap<TFx *, FxConnections> &fxConnetcions,
                       const set<TFx *> &fxs, TXsheet *xsh) {
   TFxSet *terminalFxs = xsh->getFxDag()->getTerminalFxs();
   set<TFx *>::const_iterator it;
-  for (it = fxs.begin(); it != fxs.end(); it++) {
+  for (it = fxs.begin(); it != fxs.end(); ++it) {
     TFx *fx = (*it);
     FxConnections connections;
     connections.setIsTerminal(terminalFxs->containsFx(fx));
@@ -296,7 +296,7 @@ void getColumnOutputConnections(
     QMap<TFx *, QList<TFxPort *>> &columnOutputConnections) {
   TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
   std::set<int>::const_iterator it;
-  for (it = indices.begin(); it != indices.end(); it++) {
+  for (it = indices.begin(); it != indices.end(); ++it) {
     int i              = *it;
     TXshColumn *column = xsh->getColumn(i);
     if (!column) continue;
@@ -316,14 +316,14 @@ void getChildren(const std::set<int> &indices,
                  QMap<TStageObjectId, QList<TStageObjectId>> &children) {
   TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
   std::set<int>::const_iterator it;
-  for (it = indices.begin(); it != indices.end(); it++) {
+  for (it = indices.begin(); it != indices.end(); ++it) {
     TStageObjectId id = TStageObjectId::ColumnId(*it);
     TStageObject *obj = xsh->getStageObjectTree()->getStageObject(id, false);
     assert(obj);
     if (obj && !obj->getChildren().empty()) {
       std::list<TStageObject *> childrenObj = obj->getChildren();
       std::list<TStageObject *>::iterator it2;
-      for (it2 = childrenObj.begin(); it2 != childrenObj.end(); it2++) {
+      for (it2 = childrenObj.begin(); it2 != childrenObj.end(); ++it2) {
         TStageObjectId childId = (*it2)->getId();
         children[id].append(childId);
       }
@@ -337,7 +337,7 @@ void getParents(const std::set<int> &indices,
                 QMap<TStageObjectId, TStageObjectId> &parents) {
   TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
   std::set<int>::const_iterator it;
-  for (it = indices.begin(); it != indices.end(); it++) {
+  for (it = indices.begin(); it != indices.end(); ++it) {
     TStageObjectId id = TStageObjectId::ColumnId(*it);
     TStageObject *obj = xsh->getStageObjectTree()->getStageObject(id, false);
     assert(obj);
@@ -351,7 +351,7 @@ void setColumnOutputConnections(
     const QMap<TFx *, QList<TFxPort *>> &columnOutputConnections) {
   QMap<TFx *, QList<TFxPort *>>::const_iterator it;
   for (it = columnOutputConnections.begin();
-       it != columnOutputConnections.end(); it++) {
+       it != columnOutputConnections.end(); ++it) {
     TFx *columnFx          = it.key();
     QList<TFxPort *> ports = it.value();
     int i;
@@ -364,11 +364,11 @@ void setColumnOutputConnections(
 void setChildren(const QMap<TStageObjectId, QList<TStageObjectId>> &children) {
   TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
   QMap<TStageObjectId, QList<TStageObjectId>>::const_iterator it;
-  for (it = children.begin(); it != children.end(); it++) {
+  for (it = children.begin(); it != children.end(); ++it) {
     TStageObjectId id                 = it.key();
     QList<TStageObjectId> childrenIds = it.value();
     QList<TStageObjectId>::iterator it2;
-    for (it2 = childrenIds.begin(); it2 != childrenIds.end(); it2++)
+    for (it2 = childrenIds.begin(); it2 != childrenIds.end(); ++it2)
       xsh->setStageObjectParent(*it2, id);
   }
 }
@@ -378,7 +378,7 @@ void setChildren(const QMap<TStageObjectId, QList<TStageObjectId>> &children) {
 void setParents(const QMap<TStageObjectId, TStageObjectId> &parents) {
   TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
   QMap<TStageObjectId, TStageObjectId>::const_iterator it;
-  for (it = parents.begin(); it != parents.end(); it++)
+  for (it = parents.begin(); it != parents.end(); ++it)
     xsh->setStageObjectParent(it.key(), it.value());
 }
 //-----------------------------------------------------------------------------
@@ -532,7 +532,7 @@ void bringObjectOut(TStageObject *obj, TXsheet *xsh,
   if (!obj->hasChildren()) return;
   std::list<TStageObject *> children = obj->getChildren();
   std::list<TStageObject *>::iterator it;
-  for (it = children.begin(); it != children.end(); it++) {
+  for (it = children.begin(); it != children.end(); ++it) {
     TStageObjectId id = (*it)->getId();
     if (id.isColumn()) continue;
     assert(id.isPegbar());
@@ -755,7 +755,7 @@ set<int> explodeStageObjects(
   TPointD middlePoint;
   int objCount = 0;
   QMap<TStageObjectId, TStageObjectId>::iterator it;
-  for (it = ids.begin(); it != ids.end(); it++) {
+  for (it = ids.begin(); it != ids.end(); ++it) {
     TStageObject *innerObj = innerTree->getStageObject(it.key(), false);
     if (!innerObj) continue;
 
@@ -770,7 +770,7 @@ set<int> explodeStageObjects(
   // faccio in modo che tutti i nodi estratti siano centrati in middlePoint
   // Li metto poi in un gruppo
   TPointD offset = middlePoint - subPos;
-  for (it = ids.begin(); it != ids.end(); it++) {
+  for (it = ids.begin(); it != ids.end(); ++it) {
     TStageObject *outerObj = outerTree->getStageObject(it.value(), false);
     if (!outerObj) continue;
     /*outerObj->setGroupId(groupId);
@@ -841,7 +841,7 @@ void explodeFxs(TXsheet *xsh, TXsheet *subXsh, const GroupData &fxGroupData,
   int fxsCount = 0;
 
   QMap<TFx *, QPair<TFx *, int>>::iterator it;
-  for (it = fxs.begin(); it != fxs.end(); it++) {
+  for (it = fxs.begin(); it != fxs.end(); ++it) {
     TFx *innerFx = it.key();
     if (!innerFx) continue;
 
@@ -861,7 +861,7 @@ void explodeFxs(TXsheet *xsh, TXsheet *subXsh, const GroupData &fxGroupData,
   // Li metto poi in un gruppo
   TPointD offset = middlePoint - subPos;
   int groupId    = outerDag->getNewGroupId();
-  for (it = fxs.begin(); it != fxs.end(); it++) {
+  for (it = fxs.begin(); it != fxs.end(); ++it) {
     QPair<TFx *, int> pair = it.value();
     TFx *outerFx = pair.first;
     outerFx->getAttributes()->setGroupId(groupId);
@@ -1342,7 +1342,7 @@ void collapseColumns(std::set<int> indices, const std::set<TFx *> &fxs,
   xsh->insertColumn(index);
 
   std::set<TFx *>::const_iterator it;
-  for (it = fxs.begin(); it != fxs.end(); it++) {
+  for (it = fxs.begin(); it != fxs.end(); ++it) {
     TOutputFx *output = dynamic_cast<TOutputFx *>(*it);
     if (output) xsh->getFxDag()->removeOutputFx(output);
   }
@@ -1368,7 +1368,7 @@ void collapseColumns(std::set<int> indices, const std::set<TFx *> &fxs,
 
   // Rimuovo gli effetti che sono in fxs dall'xsheet
   std::set<TFx *>::const_iterator it2;
-  for (it2 = fxs.begin(); it2 != fxs.end(); it2++) removeFx(xsh, *it2);
+  for (it2 = fxs.begin(); it2 != fxs.end(); ++it2) removeFx(xsh, *it2);
   if (!columnsOnly) bringPegbarsInsideChildXsheet(xsh, childXsh);
 
   xsh->getStageObject(TStageObjectId::ColumnId(index))
@@ -1559,7 +1559,7 @@ public:
 
   ~CollapseFxUndo() {
     set<TFx *>::const_iterator it;
-    for (it = m_fxs.begin(); it != m_fxs.end(); it++) (*it)->release();
+    for (it = m_fxs.begin(); it != m_fxs.end(); ++it) (*it)->release();
   }
 
   void undo() const override {
@@ -1569,7 +1569,7 @@ public:
     TFxSet *internalFxs = xsh->getFxDag()->getInternalFxs();
     TFxSet *terminalFxs = xsh->getFxDag()->getTerminalFxs();
     set<TFx *>::const_iterator it;
-    for (it = m_fxs.begin(); it != m_fxs.end(); it++)
+    for (it = m_fxs.begin(); it != m_fxs.end(); ++it)
       if (!internalFxs->containsFx((*it))) {
         TOutputFx *outFx = dynamic_cast<TOutputFx *>(*it);
         if (outFx)
@@ -1578,12 +1578,12 @@ public:
           internalFxs->addFx((*it));
       }
     QMap<TFx *, FxConnections>::const_iterator it2;
-    for (it2 = m_fxConnections.begin(); it2 != m_fxConnections.end(); it2++) {
+    for (it2 = m_fxConnections.begin(); it2 != m_fxConnections.end(); ++it2) {
       TFx *fx                   = it2.key();
       FxConnections connections = it2.value();
       QMap<int, TFx *> inputLinks = connections.getInputLinks();
       QMap<int, TFx *>::const_iterator it3;
-      for (it3 = inputLinks.begin(); it3 != inputLinks.end(); it3++)
+      for (it3 = inputLinks.begin(); it3 != inputLinks.end(); ++it3)
         fx->getInputPort(it3.key())->setFx(it3.value());
       if (connections.isTerminal()) {
         terminalFxs->addFx(fx);
@@ -1595,7 +1595,7 @@ public:
       }
       QMap<TFx *, int> outputLinks = connections.getOutputLinks();
       QMap<TFx *, int>::const_iterator it4;
-      for (it4 = outputLinks.begin(); it4 != outputLinks.end(); it4++)
+      for (it4 = outputLinks.begin(); it4 != outputLinks.end(); ++it4)
         it4.key()->getInputPort(it4.value())->setFx(fx);
     }
     app->getCurrentXsheet()->notifyXsheetChanged();
@@ -1610,7 +1610,7 @@ public:
         isConnected(m_indices, m_fxs, app->getCurrentXsheet());
     doRedo(true);
     std::set<TFx *>::const_iterator it2;
-    for (it2 = m_fxs.begin(); it2 != m_fxs.end(); it2++) removeFx(xsh, *it2);
+    for (it2 = m_fxs.begin(); it2 != m_fxs.end(); ++it2) removeFx(xsh, *it2);
     if (roots.size() == 1) {
       TFx *fx                          = xsh->getColumn(m_columnIndex)->getFx();
       std::vector<TFxPort *> rootPorts = roots.begin()->second;
@@ -1677,7 +1677,7 @@ public:
     TApp *app    = TApp::instance();
     TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
     std::set<int>::iterator it;
-    for (it = m_newIndexs.begin(); it != m_newIndexs.end(); it++) {
+    for (it = m_newIndexs.begin(); it != m_newIndexs.end(); ++it) {
       TXshColumn *column   = xsh->getColumn(*it);
       TStageObjectId colId = TStageObjectId::ColumnId(*it);
       m_parentIds[colId]   = xsh->getStageObjectParent(colId);
@@ -1693,7 +1693,7 @@ public:
     }
 
     std::set<TOutputFx *>::iterator it2;
-    for (it2 = m_oldOutFxs.begin(); it2 != m_oldOutFxs.end(); it2++)
+    for (it2 = m_oldOutFxs.begin(); it2 != m_oldOutFxs.end(); ++it2)
       (*it2)->addRef();
     int i, outFxCount = xsh->getFxDag()->getOutputFxCount();
     for (i = 0; i < outFxCount; i++) {
@@ -1706,7 +1706,7 @@ public:
       m_parentIds[m_pegObjects[i]->getId()] = m_pegObjects[i]->getParent();
 
     QMap<TStageObjectSpline *, TStageObjectSpline *>::iterator it3;
-    for (it3 = m_splines.begin(); it3 != m_splines.end(); it3++)
+    for (it3 = m_splines.begin(); it3 != m_splines.end(); ++it3)
       it3.value()->addRef();
   }
 
@@ -1716,12 +1716,12 @@ public:
     int i;
     for (i = m_pegObjects.size() - 1; i >= 0; i--) m_pegObjects[i]->release();
     std::set<TOutputFx *>::iterator it2;
-    for (it2 = m_oldOutFxs.begin(); it2 != m_oldOutFxs.end(); it2++)
+    for (it2 = m_oldOutFxs.begin(); it2 != m_oldOutFxs.end(); ++it2)
       (*it2)->release();
-    for (it2 = m_newOutFxs.begin(); it2 != m_newOutFxs.end(); it2++)
+    for (it2 = m_newOutFxs.begin(); it2 != m_newOutFxs.end(); ++it2)
       (*it2)->release();
     QMap<TStageObjectSpline *, TStageObjectSpline *>::iterator it3;
-    for (it3 = m_splines.begin(); it3 != m_splines.end(); it3++)
+    for (it3 = m_splines.begin(); it3 != m_splines.end(); ++it3)
       it3.value()->release();
   }
 
@@ -1742,7 +1742,7 @@ public:
     while (obj->getEditingGroupId() != editingGroup) obj->editGroup();
     std::list<TStageObject *> children = obj->getChildren();
     std::list<TStageObject *>::iterator it;
-    for (it = children.begin(); it != children.end(); it++) {
+    for (it = children.begin(); it != children.end(); ++it) {
       TStageObject *childeObj = *it;
       if (childeObj) setEditingObjGroup(childeObj, editingGroup, objGroupIds);
     }
@@ -1776,7 +1776,7 @@ public:
       xsh->getStageObjectTree()->removeStageObject(pegObjectId);
     }
     QMap<TStageObjectSpline *, TStageObjectSpline *>::const_iterator it;
-    for (it = m_splines.begin(); it != m_splines.end(); it++) {
+    for (it = m_splines.begin(); it != m_splines.end(); ++it) {
       TStageObjectSpline *spline = it.value();
       xsh->getStageObjectTree()->removeSpline(spline);
     }
@@ -1792,7 +1792,7 @@ public:
         internals->removeFx(fx);
     }
     std::set<TOutputFx *>::const_iterator it2;
-    for (it2 = m_newOutFxs.begin(); it2 != m_newOutFxs.end(); it2++) {
+    for (it2 = m_newOutFxs.begin(); it2 != m_newOutFxs.end(); ++it2) {
       if (m_oldOutFxs.find(*it2) == m_oldOutFxs.end())
         xsh->getFxDag()->removeOutputFx(*it2);
     }
@@ -1837,11 +1837,6 @@ public:
     TStageObject *obj = xsh->getStageObject(TStageObjectId::ColumnId(m_index));
     TStageObjectId parentId = obj->getParent();
     TStageObject *parentObj = xsh->getStageObject(parentId);
-
-    int objEditingGroup = -1;
-    if (parentObj->isGrouped())
-      objEditingGroup = parentObj->getEditingGroupId();
-
     TXshColumn *column = xsh->getColumn(m_index);
     assert(column);
     TFx *columnFx = column->getFx();
@@ -1855,7 +1850,7 @@ public:
     for (i = m_pegObjects.size() - 1; i >= 0; i--)
       xsh->getStageObjectTree()->insertStageObject(m_pegObjects[i]);
     QMap<TStageObjectSpline *, TStageObjectSpline *>::const_iterator it3;
-    for (it3 = m_splines.begin(); it3 != m_splines.end(); it3++)
+    for (it3 = m_splines.begin(); it3 != m_splines.end(); ++it3)
       xsh->getStageObjectTree()->insertSpline(it3.value());
     std::list<int> restoredSplineIds;
     m_newData->restoreObjects(indexes, restoredSplineIds, xsh, 0);
@@ -1863,7 +1858,7 @@ public:
       xsh->setStageObjectParent(m_pegObjects[i]->getId(),
                                 m_parentIds[m_pegObjects[i]->getId()]);
     std::set<int>::const_iterator it;
-    for (it = m_newIndexs.begin(); it != m_newIndexs.end(); it++) {
+    for (it = m_newIndexs.begin(); it != m_newIndexs.end(); ++it) {
       TStageObjectId colId    = TStageObjectId::ColumnId(*it);
       TStageObjectId parentId = m_parentIds[colId];
       xsh->setStageObjectParent(colId, m_parentIds[colId]);
@@ -1884,7 +1879,7 @@ public:
     setColumnOutputConnections(m_newColumnOutputConnections);
     for (i = 0; i < outPorts.size() && m_root; i++) outPorts[i]->setFx(m_root);
     std::set<TOutputFx *>::const_iterator it2;
-    for (it2 = m_newOutFxs.begin(); it2 != m_newOutFxs.end(); it2++) {
+    for (it2 = m_newOutFxs.begin(); it2 != m_newOutFxs.end(); ++it2) {
       if (m_oldOutFxs.find(*it2) == m_oldOutFxs.end())
         xsh->getFxDag()->addOutputFx(*it2);
     }
@@ -1963,7 +1958,7 @@ public:
     TApp *app    = TApp::instance();
     TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
     std::set<int>::iterator it;
-    for (it = m_newIndexs.begin(); it != m_newIndexs.end(); it++) {
+    for (it = m_newIndexs.begin(); it != m_newIndexs.end(); ++it) {
       TXshColumn *column = xsh->getColumn(*it);
       TFx *columnFx      = column->getFx();
       QList<TFxPort *> outputConnections;
@@ -1973,7 +1968,7 @@ public:
       m_newColumnOutputConnections[columnFx] = outputConnections;
     }
     std::set<TOutputFx *>::iterator it2;
-    for (it2 = m_oldOutFxs.begin(); it2 != m_oldOutFxs.end(); it2++)
+    for (it2 = m_oldOutFxs.begin(); it2 != m_oldOutFxs.end(); ++it2)
       (*it2)->addRef();
     int i, outFxCount = xsh->getFxDag()->getOutputFxCount();
     for (i = 0; i < outFxCount; i++) {
@@ -1989,9 +1984,9 @@ public:
     int i;
     for (i = m_pegObjects.size() - 1; i >= 0; i--) m_pegObjects[i]->release();
     std::set<TOutputFx *>::iterator it2;
-    for (it2 = m_oldOutFxs.begin(); it2 != m_oldOutFxs.end(); it2++)
+    for (it2 = m_oldOutFxs.begin(); it2 != m_oldOutFxs.end(); ++it2)
       (*it2)->release();
-    for (it2 = m_newOutFxs.begin(); it2 != m_newOutFxs.end(); it2++)
+    for (it2 = m_newOutFxs.begin(); it2 != m_newOutFxs.end(); ++it2)
       (*it2)->release();
   }
 
@@ -2020,7 +2015,7 @@ public:
         internals->removeFx(fx);
     }
     std::set<TOutputFx *>::const_iterator it;
-    for (it = m_newOutFxs.begin(); it != m_newOutFxs.end(); it++) {
+    for (it = m_newOutFxs.begin(); it != m_newOutFxs.end(); ++it) {
       if (m_oldOutFxs.find(*it) == m_oldOutFxs.end())
         xsh->getFxDag()->removeOutputFx(*it);
     }
@@ -2060,7 +2055,7 @@ public:
     m_newData->restoreObjects(indexes, restoredSplineIds, xsh, 0);
     setColumnOutputConnections(m_newColumnOutputConnections);
     std::set<TOutputFx *>::const_iterator it;
-    for (it = m_newOutFxs.begin(); it != m_newOutFxs.end(); it++) {
+    for (it = m_newOutFxs.begin(); it != m_newOutFxs.end(); ++it) {
       if (m_oldOutFxs.find(*it) == m_oldOutFxs.end())
         xsh->getFxDag()->addOutputFx(*it);
     }
@@ -2076,7 +2071,7 @@ public:
     // reinsert in groups
     if (!m_objGroupIds.empty()) {
       set<int>::iterator it;
-      for (it = indexes.begin(); it != indexes.end(); it++) {
+      for (it = indexes.begin(); it != indexes.end(); ++it) {
         TStageObject *obj = xsh->getStageObject(TStageObjectId::ColumnId(*it));
         TStageObjectId parentId = obj->getParent();
         TStageObject *parentObj = xsh->getStageObject(parentId);

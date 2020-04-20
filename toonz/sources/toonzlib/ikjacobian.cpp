@@ -285,7 +285,6 @@ MatrixRmn &MatrixRmn::AddToDiagonal(
 
 MatrixRmn &MatrixRmn::MultiplyScalar(const MatrixRmn &A, double k,
                                      MatrixRmn &dst) {
-  long length  = A.NumCols;
   double *dPtr = dst.x;
   for (long i = dst.NumCols; i > 0; i--) {
     double *aPtr = A.x;  // Points to beginning of row in A
@@ -542,7 +541,6 @@ void MatrixRmn::ComputeSVD(MatrixRmn &U, VectorRn &w, MatrixRmn &V) const {
          U.NumRows == U.NumCols && V.NumRows == V.NumCols &&
          w.GetLength() == std::min(NumRows, NumCols));
 
-  double temp         = 0.0;
   VectorRn &superDiag = VectorRn::GetWorkVector(
       w.GetLength() - 1);  // Some extra work space.  Will get passed around.
 
@@ -649,10 +647,6 @@ void MatrixRmn::SvdHouseholder(double *basePt, long colLength, long numCols,
   double *cPtr = basePt;
   double norm  = 0.0;
   long i;
-
-  double aa0 = *cPtr;
-  double aa1 = *basePt;
-  double aa2 = *retFirstEntry;
 
   for (i = colLength; i > 0; i--) {
     norm += Square(*cPtr);
@@ -1146,7 +1140,6 @@ void Jacobian::computeJacobian() {
       while (m) {
         int j = m->getJointNum();
         // assert(j>=0 && j<skeleton->GetNumJoint());
-        int numnode = skeleton->getNodeCount();
         assert(0 <= i && i < nEffector && 0 <= j &&
                j < (skeleton->getNodeCount() - skeleton->getNumEffector()));
         if (m->isFrozen()) {

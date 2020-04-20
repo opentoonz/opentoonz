@@ -446,7 +446,7 @@ Le lw sono non decrescenti e delimitate da 0.0 li' dove non sono valide
 
   j = min_ref_gr;
   for (i = min_gr; i <= max_gr; i++) {
-    while (ref_lw[j] < lw[i] && j < max_ref_gr) j++;
+    while (j < max_ref_gr && ref_lw[j] < lw[i]) j++;
     lut[i] = j;
   }
   fac = (float)min_ref_gr / (float)min_gr;
@@ -828,9 +828,9 @@ static void edge_init(void) {
 /*---------------------------------------------------------------------------*/
 
 static int edge_int(const char x[8]) {
-  return (x[0] != ' ') << 7 | (x[1] != ' ') << 6 | (x[2] != ' ') << 5 |
-         (x[3] != ' ') << 4 | (x[4] != ' ') << 3 | (x[5] != ' ') << 2 |
-         (x[6] != ' ') << 1 | (x[7] != ' ');
+  return ((x[0] != ' ') << 7) | ((x[1] != ' ') << 6) | ((x[2] != ' ') << 5) |
+         ((x[3] != ' ') << 4) | ((x[4] != ' ') << 3) | ((x[5] != ' ') << 2) |
+         ((x[6] != ' ') << 1) | ((x[7] != ' '));
 }
 
 /*---------------------------------------------------------------------------*/

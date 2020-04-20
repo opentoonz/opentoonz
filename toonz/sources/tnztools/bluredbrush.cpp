@@ -119,9 +119,9 @@ void eraseFromRasterCM(const TRasterCM32P &out, const TRaster32P &in,
       if (inPix->m == 0) continue;
       TPixelCM32 *outPix = &out->pixels(y)[x];
       bool eraseInk =
-          !selective || (selective && selectedStyleId == outPix->getInk());
+          !selective || selectedStyleId == outPix->getInk();
       bool erasePaint =
-          !selective || (selective && selectedStyleId == outPix->getPaint());
+          !selective || selectedStyleId == outPix->getPaint();
       int paint = eraseAreas && erasePaint ? 0 : outPix->getPaint();
       int tone  = inPix->m > 0 && eraseLine && eraseInk
                      ? std::max(outPix->getTone(), (int)inPix->m)

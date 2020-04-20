@@ -195,8 +195,6 @@ void hrCheckTime(LARGE_INTEGER start, START_USER startUser,
              hrTm_stop.LowPart >= start.LowPart);
 
   LARGE_INTEGER Freq = perfFreq;
-  int Oht            = overheadTicks;
-
   LARGE_INTEGER dtime;
   // faccio "a mano" la differenza dtime = m_tStop - m_tStart
   dtime.HighPart = hrTm_stop.HighPart - start.HighPart;

@@ -127,7 +127,7 @@ TLevelReaderWriterZCC::TLevelReaderWriterZCC(const TFilePath &path,
   TFilePathSet fps = TSystem::getDisks();
   TFilePath disk;
 
-  for (TFilePathSet::iterator it = fps.begin(); it != fps.end(); it++) {
+  for (TFilePathSet::iterator it = fps.begin(); it != fps.end(); ++it) {
     disk = *it;
     if (disk.isAncestorOf(m_path)) {
       DWORD sectorsPerCluster;

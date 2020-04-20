@@ -69,7 +69,7 @@ void CPatternPosition::getPosAroundThis(const int lX, const int lY,
   prepareCircle(ddc, 2.0);
 
   int qx = 0, qy = 0, q = 0;
-  for (vector<SPOINT>::iterator p = ddc.begin(); p != ddc.end(); p++) {
+  for (vector<SPOINT>::iterator p = ddc.begin(); p != ddc.end(); ++p) {
     int x = xx + p->x;
     int y = yy + p->y;
     if (x >= 0 && y >= 0 && x < lX && y < lY)
@@ -117,7 +117,7 @@ bool CPatternPosition::findEmptyPos(const int lX, const int lY,
 void CPatternPosition::eraseCurrentArea(const int lX, const int lY, UCHAR *lSel,
                                         vector<SPOINT> &ddc, const int xx,
                                         const int yy) {
-  for (vector<SPOINT>::iterator pDdc = ddc.begin(); pDdc != ddc.end(); pDdc++) {
+  for (vector<SPOINT>::iterator pDdc = ddc.begin(); pDdc != ddc.end(); ++pDdc) {
     int x = xx + pDdc->x;
     int y = yy + pDdc->y;
     if (x >= 0 && y >= 0 && x < lX && y < lY) {

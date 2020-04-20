@@ -109,7 +109,6 @@ void ColumnFan::activate(int col) {
     }
     i++;
     if (i < m) {
-      m = i;
       m_columns.erase(m_columns.begin() + i, m_columns.end());
     }
   }

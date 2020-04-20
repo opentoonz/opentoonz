@@ -1046,10 +1046,10 @@ bool ToonzVectorBrushTool::doFrameRangeStrokes(
   std::vector<TFrameId> allFids;
   sl->getFids(allFids);
   std::vector<TFrameId>::iterator i0 = allFids.begin();
-  while (i0 != allFids.end() && *i0 < firstFrameId) i0++;
+  while (i0 != allFids.end() && *i0 < firstFrameId) ++i0;
   if (i0 == allFids.end()) return false;
   std::vector<TFrameId>::iterator i1 = i0;
-  while (i1 != allFids.end() && *i1 <= lastFrameId) i1++;
+  while (i1 != allFids.end() && *i1 <= lastFrameId) ++i1;
   assert(i0 < i1);
   std::vector<TFrameId> fids(i0, i1);
   int m = fids.size();

@@ -35,7 +35,6 @@ void TCamera::setSize(const TDimensionD &size, bool preserveDpi,
   m_size.lx = m_res.lx / currDpi.x;
   if (preserveAR)  //&& currDpi.x==currDpi.y)
   {
-    double aux = m_size.lx / currAR - m_res.ly / currDpi.y;
     m_size.ly  = m_size.lx / currAR;
   } else
     m_size.ly = m_res.ly / currDpi.y;

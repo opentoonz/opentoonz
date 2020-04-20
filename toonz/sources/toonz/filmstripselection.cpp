@@ -163,7 +163,6 @@ bool TFilmstripSelection::isSelected(const TFrameId &fid) const {
 void TFilmstripSelection::selectNone() {
   m_selectedFrames.clear();
   updateInbetweenRange();
-  TXshSimpleLevel *sl = TApp::instance()->getCurrentLevel()->getSimpleLevel();
   CommandManager::instance()->enable(MI_CanvasSize, false);
 }
 
@@ -196,7 +195,7 @@ void TFilmstripSelection::invertSelection() {
   std::set<TFrameId> oldSelectedFrames = m_selectedFrames;
   m_selectedFrames.clear();
   std::vector<TFrameId>::iterator it;
-  for (it = fids.begin(); it != fids.end(); it++) {
+  for (it = fids.begin(); it != fids.end(); ++it) {
     if (oldSelectedFrames.find(*it) != oldSelectedFrames.end()) continue;
     m_selectedFrames.insert(*it);
   }

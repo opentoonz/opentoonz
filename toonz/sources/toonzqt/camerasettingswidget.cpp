@@ -609,7 +609,6 @@ void CameraSettingsWidget::updatePresetListOm() {
 
   if (parsePresetString(m_presetListOm->currentText(), name, xres, yres, fx, fy,
                         xoffset, yoffset, ar, m_forCleanup)) {
-    double eps = 1.0e-6;
     if (m_forCleanup && m_offsX && m_offsY) {
       match = xres == m_xResFld->getValue() && yres == m_yResFld->getValue() &&
               (fx < 0.0 || fx == m_lxFld->getValue()) &&

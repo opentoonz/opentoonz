@@ -507,7 +507,7 @@ public:
     ++it;
     for (int count = 0; it != indices.end();) {
       int index = *it;
-      it++;
+      ++it;
       mergeCmapped(destColumn, index - count,
                    it == indices.end() ? newLevelPath.getQString()
                                        : tmpPath.getQString(),

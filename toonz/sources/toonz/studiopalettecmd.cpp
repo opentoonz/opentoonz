@@ -218,7 +218,7 @@ void StudioPaletteCmd::loadIntoCurrentPalette(const TFilePath &fp) {
   //  ColorController *cc = ColorController::instance();
   //  int styleId = cc->getCurrentStyleIndex();
   TApp *app   = TApp::instance();
-  int styleId = app->getCurrentPalette()->getStyleIndex();
+  //int styleId = app->getCurrentPalette()->getStyleIndex();
 
   TPalette *palette = StudioPalette::instance()->getPalette(fp, true);
   if (!palette) return;

@@ -113,7 +113,7 @@ TXshLevel *TLevelSet::getLevel(const ToonzScene &scene,
 //-----------------------------------------------------------------------------
 
 bool TLevelSet::hasLevel(const std::wstring &levelName) const {
-  std::vector<TXshLevel *>::const_iterator it = m_levels.begin();
+
   for (auto const level : m_levels) {
     if (levelName == level->getName()) return true;
   }

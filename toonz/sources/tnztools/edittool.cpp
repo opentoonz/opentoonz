@@ -1473,8 +1473,6 @@ void EditTool::draw() {
   tglMultMatrix(parentAff.inv() * TTranslation(aff * center));
   center = TPointD();
 
-  bool dragging = m_dragTool != 0;
-
   // draw center
   tglColor(normalColor);
   glPushName(Center);

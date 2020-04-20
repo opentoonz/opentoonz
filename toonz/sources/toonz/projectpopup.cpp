@@ -420,7 +420,6 @@ void ProjectPopup::updateProjectFromFields(TProject *project) {
   for (i = 0; i < m_useScenePathCbs.size(); i++) {
     std::string folderName = m_useScenePathCbs[i].first;
     int cbState            = m_useScenePathCbs[i].second->checkState();
-    bool useScenePath      = cbState == Qt::Checked;
     project->setUseScenePath(folderName, cbState);
   }
   TProjectManager::instance()->notifyProjectChanged();

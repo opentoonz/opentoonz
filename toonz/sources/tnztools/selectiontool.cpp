@@ -435,7 +435,6 @@ void DragSelectionTool::Rotation::leftButtonDrag(const TPointD &pos,
   double b2            = norm2(b);
   const double epsilon = 1e-8;
   double dang          = 0;
-  double scale         = 1;
   if (a2 <= epsilon || b2 <= epsilon) return;
   dang = asin(cross(a, b) / sqrt(a2 * b2)) * -M_180_PI;
   if (e.isShiftPressed()) {

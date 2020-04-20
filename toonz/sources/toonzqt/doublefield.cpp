@@ -281,7 +281,6 @@ void DoubleValueField::onSliderChanged(int sliderPos) {
 
 void DoubleValueField::onLineEditValueChanged() {
   double value = m_lineEdit->getValue();
-  int dicimal  = m_lineEdit->getDecimals();
 
   // Control necessary to prevent the change signal from being emitted more than
   // once.
@@ -491,12 +490,6 @@ void MeasuredDoubleLineEdit::onEditingFinished() {
 
   int err = -10;
   m_value->setValue(text().toStdWString(), &err);
-
-  bool outOfRange = false;
-  if (!err) {
-    double v   = getValue();
-    outOfRange = m_minValue > v || m_maxValue < v;
-  }
 
   if (err) {
     m_errorHighlighting = 1;

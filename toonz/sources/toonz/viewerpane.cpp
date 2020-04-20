@@ -275,7 +275,6 @@ void SceneViewerPanel::onDrawFrame(
                                                              // render of the
                                                              // frame is not
                                                              // already started
-    int curFrame = frame;
     if (frameHandle->isPlaying() &&
         !pr->isFrameReady(
             frame - 1))  // stops on last rendered frame until current is ready!

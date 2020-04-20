@@ -275,7 +275,7 @@ public:
   ~DeleteCellsUndo() {
     delete m_selection;
     QMap<int, TXshColumn *>::iterator it;
-    for (it = m_columns.begin(); it != m_columns.end(); it++)
+    for (it = m_columns.begin(); it != m_columns.end(); ++it)
       it.value()->release();
   }
 
@@ -284,7 +284,7 @@ public:
 
     // devo rimettere le colonne che ho rimosso dall'xsheet
     QMap<int, TXshColumn *>::const_iterator colIt;
-    for (colIt = m_columns.begin(); colIt != m_columns.end(); colIt++) {
+    for (colIt = m_columns.begin(); colIt != m_columns.end(); ++colIt) {
       int index          = colIt.key();
       TXshColumn *column = colIt.value();
       xsh->removeColumn(index);
@@ -295,7 +295,7 @@ public:
     m_selection->getSelectedCells(r0, c0, r1, c1);
     QMap<int, QList<TFxPort *>>::const_iterator it;
     for (it = m_outputConnections.begin(); it != m_outputConnections.end();
-         it++) {
+         ++it) {
       TXshColumn *col          = xsh->getColumn(it.key());
       QList<TFxPort *> fxPorts = it.value();
       int i;
@@ -371,7 +371,7 @@ public:
     TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
     QMap<int, QList<TFxPort *>>::const_iterator it;
     for (it = m_outputConnections.begin(); it != m_outputConnections.end();
-         it++) {
+         ++it) {
       TXshColumn *col          = xsh->getColumn(it.key());
       QList<TFxPort *> fxPorts = it.value();
       int i;
@@ -643,7 +643,7 @@ bool pasteRasterImageInCellWithoutUndo(int row, int col,
     sl = cell.getSimpleLevel();
     if (!sl || (sl->getType() == OVL_XSHLEVEL &&
                 sl->getPath().getFrame() == TFrameId::NO_FRAME)) {
-      int levelType;
+      int levelType = 0;
       if (dynamic_cast<const ToonzImageData *>(rasterImageData))
         levelType = TZP_XSHLEVEL;
       else if (dynamic_cast<const FullColorImageData *>(rasterImageData))
@@ -837,7 +837,7 @@ void pasteDrawingsInCellWithoutUndo(TXsheet *xsh, TXshSimpleLevel *level,
   xsh->insertCells(r0, c0, frameToInsert);
   set<TFrameId>::const_iterator it;
   int r = r0;
-  for (it = frameIds.begin(); it != frameIds.end(); it++, r++) {
+  for (it = frameIds.begin(); it != frameIds.end(); ++it, r++) {
     TXshCell cell(level, *it);
     xsh->setCell(r, c0, cell);
   }
@@ -925,7 +925,6 @@ public:
                           const std::vector<bool> &areColumnsEmpty,
                           TCellData *beforeData)
       : m_areOldColumnsEmpty(areColumnsEmpty) {
-    QClipboard *clipboard = QApplication::clipboard();
     /*-- ペーストされたセルをdataに保持しておく --*/
     TCellData *data = new TCellData();
     TXsheet *xsh    = TApp::instance()->getCurrentXsheet()->getXsheet();
@@ -1043,7 +1042,6 @@ public:
   OverwritePasteNumbersUndo(int r0, int c0, int r1, int c1, int oldR0,
                             int oldC0, int oldR1, int oldC1,
                             TCellData *beforeData) {
-    QClipboard *clipboard = QApplication::clipboard();
     // keep the pasted data
     TCellData *data = new TCellData();
     TXsheet *xsh    = TApp::instance()->getCurrentXsheet()->getXsheet();
@@ -1072,11 +1070,7 @@ public:
     m_oldSelection->getSelectedCells(oldR0, oldC0, oldR1, oldC1);
 
     QClipboard *clipboard = QApplication::clipboard();
-    int c0BeforeCut       = c0;
-    int c1BeforeCut       = c1;
     cutCellsWithoutUndo(r0, c0, r1, c1);
-
-    TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
 
     // keep the clipboard content
     QMimeData *mimeData = cloneData(clipboard->mimeData());

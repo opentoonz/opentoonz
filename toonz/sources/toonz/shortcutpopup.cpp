@@ -671,7 +671,6 @@ void ShortcutPopup::importPreset() {
     TSystem::mkDir(presetDir);
   }
   QString name        = shortcutPath.withoutParentDir().getQString();
-  std::string strName = name.toStdString();
   if (TSystem::doesExistFileOrLevel(presetDir + TFilePath(name))) {
     if (!showOverwriteDialog(name)) return;
   }
@@ -751,7 +750,6 @@ QStringList ShortcutPopup::buildPresets() {
     for (TFilePath fp : fps) {
       if (fp.getType() == "ini") {
         customPresets << QString::fromStdString(fp.getName());
-        std::string name = fp.getName();
       }
     }
     customPresets.sort();

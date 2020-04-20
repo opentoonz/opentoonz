@@ -93,7 +93,7 @@ double retrieveInitLength(double strokeLength, int beginEndOrAll) {
 
 //-----------------------------------------------------------------------------
 
-inline bool isOdd(UINT val) { return val & 1 ? true : false; }
+inline bool isOdd(UINT val) { return (val & 1) ? true : false; }
 
 inline bool isEven(UINT val) { return !isOdd(val); }
 

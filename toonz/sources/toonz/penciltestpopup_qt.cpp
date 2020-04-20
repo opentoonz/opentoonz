@@ -142,7 +142,6 @@ void bgReduction(QImage& srcImg, QImage& bgImg, int reduction) {
 
 void my_compute_lut(int black, int white, float gamma, std::vector<int>& lut) {
   const int maxChannelValue         = lut.size() - 1;
-  const float half_maxChannelValueF = 0.5f * maxChannelValue;
   const float maxChannelValueF      = maxChannelValue;
 
   float value;

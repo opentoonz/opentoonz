@@ -496,7 +496,7 @@ void OutlineVectorizer::createOutlineStrokes() {
 
   std::list<std::vector<TThickPoint>>::iterator it_outlines =
       m_protoOutlines.begin();
-  for (; it_outlines != m_protoOutlines.end(); it_outlines++) {
+  for (; it_outlines != m_protoOutlines.end(); ++it_outlines) {
     if (it_outlines->size() > 3) {
       std::vector<TThickPoint> points;
       std::vector<TThickPoint>::iterator it;
@@ -1028,8 +1028,6 @@ bool getInternalPoint(const TRasterPT<Pix> &ras, const Selector &sel,
     }
 
     bool selected(const TPointD &point) {
-      assert(inRaster(point));
-
       const TPoint &pRas = toRaster(point);
       return m_sel(m_ras->pixels(pRas.y)[pRas.x]);
     }
@@ -1049,7 +1047,6 @@ bool getInternalPoint(const TRasterPT<Pix> &ras, const Selector &sel,
         isolateBorderX(in1, out1, newP.y, iCount, tol);
 
         newP = TPointD(0.5 * (in0 + in1), newP.y);
-        assert(scanlineIntersectionsBefore(newP.x, newP.y, true) == iCount);
       }
       {
         // Adjust along y axis
@@ -1061,7 +1058,6 @@ bool getInternalPoint(const TRasterPT<Pix> &ras, const Selector &sel,
         isolateBorderY(newP.x, in1, out1, iCount, tol);
 
         newP = TPointD(newP.x, 0.5 * (in0 + in1));
-        assert(scanlineIntersectionsBefore(newP.x, newP.y, false) == iCount);
       }
 
       return inRaster(newP) ? (p = newP, true) : false;
@@ -1069,9 +1065,7 @@ bool getInternalPoint(const TRasterPT<Pix> &ras, const Selector &sel,
 
     void isolateBorderX(double &xIn, double &xOut, double y, int iCount,
                         const double tol) {
-      assert(scanlineIntersectionsBefore(xIn, y, true) == iCount);
-
-      while (true) {
+       while (true) {
         // Subdivide current interval
         double mid = 0.5 * (xIn + xOut);
 
@@ -1086,9 +1080,7 @@ bool getInternalPoint(const TRasterPT<Pix> &ras, const Selector &sel,
 
     void isolateBorderY(double x, double &yIn, double &yOut, int iCount,
                         const double tol) {
-      assert(scanlineIntersectionsBefore(x, yIn, false) == iCount);
-
-      while (true) {
+       while (true) {
         // Subdivide current interval
         double mid = 0.5 * (yIn + yOut);
 
@@ -1450,8 +1442,8 @@ void VectorizerCore::applyFillColors(TRegion *r, const TRasterP &ras,
           color   = (val < 80) ? TPixel32::Black : TPixel32::White;
         }
 
-        if ((color.m != 0) && ((!c.m_leaveUnpainted) ||
-                               (c.m_leaveUnpainted && color == c.m_inkColor))) {
+        if ((color.m != 0) && (!c.m_leaveUnpainted ||
+                               color == c.m_inkColor)) {
           styleId           = palette->getClosestStyle(color);
           TPixel32 oldColor = palette->getStyle(styleId)->getMainColor();
 

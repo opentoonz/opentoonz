@@ -131,7 +131,6 @@ void Separator::paintEvent(QPaintEvent *) {
   lineColor.setAlpha(128);
 
   p.setPen(lineColor);
-  int h = contents.height();
   if (m_isHorizontal) {
     int y     = contents.center().y();
     int space = (textWidth == 0) ? 0 : 8;
@@ -453,7 +452,6 @@ void Dialog::endHLayout() {
 void Dialog::addWidget(QWidget *widget, bool isRight) {
   if (m_isMainVLayout) {
     assert(m_leftVLayout && m_rightVLayout);
-    QWidget *w = new QWidget();
     int h      = widget->height() + m_layoutSpacing;
     if (isRight) {
       m_leftVLayout->addSpacing(h);

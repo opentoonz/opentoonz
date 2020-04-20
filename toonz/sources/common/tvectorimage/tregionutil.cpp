@@ -60,7 +60,7 @@ void print(list<Intersection> &intersectionList, char *str) {
     of << endl;
 
     for (j = 0, it1 = it->m_strokeList.begin(); it1 != it->m_strokeList.end();
-         it1++, j++) {
+         ++it1, j++) {
       of << "----Branch #" << j;
       if (it1->m_edge.m_index < 0) of << "(AUTOCLOSE)";
       of << "Intersection at " << it1->m_edge.m_w0 << ": "
@@ -123,9 +123,9 @@ void checkInterList(list<Intersection> &intersectionList) {
   list<Intersection>::iterator it;
   list<IntersectedStroke>::iterator it1;
 
-  for (it = intersectionList.begin(); it != intersectionList.end(); it++) {
+  for (it = intersectionList.begin(); it != intersectionList.end(); ++it) {
     int count = 0;
-    for (it1 = it->m_strokeList.begin(); it1 != it->m_strokeList.end(); it1++) {
+    for (it1 = it->m_strokeList.begin(); it1 != it->m_strokeList.end(); ++it1) {
       int val;
       if (it1->m_nextIntersection != intersectionList.end()) {
         count++;
@@ -168,9 +168,9 @@ bool sortBBox(const TStroke *s1, const TStroke *s2) {
 
 void cleanIntersectionMarks(list<Intersection> &interList) {
   for (list<Intersection>::iterator it1 = interList.begin();
-       it1 != interList.end(); it1++)
+       it1 != interList.end(); ++it1)
     for (list<IntersectedStroke>::iterator it2 = (*it1).m_strokeList.begin();
-         it2 != (*it1).m_strokeList.end(); it2++) {
+         it2 != (*it1).m_strokeList.end(); ++it2) {
       it2->m_visited =
           false;  // Ogni ramo della lista viene messo nella condizione
                   // di poter essere visitato
@@ -187,9 +187,9 @@ void cleanIntersectionMarks(list<Intersection> &interList) {
 
 void cleanNextIntersection(list<Intersection> &interList, TStroke *s) {
   for (list<Intersection>::iterator it1 = interList.begin();
-       it1 != interList.end(); it1++)
+       it1 != interList.end(); ++it1)
     for (list<IntersectedStroke>::iterator it2 = (*it1).m_strokeList.begin();
-         it2 != (*it1).m_strokeList.end(); it2++)
+         it2 != (*it1).m_strokeList.end(); ++it2)
       if (it2->m_edge.m_s == s) {
         // if (it2->m_nextIntersection==NULL)
         //  return; //gia' ripulita prima
@@ -289,7 +289,7 @@ void TVectorImage::Imp::eraseDeadIntersections() {
       list<IntersectedStroke>::iterator it1 = it->m_strokeList.begin(), iit1,
                                         iit2;
       list<IntersectedStroke>::iterator it2 = it1;
-      it2++;
+      ++it2;
 
       eraseEdgeFromStroke(it1);
       eraseEdgeFromStroke(it2);
@@ -358,7 +358,7 @@ void TVectorImage::Imp::doEraseIntersection(int index,
     {
       assert(toBeDeleted);
       for (it2 = (*it1).m_strokeList.begin(); it2 != (*it1).m_strokeList.end();
-           it2++)
+           ++it2)
         if (it2->m_edge.m_index < 0 &&
             (it2->m_edge.m_w0 == 1 || it2->m_edge.m_w0 == 0))
           toBeDeleted->push_back(it2->m_edge.m_index);
@@ -367,7 +367,7 @@ void TVectorImage::Imp::doEraseIntersection(int index,
     if ((*it1).m_strokeList.empty())
       it1 = interList.erase(it1);
     else
-      it1++;
+      ++it1;
   }
 
   if (deleteIt) delete deleteIt;
@@ -612,7 +612,7 @@ assert(v[b.m_nextBranch].m_nextBranch==i);
 
   vector<UINT> toBeDeleted;
 
-  for (it1 = intList.begin(); it1 != intList.end(); it1++)
+  for (it1 = intList.begin(); it1 != intList.end(); ++it1)
     for (it2 = it1->m_strokeList.begin(); it2 != it1->m_strokeList.end();
          ++it2) {
       if (it2->m_edge.m_index < 0 && !it2->m_edge.m_s &&
@@ -626,7 +626,7 @@ assert(v[b.m_nextBranch].m_nextBranch==i);
       }
     }
 
-  for (it1 = intList.begin(); it1 != intList.end(); it1++)
+  for (it1 = intList.begin(); it1 != intList.end(); ++it1)
     for (it2 = it1->m_strokeList.begin(); it2 != it1->m_strokeList.end();
          ++it2) {
       if (!it2->m_edge.m_s && it2->m_edge.m_index < 0) {
@@ -677,7 +677,7 @@ void findNearestIntersection(list<Intersection> &interList) {
 
       for (it1 = i1; it1 != interList.end(); ++it1) {
         if (it1 == i1)
-          it2 = i2, it2++;
+          it2 = i2, ++it2;
         else
           it2 = (*it1).m_strokeList.begin();
 
@@ -727,7 +727,7 @@ void markDeadIntersections(list<Intersection> &intList,
   list<IntersectedStroke>::iterator it1 = it->m_strokeList.begin();
 
   if (it->m_numInter == 1) {
-    while (it1->m_nextIntersection == intList.end()) it1++;
+    while (it1->m_nextIntersection == intList.end()) ++it1;
     assert(it1 != it->m_strokeList.end());
 
     list<Intersection>::iterator nextInt         = it1->m_nextIntersection;
@@ -745,13 +745,13 @@ void markDeadIntersections(list<Intersection> &intList,
   {
     while (it1 != it->m_strokeList.end() &&
            it1->m_nextIntersection == intList.end())
-      it1++;
+      ++it1;
     assert(it1 != it->m_strokeList.end());
     list<IntersectedStroke>::iterator it2 = it1;
-    it2++;
+    ++it2;
     while (it2 != it->m_strokeList.end() &&
            it2->m_nextIntersection == intList.end())
-      it2++;
+      ++it2;
     assert(it2 != it->m_strokeList.end());
 
     if (it1->m_edge.m_s == it2->m_edge.m_s &&
@@ -1505,7 +1505,7 @@ void addBranches(IntersectionData &intData, Intersection &intersection,
   assert(!intersection.m_strokeList.empty());
 
   for (it = intersection.m_strokeList.begin();
-       it != intersection.m_strokeList.end(); it++) {
+       it != intersection.m_strokeList.end(); ++it) {
     if ((ii >= 0 && (*it).m_edge.m_s == s[ii]->m_s &&
          it->m_edge.m_w0 == intersectionPair.first) ||
         (ii < 0 && (*it).m_edge.m_index == ii &&
@@ -1526,7 +1526,7 @@ coincidenti se passano per l'estremo di una quad
 quindi devo invertire l'ordine di due branch enlla rosa dei branch.
 list<IntersectedStroke>::iterator it1, it2;
 it1=intersection.m_strokeList.begin();
-it2 = it1; it2++;
+it2 = it1; ++it2;
 for (; it2!=intersection.m_strokeList.end(); ++it1, ++it2)
 {
 if ((*it1).m_gettingOut!=(*it2).m_gettingOut &&((*it1).m_edge.m_index==jj &&
@@ -1625,7 +1625,7 @@ void addIntersection(IntersectionData &intData, const vector<VIStroke *> &s,
 
   p = s[ii]->m_s->getPoint(intersection.first);
 
-  for (it = intData.m_intList.begin(); it != intData.m_intList.end(); it++)
+  for (it = intData.m_intList.begin(); it != intData.m_intList.end(); ++it)
     if ((*it).m_intersection ==
         p)  // devono essere rigorosamente uguali, altrimenti
     // il calcolo dell'ordine dei rami con le tangenti sballa
@@ -1793,7 +1793,7 @@ int TVectorImage::Imp::computeIntersections() {
   // faccio qui, e non nella eraseIntersection. vedi commento li'.
   eraseDeadIntersections();
 
-  for (it1 = intData.m_intList.begin(); it1 != intData.m_intList.end(); it1++)
+  for (it1 = intData.m_intList.begin(); it1 != intData.m_intList.end(); ++it1)
     markDeadIntersections(intData.m_intList, it1);
 
   // checkInterList(intData.m_intList);
@@ -1848,7 +1848,7 @@ TRegion *findRegion(list<Intersection> &intList,
     // Ciclo finche' lo stroke puntato da it2 non ha un successivo punto di
     // intersezione
     do {
-      it2++;
+      ++it2;
       if (it2 ==
           it1->m_strokeList.end())  // uso la lista come se fosse circolare
         it2 = it1->m_strokeList.begin();
@@ -2119,17 +2119,17 @@ return true;
   list<Intersection>::iterator it1;
   list<IntersectedStroke>::iterator it2;
 
-  for (it1 = intList.begin(); it1 != intList.end(); it1++)
+  for (it1 = intList.begin(); it1 != intList.end(); ++it1)
     for (it2 = (*it1).m_strokeList.begin(); it2 != (*it1).m_strokeList.end();
-         it2++)
+         ++it2)
       it2->m_edge.m_r = 0;
 
-  for (it1 = intList.begin(); it1 != intList.end(); it1++) {
+  for (it1 = intList.begin(); it1 != intList.end(); ++it1) {
     // Controlla che il punto in questione non sia isolato
     if (it1->m_numInter == 0) continue;
 
     for (it2 = it1->m_strokeList.begin(); it2 != it1->m_strokeList.end();
-         it2++) {
+         ++it2) {
       TRegion *region;
 
       // se lo stroke non unisce due punti di intersezione

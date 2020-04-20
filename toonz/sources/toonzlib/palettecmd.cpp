@@ -832,7 +832,7 @@ int loadRefImage(TPaletteHandle *paletteHandle,
       // the list
       else {
         std::vector<int>::const_iterator framesIt;
-        for (framesIt = frames.begin(); framesIt != frames.end(); framesIt++) {
+        for (framesIt = frames.begin(); framesIt != frames.end(); ++framesIt) {
           if (it->first.getNumber() == *framesIt) {
             fids.push_back(it->first);
             break;

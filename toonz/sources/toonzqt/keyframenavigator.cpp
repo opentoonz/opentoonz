@@ -347,7 +347,7 @@ bool PaletteKeyframeNavigator::hasNext() const {
     int f = palette->getKeyframe(styleId, i);
     if (f > frame)
       return true;
-    else if (f <= frame)
+    else
       return false;
   }
   return false;
@@ -365,7 +365,7 @@ bool PaletteKeyframeNavigator::hasPrev() const {
     int f = palette->getKeyframe(styleId, i);
     if (f < frame)
       return true;
-    else if (f >= frame)
+    else
       return false;
   }
   return false;
@@ -595,7 +595,7 @@ void FxKeyframeNavigator::toggle() {
   if (!isKeyframe) isFullKeyframe = false;
 
   // modifico lo stato: nokeyframe->full, full->no, partial->full
-  bool on = (!isKeyframe || (isKeyframe && !isFullKeyframe));
+  bool on = (!isKeyframe || !isFullKeyframe);
   for (i = 0; i < fx->getParams()->getParamCount();
        i++) {  // TODO. spostare questo codice in TParam
     TParamP param = fx->getParams()->getParam(i);

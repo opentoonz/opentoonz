@@ -790,17 +790,15 @@ bool StageSchematicNodePort::linkTo(SchematicPort *port, bool checkOnly) {
   if (srcNode == dstNode) return false;
 
   TStageObject *pegbar = 0, *parentPegbar = 0;
-  SchematicPort *childPort, *parentPort;
+  SchematicPort *parentPort;
   if (getType() == eStageParentPort && port->getType() == eStageChildPort) {
     pegbar       = srcNode->getStageObject();
     parentPegbar = dstNode->getStageObject();
-    childPort    = this;
     parentPort   = port;
   } else if (getType() == eStageChildPort &&
              port->getType() == eStageParentPort) {
     pegbar       = dstNode->getStageObject();
     parentPegbar = srcNode->getStageObject();
-    childPort    = port;
     parentPort   = this;
   } else
     return false;
@@ -1014,9 +1012,7 @@ SplineAimChanger::~SplineAimChanger() {}
 
 void SplineAimChanger::mouseMoveEvent(QGraphicsSceneMouseEvent *me) {
   if (m_buttonState == Qt::LeftButton) {
-    bool increase           = false;
     int delta               = me->screenPos().y() - me->lastScreenPos().y();
-    if (delta < 0) increase = true;
     m_delta += abs(delta);
     if (m_delta > 15) {
       emit(changeStatus());
@@ -2155,7 +2151,6 @@ void StageSchematicSplineNode::setSchematicNodePos(const QPointF &pos) const {
 
 QPixmap StageSchematicSplineNode::getPixmap() {
   return IconGenerator::instance()->getIcon(m_spline);
-  return QPixmap();
 }
 
 //--------------------------------------------------------

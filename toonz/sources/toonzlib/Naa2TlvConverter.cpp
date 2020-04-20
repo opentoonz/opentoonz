@@ -335,8 +335,6 @@ void Naa2TlvConverter::computeLinks() {
 //
 void Naa2TlvConverter::findBackgroundRegions() {
   if (!m_regionRas || m_regions.empty()) return;
-  int lx = m_regionRas->getLx();
-  int ly = m_regionRas->getLy();
 
   // find the whitest color
   int bgColorIndex = -1;
@@ -501,9 +499,6 @@ void Naa2TlvConverter::computeMainInkThickness() {
     if (m_regions[i].type != RegionInfo::MainInk) continue;
     if (m_regions[i].pixelCount < largestArea) continue;
     largestArea = m_regions[i].pixelCount;
-    if (i == 55) {
-      int x = 123;
-    }
     QList<int> &bs = m_regions[i].boundaries;
     Q_ASSERT(bs[1] > 0);
     int perimeter = m_regions[i].perimeter;
@@ -610,8 +605,6 @@ void Naa2TlvConverter::findPaints2() {
 //-----------------------------------------------------------------------------
 
 void Naa2TlvConverter::findThinPaints() {
-  int lx = m_regionRas->getLx();
-  int ly = m_regionRas->getLy();
 
   QList<int> regions;
   for (int i = 0; i < m_regions.count(); i++) {
@@ -642,15 +635,12 @@ void Naa2TlvConverter::findSuspectInks() {
     RegionInfo &region = m_regions[i];
     if (0 == (region.type & RegionInfo::Paint)) continue;
     TPixel32 color = m_colors[region.colorIndex];
-    if (color == TPixel32(0, 0, 0)) {
-      int x = 1234;
+    if (color == TPixel32(0, 0, 0))
       continue;
-    }
     TUINT32 rawColor = *(TUINT32 *)&color;
     paintColorTable.insert(rawColor, i);
   }
 
-  int count = 0;
   for (int i = 0; i < m_regions.count(); i++) {
     RegionInfo &region = m_regions[i];
     if (region.isInk() && region.links.size() == 2) {
@@ -662,7 +652,6 @@ void Naa2TlvConverter::findSuspectInks() {
           int sb = region.links[rb];
           if (sa > sb) {
             region.type = RegionInfo::Paint;
-            count++;
             continue;
           }
         }
@@ -673,7 +662,6 @@ void Naa2TlvConverter::findSuspectInks() {
     TUINT32 rawColor = *(TUINT32 *)&m_colors[region.colorIndex];
     if (paintColorTable.contains(rawColor)) {
       region.type = RegionInfo::Unknown;
-      count++;
     }
   }
 
@@ -711,8 +699,6 @@ void Naa2TlvConverter::findSuspectInks() {
 
 void Naa2TlvConverter::assignColorTypes() {
   if (!m_regionRas || !m_borderRas || m_regions.empty()) return;
-  int lx = m_regionRas->getLx();
-  int ly = m_regionRas->getLy();
 
   for (int i = 0; i < m_regions.count(); i++) {
     RegionInfo &region = m_regions[i];

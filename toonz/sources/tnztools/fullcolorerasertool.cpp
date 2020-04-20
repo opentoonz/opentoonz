@@ -612,6 +612,8 @@ void FullColorEraserTool::leftButtonUp(const TPointD &pos,
   m_brushPos = m_mousePos = pos;
   TRasterImageP ri        = (TRasterImageP)getImage(true);
   if (!ri) return;
+  double opacity = m_opacity.getValue() * 0.01;
+
   if (m_eraseType.getValue() == NORMALERASE) {
     if (m_points.size() != 1) {
       TPointD rasCenter = ri->getRaster()->getCenterD();
@@ -625,7 +627,6 @@ void FullColorEraserTool::leftButtonUp(const TPointD &pos,
       TRect bbox = m_brush->getBoundFromPoints(points);
       m_tileSaver->save(bbox);
       m_brush->addArc(points[0], points[1], points[2], 1, 1);
-      double opacity = m_opacity.getValue() * 0.01;
       m_brush->eraseDrawing(ri->getRaster(), m_backUpRas, bbox, opacity);
       TRectD invalidateRect = ToolUtils::getBounds(points, m_size.getValue());
       invalidate(invalidateRect.enlarge(2) - rasCenter);
@@ -637,8 +638,6 @@ void FullColorEraserTool::leftButtonUp(const TPointD &pos,
     }
 
     m_workRaster->unlock();
-    double opacity  = m_opacity.getValue() * 0.01;
-    double hardness = m_hardness.getValue() * 0.01;
 
     m_workRaster = TRaster32P();
     m_backUpRas  = TRaster32P();
@@ -1057,10 +1056,10 @@ void FullColorEraserTool::multiUpdate(const TRectD firstRect,
   m_level->getFids(allFids);
 
   std::vector<TFrameId>::iterator i0 = allFids.begin();
-  while (i0 != allFids.end() && *i0 < firstFid) i0++;
+  while (i0 != allFids.end() && *i0 < firstFid) ++i0;
   if (i0 == allFids.end()) return;
   std::vector<TFrameId>::iterator i1 = i0;
-  while (i1 != allFids.end() && *i1 <= lastFid) i1++;
+  while (i1 != allFids.end() && *i1 <= lastFid) ++i1;
   assert(i0 < i1);
   std::vector<TFrameId> fids(i0, i1);
   int m = fids.size();
@@ -1129,10 +1128,10 @@ void FullColorEraserTool::multiAreaEraser(TFrameId &firstFid, TFrameId &lastFid,
   m_level->getFids(allFids);
 
   std::vector<TFrameId>::iterator i0 = allFids.begin();
-  while (i0 != allFids.end() && *i0 < firstFid) i0++;
+  while (i0 != allFids.end() && *i0 < firstFid) ++i0;
   if (i0 == allFids.end()) return;
   std::vector<TFrameId>::iterator i1 = i0;
-  while (i1 != allFids.end() && *i1 <= lastFid) i1++;
+  while (i1 != allFids.end() && *i1 <= lastFid) ++i1;
   assert(i0 < i1);
   std::vector<TFrameId> fids(i0, i1);
   int m = fids.size();
@@ -1156,7 +1155,7 @@ void FullColorEraserTool::doMultiEraser(const TImageP &img, double t,
                                         const TFrameId &fid,
                                         const TVectorImageP &firstImage,
                                         const TVectorImageP &lastImage) {
-  int styleId = TTool::getApplication()->getCurrentLevelStyleIndex();
+
   if (t == 0)
     eraseStroke(img, firstImage->getStroke(0), m_eraseType.getValue(),
                 m_invertOption.getValue(), /*m_multi.getValue(),*/ m_level,

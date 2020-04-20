@@ -1102,7 +1102,7 @@ private:
 
 /* ベクトルの角度を"0"から"2*PI"で返す */
 double calculator_geometry::get_d_radian(double d_xv, double d_yv) {
-  double d_radian;
+  double d_radian = 0.0;
 
   /* ゼロエラー */
   if ((0.0 == d_xv) && (0.0 == d_yv)) {

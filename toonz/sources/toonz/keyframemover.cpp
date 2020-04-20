@@ -45,7 +45,7 @@ TXsheet *KeyframeMover::getXsheet() const {
 
 void KeyframeMover::setKeyframes() {
   TXsheet *xsh = getXsheet();
-  std::set<KeyframePosition>::iterator posIt;
+
   for (auto const &key : m_lastKeyframes) {
     int c = key.second;
     TStageObjectId objId =
@@ -376,9 +376,8 @@ void KeyframeMoverTool::rectSelect(int row, int col) {
 
 bool KeyframeMoverTool::canMove(const TPoint &pos) {
   const Orientation *o = getViewer()->orientation();
-  TXsheet *xsh         = getViewer()->getXsheet();
-
   TPoint usePos = pos;
+
   if (!o->isVerticalTimeline()) {
     usePos.x = pos.y;
     usePos.y = pos.x;
@@ -413,7 +412,6 @@ void KeyframeMoverTool::onCellChange(int row, int col) {
 void KeyframeMoverTool::onClick(const QMouseEvent *event) {
   m_firstKeyframeMovement   = true;
   m_selecting               = false;
-  TXsheet *xsheet           = getViewer()->getXsheet();
   CellPosition cellPosition = getViewer()->xyToPosition(event->pos());
   int row                   = cellPosition.frame();
   int col                   = cellPosition.layer();

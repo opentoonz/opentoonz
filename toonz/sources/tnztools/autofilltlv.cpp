@@ -102,13 +102,11 @@ void rect_autofill_learn(const TToonzImageP &imgToLearn, int x1, int y1, int x2,
 {
   int i;
   double pbx, pby;
-  double abx, aby;
   int tot_pix = 0;
 
   if ((x2 - x1) * (y2 - y1) < MIN_SIZE) return;
 
   pbx = pby = 0.0;
-  abx = aby = 0.0;
 
   TRasterCM32P ras = imgToLearn->getRaster();
 
@@ -131,8 +129,6 @@ void rect_autofill_learn(const TToonzImageP &imgToLearn, int x1, int y1, int x2,
         ras->pixels(F_reference.array[i].y)[F_reference.array[i].x].getPaint();
     pbx += BIG_TO_DOUBLE(F_reference.array[i].bx);
     pby += BIG_TO_DOUBLE(F_reference.array[i].by);
-    abx = BIG_TO_DOUBLE(F_reference.array[i].bx);
-    aby = BIG_TO_DOUBLE(F_reference.array[i].by);
     tot_pix += F_reference.array[i].npix;
   }
 
@@ -151,7 +147,6 @@ bool rect_autofill_apply(const TToonzImageP &imgToApply, int x1, int y1, int x2,
 /*----------------------------------------------------------------------------*/
 {
   double pbx, pby;
-  double abx, aby;
   int i, j;
   int tot_pix = 0;
   int *prob_vector;
@@ -167,7 +162,6 @@ bool rect_autofill_apply(const TToonzImageP &imgToApply, int x1, int y1, int x2,
   if (F_reference.n <= 0 || F_reference.array == 0) return false;
 
   pbx = pby = 0.0;
-  abx = aby = 0.0;
 
   /* Resetta gli eventuali accoppiamenti fatti precedentemente */
   for (i = 0; i < F_reference.n; i++) F_reference.array[i].match = -1;
@@ -193,8 +187,6 @@ bool rect_autofill_apply(const TToonzImageP &imgToApply, int x1, int y1, int x2,
     F_work.array[i].match = -1;
     pbx += BIG_TO_DOUBLE(F_work.array[i].bx);
     pby += BIG_TO_DOUBLE(F_work.array[i].by);
-    abx = BIG_TO_DOUBLE(F_work.array[i].bx);
-    aby = BIG_TO_DOUBLE(F_work.array[i].by);
     tot_pix += F_work.array[i].npix;
   }
 
@@ -297,11 +289,9 @@ void autofill_learn(const TToonzImageP &imgToLearn)
 {
   int i;
   double pbx, pby;
-  double abx, aby;
   int tot_pix = 0;
 
   pbx = pby = 0.0;
-  abx = aby = 0.0;
 
   TRasterCM32P ras = imgToLearn->getRaster();
 
@@ -324,8 +314,6 @@ void autofill_learn(const TToonzImageP &imgToLearn)
         ras->pixels(F_reference.array[i].y)[F_reference.array[i].y].getPaint();
     pbx += BIG_TO_DOUBLE(F_reference.array[i].bx);
     pby += BIG_TO_DOUBLE(F_reference.array[i].by);
-    abx = BIG_TO_DOUBLE(F_reference.array[i].bx);
-    aby = BIG_TO_DOUBLE(F_reference.array[i].by);
     tot_pix += F_reference.array[i].npix;
   }
   F_ref_bx = pbx / tot_pix;
@@ -343,7 +331,6 @@ bool autofill_apply(const TToonzImageP &imgToApply, bool selective,
 /*---------------------------------------------------------------------------*/
 {
   double pbx, pby;
-  double abx, aby;
   int i, j;
   int tot_pix = 0;
   int *prob_vector;
@@ -356,7 +343,6 @@ bool autofill_apply(const TToonzImageP &imgToApply, bool selective,
   if (F_reference.n <= 0 || F_reference.array == 0) return false;
 
   pbx = pby = 0.0;
-  abx = aby = 0.0;
 
   TRasterCM32P ras = imgToApply->getRaster();
 
@@ -383,8 +369,6 @@ bool autofill_apply(const TToonzImageP &imgToApply, bool selective,
     F_work.array[i].match = -1;
     pbx += BIG_TO_DOUBLE(F_work.array[i].bx);
     pby += BIG_TO_DOUBLE(F_work.array[i].by);
-    abx = BIG_TO_DOUBLE(F_work.array[i].bx);
-    aby = BIG_TO_DOUBLE(F_work.array[i].by);
     tot_pix += F_work.array[i].npix;
   }
 
@@ -930,8 +914,8 @@ static void rimuovi_tutti(int r1, struct s_fabri_region_list *rlst)
       appo = rlst->array[i].vicini;
       while (appo != NULL) {
         if (appo->region_id == r1) {
-          PRINTF("A%d %d\n", appo->region_id, old->region_id);
           if (old != NULL) {
+            PRINTF("A%d %d\n", appo->region_id, old->region_id);
             old->next = appo->next;
             /* free(appo); */
             appo = old->next;
@@ -964,8 +948,8 @@ static void assign_prob3(int prob[], int i, int j)
   double delta_posx1, delta_posy1, delta_posx2, delta_posy2;
   double delta_momx1, delta_momy1, delta_momx2, delta_momy2;
   int delta_pix, delta_pix_max;
-  double delta_pos, delta_pos_max, delta_forma_mom;
-  int delta_forma1, delta_forma2, delta_forma;
+  double delta_pos, delta_forma_mom;
+  int delta_forma;
 
   delta_posx1 =
       BIG_TO_DOUBLE(F_reference.array[i].bx) / F_reference.array[i].npix -
@@ -989,8 +973,6 @@ static void assign_prob3(int prob[], int i, int j)
       ROUNDP(1000 * (1 - (delta_pos / delta_pos_max)));
 
   delta_pix = abs(F_reference.array[i].npix - F_work.array[j].npix);
-  delta_pix_max =
-      std::max((F_work.lx * F_work.ly), (F_reference.lx * F_reference.ly));
 
   prob[(F_work.n * F_reference.n) + i + (j * F_reference.n)] =
       ROUNDP(1000 * (1 - ((double)delta_pix /
@@ -1015,16 +997,6 @@ static void assign_prob3(int prob[], int i, int j)
 
   delta_forma_mom =
       std::abs(sqrt(delta_momx1 + delta_momy1) - sqrt(delta_momx2 + delta_momy2));
-
-  delta_forma1 = ROUNDP(
-      1000 * (((double)F_reference.array[i].per / F_reference.array[i].npix -
-               2 / sqrt((double)F_reference.array[i].npix / 3.14)) /
-              (2 - 2 / sqrt((double)F_reference.array[i].npix / 3.14))));
-
-  delta_forma2 =
-      ROUNDP(1000 * (((double)F_work.array[j].per / F_work.array[j].npix -
-                      2 / sqrt((double)F_work.array[j].npix / 3.14)) /
-                     (2 - 2 / sqrt((double)F_work.array[j].npix / 3.14))));
 
   delta_forma = ROUNDP(1000 * (1 - (delta_forma_mom / delta_pos_max)));
 

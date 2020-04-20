@@ -112,7 +112,7 @@ TLevelP TLevelReader::loadInfo() {
   }
   TLevelP level;
   vector<TFilePath> data;
-  for (TFilePathSet::iterator it = files.begin(); it != files.end(); it++) {
+  for (TFilePathSet::iterator it = files.begin(); it != files.end(); ++it) {
     TFilePath ln(it->getLevelName());
     // cout << "try " << *it << "  " << it->getLevelName() <<  endl;
     if (levelName == TFilePath(it->getLevelName())) {
@@ -217,7 +217,7 @@ TLevelWriterP::TLevelWriterP(const TFilePath &path, TPropertyGroup *winfo) {
 //-----------------------------------------------------------
 
 void TLevelWriter::save(const TLevelP &level) {
-  for (TLevel::Iterator it = level->begin(); it != level->end(); it++) {
+  for (TLevel::Iterator it = level->begin(); it != level->end(); ++it) {
     if (it->second) getFrameWriter(it->first)->save(it->second);
   }
 }
@@ -226,7 +226,6 @@ void TLevelWriter::save(const TLevelP &level) {
 
 void TLevelWriter::saveSoundTrack(TSoundTrack *) {
   return;
-  throw TException("The level format doesn't support soundtracks");
 }
 
 //-----------------------------------------------------------

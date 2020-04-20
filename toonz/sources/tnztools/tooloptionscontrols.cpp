@@ -1076,8 +1076,6 @@ MeasuredValueField::~MeasuredValueField() { delete m_value; }
 
 void MeasuredValueField::setMeasure(std::string name) {
   // for reproducing the precision
-  int oldPrec = -1;
-
   delete m_value;
   m_value = new TMeasuredValue(name != "" ? name : "dummy");
 
@@ -1490,7 +1488,6 @@ void NoScaleField::onChange(TMeasuredValue *fld, bool addToUndo) {
 
 void NoScaleField::updateStatus() {
   TXsheet *xsh         = m_tool->getXsheet();
-  int frame            = m_tool->getFrame();
   TStageObjectId objId = m_tool->getObjectId();
   TStageObject *obj    = xsh->getStageObject(objId);
 

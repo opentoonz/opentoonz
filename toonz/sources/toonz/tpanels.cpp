@@ -679,7 +679,6 @@ ColorFieldEditorController::ColorFieldEditorController() {
   m_currentColorField = 0;
   m_colorFieldHandle  = new TPaletteHandle();
   m_palette           = new TPalette();
-  TColorStyle *style  = m_palette->getStyle(1);
   std::wstring name   = L"EmptyColorFieldPalette";
   m_palette->setPaletteName(name);
   m_colorFieldHandle->setPalette(m_palette.getPointer(), 1);
@@ -910,7 +909,6 @@ OpenFloatingPanel openCommandBarCommand(MI_OpenCommandToolbar, "CommandBar",
 
 ToolOptionPanel::ToolOptionPanel(QWidget *parent)
     : TPanel(parent, 0, TDockWidget::horizontal) {
-  TApp *app    = TApp::instance();
   m_toolOption = new ToolOptions;
 
   setWidget(m_toolOption);

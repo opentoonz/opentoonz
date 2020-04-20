@@ -49,12 +49,12 @@ of the ray we're tracing
 
   double scale =
       params.m_scale;  // NOTE: These variable initializations are, well,
-  double decay = log(params.m_decay / 100.0 + 1.0) +
+  double decay = log1p(params.m_decay / 100.0) +
                  1.0;  // heuristic at least. They were probably tested
   double intensity =
-      1e8 * log(params.m_intensity / 100.0 + 1.0) /
+      1e8 * log1p(params.m_intensity / 100.0) /
       scale;  // to be good, but didn't quite make any REAL sense.
-  double smoothness = log(params.m_smoothness * 5.0 / 100.0 + 1.0);  //
+  double smoothness = log1p(params.m_smoothness * 5.0 / 100.0);  //
   // They could be done MUCH better, but changing them
   /*-- 1ステップ進んだ時、次のピクセルで光源が無かったときの光の弱まる割合 --*/
   double neg_delta_p =
@@ -190,12 +190,12 @@ void performColorRaylit(T *bufIn, T *bufOut, int dxIn, int dyIn, int dxOut,
 
   double scale =
       params.m_scale;  // NOTE: These variable initializations are, well,
-  double decay = log(params.m_decay / 100.0 + 1.0) +
+  double decay = log1p(params.m_decay / 100.0) +
                  1.0;  // heuristic at least. They were probably tested
   double intensity =
-      1e8 * log(params.m_intensity / 100.0 + 1.0) /
+      1e8 * log1p(params.m_intensity / 100.0) /
       scale;  // to be good, but didn't quite make any REAL sense.
-  double smoothness = log(params.m_smoothness * 5.0 / 100.0 + 1.0);  //
+  double smoothness = log1p(params.m_smoothness * 5.0 / 100.0);  //
   // They could be done MUCH better, but changing them
   double neg_delta_p =
       smoothness *

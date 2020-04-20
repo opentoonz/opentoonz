@@ -175,7 +175,6 @@ void PreviewToggleCommand::onModelChanged(bool needsPostProcess) {
 //--------------------------------------------------------------------------
 
 void PreviewToggleCommand::postProcess() {
-  TApp *app                   = TApp::instance();
   CleanupSettingsModel *model = CleanupSettingsModel::instance();
 
   TXshSimpleLevel *sl;
@@ -341,7 +340,6 @@ void CameraTestToggleCommand::onPreviewDataChanged() {
 //--------------------------------------------------------------------------
 
 void CameraTestToggleCommand::postProcess() {
-  TApp *app                   = TApp::instance();
   CleanupSettingsModel *model = CleanupSettingsModel::instance();
 
   TXshSimpleLevel *sl;

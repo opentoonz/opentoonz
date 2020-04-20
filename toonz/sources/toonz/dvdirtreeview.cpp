@@ -266,12 +266,10 @@ void DvDirTreeViewDelegate::paint(QPainter *painter,
 void DvDirTreeViewDelegate::setEditorData(QWidget *editor,
                                           const QModelIndex &index) const {
 #if QT_VERSION >= 0x050000
-  if (index.data().canConvert(QMetaType::QString))
+  if (!index.data().canConvert(QMetaType::QString))
 #else
-  if (qVariantCanConvert<QString>(index.data()))
+  if (!qVariantCanConvert<QString>(index.data()))
 #endif
-    NodeEditor *nodeEditor = qobject_cast<NodeEditor *>(editor);
-  else
     QAbstractItemDelegate::setEditorData(editor, index);
 }
 
@@ -426,7 +424,6 @@ void DvDirTreeView::dropEvent(QDropEvent *e) {
           DvDirModel::instance()->getNode(index));
   if (!folderNode || !folderNode->isFolder()) return;
   if (!mimeData->hasUrls()) return;
-  int count = 0;
   for (const QUrl &url : mimeData->urls()) {
     TFilePath srcFp(url.toLocalFile().toStdWString());
     TFilePath dstFp = folderNode->getPath();
@@ -851,7 +848,6 @@ void DvDirTreeView::deleteVersionControl(DvDirVersionControlNode *node) {
   }
 
   TFilePath path   = node->getPath();
-  bool isSceneFile = path.getType() == "tnz";
   if (path.getType() == "tnz")
     vc->deleteFiles(this, toQString(parentNode->getPath()),
                     QStringList(QString::fromStdWString(node->getName())));

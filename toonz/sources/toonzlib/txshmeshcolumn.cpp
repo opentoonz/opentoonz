@@ -136,7 +136,6 @@ void TXshMeshColumn::loadData(TIStream &is) {
       setStatusWord(status);
       if (status & eCamstandTransparent43) {
         setOpacity(128);
-        status = status & ~eCamstandTransparent43;
       }
 
       is.closeChild();

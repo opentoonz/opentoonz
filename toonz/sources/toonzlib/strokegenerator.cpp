@@ -225,7 +225,6 @@ void StrokeGenerator::drawAllFragments() {
   if (m_points.empty()) return;
 
   int n          = m_points.size();
-  int i          = 0;
   const double h = 0.01;
 
   TThickPoint a = m_points[0];

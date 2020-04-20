@@ -833,7 +833,7 @@ bool PlasticSkeletonDeformation::setKeyframe(const SkDKey &keyframe) {
   const std::map<QString, SkVD::Keyframe> &vdKeys = keyframe.m_vertexKeyframes;
 
   // Iterate the keyframe's vertex deformations
-  std::map<QString, SkVD::Keyframe>::const_iterator kt, kEnd(vdKeys.end());
+  std::map<QString, SkVD::Keyframe>::const_iterator kt;
   for (kt = vdKeys.begin(); kt != vdKeys.end(); ++kt) {
     // Search for a corresponding vertex deformation among stored ones
     SkVDSet::iterator vdt = m_imp->m_vds.find(kt->first);
@@ -864,7 +864,7 @@ bool PlasticSkeletonDeformation::setKeyframe(const SkDKey &keyframe,
   const std::map<QString, SkVD::Keyframe> &vdKeys = keyframe.m_vertexKeyframes;
 
   // Iterate the keyframe's vertex deformations
-  std::map<QString, SkVD::Keyframe>::const_iterator kt, kEnd(vdKeys.end());
+  std::map<QString, SkVD::Keyframe>::const_iterator kt;
   for (kt = vdKeys.begin(); kt != vdKeys.end(); ++kt) {
     // Search for a corresponding vertex deformation among stored ones
     SkVDSet::iterator vdt = m_imp->m_vds.find(kt->first);

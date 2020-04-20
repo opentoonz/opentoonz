@@ -198,15 +198,14 @@ std::string ExpressionField::getExpression() const {
 }
 
 bool ExpressionField::event(QEvent *e) {
-  if (e->type() == QEvent::ToolTip) {
-    QHelpEvent *helpEvent = static_cast<QHelpEvent *>(e);
-    // openCompletionPopup();
 
+  if (e->type() == QEvent::ToolTip) {
+    // openCompletionPopup();
   } else if (e->type() == QEvent::ShortcutOverride) {
     e->accept();
     return true;
   }
-  // else
+
   return QTextEdit::event(e);
 }
 
@@ -394,7 +393,7 @@ void ExpressionField::insertCompletion() {
   QString item =
       m_completerPopup->model()->data(index, Qt::EditRole).toString();
   QTextCursor tc = textCursor();
-  int pos        = tc.position();
+
   // tc.movePosition(m_completionStartPos, QTextCursor::KeepAnchor);
   tc.insertText(item);
   m_completerPopup->hide();

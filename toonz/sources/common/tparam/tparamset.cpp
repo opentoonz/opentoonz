@@ -172,7 +172,7 @@ void TParamSet::insertParam(const TParamP &param, const std::string &name,
     param->addObserver(m_imp);
     it = m_imp->m_params.begin();
     int f;
-    for (f = 0; f < index; f++) it++;
+    for (f = 0; f < index; f++) ++it;
     m_imp->m_params.insert(it, paramToInsert);
     if (param->getName().empty()) param->setName(name);
   }

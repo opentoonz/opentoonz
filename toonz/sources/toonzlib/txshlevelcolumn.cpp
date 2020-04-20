@@ -109,7 +109,6 @@ void TXshLevelColumn::loadData(TIStream &is) {
       setStatusWord(status);
       if (status & eCamstandTransparent43) {
         setOpacity(128);
-        status = status & ~eCamstandTransparent43;
       }
     } else if (tagName == "camerastand_opacity") {
       int opacity;

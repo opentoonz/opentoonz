@@ -96,7 +96,7 @@ void CasmSubmitPage::Data::configureNotify(const TDimension &size) {
   m_filepathLabel->setGeometry(x, y - 15, x + 100, y);
   m_filepathTextField->setGeometry(x + 104, y - 15, x + 650, y);
   m_casmBrowseBtn->setGeometry(x + 660, y - 15, x + 680, y);
-  x = x0;
+  //x = x0;
   y -= 40;
 
   m_configPanel->setGeometry(0, 0, size.lx - 1, y);

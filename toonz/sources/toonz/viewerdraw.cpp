@@ -395,9 +395,9 @@ void ViewerDraw::drawColorcard(UCHAR channel) {
         assert(false);
       }
     } else {
-      color.r = channel & TRop::RChan ? color.r : 0;
-      color.b = channel & TRop::BChan ? color.b : 0;
-      color.g = channel & TRop::GChan ? color.g : 0;
+      color.r = (channel & TRop::RChan) ? color.r : 0;
+      color.b = (channel & TRop::BChan) ? color.b : 0;
+      color.g = (channel & TRop::GChan) ? color.g : 0;
     }
   }
   tglColor(color);
@@ -408,7 +408,6 @@ void ViewerDraw::drawColorcard(UCHAR channel) {
 
 void ViewerDraw::draw3DCamera(unsigned long flags, double zmin, double phi) {
   bool cameraRef = 0 != (flags & ViewerDraw::CAMERA_REFERENCE);
-  bool safeArea  = 0 != (flags & ViewerDraw::SAFE_AREA);
 
   TApp *app               = TApp::instance();
   int frame               = app->getCurrentFrame()->getFrame();
@@ -656,7 +655,6 @@ void ViewerDraw::drawCamera(unsigned long flags, double pixelSize) {
 void ViewerDraw::draw3DFrame(double minZ, double phi) {
   double a = Stage::bigBoxSize[0];
   double b = Stage::bigBoxSize[1];
-  double c = Stage::bigBoxSize[2];
 
   double d = phi < 0 ? -a : a;
 

@@ -353,7 +353,7 @@ void TUndoManager::popUndo(int n, bool forward) {
         start                 = m_imp->m_current;
         UndoListIterator _end = end;
         while (_end != start) {
-          _end--;
+          --_end;
           delete (*_end);
         }
         m_imp->m_undoList.erase(start, end);
@@ -402,7 +402,7 @@ int TUndoManager::getCurrentHistoryIndex() {
     if (it == m_imp->m_undoList.end()) break;
 
     index++;
-    it++;
+    ++it;
   }
   return 0;
 }

@@ -85,7 +85,7 @@ public:
 
   bool inline removeEdge(TEdge *e) {
     std::list<TEdge *>::iterator it = m_edgeList.begin();
-    while (it != m_edgeList.end() && *it != e) it++;
+    while (it != m_edgeList.end() && *it != e) ++it;
     if (*it == e) {
       m_edgeList.erase(it);
       return true;

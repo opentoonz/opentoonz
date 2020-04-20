@@ -225,7 +225,7 @@ void TXshSimpleLevel::setEditableRange(unsigned int from, unsigned int to,
     TLevelReaderP lr(dstPath);
     TLevelP level = lr->loadInfo();
     setPalette(level->getPalette());
-    for (TLevel::Iterator it = level->begin(); it != level->end(); it++) {
+    for (TLevel::Iterator it = level->begin(); it != level->end(); ++it) {
       TImageP img = lr->getFrameReader(it->first)->load();
       setFrame(it->first, img);
     }
@@ -1092,7 +1092,7 @@ void TXshSimpleLevel::load() {
       if (!checkCreatorString(creator = lr->getCreator()))
         getProperties()->setIsForbidden(true);
       else
-        for (TLevel::Iterator it = level->begin(); it != level->end(); it++) {
+        for (TLevel::Iterator it = level->begin(); it != level->end(); ++it) {
           TFrameId fid = it->first;
           if (!loadingLevelRange.match(fid)) continue;
           setFrameStatus(
@@ -1113,7 +1113,7 @@ void TXshSimpleLevel::load() {
       if (!checkCreatorString(creator = lr->getCreator()))
         getProperties()->setIsForbidden(true);
       else
-        for (TLevel::Iterator it = level->begin(); it != level->end(); it++) {
+        for (TLevel::Iterator it = level->begin(); it != level->end(); ++it) {
           TFrameId fid = it->first;
           if (!loadingLevelRange.match(fid)) continue;
           setFrameStatus(fid, getFrameStatus(fid) | Cleanupped);
@@ -1161,7 +1161,7 @@ void TXshSimpleLevel::load() {
     if (!checkCreatorString(creator = lr->getCreator()))
       getProperties()->setIsForbidden(true);
     else
-      for (TLevel::Iterator it = level->begin(); it != level->end(); it++) {
+      for (TLevel::Iterator it = level->begin(); it != level->end(); ++it) {
         m_renumberTable[it->first] = it->first;  // Voglio che la tabella
                                                  // contenga anche i frame che
                                                  // non vengono caricati
@@ -1297,7 +1297,7 @@ void TXshSimpleLevel::load(const std::vector<TFrameId> &fIds) {
       if (info) set16BitChannelLevel(info->m_bitsPerSample == 16);
     } else {
       TLevelP level = lr->loadInfo();
-      for (TLevel::Iterator it = level->begin(); it != level->end(); it++) {
+      for (TLevel::Iterator it = level->begin(); it != level->end(); ++it) {
         m_renumberTable[it->first] = it->first;
         if (!loadingLevelRange.match(it->first)) continue;
         setFrame(it->first, TImageP());
@@ -1416,7 +1416,7 @@ static void saveBackup(TFilePath path) {
     TFilePathSet files =
         TSystem::readDirectory(path.getParentDir(), false, true);
     for (TFilePathSet::iterator file = files.begin(); file != files.end();
-         file++) {
+         ++file) {
       if (file->getLevelName() == path.getLevelName()) saveBackup(*file);
     }
     return;

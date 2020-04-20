@@ -94,7 +94,7 @@ bool CYOMBParam::read(basic_ifstream<char> &in) {
     if (isBegin && strcmp(token, "COLOR") == 0) {
       m_color.resize(m_color.size() + 1);
       vector<I_PIXEL>::iterator p = m_color.end();
-      p--;
+      --p;
       p->r = p->g = p->b = p->m = 0;
       if (in.good()) in >> p->r;
       if (in.good()) in >> p->g;

@@ -241,9 +241,9 @@ void doSetChannel(const TRasterPT<T> &rin, const TRasterPT<T> &rout,
       }
     } else {
       for (j = 0; j < lx; j++, pixin++, pixout++) {
-        pixout->r = channel & TRop::RChan ? pixin->r : 0;
-        pixout->b = channel & TRop::BChan ? pixin->b : 0;
-        pixout->g = channel & TRop::GChan ? pixin->g : 0;
+        pixout->r = (channel & TRop::RChan) ? pixin->r : 0;
+        pixout->b = (channel & TRop::BChan) ? pixin->b : 0;
+        pixout->g = (channel & TRop::GChan) ? pixin->g : 0;
       }
     }
   }

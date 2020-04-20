@@ -55,7 +55,7 @@ void TLevel::setFrame(const TFrameId &fid, const TImageP &img) {
 int TLevel::getIndex(const TFrameId fid)
 {
   int index = 0;
-  for(Iterator it = m_table->begin(); it != m_table->end(); it++, index++)
+  for(Iterator it = m_table->begin(); it != m_table->end(); ++it, index++)
     if(it->first == fid) return index;
   return -1;
 }

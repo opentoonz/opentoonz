@@ -161,7 +161,7 @@ TFilePath getBinRoot() {
 //--------------------------------------------------------------------
 
 bool dirExists(const TFilePath &dirFp) {
-  bool exists = false;
+  bool exists;
 #ifdef _WIN32
   TFileStatus fs(dirFp);
   exists = fs.isDirectory();
@@ -175,7 +175,7 @@ bool dirExists(const TFilePath &dirFp) {
 //--------------------------------------------------------------------
 
 bool myDoesExists(const TFilePath &fp) {
-  bool exists = false;
+  bool exists;
 #ifdef _WIN32
   TFileStatus fs(fp);
   exists = fs.doesExist();
@@ -1128,10 +1128,6 @@ int main(int argc, char **argv) {
   bool console = false;
 
   if (argc > 1) {
-    std::string serviceName(
-        "ToonzFarmServer");  // Must be the same of the installer's
-    std::string serviceDisplayName = serviceName;
-
     TCli::SimpleQualifier consoleQualifier("-console", "Run as console app");
     TCli::StringQualifier installQualifier("-install name",
                                            "Install service as 'name'");
@@ -1142,6 +1138,11 @@ int main(int argc, char **argv) {
     if (!usage.parse(argc, argv)) exit(1);
 
 #ifdef _WIN32
+    std::string serviceName(
+        "ToonzFarmServer");  // Must be the same of the installer's
+
+    std::string serviceDisplayName = serviceName;
+
     if (installQualifier.isSelected()) {
       char szPath[512];
 

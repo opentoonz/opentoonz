@@ -251,7 +251,7 @@ void HookSelection::copySelectedHooks() {
   if (isEmpty()) return;
   std::vector<int> ids;
   std::set<std::pair<int, int>>::iterator it;
-  for (it = m_hooks.begin(); it != m_hooks.end(); it++) {
+  for (it = m_hooks.begin(); it != m_hooks.end(); ++it) {
     if (std::find(ids.begin(), ids.end(), it->first) == ids.end())
       ids.push_back(it->first);
   }
@@ -270,7 +270,7 @@ void HookSelection::cutSelectedHooks() {
   TUndo *undo      = new HookUndo(xl);
   HookSet *hookSet = xl->getHookSet();
   std::set<std::pair<int, int>>::iterator it;
-  for (it = m_hooks.begin(); it != m_hooks.end(); it++) {
+  for (it = m_hooks.begin(); it != m_hooks.end(); ++it) {
     Hook *hook = hookSet->getHook(it->first);
     assert(hook);
     if (!hook) return;

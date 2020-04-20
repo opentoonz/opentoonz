@@ -1242,7 +1242,6 @@ void TTool::tweenSelectedGuideStrokes() {
   if (backIdx == -1 || frontIdx == -1) return;
 
   TFrameHandle *currentFrame = getApplication()->getCurrentFrame();
-  int row                    = currentFrame->getFrameIndex();
   TFrameId bFid, cFid, fFid;
 
   cFid = getCurrentFid();
@@ -1319,7 +1318,6 @@ void TTool::tweenGuideStrokeToSelected() {
   getViewer()->getGuidedFrameIdx(&backIdx, &frontIdx);
 
   TFrameHandle *currentFrame = getApplication()->getCurrentFrame();
-  int row                    = currentFrame->getFrameIndex();
   TFrameId bFid, cFid, fFid;
   TVectorImageP bvi, cvi, fvi;
 
@@ -1441,7 +1439,6 @@ void TTool::flipGuideStrokeDirection(int mode) {
   if (os < 0) return;
 
   TFrameHandle *currentFrame = getApplication()->getCurrentFrame();
-  int row                    = currentFrame->getFrameIndex();
   TFrameId cFid              = getCurrentFid();
   if (cFid.isEmptyFrame()) return;
 

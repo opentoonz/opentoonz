@@ -259,8 +259,6 @@ inline IndexTable::IndexColumn::iterator IndexTable::find(ContourNode *sought) {
 // Handles active contour merging due to split/vertex events
 void IndexTable::merge(IndexColumn::iterator index1,
                        IndexColumn::iterator index2) {
-  IndexColumn::iterator current;
-
   int identifier1 = m_identifiers[(*index1)->m_ancestorContour],
       identifier2 = m_identifiers[(*index2)->m_ancestorContour];
 
@@ -895,7 +893,7 @@ inline void Event::calculateSplitEvent() {
   // Then, try in the remaining active contours whose identifier is != our
   for (i = 0; i < activeTable.m_columns.size(); ++i) {
     for (currentContour = activeTable[i]->begin();
-         currentContour != activeTable[i]->end(); currentContour++) {
+         currentContour != activeTable[i]->end(); ++currentContour) {
       // Da spostare sopra il 2o for
       if (activeTable.m_identifiers[(*currentContour)->m_ancestorContour] !=
           activeTable.m_identifiers[m_generator->m_ancestorContour]) {
@@ -1891,7 +1889,7 @@ void SSDebugger::paintEvent(QPaintEvent *) {
 
   for (i = 0; i < activeTable.m_columns.size(); ++i) {
     for (currentContour = activeTable[i]->begin();
-         currentContour != activeTable[i]->end(); currentContour++) {
+         currentContour != activeTable[i]->end(); ++currentContour) {
       // Draw edge
       p.setPen(Qt::black);
       last = first = *currentContour;

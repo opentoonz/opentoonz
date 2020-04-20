@@ -723,22 +723,8 @@ bool TRasterCodecLZO::decompress(const UCHAR *inData, TINT32 inDataSize,
   outRas->lock();
   memcpy(outRas->getRawData(), decompressedBuffer.data(),
          decompressedBuffer.size());
-  bool rc = true;
 
   outRas->unlock();
-
-  /*
-if (rc != true)                                     // Check success code here
-{
-if (safeMode)
-return false;
-else
-{
-throw TException("decompress... something goes bad");
-return false;
-}
-}
-  */
 
   assert(outSize == (size_t)outDataSize);
   return true;
@@ -772,21 +758,15 @@ void TRasterCodecLZO::decompress(const TRasterP &compressedRas,
 
   size_t outSize = outDataSize;  // Calculate output buffer size
 
-  char *outData = (char *)outRas->getRawData();
-
   QByteArray decompressedBuffer;
   if (!lzoDecompress(QByteArray(mc, ds), outSize, decompressedBuffer))
     throw TException("LZO decompression failed");
   outRas->lock();
   memcpy(outRas->getRawData(), decompressedBuffer.data(),
          decompressedBuffer.size());
-  bool rc = true;
 
   outRas->unlock();
   compressedRas->unlock();
-
-  if (rc != true)  // Check success code here
-    throw TException("decompress... something goes bad");
 
   assert(outSize == (size_t)outDataSize);
 }

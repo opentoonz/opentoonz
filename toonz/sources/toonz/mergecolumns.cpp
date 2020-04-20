@@ -442,12 +442,12 @@ QString indexes2string(const std::set<TFrameId> fids) {
 
   while (it != fids.end()) {
     std::set<TFrameId>::const_iterator it1 = it;
-    it1++;
+    ++it1;
 
     int lastVal = it->getNumber();
     while (it1 != fids.end() && it1->getNumber() == lastVal + 1) {
       lastVal = it1->getNumber();
-      it1++;
+      ++it1;
     }
 
     if (lastVal != it->getNumber()) str += "-" + QString::number(lastVal);

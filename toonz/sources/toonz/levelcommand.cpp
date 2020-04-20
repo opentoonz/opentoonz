@@ -127,7 +127,6 @@ public:
   }
 
   void execute() override {
-    TXsheet *xsheet = TApp::instance()->getCurrentXsheet()->getXsheet();
     CastSelection *castSelection =
         dynamic_cast<CastSelection *>(TSelection::getCurrent());
     if (!castSelection) return;
@@ -353,7 +352,6 @@ void revertTo(bool isCleanedUp) {
         TXshCell cell          = xsheet->getCell(r, c);
         TXshSimpleLevel *level = (!cell.isEmpty()) ? cell.getSimpleLevel() : 0;
         if (!level) continue;
-        std::string ext = level->getPath().getType();
         int type        = level->getType();
         /*-- Revert可能なLevelタイプの条件 --*/
         if ((isCleanedUp && type == TZP_XSHLEVEL) ||

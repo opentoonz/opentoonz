@@ -137,8 +137,6 @@ void TXshSoundLevel::loadData(TIStream &is) {
 
 void TXshSoundLevel::saveData(TOStream &os) {
   os << m_name;
-
-  std::map<std::string, std::string> attr;
   os.child("type") << L"sound";
   os.child("path") << m_path;
 }

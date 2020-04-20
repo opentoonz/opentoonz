@@ -205,7 +205,7 @@ public:
     try {
       TFilePathSet fps = TSystem::readDirectory(m_path);
       fps.sort(caseInsensitiveLessThan);
-      for (TFilePathSet::iterator it = fps.begin(); it != fps.end(); it++) {
+      for (TFilePathSet::iterator it = fps.begin(); it != fps.end(); ++it) {
         if (TFileStatus(*it).isDirectory()) new FileFolderItem(this, *it);
         // else
         //  new SimpleFileItem(this, *it);
@@ -233,7 +233,7 @@ public:
     clearItems();
 
     TFilePathSet fps = TSystem::getDisks();
-    for (TFilePathSet::iterator it = fps.begin(); it != fps.end(); it++) {
+    for (TFilePathSet::iterator it = fps.begin(); it != fps.end(); ++it) {
       TTreeViewItem *item = new FileFolderItem(this, *it);
     }
   }

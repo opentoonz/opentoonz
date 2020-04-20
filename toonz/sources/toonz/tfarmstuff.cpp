@@ -79,7 +79,7 @@ void TFarmStuff::getControllerData(QString &hostName, QString &ipAddr,
   if (groot.isEmpty() || grootpath == " ")
     throw TFarmStuff::TMissingGRootEnvironmentVariable();
 
-  bool fileExists = false;
+  bool fileExists;
   TFileStatus fs(groot);
   fileExists = fs.doesExist();
   if (!fileExists) throw TFarmStuff::TMissingGRootFolder();

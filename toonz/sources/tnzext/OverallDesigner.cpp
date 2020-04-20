@@ -271,6 +271,7 @@ void ToonzExt::OverallDesigner::draw(ToonzExt::StrokeDeformation *sd) {
     // glColor3d(1.0,0.0,1.0);
     s = sd->getCopiedStroke();
     if (s) {
+#ifdef _DEBUG
       const ContextStatus *status = sd->getStatus();
       double w = 0.0, pixelSize = 1.0;
 
@@ -278,7 +279,6 @@ void ToonzExt::OverallDesigner::draw(ToonzExt::StrokeDeformation *sd) {
         w         = status->w_;
         pixelSize = status->pixelSize_ < 0 ? 1.0 : status->pixelSize_;
       }
-#ifdef _DEBUG
       drawCross(s->getPoint(0), 2 * pixelSize);
 
       tglDrawCircle(s->getPoint(w), 8 * pixelSize);
@@ -286,8 +286,8 @@ void ToonzExt::OverallDesigner::draw(ToonzExt::StrokeDeformation *sd) {
 #endif
       ToonzExt::Interval ex = sd->getExtremes();
       drawStrokeCenterLine(s, pixelSize_, ex);
-      if (status) {
 #ifdef _DEBUG
+      if (status) {
         glColor3d(0, 0, 0);
         showCorners(s, status->cornerSize_, pixelSize);
 
@@ -301,8 +301,8 @@ void ToonzExt::OverallDesigner::draw(ToonzExt::StrokeDeformation *sd) {
 
         glColor3d(0.5, 1.0, 0.5);
         showCP(s, pixelSize);
-#endif
       }
+#endif
     }
 
     /*

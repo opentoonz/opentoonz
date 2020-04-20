@@ -124,7 +124,7 @@ void CasmTask2::setFileArg(const string &fp) {
 //------------------------------------------------------------------------------
 
 string CasmTask2::getCommandLine() const {
-  string qualifiers, prgname, dirname, biname;
+  string qualifiers;
 
   if (m_reduction != 1) qualifiers += " -shrink " + toString(m_reduction) + " ";
 
@@ -198,7 +198,7 @@ string CasmTask2::getCommandLine() const {
         app = " -ac_args '$filename $count " + entry_point;
         app += " " + parity;
         app += " $total' ";
-        qualifiers += " app;
+        qualifiers += app;
 #endif
       }
     } else {
@@ -229,7 +229,7 @@ static bool is_num(string word) {
   string::iterator it = word.begin();
   while (it != word.end()) {
     if ((*it < '0' || *it > '9') && *it != '.') return false;
-    it++;
+    ++it;
   }
   return true;
 }
@@ -241,22 +241,22 @@ static string cpy_word(string &word, string s) {
   string::iterator it  = s.begin();
   word                 = "";
   string::iterator it2 = word.begin();
-  while (s[0] == ' ' || s[0] == '\t') it++;
+  while (s[0] == ' ' || s[0] == '\t') ++it;
   if (s[0] == '\'' || s[0] == '\"') {
     /* argomento fra virgolette */
     char quote = *it++;
     while (*it && *it != '\n') {
       if (*it == '\\') {
-        it++;
+        ++it;
         if (*it == '\0' || *it == '\n') break;
         switch (*it) {
           CASE '\\' : *it2++ = '\\';
         DEFAULT:
           *it2++ = *it;
         }
-        it++;
+        ++it;
       } else if (*it == quote) {
-        it++;
+        ++it;
         break;
       } else
         *it2++ = *it++;
@@ -268,7 +268,7 @@ static string cpy_word(string &word, string s) {
   //*word = '\0';
 
   /* salto gli spazi bianchi finali */
-  while (*it == ' ' || *it == '\t') it++;
+  while (*it == ' ' || *it == '\t') ++it;
   return s.erase(s.begin(), it);
 }
 

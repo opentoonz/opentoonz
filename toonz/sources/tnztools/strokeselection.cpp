@@ -540,10 +540,9 @@ void StrokeSelection::deleteStrokes() {
 void StrokeSelection::copy() {
   if (m_indexes.empty()) return;
   QClipboard *clipboard = QApplication::clipboard();
-  QMimeData *oldData    = cloneData(clipboard->mimeData());
+  // QMimeData *oldData    = cloneData(clipboard->mimeData());
   copyStrokesWithoutUndo(m_vi, m_indexes);
-  QMimeData *newData = cloneData(clipboard->mimeData());
-
+  // QMimeData *newData = cloneData(clipboard->mimeData());
   // TUndoManager::manager()->add(new CopyStrokesUndo(oldData, newData));
 }
 

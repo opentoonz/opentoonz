@@ -134,7 +134,6 @@ void RaylitFx::doCompute(TTile &tileOut, double frame,
   if (!m_input.isConnected()) return;
 
   double scale = sqrt(fabs(ri.m_affine.det()));
-  int shrink   = (ri.m_shrinkX + ri.m_shrinkY) / 2;
 
   TPointD p(ri.m_affine * m_p->getValue(frame));
 
@@ -194,7 +193,6 @@ void ColorRaylitFx::doCompute(TTile &tileOut, double frame,
   if (!m_input.isConnected()) return;
 
   double scale = sqrt(fabs(ri.m_affine.det()));
-  int shrink   = (ri.m_shrinkX + ri.m_shrinkY) / 2;
 
   TPointD p(ri.m_affine * m_p->getValue(frame));
 

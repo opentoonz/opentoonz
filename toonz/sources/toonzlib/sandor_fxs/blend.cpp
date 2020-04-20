@@ -335,12 +335,9 @@ inline bool isFlatNeighbourhood(int selectedColor, const TRasterCM32P &cmIn,
                                 const TPoint &pos,
                                 const SelectionRaster &selRas,
                                 const BlurPattern &blurPattern) {
-  TPixelCM32 &pix = cmIn->pixels(pos.y)[pos.x];
   int lx = cmIn->getLx(), ly = cmIn->getLy();
   unsigned int xy;
-
   TPoint samplePix;
-
   const TPoint *samplePoint =
       blurPattern.m_samples.empty() ? 0 : &blurPattern.m_samples[0];
 

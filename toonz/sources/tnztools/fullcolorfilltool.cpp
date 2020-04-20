@@ -90,9 +90,9 @@ void doFill(const TImageP &img, const TPointD &pos, FillParameters &params,
     TTileSetFullColor *tileSet = new TTileSetFullColor(ras->getSize());
     TTileSaverFullColor tileSaver(ras, tileSet);
     TDimension imageSize = ras->getSize();
-    TPointD p(imageSize.lx % 2 ? 0.0 : 0.5, imageSize.ly % 2 ? 0.0 : 0.5);
+    TPointD p((imageSize.lx % 2) ? 0.0 : 0.5, (imageSize.ly % 2) ? 0.0 : 0.5);
 
-    /*-- params.m_p = convert(pos-p)では、マイナス座標でずれが生じる --*/
+    /*-- params.m_p = convert(pos-p)縺ｧ縺ｯ縲√�槭う繝翫せ蠎ｧ讓吶〒縺壹ｌ縺檎函縺倥ｋ --*/
     TPointD tmp_p = pos - p;
     params.m_p = TPoint((int)floor(tmp_p.x + 0.5), (int)floor(tmp_p.y + 0.5));
 

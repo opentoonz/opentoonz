@@ -394,10 +394,6 @@ void TKeyframeSelection::shiftKeyframes(int direction) {
   if (isEmpty()) return;
 
   std::set<Position> positions = m_positions;
-
-  int r0 = positions.begin()->first;
-  int c0 = positions.begin()->second;
-
   TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
   TKeyframeData *data = new TKeyframeData();
   data->setKeyframes(positions, xsh);

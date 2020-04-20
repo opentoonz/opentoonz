@@ -122,7 +122,6 @@ std::wstring getProjectSuffix(const TFilePath &path) {
  */
 TFilePath getProjectFile(const TFilePath &fp) {
   const std::wstring &fpName     = fp.getWideName();
-  const std::wstring &folderName = fp.getParentDir().getWideName();
   QDir dir(fp.getQString());
   for (int i = 0; i < prjSuffixCount; ++i) {
     TFilePath path = fp + (fpName + prjSuffix[i] + xmlExt);

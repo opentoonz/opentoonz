@@ -308,7 +308,7 @@ void print(list<Intersection> &intersectionList, char *str) {
     of << endl;
 
     for (j = 0, it1 = it->m_strokeList.begin(); it1 != it->m_strokeList.end();
-         it1++, j++) {
+         ++it1, j++) {
       of << "----Branch #" << j;
       if (it1->m_edge.m_index < 0) of << "(AUTOCLOSE)";
       of << "Intersection at " << it1->m_edge.m_w0 << ": "
@@ -373,9 +373,9 @@ void checkInterList(list<Intersection> &intersectionList) {
   list<Intersection>::iterator it;
   list<IntersectedStroke>::iterator it1;
 
-  for (it = intersectionList.begin(); it != intersectionList.end(); it++) {
+  for (it = intersectionList.begin(); it != intersectionList.end(); ++it) {
     int count = 0;
-    for (it1 = it->m_strokeList.begin(); it1 != it->m_strokeList.end(); it1++) {
+    for (it1 = it->m_strokeList.begin(); it1 != it->m_strokeList.end(); ++it1) {
       int val;
       if (it1->m_nextIntersection != intersectionList.end()) {
         count++;
@@ -2096,7 +2096,7 @@ coincidenti se passano per l'estremo di una quad
 quindi devo invertire l'ordine di due branch enlla rosa dei branch.
 list<IntersectedStroke>::iterator it1, it2;
 it1=intersection.m_strokeList.begin();
-it2 = it1; it2++;
+it2 = it1; ++it2;
 for (; it2!=intersection.m_strokeList.end(); ++it1, ++it2)
 {
 if ((*it1).m_gettingOut!=(*it2).m_gettingOut &&((*it1).m_edge.m_index==jj &&

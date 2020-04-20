@@ -468,7 +468,7 @@ void JpgExifReader::process_EXIF(unsigned char *ExifSection,
     unsigned a, b;
     printf("Map: %05d- End of exif\n", length - 8);
     for (a = 0; a < length - 8; a += 10) {
-      printf("Map: %05d ", a);
+      printf("Map: %05u ", a);
       for (b = 0; b < 10; b++) printf(" %02x", *(ExifSection + 8 + a + b));
       printf("\n");
     }
@@ -537,7 +537,7 @@ void JpgExifReader::ProcessExifDir(unsigned char *DirStart,
       }
     }
     if (DumpExifMap) {
-      printf("Map: %05u-%05u: Directory\n", (int)(DirStart - OffsetBase),
+      printf("Map: %05i-%05i: Directory\n", (int)(DirStart - OffsetBase),
              (int)(DirEnd + 4 - OffsetBase));
     }
   }
@@ -1032,7 +1032,7 @@ void JpgExifReader::ProcessExifDir(unsigned char *DirStart,
     ImageInfo.ThumbnailAtEnd = FALSE;
 
     if (DumpExifMap) {
-      printf("Map: %05d-%05d: Thumbnail\n", ThumbnailOffset,
+      printf("Map: %05u-%05u: Thumbnail\n", ThumbnailOffset,
              ThumbnailOffset + ThumbnailSize);
     }
 

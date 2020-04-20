@@ -395,7 +395,7 @@ void StudioPaletteTreeViewer::refreshItem(QTreeWidgetItem *item) {
       item->insertChild(pathIndex, currentItem);
       pathIndex++;
     } else {
-      assert(locals.isUpper(currentItemPath, path) || path.isEmpty());
+      assert(path.isEmpty());
       assert(currentItem);
       item->removeChild(currentItem);
       itemIndex++;

@@ -495,7 +495,6 @@ void ExternalProgramFx::doCompute(TTile &tile, double frame,
 }
 
 FX_PLUGIN_IDENTIFIER(ExternalProgramFx, "externalProgramFx");
-* /
 
 #endif
     FX_IDENTIFIER(TExternalProgramFx, "externalProgramFx")

@@ -1887,7 +1887,6 @@ void PlasticTool::drawSkeleton(const PlasticSkeleton &skel, double pixelSize,
       const TPixel32 yellow(255, 255, 0, alpha);
 
       double handleRadius  = HANDLE_SIZE * pixelSize;
-      float intHandleThick = 2.0f, extHandleThick = 4.0f;
 
       // Draw root
       drawFilledHandle(vertices.begin()->P(), handleRadius, pixelSize, magenta);

@@ -227,7 +227,7 @@ void FilmstripCmd::inbetween(
   std::vector<TFrameId> levelFids;
   sl->getFids(levelFids);
   std::vector<TFrameId>::iterator it = levelFids.begin();
-  for (it; it != levelFids.end(); it++) {
+  for (it; it != levelFids.end(); ++it) {
     int curFid = it->getNumber();
     if (fid0.getNumber() <= curFid && curFid <= fid1.getNumber())
       fids.push_back(*it);

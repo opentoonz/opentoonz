@@ -62,7 +62,6 @@ void mergeCmapped(const std::vector<MergeCmappedPair> &matchingLevels) {
   TPalette *matchPalette =
       matchingLevels[0].m_mcell->getImage(false)->getPalette();
 
-  TPalette::Page *page;
 
   // upInkId -> downInkId
   std::map<int, int> usedColors;
@@ -140,6 +139,7 @@ void mergeCmapped(const std::vector<MergeCmappedPair> &matchingLevels) {
     img->setSavebox(img->getSavebox() + (matchRas->getBounds() + offs));
   }
   /*
+    TPalette::Page *page;
     std::map<int, int>::iterator it = usedColors.begin();
     for (; it != usedColors.end(); ++it)
       if (it->first != it->second) break;
@@ -576,7 +576,6 @@ void mergeCmapped(int column, int mColumn, const QString &fullpath,
 
     TPaletteHandle *pltHandle = new TPaletteHandle();
     pltHandle->setPalette(plt);
-    int styleCount = plt->getStyleCount();
 
     TUndoManager::manager()->add(new MergeCmappedUndo(
         txl, MergeCmappedSessionId, column, level, images, mColumn, plt));
@@ -636,12 +635,12 @@ QString indexes2string(const std::set<TFrameId> fids) {
 
   while (it != fids.end()) {
     std::set<TFrameId>::const_iterator it1 = it;
-    it1++;
+    ++it1;
 
     int lastVal = it->getNumber();
     while (it1 != fids.end() && it1->getNumber() == lastVal + 1) {
       lastVal = it1->getNumber();
-      it1++;
+      ++it1;
     }
 
     if (lastVal != it->getNumber()) str += "-" + QString::number(lastVal);

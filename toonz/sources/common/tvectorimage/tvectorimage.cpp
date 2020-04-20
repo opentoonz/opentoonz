@@ -1081,7 +1081,7 @@ void TVectorImage::Imp::notifyChangedStrokes(
     //  assert(s->m_edgeList.size()<=1);
 
     std::list<TEdge *>::iterator it = s->m_edgeList.begin();
-    for (; it != s->m_edgeList.end(); it++) {
+    for (; it != s->m_edgeList.end(); ++it) {
       TEdge *e = new TEdge(**it, false);
       if (!oldStrokeArray.empty()) e->m_s = oldStrokeArray[i];
       oldEdgeListArray[i].push_back(e);  // bisogna allocare nuovo edge,

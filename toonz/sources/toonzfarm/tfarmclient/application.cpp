@@ -137,7 +137,7 @@ void Application::init() {
   m_imp->loadControllerData();
 
   TFarmControllerFactory factory;
-  int ret = factory.create(m_imp->m_controllerData, &m_imp->m_farmController);
+  factory.create(m_imp->m_controllerData, &m_imp->m_farmController);
 }
 
 //------------------------------------------------------------------------------

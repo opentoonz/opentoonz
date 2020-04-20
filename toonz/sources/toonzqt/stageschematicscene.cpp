@@ -87,7 +87,7 @@ TStageObject *getRoot(const QList<TStageObject *> &objs,
 
 void keepSubgroup(QMap<int, QList<SchematicNode *>> &editedGroup) {
   QMap<int, QList<SchematicNode *>>::iterator it;
-  for (it = editedGroup.begin(); it != editedGroup.end(); it++) {
+  for (it = editedGroup.begin(); it != editedGroup.end(); ++it) {
     QList<SchematicNode *> groupedNodes = it.value();
     int i;
     for (i = 0; i < groupedNodes.size(); i++) {
@@ -97,7 +97,7 @@ void keepSubgroup(QMap<int, QList<SchematicNode *>> &editedGroup) {
       TStageObject *obj = node->getStageObject();
       assert(obj);
       QMap<int, QList<SchematicNode *>>::iterator it2;
-      for (it2 = editedGroup.begin(); it2 != editedGroup.end(); it2++) {
+      for (it2 = editedGroup.begin(); it2 != editedGroup.end(); ++it2) {
         if (obj->isContainedInGroup(it2.key()) &&
             !editedGroup[it2.key()].contains(node))
           editedGroup[it2.key()].append(node);
@@ -249,7 +249,7 @@ void StageSchematicScene::updateScene() {
   }
 
   QMap<int, QList<TStageObject *>>::iterator it;
-  for (it = groupedObj.begin(); it != groupedObj.end(); it++) {
+  for (it = groupedObj.begin(); it != groupedObj.end(); ++it) {
     StageSchematicGroupNode *node = addStageGroupNode(it.value());
     m_GroupTable[it.key()]        = node;
     int editingGroupId            = node->getStageObject()->getEditingGroupId();
@@ -479,7 +479,7 @@ void StageSchematicScene::highlightLinks(StageSchematicNode *node, bool value) {
 void StageSchematicScene::updateEditedGroups(
     const QMap<int, QList<SchematicNode *>> &editedGroup) {
   QMap<int, QList<SchematicNode *>>::const_iterator it;
-  for (it = editedGroup.begin(); it != editedGroup.end(); it++) {
+  for (it = editedGroup.begin(); it != editedGroup.end(); ++it) {
     int zValue                                            = 2;
     QMap<int, QList<SchematicNode *>>::const_iterator it2 = editedGroup.begin();
     while (it2 != editedGroup.end()) {
@@ -488,14 +488,14 @@ void StageSchematicScene::updateEditedGroups(
       StageSchematicNode *obj =
           dynamic_cast<StageSchematicNode *>(it.value()[0]);
       if (!placedObj || !obj) {
-        it2++;
+        ++it2;
         continue;
       }
       int placedGroupedId = placedObj->getStageObject()->getEditingGroupId();
       if (obj->getStageObject()->isContainedInGroup(placedGroupedId) &&
           obj->getStageObject()->getEditingGroupId() != it2.key())
         zValue += 2;
-      it2++;
+      ++it2;
     }
     StageSchematicGroupEditor *node =
         addEditedGroupedStageSchematicNode(it.key(), it.value());
@@ -575,14 +575,14 @@ void StageSchematicScene::resizeNodes(bool maximizedNode) {
     }
   }
   QMap<int, StageSchematicGroupNode *>::iterator it;
-  for (it = m_GroupTable.begin(); it != m_GroupTable.end(); it++) {
+  for (it = m_GroupTable.begin(); it != m_GroupTable.end(); ++it) {
     it.value()->resize(maximizedNode);
     QList<TStageObject *> groupedObjs = it.value()->getGroupedObjects();
     for (int i = 0; i < groupedObjs.size(); i++)
       updatePositionOnResize(groupedObjs[i], maximizedNode);
   }
   QMap<int, StageSchematicGroupEditor *>::iterator it2;
-  for (it2 = m_groupEditorTable.begin(); it2 != m_groupEditorTable.end(); it2++)
+  for (it2 = m_groupEditorTable.begin(); it2 != m_groupEditorTable.end(); ++it2)
     it2.value()->resizeNodes(maximizedNode);
   updateScene();
   resizingNodes = false;
@@ -1203,7 +1203,7 @@ void StageSchematicScene::onSelectionChanged() {
   m_highlightedLinks.clear();
   QList<QGraphicsItem *> slcItems = selectedItems();
   QList<QGraphicsItem *>::iterator it;
-  for (it = slcItems.begin(); it != slcItems.end(); it++) {
+  for (it = slcItems.begin(); it != slcItems.end(); ++it) {
     StageSchematicGroupNode *groupNode =
         dynamic_cast<StageSchematicGroupNode *>(*it);
     StageSchematicNode *node = dynamic_cast<StageSchematicNode *>(*it);

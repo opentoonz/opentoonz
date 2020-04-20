@@ -67,10 +67,6 @@ TFilePath TSystem::toUNC(const TFilePath &fp) {
 
       DWORD er = 0, tr = 0, resume = 0, i;
 
-      int iBestMatch = 0;
-
-      std::string csTemp, csTempDrive, csBestMatch;
-
       do {
         res = NetShareEnum(NULL, 502, (LPBYTE *)&BufPtr, MAX_PREFERRED_LENGTH,
                            &er, &tr, &resume);

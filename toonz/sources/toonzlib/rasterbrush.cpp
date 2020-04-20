@@ -425,7 +425,7 @@ void makeLittleArch(const TRasterCM32P &ras, const Disk &disk1,
 
   double length = quadratic.getLength();
   if (length < 2) return;
-  double t = 0, step = 1 / (length * 1.5), t2 = quadratic.getT(center2);
+  double t = 0, step = 1 / (length * 1.5);
   bool idLastDiskDrown = true;
   for (t = step; t < 1; t += step) {
     TPointD center = quadratic.getPoint(t);

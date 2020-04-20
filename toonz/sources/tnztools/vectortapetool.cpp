@@ -615,9 +615,6 @@ public:
         new std::vector<TFilledRegionInf>;
     ImageUtils::getFillingInformationOverlappingArea(vi, *fillInformation,
                                                      rect);
-
-    bool initUndoBlock = false;
-
     std::vector<std::pair<int, double>> startPoints, endPoints;
     getClosingPoints(rect, m_autocloseFactor.getValue(), vi, startPoints,
                      endPoints);

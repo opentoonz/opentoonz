@@ -785,7 +785,7 @@ TRasterImageP TCleanupper::autocenterOnly(const TRasterImageP &image,
   double xDpi, yDpi;
   // double inlx, inly, zoom_factor, max_blur;
   double skew = 0, angle = 0,
-         dist = 0 /*lq_nozoom, lp_nozoom,, cx, cy, scalex, scaley*/;
+         /*lq_nozoom, lp_nozoom,, cx, cy, scalex, scaley*/;
   double cxin, cyin, cpout, cqout;
   int rasterIsSavebox = true;
   TAffine aff, preAff, inv;

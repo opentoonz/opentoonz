@@ -550,7 +550,6 @@ AutocenterPopup::AutocenterPopup() : DVGui::Dialog(0, false, true) {
   for (i = 0; i < (int)fdgNames.size(); i++)
     m_fieldGuide->addItem(QString(fdgNames[i].c_str()));
   settingsLayout->addWidget(m_fieldGuide, row, 1, Qt::AlignLeft);
-  ++row;
 
   beginHLayout();
   addLayout(settingsLayout, false);

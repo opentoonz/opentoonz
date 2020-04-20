@@ -32,8 +32,6 @@ public:
   void leftButtonDown(const TPointD &pos, const TMouseEvent &e) override {
     if (!m_viewer) return;
     m_dragging              = true;
-    int v                   = 1;
-    if (e.isAltPressed()) v = -1;
     m_oldY                  = e.m_pos.y;
     // m_center = getViewer()->winToWorld(e.m_pos);
     m_center = TPointD(e.m_pos.x, e.m_pos.y);
@@ -68,7 +66,6 @@ public:
     glScaled(unit, unit, unit);
     glColor3f(1, 0, 0);
 
-    double u = 4;
     glBegin(GL_LINES);
     glVertex2d(0, -10);
     glVertex2d(0, 10);

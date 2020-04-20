@@ -472,9 +472,6 @@ void ImageViewer::resizeGL(int w, int h) {
   glViewport(0, 0, w, h);
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-  double nearPlane   = 100;
-  double farPlane    = 2500;
-  double centerPlane = 1100;
   glOrtho(0, w, 0, h, -4000, 4000);
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();

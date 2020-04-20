@@ -188,7 +188,6 @@ private:
 
 inline void flattenTones(const TRasterCM32P &cmout, const TRasterCM32P &cmin) {
   int lx = cmin->getLx(), ly = cmin->getLy();
-  int wrapin = cmin->getWrap(), wrapout = cmout->getWrap();
 
   assert(lx == cmout->getLx() && ly == cmout->getLy());
 

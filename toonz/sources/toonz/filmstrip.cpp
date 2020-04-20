@@ -537,10 +537,6 @@ void FilmstripFrames::paintEvent(QPaintEvent *evt) {
   //--- compute navigator rect end ---
 
   int frameCount = (int)fids.size();
-
-  bool isReadOnly = false;
-  if (sl) isReadOnly = sl->isReadOnly();
-
   int i;
   int iconWidth   = m_iconSize.width();
   int x0          = m_frameLabelWidth;
@@ -889,8 +885,6 @@ void FilmstripFrames::mouseMoveEvent(QMouseEvent *e) {
     int speed = getOneFrameHeight() / 64;
 
     QRect visibleRect = visibleRegion().boundingRect();
-    int visibleTop    = visibleRect.top();
-    int visibleBottom = visibleRect.bottom();
     if (pos.y() < visibleRect.top()) {
       m_scrollSpeed = -speed;
       if (visibleRect.top() - pos.y() > 30) {
@@ -1092,7 +1086,6 @@ void FilmstripFrames::onFrameSwitched() {
   // no. interferische con lo shift-click per la selezione.
   // m_selection->selectNone();
   TApp *app        = TApp::instance();
-  TFrameHandle *fh = app->getCurrentFrame();
   TFrameId fid     = getCurrentFrameId();
 
   int index = fid2index(fid);

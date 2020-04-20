@@ -679,7 +679,7 @@ continue;
           tround(p0.x - (float)((p0.x - p1.x) * (p0.y - ly)) / (p0.y - p1.y));
       p1.y = ly;
     }
-    it++;
+    ++it;
   }
 }
 

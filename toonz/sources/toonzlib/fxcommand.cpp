@@ -902,7 +902,7 @@ QString InsertFxUndo::getHistoryString() {
   QString str = (m_selectedLinks.isEmpty()) ? QObject::tr("Add Fx  : ")
                                             : QObject::tr("Insert Fx  : ");
   QList<TFxP>::iterator it;
-  for (it = m_insertedFxs.begin(); it != m_insertedFxs.end(); it++) {
+  for (it = m_insertedFxs.begin(); it != m_insertedFxs.end(); ++it) {
     if (it != m_insertedFxs.begin()) str += QString(", ");
 
     str += QString::fromStdWString((*it)->getFxId());
@@ -1687,7 +1687,7 @@ accessible without scene change notifications (see TFxCommand::setParent())
   QString getHistoryString() override {
     QString str = QObject::tr("Connect to Xsheet  : ");
     std::vector<TFxP>::iterator it;
-    for (it = m_fxs.begin(); it != m_fxs.end(); it++) {
+    for (it = m_fxs.begin(); it != m_fxs.end(); ++it) {
       if (it != m_fxs.begin()) str += QString(", ");
       str += QString::fromStdWString((*it)->getFxId());
     }
@@ -1747,7 +1747,7 @@ public:
   QString getHistoryString() override {
     QString str = QObject::tr("Disconnect from Xsheet  : ");
     std::vector<TFxP>::iterator it;
-    for (it = m_fxs.begin(); it != m_fxs.end(); it++) {
+    for (it = m_fxs.begin(); it != m_fxs.end(); ++it) {
       if (it != m_fxs.begin()) str += QString(", ");
       str += QString::fromStdWString((*it)->getFxId());
     }
@@ -2022,7 +2022,7 @@ QString DeleteLinksUndo::getHistoryString() {
   if (!m_normalLinks.empty()) {
     str += QString("  :  ");
     std::list<TFxCommand::Link>::const_iterator it;
-    for (it = m_normalLinks.begin(); it != m_normalLinks.end(); it++) {
+    for (it = m_normalLinks.begin(); it != m_normalLinks.end(); ++it) {
       if (it != m_normalLinks.begin()) str += QString(",  ");
       TFxCommand::Link boundingFxs = *it;
       str +=
@@ -2312,7 +2312,6 @@ QString DeleteFxOrColumnUndo::getHistoryString() {
 static void deleteFxs(const std::list<TFxP> &fxs, TXsheetHandle *xshHandle,
                       TFxHandle *fxHandle) {
   TUndoManager *undoManager = TUndoManager::manager();
-  TXsheet *xsh              = xshHandle->getXsheet();
 
   undoManager->beginBlock();
 
@@ -2721,7 +2720,7 @@ void UndoPasteFxs::for_each_fx(Func func) const {
 QString UndoPasteFxs::getHistoryString() {
   QString str = QObject::tr("Paste Fx  :  ");
   std::list<TFxP>::const_iterator it;
-  for (it = m_fxs.begin(); it != m_fxs.end(); it++) {
+  for (it = m_fxs.begin(); it != m_fxs.end(); ++it) {
     if (it != m_fxs.begin()) str += QString(",  ");
     str += QString("%1").arg(QString::fromStdWString((*it)->getName()));
   }

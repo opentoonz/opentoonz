@@ -1412,8 +1412,8 @@ void TPointShadowFillStyle::deleteSameVerts(
   TRegionOutline::PointVector::iterator it_end = rit->end();
   TRegionOutline::PointVector::iterator it     = it_beg;
   pv.push_back(*it);
-  it++;
-  for (; it != it_end; it++) {
+  ++it;
+  for (; it != it_end; ++it) {
     if (tdistance(*it, pv.back()) > TConsts::epsilon) {
       pv.push_back(*it);
     }
@@ -1476,7 +1476,7 @@ void TPointShadowFillStyle::drawRegion(const TColorFunction *cf,
     std::vector<T3DPointD>::iterator it_last = it_end - 1;
     std::vector<T3DPointD>::iterator it0, it1, it2;
     glBegin(GL_POINTS);
-    for (it1 = it_beg; it1 != it_end; it1++) {
+    for (it1 = it_beg; it1 != it_end; ++it1) {
       it0 = it1 == it_beg ? it_last : it1 - 1;
       it2 = it1 == it_last ? it_beg : it1 + 1;
 
@@ -1516,7 +1516,7 @@ void TPointShadowFillStyle::drawRegion(TFlash &flash, const TRegion *r) const {
     std::vector<T3DPointD>::iterator it_end  = pv.end();
     std::vector<T3DPointD>::iterator it_last = it_end - 1;
     std::vector<T3DPointD>::iterator it0, it1, it2;
-    for (it1 = it_beg; it1 != it_end; it1++) {
+    for (it1 = it_beg; it1 != it_end; ++it1) {
       it0 = it1 == it_beg ? it_last : it1 - 1;
       it2 = it1 == it_last ? it_beg : it1 + 1;
       nbDraw += shadowOnEdge_parallel(
@@ -1539,7 +1539,7 @@ void TPointShadowFillStyle::drawRegion(TFlash &flash, const TRegion *r) const {
     std::vector<T3DPointD>::iterator it_end  = pv.end();
     std::vector<T3DPointD>::iterator it_last = it_end - 1;
     std::vector<T3DPointD>::iterator it0, it1, it2;
-    for (it1 = it_beg; it1 != it_end; it1++) {
+    for (it1 = it_beg; it1 != it_end; ++it1) {
       it0 = it1 == it_beg ? it_last : it1 - 1;
       it2 = it1 == it_last ? it_beg : it1 + 1;
       shadowOnEdge_parallel(flash, TPointD(it0->x, it0->y),
@@ -2855,7 +2855,7 @@ void TChessFillStyle::drawRegion(const TColorFunction *cf,
 
   std::vector<TPointD>::const_iterator it  = grid.begin();
   std::vector<TPointD>::const_iterator ite = grid.end();
-  for (; it != ite; it++) {
+  for (; it != ite; ++it) {
     glPushMatrix();
     glTranslated(it->x, it->y, 0.0);
     glCallList(chessId);
@@ -2899,7 +2899,7 @@ void TChessFillStyle::drawRegion(TFlash &flash, const TRegion *r) const {
 
   std::vector<TPointD>::const_iterator it  = grid.begin();
   std::vector<TPointD>::const_iterator ite = grid.end();
-  for (; it != ite; it++) {
+  for (; it != ite; ++it) {
     TTranslation trM(it->x, it->y);
     std::vector<TPointD> lvert;
     lvert.push_back(trM * vert[0]);
@@ -4547,7 +4547,7 @@ void TMosaicFillStyle::drawRegion(TFlash &flash, const TRegion *r) const {
 
   preaprePos(bbox, pos, posLX, posLY, rand);
 
-  if (pos.size() <= 0) return;
+  if (pos.size() == 0) return;
 
   int nbClip = (posLX - 1) * (posLY - 1) + 1;
   flash.drawRegion(*r, nbClip);
@@ -4951,7 +4951,7 @@ void TPatchFillStyle::drawRegion(TFlash &flash, const TRegion *r) const {
   TPointD quad[4];
 
   preaprePos(bbox, pos, posLX, posLY, rand);
-  if (pos.size() <= 0) return;
+  if (pos.size() == 0) return;
   flash.drawRegion(*r, nbClip(posLX, posLY, pos));
 
   flash.setThickness(0.0);

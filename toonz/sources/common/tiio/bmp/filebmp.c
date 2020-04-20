@@ -331,7 +331,7 @@ int error_checking_bmp(BMP_HEADER *hd)
 int load_bmp_header(FILE *fp, BMP_HEADER **header)
 /*---------------------------------------------------------------------------*/
 {
-  BMP_HEADER *hd = NULL;
+  BMP_HEADER *hd;
   int c, c1;
 
   *header = NULL;
@@ -1755,7 +1755,7 @@ BMP_WRITE_ERROR:
 static int writeBMP1(FILE *fp, UCHAR *pic8, UINT w, UINT h, UCHAR *pc2nc)
 /*---------------------------------------------------------------------------*/
 {
-  UINT i, j, c, bitnum, padw;
+  UINT i, padw;
   UCHAR *pp;
 
   padw = ((w + 31) / 32) * 32; /* 'w', padded to be a multiple of 32 */
@@ -1765,6 +1765,7 @@ static int writeBMP1(FILE *fp, UCHAR *pic8, UINT w, UINT h, UCHAR *pc2nc)
 #ifdef BMP_WRITE_LINE_BY_LINE
     if (line_writeBMP1(fp, pp, w, padw, pc2nc) == FALSE) return FALSE;
 #else
+    UINT j, c, bitnum;
     for (j = bitnum = c = 0; j <= padw; j++, bitnum++) {
       if (bitnum == 8) /* write the next byte */
       {
@@ -1811,7 +1812,7 @@ static int line_writeBMP1(FILE *fp, UCHAR *pic8, UINT w, UINT padw,
 static int writeBMP4(FILE *fp, UCHAR *pic8, UINT w, UINT h, UCHAR *pc2nc)
 /*---------------------------------------------------------------------------*/
 {
-  UINT i, j, c, nybnum, padw;
+  UINT i, padw;
   UCHAR *pp;
 
   padw = ((w + 7) / 8) * 8; /* 'w' padded to a multiple of 8pix (32 bits) */
@@ -1821,6 +1822,7 @@ static int writeBMP4(FILE *fp, UCHAR *pic8, UINT w, UINT h, UCHAR *pc2nc)
 #ifdef BMP_WRITE_LINE_BY_LINE
     if (line_writeBMP4(fp, pp, w, padw, pc2nc) == FALSE) return FALSE;
 #else
+    UINT j, c, nybnum;
     for (j = nybnum = c = 0; j <= padw; j++, nybnum++) {
       if (nybnum == 2) /* write next byte */
       {
@@ -2099,7 +2101,7 @@ static int line_writeBMPC8(FILE *fp, UCHAR *pic8, UINT w, UINT row,
 static int writeBMP24(FILE *fp, UCHAR *pic24, UINT w, UINT h, UCHAR *whence)
 /*---------------------------------------------------------------------------*/
 {
-  UINT i, j, padb;
+  UINT i, padb;
   LPIXEL *pixel;
   UCHAR *pp;
 
@@ -2113,14 +2115,14 @@ static int writeBMP24(FILE *fp, UCHAR *pic24, UINT w, UINT h, UCHAR *whence)
 #ifdef BMP_WRITE_LINE_BY_LINE
     if (line_writeBMP24(fp, pixel, w, padb) == FALSE) return FALSE;
 #else
-    for (j = 0; j < w; j++) {
+    for (UINT j = 0; j < w; j++) {
       putc(pixel->b, fp);
       putc(pixel->g, fp);
       putc(pixel->r, fp);
 
       pixel++;
     }
-    for (j = 0; j < padb; j++) putc(0, fp);
+    for (UINT j = 0; j < padb; j++) putc(0, fp);
 #endif
   }
   if (BMP_FERROR(fp)) return FALSE;

@@ -4688,7 +4688,7 @@ void TZigzagStrokeStyle::drawStroke(TFlash &flash,
 
   flash.setThickness(m_thickness);
   RectVector::const_iterator rvi = rects.begin();
-  for (; rvi != (rects.end() - 1); rvi++) {
+  for (; rvi != (rects.end() - 1); ++rvi) {
     RectVector::const_iterator rvii = rvi + 1;
     TPointD p0((rvi->x0 + rvi->x1) / 2.0, (rvi->y0 + rvi->y1) / 2.0);
     TPointD p1((rvii->x0 + rvii->x1) / 2.0, (rvii->y0 + rvii->y1) / 2.0);
@@ -5001,7 +5001,6 @@ void TFriezeStrokeStyle2::computeData(Points &positions, const TStroke *stroke,
   double phi   = 0;
   double lastW = 0;
   double thick = 1 - m_thick;
-  vector<TPointD> points;
   while (s <= length) {
     double w = stroke->getParameterAtLength(s);
     if (w < lastW) {

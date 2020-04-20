@@ -193,10 +193,9 @@ void SpectrumBar::paintEvent(QPaintEvent *e) {
 void SpectrumBar::mousePressEvent(QMouseEvent *e) {
   QPoint pos = e->pos();
   int x      = pos.x();
-
   // Verifico se esiste una key vicino alla posizione in cui ho cliccato
   int index        = -1;
-  int spectrumSize = m_spectrum.getKeyCount();
+
   if (x < m_x0)
     index = getMinPosKeyIndex();
   else if (x > width() - m_x0)

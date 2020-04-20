@@ -433,7 +433,6 @@ void TXshSoundColumn::getCells(int row, int rowCount, TXshCell cells[]) {
   int ra = row;
   int rb = row + rowCount - 1;
   assert(ra <= rb);
-  TXshCell *dstCell = cells;
   int r;
   for (r = ra; r <= rb; r++) *cells++ = getCell(r);
   checkColumn();
@@ -831,7 +830,6 @@ void TXshSoundColumn::play(TSoundTrackP soundtrack, int s0, int s1, bool loop) {
 void TXshSoundColumn::play(ColumnLevel *columnLevel, int currentFrame) {
   assert(columnLevel);
   TXshSoundLevel *soundLevel = columnLevel->getSoundLevel();
-  int offset                 = 0;
   int startFrame             = currentFrame - columnLevel->getStartFrame();
   int endFrame = soundLevel->getFrameCount() - columnLevel->getEndOffset();
   int spf      = soundLevel->getSamplePerFrame();
@@ -1099,12 +1097,8 @@ TSoundTrackP TXshSoundColumn::getOverallSoundTrack(int fromFrame, int toFrame,
 TSoundTrackP TXshSoundColumn::mixingTogether(
     const std::vector<TXshSoundColumn *> &vect, int fromFrame, int toFrame,
     double fps) {
-  int offset       = 0xffff;
-  long sampleCount = 0;
-  std::vector<TSoundTrackP> tracks;
   TSoundTrackP mix;
-
-  int size = vect.size(), i = 0;
+  int size = vect.size(), j;
 
   ColumnLevel *l = vect[0]->getColumnLevel(0);
   if (!l)        // May happen if the sound level is not
@@ -1121,7 +1115,6 @@ TSoundTrackP TXshSoundColumn::mixingTogether(
   TSoundTrackFormat format = soundLevel->getSoundTrack()->getFormat();
 
   TXshSoundColumn *c = 0;
-  int j;
   for (j = 0; j < size; ++j) {
     TXshSoundColumn *oldC = c;
     c                     = vect[j];

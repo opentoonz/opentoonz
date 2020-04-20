@@ -179,7 +179,6 @@ int KeyframeSetter::createKeyframe(double frame) {
         } else  // easeinpercentage
         {
           m_keyframe.m_speedIn = m_keyframe.m_speedOut = TPointD();
-          double segmentWidth = kb.m_frame - ka.m_frame;
         }
         keyframes[m_kIndex - 1] = ka;
         keyframes[m_kIndex]     = m_keyframe;

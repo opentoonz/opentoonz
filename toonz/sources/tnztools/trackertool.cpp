@@ -385,8 +385,6 @@ bool TrackerTool::pick(int &hookIndex, const TPointD &pos) {
       for(j=0;j<(int)trackerObject->getHooksCount();j++)
       {*/
       TPointD centerPos = hook->getPos(fid);
-      double width      = hook->getTrackerRegionWidth();
-      double height     = hook->getTrackerRegionHeight();
       double distance   = tdistance2(centerPos, pos);
       TPointD localPos  = pos - centerPos;
       TRectD rect       = hook->getTrackerRegion(fid);
@@ -542,8 +540,7 @@ void TrackerTool::leftButtonDrag(const TPointD &pp, const TMouseEvent &e) {
     return;
 
   if (m_dragged == true) {
-    Hook *hook = new Hook();
-    hook       = getHookSet()->getHook(m_hookSelectedIndex);
+    Hook *hook = getHookSet()->getHook(m_hookSelectedIndex);
     if (!hook || hook->isEmpty()) return;
     TPointD deltaPos = pp - m_oldPos;
     m_oldPos         = pp;

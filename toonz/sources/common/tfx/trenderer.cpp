@@ -225,7 +225,7 @@ TRasterP RasterPool::getRaster() {
 
       if (!raster) {
         delete rasItem;
-        m_rasterRepository.erase(it++);
+        m_rasterRepository.erase(++it);
         continue;
       }
 
@@ -1072,9 +1072,6 @@ void RenderTask::onFrameCompleted() {
 
   if (m_fieldRender) {
     assert(rasB);
-
-    double t = m_frames[0];
-
     int f = (m_info.m_fieldPrevalence == TRenderSettings::EvenField) ? 0 : 1;
     interlace(rasA, rasB, f);
     rasB = TRasterP();

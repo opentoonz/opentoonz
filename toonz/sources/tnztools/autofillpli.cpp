@@ -101,10 +101,10 @@ public:
 //---------------------------------------------------------------------------------------------
 
 int match(std::vector<MatchingProbs> &probsVector, int &from, int &to) {
-  int i = 0, maxProb = 0;
+  int maxProb = 0;
   bool overlappingArea = false;
   std::vector<MatchingProbs>::iterator it, matchedProbs;
-  for (it = probsVector.begin(); it != probsVector.end(); it++) {
+  for (it = probsVector.begin(); it != probsVector.end(); ++it) {
     MatchingProbs probs = *it;
     if (probs.m_matched) continue;
     int probValue =
@@ -269,7 +269,7 @@ void rect_autofill_learn(const TVectorImageP &imgToLearn, const TRectD &rect)
   }
 
   QMap<int, Region>::Iterator it;
-  for (it = regionsReference.begin(); it != regionsReference.end(); it++) {
+  for (it = regionsReference.begin(); it != regionsReference.end(); ++it) {
     pbx += it.value().m_barycentre.x;
     pby += it.value().m_barycentre.y;
     totalArea += it.value().m_area;
@@ -314,7 +314,7 @@ bool rect_autofill_apply(const TVectorImageP &imgToApply, const TRectD &rect,
   if (regionsWork.size() <= 0) return false;
 
   QMap<int, Region>::Iterator it;
-  for (it = regionsWork.begin(); it != regionsWork.end(); it++) {
+  for (it = regionsWork.begin(); it != regionsWork.end(); ++it) {
     pbx += it.value().m_barycentre.x;
     pby += it.value().m_barycentre.y;
     totalArea += it.value().m_area;
@@ -346,7 +346,7 @@ bool rect_autofill_apply(const TVectorImageP &imgToApply, const TRectD &rect,
       regionsReference[from].m_match = to;
       regionsWork[to].m_styleId      = regionsReference[from].m_styleId;
       TRegion *reg                   = regionsWork[to].m_region;
-      if (reg && (!selective || (selective && reg->getStyle() == 0))) {
+      if (reg && (!selective || reg->getStyle() == 0)) {
         reg->setStyle(regionsWork[to].m_styleId);
         filledRegions = true;
       }
@@ -391,7 +391,7 @@ void stroke_autofill_learn(const TVectorImageP &imgToLearn, TStroke *stroke) {
   }
 
   QMap<int, Region>::Iterator it;
-  for (it = regionsReference.begin(); it != regionsReference.end(); it++) {
+  for (it = regionsReference.begin(); it != regionsReference.end(); ++it) {
     pbx += it.value().m_barycentre.x;
     pby += it.value().m_barycentre.y;
     totalArea += it.value().m_area;
@@ -444,7 +444,7 @@ bool stroke_autofill_apply(const TVectorImageP &imgToApply, TStroke *stroke,
   if (regionsWork.size() <= 0) return false;
 
   QMap<int, Region>::Iterator it;
-  for (it = regionsWork.begin(); it != regionsWork.end(); it++) {
+  for (it = regionsWork.begin(); it != regionsWork.end(); ++it) {
     pbx += it.value().m_barycentre.x;
     pby += it.value().m_barycentre.y;
     totalArea += it.value().m_area;
@@ -476,7 +476,7 @@ bool stroke_autofill_apply(const TVectorImageP &imgToApply, TStroke *stroke,
       regionsReference[from].m_match = to;
       regionsWork[to].m_styleId      = regionsReference[from].m_styleId;
       TRegion *reg                   = regionsWork[to].m_region;
-      if (reg && (!selective || (selective && reg->getStyle() == 0))) {
+      if (reg && (!selective || reg->getStyle() == 0)) {
         reg->setStyle(regionsWork[to].m_styleId);
         filledRegions = true;
       }

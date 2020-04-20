@@ -37,7 +37,6 @@ void copyStylesWithoutUndo(TPaletteP palette, int pageIndex,
   if (n == 0) return;
   TPalette::Page *page = palette->getPage(pageIndex);
   assert(page);
-  TPaletteHandle *cph = TApp::instance()->getCurrentPalette();
   StyleData *data     = new StyleData();
   std::set<int>::iterator it;
   for (it = styleIndicesInPage->begin(); it != styleIndicesInPage->end();
@@ -550,7 +549,6 @@ public:
     if (!m_palette) return;
     TPalette::Page *page = m_palette->getPage(m_pageIndex);
     if (!page) return;
-    int count = 0;
 
     for (UINT i = 0; i < m_colorStyles.size(); i++) {
       TColorStyle *st = page->getStyle(m_colorStyles[i].first);

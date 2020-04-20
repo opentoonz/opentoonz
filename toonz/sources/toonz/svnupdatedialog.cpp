@@ -223,7 +223,7 @@ void SVNUpdateDialog::checkFiles() {
         (s.m_item == "modified" && s.m_repoStatus == "modified"))
       m_filesWithConflict.prepend(s.m_path);
     else if (s.m_item == "none" || s.m_item == "missing" ||
-             s.m_repoStatus == "modified" || s.m_repoStatus == "modified") {
+             s.m_item == "modified" || s.m_repoStatus == "modified") {
       if (s.m_path.endsWith(".tnz") &&
           (s.m_item == "missing" ||
            (s.m_item == "none" && s.m_repoStatus == "added"))) {

@@ -642,7 +642,6 @@ void SceneViewer::mousePressEvent(QMouseEvent *event) {
   // source can be useful for detecting touch vs mouse,
   // but has reports of being unreliable on mac
   // so m_gestureActive is the marker for rejecting touch events
-  int source = event->source();
   // if this is called just after tabletEvent, skip the execution
   if (m_tabletEvent) return;
   // and touchscreens but not touchpads...

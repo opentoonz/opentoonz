@@ -1632,7 +1632,6 @@ public:
       return;
     }
 
-    TXshSimpleLevel *sl = 0;
     int i               = 0;
     std::vector<TXshSimpleLevel *> simpleLevels;
     /*-- セル選択ContextMenu→Viewコマンドの場合 --*/

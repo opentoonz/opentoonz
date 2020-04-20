@@ -979,10 +979,9 @@ void TColorUtils::buildPrecisePalette(std::set<TPixel32> &palette,
                                       int maxColorCount) {
   int lx   = raster->getLx();
   int ly   = raster->getLy();
-  int wrap = raster->getWrap();
-
   int x, y;
   int count = maxColorCount;
+
   raster->lock();
   for (y = 1; y < ly - 1 && count > 0; y++) {
     TPixel *pix = raster->pixels(y);

@@ -603,7 +603,7 @@ void XsheetViewer::setAutoPanSpeed(const QPoint &speed) {
   m_autoPanSpeed      = speed;
   if (isAutoPanning() && !wasAutoPanning && m_timerId == 0)
     m_timerId = startTimer(40);
-  else if (!isAutoPanning() && wasAutoPanning && m_timerId != 0) {
+  else {
     killTimer(m_timerId);
     m_timerId = 0;
   }
@@ -621,7 +621,7 @@ static int getAutoPanSpeed(int pixels) {
 void XsheetViewer::setAutoPanSpeed(const QRect &widgetBounds,
                                    const QPoint &mousePos) {
   QPoint speed;
-  int limit = 100, factor = 30;
+
   if (mousePos.x() < widgetBounds.left())
     speed.setX(-getAutoPanSpeed(widgetBounds.left() - mousePos.x()));
   else if (mousePos.x() > widgetBounds.right())
@@ -754,7 +754,7 @@ int XsheetViewer::colToTimelineLayerAxis(int layer) const {
   int yBottom = o->colToLayerAxis(layer, fan) +
                 (fan->isActive(layer) ? o->cellHeight() : o->foldedCellSize()) -
                 1;
-  int columnCount = std::max(1, xsh->getColumnCount());
+  //int columnCount = std::max(1, xsh->getColumnCount());
   int layerHeightActual =
       m_columnArea->height() - 2;  // o->colToLayerAxis(columnCount, fan) - 1;
 
@@ -1549,9 +1549,8 @@ void XsheetViewer::onScrubStopped() {
 
 void XsheetViewer::discardNoteWidget() {
   if (m_currentNoteIndex == -1) return;
-  TXshNoteSet *notes = getXsheet()->getNotes();
-  int i;
-  for (i = m_currentNoteIndex + 1; i < m_noteWidgets.size(); i++) {
+
+  for (int i = m_currentNoteIndex + 1; i < m_noteWidgets.size(); i++) {
     XsheetGUI::NoteWidget *w = m_noteWidgets.at(i);
     int index                = w->getNoteIndex();
     w->setNoteIndex(index - 1);

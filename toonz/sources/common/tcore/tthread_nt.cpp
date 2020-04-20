@@ -275,7 +275,7 @@ void TThreadGroupImp::wait() {
   HANDLE *hThreads = new HANDLE[count];
   int id           = 0;
   for (list<TThread *>::iterator it = threads.begin(); it != threads.end();
-       it++, id++) {
+       ++it, id++) {
     TThread *t = *it;
     if (t->m_imp->threadId == 0) t->start();
     hThreads[id] = t->m_imp->threadId;

@@ -1325,6 +1325,7 @@ bool CenterLineVectorizer::linkNextProtoStroke(
   assert(currJunction);
   //	if(dstProtoStroke->m_startJunction == dstProtoStroke->m_endJunction)
   return false;
+#if 0
   if (k == 0 && dstProtoStroke->m_startJunction->m_locked ||
       k == 1 && dstProtoStroke->m_endJunction->m_locked)
     return false;
@@ -1338,7 +1339,7 @@ bool CenterLineVectorizer::linkNextProtoStroke(
   std::vector<ProtoStroke *>::iterator it_candidate = it_e;
   double candidateProbability                       = JOIN_LIMIT;
   int candidate_k;
-  for (it = currJunction->m_protoStrokes.begin(); it != it_e; it++) {
+  for (it = currJunction->m_protoStrokes.begin(); it != it_e; ++it) {
     // erase dstProtoStroke in currJunction
     if (*it == dstProtoStroke) {
       it   = currJunction->m_protoStrokes.erase(it);
@@ -1463,6 +1464,7 @@ bool CenterLineVectorizer::linkNextProtoStroke(
   }
   if (!nextJunction) return false;
   return true;
+#endif
 }
 
 //---------------------------------------------------------
@@ -1695,7 +1697,7 @@ void CenterLineVectorizer::joinJunctions() {
     // currJunction->m_nodes.end());
     std::deque<Node *>::iterator it;
     for (it = currJunction->m_nodes.begin(); it != currJunction->m_nodes.end();
-         it++) {
+         ++it) {
       Node *currNode = *it;
       Node *prevNode = *it;
       Node *nextNode = *it;
@@ -1855,8 +1857,8 @@ void CenterLineVectorizer::createJunctionPolygon(Junction *junction) {
   // CompareJunctionNodes(junction->m_center));
   //	std::reverse(junction->m_nodes.begin(), junction->m_nodes.end());
   // std::deque<Node*>::iterator it, it_temp;
-  std::deque<Node *>::iterator it, it_temp;
-  for (it = junction->m_nodes.begin(); it != junction->m_nodes.end(); it++) {
+  std::deque<Node *>::iterator it;
+  for (it = junction->m_nodes.begin(); it != junction->m_nodes.end(); ++it) {
     int step = 0;
 
     Node *currNode;
@@ -1993,7 +1995,7 @@ bool isFalseBranch(int k, ProtoStroke *protoStroke, int recursionOrder,
           protoStroke->m_endJunction   = 0;
           return true;
         } else if (protoStroke->m_endJunction->m_protoStrokes.size() == 2) {
-          ProtoStroke *nextProtoStroke;
+          ProtoStroke *nextProtoStroke = NULL;
           int next_k;
 
           if (protoStroke->m_endJunction->m_protoStrokes[0] == protoStroke)
@@ -2034,7 +2036,7 @@ bool isFalseBranch(int k, ProtoStroke *protoStroke, int recursionOrder,
           protoStroke->m_endJunction   = 0;
           return true;
         } else if (protoStroke->m_startJunction->m_protoStrokes.size() == 2) {
-          ProtoStroke *nextProtoStroke;
+          ProtoStroke *nextProtoStroke = NULL;
           int next_k;
 
           if (protoStroke->m_startJunction->m_protoStrokes[0] == protoStroke)
@@ -2074,7 +2076,7 @@ bool isFalseBranch(int k, ProtoStroke *protoStroke, int recursionOrder,
 void CenterLineVectorizer::handleJunctions() {
   std::vector<Junction *>::iterator it_junction = m_junctions.begin();
   for (it_junction = m_junctions.begin(); it_junction < m_junctions.end();
-       it_junction++) {
+       ++it_junction) {
     Junction *currJunction = *it_junction;
 
     if (currJunction->m_protoStrokes.empty()) {
@@ -2111,7 +2113,7 @@ it_node!=currJunction->m_nodes.end(); it_node++)
 */
     double size = currJunction->m_protoStrokes.size();
     for (it = currJunction->m_protoStrokes.begin();
-         it != currJunction->m_protoStrokes.end(); it++) {
+         it != currJunction->m_protoStrokes.end(); ++it) {
       if (((*it))->m_startJunction == currJunction &&
           (*it)->m_endJunction == currJunction) {
         currJunction->m_center += 0.5 * (*it)->m_points.front();
@@ -2146,7 +2148,7 @@ it_node!=currJunction->m_nodes.end(); it_node++)
   joinJunctions();
   //	return;
   for (it_junction = m_junctions.begin(); it_junction < m_junctions.end();
-       it_junction++) {
+       ++it_junction) {
     Junction *currJunction = *it_junction;
     if (currJunction->m_center.thick < 2 * THICKNESS_LIMIT)
       currJunction->m_center.thick = 2 * THICKNESS_LIMIT;
@@ -2165,7 +2167,7 @@ it_node!=currJunction->m_nodes.end(); it_node++)
       int candidate1_k, candidate2_k;
       double candidateProbability = JOIN_LIMIT;
       int k, next_k;
-      for (it = currJunction->m_protoStrokes.begin(); it != it_e; it++) {
+      for (it = currJunction->m_protoStrokes.begin(); it != it_e; ++it) {
         if (((*it))->m_startJunction == currJunction)
           k = 0;
         else if ((*it)->m_endJunction == currJunction)
@@ -2180,8 +2182,7 @@ it_node!=currJunction->m_nodes.end(); it_node++)
         }
 
         it_next = it;
-        it_next++;
-        for (; it_next != it_e; it_next++) {
+        for (++it_next; it_next != it_e; ++it_next) {
           double probability;
           if (((*it_next))->m_startJunction == currJunction)
             next_k = 0;
@@ -2262,7 +2263,7 @@ intersected)
 if (true || currJunction->m_nodes.size() <= 12 || currJunction->isConvex()) {
   TThickPoint junctionPoint(currJunction->m_center);
   for (it = currJunction->m_protoStrokes.begin();
-       it != currJunction->m_protoStrokes.end(); it++) {
+       it != currJunction->m_protoStrokes.end(); ++it) {
     assert((*it)->m_startJunction == currJunction ||
            (*it)->m_endJunction == currJunction);
     if ((*it)->m_startJunction == currJunction) {
@@ -2306,7 +2307,7 @@ if (true || currJunction->m_nodes.size() <= 12 || currJunction->isConvex()) {
 
   std::deque<Node *>::iterator it_nodes;
   for (it_nodes = currJunction->m_nodes.begin();
-       it_nodes != currJunction->m_nodes.end(); it_nodes++)
+       it_nodes != currJunction->m_nodes.end(); ++it_nodes)
     region.m_points.push_back(
         TThickPoint(convert((*it_nodes)->m_pixel->m_pos), 0.0));
 
@@ -2316,7 +2317,7 @@ if (true || currJunction->m_nodes.size() <= 12 || currJunction->isConvex()) {
   m_protoRegions.push_back(region);
 
   for (it = currJunction->m_protoStrokes.begin();
-       it != currJunction->m_protoStrokes.end(); it++) {
+       it != currJunction->m_protoStrokes.end(); ++it) {
     if ((*it)->m_startJunction == currJunction &&
         (*it)->m_endJunction == currJunction) {
       if ((*it)->m_points.size() < 10) (*it)->m_points.clear();
@@ -2340,7 +2341,7 @@ if (true || currJunction->m_nodes.size() <= 12 || currJunction->isConvex()) {
 
 void CenterLineVectorizer::createStrokes() {
   std::list<ProtoStroke>::iterator it_centerlines = m_protoStrokes.begin();
-  for (; it_centerlines != m_protoStrokes.end(); it_centerlines++) {
+  for (; it_centerlines != m_protoStrokes.end(); ++it_centerlines) {
     if (!it_centerlines->m_points.empty()) {
       joinProtoStrokes(&(*it_centerlines));
       if (it_centerlines->m_points.size() <= 1) continue;
@@ -2382,7 +2383,7 @@ void CenterLineVectorizer::createStrokes() {
       points.push_back(*it);
       assert(it->thick >= THICKNESS_LIMIT);
       TThickPoint old = *it;
-      for (it++; it != it_centerlines->m_points.end(); ++it) {
+      for (++it; it != it_centerlines->m_points.end(); ++it) {
         assert(it->thick >= THICKNESS_LIMIT);
         TThickPoint point(0.5 * (*it + old), 0.5 * (it->thick + old.thick));
         points.push_back(point);
@@ -2418,7 +2419,7 @@ void CenterLineVectorizer::createStrokes() {
 void CenterLineVectorizer::createRegions() {
   std::list<ProtoRegion>::iterator it_regions;
   for (it_regions = m_protoRegions.begin(); it_regions != m_protoRegions.end();
-       it_regions++) {
+       ++it_regions) {
     assert(it_regions->m_points.size() > 4);
     TStroke *stroke = TStroke::interpolate(it_regions->m_points, 0.1);
     stroke->setSelfLoop();
@@ -2588,7 +2589,7 @@ void OutlineVectorizer::createOutlineStrokes() {
 
   std::list<std::vector<TThickPoint>>::iterator it_outlines =
       m_protoOutlines.begin();
-  for (; it_outlines != m_protoOutlines.end(); it_outlines++) {
+  for (; it_outlines != m_protoOutlines.end(); ++it_outlines) {
     if (it_outlines->size() > 3) {
       std::vector<TThickPoint> points;
       std::vector<TThickPoint>::iterator it;

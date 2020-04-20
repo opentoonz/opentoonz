@@ -353,7 +353,7 @@ continue;
       // once.
       if (it->second.m_tiles.size() == 1 &&
           it->second.m_tiles[0].m_refCount == 1) {
-        Imp::ResourceInstanceDataMap::iterator jt = it++;
+        Imp::ResourceInstanceDataMap::iterator jt = ++it;
         resMap.erase(jt);
         continue;
       }

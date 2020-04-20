@@ -48,7 +48,7 @@ bool FunctionKeyframeNavigator::isKeyframe() const {
 void FunctionKeyframeNavigator::toggle() {
   if (!m_curve) return;
   int frame    = getCurrentFrame();
-  double value = m_curve->getValue(frame);
+
   if (m_curve->isKeyframe(frame))
     KeyframeSetter::removeKeyframeAt(m_curve.getPointer(), frame);
   else {

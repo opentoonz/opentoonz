@@ -318,7 +318,7 @@ void Particles_Engine::roll_particles(
       for (i = 0; i < newparticles; i++) {
         double tmp = values.random_val->getFloat() * myParticles.size();
         std::list<Particle>::iterator it = myParticles.begin();
-        for (int j = 0; j < tmp; j++, it++)
+        for (int j = 0; j < tmp; j++, ++it)
           ;
         {
           int seed     = (int)((std::numeric_limits<int>::max)() *
@@ -662,7 +662,6 @@ void Particles_Engine::do_render(
 
   TRasterP tileRas(tile->getRaster());
 
-  std::string levelid;
   double aim_angle = 0;
   if (values.pathaim_val) {
     double arctan = atan2(part->vy, part->vx);
@@ -846,7 +845,6 @@ void Particles_Engine::fill_array(TTile *ctrl1, int &regioncount,
                                   std::vector<int> &myarray,
                                   std::vector<int> &lista,
                                   std::vector<int> &listb, int threshold) {
-  int pr = 0;
   int i, j;
   int lx, ly;
   lx = ctrl1->getRaster()->getLx();
@@ -858,7 +856,6 @@ void Particles_Engine::fill_array(TTile *ctrl1, int &regioncount,
   TPixel32 *pix = raster32->pixels(0);
   for (i = 0; i < lx; i++) {
     if (pix->m > threshold) {
-      pr++;
       if (!i) {
         (regioncount)++;
         myarray[i] = (regioncount);
@@ -874,7 +871,6 @@ void Particles_Engine::fill_array(TTile *ctrl1, int &regioncount,
       /*TMSG_INFO("j=%d i=%d\n", j, i);*/
       if (pix->m > threshold) {
         std::vector<int> mask(4);
-        pr++;
         /* l,ul,u,ur;*/
         if (i) {
           mask[0] = myarray[i - 1 + lx * j];
@@ -1012,8 +1008,6 @@ void Particles_Engine::fill_single_region(
   int j;
   myregions.resize(1);
   myregions[0].clear();
-  int cc  = 0;
-  int icc = 0;
   raster32->lock();
 
   if (!do_source_gradation) /*- 2階調の場合 -*/
@@ -1023,9 +1017,7 @@ void Particles_Engine::fill_single_region(
       TPixel32 *endPix = pix + raster32->getLx();
       int i            = 0;
       while (pix < endPix) {
-        cc++;
         if (pix->m > threshold) {
-          icc++;
           TPointD tmp;
           tmp.y = j;
           tmp.x = i;
@@ -1049,12 +1041,10 @@ void Particles_Engine::fill_single_region(
       TPixel32 *endPix = pix + raster32->getLx();
       int i            = 0;
       while (pix < endPix) {
-        cc++;
         /*-- アルファの濃度に比例してパーティクルを発生させるための、
                 シンプルな方法。そのピクセルのアルファ値の数だけ「立候補」させる。
         --*/
         if (pix->m > 0) {
-          icc++;
           TPointD tmp;
           tmp.y = j;
           tmp.x = i;

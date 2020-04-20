@@ -588,7 +588,6 @@ public:
       rangeSet->setRange(m_oldRange.first, m_oldRange.second);
       rangeSet->setPlacement(m_oldPlacement);
     }
-    TXsheet *xsh = getXsheet();
     for (int i = 0; i < (int)m_keyframes.size(); i++) {
       TStageObject *stageObject =
           getXsheet()->getStageObject(m_keyframes[i].first);
@@ -602,7 +601,6 @@ public:
   }
 
   void redo() const override {
-    TXsheet *xsh = getXsheet();
     for (int i = 0; i < (int)m_keyframes.size(); i++) {
       TStageObject *stageObject =
           getXsheet()->getStageObject(m_keyframes[i].first);
@@ -737,7 +735,6 @@ void SkeletonTool::drawSkeleton(const Skeleton &skeleton, int row) {
     showBoneIndex.push_back(i);
   }
 
-  bool changingParent = dynamic_cast<ParentChangeTool *>(m_dragTool) != 0;
   TStageObjectId currentObjectId =
       TTool::getApplication()->getCurrentObject()->getObjectId();
   std::string currentHandle = xsh->getStageObject(currentObjectId)->getHandle();
@@ -1145,12 +1142,11 @@ qDebug("
 
   if (m_parentProbeEnabled) {
     // search for the closest hook of the picked column
-    int i = -1, j = -1;
+    int i = -1;
     double minDist2 = snapRadius2;
     for (i = 0; i < (int)otherColumnsHooks.size(); i++) {
       double dist2 = tdistance2(otherColumnsHooks[i].m_pos, m_parentProbe);
       if (dist2 < minDist2) {
-        j           = i;
         minDist2    = dist2;
         otherColumn = otherColumnsHooks[i].m_columnIndex;
       }
@@ -1485,8 +1481,6 @@ void SkeletonTool::draw() {
     if (isCurrent && m_mode.getValue() != BUILD_SKELETON) {
       drawDrawingBrowser(cell, pos);
     }
-
-    bool isActiveChain = bone->isSelected();
 
     glColor3d(0, 1, 0);
     if (ikEnabled) {

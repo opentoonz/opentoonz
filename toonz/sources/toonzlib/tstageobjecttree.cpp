@@ -78,7 +78,7 @@ TStageObjectTree::TStageObjectTreeImp::~TStageObjectTreeImp() {
   for (i = m_pegbarTable.begin(); i != m_pegbarTable.end(); ++i)
     i->second->release();
   std::map<int, TStageObjectSpline *>::iterator it;
-  for (it = m_splines.begin(); it != m_splines.end(); it++)
+  for (it = m_splines.begin(); it != m_splines.end(); ++it)
     it->second->release();
   delete m_grammar;
 }
@@ -414,8 +414,6 @@ void TStageObjectTree::loadData(TIStream &is, TXsheet *xsh) {
       if (pegbar->isGrouped() && m_imp->m_groupIdCount < pegbar->getGroupId())
         m_imp->m_groupIdCount = pegbar->getGroupId();
       is.matchEndTag();
-
-      std::string name = pegbar->getName();
     } else if (tagName == "grid_dimension") {
       is >> m_imp->m_dagGridDimension;
       is.matchEndTag();
@@ -437,7 +435,7 @@ void TStageObjectTree::saveData(TOStream &os, int occupiedColumnCount,
   if (!m_imp->m_splines.empty()) {
     os.openChild("splines");
     std::map<int, TStageObjectSpline *>::iterator it;
-    for (it = m_imp->m_splines.begin(); it != m_imp->m_splines.end(); it++) {
+    for (it = m_imp->m_splines.begin(); it != m_imp->m_splines.end(); ++it) {
       os << it->second;
     }
     os.closeChild();
@@ -564,7 +562,7 @@ int TStageObjectTree::getSplineCount() const { return m_imp->m_splines.size(); }
 TStageObjectSpline *TStageObjectTree::getSpline(int index) const {
   assert(0 <= index && index < getSplineCount());
   std::map<int, TStageObjectSpline *>::iterator it = m_imp->m_splines.begin();
-  for (int i = 0; i < index; i++) it++;
+  for (int i = 0; i < index; i++) ++it;
   return it->second;
 }
 

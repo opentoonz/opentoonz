@@ -230,7 +230,6 @@ return;
     qApp->setOverrideCursor(QCursor(Qt::WaitCursor));
     qApp->processEvents();
 
-    int count           = 0;
     TLevel::Iterator it = level->begin();
 
     for (; it != level->end(); ++it) {
@@ -590,13 +589,13 @@ void convert(const TFilePath &source, const TFilePath &dest,
              const TFrameId &from, const TFrameId &to, double framerate,
              TPropertyGroup *prop, FrameTaskNotifier *frameNotifier,
              const TPixel &bgColor, bool removeDotBeforeFrameNumber) {
-  std::string dstExt = dest.getType(), srcExt = source.getType();
-
   // Load source level structure
   TLevelReaderP lr(source);
   TLevelP level = lr->loadInfo();
 
 #ifdef _WIN32
+  std::string dstExt = dest.getType(), srcExt = source.getType();
+
   if (dstExt == "avi") {
     TDimension res(0, 0);
 

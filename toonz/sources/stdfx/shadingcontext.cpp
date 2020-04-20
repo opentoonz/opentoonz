@@ -47,7 +47,7 @@ public:
 TQOpenGLWidget::TQOpenGLWidget() {}
 
 void TQOpenGLWidget::initializeGL() {
-  QOffscreenSurface *surface = new QOffscreenSurface();
+  // QOffscreenSurface *surface = new QOffscreenSurface();
   // context()->create();
   // context()->makeCurrent(surface);
 }
@@ -210,10 +210,7 @@ void ShadingContext::resize(int lx, int ly,
   if (lx == 0 || ly == 0) {
     m_imp->m_fbo.reset(0);
   } else {
-    bool get                         = m_imp->m_fbo.get();
     QOpenGLContext *currContext      = m_imp->m_context->currentContext();
-    bool yes                         = false;
-    if (currContext) bool yes        = true;
     while (!currContext) currContext = m_imp->m_context->currentContext();
     m_imp->m_fbo.reset(new QOpenGLFramebufferObject(lx, ly, fmt));
     assert(m_imp->m_fbo->isValid());

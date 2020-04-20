@@ -311,7 +311,6 @@ void Room::load(const TFilePath &fp) {
     if (name.canConvert(QVariant::String)) {
       // Allocate panel
       paneObjectName          = name.toString();
-      std::string paneStrName = paneObjectName.toStdString();
       pane = TPanelFactory::createPanel(this, paneObjectName);
       if (SaveLoadQSettings *persistent =
               dynamic_cast<SaveLoadQSettings *>(pane->widget()))
@@ -2045,8 +2044,7 @@ void MainWindow::defineActions() {
       createAction(MI_ResetShift, tr("Reset Shift"), "", MenuViewCommandType);
   shiftTraceAction->setIcon(QIcon(":Resources/shift_and_trace_reset.svg"));
 
-  QAction *GuidedDrawingAction = createToggle(
-      MI_VectorGuidedDrawing, tr("Vector Guided Drawing"), "",
+  createToggle(MI_VectorGuidedDrawing, tr("Vector Guided Drawing"), "",
       Preferences::instance()->isGuidedDrawingEnabled(), MenuViewCommandType);
 
   if (QGLPixelBuffer::hasOpenGLPbuffers())

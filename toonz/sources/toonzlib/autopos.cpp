@@ -226,7 +226,7 @@ found:
 /*---------------------------------------------------------------------------*/
 
 bool do_autoalign(const TRasterImageP &image) {
-  int wrap, lx, ly, mx, my;
+  int wrap, lx, ly;
   int pix_origin, dpix_dx, dpix_dy;
   int strip_width;
 
@@ -243,9 +243,6 @@ bool do_autoalign(const TRasterImageP &image) {
   strip_width = (int)mmToPixel(5.0, dpix);
   lx          = ras->getLx();
   ly          = ras->getLy();
-
-  mx = lx - 1;
-  my = ly - 1;
 
   // assumo  CASE TOR_BOTLEFT:
   pix_origin = 0;
@@ -269,7 +266,7 @@ bool do_autoalign(const TRasterImageP &image) {
 
   ras->unlock();
 
-  return false;
+  return ret;
 }
 
 /*===========================================================================*/
@@ -441,9 +438,10 @@ static int Stack_size       = 0;
   {                                                                            \
     if (Stack_size >= Stack_alloc_size) {                                      \
       Stack_alloc_size += 65500;                                               \
-      Stack =                                                                  \
+      STACK_INFO *__Stack =                                                    \
           (STACK_INFO *)realloc(Stack, Stack_alloc_size * sizeof(STACK_INFO)); \
-      if (!Stack) return;                                                      \
+      if (!__Stack) return;                                                    \
+      Stack = __Stack;                                                         \
     }                                                                          \
     Stack[Stack_size].ret = (RET);                                             \
     Stack[Stack_size].x   = (X);                                               \
@@ -543,8 +541,8 @@ static int find_dots_bw(const TRasterP &img, int strip_width,
     os << "find dots internal error: pegs_side = " << std::hex << pegs_side
        << '\0';
     throw TCleanupException(os.str().c_str());
-    x0 = y0 = xsize = ysize = 0;
-    vertical = false;
+    //x0 = y0 = xsize = ysize = 0;
+    //vertical = false;
   }
   }
   xlast        = x0 + xsize - 1;
@@ -672,8 +670,8 @@ static int find_dots_gr8(const TRasterGR8P &img, int strip_width,
     os << "find dots internal error: pegs_side = " << std::hex << pegs_side
        << '\0';
     throw TCleanupException(os.str().c_str());
-    x0 = y0 = xsize = ysize = 0;
-    vertical = false;
+    //x0 = y0 = xsize = ysize = 0;
+    //vertical = false;
   }
   }
 
@@ -799,9 +797,9 @@ static int find_dots_rgb(const TRaster32P &img, int strip_width,
     os << "find dots internal error: pegs_side = " << std::hex << pegs_side
        << '\0';
     throw TCleanupException(os.str().c_str());
-    x0 = y0 = xsize = ysize = 0;
-    vertical = false;
-    break;
+    //x0 = y0 = xsize = ysize = 0;
+    //vertical = false;
+    //break;
   }
   }
   xlast        = x0 + xsize - 1;

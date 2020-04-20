@@ -131,7 +131,7 @@ void FileBrowserPopup::configureNotify(const TDimension &d) {
 
   y += 20 + 4;
 
-  int x = 200;
+  // int x = 200;
   // m_importTray->setGeometry(x,y,d.lx-1,y+m_importTrayH-4);
 
   // y = y + (m_importTrayH + 8);

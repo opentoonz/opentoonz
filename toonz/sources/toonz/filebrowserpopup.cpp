@@ -1014,13 +1014,13 @@ void LoadLevelPopup::updatePosTo() {
           std::vector<TFrameId>::iterator it;
           int firstFrame = 0;
           int lastFrame  = 0;
-          for (it = fIds.begin(); it != fIds.end(); it++) {
+          for (it = fIds.begin(); it != fIds.end(); ++it) {
             if (xFrom <= it->getNumber()) {
               firstFrame = it->getNumber();
               break;
             }
           }
-          for (it = fIds.begin(); it != fIds.end(); it++) {
+          for (it = fIds.begin(); it != fIds.end(); ++it) {
             if (it->getNumber() <= xTo) {
               lastFrame = it->getNumber();
             }
@@ -1030,7 +1030,7 @@ void LoadLevelPopup::updatePosTo() {
         {
           std::vector<TFrameId>::iterator it;
           int loopAmount = 0;
-          for (it = fIds.begin(); it != fIds.end(); it++) {
+          for (it = fIds.begin(); it != fIds.end(); ++it) {
             if (xFrom <= it->getNumber() && it->getNumber() <= xTo)
               loopAmount++;
           }
@@ -1052,13 +1052,13 @@ void LoadLevelPopup::updatePosTo() {
             TLevel::Iterator it;
             int firstFrame = 0;
             int lastFrame  = 0;
-            for (it = level->begin(); it != level->end(); it++) {
+            for (it = level->begin(); it != level->end(); ++it) {
               if (xFrom <= it->first.getNumber()) {
                 firstFrame = it->first.getNumber();
                 break;
               }
             }
-            for (it = level->begin(); it != level->end(); it++) {
+            for (it = level->begin(); it != level->end(); ++it) {
               if (it->first.getNumber() <= xTo) {
                 lastFrame = it->first.getNumber();
               }
@@ -1068,7 +1068,7 @@ void LoadLevelPopup::updatePosTo() {
           {
             TLevel::Iterator it;
             int loopAmount = 0;
-            for (it = level->begin(); it != level->end(); it++) {
+            for (it = level->begin(); it != level->end(); ++it) {
               if (xFrom <= it->first.getNumber() &&
                   it->first.getNumber() <= xTo)
                 loopAmount++;
@@ -1817,7 +1817,7 @@ bool ReplaceLevelPopup::execute() {
         cell.m_level = xl;
         xsh->setCell(r, *i, cell);
       }
-      i++;
+      ++i;
     }
   }
 
@@ -2097,7 +2097,7 @@ bool ReplaceParentDirectoryPopup::execute() {
         if (!cell.m_level.getPointer()) continue;
         levelsToBeReplaced.push_back(cell.m_level.getPointer());
       }
-      i++;
+      ++i;
     }
   }
 
@@ -2113,7 +2113,7 @@ bool ReplaceParentDirectoryPopup::execute() {
   // rewrite the path in the level settings
   bool somethingChanged                 = false;
   std::vector<TXshLevel *>::iterator it = levelsToBeReplaced.begin();
-  for (; it != levelsToBeReplaced.end(); it++) {
+  for (; it != levelsToBeReplaced.end(); ++it) {
     TFilePath orgPath = (*it)->getPath();
     if (orgPath.isEmpty()) continue;
 
@@ -2135,7 +2135,7 @@ bool ReplaceParentDirectoryPopup::execute() {
       std::vector<TFrameId> frames;
       sl->getFids(frames);
       std::vector<TFrameId>::iterator f_it = frames.begin();
-      for (; f_it != frames.end(); f_it++)
+      for (; f_it != frames.end(); ++f_it)
         IconGenerator::instance()->invalidate(sl, *f_it);
 
       somethingChanged = true;

@@ -121,7 +121,6 @@ bool TCellData::getNumbers(TXsheet *xsh, int r0, int c0, int &r1,
     std::vector<TXshCell> cells = m_cells;
 
     int sourceColIndex  = (oneToMulti) ? 0 : c - c0;
-    int sourceCellIndex = sourceColIndex * m_rowCount;
 
     if (!canChange(column, sourceColIndex)) continue;
 

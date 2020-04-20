@@ -369,7 +369,6 @@ void ParentChangeTool::leftButtonDrag(const TPointD &pos,
 void ParentChangeTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
   TTool::Application *app = TTool::getApplication();
   int currentColumnIndex  = app->getCurrentColumn()->getColumnIndex();
-  int currentFrame        = app->getCurrentFrame()->getFrame();
   TXsheet *xsh            = app->getCurrentScene()->getScene()->getXsheet();
   TStageObjectId objId    = TStageObjectId::ColumnId(currentColumnIndex);
   getTool()->resetParentProbe();
@@ -497,8 +496,7 @@ private:
 
 bool hasPinned(const Skeleton::Bone *bone, const Skeleton::Bone *prevBone) {
   if (!bone) return false;
-  bool isHandle = prevBone == 0;
-  bool isChild  = prevBone != 0 && prevBone == bone->getParent();
+  bool prevBone == 0;
   if (bone->getPinnedStatus() != Skeleton::Bone::FREE) return true;
 
   if (bone->getParent() && bone->getParent() != prevBone &&
@@ -805,7 +803,7 @@ void IKTool::initEngine(const TPointD &pos) {
         break;
       } else {
         Graph::LinkIter it   = links.begin();
-        Skeleton::Bone *next = m_skeleton->getBoneByColumnIndex(*it++);
+        Skeleton::Bone *next = m_skeleton->getBoneByColumnIndex(*++it);
         for (; it != links.end(); ++it)
           stack.push_back(std::make_pair(*it, prev));
         if (links.size() > 1 || (prev && next && (prev->getParent() == bone &&
@@ -937,7 +935,6 @@ void IKTool::storeOldValues() {
 
 void IKTool::apply() {
   if (!m_valid) return;
-  TStageObject *rootObj = m_skeleton->getRootBone()->getStageObject();
   if (!m_undo) {
     m_undo = new IKToolUndo();
     for (int i = 0; i < (int)m_joints.size(); i++)
@@ -1029,7 +1026,6 @@ void IKTool::draw() {
   int err = glGetError();
   assert(err == GL_NO_ERROR);
   TTool::Application *app = TTool::getApplication();
-  int frame               = app->getCurrentFrame()->getFrame();
 
   double unit =
       TTool::getApplication()->getCurrentTool()->getTool()->getPixelSize();

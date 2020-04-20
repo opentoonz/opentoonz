@@ -1076,7 +1076,7 @@ void FlipBook::setLevel(const TFilePath &fp, TPalette *palette, int from,
           // make the fid list to be deleted
           std::vector<TFrameId> deleteList;
           TLevel::Iterator it;
-          for (it = level->begin(); it != level->end(); it++) {
+          for (it = level->begin(); it != level->end(); ++it) {
             // If the fid is not included in the reference list, then delete it
             int i;
             for (i = 0; i < (int)fids.size(); i++) {
@@ -1484,7 +1484,6 @@ void FlipBook::playAudioFrame(int frame) {
     try {
       m_player->play(m_snd, firstSample, lastSample, false, false);
     } catch (TSoundDeviceException &e) {
-      std::string msg;
       if (e.getType() == TSoundDeviceException::UnsupportedFormat) {
         try {
           TSoundTrackFormat fmt =
@@ -1493,7 +1492,6 @@ void FlipBook::playAudioFrame(int frame) {
                          false, false);
         } catch (TSoundDeviceException &ex) {
           throw TException(ex.getMessage());
-          return;
         }
       }
     }
@@ -2152,8 +2150,8 @@ void FlipBook::loadAndCacheAllTlvImages(Level level, int fromFrame,
   // show the wait cursor when loading a level with more than 50 frames
   if (toFrame - fromFrame > 50) QApplication::setOverrideCursor(Qt::WaitCursor);
 
-  int lx = 0, oriLx = 0;
-  if (m_lr->getImageInfo()) lx = oriLx = m_lr->getImageInfo()->m_lx;
+  int lx = 0;
+  if (m_lr->getImageInfo()) lx = m_lr->getImageInfo()->m_lx;
 
   std::string fileName = toQString(fp.withoutParentDir()).toStdString();
 

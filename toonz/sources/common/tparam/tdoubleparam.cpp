@@ -568,15 +568,15 @@ double TDoubleParam::getValue(double frame, bool leftmost) const {
     DoubleKeyframeVector::const_iterator a;
     if (b->m_frame == frame && (b + 1) != keyframes.end()) {
       a = b;
-      b++;
+      ++b;
     } else {
       assert(b != keyframes.begin());
       a = b - 1;
     }
 
     if (leftmost && frame - a->m_frame < 0.00001 && a != keyframes.begin()) {
-      a--;
-      b--;
+      --a;
+      --b;
     }
 
     // segment (a,b) contains frame
@@ -1086,7 +1086,6 @@ is >> m_imp->m_defaultValue;
       // vecchio formato
       if (oldType != 1) continue;
       string text    = is.getTagAttribute("text");
-      string enabled = is.getTagAttribute("enabled");
       TDoubleKeyframe kk1, kk2;
       kk1.m_frame          = -1000;
       kk2.m_frame          = 1000;

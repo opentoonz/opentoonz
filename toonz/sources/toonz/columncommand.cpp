@@ -203,7 +203,6 @@ void cloneNotColumnLinkedFxsAndOutputsFx(TXsheet *xsh, TXsheet *newXsh) {
 //-----------------------------------------------------------------------------
 
 void cloneXsheetTStageObjectTree(TXsheet *xsh, TXsheet *newXsh) {
-  std::set<TStageObjectId> pegbarIds;
   TStageObjectTree *tree    = xsh->getStageObjectTree();
   TStageObjectTree *newTree = newXsh->getStageObjectTree();
   // Ricostruisco l'intero albero
@@ -299,7 +298,6 @@ void deleteColumnsWithoutUndo(std::set<int> *indices,
   }
 
   bool soundColumnRemoved = false;
-  int firstIndex          = *indices->begin();
   std::set<int>::reverse_iterator it;
   for (it = indices->rbegin(); it != indices->rend(); ++it) {
     TXshColumn *column = xsh->getColumn(*it);
@@ -360,13 +358,13 @@ void resetColumns(
   std::list<int> restoredSplineIds;
   data->restoreObjects(*indices, restoredSplineIds, xsh, 0);
   QMap<TFxPort *, TFx *>::const_iterator it;
-  for (it = columnFxLinks.begin(); it != columnFxLinks.end(); it++)
+  for (it = columnFxLinks.begin(); it != columnFxLinks.end(); ++it)
     it.key()->setFx(it.value());
 
   // Devo rimettere le stesse connessioni tra gli stage object
   QMap<TStageObjectId, TStageObjectId>::const_iterator it2;
   for (it2 = columnObjParents.begin(); it2 != columnObjParents.end();
-       it2++) {  // Parents
+       ++it2) {  // Parents
     TStageObject *obj = xsh->getStageObject(it2.key());
     if (obj) {
       obj->setParent(it2.value());
@@ -375,7 +373,7 @@ void resetColumns(
 
   QMap<TStageObjectId, QList<TStageObjectId>>::const_iterator it3;
   for (it3 = columnObjChildren.begin(); it3 != columnObjChildren.end();
-       it3++) {  // Children
+       ++it3) {  // Children
     QList<TStageObjectId> children = it3.value();
     int i;
     for (i = 0; i < children.size(); i++) {
@@ -480,7 +478,7 @@ public:
     m_data->storeColumns(indices, xsh, 0);
     m_data->storeColumnFxs(indices, xsh, 0);
     std::set<int>::iterator it;
-    for (it = m_indices.begin(); it != m_indices.end(); it++) {
+    for (it = m_indices.begin(); it != m_indices.end(); ++it) {
       TXshColumn *column = xsh->getColumn(*it);
       if (!column || !column->getFx()) continue;
       TFx *fx = column->getFx();
@@ -514,7 +512,7 @@ public:
     QString str = QObject::tr("Paste Column :  ");
 
     std::set<int>::iterator it;
-    for (it = m_indices.begin(); it != m_indices.end(); it++) {
+    for (it = m_indices.begin(); it != m_indices.end(); ++it) {
       if (it != m_indices.begin()) str += QString(", ");
       str += QString("Col%1").arg(QString::number((*it) + 1));
     }
@@ -611,7 +609,7 @@ public:
     QString str = QObject::tr("Delete Column :  ");
 
     std::set<int>::iterator it;
-    for (it = m_indices.begin(); it != m_indices.end(); it++) {
+    for (it = m_indices.begin(); it != m_indices.end(); ++it) {
       if (it != m_indices.begin()) str += QString(", ");
       str += QString("Col%1").arg(QString::number((*it) + 1));
     }
@@ -658,7 +656,7 @@ public:
     QString str = QObject::tr("Insert Column :  ");
 
     std::vector<std::pair<int, int>>::iterator it;
-    for (it = m_columnBlocks.begin(); it != m_columnBlocks.end(); it++) {
+    for (it = m_columnBlocks.begin(); it != m_columnBlocks.end(); ++it) {
       if (it != m_columnBlocks.begin()) str += QString(", ");
       str += QString("Col%1").arg(QString::number((*it).first + 1));
     }
@@ -675,9 +673,6 @@ private:
 
 void InsertEmptyColumnsUndo::initialize(const std::vector<int> &indices,
                                         bool insertAfter) {
-  TApp *app    = TApp::instance();
-  TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
-
   std::vector<int>::const_iterator cb, ce, cEnd = indices.end();
 
   for (cb = indices.begin(); cb != cEnd; cb = ce)  // As long as block end is ok

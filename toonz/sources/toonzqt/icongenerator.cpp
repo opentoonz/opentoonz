@@ -337,8 +337,7 @@ TRaster32P convertToIcon(TRasterImageP rimage, const TDimension &iconSize) {
   if (!rimage) return TRaster32P();
 
   TRasterP ras = rimage->getRaster();
-
-  if (!(TRaster32P)ras && !(TRasterGR8P)ras) return TRaster32P();
+  if (!ras) return TRaster32P();
 
   if (ras->getSize() == iconSize) return ras;
 

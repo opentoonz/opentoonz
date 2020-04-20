@@ -435,7 +435,6 @@ CommandBarPopup::CommandBarPopup(bool isXsheetToolbar)
   noticeLabel->setFont(nf);
 
   //--- layout
-  QVBoxLayout* mainLay = new QVBoxLayout();
   m_topLayout->setMargin(0);
   m_topLayout->setSpacing(0);
   {

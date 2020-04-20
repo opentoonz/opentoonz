@@ -288,7 +288,7 @@ void LineTestViewer::paintRaster(TRasterP ras) {
   vertices[9]  = w;
   vertices[10] = h;
 
-  int dataSize = w * h * 4;
+  //int dataSize = w * h * 4;
 
   // timer.stop();
   // timer2.stop();
@@ -777,7 +777,6 @@ void LineTestViewer::zoomQt(const QPoint &center, double factor) {
 //-----------------------------------------------------------------------------
 
 void LineTestViewer::zoomQt(bool forward, bool reset) {
-  int i;
   double normalZoom = sqrt(getNormalZoomScale().det());
   double scale2     = m_viewAffine.det();
   if (reset ||

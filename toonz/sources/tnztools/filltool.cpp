@@ -864,7 +864,7 @@ void fillAreaWithUndo(const TImageP &img, const TRectD &area, TStroke *stroke,
   } else if (TVectorImageP vi = img) {
     TPalette *palette = vi->getPalette();
     assert(palette);
-    const TColorStyle *style = palette->getStyle(cs);
+    // const TColorStyle *style = palette->getStyle(cs);
     // if( !style->isRegionStyle() )
     // return;
 
@@ -927,7 +927,7 @@ void doFill(const TImageP &img, const TPointD &pos, FillParameters &params,
     TTileSetCM32 *tileSet = new TTileSetCM32(ras->getSize());
     TTileSaverCM32 tileSaver(ras, tileSet);
     TDimension imageSize = ti->getSize();
-    TPointD p(imageSize.lx % 2 ? 0.0 : 0.5, imageSize.ly % 2 ? 0.0 : 0.5);
+    TPointD p((imageSize.lx % 2) ? 0.0 : 0.5, (imageSize.ly % 2) ? 0.0 : 0.5);
 
     /*-- params.m_p = convert(pos-p)では、マイナス座標でずれが生じる --*/
     TPointD tmp_p = pos - p;
@@ -1032,10 +1032,10 @@ void SequencePainter::processSequence(TXshSimpleLevel *sl, TFrameId firstFid,
   sl->getFids(allFids);
 
   std::vector<TFrameId>::iterator i0 = allFids.begin();
-  while (i0 != allFids.end() && *i0 < firstFid) i0++;
+  while (i0 != allFids.end() && *i0 < firstFid) ++i0;
   if (i0 == allFids.end()) return;
   std::vector<TFrameId>::iterator i1 = i0;
-  while (i1 != allFids.end() && *i1 <= lastFid) i1++;
+  while (i1 != allFids.end() && *i1 <= lastFid) ++i1;
   assert(i0 < i1);
   std::vector<TFrameId> fids(i0, i1);
   int m = fids.size();

@@ -71,7 +71,6 @@ NotePopup::NotePopup(XsheetViewer *viewer, int noteIndex)
 
   QString text;
   TPixel32 color;
-  int colorIndex = 0;
   if (m_noteIndex < 0) {
     text  = QString();
     color = getColors().at(0);

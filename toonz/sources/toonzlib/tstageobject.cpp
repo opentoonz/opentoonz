@@ -684,7 +684,6 @@ void TStageObject::setSpline(TStageObjectSpline *spline) {
 
 void TStageObject::setStatus(Status status) {
   if (m_status == status) return;
-  bool oldPathEnabled = isPathEnabled();
   bool oldUppkEnabled = isUppkEnabled();
   m_status            = status;
   bool pathEnabled    = isPathEnabled();
@@ -1809,10 +1808,10 @@ void TStageObject::loadData(TIStream &is) {
   if (tnzVersion < VersionNumber(1, 16) && !keyframes.empty()) {
     std::map<int, TStageObject::Keyframe>::iterator itKf = keyframes.begin();
     std::set<int> keyframeIndexSet;
-    for (; itKf != keyframes.end(); itKf++)
+    for (; itKf != keyframes.end(); ++itKf)
       if (is52FullKeyframe(itKf->first)) keyframeIndexSet.insert(itKf->first);
     std::set<int>::iterator itKfInd = keyframeIndexSet.begin();
-    for (; itKfInd != keyframeIndexSet.end(); itKfInd++)
+    for (; itKfInd != keyframeIndexSet.end(); ++itKfInd)
       setkey(m_scale, *itKfInd);
   }
   updateKeyframes();

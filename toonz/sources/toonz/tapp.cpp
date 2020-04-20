@@ -614,8 +614,8 @@ void TApp::onLevelColorStyleSwitched() {
       s.m_blackBgCheck      = mask & ToonzCheck::eBlackBg;
       s.m_transparencyCheck = mask & ToonzCheck::eTransparency;
       s.m_inksOnly          = mask & ToonzCheck::eInksOnly;
-      s.m_inkIndex   = mask & ToonzCheck::eInk ? tc->getColorIndex() : -1;
-      s.m_paintIndex = mask & ToonzCheck::ePaint ? tc->getColorIndex() : -1;
+      s.m_inkIndex   = (mask & ToonzCheck::eInk) ? tc->getColorIndex() : -1;
+      s.m_paintIndex = (mask & ToonzCheck::ePaint) ? tc->getColorIndex() : -1;
 
       IconGenerator::instance()->setSettings(s);
 

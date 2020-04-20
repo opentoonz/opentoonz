@@ -244,7 +244,7 @@ void TThreadGroupImp::wait() {
   ULONG count = threads.size();
 
   for (list<TThread *>::iterator it = threads.begin(); it != threads.end();
-       it++) {
+       ++it) {
     TThread *t = *it;
     t->start();
   }

@@ -725,8 +725,6 @@ QMenu *CastBrowser::getContextMenu(QWidget *parent, int index) {
   bool paletteSelected     = false;
   bool vectorLevelSelected = false;
   bool meshLevelSelected   = false;
-  bool otherFileSelected   = false;
-  int levelSelectedCount   = 0;
   for (it = indices.begin(); it != indices.end(); ++it) {
     int index = *it;
     if (index < 0 || index >= m_castItems->getItemCount())
@@ -739,13 +737,10 @@ QMenu *CastBrowser::getContextMenu(QWidget *parent, int index) {
         audioSelected = true;
       continue;
     }
-    levelSelectedCount++;
     if (sl->getType() == PLI_XSHLEVEL)
       vectorLevelSelected = true;
     else if (sl->getType() == MESH_XSHLEVEL)
       meshLevelSelected = true;
-    else
-      otherFileSelected = true;
   }
   QMenu *menu        = new QMenu(parent);
   CommandManager *cm = CommandManager::instance();

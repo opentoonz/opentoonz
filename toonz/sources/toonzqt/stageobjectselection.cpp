@@ -48,7 +48,7 @@ public:
       , m_fxHandle(fxHandle)
       , m_pastedPos(pastedPos) {
     std::vector<TStageObjectId>::const_iterator it;
-    for (it = m_pastedId.begin(); it != m_pastedId.end(); it++) {
+    for (it = m_pastedId.begin(); it != m_pastedId.end(); ++it) {
       if (it->isColumn()) {
         TXsheet *xsh       = m_xshHandle->getXsheet();
         TXshColumnP column = xsh->getColumn(it->getIndex());
@@ -82,7 +82,7 @@ public:
     QMap<TStageObjectId, QList<TFxPort *>>::const_iterator it;
     TXsheet *xsh = m_xshHandle->getXsheet();
     for (it = m_columnFxConnections.begin(); it != m_columnFxConnections.end();
-         it++) {
+         ++it) {
       TXshColumnP column = xsh->getColumn(it.key().getIndex());
       assert(column);
       TFx *columnFx          = column->getFx();
@@ -100,7 +100,7 @@ public:
   QString getHistoryString() override {
     QString str                              = QObject::tr("Paste Object  ");
     std::vector<TStageObjectId>::iterator it = m_pastedId.begin();
-    for (; it != m_pastedId.end(); it++) {
+    for (; it != m_pastedId.end(); ++it) {
       if (it != m_pastedId.begin()) str += QString::fromStdString(", ");
       str += QString::fromStdString((*it).toString());
     }
@@ -301,7 +301,7 @@ void StageObjectSelection::ungroupSelection() {
 
   TUndoManager::manager()->beginBlock();
   QSet<int>::iterator it;
-  for (it = idSet.begin(); it != idSet.end(); it++)
+  for (it = idSet.begin(); it != idSet.end(); ++it)
     TStageObjectCmd::ungroup(*it, m_xshHandle);
   TUndoManager::manager()->endBlock();
   selectNone();
@@ -328,7 +328,6 @@ void StageObjectSelection::explodeChild() {
 
 void StageObjectSelection::copySelection() {
   StageObjectsData *data = new StageObjectsData();
-  bool pegSelected       = false;
   data->storeObjects(
       m_selectedObjects.toVector().toStdVector(), m_xshHandle->getXsheet(),
       StageObjectsData::eDoClone | StageObjectsData::eResetFxDagPositions);

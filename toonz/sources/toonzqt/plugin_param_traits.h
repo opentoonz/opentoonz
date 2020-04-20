@@ -474,7 +474,7 @@ inline int check_traits_sanity_<toonz_param_traits_double_t>(
   const toonz_param_traits_double_t &t = desc->traits.d;
   err |= check_pollution_(t);
   if (t.min > t.max) err |= TOONZ_PARAM_ERROR_MIN_MAX;
-  return 0;
+  return err;
 }
 
 template <>

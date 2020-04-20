@@ -1388,7 +1388,7 @@ void OutputSettingsPopup::updatePresetComboItems() {
   if (!fs.doesExist()) TSystem::mkDir(folder);
 
   TFilePathSet paths = TSystem::readDirectory(folder);
-  for (TFilePathSet::iterator it = paths.begin(); it != paths.end(); it++) {
+  for (TFilePathSet::iterator it = paths.begin(); it != paths.end(); ++it) {
     std::cout << it->getName() << std::endl;
     m_presetCombo->addItem(QString::fromStdString(it->getName()));
   }

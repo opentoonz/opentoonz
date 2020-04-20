@@ -443,7 +443,6 @@ void PageViewer::drawColorChip(QPainter &p, QRect &chipRect,
 void PageViewer::drawColorName(QPainter &p, QRect &nameRect, TColorStyle *style,
                                int styleIndex) {
   if (m_viewMode == SmallChips && style->getFlags() == 0) return;
-  TPalette *palette = (m_page) ? m_page->getPalette() : 0;
 
   QString name = QString::fromStdWString(style->getName());
   if (m_viewMode == List) {
@@ -908,7 +907,6 @@ void PageViewer::resizeEvent(QResizeEvent *) { computeSize(); }
                 */
 void PageViewer::mousePressEvent(QMouseEvent *event) {
   if (!m_page) return;
-  TPalette *palette = m_page->getPalette();
   QPoint pos        = event->pos();
   int indexInPage   = posToIndex(pos);
   m_startDrag       = false;
@@ -1005,7 +1003,6 @@ void PageViewer::mouseMoveEvent(QMouseEvent *event) {
 
 void PageViewer::mouseReleaseEvent(QMouseEvent *event) {
   if (!m_page) return;
-  TPalette *palette = m_page->getPalette();
   QPoint pos        = event->pos();
   int indexInPage   = posToIndex(pos);
   if (m_startDrag && m_dropPositionIndex == -1 &&
@@ -1048,7 +1045,7 @@ void PageViewer::mouseDoubleClickEvent(QMouseEvent *e) {
 //-----------------------------------------------------------------------------
 void PageViewer::createMenuAction(QMenu &menu, const char *id, QString name,
                                   const char *slot) {
-  bool ret     = true;
+  bool ret;
   QAction *act = menu.addAction(name);
   std::string slotName(slot);
   slotName = std::string("1") + slotName;

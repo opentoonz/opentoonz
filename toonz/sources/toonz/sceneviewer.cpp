@@ -294,7 +294,7 @@ void invalidateIcons() {
     s.m_inkIndex = tc->getColorIndex();
   else
     s.m_inkIndex = -1;
-  s.m_paintIndex = mask & ToonzCheck::ePaint ? tc->getColorIndex() : -1;
+  s.m_paintIndex = (mask & ToonzCheck::ePaint) ? tc->getColorIndex() : -1;
   IconGenerator::instance()->setSettings(s);
 
    // Force icons to refresh
@@ -1308,8 +1308,6 @@ void SceneViewer::drawDisableScissor() {
 //-----------------------------------------------------------------------------
 
 void SceneViewer::drawBackground() {
-  TApp *app         = TApp::instance();
-  ToonzScene *scene = app->getCurrentScene()->getScene();
 
   if (m_visualSettings.m_colorMask == 0) {
     TPixel32 bgColor;

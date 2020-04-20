@@ -180,7 +180,7 @@ public:
   DeleteFolderUndo(const TFilePath &path, const TFilePathSet &pathSet)
       : m_path(path), m_pathSet(pathSet), m_paletteList() {
     for (TFilePathSet::const_iterator it = m_pathSet.begin();
-         it != m_pathSet.end(); it++) {
+         it != m_pathSet.end(); ++it) {
       TFilePath path = *it;
       if (path.getType() == "tpl")
         m_paletteList.push_back(StudioPalette::instance()->getPalette(path));
@@ -192,7 +192,7 @@ public:
                                             m_path.getWideName());
     int paletteCount = -1;
     for (TFilePathSet::const_iterator it = m_pathSet.begin();
-         it != m_pathSet.end(); it++) {
+         it != m_pathSet.end(); ++it) {
       TFilePath path = *it;
       if (path.getType() == "tpl")  // Is a palette
         StudioPalette::instance()->setPalette(
@@ -634,15 +634,6 @@ void StudioPaletteCmd::updateAllLinkedStyles(TPaletteHandle *paletteHandle,
     TPalette *palette = sl->getPalette();
     if (palette) {
       somethingChanged = somethingChanged | sp->updateLinkedColors(palette);
-      if (sl->getType() == TZP_XSHLEVEL) {
-        std::vector<TFrameId> fids;
-        sl->getFids(fids);
-        std::vector<TFrameId>::iterator it;
-        for (it = fids.begin(); it != fids.end(); ++it) {
-          TFrameId fid   = *it;
-          std::string id = sl->getImageId(fid);
-        }
-      }
     }
   }
   if (!paletteHandle || !paletteHandle->getPalette()) return;

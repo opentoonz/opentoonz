@@ -229,8 +229,6 @@ void IncrementUndo::undo() const {
 void TCellSelection::incrementCells() {
   if (isEmpty() || areAllColSelectedLocked()) return;
 
-  TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
-
   std::unique_ptr<IncrementUndo> undo(new IncrementUndo(
       m_range.m_r0, m_range.m_c0, m_range.m_r1, m_range.m_c1));
 
@@ -695,7 +693,7 @@ void TColumnSelection::reframeCells(int count) {
       TApp::instance()->getCurrentXsheet()->getXsheet()->getFrameCount();
   std::vector<int> colIndeces;
   std::set<int>::const_iterator it;
-  for (it = m_indices.begin(); it != m_indices.end(); it++)
+  for (it = m_indices.begin(); it != m_indices.end(); ++it)
     colIndeces.push_back(*it);
 
   ReframeUndo *undo = new ReframeUndo(0, rowCount - 1, colIndeces, count);
@@ -761,7 +759,7 @@ void TColumnSelection::reframeWithEmptyInbetweens() {
       TApp::instance()->getCurrentXsheet()->getXsheet()->getFrameCount();
   std::vector<int> colIndeces;
   std::set<int>::const_iterator it;
-  for (it = m_indices.begin(); it != m_indices.end(); it++)
+  for (it = m_indices.begin(); it != m_indices.end(); ++it)
     colIndeces.push_back(*it);
 
   if (!m_reframePopup) m_reframePopup = new ReframePopup();
@@ -1433,8 +1431,6 @@ TXshSimpleLevel *CloneLevelUndo::cloneLevel(
   // in the selection
   std::set<TFrameId>::const_iterator ft, fEnd(frames.end());
   for (ft = frames.begin(); ft != fEnd; ++ft) {
-    const TFrameId &fid = *ft;
-
     TImageP img = srcSl->getFullsampledFrame(*ft, ImageManager::dontPutInCache);
     if (!img) continue;
 
@@ -1709,7 +1705,7 @@ void TCellSelection::shiftKeyframes(int direction) {
     if (!keyframes.size()) continue;
     int row = m_range.m_r0;
     for (TStageObject::KeyframeMap::iterator it = keyframes.begin();
-         it != keyframes.end(); it++) {
+         it != keyframes.end(); ++it) {
       if (it->first < m_range.m_r0) continue;
       row = it->first;
       cellKeyframeSelection->selectCellsKeyframes(row, col,

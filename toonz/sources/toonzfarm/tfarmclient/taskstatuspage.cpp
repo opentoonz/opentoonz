@@ -369,7 +369,7 @@ if(taskItem)
     }
 
     vector<string>::iterator it = tasks.begin();
-    for (; it != tasks.end(); it++) {
+    for (; it != tasks.end(); ++it) {
       bool old  = false;
       int count = item->getItemCount();
       for (int i = 0; i < count; ++i) {

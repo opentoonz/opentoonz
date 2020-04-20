@@ -473,8 +473,8 @@ int establish(unsigned short portnum, int &sock) {
     closesocket(sock);
     return err;
 #else
-    return errno;
     close(sock);
+    return errno;
 #endif
   }
 

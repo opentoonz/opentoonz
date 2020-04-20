@@ -68,7 +68,6 @@ void TCellKeyframeSelection::copyCellsKeyframes() {
   }
   // Copy keyframes
   if (!isEmpty()) {
-    QClipboard *clipboard       = QApplication::clipboard();
     TXsheet *xsh                = m_xsheetHandle->getXsheet();
     TKeyframeData *keyframeData = new TKeyframeData();
     TKeyframeData::Position startPos(r0, c0);

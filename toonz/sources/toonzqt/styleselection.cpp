@@ -237,7 +237,7 @@ void insertStylesWithoutUndo(TPalette *palette, TPaletteHandle *pltHandle,
   // comincio a fare paste
   std::set<int>::iterator it = styleIndicesInPage->begin();
   int i;
-  for (i = 0; i < data->getStyleCount(); i++, it++) {
+  for (i = 0; i < data->getStyleCount(); i++, ++it) {
     styleId            = data->getStyleIndex(i);
     TColorStyle *style = data->getStyle(i)->clone();
     palette->setStyle(styleId, style);
@@ -861,7 +861,7 @@ public:
   void addItemToInsert(const std::set<int> styleIndicesInPage) {
     TPalette::Page *page = getPalette()->getPage(m_pageIndex);
     std::set<int>::const_iterator it;
-    for (it = styleIndicesInPage.begin(); it != styleIndicesInPage.end(); it++)
+    for (it = styleIndicesInPage.begin(); it != styleIndicesInPage.end(); ++it)
       m_itemsInserted.push_back(new Item(*it, page->getStyle(*it)));
   }
 
@@ -1258,7 +1258,6 @@ public:
     if (!m_palette) return;
     TPalette::Page *page = m_palette->getPage(m_pageIndex);
     if (!page) return;
-    int count = 0;
 
     for (UINT i = 0; i < m_colorStyles.size(); i++) {
       TColorStyle *st = page->getStyle(m_colorStyles[i].first);
@@ -1402,7 +1401,6 @@ public:
     assert(page);
     int i;
     for (i = 0; i < (int)m_styles.size(); i++) {
-      ColorStyleData data   = m_styles[i];
       int styleId           = page->getStyleId(m_styles[i].m_indexInPage);
       TColorStyle *oldStyle = m_styles[i].m_oldStyle;
       m_palette->setStyle(styleId, oldStyle->clone());
@@ -1446,9 +1444,6 @@ void TStyleSelection::toggleLink() {
   if (isEmpty() || palette->isLocked()) return;
   int n = m_styleIndicesInPage.size();
   if (n <= 0) return;
-
-  std::vector<std::pair<int, std::wstring>> oldColorStylesLinked;
-  std::vector<std::pair<int, std::wstring>> newColorStylesLinked;
 
   bool somethingHasBeenLinked    = false;
   bool somethingChanged          = false;
@@ -1513,9 +1508,6 @@ void TStyleSelection::eraseToggleLink() {
   TPalette::Page *page = palette->getPage(m_pageIndex);
   assert(page);
 
-  std::vector<std::pair<int, std::wstring>> oldColorStylesLinked;
-  std::vector<std::pair<int, std::wstring>> newColorStylesLinked;
-
   UndoLinkToStudioPalette *undo =
       new UndoLinkToStudioPalette(m_paletteHandle, m_pageIndex);
 
@@ -1548,7 +1540,6 @@ void TStyleSelection::eraseToggleLink() {
 void TStyleSelection::toggleKeyframe(int frame) {
   TPalette *palette = getPalette();
   if (!palette || m_pageIndex < 0) return;
-  int n                = m_styleIndicesInPage.size();
   TPalette::Page *page = palette->getPage(m_pageIndex);
   assert(page);
   for (std::set<int>::iterator it = m_styleIndicesInPage.begin();

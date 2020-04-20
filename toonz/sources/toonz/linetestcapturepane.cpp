@@ -247,7 +247,6 @@ void LineTestImageViewer::zoomQt(const QPoint &center, double factor) {
 //-----------------------------------------------------------------------------
 
 void LineTestImageViewer::zoomQt(bool forward, bool reset) {
-  int i;
   double normalZoom = sqrt(getNormalZoomScale().det());
   double scale2     = m_viewAffine.det();
   if (reset ||
@@ -362,11 +361,9 @@ void LineTestImageViewer::paintEvent(QPaintEvent *e) {
   if (capturePanelFieldGuideToggle.getStatus()) {
     TSceneProperties *sprop =
         TApp::instance()->getCurrentScene()->getScene()->getProperties();
-    double f              = 1;
     int n                 = sprop->getFieldGuideSize();
     if (n < 4) n          = 4;
     double ar             = sprop->getFieldGuideAspectRatio();
-    double cameraAr       = camera->getAspectRatio();
     TDimensionD cameraDpi = camera->getSize();
     double ux             = (double)res.lx / cameraDpi.lx * 0.5;
     double uy             = ux / ar;
@@ -1141,7 +1138,6 @@ void LineTestCapturePane::initializeTitleBar(TPanelTitleBar *titleBar) {
   bool ret = true;
 
   int x         = -50;
-  int iconWidth = 20;
   TPanelTitleBarButton *button;
   button = new TPanelTitleBarButton(titleBar, ":Resources/pane_freeze_off.svg",
                                     ":Resources/pane_freeze_over.svg",

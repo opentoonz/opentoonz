@@ -828,7 +828,6 @@ void SizeFxGadget::draw(bool picking) {
   glDisable(GL_LINE_STIPPLE);
   drawDot(lx, ly);
 
-  double d = getPixelSize() * 3;
   glPopName();
   if (isSelected()) {
     drawTooltip(TPointD(lx, ly), getLabel());

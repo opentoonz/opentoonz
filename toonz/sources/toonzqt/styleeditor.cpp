@@ -1608,10 +1608,6 @@ PlainColorPage::PlainColorPage(QWidget *parent)
 //-----------------------------------------------------------------------------
 
 void PlainColorPage::resizeEvent(QResizeEvent *) {
-  int w = width();
-  int h = height();
-
-  int parentW = parentWidget()->width();
 }
 
 //-----------------------------------------------------------------------------
@@ -2149,12 +2145,10 @@ void TextureStyleChooserPage::loadItems() {
     return;
   }
   if (fps.empty()) return;
-  int count = 0;
-  for (TFilePathSet::iterator it = fps.begin(); it != fps.end(); it++)
+  for (TFilePathSet::iterator it = fps.begin(); it != fps.end(); ++it)
     if (TFileType::getInfo(*it) == TFileType::RASTER_IMAGE) {
       try {
         loadTexture(*it);
-        ++count;
       } catch (...) {
       }
     }
@@ -2330,8 +2324,6 @@ bool SpecialStyleChooserPage::m_loaded(false);
 void SpecialStyleChooserPage::loadItems() {
   std::vector<int> tags;
   TColorStyle::getAllTags(tags);
-
-  int chipCount = 0;
 
   for (int j = 0; j < (int)tags.size(); j++) {
     int tagId = tags[j];
@@ -2519,7 +2511,7 @@ m_index) == value)
 
 SettingsPage::SettingsPage(QWidget *parent)
     : QScrollArea(parent), m_updating(false) {
-  bool ret = true;
+  bool ret;
 
   setObjectName("styleEditorPage");  // It is necessary for the styleSheet
   setFrameStyle(QFrame::StyledPanel);

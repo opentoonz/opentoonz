@@ -272,7 +272,6 @@ void RowArea::drawPlayRangeBackground(QPainter &p, int r0, int r1) {
   if (!XsheetGUI::isPlayRangeEnabled()) return;
 
   const Orientation *o = m_viewer->orientation();
-  TXsheet *xsh         = m_viewer->getXsheet();
   int frameAdj         = m_viewer->getFrameZoomAdjustment();
   QRect playRangeRect  = o->rect(PredefinedRect::PLAY_RANGE);
 
@@ -392,8 +391,6 @@ void RowArea::drawStopMotionCameraIndicator(QPainter &p) {
 #endif
 
 void RowArea::drawOnionSkinBackground(QPainter &p, int r0, int r1) {
-  const Orientation *o = m_viewer->orientation();
-
   int frameAdj = m_viewer->getFrameZoomAdjustment();
 
   for (int r = r0; r <= r1; r++) {
@@ -1031,7 +1028,6 @@ void RowArea::mouseMoveEvent(QMouseEvent *event) {
   }
 
   m_row = m_viewer->xyToPosition(pos).frame();
-  int x = pos.x();
 
   if ((event->buttons() & Qt::LeftButton) != 0 &&
       !visibleRegion().contains(pos)) {

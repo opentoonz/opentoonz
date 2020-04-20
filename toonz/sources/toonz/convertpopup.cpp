@@ -538,7 +538,6 @@ QString ConvertPopup::getTlvMode() const { return m_tlvMode->currentText(); }
 //-----------------------------------------------------------------------------
 
 QFrame *ConvertPopup::createSvgSettings() {
-  bool ret = true;
   QHBoxLayout *hLayout;
   QFrame *frame        = new QFrame();
   QVBoxLayout *vLayout = new QVBoxLayout();
@@ -707,8 +706,6 @@ void ConvertPopup::onAntialiasSelected(int index) {
 void ConvertPopup::onFileInChanged() {
   assert(m_convertFileFld);
   std::vector<TFilePath> fps;
-  TProject *project =
-      TProjectManager::instance()->getCurrentProject().getPointer();
   ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
   fps.push_back(scene->decodeFilePath(
       TFilePath(m_convertFileFld->getPath().toStdString())));
@@ -815,7 +812,6 @@ void ConvertPopup::setFiles(const std::vector<TFilePath> &fps) {
     onFormatSelected(OldLevelToTlvExtension);
   } else {
     if (tlvIndex >= 0) {
-      int index = m_fileFormat->currentIndex();
       m_fileFormat->removeItem(tlvIndex);
     }
   }
@@ -922,8 +918,6 @@ Convert2Tlv *ConvertPopup::makeTlvConverter(const TFilePath &sourceFilePath) {
 
 void ConvertPopup::convertToTlv(bool toPainted) {
 #ifdef CICCIO
-  ToonzScene *sc   = TApp::instance()->getCurrentScene()->getScene();
-  bool doAutoclose = false;
 
   QApplication::setOverrideCursor(Qt::WaitCursor);
 

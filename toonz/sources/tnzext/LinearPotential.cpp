@@ -60,7 +60,7 @@ double ToonzExt::LinearPotential::compute_value(double value2test) const {
   //  1-x
   //
 
-  double x   = 0.0;
+  double x;
   double res = 0.0;
 
   // length  at parameter

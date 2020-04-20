@@ -129,7 +129,6 @@ void IntPairField::paintEvent(QPaintEvent *) {
 
   p.setPen(Qt::black);
 
-  int y1 = height() - 1;
   int x;
   x                = value2pos(m_values.first);
   QRect sliderRect = QRect(x0, -5, x1 - x0 + 1, 10);

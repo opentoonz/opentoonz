@@ -403,7 +403,6 @@ void TRasterImageUtils::addGlobalNumbering(const TRasterImageP &ri,
                                            int globalIndex) {
   if (!ri) return;
   TRasterP raster = ri->getRaster();
-  int lx = raster->getLx(), ly = raster->getLy();
   QColor greyOverlay(100, 100, 100, 140);
   QImage image = rasterToQImage(raster, true, false);
   QPainter p(&image);

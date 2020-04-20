@@ -32,7 +32,6 @@ TFilePath ToonzFolder::getModulesDir() {
 }
 
 TFilePathSet ToonzFolder::getProjectsFolders() {
-  int location = Preferences::instance()->getProjectRoot();
   QString path = Preferences::instance()->getCustomProjectRoot();
   TFilePathSet fps;
   int projectPaths = Preferences::instance()->getProjectRoot();

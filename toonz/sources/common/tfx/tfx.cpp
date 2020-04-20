@@ -54,7 +54,6 @@ public:
 
 void skipChild(TIStream &is) {
   while (!is.eos()) {
-    std::string dummy = is.getString();
     std::string tagName;
     while (is.openChild(tagName)) {
       skipChild(is);

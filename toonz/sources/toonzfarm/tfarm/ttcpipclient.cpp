@@ -183,11 +183,6 @@ int TTcpIpClient::send(int sock, const QString &data) {
 #endif
 
     if (ret == SOCKET_ERROR) {
-// Error
-#ifdef _WIN32
-      int err = WSAGetLastError();
-#else
-#endif
       return SEND_FAILED;
     }
     nLeft -= ret;

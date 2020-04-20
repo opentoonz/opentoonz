@@ -481,7 +481,6 @@ void AudioRecordingPopup::makePaths() {
       TApp::instance()->getCurrentScene()->getScene()->decodeFilePath(savePath);
   savePath = savePath.getParentDir();
 
-  std::string strPath = savePath.getQString().toStdString();
   int number          = 1;
   TFilePath finalPath =
       savePath + TFilePath("recordedAudio" + QString::number(number) + ".wav");

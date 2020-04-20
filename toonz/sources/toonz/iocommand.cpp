@@ -854,9 +854,6 @@ TXshLevel *loadLevel(ToonzScene *scene,
 
   LoadLevelUndo *undo                  = 0;
   LoadAndReplaceLevelUndo *replaceUndo = 0;
-
-  TXsheet *xsh = scene->getXsheet();
-
   TFileType::Type type = TFileType::getInfo(actualPath);
   // try to find the level with the same path in the Scene Cast. If found, reuse
   // it
@@ -2081,8 +2078,6 @@ static int createSubXSheetFromPSDFolder(IoCmd::LoadResourceArguments &args,
                                         TXsheet *xsh, int &col0,
                                         int psdLevelIndex,
                                         PsdSettingsPopup *popup) {
-  assert(popup->isFolder(psdLevelIndex));
-
   int row0  = 0;
   int &row1 = args.row1, &col1 = args.col1;
 

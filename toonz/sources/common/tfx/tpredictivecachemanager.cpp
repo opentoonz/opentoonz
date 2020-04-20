@@ -211,10 +211,10 @@ void TPredictiveCacheManager::onRenderStatusEnd(int renderStatus) {
       const ResourceDeclaration *decl = it->second.m_decl;
 
       if (decl->m_tiles.size() == 1 && decl->m_tiles[0].m_refCount == 1) {
-        std::map<TCacheResourceP, PredictionData>::iterator jt = it++;
+        std::map<TCacheResourceP, PredictionData>::iterator jt = ++it;
         m_imp->m_resources.erase(jt);
       } else
-        it++;
+        ++it;
     }
   }
 }

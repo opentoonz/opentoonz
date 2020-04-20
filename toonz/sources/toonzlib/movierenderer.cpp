@@ -212,7 +212,6 @@ void MovieRenderer::Imp::prepareForStart() {
       assert(!fp.isEmpty());
 
       if (TSystem::doesExistFileOrLevel(fp)) {
-        bool remove = false;
         // In case the raster specifics are different from those of a currently
         // existing movie, erase it
         try {

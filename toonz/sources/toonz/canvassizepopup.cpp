@@ -266,7 +266,7 @@ void PeggingWidget::on00() {
   m_01->setIcon(m_topPix.transformed(QMatrix().rotate(m_cutLx ? -90 : 90),
                                      Qt::SmoothTransformation));
   m_11->setIcon(
-      m_topRightPix.transformed(QMatrix().rotate(m_cutLx || m_cutLx ? -90 : 90),
+      m_topRightPix.transformed(QMatrix().rotate((m_cutLx || m_cutLy) ? -90 : 90),
                                 Qt::SmoothTransformation));
   m_10->setIcon(m_topPix.transformed(QMatrix().rotate(m_cutLy ? 0 : 180),
                                      Qt::SmoothTransformation));

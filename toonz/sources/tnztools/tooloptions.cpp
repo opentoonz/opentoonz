@@ -174,7 +174,7 @@ ToolOptionControl *ToolOptionsBox::control(
 
 void ToolOptionsBox::updateStatus() {
   QMap<std::string, ToolOptionControl *>::iterator it;
-  for (it = m_controls.begin(); it != m_controls.end(); it++)
+  for (it = m_controls.begin(); it != m_controls.end(); ++it)
     it.value()->updateStatus();
 }
 
@@ -1343,7 +1343,7 @@ SelectionToolOptionsBox::SelectionToolOptionsBox(QWidget *parent, TTool *tool,
 
 void SelectionToolOptionsBox::updateStatus() {
   QMap<std::string, ToolOptionControl *>::iterator it;
-  for (it = m_controls.begin(); it != m_controls.end(); it++)
+  for (it = m_controls.begin(); it != m_controls.end(); ++it)
     it.value()->updateStatus();
 
   if (m_setSaveboxCheckbox) {
@@ -1511,7 +1511,7 @@ GeometricToolOptionsBox::GeometricToolOptionsBox(QWidget *parent, TTool *tool,
 
 void GeometricToolOptionsBox::updateStatus() {
   QMap<std::string, ToolOptionControl *>::iterator it;
-  for (it = m_controls.begin(); it != m_controls.end(); it++)
+  for (it = m_controls.begin(); it != m_controls.end(); ++it)
     it.value()->updateStatus();
   if (m_tool->getTargetType() & TTool::Vectors) {
     m_snapSensitivityCombo->setHidden(!m_snapCheckbox->isChecked());
@@ -1594,7 +1594,7 @@ TypeToolOptionsBox::TypeToolOptionsBox(QWidget *parent, TTool *tool,
 
 void TypeToolOptionsBox::updateStatus() {
   QMap<std::string, ToolOptionControl *>::iterator it;
-  for (it = m_controls.begin(); it != m_controls.end(); it++)
+  for (it = m_controls.begin(); it != m_controls.end(); ++it)
     it.value()->updateStatus();
 }
 
@@ -1638,7 +1638,7 @@ PaintbrushToolOptionsBox::PaintbrushToolOptionsBox(QWidget *parent, TTool *tool,
 
 void PaintbrushToolOptionsBox::updateStatus() {
   QMap<std::string, ToolOptionControl *>::iterator it;
-  for (it = m_controls.begin(); it != m_controls.end(); it++)
+  for (it = m_controls.begin(); it != m_controls.end(); ++it)
     it.value()->updateStatus();
 }
 
@@ -1741,7 +1741,7 @@ FillToolOptionsBox::FillToolOptionsBox(QWidget *parent, TTool *tool,
 
 void FillToolOptionsBox::updateStatus() {
   QMap<std::string, ToolOptionControl *>::iterator it;
-  for (it = m_controls.begin(); it != m_controls.end(); it++)
+  for (it = m_controls.begin(); it != m_controls.end(); ++it)
     it.value()->updateStatus();
 }
 
@@ -1915,7 +1915,7 @@ void BrushToolOptionsBox::filterControls() {
   }
 
   for (QMap<std::string, QLabel *>::iterator it = m_labels.begin();
-       it != m_labels.end(); it++) {
+       it != m_labels.end(); ++it) {
     bool isModifier = (it.key().substr(0, 8) == "Modifier");
     bool isCommon   = (it.key() == "Pressure" || it.key() == "Preset:");
     bool visible    = isCommon || (isModifier == showModifiers);
@@ -1923,7 +1923,7 @@ void BrushToolOptionsBox::filterControls() {
   }
 
   for (QMap<std::string, ToolOptionControl *>::iterator it = m_controls.begin();
-       it != m_controls.end(); it++) {
+       it != m_controls.end(); ++it) {
     bool isModifier = (it.key().substr(0, 8) == "Modifier");
     bool isCommon   = (it.key() == "Pressure" || it.key() == "Preset:");
     bool visible    = isCommon || (isModifier == showModifiers);
@@ -1938,7 +1938,7 @@ void BrushToolOptionsBox::updateStatus() {
   filterControls();
 
   QMap<std::string, ToolOptionControl *>::iterator it;
-  for (it = m_controls.begin(); it != m_controls.end(); it++)
+  for (it = m_controls.begin(); it != m_controls.end(); ++it)
     it.value()->updateStatus();
 
   if (m_miterField)
@@ -2075,7 +2075,7 @@ EraserToolOptionsBox::EraserToolOptionsBox(QWidget *parent, TTool *tool,
 
 void EraserToolOptionsBox::updateStatus() {
   QMap<std::string, ToolOptionControl *>::iterator it;
-  for (it = m_controls.begin(); it != m_controls.end(); it++)
+  for (it = m_controls.begin(); it != m_controls.end(); ++it)
     it.value()->updateStatus();
 }
 
@@ -2324,7 +2324,7 @@ TapeToolOptionsBox::TapeToolOptionsBox(QWidget *parent, TTool *tool,
 
 void TapeToolOptionsBox::updateStatus() {
   QMap<std::string, ToolOptionControl *>::iterator it;
-  for (it = m_controls.begin(); it != m_controls.end(); it++)
+  for (it = m_controls.begin(); it != m_controls.end(); ++it)
     it.value()->updateStatus();
 }
 
@@ -2457,7 +2457,7 @@ RGBPickerToolOptionsBox::RGBPickerToolOptionsBox(
 
 void RGBPickerToolOptionsBox::updateStatus() {
   QMap<std::string, ToolOptionControl *>::iterator it;
-  for (it = m_controls.begin(); it != m_controls.end(); it++)
+  for (it = m_controls.begin(); it != m_controls.end(); ++it)
     it.value()->updateStatus();
 }
 
@@ -2525,7 +2525,7 @@ StylePickerToolOptionsBox::StylePickerToolOptionsBox(
 
 void StylePickerToolOptionsBox::updateStatus() {
   QMap<std::string, ToolOptionControl *>::iterator it;
-  for (it = m_controls.begin(); it != m_controls.end(); it++)
+  for (it = m_controls.begin(); it != m_controls.end(); ++it)
     it.value()->updateStatus();
 }
 

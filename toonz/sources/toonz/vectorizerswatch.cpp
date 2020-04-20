@@ -255,7 +255,6 @@ void VectorizationSwatchTask::run() {
   if (!m_image || !m_config.get()) return;
 
   // The task must be performed - retrieve and prepare configuration data
-  ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
 
   VectorizerConfiguration *c = m_config.get();
 

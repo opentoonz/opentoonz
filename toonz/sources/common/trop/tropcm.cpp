@@ -588,7 +588,7 @@ void doMergeCmapped(TRasterCM32P rasOut, const TRasterCM32P &rasUp,
 
   TPaletteP downPlt = pltOut->clone();
   std::map<int, int>::iterator it;
-  for (it = usedInks.begin(); it != usedInks.end(); it++)
+  for (it = usedInks.begin(); it != usedInks.end(); ++it)
     downPlt->getPage(0)->addStyle(TPixel32::Red);
   for (int y = 0; y < rasOut->getLy(); y++) {
     TPixelCM32 *pixDown = rasOut->pixels(y),
@@ -857,7 +857,7 @@ void TRop::overlayCmapped(TRasterCM32P rasOut, const TRasterCM32P &rasUp,
 
   TPaletteP downPlt = pltOut->clone();
   std::map<int, int>::iterator it;
-  for (it = usedColors.begin(); it != usedColors.end(); it++)
+  for (it = usedColors.begin(); it != usedColors.end(); ++it)
     downPlt->getPage(0)->addStyle(TPixel32::Red);
 
   for (int y = 0; y < rasOut->getLy(); y++) {

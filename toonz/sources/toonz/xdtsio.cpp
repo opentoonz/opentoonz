@@ -472,7 +472,6 @@ bool XdtsIo::loadXdtsScene(ToonzScene *scene, const TFilePath &scenePath) {
     QVector<int> track = cellField.getColumnTrack(column);
 
     int row = 0;
-    std::vector<TFrameId>::iterator it;
     for (int f : track) {
       if (f == 0)  // empty cell
         row++;

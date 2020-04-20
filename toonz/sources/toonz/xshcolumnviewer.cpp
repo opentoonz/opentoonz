@@ -88,7 +88,7 @@ bool containsRasterLevel(TColumnSelection *selection) {
   set<int> indexes = selection->getIndices();
   TXsheet *xsh     = TApp::instance()->getCurrentXsheet()->getXsheet();
   set<int>::iterator it;
-  for (it = indexes.begin(); it != indexes.end(); it++) {
+  for (it = indexes.begin(); it != indexes.end(); ++it) {
     TXshColumn *col = xsh->getColumn(*it);
     if (!col || col->getColumnType() != TXshColumn::eLevelType) continue;
 
@@ -389,8 +389,6 @@ void ChangeObjectParent::onTextChanged(const QString &text) {
 
   if (newStageObjectId == currentObjectId) return;
 
-  TStageObject *stageObject =
-      m_xsheetHandle->getXsheet()->getStageObject(currentObjectId);
   TStageObjectCmd::setParent(currentObjectId, newStageObjectId, "B",
                              m_xsheetHandle);
 
@@ -654,11 +652,6 @@ void ColumnArea::DrawHeader::drawBaseFill(const QColor &columnColor,
                                  : PredefinedRect::LAYER_HEADER)
                    .translated(orig);
 
-  int x0 = rect.left();
-  int x1 = rect.right();
-  int y0 = rect.top();
-  int y1 = rect.bottom();
-
   // fill base color
   if (isEmpty)
     p.fillRect(rect, m_viewer->getEmptyColumnHeadColor());
@@ -690,7 +683,6 @@ void ColumnArea::DrawHeader::drawBaseFill(const QColor &columnColor,
   // highlight selection
   bool isSelected =
       m_viewer->getColumnSelection()->isColumnSelected(col) && !isEditingSpline;
-  bool isCameraSelected = col == -1 && isCurrent && !isEditingSpline;
 
   QColor pastelizer(m_viewer->getColumnHeadPastelizer());
   pastelizer.setAlpha(50);
@@ -1304,7 +1296,6 @@ void ColumnArea::drawFoldedColumnHead(QPainter &p, int col) {
 }
 
 void ColumnArea::drawLevelColumnHead(QPainter &p, int col) {
-  TColumnSelection *selection = m_viewer->getColumnSelection();
   const Orientation *o        = m_viewer->orientation();
 
   // Preparing painter
@@ -1322,10 +1313,6 @@ void ColumnArea::drawLevelColumnHead(QPainter &p, int col) {
   p.setFont(font);
   p.setRenderHint(QPainter::SmoothPixmapTransform, true);
 
-  // Retrieve reference coordinates
-  int currentColumnIndex = m_viewer->getCurrentColumn();
-  int layerAxis          = m_viewer->columnToLayerAxis(col);
-
   QPoint orig = m_viewer->positionToXY(CellPosition(0, col));
   QRect rect  = o->rect(PredefinedRect::LAYER_HEADER).translated(orig);
 
@@ -1338,22 +1325,7 @@ void ColumnArea::drawLevelColumnHead(QPainter &p, int col) {
 
   // Retrieve column properties
   // Check if the column is empty
-  bool isEmpty       = col >= 0 && xsh->isColumnEmpty(col);
   TXshColumn *column = col >= 0 ? xsh->getColumn(col) : 0;
-
-  bool isEditingSpline = app->getCurrentObject()->isSpline();
-
-  // check if the column is current
-  bool isCurrent = false;
-  if (currentColumnId ==
-      TStageObjectId::CameraId(xsh->getCameraColumnIndex()))  // CAMERA
-    isCurrent = col == -1;
-  else
-    isCurrent = m_viewer->getCurrentColumn() == col;
-
-  bool isSelected =
-      m_viewer->getColumnSelection()->isColumnSelected(col) && !isEditingSpline;
-  bool isCameraSelected = col == -1 && isCurrent && !isEditingSpline;
 
   // Draw column
   DrawHeader drawHeader(this, p, col);
@@ -1377,10 +1349,7 @@ void ColumnArea::drawLevelColumnHead(QPainter &p, int col) {
 //-----------------------------------------------------------------------------
 
 void ColumnArea::drawSoundColumnHead(QPainter &p, int col) {  // AREA
-  TColumnSelection *selection = m_viewer->getColumnSelection();
   const Orientation *o        = m_viewer->orientation();
-
-  int x = m_viewer->columnToLayerAxis(col);
 
   p.setRenderHint(QPainter::SmoothPixmapTransform, true);
   QString fontName = Preferences::instance()->getInterfaceFont();
@@ -1406,8 +1375,6 @@ void ColumnArea::drawSoundColumnHead(QPainter &p, int col) {  // AREA
 
   QPoint columnNamePos = orig + QPoint(12, o->cellHeight());
 
-  bool isCurrent = m_viewer->getCurrentColumn() == col;
-
   DrawHeader drawHeader(this, p, col);
   drawHeader.prepare();
   QColor columnColor, dragColor;
@@ -1432,7 +1399,6 @@ void ColumnArea::drawSoundColumnHead(QPainter &p, int col) {  // AREA
 //-----------------------------------------------------------------------------
 
 void ColumnArea::drawPaletteColumnHead(QPainter &p, int col) {  // AREA
-  TColumnSelection *selection = m_viewer->getColumnSelection();
   const Orientation *o        = m_viewer->orientation();
 
   QPoint orig = m_viewer->positionToXY(CellPosition(0, max(col, -1)));
@@ -1451,16 +1417,9 @@ void ColumnArea::drawPaletteColumnHead(QPainter &p, int col) {  // AREA
   p.setFont(font);
   p.setRenderHint(QPainter::SmoothPixmapTransform, true);
 
-  int currentColumnIndex = m_viewer->getCurrentColumn();
   int x                  = m_viewer->columnToLayerAxis(col);
 
   QRect rect(x, 0, o->cellWidth(), height());
-
-  TXsheet *xsh = m_viewer->getXsheet();
-
-  bool isEmpty = false;
-  if (col >= 0)  // Verifico se la colonna e' vuota
-    isEmpty = xsh->isColumnEmpty(col);
 
   DrawHeader drawHeader(this, p, col);
   drawHeader.prepare();
@@ -1483,9 +1442,7 @@ void ColumnArea::drawPaletteColumnHead(QPainter &p, int col) {  // AREA
 //-----------------------------------------------------------------------------
 
 void ColumnArea::drawSoundTextColumnHead(QPainter &p, int col) {  // AREA
-  TColumnSelection *selection = m_viewer->getColumnSelection();
   const Orientation *o        = m_viewer->orientation();
-
   int x = m_viewer->columnToLayerAxis(col);
 
   p.setRenderHint(QPainter::SmoothPixmapTransform, true);
@@ -1507,16 +1464,6 @@ void ColumnArea::drawSoundTextColumnHead(QPainter &p, int col) {  // AREA
   TXsheet *xsh = m_viewer->getXsheet();
 
   TStageObjectId columnId = m_viewer->getObjectId(col);
-  std::string name        = xsh->getStageObject(columnId)->getName();
-
-  bool isEditingSpline = app->getCurrentObject()->isSpline();
-
-  // Check if column is locked and selected
-  TXshColumn *column = col >= 0 ? xsh->getColumn(col) : 0;
-  bool isLocked      = column != 0 && column->isLocked();
-  bool isCurrent     = m_viewer->getCurrentColumn() == col;
-  bool isSelected =
-      m_viewer->getColumnSelection()->isColumnSelected(col) && !isEditingSpline;
 
   DrawHeader drawHeader(this, p, col);
   drawHeader.prepare();
@@ -2017,10 +1964,6 @@ void ColumnArea::mousePressEvent(QMouseEvent *event) {
     // get mouse position
     QPoint mouseInCell =
         event->pos() - m_viewer->positionToXY(CellPosition(0, m_col));
-    // int x = event->pos().x() - m_viewer->columnToX(m_col);
-    // int y = event->pos().y();
-    // QPoint mouseInCell(x, y);
-    int x = mouseInCell.x(), y = mouseInCell.y();
 
     // clicking on the camera column
     if (m_col < 0) {
@@ -2189,9 +2132,9 @@ void ColumnArea::mouseMoveEvent(QMouseEvent *event) {
   TXsheet *xsh       = m_viewer->getXsheet();
   TXshColumn *column = xsh->getColumn(col);
   QPoint mouseInCell = pos - m_viewer->positionToXY(CellPosition(0, col));
-  int x = mouseInCell.x(), y = mouseInCell.y();
 
 #ifdef LINETEST
+  int x = mouseInCell.x(), y = mouseInCell.y();
   // Ensure that the menu of the motion path is hidden
   if ((x - m_mtypeBox.left() > 20 || y < m_mtypeBox.y() ||
        y > m_mtypeBox.bottom()) &&
@@ -2640,14 +2583,14 @@ void ColumnArea::onSubSampling(QAction *action) {
   assert(selection && xsh);
   const set<int> indexes = selection->getIndices();
   set<int>::const_iterator it;
-  for (it = indexes.begin(); it != indexes.end(); it++) {
+  for (it = indexes.begin(); it != indexes.end(); ++it) {
     if (*it < 0) continue;  // Ignore camera column
     TXshColumn *column          = xsh->getColumn(*it);
     TXshColumn::ColumnType type = column->getColumnType();
     if (type != TXshColumn::eLevelType) continue;
     const QSet<TXshSimpleLevel *> levels = getLevels(column);
     QSet<TXshSimpleLevel *>::const_iterator it2;
-    for (it2 = levels.begin(); it2 != levels.end(); it2++) {
+    for (it2 = levels.begin(); it2 != levels.end(); ++it2) {
       TXshSimpleLevel *sl = *it2;
       if (sl->getProperties()->getDirtyFlag()) continue;
       int type = sl->getType();

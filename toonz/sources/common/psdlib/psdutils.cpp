@@ -107,7 +107,7 @@ void skipBlock(FILE *f) {
 // BigEndian.
 unsigned read2UBytes(FILE *f) {
   unsigned n = fgetc(f) << 8;
-  return n |= fgetc(f);
+  return (n | fgetc(f));
 }
 // Read 2byte binary value
 // BigEndian.

@@ -1259,11 +1259,8 @@ bool Region::subItemSize(DockWidget *item) {
 //! insertionIdx.
 bool DockLayout::isPossibleInsertion(DockWidget *item, Region *parentRegion,
                                      int insertionIdx) {
-  const int inf = 1000000;
-
   int mainWindowWidth  = contentsRect().width();
   int mainWindowHeight = contentsRect().height();
-  std::deque<Region *>::iterator i;
   bool result = true;
 
   if (m_regions.size()) {
@@ -1319,11 +1316,8 @@ bool DockLayout::isPossibleRemoval(DockWidget *item, Region *parentRegion,
   // NOTE: parentRegion is necessarily !=0 or there's no need to check anything
   if (!parentRegion) return true;
 
-  const int inf = 1000000;
-
   int mainWindowWidth  = contentsRect().width();
   int mainWindowHeight = contentsRect().height();
-  std::deque<Region *>::iterator i;
   bool result = true;
 
   // Calculate original extremal sizes

@@ -861,7 +861,7 @@ void TypeTool::updateTextBox() {
 //---------------------------------------------------------
 
 void TypeTool::updateMouseCursor(const TPointD &pos) {
-  int oldCursor = m_cursorId;
+  //int oldCursor = m_cursorId;
 
   if (!m_validFonts)
     m_cursorId = ToolCursor::CURSOR_NO;

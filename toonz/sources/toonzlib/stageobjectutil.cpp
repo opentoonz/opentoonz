@@ -360,9 +360,8 @@ UndoStageObjectPinned::UndoStageObjectPinned(const TStageObjectId &id,
 //-----------------------------------------------------------------------------
 
 void UndoStageObjectPinned::undo() const {
-  TXsheet *xsh      = m_xsheetHandle->getXsheet();
-  TStageObject *obj = xsh->getStageObject(m_pid);
-  assert(0);
+  //TXsheet *xsh      = m_xsheetHandle->getXsheet();
+  //TStageObject *obj = xsh->getStageObject(m_pid);
   // obj->setIsPinned(m_frame,m_before);
   m_objectHandle->notifyObjectIdChanged(false);
 }
@@ -370,9 +369,8 @@ void UndoStageObjectPinned::undo() const {
 //-----------------------------------------------------------------------------
 
 void UndoStageObjectPinned::redo() const {
-  TXsheet *xsh      = m_xsheetHandle->getXsheet();
-  TStageObject *obj = xsh->getStageObject(m_pid);
-  assert(0);
+  //TXsheet *xsh      = m_xsheetHandle->getXsheet();
+  //TStageObject *obj = xsh->getStageObject(m_pid);
   // obj->setIsPinned(m_frame,m_after);
   m_objectHandle->notifyObjectIdChanged(false);
 }

@@ -817,7 +817,6 @@ public:
   }
 
   void onRelease(const CellPosition &pos) override {
-    int row = pos.frame(), col = pos.layer();
     int delta = m_r1 - (m_r0 + m_rowCount - 1);
     if (delta == 0)
       delete m_undo;
@@ -1002,7 +1001,6 @@ public:
       return;
     }
 
-    TXshColumn *column           = getViewer()->getXsheet()->getColumn(m_col);
     TXshSoundColumn *soundColumn = getColumn();
     if (!soundColumn) return;
 
@@ -1060,7 +1058,6 @@ public:
     if (m_validPos) m_keyframeMoverTool->onDrag(e);
   }
   void onRelease(const CellPosition &pos) override {
-    int row = pos.frame(), col = pos.layer();
     TUndoManager::manager()->beginBlock();
     LevelMoverTool::onRelease(pos);
     m_keyframeMoverTool->onRelease(pos);
@@ -1206,7 +1203,6 @@ public:
   }
 
   void onRelease(const CellPosition &pos) override {
-    int row = pos.frame(), col = pos.layer();
     if (!m_enable) return;
     if (m_r0 == m_r1)
       delete m_undo;
@@ -1407,7 +1403,6 @@ public:
   void onRowChange(int row) {
     TApp *app = TApp::instance();
     app->getCurrentFrame()->setFrame(row);
-    int columnIndex = app->getCurrentColumn()->getColumnIndex();
     app->getCurrentFrame()->scrubXsheet(row, row, getViewer()->getXsheet());
   }
 
@@ -1465,7 +1460,7 @@ public:
     if (m_movingFirst) {
       if (row <= r1)
         r0 = row;
-      else if (row > r1) {
+      else {
         r0            = (r1 > 0) ? r1 : 0;
         r1            = row;
         m_movingFirst = false;
@@ -1473,7 +1468,7 @@ public:
     } else {
       if (row >= r0)
         r1 = row;
-      else if (row < r0) {
+      else {
         r1            = r0;
         r0            = row;
         m_movingFirst = true;
@@ -1483,7 +1478,6 @@ public:
   }
 
   void onRelease(const CellPosition &pos) override {
-    int row = pos.frame();
     int newR0, newR1, newStep;
     XsheetGUI::getPlayRange(newR0, newR1, newStep);
     if (m_oldR0 != newR0 || m_oldR1 != newR1) {
@@ -1691,7 +1685,6 @@ public:
     assert(m_lastCol == *indices.begin());
 
     int currEnd = xsh->getColumnCount() - 1;
-    int origCol = col;
     if (col < 0)
       col = 0;
     else if (!getViewer()->orientation()->isVerticalTimeline() && col > currEnd)

@@ -102,8 +102,6 @@ bool TKeyframeData::getKeyframes(std::set<Position> &positions,
       itL->second = c0;
   }
 
-  XsheetViewer *viewer = TApp::instance()->getCurrentXsheetViewer();
-
   positions.clear();
   TStageObjectId cameraId =
       TStageObjectId::CameraId(xsh->getCameraColumnIndex());

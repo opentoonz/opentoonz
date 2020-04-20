@@ -105,7 +105,6 @@ QString hyphenText(const QString &srcText, const QFont &font, int width) {
   int diff  = srcWidth - width * count + 4;  // +4 to keep a margin
 
   QString text;
-  int middleWidth = (double(width) * 0.5);
   int i;
   int hyphenCount = 1;
   for (i = 0; i < srcText.size(); i++) {
@@ -467,7 +466,6 @@ bool ItemViewPlayWidget::PlayManager::setCurrentFrameIndexFromXValue(
   int newIndex = tround((double)xValue / d);
   if (newIndex == m_currentFidIndex) return false;
   m_currentFidIndex = newIndex;
-  assert(isFrameIndexInRange());
   return true;
 }
 
@@ -1131,7 +1129,6 @@ void DvItemViewerPanel::paintTableItem(QPainter &p, int index) {
       p.setPen((isSelected) ? getSelectedTextColor() : getTextColor());
   }
 
-  int h  = 0;  // fontMetrics().descent();
   int y  = rect.top();
   int ly = rect.height();
   int x  = rect.left();
@@ -1611,12 +1608,11 @@ void DvItemViewerTitleBar::mouseMoveEvent(QMouseEvent *event) {
   std::vector<std::pair<DvItemListModel::DataType, std::pair<int, bool>>>
       columns;
   m_itemViewer->getPanel()->getColumns(columns);
-  DvItemListModel *model = m_itemViewer->getModel();
 
   if (event->buttons() == Qt::NoButton) {
     int i, n = (int)columns.size();
     int x  = 0;
-    int ly = height();
+
     for (i = 0; i < n; i++) {
       if (!(columns[i].second.second)) continue;
       int lx = columns[i].second.first;
@@ -1762,10 +1758,8 @@ void DvItemViewerTitleBar::paintEvent(QPaintEvent *) {
   p.fillRect(rect, QColor(0, 0, 0, 90));  // bg color
 
   p.setPen(QColor(200, 200, 200, 255));  // text color
-  int h  = 0;                            // fontMetrics().descent();
   int y  = rect.top();
   int ly = rect.height();
-  int lx = rect.width();
   int x  = rect.left();
 
   DvItemListModel *model = m_itemViewer->getModel();

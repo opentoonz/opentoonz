@@ -308,7 +308,7 @@ void SchematicToggle::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) {
     menu->addAction(cmdManager->getAction("MI_DisableAllColumns"));
     menu->addAction(cmdManager->getAction("MI_DisableSelectedColumns"));
     menu->addAction(cmdManager->getAction("MI_SwapEnabledColumns"));
-    QAction *action = menu->exec(cme->screenPos());
+    menu->exec(cme->screenPos());
   } else {
     QMenu *menu                = new QMenu(0);
     CommandManager *cmdManager = CommandManager::instance();
@@ -318,7 +318,7 @@ void SchematicToggle::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) {
     menu->addAction(cmdManager->getAction("MI_DeactivateAllColumns"));
     menu->addAction(cmdManager->getAction("MI_DeactivateSelectedColumns"));
     menu->addAction(cmdManager->getAction("MI_ToggleColumnsActivation"));
-    QAction *action = menu->exec(cme->screenPos());
+    menu->exec(cme->screenPos());
   }
 }
 //========================================================

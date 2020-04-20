@@ -80,7 +80,7 @@ static void patternmapUC(
       CPattern pat(imgContour);
 
       for (vector<SPOINT>::iterator pp = pPos.m_pos.begin();
-           pp != pPos.m_pos.end(); pp++) {
+           pp != pPos.m_pos.end(); ++pp) {
         // Calculates the rotation angle
         double angle = 0.0;
         if (pmP.m_isRandomDir)
@@ -99,7 +99,7 @@ static void patternmapUC(
         }
 
         // Calculates the scale
-        double scale = 1.0;
+        double scale;
         scale =
             pmP.m_minScale +
             (double)(rand() % 1001) * 0.001 * (pmP.m_maxScale - pmP.m_minScale);
@@ -162,7 +162,7 @@ static void patternmapUS(
       CPattern pat(imgContour);
 
       for (vector<SPOINT>::iterator pp = pPos.m_pos.begin();
-           pp != pPos.m_pos.end(); pp++) {
+           pp != pPos.m_pos.end(); ++pp) {
         // Calculates the rotation angle
         double angle = 0.0;
         if (pmP.m_isRandomDir)
@@ -181,7 +181,7 @@ static void patternmapUS(
         }
 
         // Calculates the scale
-        double scale = 1.0;
+        double scale;
         scale =
             pmP.m_minScale +
             (double)(rand() % 1001) * 0.001 * (pmP.m_maxScale - pmP.m_minScale);

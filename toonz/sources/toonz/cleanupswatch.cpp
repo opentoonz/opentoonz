@@ -86,7 +86,7 @@ void CleanupSwatch::CleanupSwatchArea::mousePressEvent(QMouseEvent *event) {
   if (event->button() != Qt::MidButton || !m_sw->m_resampledRaster) {
     event->ignore();
     return;
-    m_panning = false;
+    //m_panning = false;
   } else
     m_panning = true;
 }

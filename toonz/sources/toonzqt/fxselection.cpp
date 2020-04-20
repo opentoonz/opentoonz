@@ -377,7 +377,7 @@ void FxSelection::ungroupSelection() {
 
   TUndoManager::manager()->beginBlock();
   QSet<int>::iterator it;
-  for (it = idSet.begin(); it != idSet.end(); it++)
+  for (it = idSet.begin(); it != idSet.end(); ++it)
     TFxCommand::ungroupFxs(*it, m_xshHandle);
   TUndoManager::manager()->endBlock();
   selectNone();
@@ -513,7 +513,7 @@ bool FxSelection::isConnected() {
   QList<TFxP>::const_iterator it;
   TXsheet *xsh        = m_xshHandle->getXsheet();
   TFxSet *internalFxs = xsh->getFxDag()->getInternalFxs();
-  for (it = m_selectedFxs.begin(); it != m_selectedFxs.end(); it++) {
+  for (it = m_selectedFxs.begin(); it != m_selectedFxs.end(); ++it) {
     TFx *selectedFx = it->getPointer();
     TColumnFx *cfx  = dynamic_cast<TColumnFx *>(selectedFx);
     if (!cfx && !internalFxs->containsFx(selectedFx)) return false;

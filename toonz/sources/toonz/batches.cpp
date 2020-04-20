@@ -398,10 +398,6 @@ void BatchesController::addComposerTask(const TFilePath &_taskFilePath) {
 /*--- id はタスクを追加するごとにインクリメントされる数字 ---*/
 void BatchesController::addTask(const QString &id, TFarmTask *task,
                                 bool doUpdate) {
-#ifdef _DEBUG
-  std::map<QString, TFarmTask *>::iterator it = m_tasks.find(id);
-// assert(it == m_tasks.end());
-#endif
   if (task->m_id.isEmpty()) task->m_id = id;
 
   task->m_status         = Suspended;
@@ -823,10 +819,9 @@ void BatchesController::doLoad(const TFilePath &fp) {
 
     if (tagName == "tnzbatches") {
       std::string rootTagName = tagName;
-      std::string v           = is.getTagAttribute("version");
       while (is.matchTag(tagName)) {
         if (tagName == "generator") {
-          std::string program = is.getString();
+          //std::string program = is.getString();
         } else if (tagName == "batch") {
           while (!is.eos()) {
             TPersist *p = 0;
@@ -981,9 +976,9 @@ void BatchesController::update() {
         QString batchesTaskId = it->first;
 
         TFarmTask *batchesTask = getTask(batchesTaskId);
-        TFarmTask farmTask     = *batchesTask;
 
         if (batchesTask) {
+          TFarmTask farmTask       = *batchesTask;
           QString batchesTaskParentId = batchesTask->m_parentId;
           m_controller->queryTaskInfo(farmTaskId, farmTask);
           int chunkSize            = batchesTask->m_chunkSize;

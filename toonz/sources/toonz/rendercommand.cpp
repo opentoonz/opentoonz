@@ -765,10 +765,10 @@ public:
 //! Specialized render invocation for multimedia rendering. Flash rendering
 //! is currently not supported in this mode.
 void RenderCommand::multimediaRender() {
+#ifdef _WIN32
   ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
   std::string ext   = m_fp.getType();
 
-#ifdef _WIN32
   if (ext == "avi") {
     TPropertyGroup *props =
         scene->getProperties()->getOutputProperties()->getFileFormatProperties(
@@ -904,9 +904,6 @@ void RenderCommand::doRender(bool isPreview) {
     DVGui::warning(str);
     return;
   }
-
-  ToonzScene *scene = 0;
-  TCamera *camera   = 0;
 
   try {
     /*-- Xsheetノードに繋がっている各ラインごとに計算するモード。

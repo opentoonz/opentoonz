@@ -66,7 +66,7 @@ public:
 
 void keepSubgroup(QMap<int, QList<SchematicNode *>> &editedGroup) {
   QMap<int, QList<SchematicNode *>>::iterator it;
-  for (it = editedGroup.begin(); it != editedGroup.end(); it++) {
+  for (it = editedGroup.begin(); it != editedGroup.end(); ++it) {
     QList<SchematicNode *> groupedNodes = it.value();
     int i;
     for (i = 0; i < groupedNodes.size(); i++) {
@@ -75,7 +75,7 @@ void keepSubgroup(QMap<int, QList<SchematicNode *>> &editedGroup) {
       TFx *fx = node->getFx();
       assert(fx);
       QMap<int, QList<SchematicNode *>>::iterator it2;
-      for (it2 = editedGroup.begin(); it2 != editedGroup.end(); it2++) {
+      for (it2 = editedGroup.begin(); it2 != editedGroup.end(); ++it2) {
         if (fx->getAttributes()->isContainedInGroup(it2.key()) &&
             !editedGroup[it2.key()].contains(node))
           editedGroup[it2.key()].append(node);
@@ -468,7 +468,7 @@ void FxSchematicScene::updateScene() {
 
   // grouped node
   QMap<int, QList<TFxP>>::const_iterator it;
-  for (it = groupedFxs.begin(); it != groupedFxs.end(); it++) {
+  for (it = groupedFxs.begin(); it != groupedFxs.end(); ++it) {
     FxSchematicNode *node = addGroupedFxSchematicNode(it.key(), it.value());
     TFx *fx               = node->getFx();
     assert(fx);
@@ -489,7 +489,7 @@ void FxSchematicScene::updateScene() {
 void FxSchematicScene::updateEditedGroups(
     const QMap<int, QList<SchematicNode *>> &editedGroup) {
   QMap<int, QList<SchematicNode *>>::const_iterator it;
-  for (it = editedGroup.begin(); it != editedGroup.end(); it++) {
+  for (it = editedGroup.begin(); it != editedGroup.end(); ++it) {
     int zValue = 2;
     QMap<int, QList<SchematicNode *>>::const_iterator it2 = editedGroup.begin();
     while (it2 != editedGroup.end()) {
@@ -497,7 +497,7 @@ void FxSchematicScene::updateEditedGroups(
           dynamic_cast<FxSchematicNode *>(it2.value()[0]);
       FxSchematicNode *fxNode = dynamic_cast<FxSchematicNode *>(it.value()[0]);
       if (!placedFxNode || !fxNode) {
-        it2++;
+        ++it2;
         continue;
       }
       int placedGroupedId =
@@ -506,7 +506,7 @@ void FxSchematicScene::updateEditedGroups(
               placedGroupedId) &&
           fxNode->getFx()->getAttributes()->getEditingGroupId() != it2.key())
         zValue += 2;
-      it2++;
+      ++it2;
     }
     FxSchematicGroupEditor *node =
         addEditedGroupedFxSchematicNode(it.key(), it.value());
@@ -520,7 +520,7 @@ void FxSchematicScene::updateEditedGroups(
 void FxSchematicScene::updateEditedMacros(
     const QMap<TMacroFx *, QList<SchematicNode *>> &editedMacro) {
   QMap<TMacroFx *, QList<SchematicNode *>>::const_iterator it;
-  for (it = editedMacro.begin(); it != editedMacro.end(); it++) {
+  for (it = editedMacro.begin(); it != editedMacro.end(); ++it) {
     TMacroFx *macro = it.key();
     int zValue      = 2;
     if (macro->getAttributes()->isGrouped()) {
@@ -855,7 +855,7 @@ void FxSchematicScene::updateLink() {
     }
   }
   QMap<int, FxGroupNode *>::iterator it2;
-  for (it2 = m_groupedTable.begin(); it2 != m_groupedTable.end(); it2++) {
+  for (it2 = m_groupedTable.begin(); it2 != m_groupedTable.end(); ++it2) {
     FxGroupNode *node = it2.value();
     if (!node) continue;
     int i, fxCount = node->getFxCount();
@@ -906,7 +906,7 @@ void FxSchematicScene::updateLink() {
   // to solve an edit macro problem: create a dummy link
   QMap<TMacroFx *, FxSchematicMacroEditor *>::iterator it3;
   for (it3 = m_macroEditorTable.begin(); it3 != m_macroEditorTable.end();
-       it3++) {
+       ++it3) {
     TMacroFx *macro = it3.key();
     int i;
     FxSchematicNode *root = m_table[macro->getRoot()];
@@ -1131,7 +1131,7 @@ void FxSchematicScene::onSelectionChanged() {
   m_highlightedLinks.clear();
   QList<QGraphicsItem *> slcItems = selectedItems();
   QList<QGraphicsItem *>::iterator it;
-  for (it = slcItems.begin(); it != slcItems.end(); it++) {
+  for (it = slcItems.begin(); it != slcItems.end(); ++it) {
     FxSchematicNode *node = dynamic_cast<FxSchematicNode *>(*it);
     if (node) {
       if (!node->isA(eGroupedFx)) {
@@ -1481,7 +1481,7 @@ void FxSchematicScene::setEnableCache(bool toggle) {
       }
     } else {
       QMap<int, FxGroupNode *>::iterator it;
-      for (it = m_groupedTable.begin(); it != m_groupedTable.end(); it++) {
+      for (it = m_groupedTable.begin(); it != m_groupedTable.end(); ++it) {
         FxGroupNode *group = it.value();
         QList<TFxP> roots  = group->getRootFxs();
         for (int j = 0; j < roots.size(); j++) {
@@ -2026,7 +2026,7 @@ void FxSchematicScene::updateNestedGroupEditors(FxSchematicNode *node,
     }
   }
   QMap<TMacroFx *, FxSchematicMacroEditor *>::iterator it;
-  for (it = m_macroEditorTable.begin(); it != m_macroEditorTable.end(); it++) {
+  for (it = m_macroEditorTable.begin(); it != m_macroEditorTable.end(); ++it) {
     if (it.value()->contains(node)) {
       QRectF app = it.value()->sceneBoundingRect();
       if (rect.isEmpty())
@@ -2052,7 +2052,7 @@ void FxSchematicScene::updateNestedGroupEditors(FxSchematicNode *node,
     if (m_groupEditorTable[groupIdStack[i]]->scenePos() != app.topLeft())
       m_groupEditorTable[groupIdStack[i]]->setPos(app.topLeft());
   }
-  for (it = m_macroEditorTable.begin(); it != m_macroEditorTable.end(); it++) {
+  for (it = m_macroEditorTable.begin(); it != m_macroEditorTable.end(); ++it) {
     FxSchematicMacroEditor *editor = it.value();
     if (editor->contains(node)) {
       QRectF app = editor->sceneBoundingRect();
@@ -2073,7 +2073,7 @@ void FxSchematicScene::updateNestedGroupEditors(FxSchematicNode *node,
 void FxSchematicScene::closeInnerMacroEditor(int groupId) {
   assert(m_groupEditorTable.contains(groupId));
   QMap<TMacroFx *, FxSchematicMacroEditor *>::iterator it;
-  for (it = m_macroEditorTable.begin(); it != m_macroEditorTable.end(); it++) {
+  for (it = m_macroEditorTable.begin(); it != m_macroEditorTable.end(); ++it) {
     TMacroFx *macro = it.key();
     assert(macro);
     if (macro->getAttributes()->isContainedInGroup(groupId)) {
@@ -2092,14 +2092,14 @@ void FxSchematicScene::resizeNodes(bool maximizedNode) {
   m_gridDimension = maximizedNode ? eLarge : eSmall;
   m_xshHandle->getXsheet()->getFxDag()->setDagGridDimension(m_gridDimension);
   QMap<TFx *, FxSchematicNode *>::iterator it1;
-  for (it1 = m_table.begin(); it1 != m_table.end(); it1++) {
+  for (it1 = m_table.begin(); it1 != m_table.end(); ++it1) {
     if (!it1.value()) continue;
     it1.value()->resize(maximizedNode);
     TFx *fx = it1.value()->getFx();
     updatePositionOnResize(fx, maximizedNode);
   }
   QMap<int, FxGroupNode *>::iterator it2;
-  for (it2 = m_groupedTable.begin(); it2 != m_groupedTable.end(); it2++) {
+  for (it2 = m_groupedTable.begin(); it2 != m_groupedTable.end(); ++it2) {
     if (!it2.value()) continue;
     it2.value()->resize(maximizedNode);
     QList<TFxP> groupedFxs = it2.value()->getGroupedFxs();
@@ -2109,7 +2109,7 @@ void FxSchematicScene::resizeNodes(bool maximizedNode) {
 
   QMap<TMacroFx *, FxSchematicMacroEditor *>::iterator it3;
   for (it3 = m_macroEditorTable.begin(); it3 != m_macroEditorTable.end();
-       it3++) {
+       ++it3) {
     if (!it3.value()) continue;
     it3.value()->resizeNodes(maximizedNode);
   }

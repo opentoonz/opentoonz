@@ -611,7 +611,7 @@ void FileBrowser::refreshCurrentFolderItems() {
     // update the m_multiFileItemMap
     m_multiFileItemMap.clear();
 
-    for (it = all_files.begin(); it != all_files.end(); it++) {
+    for (it = all_files.begin(); it != all_files.end(); ++it) {
       TFrameId tFrameId;
       try {
         tFrameId = it->getFrame();
@@ -775,7 +775,7 @@ void FileBrowser::setUnregisteredFolder(const TFilePath &fp) {
 
     // update the m_multiFileItemMap
     m_multiFileItemMap.clear();
-    for (it = all_files.begin(); it != all_files.end(); it++) {
+    for (it = all_files.begin(); it != all_files.end(); ++it) {
       TFilePath levelName(it->getLevelName());
       if (levelName.isLevelName()) {
         Item &levelItem = m_multiFileItemMap[levelName];
@@ -1604,7 +1604,6 @@ bool FileBrowser::drop(const QMimeData *mimeData) {
     refreshFolder(folderPath.getParentDir());
     return true;
   } else if (mimeData->hasUrls()) {
-    int count = 0;
     for (const QUrl &url : mimeData->urls()) {
       TFilePath srcFp(url.toLocalFile().toStdWString());
       TFilePath dstFp = srcFp.withParentDir(folderPath);
@@ -1772,7 +1771,7 @@ QString getFrame(const QString &filename) {
   char padStr[5];
   padStr[4] = '\0';
 
-  int i, frame = 0;
+  int i;
 
   QString number = filename.mid(from + 1, to - from);
   for (i = 0; i < 4 - number.size(); i++) padStr[i] = '0';

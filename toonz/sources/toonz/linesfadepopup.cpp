@@ -200,9 +200,6 @@ LinesFadePopup::LinesFadePopup()
   addButtonBarWidget(m_okBtn);
 
   //------------------------ Connections --------------------------
-
-  TApp *app = TApp::instance();
-
   bool ret = true;
 
   ret = ret &&

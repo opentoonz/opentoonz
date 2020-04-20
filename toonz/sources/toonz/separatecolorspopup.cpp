@@ -83,7 +83,6 @@ namespace {
 //--------------------------------------------------------------------
 void getFrameIds(int from, int to, const TLevelP& level,
                  std::vector<TFrameId>& frames) {
-  std::string msg;
   int r0, r1;
   TLevel::Iterator begin = level->begin();
   TLevel::Iterator end   = level->end();

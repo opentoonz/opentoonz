@@ -444,7 +444,7 @@ void TLevelWriterTzl::buildFreeChunksTable() {
     occupiedChunks.insert(TzlChunk(it1->second.m_offs, it1->second.m_length));
     if (it1->second.m_offs + it1->second.m_length > lastOccupiedPos)
       lastOccupiedPos = it1->second.m_offs + it1->second.m_length - 1;
-    it1++;
+    ++it1;
   }
   TzlOffsetMap::const_iterator iconIt1 = m_iconOffsTable.begin();
   while (iconIt1 != m_iconOffsTable.end()) {
@@ -471,7 +471,7 @@ void TLevelWriterTzl::buildFreeChunksTable() {
     if (it2->m_offs > curPos)
       m_freeChunks.insert(TzlChunk(curPos, it2->m_offs - curPos));
     curPos = it2->m_offs + it2->m_length;
-    it2++;
+    ++it2;
   }
   assert(lastOccupiedPos < m_offsetTablePos);
   if (lastOccupiedPos + 1 < m_offsetTablePos)
@@ -721,7 +721,7 @@ TINT32 TLevelWriterTzl::findSavingChunk(const TFrameId &fid, TINT32 length,
   // ora cerco un cioncone libero con la piu' piccola memoria sufficiente
   std::set<TzlChunk>::iterator it1   = m_freeChunks.begin(),
                                found = m_freeChunks.end();
-  for (; it1 != m_freeChunks.end(); it1++) {
+  for (; it1 != m_freeChunks.end(); ++it1) {
     //   TINT32 _length = it1->m_length;
 
     if (it1->m_length >= length &&
@@ -1100,7 +1100,7 @@ void TLevelWriterTzl::renumberFids(
     if (it != m_frameOffsTable.end()) frameOffsTable[it3->second] = it->second;
     if (m_iconOffsTable.size() > 0 && iconIt != m_iconOffsTable.end())
       iconOffsTable[it3->second] = iconIt->second;
-    it3++;
+    ++it3;
   }
 
   m_frameOffsTable.clear();

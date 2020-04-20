@@ -1076,7 +1076,6 @@ void StopMotionController::refreshCameraList() {
     m_cameraListCombo->addItem(tr("- Select camera -"));
     if (webcams.count() > 0) {
       for (int c = 0; c < webcams.size(); c++) {
-        std::string name = webcams.at(c).deviceName().toStdString();
         QString camDesc  = webcams.at(c).description();
         m_cameraListCombo->addItem(camDesc);
         maxTextLength = std::max(maxTextLength, fontMetrics().width(camDesc));
@@ -1202,7 +1201,6 @@ void StopMotionController::refreshIsoList() {
     m_isoCombo->setDisabled(true);
   } else {
     m_isoCombo->setEnabled(true);
-    std::string currIso = m_stopMotion->getCurrentIso().toStdString();
     m_isoCombo->setCurrentText(m_stopMotion->getCurrentIso());
   }
   m_isoCombo->blockSignals(false);
@@ -1252,8 +1250,6 @@ void StopMotionController::refreshColorTemperatureList() {
   m_kelvinCombo->blockSignals(true);
   m_kelvinCombo->clear();
   m_kelvinCombo->addItems(m_stopMotion->getColorTemperatureOptions());
-  std::string ct = m_stopMotion->getCurrentWhiteBalance().toStdString();
-  int kCount     = m_kelvinCombo->count();
   if (m_kelvinCombo->count() == 0 ||
       m_stopMotion->getCurrentWhiteBalance() != "Color Temperature") {
     // m_kelvinCombo->addItem(tr("Disabled"));

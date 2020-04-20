@@ -179,9 +179,6 @@ AntialiasPopup::AntialiasPopup()
   addButtonBarWidget(m_okBtn);
 
   //------------------------ Connections --------------------------
-
-  TApp *app = TApp::instance();
-
   bool ret = true;
 
   ret = ret && connect(m_thresholdField, SIGNAL(valueChanged(bool)), this,

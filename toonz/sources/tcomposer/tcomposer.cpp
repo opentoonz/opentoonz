@@ -410,7 +410,6 @@ static std::pair<int, int> generateMovie(ToonzScene *scene, const TFilePath &fp,
 
   if (r0 < 0) r0 = 0;
   if (r1 < 0 || r1 >= scene->getFrameCount()) r1 = scene->getFrameCount() - 1;
-  string msg;
   assert(r1 >= r0);
   TSceneProperties *sprop          = scene->getProperties();
   TOutputProperties outputSettings = *sprop->getOutputProperties();
@@ -420,9 +419,10 @@ static std::pair<int, int> generateMovie(ToonzScene *scene, const TFilePath &fp,
   TDimension cameraSize = scene->getCurrentCamera()->getRes();
   TSystem::touchParentDir(fp);
 
+#ifdef _WIN32
+  string msg;
   string ext = fp.getType();
 
-#ifdef _WIN32
   if (ext == "avi") {
     TPropertyGroup *props =
         scene->getProperties()->getOutputProperties()->getFileFormatProperties(

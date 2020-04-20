@@ -178,7 +178,7 @@ QList<TPointD> TToneCurveParam::getValue(double frame) const {
   std::set<double>::iterator nextIt = frames.upper_bound(frame);
   bool isNotInSegment               = getCurrentParamSet()->isKeyframe(frame) ||
                         prevIt == frames.begin() || nextIt == frames.end();
-  if (prevIt != frames.begin()) prevIt--;
+  if (prevIt != frames.begin()) --prevIt;
 
   int i;
   QList<TPointD> points;

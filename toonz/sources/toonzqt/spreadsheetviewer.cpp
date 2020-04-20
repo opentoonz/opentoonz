@@ -318,11 +318,8 @@ void RowPanel::drawRows(QPainter &p, int r0, int r1) {
   QRect visibleRect = visibleRegion().boundingRect();
   int x0            = visibleRect.left();
   int x1            = visibleRect.right();
-  int y0            = visibleRect.top();
-  int y1            = visibleRect.bottom();
 
-  int r;
-  for (r = r0; r <= r1; r++) {
+  for (int r = r0; r <= r1; r++) {
     int y = getViewer()->rowToY(r);
     // draw horizontal line
     QColor color = (getViewer()->isMarkRow(r))
@@ -430,7 +427,6 @@ void CellPanel::paintEvent(QPaintEvent *e) {
   }
 
   // draw rows
-  int currentRow = getViewer()->getCurrentRow();
   for (int r = r0; r <= r1; r++) {
     int y        = getViewer()->rowToY(r);
     QColor color = getViewer()->isMarkRow(r) ? getViewer()->getMarkerLineColor()
@@ -654,7 +650,7 @@ static int getAutoPanSpeed(int pixels) {
 void SpreadsheetViewer::setAutoPanSpeed(const QRect &widgetBounds,
                                         const QPoint &mousePos) {
   QPoint speed;
-  int limit = 100, factor = 30;
+
   if (mousePos.x() < widgetBounds.left())
     speed.setX(-getAutoPanSpeed(widgetBounds.left() - mousePos.x()));
   else if (mousePos.x() > widgetBounds.right())
@@ -847,12 +843,6 @@ void SpreadsheetViewer::keyPressEvent(QKeyEvent *e) {
     while (panelParent != 0 && dynamic_cast<QMainWindow *>(panelParent) == 0) {
       panel       = panelParent;
       panelParent = panel->parentWidget();
-    }
-    if (panelParent) {
-      QList<QDockWidget *> panels = panelParent->findChildren<QDockWidget *>();
-      for (int i = 0; i < panels.size(); i++) {
-        QWidget *w = panels[i];
-      }
     }
     return;
   }

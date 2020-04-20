@@ -98,7 +98,7 @@ double getCurrentCameraStandDpi() {
     if (sl) {
       double dpi = sl->getDpi().x;
       return dpi > 0.0 ? dpi : defaultDpi;
-      return sl->getDpi().x;
+      //return sl->getDpi().x;
     } else
       return defaultDpi;
   } else {

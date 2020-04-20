@@ -170,12 +170,12 @@ void HistogramGraph::setValues(const int values[]) {
   m_viewValues.resize(256);
   m_logViewValues.resize(256);
 
-  double logMaxValue = log(1.0 + maxValue);
+  double logMaxValue = log1p(maxValue);
 
   for (i = 0; i < 256; i++) {
     m_viewValues[i] = double(values[i]) * double(m_height) / maxValue;
     m_logViewValues[i] =
-        double(log(1.0 + values[i])) * double(m_height) / logMaxValue;
+        double(log1p(values[i])) * double(m_height) / logMaxValue;
   }
 }
 

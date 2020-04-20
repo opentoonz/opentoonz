@@ -415,7 +415,6 @@ void FxSchematicMacroEditor::mouseMoveEvent(QGraphicsSceneMouseEvent *e) {
   SchematicWindowEditor::mouseMoveEvent(e);
   if (m_button == Qt::LeftButton) {
     QPointF delta  = pos() - prevPos;
-    TFx *root      = m_macro->getRoot();
     TPointD oldPos = m_macro->getAttributes()->getDagNodePos();
     m_macro->getAttributes()->setDagNodePos(oldPos +
                                             TPointD(delta.x(), delta.y()));

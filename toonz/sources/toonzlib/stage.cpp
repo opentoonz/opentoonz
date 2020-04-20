@@ -604,10 +604,12 @@ void StageBuilder::addCellWithOnionSkin(PlayerSet &players, ToonzScene *scene,
     std::vector<int> rows;
     m_onionSkinMask.getAll(row, rows);
     std::vector<int>::iterator it = rows.begin();
-    while (it != rows.end() && *it < row) it++;
+    while (it != rows.end() && *it < row) ++it;
     std::sort(rows.begin(), it, descending);
 
+#ifndef NUOVO_ONION
     int frontPos = 0, backPos = 0;
+#endif
     for (int i = 0; i < (int)rows.size(); i++) {
       if (rows[i] == row) continue;
 

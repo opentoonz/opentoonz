@@ -300,7 +300,6 @@ void RadialBlurFx::doCompute(TTile &tile, double frame,
 
 int RadialBlurFx::getMemoryRequirement(const TRectD &rect, double frame,
                                        const TRenderSettings &info) {
-  double scale  = sqrt(fabs(info.m_affine.det()));
   TPointD point = info.m_affine * m_point->getValue(frame);
   double blur   = m_blur->getValue(frame);
 

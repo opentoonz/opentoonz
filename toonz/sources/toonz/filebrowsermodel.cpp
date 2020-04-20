@@ -129,7 +129,6 @@ int DvDirModelNode::getChildCount() {
 
 DvDirModelNode *DvDirModelNode::getChild(int index) {
   if (!m_childrenValid) refreshChildren();
-  assert(0 <= index && index < getChildCount());
   return m_children[index];
 }
 
@@ -419,7 +418,7 @@ QList<TFilePath> DvDirVersionControlNode::getMissingFiles() const {
         if (!list.contains(path)) list.append(path);
       }
     }
-    i++;
+    ++i;
   }
   return list;
 }
@@ -430,7 +429,7 @@ QStringList DvDirVersionControlNode::getMissingFiles(
     const QRegExp &filter) const {
   QStringList list;
   QMap<QString, SVNStatus>::const_iterator i = m_statusMap.constBegin();
-  for (; i != m_statusMap.constEnd(); i++) {
+  for (; i != m_statusMap.constEnd(); ++i) {
     SVNStatus s = i.value();
     if (s.m_item == "missing" ||
         (s.m_item == "none" && s.m_repoStatus == "added")) {
@@ -469,7 +468,7 @@ QList<TFilePath> DvDirVersionControlNode::getMissingFolders() const {
         }
       }
     }
-    i++;
+    ++i;
   }
   return list;
 }
@@ -712,7 +711,6 @@ QPixmap DvDirVersionControlProjectNode::getPixmap(bool isOpen) const {
 void DvDirVersionControlProjectNode::refreshChildren() {
   DvDirModelFileFolderNode::refreshChildren();
   int i;
-  TProjectManager *pm = TProjectManager::instance();
   TProject *project   = new TProject();
   project->load(getProjectPath());
   for (i = 0; i < getChildCount(); i++) {
@@ -731,7 +729,6 @@ void DvDirVersionControlProjectNode::refreshChildren() {
 void DvDirVersionControlProjectNode::getChildrenNames(
     std::vector<std::wstring> &names) const {
   DvDirVersionControlNode::getChildrenNames(names);
-  TProjectManager *pm = TProjectManager::instance();
   TProject *project   = new TProject();
   project->load(getProjectPath());
   int i;
@@ -802,7 +799,6 @@ QPixmap DvDirModelProjectNode::getPixmap(bool isOpen) const {
 void DvDirModelProjectNode::refreshChildren() {
   DvDirModelFileFolderNode::refreshChildren();
   int i;
-  TProjectManager *pm = TProjectManager::instance();
   TProject *project   = new TProject();
   project->load(getProjectPath());
   for (i = 0; i < getChildCount(); i++) {
@@ -821,7 +817,6 @@ void DvDirModelProjectNode::refreshChildren() {
 void DvDirModelProjectNode::getChildrenNames(
     std::vector<std::wstring> &names) const {
   DvDirModelFileFolderNode::getChildrenNames(names);
-  TProjectManager *pm = TProjectManager::instance();
   TProject *project   = new TProject();
   project->load(getProjectPath());
   int i;
@@ -840,7 +835,6 @@ void DvDirModelProjectNode::getChildrenNames(
 
 DvDirModelNode *DvDirModelProjectNode::makeChild(std::wstring name) {
   if (name != L"" && name[0] == L'+') {
-    TProjectManager *pm = TProjectManager::instance();
     TProject *project   = new TProject();
     project->load(getProjectPath());
     std::string folderName = ::to_string(name.substr(1));

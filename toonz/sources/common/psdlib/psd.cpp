@@ -171,12 +171,11 @@ bool TPSDReader::doImageResources() {
     if (id == 1005)  // ResolutionInfo
     {
       psdByte savepos = ftell(m_file);
-      long hres, vres;
       double hresd, vresd;
-      hresd = FIXDPI(hres = read4Bytes(m_file));
+      hresd = FIXDPI(read4Bytes(m_file));
       read2Bytes(m_file);
       read2Bytes(m_file);
-      vresd = FIXDPI(vres = read4Bytes(m_file));
+      vresd = FIXDPI(read4Bytes(m_file));
       m_headerInfo.vres = vresd;
       m_headerInfo.hres = hresd;
       fseek(m_file, savepos, SEEK_SET);
@@ -230,7 +229,7 @@ bool TPSDReader::doLayersInfo() {
   return true;
 }
 bool TPSDReader::readLayerInfo(int i) {
-  psdByte chlen, extralen, extrastart;
+  psdByte extralen, extrastart;
   int j, chid, namelen;
   TPSDLayerInfo *li = m_headerInfo.linfo + i;
 
@@ -258,7 +257,7 @@ bool TPSDReader::readLayerInfo(int i) {
     // fetch info on each of the layer's channels
     for (j = 0; j < li->channels; ++j) {
       chid = li->chan[j].id = read2Bytes(m_file);
-      chlen = li->chan[j].length = read4Bytes(m_file);
+      li->chan[j].length = read4Bytes(m_file);
 
       if (chid >= -2 && chid < li->channels)
         li->chindex[chid] = j;
@@ -419,10 +418,8 @@ void TPSDReader::doImage(TRasterP &rasP, int layerId) {
 void TPSDReader::load(TRasterImageP &img, int layerId) {
   QMutexLocker sl(&m_mutex);
   TPSDLayerInfo *li = NULL;
-  int layerIndex    = 0;
   if (layerId > 0) {
-    layerIndex = getLayerInfoIndexById(layerId);
-    li         = getLayerInfo(layerIndex);
+    //li = getLayerInfo(getLayerInfoIndexById(layerId));
   }
   if (layerId < 0) throw TImageException(m_path, "Layer ID not exists");
 
@@ -1165,7 +1162,6 @@ void TPSDParser::doLevels() {
         long width        = li->right - li->left;
         long height       = li->bottom - li->top;
         if (width > 0 && height > 0) {
-          assert(li->layerId >= 0);
           if (i == 0) firstLayerId = li->layerId;
           level.addFrame(li->layerId);
         }
@@ -1185,7 +1181,6 @@ void TPSDParser::doLevels() {
           long width        = li->right - li->left;
           long height       = li->bottom - li->top;
           if (width > 0 && height > 0 && folderTagOpen == 0) {
-            assert(li->layerId >= 0);
             Level level(li->name, li->layerId);
             level.addFrame(li->layerId);
             m_levels.push_back(level);
@@ -1197,7 +1192,6 @@ void TPSDParser::doLevels() {
             } else {
               if (strcmp(li->name, "</Layer group>") == 0 ||
                   strcmp(li->name, "</Layer set>") == 0) {
-                assert(li->layerId >= 0);
                 Level level(li->name, li->layerId, true);
                 m_levels.push_back(level);
                 folderTagOpen++;
@@ -1205,7 +1199,6 @@ void TPSDParser::doLevels() {
               } else if (li->section > 0 &&
                          li->section <= 3)  // vedi specifiche psd
               {
-                assert(li->layerId >= 0);
                 m_levels[m_levels.size() - 1 - (scavenge - folderTagOpen)]
                     .setName(li->name);
                 m_levels[m_levels.size() - 1 - (scavenge - folderTagOpen)]
@@ -1236,7 +1229,6 @@ void TPSDParser::doLevels() {
         long width        = li->right - li->left;
         long height       = li->bottom - li->top;
         if (width > 0 && height > 0) {
-          assert(li->layerId >= 0);
           Level level(li->name, li->layerId);
           level.addFrame(li->layerId);
           m_levels.push_back(level);
@@ -1294,9 +1286,10 @@ int TPSDParser::getLevelIdByName(std::string levelName) {
       levelNameCount++;
     }
   }
-  if (lyid == 0 && lyid < 0) lyid = 0;
-  if (lyid < 0 && lyid != 0)
+  if (lyid < 0) {
+    lyid = 0;
     throw TImageException(m_path, "Layer ID not exists");
+  }
   return lyid;
 }
 int TPSDParser::getFramesCount(int levelId) {

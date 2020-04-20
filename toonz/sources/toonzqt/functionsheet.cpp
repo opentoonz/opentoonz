@@ -301,7 +301,6 @@ void FunctionSheetColumnHeadViewer::paintEvent(QPaintEvent *e) {
   for (int c = c0; c <= c1; ++c) {
     FunctionTreeModel::Channel *channel = m_sheet->getChannel(c);
     if (!channel) continue;
-    int i = c - c0 + 1;
     /*---- Channel Column of the current Column and the preceding and following
      * Columns ---*/
     FunctionTreeModel::ChannelGroup *prevGroup = channelGroups[c - c0],
@@ -905,7 +904,6 @@ void FunctionSheetCellViewer::mousePressEvent(QMouseEvent *e) {
 
 void FunctionSheetCellViewer::mouseReleaseEvent(QMouseEvent *e) {
   if (m_lineEdit->getMouseDragEditing()) {
-    std::string textValue = m_lineEdit->text().toStdString();
     onCellEditorEditingFinished();
     m_lineEdit->setMouseDragEditing(false);
   } else

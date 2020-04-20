@@ -365,7 +365,6 @@ public:
       TParam *param       = getParam(fx, previousTokens[4]);
       TParamSet *paramSet = dynamic_cast<TParamSet *>(param);
       if (!paramSet) return false;
-      TParam *leafParam = getLeafParam(fx, paramSet, token);
       return !!param;
     } else
       return false;

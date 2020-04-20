@@ -799,7 +799,6 @@ double cubicRoot(double a, double b, double c, double d) {
   b /= a;
   c /= a;
   d /= a;
-  a = 1.0;
   /* Compute discriminants						*/
   Q   = (b * b - 3.0 * c) / 9.0;
   QQQ = Q * Q * Q;

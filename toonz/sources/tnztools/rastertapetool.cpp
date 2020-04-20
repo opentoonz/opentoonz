@@ -299,20 +299,19 @@ public:
   void multiApplyAutoclose(TFrameId firstFid, TFrameId lastFid,
                            TRectD firstRect, TRectD lastRect,
                            TStroke *firstStroke = 0, TStroke *lastStroke = 0) {
-    bool backward = false;
+
     if (firstFid > lastFid) {
       std::swap(firstFid, lastFid);
-      backward = true;
     }
     assert(firstFid <= lastFid);
     std::vector<TFrameId> allFids;
     m_level->getFids(allFids);
 
     std::vector<TFrameId>::iterator i0 = allFids.begin();
-    while (i0 != allFids.end() && *i0 < firstFid) i0++;
+    while (i0 != allFids.end() && *i0 < firstFid) ++i0;
     if (i0 == allFids.end()) return;
     std::vector<TFrameId>::iterator i1 = i0;
-    while (i1 != allFids.end() && *i1 <= lastFid) i1++;
+    while (i1 != allFids.end() && *i1 <= lastFid) ++i1;
     assert(i0 < i1);
     std::vector<TFrameId> fids(i0, i1);
     int m = fids.size();
@@ -767,7 +766,7 @@ public:
     vi.addStroke(app);
     vi.findRegions();
     std::vector<TAutocloser::Segment>::iterator it = segments.begin();
-    for (; it < segments.end(); it++) {
+    for (; it < segments.end(); ++it) {
       if (it == segments.end()) break;
 
       int i;
@@ -783,7 +782,7 @@ public:
       if (!isContained) {
         it = segments.erase(it);
         if (it != segments.end() && it != segments.begin())
-          it--;
+          --it;
         else if (it == segments.end())
           break;
       }

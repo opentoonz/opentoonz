@@ -726,7 +726,7 @@ void TCacheResource::release2(const TRect &rect) {
     QRect cellQRect(toQRect(cellRect));
     if (--it->second.m_refsCount <= 0) {
       releaseCell(cellQRect, it->first, it->second.m_modified);
-      std::map<PointLess, CellData>::iterator jt = it++;
+      std::map<PointLess, CellData>::iterator jt = ++it;
       m_cellDatas.erase(jt);
     } else
       ++it;
@@ -762,7 +762,7 @@ void TCacheResource::releaseLock() {
       QRect cellQRect(cellPos.x, cellPos.y, latticeStep, latticeStep);
 
       releaseCell(cellQRect, it->first, it->second.m_modified);
-      std::map<PointLess, CellData>::iterator jt = it++;
+      std::map<PointLess, CellData>::iterator jt = ++it;
       m_cellDatas.erase(jt);
     } else
       ++it;
