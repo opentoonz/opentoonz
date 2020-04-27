@@ -5,26 +5,26 @@
     <name>BmpWriterProperties</name>
     <message>
         <source>Bits Per Pixel</source>
-        <translation type="unfinished"></translation>
+        <translation>Bits par pixels</translation>
     </message>
     <message>
         <source>24 bits</source>
-        <translation type="unfinished"></translation>
+        <translation>24 bits</translation>
     </message>
     <message>
         <source>8 bits (Greyscale)</source>
-        <translation type="unfinished"></translation>
+        <translation>8 bits (niveaux de gris)</translation>
     </message>
 </context>
 <context>
     <name>JpgWriterProperties</name>
     <message>
         <source>Quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Qualité</translation>
     </message>
     <message>
         <source>Smoothing</source>
-        <translation type="unfinished"></translation>
+        <translation>Lissage</translation>
     </message>
 </context>
 <context>
@@ -35,11 +35,11 @@
     </message>
     <message>
         <source>Unidentified Action</source>
-        <translation type="unfinished"></translation>
+        <translation>Action non identifiée</translation>
     </message>
     <message>
         <source>Skipping frame.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ignorer l'image.</translation>
     </message>
 </context>
 <context>
@@ -50,7 +50,7 @@
     </message>
     <message>
         <source>Thickness</source>
-        <translation>Epaisseur</translation>
+        <translation>Épaisseur</translation>
     </message>
 </context>
 <context>
