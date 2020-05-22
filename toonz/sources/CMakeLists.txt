@@ -458,6 +458,8 @@ elseif(BUILD_ENV_UNIXLIKE)
     find_package(LZO REQUIRED)
     message("LZO:" ${LZO_INCLUDE_DIR})
 
+    find_library(PTHREAD_LIBRARY pthread)
+
     if(NOT BUILD_TARGET_WIN)
         pkg_check_modules(USB_LIB REQUIRED libusb-1.0)
         pkg_check_modules(FREETYPE REQUIRED freetype2)

@@ -303,15 +303,4 @@ include_directories(
 
 _find_toonz_library(TNZLIBS "tnzcore;tnzbase;toonzlib")
 
-if(BUILD_ENV_APPLE)
-    # macports を使っていると symbol が非互換の /opt/lib が引っ掛かってしまう
-    find_library(ICONV_LIB iconv HINTS /usr/lib)
-    if(ICONV_LIB-NOTFOUND)
-        message("************* NO ICONV ****************")
-    else()
-        message("************* ICONV:" ${ICONV_LIB})
-    endif()
-    target_link_libraries(tnzstdfx Qt5::Core Qt5::Gui Qt5::OpenGL ${GL_LIB} ${GLEW_LIB} ${TNZLIBS} ${ICONV_LIB})
-else()
-    target_link_libraries(tnzstdfx Qt5::Core Qt5::Gui Qt5::OpenGL ${GL_LIB} ${GLEW_LIB} ${TNZLIBS})
-endif()
+target_link_libraries(tnzstdfx Qt5::Core Qt5::Gui Qt5::OpenGL ${GL_LIB} ${GLEW_LIB} ${TNZLIBS} ${PTHREAD_LIBRARY})
