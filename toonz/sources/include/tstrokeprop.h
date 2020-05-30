@@ -23,7 +23,6 @@ class TVectorRenderData;
 // class TStroke;
 class TColorStyle;
 class TSimpleStrokeStyle;
-class TFlash;
 class TRasterImagePatternStrokeStyle;
 class TVectorImagePatternStrokeStyle;
 class TCenterLineStrokeStyle;
@@ -43,7 +42,6 @@ public:
 
   TStrokeProp *clone(const TStroke *stroke) const override;
   void draw(const TVectorRenderData &rd) override;
-  void draw(TFlash &flash) override;
 };
 
 //=============================================================================
@@ -62,7 +60,6 @@ public:
 
   TStrokeProp *clone(const TStroke *stroke) const override;
   void draw(const TVectorRenderData &rd) override;
-  void draw(TFlash &flash) override;
 };
 
 //=============================================================================
@@ -81,7 +78,6 @@ public:
 
   TStrokeProp *clone(const TStroke *stroke) const override;
   void draw(const TVectorRenderData &rd) override;
-  void draw(TFlash &flash) override;
 };
 
 //=============================================================================
@@ -99,7 +95,6 @@ public:
 
   TStrokeProp *clone(const TStroke *stroke) const override;
   void draw(const TVectorRenderData &rd) override;
-  void draw(TFlash &flash) override;
 };
 
 //=============================================================================

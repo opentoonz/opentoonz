@@ -26,7 +26,6 @@
 #include "toonz/toonzscene.h"
 #include "toonz/txshsimplelevel.h"
 #include "toonz/txshsoundlevel.h"
-#include "toonz/screensavermaker.h"
 #include "toonz/tproject.h"
 #include "toonz/txshlevelhandle.h"
 #include "toonz/namebuilder.h"
@@ -1137,19 +1136,6 @@ QMenu *FileBrowser::getContextMenu(QWidget *parent, int index) {
   if (files.size() == 1 && files[0].getType() == "tnz") {
     menu->addAction(cm->getAction(MI_LoadScene));
   }
-#ifdef _WIN32
-  else if (files.size() == 1 && files[0].getType() == "scr") {
-    QAction *action;
-    action = new QAction(tr("Preview Screensaver"), menu);
-    ret    = ret && connect(action, SIGNAL(triggered()), this,
-                         SLOT(previewScreenSaver()));
-    menu->addAction(action);
-    action = new QAction(tr("Install Screensaver"), menu);
-    ret    = ret && connect(action, SIGNAL(triggered()), this,
-                         SLOT(installScreenSaver()));
-    menu->addAction(action);
-  }
-#endif
 
   bool areResources = true;
   bool areScenes    = false;
@@ -2244,31 +2230,6 @@ void FileBrowser::newFolder() {
     m_folderTreeView->scrollTo(newFolderIndex);
     m_folderTreeView->QAbstractItemView::edit(newFolderIndex);
   }
-}
-
-//-----------------------------------------------------------------------------
-
-void FileBrowser::previewScreenSaver() {
-  std::vector<TFilePath> files;
-  FileSelection *fs =
-      dynamic_cast<FileSelection *>(m_itemViewer->getPanel()->getSelection());
-  if (!fs) return;
-  fs->getSelectedFiles(files);
-  if (files.size() != 1 || files[0].getType() != "scr") return;
-
-  QDesktopServices::openUrl(QUrl(toQString(files[0])));
-}
-
-//-----------------------------------------------------------------------------
-
-void FileBrowser::installScreenSaver() {
-  std::vector<TFilePath> files;
-  FileSelection *fs =
-      dynamic_cast<FileSelection *>(m_itemViewer->getPanel()->getSelection());
-  if (!fs) return;
-  fs->getSelectedFiles(files);
-  if (files.size() != 1 || files[0].getType() != "scr") return;
-  ::installScreenSaver(files[0]);
 }
 
 //-----------------------------------------------------------------------------

@@ -3,7 +3,6 @@
 // TnzCore includes
 #include "tstream.h"
 #include "trop.h"
-#include "tflash.h"
 
 // TnzBase includes
 #include "tdoubleparam.h"
@@ -526,24 +525,6 @@ public:
   int getMemoryRequirement(const TRectD &rect, double frame,
                            const TRenderSettings &info) override {
     return TRasterFx::memorySize(rect, info.m_bpp);
-  }
-
-  void compute(TFlash &flash, int frame) override {
-    if (m_matte.isConnected()) {
-      flash.pushMatrix();
-      flash.beginMask();
-      ((TRasterFxP)(m_matte.getFx()))->compute(flash, frame);
-      flash.endMask();
-      flash.popMatrix();
-    }
-
-    if (m_source.isConnected()) {
-      flash.pushMatrix();
-      flash.enableMask();
-      ((TRasterFxP)(m_source.getFx()))->compute(flash, frame);
-      flash.disableMask();
-      flash.popMatrix();
-    }
   }
 };
 

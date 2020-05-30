@@ -12,7 +12,6 @@
 //#include "tstrokeutil.h"
 
 //#include "tstroke.h"
-//#include "tflash.h"
 
 //=============================================================================
 
@@ -73,11 +72,6 @@ void TSimpleStrokeProp::draw(
   glPopMatrix();
 }
 
-//-----------------------------------------------------------------------------
-
-void TSimpleStrokeProp::draw(TFlash &flash) {
-  getColorStyle()->drawStroke(flash, getStroke());
-}
 //=============================================================================
 
 TRasterImagePatternStrokeProp::TRasterImagePatternStrokeProp(
@@ -129,12 +123,6 @@ void TRasterImagePatternStrokeProp::draw(
     m_colorStyle->computeTransformations(m_transformations, m_stroke);
   }
   m_colorStyle->drawStroke(rd, m_transformations, m_stroke);
-}
-
-//-----------------------------------------------------------------------------
-
-void TRasterImagePatternStrokeProp::draw(TFlash &flash) {
-  getColorStyle()->drawStroke(flash, getStroke());
 }
 
 //-----------------------------------------------------------------------------
@@ -190,30 +178,6 @@ void TVectorImagePatternStrokeProp::draw(
   }
   m_colorStyle->drawStroke(rd, m_transformations, m_stroke);
 }
-
-//-----------------------------------------------------------------------------
-
-void TVectorImagePatternStrokeProp::draw(TFlash &flash) {
-  getColorStyle()->drawStroke(flash, getStroke());
-}
-
-//-----------------------------------------------------------------------------
-
-/*
-void TSimpleStrokeProp::draw(TFlash &flash)
-{
-  // fintissima!!!! quella vera deve risalire per m_colorStyle->drawStroke()
-  // come la sua sorellina di sopra
-  int i, n = m_stroke->getControlPointCount();
-  flash.setColor(m_colorStyle->getMainColor());
-  for(i=0;i<n-1;i++)
-    {
-     TPointD a = m_stroke->getControlPoint(i);
-     TPointD b = m_stroke->getControlPoint(i+1);
-     flash.drawLine(a,b);
-    }
-}
-*/
 
 //=============================================================================
 
@@ -288,21 +252,5 @@ void OutlineStrokeProp::draw(const TVectorRenderData &rd) {
 
   glPopMatrix();
 }
-
-//=============================================================================
-
-void OutlineStrokeProp::draw(TFlash &flash) {
-  m_colorStyle->drawStroke(flash, getStroke());
-}
-
-//=============================================================================
-
-/* ora e' virtuale pura
-void TStrokeProp::draw(TFlash &flash)
-{
-getColorStyle()->drawStroke(flash, getStroke());
-}
-
-*/
 
 //=============================================================================

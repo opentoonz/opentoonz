@@ -28,8 +28,6 @@ class TVectorRenderData;
 class TInputStreamInterface;
 class TOutputStreamInterface;
 
-class TFlash;
-
 template <class T>
 class TRasterPT;
 class TPixelRGBM32;
@@ -55,8 +53,6 @@ public:
 
   //! Note: update internal data if isRegionChanged()
   virtual void draw(const TVectorRenderData &rd) = 0;
-
-  virtual void draw(TFlash &){};
 
   const TRegion *getRegion() const { return m_region; }
 
@@ -88,7 +84,6 @@ public:
   OutlineRegionProp(const TRegion *region, const TOutlineStyleP regionStyle);
 
   void draw(const TVectorRenderData &rd) override;
-  void draw(TFlash &rd) override;
 
   const TColorStyle *getColorStyle() const override;
 

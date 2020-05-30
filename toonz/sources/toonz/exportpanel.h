@@ -65,6 +65,7 @@ public:
   void startDragDrop() override;
 
   void draw(QPainter &) override;
+  void addCurrentScene();
 
 protected:
   void dragEnterEvent(QDragEnterEvent *event) override;
@@ -104,6 +105,9 @@ public slots:
   void onSceneSwitched();
   void onFormatChanged(const QString &);
   void openSettingsPopup();
+
+protected:
+  void showEvent(QShowEvent *) override;
 };
 
 class RenderController final : public QObject,

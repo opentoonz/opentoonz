@@ -7,7 +7,6 @@
 #include "ttessellator.h"
 #include "trop.h"
 #include "drawutil.h"
-#include "tflash.h"
 #include "tpixelutils.h"
 #include "tlevel_io.h"
 #include "timage_io.h"
@@ -330,18 +329,6 @@ void TTextureStyle::drawRegion(const TColorFunction *cf,
                                TRegionOutline &boundary) const {
   if (m_tessellator)
     m_tessellator->tessellate(cf, antiAliasing, boundary, m_texture);
-}
-//-----------------------------------------------------------------------------
-void TTextureStyle::drawRegion(TFlash &flash, const TRegion *r) const {
-  flash.setTexture(m_texture);
-  flash.setFillStyleMatrix(TAffine());
-  flash.drawRegion(*r);
-  // rd.setTexture(m_colorStyle->getMainColor());
-}
-//-----------------------------------------------------------------------------
-
-void TTextureStyle::setFill(TFlash &flash) const {
-  flash.setTexture(getTexture());
 }
 
 //-----------------------------------------------------------------------------

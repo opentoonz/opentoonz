@@ -382,6 +382,7 @@ protected slots:
   void openCameraColumnPopup(QPoint pos);
   void onCameraColumnChangedTriggered();
   void onXsheetCameraChange(int);
+  void onSetMask(int);
 };
 
 //-----------------------------------------------------------------------------

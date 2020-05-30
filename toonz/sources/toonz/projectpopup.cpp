@@ -17,11 +17,6 @@
 #include "toonzqt/checkbox.h"
 #include "toonzqt/gutil.h"
 
-// TnzLic includes
-#ifdef LINETEST
-#include "tnzcamera.h"
-#endif
-
 // TnzCore includes
 #include "tsystem.h"
 #include "tenv.h"
@@ -145,7 +140,7 @@ DvDirModelNode *ProjectDirModel::getNode(const QModelIndex &index) const {
 QModelIndex ProjectDirModel::index(int row, int column,
                                    const QModelIndex &parent) const {
   if (column != 0) return QModelIndex();
-  DvDirModelNode *parentNode = m_root;
+  DvDirModelNode *parentNode       = m_root;
   if (parent.isValid()) parentNode = getNode(parent);
   if (row < 0 || row >= parentNode->getChildCount()) return QModelIndex();
   DvDirModelNode *node = parentNode->getChild(row);
@@ -569,11 +564,6 @@ ProjectCreatePopup::ProjectCreatePopup() : ProjectPopup(true) {
 
 void ProjectCreatePopup::createProject() {
   if (!IoCmd::saveSceneIfNeeded(QObject::tr("Create project"))) return;
-
-#ifdef LINETEST
-  TnzCamera *camera = TnzCamera::instance();
-  if (camera->isCameraConnected()) camera->cameraDisconnect();
-#endif
 
   QFileInfo fi(m_nameFld->text());
 

@@ -32,7 +32,6 @@ class TColorStyle;
 class TThickQuadratic;
 class TStrokeProp;
 class TSegment;
-class TFlash;
 
 //===================================================================
 
@@ -409,7 +408,6 @@ public:
   TThread::Mutex *getMutex() { return &m_mutex; }
 
   virtual void draw(const TVectorRenderData &rd) = 0;
-  virtual void draw(TFlash &flash)               = 0;
 
   virtual const TColorStyle *getColorStyle() const = 0;
 

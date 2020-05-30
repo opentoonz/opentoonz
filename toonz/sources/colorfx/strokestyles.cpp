@@ -3,12 +3,12 @@
 // TnzCore includes
 #include "tcolorfunctions.h"
 #include "trandom.h"
-#include "tflash.h"
 #include "tcurves.h"
 #include "tvectorrenderdata.h"
 #include "tmathutil.h"
 #include "colorfxutils.h"
 #include "tpixelutils.h"
+#include "tconvert.h"
 
 // tcg includes
 #include "tcg/tcg_misc.h"
@@ -44,9 +44,6 @@ public:
 
   TStrokeProp *clone(const TStroke *stroke) const override;
   void draw(const TVectorRenderData &rd) override;
-  void draw(TFlash &flash) override {
-    getColorStyle()->drawStroke(flash, getStroke());
-  }
 };
 
 //-----------------------------------------------------------------------------
@@ -193,44 +190,6 @@ void TFurStrokeStyle::setParamValue(int index, double value) {
     m_length = value;
 
   updateVersionNumber();
-}
-
-//-----------------------------------------------------------------------------
-
-void TFurStrokeStyle::drawStroke(TFlash &flash, const TStroke *stroke) const {
-  // TStroke *stroke = getStroke();
-  double length = stroke->getLength();
-
-  double s  = 0.0;
-  double ds = 4;
-  double vs = 1;
-  TRandom rnd;
-  flash.setLineColor(m_color);
-  vector<TSegment> segmentsArray;
-
-  while (s <= length) {
-    double w        = stroke->getParameterAtLength(s);
-    TThickPoint pos = stroke->getThickPoint(w);
-    TPointD pos1    = (TPointD)pos;
-
-    TPointD u = stroke->getSpeed(w);
-    if (norm2(u) == 0.0) {
-      s += 0.5;
-      continue;
-    }
-    u         = normalize(u);
-    TPointD v = rotate90(u);
-
-    double length = m_length * pos.thick;
-    vs            = -vs;
-
-    double q = 0.01 * (rnd.getFloat() * 2 - 1);
-    segmentsArray.push_back(
-        TSegment(pos1, pos1 + length * ((m_cs + q) * u + (vs * m_sn) * v)));
-    s += ds;
-  }
-
-  flash.drawSegments(segmentsArray, true);
 }
 
 //-----------------------------------------------------------------------------
@@ -446,124 +405,6 @@ void TChainStrokeStyle::drawStroke(const TColorFunction *cf, Points &data,
   glDeleteLists(ringId, 1);
 }
 
-//-----------------------------------------------------------------------------
-
-void TChainStrokeStyle::drawStroke(TFlash &flash, const TStroke *stroke) const {
-  // TStroke *stroke = getStroke();
-  double length = stroke->getLength();
-
-  // spessore della catena = spessore "medio" dello stroke
-  double thickness =
-      0.25 *
-      (stroke->getThickPoint(0).thick + stroke->getThickPoint(1.0 / 3.0).thick +
-       stroke->getThickPoint(2.0 / 3.0).thick + stroke->getThickPoint(1).thick);
-
-  if (thickness < 2) {
-    TCenterLineStrokeStyle *appStyle =
-        new TCenterLineStrokeStyle(m_color, 0x0, thickness);
-    appStyle->drawStroke(flash, stroke);
-    delete appStyle;
-    return;
-  }
-
-  assert(thickness);
-  double ringHeight   = thickness;
-  double ringWidth    = 1.5 * ringHeight;
-  double ringDistance = 2 * 1.2 * ringWidth;
-
-  double joinPos = 0.45 * ringWidth;
-  // const int ringId = 124;
-  double a = .6, b = .6;
-
-  TScale scaleM(ringWidth, ringHeight);
-  vector<TPointD> chain;
-  chain.push_back(scaleM * TPointD(1, b));    // 0
-  chain.push_back(scaleM * TPointD(a, 1));    // 1
-  chain.push_back(scaleM * TPointD(-a, 1));   // 2
-  chain.push_back(scaleM * TPointD(-1, b));   // 3
-  chain.push_back(scaleM * TPointD(-1, -b));  // 4
-  chain.push_back(scaleM * TPointD(-a, -1));  // 5
-  chain.push_back(scaleM * TPointD(a, -1));   // 6
-  chain.push_back(scaleM * TPointD(1, -b));   // 7
-  chain.push_back(scaleM * TPointD(1, b));    // 8
-
-  /*
-chain.push_back( TPointD(1, b));	//0
-chain.push_back( TPointD( a, 1));	//1
-chain.push_back( TPointD(-a, 1));	//2
-chain.push_back( TPointD(-1, b));	//3
-chain.push_back( TPointD(-1,-b));	//4
-chain.push_back( TPointD(-a,-1));	//5
-chain.push_back( TPointD( a,-1));	//6
-chain.push_back( TPointD( 1,-b));	//7
-chain.push_back( TPointD(1, b));	//8
-*/
-
-  vector<TSegment> chainS;
-  chainS.push_back(TSegment(chain[0], chain[1]));
-  chainS.push_back(TSegment(chain[1], chain[2]));
-  chainS.push_back(TSegment(chain[2], chain[3]));
-  chainS.push_back(TSegment(chain[3], chain[4]));
-  chainS.push_back(TSegment(chain[4], chain[5]));
-  chainS.push_back(TSegment(chain[5], chain[6]));
-  chainS.push_back(TSegment(chain[6], chain[7]));
-  chainS.push_back(TSegment(chain[7], chain[0]));
-
-  flash.setLineColor(m_color);
-
-  TPointD oldPos;
-  bool firstRing = true;
-  double s       = 0;
-  while (s <= length) {
-    double w = stroke->getParameterAtLength(s);
-    // if(w<0) {s+=0.1; continue;} // per tamponare il baco della
-    // getParameterAtLength()
-    TThickPoint pos = stroke->getThickPoint(w);
-    TPointD u       = stroke->getSpeed(w);
-    if (norm2(u) == 0) {
-      s += 0.1;
-      continue;
-    }  // non dovrebbe succedere mai, ma per prudenza....
-    u = normalize(u);
-    //     TPointD v = rotate90(u);
-
-    TTranslation translM(pos.x, pos.y);
-    TRotation rotM(rad2degree(atan(u)));
-    TAffine tM = translM * rotM;
-
-    //	 With direct transformation
-    vector<TSegment> lchainS;
-    for (int i = 0; i < 8; i++)
-      lchainS.push_back(TSegment(tM * chain[i], tM * chain[i + 1]));
-    flash.drawSegments(lchainS, false);
-
-    /*
-// With TFlash transformations
-flash.pushMatrix();
-flash.multMatrix(translM);
-flash.multMatrix(rotM);
-//	 flash.multMatrix(scaleM);
-flash.drawSegments(chainS,false);
-//	 if (chainId==-1)
-//		chainId=flash.drawSegments(chainS,false);
-//	 else
-//		 flash.drawShape(chainId);
-flash.popMatrix();
-*/
-
-    if (!firstRing) {
-      TPointD q = pos - u * joinPos;
-      vector<TSegment> sv;
-      sv.push_back(TSegment(oldPos, q));
-      flash.drawSegments(sv, false);
-    } else
-      firstRing = false;
-
-    oldPos = pos + u * joinPos;
-    s += ringDistance;
-  }
-}
-
 //=============================================================================
 
 TSprayStrokeStyle::TSprayStrokeStyle()
@@ -731,68 +572,6 @@ void TSprayStrokeStyle::drawStroke(const TColorFunction *cf,
   }
 }
 
-//-----------------------------------------------------------------------------
-
-void TSprayStrokeStyle::drawStroke(TFlash &flash, const TStroke *stroke) const {
-  double length = stroke->getLength();
-  double step   = 4;
-
-  double blend = m_blend;          // distanza che controlla da dove il gessetto
-                                   // comincia il fade out  (0, 1)
-  double intensity = m_intensity;  // quanti punti vengono disegnati ad ogni
-                                   // step
-  double radius = m_radius;
-  double decay  = 1 - blend;
-  bool fill     = 0;
-  TPointD pos1;
-  TRandom rnd;
-  TPixel32 color = m_color;
-  TPixelD dcolor;
-  dcolor = toPixelD(color);
-
-  double s = 0;
-  while (s <= length) {
-    double w = stroke->getParameterAtLength(s);
-    // if(w<0) {s+=0.1; continue;} // per tamponare il baco della
-    // getParameterAtLength()
-    TThickPoint pos = stroke->getThickPoint(w);
-    TPointD u       = stroke->getSpeed(w);
-    double normu    = norm2(u);
-    if (normu == 0) {
-      s += 0.1;
-      continue;
-    }  // non dovrebbe succedere mai, ma per prudenza....
-    u         = normalize(u);
-    TPointD v = rotate90(u);
-    TPointD shift;
-    for (int i = 0; i < intensity; i++) {
-      double vrandnorm = (0.5 - rnd.getFloat()) * 2;
-      double randomv   = vrandnorm * pos.thick;
-      double randomu   = (0.5 - rnd.getFloat()) * step;
-      shift            = u * randomu + v * randomv;
-      pos1             = pos + shift;
-      double mod       = fabs(vrandnorm);
-      TPixelD ldcolor  = dcolor;
-      ldcolor.m        = mod < decay ? rnd.getFloat() * dcolor.m
-                              : rnd.getFloat() * (1 - mod) * dcolor.m;
-      TPixel32 lcolor;
-      lcolor = toPixel32(ldcolor);
-      if (fill) {
-        flash.setFillColor(lcolor);
-        double r = radius * pos.thick * rnd.getFloat();
-        flash.drawEllipse(pos1, r, r);
-      } else {
-        flash.setLineColor(lcolor);
-        flash.setFillColor(TPixel32(0, 0, 0, 0));
-        flash.setThickness(0.5);
-        double r = radius * pos.thick * rnd.getFloat();
-        flash.drawEllipse(pos1, r, r);
-      }
-    }
-    s += step;
-  }
-}
-
 //=============================================================================
 
 TGraphicPenStrokeStyle::TGraphicPenStrokeStyle()
@@ -930,50 +709,6 @@ void TGraphicPenStrokeStyle::drawStroke(const TColorFunction *cf,
       glEnd();
     }
   }
-}
-
-//-----------------------------------------------------------------------------
-
-void TGraphicPenStrokeStyle::drawStroke(TFlash &flash,
-                                        const TStroke *stroke) const
-
-{
-  // TStroke *stroke = getStroke();
-  vector<TSegment> segmentsArray;
-  double length = stroke->getLength();
-  double step   = 10;
-  TPointD pos1, pos2;
-  TRandom rnd;
-  double intensity = m_intensity;
-  flash.setLineColor(m_color);
-
-  double s = 0;
-  while (s <= length) {
-    double w = stroke->getParameterAtLength(s);
-    // if(w<0) {s+=0.1; continue;} // per tamponare il baco della
-    // getParameterAtLength()
-    TThickPoint pos = stroke->getThickPoint(w);
-    TPointD u       = stroke->getSpeed(w);
-    double normu    = norm2(u);
-    if (normu == 0) {
-      s += 0.1;
-      continue;
-    }  // non dovrebbe succedere mai, ma per prudenza....
-    u         = normalize(u);
-    TPointD v = rotate90(u);
-    TPointD shift;
-    for (int i = 0; i < intensity; i++) {
-      double randomv = (0.5 - rnd.getFloat()) * pos.thick;
-      double randomu = (0.5 - rnd.getFloat()) * step;
-      shift          = randomu * u + randomv * v;
-      pos1           = pos + shift + v * (pos.thick);
-      pos2           = pos + shift - v * (pos.thick);
-      segmentsArray.push_back(TSegment(pos1, pos2));
-    }
-    s += step;
-  }
-
-  flash.drawSegments(segmentsArray, false);
 }
 
 //=============================================================================
@@ -1225,128 +960,6 @@ void TDottedLineStrokeStyle::drawStroke(const TColorFunction *cf,
   }
 }
 
-//-----------------------------------------------------------------------------
-
-void TDottedLineStrokeStyle::drawStroke(TFlash &flash,
-                                        const TStroke *stroke) const {
-  // TStroke *stroke = getStroke();
-  double length = stroke->getLength();
-
-  double step     = 5.0;
-  double linemax  = m_line;
-  double inmax    = m_in / 100;
-  double outmax   = m_out / 100;
-  double blankmax = m_blank;
-  double total    = 0;
-  TRandom rnd;
-
-  TPixel32 color = m_color;
-  TPixel32 color_transp(color.r, color.g, color.b, 0);
-
-  TPointD oldPos1, oldPos2, oldPos3, oldPos4, pos1, pos2, pos3, pos4;
-  bool firstRing      = true;
-  double s            = 0;
-  double meter        = 0;
-  double center       = 0;
-  double slopetmp     = 0;
-  double minthickness = MINTHICK;
-  double thickness    = 0;
-  SFlashUtils sfu;
-  flash.setThickness(0.0);
-  while (s <= length) {
-    double w = stroke->getParameterAtLength(s);
-    if (w < 0) {
-      s += 0.1;
-      continue;
-    }  // per tamponare il baco della getParameterAtLength()
-    TThickPoint pos = stroke->getThickPoint(w);
-    double line = 0, in = 0, out = 0, blank = 0;
-    if (pos.thick < MINTHICK)
-      thickness = minthickness;
-    else
-      thickness = pos.thick;
-
-    if (meter >= total) {
-      meter = 0;
-
-      line                        = linemax * (1 + rnd.getFloat()) * thickness;
-      if (line > length - s) line = length - s;
-      in                          = inmax * line;
-      out                         = outmax * line;
-      line                        = line - in - out;
-      blank                       = blankmax * (1 + rnd.getFloat()) * thickness;
-      /*   --- OLD Version ---
-line=linemax*(1+rnd.getFloat());
-in=inmax*(1+rnd.getFloat())*pos.thick;
-out=outmax*(1+rnd.getFloat())*pos.thick;
-blank=blankmax*(1+rnd.getFloat())*pos.thick;
-*/
-      if (in + out > length) {
-        in   = rnd.getFloat() * (length / 2);
-        out  = length - in;
-        line = 0;
-      }
-      total = in + line + out + blank;
-    } else if (meter > in + line + out + step) {
-      s += step;
-      meter += step;
-      continue;
-    }
-    TPointD u = stroke->getSpeed(w);
-    if (norm2(u) == 0) {
-      s += 0.1;
-      continue;
-    }  // non dovrebbe succedere mai, ma per prudenza....
-    u            = normalize(u);
-    double slope = 0;
-    if (s <= length - out) {
-      slope    = get_line_slope(meter, in, line, out);
-      slopetmp = slope;
-    } else
-      slope   = (length - s) * (slopetmp / out);
-    TPointD v = rotate90(u) * (pos.thick) * slope;
-    if (pos.thick * slope < 1)
-      center = 0.0;
-    else
-      center = 0.5;
-    pos1     = pos + v;
-    pos2     = pos + v * 0.5;
-    pos3     = pos - v * 0.5;
-    pos4     = pos - v;
-    if (firstRing) {
-      firstRing = false;
-    } else {
-      vector<TPointD> pv;
-      pv.push_back(oldPos1);
-      pv.push_back(pos1);
-      pv.push_back(pos2);
-      pv.push_back(oldPos2);
-      sfu.drawGradedPolyline(flash, pv, color_transp, color);
-
-      pv.clear();
-      pv.push_back(oldPos2);
-      pv.push_back(pos2);
-      pv.push_back(pos3);
-      pv.push_back(oldPos3);
-      flash.setFillColor(color);
-      flash.drawPolyline(pv);
-
-      pv.clear();
-      pv.push_back(oldPos3);
-      pv.push_back(pos3);
-      pv.push_back(pos4);
-      pv.push_back(oldPos4);
-      sfu.drawGradedPolyline(flash, pv, color, color_transp);
-    }
-    oldPos1 = pos1;
-    oldPos2 = pos2;
-    oldPos3 = pos3;
-    oldPos4 = pos4;
-    s += step;
-    meter += step;
-  }
-}
-
 //=============================================================================
 
 TRopeStrokeStyle::TRopeStrokeStyle()
@@ -1523,81 +1136,6 @@ glEndList();
   // glDeleteLists(rope_id,1);
 }
 
-//-----------------------------------------------------------------------------
-
-void TRopeStrokeStyle::drawStroke(TFlash &flash, const TStroke *stroke) const {
-  // TStroke *stroke = getStroke();
-  double length = stroke->getLength();
-
-  // spessore della catena = spessore "medio" dello stroke
-
-  double step = 10.0;
-  double bend;
-  double bump;
-  double bump_max = step / 4;
-
-  TPixel32 color = m_color;
-  TPixel32 blackcolor(TPixel32::Black);
-
-  TPointD oldPos1, oldPos2;
-  bool firstRing = true;
-  double s       = 0;
-  while (s <= length) {
-    double w = stroke->getParameterAtLength(s);
-    if (w < 0) {
-      s += 0.1;
-      continue;
-    }  // per tamponare il baco della getParameterAtLength()
-    TThickPoint pos = stroke->getThickPoint(w);
-    TPointD u       = stroke->getSpeed(w);
-    if (norm2(u) == 0) {
-      s += 0.1;
-      continue;
-    }  // non dovrebbe succedere mai, ma per prudenza....
-    u                          = normalize(u);
-    bend                       = pos.thick * m_bend;
-    bump                       = pos.thick * 0.3;
-    if (bump >= bump_max) bump = bump_max;
-    TPointD v                  = rotate90(u) * pos.thick;
-    TPointD v1                 = v * 0.2;
-    if (firstRing) {
-      firstRing = false;
-    } else {
-      const int nbpp = 8;
-      TPointD pp[nbpp];
-      pp[0] = (pos + (bend + bump) * u + v - v1);
-      pp[1] = (pos + (bend)*u + v);
-      pp[2] = (oldPos1 + (bump)*u + v1);
-      pp[3] = (oldPos1);
-      pp[4] = (oldPos2);
-      pp[5] = (oldPos2 + bump * u - v1);
-      pp[6] = (pos + u * (-bend) - v);
-      pp[7] = (pos + u * (bump - bend) - v + v1);
-
-      vector<TPointD> pv;
-      int i;
-      for (i = 0; i < nbpp; i++) pv.push_back(pp[i]);
-
-      flash.setFillColor(color);
-      flash.drawPolyline(pv);
-
-      vector<TSegment> sv;
-      for (i = 0; i < (nbpp - 1); i++) sv.push_back(TSegment(pp[i], pp[i + 1]));
-      flash.setThickness(1.0);
-      flash.setLineColor(blackcolor);
-      flash.drawSegments(sv, false);
-    }
-    oldPos1 = pos + (bend + bump) * u + v - v1;
-    oldPos2 = pos + u * (bump - bend) - v + v1;
-    s += step;
-  }
-
-  vector<TSegment> sv;
-  sv.push_back(TSegment(oldPos1, oldPos2));
-  flash.setLineColor(blackcolor);
-  flash.drawSegments(sv, false);
-}
-
 //=============================================================================
 
 TCrystallizeStrokeStyle::TCrystallizeStrokeStyle()
@@ -1743,86 +1281,6 @@ void TCrystallizeStrokeStyle::drawStroke(const TColorFunction *cf,
   }
 }
 
-//-----------------------------------------------------------------------------
-
-void TCrystallizeStrokeStyle::drawStroke(TFlash &flash,
-                                         const TStroke *stroke) const {
-  double length  = stroke->getLength();
-  double step    = 10.0;
-  double period  = m_period * step;
-  double counter = 0;
-  double opacity = m_opacity;
-  TRandom rnd;
-  //  const double flashGrad=16384.0;
-
-  TPixel32 color = m_color;
-
-  TPixelD dcolor = toPixelD(color);
-  vector<TPointD> points1;
-  vector<TPointD> points2;
-  double s = 0;
-  while (s <= length) {
-    double w = stroke->getParameterAtLength(s);
-    if (w < 0) {
-      s += 0.1;
-      continue;
-    }  // per tamponare il baco della getParameterAtLength()
-    TThickPoint pos = stroke->getThickPoint(w);
-    TPointD u       = stroke->getSpeed(w);
-    if (norm2(u) == 0) {
-      s += 0.1;
-      continue;
-    }  // non dovrebbe succedere mai, ma per prudenza....
-    u         = normalize(u);
-    TPointD v = rotate90(u) * (pos.thick / 2);
-    points1.push_back(pos + v * (1 + rnd.getFloat()) + u * 2 * rnd.getFloat());
-    points2.push_back(pos - v * (1 + rnd.getFloat()) - u * 2 * rnd.getFloat());
-    s += step;
-  }
-
-  // Just for the polygon grading function
-  //  SRegionDrawInFlash rdf;
-  SFlashUtils sfu;
-  TPixelD ldcolorPrev = dcolor;
-  ldcolorPrev.m       = (opacity + (0.0 / period) * rnd.getFloat()) * dcolor.m;
-  flash.setThickness(0.0);
-  for (int i = 0; i < (int)(points1.size() - 1); i++) {
-    if (counter > period) counter = 0;
-    TPixelD ldcolor               = dcolor;
-    ldcolor.m = (opacity + (counter / period) * rnd.getFloat()) * dcolor.m;
-
-    TPixel32 lcolorPrev;
-    lcolorPrev = toPixel32(ldcolorPrev);
-    TPixel32 lcolor;
-    lcolor = toPixel32(ldcolor);
-
-    vector<TPointD> tpv;
-    tpv.push_back(points1[i]);
-    tpv.push_back(points2[i]);
-    tpv.push_back(points2[i + 1]);
-    tpv.push_back(points1[i + 1]);
-
-    // Solid Color version
-    //	flash.setFillColor(blend(lcolorPrev,lcolor,0.5));
-    //    flash.drawPolyline(tpv);
-    sfu.drawGradedPolyline(flash, tpv, lcolorPrev, lcolor);
-
-    counter += step;
-    ldcolorPrev = ldcolor;
-  }
-
-  counter = 0;
-  vector<TSegment> tsv1, tsv2;
-  for (int j = 1; j < (int)points1.size(); j++) {
-    tsv1.push_back(TSegment(points1[j - 1], points1[j]));
-    tsv2.push_back(TSegment(points2[j - 1], points2[j]));
-  }
-  flash.setThickness(1.0);
-  flash.setLineColor(color);
-  flash.drawSegments(tsv1, false);
-  flash.drawSegments(tsv2, false);
-}
-
 //=============================================================================
 
 namespace {
@@ -1837,7 +1295,6 @@ public:
   TPixel32 color;
   Stripe();
   void drawpolygon();
-  void drawpolygon(TFlash &flash);
   void drawlines(TPixel32 blackcolor);
   void addToSegment(vector<TSegment> *sv, vector<TSegment> &scontour,
                     TPixel32 *colors);
@@ -1860,32 +1317,6 @@ void Stripe::drawpolygon() {
   tglVertex(pos2);
   tglVertex(oldpos2);
   glEnd();
-}
-
-void Stripe::drawpolygon(TFlash &flash) {
-  vector<TPointD> pv;
-  pv.push_back(oldpos1);
-  pv.push_back(oldpos2);
-  pv.push_back(pos2);
-  pv.push_back(pos1);
-  flash.setThickness(0);
-  flash.setFillColor(color);
-  flash.drawPolyline(pv);
-
-  // Draws the black contour
-  flash.setThickness(0.5);
-  flash.setLineColor(TPixel32::Black);
-  vector<TSegment> sv;
-  sv.push_back(TSegment(oldpos1, pos1));
-  sv.push_back(TSegment(oldpos2, pos2));
-  flash.drawSegments(sv, false);
-
-  // It is better, but the flash.drawLine() is missing in my SDK
-  /*	flash.setThickness(0.5);
-flash.setLineColor(TPixel32::Black);
-  flash.drawLine(oldpos1,pos1);
-  flash.drawLine(oldpos2,pos2);
-*/
 }
 
 void Stripe::addToSegment(vector<TSegment> *sv, vector<TSegment> &scontour,
@@ -2111,89 +1542,6 @@ void TBraidStrokeStyle::drawStroke(const TColorFunction *cf,
   }
 }
 
-//-----------------------------------------------------------------------------
-
-void TBraidStrokeStyle::drawStroke(TFlash &flash, const TStroke *stroke) const {
-  double length                = stroke->getLength();
-  const int ntick              = 162;
-  const double stripethickness = 0.3;
-  int period                   = (int)(101 - m_period) * 20;
-  double step                  = period / (double)ntick;
-  double freq                  = M_2PI / ntick;
-  int swapcount                = 0;
-  int count                    = 0;
-  bool firstRing               = true;
-  double s                     = 0;
-  double swap;
-  vector<Stripe> braid;
-  vector<double> ssin;
-  int k = 0;
-  TPixel32 colors[3];
-
-  for (k = 0; k < 3; k++) colors[k] = m_colors[k];
-
-  TPixel32 blackcolor = TPixel32::Black;
-
-  for (k = 0; k < 3; k++) {
-    Stripe tmp;
-    tmp.phase = (ntick * k) / 3;
-    tmp.color = colors[k];
-    braid.push_back(tmp);
-  }
-
-  for (int z = 0; z < ntick; z++) {
-    double tmpsin = sin(z * freq);
-    ssin.push_back(tmpsin);
-  }
-
-  while (s <= length) {
-    count++;
-    double w = stroke->getParameterAtLength(s);
-    if (w < 0) {
-      s += 0.1;
-      continue;
-    }  // per tamponare il baco della getParameterAtLength()
-    TThickPoint pos = stroke->getThickPoint(w);
-    TPointD u       = stroke->getSpeed(w);
-    if (norm2(u) == 0) {
-      s += 0.1;
-      continue;
-    }  // non dovrebbe succedere mai, ma per prudenza....
-    u          = normalize(u);
-    TPointD v  = rotate90(u) * pos.thick;
-    TPointD v1 = v * stripethickness;
-    v          = v * 0.5;
-    // int modper=(int)s%(int)period;
-    if (firstRing) {
-      firstRing = false;
-      swap      = 0;
-      for (int j = 0; j < (int)braid.size(); j++) {
-        int tmp          = (count + braid[j].phase) % ntick;
-        braid[j].oldpos1 = pos + v * ssin[tmp];
-        braid[j].oldpos2 = pos + v * ssin[tmp] + v1;
-      }
-    } else {
-      for (int i = 0; i < (int)braid.size(); i++) {
-        int tmp       = (count + braid[i].phase) % ntick;
-        braid[i].pos1 = pos + v * ssin[tmp];
-        braid[i].pos2 = pos + v * ssin[tmp] + v1;
-
-        braid[i].drawpolygon(flash);
-
-        braid[i].oldpos1 = pos + v * ssin[tmp];
-        braid[i].oldpos2 = pos + v * ssin[tmp] + v1;
-      }
-    }
-    s += step;
-    swap += step;
-    if (swap > (period / 3.0)) {
-      swapcount++;
-      std::swap(braid[0], braid[1 + (swapcount & 1)]);
-      swap -= period / 3.0;
-    }
-  }
-}
-
 //=============================================================================
 
 TSketchStrokeStyle::TSketchStrokeStyle()
@@ -2320,68 +1668,6 @@ void TSketchStrokeStyle::drawStroke(const TColorFunction *cf,
   glColor4d(0, 0, 0, 1);
 }
 
-//-----------------------------------------------------------------------------
-
-void TSketchStrokeStyle::drawStroke(TFlash &flash,
-                                    const TStroke *stroke) const {
-  double length = stroke->getLength();
-  if (length <= 0) return;
-  vector<TQuadratic> quadsArray;
-
-  int count = (int)(length * m_density);
-
-  double maxDw = std::min(1.0, 20.0 / length);
-  double minDw = 1.0 / length;
-  TPixel color(m_color.r, m_color.g, m_color.b, m_color.m);
-  flash.setLineColor(color);
-
-  TRandom rnd;
-
-  for (int i = 0; i < count; i++) {
-    double r    = rnd.getFloat();
-    double dw   = (1 - r) * minDw + r * maxDw;
-    double wmin = dw, wmax = 1 - dw;
-    if (wmin >= wmax) continue;
-    r        = rnd.getFloat();
-    double w = (1 - r) * wmin + r * wmax;
-
-    double w0 = w - dw;
-    double w1 = w + dw;
-
-    TThickPoint p0 = stroke->getThickPoint(w0);
-    TThickPoint p1 = stroke->getThickPoint(w1);
-    double d01     = tdistance(p0, p1);
-    if (d01 == 0) continue;
-
-    // int count = (int)(d01);
-
-    TPointD v0 = stroke->getSpeed(w0);
-    TPointD v1 = stroke->getSpeed(w1);
-
-    if (norm2(v0) == 0 || norm2(v1) == 0)
-      continue;  // non dovrebbe succedere mai, ma....
-    v0 = rotate90(normalize(v0));
-    v1 = rotate90(normalize(v1));
-
-    double delta  = 0.5 * (rnd.getFloat() - 0.5) * (p0.thick + p1.thick);
-    double d      = 0.1 * d01;
-    double delta0 = delta - d;
-    double delta1 = delta + d;
-
-    TPointD v      = rotate90(normalize(stroke->getSpeed(0.5 * (w0 + w1))));
-    TPointD p      = stroke->getPoint(0.5 * (w0 + w1));
-    double delta_t = 0.5 * (delta0 + delta1);
-    // quadsArray.push_back(TSegment(p0 + v0*delta0, p1 + v1*delta1));
-    TPointD pp0 = p0 + v0 * delta0;
-    TPointD pp2 = p1 + v1 * delta1;
-    TPointD pp1 = 2 * (p + v * delta_t) -
-                  0.5 * (pp0 + pp2);  // punto p1 ottenuto imponendo che la quad
-                                      // passi per il punto p in t=.5
-    quadsArray.push_back(TQuadratic(pp0, pp1, pp2));
-  }
-  flash.drawquads(quadsArray);
-}
-
 //=============================================================================
 
 TBubbleStrokeStyle::TBubbleStrokeStyle()
@@ -2442,40 +1728,6 @@ void TBubbleStrokeStyle::drawStroke(const TColorFunction *cf,
     tglColor(blend(color0, color1, rnd.getFloat()));
     double radius = (t & ((int)(thickness)));
     tglDrawCircle(p, radius);
-  }
-}
-
-//-----------------------------------------------------------------------------
-
-void TBubbleStrokeStyle::drawStroke(TFlash &flash,
-                                    const TStroke *stroke) const {
-  double length = stroke->getLength();
-  if (length <= 0) return;
-
-  TRandom rnd(0);
-  static int count = 0;
-  count++;
-
-  TPixel32 color0 = m_color0;
-  TPixel32 color1 = m_color1;
-
-  for (double s = 0; s < length; s += 5) {
-    TPointD p = stroke->getPointAtLength(s);
-    double w  = stroke->getParameterAtLength(s);
-    if (w < 0) {
-      s += 0.1;
-      continue;
-    }  // per tamponare il baco della getParameterAtLength()
-    TThickPoint pos = stroke->getThickPoint(w);
-    int toff        = rnd.getInt(0, 999);
-    int t           = (count + toff) % 1000;
-    TRandom rnd2(t >> 2);
-    p += 2 * TPointD(-0.5 + rnd2.getFloat(), -0.5 + rnd2.getFloat());
-    double r = (t & ((int)(pos.thick)));
-    flash.setThickness(0.5);
-    flash.setLineColor(blend(color0, color1, rnd.getFloat()));
-    flash.setFillColor(TPixel32(0, 0, 0, 0));
-    flash.drawEllipse(p, r, r);
   }
 }
 
@@ -2638,77 +1890,6 @@ void TTissueStrokeStyle::drawStroke(const TColorFunction *cf, PointMatrix &data,
   }
 }
 
-//-----------------------------------------------------------------------------
-
-void TTissueStrokeStyle::drawStroke(TFlash &flash,
-                                    const TStroke *stroke) const {
-  double length = stroke->getLength();
-  double step   = 5.0;
-  double border = m_border;
-  TPointD pos1, oldPos1;
-  TRandom rnd;
-  double increment = 0.0;
-  int intensity    = (int)m_density + 2;
-  vector<TPointD> points;
-  vector<TPointD> oldpoints;
-  TPixel32 color = m_color;
-
-  flash.setLineColor(m_color);
-  flash.setThickness(1.0);
-  double s       = 0;
-  bool firstRing = true;
-  while (s <= length) {
-    double w = stroke->getParameterAtLength(s);
-    if (w < 0) {
-      s += 0.1;
-      continue;
-    }  // per tamponare il baco della getParameterAtLength()
-    TThickPoint pos = stroke->getThickPoint(w);
-    TPointD u       = stroke->getSpeed(w);
-    if (norm2(u) == 0) {
-      s += 0.1;
-      continue;
-    }  // non dovrebbe succedere mai, ma per prudenza....
-    u         = normalize(u);
-    TPointD v = rotate90(u);
-    increment = (2 * pos.thick) / (intensity - 1);
-    for (int i = 1; i < intensity - 1; i++) {
-      pos1 = pos + v * (-pos.thick + i * increment);
-      points.push_back(pos1);
-    }
-    if (firstRing) {
-      firstRing = false;
-    } else {
-      flash.setThickness(1.5);
-      vector<TSegment> sv;
-      for (int i = 1; i < intensity - 1; i++) {
-        pos1    = points[i - 1];
-        oldPos1 = oldpoints[i - 1];
-        sv.push_back(TSegment(oldPos1, pos1));
-      }
-      flash.drawSegments(sv, false);
-
-      if (increment > 1) {
-        sv.clear();
-        double startpoint = -step - increment / 2.0;
-        for (int j = 1; j < step / increment + 1; j++) {
-          TPointD p0 = points[0] - v * border * increment * rnd.getFloat() +
-                       u * (startpoint + j * (increment));
-          TPointD p1 = points[intensity - 3] +
-                       v * border * increment * rnd.getFloat() +
-                       u * (startpoint + j * (increment));
-          //			vector<TSegment> sv;
-          sv.push_back(TSegment(p0, p1));
-        }
-        flash.drawSegments(sv, false);
-      }
-    }
-    oldpoints = points;
-    points.clear();
-    s += step;
-  }
-}
-
 //=============================================================================
 
 TBiColorStrokeStyle::TBiColorStrokeStyle()
@@ -2790,35 +1971,6 @@ void TBiColorStrokeStyle::drawStroke(const TColorFunction *cf,
     glVertex2dv(&v[i + 1].x);
   }
   glEnd();
-}
-
-//-----------------------------------------------------------------------------
-
-void TBiColorStrokeStyle::drawStroke(TFlash &flash,
-                                     const TStroke *stroke) const {
-  TOutlineUtil::OutlineParameter param;
-  param.m_lengthStep = std::max(10.0, m_parameter);
-  TStrokeOutline outline;
-  TOutlineStyle::computeOutline(stroke, outline, param);
-  const std::vector<TOutlinePoint> &v = outline.getArray();
-  if (v.empty()) return;
-
-  TPixel32 color0 = m_color0;
-  TPixel32 color1 = m_color1;
-  flash.setThickness(0.0);
-  // Just for the polygon grading function
-  SFlashUtils sfu;
-  for (UINT i = 0; i < (v.size() - 3); i += 2) {
-    vector<TPointD> plv;
-    plv.push_back(TPointD(v[i].x, v[i].y));
-    plv.push_back(TPointD(v[i + 2].x, v[i + 2].y));
-    plv.push_back(TPointD(v[i + 3].x, v[i + 3].y));
-    plv.push_back(TPointD(v[i + 1].x, v[i + 1].y));
-    //	 flash.setFillColor(blend(color0,color1,0.5));
-    //	 flash.drawPolyline(plv);
-    // graded multipolygons
-    sfu.drawGradedPolyline(flash, plv, color0, color1);
-  }
 }
 
 //=============================================================================
@@ -3063,60 +2215,6 @@ void TNormal2StrokeStyle::drawStroke(const TColorFunction *cf,
   glDisable(GL_NORMALIZE);
   glDisable(GL_LIGHTING);
   glDisable(GL_LIGHT0);
-}
-
-//-----------------------------------------------------------------------------
-
-void TNormal2StrokeStyle::drawStroke(TFlash &flash,
-                                     const TStroke *stroke) const {
-  // TStroke *stroke = getStroke();
-  // double length = stroke->getLength();
-  // double step=10.0;
-  TPointD pos1, pos2, pos3, pos4, oldPos1, oldPos2, oldPos3, oldPos4;
-
-  TOutlineUtil::OutlineParameter param;
-  param.m_lengthStep = 10.0;
-  TStrokeOutline outline;
-  TOutlineStyle::computeOutline(stroke, outline, param);
-  const std::vector<TOutlinePoint> &v = outline.getArray();
-
-  TPixel32 color = m_color;
-  TPixelD dcolor;
-  dcolor = toPixelD(color);
-
-  TPixel32 color1;
-  TPixelD dcolor1(0.5 * dcolor.r, 0.5 * dcolor.g, 0.5 * dcolor.b, 1.0);
-  color1 = toPixel32(dcolor1);
-
-  dcolor = TPixelD(dcolor.r + (1.0 - dcolor.r) * m_metal,
-                   dcolor.g + (1.0 - dcolor.g) * m_metal,
-                   dcolor.b + (1.0 - dcolor.b) * m_metal, dcolor.m);
-  color = toPixel32(dcolor);
-  flash.setThickness(0.0);
-
-  SFlashUtils sfu;
-  for (int i = 0; i <= (int)(v.size() - 4); i += 2) {
-    TPointD olda(v[i].x, v[i].y);
-    TPointD oldb(v[i + 1].x, v[i + 1].y);
-    TPointD oldcenter = 0.5 * (olda + oldb);
-    TPointD a(v[i + 2].x, v[i + 2].y);
-    TPointD b(v[i + 3].x, v[i + 3].y);
-    TPointD center = 0.5 * (a + b);
-
-    vector<TPointD> vpl;
-    vpl.push_back(olda);
-    vpl.push_back(a);
-    vpl.push_back(center);
-    vpl.push_back(oldcenter);
-    sfu.drawGradedPolyline(flash, vpl, color1, color);
-
-    vpl.clear();
-    vpl.push_back(oldb);
-    vpl.push_back(b);
-    vpl.push_back(center);
-    vpl.push_back(oldcenter);
-    sfu.drawGradedPolyline(flash, vpl, color1, color);
-  }
 }
 
 //=============================================================================
@@ -3605,106 +2703,6 @@ void TBlendStrokeStyle2::drawStroke(const TColorFunction *cf,
   glEnd();
 }
 
-//-----------------------------------------------------------------------------
-
-void TBlendStrokeStyle2::drawStroke(TFlash &flash,
-                                    const TStroke *stroke) const {
-  // TStroke *stroke = getStroke();
-  double length = stroke->getLength();
-  double step   = 10.0;
-  TPointD pos1, pos2, pos3, pos4, oldPos1, oldPos2, oldPos3, oldPos4;
-  double oldintslope;
-  TPixel32 color = m_color;
-
-  double lblend = m_blend;
-  // For the Flash version, to simplify the grading.
-  lblend = 1.0;
-
-  TPixelD dcolor;
-  dcolor         = toPixelD(color);
-  bool firstRing = true;
-  double s       = 0;
-  // double maxfactor=2*lblend/step; //max definisce il numero di intervalli in
-  // cui la regione viene divisa
-  // per evitare il problema del blend poco efficiente sui triangoli
-
-  vector<TPointD> vp1, vp2;
-  vector<TPixelD> vdc1, vdc2;
-
-  flash.setThickness(0);
-  SFlashUtils sfu;
-  while (s <= length) {
-    double w = stroke->getParameterAtLength(s);
-    if (w < 0) {
-      s += 0.1;
-      continue;
-    }  // per tamponare il baco della getParameterAtLength()
-    TThickPoint pos = stroke->getThickPoint(w);
-    TPointD u       = stroke->getSpeed(w);
-    if (norm2(u) == 0) {
-      s += 0.1;
-      continue;
-    }  // non dovrebbe succedere mai, ma per prudenza....
-    u          = normalize(u);
-    TPointD v  = rotate90(u) * pos.thick;
-    TPointD v1 = v * (1 - lblend);
-    pos1       = pos + v;
-    pos2       = pos + v1;
-    pos3       = pos - v1;
-    pos4       = pos - v;
-    double intslope =
-        get_inout_intensityslope(m_in, 1 - m_out, s / length) * dcolor.m;
-    if (firstRing) {
-      firstRing = false;
-    } else {
-      vp1.clear();
-      vp2.clear();
-      vdc1.clear();
-      vdc2.clear();
-
-      // The Flash version has been simplified. Only one direction grading!
-
-      vdc1.push_back(TPixelD(dcolor.r, dcolor.g, dcolor.b, 0));
-      vp1.push_back(oldPos1);
-      vdc2.push_back(TPixelD(dcolor.r, dcolor.g, dcolor.b, 0));
-      vp2.push_back(pos1);
-      vdc1.push_back(TPixelD(dcolor.r, dcolor.g, dcolor.b, oldintslope));
-      vp1.push_back(oldPos2);
-      vdc2.push_back(TPixelD(dcolor.r, dcolor.g, dcolor.b, intslope));
-      vp2.push_back(pos2);
-      vdc1.push_back(TPixelD(dcolor.r, dcolor.g, dcolor.b, oldintslope));
-      vp1.push_back(oldPos3);
-      vdc2.push_back(TPixelD(dcolor.r, dcolor.g, dcolor.b, intslope));
-      vp2.push_back(pos3);
-      vdc1.push_back(TPixelD(dcolor.r, dcolor.g, dcolor.b, 0));
-      vp1.push_back(oldPos4);
-      vdc2.push_back(TPixelD(dcolor.r, dcolor.g, dcolor.b, 0));
-      vp2.push_back(pos4);
-
-      vector<TPointD> vpl;
-      vpl.push_back(vp1[0]);
-      vpl.push_back(vp1[3]);
-      vpl.push_back(vp2[3]);
-      vpl.push_back(vp2[0]);
-
-      TPixel32 col[4];
-      col[0] = toPixel32(vdc1[1]);
-      col[1] = toPixel32(vdc1[2]);
-      col[2] = toPixel32(vdc2[2]);
-      col[3] = toPixel32(vdc2[1]);
-
-      sfu.drawGradedPolyline(flash, vpl, blend(col[0], col[1], 0.5),
-                             blend(col[2], col[3], 0.5));
-    }
-    oldPos1     = pos1;
-    oldPos2     = pos2;
-    oldPos3     = pos3;
-    oldPos4     = pos4;
-    oldintslope = intslope;
-    s += step;
-  }
-}
-
 //=============================================================================
 
 TTwirlStrokeStyle::TTwirlStrokeStyle()
@@ -3866,68 +2864,6 @@ void TTwirlStrokeStyle::drawStroke(const TColorFunction *cf, Doubles &data,
   }
 }
 
-//-----------------------------------------------------------------------------
-
-void TTwirlStrokeStyle::drawStroke(TFlash &flash, const TStroke *stroke) const {
-  double length   = stroke->getLength();
-  double step     = 5.0;
-  double period   = 10 * (102 - m_period);
-  double hperiod  = period / 2;
-  double blendval = 0;
-  TRandom rnd;
-  TPixel32 blackcolor = TPixel32::Black;
-  TPixel32 color      = m_color;
-  blackcolor.m        = m_color.m;
-
-  vector<TPointD> points1;
-  vector<TPointD> points2;
-  vector<double> vblend;
-  double s = 0;
-  while (s <= length) {
-    double w = stroke->getParameterAtLength(s);
-    if (w < 0) {
-      s += 0.1;
-      continue;
-    }  // per tamponare il baco della getParameterAtLength()
-    TThickPoint pos = stroke->getThickPoint(w);
-    TPointD u       = stroke->getSpeed(w);
-    if (norm2(u) == 0) {
-      s += 0.1;
-      continue;
-    }  // non dovrebbe succedere mai, ma per prudenza....
-    u            = normalize(u);
-    TPointD v    = rotate90(u) * (pos.thick);
-    double shift = sin((M_PI / hperiod) * s);
-    points1.push_back(pos + v * shift);
-    points2.push_back(pos - v * shift);
-    blendval = get_inout_intensityslope(
-        m_blend, 1.0 - m_blend, (s - ((int)(s / hperiod) * hperiod)) / hperiod);
-    vblend.push_back(blendval);
-    s += step;
-  }
-
-  SFlashUtils sfu;
-  for (int i = 1; i < (int)points1.size(); i++) {
-    vector<TPointD> vp;
-    vp.push_back(points1[i - 1]);
-    vp.push_back(points2[i - 1]);
-    vp.push_back(points2[i]);
-    vp.push_back(points1[i]);
-    flash.setThickness(0.0);
-    sfu.drawGradedPolyline(flash, vp, blend(blackcolor, color, vblend[i - 1]),
-                           blend(blackcolor, color, vblend[i]));
-    //	flash.setFillColor(blend(blackcolor, color , vblend[i-1]));
-    //	flash.drawPolyline(vp);
-
-    vector<TSegment> sv;
-    sv.push_back(TSegment(points1[i - 1], points1[i]));
-    sv.push_back(TSegment(points2[i - 1], points2[i]));
-    flash.setThickness(1.0);
-    flash.setLineColor(blend(color, blackcolor, vblend[i - 1]));
-    flash.drawSegments(sv, false);
-  }
-}
-
 //=============================================================================
 
 TSawToothStrokeStyle::TSawToothStrokeStyle(TPixel32 color, double parameter)
@@ -3946,42 +2882,6 @@ void TSawToothStrokeStyle::computeOutline(
     TOutlineUtil::OutlineParameter param) const {
   param.m_lengthStep = m_parameter;
   TOutlineStyle::computeOutline(stroke, outline, param);
-}
-
-//-----------------------------------------------------------------------------
-
-void TSawToothStrokeStyle::drawStroke(TFlash &flash,
-                                      const TStroke *stroke) const {
-  TOutlineUtil::OutlineParameter param;
-  param.m_lengthStep = std::max(20.0, m_parameter);
-  TStrokeOutline outline;
-  TOutlineStyle::computeOutline(stroke, outline, param);
-  const std::vector<TOutlinePoint> &v = outline.getArray();
-  if (v.empty()) return;
-
-  TPixel32 color = m_color;
-  flash.setThickness(0.0);
-  flash.setFillColor(color);
-
-  if (v.empty()) return;
-  double old[2];
-  int counter = 0;
-  for (UINT i = 0; i < v.size() - 2; i += 2) {
-    if (0 != v[i].stepCount) {
-      if (counter) {
-        vector<TPointD> plv;
-        //        flash.setFillColor(color);
-
-        plv.push_back(TPointD(old[0], old[1]));
-        plv.push_back(TPointD(v[i].x, v[i].y));
-        plv.push_back(TPointD(v[i + 1].x, v[i + 1].y));
-        flash.drawPolyline(plv);
-      }
-      old[0] = v[i].x;
-      old[1] = v[i].y;
-      counter++;
-    }
-  }
 }
 
 //-----------------------------------------------------------------------------
@@ -4326,79 +3226,6 @@ void TMultiLineStrokeStyle2::drawStroke(const TColorFunction *cf,
   glDisable(GL_POLYGON_SMOOTH);
 }
 
-//-----------------------------------------------------------------------------
-
-void TMultiLineStrokeStyle2::drawStroke(TFlash &flash,
-                                        const TStroke *stroke) const {
-  // TStroke *stroke = getStroke();
-  double length = stroke->getLength();
-  double step   = 4.0;
-  int maxlength = (int)m_length;
-  double factor = 0;
-  TRandom rnd;
-  TPixel32 color0, color1;
-  color0 = m_color0;
-  color1 = m_color1;
-
-  vector<myLineData> LineData;
-  myLineData Data;
-  double s           = 0;
-  double strokethick = m_thick;
-  while (s <= length) {
-    double w = stroke->getParameterAtLength(s);
-    if (w < 0) {
-      s += 0.1;
-      continue;
-    }  // per tamponare il baco della getParameterAtLength()
-    Data.p = stroke->getThickPoint(w);
-    Data.u = stroke->getSpeed(w);
-    if (norm2(Data.u) == 0) {
-      s += 0.1;
-      continue;
-    }  // non dovrebbe succedere mai, ma per prudenza....
-    Data.u = normalize(Data.u);
-    Data.v = rotate90(Data.u) * Data.p.thick;
-    LineData.push_back(Data);
-    s += step;
-  }
-
-  for (int i = 0; i < m_intensity * LineData.size(); i++) {
-    int start = rnd.getInt(0, LineData.size());
-    int end   = start + maxlength + rnd.getInt(0, maxlength);
-    if (end > (int)LineData.size()) end = LineData.size();
-    double halfcount                    = (end - start) / 2.0;
-    double vshift                       = (0.5 - rnd.getFloat());
-    flash.setThickness(0.0);
-    flash.setFillColor(blend(color0, color1, rnd.getFloat()));
-    vector<TSegment> sv;
-    int j;
-    for (j = 0; j < (end - start); j++) {
-      if (j < halfcount)
-        factor = j / halfcount;
-      else
-        factor   = 1 - (j - halfcount) / halfcount;
-      float rand = rnd.getFloat();
-      TPointD p0 =
-          (LineData[j + start].p +
-           LineData[j + start].v *
-               (vshift - strokethick * factor * (1 - m_noise * (1 - rand))));
-      TPointD p1 =
-          (LineData[j + start].p +
-           LineData[j + start].v *
-               (vshift + strokethick * factor * (1 - m_noise * (1 - rand))));
-      sv.push_back(TSegment(p0, p1));
-    }
-    for (j = 0; j < ((int)sv.size() - 1); j++) {
-      vector<TPointD> pv;
-      pv.push_back(sv[j].getP0());
-      pv.push_back(sv[j].getP1());
-      pv.push_back(sv[j + 1].getP1());
-      pv.push_back(sv[j + 1].getP0());
-      flash.drawPolyline(pv);
-    }
-  }
-}
-
 //=============================================================================
 
 TZigzagStrokeStyle::TZigzagStrokeStyle()
@@ -4652,52 +3479,6 @@ glEnd();
   // drawBLines(rects);
 }
 
-//-----------------------------------------------------------------------------
-
-void TZigzagStrokeStyle::drawStroke(TFlash &flash,
-                                    const TStroke *stroke) const {
-  if (!stroke) return;
-  double length = stroke->getLength();
-  if (length <= 0) return;
-
-  setRealMinMax();
-  // e.g minimum translation length is the half of the thickness
-  const double minTranslLength = 0.7;
-
-  int first = 1;
-  TThickPoint pos;
-  TThickPoint pos1;
-  TRandom rnd;
-  RectVector rects;
-
-  for (double s = 0.0; s <= length; first = -first) {
-    if (getZigZagPosition(stroke, rnd, s, first, minTranslLength, pos, pos1)) {
-      TRectD rec(pos.x, pos.y, pos1.x, pos1.y);
-      rects.push_back(rec);
-    }
-    s += m_minDist + (m_maxDist - m_minDist) * (double)rnd.getUInt(101) * 0.01;
-  }
-  if (getZigZagPosition(stroke, rnd, length - TConsts::epsilon, first,
-                        minTranslLength, pos, pos1)) {
-    TRectD rec(pos.x, pos.y, pos1.x, pos1.y);
-    rects.push_back(rec);
-  }
-
-  flash.setLineColor(m_color);
-  vector<TSegment> segmentsArray;
-
-  flash.setThickness(m_thickness);
-  RectVector::const_iterator rvi = rects.begin();
-  for (; rvi != (rects.end() - 1); rvi++) {
-    RectVector::const_iterator rvii = rvi + 1;
-    TPointD p0((rvi->x0 + rvi->x1) / 2.0, (rvi->y0 + rvi->y1) / 2.0);
-    TPointD p1((rvii->x0 + rvii->x1) / 2.0, (rvii->y0 + rvii->y1) / 2.0);
-    segmentsArray.push_back(TSegment(p0, p1));
-  }
-
-  flash.drawSegments(segmentsArray, false);
-}
-
 //=============================================================================
 
 TSinStrokeStyle::TSinStrokeStyle()
@@ -4827,83 +3608,6 @@ void TSinStrokeStyle::drawStroke(const TColorFunction *cf,
     tglVertex(positions[i]);
   }
   glEnd();
-}
-
-//-----------------------------------------------------------------------------
-
-void TSinStrokeStyle::drawStroke(TFlash &flash, const TStroke *stroke) const {
-  double length = stroke->getLength();
-  double step   = 5.0;
-
-  double frequency = m_frequency / 100;
-  ;
-  vector<TPointD> points;
-
-  double s = 0;
-  // bool firstRing = true;
-  double thick = 1 - m_thick;
-  while (s <= length) {
-    double w = stroke->getParameterAtLength(s);
-    // if(w<0) {s+=0.1; continue;} // per tamponare il baco della
-    // getParameterAtLength()
-    TThickPoint pos = stroke->getThickPoint(w);
-    TPointD u       = stroke->getSpeed(w);
-    double normu    = norm2(u);
-    if (normu == 0) {
-      s += 0.1;
-      continue;
-    }  // non dovrebbe succedere mai, ma per prudenza....
-    u               = normalize(u);
-    TPointD v       = rotate90(u);
-    double sinvalue = sin(frequency * s);
-    points.push_back(pos + v * pos.thick * sinvalue);
-    points.push_back(pos + v * thick * pos.thick * sinvalue);
-    s += step;
-  }
-
-  // Polyline version
-  flash.setThickness(0.0);
-  flash.setFillColor(m_color);
-  for (int i = 0; i < ((int)points.size() - 2); i += 2) {
-    vector<TPointD> plv;
-    plv.push_back(points[i]);
-    plv.push_back(points[i + 1]);
-    plv.push_back(points[i + 3]);
-    plv.push_back(points[i + 2]);
-    flash.drawPolyline(plv);
-  }
-
-  // Quadratic version
-  /*  flash.setThickness(m_thick);
-vector<TPointD> pp;
-for( int i=0; i<(int)(points.size()-1); i+=2 )
-    pp.push_back(TPointD((points[i]+points[i+1])*0.5));
-
-if ( pp.size()<=2 ) {
-    if ( pp.size()==2 ) {
-       vector<TSegment> sv;
-       sv.push_back(TSegment(pp[0],pp[1]));
-           flash.setLineColor(m_color);
-           flash.drawSegments(sv,false);
-    }
-    return;
-}
-
-vector<TQuadratic> qv;
-qv.push_back(TQuadratic(pp[i],pp[i]*0.75+pp[i+1]*0.25,(pp[i]+pp[i+1])*0.5));
-for( i=1; i<(int)(pp.size()-1); i++ ) {
-   TPointD p0=((pp[i-1]+pp[i])*0.5);
-   TPointD p1=pp[i];
-   TPointD p2=((pp[i]+pp[i+1])*0.5);
-   qv.push_back(TQuadratic(p0,p1,p2));
-}
-int n=pp.size()-1;
-qv.push_back(TQuadratic((pp[n-1]+pp[n])*0.5,pp[n-1]*0.25+pp[n]*0.75,pp[n]));
-
-flash.setLineColor(m_color);
-flash.setThickness(m_thick);
-flash.drawquads(qv);
-*/
 }
 
 //=============================================================================
@@ -5068,111 +3772,6 @@ void TFriezeStrokeStyle2::drawStroke(const TColorFunction *cf,
   glEnd();
 }
 
-//-----------------------------------------------------------------------------
-
-void TFriezeStrokeStyle2::drawStroke(TFlash &flash,
-                                     const TStroke *stroke) const {
-  // TStroke *stroke = getStroke();
-  double length = stroke->getLength();
-
-  double s     = 0.01;
-  double lastS = 0;
-  double phi   = 0;
-  double lastW = 0;
-  double thick = 1 - m_thick;
-  vector<TPointD> points;
-  while (s <= length) {
-    double w = stroke->getParameterAtLength(s);
-    if (w < lastW) {
-      s += 0.1;
-      continue;
-    }
-    lastW           = w;
-    TThickPoint pos = stroke->getThickPoint(w);
-    TPointD u       = normalize(stroke->getSpeed(w));
-    TPointD v       = rotate90(u);
-
-    double thickness = pos.thick;  // 5; //(1-t)*40 + t * 10;
-
-    if (thickness > 0) {
-      double omega = M_PI / thickness;
-
-      double q        = 0.5 * (1 - cos(phi));
-      double theta    = M_PI_2 - M_PI * m_parameter * q;
-      double r        = thickness * sin(phi);
-      double r1       = r * thick;
-      double costheta = cos(theta);
-      double sintheta = sin(theta);
-      points.push_back(pos + u * (r * costheta) + v * (r * sintheta));
-      points.push_back(pos + u * (r1 * costheta) + v * (r1 * sintheta));
-      phi += (s - lastS) * omega;
-      lastS = s;
-    } else {
-      points.push_back(pos);
-      points.push_back(pos);
-    }
-
-    double ds = 0.5;
-    s += ds;
-  }
-
-  // Polyline version
-  flash.setThickness(0.0);
-  flash.setFillColor(m_color);
-  for (int i = 0; i < ((int)points.size() - 2); i += 2) {
-    vector<TPointD> plv;
-    plv.push_back(points[i]);
-    plv.push_back(points[i + 1]);
-    plv.push_back(points[i + 3]);
-    plv.push_back(points[i + 2]);
-    flash.drawPolyline(plv);
-  }
-
-  /*
-vector<TPointD> pp;
-for( int i=0; i<((int)points.size()-1); i+=2 )
-    pp.push_back(TPointD((points[i]+points[i+1])*0.5));
-
-// Quadratic version
-
-if ( pp.size()<=2 ) {
-    if ( pp.size()==2 ) {
-       vector<TSegment> sv;
-       sv.push_back(TSegment(pp[0],pp[1]));
-           flash.setLineColor(m_color);
-           flash.drawSegments(sv,false);
-    }
-    return;
-}
-
-vector<TQuadratic> qv;
-qv.push_back(TQuadratic(pp[i],pp[i]*0.75+pp[i+1]*0.25,(pp[i]+pp[i+1])*0.5));
-for( i=1; i<(int)(pp.size()-1); i++ ) {
-   TPointD p0=((pp[i-1]+pp[i])*0.5);
-   TPointD p1=pp[i];
-   TPointD p2=((pp[i]+pp[i+1])*0.5);
-   qv.push_back(TQuadratic(p0,p1,p2));
-}
-int n=pp.size()-1;
-qv.push_back(TQuadratic((pp[n-1]+pp[n])*0.5,pp[n-1]*0.25+pp[n]*0.75,pp[n]));
-
-flash.setLineColor(m_color);
-flash.setThickness(m_thick);
-flash.drawquads(qv);
-
-*/
-  // Segment version
-  /*
-flash.setThickness(m_thick);
-flash.setLineColor(m_color);
-  for( i=0; i<(int)(pp.size()-1); i++ ) {
-  vector<TSegment> sv;
-          sv.push_back(TSegment(pp[i],pp[i+1]));
-  flash.drawSegments(sv,false);
-  }
-*/
-}
-
 //=============================================================================
 
 TDualColorStrokeStyle2::TDualColorStrokeStyle2(TPixel32 color0, TPixel32 color1,
@@ -5261,45 +3860,6 @@ void TDualColorStrokeStyle2::drawStroke(const TColorFunction *cf,
       glVertex2dv(&v[i + 1].x);
       glEnd();
     }
-  }
-}
-
-//-----------------------------------------------------------------------------
-
-void TDualColorStrokeStyle2::drawStroke(TFlash &flash,
-                                        const TStroke *stroke) const {
-  TOutlineUtil::OutlineParameter param;
-  param.m_lengthStep = m_parameter;
-  TStrokeOutline outline;
-  TOutlineStyle::computeOutline(stroke, outline, param);
-  const std::vector<TOutlinePoint> &v = outline.getArray();
-  if (v.empty()) return;
-
-  TPixel32 colorv[2] = {m_color0, m_color1};
-  int colorindex     = 0;
-  flash.setThickness(0.0);
-  flash.setFillColor(TPixel32(0, 0, 0, 255));
-  for (UINT i = 0; i < (v.size() - 2); i += 2) {
-    vector<TPointD> tpv;
-    tpv.push_back(TPointD(v[i].x, v[i].y));
-    tpv.push_back(TPointD(v[i + 1].x, v[i + 1].y));
-    tpv.push_back(TPointD(v[i + 3].x, v[i + 3].y));
-    tpv.push_back(TPointD(v[i + 2].x, v[i + 2].y));
-
-    if (0 != v[i].stepCount) {
-      colorindex++;
-      flash.setFillColor(colorv[colorindex & 1]);
-    }
-    flash.drawPolyline(tpv);
-
-    /*  --- testing ---
-vector<TSegment> s;
-s.push_back(TSegment(tpv[0],tpv[1]));
-s.push_back(TSegment(tpv[1],tpv[2]));
-s.push_back(TSegment(tpv[2],tpv[3]));
-s.push_back(TSegment(tpv[3],tpv[0]));
-flash.drawSegments(s,false);
-*/
   }
 }
 
@@ -5427,47 +3987,6 @@ void TLongBlendStrokeStyle2::drawStroke(const TColorFunction *cf,
     glVertex2dv(&v[i + 1].x);
   }
   glEnd();
-}
-
-//-----------------------------------------------------------------------------
-
-void TLongBlendStrokeStyle2::drawStroke(TFlash &flash,
-                                        const TStroke *stroke) const {
-  TPixel32 color0, color1;
-  color0 = m_color0;
-  color1 = m_color1;
-
-  UINT i;
-  TOutlineUtil::OutlineParameter param;
-  double lParameter =
-      m_parameter >= 20.0 || m_parameter < 0.0 ? 10.0 : m_parameter;
-  param.m_lengthStep = lParameter;
-  TStrokeOutline outline;
-  TOutlineStyle::computeOutline(stroke, outline, param);
-  const std::vector<TOutlinePoint> &v = outline.getArray();
-  if (v.empty()) return;
-
-  flash.setThickness(0.0);
-
-  int mystepCount    = 0;
-  double totallength = stroke->getLength();
-  double ntick       = totallength / lParameter + 1;
-  SFlashUtils sfu;
-  TPixel32 col0, col1;
-  col0 = col1 = color0;
-  for (i = 2; i < v.size(); i += 2) {
-    if (0 != v[i].stepCount) {
-      col1 = blend(color0, color1, (double)mystepCount / ntick);
-      mystepCount++;
-    }
-    vector<TPointD> plv;
-    plv.push_back(TPointD(v[i - 2].x, v[i - 2].y));
-    plv.push_back(TPointD(v[i - 1].x, v[i - 1].y));
-    plv.push_back(TPointD(v[i + 1].x, v[i + 1].y));
-    plv.push_back(TPointD(v[i].x, v[i].y));
-    sfu.drawGradedPolyline(flash, plv, col0, col1);
-    col0 = col1;
-  }
 }
 
 //-----------------------------------------------------------------------------
@@ -5978,28 +4497,6 @@ void TMatrioskaStrokeProp::draw(const TVectorRenderData &rd) {
   //  }
 
   glPopMatrix();
-}
-
-//------------------------------------------------------------------------------------------
-
-void TMatrioskaStrokeProp::draw(TFlash &flash) {
-  int strokeId,
-      strokeNumber =
-          (int)(m_colorStyle->getParamValue(TColorStyle::double_tag(), 0)) - 1;
-  if ((UINT)strokeNumber != m_appStrokes.size()) {
-    recomputeStrokes(m_stroke, m_appStrokes, strokeNumber);
-  }
-
-  m_colorStyle->TOutlineStyle::drawStroke(flash, m_stroke);
-
-  TSolidColorStyle appStyle(m_colorStyle->getColorParamValue(1));
-
-  for (strokeId = strokeNumber - 1; strokeId >= 0; strokeId--) {
-    if ((m_appStrokes.size() - strokeId) & 1)
-      appStyle.TOutlineStyle::drawStroke(flash, m_appStrokes[strokeId]);
-    else
-      m_colorStyle->TOutlineStyle::drawStroke(flash, m_appStrokes[strokeId]);
-  }
 }
 
 //-----------------------------------------------------------------------------

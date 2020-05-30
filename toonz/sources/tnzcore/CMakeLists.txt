@@ -84,7 +84,6 @@ set(HEADERS ${MOC_HEADERS}
     ../include/tcodec.h
     ../include/trasterimage.h
     ../include/tcolorstyles.h
-    ../include/tflash.h
     ../include/tfont.h
     ../include/tinbetween.h
     ../include/tofflinegl.h
@@ -179,7 +178,6 @@ set(SOURCES
     ../common/trasterimage/trasterimage.cpp
     ../common/tvrender/tcolorstyles.cpp
     ../common/tvrender/tellipticbrush.cpp
-    ../common/tvrender/tflash.cpp
     ../common/tvrender/qtofflinegl.cpp
     ../common/tvrender/tglcurves.cpp
     ../common/tvrender/tglregions.cpp

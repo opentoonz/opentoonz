@@ -29,7 +29,6 @@
 
 //  Forward declarations
 
-class TFlash;
 class TPalette;
 
 //===================================================================
@@ -244,8 +243,6 @@ public:
 
   virtual void compute(TTile &tile, double frame, const TRenderSettings &info);
 
-  virtual void compute(TFlash &flash, int frame);
-
   void allocateAndCompute(TTile &tile, const TPointD &pos,
                           const TDimension &size, TRasterP templateRas,
                           double frame, const TRenderSettings &info);
@@ -341,7 +338,6 @@ public:
 
   void doCompute(TTile &tile, double frame,
                  const TRenderSettings &info) override;
-  void compute(TFlash &flash, int frame) override;
 
   bool doGetBBox(double frame, TRectD &bbox,
                  const TRenderSettings &info) override;
@@ -405,8 +401,6 @@ public:
   bool canHandle(const TRenderSettings &info, double frame) override {
     return true;
   }
-
-  void compute(TFlash &flash, int frame) override;
 
   TAffine getPlacement(double frame) override { return m_aff; }
   TAffine getParentPlacement(double frame) override { return TAffine(); }

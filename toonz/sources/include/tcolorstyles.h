@@ -30,7 +30,6 @@ class TRegion;
 class TStrokeProp;
 class TRegionProp;
 class TVectorRenderData;
-class TFlash;
 class TInputStreamInterface;
 class TOutputStreamInterface;
 class TRasterStyleFx;
@@ -367,11 +366,6 @@ etc...
       const = 0;  //!< Return a brief description of the style.
   virtual QString getParamNames(int index)
       const;  //!< Return the string that identifies the \a index-th parameter.
-
-  // Drawing-related  functions
-
-  virtual void drawStroke(TFlash &flash, const TStroke *stroke)
-      const;  //!< Draws the supplied stroke in flash.
 
   // I/O-related  functions
 

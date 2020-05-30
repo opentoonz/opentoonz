@@ -102,7 +102,7 @@ SizeField::SizeField(QSize min, QSize max, QSize value, QWidget* parent)
   bool ret = true;
   ret      = ret && connect(m_fieldX, SIGNAL(editingFinished()), this,
                        SIGNAL(editingFinished()));
-  ret      = ret && connect(m_fieldY, SIGNAL(editingFinished()), this,
+  ret = ret && connect(m_fieldY, SIGNAL(editingFinished()), this,
                        SIGNAL(editingFinished()));
   assert(ret);
 }
@@ -612,7 +612,7 @@ void PreferencesPopup::onInterfaceFontChanged(const QString& text) {
   for (ComboBoxItem& item : newStyleItems)
     fontStyleCombo->addItem(item.first, item.second);
   if (!oldTypeface.isEmpty()) {
-    int newIndex = fontStyleCombo->findText(oldTypeface);
+    int newIndex               = fontStyleCombo->findText(oldTypeface);
     if (newIndex < 0) newIndex = 0;
     fontStyleCombo->setCurrentIndex(newIndex);
   }
@@ -696,17 +696,6 @@ void PreferencesPopup::onImportPolicyExternallyChanged(int policy) {
   // update preferences data accordingly
   importPolicyCombo->setCurrentIndex(policy);
 }
-//-----------------------------------------------------------------------------
-
-#ifdef LINETEST
-void PreferencesPopup::onLineTestFpsCapture(int index) {
-  if (index == 0) m_pref->setLineTestFpsCapture(0);
-  if (index == 1)
-    m_pref->setLineTestFpsCapture(25);
-  else if (index == 2)
-    m_pref->setLineTestFpsCapture(30);
-}
-#endif
 
 //-----------------------------------------------------------------------------
 
@@ -731,7 +720,7 @@ QWidget* PreferencesPopup::createUI(PreferencesItemId id,
       for (const ComboBoxItem& item : comboItems)
         combo->addItem(item.first, item.second);
       combo->setCurrentIndex(combo->findData(item.value));
-      ret    = connect(combo, SIGNAL(currentIndexChanged(int)), this,
+      ret = connect(combo, SIGNAL(currentIndexChanged(int)), this,
                     SLOT(onChange()));
       widget = combo;
     } else {  // create IntLineEdit
@@ -768,7 +757,7 @@ QWidget* PreferencesPopup::createUI(PreferencesItemId id,
     if (id == interfaceFont) {  // create QFontComboBox
       QFontComboBox* combo = new QFontComboBox(this);
       combo->setCurrentText(item.value.toString());
-      ret    = connect(combo, SIGNAL(currentIndexChanged(const QString&)), this,
+      ret = connect(combo, SIGNAL(currentIndexChanged(const QString&)), this,
                     SLOT(onInterfaceFontChanged(const QString&)));
       widget = combo;
     } else if (!comboItems.isEmpty()) {  // create QComboBox
@@ -776,7 +765,7 @@ QWidget* PreferencesPopup::createUI(PreferencesItemId id,
       for (const ComboBoxItem& item : comboItems)
         combo->addItem(item.first, item.second);
       combo->setCurrentIndex(combo->findData(item.value));
-      ret    = connect(combo, SIGNAL(currentIndexChanged(int)), this,
+      ret = connect(combo, SIGNAL(currentIndexChanged(int)), this,
                     SLOT(onChange()));
       widget = combo;
     } else {  // create FileField
@@ -799,7 +788,7 @@ QWidget* PreferencesPopup::createUI(PreferencesItemId id,
   {
     ColorField* field =
         new ColorField(this, false, colorToTPixel(item.value.value<QColor>()));
-    ret    = connect(field, SIGNAL(colorChanged(const TPixel32&, bool)), this,
+    ret = connect(field, SIGNAL(colorChanged(const TPixel32&, bool)), this,
                   SLOT(onColorFieldChanged(const TPixel32&, bool)));
     widget = field;
   } break;
@@ -908,8 +897,8 @@ void PreferencesPopup::insertDualUIs(
 //-----------------------------------------------------------------------------
 
 void PreferencesPopup::insertFootNote(QGridLayout* layout) {
-  QLabel* note =
-      new QLabel(tr("* Changes will take effect the next time you run OpenToonz"));
+  QLabel* note = new QLabel(
+      tr("* Changes will take effect the next time you run OpenToonz"));
   note->setStyleSheet("font-size: 10px; font: italic;");
   layout->addWidget(note, layout->rowCount(), 0, 1, 2,
                     Qt::AlignLeft | Qt::AlignVCenter);
@@ -1352,9 +1341,9 @@ QWidget* PreferencesPopup::createGeneralPage() {
   bool ret = true;
   ret      = ret && connect(m_pref, SIGNAL(stopAutoSave()), this,
                        SLOT(onAutoSaveExternallyChanged()));
-  ret      = ret && connect(m_pref, SIGNAL(startAutoSave()), this,
+  ret = ret && connect(m_pref, SIGNAL(startAutoSave()), this,
                        SLOT(onAutoSaveExternallyChanged()));
-  ret      = ret && connect(m_pref, SIGNAL(autoSavePeriodChanged()), this,
+  ret = ret && connect(m_pref, SIGNAL(autoSavePeriodChanged()), this,
                        SLOT(onAutoSavePeriodExternallyChanged()));
 
   ret = ret && connect(m_projectRootDocuments, SIGNAL(stateChanged(int)),

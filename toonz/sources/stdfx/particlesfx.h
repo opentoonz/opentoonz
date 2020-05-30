@@ -132,7 +132,6 @@ public:
   void doDryCompute(TRectD &rect, double frame,
                     const TRenderSettings &info) override;
   void doCompute(TTile &tile, double frame, const TRenderSettings &ri) override;
-  void compute(TFlash &flash, int frame) override;
 
   void getParamUIs(TParamUIConcept *&concepts, int &length) override;
 

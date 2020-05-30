@@ -9,7 +9,6 @@
 #include "tsystem.h"
 #include "timagecache.h"
 #include "tconvert.h"
-#include "tflash.h"
 
 #include "trasterimage.h"
 
@@ -209,7 +208,7 @@ void Iwa_Particles_Engine::roll_particles(
     std::vector<int> lastframe, /*-テクスチャ素材のそれぞれのカラム長-*/
     int &totalparticles, QList<ParticleOrigin> &particleOrigins,
     int genPartNum /*- 実際に生成したい粒子数 -*/
-) {
+    ) {
   particles_ranges ranges;
   int i;
   float xgravity, ygravity, windx, windy;
@@ -329,7 +328,7 @@ void Iwa_Particles_Engine::roll_particles(
             po.pos[1],               /*- 座標を指定して発生 -*/
             po.isUpward,             /*- orientation を追加 -*/
             (int)po.initSourceFrame) /*- 素材内の初期フレーム位置 -*/
-        );
+                              );
       }
       totalparticles++;
     }
@@ -375,7 +374,7 @@ void Iwa_Particles_Engine::roll_particles(
               (int)po.level, lastframe[po.level], po.pos[0], po.pos[1],
               po.isUpward,
               (int)po.initSourceFrame) /*- 素材内の初期フレーム位置 -*/
-          );
+                                 );
         }
         totalparticles++;
       }
@@ -391,7 +390,7 @@ void Iwa_Particles_Engine::roll_particles(
           /*- 出発する粒子 -*/
           ParticleOrigin po = particleOrigins.at(leavingPartIndex.at(i));
 
-          int seed     = (int)((std::numeric_limits<int>::max)() *
+          int seed = (int)((std::numeric_limits<int>::max)() *
                            values.random_val->getFloat());
           int lifetime = 0;
 
@@ -410,7 +409,7 @@ void Iwa_Particles_Engine::roll_particles(
                     0, (int)po.level, lastframe[po.level], po.pos[0], po.pos[1],
                     po.isUpward,
                     (int)po.initSourceFrame) /*- 素材内の初期フレーム位置 -*/
-            );
+                );
           }
           totalparticles++;
         }
@@ -422,7 +421,7 @@ void Iwa_Particles_Engine::roll_particles(
         /*- 出発する粒子 -*/
         ParticleOrigin po = particleOrigins.at(leavingPartIndex.at(i));
 
-        int seed     = (int)((std::numeric_limits<int>::max)() *
+        int seed = (int)((std::numeric_limits<int>::max)() *
                          values.random_val->getFloat());
         int lifetime = 0;
 
@@ -438,7 +437,7 @@ void Iwa_Particles_Engine::roll_particles(
               (int)po.level, lastframe[po.level], po.pos[0], po.pos[1],
               po.isUpward,
               (int)po.initSourceFrame) /*-  素材内の初期フレーム位置  -*/
-          );
+                                );
         }
         totalparticles++;
       }
@@ -488,10 +487,10 @@ void Iwa_Particles_Engine::normalize_values(struct particles_values &values,
   (values.speeda_val.first)        = (values.speeda_val.first) * M_PI_180;
   (values.speeda_val.second)       = (values.speeda_val.second) * M_PI_180;
   if (values.step_val < 1) values.step_val = 1;
-  values.genfadecol_val  = (values.genfadecol_val) * 0.01;
-  values.finfadecol_val  = (values.finfadecol_val) * 0.01;
-  values.foutfadecol_val = (values.foutfadecol_val) * 0.01;
-  (values.curl_val)      = (values.curl_val) * dpicorr * 0.1;
+  values.genfadecol_val                    = (values.genfadecol_val) * 0.01;
+  values.finfadecol_val                    = (values.finfadecol_val) * 0.01;
+  values.foutfadecol_val                   = (values.foutfadecol_val) * 0.01;
+  (values.curl_val)                        = (values.curl_val) * dpicorr * 0.1;
   /*- ひらひら粒子に照明を当てる normalize_values()内で Degree → Radian 化する
    * -*/
   (values.iw_light_theta_val) = (values.iw_light_theta_val) * M_PI_180;
@@ -503,23 +502,24 @@ void Iwa_Particles_Engine::normalize_values(struct particles_values &values,
 /*-----------------------------------------------------------------*/
 
 void Iwa_Particles_Engine::render_particles(
-    TFlash *flash,                           /*-  0 が入ってくる -*/
     TTile *tile,                             /*- 結果を格納するTile -*/
     std::vector<TRasterFxPort *> part_ports, /*- テクスチャ素材画像のポート -*/
     const TRenderSettings &ri,
     TDimension
-        &p_size, /*- テクスチャ素材のバウンディングボックスの足し合わさったもの
-                    -*/
+        &p_size,       /*- テクスチャ素材のバウンディングボックスの足し合わさったもの
+                          -*/
     TPointD &p_offset, /*- バウンディングボックス左下の座標 -*/
     std::map<int, TRasterFxPort *>
         ctrl_ports, /*- コントロール画像のポート番号／ポート -*/
-    std::vector<TLevelP> partLevel, /*- テクスチャ素材のリスト -*/
-    float dpi,                      /*- 1 が入ってくる -*/
-    int curr_frame, int shrink,     /*- 1 が入ってくる -*/
-    double startx,                  /*- 0 が入ってくる -*/
-    double starty,                  /*- 0 が入ってくる -*/
-    double endx,                    /*- 0 が入ってくる -*/
-    double endy,                    /*- 0 が入ってくる -*/
+    std::vector<TLevelP>
+        partLevel, /*- テクスチャ素材のリスト -*/
+    float dpi,     /*- 1 が入ってくる -*/
+    int curr_frame,
+    int shrink,                  /*- 1 が入ってくる -*/
+    double startx,               /*- 0 が入ってくる -*/
+    double starty,               /*- 0 が入ってくる -*/
+    double endx,                 /*- 0 が入ってくる -*/
+    double endy,                 /*- 0 が入ってくる -*/
     std::vector<int> last_frame, /*- テクスチャ素材のそれぞれのカラム長 -*/
     unsigned long fxId) {
   /*- 各種パーティクルのパラメータ -*/
@@ -737,7 +737,7 @@ void Iwa_Particles_Engine::render_particles(
                    curr_frame, level_n, &random_level, 1, last_frame,
                    totalparticles, particleOrigins,
                    intpart /*- 実際に生成したい粒子数 -*/
-    );
+                   );
 
     // Store the rolled data in the particles manager
     if (!particlesData->m_calculated ||
@@ -824,7 +824,7 @@ void Iwa_Particles_Engine::render_particles(
                 part.lifetime <=
                     part.genlifetime)  // This last... shouldn't always be?
             {
-              do_render(flash, &part, tile, part_ports, porttiles, ri, p_size,
+              do_render(&part, tile, part_ports, porttiles, ri, p_size,
                         p_offset, last_frame[part.level], partLevel, values,
                         opacity_range, dist_frame, partScales, &baseImgTile);
             }
@@ -842,7 +842,7 @@ void Iwa_Particles_Engine::render_particles(
                 part.lifetime > 0 &&
                 part.lifetime <= part.genlifetime)  // Same here..?
             {
-              do_render(flash, &part, tile, part_ports, porttiles, ri, p_size,
+              do_render(&part, tile, part_ports, porttiles, ri, p_size,
                         p_offset, last_frame[part.level], partLevel, values,
                         opacity_range, dist_frame, partScales, &baseImgTile);
             }
@@ -869,11 +869,11 @@ void Iwa_Particles_Engine::render_particles(
 -----------------------------------------------------------------*/
 
 void Iwa_Particles_Engine::do_render(
-    TFlash *flash, Iwa_Particle *part, TTile *tile,
-    std::vector<TRasterFxPort *> part_ports, std::map<int, TTile *> porttiles,
-    const TRenderSettings &ri, TDimension &p_size, TPointD &p_offset,
-    int lastframe, std::vector<TLevelP> partLevel,
-    struct particles_values &values, float opacity_range, int dist_frame,
+    Iwa_Particle *part, TTile *tile, std::vector<TRasterFxPort *> part_ports,
+    std::map<int, TTile *> porttiles, const TRenderSettings &ri,
+    TDimension &p_size, TPointD &p_offset, int lastframe,
+    std::vector<TLevelP> partLevel, struct particles_values &values,
+    float opacity_range, int dist_frame,
     std::map<std::pair<int, int>, float> &partScales, TTile *baseImgTile) {
   /*- カメラに対してタテになっている粒子を描かずに飛ばす -*/
   if (std::abs(cosf(part->flap_phi * 3.14159f / 180.0f)) < 0.03f) {
@@ -916,15 +916,15 @@ void Iwa_Particles_Engine::do_render(
 
     /*- ここで、照明モードのとき、その明るさを計算する -*/
     if (values.iw_rendermode_val == Iwa_TiledParticlesFx::REND_ILLUMINATED) {
-      float liTheta   = values.iw_light_theta_val;
-      float liPhi     = values.iw_light_phi_val;
-      float3 normVec  = {sinf(theta) * sinf(phi), cosf(theta) * sinf(phi),
+      float liTheta  = values.iw_light_theta_val;
+      float liPhi    = values.iw_light_phi_val;
+      float3 normVec = {sinf(theta) * sinf(phi), cosf(theta) * sinf(phi),
                         cosf(phi)};
       float3 lightVec = {sinf(liTheta) * sinf(liPhi),
                          cosf(liTheta) * sinf(liPhi), cosf(liPhi)};
       /*- 法線ベクトルと光源ベクトルの内積の絶対値 -*/
-      illuminant = std::abs(normVec.x * lightVec.x + normVec.y *
-                            lightVec.y + normVec.z * lightVec.z);
+      illuminant = std::abs(normVec.x * lightVec.x + normVec.y * lightVec.y +
+                            normVec.z * lightVec.z);
     }
   }
 
@@ -966,138 +966,108 @@ void Iwa_Particles_Engine::do_render(
   /*- 縮小済みのParticleのサイズ -*/
   partResolution = TDimensionD(tceil(bbox.getLx()), tceil(bbox.getLy()));
 
-  if (flash) {
-    if (!partLevel[part->level]->frame(ndx)) {
-      if (part_ports[0]->isConnected()) {
-        TTile auxTile;
-        /*- テクスチャは出力タイルと同じbpcにする -*/
-        (*part_ports[0])
-            ->allocateAndCompute(auxTile, p_offset, p_size, tile->getRaster(),
-                                 ndx, ri);
-        partLevel[part->level]->setFrame(ndx,
-                                         TRasterImageP(auxTile.getRaster()));
-      }
-    }
+  TRasterP ras;
 
-    flash->pushMatrix();
-
-    const TAffine aff;
-
-    flash->multMatrix(scaleM * aff.place(0, 0, part->x, part->y));
-
-    {
-      TColorFader cf(TPixel32::Red, .5);
-      flash->draw(partLevel[part->level]->frame(ndx), &cf);
-    }
-
-    flash->popMatrix();
+  std::string alias;
+  TRasterImageP rimg;
+  rimg = partLevel[part->level]->frame(ndx);
+  if (rimg) {
+    ras = rimg->getRaster();
   } else {
-    TRasterP ras;
-
-    std::string alias;
-    TRasterImageP rimg;
-    rimg = partLevel[part->level]->frame(ndx);
+    alias = "PART: " + (*part_ports[part->level])->getAlias(ndx, riNew);
+    rimg  = TImageCache::instance()->get(alias, false);
     if (rimg) {
       ras = rimg->getRaster();
-    } else {
-      alias = "PART: " + (*part_ports[part->level])->getAlias(ndx, riNew);
-      rimg = TImageCache::instance()->get(alias, false);
-      if (rimg) {
-        ras = rimg->getRaster();
 
-        // Check that the raster resolution is sufficient for our purposes
-        if (ras->getLx() < partResolution.lx ||
-            ras->getLy() < partResolution.ly)
-          ras = 0;
-        else
-          partResolution = TDimensionD(ras->getLx(), ras->getLy());
-      }
-    }
-
-    // We are interested in making the relation between scale and (integer)
-    // resolution
-    // bijective - since we shall cache by using resolution as a partial
-    // identification parameter.
-    // Therefore, we find the current bbox Lx and take a unique scale out of it.
-    partScale      = partResolution.lx / standardRefBBox.getLx();
-    riNew.m_affine = TScale(partScale);
-    bbox           = riNew.m_affine * standardRefBBox;
-
-    // If no image was retrieved from the cache (or it was not scaled enough),
-    // calculate it
-    if (!ras) {
-      TTile auxTile;
-      (*part_ports[part->level])
-          ->allocateAndCompute(auxTile, bbox.getP00(),
-                               TDimension(partResolution.lx, partResolution.ly),
-                               tile->getRaster(), ndx, riNew);
-      ras = auxTile.getRaster();
-
-      // Finally, cache the particle
-      addRenderCache(alias, TRasterImageP(ras));
-    }
-
-    if (!ras) return;  // At this point, it should never happen anyway...
-
-    // Deal with particle colors/opacity
-    TRasterP rfinalpart;
-    // TRaster32P rfinalpart;
-    double curr_opacity =
-        part->set_Opacity(porttiles, values, opacity_range, dist_frame);
-    if (curr_opacity != 1.0 || part->gencol.fadecol || part->fincol.fadecol ||
-        part->foutcol.fadecol) {
-      if (values.pick_color_for_every_frame_val && values.gencol_ctrl_val &&
-          (porttiles.find(values.gencol_ctrl_val) != porttiles.end()))
-        part->get_image_reference(porttiles[values.gencol_ctrl_val], values,
-                                  part->gencol.col);
-
-      rfinalpart = ras->clone();
-      part->modify_colors_and_opacity(values, curr_opacity, dist_frame,
-                                      rfinalpart);
-    } else
-      rfinalpart = ras;
-
-    TRasterP rfinalpart2;
-    /*- 照明モードのとき、その明るさを色に格納 -*/
-    if (values.iw_rendermode_val == Iwa_TiledParticlesFx::REND_ILLUMINATED) {
-      rfinalpart2 = rfinalpart->clone();
-      part->set_illuminated_colors(illuminant, rfinalpart2);
-    } else if (baseImgTile->getRaster() &&
-               !baseImgTile->getRaster()->isEmpty()) {
-      rfinalpart2 = rfinalpart->clone();
-      /*- サイズが小さい場合は、単に色を拾う -*/
-      if (partResolution.lx <= 4.0 && partResolution.ly <= 4.0)
-        part->get_base_image_color(baseImgTile, values, rfinalpart2, bbox, ri);
+      // Check that the raster resolution is sufficient for our purposes
+      if (ras->getLx() < partResolution.lx || ras->getLy() < partResolution.ly)
+        ras = 0;
       else
-        part->get_base_image_texture(baseImgTile, values, rfinalpart2, bbox,
-                                     ri);
-    } else
-      rfinalpart2 = rfinalpart;
-
-    // Now, let's build the particle transform before it is overed on the output
-    // tile
-
-    // First, complete the transform by adding the rotational and scale
-    // components from
-    // Particles parameters
-    M = ri.m_affine * M * TScale(1.0 / partScale);
-
-    // Then, retrieve the particle position in current reference.
-    TPointD pos(part->x, part->y);
-    pos = ri.m_affine * pos;
-
-    // Finally, add the translational component to the particle
-    // NOTE: p_offset is added to account for the particle relative position
-    // inside its level's bbox
-    M = TTranslation(pos - tile->m_pos) * M * TTranslation(bbox.getP00());
-
-    if (TRaster32P myras32 = tile->getRaster())
-      TRop::over(tileRas, rfinalpart2, M);
-    else if (TRaster64P myras64 = tile->getRaster())
-      TRop::over(tileRas, rfinalpart2, M);
-    else {
-      throw TException("ParticlesFx: unsupported Pixel Type");
+        partResolution = TDimensionD(ras->getLx(), ras->getLy());
     }
+  }
+
+  // We are interested in making the relation between scale and (integer)
+  // resolution
+  // bijective - since we shall cache by using resolution as a partial
+  // identification parameter.
+  // Therefore, we find the current bbox Lx and take a unique scale out of it.
+  partScale      = partResolution.lx / standardRefBBox.getLx();
+  riNew.m_affine = TScale(partScale);
+  bbox           = riNew.m_affine * standardRefBBox;
+
+  // If no image was retrieved from the cache (or it was not scaled enough),
+  // calculate it
+  if (!ras) {
+    TTile auxTile;
+    (*part_ports[part->level])
+        ->allocateAndCompute(auxTile, bbox.getP00(),
+                             TDimension(partResolution.lx, partResolution.ly),
+                             tile->getRaster(), ndx, riNew);
+    ras = auxTile.getRaster();
+
+    // Finally, cache the particle
+    addRenderCache(alias, TRasterImageP(ras));
+  }
+
+  if (!ras) return;  // At this point, it should never happen anyway...
+
+  // Deal with particle colors/opacity
+  TRasterP rfinalpart;
+  // TRaster32P rfinalpart;
+  double curr_opacity =
+      part->set_Opacity(porttiles, values, opacity_range, dist_frame);
+  if (curr_opacity != 1.0 || part->gencol.fadecol || part->fincol.fadecol ||
+      part->foutcol.fadecol) {
+    if (values.pick_color_for_every_frame_val && values.gencol_ctrl_val &&
+        (porttiles.find(values.gencol_ctrl_val) != porttiles.end()))
+      part->get_image_reference(porttiles[values.gencol_ctrl_val], values,
+                                part->gencol.col);
+
+    rfinalpart = ras->clone();
+    part->modify_colors_and_opacity(values, curr_opacity, dist_frame,
+                                    rfinalpart);
+  } else
+    rfinalpart = ras;
+
+  TRasterP rfinalpart2;
+  /*- 照明モードのとき、その明るさを色に格納 -*/
+  if (values.iw_rendermode_val == Iwa_TiledParticlesFx::REND_ILLUMINATED) {
+    rfinalpart2 = rfinalpart->clone();
+    part->set_illuminated_colors(illuminant, rfinalpart2);
+  } else if (baseImgTile->getRaster() && !baseImgTile->getRaster()->isEmpty()) {
+    rfinalpart2 = rfinalpart->clone();
+    /*- サイズが小さい場合は、単に色を拾う -*/
+    if (partResolution.lx <= 4.0 && partResolution.ly <= 4.0)
+      part->get_base_image_color(baseImgTile, values, rfinalpart2, bbox, ri);
+    else
+      part->get_base_image_texture(baseImgTile, values, rfinalpart2, bbox, ri);
+  } else
+    rfinalpart2 = rfinalpart;
+
+  // Now, let's build the particle transform before it is overed on the output
+  // tile
+
+  // First, complete the transform by adding the rotational and scale
+  // components from
+  // Particles parameters
+  M = ri.m_affine * M * TScale(1.0 / partScale);
+
+  // Then, retrieve the particle position in current reference.
+  TPointD pos(part->x, part->y);
+  pos = ri.m_affine * pos;
+
+  // Finally, add the translational component to the particle
+  // NOTE: p_offset is added to account for the particle relative position
+  // inside its level's bbox
+  M = TTranslation(pos - tile->m_pos) * M * TTranslation(bbox.getP00());
+
+  if (TRaster32P myras32 = tile->getRaster())
+    TRop::over(tileRas, rfinalpart2, M);
+  else if (TRaster64P myras64 = tile->getRaster())
+    TRop::over(tileRas, rfinalpart2, M);
+  else {
+    throw TException("ParticlesFx: unsupported Pixel Type");
   }
 }
 
@@ -1108,7 +1078,8 @@ void Iwa_Particles_Engine::fill_array(
     int &regioncount, /*- 領域数を返す -*/
     std::vector<int>
         &myarray, /*- インデックスを返すと思われる。サイズはソースTileの縦横 -*/
-    std::vector<int> &lista, std::vector<int> &listb, int threshold) {
+    std::vector<int> &lista,
+    std::vector<int> &listb, int threshold) {
   int pr = 0;
   int i, j;
   int lx, ly;
@@ -1144,7 +1115,7 @@ void Iwa_Particles_Engine::fill_array(
           mask[1] = myarray[i - 1 + lx * (j - 1)];
         }
         if (i != lx - 1) mask[3] = myarray[i + 1 + lx * (j - 1)];
-        mask[2] = myarray[i + lx * (j - 1)];
+        mask[2]                  = myarray[i + lx * (j - 1)];
         if (!mask[0] && !mask[1] && !mask[2] && !mask[3]) {
           (regioncount)++;
           myarray[i + lx * j] = (regioncount);
@@ -1178,7 +1149,7 @@ void Iwa_Particles_Engine::fill_array(
 void Iwa_Particles_Engine::normalize_array(
     std::vector<std::vector<TPointD>> &myregions, TPointD pos, int lx, int ly,
     int regioncounter, std::vector<int> &myarray, std::vector<int> &lista,
-    std::vector<int> &listb, std::vector<int> &final) {
+    std::vector<int> &listb, std::vector<int> & final) {
   int i, j, k, l;
 
   std::vector<int> tmp;
@@ -1191,13 +1162,13 @@ void Iwa_Particles_Engine::normalize_array(
     j = lista[l];
     /*TMSG_INFO("j vale %d\n", j);*/
     while (final[j] != j) j = final[j];
-    k = listb[l];
+    k                       = listb[l];
     /*TMSG_INFO("k vale %d\n", k);*/
     while (final[k] != k) k = final[k];
-    if (j != k) final[j] = k;
+    if (j != k) final[j]    = k;
   }
   // TMSG_INFO("esco dal for\n");
-  for (j = 1; j <= regioncounter; j++)
+  for (j                                         = 1; j <= regioncounter; j++)
     while (final[j] != final[final[j]]) final[j] = final[final[j]];
 
   /*conto quante cavolo di regioni sono*/
@@ -1525,7 +1496,7 @@ void Iwa_Particles_Engine::renderBackground(
       ras = rimg->getRaster();
     } else {
       alias = "PART: " + (*part_ports[origin.level])->getAlias(ndx, riNew);
-      rimg = TImageCache::instance()->get(alias, false);
+      rimg  = TImageCache::instance()->get(alias, false);
       if (rimg) {
         ras = rimg->getRaster();
 

@@ -14,7 +14,6 @@
 #include "tstrokeprop.h"
 #include "ttessellator.h"
 #include "tcolorfunctions.h"
-#include "tflash.h"
 #include "tofflinegl.h"
 #include "drawutil.h"
 #include "trop.h"
@@ -100,108 +99,116 @@ private:
   double px, py, pz;
   double ax, ay;
 
-  inline void next_stage(const double &x, const double &y, const double &z)
-    { stages[stage][0] = x; stages[stage][1] = y; stages[stage][2] = z; ++stage; }
+  inline void next_stage(const double &x, const double &y, const double &z) {
+    stages[stage][0] = x;
+    stages[stage][1] = y;
+    stages[stage][2] = z;
+    ++stage;
+  }
 
 public:
   std::vector<double> vertices;
 
-  explicit OutlineBuilder(double width, int count = 0):
-    width(width), stage(0), px(), py(), pz(), ax(), ay()
-  {
+  explicit OutlineBuilder(double width, int count = 0)
+      : width(width), stage(0), px(), py(), pz(), ax(), ay() {
     memset(stages, 0, sizeof(stages));
-    vertices.reserve(12*(count + 2));
+    vertices.reserve(12 * (count + 2));
   }
 
   void add(double x, double y, double z = 0.0) {
     const double maxl = 4.0;
 
-    if (stage == 0) next_stage(x, y, z); else {
+    if (stage == 0)
+      next_stage(x, y, z);
+    else {
       double bx = x - px;
       double by = y - py;
-      double lb = sqrt(bx*bx + by*by);
-      if (lb < 1e-9)
-        return;
-      bx = width*bx/lb;
-      by = width*by/lb;
+      double lb = sqrt(bx * bx + by * by);
+      if (lb < 1e-9) return;
+      bx = width * bx / lb;
+      by = width * by / lb;
 
-      if (stage == 1) next_stage(x, y, z); else {
+      if (stage == 1)
+        next_stage(x, y, z);
+      else {
         if (stage == 2) next_stage(x, y, z);
-        double l = fabs(ax + bx) > 1e-9 ? -(ay - by)/(ax + bx)
-                 : fabs(ay + by) > 1e-9 ?  (ax - bx)/(ay + by)
-                 : 0.0;
+        double l = fabs(ax + bx) > 1e-9
+                       ? -(ay - by) / (ax + bx)
+                       : fabs(ay + by) > 1e-9 ? (ax - bx) / (ay + by) : 0.0;
         if (fabs(l) > maxl || fabs(l) < 1.0 || l > 0.0) {
           vertices.resize(vertices.size() + 12);
           double *p = &vertices.back() - 11;
-          p[ 0] = px;
-          p[ 1] = py;
-          p[ 2] = pz;
-          p[ 3] = px + ay;
-          p[ 4] = py - ax;
-          p[ 5] = pz;
-          p[ 6] = px;
-          p[ 7] = py;
-          p[ 8] = pz;
-          p[ 9] = px + by;
-          p[10] = py - bx;
-          p[11] = pz;
+          p[0]      = px;
+          p[1]      = py;
+          p[2]      = pz;
+          p[3]      = px + ay;
+          p[4]      = py - ax;
+          p[5]      = pz;
+          p[6]      = px;
+          p[7]      = py;
+          p[8]      = pz;
+          p[9]      = px + by;
+          p[10]     = py - bx;
+          p[11]     = pz;
         } else {
           vertices.resize(vertices.size() + 6);
           double *p = &vertices.back() - 5;
-          p[0] = px;
-          p[1] = py;
-          p[2] = pz;
-          p[3] = px - l*bx + by;
-          p[4] = py - l*by - bx;
-          p[5] = pz;
+          p[0]      = px;
+          p[1]      = py;
+          p[2]      = pz;
+          p[3]      = px - l * bx + by;
+          p[4]      = py - l * by - bx;
+          p[5]      = pz;
         }
       }
 
-      ax = bx; ay = by;
+      ax = bx;
+      ay = by;
     }
 
-    px = x; py = y; pz = z;
+    px = x;
+    py = y;
+    pz = z;
   }
 
   void finish() {
-    for(int i = 0; i < stage; ++i)
+    for (int i = 0; i < stage; ++i)
       add(stages[i][0], stages[i][1], stages[i][2]);
     stage = 0;
   }
 
-  double get_width() const
-    { return width; }
+  double get_width() const { return width; }
 
   void restart(double width) {
     this->width = width;
-    stage = 0;
+    stage       = 0;
     vertices.clear();
   }
 
-  void invert()
-    { restart(-width); }
+  void invert() { restart(-width); }
 };
 
 void vector4_div(double *v) {
-  double k = fabs(v[3]) > 1e-9 ? 1.0/v[3] : 0.0;
-  v[0] *= k, v[1] *= k, v[2] *= k; v[3] = 1.0;
+  double k = fabs(v[3]) > 1e-9 ? 1.0 / v[3] : 0.0;
+  v[0] *= k, v[1] *= k, v[2] *= k;
+  v[3] = 1.0;
 }
 
 void matrix4_x_vector4(double *dv, const double *m, const double *v) {
-  dv[0] = m[0]*v[0] + m[4]*v[1] + m[ 8]*v[2] + m[12]*v[3];
-  dv[1] = m[1]*v[0] + m[5]*v[1] + m[ 9]*v[2] + m[13]*v[3];
-  dv[2] = m[2]*v[0] + m[6]*v[1] + m[10]*v[2] + m[14]*v[3];
-  dv[3] = m[3]*v[0] + m[7]*v[1] + m[11]*v[2] + m[15]*v[3];
+  dv[0] = m[0] * v[0] + m[4] * v[1] + m[8] * v[2] + m[12] * v[3];
+  dv[1] = m[1] * v[0] + m[5] * v[1] + m[9] * v[2] + m[13] * v[3];
+  dv[2] = m[2] * v[0] + m[6] * v[1] + m[10] * v[2] + m[14] * v[3];
+  dv[3] = m[3] * v[0] + m[7] * v[1] + m[11] * v[2] + m[15] * v[3];
 }
 
 void matrix4_x_matrix4(double *dm, const double *ma, const double *mb) {
-  matrix4_x_vector4(dm +  0, ma, mb +  0);
-  matrix4_x_vector4(dm +  4, ma, mb +  4);
-  matrix4_x_vector4(dm +  8, ma, mb +  8);
+  matrix4_x_vector4(dm + 0, ma, mb + 0);
+  matrix4_x_vector4(dm + 4, ma, mb + 4);
+  matrix4_x_vector4(dm + 8, ma, mb + 8);
   matrix4_x_vector4(dm + 12, ma, mb + 12);
 }
 
-class AntialiasingOutlinePainter: public OutlineBuilder {
+class AntialiasingOutlinePainter : public OutlineBuilder {
 private:
   double matrix[16];
   double projection_matrix[16];
@@ -209,9 +216,7 @@ private:
   double anti_viewport_matrix[16];
 
 public:
-  explicit AntialiasingOutlinePainter(int count = 0):
-    OutlineBuilder(1.0, 0)
-  {
+  explicit AntialiasingOutlinePainter(int count = 0) : OutlineBuilder(1.0, 0) {
     memset(matrix, 0, sizeof(matrix));
     memset(projection_matrix, 0, sizeof(projection_matrix));
     memset(modelview_matrix, 0, sizeof(modelview_matrix));
@@ -224,23 +229,25 @@ public:
     glGetDoublev(GL_MODELVIEW_MATRIX, modelview_matrix);
 
     double viewport_matrix[16] = {};
-    viewport_matrix[ 0] = 0.5*viewport[2];
-    viewport_matrix[ 5] = 0.5*viewport[3];
-    viewport_matrix[10] = 1.0;
-    viewport_matrix[12] = 0.5*viewport[2];
-    viewport_matrix[13] = 0.5*viewport[3];
-    viewport_matrix[15] = 1.0;
+    viewport_matrix[0]         = 0.5 * viewport[2];
+    viewport_matrix[5]         = 0.5 * viewport[3];
+    viewport_matrix[10]        = 1.0;
+    viewport_matrix[12]        = 0.5 * viewport[2];
+    viewport_matrix[13]        = 0.5 * viewport[3];
+    viewport_matrix[15]        = 1.0;
 
-    anti_viewport_matrix[ 0] = 2.0/viewport[2];
-    anti_viewport_matrix[ 5] = 2.0/viewport[3];
+    anti_viewport_matrix[0]  = 2.0 / viewport[2];
+    anti_viewport_matrix[5]  = 2.0 / viewport[3];
     anti_viewport_matrix[10] = 1.0;
     anti_viewport_matrix[12] = -1.0;
     anti_viewport_matrix[13] = -1.0;
     anti_viewport_matrix[15] = 1.0;
 
-    { double tmp[16] = {};
+    {
+      double tmp[16] = {};
       matrix4_x_matrix4(tmp, projection_matrix, modelview_matrix);
-      matrix4_x_matrix4(matrix, viewport_matrix, tmp); }
+      matrix4_x_matrix4(matrix, viewport_matrix, tmp);
+    }
   }
 
   void add(double x, double y, double z = 0.0) {
@@ -252,16 +259,15 @@ public:
 
   void finish() {
     OutlineBuilder::finish();
-    if (vertices.empty())
-      return;
-    int count = (int)vertices.size()/6;
+    if (vertices.empty()) return;
+    int count = (int)vertices.size() / 6;
 
     // prepare colors
     float color[8] = {};
     glGetFloatv(GL_CURRENT_COLOR, color);
-    memcpy(color+4, color, 3*sizeof(float));
-    std::vector<float> colors(8*count);
-    for(float *c = &colors[0], *ce = &colors.back(); c < ce; c += 8)
+    memcpy(color + 4, color, 3 * sizeof(float));
+    std::vector<float> colors(8 * count);
+    for (float *c = &colors[0], *ce = &colors.back(); c < ce; c += 8)
       memcpy(c, color, sizeof(color));
 
     // draw
@@ -274,7 +280,7 @@ public:
 
     glVertexPointer(3, GL_DOUBLE, 0, &vertices.front());
     glColorPointer(4, GL_FLOAT, 0, &colors.front());
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 2*count);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 2 * count);
 
     glDisableClientState(GL_VERTEX_ARRAY);
     glDisableClientState(GL_COLOR_ARRAY);
@@ -287,27 +293,21 @@ public:
   }
 };
 
-void drawAntialiasedOutline(
-    const std::vector<TOutlinePoint> &_v, const TStroke *stroke )
-{
-  if (_v.empty())
-    return;
+void drawAntialiasedOutline(const std::vector<TOutlinePoint> &_v,
+                            const TStroke *stroke) {
+  if (_v.empty()) return;
 
   const TOutlinePoint *begin = &_v.front(), *end = &_v.back();
   assert(_v.size() % 2 == 0);
 
   AntialiasingOutlinePainter outline(_v.size());
-  for(const TOutlinePoint *i = begin; i < end; i += 2)
-    outline.add(i->x, i->y);
-  for(const TOutlinePoint *i = end; i > begin; i -= 2)
-    outline.add(i->x, i->y);
+  for (const TOutlinePoint *i = begin; i < end; i += 2) outline.add(i->x, i->y);
+  for (const TOutlinePoint *i = end; i > begin; i -= 2) outline.add(i->x, i->y);
   outline.finish();
 
   outline.invert();
-  for(const TOutlinePoint *i = begin; i < end; i += 2)
-    outline.add(i->x, i->y);
-  for(const TOutlinePoint *i = end; i > begin; i -= 2)
-    outline.add(i->x, i->y);
+  for (const TOutlinePoint *i = begin; i < end; i += 2) outline.add(i->x, i->y);
+  for (const TOutlinePoint *i = end; i > begin; i -= 2) outline.add(i->x, i->y);
   outline.finish();
 }
 
@@ -607,15 +607,6 @@ void TSolidColorStyle::drawRegion(const TColorFunction *cf,
 
 //-----------------------------------------------------------------------------
 
-void TSolidColorStyle::drawRegion(TFlash &flash, const TRegion *r) const {
-  flash.setFillColor(getMainColor());
-  flash.setLineColor(TPixel::Transparent);
-  flash.setThickness(0);
-  flash.drawRegion(*r);
-}
-
-//-----------------------------------------------------------------------------
-
 //=============================================================================
 
 void TSolidColorStyle::drawStroke(const TColorFunction *cf,
@@ -712,12 +703,6 @@ int TSolidColorStyle::getTagId() const { return 3; }
 
 //-----------------------------------------------------------------------------
 
-void TSolidColorStyle::setFill(TFlash &flash) const {
-  flash.setFillColor(getMainColor());
-}
-
-//-----------------------------------------------------------------------------
-
 void TSolidColorStyle::loadData(TInputStreamInterface &is) {
   TPixel32 color;
   is >> color;
@@ -742,17 +727,6 @@ TCenterLineStrokeStyle::TCenterLineStrokeStyle(const TPixel32 &color,
 
 TColorStyle *TCenterLineStrokeStyle::clone() const {
   return new TCenterLineStrokeStyle(*this);
-}
-
-//-----------------------------------------------------------------------------
-
-void TCenterLineStrokeStyle::drawStroke(TFlash &flash, const TStroke *s) const {
-  if (m_width == 0) return;
-
-  flash.setThickness(m_width);
-  flash.setLineColor(getAverageColor());
-  flash.drawCenterline(s, true);
-  flash.setThickness(0);
 }
 
 //------------------------------------------------------------------------------------
@@ -1286,40 +1260,6 @@ void TRasterImagePatternStrokeStyle::drawStroke(
   glDisable(GL_BLEND);
 }
 
-//---------------------------------------------------------------------------------------------------------------
-
-void TRasterImagePatternStrokeStyle::drawStroke(TFlash &flash,
-                                                const TStroke *stroke) const {
-  flash.drawHangedObjects();
-  if (m_level->getFrameCount() == 0) {
-    // if( rd.m_clippingRect!=TRect() && !
-    // convert(rd.m_aff*stroke->getBBox()).overlaps( rd.m_clippingRect ) )
-    // return;
-    TCenterLineStrokeStyle *appStyle =
-        new TCenterLineStrokeStyle(TPixel32(255, 0, 0, 255), 0x0, 2.0);
-    // flash.pushMatrix();
-    // flash.multMatrix(rd.m_aff);
-    appStyle->drawStroke(flash, stroke);
-    // glPopMatrix();
-    return;
-  }
-
-  std::vector<TAffine> transformations;
-  computeTransformations(transformations, stroke);
-  assert(m_level->begin() != m_level->end());
-  TLevel::Iterator lit = m_level->begin();
-
-  for (UINT i = 0; i < transformations.size(); i++) {
-    TRasterImageP img                = m_level->frame(lit->first);
-    if (++lit == m_level->end()) lit = m_level->begin();
-    assert(img);
-    flash.pushMatrix();
-    flash.multMatrix(transformations[i] * TScale(2.0));
-    flash.buildImage(img.getPointer(), false);
-    flash.popMatrix();
-  }
-}
-
 //-----------------------------------------------------------------------------
 
 void TRasterImagePatternStrokeStyle::loadData(TInputStreamInterface &is) {
@@ -1725,81 +1665,6 @@ void TVectorImagePatternStrokeStyle::drawStroke(
       }
       glPopMatrix();
     }
-  }
-}
-
-//---------------------------------------------------------------------------------------------------------------
-
-void TVectorImagePatternStrokeStyle::drawStroke(TFlash &flash,
-                                                const TStroke *stroke) const {
-  flash.drawHangedObjects();
-
-  const int frameCount = m_level->getFrameCount();
-  if (frameCount == 0) {
-    // if( rd.m_clippingRect!=TRect() && !
-    // convert(rd.m_aff*stroke->getBBox()).overlaps( rd.m_clippingRect ) )
-    // return;
-    TCenterLineStrokeStyle *appStyle =
-        new TCenterLineStrokeStyle(TPixel32(255, 0, 0, 255), 0x0, 2.0);
-    // flash.pushMatrix();
-    // flash.multMatrix(rd.m_aff);
-    appStyle->drawStroke(flash, stroke);
-    // glPopMatrix();
-    return;
-  }
-  UINT cpCount    = stroke->getControlPointCount();
-  UINT sampleStep = (cpCount < 10) ? 1 : (UINT)((double)cpCount / 10.0);
-
-  double thickSum = 0;
-  UINT count      = 0;
-  for (UINT cp = 0; cp < cpCount; cp += sampleStep) {
-    thickSum += stroke->getControlPoint(cp).thick;
-    count++;
-  }
-  double averageThick = thickSum / (double)count;
-
-  if (averageThick < 2.0) return;
-  const double length = stroke->getLength();
-  assert(m_level->begin() != m_level->end());
-  TLevel::Iterator lit = m_level->begin();
-  double s             = 0;
-
-  while (s < length) {
-    TFrameId fid                     = lit->first;
-    TVectorImageP img                = m_level->frame(fid);
-    if (++lit == m_level->end()) lit = m_level->begin();
-    assert(img);
-    if (img->getType() != TImage::VECTOR) return;
-    double t       = stroke->getParameterAtLength(s);
-    TThickPoint p  = stroke->getThickPoint(t);
-    TPointD v      = stroke->getSpeed(t);
-    double ang     = rad2degree(atan(v)) + m_rotation;
-    TRectD bbox    = img->getBBox();
-    TPointD center = 0.5 * (bbox.getP00() + bbox.getP11());
-    // double rx = bbox.getLx() * 0.5;
-    double ry              = bbox.getLy() * 0.5;
-    if (ry * ry < 1e-5) ry = p.thick;
-    double sc              = p.thick / ry;
-    if (sc < 0.0001) sc    = 0.0001;
-    TAffine aff =
-        TTranslation(p) * TRotation(ang) * TScale(sc) * TTranslation(-center);
-    // TVectorRenderData rd2(rd, rd.m_aff * aff);
-    // c'era un crash se, dopo aver fatto new color, si selezionava un pattern
-    // e si disegnava (stack overflow). Ora r2 prende la palette
-    // dell'immagine caricata
-    TVectorImage *imgPointer = img.getPointer();
-
-    // TVectorRenderData rd2(rd.m_aff * aff,rd.m_clippingRect,
-    //                  img->getPalette(),rd.m_cf,rd.m_antiAliasing);
-
-    flash.pushMatrix();
-    flash.multMatrix(aff);
-    flash.buildImage(imgPointer, false);
-    // flash.draw(imgPointer, 0);
-    flash.popMatrix();
-
-    double ds = std::max(2.0, sc * bbox.getLx() + m_space);
-    s += ds;
   }
 }
 

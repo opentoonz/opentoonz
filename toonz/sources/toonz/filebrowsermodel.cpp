@@ -29,10 +29,6 @@
 #include <Cocoa/Cocoa.h>
 #endif
 
-#ifdef LINETEST
-#include "tnzcamera.h"
-#endif
-
 namespace {
 TFilePath getMyDocumentsPath() {
 #ifdef _WIN32
@@ -777,11 +773,6 @@ void DvDirModelProjectNode::makeCurrent() {
   TProjectManager *pm   = TProjectManager::instance();
   TFilePath projectPath = getProjectPath();
   if (!IoCmd::saveSceneIfNeeded(QObject::tr("Change project"))) return;
-
-#ifdef LINETEST
-  TnzCamera *camera = TnzCamera::instance();
-  if (camera->isCameraConnected()) camera->cameraDisconnect();
-#endif
 
   pm->setCurrentProjectPath(projectPath);
   IoCmd::newScene();

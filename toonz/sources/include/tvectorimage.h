@@ -240,7 +240,7 @@ get the stroke nearest at point
                                                       //! index.
   void moveStrokes(int fromIndex, int count, int moveBefore);
   //! Find regions of a \b TVectorImage
-  void findRegions(bool fromSwf = false);
+  void findRegions();
 
 // Gmt. VA TOLTO IL PRIMA POSSIBILE.
 // E' una pessima cosa rendere platform dependent l'interfaccia pubblica di una

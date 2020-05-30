@@ -32,7 +32,6 @@ class TRegionProp;
 class TRegionOutline;
 class TTessellator;
 class TColorFunction;
-class TFlash;
 class TVectorImage;
 
 //=================================================
@@ -117,14 +116,8 @@ public:
   virtual void drawRegion(const TColorFunction *cf, const bool antiAliasing,
                           TRegionOutline &outline) const = 0;
 
-  virtual void drawRegion(TFlash &, const TRegion *) const {};
   virtual void drawStroke(const TColorFunction *cf, TStrokeOutline *outline,
                           const TStroke *stroke) const = 0;
-
-  void drawStroke(TFlash &flash, const TStroke *stroke) const override {
-    TColorStyle::drawStroke(flash, stroke);
-  }
-  virtual void setFill(TFlash &) const {};
 
 protected:
   // Not assignable
@@ -164,12 +157,9 @@ public:
 
   void drawRegion(const TColorFunction *cf, const bool antiAliasing,
                   TRegionOutline &outline) const override;
-  void drawRegion(TFlash &flash, const TRegion *r) const override;
 
   void drawStroke(const TColorFunction *cf, TStrokeOutline *outline,
                   const TStroke *s) const override;
-
-  void setFill(TFlash &flash) const override;
 
   int getTagId() const override;
 
@@ -204,7 +194,6 @@ public:
 
   void drawStroke(const TColorFunction *cf,
                   const TStroke *stroke) const override;
-  void drawStroke(TFlash &flash, const TStroke *s) const override;
 
   bool hasMainColor() const override { return true; }
   TPixel32 getMainColor() const override { return m_color; }
@@ -258,7 +247,6 @@ public:
   void drawStroke(const TVectorRenderData &rd,
                   const std::vector<TAffine> &positions,
                   const TStroke *stroke) const;
-  void drawStroke(TFlash &flash, const TStroke *stroke) const override;
 
   void invalidate(){};
 
@@ -335,7 +323,6 @@ public:
   void drawStroke(const TVectorRenderData &rd,
                   const std::vector<TAffine> &positions,
                   const TStroke *stroke) const;
-  void drawStroke(TFlash &flash, const TStroke *stroke) const override;
 
   void invalidate(){};
 

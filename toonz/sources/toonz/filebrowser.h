@@ -170,9 +170,6 @@ protected slots:
   void folderUp();
   void newFolder();
 
-  void previewScreenSaver();
-  void installScreenSaver();
-
   void onBackButtonPushed();
   void onFwdButtonPushed();
   void onFolderEdited();

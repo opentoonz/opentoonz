@@ -7,7 +7,6 @@
 #include "tconvert.h"
 #include "tstopwatch.h"
 #include "tlevel_io.h"
-#include "tflash.h"
 #include "trasterimage.h"
 #include "ttoonzimage.h"
 #include "tvectorimage.h"
@@ -1544,17 +1543,6 @@ TXshColumn *TLevelColumnFx::getXshColumn() const { return m_levelColumn; }
 
 //-------------------------------------------------------------------
 
-void TLevelColumnFx::compute(TFlash &flash, int frame) {
-  if (!m_levelColumn) return;
-
-  TImageP img = m_levelColumn->getCell(frame).getImage(false);
-  if (!img) return;
-
-  flash.draw(img, 0);
-}
-
-//-------------------------------------------------------------------
-
 TAffine TLevelColumnFx::getDpiAff(int frame) {
   if (!m_levelColumn) return TAffine();
 
@@ -1694,10 +1682,6 @@ std::string TPaletteColumnFx::getAlias(double frame,
   TFilePath palettePath = getPalettePath(frame);
   return "TPaletteColumnFx[" + ::to_string(palettePath.getWideString()) + "]";
 }
-
-//-------------------------------------------------------------------
-
-void TPaletteColumnFx::compute(TFlash &flash, int frame) {}
 
 //-------------------------------------------------------------------
 

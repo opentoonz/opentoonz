@@ -157,10 +157,6 @@ private slots:
   void onEditLevelFormat();
   void onLevelFormatEdited();
   void onImportPolicyExternallyChanged(int policy);
-
-#ifdef LINETEST
-  void onLineTestFpsCapture(int);
-#endif
 };
 
 //**********************************************************************************

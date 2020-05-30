@@ -6,7 +6,6 @@
 #include <vector>
 //#include "tstroke.h"
 //#include "tcurves.h"
-//#include "tflash.h"
 
 // bool computeSweepBoundary(	const std::vector<TStroke*> &strokes,
 //							std::vector<

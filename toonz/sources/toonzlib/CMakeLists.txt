@@ -108,7 +108,6 @@ set(HEADERS
     ../include/toonz/scenefx.h
     ../include/toonz/sceneproperties.h
     ../include/toonz/sceneresources.h
-    ../include/toonz/screensavermaker.h
     ../include/toonz/skeleton.h
     ../include/toonz/stage.h
     ../include/toonz/stage2.h
@@ -210,7 +209,6 @@ set(SOURCES
     scenefx.cpp
     sceneproperties.cpp
     sceneresources.cpp
-    screensavermaker.cpp
     scriptbinding.cpp
     scriptbinding_centerline_vectorizer.cpp
     scriptbinding_files.cpp

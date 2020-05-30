@@ -211,7 +211,7 @@ bool mustRemoveColumn(int &from, int &to, TXshChildLevel *childLevel,
     if (app != childLevel) {
       removeColumn = false;
       if (from != -1 && to != -1) {
-        rangeFound            = from <= row && row <= to;
+        rangeFound = from <= row && row <= to;
         if (!rangeFound) from = to = -1;
       }
       continue;
@@ -496,7 +496,7 @@ TFx *explodeFxSubTree(TFx *innerFx, QMap<TFx *, QPair<TFx *, int>> &fxs,
       sortedFx.insert(fxs[terminalFx].second, fxs[terminalFx].first);
     }
     if (outPorts.empty()) return 0;
-    TFx *root = sortedFx.begin().value();
+    TFx *root                          = sortedFx.begin().value();
     QMultiMap<int, TFx *>::iterator it = sortedFx.begin();
     outerDag->removeFromXsheet(it.value());
     for (++it; it != sortedFx.end(); ++it) {
@@ -806,7 +806,7 @@ void explodeFxs(TXsheet *xsh, TXsheet *subXsh, const GroupData &fxGroupData,
       if (outPorts.empty() || linkToXsheet)
         outerDag->addToXsheet(root);
       else
-        for (int j    = 0; j < outPorts.size(); j++) outPorts[j]->setFx(root);
+        for (int j = 0; j < outPorts.size(); j++) outPorts[j]->setFx(root);
       explosionLinked = true;
     }
   }
@@ -863,7 +863,7 @@ void explodeFxs(TXsheet *xsh, TXsheet *subXsh, const GroupData &fxGroupData,
   int groupId    = outerDag->getNewGroupId();
   for (it = fxs.begin(); it != fxs.end(); it++) {
     QPair<TFx *, int> pair = it.value();
-    TFx *outerFx = pair.first;
+    TFx *outerFx           = pair.first;
     outerFx->getAttributes()->setGroupId(groupId);
     outerFx->getAttributes()->setGroupName(L"Group " +
                                            std::to_wstring(groupId));
@@ -1092,18 +1092,31 @@ void closeSubXsheet(int dlevel) {
 
 //=============================================================================
 
-void bringPegbarsInsideChildXsheet(TXsheet *xsh, TXsheet *childXsh) {
+void bringPegbarsInsideChildXsheet(TXsheet *xsh, TXsheet *childXsh,
+                                   std::set<int> indices,
+                                   std::set<int> newIndices) {
+  // columns in the child xsheet are all connected to the table for now.
+  // so we need to take parental connection information from the parent xsheet.
+
   // retrieve all pegbars used from copied columns
   std::set<TStageObjectId> pegbarIds;
-  int i;
-  for (i = 0; i < childXsh->getColumnCount(); i++) {
-    TStageObjectId columnId = TStageObjectId::ColumnId(i);
-    TStageObjectId id       = childXsh->getStageObjectParent(columnId);
+
+  std::set<int>::iterator itr     = indices.begin();
+  std::set<int>::iterator new_itr = newIndices.begin();
+  while (itr != indices.end()) {
+    TStageObjectId id =
+        xsh->getStageObjectParent(TStageObjectId::ColumnId(*itr));
+
+    TStageObjectId newCol = TStageObjectId::ColumnId(*new_itr);
+    if (id.isPegbar() || id.isCamera())
+      childXsh->setStageObjectParent(newCol, id);
     /*- Columnの上流のPegbar/Cameraを格納していく -*/
     while (id.isPegbar() || id.isCamera()) {
       pegbarIds.insert(id);
       id = xsh->getStageObjectParent(id);
     }
+    itr++;
+    new_itr++;
   }
 
   std::set<TStageObjectId>::iterator pegbarIt;
@@ -1153,26 +1166,18 @@ void removeFx(TXsheet *xsh, TFx *fx) {
 
 //-----------------------------------------------------------------------------
 
-TXsheet *collapseColumns(std::set<int> indices) {
+void collapseColumns(std::set<int> indices, bool columnsOnly) {
+  // return if there is no selected columns
+  if (indices.empty()) return;
+
+  int index    = *indices.begin();
   TApp *app    = TApp::instance();
   TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
 
-  int index = *indices.begin();
-
   StageObjectsData *data = new StageObjectsData();
-  /*- StageObjectsData内にXshのデータを格納 -*/
+  // store xsheet data to be collapsed
   data->storeColumns(indices, xsh, StageObjectsData::eDoClone);
   data->storeColumnFxs(indices, xsh, StageObjectsData::eDoClone);
-
-  app->getCurrentXsheet()->blockSignals(true);
-  app->getCurrentObject()->blockSignals(true);
-  /*- 親Sheetのカラムを消す -*/
-  ColumnCmd::deleteColumns(indices, false, true);
-  app->getCurrentXsheet()->blockSignals(false);
-  app->getCurrentObject()->blockSignals(false);
-
-  /*- 消したColumnの最初のIndexに、SubXsheetLevelを作る -*/
-  xsh->insertColumn(index);
 
   ToonzScene *scene = app->getCurrentScene()->getScene();
   TXshLevel *xl     = scene->createNewLevel(CHILD_XSHLEVEL);
@@ -1185,39 +1190,37 @@ TXsheet *collapseColumns(std::set<int> indices) {
 
   std::set<int> newIndices;
   std::list<int> restoredSplineIds;
-  /*- 先ほどのColumnDataをSubXsheetの中に格納 -*/
+  // restore data into sub xsheet
   data->restoreObjects(newIndices, restoredSplineIds, childXsh, 0);
+
+  // bring pegbars into sub xsheet
+  if (!columnsOnly)
+    bringPegbarsInsideChildXsheet(xsh, childXsh, indices, newIndices);
+
   childXsh->updateFrameCount();
 
-  /*- SubXsheet Levelの動画番号を親Sheetに記入 -*/
+  app->getCurrentXsheet()->blockSignals(true);
+  app->getCurrentObject()->blockSignals(true);
+  // remove columns in the parent xsheet
+  ColumnCmd::deleteColumns(indices, false, true);
+  app->getCurrentXsheet()->blockSignals(false);
+  app->getCurrentObject()->blockSignals(false);
+
+  // insert subxsheet column at the leftmost of the deleted columns
+  xsh->insertColumn(index);
+
+  // set subxsheet cells in the parent xhseet
   int r, rowCount = childXsh->getFrameCount();
   for (r = 0; r < rowCount; ++r)
     xsh->setCell(r, index, TXshCell(xl, TFrameId(r + 1)));
 
-  return childXsh;
-}
-
-//-----------------------------------------------------------------------------
-
-void collapseColumns(std::set<int> indices, bool columnsOnly) {
-  /*- 選択カラムが無ければreturn -*/
-  if (indices.empty()) return;
-
-  int index    = *indices.begin();
-  TApp *app    = TApp::instance();
-  TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
-
-  TXsheet *childXsh = collapseColumns(indices);
-
-  /*- Pegbar を持ち込む場合 -*/
-  if (!columnsOnly) bringPegbarsInsideChildXsheet(xsh, childXsh);
-
-  /*- 現状では、Pegbarを持ち込むかどうかに関わらず、subXsheetはTableに繋がる -*/
+  // the subxsheet node will always be connected to the table
+  // regardless of the "columns only" option
   xsh->getStageObject(TStageObjectId::ColumnId(index))
       ->setParent(TStageObjectId::TableId);
   xsh->updateFrameCount();
 
-  /*-- カメラ情報のコピー --*/
+  // copy camera info
   // xsh -> childXsh
   TStageObjectTree *parentTree = xsh->getStageObjectTree();
   TStageObjectTree *childTree  = childXsh->getStageObjectTree();
@@ -1226,15 +1229,16 @@ void collapseColumns(std::set<int> indices, bool columnsOnly) {
   for (int cam = 0; cam < parentTree->getCameraCount();) {
     TStageObject *parentCamera =
         parentTree->getStageObject(TStageObjectId::CameraId(tmpCamId), false);
-    /*- DeleteされたCameraはコピーしない -*/
+    // skip the deleted camera
     if (!parentCamera) {
       tmpCamId++;
       continue;
     }
 
-    /*- Deleteされていない場合 -*/
+    // if the camera exists
     if (parentCamera->getCamera()) {
-      /*- SubXsheetの対応するCameraを取得。なければ作る -*/
+      // obtain the correspondent camera in subxsheet. create it if it does not
+      // exist
       TCamera *childCamera =
           childTree->getStageObject(TStageObjectId::CameraId(tmpCamId))
               ->getCamera();
@@ -1246,7 +1250,7 @@ void collapseColumns(std::set<int> indices, bool columnsOnly) {
     tmpCamId++;
     cam++;
   }
-  /*- カレントカメラを同期させる -*/
+  // sync the current camera
   childTree->setCurrentCameraId(parentTree->getCurrentCameraId());
 
   app->getCurrentXsheet()->notifyXsheetChanged();
@@ -1332,6 +1336,22 @@ void collapseColumns(std::set<int> indices, const std::set<TFx *> &fxs,
   data->storeColumns(indices, xsh, StageObjectsData::eDoClone);
   data->storeFxs(fxs, xsh, StageObjectsData::eDoClone);
 
+  ToonzScene *scene = app->getCurrentScene()->getScene();
+  TXshLevel *xl     = scene->createNewLevel(CHILD_XSHLEVEL);
+  assert(xl);
+  TXshChildLevel *childLevel = xl->getChildLevel();
+  assert(childLevel);
+  TXsheet *childXsh = childLevel->getXsheet();
+
+  std::set<int> newIndices;
+  std::list<int> restoredSplineIds;
+  data->restoreObjects(newIndices, restoredSplineIds, childXsh, 0);
+
+  if (!columnsOnly)
+    bringPegbarsInsideChildXsheet(xsh, childXsh, indices, newIndices);
+
+  childXsh->updateFrameCount();
+
   std::map<TFx *, std::vector<TFxPort *>> roots =
       isConnected(indices, fxs, app->getCurrentXsheet());
   app->getCurrentXsheet()->blockSignals(true);
@@ -1347,18 +1367,6 @@ void collapseColumns(std::set<int> indices, const std::set<TFx *> &fxs,
     if (output) xsh->getFxDag()->removeOutputFx(output);
   }
 
-  ToonzScene *scene = app->getCurrentScene()->getScene();
-  TXshLevel *xl     = scene->createNewLevel(CHILD_XSHLEVEL);
-  assert(xl);
-  TXshChildLevel *childLevel = xl->getChildLevel();
-  assert(childLevel);
-  TXsheet *childXsh = childLevel->getXsheet();
-
-  std::set<int> newIndices;
-  std::list<int> restoredSplineIds;
-  data->restoreObjects(newIndices, restoredSplineIds, childXsh, 0);
-  childXsh->updateFrameCount();
-
   int rowCount = childXsh->getFrameCount();
   int r;
   for (r = 0; r < rowCount; r++)
@@ -1369,7 +1377,6 @@ void collapseColumns(std::set<int> indices, const std::set<TFx *> &fxs,
   // Rimuovo gli effetti che sono in fxs dall'xsheet
   std::set<TFx *>::const_iterator it2;
   for (it2 = fxs.begin(); it2 != fxs.end(); it2++) removeFx(xsh, *it2);
-  if (!columnsOnly) bringPegbarsInsideChildXsheet(xsh, childXsh);
 
   xsh->getStageObject(TStageObjectId::ColumnId(index))
       ->setParent(TStageObjectId::TableId);
@@ -1579,8 +1586,8 @@ public:
       }
     QMap<TFx *, FxConnections>::const_iterator it2;
     for (it2 = m_fxConnections.begin(); it2 != m_fxConnections.end(); it2++) {
-      TFx *fx                   = it2.key();
-      FxConnections connections = it2.value();
+      TFx *fx                     = it2.key();
+      FxConnections connections   = it2.value();
       QMap<int, TFx *> inputLinks = connections.getInputLinks();
       QMap<int, TFx *>::const_iterator it3;
       for (it3 = inputLinks.begin(); it3 != inputLinks.end(); it3++)
@@ -1702,7 +1709,7 @@ public:
       outFx->addRef();
     }
 
-    for (int i                              = 0; i < m_pegObjects.size(); i++)
+    for (int i = 0; i < m_pegObjects.size(); i++)
       m_parentIds[m_pegObjects[i]->getId()] = m_pegObjects[i]->getParent();
 
     QMap<TStageObjectSpline *, TStageObjectSpline *>::iterator it3;
@@ -2130,8 +2137,6 @@ public:
 void SubsceneCmd::collapse(std::set<int> &indices) {
   if (indices.empty()) return;
 
-#ifndef LINETEST
-
   // User must decide if pegbars must be collapsed too
   QString question(QObject::tr("Collapsing columns: what you want to do?"));
 
@@ -2142,10 +2147,6 @@ void SubsceneCmd::collapse(std::set<int> &indices) {
 
   int ret = DVGui::RadioButtonMsgBox(DVGui::WARNING, question, list);
   if (ret == 0) return;
-
-#else
-  int ret = 1;
-#endif
 
   std::set<int> oldIndices = indices;
   int index                = *indices.begin();
@@ -2236,8 +2237,6 @@ void SubsceneCmd::collapse(const QList<TStageObjectId> &objects) {
 void SubsceneCmd::collapse(const QList<TFxP> &fxs) {
   if (fxs.isEmpty()) return;
 
-#ifndef LINETEST
-
   QString question(QObject::tr("Collapsing columns: what you want to do?"));
   QList<QString> list;
   list.append(
@@ -2245,10 +2244,6 @@ void SubsceneCmd::collapse(const QList<TFxP> &fxs) {
   list.append(QObject::tr("Include only selected columns in the sub-xsheet."));
   int ret = DVGui::RadioButtonMsgBox(DVGui::WARNING, question, list);
   if (ret == 0) return;
-
-#else
-  int ret = 1;
-#endif
 
   std::set<int> indices;
   std::set<TFx *> internalFx;
@@ -2308,8 +2303,6 @@ void SubsceneCmd::explode(int index) {
   TXshChildLevel *childLevel = cell.getChildLevel();
   if (!childLevel) return;
 
-#ifndef LINETEST
-
   /*- Pegbarを親Sheetに持って出るか？の質問ダイアログ -*/
   QString question(QObject::tr("Exploding Sub-xsheet: what you want to do?"));
   QList<QString> list;
@@ -2317,10 +2310,6 @@ void SubsceneCmd::explode(int index) {
   list.append(QObject::tr("Bring only columns in the main xsheet."));
   int ret = DVGui::RadioButtonMsgBox(DVGui::WARNING, question, list);
   if (ret == 0) return;
-
-#else
-  int ret = 2;
-#endif
 
   // Collect column stage object informations
   TStageObjectId colId    = TStageObjectId::ColumnId(index);
@@ -2434,7 +2423,7 @@ void SubsceneCmd::explode(int index) {
 
     TFx *root = 0;
     assert(!columnOutputConnections.empty());
-    QList<TFxPort *> ports   = columnOutputConnections.begin().value();
+    QList<TFxPort *> ports = columnOutputConnections.begin().value();
     if (!ports.empty()) root = (*ports.begin())->getFx();
 
     ExplodeChildUndoRemovingColumn *undo = new ExplodeChildUndoRemovingColumn(

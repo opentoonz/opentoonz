@@ -9,7 +9,6 @@
 #include "tpalette.h"
 #include "tvectorimage.h"
 #include "tvectorrenderdata.h"
-#include "tflash.h"
 #include "texception.h"
 #include "trasterimage.h"
 #include "drawutil.h"
@@ -549,24 +548,15 @@ void Iwa_TiledParticlesFx::doCompute(TTile &tile, double frame,
 
   TTile tileIn;
   if (TRaster32P raster32 = tile.getRaster()) {
-    TFlash *flash = 0;
-    myEngine.render_particles(flash, &tile, part_ports, ri, p_size, p_offset,
+    myEngine.render_particles(&tile, part_ports, ri, p_size, p_offset,
                               ctrl_ports, partLevel, 1, (int)frame, 1, 0, 0, 0,
                               0, lastframe, getIdentifier());
   } else if (TRaster64P raster64 = tile.getRaster()) {
-    TFlash *flash = 0;
-    myEngine.render_particles(flash, &tile, part_ports, ri, p_size, p_offset,
+    myEngine.render_particles(&tile, part_ports, ri, p_size, p_offset,
                               ctrl_ports, partLevel, 1, (int)frame, 1, 0, 0, 0,
                               0, lastframe, getIdentifier());
   } else
     throw TException("ParticlesFx: unsupported Pixel Type");
-}
-
-//------------------------------------------------------------------
-
-void Iwa_TiledParticlesFx::compute(TFlash &flash, int frame) {
-  // Particles is currently disabled in Flash...
-  return;
 }
 
 //------------------------------------------------------------------

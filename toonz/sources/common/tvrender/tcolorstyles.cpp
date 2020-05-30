@@ -9,7 +9,6 @@
 #include "tconvert.h"
 #include "tofflinegl.h"
 #include "tpixelutils.h"
-#include "tflash.h"
 #include "tcolorstyles.h"
 
 //*****************************************************************************
@@ -474,43 +473,6 @@ static double computeAverageThickness(const TStroke *s, double &minThickness,
 
   if (count < 6) return s->getControlPoint(count / 2 + 1).thick;
   return resThick / (s->getControlPointCount() - 4);
-}
-
-void TColorStyle::drawStroke(TFlash &flash, const TStroke *s) const {
-  bool isCenterline = false;
-  double minThickness, maxThickness = 0;
-  std::wstring quality = flash.getLineQuality();
-  double thickness     = computeAverageThickness(s, minThickness, maxThickness);
-  if (minThickness == maxThickness && minThickness == 0) return;
-  if (quality == TFlash::ConstantLines)
-    isCenterline = true;
-  else if (quality == TFlash::MixedLines &&
-           (maxThickness == 0 || minThickness / maxThickness > 0.5))
-    isCenterline = true;
-  else if (quality == TFlash::VariableLines &&
-           maxThickness - minThickness <
-               0.16)  // Quando si salva il pli, si approssima al thick.
-                      // L'errore di approx e' sempre 0.1568...
-    isCenterline = true;
-  // else	assert(false);
-
-  flash.setFillColor(getAverageColor());
-  // flash.setFillColor(TPixel::Red);
-
-  TStroke *saux = const_cast<TStroke *>(s);
-  if (isCenterline) {
-    saux->setAverageThickness(thickness);
-    flash.setThickness(s->getAverageThickness());
-    flash.setLineColor(getAverageColor());
-    flash.drawCenterline(s, false);
-  } else {
-    saux->setAverageThickness(0);
-    if (!flash.drawOutline(saux)) {
-      flash.setThickness(thickness);
-      flash.setLineColor(getAverageColor());
-      flash.drawCenterline(s, false);
-    }
-  }
 }
 
 //-----------------------------------------------------------------------------

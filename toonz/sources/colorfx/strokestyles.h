@@ -86,7 +86,6 @@ public:
                    const TColorFunction *cf) const override;
   void drawStroke(const TColorFunction *cf, Points &positions,
                   const TStroke *stroke) const override;
-  void drawStroke(TFlash &rd, const TStroke *stroke) const override;
 
   QString getDescription() const override {
     return QCoreApplication::translate("TFurStrokeStyle", "Herringbone");
@@ -142,7 +141,6 @@ public:
                    const TColorFunction *cf) const override;
   void drawStroke(const TColorFunction *cf, Points &positions,
                   const TStroke *stroke) const override;
-  void drawStroke(TFlash &flash, const TStroke *stroke) const override;
 
   void loadData(TInputStreamInterface &is) override { is >> m_color; }
   void saveData(TOutputStreamInterface &os) const override { os << m_color; }
@@ -180,7 +178,6 @@ public:
 
   void drawStroke(const TColorFunction *cf,
                   const TStroke *stroke) const override;
-  void drawStroke(TFlash &flash, const TStroke *stroke) const override;
 
   void loadData(TInputStreamInterface &is) override {
     is >> m_color >> m_blend >> m_intensity >> m_radius;
@@ -225,7 +222,6 @@ public:
                    const TColorFunction *cf) const override;
   void drawStroke(const TColorFunction *cf, DrawmodePointsMatrix &data,
                   const TStroke *stroke) const override;
-  void drawStroke(TFlash &flash, const TStroke *s) const override;
 
   void loadData(TInputStreamInterface &is) override {
     is >> m_color >> m_intensity;
@@ -249,7 +245,6 @@ public:
                    const TColorFunction *cf) const override;
   void drawStroke(const TColorFunction *cf, Points &positions,
                   const TStroke *stroke) const override;
-  void drawStroke(TFlash &flash, const TStroke *stroke) const override;
 
   void invalidate() {}
 
@@ -295,7 +290,6 @@ public:
                    const TColorFunction *cf) const override;
   void drawStroke(const TColorFunction *cf, Points &positions,
                   const TStroke *stroke) const override;
-  void drawStroke(TFlash &flash, const TStroke *stroke) const override;
 
   void invalidate() {}
 
@@ -339,7 +333,6 @@ public:
                    const TColorFunction *cf) const override;
   void drawStroke(const TColorFunction *cf, Points &positions,
                   const TStroke *stroke) const override;
-  void drawStroke(TFlash &flash, const TStroke *stroke) const override;
 
   void invalidate() {}
 
@@ -385,7 +378,6 @@ public:
 
   void drawStroke(const TColorFunction *cf,
                   const TStroke *stroke) const override;
-  void drawStroke(TFlash &flash, const TStroke *stroke) const override;
 
   void invalidate() {}
 
@@ -455,7 +447,6 @@ public:
 
   void drawStroke(const TColorFunction *cf,
                   const TStroke *stroke) const override;
-  void drawStroke(TFlash &fl, const TStroke *s) const override;
 
   void loadData(TInputStreamInterface &is) override {
     is >> m_color >> m_density;
@@ -501,7 +492,6 @@ public:
 
   void drawStroke(const TColorFunction *cf,
                   const TStroke *stroke) const override;
-  void drawStroke(TFlash &flash, const TStroke *stroke) const override;
 
   void loadData(TInputStreamInterface &is) override {
     is >> m_color0 >> m_color1;
@@ -533,7 +523,6 @@ public:
                    const TColorFunction *cf) const override;
   void drawStroke(const TColorFunction *cf, PointMatrix &data,
                   const TStroke *stroke) const override;
-  void drawStroke(TFlash &flash, const TStroke *stroke) const override;
 
   void invalidate() {}
 
@@ -578,7 +567,6 @@ public:
                   const TStroke *stroke) const override;
   void drawRegion(const TColorFunction *cf, const bool antiAliasing,
                   TRegionOutline &boundary) const override;
-  void drawStroke(TFlash &flash, const TStroke *stroke) const override;
 
   bool isRegionStyle() const override { return false; }
   bool isStrokeStyle() const override { return true; }
@@ -631,7 +619,6 @@ public:
                   TRegionOutline &boundary) const override;
   void drawStroke(const TColorFunction *cf, TStrokeOutline *outline,
                   const TStroke *stroke) const override;
-  void drawStroke(TFlash &flash, const TStroke *stroke) const override;
 
   bool isRegionStyle() const override { return false; }
   bool isStrokeStyle() const override { return true; }
@@ -731,7 +718,6 @@ public:
                    const TColorFunction *cf) const override;
   void drawStroke(const TColorFunction *cf, PointsAndDoubles &data,
                   const TStroke *stroke) const override;
-  void drawStroke(TFlash &flash, const TStroke *stroke) const override;
 
   void invalidate() {}
 
@@ -782,7 +768,6 @@ public:
   void drawStroke(const TColorFunction *cf, Doubles &data,
                   const TStroke *stroke) const override;
   // void drawStroke(const TColorFunction *cf, const TStroke *stroke) const;
-  void drawStroke(TFlash &flash, const TStroke *stroke) const override;
 
   void invalidate() {}
 
@@ -829,7 +814,6 @@ public:
                   TRegionOutline &boundary) const override {}
   void drawStroke(const TColorFunction *cf, TStrokeOutline *outline,
                   const TStroke *stroke) const override;
-  void drawStroke(TFlash &flash, const TStroke *stroke) const override;
 
   bool isRegionStyle() const override { return false; }
   bool isStrokeStyle() const override { return true; }
@@ -881,7 +865,6 @@ public:
   void drawStroke(const TColorFunction *cf, BlendAndPoints &data,
                   const TStroke *stroke) const override;
   // void drawStroke(const TColorFunction *cf, const TStroke *stroke) const;
-  void drawStroke(TFlash &flash, const TStroke *stroke) const override;
 
   void invalidate() {}
 
@@ -952,7 +935,6 @@ public:
   void drawStroke(const TColorFunction *cf, Points &positions,
                   const TStroke *stroke) const override;
   // void drawStroke(const TColorFunction *cf, const TStroke *stroke) const;
-  void drawStroke(TFlash &flash, const TStroke *stroke) const override;
 
   void invalidate() {}
 
@@ -1001,7 +983,6 @@ public:
   void drawStroke(const TColorFunction *cf, Points &positions,
                   const TStroke *stroke) const override;
   // void drawStroke(const TColorFunction *cf, const TStroke *stroke) const;
-  void drawStroke(TFlash &flash, const TStroke *stroke) const override;
 
   void invalidate() {}
 
@@ -1065,7 +1046,6 @@ public:
   void drawStroke(const TColorFunction *cf, std::vector<TPointD> &positions,
                   const TStroke *stroke) const override;
   // void drawStroke(const TColorFunction *cf, const TStroke *stroke) const;
-  void drawStroke(TFlash &flash, const TStroke *stroke) const override;
 
   void loadData(TInputStreamInterface &is) override {
     is >> m_color >> m_parameter >> m_thick;
@@ -1097,7 +1077,6 @@ public:
                   TRegionOutline &boundary) const override {}
   void drawStroke(const TColorFunction *cf, TStrokeOutline *outline,
                   const TStroke *stroke) const override;
-  void drawStroke(TFlash &flash, const TStroke *stroke) const override;
 
   bool isRegionStyle() const override { return false; }
   bool isStrokeStyle() const override { return true; }
@@ -1160,7 +1139,6 @@ public:
                   TRegionOutline &boundary) const override {}
   void drawStroke(const TColorFunction *cf, TStrokeOutline *outline,
                   const TStroke *stroke) const override;
-  void drawStroke(TFlash &flash, const TStroke *stroke) const override;
 
   bool isRegionStyle() const override { return false; }
   bool isStrokeStyle() const override { return true; }
@@ -1288,7 +1266,6 @@ public:
 
   TStrokeProp *clone(const TStroke *stroke) const override;
   void draw(const TVectorRenderData &rd) override;
-  void draw(TFlash &flash) override;
 };
 
 class TMatrioskaStrokeStyle final : public TSolidColorStyle {

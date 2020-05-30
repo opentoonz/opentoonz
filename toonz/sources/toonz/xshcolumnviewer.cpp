@@ -117,8 +117,78 @@ const QIcon getColorChipIcon(TPixel32 color) {
   return QIcon(pixmap);
 }
 
+bool containsVectorLevel(int col) {
+  TXshColumn *column =
+      TApp::instance()->getCurrentXsheet()->getXsheet()->getColumn(col);
+  TXshColumn::ColumnType type = column->getColumnType();
+  if (type != TXshColumn::eLevelType) return false;
+
+  const QSet<TXshSimpleLevel *> levels = getLevels(column);
+  QSet<TXshSimpleLevel *>::const_iterator it2;
+  bool isVector = false;
+  for (it2 = levels.begin(); it2 != levels.end(); it2++) {
+    TXshSimpleLevel *sl = *it2;
+    int type            = sl->getType();
+    if (type == PLI_XSHLEVEL) {
+      isVector = true;
+      return true;
+    }
+  }
+  return false;
+}
+
 bool isCtrlPressed = false;
 }  // namespace
+
+//=============================================================================
+// ColumnMaskUndo
+//-----------------------------------------------------------------------------
+class ColumnMaskUndo final : public TUndo {
+  int m_col;
+  bool m_isMask;
+  std::string m_name;
+
+public:
+  ColumnMaskUndo(int column, bool isMask, std::string name)
+      : m_col(column), m_isMask(isMask), m_name(name) {}
+  ~ColumnMaskUndo() {}
+
+  void undo() const override {
+    TXshColumn *column =
+        TApp::instance()->getCurrentXsheet()->getXsheet()->getColumn(m_col);
+    TXshColumn::ColumnType type = column->getColumnType();
+    if (type != TXshColumn::eLevelType) return;
+
+    if (containsVectorLevel(m_col)) {
+      column->setIsMask(m_isMask);
+      TApp::instance()->getCurrentScene()->notifySceneChanged();
+      TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+      TApp::instance()->getCurrentScene()->setDirtyFlag(true);
+    }
+  }
+
+  void redo() const override {
+    TXshColumn *column =
+        TApp::instance()->getCurrentXsheet()->getXsheet()->getColumn(m_col);
+    TXshColumn::ColumnType type = column->getColumnType();
+    if (type != TXshColumn::eLevelType) return;
+
+    if (containsVectorLevel(m_col)) {
+      column->setIsMask(!m_isMask);
+      TApp::instance()->getCurrentScene()->notifySceneChanged();
+      TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+      TApp::instance()->getCurrentScene()->setDirtyFlag(true);
+    }
+  }
+
+  int getSize() const override { return sizeof(*this); }
+
+  QString getHistoryString() override {
+    QString str = QObject::tr("Toggle vector column as mask. ");
+    return str;
+  }
+  int getHistoryType() override { return HistoryType::Xsheet; }
+};
 
 //-----------------------------------------------------------------------------
 
@@ -371,9 +441,9 @@ void ChangeObjectParent::onTextChanged(const QString &text) {
     hide();
     return;
   }
-  bool isPegbar = false;
+  bool isPegbar                        = false;
   if (text.startsWith("Peg")) isPegbar = true;
-  QString number = text;
+  QString number                       = text;
   number.remove(0, 4);
   int index = number.toInt() - 1;
   if (index < 0) {
@@ -446,7 +516,7 @@ void ChangeObjectHandle::onTextChanged(const QString &text) {
   assert(m_objectHandle);
   TStageObjectId currentObjectId = m_objectHandle->getObjectId();
   QString handle                 = text;
-  if (text.toInt() != 0) handle = QString("H") + handle;
+  if (text.toInt() != 0) handle  = QString("H") + handle;
   if (handle.isEmpty()) return;
   std::vector<TStageObjectId> ids;
   ids.push_back(currentObjectId);
@@ -614,7 +684,7 @@ void ColumnArea::DrawHeader::levelColors(QColor &columnColor,
   }
   enum { Normal, Reference, Control } usage = Reference;
   if (column) {
-    if (column->isControl()) usage = Control;
+    if (column->isControl()) usage                             = Control;
     if (column->isRendered() || column->getMeshColumn()) usage = Normal;
   }
 
@@ -632,7 +702,7 @@ void ColumnArea::DrawHeader::paletteColors(QColor &columnColor,
                                            QColor &dragColor) const {
   enum { Normal, Reference, Control } usage = Reference;
   if (column) {  // Check if column is a mask
-    if (column->isControl()) usage = Control;
+    if (column->isControl()) usage  = Control;
     if (column->isRendered()) usage = Normal;
   }
 
@@ -1168,7 +1238,6 @@ ColumnArea::ColumnArea(XsheetViewer *parent, Qt::WFlags flags)
     , m_isPanning(false)
     , m_soundColumnPopup(0) {
   TXsheetHandle *xsheetHandle = TApp::instance()->getCurrentXsheet();
-#ifndef LINETEST
   TObjectHandle *objectHandle = TApp::instance()->getCurrentObject();
   m_changeObjectParent        = new ChangeObjectParent(0);
   m_changeObjectParent->setObjectHandle(objectHandle);
@@ -1179,7 +1248,10 @@ ColumnArea::ColumnArea(XsheetViewer *parent, Qt::WFlags flags)
   m_changeObjectHandle->setObjectHandle(objectHandle);
   m_changeObjectHandle->setXsheetHandle(xsheetHandle);
   m_changeObjectHandle->hide();
-#else
+
+#ifdef LINETEST
+  // linetest had options around a motion path
+  // you could configure from the column header
   m_motionPathMenu = new MotionPathMenu(0);
 #endif
 
@@ -1699,11 +1771,11 @@ m_value->setFont(font);*/
 
   bool ret = connect(m_slider, SIGNAL(sliderReleased()), this,
                      SLOT(onSliderReleased()));
-  ret      = ret && connect(m_slider, SIGNAL(sliderMoved(int)), this,
+  ret = ret && connect(m_slider, SIGNAL(sliderMoved(int)), this,
                        SLOT(onSliderChange(int)));
-  ret      = ret && connect(m_slider, SIGNAL(valueChanged(int)), this,
+  ret = ret && connect(m_slider, SIGNAL(valueChanged(int)), this,
                        SLOT(onSliderValueChanged(int)));
-  ret      = ret && connect(m_value, SIGNAL(textChanged(const QString &)), this,
+  ret = ret && connect(m_value, SIGNAL(textChanged(const QString &)), this,
                        SLOT(onValueChanged(const QString &)));
 
   ret = ret && connect(m_filterColorCombo, SIGNAL(activated(int)), this,
@@ -1816,11 +1888,11 @@ SoundColumnPopup::SoundColumnPopup(QWidget *parent)
 
   bool ret = connect(m_slider, SIGNAL(sliderReleased()), this,
                      SLOT(onSliderReleased()));
-  ret      = ret && connect(m_slider, SIGNAL(sliderMoved(int)), this,
+  ret = ret && connect(m_slider, SIGNAL(sliderMoved(int)), this,
                        SLOT(onSliderChange(int)));
-  ret      = ret && connect(m_slider, SIGNAL(valueChanged(int)), this,
+  ret = ret && connect(m_slider, SIGNAL(valueChanged(int)), this,
                        SLOT(onSliderValueChanged(int)));
-  ret      = ret && connect(m_value, SIGNAL(textChanged(const QString &)), this,
+  ret = ret && connect(m_value, SIGNAL(textChanged(const QString &)), this,
                        SLOT(onValueChanged(const QString &)));
   assert(ret);
 }
@@ -2184,8 +2256,8 @@ void ColumnArea::mouseMoveEvent(QMouseEvent *event) {
     return;
   }
 
-  int col = m_viewer->xyToPosition(pos).layer();
-  if (col < -1) col = 0;
+  int col            = m_viewer->xyToPosition(pos).layer();
+  if (col < -1) col  = 0;
   TXsheet *xsh       = m_viewer->getXsheet();
   TXshColumn *column = xsh->getColumn(col);
   QPoint mouseInCell = pos - m_viewer->positionToXY(CellPosition(0, col));
@@ -2334,15 +2406,16 @@ void ColumnArea::mouseReleaseEvent(QMouseEvent *event) {
         QDesktopWidget *desktop = qApp->desktop();
         QRect screenRect        = desktop->screenGeometry(app->getMainWindow());
 
-        int popupLeft = event->globalPos().x() + x;
+        int popupLeft  = event->globalPos().x() + x;
         int popupRight = popupLeft + m_columnTransparencyPopup->width();
 
         // first condition checks if popup is on same monitor as main app;
         // if popup is on different monitor, leave as is
         if (popupLeft < screenRect.right() && popupRight > screenRect.right()) {
           int distance = popupRight - screenRect.right();
-          m_columnTransparencyPopup->move(m_columnTransparencyPopup->x() - distance,
-                                          m_columnTransparencyPopup->y());
+          m_columnTransparencyPopup->move(
+              m_columnTransparencyPopup->x() - distance,
+              m_columnTransparencyPopup->y());
         }
 
         openTransparencyPopup();
@@ -2417,11 +2490,6 @@ void ColumnArea::mouseDoubleClickEvent(QMouseEvent *event) {
   CellPosition cellPosition(0, col);
   QPoint topLeft     = m_viewer->positionToXY(cellPosition);
   QPoint mouseInCell = pos - topLeft;
-
-#ifdef LINETEST
-  // Camera column
-  if (col == -1) return;
-#endif
 
   QRect nameRect = o->rect((col < 0) ? PredefinedRect::CAMERA_LAYER_NAME
                                      : PredefinedRect::LAYER_NAME);
@@ -2591,6 +2659,22 @@ void ColumnArea::contextMenuEvent(QContextMenuEvent *event) {
     if (!xsh->isColumnEmpty(col)) {
       menu.addAction(cmdManager->getAction(MI_ReplaceLevel));
       menu.addAction(cmdManager->getAction(MI_ReplaceParentDirectory));
+
+      //if (containsVectorLevel(col)) {
+      //  menu.addSeparator();
+      //  QAction *setMask =
+      //      new QAction(tr("Temporary Mask (Not in final render)"), this);
+      //  setMask->setCheckable(true);
+      //  setMask->setChecked(xsh->getColumn(col)->isMask());
+      //  setMask->setToolTip(
+      //      tr("Only Toonz Vector levels can be used as masks. \n Masks don't "
+      //         "show up in final renders."));
+      //  bool ret = true;
+      //  ret      = ret &&
+      //        connect(setMask, &QAction::toggled, [=]() { onSetMask(col); });
+      //  assert(ret);
+      //  menu.addAction(setMask);
+      //}
     }
   }
 
@@ -2620,6 +2704,20 @@ void ColumnArea::contextMenuEvent(QContextMenuEvent *event) {
   act2->setText(act2Text);
   act3->setText(act3Text);
   act4->setText(act4Text);
+}
+
+//-----------------------------------------------------------------------------
+
+void ColumnArea::onSetMask(int col) {
+  TXshColumn *column = m_viewer->getXsheet()->getColumn(m_col);
+
+  std::string name = m_viewer->getXsheet()
+                         ->getStageObject(TStageObjectId::ColumnId(col))
+                         ->getName();
+  ColumnMaskUndo *undo = new ColumnMaskUndo(col, column->isMask(), name);
+  undo->redo();
+  TUndoManager::manager()->add(undo);
+  update();
 }
 
 //-----------------------------------------------------------------------------

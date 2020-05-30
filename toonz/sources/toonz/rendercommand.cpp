@@ -46,7 +46,6 @@
 #include "trop.h"
 #include "tconvert.h"
 #include "tfiletype.h"
-#include "tflash.h"
 #include "timagecache.h"
 #include "tthreadmessage.h"
 
@@ -154,7 +153,7 @@ public:
             isPreview ? *scene->getProperties()->getPreviewProperties()
                       : *scene->getProperties()->getOutputProperties();
         outputSettings.getRange(r0, r1, step);
-        const TRenderSettings rs = outputSettings.getRenderSettings();
+        const TRenderSettings rs    = outputSettings.getRenderSettings();
         if (r0 == 0 && r1 == -1) r0 = 0, r1 = scene->getFrameCount() - 1;
 
         double timeStretchFactor =
@@ -219,7 +218,6 @@ public:
   }
 
   bool init(bool isPreview);  // true if r0<=r1
-  void flashRender();
   void rasterRender(bool isPreview);
   void multimediaRender();
   void onRender();
@@ -245,7 +243,7 @@ bool RenderCommand::init(bool isPreview) {
     m_r0 = 0;
     m_r1 = scene->getFrameCount() - 1;
   }
-  if (m_r0 < 0) m_r0 = 0;
+  if (m_r0 < 0) m_r0                       = 0;
   if (m_r1 >= scene->getFrameCount()) m_r1 = scene->getFrameCount() - 1;
   if (m_r1 < m_r0) {
     DVGui::warning(QObject::tr(
@@ -300,7 +298,7 @@ sprop->getOutputProperties()->setRenderSettings(rso);*/
       fp.getType() == "pict")  // pct e' un formato"livello" (ha i settings di
                                // quicktime) ma fatto di diversi frames
     fp = fp.withFrame(TFrameId::EMPTY_FRAME);
-  fp = scene->decodeFilePath(fp);
+  fp   = scene->decodeFilePath(fp);
   if (!TFileStatus(fp.getParentDir()).doesExist()) {
     try {
       TFilePath parent = fp.getParentDir();
@@ -346,54 +344,6 @@ sprop->getOutputProperties()->setRenderSettings(rso);*/
 
 //===================================================================
 
-void RenderCommand::flashRender() {
-  ToonzScene *scene       = TApp::instance()->getCurrentScene()->getScene();
-  TSceneProperties *sprop = scene->getProperties();
-  FILE *fileP             = fopen(m_fp, "wb");
-  if (!fileP) return;
-  DVGui::ProgressDialog pb("rendering " + toQString(m_fp), "Cancel", 0,
-                           m_numFrames);
-  pb.show();
-
-  TDimension cameraSize = scene->getCurrentCamera()->getRes();
-  double frameRate      = sprop->getOutputProperties()->getFrameRate();
-  TFlash flash(cameraSize.lx, cameraSize.ly, m_numFrames, frameRate,
-               sprop->getOutputProperties()->getFileFormatProperties("swf"));
-  flash.setBackgroundColor(sprop->getBgColor());
-
-  std::vector<TXshSoundColumn *> columns;
-  scene->getSoundColumns(columns);
-  if (!columns.empty()) {
-    TXsheet::SoundProperties *prop = new TXsheet::SoundProperties();
-    prop->m_frameRate              = frameRate;
-    TSoundTrack *st                = scene->getXsheet()->makeSound(prop);
-    if (st) flash.putSound(st, 0);
-  }
-
-  int i = 0;
-  for (i = 0; i < m_numFrames; ++i, m_r += m_stepd) {
-    flash.beginFrame(m_step * i + 1);
-    TRasterFxP rfx = buildSceneFx(scene, m_r, 0, false);
-    assert(rfx);
-    rfx->compute(flash,
-                 tround(m_r));  // WARNING: This should accept a DOUBLE...
-    flash.endFrame(i == m_numFrames - 1, 0, true);
-    if (pb.wasCanceled()) break;
-    pb.setValue(i + 1);
-  }
-
-  flash.writeMovie(fileP);
-  fclose(fileP);
-
-  TSystem::showDocument(m_fp);
-  // QDesktopServices::openUrl(QUrl(toQString(m_fp)));
-
-  TImageCache::instance()->remove(::to_string(m_fp.getWideString() + L".0"));
-  TNotifier::instance()->notify(TSceneNameChange());
-}
-
-//===================================================================
-
 class RenderListener final : public DVGui::ProgressDialog,
                              public MovieRenderer::Listener {
   QString m_progressBarString;
@@ -431,9 +381,8 @@ public:
                  bool isPreview)
       : DVGui::ProgressDialog(
             QObject::tr("Precomputing %1 Frames", "RenderListener").arg(steps) +
-                ((isPreview) ? ""
-                             : QObject::tr(" of %1", "RenderListener")
-                                   .arg(toQString(path))),
+                ((isPreview) ? "" : QObject::tr(" of %1", "RenderListener")
+                                        .arg(toQString(path))),
             QObject::tr("Cancel"), 0, steps, TApp::instance()->getMainWindow())
       , m_renderer(renderer)
       , m_frameCounter(0)
@@ -762,8 +711,7 @@ public:
 
 //---------------------------------------------------------
 
-//! Specialized render invocation for multimedia rendering. Flash rendering
-//! is currently not supported in this mode.
+//! Specialized render invocation for multimedia rendering.
 void RenderCommand::multimediaRender() {
   ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
   std::string ext   = m_fp.getType();
@@ -913,12 +861,9 @@ void RenderCommand::doRender(bool isPreview) {
             MultipleRender で Schematic Flows または Fx Schematic Terminal Nodes
     が選択されている場合
     --*/
-    if (m_multimediaRender &&
-        m_fp.getType() !=
-            "swf")  // swf is not currently supported on multimedia...
+    if (m_multimediaRender)
       multimediaRender();
-    else if (!isPreview && m_fp.getType() == "swf")
-      flashRender();
+
     else
       /*-- 通常のRendering --*/
       rasterRender(isPreview);

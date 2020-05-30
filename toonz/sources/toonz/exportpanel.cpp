@@ -25,13 +25,16 @@
 #include "toonz/tscenehandle.h"
 #include "toonz/tcolumnhandle.h"
 #include "toonz/txsheethandle.h"
-#include "toonz/screensavermaker.h"
+#include "toonz/txshlevelcolumn.h"
+#include "toonz/txshchildlevel.h"
+#include "toonz/txshcell.h"
 #include "toonz/toonzscene.h"
 #include "toonz/tcamera.h"
 #include "toonz/sceneproperties.h"
 #include "toonz/onionskinmask.h"
 #include "toonz/preferences.h"
 #include "toutputproperties.h"
+#include "toonz/txshleveltypes.h"
 
 // TnzBase includes
 #include "trasterfx.h"
@@ -66,6 +69,45 @@
 #include <QMainWindow>
 #include <QMimeData>
 #include <QLabel>
+
+TEnv::IntVar ExportUseMarkers("ExportUseMarkers", 1);
+
+bool checkForMeshColumns(TXsheet *xsh,
+                         std::vector<TXshChildLevel *> &childLevels) {
+  bool foundMesh = false;
+  int count      = xsh->getColumnCount();
+  for (int c = 0; c < count; c++) {
+    int r0, r1;
+    int n = xsh->getCellRange(c, r0, r1);
+    if (n > 0) {
+      bool changed = false;
+      std::vector<TXshCell> cells(n);
+      xsh->getCells(r0, c, n, &cells[0]);
+      for (int i = 0; i < n; i++) {
+        TXshCell currCell = cells[i];
+        if (!cells[i].isEmpty() &&
+            cells[i].m_level->getType() == MESH_XSHLEVEL) {
+          return true;
+        }
+        // check the sub xsheets too
+        if (!cells[i].isEmpty() &&
+            cells[i].m_level->getType() == CHILD_XSHLEVEL) {
+          TXshChildLevel *level = cells[i].m_level->getChildLevel();
+          // make sure we haven't already checked the level
+          if (level &&
+              std::find(childLevels.begin(), childLevels.end(), level) ==
+                  childLevels.end()) {
+            childLevels.push_back(level);
+            TXsheet *subXsh = level->getXsheet();
+            foundMesh       = checkForMeshColumns(subXsh, childLevels);
+          }
+        }
+      }
+    }
+  }
+
+  return foundMesh;
+}
 
 //=============================================================================
 // RenderLocker
@@ -110,6 +152,12 @@ void RenderController::setMovieExt(string ext) { m_movieExt = ext; }
 //-----------------------------------------------------------------------------
 
 bool RenderController::addScene(MovieGenerator &g, ToonzScene *scene) {
+  bool hasMesh = false;
+  std::vector<TXshChildLevel *> childLevels;
+  hasMesh      = checkForMeshColumns(scene->getXsheet(), childLevels);
+  TXsheet *xsh = scene->getXsheet();
+  if (hasMesh) return false;
+
   int frameCount = scene->getFrameCount();
   if (frameCount < 0) return false;
   int r0 = 0, r1 = frameCount - 1, step = 0;
@@ -122,7 +170,9 @@ bool RenderController::addScene(MovieGenerator &g, ToonzScene *scene) {
     }
   }
   if (r1 < r0) return false;
-  g.setBackgroundColor(scene->getProperties()->getBgColor());
+  TPixel color = scene->getProperties()->getBgColor();
+  if (m_movieExt == "mp4" || m_movieExt == "webm") color.m = 255;
+  g.setBackgroundColor(color);
   g.addScene(*scene, r0, r1);
   return true;
 }
@@ -178,8 +228,14 @@ void RenderController::myCancel() { m_cancelled = true; }
 //-----------------------------------------------------------------------------
 
 void RenderController::generateMovie(TFilePath outPath, bool emitSignal) {
-  if (outPath == TFilePath()) return;
-  if (m_clipList.empty()) return;
+  if (outPath == TFilePath()) {
+    DVGui::warning(tr("Please specify an file name."));
+    return;
+  }
+  if (m_clipList.empty()) {
+    DVGui::warning(tr("Drag a scene into the box to export a scene."));
+    return;
+  }
 
   // verifico che il "generatore" sia libero.
   if (m_rendering) return;
@@ -190,7 +246,10 @@ void RenderController::generateMovie(TFilePath outPath, bool emitSignal) {
   if (outPath.getName() == "") outPath = outPath.withName("untitled");
 
   int sceneCount = (int)m_clipList.size();
-  if (sceneCount < 1) return;  // non dovrebbe succedere mai
+  if (sceneCount < 1) {
+    DVGui::warning(tr("Drag a scene into the box to export a scene."));
+    return;
+  }
 
   // Risoluzione e Settings
   TDimension resolution(0, 0);
@@ -297,6 +356,14 @@ you want to do?";*/
       if (sceneFrames == 0) continue;
       ToonzScene scene;
       scene.load(fp);
+      std::vector<TXshChildLevel *> childLevels;
+      if (checkForMeshColumns(scene.getXsheet(), childLevels)) {
+        QString text = tr("The %1 scene contains a plastic deformed level.\n"
+                          "These levels can't be exported with this tool.")
+                           .arg(QString::fromStdWString(fp.getLevelNameW()));
+        DVGui::warning(text);
+        continue;
+      }
       addScene(movieGenerator, &scene);
     }
 
@@ -560,6 +627,22 @@ QMenu *ClipListViewer::getContextMenu(QWidget *parent, int index) {
 
 //-----------------------------------------------------------------------------
 
+void ClipListViewer::addCurrentScene() {
+  ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
+  std::vector<TXshChildLevel *> childLevels;
+  if (checkForMeshColumns(scene->getXsheet(), childLevels)) return;
+  if (!scene->isUntitled()) {
+    int j = getItemCount();
+    TFilePath fp(scene->decodeFilePath(scene->getScenePath()));
+    getController()->insertClipPath(j, fp);
+    updateContentSize();
+    getPanel()->update();
+    update();
+  }
+}
+
+//-----------------------------------------------------------------------------
+
 void ClipListViewer::setDropInsertionPoint(const QPoint &pos) {
   int old                  = m_dropInsertionPoint;
   m_dropInsertionPoint     = getItemCount();
@@ -745,7 +828,7 @@ ExportPanel::ExportPanel(QWidget *parent, Qt::WFlags flags)
   m_saveInFileFld->setPath(QString::fromStdWString(scenePath.getWideString()));
   QLabel *dirLabel = new QLabel(tr("Save in:"));
   dirLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-  dirLabel->setFixedSize(55, m_saveInFileFld->height());
+  dirLabel->setFixedSize(65, m_saveInFileFld->height());
   saveIn->addWidget(dirLabel);
   saveIn->addWidget(m_saveInFileFld);
 
@@ -757,7 +840,7 @@ ExportPanel::ExportPanel(QWidget *parent, Qt::WFlags flags)
       new DVGui::LineEdit(QString::fromStdWString(sceneName), settingsBox);
   QLabel *nameLabel = new QLabel(tr("File Name:"));
   nameLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-  nameLabel->setFixedSize(55, m_fileNameFld->height());
+  nameLabel->setFixedSize(65, m_fileNameFld->height());
   fileNname->addWidget(nameLabel);
   fileNname->addWidget(m_fileNameFld);
 
@@ -771,17 +854,18 @@ ExportPanel::ExportPanel(QWidget *parent, Qt::WFlags flags)
   formats.sort();
 
   m_fileFormat->addItems(formats);
-  m_fileFormat->setMaximumHeight(DVGui::WidgetHeight);
+  m_fileFormat->setFixedHeight(DVGui::WidgetHeight + 2);
   connect(m_fileFormat, SIGNAL(currentIndexChanged(const QString &)),
           SLOT(onFormatChanged(const QString &)));
-  m_fileFormat->setCurrentIndex(formats.indexOf("mov"));
+  // m_fileFormat->setCurrentIndex(formats.indexOf("mov"));
 
   QPushButton *fileFormatButton = new QPushButton(QString(tr("Options")));
-  fileFormatButton->setFixedSize(60, DVGui::WidgetHeight);
+  fileFormatButton->setMinimumWidth(75);
+  fileFormatButton->setFixedHeight(DVGui::WidgetHeight);
   connect(fileFormatButton, SIGNAL(pressed()), this, SLOT(openSettingsPopup()));
   QLabel *fileFormat = new QLabel(tr("File Format:"));
   fileFormat->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-  fileFormat->setFixedSize(55, fileFormatButton->height());
+  fileFormat->setFixedSize(65, fileFormatButton->height());
 
   fileFormatLayout->addWidget(fileFormat);
   fileFormatLayout->addWidget(m_fileFormat);
@@ -790,7 +874,7 @@ ExportPanel::ExportPanel(QWidget *parent, Qt::WFlags flags)
   // Use Marker checkbox
   m_useMarker = new QCheckBox(tr("Use Markers"), settingsBox);
   m_useMarker->setMinimumHeight(30);
-  m_useMarker->setChecked(false);
+  m_useMarker->setChecked(ExportUseMarkers);
   connect(m_useMarker, SIGNAL(toggled(bool)), this,
           SLOT(onUseMarkerToggled(bool)));
 
@@ -829,6 +913,14 @@ ExportPanel::ExportPanel(QWidget *parent, Qt::WFlags flags)
 //-----------------------------------------------------------------------------
 
 ExportPanel::~ExportPanel() { saveExportSettings(); }
+
+//-----------------------------------------------------------------------------
+
+void ExportPanel::showEvent(QShowEvent *) {
+  if (m_clipListViewer->getItemCount() == 0) {
+    m_clipListViewer->addCurrentScene();
+  }
+}
 
 //-----------------------------------------------------------------------------
 
@@ -908,6 +1000,11 @@ void ExportPanel::generateMovie() {
 
 void ExportPanel::onUseMarkerToggled(bool toggled) {
   RenderController::instance()->setUseMarkers(toggled);
+  if (toggled) {
+    ExportUseMarkers = 1;
+  } else {
+    ExportUseMarkers = 0;
+  }
 }
 
 //-----------------------------------------------------------------------------

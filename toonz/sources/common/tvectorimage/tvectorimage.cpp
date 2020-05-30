@@ -1114,7 +1114,7 @@ void TVectorImage::Imp::notifyChangedStrokes(
 
 //-----------------------------------------------------------------------------
 
-void TVectorImage::findRegions(bool fromSwf) {
+void TVectorImage::findRegions() {
   // for (int i=0; i<(int)m_imp->m_strokes.size(); i++)
   //  {
   //  m_imp->eraseIntersection(i);
