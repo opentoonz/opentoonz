@@ -826,10 +826,10 @@ void ConvertPopup::setFiles(const std::vector<TFilePath> &fps) {
 
   if (m_srcFilePaths.size() == 1) {
     setWindowTitle(tr("Convert 1 Level"));
-    m_fromFld->setEnabled(true);
-    m_toFld->setEnabled(true);
     m_fileNameFld->setEnabled(true);
 
+    m_fromFld->setEnabled(false);
+    m_toFld->setEnabled(false);
     m_fromFld->setText("");
     m_toFld->setText("");
     TLevelP levelTmp;
@@ -840,10 +840,12 @@ void ConvertPopup::setFiles(const std::vector<TFilePath> &fps) {
       if (!t->empty()) {
         TFrameId start = t->begin()->first;
         TFrameId end   = t->rbegin()->first;
-        if (start.getNumber() > 0)
+        if (start.getNumber() >= 0 && end.getNumber() >= 0) {
+          m_fromFld->setEnabled(true);
+          m_toFld->setEnabled(true);
           m_fromFld->setText(QString::number(start.getNumber()));
-        if (end.getNumber() > 0)
           m_toFld->setText(QString::number(end.getNumber()));
+        }
       }
 
       // use the image dpi for the converted tlv
@@ -895,7 +897,8 @@ Convert2Tlv *ConvertPopup::makeTlvConverter(const TFilePath &sourceFilePath) {
         sourceFilePath.withParentDir(unpaintedFolder).withName(basename));
   }
   int from = -1, to = -1;
-  if (m_srcFilePaths.size() == 1) {
+  if (m_srcFilePaths.size() == 1 && m_fromFld->isEnabled() &&
+      m_toFld->isEnabled()) {
     from = m_fromFld->getValue();
     to   = m_toFld->getValue();
   }
