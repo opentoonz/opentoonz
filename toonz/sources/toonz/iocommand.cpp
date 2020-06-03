@@ -20,6 +20,7 @@
 #include "versioncontrol.h"
 #include "cachefxcommand.h"
 #include "xdtsio.h"
+#include "sceneviewer.h"
 
 // TnzTools includes
 #include "tools/toolhandle.h"
@@ -1336,8 +1337,10 @@ void IoCmd::newScene() {
   CameraTestCheck::instance()->setIsEnabled(false);
   SetScanCropboxCheck::instance()->setIsEnabled(false);
 
-  if (!TApp::instance()->isApplicationStarting())
+  if (!TApp::instance()->isApplicationStarting()) {
     QApplication::clipboard()->clear();
+    TApp::instance()->getActiveViewer()->fitToCamera();
+  }
   TSelection::setCurrent(0);
   TUndoManager::manager()->reset();
 
@@ -1983,6 +1986,9 @@ bool IoCmd::loadScene(const TFilePath &path, bool updateRecentFile,
   }
 
   printf("%s:%s loadScene() completed :\n", __FILE__, __FUNCTION__);
+
+  TApp::instance()->getActiveViewer()->fitToCamera();
+
   return true;
 }
 
