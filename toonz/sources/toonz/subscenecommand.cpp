@@ -1123,9 +1123,16 @@ void bringPegbarsInsideChildXsheet(TXsheet *xsh, TXsheet *childXsh,
   for (pegbarIt = pegbarIds.begin(); pegbarIt != pegbarIds.end(); ++pegbarIt) {
     TStageObjectId id        = *pegbarIt;
     TStageObjectParams *data = xsh->getStageObject(id)->getParams();
-    childXsh->getStageObject(id)->assignParams(data);
+    TStageObject *obj        = childXsh->getStageObject(id);
+    obj->assignParams(data);
     delete data;
-    childXsh->getStageObject(id)->setParent(xsh->getStageObjectParent(id));
+    obj->setParent(xsh->getStageObjectParent(id));
+
+    // reset grammers of all parameters or they fails to refer to other
+    // parameters via expression
+    for (int c = 0; c != TStageObject::T_ChannelCount; ++c)
+      childXsh->getStageObjectTree()->setGrammar(
+          obj->getParam((TStageObject::Channel)c));
   }
 }
 
