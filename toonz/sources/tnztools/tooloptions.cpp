@@ -542,18 +542,18 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
 
   m_zLabel             = new ClickableLabel(tr("Z:"), this);
   m_motionPathPosLabel = new ClickableLabel(tr("Position:"), this);
-  m_ewPosLabel         = new ClickableLabel(tr("E/W:"), this);
-  m_nsPosLabel         = new ClickableLabel(tr("N/S:"), this);
+  m_ewPosLabel         = new ClickableLabel(tr("X:"), this);
+  m_nsPosLabel         = new ClickableLabel(tr("Y:"), this);
 
-  // Lock E/W
+  // Lock X
   TBoolProperty *lockProp =
-      dynamic_cast<TBoolProperty *>(m_pg->getProperty("Lock Position E/W"));
+      dynamic_cast<TBoolProperty *>(m_pg->getProperty("Lock Position X"));
   if (lockProp)
     m_lockEWPosCheckbox =
         new ToolOptionCheckbox(m_tool, lockProp, toolHandle, this);
-  // Lock N/S
+  // Lock Y
   lockProp =
-      dynamic_cast<TBoolProperty *>(m_pg->getProperty("Lock Position N/S"));
+      dynamic_cast<TBoolProperty *>(m_pg->getProperty("Lock Position Y"));
   if (lockProp)
     m_lockNSPosCheckbox =
         new ToolOptionCheckbox(m_tool, lockProp, toolHandle, this);
@@ -625,18 +625,18 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
       new PegbarCenterField(m_tool, 0, "field", objHandle, xshHandle, this);
   m_nsCenterField =
       new PegbarCenterField(m_tool, 1, "field", objHandle, xshHandle, this);
-  m_ewCenterLabel = new ClickableLabel(tr("E/W:"), this);
-  m_nsCenterLabel = new ClickableLabel(tr("N/S:"), this);
+  m_ewCenterLabel = new ClickableLabel(tr("X:"), this);
+  m_nsCenterLabel = new ClickableLabel(tr("Y:"), this);
 
-  // Lock E/W Center
+  // Lock X Center
   lockProp =
-      dynamic_cast<TBoolProperty *>(m_pg->getProperty("Lock Center E/W"));
+      dynamic_cast<TBoolProperty *>(m_pg->getProperty("Lock Center X"));
   if (lockProp)
     m_lockEWCenterCheckbox =
         new ToolOptionCheckbox(m_tool, lockProp, toolHandle, this);
-  // Lock N/S Center
+  // Lock Y Center
   lockProp =
-      dynamic_cast<TBoolProperty *>(m_pg->getProperty("Lock Center N/S"));
+      dynamic_cast<TBoolProperty *>(m_pg->getProperty("Lock Center Y"));
   if (lockProp)
     m_lockNSCenterCheckbox =
         new ToolOptionCheckbox(m_tool, lockProp, toolHandle, this);
@@ -1207,9 +1207,9 @@ SelectionToolOptionsBox::SelectionToolOptionsBox(QWidget *parent, TTool *tool,
       new SimpleIconViewField("edit_rotation", tr("Rotation"));
   m_rotationField = new SelectionRotationField(selectionTool, tr("Rotation"));
 
-  m_moveXLabel = new ClickableLabel(tr("E/W:"), this);
+  m_moveXLabel = new ClickableLabel(tr("X:"), this);
   m_moveXField = new SelectionMoveField(selectionTool, 0, "Move X");
-  m_moveYLabel = new ClickableLabel(tr("N/S:"), this);
+  m_moveYLabel = new ClickableLabel(tr("Y:"), this);
   m_moveYField = new SelectionMoveField(selectionTool, 1, "Move Y");
 
   if (rasterSelectionTool) {

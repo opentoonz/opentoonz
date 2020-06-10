@@ -164,10 +164,10 @@ QString TStageObjectValues::getStringForHistory() {
       channelStr = QObject::tr("Edit Rotation");
       break;
     case TStageObject::T_X:
-      channelStr = QObject::tr("Move E/W");
+      channelStr = QObject::tr("Move X");
       break;
     case TStageObject::T_Y:
-      channelStr = QObject::tr("Move N/S");
+      channelStr = QObject::tr("Move Y");
       break;
     case TStageObject::T_Z:
       channelStr = QObject::tr("Move Z");

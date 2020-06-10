@@ -450,11 +450,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Move E/W</source>
+        <source>Move X</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Move N/S</source>
+        <source>Move Y</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

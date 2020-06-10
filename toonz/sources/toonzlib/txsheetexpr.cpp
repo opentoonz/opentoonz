@@ -193,9 +193,9 @@ public:
 
   TStageObject::Channel matchChannelName(const Token &token) const {
     std::string s = toLower(token.getText());
-    if (s == "ns")
+    if (s == "y" || s == "ns")
       return TStageObject::T_Y;
-    else if (s == "ew")
+    else if (s == "x" || s == "ew")
       return TStageObject::T_X;
     else if (s == "rot" || s == "ang" || s == "angle")
       return TStageObject::T_Angle;

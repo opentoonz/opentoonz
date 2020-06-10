@@ -12,12 +12,12 @@
         <translation>Position</translation>
     </message>
     <message>
-        <source>E/W:</source>
-        <translation>E/O:</translation>
+        <source>X:</source>
+        <translation>X:</translation>
     </message>
     <message>
-        <source>N/S:</source>
-        <translation>N/S:</translation>
+        <source>Y:</source>
+        <translation>Y:</translation>
     </message>
     <message>
         <source>Z:</source>
@@ -194,20 +194,20 @@
         <translation>Clé Globale</translation>
     </message>
     <message>
-        <source>Lock Center E/W</source>
-        <translation>Verrouiller le Centre E/O</translation>
+        <source>Lock Center X</source>
+        <translation>Verrouiller le Centre X</translation>
     </message>
     <message>
-        <source>Lock Center N/S</source>
-        <translation>Verrouiller le Centre N/S</translation>
+        <source>Lock Center Y</source>
+        <translation>Verrouiller le Centre Y</translation>
     </message>
     <message>
-        <source>Lock Position E/W</source>
-        <translation>Verrouiller la Position E/O</translation>
+        <source>Lock Position X</source>
+        <translation>Verrouiller la Position X</translation>
     </message>
     <message>
-        <source>Lock Position N/S</source>
-        <translation>Verrouiller la Position N/S</translation>
+        <source>Lock Position Y</source>
+        <translation>Verrouiller la Position Y</translation>
     </message>
     <message>
         <source>Lock Rotation</source>
@@ -234,8 +234,8 @@
         <translation>Verrouiller l&apos; Échelle Globale</translation>
     </message>
     <message>
-        <source>E/W and N/S Positions</source>
-        <translation>Positions E/O et N/S</translation>
+        <source>X and Y Positions</source>
+        <translation>Positions X et Y</translation>
     </message>
     <message>
         <source>Z Position</source>
@@ -1276,12 +1276,12 @@ Voulez-vous continuer?</translation>
         <translation>Rotation</translation>
     </message>
     <message>
-        <source>E/W:</source>
-        <translation>E/O:</translation>
+        <source>X:</source>
+        <translation>X:</translation>
     </message>
     <message>
-        <source>N/S:</source>
-        <translation>N/S:</translation>
+        <source>Y:</source>
+        <translation>Y:</translation>
     </message>
     <message>
         <source>Thickness</source>

@@ -12,11 +12,11 @@
         <translation>이동:</translation>
     </message>
     <message>
-        <source>E/W:</source>
+        <source>X:</source>
         <translation></translation>
     </message>
     <message>
-        <source>N/S:</source>
+        <source>Y:</source>
         <translation></translation>
     </message>
     <message>
@@ -262,19 +262,19 @@
         <translation>글로벌 키</translation>
     </message>
     <message>
-        <source>Lock Center E/W</source>
+        <source>Lock Center X</source>
         <translation>중심점 좌우 잠금</translation>
     </message>
     <message>
-        <source>Lock Center N/S</source>
+        <source>Lock Center Y</source>
         <translation>중심점 위아래 잠금</translation>
     </message>
     <message>
-        <source>Lock Position E/W</source>
+        <source>Lock Position X</source>
         <translation>위치 좌우 잠금</translation>
     </message>
     <message>
-        <source>Lock Position N/S</source>
+        <source>Lock Position Y</source>
         <translation>위치 위아래 잠금</translation>
     </message>
     <message>
@@ -302,7 +302,7 @@
         <translation>잠금 확대/축소(전체)</translation>
     </message>
     <message>
-        <source>E/W and N/S Positions</source>
+        <source>X and Y Positions</source>
         <translation>좌우/상하 위치</translation>
     </message>
     <message>
@@ -1307,11 +1307,11 @@ Do you want to proceed?</source>
         <translation>회전</translation>
     </message>
     <message>
-        <source>E/W:</source>
+        <source>X:</source>
         <translation></translation>
     </message>
     <message>
-        <source>N/S:</source>
+        <source>Y:</source>
         <translation></translation>
     </message>
     <message>

@@ -204,11 +204,11 @@ Possibly the preset file has been corrupted</source>
         <translation type="vanished">フィールドの最大拡大値：</translation>
     </message>
     <message>
-        <source>E/W:</source>
+        <source>X:</source>
         <translation type="vanished">X：</translation>
     </message>
     <message>
-        <source>N/S:</source>
+        <source>Y:</source>
         <translation type="vanished">Y：</translation>
     </message>
     <message>
@@ -240,11 +240,11 @@ Possibly the preset file has been corrupted</source>
         <translation type="vanished">完成レベルの情報</translation>
     </message>
     <message>
-        <source>N/S</source>
+        <source>Y</source>
         <translation>Y</translation>
     </message>
     <message>
-        <source>E/W</source>
+        <source>X</source>
         <translation>X</translation>
     </message>
 </context>

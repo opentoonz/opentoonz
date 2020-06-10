@@ -281,11 +281,11 @@
         <translation>回転角を変更</translation>
     </message>
     <message>
-        <source>Move E/W</source>
+        <source>Move X</source>
         <translation>左右に移動</translation>
     </message>
     <message>
-        <source>Move N/S</source>
+        <source>Move Y</source>
         <translation>上下に移動</translation>
     </message>
     <message>

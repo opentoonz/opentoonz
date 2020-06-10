@@ -816,8 +816,8 @@
   
  <!------------------------------ Function Editor ------------------------------------------->
  
-  <item>W_NS		"N/S"		</item>
-  <item>W_EW		"E/W"		</item>
+  <item>W_Y		"Y"		</item>
+  <item>W_X		"X"		</item>
   <item>W_Z		"Z"		</item>
   <item>W_SO		"SO"		</item>
   <item>W_Rotation	"Rotation"	</item>

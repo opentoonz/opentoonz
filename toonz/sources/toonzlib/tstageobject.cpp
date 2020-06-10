@@ -385,11 +385,11 @@ TStageObject::TStageObject(TStageObjectTree *tree, TStageObjectId id)
     , m_ikflag(0)
     , m_groupSelector(-1) {
   // NOTA: per le unita' di misura controlla anche tooloptions.cpp
-  m_x->setName("W_EW");
+  m_x->setName("W_X");
   m_x->setMeasureName("length.x");
   m_x->addObserver(this);
 
-  m_y->setName("W_NS");
+  m_y->setName("W_Y");
   m_y->setMeasureName("length.y");
   m_y->addObserver(this);
 

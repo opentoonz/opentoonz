@@ -207,11 +207,11 @@ Possibly the preset file has been corrupted</source>
         <translation type="vanished">Nächste Position:</translation>
     </message>
     <message>
-        <source>E/W:</source>
+        <source>X:</source>
         <translation type="vanished">X:</translation>
     </message>
     <message>
-        <source>N/S:</source>
+        <source>Y:</source>
         <translation type="vanished">Y:</translation>
     </message>
     <message>
@@ -243,11 +243,11 @@ Possibly the preset file has been corrupted</source>
         <translation type="vanished">Fertige Ebenen-Information</translation>
     </message>
     <message>
-        <source>N/S</source>
+        <source>Y</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>E/W</source>
+        <source>X</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

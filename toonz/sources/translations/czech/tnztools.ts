@@ -16,13 +16,13 @@
     <message>
         <location filename="../../tnztools/tooloptions.cpp" line="544"/>
         <location filename="../../tnztools/tooloptions.cpp" line="627"/>
-        <source>E/W:</source>
+        <source>X:</source>
         <translation>V/Z:</translation>
     </message>
     <message>
         <location filename="../../tnztools/tooloptions.cpp" line="545"/>
         <location filename="../../tnztools/tooloptions.cpp" line="628"/>
-        <source>N/S:</source>
+        <source>Y:</source>
         <translation>S/J:</translation>
     </message>
     <message>
@@ -298,22 +298,22 @@
     </message>
     <message>
         <location filename="../../tnztools/edittool.cpp" line="849"/>
-        <source>Lock Center E/W</source>
+        <source>Lock Center X</source>
         <translation>Uzmknout střed [X]</translation>
     </message>
     <message>
         <location filename="../../tnztools/edittool.cpp" line="850"/>
-        <source>Lock Center N/S</source>
+        <source>Lock Center Y</source>
         <translation>Uzmknout střed [Y]</translation>
     </message>
     <message>
         <location filename="../../tnztools/edittool.cpp" line="851"/>
-        <source>Lock Position E/W</source>
+        <source>Lock Position X</source>
         <translation>Uzmknout polohu [X]</translation>
     </message>
     <message>
         <location filename="../../tnztools/edittool.cpp" line="852"/>
-        <source>Lock Position N/S</source>
+        <source>Lock Position Y</source>
         <translation>Uzmknout polohu [Y]</translation>
     </message>
     <message>
@@ -348,7 +348,7 @@
     </message>
     <message>
         <location filename="../../tnztools/edittool.cpp" line="859"/>
-        <source>E/W and N/S Positions</source>
+        <source>X and Y Positions</source>
         <translation>Polohy X a Y</translation>
     </message>
     <message>
@@ -1607,12 +1607,12 @@ Chcete pokračovat?</translation>
     </message>
     <message>
         <location filename="../../tnztools/tooloptions.cpp" line="1209"/>
-        <source>E/W:</source>
+        <source>X:</source>
         <translation>X:</translation>
     </message>
     <message>
         <location filename="../../tnztools/tooloptions.cpp" line="1211"/>
-        <source>N/S:</source>
+        <source>Y:</source>
         <translation>Y:</translation>
     </message>
     <message>

@@ -204,11 +204,11 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
         <translation type="vanished">Más cercano:</translation>
     </message>
     <message>
-        <source>E/W:</source>
+        <source>X:</source>
         <translation type="vanished">X:</translation>
     </message>
     <message>
-        <source>N/S:</source>
+        <source>Y:</source>
         <translation type="vanished">Y:</translation>
     </message>
     <message>
@@ -240,11 +240,11 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
         <translation type="vanished">Información del nivel</translation>
     </message>
     <message>
-        <source>N/S</source>
+        <source>Y</source>
         <translation>Y</translation>
     </message>
     <message>
-        <source>E/W</source>
+        <source>X</source>
         <translation>X</translation>
     </message>
 </context>

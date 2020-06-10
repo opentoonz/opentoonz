@@ -12,11 +12,11 @@
         <translation>位置</translation>
     </message>
     <message>
-        <source>E/W:</source>
+        <source>X:</source>
         <translation>左右:</translation>
     </message>
     <message>
-        <source>N/S:</source>
+        <source>Y:</source>
         <translation>上下:</translation>
     </message>
     <message>
@@ -294,19 +294,19 @@
         <translation>全局关键帧</translation>
     </message>
     <message>
-        <source>Lock Center E/W</source>
+        <source>Lock Center X</source>
         <translation>锁定中心点(左右)</translation>
     </message>
     <message>
-        <source>Lock Center N/S</source>
+        <source>Lock Center Y</source>
         <translation>锁定中心点(上下)</translation>
     </message>
     <message>
-        <source>Lock Position E/W</source>
+        <source>Lock Position X</source>
         <translation>锁定位置(左右)</translation>
     </message>
     <message>
-        <source>Lock Position N/S</source>
+        <source>Lock Position Y</source>
         <translation>锁定位置(上下)</translation>
     </message>
     <message>
@@ -334,7 +334,7 @@
         <translation>锁定缩放(全局)</translation>
     </message>
     <message>
-        <source>E/W and N/S Positions</source>
+        <source>X and Y Positions</source>
         <translation>左右和上下位置</translation>
     </message>
     <message>
@@ -1379,11 +1379,11 @@ Do you want to proceed?</source>
         <translation>旋转</translation>
     </message>
     <message>
-        <source>E/W:</source>
+        <source>X:</source>
         <translation>左右:</translation>
     </message>
     <message>
-        <source>N/S:</source>
+        <source>Y:</source>
         <translation>上下:</translation>
     </message>
     <message>

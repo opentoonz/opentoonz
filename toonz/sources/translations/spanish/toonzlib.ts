@@ -281,11 +281,11 @@
         <translation>Editar rotación</translation>
     </message>
     <message>
-        <source>Move E/W</source>
+        <source>Move X</source>
         <translation>Mover en X</translation>
     </message>
     <message>
-        <source>Move N/S</source>
+        <source>Move Y</source>
         <translation>Mover en Y</translation>
     </message>
     <message>

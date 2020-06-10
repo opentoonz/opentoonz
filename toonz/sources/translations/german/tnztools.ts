@@ -12,12 +12,12 @@
         <translation>Position</translation>
     </message>
     <message>
-        <source>E/W:</source>
-        <translation>E/W:</translation>
+        <source>X:</source>
+        <translation>X:</translation>
     </message>
     <message>
-        <source>N/S:</source>
-        <translation>N/S:</translation>
+        <source>Y:</source>
+        <translation>Y:</translation>
     </message>
     <message>
         <source>Z:</source>
@@ -210,19 +210,19 @@
         <translation>Globale Taste</translation>
     </message>
     <message>
-        <source>Lock Center E/W</source>
+        <source>Lock Center X</source>
         <translation>Mitte [X] sperren</translation>
     </message>
     <message>
-        <source>Lock Center N/S</source>
+        <source>Lock Center Y</source>
         <translation>Mitte ［Y］ sperren</translation>
     </message>
     <message>
-        <source>Lock Position E/W</source>
+        <source>Lock Position X</source>
         <translation>Position ［X］ sperren</translation>
     </message>
     <message>
-        <source>Lock Position N/S</source>
+        <source>Lock Position Y</source>
         <translation>Position ［Y］ sperren</translation>
     </message>
     <message>
@@ -250,7 +250,7 @@
         <translation>Globalen Maßstab sperren</translation>
     </message>
     <message>
-        <source>E/W and N/S Positions</source>
+        <source>X and Y Positions</source>
         <translation>X- und Y-Positionen</translation>
     </message>
     <message>
@@ -1291,11 +1291,11 @@ Möchten Sie fortfahren?</translation>
         <translation>Rotation</translation>
     </message>
     <message>
-        <source>E/W:</source>
+        <source>X:</source>
         <translation>X:</translation>
     </message>
     <message>
-        <source>N/S:</source>
+        <source>Y:</source>
         <translation>Y:</translation>
     </message>
     <message>

@@ -551,13 +551,13 @@
     </message>
     <message>
         <location filename="../../toonzlib/stageobjectutil.cpp" line="167"/>
-        <source>Move E/W</source>
-        <translation>Перемещение E/W</translation>
+        <source>Move X</source>
+        <translation>Перемещение X</translation>
     </message>
     <message>
         <location filename="../../toonzlib/stageobjectutil.cpp" line="170"/>
-        <source>Move N/S</source>
-        <translation>Перемещение N/S</translation>
+        <source>Move Y</source>
+        <translation>Перемещение Y</translation>
     </message>
     <message>
         <location filename="../../toonzlib/stageobjectutil.cpp" line="173"/>

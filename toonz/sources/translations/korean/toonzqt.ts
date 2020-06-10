@@ -172,11 +172,11 @@ Possibly the preset file has been corrupted</source>
 <context>
     <name>CleanupCameraSettingsWidget</name>
     <message>
-        <source>N/S</source>
+        <source>Y</source>
         <translation></translation>
     </message>
     <message>
-        <source>E/W</source>
+        <source>X</source>
         <translation></translation>
     </message>
 </context>

@@ -475,12 +475,12 @@
         <translation>회전 편집</translation>
     </message>
     <message>
-        <source>Move E/W</source>
-        <translation>E/W 이동</translation>
+        <source>Move X</source>
+        <translation>X 이동</translation>
     </message>
     <message>
-        <source>Move N/S</source>
-        <translation>N/S 이동</translation>
+        <source>Move Y</source>
+        <translation>Y 이동</translation>
     </message>
     <message>
         <source>Move Z</source>

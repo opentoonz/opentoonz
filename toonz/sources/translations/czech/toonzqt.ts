@@ -216,12 +216,12 @@ Možná byl soubor s přednastavením poškozen</translation>
     <name>CleanupCameraSettingsWidget</name>
     <message>
         <location filename="../../toonzqt/cleanupcamerasettingswidget.cpp" line="57"/>
-        <source>N/S</source>
+        <source>Y</source>
         <translation>S/J</translation>
     </message>
     <message>
         <location filename="../../toonzqt/cleanupcamerasettingswidget.cpp" line="60"/>
-        <source>E/W</source>
+        <source>X</source>
         <translation>V/Z</translation>
     </message>
 </context>

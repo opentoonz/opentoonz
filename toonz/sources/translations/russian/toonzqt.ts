@@ -216,12 +216,12 @@ Possibly the preset file has been corrupted</source>
     <name>CleanupCameraSettingsWidget</name>
     <message>
         <location filename="../../toonzqt/cleanupcamerasettingswidget.cpp" line="57"/>
-        <source>N/S</source>
+        <source>Y</source>
         <translation>Y</translation>
     </message>
     <message>
         <location filename="../../toonzqt/cleanupcamerasettingswidget.cpp" line="60"/>
-        <source>E/W</source>
+        <source>X</source>
         <translation>X</translation>
     </message>
 </context>

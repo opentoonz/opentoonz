@@ -6,16 +6,16 @@
     <message>
         <location filename="../../tnztools/tooloptions.cpp" line="544"/>
         <location filename="../../tnztools/tooloptions.cpp" line="627"/>
-        <source>E/W:</source>
+        <source>X:</source>
         <translatorcomment>запад/восток</translatorcomment>
-        <translation>E/W:</translation>
+        <translation>X:</translation>
     </message>
     <message>
         <location filename="../../tnztools/tooloptions.cpp" line="545"/>
         <location filename="../../tnztools/tooloptions.cpp" line="628"/>
-        <source>N/S:</source>
+        <source>Y:</source>
         <translatorcomment>север/юг</translatorcomment>
-        <translation>N/S:</translation>
+        <translation>Y:</translation>
     </message>
     <message>
         <location filename="../../tnztools/tooloptions.cpp" line="560"/>
@@ -339,23 +339,23 @@
     </message>
     <message>
         <location filename="../../tnztools/edittool.cpp" line="849"/>
-        <source>Lock Center E/W</source>
-        <translation>Блокировать центр E/W</translation>
+        <source>Lock Center X</source>
+        <translation>Блокировать центр X</translation>
     </message>
     <message>
         <location filename="../../tnztools/edittool.cpp" line="850"/>
-        <source>Lock Center N/S</source>
-        <translation>Блокировать центр N/S</translation>
+        <source>Lock Center Y</source>
+        <translation>Блокировать центр Y</translation>
     </message>
     <message>
         <location filename="../../tnztools/edittool.cpp" line="851"/>
-        <source>Lock Position E/W</source>
-        <translation>Блокировать положение E/W</translation>
+        <source>Lock Position X</source>
+        <translation>Блокировать положение X</translation>
     </message>
     <message>
         <location filename="../../tnztools/edittool.cpp" line="852"/>
-        <source>Lock Position N/S</source>
-        <translation>Блокировать положение N/S</translation>
+        <source>Lock Position Y</source>
+        <translation>Блокировать положение Y</translation>
     </message>
     <message>
         <location filename="../../tnztools/edittool.cpp" line="853"/>
@@ -389,8 +389,8 @@
     </message>
     <message>
         <location filename="../../tnztools/edittool.cpp" line="859"/>
-        <source>E/W and N/S Positions</source>
-        <translation>E/W и N/S положение</translation>
+        <source>X and Y Positions</source>
+        <translation>X и Y положение</translation>
     </message>
     <message>
         <location filename="../../tnztools/edittool.cpp" line="860"/>
@@ -1655,13 +1655,13 @@ Do you want to proceed?</source>
     </message>
     <message>
         <location filename="../../tnztools/tooloptions.cpp" line="1209"/>
-        <source>E/W:</source>
-        <translation>E/W:</translation>
+        <source>X:</source>
+        <translation>X:</translation>
     </message>
     <message>
         <location filename="../../tnztools/tooloptions.cpp" line="1211"/>
-        <source>N/S:</source>
-        <translation>N/S:</translation>
+        <source>Y:</source>
+        <translation>Y:</translation>
     </message>
     <message>
         <location filename="../../tnztools/tooloptions.cpp" line="1231"/>

@@ -451,11 +451,11 @@
         <translation>编辑旋转</translation>
     </message>
     <message>
-        <source>Move E/W</source>
+        <source>Move X</source>
         <translation>左右移动</translation>
     </message>
     <message>
-        <source>Move N/S</source>
+        <source>Move Y</source>
         <translation>上下移动</translation>
     </message>
     <message>

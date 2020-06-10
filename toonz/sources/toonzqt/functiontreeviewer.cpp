@@ -637,10 +637,10 @@ QString FunctionTreeModel::Channel::getExprRefName() const {
   StageObjectChannelGroup *stageGroup =
       dynamic_cast<StageObjectChannelGroup *>(m_group);
   if (stageGroup) {
-    if (tmpName == "N/S")
-      tmpName = "ns";
-    else if (tmpName == "E/W")
-      tmpName = "ew";
+    if (tmpName == "Y")
+      tmpName = "y";
+    else if (tmpName == "X")
+      tmpName = "x";
     else if (tmpName == "Z")
       tmpName = "z";
     else if (tmpName == "Rotation")

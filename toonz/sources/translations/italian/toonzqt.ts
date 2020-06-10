@@ -204,12 +204,12 @@ E&apos; possibile che il file sia corrotto.</translation>
         <translation type="vanished">Closest:</translation>
     </message>
     <message>
-        <source>E/W:</source>
+        <source>X:</source>
         <translation type="vanished">E/O</translation>
     </message>
     <message>
-        <source>N/S:</source>
-        <translation type="vanished">N/S</translation>
+        <source>Y:</source>
+        <translation type="vanished">Y</translation>
     </message>
     <message>
         <source>DPI:</source>
@@ -240,11 +240,11 @@ E&apos; possibile che il file sia corrotto.</translation>
         <translation type="vanished">Informazioni sul Livello</translation>
     </message>
     <message>
-        <source>N/S</source>
+        <source>Y</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>E/W</source>
+        <source>X</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

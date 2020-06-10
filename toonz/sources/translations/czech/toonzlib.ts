@@ -383,12 +383,12 @@ Pravděpodobně kodek nemůže pracovat řádně.</translation>
     </message>
     <message>
         <location filename="../../toonzlib/stageobjectutil.cpp" line="167"/>
-        <source>Move E/W</source>
+        <source>Move X</source>
         <translation>Posunout V/Z</translation>
     </message>
     <message>
         <location filename="../../toonzlib/stageobjectutil.cpp" line="170"/>
-        <source>Move N/S</source>
+        <source>Move Y</source>
         <translation>Posunout S/J</translation>
     </message>
     <message>

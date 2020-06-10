@@ -12,11 +12,11 @@
         <translation>Posición</translation>
     </message>
     <message>
-        <source>E/W:</source>
+        <source>X:</source>
         <translation>X:</translation>
     </message>
     <message>
-        <source>N/S:</source>
+        <source>Y:</source>
         <translation>Y:</translation>
     </message>
     <message>
@@ -294,19 +294,19 @@
         <translation>Clave global</translation>
     </message>
     <message>
-        <source>Lock Center E/W</source>
+        <source>Lock Center X</source>
         <translation>Bloquear centro X</translation>
     </message>
     <message>
-        <source>Lock Center N/S</source>
+        <source>Lock Center Y</source>
         <translation>Bloquear centro Y</translation>
     </message>
     <message>
-        <source>Lock Position E/W</source>
+        <source>Lock Position X</source>
         <translation>Bloquear posición X</translation>
     </message>
     <message>
-        <source>Lock Position N/S</source>
+        <source>Lock Position Y</source>
         <translation>Bloquear posición Y</translation>
     </message>
     <message>
@@ -334,7 +334,7 @@
         <translation>Bloquear escala global</translation>
     </message>
     <message>
-        <source>E/W and N/S Positions</source>
+        <source>X and Y Positions</source>
         <translation>Posiciones X e Y</translation>
     </message>
     <message>
@@ -1375,11 +1375,11 @@ Do you want to proceed?</source>
         <translation>Rotación</translation>
     </message>
     <message>
-        <source>E/W:</source>
+        <source>X:</source>
         <translation>X:</translation>
     </message>
     <message>
-        <source>N/S:</source>
+        <source>Y:</source>
         <translation>Y:</translation>
     </message>
     <message>

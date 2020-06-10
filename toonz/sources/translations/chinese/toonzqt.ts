@@ -210,11 +210,11 @@ Possibly the preset file has been corrupted</source>
         <translation type="vanished">最靠近的:</translation>
     </message>
     <message>
-        <source>E/W:</source>
+        <source>X:</source>
         <translation type="vanished">左右:</translation>
     </message>
     <message>
-        <source>N/S:</source>
+        <source>Y:</source>
         <translation type="vanished">上下:</translation>
     </message>
     <message>
@@ -246,11 +246,11 @@ Possibly the preset file has been corrupted</source>
         <translation type="vanished">结果层级信息</translation>
     </message>
     <message>
-        <source>N/S</source>
+        <source>Y</source>
         <translation>上下</translation>
     </message>
     <message>
-        <source>E/W</source>
+        <source>X</source>
         <translation>左右</translation>
     </message>
 </context>

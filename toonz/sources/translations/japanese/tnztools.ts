@@ -12,12 +12,12 @@
         <translation>位置</translation>
     </message>
     <message>
-        <source>E/W:</source>
-        <translation>E/W:</translation>
+        <source>X:</source>
+        <translation>X:</translation>
     </message>
     <message>
-        <source>N/S:</source>
-        <translation>N/S:</translation>
+        <source>Y:</source>
+        <translation>Y:</translation>
     </message>
     <message>
         <source>Z:</source>
@@ -294,19 +294,19 @@
         <translation>グローバルキー</translation>
     </message>
     <message>
-        <source>Lock Center E/W</source>
+        <source>Lock Center X</source>
         <translation>基準点 [X]</translation>
     </message>
     <message>
-        <source>Lock Center N/S</source>
+        <source>Lock Center Y</source>
         <translation>基準点［Y］</translation>
     </message>
     <message>
-        <source>Lock Position E/W</source>
+        <source>Lock Position X</source>
         <translation>位置 ［X］</translation>
     </message>
     <message>
-        <source>Lock Position N/S</source>
+        <source>Lock Position Y</source>
         <translation>位置［Y］</translation>
     </message>
     <message>
@@ -334,7 +334,7 @@
         <translation>拡大・縮小［全体］</translation>
     </message>
     <message>
-        <source>E/W and N/S Positions</source>
+        <source>X and Y Positions</source>
         <translation>X と Y の位置</translation>
     </message>
     <message>
@@ -1375,12 +1375,12 @@ Do you want to proceed?</source>
         <translation>回転</translation>
     </message>
     <message>
-        <source>E/W:</source>
-        <translation>E/W:</translation>
+        <source>X:</source>
+        <translation>X:</translation>
     </message>
     <message>
-        <source>N/S:</source>
-        <translation>N/S:</translation>
+        <source>Y:</source>
+        <translation>Y:</translation>
     </message>
     <message>
         <source>Thickness</source>
