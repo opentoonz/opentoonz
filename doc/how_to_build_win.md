@@ -1,19 +1,30 @@
 # Building on Windows
 
-This software can be built using Visual Studio 2015 and Qt 5.9
+This software can be built using Visual Studio 2015 or above and Qt 5.9(later versions still not working correctly.)
 
 ## Required Software
 
-### Visual Studio Express 2015 for Windows Desktop
+### Visual Studio Express 2015 or higher for Windows Desktop
 - https://www.visualstudio.com/vs/older-downloads/
-- Make sure that the version is "2015" and that the target platform is "for Windows Desktop", not "for Windows".
-- Community and Professional versions of Visual Studio 2015 for Windows Desktop also work.
-- Visual Studio 2017 is currently unsupported.
+- Make sure the target platform is "for Windows Desktop", not "for Windows".
+- Community and Professional versions of Visual Studio for Windows Desktop also work.
 - During the installation, make sure to select all the Visual C++ packages.
 
 ### CMake
 - https://cmake.org/download/
 - This will be used to create the `MSVC 2015` project file.
+
+### Qt
+- https://www.qt.io/download-open-source/
+- Qt is a cross-platform GUI framework.
+- Install Qt 5.9 (64-bit version, tested up to 5.9.9) with the [Qt Online Installer for Windows](http://download.qt.io/official_releases/online_installers/qt-unified-windows-x86-online.exe).
+
+### boost
+- Boost 1.55.0 or later is required (tested up to 1.61.0).
+- http://www.boost.org/users/history/version_1_61_0.html
+- Download boost_1_73_0.zip from the above link.  Extract all contents to the '$opentoonz/thirdparty/boost' directory.
+- Install the following patch (Make the changes listed in the patch file), if you use Boost 1.55.0 with Visual Studio 2013.
+  - https://svn.boost.org/trac/boost/attachment/ticket/9369/vc12_fix_has_member_function_callable_with.patch
 
 ## Acquiring the Source Code
 - Clone the base repository.
@@ -21,27 +32,13 @@ This software can be built using Visual Studio 2015 and Qt 5.9
 - Visual Studio cannot recognize UTF-8 without BOM source code properly.  Furthermore, since the endline character is represented with only the LF character, one line comments in Japanese will often cause the following line to be treated as a comment by `MSVS` as well.
 - In order to prevent this, please change the following setting in git so that it will preserve the proper endline characters:
   - `git config core.safecrlf true`
+- Execute `git lfs pull` after `git clone` by using the `lfs` client.
 
-## Installation of Required Libraries
-Because of the size of these libraries, they are not maintained in the git repository.
-They will have to be installed seperately as follows.
+Note: Also all of these actions can also be done using the GitHub Desktop Client.  Recommended if you are not proficient with git commands.  https://desktop.github.com/
 
 ### `lib` and `dll`
 - `lib` and `dll` files are tracked by [Git Large File Storage](https://git-lfs.github.com/).
-- Execute `git lfs pull` after `git clone` by using the `lfs` client.
-
-### Qt
-- https://www.qt.io/download-open-source/
-- Qt is a cross-platform GUI framework.
-- Install Qt 5.9 (64-bit version, tested up to 5.9.4) with the [Qt Online Installer for Windows](http://download.qt.io/official_releases/online_installers/qt-unified-windows-x86-online.exe).
-
-### boost
-- Boost 1.55.0 or later is required (tested up to 1.61.0).
-- http://www.boost.org/users/history/version_1_61_0.html
-- Download boost_1_61_0.zip from the above link.  Extract all contents to the '$opentoonz/thirdparty/boost' directory.
-- Install the following patch (Make the changes listed in the patch file), if you use Boost 1.55.0 with Visual Studio 2013.
-  - https://svn.boost.org/trac/boost/attachment/ticket/9369/vc12_fix_has_member_function_callable_with.patch
-
+Note: git-lfs is also installed with Github Desktop.
 
 ## Building
 
@@ -52,7 +49,7 @@ They will have to be installed seperately as follows.
   - Or to wherever you usually build to.
   - If the build directory is in the git repository, be sure to add the directory to .gitignore
   - If the build directory is different from the one above, be sure to change to the specified directory where appropriate below.
-4. Click on Configure and select Visual Studio 14 2015 Win64.
+4. Click on Configure and select the version of Visual Studio you are using.
 5. If Qt was installed to a directory other than the default, and the error `Specify QT_PATH properly` appears, navigate to the `QT_DIR` install folder and specify the path to `msvc2015_64`. Rerun Configure.
   - If red lines appear in the bottom box, you can safely ignore them.
 6. Click Generate
@@ -68,7 +65,8 @@ Rename the following files:
 
 ## Building
 1. Open `$opentoonz/toonz/build/OpenToonz.sln` and change to `Debug` or `Release` in the top bar.
-2. The output will be in the corresponding folder in `$opentoonz/toonz/build/`
+2. Generate the build.
+3. The output will be in the corresponding folder in `$opentoonz/toonz/build/`
 
 ## Building with extended stop motion support for webcams and Canon DSLR cameras.
 You will need three additional libraries.
@@ -91,6 +89,8 @@ To run the program with stop motion support, you will need to copy the .dll file
 1. Copy the entire contents of `$opentoonz/toonz/build/Release` to an appropriate folder.
 
 2. Open a Command Prompt and navigate to `QT_DIR/msvc2015_64/bin`. Run the Qt program `windeployqt.exe` with the path for `OpenToonz.exe` as an argument.
+(Another way to do this is navigate to the exe that was created in your Release folder and drag and drop the Opentoonz.exe on top of the windeployqt.exe This will automatically generate the  QT files and folders you will need.)
+
   - The necessary Qt library files should be in the same folder as `OpenToonz.exe`
   - These include:
     - `Qt5Core.dll`
@@ -125,6 +125,7 @@ To run the program with stop motion support, you will need to copy the .dll file
 4. Copy the `srv` folder from the previous OpenToonz installation to the same folder as `OpenToonz.exe`
   - If there is no `srv` folder, OpenToonz can still be used.  However, various file formats such as `mov` cannot be used.
   - Creating the files for `srv` is discussed later.
+5. You will also need `$opentoonz\thirdparty\libmypaint\dist\64\libmypaint-1-4-0.dll`
 
 ### Creating the stuff Folder
 If a previous binary of OpenToonz was already installed, this step and the following about creating a registry key has already been dealt with.  So feel free to skip these parts.
