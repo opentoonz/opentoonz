@@ -14,6 +14,27 @@ This software can be built using Visual Studio 2015 or above and Qt 5.9(later ve
 - https://cmake.org/download/
 - This will be used to create the `MSVC 2015` project file.
 
+
+## Acquiring the Source Code
+- Clone the base repository.
+- Throughout the explanation `$opentoonz` will represent the root for the base repository.
+- Visual Studio cannot recognize UTF-8 without BOM source code properly.  Furthermore, since the endline character is represented with only the LF character, one line comments in Japanese will often cause the following line to be treated as a comment by `MSVS` as well.
+- In order to prevent this, please change the following setting in git so that it will preserve the proper endline characters:
+  - `git config core.safecrlf true`
+- Execute `git lfs pull` after `git clone` by using the `lfs` client.
+
+##Installation of Required Libraries
+Because of the size of these libraries, they are not maintained in the git repository. They will have to be installed seperately as follows.
+
+### `lib` and `dll`
+- `lib` and `dll` files are tracked by [Git Large File Storage](https://git-lfs.github.com/).
+- Visual Studio cannot recognize UTF-8 without BOM source code properly.  Furthermore, since the endline character is represented with only the LF character, one line comments in Japanese will often cause the following line to be treated as a comment by `MSVS` as well.
+- In order to prevent this, please change the following setting in git so that it will preserve the proper endline characters:
+  - `git config core.safecrlf true`
+- Execute `git lfs pull` after `git clone` by using the `lfs` client.
+Note: Also all of these actions can also be done using the GitHub Desktop Client.  Recommended if you are not proficient with git commands.  https://desktop.github.com/
+      git-lfs is also installed with Github Desktop.
+
 ### Qt
 - https://www.qt.io/download-open-source/
 - Qt is a cross-platform GUI framework.
@@ -25,20 +46,6 @@ This software can be built using Visual Studio 2015 or above and Qt 5.9(later ve
 - Download boost_1_73_0.zip from the above link.  Extract all contents to the '$opentoonz/thirdparty/boost' directory.
 - Install the following patch (Make the changes listed in the patch file), if you use Boost 1.55.0 with Visual Studio 2013.
   - https://svn.boost.org/trac/boost/attachment/ticket/9369/vc12_fix_has_member_function_callable_with.patch
-
-## Acquiring the Source Code
-- Clone the base repository.
-- Throughout the explanation `$opentoonz` will represent the root for the base repository.
-- Visual Studio cannot recognize UTF-8 without BOM source code properly.  Furthermore, since the endline character is represented with only the LF character, one line comments in Japanese will often cause the following line to be treated as a comment by `MSVS` as well.
-- In order to prevent this, please change the following setting in git so that it will preserve the proper endline characters:
-  - `git config core.safecrlf true`
-- Execute `git lfs pull` after `git clone` by using the `lfs` client.
-
-Note: Also all of these actions can also be done using the GitHub Desktop Client.  Recommended if you are not proficient with git commands.  https://desktop.github.com/
-
-### `lib` and `dll`
-- `lib` and `dll` files are tracked by [Git Large File Storage](https://git-lfs.github.com/).
-Note: git-lfs is also installed with Github Desktop.
 
 ## Building
 
@@ -125,7 +132,7 @@ To run the program with stop motion support, you will need to copy the .dll file
 4. Copy the `srv` folder from the previous OpenToonz installation to the same folder as `OpenToonz.exe`
   - If there is no `srv` folder, OpenToonz can still be used.  However, various file formats such as `mov` cannot be used.
   - Creating the files for `srv` is discussed later.
-5. You will also need `$opentoonz\thirdparty\libmypaint\dist\64\libmypaint-1-4-0.dll`
+5. You will also need '$opentoonz\thirdparty\libmypaint\dist\64\libmypaint-1-4-0.dll'
 
 ### Creating the stuff Folder
 If a previous binary of OpenToonz was already installed, this step and the following about creating a registry key has already been dealt with.  So feel free to skip these parts.
