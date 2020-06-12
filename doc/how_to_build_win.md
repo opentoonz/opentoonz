@@ -23,7 +23,7 @@ This software can be built using Visual Studio 2015 or above and Qt 5.9(later ve
   - `git config core.safecrlf true`
 - Execute `git lfs pull` after `git clone` by using the `lfs` client.
 
-##Installation of Required Libraries
+## Installation of Required Libraries
 Because of the size of these libraries, they are not maintained in the git repository. They will have to be installed seperately as follows.
 
 ### `lib` and `dll`
