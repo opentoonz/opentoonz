@@ -21,19 +21,15 @@ This software can be built using Visual Studio 2015 or above and Qt 5.9(later ve
 - Visual Studio cannot recognize UTF-8 without BOM source code properly.  Furthermore, since the endline character is represented with only the LF character, one line comments in Japanese will often cause the following line to be treated as a comment by `MSVS` as well.
 - In order to prevent this, please change the following setting in git so that it will preserve the proper endline characters:
   - `git config core.safecrlf true`
-- Execute `git lfs pull` after `git clone` by using the `lfs` client.
 
 ## Installation of Required Libraries
 Because of the size of these libraries, they are not maintained in the git repository. They will have to be installed seperately as follows.
 
 ### `lib` and `dll`
 - `lib` and `dll` files are tracked by [Git Large File Storage](https://git-lfs.github.com/).
-- Visual Studio cannot recognize UTF-8 without BOM source code properly.  Furthermore, since the endline character is represented with only the LF character, one line comments in Japanese will often cause the following line to be treated as a comment by `MSVS` as well.
-- In order to prevent this, please change the following setting in git so that it will preserve the proper endline characters:
-  - `git config core.safecrlf true`
 - Execute `git lfs pull` after `git clone` by using the `lfs` client.
 Note: Also all of these actions can also be done using the GitHub Desktop Client.  Recommended if you are not proficient with git commands.  https://desktop.github.com/
-      git-lfs is also installed with Github Desktop.
+- git-lfs is also installed with Github Desktop.
 
 ### Qt
 - https://www.qt.io/download-open-source/
@@ -96,7 +92,7 @@ To run the program with stop motion support, you will need to copy the .dll file
 1. Copy the entire contents of `$opentoonz/toonz/build/Release` to an appropriate folder.
 
 2. Open a Command Prompt and navigate to `QT_DIR/msvc2015_64/bin`. Run the Qt program `windeployqt.exe` with the path for `OpenToonz.exe` as an argument.
-(Another way to do this is navigate to the exe that was created in your Release folder and drag and drop the Opentoonz.exe on top of the windeployqt.exe This will automatically generate the  QT files and folders you will need.)
+(Another way to do this is to open two explorer windows. Navigate to the exe that was created in your Release folder in the first window. Open another window where ever QT is installed `Qt\5.9.9\msvc2015_64`. Drag and drop the Opentoonz.exe on top of the windeployqt.exe This will automatically generate the  QT files and folders you will need.)
 
   - The necessary Qt library files should be in the same folder as `OpenToonz.exe`
   - These include:
