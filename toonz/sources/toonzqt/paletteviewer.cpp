@@ -105,7 +105,7 @@ PaletteViewer::PaletteViewer(QWidget *parent, PaletteViewType viewType,
   // Create pageView
   m_pageViewerScrollArea = new QScrollArea();
   m_pageViewerScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-  m_pageViewerScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+  m_pageViewerScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
   m_pageViewerScrollArea->setWidgetResizable(true);
 
   m_pageViewer =
@@ -115,10 +115,8 @@ PaletteViewer::PaletteViewer(QWidget *parent, PaletteViewType viewType,
 
   // Create toolbar. It is an horizontal layout with three internal toolbar.
   DvScrollWidget *toolbarScrollWidget = new DvScrollWidget;
-
-  toolbarScrollWidget->setObjectName(
-      "ToolBarContainer");  // Toonz's qss files are instructed to leave a
-                            // 1px grey margin on top for scroll buttons
+  QFrame *outerToolbarFrame           = new QFrame(this);
+  outerToolbarFrame->setObjectName("ToolBarContainer");
   QWidget *toolBarWidget = new QWidget;  // children of this parent name.
   toolbarScrollWidget->setWidget(toolBarWidget);
   toolBarWidget->setSizePolicy(QSizePolicy::MinimumExpanding,
@@ -127,14 +125,41 @@ PaletteViewer::PaletteViewer(QWidget *parent, PaletteViewType viewType,
 
   m_paletteToolBar     = new QToolBar(toolBarWidget);
   m_savePaletteToolBar = new QToolBar(toolBarWidget);
+
+  QWidget *newPageWidget = new QWidget;  // children of this parent name.
+  newPageWidget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+  newPageWidget->setFixedHeight(22);
+
+  m_newPageToolbar = new QToolBar(this);
+  m_newPageToolbar->clear();
+  m_newPageToolbar->setMovable(false);
+  m_newPageToolbar->setIconSize(QSize(23, 20));
+  m_newPageToolbar->setLayoutDirection(Qt::RightToLeft);
+
+  if (m_hasPageCommand) {
+    QAction *addPage;
+    QIcon addPageIcon = createQIcon("newpage");
+    addPage = new QAction(addPageIcon, tr("&New Page"), m_newPageToolbar);
+    connect(addPage, SIGNAL(triggered()), this, SLOT(addNewPage()));
+
+    m_newPageToolbar->addAction(addPage);
+  }
+
+  QHBoxLayout *newPageLayout = new QHBoxLayout(toolBarWidget);
+  newPageLayout->setMargin(0);
+  newPageLayout->setSpacing(0);
+  newPageLayout->addWidget(m_newPageToolbar, 0, Qt::AlignRight);
+  newPageWidget->setLayout(newPageLayout);
+
   createToolBar();
 
   QHBoxLayout *toolBarLayout = new QHBoxLayout(toolBarWidget);
   toolBarLayout->setMargin(0);
   toolBarLayout->setSpacing(0);
   {
+    toolBarLayout->addWidget(m_paletteToolBar, 0, Qt::AlignLeft);
+    toolBarLayout->addStretch();
     toolBarLayout->addWidget(m_savePaletteToolBar, 0, Qt::AlignRight);
-    toolBarLayout->addWidget(m_paletteToolBar, 0, Qt::AlignRight);
   }
   toolBarWidget->setLayout(toolBarLayout);
 
@@ -154,15 +179,20 @@ PaletteViewer::PaletteViewer(QWidget *parent, PaletteViewType viewType,
     // hLayout->setAlignment(Qt::AlignLeft);
     // hLayout->addSpacing(6);
     {
-      hLayout->addWidget(m_pagesBar, 0);
-      hLayout->addStretch(1);
-      hLayout->addWidget(toolbarScrollWidget, 0);
+      hLayout->addWidget(m_pagesBar, 1);
+      hLayout->addWidget(newPageWidget, 0);
     }
     m_tabBarContainer->setLayout(hLayout);
 
     // To align this panel with the style Editor
     mainLayout->addWidget(m_tabBarContainer, 0);
     mainLayout->addWidget(m_pageViewerScrollArea, 1);
+
+    QHBoxLayout *bottomLayout = new QHBoxLayout;
+    bottomLayout->setMargin(0);
+    bottomLayout->addWidget(toolbarScrollWidget, 0);
+    outerToolbarFrame->setLayout(bottomLayout);
+    mainLayout->addWidget(outerToolbarFrame);
   }
   setLayout(mainLayout);
 
@@ -189,7 +219,7 @@ PaletteViewer::~PaletteViewer() { delete m_changeStyleCommand; }
 void PaletteViewer::setPaletteHandle(TPaletteHandle *paletteHandle) {
   if (m_paletteHandle == paletteHandle) return;
 
-  bool ret = true;
+  bool ret                 = true;
   if (m_paletteHandle) ret = ret && disconnect(m_paletteHandle, 0, this, 0);
 
   m_paletteHandle = paletteHandle;
@@ -262,6 +292,7 @@ void PaletteViewer::updateView() {
   updateTabBar();
   updatePaletteToolBar();
   updateSavePaletteToolBar();
+  updatePaletteMenu();
 }
 
 //-----------------------------------------------------------------------------
@@ -302,7 +333,24 @@ void PaletteViewer::createPaletteToolBar() {
   m_paletteToolBar->clear();
   m_paletteToolBar->setMovable(false);
   m_paletteToolBar->setIconSize(QSize(23, 20));
-  m_paletteToolBar->setLayoutDirection(Qt::RightToLeft);
+  m_paletteToolBar->setLayoutDirection(Qt::LeftToRight);
+
+  // QIcon newColorIcon = createQIcon("newstyle");
+  // QAction* addColor =
+  //    new QAction(newColorIcon, tr("&New Style"), m_paletteToolBar);
+  // connect(addColor, SIGNAL(triggered()), this, SLOT(addNewColor()));
+
+  // m_paletteToolBar->addAction(addColor);
+
+  // m_paletteToolBar->addSeparator();
+
+  // KeyFrame button
+  if (m_viewType != CLEANUP_PALETTE) {
+    m_keyFrameButton = new PaletteKeyframeNavigator(m_paletteToolBar);
+    m_paletteToolBar->addWidget(m_keyFrameButton);
+    m_paletteToolBar->addSeparator();
+    m_keyFrameButton->setSelection(m_pageViewer->getSelection());
+  }
 
   // Lock button to avoid editing the palette by mistake
   if (m_viewType == LEVEL_PALETTE) {
@@ -350,89 +398,6 @@ void PaletteViewer::createPaletteToolBar() {
     m_paletteToolBar->addWidget(toolButton);
   }
 
-  // Attenzione: alcune modifiche sono state fatte a livello di stylesheet
-  QToolButton *viewModeButton = new QToolButton(this);
-  viewModeButton->setPopupMode(QToolButton::InstantPopup);
-
-  QIcon viewModeIcon = createQIcon("options");
-  viewModeButton->setIcon(viewModeIcon);
-  QMenu *viewMode = new QMenu(QString("Options"), viewModeButton);
-  viewMode->setToolTip(tr("Options"));
-  viewMode->setLayoutDirection(Qt::LeftToRight);
-
-  QActionGroup *viewModeGroup = new QActionGroup(viewMode);
-  viewModeGroup->setExclusive(true);
-  connect(viewModeGroup, SIGNAL(triggered(QAction *)), this,
-          SLOT(onViewMode(QAction *)));
-
-  auto addViewAction = [&](const QString &label, PageViewer::ViewMode mode) {
-    QAction *viewAction = new QAction(label, viewMode);
-    viewAction->setData(mode);
-    viewAction->setCheckable(true);
-    if (m_pageViewer->getViewMode() == mode) viewAction->setChecked(true);
-    viewModeGroup->addAction(viewAction);
-    viewMode->addAction(viewAction);
-  };
-
-  addViewAction(tr("&Small Thumbnails View"), PageViewer::SmallChips);
-  addViewAction(tr("&Medium Thumbnails View"), PageViewer::MediumChips);
-  addViewAction(tr("&Large Thumbnails View"), PageViewer::LargeChips);
-  addViewAction(tr("&List View"), PageViewer::List);
-
-  viewMode->addSeparator();
-
-  QActionGroup *nameDisplayModeGroup = new QActionGroup(viewMode);
-  nameDisplayModeGroup->setExclusive(true);
-  connect(nameDisplayModeGroup, SIGNAL(triggered(QAction *)), this,
-          SLOT(onNameDisplayMode(QAction *)));
-
-  auto addNameDisplayAction = [&](const QString &label,
-                                  PageViewer::NameDisplayMode mode) {
-    QAction *nameDisplayAction = new QAction(label, viewMode);
-    nameDisplayAction->setData(mode);
-    nameDisplayAction->setCheckable(true);
-    if (m_pageViewer->getNameDisplayMode() == mode)
-      nameDisplayAction->setChecked(true);
-    nameDisplayModeGroup->addAction(nameDisplayAction);
-    viewMode->addAction(nameDisplayAction);
-  };
-
-  addNameDisplayAction(tr("Style Name"), PageViewer::Style);
-  addNameDisplayAction(tr("StudioPalette Name"), PageViewer::Original);
-  addNameDisplayAction(tr("Both Names"), PageViewer::StyleAndOriginal);
-
-  viewModeButton->setMenu(viewMode);
-
-  // Attenzione: avendo invertito la direzione devo aggiungere gli oggetti al
-  // contrario
-
-  m_paletteToolBar->addWidget(viewModeButton);
-  m_paletteToolBar->addSeparator();
-
-  if (m_hasPageCommand) {
-    QAction *addPage;
-    QIcon addPageIcon = createQIcon("newpage");
-    addPage = new QAction(addPageIcon, tr("&New Page"), m_paletteToolBar);
-    connect(addPage, SIGNAL(triggered()), this, SLOT(addNewPage()));
-
-    m_paletteToolBar->addAction(addPage);
-  }
-
-  QIcon newColorIcon = createQIcon("newstyle");
-  QAction *addColor =
-      new QAction(newColorIcon, tr("&New Style"), m_paletteToolBar);
-  connect(addColor, SIGNAL(triggered()), this, SLOT(addNewColor()));
-
-  m_paletteToolBar->addAction(addColor);
-  m_paletteToolBar->addSeparator();
-
-  // KeyFrame button
-  if (m_viewType != CLEANUP_PALETTE) {
-    m_keyFrameButton = new PaletteKeyframeNavigator(m_paletteToolBar);
-    m_paletteToolBar->addWidget(m_keyFrameButton);
-    m_paletteToolBar->addSeparator();
-    m_keyFrameButton->setSelection(m_pageViewer->getSelection());
-  }
   updatePaletteToolBar();
 }
 
@@ -445,47 +410,107 @@ void PaletteViewer::createSavePaletteToolBar() {
   m_savePaletteToolBar->setMovable(false);
   m_savePaletteToolBar->setIconSize(QSize(22, 20));
 
+  QWidget *spacer = new QWidget();
+  spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+  // toolBar is a pointer to an existing toolbar
+  m_savePaletteToolBar->addWidget(spacer);
+
   if (!m_hasSavePaletteToolbar || m_viewType == CLEANUP_PALETTE) {
     m_savePaletteToolBar->hide();
     return;
   }
 
-  // save palette as
-  QIcon saveAsPaletteIcon = createQIconOnOff("savepaletteas", false);
-  QAction *saveAsPalette  = new QAction(
-      saveAsPaletteIcon, tr("&Save Palette As"), m_savePaletteToolBar);
-  // overwrite palette
-  QIcon savePaletteIcon = createQIconOnOff("savepalette", false);
-  QAction *savePalette =
-      new QAction(savePaletteIcon, tr("&Save Palette"), m_savePaletteToolBar);
-
-  if (m_viewType == STUDIO_PALETTE) {
-    connect(savePalette, SIGNAL(triggered()), this, SLOT(saveStudioPalette()));
-    m_savePaletteToolBar->addAction(savePalette);
-  } else if (m_viewType == LEVEL_PALETTE) {
+  if (m_viewType == LEVEL_PALETTE) {
     // save load palette
     PaletteIconWidget *movePalette =
         new PaletteIconWidget(m_savePaletteToolBar);
+    movePalette->setToolTip(
+        tr("Drag this icon to a Studio or Project palette to add it."));
     connect(movePalette, SIGNAL(startDrag()), this, SLOT(startDragDrop()));
 
     QAction *act = m_savePaletteToolBar->addWidget(movePalette);
     act->setText(tr("&Move Palette"));
-    m_savePaletteToolBar->addSeparator();
+  }
+
+  // Attenzione: alcune modifiche sono state fatte a livello di stylesheet
+  QToolButton *viewModeButton = new QToolButton(this);
+  viewModeButton->setPopupMode(QToolButton::InstantPopup);
+  viewModeButton->setToolTip(tr("Options"));
+
+  QIcon viewModeIcon = createQIcon("options");
+  viewModeButton->setIcon(viewModeIcon);
+  m_viewMode = new QMenu(QString("Options"), viewModeButton);
+  m_viewMode->setLayoutDirection(Qt::LeftToRight);
+
+  QActionGroup *viewModeGroup = new QActionGroup(m_viewMode);
+  viewModeGroup->setExclusive(true);
+  connect(viewModeGroup, SIGNAL(triggered(QAction *)), this,
+          SLOT(onViewMode(QAction *)));
+
+  auto addViewAction = [&](const QString &label, PageViewer::ViewMode mode) {
+    QAction *viewAction = new QAction(label, m_viewMode);
+    viewAction->setData(mode);
+    viewAction->setCheckable(true);
+    if (m_pageViewer->getViewMode() == mode) viewAction->setChecked(true);
+    viewModeGroup->addAction(viewAction);
+    m_viewMode->addAction(viewAction);
+  };
+
+  addViewAction(tr("&Small Thumbnails View"), PageViewer::SmallChips);
+  addViewAction(tr("&Medium Thumbnails View"), PageViewer::MediumChips);
+  addViewAction(tr("&Large Thumbnails View"), PageViewer::LargeChips);
+  addViewAction(tr("&List View"), PageViewer::List);
+
+  m_viewMode->addSeparator();
+  QAction *showStyleIndex = new QAction(tr("Show Style Index"), this);
+  showStyleIndex->setCheckable(true);
+  if (m_pageViewer)
+    showStyleIndex->setChecked(m_pageViewer->getShowStyleIndex());
+  connect(showStyleIndex, &QAction::toggled, [=](bool checked) {
+    if (m_pageViewer) m_pageViewer->toggleShowStyleIndex();
+    if (m_pageViewer) m_pageViewer->update();
+    bool setChecked              = false;
+    if (m_pageViewer) setChecked = m_pageViewer->getShowStyleIndex();
+    showStyleIndex->setChecked(setChecked);
+  });
+  m_viewMode->addAction(showStyleIndex);
+
+  QIcon saveAsPaletteIcon = createQIconOnOff("savepaletteas", false);
+  QAction *saveAsPalette  = new QAction(
+      saveAsPaletteIcon, tr("&Save Palette As"), m_savePaletteToolBar);
+  saveAsPalette->setToolTip(tr("Save palette with a different name."));
+  // overwrite palette
+  QIcon savePaletteIcon = createQIconOnOff("savepalette", false);
+  QAction *savePalette =
+      new QAction(savePaletteIcon, tr("&Save Palette"), m_savePaletteToolBar);
+  savePalette->setToolTip(tr("Save the palette."));
+  if (m_viewType == STUDIO_PALETTE) {
+    connect(savePalette, SIGNAL(triggered()), this, SLOT(saveStudioPalette()));
+    m_viewMode->addSeparator();
+    m_viewMode->addAction(savePalette);
+  } else if (m_viewType == LEVEL_PALETTE) {
+    // save load palette
+    m_viewMode->addSeparator();
 
     // save palette as
     connect(saveAsPalette, SIGNAL(triggered()),
             CommandManager::instance()->getAction("MI_SavePaletteAs"),
             SIGNAL(triggered()));
-    m_savePaletteToolBar->addAction(saveAsPalette);
+    m_viewMode->addAction(saveAsPalette);
 
     // overwrite palette
     connect(savePalette, SIGNAL(triggered()),
             CommandManager::instance()->getAction("MI_OverwritePalette"),
             SIGNAL(triggered()));
-    m_savePaletteToolBar->addAction(savePalette);
+    m_viewMode->addAction(savePalette);
   }
 
+  viewModeButton->setMenu(m_viewMode);
+
+  m_savePaletteToolBar->addWidget(viewModeButton);
+
   updateSavePaletteToolBar();
+  updatePaletteMenu();
 }
 
 //-----------------------------------------------------------------------------
@@ -528,8 +553,19 @@ void PaletteViewer::updatePaletteToolBar() {
   // limit the number of cleanup styles to 7
   if (palette && palette->isCleanupPalette())
     enableNewStyleAct = (palette->getStyleInPagesCount() < 8);
+
   if (m_viewType != CLEANUP_PALETTE) m_keyFrameButton->setEnabled(enable);
   int i;
+  for (i = 0; i < actions.count(); i++) {
+    QAction *act = actions[i];
+    if (act->text() == tr("&New Style")) {
+      act->setEnabled(enableNewStyleAct);
+      continue;
+    }
+    act->setEnabled(enable);
+  }
+  actions.clear();
+  actions = m_newPageToolbar->actions();
   for (i = 0; i < actions.count(); i++) {
     QAction *act = actions[i];
     if (act->text() == tr("&New Style")) {
@@ -549,6 +585,7 @@ void PaletteViewer::updateSavePaletteToolBar() {
   QList<QAction *> actions;
   actions     = m_savePaletteToolBar->actions();
   bool enable = !getPalette() ? false : true;
+
   int i;
   for (i = 0; i < actions.count(); i++) {
     QAction *act = actions[i];
@@ -556,10 +593,37 @@ void PaletteViewer::updateSavePaletteToolBar() {
         act->text() == tr("&Save Palette") ||
         act->text() == tr("&Palette Gizmo"))
       act->setEnabled(enable);
-    else if (m_viewType != STUDIO_PALETTE && i == 0)  // move action
+    else if (m_viewType != STUDIO_PALETTE && i == 1)  // move action
       actions[i]->setVisible(enable);
     else
-      actions[i]->setEnabled(false);
+      actions[i]->setEnabled(true);
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+void PaletteViewer::updatePaletteMenu() {
+  if (!m_viewMode) return;
+  QList<QAction *> actions;
+  actions                   = m_viewMode->actions();
+  bool enable               = !getPalette() ? false : true;
+  PageViewer::ViewMode mode = m_pageViewer->getViewMode();
+  int i;
+  for (i = 0; i < actions.count(); i++) {
+    QAction *act = actions[i];
+    if (act->text() == tr("&Save Palette As") ||
+        act->text() == tr("&Save Palette") ||
+        act->text() == tr("&Palette Gizmo"))
+      act->setEnabled(enable);
+    else
+      actions[i]->setEnabled(true);
+
+    if (act->data().canConvert<int>()) {
+      int i = act->data().toInt();
+      if (i == static_cast<int>(mode)) {
+        act->setChecked(true);
+      }
+    }
   }
 }
 
@@ -1027,7 +1091,7 @@ void PaletteViewer::onPaletteSwitched() {
     if (palette) {
       int currentStyleId   = palette->getCurrentStyleId();
       TPalette::Page *page = palette->getStylePage(currentStyleId);
-      if (page) pageIndex = page->getIndex();
+      if (page) pageIndex  = page->getIndex();
     }
   }
   onSwitchToPage(pageIndex);
