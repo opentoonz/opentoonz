@@ -105,7 +105,7 @@ PaletteViewer::PaletteViewer(QWidget *parent, PaletteViewType viewType,
   // Create pageView
   m_pageViewerScrollArea = new QScrollArea();
   m_pageViewerScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-  m_pageViewerScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+  m_pageViewerScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
   m_pageViewerScrollArea->setWidgetResizable(true);
 
   m_pageViewer =

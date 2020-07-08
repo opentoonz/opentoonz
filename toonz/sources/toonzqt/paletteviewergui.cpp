@@ -41,8 +41,6 @@
 TEnv::IntVar EnvSoftwareCurrentFontSize_StyleName(
     "SoftwareCurrentFontSize_StyleName", 11);
 
-TEnv::IntVar ShowStyleIndex("ShowStyleIndex", 0);
-
 using namespace PaletteViewerGUI;
 using namespace DVGui;
 
@@ -140,16 +138,16 @@ PageViewer::PageViewer(QWidget *parent, PaletteViewType viewType,
   ViewMode defaultChipSize;
   switch (m_viewType) {
   case LEVEL_PALETTE:
-    defaultChipSize = SmallChips;
+    defaultChipSize = LargeChips;
     break;
   case CLEANUP_PALETTE:
     defaultChipSize = SmallChips;
     break;
   case STUDIO_PALETTE:
-    defaultChipSize = SmallChips;
+    defaultChipSize = MediumChips;
     break;
   default:
-    defaultChipSize = SmallChips;
+    defaultChipSize = LargeChips;
     break;
   }
   setViewMode(defaultChipSize);
@@ -228,9 +226,6 @@ int PageViewer::getCurrentStyleIndex() const {
   return getPaletteHandle()->getStyleIndex();
 }
 
-//-----------------------------------------------------------------------------
-
-void PageViewer::toggleShowStyleIndex() {
   if (ShowStyleIndex == 1) {
     ShowStyleIndex = 0;
   } else {
@@ -1382,10 +1377,7 @@ bool PageViewer::event(QEvent *e) {
       TColorStyle *style = m_page->getStyle(indexInPage);
       if (style) {
         int styleIndex = m_page->getStyleId(indexInPage);
-        if (styleIndex == 0) {
-          toolTip =
-              tr("Style 0 is set to full transparent. \nIt can't be changed.  "
-                 "Ever.");
+       
         } else {
           toolTip = "#" + QString::number(styleIndex) + " " +
                     QString::fromStdWString(style->getName());

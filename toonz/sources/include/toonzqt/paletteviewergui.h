@@ -116,7 +116,6 @@ public:
   NameDisplayMode getNameDisplayMode() const { return m_nameDisplayMode; }
   void setNameDisplayMode(NameDisplayMode mode);
 
-  void toggleShowStyleIndex();
   bool getShowStyleIndex();
 
   PaletteViewerGUI::PaletteViewType getViewType() const { return m_viewType; }
