@@ -226,16 +226,7 @@ int PageViewer::getCurrentStyleIndex() const {
   return getPaletteHandle()->getStyleIndex();
 }
 
-  if (ShowStyleIndex == 1) {
-    ShowStyleIndex = 0;
-  } else {
-    ShowStyleIndex = 1;
-  }
-}
-
-//-----------------------------------------------------------------------------
-
-bool PageViewer::getShowStyleIndex() { return ShowStyleIndex == 1; }
+ bool PageViewer::getShowStyleIndex() { return ShowStyleIndex == 1; }
 
 //-----------------------------------------------------------------------------
 /*! Set current page to \b page and update view.
