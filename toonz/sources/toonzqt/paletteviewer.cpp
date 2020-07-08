@@ -115,8 +115,11 @@ PaletteViewer::PaletteViewer(QWidget *parent, PaletteViewType viewType,
 
   // Create toolbar. It is an horizontal layout with three internal toolbar.
   DvScrollWidget *toolbarScrollWidget = new DvScrollWidget;
-  QFrame *outerToolbarFrame           = new QFrame(this);
-  outerToolbarFrame->setObjectName("ToolBarContainer");
+
+  toolbarScrollWidget->setObjectName(
+    "ToolBarContainer");  // Toonz's qss files are instructed to leave a	
+                            // 1px grey margin on top for scroll buttons
+
   QWidget *toolBarWidget = new QWidget;  // children of this parent name.
   toolbarScrollWidget->setWidget(toolBarWidget);
   toolBarWidget->setSizePolicy(QSizePolicy::MinimumExpanding,
@@ -126,40 +129,16 @@ PaletteViewer::PaletteViewer(QWidget *parent, PaletteViewType viewType,
   m_paletteToolBar     = new QToolBar(toolBarWidget);
   m_savePaletteToolBar = new QToolBar(toolBarWidget);
 
-  QWidget *newPageWidget = new QWidget;  // children of this parent name.
-  newPageWidget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-  newPageWidget->setFixedHeight(22);
-
-  m_newPageToolbar = new QToolBar(this);
-  m_newPageToolbar->clear();
-  m_newPageToolbar->setMovable(false);
-  m_newPageToolbar->setIconSize(QSize(23, 20));
-  m_newPageToolbar->setLayoutDirection(Qt::RightToLeft);
-
-  if (m_hasPageCommand) {
-    QAction *addPage;
-    QIcon addPageIcon = createQIcon("newpage");
-    addPage = new QAction(addPageIcon, tr("&New Page"), m_newPageToolbar);
-    connect(addPage, SIGNAL(triggered()), this, SLOT(addNewPage()));
-
-    m_newPageToolbar->addAction(addPage);
-  }
-
-  QHBoxLayout *newPageLayout = new QHBoxLayout(toolBarWidget);
-  newPageLayout->setMargin(0);
-  newPageLayout->setSpacing(0);
-  newPageLayout->addWidget(m_newPageToolbar, 0, Qt::AlignRight);
-  newPageWidget->setLayout(newPageLayout);
-
-  createToolBar();
+   createToolBar();
 
   QHBoxLayout *toolBarLayout = new QHBoxLayout(toolBarWidget);
   toolBarLayout->setMargin(0);
   toolBarLayout->setSpacing(0);
   {
-    toolBarLayout->addWidget(m_paletteToolBar, 0, Qt::AlignLeft);
-    toolBarLayout->addStretch();
-    toolBarLayout->addWidget(m_savePaletteToolBar, 0, Qt::AlignRight);
+ 
+  toolBarLayout->addWidget(m_savePaletteToolBar, 0, Qt::AlignRight);
+  toolBarLayout->addWidget(m_paletteToolBar, 0, Qt::AlignRight);
+
   }
   toolBarWidget->setLayout(toolBarLayout);
 
@@ -179,20 +158,16 @@ PaletteViewer::PaletteViewer(QWidget *parent, PaletteViewType viewType,
     // hLayout->setAlignment(Qt::AlignLeft);
     // hLayout->addSpacing(6);
     {
-      hLayout->addWidget(m_pagesBar, 1);
-      hLayout->addWidget(newPageWidget, 0);
+     hLayout->addWidget(m_pagesBar, 0);
+     hLayout->addStretch(1);	      
+     hLayout->addWidget(toolbarScrollWidget, 0);
     }
     m_tabBarContainer->setLayout(hLayout);
 
     // To align this panel with the style Editor
     mainLayout->addWidget(m_tabBarContainer, 0);
     mainLayout->addWidget(m_pageViewerScrollArea, 1);
-
-    QHBoxLayout *bottomLayout = new QHBoxLayout;
-    bottomLayout->setMargin(0);
-    bottomLayout->addWidget(toolbarScrollWidget, 0);
-    outerToolbarFrame->setLayout(bottomLayout);
-    mainLayout->addWidget(outerToolbarFrame);
+   
   }
   setLayout(mainLayout);
 
