@@ -226,9 +226,7 @@ int PageViewer::getCurrentStyleIndex() const {
   return getPaletteHandle()->getStyleIndex();
 }
 
- bool PageViewer::getShowStyleIndex() { return ShowStyleIndex == 1; }
-
-//-----------------------------------------------------------------------------
+ //-----------------------------------------------------------------------------
 /*! Set current page to \b page and update view.
  */
 void PageViewer::setPage(TPalette::Page *page) {
