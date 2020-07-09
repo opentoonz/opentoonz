@@ -596,6 +596,9 @@ void PageViewer::paintEvent(QPaintEvent *e) {
   int i1 = posToIndex(visibleRect.bottomRight());
   if (i1 >= getChipCount()) i1 = getChipCount() - 1;
 
+  QFont preFont = p.font();
+  QFont tmpFont = p.font();
+
   if (m_viewMode == List) {
     // disegno le celle
     int i;
@@ -653,6 +656,23 @@ void PageViewer::paintEvent(QPaintEvent *e) {
       // toggle link
       drawToggleLink(p, chipRect, m_page->getStyle(i));
     }
+     if (!m_page->getPalette()->isLocked()) {
+      int j      = getChipCount();
+      QRect rect = getItemRect(j);
+      p.setPen(QColor(200, 200, 200));
+      // p.fillRect(rect, QBrush(QColor(0, 0, 0, 64)));
+      // p.drawRect(rect);
+      tmpFont.setPointSize(16);
+      tmpFont.setBold(true);
+      p.setFont(tmpFont);
+      QString newLabel = tr(" + ");
+      p.drawText(rect.adjusted(0, -6, 0, 0), Qt::AlignCenter, newLabel);
+
+      // revert font set
+      p.setFont(preFont);
+      p.setPen(Qt::black);
+     }
+
   } else {
     int currentStyleIndex = getCurrentStyleIndex();
     int i;
@@ -809,12 +829,12 @@ void PageViewer::paintEvent(QPaintEvent *e) {
         }
       }
 
-      // draw the frame border if the style is selected or current
-      if (m_styleSelection->isSelected(m_page->getIndex(), i) ||
-          currentStyleIndex == styleIndex) {
-        p.setBrush(Qt::NoBrush);
-        p.drawRect(chipRect.adjusted(3, 3, -3, -3));
-      }
+      //// draw the frame border if the style is selected or current
+      //if (m_styleSelection->isSelected(m_page->getIndex(), i) ||
+      //    currentStyleIndex == styleIndex) {
+      //  p.setBrush(Qt::NoBrush);
+      //  p.drawRect(chipRect.adjusted(3, 3, -3, -3));
+      //}
 
       // draw border
       p.setPen(Qt::black);
@@ -879,6 +899,24 @@ void PageViewer::paintEvent(QPaintEvent *e) {
 
       // draw link indicator
       drawToggleLink(p, chipRect, style);
+    }
+     // draw new style chip
+    if (!m_page->getPalette()->isLocked()) {
+      i              = getChipCount();
+      QRect chipRect = getItemRect(i).adjusted(0, -1, 0, -1);
+      p.setPen(QColor(200, 200, 200));
+      p.fillRect(chipRect, QBrush(QColor(0, 0, 0, 64)));
+      p.drawRect(chipRect);
+      tmpFont.setPointSize(16);
+      tmpFont.setBold(true);
+      p.setFont(tmpFont);
+      QString newLabel = tr(" + ");
+      p.drawText(chipRect.adjusted(0, -6, 0, 0), Qt::AlignCenter, newLabel);
+
+      // revert font set
+      p.setFont(preFont);
+      // revert brush
+      p.setBrush(Qt::NoBrush);
     }
   }
 
@@ -955,10 +993,14 @@ void PageViewer::mousePressEvent(QMouseEvent *event) {
   }
   m_dragStartPosition = pos;
   if (indexInPage < 0 || indexInPage >= getChipCount()) {
-    // l'utente ha fatto click fuori dai color chip. vuole deselezionare tutto
-    // (lasciando la selezione attiva, per un eventuale paste)
+    if (indexInPage == getChipCount() && !m_page->getPalette()->isLocked()) {
+      PaletteCmd::createStyle(getPaletteHandle(), getPage());
+    } else {
+      // the user clicked out of the color chips.wants to deselect everything
+      // (leaving the selection active, for a possible paste)
     m_styleSelection->select(pageIndex);
     m_styleSelection->makeCurrent();
+    }
 
     update();
     // update locks when the styleSelection becomes current
@@ -1325,14 +1367,11 @@ bool PageViewer::event(QEvent *e) {
       TColorStyle *style = m_page->getStyle(indexInPage);
       if (style) {
         int styleIndex = m_page->getStyleId(indexInPage);
-        toolTip        = "#" + QString::number(styleIndex) + " " +
-                  QString::fromStdWString(style->getName());
-
-        int shortcutKey = m_page->getPalette()->getStyleShortcut(styleIndex);
-        if (shortcutKey > 0)
-          toolTip += QString::fromStdWString(std::wstring(L" (") +
-                                             (wchar_t)shortcutKey + L")");
+       
       }
+    }
+     if (indexInPage == m_page->getStyleCount()) {
+        toolTip = tr("New Style");
     }
     if (toolTip != "")
       QToolTip::showText(helpEvent->globalPos(), toolTip);
@@ -1426,7 +1465,7 @@ void PageViewer::computeSize() {
   QSize chipSize = getChipSize();
   m_chipPerRow   = m_viewMode == List ? 1 : (w - 8) / chipSize.width();
   if (m_chipPerRow == 0) m_chipPerRow = 1;
-  int rowCount = (chipCount + m_chipPerRow - 1) / m_chipPerRow;
+  int rowCount = (chipCount + m_chipPerRow) / m_chipPerRow;
   setMinimumSize(w, rowCount * chipSize.height() + 10);
 }
 
@@ -1727,4 +1766,5 @@ void PageViewer::updateCommandLocks() {
   cmd->getAction("MI_ToggleLinkToStudioPalette")->setEnabled(!isLocked);
   cmd->getAction("MI_RemoveReferenceToStudioPalette")->setEnabled(!isLocked);
   cmd->getAction("MI_EraseUnusedStyles")->setEnabled(!isLocked);
+  update();
 }
