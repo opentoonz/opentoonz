@@ -829,12 +829,12 @@ void PageViewer::paintEvent(QPaintEvent *e) {
         }
       }
 
-      //// draw the frame border if the style is selected or current
-      //if (m_styleSelection->isSelected(m_page->getIndex(), i) ||
-      //    currentStyleIndex == styleIndex) {
-      //  p.setBrush(Qt::NoBrush);
-      //  p.drawRect(chipRect.adjusted(3, 3, -3, -3));
-      //}
+      // draw the frame border if the style is selected or current
+      if (m_styleSelection->isSelected(m_page->getIndex(), i) ||
+          currentStyleIndex == styleIndex) {
+        p.setBrush(Qt::NoBrush);
+        p.drawRect(chipRect.adjusted(3, 3, -3, -3));
+      }
 
       // draw border
       p.setPen(Qt::black);
@@ -1367,7 +1367,14 @@ bool PageViewer::event(QEvent *e) {
       TColorStyle *style = m_page->getStyle(indexInPage);
       if (style) {
         int styleIndex = m_page->getStyleId(indexInPage);
-       
+        
+       toolTip        = "#" + QString::number(styleIndex) + " " +
+                  QString::fromStdWString(style->getName());
+
+        int shortcutKey = m_page->getPalette()->getStyleShortcut(styleIndex);
+        if (shortcutKey > 0)
+          toolTip += QString::fromStdWString(std::wstring(L" (") +
+                                             (wchar_t)shortcutKey + L")");
       }
     }
      if (indexInPage == m_page->getStyleCount()) {
