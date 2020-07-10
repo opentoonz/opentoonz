@@ -1366,8 +1366,7 @@ bool PageViewer::event(QEvent *e) {
     if (0 <= indexInPage && indexInPage < m_page->getStyleCount()) {
       TColorStyle *style = m_page->getStyle(indexInPage);
       if (style) {
-        int styleIndex = m_page->getStyleId(indexInPage);
-        
+        int styleIndex = m_page->getStyleId(indexInPage);        
        toolTip        = "#" + QString::number(styleIndex) + " " +
                   QString::fromStdWString(style->getName());
 
