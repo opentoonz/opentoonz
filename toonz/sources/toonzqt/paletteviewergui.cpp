@@ -715,10 +715,12 @@ void PageViewer::paintEvent(QPaintEvent *e) {
         if ((int)style->getMainColor().m !=
             (int)style->getMainColor().maxChannelValue) {
           QRect bottomRect = chipRect;
+         if (styleIndex != 0) {
           if (m_viewMode == LargeChips) {
             bottomRect.adjust(0, bottomRect.height() - 12, 0, 0);
           } else
             bottomRect.adjust(0, bottomRect.height() - 6, 0, 0);
+        }
 
           TRaster32P icon = style->getIcon(qsize2Dimension(bottomRect.size()));
           p.drawPixmap(bottomRect.left(), bottomRect.top(),
