@@ -128,6 +128,25 @@ inline void notifySelectionChanged() {
   TTool::getApplication()->getCurrentSelection()->notifySelectionChanged();
 }
 
+static bool isClockwise(TStroke *stroke) {
+  assert(stroke);
+
+  std::vector<TThickPoint> points;
+  stroke->getControlPoints(points);
+
+  if (points.size() < 3) {
+    return false;
+  }
+
+  double area = 0;
+  for (int i = 0; i < points.size() - 1; ++i) {
+    area += (points[i + 1].x - points[i].x) * (points[i + 1].y + points[i].y);
+  }
+  area += (points[0].x - points.back().x) * (points[0].y + points.back().y);
+
+  return area > 0;
+}
+
 }  // namespace
 
 //********************************************************************************
@@ -1206,7 +1225,6 @@ public:
 VectorSelectionTool::VectorSelectionTool(int targetType)
     : SelectionTool(targetType)
     , m_selectionTarget("Mode:")
-    , m_includeIntersection("Include Intersection", false)
     , m_constantThickness("Preserve Thickness", false)
     , m_levelSelection(m_strokeSelection)
     , m_capStyle("Cap")
@@ -1217,7 +1235,6 @@ VectorSelectionTool::VectorSelectionTool(int targetType)
     , m_resetCenter(true) {
   assert(targetType == TTool::Vectors);
   m_prop.bind(m_selectionTarget);
-  m_prop.bind(m_includeIntersection);
   m_prop.bind(m_constantThickness);
 
   m_selectionTarget.addValue(NORMAL_TYPE);
@@ -1232,7 +1249,6 @@ VectorSelectionTool::VectorSelectionTool(int targetType)
 
   m_strokeSelection.setView(this);
 
-  m_includeIntersection.setId("IncludeIntersection");
   m_constantThickness.setId("PreserveThickness");
   m_selectionTarget.setId("SelectionMode");
 
@@ -1339,7 +1355,6 @@ void VectorSelectionTool::updateTranslation() {
   m_selectionTarget.setItemUIName(BOUNDARY_LEVEL_TYPE,
                                   tr("Boundaries on Whole Level"));
 
-  m_includeIntersection.setQStringName(tr("Include Intersection"));
   m_constantThickness.setQStringName(tr("Preserve Thickness"));
 
   m_capStyle.setQStringName(tr("Cap"));
@@ -1532,7 +1547,7 @@ void VectorSelectionTool::leftButtonDoubleClick(const TPointD &pos,
   if (m_strokeSelectionType.getIndex() == POLYLINE_SELECTION_IDX &&
       !m_polyline.empty()) {
     closePolyline(pos);
-    selectRegionVectorImage(m_includeIntersection.getValue());
+    selectRegionVectorImage();
 
     m_selecting = false;
     invalidate();
@@ -1665,8 +1680,7 @@ void VectorSelectionTool::leftButtonUp(const TPointD &pos,
 
       closeFreehand(pos);
 
-      if (m_stroke->getControlPointCount() > 3)
-        selectRegionVectorImage(m_includeIntersection.getValue());
+      if (m_stroke->getControlPointCount() > 3) selectRegionVectorImage();
 
       delete m_stroke;  // >:(
       m_stroke = 0;
@@ -1932,7 +1946,6 @@ bool VectorSelectionTool::selectStroke(int index, bool toggle) {
 
 void VectorSelectionTool::onActivate() {
   if (m_firstTime) {
-    m_includeIntersection.setValue(l_strokeSelectIncludeIntersection ? 1 : 0);
     m_constantThickness.setValue(l_strokeSelectConstantThickness ? 1 : 0);
     m_strokeSelection.setSceneHandle(
         TTool::getApplication()->getCurrentScene());
@@ -2033,8 +2046,6 @@ bool VectorSelectionTool::onPropertyChanged(std::string propertyName) {
 
   if (SelectionTool::onPropertyChanged(propertyName)) return true;
 
-  if (propertyName == m_includeIntersection.getName())
-    l_strokeSelectIncludeIntersection = (int)(m_includeIntersection.getValue());
   if (propertyName == m_constantThickness.getName())
     l_strokeSelectConstantThickness = (int)(m_constantThickness.getValue());
   else if (propertyName == m_selectionTarget.getName())
@@ -2170,7 +2181,7 @@ void VectorSelectionTool::selectionOutlineStyle(int &capStyle, int &joinStyle) {
 
 //-----------------------------------------------------------------------------
 
-void VectorSelectionTool::selectRegionVectorImage(bool includeIntersect) {
+void VectorSelectionTool::selectRegionVectorImage() {
   if (!m_stroke) return;
 
   TVectorImageP vi(getImage(false));
@@ -2186,6 +2197,7 @@ void VectorSelectionTool::selectRegionVectorImage(bool includeIntersect) {
       rCount = int(selectImg.getRegionCount());
 
   bool selectionChanged = false;
+  bool clockwise        = isClockwise(m_stroke);
 
   for (int s = 0; s != sCount; ++s) {
     TStroke *currentStroke = vi->getStroke(s);
@@ -2197,7 +2209,7 @@ void VectorSelectionTool::selectRegionVectorImage(bool includeIntersect) {
         selectionChanged = selectStroke(s, false) || selectionChanged;
     }
 
-    if (includeIntersect) {
+    if (!clockwise) {
       std::vector<DoublePair> intersections;
       intersect(m_stroke, currentStroke, intersections, false);
       if (intersections.size() > 0) {
