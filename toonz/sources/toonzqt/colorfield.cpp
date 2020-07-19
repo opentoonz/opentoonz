@@ -51,7 +51,7 @@ StyleSample::StyleSample(QWidget *parent, int sizeX, int sizeY)
     , m_bgRas(sizeX, sizeY)
     , m_style(0)
     , m_clickEnabled(false)
-    , m_chessColor1(200, 200, 200)
+    , m_chessColor1(0, 0, 0)
     , m_chessColor2(255, 255, 255)
     , m_isEditing(false) {
   setMinimumSize(sizeX, sizeY);

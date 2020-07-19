@@ -590,7 +590,7 @@ void TSolidColorStyle::makeIcon(const TDimension &size) {
     else {
       TRaster32P fg(size);
       fg->fill(premultiply(col));
-      TRop::checkBoard(m_icon, TPixel32(200, 200, 200), TPixel32::White,
+      TRop::checkBoard(m_icon, TPixel32(180, 180, 180), TPixel32(230, 230, 230),
                        TDimensionD(6, 6), TPointD());
       TRop::over(m_icon, fg);
     }
