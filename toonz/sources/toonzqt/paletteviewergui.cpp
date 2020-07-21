@@ -720,12 +720,12 @@ void PageViewer::paintEvent(QPaintEvent *e) {
             bottomRect.adjust(0, bottomRect.height() - 12, 0, 0);
           } else
             bottomRect.adjust(0, bottomRect.height() - 6, 0, 0);
-
+          }
           TRaster32P icon = style->getIcon(qsize2Dimension(bottomRect.size()));
           p.drawPixmap(bottomRect.left(), bottomRect.top(),
                        rasterToQPixmap(icon));
         }
-      }
+      
      
         // Use white line for dark color. Use black line for light color.
         int val = (int)style->getMainColor().r * 30 +
