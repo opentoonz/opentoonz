@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef FILEBROWSER_INCLUDED
-#define FILEBROWSER_INCLUDED
+#ifndef SCENEBROWSER_INCLUDED
+#define SCENEBROWSER_INCLUDED
 
 #include <QFrame>
 #include <QTreeWidget>
@@ -14,6 +14,7 @@
 #include "tfilepath.h"
 #include "toonzqt/dvdialog.h"
 #include "versioncontrol.h"
+#include "filebrowser.h"
 
 #include "tthread.h"
 
@@ -26,48 +27,18 @@ class QFileSystemWatcher;
 
 //-----------------------------------------------------------------------------
 
-//! FrameCountReader is the class responsible for calculation of levels' frame
-//! counts
-//! in the file browser. Since on many file formats this requires to open the
-//! level file
-//! and scan each frame (MOV-like), and on some machine configurations such a
-//! task
-//! can be time consuming, we dedicate a separate thread for it - just like the
-//! icon
-//! generator does. Calculated frame counts are also stored for quick lookup
-//! once they
-//! have been calculated the first time.
-class FrameCountReader final : public QObject {
-  Q_OBJECT
-
-  TThread::Executor m_executor;
-
-public:
-  FrameCountReader();
-  ~FrameCountReader();
-
-  int getFrameCount(const TFilePath &path);
-  void stopReading();
-
-signals:
-
-  void calculatedFrameCount();
-};
-
-//-----------------------------------------------------------------------------
-
-class FileBrowser final : public QFrame, public DvItemListModel {
+class SceneBrowser final : public QFrame, public DvItemListModel {
   Q_OBJECT
 
 public:
 #if QT_VERSION >= 0x050500
-  FileBrowser(QWidget *parent, Qt::WindowFlags flags = 0,
+  SceneBrowser(QWidget *parent, Qt::WindowFlags flags = 0,
               bool noContextMenu = false, bool multiSelectionEnabled = false);
 #else
-  FileBrowser(QWidget *parent, Qt::WFlags flags = 0, bool noContextMenu = false,
+  SceneBrowser(QWidget *parent, Qt::WFlags flags = 0, bool noContextMenu = false,
               bool multiSelectionEnabled = false);
 #endif
-  ~FileBrowser();
+  ~SceneBrowser();
 
   void sortByDataModel(DataType dataType, bool isDiscendent) override;
   void refreshData() override;
@@ -271,30 +242,7 @@ private:
   void refreshCurrentFolderItems();
 
   DvItemListModel::Status getItemVersionControlStatus(
-      const FileBrowser::Item &item);
-};
-
-//--------------------------------------------------------------------
-class RenameAsToonzPopup final : public DVGui::Dialog {
-  Q_OBJECT
-  QPushButton *m_okBtn, *m_cancelBtn;
-  DVGui::LineEdit *m_name;
-  QCheckBox *m_overwrite;
-
-public:
-  RenameAsToonzPopup(const QString name = "", int frames = -1);
-
-  bool doOverwrite() { return m_overwrite->isChecked(); }
-  QString getName() { return m_name->text(); }
-
-private:
-  // TPropertyGroup* getFormatProperties(const std::string &ext);
-
-public slots:
-  //! Starts the convertion.
-  // void onConvert();
-  // void onOptionsClicked();
-  void onOk();
+      const SceneBrowser::Item &item);
 };
 
 //-----------------------------------------------------------

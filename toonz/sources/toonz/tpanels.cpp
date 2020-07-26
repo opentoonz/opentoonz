@@ -18,6 +18,7 @@
 #include "flipbook.h"
 #include "castviewer.h"
 #include "filebrowser.h"
+#include "scenebrowser.h"
 #include "filmstrip.h"
 #include "previewfxmanager.h"
 #include "comboviewerpane.h"
@@ -1153,7 +1154,7 @@ class PreproductionBoardFactory final : public TPanelFactory {
 public:
   PreproductionBoardFactory() : TPanelFactory("PreproductionBoard") {}
   void initialize(TPanel *panel) override {
-    FileBrowser *browser = new FileBrowser(panel, 0, false, true);
+    SceneBrowser *browser = new SceneBrowser(panel, 0, false, true);
     panel->setWidget(browser);
     panel->setWindowTitle(QObject::tr("Preproduction Board"));
     TFilePath scenesFolder =
