@@ -2171,6 +2171,12 @@ void SceneBrowser::enableDoubleClickToOpenScenes() {
           SLOT(tryToOpenScene(const TFilePath &)));
 }
 
+void SceneBrowser::enableSingleClickToOpenScenes() {
+  // perhaps this should disconnect existing signal handlers first
+  connect(this, SIGNAL(filePathClicked(const TFilePath &)), this,
+          SLOT(tryToOpenScene(const TFilePath &)));
+}
+
 //-----------------------------------------------------------------------------
 
 void SceneBrowser::tryToOpenScene(const TFilePath &filePath) {

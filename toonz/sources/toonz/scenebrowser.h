@@ -101,6 +101,8 @@ types to be displayed in the file browser.
   // So it is disabled by default.
   void enableDoubleClickToOpenScenes();
 
+  void enableSingleClickToOpenScenes();
+
 protected:
   int findIndexWithPath(TFilePath path);
   void getExpandedFolders(DvDirModelNode *node,
