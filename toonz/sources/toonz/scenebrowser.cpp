@@ -491,32 +491,9 @@ void SceneBrowser::refreshCurrentFolderItems() {
   m_items.clear();
 
   // put the parent directory item
-  TFilePath parentFp = m_folder.getParentDir();
-  if (parentFp != TFilePath("") && parentFp != m_folder)
-    m_items.push_back(Item(parentFp, true, false));
-
-  // register the all folder items by using the folde tree model
-  DvDirModel *model        = DvDirModel::instance();
-  QModelIndex currentIndex = model->getIndexByPath(m_folder);
-  if (currentIndex.isValid()) {
-    for (int i = 0; i < model->rowCount(currentIndex); i++) {
-      QModelIndex tmpIndex = model->index(i, 0, currentIndex);
-      if (tmpIndex.isValid()) {
-        DvDirModelFileFolderNode *node =
-            dynamic_cast<DvDirModelFileFolderNode *>(model->getNode(tmpIndex));
-        if (node) {
-          TFilePath childFolderPath = node->getPath();
-          if (TFileStatus(childFolderPath).isLink())
-            m_items.push_back(Item(childFolderPath, true, true,
-                                   QString::fromStdWString(node->getName())));
-          else
-            m_items.push_back(Item(childFolderPath, true, false,
-                                   QString::fromStdWString(node->getName())));
-        }
-      }
-    }
-  } else
-    setUnregisteredFolder(m_folder);
+  //TFilePath parentFp = m_folder.getParentDir();
+  //if (parentFp != TFilePath("") && parentFp != m_folder)
+  //  m_items.push_back(Item(parentFp, true, false));
 
   // register the file items
   if (m_folder != TFilePath()) {
@@ -539,17 +516,6 @@ void SceneBrowser::refreshCurrentFolderItems() {
     }
     TFilePathSet::iterator it;
     for (it = files.begin(); it != files.end(); ++it) {
-#ifdef _WIN32
-      // include folder shortcut items
-      if (it->getType() == "lnk") {
-        TFileStatus info(*it);
-        if (info.isLink() && info.isDirectory()) {
-          m_items.push_back(
-              Item(*it, true, true, QString::fromStdString((*it).getName())));
-        }
-        continue;
-      }
-#endif
       // skip the plt file (Palette file for TOONZ 4.6 and earlier)
       if (it->getType() == "plt") continue;
 
@@ -560,7 +526,7 @@ void SceneBrowser::refreshCurrentFolderItems() {
             it->getType() != "curve" && it->getType() != "tpl" &&
             TFileType::getInfo(*it) == TFileType::UNKNOW_FILE)
           continue;
-      } else if (!m_filter.contains(QString::fromStdString(it->getType())))
+      } else if (m_filter.contains(QString::fromStdString(it->getType())))
         continue;
       // store the filtered file paths
       m_items.push_back(Item(*it));
@@ -694,17 +660,6 @@ void SceneBrowser::setUnregisteredFolder(const TFilePath &fp) {
     }
 
     for (it = files.begin(); it != files.end(); ++it) {
-#ifdef _WIN32
-      // include folder shortcut items
-      if (it->getType() == "lnk") {
-        TFileStatus info(*it);
-        if (info.isLink() && info.isDirectory()) {
-          m_items.push_back(
-              Item(*it, true, true, QString::fromStdString((*it).getName())));
-        }
-        continue;
-      }
-#endif
       // skip the plt file (Palette file for TOONZ 4.6 and earlier)
       if (it->getType() == "plt") continue;
 
@@ -715,7 +670,7 @@ void SceneBrowser::setUnregisteredFolder(const TFilePath &fp) {
             it->getType() != "curve" && it->getType() != "tpl" &&
             TFileType::getInfo(*it) == TFileType::UNKNOW_FILE)
           continue;
-      } else if (!m_filter.contains(QString::fromStdString(it->getType())))
+      } else if (m_filter.contains(QString::fromStdString(it->getType())))
         continue;
 
       m_items.push_back(Item(*it));
