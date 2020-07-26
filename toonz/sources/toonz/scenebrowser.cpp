@@ -125,7 +125,7 @@ SceneBrowser::SceneBrowser(QWidget *parent, Qt::WFlags flags, bool noContextMenu
   setObjectName("SceneBrowser");
   setFrameStyle(QFrame::StyledPanel);
 
-  m_mainSplitter      = new QSplitter(this);
+  //m_mainSplitter      = new QSplitter(this);
   m_folderTreeView    = new DvDirTreeView(this);
   QFrame *box         = new QFrame(this);
   QLabel *folderLabel = new QLabel(tr("Folder: "), this);
@@ -150,7 +150,7 @@ SceneBrowser::SceneBrowser(QWidget *parent, Qt::WFlags flags, bool noContextMenu
       new DVItemViewPlayDelegate(viewerPanel);
   viewerPanel->setItemViewPlayDelegate(itemViewPlayDelegate);
 
-  m_mainSplitter->setObjectName("SceneBrowserSplitter");
+  //m_mainSplitter->setObjectName("SceneBrowserSplitter");
   m_folderTreeView->setObjectName("DirTreeView");
   box->setObjectName("castFrame");
   box->setFrameStyle(QFrame::StyledPanel);
@@ -173,7 +173,7 @@ SceneBrowser::SceneBrowser(QWidget *parent, Qt::WFlags flags, bool noContextMenu
     }
     mainLayout->addLayout(folderLay, 0);
 
-    m_mainSplitter->addWidget(m_folderTreeView);
+    //m_mainSplitter->addWidget(m_folderTreeView);
     QVBoxLayout *boxLayout = new QVBoxLayout(box);
     boxLayout->setMargin(0);
     boxLayout->setSpacing(0);
@@ -181,12 +181,12 @@ SceneBrowser::SceneBrowser(QWidget *parent, Qt::WFlags flags, bool noContextMenu
       boxLayout->addWidget(titleBar, 0);
       boxLayout->addWidget(m_itemViewer, 1);
     }
-    m_mainSplitter->addWidget(box);
-    mainLayout->addWidget(m_mainSplitter, 1);
+    //m_mainSplitter->addWidget(box);
+    mainLayout->addWidget(box, 1);
   }
   setLayout(mainLayout);
 
-  m_mainSplitter->setSizes(QList<int>() << 270 << 500);
+  //m_mainSplitter->setSizes(QList<int>() << 270 << 500);
 
   // signal-slot connections
   bool ret = connect(m_folderTreeView, SIGNAL(currentNodeChanged()),
