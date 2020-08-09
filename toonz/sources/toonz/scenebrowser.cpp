@@ -241,6 +241,15 @@ SceneBrowser::SceneBrowser(QWidget *parent, Qt::WFlags flags, bool noContextMenu
   ret = ret && connect(MyFileSystemWatcher::instance(),
                        SIGNAL(directoryChanged(const QString &)), this,
                        SLOT(onFileSystemChanged(const QString &)));
+  
+  // when the scene switched, update the path of the scene location node
+  TSceneHandle *sceneHandle = TApp::instance()->getCurrentScene();
+  //ret = ret && connect(sceneHandle, SIGNAL(sceneSwitched()), this,
+  //                     SLOT(onSceneSwitched()));
+  ret = ret && connect(sceneHandle, SIGNAL(nameSceneChanged()), this,
+                       SLOT(onSceneSwitched()));
+
+  //onSceneSwitched();
 
   // store the first item("Root") in the history
   m_indexHistoryList.append(m_folderTreeView->currentIndex());
@@ -1898,6 +1907,14 @@ void SceneBrowser::convertToPaintedTlv() {
   SceneBrowser::refreshFolder(filePaths[0].getParentDir());
 }
 #endif
+
+//-----------------------------------------------------------------------------
+
+void SceneBrowser::onSceneSwitched() {
+  //TSceneHandle *sceneHandle = TApp::instance()->getCurrentScene();
+  TFilePath scenesFolder = TProjectManager::instance()->getCurrentProject()->getScenesPath();
+  setFolder(scenesFolder, true);
+}
 
 //-----------------------------------------------------------------------------
 
