@@ -1911,8 +1911,9 @@ void SceneBrowser::convertToPaintedTlv() {
 //-----------------------------------------------------------------------------
 
 void SceneBrowser::onSceneSwitched() {
-  //TSceneHandle *sceneHandle = TApp::instance()->getCurrentScene();
-  TFilePath scenesFolder = TProjectManager::instance()->getCurrentProject()->getScenesPath();
+  ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
+  TFilePath scenesFolder = scene->getScenePath().getParentDir();
+  //TFilePath scenesFolder = TProjectManager::instance()->getCurrentProject()->getScenesPath();
   setFolder(scenesFolder, true);
 }
 
