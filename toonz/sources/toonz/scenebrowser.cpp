@@ -123,102 +123,13 @@ SceneBrowserButtonBar::SceneBrowserButtonBar(DvItemViewer *itemViewer,
   setObjectName("buttonBar");
   // buttonBar->setIconSize(QSize(10,10));
 
-  QString backButtonEnable  = QString(":Resources/fb_history_back_enable.svg");
-  QString backButtonDisable = QString(":Resources/fb_history_back_disable.svg");
-  QString fwdButtonEnable   = QString(":Resources/fb_history_fwd_enable.svg");
-  QString fwdButtonDisable  = QString(":Resources/fb_history_fwd_disable.svg");
-
-  QIcon backButtonIcon, fwdButtonIcon;
-  backButtonIcon.addFile(backButtonEnable, QSize(), QIcon::Normal);
-  backButtonIcon.addFile(backButtonDisable, QSize(), QIcon::Disabled);
-  fwdButtonIcon.addFile(fwdButtonEnable, QSize(), QIcon::Normal);
-  fwdButtonIcon.addFile(fwdButtonDisable, QSize(), QIcon::Disabled);
-
-  m_folderBack = new QAction(backButtonIcon, tr("Back"), this);
-  m_folderBack->setIconText("");
-  addAction(m_folderBack);
-  m_folderFwd = new QAction(fwdButtonIcon, tr("Forward"), this);
-  m_folderFwd->setIconText("");
-  addAction(m_folderFwd);
-
-  QIcon folderUpIcon = createQIcon("folderup");
-  QAction *folderUp  = new QAction(folderUpIcon, tr("Up One Level"), this);
-  folderUp->setIconText(tr("Up"));
-  addAction(folderUp);
-  addSeparator();
-
   QIcon newFolderIcon = createQIcon("newfolder");
-  QAction *newFolder  = new QAction(newFolderIcon, tr("New Folder"), this);
-  newFolder->setIconText(tr("New"));
+  QAction *newFolder  = new QAction(newFolderIcon, tr("Add new scene"), this);
+  newFolder->setIconText(tr("Add scene"));
   addAction(newFolder);
-  addSeparator();
+  //addSeparator();
 
-  //	QIcon tableViewIcon = createQIconOnOffPNG("viewtable");
-  //  QAction* tableView = new QAction(tableViewIcon, tr("Table View"), this);
-  //  tableView->setCheckable(true);
-  //  actions->addAction(tableView);
-  //  addAction(tableView);
-  addSeparator();
-
-  // button to export file list to csv
-  QAction *exportFileListAction = new QAction(tr("Export File List"), this);
-  addAction(exportFileListAction);
-  addSeparator();
-
-  if (itemViewer->m_windowType == DvItemViewer::Browser &&
-      !Preferences::instance()->isWatchFileSystemEnabled()) {
-    addAction(CommandManager::instance()->getAction("MI_RefreshTree"));
-    addSeparator();
-  }
-
-  connect(exportFileListAction, SIGNAL(triggered()), itemViewer->getPanel(),
-          SLOT(exportFileList()));
-
-  connect(folderUp, SIGNAL(triggered()), SIGNAL(folderUp()));
   connect(newFolder, SIGNAL(triggered()), SIGNAL(newFolder()));
-  //	connect(listView      , SIGNAL(triggered()), itemViewer->getPanel(),
-  // SLOT(setListView()));
-  //	connect(tableView     , SIGNAL(triggered()), itemViewer->getPanel(),
-  // SLOT(setTableView()));
-
-  connect(m_folderBack, SIGNAL(triggered()), SIGNAL(folderBack()));
-  connect(m_folderFwd, SIGNAL(triggered()), SIGNAL(folderFwd()));
-
-  if (itemViewer->m_windowType == DvItemViewer::Browser) {
-    connect(TApp::instance()->getCurrentScene(),
-            SIGNAL(preferenceChanged(const QString &)), this,
-            SLOT(onPreferenceChanged(const QString &)));
-  }
-}
-
-//-----------------------------------------------------------------------------
-
-void SceneBrowserButtonBar::onHistoryChanged(bool backEnable, bool fwdEnable) {
-  if (backEnable)
-    m_folderBack->setEnabled(true);
-  else
-    m_folderBack->setEnabled(false);
-
-  if (fwdEnable)
-    m_folderFwd->setEnabled(true);
-  else
-    m_folderFwd->setEnabled(false);
-}
-
-//-----------------------------------------------------------------------------
-
-void SceneBrowserButtonBar::onPreferenceChanged(const QString &prefName) {
-  // react only when the related preference is changed
-  if (prefName != "WatchFileSystem") return;
-
-  QAction *refreshAct = CommandManager::instance()->getAction("MI_RefreshTree");
-  if (Preferences::instance()->isWatchFileSystemEnabled()) {
-    removeAction(refreshAct);
-    removeAction(actions().last());  // remove separator
-  } else {
-    addAction(refreshAct);
-    addSeparator();
-  }
 }
 
 //=============================================================================

@@ -34,15 +34,8 @@ class SceneBrowserButtonBar final : public QToolBar {
 public:
   SceneBrowserButtonBar(DvItemViewer *itemViewer, QWidget *parent = 0);
 
-public slots:
-  void onHistoryChanged(bool, bool);
-  void onPreferenceChanged(const QString &);
-
 signals:
-  void folderUp();
   void newFolder();
-  void folderBack();
-  void folderFwd();
 };
 //-----------------------------------------------------------------------------
 
