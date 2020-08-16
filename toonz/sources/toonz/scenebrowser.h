@@ -26,6 +26,25 @@ class DvDirTreeView;
 class QFileSystemWatcher;
 
 //-----------------------------------------------------------------------------
+class SceneBrowserButtonBar final : public QToolBar {
+  Q_OBJECT
+  QAction *m_folderBack;
+  QAction *m_folderFwd;
+
+public:
+  SceneBrowserButtonBar(DvItemViewer *itemViewer, QWidget *parent = 0);
+
+public slots:
+  void onHistoryChanged(bool, bool);
+  void onPreferenceChanged(const QString &);
+
+signals:
+  void folderUp();
+  void newFolder();
+  void folderBack();
+  void folderFwd();
+};
+//-----------------------------------------------------------------------------
 
 class SceneBrowser final : public QFrame, public DvItemListModel {
   Q_OBJECT
