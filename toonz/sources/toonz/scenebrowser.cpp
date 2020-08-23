@@ -2060,22 +2060,6 @@ void SceneBrowser::refresh() {
 
 //-----------------------------------------------------------------------------
 
-void SceneBrowser::folderUp() {
-  QModelIndex index = m_folderTreeView->currentIndex();
-  if (!index.isValid() || !index.parent().isValid()) {
-    // cannot go up tree view, so try going to parent directory
-    TFilePath parentFp = m_folder.getParentDir();
-    if (parentFp != TFilePath("") && parentFp != m_folder) {
-      setFolder(parentFp, true);
-    }
-    return;
-  }
-  m_folderTreeView->setCurrentIndex(index.parent());
-  m_folderTreeView->scrollTo(index.parent());
-}
-
-//-----------------------------------------------------------------------------
-
 void SceneBrowser::newFolder() {
   TFilePath parentFolder = getFolder();
   if (parentFolder == TFilePath() || !TFileStatus(parentFolder).isDirectory())

@@ -153,7 +153,6 @@ protected slots:
   void onDoubleClickedItem(int index);
   void onSelectedItems(const std::set<int> &indexes);
   void onSceneSwitched();
-  void folderUp();
   void newFolder();
 
   void onBackButtonPushed();
