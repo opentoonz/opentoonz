@@ -226,7 +226,6 @@ SceneBrowser::SceneBrowser(QWidget *parent, Qt::WFlags flags, bool noContextMenu
   ret =
       ret && connect(m_itemViewer, SIGNAL(selectedItems(const std::set<int> &)),
                      this, SLOT(onSelectedItems(const std::set<int> &)));
-  ret = ret && connect(buttonBar, SIGNAL(folderUp()), this, SLOT(folderUp()));
   ret = ret && connect(buttonBar, SIGNAL(newFolder()), this, SLOT(newFolder()));
 
   ret = ret && connect(&m_frameCountReader, SIGNAL(calculatedFrameCount()),
@@ -250,13 +249,6 @@ SceneBrowser::SceneBrowser(QWidget *parent, Qt::WFlags flags, bool noContextMenu
   // folder history
   ret = ret && connect(m_folderTreeView, SIGNAL(currentNodeChanged()), this,
                        SLOT(storeFolderHistory()));
-  ret = ret && connect(buttonBar, SIGNAL(folderBack()), this,
-                       SLOT(onBackButtonPushed()));
-  ret = ret && connect(buttonBar, SIGNAL(folderFwd()), this,
-                       SLOT(onFwdButtonPushed()));
-  // when the history changes, enable/disable the history buttons accordingly
-  ret = ret && connect(this, SIGNAL(historyChanged(bool, bool)), buttonBar,
-                       SLOT(onHistoryChanged(bool, bool)));
 
   // check out the update of the current folder.
   // Use MyFileSystemWatcher which is shared by all browsers.
