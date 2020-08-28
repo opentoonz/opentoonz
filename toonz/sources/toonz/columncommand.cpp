@@ -1239,8 +1239,8 @@ public:
     int cc             = TApp::instance()->getCurrentColumn()->getColumnIndex();
     bool sound_changed = false;
     TTool *tool        = TApp::instance()->getCurrentTool()->getTool();
-    TTool::Viewer *viewer = tool ? tool->getViewer() : nullptr;
-    bool viewer_changed   = false;
+    TToolViewer *viewer = tool ? tool->getViewer() : nullptr;
+    bool viewer_changed = false;
 
     int startCol =
         Preferences::instance()->isXsheetCameraColumnVisible() ? -1 : 0;

@@ -8,12 +8,19 @@
 #include "tsound.h"
 #include "tconvert.h"
 #include "tpropertytype.h"
-#include "../mov/tiio_mov.h"
-#include "movsettings.h"
 #include "trasterimage.h"
 #include "tsystem.h"
 
+// movesettings deps, must be included before QuickTime includes
+#include "texception.h"
+#include "tpropertytype.h"
+#include "tproperty.h"
+
+// following includes may include QuickTime
+#include "../mov/tiio_mov.h"
 #include "tiio_3gp.h"
+
+#include "movsettings.h"
 
 namespace {
 

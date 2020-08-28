@@ -13,6 +13,8 @@
 //    32-bit version
 //*******************************************************************************
 
+#include "movsettings.h"
+
 #ifdef _WIN32
 #ifdef _MSC_VER
 #pragma warning(disable : 4996)
@@ -92,8 +94,6 @@ count" in cui count e' il numero di 0.
 esempio:  buf[0] = 13 buf[1]=0 buf[2]=0 buf[3]=0 buf[4]=0 buf5]=231
 allora str = "13 z 4 231"
 */
-
-#include "movsettings.h"
 
 //------------------------------------------------
 
@@ -392,12 +392,12 @@ bool Tiio::isQuicktimeInstalled() {
 #include "tipc.h"
 #include "t32bitsrv_wrap.h"
 
+#include "movsettings.h"
+
 // MAC-Specific includes
 #ifdef MACOSX
 #include <ApplicationServices/ApplicationServices.h>
 #endif
-
-#include "movsettings.h"
 
 //---------------------------------------------------------------------------
 

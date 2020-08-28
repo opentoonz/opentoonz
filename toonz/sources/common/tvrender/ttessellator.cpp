@@ -139,10 +139,9 @@ void TglTessellator::doTessellate(GLTess &glTess, const TColorFunction *cf,
 
     for (TRegionOutline::PointVector::iterator it = poly_it->begin();
          it != poly_it->end(); ++it) {
-      // T3DPointD p = *it;
-      it->x = aff.a11 * it->x + aff.a12 * it->y;
-      it->y = aff.a21 * it->x + aff.a22 * it->y;
-
+      TPointD p = aff * TPointD(it->x, it->y);
+      it->x     = p.x;
+      it->y     = p.y;
       gluTessVertex(glTess.m_tess, &(it->x), &(it->x));
     }
 #ifdef GLU_VERSION_1_2
@@ -168,9 +167,9 @@ void TglTessellator::doTessellate(GLTess &glTess, const TColorFunction *cf,
       for (TRegionOutline::PointVector::reverse_iterator rit =
                poly_it->rbegin();
            rit != poly_it->rend(); ++rit) {
-        // T3DPointD p = *rit;
-        rit->x = aff.a11 * rit->x + aff.a12 * rit->y;
-        rit->y = aff.a21 * rit->x + aff.a22 * rit->y;
+        TPointD p = aff * TPointD(rit->x, rit->y);
+        rit->x    = p.x;
+        rit->y    = p.y;
         gluTessVertex(glTess.m_tess, &(rit->x), &(rit->x));
       }
 

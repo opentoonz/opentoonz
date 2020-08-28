@@ -1542,7 +1542,7 @@ void ToolUtils::drawBalloon(const TPointD &pos, std::string text,
   int y1 = textRect.bottom() + mrg;
 
   if (isPicking) {
-    TTool::Viewer *viewer =
+    TToolViewer *viewer =
         TTool::getApplication()->getCurrentTool()->getTool()->getViewer();
 
     if (viewer->is3DView()) {

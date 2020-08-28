@@ -554,20 +554,8 @@ void PlaneViewer::zoomOut() {
 //=========================================================================================
 
 void PlaneViewer::pushGLWorldCoordinates() {
-  m_matrix[0]  = m_aff.a11;
-  m_matrix[4]  = m_aff.a12;
-  m_matrix[12] = m_aff.a13;
-  m_matrix[1]  = m_aff.a21;
-  m_matrix[5]  = m_aff.a22;
-  m_matrix[13] = m_aff.a23;
-
-  m_matrix[2] = m_matrix[3] = m_matrix[6] = m_matrix[7] = m_matrix[8] =
-      m_matrix[9] = m_matrix[10] = m_matrix[11] = m_matrix[14] = 0;
-
-  m_matrix[15] = 1.0;
-
   glPushMatrix();
-  glLoadMatrixd(m_matrix);  //(GLdouble*) &m_matrix
+  glLoadMatrixd(TAffine4(m_aff).a);
 }
 
 //------------------------------------------------------
@@ -622,11 +610,11 @@ void PlaneViewer::draw(TRasterP ras, double dpiX, double dpiY, TPalette *pal) {
   aux->lock();
   ras->lock();
 
-  glGetDoublev(GL_MODELVIEW_MATRIX, m_matrix);
-  TAffine viewAff(m_matrix[0], m_matrix[4], m_matrix[12], m_matrix[1],
-                  m_matrix[5], m_matrix[13]);
-  viewAff = viewAff * TScale(Stage::inch / dpiX, Stage::inch / dpiY) *
-            TTranslation(-rasCenter);
+  TAffine4 matrix;
+  glGetDoublev(GL_MODELVIEW_MATRIX, matrix.a);
+  TAffine viewAff = matrix.get2d() *
+                    TAffine::scale(Stage::inch / dpiX, Stage::inch / dpiY) *
+                    TAffine::translation(-rasCenter);
 
   pushGLWinCoordinates();
 

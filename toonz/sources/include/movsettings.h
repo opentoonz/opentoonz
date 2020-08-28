@@ -17,6 +17,10 @@
 
 #ifdef _WIN32
 
+#include "texception.h"
+#include "tpropertytype.h"
+#include "tproperty.h"
+
 #define list QuickTime_list
 #define map QuickTime_map
 #define iterator QuickTime_iterator
@@ -43,12 +47,6 @@
 #undef int_fast8_t
 #undef int_fast16_t
 #undef uint_fast16_t
-
-#include "texception.h"
-#include "tpropertytype.h"
-//#include "timageinfo.h"
-//#include "tlevel_io.h"
-#include "tproperty.h"
 
 #else  // _WIN32
 

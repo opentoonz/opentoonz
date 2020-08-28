@@ -338,8 +338,8 @@ void doQuickPutNoFilter(const TRaster32P &dn, const TRaster32P &up,
                         const TAffine &aff, const TPixel32 &colorScale,
                         bool doPremultiply, bool whiteTransp, bool firstColumn,
                         bool doRasterDarkenBlendedView) {
-  //  se aff := TAffine(sx, 0, tx, 0, sy, ty) e' degenere la controimmagine
-  //  di up e' un segmento (o un punto)
+  //  se aff := TAffine(TPointD(sx, 0), TPointD(0, sy), TPointD(tx, ty))
+  //  e' degenere la controimmagine di up e' un segmento (o un punto)
   if ((aff.a11 * aff.a22 - aff.a12 * aff.a21) == 0) return;
 
   //  contatore bit di shift
@@ -571,8 +571,8 @@ void doQuickPutNoFilter(const TRaster32P &dn, const TRaster32P &up,
 void doQuickPutNoFilter(const TRaster32P &dn, const TRaster64P &up,
                         const TAffine &aff, bool doPremultiply,
                         bool firstColumn) {
-  //  se aff := TAffine(sx, 0, tx, 0, sy, ty) e' degenere la controimmagine
-  //  di up e' un segmento (o un punto)
+  //  se aff := TAffine(TPointD(sx, 0), TPointD(0, sy), TPointD(tx, ty))
+  //  e' degenere la controimmagine di up e' un segmento (o un punto)
   if ((aff.a11 * aff.a22 - aff.a12 * aff.a21) == 0) return;
 
   //  contatore bit di shift
@@ -946,8 +946,8 @@ void doQuickPutNoFilter(const TRaster32P &dn, const TRasterGR8P &up,
 
 void doQuickPutFilter(const TRaster32P &dn, const TRaster32P &up, double sx,
                       double sy, double tx, double ty) {
-  //  se aff := TAffine(sx, 0, tx, 0, sy, ty) e' degenere la controimmagine
-  //  di up e' un segmento (o un punto)
+  //  se aff := TAffine(TPointD(sx, 0), TPointD(0, sy), TPointD(tx, ty))
+  //  e' degenere la controimmagine di up e' un segmento (o un punto)
   if ((sx == 0) || (sy == 0)) return;
 
   //  contatore bit di shift
@@ -961,7 +961,7 @@ void doQuickPutFilter(const TRaster32P &dn, const TRaster32P &up, double sx,
 
   //  max dimensioni di up gestibili (limite imposto dal numero di bit
   //  disponibili per la parte intera di xL, yL)
-  TAffine aff(sx, 0, tx, 0, sy, ty);
+  TAffine aff(TPointD(sx, 0), TPointD(0, sy), TPointD(tx, ty));
   TRectD boundingBoxD = TRectD(convert(dn->getSize())) *
                         (aff * TRectD(0, 0, up->getLx() - 2, up->getLy() - 2));
 
@@ -1222,8 +1222,8 @@ void doQuickPutNoFilter(const TRaster32P &dn, const TRaster32P &up, double sx,
                         const TPixel32 &colorScale, bool doPremultiply,
                         bool whiteTransp, bool firstColumn,
                         bool doRasterDarkenBlendedView) {
-  //  se aff := TAffine(sx, 0, tx, 0, sy, ty) e' degenere la controimmagine
-  //  di up e' un segmento (o un punto)
+  //  se aff := TAffine(TPointD(sx, 0), TPointD(0, sy), TPointD(tx, ty))
+  //  e' degenere la controimmagine di up e' un segmento (o un punto)
   if ((sx == 0) || (sy == 0)) return;
 
   //  contatore bit di shift
@@ -1233,7 +1233,7 @@ void doQuickPutNoFilter(const TRaster32P &dn, const TRaster32P &up, double sx,
   //  max dimensioni di up gestibili (limite imposto dal numero di bit
   // disponibili per la parte intera di xL, yL)
 
-  TAffine aff(sx, 0, tx, 0, sy, ty);
+  TAffine aff(TPointD(sx, 0), TPointD(0, sy), TPointD(tx, ty));
   TRectD boundingBoxD =
       TRectD(convert(dn->getBounds())) *
       (aff * TRectD(-0.5, -0.5, up->getLx() - 0.5, up->getLy() - 0.5));
@@ -1430,7 +1430,7 @@ void doQuickPutNoFilter(const TRaster32P &dn, const TRaster32P &up, double sx,
 
       TPixel32 upPix = *(upBasePix + (yI * upWrap + xI));
 
-      if (firstColumn) upPix.m = 65535;
+      if (firstColumn) upPix.m = TPixel32::maxChannelValue;
 
       if (upPix.m == 0 || (whiteTransp && upPix == TPixel::White)) continue;
 
@@ -1463,7 +1463,7 @@ void doQuickPutNoFilter(const TRaster32P &dn, const TRasterGR8P &up, double sx,
   assert(std::max(up->getLx(), up->getLy()) <
          (1 << (8 * sizeof(int) - PADN - 1)));
 
-  TAffine aff(sx, 0, tx, 0, sy, ty);
+  TAffine aff(TPointD(sx, 0), TPointD(0, sy), TPointD(tx, ty));
   TRectD boundingBoxD =
       TRectD(convert(dn->getBounds())) *
       (aff * TRectD(-0.5, -0.5, up->getLx() - 0.5, up->getLy() - 0.5));
@@ -2227,8 +2227,8 @@ void doQuickResampleColorFilter(const TRaster32P &dn, const TRaster64P &up,
 
 void doQuickResampleFilter(const TRaster32P &dn, const TRaster32P &up,
                            double sx, double sy, double tx, double ty) {
-  //  se aff := TAffine(sx, 0, tx, 0, sy, ty) e' degenere la controimmagine
-  //  di up e' un segmento (o un punto)
+  //  se aff := TAffine(TPointD(sx, 0), TPointD(0, sy), TPointD(tx, ty))
+  //  e' degenere la controimmagine di up e' un segmento (o un punto)
   if ((sx == 0) || (sy == 0)) return;
 
   //  contatore bit di shift
@@ -2242,7 +2242,7 @@ void doQuickResampleFilter(const TRaster32P &dn, const TRaster32P &up,
   assert(std::max(up->getLx(), up->getLy()) <
          (1 << (8 * sizeof(int) - PADN - 1)));
 
-  TAffine aff(sx, 0, tx, 0, sy, ty);
+  TAffine aff(TPointD(sx, 0), TPointD(0, sy), TPointD(tx, ty));
   TRectD boundingBoxD =
       TRectD(convert(dn->getSize())) *
       (aff * TRectD(0, 0, up->getLx() - /*1*/ 2, up->getLy() - /*1*/ 2));
@@ -2486,8 +2486,8 @@ void doQuickResampleFilter(const TRaster32P &dn, const TRaster32P &up,
 
 void doQuickResampleFilter(const TRaster32P &dn, const TRasterGR8P &up,
                            double sx, double sy, double tx, double ty) {
-  //  se aff := TAffine(sx, 0, tx, 0, sy, ty) e' degenere la controimmagine
-  //  di up e' un segmento (o un punto)
+  //  se aff := TAffine(TPointD(sx, 0), TPointD(0, sy), TPointD(tx, ty))
+  //  e' degenere la controimmagine di up e' un segmento (o un punto)
   if ((sx == 0) || (sy == 0)) return;
 
   //  contatore bit di shift
@@ -2501,7 +2501,7 @@ void doQuickResampleFilter(const TRaster32P &dn, const TRasterGR8P &up,
   assert(std::max(up->getLx(), up->getLy()) <
          (1 << (8 * sizeof(int) - PADN - 1)));
 
-  TAffine aff(sx, 0, tx, 0, sy, ty);
+  TAffine aff(TPointD(sx, 0), TPointD(0, sy), TPointD(tx, ty));
   TRectD boundingBoxD =
       TRectD(convert(dn->getSize())) *
       (aff * TRectD(0, 0, up->getLx() - /*1*/ 2, up->getLy() - /*1*/ 2));
@@ -2721,8 +2721,8 @@ void doQuickResampleFilter(const TRaster32P &dn, const TRasterGR8P &up,
 template <typename PIX>
 void doQuickResampleNoFilter(const TRasterPT<PIX> &dn, const TRasterPT<PIX> &up,
                              double sx, double sy, double tx, double ty) {
-  //  se aff := TAffine(sx, 0, tx, 0, sy, ty) e' degenere la controimmagine
-  //  di up e' un segmento (o un punto)
+  //  se aff := TAffine(TPointD(sx, 0), TPointD(0, sy), TPointD(tx, ty))
+  //  e' degenere la controimmagine di up e' un segmento (o un punto)
   if ((sx == 0) || (sy == 0)) return;
 
   //  contatore bit di shift
@@ -2733,7 +2733,7 @@ void doQuickResampleNoFilter(const TRasterPT<PIX> &dn, const TRasterPT<PIX> &up,
   assert(std::max(up->getLx(), up->getLy()) <
          (1 << (8 * sizeof(int) - PADN - 1)));
 
-  TAffine aff(sx, 0, tx, 0, sy, ty);
+  TAffine aff(TPointD(sx, 0), TPointD(0, sy), TPointD(tx, ty));
   TRectD boundingBoxD =
       TRectD(convert(dn->getBounds())) *
       (aff * TRectD(-0.5, -0.5, up->getLx() - 0.5, up->getLy() - 0.5));
@@ -2929,8 +2929,8 @@ void doQuickResampleNoFilter(const TRasterPT<PIX> &dn, const TRasterPT<PIX> &up,
 void doQuickPutCmapped(const TRaster32P &dn, const TRasterCM32P &up,
                        const TPaletteP &palette, const TAffine &aff,
                        const TPixel32 &globalColorScale, bool inksOnly) {
-  //  se aff := TAffine(sx, 0, tx, 0, sy, ty) e' degenere la controimmagine
-  //  di up e' un segmento (o un punto)
+  //  se aff := TAffine(TPointD(sx, 0), TPointD(0, sy), TPointD(tx, ty))
+  //  e' degenere la controimmagine di up e' un segmento (o un punto)
   if ((aff.a11 * aff.a22 - aff.a12 * aff.a21) == 0) return;
 
   //  contatore bit di shift
@@ -3375,8 +3375,8 @@ void doQuickPutCmapped(const TRaster32P &dn, const TRasterCM32P &up,
                        const TPaletteP &palette, double sx, double sy,
                        double tx, double ty, const TPixel32 &globalColorScale,
                        bool inksOnly) {
-  //  se aff := TAffine(sx, 0, tx, 0, sy, ty) e' degenere la controimmagine
-  //  di up e' un segmento (o un punto)
+  //  se aff := TAffine(TPointD(sx, 0), TPointD(0, sy), TPointD(tx, ty))
+  //  e' degenere la controimmagine di up e' un segmento (o un punto)
   if ((sx == 0) || (sy == 0)) return;
 
   //  contatore bit di shift
@@ -3386,7 +3386,7 @@ void doQuickPutCmapped(const TRaster32P &dn, const TRasterCM32P &up,
   //  max dimensioni di up gestibili (limite imposto dal numero di bit
   // disponibili per la parte intera di xL, yL)
 
-  TAffine aff(sx, 0, tx, 0, sy, ty);
+  TAffine aff(TPointD(sx, 0), TPointD(0, sy), TPointD(tx, ty));
   TRectD boundingBoxD =
       TRectD(convert(dn->getBounds())) *
       (aff * TRectD(-0.5, -0.5, up->getLx() - 0.5, up->getLy() - 0.5));
@@ -3938,8 +3938,8 @@ void doQuickResampleFilter_optimized(const TRaster32P &dn, const TRaster32P &up,
 void doQuickResampleFilter_optimized(const TRaster32P &dn, const TRaster32P &up,
                                      double sx, double sy, double tx,
                                      double ty) {
-  //  se aff := TAffine(sx, 0, tx, 0, sy, ty) e' degenere la controimmagine
-  //  di up e' un segmento (o un punto)
+  //  se aff := TAffine(TPointD(sx, 0), TPointD(0, sy), TPointD(tx, ty))
+  //  e' degenere la controimmagine di up e' un segmento (o un punto)
   if ((sx == 0) || (sy == 0)) return;
 
   //  contatore bit di shift
@@ -3953,7 +3953,7 @@ void doQuickResampleFilter_optimized(const TRaster32P &dn, const TRaster32P &up,
   assert(std::max(up->getLx(), up->getLy()) <
          (1 << (8 * sizeof(int) - PADN - 1)));
 
-  TAffine aff(sx, 0, tx, 0, sy, ty);
+  TAffine aff(TPointD(sx, 0), TPointD(0, sy), TPointD(tx, ty));
   TRectD boundingBoxD = TRectD(convert(dn->getSize())) *
                         (aff * TRectD(0, 0, up->getLx() - 2, up->getLy() - 2));
 
@@ -4297,8 +4297,8 @@ void quickPut(const TRasterP &dn, const TRasterP &up, const TAffine &aff,
 template <typename PIX>
 void doQuickResampleNoFilter(const TRasterPT<PIX> &dn, const TRasterPT<PIX> &up,
                              const TAffine &aff) {
-  //  se aff := TAffine(sx, 0, tx, 0, sy, ty) e' degenere la controimmagine
-  //  di up e' un segmento (o un punto)
+  //  se aff := TAffine(TPointD(sx, 0), TPointD(0, sy), TPointD(tx, ty))
+  //  e' degenere la controimmagine di up e' un segmento (o un punto)
   if ((aff.a11 * aff.a22 - aff.a12 * aff.a21) == 0) return;
 
   //  contatore bit di shift

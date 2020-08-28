@@ -195,10 +195,9 @@ void ViewerDraw::drawCameraMask(SceneViewer *viewer) {
   viewer->rect().getCoords(&x1, &y1, &x2, &y2);
   TRect clipRect = TRect(x1, y1, x2 + 1, y2 + 1);
 
-  GLfloat modelView[16];
-  glGetFloatv(GL_MODELVIEW_MATRIX, modelView);
-  TAffine modelViewAff(modelView[0], modelView[4], modelView[12], modelView[1],
-                       modelView[5], modelView[13]);
+  TAffine4 modelView;
+  glGetDoublev(GL_MODELVIEW_MATRIX, modelView.a);
+  TAffine modelViewAff = modelView.get2d();
 
   TRectD cameraRect = getCameraRect();
 

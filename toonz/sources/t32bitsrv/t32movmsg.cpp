@@ -9,16 +9,30 @@
 #include "trasterimage.h"
 #include "traster.h"
 #include "tstream.h"
-#include "movsettings.h"
 #include "tproperty.h"
 #include "tsound.h"
 
+// tipc includes
+#include "tipc.h"
+#include "tipcmsg.h"
+#include "tipcsrv.h"
+#include "t32bitsrv_wrap.h"
+
+#include "t32movmsg.h"
+
+// movesettings deps, must be included before QuickTime includes
+#include "texception.h"
+#include "tpropertytype.h"
+#include "tproperty.h"
+
+// following includes may include QuickTime
 #if defined(_WIN32)
 #include "../image/mov/tiio_mov.h"
 #elif defined(MACOSX)
 #include "../image/mov/tiio_movM.h"
 #include <ApplicationServices/ApplicationServices.h>
 #endif
+#include "movsettings.h"
 
 // Qt stuff
 #include <QString>
@@ -28,14 +42,6 @@
 
 #include <QLocalSocket>
 #include <QDataStream>
-
-// tipc includes
-#include "tipc.h"
-#include "tipcmsg.h"
-#include "tipcsrv.h"
-#include "t32bitsrv_wrap.h"
-
-#include "t32movmsg.h"
 
 //---------------------------------------------------
 

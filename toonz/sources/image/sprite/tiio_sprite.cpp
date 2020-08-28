@@ -1,6 +1,5 @@
 
 #include "tiio_sprite.h"
-#include "../toonz/tapp.h"
 #include "tsystem.h"
 #include "tsound.h"
 

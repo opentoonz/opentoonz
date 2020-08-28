@@ -809,6 +809,9 @@ void SchematicViewer::getNodeColor(int ltype, QColor &nodeColor) {
   case MESH_XSHLEVEL:
     nodeColor = getMeshColumnColor();
     break;
+  case META_XSHLEVEL:
+    nodeColor = getMetaColumnColor();
+    break;
   case PLT_XSHLEVEL:
     nodeColor = getPaletteColumnColor();
     break;

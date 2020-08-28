@@ -523,9 +523,10 @@ inline bool JunctionArea::solveJunctionPosition() {
   // First check problem determinant
   double det = Sx2 * Sy2 - sq(Sxy);
   if (fabs(det) < 0.1) return 0;
+  double invDet = 1.0 / det;
 
   // Now construct linear system
-  TAffine M(Sx2 / det, Sxy / det, 0, Sxy / det, Sy2 / det, 0);
+  TAffine M(TPointD(Sx2, Sxy) * invDet, TPointD(Sxy, Sy2) * invDet);
 
   m_newJointPosition = M * b;
 

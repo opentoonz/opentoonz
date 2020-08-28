@@ -21,6 +21,7 @@
 // TnzCore includes
 #include "trasterimage.h"
 #include "tvectorimage.h"
+#include "tmetaimage.h"
 #include "tmeshimage.h"
 #include "timagecache.h"
 #include "tofflinegl.h"
@@ -978,6 +979,8 @@ void TXshSimpleLevel::loadData(TIStream &is) {
       type = TZI_XSHLEVEL;
     else if (ext == "mesh")
       type = MESH_XSHLEVEL;
+    else if (ext == "tzm")
+      type = META_XSHLEVEL;
     else
       type = OVL_XSHLEVEL;
   }
@@ -1911,6 +1914,10 @@ TImageP TXshSimpleLevel::createEmptyFrame() {
   switch (m_type) {
   case PLI_XSHLEVEL:
     result = new TVectorImage;
+    break;
+
+  case META_XSHLEVEL:
+    result = new TMetaImage();
     break;
 
   case MESH_XSHLEVEL:

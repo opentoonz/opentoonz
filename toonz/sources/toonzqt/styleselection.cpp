@@ -25,7 +25,6 @@
 #include "tundo.h"
 #include "tconvert.h"
 
-#include "../toonz/menubarcommandids.h"
 #include "historytypes.h"
 
 // Qt includes

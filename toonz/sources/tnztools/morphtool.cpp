@@ -32,7 +32,7 @@ public:
     TPointD p2 = m_controlPoints[4];
     double a00 = p0.x - p2.x, a01 = p1.x - p2.x, a10 = p0.y - p2.y,
            a11 = p1.y - p2.y;
-    TAffine aff(a00, a01, 0, a10, a11, 0);
+    TAffine aff(TPointD(a00, a10), TPointD(a01, a11));
     aff       = aff.inv();
     TPointD d = -(aff * p2);
     aff.a13   = d.x;

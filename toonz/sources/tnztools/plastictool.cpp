@@ -642,7 +642,7 @@ PlasticTool::PlasticTool()
     , m_showSkeletonOS(true)
     , m_recompileOnMouseRelease(false) {
   // And now, a little trick about tool binding
-  bind(TTool::AllImages);   // Attach the tool to all types :)
+  bind(TTool::AllImages | TTool::EmptyTarget);   // Attach the tool to all types :)
   bind(TTool::MeshLevels);  // But disable it for all but meshes :0
 
   // This little trick is needed to associate the tool to common levels (the
@@ -926,7 +926,7 @@ void PlasticTool::onChange() {
   }
 
   // Passing through Qt's event system to compress repaints in a single one
-  TTool::Viewer *viewer = getViewer();
+  TToolViewer *viewer = getViewer();
   if (viewer)                 // This goes through paintEvent(),
     viewer->invalidateAll();  // \a unlike TTool::invalidate()
 }
@@ -942,7 +942,7 @@ void PlasticTool::onChange(const TParamChange &pc) {
 //------------------------------------------------------------------------
 
 void PlasticTool::onSetViewer() {
-  Viewer *viewer = getViewer();
+  TToolViewer *viewer = getViewer();
   if (viewer) {
     PlasticVisualSettings &pvs =
         viewer->visualSettings().m_plasticVisualSettings;
@@ -997,7 +997,7 @@ void PlasticTool::onDeactivate() {
                    SIGNAL(xsheetSwitched()), this, SLOT(onXsheetChanged())),
   assert(ret);
 
-  Viewer *viewer = getViewer();
+  TToolViewer *viewer = getViewer();
   if (viewer) {
     viewer->visualSettings().m_plasticVisualSettings = PlasticVisualSettings();
     // Only the mesh visibility is not reset in order to enable to keep the mesh
@@ -1747,11 +1747,9 @@ static void drawFilledHandle(const TPointD &pos, double radius,
 static void drawText(const TPointD &pos, const QString &text,
                      double fontScale) {
   // Get the world-to-window affine
-  double matrix[16];
-
-  glGetDoublev(GL_MODELVIEW_MATRIX, matrix);
-  TAffine worldToWindowAff(matrix[0], matrix[4], matrix[12], matrix[1],
-                           matrix[5], matrix[13]);
+  TAffine4 matrix;
+  glGetDoublev(GL_MODELVIEW_MATRIX, matrix.a);
+  TAffine worldToWindowAff = matrix.get2d();
 
   // Push the window reference
   glPushMatrix();

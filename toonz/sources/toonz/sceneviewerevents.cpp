@@ -26,6 +26,7 @@
 #include "toonzqt/styleselection.h"
 
 // TnzTools includes
+#include "tools/inputmanager.h"
 #include "tools/cursors.h"
 #include "tools/toolhandle.h"
 #include "tools/cursormanager.h"
@@ -341,20 +342,13 @@ void SceneViewer::tabletEvent(QTabletEvent *e) {
 #endif
   } break;
   case QEvent::TabletMove: {
-#ifdef MACOSX
     // for now OSX seems to fail to call enter/leaveEvent properly while
     // the tablet is floating
     bool isHoveringInsideViewer =
         !rect().marginsRemoved(QMargins(5, 5, 5, 5)).contains(e->pos());
     // call the fake enter event
     if (isHoveringInsideViewer) onEnter();
-#else
-    // for Windowsm, use tabletEvent only for the left Button
-    if (m_tabletState != StartStroke && m_tabletState != OnStroke) {
-      m_tabletEvent = false;
-      break;
-    }
-#endif
+
     QPointF curPos = e->posF() * getDevPixRatio();
     // It seems that the tabletEvent is called more often than mouseMoveEvent.
     // So I fire the interval timer in order to limit the following process
@@ -425,17 +419,14 @@ void SceneViewer::onEnter() {
 
   TApp *app = TApp::instance();
   app->setActiveViewer(this);
-  TTool *tool      = app->getCurrentTool()->getTool();
-  TXshLevel *level = app->getCurrentLevel()->getLevel();
-  if (level && level->getSimpleLevel())
-    m_dpiScale =
-        getCurrentDpiScale(level->getSimpleLevel(), tool->getCurrentFid());
-  else
-    m_dpiScale = TPointD(1, 1);
+
+  getInputManager()->updateDpiScale();
 
   if (m_freezedStatus != NO_FREEZED) return;
 
   invalidateToolStatus();
+
+  TTool *tool = app->getCurrentTool()->getTool();
   if (tool && tool->isEnabled()) {
     tool->setViewer(this);
     tool->updateMatrix();
@@ -571,18 +562,12 @@ void SceneViewer::onMove(const TMouseEvent &event) {
       return;
     }
     tool->setViewer(this);
-    TPointD worldPos = winToWorld(curPos);
-    TPointD pos      = tool->getMatrix().inv() * worldPos;
 
-    if (m_locator) {
-      m_locator->onChangeViewAff(worldPos);
-    }
-
-    TObjectHandle *objHandle = TApp::instance()->getCurrentObject();
-    if (tool->getToolType() & TTool::LevelTool && !objHandle->isSpline()) {
-      pos.x /= m_dpiScale.x;
-      pos.y /= m_dpiScale.y;
-    }
+    TPointD screenPos(curPos.x() - (double)width() / 2.0,
+                      -curPos.y() + (double)height() / 2.0);
+    TPointD worldPos = getInputManager()->screenToWorld() * screenPos;
+    if (m_locator) m_locator->onChangeViewAff(worldPos);
+    TPointD pos = getInputManager()->worldToTool() * worldPos;
 
     // qDebug() << "mouseMoveEvent. "  << (m_tabletEvent?"tablet":"mouse")
     //         << " pressure=" << m_pressure << " mouseButton=" << m_mouseButton
@@ -592,21 +577,22 @@ void SceneViewer::onMove(const TMouseEvent &event) {
     if (m_tabletEvent &&
         (m_tabletState == OnStroke || m_tabletState == StartStroke) &&
         m_tabletMove) {
-      if (m_toolSwitched) tool->leftButtonDown(pos, event);
-      tool->leftButtonDrag(pos, event);
+      getInputManager()->trackEvent(0, 0, screenPos, &event.m_pressure, NULL,
+                                    false, TToolTimer::ticks());
+      getInputManager()->processTracks();
       m_tabletState = OnStroke;
-    }
-
-    else if (m_mouseButton == Qt::LeftButton) {
+    } else if (m_mouseButton == Qt::LeftButton) {
       // sometimes the mousePressedEvent is postponed to a wrong  mouse move
       // event!
-      //      if (m_buttonClicked && !m_toolSwitched) tool->leftButtonDrag(pos,
-      //      event);
-      if (m_toolSwitched) tool->leftButtonDown(pos, event);
-      tool->leftButtonDrag(pos, event);
+      if (m_buttonClicked && !m_toolSwitched) {
+        getInputManager()->trackEvent(0, 0, screenPos, NULL, NULL, false,
+                                      TToolTimer::ticks());
+        getInputManager()->processTracks();
+      }
       m_mouseState = OnStroke;
     } else if (m_pressure == 0.0) {
-      tool->mouseMove(pos, event);
+      m_hovers.front() = worldPos;
+      getInputManager()->hoverEvent(m_hovers);
     }
     if (!cursorSet) setToolCursor(this, tool->getCursorId());
 
@@ -748,13 +734,13 @@ void SceneViewer::onPress(const TMouseEvent &event) {
 
   // if(!m_tabletEvent) qDebug() << "-----------------MOUSE PRESS 'PURO'.
   // POSSIBILE EMBOLO";
-  TPointD pos = tool->getMatrix().inv() * winToWorld(m_pos);
 
-  TObjectHandle *objHandle = TApp::instance()->getCurrentObject();
-  if (tool->getToolType() & TTool::LevelTool && !objHandle->isSpline()) {
-    pos.x /= m_dpiScale.x;
-    pos.y /= m_dpiScale.y;
-  }
+  TPointD screenPos(m_pos.x() - (double)width() / 2.0,
+                    -m_pos.y() + (double)height() / 2.0);
+  TPointD worldPos = getInputManager()->screenToWorld() * screenPos;
+  TPointD pos      = getInputManager()->worldToTool() * worldPos;
+
+  getInputManager()->buttonEvent(true, 0, event.button(), TToolTimer::ticks());
 
 #ifdef WITH_STOPMOTION
   // grab screen picking for stop motion live view zoom
@@ -770,13 +756,16 @@ void SceneViewer::onPress(const TMouseEvent &event) {
   if (m_tabletEvent && m_tabletState == Touched) {
     TApp::instance()->getCurrentTool()->setToolBusy(true);
     m_tabletState = StartStroke;
-    tool->leftButtonDown(pos, event);
+    getInputManager()->trackEvent(0, 0, screenPos, &event.m_pressure, NULL,
+                                  false, TToolTimer::ticks());
+    getInputManager()->processTracks();
   } else if (m_mouseButton == Qt::LeftButton) {
     m_mouseState = StartStroke;
     TApp::instance()->getCurrentTool()->setToolBusy(true);
-    tool->leftButtonDown(pos, event);
+    getInputManager()->trackEvent(0, 0, screenPos, NULL, NULL, false,
+                                  TToolTimer::ticks());
+    getInputManager()->processTracks();
   }
-  if (m_mouseButton == Qt::RightButton) tool->rightButtonDown(pos, event);
 }
 
 //-----------------------------------------------------------------------------
@@ -854,19 +843,22 @@ void SceneViewer::onRelease(const TMouseEvent &event) {
   tool->setViewer(this);
 
   {
-    TPointD pos = tool->getMatrix().inv() *
-                  winToWorld(event.mousePos() * getDevPixRatio());
-
-    TObjectHandle *objHandle = TApp::instance()->getCurrentObject();
-    if (tool->getToolType() & TTool::LevelTool && !objHandle->isSpline()) {
-      pos.x /= m_dpiScale.x;
-      pos.y /= m_dpiScale.y;
-    }
+    QPointF winPos = event.mousePos() * getDevPixRatio();
+    TPointD screenPos(winPos.x() - (double)width() / 2.0,
+                      -winPos.y() + (double)height() / 2.0);
+    TPointD worldPos = getInputManager()->screenToWorld() * screenPos;
+    TPointD pos      = getInputManager()->worldToTool() * worldPos;
 
     if (m_mouseButton == Qt::LeftButton || m_tabletState == Released) {
-      if (!m_toolSwitched) tool->leftButtonUp(pos, event);
+      if (!m_toolSwitched) {
+        getInputManager()->trackEventFinish(0, 0);
+        getInputManager()->processTracks();
+      }
       TApp::instance()->getCurrentTool()->setToolBusy(false);
     }
+
+    getInputManager()->buttonEvent(false, 0, event.button(),
+                                   TToolTimer::ticks());
   }
 
 quit:
@@ -1348,7 +1340,9 @@ bool changeFrameSkippingHolds(QKeyEvent *e) {
 
 void SceneViewer::keyPressEvent(QKeyEvent *event) {
   if (m_freezedStatus != NO_FREEZED) return;
-  int key = event->key();
+  // int key = event->key();
+  TKey key = TKey((Qt::Key)event->key(), false,
+                  (bool)(event->modifiers() & Qt::KeypadModifier));
 
   // resolving priority and tool-specific key events in this lambda
   auto ret = [&]() -> bool {
@@ -1360,6 +1354,7 @@ void SceneViewer::keyPressEvent(QKeyEvent *event) {
     if (!isTextToolActive) {
       if (ViewerZoomer(this).exec(event)) return true;
       if (SceneViewerShortcutReceiver(this).exec(event)) return true;
+
       // If this object is child of Viewer or ComboViewer
       // (m_isStyleShortcutSelective = true),
       // then consider about shortcut for the current style selection.
@@ -1367,18 +1362,17 @@ void SceneViewer::keyPressEvent(QKeyEvent *event) {
           Preferences::instance()->isUseNumpadForSwitchingStylesEnabled() &&
           (event->modifiers() == Qt::NoModifier ||
            event->modifiers() == Qt::KeypadModifier) &&
-          ((Qt::Key_0 <= key && key <= Qt::Key_9) || key == Qt::Key_Tab ||
-           key == Qt::Key_Backtab)) {
+          (key.isNumber() || key.is(Qt::Key_Tab) || key.is(Qt::Key_Backtab))) {
         event->ignore();
         return true;
       }
       // pressing F1, F2 or F3 key will flip between corresponding ghost
       if (CommandManager::instance()->getAction(MI_ShiftTrace)->isChecked() &&
-          (Qt::Key_F1 <= key && key <= Qt::Key_F3)) {
+          (Qt::Key_F1 <= key.key && key.key <= Qt::Key_F3)) {
         OnionSkinMask osm =
             TApp::instance()->getCurrentOnionSkin()->getOnionSkinMask();
-        if (osm.getGhostFlipKey() != key) {
-          osm.appendGhostFlipKey(key);
+        if (osm.getGhostFlipKey() != key.key) {
+          osm.appendGhostFlipKey(key.key);
           TApp::instance()->getCurrentOnionSkin()->setOnionSkinMask(osm);
           TApp::instance()->getCurrentOnionSkin()->notifyOnionSkinMaskChanged();
         }
@@ -1390,8 +1384,8 @@ void SceneViewer::keyPressEvent(QKeyEvent *event) {
 
     tool->setViewer(this);
 
-    if (key == Qt::Key_Shift || key == Qt::Key_Control || key == Qt::Key_Alt ||
-        key == Qt::Key_AltGr) {
+    bool ret = false;
+    if (key.isModifier()) {
       // quando l'utente preme shift/ctrl ecc. alcuni tool (es. pinch) devono
       // cambiare subito la forma del cursore, senza aspettare il prossimo move
       TMouseEvent toonzEvent;
@@ -1399,21 +1393,21 @@ void SceneViewer::keyPressEvent(QKeyEvent *event) {
       toonzEvent.m_pos = TPointD(m_lastMousePos.x(),
                                  (double)(height() - 1) - m_lastMousePos.y());
 
-      TPointD pos = tool->getMatrix().inv() * winToWorld(m_lastMousePos);
+      TPointD worldPos = winToWorld(m_lastMousePos);
+      TPointD pos      = getInputManager()->worldToTool() * worldPos;
 
-      TObjectHandle *objHandle = TApp::instance()->getCurrentObject();
-      if (tool->getToolType() & TTool::LevelTool && !objHandle->isSpline()) {
-        pos.x /= m_dpiScale.x;
-        pos.y /= m_dpiScale.y;
-      }
+      ret = getInputManager()->keyEvent(true, key, TToolTimer::ticks(), event);
+      m_hovers.front() = worldPos;
+      getInputManager()->hoverEvent(m_hovers);
 
-      tool->mouseMove(pos, toonzEvent);
       setToolCursor(this, tool->getCursorId());
     }
 
-    if (key == Qt::Key_Menu || key == Qt::Key_Meta) return false;
+    if (key.is(Qt::Key_Menu) || key.is(Qt::Key_Meta)) return false;
 
-    return tool->keyDown(event);
+    if (!key.isModifier())
+      ret = getInputManager()->keyEvent(true, key, TToolTimer::ticks(), event);
+    return ret;
   }();
 
   if (!ret) {
@@ -1422,9 +1416,9 @@ void SceneViewer::keyPressEvent(QKeyEvent *event) {
     TFrameHandle *fh = TApp::instance()->getCurrentFrame();
     int origFrame    = fh->getFrame();
 
-    if (key == Qt::Key_Up || key == Qt::Key_Left)
+    if (key.is(Qt::Key_Up) || key.is(Qt::Key_Left))
       fh->prevFrame();
-    else if (key == Qt::Key_Down || key == Qt::Key_Right) {
+    else if (key.is(Qt::Key_Down) || key.is(Qt::Key_Right)) {
       // If on a level frame pass the frame id after the last frame to allow
       // creating a new frame with the down arrow key
       TFrameId newId = 0;
@@ -1442,9 +1436,9 @@ void SceneViewer::keyPressEvent(QKeyEvent *event) {
         }
       }
       fh->nextFrame(newId);
-    } else if (key == Qt::Key_Home)
+    } else if (key.is(Qt::Key_Home))
       fh->firstFrame();
-    else if (key == Qt::Key_End)
+    else if (key.is(Qt::Key_End))
       fh->lastFrame();
 
     // Use arrow keys to shift the cell selection.
@@ -1472,13 +1466,16 @@ void SceneViewer::keyReleaseEvent(QKeyEvent *event) {
   if (m_freezedStatus != NO_FREEZED) return;
 
   TTool *tool = TApp::instance()->getCurrentTool()->getTool();
+  if (tool && tool->isEnabled())
+    tool->setViewer(this);
+
+  TKey key = TKey((Qt::Key)event->key(), false,
+                  (bool)(event->modifiers() & Qt::KeypadModifier));
+  getInputManager()->keyEvent(false, key, TToolTimer::ticks(), event);
+
   if (!tool || !tool->isEnabled()) return;
-  tool->setViewer(this);
-
-  int key = event->key();
-
-  if (key == Qt::Key_Shift || key == Qt::Key_Control || key == Qt::Key_Alt ||
-      key == Qt::Key_AltGr) {
+  
+  if (key.isModifier()) {
     // quando l'utente preme shift/ctrl ecc. alcuni tool (es. pinch) devono
     // cambiare subito la forma del cursore, senza aspettare il prossimo move
     TMouseEvent toonzEvent;
@@ -1486,23 +1483,20 @@ void SceneViewer::keyReleaseEvent(QKeyEvent *event) {
     toonzEvent.m_pos = TPointD(m_lastMousePos.x(),
                                (double)(height() - 1) - m_lastMousePos.y());
 
-    TPointD pos = tool->getMatrix().inv() * winToWorld(m_lastMousePos);
+    TPointD worldPos = winToWorld(m_lastMousePos);
+    TPointD pos      = getInputManager()->worldToTool() * worldPos;
 
-    TObjectHandle *objHandle = TApp::instance()->getCurrentObject();
-    if (tool->getToolType() & TTool::LevelTool && !objHandle->isSpline()) {
-      pos.x /= m_dpiScale.x;
-      pos.y /= m_dpiScale.y;
-    }
+    m_hovers.front() = worldPos;
+    getInputManager()->hoverEvent(m_hovers);
 
-    tool->mouseMove(pos, toonzEvent);
     setToolCursor(this, tool->getCursorId());
   }
 
   if (CommandManager::instance()->getAction(MI_ShiftTrace)->isChecked() &&
-      (Qt::Key_F1 <= key && key <= Qt::Key_F3)) {
+      (Qt::Key_F1 <= key.key && key.key <= Qt::Key_F3)) {
     OnionSkinMask osm =
         TApp::instance()->getCurrentOnionSkin()->getOnionSkinMask();
-    osm.removeGhostFlipKey(key);
+    osm.removeGhostFlipKey(key.key);
     TApp::instance()->getCurrentOnionSkin()->setOnionSkinMask(osm);
     TApp::instance()->getCurrentOnionSkin()->notifyOnionSkinMaskChanged();
   }
@@ -1511,6 +1505,13 @@ void SceneViewer::keyReleaseEvent(QKeyEvent *event) {
     event->accept();
   else
     event->ignore();
+}
+
+//-----------------------------------------------------------------------------
+
+void SceneViewer::focusOutEvent(QFocusEvent* event) {
+  getInputManager()->releaseAllEvent(TToolTimer::ticks());
+  QWidget::focusOutEvent(event);
 }
 
 //-----------------------------------------------------------------------------
@@ -1530,16 +1531,11 @@ void SceneViewer::mouseDoubleClickEvent(QMouseEvent *event) {
   if (!tool || !tool->isEnabled()) return;
   TMouseEvent toonzEvent;
   initToonzEvent(toonzEvent, event, height(), 1.0, getDevPixRatio());
-  TPointD pos =
-      tool->getMatrix().inv() * winToWorld(event->pos() * getDevPixRatio());
-  TObjectHandle *objHandle = TApp::instance()->getCurrentObject();
-  if (tool->getToolType() & TTool::LevelTool && !objHandle->isSpline()) {
-    pos.x /= m_dpiScale.x;
-    pos.y /= m_dpiScale.y;
-  }
 
-  if (event->button() == Qt::LeftButton)
-    tool->leftButtonDoubleClick(pos, toonzEvent);
+  TPointD pos = getInputManager()->worldToTool() *
+                winToWorld(event->pos() * getDevPixRatio());
+
+  if (event->button() == Qt::LeftButton) getInputManager()->doubleClickEvent();
 }
 
 //-----------------------------------------------------------------------------
@@ -1677,6 +1673,8 @@ void SceneViewer::onToolSwitched() {
     tool->updateMatrix();
     if (tool->getViewer()) tool->getViewer()->setGuidedStrokePickerMode(0);
   }
+
+  rebuildModifiers();
 
   onLevelChanged();
   update();

@@ -20,8 +20,6 @@
 #include "timagecache.h"
 #include "trop.h"
 
-#include "../toonz/tapp.h"
-
 // Qt includes
 #include <QVBoxLayout>
 #include <QHBoxLayout>

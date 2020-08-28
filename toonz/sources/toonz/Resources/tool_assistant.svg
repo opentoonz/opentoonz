@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg version="1.1" id="Layer_1_copy_2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px"
+	 y="0px" viewBox="0 0 26 26" style="enable-background:new 0 0 26 26;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:url(#icon_1_);stroke:#000000;stroke-linejoin:round;}
+</style>
+<linearGradient id="icon_1_" gradientUnits="userSpaceOnUse" x1="13.5" y1="23.5" x2="13.5" y2="3.5" gradientTransform="matrix(1 0 0 -1 0 26)">
+	<stop  offset="0" style="stop-color:#FCFCFC"/>
+	<stop  offset="1" style="stop-color:#CACACA"/>
+</linearGradient>
+<path id="icon" class="st0" d="M4.5,2.5h-1v20h3v-1h1v1h3v-1h1v1h3v-1h1v1h3v-1h0.8l1,1h3.2v-1L4.5,2.5z M6.5,8.7l9.8,9.8H6.5V8.7z"
+	/>
+</svg>

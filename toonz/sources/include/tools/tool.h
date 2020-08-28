@@ -3,12 +3,16 @@
 #ifndef TOOL_INCLUDED
 #define TOOL_INCLUDED
 
+// TnzTools includes
+#include "tools/inputstate.h"
+#include "tools/track.h"
+#include "tools/toolviewer.h"
+
 // TnzLib includes
 #include "toonz/tstageobjectid.h"
 #include "toonz/txsheet.h"
 #include "toonz/imagepainter.h"
 #include "toonz/tapplication.h"
-#include "tools/cursors.h"
 
 // TnzCore includes
 #include "tcommon.h"
@@ -33,8 +37,8 @@
 
 //    Forward Declarations
 
+class TInputManager;
 class TToolParam;
-class TMouseEvent;
 class TStroke;
 class TImage;
 class TPropertyGroup;
@@ -254,8 +258,6 @@ to isolate commands
 
 class DVAPI TTool {
 public:
-  class Viewer;
-
   typedef TApplication Application;
 
 public:
@@ -283,8 +285,10 @@ public:
 
     EmptyTarget = 0x80,  //!< Will work on empty cells/columns
 
+    MetaImage = 0x100,  //!< Will work on mets images
+
     CommonImages = VectorImage | ToonzImage | RasterImage,
-    AllImages    = CommonImages | MeshImage,
+    AllImages    = CommonImages | MeshImage | MetaImage,
     Vectors      = VectorImage | Splines,
 
     CommonLevels = CommonImages | LevelColumns,
@@ -292,6 +296,20 @@ public:
 
     AllTargets = 0xffffffff,
   };
+
+  enum ToolModifier  //!<  Set of modifiers which can be applied to user input
+                     //! for this tool
+  { NoModifiers      = 0x0,
+    ModifierTangents = 0x1,  //!< If enabled then 'segmentation' will do spline
+                             //! interpolation instead of linear
+    ModifierAssistants =
+        0x2,  //!< Show and snable assistants, see also: isAssistantsEnabled()
+    ModifierCustom =
+        0x4,  //!< Enable other modifiers, see also: isCustomModifiersEnabled()
+    ModifierSegmentation =
+        0x8,  //!< Enable interpolation, see also: getInterpolationStep()
+  };
+  typedef long long ToolModifiers;
 
 public:
   static TTool *getTool(std::string toolName, ToolTargetType targetType);
@@ -316,8 +334,8 @@ public:
       bool toBeModified,
       int subsampling = 0);  //!< Returns the image to be edited by the tool.
 
-  static TImage *touchImage();  //!< Returns a pointer to the actual image - the
-                                //!  one of the frame that has been selected.
+  TImage *touchImage();  //!< Returns a pointer to the actual image - the
+                         //!  one of the frame that has been selected.
 
   /*! \details      This function is necessary since tools are created before
 the main
@@ -337,10 +355,23 @@ public:
   TTool(std::string toolName);
   virtual ~TTool() {}
 
+  std::string getName() const { return m_name; }
   virtual ToolType getToolType() const = 0;
   ToolTargetType getTargetType() const { return (ToolTargetType)m_targetType; }
 
-  std::string getName() const { return m_name; }
+  //! See ToolModifiers
+  virtual ToolModifiers getToolModifiers() const { return ModifierAssistants; }
+
+  //! If return false then Assistants will deactivated but visible,
+  //! see ModifierAssistants
+  virtual bool isAssistantsEnabled() const { return false; }
+
+  //! If return false then Custom Modifiers will deactivated but visible,
+  //! see ModifierCustom
+  virtual bool isCustomModifiersEnabled() const { return false; }
+
+  //! Set step for Segmentation Modifier (see ModifierSegmentation)
+  virtual TPointD getInterpolationStep() const { return TPointD(1.0, 1.0); }
 
   /*! \details  The default returns a generic box containing the options
           for property group 0).
@@ -350,11 +381,11 @@ public:
   createOptionsBox();  //!< Factory function returning a newly created
                        //!  GUI options box to be displayed for the tool
 
-  void setViewer(Viewer *viewer) {
+  void setViewer(TToolViewer *viewer) {
     m_viewer = viewer;
     onSetViewer();
   }
-  Viewer *getViewer() const { return m_viewer; }
+  TToolViewer *getViewer() const { return m_viewer; }
 
   double getPixelSize() const;
 
@@ -386,9 +417,63 @@ return true if the method execution can have changed the current tool
   virtual void leftButtonUp(const TPointD &, const TMouseEvent &) {}
   virtual void leftButtonDoubleClick(const TPointD &, const TMouseEvent &) {}
   virtual void rightButtonDown(const TPointD &, const TMouseEvent &) {}
-  virtual bool keyDown(QKeyEvent *) { return false; }
 
-  virtual void onInputText(std::wstring, std::wstring, int, int){};
+  TMouseEvent makeMouseEvent();
+  TMouseEvent makeMouseEvent(const TTrackPoint &point, const TTrack &track);
+
+  virtual bool keyDown(QKeyEvent * /*event*/) { return false; }
+  virtual void onInputText(const std::wstring & /*preedit*/,
+                           const std::wstring & /*commit*/,
+                           int /*replacementStart*/, int /*replacementEnd*/) {}
+
+  virtual bool keyEvent(bool press, TInputState::Key key, QKeyEvent *event,
+                        const TInputManager &manager);
+  virtual void buttonEvent(bool press, TInputState::DeviceId device,
+                           TInputState::Button button,
+                           const TInputManager &manager);
+  virtual void hoverEvent(const TInputManager &manager);
+  virtual void doubleClickEvent(const TInputManager &manager);
+
+  virtual void paintTrackBegin(const TTrackPoint &point, const TTrack &track,
+                               bool firstTrack);
+  virtual void paintTrackMotion(const TTrackPoint &point, const TTrack &track,
+                                bool firstTrack);
+  virtual void paintTrackEnd(const TTrackPoint &point, const TTrack &track,
+                             bool firstTrack);
+
+  /*! paint single track-point at the top painting level */
+  virtual void paintTrackPoint(const TTrackPoint &point, const TTrack &track,
+                               bool firstTrack);
+
+  /*! called before paint first point */
+  virtual void paintBegin() {}
+  /*! create new painting level and return true, or do nothing and return false
+      was:            ------O-------O------
+      become:         ------O-------O------O */
+  virtual bool paintPush() { return false; }
+  /*! paint several track-points at the top painting level
+      was:            ------O-------O------
+      become:         ------O-------O------------ */
+  virtual void paintTracks(const TTrackList &tracks);
+  /*! try to merge single top painting level */
+  virtual int paintApply() { return false; }
+  /*! try to merge N top painting levels and return count of levels that
+     actually merged
+      was:            ------O-------O------O------
+      become (N = 2): ------O--------------------- */
+  virtual int paintApply(int count);
+  /*! reset top level to initial state
+      was:            ------O-------O------O------
+      become:         ------O-------O------O */
+  virtual void paintCancel() {}
+  /*! cancel and pop top painting level */
+  virtual void paintPop() {}
+  /*! cancel and pop N painting levels
+      was:            ------O-------O------O------
+      become (N = 2): ------O------- */
+  virtual void paintPop(int count);
+  /*! called after all tracks finished */
+  virtual void paintEnd() {}
 
   virtual void onSetViewer() {}
 
@@ -419,6 +504,9 @@ return true if the method execution can have changed the current tool
 
   virtual TPropertyGroup *getProperties(int) { return 0; }
 
+  virtual bool onPropertyChanged(std::string propertyName, bool addToUndo) {
+    return onPropertyChanged(propertyName);
+  }
   /*!
           Does the tasks associated to changes in \p propertyName and returns \p
      true;
@@ -547,8 +635,8 @@ public:
 protected:
   std::string m_name;  //!< The tool's name.
 
-  Viewer *m_viewer;  //!< Tool's current viewer.
-  TAffine m_matrix;  //!< World-to-window reference change affine.
+  TToolViewer *m_viewer;  //!< Tool's current viewer.
+  TAffine m_matrix;       //!< World-to-window reference change affine.
 
   int m_targetType;  //!< The tool's image type target.
 
@@ -568,139 +656,6 @@ protected:
   virtual QString disableString() {
     return QString();
   }  //!< Returns a custom reason to disable the tool
-};
-
-//*****************************************************************************************
-//    TTool::Viewer  declaration
-//*****************************************************************************************
-
-/*!
-  \brief    The TTool::Viewer class is the abstract base class that provides an
-  interface for
-            TTool viewer widgets (it is required that such widgets support
-  OpenGL).
-*/
-
-class TTool::Viewer {
-protected:
-  ImagePainter::VisualSettings
-      m_visualSettings;  //!< Settings used by the Viewer to draw scene contents
-
-  int guidedStrokePickMode = 0;
-  int m_guidedFrontStroke  = -1;
-  int m_guidedBackStroke   = -1;
-
-public:
-  Viewer() {}
-  virtual ~Viewer() {}
-
-  const ImagePainter::VisualSettings &visualSettings() const {
-    return m_visualSettings;
-  }
-  ImagePainter::VisualSettings &visualSettings() { return m_visualSettings; }
-
-  virtual double getPixelSize() const = 0;  //!< Returns the length of a pixel
-                                            //!< in current OpenGL coordinates
-
-  virtual void invalidateAll() = 0;    //!< Redraws the entire viewer, passing
-                                       //! through Qt's event system
-  virtual void GLInvalidateAll() = 0;  //!< Redraws the entire viewer, bypassing
-                                       //! Qt's event system
-  virtual void GLInvalidateRect(const TRectD &rect) = 0;  //!< Same as
-                                                          //! GLInvalidateAll(),
-  //! for a specific
-  //! clipping rect
-  virtual void invalidateToolStatus() = 0;  //!< Forces the viewer to update the
-                                            //! perceived status of tools
-  virtual TAffine getViewMatrix() const {
-    return TAffine();
-  }  //!< Gets the viewer's current view affine (ie the transform from
-     //!<  starting to current <I> world view <\I>)
-
-  //! return the column index of the drawing intersecting point \b p
-  //! (window coordinate, pixels, bottom-left origin)
-  virtual int posToColumnIndex(const TPointD &p, double distance,
-                               bool includeInvisible = true) const    = 0;
-  virtual void posToColumnIndexes(const TPointD &p, std::vector<int> &indexes,
-                                  double distance,
-                                  bool includeInvisible = true) const = 0;
-
-  //! return the row of the drawing intersecting point \b p (used with
-  //! onionskins)
-  //! (window coordinate, pixels, bottom-left origin)
-  virtual int posToRow(const TPointD &p, double distance,
-                       bool includeInvisible  = true,
-                       bool currentColumnOnly = false) const = 0;
-
-  //! return pos in pixel, bottom-left origin
-  virtual TPointD worldToPos(const TPointD &worldPos) const = 0;
-
-  //! return the OpenGL nameId of the object intersecting point \b p
-  //! (window coordinate, pixels, bottom-left origin)
-  virtual int pick(const TPointD &point) = 0;
-
-  // note: winPos in pixel, top-left origin;
-  // when no camera movements have been defined then worldPos = 0 at camera
-  // center
-  virtual TPointD winToWorld(const TPointD &winPos) const = 0;
-
-  // delta.x: right panning, pixels; delta.y: down panning, pixels
-  virtual void pan(const TPointD &delta) = 0;
-
-  // center: window coordinates, pixels, bottomleft origin
-  virtual void zoom(const TPointD &center, double scaleFactor) = 0;
-
-  virtual void rotate(const TPointD &center, double angle) = 0;
-  virtual void rotate3D(double dPhi, double dTheta)        = 0;
-  virtual bool is3DView() const                            = 0;
-  virtual bool getIsFlippedX() const                       = 0;
-  virtual bool getIsFlippedY() const                       = 0;
-
-  virtual double projectToZ(const TPointD &delta) = 0;
-
-  virtual TPointD getDpiScale() const = 0;
-  virtual int getVGuideCount()        = 0;
-  virtual int getHGuideCount()        = 0;
-  virtual double getHGuide(int index) = 0;
-  virtual double getVGuide(int index) = 0;
-
-  virtual void
-  resetInputMethod() = 0;  // Intended to call QWidget->resetInputContext()
-
-  virtual void setFocus() = 0;
-
-  /*-- Toolで画面の内外を判断するため --*/
-  virtual TRectD getGeometry() const = 0;
-
-  virtual void bindFBO() {}
-  virtual void releaseFBO() {}
-
-  int getGuidedStrokePickerMode() { return guidedStrokePickMode; }
-  void setGuidedStrokePickerMode(int mode) { guidedStrokePickMode = mode; }
-
-  int getGuidedStrokePickerCursor() {
-    if (guidedStrokePickMode < 0)
-      return ToolCursor::PickPrevCursor;
-    else if (guidedStrokePickMode > 0)
-      return ToolCursor::PickNextCursor;
-    else
-      return ToolCursor::PointingHandCursor;
-  }
-
-  int getGuidedFrontStroke() { return m_guidedFrontStroke; }
-  void setGuidedFrontStroke(int strokeIdx) {
-    m_guidedFrontStroke = strokeIdx;
-    invalidateAll();
-  }
-
-  int getGuidedBackStroke() { return m_guidedBackStroke; }
-  void setGuidedBackStroke(int strokeIdx) {
-    m_guidedBackStroke = strokeIdx;
-    invalidateAll();
-  }
-
-  void getGuidedFrameIdx(int *backIdx, int *frontIdx);
-  void doPickGuideStroke(const TPointD &pos);
 };
 
 #endif

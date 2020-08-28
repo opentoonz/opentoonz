@@ -1,5 +1,4 @@
 
-
 #include "tools/tool.h"
 
 // TnzTools includes
@@ -8,6 +7,7 @@
 #include "tools/cursors.h"
 #include "tools/tooloptions.h"
 #include "tools/toolutils.h"
+#include "tools/inputmanager.h"
 
 // TnzQt includes
 #include "toonzqt/icongenerator.h"
@@ -56,7 +56,7 @@ namespace {
 // Global variables
 
 typedef std::pair<std::string, TTool::ToolTargetType> ToolKey;
-typedef std::map<ToolKey, TTool *> ToolTable;
+typedef std::multimap<ToolKey, TTool *> ToolTable;
 ToolTable *toolTable = 0;
 
 std::set<std::string> *toolNames = 0;
@@ -174,10 +174,46 @@ TTool::TTool(std::string name)
 
 TTool *TTool::getTool(std::string toolName, ToolTargetType targetType) {
   if (!toolTable) return 0;
-  ToolTable::iterator it =
-      toolTable->find(std::make_pair(toolName, targetType));
-  if (it == toolTable->end()) return 0;
-  return it->second;
+
+  // if to this name and target type was assigned more then one tool
+  // then select tool which more compatible with default target type
+
+  int defTarget = 0;
+  switch (Preferences::instance()->getDefLevelType()) {
+  case PLI_XSHLEVEL:
+    defTarget = VectorImage;
+    break;
+  case TZP_XSHLEVEL:
+    defTarget = ToonzImage;
+    break;
+  case OVL_XSHLEVEL:
+    defTarget = RasterImage;
+    break;
+  case META_XSHLEVEL:
+    defTarget = MetaImage;
+    break;
+  default:
+    defTarget = 0;
+    break;
+  }
+
+  bool isDefault = false;
+  int target     = 0;
+  TTool *tool    = 0;
+
+  std::pair<ToolTable::iterator, ToolTable::iterator> range =
+      toolTable->equal_range(std::make_pair(toolName, targetType));
+  for (ToolTable::iterator it = range.first; it != range.second; ++it) {
+    int t  = it->second->getTargetType();
+    bool d = (bool)(t & defTarget);
+    if (!tool || (d && !isDefault) || (d == isDefault && t > target)) {
+      isDefault = d;
+      target    = t;
+      tool      = it->second;
+    }
+  }
+
+  return tool;
 }
 
 //-----------------------------------------------------------------------------
@@ -189,19 +225,19 @@ void TTool::bind(int targetType) {
 
   if (!toolNames) toolNames = new std::set<std::string>();
 
+  ToolTargetType targets[] = {EmptyTarget, ToonzImage, VectorImage,
+                              RasterImage, MeshImage,  MetaImage};
+  int targetsCount = sizeof(targets) / sizeof(*targets);
+
   std::string name = getName();
   if (toolNames->count(name) == 0) {
     toolNames->insert(name);
 
     // Initialize with the dummy tool
-    toolTable->insert(
-        std::make_pair(std::make_pair(name, ToonzImage), &theDummyTool));
-    toolTable->insert(
-        std::make_pair(std::make_pair(name, VectorImage), &theDummyTool));
-    toolTable->insert(
-        std::make_pair(std::make_pair(name, RasterImage), &theDummyTool));
-    toolTable->insert(
-        std::make_pair(std::make_pair(name, MeshImage), &theDummyTool));
+    for (int i = 0; i < targetsCount; ++i)
+      if (!toolTable->count(std::make_pair(name, targets[i])))
+        toolTable->insert(
+            std::make_pair(std::make_pair(name, targets[i]), &theDummyTool));
 
     ToolSelector *toolSelector = new ToolSelector(name);
     CommandManager::instance()->setHandler(
@@ -209,14 +245,9 @@ void TTool::bind(int targetType) {
                           toolSelector, &ToolSelector::selectTool));
   }
 
-  if (targetType & ToonzImage)
-    (*toolTable)[std::make_pair(name, ToonzImage)] = this;
-  if (targetType & VectorImage)
-    (*toolTable)[std::make_pair(name, VectorImage)] = this;
-  if (targetType & RasterImage)
-    (*toolTable)[std::make_pair(name, RasterImage)] = this;
-  if (targetType & MeshImage)
-    (*toolTable)[std::make_pair(name, MeshImage)] = this;
+  for (int i = 0; i < targetsCount; ++i)
+    if (targetType & targets[i])
+      toolTable->insert(std::make_pair(std::make_pair(name, targets[i]), this));
 }
 
 //-----------------------------------------------------------------------------
@@ -502,11 +533,35 @@ TImage *TTool::touchImage() {
 
   // - - - - empty column case starts here - - - -
   // autoCreate is enabled: we must create a new level
+  
   int levelType    = pref->getDefLevelType();
+  int toolLevelType = UNKNOWN_XSHLEVEL;
+  bool found        = false;
+
+  if (m_targetType & MetaImage) {
+    toolLevelType = META_XSHLEVEL;
+    found         = found || toolLevelType == levelType;
+  }
+  if (m_targetType & RasterImage) {
+    toolLevelType = OVL_XSHLEVEL;
+    found         = found || toolLevelType == levelType;
+  }
+  if (m_targetType & ToonzImage) {
+    toolLevelType = TZP_XSHLEVEL;
+    found         = found || toolLevelType == levelType;
+  }
+  if (m_targetType & VectorImage) {
+    toolLevelType = PLI_XSHLEVEL;
+    found         = found || toolLevelType == levelType;
+  }
+
+  if (toolLevelType == UNKNOWN_XSHLEVEL) return 0;
+  if (!found) levelType = toolLevelType;
+
   TXshLevel *xl    = scene->createNewLevel(levelType);
   sl               = xl->getSimpleLevel();
   m_isLevelCreated = true;
-
+  
   // create the drawing
   TFrameId fid = animationSheetEnabled ? getNewFrameId(sl, row) : TFrameId(1);
   TImageP img  = sl->createEmptyFrame();
@@ -556,6 +611,187 @@ int TTool::pick(const TPointD &p) {
   m_picking = false;
 
   return ret;
+}
+
+//-----------------------------------------------------------------------------
+
+TMouseEvent TTool::makeMouseEvent() {
+  TToolViewer *viewer    = getViewer();
+  TInputManager *manager = viewer ? viewer->getInputManager() : 0;
+
+  TPointD point = manager && !manager->getOutputHovers().empty()
+                      ? manager->getOutputHovers().front()
+                      : TPointD();
+  TPointD pos      = manager ? manager->toolToScreen() * point : point;
+  TDimensionI size = viewer ? viewer->getWindowSize() : TDimensionI();
+  TPointD center(0.5 * (double)size.lx, 0.5 * (double)size.ly);
+
+  TMouseEvent e;
+  e.m_pos = pos + center;
+  if (manager) {
+    e.setModifiers(manager->state.isKeyPressed(TKey::shift),
+                   manager->state.isKeyPressed(TKey::alt),
+                   manager->state.isKeyPressed(TKey::control));
+    if (manager->state.isButtonPressedAny(Qt::LeftButton))
+      e.m_buttons |= Qt::LeftButton;
+    if (manager->state.isButtonPressedAny(Qt::RightButton))
+      e.m_buttons |= Qt::RightButton;
+    if (manager->state.isButtonPressedAny(Qt::MidButton))
+      e.m_buttons |= Qt::MidButton;
+    if (manager->state.isButtonPressedAny(Qt::BackButton))
+      e.m_buttons |= Qt::BackButton;
+    if (manager->state.isButtonPressedAny(Qt::ForwardButton))
+      e.m_buttons |= Qt::ForwardButton;
+    if (manager->state.isButtonPressedAny(Qt::TaskButton))
+      e.m_buttons |= Qt::TaskButton;
+  }
+  e.m_mousePos = QPointF(pos.x + center.x, center.y - pos.y);
+  return e;
+}
+
+//-----------------------------------------------------------------------------
+
+TMouseEvent TTool::makeMouseEvent(const TTrackPoint &point,
+                                  const TTrack &track) {
+  TToolViewer *viewer    = getViewer();
+  TInputManager *manager = viewer ? viewer->getInputManager() : 0;
+
+  TDimensionI size = viewer ? viewer->getWindowSize() : TDimensionI();
+  TPointD center(0.5 * (double)size.lx, 0.5 * (double)size.ly);
+
+  TInputState::KeyState::Holder keyState = track.getKeyState(point.time);
+  TInputState::ButtonState::Holder buttonState =
+      track.getButtonState(point.time);
+
+  TMouseEvent e;
+  e.m_pos      = point.screenPosition + center;
+  e.m_pressure = track.hasPressure ? point.pressure : 1.0;
+  e.setModifiers(keyState.isPressed(TKey::shift), keyState.isPressed(TKey::alt),
+                 keyState.isPressed(TKey::control));
+  if (buttonState.isPressed(Qt::LeftButton)) e.m_buttons |= Qt::LeftButton;
+  if (buttonState.isPressed(Qt::RightButton)) e.m_buttons |= Qt::RightButton;
+  if (buttonState.isPressed(Qt::MidButton)) e.m_buttons |= Qt::MidButton;
+  if (buttonState.isPressed(Qt::BackButton)) e.m_buttons |= Qt::BackButton;
+  if (buttonState.isPressed(Qt::ForwardButton))
+    e.m_buttons |= Qt::ForwardButton;
+  if (buttonState.isPressed(Qt::TaskButton)) e.m_buttons |= Qt::TaskButton;
+  e.m_mousePos = QPointF(point.screenPosition.x + center.x,
+                         center.y - point.screenPosition.y);
+  e.m_isTablet = track.hasPressure;
+  return e;
+}
+
+//-----------------------------------------------------------------------------
+
+bool TTool::keyEvent(bool press, TInputState::Key key, QKeyEvent *event,
+                     const TInputManager &manager) {
+  if (press && !key.isModifier()) return keyDown(event);
+  return false;
+}
+
+//-----------------------------------------------------------------------------
+
+void TTool::buttonEvent(bool press, TInputState::DeviceId device,
+                        TInputState::Button button,
+                        const TInputManager &manager) {
+  if (press && button == Qt::RightButton &&
+      !manager.getOutputHovers().empty()) {
+    TMouseEvent e = makeMouseEvent();
+    e.m_button    = Qt::RightButton;
+    rightButtonDown(manager.getOutputHovers().front(), e);
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+void TTool::hoverEvent(const TInputManager &manager) {
+  if (!manager.getOutputHovers().empty())
+    mouseMove(manager.getOutputHovers().front(), makeMouseEvent());
+}
+
+//-----------------------------------------------------------------------------
+
+void TTool::doubleClickEvent(const TInputManager &manager) {
+  if (!manager.getOutputHovers().empty())
+    leftButtonDoubleClick(manager.getOutputHovers().front(), makeMouseEvent());
+}
+
+//-----------------------------------------------------------------------------
+
+void TTool::paintTrackBegin(const TTrackPoint &point, const TTrack &track,
+                            bool firstTrack) {
+  if (firstTrack) leftButtonDown(point.position, makeMouseEvent(point, track));
+}
+
+//-----------------------------------------------------------------------------
+
+void TTool::paintTrackMotion(const TTrackPoint &point, const TTrack &track,
+                             bool firstTrack) {
+  if (firstTrack) leftButtonDrag(point.position, makeMouseEvent(point, track));
+}
+
+//-----------------------------------------------------------------------------
+
+void TTool::paintTrackEnd(const TTrackPoint &point, const TTrack &track,
+                          bool firstTrack) {
+  if (firstTrack) leftButtonUp(point.position, makeMouseEvent(point, track));
+}
+
+//-----------------------------------------------------------------------------
+
+void TTool::paintTrackPoint(const TTrackPoint &point, const TTrack &track,
+                            bool firstTrack) {
+  if (track.pointsAdded == track.size())
+    paintTrackBegin(point, track, firstTrack);
+  else if (point.final)
+    paintTrackEnd(point, track, firstTrack);
+  else
+    paintTrackMotion(point, track, firstTrack);
+}
+
+//-----------------------------------------------------------------------------
+
+void TTool::paintTracks(const TTrackList &tracks) {
+  // paint track points in chronological order
+  while (true) {
+    TTrackP track;
+    TTimerTicks minTicks = 0;
+    double minTimeOffset = 0.0;
+    for (TTrackList::const_iterator i = tracks.begin(); i != tracks.end();
+         ++i) {
+      const TTrack &t = **i;
+      if (t.pointsAdded > 0) {
+        TTimerTicks ticks = t.ticks();
+        double timeOffset = t.timeOffset() + t.current().time;
+        if (!track ||
+            (ticks - minTicks) * TToolTimer::frequency + timeOffset -
+                    minTimeOffset <
+                0.0) {
+          track         = *i;
+          minTicks      = ticks;
+          minTimeOffset = timeOffset;
+        }
+      }
+    }
+    if (!track) break;
+    paintTrackPoint(track->current(), *track, track == tracks.front());
+    --track->pointsAdded;
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+int TTool::paintApply(int count) {
+  if (count <= 0) return 0;
+  for (int i = 0; i < count; ++i)
+    if (!paintApply()) return i;
+  return count;
+}
+
+//-----------------------------------------------------------------------------
+
+void TTool::paintPop(int count) {
+  for (int i = 0; i < count; ++i) paintPop();
 }
 
 //-----------------------------------------------------------------------------
@@ -1010,6 +1246,10 @@ QString TTool::updateEnabled(int rowIndex, int columnIndex) {
         return (
             enable(false),
             QObject::tr("The current tool cannot be used on a Mesh Level."));
+
+      if ((levelType == META_XSHLEVEL) && !(targetType & MetaImage))
+        return (enable(false), QObject::tr("The current tool cannot be used on "
+                                           "a Assistants (Meta) Level."));
     }
 
     // Check against impossibly traceable movements on the column
@@ -1067,15 +1307,15 @@ void TTool::setSelectedFrames(const std::set<TFrameId> &selectedFrames) {
 
 //-------------------------------------------------------------------------------------------------------------
 
-void TTool::Viewer::getGuidedFrameIdx(int *backIdx, int *frontIdx) {
+void TToolViewer::getGuidedFrameIdx(int *backIdx, int *frontIdx) {
   if (!Preferences::instance()->isGuidedDrawingEnabled()) return;
 
   OnionSkinMask osMask =
-      m_application->getCurrentOnionSkin()->getOnionSkinMask();
+      TTool::getApplication()->getCurrentOnionSkin()->getOnionSkinMask();
 
   if (!osMask.isEnabled() || osMask.isEmpty()) return;
 
-  TFrameHandle *currentFrame = getApplication()->getCurrentFrame();
+  TFrameHandle *currentFrame = TTool::getApplication()->getCurrentFrame();
 
   int cidx     = currentFrame->getFrameIndex();
   int mosBack  = 0;
@@ -1146,7 +1386,7 @@ void TTool::Viewer::getGuidedFrameIdx(int *backIdx, int *frontIdx) {
 
 //-------------------------------------------------------------------------------------------------------------
 
-void TTool::Viewer::doPickGuideStroke(const TPointD &pos) {
+void TToolViewer::doPickGuideStroke(const TPointD &pos) {
   int pickerMode = getGuidedStrokePickerMode();
 
   if (!pickerMode) return;
@@ -1165,14 +1405,14 @@ void TTool::Viewer::doPickGuideStroke(const TPointD &pos) {
     os = osFront;
 
   TFrameId fid;
-  TFrameHandle *currentFrame = getApplication()->getCurrentFrame();
+  TFrameHandle *currentFrame = TTool::getApplication()->getCurrentFrame();
   TXshSimpleLevel *sl =
-      getApplication()->getCurrentLevel()->getLevel()->getSimpleLevel();
+      TTool::getApplication()->getCurrentLevel()->getLevel()->getSimpleLevel();
   if (!sl) return;
 
   if (currentFrame->isEditingScene()) {
-    TXsheet *xsh = getApplication()->getCurrentXsheet()->getXsheet();
-    int col      = getApplication()->getCurrentColumn()->getColumnIndex();
+    TXsheet *xsh = TTool::getApplication()->getCurrentXsheet()->getXsheet();
+    int col      = TTool::getApplication()->getCurrentColumn()->getColumnIndex();
     if (xsh && col >= 0) {
       TXshCell cell            = xsh->getCell(os, col);
       if (!cell.isEmpty()) fid = cell.getFrameId();

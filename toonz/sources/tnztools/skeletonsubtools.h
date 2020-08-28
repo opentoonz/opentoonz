@@ -112,7 +112,7 @@ public:
 //---------------------------------------------------------
 
 class ParentChangeTool final : public DragTool {
-  TTool::Viewer *m_viewer;
+  TToolViewer *m_viewer;
   TPointD m_firstWinPos;
   TPointD m_lastPos, m_lastPos2;
   TPointD m_center;
@@ -142,7 +142,7 @@ class ParentChangeTool final : public DragTool {
   double m_pixelSize;
 
 public:
-  ParentChangeTool(SkeletonTool *tool, TTool::Viewer *viewer);
+  ParentChangeTool(SkeletonTool *tool, TToolViewer *viewer);
 
   void leftButtonDown(const TPointD &pos, const TMouseEvent &e) override;
   void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) override;
@@ -156,7 +156,7 @@ public:
 class IKToolUndo;
 
 class IKTool final : public DragTool {
-  TTool::Viewer *m_viewer;
+  TToolViewer *m_viewer;
   TPointD m_pos;
   Skeleton *m_skeleton;
   int m_columnIndex;
@@ -192,7 +192,7 @@ class IKTool final : public DragTool {
   bool isParentOf(int columnIndex, int childColumnIndex) const;
 
 public:
-  IKTool(SkeletonTool *tool, TTool::Viewer *viewer, Skeleton *skeleton,
+  IKTool(SkeletonTool *tool, TToolViewer *viewer, Skeleton *skeleton,
          int columnIndex);
   ~IKTool();
 

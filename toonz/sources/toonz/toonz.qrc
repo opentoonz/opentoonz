@@ -293,6 +293,8 @@
         <file>Resources/toggle_audibility_click.png</file>
         <file>Resources/toggle_audibility_over.png</file>
         <file>Resources/toggle_lock.png</file>
+        <file>Resources/tool_assistant.svg</file>
+        <file>Resources/tool_assistant_rollover.svg</file>
         <file>Resources/toolbar_arrow.svg</file>
         <file>Resources/touch.svg</file>
         <file>Resources/tracker.svg</file>

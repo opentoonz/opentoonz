@@ -467,7 +467,7 @@ bool SequenceConverter::calculateCPs(unsigned int i, unsigned int j,
 
   // Build TAffine M
   double par = ellProd(x, y) / 5;
-  M          = TAffine(ellProd(x, x) / 3, par, 0, par, ellProd(y, y) / 3, 0);
+  M = TAffine(TPointD(ellProd(x, x) / 3, par), TPointD(par, ellProd(y, y) / 3));
 
   // Costruisco il termine noto b:
   // Calculate polygonal integrals

@@ -57,6 +57,8 @@ public:
       : m_frame(f), m_letter(c), m_zeroPadding(p), m_startSeqInd('.') {}
   TFrameId(int f, char c, int p, char s)
       : m_frame(f), m_letter(c), m_zeroPadding(p), m_startSeqInd(s) {}
+  explicit TFrameId(const std::string &str, char s = '.');
+  explicit TFrameId(const std::wstring &wstr, char s = '.');
 
   inline bool operator==(const TFrameId &f) const {
     return f.m_frame == m_frame && f.m_letter == m_letter;
@@ -274,18 +276,6 @@ type is a string that indicate the filename extension(ex:. bmp or .bmp)*/
 
   // '/a/b/c.txt' => head='a' tail='b/c.txt'
   void split(std::wstring &head, TFilePath &tail) const;
-};
-
-//-----------------------------------------------------------------------------
-
-class TMalformedFrameException final : public TException {
-public:
-  TMalformedFrameException(const TFilePath &fp,
-                           const std::wstring &msg = std::wstring())
-      : TException(fp.getWideName() + L":" + msg) {}
-
-private:
-  TMalformedFrameException();
 };
 
 //-----------------------------------------------------------------------------

@@ -50,9 +50,9 @@ class Raster32PMyPaintSurface::Internal
 public:
   typedef SurfaceCustom Parent;
   Internal(Raster32PMyPaintSurface &owner)
-      : SurfaceCustom(owner.m_ras->pixels(), owner.m_ras->getLx(),
-                      owner.m_ras->getLy(), owner.m_ras->getPixelSize(),
-                      owner.m_ras->getRowSize(), &owner) {}
+      : SurfaceCustom(owner.ras->pixels(), owner.ras->getLx(),
+                      owner.ras->getLy(), owner.ras->getPixelSize(),
+                      owner.ras->getRowSize(), &owner) {}
 };
 
 //=======================================================
@@ -62,14 +62,14 @@ public:
 //=======================================================
 
 Raster32PMyPaintSurface::Raster32PMyPaintSurface(const TRaster32P &ras)
-    : m_ras(ras), controller(), internal() {
+    : ras(ras), controller(), internal() {
   assert(ras);
   internal = new Internal(*this);
 }
 
 Raster32PMyPaintSurface::Raster32PMyPaintSurface(const TRaster32P &ras,
                                                  RasterController &controller)
-    : m_ras(ras), controller(&controller), internal() {
+    : ras(ras), controller(&controller), internal() {
   assert(ras);
   internal = new Internal(*this);
 }
@@ -102,14 +102,17 @@ void Raster32PMyPaintSurface::setAntialiasing(bool value) {
 
 MyPaintToonzBrush::MyPaintToonzBrush(const TRaster32P &ras,
                                      RasterController &controller,
-                                     const mypaint::Brush &brush)
-    : m_ras(ras)
-    , m_mypaintSurface(m_ras, controller)
+                                     const mypaint::Brush &brush,
+                                     bool interpolation)
+    : ras(ras)
+    , mypaintSurface(ras, controller)
     , brush(brush)
-    , reset(true) {
+    , interpolation(interpolation)
+    , reset(true)
+{
   // read brush antialiasing settings
   float aa = this->brush.getBaseValue(MYPAINT_BRUSH_SETTING_ANTI_ALIASING);
-  m_mypaintSurface.setAntialiasing(aa > 0.5f);
+  mypaintSurface.setAntialiasing(aa > 0.5f);
 
   // reset brush antialiasing to zero to avoid radius and hardness correction
   this->brush.setBaseValue(MYPAINT_BRUSH_SETTING_ANTI_ALIASING, 0.f);
@@ -126,70 +129,115 @@ void MyPaintToonzBrush::beginStroke() {
 
 void MyPaintToonzBrush::endStroke() {
   if (!reset) {
-    strokeTo(TPointD(current.x, current.y), current.pressure, 0.f);
+    if (interpolation)
+      strokeTo(
+        TPointD(current.x, current.y),
+        current.pressure,
+        TPointD(current.tilt_x, current.tilt_y),
+        0.0 );
     beginStroke();
   }
 }
 
-void MyPaintToonzBrush::strokeTo(const TPointD &point, double pressure,
-                                 double dtime) {
-  Params next(point.x, point.y, pressure, 0.0);
+void MyPaintToonzBrush::strokeTo(const Params &p, double prevtime) {
+  brush.strokeTo(
+    mypaintSurface,
+    p.x, p.y,
+    std::max(0.0, p.pressure),
+    p.tilt_x, p.tilt_y,
+    std::max(0.0, p.time - prevtime) );
+}
 
-  if (reset) {
-    current  = next;
-    previous = current;
-    reset    = false;
-    // we need to jump to initial point (heuristic)
-    brush.setState(MYPAINT_BRUSH_STATE_X, current.x);
-    brush.setState(MYPAINT_BRUSH_STATE_Y, current.y);
-    brush.setState(MYPAINT_BRUSH_STATE_ACTUAL_X, current.x);
-    brush.setState(MYPAINT_BRUSH_STATE_ACTUAL_Y, current.y);
-    return;
-  } else {
-    next.time = current.time + dtime;
-  }
-
+void MyPaintToonzBrush::strokeBezierSegment(const Params &p0, const Params &p1,
+                                            const Params &p2, const Params &p3, int level)
+{
   // accuracy
-  const double threshold    = 1.0;
-  const double thresholdSqr = threshold * threshold;
-  const int maxLevel        = 16;
+  const double threshold = 1.0;
+  const double thresholdSqr = threshold*threshold;
+  
+  // use 'not greater' inversion handle NaNs immediatelly without subdivisions
+  if (level <= 0 || !((p3.x-p0.x)*(p3.x-p0.x) + (p3.y-p0.y)*(p3.y-p0.y) > thresholdSqr)) {
+    // stroke immediatelly
+    strokeTo(p3, p0.time);
+    return;
+  }
+  
+  // make subdivisions
+  Params pp0 = (p0 + p1)/2;
+  Params pp1 = (p1 + p2)/2;
+  Params pp2 = (p2 + p3)/2;
+  Params ppp0 = (pp0 + pp1)/2;
+  Params ppp1 = (pp1 + pp2)/2;
+  Params pppp = (ppp0 + ppp1)/2;
+  
+  strokeBezierSegment(p0, pp0, ppp0, pppp, level - 1);
+  strokeBezierSegment(pppp, ppp1, pp2, p3, level - 1);
+}
 
-  // set initial segment
-  Segment stack[maxLevel + 1];
-  Params p0;
-  Segment *segment    = stack;
-  Segment *maxSegment = segment + maxLevel;
-  p0.setMedian(previous, current);
-  segment->p1 = current;
-  segment->p2.setMedian(current, next);
 
-  // process
-  while (true) {
-    double dx = segment->p2.x - p0.x;
-    double dy = segment->p2.y - p0.y;
-    if (dx * dx + dy * dy > thresholdSqr && segment != maxSegment) {
-      Segment *sub = segment + 1;
-      sub->p1.setMedian(p0, segment->p1);
-      segment->p1.setMedian(segment->p1, segment->p2);
-      sub->p2.setMedian(sub->p1, segment->p1);
-      segment = sub;
-    } else {
-      brush.strokeTo(m_mypaintSurface, segment->p2.x, segment->p2.y,
-                     segment->p2.pressure, 0.f, 0.f,
-                     segment->p2.time - p0.time);
-      if (segment == stack) break;
-      p0 = segment->p2;
-      --segment;
-    }
+void MyPaintToonzBrush::strokeTo(const TPointD &position, double pressure,
+                                 const TPointD &tilt, double dtime)
+{
+  Params next(position.x, position.y, pressure, tilt.x, tilt.y, 0.0);
+  
+  if (reset) {
+    prevprev = prev = current = next;
+    reset = false;
+    // we need to jump to initial point (heuristic)
+    brush.setState(MYPAINT_BRUSH_STATE_X, position.x);
+    brush.setState(MYPAINT_BRUSH_STATE_Y, position.y);
+    brush.setState(MYPAINT_BRUSH_STATE_ACTUAL_X, position.x);
+    brush.setState(MYPAINT_BRUSH_STATE_ACTUAL_Y, position.y);
+    return;
   }
 
-  // keep parameters for future interpolation
-  previous = current;
-  current  = next;
+  if (interpolation) {
+    next.time = current.time + dtime;
 
-  // shift time
-  previous.time = 0.0;
-  current.time  = dtime;
+    // make hermite spline
+    const Params pp = prevprev;
+    const Params p0 = prev;
+    const Params p1 = current;
+    const Params pn = next;
+    Params t0 = (p1 - pp)/2;
+    Params t1 = (pn - p0)/2;
+    
+    // clamp tangents
+    for(int i = 2; i < Params::Count; ++i) { // do not clamp first two (x and y)
+      double dp = p0[i] - pp[i];
+      double dc = p1[i] - p0[i];
+      double dn = pn[i] - p1[i];
+
+      t0[i] = dp > 0 ? std::max(0.0, std::min(dp, t0[i]))
+                     : std::min(0.0, std::max(dp, t0[i]));
+      t0[i] = dc > 0 ? std::max(0.0, std::min(dc, t0[i]))
+                     : std::min(0.0, std::max(dc, t0[i]));
+      t1[i] = dc > 0 ? std::max(0.0, std::min(dc, t1[i]))
+                     : std::min(0.0, std::max(dc, t1[i]));
+      t1[i] = dn > 0 ? std::max(0.0, std::min(dn, t1[i]))
+                     : std::min(0.0, std::max(dn, t1[i]));
+    }
+    
+    // make bezier spline
+    const Params pp0 = p0 + t0/3;
+    const Params pp1 = p1 - t1/3;
+    
+    // stroke
+    strokeBezierSegment(p0, pp0, pp1, p1, 16);
+    
+    // keep parameters for future interpolation
+    prevprev = prev;
+    prev = current;
+    current = next;
+
+    // shift time
+    prev.time -= prevprev.time;
+    current.time -= prevprev.time;
+    prevprev.time = 0.0;
+  } else {
+    next.time = dtime;
+    strokeTo(next, 0.0);
+  }
 }
 
 //----------------------------------------------------------------------------------
@@ -204,6 +252,5 @@ void MyPaintToonzBrush::updateDrawing(const TRasterCM32P rasCM,
   if (targetRect.isEmpty()) return;
 
   rasCM->copy(rasBackupCM->extract(targetRect), targetRect.getP00());
-  putOnRasterCM(rasCM->extract(targetRect), m_ras->extract(targetRect),
-                styleId);
+  putOnRasterCM(rasCM->extract(targetRect), ras->extract(targetRect), styleId);
 }

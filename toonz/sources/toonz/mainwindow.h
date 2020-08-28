@@ -198,6 +198,7 @@ public:
   void onNewToonzRasterLevelButtonPressed();
   void onNewRasterLevelButtonPressed();
   void clearCacheFolder();
+  void onNewAssistantLevelButtonPressed();
 
   QString getLayoutName() { return m_layoutName; }
 

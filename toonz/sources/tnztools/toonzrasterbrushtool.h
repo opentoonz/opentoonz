@@ -18,6 +18,8 @@
 #include <QRadialGradient>
 #include <QElapsedTimer>
 
+#include <deque>
+
 //--------------------------------------------------------------
 
 //  Forward declarations
@@ -46,6 +48,7 @@ struct BrushData final : public TPersist {
   int m_drawOrder;
   double m_modifierSize, m_modifierOpacity;
   bool m_modifierEraser, m_modifierLockAlpha;
+  bool m_assistants;
 
   BrushData();
   BrushData(const std::wstring &name);
@@ -78,37 +81,89 @@ public:
 };
 
 //************************************************************************
+//    Box Smooth Queue template
+//    Buffer for sequential box shooth.
+//************************************************************************
+
+template<typename T>
+class BoxSmoothQueueT {
+public:
+  typedef T value_type;
+    
+private:
+  int size;
+  double d;
+  value_type total;
+  std::deque<value_type> queue;
+  
+public:
+  BoxSmoothQueueT *sub_queue;
+  std::vector<value_type> result;
+
+  explicit BoxSmoothQueueT(): size(), sub_queue(), d(), total() { }
+  
+  void set_size(int size, bool recursive = true) {
+    flush(false);
+    if (size < 0) size = 0;
+    this->size = size;
+    d = size ? 1.0/size : 0.0;
+    result.reserve(size);
+    if (recursive && sub_queue)
+      sub_queue->set_size(size, true);
+  }
+
+  void flush(bool recursive = true) {
+    if (!queue.empty()) {
+      value_type point = queue.back();
+      for(int i = 0; i < size; ++i)
+        push(point);
+      queue.clear();
+      total = value_type();
+    }
+    if (recursive && sub_queue)
+      sub_queue->flush(true);
+  }
+
+  void push(const value_type &point) {
+    if (queue.empty()) {
+      total = point*size;
+      queue.resize(size, point);
+      if (sub_queue) sub_queue->push(point); else result.push_back(point);
+      return;
+    }
+    
+    total -= queue.front();
+    total += point;
+    queue.pop_front();
+    queue.push_back(point);
+    if (sub_queue) sub_queue->push(total*d); else result.push_back(total*d);
+  }
+};
+
+//************************************************************************
 //    Smooth Stroke declaration
 //    Brush stroke smoothing buffer.
 //************************************************************************
+
 class SmoothStroke {
+private:
+  enum { LEVELS = 3 };
+  BoxSmoothQueueT<TThickPoint> queues[LEVELS];
+
 public:
-  SmoothStroke() {}
-  ~SmoothStroke() {}
+  SmoothStroke() { for(int i = 0; i < LEVELS - 1; ++i) queues[i].sub_queue = &queues[i+1]; }
 
   // begin stroke
   // smooth is smooth strength, from 0 to 100
-  void beginStroke(int smooth);
+  void beginStroke(int smooth) { queues[0].set_size(2*smooth + 1); }
   // add stroke point
-  void addPoint(const TThickPoint &point);
+  void addPoint(const TThickPoint &point) { queues[0].push(point); }
   // end stroke
-  void endStroke();
+  void endStroke() { queues[0].flush(); }
   // Get generated stroke points which has been smoothed.
   // Both addPoint() and endStroke() generate new smoothed points.
   // This method will removed generated points
-  void getSmoothPoints(std::vector<TThickPoint> &smoothPoints);
-  // Remove all points - used for straight lines
-  void clearPoints();
-
-private:
-  void generatePoints();
-
-private:
-  int m_smooth;
-  int m_outputIndex;
-  int m_readIndex;
-  std::vector<TThickPoint> m_rawPoints;
-  std::vector<TThickPoint> m_outputPoints;
+  std::vector<TThickPoint>& points() { return queues[LEVELS-1].result; }
 };
 //************************************************************************
 //   Toonz Raster Brush Tool declaration
@@ -124,6 +179,11 @@ public:
   ToonzRasterBrushTool(std::string name, int targetType);
 
   ToolType getToolType() const override { return TTool::LevelWriteTool; }
+  ToolModifiers getToolModifiers() const override {
+    return ModifierTangents | ModifierAssistants | ModifierCustom | ModifierSegmentation;
+  }
+  bool isAssistantsEnabled() const override;
+  bool isCustomModifiersEnabled() const override { return true; }
 
   ToolOptionsBox *createOptionsBox() override;
 
@@ -169,7 +229,7 @@ public:
   bool isMyPaintStyleSelected() { return m_isMyPaintStyleSelected; }
 
 protected:
-  TPropertyGroup m_prop[2];
+  TPropertyGroup m_prop;
 
   TDoublePairProperty m_rasThickness;
   TDoubleProperty m_smooth;
@@ -178,6 +238,7 @@ protected:
   TEnumProperty m_drawOrder;
   TBoolProperty m_pencil;
   TBoolProperty m_pressure;
+  TBoolProperty m_assistants;
   TDoubleProperty m_modifierSize;
 
   RasterStrokeGenerator *m_rasterTrack;

@@ -37,11 +37,12 @@ LocatorPopup::LocatorPopup(QWidget *parent)
 //-----------------------------------------------------------------------------
 
 void LocatorPopup::onChangeViewAff(const TPointD &pos) {
-  TAffine curAff = m_viewer->getSceneMatrix();
-  TAffine newAff(curAff.a11, 0, -pos.x * curAff.a11, 0, curAff.a22,
-                 -pos.y * curAff.a22);
-  m_viewer->setViewMatrix(newAff, 0);
-  m_viewer->setViewMatrix(newAff, 1);
+  TAffine aff = m_viewer->getSceneMatrix();
+  aff.m01 = aff.m10 = 0.0;
+  aff.m20           = -pos.x * aff.m00;
+  aff.m21           = -pos.y * aff.m11;
+  m_viewer->setViewMatrix(aff, 0);
+  m_viewer->setViewMatrix(aff, 1);
   m_viewer->update();
 }
 

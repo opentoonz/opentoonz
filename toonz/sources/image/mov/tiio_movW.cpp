@@ -11,6 +11,12 @@
 #include "../avi/tiio_avi.h"
 #include "trasterimage.h"
 
+// movesettings deps, must be included before QuickTime includes
+#include "texception.h"
+#include "tpropertytype.h"
+#include "tproperty.h"
+
+// following includes may include QuickTime
 #include "tiio_mov.h"
 #include "movsettings.h"
 

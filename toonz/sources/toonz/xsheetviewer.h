@@ -111,6 +111,10 @@ const QColor MeshColumnColor(200, 130, 255);
 const QColor MeshColumnBorderColor(105, 70, 135);
 const QColor SelectedMeshColumnColor(216, 180, 245);
 
+const QColor MetaColumnColor(200, 130, 255);
+const QColor MetaColumnBorderColor(105, 70, 135);
+const QColor SelectedMetaColumnColor(216, 180, 245);
+
 // Empty column
 const QColor EmptyColumnColor(124, 124, 124);
 // Occupied column
@@ -349,6 +353,16 @@ class XsheetViewer final : public QFrame, public SaveLoadQSettings {
   Q_PROPERTY(QColor SelectedSoundColumnColor MEMBER m_selectedSoundColumnColor)
   Q_PROPERTY(QColor SoundColumnHlColor MEMBER m_soundColumnHlColor)
   Q_PROPERTY(QColor SoundColumnTrackColor MEMBER m_soundColumnTrackColor)
+  // Meta column
+  QColor m_metaColumnColor;
+  QColor m_metaColumnBorderColor;
+  QColor m_selectedMetaColumnColor;
+  Q_PROPERTY(
+      QColor MetaColumnColor READ getMetaColumnColor WRITE setMetaColumnColor)
+  Q_PROPERTY(QColor MetaColumnBorderColor READ getMetaColumnBorderColor WRITE
+                 setMetaColumnBorderColor)
+  Q_PROPERTY(QColor SelectedMetaColumnColor READ getSelectedMetaColumnColor
+                 WRITE setSelectedMetaColumnColor)
 
   // for making the column head lighter (255,255,255,50);
   QColor m_columnHeadPastelizer;
@@ -909,6 +923,19 @@ public:
     m_selectedColumnHead = color;
   }
   QColor getSelectedColumnHead() const { return m_selectedColumnHead; }
+  // Meta column
+  void setMetaColumnColor(const QColor &color) { m_metaColumnColor = color; }
+  void setMetaColumnBorderColor(const QColor &color) {
+    m_metaColumnBorderColor = color;
+  }
+  void setSelectedMetaColumnColor(const QColor &color) {
+    m_selectedMetaColumnColor = color;
+  }
+  QColor getMetaColumnColor() const { return m_metaColumnColor; }
+  QColor getMetaColumnBorderColor() const { return m_metaColumnBorderColor; }
+  QColor getSelectedMetaColumnColor() const {
+    return m_selectedMetaColumnColor;
+  }
 
   void getCellTypeAndColors(int &ltype, QColor &cellColor, QColor &sideColor,
                             const TXshCell &cell, bool isSelected = false);

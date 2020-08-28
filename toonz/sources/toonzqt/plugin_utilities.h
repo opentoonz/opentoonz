@@ -31,7 +31,8 @@ inline bool copy_affine(toonz_affine_t *dst, const TAffine &src) {
 }
 
 inline TAffine restore_affine(const toonz_affine_t *src) {
-  return TAffine(src->a11, src->a12, src->a13, src->a21, src->a22, src->a23);
+  return TAffine(TPointD(src->a11, src->a21), TPointD(src->a12, src->a22),
+                 TPointD(src->a13, src->a23));
 }
 }
 }

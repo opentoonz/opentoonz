@@ -3,12 +3,15 @@
 #ifndef PLUGIN_PARAM_VIEW_INTERFACE
 #define PLUGIN_PARAM_VIEW_INTERFACE
 
-#include <vector>
-#include <memory>
-#include <QWidget>
 #include "tfx.h"
 #include "toonz_hostif.h"
-#include "../include/toonzqt/fxsettings.h"
+
+#include <toonzqt/fxsettings.h>
+
+#include <QWidget>
+
+#include <vector>
+#include <memory>
 
 /* 公開ヘッダからは引っ込められた都合上ここで宣言(内部ではまだ使っているので) */
 typedef void *toonz_param_view_handle_t;

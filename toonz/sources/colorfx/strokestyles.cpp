@@ -388,7 +388,7 @@ void TChainStrokeStyle::drawStroke(const TColorFunction *cf, Points &data,
 
     // disegno un anello della catena
     glPushMatrix();
-    TAffine aff(u.x, v.x, pos.x, u.y, v.y, pos.y);
+    TAffine aff(u, v, pos);
     tglMultMatrix(aff);
     glCallList(ringId);
     glPopMatrix();

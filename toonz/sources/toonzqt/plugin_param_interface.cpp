@@ -1,8 +1,10 @@
+
+#include <ttonecurveparam.h>
+#include <toonzqt/fxsettings.h>
+
 #include "plugin_param_interface.h"
 #include "plugin_utilities.h"
 #include "tparamset.h"
-#include "../include/ttonecurveparam.h"
-#include "../include/toonzqt/fxsettings.h"
 #include "plugin_param_traits.h"
 
 /* 公開インターフェイスからは削除 */

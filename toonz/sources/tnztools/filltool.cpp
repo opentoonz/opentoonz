@@ -1985,7 +1985,7 @@ void FillTool::resetMulti() {
 
 //-----------------------------------------------------------------------------
 
-bool FillTool::onPropertyChanged(std::string propertyName) {
+bool FillTool::onPropertyChanged(std::string propertyName, bool addToUndo) {
   /*--- m_rectFill->onPropertyChangedを呼ぶかどうかのフラグ
                   fillType, frameRange, selective,
      colorTypeが変わったときに呼ぶ---*/
@@ -2041,9 +2041,7 @@ bool FillTool::onPropertyChanged(std::string propertyName) {
     rectPropChangedflag = true;
   }
 
-  else if (!m_frameSwitched &&
-           (propertyName == m_maxGapDistance.getName() ||
-            propertyName == m_maxGapDistance.getName() + "withUndo")) {
+  else if (!m_frameSwitched && (propertyName == m_maxGapDistance.getName())) {
     TXshLevel *xl = TTool::getApplication()->getCurrentLevel()->getLevel();
     m_level       = xl ? xl->getSimpleLevel() : 0;
     if (TVectorImageP vi = getImage(true)) {
@@ -2063,8 +2061,7 @@ bool FillTool::onPropertyChanged(std::string propertyName) {
       if (m_level) {
         m_level->setDirtyFlag(true);
         TTool::getApplication()->getCurrentLevel()->notifyLevelChange();
-        if (propertyName == m_maxGapDistance.getName() + "withUndo" &&
-            m_changedGapOriginalValue != -1.0) {
+        if (addToUndo && m_changedGapOriginalValue != -1.0) {
           TUndoManager::manager()->add(new VectorGapSizeChangeUndo(
               m_changedGapOriginalValue, m_maxGapDistance.getValue(),
               m_level.getPointer(), fid, vi, m_oldFillInformation));

@@ -30,5 +30,6 @@
 #define T_Hand "T_Hand"
 #define T_Ruler "T_Ruler"
 #define T_Finger "T_Finger"
+#define T_EditAssistants "T_EditAssistants"
 
 #endif  // TOOL_COMMAND_IDS_H

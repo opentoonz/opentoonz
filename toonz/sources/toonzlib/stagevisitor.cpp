@@ -713,7 +713,7 @@ void RasterPainter::drawRasterImages(QPainter &p, QPolygon cameraPol) {
   rect = rect * TRect(0, 0, m_dim.lx - 1, m_dim.ly - 1);
 
   TRect r = rect - rect.getP00();
-  TAffine flipY(1, 0, 0, 0, -1, m_dim.ly);
+  TAffine flipY(TPointD(1, 0), TPointD(0, -1), TPointD(0, m_dim.ly));
   p.setClipRegion(QRegion(cameraPol));
   for (i = 0; i < (int)m_nodes.size(); i++) {
     if (m_nodes[i].m_onionMode != Node::eOnionSkinNone) continue;

@@ -351,6 +351,8 @@ void SceneViewerPanel::showEvent(QShowEvent *event) {
 
   assert(ret);
 
+  m_sceneViewer->onToolSwitched();
+
   // Aggiorno FPS al valore definito nel viewer corrente.
   // frameHandle->setPreviewFrameRate(m_fpsSlider->value());
   m_flipConsole->setActive(true);

@@ -860,7 +860,7 @@ QPointF SchematicPort::getLinkEndPoint() const { return scenePos() + m_hook; }
 //
 //========================================================
 
-/*! \class SchematicNode schematicnode.h "../inlcude/toonzqt/schematicnode.h"
+/*! \class SchematicNode schematicnode.h <toonzqt/schematicnode.h>
         \brief The class provides methods to draw and handle a node item in the
    SchematicScene.
 */

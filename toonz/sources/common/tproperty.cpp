@@ -51,20 +51,20 @@ TPropertyGroup *TPropertyGroup::clone() const {
 }
 
 void TPropertyGroup::add(TProperty *p) {
-  std::string name = p->getName();
+  const TStringId &name = p->getNameId();
   assert(m_table.find(name) == m_table.end());
   m_properties.push_back(std::make_pair(p, true));
   m_table[name] = p;
 }
 
 void TPropertyGroup::bind(TProperty &p) {
-  std::string name = p.getName();
+  const TStringId &name = p.getNameId();
   assert(m_table.find(name) == m_table.end());
   m_properties.push_back(std::make_pair(&p, false));
   m_table[name] = &p;
 }
 
-TProperty *TPropertyGroup::getProperty(std::string name) {
+TProperty *TPropertyGroup::getProperty(const TStringId &name) {
   PropertyTable::iterator i = m_table.find(name);
   if (i == m_table.end())
     return 0;
