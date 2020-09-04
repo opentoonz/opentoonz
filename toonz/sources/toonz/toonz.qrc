@@ -405,16 +405,16 @@
 		<file>icons/dark/actions/20/palettegizmo.svg</file>
 
 		<!-- Titlebars -->
-		<file>icons/dark/actions/18/pane_table.svg</file>
-		<file>icons/dark/actions/18/pane_safe.svg</file>
-		<file>icons/dark/actions/18/pane_grid.svg</file>
-		<file>icons/dark/actions/18/pane_cam.svg</file>
-		<file>icons/dark/actions/18/pane_freeze.svg</file>
-		<file>icons/dark/actions/18/pane_preview.svg</file>
-		<file>icons/dark/actions/18/pane_subpreview.svg</file>
-		<file>icons/dark/actions/18/pane_3d.svg</file>
-		<file>icons/dark/actions/18/pane_minimize.svg</file>
-		<file>icons/dark/actions/18/pane_close.svg</file>
+		<file>icons/dark/actions/20/pane_table.svg</file>
+		<file>icons/dark/actions/20/pane_safe.svg</file>
+		<file>icons/dark/actions/20/pane_grid.svg</file>
+		<file>icons/dark/actions/20/pane_cam.svg</file>
+		<file>icons/dark/actions/20/pane_freeze.svg</file>
+		<file>icons/dark/actions/20/pane_preview.svg</file>
+		<file>icons/dark/actions/20/pane_subpreview.svg</file>
+		<file>icons/dark/actions/20/pane_3d.svg</file>
+		<file>icons/dark/actions/20/pane_minimize.svg</file>
+		<file>icons/dark/actions/20/pane_close.svg</file>
 
 		<!-- Textstyle -->
 		<file>icons/dark/actions/16/bold.svg</file>

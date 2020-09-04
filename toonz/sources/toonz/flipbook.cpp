@@ -267,7 +267,7 @@ void FlipBook::addFreezeButtonToTitleBar() {
   if (panel) {
     TPanelTitleBar *titleBar = panel->getTitleBar();
     m_freezeButton           = new TPanelTitleBarButton(
-        titleBar, getIconThemePath("actions/18/pane_freeze.svg"));
+        titleBar, getIconThemePath("actions/20/pane_freeze.svg"));
     m_freezeButton->setToolTip("Freeze");
     titleBar->add(QPoint(-64, 0), m_freezeButton);
     connect(m_freezeButton, SIGNAL(toggled(bool)), this, SLOT(freeze(bool)));

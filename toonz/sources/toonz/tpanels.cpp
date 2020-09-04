@@ -862,8 +862,8 @@ public:
     panel->setWidget(toolbar);
     panel->setIsMaximizable(false);
     // panel->setAllowedAreas(Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea);
-    panel->setFixedWidth(40);  // 35
-    toolbar->setFixedWidth(30);
+    panel->setFixedWidth(44);  // 35
+    toolbar->setFixedWidth(34);
     panel->setWindowTitle(QString(""));
   }
 } toolbarFactory;
@@ -961,11 +961,11 @@ void FlipbookPanel::reset() { m_flipbook->reset(); }
 void FlipbookPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
   bool ret      = true;
   int x         = -91;
-  int iconWidth = 18;
+  int iconWidth = 20;
   // safe area button
   TPanelTitleBarButtonForSafeArea *safeAreaButton =
       new TPanelTitleBarButtonForSafeArea(
-          titleBar, getIconThemePath("actions/18/pane_safe.svg"));
+          titleBar, getIconThemePath("actions/20/pane_safe.svg"));
   safeAreaButton->setToolTip(tr("Safe Area (Right Click to Select)"));
   titleBar->add(QPoint(x, 0), safeAreaButton);
   ret = ret && connect(safeAreaButton, SIGNAL(toggled(bool)),
@@ -978,10 +978,10 @@ void FlipbookPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
   safeAreaButton->setPressed(
       CommandManager::instance()->getAction(MI_SafeArea)->isChecked());
 
-  x += 33 + iconWidth;
+  x += 28 + iconWidth;
   // minimize button
   m_button = new TPanelTitleBarButton(
-      titleBar, getIconThemePath("actions/18/pane_minimize.svg"));
+      titleBar, getIconThemePath("actions/20/pane_minimize.svg"));
   m_button->setToolTip(tr("Minimize"));
   m_button->setPressed(false);
 

@@ -4,12 +4,9 @@
     <g transform="matrix(0.818182,0,0,0.818182,1,1)">
         <rect x="0" y="0" width="22" height="22" style="fill:rgb(51,51,51);fill-opacity:0;"/>
     </g>
-    <g transform="matrix(1,0,0,1,1,0)">
-        <g transform="matrix(1,0,0,1,1,0)">
-            <path d="M0,7L0,3L6,3L8,5L16,5L16,7L0,7Z"/>
-        </g>
-        <g transform="matrix(1,0,0,1,2.22045e-16,1)">
-            <path d="M4,16L1,16L1,7L17,7L17,16L14,16L14,10L4,10L4,16ZM11,16L7,16L7,12L11,12L11,16Z"/>
+    <g>
+        <g>
+            <path d="M18,17L15,17L15,11L5,11L5,17L2,17L2,3L8,3L10,5L18,5L18,17ZM12,17L8,17L8,13L12,13L12,17Z"/>
         </g>
     </g>
 </svg>

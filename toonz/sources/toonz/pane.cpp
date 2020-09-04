@@ -453,11 +453,11 @@ void TPanelTitleBar::paintEvent(QPaintEvent *) {
   if (dw->isFloating()) {
     QIcon paneCloseIcon = createQIcon("pane_close");
     const static QPixmap closeButtonPixmap(
-        paneCloseIcon.pixmap(18, 18, QIcon::Normal, QIcon::Off));
+        paneCloseIcon.pixmap(20, 18, QIcon::Normal, QIcon::Off));
     const static QPixmap closeButtonPixmapOver(
-        paneCloseIcon.pixmap(18, 18, QIcon::Active));
+        paneCloseIcon.pixmap(20, 18, QIcon::Active));
 
-    QPoint closeButtonPos(rect.right() - 18, rect.top());
+    QPoint closeButtonPos(rect.right() - 20, rect.top());
 
     if (m_closeButtonHighlighted)
       painter.drawPixmap(closeButtonPos, closeButtonPixmapOver);
@@ -477,7 +477,7 @@ void TPanelTitleBar::mousePressEvent(QMouseEvent *event) {
 
   if (dw->isFloating()) {
     QRect rect = this->rect();
-    QRect closeButtonRect(rect.right() - 18, rect.top() + 1, 18, 18);
+    QRect closeButtonRect(rect.right() - 20, rect.top() + 1, 20, 18);
     if (closeButtonRect.contains(pos) && dw->isFloating()) {
       event->accept();
       dw->hide();
