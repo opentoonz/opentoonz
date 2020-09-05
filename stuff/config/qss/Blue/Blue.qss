@@ -1845,7 +1845,7 @@ ParamFieldKeyToggle {
    Tools Window
 ----------------------------------------------------------------------------- */
 #ToolBar QToolBar {
-  padding-left: 2px;
+  padding-left: 3px;
 }
 #ToolBar QToolButton {
   padding: 1 0 0 1;
