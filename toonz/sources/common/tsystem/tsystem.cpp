@@ -390,8 +390,12 @@ void TSystem::renameFile(const TFilePath &dst, const TFilePath &src,
 
 // gestire gli errori con GetLastError?
 void TSystem::deleteFile(const TFilePath &fp) {
-  if (!QFile::remove(toQString(fp)))
-    throw TSystemException(fp, "can't delete file!");
+  if (TSystem::doesExistFileOrLevel(fp)) {
+    if (fp.getQString().contains("cache")) {
+      QFile::remove(toQString(fp));
+    } else if (!QFile::remove(toQString(fp)))
+      throw TSystemException(fp, "can't delete file!");
+  }
 }
 
 //------------------------------------------------------------
