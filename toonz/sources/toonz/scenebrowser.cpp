@@ -124,12 +124,12 @@ SceneBrowserButtonBar::SceneBrowserButtonBar(DvItemViewer *itemViewer,
   // buttonBar->setIconSize(QSize(10,10));
 
   QIcon newFolderIcon = createQIcon("newfolder");
-  QAction *newFolder  = new QAction(newFolderIcon, tr("Add new scene"), this);
-  newFolder->setIconText(tr("Add scene"));
-  addAction(newFolder);
+  QAction *newScene  = new QAction(newFolderIcon, tr("Add new scene"), this);
+  newScene->setIconText(tr("Add scene"));
+  addAction(newScene);
   //addSeparator();
 
-  connect(newFolder, SIGNAL(triggered()), SIGNAL(newFolder()));
+  connect(newScene, SIGNAL(triggered()), SIGNAL(newScene()));
 }
 
 //=============================================================================
@@ -226,7 +226,7 @@ SceneBrowser::SceneBrowser(QWidget *parent, Qt::WFlags flags, bool noContextMenu
   ret =
       ret && connect(m_itemViewer, SIGNAL(selectedItems(const std::set<int> &)),
                      this, SLOT(onSelectedItems(const std::set<int> &)));
-  ret = ret && connect(buttonBar, SIGNAL(newFolder()), this, SLOT(newFolder()));
+  ret = ret && connect(buttonBar, SIGNAL(newScene()), this, SLOT(newScene()));
 
   ret = ret && connect(&m_frameCountReader, SIGNAL(calculatedFrameCount()),
                        m_itemViewer->getPanel(), SLOT(update()));
@@ -2060,7 +2060,7 @@ void SceneBrowser::refresh() {
 
 //-----------------------------------------------------------------------------
 
-void SceneBrowser::newFolder() {
+void SceneBrowser::newScene() {
   TFilePath parentFolder = getFolder();
   if (parentFolder == TFilePath() || !TFileStatus(parentFolder).isDirectory())
     return;

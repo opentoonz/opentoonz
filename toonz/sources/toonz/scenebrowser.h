@@ -35,7 +35,7 @@ public:
   SceneBrowserButtonBar(DvItemViewer *itemViewer, QWidget *parent = 0);
 
 signals:
-  void newFolder();
+  void newScene();
 };
 //-----------------------------------------------------------------------------
 
@@ -153,7 +153,7 @@ protected slots:
   void onDoubleClickedItem(int index);
   void onSelectedItems(const std::set<int> &indexes);
   void onSceneSwitched();
-  void newFolder();
+  void newScene();
 
   void onBackButtonPushed();
   void onFwdButtonPushed();
