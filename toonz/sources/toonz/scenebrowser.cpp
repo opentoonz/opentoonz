@@ -2062,12 +2062,45 @@ void SceneBrowser::refresh() {
 
 void SceneBrowser::newScene() {
   TFilePath parentFolder = getFolder();
+  std::wstring sceneName;
+  TFilePath scenePath;
+  ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
+  if (scene->isUntitled()) {
+      bool ok;
+      QString sceneNameQstring =
+          QInputDialog::getText(this, tr("Save Scene"), tr("Scene name:"),
+                                QLineEdit::Normal, QString(), &ok);
+      if (!ok || sceneNameQstring == "") return;
+      sceneName = sceneNameQstring.toStdWString();
+    } else
+      sceneName = scene->getSceneName();
+  
+  int i = 0;
+  do {
+    QString number = QStringLiteral("%1").arg(++i, 3, 10, QLatin1Char('0'));
+    scenePath = parentFolder + (sceneName+L"-"+number.toStdWString()+L".tnz");
+  } while (TFileStatus(scenePath).doesExist());
+  
+  //TProjectManager *pm   = TProjectManager::instance();
+  //TFilePath projectPath = pm->projectFolderToProjectPath(getFolder());
+  if (!IoCmd::saveSceneIfNeeded(QObject::tr("Change project"))) return;
+  IoCmd::newScene();
+  //TProjectManager *pm   = TProjectManager::instance();
+  //TProject *projectP =
+  //    TProjectManager::instance()->getCurrentProject().getPointer();
+  //pm->setCurrentProjectPath(projectP->getProjectPath());
+  //printf(projectP->getProjectPath().getQString().toStdString().c_str());
+  printf(scenePath.getQString().toStdString().c_str());
+  printf("\n");
+  IoCmd::saveScene(scenePath, false);
+  return;
+
   if (parentFolder == TFilePath() || !TFileStatus(parentFolder).isDirectory())
     return;
   QString tempName(tr("New Folder"));
   std::wstring folderName = tempName.toStdWString();
   TFilePath folderPath    = parentFolder + folderName;
-  int i                   = 1;
+  //int i                   = 1;
   while (TFileStatus(folderPath).doesExist())
     folderPath = parentFolder + (folderName + L" " + std::to_wstring(++i));
 
