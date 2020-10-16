@@ -2071,12 +2071,9 @@ void SceneBrowser::newScene() {
           QInputDialog::getText(this, tr("Save Scene"), tr("Scene name:"),
                                 QLineEdit::Normal, QString(), &ok);
       if (!ok || sceneName == "") return;
-      //sceneName = sceneNameQstring.toStdWString();
-    } else
+    } else {
       sceneName = QString::fromWCharArray( scene->getSceneName().c_str() );
-  
-  printf("================\n");
-  printf("length: {%d}\n", sceneName.length());
+  }
   QString prefix;
   QString number;
   for(int j = 0; j<sceneName.length(); j++) {
@@ -2089,37 +2086,15 @@ void SceneBrowser::newScene() {
       prefix.truncate(sceneName.length()-j);
       break;
     }
-    //QString str=sceneName.at(sceneName.length()-1-j);
-    //printf("pos: {%d}\n", sceneName.length()-1-j);
-    //std::string utf8_text = str.toUtf8().constData();
-    //printf(utf8_text.c_str());
-    printf("\n");
   }
-  std::string str;
-  str = prefix.toUtf8().constData();
-  printf(str.c_str());
-  printf("\n");
-  str = number.toUtf8().constData();
-  printf(str.c_str());
-  printf("\n");
-  printf("================\n");
   int i = number.toInt();
   do {
     QString number = QStringLiteral("%1").arg(++i, 3, 10, QLatin1Char('0'));
     scenePath = parentFolder + (prefix.toStdWString()+number.toStdWString()+L".tnz");
   } while (TFileStatus(scenePath).doesExist());
   
-  //TProjectManager *pm   = TProjectManager::instance();
-  //TFilePath projectPath = pm->projectFolderToProjectPath(getFolder());
   if (!IoCmd::saveSceneIfNeeded(QObject::tr("Change project"))) return;
   IoCmd::newScene();
-  //TProjectManager *pm   = TProjectManager::instance();
-  //TProject *projectP =
-  //    TProjectManager::instance()->getCurrentProject().getPointer();
-  //pm->setCurrentProjectPath(projectP->getProjectPath());
-  //printf(projectP->getProjectPath().getQString().toStdString().c_str());
-  printf(scenePath.getQString().toStdString().c_str());
-  printf("\n");
   IoCmd::saveScene(scenePath, false);
   return;
 
