@@ -2062,23 +2062,51 @@ void SceneBrowser::refresh() {
 
 void SceneBrowser::newScene() {
   TFilePath parentFolder = getFolder();
-  std::wstring sceneName;
+  QString sceneName;
   TFilePath scenePath;
   ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
   if (scene->isUntitled()) {
       bool ok;
-      QString sceneNameQstring =
+      sceneName =
           QInputDialog::getText(this, tr("Save Scene"), tr("Scene name:"),
                                 QLineEdit::Normal, QString(), &ok);
-      if (!ok || sceneNameQstring == "") return;
-      sceneName = sceneNameQstring.toStdWString();
+      if (!ok || sceneName == "") return;
+      //sceneName = sceneNameQstring.toStdWString();
     } else
-      sceneName = scene->getSceneName();
+      sceneName = QString::fromWCharArray( scene->getSceneName().c_str() );
   
-  int i = 0;
+  printf("================\n");
+  printf("length: {%d}\n", sceneName.length());
+  QString prefix;
+  QString number;
+  for(int j = 0; j<sceneName.length(); j++) {
+    QChar c;
+    c = sceneName.at(sceneName.length()-1-j);
+    if (c.isDigit()) {
+      number = QString(c) + number;
+    } else {
+      prefix = sceneName;
+      prefix.truncate(sceneName.length()-j);
+      break;
+    }
+    //QString str=sceneName.at(sceneName.length()-1-j);
+    //printf("pos: {%d}\n", sceneName.length()-1-j);
+    //std::string utf8_text = str.toUtf8().constData();
+    //printf(utf8_text.c_str());
+    printf("\n");
+  }
+  std::string str;
+  str = prefix.toUtf8().constData();
+  printf(str.c_str());
+  printf("\n");
+  str = number.toUtf8().constData();
+  printf(str.c_str());
+  printf("\n");
+  printf("================\n");
+  int i = number.toInt();
   do {
     QString number = QStringLiteral("%1").arg(++i, 3, 10, QLatin1Char('0'));
-    scenePath = parentFolder + (sceneName+L"-"+number.toStdWString()+L".tnz");
+    scenePath = parentFolder + (prefix.toStdWString()+number.toStdWString()+L".tnz");
   } while (TFileStatus(scenePath).doesExist());
   
   //TProjectManager *pm   = TProjectManager::instance();
