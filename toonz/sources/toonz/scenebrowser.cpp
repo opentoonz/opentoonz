@@ -2093,8 +2093,8 @@ void SceneBrowser::newScene() {
   }
   int i = number.toInt();
   do {
-    QString number = QStringLiteral("%1").arg(++i, number.length(), 10, QLatin1Char('0'));
-    scenePath = parentFolder + (prefix.toStdWString()+number.toStdWString()+L".tnz");
+    QString number_ext = QStringLiteral("%1").arg(++i, number.length(), 10, QLatin1Char('0'));
+    scenePath = parentFolder + (prefix.toStdWString()+number_ext.toStdWString()+L".tnz");
   } while (TFileStatus(scenePath).doesExist());
   
   if (!IoCmd::saveSceneIfNeeded(QObject::tr("Change project"))) return;
