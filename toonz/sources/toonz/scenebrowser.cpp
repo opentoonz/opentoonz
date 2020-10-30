@@ -2087,6 +2087,10 @@ void SceneBrowser::newScene() {
       break;
     }
   }
+  if (number.length()==0) {
+    prefix+="-";
+    number="000";
+  }
   int i = number.toInt();
   do {
     QString number = QStringLiteral("%1").arg(++i, 3, 10, QLatin1Char('0'));
