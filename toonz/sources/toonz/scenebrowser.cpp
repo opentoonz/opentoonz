@@ -2093,7 +2093,7 @@ void SceneBrowser::newScene() {
   }
   int i = number.toInt();
   do {
-    QString number = QStringLiteral("%1").arg(++i, 3, 10, QLatin1Char('0'));
+    QString number = QStringLiteral("%1").arg(++i, number.length(), 10, QLatin1Char('0'));
     scenePath = parentFolder + (prefix.toStdWString()+number.toStdWString()+L".tnz");
   } while (TFileStatus(scenePath).doesExist());
   
