@@ -1411,6 +1411,10 @@ void SceneBrowser::onTreeFolderChanged() {
   DvDirModelFileFolderNode *fileFolderNode =
       dynamic_cast<DvDirModelFileFolderNode *>(node);
   if (fileFolderNode) emit treeFolderChanged(fileFolderNode->getPath());
+
+  // Restore scroll position
+  m_itemViewer->verticalScrollBar()->setValue(m_currentScroll);
+
 }
 
 //-----------------------------------------------------------------------------
@@ -2061,6 +2065,9 @@ void SceneBrowser::refresh() {
 //-----------------------------------------------------------------------------
 
 void SceneBrowser::newScene() {
+
+  m_currentScroll = m_itemViewer->verticalScrollBar()->value();
+
   TFilePath parentFolder = getFolder();
   QString sceneName;
   TFilePath scenePath;

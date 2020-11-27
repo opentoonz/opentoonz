@@ -242,6 +242,7 @@ private:
   // folder history
   QList<QModelIndex> m_indexHistoryList;
   int m_currentPosition;
+  int m_currentScroll;
 
   std::vector<Item> m_items;
   TFilePath m_folder;
