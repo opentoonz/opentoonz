@@ -2095,7 +2095,7 @@ void SceneBrowser::newScene() {
     }
   }
   if (number.length()==0) {
-    prefix+="-";
+    //prefix+="-";
     number="000";
   }
   int i = number.toInt();
