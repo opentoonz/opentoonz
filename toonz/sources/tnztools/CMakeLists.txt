@@ -119,7 +119,7 @@ add_definitions(
 )
 
 if(BUILD_ENV_APPLE)
-    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-install_name,@executable_path/libtnztools.dylib")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-install_name,@rpath/libtnztools.dylib")
     add_dependencies(tnztools tnzcore tnzbase tnzext toonzlib toonzqt)
 endif()
 

@@ -288,7 +288,7 @@ add_definitions(
 )
 
 if(BUILD_ENV_APPLE)
-    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-install_name,@executable_path/libtnzstdfx.dylib")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-install_name,@rpath/libtnzstdfx.dylib")
     add_dependencies(tnzstdfx tnzcore tnzbase toonzlib)
 endif()
 

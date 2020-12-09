@@ -461,11 +461,13 @@ void TSystem::readDirectory_DirItems(QStringList &dst, const TFilePath &path) {
 
 #ifdef _WIN32
   // equivalent to sorting with QDir::LocaleAware
-  auto const strCompare = [](const QString &s1, const QString &s2) {
-    return QString::localeAwareCompare(s1, s2) < 0;
+  struct strCompare {
+    bool operator()(const QString &s1, const QString &s2) const {
+      return QString::localeAwareCompare(s1, s2) < 0;
+    }
   };
 
-  std::set<QString, decltype(strCompare)> entries(strCompare);
+  std::set<QString, strCompare> entries;
 
   WIN32_FIND_DATA find_dir_data;
   QString dir_search_path = dir.absolutePath() + "\\*";

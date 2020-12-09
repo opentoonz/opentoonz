@@ -382,11 +382,7 @@ elseif(BUILD_ENV_APPLE)
     if(GLEW-NOTFOUND)
         pkg_check_modules(GLEW REQUIRED glew)
     endif()
-    if (TARGET GLEW::GLEW)
-      set(GLEW_LIB GLEW::GLEW)
-    else()
-      set(GLEW_LIB ${GLEW_LIBRARIES})
-    endif()
+    set(GLEW_LIB ${GLEW_LIBRARIES})
 
     pkg_check_modules(LZ4_LIB REQUIRED liblz4)
 
