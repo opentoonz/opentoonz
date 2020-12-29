@@ -1147,6 +1147,23 @@ public:
 } browserFactory;
 
 //=============================================================================
+// PreproductionBoardFactory
+//-----------------------------------------------------------------------------
+class PreproductionBoardFactory final : public TPanelFactory {
+public:
+  PreproductionBoardFactory() : TPanelFactory("PreproductionBoard") {}
+  void initialize(TPanel *panel) override {
+    FileBrowser *browser = new FileBrowser(panel, 0, false, true);
+    panel->setWidget(browser);
+    panel->setWindowTitle(QObject::tr("Preproduction Board"));
+    TFilePath scenesFolder =
+        TProjectManager::instance()->getCurrentProject()->getScenesPath();
+    browser->setFolder(scenesFolder, true);
+    browser->enableDoubleClickToOpenScenes();
+  }
+} PreproductionBoardFactory;
+
+//=============================================================================
 // CastViewerFactory
 //-----------------------------------------------------------------------------
 

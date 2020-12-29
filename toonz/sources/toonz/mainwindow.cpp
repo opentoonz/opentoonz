@@ -2236,6 +2236,9 @@ void MainWindow::defineActions() {
   menuAct =
       createMenuWindowsAction(MI_OpenFileBrowser, tr("&File Browser"), "");
   menuAct->setIcon(createQIcon("filebrowser"));
+  menuAct = createMenuWindowsAction(MI_OpenPreproductionBoard, tr("&Preproduction Board"), "");
+  // TODO: Fix icon
+  menuAct->setIcon(createQIcon("filebrowser"));
   menuAct = createMenuWindowsAction(MI_OpenFileViewer, tr("&Flipbook"), "");
   menuAct->setIcon(createQIcon("flipbook"));
   menuAct = createMenuWindowsAction(MI_OpenFunctionEditor,
