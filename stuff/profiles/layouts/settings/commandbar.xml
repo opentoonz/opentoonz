@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <commandbar>
     <command>MI_Undo</command>
     <command>MI_Redo</command>
@@ -14,12 +15,13 @@
     <separator/>
     <command>MI_AddFrames</command>
     <separator/>
-    <command>MI_Group</command>
-    <command>MI_Ungroup</command>
-    <command>MI_EnterGroup</command>
-    <command>MI_ExitGroup</command>
-    <command>MI_BringToFront</command>
-    <command>MI_BringForward</command>
-    <command>MI_SendBackward</command>
+    <command>MI_ShiftTrace</command>
+    <command>MI_EditShift</command>
+    <command>MI_NoShift</command>
+    <command>MI_ResetShift</command>
+    <separator/>
     <command>MI_SendBack</command>
+    <command>MI_SendBackward</command>
+    <command>MI_BringForward</command>
+    <command>MI_BringToFront</command>
 </commandbar>
