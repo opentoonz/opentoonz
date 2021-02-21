@@ -10,10 +10,9 @@
     <command>MI_Paste</command>
     <command>MI_Clear</command>
     <separator/>
-    <command>MI_SelectAll</command>
-    <command>MI_InvertSelection</command>
-    <separator/>
     <command>MI_AddFrames</command>
+    <command>MI_PrevDrawing</command>
+    <command>MI_NextDrawing</command>
     <separator/>
     <command>MI_ShiftTrace</command>
     <command>MI_EditShift</command>
@@ -24,4 +23,8 @@
     <command>MI_SendBackward</command>
     <command>MI_BringForward</command>
     <command>MI_BringToFront</command>
+    <command>MI_Group</command>
+    <command>MI_Ungroup</command>
+    <command>MI_EnterGroup</command>
+    <command>MI_ExitGroup</command>
 </commandbar>
