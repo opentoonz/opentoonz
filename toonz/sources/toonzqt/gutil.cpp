@@ -495,7 +495,9 @@ QIcon createTemporaryIconFromName(const char *commandName) {
 
     painter.end();
 
-    icon.addPixmap(transparentPm);
+    icon.addPixmap(transparentPm, QIcon::Normal, QIcon::Off);
+    icon.addPixmap(transparentPm, QIcon::Active);
+    icon.addPixmap(transparentPm, QIcon::Normal, QIcon::On);
     icon.addPixmap(transparentPm, QIcon::Disabled);
     icon.addPixmap(compositePixmap(pixmap, normalOpacity, pxSize, pxSize,
                                    pixmap.width(), pixmap.height()),
