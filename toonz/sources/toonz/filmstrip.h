@@ -49,9 +49,10 @@ public:
 #endif
   ~FilmstripFrames();
 
-  bool m_isVertical    = true;
-  bool m_showNavigator = true;
-  bool m_showComboBox  = true;
+  bool m_isVertical        = true;
+  bool m_showNavigator     = true;
+  bool m_showComboBox      = true;
+  bool m_showSeparatorLine = false;
 
   void setBGColor(const QColor &color) { m_bgColor = color; }
   QColor getBGColor() const { return m_bgColor; }
@@ -123,12 +124,14 @@ public:
   void setOrientation(bool isVertical);
   void setNavigator(bool showNavigator);
   void setComboBox(bool showComboBox);
+  void setSeparatorLine(bool showSeparatorLine);
 
 signals:
   void orientationToggledSignal(bool);
   void comboBoxToggledSignal();
   void navigatorToggledSignal();
   void levelSelectedSignal(int);
+  void separatorLineToggledSignal();
 
 protected:
   void showEvent(QShowEvent *) override;
@@ -173,6 +176,7 @@ protected slots:
   void navigatorToggled(bool);
   void levelSelected(int);
   void onViewerAboutToBeDestroyed();
+  void separatorLineToggled(bool);
 
 private:
   // QSS Properties
@@ -234,9 +238,10 @@ class Filmstrip final : public QWidget, public SaveLoadQSettings {
 
   std::vector<TXshSimpleLevel *> m_levels;
   std::map<TXshSimpleLevel *, TFrameId> m_workingFrames;
-  bool m_isVertical    = true;
-  bool m_showNavigator = true;
-  bool m_showComboBox  = true;
+  bool m_isVertical        = true;
+  bool m_showNavigator     = true;
+  bool m_showComboBox      = true;
+  bool m_showSeparatorLine = false;
 
 public:
 #if QT_VERSION >= 0x050500
@@ -276,6 +281,7 @@ public slots:
   void orientationToggled(bool);
   void comboBoxToggled();
   void navigatorToggled();
+  void separatorLineToggled();
 
 private:
   void updateWindowTitle();

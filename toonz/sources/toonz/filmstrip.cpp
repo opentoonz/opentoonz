@@ -641,15 +641,24 @@ void FilmstripFrames::paintEvent(QPaintEvent *evt) {
   int x1          = x0 + iconWidth;
   int frameHeight = m_iconSize.height();
 
-  // linee orizzontali che separano i frames
-  p.setPen(getLightLineColor());
-  for (i = i0; i <= i1; i++) {
-    if (m_isVertical) {
-      int y = index2y(i) + frameHeight;
-      p.drawLine(0, y, x1, y);
-    } else {
-      int x = index2x(i) + iconWidth;
-      p.drawLine(x, 0, x, frameHeight);
+  // horizontal lines that separate the frames
+  if (m_showSeparatorLine) {
+    p.setPen(getLightLineColor());
+    for (i = i0; i <= i1; i++) {
+      if (m_isVertical) {
+        int y = index2y(i) + frameHeight;
+        p.drawLine(
+            0, y + fs_iconMarginTop + fs_iconMarginBottom + fs_frameSpacing,
+            x1 + 3,
+            y + fs_iconMarginTop + fs_iconMarginBottom + fs_frameSpacing);
+      } else {
+        int x = index2x(i) + iconWidth;
+        p.drawLine(x + (fs_iconMarginLR * 2) + fs_leftMargin + fs_rightMargin,
+                   0,
+                   x + (fs_iconMarginLR * 2) + fs_leftMargin + fs_rightMargin,
+                   frameHeight + fs_iconMarginTop + fs_iconMarginBottom +
+                       fs_frameSpacing);
+      }
     }
   }
 
@@ -745,14 +754,12 @@ void FilmstripFrames::paintEvent(QPaintEvent *evt) {
       pen.setWidth(2);
       pen.setJoinStyle(Qt::RoundJoin);
       p.setPen(pen);
-
       p.drawRect(tmp_frameRect.adjusted(-1, -1, 2, 2));
       p.setPen(Qt::NoPen);
     }
   }
 
-  // se sono in modalita' level edit faccio vedere la freccia che indica il
-  // frame corrente
+  // if we're in level edit mode we show the arrow indicating the current frame
   if (TApp::instance()->getCurrentFrame()->isEditingLevel())
     m_frameHeadGadget->draw(p, QColor(Qt::white), QColor(Qt::black));
 }
@@ -809,7 +816,7 @@ void FilmstripFrames::drawFrameIcon(QPainter &p, const QRect &r, int index,
       }
     }
   } else {
-    // non riesco (per qualche ragione) a visualizzare l'icona
+    // if for some reason we can't see the icon
     p.fillRect(r, QColor(255, 200, 200));
     p.setPen(Qt::black);
     p.drawText(r, tr("no icon"), QTextOption(Qt::AlignCenter));
@@ -1095,7 +1102,7 @@ void FilmstripFrames::mouseMoveEvent(QMouseEvent *e) {
     } else
       stopAutoPanning();
     update();
-  } else if (e->buttons() & Qt::MidButton) {
+  } else if (e->buttons() & Qt::MiddleButton) {
     // scroll con il tasto centrale
     pos = e->globalPos();
     if (m_isVertical) {
@@ -1276,19 +1283,24 @@ void FilmstripFrames::contextMenuEvent(QContextMenuEvent *event) {
   createSelectLevelMenu(menu);
   QMenu *panelMenu           = menu->addMenu(tr("Panel Settings"));
   QAction *toggleOrientation = panelMenu->addAction(tr("Toggle Orientation"));
-  QAction *hideComboBox = panelMenu->addAction(tr("Show/Hide Drop Down Menu"));
-  QAction *hideNavigator =
-      panelMenu->addAction(tr("Show/Hide Level Navigator"));
+  panelMenu->addSeparator();
+  QAction *hideComboBox  = panelMenu->addAction(tr("Show Level Select Menu"));
+  QAction *hideNavigator = panelMenu->addAction(tr("Show Navigator"));
+  QAction *hideSeparatorLine = panelMenu->addAction(tr("Show Separator Line"));
   hideComboBox->setCheckable(true);
   hideComboBox->setChecked(m_showComboBox);
   hideNavigator->setCheckable(true);
   hideNavigator->setChecked(m_showNavigator);
+  hideSeparatorLine->setCheckable(true);
+  hideSeparatorLine->setChecked(m_showSeparatorLine);
   connect(toggleOrientation, SIGNAL(triggered(bool)), this,
           SLOT(orientationToggled(bool)));
   connect(hideComboBox, SIGNAL(triggered(bool)), this,
           SLOT(comboBoxToggled(bool)));
   connect(hideNavigator, SIGNAL(triggered(bool)), this,
           SLOT(navigatorToggled(bool)));
+  connect(hideSeparatorLine, SIGNAL(triggered(bool)), this,
+          SLOT(separatorLineToggled(bool)));
 
   menu->exec(event->globalPos());
 }
@@ -1344,6 +1356,12 @@ void FilmstripFrames::navigatorToggled(bool ignore) {
 
 //-----------------------------------------------------------------------------
 
+void FilmstripFrames::separatorLineToggled(bool ignore) {
+  emit(separatorLineToggledSignal());
+}
+
+//-----------------------------------------------------------------------------
+
 void FilmstripFrames::orientationToggled(bool ignore) {
   m_isVertical = !m_isVertical;
   emit(orientationToggledSignal(m_isVertical));
@@ -1386,6 +1404,12 @@ void FilmstripFrames::setNavigator(bool showNavigator) {
 
 void FilmstripFrames::setComboBox(bool showComboBox) {
   m_showComboBox = showComboBox;
+}
+
+//-----------------------------------------------------------------------------
+
+void FilmstripFrames::setSeparatorLine(bool showSeparatorLine) {
+  m_showSeparatorLine = showSeparatorLine;
 }
 
 //-----------------------------------------------------------------------------
@@ -1557,6 +1581,8 @@ Filmstrip::Filmstrip(QWidget *parent, Qt::WFlags flags)
           SLOT(comboBoxToggled()));
   connect(m_frames, SIGNAL(navigatorToggledSignal()), this,
           SLOT(navigatorToggled()));
+  connect(m_frames, SIGNAL(separatorLineToggledSignal()), this,
+          SLOT(separatorLineToggled()));
   connect(m_frames, SIGNAL(levelSelectedSignal(int)), this,
           SLOT(onChooseLevelComboChanged(int)));
 }
@@ -1912,6 +1938,13 @@ void Filmstrip::comboBoxToggled() {
 
 //-----------------------------------------------------------------------------
 
+void Filmstrip::separatorLineToggled() {
+  m_showSeparatorLine = !m_showSeparatorLine;
+  m_frames->setSeparatorLine(m_showSeparatorLine);
+}
+
+//-----------------------------------------------------------------------------
+
 void Filmstrip::navigatorToggled() {
   m_showNavigator = !m_showNavigator;
   m_frames->setNavigator(m_showNavigator);
@@ -1944,6 +1977,10 @@ void Filmstrip::save(QSettings &settings) const {
   showCombo      = m_chooseLevelCombo->isHidden() ? 0 : 1;
   settings.setValue("showCombo", showCombo);
 
+  UINT separatorLine = 0;
+  separatorLine      = m_showSeparatorLine ? 1 : 0;
+  settings.setValue("separatorLine", separatorLine);
+
   UINT navigator = 0;
   navigator      = m_showNavigator ? 1 : 0;
   settings.setValue("navigator", navigator);
@@ -1957,6 +1994,10 @@ void Filmstrip::load(QSettings &settings) {
   UINT navigator  = settings.value("navigator", 1).toUInt();
   m_showNavigator = navigator == 1;
   m_frames->setNavigator(m_showNavigator);
+
+  UINT separatorLine  = settings.value("separatorLine", 1).toUInt();
+  m_showSeparatorLine = separatorLine == 1;
+  m_frames->setSeparatorLine(m_showSeparatorLine);
 
   UINT showCombo = settings.value("showCombo", 1).toUInt();
   m_showComboBox = showCombo == 1;

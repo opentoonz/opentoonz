@@ -7,7 +7,7 @@
 }
 
 #FilmStrip {
-  qproperty-BGColor: @bg;
+  qproperty-BGColor: @levelstrip-Bg-color;
   margin: 0;
   padding: 0;
   & QComboBox {
@@ -16,4 +16,9 @@
       background-color: @menu-bg-color;
     }
   }
+}
+
+FilmstripFrames {
+  qproperty-LightLineColor: @levelstrip-SeparatorLine-color;
+  qproperty-DarkLineColor: #000; // afaik unused
 }

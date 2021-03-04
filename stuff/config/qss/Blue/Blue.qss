@@ -1345,6 +1345,10 @@ StyledTreeView {
 #FilmStrip QComboBox QAbstractItemView {
   background-color: #414345;
 }
+FilmstripFrames {
+  qproperty-LightLineColor: #414345;
+  qproperty-DarkLineColor: #000;
+}
 /* -----------------------------------------------------------------------------
    Cleanup Settings
 ----------------------------------------------------------------------------- */
