@@ -52,7 +52,7 @@ public:
   bool m_isVertical        = true;
   bool m_showNavigator     = true;
   bool m_showComboBox      = true;
-  bool m_showSeparatorLine = false;
+  bool m_hideSeparatorLine = true;
 
   void setBGColor(const QColor &color) { m_bgColor = color; }
   QColor getBGColor() const { return m_bgColor; }
@@ -124,7 +124,7 @@ public:
   void setOrientation(bool isVertical);
   void setNavigator(bool showNavigator);
   void setComboBox(bool showComboBox);
-  void setSeparatorLine(bool showSeparatorLine);
+  void setSeparatorLine(bool hideSeparatorLine);
 
 signals:
   void orientationToggledSignal(bool);
@@ -241,7 +241,7 @@ class Filmstrip final : public QWidget, public SaveLoadQSettings {
   bool m_isVertical        = true;
   bool m_showNavigator     = true;
   bool m_showComboBox      = true;
-  bool m_showSeparatorLine = false;
+  bool m_hideSeparatorLine = true;
 
 public:
 #if QT_VERSION >= 0x050500
