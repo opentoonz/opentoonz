@@ -642,7 +642,7 @@ void FilmstripFrames::paintEvent(QPaintEvent *evt) {
   int frameHeight = m_iconSize.height();
 
   // horizontal lines that separate the frames
-  if (!m_hideSeparatorLine) {
+  if (m_showSeparatorLine) {
     p.setPen(getLightLineColor());
     for (i = i0; i <= i1; i++) {
       if (m_isVertical) {
@@ -1284,9 +1284,15 @@ void FilmstripFrames::contextMenuEvent(QContextMenuEvent *event) {
   QMenu *panelMenu           = menu->addMenu(tr("Panel Settings"));
   QAction *toggleOrientation = panelMenu->addAction(tr("Toggle Orientation"));
   panelMenu->addSeparator();
-  QAction *hideComboBox  = panelMenu->addAction(tr("Show/Hide Drop Down Menu"));
-  QAction *hideNavigator = panelMenu->addAction(tr("Show/Hide Level Navigator"));
-  QAction *hideSeparatorLine = panelMenu->addAction(tr("Show/Hide Frame Separator Line"));
+  QAction *hideComboBox  = panelMenu->addAction(tr("Show Level Select Menu"));
+  QAction *hideNavigator = panelMenu->addAction(tr("Show Navigator"));
+  QAction *hideSeparatorLine = panelMenu->addAction(tr("Show Separator Line"));
+  hideComboBox->setCheckable(true);
+  hideComboBox->setChecked(m_showComboBox);
+  hideNavigator->setCheckable(true);
+  hideNavigator->setChecked(m_showNavigator);
+  hideSeparatorLine->setCheckable(true);
+  hideSeparatorLine->setChecked(m_showSeparatorLine);
   connect(toggleOrientation, SIGNAL(triggered(bool)), this,
           SLOT(orientationToggled(bool)));
   connect(hideComboBox, SIGNAL(triggered(bool)), this,
@@ -1403,7 +1409,7 @@ void FilmstripFrames::setComboBox(bool showComboBox) {
 //-----------------------------------------------------------------------------
 
 void FilmstripFrames::setSeparatorLine(bool showSeparatorLine) {
-  m_hideSeparatorLine = showSeparatorLine;
+  m_showSeparatorLine = showSeparatorLine;
 }
 
 //-----------------------------------------------------------------------------
@@ -1933,8 +1939,8 @@ void Filmstrip::comboBoxToggled() {
 //-----------------------------------------------------------------------------
 
 void Filmstrip::separatorLineToggled() {
-  m_hideSeparatorLine = !m_hideSeparatorLine;
-  m_frames->setSeparatorLine(m_hideSeparatorLine);
+  m_showSeparatorLine = !m_showSeparatorLine;
+  m_frames->setSeparatorLine(m_showSeparatorLine);
 }
 
 //-----------------------------------------------------------------------------
@@ -1972,7 +1978,7 @@ void Filmstrip::save(QSettings &settings) const {
   settings.setValue("showCombo", showCombo);
 
   UINT separatorLine = 0;
-  separatorLine      = m_hideSeparatorLine ? 1 : 0;
+  separatorLine      = m_showSeparatorLine ? 1 : 0;
   settings.setValue("separatorLine", separatorLine);
 
   UINT navigator = 0;
@@ -1989,9 +1995,9 @@ void Filmstrip::load(QSettings &settings) {
   m_showNavigator = navigator == 1;
   m_frames->setNavigator(m_showNavigator);
 
-  UINT separatorLine  = settings.value("separatorLine", 1).toUInt();
-  m_hideSeparatorLine = separatorLine == 1;
-  m_frames->setSeparatorLine(m_hideSeparatorLine);
+  UINT separatorLine  = settings.value("separatorLine", 0).toUInt();
+  m_showSeparatorLine = separatorLine == 1;
+  m_frames->setSeparatorLine(m_showSeparatorLine);
 
   UINT showCombo = settings.value("showCombo", 1).toUInt();
   m_showComboBox = showCombo == 1;
