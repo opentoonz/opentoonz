@@ -1284,15 +1284,9 @@ void FilmstripFrames::contextMenuEvent(QContextMenuEvent *event) {
   QMenu *panelMenu           = menu->addMenu(tr("Panel Settings"));
   QAction *toggleOrientation = panelMenu->addAction(tr("Toggle Orientation"));
   panelMenu->addSeparator();
-  QAction *hideComboBox  = panelMenu->addAction(tr("Show Level Select Menu"));
-  QAction *hideNavigator = panelMenu->addAction(tr("Show Navigator"));
-  QAction *hideSeparatorLine = panelMenu->addAction(tr("Hide Separator Line"));
-  hideComboBox->setCheckable(true);
-  hideComboBox->setChecked(m_showComboBox);
-  hideNavigator->setCheckable(true);
-  hideNavigator->setChecked(m_showNavigator);
-  hideSeparatorLine->setCheckable(true);
-  hideSeparatorLine->setChecked(m_hideSeparatorLine);
+  QAction *hideComboBox  = panelMenu->addAction(tr("Show/Hide Drop Down Menu"));
+  QAction *hideNavigator = panelMenu->addAction(tr("Show/Hide Level Navigator"));
+  QAction *hideSeparatorLine = panelMenu->addAction(tr("Show/Hide Frame Separator Line"));
   connect(toggleOrientation, SIGNAL(triggered(bool)), this,
           SLOT(orientationToggled(bool)));
   connect(hideComboBox, SIGNAL(triggered(bool)), this,
