@@ -170,10 +170,10 @@
       0 0 
     </speeda_use_gradient>
     <speed_size>
-      0 0 
+      0 1 
     </speed_size>
     <top_layer>
-      4 
+      3 
     </top_layer>
     <mass>
       <min>
@@ -710,7 +710,7 @@
       0 0 
     </pick_color_for_every_frame>
     <perspective_distribution>
-      0 0 
+      0 1 
     </perspective_distribution>
     </params>
   </dvpreset>
