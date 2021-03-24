@@ -225,34 +225,23 @@ void TPanelTitleBarButton::setPressed(bool pressed) {
 //-----------------------------------------------------------------------------
 
 void TPanelTitleBarButton::paintEvent(QPaintEvent *event) {
+  // Set unique pressed colors if filename contains the following words:
+  QColor bgColor = getPressedColor();
+  if (m_standardPixmapName.contains("freeze", Qt::CaseInsensitive))
+    bgColor = getFreezeColor();
+  if (m_standardPixmapName.contains("preview", Qt::CaseInsensitive))
+    bgColor = getPreviewColor();
+
+  QPixmap panePixmap    = recolorPixmap(svgToPixmap(m_standardPixmapName));
+  QPixmap panePixmapOff = compositePixmap(panePixmap, 0.8);
+  QPixmap panePixmapOver =
+      compositePixmap(panePixmap, 1, QSize(), 0, 0, getOverColor());
+  QPixmap panePixmapOn = compositePixmap(panePixmap, 1, QSize(), 0, 0, bgColor);
+
   QPainter painter(this);
-
-  // Create color states for the button
-  QPixmap normalPixmap(m_standardPixmap.size());
-  QPixmap onPixmap(m_standardPixmap.size());
-  QPixmap overPixmap(m_standardPixmap.size());
-  normalPixmap.fill(Qt::transparent);
-  onPixmap.fill(QColor(getPressedColor()));
-  overPixmap.fill(QColor(getOverColor()));
-
-  // Set unique 'pressed' colors if filename contains...
-  if (m_standardPixmapName.contains("freeze", Qt::CaseInsensitive)) {
-    onPixmap.fill(QColor(getFreezeColor()));
-  }
-  if (m_standardPixmapName.contains("preview", Qt::CaseInsensitive)) {
-    onPixmap.fill(QColor(getPreviewColor()));
-  }
-
-  // Compose the state colors
   painter.drawPixmap(
-      0, 0, m_pressed ? onPixmap : m_rollover ? overPixmap : normalPixmap);
-
-  // Icon
-  QPixmap panePixmap    = recolorPixmap(m_standardPixmap);
-  QPixmap paneOffPixmap = setOpacity(panePixmap, 0.8);
-  painter.drawPixmap(
-      0, 0, m_pressed ? panePixmap : m_rollover ? panePixmap : paneOffPixmap);
-
+      0, 0,
+      m_pressed ? panePixmapOn : m_rollover ? panePixmapOver : panePixmapOff);
   painter.end();
 }
 

@@ -477,7 +477,7 @@ NoteArea::NoteArea(XsheetViewer *parent, Qt::WFlags flags)
   m_flipOrientationButton->setObjectName("flipOrientationButton");
   m_flipOrientationButton->setFocusPolicy(Qt::FocusPolicy::NoFocus);
   m_flipOrientationButton->setFixedSize(QSize(70, 23));
-  m_flipOrientationButton->setIconSize(QSize(40, 20));
+  m_flipOrientationButton->setIconSize(QSize(20, 20));
   m_flipOrientationButton->setIcon(createQIcon("toggle_xsheet_orientation"));
   m_flipOrientationButton->setToolTip(tr("Toggle Xsheet/Timeline"));
 
@@ -618,6 +618,7 @@ void NoteArea::onXsheetOrientationChanged(const Orientation *newOrientation) {
   //  m_flipOrientationButton->setText(newOrientation->caption());
 
   m_flipOrientationButton->setIcon(createQIcon("toggle_xsheet_orientation"));
+  m_flipOrientationButton->setIconSize(QSize(20, 20));
 
   removeLayout();
   createLayout();
