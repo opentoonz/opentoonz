@@ -550,11 +550,11 @@ Stop it or wait for its completion before removing it.</source>
     <name>Canon</name>
     <message>
         <source>AC Power</source>
-        <translation type="unfinished"></translation>
+        <translation>交流电源</translation>
     </message>
     <message>
         <source>Full</source>
-        <translation type="unfinished"></translation>
+        <translation>满</translation>
     </message>
 </context>
 <context>
@@ -6240,23 +6240,23 @@ or you may delete necessary files for it.</source>
     </message>
     <message>
         <source>&amp;Export Stop Motion Image Sequence</source>
-        <translation type="unfinished"></translation>
+        <translation>输出定格图像系列(&amp;E)</translation>
     </message>
     <message>
         <source>Pick Focus Check Location</source>
-        <translation type="unfinished"></translation>
+        <translation>拾取焦点检查位置</translation>
     </message>
     <message>
         <source>Remove frame before Stop Motion Camera</source>
-        <translation type="unfinished"></translation>
+        <translation>删除定格摄影机前的帧</translation>
     </message>
     <message>
         <source>Next Frame including Stop Motion Camera</source>
-        <translation type="unfinished"></translation>
+        <translation>下一帧包含定格摄影机</translation>
     </message>
     <message>
         <source>Show original live view images.</source>
-        <translation type="unfinished"></translation>
+        <translation>显示原来的实时查看图像。</translation>
     </message>
 </context>
 <context>
@@ -6976,7 +6976,7 @@ Do you want to overwrite it?</source>
     <name>PaletteViewerPanel</name>
     <message>
         <source>Freeze</source>
-        <translation type="unfinished">冻结</translation>
+        <translation>冻结</translation>
     </message>
 </context>
 <context>
@@ -8599,13 +8599,15 @@ in non alpha-enabled image format.</source>
     </message>
     <message>
         <source>Show Icons In Menu*</source>
-        <translation type="unfinished"></translation>
+        <translation>现实菜单图标*</translation>
     </message>
     <message>
         <source>Use Qt&apos;s Native Windows Ink Support*
 (CAUTION: This options is for maintenance purpose. 
  Do not activate this option or the tablet won&apos;t work properly.)</source>
-        <translation type="unfinished"></translation>
+        <translation>使用 Qt 的原生 Windows Ink 支持*
+(请注意：此选项是用于维护目的。
+不要开启这个选项负责绘图板可能不能正常工作。)</translation>
     </message>
 </context>
 <context>
@@ -11035,11 +11037,11 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>Add Level to Scene Cast : %1</source>
-        <translation type="unfinished"></translation>
+        <translation>添加层级到场景演员表 : %1</translation>
     </message>
     <message>
         <source>The Premultiply options in the following levels are disabled, since PNG files are premultiplied on loading in the current version: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>预乘选项在后面的层级中是未打开的，因为在当前这个版本: %1 中， PNG 文件是在加载时做了预乘处理的。</translation>
     </message>
 </context>
 <context>
@@ -12904,7 +12906,7 @@ Please commit or revert changes first.</source>
     </message>
     <message>
         <source>Stop Motion</source>
-        <translation type="unfinished"></translation>
+        <translation>定格动画</translation>
     </message>
 </context>
 <context>
@@ -13442,47 +13444,47 @@ WARNING : Image size mismatch. The size of level with the same path is %1 x %2.<
     </message>
     <message>
         <source>Please start live view before using time lapse.</source>
-        <translation type="unfinished"></translation>
+        <translation>请在使用时间间隔前打开实时查看。</translation>
     </message>
     <message>
         <source>Cannot capture image unless live view is active.</source>
-        <translation type="unfinished"></translation>
+        <translation>除非开启实时查看否则不能拍摄。</translation>
     </message>
     <message>
         <source>No level exists with the current name.</source>
-        <translation type="unfinished"></translation>
+        <translation>无当前名字的层级。</translation>
     </message>
     <message>
         <source>This is not an image level.</source>
-        <translation type="unfinished"></translation>
+        <translation>这不是图像层级。</translation>
     </message>
     <message>
         <source>This is not a stop motion level.</source>
-        <translation type="unfinished"></translation>
+        <translation>这不是定格层级。</translation>
     </message>
     <message>
         <source>Could not find an xsheet level with  the current level</source>
-        <translation type="unfinished"></translation>
+        <translation>不能找到当前层级对应的摄影表层级</translation>
     </message>
     <message>
         <source>No export path given.</source>
-        <translation type="unfinished"></translation>
+        <translation>没有选定导出路径。</translation>
     </message>
     <message>
         <source>Could not find the source file.</source>
-        <translation type="unfinished"></translation>
+        <translation>不能找到源文件。</translation>
     </message>
     <message>
         <source>Overwrite existing files?</source>
-        <translation type="unfinished"></translation>
+        <translation>覆盖已有文件吗？</translation>
     </message>
     <message>
         <source>An error occurred.  Aborting.</source>
-        <translation type="unfinished"></translation>
+        <translation>发生了错误。忽略。</translation>
     </message>
     <message>
         <source>Successfully exported %1 images.</source>
-        <translation type="unfinished"></translation>
+        <translation>成功导出了 %1 张图像。</translation>
     </message>
 </context>
 <context>
@@ -13741,138 +13743,138 @@ WARNING : Image size mismatch. The size of level with the same path is %1 x %2.<
     </message>
     <message>
         <source>Light</source>
-        <translation type="unfinished"></translation>
+        <translation>灯光</translation>
     </message>
     <message>
         <source>Motion</source>
-        <translation type="unfinished"></translation>
+        <translation>移动</translation>
     </message>
     <message>
         <source>Camera Status</source>
-        <translation type="unfinished"></translation>
+        <translation>摄影机状态</translation>
     </message>
     <message>
         <source>Show original live view images in timeline</source>
-        <translation type="unfinished"></translation>
+        <translation>在时间时间轴上显示原实时查看图像</translation>
     </message>
     <message>
         <source>Check</source>
-        <translation type="unfinished"></translation>
+        <translation>检查</translation>
     </message>
     <message>
         <source>Zoom in to check focus</source>
-        <translation type="unfinished"></translation>
+        <translation>放大以检查焦点</translation>
     </message>
     <message>
         <source>Pick</source>
-        <translation type="unfinished"></translation>
+        <translation>拾取</translation>
     </message>
     <message>
         <source>Set focus check location</source>
-        <translation type="unfinished"></translation>
+        <translation>设定焦点检查位置</translation>
     </message>
     <message>
         <source>Select a camera to change settings.</source>
-        <translation type="unfinished"></translation>
+        <translation>选择摄影机改变设定。</translation>
     </message>
     <message>
         <source>insert webcam name here</source>
-        <translation type="unfinished"></translation>
+        <translation>在此插入摄像头名字</translation>
     </message>
     <message>
         <source>Manual Focus</source>
-        <translation type="unfinished"></translation>
+        <translation>手动对焦</translation>
     </message>
     <message>
         <source>Focus: </source>
-        <translation type="unfinished"></translation>
+        <translation>对焦: </translation>
     </message>
     <message>
         <source>Brightness: </source>
-        <translation type="unfinished">亮度: </translation>
+        <translation>亮度: </translation>
     </message>
     <message>
         <source>Contrast: </source>
-        <translation type="unfinished"></translation>
+        <translation>对比度: </translation>
     </message>
     <message>
         <source>Gain: </source>
-        <translation type="unfinished"></translation>
+        <translation>增益: </translation>
     </message>
     <message>
         <source>Saturation: </source>
-        <translation type="unfinished"></translation>
+        <translation>饱和度: </translation>
     </message>
     <message>
         <source>More</source>
-        <translation type="unfinished">更多</translation>
+        <translation>更多</translation>
     </message>
     <message>
         <source>Time Lapse</source>
-        <translation type="unfinished"></translation>
+        <translation>时间间隔</translation>
     </message>
     <message>
         <source>Use time lapse</source>
-        <translation type="unfinished"></translation>
+        <translation>使用时间间隔</translation>
     </message>
     <message>
         <source>Interval(sec):</source>
-        <translation type="unfinished">间隔(秒):</translation>
+        <translation>间隔(秒):</translation>
     </message>
     <message>
         <source>Blackout all Screens</source>
-        <translation type="unfinished"></translation>
+        <translation>停止所以屏幕</translation>
     </message>
     <message>
         <source>Test</source>
-        <translation type="unfinished"></translation>
+        <translation>测试</translation>
     </message>
     <message>
         <source>Screen 1</source>
-        <translation type="unfinished"></translation>
+        <translation>屏幕 1</translation>
     </message>
     <message>
         <source>Screen 2</source>
-        <translation type="unfinished"></translation>
+        <translation>屏幕 2</translation>
     </message>
     <message>
         <source>Screen 3</source>
-        <translation type="unfinished"></translation>
+        <translation>屏幕 3</translation>
     </message>
     <message>
         <source>Motion Control</source>
-        <translation type="unfinished"></translation>
+        <translation>移动控制</translation>
     </message>
     <message>
         <source>Port: </source>
-        <translation type="unfinished"></translation>
+        <translation>端口: </translation>
     </message>
     <message>
         <source> - Battery: </source>
-        <translation type="unfinished"></translation>
+        <translation> - 电池: </translation>
     </message>
     <message>
         <source>Aperture: Auto</source>
-        <translation type="unfinished"></translation>
+        <translation>光圈: 自动</translation>
     </message>
     <message>
         <source>Shutter Speed: Auto</source>
-        <translation type="unfinished"></translation>
+        <translation>快门速度: 自动</translation>
     </message>
     <message>
         <source>Start Capturing</source>
-        <translation type="unfinished"></translation>
+        <translation>开始拍摄</translation>
     </message>
     <message>
         <source>Stop Capturing</source>
-        <translation type="unfinished"></translation>
+        <translation>停止拍摄</translation>
     </message>
 </context>
 <context>
     <name>StopMotionSerial</name>
     <message>
         <source>No Device</source>
-        <translation type="unfinished"></translation>
+        <translation>无设备</translation>
     </message>
 </context>
 <context>

@@ -181,23 +181,23 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>cm</source>
-        <translation type="unfinished"></translation>
+        <translation>厘米</translation>
     </message>
     <message>
         <source>mm</source>
-        <translation type="unfinished"></translation>
+        <translation>毫米</translation>
     </message>
     <message>
         <source>inch</source>
-        <translation type="unfinished"></translation>
+        <translation>英尺</translation>
     </message>
     <message>
         <source>field</source>
-        <translation type="unfinished"></translation>
+        <translation>视场</translation>
     </message>
     <message>
         <source>pixel</source>
-        <translation type="unfinished"></translation>
+        <translation>像素</translation>
     </message>
 </context>
 <context>
@@ -1689,11 +1689,11 @@ Select FX nodes and related links before copying or cutting the selection you wa
     </message>
     <message>
         <source>Set Toolbar Below Styles</source>
-        <translation type="unfinished"></translation>
+        <translation>使工具条在样式下方</translation>
     </message>
     <message>
         <source>Set Toolbar Above Styles</source>
-        <translation type="unfinished"></translation>
+        <translation>使工具条在样式上方</translation>
     </message>
 </context>
 <context>
