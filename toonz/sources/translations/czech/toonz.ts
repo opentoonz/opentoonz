@@ -540,11 +540,11 @@ Zastavte ji nebo počkejte na její dokončení, předtím než ji odstraníte.<
     <name>Canon</name>
     <message>
         <source>AC Power</source>
-        <translation type="unfinished"></translation>
+        <translation>AC napájení</translation>
     </message>
     <message>
         <source>Full</source>
-        <translation type="unfinished"></translation>
+        <translation>Nabito</translation>
     </message>
 </context>
 <context>
@@ -4143,7 +4143,7 @@ Pro odkaz, prosím, použijte čísla snímků.</translation>
     </message>
     <message>
         <source>Collapse</source>
-        <translation>Složit</translation>
+        <translation>Sbalit</translation>
     </message>
     <message>
         <source>&amp;Save Sub-xsheet As...</source>
@@ -6347,23 +6347,23 @@ protože jinak můžete smazat pro něj nezbytné soubory.</translation>
     </message>
     <message>
         <source>&amp;Export Stop Motion Image Sequence</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Vyvést obrázkovou řadu pookénkové (fázové) animace</translation>
     </message>
     <message>
         <source>Pick Focus Check Location</source>
-        <translation type="unfinished"></translation>
+        <translation>Vyberte místo pro kontrolu zaměření</translation>
     </message>
     <message>
         <source>Remove frame before Stop Motion Camera</source>
-        <translation type="unfinished"></translation>
+        <translation>Odstranit snímek před kamery pookénkové (fázové) animace</translation>
     </message>
     <message>
         <source>Next Frame including Stop Motion Camera</source>
-        <translation type="unfinished"></translation>
+        <translation>Další snímek včetně kamery pookénkové (fázové) animace</translation>
     </message>
     <message>
         <source>Show original live view images.</source>
-        <translation type="unfinished"></translation>
+        <translation>Zobrazit původní obrázky živého náhledu.</translation>
     </message>
 </context>
 <context>
@@ -7084,7 +7084,7 @@ Chcete jej přepsat?</translation>
     <name>PaletteViewerPanel</name>
     <message>
         <source>Freeze</source>
-        <translation type="unfinished">Pozastavit</translation>
+        <translation>Pozastavit</translation>
     </message>
 </context>
 <context>
@@ -8653,13 +8653,15 @@ v obrázkových formátech, kde není povolen kanál alfa.</translation>
     </message>
     <message>
         <source>Show Icons In Menu*</source>
-        <translation type="unfinished"></translation>
+        <translation>Ukázat ikony v nabídce*</translation>
     </message>
     <message>
         <source>Use Qt&apos;s Native Windows Ink Support*
 (CAUTION: This options is for maintenance purpose. 
  Do not activate this option or the tablet won&apos;t work properly.)</source>
-        <translation type="unfinished"></translation>
+        <translation>Použijte vlastní podporu inkoustu Windows Qt*
+(UPOZORNĚNÍ: Tato volba slouží pro účely údržby.
+  Nezapínejte tuto volbu, jinak tablet nebude fungovat správně.)</translation>
     </message>
 </context>
 <context>
@@ -10096,7 +10098,7 @@ Jste si jistý </translation>
     </message>
     <message>
         <source>Resequence :  Col%1</source>
-        <translation>Vyrovnat znovu snímky podzáběru: Col%1</translation>
+        <translation>Změnit pořadí snímků podzáběru: Col%1</translation>
     </message>
     <message>
         <source>Clone Sub-xsheet :  Col%1</source>
@@ -11035,7 +11037,7 @@ Chcete ji vytvořit?</translation>
     </message>
     <message>
         <source>Stop Motion Controller</source>
-        <translation>Zastavit ovládání pookénkové (fázové) animace</translation>
+        <translation>Ovládání pookénkové (fázové) animace</translation>
     </message>
     <message>
         <source>Camera Column Switch :  </source>
@@ -11127,11 +11129,11 @@ Chcete ji vytvořit?</translation>
     </message>
     <message>
         <source>Add Level to Scene Cast : %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Přidat úroveň k obsazení výjevu: %1</translation>
     </message>
     <message>
         <source>The Premultiply options in the following levels are disabled, since PNG files are premultiplied on loading in the current version: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Volby předběžného rozmnožování jsou pro následující úrovně vypnuty, protože v nynější verzi jsou soubory PNG jsou při načítání předmnoženy:%1</translation>
     </message>
 </context>
 <context>
@@ -12996,7 +12998,7 @@ Chcete jej nahradit?</translation>
     </message>
     <message>
         <source>Stop Motion</source>
-        <translation type="unfinished"></translation>
+        <translation>Pookénková (fázová) animace</translation>
     </message>
 </context>
 <context>
@@ -13521,47 +13523,47 @@ VAROVÁNÍ: Nesoulad ve velikosti obrázku. Velikost úrovně se stejnou cestou 
     </message>
     <message>
         <source>Please start live view before using time lapse.</source>
-        <translation type="unfinished"></translation>
+        <translation>Před použitím časové prodlevy spusťte živý náhled.</translation>
     </message>
     <message>
         <source>Cannot capture image unless live view is active.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nelze pořídit snímek, pokud není zapnuto živé zobrazení.</translation>
     </message>
     <message>
         <source>No level exists with the current name.</source>
-        <translation type="unfinished"></translation>
+        <translation>Neexistuje žádná úroveň se současným názvem.</translation>
     </message>
     <message>
         <source>This is not an image level.</source>
-        <translation type="unfinished"></translation>
+        <translation>Toto není úroveň obrázku.</translation>
     </message>
     <message>
         <source>This is not a stop motion level.</source>
-        <translation type="unfinished"></translation>
+        <translation>Toto není úroveň pookénkové (fázové) animace.</translation>
     </message>
     <message>
         <source>Could not find an xsheet level with  the current level</source>
-        <translation type="unfinished"></translation>
+        <translation>Nepodařilo se najít tabulku s nynější úrovní</translation>
     </message>
     <message>
         <source>No export path given.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nebyla zadána žádná cesta pro vyvedení.</translation>
     </message>
     <message>
         <source>Could not find the source file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nepodařilo se najít zdrojový soubor.</translation>
     </message>
     <message>
         <source>Overwrite existing files?</source>
-        <translation type="unfinished"></translation>
+        <translation>Přepsat stávající soubory?</translation>
     </message>
     <message>
         <source>An error occurred.  Aborting.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vyskytla se chyba. Přerušuje se.</translation>
     </message>
     <message>
         <source>Successfully exported %1 images.</source>
-        <translation type="unfinished"></translation>
+        <translation>Úspěšně vyvedeno %1 obrázků.</translation>
     </message>
 </context>
 <context>
@@ -13820,138 +13822,138 @@ VAROVÁNÍ: Nesoulad ve velikosti obrázku. Velikost úrovně se stejnou cestou 
     </message>
     <message>
         <source>Light</source>
-        <translation type="unfinished"></translation>
+        <translation>Světlo</translation>
     </message>
     <message>
         <source>Motion</source>
-        <translation type="unfinished"></translation>
+        <translation>Pohyb</translation>
     </message>
     <message>
         <source>Camera Status</source>
-        <translation type="unfinished"></translation>
+        <translation>Stav kamery</translation>
     </message>
     <message>
         <source>Show original live view images in timeline</source>
-        <translation type="unfinished"></translation>
+        <translation>Zobrazit původní obrázky živého náhledu na časové ose</translation>
     </message>
     <message>
         <source>Check</source>
-        <translation type="unfinished"></translation>
+        <translation>Kontrolovat</translation>
     </message>
     <message>
         <source>Zoom in to check focus</source>
-        <translation type="unfinished"></translation>
+        <translation>Přiblížit pro kontrolu zaměření</translation>
     </message>
     <message>
         <source>Pick</source>
-        <translation type="unfinished"></translation>
+        <translation>Zvolit</translation>
     </message>
     <message>
         <source>Set focus check location</source>
-        <translation type="unfinished"></translation>
+        <translation>Nastavit místo pro kontrolu zaměření</translation>
     </message>
     <message>
         <source>Select a camera to change settings.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vyberte kameru a změňte nastavení.</translation>
     </message>
     <message>
         <source>insert webcam name here</source>
-        <translation type="unfinished"></translation>
+        <translation>Zde zadejte název webové kamery</translation>
     </message>
     <message>
         <source>Manual Focus</source>
-        <translation type="unfinished"></translation>
+        <translation>Ruční zaměření</translation>
     </message>
     <message>
         <source>Focus: </source>
-        <translation type="unfinished"></translation>
+        <translation>Zaměření: </translation>
     </message>
     <message>
         <source>Brightness: </source>
-        <translation type="unfinished">Jas: </translation>
+        <translation>Jas: </translation>
     </message>
     <message>
         <source>Contrast: </source>
-        <translation type="unfinished"></translation>
+        <translation>Kontrast: </translation>
     </message>
     <message>
         <source>Gain: </source>
-        <translation type="unfinished"></translation>
+        <translation>Zesílení: </translation>
     </message>
     <message>
         <source>Saturation: </source>
-        <translation type="unfinished"></translation>
+        <translation>Sytost: </translation>
     </message>
     <message>
         <source>More</source>
-        <translation type="unfinished">Více</translation>
+        <translation>Více</translation>
     </message>
     <message>
         <source>Time Lapse</source>
-        <translation type="unfinished"></translation>
+        <translation>Časová prodleva</translation>
     </message>
     <message>
         <source>Use time lapse</source>
-        <translation type="unfinished"></translation>
+        <translation>Použít časovou prodlevu</translation>
     </message>
     <message>
         <source>Interval(sec):</source>
-        <translation type="unfinished">Interval (s):</translation>
+        <translation>Interval (s):</translation>
     </message>
     <message>
         <source>Blackout all Screens</source>
-        <translation type="unfinished"></translation>
+        <translation>Zatemnění všech obrazovek</translation>
     </message>
     <message>
         <source>Test</source>
-        <translation type="unfinished"></translation>
+        <translation>Zkouška</translation>
     </message>
     <message>
         <source>Screen 1</source>
-        <translation type="unfinished"></translation>
+        <translation>Obrazovka 1</translation>
     </message>
     <message>
         <source>Screen 2</source>
-        <translation type="unfinished"></translation>
+        <translation>Obrazovka 2</translation>
     </message>
     <message>
         <source>Screen 3</source>
-        <translation type="unfinished"></translation>
+        <translation>Obrazovka 3</translation>
     </message>
     <message>
         <source>Motion Control</source>
-        <translation type="unfinished"></translation>
+        <translation>Ovládání pohybu</translation>
     </message>
     <message>
         <source>Port: </source>
-        <translation type="unfinished"></translation>
+        <translation>Přípojka: </translation>
     </message>
     <message>
         <source> - Battery: </source>
-        <translation type="unfinished"></translation>
+        <translation> - Baterie: </translation>
     </message>
     <message>
         <source>Aperture: Auto</source>
-        <translation type="unfinished"></translation>
+        <translation>Clona: Automaticky</translation>
     </message>
     <message>
         <source>Shutter Speed: Auto</source>
-        <translation type="unfinished"></translation>
+        <translation>Rychlost závěrky: Automaticky</translation>
     </message>
     <message>
         <source>Start Capturing</source>
-        <translation type="unfinished"></translation>
+        <translation>Spustit zachytávání</translation>
     </message>
     <message>
         <source>Stop Capturing</source>
-        <translation type="unfinished"></translation>
+        <translation>Zastavit zachytávání</translation>
     </message>
 </context>
 <context>
     <name>StopMotionSerial</name>
     <message>
         <source>No Device</source>
-        <translation type="unfinished"></translation>
+        <translation>Žádné zařízení</translation>
     </message>
 </context>
 <context>
