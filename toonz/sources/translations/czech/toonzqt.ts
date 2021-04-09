@@ -106,27 +106,27 @@
     <message>
         <location filename="../../toonzqt/camerasettingswidget.cpp" line="182"/>
         <source>cm</source>
-        <translation type="unfinished"></translation>
+        <translation>cm</translation>
     </message>
     <message>
         <location filename="../../toonzqt/camerasettingswidget.cpp" line="183"/>
         <source>mm</source>
-        <translation type="unfinished"></translation>
+        <translation>mm</translation>
     </message>
     <message>
         <location filename="../../toonzqt/camerasettingswidget.cpp" line="184"/>
         <source>inch</source>
-        <translation type="unfinished"></translation>
+        <translation>palec</translation>
     </message>
     <message>
         <location filename="../../toonzqt/camerasettingswidget.cpp" line="185"/>
         <source>field</source>
-        <translation type="unfinished"></translation>
+        <translation>pole</translation>
     </message>
     <message>
         <location filename="../../toonzqt/camerasettingswidget.cpp" line="186"/>
         <source>pixel</source>
-        <translation type="unfinished"></translation>
+        <translation>pixel</translation>
     </message>
     <message>
         <location filename="../../toonzqt/camerasettingswidget.cpp" line="206"/>
@@ -1682,13 +1682,13 @@ Vyberte uzly efektů a příbuzné odkazy, jež chcete vložit, před kopírová
         <location filename="../../toonzqt/paletteviewer.cpp" line="224"/>
         <location filename="../../toonzqt/paletteviewer.cpp" line="459"/>
         <source>Set Toolbar Below Styles</source>
-        <translation type="unfinished"></translation>
+        <translation>Nastavit panel nástrojů pod styly</translation>
     </message>
     <message>
         <location filename="../../toonzqt/paletteviewer.cpp" line="228"/>
         <location filename="../../toonzqt/paletteviewer.cpp" line="461"/>
         <source>Set Toolbar Above Styles</source>
-        <translation type="unfinished"></translation>
+        <translation>Nastavit panel nástrojů nad styly</translation>
     </message>
     <message>
         <location filename="../../toonzqt/paletteviewer.cpp" line="336"/>
