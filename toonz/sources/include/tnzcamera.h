@@ -10,7 +10,7 @@
 #include "toonz/toonzscene.h"
 
 //#define WRITE_LOG_FILE
-//#define CHECK_VIDEO_FRAME_INTERVALL
+//#define CHECK_VIDEO_FRAME_INTERVAL
 //#define USE_OPENGL_SHARED
 
 #undef DVAPI
@@ -100,8 +100,8 @@ class DVAPI TnzCamera : public QObject {
 
   bool m_freeze;
 
-#ifdef CHECK_VIDEO_FRAME_INTERVALL
-  double m_videoFrameIntervall;
+#ifdef CHECK_VIDEO_FRAME_INTERVAL
+  double m_videoFrameInterval;
 #endif
 
   TnzCamera();
@@ -132,9 +132,9 @@ public:
   TXshSimpleLevel *getCurrentLevel() const;
   TFrameId getCurrentFid() const;
 
-#ifdef CHECK_VIDEO_FRAME_INTERVALL
-  double getVideoFrameIntervall() const { return m_videoFrameIntervall; }
-  void setVideoFrameIntervall(double intervall);
+#ifdef CHECK_VIDEO_FRAME_INTERVAL
+  double getVideoFrameInterval() const { return m_videoFrameInterval; }
+  void setVideoFrameInterval(double interval);
 #endif
 
   bool isAcquireFrame() const { return m_acquireFrame; }
