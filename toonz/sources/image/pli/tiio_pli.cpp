@@ -816,7 +816,7 @@ TLevelP TLevelReaderPli::loadInfo() {
   } catch (std::exception &e) {
     TSystem::outputDebug(e.what());
 
-    throw TImageException(getFilePath(), "Unknow error on reading file");
+    throw TImageException(getFilePath(), "Unknown error on reading file");
   } catch (...) {
     throw;
   }

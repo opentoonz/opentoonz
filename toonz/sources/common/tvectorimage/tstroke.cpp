@@ -2855,7 +2855,7 @@ int intersect(const TStroke &stroke, const TPointD &center, double radius,
 
 #if defined(DEBUG) || defined(_DEBUG)
   /*
-cout<<"interesections:";
+cout<<"intersections:";
 copy( intersections.begin(), intersections.end(), ostream_iterator<double>(
 cout, " " ) );
 cout<<endl;
