@@ -689,7 +689,7 @@ void TInbetween::Imp::computeTransformation() {
   std::vector<TPointD> samplingPoint1(samplingPointNumber),
       samplingPoint2(samplingPointNumber);
   TStroke *stroke1, *stroke2;
-  std::vector<double> ratioSampling, weigths, subStrokeXScaling,
+  std::vector<double> ratioSampling, weights, subStrokeXScaling,
       subStrokeYScaling;
 
   UINT strokeCount1 = m_firstImage->getStrokeCount();
@@ -1011,8 +1011,8 @@ debugStream <<"num angoli 2: "<< angles2.size() << endl;
 
           ratioSampling.clear();
           ratioSampling.reserve(samplingPointNumber);
-          weigths.clear();
-          weigths.reserve(samplingPointNumber);
+          weights.clear();
+          weights.reserve(samplingPointNumber);
 
           TPointD pOld, pNew;
           // double totalW=0;
@@ -1024,7 +1024,7 @@ debugStream <<"num angoli 2: "<< angles2.size() << endl;
             if (pNew == stroke2Centroid) continue;
             versor1 = normalize(pOld - stroke1Centroid);
             versor2 = normalize(pNew - stroke2Centroid);
-            weigths.push_back(tdistance(pOld, stroke1Centroid) +
+            weights.push_back(tdistance(pOld, stroke1Centroid) +
                               tdistance(pNew, stroke2Centroid));
             cs       = versor1 * versor2;
             sn       = cross(versor1, versor2);
@@ -1036,7 +1036,7 @@ debugStream <<"num angoli 2: "<< angles2.size() << endl;
           subStroke1 = 0;
           subStroke2 = 0;
 
-          double radRotation = weightedAverage(ratioSampling, weigths);
+          double radRotation = weightedAverage(ratioSampling, weights);
 
           totalRadRotation += radRotation;
         }
