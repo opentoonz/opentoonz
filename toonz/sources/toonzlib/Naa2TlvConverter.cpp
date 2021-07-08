@@ -785,7 +785,7 @@ void Naa2TlvConverter::addBorderInks()  // add syntethic inks: lines between two
                      (m_regions[c1].type & RegionInfo::Paint) != 0) {
             // OLD: note: we consider only regions with a lower index, to avoid
             // to create double border strokes
-            // NEW: we put syntetic ink pixels in larger regions
+            // NEW: we put synthetic ink pixels in larger regions
             // UPDATE 2017/5/12 : we put ink on darker style
             if (colorsBrightness[m_regions[c1].colorIndex] >
                 colorsBrightness[m_regions[c].colorIndex]) {
@@ -1039,10 +1039,10 @@ TToonzImageP Naa2TlvConverter::makeTlv(bool transparentSyntheticInks,
     styleIds.append(styleId);
     if (!usedStyleIds.contains(styleId)) usedStyleIds.append(styleId);
   }
-  styleIds.append(0);  // syntetic ink
+  styleIds.append(0);  // synthetic ink
 
-  // int synteticInkStyleId = palette->getPage(0)->addStyle(TPixel32(0,0,0,0));
-  // styleIds.append(synteticInkStyleId);
+  // int syntheticInkStyleId = palette->getPage(0)->addStyle(TPixel32(0,0,0,0));
+  // styleIds.append(syntheticInkStyleId);
 
   for (int y = 0; y < ly; y++) {
     unsigned short *workScanLine = m_regionRas->pixels(y);
