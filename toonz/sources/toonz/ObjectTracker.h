@@ -94,7 +94,7 @@ private:
   void FindWightsAndCOM(TRaster32P *frame, float(*histogram));
   //--------------------------------------------------------------------------------------------------------
 
-  UBYTE8 CheckEdgeExistance(TRaster32P *frame, short _x, short _y);
+  UBYTE8 CheckEdgeExistence(TRaster32P *frame, short _x, short _y);
   //--------------------------------------------------------------------------------------------------------
 
   void UpdateInitialHistogram(float(*histogram));
