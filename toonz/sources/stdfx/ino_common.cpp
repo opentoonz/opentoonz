@@ -532,7 +532,7 @@ m_down,m_upは繋がっている方があればそれを表示する
 表示スイッチを切ってあるならm_upを表示する
 fxをreplaceすると、
   m_source   --> m_up  (=port0)
-  m_refernce --> m_down(=port1)
+  m_reference --> m_down(=port1)
 となる
 */
   const bool up_is   = (this->m_up.isConnected() &&
