@@ -150,9 +150,9 @@ void Selector::draw(Designer *designer) {
     TPointD
         //  offset(length, 0.0),
         offset(length, length),
-        bottom_left = center - offset, top_rigth = center + offset;
+        bottom_left = center - offset, top_right = center + offset;
 
-    TRectD rectangle(bottom_left, top_rigth);
+    TRectD rectangle(bottom_left, top_right);
 
     if (isSelected_ == LENGTH) tglFillRect(rectangle);
 
@@ -210,11 +210,11 @@ drawArrow(down,
   TPointD
     offset(length, 0.0),
     bottom_left = center - offset,
-    top_rigth   = center + offset;
+    top_right   = center + offset;
 
   TRectD
     rectangle(bottom_left,
-              top_rigth);
+              top_right);
 
   rectangle = rectangle.enlarge( 2.0* pixel_size_);
 
@@ -319,9 +319,9 @@ Selector::Selection Selector::getSelection(const TPointD &pos) {
   TPointD
       //  offset(length, 0.0),
       offset(length, length),
-      bottom_left = center - offset, top_rigth = center + offset;
+      bottom_left = center - offset, top_right = center + offset;
 
-  TRectD rectangle(bottom_left, top_rigth);
+  TRectD rectangle(bottom_left, top_right);
 
   rectangle = rectangle.enlarge(2.0 * pixel_size_);
 
