@@ -23,7 +23,7 @@ class BluredBrush {
   QRadialGradient m_gradient;
   TThickPoint m_lastPoint;
   double m_oldOpacity;
-  bool m_enableDinamicOpacity;
+  bool m_enableDynamicOpacity;
 
   QSet<int> m_aboveStyleIds;
 
@@ -31,7 +31,7 @@ class BluredBrush {
 
 public:
   BluredBrush(const TRaster32P &ras, int size, const QRadialGradient &gradient,
-              bool doDinamicOpacity);
+              bool doDynamicOpacity);
   ~BluredBrush();
 
   void addPoint(const TThickPoint &p, double opacity);
