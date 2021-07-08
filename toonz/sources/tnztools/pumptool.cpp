@@ -577,12 +577,12 @@ double PumpTool::actionRadius(double strokeLength) {
   double toolSize         = m_toolSize.getValue();
   double toolPercent      = toolSize * 0.01;
   double interpolationVal = pow(toolPercent, 5);
-  double indipendentValue = 7.0 * toolSize;
+  double independentValue = 7.0 * toolSize;
 
-  double actionRadius = (indipendentValue) * (1.0 - interpolationVal) +
+  double actionRadius = (independentValue) * (1.0 - interpolationVal) +
                         (strokeLength * toolPercent) * interpolationVal;
 
-  return std::max(actionRadius, indipendentValue);
+  return std::max(actionRadius, independentValue);
 }
 
 //----------------------------------------------------------------------
