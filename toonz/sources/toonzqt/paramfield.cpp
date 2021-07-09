@@ -1862,7 +1862,7 @@ void ToneCurveParamField::setParams() {
 
 //-----------------------------------------------------------------------------
 
-QSize ToneCurveParamField::getPreferedSize() {
+QSize ToneCurveParamField::getPreferredSize() {
   if (m_toneCurveField->isEnlarged())
     return QSize(676, 640);
   else

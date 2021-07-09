@@ -152,7 +152,7 @@ void parse_with_letter(const QString &text, std::wstring &levelName,
                        TFrameId &fid) {
   QRegExp spaces("\\t|\\s");
   QRegExp numbers("\\d+");
-  QRegExp caracters("[^\\d+]");
+  QRegExp characters("[^\\d+]");
   QString str = text;
 
   // remove final spaces
@@ -169,12 +169,12 @@ void parse_with_letter(const QString &text, std::wstring &levelName,
   // if input only digits / alphabet
   if (lastSpaceIndex == -1) {
     // in case of only level name
-    if (str.contains(caracters) && !str.contains(numbers)) {
+    if (str.contains(characters) && !str.contains(numbers)) {
       levelName = text.toStdWString();
       fid       = TFrameId::NO_FRAME;
     }
     // in case of input frame number + alphabet
-    else if (str.contains(numbers) && str.contains(caracters)) {
+    else if (str.contains(numbers) && str.contains(characters)) {
       levelName = L"";
 
       QString appendix = str.right(1);
@@ -202,7 +202,7 @@ void parse_with_letter(const QString &text, std::wstring &levelName,
 
       str.chop(1);
 
-      if (str.contains(caracters) || !str.contains(numbers)) {
+      if (str.contains(characters) || !str.contains(numbers)) {
         levelName = text.toStdWString();
         fid       = TFrameId::NO_FRAME;
         return;
@@ -225,7 +225,7 @@ void parse_with_letter(const QString &text, std::wstring &levelName,
       levelName           = firstString.toStdWString();
 
       // frame number + alphabet
-      if (lastString.contains(caracters)) {
+      if (lastString.contains(characters)) {
         QString appendix = lastString.right(1);
 
         int appendNum = 0;
@@ -251,7 +251,7 @@ void parse_with_letter(const QString &text, std::wstring &levelName,
 
         lastString.chop(1);
 
-        if (lastString.contains(caracters) || !lastString.contains(numbers)) {
+        if (lastString.contains(characters) || !lastString.contains(numbers)) {
           levelName = text.toStdWString();
           fid       = TFrameId::NO_FRAME;
           return;
@@ -276,7 +276,7 @@ void parse_with_letter(const QString &text, std::wstring &levelName,
 void parse(const QString &text, std::wstring &levelName, TFrameId &fid) {
   QRegExp spaces("\\t|\\s");
   QRegExp numbers("\\d+");
-  QRegExp caracters("[^\\d+]");
+  QRegExp characters("[^\\d+]");
   QRegExp fidWithSuffix("([0-9]+)([a-z]?)");
   QString str = text;
 
@@ -291,7 +291,7 @@ void parse(const QString &text, std::wstring &levelName, TFrameId &fid) {
   }
   int lastSpaceIndex = str.lastIndexOf(spaces);
   if (lastSpaceIndex == -1) {
-    if (str.contains(numbers) && !str.contains(caracters)) {
+    if (str.contains(numbers) && !str.contains(characters)) {
       levelName = L"";
       fid       = TFrameId(str.toInt());
     } else if (fidWithSuffix.exactMatch(str)) {
@@ -299,13 +299,13 @@ void parse(const QString &text, std::wstring &levelName, TFrameId &fid) {
       fid       = TFrameId(
           fidWithSuffix.cap(1).toInt(),
           fidWithSuffix.cap(2) == "" ? 0 : fidWithSuffix.cap(2).toLatin1()[0]);
-    } else if (str.contains(caracters)) {
+    } else if (str.contains(characters)) {
       levelName = text.toStdWString();
       fid       = TFrameId::NO_FRAME;
     }
   } else {
     QString lastString = str.right(str.size() - 1 - lastSpaceIndex);
-    if (lastString.contains(numbers) && !lastString.contains(caracters)) {
+    if (lastString.contains(numbers) && !lastString.contains(characters)) {
       QString firstString = str.left(lastSpaceIndex);
       levelName           = firstString.toStdWString();
       fid                 = TFrameId(lastString.toInt());
@@ -315,7 +315,7 @@ void parse(const QString &text, std::wstring &levelName, TFrameId &fid) {
       fid                 = TFrameId(
           fidWithSuffix.cap(1).toInt(),
           fidWithSuffix.cap(2) == "" ? 0 : fidWithSuffix.cap(2).toLatin1()[0]);
-    } else if (lastString.contains(caracters)) {
+    } else if (lastString.contains(characters)) {
       levelName = text.toStdWString();
       fid       = TFrameId::NO_FRAME;
     }
@@ -898,7 +898,7 @@ bool RenameCellField::eventFilter(QObject *obj, QEvent *e) {
 
   std::string actionId = CommandManager::instance()->getIdFromAction(action);
 
-  // These are usally standard ctrl/command strokes for text editing.
+  // These are usually standard ctrl/command strokes for text editing.
   // Default to standard behavior and don't execute OT's action while renaming
   // cell if users prefer to do so.
   // Or, always invoke OT's commands when renaming cell even the standard

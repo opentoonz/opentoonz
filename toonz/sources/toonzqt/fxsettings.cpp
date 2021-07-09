@@ -590,7 +590,7 @@ QSize getItemSize(QLayoutItem *item) {
   }
 
   ParamField *pF = dynamic_cast<ParamField *>(item->widget());
-  if (pF) return pF->getPreferedSize();
+  if (pF) return pF->getPreferredSize();
 
   Separator *sep = dynamic_cast<Separator *>(item->widget());
   if (sep) return QSize(0, 16);

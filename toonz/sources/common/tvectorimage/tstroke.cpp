@@ -2855,7 +2855,7 @@ int intersect(const TStroke &stroke, const TPointD &center, double radius,
 
 #if defined(DEBUG) || defined(_DEBUG)
   /*
-cout<<"interesections:";
+cout<<"intersections:";
 copy( intersections.begin(), intersections.end(), ostream_iterator<double>(
 cout, " " ) );
 cout<<endl;
@@ -3491,20 +3491,20 @@ TCubicStroke::TCubicStroke(const vector<T3DPointD> &pointsArray3D, double error,
   for (int i = 1; i < (int)corners.size(); i++) {
     int size       = corners[i] - corners[i - 1] + 1;
     int firstPoint = corners[i - 1];
-    T3DPointD tanLeft, tanRigth;
+    T3DPointD tanLeft, tanRight;
     assert(size > 0);
     if (size > 1)  //  capita che corners[i] = corners[i - 1] ("clic" senza drag
                    //  oppure bug (noto!!!) del cornerDetector)
     {
       tanLeft  = -pointsArray3D[firstPoint + 1] + pointsArray3D[firstPoint];
-      tanRigth = pointsArray3D[firstPoint + size - 2] -
+      tanRight = pointsArray3D[firstPoint + size - 2] -
                  pointsArray3D[firstPoint + size - 1];
 
       if (norm2(tanLeft) > 0) tanLeft = normalize(tanLeft);
 
-      if (norm2(tanRigth) > 0) tanRigth = normalize(tanRigth);
+      if (norm2(tanRight) > 0) tanRight = normalize(tanRight);
 
-      fitCubic3D(&pointsArray3D[firstPoint], size, tanLeft, tanRigth, error);
+      fitCubic3D(&pointsArray3D[firstPoint], size, tanLeft, tanRight, error);
     } else if (pointsArray3D.size() == 1) {
       //  caso in cui i non calcola nessun corner a meno di quello iniziale
       //  e finale coincidenti: 1 solo punto campionato ("clic" senza drag)

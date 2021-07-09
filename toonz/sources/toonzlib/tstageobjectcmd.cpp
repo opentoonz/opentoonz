@@ -827,11 +827,11 @@ void removeStageObjectNode(const TStageObjectId &id, TXsheetHandle *xshHandle,
 
 //===================================================================
 //
-// removeColums
+// removeColumns
 //
 //-------------------------------------------------------------------
 
-void removeColums(const QVector<int> &columnIndexes, TXsheetHandle *xshHandle,
+void removeColumns(const QVector<int> &columnIndexes, TXsheetHandle *xshHandle,
                   TObjectHandle *objHandle, TFxHandle *fxHandle,
                   bool doUndo = true) {
   TXsheet *xsh = xshHandle->getXsheet();
@@ -1502,7 +1502,7 @@ void TStageObjectCmd::deleteSelection(
   }
 
   // remove all selected objects
-  removeColums(columnIndexes, xshHandle, objHandle, fxHandle, doUndo);
+  removeColumns(columnIndexes, xshHandle, objHandle, fxHandle, doUndo);
   int i;
   for (i = pegbarIndexes.size() - 1; i >= 0; i--)
     removeStageObjectNode(TStageObjectId::PegbarId(pegbarIndexes[i]), xshHandle,

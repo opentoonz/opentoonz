@@ -281,12 +281,12 @@ else
     delete edge.second;
   }
 
-  TThickQuadratic tq_left, tq_rigth;
+  TThickQuadratic tq_left, tq_right;
 
-  tq->split(0.5, tq_left, tq_rigth);
+  tq->split(0.5, tq_left, tq_right);
 
   makeOutline(/*out,*/ outl, tq_left, error);
-  makeOutline(/*cout,*/ outl, tq_rigth, error);
+  makeOutline(/*cout,*/ outl, tq_right, error);
 }
 
 //---------------------------------------------------------------------------

@@ -34,7 +34,7 @@ TEnv::IntVar ShowAllToolsToggle("ShowAllToolsToggle", 1);
 namespace {
 struct {
   const char *toolName;
-  bool collapsable;
+  bool collapsible;
   QAction *action;
 } buttonLayout[] = {{T_Edit, false, 0},        {T_Selection, false, 0},
                     {"Separator_1", false, 0}, {T_Brush, false, 0},

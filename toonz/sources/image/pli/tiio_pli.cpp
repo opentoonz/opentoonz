@@ -25,11 +25,11 @@ namespace {
 
 //---------------------------------------------------------------------------
 
-class PliOuputStream final : public TOutputStreamInterface {
+class PliOutputStream final : public TOutputStreamInterface {
   std::vector<TStyleParam> *m_stream;
 
 public:
-  PliOuputStream(std::vector<TStyleParam> *stream) : m_stream(stream) {}
+  PliOutputStream(std::vector<TStyleParam> *stream) : m_stream(stream) {}
   TOutputStreamInterface &operator<<(double x) override {
     m_stream->push_back(TStyleParam(x));
     return *this;
@@ -183,7 +183,7 @@ pli->m_idWrittenColorsArray[0]=true;
 
     // TColorStyle*style = tempVecImg->getPalette()->getStyle(styleId);
     std::vector<TStyleParam> stream;
-    PliOuputStream chan(&stream);
+    PliOutputStream chan(&stream);
     style->save(chan);  // viene riempito lo stream;
 
     assert(pageIndex >= 0 && pageIndex <= 65535);
@@ -216,7 +216,7 @@ pli->m_idWrittenColorsArray[0]=true;
 
           // TColorStyle*style = tempVecImg->getPalette()->getStyle(styleId);
           std::vector<TStyleParam> stream;
-          PliOuputStream chan(&stream);
+          PliOutputStream chan(&stream);
           style->save(chan);  // viene riempito lo stream;
 
           assert(pageIndex >= 0 && pageIndex <= 65535);
@@ -816,7 +816,7 @@ TLevelP TLevelReaderPli::loadInfo() {
   } catch (std::exception &e) {
     TSystem::outputDebug(e.what());
 
-    throw TImageException(getFilePath(), "Unknow error on reading file");
+    throw TImageException(getFilePath(), "Unknown error on reading file");
   } catch (...) {
     throw;
   }
