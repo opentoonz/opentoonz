@@ -195,6 +195,7 @@ QFrame {
   border: 0;
   margin: 0;
   padding: 0;
+  alternate-background-color: #000;
 }
 QToolTip,
 #helpToolTip {
