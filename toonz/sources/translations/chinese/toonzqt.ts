@@ -2060,7 +2060,7 @@ Select FX nodes and related links before copying or cutting the selection you wa
         <translation>输出路径:      </translation>
     </message>
     <message>
-        <source>Endianess:      </source>
+        <source>Endianness:      </source>
         <translation>字节次序:      </translation>
     </message>
     <message>

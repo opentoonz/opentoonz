@@ -6833,7 +6833,7 @@ WARNING : Image size mismatch. The size of level with the same path is %1 x %2.<
         <translation>하위 폴더 작성</translation>
     </message>
     <message>
-        <source>Infomation</source>
+        <source>Information</source>
         <translation>정보</translation>
     </message>
     <message>
@@ -8742,7 +8742,7 @@ Do you want to overwrite it?</source>
         <translation>%1 파일이 툰즈 장면처럼 보이지 않음.</translation>
     </message>
     <message>
-        <source>A prior save of Scene &apos;%1&apos; was critically interupted. 
+        <source>A prior save of Scene &apos;%1&apos; was critically interrupted. 
 
 A partial save file was generated and changes may be manually salvaged from &apos;%2&apos;.
 
@@ -9324,7 +9324,7 @@ Do you want to overwrite it?</source>
         </translation>
     </message>
     <message>
-        <source>A convertion task is in progress! wait until it stops or cancel it</source>
+        <source>A conversion task is in progress! wait until it stops or cancel it</source>
         <translation>변환 작업이 진행중! 중지 될때까지 기다리거나 취소 하세요.</translation>
     </message>
     <message>

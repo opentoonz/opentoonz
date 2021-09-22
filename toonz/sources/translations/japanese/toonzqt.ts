@@ -2024,7 +2024,7 @@ Select FX nodes and related links before copying or cutting the selection you wa
         <translation>出力パス：</translation>
     </message>
     <message>
-        <source>Endianess:      </source>
+        <source>Endianness:      </source>
         <translation>エンディアン：</translation>
     </message>
     <message>

@@ -8841,7 +8841,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <location filename="../../toonz/penciltestpopup.cpp" line="832"/>
-        <source>Infomation</source>
+        <source>Information</source>
         <translatorcomment>точно не &quot;Info R mation&quot; ?</translatorcomment>
         <translation>Информация</translation>
     </message>
@@ -11623,7 +11623,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <location filename="../../toonz/iocommand.cpp" line="1805"/>
-        <source>A prior save of Scene &apos;%1&apos; was critically interupted. 
+        <source>A prior save of Scene &apos;%1&apos; was critically interrupted. 
 
 A partial save file was generated and changes may be manually salvaged from &apos;%2&apos;.
 
@@ -12442,7 +12442,7 @@ What do you want to do? </source>
     </message>
     <message>
         <location filename="../../toonz/fileselection.cpp" line="394"/>
-        <source>A convertion task is in progress! wait until it stops or cancel it</source>
+        <source>A conversion task is in progress! wait until it stops or cancel it</source>
         <translatorcomment>по идее здесь обязан быть вопросительный знак</translatorcomment>
         <translation>Выполняется задача конвертации! Подождать, пока она закончится, или отменить?</translation>
     </message>

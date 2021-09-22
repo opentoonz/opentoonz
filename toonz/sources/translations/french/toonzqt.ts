@@ -1901,8 +1901,8 @@ Sélectionnez les nœuds FX et les liens connexes avant de copier ou couper la s
         <translation>Chemin de Sortie:</translation>
     </message>
     <message>
-        <source>Endianess:      </source>
-        <translation>Endianess:</translation>
+        <source>Endianness:      </source>
+        <translation>Endianness:</translation>
     </message>
     <message>
         <source>It is not possible to delete the style #</source>

@@ -7432,7 +7432,7 @@ VAROVÁNÍ: Nesoulad ve velikosti obrázku. Velikost úrovně se stejnou cestou 
         <translation>Vytvořit podsložku</translation>
     </message>
     <message>
-        <source>Infomation</source>
+        <source>Information</source>
         <translation>Informace</translation>
     </message>
     <message>
@@ -9763,7 +9763,7 @@ Některé úrovně nebyly nahrány, protože jejich verze není podporována</tr
         <translation>Ještě nejsou připraveny žádné náhledové obrázky.</translation>
     </message>
     <message>
-        <source>A convertion task is in progress! wait until it stops or cancel it</source>
+        <source>A conversion task is in progress! wait until it stops or cancel it</source>
         <translation>Probíhá úloha převedení! Počkejte, dokud se nedokončí, nebo ji zrušte</translation>
     </message>
     <message>
@@ -10601,7 +10601,7 @@ Save the scene first.</source>
 Nejprve výjev uložte.</translation>
     </message>
     <message>
-        <source>A prior save of Scene &apos;%1&apos; was critically interupted. 
+        <source>A prior save of Scene &apos;%1&apos; was critically interrupted. 
 
 A partial save file was generated and changes may be manually salvaged from &apos;%2&apos;.
 

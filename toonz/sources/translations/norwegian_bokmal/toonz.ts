@@ -8270,7 +8270,7 @@ WARNING : Image size mismatch. The size of level with the same path is %1 x %2.<
     <message>
         <location filename="../../toonz/penciltestpopup.cpp" line="832"/>
         <location filename="../../toonz/penciltestpopup_qt.cpp" line="1036"/>
-        <source>Infomation</source>
+        <source>Information</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -10948,7 +10948,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <location filename="../../toonz/fileselection.cpp" line="394"/>
-        <source>A convertion task is in progress! wait until it stops or cancel it</source>
+        <source>A conversion task is in progress! wait until it stops or cancel it</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -11254,7 +11254,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <location filename="../../toonz/iocommand.cpp" line="1787"/>
-        <source>A prior save of Scene &apos;%1&apos; was critically interupted. 
+        <source>A prior save of Scene &apos;%1&apos; was critically interrupted. 
 
 A partial save file was generated and changes may be manually salvaged from &apos;%2&apos;.
 

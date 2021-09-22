@@ -7329,7 +7329,7 @@ WARNING : Image size mismatch. The saved image size is %1 x %2.</source>
         <translation>创建子文件夹</translation>
     </message>
     <message>
-        <source>Infomation</source>
+        <source>Information</source>
         <translation>信息</translation>
     </message>
     <message>
@@ -9675,7 +9675,7 @@ Some levels have not been loaded because their version is not supported</source>
         <translation>预览图像还没准备好。</translation>
     </message>
     <message>
-        <source>A convertion task is in progress! wait until it stops or cancel it</source>
+        <source>A conversion task is in progress! wait until it stops or cancel it</source>
         <translation>正在进行转换任务！请等它停止或者取消它</translation>
     </message>
     <message>
@@ -10502,7 +10502,7 @@ Save the scene first.</source>
 请先保存场景。</translation>
     </message>
     <message>
-        <source>A prior save of Scene &apos;%1&apos; was critically interupted. 
+        <source>A prior save of Scene &apos;%1&apos; was critically interrupted. 
 
 A partial save file was generated and changes may be manually salvaged from &apos;%2&apos;.
 

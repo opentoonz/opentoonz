@@ -1996,8 +1996,8 @@ Seleziona i nodi Effetto ed i relativi collegamenti prima di copiare o tagliare 
         <translation>Percorso di Uscita:</translation>
     </message>
     <message>
-        <source>Endianess:      </source>
-        <translation>Endianess:</translation>
+        <source>Endianness:      </source>
+        <translation>Endianness:</translation>
     </message>
     <message>
         <source>It is not possible to delete the style #</source>

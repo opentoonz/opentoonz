@@ -7309,7 +7309,7 @@ WARNING : Image size mismatch. The size of level with the same path is %1 x %2.<
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Infomation</source>
+        <source>Information</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -9631,7 +9631,7 @@ Einige Ebenen wurden nicht geladen, da ihre Version nicht unterstützt wird</tra
         <translation>Es gibt noch keine Vorschau-Bilder.</translation>
     </message>
     <message>
-        <source>A convertion task is in progress! wait until it stops or cancel it</source>
+        <source>A conversion task is in progress! wait until it stops or cancel it</source>
         <translation>Eine Umwandlungs-Aufgabe wird durchgeführt! Warten Sie bis sie beendet wird oder brechen Sie ab</translation>
     </message>
     <message>
@@ -10451,7 +10451,7 @@ Save the scene first.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>A prior save of Scene &apos;%1&apos; was critically interupted. 
+        <source>A prior save of Scene &apos;%1&apos; was critically interrupted. 
 
 A partial save file was generated and changes may be manually salvaged from &apos;%2&apos;.
 

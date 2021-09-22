@@ -6644,7 +6644,7 @@ WARNING : Image size mismatch. The size of level with the same path is %1 x %2.<
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Infomation</source>
+        <source>Information</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8801,8 +8801,8 @@ Certains niveaux n&apos;ont pas été chargés, car leur version n&apos;est pas 
         <translation>Les images d&apos;aperçu ne sont pas encore prêts.</translation>
     </message>
     <message>
-        <source>A convertion task is in progress! wait until it stops or cancel it</source>
-        <translation>Une tâche de convertion est en cours! Attendre jusqu&apos;à ce qu&apos;il s&apos;arrête ou l&apos; annuler</translation>
+        <source>A conversion task is in progress! wait until it stops or cancel it</source>
+        <translation>Une tâche de conversion est en cours! Attendre jusqu&apos;à ce qu&apos;il s&apos;arrête ou l&apos; annuler</translation>
     </message>
     <message>
         <source>Error loading scene %1 :%2</source>
@@ -9567,7 +9567,7 @@ Save the scene first.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>A prior save of Scene &apos;%1&apos; was critically interupted. 
+        <source>A prior save of Scene &apos;%1&apos; was critically interrupted. 
 
 A partial save file was generated and changes may be manually salvaged from &apos;%2&apos;.
 

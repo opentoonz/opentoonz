@@ -7285,7 +7285,7 @@ ADVERTENCIA : Tamaño de imagen no coincidente. El tamaño de la imagen guardada
         <translation>Crear subcarpeta</translation>
     </message>
     <message>
-        <source>Infomation</source>
+        <source>Information</source>
         <translation>Información</translation>
     </message>
     <message>
@@ -9634,7 +9634,7 @@ Algunos niveles no han sido cargados porque su versión no es soportada.</transl
         <translation>Las imágenes de previsualización no se encuentran listas aún.</translation>
     </message>
     <message>
-        <source>A convertion task is in progress! wait until it stops or cancel it</source>
+        <source>A conversion task is in progress! wait until it stops or cancel it</source>
         <translation>¡Existe una tarea de conversión en curso! Esperar a que finalice o cancelarla.</translation>
     </message>
     <message>
@@ -10450,7 +10450,7 @@ Save the scene first.</source>
 Guardar primero la escena.</translation>
     </message>
     <message>
-        <source>A prior save of Scene &apos;%1&apos; was critically interupted. 
+        <source>A prior save of Scene &apos;%1&apos; was critically interrupted. 
 
 A partial save file was generated and changes may be manually salvaged from &apos;%2&apos;.
 

@@ -7486,7 +7486,7 @@ WARNING : Image size mismatch. The saved image size is %1 x %2.</source>
         <translation>カットフォルダを作成する</translation>
     </message>
     <message>
-        <source>Infomation</source>
+        <source>Information</source>
         <translation type="vanished">基本情報</translation>
     </message>
     <message>
@@ -9843,7 +9843,7 @@ Some levels have not been loaded because their version is not supported</source>
         <translation>プレビュー画像がまだありません。</translation>
     </message>
     <message>
-        <source>A convertion task is in progress! wait until it stops or cancel it</source>
+        <source>A conversion task is in progress! wait until it stops or cancel it</source>
         <translation type="vanished">変換タスクの処理中です! 完了まで待つか、またはキャンセルして下さい</translation>
     </message>
     <message>
@@ -10657,7 +10657,7 @@ Save the scene first.</source>
 先にシーンを保存して下さい。</translation>
     </message>
     <message>
-        <source>A prior save of Scene &apos;%1&apos; was critically interupted. 
+        <source>A prior save of Scene &apos;%1&apos; was critically interrupted. 
 
 A partial save file was generated and changes may be manually salvaged from &apos;%2&apos;.
 
