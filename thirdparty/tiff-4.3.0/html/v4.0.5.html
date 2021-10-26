@@ -1,0 +1,149 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+<HEAD>
+<TITLE>
+	Changes in TIFF v4.0.5
+</TITLE>
+</HEAD>
+
+<BODY BGCOLOR=white>
+<FONT FACE="Helvetica, Arial, Sans">
+
+<BASEFONT SIZE=4>
+<B><FONT SIZE=+3>T</FONT>IFF <FONT SIZE=+2>C</FONT>HANGE <FONT SIZE=+2>I</FONT>NFORMATION</B>
+<BASEFONT SIZE=3>
+
+<UL>
+<HR SIZE=4 WIDTH=65% ALIGN=left>
+<B>Current Version</B>: v4.0.5<BR>
+<B>Previous Version</B>: <A HREF=v4.0.4.html>v4.0.4</a><BR>
+<B>Master Download Site</B>: <A HREF="https://download.osgeo.org/libtiff">
+download.osgeo.org</a>, directory pub/libtiff</A><BR>
+<B>Master HTTP Site</B>: <A HREF="http://www.simplesystems.org/libtiff/">
+http://www.simplesystems.org/libtiff/</a> 
+<HR SIZE=4 WIDTH=65% ALIGN=left>
+</UL>
+
+<P>
+This document describes the changes made to the software between the
+<I>previous</I> and <I>current</I> versions (see above).  If you don't
+find something listed here, then it was not done in this timeframe, or
+it was not considered important enough to be mentioned.  The following
+information is located here:
+<UL>
+<LI><A HREF="#highlights">Major Changes</A>
+<LI><A HREF="#configure">Changes in the software configuration</A>
+<LI><A HREF="#libtiff">Changes in libtiff</A>
+<LI><A HREF="#tools">Changes in the tools</A>
+<LI><A HREF="#contrib">Changes in the contrib area</A>
+</UL>
+<p> 
+<P><HR WIDTH=65% ALIGN=left>
+
+<!--------------------------------------------------------------------------->
+
+<A NAME="highlights"><B><FONT SIZE=+3>M</FONT>AJOR CHANGES:</B></A>
+
+<UL>
+
+	<li> Support for configure/build using CMake.
+	<li> Support for large (> 2GB) files under Microsoft Windows.
+
+</UL>
+
+
+<P><HR WIDTH=65% ALIGN=left>
+<!--------------------------------------------------------------------------->
+
+<A NAME="configure"><B><FONT SIZE=+3>C</FONT>HANGES IN THE SOFTWARE CONFIGURATION:</B></A>
+
+<UL>
+
+  <LI> CMakeLists.txt / CMake
+    <UL>
+      <LI> Configuration and building using CMake is now supported
+      under Microsoft Windows and on Unix-type systems.
+    </UL>
+  </LI>
+
+  <LI> configure.ac / configure
+    <UL>
+      <LI> Test for and use fseeko() if it is available.  This allows
+      supporting large files on Unix-type systems with a 32-bit 'long'
+      type and a 64-bit 'off_t' type.
+    </UL>
+  </LI>
+
+</UL>
+
+<P><HR WIDTH=65% ALIGN=left>
+
+<!--------------------------------------------------------------------------->
+
+<A NAME="libtiff"><B><FONT SIZE=+3>C</FONT>HANGES IN LIBTIFF:</B></A>
+
+<UL>
+
+    <LI> tiffiop.h:
+    <UL>
+      <LI> Macros added to use 64-bit equivalents for all standard I/O
+      and POSIX APIs used by libtiff and its tools which are limited
+      to 2GB in Windows builds.  Note that these 64-bit equivalents
+      were introduced by the CRT provided with Visual Studio 2005 and
+      if the necessary CRT is not installed on the target computer,
+      the program will not run.  The wrapper macros will not be
+      activated unless the definition _MSC_VER is at least 1400 or
+      __MSVCRT_VERSION__ is at least 0x800.
+    </UL>
+
+  <LI> tif_unix.c:
+    <UL>
+      <LI> Updated to support large files under Microsoft Windows.
+      This makes tif_unix.c a completely viable candidate for use
+      under Windows (in spite of its name) if the CRT is modern
+      enough.  Please note that tif_win32.c already supported large
+      files, but only 'tiffinfo' and 'tiffdump' made any provision to
+      support large files under Windows.
+      <LI> _tiffReadProc() and _tiffWriteProc() are modified to chunk
+      I/O to a maximum size of 2GB for extremely large I/O
+      requests. This surmounts limitations in the Microsoft Windows
+      read() and write() APIs (which are limited to the range of a
+      32-bit 'int'), and may avoid poor behavior with extremely large
+      I/O requests on other systems.
+    </UL>
+
+
+</UL>
+
+<P><HR WIDTH=65% ALIGN=left>
+
+<!-------------------------------------------------------------------------->
+	
+<A NAME="tools"><B><FONT SIZE=+3>C</FONT>HANGES IN THE TOOLS:</B></A>
+
+<UL>
+
+  <LI> All tools
+    <UL>
+      <LI> Updated to use I/O wrapper macros from tiffiop.h in order
+      to support large files under Microsoft Windows.
+    </UL>
+
+</UL>
+
+<P><HR WIDTH=65% ALIGN=left>
+
+<!--------------------------------------------------------------------------->
+
+<A NAME="contrib"><B><FONT SIZE=+3>C</FONT>HANGES IN THE CONTRIB AREA:</B></A>
+
+<UL> 
+
+  <LI> None
+
+</UL>
+
+Last updated $Date: 2016-09-25 20:05:47 $.
+
+</BODY>
+</HTML>

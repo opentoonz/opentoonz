@@ -1,0 +1,186 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+<HEAD>
+<TITLE>
+        Changes in TIFF v4.3.0
+</TITLE>
+<STYLE TYPE="text/css">
+body {
+    font-family: Helvetica, Arial, Sans;
+}
+table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+th, td {
+    padding: 8pt;
+    text-align: center;
+}
+th {
+    text-align: center;
+}
+td {
+    text-align: center;
+}
+
+ul li {
+    padding: 3pt;
+}
+
+ul.a {
+    list-style-type: circle;
+}
+
+ul.b {
+    list-style-type: square;
+}
+
+ol.c {
+    list-style-type: upper-roman;
+}
+
+ol.d {
+    list-style-type: lower-alpha;
+}
+
+hr {
+    width: 65%;
+}
+
+</STYLE>
+</HEAD>
+
+<BODY BGCOLOR=white>
+
+<BASEFONT SIZE=4>
+<B><FONT SIZE="+3">T</FONT>IFF <FONT SIZE="+2">C</FONT>HANGE <FONT SIZE="+2">I</FONT>NFORMATION</B>
+<BASEFONT SIZE=3>
+
+<div style="margin-left: 3em">
+<HR SIZE=4 ALIGN=left>
+<B>Current Version</B>: v4.3.0<BR>
+<B>Previous Version</B>: <A HREF="v4.2.0.html">v4.2.0</A><BR>
+<B>Master Download Site</B>: <A HREF="https://download.osgeo.org/libtiff">
+download.osgeo.org</a>, directory pub/libtiff<BR>
+<B>Master HTTP Site #1</B>: <A HREF="http://www.simplesystems.org/libtiff/">
+  http://www.simplesystems.org/libtiff/</A><BR>
+<B>Master HTTP Site #2</B>: <A HREF="https://libtiff.gitlab.io/libtiff/">
+  https://libtiff.gitlab.io/libtiff/</A><BR>
+<B>Master HTTP Site #3</B>: <A HREF="http://libtiff.maptools.org/">
+http://libtiff.maptools.org/</a>
+<HR SIZE=4 ALIGN=left>
+</div>
+
+<P>
+This document provides a summary of significant changes made to the
+software between the <I>previous</I> and <I>current</I> versions (see
+above). A fully-detailed change summary is provided by the ChangeLog file
+included in the release package and by the Git commit history:
+<UL>
+<LI><A HREF="#highlights">Major Changes</A>
+<LI><A HREF="#configure">Changes in the software configuration</A>
+<LI><A HREF="#libtiff">Changes in libtiff</A>
+<LI><A HREF="#tools">Changes in the tools</A>
+<LI><A HREF="#contrib">Changes in the contrib area</A>
+</UL>
+<p>
+<P><HR ALIGN=left>
+
+<!-- ============================================================= -->
+
+<A NAME="highlights"><B><FONT SIZE="+3">M</FONT>AJOR CHANGES:</B></A>
+
+<UL>
+
+  <LI>Build and usage of the library and its utilities requires a C99 capable
+      compiler.</LI>
+
+  <LI>New optional codec for the LERC (Limited Error Raster Compression) compression scheme.
+      To have it available, configure libtiff against the SDK available at
+      https://github.com/esri/lerc</LI>
+
+  <LI>CMake build: revamp of build scripts</LI>
+</UL>
+
+
+<P><HR ALIGN=left>
+<!-- ============================================================= -->
+
+<A NAME="configure"><B><FONT SIZE="+3">C</FONT>HANGES IN THE SOFTWARE CONFIGURATION:</B></A>
+
+<UL>
+
+  <LI>cmake: revamp of the cmake build scripts. There are impacts on the case of
+      some options.</LI>
+
+  <LI>cmake: update minimum version and policy version to 3.9.</LI>
+
+  <LI>Remove NMake build support. The functionality provided by the NMake build
+      is now completely superseded by the CMake build.</LI>
+
+  <LI>Remove antiquated Scons and makefile.lcc build support.</LI>
+
+  <LI>Remove non-functional VMS and WinCE support.</LI>
+
+  <LI>autogen.sh now updates config.guess and config.sub from master gnulib version.</LI>
+
+</UL>
+
+<P><HR ALIGN=left>
+
+<!-- ============================================================= -->
+
+<A NAME="libtiff"><B><FONT SIZE="+3">C</FONT>HANGES IN LIBTIFF:</B></A>
+
+<UL>
+
+  <LI>Use of "int8", "uint8", "int16", "uint16", "int32", "uint32", "int64", "uint64"
+      typedefs is now deprecated. libtiff code and headers no longer use them,
+      and use their C99 standard equivalents (with "_t" suffix). Those typedefs
+      are still available, with deprecation warnings, but external code is strongly
+      encouraged to use the corresponding C99 stdint.h types. The deprecated
+      types might be removed in a future release.</LI>
+
+  <LI>Removal of unused, or now useless due to C99 availability, functions in port/</LI>
+
+  <LI>A few issues spotted by static code analysis tools fixed. Compiler
+      warnings addressed.</LI>
+</UL>
+
+<P><HR ALIGN=left>
+
+<!-- ============================================================= -->
+
+<A NAME="tools"><B><FONT SIZE="+3">C</FONT>HANGES IN THE TOOLS:</B></A>
+
+<UL>
+
+  <LI>In usage text, insert a line of text summarizing each tool's purpose </LI>
+
+  <LI>tiff tools: made display of compression methods and their parameters
+      conditional on their actual availability</LI>
+
+  <LI>tiff2ps: exit the loop in case of error (#232)</LI>
+
+  <LI>tiff2pdf: check that tiff_datasize fits in a signed tsize_t (#202)</LI>
+
+  <LI>tiffsplit: exit with EXIT_FAILURE if there are extra args on the command line</LI>
+
+  <LI>tiffcmp: fix comparaison with pixels that are fractional number of bytes (#53)</LI>
+
+</UL>
+
+<P><HR ALIGN=left>
+
+<!-- ============================================================= -->
+
+<A NAME="contrib"><B><FONT SIZE="+3">C</FONT>HANGES IN THE CONTRIB AREA:</B></A>
+
+<UL>
+
+  <LI>iptcutil.c - set '#ifdef _WIN32' (was '#ifdef WIN32', which failed at build time)</LI>
+
+</UL>
+
+</BODY>
+</HTML>
