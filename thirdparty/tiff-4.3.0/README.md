@@ -14,9 +14,11 @@ or fetch a PostScript version of this documentation from the directory
     http://download.osgeo.org/libtiff/
 
 If you can't hack either of these options then basically what you
-want to do is:
+want to do in the libtiff directory is:
 
-    % ./configure
+    % mkdir BIN
+    % cmake -B BIN -S . -G "Unix Makefiles"
+    % cd BIN
     % make
     % su
     # make install
