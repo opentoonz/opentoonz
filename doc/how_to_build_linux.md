@@ -120,10 +120,11 @@ TODO: make sure we can use the system libtiff instead and remove this section.
 Features from the modified libtiff are needed currently, so this isn't a simple switch.
 
 ```
-$ cd opentoonz/thirdparty/tiff-4.0.3
-$ ./configure --with-pic --disable-jbig
-$ make -j$(nproc)
-$ cd ../../
+$ cd opentoonz/thirdparty/tiff-4.3.0
+$ mkdir BIN
+$ cmake -B BIN -S . -G "Unix Makefiles"
+$ cd BIN
+$ make
 ```
 
 ### Building OpenToonz
