@@ -1,0 +1,275 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+<HEAD>
+<TITLE>
+	Changes in TIFF v4.0.4
+</TITLE>
+</HEAD>
+
+<BODY BGCOLOR=white>
+<FONT FACE="Helvetica, Arial, Sans">
+
+<BASEFONT SIZE=4>
+<B><FONT SIZE=+3>T</FONT>IFF <FONT SIZE=+2>C</FONT>HANGE <FONT SIZE=+2>I</FONT>NFORMATION</B>
+<BASEFONT SIZE=3>
+
+<UL>
+<HR SIZE=4 WIDTH=65% ALIGN=left>
+<B>Current Version</B>: v4.0.4<BR>
+<B>Previous Version</B>: <A HREF=v4.0.4beta.html>v4.0.4beta</a><BR>
+<B>Master Download Site</B>: <A HREF="https://download.osgeo.org/libtiff">
+download.osgeo.org</a>, directory pub/libtiff</A><BR>
+<B>Master HTTP Site</B>: <A HREF="http://www.simplesystems.org/libtiff/">
+http://www.simplesystems.org/libtiff/</a> 
+<HR SIZE=4 WIDTH=65% ALIGN=left>
+</UL>
+
+<P>
+This document describes the changes made to the software between the
+<I>previous</I> and <I>current</I> versions (see above).  If you don't
+find something listed here, then it was not done in this timeframe, or
+it was not considered important enough to be mentioned.  The following
+information is located here:
+<UL>
+<LI><A HREF="#highlights">Major Changes</A>
+<LI><A HREF="#configure">Changes in the software configuration</A>
+<LI><A HREF="#libtiff">Changes in libtiff</A>
+<LI><A HREF="#tools">Changes in the tools</A>
+<LI><A HREF="#contrib">Changes in the contrib area</A>
+</UL>
+<p> 
+<P><HR WIDTH=65% ALIGN=left>
+
+<!--------------------------------------------------------------------------->
+
+<A NAME="highlights"><B><FONT SIZE=+3>M</FONT>AJOR CHANGES:</B></A>
+
+<UL>
+
+	<li> None
+
+</UL>
+
+
+<P><HR WIDTH=65% ALIGN=left>
+<!--------------------------------------------------------------------------->
+
+<A NAME="configure"><B><FONT SIZE=+3>C</FONT>HANGES IN THE SOFTWARE CONFIGURATION:</B></A>
+
+<UL>
+
+  <LI> configure.ac / configure
+    <UL>
+      <LI> Bugzilla Bug #2405: Correct shell equality operator.
+      <LI> Bugzilla Bug #2498: Adds an option to select the file I/O style on Windows hosts.
+    </UL>
+
+</UL>
+
+<P><HR WIDTH=65% ALIGN=left>
+
+<!--------------------------------------------------------------------------->
+
+<A NAME="libtiff"><B><FONT SIZE=+3>C</FONT>HANGES IN LIBTIFF:</B></A>
+
+<UL>
+
+  <LI> tif_dir.c:
+    <UL>
+      <LI> TIFFNumberOfDirectories: Coverity 1134470 "Logically dead code"
+    </UL>
+
+  <LI> tif_dirread.c:
+    <UL>
+      <LI> TIFFReadDirEntryDoubleArray: Coverity 298626 "Logically dead code".
+      <LI> TIFFReadDirEntryFloatArray: Coverity 298627 "Logically dead code".
+      <LI> TIFFReadDirEntryIfd8Array: Coverity 298628 "Logically dead code".
+      <LI> TIFFReadDirEntrySlong8Array: Coverity 298629 "Logically dead code"
+    </UL>
+
+  <LI> tif_dirwrite.c
+    <UL>
+      <LI> _TIFFRewriteField: Coverity 1024310 "Resource leak".
+    </UL>
+
+  <LI> tif_jpeg.c
+    <UL>
+      <LI> JPEGCleanup: Coverity 298624 "Dereference before null check".
+      <LI> JPEGDecode: Coverity 602597 "Operands don't affect result".
+    </UL>
+
+  <LI> tif_getimage.c
+    <UL>
+      <LI> Bugzilla Bug #2409: Correct reading of certain tiled TIFFs.
+    </UL>
+
+  <LI> tif_luv.c
+    <UL>
+      <LI> LogLuvDecodeStrip: Coverity 991239 "Division or modulo by zero".
+      <LI> LogLuvDecodeTile: Coverity 991227 "Division or modulo by zero".
+      <LI> LogLuvEncodeStrip: Coverity 991240 "Division or modulo by zero".
+      <LI> LogLuvEncodeTile: Coverity 991241 "Division or modulo by zero".
+    </UL>
+
+  <LI> tif_lzw.c
+    <UL>
+      <LI> Decode files that contain consecutive CODE_CLEAR codes.
+    </UL>
+
+  <LI> tif_ojpeg.c
+    <UL>
+      <LI> OJPEGReadBufferFill: Coverity 603400 "Missing break in switch".
+      <LI> OJPEGReadHeaderInfoSecStreamDht: Coverity 601720 "Resource leak".
+    </UL>
+
+  <LI> tif_read.c
+    <UL>
+      <LI> TIFFStartTile: Coverity 715973 and 715974 "Division or modulo by zero".
+    </UL>
+
+  <LI> tif_unix.c
+    <UL>
+      <LI> Bugzilla Bug #2510: Fix several harmless but still annoying warnings.
+    </UL>
+
+  <LI> tif_write
+    <UL>
+      <LI> TIFFWriteEncodedStrip: Coverity 715975 "Division or modulo by zero".
+      <LI> TIFFWriteEncodedTile: Coverity 715976 and 715977 "Division or modulo by zero".
+      <LI> TIFFWriteRawStrip: Coverity 715978 "Division or modulo by zero".
+      <LI> TIFFWriteScanline: Coverity 715979 "Division or modulo by zero".
+    </UL>
+
+</UL>
+
+<P><HR WIDTH=65% ALIGN=left>
+
+<!-------------------------------------------------------------------------->
+	
+<A NAME="tools"><B><FONT SIZE=+3>C</FONT>HANGES IN THE TOOLS:</B></A>
+
+<UL>
+
+  <LI> bmp2tiff
+    <UL>
+      <LI> Coverity 1024225 "Untrusted value as argument".
+      <LI> Coverity 1024678 "Unchecked return value from library".
+      <LI> Coverity 1024679 "Unchecked return value from library".
+      <LI> Coverity 1214160 "Ignoring number of bytes read".
+    </UL>
+
+  <LI> gif2tiff
+    <UL>
+      <LI> Coverity 1024222 "Untrusted value as argument".
+      <LI> Coverity 1024890 "Ignoring number of bytes read".
+      <LI> Coverity 1024891 "Ignoring number of bytes read".
+      <LI> Coverity 1024892 "Ignoring number of bytes read".
+      <LI> Coverity 1024893 "Ignoring number of bytes read".
+      <LI> Coverity 1024894 "Ignoring number of bytes read".
+    </UL>
+
+  <LI> ras2tiff
+    <UL>
+      <LI> Corrected Sun Raster header definition to be safe for
+      64-bit systems.  Add some header validations.  Fixes many
+      (unspecified) Coverity issues.
+      <LI> Coverity 1024223 "Untrusted value as argument".
+      <LI> Coverity 1301206: "Integer handling issues  (BAD_SHIFT)".
+    </UL>
+
+  <LI> raw2tiff
+    <UL>
+      <LI> Coverity 1024887 "Unchecked return value from library".
+      <LI> Coverity 1024888 "Unchecked return value from library".
+      <LI> Coverity 1024889 "Unchecked return value from library".
+      <LI> Coverity 1214162 "Ignoring number of bytes read".
+    </UL>
+
+  <LI> tiff2pdf
+    <UL>
+      <LI> Bugzilla Bug #2078. Suppress initial output of the header.
+      <LI> Bugzilla Bug #2150. Change ColorTransform from "0" to "1".
+      <LI> Take care in using the return value from snprintf().
+      <LI> Coverity 1024181 "Structurally dead code".
+      <LI> Coverity 1024181 "Structurally dead code".
+      <LI> Coverity 1227690 "Unused value".
+      <LI> Coverity 298621 "Resource leak".
+    </UL>
+
+  <LI> tiff2ps
+    <UL>
+      <LI> Correct sizing and scaling problems with output document.
+    </UL>
+
+  <LI> tiffcp
+    <UL>
+      <LI> Coverity 1024306, 1024307, 1024308, 1024309 "Resource leak".
+    </UL>
+
+  <LI> tiffcrop
+    <UL>
+      <LI> Correctly copy the compression tag from the source TIFF.
+      <LI> Coverity 1024545 "Division or modulo by zero".
+      <LI> Coverity 1024586 "Logically dead code".
+      <LI> Coverity 1024796 "Nesting level does not match indentation".
+      <LI> Coverity 1024797 "Nesting level does not match indentation".
+      <LI> Coverity 1294542 "Logical vs. bitwise operator".
+      <LI> Coverity 1299740 "Out-of-bounds write".
+      <LI> Coverity 1299741 "Dereference before null check".
+    </UL>
+
+  <LI> tiffdither
+    <UL>
+      <LI>Check memory allocations for failure.  Also check
+        multiplication overflow. (Fixes #2501, CVE-2014-8128)
+    </UL>
+
+  <LI> tiffgt.c
+    <UL>
+      <LI> Bugzilla Bug #2401. Appropriately call glFlush().
+    </UL>
+
+  <LI> tiffmedian
+    <UL>
+      <LI> Coverity 1024386 "Out-of-bounds read".
+      <LI> Coverity 1024386 "Out-of-bounds read".
+      <LI> Coverity 1024795 "Nesting level does not match indentation".
+      <LI> Coverity 1024795 "Nesting level does not match indentation".
+    </UL>
+
+  <LI> tiffsplit
+    <UL>
+      <LI> Coverity 1024304 "Resource leak".
+      <LI> Coverity 1024305 "Resource leak".
+    </UL>
+
+</UL>
+
+<P><HR WIDTH=65% ALIGN=left>
+
+<!--------------------------------------------------------------------------->
+
+<A NAME="contrib"><B><FONT SIZE=+3>C</FONT>HANGES IN THE CONTRIB AREA:</B></A>
+
+<UL> 
+
+  <LI> addtiffo
+    <UL>
+      <LI> Check buffer size calculation for overflow.
+      <LI> Coverity  298615 "Resource leak".
+      <LI> Coverity 1024649 "Unintended sign extension".
+    </UL>
+
+  <LI> iptcutil
+    <UL>
+      <LI> Coverity 1024468 "Infinite loop".
+      <LI> Coverity 1024727 "Truncated stdio return value".
+      <LI> Coverity 1214240 "Untrusted loop bound".
+    </UL>
+
+</UL>
+
+Last updated $Date: 2016-09-25 20:05:47 $.
+
+</BODY>
+</HTML>

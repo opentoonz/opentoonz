@@ -1,3 +1,4 @@
+#
 # Tag Image File Format (TIFF) Software
 #
 # Copyright (C) 2004, Andrey Kiselev <dron@ak4719.spb.edu>
@@ -23,65 +24,77 @@
 
 # Process this file with automake to produce Makefile.in.
 
-docdir = $(LIBTIFF_DOCDIR)
-
-AUTOMAKE_OPTIONS = 1.12 dist-zip foreign
-ACLOCAL_AMFLAGS = -I m4
+docdir = $(LIBTIFF_DOCDIR)/html
 
 docfiles = \
-	COPYRIGHT \
-	ChangeLog \
-	README.md \
-	RELEASE-DATE \
-	TODO \
-	VERSION
-
-EXTRA_DIST = \
-	cmake \
-	CMakeLists.txt \
-	HOWTO-RELEASE \
-	autogen.sh \
-	libtiff-4.pc.in
+	addingtags.html \
+	bugs.html \
+	build.html \
+	contrib.html \
+	document.html \
+	images.html \
+	index.html \
+	internals.html \
+	intro.html \
+	libtiff.html \
+	misc.html \
+	support.html \
+	TIFFTechNote2.html \
+	tools.html \
+	v3.4beta007.html \
+	v3.4beta016.html \
+	v3.4beta018.html \
+	v3.4beta024.html \
+	v3.4beta028.html \
+	v3.4beta029.html \
+	v3.4beta031.html \
+	v3.4beta032.html \
+	v3.4beta033.html \
+	v3.4beta034.html \
+	v3.4beta035.html \
+	v3.4beta036.html \
+	v3.5.1.html \
+	v3.5.2.html \
+	v3.5.3.html \
+	v3.5.4.html \
+	v3.5.5.html \
+	v3.5.6-beta.html \
+	v3.5.7.html \
+	v3.6.0.html \
+	v3.6.1.html \
+	v3.7.0alpha.html \
+	v3.7.0beta.html \
+	v3.7.0beta2.html \
+	v3.7.0.html \
+	v3.7.1.html \
+	v3.7.2.html \
+	v3.7.3.html \
+	v3.7.4.html \
+	v3.8.0.html \
+	v3.8.1.html \
+	v3.8.2.html \
+	v3.9.0beta.html \
+	v3.9.1.html \
+	v3.9.2.html \
+	v4.0.0.html \
+	v4.0.1.html \
+	v4.0.2.html \
+	v4.0.3.html \
+	v4.0.4beta.html \
+	v4.0.4.html \
+	v4.0.5.html \
+	v4.0.6.html \
+	v4.0.7.html \
+	v4.0.8.html \
+	v4.0.9.html \
+	v4.0.10.html \
+	v4.1.0.html \
+	v4.2.0.html \
+	v4.3.0.html
 
 dist_doc_DATA = $(docfiles)
 
-distcheck-hook:
-	if [ -x "$(CMAKE)" ]; then \
-	  mkdir $(distdir)/_build/cmake \
-	  && cd $(distdir)/_build/cmake \
-	  && cmake ../.. \
-	  && $(MAKE) \
-	  && ctest -V \
-	  && $(MAKE) DESTDIR=../../_inst/cmake install ; \
-	fi
-	rm -rf $(distdir)/_build/cmake
-	rm -rf $(distdir)/_inst/cmake
+SUBDIRS = images man
 
-SUBDIRS = port libtiff tools build contrib test man html
-
-release:
-	(rm -f $(top_srcdir)/RELEASE-DATE && echo $(LIBTIFF_RELEASE_DATE) > $(top_srcdir)/RELEASE-DATE)
-	(rm -f $(top_srcdir)/VERSION && echo $(LIBTIFF_VERSION) > $(top_srcdir)/VERSION)
-	(rm -f $(top_srcdir)/libtiff/tiffvers.h && sed 's,LIBTIFF_VERSION,$(LIBTIFF_VERSION),;s,LIBTIFF_RELEASE_DATE,$(LIBTIFF_RELEASE_DATE),' $(top_srcdir)/libtiff/tiffvers.h.in > $(top_srcdir)/libtiff/tiffvers.h)
-
-pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = libtiff-4.pc
-
-# Special rules to assist with Coverity submissions.
-PACKAGE_CHANGE_DATE=`awk '/^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]/ { print substr($$1,1,4) substr($$1,6,2) substr($$1,9,2); exit; }' $(top_srcdir)/ChangeLog`
-COVERITY_EMAIL=bfriesen@simple.dallas.tx.us
-COVERITY_TARBALL=libtiff.xz
-COVERITY_VERSION=devel-${PACKAGE_CHANGE_DATE}
-COVERITY_DESCRIPTION='libtiff development'
-coverity:
-	$(MAKE) clean
-	cov-build --dir cov-int $(MAKE)
-	tar caf $(COVERITY_TARBALL) cov-int
-	curl --limit-rate 50K \
-	--form token=`cat $$HOME/.coverity_key_tiff` \
-	--form email=$(COVERITY_EMAIL) \
-	--form file=@$(COVERITY_TARBALL) \
-	--form version=$(COVERITY_VERSION) \
-	--form description=$(COVERITY_DESCRIPTION) \
-	https://scan.coverity.com/builds?project=tiff
-	$(RM) $(COVERITY_TARBALL)
+EXTRA_DIST = \
+	CMakeLists.txt

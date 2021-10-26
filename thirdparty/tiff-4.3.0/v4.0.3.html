@@ -1,0 +1,126 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+<HEAD>
+<TITLE>
+	Changes in TIFF v4.0.3
+</TITLE>
+</HEAD>
+
+<BODY BGCOLOR=white>
+<FONT FACE="Helvetica, Arial, Sans">
+
+<BASEFONT SIZE=4>
+<B><FONT SIZE=+3>T</FONT>IFF <FONT SIZE=+2>C</FONT>HANGE <FONT SIZE=+2>I</FONT>NFORMATION</B>
+<BASEFONT SIZE=3>
+
+<UL>
+<HR SIZE=4 WIDTH=65% ALIGN=left>
+<B>Current Version</B>: v4.0.3<BR>
+<B>Previous Version</B>: <A HREF=v4.0.2.html>v4.0.2</a><BR>
+<B>Master Download Site</B>: <A HREF="https://download.osgeo.org/libtiff">
+download.osgeo.org</a>, directory pub/libtiff</A><BR>
+<B>Master HTTP Site</B>: <A HREF="http://www.simplesystems.org/libtiff/">
+http://www.simplesystems.org/libtiff/</a> 
+<HR SIZE=4 WIDTH=65% ALIGN=left>
+</UL>
+
+<P>
+This document describes the changes made to the software between the
+<I>previous</I> and <I>current</I> versions (see above).  If you don't
+find something listed here, then it was not done in this timeframe, or
+it was not considered important enough to be mentioned.  The following
+information is located here:
+<UL>
+<LI><A HREF="#highlights">Major Changes</A>
+<LI><A HREF="#configure">Changes in the software configuration</A>
+<LI><A HREF="#libtiff">Changes in libtiff</A>
+<LI><A HREF="#tools">Changes in the tools</A>
+<LI><A HREF="#contrib">Changes in the contrib area</A>
+</UL>
+<p> 
+<P><HR WIDTH=65% ALIGN=left>
+
+<!--------------------------------------------------------------------------->
+
+<A NAME="highlights"><B><FONT SIZE=+3>M</FONT>AJOR CHANGES:</B></A>
+
+<UL>
+
+	<li> None
+
+</UL>
+
+
+<P><HR WIDTH=65% ALIGN=left>
+<!--------------------------------------------------------------------------->
+
+<A NAME="configure"><B><FONT SIZE=+3>C</FONT>HANGES IN THE SOFTWARE CONFIGURATION:</B></A>
+
+<UL>
+
+  <li> Updated to use Automake 1.12.4.  Avoids security problem with
+  'make distcheck' (CVE-2012-3386).
+
+</UL>
+
+<P><HR WIDTH=65% ALIGN=left>
+
+<!--------------------------------------------------------------------------->
+
+<A NAME="libtiff"><B><FONT SIZE=+3>C</FONT>HANGES IN LIBTIFF:</B></A>
+
+<UL>
+
+  <li> Various memory buffer access fixes.
+
+  <li> Fix handling when writing RGBA jpeg compressed imagery
+  (<A HREF="http://trac.osgeo.org/gdal/ticket/4732">http://trac.osgeo.org/gdal/ticket/4732</A>).
+
+  <li> Fix to work properly with IJG JPEG 7+.
+
+  <li> New functions TIFFFieldTag(), TIFFFieldName(),
+  TIFFFieldDataType(), TIFFFieldPassCount(), TIFFFieldReadCount(),
+  TIFFFieldWriteCount() to use as external accessors for the opaque
+  type TIFFField.
+
+  <li> Fix bug rewriting image tiles in a compressed
+  file (<A HREF="http://trac.osgeo.org/gdal/ticket/4771">http://trac.osgeo.org/gdal/ticket/4771</A>).
+
+  <li> Add TIFF/FX tag support in libtiff.
+
+</UL>
+
+<P><HR WIDTH=65% ALIGN=left>
+
+<!-------------------------------------------------------------------------->
+	
+<A NAME="tools"><B><FONT SIZE=+3>C</FONT>HANGES IN THE TOOLS:</B></A>
+
+<UL>
+
+  <li> tiff2pdf: Fail when TIFFSetDirectory() fails.  This prevents
+  core dumps or perhaps even arbitrary code execution when processing
+  a corrupt input file (CVE-2012-3401).
+
+  <li> tiff2pdf: Fix two places where t2p_error didn't get set after a
+  malloc failure.  No crash risk AFAICS, but the program might not
+  report exit code 1 as desired.
+
+</UL>
+
+<P><HR WIDTH=65% ALIGN=left>
+
+<!--------------------------------------------------------------------------->
+
+<A NAME="contrib"><B><FONT SIZE=+3>C</FONT>HANGES IN THE CONTRIB AREA:</B></A>
+
+<UL> 
+
+	<li> None
+
+</UL>
+
+Last updated $Date: 2016-09-25 20:05:47 $.
+
+</BODY>
+</HTML>

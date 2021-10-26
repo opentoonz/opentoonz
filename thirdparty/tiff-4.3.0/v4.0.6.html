@@ -1,0 +1,140 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+<HEAD>
+<TITLE>
+	Changes in TIFF v4.0.6
+</TITLE>
+</HEAD>
+
+<BODY BGCOLOR=white>
+<FONT FACE="Helvetica, Arial, Sans">
+
+<BASEFONT SIZE=4>
+<B><FONT SIZE=+3>T</FONT>IFF <FONT SIZE=+2>C</FONT>HANGE <FONT SIZE=+2>I</FONT>NFORMATION</B>
+<BASEFONT SIZE=3>
+
+<UL>
+<HR SIZE=4 WIDTH=65% ALIGN=left>
+<B>Current Version</B>: v4.0.6<BR>
+<B>Previous Version</B>: <A HREF=v4.0.5.html>v4.0.5</a><BR>
+<B>Master Download Site</B>: <A HREF="https://download.osgeo.org/libtiff">
+download.osgeo.org</a>, directory pub/libtiff</A><BR>
+<B>Master HTTP Site</B>: <A HREF="http://www.simplesystems.org/libtiff/">
+http://www.simplesystems.org/libtiff/</a> 
+<HR SIZE=4 WIDTH=65% ALIGN=left>
+</UL>
+
+<P>
+This document describes the changes made to the software between the
+<I>previous</I> and <I>current</I> versions (see above).  If you don't
+find something listed here, then it was not done in this timeframe, or
+it was not considered important enough to be mentioned.  The following
+information is located here:
+<UL>
+<LI><A HREF="#highlights">Major Changes</A>
+<LI><A HREF="#configure">Changes in the software configuration</A>
+<LI><A HREF="#libtiff">Changes in libtiff</A>
+<LI><A HREF="#tools">Changes in the tools</A>
+<LI><A HREF="#contrib">Changes in the contrib area</A>
+</UL>
+<p> 
+<P><HR WIDTH=65% ALIGN=left>
+
+<!--------------------------------------------------------------------------->
+
+<A NAME="highlights"><B><FONT SIZE=+3>M</FONT>AJOR CHANGES:</B></A>
+
+<UL>
+
+	<li> Now builds with CMake 2.8.9 and newer (previously required 3.0.0)
+
+</UL>
+
+
+<P><HR WIDTH=65% ALIGN=left>
+<!--------------------------------------------------------------------------->
+
+<A NAME="configure"><B><FONT SIZE=+3>C</FONT>HANGES IN THE SOFTWARE CONFIGURATION:</B></A>
+
+<UL>
+
+  <LI> CMakeLists.txt / CMake
+    <UL>
+      <LI> Supports CMake 2.8.9 and later.
+      <LI> Add missing file which wasn't being distributed, causing
+      unit tests to fail.
+      <LI> Make shared/static library building configurable.
+      <LI> CMake reads all version information directly from
+      configure.ac to avoid duplication of values.
+      <LI> CMake builds are now included in 'distcheck' target.
+    </UL>
+  </LI>
+
+  <LI> Makefile.am
+    <UL>
+      <LI> Autotools 'make distcheck' now tests the CMake-based build
+      if CMake is available.
+    </UL>
+  </LI>
+
+</UL>
+
+<P><HR WIDTH=65% ALIGN=left>
+
+<!--------------------------------------------------------------------------->
+
+<A NAME="libtiff"><B><FONT SIZE=+3>C</FONT>HANGES IN LIBTIFF:</B></A>
+
+<UL>
+
+    <LI> Fixes to avoid undefined behaviour of signed types (C
+    standard compliance).
+    <LI> Fixes to avoid possible isses when casting to unsigned char.
+    <LI> Fixes to avoid undefined behaviour with shifts.
+    <LI> Fix generation of output with 16 bit or 32 bit integer, when
+    byte swapping is needed, in horizontal predictor (#2521).
+    <LI> Fix decoding when there is a single pixel to decode (unlikely
+    case...) and byte swapping is involved.
+    <LI> Add add explicit masking with 0xff before casting to uchar in
+    floating-point horizontal differencing and accumulation routines.
+    <LI> Eliminate requirement for and use of 64-bit constant values.
+
+</UL>
+
+<P><HR WIDTH=65% ALIGN=left>
+
+<!-------------------------------------------------------------------------->
+	
+<A NAME="tools"><B><FONT SIZE=+3>C</FONT>HANGES IN THE TOOLS:</B></A>
+
+<UL>
+
+  <LI> tiffgt
+    <UL>
+      <LI> Silence glut API deprecation warnings on MacOS X.
+    </UL>
+
+
+  <LI> fax2ps
+    <UL>
+      <LI> Detect failure to write to temporary file.
+    </UL>
+
+</UL>
+
+<P><HR WIDTH=65% ALIGN=left>
+
+<!--------------------------------------------------------------------------->
+
+<A NAME="contrib"><B><FONT SIZE=+3>C</FONT>HANGES IN THE CONTRIB AREA:</B></A>
+
+<UL> 
+
+  <LI> None
+
+</UL>
+
+Last updated $Date: 2016-09-25 20:05:47 $.
+
+</BODY>
+</HTML>
