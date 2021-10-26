@@ -59,8 +59,11 @@ $ cd opentoonz
 $ git lfs pull
 $ cd thirdparty/lzo
 $ cp -r 2.03/include/lzo driver
-$ cd ../tiff-4.0.3
-$ ./configure && make
+$ cd ../tiff-4.3.0
+$ mkdir BIN
+$ cmake -B BIN -S . -G "Unix Makefiles"
+$ cd BIN
+$ make
 ```
 
 If you downloaded and installed boost from https://boost.org instead of homebrew, move the package under `thirdparty/boost` as follows: 
