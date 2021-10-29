@@ -1,0 +1,207 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+<HEAD>
+<TITLE>
+        Changes in TIFF v4.2.0
+</TITLE>
+<STYLE TYPE="text/css">
+body {
+    font-family: Helvetica, Arial, Sans;
+}
+table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+th, td {
+    padding: 8pt;
+    text-align: center;
+}
+th {
+    text-align: center;
+}
+td {
+    text-align: center;
+}
+
+ul li {
+    padding: 3pt;
+}
+
+ul.a {
+    list-style-type: circle;
+}
+
+ul.b {
+    list-style-type: square;
+}
+
+ol.c {
+    list-style-type: upper-roman;
+}
+
+ol.d {
+    list-style-type: lower-alpha;
+}
+
+hr {
+    width: 65%;
+}
+
+</STYLE>
+</HEAD>
+
+<BODY BGCOLOR=white>
+
+<BASEFONT SIZE=4>
+<B><FONT SIZE="+3">T</FONT>IFF <FONT SIZE="+2">C</FONT>HANGE <FONT SIZE="+2">I</FONT>NFORMATION</B>
+<BASEFONT SIZE=3>
+
+<div style="margin-left: 3em">
+<HR SIZE=4 ALIGN=left>
+<B>Current Version</B>: v4.2.0<BR>
+<B>Previous Version</B>: <A HREF="v4.1.0.html">v4.1.0</A><BR>
+<B>Master Download Site</B>: <A HREF="https://download.osgeo.org/libtiff">
+download.osgeo.org</a>, directory pub/libtiff<BR>
+<B>Master HTTP Site #1</B>: <A HREF="http://www.simplesystems.org/libtiff/">
+  http://www.simplesystems.org/libtiff/</A><BR>
+<B>Master HTTP Site #2</B>: <A HREF="https://libtiff.gitlab.io/libtiff/">
+  https://libtiff.gitlab.io/libtiff/</A><BR>
+<B>Master HTTP Site #3</B>: <A HREF="http://libtiff.maptools.org/">
+http://libtiff.maptools.org/</a>
+<HR SIZE=4 ALIGN=left>
+</div>
+
+<P>
+This document provides a summary of significant changes made to the
+software between the <I>previous</I> and <I>current</I> versions (see
+above). A fully-detailed change summary is provided by the ChangeLog file
+included in the release package and by the Git commit history:
+<UL>
+<LI><A HREF="#highlights">Major Changes</A>
+<LI><A HREF="#configure">Changes in the software configuration</A>
+<LI><A HREF="#libtiff">Changes in libtiff</A>
+<LI><A HREF="#tools">Changes in the tools</A>
+<LI><A HREF="#contrib">Changes in the contrib area</A>
+</UL>
+<p>
+<P><HR ALIGN=left>
+
+<!-- ============================================================= -->
+
+<A NAME="highlights"><B><FONT SIZE="+3">M</FONT>AJOR CHANGES:</B></A>
+
+<UL>
+
+  <LI>Optional support for using libdeflate is added.</LI>
+
+  <LI>Many of the tools now support a memory usage limit.</LI>
+
+</UL>
+
+
+<P><HR ALIGN=left>
+<!-- ============================================================= -->
+
+<A NAME="configure"><B><FONT SIZE="+3">C</FONT>HANGES IN THE SOFTWARE CONFIGURATION:</B></A>
+
+<UL>
+
+  <LI>The Microsoft Windows 'nmake' build is resuscitated and provides
+  a default HAVE_STRTOLL setting in 'nmake.opt' which is suitable for
+  MSVC++ 14.0 ("Visual Studio 2015") and later but may be disabled in
+    order to compile with earlier compiler versions.</LI>
+
+  <LI>mingw-w64 cmake build fixes to not add libm</LI>
+
+</UL>
+
+<P><HR ALIGN=left>
+
+<!-- ============================================================= -->
+
+<A NAME="libtiff"><B><FONT SIZE="+3">C</FONT>HANGES IN LIBTIFF:</B></A>
+
+<UL>
+
+  <LI>A great many issues discovered by fuzzers (via oss-fuzz and other reports) have been addressed.</LI>
+
+  <LI>EXIF 2.32 and GPS tags and functionality have been upgraded:
+    <UL>
+      <LI>Existing EXIF field definition of tags are upgraded to EXIF version 2.3.2</LI>
+      <LI>EXIF-GPS structure, tags and access functions are added as special CustomDirectory (like it was done for EXIF).</LI>
+      <LI>Reading error for FileSource and SceneType tags corrected.</LI>
+    </UL>
+
+  <LI>Make TIFFTAG_CFAPATTERN variable count.</LI>
+
+  <LI>Cmake configuration fixes for big-endian targets.</LI>
+
+  <LI><P>Added support for optional building against libdeflate for
+    faster Zip/Deflate compression/decompression.</P>
+
+    <P>We now have 2 kinds of builds with the Zip/Deflate codec:</P>
+    <UL>
+      <LI>zlib only</LI>
+      <LI>zlib + libdeflate</LI>
+    </UL>
+
+    <P>Speed improvements in the 35%-50% range can be expected when libdeflate is used.
+      Compression level up to 12 is now supported (capped to 9 when zlib is used).
+      Still requires zlib for situations where libdeflate cannot be used (that
+      is for scanline access, since libdeflate has no streaming mode)</P>
+
+    <P>Pseudo-tag TIFFTAG_DEFLATE_SUBCODEC=DEFLATE_SUBCODEC_ZLIB/DEFLATE_SUBCODEC_LIBDEFLATE
+      is added to control which subcodec (zlib or libdeflate) should be used (it defaults
+      of course to libdeflate, when it is available).
+      This is mostly aimed at being used on the writing side, to be able to reproduce
+      output of previous libtiff versions at a binary level, in situations where this would
+      be really needed. Or as a safety belt in case there would be unforeseen issues
+      with using libdeflate.
+      It can be used to know when libdeflate is available at runtime (DEFLATE_SUBCODEC_LIBDEFLATE
+      will be the default value in that situation).</P>
+    <P>Of course, deflate codestreams produced by libdeflate can be read by zlib, and vice-versa.</P>
+
+  </LI>
+
+</UL>
+
+<P><HR ALIGN=left>
+
+<!-- ============================================================= -->
+
+<A NAME="tools"><B><FONT SIZE="+3">C</FONT>HANGES IN THE TOOLS:</B></A>
+
+<UL>
+
+  <LI>A great many issues discovered by fuzzers (via oss-fuzz and other reports) have been addressed.</LI>
+
+  <LI>ppm2tiff: support any bps value from 1 to 16.</LI>
+
+  <LI>tiff2ps, tiff2rgba:  A default memory limit is now enforced (256MiB) and a '-M' option is added to allow the user to adjust the limit.</LI>
+
+  <LI>tiff2pdf, tiffcp: A default memory limit is now enforced (256MiB) and a '-m' option is added to allow the user to adjust the limit.</LI>
+
+  <LI>tiffcrop: A default memory limit is now enforced (256MiB) and a '-k' option is added to allow the user to adjust the limit.</LI>
+
+  <LI>tiff2pdf: fix "raw" copy of Deflate streams.</LI>
+
+  <LI>tiff2pdf.c: properly calculate datasize when saving to JPEG YCbCr</LI>
+
+  <LI>tiffcp: disable strip chopping when trying to convert to JBIG compression</LI>
+
+</UL>
+
+<P><HR ALIGN=left>
+
+<!-- ============================================================= -->
+
+<A NAME="contrib"><B><FONT SIZE="+3">C</FONT>HANGES IN THE CONTRIB AREA:</B></A>
+
+<UL>
+
+  <LI>None</LI>
+
+</UL>
+
+</BODY>
+</HTML>

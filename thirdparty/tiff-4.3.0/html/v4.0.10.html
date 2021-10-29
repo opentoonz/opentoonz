@@ -1,0 +1,327 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+<HEAD>
+<TITLE>
+        Changes in TIFF v4.0.10
+</TITLE>
+<STYLE>
+table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+th, td {
+    padding: 8pt;
+    text-align: center;
+}
+th {
+    text-align: center;
+}
+td {
+    text-align: center;
+}
+
+ul li {
+    padding: 3pt;
+}
+
+ul.a {
+    list-style-type: circle;
+}
+
+ul.b {
+    list-style-type: square;
+}
+
+ol.c {
+    list-style-type: upper-roman;
+}
+
+ol.d {
+    list-style-type: lower-alpha;
+}
+
+</STYLE>
+</HEAD>
+
+<BODY BGCOLOR=white>
+<FONT FACE="Helvetica, Arial, Sans">
+
+<BASEFONT SIZE=4>
+<B><FONT SIZE=+3>T</FONT>IFF <FONT SIZE=+2>C</FONT>HANGE <FONT SIZE=+2>I</FONT>NFORMATION</B>
+<BASEFONT SIZE=3>
+
+<UL>
+<HR SIZE=4 WIDTH=65% ALIGN=left>
+<B>Current Version</B>: v4.0.10<BR>
+<B>Previous Version</B>: <A HREF=v4.0.9.html>v4.0.9</a><BR>
+<B>Master Download Site</B>: <A HREF="https://download.osgeo.org/libtiff">
+download.osgeo.org</a>, directory pub/libtiff</A><BR>
+<B>Master HTTP Site #1</B>: <A HREF="http://www.simplesystems.org/libtiff/">
+http://www.simplesystems.org/libtiff/</a><BR>
+<B>Master HTTP Site #2</B>: <A HREF="http://libtiff.maptools.org/">
+http://libtiff.maptools.org/</a>
+<HR SIZE=4 WIDTH=65% ALIGN=left>
+</UL>
+
+<P>
+This document describes the changes made to the software between the
+<I>previous</I> and <I>current</I> versions (see above).  If you don't
+find something listed here, then it was not done in this timeframe, or
+it was not considered important enough to be mentioned.  The following
+information is located here:
+<UL>
+<LI><A HREF="#highlights">Major Changes</A>
+<LI><A HREF="#configure">Changes in the software configuration</A>
+<LI><A HREF="#libtiff">Changes in libtiff</A>
+<LI><A HREF="#tools">Changes in the tools</A>
+<LI><A HREF="#contrib">Changes in the contrib area</A>
+</UL>
+<p>
+<P><HR WIDTH=65% ALIGN=left>
+
+<!--------------------------------------------------------------------------->
+
+<A NAME="highlights"><B><FONT SIZE=+3>M</FONT>AJOR CHANGES:</B></A>
+
+<UL>
+
+  <LI> The libtiff source repository is changed from CVS to Git and the master libtiff source repository is now at <A HREF="https://gitlab.com/libtiff/libtiff">Gitlab</A>.  This is the first release to be made from the new Git repository.</LI>
+
+</UL>
+
+
+<P><HR WIDTH=65% ALIGN=left>
+<!--------------------------------------------------------------------------->
+
+<A NAME="configure"><B><FONT SIZE=+3>C</FONT>HANGES IN THE SOFTWARE CONFIGURATION:</B></A>
+
+<UL>
+
+  <LI>Minimum CMake version is now v2.8.11 for the CMake-based build.</LI>
+
+  <LI>Libwebp will be automatically detected and used by configure/cmake if present.
+
+  <LI>Libzstd will be automatically detected and used by configure/cmake if present.
+
+
+</UL>
+
+<P><HR WIDTH=65% ALIGN=left>
+
+<!--------------------------------------------------------------------------->
+
+<A NAME="libtiff"><B><FONT SIZE=+3>C</FONT>HANGES IN LIBTIFF:</B></A>
+
+<UL>
+
+  <LI>
+    <P>Added ZSTD compression codec.
+    <A HREF="https://github.com/facebook/zstd">Zstandard<A> or zstd as
+    short version, is a fast lossless compression algorithm, targeting
+    real-time compression scenarios at zlib-level and better
+    compression ratios. It's backed by a very fast entropy stage,
+    provided by Huff0 and FSE library.</P>
+
+    <P>We require libzstd >= 1.0.0 so as to be able to use streaming
+    compression and decompression methods.</P>
+
+    <P>The default compression level we have selected is 9 (range goes
+    from 1 to 22), which experimentally offers equivalent or better
+    compression ratio than the default deflate/ZIP level of 6, and
+    much faster compression.</P>
+
+    <P>For example on a 6600x4400 16bit image, tiffcp -c zip runs in
+    10.7 seconds, while tiffcp -c zstd runs in 5.3
+    seconds. Decompression time for zip is 840 ms, and for zstd 650
+    ms. File size is 42735936 for zip, and 42586822 for zstd. Similar
+    findings on other images.</P>
+
+    <P>On a 25894x16701 16bit image,</P>
+
+    <TABLE>
+      <TR><TH>Compressor</TH>   <TH>Compression time</TH>   <TH>Decompression time</TH>   <TH>File size</TH></TR>
+
+      <TR><TD>ZSTD</TD>         <TD>35 s</TD>               <TD>3.2 s</TD>                <TD>399 700 498</TD></TR>
+      <TR><TD>ZIP/Deflate</TD>  <TD>1m 20 s</TD>            <TD>4.9 s </TD>               <TD>419 622 336</TD></TR>
+    </TABLE>
+
+    <P>Please note that COMPRESSION_ZSTD is self-assigned the id 50000
+    by the libtiff project and is not officially registered with Adobe
+    since Adobe's registration function is defunct.</P>
+  </LI>
+
+  <LI><P>Added WebP compression codec.
+
+    <A HREF="https://developers.google.com/speed/webp/">WebP</A> is
+    a high performance compressor intended for photos as commonly used
+    on the Web.  The WebP encoder is not designed for huge images, but
+    serves very well for compressing strips and tiles in TIFF as long
+    as the strips or tiles do not exceed the capability of the
+    encoder.</P>
+
+    <P>As a test of compression performance metrics, GraphicsMagick
+    was used on an extremely high quality 8-bit TIFF image from a
+    Hasselblad H4D-200MS camera with pixel dimensions of
+    16352x12264. The image was re-encoded with 1024x1024 tiles and
+    various compression algorithms, using default settings for each
+    algorithm.  Based on this test, the compression and decompression
+    performance (in iterations per second), the resulting file size,
+    and the calculated total PSNR are provided here.  It can be seen
+    that WebP provided excellent encode and decode performance, and
+    the compressed file size was very small:</P>
+
+    <TABLE>
+      <caption>Compressor Relative Performance</caption>
+      <TR><TH>Compressor</TH> <TH>Compression</TH>   <TH>Decompression</TH> <TH>File size</TH>  <TH>PSNR</TH></TR>
+
+
+      <TR><TD>None</TD>       <TD>0.536 iter/s</TD>  <TD>1.506 iter/s</TD>  <TD>576.03MiB</TD>    <TD>Inf</TD></TR>
+      <TR><TD>LZW</TD>        <TD>0.105 iter/s</TD>  <TD>0.266 iter/s</TD>  <TD>270.68MiB</TD>    <TD>Inf</TD></TR>
+      <TR><TD>ZStd</TD>       <TD>0.020 iter/s</TD>  <TD>0.518 iter/s</TD>  <TD>238.42MiB</TD>    <TD>Inf</TD></TR>
+      <TR><TD>LZMA</TD>       <TD>0.009 iter/s</TD>  <TD>0.056 iter/s</TD>  <TD>247.61MiB</TD>    <TD>Inf</TD></TR>
+      <TR><TD>ZIP</TD>        <TD>0.009 iter/s</TD>  <TD>0.301 iter/s</TD>  <TD>247.88MiB</TD>    <TD>Inf</TD></TR>
+      <TR><TD>JPEG</TD>       <TD>0.446 iter/s</TD>  <TD>0.760 iter/s</TD>  <TD>18.59MiB</TD>     <TD>39.00</TD></TR>
+      <TR><TD>WebP</TD>       <TD>0.019 iter/s</TD>  <TD>0.330 iter/s</TD>  <TD>9.38MiB</TD>      <TD>37.78</TD></TR>
+
+    </TABLE>
+
+    <P>Please note that COMPRESSION_WEBP is self-assigned the id 50001
+    by the libtiff project and is not officially registered with Adobe
+    since Adobe's registration function is defunct.</P>
+
+  </LI>
+
+  <LI>TIFFPrintDirectory(): fix null pointer dereference on corrupted
+  file. Fixes <A HREF="http://bugzilla.maptools.org/show_bug.cgi?id=2770">Bug
+  2770 - NULL Pointer Dereference in tiffinfo.c with crafted TIFF
+  image</A>.</LI>
+
+  <LI>_TIFFVGetField(): fix heap out-of-bounds access when requesting
+  TIFFTAG_NUMBEROFINKS on a EXIF
+  directory. Fixes <A HREF="http://bugzilla.maptools.org/show_bug.cgi?id=2765">Bug
+  2765 - Heap Out-Of-Bounds Memory Access - 68122422</A>. Reported by
+  Google Autofuzz project</LI>
+
+  <LI>Fix a memory leak in TIFFStreamOpen. TIFFStreamOpen allocates a
+  new tiff{o,i}s_data, but if TIFFClientOpen fails then that struct is
+  leaked.</LI>
+
+  <LI><P>Fix for bug 2772. It is possible to craft a TIFF document where
+  the IFD list is circular, leading to an infinite loop while
+  traversing the chain. The libtiff directory reader has a failsafe
+  that will break out of this loop after reading 65535 directory
+  entries, but it will continue processing, consuming time and
+  resources to process what is essentially a bogus TIFFdocument.</P>
+
+  <P>This change fixes the above behavior by breaking out of processing
+  when a TIFF document has >= 65535 directories and terminating with an
+  error.</P></LI>
+
+  <LI>ChopUpSingleUncompressedStrip: avoid memory exhaustion
+  (CVE-2017-11613).  In ChopUpSingleUncompressedStrip(), if the
+  computed number of strips is big enough and we are in read only
+  mode, validate that the file size is consistent with that number of
+  strips to avoid useless attempts at allocating a lot of memory for
+  the td_stripbytecount and td_stripoffset
+  arrays. Fixes <A HREF="http://bugzilla.maptools.org/show_bug.cgi?id=2724">Bug
+  2724 - memory exhaustion in ChopUpSingleUncompressedStrip</A></LI>
+
+  <LI>Port code: Add strtol, strtoll and strtoull. Also update
+  strtoul.  All use the same implementation from NetBSD libc.</LI>
+
+  <LI>Fix for CVE-2018-7456 "NULL pointer dereference in
+  TIFFPrintDirectory".</LI>
+
+  <LI>TIFFWriteDirectorySec: avoid
+  assertion. Fixes <A HREF="http://bugzilla.maptools.org/show_bug.cgi?id=2795">Bug
+  2795 - There is a reachable assertion abort in function
+  TIFFWriteDirectorySec() of libtiff 4.0.9. A crafted input will lead
+  to remote denial of attack. (CVE-2018-10963)</A>.</LI>
+
+  <LI>LZWDecodeCompat(): fix potential index-out-of-bounds
+  write. Fixes <A HREF="http://bugzilla.maptools.org/show_bug.cgi?id=2780">Bug
+  2780 - A heap-buffer-overflow in function LZWDecodeCompat in
+  libtiff4.0.9 (CVE-2018-8905)</A>. The fix consists in using the
+  similar code as LZWDecode() to validate we don't write outside of
+  the output buffer.</LI>
+
+  <LI><P>Remove builtin support for GUI warning and error message
+  boxes. Now warnings always go to the console by default unless
+  applications define their own warning and error handlers.</P>
+
+  <P>GUI applications (and Windows CE) are required to define such handlers.</P></LI>
+
+  <LI>Add tag and pseudo-tag definitions for ESRI LERC codec (out of
+  tree codec whose source is
+  at <A HREF="https://github.com/OSGeo/gdal/blob/master/gdal/frmts/gtiff/tif_lerc.c">
+      https://github.com/OSGeo/gdal/blob/master/gdal/frmts/gtiff/tif_lerc.c</A>).</LI>
+
+  <LI>Fix libtiff 4.0.8 regression when reading LZW-compressed strips with scanline API
+        Fixes <A HREF="http://bugzilla.maptools.org/show_bug.cgi?id=2800">
+      Bug 2800 - Regression: Opening a tiff file with v4.0.9 gives an error with LZWDecode</A>.</LI>
+
+  <LI>TIFFSetupStrips(): avoid potential uint32 overflow on 32-bit
+  systems with large number of strips.  Probably relates
+  to <A HREF="http://bugzilla.maptools.org/show_bug.cgi?id=2788">Bug
+  2788 - Heap Buffer Overflow in TIFFWriteScanline of tif_write.c
+  (CVE-2018-10779)</A></LI>
+
+  <LI>Fix out-of-bound read on some tiled images.</LI>
+
+  <LI>Avoid potential int32 overflows in multiply_ms().</LI>
+
+  <LI>Only read/write TIFFTAG_GROUP3OPTIONS or TIFFTAG_GROUP4OPTIONS
+  if compression is COMPRESSION_CCITTFAX3 or
+  COMPRESSION_CCITTFAX4.</LI>
+
+  <LI>JBIG: fix potential out-of-bounds write in JBIGDecode(). Also
+  fix a (harmless) potential use of uninitialized memory when
+  tif->tif_rawsize > tif->tif_rawcc. In case libtiff is compiled with
+  CHUNKY_STRIP_READ_SUPPORT, make sure that whole strip data is
+  provided to JBIGDecode().</LI>
+
+  <LI>LZMAPreEncode: emit verbose error if lzma_stream_encoder() fails
+  (typically because not enough memory available)</LI>
+
+
+</UL>
+
+<P><HR WIDTH=65% ALIGN=left>
+
+<!-------------------------------------------------------------------------->
+
+<A NAME="tools"><B><FONT SIZE=+3>C</FONT>HANGES IN THE TOOLS:</B></A>
+
+<UL>
+
+  <LI>tiff2pdf: Fix
+  CVE-2017-9935, <A HREF="http://bugzilla.maptools.org/show_bug.cgi?id=2704">Bug
+  2704 - There is a heap based buffer overflow in the tiff2pdf tool of
+  the libtiff library. A crafted TIFF document can lead to a heap
+  based buffer overflow resulting in multiple damages.</A>.</LI>
+
+  <LI>pal2rgb: Add workaround to pal2rgb buffer overflow.</LI>
+
+  <LI>tiffset: Add support for LONG8, SLONG8 and IFD8 field types</LI>
+
+  <LI>tiff2bw: avoid null pointer dereference in case of out of memory
+  situation. Fixes <A HREF="http://bugzilla.maptools.org/show_bug.cgi?id=2819">Bug
+  2819 - There is a NULL pointer dereference at function LZWDecode in
+  libtiff 4.0.9 (CVE-2018-18661)</A></LI>
+
+</UL>
+
+<P><HR WIDTH=65% ALIGN=left>
+
+<!--------------------------------------------------------------------------->
+
+<A NAME="contrib"><B><FONT SIZE=+3>C</FONT>HANGES IN THE CONTRIB AREA:</B></A>
+
+<UL>
+
+  <LI> None</LI>
+
+</UL>
+
+</BODY>
+</HTML>

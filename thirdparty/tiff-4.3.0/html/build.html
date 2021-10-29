@@ -1,0 +1,561 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Building the TIFF Software Distribution</title>
+<style type="text/css">
+body {
+font-family: Arial, Helvetica, Sans;
+}
+</style>
+</head>
+<body>
+<h1><img src="images/cramps.gif" width="159" height="203" align="left" border="1" hspace="6" alt="cramps">
+Building the Software Distribution</h1>
+<ul>
+<li><a href="#CMAKE">Building on all systems with CMake</a>.</li>
+<li><a href="#UNIX">Building on a UNIX system with Autoconf</a>.</li>
+<li><a href="#Other">Building the Software on Other
+Systems.</a></li>
+</ul>
+<br clear="left">
+This chapter contains step-by-step instructions on how to configure
+and build the TIFF software distribution. The software is most
+easily built on a UNIX system, but with a little bit of work it can
+easily be built and used on other non-UNIX platforms.
+<hr>
+<a name="CMake" id="CMAKE"></a>
+<h2>Building on all systems with CMake</h2> CMake may be used to
+generate build files for most common build systems and IDEs, and
+supports all UNIX-like systems as well as Windows. See
+the <a href="http://www.cmake.org/">CMake website</a> for further
+details. To build the software on you need to first run
+<tt>cmake</tt> to configure the build and generate the system-specific
+build files. This reads the top-level <tt>CMakeLists.txt</tt> file,
+which probes the target system for necessary tools and functions,
+checks any options you specified to configure the build, and then
+outputs build files configured for your system.  If using <tt>Unix
+Makefiles</tt>, once configuration is done, you simply
+run <tt>make</tt> (or <tt>gmake</tt>) to build the software and
+then <tt>make install</tt> to do the installation.  For other build
+systems, you do the equivalent steps with the tool for that system.
+For example, on any UNIX system:
+<div style="margin-left: 2em">
+<pre>
+% <b>cd ./tiff-4.0.5</b>
+% <b>cmake</b>
+    <i>...lots of messages...</i>
+% <b>make</b>
+    <i>...lots of messages...</i>
+% <b>make test</b>
+    <i>...lots of messages...</i>
+# <b>make install</b>
+</pre></div>
+Building is dependent on a <tt>make</tt> utility and a C
+(and optionally a C++ compiler), so you will need these tools.
+<p>In general, the software is designed such that the following
+targets will always be available</p>
+<div style="margin-left: 2em">
+<pre>
+make [all]      build stuff
+make test       run the test suite
+make install    build and install stuff
+make clean      remove object files, executables and cruft
+</pre></div>
+<a name="CMakeBuildTrees" id= "CMakeBuildTrees"></a>
+<hr width="65%" align="right">
+<h3>Build Trees</h3>
+There are two schemes for configuring and building the software. If
+you intend to build the software for only one target system, you
+can configure the software so that it is built in the same
+directories as the source code.
+<div style="margin-left: 2em">
+<pre>
+% <b>gzip -dc tiff-4.0.5.tar.gz | tar -xf -</b>
+% <b>cd ./tiff-4.0.5</b>
+% <b>cmake</b>
+% <b>make</b>
+% <b>make test</b>
+% <b>make install</b>
+</pre></div>
+<p>Otherwise, you can configure a build tree that is parallel to
+the source tree hierarchy (or in some completely different place)
+but which contains only configured files and files created during
+the build procedure.</p>
+<div style="margin-left: 2em">
+<pre>
+% <b>gzip -dc tiff-4.0.5.tar.gz | tar -xf -</b>
+% <b>mkdir tiff-4.0.5-build</b>
+% <b>cd ./tiff-4.0.5-build</b>
+% <b>cmake ../tiff-4.0.5</b>
+% <b>make</b>
+% <b>make test</b>
+% <b>make install</b>
+</pre></div>
+This second scheme is useful for:
+<ul>
+<li>building multiple targets from a single source tree</li>
+<li>building from a read-only source tree (e.g. if you receive the
+distribution on CD-ROM)</li>
+<li>sharing the source files via a network, but building on
+multiple systems</li>
+<li>keeping the source tree clean
+(unlike <tt>autoconf</tt>, <tt>cmake</tt> does not provide
+a <tt>distclean</tt> target, so out of source builds are
+recommended)</li>
+</ul>
+<a name="CMakeGenerators" id= "CMakeGenerators"></a>
+<hr width="65%" align="right">
+<h3>Generators</h3> The default generator for UNIX is <tt>Unix
+Makefiles</tt>, and on Windows is <tt>NMake Makefiles</tt> or MSBuild
+depending upon the setup.  Run <b>cmake --help</b> to list all the
+generators available for your platform.  For example, to use the Ninja
+<a href="https://martine.github.io/ninja/">build system</a> on UNIX or
+Windows:
+<pre>
+<b>cmake -G Ninja</b>
+<b>cmake --build .</b>
+<b>ctest -V</b>
+<b>cmake --build . --target install</b>
+</pre>
+<p>Note that <b>cmake --build .</b> is a build-system-independent way
+of building a target; you can always use the build system directly.</p>
+<p>Alternatively, using the MSBuild system on Windows (64-bit Release
+build with VS2013):
+</p>
+<pre>
+<b>cmake -G "Visual Studio 12 2013 Win64"</b>
+<b>cmake --build . --config Release</b>
+<b>ctest -V -C Release</b>
+<b>cmake --build . --config Release --target install</b>
+</pre>
+With the above configuration, it's also possible to open the generated
+solution file with the Visual Studio IDE as well as building on the
+command-line.
+<a name="CMakeConfigOptions" id="CMakeConfigOptions"></a>
+<hr width="65%" align="right">
+<h3>Configuration Options</h3>
+The configuration process is critical to the proper compilation,
+installation, and operation of the
+software. The <tt>CMakeLists.txt</tt> script runs a series of tests to
+decide whether or not the target system supports required
+functionality and, if it does not, whether it can emulate or
+workaround the missing functions.  After running <tt>cmake</tt>, check
+the <tt>CMakeCache.txt</tt> file; this contains all the results of the
+checks performed and the options set by the user.  If <tt>cmake</tt>
+failed to run, check <tt>CMakeFiles/CMakeOutput.log</tt>
+and <tt>CMakeFiles/CMakeError.log</tt>; these should record the error
+which caused the failure.
+<p>A second function of the configure script is to set the default
+configuration parameters for the software. Of particular note are the
+directories where the software is to be installed. By default the
+software is installed in the <b>/usr/local</b> hierarchy. To change
+this behaviour the appropriate parameters can be specified on the
+command line. Run <b>cmake --help</b> to get a full list of possible
+options, and <b>cmake -LH</b> to list all the configurable options for
+this software package, or <b>cmake -LAH</b> to show all advanced
+options in addition. Standard installation related options are shown
+below.</p>
+<pre>
+<tt>
+Installation directories:
+  CMAKE_INSTALL_PREFIX
+
+Fine tuning of the installation directories:
+  CMAKE_INSTALL_BINDIR            user executables [PREFIX/bin]
+  CMAKE_INSTALL_SBINDIR           system admin executables [PREFIX/sbin]
+  CMAKE_INSTALL_LIBEXECDIR        program executables [PREFIX/libexec]
+  CMAKE_INSTALL_SYSCONFDIR        read-only single-machine data [PREFIX/etc]
+  CMAKE_INSTALL_SHAREDSTATEDIR    modifiable architecture-independent data [PREFIX/com]
+  CMAKE_INSTALL_LOCALSTATEDIR     modifiable single-machine data [PREFIX/var]
+  CMAKE_INSTALL_LIBDIR            object code libraries [PREFIX/lib]
+  CMAKE_INSTALL_INCLUDEDIR        C header files [PREFIX/include]
+  CMAKE_INSTALL_OLDINCLUDEDIR     C header files for non-gcc [/usr/include]
+  CMAKE_INSTALL_DATAROOTDIR       read-only arch.-independent data root [PREFIX/share]
+  CMAKE_INSTALL_DATADIR           read-only architecture-independent data [DATAROOTDIR]
+  CMAKE_INSTALL_LOCALEDIR         locale-dependent data [DATAROOTDIR/locale]
+  CMAKE_INSTALL_MANDIR            man documentation [DATAROOTDIR/man]
+  CMAKE_INSTALL_DOCDIR            documentation root [DATAROOTDIR/doc/tiff]
+</tt>
+</pre>
+Also see the
+CMake <a href="http://www.cmake.org/cmake/help/v3.3/">documentation</a>
+for <a href="http://www.cmake.org/cmake/help/v3.3/manual/cmake-variables.7.html"
+>additional variables</a> which may be set.
+<a name="CMakePackages" id="CMakePackages"></a>
+<hr width="65%" align="right">
+<h3>Configuring Optional Packages/Support</h3>
+The TIFF software comes with several packages that are installed
+only as needed, or only if specifically configured at the time the
+configure script is run. Packages can be configured via the
+<b>cmake</b> commandline parameters.
+<dl>
+<dt><i>Static/Shared Objects Support</i></dt>
+<dd><tt>BUILD_SHARED_LIBS[=ON|OFF]&nbsp;&nbsp;&nbsp;&nbsp;build shared
+libraries [default=ON]</tt><br>
+<p>This option controls whether or not to configure the software
+to build a shared and static binaries for the TIFF library. Use of
+shared libraries can significantly reduce the disk space needed for
+users of the TIFF software. If shared libraries are not used then
+the code is statically linked into each application that uses it.
+</p>
+<p><tt>ld-version-script[=ON|OFF]&nbsp;&nbsp;Enable linker version
+script (default is ON)</tt></p>
+<p>Add shared library symbol versioning on ELF-based systems (e.g.
+Linux and FreeBSD) which use the GNU linker. This is needed if
+several major versions of libtiff might be loaded at once into the
+same program.</p>
+</dd>
+<dt><i>JPEG Support</i></dt>
+<dd><tt>jpeg[=ON|OFF]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;enable IJG JPEG
+library usage (required for JPEG compression, enabled by default)<br>
+JPEG_INCLUDE_DIR=DIR&nbsp;location of IJG
+JPEG library headers<br>
+JPEG_LIBRARY=DIR&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;location of IJG JPEG
+library binary)</tt></dd>
+<dd>The <tt>JPEG</tt> package enables support for the handling of
+TIFF images with JPEG-encoded data. Support for JPEG-encoded data
+requires the Independent JPEG Group (IJG) <tt>libjpeg</tt>
+distribution; this software is available at <a href=
+"http://www.ijg.org/">http://www.ijg.org/</a>. <b>cmake</b>
+script automatically tries to search for a working IJG JPEG
+installation. If it fails to find library, JPEG support will be
+automatically disabled. If you want specify the exact paths to
+library binary and headers, use above options for that.</dd>
+<dt><i>ZIP Support</i></dt>
+<dd>The <tt>ZIP</tt> support enables support for the handling of TIFF
+images with deflate-encoded data (enabled by default if
+available). Support for deflate-encoded data requires the freely
+available <tt>zlib</tt> distribution written by Jean-loup Gailly and
+Mark Adler; this software is available at <a href=
+"http://www.zlib.org/">http://www.zlib.org/</a>.</dd>
+</dl>
+<hr width="65%" align="right">
+<a name="UNIX" id="UNIX"></a>
+<h2>Building on a UNIX System with Autoconf</h2>
+To build the software on a UNIX system you need to first run the
+configure shell script that is located in the top level of the
+source directory. This script probes the target system for
+necessary tools and functions and constructs a build environment in
+which the software may be compiled. Once configuration is done, you
+simply run <tt>make</tt> (or <tt>gmake</tt>) to build the software
+and then <tt>make install</tt> to do the installation; for example:
+<div style="margin-left: 2em">
+<pre>
+% <b>cd ./tiff-4.0.5</b>
+% <b>./configure</b>
+    <i>...lots of messages...</i>
+% <b>make</b>
+    <i>...lots of messages...</i>
+% <b>make check</b>
+    <i>...lots of messages...</i>
+# <b>make install</b>
+</pre></div>
+Supplied makefiles are dependent on a <tt>make</tt> utility and a C
+(and optionally a C++ compiler), so you will need these tools.
+<p>In general, the software is designed such that the following
+should be ``<i>make-able</i>'' in each directory:</p>
+<div style="margin-left: 2em">
+<pre>
+make [all]      build stuff
+make check      run the test suite
+make install    build and install stuff
+make clean      remove object files, executables and cruft
+make distclean  remove everything, that can be recreated
+</pre></div>
+Note that after running "<tt>make distclean</tt>" the
+<tt>configure</tt> script must be run again to create the Makefiles
+and other make-related files. <a name="BuildTrees" id=
+"BuildTrees"></a>
+<hr width="65%" align="right">
+<h3>Build Trees</h3>
+There are two schemes for configuring and building the software. If
+you intend to build the software for only one target system, you
+can configure the software so that it is built in the same
+directories as the source code.
+<div style="margin-left: 2em">
+<pre>
+% <b>gzip -dc tiff-4.0.5.tar.gz | tar -xf -</b>
+% <b>cd ./tiff-4.0.5</b>
+% <b>./configure</b>
+% <b>make</b>
+% <b>make check</b>
+% <b>make install</b>
+</pre></div>
+<p>Otherwise, you can configure a build tree that is parallel to
+the source tree hierarchy (or in some completely different place)
+but which contains only configured files and files created during
+the build procedure.</p>
+<div style="margin-left: 2em">
+<pre>
+% <b>gzip -dc tiff-4.0.5.tar.gz | tar -xf -</b>
+% <b>mkdir tiff-4.0.5-build</b>
+% <b>cd ./tiff-4.0.5-build</b>
+% <b>../tiff-4.0.5/configure</b>
+% <b>make</b>
+% <b>make check</b>
+% <b>make install</b>
+</pre></div>
+This second scheme is useful for:
+<ul>
+<li>building multiple targets from a single source tree</li>
+<li>building from a read-only source tree (e.g. if you receive the
+distribution on CD-ROM)</li>
+<li>sharing the source files via a network, but building on
+multiple systems</li>
+</ul>
+<a name="ConfigOptions" id="ConfigOptions"></a>
+<hr width="65%" align="right">
+<h3>Configuration Options</h3>
+The configuration process is critical to the proper compilation,
+installation, and operation of the software. The configure script
+runs a series of tests to decide whether or not the target system
+supports required functionality and, if it does not, whether it can
+emulate or workaround the missing functions. This procedure is
+fairly complicated and, due to the nonstandard nature of most UNIX
+systems, prone to error. The first time that you configure the
+software for use you should check the output from the configure
+script and look for anything that does not make sense for your
+system.
+<p>A second function of the configure script is to set the default
+configuration parameters for the software. Of particular note are
+the directories where the software is to be installed. By default
+the software is installed in the <b>/usr/local</b> hierarchy. To
+change this behaviour the appropriate parameters can be specified
+on the command line to configure. Run <b>./configure --help</b> to
+get a full list of possible options. Standard installation related
+options are shown below.</p>
+<pre>
+<tt>
+Installation directories:
+  --prefix=PREFIX         install architecture-independent files in PREFIX
+                          [/usr/local]
+  --exec-prefix=EPREFIX   install architecture-dependent files in EPREFIX
+                          [PREFIX]
+
+By default, `make install' will install all the files in
+`/usr/local/bin', `/usr/local/lib' etc.  You can specify
+an installation prefix other than `/usr/local' using `--prefix',
+for instance `--prefix=$HOME'.
+
+For better control, use the options below.
+
+Fine tuning of the installation directories:
+  --bindir=DIR            user executables [EPREFIX/bin]
+  --sbindir=DIR           system admin executables [EPREFIX/sbin]
+  --libexecdir=DIR        program executables [EPREFIX/libexec]
+  --sysconfdir=DIR        read-only single-machine data [PREFIX/etc]
+  --sharedstatedir=DIR    modifiable architecture-independent data [PREFIX/com]
+  --localstatedir=DIR     modifiable single-machine data [PREFIX/var]
+  --libdir=DIR            object code libraries [EPREFIX/lib]
+  --includedir=DIR        C header files [PREFIX/include]
+  --oldincludedir=DIR     C header files for non-gcc [/usr/include]
+  --datarootdir=DIR       read-only arch.-independent data root [PREFIX/share]
+  --datadir=DIR           read-only architecture-independent data [DATAROOTDIR]
+  --localedir=DIR         locale-dependent data [DATAROOTDIR/locale]
+  --mandir=DIR            man documentation [DATAROOTDIR/man]
+  --docdir=DIR            documentation root [DATAROOTDIR/doc/tiff]
+  --htmldir=DIR           html documentation [DOCDIR]
+
+Program names:
+  --program-prefix=PREFIX            prepend PREFIX to installed program names
+  --program-suffix=SUFFIX            append SUFFIX to installed program names
+  --program-transform-name=PROGRAM   run sed PROGRAM on installed program names
+</tt>
+</pre>
+<a name="Packages" id="Packages"></a>
+<hr width="65%" align="right">
+<h3>Configuring Optional Packages/Support</h3>
+The TIFF software comes with several packages that are installed
+only as needed, or only if specifically configured at the time the
+configure script is run. Packages can be configured via the
+<b>configure</b> script commandline parameters.
+<dl>
+<dt><i>Static/Shared Objects Support</i></dt>
+<dd><tt>--enable-shared[=PKGS]&nbsp;&nbsp;&nbsp;&nbsp;build shared
+libraries [default=yes]<br>
+--enable-static[=PKGS]&nbsp;&nbsp;&nbsp;&nbsp;build static
+libraries [default=yes]</tt>
+<p>These options control whether or not to configure the software
+to build a shared and static binaries for the TIFF library. Use of
+shared libraries can significantly reduce the disk space needed for
+users of the TIFF software. If shared libraries are not used then
+the code is statically linked into each application that uses it.
+By default both types of binaries is configured.</p>
+<p>
+<tt>--enable-rpath&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Enable
+runtime linker paths (-R libtool option)</tt></p>
+<p>Add library directories (see other options below) to the TIFF
+library run-time linker path.</p>
+<p><tt>--enable-ld-version-script&nbsp;&nbsp;Enable linker version
+script (default is disabled)</tt></p>
+<p>Add shared library symbol versioning on ELF-based systems (e.g.
+Linux and FreeBSD) which use the GNU linker. This is needed if
+several major versions of libtiff might be loaded at once into the
+same program.</p>
+</dd>
+<dt><i>JPEG Support</i></dt>
+<dd><tt>--disable-jpeg&nbsp;&nbsp;&nbsp;&nbsp;disable IJG JPEG
+library usage (required for JPEG compression, enabled by default)
+--with-jpeg-include-dir=DIR&nbsp;&nbsp;&nbsp;&nbsp;location of IJG
+JPEG library headers
+--with-jpeg-lib-dir=DIR&nbsp;&nbsp;&nbsp;&nbsp;location of IJG JPEG
+library binary)</tt></dd>
+<dd>The <tt>JPEG</tt> package enables support for the handling of
+TIFF images with JPEG-encoded data. Support for JPEG-encoded data
+requires the Independent JPEG Group (IJG) <tt>libjpeg</tt>
+distribution; this software is available at <a href=
+"http://www.ijg.org/">http://www.ijg.org/</a>. <b>configure</b>
+script automatically tries to search for a working IJG JPEG
+installation. If it fails to find library, JPEG support will be
+automatically disabled. If you want specify the exact paths to
+library binary and headers, use above switches for that.</dd>
+<dt><i>ZIP Support</i></dt>
+<dd>The <tt>ZIP</tt> support enables support for the handling of
+TIFF images with deflate-encoded data. Support for deflate-encoded
+data requires the freely available <tt>zlib</tt> distribution
+written by Jean-loup Gailly and Mark Adler; this software is
+available at <a href=
+"http://www.zlib.org/">http://www.zlib.org/</a>. If ZIP support is
+enabled the <tt>DIRS_LIBINC</tt> and <tt>DIR_GZLIB</tt> parameters
+should also be set (see below). By default this package is not
+configured.</dd>
+</dl>
+<hr width="65%" align="right">
+<a name="PC" id="PC"></a>
+<a name="Other" id="Other"></a>
+<h2>Building the Software on Other Systems</h2>
+This section contains information that might be useful if you are
+working on a non-UNIX system that is not directly supported. All
+library-related files described below are located in the
+<b>libtiff</b> directory.
+<p>The library requires two files that are generated
+<i>on-the-fly</i>. The file <b>tif_fax3sm.c</b> has the state
+tables for the Group 3 and Group 4 decoders. This file is generated
+by the <tt>mkg3states</tt> program on a UNIX system; for
+example,</p>
+<div style="margin-left: 2em">
+<pre>
+<tt>
+cd libtiff
+cc -o mkg3states mkg3states.c
+rm -f tif_fax3sm.c
+./mkg3states -c const tif_fax3sm.c
+</tt>
+</pre></div>
+The <tt>-c</tt> option can be used to control whether or not the
+resutling tables are generated with a <tt>const</tt> declaration.
+The <tt>-s</tt> option can be used to specify a C storage class for
+the table declarations. The <tt>-b</tt> option can be used to force
+data values to be explicitly bracketed with ``{}'' (apparently
+needed for some MS-Windows compilers); otherwise the structures are
+emitted in as compact a format as possible. Consult the source code
+for this program if you have questions.
+<p>The second file required to build the library, <b>version.h</b>,
+contains the version information returned by the
+<tt>TIFFGetVersion</tt> routine. This file is built on most systems
+using the <tt>mkversion</tt> program and the contents of the
+<tt>VERSION</tt> and <tt>tiff.alpha</tt> files; for example,</p>
+<div style="margin-left: 2em">
+<pre>
+cd libtiff
+cc -o mkversion mkversion.c
+rm -f version.h
+./mkversion -v ../VERSION -a ../dist/tiff.alpha version.h
+</pre></div>
+<p>Otherwise, when building the library on a non-UNIX system be
+sure to consult the files <b>tiffcomp.h</b> and <b>tiffconf.h</b>.
+The former contains system compatibility definitions while the
+latter is provided so that the software configuration can be
+controlled on systems that do not support the make facility for
+building the software.</p>
+<p>Systems without a 32-bit compiler may not be able to handle some
+of the codecs in the library; especially the Group 3 and 4 decoder.
+If you encounter problems try disabling support for a particular
+codec; consult the <a href=
+"internals.html#Config">documentation</a>.</p>
+<p>Programs in the tools directory are written to assume an ANSI C
+compilation environment. There may be a few POSIX'isms as well. The
+code in the <b>port</b> directory is provided to emulate routines
+that may be missing on some systems. On UNIX systems the
+<tt>configure</tt> script automatically figures out which routines
+are not present on a system and enables the use of the equivalent
+emulation routines from the <b>port</b> directory. It may be
+necessary to manually do this work on a non-UNIX system. <a name=
+"Testing" id="Testing"></a></p>
+<hr>
+<h2>Checking out the Software</h2>
+<p>Assuming you have working versions of <tt>tiffgt</tt> and
+<tt>tiffsv</tt>, you can just use them to view any of the sample
+images available for testing (see the <a href="images.html">section
+on obtaining the test images</a>). Otherwise, you can do a cursory
+check of the library with the <tt>tiffcp</tt> and <tt>tiffcmp</tt>
+programs. For example,</p>
+<div style="margin-left: 2em">
+<pre>
+tiffcp -lzw cramps.tif x.tif
+tiffcmp cramps.tif x.tif
+</pre></div>
+<p>(<tt>tiffcmp</tt> should be silent if the files compare
+correctly). <a name="TOC" id="TOC"></a></p>
+<hr>
+<h2>Table of Contents</h2>
+The following files makup the core library:
+<pre>
+libtiff/tiff.h                  TIFF spec definitions
+libtiff/tiffcomp.h              non-UNIX OS-compatibility definitions
+libtiff/tiffconf.h              non-UNIX configuration definitions
+libtiff/tiffio.h                public TIFF library definitions
+libtiff/tiffiop.h               private TIFF library definitions
+libtiff/t4.h                    CCITT Group 3/4 code tables+definitions
+libtiff/tif_dir.h               private defs for TIFF directory handling
+libtiff/tif_fax3.h              CCITT Group 3/4-related definitions
+libtiff/tif_predict.h           private defs for Predictor tag support
+libtiff/uvcode.h                LogL/LogLuv codec-specific definitions
+libtiff/version.h               version string (generated by Makefile)
+libtiff/tif_apple.c             Apple-related OS support
+libtiff/tif_atari.c             Atari-related OS support
+libtiff/tif_aux.c               auxiliary directory-related functions
+libtiff/tif_close.c             close an open TIFF file
+libtiff/tif_codec.c             configuration table of builtin codecs
+libtiff/tif_compress.c          compression scheme support
+libtiff/tif_dir.c               directory tag interface code
+libtiff/tif_dirinfo.c           directory known tag support code
+libtiff/tif_dirread.c           directory reading code
+libtiff/tif_dirwrite.c          directory writing code
+libtiff/tif_dumpmode.c          "no" compression codec
+libtiff/tif_error.c             library error handler
+libtiff/tif_fax3.c              CCITT Group 3 and 4 codec
+libtiff/tif_fax3sm.c            G3/G4 state tables (generated by mkg3states)
+libtiff/tif_flush.c             i/o and directory state flushing
+libtiff/tif_getimage.c          TIFFRGBAImage support
+libtiff/tif_jpeg.c              JPEG codec (interface to the IJG distribution)
+libtiff/tif_luv.c               SGI LogL/LogLuv codec
+libtiff/tif_lzw.c               LZW codec
+libtiff/tif_msdos.c             MSDOS-related OS support
+libtiff/tif_next.c              NeXT 2-bit scheme codec (decoding only)
+libtiff/tif_open.c              open and simply query code
+libtiff/tif_packbits.c          Packbits codec
+libtiff/tif_pixarlog.c          Pixar codec
+libtiff/tif_predict.c           Predictor tag support
+libtiff/tif_print.c             directory printing support
+libtiff/tif_read.c              image data reading support
+libtiff/tif_strip.c             some strip-related code
+libtiff/tif_swab.c              byte and bit swapping support
+libtiff/tif_thunder.c           Thunderscan codec (decoding only)
+libtiff/tif_tile.c              some tile-related code
+libtiff/tif_unix.c              UNIX-related OS support
+libtiff/tif_version.c           library version support
+libtiff/tif_warning.c           library warning handler
+libtiff/tif_win3.c              Windows-3.1-related OS support
+libtiff/tif_win32.c             Win32 (95/98/NT) related OS support
+libtiff/tif_write.c             image data writing support
+libtiff/tif_zip.c               Deflate codec
+
+libtiff/mkg3states.c            program to generate G3/G4 decoder state tables
+libtiff/mkspans.c               program to generate black-white span tables
+libtiff/mkversion.c             program to generate libtiff/version.h.
+</pre>
+<hr>
+Last updated: $Date: 2015-08-29 15:30:11 $
+</body>
+</html>

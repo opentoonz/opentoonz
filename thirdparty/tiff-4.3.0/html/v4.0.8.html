@@ -1,0 +1,446 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+<HEAD>
+<TITLE>
+	Changes in TIFF v4.0.8
+</TITLE>
+</HEAD>
+
+<BODY BGCOLOR=white>
+<FONT FACE="Helvetica, Arial, Sans">
+
+<BASEFONT SIZE=4>
+<B><FONT SIZE=+3>T</FONT>IFF <FONT SIZE=+2>C</FONT>HANGE <FONT SIZE=+2>I</FONT>NFORMATION</B>
+<BASEFONT SIZE=3>
+
+<UL>
+<HR SIZE=4 WIDTH=65% ALIGN=left>
+<B>Current Version</B>: v4.0.8<BR>
+<B>Previous Version</B>: <A HREF=v4.0.7.html>v4.0.7</a><BR>
+<B>Master Download Site</B>: <A HREF="https://download.osgeo.org/libtiff">
+download.osgeo.org</a>, directory pub/libtiff</A><BR>
+<B>Master HTTP Site #1</B>: <A HREF="http://www.simplesystems.org/libtiff/">
+http://www.simplesystems.org/libtiff/</a><BR>
+<B>Master HTTP Site #2</B>: <A HREF="http://libtiff.maptools.org/">
+http://libtiff.maptools.org/</a> 
+<HR SIZE=4 WIDTH=65% ALIGN=left>
+</UL>
+
+<P>
+This document describes the changes made to the software between the
+<I>previous</I> and <I>current</I> versions (see above).  If you don't
+find something listed here, then it was not done in this timeframe, or
+it was not considered important enough to be mentioned.  The following
+information is located here:
+<UL>
+<LI><A HREF="#highlights">Major Changes</A>
+<LI><A HREF="#configure">Changes in the software configuration</A>
+<LI><A HREF="#libtiff">Changes in libtiff</A>
+<LI><A HREF="#tools">Changes in the tools</A>
+<LI><A HREF="#contrib">Changes in the contrib area</A>
+</UL>
+<p> 
+<P><HR WIDTH=65% ALIGN=left>
+
+<!--------------------------------------------------------------------------->
+
+<A NAME="highlights"><B><FONT SIZE=+3>M</FONT>AJOR CHANGES:</B></A>
+
+<UL>
+
+	<LI> None
+
+</UL>
+
+
+<P><HR WIDTH=65% ALIGN=left>
+<!--------------------------------------------------------------------------->
+
+<A NAME="configure"><B><FONT SIZE=+3>C</FONT>HANGES IN THE SOFTWARE CONFIGURATION:</B></A>
+
+<UL>
+
+  <LI> None
+
+</UL>
+
+<P><HR WIDTH=65% ALIGN=left>
+
+<!--------------------------------------------------------------------------->
+
+<A NAME="libtiff"><B><FONT SIZE=+3>C</FONT>HANGES IN LIBTIFF:</B></A>
+
+<UL>
+
+    <LI> libtiff/tif_getimage.c, libtiff/tif_open.c: add parenthesis
+        to fix cppcheck clarifyCalculation warnings *
+        libtiff/tif_predict.c, libtiff/tif_print.c: fix printf
+        unsigned vs signed formatting (cppcheck
+        invalidPrintfArgType_uint warnings)
+
+    <LI> libtiff/tif_read.c, libtiff/tiffiop.h: fix uint32 overflow in
+        TIFFReadEncodedStrip() that caused an integer division by
+        zero.  Reported by Agostino Sarubbo.  Fixes
+        http://bugzilla.maptools.org/show_bug.cgi?id=2596
+
+    <LI> libtiff/tif_pixarlog.c, libtiff/tif_luv.c: fix heap-based
+        buffer overflow on generation of PixarLog / LUV compressed
+        files, with ColorMap, TransferFunction attached and nasty
+        plays with bitspersample.  The fix for LUV has not been
+        tested, but suffers from the same kind of issue of PixarLog.
+        Reported by Agostino Sarubbo.  Fixes
+        http://bugzilla.maptools.org/show_bug.cgi?id=2604
+
+    <LI> libtiff/tif_strip.c: revert the change in
+        TIFFNumberOfStrips() done for
+        http://bugzilla.maptools.org/show_bug.cgi?id=2587 /
+        CVE-2016-9273 since the above change is a better fix that
+        makes it unnecessary.
+
+    <LI> libtiff/tif_dirread.c: modify ChopUpSingleUncompressedStrip()
+        to instantiate compute ntrips as
+        TIFFhowmany_32(td->td_imagelength, rowsperstrip), instead of a
+        logic based on the total size of data. Which is faulty is the
+        total size of data is not sufficient to fill the whole image,
+        and thus results in reading outside of the
+        StripByCounts/StripOffsets arrays when using
+        TIFFReadScanline().  Reported by Agostino Sarubbo.  Fixes
+        http://bugzilla.maptools.org/show_bug.cgi?id=2608.
+
+    <LI> libtiff/tif_ojpeg.c: make OJPEGDecode() early exit in case of
+        failure in OJPEGPreDecode(). This will avoid a divide by zero,
+        and potential other issues.  Reported by Agostino Sarubbo.
+        Fixes http://bugzilla.maptools.org/show_bug.cgi?id=2611
+
+    <LI> libtiff/tif_write.c: fix misleading indentation as warned by GCC.
+
+
+    <LI> libtiff/tif_fax3.h: revert change done on 2016-01-09 that
+        made Param member of TIFFFaxTabEnt structure a uint16 to
+        reduce size of the binary. It happens that the Hylafax
+        software uses the tables that follow this typedef
+        (TIFFFaxMainTable, TIFFFaxWhiteTable, TIFFFaxBlackTable),
+        although they are not in a public libtiff header.  Raised by
+        Lee Howard.  Fixes
+        http://bugzilla.maptools.org/show_bug.cgi?id=2636
+
+    <LI> libtiff/tiffio.h, libtiff/tif_getimage.c: add
+        TIFFReadRGBAStripExt() and TIFFReadRGBATileExt() variants of
+        the functions without ext, with an extra argument to control
+        the stop_on_error behaviour.
+
+    <LI> libtiff/tif_getimage.c: fix potential memory leaks in error
+        code path of TIFFRGBAImageBegin().  Fixes
+        http://bugzilla.maptools.org/show_bug.cgi?id=2627
+
+    <LI> libtiff/tif_jpeg.c: increase libjpeg max memory usable to 10
+        MB instead of libjpeg 1MB default. This helps when creating
+        files with "big" tile, without using libjpeg temporary files.
+        Related to https://trac.osgeo.org/gdal/ticket/6757
+
+    <LI> libtiff/tif_jpeg.c: avoid integer division by zero in
+        JPEGSetupEncode() when horizontal or vertical sampling is set
+        to 0.  Fixes http://bugzilla.maptools.org/show_bug.cgi?id=2653
+
+    <LI> libtiff/tif_dirwrite.c: in
+        TIFFWriteDirectoryTagCheckedRational, replace assertion by
+        runtime check to error out if passed value is strictly
+        negative.  Fixes
+        http://bugzilla.maptools.org/show_bug.cgi?id=2535
+
+    <LI> libtiff/tif_dirread.c: avoid division by floating point 0 in
+        TIFFReadDirEntryCheckedRational() and
+        TIFFReadDirEntryCheckedSrational(), and return 0 in that case
+        (instead of infinity as before presumably) Apparently some
+        sanitizers do not like those divisions by zero.  Fixes
+        http://bugzilla.maptools.org/show_bug.cgi?id=2644
+
+    <LI> libtiff/tif_dir.c, tif_dirread.c, tif_dirwrite.c: implement
+        various clampings of double to other data types to avoid
+        undefined behaviour if the output range isn't big enough to
+        hold the input value.  Fixes
+        http://bugzilla.maptools.org/show_bug.cgi?id=2643
+        http://bugzilla.maptools.org/show_bug.cgi?id=2642
+        http://bugzilla.maptools.org/show_bug.cgi?id=2646
+        http://bugzilla.maptools.org/show_bug.cgi?id=2647
+
+    <LI> libtiff/tif_jpeg.c: validate BitsPerSample in
+        JPEGSetupEncode() to avoid undefined behaviour caused by
+        invalid shift exponent.  Fixes
+        http://bugzilla.maptools.org/show_bug.cgi?id=2648
+
+    <LI> libtiff/tif_read.c: avoid potential undefined behaviour on
+        signed integer addition in TIFFReadRawStrip1() in isMapped()
+        case.  Fixes http://bugzilla.maptools.org/show_bug.cgi?id=2650
+
+    <LI> libtiff/tif_getimage.c: add explicit uint32 cast in
+        putagreytile to avoid UndefinedBehaviorSanitizer warning.
+        Patch by Nicolás Peña.  Fixes
+        http://bugzilla.maptools.org/show_bug.cgi?id=2658
+
+    <LI> libtiff/tif_read.c: TIFFReadBufferSetup(): use _TIFFcalloc()
+        to zero initialize tif_rawdata.  Fixes
+        http://bugzilla.maptools.org/show_bug.cgi?id=2651
+
+    <LI> libtiff/tiffio.h, tif_unix.c, tif_win32.c, tif_vms.c: add
+    _TIFFcalloc()
+
+    <LI> libtiff/tif_luv.c, tif_lzw.c, tif_packbits.c: return 0 in
+        Encode functions instead of -1 when TIFFFlushData1() fails.
+        Fixes http://bugzilla.maptools.org/show_bug.cgi?id=2130
+
+    <LI> libtiff/tif_ojpeg.c: fix leak in
+        OJPEGReadHeaderInfoSecTablesQTable,
+        OJPEGReadHeaderInfoSecTablesDcTable and
+        OJPEGReadHeaderInfoSecTablesAcTable when read fails.  Patch by
+        Nicolás Peña.  Fixes
+        http://bugzilla.maptools.org/show_bug.cgi?id=2659
+
+    <LI> libtiff/tif_jpeg.c: only run JPEGFixupTagsSubsampling() if
+        the YCbCrSubsampling tag is not explicitly present. This helps
+        a bit to reduce the I/O amount when the tag is present
+        (especially on cloud hosted files).
+
+    <LI> libtiff/tif_lzw.c: in LZWPostEncode(), increase, if
+        necessary, the code bit-width after flushing the remaining
+        code and before emitting the EOI code.  Fixes
+        http://bugzilla.maptools.org/show_bug.cgi?id=1982
+
+    <LI> libtiff/tif_pixarlog.c: fix memory leak in error code path of
+        PixarLogSetupDecode(). Patch by Nicolás Peña.  Fixes
+        http://bugzilla.maptools.org/show_bug.cgi?id=2665
+
+    <LI> libtiff/tif_fax3.c, tif_predict.c, tif_getimage.c: fix GCC 7
+        -Wimplicit-fallthrough warnings.
+
+    <LI> libtiff/tif_dirread.c: fix memory leak in non
+        DEFER_STRILE_LOAD mode (ie default) when there is both a
+        StripOffsets and TileOffsets tag, or a StripByteCounts and
+        TileByteCounts Fixes
+        http://bugzilla.maptools.org/show_bug.cgi?id=2689
+
+    <LI> libtiff/tif_ojpeg.c: fix potential memory leak in
+        OJPEGReadHeaderInfoSecTablesQTable,
+        OJPEGReadHeaderInfoSecTablesDcTable and
+        OJPEGReadHeaderInfoSecTablesAcTable Patch by Nicolás Peña.
+        Fixes http://bugzilla.maptools.org/show_bug.cgi?id=2670
+
+    <LI> libtiff/tif_fax3.c: avoid crash in Fax3Close() on empty file.
+        Patch by Alan Coopersmith + complement by myself.  Fixes
+        http://bugzilla.maptools.org/show_bug.cgi?id=2673
+
+    <LI> libtiff/tif_read.c: TIFFFillStrip(): add limitation to the
+        number of bytes read in case td_stripbytecount[strip] is
+        bigger than reasonable, so as to avoid excessive memory
+        allocation.
+
+    <LI> libtiff/tif_zip.c, tif_pixarlog.c, tif_predict.c: fix memory
+        leak when the underlying codec (ZIP, PixarLog) succeeds its
+        setupdecode() method, but PredictorSetup fails.  Credit to
+        OSS-Fuzz (locally run, on GDAL)
+
+    <LI> libtiff/tif_read.c: TIFFFillStrip() and TIFFFillTile(): avoid
+        excessive memory allocation in case of shorten files.  Only
+        effective on 64 bit builds and non-mapped cases.  Credit to
+        OSS-Fuzz (locally run, on GDAL)
+
+    <LI> libtiff/tif_read.c: TIFFFillStripPartial() / TIFFSeek(),
+        avoid potential integer overflows with read_ahead in
+        CHUNKY_STRIP_READ_SUPPORT mode. Should
+        especially occur on 32 bit platforms.
+
+    <LI> libtiff/tif_read.c: TIFFFillStripPartial(): avoid excessive
+        memory allocation in case of shorten files.  Only effective on
+        64 bit builds.  Credit to OSS-Fuzz (locally run, on GDAL)
+
+    <LI> libtiff/tif_read.c: update tif_rawcc in
+        CHUNKY_STRIP_READ_SUPPORT mode with tif_rawdataloaded when
+        calling TIFFStartStrip() or TIFFFillStripPartial(). This
+        avoids reading beyond tif_rawdata when bytecount >
+        tif_rawdatasize.  Fixes
+        https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=1545.
+        Credit to OSS-Fuzz
+
+    <LI> libtiff/tif_color.c: avoid potential int32 overflow in
+        TIFFYCbCrToRGBInit() Fixes
+        https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=1533
+        Credit to OSS-Fuzz
+
+    <LI> libtiff/tif_pixarlog.c, tif_luv.c: avoid potential int32
+        overflows in multiply_ms() and add_ms().  Fixes
+        https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=1558
+        Credit to OSS-Fuzz
+
+    <LI> libtiff/tif_packbits.c: fix out-of-buffer read in
+        PackBitsDecode() Fixes
+        https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=1563
+        Credit to OSS-Fuzz
+
+    <LI> libtiff/tif_luv.c: LogL16InitState(): avoid excessive memory
+        allocation when RowsPerStrip tag is missing.
+        Credit to OSS-Fuzz (locally run, on GDAL)
+
+    <LI> libtiff/tif_lzw.c: update dec_bitsleft at beginning of
+        LZWDecode(), and update tif_rawcc at end of LZWDecode(). This
+        is needed to properly work with the latest chnges in
+        tif_read.c in CHUNKY_STRIP_READ_SUPPORT mode.
+
+    <LI> libtiff/tif_pixarlog.c: PixarLogDecode(): resync tif_rawcp
+        with next_in and tif_rawcc with avail_in at beginning and end
+        of function, similarly to what is done in LZWDecode(). Likely
+        needed so that it works properly with latest chnges in
+        tif_read.c in CHUNKY_STRIP_READ_SUPPORT mode. But untested...
+
+    <LI> libtiff/tif_getimage.c: initYCbCrConversion(): add basic
+        validation of luma and refBlackWhite coefficients (just check
+        they are not NaN for now), to avoid potential float to int
+        overflows.  Fixes
+        https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=1663
+        Credit to OSS Fuzz
+
+    <LI> libtiff/tif_read.c: _TIFFVSetField(): fix outside range cast
+        of double to float.  Credit to Google Autofuzz project
+
+    <LI> libtiff/tif_getimage.c: initYCbCrConversion(): check luma[1]
+        is not zero to avoid division by zero.  Fixes
+        https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=1665
+        Credit to OSS Fuzz
+
+    <LI> libtiff/tif_read.c: _TIFFVSetField(): fix outside range cast
+        of double to float.  Credit to Google Autofuzz project
+
+    <LI> libtiff/tif_getimage.c: initYCbCrConversion(): check luma[1]
+        is not zero to avoid division by zero.  Fixes
+        https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=1665
+        Credit to OSS Fuzz
+
+    <LI> libtiff/tif_getimage.c: initYCbCrConversion(): stricter
+        validation for refBlackWhite coefficients values. To avoid
+        invalid float->int32 conversion.  Fixes
+        https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=1718
+        Credit to OSS Fuzz
+
+</UL>
+
+<P><HR WIDTH=65% ALIGN=left>
+
+<!-------------------------------------------------------------------------->
+	
+<A NAME="tools"><B><FONT SIZE=+3>C</FONT>HANGES IN THE TOOLS:</B></A>
+
+<UL>
+
+    <LI> tools/fax2tiff.c (main): Applied patch by Jörg Ahrens to fix
+        passing client data for Win32 builds using tif_win32.c
+        (USE_WIN32_FILEIO defined) for file I/O.  Patch was provided
+        via email on November 20, 2016.
+
+    <LI> tools/tiffcp.c: avoid uint32 underflow in cpDecodedStrips
+        that can cause various issues, such as buffer overflows in the
+        library.  Reported by Agostino Sarubbo.  Fixes
+        http://bugzilla.maptools.org/show_bug.cgi?id=2598
+
+    <LI> tools/tiffcrop.c: fix readContigStripsIntoBuffer() in -i
+        (ignore) mode so that the output buffer is correctly
+        incremented to avoid write outside bounds.  Reported by
+        Agostino Sarubbo.  Fixes
+        http://bugzilla.maptools.org/show_bug.cgi?id=2620
+
+    <LI> tools/tiffcrop.c: add 3 extra bytes at end of strip buffer in
+        readSeparateStripsIntoBuffer() to avoid read outside of heap
+        allocated buffer.  Reported by Agostino Sarubbo.  Fixes
+        http://bugzilla.maptools.org/show_bug.cgi?id=2621
+
+    <LI> tools/tiffcrop.c: fix integer division by zero when
+        BitsPerSample is missing.  Reported by Agostino Sarubbo.
+        Fixes http://bugzilla.maptools.org/show_bug.cgi?id=2619
+
+    <LI> tools/tiffinfo.c: fix null pointer dereference in -r mode
+        when the image has no StripByteCount tag.  Reported by
+        Agostino Sarubbo.  Fixes
+        http://bugzilla.maptools.org/show_bug.cgi?id=2594
+
+    <LI> tools/tiffcp.c: avoid potential division by zero is
+        BitsPerSamples tag is missing.  Reported by Agostino Sarubbo.
+        Fixes http://bugzilla.maptools.org/show_bug.cgi?id=2597
+
+    <LI> tools/tif_dir.c: when TIFFGetField(, TIFFTAG_NUMBEROFINKS, )
+        is called, limit the return number of inks to SamplesPerPixel,
+        so that code that parses ink names doesn't go past the end of
+        the buffer.  Reported by Agostino Sarubbo.  Fixes
+        http://bugzilla.maptools.org/show_bug.cgi?id=2599
+
+    <LI> tools/tiffcp.c: avoid potential division by zero is
+        BitsPerSamples tag is missing.  Reported by Agostino Sarubbo.
+        Fixes http://bugzilla.maptools.org/show_bug.cgi?id=2607
+
+    <LI> tools/tiffcp.c: fix uint32 underflow/overflow that can cause
+        heap-based buffer overflow.  Reported by Agostino Sarubbo.
+        Fixes http://bugzilla.maptools.org/show_bug.cgi?id=2610
+
+    <LI> tools/tiffcp.c: replace assert( (bps % 8) == 0 ) by a non
+        assert check.  Reported by Agostino Sarubbo.  Fixes
+        http://bugzilla.maptools.org/show_bug.cgi?id=2605
+
+    <LI> tools/tiff2ps.c: fix 2 heap-based buffer overflows (in
+        PSDataBW and PSDataColorContig). Reported by Agostino Sarubbo.
+        Fixes http://bugzilla.maptools.org/show_bug.cgi?id=2633 and
+        http://bugzilla.maptools.org/show_bug.cgi?id=2634.
+
+    <LI> tools/tiff2pdf.c: prevent heap-based buffer overflow in -j
+        mode on a paletted image. Note: this fix errors out before the
+        overflow happens. There could probably be a better fix.  Fixes
+        http://bugzilla.maptools.org/show_bug.cgi?id=2635
+
+    <LI> tools/tiff2pdf.c: fix wrong usage of memcpy() that can
+        trigger unspecified behaviour.  Fixes
+        http://bugzilla.maptools.org/show_bug.cgi?id=2638
+
+    <LI> tools/tiff2pdf.c: avoid potential invalid memory read in
+        t2p_writeproc.  Fixes
+        http://bugzilla.maptools.org/show_bug.cgi?id=2639
+
+    <LI> tools/tiff2pdf.c: avoid potential heap-based overflow in
+        t2p_readwrite_pdf_image_tile().  Fixes
+        http://bugzilla.maptools.org/show_bug.cgi?id=2640
+
+    <LI> tools/tiffcrop.c: remove extraneous TIFFClose() in error code
+        path, that caused double free.  Related to
+        http://bugzilla.maptools.org/show_bug.cgi?id=2535
+
+    <LI> tools/tiffcp.c: error out cleanly in cpContig2SeparateByRow
+        and cpSeparate2ContigByRow if BitsPerSample != 8 to avoid heap
+        based overflow.  Fixes
+        http://bugzilla.maptools.org/show_bug.cgi?id=2656 and
+        http://bugzilla.maptools.org/show_bug.cgi?id=2657
+
+    <LI> tools/raw2tiff.c: avoid integer division by zero.  Fixes
+        http://bugzilla.maptools.org/show_bug.cgi?id=2631
+
+    <LI> tools/tiff2ps.c: call TIFFClose() in error code paths.
+
+    <LI> tools/fax2tiff.c: emit appropriate message if the input file
+        is empty. Patch by Alan Coopersmith.  Fixes
+        http://bugzilla.maptools.org/show_bug.cgi?id=2672
+
+    <LI> tools/tiff2bw.c: close TIFF handle in error code path.  Fixes
+        http://bugzilla.maptools.org/show_bug.cgi?id=2677
+
+</UL>
+
+<P><HR WIDTH=65% ALIGN=left>
+
+<!--------------------------------------------------------------------------->
+
+<A NAME="contrib"><B><FONT SIZE=+3>C</FONT>HANGES IN THE CONTRIB AREA:</B></A>
+
+<UL> 
+
+  <LI> None
+
+</UL>
+
+Last updated $Date: 2017-05-21 17:47:46 $.
+
+</BODY>
+</HTML>
