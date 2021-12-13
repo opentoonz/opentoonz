@@ -5,6 +5,7 @@
 
 // tcg includes
 #include "macros.h"
+#include <algorithm>
 
 /*!
   \file     tcg_poly_ops.h
