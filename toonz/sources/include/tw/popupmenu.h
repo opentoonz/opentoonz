@@ -121,7 +121,7 @@ private:
 // see examples below
 //
 
-/*---- Example 1 (position indipendent) ----
+/*---- Example 1 (position independent) ----
 
    void Pluto::rightButtonUp(const TMouseEvent &e) {
      TContextMenu *menu = new TContextMenu(this);

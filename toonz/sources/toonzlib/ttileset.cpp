@@ -197,6 +197,16 @@ const TTileSetFullColor::Tile *TTileSetFullColor::getTile(int index) const {
 
 //------------------------------------------------------------------------------------------
 
+TTileSetFullColor::Tile *TTileSetFullColor::editTile(int index) const {
+  assert(0 <= index && index < getTileCount());
+  TTileSetFullColor::Tile *tile =
+      dynamic_cast<TTileSetFullColor::Tile *>(m_tiles[index]);
+  assert(tile);
+  return tile;
+}
+
+//------------------------------------------------------------------------------------------
+
 TTileSetFullColor *TTileSetFullColor::clone() const {
   TTileSetFullColor *tileSet = new TTileSetFullColor(m_srcImageSize);
   Tiles::const_iterator it   = m_tiles.begin();

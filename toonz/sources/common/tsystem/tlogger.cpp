@@ -10,8 +10,6 @@
 #include <vector>
 #include <QTimer>
 
-using std::endl;
-
 class TLogger::Imp {
 public:
   std::vector<TLogger::Message> m_messages;

@@ -126,7 +126,7 @@ void Iwa_GradientWarpFx::doCompute(TTile &tile, double frame,
   }
 
   int margin = static_cast<int>(
-      ceil((abs(hLength) < abs(vLength)) ? abs(vLength) : abs(hLength)));
+      ceil((std::abs(hLength) < std::abs(vLength)) ? std::abs(vLength) : std::abs(hLength)));
 
   /*- 素材計算範囲を計算 -*/
   /*- 出力範囲 -*/
@@ -312,8 +312,8 @@ void Iwa_GradientWarpFx::get_render_real_hv(const double frame,
                                             double &v_maxlen) {
   /*--- ベクトルにする(プラス値) --- */
   TPointD rend_vect;
-  rend_vect.x = abs(m_h_maxlen->getValue(frame));
-  rend_vect.y = abs(m_v_maxlen->getValue(frame));
+  rend_vect.x = std::abs(m_h_maxlen->getValue(frame));
+  rend_vect.y = std::abs(m_v_maxlen->getValue(frame));
   /*--- 拡大縮小(移動回転しないで)のGeometryを反映させる ---*/
   rend_vect = rend_vect * sqrt(fabs(affine.det()));
   /*--- 方向は無視して長さを返す(プラス値) ---*/

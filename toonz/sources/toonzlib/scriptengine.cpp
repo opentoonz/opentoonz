@@ -256,6 +256,10 @@ void ScriptEngine::evaluate(const QString &cmd) {
   m_executor->start();
 }
 
+bool ScriptEngine::wait(unsigned long time) {
+  return !m_executor || m_executor->wait(time);
+}
+
 bool ScriptEngine::isEvaluating() const { return m_engine->isEvaluating(); }
 
 void ScriptEngine::interrupt() { m_engine->abortEvaluation(); }

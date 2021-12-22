@@ -56,7 +56,7 @@ bool  findZero_Newton ( double          x0      ,
 
   for(i=0;i<maxIter;++i)
   {
-    // the firts time x_n = x1
+    // the first time x_n = x1
     double  fd1_x_n = fd1(x_n);
     assert( fd1_x_n != 0.0 );
 
@@ -96,7 +96,7 @@ bool  findZero_Newton ( double          x0      ,
 
     Return:
     the minimum or,
-    -2  if min it's unreacheable.
+    -2  if min it's unreachable.
     -1  if min does not exist
     Remark:
     Max iterations numbers is fixed to 100 in in maxIter.

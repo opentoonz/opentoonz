@@ -20,7 +20,7 @@
 // Platform-specific includes
 #if defined(_WIN32)
 
-#ifndef x64
+#if !defined(x64) && !defined(__GNUC__)
 
 #define list QuickTime_list
 #define map QuickTime_map
@@ -53,7 +53,7 @@
 #include "./mov/tiio_movM.h"
 #include "./3gp/tiio_3gpM.h"
 
-#elif defined(LINUX)  // No more supported by the way...
+#elif defined(LINUX) || defined(FREEBSD)  // No more supported by the way...
 // #include "./mov/tiio_movL.h"
 #include "./mov/tiio_mov_proxy.h"
 #include "./3gp/tiio_3gp_proxy.h"
@@ -64,9 +64,13 @@
 #include "./sgi/tiio_sgi.h"
 #include "./tga/tiio_tga.h"
 #include "./png/tiio_png.h"
+/* Can't build this on FreeBSD: libtiff requires internal API access.
+ * Probably some one get luck to fix this. */
+#ifndef FREEBSD
 #include "./tif/tiio_tif.h"
 #include "./tzp/tiio_tzp.h"
 #include "./tzp/tiio_plt.h"
+#endif
 #include "./psd/tiio_psd.h"
 #include "./avi/tiio_avi.h"
 #include "./pli/tiio_pli.h"
@@ -102,6 +106,9 @@ void initImageIo(bool lightVersion) {
     TLevelReader::define("tlv", TLevelReaderTzl::create);
     TFileType::declare("tlv", TFileType::CMAPPED_LEVEL);
 
+/* Can't build this on FreeBSD: libtiff requires internal API access.
+ * Probably some one get luck to fix this. */
+#ifndef FREEBSD
     Tiio::defineReaderMaker("tzp", Tiio::makeTzpReader);
     Tiio::defineWriterMaker("tzp", Tiio::makeTzpWriter, false);
     TFileType::declare("tzp", TFileType::CMAPPED_IMAGE);
@@ -116,6 +123,7 @@ void initImageIo(bool lightVersion) {
     Tiio::defineReaderMaker("plt", Tiio::makePltReader);
     Tiio::defineWriterMaker("plt", Tiio::makePltWriter, false);
     TFileType::declare("plt", TFileType::RASTER_IMAGE);
+#endif
 
     Tiio::defineReaderMaker("nol", Tiio::makePngReader);
     Tiio::defineWriterMaker("nol", Tiio::makePngWriter, true);
@@ -143,6 +151,9 @@ void initImageIo(bool lightVersion) {
   TFileType::declare("tga", TFileType::RASTER_IMAGE);
   Tiio::defineWriterProperties("tga", new Tiio::TgaWriterProperties());
 
+/* Can't build this on FreeBSD: libtiff requires internal API access.
+ * Probably some one get luck to fix this. */
+#ifndef FREEBSD
   Tiio::defineReaderMaker("tif", Tiio::makeTifReader);
   Tiio::defineWriterMaker("tif", Tiio::makeTifWriter, true);
   TFileType::declare("tif", TFileType::RASTER_IMAGE);
@@ -152,6 +163,7 @@ void initImageIo(bool lightVersion) {
   Tiio::defineWriterMaker("tiff", Tiio::makeTifWriter, true);
   TFileType::declare("tiff", TFileType::RASTER_IMAGE);
   Tiio::defineWriterProperties("tiff", new Tiio::TifWriterProperties());
+#endif
 
   Tiio::defineReaderMaker("sgi", Tiio::makeSgiReader);
   Tiio::defineWriterMaker("sgi", Tiio::makeSgiWriter, true);
@@ -169,7 +181,7 @@ void initImageIo(bool lightVersion) {
                                new Tiio::SpriteWriterProperties());
 
 // ffmpeg
-#if !defined(_WIN32) || defined(x64)
+#if !defined(_WIN32) || defined(x64) || (defined(_WIN32) && defined(__GNUC__))
   if (Ffmpeg::checkFfmpeg()) {
     bool ffprobe = Ffmpeg::checkFfprobe();
     if (Ffmpeg::checkFormat("webm")) {

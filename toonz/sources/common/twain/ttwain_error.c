@@ -98,19 +98,21 @@ void TTWAIN_RecordError(void) {
   else
     TTwainData.ErrCC = -1;
 
-  strcpy(Msg_out, "");
   if (TTwainData.ErrRC < (sizeof(RC_msg) / sizeof(RC_msg[0]))) {
-    sprintf(Msg_out, "RC: %s(%d)", RC_msg[TTwainData.ErrRC],
-            (int)TTwainData.ErrRC);
+    snprintf(Msg_out, sizeof(Msg_out), "RC: %s(%d)",
+             RC_msg[TTwainData.ErrRC], (int)TTwainData.ErrRC);
   } else {
-    sprintf(Msg_out, "RC: %s(%d)", "unknown", (int)TTwainData.ErrRC);
+    snprintf(Msg_out, sizeof(Msg_out), "RC: %s(%d)", "unknown",
+             (int)TTwainData.ErrRC);
   }
 
   if (TTwainData.ErrCC < (sizeof(CC_msg) / sizeof(CC_msg[0]))) {
-    sprintf(tmp, "CC: %s(%d)", CC_msg[TTwainData.ErrCC], (int)TTwainData.ErrCC);
+    snprintf(tmp, sizeof(tmp), "CC: %s(%d)", CC_msg[TTwainData.ErrCC],
+             (int)TTwainData.ErrCC);
     strcat(Msg_out, tmp);
   } else {
-    sprintf(tmp, "CC: %s(%d)", "unknown", (int)TTwainData.ErrCC);
+    snprintf(tmp, sizeof(tmp), "CC: %s(%d)", "unknown",
+             (int)TTwainData.ErrCC);
     strcat(Msg_out, tmp);
   }
 

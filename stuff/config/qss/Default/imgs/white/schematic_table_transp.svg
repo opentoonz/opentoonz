@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="18px" height="17px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <path d="M9,0.706C4.698,0.706 1.206,4.198 1.206,8.5C1.206,12.802 4.698,16.294 9,16.294C13.302,16.294 16.794,12.802 16.794,8.5C16.794,4.198 13.302,0.706 9,0.706ZM9,2.294C12.424,2.294 15.206,5.076 15.206,8.5C15.206,11.924 12.424,14.706 9,14.706C5.576,14.706 2.794,11.924 2.794,8.5C2.794,5.076 5.576,2.294 9,2.294Z"/>
+    <rect x="5" y="5" width="8" height="7" style="fill:url(#_Linear1);"/>
+    <defs>
+        <linearGradient id="_Linear1" x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(10,0,0,10,3,5)"><stop offset="0" style="stop-color:black;stop-opacity:1"/><stop offset="1" style="stop-color:black;stop-opacity:0"/></linearGradient>
+    </defs>
+</svg>

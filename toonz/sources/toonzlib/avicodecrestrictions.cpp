@@ -75,7 +75,7 @@ bool canWork(const HIC &hic, const TDimension &resolution, int bpp) {
 
   return ICERR_OK == ICCompressQuery(hic, &bi.bmiHeader, NULL);
 }
-}
+}  // namespace
 
 //-----------------------------------------------------------------------------
 
@@ -227,6 +227,9 @@ QMap<std::wstring, bool> AviCodecRestrictions::getUsableCodecs(
                           sizeof(descr), 0, 0);
       WideCharToMultiByte(CP_ACP, 0, icinfo.szName, -1, name, sizeof(name), 0,
                           0);
+      // Give up to load codecs once the blackmagic codec is found -
+      // as it seems to cause crash for unknown reasons (issue #138)
+      if (strstr(descr, "Blackmagic") != 0) break;
 
       std::wstring compressorName;
       compressorName =

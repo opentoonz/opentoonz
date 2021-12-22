@@ -50,12 +50,12 @@ public:
 
   inline void setValue(int _value) { value = (UCHAR)_value; }
 
-  //! In this conversion instead of truncating values fron 16 to 8 a randomic
+  //! In this conversion instead of truncating values from 16 to 8 a randomic
   //! dithering is performed.
   //    randomNumber is an unsigned int random value
   static inline TPixelGR8 from(const TPixelGR16 &pix,
                                TUINT32 randomNumber);  // per il dithering
-  //! In this conversion instead of truncating values fron 64 to 8 a randomic
+  //! In this conversion instead of truncating values from 64 to 8 a randomic
   //! dithering is performed.
   //    randomNumber is an unsigned int random value
 

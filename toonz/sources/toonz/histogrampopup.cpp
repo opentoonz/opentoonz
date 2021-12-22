@@ -45,6 +45,7 @@ HistogramPopup::HistogramPopup(QString title)
   mainLay->setSpacing(0);
   { mainLay->addWidget(m_histogram); }
   setLayout(mainLay);
+  mainLay->setSizeConstraint(QLayout::SetFixedSize);
   setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 }
 
@@ -74,16 +75,35 @@ void HistogramPopup::setImage(TImageP image) {
 }
 //-----------------------------------------------------------------------------
 /*! show the picked color
-*/
+ */
 void HistogramPopup::updateInfo(const TPixel32 &pix, const TPointD &imagePos) {
+  m_histogram->updateInfo(pix, imagePos);
+}
+
+void HistogramPopup::updateInfo(const TPixel64 &pix, const TPointD &imagePos) {
   m_histogram->updateInfo(pix, imagePos);
 }
 
 //-----------------------------------------------------------------------------
 /*! show the average-picked color
-*/
+ */
 void HistogramPopup::updateAverageColor(const TPixel32 &pix) {
   m_histogram->updateAverageColor(pix);
+}
+
+void HistogramPopup::updateAverageColor(const TPixel64 &pix) {
+  m_histogram->updateAverageColor(pix);
+}
+//-----------------------------------------------------------------------------
+
+void HistogramPopup::setShowCompare(bool on) {
+  m_histogram->setShowCompare(on);
+}
+
+//-----------------------------------------------------------------------------
+
+void HistogramPopup::invalidateCompHisto() {
+  m_histogram->invalidateCompHisto();
 }
 
 //=============================================================================

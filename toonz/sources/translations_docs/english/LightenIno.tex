@@ -1,0 +1,45 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[a4paper, total={180mm, 272mm}]{geometry}
+
+\usepackage{fontspec}
+\setmainfont[Path=fonts/, Extension=.ttf]{ipaexm}
+
+\setlength\parindent{3.5em}
+\setlength\parskip{0em}
+\renewcommand{\baselinestretch}{1.247}
+
+\begin{document}
+
+\thispagestyle{empty}
+
+\Large
+\noindent \\
+Lighten Ino\medskip
+\par
+\normalsize
+Lightens the image\par
+Increases the values (RGB individually) of the Fore and Back images.\\
+\\
+-{-}- \ Inputs \ -{-}-\par
+When both input ports are connected, they will be combined in the process.\par
+When the node Visibility switch is OFF it will display the Back port content.\par
+If there is only one port connected, it will display its content.\\
+Fore\par
+Connect the image that will be overlaid on top.\\
+Back\par
+Connect the base image.\\
+\\
+-{-}- \ Settings \ -{-}-\\
+Opacity\par
+Specifies the opacity of the image overlaid on top.\par
+When 0 the Fore image will be transparent.\par
+With the default value \textquotedbl 1.0\textquotedbl \ , the Fore image will be composed as opaque.\par
+Usually specified values range from 0 to 1.0.\par
+You can also specify larger values from 1 to 10.0\\
+\\
+Clipping Mask\par
+When ON, it will take the Back port alpha information to define the alpha of the\par 
+resulting image, leaving areas where the Alpha value is zero as transparent.\par
+The default value is OFF.
+
+\end{document}

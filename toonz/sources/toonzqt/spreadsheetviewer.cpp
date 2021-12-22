@@ -61,37 +61,67 @@ void FrameScroller::onVScroll(int y) {
   QPoint offset(0, y - m_lastY);
   if (isSyncing()) return;
   m_lastY = y;
+
+  int senderMaximum     = 0;
+  QScrollBar *scrollBar = dynamic_cast<QScrollBar *>(sender());
+  if (scrollBar) senderMaximum = scrollBar->maximum();
+
   setSyncing(true);
-  handleScroll(offset);
+  handleScroll(offset, senderMaximum, y);
   setSyncing(false);
 }
 void FrameScroller::onHScroll(int x) {
   QPoint offset(x - m_lastX, 0);
   if (isSyncing()) return;
   m_lastX = x;
+
+  int senderMaximum     = 0;
+  QScrollBar *scrollBar = dynamic_cast<QScrollBar *>(sender());
+  if (scrollBar) senderMaximum = scrollBar->maximum();
+
   setSyncing(true);
-  handleScroll(offset);
+  handleScroll(offset, senderMaximum, x);
   setSyncing(false);
 }
 
 static QList<FrameScroller *> frameScrollers;
 
-void FrameScroller::handleScroll(QPoint &offset) {
+void FrameScroller::handleScroll(QPoint &offset, int senderMaximum,
+                                 int senderValue) {
   if ((m_orientation->isVerticalTimeline() && offset.x()) ||
       (!m_orientation->isVerticalTimeline() &&
        offset.y()))  // only synchronize changes by frames axis
     return;
 
+  // If the scroller has the same maximum size, assume it as the scroll bar in
+  // the neighbor panel with the same height & scale. In such case just set the
+  // same value as the sender without zoom adjusting whichi may cause error due
+  // to rounding off.
+  QList<FrameScroller *> scrollBarCue;
+  for (auto frameScroller : frameScrollers)
+    if (frameScroller != this) {
+      if (!frameScroller->isSyncing()) {
+        if (!frameScroller->exactScroll(senderMaximum, senderValue)) {
+          // If the size is different from the sender, then put it in the cue
+          // for adjusting offset and scrolling.
+          scrollBarCue.append(frameScroller);
+        }
+      }
+    }
+
+  if (scrollBarCue.isEmpty()) return;
+
+  QPointF offsetF(offset);
   // In case of a zoomed viewer is sending this out, adjust the
   // zoomed offset back to a standardized offset
-  emit zoomScrollAdjust(offset, false);
+  emit zoomScrollAdjust(offsetF, false);
 
-  CellPositionRatio ratio = orientation()->xyToPositionRatio(offset);
+  CellPositionRatio ratio = orientation()->xyToPositionRatio(offsetF);
 
-  for (int i = 0; i < frameScrollers.size(); i++)
-    if (frameScrollers[i] != this) {
-      if (!frameScrollers[i]->isSyncing()) {
-        frameScrollers[i]->onScroll(ratio);
+  for (auto frameScroller : scrollBarCue)
+    if (frameScroller != this) {
+      if (!frameScroller->isSyncing()) {
+        frameScroller->onScroll(ratio);
         break;
       }
     }
@@ -99,11 +129,28 @@ void FrameScroller::handleScroll(QPoint &offset) {
 
 void adjustScrollbar(QScrollBar *scrollBar, int add);
 
+// Check if the scroll bar has the same size as the sender and just put the
+// value
+bool FrameScroller::exactScroll(const int senderMaximum,
+                                const int senderValue) {
+  QScrollBar *scrollBar = (m_orientation->isVerticalTimeline())
+                              ? m_scrollArea->verticalScrollBar()
+                              : m_scrollArea->horizontalScrollBar();
+
+  if (scrollBar->maximum() == senderMaximum) {
+    scrollBar->setValue(senderValue);
+    return true;
+  }
+
+  return false;
+}
+
 void FrameScroller::onScroll(const CellPositionRatio &ratio) {
-  QPoint offset = orientation()->positionRatioToXY(ratio);
+  QPointF offset = orientation()->positionRatioToXY(ratio);
 
   // In case of a zoomed viewer is receiving this, adjust the
   // standardized offset to zoomed offset
+
   emit zoomScrollAdjust(offset, true);
 
   // scroll area should be resized before moving down the scroll bar.
@@ -111,11 +158,11 @@ void FrameScroller::onScroll(const CellPositionRatio &ratio) {
   // since the receiver is in the same thread.
   // when moving up the scroll bar, resizing will be done in
   // SpreadsheetViewer::onVSliderChanged().
-  if (offset.x() > 0 || offset.y() > 0) emit prepareToScrollOffset(offset);
-  if (offset.x())
-    adjustScrollbar(m_scrollArea->horizontalScrollBar(), offset.x());
-  if (offset.y())
-    adjustScrollbar(m_scrollArea->verticalScrollBar(), offset.y());
+  if (offset.x() > 0.0 || offset.y() > 0.0) emit prepareToScrollOffset(offset);
+  if ((int)offset.x())
+    adjustScrollbar(m_scrollArea->horizontalScrollBar(), (int)offset.x());
+  if ((int)offset.y())
+    adjustScrollbar(m_scrollArea->verticalScrollBar(), (int)offset.y());
 }
 
 void adjustScrollbar(QScrollBar *scrollBar, int add) {
@@ -130,14 +177,14 @@ void FrameScroller::unregisterFrameScroller() {
   if (frameScrollers.contains(this)) frameScrollers.removeAll(this);
 }
 
-void FrameScroller::prepareToScrollOthers(const QPoint &offset) {
+void FrameScroller::prepareToScrollOthers(const QPointF &offset) {
   CellPositionRatio ratio = orientation()->xyToPositionRatio(offset);
   for (int i = 0; i < frameScrollers.size(); i++)
     if (frameScrollers[i] != this)
       frameScrollers[i]->prepareToScrollRatio(ratio);
 }
 void FrameScroller::prepareToScrollRatio(const CellPositionRatio &ratio) {
-  QPoint offset = orientation()->positionRatioToXY(ratio);
+  QPointF offset = orientation()->positionRatioToXY(ratio);
   emit prepareToScrollOffset(offset);
 }
 
@@ -171,10 +218,10 @@ void SelectionDragTool::click(int row, int col, QMouseEvent *e) {
 }
 
 void SelectionDragTool::drag(int row, int col, QMouseEvent *e) {
-  int r0 = qMin(row, m_firstRow);
-  int r1 = qMax(row, m_firstRow);
-  int c0 = qMin(col, m_firstCol);
-  int c1 = qMax(col, m_firstCol);
+  int r0 = std::min(row, m_firstRow);
+  int r1 = std::max(row, m_firstRow);
+  int c0 = std::min(col, m_firstCol);
+  int c1 = std::max(col, m_firstCol);
   QRect selectedCells(c0, r0, c1 - c0 + 1, r1 - r0 + 1);
   m_viewer->selectCells(selectedCells);
 }
@@ -321,9 +368,13 @@ void RowPanel::drawRows(QPainter &p, int r0, int r1) {
   int y0            = visibleRect.top();
   int y1            = visibleRect.bottom();
 
+  bool simpleView = getViewer()->getFrameZoomFactor() <=
+                    Orientations::topToBottom()->dimension(
+                        PredefinedDimension::SCALE_THRESHOLD);
   int r;
+  int y = getViewer()->rowToY(r0);
   for (r = r0; r <= r1; r++) {
-    int y = getViewer()->rowToY(r);
+    int next_y = getViewer()->rowToY(r + 1);
     // draw horizontal line
     QColor color = (getViewer()->isMarkRow(r))
                        ? getViewer()->getMarkerLineColor()
@@ -331,12 +382,18 @@ void RowPanel::drawRows(QPainter &p, int r0, int r1) {
     p.setPen(color);
     p.drawLine(x0, y, x1, y);
 
+    if (simpleView && r > 0 && !getViewer()->isMarkRow(r + 1)) {
+      y = next_y;
+      continue;
+    }
+
     // draw numbers
     p.setPen(getViewer()->getTextColor());
 
     QString number = QString::number(r + 1);
-    p.drawText(QRect(x0, y + 1, width(), 18),
-               Qt::AlignHCenter | Qt::AlignBottom, number);
+    p.drawText(QRect(x0, y + 1, width() - 4, next_y - y - 1),
+               Qt::AlignVCenter | Qt::AlignRight, number);
+    y = next_y;
   }
   // erase the marker interval at upper-end
   if (r0 == 0) {
@@ -349,9 +406,13 @@ void RowPanel::drawRows(QPainter &p, int r0, int r1) {
 
 void RowPanel::drawCurrentRowGadget(QPainter &p, int r0, int r1) {
   int currentRow = getViewer()->getCurrentRow();
-  int y          = getViewer()->rowToY(currentRow);
+  // int y          = getViewer()->rowToY(currentRow);
   if (currentRow < r0 || r1 < currentRow) return;
-  p.fillRect(1, y + 1, width() - 2, 19, getViewer()->getCurrentRowBgColor());
+  int top    = getViewer()->rowToY(currentRow);
+  int bottom = getViewer()->rowToY(currentRow + 1) - 1;
+  QRect rect(1, top, width() - 1, bottom - top);
+
+  p.fillRect(rect, getViewer()->getCurrentRowBgColor());
 }
 
 //-----------------------------------------------------------------------------
@@ -455,6 +516,7 @@ SpreadsheetViewer::SpreadsheetViewer(QWidget *parent)
     , m_frameHandle(0)
     , m_columnWidth(50)
     , m_rowHeight(20)
+    , m_scaleFactor(100)
     , m_timerId(0)
     , m_autoPanSpeed(0, 0)
     , m_lastAutoPanPos(0, 0)
@@ -474,21 +536,21 @@ SpreadsheetViewer::SpreadsheetViewer(QWidget *parent)
 
   // column header
   m_columnScrollArea = new Spreadsheet::ScrollArea;
-  m_columnScrollArea->setObjectName("ScrollArea");
+  m_columnScrollArea->setObjectName("ScrollColumnArea");
   m_columnScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   m_columnScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   m_columnScrollArea->setFocusPolicy(Qt::NoFocus);
 
   // row area
   m_rowScrollArea = new Spreadsheet::ScrollArea;
-  m_rowScrollArea->setObjectName("ScrollArea");
+  m_rowScrollArea->setObjectName("ScrollRowArea");
   m_rowScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   m_rowScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   m_rowScrollArea->setFocusPolicy(Qt::NoFocus);
 
   // cell area
   m_cellScrollArea = new Spreadsheet::ScrollArea;
-  m_cellScrollArea->setObjectName("ScrollArea");
+  m_cellScrollArea->setObjectName("ScrollCellArea");
   m_cellScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
   m_cellScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
   // m_cellScrollArea->horizontalScrollBar()->setObjectName("XsheetScrollBar");
@@ -501,12 +563,21 @@ SpreadsheetViewer::SpreadsheetViewer(QWidget *parent)
       QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Ignored));
 
   m_rowScrollArea->setFixedWidth(30);
-  m_columnScrollArea->setFixedHeight(m_rowHeight * 3 - 3);
-  // m_columnScrollArea->setFixedHeight(m_rowHeight * 3 + 60 - 63);
+
+  if (Preferences::instance()->getLoadedXsheetLayout() == QString("Minimum") &&
+      !Preferences::instance()->isShowXSheetToolbarEnabled() &&
+      Preferences::instance()->isExpandFunctionHeaderEnabled() &&
+      Preferences::instance()->getFunctionEditorToggle() !=
+          Preferences::FunctionEditorToggle::ShowFunctionSpreadsheetInPopup)
+    m_columnScrollArea->setFixedHeight(m_rowHeight * 2 - 4);
+  else
+    m_columnScrollArea->setFixedHeight(m_rowHeight * 3 - 4);
 
   m_frameScroller.setFrameScrollArea(m_cellScrollArea);
   connect(&m_frameScroller, &Spreadsheet::FrameScroller::prepareToScrollOffset,
           this, &SpreadsheetViewer::onPrepareToScrollOffset);
+  connect(&m_frameScroller, &Spreadsheet::FrameScroller::zoomScrollAdjust, this,
+          &SpreadsheetViewer::onZoomScrollAdjust);
 
   //---- layout
   QGridLayout *layout = new QGridLayout();
@@ -520,7 +591,8 @@ SpreadsheetViewer::SpreadsheetViewer(QWidget *parent)
     int scrollBarWidth = 16;
     // upper-right
     QWidget *w = new QWidget(this);
-    w->setFixedSize(QSize(scrollBarWidth, m_rowHeight * 3 + 60 - 63));
+    w->setFixedWidth(scrollBarWidth);
+    w->setFixedHeight(m_columnScrollArea->height());
     layout->addWidget(w, 0, 2);
 
     // lower-left
@@ -584,6 +656,11 @@ void SpreadsheetViewer::setCellsPanel(Spreadsheet::CellPanel *cells) {
   m_cellScrollArea->setWidget(cells);
 }
 
+void SpreadsheetViewer::setButtonAreaWidget(QWidget *widget) {
+  QGridLayout *lay = dynamic_cast<QGridLayout *>(layout());
+  lay->addWidget(widget, 0, 0);
+}
+
 void SpreadsheetViewer::setRowCount(int rowCount) {
   if (m_rowCount != rowCount) {
     m_rowCount = rowCount;
@@ -619,6 +696,10 @@ void SpreadsheetViewer::scroll(QPoint delta) {
   else if (!notUpdateSizeH && notUpdateSizeV)
     refreshContentSize(x, 0);
 
+  // Recheck in case refreshContentSize changed the max
+  if (!notUpdateSizeH) maxValueH = hSc->maximum();
+  if (!notUpdateSizeV) maxValueV = vSc->maximum();
+
   if (valueH > maxValueH && x > 0) valueH = hSc->maximum();
 
   if (valueV > maxValueV && y > 0) valueV = vSc->maximum();
@@ -627,8 +708,22 @@ void SpreadsheetViewer::scroll(QPoint delta) {
   vSc->setValue(valueV);
 }
 
-void SpreadsheetViewer::onPrepareToScrollOffset(const QPoint &offset) {
-  refreshContentSize(offset.x(), offset.y());
+void SpreadsheetViewer::onPrepareToScrollOffset(const QPointF &offset) {
+  refreshContentSize((int)offset.x(), (int)offset.y());
+}
+
+void SpreadsheetViewer::onZoomScrollAdjust(QPointF &offset, bool toZoom) {
+  double frameZoomFactor = (double)getFrameZoomFactor();
+
+  // toZoom = true: Adjust standardized offset down to zoom factor
+  // toZoom = false: Adjust zoomed offset up to standardized offset
+  double newY;
+  if (toZoom)
+    newY = (offset.y() * frameZoomFactor) / 100.0;
+  else
+    newY = (offset.y() * 100.0) / frameZoomFactor;
+
+  offset.setY(newY);
 }
 
 void SpreadsheetViewer::setAutoPanSpeed(const QPoint &speed) {
@@ -686,15 +781,16 @@ int SpreadsheetViewer::rowToY(int row) const {
 
 /*!Shift is a consequence of style sheet border.*/
 CellPosition SpreadsheetViewer::xyToPosition(const QPoint &point) const {
-  int row = (point.y() + 1) / m_rowHeight;
-  int col = (point.x() + 1) / m_columnWidth;
+  int row = (point.y() * 100 / m_scaleFactor) / m_rowHeight;
+  int col = (point.x()) / m_columnWidth;
   return CellPosition(row, col);
 }
 
 /*!Shift is a consequence of style sheet border.*/
 QPoint SpreadsheetViewer::positionToXY(const CellPosition &pos) const {
-  int x = (pos.layer() * m_columnWidth) - 1;
-  int y = (pos.frame() * m_rowHeight) - 1;
+  int x = (pos.layer() * m_columnWidth);
+  int y = pos.frame() * m_rowHeight * m_scaleFactor / 100;
+  // int y = (pos.frame() * m_rowHeight * m_scaleFactor / 100) - 1;
   return QPoint(x, y);
 }
 
@@ -707,8 +803,8 @@ CellRange SpreadsheetViewer::xyRectToRange(const QRect &rect) const {
 bool SpreadsheetViewer::refreshContentSize(int scrollDx, int scrollDy) {
   QSize viewportSize = m_cellScrollArea->viewport()->size();
   QPoint offset      = m_cellScrollArea->widget()->pos();
-  offset =
-      QPoint(qMin(0, offset.x() - scrollDx), qMin(0, offset.y() - scrollDy));
+  offset             = QPoint(std::min(0, offset.x() - scrollDx),
+                  std::min(0, offset.y() - scrollDy));
 
   QSize contentSize(columnToX(m_columnCount + 1), rowToY(m_rowCount + 1));
 
@@ -728,16 +824,19 @@ bool SpreadsheetViewer::refreshContentSize(int scrollDx, int scrollDy) {
     m_columnScrollArea->widget()->setFixedSize(
         actualSize.width(), m_columnScrollArea->viewport()->height());
     m_isComputingSize = false;
+
     return true;
   }
 }
 
 void SpreadsheetViewer::showEvent(QShowEvent *) {
-  int viewportHeight      = m_cellScrollArea->height();
-  int contentHeight       = rowToY(m_rowCount * 0 + 50);
-  QScrollBar *vSc         = m_cellScrollArea->verticalScrollBar();
-  int actualContentHeight = qMax(contentHeight, vSc->value() + viewportHeight);
-  m_rowScrollArea->widget()->setFixedHeight(actualContentHeight);
+  int viewportHeight = m_cellScrollArea->height();
+  int contentHeight  = rowToY(m_rowCount * 0 + 50);
+  QScrollBar *vSc    = m_cellScrollArea->verticalScrollBar();
+  int actualContentHeight =
+      std::max(contentHeight, vSc->value() + viewportHeight);
+  m_rowScrollArea->widget()->setFixedSize(m_rowScrollArea->viewport()->width(),
+                                          actualContentHeight);
   m_cellScrollArea->widget()->setFixedHeight(actualContentHeight);
   if (m_frameHandle)
     connect(m_frameHandle, SIGNAL(frameSwitched()), this,
@@ -805,13 +904,13 @@ void SpreadsheetViewer::wheelEvent(QWheelEvent *event) {
 
   default:  // Qt::MouseEventSynthesizedByQt,
             // Qt::MouseEventSynthesizedByApplication
-    {
-      std::cout << "not supported wheelEvent.source(): "
-                   "Qt::MouseEventSynthesizedByQt, "
-                   "Qt::MouseEventSynthesizedByApplication"
-                << std::endl;
-      break;
-    }
+  {
+    std::cout << "not supported wheelEvent.source(): "
+                 "Qt::MouseEventSynthesizedByQt, "
+                 "Qt::MouseEventSynthesizedByApplication"
+              << std::endl;
+    break;
+  }
 
   }  // end switch
 }
@@ -931,4 +1030,20 @@ void SpreadsheetViewer::ensureVisibleCol(int col) {
 
   int vertValue = m_cellScrollArea->verticalScrollBar()->value();
   m_cellScrollArea->ensureVisible(x, vertValue, m_columnWidth / 2, 0);
+}
+
+bool SpreadsheetViewer::isSmallHeader() {
+  return (
+      Preferences::instance()->getLoadedXsheetLayout() == QString("Minimum") &&
+      !Preferences::instance()->isShowXSheetToolbarEnabled() &&
+      Preferences::instance()->isExpandFunctionHeaderEnabled() &&
+      Preferences::instance()->getFunctionEditorToggle() !=
+          Preferences::FunctionEditorToggle::ShowFunctionSpreadsheetInPopup);
+}
+
+void SpreadsheetViewer::updateHeaderHeight() {
+  if (isSmallHeader())
+    m_columnScrollArea->setFixedHeight(m_rowHeight * 2 - 4);
+  else
+    m_columnScrollArea->setFixedHeight(m_rowHeight * 3 - 4);
 }

@@ -3,6 +3,17 @@
 #ifndef XSHCOLUMNVIEWER_H
 #define XSHCOLUMNVIEWER_H
 
+#include "tapp.h"
+
+#include "toonz/tstageobject.h"
+#include "toonz/txsheethandle.h"
+#include "toonz/tscenehandle.h"
+#include "toonz/tcolumnhandle.h"
+#include "toonz/txsheet.h"
+
+#include "../include/tundo.h"
+#include "../include/historytypes.h"
+
 #include <QWidget>
 #include <QListWidget>
 #include <QLineEdit>
@@ -16,6 +27,7 @@ class TXsheetHandle;
 class TStageObjectId;
 class TXshColumn;
 class QComboBox;
+class QPushButton;
 class Orientation;
 class TApp;
 class TXsheet;
@@ -78,6 +90,7 @@ public:
 
 protected:
   void mouseMoveEvent(QMouseEvent *event) override;
+  void wheelEvent(QWheelEvent *event) override;
   void focusOutEvent(QFocusEvent *e) override;
   void focusInEvent(QFocusEvent *e) override {}
   void selectCurrent(const QString &text);
@@ -149,6 +162,48 @@ protected slots:
 };
 
 //=============================================================================
+// CameraColumnSwitchUndo
+//-----------------------------------------------------------------------------
+class CameraColumnSwitchUndo final : public TUndo {
+  int m_oldCameraIndex, m_newCameraIndex;
+  TXsheetHandle *m_xsheetHandle;
+
+public:
+  CameraColumnSwitchUndo(int oldIndex, int newIndex, TXsheetHandle *xshHandle)
+      : m_oldCameraIndex(oldIndex)
+      , m_newCameraIndex(newIndex)
+      , m_xsheetHandle(xshHandle) {}
+  ~CameraColumnSwitchUndo() {}
+
+  void undo() const override {
+    m_xsheetHandle->getXsheet()->setCameraColumnIndex(m_oldCameraIndex);
+    TApp::instance()->getCurrentScene()->notifySceneChanged();
+    TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+    TApp::instance()->getCurrentColumn()->notifyColumnIndexSwitched();
+  }
+
+  void redo() const override {
+    m_xsheetHandle->getXsheet()->setCameraColumnIndex(m_newCameraIndex);
+    TApp::instance()->getCurrentScene()->notifySceneChanged();
+    TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+    TApp::instance()->getCurrentColumn()->notifyColumnIndexSwitched();
+  }
+
+  int getSize() const override { return sizeof(*this); }
+
+  QString getHistoryString() override {
+    TStageObjectId objId = TStageObjectId::CameraId(m_newCameraIndex);
+    TStageObject *obj    = m_xsheetHandle->getXsheet()->getStageObject(objId);
+    std::string objName  = obj->getName();
+    QString str          = QObject::tr("Camera Column Switch :  ") +
+                  QString::fromStdString(objName);
+    return str;
+  }
+
+  int getHistoryType() override { return HistoryType::Xsheet; }
+};
+
+//=============================================================================
 // ColumnArea
 //-----------------------------------------------------------------------------
 
@@ -161,8 +216,11 @@ class ColumnTransparencyPopup final : public QWidget {
 
   QComboBox *m_filterColorCombo;
 
+  XsheetViewer *m_viewer;
+  QPushButton *m_lockBtn;
+
 public:
-  ColumnTransparencyPopup(QWidget *parent);
+  ColumnTransparencyPopup(XsheetViewer *viewer, QWidget *parent);
   void setColumn(TXshColumn *column);
 
 protected:
@@ -176,6 +234,29 @@ protected slots:
   void onValueChanged(const QString &);
 
   void onFilterColorChanged(int id);
+  void onLockButtonClicked(bool on);
+};
+
+class SoundColumnPopup final : public QWidget {
+  Q_OBJECT
+
+  QSlider *m_slider;
+  QLineEdit *m_value;
+  TXshColumn *m_column;
+
+public:
+  SoundColumnPopup(QWidget *parent);
+  void setColumn(TXshColumn *column);
+
+protected:
+  // void mouseMoveEvent ( QMouseEvent * e );
+  void mouseReleaseEvent(QMouseEvent *e) override;
+
+protected slots:
+  void onSliderReleased();
+  void onSliderChange(int val);
+  void onSliderValueChanged(int);
+  void onValueChanged(const QString &);
 };
 
 //! The class in charge of the region showing layer headers
@@ -193,6 +274,7 @@ class ColumnArea final : public QWidget {
   };
 
   ColumnTransparencyPopup *m_columnTransparencyPopup;
+  SoundColumnPopup *m_soundColumnPopup;
   QTimer *m_transparencyPopupTimer;
   int m_doOnRelease;
   XsheetViewer *m_viewer;
@@ -302,10 +384,16 @@ protected:
 protected slots:
   void onSubSampling(QAction *);
   void openTransparencyPopup();
+  void openSoundColumnPopup();
+  void openCameraColumnPopup(QPoint pos);
+  void onCameraColumnChangedTriggered();
+  void onCameraColumnLockToggled(bool);
+  void onXsheetCameraChange(int);
+  void onSetMask(int);
 };
 
 //-----------------------------------------------------------------------------
-}  // namespace XsheetGUI;
+}  // namespace XsheetGUI
 //-----------------------------------------------------------------------------
 
 #endif  // XSHCOLUMNVIEWER_H

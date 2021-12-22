@@ -4,22 +4,22 @@
 <context>
     <name>ArtisticSolidColor</name>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="2244"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="1784"/>
         <source>Horiz Offset</source>
         <translation>Гориз. смещение</translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="2247"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="1787"/>
         <source>Vert Offset</source>
         <translation>Вертик. смещение</translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="2250"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="1790"/>
         <source>Noise</source>
         <translation>Шум</translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.h" line="476"/>
+        <location filename="../../colorfx/regionstyles.h" line="460"/>
         <source>Irregular</source>
         <translation>Нерегулярный</translation>
     </message>
@@ -27,12 +27,12 @@
 <context>
     <name>MovingSolidColor</name>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="105"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="104"/>
         <source>Horiz Offset</source>
         <translation>Гориз. смещение</translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="106"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="105"/>
         <source>Vert Offset</source>
         <translation>Вертик. смещение</translation>
     </message>
@@ -45,32 +45,32 @@
 <context>
     <name>OutlineViewerStyle</name>
     <message>
-        <location filename="../../colorfx/strokestyles.cpp" line="5566"/>
+        <location filename="../../colorfx/strokestyles.cpp" line="4085"/>
         <source>Control Point</source>
         <translation>Контрольная точка</translation>
     </message>
     <message>
-        <location filename="../../colorfx/strokestyles.cpp" line="5568"/>
+        <location filename="../../colorfx/strokestyles.cpp" line="4087"/>
         <source>Center Line</source>
         <translation>Центральная линия</translation>
     </message>
     <message>
-        <location filename="../../colorfx/strokestyles.cpp" line="5570"/>
+        <location filename="../../colorfx/strokestyles.cpp" line="4089"/>
         <source>Outline Mode</source>
         <translation>Режим контура</translation>
     </message>
     <message>
-        <location filename="../../colorfx/strokestyles.cpp" line="5572"/>
+        <location filename="../../colorfx/strokestyles.cpp" line="4091"/>
         <source>Distance</source>
         <translation>Расстояние</translation>
     </message>
     <message>
-        <location filename="../../colorfx/strokestyles.cpp" line="5584"/>
+        <location filename="../../colorfx/strokestyles.cpp" line="4103"/>
         <source>distance</source>
         <translation>расстояние</translation>
     </message>
     <message>
-        <location filename="../../colorfx/strokestyles.h" line="1262"/>
+        <location filename="../../colorfx/strokestyles.h" line="1240"/>
         <source>OutlineViewer(OnlyDebug)</source>
         <translation>OutlineViewer(OnlyDebug)</translation>
     </message>
@@ -78,22 +78,22 @@
 <context>
     <name>ShadowStyle</name>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="227"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="216"/>
         <source>Angle</source>
         <translation>Угол</translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="229"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="218"/>
         <source>Density</source>
         <translation>Плотность</translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="231"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="220"/>
         <source>Length</source>
         <translation>Длина</translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.h" line="121"/>
+        <location filename="../../colorfx/regionstyles.h" line="120"/>
         <source>Hatched Shading</source>
         <translation>Заштрихованная заливка</translation>
     </message>
@@ -101,17 +101,17 @@
 <context>
     <name>ShadowStyle2</name>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="622"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="495"/>
         <source>Angle</source>
         <translation>Угол</translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="623"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="496"/>
         <source>Size</source>
         <translation>Размер</translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.h" line="175"/>
+        <location filename="../../colorfx/regionstyles.h" line="169"/>
         <source>Plain Shadow</source>
         <translation>Обычная тень</translation>
     </message>
@@ -132,7 +132,7 @@
 <context>
     <name>TBiColorStrokeStyle</name>
     <message>
-        <location filename="../../colorfx/strokestyles.h" line="589"/>
+        <location filename="../../colorfx/strokestyles.h" line="577"/>
         <source>Shade</source>
         <translation>Тень</translation>
     </message>
@@ -148,22 +148,22 @@
 <context>
     <name>TBlendStrokeStyle2</name>
     <message>
-        <location filename="../../colorfx/strokestyles.cpp" line="3425"/>
+        <location filename="../../colorfx/strokestyles.cpp" line="2523"/>
         <source>Border Fade</source>
         <translation>Затухание границ</translation>
     </message>
     <message>
-        <location filename="../../colorfx/strokestyles.cpp" line="3428"/>
+        <location filename="../../colorfx/strokestyles.cpp" line="2526"/>
         <source>Fade In</source>
         <translation>Fade In</translation>
     </message>
     <message>
-        <location filename="../../colorfx/strokestyles.cpp" line="3431"/>
+        <location filename="../../colorfx/strokestyles.cpp" line="2529"/>
         <source>Fade Out</source>
         <translation>Fade Out</translation>
     </message>
     <message>
-        <location filename="../../colorfx/strokestyles.h" line="739"/>
+        <location filename="../../colorfx/strokestyles.h" line="725"/>
         <source>Fade</source>
         <translation>Затухание</translation>
     </message>
@@ -171,12 +171,12 @@
 <context>
     <name>TBraidStrokeStyle</name>
     <message>
-        <location filename="../../colorfx/strokestyles.cpp" line="1951"/>
+        <location filename="../../colorfx/strokestyles.cpp" line="1382"/>
         <source>Twirl</source>
         <translation>Вращение</translation>
     </message>
     <message>
-        <location filename="../../colorfx/strokestyles.h" line="393"/>
+        <location filename="../../colorfx/strokestyles.h" line="385"/>
         <source>Plait</source>
         <translation>Заплетание</translation>
     </message>
@@ -184,7 +184,7 @@
 <context>
     <name>TBubbleStrokeStyle</name>
     <message>
-        <location filename="../../colorfx/strokestyles.h" line="484"/>
+        <location filename="../../colorfx/strokestyles.h" line="475"/>
         <source>Bubbles</source>
         <translation>Пузыри</translation>
     </message>
@@ -192,7 +192,7 @@
 <context>
     <name>TChainStrokeStyle</name>
     <message>
-        <location filename="../../colorfx/strokestyles.h" line="134"/>
+        <location filename="../../colorfx/strokestyles.h" line="133"/>
         <source>Chain</source>
         <translation>Цепь</translation>
     </message>
@@ -200,17 +200,17 @@
 <context>
     <name>TChalkFillStyle</name>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="2395"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="1925"/>
         <source>Density</source>
         <translation>Плотность</translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="2398"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="1928"/>
         <source>Dot Size</source>
         <translation>Размер точки</translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.h" line="526"/>
+        <location filename="../../colorfx/regionstyles.h" line="508"/>
         <source>Chalk</source>
         <translation>Мел</translation>
     </message>
@@ -218,32 +218,32 @@
 <context>
     <name>TChalkStrokeStyle2</name>
     <message>
-        <location filename="../../colorfx/strokestyles.cpp" line="3170"/>
+        <location filename="../../colorfx/strokestyles.cpp" line="2268"/>
         <source>Border Fade</source>
         <translation>Затухание границ</translation>
     </message>
     <message>
-        <location filename="../../colorfx/strokestyles.cpp" line="3173"/>
+        <location filename="../../colorfx/strokestyles.cpp" line="2271"/>
         <source>Density</source>
         <translation>Плотность</translation>
     </message>
     <message>
-        <location filename="../../colorfx/strokestyles.cpp" line="3176"/>
+        <location filename="../../colorfx/strokestyles.cpp" line="2274"/>
         <source>Fade In</source>
         <translation>Fade In</translation>
     </message>
     <message>
-        <location filename="../../colorfx/strokestyles.cpp" line="3179"/>
+        <location filename="../../colorfx/strokestyles.cpp" line="2277"/>
         <source>Fade Out</source>
         <translation>Fade Out</translation>
     </message>
     <message>
-        <location filename="../../colorfx/strokestyles.cpp" line="3182"/>
+        <location filename="../../colorfx/strokestyles.cpp" line="2280"/>
         <source>Noise</source>
         <translation>Шум</translation>
     </message>
     <message>
-        <location filename="../../colorfx/strokestyles.h" line="685"/>
+        <location filename="../../colorfx/strokestyles.h" line="672"/>
         <source>Chalk</source>
         <translation>Мел</translation>
     </message>
@@ -251,32 +251,32 @@
 <context>
     <name>TCheckedFillStyle</name>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="1824"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="1413"/>
         <source>Horiz Dist</source>
         <translation>Гориз. расст</translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="1827"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="1416"/>
         <source>Horiz Angle</source>
         <translation>Горизонтальный угол</translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="1830"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="1419"/>
         <source>Vert Dist</source>
         <translation>Вертик. расст</translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="1833"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="1422"/>
         <source>Vert Angle</source>
         <translation>Вертикальный угол</translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="1836"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="1425"/>
         <source>Thickness</source>
         <translation>Толщина</translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.h" line="415"/>
+        <location filename="../../colorfx/regionstyles.h" line="399"/>
         <source>Square</source>
         <translation>Квадрат</translation>
     </message>
@@ -284,22 +284,22 @@
 <context>
     <name>TChessFillStyle</name>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="2671"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="2138"/>
         <source>Horiz Size</source>
         <translation>Горизонтальный размер</translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="2674"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="2141"/>
         <source>Vert Size</source>
         <translation>Ввертикальный размер</translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="2677"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="2144"/>
         <source>Angle</source>
         <translation>Угол</translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.h" line="578"/>
+        <location filename="../../colorfx/regionstyles.h" line="559"/>
         <source>Chessboard</source>
         <translation>Шахматная доска</translation>
     </message>
@@ -307,27 +307,27 @@
 <context>
     <name>TCircleStripeFillStyle</name>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="3974"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="3242"/>
         <source>X Position</source>
         <translation>Положение по оси X</translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="3977"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="3245"/>
         <source>Y Position</source>
         <translation>Положение по оси Y</translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="3980"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="3248"/>
         <source>Distance</source>
         <translation>Расстояние</translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="3983"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="3251"/>
         <source>Thickness</source>
         <translation>Толщина</translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.h" line="789"/>
+        <location filename="../../colorfx/regionstyles.h" line="766"/>
         <source>Concentric</source>
         <translation>Концентрический</translation>
     </message>
@@ -335,17 +335,17 @@
 <context>
     <name>TCrystallizeStrokeStyle</name>
     <message>
-        <location filename="../../colorfx/strokestyles.cpp" line="1628"/>
+        <location filename="../../colorfx/strokestyles.cpp" line="1166"/>
         <source>Crease</source>
         <translation>Сгиб</translation>
     </message>
     <message>
-        <location filename="../../colorfx/strokestyles.cpp" line="1629"/>
+        <location filename="../../colorfx/strokestyles.cpp" line="1167"/>
         <source>Opacity</source>
         <translation>Непрозрачность</translation>
     </message>
     <message>
-        <location filename="../../colorfx/strokestyles.h" line="349"/>
+        <location filename="../../colorfx/strokestyles.h" line="342"/>
         <source>Tulle</source>
         <translation>Тюль</translation>
     </message>
@@ -353,17 +353,17 @@
 <context>
     <name>TDottedFillStyle</name>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="1598"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="1213"/>
         <source>Dot Size</source>
         <translation>Размер точки</translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="1599"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="1214"/>
         <source>Dot Distance</source>
         <translation>Расстояние между точек</translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.h" line="361"/>
+        <location filename="../../colorfx/regionstyles.h" line="346"/>
         <source>Polka Dots</source>
         <translation>В горошек</translation>
     </message>
@@ -371,27 +371,27 @@
 <context>
     <name>TDottedLineStrokeStyle</name>
     <message>
-        <location filename="../../colorfx/strokestyles.cpp" line="1028"/>
+        <location filename="../../colorfx/strokestyles.cpp" line="763"/>
         <source>Fade In</source>
         <translation>Fade In</translation>
     </message>
     <message>
-        <location filename="../../colorfx/strokestyles.cpp" line="1031"/>
+        <location filename="../../colorfx/strokestyles.cpp" line="766"/>
         <source>Dash</source>
         <translation>Черточка</translation>
     </message>
     <message>
-        <location filename="../../colorfx/strokestyles.cpp" line="1034"/>
+        <location filename="../../colorfx/strokestyles.cpp" line="769"/>
         <source>Fade Out</source>
         <translation>Fade Out</translation>
     </message>
     <message>
-        <location filename="../../colorfx/strokestyles.cpp" line="1037"/>
+        <location filename="../../colorfx/strokestyles.cpp" line="772"/>
         <source>Gap</source>
         <translation>Щель</translation>
     </message>
     <message>
-        <location filename="../../colorfx/strokestyles.h" line="259"/>
+        <location filename="../../colorfx/strokestyles.h" line="254"/>
         <source>Vanishing</source>
         <translation>Исчезающий</translation>
     </message>
@@ -399,12 +399,12 @@
 <context>
     <name>TDualColorStrokeStyle2</name>
     <message>
-        <location filename="../../colorfx/strokestyles.cpp" line="5322"/>
+        <location filename="../../colorfx/strokestyles.cpp" line="3882"/>
         <source>Distance</source>
         <translation>Расстояние</translation>
     </message>
     <message>
-        <location filename="../../colorfx/strokestyles.h" line="1111"/>
+        <location filename="../../colorfx/strokestyles.h" line="1090"/>
         <source>Striped</source>
         <translation>В полоску</translation>
     </message>
@@ -412,17 +412,17 @@
 <context>
     <name>TFriezeStrokeStyle2</name>
     <message>
-        <location filename="../../colorfx/strokestyles.cpp" line="4936"/>
+        <location filename="../../colorfx/strokestyles.cpp" line="3640"/>
         <source>Twirl</source>
         <translation>Вращение</translation>
     </message>
     <message>
-        <location filename="../../colorfx/strokestyles.cpp" line="4938"/>
+        <location filename="../../colorfx/strokestyles.cpp" line="3642"/>
         <source>Thickness</source>
         <translation>Толщина</translation>
     </message>
     <message>
-        <location filename="../../colorfx/strokestyles.h" line="1048"/>
+        <location filename="../../colorfx/strokestyles.h" line="1029"/>
         <source>Curl</source>
         <translation>Завивка</translation>
     </message>
@@ -430,17 +430,17 @@
 <context>
     <name>TFurStrokeStyle</name>
     <message>
-        <location filename="../../colorfx/strokestyles.cpp" line="158"/>
+        <location filename="../../colorfx/strokestyles.cpp" line="155"/>
         <source>Angle</source>
         <translation>Угол</translation>
     </message>
     <message>
-        <location filename="../../colorfx/strokestyles.cpp" line="159"/>
+        <location filename="../../colorfx/strokestyles.cpp" line="156"/>
         <source>Size</source>
         <translation>Размер</translation>
     </message>
     <message>
-        <location filename="../../colorfx/strokestyles.h" line="92"/>
+        <location filename="../../colorfx/strokestyles.h" line="91"/>
         <source>Herringbone</source>
         <translation>Елочка</translation>
     </message>
@@ -448,12 +448,12 @@
 <context>
     <name>TGraphicPenStrokeStyle</name>
     <message>
-        <location filename="../../colorfx/strokestyles.cpp" line="823"/>
+        <location filename="../../colorfx/strokestyles.cpp" line="602"/>
         <source>Density</source>
         <translation>Плотность</translation>
     </message>
     <message>
-        <location filename="../../colorfx/strokestyles.h" line="209"/>
+        <location filename="../../colorfx/strokestyles.h" line="206"/>
         <source>Dashes</source>
         <translation>Черточки</translation>
     </message>
@@ -461,27 +461,27 @@
 <context>
     <name>TLinGradFillStyle</name>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="3369"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="2741"/>
         <source>Angle</source>
         <translation>Угол</translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="3372"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="2744"/>
         <source>X Position</source>
         <translation>Положение по оси X</translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="3375"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="2747"/>
         <source>Y Position</source>
         <translation>Положение по оси Y</translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="3378"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="2750"/>
         <source>Smoothness</source>
         <translation>Гладкость</translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.h" line="686"/>
+        <location filename="../../colorfx/regionstyles.h" line="665"/>
         <source>Linear Gradient</source>
         <translation>Линейный градиент</translation>
     </message>
@@ -489,12 +489,12 @@
 <context>
     <name>TLongBlendStrokeStyle2</name>
     <message>
-        <location filename="../../colorfx/strokestyles.cpp" line="5489"/>
+        <location filename="../../colorfx/strokestyles.cpp" line="4008"/>
         <source>Distance</source>
         <translation>Расстояние</translation>
     </message>
     <message>
-        <location filename="../../colorfx/strokestyles.h" line="1174"/>
+        <location filename="../../colorfx/strokestyles.h" line="1152"/>
         <source>Watercolor</source>
         <translation>Акварель</translation>
     </message>
@@ -502,12 +502,12 @@
 <context>
     <name>TMatrioskaStrokeStyle</name>
     <message>
-        <location filename="../../colorfx/strokestyles.cpp" line="6049"/>
+        <location filename="../../colorfx/strokestyles.cpp" line="4546"/>
         <source>Stripes</source>
         <translation>Полосы</translation>
     </message>
     <message>
-        <location filename="../../colorfx/strokestyles.h" line="1327"/>
+        <location filename="../../colorfx/strokestyles.h" line="1304"/>
         <source>Toothpaste</source>
         <translation>Зубная паста</translation>
     </message>
@@ -515,27 +515,27 @@
 <context>
     <name>TMosaicFillStyle</name>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="4301"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="3531"/>
         <source>Size</source>
         <translation>Размер</translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="4304"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="3534"/>
         <source>Distortion</source>
         <translation>Дисторсия</translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="4307"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="3537"/>
         <source>Min Thick</source>
         <translation>Минимальная толщина</translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="4310"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="3540"/>
         <source>Max Thick</source>
         <translation>Максимальная толщина</translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.h" line="846"/>
+        <location filename="../../colorfx/regionstyles.h" line="822"/>
         <source>Stained Glass</source>
         <translation>Витражное стекло</translation>
     </message>
@@ -543,27 +543,27 @@
 <context>
     <name>TMultiLineStrokeStyle2</name>
     <message>
-        <location filename="../../colorfx/strokestyles.cpp" line="4125"/>
+        <location filename="../../colorfx/strokestyles.cpp" line="3025"/>
         <source>Density</source>
         <translation>Плотность</translation>
     </message>
     <message>
-        <location filename="../../colorfx/strokestyles.cpp" line="4128"/>
+        <location filename="../../colorfx/strokestyles.cpp" line="3028"/>
         <source>Size</source>
         <translation>Размер</translation>
     </message>
     <message>
-        <location filename="../../colorfx/strokestyles.cpp" line="4131"/>
+        <location filename="../../colorfx/strokestyles.cpp" line="3031"/>
         <source>Thickness</source>
         <translation>Толщина</translation>
     </message>
     <message>
-        <location filename="../../colorfx/strokestyles.cpp" line="4134"/>
+        <location filename="../../colorfx/strokestyles.cpp" line="3034"/>
         <source>Noise</source>
         <translation>Шум</translation>
     </message>
     <message>
-        <location filename="../../colorfx/strokestyles.h" line="889"/>
+        <location filename="../../colorfx/strokestyles.h" line="872"/>
         <source>Gouache</source>
         <translation>Гуашь</translation>
     </message>
@@ -579,28 +579,28 @@
 <context>
     <name>TNormal2StrokeStyle</name>
     <message>
-        <location filename="../../colorfx/strokestyles.cpp" line="2858"/>
+        <location filename="../../colorfx/strokestyles.cpp" line="2010"/>
         <source>Light X Pos</source>
         <translation>Свет по X</translation>
     </message>
     <message>
-        <location filename="../../colorfx/strokestyles.cpp" line="2861"/>
+        <location filename="../../colorfx/strokestyles.cpp" line="2013"/>
         <source>Light Y Pos</source>
         <translation>Свет по Y</translation>
     </message>
     <message>
-        <location filename="../../colorfx/strokestyles.cpp" line="2864"/>
+        <location filename="../../colorfx/strokestyles.cpp" line="2016"/>
         <source>Shininess</source>
         <translation>Блеск</translation>
     </message>
     <message>
-        <location filename="../../colorfx/strokestyles.cpp" line="2867"/>
+        <location filename="../../colorfx/strokestyles.cpp" line="2019"/>
         <source>Plastic</source>
         <translation>Пластик</translation>
     </message>
     <message>
-        <location filename="../../colorfx/strokestyles.cpp" line="2870"/>
-        <location filename="../../colorfx/strokestyles.h" line="642"/>
+        <location filename="../../colorfx/strokestyles.cpp" line="2022"/>
+        <location filename="../../colorfx/strokestyles.h" line="629"/>
         <source>Bump</source>
         <translation>Выпуклость</translation>
     </message>
@@ -608,22 +608,22 @@
 <context>
     <name>TPatchFillStyle</name>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="4622"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="3819"/>
         <source>Size</source>
         <translation>Размер</translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="4625"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="3822"/>
         <source>Distortion</source>
         <translation>Дисторсия</translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="4628"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="3825"/>
         <source>Thickness</source>
         <translation>Толщина</translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.h" line="897"/>
+        <location filename="../../colorfx/regionstyles.h" line="872"/>
         <source>Beehive</source>
         <translation>Улей</translation>
     </message>
@@ -631,27 +631,27 @@
 <context>
     <name>TPointShadowFillStyle</name>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="1183"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="898"/>
         <source>Angle</source>
         <translation>Угол</translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="1186"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="901"/>
         <source>Density</source>
         <translation>Плотность</translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="1189"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="904"/>
         <source>Size</source>
         <translation>Размер</translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="1192"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="907"/>
         <source>Point Size</source>
         <translation>Размер точки</translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.h" line="293"/>
+        <location filename="../../colorfx/regionstyles.h" line="283"/>
         <source>Sponge Shading</source>
         <translation>Затенение губкой</translation>
     </message>
@@ -659,27 +659,27 @@
 <context>
     <name>TRadGradFillStyle</name>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="3717"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="3006"/>
         <source>X Position</source>
         <translation>Положение по оси X</translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="3720"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="3009"/>
         <source>Y Position</source>
         <translation>Положение по оси Y</translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="3723"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="3012"/>
         <source>Radius</source>
         <translation>Радиус</translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="3726"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="3015"/>
         <source>Smoothness</source>
         <translation>Гладкость</translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.h" line="740"/>
+        <location filename="../../colorfx/regionstyles.h" line="718"/>
         <source>Radial Gradient</source>
         <translation>Радиальный градиент</translation>
     </message>
@@ -687,12 +687,12 @@
 <context>
     <name>TRopeStrokeStyle</name>
     <message>
-        <location filename="../../colorfx/strokestyles.cpp" line="1376"/>
+        <location filename="../../colorfx/strokestyles.cpp" line="989"/>
         <source>Tilt</source>
         <translation>Наклон</translation>
     </message>
     <message>
-        <location filename="../../colorfx/strokestyles.h" line="305"/>
+        <location filename="../../colorfx/strokestyles.h" line="299"/>
         <source>Rope</source>
         <translation>Rope</translation>
     </message>
@@ -700,12 +700,12 @@
 <context>
     <name>TRubberFillStyle</name>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="1071"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="796"/>
         <source>Intensity</source>
         <translation>Интенсивность</translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.h" line="239"/>
+        <location filename="../../colorfx/regionstyles.h" line="230"/>
         <source>Blob</source>
         <translation>Капля</translation>
     </message>
@@ -713,12 +713,12 @@
 <context>
     <name>TSawToothStrokeStyle</name>
     <message>
-        <location filename="../../colorfx/strokestyles.cpp" line="4052"/>
+        <location filename="../../colorfx/strokestyles.cpp" line="2952"/>
         <source>Distance</source>
         <translation>Расстояние</translation>
     </message>
     <message>
-        <location filename="../../colorfx/strokestyles.h" line="843"/>
+        <location filename="../../colorfx/strokestyles.h" line="827"/>
         <source>Jagged</source>
         <translation>Зубчатый</translation>
     </message>
@@ -726,12 +726,12 @@
 <context>
     <name>TSinStrokeStyle</name>
     <message>
-        <location filename="../../colorfx/strokestyles.cpp" line="4728"/>
+        <location filename="../../colorfx/strokestyles.cpp" line="3509"/>
         <source>Frequency</source>
         <translation>Частота</translation>
     </message>
     <message>
-        <location filename="../../colorfx/strokestyles.h" line="1009"/>
+        <location filename="../../colorfx/strokestyles.h" line="990"/>
         <source>Wave</source>
         <translation>Волна</translation>
     </message>
@@ -739,12 +739,12 @@
 <context>
     <name>TSketchStrokeStyle</name>
     <message>
-        <location filename="../../colorfx/strokestyles.cpp" line="2224"/>
+        <location filename="../../colorfx/strokestyles.cpp" line="1572"/>
         <source>Density</source>
         <translation>Плотность</translation>
     </message>
     <message>
-        <location filename="../../colorfx/strokestyles.h" line="441"/>
+        <location filename="../../colorfx/strokestyles.h" line="433"/>
         <source>Fuzz</source>
         <translation>Fuzz</translation>
     </message>
@@ -752,22 +752,22 @@
 <context>
     <name>TSprayStrokeStyle</name>
     <message>
-        <location filename="../../colorfx/strokestyles.cpp" line="596"/>
+        <location filename="../../colorfx/strokestyles.cpp" line="437"/>
         <source>Border Fade</source>
         <translation>Затухание границ</translation>
     </message>
     <message>
-        <location filename="../../colorfx/strokestyles.cpp" line="599"/>
+        <location filename="../../colorfx/strokestyles.cpp" line="440"/>
         <source>Density</source>
         <translation>Плотность</translation>
     </message>
     <message>
-        <location filename="../../colorfx/strokestyles.cpp" line="602"/>
+        <location filename="../../colorfx/strokestyles.cpp" line="443"/>
         <source>Size</source>
         <translation>Размер</translation>
     </message>
     <message>
-        <location filename="../../colorfx/strokestyles.h" line="166"/>
+        <location filename="../../colorfx/strokestyles.h" line="164"/>
         <source>Circlets</source>
         <translation>Кружки</translation>
     </message>
@@ -775,22 +775,22 @@
 <context>
     <name>TStripeFillStyle</name>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="2961"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="2384"/>
         <source>Distance</source>
         <translation>Расстояние</translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="2964"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="2387"/>
         <source>Angle</source>
         <translation>Угол</translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.cpp" line="2967"/>
+        <location filename="../../colorfx/regionstyles.cpp" line="2390"/>
         <source>Thickness</source>
         <translation>Толщина</translation>
     </message>
     <message>
-        <location filename="../../colorfx/regionstyles.h" line="630"/>
+        <location filename="../../colorfx/regionstyles.h" line="610"/>
         <source>Banded</source>
         <translation>Окаймленный</translation>
     </message>
@@ -798,17 +798,17 @@
 <context>
     <name>TTissueStrokeStyle</name>
     <message>
-        <location filename="../../colorfx/strokestyles.cpp" line="2509"/>
+        <location filename="../../colorfx/strokestyles.cpp" line="1761"/>
         <source>Density</source>
         <translation>Плотность</translation>
     </message>
     <message>
-        <location filename="../../colorfx/strokestyles.cpp" line="2510"/>
+        <location filename="../../colorfx/strokestyles.cpp" line="1762"/>
         <source>Border Size</source>
         <translation>Размер границы</translation>
     </message>
     <message>
-        <location filename="../../colorfx/strokestyles.h" line="541"/>
+        <location filename="../../colorfx/strokestyles.h" line="530"/>
         <source>Gauze</source>
         <translation>Дымка</translation>
     </message>
@@ -816,17 +816,17 @@
 <context>
     <name>TTwirlStrokeStyle</name>
     <message>
-        <location filename="../../colorfx/strokestyles.cpp" line="3734"/>
+        <location filename="../../colorfx/strokestyles.cpp" line="2732"/>
         <source>Twirl</source>
         <translation>Вращение</translation>
     </message>
     <message>
-        <location filename="../../colorfx/strokestyles.cpp" line="3735"/>
+        <location filename="../../colorfx/strokestyles.cpp" line="2733"/>
         <source>Shade</source>
         <translation>Тень</translation>
     </message>
     <message>
-        <location filename="../../colorfx/strokestyles.h" line="790"/>
+        <location filename="../../colorfx/strokestyles.h" line="775"/>
         <source>Ribbon</source>
         <translation>Лента</translation>
     </message>
@@ -834,7 +834,7 @@
 <context>
     <name>TZigzTSinStrokeStyleagStrokeStyle</name>
     <message>
-        <location filename="../../colorfx/strokestyles.cpp" line="4729"/>
+        <location filename="../../colorfx/strokestyles.cpp" line="3510"/>
         <source>Thickness</source>
         <translation>Толщина</translation>
     </message>
@@ -842,32 +842,32 @@
 <context>
     <name>TZigzagStrokeStyle</name>
     <message>
-        <location filename="../../colorfx/strokestyles.cpp" line="4436"/>
+        <location filename="../../colorfx/strokestyles.cpp" line="3263"/>
         <source>Min Distance</source>
         <translation>Минимальное расстояние</translation>
     </message>
     <message>
-        <location filename="../../colorfx/strokestyles.cpp" line="4439"/>
+        <location filename="../../colorfx/strokestyles.cpp" line="3266"/>
         <source>Max Distance</source>
         <translation>Максимальное расстояние</translation>
     </message>
     <message>
-        <location filename="../../colorfx/strokestyles.cpp" line="4442"/>
+        <location filename="../../colorfx/strokestyles.cpp" line="3269"/>
         <source>Min Angle</source>
         <translation>Минимальный угол</translation>
     </message>
     <message>
-        <location filename="../../colorfx/strokestyles.cpp" line="4445"/>
+        <location filename="../../colorfx/strokestyles.cpp" line="3272"/>
         <source>Max Angle</source>
         <translation>Максимальный угол</translation>
     </message>
     <message>
-        <location filename="../../colorfx/strokestyles.cpp" line="4448"/>
+        <location filename="../../colorfx/strokestyles.cpp" line="3275"/>
         <source>Thickness</source>
         <translation>Толщина</translation>
     </message>
     <message>
-        <location filename="../../colorfx/strokestyles.h" line="960"/>
+        <location filename="../../colorfx/strokestyles.h" line="942"/>
         <source>Zigzag</source>
         <translation>Зигзаг</translation>
     </message>

@@ -50,6 +50,11 @@ class DVAPI TSceneProperties {
 public:
   typedef std::vector<double> Guides;
 
+  struct CellMark {
+    QString name;
+    TPixel32 color;
+  };
+
 private:
   Guides m_hGuides, m_vGuides;
 
@@ -74,6 +79,9 @@ private:
 
   //! Xsheet Note Color, color number = 7.
   QList<TPixel32> m_notesColor;
+
+  // Cell Mark colors and names
+  QList<CellMark> m_cellMarks;
 
   bool m_columnColorFilterOnRender;
   TFilePath m_camCapSaveInPath;
@@ -280,6 +288,12 @@ and height.
   QList<TPixel32> getNoteColors() const;
   TPixel32 getNoteColor(int colorIndex) const;
   void setNoteColor(TPixel32 color, int colorIndex);
+
+  QList<CellMark> getCellMarks() const;
+  CellMark getCellMark(int index) const;
+  void setCellMark(const CellMark &mark, int index);
+  bool hasDefaultCellMarks()
+      const;  // check if the cell mark settings are modified
 
 private:
   // not implemented

@@ -3,6 +3,7 @@
 #ifndef INSERTFXPOPUP_H
 #define INSERTFXPOPUP_H
 
+#include <QTreeWidget>
 #include "toonzqt/dvdialog.h"
 #include "tfilepath.h"
 #include "tstream.h"
@@ -15,13 +16,28 @@ class TFx;
 #include <QIcon>
 
 //=============================================================================
+// FxTree
+//-----------------------------------------------------------------------------
+
+class FxTree final : public QTreeWidget {
+  Q_OBJECT
+
+public:
+  void searchItems(const QString &searchWord = QString());
+
+private:
+  void displayAll(QTreeWidgetItem *item);
+  void hideAll(QTreeWidgetItem *item);
+};
+
+//=============================================================================
 // InsertFxPopup
 //-----------------------------------------------------------------------------
 
 class InsertFxPopup final : public DVGui::Dialog {
   Q_OBJECT
 
-  QTreeWidget *m_fxTree;
+  FxTree *m_fxTree;
 
   TIStream *m_is;
   TFilePath m_presetFolder;
@@ -59,6 +75,7 @@ protected:
 protected slots:
   void updatePresets();
   void removePreset();
+  void onSearchTextChanged(const QString &text);
 };
 
 #endif  // INSERTFXPOPUP_H

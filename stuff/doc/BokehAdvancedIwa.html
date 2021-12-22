@@ -1,0 +1,104 @@
+<html lang="ja">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+      <title>Bokeh Advanced Iwa</title>
+    </head>
+<body bgcolor="#f5f5f5" text="#220011">
+<h1><img src = ".\img\fx_iwa_bokeh_advanced.png" width = 30 height = 30 >   Bokeh Iwa</h1>
+
+<h4>● Overview</h4>
+This effect reproduces a camera lens blur. The RGB values of each layer will be converted<br>
+to exposure values, then blurred using the Iris shape, and finally composed together.<br>
+Unlike the <a href="./BokehIwa.html">Bokeh Iwa Fx</a>, this fx can use depth reference images 
+for dividing layer into several sub-layers within specified range of depth.<br>
+Also, this fx can apply individual hardness value for each source for adjusting bokeh brightness.<br> 
+To achieve a faster processing time, a Fourier transformation is used to process the filter.
+
+<h4>● Input Port</h4>
+<UL>
+<LI><b>Iris</b> : Connects the image to define the shape of the Iris. The image luminance<br>
+values will be used for the effect. If no image is connected to the Iris port, no calculation<br>
+will take place. It's possible to connect 8bit or 16bit RGBA images.
+<LI><b>Source [1～5]</b> : Connects images for the layers. The order in which they are<br>
+connected here doesn't define the layer stacking order. If nothing is connected to any<br>
+Source port, no calculation will be performed.
+<LI><b>Depth [1～]</b> : Connect the Depth reference image for the layer to be divided into sub-layers.<br>
+  The brightness of each pixel corresponds to the depth. <br>
+  The higher (brighter) the value, the farther away from the camera.
+</UL>
+
+<h4>● Parameters</h4>
+Common
+<UL>
+<LI><b>On-Focus Distance</b> : If there's a layer or sub-layer in this position, it will look on focus and it will be<br>
+composed normally. 0 represents the camera position. (Range 0.0-1.0)
+<LI><b>Bokeh Amount</b> : Maximum size of blur (in scene units). When the focus position and the<br>
+layer position are 1.0 away from each other and Bokeh Adjustment is 1, the Iris image is<br>
+enlarged until the width of this image reaches this value.
+<LI><b>Master Hardness</b> : The gamma value of the film. Used to convert between RGB value and<br>
+exposure. This is equivalent to the increase in RGB value (0.0 to 1.0) when the exposure is<br>
+increased 10 times. The lower the value, the more the highlights are emphasized.<br>
+(Range 0.05-3.0)
+<LI><b>Hardness per Source</b> : Specify whether to use individual hardness value instead of the master hardness for converting the layer RGB values to exposures.
+</UL>
+Sources
+<UL>
+<LI><b>Distance</b> : The distance of the layer from the camera. The layer stacking order is<br>
+automatically sorted according to this value. (Range 0.0-1.0)
+<LI><b>Bokeh Adjustment</b> : Bokeh size correction value. The size of the bokeh is multiplied by N,<br>
+keeping the order of layer stacking. If this value is 0, the layers will be composited normally<br>
+without blurring regardless of the distance of the layer. (Range 0.0-2.0)
+<LI><b>Hardness</b> : Individual hardness used for converting this layer's RGB values to exposure.
+<LI><b>Depth Image</b> : Specifies the Depth port number. If some available Depth port is set, this layer will be divided into sub-layers at different depths in the specified range.
+<LI><b>Depth Range</b> : Specifies the range of depth where the sub-layers will be distributed.
+</UL>
+
+<h4>● Notes</h4>
+<UL>
+<LI>Separating a layer into sub-layers is just like the <a href="./BokehRefIwa.html">Bokeh Ref Iwa Fx</a> except that the following parameters are hard-coded:<br>
+  <UL>
+    <LI>Distance Precision = 10
+    <LI>Fill Gap = ON
+    <LI>Use Median Filter = OFF
+  </UL>
+<LI>When rendering multiple frames, the Iris and the layers images, must be present within<br>
+the range of all frames to be rendered.
+<LI>This effect uses a lot of RAM.
+</UL>
+
+<h4>● License Information</h4>
+<UL>
+<LI>This effect uses an open source library called Kiss FFT for the Fourier transform.<br>
+</UL>
+<font size = "-1">
+<blockquote>
+This is the BSD-style license for the KissFFT.<br>
+<br>
+Copyright (c) 2003-2010 Mark Borgerding<br>
+<br>
+All rights reserved.<br>
+<br>
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that<br>
+the following conditions are met:<br>
+<br>
+    * Redistributions of source code must retain the above copyright notice, this list of conditions and the following<br>
+disclaimer.<br>
+    * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the<br>
+following disclaimer in the documentation and/or other materials provided with the distribution.<br>
+    * Neither the author nor the names of any contributors may be used to endorse or promote products derived<br>
+from this software without specific prior written permission.<br>
+<br>
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY<br>
+EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES<br>
+OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT<br>
+SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,<br>
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT<br>
+OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)<br>
+HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,<br>
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS<br>
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+</blockquote>
+</font>
+</body>
+
+</html>

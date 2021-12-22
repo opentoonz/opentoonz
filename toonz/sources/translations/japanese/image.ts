@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="ja_JP">
+<TS version="2.1" language="ja_JP" sourcelanguage="en">
 <context>
     <name>AviWriterProperties</name>
     <message>
@@ -17,17 +17,17 @@
 <context>
     <name>GifWriterProperties</name>
     <message>
-        <location filename="../../image/ffmpeg/tiio_gif.cpp" line="255"/>
+        <location filename="../../image/ffmpeg/tiio_gif.cpp" line="257"/>
         <source>Scale</source>
         <translation>スケール(%)</translation>
     </message>
     <message>
-        <location filename="../../image/ffmpeg/tiio_gif.cpp" line="256"/>
+        <location filename="../../image/ffmpeg/tiio_gif.cpp" line="258"/>
         <source>Looping</source>
         <translation>繰り返し再生</translation>
     </message>
     <message>
-        <location filename="../../image/ffmpeg/tiio_gif.cpp" line="257"/>
+        <location filename="../../image/ffmpeg/tiio_gif.cpp" line="259"/>
         <source>Generate Palette</source>
         <translation>パレットを生成</translation>
     </message>
@@ -35,12 +35,12 @@
 <context>
     <name>Mp4WriterProperties</name>
     <message>
-        <location filename="../../image/ffmpeg/tiio_mp4.cpp" line="232"/>
+        <location filename="../../image/ffmpeg/tiio_mp4.cpp" line="234"/>
         <source>Quality</source>
         <translation>品質</translation>
     </message>
     <message>
-        <location filename="../../image/ffmpeg/tiio_mp4.cpp" line="233"/>
+        <location filename="../../image/ffmpeg/tiio_mp4.cpp" line="235"/>
         <source>Scale</source>
         <translation>スケール(%)</translation>
     </message>
@@ -48,7 +48,7 @@
 <context>
     <name>PngWriterProperties</name>
     <message>
-        <location filename="../../image/png/tiio_png.cpp" line="738"/>
+        <location filename="../../image/png/tiio_png.cpp" line="757"/>
         <source>Alpha Channel</source>
         <translation>アルファチャンネル</translation>
     </message>
@@ -69,52 +69,52 @@ Please try raising the FFmpeg timeout in Preferences.</source>
 <context>
     <name>SgiWriterProperties</name>
     <message>
-        <location filename="../../image/sgi/filesgi.cpp" line="1225"/>
+        <location filename="../../image/sgi/filesgi.cpp" line="1229"/>
         <source>Bits Per Pixel</source>
         <translation>色深度</translation>
     </message>
     <message>
-        <location filename="../../image/sgi/filesgi.cpp" line="1226"/>
+        <location filename="../../image/sgi/filesgi.cpp" line="1230"/>
         <source>24 bits</source>
         <translation>24ビット</translation>
     </message>
     <message>
-        <location filename="../../image/sgi/filesgi.cpp" line="1227"/>
+        <location filename="../../image/sgi/filesgi.cpp" line="1231"/>
         <source>32 bits</source>
         <translation>32ビット</translation>
     </message>
     <message>
-        <location filename="../../image/sgi/filesgi.cpp" line="1228"/>
+        <location filename="../../image/sgi/filesgi.cpp" line="1232"/>
         <source>48 bits</source>
         <translation>48ビット</translation>
     </message>
     <message>
-        <location filename="../../image/sgi/filesgi.cpp" line="1229"/>
+        <location filename="../../image/sgi/filesgi.cpp" line="1233"/>
         <source>64 bits</source>
         <translation>64ビット</translation>
     </message>
     <message>
-        <location filename="../../image/sgi/filesgi.cpp" line="1230"/>
+        <location filename="../../image/sgi/filesgi.cpp" line="1234"/>
         <source>8 bits (Greyscale)</source>
         <translation>8ビット (グレースケール)</translation>
     </message>
     <message>
-        <location filename="../../image/sgi/filesgi.cpp" line="1231"/>
+        <location filename="../../image/sgi/filesgi.cpp" line="1235"/>
         <source>Endianess</source>
         <translation>エンディアン</translation>
     </message>
     <message>
-        <location filename="../../image/sgi/filesgi.cpp" line="1232"/>
+        <location filename="../../image/sgi/filesgi.cpp" line="1236"/>
         <source>Big Endian</source>
         <translation>ビッグエンディアン</translation>
     </message>
     <message>
-        <location filename="../../image/sgi/filesgi.cpp" line="1233"/>
+        <location filename="../../image/sgi/filesgi.cpp" line="1237"/>
         <source>Little Endian</source>
         <translation>リトルエンディアン</translation>
     </message>
     <message>
-        <location filename="../../image/sgi/filesgi.cpp" line="1234"/>
+        <location filename="../../image/sgi/filesgi.cpp" line="1238"/>
         <source>RLE-Compressed</source>
         <translation>RLE圧縮</translation>
     </message>
@@ -180,37 +180,37 @@ Please try raising the FFmpeg timeout in Preferences.</source>
 <context>
     <name>SvgWriterProperties</name>
     <message>
-        <location filename="../../image/svg/tiio_svg.cpp" line="1954"/>
+        <location filename="../../image/svg/tiio_svg.cpp" line="1969"/>
         <source>Stroke Mode</source>
         <translation>モード</translation>
     </message>
     <message>
-        <location filename="../../image/svg/tiio_svg.cpp" line="1955"/>
+        <location filename="../../image/svg/tiio_svg.cpp" line="1970"/>
         <source>Outline Quality</source>
         <translation>アウトラインの品質</translation>
     </message>
     <message>
-        <location filename="../../image/svg/tiio_svg.cpp" line="1956"/>
+        <location filename="../../image/svg/tiio_svg.cpp" line="1971"/>
         <source>Centerline</source>
         <translation>中心線</translation>
     </message>
     <message>
-        <location filename="../../image/svg/tiio_svg.cpp" line="1957"/>
+        <location filename="../../image/svg/tiio_svg.cpp" line="1972"/>
         <source>Outline</source>
         <translation>アウトライン</translation>
     </message>
     <message>
-        <location filename="../../image/svg/tiio_svg.cpp" line="1958"/>
+        <location filename="../../image/svg/tiio_svg.cpp" line="1973"/>
         <source>High</source>
         <translation>高</translation>
     </message>
     <message>
-        <location filename="../../image/svg/tiio_svg.cpp" line="1959"/>
+        <location filename="../../image/svg/tiio_svg.cpp" line="1974"/>
         <source>Medium</source>
         <translation>中</translation>
     </message>
     <message>
-        <location filename="../../image/svg/tiio_svg.cpp" line="1960"/>
+        <location filename="../../image/svg/tiio_svg.cpp" line="1975"/>
         <source>Low</source>
         <translation>低</translation>
     </message>
@@ -281,13 +281,21 @@ Please try raising the FFmpeg timeout in Preferences.</source>
         <translation> 8ビット (グレースケール)</translation>
     </message>
     <message>
-        <location filename="../../image/tif/tiio_tif.cpp" line="737"/>
         <source>32(RGBM)</source>
+        <translation type="vanished">32ビット (RGBA)</translation>
+    </message>
+    <message>
+        <source>64(RGBM)</source>
+        <translation type="vanished">64ビット (RGBA)</translation>
+    </message>
+    <message>
+        <location filename="../../image/tif/tiio_tif.cpp" line="737"/>
+        <source>32(RGBA)</source>
         <translation>32ビット (RGBA)</translation>
     </message>
     <message>
         <location filename="../../image/tif/tiio_tif.cpp" line="738"/>
-        <source>64(RGBM)</source>
+        <source>64(RGBA)</source>
         <translation>64ビット (RGBA)</translation>
     </message>
     <message>
@@ -339,12 +347,12 @@ Please try raising the FFmpeg timeout in Preferences.</source>
 <context>
     <name>WebmWriterProperties</name>
     <message>
-        <location filename="../../image/ffmpeg/tiio_webm.cpp" line="231"/>
+        <location filename="../../image/ffmpeg/tiio_webm.cpp" line="235"/>
         <source>Quality</source>
         <translation>品質</translation>
     </message>
     <message>
-        <location filename="../../image/ffmpeg/tiio_webm.cpp" line="232"/>
+        <location filename="../../image/ffmpeg/tiio_webm.cpp" line="236"/>
         <source>Scale</source>
         <translation>スケール(%)</translation>
     </message>

@@ -1,19 +1,19 @@
-version: 1.2.0.{build}
+version: 1.5.0.{build}
 pull_requests:
   do_not_increment_build_number: true
 skip_tags: true
-image: Visual Studio 2015
+image: Visual Studio 2019
 configuration:
 - Debug
 - Release
 platform: x64
 clone_depth: 1
-# C:\Qt\5.9 is mapped to C:\Qt\5.9.n for backward compatibility
+cache: c:\tools\vcpkg\installed
 install:
 - cmd: >-
-    cd thirdparty
+    choco install opencv
 
-    copy /Y LibJPEG\jpeg-9\jconfig.vc LibJPEG\jpeg-9\jconfig.h
+    cd thirdparty
 
     copy /Y tiff-4.0.3\libtiff\tif_config.vc.h tiff-4.0.3\libtiff\tif_config.h
 
@@ -21,32 +21,42 @@ install:
 
     copy /Y libpng-1.6.21\scripts\pnglibconf.h.prebuilt libpng-1.6.21\pnglibconf.h
 
-
     cd ../toonz
 
     mkdir %PLATFORM% && cd %PLATFORM%
 
-    cmake ..\sources -G "Visual Studio 14 2015 Win64" -DQT_PATH="C:\Qt\5.9\msvc2015_64" -DBOOST_ROOT="C:\Libraries\boost_1_60_0"
+    cmake ..\sources -G "Visual Studio 16 2019" -Ax64 -DQT_PATH="C:\Qt\5.15.2\msvc2019_64" -DBOOST_ROOT="C:\Libraries\boost_1_73_0" -DOpenCV_DIR="C:\Tools\opencv\build"
 build:
   project: $(APPVEYOR_BUILD_FOLDER)\toonz\$(PLATFORM)\ALL_BUILD.vcxproj
   parallel: true
   verbosity: minimal
 after_build:
 - cmd: >-
-    C:\Qt\5.9\msvc2015_64\bin\windeployqt.exe %CONFIGURATION%\OpenToonz_1.2.exe
+    mkdir %CONFIGURATION%\OpenToonz
 
-    copy /Y ..\..\thirdparty\glut\3.7.6\lib\glut64.dll %CONFIGURATION%
+    move %CONFIGURATION%\*.* %CONFIGURATION%\OpenToonz
 
-    copy /Y ..\..\thirdparty\glew\glew-1.9.0\bin\64bit\glew32.dll %CONFIGURATION%
+    C:\Qt\5.15.2\msvc2019_64\bin\windeployqt.exe %CONFIGURATION%\OpenToonz\OpenToonz.exe
 
-    copy /Y ..\..\thirdparty\libmypaint\dist\64\libiconv-2.dll %CONFIGURATION%
+    copy /Y ..\..\thirdparty\glut\3.7.6\lib\glut64.dll %CONFIGURATION%\OpenToonz
 
-    copy /Y ..\..\thirdparty\libmypaint\dist\64\libintl-8.dll %CONFIGURATION%
+    copy /Y ..\..\thirdparty\glew\glew-1.9.0\bin\64bit\glew32.dll %CONFIGURATION%\OpenToonz
 
-    copy /Y ..\..\thirdparty\libmypaint\dist\64\libjson-c-2.dll %CONFIGURATION%
+    copy /Y ..\..\thirdparty\libmypaint\dist\64\libiconv-2.dll %CONFIGURATION%\OpenToonz
+
+    copy /Y ..\..\thirdparty\libmypaint\dist\64\libintl-8.dll %CONFIGURATION%\OpenToonz
+
+    copy /Y ..\..\thirdparty\libmypaint\dist\64\libjson-c-2.dll %CONFIGURATION%\OpenToonz
     
-    copy /Y ..\..\thirdparty\libmypaint\dist\64\libmypaint-1-4-0.dll %CONFIGURATION%
+    copy /Y ..\..\thirdparty\libmypaint\dist\64\libmypaint-1-4-0.dll %CONFIGURATION%\OpenToonz
+
+    copy /Y "C:\Tools\opencv\build\x64\vc15\bin\opencv_world454.dll" %CONFIGURATION%\OpenToonz
+
+    mkdir "%CONFIGURATION%\OpenToonz stuff"
+
+    xcopy /Y /E ..\..\stuff "%CONFIGURATION%\OpenToonz stuff"
+    
 artifacts:
 - path: toonz\$(PLATFORM)\$(CONFIGURATION)
-  name: OpenToonz_1.2
+  name: OpenToonz
   

@@ -41,7 +41,7 @@
 // Qt stuff
 #include <QMetaType>
 #include <QRegion>
-#include "toonzqt/gutil.h"  //For converions between TRects and QRects
+#include "toonzqt/gutil.h"  //For conversions between TRects and QRects
 
 // Preferences
 #include "toonz/preferences.h"
@@ -131,7 +131,7 @@ inline void adaptView(FlipBook *flipbook, TDimension cameraSize) {
   TRect imgRect(cameraSize);
   flipbook->getImageViewer()->adaptView(imgRect, imgRect);
 }
-};
+};  // namespace
 
 //=======================================================================================================
 
@@ -379,9 +379,9 @@ PreviewFxInstance::~PreviewFxInstance() {
 
 //-----------------------------------------------------------------------------------------
 
-//! Clears the preview instance informations about passed frame, including any
+//! Clears the preview instance information about passed frame, including any
 //! cached image.
-//! Informations needed to preview again are NOT rebuilt.
+//! Information needed to preview again are NOT rebuilt.
 void PreviewFxInstance::reset(int frame) {
   TImageCache::instance()->remove(getCacheId(m_fx, frame));
   std::map<int, FrameInfo>::iterator it = m_frameInfos.find(frame);
@@ -396,8 +396,8 @@ void PreviewFxInstance::reset(int frame) {
 
 //-----------------------------------------------------------------------------------------
 
-//! Clears the preview instance informations, including cached images.
-//! Informations needed
+//! Clears the preview instance information, including cached images.
+//! Information needed
 //! to preview again are rebuilt.
 void PreviewFxInstance::reset() {
   int i;
@@ -483,7 +483,7 @@ void PreviewFxInstance::addFlipbook(FlipBook *&flipbook) {
   else if (sfx)
     fxId = sfx->getZeraryFx()->getFxId();
   else {
-    fxId                   = m_fx->getFxId();
+    fxId = m_fx->getFxId();
     if (fxId.empty()) fxId = m_fx->getName();
   }
 
@@ -633,7 +633,7 @@ void PreviewFxInstance::updateFlipbookTitles() {
     std::set<FlipBook *>::iterator kt;
     for (kt = m_flipbooks.begin(); kt != m_flipbooks.end(); ++kt) {
       // In the full preview case, the title must display the frame range
-      // informations
+      // information
       (*kt)->setTitle(
           /*"Rendered Frames  ::  From " + QString::number(start) +
         " To " + QString::number(end) +
@@ -1070,7 +1070,9 @@ void PreviewFxInstance::doOnRenderRasterCompleted(
   /*-- 16bpcで計算された場合、結果をDitheringする --*/
   TRasterP rasA = renderData.m_rasA;
   TRasterP rasB = renderData.m_rasB;
-  if (rasA->getPixelSize() == 8)  // render in 64 bits
+  // dither the 16bpc image IF the "30bit display" prefernce option is OFF
+  if (rasA->getPixelSize() == 8 &&
+      !Preferences::instance()->is30bitDisplayEnabled())  // render in 64 bits
   {
     TRaster32P auxA(rasA->getLx(), rasA->getLy());
     TRop::convert(auxA, rasA);  // dithering
@@ -1270,7 +1272,7 @@ FlipBook *PreviewFxManager::showNewPreview(TFxP fx, bool forceFlipbook) {
 //-----------------------------------------------------------------------------
 /*! return true if the preview fx instance for specified fx is with sub-camera
  * activated
-*/
+ */
 
 bool PreviewFxManager::isSubCameraActive(TFxP fx) {
   if (!fx) return false;
@@ -1335,6 +1337,15 @@ void PreviewFxManager::unfreeze(FlipBook *flipbook) {
     flipbook->setProgressBarStatus(NULL);
 
     previewInstance->addFlipbook(flipbook);
+
+    // recompute frames, if necessary (call the same process as
+    // PreviewFxManager::onXsheetChanged())
+    previewInstance->updateRenderSettings();
+    previewInstance->updateCamera();
+    previewInstance->updateFrameRange();
+    previewInstance->updateFlipbookTitles();
+    previewInstance->updateAliases();
+
     previewInstance->refreshViewRects();
   }
 }
@@ -1471,6 +1482,8 @@ void PreviewFxManager::onFxChanged() {
     // if(areAncestorAndDescendant(it.value()->m_fx, fx))  //Currently not
     // trespassing sub-xsheet boundaries
     {
+      // in case the flipbook is frozen
+      if (it.value()->m_flipbooks.empty()) continue;
       it.value()->updateAliases();
       emit refreshViewRects(it.key());
       // it.value()->refreshViewRects();
@@ -1486,6 +1499,8 @@ void PreviewFxManager::onXsheetChanged() {
     QMap<unsigned long, PreviewFxInstance *>::iterator it;
     for (it = m_previewInstances.begin(); it != m_previewInstances.end();
          ++it) {
+      // in case the flipbook is frozen
+      if (it.value()->m_flipbooks.empty()) continue;
       it.value()->updateRenderSettings();
       it.value()->updateCamera();
       it.value()->updateFrameRange();
@@ -1506,6 +1521,8 @@ void PreviewFxManager::onObjectChanged(bool isDragging) {
     QMap<unsigned long, PreviewFxInstance *>::iterator it;
     for (it = m_previewInstances.begin(); it != m_previewInstances.end();
          ++it) {
+      // in case the flipbook is frozen
+      if (it.value()->m_flipbooks.empty()) continue;
       it.value()->updateFrameRange();
       it.value()->updateFlipbookTitles();
       it.value()->updateAliases();

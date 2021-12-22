@@ -71,7 +71,7 @@ SVNCommitDialog::SVNCommitDialog(QWidget *parent, const QString &workingDir,
 
   if (m_folderOnly) {
     m_treeWidget->setSelectionMode(QAbstractItemView::ExtendedSelection);
-    m_treeWidget->setIconSize(QSize(21, 17));
+    m_treeWidget->setIconSize(QSize(21, 18));
   }
   m_treeWidget->setStyleSheet("QTreeWidget { border: 1px solid gray; }");
 
@@ -167,7 +167,7 @@ SVNCommitDialog::SVNCommitDialog(QWidget *parent, const QString &workingDir,
 
   addButtonBarWidget(m_commitButton, m_cancelButton);
 
-  // 0. Connect for svn errors (that may occurs everythings)
+  // 0. Connect for svn errors (that may occur every time)
   connect(&m_thread, SIGNAL(error(const QString &)), this,
           SLOT(onError(const QString &)));
 
@@ -469,7 +469,8 @@ void SVNCommitDialog::onResourcesStatusRetrieved(const QString &xmlResponse) {
 
 void SVNCommitDialog::onStatusRetrieved(const QString &xmlResponse) {
   SVNStatusReader sr(xmlResponse);
-  m_status = sr.getStatus();
+  m_status   = sr.getStatus();
+  int height = 160;
 
   m_thread.disconnect(SIGNAL(statusRetrieved(const QString &)));
 
@@ -508,6 +509,10 @@ void SVNCommitDialog::onStatusRetrieved(const QString &xmlResponse) {
         }
       }
 
+      if (m_treeWidget->isVisible()) height += (filesToPutCount * 25);
+
+      setMinimumSize(350, std::min(height, 350));
+
       m_waitingLabel->hide();
       m_commentLabel->show();
       m_commentTextEdit->show();
@@ -530,6 +535,10 @@ void SVNCommitDialog::onStatusRetrieved(const QString &xmlResponse) {
       m_selectionCheckBox->show();
       m_selectionLabel->show();
     }
+
+    if (m_treeWidget->isVisible()) height += (m_items.size() * 25);
+
+    setMinimumSize(350, std::min(height, 350));
 
     m_waitingLabel->hide();
     m_textLabel->hide();
@@ -610,7 +619,7 @@ void SVNCommitDialog::addUnversionedItem(const QString &relativePath) {
   QTreeWidgetItem *parent = 0;
   QString tempString      = "";
 
-  QIcon folderIcon = QIcon(":Resources/vcfolder_close.svg");
+  QIcon folderIcon = QIcon(createQIcon("folder_vc", true));
 
   int levelCount = list.count();
   for (int i = 0; i < levelCount; i++) {
@@ -630,7 +639,7 @@ void SVNCommitDialog::addUnversionedItem(const QString &relativePath) {
         item = new QTreeWidgetItem(m_treeWidget, QStringList(list.at(i)));
 
       if (fi.isDir()) item->setIcon(0, folderIcon);
-      if (relativePath == tempString) {
+      if ((i + 1) == levelCount) {
         item->setCheckState(0, m_folderOnly ? Qt::Unchecked : Qt::Checked);
         item->setData(0, Qt::UserRole, tempString);
         item->setData(0, Qt::UserRole + 1, true);
@@ -659,7 +668,7 @@ void SVNCommitDialog::addUnversionedFolders(const QDir &dir,
       dir.entryList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
   int count = entries.count();
 
-  QIcon folderIcon = QIcon(":Resources/vcfolder_close.svg");
+  QIcon folderIcon = QIcon(createQIcon("folder_vc", true));
 
   for (int i = 0; i < count; i++) {
     QString entry = entries.at(i);
@@ -723,7 +732,7 @@ void SVNCommitDialog::addModifiedItem(const QString &relativePath) {
   QString tempString      = "";
 
   QBrush brush(Qt::red);
-  QIcon folderIcon = QIcon(":Resources/vcfolder_close.svg");
+  QIcon folderIcon = QIcon(createQIcon("folder_vc", true));
 
   int levelCount = list.count();
   for (int i = 0; i < levelCount; i++) {
@@ -916,7 +925,7 @@ SVNCommitFrameRangeDialog::SVNCommitFrameRangeDialog(QWidget *parent,
 
   setWindowTitle(tr("Version Control: Put"));
 
-  setMinimumSize(300, 150);
+  setMinimumSize(350, 150);
   QWidget *container = new QWidget;
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
@@ -985,7 +994,7 @@ SVNCommitFrameRangeDialog::SVNCommitFrameRangeDialog(QWidget *parent,
 
   addButtonBarWidget(m_commitButton, m_cancelButton);
 
-  // 0. Connect for svn errors (that may occurs)
+  // 0. Connect for svn errors (that may occur)
   connect(&m_thread, SIGNAL(error(const QString &)), this,
           SLOT(onError(const QString &)));
 }
@@ -1041,10 +1050,10 @@ void SVNCommitFrameRangeDialog::onLockDone() {
 
   // Step 3: propget
   QStringList args;
-  args << "propget";
-  args << "partial-lock";
+  args << "proplist";
   args << m_file;
   args << "--xml";
+  args << "-v";
 
   m_thread.disconnect(SIGNAL(done(const QString &)));
   connect(&m_thread, SIGNAL(done(const QString &)), this,

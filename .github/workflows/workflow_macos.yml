@@ -1,0 +1,91 @@
+name: MacOS Build
+
+on: [push, pull_request]
+
+jobs:
+  macOS:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install libraries
+      run: |
+        checkPkgAndInstall()
+        {
+          while [ $# -ne 0 ]
+          do
+            rm -f '/usr/local/bin/2to3'
+            if brew ls --versions $1 ; then
+              brew upgrade $1
+            else
+              brew install $1
+            fi
+            shift
+          done
+        }
+        brew update
+        checkPkgAndInstall pkg-config glew lz4 libjpeg libpng lzo qt@5 boost libusb libmypaint ccache jpeg-turbo ninja
+        brew unlink gcc@9
+        checkPkgAndInstall opencv
+        
+    - uses: actions/cache@v1
+      with:
+        path: /Users/runner/.ccache
+        key: ${{ runner.os }}-${{ github.sha }}
+        restore-keys: ${{ runner.os }}-
+
+    - name: Build libtiff
+      run: |
+        export PATH="/usr/local/opt/ccache/libexec:$PATH"
+        cd thirdparty/tiff-4.0.3
+        CFLAGS='-fPIC' CXXFLAGS='-fPIC' ./configure --disable-lzma
+        make -j $(nproc)
+
+    - name: Build
+      run: |
+        export PKG_CONFIG_PATH="/usr/local/opt/jpeg-turbo/lib/pkgconfig:$PKG_CONFIG_PATH"
+        cd toonz
+        mkdir build
+        cd build
+        cmake ../sources -G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DQT_PATH='/usr/local/opt/qt@5/lib' -DWITH_TRANSLATION=OFF
+        ninja -w dupbuild=warn
+    
+    - name: Introduce Libraries and Stuff
+      run: |
+        cd toonz/build/toonz
+        cp -pr ../../../stuff OpenToonz.app/portablestuff
+        /usr/local/opt/qt@5/bin/macdeployqt OpenToonz.app -verbose=1 -always-overwrite \
+        -executable=OpenToonz.app/Contents/MacOS/lzocompress \
+        -executable=OpenToonz.app/Contents/MacOS/lzodecompress \
+        -executable=OpenToonz.app/Contents/MacOS/tcleanup \
+        -executable=OpenToonz.app/Contents/MacOS/tcomposer \
+        -executable=OpenToonz.app/Contents/MacOS/tconverter \
+        -executable=OpenToonz.app/Contents/MacOS/tfarmcontroller \
+        -executable=OpenToonz.app/Contents/MacOS/tfarmserver
+    
+    - name: Modify Library Paths
+      run: |
+        cd toonz/build/toonz/OpenToonz.app/Contents/Frameworks
+        for TARGETLIB in `ls ./ | grep dylib`
+        do
+          echo $TARGETLIB
+          for FROMPATH in `otool -L "$TARGETLIB" | grep ".dylib" | grep -v "$TARGETLIB" | grep -v "@executable_path/../Frameworks" | sed -e"s/ (.*$//"`
+          do
+            echo "  $FROMPATH"
+            LIBNAME=`basename $FROMPATH`
+            if [[ -e ./$LIBNAME ]]; then
+              echo "updating library path of $LIBNAME in $TARGETLIB"
+              install_name_tool -change "$FROMPATH" "@executable_path/../Frameworks/$LIBNAME" $TARGETLIB
+            fi
+          done
+        done
+
+    - name: Create Artifact
+      run: |
+        cd toonz/build/toonz
+        /usr/local/opt/qt@5/bin/macdeployqt OpenToonz.app -dmg -verbose=1
+    
+    - uses: actions/upload-artifact@v1
+      with:
+        name: Opentoonz-${{ runner.os }}-${{ github.sha }}
+        path: toonz/build/toonz/OpenToonz.dmg

@@ -32,7 +32,7 @@ public:
 
   void redo() const override { toggleAutopaint(); }
 
-  void onAdd() { redo(); }
+  void onAdd() override { redo(); }
 
   int getSize() const override { return sizeof(*this); }
 
@@ -130,6 +130,17 @@ bool TPaletteHandle::disconnectBroadcasts(const QObject *receiver) {
 //-----------------------------------------------------------------------------
 
 void TPaletteHandle::setPalette(TPalette *palette, int styleIndex) {
+  if (palette) {
+    if (styleIndex < 0) {
+      styleIndex = palette->getCurrentStyleId();
+      if (!palette->getStylePage(styleIndex)) {  // in case the style is deleted
+        styleIndex = 1;
+        palette->setCurrentStyleId(styleIndex);
+      }
+    } else
+      palette->setCurrentStyleId(styleIndex);
+  }
+
   if (m_palette == palette)
     setStyleIndex(styleIndex);
   else {
@@ -138,18 +149,23 @@ void TPaletteHandle::setPalette(TPalette *palette, int styleIndex) {
     m_styleParamIndex = 0;
 
     emit paletteSwitched();
+    // to let ToonzCheck to update the current index
+    emit broadcastColorStyleSwitched();
   }
 }
 
 //-----------------------------------------------------------------------------
+// forceEmit flag is used in PageViewer and StylePicker tool.
+// See the function PageViewer::setCurrentStyleIndex() in paletteviewergui.cpp
+// Also see the function StylePickerTool::pick() in stylepickertool.cpp
 
-void TPaletteHandle::setStyleIndex(int index) {
-  //	if(m_styleIndex != index)
-  //	{
-  m_styleIndex      = index;
-  m_styleParamIndex = 0;
-  emit broadcastColorStyleSwitched();
-  //	}
+void TPaletteHandle::setStyleIndex(int index, bool forceEmit) {
+  if (m_styleIndex != index || m_styleParamIndex != 0 || forceEmit) {
+    if (m_palette) m_palette->setCurrentStyleId(index);
+    m_styleIndex      = index;
+    m_styleParamIndex = 0;
+    emit broadcastColorStyleSwitched();
+  }
 }
 
 //-----------------------------------------------------------------------------

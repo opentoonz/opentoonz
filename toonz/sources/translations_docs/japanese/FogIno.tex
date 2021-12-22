@@ -1,0 +1,103 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[a4paper, total={180mm, 272mm}]{geometry}
+
+\usepackage{fontspec}
+\setmainfont[Path=fonts/, Extension=.ttf]{ipaexm}
+
+\setlength\parindent{3.5em}
+\setlength\parskip{0em}
+\renewcommand{\baselinestretch}{1.247}
+
+\begin{document}
+
+\thispagestyle{empty}
+
+\Large
+\noindent \\
+Fog Ino\medskip
+\par
+\normalsize
+光を散らします。\\
+\par
+水の中や、風呂の中、霧の中などで、\par
+光が散乱(Light Scattering)して見える効果をねらって作成しました。\par
+光学フィルターにおける、フォグや、ディフュージョンのような\par
+効果をねらっていますが、光をシミュレートしているわけではありません。\\
+\par
+各 pixel において、周りのより明るい pixelから、光るさの影響を受けます。\par
+近くの pixel からはより強く、遠くの pixelからは弱い影響になります。\\
+\par
+初めに、\textquotedbl Alpha Rendering\textquotedbl が ONなら Alpha チャンネルを処理し、\par
+次に、Alphaチャンネルがゼロでないピクセルの RGBを処理します。\\
+\par
+\textquotedbl Alpha Rendering\textquotedbl が OFFなら Alphaチャンネルを処理せず、\par
+RGB画像の変化に Mask しないので、マスクエッジにジャギーが出ます。\\
+\\
+-{-}- \ 入力 \ -{-}-\\
+Source\par
+処理をする画像を接続します。\\
+\\
+-{-}- \ 設定 \ -{-}-\\
+Radius\par
+光を散らす範囲を、円半径で指定します。\par
+単位はミリメートルです。\par
+ゼロ以上の値で指定します。最大は100です。\par
+Pixel 幅より小さい値の時は光が散らず、Fogはかかりません。\par
+半径は大きくするほど処理に時間がかかります。\par
+初期値は1です。\\
+\\
+Curve\par
+散っていく光の減衰カーブです。\par
+0.01以上の値で指定します。最大は100です。\par
+離れた pixel ほどその影響は弱くなりますが、\par
+その変化を Gamma曲線で表わします。\par
+1.0の場合は明るさはリニアに減衰します。\par
+値が小さいほど明るさが細り(影響が急に減り)、\par
+大きいほど明るさが膨らみ(影響が強調され)ます。\par
+初期値は1です。
+
+\newpage
+
+\thispagestyle{empty}
+
+\ \vspace{-0.2em}
+\par
+\noindent Power\par
+光りを散らす強さを変えます。\par
+0から1の範囲で指定します。\par
+1.0が最大値ですがさらに2.0まで指定できて、光を強調できます。\par
+強調では墨線等の暗い部分が発光することがあります。\par
+0.0の時は光が散らず、Fogはかかりません。\par
+0.0より小さい値を-2.0まで与えることができます。\par
+この時の処理は光の散乱ではなく、暗さの散乱となります。\par
+初期値は1です。\\
+\\
+Threshold Min\\
+Threshold Max\par
+この値を含めてそれ以上の明るさの Pixel が光を放ちます。\\
+\par
+より明るい Pixel から明るさの影響を受けますが、それに加え、\par
+値(\textquotedbl Threshold Min\textquotedbl )以上の輝度の Pixel であったときに、\par
+明るさの影響を受けます。\par
+輝度は、Pixel 値の RGBから求めた(HLS の)L値です。\\
+\par
+0.0以上1.01以下の範囲で指定します。\\
+\par
+両方とも1.01とすると Fogはかかりません。\\
+\par
+\textquotedbl Threshold Max\textquotedbl が\textquotedbl Threshold Min\textquotedbl より大きい場合、\par
+Min から Max の間をリニア補間して fogの変化をなめらかに行ないます。\\
+\par
+\textquotedbl Threshold Max\textquotedbl をゼロとしておく(Min より小さければよい)ことで、\par
+\textquotedbl Threshold Min\textquotedbl 以上の明るさからいきなり光を放ちます。\par
+\textquotedbl Threshold Min\textquotedbl もゼロにすれば全体に Fogがかかります。\\
+\par
+初期値はどちらも0です。\\
+\\
+Alpha Rendering\par
+Alphaチャンネルがあるときのみ有効なスイッチです。\par
+OFFのときはなにもしません。\par
+ONで Alphaにも処理をします。\par
+初期値は OFFです。
+
+\end{document}

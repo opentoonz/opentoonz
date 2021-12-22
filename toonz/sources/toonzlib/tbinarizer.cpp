@@ -53,7 +53,7 @@ else color=6;
 
 // ritorna true se i primi pixel del buffer non sono tutti opachi
 bool hasAlpha(const TPixel32 *buffer, int w, int h) {
-  int n = qMin(500, w * h);
+  int n = std::min(500, w * h);
   for (int i = 0; i < n; i++)
     if (buffer[i].m < 255) return true;
   return false;
@@ -129,10 +129,10 @@ void TBinarizer::process(const TRaster32P &ras) {
   // conto i quadrati che hanno un "buon" background
   for (int y1 = 0; y1 < h1; y1++) {
     int ya = y1 * bsize;
-    int yb = qMin(h, ya + bsize) - 1;
+    int yb = std::min(h, ya + bsize) - 1;
     for (int x1 = 0; x1 < w1; x1++) {
       int xa = x1 * bsize;
-      int xb = qMin(w, xa + bsize) - 1;
+      int xb = std::min(w, xa + bsize) - 1;
 
       int tot = 0;
       std::vector<int> histo(32, 0);
@@ -140,7 +140,7 @@ void TBinarizer::process(const TRaster32P &ras) {
         for (int x = xa; x <= xb; x++) {
           int k        = y * w + x;
           TPixel32 pix = buffer[k];
-          int v        = qMin(qMin(pix.r, pix.g), pix.b);
+          int v        = std::min({pix.r, pix.g, pix.b});
           vBuffer[k]   = v;
           histo[v >> 3] += 1;
           tot += 1;
@@ -196,16 +196,16 @@ void TBinarizer::process(const TRaster32P &ras) {
 
   // cerco i pixel sicuramente colorati e i sicuramente neri
   for (int y1 = 0; y1 < h1; y1++) {
-    int ya = qMax(1, y1 * bsize);
-    int yb = qMin(h - 1, ya + bsize) - 1;
+    int ya = std::max(1, y1 * bsize);
+    int yb = std::min(h - 1, ya + bsize) - 1;
     for (int x1 = 0; x1 < w1; x1++) {
       int k1 = y1 * w1 + x1;
       // salto i quadrati completamente bianchi
       if (qBuffer[k1] >= thrBuffer[k1] - thrDelta) continue;
 
       for (int y = ya + 1; y <= yb; y++) {
-        int xa = qMax(1, x1 * bsize);
-        int xb = qMin(w - 1, xa + bsize) - 1;
+        int xa = std::max(1, x1 * bsize);
+        int xb = std::min(w - 1, xa + bsize) - 1;
         for (int x = xa + 1; x <= xb; x++) {
           int k = y * w + x;
 

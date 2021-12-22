@@ -2,42 +2,14 @@
    Component: Button Styles
 ----------------------------------------------------------------------------- */
 
-// Show (+/-) Button
-// -----------------------------------------------------------------------------
-// a button style for the show more options button
-
-.button-show {
-  image: url('@{img-url}/plus.svg');
-  image-position: center center;
-  margin: 0;
-  padding: 1;
-  min-width: 10;
-  min-height: 10;
-  &:checked {
-    background-color: @button-bg-color-checked;
-    border-color: @button-border-color-checked;
-    image: url('@{img-url}/minus.svg');
-    &:pressed {
-      background-color: @button-bg-color-pressed;
-      border-color: @button-border-color-pressed;
-    }
-    &:hover {
-      background-color: @button-bg-color-checked-hover;
-    }
-  }
-}
-
 // Tool Button
 // -----------------------------------------------------------------------------
-// ideal for use on toolbar buttons and console buttons
 
 .button-tool {
   background-color: @toolbutton-bg-color;
   border: 1 solid @toolbutton-border-color;
   border-radius: 2;
   color: @toolbutton-text-color;
-  margin: 1;
-  padding: 0;
   &:hover {
     background-color: @toolbutton-bg-color-hover;
     border-color: @toolbutton-border-color-hover;
@@ -59,13 +31,16 @@
   }
   &:disabled {
     color: @text-color-disabled;
+    &:checked {
+      background-color: @toolbutton-bg-color-disabled;
+      border-color: @toolbutton-border-color-disabled;
+    }
   }
 }
 
 // Flat Button
 // -----------------------------------------------------------------------------
-// this is a flat button style with no border and no margin
-// ideal for use in palette tool bars and tight areas
+// This is a flat style with no border and no margin, for use in tight areas.
 
 .button-flat {
   background-color: none;

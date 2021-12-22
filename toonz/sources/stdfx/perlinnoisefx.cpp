@@ -124,8 +124,8 @@ void doPerlinNoise(const TRasterPT<PIXEL> &rasOut,
           pixout->b = (CHANNEL_TYPE)((pix + pixshift)->b);
           pixout->m = (CHANNEL_TYPE)((pix + pixshift)->m);
         }
-        *pix++;
-        *pixout++;
+        pix++;
+        pixout++;
       }
     }
   else
@@ -157,8 +157,8 @@ void doPerlinNoise(const TRasterPT<PIXEL> &rasOut,
           pixout->b = (CHANNEL_TYPE)((pix + pixshift)->b);
           pixout->m = (CHANNEL_TYPE)((pix + pixshift)->m);
         }
-        *pix++;
-        *pixout++;
+        pix++;
+        pixout++;
       }
     }
   rasOut->unlock();

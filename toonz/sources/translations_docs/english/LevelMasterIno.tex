@@ -1,0 +1,74 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[a4paper, total={180mm, 272mm}]{geometry}
+
+\usepackage{fontspec}
+\setmainfont[Path=fonts/, Extension=.ttf]{ipaexm}
+
+\setlength\parindent{3.5em}
+\setlength\parskip{0em}
+\renewcommand{\baselinestretch}{1.247}
+
+\begin{document}
+
+\thispagestyle{empty}
+
+\Large
+\noindent \\
+Level Master Ino\medskip
+\par
+\normalsize
+Allows to perform a global correction to the image levels.\par
+For adjusting levels individually on RGBA channels, use the \textquotedbl Level RGBA Ino\textquotedbl \ effect.\\
+\\
+-{-}- \ Inputs \ -{-}-\\
+Source\par
+Connect the image to be processed.\\
+\\
+Reference\par
+Connect the reference image to assign the strength of the effect into each pixel.\\
+\\
+-{-}- \ Settings \ -{-}-\\
+In\par
+Allows to define the minimum and maximum values for the input pixel values.\par
+Values less than Min will be limited to Min, values greater than Max will be\par 
+limited to Max.\par
+Minimum value is 0, maximum value is 1.\par
+The default values are Min: 0, Max: 1.\par
+Values can take an input of up to 4 decimal places.\\
+\\
+Out\par
+Allows to fit the range defined by \textquotedbl In\textquotedbl , to the range of\par 
+minimum and maximum values specified here.\par
+Minimum value is 0, maximum value is 1.\par
+The default values are, Min: 0, Max: 1.\par
+Values can take an input of up to 4 decimal places.\\
+\\
+Gamma\par
+Perform gamma correction between \textquotedbl Out Min\textquotedbl \ and \textquotedbl Out Max\textquotedbl .\par
+A value between 0.1 and 1.0, will make the image become darker.\par
+When the value is 1.0, no correction will be performed.\par
+A value between 1.0 and 10.0, will make the image become brighter.\par
+The default value is 1.\\
+\\
+Alpha Rendering\par
+This option is valid only when there is an Alpha channel.\par
+When inactive, it masks the changes in the RGB values using the original Alpha\par 
+of the image.\par
+When active, the effect will be able to modify the Alpha channel, extending it\par 
+as necessary to reproduce the full span of the effect.\par
+The default setting is ON.\\
+\\
+Premultiplied\par
+When ON, the image will be processed as if having a Premultiplied Alpha channel\par 
+(Alpha value already multiplied by RGB channels).\par
+If image is not premultiplied, the image may not look correct.\par
+The default setting is ON.\\
+\\
+Reference\par
+Specify which channel to use from the image connected to the Reference port to\par 
+drive the intensity of the effect.\par
+Choose from Red/Green/Blue/Alpha/Luminance.\par
+Choose Nothing to disable the effect.\par
+The default value is \textquotedbl Red\textquotedbl .
+
+\end{document}

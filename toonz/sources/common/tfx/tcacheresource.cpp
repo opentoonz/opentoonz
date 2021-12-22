@@ -77,7 +77,7 @@ in
 case some part of the complex inside the cell has been defined.
 The plane outside the complex is assumed to be transparent.
 \n
-The lattice origin must be specified in the complex's contructor, and all tiles
+The lattice origin must be specified in the complex's constructor, and all tiles
 uploaded into and downloaded from it must have an integer displacement with
 respect
 to it - in other words, it is required that the complex has a well-defined pixel
@@ -317,7 +317,7 @@ inline TPoint TCacheResource::getCellPos(const TPointD &pos) const {
 bool TCacheResource::checkRasterType(const TRasterP &ras, int &rasType) const {
   rasType = ::getRasterType(ras);
   if (rasType == NONE) {
-    assert(!"The passed raster has unkown type!");
+    assert(!"The passed raster has unknown type!");
     return false;
   }
   if (m_tileType != NONE && m_tileType != rasType) {

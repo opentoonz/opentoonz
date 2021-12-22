@@ -6,35 +6,54 @@
 <body bgcolor="#f5f5f5" text="#220011">
 <h1><img src = ".\img\fx_iwa_pn_perspective.png" width = 30 height = 30 >   PN PerspectiveFx Iwa</h1>
 
-<h4>● 概要</h4>
-水平面上に奥行きのあるPerlinノイズパターンを生成するためのエフェクトです。<br>
-通常のノイズパターンだけではなく、inoWarpHVFxのオフセット参照画像として出力するモードや、<br>
-ノイズパターンを水面の波の高さとしたとき、カメラから見た水面のフレネル反射強度を出力するモードを
-選択することができます。
+<h4>● Overview</h4>
+This effect generates a deep Perlin noise pattern on a horizontal plane.<br>
+In addition to the normal noise pattern, there is a mode for outputting as an offset reference image<br>
+for the WarpHVIno effect, and a mode for outputting the Fresnel reflection intensity of the water surface<br>
+as seen from the camera, when the noise pattern is the water surface wave height.
 
-<h4>● パラメータ</h4>
+<h4>● Parameters</h4>
 <UL>
-<LI><b>Mode</b> : 描画モード指定します。選べるモードは以下の４つです。</LI>
+<LI><b>Mode</b> : Specify drawing mode. There is a choice of the 4 following modes:</LI>
 	<UL>
-	<LI><I>Noise</I>：Perlinノイズパターンを描画します。1ピクセルを100分割したサンプル点毎にノイズ値を計算します。</LI>
-	<LI><I>Noise (no resampled)</I>：Perlinノイズパターンを描画します。サブピクセル処理を行わないので高速に結果が得られますが、水平線近くのノイズパターンが不規則になります。</LI>
-	<LI><I>Warp HV offset</I>：ノイズパターンを水面の高低としたとき、水面で反射した光が水平/垂直方向にどれくらいずれるかを、それぞれ赤チャンネル/緑チャンネルで表したものを描画します。Warp HV Fx Inoの"Hori","Vert"ポートに接続することで、水面の映りこみのゆがみをそれなりに再現することができます。後述の"Wave Height"パラメータによって、パターンの濃淡の度合いを調整できます。<br>
-※Warp HV Fx Inoのポートは、"Hori","Vert"とも赤チャンネルを参照するので、"Vert"ポート側では、Channel Selector Fx等で、チャンネルの変換が必要です。</LI>
-	<LI><I>Fresnel reflectivity</I>：ノイズパターンを水面の高低としたとき、カメラから見た水面のフレネル反射強度を濃淡にして出力します。カメラ枠下辺での反射強度を明るさ０として正規化して表示されます。後述の"Wave Height"パラメータによって、パターンの濃淡の度合いを調整できます。</LI>
+	<LI><I>Noise</I> : Draws a Perlin noise pattern. The noise value is calculated for each sampling<br>
+	point obtained by dividing 1 pixel into 100.</LI>
+	<LI><I>Noise (no resampled)</I> : Draws a Perlin noise pattern. Subpixel processing is not performed<br>
+	and results are obtained at high speed, but the noise pattern near the horizon is irregular.</LI>
+	<LI><I>Warp HV offset</I> : When the noise pattern is set to the level of the water surface, the red<br>
+	or green channel is drawn to show how much the light reflected by the water surface is in the<br>
+	horizontal or vertical direction.<br>
+	By connecting to the WarpHVIno effect's "Hori" and "Vert" ports, you can reproduce the distortion of<br>
+	the reflected water surface. You can adjust the shade of the pattern with the "Wave Height" parameter<br>
+	described below.<br>
+	*Since the WarpHVIno effect port refers by default to the Red channel for both "Hori" and "Vert", channel<br>
+	conversion is required on the "Vert" port side, using Channel Selector effect.</LI>
+	<LI><I>Fresnel reflectivity</I> : When the noise pattern is high or low on the water surface, the Fresnel<br>
+	reflection intensity of the water surface as seen from the camera is output in shades. The reflected<br>
+	intensity at the bottom of the camera frame is normalized and displayed as 0 brightness. You can adjust<br>
+	the shade of the pattern with the "Wave Height" parameter described below.</LI>
 	
 </UL>
-<LI><b>Size</b> : 1代目のランダムパターンのサイズを指定します。</LI>
-<LI><b>Evolution</b> : 1代目のランダムパターンの展開を指定します。</LI>
-<LI><b>Octaves</b> : ランダムパターンを何代 合成するかを指定します。</LI>
-<LI><b>Offset</b> : 1代目のランダムパターンのオフセット位置を指定します。カメラ右方向がX軸に正、カメラ奥方向がY軸に正です。</LI>
-<LI><b>p_Intensity</b> : 現在の世代と、次の世代とのパターンの強度比を指定します。</LI>
-<LI><b>p_Size</b> : 現在の世代と、次の世代とのパターンのサイズ比を指定します。</LI>
-<LI><b>p_Evolution</b> : 現在の世代と、次の世代とのパターンの展開周期の比を指定します。</LI>
-<LI><b>p_Offset</b> : 現在の世代と、次の世代とのパターンのオフセット比を指定します。</LI>
-<LI><b>Fov</b> : カメラの縦方向の画角をdegreeで指定します。画角が大きいと、遠近が強調され（広角）、画角が小さいと、遠近が圧縮されたようになります（望遠）。</LI>
-<LI><b>Eye Level</b> : カメラの消失点（水平線）の位置を指定します。</LI>
-<LI><b>Alpha Rendering</b> : ノイズの強度値を、アルファチャンネルにも格納するかどうかを指定します。</LI>
-<LI><b>Wave Height</b> : ノイズパターンを水面の高低としたとき、ノイズの最大位置と最小位置との波の高さの差を指定します。"Warp HV offset" モードと "Fresnel reflectivity"モードでのみ有効です。</LI>
+<LI><b>Size</b> : Specify the size of the main random pattern.</LI>
+<LI><b>Evolution</b> : Specify the expansion of the main random pattern.</LI>
+<LI><b>Octaves</b> : Specify how many levels of random pattern to synthesize.</LI>
+<LI><b>Offset</b> : Specify the offset position of the first random pattern.<br>
+The right direction of the camera is positive on the X axis, and the back direction of the camera is positive on<br>
+the Y axis.</LI>
+<LI><b>p_Intensity</b> : Specify the pattern intensity ratio, between the current generation and the next<br>
+generation.</LI>
+<LI><b>p_Size</b> : OSpecify the pattern size ratio, between the current generation and the next generation.</LI>
+<LI><b>p_Evolution</b> : Specify the ratio of the pattern evolution period, between the current generation and the next<br>
+generation.</LI>
+<LI><b>p_Offset</b> : Specify the pattern offset ratio, between the current generation and the next generation.</LI>
+<LI><b>Fov</b> : Specify the vertical angle of view of the camera in degrees.<br>
+When the angle of view is large, the perspective is emphasized (wide angle), and when the angle of view is<br>
+small, the perspective is compressed (telephoto).</LI>
+<LI><b>Eye Level</b> : Specify the vanishing point (Horizon line) position of the camera.</LI>
+<LI><b>Alpha Rendering</b> : Specifies whether the noise intensity value is also stored in the Alpha channel.</LI>
+<LI><b>Wave Height</b> : When the noise pattern is the height of the water surface, specify the difference in wave<br>
+height between the maximum and minimum noise positions.<br>
+Valid only for "Warp HV offset" and "Fresnel reflectivity" modes.</LI>
 </UL>
 </body>
 

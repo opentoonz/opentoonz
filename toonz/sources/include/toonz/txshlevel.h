@@ -37,7 +37,7 @@ class TXshSoundTextLevel;
    \b TXshChildLevel, \b TXshSimpleLevel and \b TXshZeraryFxLevel.
 
    The class contains all features about a generic level and gives all methods
-   to access to these informations.
+   to access to these information.
 
    It's possible ot know level name, getName(), or identify level types
 getType(),

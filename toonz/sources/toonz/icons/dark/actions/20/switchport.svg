@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="20px" height="20px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <rect x="0" y="0" width="20" height="20" style="fill-opacity:0;"/>
+    <g id="Cutter" transform="matrix(1.11111,0,0,1.11111,-7.44444,-8.4444)">
+        <g transform="matrix(1,0,0,1,-1.8,-0.900001)">
+            <circle cx="17.5" cy="17.5" r="4.5" style="fill:black;fill-opacity:0.4;"/>
+        </g>
+        <g transform="matrix(1,0,0,1,-1.8,-0.900001)">
+            <path d="M17.5,13C19.984,13 22,15.016 22,17.5C22,19.984 19.984,22 17.5,22C15.016,22 13,19.984 13,17.5C13,15.016 15.016,13 17.5,13ZM17.5,13.9C19.487,13.9 21.1,15.513 21.1,17.5C21.1,19.487 19.487,21.1 17.5,21.1C15.513,21.1 13.9,19.487 13.9,17.5C13.9,15.513 15.513,13.9 17.5,13.9Z" style="fill:black;"/>
+        </g>
+    </g>
+</svg>

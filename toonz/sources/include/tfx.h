@@ -373,7 +373,7 @@ public:
   TFx *clone(TFx *fx, bool recursive) const;
 
   void unlinkParams();
-  void linkParams(TFx *src);
+  virtual void linkParams(TFx *src);
 
   TFx *getLinkedFx() const;
 
@@ -503,6 +503,9 @@ public:
   // parameter is loaded. Do nothing by default.
   virtual void onObsoleteParamLoaded(const std::string &paramName) {}
 
+  void setFxVersion(int);
+  int getFxVersion() const;
+
 public:
   // Id-related functions
 
@@ -543,7 +546,7 @@ inline std::string TFx::getFxType() const { return getDeclaration()->getId(); }
 //-------------------------------------------------------------------
 
 #define FX_DECLARATION(T)                                                      \
-  \
+                                                                               \
 public:                                                                        \
   const TPersistDeclaration *getDeclaration() const override;
 

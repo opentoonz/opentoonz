@@ -1,0 +1,16 @@
+<fxlayout>
+	<page name="Bloom Iwa">
+		<control>gamma</control>
+		<control>auto_gain</control>
+		<control>gain_adjust</control>
+		<control>gain</control>
+		<control decimals="0">decay</control>
+		<control>size</control>
+		<control>alpha_mode</control>
+		<visibleToggle> 
+			<controller>auto_gain</controller>
+			<on>gain_adjust</on>
+			<off>gain</off>
+		</visibleToggle>
+	</page>
+</fxlayout>

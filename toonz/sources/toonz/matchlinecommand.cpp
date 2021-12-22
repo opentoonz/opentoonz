@@ -6,6 +6,7 @@
 #include "tpalette.h"
 
 // TnzLib includes
+#include "toonz/txsheet.h"
 #include "toonz/toonzscene.h"
 #include "toonz/txshcell.h"
 #include "toonz/txshsimplelevel.h"
@@ -15,6 +16,7 @@
 #include "toonz/txshlevelhandle.h"
 #include "toonz/txsheethandle.h"
 #include "toonz/tscenehandle.h"
+#include "toonz/txshleveltypes.h"
 
 // TnzQt includes
 #include "toonzqt/menubarcommand.h"
@@ -49,10 +51,9 @@ void MergeCmappedDialog::accept() {
 
   if (TSystem::doesExistFileOrLevel(fp)) {
     if (DVGui::MsgBox(
-            QObject::tr("Level ") +
-                QString::fromStdWString(m_levelPath.getWideString()) +
-                QObject::tr(
-                    " already exists! Are you sure you want to overwrite it?"),
+            tr("Level %1 already exists! Are you sure you want to overwrite "
+               "it?")
+                .arg(QString::fromStdWString(m_levelPath.getWideString())),
             tr("Ok"), tr("Cancel")) != 1)
       return;
     else {
@@ -100,6 +101,18 @@ MergeCmappedDialog::MergeCmappedDialog(TFilePath &levelPath)
 //    MergeColumns  command
 //*****************************************************************************
 
+static bool isVectorColumn(const std::set<int> &columns) {
+  TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
+  std::set<int>::const_iterator column = columns.begin();
+  int start, end;
+  xsh->getCellRange(*column, start, end);
+
+  if (start > end) return false;
+  // a cell at "start" must be occupied
+  TXshCell cell = xsh->getCell(start, *column);
+  return cell.m_level->getType() == PLI_XSHLEVEL;
+}
+
 class MergeColumnsCommand final : public MenuItemHandler {
 public:
   MergeColumnsCommand() : MenuItemHandler(MI_MergeColumns) {}
@@ -112,20 +125,32 @@ public:
         selection ? selection->getIndices() : std::set<int>();
 
     if (indices.empty()) {
-      DVGui::warning(
-          tr("It is not possible to execute the merge column command because "
-             "no column was selected."));
+      DVGui::warning(QObject::tr(
+          "It is not possible to execute the merge column command because "
+          "no column was selected."));
       return;
     }
 
     if (indices.size() == 1) {
-      DVGui::warning(
-          tr("It is not possible to execute the merge column command  because "
-             "only one columns is  selected."));
+      DVGui::warning(QObject::tr(
+          "It is not possible to execute the merge column command because "
+          "only one columns is selected."));
       return;
     }
 
-    mergeColumns(indices);
+    bool groupLevels = true;
+    if (isVectorColumn(indices)) {
+      int opt = DVGui::MsgBox(QObject::tr("Group strokes by vector levels?"),
+                              QObject::tr("Yes"), QObject::tr("No"),
+                              QObject::tr("Cancel"));
+      if (opt == 0 || opt == 3)
+        return;
+      else {
+        groupLevels = (opt == 1);
+      };
+    }
+
+    mergeColumns(indices, groupLevels);
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
   }
 
@@ -143,18 +168,18 @@ public:
     TColumnSelection *selection =
         dynamic_cast<TColumnSelection *>(TSelection::getCurrent());
     if (!selection) {
-      DVGui::warning(
-          tr("It is not possible to apply the match lines because no column "
-             "was selected."));
+      DVGui::warning(QObject::tr(
+          "It is not possible to apply the match lines because no column "
+          "was selected."));
       return;
     }
 
     std::set<int> indices = selection->getIndices();
 
     if (indices.size() != 2) {
-      DVGui::warning(
-          tr("It is not possible to apply the match lines because two columns "
-             "have to be selected."));
+      DVGui::warning(QObject::tr(
+          "It is not possible to apply the match lines because two columns "
+          "have to be selected."));
       return;
     }
 
@@ -263,9 +288,8 @@ public:
   }
 
   int getSize() const override {
-    return sizeof *this +
-           (sizeof(TXshLevelP) + sizeof(TXshSimpleLevel *)) *
-               m_createdLevels.size();
+    return sizeof *this + (sizeof(TXshLevelP) + sizeof(TXshSimpleLevel *)) *
+                              m_createdLevels.size();
   }
 };
 
@@ -311,7 +335,10 @@ void doCloneLevelNoSave(const TCellSelection::Range &range,
       fid = cell.getFrameId();
 
       if (cell.getSimpleLevel() == 0 ||
-          cell.getSimpleLevel()->getPath().getType() == "psd")
+          cell.getSimpleLevel()->getPath().getType() == "psd" ||
+          cell.getSimpleLevel()->getPath().getType() == "gif" ||
+          cell.getSimpleLevel()->getPath().getType() == "mp4" ||
+          cell.getSimpleLevel()->getPath().getType() == "webm")
         continue;
 
       std::map<TXshSimpleLevel *, TXshLevelP>::iterator it =
@@ -420,18 +447,18 @@ public:
     TColumnSelection *selection =
         dynamic_cast<TColumnSelection *>(TSelection::getCurrent());
     if (!selection) {
-      DVGui::warning(
-          tr("It is not possible to merge tlv columns because no column was "
-             "selected."));
+      DVGui::warning(QObject::tr(
+          "It is not possible to merge tlv columns because no column was "
+          "selected."));
       return;
     }
 
     std::set<int> indices = selection->getIndices();
 
     if (indices.size() < 2) {
-      DVGui::warning(
-          tr("It is not possible to merge tlv columns because at least two "
-             "columns have to be selected."));
+      DVGui::warning(QObject::tr(
+          "It is not possible to merge tlv columns because at least two "
+          "columns have to be selected."));
       return;
     }
 
@@ -459,11 +486,11 @@ public:
     for (; it != indices.end(); ++it)
       if (!checkColumnValidity(*it)) return;
 
-    DVGui::ProgressDialog progress(tr("Merging Tlv Levels..."), QString(), 0,
-                                   indices.size() - 1,
+    DVGui::ProgressDialog progress(QObject::tr("Merging Tlv Levels..."),
+                                   QString(), 0, indices.size() - 1,
                                    TApp::instance()->getMainWindow());
     progress.setWindowModality(Qt::WindowModal);
-    progress.setWindowTitle(tr("Merging Tlv Levels..."));
+    progress.setWindowTitle(QObject::tr("Merging Tlv Levels..."));
     progress.setValue(0);
     progress.show();
 

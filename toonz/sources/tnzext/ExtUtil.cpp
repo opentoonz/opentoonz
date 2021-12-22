@@ -32,12 +32,13 @@ inline bool isWGood(double first, double w, double second, const TStroke *s) {
     return false;
 
   if (s) {
-    if (s->isSelfLoop())
+    if (s->isSelfLoop()) {
       if (first > second) {
         if ((first < w && w <= 1.0) || (0.0 <= w && w < second)) return true;
       } else if (first == second) {
         if (areAlmostEqual(w, first)) return true;
       }
+    }
   }
 
   if (first < w && w < second) return true;

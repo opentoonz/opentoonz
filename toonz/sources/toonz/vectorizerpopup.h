@@ -41,7 +41,7 @@ class IntField;
 class MeasuredDoubleLineEdit;
 class ColorField;
 class CheckBox;
-}
+}  // namespace DVGui
 
 //====================================================
 
@@ -141,6 +141,8 @@ private:
 
   DVGui::CheckBox *m_cPaintFill;
 
+  DVGui::CheckBox *m_cAlignBoundaryStrokesDirection;
+
   DVGui::Separator *m_cNaaSourceSeparator;
 
   DVGui::CheckBox *m_cNaaSource;
@@ -155,6 +157,8 @@ private:
 
   QLabel *m_oPaintFillLabel;
   DVGui::CheckBox *m_oPaintFill;
+
+  DVGui::CheckBox *m_oAlignBoundaryStrokesDirection;
 
   DVGui::Separator *m_oCornersSeparator;
 

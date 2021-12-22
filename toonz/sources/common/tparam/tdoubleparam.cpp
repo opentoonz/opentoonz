@@ -379,6 +379,8 @@ double TDoubleParam::Imp::getValue(int segmentIndex, double frame) {
   case TDoubleKeyframe::SimilarShape:
     value = getSimilarShapeValue(k0, k1, frame, m_measure);
     break;
+  default:
+    break;
   }
   if (convertUnit) value = k0.convertFrom(m_measure, value);
   return value;
@@ -755,6 +757,9 @@ void TDoubleParam::setKeyframe(int index, const TDoubleKeyframe &k) {
     dst.m_prevType = TDoubleKeyframe::None;
   else
     dst.m_prevType = keyframes[index - 1].m_type;
+
+ if (getKeyframeCount() - 1 != index)
+    keyframes[index + 1].m_prevType = dst.m_type;
 }
 
 //---------------------------------------------------------
@@ -825,6 +830,8 @@ void TDoubleParam::setKeyframe(const TDoubleKeyframe &k) {
     it->m_prevType = TDoubleKeyframe::None;
   else
     it->m_prevType = it[-1].m_type;
+
+  if (it + 1 != keyframes.end()) it[1].m_prevType = it->m_type;
 
   m_imp->notify(TParamChange(this, 0, 0, true, false, false));
 
@@ -1146,6 +1153,8 @@ is >> m_imp->m_defaultValue;
       while (!is.eos()) {
         TDoubleKeyframe kk;
         kk.loadData(is);
+         // Throw out invalid interpolation types
+        if (kk.m_type == TDoubleKeyframe::None) continue;
         TActualDoubleKeyframe k(kk);
         k.m_expression.setGrammar(m_imp->m_grammar);
         k.m_expression.setOwnerParameter(this);

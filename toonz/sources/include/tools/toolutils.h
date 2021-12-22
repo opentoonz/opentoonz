@@ -119,7 +119,7 @@ QList<TRect> splitRect(const TRect &first, const TRect &second);
 //! the \b imageBounds.
 //! If this intersection is empty a TRaster32P() is returned.
 TRaster32P convertStrokeToImage(TStroke *stroke, const TRect &imageBounds,
-                                TPoint &pos);
+                                TPoint &pos, bool pencilMode = false);
 
 //-----------------------------------------------------------------------------
 
@@ -152,10 +152,13 @@ protected:
   bool m_isEditingLevel;
   bool m_createdFrame;
   bool m_createdLevel;
-  bool m_animationSheetEnabled;
-  std::vector<int> m_cellsData;  // represent original frame range when
-                                 // m_animationSheetEnabled, m_createdFrame and
-                                 // !m_isEditingLevel; see tool.cpp
+  bool m_renumberedLevel;
+  std::vector<TTool::CellOps>
+      m_cellsData;  // represent original frame range when
+                    // m_animationSheetEnabled, m_createdFrame and
+                    // !m_isEditingLevel; see tool.cpp
+  std::vector<TFrameId> m_oldFids;
+  std::vector<TFrameId> m_newFids;
   TPaletteP m_oldPalette;
   std::string m_imageId;
   static int m_idCount;
@@ -504,6 +507,13 @@ TRasterPT<PIXEL> rotate90(const TRasterPT<PIXEL> &ras, bool toRight) {
   }
   return workRas;
 }
+
+bool DVAPI doUpdateXSheet(TXshSimpleLevel *sl, std::vector<TFrameId> oldFids,
+                          std::vector<TFrameId> newFids, TXsheet *xsh,
+                          std::vector<TXshChildLevel *> &childLevels);
+
+bool DVAPI renumberForInsertFId(TXshSimpleLevel *sl, const TFrameId &fid,
+                                const TFrameId &maxFid, TXsheet *xsh);
 
 }  // namespace ToolUtils
 

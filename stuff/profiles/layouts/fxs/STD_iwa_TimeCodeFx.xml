@@ -2,13 +2,17 @@
 	<page name="TimeCode Iwa">
  	<vbox>
 		<control>displayType</control>
-		<control>frameRate</control>
+		<vbox modeSensitive="displayType" mode="0,2">
+			<control>frameRate</control>
+		</vbox>
 		<control>startFrame</control>
 		<control>position</control>
 		<control>size</control>
 		<control>textColor</control>
 		<control>showBox</control>
-		<control>boxColor</control>
+		<vbox modeSensitive="showBox" mode="1">
+			<control>boxColor</control>
+		</vbox>
   	</vbox>
   	</page>
 </fxlayout>

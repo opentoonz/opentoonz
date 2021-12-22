@@ -33,12 +33,12 @@ class TOStream;
 /*!
   \brief    Provides a base container for vectorization options.
 
-  \details  All vectorization options and informations are passed from higher
+  \details  All vectorization options and information are passed from higher
             (like \p VectorizerPopup) to lower layers (\p VectorizerCore) of
             the vectorization process inside a \p VectorizerConfiguration
   variable.
             This typically includes vectorization modes, various sensitivity and
-            accuracy parameters, and post-processing informations. This class
+            accuracy parameters, and post-processing information. This class
             merely acts as a base parameters container (although no pure virtual
             method is present) - meaning that every vectorization method
   inherits
@@ -61,13 +61,18 @@ public:
   TAffine m_affine;  //!< Affine transform applied to the vectorization results
   double m_thickScale;  //!< Impose a thickness reduction by this ratio
 
+  // Align stroke directions to be the same (clockwise, i.e. left to right as
+  // viewed from inside of the shape).
+  bool m_alignBoundaryStrokesDirection;
+
 public:
   VectorizerConfiguration(bool outline)
       : m_outline(outline)
       , m_threshold(200)
       , m_leaveUnpainted(true)
       , m_affine()
-      , m_thickScale(1.0) {}
+      , m_thickScale(1.0)
+      , m_alignBoundaryStrokesDirection(false) {}
 };
 
 //*****************************************************************************
@@ -231,6 +236,7 @@ public:
 
   bool m_cMakeFrame;
   bool m_cPaintFill;
+  bool m_cAlignBoundaryStrokesDirection;
   bool m_cNaaSource;
 
   // Outline options
@@ -246,6 +252,7 @@ public:
   TPixel32 m_oTransparentColor;
 
   bool m_oPaintFill;
+  bool m_oAlignBoundaryStrokesDirection;
 
   // Generic data
 

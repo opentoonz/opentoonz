@@ -1,0 +1,55 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[a4paper, total={180mm, 272mm}]{geometry}
+
+\usepackage{fontspec}
+\setmainfont[Path=fonts/, Extension=.ttf]{ipaexm}
+
+\setlength\parindent{3.5em}
+\setlength\parskip{0em}
+\renewcommand{\baselinestretch}{1.247}
+
+\begin{document}
+
+\thispagestyle{empty}
+
+\Large
+\noindent \\
+PN Clouds Ino\medskip
+\par
+\normalsize
+雲模様の絵を生成します。\\
+\par
+pixel 値は、\par
+\noindent \hskip 7em \ \ 8bits 画像の場合128(0x80)\par
+\noindent \hskip 7em 16bits 画像の場合32768(0x8000)\par
+を中心としたノイズとなります。\par
+なお、この値より大きい値と小さい値は\par
+必ずしも均等にはなりません。\\
+\\
+-{-}- \ 設定 \ -{-}-\\
+Size\par
+模様のパターンの大きさを指定します。\par
+値を小さくすると小さい模様、大きくすると大きい模様となります。\par
+単位は mm です。\par
+初期値は10です。\\
+\\
+Z\par
+絵を連続的に変化させます。\par
+例えば、1フレームから24フレームを0から1まで変化させます。\par
+初期値は0です。\\
+\\
+Octaves\par
+雲模様の細部を加えます。\par
+1から10までの整数で指定します。\par
+数が増えるほど細部のノイズが現れます。\par
+初期値は1です。\\
+\\
+Persistance\par
+雲模様の細部のノイズの強さを指定します。\\
+\\
+Alpha Rendering\par
+OFFのとき Alphaを最大値で塗りつぶし、全面不透明とします。\par
+ONで Alphaにも RGB と同じ画像を生成します。\par
+初期値は ONです。
+
+\end{document}

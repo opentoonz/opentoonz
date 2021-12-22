@@ -16,7 +16,7 @@ using namespace tellipticbrush;
 /*! \file tellipticbrush.cpp
 This code deals with the "outlinization" process of a TStroke instance.
 
-The process of extracing the outline of a thick stroke can be resumed in 2 main
+The process of extracting the outline of a thick stroke can be resumed in 2 main
 steps:
 
   1. Discretize the stroke centerline in the most appropriate centerline points,
@@ -472,7 +472,7 @@ void CoverageLinearizator::linearize(std::vector<CenterlinePoint> &cPoints,
 
   TThickPoint P0(ttq.getThickP0()), P1(ttq.getThickP1()), P2(ttq.getThickP2());
   if ((P0 == P1) || (P1 == P2))
-    return;  // Linear speed out/in case. Straighted up in the buildDirs()
+    return;  // Linear speed out/in case. Straightened up in the buildDirs()
 
   // Remember that d = 2 [P1 - P0 + t (P0 + P2 - 2 P1)]
 
@@ -877,7 +877,7 @@ void tellipticbrush::OutlineBuilder::addRoundSideCaps(
     std::vector<TOutlinePoint> &oPoints, const CenterlinePoint &cPoint) {
   // Side caps - this has only sense when the backward and forward
   // direction-derivatives
-  // are different. This means that thay build different envelope directions.
+  // are different. This means that they build different envelope directions.
   // So, we add
   // side caps to cover the 'elbow fractures'
 
@@ -1132,7 +1132,7 @@ namespace {
 
 /*
   Quick container to store all the linearization features to be supported.
-  \note The set should be appropriately ordered so that linearizator dependance
+  \note The set should be appropriately ordered so that linearizator dependence
   can be supported (linearizators may work depending on knowledge of the other
   linearized points)
 */

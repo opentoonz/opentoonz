@@ -5,8 +5,9 @@
 #include "tpixelutils.h"
 
 #include "tparamset.h"
+#include "globalcontrollablefx.h"
 
-class RGBMCutFx final : public TStandardRasterFx {
+class RGBMCutFx final : public GlobalControllableFx {
   FX_PLUGIN_DECLARATION(RGBMCutFx)
 
   TRasterFxPort m_input;
@@ -58,7 +59,7 @@ void update_param(double &param, TRaster64P ras) {
   param = param * 257;
   return;
 }
-}
+}  // namespace
 
 //-------------------------------------------------------------------
 
@@ -93,7 +94,7 @@ void doRGBMCut(TRasterPT<PIXEL> ras, double hi_m, double hi_r, double hi_g,
         pix->b = tcrop((int)pix->b, (int)lo_b, (int)hi_b);
         *pix   = premultiply(*pix);
       }
-      *pix++;
+      pix++;
     }
   }
   ras->unlock();
@@ -127,7 +128,7 @@ void RGBMCutFx::doCompute(TTile &tile, double frame,
       doRGBMCut<TPixel64, USHORT>(raster64, hi_m, hi_r, hi_g, hi_b, lo_m, lo_r,
                                   lo_g, lo_b);
     else
-      throw TException("RGBMCutFx: unsupported Pixel Type");
+      throw TException("RGBACutFx: unsupported Pixel Type");
   }
 }
 

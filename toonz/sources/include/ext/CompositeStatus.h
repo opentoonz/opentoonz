@@ -28,7 +28,7 @@
 namespace ToonzExt {
 
 /**
-   * This class mantains interal data for Dragger manipulator.
+   * This class maintains internal data for Dragger manipulator.
    */
 class DVAPI CompositeStatus {
 private:

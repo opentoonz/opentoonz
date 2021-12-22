@@ -76,7 +76,7 @@ FormatSettingsPopup::FormatSettingsPopup(QWidget *parent,
   if (format == "avi") {
     m_codecRestriction = new QLabel(this);
     m_codecRestriction->setMinimumHeight(70);
-    m_codecRestriction->setStyleSheet("border: 1px solid rgb(200,200,200);");
+    m_codecRestriction->setStyleSheet("border: 1px solid rgba(0,0,0,0.5);");
     m_mainLayout->addWidget(m_codecRestriction, m_mainLayout->rowCount(), 0, 1,
                             2);
     m_configureCodec = new QPushButton(tr("Configure Codec"), this);

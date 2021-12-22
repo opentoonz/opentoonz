@@ -101,6 +101,11 @@ void TXshPaletteLevel::load() {
 void TXshPaletteLevel::save() {
   TFilePath path = getScene()->decodeFilePath(m_path);
   if (TSystem::doesExistFileOrLevel(path) && m_palette) {
+    TFileStatus fs(path);
+    if (!fs.isWritable()) {
+      throw TSystemException(
+          path, "The palette cannot be saved: it is a read only palette.");
+    }
     TOStream os(path);
     os << m_palette;
   }

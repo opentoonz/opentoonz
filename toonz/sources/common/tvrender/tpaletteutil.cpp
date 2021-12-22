@@ -12,7 +12,7 @@ void mergePalette(const TPaletteP &targetPalette,
 
   indexTable[0]                         = 0;
   std::set<int>::const_iterator styleIt = sourceIndices.begin();
-  for (styleIt; styleIt != sourceIndices.end(); ++styleIt) {
+  for (; styleIt != sourceIndices.end(); ++styleIt) {
     int srcStyleId = *styleIt;
     if (srcStyleId == 0) continue;
     assert(0 <= srcStyleId && srcStyleId < sourcePalette->getStyleCount());

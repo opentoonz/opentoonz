@@ -6,15 +6,19 @@
 #include "toonzqt/dvdialog.h"
 #include "toonzqt/lineedit.h"
 #include "toonz/namebuilder.h"
+#include "opencv2/opencv.hpp"
+#include "tfilepath.h"
+#include "toonz/tproject.h"
 
-#include <QFrame>
+#include <QAbstractVideoSurface>
+#include <QRunnable>
+#include <QLineEdit>
 
 // forward decl.
 class QCamera;
 class QCameraImageCapture;
 
 class QComboBox;
-class QLineEdit;
 class QSlider;
 class QCheckBox;
 class QPushButton;
@@ -30,51 +34,82 @@ class QCameraViewfinder;
 namespace DVGui {
 class FileField;
 class IntField;
-}
+class IntLineEdit;
+}  // namespace DVGui
 
 class CameraCaptureLevelControl;
 
 //=============================================================================
-// MyViewFinder
+// MyVideoWidget
 //-----------------------------------------------------------------------------
 
-class MyViewFinder : public QFrame {
+class MyVideoWidget : public QWidget {
   Q_OBJECT
 
   QImage m_image;
   QImage m_previousImage;
-  QCamera* m_camera;
-  QRect m_imageRect;
-
   int m_countDownTime;
-
   bool m_showOnionSkin;
   int m_onionOpacity;
   bool m_upsideDown;
 
+  QRect m_subCameraRect;
+  QRect m_preSubCameraRect;
+  QPoint m_dragStartPos;
+
+  QRect m_targetRect;
+  QTransform m_S2V_Transform;  // surface to video transform
+  enum SUBHANDLE {
+    HandleNone,
+    HandleFrame,
+    HandleTopLeft,
+    HandleTopRight,
+    HandleBottomLeft,
+    HandleBottomRight,
+    HandleLeft,
+    HandleTop,
+    HandleRight,
+    HandleBottom
+  } m_activeSubHandle = HandleNone;
+  void drawSubCamera(QPainter&);
+
 public:
-  MyViewFinder(QWidget* parent = 0);
+  MyVideoWidget(QWidget* parent = 0);
+
   void setImage(const QImage& image) {
     m_image = image;
     update();
   }
-  void setCamera(QCamera* camera) { m_camera = camera; }
+
   void setShowOnionSkin(bool on) { m_showOnionSkin = on; }
   void setOnionOpacity(int value) { m_onionOpacity = value; }
-  void setPreviousImage(QImage& prevImage) { m_previousImage = prevImage; }
+  void setPreviousImage(QImage prevImage) { m_previousImage = prevImage; }
 
   void showCountDownTime(int time) {
     m_countDownTime = time;
     repaint();
   }
 
-  void updateSize();
+  void setSubCameraSize(QSize size);
+  QRect subCameraRect() { return m_subCameraRect; }
+
+  void computeTransform(QSize imgSize);
 
 protected:
-  void paintEvent(QPaintEvent* event);
-  void resizeEvent(QResizeEvent* event);
+  void paintEvent(QPaintEvent* event) override;
+  void resizeEvent(QResizeEvent* event) override;
+
+  void mouseMoveEvent(QMouseEvent* event) override;
+  void mousePressEvent(QMouseEvent* event) override;
+  void mouseReleaseEvent(QMouseEvent* event) override;
+
 protected slots:
   void onUpsideDownChecked(bool on) { m_upsideDown = on; }
+
+signals:
+  void startCamera();
+  void stopCamera();
+  void subCameraResized(bool isDragging);
 };
 
 //=============================================================================
@@ -84,26 +119,33 @@ protected slots:
 // "Show ABC Appendix to the Frame Number in Xsheet Cell" is active.
 //-----------------------------------------------------------------------------
 
-class FrameNumberLineEdit : public DVGui::LineEdit {
+class FrameNumberLineEdit : public DVGui::LineEdit,
+                            public TProjectManager::Listener {
   Q_OBJECT
   /* having two validators and switch them according to the preferences*/
-  QIntValidator* m_intValidator;
-  QRegExpValidator* m_regexpValidator;
+  QRegExpValidator *m_regexpValidator, *m_regexpValidator_alt;
 
   void updateValidator();
+  QString m_textOnFocusIn;
 
 public:
-  FrameNumberLineEdit(QWidget* parent = 0, int value = 1);
+  FrameNumberLineEdit(QWidget* parent = 0, TFrameId fId = TFrameId(1),
+                      bool acceptLetter = true);
   ~FrameNumberLineEdit() {}
 
   /*! Set text in field to \b value. */
-  void setValue(int value);
+  void setValue(TFrameId fId);
   /*! Return an integer with text field value. */
-  int getValue();
+  TFrameId getValue();
+
+  // TProjectManager::Listener
+  void onProjectSwitched() override;
+  void onProjectChanged() override;
 
 protected:
   /*! If focus is lost and current text value is out of range emit signal
   \b editingFinished.*/
+  void focusInEvent(QFocusEvent*) override;
   void focusOutEvent(QFocusEvent*) override;
   void showEvent(QShowEvent* event) override { updateValidator(); }
 };
@@ -180,10 +222,15 @@ protected slots:
 class PencilTestPopup : public DVGui::Dialog {
   Q_OBJECT
 
+  QTimer* m_timer;
+  cv::VideoCapture m_cvWebcam;
+  QSize m_resolution;
+
+  //--------
+
   QCamera* m_currentCamera;
   QString m_deviceName;
-  MyViewFinder* m_cameraViewfinder;
-  QCameraImageCapture* m_cameraImageCapture;
+  MyVideoWidget* m_videoWidget;
 
   QComboBox *m_cameraListCombo, *m_resolutionCombo, *m_fileTypeCombo,
       *m_colorTypeCombo;
@@ -197,7 +244,7 @@ class PencilTestPopup : public DVGui::Dialog {
 
   QTimer *m_captureTimer, *m_countdownTimer;
 
-  QImage m_whiteBGImg;
+  cv::Mat m_whiteBGImg;
 
   // used only for Windows
   QPushButton* m_captureFilterSettingsBtn;
@@ -210,42 +257,51 @@ class PencilTestPopup : public DVGui::Dialog {
 
   QToolButton* m_previousLevelButton;
 
-#ifdef MACOSX
-  QCameraViewfinder* m_dummyViewFinder;
-#endif
+  QPushButton* m_subcameraButton;
+  DVGui::IntLineEdit *m_subWidthFld, *m_subHeightFld;
+  QSize m_allowedCameraSize;
 
-  int m_timerId;
-  QString m_cacheImagePath;
   bool m_captureWhiteBGCue;
   bool m_captureCue;
+  bool m_alwaysOverwrite = false;
+  bool m_useMjpg;
+#ifdef _WIN32
+  bool m_useDirectShow;
+#endif
 
-  void processImage(QImage& procImage);
-  bool importImage(QImage& image);
+  void processImage(cv::Mat& procImage);
+  bool importImage(QImage image);
 
   void setToNextNewLevel();
   void updateLevelNameAndFrame(std::wstring levelName);
+
+  void getWebcamImage();
+
+  QMenu* createOptionsMenu();
+
+  int translateIndex(int camIndex);
 
 public:
   PencilTestPopup();
   ~PencilTestPopup();
 
 protected:
-  void timerEvent(QTimerEvent* event);
-  void showEvent(QShowEvent* event);
-  void hideEvent(QHideEvent* event);
+  void showEvent(QShowEvent* event) override;
+  void hideEvent(QHideEvent* event) override;
+  void keyPressEvent(QKeyEvent* event) override;
 
-  void keyPressEvent(QKeyEvent* event);
+  bool event(QEvent* e) override;
 
 protected slots:
   void refreshCameraList();
   void onCameraListComboActivated(int index);
-  void onResolutionComboActivated(const QString&);
+  void onResolutionComboActivated();
   void onFileFormatOptionButtonPressed();
   void onLevelNameEdited();
   void onNextName();
   void onPreviousName();
   void onColorTypeComboChanged(int index);
-  void onImageCaptured(int, const QImage&);
+  void onFrameCaptured(cv::Mat& image);
   void onCaptureWhiteBGButtonPressed();
   void onOnionCBToggled(bool);
   void onLoadImageButtonPressed();
@@ -262,6 +318,11 @@ protected slots:
   void onSaveInPathEdited();
   void onSceneSwitched();
 
+  void onSubCameraToggled(bool);
+  void onSubCameraResized(bool isDragging);
+  void onSubCameraSizeEdited();
+
+  void onTimeout();
 public slots:
   void openSaveInFolderPopup();
 };

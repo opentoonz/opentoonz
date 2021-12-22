@@ -1,0 +1,107 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[a4paper, total={180mm, 272mm}]{geometry}
+
+\usepackage{fontspec}
+\setmainfont[Path=fonts/, Extension=.ttf]{ipaexm}
+
+\setlength\parindent{3.5em}
+\setlength\parskip{0em}
+\renewcommand{\baselinestretch}{1.247}
+
+\begin{document}
+
+\thispagestyle{empty}
+
+\Large
+\noindent \\
+Motion Blur Ino\medskip
+\par
+\normalsize
+Produces a linear motion blur effect by using translation values.\par
+It is also possible to specify an afterimage shake effect in the options.\\
+\par
+When \textquotedbl Alpha Rendering\textquotedbl \ is ON, Alpha channel will be processed first,\par
+then it will process all RGB pixels where the Alpha channel is not zero.\\
+\par
+When \textquotedbl Alpha Rendering\textquotedbl \ is OFF, Alpha channel will not be taken into account,\par
+so the RGB image changes will not be masked, causing defined edges.\\
+\\
+-{-}- \ Inputs \ -{-}-\\
+Source\par
+Connect the image to be processed.\\
+\\
+-{-}- \ Settings \ -{-}-\\
+Depend Move\par
+\noindent \ \ \, P1 -> P2\par
+Use the X1,Y1,X2,Y2 parameters to specify movement in a fixed direction and\par 
+magnitude.\\
+\par
+\noindent \ \ \, Motion\par
+It will take into account the object movements along the X and Y channels,\par 
+on a frame-by-frame basis.\par
+The X1,Y1,X2,Y2 parameters values will be ignored.\\
+\\
+X1\\
+Y1\\
+X2\\
+Y2\par
+Specifies the start and end coordinate values for the motion blur.\par
+The origin of the used coordinate system is at the lower left corner.\par
+The unit is millimeters.\par
+By specifying values with decimal places, it will be possible to define subtle changes\par 
+in the length.\par
+If the distance between the starting and ending points is less than 1/16 of a pixel,\par 
+it will have no effect.\par
+The default values are\par
+\noindent \hskip 7em X1 Y1 -> 0.0 0.0\par
+\noindent \hskip 7em X2 Y2 -> 1.0 1.0\par
+
+\newpage
+
+\thispagestyle{empty}
+
+\ \vspace{-0.2em}
+\par
+\noindent Scale\par
+Adjusts the scale for the length of the motion blur effect.\par
+For example,\par
+\noindent \hskip 7em X1 Y1 -> 0.0 0.0\par
+\noindent \hskip 7em X2 Y2 -> 1.0 -1.0\par
+\noindent \hskip 7em Scale -> 100\par
+Would be equivalent to,\par
+\noindent \hskip 7em X1 Y1 -> 0.0 0.0\par
+\noindent \hskip 7em X2 Y2 -> 100.0 -100.0\par
+and will have the same effect.\par
+When Scale is 0, blur will not be applied.\par
+The default value is 1, which will apply no scaling.\\
+\\
+Curve\par
+Allows to adjust the blur strenght.\par
+With a value between 1.0 and 10.0, blur will become stronger.\par
+With a value between 0.1 and 1.0, blur will become lighter.\par
+The default value is 1, which will produce an linear attenuation.\\
+\\
+Afterimage Length\par
+Specify the lenght of the afterimage effect.\par
+The unit is millimeters.\par
+Specify a value greater than or equal to 0.\par
+For example, to create an afterimage for a line with a width of 3,\par
+specify a value greater than or equal to 3.\par
+The default value is 0, which produces no afterimage.\\
+\\
+Afterimage Power\par
+Determines the strength of the afterimage.\par
+At 0, no afterimage effect will be applied.\par
+The larger the value, the less blur and stronger afterimage effect will be applied.\par
+The default value of 1 is the strongest possible one. Where there will be no\par 
+motion blur, but only the afterimage effect applied.\\
+\\
+Alpha Rendering\par
+This option is valid only when there is an Alpha channel.\par
+When inactive, it masks the changes in the RGB values using the original Alpha\par 
+of the image.\par
+When active, the effect will be able to modify the Alpha channel, extending it\par 
+as necessary to reproduce the full span of the effect.\par
+The default setting is active.
+
+\end{document}

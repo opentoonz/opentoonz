@@ -121,7 +121,9 @@ ShadingContext::ShadingContext(QOffscreenSurface *surface) : m_imp(new Imp) {
   // m_imp->m_pixelBuffer->context()->create();
   // m_imp->m_fbo(new QOpenGLFramebufferObject(1, 1));
   makeCurrent();
-  glewExperimental = GL_TRUE;
+   if( GLEW_VERSION_3_2 ) {
+       glewExperimental = GL_TRUE;
+   }
   glewInit();
   doneCurrent();
 }

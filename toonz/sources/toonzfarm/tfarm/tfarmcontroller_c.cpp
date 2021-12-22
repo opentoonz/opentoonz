@@ -28,9 +28,10 @@ public:
   void activateTask(const QString &id) override;
   void restartTask(const QString &id) override;
 
-  void getTasks(vector<QString> &tasks) override;
-  void getTasks(const QString &parentId, vector<QString> &tasks) override;
-  void getTasks(const QString &parentId, vector<TaskShortInfo> &tasks) override;
+  void getTasks(std::vector<QString> &tasks) override;
+  void getTasks(const QString &parentId, std::vector<QString> &tasks) override;
+  void getTasks(const QString &parentId,
+                std::vector<TaskShortInfo> &tasks) override;
 
   void queryTaskInfo(const QString &id, TFarmTask &task) override;
 
@@ -51,7 +52,7 @@ public:
   void taskCompleted(const QString &taskId, int exitCode) override;
 
   // fills the servers vector with the names of the servers
-  void getServers(vector<ServerIdentity> &servers) override;
+  void getServers(std::vector<ServerIdentity> &servers) override;
 
   // returns the state of the server whose id has been specified
   ServerState queryServerState2(const QString &id) override;
@@ -166,30 +167,12 @@ void Controller::restartTask(const QString &id) {
 
 //------------------------------------------------------------------------------
 
-void Controller::getTasks(vector<QString> &tasks) {
+void Controller::getTasks(std::vector<QString> &tasks) {
   QString data("getTasks@vector");
   QString reply = sendToStub(data);
 
   // la stringa restituita contiene le informazioni desiderate separate da ","
-  vector<QString> argv;
-  extractArgs(reply, argv);
-
-  tasks.clear();
-  std::vector<QString>::iterator it = argv.begin();
-  for (; it != argv.end(); ++it) tasks.push_back(*it);
-}
-
-//------------------------------------------------------------------------------
-
-void Controller::getTasks(const QString &parentId, vector<QString> &tasks) {
-  QString data("getTasks@string@vector");
-  data += ",";
-  data += parentId;
-
-  QString reply = sendToStub(data);
-
-  // la stringa restituita contiene le informazioni deiderate separate da ","
-  vector<QString> argv;
+  std::vector<QString> argv;
   extractArgs(reply, argv);
 
   tasks.clear();
@@ -200,7 +183,26 @@ void Controller::getTasks(const QString &parentId, vector<QString> &tasks) {
 //------------------------------------------------------------------------------
 
 void Controller::getTasks(const QString &parentId,
-                          vector<TaskShortInfo> &tasks) {
+                          std::vector<QString> &tasks) {
+  QString data("getTasks@string@vector");
+  data += ",";
+  data += parentId;
+
+  QString reply = sendToStub(data);
+
+  // la stringa restituita contiene le informazioni deiderate separate da ","
+  std::vector<QString> argv;
+  extractArgs(reply, argv);
+
+  tasks.clear();
+  std::vector<QString>::iterator it = argv.begin();
+  for (; it != argv.end(); ++it) tasks.push_back(*it);
+}
+
+//------------------------------------------------------------------------------
+
+void Controller::getTasks(const QString &parentId,
+                          std::vector<TaskShortInfo> &tasks) {
   QString data("getTasks@string@vector$TaskShortInfo");
   data += ",";
   data += parentId;
@@ -208,7 +210,7 @@ void Controller::getTasks(const QString &parentId,
   QString reply = sendToStub(data);
 
   // la stringa restituita contiene le informazioni desiderate separate da ","
-  vector<QString> argv;
+  std::vector<QString> argv;
   extractArgs(reply, argv);
 
   tasks.clear();
@@ -233,7 +235,7 @@ void Controller::queryTaskInfo(const QString &id, TFarmTask &task) {
   QString reply = sendToStub(data);
 
   // la stringa restituita contiene le informazioni desiderate separate da ","
-  vector<QString> argv;
+  std::vector<QString> argv;
   int count = extractArgs(reply, argv);
 
   if (reply == "") return;
@@ -283,7 +285,7 @@ void Controller::queryTaskShortInfo(const QString &id, QString &parentId,
   QString reply = sendToStub(data);
 
   // la stringa restituita contiene le informazioni desiderate separate da ","
-  vector<QString> argv;
+  std::vector<QString> argv;
   extractArgs(reply, argv);
 
   assert(argv.size() == 3);
@@ -368,12 +370,12 @@ void Controller::taskCompleted(const QString &taskId, int exitCode) {
 
 //------------------------------------------------------------------------------
 
-void Controller::getServers(vector<ServerIdentity> &servers) {
+void Controller::getServers(std::vector<ServerIdentity> &servers) {
   QString data("getServers");
   QString reply = sendToStub(data);
 
   // la stringa restituita contiene le informazioni desiderate separate da ","
-  vector<QString> argv;
+  std::vector<QString> argv;
   extractArgs(reply, argv);
 
   servers.clear();
@@ -405,7 +407,7 @@ void Controller::queryServerInfo(const QString &id, ServerInfo &info) {
   QString reply = sendToStub(data);
   if (reply != "") {
     // la stringa restituita contiene le informazioni desiderate separate da ","
-    vector<QString> argv;
+    std::vector<QString> argv;
     extractArgs(reply, argv);
 
     info.m_name       = argv[0];

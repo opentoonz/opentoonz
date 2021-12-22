@@ -34,7 +34,6 @@ set(HEADERS ${MOC_HEADERS}
     ../include/tdebugmessage.h
     ../include/texception.h
     ../include/texpression.h
-    ../include/tidentifiable.h
     ../include/tmathutil.h
     ../include/tnztypes.h
     ../include/tproperty.h
@@ -85,7 +84,6 @@ set(HEADERS ${MOC_HEADERS}
     ../include/tcodec.h
     ../include/trasterimage.h
     ../include/tcolorstyles.h
-    ../include/tflash.h
     ../include/tfont.h
     ../include/tinbetween.h
     ../include/tofflinegl.h
@@ -129,7 +127,6 @@ set(SOURCES
     ../common/tcore/tdebugmessage.cpp
     ../common/tcore/texception.cpp
     ../common/tcore/threadmessage.cpp
-    ../common/tcore/tidentifiable.cpp
     ../common/tcore/tmathutil.cpp
     ../common/tproperty.cpp
     ../common/tcore/trandom.cpp
@@ -181,7 +178,6 @@ set(SOURCES
     ../common/trasterimage/trasterimage.cpp
     ../common/tvrender/tcolorstyles.cpp
     ../common/tvrender/tellipticbrush.cpp
-    ../common/tvrender/tflash.cpp
     ../common/tvrender/qtofflinegl.cpp
     ../common/tvrender/tglcurves.cpp
     ../common/tvrender/tglregions.cpp
@@ -262,14 +258,16 @@ elseif(BUILD_TARGET_UNIX)
     )
 endif()
 
-add_translation(tnzcore ${HEADERS} ${SOURCES})
+if(WITH_TRANSLATION)
+    add_translation(tnzcore ${HEADERS} ${SOURCES})
+endif()
 
 qt5_wrap_cpp(SOURCES ${MOC_HEADERS})
 
 add_library(tnzcore SHARED ${HEADERS} ${SOURCES})
 
 if(BUILD_ENV_APPLE)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-install_name,@rpath/libtnzcore.dylib")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-install_name,@executable_path/libtnzcore.dylib")
 endif()
 
 add_definitions(
@@ -289,6 +287,13 @@ add_definitions(
     -DTROP_EXPORTS
     -DTSTREAM_EXPORTS
 )
+
+if(BUILD_TARGET_WIN)
+    add_definitions(
+        -DUNICODE
+        -D_UNICODE
+    )
+endif()
 
 message("subdir: tnzcore")
 #message("Sources:" ${SOURCES})
@@ -349,7 +354,7 @@ elseif(BUILD_ENV_UNIXLIKE)
 endif()
 
 target_link_libraries(tnzcore
-    Qt5::OpenGL Qt5::Network Qt5::Multimedia
+    Qt5::Core Qt5::OpenGL Qt5::Network Qt5::Multimedia
     ${GL_LIB} ${GLUT_LIB} ${QT_LIB} ${Z_LIB} ${JPEG_LIB} ${LZ4_LIB}
     ${EXTRA_LIBS}
 )

@@ -9,7 +9,7 @@ namespace {
 //---------------------------------------------------------
 
 bool parseDouble(double &value, char *&s) {
-  if (!(*s == '-' || *s == '.' || '0' <= *s && *s <= '9')) return false;
+  if (!(*s == '-' || *s == '.' || ('0' <= *s && *s <= '9'))) return false;
   char *t = s;
   if (*s == '-') s++;
   while ('0' <= *s && *s <= '9') s++;

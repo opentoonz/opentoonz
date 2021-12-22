@@ -1,0 +1,12 @@
+<fxlayout>
+  <page name="Spin Gradient Iwa">
+    <control>center</control>
+    <control>curveType</control>
+   <separator label="Start"/>
+    <control>startAngle</control>
+    <control>startColor</control>
+   <separator label="End"/>
+    <control>endAngle</control>
+    <control>endColor</control>
+  </page>
+</fxlayout>

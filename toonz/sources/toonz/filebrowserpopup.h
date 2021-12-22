@@ -25,12 +25,14 @@ class FileBrowser;
 class TDoubleParam;
 class TCamera;
 class TPropertyGroup;
+class LevelOptions;
 class QShowEvent;
 class QFrame;
 class QPushButton;
 class QComboBox;
 class QGroupBox;
 class QCheckBox;
+class FrameNumberLineEdit;
 
 namespace DVGui {
 class ColorField;
@@ -52,8 +54,12 @@ public:
                           //! construction, surrendering it
     //!  to the user. Observe that sub-widgets creation is still enforced.
     MULTISELECTION = 0x2,  //!< Enable multiple selection in the browser widget.
-    WITH_APPLY_BUTTON = 0x4  //!< Enable if the filebrowser has an apply button
-                             //! next to the OK button
+    WITH_APPLY_BUTTON = 0x4,  //!< Enable if the filebrowser has an apply button
+                              //! next to the OK button
+    FOR_SAVING = 0x8  //!< The popup is for saving. When file selection is
+                      //! released, previously-clicked file name remains so
+                      //! that users can reuse it for inputting the file name.
+                      //! see FileBrowserPopup::onFilePathsSelected
   };
 
 public:
@@ -84,7 +90,7 @@ protected:
   std::set<TFilePath> m_selectedPaths;  //!< Paths in the active selection.
   TFilePath m_currentProjectPath;       //!< Path of current project.
   //!  \deprecated  Should not be cached...
-  // keep TFrameId list in order to speed up the loading of sequencial files
+  // keep TFrameId list in order to speed up the loading of sequential files
   std::list<std::vector<TFrameId>> m_currentFIdsSet;
   FileBrowser *m_browser;
 
@@ -101,6 +107,7 @@ protected:
   bool m_isDirectoryOnly;
   // bool                  m_checkFrameRange;
   bool m_multiSelectionEnabled;
+  bool m_forSaving;
 
   QSize m_dialogSize;
   QWidget *m_customWidget;
@@ -111,7 +118,7 @@ protected:
     else
       return *m_selectedPaths.begin();
   }
-  std::set<TFilePath> getCurrentPathSet() { return m_selectedPaths; }
+  std::set<TFilePath> &getCurrentPathSet() { return m_selectedPaths; }
 
   std::vector<TFrameId> getCurrentFIds() {
     std::vector<TFrameId> tmp;
@@ -121,7 +128,7 @@ protected:
     else
       return *m_currentFIdsSet.begin();
   }
-  std::list<std::vector<TFrameId>> getCurrentFIdsSet() {
+  std::list<std::vector<TFrameId>> &getCurrentFIdsSet() {
     return m_currentFIdsSet;
   }
 
@@ -144,6 +151,7 @@ protected slots:
   virtual void onFilePathsSelected(
       const std::set<TFilePath> &paths,
       const std::list<std::vector<TFrameId>> &fIds);
+  virtual void onFilePathDoubleClicked(const TFilePath &);
 
   // utility function
 public:
@@ -177,7 +185,7 @@ protected:
 //! asks the user for a \a single file path to save something to.
 class GenericSaveFilePopup : public FileBrowserPopup {
 public:
-  GenericSaveFilePopup(const QString &title);
+  GenericSaveFilePopup(const QString &title, QWidget *customWidget = nullptr);
 
   /*!
 This function shows the popup and blocks until a suitable
@@ -209,6 +217,9 @@ public:
 
 protected:
   void showEvent(QShowEvent *) override;
+
+protected slots:
+  void onFilePathDoubleClicked(const TFilePath &path) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -256,17 +267,21 @@ class LoadLevelPopup final : public FileBrowserPopup {
   Q_OBJECT
 
   QFrame *m_subsequenceFrame;
-  DVGui::LineEdit *m_fromFrame;
-  DVGui::LineEdit *m_toFrame;
+  FrameNumberLineEdit *m_fromFrame, *m_toFrame;
 
+  QWidget *m_arrLvlPropWidget;
   QFrame *m_arrangementFrame;
-  DVGui::LineEdit *m_xFrom;
-  DVGui::LineEdit *m_xTo;
-  QComboBox *m_stepCombo;
-  QComboBox *m_incCombo;
+  FrameNumberLineEdit *m_xFrom, *m_xTo;
+  QComboBox *m_stepCombo, *m_incCombo;
+  DVGui::IntLineEdit *m_posFrom, *m_posTo;
+
+  QFrame *m_levelPropertiesFrame;
   DVGui::LineEdit *m_levelName;
-  DVGui::LineEdit *m_posFrom;
-  DVGui::LineEdit *m_posTo;
+  QWidget *m_dpiWidget;  // hide on pixels only mode
+  QComboBox *m_dpiPolicy;
+  DVGui::DoubleLineEdit *m_dpi;
+  DVGui::IntLineEdit *m_subsampling, *m_antialias;
+  DVGui::CheckBox *m_premultiply, *m_whiteTransp;  // , *m_doAntialias;
 
   QLabel *m_notExistLabel;
   QComboBox *m_loadTlvBehaviorComboBox;
@@ -282,7 +297,7 @@ protected:
   void showEvent(QShowEvent *) override;
   void hideEvent(QHideEvent *) override;
 
-public slots:
+protected slots:
   void onFilePathsSelected(
       const std::set<TFilePath> &paths,
       const std::list<std::vector<TFrameId>> &fIds) override;
@@ -299,12 +314,23 @@ public slots:
   // the selection
   void onSelectionChanged(TSelection *selection);
 
+  void onFilePathDoubleClicked(const TFilePath &path) override;
+
+  void onPreferenceChanged(const QString &);
+
+  void onDpiPolicyActivated();
+  void onDoPremultiplyClicked();
+  void onWhiteTranspClicked();
+
 private:
-  // update the fields acording to the current Path
+  // update the fields according to the current Path
   void updateBottomGUI(void);
   // if some option in the preferences is selected, load the level with removing
   // six letters of the scene name from the level name
   QString getLevelNameWithoutSceneNumber(std::string orgName);
+
+  void setLevelProperties(LevelOptions &options);
+  void getLevelProperties(LevelOptions &options);
 };
 
 //-----------------------------------------------------------------------------
@@ -390,7 +416,7 @@ protected:
 
 //-----------------------------------------------------------------------------
 /*! replace the parent folder path of the levels in the selected cells
-*/
+ */
 
 class ReplaceParentDirectoryPopup final : public FileBrowserPopup {
   Q_OBJECT

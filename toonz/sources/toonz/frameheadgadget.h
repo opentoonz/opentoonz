@@ -42,7 +42,7 @@ public:
 
   void drawPlayingHead(QPainter &p, const QColor &lightColor,
                        const QColor &darkColor);
-  // reimpremented in FilmstripFrameHeadGadget
+  // reimplemented in FilmstripFrameHeadGadget
   virtual void drawOnionSkinSelection(QPainter &p, const QColor &lightColor,
                                       const QColor &darkColor);
 
@@ -61,7 +61,7 @@ public:
   void setFos(int frame, bool on);
   void setMos(int frame, bool on);
 
-  // reimpremented in FilmstripFrameHeadGadget
+  // reimplemented in FilmstripFrameHeadGadget
   bool eventFilter(QObject *obj, QEvent *event) override;
 };
 
@@ -70,8 +70,9 @@ public:
 };
 
 class FilmstripFrameHeadGadget final : public FrameHeadGadget {
+  Q_OBJECT
   FilmstripFrames *m_filmstrip;
-  int m_dy;
+  int m_dy, m_dx;
   int m_highlightedghostFrame;
 
 public:
@@ -80,6 +81,10 @@ public:
   int getY() const override;
   int index2y(int index) const override;
   int y2index(int y) const override;
+
+  int getX() const;
+  int index2x(int index) const;
+  int x2index(int y) const;
 
   void drawOnionSkinSelection(QPainter &p, const QColor &lightColor,
                               const QColor &darkColor) override;

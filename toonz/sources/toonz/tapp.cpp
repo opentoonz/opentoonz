@@ -44,6 +44,7 @@
 #include "toonz/txshleveltypes.h"
 #include "toonz/tcamera.h"
 #include "toonz/preferences.h"
+#include "toonz/txshsoundcolumn.h"
 
 // TnzCore includes
 #include "tbigmemorymanager.h"
@@ -267,8 +268,9 @@ int TApp::getCurrentLevelStyleIndex() const {
 
 //-----------------------------------------------------------------------------
 
-void TApp::setCurrentLevelStyleIndex(int index) {
-  m_paletteController->getCurrentLevelPalette()->setStyleIndex(index);
+void TApp::setCurrentLevelStyleIndex(int index, bool forceUpdate) {
+  m_paletteController->getCurrentLevelPalette()->setStyleIndex(index,
+                                                               forceUpdate);
 }
 
 //-----------------------------------------------------------------------------
@@ -283,11 +285,7 @@ int TApp::getCurrentImageType() {
   if (getCurrentFrame()->isEditingScene()) {
     int row = getCurrentFrame()->getFrame();
     int col = getCurrentColumn()->getColumnIndex();
-    if (col < 0)
-#ifdef LINETEST
-      return TImage::RASTER;
-#else
-    {
+    if (col < 0) {
       int levelType = Preferences::instance()->getDefLevelType();
       return (levelType == PLI_XSHLEVEL)
                  ? TImage::VECTOR
@@ -296,9 +294,10 @@ int TApp::getCurrentImageType() {
                      ? TImage::TOONZ_RASTER
                      : TImage::RASTER;  // and OVL_XSHLEVEL level types
     }
-#endif
 
-    TXsheet *xsh  = getCurrentXsheet()->getXsheet();
+    TXsheet *xsh = getCurrentXsheet()->getXsheet();
+    if (xsh->getColumn(col) && xsh->getColumn(col)->getSoundColumn())
+      return TImage::VECTOR;
     TXshCell cell = xsh->getCell(row, col);
     if (cell.isEmpty()) {
       int r0, r1;
@@ -308,15 +307,11 @@ int TApp::getCurrentImageType() {
         cell = xsh->getCell(r0, col);
       } else /*-- Columnが空の場合 --*/
       {
-#ifdef LINETEST
-        return TImage::RASTER;
-#else
         int levelType = Preferences::instance()->getDefLevelType();
         return (levelType == PLI_XSHLEVEL)
                    ? TImage::VECTOR
                    : (levelType == TZP_XSHLEVEL) ? TImage::TOONZ_RASTER
                                                  : TImage::RASTER;
-#endif
       }
     }
 
@@ -350,7 +345,17 @@ void TApp::updateXshLevel() {
     int column      = m_currentColumn->getColumnIndex();
     TXsheet *xsheet = m_currentXsheet->getXsheet();
 
-    if (xsheet && column >= 0 && frame >= 0 && !xsheet->isColumnEmpty(column)) {
+    // sound column case
+    if (xsheet->getColumn(column) &&
+        xsheet->getColumn(column)->getSoundColumn()) {
+      if (xsheet->getColumn(column)->getSoundColumn()->m_levels.size() > 0) {
+        xl = static_cast<TXshLevel *>(xsheet->getColumn(column)
+                                          ->getSoundColumn()
+                                          ->m_levels.at(0)
+                                          ->getSoundLevel());
+      }
+    } else if (xsheet && column >= 0 && frame >= 0 &&
+               !xsheet->isColumnEmpty(column)) {
       TXshCell cell = xsheet->getCell(frame, column);
       xl            = cell.m_level.getPointer();
 
@@ -458,7 +463,7 @@ void TApp::onXsheetSwitched() {
   // update xsheetlevel
   updateXshLevel();
 
-  // no Fx is setted to current.
+  // no Fx is set to current.
   m_currentFx->setFx(0);
 }
 
@@ -508,6 +513,11 @@ void TApp::onColumnIndexSwitched() {
   int columnIndex = m_currentColumn->getColumnIndex();
   if (columnIndex >= 0)
     m_currentObject->setObjectId(TStageObjectId::ColumnId(columnIndex));
+  else {
+    TXsheet *xsh = getCurrentXsheet()->getXsheet();
+    m_currentObject->setObjectId(
+        TStageObjectId::CameraId(xsh->getCameraColumnIndex()));
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -596,6 +606,10 @@ void TApp::onPaletteChanged() { m_currentScene->setDirtyFlag(true); }
 //-----------------------------------------------------------------------------
 
 void TApp::onLevelColorStyleSwitched() {
+  TXshLevel *sl = m_currentLevel->getLevel();
+  if (!sl || (sl->getType() != TZP_XSHLEVEL && sl->getType() != PLI_XSHLEVEL))
+    return;
+
   TPaletteHandle *ph = m_paletteController->getCurrentLevelPalette();
   assert(ph);
 
@@ -613,14 +627,12 @@ void TApp::onLevelColorStyleSwitched() {
 
       IconGenerator::instance()->setSettings(s);
 
-      TXshLevel *sl = m_currentLevel->getLevel();
-      if (!sl) return;
-
-      std::vector<TFrameId> fids;
-      sl->getFids(fids);
-
-      for (int i = 0; i < (int)fids.size(); i++)
-        IconGenerator::instance()->invalidate(sl, fids[i]);
+      if (sl->getType() == PLI_XSHLEVEL) {
+        std::vector<TFrameId> fids;
+        sl->getFids(fids);
+        for (int i = 0; i < (int)fids.size(); i++)
+          IconGenerator::instance()->invalidate(sl, fids[i]);
+      }
 
       m_currentLevel->notifyLevelViewChange();
     }
@@ -634,10 +646,23 @@ void TApp::onLevelColorStyleSwitched() {
 
 static void notifyPaletteChanged(TXshSimpleLevel *simpleLevel) {
   simpleLevel->onPaletteChanged();
+  // palette change can update icons only for ToonzVector / ToonzRaster types
+  if (simpleLevel->getType() != TZP_XSHLEVEL &&
+      simpleLevel->getType() != PLI_XSHLEVEL)
+    return;
   std::vector<TFrameId> fids;
   simpleLevel->getFids(fids);
-  for (int i = 0; i < (int)fids.size(); i++)
-    IconGenerator::instance()->invalidate(simpleLevel, fids[i]);
+  // ToonzRaster level does not need to re-generate icons along with palette
+  // changes since the icons are cached as color mapped images and the current
+  // palette is applied just before using it. So here we just emit the signal to
+  // update related panels.
+  if (simpleLevel->getType() == TZP_XSHLEVEL)
+    IconGenerator::instance()->notifyIconGenerated();
+  else {  // ToonzVecor needs to re-generate icons since it includes colors in
+          // the cache.
+    for (int i = 0; i < (int)fids.size(); i++)
+      IconGenerator::instance()->invalidate(simpleLevel, fids[i]);
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -681,9 +706,9 @@ void TApp::autosave() {
   pb.show();
   Preferences *pref = Preferences::instance();
   if (pref->isAutosaveSceneEnabled() && pref->isAutosaveOtherFilesEnabled()) {
-    IoCmd::saveAll();
+    IoCmd::saveAll(IoCmd::AUTO_SAVE);
   } else if (pref->isAutosaveSceneEnabled()) {
-    IoCmd::saveScene();
+    IoCmd::saveScene(IoCmd::AUTO_SAVE);
   } else if (pref->isAutosaveOtherFilesEnabled()) {
     IoCmd::saveNonSceneFiles();
   }

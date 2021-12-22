@@ -130,6 +130,10 @@ class NoteArea final : public QFrame {
 
   LayerHeaderPanel *m_layerHeaderPanel;
 
+  QPushButton *m_hamburgerButton;
+  QWidget *m_popup;
+  QLayout *m_currentLayout;
+
 public:
 #if QT_VERSION >= 0x050500
   NoteArea(XsheetViewer *parent = 0, Qt::WindowFlags flags = 0);
@@ -149,11 +153,13 @@ protected slots:
   void onFrameDisplayStyleChanged(int id);
   void onXsheetOrientationChanged(const Orientation *orientation);
 
+  void onClickHamburger();
+
 protected:
   void removeLayout();
   void createLayout();
 };
 
-}  // namespace XsheetGUI;
+}  // namespace XsheetGUI
 
 #endif  // XSHNOTEVIEWER_H

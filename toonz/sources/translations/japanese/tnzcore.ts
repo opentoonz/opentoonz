@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="ja_JP">
+<TS version="2.1" language="ja_JP" sourcelanguage="en">
 <context>
     <name>BmpWriterProperties</name>
     <message>
@@ -43,7 +43,7 @@
     </message>
     <message>
         <source>Malformed frame name</source>
-        <translation>フレーム番号が不正な形式です</translation>
+        <translation type="vanished">フレーム番号が不正な形式です</translation>
     </message>
 </context>
 <context>

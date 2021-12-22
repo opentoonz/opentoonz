@@ -1,6 +1,6 @@
 
 
-#if (!(defined(x64) || defined(__LP64__) || defined(LINUX)))
+#if (!(defined(x64) || defined(__LP64__) || defined(LINUX) || defined(FREEBSD)))
 
 // Toonz includes
 #include "tiio_std.h"

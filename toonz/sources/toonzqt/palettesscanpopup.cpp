@@ -49,14 +49,14 @@ PalettesScanPopup::PalettesScanPopup()
 
 //-----------------------------------------------------------------------------
 /*! Set current folder path to \b path.
-*/
+ */
 void PalettesScanPopup::setCurrentFolder(TFilePath path) {
   m_folderPath = path;
 }
 
 //-----------------------------------------------------------------------------
 /*! Return current folder path.
-*/
+ */
 TFilePath PalettesScanPopup::getCurrentFolder() { return m_folderPath; }
 
 //-----------------------------------------------------------------------------
@@ -84,7 +84,7 @@ void PalettesScanPopup::onOkBtnClicked() {
 
 //-----------------------------------------------------------------------------
 /*! Set label text to path \b fp.
-*/
+ */
 void PalettesScanPopup::setLabel(const TFilePath &fp) {
   QString elideStr =
       elideText(toQString(fp), m_label->font(), m_label->width());
@@ -107,7 +107,7 @@ void PalettesScanPopup::timerEvent(QTimerEvent *event) {
 
 //-----------------------------------------------------------------------------
 /*! Push TFilePath \b fp to the top of directories stack. Set label text to fp.
-*/
+ */
 void PalettesScanPopup::push(const TFilePath &fp) {
   setLabel(fp);
   Directory *dir = new Directory();
@@ -132,7 +132,7 @@ void PalettesScanPopup::push(const TFilePathSet &fs) {
 
 //-----------------------------------------------------------------------------
 /*! Removes the top item from the stack. If stack is empty return immediately.
-*/
+ */
 void PalettesScanPopup::pop() {
   if (m_stack.empty()) return;
   Directory *dir = m_stack.back();
@@ -146,7 +146,7 @@ void PalettesScanPopup::pop() {
 }
 
 //-----------------------------------------------------------------------------
-/*! Return true if direcories stack is not empty; otherwise return false.
+/*! Return true if directories stack is not empty; otherwise return false.
 \n	If stack is not empty check current directory:
 \li	if all files are checked recall \b pop();
 \li	if its path is a directory recall \b push(const TFilePath &fp);
@@ -173,7 +173,7 @@ bool PalettesScanPopup::step() {
 
 //-----------------------------------------------------------------------------
 /*! Resets the content of the directories stack and set label text empty.
-*/
+ */
 void PalettesScanPopup::clearStack() {
   for (int i = 0; i < (int)m_stack.size(); i++) delete m_stack[i];
   m_stack.clear();
@@ -182,10 +182,17 @@ void PalettesScanPopup::clearStack() {
 
 //-----------------------------------------------------------------------------
 /*! Import palette, defined in path \b fp, in current \b StudioPalette folder.
-*/
+ */
 void PalettesScanPopup::onPlt(const TFilePath &fp) {
   TFilePath root(m_field->getPath().toStdString());
   assert(root.isAncestorOf(fp));
   TFilePath q = fp.getParentDir() - root;
-  StudioPalette::instance()->importPalette(m_folderPath + q, fp);
+  try {
+    StudioPalette::instance()->importPalette(m_folderPath + q, fp);
+  } catch (TSystemException &se) {
+    DVGui::warning(QString::fromStdWString(se.getMessage()));
+  } catch (...) {
+    DVGui::warning(QString::fromStdWString(fp.getWideString() + L"\n") +
+                   tr("Failed to import palette."));
+  }
 }

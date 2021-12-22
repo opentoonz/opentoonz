@@ -112,7 +112,7 @@ inline std::string TPersist::getStreamTag() const {
 
 //-------------------------------------------------------------------
 /*!
-                This template class is used to create an istance of the class \a
+                This template class is used to create an instance of the class \a
    T.
         */
 template <class T>

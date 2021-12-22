@@ -12,14 +12,14 @@
 #ifdef _WIN32
 #include <cstdlib>
 #include <GL/glut.h>
-#elif defined(LINUX)
+#elif defined(LINUX) || defined(FREEBSD)
 #include <GL/glut.h>
 #else
 #include <GLUT/glut.h>
 #endif
 #endif
 
-#if defined(MACOSX) || defined(LINUX)
+#if defined(MACOSX) || defined(LINUX) || defined(FREEBSD)
 #include <QGLContext>
 #endif
 
@@ -66,7 +66,7 @@ double tglGetPixelSize2() {
   glMatrixMode(GL_MODELVIEW);
   glGetDoublev(GL_MODELVIEW_MATRIX, mat);
 
-  double det                      = fabs(mat[0] * mat[5] - mat[1] * mat[4]);
+  double det = fabs(mat[0] * mat[5] - mat[1] * mat[4]);
   if (det < TConsts::epsilon) det = TConsts::epsilon;
   return 1.0 / det;
 }
@@ -431,7 +431,7 @@ void tglDraw(const TRectD &rect, const std::vector<TRaster32P> &textures,
   unsigned int level = 1;
   while (pixelSize2 * level * level <= 1.0) level <<= 1;
 
-  unsigned int texturesCount       = (int)textures.size();
+  unsigned int texturesCount = (int)textures.size();
   if (level > texturesCount) level = texturesCount;
 
   level = texturesCount - level;
@@ -467,8 +467,8 @@ void tglDraw(const TRectD &rect, const TRaster32P &tex, bool blending) {
     texture = TRaster32P(texWidth, texHeight);
     texture->fill(TPixel32(0, 0, 0, 0));
     texture->copy(tex);
-    lwTex                  = (texLx) / (double)(texWidth);
-    lhTex                  = (texLy) / (double)(texHeight);
+    lwTex = (texLx) / (double)(texWidth);
+    lhTex = (texLy) / (double)(texHeight);
     if (lwTex > 1.0) lwTex = 1.0;
     if (lhTex > 1.0) lhTex = 1.0;
   } else
@@ -587,10 +587,10 @@ void tglBuildMipmaps(std::vector<TRaster32P> &rasters,
     ly >>= 1;
     if (lx < 1) lx = 1;
     if (ly < 1) ly = 1;
-    rasters[i]     = TRaster32P(lx, ly);
-    sx             = (double)lx / (double)ras2Lx;
-    sy             = (double)ly / (double)ras2Ly;
-    rasters[i]     = TRaster32P(lx, ly);
+    rasters[i] = TRaster32P(lx, ly);
+    sx         = (double)lx / (double)ras2Lx;
+    sy         = (double)ly / (double)ras2Ly;
+    rasters[i] = TRaster32P(lx, ly);
 #ifndef SCALE_BY_GLU
     TRop::resample(rasters[i], ras2, TScale(sx, sy), resampleFilter);
 #else
@@ -617,7 +617,7 @@ void tglMakeCurrent(TGlContext context) {
 
 void tglDoneCurrent(TGlContext) { wglMakeCurrent(NULL, NULL); }
 
-#elif defined(LINUX) || defined(__sgi) || defined(MACOSX)
+#elif defined(LINUX) || defined(FREEBSD) || defined(__sgi) || defined(MACOSX)
 
 TGlContext tglGetCurrentContext() {
   return reinterpret_cast<TGlContext>(

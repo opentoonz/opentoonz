@@ -4,7 +4,6 @@
 #include "tiio_bmp.h"
 #include "tiio_std.h"
 #include "tfiletype.h"
-#include "tflash.h"
 
 using namespace Tiio;
 using namespace TFileType;

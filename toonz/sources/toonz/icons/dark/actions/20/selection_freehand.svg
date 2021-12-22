@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="20px" height="20px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;">
+    <g transform="matrix(1,0,0,1,-40,-40)">
+        <g id="selection_freehand" transform="matrix(1,0,0,1,30,0)">
+            <g transform="matrix(1,0,0,1,0,30)">
+                <rect x="10" y="10" width="20" height="20" style="fill-opacity:0;"/>
+            </g>
+            <g transform="matrix(0.882706,0,0,0.826498,10.3129,40.5925)">
+                <path d="M5.5,20.525C5.5,20.525 7.081,20.346 7.5,18.5C7.979,16.389 5.879,15.594 3.5,13.5C3.179,13.217 2.944,12.876 2.778,12.498C1.918,10.529 2.949,7.557 3.527,6.599C4.058,5.719 5.431,3.438 8.684,2.584C11.603,1.818 17.821,1.947 19.19,7.063C20.291,11.174 18.16,13.044 17.444,13.641C15.12,15.575 12.869,15.606 9.589,15.535" style="fill:none;stroke:black;stroke-width:1px;"/>
+            </g>
+            <g transform="matrix(0.882706,0,0,1.12368,11.083,35.0807)">
+                <ellipse cx="5.534" cy="16.339" rx="3.034" ry="1.839" style="fill:none;stroke:black;stroke-width:0.84px;"/>
+            </g>
+        </g>
+    </g>
+</svg>

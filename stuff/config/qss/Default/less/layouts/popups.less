@@ -6,7 +6,7 @@ QDialog {
   background-color: @bg;
   & #dialogButtonFrame {
     background-color: @dialogButtonFrame-bg-color;
-    border-top: 1 solid @dialogButtonFrame-border-color;
+    border-top: 1 solid @accent;
     & QPushButton {
       border-color: @button-dialog-border-color;
       outline: 0;
@@ -41,18 +41,17 @@ QDialog {
    Preferences
 ----------------------------------------------------------------------------- */
 
-#PreferencesPopup {
+#PreferencesPopup, #OutputSettingsPopup {
   & QListWidget {
     background-color: @prefs-tree-bg-color;
     alternate-background-color: @prefs-tree-bg-color;
     border: 1 solid @accent;
-    font-size: 13;
+    font-size: 13px;
     &::item {
       border: 0; // remove indent on hover
       padding: 3;
       &:hover {
         .hl-color-secondary;
-        background-color: @prefs-tree-hl-color;
       }
       &:selected {
         .hl-color;
@@ -78,6 +77,18 @@ QDialog {
   }
 }
 
+#ShortcutViewer {
+  font-size: 17px;
+  & QLineEdit{
+    color:black;
+    border-color: rgb(184, 188, 127);
+    background-color: white;
+    &:focus{
+      background-color: rgb(171, 206, 255);
+    } 
+  }
+}
+
 /* -----------------------------------------------------------------------------
    New Project / Configure Project Window
 ----------------------------------------------------------------------------- */
@@ -92,13 +103,27 @@ ProjectPopup {
    PencilTestPopup / CameraCapture Window
 ----------------------------------------------------------------------------- */
 
-PencilTestPopup {
-}
+//PencilTestPopup {}
 
 #GearButton {
-  qproperty-icon: url('@{img-url}/gear.svg');
+  &::menu-indicator{
+    image: url("");
+  }
+}
+
+#LiveViewButton {
+  qproperty-icon: url('@{img-url}/liveview.svg');
+  &::menu-indicator{
+    image:"";
+  }
 }
 
 #SubfolderButton {
-  qproperty-icon: url('@{img-url}/subfolder.svg');
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#SubcameraButton {
+  padding-left: 5px;
+  padding-right: 5px;
 }

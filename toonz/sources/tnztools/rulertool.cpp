@@ -301,7 +301,7 @@ TPointD RulerTool::getHVCoordinatedPos(TPointD p, TPointD centerPos) {
     outPoint.y = p.y;
   } else if (degree < -22.5) /*--右斜め下--*/
   {
-    if (abs(vec.x) > abs(vec.y))
+    if (std::abs(vec.x) > std::abs(vec.y))
       outPoint = centerPos + TPointD(-vec.y, vec.y);
     else
       outPoint = centerPos + TPointD(vec.x, -vec.x);
@@ -311,7 +311,7 @@ TPointD RulerTool::getHVCoordinatedPos(TPointD p, TPointD centerPos) {
     outPoint.y = centerPos.y;
   } else if (degree < 67.5) /*--右斜め上--*/
   {
-    if (abs(vec.x) > abs(vec.y))
+    if (std::abs(vec.x) > std::abs(vec.y))
       outPoint = centerPos + TPointD(vec.y, vec.y);
     else
       outPoint = centerPos + TPointD(vec.x, vec.x);

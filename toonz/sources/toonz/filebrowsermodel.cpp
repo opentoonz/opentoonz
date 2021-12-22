@@ -15,21 +15,18 @@
 
 #include "tapp.h"
 #include "toonz/tscenehandle.h"
-#include "toonz/toonzscene.h"
 
 #include <QFileInfo>
 #include <QDir>
+#include <QDirIterator>
 
 #ifdef _WIN32
 #include <shlobj.h>
 #include <winnetwk.h>
+#include <wctype.h>
 #endif
 #ifdef MACOSX
 #include <Cocoa/Cocoa.h>
-#endif
-
-#ifdef LINETEST
-#include "tnzcamera.h"
 #endif
 
 namespace {
@@ -50,7 +47,9 @@ TFilePath getMyDocumentsPath() {
   return TFilePath((const char *)[documentsDirectory
       cStringUsingEncoding:NSASCIIStringEncoding]);
 #else
-  return TFilePath();
+  QDir dir = QDir::home();
+  if (!dir.cd("Documents")) return TFilePath();
+  return TFilePath(dir.absolutePath().toStdString());
 #endif
 }
 
@@ -72,10 +71,12 @@ TFilePath getDesktopPath() {
   return TFilePath((const char *)[desktopDirectory
       cStringUsingEncoding:NSASCIIStringEncoding]);
 #else
-  return TFilePath();
+  QDir dir = QDir::home();
+  if (!dir.cd("Desktop")) return TFilePath();
+  return TFilePath(dir.absolutePath().toStdString());
 #endif
 }
-}
+}  // namespace
 
 //=============================================================================
 //
@@ -215,7 +216,7 @@ DvDirModelNode *DvDirModelFileFolderNode::makeChild(std::wstring name) {
 DvDirModelFileFolderNode *DvDirModelFileFolderNode::createNode(
     DvDirModelNode *parent, const TFilePath &path) {
   DvDirModelFileFolderNode *node;
-  // check the project nodes under the Poject Root Node
+  // check the project nodes under the Project Root Node
   if (QString::fromStdWString(parent->getName()).startsWith("Project root") &&
       TProjectManager::instance()->isProject(path))
     node = new DvDirModelProjectNode(parent, path);
@@ -251,13 +252,11 @@ bool DvDirModelFileFolderNode::hasChildren() {
   if (m_childrenValid) return m_hasChildren;
 
   if (m_peeks) {
-    // Using QDir directly rather than
-    // DvDirModelFileFolderNode::refreshChildren() due to
-    // performance issues
-    QDir dir(QString::fromStdWString(m_path.getWideString()));
+    // Using QDirIterator and only checking existence of the first item
+    QDir dir(m_path.getQString());
     dir.setFilter(QDir::AllDirs | QDir::NoDotAndDotDot);
-
-    return (dir.count() > 0);
+    QDirIterator it(dir);
+    return (it.hasNext());
   } else
     return true;  // Not peeking nodes allow users to actively scan for
                   // sub-folders
@@ -315,16 +314,13 @@ void DvDirModelFileFolderNode::getChildrenNames(
   TFileStatus folderPathStatus(m_path);
   if (folderPathStatus.isLink()) return;
 
-  QStringList entries;
-  if (folderPathStatus.isDirectory()) {
-    QDir dir(toQString(m_path));
+  if (!folderPathStatus.isDirectory()) return;
 
-    entries = dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot,
-                            QDir::Name | QDir::LocaleAware);
-  }
+  QStringList dirItems;
+  TSystem::readDirectory_DirItems(dirItems, m_path);
+  for (const QString &name : dirItems) names.push_back(name.toStdWString());
 
-  int e, eCount = entries.size();
-  for (e = 0; e != eCount; ++e) names.push_back(entries[e].toStdWString());
+  QDir dir(toQString(m_path));
 }
 
 //-----------------------------------------------------------------------------
@@ -357,9 +353,9 @@ DvDirModelNode *DvDirModelFileFolderNode::getNodeByPath(const TFilePath &path) {
 
 QPixmap DvDirModelFileFolderNode::getPixmap(bool isOpen) const {
   static QPixmap openFolderPixmap(
-      svgToPixmap(":Resources/browser_folder_open.svg"));
+      svgToPixmap(getIconThemePath("actions/18/folder_on.svg")));
   static QPixmap closeFolderPixmap(
-      svgToPixmap(":Resources/browser_folder_close.svg"));
+      svgToPixmap(getIconThemePath("actions/18/folder.svg")));
   return isOpen ? openFolderPixmap : closeFolderPixmap;
 }
 
@@ -411,7 +407,7 @@ QList<TFilePath> DvDirVersionControlNode::getMissingFiles() const {
   while (i != m_statusMap.constEnd()) {
     SVNStatus s = i.value();
     if (s.m_item == "missing" ||
-        s.m_item == "none" && s.m_repoStatus == "added") {
+        (s.m_item == "none" && s.m_repoStatus == "added")) {
       TFilePath path(getPath() + TFilePath(s.m_path.toStdWString()));
       std::string dots = path.getDots();
       if (dots != "") {
@@ -433,7 +429,7 @@ QStringList DvDirVersionControlNode::getMissingFiles(
   for (; i != m_statusMap.constEnd(); i++) {
     SVNStatus s = i.value();
     if (s.m_item == "missing" ||
-        s.m_item == "none" && s.m_repoStatus == "added") {
+        (s.m_item == "none" && s.m_repoStatus == "added")) {
       TFilePath path(s.m_path.toStdWString());
       if (!filter.exactMatch(
               QString::fromStdWString(path.withoutParentDir().getWideString())))
@@ -493,7 +489,7 @@ void DvDirVersionControlNode::getChildrenNames(
 //-----------------------------------------------------------------------------
 
 void DvDirVersionControlNode::setIsUnderVersionControl(bool value) {
-  // Set the flags and enable/disable renaming accordling
+  // Set the flags and enable/disable renaming accordingly
   m_isUnderVersionControl = value;
   enableRename(!value);
 }
@@ -510,9 +506,9 @@ DvDirModelNode *DvDirVersionControlNode::makeChild(std::wstring name) {
 
 QPixmap DvDirVersionControlNode::getPixmap(bool isOpen) const {
   static QPixmap openFolderPixmap(
-      svgToPixmap(":Resources/browser_folder_open.svg"));
+      svgToPixmap(getIconThemePath("actions/18/folder_on.svg")));
   static QPixmap closeFolderPixmap(
-      svgToPixmap(":Resources/browser_folder_open.svg"));
+      svgToPixmap(getIconThemePath("actions/18/folder.svg")));
   static QPixmap openMissingPixmap(
       svgToPixmap(":Resources/vcfolder_mis_open.svg"));
   static QPixmap closeMissingPixmap(
@@ -778,11 +774,6 @@ void DvDirModelProjectNode::makeCurrent() {
   TFilePath projectPath = getProjectPath();
   if (!IoCmd::saveSceneIfNeeded(QObject::tr("Change project"))) return;
 
-#ifdef LINETEST
-  TnzCamera *camera = TnzCamera::instance();
-  if (camera->isCameraConnected()) camera->cameraDisconnect();
-#endif
-
   pm->setCurrentProjectPath(projectPath);
   IoCmd::newScene();
 }
@@ -791,9 +782,9 @@ void DvDirModelProjectNode::makeCurrent() {
 
 QPixmap DvDirModelProjectNode::getPixmap(bool isOpen) const {
   static QPixmap openProjectPixmap(
-      svgToPixmap(":Resources/browser_project_open.svg"));
+      svgToPixmap(getIconThemePath("actions/18/folder_project_on.svg")));
   static QPixmap closeProjectPixmap(
-      svgToPixmap(":Resources/browser_project_close.svg"));
+      svgToPixmap(getIconThemePath("actions/18/folder_project.svg")));
   return isOpen ? openProjectPixmap : closeProjectPixmap;
 }
 
@@ -875,9 +866,9 @@ void DvDirModelDayNode::visualizeContent(FileBrowser *browser) {
 
 QPixmap DvDirModelDayNode::getPixmap(bool isOpen) const {
   static QPixmap openFolderPixmap(
-      svgToPixmap(":Resources/browser_folder_open.svg"));
+      svgToPixmap(getIconThemePath("actions/18/folder_on.svg")));
   static QPixmap closeFolderPixmap(
-      svgToPixmap(":Resources/browser_folder_close.svg"));
+      svgToPixmap(getIconThemePath("actions/18/folder.svg")));
   return isOpen ? openFolderPixmap : closeFolderPixmap;
 }
 
@@ -909,7 +900,8 @@ void DvDirModelHistoryNode::refreshChildren() {
 //-----------------------------------------------------------------------------
 
 QPixmap DvDirModelHistoryNode::getPixmap(bool isOpen) const {
-  static QPixmap pixmap(svgToPixmap(":Resources/history.svg"));
+  QIcon icon            = createQIcon("history");
+  static QPixmap pixmap = icon.pixmap(16);
   return pixmap;
 }
 
@@ -948,7 +940,8 @@ void DvDirModelMyComputerNode::refreshChildren() {
 //-----------------------------------------------------------------------------
 
 QPixmap DvDirModelMyComputerNode::getPixmap(bool isOpen) const {
-  static QPixmap pixmap(svgToPixmap(":Resources/my_computer.svg"));
+  QIcon icon            = createQIcon("my_computer");
+  static QPixmap pixmap = icon.pixmap(16);
   return pixmap;
 }
 
@@ -1020,7 +1013,8 @@ void DvDirModelNetworkNode::refreshChildren() {
 //-----------------------------------------------------------------------------
 
 QPixmap DvDirModelNetworkNode::getPixmap(bool isOpen) const {
-  static QPixmap pixmap(svgToPixmap(":Resources/network.svg"));
+  QIcon icon            = createQIcon("network");
+  static QPixmap pixmap = icon.pixmap(16);
   return pixmap;
 }
 
@@ -1056,23 +1050,25 @@ void DvDirModelRootNode::refreshChildren() {
 #ifdef _WIN32
     addChild(m_networkNode = new DvDirModelNetworkNode(this));
 #endif
-
     DvDirModelSpecialFileFolderNode *child;
     child = new DvDirModelSpecialFileFolderNode(this, L"My Documents",
                                                 getMyDocumentsPath());
-    child->setPixmap(svgToPixmap(":Resources/my_documents.svg"));
+    child->setPixmap(recolorPixmap(
+        svgToPixmap(getIconThemePath("actions/16/my_documents.svg"))));
     m_specialNodes.push_back(child);
     addChild(child);
 
     child =
         new DvDirModelSpecialFileFolderNode(this, L"Desktop", getDesktopPath());
-    child->setPixmap(svgToPixmap(":Resources/desktop.svg"));
+    child->setPixmap(
+        recolorPixmap(svgToPixmap(getIconThemePath("actions/16/desktop.svg"))));
     m_specialNodes.push_back(child);
     addChild(child);
 
     child = new DvDirModelSpecialFileFolderNode(
         this, L"Library", ToonzFolder::getLibraryFolder());
-    child->setPixmap(svgToPixmap(":Resources/library.svg"));
+    child->setPixmap(
+        recolorPixmap(svgToPixmap(getIconThemePath("actions/16/library.svg"))));
     m_specialNodes.push_back(child);
     addChild(child);
 
@@ -1089,8 +1085,8 @@ void DvDirModelRootNode::refreshChildren() {
       DvDirModelSpecialFileFolderNode *projectRootNode =
           new DvDirModelSpecialFileFolderNode(
               this, L"Project root (" + roothDir + L")", projectRoot);
-      projectRootNode->setPixmap(
-          QPixmap(svgToPixmap(":Resources/projects.svg")));
+      projectRootNode->setPixmap(QPixmap(recolorPixmap(svgToPixmap(
+          getIconThemePath("actions/18/folder_project_root.svg")))));
       m_projectRootNodes.push_back(projectRootNode);
       addChild(projectRootNode);
     }
@@ -1289,9 +1285,9 @@ void DvDirModel::onFolderChanged(const TFilePath &path) { refreshFolder(path); }
 void DvDirModel::refresh(const QModelIndex &index) {
   if (!index.isValid()) return;
   DvDirModelNode *node = getNode(index);
-  if (!node) return;
+  if (!node || node->getChildCount() < 1) return;
   emit layoutAboutToBeChanged();
-  emit beginRemoveRows(index, 0, node->getChildCount());
+  emit beginRemoveRows(index, 0, node->getChildCount() - 1);
   node->refreshChildren();
   emit endRemoveRows();
   emit layoutChanged();
@@ -1416,7 +1412,7 @@ Qt::ItemFlags DvDirModel::flags(const QModelIndex &index) const {
 
 //-----------------------------------------------------------------------------
 /*! used only for name / rename of items
-*/
+ */
 bool DvDirModel::setData(const QModelIndex &index, const QVariant &value,
                          int role) {
   if (!index.isValid()) return false;

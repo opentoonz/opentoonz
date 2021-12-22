@@ -45,7 +45,6 @@
 #include "tcg/tcg_macros.h"
 #include "tcg/tcg_point_ops.h"
 #include "tcg/tcg_list.h"
-#include "tcg/tcg_function_types.h"
 #include "tcg/tcg_iterator_ops.h"
 
 //****************************************************************************************
@@ -402,19 +401,23 @@ PlasticToolOptionsBox::PlasticToolOptionsBox(QWidget *parent, TTool *tool,
       return space;
     }
   };
-
+  setObjectName("toolOptionsPanel");
   // Create Mesh button
   QPushButton *meshifyButton = new QPushButton(tr("Create Mesh"));
+
   // Add skeleton id-related widgets
   QLabel *skelIdLabel = new QLabel(tr("Skeleton:"));
   m_skelIdComboBox    = new SkelIdsComboBox;
   m_addSkelButton     = new QPushButton("+");  // Connected in the show event
   m_removeSkelButton  = new QPushButton("-");  // Connected in the show event
   // Add sub-options for each mode group
-  for (int m         = 0; m != PlasticTool::MODES_COUNT; ++m)
-    m_subToolbars[m] = new GenericToolOptionsBox(0, tool, pltHandle, m);
+  for (int m = 0; m != PlasticTool::MODES_COUNT; ++m)
+    m_subToolbars[m] =
+        new GenericToolOptionsBox(0, tool, pltHandle, m, 0, false);
 
   meshifyButton->setFixedHeight(20);
+  int buttonWidth = fontMetrics().width(meshifyButton->text()) + 20;
+  meshifyButton->setFixedWidth(buttonWidth);
   QAction *meshifyAction =
       CommandManager::instance()->getAction("A_ToolOption_Meshify");
   meshifyButton->addAction(meshifyAction);
@@ -761,11 +764,9 @@ PlasticSkeletonP PlasticTool::skeleton() const {
 //------------------------------------------------------------------------
 
 PlasticSkeleton &PlasticTool::deformedSkeleton() {
-  typedef tcg::function<void (PlasticTool::*)(PlasticSkeleton &),
-                        &PlasticTool::updateDeformedSkeleton>
-      Func;
-
-  return m_deformedSkeleton(tcg::bind1st(Func(), *this));
+  return m_deformedSkeleton([this](PlasticSkeleton &deformedSkeleton) {
+    updateDeformedSkeleton(deformedSkeleton);
+  });
 }
 
 //------------------------------------------------------------------------
@@ -1972,9 +1973,8 @@ void PlasticTool::drawOnionSkinSkeletons_animate(double pixelSize) {
     PlasticSkeleton skel;
     m_sd->storeDeformedSkeleton(m_sd->skeletonId(sdFrame), sdFrame, skel);
 
-    UCHAR alpha =
-        255 -
-        255.0 * OnionSkinMask::getOnionSkinFade(abs(osRows[r] - currentRow));
+    UCHAR alpha = 255 - 255.0 * OnionSkinMask::getOnionSkinFade(
+                                    abs(osRows[r] - currentRow));
     drawSkeleton(skel, pixelSize, alpha);
   }
 }
@@ -2113,6 +2113,7 @@ void PlasticTool::draw() {
   glPushAttrib(GL_LINE_BIT | GL_COLOR_BUFFER_BIT | GL_ENABLE_BIT);
 
   glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glEnable(GL_LINE_SMOOTH);
 
   switch (m_mode.getIndex()) {

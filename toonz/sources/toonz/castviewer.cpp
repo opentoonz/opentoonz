@@ -17,7 +17,6 @@
 #include "toonz/txshlevelhandle.h"
 #include "toonz/levelset.h"
 #include "toonz/toonzscene.h"
-#include "toonz/levelset.h"
 #include "toonz/txshsimplelevel.h"
 #include "toonz/txshleveltypes.h"
 
@@ -108,7 +107,7 @@ CastTreeViewer::CastTreeViewer(QWidget *parent)
   // qproperty-autoFillBackground: true;}");
 
   header()->close();
-  setIconSize(QSize(21, 17));
+  setIconSize(QSize(16, 16));
   setUniformRowHeights(true);
   // m_treeViewer->setColumnCount(1);
 
@@ -238,7 +237,7 @@ void CastTreeViewer::rebuildCastTree() {
 
   QTreeWidgetItem *root =
       new QTreeWidgetItem((QTreeWidgetItem *)0, QStringList(rootName));
-  static QPixmap clapboard(":Resources/clapboard.png");
+  static QIcon clapboard = createQIcon("clapboard");
   root->setIcon(0, clapboard);
   insertTopLevelItem(0, root);
   populateFolder(root);
@@ -299,11 +298,11 @@ void CastTreeViewer::dragMoveEvent(QDragMoveEvent *event) {
         (scene->isUntitled()) ? L"Untitled" : scene->getSceneName();
     rootName = rootName.fromStdWString(name);
   }
-  if (m_dropTargetItem &&
-          m_dropTargetItem->data(0, Qt::DisplayRole).toString() ==
-              AudioFolderName ||
-      m_dropFilePath != TFilePath() &&
-          m_dropTargetItem->data(0, Qt::DisplayRole).toString() == rootName)
+  if ((m_dropTargetItem &&
+       m_dropTargetItem->data(0, Qt::DisplayRole).toString() ==
+           AudioFolderName) ||
+      (m_dropFilePath != TFilePath() &&
+       m_dropTargetItem->data(0, Qt::DisplayRole).toString() == rootName))
     m_dropTargetItem = 0;
 
   if (!m_dropTargetItem)
@@ -466,8 +465,6 @@ CastBrowser::CastBrowser(QWidget *parent, Qt::WFlags flags)
   // style sheet
   setObjectName("CastBrowser");
   setFrameStyle(QFrame::StyledPanel);
-  setStyleSheet("QSplitter::handle {height:4px;}");
-  setStyleSheet("#CastBrowser { margin:1px;border:0px }");
 
   m_treeViewer = new CastTreeViewer(this);
   m_treeViewer->resize(300, m_treeViewer->size().height());
@@ -479,8 +476,8 @@ CastBrowser::CastBrowser(QWidget *parent, Qt::WFlags flags)
   boxLayout->setSpacing(0);
 
   m_folderName = new QLabel("", box);
-  m_folderName->setFrameStyle(QFrame::StyledPanel);
-  m_folderName->setStyleSheet("border-bottom: 1px solid black");
+  m_folderName->setObjectName("CastBrowserFolderName");
+  m_folderName->setFrameStyle(QFrame::Box);
   m_itemViewer = new DvItemViewer(box, false, true, DvItemViewer::Cast);
   DvItemViewerPanel *viewerPanel = m_itemViewer->getPanel();
   viewerPanel->setMissingTextColor(QColor(200, 0, 0));
@@ -696,7 +693,7 @@ bool CastBrowser::drop(const QMimeData *data) {
   if (data->hasUrls()) {
     IoCmd::LoadResourceArguments args;
 
-    foreach (const QUrl &url, data->urls()) {
+    for (const QUrl &url : data->urls()) {
       TFilePath fp(url.toLocalFile().toStdWString());
       args.resourceDatas.push_back(fp);
     }

@@ -28,6 +28,8 @@ class TXsheet;
 class PlasticDeformerFx final : public TRasterFx {
   FX_DECLARATION(PlasticDeformerFx)
 
+  bool m_was64bit = false;
+
 public:
   TXsheet *m_xsh;          //!< The Fx's enclosing Xsheet
   int m_col;               //!< The input column index

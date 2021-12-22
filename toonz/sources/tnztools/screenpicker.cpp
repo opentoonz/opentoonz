@@ -47,7 +47,10 @@ void ScreenPicker::event(QWidget *widget, QEvent *e) {
 
   case QEvent::MouseButtonRelease:
     mouseReleaseEvent(widget, static_cast<QMouseEvent *>(e));
-  };
+
+  default:
+    break;
+  }
 }
 
 //------------------------------------------------------------------

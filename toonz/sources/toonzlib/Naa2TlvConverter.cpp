@@ -344,7 +344,7 @@ void Naa2TlvConverter::findBackgroundRegions() {
   for (int i = 0; i < m_colors.count(); i++) {
     TPixel color = m_colors.at(i);
     int v        = color.r + color.g + color.b;
-    int a        = qMin(color.r, qMin(color.g, color.b));
+    int a        = std::min({color.r, color.g, color.b});
     if (a < 230) continue;
     if (v > maxV) {
       bgColorIndex = i;
@@ -477,7 +477,7 @@ void Naa2TlvConverter::findMainInks() {
     double ap2 =
         100000.0 * (double)region.pixelCount / pow((double)region.perimeter, 2);
     if (ap2 > 100) continue;
-    foreach (int c, region.links.keys()) {
+    for (int c : region.links.keys()) {
       if (c >= 0 && (m_regions[c].isBackground() ||
                      m_regions[c].type == RegionInfo::LargePaint)) {
         int strength = region.links[c];
@@ -567,7 +567,7 @@ void Naa2TlvConverter::findPaints() {
   for (int i = 0; i < m_regions.count(); i++) {
     RegionInfo &region = m_regions[i];
     if (region.type != RegionInfo::Unknown) continue;
-    foreach (int c, m_regions[i].links.keys()) {
+    for (int c : m_regions[i].links.keys()) {
       if (c >= 0 && m_regions[c].isInk()) {
         m_regions[i].type = RegionInfo::Paint;
         break;
@@ -630,7 +630,7 @@ void Naa2TlvConverter::findThinPaints() {
     if (inkBoundary * 100 > region.perimeter * 80) regions.append(i);
   }
 
-  foreach (int c, regions)
+  for (int c : regions)
     m_regions[c].type = RegionInfo::SmallPaint;
 }
 
@@ -682,8 +682,8 @@ void Naa2TlvConverter::findSuspectInks() {
     if (region.isInk() && 10 <= region.pixelCount && region.pixelCount < 100) {
       int lx = region.x1 - region.x0 + 1;
       int ly = region.y1 - region.y0 + 1;
-      int d  = qMax(lx, ly);
-      if (qMin(lx, ly) * 2 > qMax(lx, ly) && region.pixelCount > d * d / 2) {
+      int d  = std::max(lx, ly);
+      if (std::min(lx, ly) * 2 > std::max(lx, ly) && region.pixelCount > d * d / 2) {
         region.type = RegionInfo::Paint;
       }
     }
@@ -785,7 +785,7 @@ void Naa2TlvConverter::addBorderInks()  // add syntethic inks: lines between two
                      (m_regions[c1].type & RegionInfo::Paint) != 0) {
             // OLD: note: we consider only regions with a lower index, to avoid
             // to create double border strokes
-            // NEW: we put syntetic ink pixels in larger regions
+            // NEW: we put synthetic ink pixels in larger regions
             // UPDATE 2017/5/12 : we put ink on darker style
             if (colorsBrightness[m_regions[c1].colorIndex] >
                 colorsBrightness[m_regions[c].colorIndex]) {
@@ -1039,10 +1039,10 @@ TToonzImageP Naa2TlvConverter::makeTlv(bool transparentSyntheticInks,
     styleIds.append(styleId);
     if (!usedStyleIds.contains(styleId)) usedStyleIds.append(styleId);
   }
-  styleIds.append(0);  // syntetic ink
+  styleIds.append(0);  // synthetic ink
 
-  // int synteticInkStyleId = palette->getPage(0)->addStyle(TPixel32(0,0,0,0));
-  // styleIds.append(synteticInkStyleId);
+  // int syntheticInkStyleId = palette->getPage(0)->addStyle(TPixel32(0,0,0,0));
+  // styleIds.append(syntheticInkStyleId);
 
   for (int y = 0; y < ly; y++) {
     unsigned short *workScanLine = m_regionRas->pixels(y);
@@ -1109,7 +1109,7 @@ TToonzImageP Naa2TlvConverter::makeTlv(bool transparentSyntheticInks,
       locals::addPaint(neighborPaints, bottomScanLine[prev_x].getPaint());
       locals::addPaint(neighborPaints, bottomScanLine[x].getPaint());
       locals::addPaint(neighborPaints, bottomScanLine[next_x].getPaint());
-      qSort(neighborPaints.begin(), neighborPaints.end(), locals::compare);
+      std::sort(neighborPaints.begin(), neighborPaints.end(), locals::compare);
 
       if (!neighborPaints.isEmpty())
         outScanLine[x].setPaint(neighborPaints[0].first);

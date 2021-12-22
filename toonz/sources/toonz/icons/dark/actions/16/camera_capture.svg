@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="16px" height="16px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;">
+    <g transform="matrix(1,0,0,1,-30,-510)">
+        <g id="camera_capture">
+            <g id="bg" transform="matrix(0.110345,0,0,0.121212,13.7793,491.091)">
+                <rect x="147" y="156" width="145" height="132" style="fill:rgb(135,135,135);fill-opacity:0;"/>
+            </g>
+            <path d="M42,512L32,512L32,524L46,524L46,526L30,526L30,512C30,510.895 30.895,510 32,510C34.918,510 42,510 42,510L42,512Z"/>
+            <g transform="matrix(1.2,0,0,1,-9.6,-1)">
+                <rect x="38" y="513" width="5" height="2"/>
+            </g>
+            <g transform="matrix(1,0,0,1,-1,0)">
+                <rect x="39" y="514" width="2" height="3"/>
+            </g>
+            <g transform="matrix(1,0,0,1,0,-3)">
+                <path d="M40,517L45.5,522.5" style="fill:none;stroke:black;stroke-opacity:0.5;stroke-width:1px;"/>
+            </g>
+            <g transform="matrix(-1,0,0,1,78,-3)">
+                <path d="M40,517L45.5,522.5" style="fill:none;stroke:black;stroke-opacity:0.5;stroke-width:1px;"/>
+            </g>
+        </g>
+    </g>
+</svg>

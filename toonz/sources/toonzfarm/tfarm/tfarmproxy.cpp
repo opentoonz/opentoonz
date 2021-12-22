@@ -29,7 +29,7 @@ QString TFarmProxy::sendToStub(const QString &data) {
 
 //------------------------------------------------------------------------------
 
-int TFarmProxy::extractArgs(const QString &s, vector<QString> &argv) {
+int TFarmProxy::extractArgs(const QString &s, std::vector<QString> &argv) {
   argv.clear();
   if (s == "") return 0;
 
@@ -43,7 +43,7 @@ int TFarmProxy::extractArgs(const QString &s, vector<QString> &argv) {
 //==============================================================================
 
 TString CantConnectToStub::getMessage() const {
-  string msg("Unable to connect to ");
+  std::string msg("Unable to connect to ");
   msg += m_hostName.toStdString();
   msg += " on port ";
   msg += std::to_string(m_port);

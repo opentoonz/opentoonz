@@ -68,7 +68,7 @@ namespace TConsts {
 const double epsilon = 1e-8;
 }
 
-// use macros insted of constexprs, because MSVC2013 does not support
+// use macros instead of constexprs, because MSVC2013 does not support
 // `constexpr`.
 #define M_PI_3 (M_PI / 3)
 #define M_PI_180 (M_PI_4 / 45)
@@ -174,9 +174,6 @@ inline std::ostream &operator<<(std::ostream &out, const std::string &s) {
   return out << s.c_str();
 }
 
-#define tArrayCount(ARRAY) (sizeof(ARRAY) / sizeof(ARRAY[0]))
-
-const std::string mySettingsFileName              = "mysettings.ini";
 const std::string styleNameEasyInputWordsFileName = "stylename_easyinput.ini";
 
 #endif  //__T_COMMON_INCLUDED

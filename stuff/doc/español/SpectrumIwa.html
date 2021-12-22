@@ -1,0 +1,63 @@
+<html lang="ja">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+      <title>Spectrum (Espectro) Iwa</title>
+    </head>
+<body bgcolor="#f5f5f5" text="#220011">
+<h1><img src = ".\img\fx_iwa_spectrum.png" width = 30 height = 30 >   Spectrum (Espectro) Iwa</h1>
+
+<h4>● Descripción</h4>
+Este efecto produce un patrón de tipo arcoiris similar al de la interferencia producida por una película líquida fina,<br>
+de acuerdo al brillo de la imagen de entrada.<br>
+Si bien los colores generados no corresponden con los de una interferencia física real, es posible obtener resultados<br>
+bastante similares.
+
+  <h4>● Entradas</h4>
+<UL>
+<LI><b>Source (Origen)</b> : Permite conectar la imagen a ser procesada. El brillo de la imagen será usado como<br>
+grosor de la película fina de líquido.<br>
+Cuanto más alta sea la luminosidad, más fino será el grosor de la película. Una luminosidad de 0.0 corresponderá al valor<br>
+de "Thickness Min" descripto más abajo, y una de 1.0 al de "Thickness Max".</LI>
+<LI><b>Light (Luz)</b> : Permite conectar una imagen para representar la luz.<br>
+Cuando haya una imagen conectada, el resultado será como se describe a continuación:</LI>
+<UL>
+<LI>El canal Alfa producido será el canal Alfa de la imagen conectada a Light.</LI>
+<LI>Si el parámetro "Light Threshold" estuviera activado, la imagen conectada a Light y el arcoiris generado<br>
+podrán ser compuestos usando el modo Trama.</LI>
+</UL>
+</UL>
+
+<h4>● Opciones</h4>
+<UL>
+<LI><b>Intensity (Intensidad)</b> : La intensidad de la luz. Cuanto más alto sea el valor, más claro será el arcoiris.</LI>
+<LI><b>Refractive Index (Índice de refracción)</b> : El índice de refracción del medio. Cuanto más alto sea el valor,<br>
+más claro será el arcoiris.</LI>
+<LI><b>Thickness Max (Grosor máximo)</b> : El grosor máximo de la película fina. Corresponde al grosor de la película en<br>
+las partes más oscuras de la imagen conectada a Source.</LI>
+<LI><b>Thickness Min (Grosor mínimo)</b> : El grosor mínimo de la película fina. Corresponde al grosor de la película en<br>
+las partes más claras de la imagen conectada a Source.</LI>
+*El grosor también puede tomar valores negativos; en ese caso, todas las partes donde esto sea así serán calculadas como cero.<br>
+*Thickness Min y Max podrán invertirse; en ese caso, el patrón iridiscente quedará invertido.
+<LI><b>R/G/B Gamma (Gama R/V/A)</b> : Valor de corrección gama para cada uno de los canales RVA del patrón de arcoiris.</LI>
+<LI><b>Lens Factor (Factor de lente)</b> : Un valor de corrección gama que puede ser agregado al producir un patrón de arcoiris<br>
+a partir de la luminosidad de la imagen conectada a Source.<br>
+Esto permite, por ejemplo, que patrones concéntricos sean distorsionados a través de una lente cóncava/convexa a lo largo del<br>
+período de iridiscencia.</LI>
+<LI><b>Light Threshold (Umbral de luz)</b> : Cuando se conecta una imagen al conector Light, la misma podrá ser compuesta con el<br>
+patrón de arcoiris, usando el modo Trama.<br>
+Light Threshold es el menor valor del canal Alfa de la imagen conectada a Light requerido para componer en modo Trama.<br>
+Para cada píxel, se realizará el siguiente proceso:</LI>
+<UL>
+<LI>Cuando el canal alfa de la imagen conectada a Light se encuentre por debajo del Umbral de luz: No se realizará una composición<br>
+usando el modo Trama.</LI>
+<LI>Cuando el canal alfa de la imagen conectada a Light sea 1: La imagen conectada a Light será compuesta en modo Trama al 100%.</LI>
+<LI>Cuando el canal alfa de la imagen conectada a Light sea mayor que Light Threshold pero menor a 1: La imagen compuesta en modo<br>
+Trama será fundida, usando dicho valor en una interpolación lineal.</LI>
+</UL>
+Cuanto menor sea el valor Light Threshold, mayor será la proporción de la composición en modo Trama de la imagen conectada a Light,<br>
+de manera que la imagen final será más clara.<br>
+También podrá aceptar valores negativos.
+</UL>
+</body>
+
+</html>

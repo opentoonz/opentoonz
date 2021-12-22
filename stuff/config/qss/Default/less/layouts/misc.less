@@ -8,9 +8,7 @@ PencilTestPopup {
                         allows for filling half of a 1024 screen */
 }
 
-#HistoryPanel {
-  // Placeholder
-}
+// #HistoryPanel {}
 
 #MatchLineButton {
     background-color: lighten(@bg, 15%);
@@ -22,8 +20,36 @@ PencilTestPopup {
 }
 
 #LargeSizedText {
-    font-size: 17;
+    font-size: 17px;
 }
+
+/* -----------------------------------------------------------------------------
+   Stop Motion Controller
+----------------------------------------------------------------------------- */
+
+#StopMotionController {
+  & QScrollArea {
+    margin: 8;
+  }
+  & QPushButton {
+    // Adds spacing to buttons, but this setting may be temporary
+    margin: 2 1;
+    padding: 0;
+  }
+  & #TabBarContainer {
+    margin-left: -4; // reset left edge margin
+  }
+  & #bottomWidget {
+    border-top: 1 solid @accent;
+    padding: 3 2 8 3;
+    & QPushButton {
+      // override above margin reset
+      padding: 3 5;
+    }
+  }
+}
+
+// #StopMotionTabBar {}
 
 /* -----------------------------------------------------------------------------
    Unknowns + Legacy

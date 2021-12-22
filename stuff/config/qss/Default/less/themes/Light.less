@@ -3,315 +3,242 @@
 // -----------------------------------------------------------------------------
 // LIGHT
 // -----------------------------------------------------------------------------
+// This inherits from NEUTRAL theme, when updating NEUTRAL make sure to check
+// changes against LIGHT.
+//
+// NOTE: Compile Neutral.less before this.
+// -----------------------------------------------------------------------------
 
 // Override
-@import '../Default';
+@import 'Neutral.less';
 
 // Resource Location
 @img-url: '../Default/imgs/black';
 
-@bg: #808080;
-@accent: darken(@bg, 25);
-@text-color: #000;
-@text-color-disabled: rgba(0, 0, 0, 0.466);
+@bg:                    #DBDBDB;
+@accent:                darken(@bg, 20);
+@dock-bg-color:         darken(@bg, 30);
+@hl-bg-color:           #a0c1dd;
+@hl-text-color:         #000;
+@hl-bg-color-secondary: darken(@bg, 15);
 
-@dock-bg-color: darken(@bg, 35);
-
-@hl-bg-color: rgb(34, 91, 175);
-@hl-text-color: #FFFFFF;
-@hl-bg-color-secondary: lighten(@bg, 12);
-
-@label-title: rgb(0, 0, 0);
+@dialogButtonFrame-bg-color: @bg;
 
 // -----------------------------------------------------------------------------
 // Tabs
 // -----------------------------------------------------------------------------
 
-// Container
-@tabbar-bg-color: darken(@bg, 8);
-
-// Tabs
-@tab-bg-color: darken(@topbar-bg-color, 15);
-@tab-text-color: lighten(saturate(spin(@bg, 0.0000), 0.0000), 25);
-
-@tab-bg-color-hover: lighten(@rooms-tab-bg-color, 8);
-@tab-text-color-hover: #fff;
-
-@tab-text-color-selected: @text-color;
+@tabbar-bg-color: darken(@bg, 9);
 
 // -----------------------------------------------------------------------------
-// Topbar & Workspaces
+// Menu
 // -----------------------------------------------------------------------------
 
-// Topbar
-@topbar-bg-color: @bg;
-
-// Workspace Tabs
-@rooms-tab-bg-color: darken(@topbar-bg-color, 15);
-@rooms-tab-text-color: rgb(175, 175, 175);
-
-@rooms-tab-bg-color-hover: lighten(@rooms-tab-bg-color, 8);
-@rooms-text-color-hover: #fff;
-
-@rooms-tab-bg-color-selected: lighten(@tab-bg-color-selected, 10);
-
-// -----------------------------------------------------------------------------
-// Right-Click Menu
-// -----------------------------------------------------------------------------
-
-@menu-bg-color: lighten(@bg, 8);
-@menu-separator-color: darken(@menu-bg-color, 15);
-
-// -----------------------------------------------------------------------------
-// Titlebars
-// -----------------------------------------------------------------------------
-
-@title-bg-color: darken(@bg, 15);
-@title-text-color: lighten(saturate(spin(@bg, 0.0000), 0.0000), 25);
-@title-text-color-active: #fff;
+@menu-bg-color:                     @bg;
+@menu-checkbox-text-color-selected: @text-color;
+@menu-icon-checked-bg-color:        @toolbutton-bg-color-checked;
+@menu-icon-checked-border-color:    @toolbutton-border-color-checked;
 
 // -----------------------------------------------------------------------------
 // Scrollbars
 // -----------------------------------------------------------------------------
 
 // Container
-@scrollbar-bg-color: darken(@bg, 7);
-
-// Handle
-@scrollbar-handle-radius: 2;
-@scrollbar-handle-margin: 2;
-@scrollbar-handle-bg-color: lighten(@bg, 12);
-@scrollbar-handle-border-color: darken(@scrollbar-bg-color, 10);
-@scrollbar-handle-border-color-hover: @accent;
-@scrollbar-handle-border-color-pressed: @accent;
+@scrollbar-handle-bg-color:         darken(@bg, 15);
 
 // -----------------------------------------------------------------------------
-// File Browser / Trees
+// Titlebars
 // -----------------------------------------------------------------------------
 
-// Trees
-@tree-bg-color: lighten(@bg, 8);
-@tree-bg-color-alt: darken(@tree-bg-color, 4);
-@prefs-tree-hl-color: lighten(@tree-bg-color, 8);
+@title-text-color:             fade(@text-color, 50);
+@title-text-color-active:      @text-color;
 
-// All Panes
-@browser-folder-text-color: rgb(7, 27, 155);
-
-// Left Pane
-@browser-listview-bg-color: lighten(@bg, 8);
-
-// Right Pane
-@browser-itemview-bg-color: @tree-bg-color;
-@browser-itemview-bg-color-alt: @tree-bg-color-alt;
+// Title pane icon colors
+@title-button-pressed-color:   darken(@hl-bg-color, 8);
+@title-button-rollover-color:  darken(@title-bg-color, 20);
+@title-button-freeze-color:    #e0625c;
+@title-button-preview-color:   #2cb856;
 
 // -----------------------------------------------------------------------------
 // Button
 // -----------------------------------------------------------------------------
 
-@button-bg-color: lighten(@bg, 15);
-@button-border-color: darken(@bg, 18);
-@button-text-color: rgb(0, 0, 0);
-
-@button-bg-color-hover: lighten(@button-bg-color, 8);
-
-@button-bg-color-pressed: lighten(@button-bg-color-hover, 15);
-@button-border-color-pressed: @button-border-color;
-
-@button-bg-color-checked: darken(@bg, 15);
-@button-border-color-checked: darken(@button-bg-color-checked, 8);
-@button-text-color-checked: @tab-text-color;
-
-@button-bg-color-focus: #B5C0D0;
-@button-border-color-focus: darken(@button-bg-color-focus, 40);
-@button-text-color-focus: @button-text-color;
-
-@button-border-color-disabled: darken(@bg, 5);
-
-// For QDialogs
-@button-dialog-border-color: @button-border-color;
+@button-bg-color:              darken(@bg, 8);
+@button-border-color:          darken(@button-bg-color, 15);
+@button-bg-color-hover:        lighten(@button-bg-color, 5);
+@button-border-color-checked:  darken(@button-bg-color-checked, 15);
+@button-text-color-checked:    @text-color;
+@button-bg-color-disabled:     darken(@bg, 4);
+@button-border-color-disabled: darken(@button-bg-color-disabled, 10);
+@button-bg-color-focus:        mix(@hl-bg-color, @button-bg-color, 70);
+@button-border-color-focus:    darken(@button-bg-color-focus, 10);
 
 // -----------------------------------------------------------------------------
 // Tool Buttons
 // -----------------------------------------------------------------------------
 
-// Main
-@toolbutton-border-color-hover: @button-border-color;
-
-@toolbutton-bg-color-checked: @button-bg-color-checked;
-@toolbutton-border-color-checked: @button-border-color-checked;
-@toolbutton-text-color-checked: @button-text-color-checked;
-
-@toolbutton-bg-color-checked-hover: lighten(@toolbutton-bg-color-checked, 8);
-@toolbutton-border-color-checked-hover: @toolbutton-border-color-checked;
-
-// Lock
+@toolbutton-border-color-checked:      darken(@toolbutton-bg-color-checked, 10);
+@toolbutton-bg-color-hover:            darken(@bg, 15);
+@toolbutton-lock-bg-color-checked:     @title-button-freeze-color;
 @toolbutton-lock-border-color-checked: darken(@toolbutton-lock-bg-color-checked, 20);
-@toolbutton-lock-border-color-checked-hover: @toolbutton-lock-border-color-checked;
-
-// -----------------------------------------------------------------------------
-// ComboBox
-// -----------------------------------------------------------------------------
-
-@combobox-bg-color-pressed: @button-bg-color-focus;
-@combobox-border-color-pressed: @hl-bg-color;
 
 // -----------------------------------------------------------------------------
 // Textfield
 // -----------------------------------------------------------------------------
 
-@input-bg-color: lighten(@bg, 40);
-@input-border-color: darken(@bg, 18);
-
-@input-border-color-focus: @input-border-color;
-
-@input-bg-color-disabled: lighten(@bg, 10);
+@input-bg-color:           lighten(@bg, 10);
+@input-text-color:         #000;
+@input-border-color:       @accent;
+@input-border-color-focus: saturate(darken(@hl-bg-color, 20), 20);
+@input-bg-color-disabled:  lighten(@bg, 8);
 
 // -----------------------------------------------------------------------------
 // CheckBox
 // -----------------------------------------------------------------------------
 
-@checkbox-bg-color: lighten(@button-bg-color, 15);
-@checkbox-border-color: @button-border-color;
-
-@checkbox-bg-color-hover: lighten(@checkbox-bg-color, 10);
-@checkbox-border-color-hover: @checkbox-border-color;
-@checkbox-text-color-hover: #fff;
-
-@checkbox-border-color-checked: @button-border-color;
-
-@checkbox-bg-color-disabled: @button-bg-color-disabled;
-@checkbox-border-color-disabled: @button-border-color-disabled;
-
-// -----------------------------------------------------------------------------
-// Slider
-// -----------------------------------------------------------------------------
-
-// This one is used only for #ViewerFpsSlider
-@slider-handle-margin: -2 0;
-@slider-handle-bg-color: lighten(@bg, 15);
-@slider-handle-border-color: @accent;
-
-// DoublePairField, IntPairField
-@slider-groove-color: darken(@bg, 22);
+@checkbox-bg-color-hover:             lighten(@hl-bg-color, 10);
+@checkbox-border-color-hover:         darken(@bg, 40);
+@checkbox-text-color-hover:           @text-color;
+@checkbox-bg-color-checked-hover:     darken(@bg, 50);
+@checkbox-border-color-checked-hover: @checkbox-bg-color-checked-hover;
+@checkbox-bg-color-disabled:          @bg;
 
 // -----------------------------------------------------------------------------
 // Viewer Window
 // -----------------------------------------------------------------------------
 
 // FlipSlider
-@flipslider-notstarted-color: rgb(139, 37, 37);
-@flipslider-started-color: rgb(0, 168, 8);
+@flipmarker-img:              'flipmarker_light.svg';
+@flipslider-img:              'flipslider_light.svg';
+@flipslider-base-color:       darken(@bg, 10);
+@flipslider-notstarted-color: rgb(195, 60, 60);
+@flipslider-started-color:    rgb(16, 221, 64);
 
 // Ruler
-@viewer-ruler-bg-color: lighten(@bg, 25);
+@viewer-ruler-handle-color:      black;
+@viewer-ruler-handle-drag-color: red;
 
 // -----------------------------------------------------------------------------
-// Schematic Viewer
+// Palette Window
 // -----------------------------------------------------------------------------
 
-@schematic-viewer-bg-color: darken(@bg, 5);
+// All views (except list);
+@palette-SelectedBorderColor:           rgb(66, 82, 100);
+@palette-NumpadShortcutBgColor:         rgba(0, 0, 0, 0.15);
+@palette-NumpadShortcutBorderColor:     rgb(128, 128, 128);
 
-@schematic-label-text-color: rgb(0, 0, 0);
+// List view
+@palette-ListNumpadShortcutBorderColor: rgb(105, 105, 105);
 
-@schematic-help-button-bg-color: #80a0dc;
-@schematic-help-button-bg-color-hover: lighten(@schematic-help-button-bg-color, 10);
+// -----------------------------------------------------------------------------
+// File Browser / Trees
+// -----------------------------------------------------------------------------
 
-@schematic-TableColor: rgb(164, 164, 191);
-@schematic-ActiveCameraColor: rgb(107, 165, 222);
-@schematic-OtherCameraColor: rgb(143, 156, 158);
-@schematic-GroupColor: rgb(102, 152, 198);
-@schematic-PegColor: rgb(190, 138, 86);
-@schematic-SplineColor: rgb(123, 184, 33);
-@schematic-ActiveOutputcolor: rgb(107, 165, 222);
-@schematic-OtherOutputcolor: rgb(143, 156, 158);
-@schematic-XsheetColor: rgb(164, 164, 191);
-@schematic-NormalFxColor: rgb(141, 156, 175);
-@schematic-MacroFxColor: rgb(174, 140, 165);
-@schematic-ImageAdjustFxColor: rgb(156, 154, 180);
-@schematic-LayerBlendingFxColor: rgb(112, 155,165);
-@schematic-MatteFxColor: rgb(186, 133, 133);
+// Trees
+@tree-bg-color:     darken(@bg, 5);
+@tree-bg-color-alt: lighten(@tree-bg-color, -4);
+
+// -----------------------------------------------------------------------------
+// Keyframes
+// -----------------------------------------------------------------------------
+
+@keyframe-total-color: #f8a145;
+
+// For use in FX Settings Panels
+@keyframe-inbetween-color: #e6dbb6;
+@keyframe-modified-color:  rgb(243, 226, 129);
+
+// -----------------------------------------------------------------------------
+// Slider
+// -----------------------------------------------------------------------------
+
+// Single
+@slider-groove-img:          'slider-groove_light.svg';
+@slider-groove-img-disabled: 'slider-groove_disabled_light.svg';
+@slider-handle-img:          'slider-handle_light.svg';
+@slider-handle-img-disabled: 'slider-handle_disabled_light.svg';
+@slider-v-handle-img:          'slider-v-handle_light.svg';
+@slider-v-handle-img-disabled: 'slider-v-handle_disabled_light.svg';
+
+// This one is used only for #ViewerFpsSlider
+@slider-handle-bg-color:     lighten(@bg, -10);
+@slider-handle-border-color: darken(@bg, 30);
+
+// DoublePairField, IntPairField
+@slider-groove-color: darken(@bg, 35);
 
 // -----------------------------------------------------------------------------
 // XSheet
 // -----------------------------------------------------------------------------
 
 // XSheet Spreadsheet Viewer
-@xsheet-text-color:                         @text-color;
-@xsheet-bg-color:                           lighten(@bg, 7.12);
-@xsheet-LightLine-color:                    darken(@bg, 12);
-@xsheet-MarkerLine-color:                   #000; //rgb(0, 255, 246);
-@xsheet-VerticalLine-color:                 darken(@bg, 11);
-@xsheet-VerticalLineHead-color:             darken(@bg, 28);
-@xsheet-PreviewFrameText-color:             #000eb6;
-@xsheet-CurrentRowBG-color:                 #B5C0D0;
+@xsheet-bg-color:                           darken(@bg, 5);
+@xsheet-LightLine-color:                    rgba(0, 0, 0, 0.15);
+@xsheet-VerticalLine-color:                 rgba(0, 0, 0, 0.15);
+@xsheet-ColumnIconLine-color:               rgb(112, 112, 112);
+@xsheet-MarkerLine-color:                   rgba(0, 0, 0, 0.3);
+@xsheet-OnionSkinAreaBG-color:              darken(@bg, 10);
+@xsheet-PreviewFrameText-color:             #2d42b9;
+@xsheet-CurrentRowBG-color:                 saturate(lighten(fade(@hl-bg-color, 70), -8), 8);
+@xsheet-VerticalLineHead-color:             rgba(0, 0, 0, 0.3);
+@xsheet-SelectedColumnHead-color:           fade(black, 15);
 
-@xsheet-EmptyColumnHead-color:              @bg;
-@xsheet-SelectedColumnText-color:           rgb(158, 0, 0);
+@xsheet-FoldedColumnBG-color:               lighten(@bg, -20);
+@xsheet-FoldedColumnLine-color:             darken(@bg, 40);
 
-@xsheet-EmptyCell-color:                    darken(@bg, 1.57);
-@xsheet-NotEmptyColumn-color:               lighten(@bg, 4);
-@xsheet-SelectedEmptyCell-color:            lighten(@bg, 20);
+// Level Type Colors Adjustment
+@columnBorderDesaturation:                  8;
+@columnBorderDarkness:                      15;
+@cellHighlightLightness:                    10;
 
-@xsheet-LevelColumn-color:                  rgb(118, 183, 118);
-@xsheet-LevelColumnBorder-color:            darken(desaturate(@xsheet-LevelColumn-color, 15), 25);
+@xsheet-EmptyCell-color:                    @xsheet-OnionSkinAreaBG-color;
+@xsheet-NotEmptyColumn-color:               @xsheet-bg-color;
+@xsheet-SelectedEmptyCell-color:            fade(mix(lighten(@xsheet-EmptyCell-color, -20), @cellHighlightTintColor, 80), 50);
 
-@xsheet-VectorColumn-color:                 rgb(192, 192, 122);
-@xsheet-VectorColumnBorder-color:           darken(desaturate(@xsheet-VectorColumn-color, 15), 25);
+@xsheet-LevelColumn-color:                  #a1cea1;
+@xsheet-VectorColumn-color:                 #d3cf9a;
+@xsheet-ChildColumn-color:                  #cca3cc;
+@xsheet-FullColorColumn-color:              #b0cbdd;
+@xsheet-FxColumn-color:                     #ceb694;
+@xsheet-ReferenceColumn-color:              #c2c2c2;
+@xsheet-PaletteColumn-color:                #a9d4ca;
+@xsheet-MeshColumn-color:                   #b8a2cf;
+@xsheet-SoundColumn-color:                  #aad6d6;
+@xsheet-SoundTextColumn-color:              #c2c2c2;
+@xsheet-ActiveCamera-color:                 #79b5ee;
+@xsheet-OtherCamera-color:                  #6eb7c2;
 
-@xsheet-ChildColumn-color:                  rgb(214,154,219);
-@xsheet-ChildColumnBorder-color:            darken(desaturate(@xsheet-ChildColumn-color, 15), 25);
+// Orientation: Timeline
+@timeline-IconLine-color:                   rgba(0, 0, 0, 0.144);
+@timeline-FrameRangeMarkerLine-color:       rgba(0, 0, 0, 0.3);
 
-@xsheet-FullColorColumn-color:              rgb(139, 189, 193);
-@xsheet-FullColorColumnBorder-color:        darken(desaturate(@xsheet-FullColorColumn-color, 15), 25);
+// Orientation: XSheet
+@xsheet-CamstandButtonBgOn-color:           rgb(255, 166, 131);
+@xsheet-PreviewButtonBgOn-color:            rgb(233, 233, 127);
 
-@xsheet-FxColumn-color:                     rgb(130,129,93);
-@xsheet-FxColumnBorder-color:               darken(desaturate(@xsheet-FxColumn-color, 10), 20);
+// -----------------------------------------------------------------------------
+// Schematic Viewer
+// -----------------------------------------------------------------------------
 
-@xsheet-ReferenceColumn-color:              rgb(171,171,171);
-@xsheet-ReferenceColumnBorder-color:        darken(desaturate(@xsheet-ReferenceColumn-color, 15), 25);
+// Node Viewer
+@schematic-viewer-bg-color: rgb(128, 128, 128);
 
-@xsheet-PaletteColumn-color:                rgb(42,171,154);
-@xsheet-PaletteColumnBorder-color:          darken(desaturate(@xsheet-PaletteColumn-color, 15), 25);
-
-@xsheet-MeshColumn-color:                   rgb(172, 120, 212);
-@xsheet-MeshColumnBorder-color:             darken(desaturate(@xsheet-MeshColumn-color, 15), 25);
-
-@xsheet-SoundColumn-color:                  rgb(172, 186, 130);
-@xsheet-SoundColumnBorder-color:            darken(desaturate(@xsheet-SoundColumn-color, 15), 25);
-@xsheet-SoundColumnHL-color:                rgb(245,255,230);
-@xsheet-SoundColumnTrack-color:             rgb(90,100,45);
-
-@xsheet-ColumnHeadPastelizer-color:         rgb(255,255,255);
-@xsheet-SelectedColumnHead-color:           rgb(190,210,240);
-
-@xsheet-LightLightBG-color:                 @bg;
-@xsheet-LightBG-color:                      rgb(240,240,240);
-@xsheet-DarkBG-color:                       rgb(225,225,225);
-@xsheet-DarkLine-color:                     rgb(150,150,150);
+// Node Type Colors Adjustment
+@nodeLightness:  15;
+@nodeSaturation: 15;
 
 // -----------------------------------------------------------------------------
 // Function Editor
 // -----------------------------------------------------------------------------
 
-// Function Treeview
-@function-treeview-text-color: @text-color;
-@function-treeview-text-color-selected: rgb(167, 0, 0);
-
 // Function Curve Panel
-@function-panel-bg-color: darken(@bg, 15);
-@function-panel-ValueLine-color: darken(@bg, 20);
-@function-panel-FrameLine-color: darken(@bg, 20);
-@function-panel-OtherCurves-color: rgb(197, 197, 197);
-@function-panel-RulerBG-color: darken(@bg, 10);
+@function-panel-bg-color: @schematic-viewer-bg-color;
+@function-panel-OtherCurves-color: rgb(218, 218, 218);
 @function-panel-Text-color: @text-color;
-@function-panel-Sub-color: rgb(255, 255, 255);
-@function-panel-Selected-color: rgb(252, 174, 6);
 
-// Function Spreadsheet Viewer
-@function-KeyFrame-color: rgb(219,139,54);
-@function-KeyFrameBorder-color: darken(@function-KeyFrame-color, 25);
+@function-panel-Sub-color: #fff;
+@function-panel-Selected-color: #ffe033;
+@function-IgnoredKeyFrame-color: rgb(203,87,101);
+@function-IgnoredInbetween-color: rgb(194,156,146);
 
-@function-Inbetween-color: rgb(194,194,176);
-@function-InbetweenBorder-color: rgb(99, 99, 86);
-
-@function-SelectedSceneRangeEmpty-color: rgb(210,210,210);
+@function-SelectedKeyFrame-color:  mix(shade(@function-KeyFrame-color, @cellHighlightLightness), @cellHighlightTintColor, @cellHighlightTintAmount);

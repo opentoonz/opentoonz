@@ -129,7 +129,7 @@ void doNoise(TRasterPT<PIXEL> &ras, double sigma, bool bw, bool red, bool green,
           pix->b = tcrop<int>(b, 0, pix->m);
         }
       }
-      *pix++;
+      pix++;
     }
   }
 

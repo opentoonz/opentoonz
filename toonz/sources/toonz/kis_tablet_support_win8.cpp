@@ -341,7 +341,7 @@ bool KisTabletSupportWin8::isPenDeviceAvailable() {
     return false;
   }
   bool hasPenDevice = false;
-  Q_FOREACH (const POINTER_DEVICE_INFO &device, devices) {
+  for (const POINTER_DEVICE_INFO &device : devices) {
 #ifdef KRITA
     dbgTablet << "Found pointer device" << static_cast<void *>(device.device)
               << QString::fromWCharArray(device.productString)

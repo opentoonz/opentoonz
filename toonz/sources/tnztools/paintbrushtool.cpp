@@ -34,7 +34,6 @@
 #include "toonz/txshlevelhandle.h"
 #include "toonz/tframehandle.h"
 #include "tools/toolhandle.h"
-#include "tools/toolutils.h"
 
 // For Qt translation support
 #include <QCoreApplication>
@@ -48,6 +47,7 @@ using namespace ToolUtils;
 TEnv::StringVar PaintBrushColorType("InknpaintPaintBrushColorType", "Areas");
 TEnv::IntVar PaintBrushSelective("InknpaintPaintBrushSelective", 0);
 TEnv::DoubleVar PaintBrushSize("InknpaintPaintBrushSize", 10);
+TEnv::IntVar PaintBrushModifierLockAlpha("PaintBrushModifierLockAlpha", 0);
 
 //-----------------------------------------------------------------------------
 
@@ -62,22 +62,25 @@ class BrushUndo final : public TRasterUndo {
   int m_styleId;
   bool m_selective;
   ColorType m_colorType;
+  bool m_modifierLockAlpha;
 
 public:
   BrushUndo(TTileSetCM32 *tileSet, const std::vector<TThickPoint> &points,
             ColorType colorType, int styleId, bool selective,
-            TXshSimpleLevel *level, const TFrameId &frameId)
+            TXshSimpleLevel *level, const TFrameId &frameId, bool lockAlpha)
       : TRasterUndo(tileSet, level, frameId, false, false, 0)
       , m_points(points)
       , m_styleId(styleId)
       , m_selective(selective)
-      , m_colorType(colorType) {}
+      , m_colorType(colorType)
+      , m_modifierLockAlpha(lockAlpha) {}
 
   void redo() const override {
     TToonzImageP image = m_level->getFrame(m_frameId, true);
     TRasterCM32P ras   = image->getRaster();
     RasterStrokeGenerator m_rasterTrack(ras, PAINTBRUSH, m_colorType, m_styleId,
-                                        m_points[0], m_selective, 0, false);
+                                        m_points[0], m_selective, 0,
+                                        m_modifierLockAlpha, false);
     m_rasterTrack.setPointsSequence(m_points);
     m_rasterTrack.generateStroke(true);
     image->setSavebox(image->getSavebox() +
@@ -267,6 +270,8 @@ class PaintBrushTool final : public TTool {
           移動している場合に備える --*/
   TFrameId m_workingFrameId;
 
+  TBoolProperty m_modifierLockAlpha;
+
 public:
   PaintBrushTool();
 
@@ -290,6 +295,8 @@ public:
   TPropertyGroup *getProperties(int targetType) override { return &m_prop; }
 
   int getCursorId() const override { return m_cursor; }
+  TPointD getCenteredCursorPos(const TPointD &originalCursorPos);
+  void fixMousePos(TPointD pos, bool precise = false);
 
   int getColorClass() const { return 2; }
 
@@ -307,7 +314,7 @@ PaintBrushTool paintBrushTool;
 
 //=============================================================================
 //
-//  InkPaintTool implemention
+//  InkPaintTool implementation
 //
 //-----------------------------------------------------------------------------
 
@@ -319,11 +326,14 @@ PaintBrushTool::PaintBrushTool()
     , m_tileSaver(0)
     , m_cursor(ToolCursor::EraserCursor)
     // sostituire i nomi con quelli del current, tipo W_ToolOptions...
-    , m_toolSize("Size:", 1, 100, 10, false)  // W_ToolOptions_BrushToolSize
-    , m_colorType("Mode:")                    // W_ToolOptions_InkOrPaint
-    , m_onlyEmptyAreas("Selective", false)    // W_ToolOptions_Selective
+    , m_toolSize("Size:", 1, 1000, 10, false)  // W_ToolOptions_BrushToolSize
+    , m_colorType("Mode:")                     // W_ToolOptions_InkOrPaint
+    , m_onlyEmptyAreas("Selective", false)     // W_ToolOptions_Selective
     , m_firstTime(true)
-    , m_workingFrameId(TFrameId()) {
+    , m_workingFrameId(TFrameId())
+    , m_modifierLockAlpha("Lock Alpha", false) {
+  m_toolSize.setNonLinearSlider();
+
   m_colorType.addValue(LINES);
   m_colorType.addValue(AREAS);
   m_colorType.addValue(ALL);
@@ -333,9 +343,11 @@ PaintBrushTool::PaintBrushTool()
   m_prop.bind(m_toolSize);
   m_prop.bind(m_colorType);
   m_prop.bind(m_onlyEmptyAreas);
+  m_prop.bind(m_modifierLockAlpha);
 
   m_onlyEmptyAreas.setId("Selective");
   m_colorType.setId("Mode");
+  m_modifierLockAlpha.setId("LockAlpha");
 }
 
 //-----------------------------------------------------------------------------
@@ -349,6 +361,36 @@ void PaintBrushTool::updateTranslation() {
   m_colorType.setItemUIName(ALL, tr("Lines & Areas"));
 
   m_onlyEmptyAreas.setQStringName(tr("Selective", NULL));
+  m_modifierLockAlpha.setQStringName(tr("Lock Alpha"));
+}
+
+//-------------------------------------------------------------------------------------------------------
+
+TPointD PaintBrushTool::getCenteredCursorPos(const TPointD &originalCursorPos) {
+  TXshLevelHandle *levelHandle = m_application->getCurrentLevel();
+  TXshSimpleLevel *level = levelHandle ? levelHandle->getSimpleLevel() : 0;
+  TDimension resolution =
+      level ? level->getProperties()->getImageRes() : TDimension(0, 0);
+
+  bool xEven = (resolution.lx % 2 == 0);
+  bool yEven = (resolution.ly % 2 == 0);
+
+  TPointD centeredCursorPos = originalCursorPos;
+
+  if (xEven) centeredCursorPos.x -= 0.5;
+  if (yEven) centeredCursorPos.y -= 0.5;
+
+  return centeredCursorPos;
+}
+
+//-----------------------------------------------------------------------------
+
+void PaintBrushTool::fixMousePos(TPointD pos, bool precise) {
+  m_mousePos = getCenteredCursorPos(pos);
+  if (precise) {
+    TPointD pp(tround(m_mousePos.x), tround(m_mousePos.y));
+    m_mousePos = pp;
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -402,29 +444,31 @@ bool PaintBrushTool::onPropertyChanged(std::string propertyName) {
 
   // Selective
   else if (propertyName == m_onlyEmptyAreas.getName()) {
-    if (m_onlyEmptyAreas.getValue() && m_colorType.getValue() == LINES) {
-      m_colorType.setValue(AREAS);
-      PaintBrushColorType = ::to_string(m_colorType.getValue());
-    }
     PaintBrushSelective = (int)(m_onlyEmptyAreas.getValue());
+    if (m_onlyEmptyAreas.getValue() && m_modifierLockAlpha.getValue())
+      m_modifierLockAlpha.setValue(false);
   }
 
   // Areas, Lines etc.
   else if (propertyName == m_colorType.getName()) {
-    if (m_colorType.getValue() == LINES) {
-      PaintBrushSelective = (int)(m_onlyEmptyAreas.getValue());
-    }
     PaintBrushColorType = ::to_string(m_colorType.getValue());
     /*--- ColorModelのCursor更新のためにSIGNALを出す ---*/
     TTool::getApplication()->getCurrentTool()->notifyToolChanged();
   }
 
+  // Lock Alpha
+  else if (propertyName == m_modifierLockAlpha.getName()) {
+    PaintBrushModifierLockAlpha = (int)(m_modifierLockAlpha.getValue());
+    if (m_modifierLockAlpha.getValue() && m_onlyEmptyAreas.getValue())
+      m_onlyEmptyAreas.setValue(false);
+  }
   return true;
 }
 
 //-----------------------------------------------------------------------------
 
 void PaintBrushTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
+  fixMousePos(pos);
   m_selecting = true;
   TImageP image(getImage(true));
   if (m_colorType.getValue() == LINES) m_colorTypeBrush = INK;
@@ -440,8 +484,9 @@ void PaintBrushTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
       m_tileSaver           = new TTileSaverCM32(ras, tileSet);
       m_rasterTrack         = new RasterStrokeGenerator(
           ras, PAINTBRUSH, m_colorTypeBrush, styleId,
-          TThickPoint(pos + convert(ras->getCenter()), thickness),
-          m_onlyEmptyAreas.getValue(), 0, false);
+          TThickPoint(m_mousePos + convert(ras->getCenter()), thickness),
+          m_onlyEmptyAreas.getValue(), 0, m_modifierLockAlpha.getValue(),
+          false);
       /*-- 現在のFidを記憶 --*/
       m_workingFrameId = getFrameId();
       m_tileSaver->save(m_rasterTrack->getLastRect());
@@ -456,15 +501,15 @@ void PaintBrushTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
 void PaintBrushTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
   if (!m_selecting) return;
 
-  m_mousePos = pos;
+  fixMousePos(pos);
   if (TToonzImageP ri = TImageP(getImage(true))) {
     /*--- マウスを動かしながらショートカットでこのツールに切り替わった場合、
             いきなりleftButtonDragから呼ばれることがあり、m_rasterTrackが無い可能性がある
 　---*/
     if (m_rasterTrack) {
       int thickness = m_toolSize.getValue();
-      m_rasterTrack->add(
-          TThickPoint(pos + convert(ri->getRaster()->getCenter()), thickness));
+      m_rasterTrack->add(TThickPoint(
+          m_mousePos + convert(ri->getRaster()->getCenter()), thickness));
       m_tileSaver->save(m_rasterTrack->getLastRect());
       TRect modifiedBbox = m_rasterTrack->generateLastPieceOfStroke(true);
       invalidate();
@@ -477,7 +522,7 @@ void PaintBrushTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
 void PaintBrushTool::leftButtonUp(const TPointD &pos, const TMouseEvent &) {
   if (!m_selecting) return;
 
-  m_mousePos = pos;
+  fixMousePos(pos);
 
   finishBrush();
 }
@@ -485,9 +530,7 @@ void PaintBrushTool::leftButtonUp(const TPointD &pos, const TMouseEvent &) {
 //-----------------------------------------------------------------------------
 
 void PaintBrushTool::mouseMove(const TPointD &pos, const TMouseEvent &e) {
-  m_mousePos = pos;
-  TPointD pp(tround(pos.x), tround(pos.y));
-  m_mousePos = pp;
+  fixMousePos(pos, true);
   invalidate();
 }
 
@@ -498,6 +541,7 @@ void PaintBrushTool::onEnter() {
     m_onlyEmptyAreas.setValue(PaintBrushSelective ? 1 : 0);
     m_colorType.setValue(::to_wstring(PaintBrushColorType.getValue()));
     m_toolSize.setValue(PaintBrushSize);
+    m_modifierLockAlpha.setValue(PaintBrushModifierLockAlpha ? 1 : 0);
     m_firstTime = false;
   }
   double x = m_toolSize.getValue();
@@ -535,7 +579,7 @@ void PaintBrushTool::onDeactivate() {
 //-----------------------------------------------------------------------------
 /*!
  * 描画中にツールが切り替わった場合に備え、onDeactivateでもMouseReleaseと同じ終了処理を行う
-*/
+ */
 void PaintBrushTool::finishBrush() {
   if (TToonzImageP ti = (TToonzImageP)getImage(true)) {
     if (m_rasterTrack) {
@@ -557,7 +601,8 @@ void PaintBrushTool::finishBrush() {
       TUndoManager::manager()->add(new BrushUndo(
           m_tileSaver->getTileSet(), m_rasterTrack->getPointsSequence(),
           m_colorTypeBrush, m_rasterTrack->getStyleId(),
-          m_rasterTrack->isSelective(), simLevel.getPointer(), frameId));
+          m_rasterTrack->isSelective(), simLevel.getPointer(), frameId,
+          m_rasterTrack->isAlphaLocked()));
       ToolUtils::updateSaveBox();
 
       /*--- FIdを指定して、描画中にフレームが変わっても、

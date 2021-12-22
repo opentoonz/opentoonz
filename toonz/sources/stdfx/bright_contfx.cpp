@@ -3,8 +3,9 @@
 #include "stdfx.h"
 #include "tfxparam.h"
 #include "tpixelutils.h"
+#include "globalcontrollablefx.h"
 
-class Bright_ContFx final : public TStandardRasterFx {
+class Bright_ContFx final : public GlobalControllableFx {
   FX_PLUGIN_DECLARATION(Bright_ContFx)
 
   TRasterFxPort m_input;
@@ -60,7 +61,7 @@ void my_compute_lut(double contrast, double brightness, std::vector<T> &lut) {
       if (value > 0.5)
         nvalue = 1.0 - value;
       else
-        nvalue                 = value;
+        nvalue = value;
       if (nvalue < 0.0) nvalue = 0.0;
       nvalue = 0.5 * pow(nvalue * 2.0, (double)(1.0 + contrast));
       if (value > 0.5)
@@ -71,7 +72,7 @@ void my_compute_lut(double contrast, double brightness, std::vector<T> &lut) {
       if (value > 0.5)
         nvalue = 1.0 - value;
       else
-        nvalue                 = value;
+        nvalue = value;
       if (nvalue < 0.0) nvalue = 0.0;
       power = (contrast == 1.0) ? half_maxChannelValue : 1.0 / (1.0 - contrast);
       nvalue = 0.5 * pow(2.0 * nvalue, power);
@@ -119,11 +120,11 @@ void Bright_ContFx::doCompute(TTile &tile, double frame,
 
   m_input->compute(tile, frame, ri);
 
-  double brightness           = m_bright->getValue(frame) / 127.0;
-  double contrast             = m_contrast->getValue(frame) / 127.0;
-  if (contrast > 1) contrast  = 1;
+  double brightness = m_bright->getValue(frame) / 127.0;
+  double contrast   = m_contrast->getValue(frame) / 127.0;
+  if (contrast > 1) contrast = 1;
   if (contrast < -1) contrast = -1;
-  TRaster32P raster32         = tile.getRaster();
+  TRaster32P raster32 = tile.getRaster();
   if (raster32)
     doBrightnessContrast<TPixel32, UCHAR>(raster32, contrast, brightness);
   else {

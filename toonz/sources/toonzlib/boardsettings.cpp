@@ -35,7 +35,7 @@ std::wstring type2String(BoardItem::Type type) { return strs.value(type, L""); }
 BoardItem::Type string2Type(std::wstring str) {
   return strs.key(str, BoardItem::TypeCount);
 }
-};
+};  // namespace
 
 BoardItem::BoardItem() {
   m_name            = "Item";
@@ -46,6 +46,15 @@ BoardItem::BoardItem() {
 }
 
 QString BoardItem::getContentText(ToonzScene *scene) {
+  auto getDuration = [&]() {
+    TOutputProperties *oprop = scene->getProperties()->getOutputProperties();
+    int from, to, step;
+    if (oprop->getRange(from, to, step))
+      return to - from + 1;
+    else
+      return scene->getFrameCount();
+  };
+
   switch (m_type) {
   case FreeText:
     return m_text;
@@ -57,19 +66,19 @@ QString BoardItem::getContentText(ToonzScene *scene) {
     return QString::fromStdWString(scene->getSceneName());
     break;
   case Duration_Frame:
-    return QString::number(scene->getFrameCount());
+    return QString::number(getDuration());
     break;
   case Duration_SecFrame: {
     TOutputProperties *oprop = scene->getProperties()->getOutputProperties();
     int fps                  = (int)oprop->getFrameRate();
-    int frame                = scene->getFrameCount();
+    int frame                = getDuration();
     return QString("%1 + %2").arg(QString::number(frame / fps),
                                   QString::number(frame % fps));
   } break;
   case Duration_HHMMSSFF: {
     TOutputProperties *oprop = scene->getProperties()->getOutputProperties();
     int fps                  = (int)oprop->getFrameRate();
-    int frame                = scene->getFrameCount();
+    int frame                = getDuration();
     int hh                   = frame / (fps * 60 * 60);
     frame -= hh * fps * 60 * 60;
     int mm = frame / (fps * 60);
@@ -104,6 +113,8 @@ QString BoardItem::getContentText(ToonzScene *scene) {
     TOutputProperties *oprop = scene->getProperties()->getOutputProperties();
     return scene->decodeFilePath(oprop->getPath()).getQString();
   } break;
+  default:
+    break;
   }
   return QString();
 }
@@ -200,7 +211,7 @@ void BoardItem::saveData(TOStream &os) {
                    << m_rect.height();
 
   if (m_type == Image) {
-    // if the path is in library folder, then save the realtive path
+    // if the path is in library folder, then save the relative path
     TFilePath libFp = ToonzFolder::getLibraryFolder();
     if (libFp.isAncestorOf(m_imgPath))
       os.child("imgPath") << 1 << m_imgPath - libFp;

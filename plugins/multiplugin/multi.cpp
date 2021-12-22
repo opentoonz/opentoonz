@@ -200,7 +200,7 @@ int node_destroy(toonz::node_handle_t node)
 int can_handle(toonz_node_handle_t node, const toonz_rendering_setting_t *rs, double frame)
 {
 	printf("%s:\n", __FUNCTION__);
-	/* geometric plugin のように Bounding Box が自明の場合、 Skew などの変換の影響でフルスクリーン効果のような大きな Bouding Box が
+	/* geometric plugin のように Bounding Box が自明の場合、 Skew などの変換の影響でフルスクリーン効果のような大きな Bounding Box が
 	   過剰に大きくなってしまうことがある. これを防ぐには非ゼロを返すこと.
 	 */
 	return 1; /* non zero is 'true' */

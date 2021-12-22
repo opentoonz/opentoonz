@@ -14,6 +14,7 @@
 
 namespace {
 
+#if 0
 /* int getCurrentSceneFrameCount()
   {
     return 100; //
@@ -34,6 +35,7 @@ namespace {
 /*   r0 = 0;
     r1 = getCurrentSceneFrameCount()-1;
   }*/
+#endif
 
 bool getCurrentLevelFids(std::vector<TFrameId> &fids) {
   /*

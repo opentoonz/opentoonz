@@ -9,7 +9,11 @@ extern "C" {
 #include "ttwain_state.h"
 #include "ttwainP.h"
 //#define DEBUG
+#ifndef _WIN32
+#define PRINTF(args...)
+#else
 #define PRINTF
+#endif
 #if 1
 
 extern int TTWAIN_MessageHook(void *lpmsg);
@@ -146,8 +150,6 @@ void setupUI(void) {
 }
 
 /*---------------------------------------------------------------------------*/
-
-#define PRINTF
 
 void registerTwainCallback(void) {
   if (TTWAIN_GetState() < TWAIN_SOURCE_OPEN) {

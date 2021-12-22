@@ -9,7 +9,7 @@
 // TXsheeHandle
 //-----------------------------------------------------------------------------
 
-TXsheetHandle::TXsheetHandle() : m_xsheet(0) {}
+TXsheetHandle::TXsheetHandle() : m_xsheet(0), m_zoomFactor(100) {}
 
 //-----------------------------------------------------------------------------
 

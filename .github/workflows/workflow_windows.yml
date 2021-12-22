@@ -1,0 +1,200 @@
+name: Windows Build
+
+on: [push, pull_request]
+
+jobs:
+  Windows:
+    runs-on: windows-2019
+    env:
+      vcpkg_ref: 111220b3cf3311744369425d5c323a0f17941076
+      CLCACHE_CL: 'C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64/cl_original.exe'
+      BOOST_ROOT: ${{github.workspace}}/3rdparty/boost
+      BOOST_URL: https://sourceforge.net/projects/boost/files/boost/1.72.0/boost_1_72_0.tar.bz2/download
+      QT_ROOT: ${{github.workspace}}/3rdparty/qt
+      QT_URL: https://github.com/shun-iwasawa/qt5/releases/download/v5.15.2_wintab/Qt5.15.2_wintab.zip
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Checkout mypaint/libmypaint
+      uses: actions/checkout@v2
+      with:
+        repository: 'mypaint/libmypaint'
+        ref: '70f7686db792fa4953dc60f28a322bf2cd388ed7'
+        path: 'libmypaint'
+
+    - name: Checkout xiaoyeli/superlu
+      uses: actions/checkout@v2
+      with:
+        repository: 'xiaoyeli/superlu'
+        ref: 'a3d5233770f0caad4bc4578b46d3b26af99e9c19'
+        path: 'superlu'
+
+    - name: Install vcpkg
+      run: |
+        rm -r -fo C:/vcpkg
+        cd C:/
+        git clone https://github.com/Microsoft/vcpkg
+        cd vcpkg
+        git checkout "$env:vcpkg_ref"
+        ./bootstrap-vcpkg.bat
+
+    - uses: actions/cache@v1
+      with:
+       path: C:/vcpkg/installed
+       key: ${{ runner.os }}-vcpkg-${{ env.vcpkg_ref }}-${{ github.sha }}
+       restore-keys: ${{ runner.os }}-vcpkg-${{ env.vcpkg_ref }}-
+
+    - name: Install libraries
+      run: |
+        vcpkg install --clean-after-build --triplet x64-windows icu
+        vcpkg install --clean-after-build --triplet x64-windows-static json-c libjpeg-turbo libpng lz4 lzo openblas zlib
+        vcpkg install --clean-after-build --triplet x64-windows freeglut glew
+        vcpkg install --clean-after-build --triplet x64-windows --recurse opencv[world]
+        ls -Recurse C:/vcpkg/installed -Filter *.pdb | rm
+
+    - name: Cache Qt
+      id: cache-qt
+      uses: actions/cache@v2
+      with:
+        path: ${{env.QT_ROOT}}
+        key: ${{ runner.os }}-QtCache
+
+    - name: Install Qt
+      run: |
+        # fix up paths to be forward slashes consistently
+        QT_ROOT=$(echo $QT_ROOT | sed 's/\\/\//g')
+        mkdir -p $QT_ROOT
+        curl --progress-bar -L -o $QT_ROOT/Qt.zip $QT_URL
+        7z -o$QT_ROOT x $QT_ROOT/Qt.zip -y -bd
+        rm -f $QT_ROOT/Qt.zip
+      shell: bash
+
+    - name: Restore Boost cache
+      uses: actions/cache@v2
+      id: cache-boost
+      with:
+        path: ${{env.BOOST_ROOT}}
+        key: boost
+
+    - name: Install Boost
+      if: steps.cache-boost.outputs.cache-hit != 'true'
+      run: |
+        # fix up paths to be forward slashes consistently
+        BOOST_ROOT=$(echo $BOOST_ROOT | sed 's/\\/\//g')
+        mkdir -p $BOOST_ROOT
+        curl --progress-bar --location --output $BOOST_ROOT/download.tar.bz2 $BOOST_URL
+        7z -o$BOOST_ROOT x $BOOST_ROOT/download.tar.bz2 -y -bd
+        7z -o$BOOST_ROOT x $BOOST_ROOT/download.tar -y -bd
+        cd $BOOST_ROOT && cp -r boost_*/* .
+        rm -rf boost_*/* download.tar.bz2 download.tar
+      shell: bash
+      
+    - name: Setup Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9.1'
+
+    - name: Install clcache
+      run: |
+        pip install clcache
+        Rename-Item -Path 'C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64/cl.exe' -NewName 'cl_original.exe'
+        Rename-Item -Path 'C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64/cl.exe.config' -NewName 'cl_original.exe.config'
+        cp 'C:/hostedtoolcache/windows/Python/3.9.1/x64/Scripts/clcache.exe' 'C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64/cl.exe'
+
+    - uses: actions/cache@v1
+      with:
+       path: C:/Users/runneradmin/clcache
+       key: ${{ runner.os }}-clcache-${{ github.sha }}
+       restore-keys: ${{ runner.os }}-clcache-
+
+    - name: Build libtiff
+      run: |
+        cd thirdparty/tiff-4.0.3
+        cp libtiff/tif_config.vc.h libtiff/tif_config.h
+        cp libtiff/tiffconf.vc.h libtiff/tiffconf.h
+        cd prj/LibTIFF
+        $env:Path += ';C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/MSBuild/Current/Bin'
+        $env:CLCACHE_CL = '${{ env.CLCACHE_CL }}'
+        msbuild LibTIFF.vcxproj /p:PlatformToolset=v142 /p:Platform=x64 /p:Configuration=Release -maxcpucount:3
+
+    - name: Build mypaint/libmypaint
+      run: |
+        cd libmypaint
+        cp ../.github/workflows/CMakeLists.txt .
+        echo '#define MYPAINT_CONFIG_USE_GLIB 0' > config.h
+        python generate.py mypaint-brush-settings-gen.h brushsettings-gen.h
+        mkdir build | Out-Null
+        cd build
+        $env:CLCACHE_CL = '${{ env.CLCACHE_CL }}'
+        cmake ../ -G 'Visual Studio 16 2019' -Ax64 -Djson-c_DIR='C:/vcpkg/installed/x64-windows-static/share/json-c/' -DJSON-C_INCLUDE_DIR='C:/vcpkg/installed/x64-windows-static/include/json-c/'
+        cmake --build . --config Release
+        cp C:/vcpkg/installed/x64-windows-static/lib/json-c.lib .
+        $env:Path += ';C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64'
+        lib /OUT:libmypaint.lib Release/libmypaint.lib json-c.lib
+        cp libmypaint.lib Release/libmypaint.lib
+
+    - name: Build xiaoyeli/superlu
+      run: |
+        cd superlu
+        mkdir build | Out-Null
+        cd build
+        $env:CLCACHE_CL = '${{ env.CLCACHE_CL }}'
+        cmake ../ -G 'Visual Studio 16 2019' -Ax64 -DXSDK_ENABLE_Fortran=OFF -Denable_tests=OFF
+        cmake --build . --config Release
+
+    - name: Workaround
+      run: |
+        cd thirdparty
+        cp C:/vcpkg/installed/x64-windows-static/lib/libpng16.lib libpng-1.6.21/lib/libpng16_2015_64.lib
+        cp C:/vcpkg/installed/x64-windows-static/lib/lz4.lib Lz4/Lz4_131/lz4_64.lib
+        cp C:/vcpkg/installed/x64-windows-static/lib/lzo2.lib lzo/2.03/LZO_lib/lzo2_64.lib
+        cp C:/vcpkg/installed/x64-windows-static/lib/openblas.lib openblas/libopenblas_64.lib
+        cp C:/vcpkg/installed/x64-windows-static/lib/zlib.lib zlib-1.2.8/lib/zlib-1.2.8_2015_64.lib
+        cp C:/vcpkg/installed/x64-windows/lib/freeglut.lib glut/3.7.6/lib/glut64.lib
+        cp C:/vcpkg/installed/x64-windows/lib/glew32.lib glew/glew-1.9.0/lib/glew64.lib
+        cp D:/a/opentoonz/opentoonz/libmypaint/build/Release/libmypaint.lib libmypaint/dist/64/libmypaint.lib
+        cp D:/a/opentoonz/opentoonz/superlu/build/SRC/Release/superlu.lib superlu/SuperLU_2015_64.lib
+        cp D:/a/opentoonz/opentoonz/thirdparty/tiff-4.0.3/prj/LibTIFF/x64/Release/LibTIFF.lib tiff-4.0.3/lib/LibTIFF-4.0.3_2015_64.lib
+        cp C:/vcpkg/installed/x64-windows-static/lib/turbojpeg.lib libjpeg-turbo/lib/turbojpeg-static_2015_64.lib
+        cp C:/vcpkg/installed/x64-windows-static/lib/jpeg.lib libjpeg-turbo/lib/jpeg-static_2015_64.lib
+
+    - name: Copy headers
+      run: |
+        cd thirdparty
+        cp libpng-1.6.21/scripts/pnglibconf.h.prebuilt libpng-1.6.21/pnglibconf.h
+
+    - name: Build
+      run: |
+        cd toonz
+        mkdir build | Out-Null
+        cd build
+        $env:CLCACHE_CL = '${{ env.CLCACHE_CL }}'
+        $env:BOOST_ROOT = '${{ env.BOOST_ROOT }}'
+        $env:QT_PATH = '${{ env.QT_ROOT }}/Qt5.15.2_wintab/5.15.2_wintab/msvc2019_64'
+        cmake ../sources -G 'Visual Studio 16 2019' -Ax64 -DQT_PATH="$env:QT_PATH" -DOpenCV_DIR='C:/vcpkg/installed/x64-windows/share/opencv' -DBOOST_ROOT="$env:BOOST_ROOT" -DWITH_WINTAB=ON
+        cmake --build . --config Release
+
+    - name: Create Artifact
+      env:
+        VCINSTALLDIR: 'C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC'
+      run: |
+        mkdir artifact | Out-Null
+        cd artifact
+        cp -Recurse ../stuff portablestuff
+        cp ../toonz/build/Release/* .
+        ${{ env.QT_ROOT }}/Qt5.15.2_wintab/5.15.2_wintab/msvc2019_64/bin/windeployqt.exe OpenToonz.exe
+        cp C:/vcpkg/installed/x64-windows/bin/freeglut.dll .
+        cp C:/vcpkg/installed/x64-windows/bin/glew32.dll .
+        cp C:/vcpkg/installed/x64-windows/bin/opencv_world.dll .
+        cp C:/vcpkg/installed/x64-windows/bin/zlib1.dll .
+        cp C:/vcpkg/installed/x64-windows/bin/webp.dll .
+        cp C:/vcpkg/installed/x64-windows/bin/libpng16.dll .
+        cp C:/vcpkg/installed/x64-windows/bin/jpeg62.dll .
+        cp C:/vcpkg/installed/x64-windows/bin/tiff.dll .
+        cp C:/vcpkg/installed/x64-windows/bin/lzma.dll .
+        cp C:/vcpkg/installed/x64-windows/bin/libprotobuf.dll .
+
+    - uses: actions/upload-artifact@v1
+      with:
+        name: Opentoonz-${{ runner.os }}-${{ github.sha }}
+        path: artifact

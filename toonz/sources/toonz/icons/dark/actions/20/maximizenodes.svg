@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="20px" height="20px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <rect x="0" y="0" width="20" height="20" style="fill-opacity:0;"/>
+    <g transform="matrix(0.9375,0,0,1,-0.8125,-3)">
+        <rect x="3" y="17" width="16" height="2" style="fill:black;"/>
+    </g>
+    <g transform="matrix(1,0,0,1,-2,-4)">
+        <path d="M15,16L11.5,12L8,16L15,16Z" style="fill:black;"/>
+    </g>
+    <g transform="matrix(1,0,0,1,-1,1)">
+        <path d="M3.999,11L3,11L3,14L3.999,14L3.999,11ZM18,11L17,11L17,14L18,14L18,11ZM3.999,10L3.999,7L3,7L3,10L3.999,10ZM17.999,10L17.999,7L17,7L17,10L17.999,10ZM3,3L6,3L6,4L4,4L4,6L3,6L3,3ZM18,3L15,3L15,4L17,4L17,6L18,6L18,3ZM10,3L7,3L7,4L10,4L10,3ZM14,3L11,3L11,4L14,4L14,3Z" style="fill:black;"/>
+    </g>
+</svg>

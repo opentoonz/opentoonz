@@ -100,7 +100,10 @@ TImageP ImageLoader::build(int imFlags, void *extData) {
         (m_path.getType() == "psd"))
       lr->loadInfo();
 
-    lr->doReadPalette(true);  // Allow palette loading
+    bool isTlvIcon = data->m_icon && m_path.getType() == "tlv";
+
+    // for TLV icons, palettes will be applied in IconGenerator later
+    if (!isTlvIcon) lr->doReadPalette(true);  // Allow palette loading
 
     TImageReaderP ir = lr->getFrameReader(m_fid);
 
@@ -110,7 +113,7 @@ TImageP ImageLoader::build(int imFlags, void *extData) {
     // Load the image
     TImageP img;
 
-    if (data->m_icon && m_path.getType() == "tlv")
+    if (isTlvIcon)
       img = ir->loadIcon();  // TODO: Why just in the tlv case??
     else {
       ir->setShrink(subsampling);

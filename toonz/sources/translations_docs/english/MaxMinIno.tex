@@ -1,0 +1,92 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[a4paper, total={180mm, 272mm}]{geometry}
+
+\usepackage{fontspec}
+\setmainfont[Path=fonts/, Extension=.ttf]{ipaexm}
+
+\setlength\parindent{3.5em}
+\setlength\parskip{0em}
+\renewcommand{\baselinestretch}{1.247}
+
+\begin{document}
+
+\thispagestyle{empty}
+
+\Large
+\noindent \\
+Max Min Ino\medskip
+\par
+\normalsize
+It inflates the brightest (darkest) portions of the image.\\
+\par
+The shape can be round or polygonal.\par
+It produces smooth changes.\\
+\par
+First, it processes the Alpha channel, if specified.\par
+Then it handles RGB values of pixels, where the Alpha channel is not zero.\\
+\\
+-{-}- \ Inputs \ -{-}-\\
+Source\par
+Connect the image to be processed.\\
+\\
+Reference\par
+Connect the reference image to assign the strength of the effect into each pixel.\\
+\\
+-{-}- \ Settings \ -{-}-\\
+Max Min Select\par
+Specify the processing method.\par
+\textquotedbl Max\textquotedbl \ -> Inflate the bright areas of the image\par
+\textquotedbl Min\textquotedbl \ -> Inflate the dark areas of the image\par
+When using \textquotedbl Min\textquotedbl , black lines in the cell image outline will be painted with 0\par 
+in the transparent area outside them, so transparent area expands and black lines\par 
+dissappear.\par
+It also increases the region defined by the Alpha in the same way.\par
+The default setting is \textquotedbl Max\textquotedbl .\\
+\\
+Radius\par
+Specify the size of the bulge by a circle radius.\par
+The unit is millimeters.\par
+Specify a number greater than or equal to 0.\par
+By adding smoothing (in pixels) it will not inflate with values smaller than 1.\par
+Therefore, if the value is less, there will be an effect with a fine image,\par
+but it may not make the effect noticeable on a rough image.\par
+A larger Radius will take more time to process.\\
+
+\newpage
+
+\thispagestyle{empty}
+
+\ \vspace{-0.2em}
+\\
+Polygon Number\par
+Allows to specify if inflate into a circle or a polygon shape.\par
+Specify an integer value.\par
+A value of 2 will inflate using a circle of the specified Radius.\par
+3 or more, will inflate to the number of sides of the polygon. The maximum is 16.\par
+Polygons begin from the right side of the center of the bulge.\par
+The default value is 2.
+\\
+\par
+\noindent Degree\par
+Specifies the angle of the polygon, when \textquotedbl Polygon Number\textquotedbl \ value is 3 or more.\par
+When \textquotedbl Polygon Number\textquotedbl \ value is 2, it will have no effect.\par
+Specify a value of 0 or more degrees.\par
+It will rotate in clockwise direction.\par
+The default value is 0.\\
+\\
+Alpha Rendering\par
+This option is valid only when there is an Alpha channel.\par
+When inactive, it masks the changes in the RGB values using the original Alpha\par 
+of the image.\par
+When active, the effect will be able to modify the Alpha channel, extending it\par 
+as necessary to reproduce the full span of the effect.\par
+The default setting is ON.\\
+\\
+Reference\par
+Specify which channel to use from the image connected to the Reference port to\par 
+drive the intensity of the effect.\par
+Choose from Red/Green/Blue/Alpha/Luminance.\par
+Choose Nothing to disable the effect.\par
+The default value is \textquotedbl Red\textquotedbl .
+
+\end{document}

@@ -148,7 +148,7 @@ void TXshSoundLevel::saveData(TOStream &os) {
 void TXshSoundLevel::computeValuesFor(const Orientation *o) {
   int frameHeight = o->dimension(PredefinedDimension::FRAME);  // time axis
   int index       = o->dimension(PredefinedDimension::INDEX);
-  map<int, DoublePair> &values = m_values[index];
+  std::map<int, DoublePair> &values = m_values[index];
 
   if (frameHeight == 0) frameHeight = 1;
   values.clear();

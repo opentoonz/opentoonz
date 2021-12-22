@@ -65,7 +65,7 @@ void doSaltPepperNoise(const TRasterPT<PIXEL> &ras, const double intensity,
         } else if (data >= data2 && data < 0.5)
           pix->r = pix->g = pix->b = pix->m;
       }
-      *pix++;
+      pix++;
     }
   }
   ras->unlock();

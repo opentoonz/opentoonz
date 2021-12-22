@@ -1,0 +1,89 @@
+name: Linux Build
+
+on: [push, pull_request]
+
+jobs:
+  Ubuntu:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        compiler: [gcc, clang]
+        include:
+          - compiler: gcc
+            cc: gcc
+            cxx: g++
+          - compiler: clang
+            cc: clang
+            cxx: clang++
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install libraries
+      run: |
+        sudo apt-get update
+        sudo apt-get install build-essential cmake pkg-config ninja-build ccache libboost-all-dev qt5-default qtbase5-dev libqt5svg5-dev qtscript5-dev qttools5-dev qttools5-dev-tools libqt5opengl5-dev qtmultimedia5-dev libqt5multimedia5-plugins libqt5serialport5-dev libsuperlu-dev liblz4-dev libusb-1.0-0-dev liblzo2-dev libpng-dev libjpeg-dev libglew-dev freeglut3-dev libfreetype6-dev libjson-c-dev qtwayland5 libmypaint-dev libopencv-dev libturbojpeg-dev libomp-11-dev
+
+    - uses: actions/cache@v1
+      with:
+        path: /home/runner/.ccache
+        key: ${{ runner.os }}-${{ matrix.compiler }}-${{ github.sha }}
+        restore-keys: ${{ runner.os }}-${{ matrix.compiler }}-
+
+    - name: Build libtiff
+      run: |
+        cd thirdparty/tiff-4.0.3
+        CFLAGS='-fPIC' CXXFLAGS='-fPIC' ./configure --disable-jbig
+        make -j $(nproc)
+
+    - name: Build
+      run: |
+        cd toonz
+        mkdir build
+        cd build
+        cmake ../sources -G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER=${{ matrix.cxx }} -DCMAKE_C_COMPILER=${{ matrix.cc }} -DWITH_TRANSLATION=OFF
+        ninja
+
+    - name: Create Artifact
+      run: |
+        cd toonz/build
+        sudo ninja install
+
+        mkdir -p appdir/usr
+        cp -r /opt/opentoonz/* appdir/usr
+        cp appdir/usr/share/applications/*.desktop appdir
+        cp appdir/usr/share/icons/hicolor/*/apps/*.png appdir
+
+        mkdir artifact
+        mv appdir/usr/share/opentoonz/stuff artifact/portablestuff
+        rmdir appdir/usr/share/opentoonz
+
+        wget -q -c 'https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage'
+        wget -q -c 'https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage'
+        wget -q -c 'https://github.com/linuxdeploy/linuxdeploy-plugin-appimage/releases/download/continuous/linuxdeploy-plugin-appimage-x86_64.AppImage'
+        chmod 755 linuxdeploy-x86_64.AppImage
+        chmod 755 linuxdeploy-plugin-qt-x86_64.AppImage
+        chmod 755 linuxdeploy-plugin-appimage-x86_64.AppImage
+
+        cat << EOF > apprun.sh
+        #!/usr/bin/env bash
+        exec "\${APPDIR}/usr/bin/OpenToonz"
+        EOF
+        chmod 755 apprun.sh
+
+        export LD_LIBRARY_PATH='appdir/usr/lib/opentoonz'
+        ./linuxdeploy-x86_64.AppImage --appdir=appdir --plugin=qt --output=appimage --custom-apprun=apprun.sh \
+        --executable=appdir/usr/bin/lzocompress \
+        --executable=appdir/usr/bin/lzodecompress \
+        --executable=appdir/usr/bin/tcleanup \
+        --executable=appdir/usr/bin/tcomposer \
+        --executable=appdir/usr/bin/tconverter \
+        --executable=appdir/usr/bin/tfarmcontroller \
+        --executable=appdir/usr/bin/tfarmserver
+        mv OpenToonz*.AppImage artifact/OpenToonz.AppImage
+        ARTIFACT_NAME=Opentoonz-${{ runner.os }}-${{ matrix.compiler }}-${{ github.sha }}
+        mv artifact ${ARTIFACT_NAME}
+        tar zcf ${ARTIFACT_NAME}.tar.gz ${ARTIFACT_NAME}
+
+    - uses: actions/upload-artifact@v1
+      with:
+        name: Opentoonz-${{ runner.os }}-${{ matrix.compiler }}-${{ github.sha }}
+        path: toonz/build/Opentoonz-${{ runner.os }}-${{ matrix.compiler }}-${{ github.sha }}.tar.gz

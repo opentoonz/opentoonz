@@ -103,10 +103,10 @@ float TRandom::getFloat()  // [0,1[
 
   switch (RandomFloatType) {
   case RANDOM_FLOAT_TYPE_1:
-    u = (u >> 5) & 0x007fffff | 0x3f800000;
+    u = ((u >> 5) & 0x007fffff) | 0x3f800000;
     break;
   case RANDOM_FLOAT_TYPE_2:
-    u = u & 0xffff7f00 | 0x0000803f;
+    u = (u & 0xffff7f00) | 0x0000803f;
     break;
   default:
     assert(0);

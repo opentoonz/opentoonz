@@ -7,7 +7,6 @@
 #include "toonz/dpiscale.h"
 #include "toonz/txshsimplelevel.h"
 #include "toonz/stage.h"
-#include "toonz/hook.h"
 
 #include "xshhandlemanager.h"
 

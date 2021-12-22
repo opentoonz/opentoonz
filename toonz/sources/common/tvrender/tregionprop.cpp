@@ -13,7 +13,6 @@
 #include "tsimplecolorstyles.h"
 //#include "tcurveutil.h"
 //#include "tdebugmessage.h"
-//#include "tflash.h"
 
 #ifndef _WIN32
 #define CALLBACK
@@ -198,24 +197,4 @@ TRegionProp *OutlineRegionProp::clone(const TRegion *region) const {
 
 const TColorStyle *OutlineRegionProp::getColorStyle() const {
   return m_colorStyle.getPointer();
-}
-
-//-------------------------------------------------------------------
-
-void OutlineRegionProp::draw(TFlash &flash) {
-  m_colorStyle->drawRegion(flash, getRegion());
-
-  /*
-
-//flash.setColor(m_colorStyle->getMainColor());
-m_colorStyle->setFill(flash);
-
-//rd.setTexture(m_colorStyle->getMainColor());
-
-for (i=0; i<(int)r->getEdgeCount(); i++)
-  computeQuadChain(*r->getEdge(i), quadArray, toBeDeleted);
-
-flash.drawPolygon(quadArray);
-clearPointerContainer(toBeDeleted);
-*/
 }

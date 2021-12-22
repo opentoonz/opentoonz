@@ -86,6 +86,8 @@ public:  // Enums
     SIZE_UI,
     QUAD_UI,
     RECT_UI,
+    COMPASS_UI,
+    COMPASS_SPIN_UI,
 
     CONCEPTSCOUNT,
     UI_CONCEPTS = RADIUS_UI

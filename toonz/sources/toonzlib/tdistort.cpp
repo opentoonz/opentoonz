@@ -315,12 +315,10 @@ PIXEL filterPixel(double a, double b, double c, double d,
 
   // Deal the magnification case, assuming that intervals have at least length
   // 1. This actually stands for:
-  //  1. Their midpoint is bilinear filtered whenever their former length wass
-  //  less than 1 (see fractionary
-  //     parts computing above).
+  //  1. Their midpoint is bilinear filtered whenever their former length was
+  //     less than 1 (see fractionary parts computing above).
   //  2. This behaviour is continuous with respect to interval lengths - that
-  //  is, we pass from supersampling to
-  //     subsampling in a smooth manner.
+  //     is, we pass from supersampling to subsampling in a smooth manner.
   if (b - a < 1) {
     double v = 0.5 * (a + b);
     a        = v - 0.5;
@@ -995,33 +993,41 @@ inline void updateResult(const TPointD &srcCorner, const TPointD &xDer,
   if (jacobianSign > 0) {
     hasPositiveResults = true;
 
-    if (sideDerXAgainstRectSideX != -sideDerXAgainstRectSideY)
+    if (sideDerXAgainstRectSideX != -sideDerXAgainstRectSideY) {
       // Rect lies on one side of the derivative line extension. Therefore, the
       // inverted rect can be updated.
-      if (sideDerXAgainstRectSideX > 0 || sideDerXAgainstRectSideY > 0)
+      if (sideDerXAgainstRectSideX > 0 || sideDerXAgainstRectSideY > 0) {
         posResult.y0 = std::min(posResult.y0, srcCorner.y - securityAddendum);
-      else
+      } else {
         posResult.y1 = std::max(posResult.y1, srcCorner.y + securityAddendum);
+      }
+    }
 
-    if (sideDerYAgainstRectSideX != -sideDerYAgainstRectSideY)
-      if (sideDerYAgainstRectSideX > 0 || sideDerYAgainstRectSideY > 0)
+    if (sideDerYAgainstRectSideX != -sideDerYAgainstRectSideY) {
+      if (sideDerYAgainstRectSideX > 0 || sideDerYAgainstRectSideY > 0) {
         posResult.x1 = std::max(posResult.x1, srcCorner.x + securityAddendum);
-      else
+      } else {
         posResult.x0 = std::min(posResult.x0, srcCorner.x - securityAddendum);
+      }
+    }
   } else if (jacobianSign < 0) {
     hasNegativeResults = true;
 
-    if (sideDerXAgainstRectSideX != -sideDerXAgainstRectSideY)
-      if (sideDerXAgainstRectSideX > 0 || sideDerXAgainstRectSideY > 0)
+    if (sideDerXAgainstRectSideX != -sideDerXAgainstRectSideY) {
+      if (sideDerXAgainstRectSideX > 0 || sideDerXAgainstRectSideY > 0) {
         negResult.y1 = std::max(posResult.y1, srcCorner.y + securityAddendum);
-      else
+      } else {
         negResult.y0 = std::min(posResult.y0, srcCorner.y - securityAddendum);
+      }
+    }
 
-    if (sideDerYAgainstRectSideX != -sideDerYAgainstRectSideY)
-      if (sideDerYAgainstRectSideX > 0 || sideDerYAgainstRectSideY > 0)
+    if (sideDerYAgainstRectSideX != -sideDerYAgainstRectSideY) {
+      if (sideDerYAgainstRectSideX > 0 || sideDerYAgainstRectSideY > 0) {
         negResult.x0 = std::min(posResult.x0, srcCorner.x - securityAddendum);
-      else
+      } else {
         negResult.x1 = std::max(posResult.x1, srcCorner.x + securityAddendum);
+      }
+    }
   }
 }
 

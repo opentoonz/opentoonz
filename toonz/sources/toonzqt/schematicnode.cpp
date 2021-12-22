@@ -2,6 +2,7 @@
 
 #include "toonzqt/schematicnode.h"
 #include "toonzqt/stageschematicscene.h"
+#include "toonzqt/fxschematicscene.h"
 
 #include <QGraphicsSceneMouseEvent>
 #include <QStyleOptionGraphicsItem>
@@ -334,10 +335,9 @@ void SchematicToggle_SplineOptions::paint(
   if (m_state != 0) {
     QIcon &pix =
         (m_state == 2 && !m_imageOn2.isNull()) ? m_imageOn2 : m_imageOn;
-    QRect sourceRect =
-        scene()->views()[0]->matrix().mapRect(QRect(0, 0, 18, 17));
-    QPixmap redPm = pix.pixmap(sourceRect.size());
-    QRect newRect = QRect(0, 0, sourceRect.width() * getDevPixRatio(),
+    QRect sourceRect = scene()->views()[0]->matrix().mapRect(rect.toRect());
+    QPixmap redPm    = pix.pixmap(sourceRect.size());
+    QRect newRect    = QRect(0, 0, sourceRect.width() * getDevPixRatio(),
                           sourceRect.height() * getDevPixRatio());
     painter->drawPixmap(rect, redPm, newRect);
   }
@@ -471,17 +471,29 @@ QPainterPath SchematicLink::shape() const { return m_hitPath; }
 void SchematicLink::paint(QPainter *painter,
                           const QStyleOptionGraphicsItem *option,
                           QWidget *widget) {
+  SchematicViewer *viewer;
+  FxSchematicScene *fxScene = dynamic_cast<FxSchematicScene *>(scene());
+  StageSchematicScene *stageScene =
+      dynamic_cast<StageSchematicScene *>(scene());
+  if (fxScene) {
+    viewer = fxScene->getSchematicViewer();
+  } else if (stageScene) {
+    viewer = stageScene->getSchematicViewer();
+  } else {
+    return;
+  }
+
   if (getStartPort() && (getStartPort()->getType() == 100  // eStageSplinePort
                          || getStartPort()->getType() == 202)) {  // eFxLinkPort
     if (isSelected() || isHighlighted())
-      painter->setPen(QColor(255, 255, 10));
+      painter->setPen(QPen(viewer->getMotionPathSelectedLinkColor()));
     else
-      painter->setPen(QColor(50, 255, 50, 128));
+      painter->setPen(QColor(viewer->getMotionPathLinkColor()));
   } else if (isSelected() || isHighlighted())
-    painter->setPen(QPen(Qt::cyan));
+    painter->setPen(QPen(viewer->getSelectedLinkColor()));
 
   else if (!m_lineShaped)
-    painter->setPen(QPen(Qt::white));
+    painter->setPen(QPen(viewer->getLinkColor()));
   else
     painter->setPen(QPen(QColor(170, 170, 10), 0, Qt::DashLine));
 
@@ -564,6 +576,12 @@ void SchematicLink::mousePressEvent(QGraphicsSceneMouseEvent *me) {
   QPointF pos              = me->scenePos();
   SchematicPort *startPort = getStartPort();
   SchematicPort *endPort   = getEndPort();
+
+  if (!startPort || !endPort) {
+    me->ignore();
+    return;
+  }
+
   if (startPort && endPort) {
     QRectF startRect = startPort->boundingRect();
     startRect.moveTopLeft(startPort->scenePos());
@@ -855,7 +873,7 @@ QPointF SchematicPort::getLinkEndPoint() const { return scenePos() + m_hook; }
 //
 //========================================================
 
-/*! \class SchematicNode schematicnode.h "../inlcude/toonzqt/schematicnode.h"
+/*! \class SchematicNode schematicnode.h "../include/toonzqt/schematicnode.h"
         \brief The class provides methods to draw and handle a node item in the
    SchematicScene.
 */
@@ -908,10 +926,22 @@ QRectF SchematicNode::boundingRect() const { return QRectF(0, 0, 1, 1); }
 void SchematicNode::paint(QPainter *painter,
                           const QStyleOptionGraphicsItem *option,
                           QWidget *widget) {
+  SchematicViewer *viewer;
+  FxSchematicScene *fxScene = dynamic_cast<FxSchematicScene *>(scene());
+  StageSchematicScene *stageScene =
+      dynamic_cast<StageSchematicScene *>(scene());
+  if (fxScene) {
+    viewer = fxScene->getSchematicViewer();
+  } else if (stageScene) {
+    viewer = stageScene->getSchematicViewer();
+  } else {
+    return;
+  }
+
   QPen pen;
   if (isSelected()) {
     painter->setBrush(QColor(0, 0, 0, 0));
-    pen.setColor(QColor(255, 255, 255, 255));
+    pen.setColor(QColor(viewer->getSelectedBorderColor()));
 
     pen.setWidth(4.0);
     pen.setJoinStyle(Qt::RoundJoin);

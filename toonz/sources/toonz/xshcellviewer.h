@@ -8,6 +8,7 @@
 #include "orientation.h"
 
 #include "toonz/txshcell.h"
+#include "tundo.h"
 
 // forward declaration
 class XsheetViewer;
@@ -16,6 +17,20 @@ class TXsheetHandle;
 class TXshSoundTextColumn;
 
 namespace XsheetGUI {
+
+class SetCellMarkUndo final : public TUndo {
+  int m_row, m_col;
+  int m_idBefore, m_idAfter;
+
+public:
+  SetCellMarkUndo(int row, int col, int idAfter);
+  void setId(int id) const;
+  void undo() const override;
+  void redo() const override;
+  int getSize() const override;
+  QString getHistoryString() override;
+  int getHistoryType() override;
+};
 
 class NoteWidget;
 class DragTool;
@@ -90,8 +105,12 @@ class CellArea final : public QWidget {
 
   void drawFrameSeparator(QPainter &p, int row, int col, bool emptyFrame,
                           bool heldFrame = false);
-  void drawLevelCell(QPainter &p, int row, int col, bool isReference = false);
+  // showLevelName can be OFF only when Preferences::getLevelNameDisplayType()
+  // == ShowLevelNameOnColumnHeader
+  void drawLevelCell(QPainter &p, int row, int col, bool isReference = false,
+                     bool showLevelName = true);
   void drawSoundTextCell(QPainter &p, int row, int col);
+  void drawSoundTextColumn(QPainter &p, int r0, int r1, int col);
   void drawSoundCell(QPainter &p, int row, int col, bool isReference = false);
   void drawPaletteCell(QPainter &p, int row, int col, bool isReference = false);
 
@@ -104,10 +123,12 @@ class CellArea final : public QWidget {
                                 bool isFolded = false);
 
   void drawFrameMarker(QPainter &p, const QPoint &xy, QColor color,
-                       bool isKeyFrame = false);
+                       bool isKeyFrame = false, bool isCamera = false);
 
   // Restistusce true
   bool getEaseHandles(int r0, int r1, double e0, double e1, int &rh0, int &rh1);
+
+  bool isKeyFrameArea(int col, int row, QPoint mouseInCell);
 
   DragTool *getDragTool() const;
   void setDragTool(DragTool *dragTool);
@@ -149,7 +170,8 @@ protected:
   /*!Crea il menu' del tasto destro che si visualizza quando si clicca sulla
 cella,
 distinguendo i due casi: cella piena, cella vuota.*/
-  void createCellMenu(QMenu &menu, bool isCellSelected, TXshCell cell);
+  void createCellMenu(QMenu &menu, bool isCellSelected, TXshCell cell, int row,
+                      int col);
   //! Crea il menu' del tasto destro che si visualizza si clicca su un key
   //! frame.
   void createKeyMenu(QMenu &menu);
@@ -165,6 +187,7 @@ protected slots:
   void onStepChanged(QAction *);
   // replace level with another level in the cast
   void onReplaceByCastedLevel(QAction *action);
+  void onSetCellMark();
 };
 
 }  // namespace XsheetGUI

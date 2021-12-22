@@ -237,14 +237,12 @@ public:
   void onAdd() override {}
 
   int getSize() const override {
-    int size1 = m_regionFillInformation
-                    ? m_regionFillInformation->capacity() *
-                          sizeof(m_regionFillInformation)
-                    : 0;
-    int size2 = m_strokeFillInformation
-                    ? m_strokeFillInformation->capacity() *
-                          sizeof(m_strokeFillInformation)
-                    : 0;
+    int size1 = m_regionFillInformation ? m_regionFillInformation->capacity() *
+                                              sizeof(m_regionFillInformation)
+                                        : 0;
+    int size2 = m_strokeFillInformation ? m_strokeFillInformation->capacity() *
+                                              sizeof(m_strokeFillInformation)
+                                        : 0;
     return sizeof(*this) + size1 + size2 + 500;
   }
 
@@ -640,11 +638,10 @@ public:
   }
 
   int getSize() const override {
-    int size =
-        m_selectingStroke
-            ? m_selectingStroke->getControlPointCount() * sizeof(TThickPoint) +
-                  100
-            : 0;
+    int size = m_selectingStroke ? m_selectingStroke->getControlPointCount() *
+                                           sizeof(TThickPoint) +
+                                       100
+                                 : 0;
     return sizeof(*this) +
            m_regionFillInformation->capacity() *
                sizeof(m_regionFillInformation) +
@@ -827,10 +824,14 @@ void fillAreaWithUndo(const TImageP &img, const TRectD &area, TStroke *stroke,
     TTileSetCM32 *tileSet = new TTileSetCM32(ras->getSize());
     tileSet->add(ras, rasterFillArea);
     AreaFiller filler(ti->getRaster());
-    if (!stroke)
-      filler.rectFill(rasterFillArea, cs, onlyUnfilled, colorType != LINES,
-                      colorType != AREAS);
-    else
+    if (!stroke) {
+      bool ret = filler.rectFill(rasterFillArea, cs, onlyUnfilled,
+                                 colorType != LINES, colorType != AREAS);
+      if (!ret) {
+        delete tileSet;
+        return;
+      }
+    } else
       filler.strokeFill(stroke, cs, onlyUnfilled, colorType != LINES,
                         colorType != AREAS);
 
@@ -838,11 +839,6 @@ void fillAreaWithUndo(const TImageP &img, const TRectD &area, TStroke *stroke,
 
     // !autopaintLines will temporary disable autopaint line feature
     if ((plt && !hasAutoInks(plt)) || !autopaintLines) plt = 0;
-
-    std::set<int> autoInks;
-    autoInks.insert(3);
-    autoInks.insert(4);
-    autoInks.insert(5);
 
     if (plt) {
       TRect rect   = rasterFillArea;
@@ -870,7 +866,7 @@ void fillAreaWithUndo(const TImageP &img, const TRectD &area, TStroke *stroke,
 
     vi->findRegions();
 
-    std::vector<TFilledRegionInf> *regionFillInformation = 0;
+    std::vector<TFilledRegionInf> *regionFillInformation    = 0;
     std::vector<std::pair<int, int>> *strokeFillInformation = 0;
     if (colorType != LINES) {
       regionFillInformation = new std::vector<TFilledRegionInf>;
@@ -1324,6 +1320,7 @@ void AreaFillTool::leftButtonDoubleClick(const TPointD &pos,
 
   if (m_polyline.size() <= 1) {
     resetMulti();
+    m_isLeftButtonPressed = false;
     return;
   }
 
@@ -1387,6 +1384,7 @@ void AreaFillTool::leftButtonDoubleClick(const TPointD &pos,
 }
 
 void AreaFillTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
+  if (!m_isLeftButtonPressed) return;
   if (m_type == RECT) {
     m_selectingRect.x1 = pos.x;
     m_selectingRect.y1 = pos.y;
@@ -1586,6 +1584,8 @@ void AreaFillTool::onEnter() {
   // getApplication()->editImage();
 }
 
+bool descending(int i, int j) { return (i > j); }
+
 }  // namespace
 
 //=============================================================================
@@ -1648,9 +1648,9 @@ public:
     {
       double k = dy / dx; /*-- 直線の傾き --*/
       /*--- roundでは負値のときにうまく繋がらない ---*/
-      int start = std::min((int)floor(m_startPosition.x + 0.5),
+      int start      = std::min((int)floor(m_startPosition.x + 0.5),
                            (int)floor(m_mousePosition.x + 0.5));
-      int end = std::max((int)floor(m_startPosition.x + 0.5),
+      int end        = std::max((int)floor(m_startPosition.x + 0.5),
                          (int)floor(m_mousePosition.x + 0.5));
       double start_x = (m_startPosition.x < m_mousePosition.x)
                            ? m_startPosition.x
@@ -1673,9 +1673,9 @@ public:
     {
       double k = dx / dy; /*-- 直線の傾き --*/
       /*--- roundでは負値のときにうまく繋がらない ---*/
-      int start = std::min((int)floor(m_startPosition.y + 0.5),
+      int start      = std::min((int)floor(m_startPosition.y + 0.5),
                            (int)floor(m_mousePosition.y + 0.5));
-      int end = std::max((int)floor(m_startPosition.y + 0.5),
+      int end        = std::max((int)floor(m_startPosition.y + 0.5),
                          (int)floor(m_mousePosition.y + 0.5));
       double start_x = (m_startPosition.y < m_mousePosition.y)
                            ? m_startPosition.x
@@ -1773,7 +1773,7 @@ int FillTool::getCursorId() const {
   if (m_colorType.getValue() == LINES)
     ret = ToolCursor::FillCursorL;
   else {
-    ret                                      = ToolCursor::FillCursor;
+    ret = ToolCursor::FillCursor;
     if (m_colorType.getValue() == AREAS) ret = ret | ToolCursor::Ex_Area;
     if (!m_autopaintLines.getValue())
       ret = ret | ToolCursor::Ex_Fill_NoAutopaint;
@@ -1860,6 +1860,11 @@ void FillTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
       // drawCross(m_firstPoint, 6);
       invalidate();
     } else {
+      // When using tablet on windows, the mouse press event may be called AFTER
+      // tablet release. It causes unwanted another "first click" just after
+      // frame-range-filling. Calling processEvents() here to make sure to
+      // consume the mouse press event in advance.
+      qApp->processEvents();
       // SECONDO CLICK
       TFrameId fid = getCurrentFid();
       MultiFiller filler(m_firstPoint, pos, params,
@@ -1906,7 +1911,7 @@ void FillTool::leftButtonDoubleClick(const TPointD &pos, const TMouseEvent &e) {
 //-----------------------------------------------------------------------------
 
 void FillTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
-  if (m_fillType.getValue() != NORMALFILL && !m_onion.getValue() ||
+  if ((m_fillType.getValue() != NORMALFILL && !m_onion.getValue()) ||
       (m_colorType.getValue() == AREAS && m_onion.getValue()))
     m_rectFill->leftButtonDrag(pos, e);
   else if (!m_onion.getValue() && !m_frameRange.getValue()) {
@@ -2011,7 +2016,7 @@ bool FillTool::onPropertyChanged(std::string propertyName) {
   // Onion Skin
   else if (propertyName == m_onion.getName()) {
     if (m_onion.getValue()) FillType = ::to_string(m_fillType.getValue());
-    FillOnion                        = (int)(m_onion.getValue());
+    FillOnion = (int)(m_onion.getValue());
   }
   // Frame Range
   else if (propertyName == m_frameRange.getName()) {
@@ -2031,7 +2036,7 @@ bool FillTool::onPropertyChanged(std::string propertyName) {
   // Segment
   else if (propertyName == m_segment.getName()) {
     if (m_segment.getValue()) FillType = ::to_string(m_fillType.getValue());
-    FillSegment                        = (int)(m_segment.getValue());
+    FillSegment = (int)(m_segment.getValue());
   }
 
   // Autopaint
@@ -2162,14 +2167,30 @@ void FillTool::draw() {
 
 //-----------------------------------------------------------------------------
 
-int FillTool::pick(const TImageP &image, const TPointD &pos) {
+int FillTool::pick(const TImageP &image, const TPointD &pos, const int frame) {
   TToonzImageP ti  = image;
   TVectorImageP vi = image;
   if (!ti && !vi) return 0;
 
   StylePicker picker(image);
-  double pixelSize2 = getPixelSize() * getPixelSize();
-  return picker.pickStyleId(pos, pixelSize2);
+  double scale2 = 1.0;
+  if (vi) {
+    TAffine aff = getViewer()->getViewMatrix() * getCurrentColumnMatrix(frame);
+    scale2      = aff.det();
+  }
+  TPointD pickPos = pos;
+  // in case that the column is animated in scene-editing mode
+  if (frame > 0) {
+    TPointD dpiScale = getViewer()->getDpiScale();
+    pickPos.x *= dpiScale.x;
+    pickPos.y *= dpiScale.y;
+    TPointD worldPos = getCurrentColumnMatrix() * pickPos;
+    pickPos          = getCurrentColumnMatrix(frame).inv() * worldPos;
+    pickPos.x /= dpiScale.x;
+    pickPos.y /= dpiScale.y;
+  }
+  // thin stroke can be picked with 10 pixel range
+  return picker.pickStyleId(pickPos, 10.0, scale2);
 }
 
 //-----------------------------------------------------------------------------
@@ -2186,32 +2207,54 @@ int FillTool::pickOnionColor(const TPointD &pos) {
   if (!sl) return 0;
 
   std::vector<int> rows;
-  osMask.getAll(sl->guessIndex(fid), rows);
 
-  int i, j;
+  // level editing case
+  if (app->getCurrentFrame()->isEditingLevel()) {
+    osMask.getAll(sl->guessIndex(fid), rows);
+    int i, j;
+    for (i = 0; i < (int)rows.size(); i++)
+      if (sl->index2fid(rows[i]) > fid) break;
 
-  for (i = 0; i < (int)rows.size(); i++)
-    if (sl->index2fid(rows[i]) > fid) break;
-
-  int onionStyleId = 0;
-  for (j = i - 1; j >= 0; j--) {
-    TFrameId onionFid = sl->index2fid(rows[j]);
-    if (onionFid != fid &&
-        ((onionStyleId =
-              pick(m_level->getFrame(onionFid, ImageManager::none, 1), pos)) >
-         0))  // subsabling must be 1, otherwise onionfill does  not work
-      break;
-  }
-  if (onionStyleId == 0)
-    for (j = i; j < (int)rows.size(); j++) {
+    int onionStyleId = 0;
+    for (j = i - 1; j >= 0; j--) {
       TFrameId onionFid = sl->index2fid(rows[j]);
       if (onionFid != fid &&
           ((onionStyleId =
                 pick(m_level->getFrame(onionFid, ImageManager::none, 1), pos)) >
-           0))  // subsabling must be 1, otherwise onionfill does  not work
+           0))  // subsampling must be 1, otherwise onionfill does  not work
         break;
     }
-  return onionStyleId;
+    if (onionStyleId == 0)
+      for (j = i; j < (int)rows.size(); j++) {
+        TFrameId onionFid = sl->index2fid(rows[j]);
+        if (onionFid != fid &&
+            ((onionStyleId = pick(
+                  m_level->getFrame(onionFid, ImageManager::none, 1), pos)) >
+             0))  // subsampling must be 1, otherwise onionfill does  not work
+          break;
+      }
+    return onionStyleId;
+  } else {  // scene editing case
+    TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
+    int colId    = app->getCurrentColumn()->getColumnIndex();
+    int row      = app->getCurrentFrame()->getFrame();
+    osMask.getAll(row, rows);
+    std::vector<int>::iterator it = rows.begin();
+    while (it != rows.end() && *it < row) it++;
+    std::sort(rows.begin(), it, descending);
+    int onionStyleId = 0;
+    for (int i = 0; i < (int)rows.size(); i++) {
+      if (rows[i] == row) continue;
+      TXshCell cell = xsh->getCell(rows[i], colId);
+      TXshLevel *xl = cell.m_level.getPointer();
+      if (!xl || xl->getSimpleLevel() != sl) continue;
+      TFrameId onionFid = cell.getFrameId();
+      onionStyleId = pick(m_level->getFrame(onionFid, ImageManager::none, 1),
+                          pos, rows[i]);
+      if (onionStyleId > 0) break;
+    }
+    return onionStyleId;
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -2286,9 +2329,9 @@ void FillTool::onActivate() {
   bool ret = true;
   ret      = ret && connect(TTool::m_application->getCurrentFrame(),
                        SIGNAL(frameSwitched()), this, SLOT(onFrameSwitched()));
-  ret = ret && connect(TTool::m_application->getCurrentScene(),
+  ret      = ret && connect(TTool::m_application->getCurrentScene(),
                        SIGNAL(sceneSwitched()), this, SLOT(onFrameSwitched()));
-  ret = ret &&
+  ret      = ret &&
         connect(TTool::m_application->getCurrentColumn(),
                 SIGNAL(columnIndexSwitched()), this, SLOT(onFrameSwitched()));
   assert(ret);

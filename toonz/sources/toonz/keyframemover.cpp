@@ -13,6 +13,7 @@
 #include "toonz/txsheethandle.h"
 #include "toonz/tscenehandle.h"
 #include "toonz/txsheet.h"
+#include "toonz/preferences.h"
 
 // TnzCore includes
 #include "tundo.h"
@@ -48,7 +49,8 @@ void KeyframeMover::setKeyframes() {
   for (auto const &key : m_lastKeyframes) {
     int c = key.second;
     TStageObjectId objId =
-        c >= 0 ? TStageObjectId::ColumnId(c) : TStageObjectId::CameraId(0);
+        c >= 0 ? TStageObjectId::ColumnId(c)
+               : TStageObjectId::CameraId(xsh->getCameraColumnIndex());
     TStageObject *stObj = xsh->getStageObject(objId);
     TStageObject::KeyframeMap keyframes;
     stObj->getKeyframes(keyframes);
@@ -66,7 +68,8 @@ void KeyframeMover::getKeyframes() {
   for (auto const &pos : m_startSelectedKeyframes) {
     int c = pos.second;
     TStageObjectId objId =
-        c >= 0 ? TStageObjectId::ColumnId(c) : TStageObjectId::CameraId(0);
+        c >= 0 ? TStageObjectId::ColumnId(c)
+               : TStageObjectId::CameraId(xsh->getCameraColumnIndex());
     TStageObject *stObj = xsh->getStageObject(objId);
     assert(stObj->isKeyframe(pos.first));
     TStageObject::KeyframeMap keyframes;
@@ -115,7 +118,8 @@ bool KeyframeMover::moveKeyframes(
       int c = posIt->second;
       int r = posIt->first;
       TStageObjectId objId =
-          c >= 0 ? TStageObjectId::ColumnId(c) : TStageObjectId::CameraId(0);
+          c >= 0 ? TStageObjectId::ColumnId(c)
+                 : TStageObjectId::CameraId(xsh->getCameraColumnIndex());
       TStageObject *stObj = xsh->getStageObject(objId);
       if (r + dr < 0) {
         dr = -r;
@@ -140,7 +144,8 @@ bool KeyframeMover::moveKeyframes(
         int c = revIt->second;
         int r = revIt->first;
         TStageObjectId objId =
-            c >= 0 ? TStageObjectId::ColumnId(c) : TStageObjectId::CameraId(0);
+            c >= 0 ? TStageObjectId::ColumnId(c)
+                   : TStageObjectId::CameraId(xsh->getCameraColumnIndex());
         TStageObject *stObj = xsh->getStageObject(objId);
         if (m_qualifiers & eCopyKeyframes) {
           firstTime = true;
@@ -154,7 +159,8 @@ bool KeyframeMover::moveKeyframes(
         int c = posIt->second;
         int r = posIt->first;
         TStageObjectId objId =
-            c >= 0 ? TStageObjectId::ColumnId(c) : TStageObjectId::CameraId(0);
+            c >= 0 ? TStageObjectId::ColumnId(c)
+                   : TStageObjectId::CameraId(xsh->getCameraColumnIndex());
         TStageObject *stObj = xsh->getStageObject(objId);
         if (m_qualifiers & eCopyKeyframes) {
           firstTime = true;
@@ -178,7 +184,8 @@ bool KeyframeMover::moveKeyframes(
     int c = posIt->second;
     int r = posIt->first;
     TStageObjectId objId =
-        c >= 0 ? TStageObjectId::ColumnId(c) : TStageObjectId::CameraId(0);
+        c >= 0 ? TStageObjectId::ColumnId(c)
+               : TStageObjectId::CameraId(xsh->getCameraColumnIndex());
     TStageObject *stObj    = xsh->getStageObject(objId);
     if (r + dr < 0) dr     = -r;
     if (dr == 0) notChange = true;
@@ -192,7 +199,8 @@ bool KeyframeMover::moveKeyframes(
     int c = posIt->second;
     int r = posIt->first;
     TStageObjectId objId =
-        c >= 0 ? TStageObjectId::ColumnId(c) : TStageObjectId::CameraId(0);
+        c >= 0 ? TStageObjectId::ColumnId(c)
+               : TStageObjectId::CameraId(xsh->getCameraColumnIndex());
     TStageObject *stObj = xsh->getStageObject(objId);
 
     if (m_qualifiers & eOverwriteKeyframes) {
@@ -205,7 +213,7 @@ bool KeyframeMover::moveKeyframes(
     } else if (m_qualifiers & eInsertKeyframes) {
       int s                           = r;
       TStageObject::Keyframe keyframe = stObj->getKeyframe(r);
-      if (!m_qualifiers & eCopyKeyframes) stObj->removeKeyframeWithoutUndo(r);
+      if (!(m_qualifiers & eCopyKeyframes)) stObj->removeKeyframeWithoutUndo(r);
       std::set<int> keyframeToShift;
       while (stObj->isKeyframe(s + dr) && s + dr != r) {
         keyframeToShift.insert(s + dr);
@@ -266,13 +274,13 @@ KeyframeMoverTool::KeyframeMoverTool(XsheetViewer *viewer, bool justMovement)
     , m_startSelection()
     , m_offset(0)
     , m_firstRow(0)
-    , m_firstCol(0)
     , m_selecting(false)
     , m_startPos()
     , m_curPos()
     , m_firstKeyframeMovement(false)
     , m_justMovement(justMovement) {
-  m_mover = new KeyframeMover();
+  m_mover    = new KeyframeMover();
+  m_firstCol = Preferences::instance()->isXsheetCameraColumnVisible() ? -1 : 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -297,7 +305,13 @@ void KeyframeMoverTool::ctrlSelect(int row, int col) {
 void KeyframeMoverTool::shiftSelect(int row, int col) {
   TXsheet *xsh = getViewer()->getXsheet();
   int r0 = 0, c0 = 0, r1 = -1, c1 = -1;
-  for (int c = 0; c < xsh->getColumnCount(); c++) {
+  int c = 0;
+  if (Preferences::instance()->isXsheetCameraColumnVisible()) {
+    c0--;
+    c1--;
+    c--;
+  }
+  for (; c < xsh->getColumnCount(); c++) {
     TStageObject *obj = xsh->getStageObject(getViewer()->getObjectId(c));
     int ra, rb;
     obj->getKeyframeRange(ra, rb);

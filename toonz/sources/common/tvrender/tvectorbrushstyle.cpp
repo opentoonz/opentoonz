@@ -39,7 +39,6 @@ public:
   TStrokeProp *clone(const TStroke *stroke) const override;
 
   void draw(const TVectorRenderData &rd) override;
-  void draw(TFlash &flash) override {}
 
   const TColorStyle *getColorStyle() const override;
 

@@ -31,8 +31,9 @@ XSheetToolbar::XSheetToolbar(XsheetViewer *parent, Qt::WFlags flags)
 #endif
     : CommandBar(parent, flags, isCollapsible, true), m_viewer(parent) {
   setObjectName("cornerWidget");
-  setFixedHeight(30);
+  setFixedHeight(29);
   setObjectName("XSheetToolbar");
+  setIconSize(QSize(20, 20));
 }
 
 //-----------------------------------------------------------------------------
@@ -46,7 +47,7 @@ void XSheetToolbar::showToolbar(bool show) {
 
 void XSheetToolbar::toggleXSheetToolbar() {
   bool toolbarEnabled = Preferences::instance()->isShowXSheetToolbarEnabled();
-  Preferences::instance()->enableShowXSheetToolbar(!toolbarEnabled);
+  Preferences::instance()->setValue(showXSheetToolbar, !toolbarEnabled);
   TApp::instance()->getCurrentScene()->notifyPreferenceChanged("XSheetToolbar");
 }
 
@@ -92,4 +93,4 @@ public:
 
 //============================================================
 
-}  // namespace XsheetGUI;
+}  // namespace XsheetGUI

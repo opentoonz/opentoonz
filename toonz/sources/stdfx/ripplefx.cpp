@@ -197,11 +197,11 @@ public:
     TRasterP rasIn = tileIn.getRaster();
 
     // Compute the warper tile
-    TSpectrum::ColorKey colors[] = {TSpectrum::ColorKey(0, TPixel32::White),
-                                    TSpectrum::ColorKey(0.5, TPixel32::Black),
-                                    TSpectrum::ColorKey(1, TPixel32::White)};
-
-    TSpectrumParamP ripplecolors = TSpectrumParamP(tArrayCount(colors), colors);
+    std::vector<TSpectrum::ColorKey> colors = {
+        TSpectrum::ColorKey(0, TPixel32::White),
+        TSpectrum::ColorKey(0.5, TPixel32::Black),
+        TSpectrum::ColorKey(1, TPixel32::White)};
+    TSpectrumParamP ripplecolors = TSpectrumParamP(colors);
 
     // Build the multiradial
     warperInfo.m_affine = warperInfo.m_affine * TTranslation(center) *

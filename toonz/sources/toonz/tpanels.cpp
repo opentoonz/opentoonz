@@ -24,19 +24,24 @@
 #include "historypane.h"
 #include "cleanupsettingspane.h"
 
-#ifdef LINETEST
-#include "linetestpane.h"
-#include "linetestcapturepane.h"
-#else
+#include "vectorguideddrawingpane.h"
+
+#include "expressionreferencemanager.h"
+
+#if defined(x64)
+#include "stopmotioncontroller.h"
+#endif
+
 #include "tasksviewer.h"
 #include "batchserversviewer.h"
 #include "colormodelviewer.h"
-#endif
 
 #include "curveio.h"
 #include "menubarcommandids.h"
 #include "tapp.h"
 #include "mainwindow.h"
+#include "columncommand.h"
+#include "levelcommand.h"
 
 // TnzTools includes
 #include "tools/tooloptions.h"
@@ -53,6 +58,9 @@
 #include "toonzqt/tselectionhandle.h"
 #include "toonzqt/tmessageviewer.h"
 #include "toonzqt/scriptconsole.h"
+#include "toonzqt/fxsettings.h"
+#include "toonzqt/fxselection.h"
+#include "stageobjectselection.h"
 
 // TnzLib includes
 #include "toonz/palettecontroller.h"
@@ -72,6 +80,9 @@
 #include "toonz/palettecmd.h"
 #include "toonz/preferences.h"
 #include "tw/stringtable.h"
+#include "toonz/toonzfolders.h"
+#include "toonz/fxcommand.h"
+#include "toonz/tstageobjectcmd.h"
 
 // TnzBase includes
 #include "trasterfx.h"
@@ -214,6 +225,45 @@ int SchematicScenePanel::getViewType() {
 
 //-----------------------------------------------------------------------------
 
+void SchematicScenePanel::onDeleteFxs(const FxSelection *selection) {
+  if (selection->isEmpty()) return;
+  std::set<int> colIndices;
+  std::set<TFx *> fxs;
+  for (auto index : selection->getColumnIndexes()) colIndices.insert(index);
+  for (auto fx : selection->getFxs()) fxs.insert(fx.getPointer());
+
+  if (!ColumnCmd::checkExpressionReferences(colIndices, fxs)) return;
+
+  TApp *app = TApp::instance();
+  TFxCommand::deleteSelection(selection->getFxs().toStdList(),
+                              selection->getLinks().toStdList(),
+                              selection->getColumnIndexes().toStdList(),
+                              app->getCurrentXsheet(), app->getCurrentFx());
+}
+
+//-----------------------------------------------------------------------------
+
+void SchematicScenePanel::onDeleteStageObjects(
+    const StageObjectSelection *selection) {
+  if (!ExpressionReferenceManager::instance()->checkReferenceDeletion(
+          selection->getObjects()))
+    return;
+
+  TApp *app = TApp::instance();
+  TStageObjectCmd::deleteSelection(
+      selection->getObjects().toVector().toStdVector(),
+      selection->getLinks().toStdList(), selection->getSplines().toStdList(),
+      app->getCurrentXsheet(), app->getCurrentObject(), app->getCurrentFx());
+}
+
+//-----------------------------------------------------------------------------
+
+void SchematicScenePanel::onColumnPaste(const QList<TXshColumnP> &columns) {
+  LevelCmd::addMissingLevelsToCast(columns);
+}
+
+//-----------------------------------------------------------------------------
+
 void SchematicScenePanel::showEvent(QShowEvent *e) {
   if (m_schematicViewer->isStageSchematicViewed())
     setWindowTitle(QObject::tr("Stage Schematic"));
@@ -229,8 +279,13 @@ void SchematicScenePanel::showEvent(QShowEvent *e) {
           SLOT(onCollapse(QList<TStageObjectId>)));
   connect(m_schematicViewer, SIGNAL(doExplodeChild(const QList<TFxP> &)), this,
           SLOT(onExplodeChild(const QList<TFxP> &)));
+  connect(m_schematicViewer, SIGNAL(doDeleteFxs(const FxSelection *)), this,
+          SLOT(onDeleteFxs(const FxSelection *)));
   connect(m_schematicViewer, SIGNAL(doExplodeChild(QList<TStageObjectId>)),
           this, SLOT(onExplodeChild(QList<TStageObjectId>)));
+  connect(m_schematicViewer,
+          SIGNAL(doDeleteStageObjects(const StageObjectSelection *)), this,
+          SLOT(onDeleteStageObjects(const StageObjectSelection *)));
   connect(m_schematicViewer, SIGNAL(editObject()), this, SLOT(onEditObject()));
   connect(app->getCurrentLevel(), SIGNAL(xshLevelChanged()), m_schematicViewer,
           SLOT(updateScenes()));
@@ -242,6 +297,8 @@ void SchematicScenePanel::showEvent(QShowEvent *e) {
           SLOT(updateSchematic()));
   connect(app->getCurrentScene(), SIGNAL(sceneSwitched()), m_schematicViewer,
           SLOT(onSceneSwitched()));
+  connect(m_schematicViewer, SIGNAL(columnPasted(const QList<TXshColumnP> &)),
+          this, SLOT(onColumnPaste(const QList<TXshColumnP> &)));
   m_schematicViewer->updateSchematic();
 }
 
@@ -271,6 +328,9 @@ void SchematicScenePanel::hideEvent(QHideEvent *e) {
              m_schematicViewer, SLOT(updateSchematic()));
   disconnect(app->getCurrentScene(), SIGNAL(sceneSwitched()), m_schematicViewer,
              SLOT(onSceneSwitched()));
+  disconnect(m_schematicViewer,
+             SIGNAL(columnPasted(const QList<TXshColumnP> &)), this,
+             SLOT(onColumnPaste(const QList<TXshColumnP> &)));
 }
 
 //=============================================================================
@@ -420,7 +480,7 @@ public:
 //-----------------------------------------------------------------------------
 
 PaletteViewerPanel::PaletteViewerPanel(QWidget *parent)
-    : StyleShortcutSwitchablePanel(parent) {
+    : StyleShortcutSwitchablePanel(parent), m_isFrozen(false) {
   m_paletteHandle = new TPaletteHandle();
   connect(m_paletteHandle, SIGNAL(colorStyleSwitched()),
           SLOT(onColorStyleSwitched()));
@@ -462,21 +522,20 @@ int PaletteViewerPanel::getViewType() { return m_paletteViewer->getViewMode(); }
 void PaletteViewerPanel::reset() {
   m_paletteViewer->setPaletteHandle(
       TApp::instance()->getPaletteController()->getCurrentLevelPalette());
-  m_isCurrentButton->setPressed(true);
-  setActive(true);
+  m_freezeButton->setPressed(false);
+  setFrozen(false);
 }
 
 //-----------------------------------------------------------------------------
 
 void PaletteViewerPanel::initializeTitleBar() {
-  m_isCurrentButton = new TPanelTitleBarButton(
-      getTitleBar(), svgToPixmap(":Resources/switch.svg"),
-      svgToPixmap(":Resources/switch_over.svg"),
-      svgToPixmap(":Resources/switch_on.svg"));
-  getTitleBar()->add(QPoint(-54, 2), m_isCurrentButton);
-  m_isCurrentButton->setPressed(true);
-  connect(m_isCurrentButton, SIGNAL(toggled(bool)),
-          SLOT(onCurrentButtonToggled(bool)));
+  m_freezeButton = new TPanelTitleBarButton(
+      getTitleBar(), getIconThemePath("actions/20/pane_freeze.svg"));
+  m_freezeButton->setToolTip(tr("Freeze"));
+  getTitleBar()->add(QPoint(-54, 0), m_freezeButton);
+  m_freezeButton->setPressed(m_isFrozen);
+  connect(m_freezeButton, SIGNAL(toggled(bool)),
+          SLOT(onFreezeButtonToggled(bool)));
 }
 
 //-----------------------------------------------------------------------------
@@ -493,23 +552,24 @@ void PaletteViewerPanel::onPaletteSwitched() {
 
 //-----------------------------------------------------------------------------
 
-void PaletteViewerPanel::onCurrentButtonToggled(bool isCurrent) {
-  if (isActive() == isCurrent) return;
+void PaletteViewerPanel::onFreezeButtonToggled(bool frozen) {
+  if (isFrozen() == frozen) return;
 
   TApp *app          = TApp::instance();
   TPaletteHandle *ph = app->getPaletteController()->getCurrentLevelPalette();
   // Se sono sulla palette del livello corrente e le palette e' vuota non
   // consento di bloccare il pannello.
-  if (isActive() && !ph->getPalette()) {
-    m_isCurrentButton->setPressed(true);
+  if (!isFrozen() && !ph->getPalette()) {
+    m_freezeButton->setPressed(false);
     return;
   }
 
-  setActive(isCurrent);
-  m_paletteViewer->enableSaveAction(isCurrent);
+  setFrozen(frozen);
+  m_paletteViewer->enableSaveAction(!frozen);
 
   // Cambio il livello corrente
-  if (isCurrent) {
+  if (!frozen) {
+    m_frozenPalette = nullptr;
     std::set<TXshSimpleLevel *> levels;
     TXsheet *xsheet = app->getCurrentXsheet()->getXsheet();
     int row, column;
@@ -541,6 +601,7 @@ void PaletteViewerPanel::onCurrentButtonToggled(bool isCurrent) {
     app->getCurrentLevel()->setLevel(level);
     m_paletteViewer->setPaletteHandle(ph);
   } else {
+    m_frozenPalette = ph->getPalette();
     m_paletteHandle->setPalette(ph->getPalette());
     m_paletteViewer->setPaletteHandle(m_paletteHandle);
   }
@@ -552,18 +613,40 @@ void PaletteViewerPanel::onCurrentButtonToggled(bool isCurrent) {
 void PaletteViewerPanel::onSceneSwitched() {
   // Se e' il paletteHandle del livello corrente l'aggiornamento viene fatto
   // grazie all'aggiornamento del livello.
-  if (isActive()) return;
+  if (!isFrozen()) return;
 
   // Setto a zero la palette del "paletteHandle bloccato".
   m_paletteHandle->setPalette(0);
   // Sblocco il viewer nel caso in cui il e' bloccato.
-  if (!isActive()) {
-    setActive(true);
-    m_isCurrentButton->setPressed(true);
+  if (isFrozen()) {
+    setFrozen(false);
+    m_freezeButton->setPressed(false);
     m_paletteViewer->setPaletteHandle(
         TApp::instance()->getPaletteController()->getCurrentLevelPalette());
   }
   m_paletteViewer->updateView();
+}
+
+//-----------------------------------------------------------------------------
+
+void PaletteViewerPanel::showEvent(QShowEvent *) {
+  TSceneHandle *sceneHandle = TApp::instance()->getCurrentScene();
+  bool ret = connect(sceneHandle, SIGNAL(preferenceChanged(const QString &)),
+                     this, SLOT(onPreferenceChanged(const QString &)));
+  assert(ret);
+}
+
+//-----------------------------------------------------------------------------
+
+void PaletteViewerPanel::hideEvent(QHideEvent *) {
+  TSceneHandle *sceneHandle = TApp::instance()->getCurrentScene();
+  if (sceneHandle) sceneHandle->disconnect(this);
+}
+
+//-----------------------------------------------------------------------------
+
+void PaletteViewerPanel::onPreferenceChanged(const QString &prefName) {
+  if (prefName == "ColorCalibration") update();
 }
 
 //=============================================================================
@@ -626,6 +709,17 @@ void StudioPaletteViewerPanel::onPaletteSwitched() {
       m_studioPaletteHandle);
 }
 
+//-----------------------------------------------------------------------------
+
+void StudioPaletteViewerPanel::setViewType(int viewType) {
+  m_studioPaletteViewer->setViewMode(viewType);
+}
+//-----------------------------------------------------------------------------
+
+int StudioPaletteViewerPanel::getViewType() {
+  return m_studioPaletteViewer->getViewMode();
+}
+
 //=============================================================================
 // StudioPaletteViewerFactory
 //-----------------------------------------------------------------------------
@@ -670,8 +764,13 @@ ColorFieldEditorController::ColorFieldEditorController() {
 //-----------------------------------------------------------------------------
 
 void ColorFieldEditorController::edit(DVGui::ColorField *colorField) {
-  if (m_currentColorField && m_currentColorField->isEditing())
-    m_currentColorField->setIsEditing(false);
+  if (m_currentColorField) {
+    if (m_currentColorField->isEditing())
+      m_currentColorField->setIsEditing(false);
+    disconnect(m_currentColorField,
+               SIGNAL(colorChanged(const TPixel32 &, bool)), this,
+               SLOT(onColorChanged(const TPixel32 &, bool)));
+  }
 
   m_currentColorField = colorField;
   m_currentColorField->setIsEditing(true);
@@ -687,30 +786,31 @@ void ColorFieldEditorController::edit(DVGui::ColorField *colorField) {
   connect(m_currentColorField, SIGNAL(colorChanged(const TPixel32 &, bool)),
           SLOT(onColorChanged(const TPixel32 &, bool)));
   connect(m_colorFieldHandle, SIGNAL(colorStyleChanged(bool)),
-          SLOT(onColorStyleChanged()));
+          SLOT(onColorStyleChanged(bool)));
 }
 
 //-----------------------------------------------------------------------------
 
 void ColorFieldEditorController::hide() {
   disconnect(m_colorFieldHandle, SIGNAL(colorStyleChanged(bool)), this,
-             SLOT(onColorStyleChanged()));
+             SLOT(onColorStyleChanged(bool)));
 }
 
 //-----------------------------------------------------------------------------
 
-void ColorFieldEditorController::onColorStyleChanged() {
+void ColorFieldEditorController::onColorStyleChanged(bool isDragging) {
   if (!m_currentColorField) return;
   assert(!!m_palette);
   TPixel32 color = m_palette->getStyle(1)->getMainColor();
-  if (m_currentColorField->getColor() == color) return;
+  if (m_currentColorField->getColor() == color && isDragging) return;
   m_currentColorField->setColor(color);
-  m_currentColorField->notifyColorChanged(color, false);
+  m_currentColorField->notifyColorChanged(color, isDragging);
 }
 
 //-----------------------------------------------------------------------------
 
-void ColorFieldEditorController::onColorChanged(const TPixel32 &color, bool) {
+void ColorFieldEditorController::onColorChanged(const TPixel32 &color,
+                                                bool isDragging) {
   if (!m_currentColorField) return;
   TColorStyle *style = m_palette->getStyle(1);
   if (style->getMainColor() == color) return;
@@ -718,7 +818,7 @@ void ColorFieldEditorController::onColorChanged(const TPixel32 &color, bool) {
   TApp::instance()
       ->getPaletteController()
       ->getCurrentPalette()
-      ->notifyColorStyleChanged();
+      ->notifyColorStyleChanged(isDragging);
 }
 
 //=============================================================================
@@ -816,6 +916,23 @@ StyleEditorPanel::StyleEditorPanel(QWidget *parent) : TPanel(parent) {
 }
 
 //-----------------------------------------------------------------------------
+void StyleEditorPanel::showEvent(QShowEvent *) {
+  TSceneHandle *sceneHandle = TApp::instance()->getCurrentScene();
+  bool ret = connect(sceneHandle, SIGNAL(preferenceChanged(const QString &)),
+                     this, SLOT(onPreferenceChanged(const QString &)));
+  onPreferenceChanged("ColorCalibration");
+  assert(ret);
+}
+//-----------------------------------------------------------------------------
+void StyleEditorPanel::hideEvent(QHideEvent *) {
+  TSceneHandle *sceneHandle = TApp::instance()->getCurrentScene();
+  if (sceneHandle) sceneHandle->disconnect(this);
+}
+//-----------------------------------------------------------------------------
+void StyleEditorPanel::onPreferenceChanged(const QString &prefName) {
+  if (prefName == "ColorCalibration") m_styleEditor->updateColorCalibration();
+}
+//-----------------------------------------------------------------------------
 
 class StyleEditorFactory final : public TPanelFactory {
 public:
@@ -837,33 +954,6 @@ OpenFloatingPanel openStyleEditorCommand(MI_OpenStyleControl, "StyleEditor",
                                          QObject::tr("Style Editor"));
 //-----------------------------------------------------------------------------
 
-//=============================================================================
-// SceneViewer
-//-----------------------------------------------------------------------------
-
-class SceneViewerFactory final : public TPanelFactory {
-public:
-  SceneViewerFactory() : TPanelFactory("SceneViewer") {}
-
-  TPanel *createPanel(QWidget *parent) override {
-    SceneViewerPanel *panel = new SceneViewerPanel(parent);
-    panel->setObjectName(getPanelType());
-    panel->setWindowTitle(QObject::tr("Viewer"));
-    panel->setMinimumSize(220, 280);
-    return panel;
-  }
-
-  void initialize(TPanel *panel) override { assert(0); }
-
-} sceneViewerFactory;
-
-//=============================================================================
-OpenFloatingPanel openSceneViewerCommand(MI_OpenLevelView, "SceneViewer",
-                                         QObject::tr("Viewer"));
-//-----------------------------------------------------------------------------
-
-//-----------------------------------------------------------------------------
-
 class ToolbarFactory final : public TPanelFactory {
 public:
   ToolbarFactory() : TPanelFactory("ToolBar") {}
@@ -872,8 +962,8 @@ public:
     panel->setWidget(toolbar);
     panel->setIsMaximizable(false);
     // panel->setAllowedAreas(Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea);
-    panel->setFixedWidth(45);  // 35
-    toolbar->setFixedWidth(35);
+    panel->setFixedWidth(44);  // 35
+    toolbar->setFixedWidth(34);
     panel->setWindowTitle(QString(""));
   }
 } toolbarFactory;
@@ -975,8 +1065,7 @@ void FlipbookPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
   // safe area button
   TPanelTitleBarButtonForSafeArea *safeAreaButton =
       new TPanelTitleBarButtonForSafeArea(
-          titleBar, ":Resources/pane_safe_off.svg",
-          ":Resources/pane_safe_over.svg", ":Resources/pane_safe_on.svg");
+          titleBar, getIconThemePath("actions/20/pane_safe.svg"));
   safeAreaButton->setToolTip(tr("Safe Area (Right Click to Select)"));
   titleBar->add(QPoint(x, 0), safeAreaButton);
   ret = ret && connect(safeAreaButton, SIGNAL(toggled(bool)),
@@ -989,15 +1078,14 @@ void FlipbookPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
   safeAreaButton->setPressed(
       CommandManager::instance()->getAction(MI_SafeArea)->isChecked());
 
-  x += 33 + iconWidth;
+  x += 28 + iconWidth;
   // minimize button
-  m_button = new TPanelTitleBarButton(titleBar, ":Resources/pane_minimize.svg",
-                                      ":Resources/pane_minimize_over.svg",
-                                      ":Resources/pane_minimize_on.svg");
+  m_button = new TPanelTitleBarButton(
+      titleBar, getIconThemePath("actions/20/pane_minimize.svg"));
   m_button->setToolTip(tr("Minimize"));
   m_button->setPressed(false);
 
-  titleBar->add(QPoint(x, 1), m_button);
+  titleBar->add(QPoint(x, 0), m_button);
   ret = ret && connect(m_button, SIGNAL(toggled(bool)), this,
                        SLOT(onMinimizeButtonToggled(bool)));
   assert(ret);
@@ -1038,7 +1126,6 @@ public:
   void initialize(TPanel *panel) override { assert(0); }
 } flipbookFactory;
 
-#ifndef LINETEST
 //=============================================================================
 // TasksViewerFactory
 //-----------------------------------------------------------------------------
@@ -1060,7 +1147,6 @@ public:
     panel->setWidget(new BatchServersViewer(panel));
   }
 } batchServersViewerFactory;
-#endif
 
 class BrowserFactory final : public TPanelFactory {
 public:
@@ -1072,6 +1158,7 @@ public:
     TFilePath currentProjectFolder =
         TProjectManager::instance()->getCurrentProjectPath().getParentDir();
     browser->setFolder(currentProjectFolder, true);
+    browser->enableDoubleClickToOpenScenes();
   }
 } browserFactory;
 
@@ -1105,31 +1192,27 @@ public:
 // ExportFactory
 //-----------------------------------------------------------------------------
 
-#ifdef LINETEST
-class ExportFactory final : public TPanelFactory {
-public:
-  ExportFactory() : TPanelFactory("Export") {}
-
-  TPanel *createPanel(QWidget *parent) {
-    ExportPanel *panel = new ExportPanel(parent);
-    panel->setObjectName(getPanelType());
-    panel->setWindowTitle(QObject::tr("Export"));
-    return panel;
-  }
-
-  void initialize(TPanel *panel) { assert(0); }
-} exportFactory;
-
-OpenFloatingPanel openExportPanelCommand(MI_OpenExport, "Export",
-                                         QObject::tr("Export"));
+// class ExportFactory final : public TPanelFactory {
+// public:
+//  ExportFactory() : TPanelFactory("Export") {}
+//
+//  TPanel *createPanel(QWidget *parent) {
+//    ExportPanel *panel = new ExportPanel(parent);
+//    panel->setObjectName(getPanelType());
+//    panel->setWindowTitle(QObject::tr("Export"));
+//    return panel;
+//  }
+//
+//  void initialize(TPanel *panel) { assert(0); }
+//} exportFactory;
+//
+// OpenFloatingPanel openExportPanelCommand(MI_OpenExport, "Export",
+//                                         QObject::tr("Export"));
 
 //=============================================================================
 // ColorModelViewerFactory
 //-----------------------------------------------------------------------------
 
-#endif
-
-#ifndef LINETEST
 class ColorModelViewerFactory final : public TPanelFactory {
 public:
   ColorModelViewerFactory() : TPanelFactory("ColorModel") {}
@@ -1138,8 +1221,6 @@ public:
     panel->resize(400, 300);
   }
 } colorModelViewerFactory;
-
-#endif
 
 //=============================================================================
 // FunctionViewerFactory
@@ -1204,85 +1285,97 @@ public:
 OpenFloatingPanel openTScriptConsoleCommand("MI_OpenScriptConsole",
                                             "ScriptConsole",
                                             QObject::tr("Script Console"));
-//------------------------------------------------------------------------------
-
-#ifdef LINETEST
-
-//=============================================================================
-// LineTestViewer
-//-----------------------------------------------------------------------------
-
-class LineTestFactory final : public TPanelFactory {
-public:
-  LineTestFactory() : TPanelFactory("LineTestViewer") {}
-
-  TPanel *createPanel(QWidget *parent) {
-    LineTestPane *panel = new LineTestPane(parent);
-    panel->setObjectName(getPanelType());
-    panel->setMinimumSize(220, 280);
-    return panel;
-  }
-
-  void initialize(TPanel *panel) { assert(0); }
-
-} lineTestFactory;
-
-//=============================================================================
-OpenFloatingPanel openLineTestViewerCommand(MI_OpenLineTestView,
-                                            "LineTestViewer",
-                                            QObject::tr("LineTest Viewer"));
-//-----------------------------------------------------------------------------
-
-//=============================================================================
-// LineTestCapturePane
-//-----------------------------------------------------------------------------
-
-class LineTestCaptureFactory final : public TPanelFactory {
-public:
-  LineTestCaptureFactory() : TPanelFactory("LineTestCapture") {}
-
-  TPanel *createPanel(QWidget *parent) {
-    LineTestCapturePane *panel = new LineTestCapturePane(parent);
-    panel->setObjectName(getPanelType());
-    //     panel->setMinimumSize(220, 280);
-    return panel;
-  }
-
-  void initialize(TPanel *panel) { assert(0); }
-
-} LineTestCaptureFactory;
-
-//=============================================================================
-OpenFloatingPanel openLineTestCaptureCommand(MI_OpenLineTestCapture,
-                                             "LineTestCapture",
-                                             QObject::tr("LineTest Capture"));
-//-----------------------------------------------------------------------------
-
-#endif  // LINETEST
 
 //=============================================================================
 // ComboViewer : Viewer + Toolbar + Tool Options
+//-----------------------------------------------------------------------------
+
+ComboViewerPanelContainer::ComboViewerPanelContainer(QWidget *parent)
+    : StyleShortcutSwitchablePanel(parent) {
+  m_comboViewer = new ComboViewerPanel(parent);
+  setFocusProxy(m_comboViewer);
+  setWidget(m_comboViewer);
+
+  m_comboViewer->initializeTitleBar(getTitleBar());
+  bool ret = connect(m_comboViewer->getToolOptions(), SIGNAL(newPanelCreated()),
+                     this, SLOT(updateTabFocus()));
+  assert(ret);
+}
+// reimplementation of TPanel::widgetInThisPanelIsFocused
+bool ComboViewerPanelContainer::widgetInThisPanelIsFocused() {
+  return m_comboViewer->hasFocus();
+}
+// reimplementation of TPanel::widgetFocusOnEnter
+void ComboViewerPanelContainer::widgetFocusOnEnter() {
+  m_comboViewer->onEnterPanel();
+}
+void ComboViewerPanelContainer::widgetClearFocusOnLeave() {
+  m_comboViewer->onLeavePanel();
+}
+
 //-----------------------------------------------------------------------------
 
 class ComboViewerFactory final : public TPanelFactory {
 public:
   ComboViewerFactory() : TPanelFactory("ComboViewer") {}
   TPanel *createPanel(QWidget *parent) override {
-    ComboViewerPanel *panel = new ComboViewerPanel(parent);
+    ComboViewerPanelContainer *panel = new ComboViewerPanelContainer(parent);
     panel->setObjectName(getPanelType());
     panel->setWindowTitle(QObject::tr("Combo Viewer"));
     panel->resize(700, 600);
     return panel;
   }
-  void initialize(TPanel *panel) override {
-    assert(0);
-    panel->setWidget(new ComboViewerPanel(panel));
-  }
-} ghibliViewerFactory;
+  void initialize(TPanel *panel) override { assert(0); }
+} comboViewerFactory;
 
 //=============================================================================
 OpenFloatingPanel openComboViewerCommand(MI_OpenComboViewer, "ComboViewer",
                                          QObject::tr("Combo Viewer"));
+//-----------------------------------------------------------------------------
+
+//=============================================================================
+// SceneViewer
+//-----------------------------------------------------------------------------
+
+SceneViewerPanelContainer::SceneViewerPanelContainer(QWidget *parent)
+    : StyleShortcutSwitchablePanel(parent) {
+  m_sceneViewer = new SceneViewerPanel(parent);
+  setFocusProxy(m_sceneViewer);
+  setWidget(m_sceneViewer);
+
+  m_sceneViewer->initializeTitleBar(getTitleBar());
+}
+// reimplementation of TPanel::widgetInThisPanelIsFocused
+bool SceneViewerPanelContainer::widgetInThisPanelIsFocused() {
+  return m_sceneViewer->hasFocus();
+}
+// reimplementation of TPanel::widgetFocusOnEnter
+void SceneViewerPanelContainer::widgetFocusOnEnter() {
+  m_sceneViewer->onEnterPanel();
+}
+void SceneViewerPanelContainer::widgetClearFocusOnLeave() {
+  m_sceneViewer->onLeavePanel();
+}
+
+//-----------------------------------------------------------------------------
+
+class SceneViewerFactory final : public TPanelFactory {
+public:
+  SceneViewerFactory() : TPanelFactory("SceneViewer") {}
+
+  TPanel *createPanel(QWidget *parent) override {
+    SceneViewerPanelContainer *panel = new SceneViewerPanelContainer(parent);
+    panel->setObjectName(getPanelType());
+    panel->setWindowTitle(QObject::tr("Viewer"));
+    panel->setMinimumSize(220, 280);
+    return panel;
+  }
+  void initialize(TPanel *panel) override { assert(0); }
+} sceneViewerFactory;
+
+//=============================================================================
+OpenFloatingPanel openSceneViewerCommand(MI_OpenLevelView, "SceneViewer",
+                                         QObject::tr("Viewer"));
 //-----------------------------------------------------------------------------
 
 //=============================================================================
@@ -1325,3 +1418,135 @@ public:
 OpenFloatingPanel openHistoryPanelCommand(MI_OpenHistoryPanel, "HistoryPanel",
                                           QObject::tr("History"));
 //=============================================================================
+
+#if defined(x64)
+//=============================================================================
+// StopMotion Controller
+//-----------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------
+
+class StopMotionPanelFactory final : public TPanelFactory {
+public:
+  StopMotionPanelFactory() : TPanelFactory("StopMotionController") {}
+
+  void initialize(TPanel *panel) override {
+    StopMotionController *stopMotionController =
+        new StopMotionController(panel);
+    panel->setWidget(stopMotionController);
+    panel->setWindowTitle(QObject::tr("Stop Motion Controller"));
+    panel->setIsMaximizable(false);
+  }
+} stopMotionPanelFactory;
+
+//=============================================================================
+OpenFloatingPanel openStopMotionPanelCommand(
+    MI_OpenStopMotionPanel, "StopMotionController",
+    QObject::tr("Stop Motion Controller"));
+//-----------------------------------------------------------------------------
+
+#endif  // x64
+
+//=============================================================================
+// FxSettings
+//-----------------------------------------------------------------------------
+
+FxSettingsPanel::FxSettingsPanel(QWidget *parent) : TPanel(parent) {
+  TApp *app            = TApp::instance();
+  TSceneHandle *hScene = app->getCurrentScene();
+  TPixel32 col1, col2;
+  Preferences::instance()->getChessboardColors(col1, col2);
+
+  m_fxSettings = new FxSettings(this, col1, col2);
+  m_fxSettings->setSceneHandle(hScene);
+  m_fxSettings->setFxHandle(app->getCurrentFx());
+  m_fxSettings->setFrameHandle(app->getCurrentFrame());
+  m_fxSettings->setXsheetHandle(app->getCurrentXsheet());
+  m_fxSettings->setLevelHandle(app->getCurrentLevel());
+  m_fxSettings->setObjectHandle(app->getCurrentObject());
+
+  m_fxSettings->setCurrentFx();
+
+  setWidget(m_fxSettings);
+}
+
+// FxSettings will adjust its size according to the current fx
+// so we only restore position of the panel.
+void FxSettingsPanel::restoreFloatingPanelState() {
+  TFilePath savePath = ToonzFolder::getMyModuleDir() + TFilePath("popups.ini");
+  QSettings settings(QString::fromStdWString(savePath.getWideString()),
+                     QSettings::IniFormat);
+  settings.beginGroup("Panels");
+
+  if (!settings.childGroups().contains("FxSettings")) return;
+
+  settings.beginGroup("FxSettings");
+
+  QRect geom = settings.value("geometry", saveGeometry()).toRect();
+  // check if it can be visible in the current screen
+  if (!(geom & QApplication::desktop()->availableGeometry(this)).isEmpty())
+    move(geom.topLeft());
+
+  // FxSettings has no optional settings (SaveLoadQSettings) to load
+}
+
+//=============================================================================
+// FxSettingsFactory
+//-----------------------------------------------------------------------------
+
+class FxSettingsFactory final : public TPanelFactory {
+public:
+  FxSettingsFactory() : TPanelFactory("FxSettings") {}
+
+  TPanel *createPanel(QWidget *parent) override {
+    FxSettingsPanel *panel = new FxSettingsPanel(parent);
+    panel->move(qApp->desktop()->screenGeometry(panel).center());
+    panel->setObjectName(getPanelType());
+    panel->setWindowTitle(QObject::tr("Fx Settings"));
+    panel->setMinimumSize(390, 85);
+    panel->allowMultipleInstances(false);
+    return panel;
+  }
+
+  void initialize(TPanel *panel) override { assert(0); }
+
+} FxSettingsFactory;
+
+//=============================================================================
+OpenFloatingPanel openFxSettingsCommand(MI_FxParamEditor, "FxSettings",
+                                        QObject::tr("Fx Settings"));
+
+//=========================================================
+// VectorGuidedDrawingPanel
+//---------------------------------------------------------
+
+//-----------------------------------------------------------------------------
+VectorGuidedDrawingPanel::VectorGuidedDrawingPanel(QWidget *parent)
+    : TPanel(parent) {
+  VectorGuidedDrawingPane *pane = new VectorGuidedDrawingPane(this);
+  setWidget(pane);
+  setIsMaximizable(false);
+}
+
+//=============================================================================
+// VectorGuidedDrawingFactory
+//-----------------------------------------------------------------------------
+
+class VectorGuidedDrawingFactory final : public TPanelFactory {
+public:
+  VectorGuidedDrawingFactory() : TPanelFactory("VectorGuidedDrawingPanel") {}
+  TPanel *createPanel(QWidget *parent) override {
+    TPanel *panel = new VectorGuidedDrawingPanel(parent);
+    panel->setObjectName(getPanelType());
+    panel->setWindowTitle(QObject::tr("Vector Guided Drawing Controls"));
+    panel->setMinimumSize(387, 265);
+
+    return panel;
+  }
+  void initialize(TPanel *panel) override {}
+} VectorGuidedDrawingFactory;
+
+//=============================================================================
+OpenFloatingPanel openVectorGuidedDrawingPanelCommand(
+    MI_OpenGuidedDrawingControls, "VectorGuidedDrawingPanel",
+    QObject::tr("Vector Guided Drawing"));

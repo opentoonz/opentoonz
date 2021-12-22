@@ -1,19 +1,30 @@
-  <commandbar>
-
-    <command>MI_NewVectorLevel</command>
-    <command>MI_NewToonzRasterLevel</command>
-    <command>MI_NewRasterLevel</command>
-    <separator/>	
-    <command>MI_Reframe1</command>
-    <command>MI_Reframe2</command>
-    <command>MI_Reframe3</command>
+<?xml version="1.0" encoding="UTF-8"?>
+<commandbar>
+    <command>MI_Undo</command>
+    <command>MI_Redo</command>
     <separator/>
-    <command>MI_Dup</command>
+    <command>MI_SaveAll</command>
     <separator/>
-    <command>MI_Collapse</command> 
-    <command>MI_OpenChild</command>
-    <command>MI_CloseChild</command>
-    <command>MI_ToggleEditInPlace</command>    
-    
-  </commandbar>
-
+    <command>MI_Copy</command>
+    <command>MI_Cut</command>
+    <command>MI_Paste</command>
+    <command>MI_Clear</command>
+    <separator/>
+    <command>MI_AddFrames</command>
+    <command>MI_PrevDrawing</command>
+    <command>MI_NextDrawing</command>
+    <separator/>
+    <command>MI_ShiftTrace</command>
+    <command>MI_EditShift</command>
+    <command>MI_NoShift</command>
+    <command>MI_ResetShift</command>
+    <separator/>
+    <command>MI_SendBack</command>
+    <command>MI_SendBackward</command>
+    <command>MI_BringForward</command>
+    <command>MI_BringToFront</command>
+    <command>MI_Group</command>
+    <command>MI_Ungroup</command>
+    <command>MI_EnterGroup</command>
+    <command>MI_ExitGroup</command>
+</commandbar>

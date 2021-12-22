@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="16px" height="16px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g transform="matrix(1,0,0,1,-10,-350)">
+        <g id="fold_column" transform="matrix(1,0,0,1,-40,-40)">
+            <g id="bg" transform="matrix(0.110345,0,0,0.121212,33.7793,371.091)">
+                <rect x="147" y="156" width="145" height="132" style="fill:rgb(135,135,135);fill-opacity:0;"/>
+            </g>
+            <g transform="matrix(1.125,0,0,1,46,387)">
+                <rect x="8" y="9" width="8" height="10"/>
+            </g>
+            <g transform="matrix(1,0,0,1,47,387)">
+                <path d="M11.698,3L7.232,8.36C7.082,8.54 7,8.766 7,9L7,14L4,14L4,3L11.698,3Z" style="fill-opacity:0.5;"/>
+            </g>
+            <g transform="matrix(1,0,0,1,47,387)">
+                <path d="M13,8L8.833,8L13,3L13,8Z" style="fill-opacity:0.5;"/>
+            </g>
+        </g>
+    </g>
+</svg>

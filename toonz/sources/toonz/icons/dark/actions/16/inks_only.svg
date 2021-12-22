@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="16px" height="16px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;">
+    <g transform="matrix(1,0,0,1,-190,-412)">
+        <g id="inks_only" transform="matrix(1,0,0,1,140,-58)">
+            <g id="bg" transform="matrix(0.110345,0,0,0.121212,33.7793,451.091)">
+                <rect x="147" y="156" width="145" height="132" style="fill:rgb(135,135,135);fill-opacity:0;"/>
+            </g>
+            <g transform="matrix(0.769231,0,0,2,48.2308,462.5)">
+                <rect x="7.5" y="5.5" width="6.5" height="1" style="stroke:black;stroke-width:0.66px;"/>
+            </g>
+            <g transform="matrix(1,0,0,1,0,-40)">
+                <path d="M56,525L52.5,525C51.12,525 50,523.88 50,522.5L50,517.5C50,516.12 51.12,515 52.5,515L60.5,515C61.88,515 63,516.12 63,517.5L63,519.609L62.368,518.504C62.279,518.347 62.151,518.221 62,518.134L62,517.5C62,516.672 61.328,516 60.5,516L52.5,516C51.672,516 51,516.672 51,517.5L51,522.5C51,523.328 51.672,524 52.5,524L56,524L56,525ZM57.162,525L57,525L57,524.837L57.162,525ZM62,519.875L62.468,520.695L62,521.16L62,519.875Z"/>
+            </g>
+            <g id="exclusive" transform="matrix(1,0,0,1,46,465)">
+                <path d="M20,21L20,14L17.5,17.5L15.5,14L13.5,17.5L11,14L11,21L20,21Z"/>
+            </g>
+            <g transform="matrix(1,0,0,1,46,467)">
+                <path d="M15,3L6,3L6,7L15,7L15,3ZM8,4L7,4L7,6L8,6L8,4ZM10,4L9,4L9,6L10,6L10,4ZM12,4L11,4L11,6L12,6L12,4ZM14,4L13,4L13,6L14,6L14,4Z"/>
+            </g>
+        </g>
+    </g>
+</svg>

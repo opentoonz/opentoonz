@@ -1,0 +1,62 @@
+<html lang="ja">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+      <title>PN Perspective (PN Perspectiva) Iwa</title>
+    </head>
+<body bgcolor="#f5f5f5" text="#220011">
+<h1><img src = ".\img\fx_iwa_pn_perspective.png" width = 30 height = 30 >   PN Perspective (PN Perspectiva) Iwa</h1>
+
+<h4>● Descripción</h4>
+Este efecto genera un patrón de ruido de tipo Perlin, sobre un plano horizontal.<br>
+Además del patrón normal de ruido, existe un modo para producir una imagen de referencia de desplazamiento para<br>
+el efecto "WarpHV Ino", y un modo para producir una intensidad de reflejo en el agua de tipo Fresnel, tal como se<br>
+vería desde la cámara, haciendo que el patrón de ruido represente la altura de las olas sobre la superficie el agua.
+
+<h4>● Opciones</h4>
+<UL>
+<LI><b>Mode (Modo)</b> : Permite especificar el modo de representación. Existen 5 opciones posibles:</LI>
+	<UL>
+	<LI><I>Noise (Ruido)</I> : Dibuja un patrón de ruido de tipo Perlin. El valor del ruido es calculado para cada<br>
+	punto de muestreo, dividiendo 1 píxel entre 100.</LI>
+	<LI><I>Noise (no resampled) (Ruido sin remuestreo)</I> : Dibuja un patrón de ruido de tipo Perlin, sin realizar<br>
+	procesamiento a nivel de sub-píxeles, por lo que es más veloz, pero el patrón de ruido cerca del horizonte<br>
+	será irregular.</LI>
+	<LI><I>Warp HV offset (Desplazamiento para Warp HV)</I> : Cuando el patrón de ruido represente la altura de la<br>
+	superficie del agua, dibujará la cantidad de luz reflejada sobre la superficie en las direcciones horizontal<br>
+	y vertical, representadas por los canales rojo y verde, respectivamente.<br>
+	Al ser conectado a los conectores "Hori" y "Vert" del efecto "WarpHV Ino", será posible reproducir la<br>
+	distorsión de la reflexión sobre la superficie del agua. Es posible ajustar el sombreado del patrón mediante<br>
+	la opción "Wave Height" descripta más abajo.<br>
+	*Dado que el efecto "WarpHV Ino" usa de forma predefinida el canal Rojo tanto para los conectores "Hori"<br>
+	como "Vert", será necesario especificar manualmente que la opción "V reference" de dicho efecto utilice<br>
+	el canal Verde.</LI>
+	<LI><I>Warp HV offset 2 (Desplazamiento 2 para Warp HV)</I> : Es una variante de la opción anterior.<br>
+	<LI><I>Fresnel reflectivity (Reflectividad Fresnel)</I> : Cuando el patrón de ruido represente la altura de la superficie<br>
+	del agua, el sombreado representará la intensidad de la reflexión Fresnel en la superficie, vista desde la cámara.<br>
+	La intensidad de la reflexión en la parte inferior de la cámara se mostrará normalizada con un brillo 0.<br>
+	Es posible ajustar el sombreado del patrón mediante la opción "Wave Height" descripta más abajo.</LI>
+	
+</UL>
+<LI><b>Noise Type (Tipo de ruido)</b> : Permite especificar el tipo de ruido a usar, entre: Perlin Noise y Simplex Noise.</LI>
+<LI><b>Size (Tamaño)</b> : Permite especificar el tamaño del patrón aleatorio principal.</LI>
+<LI><b>Evolution (Evolución)</b> : Permite especificar la evolución del patrón aleatorio principal.</LI>
+<LI><b>Octaves (Octavas)</b> : Permite especificar cuántos niveles de patrones aleatorios se deben generar.</LI>
+<LI><b>Offset (Desplazamiento)</b> : Permite especificar un desplazamiento en la posición del patrón aleatorio principal.<br>
+Hacia la derecha de la cámara es X positivo y avanzando hacia la cámara es Y positivo.</LI>
+<LI><b>p_Intensity (Intensidad_p)</b> : Define la relación de intensidad, entre una generación del patrón y la próxima.</LI>
+<LI><b>p_Size (Tamaño_p)</b> : Define la relación de tamaño, entre una generación del patrón y la próxima.</LI>
+<LI><b>p_Evolution (Evolución_p)</b> : Define la relación entre el período de evolución de una generación del patrón y la próxima.</LI>
+<LI><b>p_Offset (Desplazamiento_p)</b> : Define la relación de desplazamiento, entre una generación del patrón y la próxima.</LI>
+<LI><b>Fov (Campo de visión)</b> : Permite especificar el ángulo de visión vertical de la cámara, en grados.<br>
+Cuando el ángulo de visión sea grande, la sensación de perspectiva aumentará (gran angular), cuando sea pequeño,<br>
+la perspectiva aparecerá comprimida (telefoto).</LI>
+<LI><b>Eye Level (Nivel de vista)</b> : Permite especificar la posición del punto de fuga (horizonte) de la cámara.</LI>
+<LI><b>Alpha Rendering (Procesamiento de alfa)</b> : Permite especificar si los valores de intensidad del patrón de ruido serán<br>
+también almacenados en al canal Alfa.</LI>
+<LI><b>Wave Height (Altura de olas)</b> : Cuando el patrón de ruido represente la altura de la superficie del agua, permite<br>
+especificar la diferencia en la altura de las olas producidas, entre la intensidad máxima y mínima del ruido.<br>
+Válido sólo para los modos: "Warp HV offset", "Warp HV offset 2" y "Fresnel reflectivity".</LI>
+</UL>
+</body>
+
+</html>

@@ -163,10 +163,10 @@ void Iwa_DirectionalBlurFx::doCompute(TTile &tile, double frame,
     maxY = (bidirectional) ? -blur.y : 0.0;
     minY = blur.y;
   }
-  int marginLeft   = (int)ceil(abs(minX));
-  int marginRight  = (int)ceil(abs(maxX));
-  int marginTop    = (int)ceil(abs(maxY));
-  int marginBottom = (int)ceil(abs(minY));
+  int marginLeft   = (int)ceil(std::abs(minX));
+  int marginRight  = (int)ceil(std::abs(maxX));
+  int marginTop    = (int)ceil(std::abs(maxY));
+  int marginBottom = (int)ceil(std::abs(minY));
 
   /*- マージンは、フィルタの上下左右を反転した寸法になる -*/
   TRectD enlargedBBox(bBox.x0 - (double)marginRight,
@@ -504,7 +504,7 @@ void Iwa_DirectionalBlurFx::makeDirectionalBlurFilter_CPU(
 
       /*- オフセット値を求める -*/
       float offset =
-          (bidirectional) ? abs(framePosRatio * 2.0 - 1.0) : framePosRatio;
+          (bidirectional) ? std::abs(framePosRatio * 2.0 - 1.0) : framePosRatio;
 
       /*- フィルタごとに分ける -*/
       float bokeAsiVal;
@@ -581,10 +581,10 @@ bool Iwa_DirectionalBlurFx::doGetBBox(double frame, TRectD &bBox,
     maxY = (bidirectional) ? -blur.y : 0.0;
     minY = blur.y;
   }
-  int marginLeft   = (int)ceil(abs(minX));
-  int marginRight  = (int)ceil(abs(maxX));
-  int marginTop    = (int)ceil(abs(maxY));
-  int marginBottom = (int)ceil(abs(minY));
+  int marginLeft   = (int)ceil(std::abs(minX));
+  int marginRight  = (int)ceil(std::abs(maxX));
+  int marginTop    = (int)ceil(std::abs(maxY));
+  int marginBottom = (int)ceil(std::abs(minY));
 
   TRectD enlargedBBox(
       bBox.x0 - (double)marginLeft, bBox.y0 - (double)marginBottom,

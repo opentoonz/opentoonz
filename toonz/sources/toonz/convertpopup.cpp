@@ -117,7 +117,7 @@ void ConvertPopup::Converter::run() {
     TFilePath sourceLevelPath = sc->decodeFilePath(m_parent->m_srcFilePaths[i]);
     QString levelName = QString::fromStdString(sourceLevelPath.getLevelName());
 
-    // check already exsistent levels
+    // check already existent levels
     TFilePath dstFilePath =
         m_parent->getDestinationFilePath(m_parent->m_srcFilePaths[i]);
 
@@ -127,7 +127,12 @@ void ConvertPopup::Converter::run() {
 
     m_saveToNopaintOnlyFlag = false;
 
-    if (TSystem::doesExistFileOrLevel(dstFilePath)) {
+    if (dstFilePath == sourceLevelPath) {
+      DVGui::info(tr("Level %1 converting to same file format; skipped.")
+                      .arg(levelName));
+      m_skippedCount++;
+      continue;
+    } else if (TSystem::doesExistFileOrLevel(dstFilePath)) {
       if (m_parent->m_skip->isChecked()) {
         DVGui::info(tr("Level %1 already exists; skipped.").arg(levelName));
         m_skippedCount++;
@@ -251,6 +256,8 @@ void ConvertPopup::Converter::convertLevelWithConvert2Tlv(
     tlvConverter->abort();
   } else {
     int count = tlvConverter->getFramesToConvertCount();
+    popup->m_progressDialog->setMinimum(0);
+    popup->m_progressDialog->setMaximum(count);
     bool stop = false;
     for (int j = 0; j < count && !stop; j++) {
       if (!tlvConverter->convertNext(errorMessage)) {
@@ -258,6 +265,8 @@ void ConvertPopup::Converter::convertLevelWithConvert2Tlv(
         DVGui::warning(QString::fromStdString(errorMessage));
       }
       if (popup->m_progressDialog->wasCanceled()) stop = true;
+
+      popup->m_notifier->notifyFrameCompleted(j);
     }
     if (stop) tlvConverter->abort();
 
@@ -502,6 +511,8 @@ ConvertPopup::ConvertPopup(bool specifyInput)
     ret = ret && connect(m_convertFileFld, SIGNAL(pathChanged()), this,
                          SLOT(onFileInChanged()));
 
+  // resize the dialog
+  onFormatSelected(m_fileFormat->currentText());
   // update unable/enable of checkboxes
   onTlvModeSelected(m_tlvMode->currentText());
 
@@ -656,9 +667,9 @@ QFrame *ConvertPopup::createTlvSettings() {
   bool ret = true;
   ret      = ret && connect(m_antialias, SIGNAL(currentIndexChanged(int)), this,
                        SLOT(onAntialiasSelected(int)));
-  ret = ret && connect(m_palettePath, SIGNAL(pathChanged()), this,
+  ret      = ret && connect(m_palettePath, SIGNAL(pathChanged()), this,
                        SLOT(onPalettePathChanged()));
-  ret = ret && connect(m_dpiMode, SIGNAL(currentIndexChanged(int)), this,
+  ret      = ret && connect(m_dpiMode, SIGNAL(currentIndexChanged(int)), this,
                        SLOT(onDpiModeSelected(int)));
 
   assert(ret);
@@ -753,6 +764,11 @@ void ConvertPopup::onFormatSelected(const QString &format) {
     m_saveBackupToNopaint->setEnabled(m_tlvMode->currentText() ==
                                       TlvMode_Unpainted);
   }
+  // For unknown reasons, calling adjustSize twice is needed to
+  // prevent the dialog from remaining large size when the current
+  // format is switched from tlv to another format.
+  adjustSize();
+  adjustSize();
 }
 
 //------------------------------------------------------------------
@@ -817,10 +833,10 @@ void ConvertPopup::setFiles(const std::vector<TFilePath> &fps) {
 
   if (m_srcFilePaths.size() == 1) {
     setWindowTitle(tr("Convert 1 Level"));
-    m_fromFld->setEnabled(true);
-    m_toFld->setEnabled(true);
     m_fileNameFld->setEnabled(true);
 
+    m_fromFld->setEnabled(false);
+    m_toFld->setEnabled(false);
     m_fromFld->setText("");
     m_toFld->setText("");
     TLevelP levelTmp;
@@ -831,10 +847,12 @@ void ConvertPopup::setFiles(const std::vector<TFilePath> &fps) {
       if (!t->empty()) {
         TFrameId start = t->begin()->first;
         TFrameId end   = t->rbegin()->first;
-        if (start.getNumber() > 0)
+        if (start.getNumber() >= 0 && end.getNumber() >= 0) {
+          m_fromFld->setEnabled(true);
+          m_toFld->setEnabled(true);
           m_fromFld->setText(QString::number(start.getNumber()));
-        if (end.getNumber() > 0)
           m_toFld->setText(QString::number(end.getNumber()));
+        }
       }
 
       // use the image dpi for the converted tlv
@@ -886,7 +904,8 @@ Convert2Tlv *ConvertPopup::makeTlvConverter(const TFilePath &sourceFilePath) {
         sourceFilePath.withParentDir(unpaintedFolder).withName(basename));
   }
   int from = -1, to = -1;
-  if (m_srcFilePaths.size() > 1) {
+  if (m_srcFilePaths.size() == 1 && m_fromFld->isEnabled() &&
+      m_toFld->isEnabled()) {
     from = m_fromFld->getValue();
     to   = m_toFld->getValue();
   }
@@ -1104,10 +1123,10 @@ void ConvertPopup::getFrameRange(const TFilePath &sourceFilePath,
     TFrameId fid;
     bool ok;
 
-    fid                        = TFrameId(m_fromFld->text().toInt(&ok));
+    fid = TFrameId(m_fromFld->text().toInt(&ok));
     if (ok && fid > from) from = tcrop(fid, firstFrame, lastFrame);
 
-    fid                    = TFrameId(m_toFld->text().toInt(&ok));
+    fid = TFrameId(m_toFld->text().toInt(&ok));
     if (ok && fid < to) to = tcrop(fid, firstFrame, lastFrame);
   }
 }
@@ -1261,9 +1280,9 @@ void ConvertPopup::onOptionsClicked() {
   std::string ext       = m_fileFormat->currentText().toStdString();
   TPropertyGroup *props = getFormatProperties(ext);
 
-  openFormatSettingsPopup(this, ext, props, m_srcFilePaths.size() == 1
-                                                ? m_srcFilePaths[0]
-                                                : TFilePath());
+  openFormatSettingsPopup(
+      this, ext, props,
+      m_srcFilePaths.size() == 1 ? m_srcFilePaths[0] : TFilePath());
 }
 
 //-------------------------------------------------------------------
@@ -1292,9 +1311,8 @@ void ConvertPopup::onPalettePathChanged() {
 bool ConvertPopup::isSaveTlvBackupToNopaintActive() {
   return m_fileFormat->currentText() ==
              TlvExtension /*-- tlvが選択されている --*/
-         &&
-         m_tlvMode->currentText() ==
-             TlvMode_Unpainted /*-- Unpainted Tlvが選択されている --*/
+         && m_tlvMode->currentText() ==
+                TlvMode_Unpainted /*-- Unpainted Tlvが選択されている --*/
          && m_saveBackupToNopaint->isChecked(); /*-- Save Backup to "nopaint"
                                                    Folder オプションが有効 --*/
 }

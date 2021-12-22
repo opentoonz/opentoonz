@@ -4,7 +4,6 @@
 #define TNZ_VALUEFIELD_INCLUDED
 
 #include "tw/tw.h"
-#include "ttimer.h"
 
 #undef DVAPI
 #undef DVVAR
@@ -132,7 +131,6 @@ protected:
   // servono nel drag
   int m_deltaPos;
   int m_flags;
-  TTimer m_timer;
   TRect m_sliderRect, m_arrow0Rect, m_arrow1Rect;
   TNumField *m_textField0, *m_textField1;
   bool m_arrowEnabled, m_sliderEnabled;

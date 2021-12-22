@@ -22,7 +22,7 @@ add_definitions(
 )
 
 if(BUILD_ENV_APPLE)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-install_name,@rpath/libsound.dylib")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-install_name,@executable_path/libsound.dylib")
     add_dependencies(sound tnzcore tnzbase toonzlib)
 endif()
 

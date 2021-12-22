@@ -32,8 +32,13 @@
 #include "toonz/textureutils.h"
 #include "xshhandlemanager.h"
 #include "orientation.h"
+#include "toonz/expressionreferencemonitor.h"
 
 #include "toonz/txsheet.h"
+#include "toonz/preferences.h"
+
+// STD includes
+#include <set>
 
 using namespace std;
 
@@ -97,6 +102,8 @@ struct TXsheet::TXsheetImp {
   XshHandleManager *m_handleManager;
   ToonzScene *m_scene;
 
+  ExpressionReferenceMonitor *m_expRefMonitor;
+
 public:
   TXsheetImp();
   ~TXsheetImp();
@@ -149,7 +156,8 @@ TXsheet::TXsheetImp::TXsheetImp()
     , m_soloColumn(-1)
     , m_viewColumn(-1)
     , m_mixedSound(0)
-    , m_scene(0) {
+    , m_scene(0)
+    , m_expRefMonitor(new ExpressionReferenceMonitor()) {
   initColumnFans();
 }
 
@@ -169,7 +177,9 @@ TXsheet::TXsheetImp::~TXsheetImp() {
 void TXsheet::TXsheetImp::initColumnFans() {
   for (auto o : Orientations::all()) {
     int index = o->dimension(PredefinedDimension::INDEX);
-    m_columnFans[index].setDimension(o->dimension(PredefinedDimension::LAYER));
+    m_columnFans[index].setDimensions(
+        o->dimension(PredefinedDimension::LAYER),
+        o->dimension(PredefinedDimension::CAMERA_LAYER));
   }
 }
 
@@ -185,12 +195,19 @@ TXsheet::TXsheet()
     : TSmartObject(m_classCode)
     , m_player(0)
     , m_imp(new TXsheet::TXsheetImp)
-    , m_notes(new TXshNoteSet()) {
+    , m_notes(new TXshNoteSet())
+    , m_cameraColumnIndex(0)
+    , m_observer(nullptr) {
   // extern TSyntax::Grammar *createXsheetGrammar(TXsheet*);
   m_soundProperties      = new TXsheet::SoundProperties();
   m_imp->m_handleManager = new XshHandleManager(this);
   m_imp->m_pegTree->setHandleManager(m_imp->m_handleManager);
   m_imp->m_pegTree->createGrammar(this);
+
+  // Dummy camera column
+  m_cameraColumn          = TXshColumn::createEmpty(0);
+  m_cameraColumn->m_index = -1;
+  m_cameraColumn->setXsheet(this);
 }
 
 //-----------------------------------------------------------------------------
@@ -338,7 +355,8 @@ bool TXsheet::setCells(int row, int col, int rowCount, const TXshCell cells[]) {
     else if (levelType == MESH_XSHLEVEL)
       type = TXshColumn::eMeshType;
   }
-  bool wasColumnEmpty    = isColumnEmpty(col);
+  bool wasColumnEmpty = isColumnEmpty(col);
+  if (col < 0) return false;
   TXshCellColumn *column = touchColumn(col, type)->getCellColumn();
   if (!column) return false;
 
@@ -772,7 +790,7 @@ void TXsheet::increaseStepCells(int r0, int c0, int &r1, int c1) {
   // controllo se devo cambiare la selezione
   bool allIncreaseIsEqual = true;
   for (c = 0; c < ends.size() - 1 && allIncreaseIsEqual; c++)
-    allIncreaseIsEqual       = allIncreaseIsEqual && ends[c] == ends[c + 1];
+    allIncreaseIsEqual = allIncreaseIsEqual && ends[c] == ends[c + 1];
   if (allIncreaseIsEqual) r1 = ends[0];
 }
 
@@ -806,7 +824,7 @@ void TXsheet::decreaseStepCells(int r0, int c0, int &r1, int c1) {
   // controllo se devo cambiare la selezione
   bool allDecreaseIsEqual = true;
   for (c = 0; c < ends.size() - 1 && allDecreaseIsEqual; c++)
-    allDecreaseIsEqual       = allDecreaseIsEqual && ends[c] == ends[c + 1];
+    allDecreaseIsEqual = allDecreaseIsEqual && ends[c] == ends[c + 1];
   if (allDecreaseIsEqual) r1 = ends[0];
 }
 
@@ -940,7 +958,7 @@ void TXsheet::resetStepCells(int r0, int c0, int r1, int c1) {
 //-----------------------------------------------------------------------------
 /*! Roll first cells of rect r0,c0,r1,c1. Move cells contained in first row to
  * last row.
-*/
+ */
 void TXsheet::rollupCells(int r0, int c0, int r1, int c1) {
   int nc   = c1 - c0 + 1;
   int size = 1 * nc;
@@ -963,7 +981,7 @@ void TXsheet::rollupCells(int r0, int c0, int r1, int c1) {
 //-----------------------------------------------------------------------------
 /*! Roll last cells of rect r0,c0,r1,c1. Move cells contained in last row to
  * first row.
-*/
+ */
 void TXsheet::rolldownCells(int r0, int c0, int r1, int c1) {
   int nc   = c1 - c0 + 1;
   int size = 1 * nc;
@@ -985,7 +1003,7 @@ void TXsheet::rolldownCells(int r0, int c0, int r1, int c1) {
 
 //-----------------------------------------------------------------------------
 /*! Stretch cells contained in rect r0,c0,r1,c1, from r1-r0+1 to nr.
-                If nr>r1-r0+1 add cells, overwise remove cells. */
+                If nr>r1-r0+1 add cells, otherwise remove cells. */
 void TXsheet::timeStretch(int r0, int c0, int r1, int c1, int nr) {
   int oldNr = r1 - r0 + 1;
   if (nr > oldNr) /* ingrandisce */
@@ -1041,8 +1059,8 @@ int TXsheet::exposeLevel(int row, int col, TXshLevel *xl, bool overwrite) {
 //-----------------------------------------------------------------------------
 // customized version for load level popup
 int TXsheet::exposeLevel(int row, int col, TXshLevel *xl,
-                         std::vector<TFrameId> &fIds_, int xFrom, int xTo,
-                         int step, int inc, int frameCount,
+                         std::vector<TFrameId> &fIds_, TFrameId xFrom,
+                         TFrameId xTo, int step, int inc, int frameCount,
                          bool doesFileActuallyExist) {
   if (!xl) return 0;
   std::vector<TFrameId> fids;
@@ -1084,22 +1102,19 @@ int TXsheet::exposeLevel(int row, int col, TXshLevel *xl,
     {
       std::vector<TFrameId>::iterator it;
       it = fids.begin();
-      while (it->getNumber() < xFrom) it++;
+      while (*it < xFrom) it++;
 
       if (step == 0)  // Step = Auto
       {
         std::vector<TFrameId>::iterator next_it;
         next_it = it;
         next_it++;
-
-        int startFrame = it->getNumber();
-
-        for (int f = startFrame; f < startFrame + frameCount; f++) {
-          if (next_it != fids.end() && f >= next_it->getNumber()) {
+        for (int f = 0; f < frameCount; f++) {
+          setCell(row++, col, TXshCell(xl, *it));
+          if (next_it != fids.end()) {
             it++;
             next_it++;
           }
-          setCell(row++, col, TXshCell(xl, *it));
         }
       }
 
@@ -1123,7 +1138,7 @@ int TXsheet::exposeLevel(int row, int col, TXshLevel *xl,
       loopCount = frameCount / step;
 
       for (int loop = 0; loop < loopCount; loop++) {
-        TFrameId id(xFrom + loop * inc, fids.begin()->getLetter());
+        TFrameId id(xFrom.getNumber() + loop * inc, xFrom.getLetter());
         for (int s = 0; s < step; s++) {
           setCell(row++, col, TXshCell(xl, id));
         }
@@ -1204,9 +1219,15 @@ void TXsheet::loadData(TIStream &is) {
           }
         }
       }
+    } else if (tagName == "cameraColumn") {
+      while (is.openChild(tagName)) {
+        if (!m_cameraColumn->getCellColumn()->loadCellMarks(tagName, is))
+          throw TException("Camera Column, unknown tag: " + tagName);
+        is.closeChild();
+      }
     } else if (tagName == "pegbars") {
       TPersist *p = m_imp->m_pegTree;
-      is >> *p;
+      m_imp->m_pegTree->loadData(is, this);
     } else if (tagName == "fxnodes") {
       m_imp->m_fxDag->loadData(is);
       std::vector<TFx *> fxs;
@@ -1260,8 +1281,16 @@ void TXsheet::saveData(TOStream &os) {
     if (column && c < getFirstFreeColumnIndex()) os << column.getPointer();
   }
   os.closeChild();
+
+  // save cell marks in the camera column
+  if (!m_cameraColumn->getCellColumn()->getCellMarks().isEmpty()) {
+    os.openChild("cameraColumn");
+    m_cameraColumn->getCellColumn()->saveCellMarks(os);
+    os.closeChild();
+  }
+
   os.openChild("pegbars");
-  m_imp->m_pegTree->saveData(os, getFirstFreeColumnIndex());
+  m_imp->m_pegTree->saveData(os, getFirstFreeColumnIndex(), this);
   // os << *(m_imp->m_pegTree);
   os.closeChild();
 
@@ -1299,6 +1328,7 @@ void TXsheet::insertColumn(int col, TXshColumn::ColumnType type) {
 //-----------------------------------------------------------------------------
 
 void TXsheet::insertColumn(int col, TXshColumn *column) {
+  if (col < 0) col = 0;
   column->setXsheet(this);
   m_imp->m_columnSet.insertColumn(col, column);
   m_imp->m_pegTree->insertColumn(col);
@@ -1308,6 +1338,13 @@ void TXsheet::insertColumn(int col, TXshColumn *column) {
     TFx *fx = column->getFx();
     if (fx) getFxDag()->addToXsheet(fx);
   }
+
+  for (ColumnFan &columnFan : m_imp->m_columnFans) {
+    columnFan.rollRightFoldedState(col,
+                                   m_imp->m_columnSet.getColumnCount() - col);
+  }
+
+  notify(TXsheetColumnChange(TXsheetColumnChange::Insert, col));
 }
 
 //-----------------------------------------------------------------------------
@@ -1326,6 +1363,13 @@ void TXsheet::removeColumn(int col) {
   }
   m_imp->m_columnSet.removeColumn(col);
   m_imp->m_pegTree->removeColumn(col);
+
+  for (ColumnFan &columnFan : m_imp->m_columnFans) {
+    columnFan.rollLeftFoldedState(col,
+                                  m_imp->m_columnSet.getColumnCount() - col);
+  }
+
+  notify(TXsheetColumnChange(TXsheetColumnChange::Remove, col));
 }
 
 //-----------------------------------------------------------------------------
@@ -1353,19 +1397,26 @@ void TXsheet::moveColumn(int srcIndex, int dstIndex) {
     int c1 = dstIndex;
     assert(c0 < c1);
     m_imp->m_columnSet.rollLeft(c0, c1 - c0 + 1);
+    for (ColumnFan &columnFan : m_imp->m_columnFans)
+      columnFan.rollLeftFoldedState(c0, c1 - c0 + 1);
     for (int c = c0; c < c1; ++c) m_imp->m_pegTree->swapColumns(c, c + 1);
   } else {
     int c0 = dstIndex;
     int c1 = srcIndex;
     assert(c0 < c1);
     m_imp->m_columnSet.rollRight(c0, c1 - c0 + 1);
+    for (ColumnFan &columnFan : m_imp->m_columnFans)
+      columnFan.rollRightFoldedState(c0, c1 - c0 + 1);
     for (int c = c1 - 1; c >= c0; --c) m_imp->m_pegTree->swapColumns(c, c + 1);
   }
+
+  notify(TXsheetColumnChange(TXsheetColumnChange::Move, srcIndex, dstIndex));
 }
 
 //-----------------------------------------------------------------------------
 
 TXshColumn *TXsheet::getColumn(int col) const {
+  if (col < 0) return m_cameraColumn;
   return m_imp->m_columnSet.getColumn(col).getPointer();
 }
 
@@ -1387,7 +1438,7 @@ int TXsheet::getFirstFreeColumnIndex() const {
 
 TXshColumn *TXsheet::touchColumn(int index, TXshColumn::ColumnType type) {
   TXshColumn *column = m_imp->m_columnSet.touchColumn(index, type).getPointer();
-  if (!column) return 0;
+  if (index < 0 || !column) return 0;
 
   // NOTE (Daniele): The following && should be a bug... but I fear I'd break
   // something changing it.
@@ -1417,8 +1468,9 @@ void searchAudioColumn(TXsheet *xsh, std::vector<TXshSoundColumn *> &sounds,
     TXshColumn *column = xsh->getColumn(i);
     if (column) {
       TXshSoundColumn *soundCol = column->getSoundColumn();
-      if (soundCol && ((isPreview && soundCol->isCamstandVisible()) ||
-                       (!isPreview && soundCol->isPreviewVisible()))) {
+      if (soundCol && !soundCol->isEmpty() &&
+          ((isPreview && soundCol->isCamstandVisible()) ||
+           (!isPreview && soundCol->isPreviewVisible()))) {
         sounds.push_back(soundCol);
         continue;
       }
@@ -1449,20 +1501,41 @@ TSoundTrack *TXsheet::makeSound(SoundProperties *properties) {
 //-----------------------------------------------------------------------------
 
 void TXsheet::scrub(int frame, bool isPreview) {
-  double fps =
-      getScene()->getProperties()->getOutputProperties()->getFrameRate();
+  try {
+    double fps =
+        getScene()->getProperties()->getOutputProperties()->getFrameRate();
 
-  TXsheet::SoundProperties *prop = new TXsheet::SoundProperties();
-  prop->m_isPreview              = isPreview;
+    TXsheet::SoundProperties *prop = new TXsheet::SoundProperties();
+    prop->m_isPreview              = isPreview;
 
-  TSoundTrack *st = makeSound(prop);  // Absorbs prop's ownership
-  if (!st) return;
+    TSoundTrack *st = makeSound(prop);  // Absorbs prop's ownership
+    if (!st) return;
 
-  double samplePerFrame = st->getSampleRate() / fps;
+    double samplePerFrame = st->getSampleRate() / fps;
 
-  double s0 = frame * samplePerFrame, s1 = s0 + samplePerFrame;
-
-  play(st, s0, s1, false);
+    double s0 = frame * samplePerFrame, s1 = s0 + samplePerFrame;
+    // if (m_player && m_player->isPlaying()) {
+    //    try {
+    //        m_player->stop();
+    //    }
+    //    catch (const std::runtime_error& e) {
+    //        int i = 0;
+    //    }
+    //    catch (const std::exception& e) {
+    //        int i = 0;
+    //    }
+    //    catch (...) {
+    //        int i = 0;
+    //    }
+    //}
+    play(st, s0, s1, false);
+  } catch (TSoundDeviceException &e) {
+    if (e.getType() == TSoundDeviceException::NoDevice) {
+      std::cout << ::to_string(e.getMessage()) << std::endl;
+    } else {
+      throw TSoundDeviceException(e.getType(), e.getMessage());
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -1741,3 +1814,29 @@ void TXsheet::autoInputCellNumbers(int increment, int interval, int step,
     }
   }
 }
+
+//---------------------------------------------------------
+
+void TXsheet::setObserver(TXsheetColumnChangeObserver *observer) {
+  m_observer = observer;
+}
+
+//---------------------------------------------------------
+
+void TXsheet::notify(const TXsheetColumnChange &change) {
+  if (m_observer) m_observer->onChange(change);
+}
+void TXsheet::notifyFxAdded(const std::vector<TFx *> &fxs) {
+  if (m_observer) m_observer->onFxAdded(fxs);
+}
+void TXsheet::notifyStageObjectAdded(const TStageObjectId id) {
+  if (m_observer) m_observer->onStageObjectAdded(id);
+}
+bool TXsheet::isReferenceManagementIgnored(TDoubleParam *param) {
+  if (m_observer) return m_observer->isIgnored(param);
+  return false;
+}
+ExpressionReferenceMonitor *TXsheet::getExpRefMonitor() const {
+  return m_imp->m_expRefMonitor;
+}
+//---------------------------------------------------------

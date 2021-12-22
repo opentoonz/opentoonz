@@ -24,5 +24,9 @@ Files: Mojo/*
 Copyright: Author: Saeger Ryman
 License:  CC0-1.0
 
+Files: aotz/*
+Copyright: Author: Anderson Prado (AndeOn) [https://github.com/andeon/aotz]
+License:  CC0-1.0
+
 See also CC0-1.0 license at creativecommons.org
 https://creativecommons.org/publicdomain/zero/1.0/

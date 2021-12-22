@@ -395,10 +395,10 @@ GeometricTransformationTag::GeometricTransformationTag()
 /*=====================================================================*/
 
 GeometricTransformationTag::GeometricTransformationTag(
-    const GeometricTransformationTag &trasformationTag)
+    const GeometricTransformationTag &transformationTag)
     : PliGeometricTag(PliTag::GEOMETRIC_TRANSFORMATION_GOBJ)
-    , m_affine(trasformationTag.m_affine)
-    , m_object(trasformationTag.m_object) {}
+    , m_affine(transformationTag.m_affine)
+    , m_object(transformationTag.m_object) {}
 
 /*=====================================================================*/
 

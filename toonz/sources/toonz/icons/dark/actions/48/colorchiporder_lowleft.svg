@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="48px" height="42px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;">
+    <g id="レイヤー-1" serif:id="レイヤー 1" transform="matrix(2,0,0,2,0,-2062.72)">
+        <rect id="rect4138" x="1.5" y="1032.86" width="7" height="6" style="fill:white;stroke:rgb(0,0,255);stroke-width:1px;"/>
+        <rect id="rect4138-3" x="8.5" y="1032.86" width="7" height="6" style="fill:white;stroke:rgb(0,0,255);stroke-width:1px;"/>
+        <rect id="rect4138-31" x="1.5" y="1038.86" width="7" height="6" style="fill:white;stroke:rgb(0,0,255);stroke-width:1px;"/>
+        <rect id="rect4138-3-0" x="8.5" y="1038.86" width="7" height="6" style="fill:white;stroke:rgb(0,0,255);stroke-width:1px;"/>
+        <rect id="rect4138-1" x="1.5" y="1044.86" width="7" height="6" style="fill:white;stroke:rgb(0,0,255);stroke-width:1px;"/>
+        <rect id="rect4138-3-6" x="8.5" y="1044.86" width="7" height="6" style="fill:white;stroke:rgb(0,0,255);stroke-width:1px;"/>
+        <rect id="rect4138-3-5" x="15.5" y="1032.86" width="7" height="6" style="fill:white;stroke:rgb(0,0,255);stroke-width:1px;"/>
+        <rect id="rect4138-3-0-6" x="15.5" y="1038.86" width="7" height="6" style="fill:white;stroke:rgb(0,0,255);stroke-width:1px;"/>
+        <rect id="rect4138-3-6-8" x="15.5" y="1044.86" width="7" height="6" style="fill:white;stroke:rgb(0,0,255);stroke-width:1px;"/>
+        <path id="path4202" d="M5.779,1047.86L18.779,1047.86L5.779,1035.86L17.779,1035.86" style="fill:none;stroke:rgb(3,3,3);stroke-width:1px;"/>
+        <g id="path4204" transform="matrix(1,0,0,-1,0,0)">
+            <circle cx="5" cy="-1047.86" r="2" style="fill:white;stroke:rgb(3,3,3);stroke-width:1px;"/>
+        </g>
+        <path id="path4206" d="M17,1037.36L17,1034.36L21,1035.86L17,1037.36Z" style="fill:rgb(3,3,3);"/>
+    </g>
+</svg>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="16px" height="16px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g transform="matrix(1,0,0,1,-30,-490)">
+        <g id="recordaudio">
+            <g id="bg" transform="matrix(0.110345,0,0,0.121212,13.7793,471.091)">
+                <rect x="147" y="156" width="145" height="132" style="fill:rgb(135,135,135);fill-opacity:0;"/>
+            </g>
+            <g transform="matrix(1,0,0,1,28,488)">
+                <path d="M10,18L9,18C8.448,18 8,17.552 8,17L8,14.826C5.135,14.148 3,11.571 3,8.5C3,9 3,8 3,8L5,8C5,8 5,9 5.004,8.5C5.004,10.982 7.018,12.996 9.5,12.996C11.982,12.996 13.996,10.982 13.996,8.5L14,8L16,8L16,8.5C16,11.571 13.865,14.148 11,14.826L11,17C11,17.552 10.552,18 10,18ZM12,4.5C12,3.12 10.88,2 9.5,2C8.12,2 7,3.12 7,4.5L7,8.5C7,9.88 8.12,11 9.5,11C10.88,11 12,9.88 12,8.5L12,4.5Z"/>
+            </g>
+        </g>
+    </g>
+</svg>

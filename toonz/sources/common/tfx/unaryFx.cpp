@@ -5,7 +5,6 @@
 #include "tdoubleparam.h"
 #include "tnotanimatableparam.h"
 #include "trasterfx.h"
-#include "tflash.h"
 #include "tfxparam.h"
 #include "tparamset.h"
 
@@ -14,13 +13,6 @@
 //==============================================================================
 
 TGeometryFx::TGeometryFx() { setName(L"Geometry"); }
-
-//--------------------------------------------------
-
-void TGeometryFx::compute(TFlash &flash, int frame) {
-  flash.multMatrix(getPlacement(frame));
-  TRasterFx::compute(flash, frame);
-}
 
 //---------------------------------------------------------------
 
@@ -135,26 +127,6 @@ TFx *NaAffineFx::clone(bool recursive) const {
   clonedFx->m_aff         = m_aff;
   clonedFx->m_isDpiAffine = m_isDpiAffine;
   return clonedFx;
-}
-
-//--------------------------------------------------
-
-void NaAffineFx::compute(TFlash &flash, int frame) {
-  TGeometryFx::compute(flash, frame);
-}
-
-//==================================================
-
-void TRasterFx::compute(TFlash &flash, int frame) {
-  for (int i = getInputPortCount() - 1; i >= 0; i--) {
-    TFxPort *port = getInputPort(i);
-
-    if (port->isConnected() && !port->isaControlPort()) {
-      flash.pushMatrix();
-      ((TRasterFxP)(port->getFx()))->compute(flash, frame);
-      flash.popMatrix();
-    }
-  }
 }
 
 //--------------------------------------------------

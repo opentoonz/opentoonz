@@ -74,11 +74,11 @@ public:
   //! Return the savebox of the image
   TRect getSavebox() const { return m_savebox; }
   //! Set the savebox of the image.
-  /*! The savebox setted is the intersection between \b rect and the image
+  /*! The set savebox is the intersection between \b rect and the image
    * box.*/
   void setSavebox(const TRect &rect);
 
-  //! Return the boundin box of the image.
+  //! Return the bounding box of the image.
   TRectD getBBox() const override { return convert(m_savebox); }
 
   //! Return the offset point of the image.

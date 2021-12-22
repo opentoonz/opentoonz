@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="zh_CN">
+<TS version="2.1" language="zh_CN" sourcelanguage="en">
 <context>
     <name>CenterlineVectorizer</name>
     <message>
@@ -400,7 +400,7 @@
     </message>
     <message>
         <source>Paste Fx  :  </source>
-        <translation>粘贴特效 : </translation>
+        <translation>粘贴特效  :  </translation>
     </message>
     <message>
         <source>Disconnect Fx</source>
@@ -451,11 +451,11 @@
         <translation>编辑旋转</translation>
     </message>
     <message>
-        <source>Move E/W</source>
+        <source>Move X</source>
         <translation>左右移动</translation>
     </message>
     <message>
-        <source>Move N/S</source>
+        <source>Move Y</source>
         <translation>上下移动</translation>
     </message>
     <message>
@@ -605,6 +605,20 @@
     <message>
         <source>Timeline</source>
         <translation>时间轴</translation>
+    </message>
+    <message>
+        <source>Failed to save the following resources:
+</source>
+        <translation>保存下面的资源失败:
+</translation>
+    </message>
+    <message>
+        <source>Failed to save palette.</source>
+        <translation>保存调色板失败。</translation>
+    </message>
+    <message>
+        <source>and %1 more item(s).</source>
+        <translation>和 %1 更多项目。</translation>
     </message>
 </context>
 <context>

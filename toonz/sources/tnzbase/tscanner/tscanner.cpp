@@ -225,6 +225,8 @@ void TScannerParameters::saveData(TOStream &os) const {
     case RGB24:
       scanTypeString = Rgbcolors;
       break;
+    default:
+      break;
     }
     attr.clear();
     attr["value"] = scanTypeString;

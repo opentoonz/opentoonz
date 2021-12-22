@@ -5,7 +5,6 @@
 
 // tcg includes
 #include "traits.h"
-#include "sfinae.h"
 #include "macros.h"
 
 // STD includes
@@ -90,7 +89,7 @@ inline bool areNear(Scalar a, Scalar b, Scalar tolerance) {
 //-------------------------------------------------------------------------------------------
 
 template <typename Scalar>
-inline typename tcg::disable_if<tcg::is_floating_point<Scalar>::value,
+inline typename std::enable_if<!tcg::is_floating_point<Scalar>::value,
                                 Scalar>::type
 mod(Scalar val, Scalar mod) {
   Scalar m = val % mod;
@@ -99,7 +98,7 @@ mod(Scalar val, Scalar mod) {
 
 template <typename Scalar>
 inline
-    typename tcg::enable_if<tcg::is_floating_point<Scalar>::value, Scalar>::type
+    typename std::enable_if<tcg::is_floating_point<Scalar>::value, Scalar>::type
     mod(Scalar val, Scalar mod) {
   Scalar m = fmod(val, mod);
   return (m >= 0) ? m : m + mod;
@@ -138,7 +137,7 @@ inline Scalar modShift(Scalar val1, Scalar val2, Scalar a, Scalar b) {
   \return  Integral quotient of the division of \p val by \p d.
 */
 template <typename Scalar>
-inline typename tcg::disable_if<tcg::is_floating_point<Scalar>::value,
+inline typename std::enable_if<!tcg::is_floating_point<Scalar>::value,
                                 Scalar>::type
 div(Scalar val, Scalar d) {
   TCG_STATIC_ASSERT(-3 / 5 == 0);
@@ -153,7 +152,7 @@ div(Scalar val, Scalar d) {
 */
 template <typename Scalar>
 inline
-    typename tcg::enable_if<tcg::is_floating_point<Scalar>::value, Scalar>::type
+    typename std::enable_if<tcg::is_floating_point<Scalar>::value, Scalar>::type
     div(Scalar val, Scalar d) {
   return std::floor(val / d);
 }

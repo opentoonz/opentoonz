@@ -4,7 +4,11 @@
 #include "tools/tool.h"
 #include "tools/cursors.h"
 
+#ifdef TOONZQT_EXPORTS
+#include "toonz/preferences.h"
+#else
 #include "../toonz/preferences.h"
+#endif
 
 #include <QWidget>
 #include <QPixmap>
@@ -50,6 +54,8 @@ const struct {
     {ToolCursor::PickerCursorAreaBase, "picker_style", 7, 22, true},
     {ToolCursor::PickerCursor, "picker_style", 7, 22, true},
 
+    {ToolCursor::PointingHandCursor, "pointing_hand", 13, 4, true},
+
     {ToolCursor::PumpCursor, "pump", 16, 23, false},
     {ToolCursor::RotCursor, "rot", 15, 15, false},
     {ToolCursor::RotTopLeft, "rot_top_left", 15, 15, false},
@@ -86,6 +92,8 @@ const struct {
     {ToolCursor::FillCursorL, "karasu", 7, 25, true},
     {ToolCursor::RulerModifyCursor, "ruler_modify", 7, 7, true},
     {ToolCursor::RulerNewCursor, "ruler_new", 7, 7, true},
+    {ToolCursor::PickPrevCursor, "", 13, 4, false},
+    {ToolCursor::PickNextCursor, "", 13, 4, false},
     {0, 0, 0, 0, false}};
 
 struct CursorData {
@@ -108,8 +116,11 @@ const struct {
                     {ToolCursor::Ex_StyleArea, "ex_style_area"},
                     {ToolCursor::Ex_RGB, "ex_rgb"},
                     {ToolCursor::Ex_HV, "ex_hv"},
+                    {ToolCursor::Ex_Precise, "ex_precise"},
+                    {ToolCursor::Ex_Prev, "ex_prev"},
+                    {ToolCursor::Ex_Next, "ex_next"},
                     {0, 0}};
-};
+};  // namespace
 
 //=============================================================================
 // CursorManager
@@ -135,9 +146,9 @@ public:
       p.setCompositionMode(QPainter::CompositionMode_SourceOver);
       for (int i = 0; decorateInfo[i].pixmapFilename; i++)
         if (decorationFlag & decorateInfo[i].decorateType) {
-          QString leftStr      = "";
+          QString leftStr = "";
           if (useLeft) leftStr = "_left";
-          QString path         = QString(":Resources/") +
+          QString path = QString(":Resources/") +
                          decorateInfo[i].pixmapFilename + leftStr + ".png";
           p.drawPixmap(0, 0, QPixmap(path));
         }

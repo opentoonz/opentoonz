@@ -3,10 +3,16 @@
 #include "traster.h"
 #include "trop.h"
 #include "tpixelgr.h"
-#ifdef _WIN32
-#include <emmintrin.h>
-#include <malloc.h>
+
+#if defined(_WIN32) && defined(x64)
+#define USE_SSE2
 #endif
+
+#ifdef USE_SSE2
+#include <emmintrin.h>
+#include <stdlib.h>
+#endif
+
 
 namespace {
 
@@ -223,7 +229,7 @@ inline void blur_code(PIXEL_SRC *row1, PIXEL_DST *row2, int length, float coeff,
 
 //-------------------------------------------------------------------
 
-#ifdef _WIN32
+#ifdef USE_SSE2
 
 //-------------------------------------------------------------------
 template <class T, class P>
@@ -556,7 +562,7 @@ void load_channel_col32(float *buffer, float *col, int lx, int ly, int x,
 template <class T, class Q, class P>
 void do_filtering_chan(BlurPixel<P> *row1, T *row2, int length, float coeff,
                        float coeffq, int brad, float diff, bool useSSE) {
-#ifdef _WIN32
+#ifdef USE_SSE2
   if (useSSE && T::maxChannelValue == 255)
     blur_code_SSE2<T, P>(row1, row2, length, coeff, coeffq, brad, diff, 0.5);
   else
@@ -744,7 +750,7 @@ void do_filtering_floatRgb(T *row1, BlurPixel<P> *row2, int length, float coeff,
   BLUR_CODE(0, unsigned char)
 */
 
-#ifdef _WIN32
+#ifdef USE_SSE2
   if (useSSE)
     blur_code_SSE2<T, P>(row1, row2, length, coeff, coeffq, brad, diff, 0);
   else

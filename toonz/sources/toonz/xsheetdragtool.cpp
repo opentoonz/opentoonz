@@ -49,6 +49,7 @@
 #include "toonz/txshnoteset.h"
 #include "toutputproperties.h"
 #include "toonz/preferences.h"
+#include "toonz/columnfan.h"
 
 // TnzBase includes
 #include "tfx.h"
@@ -127,6 +128,12 @@ public:
     int col          = pos.layer();
     m_firstCol       = col;
     m_firstRow       = row;
+    // First, check switching of the selection types. This may clear the
+    // previous selection.
+    if (m_modifier & Qt::ControlModifier)
+      getViewer()->getCellKeyframeSelection()->makeCurrent();
+    else
+      getViewer()->getCellSelection()->makeCurrent();
     if (m_modifier & Qt::ShiftModifier) {
       int r0, c0, r1, c1;
       getViewer()->getCellSelection()->getSelectedCells(r0, c0, r1, c1);
@@ -169,18 +176,16 @@ public:
       else
         getViewer()->getCellSelection()->selectCell(row, col);
     }
-    if (m_modifier & Qt::ControlModifier)
-      getViewer()->getCellKeyframeSelection()->makeCurrent();
-    else
-      getViewer()->getCellSelection()->makeCurrent();
     refreshCellsArea();
     refreshRowsArea();
   }
   void onDrag(const CellPosition &pos) override {
     TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
     int row = pos.frame(), col = pos.layer();
-    if (col < 0 || (!getViewer()->orientation()->isVerticalTimeline() &&
-                    col >= xsh->getColumnCount()))
+    int firstCol =
+        Preferences::instance()->isXsheetCameraColumnVisible() ? -1 : 0;
+    if (col < firstCol || (!getViewer()->orientation()->isVerticalTimeline() &&
+                           col >= xsh->getColumnCount()))
       return;
     if (row < 0) row = 0;
     if (m_modifier & Qt::ControlModifier)
@@ -325,15 +330,17 @@ class LevelExtenderUndo final : public TUndo {
   int m_col, m_row, m_deltaRow;
   std::vector<TXshCell> m_cells;  // righe x colonne
 
+  bool m_insert;
   bool m_invert;  // upper-directional
 
 public:
-  LevelExtenderUndo(bool invert = false)
+  LevelExtenderUndo(bool insert = true, bool invert = false)
       : m_colCount(0)
       , m_rowCount(0)
       , m_col(0)
       , m_row(0)
       , m_deltaRow(0)
+      , m_insert(insert)
       , m_invert(invert) {}
 
   void setCells(TXsheet *xsh, int row, int col, int rowCount, int colCount) {
@@ -345,7 +352,7 @@ public:
     m_cells.resize(rowCount * colCount, TXshCell());
     int k = 0;
     for (int r = row; r < row + rowCount; r++)
-      for (int c     = col; c < col + colCount; c++)
+      for (int c = col; c < col + colCount; c++)
         m_cells[k++] = xsh->getCell(r, c);
   }
 
@@ -388,6 +395,7 @@ public:
   }
 
   // for upper-directional smart tab
+  // also used for non-insert(overwriting) extension
   void clearCells() const {
     assert(m_deltaRow != 0);
     TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
@@ -395,21 +403,33 @@ public:
     for (int c = m_col; c < m_col + m_colCount; c++) {
       TXshColumn *column = xsh->getColumn(c);
       if (column && column->getSoundColumn()) continue;
-      xsh->clearCells(m_row, c, count);
+      if (m_invert)
+        xsh->clearCells(m_row, c, count);
+      else
+        xsh->clearCells(m_row + m_rowCount - count, c, count);
     }
   }
 
   // for upper-directional smart tab
+  // also used for non-insert(overwriting) extension
   void setCells() const {
     assert(m_deltaRow != 0);
     TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
     int count    = abs(m_deltaRow);
-    int r1       = m_row + count - 1;
+
+    int r0, r1;
+    if (m_invert) {
+      r0 = m_row;
+      r1 = m_row + count - 1;
+    } else {
+      r0 = m_row + m_rowCount - count - 1;
+      r1 = m_row + m_rowCount - 1;
+    }
     for (int c = 0; c < m_colCount; c++) {
       TXshColumn *column = xsh->getColumn(c);
       if (column && column->getSoundColumn()) continue;
       int col = m_col + c;
-      for (int r = m_row; r <= r1; r++) {
+      for (int r = r0; r <= r1; r++) {
         int k = (r - m_row) * m_colCount + c;
         xsh->setCell(r, col, m_cells[k]);
       }
@@ -418,10 +438,10 @@ public:
 
   void undo() const override {
     // undo for shrinking operation -> revert cells
-    if (m_deltaRow < 0) (m_invert) ? setCells() : insertCells();
+    if (m_deltaRow < 0) (m_insert) ? insertCells() : setCells();
     // undo for stretching operation -> remove cells
     else if (m_deltaRow > 0)
-      (m_invert) ? clearCells() : removeCells();
+      (m_insert) ? removeCells() : clearCells();
     else {
       assert(0);
     }
@@ -433,10 +453,10 @@ public:
 
   void redo() const override {
     // redo for shrinking operation -> remove cells
-    if (m_deltaRow < 0) (m_invert) ? clearCells() : removeCells();
+    if (m_deltaRow < 0) (m_insert) ? removeCells() : clearCells();
     // redo for stretching operation -> revert cells
     else if (m_deltaRow > 0)
-      (m_invert) ? setCells() : insertCells();
+      (m_insert) ? insertCells() : setCells();
     else {
       assert(0);
     }
@@ -488,7 +508,7 @@ public:
     else {
       std::vector<TXshCell> cells(rowCount, TXshCell());
       xsh->getCells(row, col, rowCount, &cells[0]);
-      for (int r         = 0; r < rowCount; r++)
+      for (int r = 0; r < rowCount; r++)
         m_sourceCells[r] = cells[rowCount - 1 - r];
       // the "first row" becomes the bottom-most row for the upper-directional
       // smart tab
@@ -511,7 +531,7 @@ public:
     int k = i + m_offset;
     // if there is a large cycle
     if (m_count > 0) k = k % m_count;
-    k                  = m_base + (k / m_step) * m_inc;
+    k = m_base + (k / m_step) * m_inc;
     if (m_inc < 0)
       while (k < 1) k += m_base;
     return TFrameId(k);
@@ -531,7 +551,7 @@ public:
     int i;
     for (i = 1; i < count; i++)
       if (m_sourceCells[i].m_level != cell.m_level ||
-          m_sourceCells[i].m_frameId.getLetter() != 0)
+          !m_sourceCells[i].m_frameId.getLetter().isEmpty())
         return;
 
     // check if all the selected cells have the same frame number
@@ -626,12 +646,15 @@ class LevelExtenderTool final : public XsheetGUI::DragTool {
   LevelExtenderUndo *m_undo;
 
   bool m_invert;  // upper directional smart tab
+  bool m_insert;
 
 public:
-  LevelExtenderTool(XsheetViewer *viewer, bool invert = false)
+  LevelExtenderTool(XsheetViewer *viewer, bool insert = true,
+                    bool invert = false)
       : XsheetGUI::DragTool(viewer)
       , m_colCount(0)
       , m_undo(0)
+      , m_insert(insert)
       , m_invert(invert) {}
 
   // called when the smart tab is clicked
@@ -649,11 +672,26 @@ public:
     m_colCount = c1 - c0 + 1;
     m_rowCount = r1 - r0 + 1;
     if (m_colCount <= 0 || m_rowCount <= 0) return;
+
+    // if m_insert is false but there are no empty rows under the tab,
+    // then switch m_insert to true so that the operation works anyway
+    if (!m_insert && !m_invert) {
+      TXsheet *xsh = getViewer()->getXsheet();
+      for (int c = c0; c <= c1; c++) {
+        TXshColumn *column = xsh->getColumn(c);
+        if (!column || column->getSoundColumn()) continue;
+        if (!column->isCellEmpty(r1 + 1)) {
+          m_insert = true;  // switch the behavior
+          break;
+        }
+      }
+    }
+
     m_columns.reserve(m_colCount);
     TXsheet *xsh = getViewer()->getXsheet();
     for (int c = c0; c <= c1; c++)
       m_columns.push_back(CellBuilder(xsh, r0, c, m_rowCount, m_invert));
-    m_undo = new LevelExtenderUndo(m_invert);
+    m_undo = new LevelExtenderUndo(m_insert, m_invert);
     m_undo->setCells(xsh, r0, c0, m_rowCount, m_colCount);
   }
 
@@ -671,7 +709,7 @@ public:
     if (row <= m_r0) row = m_r0 + 1;
     int r1 = row - 1;  // r1 e' la riga inferiore della nuova selezione
     if (r1 < m_r0) r1 = m_r0;
-    int dr            = r1 - m_r1;
+    int dr = r1 - m_r1;
     if (dr == 0) return;
     TXsheet *xsh = getViewer()->getXsheet();
     // shrink
@@ -680,16 +718,41 @@ public:
         // Se e' una colonna sound l'extender non deve fare nulla.
         TXshColumn *column = xsh->getColumn(m_c0 + c);
         if (column && column->getSoundColumn()) continue;
-        xsh->removeCells(row, m_c0 + c, -dr);
+        if (m_insert)
+          xsh->removeCells(row, m_c0 + c, -dr);
+        else {
+          for (int r = row; r <= m_r1; r++)
+            xsh->setCell(r, m_c0 + c, TXshCell());
+        }
       }
     }
     // extend
     else {
+      // check how many vacant rows
+      if (!m_insert) {
+        int tmp_dr;
+        bool found = false;
+        for (tmp_dr = 1; tmp_dr <= dr; tmp_dr++) {
+          for (int c = 0; c < m_colCount; c++) {
+            TXshColumn *column = xsh->getColumn(m_c0 + c);
+            if (!column || column->getSoundColumn()) continue;
+            if (!column->isCellEmpty(m_r1 + tmp_dr)) {
+              found = true;
+              break;
+            }
+          }
+          if (found) break;
+        }
+        if (tmp_dr == 1) return;
+        dr = tmp_dr - 1;
+        r1 = m_r1 + dr;
+      }
+
       for (int c = 0; c < m_colCount; c++) {
         // Se e' una colonna sound l'extender non deve fare nulla.
         TXshColumn *column = xsh->getColumn(m_c0 + c);
         if (column && column->getSoundColumn()) continue;
-        xsh->insertCells(m_r1 + 1, m_c0 + c, dr);
+        if (m_insert) xsh->insertCells(m_r1 + 1, m_c0 + c, dr);
         for (int r = m_r1 + 1; r <= r1; r++)
           xsh->setCell(r, m_c0 + c, m_columns[c].generate(r));
       }
@@ -703,8 +766,8 @@ public:
   void onCellChangeInvert(int row, int col) {
     if (m_colCount <= 0 || m_rowCount <= 0) return;
     if (row >= m_r1) row = m_r1 - 1;
-    int r0               = row + 1;
-    if (r0 > m_r1) r0    = m_r1;
+    int r0 = row + 1;
+    if (r0 > m_r1) r0 = m_r1;
 
     if (r0 < 0) r0 = 0;
 
@@ -776,8 +839,8 @@ public:
 //-----------------------------------------------------------------------------
 
 XsheetGUI::DragTool *XsheetGUI::DragTool::makeLevelExtenderTool(
-    XsheetViewer *viewer, bool invert) {
-  return new LevelExtenderTool(viewer, invert);
+    XsheetViewer *viewer, bool insert, bool invert) {
+  return new LevelExtenderTool(viewer, insert, invert);
 }
 
 //=============================================================================
@@ -1105,12 +1168,13 @@ public:
 
   void onClick(const CellPosition &pos) override {
     int row = pos.frame(), col = pos.layer();
-    m_r0 = m_r1             = row;
-    TXsheet *xsh            = getViewer()->getXsheet();
-    TStageObjectId cameraId = xsh->getStageObjectTree()->getCurrentCameraId();
+    m_r0 = m_r1  = row;
+    TXsheet *xsh = getViewer()->getXsheet();
+    TStageObjectId cameraId =
+        TStageObjectId::CameraId(xsh->getCameraColumnIndex());
 
     TStageObjectId objId = col >= 0 ? TStageObjectId::ColumnId(col) : cameraId;
-    if (col >= 0 && xsh->getColumn(col) && xsh->getColumn(col)->isLocked()) {
+    if (xsh->getColumn(col) && xsh->getColumn(col)->isLocked()) {
       m_enable = false;
       return;
     }
@@ -1161,10 +1225,11 @@ public:
 
 XsheetGUI::DragTool *XsheetGUI::DragTool::makeKeyFrameHandleMoverTool(
     XsheetViewer *viewer, bool isEaseOut, int keyRow) {
-  return new KeyFrameHandleMoverTool(
-      viewer, isEaseOut ? KeyFrameHandleMoverTool::EaseOut
-                        : KeyFrameHandleMoverTool::EaseIn,
-      keyRow);
+  return new KeyFrameHandleMoverTool(viewer,
+                                     isEaseOut
+                                         ? KeyFrameHandleMoverTool::EaseOut
+                                         : KeyFrameHandleMoverTool::EaseIn,
+                                     keyRow);
 }
 
 //=============================================================================
@@ -1282,7 +1347,7 @@ public:
   }
 
   void onDrag(const CellPosition &pos) override {
-    int row          = pos.frame();
+    int row = pos.frame();
     if (row < 0) row = 0;
     onRowChange(row);
     TApp::instance()->getCurrentOnionSkin()->notifyOnionSkinMaskChanged();
@@ -1333,9 +1398,9 @@ public:
   }
 
   void onDrag(const CellPosition &pos) override {
-    int row          = pos.frame();
+    int row = pos.frame();
     if (row < 0) row = 0;
-    int lastRow      = TApp::instance()->getCurrentFrame()->getFrameIndex();
+    int lastRow = TApp::instance()->getCurrentFrame()->getFrameIndex();
     if (lastRow == row) return;
     onRowChange(row);
     refreshRowsArea();
@@ -1389,7 +1454,7 @@ public:
   }
 
   void onDrag(const CellPosition &pos) override {
-    int row          = pos.frame();
+    int row = pos.frame();
     if (row < 0) row = 0;
     onRowChange(row);
     refreshRowsArea();
@@ -1487,8 +1552,10 @@ public:
     TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
     int col      = pos.layer();
     if (!m_enabled) return;
-    if (col < 0 || (!getViewer()->orientation()->isVerticalTimeline() &&
-                    col >= xsh->getColumnCount()))
+    int firstCol =
+        Preferences::instance()->isXsheetCameraColumnVisible() ? -1 : 0;
+    if (col < firstCol || (!getViewer()->orientation()->isVerticalTimeline() &&
+                           col >= xsh->getColumnCount()))
       return;
     TColumnSelection *selection = getViewer()->getColumnSelection();
     selection->selectNone();
@@ -1594,12 +1661,28 @@ public:
       , m_offset(0)
       , m_origOffset(0) {}
 
-  void onClick(const CellPosition &pos) override {
+  void onClick(const QMouseEvent *event) override {
+    QPoint xy                   = event->pos();
+    CellPosition pos            = getViewer()->xyToPosition(xy);
     int col                     = pos.layer();
     TColumnSelection *selection = getViewer()->getColumnSelection();
     if (!selection->isColumnSelected(col)) {
-      selection->selectNone();
-      selection->selectColumn(col);
+      if (event->modifiers() & Qt::ControlModifier) {
+        selection->selectColumn(col, true);
+      } else if (event->modifiers() & Qt::ShiftModifier) {
+        int ia = col, ib = col;
+        int columnCount = getViewer()->getXsheet()->getColumnCount();
+        while (ia > 0 && !selection->isColumnSelected(ia - 1)) --ia;
+        if (ia == 0) ia = col;
+        while (ib < columnCount - 1 && !selection->isColumnSelected(ib + 1))
+          ++ib;
+        if (ib == columnCount - 1) ib = col;
+        int i;
+        for (i = ia; i <= ib; i++) selection->selectColumn(i, true);
+      } else {
+        selection->selectNone();
+        selection->selectColumn(col);
+      }
       selection->makeCurrent();
     }
     std::set<int> indices = selection->getIndices();
@@ -1620,6 +1703,7 @@ public:
     TXsheet *xsh                = app->getCurrentXsheet()->getXsheet();
 
     std::set<int> indices = selection->getIndices();
+    indices.erase(-1);  // Ignore camera column
     if (indices.empty()) return;
 
     assert(m_lastCol == *indices.begin());
@@ -1629,11 +1713,21 @@ public:
     if (col < 0)
       col = 0;
     else if (!getViewer()->orientation()->isVerticalTimeline() && col > currEnd)
-      col    = currEnd;
+      col = currEnd;
     int dCol = col - (m_lastCol - m_offset);
 
     // ignore if the cursor moves in the drag-starting column
     if (dCol == 0) return;
+
+    if (dCol < 0 &&
+        !xsh->getColumnFan(getViewer()->orientation())->isActive(col)) {
+      while (
+          col != 0 &&
+          !xsh->getColumnFan(getViewer()->orientation())->isActive(col - 1)) {
+        col--;
+        dCol--;
+      }
+    }
 
     int newBegin = *indices.begin() + dCol;
     int newEnd   = *indices.rbegin() + dCol;
@@ -1733,12 +1827,12 @@ public:
     TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
     TStageObjectId columnId(getViewer()->getObjectId(m_firstCol));
     if (m_firstCol == -1)
-      columnId =
-          getViewer()->getXsheet()->getStageObjectTree()->getCurrentCameraId();
+      columnId = TStageObjectId::CameraId(
+          getViewer()->getXsheet()->getCameraColumnIndex());
     TStageObjectId parentId(getViewer()->getObjectId(m_lastCol));
     if (m_lastCol == -1)
-      parentId =
-          getViewer()->getXsheet()->getStageObjectTree()->getCurrentCameraId();
+      parentId = TStageObjectId::CameraId(
+          getViewer()->getXsheet()->getCameraColumnIndex());
     if (getViewer()->getXsheet()->getColumn(m_lastCol) &&
         getViewer()->getXsheet()->getColumn(m_lastCol)->getSoundColumn())
       return;
@@ -1937,7 +2031,7 @@ public:
     for (i = 0; i < columnCount; i++) {
       std::vector<TFrameId> fids = m_levels[i].second;
       int size                   = fids.size();
-      if (maxRow < size) maxRow  = size;
+      if (maxRow < size) maxRow = size;
     }
     if (!isVertical) return TRect(0, 0, maxRow - 1, columnCount - 1);
 
@@ -2027,7 +2121,7 @@ public:
       m_type = OVERWRITE_CELLS;
     else
       m_valid = canChange(row, col);
-    m_curPos  = pos;
+    m_curPos = pos;
     refreshCellsArea();
   }
   void onRelease(const QDropEvent *e) override {
@@ -2085,8 +2179,8 @@ public:
           CellRange(CellPosition(rect.y0, rect.x0),
                     CellPosition(rect.y1 + 1, rect.x1 + 1)));
     else {
-      int newY0  = qMax(rect.y0, rect.y1);
-      int newY1  = qMin(rect.y0, rect.y1);
+      int newY0  = std::max(rect.y0, rect.y1);
+      int newY1  = std::min(rect.y0, rect.y1);
       screenCell = getViewer()->rangeToXYRect(CellRange(
           CellPosition(rect.x0, newY0), CellPosition(rect.x1 + 1, newY1 - 1)));
     }

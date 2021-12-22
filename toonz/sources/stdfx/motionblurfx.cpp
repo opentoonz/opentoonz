@@ -193,7 +193,7 @@ void do_filtering(T *row1, T *row2, int length, double coeff, int brad,
   for (i = 0; i < length; i++) /* for the ith point the previous computing is
                                   used, with the values */
   {
-    /* stored in the auxiliar variables sigma1 and sigma2. */
+    /* stored in the auxiliary variables sigma1 and sigma2. */
     rsum = ((Mblur - i) * sigma1.r + sigma2.r) / coeff;
     gsum = ((Mblur - i) * sigma1.g + sigma2.g) / coeff;
     bsum = ((Mblur - i) * sigma1.b + sigma2.b) / coeff;
@@ -446,10 +446,26 @@ public:
 
   std::string getAlias(double frame,
                        const TRenderSettings &info) const override {
+    std::string alias = getFxType();
+    alias += "[";
+
+    // alias of the effects related to the input ports separated by commas
+    // a port that is not connected to an alias blank (empty string)
+    int i;
+    for (i = 0; i < getInputPortCount(); i++) {
+      TFxPort *port = getInputPort(i);
+      if (port->isConnected()) {
+        TRasterFxP ifx = port->getFx();
+        assert(ifx);
+        alias += ifx->getAlias(frame, info);
+      }
+      alias += ",";
+    }
+
     unsigned long id = getIdentifier();
     double value     = m_intensity->getValue(frame);
-    return getFxType() + "[" + std::to_string(id) + "," +
-           std::to_string(frame) + "," + std::to_string(value) + "]";
+    return alias + std::to_string(id) + "," + std::to_string(frame) + "," +
+           std::to_string(value) + "]";
   }
 };
 
@@ -516,7 +532,7 @@ void DirectionalBlurBaseFx::doCompute(TTile &tile, double frame,
     m_input->getBBox(frame, bboxIn, ri);
     if (bboxIn == TConsts::infiniteRectD) bboxIn = rectTile;
     TPointD blur = (1.0 / shrink) * (aff * blurVector);
-    // enlarge must be bidirectional, because we need pixel on the ohter side of
+    // enlarge must be bidirectional, because we need pixel on the other side of
     // blur
     enlargeDir(bboxIn, blur, true);
     rectTile = bboxIn * rectTile.enlarge(fabs(blur.x), fabs(blur.y));

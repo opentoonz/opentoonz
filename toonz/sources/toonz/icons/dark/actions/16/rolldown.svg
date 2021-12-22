@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="16px" height="16px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g transform="matrix(1,0,0,1,-90,-170)">
+        <g id="rolldown">
+            <g id="bg" transform="matrix(0.110345,0,0,0.121212,73.7797,151.091)">
+                <rect x="147" y="156" width="145" height="132" style="fill:rgb(135,135,135);fill-opacity:0;"/>
+            </g>
+            <g transform="matrix(-1,0,0,1,196.001,0)">
+                <path d="M93.5,185.182L90.318,182L96.682,182L93.5,185.182ZM94.001,177.5C94.001,179.65 94.002,182 94.002,182L93,182C93,182 93.001,179.65 93.001,177.5L93.001,176.5C93.001,173.464 95.465,171 98.501,171C101.537,171 104.001,173.464 104.001,176.5L104.001,177.5C104.001,177.776 103.777,178 103.501,178C103.225,178 103.001,177.776 103.001,177.5L103.001,176.5C103.001,174.016 100.985,172 98.501,172C96.017,172 94.001,174.016 94.001,176.5L94.001,177.5Z"/>
+            </g>
+        </g>
+    </g>
+</svg>

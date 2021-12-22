@@ -30,7 +30,7 @@ public:
   struct Note {
     //! Default colors are defined in TSceneProperties
     int m_colorIndex;
-    //! Is html test, contains font inforamtion.
+    //! Is html test, contains font information.
     QString m_text;
     int m_row;
     int m_col;

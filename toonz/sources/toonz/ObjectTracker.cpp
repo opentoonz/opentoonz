@@ -30,7 +30,7 @@ using namespace std;
 #define MAX_FLOAT 3.40282e+38;
 
 //---------------------------------------------------------------------------------------------------------
-// Costructor
+// Constructor
 CObjectTracker::CObjectTracker(int imW, int imH, bool _colorimage,
                                bool _att_background, bool _man_occlusion) {
   att_background = _att_background;
@@ -218,7 +218,7 @@ void CObjectTracker::FindHistogram(TRaster32P *frame, float(*histogram),
          x <= std::min(m_sTrackingObject.X + m_sTrackingObject.W / 2,
                        m_nImageWidth - 1);
          x++) {
-      E = CheckEdgeExistance(frame, x, y);
+      E = CheckEdgeExistence(frame, x, y);
 
       pixelValues = GetPixelValues(frame, x, y);
 
@@ -292,7 +292,7 @@ void CObjectTracker::FindHistogramBackground(TRaster32P *frame,
           (x <= (m_sTrackingObject.X + m_sTrackingObject.W / 2)))
         continue;
 
-      E = CheckEdgeExistance(frame, x, y);
+      E = CheckEdgeExistence(frame, x, y);
 
       pixelValues = GetPixelValues(frame, x, y);
 
@@ -353,7 +353,7 @@ void CObjectTracker::FindWightsAndCOM(TRaster32P *frame, float(*histogram)) {
 
   std::unique_ptr<float[]> weights(new float[HISTOGRAM_LENGTH]);
 
-  // weigths
+  // weights
   for (i = 0; i < HISTOGRAM_LENGTH; i++) {
     if (histogram[i] > 0.0)
       weights[i] = sqrt(m_sTrackingObject.initHistogram[i] / histogram[i]);
@@ -370,7 +370,7 @@ void CObjectTracker::FindWightsAndCOM(TRaster32P *frame, float(*histogram)) {
          x <= std::min(m_sTrackingObject.X + m_sTrackingObject.W / 2,
                        m_nImageWidth - 1);
          x++) {
-      E = CheckEdgeExistance(frame, x, y);
+      E = CheckEdgeExistence(frame, x, y);
 
       pixelValues = GetPixelValues(frame, x, y);
 
@@ -398,7 +398,7 @@ void CObjectTracker::FindWightsAndCOM(TRaster32P *frame, float(*histogram)) {
 
 //--------------------------------------------------------------------------------------------------------
 // Edge Information of pixel
-UBYTE8 CObjectTracker::CheckEdgeExistance(TRaster32P *frame, short _x,
+UBYTE8 CObjectTracker::CheckEdgeExistence(TRaster32P *frame, short _x,
                                           short _y) {
   UBYTE8 E         = 0;
   short GrayCenter = 0;

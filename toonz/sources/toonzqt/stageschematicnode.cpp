@@ -26,7 +26,6 @@
 #include "toonz/txshchildlevel.h"
 #include "toonz/txshlevelcolumn.h"
 #include "toonz/txshleveltypes.h"
-#include "toonz/txshleveltypes.h"
 #include "toonz/tcolumnhandle.h"
 #include "toonz/hook.h"
 #include "toonz/preferences.h"
@@ -1015,8 +1014,8 @@ SplineAimChanger::~SplineAimChanger() {}
 
 void SplineAimChanger::mouseMoveEvent(QGraphicsSceneMouseEvent *me) {
   if (m_buttonState == Qt::LeftButton) {
-    bool increase           = false;
-    int delta               = me->screenPos().y() - me->lastScreenPos().y();
+    bool increase = false;
+    int delta     = me->screenPos().y() - me->lastScreenPos().y();
     if (delta < 0) increase = true;
     m_delta += abs(delta);
     if (m_delta > 15) {
@@ -1323,14 +1322,16 @@ StageSchematicNode::StageSchematicNode(StageSchematicScene *scene,
   m_splineDock->setPos(x, m_height);
 
   m_pathToggle = new SchematicToggle_SplineOptions(
-      this, QPixmap(":Resources/schematic_spline_aim_rhomb.svg"),
-      QPixmap(":Resources/schematic_spline_aim_square.svg"), 0);
+      this, QIcon(":Resources/schematic_spline_aim_rhomb.svg"),
+      QIcon(":Resources/schematic_spline_aim_square.svg"), 0);
   m_cpToggle = new SchematicToggle_SplineOptions(
-      this, QPixmap(":Resources/schematic_spline_cp.svg"), 0);
-  m_pathToggle->setSize(7, 7);
-  m_cpToggle->setSize(7, 7);
-  m_cpToggle->setPos(m_splineDock->pos() - QPointF(7, 0));
-  m_pathToggle->setPos(m_cpToggle->pos() - QPointF(7, 0));
+      this, QIcon(":Resources/schematic_spline_cp.svg"), 0);
+  m_pathToggle->setSize(16, 16);
+  m_cpToggle->setSize(16, 16);
+  m_cpToggle->setPos(m_splineDock->pos() - QPointF(16, 0));
+  m_pathToggle->setPos(m_cpToggle->pos() - QPointF(16, 0));
+  m_pathToggle->setToolTip(tr("Toggle Autorotate Along Motion Path"));
+  m_cpToggle->setToolTip(tr("Toggle Link Motion Path to Control Points"));
 
   if (m_stageObject->isPathEnabled()) {
     if (m_stageObject->isAimEnabled())
@@ -1559,10 +1560,12 @@ void StageSchematicNode::onHandleReleased() {
 StageSchematicPegbarNode::StageSchematicPegbarNode(StageSchematicScene *scene,
                                                    TStageObject *pegbar)
     : StageSchematicNode(scene, pegbar, 90, 18) {
+      SchematicViewer *viewer = scene->getSchematicViewer();
   std::string name = m_stageObject->getFullName();
   std::string id   = m_stageObject->getId().toString();
   m_name           = QString::fromStdString(name);
   m_nameItem       = new SchematicName(this, 72, 20);
+  m_nameItem->setDefaultTextColor(viewer->getTextColor());
   m_nameItem->setName(m_name);
   m_nameItem->setPos(16, -1);
   m_nameItem->setZValue(2);
@@ -1704,6 +1707,7 @@ StageSchematicColumnNode::StageSchematicColumnNode(StageSchematicScene *scene,
                        SLOT(onChangedSize(bool)));
 
   m_nameItem = new SchematicName(this, 54, 20);
+  m_nameItem->setDefaultTextColor(viewer->getTextColor());
   m_nameItem->setName(m_name);
   m_nameItem->setPos(16, -1);
   m_nameItem->setZValue(2);
@@ -1893,6 +1897,7 @@ void StageSchematicColumnNode::onChangedSize(bool expand) {
   updatePortsPosition();
   updateLinksGeometry();
   update();
+  emit nodeChangedSize();
 }
 
 //--------------------------------------------------------
@@ -2002,10 +2007,12 @@ void StageSchematicColumnNode::onCameraStandToggleClicked(int state) {
 StageSchematicCameraNode::StageSchematicCameraNode(StageSchematicScene *scene,
                                                    TStageObject *pegbar)
     : StageSchematicNode(scene, pegbar, 90, 18) {
+  SchematicViewer *viewer = scene->getSchematicViewer();
   std::string name = m_stageObject->getFullName();
   m_name           = QString::fromStdString(name);
 
   m_nameItem = new SchematicName(this, 54, 20);
+  m_nameItem->setDefaultTextColor(viewer->getTextColor());
   m_nameItem->setName(m_name);
 
   m_nameItem->setPos(16, -2);
@@ -2081,6 +2088,7 @@ void StageSchematicCameraNode::onNameChanged() {
 StageSchematicSplineNode::StageSchematicSplineNode(StageSchematicScene *scene,
                                                    TStageObjectSpline *spline)
     : SchematicNode(scene), m_spline(spline), m_isOpened(false) {
+  SchematicViewer *viewer = scene->getSchematicViewer();
   m_width  = 90;
   m_height = 18;
   assert(spline);
@@ -2098,6 +2106,7 @@ StageSchematicSplineNode::StageSchematicSplineNode(StageSchematicScene *scene,
   std::string name = m_spline->getName();
   m_splineName     = QString::fromStdString(name);
   m_nameItem       = new SchematicName(this, 72, 20);
+  m_nameItem->setDefaultTextColor(viewer->getTextColor());
   m_nameItem->setName(m_splineName);
   m_nameItem->setPos(16, -1);
   m_nameItem->setZValue(2);
@@ -2211,13 +2220,15 @@ StageSchematicGroupNode::StageSchematicGroupNode(
     : StageSchematicNode(scene, root, 90, 18, true)
     , m_root(root)
     , m_groupedObj(groupedObj) {
+  SchematicViewer *viewer = scene->getSchematicViewer();
   int i;
-  for (i   = 0; i < m_groupedObj.size(); i++) m_groupedObj[i]->addRef();
-  bool ret = true;
+  for (i = 0; i < m_groupedObj.size(); i++) m_groupedObj[i]->addRef();
+  bool ret          = true;
   std::wstring name = m_stageObject->getGroupName(false);
   m_name            = QString::fromStdWString(name);
 
   m_nameItem = new SchematicName(this, 72, 20);
+  m_nameItem->setDefaultTextColor(viewer->getTextColor());
   m_nameItem->setName(m_name);
   m_nameItem->setPos(16, -1);
   m_nameItem->setZValue(2);

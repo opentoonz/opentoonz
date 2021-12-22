@@ -7,7 +7,6 @@
 
 // Boost includes
 #include <boost/container/flat_map.hpp>
-#include <boost/algorithm/minmax_element.hpp>
 
 namespace boost_c = boost::container;
 
@@ -123,10 +122,9 @@ static void sampleColor(const TRasterCM32P &ras, int threshold, Sequence &seq,
   std::vector<double> params;
 
   // Meanwhile, ensure each point belong to ras. Otherwise, typically an error
-  // occured
-  // in the thinning process and it's better avoid sampling procedure. Only
-  // exception, when
-  // a point has x==ras->getLx() || y==ras->getLy(); that is accepted.
+  // occurred in the thinning process and it's better avoid sampling procedure. 
+  // Only exception, when a point has 
+  // x==ras->getLx() || y==ras->getLy(); that is accepted.
   {
     const T3DPointD &headPos = *currGraph->getNode(seq.m_head);
 
@@ -154,8 +152,11 @@ static void sampleColor(const TRasterCM32P &ras, int threshold, Sequence &seq,
         return;
     }
 
-    params.push_back(params.back() + tdistance(*currGraph->getNode(next),
-                                               *currGraph->getNode(curr)));
+    double distance =
+        tdistance(*currGraph->getNode(next), *currGraph->getNode(curr));
+    if (distance == 0.0) continue;
+
+    params.push_back(params.back() + distance);
     nodes.push_back(next);
 
     meanThickness += currGraph->getNode(next)->z;
@@ -174,8 +175,8 @@ static void sampleColor(const TRasterCM32P &ras, int threshold, Sequence &seq,
   // Prepare sampling procedure
   int paramCount = params.size(), paramMax = paramCount - 1;
 
-  int sampleMax = std::max(params.back() / std::max(meanThickness, 1.0),
-                           3.0),    // Number of color samples depends on
+  int sampleMax   = std::max(params.back() / std::max(meanThickness, 1.0),
+                           3.0),  // Number of color samples depends on
       sampleCount = sampleMax + 1;  // the ratio params.back() / meanThickness
 
   std::vector<double> sampleParams(sampleCount);  // Sampling lengths
@@ -207,9 +208,8 @@ static void sampleColor(const TRasterCM32P &ras, int threshold, Sequence &seq,
   }
 
   // NOTE: Extremities of a sequence are considered unreliable: they typically
-  // happen
-  //       to be junction points shared between possibly different-colored
-  //       strokes.
+  // happen to be junction points shared between possibly different-colored
+  // strokes.
 
   // Find first and last extremity-free sampled points
   T3DPointD first(*currGraph->getNode(seq.m_head));
@@ -254,8 +254,9 @@ static void sampleColor(const TRasterCM32P &ras, int threshold, Sequence &seq,
     }
   }
 
-  if (i >= k) goto _getOut;  // No admissible segment found for splitting
-                             // check.
+  if (i >= k)
+    goto _getOut;  // No admissible segment found for splitting
+                   // check.
   // Find color changes between sampled colors
   for (l = i; l < k; ++l) {
     const TPixelCM32
@@ -381,8 +382,7 @@ void calculateSequenceColors(const TRasterP &ras, VectorizerCoreGlobals &g) {
 
   if (cm && g.currConfig->m_maxThickness > 0.0) {
     // singleSequence is traversed back-to-front because new, possibly splitted
-    // sequences
-    // are inserted at back - and don't have to be re-sampled.
+    // sequences are inserted at back - and don't have to be re-sampled.
     for (l = singleSequences.size() - 1; l >= 0; --l) {
       Sequence rear;
       sampleColor(ras, threshold, singleSequences[l], rear, singleSequences);
@@ -513,13 +513,6 @@ static int getInkPredominance(const TRasterCM32P &ras, TPalette *palette, int x,
 */
 static int getBranchPredominance(const TRasterCM32P &ras, TPalette *palette,
                                  JointSequenceGraph::Node &node) {
-  struct locals {
-    static inline bool valueLess(const std::pair<int, int> &a,
-                                 const std::pair<int, int> &b) {
-      return (a.second < b.second);
-    }
-  };
-
   boost_c::flat_map<int, int> branchInksHistogram;
 
   UINT l, lCount = node.getLinksCount();
@@ -535,9 +528,11 @@ static int getBranchPredominance(const TRasterCM32P &ras, TPalette *palette,
 
   typedef boost_c::flat_map<int, int>::iterator histo_it;
 
-  const std::pair<histo_it, histo_it> &histoRange =
-      boost::minmax_element(branchInksHistogram.begin(),
-                            branchInksHistogram.end(), locals::valueLess);
+  const std::pair<histo_it, histo_it> &histoRange = std::minmax_element(
+      branchInksHistogram.begin(), branchInksHistogram.end(),
+      [](const std::pair<int, int> &a, const std::pair<int, int> &b) {
+        return a.second < b.second;
+      });
 
   return (histoRange.first->second == histoRange.second->second)
              ? -1

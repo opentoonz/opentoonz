@@ -176,8 +176,11 @@ void PlasticDeformerFx::buildRenderSettings(double frame,
   // So, the best choice is to let the *input fx* decide the appropriate
   // reference, by invoking
   // its handledAffine() method.
-
-  info.m_bpp    = 32;  // We need to fix the input to 32-bpp
+  m_was64bit = false;
+  if (info.m_bpp == 64) {
+    m_was64bit = true;
+    info.m_bpp = 32;  // We need to fix the input to 32-bpp
+  }
   info.m_affine = m_port->handledAffine(info, frame);
 }
 
@@ -401,14 +404,34 @@ void PlasticDeformerFx::doCompute(TTile &tile, double frame,
 
     QImage img = fb.toImage().scaled(QSize(d.lx, d.ly), Qt::IgnoreAspectRatio,
                                      Qt::SmoothTransformation);
-    int wrap      = tile.getRaster()->getLx() * sizeof(TPixel32);
-    uchar *srcPix = img.bits();
-    uchar *dstPix = tile.getRaster()->getRawData() + wrap * (d.ly - 1);
-    for (int y = 0; y < d.ly; y++) {
-      memcpy(dstPix, srcPix, wrap);
-      dstPix -= wrap;
-      srcPix += wrap;
+    int wrap   = tile.getRaster()->getLx() * sizeof(TPixel32);
+    if (!m_was64bit) {
+      uchar *srcPix = img.bits();
+      uchar *dstPix = tile.getRaster()->getRawData() + wrap * (d.ly - 1);
+      for (int y = 0; y < d.ly; y++) {
+        memcpy(dstPix, srcPix, wrap);
+        dstPix -= wrap;
+        srcPix += wrap;
+      }
+    } else if (m_was64bit) {
+      TRaster64P newRaster(tile.getRaster()->getSize());
+      TRaster32P tempRaster(tile.getRaster()->getSize());
+      uchar *srcPix = img.bits();
+      uchar *dstPix = tempRaster.getPointer()->getRawData() + wrap * (d.ly - 1);
+      for (int y = 0; y < d.ly; y++) {
+        memcpy(dstPix, srcPix, wrap);
+        dstPix -= wrap;
+        srcPix += wrap;
+      }
+      TRop::convert(newRaster, tempRaster);
+      int size = tile.getRaster()->getLx() * tile.getRaster()->getLy() *
+                 sizeof(TPixel64);
+      srcPix = newRaster.getPointer()->getRawData();
+      dstPix = tile.getRaster()->getRawData();
+      memcpy(dstPix, srcPix, size);
+      texInfo.m_bpp = 64;
     }
+
     fb.release();
 
     // context->getRaster(tile.getRaster());

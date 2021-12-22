@@ -4,7 +4,7 @@
     
   // [EasyLess Extension] Compile Config
   "less.compile": {
-    "compress":  true,
+    "compress":  false,
     "sourceMap": false,
     "out":       false
   },

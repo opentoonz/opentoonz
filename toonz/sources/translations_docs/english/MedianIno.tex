@@ -1,0 +1,70 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[a4paper, total={180mm, 272mm}]{geometry}
+
+\usepackage{fontspec}
+\setmainfont[Path=fonts/, Extension=.ttf]{ipaexm}
+
+\setlength\parindent{3.5em}
+\setlength\parskip{0em}
+\renewcommand{\baselinestretch}{1.247}
+
+\begin{document}
+
+\thispagestyle{empty}
+
+\Large
+\noindent \\
+Median Ino\medskip
+\par
+\normalsize
+Reduces noise, and erode majority of middle colors, rounds the contour of\par 
+the picture\\
+\\
+-{-}- \ Inputs \ -{-}-\\
+Source\par
+Connect the image to be processed.\\
+\\
+Reference\par
+Connect the reference image to assign the strength of the effect into each pixel.\\
+\\
+-{-}- \ Settings \ -{-}-\\
+Radius\par
+Specify the area to be eroded by a circle radius.\par
+The unit is mm.\\
+\par
+Specify a value greater than or equal to 0. The maximum is 100mm.\par
+A value smaller than a pixel width (because it does not include any surrounding\par 
+pixels) will do nothing.\\
+\par
+The default value is 0.35mm.\\
+\\
+Channel\par
+Specifies the image color channel to apply the median to.\\
+\par
+\textquotedbl Red\textquotedbl\par
+\textquotedbl Green\textquotedbl\par
+\textquotedbl Blue\textquotedbl\par
+\textquotedbl Alpha\textquotedbl\par
+Select to process the specified color channel,\par
+it will store the results in the RGBA channels.\par
+In black-and-white images, using this method of single-channel processing,\par
+the speed of processing will be faster.\\
+\par
+\textquotedbl All\textquotedbl\par
+This will process all RGBA channels.\\
+\par
+The default setting is \textquotedbl All\textquotedbl .\\
+\newpage
+
+\thispagestyle{empty}
+
+\ \vspace{-0.2em}
+\\
+Reference\par
+Choose how the Reference image values are used to set the strength of the effect\par 
+into each pixel.\par
+Choose from Red/Green/Blue/Alpha/Luminance.\par
+Choose Nothing to disable the effect.\par
+The default value is Red.
+
+\end{document}

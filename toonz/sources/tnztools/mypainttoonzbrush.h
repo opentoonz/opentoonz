@@ -130,7 +130,7 @@ public:
 
   // colormapped
   void updateDrawing(const TRasterCM32P rasCM, const TRasterCM32P rasBackupCM,
-                     const TRect &bbox, int styleId) const;
+                     const TRect &bbox, int styleId, bool lockAlpha) const;
 };
 
 #endif  // T_BLUREDBRUSH

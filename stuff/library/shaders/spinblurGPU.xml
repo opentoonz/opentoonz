@@ -85,3 +85,13 @@
     center
   </Parameter>
 </Concept>
+
+<Concept>
+  compass_spin_ui
+  <Name>
+  Center
+  </Name>
+  <Parameter>
+    center
+  </Parameter>
+</Concept>

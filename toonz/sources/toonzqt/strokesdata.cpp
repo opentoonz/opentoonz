@@ -111,10 +111,15 @@ void StrokesData::getImage(TVectorImageP image, std::set<int> &indices,
     TAffine offset    = findOffset(srcImg, image);
     UINT oldImageSize = image->getStrokeCount();
 
-    image->mergeImage(srcImg, offset, false);
+    int insertAt      = image->mergeImage(srcImg, offset, false);
     UINT newImageSize = image->getStrokeCount();
     indices.clear();
-    for (UINT sI = oldImageSize; sI < newImageSize; sI++) indices.insert(sI);
+
+    if (insertAt == 0)
+      for (UINT sI = oldImageSize; sI < newImageSize; sI++) indices.insert(sI);
+    else
+      for (UINT sI = oldImageSize; sI < newImageSize; sI++)
+        indices.insert(sI - oldImageSize + insertAt);
   } else {
     std::vector<int> indicesToInsert(indices.begin(), indices.end());
     if (indicesToInsert.empty()) return;

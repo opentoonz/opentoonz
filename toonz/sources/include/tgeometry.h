@@ -65,7 +65,7 @@ public:
 \sa rotate270
 */
 template <class T>
-inline TPointT<T> rotate90(const TPointT<T> &p)  // counterclockwise
+inline TPointT<T> rotate90(const TPointT<T> &p)  // 90 counterclockwise
 {
   return TPointT<T>(-p.y, p.x);
 }
@@ -76,7 +76,7 @@ inline TPointT<T> rotate90(const TPointT<T> &p)  // counterclockwise
 \sa rotate90
 */
 template <class T>
-inline TPointT<T> rotate270(const TPointT<T> &p)  // clockwise
+inline TPointT<T> rotate270(const TPointT<T> &p)  // 90 clockwise
 {
   return TPointT<T>(p.y, -p.x);
 }
@@ -84,7 +84,7 @@ inline TPointT<T> rotate270(const TPointT<T> &p)  // clockwise
 /*!
 \relates TPointT
 */
-template <class T>  // prodotto scalare
+template <class T>  // Scalar(dot) Product
 inline T operator*(const TPointT<T> &a, const TPointT<T> &b) {
   return a.x * b.x + a.y * b.y;
 }
@@ -542,11 +542,11 @@ template class DVAPI TDimensionT<double>;
 //=============================================================================
 
 //! Specifies the corners of a rectangle.
-/*!\arg \a x0 specifies the x-coordinate of the bottom-left corner of a
-rectangle.
-\arg \a y0 specifies the y-coordinate of the bottom-left corner of a rectangle.
-\arg \a x1 specifies the x-coordinate of the upper-right corner of a rectangle.
-\arg \a y1 specifies the y-coordinate of the upper-right corner of a rectangle.
+/*!
+x0 specifies the x-coordinate of the bottom-left corner of a rectangle.
+y0 specifies the y-coordinate of the bottom-left corner of a rectangle.
+x1 specifies the x-coordinate of the upper-right corner of a rectangle.
+y1 specifies the y-coordinate of the upper-right corner of a rectangle.
 */
 template <class T>
 class DVAPI TRectT {
@@ -561,14 +561,18 @@ if x0==y1 && y0==y1 and rect is a  TRectD then rect is empty */
   TRectT();
 
   TRectT(T _x0, T _y0, T _x1, T _y1) : x0(_x0), y0(_y0), x1(_x1), y1(_y1){};
+
   TRectT(const TRectT &rect)
       : x0(rect.x0), y0(rect.y0), x1(rect.x1), y1(rect.y1){};
+
   TRectT(const TPointT<T> &p0, const TPointT<T> &p1)  // non importa l'ordine
       : x0(std::min((T)p0.x, (T)p1.x)),
         y0(std::min((T)p0.y, (T)p1.y)),
         x1(std::max((T)p0.x, (T)p1.x)),
         y1(std::max((T)p0.y, (T)p1.y)){};
+
   TRectT(const TPointT<T> &bottomLeft, const TDimensionT<T> &d);
+
   TRectT(const TDimensionT<T> &d);
 
   void empty();
@@ -588,15 +592,15 @@ TRectI  is empty if x0>x1 || y0>y1 */
   TPointT<T> getP11() const { return TPointT<T>(x1, y1); };
 
   //! Returns the union of two source rectangles.
-  /*!The union is the smallest rectangle that contains both source rectangles.
-*/
+  //!The union is the smallest rectangle that contains both source rectangles.
   TRectT<T> operator+(const TRectT<T> &rect) const {  // unione
     if (isEmpty())
       return rect;
     else if (rect.isEmpty())
       return *this;
     else
-      return TRectT<T>(std::min((T)x0, (T)rect.x0), std::min((T)y0, (T)rect.y0),
+      return TRectT<T>(std::min((T)x0, (T)rect.x0), 
+                       std::min((T)y0, (T)rect.y0),
                        std::max((T)x1, (T)rect.x1),
                        std::max((T)y1, (T)rect.y1));
   };
@@ -607,10 +611,8 @@ TRectI  is empty if x0>x1 || y0>y1 */
     return *this = *this * rect;
   };
 
-  /*!Returns the intersection of two existing rectangles.
-
-The intersection is the largest rectangle contained in both existing rectangles.
-*/
+  //!Returns the intersection of two existing rectangles.
+  //The intersection is the largest rectangle contained in both existing rectangles.
   TRectT<T> operator*(const TRectT<T> &rect) const {  // intersezione
     if (isEmpty() || rect.isEmpty())
       return TRectT<T>();
@@ -622,7 +624,7 @@ The intersection is the largest rectangle contained in both existing rectangles.
                        std::min((T)y1, (T)rect.y1));
   };
 
-  TRectT<T> &operator+=(const TPointT<T> &p) {  // spostamento
+  TRectT<T> &operator+=(const TPointT<T> &p) {  // shift
     x0 += p.x;
     y0 += p.y;
     x1 += p.x;
@@ -691,6 +693,7 @@ template class DVAPI TRectT<double>;
 \relates TRectT
 Convert a TRectD into a TRect
 */
+
 inline TRect convert(const TRectD &r) {
   return TRect((int)(r.x0 + 0.5), (int)(r.y0 + 0.5), (int)(r.x1 + 0.5),
                (int)(r.y1 + 0.5));
@@ -707,8 +710,8 @@ inline TRectD convert(const TRect &r) { return TRectD(r.x0, r.y0, r.x1, r.y1); }
 \relates TPointT
 */
 inline TRectD boundingBox(const TPointD &p0, const TPointD &p1) {
-  return TRectD(std::min(p0.x, p1.x), std::min(p0.y, p1.y),
-                std::max(p0.x, p1.x), std::max(p0.y, p1.y));
+  return TRectD(std::min(p0.x, p1.x), std::min(p0.y, p1.y),  // bottom left
+                std::max(p0.x, p1.x), std::max(p0.y, p1.y));  // top right
 }
 /*!
 \relates TRectT
@@ -733,6 +736,7 @@ inline TRectD boundingBox(const TPointD &p0, const TPointD &p1,
 
 //-----------------------------------------------------------------------------
 
+// TRectT is a rectangle that uses thick points
 template <>
 inline TRectT<int>::TRectT() : x0(0), y0(0), x1(-1), y1(-1) {}
 template <>
@@ -754,6 +758,8 @@ inline void TRectT<int>::empty() {
   x0 = y0 = 0;
   x1 = y1 = -1;
 }
+
+// Is the adding of one here to account for the thickness?
 template <>
 inline int TRectT<int>::getLx() const {
   return x1 >= x0 ? x1 - x0 + 1 : 0;
@@ -846,21 +852,15 @@ extern DVVAR const TRectI infiniteRectI;
 //=============================================================================
 //! This is the base class for the affine transformations.
 /*!
-                This class performs basic manipulations of affine
-   transformations.
-                An affine transformation is a linear transformation followed by
-   a translation.
-                <p>
-                \f$ 	x \mapsto \bf{A} x + b	\f$
-                </p>
-                <p>
-                \f$ \bf{A} \f$ is a \f$ 2X2 \f$ matrix.
-                In a matrix notation:
-                <p> \f$ \left(\begin{array}{c} \vec{y} \\ 1 \end{array}\right) =
-                \left( \begin{array}{cc} \bf{A} & \vec{b} \\ \vec{0} & 1
-   \end{array}\right)
-                \left(\begin{array}{c}\vec{x} \\ 1 \end{array} \right) \f$ </p>
-        */
+ This class performs basic manipulations of affine transformations.
+ An affine transformation is a linear transformation followed by a translation.
+ 
+  [a11, a12, a13]
+  [a21, a22, a23]
+
+  a13 and a23 represent translation (moving sideways or up and down)
+  the other 4 handle rotation, scale and shear
+*/
 class DVAPI TAffine {
 public:
   double a11, a12, a13;
@@ -891,7 +891,7 @@ public:
           Assignment operator.
 */
   TAffine &operator=(const TAffine &a);
-  /*Sposto in tgeometry.cpp
+  /*Moved to tgeometry.cpp
 {
 a11 = a.a11; a12 = a.a12; a13 = a.a13;
 a21 = a.a21; a22 = a.a22; a23 = a.a23;
@@ -905,7 +905,7 @@ return *this;
 
 */
   TAffine operator*(const TAffine &b) const;
-  /*Sposto in tgeometry.cpp
+  /*Moved to in tgeometry.cpp
 {
 return TAffine (
 a11 * b.a11 + a12 * b.a21,
@@ -919,18 +919,18 @@ a21 * b.a13 + a22 * b.a23 + a23);
 */
 
   TAffine operator*=(const TAffine &b);
-  /*Sposto in tgeometry.cpp
+  /*Moved to tgeometry.cpp
 {
 return *this = *this * b;
 };
 */
   /*!
-          Retruns the inverse tansformation as:
+          Returns the inverse tansformation as:
           <p>\f$\left(\begin{array}{ccc}\bf{A}^{-1}&-\bf{A}^{-1}&\vec{b}\\\vec{0}&\vec{0}&1\end{array}\right)\f$</p>
   */
 
   TAffine inv() const;
-  /*Sposto in tgeometry.cpp
+  /*Moved to tgeometry.cpp
 {
 if(a12 == 0.0 && a21 == 0.0)
 {
@@ -1024,7 +1024,7 @@ a12*a12+a21*a21) < err;
   */
 
   /*!
-          Retruns the transfomed point.
+          Returns the transformed point.
   */
   TPointD operator*(const TPointD &p) const;
   /*Sposto in tgeometry.cpp
@@ -1034,7 +1034,7 @@ return TPointD(p.x*a11+p.y*a12+a13, p.x*a21+p.y*a22+a23);
 */
 
   /*!
-          Retruns the transformed box of the bounding box.
+          Returns the transformed box of the bounding box.
   */
   TRectD operator*(const TRectD &rect) const;
 

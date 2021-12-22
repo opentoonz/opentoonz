@@ -51,8 +51,11 @@ enum CommandType {
   MenuLevelCommandType,
   MenuXsheetCommandType,
   MenuCellsCommandType,
+  MenuPlayCommandType,
+  MenuRenderCommandType,
   MenuViewCommandType,
   MenuWindowsCommandType,
+  MenuHelpCommandType,
   PlaybackCommandType,
   RGBACommandType,
   FillCommandType,
@@ -60,7 +63,10 @@ enum CommandType {
   ToolModifierCommandType,
   ZoomCommandType,
   MiscCommandType,
-  MenuCommandType
+  MenuCommandType,
+  VisualizationButtonCommandType,
+  StopMotionCommandType,
+  CellMarkCommandType
 };
 
 //-----------------------------------------------------------------------------
@@ -150,7 +156,7 @@ public:
 
   QAction *getAction(CommandId id, bool createIfNeeded = false);
 
-  // createAction creates a new indepenent QAction with text and shortcut
+  // createAction creates a new independent QAction with text and shortcut
   // if the action is a toggle action (e.g. show/hide something) the text is
   // controlled by state
   // you can use createAction() for context menu

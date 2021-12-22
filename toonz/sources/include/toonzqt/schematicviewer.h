@@ -5,6 +5,7 @@
 
 // TnzLib includes
 #include "toonz/tstageobjectid.h"
+#include "toonz/txshcolumn.h"
 
 // TnzBase includes
 #include "tfx.h"
@@ -12,6 +13,7 @@
 // Qt includes
 #include <QGraphicsScene>
 #include <QGraphicsView>
+#include <QTouchDevice>
 
 #include <QIcon>
 
@@ -51,8 +53,15 @@ class TApplication;
 class QToolBar;
 class QToolButton;
 class QAction;
+class QTouchEvent;
+class QGestureEvent;
+class FxSelection;
+class StageObjectSelection;
 
 //====================================================
+namespace {
+enum CursorMode { Select, Zoom, Hand };
+}
 
 //==================================================================
 //
@@ -81,7 +90,7 @@ protected:
   //! Returns \b true if no nodes intersects \b rect.
   bool isAnEmptyZone(const QRectF &rect);
   //! Returns a vector containing all nodes which had their bounding rects
-  //! conatined in \b node bounding
+  //! contained in \b node bounding
   //! rect enlarged of 10.
   QVector<SchematicNode *> getPlacedNode(SchematicNode *node);
 
@@ -102,13 +111,38 @@ protected slots:
 class DVAPI SchematicSceneViewer final : public QGraphicsView {
   Q_OBJECT
 
+  bool m_tabletEvent, m_tabletMove;
+  enum TabletState {
+    None = 0,
+    Touched,
+    StartStroke,  // this state is to detect the first call
+    // of TabletMove just after TabletPress
+    OnStroke,
+    Released
+  } m_tabletState = None;
+
+  bool m_touchActive = false;
+
+  bool m_gestureActive                   = false;
+  QTouchDevice::DeviceType m_touchDevice = QTouchDevice::TouchScreen;
+  bool m_zooming                         = false;
+  bool m_panning                         = false;
+  double m_scaleFactor;  // used for zoom gesture
+
+  bool m_stylusUsed = false;
+
+  CursorMode m_cursorMode;
+
 public:
   SchematicSceneViewer(QWidget *parent);
   ~SchematicSceneViewer();
 
-  void zoomQt(bool zoomin, bool resetZoom);
+  void zoomQt(bool zoomin, bool resetView);
+  void panQt(const QPointF &delta);
 
   QPointF getOldScenePos() { return m_oldScenePos; }
+
+  void setCursorMode(CursorMode mode);
 
 protected:
   void mousePressEvent(QMouseEvent *me) override;
@@ -117,18 +151,32 @@ protected:
   void keyPressEvent(QKeyEvent *ke) override;
   void wheelEvent(QWheelEvent *me) override;
   void showEvent(QShowEvent *se) override;
+  void enterEvent(QEvent *e) override;
+  void leaveEvent(QEvent *e) override;
+  void mouseDoubleClickEvent(QMouseEvent *event) override;
+
+  void tabletEvent(QTabletEvent *e) override;
+  void touchEvent(QTouchEvent *e, int type);
+  void gestureEvent(QGestureEvent *e);
+
+  bool event(QEvent *event) override;
 
 protected slots:
 
-  void fitScene();
   void centerOnCurrent();
   void reorderScene();
+
+public slots:
+
   void normalizeScene();
+  void fitScene();
 
 private:
   Qt::MouseButton m_buttonState;
   QPoint m_oldWinPos;
   QPointF m_oldScenePos;
+  QPointF m_firstPanPoint, m_mousePanPoint;
+  QPoint m_zoomPoint;
   bool m_firstShowing;
 
 private:
@@ -150,6 +198,29 @@ class DVAPI SchematicViewer final : public QWidget {
   QColor m_verticalLineColor;
   Q_PROPERTY(QColor VerticalLineColor READ getVerticalLineColor WRITE
                  setVerticalLineColor)
+
+  QColor m_linkColor;  // link color
+  Q_PROPERTY(QColor LinkColor READ getLinkColor WRITE setLinkColor)
+
+  QColor m_selectedLinkColor;  // selected link color
+  Q_PROPERTY(QColor SelectedLinkColor READ getSelectedLinkColor WRITE
+                 setSelectedLinkColor)
+
+  // Selected Node Border Color
+  QColor m_selectedBorderColor;
+  Q_PROPERTY(QColor SelectedBorderColor READ getSelectedBorderColor WRITE
+                 setSelectedBorderColor)
+
+  // Motion Path Link Color
+  QColor m_motionPathLinkColor;
+  Q_PROPERTY(QColor MotionPathLinkColor READ getMotionPathLinkColor WRITE
+                 setMotionPathLinkColor)
+
+  // Motion Path Selected Link Color
+  QColor m_motionPathSelectedLinkColor;
+  Q_PROPERTY(
+      QColor MotionPathSelectedLinkColor READ getMotionPathSelectedLinkColor
+          WRITE setMotionPathSelectedLinkColor)
 
   // TZP column
   QColor m_levelColumnColor;  //(127,219,127)
@@ -222,6 +293,11 @@ class DVAPI SchematicViewer final : public QWidget {
   // Xsheet node
   QColor m_xsheetColor;
   Q_PROPERTY(QColor XsheetColor READ getXsheetColor WRITE setXsheetColor)
+
+  // Pass Through node
+  QColor m_passThroughColor;
+  Q_PROPERTY(QColor PassThroughColor READ getPassThroughColor WRITE
+                 setPassThroughColor)
 
   // Fx nodes
   QColor m_normalFx;
@@ -298,6 +374,36 @@ public:
   }
   QColor getVerticalLineColor() const { return m_verticalLineColor; }
 
+  // Link Color
+  void setLinkColor(const QColor &color) { m_linkColor = color; }
+  QColor getLinkColor() const { return m_linkColor; }
+
+  // Selected Link Color
+  void setSelectedLinkColor(const QColor &color) {
+    m_selectedLinkColor = color;
+  }
+  QColor getSelectedLinkColor() const { return m_selectedLinkColor; }
+
+  // Selected Node Border Color
+  void setSelectedBorderColor(const QColor &color) {
+    m_selectedBorderColor = color;
+  }
+  QColor getSelectedBorderColor() const { return m_selectedBorderColor; }
+
+  // Motion Path Link Color
+  void setMotionPathLinkColor(const QColor &color) {
+    m_motionPathLinkColor = color;
+  }
+  QColor getMotionPathLinkColor() const { return m_motionPathLinkColor; }
+
+  // Motion Path Selected Link Color
+  void setMotionPathSelectedLinkColor(const QColor &color) {
+    m_motionPathSelectedLinkColor = color;
+  }
+  QColor getMotionPathSelectedLinkColor() const {
+    return m_motionPathSelectedLinkColor;
+  }
+
   // TZP column
   void setLevelColumnColor(const QColor &color) { m_levelColumnColor = color; }
   QColor getLevelColumnColor() const { return m_levelColumnColor; }
@@ -370,6 +476,10 @@ public:
   // Xsheet node
   void setXsheetColor(const QColor &color) { m_xsheetColor = color; }
   QColor getXsheetColor() const { return m_xsheetColor; }
+
+  // Pass Through node
+  void setPassThroughColor(const QColor &color) { m_passThroughColor = color; }
+  QColor getPassThroughColor() const { return m_passThroughColor; }
 
   // Fx nodes
   QColor getNormalFxColor() const { return m_normalFx; }
@@ -451,6 +561,8 @@ public:
 
   QColor getSelectedNodeTextColor();
 
+  void setCursorMode(CursorMode mode);
+
 public slots:
 
   void updateSchematic();
@@ -464,12 +576,23 @@ signals:
   void doExplodeChild(QList<TStageObjectId>);
   void editObject();
 
+  void doDeleteFxs(const FxSelection *);
+  void doDeleteStageObjects(const StageObjectSelection *);
+
+  void columnPasted(const QList<TXshColumnP> &);
 protected slots:
 
   void onSceneChanged();
   void onSceneSwitched();
   void updateScenes();
   void changeNodeSize();
+
+  void selectModeEnabled();
+  void zoomModeEnabled();
+  void handModeEnabled();
+
+  void deleteFxs();
+  void deleteStageObjects();
 
 private:
   SchematicSceneViewer *m_viewer;
@@ -481,9 +604,11 @@ private:
   QToolBar *m_stageToolbar, *m_commonToolbar, *m_fxToolbar, *m_swapToolbar;
 
   QAction *m_fitSchematic, *m_centerOn, *m_reorder, *m_normalize, *m_nodeSize,
-      *m_changeScene;
+      *m_changeScene, *m_selectMode, *m_zoomMode, *m_handMode;
 
   bool m_fullSchematic, m_maximizedNode;
+
+  CursorMode m_cursorMode;
 
 private:
   void createToolbars();

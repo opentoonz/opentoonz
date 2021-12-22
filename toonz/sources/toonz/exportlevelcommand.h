@@ -117,7 +117,7 @@ TImageP exportedImage(
 
 /*!
   \brief    Exports passed level to the specified path.
-  \return   Wheter the level was successfully exported <I>in its entirety</I>.
+  \return   Whether the level was successfully exported <I>in its entirety</I>.
             User cancels are reported as failures, even if a part of the level
             has been successfully exported.
 

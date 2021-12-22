@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="16px" height="16px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g transform="matrix(1,0,0,1,-190,-30)">
+        <g id="auto_input_cell_number" transform="matrix(1,0,0,1,80,20)">
+            <g id="bg" transform="matrix(0.110345,0,0,0.121212,93.7793,-8.90909)">
+                <rect x="147" y="156" width="145" height="132" style="fill:rgb(135,135,135);fill-opacity:0;"/>
+            </g>
+            <g transform="matrix(10.5658,0,0,11.176,114.216,23)">
+                <path d="M0.074,-0L0.074,-0.716L0.216,-0.716L0.5,-0.238L0.5,-0.716L0.642,-0.716L0.642,-0L0.5,0L0.216,-0.467L0.216,0L0.074,-0Z" style="fill-rule:nonzero;"/>
+            </g>
+            <g transform="matrix(1,0,0,1,-80,-20)">
+                <path d="M197,32.071L197,31L196.5,31C196.224,31 196,30.776 196,30.5C196,30.224 196.224,30 196.5,30L199.5,30C199.776,30 200,30.224 200,30.5C200,30.776 199.776,31 199.5,31L199,31L199,32.071C200.173,32.239 201.252,32.698 202.162,33.373L203.318,32.217C203.553,31.983 203.933,31.983 204.167,32.217L204.733,32.783C204.967,33.017 204.967,33.397 204.733,33.631L203.584,34.78C204.472,35.953 205,37.416 205,39C205,42.863 201.863,46 198,46C194.137,46 191,42.863 191,39C191,35.476 193.609,32.557 197,32.071ZM198,33C201.311,33 204,35.689 204,39C204,42.311 201.311,45 198,45C194.689,45 192,42.311 192,39C192,35.689 194.689,33 198,33Z"/>
+            </g>
+        </g>
+    </g>
+</svg>

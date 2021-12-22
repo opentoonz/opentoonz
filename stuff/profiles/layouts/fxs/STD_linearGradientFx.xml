@@ -1,9 +1,10 @@
 <fxlayout>
-  <page name="Linear Gradient">
+  <page name="Linear Gradient (Classic)">
      <control>period</control>
      <control>color1</control>
      <control>color2</control>
      <rgb_link_button>color1 color2</rgb_link_button>
+     <control>curveType</control>
 <separator label="Distortion Wave"/>
      <control>wave_amplitude</control>
      <control>wave_frequency</control>

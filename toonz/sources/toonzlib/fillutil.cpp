@@ -158,7 +158,7 @@ void fillautoInks(TRasterCM32P &rin, TRect &rect, const TRasterCM32P &rbefore,
 
 //-----------------------------------------------------------------------------
 
-void AreaFiller::rectFill(const TRect &rect, int color, bool onlyUnfilled,
+bool AreaFiller::rectFill(const TRect &rect, int color, bool onlyUnfilled,
                           bool fillPaints, bool fillInks) {
   // Viene trattato il caso fillInks
   /*- FillInkのみの場合 -*/
@@ -169,7 +169,7 @@ void AreaFiller::rectFill(const TRect &rect, int color, bool onlyUnfilled,
       TPixelCM32 *pix = m_ras->pixels(y) + rect.x0;
       for (int x = rect.x0; x <= rect.x1; x++, pix++) pix->setInk(color);
     }
-    return;
+    return true;
   }
 
   TRect r = m_bounds * rect;
@@ -177,7 +177,7 @@ void AreaFiller::rectFill(const TRect &rect, int color, bool onlyUnfilled,
   int dx = r.x1 - r.x0;
   int dy = (r.y1 - r.y0) * m_wrap;
   if (dx < 2 || dy < 2)  // rect degenere(area contenuta nulla), skippo.
-    return;
+    return false;
 
   std::vector<int> frameSeed(2 * (r.getLx() + r.getLy() - 2));
 
@@ -190,21 +190,21 @@ void AreaFiller::rectFill(const TRect &rect, int color, bool onlyUnfilled,
   // Se il rettangolo non contiene il bordo del raster e se tutti i pixels
   // contenuti nel rettangolo sono pure paint non deve fare nulla!
   if (!rect.contains(m_bounds) && areRectPixelsPurePaint(m_pixels, r, m_wrap))
-    return;
+    return false;
 
   // Viene riempito frameSeed con tutti i paint delle varie aree del rettangolo
   // di contorno.
   // Viene verificato se i pixels del rettangolo sono tutti pure paint.
   /*- 輪郭のPaintのIDをframeseed内に格納 -*/
   for (y = r.y0; y <= r.y1; y++, ptr += m_wrap, count1++, count2++) {
-    if (r.x0 > 0) frameSeed[count1]                  = ptr->getPaint();
+    if (r.x0 > 0) frameSeed[count1] = ptr->getPaint();
     if (r.x1 < m_ras->getLx() - 1) frameSeed[count2] = (ptr + dx)->getPaint();
   }
   ptr    = m_pixels + r.y0 * m_wrap + r.x0 + 1;
   count1 = count2;
   count2 = count1 + r.x1 - r.x0 - 1;
   for (x = r.x0 + 1; x < r.x1; x++, ptr++, count1++, count2++) {
-    if (r.y0 > 0) frameSeed[count1]                  = ptr->getPaint();
+    if (r.y0 > 0) frameSeed[count1] = ptr->getPaint();
     if (r.y1 < m_ras->getLy() - 1) frameSeed[count2] = (ptr + dy)->getPaint();
   }
   assert(count2 == 2 * (r.getLx() + r.getLy() - 2));
@@ -269,6 +269,7 @@ void AreaFiller::rectFill(const TRect &rect, int color, bool onlyUnfilled,
       params.m_styleId = frameSeed[count1++];
       fill(m_ras, params);
     }
+  return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -328,7 +329,7 @@ void FullColorAreaFiller::rectFill(const TRect &rect,
   int x, y;
   for (y = 0; y < workRas->getLy(); y++) {
     TPixel32 *line = workRas->pixels(y);
-    for (x        = 0; x < workRas->getLx(); x++)
+    for (x = 0; x < workRas->getLx(); x++)
       *(line + x) = overPix(color, workRas->pixels(y)[x]);
   }
 
@@ -921,10 +922,10 @@ int InkSegmenter::dragSlave(TPoint mp, TPixelCM32 *&slave, int &s_prewalker,
           nextPointIsGood(mp, sp, slave + m_displaceVector[s_next],
                           (~s_next) & 0x7, distance))) {
     if (!ret) ret = 1;
-    distance      = new_distance;
-    slave         = slave + m_displaceVector[s_next];
-    s_prewalker   = (~s_next) & 0x7;
-    s_next        = stepForward(slave, s_prewalker, new_distance, mp, sp);
+    distance    = new_distance;
+    slave       = slave + m_displaceVector[s_next];
+    s_prewalker = (~s_next) & 0x7;
+    s_next      = stepForward(slave, s_prewalker, new_distance, mp, sp);
   }
 
   newP(((~s_next) & 0x7), sp);
@@ -947,8 +948,8 @@ int InkSegmenter::dragSlaveRev(TPoint mp, TPixelCM32 *&slave, int &s_prewalker,
           nextPointIsGoodRev(mp, sp, slave + m_displaceVector[s_next],
                              (~s_next) & 0x7, distance))) {
     if (!ret) ret = 1;
-    distance      = new_distance;
-    slave         = slave + m_displaceVector[s_next];
+    distance = new_distance;
+    slave    = slave + m_displaceVector[s_next];
     if (slave == first_slave) return -1;
 
     s_prewalker = (~s_next) & 0x7;

@@ -146,7 +146,7 @@ _QuadraticsEdgeEvaluator<Point>::furthestFrom(const quad_iterator &at) {
     const point_type &C1 = *(bt.it() + 1);
 
     // Ensure that bt is not a corner
-    if (abs(tcg::point_ops::cross(*(bt.it() - 1) - *bt, *(bt.it() + 1) - *bt)) >
+    if (std::abs(tcg::point_ops::cross(*(bt.it() - 1) - *bt, *(bt.it() + 1) - *bt)) >
         1e-3)
       break;
 

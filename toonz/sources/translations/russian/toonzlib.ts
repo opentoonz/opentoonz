@@ -2,19 +2,189 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="ru" sourcelanguage="en">
 <context>
+    <name>CenterlineVectorizer</name>
+    <message>
+        <source>Can&apos;t vectorize a %1 level</source>
+        <translation type="vanished">Не удалось векторизовать уровень %1</translation>
+    </message>
+    <message>
+        <source>Can&apos;t vectorize a level with no frames</source>
+        <translation type="vanished">Не удалось векторизовать уровень без кадров</translation>
+    </message>
+    <message>
+        <source>Can&apos;t vectorize a %1 image</source>
+        <translation type="vanished">Не удалось векторизовать изображение %1</translation>
+    </message>
+    <message>
+        <source>Bad argument (%1): should be an Image or a Level</source>
+        <translation type="vanished">Некорректный аргумент (%1): должно быть изображение или уровень</translation>
+    </message>
+</context>
+<context>
+    <name>FilePath</name>
+    <message>
+        <source>&quot;%1&quot;</source>
+        <translation type="vanished">&quot;%1&quot;</translation>
+    </message>
+    <message>
+        <source>can&apos;t concatenate an absolute path : %1</source>
+        <translation type="vanished">Не может конкатенировать абсолютный путь: %1</translation>
+    </message>
+    <message>
+        <source>%1 is not a directory</source>
+        <translation type="vanished">%1 не является каталогом</translation>
+    </message>
+    <message>
+        <source>can&apos;t read directory %1</source>
+        <translation type="vanished">Не удается прочитать каталог%1</translation>
+    </message>
+</context>
+<context>
+    <name>Image</name>
+    <message>
+        <source>File %1 doesn&apos;t exist</source>
+        <translation type="vanished">Файл %1 не существует</translation>
+    </message>
+    <message>
+        <source>Loaded first frame of %1</source>
+        <translation type="vanished">Загружен первый кадр %1</translation>
+    </message>
+    <message>
+        <source>Unexpected error while reading image</source>
+        <translation type="vanished">Ошибка при чтении изображения</translation>
+    </message>
+    <message>
+        <source>Unrecognized file type :</source>
+        <translation type="vanished">Нераспознанный тип файла :</translation>
+    </message>
+    <message>
+        <source>Can&apos;t save a %1 image to this file type : %2</source>
+        <translation type="vanished">Не удалось сохранить изображение %1 в этот тип файла: %2</translation>
+    </message>
+    <message>
+        <source>Unexpected error while writing image</source>
+        <translation type="vanished">Ошибка при записи изображения</translation>
+    </message>
+</context>
+<context>
+    <name>ImageBuilder</name>
+    <message>
+        <source>Bad argument (%1): should be &apos;Raster&apos; or ToonzRaster&apos;</source>
+        <translation type="vanished">Недопустимый аргумент (%1): должен быть «Растр» или &quot;ToonzRaster&quot;</translation>
+    </message>
+    <message>
+        <source>ImageBuilder(%1 image)</source>
+        <translation type="vanished">ImageBuilder(%1 изображение)</translation>
+    </message>
+    <message>
+        <source>%1 : %2</source>
+        <translation type="vanished">%1 : %2</translation>
+    </message>
+    <message>
+        <source>Bad argument (%1): should be a Transformation</source>
+        <translation type="vanished">Плохой аргумент (%1): должно быть преобразование</translation>
+    </message>
+</context>
+<context>
+    <name>Level</name>
+    <message>
+        <source>%1 frames</source>
+        <translation type="vanished">%1 кадров</translation>
+    </message>
+    <message>
+        <source>Bad argument (%1). It should be FilePath or string</source>
+        <translation type="vanished">Недопустимый аргумент (%1). Это должен быть путь к файлу или строка</translation>
+    </message>
+    <message>
+        <source>Exception loading level (%1)</source>
+        <translation type="vanished">Уровень загрузки исключений (%1)</translation>
+    </message>
+    <message>
+        <source>File %1 doesn&apos;t exist</source>
+        <translation type="vanished">Файл %1 не существует</translation>
+    </message>
+    <message>
+        <source>File %1 is unsupported</source>
+        <translation type="vanished">Файл %1 не поддерживается</translation>
+    </message>
+    <message>
+        <source>Exception reading %1</source>
+        <translation type="vanished">Чтение исключений %1</translation>
+    </message>
+    <message>
+        <source>Can&apos;t save an empty level</source>
+        <translation type="vanished">Не удалось сохранить пустой уровень</translation>
+    </message>
+    <message>
+        <source>Unrecognized file type :</source>
+        <translation type="vanished">Нераспознанный тип файла :</translation>
+    </message>
+    <message>
+        <source>Can&apos;t save a %1 level to this file type : %2</source>
+        <translation type="vanished">Не удается сохранить уровень %1 для этого типа файла : %2</translation>
+    </message>
+    <message>
+        <source>Exception writing %1</source>
+        <translation type="vanished">Запись исключений %1</translation>
+    </message>
+    <message>
+        <source>frame index (%1) must be a number</source>
+        <translation type="vanished">Индекс кадра (%1) должен быть числом</translation>
+    </message>
+    <message>
+        <source>frame index (%1) is out of range (0-%2)</source>
+        <translation type="vanished">Индекс кадра (%1) вне диапазона (0-%2)</translation>
+    </message>
+    <message>
+        <source>second argument (%1) is not an image</source>
+        <translation type="vanished">Второй аргумент (%1) не является изображением</translation>
+    </message>
+    <message>
+        <source>can not insert a %1 image into a level</source>
+        <translation type="vanished">Невозможно вставить изображение %1 в уровень</translation>
+    </message>
+    <message>
+        <source>can not insert a %1 image to a %2 level</source>
+        <translation type="vanished">Невозможно  вставить изображение %1 в уровень %2</translation>
+    </message>
+</context>
+<context>
+    <name>OutlineVectorizer</name>
+    <message>
+        <source>Can&apos;t vectorize a %1 level</source>
+        <translation type="vanished">Не удалась векторизация уровня %1</translation>
+    </message>
+    <message>
+        <source>Can&apos;t vectorize a level with no frames</source>
+        <translation type="vanished">Не удалось векторизовать уровень без кадров</translation>
+    </message>
+    <message>
+        <source>Can&apos;t vectorize a %1 image</source>
+        <translation type="vanished">Не удалось векторизовать изображение %1</translation>
+    </message>
+    <message>
+        <source>Bad argument (%1): should be an Image or a Level</source>
+        <translation type="vanished">Некорректный аргумент (%1): должно быть изображение или уровень</translation>
+    </message>
+    <message>
+        <source>Invalid color : </source>
+        <translation type="vanished">Недопустимый цвет : </translation>
+    </message>
+</context>
+<context>
     <name>Preferences</name>
     <message>
-        <location filename="../../toonzlib/preferences.cpp" line="110"/>
+        <location filename="../../toonzlib/preferences.cpp" line="101"/>
         <source>Retas Level Format</source>
         <translation>Формат уровней Retas</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/preferences.cpp" line="116"/>
+        <location filename="../../toonzlib/preferences.cpp" line="107"/>
         <source>Adobe Photoshop</source>
         <translation>Adobe Photoshop</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/preferences.cpp" line="121"/>
+        <location filename="../../toonzlib/preferences.cpp" line="204"/>
         <source>PNG</source>
         <translation>PNG</translation>
     </message>
@@ -84,243 +254,248 @@
         <translation>Траектория линии  %1 &gt; %2</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/tstageobjectcmd.cpp" line="459"/>
+        <location filename="../../toonzlib/tstageobjectcmd.cpp" line="460"/>
         <source>Remove Object  %1</source>
         <translation>Удалить объект  %1</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/tstageobjectcmd.cpp" line="544"/>
+        <location filename="../../toonzlib/tstageobjectcmd.cpp" line="546"/>
         <source>Remove Column  </source>
         <translation>Удалить столбец  </translation>
     </message>
     <message>
-        <location filename="../../toonzlib/studiopalettecmd.cpp" line="68"/>
+        <location filename="../../toonzlib/studiopalettecmd.cpp" line="47"/>
+        <source>Failed to save palette.</source>
+        <translation>Не удалось сохранить палитру.</translation>
+    </message>
+    <message>
+        <location filename="../../toonzlib/studiopalettecmd.cpp" line="85"/>
         <source>Load into Current Palette  &gt; %1</source>
         <translation>Загрузка в текущую палитру  &gt; %1</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/studiopalettecmd.cpp" line="111"/>
+        <location filename="../../toonzlib/studiopalettecmd.cpp" line="126"/>
         <source>Replace with Current Palette  &gt; %1</source>
         <translation>Заменить текущую палитру  &gt; %1</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/studiopalettecmd.cpp" line="138"/>
+        <location filename="../../toonzlib/studiopalettecmd.cpp" line="152"/>
         <source>Delete Studio Palette  : %1</source>
         <translation>Удалить палитру Studio  : %1</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/studiopalettecmd.cpp" line="165"/>
+        <location filename="../../toonzlib/studiopalettecmd.cpp" line="178"/>
         <source>Create Studio Palette  : %1</source>
         <translation>Создать палитру Studio  : %1</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/studiopalettecmd.cpp" line="210"/>
+        <location filename="../../toonzlib/studiopalettecmd.cpp" line="223"/>
         <source>Delete Studio Palette Folder  : %1</source>
         <translation>Удалить папку палитры Studio  : %1</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/studiopalettecmd.cpp" line="234"/>
+        <location filename="../../toonzlib/studiopalettecmd.cpp" line="247"/>
         <source>Create Studio Palette Folder  : %1</source>
         <translation>Создать папку палитры Studio  : %1</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/studiopalettecmd.cpp" line="254"/>
+        <location filename="../../toonzlib/studiopalettecmd.cpp" line="267"/>
         <source>Can&apos;t undo rename palette</source>
         <translation>Не удается отменить переименование палитры</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/studiopalettecmd.cpp" line="255"/>
+        <location filename="../../toonzlib/studiopalettecmd.cpp" line="268"/>
         <source>Can&apos;t undo move palette</source>
         <translation>Не удается отменить перемещение палитры</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/studiopalettecmd.cpp" line="267"/>
+        <location filename="../../toonzlib/studiopalettecmd.cpp" line="280"/>
         <source>Can&apos;t redo rename palette</source>
         <translation>Не удается повторить переименование палитры</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/studiopalettecmd.cpp" line="268"/>
+        <location filename="../../toonzlib/studiopalettecmd.cpp" line="281"/>
         <source>Can&apos;t redo move palette</source>
         <translation>Не удается повторить перемещение палитры</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/studiopalettecmd.cpp" line="281"/>
+        <location filename="../../toonzlib/studiopalettecmd.cpp" line="294"/>
         <source>Rename Studio Palette : %1 &gt; %2</source>
         <translation>Переименовать палитру студии : %1 &gt; %2</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/studiopalettecmd.cpp" line="285"/>
+        <location filename="../../toonzlib/studiopalettecmd.cpp" line="298"/>
         <source>Move Studio Palette Folder  : %1 : %2 &gt; %3</source>
         <translation>Изменить папку палитры Studio  : %1 : %2 &gt; %3</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/palettecmd.cpp" line="253"/>
+        <location filename="../../toonzlib/palettecmd.cpp" line="251"/>
         <source>Arrange Styles  in Palette %1</source>
         <translation>Упорядочить стили в палитре %1</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/palettecmd.cpp" line="324"/>
+        <location filename="../../toonzlib/palettecmd.cpp" line="322"/>
         <source>Create Style#%1  in Palette %2</source>
         <translation>Создать стиль#%1  в палитре %2</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/palettecmd.cpp" line="455"/>
+        <location filename="../../toonzlib/palettecmd.cpp" line="453"/>
         <source>Add Style  to Palette %1</source>
         <translation>Добавить стиль в палитру %1</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/palettecmd.cpp" line="673"/>
+        <location filename="../../toonzlib/palettecmd.cpp" line="671"/>
         <source>Add Page %1 to Palette %2</source>
         <translation>Добавить страницу %1 в палитру %2</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/palettecmd.cpp" line="738"/>
+        <location filename="../../toonzlib/palettecmd.cpp" line="736"/>
         <source>Delete Page %1 from Palette %2</source>
         <translation>Удалить  страницу %1 из палитры %2</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/palettecmd.cpp" line="793"/>
+        <location filename="../../toonzlib/palettecmd.cpp" line="791"/>
         <source>Load Color Model %1  to Palette %2</source>
         <translation>Загрузить цветовую %1 модель в палитру %2</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/palettecmd.cpp" line="891"/>
+        <location filename="../../toonzlib/palettecmd.cpp" line="889"/>
         <source>color model</source>
         <translation>Цветовая модель</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/palettecmd.cpp" line="1059"/>
+        <location filename="../../toonzlib/palettecmd.cpp" line="1057"/>
         <source>Move Page</source>
         <translation>Переместить страницу</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/palettecmd.cpp" line="1110"/>
+        <location filename="../../toonzlib/palettecmd.cpp" line="1108"/>
         <source>Rename Page  %1 &gt; %2</source>
         <translation>Переименовать страницу  %1 &gt; %2</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/palettecmd.cpp" line="1174"/>
+        <location filename="../../toonzlib/palettecmd.cpp" line="1172"/>
         <source>Rename Style#%1 in Palette%2  : %3 &gt; %4</source>
         <translation>Переименование стиля#%1 в палитре%2 : %3&gt;%4</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/palettecmd.cpp" line="1239"/>
+        <location filename="../../toonzlib/palettecmd.cpp" line="1237"/>
         <source>Set Picked Position of Style#%1 in Palette%2 : %3,%4</source>
         <translation>Установить выбранное расположение стиля#%1 в палитре%2 :%3,%4</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/palettecmd.cpp" line="1318"/>
+        <location filename="../../toonzlib/palettecmd.cpp" line="1316"/>
         <source>Update Colors by Using Picked Positions in Palette %1</source>
         <translation>Обновление цветов с использованием выбранных расположений в палитре %1</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="906"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="902"/>
         <source>Add Fx  : </source>
         <translation>Добавить эффект  : </translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="907"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="903"/>
         <source>Insert Fx  : </source>
         <translation>Вставить Fx  : </translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="1060"/>
-        <location filename="../../toonzlib/fxcommand.cpp" line="1063"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="1059"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="1062"/>
         <source>Create Linked Fx  : %1</source>
         <translation>Создать связанный Fx : %1</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="1275"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="1284"/>
         <source>Replace Fx  : </source>
         <translation>Заменить Fx  : </translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="1341"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="1350"/>
         <source>Unlink Fx  : %1 - - %2</source>
         <translation>Разъединить Fx  : %1 - - %2</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="1382"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="1391"/>
         <source>Make Macro Fx  : %1</source>
         <translation>Сделать Makro Fx  : %1</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="1525"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="1534"/>
         <source>Explode Macro Fx  : %1</source>
         <translation>Разбить Macro Fx  : %1</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="1588"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="1597"/>
         <source>Create Output Fx</source>
         <translation>Создать выход Fx</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="1678"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="1688"/>
         <source>Connect to Xsheet  : </source>
         <translation>Подключить к Xsheet  : </translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="1738"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="1748"/>
         <source>Disconnect from Xsheet  : </source>
         <translation>Отключить от Xsheet  : </translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="2009"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="2021"/>
         <source>Delete Link</source>
         <translation>Удалить связь</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="2294"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="2308"/>
         <source>Delete Fx Node : %1</source>
         <translation>Удалить Fx-узел : %1</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="2712"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="2731"/>
         <source>Paste Fx  :  </source>
         <translation>Вставить Fx :</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="3078"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="3100"/>
         <source>Disconnect Fx</source>
         <translation>Отключить Fx</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="3335"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="3352"/>
         <source>Connect Fx : %1 - %2</source>
         <translation>Подключить Fx : %1 - %2</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="3517"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="3534"/>
         <source>Rename Fx : %1 &gt; %2</source>
         <translation>Переименовать Fx : %1 - %2</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="3569"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="3586"/>
         <source>Group Fx</source>
         <translation>Сгруппировать Fx</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="3673"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="3690"/>
         <source>Ungroup Fx</source>
         <translation>Разгруппировать Fx</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="3775"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="3792"/>
         <source>Rename Group  : %1 &gt; %2</source>
         <translation>Переименовать группу  : %1 &gt; %2</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/doubleparamcmd.cpp" line="72"/>
+        <location filename="../../toonzlib/doubleparamcmd.cpp" line="73"/>
         <source>Set Keyframe</source>
         <translation>Установить ключевой кадр</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/doubleparamcmd.cpp" line="815"/>
+        <location filename="../../toonzlib/doubleparamcmd.cpp" line="816"/>
         <source>Remove Keyframe</source>
         <translation>Удалить ключевой кадр</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/doubleparamcmd.cpp" line="845"/>
+        <location filename="../../toonzlib/doubleparamcmd.cpp" line="856"/>
         <source>Cycle</source>
         <translation>Цикл</translation>
     </message>
@@ -342,13 +517,13 @@
     </message>
     <message>
         <location filename="../../toonzlib/stageobjectutil.cpp" line="167"/>
-        <source>Move E/W</source>
-        <translation>Перемещение E/W</translation>
+        <source>Move X</source>
+        <translation>Перемещение X</translation>
     </message>
     <message>
         <location filename="../../toonzlib/stageobjectutil.cpp" line="170"/>
-        <source>Move N/S</source>
-        <translation>Перемещение N/S</translation>
+        <source>Move Y</source>
+        <translation>Перемещение Y</translation>
     </message>
     <message>
         <location filename="../../toonzlib/stageobjectutil.cpp" line="173"/>
@@ -412,7 +587,7 @@
         <translation>Векторизация не выполнена</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding_level.cpp" line="237"/>
+        <location filename="../../toonzlib/scriptbinding_level.cpp" line="235"/>
         <source>Argument &apos;%1&apos; does not look like a FrameId</source>
         <translation>Аргумент %1  не похож на FrameId</translation>
     </message>
@@ -427,29 +602,41 @@
         <translation>Аргумент не похож на путь к файлу :%1</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding.cpp" line="76"/>
+        <location filename="../../toonzlib/scriptbinding.cpp" line="75"/>
         <source>%1-%2</source>
         <translation>%1-%2</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding.cpp" line="78"/>
+        <location filename="../../toonzlib/scriptbinding.cpp" line="77"/>
         <source>%1</source>
         <translation>%1</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding.cpp" line="80"/>
+        <location filename="../../toonzlib/scriptbinding.cpp" line="79"/>
         <source>Expected %1 argument(s) in %2, got %3</source>
         <translation>Ожидаемый %1 аргумент(ы) в %2,%3</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding.cpp" line="96"/>
+        <location filename="../../toonzlib/scriptbinding.cpp" line="95"/>
         <source>%1 is not a valid color (valid color names are &apos;red&apos;, &apos;transparent&apos;, &apos;#FF8800&apos;, ecc.)</source>
         <translation>%1 не является допустимым цветом (допустимые названия цветов: &quot;красный&quot;,&quot;прозрачный,&quot;#FF8800&quot; и др.)</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/sceneresources.cpp" line="434"/>
+        <location filename="../../toonzlib/sceneresources.cpp" line="445"/>
         <source>Can&apos;t save</source>
         <translation>Не удается сохранить</translation>
+    </message>
+    <message>
+        <location filename="../../toonzlib/sceneresources.cpp" line="519"/>
+        <source>and %1 more item(s).</source>
+        <translation>и еще%1 элемент(ов).</translation>
+    </message>
+    <message>
+        <location filename="../../toonzlib/sceneresources.cpp" line="522"/>
+        <source>Failed to save the following resources:
+</source>
+        <translation>Failed to save the following resources:
+</translation>
     </message>
     <message>
         <location filename="../../include/toonz/stageobjectutil.h" line="133"/>
@@ -538,14 +725,76 @@
         <translation>Порог яркости</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/orientation.cpp" line="67"/>
+        <location filename="../../toonzlib/orientation.cpp" line="76"/>
         <source>Xsheet</source>
-        <translation type="unfinished"></translation>
+        <translation>Xsheet</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/orientation.cpp" line="127"/>
+        <location filename="../../toonzlib/orientation.cpp" line="141"/>
         <source>Timeline</source>
         <translation>Таймлайн</translation>
+    </message>
+</context>
+<context>
+    <name>Rasterizer</name>
+    <message>
+        <source>Expected a vector image: %1</source>
+        <translation type="vanished">Ожидаемое векторное изображение: %1</translation>
+    </message>
+    <message>
+        <source>Expected a vector level: %1</source>
+        <translation type="vanished">Ожидаемый векторный уровень: %1</translation>
+    </message>
+    <message>
+        <source>Argument must be a vector level or image : </source>
+        <translation type="vanished">Аргумент должен быть векторным уровнем или изображением : </translation>
+    </message>
+    <message>
+        <source>%1 has no palette</source>
+        <translation type="vanished">%1 не имеет палитры</translation>
+    </message>
+</context>
+<context>
+    <name>Scene</name>
+    <message>
+        <source>File %1 doesn&apos;t exist</source>
+        <translation type="vanished">Файл %1 не существует</translation>
+    </message>
+    <message>
+        <source>Exception reading %1</source>
+        <translation type="vanished">Чтение исключений %1</translation>
+    </message>
+    <message>
+        <source>Exception writing %1</source>
+        <translation type="vanished">Запись исключений %1</translation>
+    </message>
+    <message>
+        <source>Bad level type (%1): must be Vector,Raster or ToonzRaster</source>
+        <translation type="vanished">Плохой тип уровня (%1): должен быть Vector, Raster или ToonzRaster</translation>
+    </message>
+    <message>
+        <source>Can&apos;t add the level: name(%1) is already used</source>
+        <translation type="vanished">Невозможно добавить уровень: имя(%1) уже используется</translation>
+    </message>
+    <message>
+        <source>Can&apos;t load this kind of file as a level : %1</source>
+        <translation type="vanished">Невозможно загрузить этот файл как уровень : %1</translation>
+    </message>
+    <message>
+        <source>Could not load level %1</source>
+        <translation type="vanished">Не удалось загрузить уровень %1</translation>
+    </message>
+    <message>
+        <source>Level is not included in the scene : %1</source>
+        <translation type="vanished">Уровень не включен в сцену : %1</translation>
+    </message>
+    <message>
+        <source>%1 : Expected a Level instance or a level name</source>
+        <translation type="vanished">%1 : Ожидаемый экземпляр уровня или имя уровня</translation>
+    </message>
+    <message>
+        <source>Level &apos;%1&apos; is not included in the scene</source>
+        <translation type="vanished">Уровень %1 не включен в сцену</translation>
     </message>
 </context>
 <context>
@@ -581,7 +830,7 @@
     <message>
         <location filename="../../toonzlib/scriptbinding_files.cpp" line="107"/>
         <source>can&apos;t concatenate an absolute path : %1</source>
-        <translation>Не может конкатенировать абсолютный путь: %1</translation>
+        <translation>не может конкатенировать абсолютный путь: %1</translation>
     </message>
     <message>
         <location filename="../../toonzlib/scriptbinding_files.cpp" line="115"/>
@@ -591,7 +840,7 @@
     <message>
         <location filename="../../toonzlib/scriptbinding_files.cpp" line="129"/>
         <source>can&apos;t read directory %1</source>
-        <translation>Не удается прочитать каталог%1</translation>
+        <translation>не удается прочитать каталог%1</translation>
     </message>
 </context>
 <context>
@@ -632,7 +881,7 @@
     <message>
         <location filename="../../toonzlib/scriptbinding_image_builder.cpp" line="101"/>
         <source>Bad argument (%1): should be &apos;Raster&apos; or ToonzRaster&apos;</source>
-        <translation>Недопустимый аргумент (%1): должен быть «Растр» или &quot;ToonzRaster&quot;</translation>
+        <translation>Недопустимый аргумент (%1): должен быть &quot;Растр&quot; или &quot;ToonzRaster&quot;</translation>
     </message>
     <message>
         <location filename="../../toonzlib/scriptbinding_image_builder.cpp" line="138"/>
@@ -654,77 +903,77 @@
 <context>
     <name>TScriptBinding::Level</name>
     <message>
-        <location filename="../../toonzlib/scriptbinding_level.cpp" line="69"/>
+        <location filename="../../toonzlib/scriptbinding_level.cpp" line="67"/>
         <source>%1 frames</source>
         <translation>%1 кадров</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding_level.cpp" line="124"/>
+        <location filename="../../toonzlib/scriptbinding_level.cpp" line="122"/>
         <source>Bad argument (%1). It should be FilePath or string</source>
-        <translation>Плохой аргумент (%1). Это должен быть FilePath или строка</translation>
+        <translation>Плохой аргумент (%1). Это должен быть путь файла или строка</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding_level.cpp" line="132"/>
+        <location filename="../../toonzlib/scriptbinding_level.cpp" line="130"/>
         <source>Exception loading level (%1)</source>
         <translation>Уровень загрузки исключений (%1)</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding_level.cpp" line="153"/>
+        <location filename="../../toonzlib/scriptbinding_level.cpp" line="151"/>
         <source>File %1 doesn&apos;t exist</source>
         <translation>Файл %1 не существует</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding_level.cpp" line="163"/>
+        <location filename="../../toonzlib/scriptbinding_level.cpp" line="161"/>
         <source>File %1 is unsupported</source>
         <translation>Файл %1 не поддерживается</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding_level.cpp" line="172"/>
+        <location filename="../../toonzlib/scriptbinding_level.cpp" line="170"/>
         <source>Exception reading %1</source>
         <translation>Чтение исключений %1</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding_level.cpp" line="178"/>
+        <location filename="../../toonzlib/scriptbinding_level.cpp" line="176"/>
         <source>Can&apos;t save an empty level</source>
         <translation>Не удалось сохранить пустой уровень</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding_level.cpp" line="198"/>
+        <location filename="../../toonzlib/scriptbinding_level.cpp" line="196"/>
         <source>Unrecognized file type :</source>
         <translation>Нераспознанный тип файла :</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding_level.cpp" line="202"/>
+        <location filename="../../toonzlib/scriptbinding_level.cpp" line="200"/>
         <source>Can&apos;t save a %1 level to this file type : %2</source>
         <translation>Не удается сохранить уровень %1 для этого типа файла : %2</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding_level.cpp" line="211"/>
+        <location filename="../../toonzlib/scriptbinding_level.cpp" line="209"/>
         <source>Exception writing %1</source>
         <translation>Запись исключений %1</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding_level.cpp" line="270"/>
+        <location filename="../../toonzlib/scriptbinding_level.cpp" line="268"/>
         <source>frame index (%1) must be a number</source>
         <translation>Индекс кадра (%1) должен быть числом</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding_level.cpp" line="274"/>
+        <location filename="../../toonzlib/scriptbinding_level.cpp" line="272"/>
         <source>frame index (%1) is out of range (0-%2)</source>
         <translation>Индекс кадра (%1) вне диапазона (0-%2)</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding_level.cpp" line="297"/>
+        <location filename="../../toonzlib/scriptbinding_level.cpp" line="295"/>
         <source>second argument (%1) is not an image</source>
         <translation>Второй аргумент (%1) не является изображением</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding_level.cpp" line="310"/>
+        <location filename="../../toonzlib/scriptbinding_level.cpp" line="308"/>
         <source>can not insert a %1 image into a level</source>
         <translation>Невозможно вставить изображение %1 в уровень</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding_level.cpp" line="331"/>
+        <location filename="../../toonzlib/scriptbinding_level.cpp" line="329"/>
         <source>can not insert a %1 image to a %2 level</source>
         <translation>Невозможно  вставить изображение %1 в уровень %2</translation>
     </message>
@@ -800,7 +1049,7 @@
     <message>
         <location filename="../../toonzlib/scriptbinding_scene.cpp" line="113"/>
         <source>Bad level type (%1): must be Vector,Raster or ToonzRaster</source>
-        <translation>Плохой тип уровня (%1): должен быть Vector, Raster или ToonzRaster</translation>
+        <translation>Плохой тип уровня (%1): должен быть Vector,Raster или ToonzRaster</translation>
     </message>
     <message>
         <location filename="../../toonzlib/scriptbinding_scene.cpp" line="118"/>
@@ -889,6 +1138,52 @@
         <location filename="../../toonzlib/scriptbinding_image_builder.cpp" line="53"/>
         <source>Transform(%1, %2, %3;  %4, %5, %6)</source>
         <translation>Трансформация(%1, %2, %3;  %4, %5, %6)</translation>
+    </message>
+</context>
+<context>
+    <name>ToonzRasterConverter</name>
+    <message>
+        <source>Can&apos;t convert a %1 level</source>
+        <translation type="vanished">Невозможно преобразовать уровень %1</translation>
+    </message>
+    <message>
+        <source>Can&apos;t convert a level with no frames</source>
+        <translation type="vanished">Невозможно преобразовать уровень без кадров</translation>
+    </message>
+    <message>
+        <source>Can&apos;t convert a %1 image</source>
+        <translation type="vanished">Невозможно преобразовать изображение %1</translation>
+    </message>
+    <message>
+        <source>Bad argument (%1): should be a raster Level or a raster Image</source>
+        <translation type="vanished">Плохой аргумент (%1): должен быть растровый уровень или растровое изображение</translation>
+    </message>
+</context>
+<context>
+    <name>Transform</name>
+    <message>
+        <source>Identity</source>
+        <translation type="vanished">Идентичность</translation>
+    </message>
+    <message>
+        <source>Translation(%1,%2)</source>
+        <translation type="vanished">Перемещение(%1,%2)</translation>
+    </message>
+    <message>
+        <source>Rotation(%1)</source>
+        <translation type="vanished">Вращение(%1)</translation>
+    </message>
+    <message>
+        <source>Scale(%1%)</source>
+        <translation type="vanished">Масштаб(%1%)</translation>
+    </message>
+    <message>
+        <source>Scale(%1%, %2%)</source>
+        <translation type="vanished">Масштаб(%1%, %2%)</translation>
+    </message>
+    <message>
+        <source>Transform(%1, %2, %3;  %4, %5, %6)</source>
+        <translation type="vanished">Трансформация(%1, %2, %3;  %4, %5, %6)</translation>
     </message>
 </context>
 </TS>

@@ -4,6 +4,8 @@ Stylesheets are written with [LESS](http://lesscss.org/), which is a dynamic pre
 ℹ️ [LESS Functions](http://lesscss.org/functions/)
 
 ## Recommended Setup
+
+### Windows
 Although any LESS compiler will work fine, here is a recommended setup.
 
 - Install [Visual Studio Code](https://code.visualstudio.com/) by Microsoft.
@@ -20,9 +22,27 @@ A `settings.json` file is already included to ensure developers work to the same
   "out":       false
 }
 ```
+
 ℹ️ [How to Change Settings in Visual Studio Code](https://code.visualstudio.com/docs/getstarted/settings).
 
+### Linux
+
+On Linux you will need a command-line compiler `lessc`.
+
+Ubuntu:
+
+    $ apt install node-less
+
+Fedora:
+
+    $ dnf install nodejs-less
+
+
+
 ## How To Compile
+
+### Windows
+
 Easy LESS uses a compile on save feature, so the theme files must be saved to generate an output.
 
 ```
@@ -30,6 +50,15 @@ Default.less
 themes/Blue.less
 themes/Dark.less
 themes/Light.less
+```
+
+### Linux
+From opentoonz source directory root execute the following commands:
+```
+$ lessc -x stuff/config/qss/Default/less/Default.less stuff/config/qss/Default/Default.qss
+$ lessc -x stuff/config/qss/Default/less/themes/Blue.less stuff/config/qss/Blue/Blue.qss
+$ lessc -x stuff/config/qss/Default/less/themes/Dark.less stuff/config/qss/Dark/Dark.qss
+$ lessc -x stuff/config/qss/Default/less/themes/Light.less stuff/config/qss/Light/Light.qss
 ```
 
 ## How They Work

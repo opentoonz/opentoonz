@@ -37,7 +37,7 @@ bool DVAPI isMainThread();
 // executed the onDeliver function.
 // WARNING!! the sendblocking method will cause a deadlock if used in a
 // executable without main loop! (such as composer, cleanupper, etc.)
-// NOTE: if the 'send' is called in the main thread, ther onDeliver is executed
+// NOTE: if the 'send' is called in the main thread, then onDeliver is executed
 // immediately.
 
 class DVAPI Message {

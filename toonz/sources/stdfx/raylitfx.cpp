@@ -19,6 +19,7 @@ protected:
   TDoubleParamP m_decay;
   TDoubleParamP m_smoothness;
   TBoolParamP m_includeInput;
+  TDoubleParamP m_radius;
 
 public:
   BaseRaylitFx()
@@ -27,18 +28,22 @@ public:
       , m_intensity(60)
       , m_decay(1.0)
       , m_smoothness(100)
-      , m_includeInput(false) {
+      , m_includeInput(false)
+      , m_radius(0.0) {
     m_p->getX()->setMeasureName("fxLength");
     m_p->getY()->setMeasureName("fxLength");
 
+    m_radius->setMeasureName("fxLength");
     bindParam(this, "p", m_p);
     bindParam(this, "z", m_z);
     bindParam(this, "intensity", m_intensity);
     bindParam(this, "decay", m_decay);
     bindParam(this, "smoothness", m_smoothness);
     bindParam(this, "includeInput", m_includeInput);
+    bindParam(this, "radius", m_radius);
 
     addInputPort("Source", m_input);
+    m_radius->setValueRange(0.0, std::numeric_limits<double>::max());
   }
 
   ~BaseRaylitFx() {}
@@ -56,11 +61,19 @@ public:
                     const TRenderSettings &info) override;
 
   void getParamUIs(TParamUIConcept *&concepts, int &length) override {
-    concepts = new TParamUIConcept[length = 1];
+    concepts = new TParamUIConcept[length = 3];
 
     concepts[0].m_type  = TParamUIConcept::POINT;
     concepts[0].m_label = "Center";
     concepts[0].m_params.push_back(m_p);
+
+    concepts[1].m_type  = TParamUIConcept::RADIUS;
+    concepts[1].m_label = "Radius";
+    concepts[1].m_params.push_back(m_radius);
+    concepts[1].m_params.push_back(m_p);
+
+    concepts[2].m_type = TParamUIConcept::COMPASS;
+    concepts[2].m_params.push_back(m_p);
   }
 };
 
@@ -69,7 +82,7 @@ public:
 bool BaseRaylitFx::doGetBBox(double frame, TRectD &bBox,
                              const TRenderSettings &info) {
   if (m_input.isConnected()) {
-    bool ret      = m_input->doGetBBox(frame, bBox, info);
+    bool ret = m_input->doGetBBox(frame, bBox, info);
     if (ret) bBox = TConsts::infiniteRectD;
     return ret;
   } else {
@@ -171,6 +184,7 @@ void RaylitFx::doCompute(TTile &tileOut, double frame,
     params.m_lightOriginSrc.y -= (int)tileIn.m_pos.y;
     params.m_lightOriginDst.x -= (int)tileOut.m_pos.x;
     params.m_lightOriginDst.y -= (int)tileOut.m_pos.y;
+    params.m_radius = m_radius->getValue(frame);
 
     TRop::raylit(tileOut.getRaster(), tileIn.getRaster(), params);
   }
@@ -229,6 +243,7 @@ void ColorRaylitFx::doCompute(TTile &tileOut, double frame,
     params.m_lightOriginSrc.y -= (int)tileIn.m_pos.y;
     params.m_lightOriginDst.x -= (int)tileOut.m_pos.x;
     params.m_lightOriginDst.y -= (int)tileOut.m_pos.y;
+    params.m_radius = m_radius->getValue(frame);
 
     TRop::glassRaylit(tileOut.getRaster(), tileIn.getRaster(), params);
   }

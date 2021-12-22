@@ -144,7 +144,7 @@ private:
 /*!  \def MANAGER_FILESCOPE_DECLARATION(managerClass, generatorClass)
 This macro must be used at file scope to bind the manager to its generator
 instance - just place it after the generator definition.
-\note In case the manager is dependant on some other manager, use the
+\note In case the manager is dependent on some other manager, use the
 \c MANAGER_FILESCOPE_DECLARATION_DEP macro instead.
 */
 

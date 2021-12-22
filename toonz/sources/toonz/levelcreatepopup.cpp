@@ -5,6 +5,7 @@
 // Tnz6 includes
 #include "menubarcommandids.h"
 #include "tapp.h"
+#include "levelcommand.h"
 
 // TnzTools includes
 #include "tools/toolhandle.h"
@@ -34,6 +35,7 @@
 #include "toonz/palettecontroller.h"
 #include "toonz/tproject.h"
 #include "toonz/namebuilder.h"
+#include "toonz/childstack.h"
 
 // TnzCore includes
 #include "tsystem.h"
@@ -276,8 +278,8 @@ LevelCreatePopup::LevelCreatePopup()
   bool ret = true;
   ret      = ret && connect(m_levelTypeOm, SIGNAL(currentIndexChanged(int)),
                        SLOT(onLevelTypeChanged(int)));
-  ret = ret && connect(okBtn, SIGNAL(clicked()), this, SLOT(onOkBtn()));
-  ret = ret && connect(cancelBtn, SIGNAL(clicked()), this, SLOT(reject()));
+  ret      = ret && connect(okBtn, SIGNAL(clicked()), this, SLOT(onOkBtn()));
+  ret      = ret && connect(cancelBtn, SIGNAL(clicked()), this, SLOT(reject()));
   ret =
       ret && connect(applyBtn, SIGNAL(clicked()), this, SLOT(onApplyButton()));
 
@@ -328,9 +330,16 @@ bool LevelCreatePopup::levelExists(std::wstring levelName) {
            .withParentDir(parentDir);
   actualFp = scene->decodeFilePath(fp);
 
-  if (levelSet->getLevel(levelName) != 0 ||
-      TSystem::doesExistFileOrLevel(actualFp)) {
+  if (TSystem::doesExistFileOrLevel(actualFp))
     return true;
+  else if (TXshLevel *level = levelSet->getLevel(levelName)) {
+    // even if the level exists in the scene cast, it can be replaced if it is
+    // unused
+    if (Preferences::instance()->isAutoRemoveUnusedLevelsEnabled() &&
+        !scene->getChildStack()->getTopXsheet()->isLevelUsed(level))
+      return false;
+    else
+      return true;
   } else
     return false;
 }
@@ -452,6 +461,9 @@ bool LevelCreatePopup::apply() {
     return false;
   }
 
+  if (isReservedFileName_message(QString::fromStdWString(levelName)))
+    return false;
+
   if (from > to) {
     error(tr("Invalid frame range"));
     return false;
@@ -467,12 +479,18 @@ bool LevelCreatePopup::apply() {
 
   int numFrames = step * (((to - from) / inc) + 1);
 
-  if (scene->getLevelSet()->getLevel(levelName)) {
-    error(
-        tr("The level name specified is already used: please choose a "
-           "different level name"));
-    m_nameFld->selectAll();
-    return false;
+  TXshLevel *existingLevel = scene->getLevelSet()->getLevel(levelName);
+  if (existingLevel) {
+    // check if the existing level can be removed
+    if (!Preferences::instance()->isAutoRemoveUnusedLevelsEnabled() ||
+        scene->getChildStack()->getTopXsheet()->isLevelUsed(existingLevel)) {
+      error(
+          tr("The level name specified is already used: please choose a "
+             "different level name"));
+      m_nameFld->selectAll();
+      return false;
+    }
+    // if the exitingLevel is not null, it will be removed afterwards
   }
 
   TFilePath parentDir(m_pathFld->getPath().toStdWString());
@@ -506,16 +524,16 @@ bool LevelCreatePopup::apply() {
     }
   }
 
-  TXshLevel *level =
-      scene->createNewLevel(lType, levelName, TDimension(), 0, fp);
-  TXshSimpleLevel *sl = dynamic_cast<TXshSimpleLevel *>(level);
-  assert(sl);
-  sl->setPath(fp, true);
-  if (lType == TZP_XSHLEVEL || lType == OVL_XSHLEVEL) {
-    sl->getProperties()->setDpiPolicy(LevelProperties::DP_ImageDpi);
-    sl->getProperties()->setDpi(dpi);
-    sl->getProperties()->setImageDpi(TPointD(dpi, dpi));
-    sl->getProperties()->setImageRes(TDimension(xres, yres));
+  TUndoManager::manager()->beginBlock();
+
+  // existingLevel is not nullptr only if the level is unused AND
+  // the preference option AutoRemoveUnusedLevels is ON
+  if (existingLevel) {
+    bool ok = LevelCmd::removeLevelFromCast(existingLevel, scene, false);
+    assert(ok);
+    DVGui::info(QObject::tr("Removed unused level %1 from the scene cast. "
+                            "(This behavior can be disabled in Preferences.)")
+                    .arg(QString::fromStdWString(levelName)));
   }
 
   /*-- これからLevelを配置しようとしているセルが空いているかどうかのチェック
@@ -523,12 +541,16 @@ bool LevelCreatePopup::apply() {
   bool areColumnsShifted = false;
   TXshCell cell          = xsh->getCell(row, col);
   bool isInRange         = true;
-  for (i = row; i < row + numFrames; i++) {
-    if (!cell.isEmpty()) {
-      isInRange = false;
-      break;
+  if (col < 0)
+    isInRange = false;
+  else {
+    for (i = row; i < row + numFrames; i++) {
+      if (!cell.isEmpty()) {
+        isInRange = false;
+        break;
+      }
+      cell = xsh->getCell(i, col);
     }
-    cell = xsh->getCell(i, col);
   }
   if (!validColumn) {
     isInRange = false;
@@ -545,6 +567,19 @@ bool LevelCreatePopup::apply() {
   CreateLevelUndo *undo =
       new CreateLevelUndo(row, col, numFrames, step, areColumnsShifted);
   TUndoManager::manager()->add(undo);
+
+  TXshLevel *level =
+      scene->createNewLevel(lType, levelName, TDimension(), 0, fp);
+  TXshSimpleLevel *sl = dynamic_cast<TXshSimpleLevel *>(level);
+
+  assert(sl);
+  sl->setPath(fp, true);
+  if (lType == TZP_XSHLEVEL || lType == OVL_XSHLEVEL) {
+    sl->getProperties()->setDpiPolicy(LevelProperties::DP_ImageDpi);
+    sl->getProperties()->setDpi(dpi);
+    sl->getProperties()->setImageDpi(TPointD(dpi, dpi));
+    sl->getProperties()->setImageRes(TDimension(xres, yres));
+  }
 
   for (i = from; i <= to; i += inc) {
     TFrameId fid(i);
@@ -575,6 +610,8 @@ bool LevelCreatePopup::apply() {
 
   undo->onAdd(sl);
 
+  TUndoManager::manager()->endBlock();
+
   app->getCurrentScene()->notifySceneChanged();
   app->getCurrentScene()->notifyCastChange();
   app->getCurrentXsheet()->notifyXsheetChanged();
@@ -593,6 +630,13 @@ bool LevelCreatePopup::apply() {
 void LevelCreatePopup::update() {
   updatePath();
   Preferences *pref = Preferences::instance();
+  if (pref->getUnits() == "pixel") {
+    m_widthFld->setMeasure("camera.lx");
+    m_heightFld->setMeasure("camera.ly");
+  } else {
+    m_widthFld->setMeasure("level.lx");
+    m_heightFld->setMeasure("level.ly");
+  }
   if (pref->isNewLevelSizeToCameraSizeEnabled()) {
     TCamera *currCamera =
         TApp::instance()->getCurrentScene()->getScene()->getCurrentCamera();

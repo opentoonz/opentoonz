@@ -213,6 +213,8 @@ int read_bmp_line(FILE *fp, void *line_buffer, UINT w, UINT row, UCHAR **map,
     pad = (4 - ((w * 3) % 4)) & 0x03;
     rv  = load_lineBMP24(fp, pic, w, (UINT)pad);
     break;
+  default:
+    break;
   }
 
   return !rv; /* return 0 for unsuccess */
@@ -255,6 +257,8 @@ int write_bmp_line(FILE *fp, void *line_buffer, UINT w, UINT row, UCHAR *map,
     pad = (4 - ((w * 3) % 4)) & 0x03;
     rv  = line_writeBMP24(fp, p24, w, (UINT)pad);
     break;
+  default:
+    break;
   }
 
   return rv; /* 0 for unsuccess */
@@ -293,6 +297,8 @@ int skip_bmp_lines(FILE *fp, UINT w, UINT rows, int whence, BMP_SUBTYPE type)
   case BMP_RGB:
     pad = (4 - ((w * 3) % 4)) & 0x03;
     rv  = skip_rowsBMP24(fp, w, (UINT)pad, rows, whence);
+    break;
+  default:
     break;
   }
 
@@ -624,8 +630,9 @@ static int img_read_bmp_region(const MYSTRING fname, IMAGE **pimg, int x1,
   if ((hd->biBitCount != 1 && hd->biBitCount != 4 && hd->biBitCount != 8 &&
        hd->biBitCount != 24) ||
       hd->biPlanes != 1 || hd->biCompression > BMP_BI_RLE4) {
-    sprintf(buf, "Bogus BMP File! (bitCount=%d, Planes=%d, Compression=%d)",
-            hd->biBitCount, hd->biPlanes, hd->biCompression);
+    snprintf(buf, sizeof(buf),
+             "Bogus BMP File! (bitCount=%d, Planes=%d, Compression=%d)",
+             hd->biBitCount, hd->biPlanes, hd->biCompression);
 
     bmp_error = UNSUPPORTED_BMP_FORMAT;
     goto ERROR;
@@ -636,8 +643,9 @@ static int img_read_bmp_region(const MYSTRING fname, IMAGE **pimg, int x1,
        hd->biCompression != BMP_BI_RGB) ||
       (hd->biBitCount == 4 && hd->biCompression == BMP_BI_RLE8) ||
       (hd->biBitCount == 8 && hd->biCompression == BMP_BI_RLE4)) {
-    sprintf(buf, "Bogus BMP File!  (bitCount=%d, Compression=%d)",
-            hd->biBitCount, hd->biCompression);
+    snprintf(buf, sizeof(buf),
+             "Bogus BMP File!  (bitCount=%d, Compression=%d)",
+             hd->biBitCount, hd->biCompression);
     bmp_error = UNSUPPORTED_BMP_FORMAT;
     goto ERROR;
   }
@@ -1186,8 +1194,8 @@ static int skip_rowsBMPC4(FILE *fp, UINT rows)
         rows = 0;
         break;
       case 0x02:
-        c1 = getc(fp); /* x buffer offest */
-        c1 = getc(fp); /* y buffer offest */
+        c1 = getc(fp); /* x buffer offset */
+        c1 = getc(fp); /* y buffer offset */
         rows -= c1;
         break;
       default:
@@ -1465,8 +1473,8 @@ static int skip_rowsBMPC8(FILE *fp, UINT rows)
         rows = 0;
         break;
       case 0x02:
-        c1 = getc(fp); /* x buffer offest */
-        c1 = getc(fp); /* y buffer offest */
+        c1 = getc(fp); /* x buffer offset */
+        c1 = getc(fp); /* y buffer offset */
         rows -= c1;
         break;
       default:

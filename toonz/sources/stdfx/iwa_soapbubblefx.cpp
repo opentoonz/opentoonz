@@ -927,7 +927,7 @@ void Iwa_SoapBubbleFx::do_distance_transform(float* dst_p, USHORT* binarized_p,
   float* tmp_dst = dst_p;
   /* transform along rows */
   for (int j = 0; j < dim.ly; j++) {
-    for (int i = 0; i < dim.lx; i++, *tmp_dst++) {
+    for (int i = 0; i < dim.lx; i++, tmp_dst++) {
       f[i] = *tmp_dst;
     }
 
@@ -960,7 +960,7 @@ void Iwa_SoapBubbleFx::do_distance_transform(float* dst_p, USHORT* binarized_p,
 
   /* square root and normalize */
   USHORT* region_p = binarized_p;
-  for (int i = 0; i < dim.lx * dim.ly; i++, *tmp_dst++, region_p++) {
+  for (int i = 0; i < dim.lx * dim.ly; i++, tmp_dst++, region_p++) {
     if (max_val[*region_p] > 0)
       *tmp_dst = std::sqrt(*tmp_dst) / max_val[*region_p];
   }

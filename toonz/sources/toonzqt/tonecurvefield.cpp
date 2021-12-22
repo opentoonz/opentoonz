@@ -2,9 +2,9 @@
 
 #include "toonzqt/tonecurvefield.h"
 #include "toonzqt/fxhistogramrender.h"
-#include "toonzqt/intpairfield.h"
+#include "toonzqt/doublepairfield.h"
 #include "toonzqt/checkbox.h"
-
+#include "toonzqt/doublefield.h"
 #include <QPainter>
 #include <QPainterPath>
 #include <QStackedWidget>
@@ -18,6 +18,10 @@ using namespace DVGui;
 
 //-----------------------------------------------------------------------------
 namespace {
+
+// minimum distance between control points
+const double cpMargin = 4.0;
+
 //-----------------------------------------------------------------------------
 
 double getPercentAtPoint(QPointF point, QPainterPath path) {
@@ -25,8 +29,8 @@ double getPercentAtPoint(QPointF point, QPainterPath path) {
   for (i = 1; i < 100; i++) {
     double p          = double(i) * 0.01;
     QPointF pathPoint = path.pointAtPercent(p);
-    if (abs(pathPoint.x() - point.x()) < 3 &&
-        abs(pathPoint.y() - point.y()) < 3)
+    if (std::abs(pathPoint.x() - point.x()) < 3 &&
+        std::abs(pathPoint.y() - point.y()) < 3)
       return p;
   }
   return 0;
@@ -66,57 +70,31 @@ QList<QPointF> getIntersectedPoint(QRectF rect, QPainterPath path) {
 
 double qtNorm2(const QPointF &p) { return p.x() * p.x() + p.y() * p.y(); }
 
-double qtNorm(const QPointF &p) { return sqrt(qtNorm2(p)); }
-
-QPointF qtNormalize(const QPointF &p) {
-  double n = qtNorm(p);
-  assert(n != 0.0);
-  return (1.0 / n) * p;
-}
-
 double qtDistance2(const QPointF &p1, const QPointF &p2) {
   return qtNorm2(p2 - p1);
 }
 
-double qtDistance(const QPointF &p1, const QPointF &p2) {
-  return qtNorm(p2 - p1);
+//---------------------------------------------------------
+// referred to the truncateSpeeds() in tdoubleparam.cpp
+void truncateSpeeds(double aFrame, double bFrame, QVector2D &aSpeedTrunc,
+                    QVector2D &bSpeedTrunc) {
+  double deltaX = bFrame - aFrame;
+  if (aSpeedTrunc.x() < 0) aSpeedTrunc.setX(0);
+  if (bSpeedTrunc.x() > 0) bSpeedTrunc.setX(0);
+
+  if (aFrame + aSpeedTrunc.x() > bFrame) {
+    if (aSpeedTrunc.x() != 0) {
+      aSpeedTrunc = aSpeedTrunc * (deltaX / aSpeedTrunc.x());
+    }
+  }
+
+  if (bFrame + bSpeedTrunc.x() < aFrame) {
+    if (bSpeedTrunc.x() != 0) {
+      bSpeedTrunc = -bSpeedTrunc * (deltaX / bSpeedTrunc.x());
+    }
+  }
 }
 
-//-----------------------------------------------------------------------------
-
-QPointF getNewFirstHandlePoint(const QPointF &p, const QPointF &nextP,
-                               const QPointF &oldHandlePoint) {
-  bool canMove  = (nextP.x() - p.x() > 16);
-  int yDistance = nextP.y() - p.y();
-  double sign   = (yDistance != 0) ? yDistance / abs(yDistance) : 1;
-  double t      = qtDistance(p, oldHandlePoint);
-  if (!canMove) {
-    QPointF normalizedP =
-        (yDistance != 0) ? qtNormalize(nextP - p) : QPoint(1, 1);
-    return QPointF(p + QPointF(t * normalizedP));
-  } else if (abs(oldHandlePoint.x() - p.x()) < 16)
-    return QPointF(p.x() + 16, p.y() + sign * sqrt(t * t - 16 * 16));
-  return oldHandlePoint;
-}
-
-//-----------------------------------------------------------------------------
-
-QPointF getNewSecondHandlePoint(const QPointF &p, const QPointF &nextP,
-                                const QPointF &oldHandlePoint) {
-  bool canMove  = (nextP.x() - p.x() > 16);
-  int yDistance = p.y() - nextP.y();
-  double sign   = (yDistance != 0) ? yDistance / abs(yDistance) : 1;
-  double s      = qtDistance(oldHandlePoint, nextP);
-  if (!canMove) {
-    QPointF normalizedP =
-        (yDistance != 0) ? qtNormalize(nextP - p) : QPoint(1, 1);
-    return QPointF(nextP - QPointF(s * normalizedP));
-  } else if (abs(nextP.x() - oldHandlePoint.x()) < 16)
-    return QPointF(nextP.x() - 16, nextP.y() + sign * sqrt(s * s - 16 * 16));
-  return oldHandlePoint;
-}
-
-//-----------------------------------------------------------------------------
 }  // anonymous namespace
 //-----------------------------------------------------------------------------
 
@@ -134,7 +112,8 @@ ChennelCurveEditor::ChennelCurveEditor(QWidget *parent,
     , m_LeftRightMargin(42)
     , m_TopMargin(9)
     , m_BottomMargin(48)
-    , m_isLinear(false) {
+    , m_isLinear(false)
+    , m_isEnlarged(false) {
   setFixedSize(m_curveHeight + 2 * m_LeftRightMargin + 2,
                m_curveHeight + m_TopMargin + m_BottomMargin);
   setAttribute(Qt::WA_KeyCompression);
@@ -152,16 +131,13 @@ ChennelCurveEditor::ChennelCurveEditor(QWidget *parent,
 
 void ChennelCurveEditor::setPoints(QList<TPointD> points) {
   if (!m_points.isEmpty()) m_points.clear();
-  int i;
-  for (i = 0; i < points.size(); i++) {
-    QPointF p = strokeToViewPoint(points.at(i));
-    m_points.push_back(p);
-  }
-  /*--ポイント位置に合わせてスライダも更新する--*/
+  for (const TPointD &point : points)
+    m_points.push_back(QPointF(point.x, point.y));
+  // update slider position according to the first and the last control points
   int firstIndex = 3;
   int lastIndex  = m_points.size() - 4;
-  emit firstLastXPostionChanged(viewToStrokePoint(m_points.at(firstIndex)).x,
-                                viewToStrokePoint(m_points.at(lastIndex)).x);
+  emit firstLastXPostionChanged(m_points.at(firstIndex).x(),
+                                m_points.at(lastIndex).x());
   update();
 }
 
@@ -170,23 +146,17 @@ void ChennelCurveEditor::setPoints(QList<TPointD> points) {
 QList<TPointD> ChennelCurveEditor::getPoints() {
   QList<TPointD> points;
   if (m_points.isEmpty()) return points;
-  int i;
-  for (i = 0; i < m_points.size(); i++)
-    points.push_back(viewToStrokePoint(m_points.at(i)));
+  for (const QPointF &point : m_points)
+    points.push_back(TPointD(point.x(), point.y()));
   return points;
 }
 
 //-----------------------------------------------------------------------------
 
-void ChennelCurveEditor::setFirstLastXPosition(std::pair<int, int> values,
+void ChennelCurveEditor::setFirstLastXPosition(std::pair<double, double> values,
                                                bool isDragging) {
-  if (!isDragging) {
-    emit controlPointChanged(false);
-    return;
-  }
-
-  QPointF newX0 = strokeToViewPoint(TPointD(values.first, 0));
-  QPointF newX1 = strokeToViewPoint(TPointD(values.second, 0));
+  QPointF newX0(values.first, 0);
+  QPointF newX1(values.second, 0);
 
   int indexX0 = 3;
   int indexX1 = m_points.size() - 4;
@@ -203,6 +173,8 @@ void ChennelCurveEditor::setFirstLastXPosition(std::pair<int, int> values,
     update();
   }
   m_currentControlPointIndex = -1;
+
+  if (!isDragging) emit controlPointChanged(false);
 }
 
 //-----------------------------------------------------------------------------
@@ -215,33 +187,89 @@ void ChennelCurveEditor::setLinear(bool isLinear) {
 
 //-----------------------------------------------------------------------------
 
+void ChennelCurveEditor::setEnlarged(bool isEnlarged) {
+  if (m_isEnlarged == isEnlarged) return;
+  m_isEnlarged     = isEnlarged;
+  int widgetHeight = (m_isEnlarged) ? m_curveHeight * 2 : m_curveHeight;
+  setFixedSize(widgetHeight + 2 * m_LeftRightMargin + 2,
+               widgetHeight + m_TopMargin + m_BottomMargin);
+  m_histogramView->setGraphHeight(widgetHeight);
+  m_verticalChannelBar->setFixedHeight(widgetHeight + 22);
+  update();
+}
+
+//-----------------------------------------------------------------------------
+
+void ChennelCurveEditor::setLabelRange(ChannelBar::Range range) {
+  m_histogramView->channelBar()->setLabelRange(range);
+  m_verticalChannelBar->setLabelRange(range);
+}
+
+//-----------------------------------------------------------------------------
+
 QPointF ChennelCurveEditor::checkPoint(const QPointF p) {
-  QPointF checkedP         = p;
-  int y0                   = m_TopMargin + 1;
-  int y1                   = m_curveHeight + m_TopMargin;
-  if (p.y() < y0) checkedP = QPointF(checkedP.x(), y0);
-  if (p.y() > y1) checkedP = QPointF(checkedP.x(), y1);
-  int x0                   = m_LeftRightMargin + 1;
-  int x1                   = m_curveHeight + m_LeftRightMargin;
-  if (p.x() < x0) checkedP = QPointF(x0, checkedP.y());
-  if (p.x() > x1) checkedP = QPointF(x1, checkedP.y());
+  QPointF checkedP = p;
+  if (p.x() < 0)
+    checkedP.setX(0);
+  else if (p.x() > m_curveHeight)
+    checkedP.setX(m_curveHeight);
+  if (p.y() < 0)
+    checkedP.setY(0);
+  else if (p.y() > m_curveHeight)
+    checkedP.setY(m_curveHeight);
   return checkedP;
 }
 
 //-----------------------------------------------------------------------------
 
-QPointF ChennelCurveEditor::strokeToViewPoint(const TPointD p) {
-  double x = p.x + m_LeftRightMargin + 1;
-  double y = height() - m_BottomMargin - p.y;
-  return QPointF(x, y);
+QPointF ChennelCurveEditor::getVisibleHandlePos(int index) const {
+  QRectF rect(0.0, 0.0, m_curveHeight, m_curveHeight);
+  QPointF handlePos(m_points.at(index));
+  if (isCentralControlPoint(index) || rect.contains(handlePos))
+    return handlePos;
+
+  if (isLeftControlPoint(index)) {
+    QPointF cp = m_points.at(index + 1);
+    QVector2D lHandle(handlePos - cp);
+    if (handlePos.x() < 0) {
+      float ratio = -cp.x() / lHandle.x();
+      handlePos   = cp + lHandle.toPointF() * ratio;
+    }
+    if (handlePos.y() < 0) {
+      float ratio = -cp.y() / lHandle.y();
+      handlePos   = cp + lHandle.toPointF() * ratio;
+    } else if (handlePos.y() > 256) {
+      float ratio = (256 - cp.y()) / lHandle.y();
+      handlePos   = cp + lHandle.toPointF() * ratio;
+    }
+  } else {  // isRightControlPoint
+    QPointF cp = m_points.at(index - 1);
+    QVector2D rHandle(handlePos - cp);
+    if (handlePos.x() > 256) {
+      float ratio = (256 - cp.x()) / rHandle.x();
+      handlePos   = cp + rHandle.toPointF() * ratio;
+    }
+    if (handlePos.y() < 0) {
+      float ratio = -cp.y() / rHandle.y();
+      handlePos   = cp + rHandle.toPointF() * ratio;
+    } else if (handlePos.y() > 256) {
+      float ratio = (256 - cp.y()) / rHandle.y();
+      handlePos   = cp + rHandle.toPointF() * ratio;
+    }
+  }
+  return handlePos;
 }
 
 //-----------------------------------------------------------------------------
 
-TPointD ChennelCurveEditor::viewToStrokePoint(const QPointF &p) {
+QPointF ChennelCurveEditor::viewToStrokePoint(const QPointF &p) {
   double x = p.x() - m_LeftRightMargin - 1;
-  double y = m_curveHeight - (p.y() - m_TopMargin);
-  return TThickPoint(x, y);
+  double y = p.y() - m_TopMargin;
+  if (m_isEnlarged) {
+    x *= 0.5;
+    y *= 0.5;
+  }
+  return QPointF(x, m_curveHeight - y);
 }
 
 //-----------------------------------------------------------------------------
@@ -250,12 +278,24 @@ int ChennelCurveEditor::getClosestPointIndex(const QPointF &pos,
                                              double &minDistance2) const {
   int closestPointIndex = -1;
   minDistance2          = 0;
+  enum pointType { Handle = 0, ControlPoint, PseudoHandle } closestPointType;
+  QRectF rect(0, 0, m_curveHeight, m_curveHeight);
   int i;
-  for (i = 0; i < (int)m_points.size(); i++) {
-    double distance2 = qtDistance2(pos, m_points.at(i));
-    if (closestPointIndex < 0 || distance2 < minDistance2) {
+  for (i = 3; i < (int)m_points.size() - 3; i++) {
+    if (m_isLinear && !isCentralControlPoint(i)) continue;
+    QPointF visiblePoint = getVisibleHandlePos(i);
+
+    pointType type =
+        (isCentralControlPoint(i))
+            ? ControlPoint
+            : (visiblePoint == m_points.at(i)) ? Handle : PseudoHandle;
+
+    double distance2 = qtDistance2(pos, visiblePoint);
+    if (closestPointIndex < 0 || distance2 < minDistance2 ||
+        (distance2 == minDistance2 && type < closestPointType)) {
       minDistance2      = distance2;
       closestPointIndex = i;
+      closestPointType  = type;
     }
   }
   return closestPointIndex;
@@ -271,11 +311,9 @@ void ChennelCurveEditor::movePoint(int index, const QPointF delta) {
   int firstIndex = 3;
   int lastIndex  = m_points.size() - 4;
   if (index == firstIndex)
-    emit firstLastXPostionChanged(viewToStrokePoint(p).x,
-                                  viewToStrokePoint(m_points.at(lastIndex)).x);
+    emit firstLastXPostionChanged(p.x(), m_points.at(lastIndex).x());
   if (index == lastIndex)
-    emit firstLastXPostionChanged(viewToStrokePoint(m_points.at(firstIndex)).x,
-                                  viewToStrokePoint(p).x);
+    emit firstLastXPostionChanged(m_points.at(firstIndex).x(), p.x());
 }
 
 //-----------------------------------------------------------------------------
@@ -287,53 +325,74 @@ void ChennelCurveEditor::setPoint(int index, const QPointF p) {
   int firstIndex = 3;
   int lastIndex  = m_points.size() - 4;
   if (index == firstIndex)
-    emit firstLastXPostionChanged(viewToStrokePoint(p).x,
-                                  viewToStrokePoint(m_points.at(lastIndex)).x);
+    emit firstLastXPostionChanged(p.x(), m_points.at(lastIndex).x());
   if (index == lastIndex)
-    emit firstLastXPostionChanged(viewToStrokePoint(m_points.at(firstIndex)).x,
-                                  viewToStrokePoint(p).x);
+    emit firstLastXPostionChanged(m_points.at(firstIndex).x(), p.x());
 }
 
 //-----------------------------------------------------------------------------
 
-void ChennelCurveEditor::moveCurrentControlPoint(const QPointF delta) {
+void ChennelCurveEditor::moveCurrentControlPoint(QPointF delta) {
   assert(m_currentControlPointIndex != -1);
   int pointCount = m_points.size();
-  /*- セグメントを動かした場合 -*/
+  // in case moving the control point
   if (isCentralControlPoint(m_currentControlPointIndex))
     moveCentralControlPoint(m_currentControlPointIndex, delta);
-  /*- 左のハンドルを動かした場合 -*/
+  // in case moving the left handle
   else if (isLeftControlPoint(m_currentControlPointIndex)) {
-    QPointF p0 =
-        m_points.at(m_currentControlPointIndex) + QPointF(0, delta.y());
-    setPoint(m_currentControlPointIndex, p0);
+    QPointF cp   = m_points.at(m_currentControlPointIndex + 1);
+    QPointF left = m_points.at(m_currentControlPointIndex);
+
+    // handle should not move across the control point
+    if (left.x() + delta.x() > cp.x()) delta.setX(cp.x() - left.x());
+
+    left += delta;
+    setPoint(m_currentControlPointIndex, left);
+
+    // rotate the opposite handle keeping the handle length unchanged
     if (m_currentControlPointIndex < pointCount - 5) {
-      QPointF p2 =
-          m_points.at(m_currentControlPointIndex + 2) - QPointF(0, delta.y());
-      setPoint(m_currentControlPointIndex + 2, p2);
+      QVector2D lHandle(cp - left);
+      if (!lHandle.isNull()) {
+        QPointF right = m_points.at(m_currentControlPointIndex + 2);
+        QVector2D rHandle(right - cp);
+        QVector2D newRHandle = lHandle.normalized() * rHandle.length();
+        setPoint(m_currentControlPointIndex + 2, cp + newRHandle.toPointF());
+      }
     }
     emit controlPointChanged(true);
   }
-  /*- 右のハンドルを動かした場合 -*/
+  // in case moving the right handle
   else {
     assert(isRightControlPoint(m_currentControlPointIndex));
-    QPointF p0 =
-        m_points.at(m_currentControlPointIndex) + QPointF(0, delta.y());
-    setPoint(m_currentControlPointIndex, p0);
+    QPointF cp    = m_points.at(m_currentControlPointIndex - 1);
+    QPointF right = m_points.at(m_currentControlPointIndex);
+
+    // handle should not move across the control point
+    if (right.x() + delta.x() < cp.x()) delta.setX(cp.x() - right.x());
+
+    right += delta;
+    setPoint(m_currentControlPointIndex, right);
+
+    // rotate the opposite handle keeping the handle length unchanged
     if (m_currentControlPointIndex > 4) {
-      QPointF p2 =
-          m_points.at(m_currentControlPointIndex - 2) - QPointF(0, delta.y());
-      setPoint(m_currentControlPointIndex - 2, p2);
+      QVector2D rHandle(cp - right);
+      if (!rHandle.isNull()) {
+        QPointF left = m_points.at(m_currentControlPointIndex - 2);
+        QVector2D lHandle(left - cp);
+        QVector2D newLHandle = rHandle.normalized() * lHandle.length();
+        setPoint(m_currentControlPointIndex - 2, cp + newLHandle.toPointF());
+      }
     }
     emit controlPointChanged(true);
   }
   update();
+  emit updateCurrentPosition(m_currentControlPointIndex,
+                             m_points.at(m_currentControlPointIndex));
 }
 
 //-----------------------------------------------------------------------------
 
-void ChennelCurveEditor::moveCentralControlPoint(int index,
-                                                 const QPointF delta) {
+void ChennelCurveEditor::moveCentralControlPoint(int index, QPointF delta) {
   int pointCount = m_points.size();
 
   assert(index < pointCount - 3 && index > 2);
@@ -342,9 +401,7 @@ void ChennelCurveEditor::moveCentralControlPoint(int index,
   QPointF d = delta;
   // Trovo il valore di delta im modo tale che il punto di controllo non sia
   // trascinato fuori dal range consentito
-  int newX         = p.x() + delta.x();
-  int newY         = p.y() + delta.y();
-  QPointF newPoint = checkPoint(QPoint(newX, newY));
+  QPointF newPoint = checkPoint(p + delta);
   d                = newPoint - p;
 
   QPointF nextP       = m_points.at(index + 3);
@@ -352,35 +409,12 @@ void ChennelCurveEditor::moveCentralControlPoint(int index,
   double nextDistance = nextP.x() - (p.x() + d.x());
   double precDistance = (p.x() + d.x()) - precP.x();
 
-  // Caso particolare: Punto di controllo corrente == primo visibile,
-  //                   Punto di controllo successivo
-  //==
-  // l'ultimo
-  // visibile
-  if (index == 3 && index + 3 == pointCount - 4) {
-    setPoint(index + 1,
-             getNewFirstHandlePoint(p, nextP, m_points.at(index + 1)));
-    setPoint(index + 2,
-             getNewSecondHandlePoint(p, nextP, m_points.at(index + 2)));
-    if (nextDistance < 0) d = QPointF(nextP.x() - p.x(), d.y());
-  }
-  // Caso particolare: Punto di controllo corrente == ultimo visibile,
-  //                   Punto di controllo precedente
-  //==
-  // primo
-  // visibile
-  else if (index - 3 == 3 && index == pointCount - 4) {
-    setPoint(index - 2,
-             getNewFirstHandlePoint(precP, p, m_points.at(index - 2)));
-    setPoint(index - 1,
-             getNewSecondHandlePoint(precP, p, m_points.at(index - 1)));
-    if (precDistance < 0) d = QPointF(precP.x() - p.x(), d.y());
-  }
-  // Altrimenti calcolo il nuovo delta
-  else if (nextDistance < 16)
-    d = QPointF(nextP.x() - p.x() - 16, d.y());
-  else if (precDistance < 16)
-    d = QPointF(precP.x() - p.x() + 16, d.y());
+  if (nextDistance < cpMargin)
+    d = QPointF(nextP.x() - p.x() - cpMargin, d.y());
+  else if (precDistance < cpMargin)
+    d = QPointF(precP.x() - p.x() + cpMargin, d.y());
+
+  if (d.isNull()) return;
 
   // Punto di controllo speciale: il primo visualizzato.
   if (index == 3) {
@@ -423,13 +457,13 @@ void ChennelCurveEditor::addControlPoint(double percent) {
 
   QPointF p0 = checkPoint(m_points.at(beforeControlPointIndex));
   // Se sono troppo vicino al punto di controllo precedente ritorno
-  if (abs(p.x() - p0.x()) <= 16) return;
+  if (std::abs(p.x() - p0.x()) <= cpMargin) return;
   double beforeControlPointPercent = getPercentAtPoint(p0, path);
   QPointF p1 = checkPoint(m_points.at(beforeControlPointIndex + 1));
   QPointF p2 = checkPoint(m_points.at(beforeControlPointIndex + 2));
   QPointF p3 = checkPoint(m_points.at(beforeControlPointIndex + 3));
   // Se sono troppo vicino al punto di controllo successivo ritorno
-  if (abs(p3.x() - p.x()) <= 16) return;
+  if (std::abs(p3.x() - p.x()) <= cpMargin) return;
   double nextControlPointPercent = getPercentAtPoint(p3, path);
 
   // Calcolo la velocita' e quindi il coiffciente angolare.
@@ -448,6 +482,7 @@ void ChennelCurveEditor::addControlPoint(double percent) {
                   QPointF(p.x() + 16, p.y() + 16 * m));
 
   m_currentControlPointIndex = newControlPointIndex;
+  m_preMousePos              = p;
   emit controlPointAdded(newControlPointIndex);
   update();
 }
@@ -460,15 +495,55 @@ void ChennelCurveEditor::removeCurrentControlPoint() {
 
 //-----------------------------------------------------------------------------
 
+void ChennelCurveEditor::selectNextControlPoint() {
+  int controlPointCount = (int)m_points.size();
+
+  if (controlPointCount == 0) return;
+
+  int firstVisibleControlPoint = 3;
+  int lastVisibleControlPoint  = m_points.size() - 4;
+
+  m_currentControlPointIndex++;
+  if (m_currentControlPointIndex < firstVisibleControlPoint ||
+      m_currentControlPointIndex > lastVisibleControlPoint)
+    m_currentControlPointIndex = firstVisibleControlPoint;
+
+  emit updateCurrentPosition(m_currentControlPointIndex,
+                             m_points.at(m_currentControlPointIndex));
+  update();
+}
+
+//-----------------------------------------------------------------------------
+
+void ChennelCurveEditor::selectPreviousControlPoint() {
+  int controlPointCount = (int)m_points.size();
+
+  if (controlPointCount == 0) return;
+
+  int firstVisibleControlPoint = 3;
+  int lastVisibleControlPoint  = m_points.size() - 4;
+
+  m_currentControlPointIndex--;
+  if (m_currentControlPointIndex < firstVisibleControlPoint ||
+      m_currentControlPointIndex > lastVisibleControlPoint)
+    m_currentControlPointIndex = lastVisibleControlPoint;
+
+  emit updateCurrentPosition(m_currentControlPointIndex,
+                             m_points.at(m_currentControlPointIndex));
+  update();
+}
+
+//-----------------------------------------------------------------------------
+
 void ChennelCurveEditor::removeControlPoint(int index) {
   // Non posso eliminare il primo punto di controllo visibile quindi lo rimetto
   // in condizione iniziale
   if (index <= 4) {
-    setPoint(0, strokeToViewPoint(TPointD(-40, 0)));
-    setPoint(1, strokeToViewPoint(TPointD(-20, 0)));
-    setPoint(2, strokeToViewPoint(TPointD(-20, 0)));
-    setPoint(3, strokeToViewPoint(TPointD(0, 0)));
-    setPoint(4, strokeToViewPoint(TPointD(16, 16)));
+    setPoint(0, QPointF(-40, 0));
+    setPoint(1, QPointF(-20, 0));
+    setPoint(2, QPointF(-20, 0));
+    setPoint(3, QPointF(0, 0));
+    setPoint(4, QPointF(16, 16));
     update();
     emit controlPointChanged(false);
     return;
@@ -477,11 +552,11 @@ void ChennelCurveEditor::removeControlPoint(int index) {
   // rimetto in condizione iniziale
   if (index >= m_points.size() - 5) {
     int i = m_points.size() - 5;
-    setPoint(i, strokeToViewPoint(TPointD(239, 239)));
-    setPoint(i + 1, strokeToViewPoint(TPointD(255, 255)));
-    setPoint(i + 2, strokeToViewPoint(TPointD(275, 255)));
-    setPoint(i + 3, strokeToViewPoint(TPointD(275, 255)));
-    setPoint(i + 4, strokeToViewPoint(TPointD(295, 255)));
+    setPoint(i, QPointF(239, 239));
+    setPoint(i + 1, QPointF(255, 255));
+    setPoint(i + 2, QPointF(275, 255));
+    setPoint(i + 3, QPointF(275, 255));
+    setPoint(i + 4, QPointF(295, 255));
     update();
     emit controlPointChanged(false);
     return;
@@ -501,6 +576,10 @@ void ChennelCurveEditor::removeControlPoint(int index) {
 
   emit controlPointRemoved(firstIndex + 1);
   m_currentControlPointIndex = firstIndex - 2;
+
+  emit updateCurrentPosition(m_currentControlPointIndex,
+                             m_points.at(m_currentControlPointIndex));
+
   update();
 }
 
@@ -518,15 +597,20 @@ QPainterPath ChennelCurveEditor::getPainterPath() {
     QPointF p2 = m_points.at(++i);
     QPointF p3 = m_points.at(++i);
     path.moveTo(p0);
-    if (!m_isLinear)
-      path.cubicTo(p1, p2, p3);
-    else
+    if (!m_isLinear) {
+      // truncate speed
+      QVector2D aSpeed(p1 - p0);
+      QVector2D bSpeed(p2 - p3);
+      truncateSpeeds(p0.x(), p3.x(), aSpeed, bSpeed);
+      path.cubicTo(p0 + aSpeed.toPointF(), p3 + bSpeed.toPointF(), p3);
+    } else
       path.lineTo(p3);
     p0 = p3;
   }
 
   // Cerco le eventuali intersezioni con il bordo.
-  QRectF rect(m_LeftRightMargin, m_TopMargin, m_curveHeight, m_curveHeight);
+  QRectF rect(0, 0, m_curveHeight, m_curveHeight);
+  // QRectF rect(m_LeftRightMargin, m_TopMargin, m_curveHeight, m_curveHeight);
   QRectF r = path.boundingRect();
   if (!rect.contains(QRect(rect.left(), r.top(), rect.width(), r.height()))) {
     QList<QPointF> points = getIntersectedPoint(rect, path);
@@ -551,30 +635,14 @@ QPainterPath ChennelCurveEditor::getPainterPath() {
 void ChennelCurveEditor::paintEvent(QPaintEvent *e) {
   QPainter painter(this);
 
+  double scale = (m_isEnlarged) ? 2.0 : 1.0;
   // Disegno il reticolato
   painter.setRenderHint(QPainter::Antialiasing, false);
   painter.setPen(QColor(250, 250, 250));
-  int i;
-  int d = m_curveHeight * 0.25;
-  for (i = 1; i < 16; i++) {
-    // linee orizzontali
-    int delta = m_TopMargin + 16 * i;
-    int j;
-    for (j = 1; j < 4; j++)
-      painter.drawLine(QPoint((j - 1) * d + m_LeftRightMargin + 1, delta),
-                       QPoint(j * d + m_LeftRightMargin - 1, delta));
-    painter.drawLine(QPoint((4 - 1) * d + m_LeftRightMargin + 1, delta),
-                     QPoint(4 * d + m_LeftRightMargin, delta));
-    // linee verticali
-    delta = m_LeftRightMargin + 1 + 16 * i;
-    if (i % 4 == 0) continue;
-    for (j = 1; j < 5; j++)
-      painter.drawLine(QPoint(delta, (j - 1) * d + m_TopMargin),
-                       QPoint(delta, j * d + m_TopMargin - 1));
-  }
 
   // Disegno l'histogram.
-  m_histogramView->draw(&painter, QPoint(m_LeftRightMargin - 10, 0));
+  m_histogramView->draw(&painter, QPoint(m_LeftRightMargin - 10, 0),
+                        m_curveHeight * scale);
 
   // Disegno la barra verticale a sinistra.
   m_verticalChannelBar->draw(
@@ -585,48 +653,54 @@ void ChennelCurveEditor::paintEvent(QPaintEvent *e) {
                              -m_BottomMargin);
   // Disegno la curva entro i limiti del grafo
   painter.setClipRect(r, Qt::IntersectClip);
+
+  painter.translate(m_LeftRightMargin + 1, height() - m_BottomMargin);
+  painter.scale(scale, -scale);
+
   QPainterPath path = getPainterPath();
   if (path.isEmpty()) return;
   painter.setRenderHint(QPainter::Antialiasing, true);
-  painter.setPen(Qt::black);
+  QPen blackPen(Qt::black);
+  QPen bluePen(Qt::blue);
+  blackPen.setWidthF(1.0 / scale);
+  bluePen.setWidthF(1.0 / scale);
+
+  painter.setPen(blackPen);
   painter.setBrush(Qt::NoBrush);
   painter.drawPath(path);
 
-  // Disegno i punti di controllo (esclusi i primi tre e gli ultimi tre)
-  r         = r.adjusted(-5, -5, 5, 5);
   int n     = m_points.size();
   QPointF p = m_points.at(3);
-  for (i = 3; i < n - 3; i++) {
+  for (int i = 3; i < n - 3; i++) {
     QBrush brush(Qt::white);
-    int rad       = 3;
+    int rad       = (m_isEnlarged) ? 1 : 2;
     QPointF nextP = m_points.at(i + 1);
     if (isCentralControlPoint(i))
-      rad = 4;
+      rad = (m_isEnlarged) ? 2 : 3;
     else if (m_isLinear) {
       p = nextP;
       continue;
     }
-    if (m_currentControlPointIndex == i) brush = QBrush(Qt::black);
-    painter.setBrush(brush);
-    painter.setPen(Qt::black);
+    painter.setPen(blackPen);
 
+    QPointF handlePos = p;
     if (!m_isLinear) {
-      if (isLeftControlPoint(i))
+      if (isLeftControlPoint(i)) {
         painter.drawLine(p, nextP);
-      else if (isCentralControlPoint(i) && i < n - 4)
+      } else if (isCentralControlPoint(i) && i < n - 4)
         painter.drawLine(p, nextP);
+
+      handlePos = getVisibleHandlePos(i);
     }
-    QPainterPath circle;
-    QRectF pointRect(p.x() - rad, p.y() - rad, 2 * rad, 2 * rad);
-    if (r.contains(pointRect))
-#if QT_VERSION >= 0x050000
-      painter.setClipRect(pointRect.adjusted(-1, -1, 1, 1));
-#else
-      painter.setClipRect(pointRect.adjusted(-1, -1, 1, 1), Qt::UniteClip);
-#endif
-    circle.addEllipse(pointRect);
-    painter.fillPath(circle, brush);
-    painter.drawPath(circle);
+
+    painter.setBrush((m_currentControlPointIndex != i)
+                         ? Qt::white
+                         : (p == handlePos) ? Qt::black : Qt::blue);
+    painter.setPen((p == handlePos) ? blackPen : bluePen);
+
+    QRectF pointRect(handlePos.x() - rad, handlePos.y() - rad, 2 * rad,
+                     2 * rad);
+    painter.drawEllipse(pointRect);
     p = nextP;
   }
 }
@@ -634,11 +708,12 @@ void ChennelCurveEditor::paintEvent(QPaintEvent *e) {
 //-----------------------------------------------------------------------------
 
 void ChennelCurveEditor::mouseMoveEvent(QMouseEvent *e) {
+  QPointF posF = viewToStrokePoint(QPointF(e->pos()));
   if (m_mouseButton == Qt::LeftButton && m_currentControlPointIndex != -1) {
-    QPoint pos   = e->pos();
-    QPointF posF = QPointF(pos.x(), pos.y());
-    moveCurrentControlPoint(posF - m_points.at(m_currentControlPointIndex));
-  }
+    moveCurrentControlPoint(posF - m_preMousePos);
+    m_preMousePos = posF;
+  } else if (m_currentControlPointIndex == -1)
+    emit updateCurrentPosition(-1, posF);
 }
 
 //-----------------------------------------------------------------------------
@@ -647,15 +722,15 @@ void ChennelCurveEditor::mousePressEvent(QMouseEvent *e) {
   m_mouseButton = e->button();
   setFocus();
   if (m_mouseButton == Qt::LeftButton) {
-    QPoint pos   = e->pos();
-    QPointF posF = QPointF(pos.x(), pos.y());
+    QPointF posF = viewToStrokePoint(QPointF(e->pos()));
     double minDistance;
     int controlPointIndex = getClosestPointIndex(posF, minDistance);
 
     // Se la distanza e' piccola seleziono il control point corrente
-    if (minDistance < 20)
+    if (minDistance < 20) {
       m_currentControlPointIndex = controlPointIndex;
-    else {
+      m_preMousePos              = posF;
+    } else {
       m_currentControlPointIndex = -1;
       // Se sono sufficentemente lontano da un punto di controllo, ma abbastanza
       // vicino alla curva
@@ -663,6 +738,11 @@ void ChennelCurveEditor::mousePressEvent(QMouseEvent *e) {
       double percent = getPercentAtPoint(posF, getPainterPath());
       if (percent != 0 && minDistance > 20) addControlPoint(percent);
     }
+    QPointF currentPointPos = (m_currentControlPointIndex == -1)
+                                  ? posF
+                                  : m_points.at(m_currentControlPointIndex);
+
+    emit updateCurrentPosition(m_currentControlPointIndex, currentPointPos);
     update();
   }
 }
@@ -670,7 +750,7 @@ void ChennelCurveEditor::mousePressEvent(QMouseEvent *e) {
 //-----------------------------------------------------------------------------
 
 void ChennelCurveEditor::mouseReleaseEvent(QMouseEvent *e) {
-  /*-- マウスドラッグ中はプレビューを更新しない。ここで初めて更新 --*/
+  // fx preview updates here ( it does not update while mouse dragging )
   if (m_mouseButton == Qt::LeftButton && m_currentControlPointIndex != -1 &&
       e->button() == Qt::LeftButton)
     emit controlPointChanged(false);
@@ -680,16 +760,32 @@ void ChennelCurveEditor::mouseReleaseEvent(QMouseEvent *e) {
 //-----------------------------------------------------------------------------
 
 void ChennelCurveEditor::keyPressEvent(QKeyEvent *e) {
-  if (e->key() == Qt::Key_Delete) removeCurrentControlPoint();
+  if (m_currentControlPointIndex == -1) return;
+
+  if (e->key() == Qt::Key_Delete) {
+    removeCurrentControlPoint();
+    return;
+  }
+
+  bool controlPressed = e->modifiers() & Qt::ControlModifier;
+  bool shiftPressed   = e->modifiers() & Qt::ShiftModifier;
+  float delta         = (shiftPressed) ? 10.0 : 1.0;
+
+  if (e->key() == Qt::Key_Right) {
+    if (controlPressed)
+      selectNextControlPoint();
+    else
+      moveCurrentControlPoint(QPointF(delta, 0.0));
+  } else if (e->key() == Qt::Key_Left) {
+    if (controlPressed)
+      selectPreviousControlPoint();
+    else
+      moveCurrentControlPoint(QPointF(-delta, 0.0));
+  } else if (e->key() == Qt::Key_Up)
+    moveCurrentControlPoint(QPointF(0.0, delta));
+  else if (e->key() == Qt::Key_Down)
+    moveCurrentControlPoint(QPointF(0.0, -delta));
 }
-
-//-----------------------------------------------------------------------------
-
-void ChennelCurveEditor::enterEvent(QEvent *) { m_mouseButton = Qt::NoButton; }
-
-//-----------------------------------------------------------------------------
-
-void ChennelCurveEditor::leaveEvent(QEvent *) { m_mouseButton = Qt::NoButton; }
 
 //--------------------------------------------------------
 
@@ -714,7 +810,6 @@ void ChennelCurveEditor::focusInEvent(QFocusEvent *fe) {
 //--------------------------------------------------------
 
 void ChennelCurveEditor::focusOutEvent(QFocusEvent *fe) {
-  m_currentControlPointIndex = -1;
   emit focusOut();
   QWidget::focusOutEvent(fe);
   qApp->removeEventFilter(this);
@@ -727,14 +822,9 @@ void ChennelCurveEditor::focusOutEvent(QFocusEvent *fe) {
 
 ToneCurveField::ToneCurveField(QWidget *parent,
                                FxHistogramRender *fxHistogramRender)
-    : QWidget(parent), m_toneCurveStackedWidget(0) {
-  setFixedWidth(368);
-
-  int currentChannelIndex = 0;
-
-  QVBoxLayout *mainLayout = new QVBoxLayout(this);
-  mainLayout->setMargin(0);
-  mainLayout->setSpacing(0);
+    : QWidget(parent), m_toneCurveStackedWidget(0), m_currentPointIndex(-1) {
+  setFixedWidth(400);
+  // setFixedWidth(368);
 
   QStringList channels;
   channels << "RGBA"
@@ -743,22 +833,17 @@ ToneCurveField::ToneCurveField(QWidget *parent,
            << "Green"
            << "Blue"
            << "Alpha";
-  int channelCount = channels.size();
+  int channelCount        = channels.size();
+  int currentChannelIndex = 0;
 
-  // lista canali: label+comboBox
-  QWidget *channelListWidget     = new QWidget(this);
-  QHBoxLayout *channelListLayout = new QHBoxLayout(channelListWidget);
-  channelListLayout->setMargin(0);
-  channelListLayout->setSpacing(0);
-  QLabel *channelLabel = new QLabel(tr("Channel:"), channelListWidget);
-  channelListLayout->addWidget(channelLabel);
-  m_channelListChooser = new QComboBox(channelListWidget);
+  m_channelListChooser = new QComboBox(this);
   m_channelListChooser->setFixedSize(100, 20);
   m_channelListChooser->addItems(channels);
   m_channelListChooser->setCurrentIndex(currentChannelIndex);
-  channelListLayout->addWidget(m_channelListChooser);
-  channelListWidget->setLayout(channelListLayout);
-  mainLayout->addWidget(channelListWidget, 0, Qt::AlignCenter);
+
+  m_rangeMode = new QComboBox(this);
+  m_rangeMode->addItems({"0-255", "0.0-1.0"});
+  m_rangeMode->setCurrentIndex(0);
 
   // stack widget dei grafi
   m_toneCurveStackedWidget = new QStackedWidget(this);
@@ -769,49 +854,106 @@ ToneCurveField::ToneCurveField(QWidget *parent,
     ChennelCurveEditor *c =
         new ChennelCurveEditor(this, histograms->getHistogramView(i));
     m_toneCurveStackedWidget->addWidget(c);
-    connect(c, SIGNAL(firstLastXPostionChanged(int, int)), this,
-            SLOT(onFirstLastXPostionChanged(int, int)));
+    connect(c, SIGNAL(firstLastXPostionChanged(double, double)), this,
+            SLOT(onFirstLastXPostionChanged(double, double)));
+    connect(c, SIGNAL(updateCurrentPosition(int, QPointF)), this,
+            SLOT(onUpdateCurrentPosition(int, QPointF)));
   }
-
-  QWidget *w          = new QWidget(this);
-  QHBoxLayout *layout = new QHBoxLayout(w);
-  layout->setMargin(0);
-  layout->setSpacing(0);
-  layout->addWidget(m_toneCurveStackedWidget);
-  w->setLayout(layout);
-  mainLayout->addWidget(w, 0, Qt::AlignHCenter);
   m_toneCurveStackedWidget->setCurrentIndex(currentChannelIndex);
 
   // stack widget degli slider
   m_sliderStackedWidget = new QStackedWidget(this);
   for (i = 0; i < channelCount; i++) {
-    IntPairField *intPairSlider = new IntPairField(this);
-    intPairSlider->setFixedHeight(20);
-    intPairSlider->setLabelsEnabled(false);
-    intPairSlider->setRange(0, 255);
-    intPairSlider->setValues(std::make_pair(0, 255));
-    m_sliderStackedWidget->addWidget(intPairSlider);
-    connect(intPairSlider, SIGNAL(valuesChanged(bool)), this,
+    DoublePairField *doublePairSlider = new DoublePairField(this);
+    doublePairSlider->setFixedHeight(20);
+    doublePairSlider->setLabelsEnabled(false);
+    doublePairSlider->setRange(0.0, 255.0);
+    doublePairSlider->setValues(std::make_pair(0.0, 255.0));
+    m_sliderStackedWidget->addWidget(doublePairSlider);
+    connect(doublePairSlider, SIGNAL(valuesChanged(bool)), this,
             SLOT(sliderValueChanged(bool)));
   }
-  mainLayout->addWidget(m_sliderStackedWidget);
   m_sliderStackedWidget->setCurrentIndex(currentChannelIndex);
 
-  mainLayout->addSpacing(10);
-  m_isLinearCheckBox = new CheckBox(QString("Linear"), this);
-  mainLayout->addWidget(m_isLinearCheckBox, 0, Qt::AlignHCenter);
+  m_isLinearCheckBox   = new CheckBox(QString("Linear"), this);
+  m_isEnlargedCheckBox = new CheckBox(QString("Enlarge"), this);
+  m_isEnlargedCheckBox->setChecked(false);
+  m_currentInput  = new DoubleLineEdit(this);
+  m_currentOutput = new DoubleLineEdit(this);
+  m_currentInput->setFixedWidth(60);
+  m_currentOutput->setFixedWidth(60);
+  m_currentInput->setDecimals(2);
+  m_currentOutput->setDecimals(2);
+  m_currentInput->setDisabled(true);
+  m_currentOutput->setDisabled(true);
+
+  //------ layout
+
+  QVBoxLayout *mainLayout = new QVBoxLayout(this);
+  mainLayout->setMargin(0);
+  mainLayout->setSpacing(0);
+  {
+    QHBoxLayout *channelListLayout = new QHBoxLayout();
+    channelListLayout->setMargin(0);
+    channelListLayout->setSpacing(0);
+    channelListLayout->setAlignment(Qt::AlignCenter);
+    {
+      // lista canali: label+comboBox
+      channelListLayout->addWidget(new QLabel(tr("Channel:"), this));
+      channelListLayout->addWidget(m_channelListChooser);
+      channelListLayout->addSpacing(20);
+      channelListLayout->addWidget(new QLabel(tr("Range:"), this));
+      channelListLayout->addWidget(m_rangeMode);
+      channelListLayout->addSpacing(20);
+      channelListLayout->addWidget(m_isEnlargedCheckBox);
+    }
+    mainLayout->addLayout(channelListLayout, 0);
+
+    QGridLayout *bottomLayout = new QGridLayout();
+    bottomLayout->setMargin(0);
+    bottomLayout->setHorizontalSpacing(5);
+    bottomLayout->setVerticalSpacing(0);
+    {
+      QVBoxLayout *currentValLayout = new QVBoxLayout();
+      currentValLayout->setMargin(0);
+      currentValLayout->setSpacing(0);
+      currentValLayout->setAlignment(Qt::AlignLeft);
+      {
+        currentValLayout->addStretch(1);
+        currentValLayout->addWidget(new QLabel(tr("Output:"), this));
+        currentValLayout->addWidget(m_currentOutput);
+        currentValLayout->addSpacing(10);
+        currentValLayout->addWidget(new QLabel(tr("Input:"), this));
+        currentValLayout->addWidget(m_currentInput);
+        currentValLayout->addSpacing(10);
+      }
+      bottomLayout->addLayout(currentValLayout, 0, 0);
+
+      bottomLayout->addWidget(m_toneCurveStackedWidget, 0, 1, Qt::AlignHCenter);
+      bottomLayout->addWidget(m_sliderStackedWidget, 1, 1);
+    }
+    bottomLayout->setColumnStretch(1, 1);
+    bottomLayout->setRowStretch(0, 1);
+
+    mainLayout->addLayout(bottomLayout);
+    mainLayout->addSpacing(10);
+    mainLayout->addWidget(m_isLinearCheckBox, 0, Qt::AlignHCenter);
+  }
+  setLayout(mainLayout);
+
   connect(m_isLinearCheckBox, SIGNAL(clicked(bool)),
           SLOT(setLinearManually(bool)));
   connect(m_isLinearCheckBox, SIGNAL(toggled(bool)), SLOT(setLinear(bool)));
+  connect(m_isEnlargedCheckBox, SIGNAL(toggled(bool)), SLOT(setEnlarged(bool)));
 
-  connect(m_channelListChooser, SIGNAL(currentIndexChanged(int)),
-          m_toneCurveStackedWidget, SLOT(setCurrentIndex(int)));
-  connect(m_channelListChooser, SIGNAL(currentIndexChanged(int)),
-          m_sliderStackedWidget, SLOT(setCurrentIndex(int)));
   connect(m_channelListChooser, SIGNAL(currentIndexChanged(int)), this,
-          SIGNAL(currentChannelIndexChanged(int)));
-
-  setLayout(mainLayout);
+          SLOT(onCurrentChannelSwitched(int)));
+  connect(m_rangeMode, SIGNAL(currentIndexChanged(int)), this,
+          SLOT(onRangeModeSwitched(int)));
+  connect(m_currentInput, SIGNAL(editingFinished()), this,
+          SLOT(onCurrentPointEditted()));
+  connect(m_currentOutput, SIGNAL(editingFinished()), this,
+          SLOT(onCurrentPointEditted()));
 }
 
 //-----------------------------------------------------------------------------
@@ -837,23 +979,152 @@ ChennelCurveEditor *ToneCurveField::getCurrentChannelEditor() const {
 
 //-----------------------------------------------------------------------------
 
-IntPairField *ToneCurveField::getCurrentSlider() const {
-  return dynamic_cast<IntPairField *>(m_sliderStackedWidget->currentWidget());
+DoublePairField *ToneCurveField::getCurrentSlider() const {
+  return dynamic_cast<DoublePairField *>(
+      m_sliderStackedWidget->currentWidget());
 }
 
 //-----------------------------------------------------------------------------
 
 void ToneCurveField::sliderValueChanged(bool isDragging) {
-  std::pair<int, int> values = getCurrentSlider()->getValues();
+  std::pair<double, double> values = getCurrentSlider()->getValues();
+
+  if (m_rangeMode->currentIndex() == 1) {
+    values.first *= 255.0;
+    values.second *= 255.0;
+  }
+
   getCurrentChannelEditor()->setFirstLastXPosition(values, isDragging);
 }
 
 //-----------------------------------------------------------------------------
 
-void ToneCurveField::onFirstLastXPostionChanged(int x0, int x1) {
-  std::pair<int, int> values = getCurrentSlider()->getValues();
+void ToneCurveField::onFirstLastXPostionChanged(double x0, double x1) {
+  if (m_rangeMode->currentIndex() == 1) {
+    x0 /= 255.0;
+    x1 /= 255.0;
+  }
+  std::pair<double, double> values = getCurrentSlider()->getValues();
   if (values.first != x0 || values.second != x1)
     getCurrentSlider()->setValues(std::make_pair(x0, x1));
+}
+
+//-----------------------------------------------------------------------------
+// index = -1 when no point is selected
+void ToneCurveField::onUpdateCurrentPosition(int index, QPointF pos) {
+  auto modify = [&](double val) {
+    return (m_rangeMode->currentIndex() == 0) ? val : val / 255.0;
+  };
+
+  QList<TPointD> points = getCurrentChannelEditor()->getPoints();
+  assert(index == -1 || (index >= 3 && index < points.size() - 3));
+  if (index != -1 && (index < 3 || index >= points.size() - 3)) return;
+
+  double maxChanVal = 255.0;
+
+  // if no point is selected
+  if (index == -1) {
+    if (m_currentPointIndex != index) {
+      m_currentInput->setDisabled(true);
+      m_currentOutput->setDisabled(true);
+      m_currentInput->setRange(-(std::numeric_limits<double>::max)(),
+                               (std::numeric_limits<double>::max)());
+      m_currentOutput->setRange(-(std::numeric_limits<double>::max)(),
+                                (std::numeric_limits<double>::max)());
+      m_currentPointIndex = index;
+    }
+    if (pos.x() < 0.0 || pos.x() > maxChanVal || pos.y() < 0.0 ||
+        pos.y() > maxChanVal) {
+      m_currentInput->setText("");
+      m_currentOutput->setText("");
+    } else {
+      m_currentInput->setValue(modify(pos.x()));
+      m_currentOutput->setValue(modify(pos.y()));
+    }
+  } else {  // if any point is selected
+    if (m_currentPointIndex != index) {
+      m_currentInput->setEnabled(true);
+      m_currentOutput->setEnabled(true);
+      if (index % 3 == 0) {  // control point case
+        // 前後のポイントと4離す
+        double xmin = (index == 3) ? 0 : points.at(index - 3).x + cpMargin;
+        double xmax = (index == points.size() - 4)
+                          ? maxChanVal
+                          : points.at(index + 3).x - cpMargin;
+        m_currentInput->setRange(modify(xmin), modify(xmax));
+        m_currentOutput->setRange(0.0, modify(maxChanVal));
+      } else if (index % 3 == 2) {  // left handle
+        TPointD cp = points.at(index + 1);
+        m_currentInput->setRange(-(std::numeric_limits<double>::max)(),
+                                 modify(cp.x));
+        m_currentOutput->setRange(-(std::numeric_limits<double>::max)(),
+                                  (std::numeric_limits<double>::max)());
+      } else {  // right handle
+        TPointD cp = points.at(index - 1);
+        m_currentInput->setRange(modify(cp.x),
+                                 (std::numeric_limits<double>::max)());
+        m_currentOutput->setRange(-(std::numeric_limits<double>::max)(),
+                                  (std::numeric_limits<double>::max)());
+      }
+      m_currentPointIndex = index;
+    }
+    m_currentInput->setValue(modify(pos.x()));
+    m_currentOutput->setValue(modify(pos.y()));
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+void ToneCurveField::onCurrentPointEditted() {
+  TPointD oldPos =
+      getCurrentChannelEditor()->getPoints().at(m_currentPointIndex);
+  double factor = (m_rangeMode->currentIndex() == 0) ? 1.0 : 255.0;
+  QPointF newPos(m_currentInput->getValue() * factor,
+                 m_currentOutput->getValue() * factor);
+  getCurrentChannelEditor()->moveCurrentControlPoint(
+      newPos - QPointF(oldPos.x, oldPos.y));
+}
+
+//-----------------------------------------------------------------------------
+
+void ToneCurveField::onCurrentChannelSwitched(int channelIndex) {
+  getCurrentChannelEditor()->setCurrentControlPointIndex(-1);
+  m_toneCurveStackedWidget->setCurrentIndex(channelIndex);
+  m_sliderStackedWidget->setCurrentIndex(channelIndex);
+  emit currentChannelIndexChanged(channelIndex);
+  onUpdateCurrentPosition(-1, QPointF(-1, -1));
+}
+
+//-----------------------------------------------------------------------------
+
+void ToneCurveField::onRangeModeSwitched(int index) {
+  double maxVal = (index == 0) ? 255.0 : 1.0;
+  double factor = (index == 0) ? 255.0 : 1.0 / 255.0;
+  ChannelBar::Range range =
+      (index == 0) ? ChannelBar::Range_0_255 : ChannelBar::Range_0_1;
+
+  for (int i = 0; i < m_toneCurveStackedWidget->count(); i++) {
+    ChennelCurveEditor *c =
+        dynamic_cast<ChennelCurveEditor *>(m_toneCurveStackedWidget->widget(i));
+    if (c) c->setLabelRange(range);
+
+    DoublePairField *doublePairSlider =
+        dynamic_cast<DoublePairField *>(m_sliderStackedWidget->widget(i));
+    if (doublePairSlider) {
+      doublePairSlider->setRange(0.0, maxVal);
+      std::pair<double, double> val = doublePairSlider->getValues();
+      doublePairSlider->setValues(
+          std::make_pair(val.first * factor, val.second * factor));
+    }
+  }
+
+  if (m_currentPointIndex == -1) return;
+
+  int pointIndex = m_currentPointIndex;
+  // in order to force updating the value range
+  m_currentPointIndex = -1;
+  TPointD point       = getCurrentChannelEditor()->getPoints().at(pointIndex);
+  onUpdateCurrentPosition(pointIndex, QPointF(point.x, point.y));
 }
 
 //-----------------------------------------------------------------------------
@@ -873,6 +1144,20 @@ void ToneCurveField::setLinear(bool isLinear) {
 
 //-----------------------------------------------------------------------------
 
+void ToneCurveField::setEnlarged(bool isEnlarged) {
+  int i;
+  for (i = 0; i < m_sliderStackedWidget->count(); i++)
+    getChannelEditor(i)->setEnlarged(isEnlarged);
+  setFixedWidth((isEnlarged) ? 400 + 256 : 400);
+  emit sizeChanged();
+}
+
+//-----------------------------------------------------------------------------
+
 void ToneCurveField::setLinearManually(bool isLinear) {
   emit isLinearChanged(isLinear);
 }
+
+//-----------------------------------------------------------------------------
+
+bool ToneCurveField::isEnlarged() { return m_isEnlargedCheckBox->isChecked(); }

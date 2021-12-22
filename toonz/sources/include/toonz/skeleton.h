@@ -61,7 +61,7 @@ public:
     TPointD m_center;  // position of the rotation center of the stageobject,
                        // i.e. the "joint"
     bool m_selected;   // true if the bone belongs to the active chain (i.e.
-                       // handle <-> pinned ponts)
+                       // handle <-> pinned points)
     PinnedStatus m_pinnedStatus;
 
   };  // class Bone
@@ -75,7 +75,7 @@ public:
   ~Skeleton();
 
   //! create a skeleton containing 'col'.
-  //! tempPinnedColumns contains the column indices of the temporarly pinned
+  //! tempPinnedColumns contains the column indices of the temporarily pinned
   //! bones
   void build(TXsheet *xsh, int row, int col,
              const std::set<int> &tempPinnedColumns = std::set<int>());

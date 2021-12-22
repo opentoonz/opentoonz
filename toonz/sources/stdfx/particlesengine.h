@@ -33,14 +33,16 @@ public:
   void normalize_values(struct particles_values &values,
                         const TRenderSettings &ri);
 
-  void render_particles(
-      TFlash *flash, TTile *tile, std::vector<TRasterFxPort *> part_ports,
-      const TRenderSettings &ri, TDimension &p_size, TPointD &p_offset,
-      std::map<int, TRasterFxPort *> ctrl_ports, std::vector<TLevelP> partLevel,
-      float dpi, int curr_frame, int shrink, double startx, double starty,
-      double endx, double endy, std::vector<int> lastframe, unsigned long fxId);
+  void render_particles(TTile *tile, std::vector<TRasterFxPort *> part_ports,
+                        const TRenderSettings &ri, TDimension &p_size,
+                        TPointD &p_offset,
+                        std::map<int, TRasterFxPort *> ctrl_ports,
+                        std::vector<TLevelP> partLevel, float dpi,
+                        int curr_frame, int shrink, double startx,
+                        double starty, double endx, double endy,
+                        std::vector<int> lastframe, unsigned long fxId);
 
-  void do_render(TFlash *flash, Particle *part, TTile *tile,
+  void do_render(Particle *part, TTile *tile,
                  std::vector<TRasterFxPort *> part_ports,
                  std::map<int, TTile *> porttiles, const TRenderSettings &ri,
                  TDimension &p_size, TPointD &p_offset, int lastframe,
@@ -50,6 +52,8 @@ public:
                  std::map<std::pair<int, int>, double> &partScales);
 
   bool port_is_used(int i, struct particles_values &values);
+  bool port_is_used_for_value(int i, struct particles_values &values);
+  bool port_is_used_for_gradient(int i, struct particles_values &values);
 
   /*-
      do_source_gradationがONのとき、入力画像のアルファ値に比例して発生濃度を変える。
@@ -79,7 +83,7 @@ public:
   void normalize_array(std::vector<std::vector<TPointD>> &myregions,
                        TPointD pos, int lx, int ly, int regioncounter,
                        std::vector<int> &myarray, std::vector<int> &lista,
-                       std::vector<int> &listb, std::vector<int> & final);
+                       std::vector<int> &listb, std::vector<int> &final);
 
   void fill_array(TTile *ctrl1, int &regioncount, std::vector<int> &myarray,
                   std::vector<int> &lista, std::vector<int> &listb, int thres);

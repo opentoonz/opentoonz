@@ -360,7 +360,7 @@ ExportLevelPopup::ExportLevelPopup()
   bool ret = true;
   ret      = connect(tabBar, SIGNAL(currentChanged(int)), stackedWidget,
                 SLOT(setCurrentIndex(int)));
-  ret = connect(m_format, SIGNAL(currentIndexChanged(const QString &)),
+  ret      = connect(m_format, SIGNAL(currentIndexChanged(const QString &)),
                 SLOT(onformatChanged(const QString &))) &&
         ret;
   ret = connect(m_retas, SIGNAL(stateChanged(int)), SLOT(onRetas(int))) && ret;
@@ -501,8 +501,8 @@ void ExportLevelPopup::checkAlpha() {
   for (int i = 0; i < props->getPropertyCount(); ++i) {
     TProperty *p = props->getProperty(i);
 
-    const QString &name = p->getQStringName();
-    const QString &val  = QString::fromStdString(p->getValueAsString());
+    const std::string &name = p->getName();
+    const QString &val      = QString::fromStdString(p->getValueAsString());
 
     if (name == "Bits Per Pixel") {
       withAlpha = (val.contains("32") || val.contains("64"));
@@ -657,6 +657,9 @@ bool ExportLevelPopup::execute() {
              "characters:(new line)  \\ / : * ? \"  |"));
       return false;
     }
+
+    if (isReservedFileName_message(QString::fromStdString(fp.getName())))
+      return false;
 
     return IoCmd::exportLevel(fp.withType(ext).withFrame(), 0, opts);
   }

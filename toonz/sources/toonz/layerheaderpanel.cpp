@@ -27,9 +27,7 @@ LayerHeaderPanel::LayerHeaderPanel(XsheetViewer *viewer, QWidget *parent,
   QRect rect           = o->rect(PredefinedRect::LAYER_HEADER_PANEL);
 
   setObjectName("layerHeaderPanel");
-
   setFixedSize(rect.size());
-
   setMouseTracking(true);
 }
 
@@ -62,11 +60,6 @@ void LayerHeaderPanel::paintEvent(QPaintEvent *event) {
 
   const Orientation *o = Orientations::leftToRight();
 
-  QColor background      = m_viewer->getBGColor();
-  QColor slightlyLighter = {mix(background, Qt::white, 0.95)};
-  QRect rect             = QRect(QPoint(0, 0), size());
-  p.fillRect(rect.adjusted(0, 0, -3, 0), slightlyLighter);
-
   QImage preview = (m_buttonHighlighted == PreviewButton
                         ? m_viewer->getLayerHeaderPreviewOverImage()
                         : m_viewer->getLayerHeaderPreviewImage());
@@ -77,25 +70,9 @@ void LayerHeaderPanel::paintEvent(QPaintEvent *event) {
                      ? m_viewer->getLayerHeaderLockOverImage()
                      : m_viewer->getLayerHeaderLockImage());
 
-  drawIcon(p, PredefinedRect::EYE, boost::none, preview);
-  drawIcon(p, PredefinedRect::PREVIEW_LAYER, boost::none, camstand);
-  drawIcon(p, PredefinedRect::LOCK, boost::none, lock);
-
-  QRect numberRect = o->rect(PredefinedRect::LAYER_NUMBER);
-
-  int leftadj = 2;
-  if (Preferences::instance()->isShowColumnNumbersEnabled()) {
-    p.drawText(numberRect, Qt::AlignCenter | Qt::TextSingleLine, "#");
-
-    leftadj += 20;
-  }
-
-  QRect nameRect =
-      o->rect(PredefinedRect::LAYER_NAME).adjusted(leftadj, 0, -1, 0);
-  p.drawText(nameRect, Qt::AlignLeft | Qt::AlignVCenter | Qt::TextSingleLine,
-             QObject::tr("Layer name"));
-
-  drawLines(p, numberRect, nameRect);
+  drawIcon(p, PredefinedRect::PANEL_EYE, boost::none, preview);
+  drawIcon(p, PredefinedRect::PANEL_PREVIEW_LAYER, boost::none, camstand);
+  drawIcon(p, PredefinedRect::PANEL_LOCK, boost::none, lock);
 }
 
 void LayerHeaderPanel::drawIcon(QPainter &p, PredefinedRect rect,
@@ -179,7 +156,7 @@ void LayerHeaderPanel::mouseMoveEvent(QMouseEvent *event) {
 
   // preview button
   if (o->rect(PredefinedRect::EYE_AREA).contains(pos)) {
-    m_tooltip           = tr("Preview Visbility Toggle All");
+    m_tooltip           = tr("Preview Visibility Toggle All");
     m_buttonHighlighted = PreviewButton;
   }
   // camstand button
@@ -221,8 +198,10 @@ void LayerHeaderPanel::mouseReleaseEvent(QMouseEvent *event) {
   bool sound_changed = false;
 
   if (m_doOnRelease != 0 && totcols > 0) {
-    for (col = 0; col < totcols; col++) {
-      if (!xsh->isColumnEmpty(col)) {
+    int startCol =
+        Preferences::instance()->isXsheetCameraColumnVisible() ? -1 : 0;
+    for (col = startCol; col < totcols; col++) {
+      if (startCol < 0 || !xsh->isColumnEmpty(col)) {
         TXshColumn *column = xsh->getColumn(col);
 
         if (m_doOnRelease == ToggleAllPreviewVisible) {

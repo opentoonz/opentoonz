@@ -53,11 +53,11 @@ MagpieFileImportPopup::MagpieFileImportPopup()
     , m_toField(0)
     , m_flipbook(0)
     , m_levelPath() {
-  setWindowTitle(tr("Import Magpie File"));
+  setWindowTitle(tr("Import Toonz Lip Sync File"));
 
   beginVLayout();
 
-  setLabelWidth(45);
+  setLabelWidth(60);
 
   addSeparator(tr("Frame Range"));
 
@@ -70,9 +70,9 @@ MagpieFileImportPopup::MagpieFileImportPopup()
   m_fromField = new DVGui::IntLineEdit(fromToWidget, 1, 1, 1);
   fromToLayout->addWidget(m_fromField, 0, Qt::AlignLeft);
   m_toField       = new DVGui::IntLineEdit(fromToWidget, 1, 1, 1);
-  QLabel *toLabel = new QLabel(tr("To:"));
+  QLabel *toLabel = new QLabel(tr("To: "));
   toLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-  toLabel->setFixedSize(20, m_toField->height());
+  toLabel->setFixedSize(20, DVGui::WidgetHeight);
   fromToLayout->addWidget(toLabel, 0, Qt::AlignRight);
   fromToLayout->addWidget(m_toField, 0, Qt::AlignLeft);
   fromToWidget->setLayout(fromToLayout);
@@ -90,13 +90,15 @@ MagpieFileImportPopup::MagpieFileImportPopup()
 
   QLabel *frameLabel = new QLabel(" Frame", this);
   frameLabel->setFixedHeight(DVGui::WidgetHeight);
+  frameLabel->setAlignment(Qt::AlignVCenter);
   addWidget(tr("Phoneme"), frameLabel);
   int i;
   for (i = 0; i < 9; i++) {
     DVGui::IntLineEdit *field = new DVGui::IntLineEdit(this, 1, 1);
-    QLabel *label             = new QLabel("", this);
+    field->setFixedSize(54, DVGui::WidgetHeight);
+    QLabel *label = new QLabel("", this);
     label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-    label->setFixedSize(getLabelWidth(), field->height());
+    label->setFixedSize(getLabelWidth(), DVGui::WidgetHeight);
     m_actFields.append(QPair<QLabel *, DVGui::IntLineEdit *>(label, field));
     addWidgets(label, field);
   }
@@ -111,21 +113,45 @@ MagpieFileImportPopup::MagpieFileImportPopup()
   QVBoxLayout *frameLayout = new QVBoxLayout(frame);
   frameLayout->setMargin(0);
   frameLayout->setSpacing(0);
-  UINT buttonMask =
-      FlipConsole::cFullConsole &
-      (~(FlipConsole::eRate | FlipConsole::eSound | FlipConsole::eSaveImg |
-         FlipConsole::eHisto | FlipConsole::eCompare | FlipConsole::eCustomize |
-         FlipConsole::eSave | FlipConsole::eBegin | FlipConsole::eEnd |
-         FlipConsole::eFirst | FlipConsole::eNext | FlipConsole::ePause |
-         FlipConsole::ePlay | FlipConsole::ePrev | FlipConsole::eRate |
-         FlipConsole::eWhiteBg | FlipConsole::eCheckBg | FlipConsole::eBlackBg |
-         FlipConsole::eNext | FlipConsole::eLast | FlipConsole::eLoop |
-         FlipConsole::eGRed | FlipConsole::eGGreen | FlipConsole::eGBlue |
-         FlipConsole::eRed | FlipConsole::eGreen | FlipConsole::eBlue |
-         FlipConsole::eMatte | FlipConsole::eDefineSubCamera |
-         FlipConsole::eDefineLoadBox | FlipConsole::eUseLoadBox |
-         FlipConsole::eFilledRaster | FlipConsole::eLocator));
-  m_flipbook = new FlipBook(this, tr("Import Magpie File"), buttonMask);
+  std::vector<int> buttonMask = {FlipConsole::eRate,
+                                 FlipConsole::eSound,
+                                 FlipConsole::eSaveImg,
+                                 FlipConsole::eHisto,
+                                 FlipConsole::eCompare,
+                                 FlipConsole::eCustomize,
+                                 FlipConsole::eSave,
+                                 FlipConsole::eBegin,
+                                 FlipConsole::eEnd,
+                                 FlipConsole::eFirst,
+                                 FlipConsole::eNext,
+                                 FlipConsole::ePause,
+                                 FlipConsole::ePlay,
+                                 FlipConsole::ePrev,
+                                 FlipConsole::eRate,
+                                 FlipConsole::eWhiteBg,
+                                 FlipConsole::eCheckBg,
+                                 FlipConsole::eBlackBg,
+                                 FlipConsole::eNext,
+                                 FlipConsole::eLast,
+                                 FlipConsole::eLoop,
+                                 FlipConsole::eGRed,
+                                 FlipConsole::eGGreen,
+                                 FlipConsole::eGBlue,
+                                 FlipConsole::eRed,
+                                 FlipConsole::eGreen,
+                                 FlipConsole::eBlue,
+                                 FlipConsole::eMatte,
+                                 FlipConsole::eDefineSubCamera,
+                                 FlipConsole::eDefineLoadBox,
+                                 FlipConsole::eUseLoadBox,
+                                 FlipConsole::eFilledRaster,
+                                 FlipConsole::eLocator,
+                                 FlipConsole::eZoomIn,
+                                 FlipConsole::eZoomOut,
+                                 FlipConsole::eFlipHorizontal,
+                                 FlipConsole::eFlipVertical,
+                                 FlipConsole::eResetView};
+  m_flipbook = new FlipBook(this, tr("Import Toonz Lip Sync File"), buttonMask);
   m_flipbook->setFixedHeight(250);
   frameLayout->addWidget(m_flipbook);
   frame->setLayout(frameLayout);
@@ -171,7 +197,7 @@ void MagpieFileImportPopup::showEvent(QShowEvent *) {
     QString act = actsIdentifier.at(i);
     field->setProperty("act", QVariant(act));
     field->show();
-    label->setText(act);
+    label->setText(act + ":");
     label->show();
   }
   QString oldLevelPath = m_levelField->getPath();

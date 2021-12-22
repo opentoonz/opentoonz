@@ -11,7 +11,7 @@ extern "C" {
 typedef struct {unsigned char b,g,r,m;}  LPIXEL;
 #elif defined(__sgi)
 typedef struct { unsigned char  m,b,g,r; } LPIXEL;
-#elif defined (LINUX)
+#elif defined(LINUX) || defined(FREEBSD)
 typedef struct { unsigned char  r,g,b,m; } LPIXEL;
 #else
 #error	Not yet implemented

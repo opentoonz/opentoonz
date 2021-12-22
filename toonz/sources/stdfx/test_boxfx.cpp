@@ -43,10 +43,11 @@ public:
     bindParam(this, "int", m_int);
     bindParam(this, "range", m_range);
     bindParam(this, "bool", m_bool);
-    TSpectrum::ColorKey colors[] = {TSpectrum::ColorKey(0, TPixel32::White),
-                                    TSpectrum::ColorKey(0.5, TPixel32::Yellow),
-                                    TSpectrum::ColorKey(1, TPixel32::Red)};
-    m_colors = TSpectrumParamP(tArrayCount(colors), colors);
+    std::vector<TSpectrum::ColorKey> colors = {
+        TSpectrum::ColorKey(0, TPixel32::White),
+        TSpectrum::ColorKey(0.5, TPixel32::Yellow),
+        TSpectrum::ColorKey(1, TPixel32::Red)};
+    m_colors = TSpectrumParamP(colors);
     bindParam(this, "spectrum", m_colors);
     bindParam(this, "string", m_string);
     addInputPort("Source", m_input);

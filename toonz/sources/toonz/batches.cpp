@@ -135,7 +135,7 @@ bool SaveTaskListPopup::execute() {
 
 //------------------------------------------------------------------------------
 QMutex TasksMutex;
-map<QString, QProcess *> RunningTasks;
+std::map<QString, QProcess *> RunningTasks;
 
 class TaskRunner final : public TThread::Runnable {
 public:
@@ -288,7 +288,7 @@ void BatchesController::setTasksTree(TaskTreeModel *tree) {
 
 //------------------------------------------------------------------------------
 
-inline bool isMovieType(string type) {
+inline bool isMovieType(std::string type) {
   return (type == "mov" || type == "avi" || type == "3gp");
 }
 
@@ -895,7 +895,7 @@ void BatchesController::doSave(const TFilePath &_fp) {
 
   TOStream os(fp);
 
-  std::map<std::string, string> attr;
+  std::map<std::string, std::string> attr;
   attr["version"] = "1.0";
 
   os.openChild("tnzbatches", attr);
@@ -1039,7 +1039,7 @@ public:
   void activateTask(const QString &id) override;
   void restartTask(const QString &id) override;
 
-  void getTasks(vector<QString> &tasks) override;
+  void getTasks(std::vector<QString> &tasks) override;
   void getTasks(const QString &parentId, std::vector<QString> &tasks) override;
   void getTasks(const QString &parentId,
                 std::vector<TaskShortInfo> &tasks) override;
@@ -1068,7 +1068,9 @@ public:
 
   void taskCompleted(const QString &taskId, int exitCode) override;
 
-  void getServers(vector<ServerIdentity> &servers) override { assert(false); }
+  void getServers(std::vector<ServerIdentity> &servers) override {
+    assert(false);
+  }
 
   ServerState queryServerState2(const QString &id) override {
     assert(false);
@@ -1126,7 +1128,7 @@ void MyLocalController::activateTask(const QString &id) { assert(false); }
 
 void MyLocalController::restartTask(const QString &id) { assert(false); }
 
-void MyLocalController::getTasks(vector<QString> &tasks) { assert(false); }
+void MyLocalController::getTasks(std::vector<QString> &tasks) { assert(false); }
 
 void MyLocalController::getTasks(const QString &parentId,
                                  std::vector<QString> &tasks) {

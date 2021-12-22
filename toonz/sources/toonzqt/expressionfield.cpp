@@ -235,7 +235,7 @@ void ExpressionField::keyPressEvent(QKeyEvent *e) {
     QTextEdit::keyPressEvent(e);
     if (m_completerPopup->isVisible()) {
       updateCompleterPopup();
-    } else if (Qt::Key_A <= e->key() && e->key() <= Qt::Key_Z ||
+    } else if ((Qt::Key_A <= e->key() && e->key() <= Qt::Key_Z) ||
                std::string("+&|!*/=?,:-").find(e->key()) != std::string::npos) {
       openCompleterPopup();
     }
@@ -351,7 +351,7 @@ bool ExpressionField::updateCompleterPopup() {
   int w = m_completerPopup->sizeHintForColumn(0) +
           m_completerPopup->verticalScrollBar()->sizeHint().width() + 5;
   int h =
-      (m_completerPopup->sizeHintForRow(0) * qMin(7, model->rowCount()) + 3) +
+      (m_completerPopup->sizeHintForRow(0) * std::min(7, model->rowCount()) + 3) +
       3;
 
   QSize size(w, h);
@@ -371,9 +371,9 @@ int ExpressionField::computeSuggestions() {
     start--;
     while (start > 0) {
       char c = text[start - 1];
-      if (isascii(c) && isalpha(c) || c == '_' ||
-          c == '.' && (start - 2 < 0 ||
-                       isascii(text[start - 2]) && isalpha(text[start - 2]))) {
+      if ((isascii(c) && isalpha(c)) || c == '_' ||
+          (c == '.' && (start - 2 < 0 ||
+                        (isascii(text[start - 2]) && isalpha(text[start - 2]))))) {
       } else
         break;
       start--;

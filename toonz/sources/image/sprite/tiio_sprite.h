@@ -21,12 +21,12 @@ class TLevelWriterSprite : public TLevelWriter {
 public:
   TLevelWriterSprite(const TFilePath &path, TPropertyGroup *winfo);
   ~TLevelWriterSprite();
-  void setFrameRate(double fps);
+  void setFrameRate(double fps) override;
 
   TImageWriterP getFrameWriter(TFrameId fid) override;
   void save(const TImageP &image, int frameIndex);
 
-  void saveSoundTrack(TSoundTrack *st);
+  void saveSoundTrack(TSoundTrack *st) override;
 
   static TLevelWriter *create(const TFilePath &path, TPropertyGroup *winfo) {
     return new TLevelWriterSprite(path, winfo);
@@ -65,6 +65,6 @@ public:
 
 //===========================================================================
 
-}  // namespace
+}  // namespace Tiio
 
 #endif

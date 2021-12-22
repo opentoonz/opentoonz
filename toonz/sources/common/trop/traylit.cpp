@@ -47,22 +47,24 @@ of the ray we're tracing
   /*-- 8bit/16bitの違いを吸収する係数 --*/
   double factor = max / 255.0;
 
-  double scale =
-      params.m_scale;  // NOTE: These variable initializations are, well,
-  double decay = log(params.m_decay / 100.0 + 1.0) +
-                 1.0;  // heuristic at least. They were probably tested
-  double intensity =
-      1e8 * log(params.m_intensity / 100.0 + 1.0) /
-      scale;  // to be good, but didn't quite make any REAL sense.
-  double smoothness = log(params.m_smoothness * 5.0 / 100.0 + 1.0);  //
+  // NOTE: These variable initializations are, well,
+  // heuristic at least. They were probably tested
+  // to be good, but didn't quite make any REAL sense.
   // They could be done MUCH better, but changing them
+  // would alter the way raylit has been applied until now.
+  // Should be changed at some point, though...
+
+  double scale      = params.m_scale;
+  double decay      = log(params.m_decay / 100.0 + 1.0) + 1.0;
+  double intensity  = 1e8 * log(params.m_intensity / 100.0 + 1.0) / scale;
+  double smoothness = log(params.m_smoothness * 5.0 / 100.0 + 1.0);
+  double radius     = params.m_radius;
+
   /*-- 1ステップ進んだ時、次のピクセルで光源が無かったときの光の弱まる割合 --*/
-  double neg_delta_p =
-      smoothness *
-      intensity;  // would alter the way raylit has been applied until now.
+  double neg_delta_p = smoothness * intensity;
   /*-- 1ステップ進んだ時、次のピクセルで光源が有ったときの光の強まる割合 --*/
   double quot_delta_p = intensity / max;  //
-  // Should be changed at some point, though...
+
   /*--
    * m_colorはRaylitFxのColor値。r_fac、g_fac、b_facは各チャンネルをPremultiplyした値
    * --*/
@@ -136,13 +138,23 @@ of the ray we're tracing
       bool insideDst = (x >= 0) && (y >= 0);
       if (insideDst) {
         // Write the corresponding destination pixel
-        if (lightness > 0.0)
-          value = (int)(factor * lightness /
-                            (rayPos.x *
-                             pow((double)(sq(rayPos.x) + sq(rayPos.y) + sq_z),
-                                 decay)) +
-                        0.5);  // * ^-d...  0.5 rounds
-        else
+        if (lightness > 0.0) {
+          if (radius == 0.0) {
+            value = (int)(factor * lightness /
+                              (rayPos.x *
+                               pow((double)(sq(rayPos.x) + sq(rayPos.y) + sq_z),
+                                   decay)) +
+                          0.5);  // * ^-d...  0.5 rounds
+          } else {
+            double ratio = std::max(0.001, 1.0 - radius / norm(rayPos));
+            value        = (int)(factor * lightness /
+                              (rayPos.x * ratio *
+                               pow((double)(sq(rayPos.x * ratio) +
+                                            sq(rayPos.y * ratio) + sq_z),
+                                   decay)) +
+                          0.5);  // * ^-d...  0.5 rounds
+          }
+        } else
           value = 0;
 
         // NOTE: pow() could be slow. If that is the case, it could be cached
@@ -188,15 +200,19 @@ void performColorRaylit(T *bufIn, T *bufOut, int dxIn, int dyIn, int dxOut,
   double lightness_r, lightness_g, lightness_b;
   double factor = max / 255.0;
 
-  double scale =
-      params.m_scale;  // NOTE: These variable initializations are, well,
-  double decay = log(params.m_decay / 100.0 + 1.0) +
-                 1.0;  // heuristic at least. They were probably tested
-  double intensity =
-      1e8 * log(params.m_intensity / 100.0 + 1.0) /
-      scale;  // to be good, but didn't quite make any REAL sense.
-  double smoothness = log(params.m_smoothness * 5.0 / 100.0 + 1.0);  //
+  // NOTE: These variable initializations are, well,
+  // heuristic at least. They were probably tested
+  // to be good, but didn't quite make any REAL sense.
   // They could be done MUCH better, but changing them
+  // would alter the way raylit has been applied until now.
+  // Should be changed at some point, though...
+
+  double scale      = params.m_scale;
+  double decay      = log(params.m_decay / 100.0 + 1.0) + 1.0;
+  double intensity  = 1e8 * log(params.m_intensity / 100.0 + 1.0) / scale;
+  double smoothness = log(params.m_smoothness * 5.0 / 100.0 + 1.0);
+  double radius     = params.m_radius;
+
   double neg_delta_p =
       smoothness *
       intensity;  // would alter the way raylit has been applied until now.
@@ -260,9 +276,18 @@ void performColorRaylit(T *bufIn, T *bufOut, int dxIn, int dyIn, int dxOut,
       bool insideDst = (x >= 0) && (y >= 0);
       if (insideDst) {
         // Write the corresponding destination pixel
-        fac =
-            factor / (rayPos.x *
-                      pow((double)(sq(rayPos.x) + sq(rayPos.y) + sq_z), decay));
+        if (radius == 0.0) {
+          fac = factor /
+                (rayPos.x *
+                 pow((double)(sq(rayPos.x) + sq(rayPos.y) + sq_z), decay));
+        } else {
+          double ratio = std::max(0.001, 1.0 - radius / norm(rayPos));
+          fac =
+              factor /
+              (rayPos.x * ratio *
+               pow((double)(sq(rayPos.x * ratio) + sq(rayPos.y * ratio) + sq_z),
+                   decay));
+        }
 
         // NOTE: pow() could be slow. If that is the case, it could be cached
         // for the whole octant along the longest ray at integer positions,
@@ -343,12 +368,12 @@ void computeOctant(const TRasterPT<T> &src, const TRasterPT<T> &dst, int octant,
     dyIn = srcWrap, dyOut = dstWrap, y0 = tfloor(pOut.y), y1 = lyOut;
   if (octant == 5 || octant == 8)
     dyIn = -srcWrap, dyOut = -dstWrap, y0 = lyOut - tfloor(pOut.y) - 1,
-    y1 = lyOut, std::swap(srcRect.y0, srcRect.y1), srcRect.y0 = lyOut - srcRect.y0,
-    srcRect.y1 = lyOut - srcRect.y1;
+    y1         = lyOut, std::swap(srcRect.y0, srcRect.y1),
+    srcRect.y0 = lyOut - srcRect.y0, srcRect.y1 = lyOut - srcRect.y1;
   if (octant == 6 || octant == 7)
     dxIn = -srcWrap, dxOut = -dstWrap, x0 = lyOut - tfloor(pOut.y) - 1,
-    x1 = lyOut, std::swap(srcRect.y0, srcRect.y1), srcRect.y0 = lyOut - srcRect.y0,
-    srcRect.y1 = lyOut - srcRect.y1;
+    x1         = lyOut, std::swap(srcRect.y0, srcRect.y1),
+    srcRect.y0 = lyOut - srcRect.y0, srcRect.y1 = lyOut - srcRect.y1;
 
   /*-- 縦向きのピザ領域を計算する場合は、90度回転してから --*/
   // Swap x and y axis where necessary

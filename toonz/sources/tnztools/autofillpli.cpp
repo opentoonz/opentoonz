@@ -156,12 +156,12 @@ void assignProbs(std::vector<MatchingProbs> &probVector,
 
   probs.m_barycenterProb = tround(1000 * (1 - (delta_pos / delta_pos_max)));
 
-  delta_area = abs(reference.m_area - work.m_area);
+  delta_area = std::abs(reference.m_area - work.m_area);
 
   probs.m_areaProb = tround(
       1000 * (1 - ((double)delta_area / (reference.m_area + work.m_area))));
 
-  delta_per             = abs(reference.m_perimeter - work.m_perimeter);
+  delta_per             = std::abs(reference.m_perimeter - work.m_perimeter);
   probs.m_perimeterProb = tround(
       1000 *
       (1 - ((double)delta_per / (reference.m_perimeter + work.m_perimeter))));
@@ -346,7 +346,7 @@ bool rect_autofill_apply(const TVectorImageP &imgToApply, const TRectD &rect,
       regionsReference[from].m_match = to;
       regionsWork[to].m_styleId      = regionsReference[from].m_styleId;
       TRegion *reg                   = regionsWork[to].m_region;
-      if (reg && (!selective || selective && reg->getStyle() == 0)) {
+      if (reg && (!selective || (selective && reg->getStyle() == 0))) {
         reg->setStyle(regionsWork[to].m_styleId);
         filledRegions = true;
       }
@@ -476,7 +476,7 @@ bool stroke_autofill_apply(const TVectorImageP &imgToApply, TStroke *stroke,
       regionsReference[from].m_match = to;
       regionsWork[to].m_styleId      = regionsReference[from].m_styleId;
       TRegion *reg                   = regionsWork[to].m_region;
-      if (reg && (!selective || selective && reg->getStyle() == 0)) {
+      if (reg && (!selective || (selective && reg->getStyle() == 0))) {
         reg->setStyle(regionsWork[to].m_styleId);
         filledRegions = true;
       }

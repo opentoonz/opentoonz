@@ -101,7 +101,6 @@ public:
                     const TRenderSettings &info) override;
   void doCompute(TTile &tile, double frame,
                  const TRenderSettings &info) override;
-  void compute(TFlash &flash, int frame) override;
 
   void saveData(TOStream &os) override;
   void loadData(TIStream &is) override;
@@ -160,7 +159,6 @@ public:
   TAffine getDpiAff(int frame);
 
   void doCompute(TTile &tile, double frame, const TRenderSettings &) override;
-  void compute(TFlash &flash, int frame) override;
 
   const TPersistDeclaration *getDeclaration() const override;
   std::string getPluginId() const override;

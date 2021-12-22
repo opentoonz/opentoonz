@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="16px" height="16px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g transform="matrix(1,0,0,1,-90,-210)">
+        <g id="reset_step">
+            <g id="bg" transform="matrix(0.110345,0,0,0.121212,73.7797,191.091)">
+                <rect x="147" y="156" width="145" height="132" style="fill:rgb(135,135,135);fill-opacity:0;"/>
+            </g>
+            <g transform="matrix(1,0,0,1,15,-40)">
+                <circle cx="83" cy="258" r="3"/>
+            </g>
+            <path d="M90.371,219.591L91.158,219.591C91.88,222.702 94.672,225.023 98,225.023C101.876,225.023 105.023,221.876 105.023,218C105.023,214.124 101.876,210.977 98,210.977C95.134,210.977 92.666,212.698 91.575,215.162L91.575,215.163C91.564,215.187 91.534,215.199 91.499,215.212C91.359,215.261 91.137,215.253 90.965,215.206C90.894,215.186 90.83,215.159 90.791,215.123C90.777,215.11 90.767,215.095 90.775,215.077C91.932,212.223 94.732,210.208 98,210.208C102.3,210.208 105.792,213.7 105.792,218C105.792,222.3 102.3,225.792 98,225.792C94.244,225.792 91.107,223.129 90.371,219.591Z"/>
+            <g transform="matrix(-0.707107,-0.707107,0.707107,-0.707107,8.82917,427.986)">
+                <path d="M92.5,207.293L95.682,210.475L89.318,210.475L92.5,207.293Z"/>
+            </g>
+        </g>
+    </g>
+</svg>

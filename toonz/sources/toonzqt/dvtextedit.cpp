@@ -38,10 +38,10 @@ qreal distanceBetweenPointandRect(const QRect &rect, const QPoint &point) {
       sqrt(pow((double)(point.x() - rect.bottomRight().x()), 2) +
            pow((double)(point.y() - rect.bottomRight().y()), 2));
 
-  qreal topMax    = qMin(topLeftDistance, topRightDistance);
-  qreal bottomMax = qMin(bottomLeftDistance, bottomRightDistance);
+  qreal topMax    = std::min(topLeftDistance, topRightDistance);
+  qreal bottomMax = std::min(bottomLeftDistance, bottomRightDistance);
 
-  return qMin(topMax, bottomMax);
+  return std::min(topMax, bottomMax);
 }
 }
 
@@ -54,7 +54,6 @@ using namespace DVGui;
 DvMiniToolBar::DvMiniToolBar(QWidget *parent)
     : QFrame(parent), m_dragPos(0, 0) {
   setObjectName("DvMiniToolBar");
-  setStyleSheet("#DvMiniToolBar {border: 1px solid black;}");
   setWindowFlags(Qt::Tool | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
 }
 
@@ -150,17 +149,16 @@ DvTextEdit::~DvTextEdit() {}
 //-----------------------------------------------------------------------------
 
 void DvTextEdit::createActions() {
-  m_boldAction = new QAction(createQIconOnOffPNG("bold"), tr("Bold"), this);
+  m_boldAction = new QAction(createQIcon("bold"), tr("Bold"), this);
   m_boldAction->setCheckable(true);
   connect(m_boldAction, SIGNAL(triggered()), this, SLOT(setTextBold()));
 
-  m_italicAction =
-      new QAction(createQIconOnOffPNG("italic"), tr("Italic"), this);
+  m_italicAction = new QAction(createQIcon("italic"), tr("Italic"), this);
   m_italicAction->setCheckable(true);
   connect(m_italicAction, SIGNAL(triggered()), this, SLOT(setTextItalic()));
 
   m_underlineAction =
-      new QAction(createQIconOnOffPNG("underline"), tr("Underline"), this);
+      new QAction(createQIcon("underline"), tr("Underline"), this);
   m_underlineAction->setCheckable(true);
   connect(m_underlineAction, SIGNAL(triggered()), this,
           SLOT(setTextUnderline()));
@@ -174,13 +172,13 @@ void DvTextEdit::createActions() {
   connect(m_alignActionGroup, SIGNAL(triggered(QAction *)), this,
           SLOT(setTextAlign(QAction *)));
 
-  m_alignLeftAction = new QAction(createQIconOnOffPNG("align_left"),
-                                  tr("Align Left"), m_alignActionGroup);
+  m_alignLeftAction = new QAction(createQIcon("align_left"), tr("Align Left"),
+                                  m_alignActionGroup);
   m_alignLeftAction->setCheckable(true);
-  m_alignCenterAction = new QAction(createQIconOnOffPNG("align_center"),
+  m_alignCenterAction = new QAction(createQIcon("align_center"),
                                     tr("Align Center"), m_alignActionGroup);
   m_alignCenterAction->setCheckable(true);
-  m_alignRightAction = new QAction(createQIconOnOffPNG("align_right"),
+  m_alignRightAction = new QAction(createQIcon("align_right"),
                                    tr("Align Right"), m_alignActionGroup);
   m_alignRightAction->setCheckable(true);
 }
@@ -191,7 +189,7 @@ void DvTextEdit::createMiniToolBar() {
   m_miniToolBar = new DvMiniToolBar();
 
   QToolBar *toolBarUp = new QToolBar(m_miniToolBar);
-  toolBarUp->setIconSize(QSize(30, 30));
+  toolBarUp->setIconSize(QSize(16, 16));
   toolBarUp->setObjectName("toolOptionBar");
   toolBarUp->setFixedHeight(30);
 
@@ -208,7 +206,7 @@ void DvTextEdit::createMiniToolBar() {
   m_sizeComboBox->setMinimumWidth(44);
 
   QFontDatabase db;
-  foreach (int size, db.standardSizes())
+  for (int size : db.standardSizes())
     m_sizeComboBox->addItem(QString::number(size));
 
   connect(m_sizeComboBox, SIGNAL(activated(const QString &)), this,

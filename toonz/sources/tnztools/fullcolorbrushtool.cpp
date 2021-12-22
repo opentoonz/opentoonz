@@ -19,6 +19,7 @@
 #include "toonz/txsheethandle.h"
 #include "toonz/txshlevelhandle.h"
 #include "toonz/tobjecthandle.h"
+#include "toonz/tframehandle.h"
 #include "toonz/ttileset.h"
 #include "toonz/ttilesaver.h"
 #include "toonz/strokegenerator.h"
@@ -54,6 +55,7 @@ TEnv::DoubleVar FullcolorModifierSize("FullcolorModifierSize", 0);
 TEnv::DoubleVar FullcolorModifierOpacity("FullcolorModifierOpacity", 100);
 TEnv::IntVar FullcolorModifierEraser("FullcolorModifierEraser", 0);
 TEnv::IntVar FullcolorModifierLockAlpha("FullcolorModifierLockAlpha", 0);
+TEnv::StringVar FullcolorBrushPreset("FullcolorBrushPreset", "<custom>");
 
 //----------------------------------------------------------------------------------
 
@@ -112,14 +114,14 @@ public:
 
 FullColorBrushTool::FullColorBrushTool(std::string name)
     : TTool(name)
-    , m_thickness("Size", 1, 100, 1, 5, false)
+    , m_thickness("Size", 1, 1000, 1, 5, false)
     , m_pressure("Pressure", true)
     , m_opacity("Opacity", 0, 100, 100, 100, true)
     , m_hardness("Hardness:", 0, 100, 100)
     , m_modifierSize("ModifierSize", -3, 3, 0, true)
     , m_modifierOpacity("ModifierOpacity", 0, 100, 100, true)
     , m_modifierEraser("ModifierEraser", false)
-    , m_modifierLockAlpha("ModifierLockAlpha", false)
+    , m_modifierLockAlpha("Lock Alpha", false)
     , m_preset("Preset:")
     , m_minCursorThick(0)
     , m_maxCursorThick(0)
@@ -132,6 +134,8 @@ FullColorBrushTool::FullColorBrushTool(std::string name)
     , m_firstTime(true) {
   bind(TTool::RasterImage | TTool::EmptyTarget);
 
+  m_thickness.setNonLinearSlider();
+
   m_prop.bind(m_thickness);
   m_prop.bind(m_hardness);
   m_prop.bind(m_opacity);
@@ -143,6 +147,9 @@ FullColorBrushTool::FullColorBrushTool(std::string name)
   m_prop.bind(m_preset);
 
   m_preset.setId("BrushPreset");
+  m_modifierEraser.setId("RasterEraser");
+  m_modifierLockAlpha.setId("LockAlpha");
+  m_pressure.setId("PressureSensitivity");
 
   m_brushTimer.start();
 }
@@ -192,16 +199,17 @@ void FullColorBrushTool::onActivate() {
 
   if (m_firstTime) {
     m_firstTime = false;
-    m_thickness.setValue(
-        TIntPairProperty::Value(FullcolorBrushMinSize, FullcolorBrushMaxSize));
-    m_pressure.setValue(FullcolorPressureSensitivity ? 1 : 0);
-    m_opacity.setValue(
-        TDoublePairProperty::Value(FullcolorMinOpacity, FullcolorMaxOpacity));
-    m_hardness.setValue(FullcolorBrushHardness);
-    m_modifierSize.setValue(FullcolorModifierSize);
-    m_modifierOpacity.setValue(FullcolorModifierOpacity);
-    m_modifierEraser.setValue(FullcolorModifierEraser ? true : false);
-    m_modifierLockAlpha.setValue(FullcolorModifierLockAlpha ? true : false);
+
+    std::wstring wpreset =
+        QString::fromStdString(FullcolorBrushPreset.getValue()).toStdWString();
+    if (wpreset != CUSTOM_WSTR) {
+      initPresets();
+      if (!m_preset.isValue(wpreset)) wpreset = CUSTOM_WSTR;
+      m_preset.setValue(wpreset);
+      FullcolorBrushPreset = m_preset.getValueAsString();
+      loadPreset();
+    } else
+      loadLastBrush();
   }
 
   setWorkAndBackupImages();
@@ -282,7 +290,13 @@ bool FullColorBrushTool::askWrite(const TRect &rect) {
 bool FullColorBrushTool::preLeftButtonDown() {
   touchImage();
 
-  if (m_isFrameCreated) setWorkAndBackupImages();
+  if (m_isFrameCreated) {
+    setWorkAndBackupImages();
+    // When the xsheet frame is selected, whole viewer will be updated from
+    // SceneViewer::onXsheetChanged() on adding a new frame.
+    // We need to take care of a case when the level frame is selected.
+    if (m_application->getCurrentFrame()->isEditingLevel()) invalidate();
+  }
 
   return true;
 }
@@ -299,7 +313,7 @@ void FullColorBrushTool::leftButtonDown(const TPointD &pos,
   if (!viewer) return;
 
   TRasterImageP ri = (TRasterImageP)getImage(true);
-  if (!ri) ri      = (TRasterImageP)touchImage();
+  if (!ri) ri = (TRasterImageP)touchImage();
 
   if (!ri) return;
 
@@ -315,7 +329,13 @@ void FullColorBrushTool::leftButtonDown(const TPointD &pos,
 
   TPointD rasCenter = ras->getCenterD();
   TPointD point(pos + rasCenter);
-  double pressure = m_enabledPressure && e.isTablet() ? e.m_pressure : 0.5;
+
+  double pressure;
+  if (getApplication()->getCurrentLevelStyle()->getTagId() ==
+      4001)  // mypaint brush case
+    pressure = m_enabledPressure && e.isTablet() ? e.m_pressure : 0.5;
+  else
+    pressure = m_enabledPressure ? e.m_pressure : 1.0;
 
   m_tileSet   = new TTileSetFullColor(ras->getSize());
   m_tileSaver = new TTileSaverFullColor(ras, m_tileSet);
@@ -350,10 +370,17 @@ void FullColorBrushTool::leftButtonDrag(const TPointD &pos,
   TRasterImageP ri        = (TRasterImageP)getImage(true);
   if (!ri) return;
 
+  if (!m_toonz_brush) return;
+
   TRasterP ras      = ri->getRaster();
   TPointD rasCenter = ras->getCenterD();
   TPointD point(pos + rasCenter);
-  double pressure = m_enabledPressure && e.isTablet() ? e.m_pressure : 0.5;
+  double pressure;
+  if (getApplication()->getCurrentLevelStyle()->getTagId() ==
+      4001)  // mypaint brush case
+    pressure = m_enabledPressure && e.isTablet() ? e.m_pressure : 0.5;
+  else
+    pressure = m_enabledPressure ? e.m_pressure : 1.0;
 
   m_strokeSegmentRect.empty();
   m_toonz_brush->strokeTo(point, pressure, restartBrushTimer());
@@ -379,10 +406,17 @@ void FullColorBrushTool::leftButtonUp(const TPointD &pos,
   TRasterImageP ri = (TRasterImageP)getImage(true);
   if (!ri) return;
 
+  if (!m_toonz_brush) return;
+
   TRasterP ras      = ri->getRaster();
   TPointD rasCenter = ras->getCenterD();
   TPointD point(pos + rasCenter);
-  double pressure = m_enabledPressure && e.isTablet() ? e.m_pressure : 0.5;
+  double pressure;
+  if (getApplication()->getCurrentLevelStyle()->getTagId() ==
+      4001)  // mypaint brush case
+    pressure = m_enabledPressure && e.isTablet() ? e.m_pressure : 0.5;
+  else
+    pressure = m_enabledPressure ? e.m_pressure : 1.0;
 
   m_strokeSegmentRect.empty();
   m_toonz_brush->strokeTo(point, pressure, restartBrushTimer());
@@ -555,12 +589,12 @@ void FullColorBrushTool::setWorkAndBackupImages() {
   TRasterP ras   = ri->getRaster();
   TDimension dim = ras->getSize();
 
-  if (!m_workRaster || m_workRaster->getLx() > dim.lx ||
-      m_workRaster->getLy() > dim.ly)
+  if (!m_workRaster || m_workRaster->getLx() != dim.lx ||
+      m_workRaster->getLy() != dim.ly)
     m_workRaster = TRaster32P(dim);
 
-  if (!m_backUpRas || m_backUpRas->getLx() > dim.lx ||
-      m_backUpRas->getLy() > dim.ly ||
+  if (!m_backUpRas || m_backUpRas->getLx() != dim.lx ||
+      m_backUpRas->getLy() != dim.ly ||
       m_backUpRas->getPixelSize() != ras->getPixelSize())
     m_backUpRas = ras->create(dim.lx, dim.ly);
 
@@ -571,6 +605,23 @@ void FullColorBrushTool::setWorkAndBackupImages() {
 //------------------------------------------------------------------
 
 bool FullColorBrushTool::onPropertyChanged(std::string propertyName) {
+  if (m_propertyUpdating) return true;
+
+  updateCurrentStyle();
+
+  if (propertyName == "Preset:") {
+    if (m_preset.getValue() != CUSTOM_WSTR)
+      loadPreset();
+    else  // Chose <custom>, go back to last saved brush settings
+      loadLastBrush();
+
+    FullcolorBrushPreset = m_preset.getValueAsString();
+    m_propertyUpdating   = true;
+    getApplication()->getCurrentTool()->notifyToolChanged();
+    m_propertyUpdating = false;
+    return true;
+  }
+
   FullcolorBrushMinSize        = m_thickness.getValue().first;
   FullcolorBrushMaxSize        = m_thickness.getValue().second;
   FullcolorPressureSensitivity = m_pressure.getValue();
@@ -582,17 +633,12 @@ bool FullColorBrushTool::onPropertyChanged(std::string propertyName) {
   FullcolorModifierEraser      = m_modifierEraser.getValue() ? 1 : 0;
   FullcolorModifierLockAlpha   = m_modifierLockAlpha.getValue() ? 1 : 0;
 
-  updateCurrentStyle();
-
-  if (propertyName == "Preset:") {
-    loadPreset();
-    getApplication()->getCurrentTool()->notifyToolChanged();
-    return true;
-  }
-
   if (m_preset.getValue() != CUSTOM_WSTR) {
     m_preset.setValue(CUSTOM_WSTR);
+    FullcolorBrushPreset = m_preset.getValueAsString();
+    m_propertyUpdating   = true;
     getApplication()->getCurrentTool()->notifyToolChanged();
+    m_propertyUpdating = false;
   }
 
   return true;
@@ -670,6 +716,7 @@ void FullColorBrushTool::addPreset(QString name) {
 
   // Set the value to the specified one
   m_preset.setValue(preset.m_name);
+  FullcolorBrushPreset = m_preset.getValueAsString();
 }
 
 //------------------------------------------------------------------
@@ -683,6 +730,22 @@ void FullColorBrushTool::removePreset() {
 
   // No parameter change, and set the preset value to custom
   m_preset.setValue(CUSTOM_WSTR);
+  FullcolorBrushPreset = m_preset.getValueAsString();
+}
+
+//------------------------------------------------------------------
+
+void FullColorBrushTool::loadLastBrush() {
+  m_thickness.setValue(
+      TIntPairProperty::Value(FullcolorBrushMinSize, FullcolorBrushMaxSize));
+  m_pressure.setValue(FullcolorPressureSensitivity ? 1 : 0);
+  m_opacity.setValue(
+      TDoublePairProperty::Value(FullcolorMinOpacity, FullcolorMaxOpacity));
+  m_hardness.setValue(FullcolorBrushHardness);
+  m_modifierSize.setValue(FullcolorModifierSize);
+  m_modifierOpacity.setValue(FullcolorModifierOpacity);
+  m_modifierEraser.setValue(FullcolorModifierEraser ? true : false);
+  m_modifierLockAlpha.setValue(FullcolorModifierLockAlpha ? true : false);
 }
 
 //------------------------------------------------------------------
@@ -713,13 +776,7 @@ void FullColorBrushTool::updateCurrentStyle() {
     m_minCursorThick = std::max(m_thickness.getValue().first, 1);
     m_maxCursorThick =
         std::max(m_thickness.getValue().second, m_minCursorThick);
-    if (!m_enabledPressure) {
-      double minRadiusLog = log(0.5 * m_minCursorThick);
-      double maxRadiusLog = log(0.5 * m_maxCursorThick);
-      double avgRadiusLog = 0.5 * (minRadiusLog + maxRadiusLog);
-      double avgRadius    = exp(avgRadiusLog);
-      m_minCursorThick = m_maxCursorThick = (int)round(2.0 * avgRadius);
-    }
+    if (!m_enabledPressure) m_minCursorThick = m_maxCursorThick;
   }
 
   // if this function is called from onEnter(), the clipping rect will not be
@@ -832,6 +889,10 @@ void FullColorBrushTool::applyClassicToonzBrushSettings(
     mypaintBrush.setMappingPoint(MYPAINT_BRUSH_SETTING_OPAQUE,
                                  MYPAINT_BRUSH_INPUT_PRESSURE, 1, 1.0,
                                  maxOpacity - minOpacity);
+  }
+
+  if (m_modifierLockAlpha.getValue()) {
+    mypaintBrush.setBaseValue(MYPAINT_BRUSH_SETTING_LOCK_ALPHA, 1.0);
   }
 }
 

@@ -10,12 +10,12 @@
 namespace ino {
 /* 一時バッファとの変換機能 */
 void ras_to_arr(const TRasterP in_ras, const int channels,
-                unsigned char *out_arr);
-void arr_to_ras(const unsigned char *in_arr, const int channels,
+                unsigned char* out_arr);
+void arr_to_ras(const unsigned char* in_arr, const int channels,
                 TRasterP out_ras, const int margin);
 void ras_to_vec(const TRasterP ras, const int channels,
-                std::vector<unsigned char> &vec);
-void vec_to_ras(std::vector<unsigned char> &vec, const int channels,
+                std::vector<unsigned char>& vec);
+void vec_to_ras(std::vector<unsigned char>& vec, const int channels,
                 TRasterP ras, const int margin = 0);
 // void Lx_to_wrap( TRasterP ras );
 
@@ -37,10 +37,71 @@ inline int pixel_bits(const TRasterP ras) {
 // inline double pixel_per_mm(void) { return 640. / 12. / 25.4; }
 inline double pixel_per_mm(void) { return 1.; }
 // inline double pixel_per_inch(void) { return 640. / 12.; }
-}
+}  // namespace ino
 
 class TBlendForeBackRasterFx : public TRasterFx {
+protected:
+  TRasterFxPort m_up;
+  TRasterFxPort m_down;
+  TDoubleParamP m_opacity;
+  TBoolParamP m_clipping_mask;
+
+  TBoolParamP m_linear;
+  TDoubleParamP m_gamma;
+
+  // If the pixel is premultiplied, divide color data by the alpha before
+  // converting from the colorspace, and then multiply by the alpha afterwards.
+  // This will correct the color of the semi-transparent pixels in most cases.
+  TBoolParamP m_premultiplied;
+
+  TBoolParamP m_alpha_rendering;  // optional
+
+  void dryComputeUpAndDown(TRectD& rect, double frame,
+                           const TRenderSettings& rs,
+                           bool upComputesWholeTile = false);
+
+  void doComputeFx(TRasterP& dn_ras_out, const TRasterP& up_ras,
+                   const TPoint& pos, const double up_opacity,
+                   const double gamma);
+
+  template <class T, class Q>
+  void nonlinearTmpl(TRasterPT<T> dn_ras_out, const TRasterPT<T>& up_ras,
+                     const double up_opacity);
+
+  template <class T, class Q>
+  void linearTmpl(TRasterPT<T> dn_ras_out, const TRasterPT<T>& up_ras,
+                  const double up_opacity, const double gamma);
+
+  // when compute in xyz color space, do not clamp channel values in the kernel
+  virtual void brendKernel(double& dnr, double& dng, double& dnb, double& dna,
+                           const double up_, double upg, double upb, double upa,
+                           const double upopacity,
+                           const bool alpha_rendering_sw = true,
+                           const bool is_xyz             = false) = 0;
+
+  void computeUpAndDown(TTile& tile, double frame, const TRenderSettings& rs,
+                        TRasterP& dn_ras, TRasterP& up_ras,
+                        bool upComputesWholeTile = false);
+
 public:
+  TBlendForeBackRasterFx(bool clipping_mask, bool has_alpha_option = false);
+
+  bool canHandle(const TRenderSettings& rs, double frame) override {
+    return true;
+  }
+  bool doGetBBox(double frame, TRectD& bBox,
+                 const TRenderSettings& rs) override;
+  int getMemoryRequirement(const TRectD& rect, double frame,
+                           const TRenderSettings& rs) override {
+    return TRasterFx::memorySize(rect, rs.m_bpp);
+  }
+  void doDryCompute(TRectD& rect, double frame,
+                    const TRenderSettings& rs) override {
+    this->dryComputeUpAndDown(rect, frame, rs, false);
+  }
+
+  void doCompute(TTile& tile, double frame, const TRenderSettings& rs) override;
+
   /* FX nodeが無効のときの、表示port番号 */
   int getPreferredInputPort() override { return 1; }
 

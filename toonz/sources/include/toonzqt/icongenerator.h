@@ -105,6 +105,8 @@ public:
   // icons from toonz levels
   QPixmap getIcon(TXshLevel *sl, const TFrameId &fid, bool filmStrip = true,
                   bool onDemand = false);
+  QPixmap getSizedIcon(TXshLevel *sl, const TFrameId &fid, std::string newId,
+                       TDimension dim = TDimension(0, 0));
   void invalidate(TXshLevel *sl, const TFrameId &fid,
                   bool onlyFilmStrip = false);
   void remove(TXshLevel *sl, const TFrameId &fid, bool onlyFilmStrip = false);
@@ -138,6 +140,10 @@ public:
                                          const TDimension &iconSize,
                                          const TFrameId &fid);
 
+  // This function is called when only colors of styles are changed in toonz
+  // raster levels. In such case it doesn't need to re-compute icons but needs
+  // to let panels to update. See TApp::onLevelColorStyleChanged() for details.
+  void notifyIconGenerated() { emit iconGenerated(); }
 signals:
 
   void iconGenerated();

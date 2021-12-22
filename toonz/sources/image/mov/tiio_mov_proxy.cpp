@@ -1,6 +1,7 @@
 
 
-#if (defined(x64) || defined(__LP64__) || defined(LINUX))
+#if defined(x64) || defined(__LP64__) || defined(LINUX) || defined(FREEBSD) || \
+    (defined(_WIN32) && defined(__GNUC__))
 
 // Toonz includes
 #include "tfilepath.h"
@@ -232,7 +233,7 @@ void TLevelWriterMov::setFrameRate(double fps) {
 //------------------------------------------------------------------
 
 TImageWriterP TLevelWriterMov::getFrameWriter(TFrameId fid) {
-  if (fid.getLetter() != 0) return TImageWriterP(0);
+  if (!fid.getLetter().isEmpty()) return TImageWriterP(0);
 
   int index = fid.getNumber() - 1;
   return new TImageWriterMovProxy(m_path, index, this);
@@ -408,7 +409,7 @@ TLevelReaderMov::~TLevelReaderMov() {
 //------------------------------------------------------------------
 
 TImageReaderP TLevelReaderMov::getFrameReader(TFrameId fid) {
-  if (fid.getLetter() != 0) return TImageReaderP(0);
+  if (!fid.getLetter().isEmpty()) return TImageReaderP(0);
 
   int index = fid.getNumber() - 1;
   return new TImageReaderMovProxy(m_path, index, this, m_info);

@@ -399,11 +399,13 @@ int intersect_triangle(int x1a, int y1a, int x2a, int y2a, int x3a, int y3a,
 
     intersect_segment(x1a, y1a, x2a, y2a, i, &xamin);
 
-    if (intersect_segment(x1a, y1a, x3a, y3a, i, &val))
-      if (xamin)
+    if (intersect_segment(x1a, y1a, x3a, y3a, i, &val)) {
+      if (xamin) {
         xamax = val;
-      else
+      } else {
         xamin = val;
+      }
+    }
 
     if (!xamax) intersect_segment(x2a, y2a, x3a, y3a, i, &xamax);
 
@@ -413,11 +415,13 @@ int intersect_triangle(int x1a, int y1a, int x2a, int y2a, int x3a, int y3a,
 
     intersect_segment(x1b, y1b, x2b, y2b, i, &xbmin);
 
-    if (intersect_segment(x1b, y1b, x3b, y3b, i, &val))
-      if (xbmin)
+    if (intersect_segment(x1b, y1b, x3b, y3b, i, &val)) {
+      if (xbmin) {
         xbmax = val;
-      else
+      } else {
         xbmin = val;
+      }
+    }
 
     if (!xbmax) intersect_segment(x2b, y2b, x3b, y3b, i, &xbmax);
 

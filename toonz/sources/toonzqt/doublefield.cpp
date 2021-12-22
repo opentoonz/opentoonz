@@ -82,7 +82,11 @@ void DoubleValueLineEdit::mouseReleaseEvent(QMouseEvent *e) {
 
 DoubleValueField::DoubleValueField(QWidget *parent,
                                    DoubleValueLineEdit *lineEdit)
-    : QWidget(parent), m_lineEdit(lineEdit), m_slider(0), m_roller(0) {
+    : QWidget(parent)
+    , m_lineEdit(lineEdit)
+    , m_slider(0)
+    , m_roller(0)
+    , m_isLinearSlider(true) {
   assert(m_lineEdit);
 
   QWidget *field = new QWidget(this);
@@ -112,11 +116,11 @@ DoubleValueField::DoubleValueField(QWidget *parent,
   bool ret = true;
   ret      = ret && connect(m_lineEdit, SIGNAL(valueChanged()),
                        SLOT(onLineEditValueChanged()));
-  ret = ret && connect(m_roller, SIGNAL(valueChanged(bool)),
+  ret      = ret && connect(m_roller, SIGNAL(valueChanged(bool)),
                        SLOT(onRollerValueChanged(bool)));
-  ret = ret && connect(m_slider, SIGNAL(valueChanged(int)),
+  ret      = ret && connect(m_slider, SIGNAL(valueChanged(int)),
                        SLOT(onSliderChanged(int)));
-  ret = ret &&
+  ret      = ret &&
         connect(m_slider, SIGNAL(sliderReleased()), SLOT(onSliderReleased()));
   ret = ret && connect(m_lineEdit, SIGNAL(editingFinished()), this,
                        SIGNAL(valueEditedByHand()));
@@ -129,6 +133,50 @@ DoubleValueField::DoubleValueField(QWidget *parent,
   layout->addWidget(m_spaceWidget, 1, Qt::AlignLeft);
 
   setRange(-100.0, 100.0);
+}
+
+//-----------------------------------------------------------------------------
+
+double DoubleValueField::pos2value(int x) const {
+  int dicimal = m_lineEdit->getDecimals();
+  if (m_isLinearSlider) return (double)x * pow(0.1, dicimal);
+
+  // nonlinear slider case
+  double rangeSize = (double)(m_slider->maximum() - m_slider->minimum());
+  double posRatio  = (double)(x - m_slider->minimum()) / rangeSize;
+  double t;
+  if (posRatio <= 0.5)
+    t = 0.04 * posRatio;
+  else if (posRatio <= 0.75)
+    t = -0.02 + 0.08 * posRatio;
+  else if (posRatio <= 0.9)
+    t = -0.26 + 0.4 * posRatio;
+  else
+    t = -8.0 + 9.0 * posRatio;
+  double sliderValue = round((double)m_slider->minimum() + rangeSize * t);
+  return sliderValue * pow(0.1, dicimal);
+}
+
+//-----------------------------------------------------------------------------
+
+int DoubleValueField::value2pos(double v) const {
+  int dicimal        = m_lineEdit->getDecimals();
+  double sliderValue = round(v * pow(10., dicimal));
+  if (m_isLinearSlider) return (int)sliderValue;
+
+  // nonlinear slider case
+  double rangeSize  = (double)(m_slider->maximum() - m_slider->minimum());
+  double valueRatio = (sliderValue - (double)m_slider->minimum()) / rangeSize;
+  double t;
+  if (valueRatio <= 0.02)
+    t = valueRatio / 0.04;
+  else if (valueRatio <= 0.04)
+    t = (valueRatio + 0.02) / 0.08;
+  else if (valueRatio <= 0.1)
+    t = (valueRatio + 0.26) / 0.4;
+  else
+    t = (valueRatio + 8.0) / 9.0;
+  return m_slider->minimum() + (int)(t * rangeSize);
 }
 
 //-----------------------------------------------------------------------------
@@ -159,11 +207,7 @@ void DoubleValueField::setValue(double value) {
   if (m_lineEdit->getValue() == value) return;
   m_lineEdit->setValue(value);
   m_roller->setValue(value);
-
-  int dicimal     = m_lineEdit->getDecimals();
-  int sliderValue = (int)round(value * pow(10., dicimal));
-
-  m_slider->setValue(sliderValue);
+  m_slider->setValue(value2pos(value));
   // forzo il repaint... non sempre si aggiorna e l'update non sembra risolvere
   // il ptroblema!!!
   m_slider->repaint();
@@ -215,9 +259,8 @@ bool DoubleValueField::isRollerEnabled() { return m_roller->isEnabled(); }
 
 //-----------------------------------------------------------------------------
 
-void DoubleValueField::onSliderChanged(int value) {
-  int dicimal = m_lineEdit->getDecimals();
-  double val  = double(value) * pow(0.1, dicimal);
+void DoubleValueField::onSliderChanged(int sliderPos) {
+  double val = pos2value(sliderPos);
 
   // Controllo necessario per evitare che il segnale di cambiamento venga emesso
   // piu' volte.
@@ -237,16 +280,15 @@ void DoubleValueField::onSliderChanged(int value) {
 //-----------------------------------------------------------------------------
 
 void DoubleValueField::onLineEditValueChanged() {
-  double value    = m_lineEdit->getValue();
-  int dicimal     = m_lineEdit->getDecimals();
-  int sliderValue = (int)round(value * pow(10., dicimal));
+  double value = m_lineEdit->getValue();
+  int dicimal  = m_lineEdit->getDecimals();
 
   // Control necessary to prevent the change signal from being emitted more than
   // once.
-  if ((m_slider->value() == sliderValue && m_slider->isVisible()) ||
+  if ((pos2value(m_slider->value()) == value && m_slider->isVisible()) ||
       (m_roller->getValue() == value && m_roller->isVisible()))
     return;
-  m_slider->setValue(sliderValue);
+  m_slider->setValue(value2pos(value));
   m_roller->setValue(value);
   emit valueChanged(false);
 }
@@ -256,17 +298,14 @@ void DoubleValueField::onLineEditValueChanged() {
 void DoubleValueField::onRollerValueChanged(bool isDragging) {
   double value = m_roller->getValue();
 
-  int dicimal        = m_lineEdit->getDecimals();
-  double sliderValue = value * pow(10., dicimal);
-
-  if (sliderValue == m_lineEdit->getValue()) {
-    assert(m_slider->value() == value || !m_slider->isVisible());
+  if (value == m_lineEdit->getValue()) {
+    assert(pos2value(m_slider->value()) == value || !m_slider->isVisible());
     // Se isDragging e' falso e' giusto che venga emessa la notifica di
     // cambiamento.
     if (!isDragging) emit valueChanged(isDragging);
     return;
   }
-  m_slider->setValue(sliderValue);
+  m_slider->setValue(value2pos(value));
   m_lineEdit->setValue(value);
 
   // Faccio in modo che il cursore sia sulla prima cifra, cosi' se la stringa
@@ -285,7 +324,7 @@ DoubleLineEdit::DoubleLineEdit(QWidget *parent, double value)
     : DoubleValueLineEdit(parent) {
   m_validator =
       new QDoubleValidator(-(std::numeric_limits<double>::max)(),
-                           (std::numeric_limits<double>::max)(), 8, this);
+                           (std::numeric_limits<double>::max)(), 5, this);
   setValidator(m_validator);
 
   setValue(value);

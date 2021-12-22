@@ -124,7 +124,7 @@ SVNLockFrameRangeDialog::SVNLockFrameRangeDialog(QWidget *parent,
 
   addButtonBarWidget(m_lockButton, m_cancelButton);
 
-  // 0. Connect for svn errors (that may occurs)
+  // 0. Connect for svn errors (that may occur)
   connect(&m_thread, SIGNAL(error(const QString &)), this,
           SLOT(onError(const QString &)));
 
@@ -184,6 +184,10 @@ void SVNLockFrameRangeDialog::onPropGetDone(const QString &xmlResponse) {
       m_textLabel->setText(temp);
     }
   }
+
+  int height =
+      180 + (m_lockInfos.isEmpty() ? 0 : ((m_lockInfos.size() - 1) * 25));
+  setMinimumSize(300, height);
 
   m_lockButton->show();
 
@@ -304,10 +308,10 @@ void SVNLockFrameRangeDialog::onLockDone() {
 
     // Step 2: propget
     QStringList args;
-    args << "propget";
-    args << "partial-lock";
+    args << "proplist";
     args << m_file;
     args << "--xml";
+    args << "-v";
 
     m_thread.disconnect(SIGNAL(done(const QString &)));
     connect(&m_thread, SIGNAL(done(const QString &)), this,
@@ -454,7 +458,7 @@ SVNLockMultiFrameRangeDialog::SVNLockMultiFrameRangeDialog(
 
   addButtonBarWidget(m_lockButton, m_cancelButton);
 
-  // 0. Connect for svn errors (that may occurs)
+  // 0. Connect for svn errors (that may occur)
   connect(&m_thread, SIGNAL(error(const QString &)), this,
           SLOT(onError(const QString &)));
 
@@ -530,6 +534,10 @@ void SVNLockMultiFrameRangeDialog::onStatusRetrieved(
     }
     m_textLabel->setText(temp);
   }
+
+  int height =
+      180 + (m_lockInfos.isEmpty() ? 0 : ((m_lockInfos.size() - 1) * 25));
+  setMinimumSize(300, height);
 
   m_lockButton->show();
 
@@ -698,7 +706,7 @@ SVNUnlockFrameRangeDialog::SVNUnlockFrameRangeDialog(QWidget *parent,
 
   addButtonBarWidget(m_unlockButton, m_cancelButton);
 
-  // 0. Connect for svn errors (that may occurs)
+  // 0. Connect for svn errors (that may occur)
   connect(&m_thread, SIGNAL(error(const QString &)), this,
           SLOT(onError(const QString &)));
 }
@@ -736,10 +744,10 @@ void SVNUnlockFrameRangeDialog::onLockDone() {
 
   // Step 3: propget
   QStringList args;
-  args << "propget";
-  args << "partial-lock";
+  args << "proplist";
   args << m_file;
   args << "--xml";
+  args << "-v";
 
   m_thread.disconnect(SIGNAL(done(const QString &)));
   connect(&m_thread, SIGNAL(done(const QString &)), this,
@@ -934,7 +942,7 @@ SVNUnlockMultiFrameRangeDialog::SVNUnlockMultiFrameRangeDialog(
 
   addButtonBarWidget(m_unlockButton, m_cancelButton);
 
-  // 0. Connect for svn errors (that may occurs)
+  // 0. Connect for svn errors (that may occur)
   connect(&m_thread, SIGNAL(error(const QString &)), this,
           SLOT(onError(const QString &)));
 
@@ -1068,16 +1076,16 @@ SVNFrameRangeLockInfoDialog::SVNFrameRangeLockInfoDialog(
 
   addButtonBarWidget(closeButton);
 
-  // 0. Connect for svn errors (that may occurs)
+  // 0. Connect for svn errors (that may occur)
   connect(&m_thread, SIGNAL(error(const QString &)), this,
           SLOT(onError(const QString &)));
 
   // 1. propget
   QStringList args;
-  args << "propget";
-  args << "partial-lock";
+  args << "proplist";
   args << m_file;
   args << "--xml";
+  args << "-v";
 
   connect(&m_thread, SIGNAL(done(const QString &)), this,
           SLOT(onPropGetDone(const QString &)));
@@ -1115,6 +1123,9 @@ void SVNFrameRangeLockInfoDialog::onPropGetDone(const QString &xmlResponse) {
                         .arg(lock.m_from)
                         .arg(lock.m_to));
       }
+      int height = 100 + ((lockInfos.size() - 1) * 25);
+      setMinimumSize(300, height);
+
       m_textLabel->setText(temp);
     }
   }
@@ -1163,7 +1174,7 @@ SVNMultiFrameRangeLockInfoDialog::SVNMultiFrameRangeLockInfoDialog(
 
   addButtonBarWidget(closeButton);
 
-  // 0. Connect for svn errors (that may occurs)
+  // 0. Connect for svn errors (that may occur)
   connect(&m_thread, SIGNAL(error(const QString &)), this,
           SLOT(onError(const QString &)));
 
@@ -1224,6 +1235,9 @@ void SVNMultiFrameRangeLockInfoDialog::onStatusRetrieved(
                       .arg(lock.m_from)
                       .arg(lock.m_to));
     }
+    int height = 100 + ((lockInfos.size() - 1) * 25);
+    setMinimumSize(300, height);
+
     m_textLabel->setText(temp);
   }
 }

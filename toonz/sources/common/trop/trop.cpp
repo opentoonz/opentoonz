@@ -137,7 +137,7 @@ pix->r= pix->r*pix->m/T::maxChannelValue;
 pix->g= pix->g*pix->m/T::maxChannelValue;
 pix->b= pix->b*pix->m/T::maxChannelValue;
 }*/
-      *pix++;
+      pix++;
     }
   }
 }
@@ -163,7 +163,7 @@ pix->r= pix->r*pix->m/T::maxChannelValue;
 pix->g= pix->g*pix->m/T::maxChannelValue;
 pix->b= pix->b*pix->m/T::maxChannelValue;
 }*/
-      *pix++;
+      pix++;
     }
   }
 }

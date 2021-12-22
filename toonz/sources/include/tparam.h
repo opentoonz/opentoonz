@@ -34,7 +34,7 @@ class DVAPI TParam : public TSmartObject, public TPersist {
 
 public:
   /*!
-          The contructor store the name of the parameter and initialize his
+          The constructor store the name of the parameter and initialize his
           interface with I/O through the class TPersist.
   */
   TParam(std::string name = "", std::string description = "",

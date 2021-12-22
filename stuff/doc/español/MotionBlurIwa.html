@@ -1,0 +1,57 @@
+<html lang="ja">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+      <title>Motion Blur (Desenfoque por movimiento) Iwa</title>
+    </head>
+<body bgcolor="#f5f5f5" text="#220011">
+<h1><img src = ".\img\fx_iwa_motionblur.png" width = 30 height = 30 >   Motion Blur (Desenfoque por movimiento) Iwa</h1>
+
+<h4>● Descripción</h4>
+Este efecto permite generar un desenfoque causado por el movimiento.<br>
+Especificando valores de Shutter Start y Shutter End se aplicará un desenfoque de acuerdo a<br>
+la trayectoria, del objeto durante ese tiempo.<br>
+Tal como sucede en el efecto Bokeh Iwa, los valores RVA son convertidos en un valor de<br>
+exposición antes de ser desenfocados, por lo tanto aunque la partes más claras se encuentren<br>
+desenfocadas, no habrá una pérdida de brillo en las mismas.
+
+<h4>● Entradas</h4>
+<UL>
+<LI><b>Source (Origen)</b> : Permite conectar la imagen a ser procesada.</LI>
+</UL>
+<h4>● Opciones</h4>
+<img src = ".\img\motionblur.png">
+<UL>
+<LI><b>Reference Object (Objeto de referencia), Index (Número)</b> : Permite especificar el objeto<br>
+del cual extraer la información de movimiento.<br>
+La opción "Own Motion" (Movimiento propio) permite seguir el movimiento de la columna<br>
+conectada a Source.</LI>
+<LI><b>Shutter Start (Apertura obturador)</b> : Permite especificar qué tanto antes del fotograma<br>
+actual deberá abrirse el obturador.<br>
+Es expresado en fotogramas. Cuanto mayor sea el valor, más se extenderá el desenfoque.</LI>
+<LI><b>Start Value (Valor apertura)</b> : Permite especificar la intensidad del desenfoque en el<br>
+momento en que se abre el obturador.</LI>
+<LI><b>Start Curve (Curva apertura)</b> : Permite especificar cómo aplicar el desenfoque, desde el<br>
+fotograma actual, hasta el momento en que se abre el obturador.<br>
+El valor predefinido es 1, con el cual el desenfoque cambiará de forma lineal.</LI>
+<LI><b>Shutter End (Cierre obturador)</b> : Permite especificar qué tanto después del fotograma<br>
+actual deberá cerrarse el obturador.<br>
+Es expresado en fotogramas. Cuanto mayor sea el valor, más se extenderá el desenfoque.</LI>
+<LI><b>End Value (Valor cierre)</b> : Permite especificar la intensidad del desenfoque en el momento<br>
+en que se cierra el obturador.</LI>
+<LI><b>End Curve (Curva cierre)</b> : Permite especificar cómo aplicar el desenfoque, desde el<br>
+fotograma actual, hasta el momento en que se cierra el obturador. El valor predefinido es 1,<br>
+con el cual el desenfoque cambiará de forma lineal.</LI>
+<LI><b>Trace Resolution (Resolución seguimiento)</b> : Permite definir qué tan detallado será el<br>
+seguimiento de la trayectoria de movimiento del objeto, mientras el obturador se encuentre<br>
+abierto.<br>
+Cuando sea 1, la trayectoria será una línea recta, aunque el objeto se encuentre moviéndose<br>
+a lo largo de una curva.</LI>
+<LI><b>Hardness (Dureza)</b> : Valor de gama de la película. Es usado para convertir los valores RVA y<br>
+la cantidad de exposición. Cuanto mayor sea el valor, más claro será el efecto.</LI>
+<LI><b>Afterimage Mode (Modo estela)</b> : Cuando se encuentre activo, en vez de un desenfoque suave,<br>
+se dibujará una estela compuesta por una serie de repeticiones de la imagen original, en la<br>
+posiciones calculadas según la trayectoria, y respetando el parámetro "Trace Resolution".</LI>
+</UL>
+</body>
+
+</html>

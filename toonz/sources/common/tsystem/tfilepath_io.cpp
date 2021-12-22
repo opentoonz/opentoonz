@@ -34,7 +34,7 @@ FILE *fopen(const TFilePath &fp, string mode) {
 Tifstream::Tifstream(const TFilePath &fp) : ifstream(m_file = fopen(fp, "rb")) {
   // manually set the fail bit here, since constructor ifstream::ifstream(FILE*)
   // does not so even if the argument is null pointer.
-  // the state will be refered in "TIStream::operator bool()" ( in tstream.cpp )
+  // the state will be referred in "TIStream::operator bool()" ( in tstream.cpp )
   if (!m_file) setstate(failbit);
 }
 
@@ -54,7 +54,7 @@ Tofstream::Tofstream(const TFilePath &fp, bool append_existing)
     : ofstream(m_file = fopen(fp, append_existing ? "ab" : "wb")) {
   // manually set the fail bit here, since constructor ofstream::ofstream(FILE*)
   // does not so even if the argument is null pointer.
-  // the state will be refered in "TOStream::operator bool()" ( in tstream.cpp )
+  // the state will be referred in "TOStream::operator bool()" ( in tstream.cpp )
   if (!m_file) setstate(failbit);
 }
 

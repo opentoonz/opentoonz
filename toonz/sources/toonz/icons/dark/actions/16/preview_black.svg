@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="16px" height="16px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g transform="matrix(1,0,0,1,-170,-110)">
+        <g id="preview_black" transform="matrix(1,0,0,1,60,20)">
+            <g id="bg" transform="matrix(0.110345,0,0,0.121212,93.7793,71.0909)">
+                <rect x="147" y="156" width="145" height="132" style="fill:rgb(135,135,135);fill-opacity:0;"/>
+            </g>
+            <g transform="matrix(0.571429,0,0,0.571429,6.57138,58)">
+                <rect x="188" y="63" width="14" height="14" style="fill:rgb(3,3,3);"/>
+            </g>
+            <g transform="matrix(1,0,0,1,108,87.979)">
+                <path d="M15,17.021L5,17.021C3.896,17.021 3,16.125 3,15.021L3,5.021C3,3.917 3.896,3.021 5,3.021L15,3.021C16.104,3.021 17,3.917 17,5.021L17,15.021C17,16.125 16.104,17.021 15,17.021ZM15,5.021L5,5.021L5,15.021L15,15.021L15,5.021Z"/>
+            </g>
+        </g>
+    </g>
+</svg>

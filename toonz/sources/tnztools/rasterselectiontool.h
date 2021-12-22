@@ -108,7 +108,7 @@ protected:
   //! It's true when use RasterFreeDeformer
   bool m_isFreeDeformer;
 
-  void applyTransform(FourPoints bbox) override;
+  void applyTransform(FourPoints bbox, bool onFastDragging = false) override;
   void applyTransform(TAffine aff, bool modifyCenter);
   void addTransformUndo() override;
 
@@ -143,6 +143,7 @@ class RasterFreeDeformTool final : public RasterDeformTool {
 public:
   RasterFreeDeformTool(RasterSelectionTool *tool);
   void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) override;
+  void leftButtonUp(const TPointD &pos, const TMouseEvent &e) override;
 };
 
 //=============================================================================
@@ -167,11 +168,13 @@ class RasterScaleTool final : public RasterDeformTool {
   Scale *m_scale;
 
 public:
-  RasterScaleTool(RasterSelectionTool *tool, int type);
+  RasterScaleTool(RasterSelectionTool *tool, ScaleType type);
   /*! Return scale value. */
-  TPointD transform(int index, TPointD newPos) override;
+  TPointD transform(int index, TPointD newPos,
+                    bool onFastDragging = false) override;
   void leftButtonDown(const TPointD &pos, const TMouseEvent &e) override;
   void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) override;
+  void leftButtonUp(const TPointD &pos, const TMouseEvent &e) override;
 };
 
 }  // namespace DragSelectionTool
@@ -241,6 +244,8 @@ public:
   }
   bool onPropertyChanged(std::string propertyName) override;
   bool getNoAntialiasingValue() { return m_noAntialiasing.getValue(); }
+
+  bool isSelectionEditable() override { return m_rasterSelection.isEditable(); }
 
 protected:
   void updateTranslation() override;

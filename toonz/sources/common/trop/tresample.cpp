@@ -18,7 +18,11 @@
 
 using namespace TConsts;
 
-#ifdef _WIN32
+#if defined(_WIN32) && defined(x64)
+#define USE_SSE2
+#endif
+
+#ifdef USE_SSE2
 #include <emmintrin.h>  // per SSE2
 #endif
 
@@ -1345,7 +1349,7 @@ void resample_main_rgbm(TRasterPT<T> rout, const TRasterPT<T> &rin,
 
 //---------------------------------------------------------------------------
 
-#ifdef _WIN32
+#ifdef USE_SSE2
 
 namespace {
 
@@ -2372,7 +2376,7 @@ void rop_resample_rgbm(TRasterPT<T> rout, const TRasterPT<T> &rin,
   // the *opposites* of fractionary parts (explained later).
   // NOTE: We'll assume we want to include in the filter mask all
   //*integer positions around a fractionary displacement of the origin*;
-  // so the approximations below are stricly necessary.
+  // so the approximations below are strictly necessary.
 
   min_pix_ref_u = intLE(min_pix_out_u_);
   min_pix_ref_v = intLE(min_pix_out_v_);
@@ -2563,7 +2567,7 @@ void rop_resample_rgbm(TRasterPT<T> rout, const TRasterPT<T> &rin,
     }
   }
 
-#ifdef _WIN32
+#ifdef USE_SSE2
   if ((TSystem::getCPUExtensions() & TSystem::CpuSupportsSse2) &&
       T::maxChannelValue == 255)
     resample_main_rgbm_SSE2<T>(rout, rin, aff_xy2uv, aff0_uv2fg, min_pix_ref_u,
@@ -3055,7 +3059,7 @@ void do_resample(TRasterCM32P rout, const TRasterCM32P &rin,
                v * wrapin;  // Take the associated input pixel pointer
       tcm[0] = in_tcm[0];
       if (u < lu - 1 && v < lv - 1) {
-        // Also take their 4 next neighours (we shall perform a kinf of bilinear
+        // Also take their 4 next neighbours (we shall perform a kinf of bilinear
         // interpolation)
         tcm[1] = in_tcm[1];
         tcm[2] = in_tcm[wrapin];
@@ -3205,7 +3209,7 @@ void do_resample(TRasterCM32P rout, const TRasterCM32P &rin,
 
 //-----------------------------------------------------------------------------
 
-#ifdef _WIN32
+#ifdef USE_SSE2
 template <class T>
 void resample_main_cm32_rgbm_SSE2(TRasterPT<T> rout, const TRasterCM32P &rin,
                                   const TAffine &aff_xy2uv,
@@ -4593,7 +4597,7 @@ void rop_resample_rgbm_2(TRasterPT<T> rout, const TRasterCM32P &rin,
     }
   }
 
-#ifdef _MSC_VER
+#if defined(USE_SSE2)
   TRaster32P rout32 = rout;
   if ((TSystem::getCPUExtensions() & TSystem::CpuSupportsSse2) && rout32)
     resample_main_cm32_rgbm_SSE2<TPixel32>(

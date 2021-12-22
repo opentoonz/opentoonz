@@ -50,6 +50,8 @@ void TDoubleKeyframe::saveData(TOStream &os) const {
   case EaseInOutPercentage:
     os.child("prev") << m_value << m_speedIn.x;
     break;
+  default:
+    break;
   }
   std::string unitName = m_unitName != "" ? m_unitName : "default";
   // Dirty resolution. Because the degree sign is converted to unexpected
@@ -78,6 +80,8 @@ void TDoubleKeyframe::saveData(TOStream &os) const {
   case File:
     os << m_frame << m_fileParams.m_path << m_fileParams.m_fieldIndex
        << unitName;
+    break;
+  default:
     break;
   }
   os.closeChild();
@@ -148,6 +152,8 @@ void TDoubleKeyframe::loadData(TIStream &is) {
   case File:
     is >> m_frame >> m_fileParams.m_path >> m_fileParams.m_fieldIndex >>
         m_unitName;
+    break;
+  default:
     break;
   }
   if (!is.matchEndTag()) throw TException(tagName + " : missing endtag");

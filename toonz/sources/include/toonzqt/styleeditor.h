@@ -152,6 +152,9 @@ class DVAPI HexagonalColorWheel final : public GLWidgetForHighDpi {
   QOpenGLFramebufferObject *m_fbo = NULL;
   LutCalibrator *m_lutCalibrator  = NULL;
 
+  bool m_firstInitialized      = true;
+  bool m_cuedCalibrationUpdate = false;
+
 private:
   void drawCurrentColorMark();
   void clickLeftWheel(const QPoint &pos);
@@ -166,6 +169,9 @@ public:
   void setBGColor(const QColor &color) { m_bgColor = color; }
   QColor getBGColor() const { return m_bgColor; }
 
+  void updateColorCalibration();
+  void cueCalibrationUpdate() { m_cuedCalibrationUpdate = true; }
+
 protected:
   void initializeGL() override;
   void resizeGL(int width, int height) override;
@@ -176,6 +182,7 @@ protected:
   void mouseMoveEvent(QMouseEvent *event) override;
   void mouseReleaseEvent(QMouseEvent *event) override;
 
+  void showEvent(QShowEvent *) override;
 signals:
   void colorChanged(const ColorModel &color, bool isDragging);
 
@@ -427,6 +434,8 @@ signals:
 protected:
   void paintEvent(QPaintEvent *) override;
   void mousePressEvent(QMouseEvent *) override;
+
+  QSize sizeHint() const override;
 };
 
 //=============================================================================
@@ -474,6 +483,8 @@ public:
   bool getIsVertical() { return m_isVertical; }
   QByteArray getSplitterState();
   void setSplitterState(QByteArray state);
+
+  void updateColorCalibration();
 
 protected:
   void resizeEvent(QResizeEvent *) override;
@@ -557,7 +568,6 @@ class SettingsPage final : public QScrollArea {
   QGridLayout *m_paramsLayout;
 
   QCheckBox *m_autoFillCheckBox;
-  QWidget *m_autopaintToggleBox;
 
   TColorStyleP m_editedStyle;  //!< A copy of the current style being edited by
                                //! the Style Editor.
@@ -615,7 +625,7 @@ class DVAPI StyleEditor final : public QWidget, public SaveLoadQSettings {
       *m_newColor;  //!< New style viewer (lower-right panel side).
   DVGui::StyleSample
       *m_oldColor;  //!< Old style viewer (lower-right panel side).
-  QPushButton *m_toggleOrientationButton;
+  QAction *m_toggleOrientationAction;
   QPushButton
       *m_autoButton;  //!< "Auto Apply" checkbox on the right panel side.
   QPushButton *m_applyButton;  //!< "Apply" button on the right panel side.
@@ -682,6 +692,8 @@ public:
   virtual void save(QSettings &settings) const override;
   virtual void load(QSettings &settings) override;
 
+  void updateColorCalibration();
+
 protected:
   /*! Return false if style is linked and style must be set to null.*/
   bool setStyle(TColorStyle *currentStyle);
@@ -717,6 +729,7 @@ protected slots:
   void onCleanupStyleChanged(bool isDragging);
   void onOldStyleClicked(const TColorStyle &);
   void updateOrientationButton();
+  void checkPaletteLock();
   // called (e.g.) by PaletteController when an other StyleEditor change the
   // toggle
   void enableColorAutoApply(bool enabled);

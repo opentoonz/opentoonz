@@ -65,7 +65,7 @@ void doPosterize(TRasterPT<PIXEL> ras, int levels) {
       pix->r = (CHANNEL_TYPE)(solarize_lut[(int)(pix->r)]);
       pix->g = (CHANNEL_TYPE)(solarize_lut[(int)(pix->g)]);
       pix->b = (CHANNEL_TYPE)(solarize_lut[(int)(pix->b)]);
-      *pix++;
+      pix++;
     }
   }
   ras->unlock();

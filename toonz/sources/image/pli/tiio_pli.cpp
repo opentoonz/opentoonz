@@ -25,11 +25,11 @@ namespace {
 
 //---------------------------------------------------------------------------
 
-class PliOuputStream final : public TOutputStreamInterface {
+class PliOutputStream final : public TOutputStreamInterface {
   std::vector<TStyleParam> *m_stream;
 
 public:
-  PliOuputStream(std::vector<TStyleParam> *stream) : m_stream(stream) {}
+  PliOutputStream(std::vector<TStyleParam> *stream) : m_stream(stream) {}
   TOutputStreamInterface &operator<<(double x) override {
     m_stream->push_back(TStyleParam(x));
     return *this;
@@ -160,7 +160,7 @@ void buildPalette(ParsedPli *pli, const TImageP img) {
   assert(vPalette->getPageCount());
 
   std::vector<TStyleParam> pageNames(vPalette->getPageCount());
-  for (i         = 0; i < pageNames.size(); i++)
+  for (i = 0; i < pageNames.size(); i++)
     pageNames[i] = TStyleParam(::to_string(vPalette->getPage(i)->getName()));
   StyleTag *pageNamesTag =
       new StyleTag(0, 0, pageNames.size(), pageNames.data());
@@ -183,7 +183,7 @@ pli->m_idWrittenColorsArray[0]=true;
 
     // TColorStyle*style = tempVecImg->getPalette()->getStyle(styleId);
     std::vector<TStyleParam> stream;
-    PliOuputStream chan(&stream);
+    PliOutputStream chan(&stream);
     style->save(chan);  // viene riempito lo stream;
 
     assert(pageIndex >= 0 && pageIndex <= 65535);
@@ -216,7 +216,7 @@ pli->m_idWrittenColorsArray[0]=true;
 
           // TColorStyle*style = tempVecImg->getPalette()->getStyle(styleId);
           std::vector<TStyleParam> stream;
-          PliOuputStream chan(&stream);
+          PliOutputStream chan(&stream);
           style->save(chan);  // viene riempito lo stream;
 
           assert(pageIndex >= 0 && pageIndex <= 65535);
@@ -400,7 +400,7 @@ TImageP TImageReaderPli::doLoad() {
       strokeData.m_options =
           ((StrokeOutlineOptionsTag *)imageTag->m_object[i])->m_options;
       break;
-    case PliTag::AUTOCLOSE_TOLERANCE_GOBJ:
+    case PliTag::AUTOCLOSE_TOLERANCE_GOBJ: {
       // aggiunge curve quadratiche con spessore costante
       AutoCloseToleranceTag *toleranceTag =
           (AutoCloseToleranceTag *)imageTag->m_object[i];
@@ -408,21 +408,24 @@ TImageP TImageReaderPli::doLoad() {
       outVectImage->setAutocloseTolerance(
           ((double)toleranceTag->m_autoCloseTolerance) / 1000);
       break;
+    }
+    default:
+      break;
     }  // switch(groupTag->m_object[j]->m_type)
   }    // for (i=0; i<imageTag->m_numObjects; i++)
 
-//} // try
+  //} // try
 
-// catch(...) // cosi' e' inutile o raccolgo qualcosa prima di rilanciare o lo
-// elimino
-//{
-//  throw;
-// }
+  // catch(...) // cosi' e' inutile o raccolgo qualcosa prima di rilanciare o lo
+  // elimino
+  //{
+  //  throw;
+  // }
 
-//  if (regionsComputed) //WARNING !!! la seedFill mette il flag a ValidRegion a
-//  TRUE
-//    outVectImage->seedFill(); //le vecchie immagini hanno il seed
-//    (version<3.1)
+  //  if (regionsComputed) //WARNING !!! la seedFill mette il flag a ValidRegion
+  //  a TRUE
+  //    outVectImage->seedFill(); //le vecchie immagini hanno il seed
+  //    (version<3.1)
 
 #ifdef _DEBUG
   outVectImage->checkIntersections();
@@ -457,6 +460,7 @@ TImageWriterPli::TImageWriterPli(const TFilePath &f, const TFrameId &frameId,
 static void putStroke(TStroke *stroke, int &currStyleId,
                       std::vector<PliObjectTag *> &tags) {
   double maxThickness = 0;
+  bool nonStdOutline  = false;
   assert(stroke);
 
   int chunkCount = stroke->getChunkCount();
@@ -477,10 +481,12 @@ static void putStroke(TStroke *stroke, int &currStyleId,
   // If the outline options are non-standard (not round), add the outline infos
   TStroke::OutlineOptions &options = stroke->outlineOptions();
   if (options.m_capStyle != TStroke::OutlineOptions::ROUND_CAP ||
-      options.m_joinStyle != TStroke::OutlineOptions::ROUND_JOIN) {
+      options.m_joinStyle != TStroke::OutlineOptions::ROUND_JOIN ||
+      options.m_miterLower != 0.0 || options.m_miterUpper != 4.0) {
     StrokeOutlineOptionsTag *outlineOptionsTag =
         new StrokeOutlineOptionsTag(options);
     tags.push_back((PliObjectTag *)outlineOptionsTag);
+    nonStdOutline = true;
   }
 
   UINT k;
@@ -501,6 +507,14 @@ static void putStroke(TStroke *stroke, int &currStyleId,
 
   tags.push_back((PliObjectTag *)quadChainTag);
   // pli->addTag(groupTag[count++]);
+
+  if (nonStdOutline) {
+    // Restore default outline settings
+    TStroke::OutlineOptions resetoptions;
+    StrokeOutlineOptionsTag *outlineOptionsTag =
+        new StrokeOutlineOptionsTag(resetoptions);
+    tags.push_back((PliObjectTag *)outlineOptionsTag);
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -550,6 +564,9 @@ solo nel costruttore)
     PliTag *tag = new PrecisionScaleTag(precisionScale);
     tags.push_back((PliObjectTag *)tag);
   }
+
+  // update the format version if multiple suffixes is supported0
+  if (!TFilePath::useStandard()) pli->setVersion(150, 0);
   // Store the auto close tolerance
   double pliTolerance = m_lwp->m_pli->getAutocloseTolerance();
   // write the tag if the frame's tolerance has been changed or
@@ -730,7 +747,7 @@ TPalette *readPalette(GroupTag *paletteTag, int majorVersion,
                  // caricarli!
 
     std::vector<TStyleParam> params(styleTag->m_numParams);
-    for (int j  = 0; j < styleTag->m_numParams; j++)
+    for (int j = 0; j < styleTag->m_numParams; j++)
       params[j] = styleTag->m_param[j];
 
     PliInputStream chan(&params, majorVersion, minorVersion);
@@ -802,7 +819,7 @@ TLevelP TLevelReaderPli::loadInfo() {
   } catch (std::exception &e) {
     TSystem::outputDebug(e.what());
 
-    throw TImageException(getFilePath(), "Unknow error on reading file");
+    throw TImageException(getFilePath(), "Unknown error on reading file");
   } catch (...) {
     throw;
   }

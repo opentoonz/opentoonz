@@ -8,6 +8,7 @@
 #include "toonz/txshcolumn.h"
 #include "toonz/tstageobjectkeyframe.h"
 #include "toonz/stageobjectutil.h"
+#include "toonz/tapplication.h"
 
 #include "tpixelutils.h"
 #include "tfx.h"
@@ -35,44 +36,50 @@ using namespace std;
 //-----------------------------------------------------------------------------
 
 KeyframeNavigator::KeyframeNavigator(QWidget *parent, TFrameHandle *frameHandle)
-    : QToolBar(parent), m_frameHandle(frameHandle) {
+    : QToolBar(parent), m_frameHandle(frameHandle), m_panel(0) {
   setLayoutDirection(Qt::LeftToRight);
-
-  setIconSize(QSize(18, 18));
-
+  setIconSize(QSize(20, 20));
   setObjectName("keyFrameNavigator");
 
-  QPixmap emptyPrevPixmap(
-      23, 23);  // set transparent icon to show button's background
-  emptyPrevPixmap.fill(Qt::transparent);
-  QIcon emptyPrevIcon(emptyPrevPixmap);
-
-  m_actPreviewKey = new QAction(emptyPrevIcon, tr("Previous Key"), this);
+  // previous key button
+  QIcon prevKeyIcon = createQIcon("prevkey");
+  m_actPreviewKey   = new QAction(prevKeyIcon, tr("Previous Key"), this);
   connect(m_actPreviewKey, SIGNAL(triggered()), SLOT(togglePrevKeyAct()));
   addAction(m_actPreviewKey);
   QWidget *prevWidget = widgetForAction(
       m_actPreviewKey);  // obtain a widget generated from QAction
   prevWidget->setObjectName("PreviousKey");
 
-  m_actKeyNo = new QAction(createQIcon("key_no"), tr("Set Key"), this);
+  // key off button
+  QIcon keyIcon = createQIcon("key_off");
+  m_actKeyNo    = new QAction(keyIcon, tr("Set Key"), this);
   connect(m_actKeyNo, SIGNAL(triggered()), SLOT(toggleKeyAct()));
   addAction(m_actKeyNo);
+  QWidget *keyNoWidget =
+      widgetForAction(m_actKeyNo);  // obtain a widget generated from QAction
+  keyNoWidget->setObjectName("KeyNo");
 
-  m_actKeyPartial =
-      new QAction(createQIcon("key_partial"), tr("Set Key"), this);
+  // key partial button
+  QIcon keyPartialIcon = createQIcon("key_partial", true);
+  m_actKeyPartial      = new QAction(keyPartialIcon, tr("Set Key"), this);
   connect(m_actKeyPartial, SIGNAL(triggered()), SLOT(toggleKeyAct()));
   addAction(m_actKeyPartial);
+  QWidget *keyPartialWidget = widgetForAction(
+      m_actKeyPartial);  // obtain a widget generated from QAction
+  keyPartialWidget->setObjectName("KeyPartial");
 
-  m_actKeyTotal = new QAction(createQIcon("key_total"), tr("Set Key"), this);
+  // key total button
+  QIcon keyTotalIcon = createQIcon("key_on", true);
+  m_actKeyTotal      = new QAction(keyTotalIcon, tr("Set Key"), this);
   connect(m_actKeyTotal, SIGNAL(triggered()), SLOT(toggleKeyAct()));
   addAction(m_actKeyTotal);
+  QWidget *keyTotalWidget =
+      widgetForAction(m_actKeyTotal);  // obtain a widget generated from QAction
+  keyTotalWidget->setObjectName("KeyTotal");
 
-  QPixmap emptyNextPixmap(
-      23, 23);  // set transparent icon to show button's background
-  emptyNextPixmap.fill(Qt::transparent);
-  QIcon emptyNextIcon(emptyNextPixmap);
-
-  m_actNextKey = new QAction(emptyNextIcon, tr("Next Key"), this);
+  // next key button
+  QIcon nextKeyIcon = createQIcon("nextkey");
+  m_actNextKey      = new QAction(nextKeyIcon, tr("Next Key"), this);
   connect(m_actNextKey, SIGNAL(triggered()), SLOT(toggleNextKeyAct()));
   addAction(m_actNextKey);
   QWidget *nextWidget =
@@ -124,6 +131,22 @@ void KeyframeNavigator::showEvent(QShowEvent *e) {
   update();
   if (!m_frameHandle) return;
   connect(m_frameHandle, SIGNAL(frameSwitched()), this, SLOT(update()));
+
+  connect(m_frameHandle, SIGNAL(triggerNextKeyframe(QWidget *)), this,
+          SLOT(onNextKeyframe(QWidget *)));
+  connect(m_frameHandle, SIGNAL(triggerPrevKeyframe(QWidget *)), this,
+          SLOT(onPrevKeyframe(QWidget *)));
+  if (!m_panel || m_panel == nullptr) {
+    QWidget *panel = this->parentWidget();
+    while (panel) {
+      if (panel->windowType() == Qt::WindowType::SubWindow ||
+          panel->windowType() == Qt::WindowType::Tool) {
+        m_panel = panel;
+        break;
+      }
+      panel = panel->parentWidget();
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -131,6 +154,22 @@ void KeyframeNavigator::showEvent(QShowEvent *e) {
 void KeyframeNavigator::hideEvent(QHideEvent *e) {
   if (!m_frameHandle) return;
   disconnect(m_frameHandle);
+
+  disconnect(m_frameHandle, SIGNAL(triggerNextKeyframe(QWidget *)), this,
+             SLOT(onNextKeyframe(QWidget *)));
+  disconnect(m_frameHandle, SIGNAL(triggerPrevKeyframe(QWidget *)), this,
+             SLOT(onPrevKeyframe(QWidget *)));
+  m_panel = nullptr;
+}
+
+void KeyframeNavigator::onNextKeyframe(QWidget *panel) {
+  if (!m_panel || m_panel != panel) return;
+  toggleNextKeyAct();
+}
+
+void KeyframeNavigator::onPrevKeyframe(QWidget *panel) {
+  if (!m_panel || m_panel != panel) return;
+  togglePrevKeyAct();
 }
 
 //=============================================================================
@@ -562,7 +601,7 @@ void FxKeyframeNavigator::toggle() {
   if (!isKeyframe) isFullKeyframe = false;
 
   // modifico lo stato: nokeyframe->full, full->no, partial->full
-  bool on = !isKeyframe || isKeyframe && !isFullKeyframe;
+  bool on = (!isKeyframe || (isKeyframe && !isFullKeyframe));
   for (i = 0; i < fx->getParams()->getParamCount();
        i++) {  // TODO. spostare questo codice in TParam
     TParamP param = fx->getParams()->getParam(i);

@@ -44,7 +44,7 @@ typedef void *TW_HANDLE;
 #define GLOBAL_LOCK(P) (P)
 #define GLOBAL_ALLOC(T, S) malloc(S)
 #define GLOBAL_FREE(P) free(P)
-#define GLOBAL_UNLOCK(P) (P)
+#define GLOBAL_UNLOCK(P)
 
 #endif
 #endif

@@ -44,6 +44,7 @@ public:
   void importScenes();
   void exportScenes();
   void selectAll();
+  void separateFilesByColors();
 };
 
 #endif  // FILESELECTION_H

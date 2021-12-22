@@ -250,6 +250,8 @@ void PeggingWidget::createButton(QPushButton **button,
     pix = m_topRightPix.transformed(QMatrix().rotate(90),
                                     Qt::SmoothTransformation);
     break;
+  default:
+    break;
   }
   (*button)->setIcon(pix);
 }

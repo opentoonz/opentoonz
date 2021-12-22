@@ -49,7 +49,7 @@ public:
   void setLevelHandle(TXshLevelHandle *levelHandle);
   TXshLevelHandle *getLevelHandle() const { return m_levelHandle; }
 
-  // Overriden from StudioPalette::Listener
+  // Overridden from StudioPalette::Listener
   void onStudioPaletteTreeChange() { refresh(); }
   void onStudioPaletteMove(const TFilePath &dstPath, const TFilePath &srcPath) {
     refresh();

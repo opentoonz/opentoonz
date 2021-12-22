@@ -32,7 +32,6 @@ class TParamUIConcept;
 
 class FxGadget : public TParamObserver {
   GLuint m_id;
-  bool m_selected;
 
   std::vector<TDoubleParamP> m_params;
   double m_pixelSize;
@@ -42,11 +41,14 @@ class FxGadget : public TParamObserver {
 
 protected:
   FxGadgetController *m_controller;
+  int m_handleCount = 1;
+  // -1 : not selected, 0~ : handle id
+  int m_selected;
 
 public:
   static GLdouble m_selectedColor[3];  // rgb
 
-  FxGadget(FxGadgetController *controller);
+  FxGadget(FxGadgetController *controller, int handleCount = 1);
   virtual ~FxGadget();
 
   void setLabel(std::string label) { m_label = label; }
@@ -64,8 +66,11 @@ public:
   void setId(GLuint id) { m_id = id; }
   GLuint getId() const { return m_id; }
 
-  void select(bool selected) { m_selected = selected; }
-  bool isSelected() const { return m_selected; }
+  int getHandleCount() { return m_handleCount; }
+
+  void select(int selected) { m_selected = selected; }
+  bool isSelected() const { return m_selected >= 0; }
+  bool isSelected(int id) const { return m_selected == id; }
 
   void setPixelSize();  // uses tglGetPixelSize2()
   void setPixelSize(double pixelSize) { m_pixelSize = pixelSize; }
@@ -80,7 +85,7 @@ public:
 
   virtual void leftButtonDown(const TPointD &pos, const TMouseEvent &) {}
   virtual void leftButtonDrag(const TPointD &pos, const TMouseEvent &) {}
-  virtual void leftButtonUp(const TPointD &pos, const TMouseEvent &) {}
+  virtual void leftButtonUp() {}
 
   void onChange(const TParamChange &) override;
   void createUndo();
@@ -101,6 +106,7 @@ public:
   virtual void leftButtonDown(const TPointD &pos, const TMouseEvent &) = 0;
   virtual void leftButtonDrag(const TPointD &pos, const TMouseEvent &) = 0;
   virtual void leftButtonUp(const TPointD &pos, const TMouseEvent &)   = 0;
+  virtual void leftButtonUp()                                          = 0;
   virtual ~DragTool() {}
 
   virtual void enableGlobalKeyframes(bool enabled) {}
@@ -108,7 +114,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-}  // EditToolGadgets namespace
+}  // namespace EditToolGadgets
 
 class FxGadgetController final : public QObject {
   Q_OBJECT

@@ -22,8 +22,8 @@ public:
   enum Purpose { JOINT, EFFECTOR };
 
   IKNode() : m_parent(0), m_pos() {
-    r = TPointD(0.0, 1.0);  // r sara' aggiornato quando il nodo sara; inserito
-                            // nello skeleton
+    r = TPointD(0.0, 1.0);  // r will be updated when the node is added
+                            // in the skeleton
     theta    = 0.0;
     m_parent = 0;
   }
@@ -70,7 +70,7 @@ public:
   }
 
   bool isFrozen() const { return freezed; }
-  void freeze() { freezed = true; }  // mantiene l'angolo theta costante
+  void freeze() { freezed = true; }  // keeps the theta angle constant
   void unFreeze() { freezed = false; }
 
 private:
@@ -79,20 +79,20 @@ private:
 
   TPointD m_pos;
   Purpose m_purpose;
-  int m_seqNumJoint;     // indice del Joint nella sequenza di Joint
-  int m_seqNumEffector;  // indice dell'Effector nella sequenza di Effectors
+  int m_seqNumJoint;     // Joint index in the Joint sequence
+  int m_seqNumEffector;  // index of the effector in the sequence of effectors
 
-  TPointD r;  // Posizione relativa
-  TPointD s;  // Posizione Globale
-  // TPointD w; // Rotazione Globale dell'asse
+  TPointD r;  // Relative position
+  TPointD s;  // Global position
+  // TPointD w; // Global axis rotation
 
-  double theta;      // angolo del joint (radianti)
-  double theta0;     // angolo iniziale del joint (radianti)
-  double minTheta;   // limite inferiore angolo
-  double maxTheta;   // limite superiore angolo
-  double restAngle;  // angolo esplementare
+  double theta;      // joint angle(radians)
+  double theta0;     // initial angle of the joint(radians)
+  double minTheta;   // lower angle limit
+  double maxTheta;   // high angle limit
+  double restAngle;  
 
-  bool freezed;  // Se vero l'angolo è blocccato
+  bool freezed;  
 };
 
 #endif  // IKNODE_H

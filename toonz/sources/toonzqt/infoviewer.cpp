@@ -157,7 +157,7 @@ void InfoViewerImp::onSliderChanged() {
 
 namespace {
 void setLabelStyle(QLabel *l) { l->setObjectName("TitleTxtLabel"); }
-}
+}  // namespace
 
 //----------------------------------------------------------------
 
@@ -171,10 +171,10 @@ void InfoViewerImp::create(int index, QString str) {
 
 InfoViewerImp::InfoViewerImp()
     : m_palette(0)
-    , m_framesLabel("Current Frame: ")
+    , m_framesLabel(QObject::tr("Current Frame: "))
     , m_framesSlider()
     , m_history()
-    , m_historyLabel("File History") {
+    , m_historyLabel(QObject::tr("File History")) {
   setLabelStyle(&m_framesLabel);
 
   TLevelReader::getSupportedFormats(m_formats);
@@ -370,7 +370,7 @@ void InfoViewerImp::setImageInfo() {
     m_separator1.hide();
 
   const TContentHistory *ch = 0;
-  if (lr) ch                = lr->getContentHistory();
+  if (lr) ch = lr->getContentHistory();
 
   if (ch) {
     QString str = ch->serialize();

@@ -120,7 +120,7 @@ void computeRGB(int (*channelValues)[256], int *rgbValues) {
 
 void computeRGBM(int (*channelValues)[256], int *rgbmValues) {
   int i;
-  for (i          = 0; i < 256; ++i)
+  for (i = 0; i < 256; ++i)
     rgbmValues[i] = channelValues[0][i] + channelValues[1][i] +
                     channelValues[2][i] + channelValues[3][i];
 }
@@ -161,7 +161,7 @@ void HistogramGraph::setValues(const int values[]) {
 
   double maxValue = 0;
   for (i = 0; i < 256; i++) {
-    int count = m_values[i]        = values[i];
+    int count = m_values[i] = values[i];
     if (maxValue < count) maxValue = count;
   }
 
@@ -181,11 +181,13 @@ void HistogramGraph::setValues(const int values[]) {
 
 //-----------------------------------------------------------------------------
 
-void HistogramGraph::draw(QPainter *p, QPoint translation) {
+void HistogramGraph::draw(QPainter *p, QPoint translation, int w) {
   int x0 = translation.x() + drawMargin;
   int y0 = translation.y() + drawMargin - 2;
-  int w  = width() - 2 * drawMargin;
-  int h  = m_height + 1;
+  // in case that the size is not externally specified (i.e. the widget is in
+  // some layout)
+  if (w <= 0) w = width() - 2 * drawMargin;
+  int h = m_height + 1;
 
   p->setPen(Qt::NoPen);
   p->setBrush(Qt::white);
@@ -241,7 +243,8 @@ ChannelBar::ChannelBar(QWidget *parent, QColor color, bool isHorizontal)
     , m_color(color)
     , m_isHorizontal(isHorizontal)
     , m_colorBarLength(13)
-    , m_drawNumbers(true) {
+    , m_drawNumbers(true)
+    , m_range(Range_0_255) {
   int d = 256 + HistogramGraph::drawMargin * 2 + 2;
 
   if (m_isHorizontal)
@@ -269,15 +272,23 @@ void ChannelBar::setDrawNumbers(bool onOff) {
 
 //-----------------------------------------------------------------------------
 
-void ChannelBar::draw(QPainter *p, QPoint translation) {
+void ChannelBar::draw(QPainter *p, QPoint translation, int size) {
   // Calcolo i parametri necessari al draw a seconda del caso in cui mi trovo.
   int space = HistogramGraph::drawMargin;
   int w, h, x0, y0;
   QRect rect;
   QPoint initialPoint, finalPoint, delta;
   QColor initialColor, finalColor;
+
+  // in case that the size is not externally specified (i.e. the widget is in
+  // some layout)
+  if (size <= 0) {
+    size = (m_isHorizontal) ? width() - 2 * HistogramGraph::drawMargin
+                            : height() - 2 * HistogramGraph::drawMargin;
+  }
+
   if (m_isHorizontal) {
-    w            = width() - 2 * HistogramGraph::drawMargin;
+    w            = size;
     h            = m_colorBarLength;
     x0           = translation.x() + space;
     y0           = translation.y();
@@ -289,7 +300,7 @@ void ChannelBar::draw(QPainter *p, QPoint translation) {
     delta        = QPoint(w / 4, 0);
   } else {
     w            = m_colorBarLength;
-    h            = height() - 2 * HistogramGraph::drawMargin;
+    h            = size;
     x0           = translation.x() + width() - w;
     y0           = translation.y() + space;
     initialPoint = QPoint(0, y0);
@@ -314,19 +325,27 @@ void ChannelBar::draw(QPainter *p, QPoint translation) {
 
   p->setBrush(QBrush(linearGrad));
 
-  p->setPen(Qt::black);
+  p->setPen(getTextColor());
   p->drawRect(x0, y0, w - 1, h - 1);
 
   if (m_drawNumbers) {
-    p->drawText(rect, Qt::AlignCenter, QString::number(0));
-    rect.translate(delta);
-    p->drawText(rect, Qt::AlignCenter, QString::number(64));
-    rect.translate(delta);
-    p->drawText(rect, Qt::AlignCenter, QString::number(128));
-    rect.translate(delta);
-    p->drawText(rect, Qt::AlignCenter, QString::number(192));
-    rect.translate(delta);
-    p->drawText(rect, Qt::AlignCenter, QString::number(255));
+    QStringList labels;
+    if (m_range == Range_0_255)
+      labels << "0"
+             << "64"
+             << "128"
+             << "192"
+             << "255";
+    else  // m_range == Range_0_1
+      labels << "0.0"
+             << "0.25"
+             << "0.5"
+             << "0.75"
+             << "1.0";
+    for (QString &label : labels) {
+      p->drawText(rect, Qt::AlignCenter, label);
+      rect.translate(delta);
+    }
   }
 }
 
@@ -373,11 +392,12 @@ void HistogramView::setValues(const int values[]) {
 
 //-----------------------------------------------------------------------------
 
-void HistogramView::draw(QPainter *painter, QPoint translation) {
-  m_histogramGraph->draw(painter, translation);
-  m_colorBar->draw(
-      painter, QPoint(translation.x(),
-                      translation.y() + m_histogramGraph->getHeight() + 17));
+void HistogramView::draw(QPainter *painter, QPoint translation, int width) {
+  m_histogramGraph->draw(painter, translation, width);
+  m_colorBar->draw(painter,
+                   QPoint(translation.x(),
+                          translation.y() + m_histogramGraph->getHeight() + 17),
+                   width);
 }
 
 //-----------------------------------------------------------------------------
@@ -398,7 +418,7 @@ Histograms::Histograms(QWidget *parent, bool rgba)
 
   HistogramView *histogramViews[6];
 
-  int h                                      = 0;
+  int h = 0;
   if (m_computeAlsoRGBA) histogramViews[h++] = new HistogramView(this);
 
   histogramViews[h++] = new HistogramView(this);
@@ -419,7 +439,7 @@ Histograms::~Histograms() { memset(m_channelValue, 0, sizeof m_channelValue); }
 
 void Histograms::setRaster(const TRasterP &raster, const TPaletteP &palette) {
   if (palette.getPointer()) m_palette = palette;
-  m_raster                            = raster;
+  m_raster = raster;
   computeChannelsValue();
   int i;
   for (i = 0; i < count(); i++)

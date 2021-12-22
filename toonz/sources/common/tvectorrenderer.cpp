@@ -22,7 +22,7 @@
 #include <stdlib.h>
 #endif
 
-#if defined(LINUX) || defined(__sgi)
+#if defined(LINUX) || defined(FREEBSD) || defined(__sgi)
 #include <GL/glx.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
@@ -276,7 +276,7 @@ void hardRenderVectorImage(const TVectorRenderData &rd, TRaster32P &ras,
 }
 
 // end of WIN32
-#elif defined(__sgi) || defined(LINUX)
+#elif defined(__sgi) || defined(LINUX) || defined(FREEBSD)
 
 //=============================================================================
 
@@ -431,7 +431,7 @@ void hardRenderVectorImage(const TVectorRenderData &rd, TRaster32P &ras,
   glReadPixels(0, 0, ras->getLx(), ras->getLy(), GL_ABGR_EXT, GL_UNSIGNED_BYTE,
                ras->getRawData());
 
-#elif defined(LINUX)
+#elif defined(LINUX) || defined(FREEBSD)
 
   glReadPixels(0, 0, ras->getLx(), ras->getLy(), GL_RGBA, GL_UNSIGNED_BYTE,
                ras->getRawData());

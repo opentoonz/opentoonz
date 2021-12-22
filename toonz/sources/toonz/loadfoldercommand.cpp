@@ -30,10 +30,6 @@
 #include <QButtonGroup>
 #include <QRadioButton>
 
-// tcg includes
-#include "tcg/tcg_algorithm.h"
-#include "tcg/tcg_function_types.h"
-
 // boost includes
 #include <boost/optional.hpp>
 #include <boost/operators.hpp>
@@ -41,7 +37,6 @@
 
 #include <boost/bind.hpp>
 
-#include <boost/algorithm/cxx11/any_of.hpp>
 #include <boost/iterator/transform_iterator.hpp>
 
 #include <boost/range/algorithm/for_each.hpp>
@@ -54,8 +49,7 @@
 
 // STD includes
 #include <set>
-
-namespace ba = boost::algorithm;
+#include <algorithm>
 
 //************************************************************************
 //    Local namespace  structures
@@ -186,9 +180,11 @@ TFilePath multiframeResourcePath(const TFilePath &fp) {
 
 TFilePath retasComponentPath(const TFilePath &fp) {
   std::wstring name = fp.getWideName();
-  assert(name.size() > 4);
 
-  name.insert(name.size() - 4, 1, L'.');
+  // Assumes the name is Axxxx.tga and needs to be changed to A.xxxx.tga
+  if (name.size() > 4 && fp.getDots() != "..")
+    name.insert(name.size() - 4, 1, L'.');
+
   return fp.withName(name);
 }
 
@@ -210,19 +206,15 @@ static const FormatData l_formatDatas[] = {
 typedef std::pair<Resource::Path, int> RsrcKey;
 typedef std::map<RsrcKey, Resource::CompSeq> RsrcMap;
 
-bool differentPath(const RsrcMap::value_type &a, const RsrcMap::value_type &b) {
+auto const differentPath = [](const RsrcMap::value_type &a,
+                              const RsrcMap::value_type &b) -> bool {
   return (a.first.first < b.first.first) || (b.first.first < a.first.first);
-}
+};
 
 struct buildResources_locals {
   static bool isValid(const RsrcMap::value_type &rsrcVal) {
     return (isLoadable(rsrcVal.first.first.m_relFp) && !rsrcVal.second.empty());
   }
-
-  typedef tcg::function<bool (*)(const RsrcMap::value_type &,
-                                 const RsrcMap::value_type &),
-                        &differentPath>
-      DifferentPath;
 
   static Resource toResource(const RsrcMap::value_type &rsrcVal) {
     return Resource(rsrcVal.first.first, rsrcVal.second);
@@ -335,12 +327,11 @@ void buildResources(std::vector<Resource> &resources, const TFilePath &rootPath,
     for (rt = rsrcMap.begin(); rt != rEnd; ++rt) locals::mergeInto(rt, rsrcMap);
 
     // Export valid data into the output resources collection
-    boost::copy(
-        rsrcMap | boost::adaptors::filtered(locals::isValid) |
-            boost::adaptors::adjacent_filtered(
-                locals::DifferentPath())  // E.g. A.xxxx.tga and Axxxx.tga
-            | boost::adaptors::transformed(locals::toResource),
-        std::back_inserter(resources));
+    boost::copy(rsrcMap | boost::adaptors::filtered(locals::isValid) |
+                    boost::adaptors::adjacent_filtered(
+                        differentPath)  // E.g. A.xxxx.tga and Axxxx.tga
+                    | boost::adaptors::transformed(locals::toResource),
+                std::back_inserter(resources));
   }
 
   // Look for level options associated to each level
@@ -465,11 +456,11 @@ void import(const ToonzScene &scene, std::vector<Resource> &resources,
 
 OverwriteDialog::OverwriteDialog(QWidget *parent)
     : ValidatedChoiceDialog(parent, ValidatedChoiceDialog::APPLY_TO_ALL) {
-  setWindowTitle(tr("Warning!"));
+  setWindowTitle(QObject::tr("Warning!", "OverwriteDialog"));
 
   // Option 1: OVERWRITE
   QRadioButton *radioButton = new QRadioButton;
-  radioButton->setText(tr("Overwrite"));
+  radioButton->setText(QObject::tr("Overwrite", "OverwriteDialog"));
   radioButton->setFixedHeight(20);
   radioButton->setChecked(true);  // initial option: OVERWRITE
 
@@ -478,7 +469,7 @@ OverwriteDialog::OverwriteDialog(QWidget *parent)
 
   // Option 2: SKIP
   radioButton = new QRadioButton;
-  radioButton->setText(tr("Skip"));
+  radioButton->setText(QObject::tr("Skip", "OverwriteDialog"));
   radioButton->setFixedHeight(20);
 
   m_buttonGroup->addButton(radioButton, SKIP);
@@ -500,8 +491,8 @@ QString OverwriteDialog::acceptResolution(void *obj_, int resolution,
     }
 
     static bool existsResource(const TFilePath &dstDir, const Resource &rsrc) {
-      return ba::any_of(rsrc.m_components.begin(), rsrc.m_components.end(),
-                        boost::bind(existsComponent, boost::cref(dstDir), _1));
+      return std::any_of(rsrc.m_components.begin(), rsrc.m_components.end(),
+                         boost::bind(existsComponent, boost::cref(dstDir), _1));
     }
   };  // locals
 
@@ -512,7 +503,9 @@ QString OverwriteDialog::acceptResolution(void *obj_, int resolution,
   if (resolution == NO_RESOLUTION) {
     // Test existence of any resource components
     if (locals::existsResource(obj.m_dstDir, obj.m_rsrc))
-      error = tr("File \"%1\" already exists.\nDo you want to overwrite it?")
+      error = QObject::tr(
+                  "File \"%1\" already exists.\nDo you want to overwrite it?",
+                  "OverwriteDialog")
                   .arg(obj.m_rsrc.m_path.m_relFp.getQString());
   }
 
@@ -552,7 +545,7 @@ int IoCmd::loadResourceFolders(LoadResourceArguments &args,
   // Deal with import decision
   bool import = false;
   {
-    if (ba::any_of(
+    if (std::any_of(
             args.resourceDatas.begin(), args.resourceDatas.end(),
             boost::bind(locals::isExternPath, boost::cref(*scene), _1))) {
       // Ask for data import in this case

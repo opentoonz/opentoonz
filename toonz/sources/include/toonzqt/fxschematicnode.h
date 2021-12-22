@@ -70,7 +70,8 @@ protected:
 //    FxPalettePainter
 //*****************************************************
 
-class FxPalettePainter final : public QGraphicsItem, public QObject {
+class FxPalettePainter final : public QObject, public QGraphicsItem {
+  Q_OBJECT
   FxSchematicPaletteNode *m_parent;
   double m_width, m_height;
   QString m_name;
@@ -189,10 +190,13 @@ protected:
 //*****************************************************
 
 class FxSchematicPort final : public SchematicPort {
+  Q_OBJECT
   TFx *m_ownerFx;
   FxSchematicPort *m_currentTargetPort;
   QList<SchematicLink *> m_hiddenLinks;
   QList<SchematicLink *> m_ghostLinks;
+
+  bool m_isPassThrough;
 
 public:
   FxSchematicPort(FxSchematicDock *parent, int type);
@@ -204,6 +208,8 @@ public:
   bool linkTo(SchematicPort *port, bool checkOnly = false) override;
   FxSchematicDock *getDock() const;
   SchematicLink *makeLink(SchematicPort *port) override;
+
+  void setIsPassThrough();
 
 protected:
   void contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) override;
@@ -353,6 +359,8 @@ signals:
 //*****************************************************
 
 class FxSchematicOutputNode final : public FxSchematicNode {
+  Q_OBJECT
+
   FxOutputPainter *m_outputPainter;
 
 public:
@@ -365,6 +373,7 @@ public:
 
 protected:
   void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *me) override;
+  void mousePressEvent(QGraphicsSceneMouseEvent *me) override;
 };
 
 //*****************************************************
@@ -372,6 +381,8 @@ protected:
 //*****************************************************
 
 class FxSchematicXSheetNode final : public FxSchematicNode {
+  Q_OBJECT
+
   FxXSheetPainter *m_xsheetPainter;
 
 public:
@@ -384,6 +395,7 @@ public:
 
 protected:
   void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *me) override;
+  void mousePressEvent(QGraphicsSceneMouseEvent *me) override;
 };
 
 //*****************************************************
@@ -408,6 +420,7 @@ public:
 
 protected:
   void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *me) override;
+  void mousePressEvent(QGraphicsSceneMouseEvent *me) override;
 
 protected slots:
 
@@ -441,6 +454,7 @@ public:
 
 protected:
   void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *me) override;
+  void mousePressEvent(QGraphicsSceneMouseEvent *me) override;
 
 protected slots:
 
@@ -479,6 +493,7 @@ public:
 
 protected:
   void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *me) override;
+  void mousePressEvent(QGraphicsSceneMouseEvent *me) override;
 
 private:
   void renameObject(const TStageObjectId &id, std::string name);
@@ -517,6 +532,7 @@ public:
 
 protected:
   void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *me) override;
+  void mousePressEvent(QGraphicsSceneMouseEvent *me) override;
 
 protected slots:
 
@@ -575,12 +591,71 @@ public:
 
 protected:
   void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *me) override;
+  void mousePressEvent(QGraphicsSceneMouseEvent *me) override;
   QPointF computePos() const;
 
 protected slots:
 
   void onNameChanged();
   void onRenderToggleClicked(bool);
+};
+
+//*****************************************************
+//    FxPassThroughPainter
+//*****************************************************
+class FxSchematicPassThroughNode;
+class FxPassThroughPainter final : public QObject, public QGraphicsItem {
+  Q_OBJECT
+  Q_INTERFACES(QGraphicsItem)
+
+  double m_width, m_height;
+  QString m_name;
+  bool m_showName;
+
+  FxSchematicPassThroughNode *m_parent;
+
+public:
+  FxPassThroughPainter(FxSchematicPassThroughNode *parent, double width,
+                       double height, const QString &name, bool showName);
+  ~FxPassThroughPainter();
+
+  QRectF boundingRect() const override;
+  void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+             QWidget *widget = 0) override;
+  void setName(const QString &name) { m_name = name; }
+  void setShowName(bool showName) { m_showName = showName; }
+
+protected:
+  void contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) override;
+};
+
+//*****************************************************
+//    FxSchematicPassThroughNode
+//*****************************************************
+
+class FxSchematicPassThroughNode final : public FxSchematicNode {
+  Q_OBJECT
+
+  bool m_showName;
+
+  FxPassThroughPainter *m_passThroughPainter;
+
+public:
+  FxSchematicPassThroughNode(FxSchematicScene *scene, TFx *fx);
+  ~FxSchematicPassThroughNode();
+
+  QRectF boundingRect() const override;
+  void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+             QWidget *widget = 0) override;
+  bool isOpened() override { return false; }
+
+protected:
+  void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *me) override;
+  void mousePressEvent(QGraphicsSceneMouseEvent *me) override;
+
+protected slots:
+
+  void onNameChanged();
 };
 
 #endif  // FXSCHEMATICNODE_H

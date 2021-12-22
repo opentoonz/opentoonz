@@ -223,7 +223,7 @@ private:
   //! Compute the matrix used to distort image.
   //! First is compute a transformation A' starting from m_startPoints to (0,0),
   //! (0,1), (1,1), (1,0);
-  //! the a second tranformation A'' is compute starting from (0,0), (0,1),
+  //! the second transformation A'' is computed starting from (0,0), (0,1),
   //! (1,1), (1,0) to m_endPoints.
   //! The resulting matrix is A'*A''.
   void computeMatrix();

@@ -100,7 +100,7 @@ types to be displayed in the file browser.
 
   void setFolder(const TFilePath &fp, bool expandNode = false,
                  bool forceUpdate = false);
-  // process when inputting the folder which is not regitered in the folder tree
+  // process when inputting the folder which is not registered in the folder tree
   // (e.g. UNC path in Windows)
   void setUnregisteredFolder(const TFilePath &fp);
 
@@ -110,6 +110,8 @@ types to be displayed in the file browser.
   std::string getDayDateString() const { return m_dayDateString; }
 
   static void refreshFolder(const TFilePath &folder);
+
+  static void updateItemViewerPanel();
 
   // ritorna true se il file e' stato rinominato. dopo la chiamata fp contiene
   // il nuovo path
@@ -121,6 +123,12 @@ types to be displayed in the file browser.
   void selectNone();
 
   QSplitter *getMainSplitter() const { return m_mainSplitter; }
+
+  // Enable double-click to open a scene.
+  // This is not always desirable (e.g. if a user double-clicks on a file in
+  // a "Save As" dialog, they expect the file will be saved to, not opened).
+  // So it is disabled by default.
+  void enableDoubleClickToOpenScenes();
 
 protected:
   int findIndexWithPath(TFilePath path);
@@ -157,12 +165,10 @@ protected slots:
                      const QModelIndex &bottomRight);
   void loadResources();
   void onClickedItem(int index);
+  void onDoubleClickedItem(int index);
   void onSelectedItems(const std::set<int> &indexes);
   void folderUp();
   void newFolder();
-
-  void previewScreenSaver();
-  void installScreenSaver();
 
   void onBackButtonPushed();
   void onFwdButtonPushed();
@@ -195,11 +201,15 @@ protected slots:
 
   void onFileSystemChanged(const QString &folderPath);
 
+  // If filePath is a valid scene file, open it. Otherwise do nothing.
+  void tryToOpenScene(const TFilePath &filePath);
+
 signals:
 
   void filePathClicked(const TFilePath &);
+  void filePathDoubleClicked(const TFilePath &);
   // reuse the list of TFrameId in order to skip loadInfo() when loading the
-  // level with sequencial frames.
+  // level with sequential frames.
   void filePathsSelected(const std::set<TFilePath> &,
                          const std::list<std::vector<TFrameId>> &);
   void treeFolderChanged(const TFilePath &);
@@ -221,7 +231,7 @@ private:
 
     bool m_isFolder;
     bool m_isLink;
-    // calling loadInfo to the level with sequencial frames is time consuming.
+    // calling loadInfo to the level with sequential frames is time consuming.
     // so keep the list of frameIds at the first time and try to reuse it.
     std::vector<TFrameId> m_frameIds;
 
@@ -281,7 +291,7 @@ private:
   // TPropertyGroup* getFormatProperties(const std::string &ext);
 
 public slots:
-  //! Starts the convertion.
+  //! Starts the conversion.
   // void onConvert();
   // void onOptionsClicked();
   void onOk();

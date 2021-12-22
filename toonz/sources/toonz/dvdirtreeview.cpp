@@ -323,7 +323,7 @@ void DvDirTreeViewDelegate::updateEditorGeometry(
 //-----------------------------------------------------------------------------
 
 DvDirTreeView::DvDirTreeView(QWidget *parent)
-    : QTreeView(parent)
+    : StyledTreeView(parent)
     , m_globalSelectionEnabled(true)
     , m_currentDropItem(0)
     , m_refreshVersionControlEnabled(false)
@@ -367,6 +367,9 @@ DvDirTreeView::DvDirTreeView(QWidget *parent)
   assert(ret);
 
   setAcceptDrops(true);
+
+  if (Preferences::instance()->isAutomaticSVNFolderRefreshEnabled())
+    setRefreshVersionControlEnabled(true);
 }
 
 //-----------------------------------------------------------------------------
@@ -424,9 +427,13 @@ void DvDirTreeView::dropEvent(QDropEvent *e) {
   if (!folderNode || !folderNode->isFolder()) return;
   if (!mimeData->hasUrls()) return;
   int count = 0;
-  foreach (QUrl url, mimeData->urls()) {
+  for (const QUrl &url : mimeData->urls()) {
     TFilePath srcFp(url.toLocalFile().toStdWString());
     TFilePath dstFp = folderNode->getPath();
+
+    // Dropping file in the same directory that already exists should just be
+    // ignored
+    if (srcFp.getParentDir() == dstFp) continue;
 
     TFilePath path = dstFp + TFilePath(srcFp.getLevelNameW());
     NameBuilder *nameBuilder =
@@ -1373,11 +1380,11 @@ void DvDirTreeView::onRefreshStatusError(const QString &text) {
 void DvDirTreeView::checkPartialLock(const QString &workingDir,
                                      const QStringList &files) {
   QStringList args;
-  args << "propget";
-  args << "partial-lock";
+  args << "proplist";
   int filesCount = files.count();
   for (int i = 0; i < filesCount; i++) args << files.at(i);
   args << "--xml";
+  args << "-v";
 
   m_thread.disconnect(SIGNAL(done(const QString &)));
   m_thread.disconnect(SIGNAL(error(const QString &)));
@@ -1468,20 +1475,13 @@ DvItemListModel::Status DvDirTreeView::getItemVersionControlStatus(
   SVNStatus s = node->getVersionControlStatus(name);
   if (s.m_path == name) {
     if (s.m_item == "missing" ||
-        s.m_item == "none" && s.m_repoStatus == "added")
+        (s.m_item == "none" && s.m_repoStatus == "added"))
       return DvItemListModel::VC_Missing;
-    if (s.m_isLocked) {
-      DvDirVersionControlRootNode *rootNode = node->getVersionControlRootNode();
-      if (rootNode) {
-        if (QString::fromStdWString(rootNode->getUserName()) != s.m_lockOwner ||
-            TSystem::getHostName() != s.m_lockHostName)
-          return DvItemListModel::VC_Locked;
-        else if (s.m_item == "normal" && s.m_repoStatus == "none")
-          return DvItemListModel::VC_Edited;
-      }
-    }
-
     if (s.m_item == "unversioned") return DvItemListModel::VC_Unversioned;
+    // If, for some errors, there is some item added locally but not committed
+    // yet, use the modified status
+    if (s.m_item == "modified" || s.m_item == "added")
+      return DvItemListModel::VC_Modified;
     if (s.m_isPartialEdited) {
       QString from                          = QString::number(s.m_editFrom);
       QString to                            = QString::number(s.m_editTo);
@@ -1500,15 +1500,21 @@ DvItemListModel::Status DvDirTreeView::getItemVersionControlStatus(
         return DvItemListModel::VC_PartialEdited;
     }
     if (s.m_isPartialLocked) return DvItemListModel::VC_PartialLocked;
+    if (s.m_isLocked) {
+      DvDirVersionControlRootNode *rootNode = node->getVersionControlRootNode();
+      if (rootNode) {
+        if (QString::fromStdWString(rootNode->getUserName()) != s.m_lockOwner ||
+            TSystem::getHostName() != s.m_lockHostName)
+          return DvItemListModel::VC_Locked;
+        else if (s.m_item == "normal" && s.m_repoStatus == "none")
+          return DvItemListModel::VC_Edited;
+      }
+    }
     // Pay attention: "ToUpdate" is more important than "ReadOnly"
     if (s.m_item == "normal" && s.m_repoStatus == "modified")
       return DvItemListModel::VC_ToUpdate;
     if (!fs.isWritable() || s.m_item == "normal")
       return DvItemListModel::VC_ReadOnly;
-    // If, for some errors, there is some item added locally but not committed
-    // yet, use the modified status
-    if (s.m_item == "modified" || s.m_item == "added")
-      return DvItemListModel::VC_Modified;
   } else if (fp.getDots() == "..") {
     // Get the files list to control its status...
     QStringList levelNames = getLevelFileNames(fp);
@@ -1529,7 +1535,7 @@ DvItemListModel::Status DvDirTreeView::getItemVersionControlStatus(
       TFileStatus fs(node->getPath() + levelNames.at(i).toStdWString());
 
       if (s.m_item == "missing" ||
-          s.m_item == "none" && s.m_repoStatus == "added")
+          (s.m_item == "none" && s.m_repoStatus == "added"))
         missingCount++;
       else if (s.m_item == "modified")
         modifiedCount++;

@@ -19,4 +19,4 @@ matrix:
         - os: linux
           compiler: clang
         - os: osx
-          osx_image: xcode8.3
+          osx_image: xcode10.1

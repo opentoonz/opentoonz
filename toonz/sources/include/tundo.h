@@ -28,7 +28,10 @@
 
 class DVAPI TUndo {
 public:
+  // To be called in the last of the block when undo
   bool m_isLastInBlock;
+  // To be called in the last of the block when redo
+  bool m_isLastInRedoBlock;
 
 public:
   TUndo() {}

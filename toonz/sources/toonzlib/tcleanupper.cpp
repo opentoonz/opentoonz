@@ -45,7 +45,7 @@ centered
 
   Post-processing include despeckling (ie removal or recoloration of little
 blots with
-  uniform color), and tones' brigthness/contrast manipulation.
+  uniform color), and tones' brightness/contrast manipulation.
 
   (*) The image is first overed on top of a white background
 
@@ -160,7 +160,7 @@ HSVColor HSVColor::fromRGB(double r, double g, double b) {
       h = 2.0 + (b - r) / delta;
     else if (b == max)
       h = 4.0 + (r - g) / delta;
-    h   = h * 60.0;
+    h = h * 60.0;
     if (h < 0) h += 360.0;
   }
 
@@ -194,7 +194,7 @@ public:
 
 //=========================================================================
 
-//! Birghtness/Contrast color transform data
+//! Brightness/Contrast color transform data
 
 #define MAX_N_PENCILS 8
 
@@ -207,7 +207,7 @@ TPixelRGBM32 Paper = TPixel32::White;
 
 //=========================================================================
 
-//! Birghtness/Contrast color transform structure
+//! Brightness/Contrast color transform structure
 class TransfFunction {
   USHORT TransfFun[(MAX_N_PENCILS + 1) << 8];
 
@@ -412,8 +412,8 @@ bool TCleanupper::getResampleValues(const TRasterImageP &image, TAffine &aff,
   TRect saveBox          = image->getSavebox();
   bool raster_is_savebox = true;
   if (saveBox == TRect() &&
-      (saveBox.getLx() > 0 && saveBox.getLx() < rasterLx ||
-       saveBox.getLy() > 0 && saveBox.getLy() < rasterLy))
+      ((saveBox.getLx() > 0 && saveBox.getLx() < rasterLx) ||
+       (saveBox.getLy() > 0 && saveBox.getLy() < rasterLy)))
     raster_is_savebox = false;
 
   // Use the same source dpi throughout the level
@@ -501,7 +501,7 @@ bool TCleanupper::getResampleValues(const TRasterImageP &image, TAffine &aff,
 //------------------------------------------------------------------------------------
 
 // this one incorporate the preprocessColors and the finalize function; used for
-// swatch.(tipically on very small rasters)
+// swatch.(typically on very small rasters)
 TRasterP TCleanupper::processColors(const TRasterP &rin) {
   if (m_parameters->m_lineProcessingMode == lpNone) return rin;
 
@@ -569,7 +569,7 @@ TRasterP TCleanupper::processColors(const TRasterP &rin) {
 CleanupPreprocessedImage *TCleanupper::process(
     TRasterImageP &image, bool first_image, TRasterImageP &onlyResampledImage,
     bool isCameraTest, bool returnResampled, bool onlyForSwatch,
-    TAffine *resampleAff) {
+    TAffine *resampleAff, TRasterP templateForResampled) {
   TAffine aff;
   double blur;
   TDimension outDim(0, 0);
@@ -682,7 +682,9 @@ CleanupPreprocessedImage *TCleanupper::process(
   TRasterP tmp_ras;
 
   if (returnResampled || (fromGr8 && toGr8)) {
-    if (fromGr8 && toGr8)
+    if (templateForResampled)
+      tmp_ras = templateForResampled->create(outDim.lx, outDim.ly);
+    else if (fromGr8 && toGr8)
       tmp_ras = TRasterGR8P(outDim);
     else
       tmp_ras = TRaster32P(outDim);
@@ -709,7 +711,7 @@ CleanupPreprocessedImage *TCleanupper::process(
     flt_type = TRop::Hann2;
   TRop::resample(tmp_ras, image->getRaster(), aff, flt_type, blur);
 
-  if ((TRaster32P)tmp_ras)
+  if ((TRaster32P)tmp_ras && !templateForResampled)
     // Add white background to deal with semitransparent pixels
     TRop::addBackground(tmp_ras, TPixel32::White);
 

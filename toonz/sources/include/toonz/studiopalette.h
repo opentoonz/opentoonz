@@ -107,6 +107,9 @@ public:
 
   void save(const TFilePath &path, TPalette *palette);
 
+  void removeEntry(const std::wstring paletteId);
+  void addEntry(const std::wstring paletteId, const TFilePath &path);
+
 private:
   StudioPalette();
   TFilePath m_root;

@@ -49,7 +49,7 @@ class FrameTaskNotifier;
 //*****************************************************************************
 
 /*!
-  \brief    Window class used in the convertion of levels between different
+  \brief    Window class used in the conversion of levels between different
             file formats.
 */
 
@@ -77,7 +77,7 @@ public:
 
 public slots:
 
-  void apply();  //!< Starts the convertion.
+  void apply();  //!< Starts the conversion.
   void onOptionsClicked();
   void onConvertFinished();
   void onTlvModeSelected(const QString &tlvMode);

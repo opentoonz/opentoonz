@@ -594,10 +594,10 @@ bool Tracker::setup() {
   bool image_background = false;
   bool occl             = m_manageOcclusion;
 
-  // costruct trackers
+  // construct trackers
 
   for (i = 0; i < m_trackerCount; i++) {
-    // costruct
+    // construct
     m_pObjectTracker[i] =
         new CObjectTracker(size.lx, size.ly, image_c, image_background, occl);
 

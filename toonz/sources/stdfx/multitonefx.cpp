@@ -3,8 +3,9 @@
 #include "stdfx.h"
 #include "tfxparam.h"
 #include "tspectrumparam.h"
+#include "globalcontrollablefx.h"
 
-class MultiToneFx final : public TStandardRasterFx {
+class MultiToneFx final : public GlobalControllableFx {
   FX_PLUGIN_DECLARATION(MultiToneFx)
 
   TRasterFxPort m_input;
@@ -12,10 +13,11 @@ class MultiToneFx final : public TStandardRasterFx {
 
 public:
   MultiToneFx() {
-    TSpectrum::ColorKey colors[] = {TSpectrum::ColorKey(0, TPixel32::White),
-                                    TSpectrum::ColorKey(0.5, TPixel32::Yellow),
-                                    TSpectrum::ColorKey(1, TPixel32::Red)};
-    m_colors = TSpectrumParamP(tArrayCount(colors), colors);
+    std::vector<TSpectrum::ColorKey> colors = {
+        TSpectrum::ColorKey(0, TPixel32::White),
+        TSpectrum::ColorKey(0.5, TPixel32::Yellow),
+        TSpectrum::ColorKey(1, TPixel32::Red)};
+    m_colors = TSpectrumParamP(colors);
     bool ret = m_colors->isKeyframe(0);
     bindParam(this, "colors", m_colors);
 

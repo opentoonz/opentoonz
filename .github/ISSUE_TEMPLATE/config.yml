@@ -1,0 +1,11 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Manual
+    url: https://opentoonz.readthedocs.io/
+    about: The official, extensive manual for OpenToonz
+  - name: User forum
+    url: https://groups.google.com/forum/#!forum/opentoonz_en/categories/
+    about: You can ask and answer general questions here, and connect with other users
+  - name: ユーザーフォーラム
+    url: https://groups.google.com/forum/#!forum/opentoonz/categories/
+    about: このフォーラムは、OpenToonz の利用者同士で情報共有を行うことを目的としています

@@ -1,6 +1,6 @@
 //------------------------------------------------------
 /*! Finger Tool : 線のノイズを埋めるツール
-*/
+ */
 #include "tstroke.h"
 #include "tools/toolutils.h"
 #include "tools/tool.h"
@@ -35,7 +35,6 @@
 #include "toonz/txshlevelhandle.h"
 #include "toonz/tframehandle.h"
 #include "tools/toolhandle.h"
-#include "tools/toolutils.h"
 
 // For Qt translation support
 #include <QCoreApplication>
@@ -76,7 +75,7 @@ public:
     TToonzImageP image = m_level->getFrame(m_frameId, true);
     TRasterCM32P ras   = image->getRaster();
     RasterStrokeGenerator m_rasterTrack(ras, FINGER, INK, m_styleId,
-                                        m_points[0], m_invert, 0, false);
+                                        m_points[0], m_invert, 0, false, false);
     m_rasterTrack.setPointsSequence(m_points);
     m_rasterTrack.generateStroke(true);
     image->setSavebox(image->getSavebox() +
@@ -303,7 +302,7 @@ FingerTool fingerTool;
 
 //=============================================================================
 //
-//  InkPaintTool implemention
+//  InkPaintTool implementation
 //
 //-----------------------------------------------------------------------------
 
@@ -314,11 +313,13 @@ FingerTool::FingerTool()
     , m_selecting(false)
     , m_tileSaver(0)
     , m_cursor(ToolCursor::EraserCursor)
-    , m_toolSize("Size:", 1, 100, 10, false)
+    , m_toolSize("Size:", 1, 1000, 10, false)
     , m_invert("Invert", false)
     , m_firstTime(true)
     , m_workingFrameId(TFrameId()) {
   bind(TTool::ToonzImage);
+
+  m_toolSize.setNonLinearSlider();
 
   m_prop.bind(m_toolSize);
   m_prop.bind(m_invert);
@@ -408,7 +409,7 @@ void FingerTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
       m_rasterTrack         = new RasterStrokeGenerator(
           ras, FINGER, INK, styleId,
           TThickPoint(pos + convert(ras->getCenter()), thickness),
-          m_invert.getValue(), 0, false);
+          m_invert.getValue(), 0, false, false);
 
       /*-- 作業中Fidを現在のFIDにする --*/
       m_workingFrameId = getFrameId();
@@ -505,7 +506,7 @@ void FingerTool::onDeactivate() {
 //-----------------------------------------------------------------------------
 /*!
  * ドラッグ中にツールが切り替わった場合に備え、onDeactivateにもMouseReleaseと同じ処理を行う
-*/
+ */
 void FingerTool::finishBrush() {
   if (TToonzImageP ti = (TToonzImageP)getImage(true)) {
     if (m_rasterTrack) {
@@ -564,7 +565,7 @@ void FingerTool::pick(const TPointD &pos) {
 
   int styleId =
       picker.pickStyleId(TScale(1.0 / subsampling) * pos + TPointD(-0.5, -0.5),
-                         getPixelSize() * getPixelSize(), modeValue);
+                         getPixelSize() * getPixelSize(), 1.0, modeValue);
 
   if (styleId < 0) return;
 
@@ -577,9 +578,8 @@ void FingerTool::pick(const TPointD &pos) {
     /*---
      * pickLineモードのとき、PurePaintの部分をクリックしてもカレントStyleを変えない
      * ---*/
-    if (ti &&
-        picker.pickTone(TScale(1.0 / subsampling) * pos +
-                        TPointD(-0.5, -0.5)) == 255)
+    if (ti && picker.pickTone(TScale(1.0 / subsampling) * pos +
+                              TPointD(-0.5, -0.5)) == 255)
       return;
   }
 

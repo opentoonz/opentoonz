@@ -2,7 +2,6 @@
 
 #include "tiio.h"
 
-#include "tiio.h"
 #include "tiio_jpg.h"
 #include "tproperty.h"
 

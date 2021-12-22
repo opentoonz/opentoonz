@@ -3,10 +3,11 @@
 #include "stdfx.h"
 #include "tfxparam.h"
 #include "ttzpimagefx.h"
+#include "globalcontrollablefx.h"
 
 //===================================================================
 
-class PaletteFilterFx final : public TStandardRasterFx {
+class PaletteFilterFx final : public GlobalControllableFx {
   FX_PLUGIN_DECLARATION(PaletteFilterFx)
 
   TRasterFxPort m_input;

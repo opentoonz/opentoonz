@@ -3,6 +3,7 @@
 #include "controlpointselection.h"
 #include "tvectorimage.h"
 #include "tmathutil.h"
+#include "controlpointeditortool.h"
 
 #include "tools/toolhandle.h"
 #include "tools/toolutils.h"
@@ -71,7 +72,7 @@ void insertPoint(TStroke *stroke, int indexA, int indexB) {
     if (j == stroke->getChunkCount() - 1)
       w1 = 1;
     else
-      w1           = stroke->getW(stroke->getChunk(j)->getP2());
+      w1 = stroke->getW(stroke->getChunk(j)->getP2());
     double length0 = stroke->getLength(w0);
     double length1 = stroke->getLength(w1);
     if (length < length1 - length0) {
@@ -179,8 +180,11 @@ void ControlPointEditorStroke::resetControlPoints() {
     }
     if (i == 0)  // calcola solo lo speedOut
     {
-      speedOut                  = nextP - p;
-      if (isSelfLoop()) speedIn = p - stroke->getControlPoint(cpCount - 2);
+      speedOut = nextP - p;
+      if (isSelfLoop()) {
+        precP   = stroke->getControlPoint(cpCount - 2);
+        speedIn = p - precP;
+      }
     }
     if (i == cpCount - 1)  // calcola solo lo speedIn
       speedIn = p - precP;
@@ -452,23 +456,26 @@ void ControlPointEditorStroke::moveSingleControlPoint(int index,
 
 //-----------------------------------------------------------------------------
 
-void ControlPointEditorStroke::setStroke(const TVectorImageP &vi,
+bool ControlPointEditorStroke::setStroke(const TVectorImageP &vi,
                                          int strokeIndex) {
+  bool ret = true;
+  if (m_strokeIndex == strokeIndex && m_vi == vi) ret = false;
   m_strokeIndex = strokeIndex;
   m_vi          = vi;
   if (!vi || strokeIndex == -1) {
     m_controlPoints.clear();
-    return;
+    return true;
   }
   TStroke *stroke              = getStroke();
   const TThickQuadratic *chunk = stroke->getChunk(0);
   if (stroke->getControlPointCount() == 3 && chunk->getP0() == chunk->getP1() &&
       chunk->getP0() == chunk->getP2()) {
     resetControlPoints();
-    return;
+    return ret;
   }
   adjustChunkParity();
   resetControlPoints();
+  return ret;
 }
 
 //-----------------------------------------------------------------------------
@@ -622,8 +629,8 @@ bool ControlPointEditorStroke::setLinear(int index, bool isLinear,
   if (isLinear != isSpeedOutLinear(index))
     setLinearSpeedOut(index, isLinear, updatePoints);
   else
-    moveNext                               = false;
-  bool ret                                 = moveNext || movePrec;
+    moveNext = false;
+  bool ret = moveNext || movePrec;
   if (ret) m_controlPoints[index].m_isCusp = true;
   return ret;
 }
@@ -813,7 +820,7 @@ void ControlPointEditorStroke::deleteControlPoint(int index) {
 
   // Aggiorno gli indici dei punti nella stroke
   assert((int)newPointsIndex.size() == (int)getControlPointCount());
-  for (i                            = 0; i < (int)getControlPointCount(); i++)
+  for (i = 0; i < (int)getControlPointCount(); i++)
     m_controlPoints[i].m_pointIndex = newPointsIndex.at(i);
 
   int prev = prevIndex(index);
@@ -1077,6 +1084,11 @@ void ControlPointSelection::setUnlinear() {
 
 void ControlPointSelection::deleteControlPoints() {
   TTool *tool = TTool::getApplication()->getCurrentTool()->getTool();
+
+  // cancel deleting while dragging points
+  ControlPointEditorTool *cpTool = dynamic_cast<ControlPointEditorTool *>(tool);
+  if (cpTool && cpTool->isBusy()) return;
+
   TVectorImageP vi(tool->getImage(false));
   int currentStrokeIndex = m_controlPointEditorStroke->getStrokeIndex();
   if (!vi || isEmpty() || currentStrokeIndex == -1) return;

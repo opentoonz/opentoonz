@@ -19,7 +19,7 @@
 
 namespace {
 inline bool myIsEmpty(const TRectD &r) { return r.x0 >= r.x1 || r.y0 >= r.y1; }
-}
+}  // namespace
 
 //==============================================================================
 
@@ -415,19 +415,21 @@ void FreeDistortBaseFx::safeTransform(double frame, int port,
 // ------------------------------------------------------------------------
 
 void FreeDistortBaseFx::getParamUIs(TParamUIConcept *&concepts, int &length) {
-  concepts = new TParamUIConcept[length = 14];
+  concepts = new TParamUIConcept[length = 6];
 
   concepts[0].m_type = TParamUIConcept::QUAD;
-  concepts[0].m_params.push_back(m_p00_b);
-  concepts[0].m_params.push_back(m_p10_b);
-  concepts[0].m_params.push_back(m_p11_b);
   concepts[0].m_params.push_back(m_p01_b);
+  concepts[0].m_params.push_back(m_p11_b);
+  concepts[0].m_params.push_back(m_p10_b);
+  concepts[0].m_params.push_back(m_p00_b);
+  concepts[0].m_label = " Src";
 
   concepts[1].m_type = TParamUIConcept::QUAD;
-  concepts[1].m_params.push_back(m_p00_a);
-  concepts[1].m_params.push_back(m_p10_a);
-  concepts[1].m_params.push_back(m_p11_a);
   concepts[1].m_params.push_back(m_p01_a);
+  concepts[1].m_params.push_back(m_p11_a);
+  concepts[1].m_params.push_back(m_p10_a);
+  concepts[1].m_params.push_back(m_p00_a);
+  concepts[1].m_label = " Dst";
 
   concepts[2].m_type = TParamUIConcept::VECTOR;
   concepts[2].m_params.push_back(m_p00_b);
@@ -444,38 +446,6 @@ void FreeDistortBaseFx::getParamUIs(TParamUIConcept *&concepts, int &length) {
   concepts[5].m_type = TParamUIConcept::VECTOR;
   concepts[5].m_params.push_back(m_p11_b);
   concepts[5].m_params.push_back(m_p11_a);
-
-  concepts[6].m_type  = TParamUIConcept::POINT;
-  concepts[6].m_label = "Bottom Left Src";
-  concepts[6].m_params.push_back(m_p00_b);
-
-  concepts[7].m_type  = TParamUIConcept::POINT;
-  concepts[7].m_label = "Bottom Right Src";
-  concepts[7].m_params.push_back(m_p10_b);
-
-  concepts[8].m_type  = TParamUIConcept::POINT;
-  concepts[8].m_label = "Top Left Src";
-  concepts[8].m_params.push_back(m_p01_b);
-
-  concepts[9].m_type  = TParamUIConcept::POINT;
-  concepts[9].m_label = "Top Right Src";
-  concepts[9].m_params.push_back(m_p11_b);
-
-  concepts[10].m_type  = TParamUIConcept::POINT;
-  concepts[10].m_label = "Bottom Left Dst";
-  concepts[10].m_params.push_back(m_p00_a);
-
-  concepts[11].m_type  = TParamUIConcept::POINT;
-  concepts[11].m_label = "Bottom Right Dst";
-  concepts[11].m_params.push_back(m_p10_a);
-
-  concepts[12].m_type  = TParamUIConcept::POINT;
-  concepts[12].m_label = "Top Left Dst";
-  concepts[12].m_params.push_back(m_p01_a);
-
-  concepts[13].m_type  = TParamUIConcept::POINT;
-  concepts[13].m_label = "Top Right Dst";
-  concepts[13].m_params.push_back(m_p11_a);
 }
 
 // ------------------------------------------------------------------------
@@ -620,7 +590,7 @@ void doBlur(TRasterPT<PIX> &r, double blur0, double blur1, double transp0,
   row = new PIX[std::max(lx, ly)];
   r->lock();
   bufin = r->pixels(0);
-  for (i = 0, cur_blur = blur0 + (blur1 - blur0) * (i - y0) / den, 0.0,
+  for (i = 0, cur_blur = blur0 + (blur1 - blur0) * (i - y0) / den,
       actual_blur = std::max(cur_blur, 0.0);
        i < ly; i++, bufin += wrap, cur_blur += blur_incr,
       actual_blur = std::max(cur_blur, 0.0)) {
@@ -672,7 +642,7 @@ void doBlur(TRasterPT<PIX> &r, double blur0, double blur1, double transp0,
   r->unlock();
   delete[] row;
 }
-}
+}  // namespace
 
 // ------------------------------------------------------------------------
 

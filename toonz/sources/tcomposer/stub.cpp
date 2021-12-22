@@ -89,10 +89,6 @@ TWriterInfo *getRasterMovieInfo(string, bool) { return 0; }
 
 bool getFramesMovieInfo(struct TFramesMovieInfo &, bool) { return true; }
 
-TFlashMovieInfo *getFlashMovieInfo(bool) { return 0; }
-
-TFlashMovieInfo *getScrMovieInfo(bool) { return 0; }
-
 //=========================================================
 // makeScreenSaver
 //---------------------------------------------------------

@@ -40,7 +40,7 @@ class DoubleLineEdit;
 class IntLineEdit;
 class MeasuredDoubleLineEdit;
 class CheckBox;
-}
+}  // namespace DVGui
 
 //---------------------------------------------------------------
 
@@ -124,8 +124,8 @@ public:
   // camera => widget fields (i.e. initialize widget)
   void setFields(const TCamera *camera);
 
-  // widget fields => camera
-  void getFields(TCamera *camera);
+  // widget fields => camera return true if the value is actually changed
+  bool getFields(TCamera *camera);
 
   QSize sizeHint() const override { return minimumSize(); }
 

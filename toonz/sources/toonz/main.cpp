@@ -8,11 +8,7 @@
 #include "previewfxmanager.h"
 #include "cleanupsettingspopup.h"
 #include "filebrowsermodel.h"
-
-#ifdef LINETEST
-#include "licensegui.h"
-#include "licensecontroller.h"
-#endif
+#include "expressionreferencemanager.h"
 
 // TnzTools includes
 #include "tools/tool.h"
@@ -37,6 +33,8 @@
 #include "toonz/stylemanager.h"
 #include "toonz/tscenehandle.h"
 #include "toonz/txshsimplelevel.h"
+#include "toonz/tproject.h"
+#include "toonz/scriptengine.h"
 
 // TnzSound includes
 #include "tnzsound.h"
@@ -82,27 +80,17 @@
 #include <QLibraryInfo>
 #include <QHash>
 
-using namespace DVGui;
-#if defined LINETEST
-const char *applicationName    = "Toonz LineTest";
-const char *applicationVersion = "6.4";
-const char *dllRelativePath    = "./linetest.app/Contents/Frameworks";
-TEnv::StringVar EnvSoftwareCurrentFont("SoftwareCurrentFont", "MS Sans Serif");
-TEnv::IntVar EnvSoftwareCurrentFontSize("SoftwareCurrentFontSize", 12);
-const char *applicationFullName = "LineTest 6.4 Beta";
-const char *rootVarName         = "LINETESTROOT";
-const char *systemVarPrefix     = "LINETEST";
-#else
-const char *applicationName     = "OpenToonz";
-const char *applicationVersion  = "1.2";
-const char *applicationRevision = "1";
-const char *dllRelativePath     = "./toonz6.app/Contents/Frameworks";
+#ifdef _WIN32
+#ifndef x64
+#include <float.h>
+#endif
+#include <QtPlatformHeaders/QWindowsWindowFunctions>
 #endif
 
+using namespace DVGui;
+
 TEnv::IntVar EnvSoftwareCurrentFontSize("SoftwareCurrentFontSize", 12);
 
-const char *applicationFullName =
-    "OpenToonz 1.2.1";  // next will be 1.3 (not 1.3.0)
 const char *rootVarName     = "TOONZROOT";
 const char *systemVarPrefix = "TOONZ";
 
@@ -118,9 +106,10 @@ void qt_mac_set_menubar_merge(bool enable);
 
 static void fatalError(QString msg) {
   DVGui::MsgBoxInPopup(
-      CRITICAL, msg + "\n" +
-                    QObject::tr("Installing %1 again could fix the problem.")
-                        .arg(applicationFullName));
+      CRITICAL,
+      msg + "\n" +
+          QObject::tr("Installing %1 again could fix the problem.")
+              .arg(QString::fromStdString(TEnv::getApplicationFullName())));
   exit(0);
 }
 //-----------------------------------------------------------------------------
@@ -157,12 +146,8 @@ DV_IMPORT_API void initColorFx();
 */
 static void initToonzEnv(QHash<QString, QString> &argPathValues) {
   StudioPalette::enable(true);
-
-  TEnv::setApplication(applicationName, applicationVersion,
-                       applicationRevision);
   TEnv::setRootVarName(rootVarName);
   TEnv::setSystemVarPrefix(systemVarPrefix);
-  TEnv::setDllRelativeDir(TFilePath(dllRelativePath));
 
   QHash<QString, QString>::const_iterator i = argPathValues.constBegin();
   while (i != argPathValues.constEnd()) {
@@ -175,9 +160,8 @@ static void initToonzEnv(QHash<QString, QString> &argPathValues) {
 
   QCoreApplication::setOrganizationName("OpenToonz");
   QCoreApplication::setOrganizationDomain("");
-  QString fullApplicationNameQStr =
-      QString(applicationName) + " " + applicationVersion;
-  QCoreApplication::setApplicationName(fullApplicationNameQStr);
+  QCoreApplication::setApplicationName(
+      QString::fromStdString(TEnv::getApplicationName()));
 
   /*-- TOONZROOTのPathの確認 --*/
   // controllo se la xxxroot e' definita e corrisponde ad un folder esistente
@@ -240,9 +224,21 @@ project->setUseScenePath(TProject::Extras, false);
   // Imposto la rootDir per ImageCache
 
   /*-- TOONZCACHEROOTの設定  --*/
-  TFilePath cacheDir               = ToonzFolder::getCacheRootFolder();
+  TFilePath cacheDir = ToonzFolder::getCacheRootFolder();
   if (cacheDir.isEmpty()) cacheDir = TEnv::getStuffDir() + "cache";
   TImageCache::instance()->setRootDir(cacheDir);
+}
+
+//-----------------------------------------------------------------------------
+
+static void script_output(int type, const QString &value) {
+  if (type == ScriptEngine::ExecutionError ||
+      type == ScriptEngine::SyntaxError ||
+      type == ScriptEngine::UndefinedEvaluationResult ||
+      type == ScriptEngine::Warning)
+    std::cerr << value.toStdString() << std::endl;
+  else
+    std::cout << value.toStdString() << std::endl;
 }
 
 //-----------------------------------------------------------------------------
@@ -259,13 +255,14 @@ int main(int argc, char *argv[]) {
 #endif
 
   // parsing arguments and qualifiers
-  TFilePath loadScenePath;
+  TFilePath loadFilePath;
   QString argumentLayoutFileName = "";
   QHash<QString, QString> argumentPathValues;
   if (argc > 1) {
     TCli::Usage usage(argv[0]);
     TCli::UsageLine usageLine;
-    TCli::FilePathArgument loadSceneArg("scenePath", "Source scene file");
+    TCli::FilePathArgument loadFileArg(
+        "filePath", "Source scene file to open or script file to run");
     TCli::StringQualifier layoutFileQual(
         "-layout filename",
         "Custom layout file to be used, it should be saved in "
@@ -299,11 +296,11 @@ int main(int argc, char *argv[]) {
       usageLine = usageLine + *systemPathQualMap[qualKey];
     }
     usage.add(usageLine);
-    usage.add(usageLine + loadSceneArg);
+    usage.add(usageLine + loadFileArg);
 
     if (!usage.parse(argc, argv)) exit(1);
 
-    loadScenePath = loadSceneArg.getValue();
+    loadFilePath = loadFileArg.getValue();
     if (layoutFileQual.isSelected())
       argumentLayoutFileName =
           QString::fromStdString(layoutFileQual.getValue());
@@ -326,11 +323,10 @@ int main(int argc, char *argv[]) {
   QApplication a(argc, argv);
 
 #ifdef MACOSX
-// This workaround is to avoid missing left button problem on Qt5.6.0.
-// To invalidate m_rightButtonClicked in Qt/qnsview.mm, sending NSLeftButtonDown
-// event
-// before NSLeftMouseDragged event propagated to QApplication.
-// See more details in ../mousedragfilter/mousedragfilter.mm.
+  // This workaround is to avoid missing left button problem on Qt5.6.0.
+  // To invalidate m_rightButtonClicked in Qt/qnsview.mm, sending
+  // NSLeftButtonDown event before NSLeftMouseDragged event propagated to
+  // QApplication. See more details in ../mousedragfilter/mousedragfilter.mm.
 
 #include "mousedragfilter.h"
 
@@ -363,12 +359,13 @@ int main(int argc, char *argv[]) {
 
 #ifdef Q_OS_WIN
   //	Since currently OpenToonz does not work with OpenGL of software or
-  // angle,
-  //	force Qt to use desktop OpenGL
+  // angle,	force Qt to use desktop OpenGL
+  // FIXME: This options should be called before constructing the application.
+  // Thus, ANGLE seems to be enabled as of now.
   a.setAttribute(Qt::AA_UseDesktopOpenGL, true);
 #endif
 
-  // Some Qt objects are destroyed badly withouth a living qApp. So, we must
+  // Some Qt objects are destroyed badly without a living qApp. So, we must
   // enforce a way to either
   // postpone the application destruction until the very end, OR ensure that
   // sensible objects are
@@ -402,10 +399,25 @@ int main(int argc, char *argv[]) {
 
   // Enable to render smooth icons on high dpi monitors
   a.setAttribute(Qt::AA_UseHighDpiPixmaps);
+#if defined(_WIN32) && QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
+  // Compress tablet events with application attributes instead of implementing
+  // the delay-timer by ourselves
+  a.setAttribute(Qt::AA_CompressHighFrequencyEvents);
+  a.setAttribute(Qt::AA_CompressTabletEvents);
+#endif
+
+#ifdef _WIN32
+  // This attribute is set to make menubar icon to be always (16 x devPixRatio).
+  // Without this attribute the menu bar icon size becomes the same as tool bar
+  // when Windows scale is in 125%. Currently hiding the menu bar icon is done
+  // by setting transparent pixmap only in menu bar icon size. So the size must
+  // be different between for menu bar and for tool bar.
+  a.setAttribute(Qt::AA_Use96Dpi);
+#endif
 
   // Set the app's locale for numeric stuff to standard C. This is important for
   // atof() and similar
-  // calls that are locale-dependant.
+  // calls that are locale-dependent.
   setlocale(LC_NUMERIC, "C");
 
 // Set current directory to the bundle/application path - this is needed to have
@@ -419,6 +431,16 @@ int main(int argc, char *argv[]) {
     assert(ret);
   }
 #endif
+
+  // Set icon theme search paths
+  QStringList themeSearchPathsList = {":/icons"};
+  QIcon::setThemeSearchPaths(themeSearchPathsList);
+  // qDebug() << "All icon theme search paths:" << QIcon::themeSearchPaths();
+
+  // Set show icons in menus flag (use iconVisibleInMenu to disable selectively)
+  QApplication::instance()->setAttribute(Qt::AA_DontShowIconsInMenus, false);
+
+  TEnv::setApplicationFileName(argv[0]);
 
   // splash screen
   QPixmap splashPixmap = QIcon(":Resources/splash.svg").pixmap(QSize(610, 344));
@@ -439,8 +461,10 @@ int main(int argc, char *argv[]) {
 
   TMessageRepository::instance();
 
+  bool isRunScript = (loadFilePath.getType() == "toonzscript");
+
   QSplashScreen splash(splashPixmap);
-  splash.show();
+  if (!isRunScript) splash.show();
   a.processEvents();
 
   splash.showMessage(offsetStr + "Initializing QGLFormat...", Qt::AlignCenter,
@@ -453,11 +477,7 @@ int main(int argc, char *argv[]) {
   fmt.setStencil(true);
   QGLFormat::setDefaultFormat(fmt);
 
-// seems this function should be called at all systems
-// pheraps in some GLUT-implementations initalization is mere formality
-#if defined(LINUX) || (defined(_WIN32) && defined(__GNUC__))
   glutInit(&argc, argv);
-#endif
 
   splash.showMessage(offsetStr + "Initializing Toonz environment ...",
                      Qt::AlignCenter, Qt::white);
@@ -469,6 +489,16 @@ int main(int argc, char *argv[]) {
 
   // Toonz environment
   initToonzEnv(argumentPathValues);
+
+  // prepare for 30bit display
+  if (Preferences::instance()->is30bitDisplayEnabled()) {
+    QSurfaceFormat sFmt = QSurfaceFormat::defaultFormat();
+    sFmt.setRedBufferSize(10);
+    sFmt.setGreenBufferSize(10);
+    sFmt.setBlueBufferSize(10);
+    sFmt.setAlphaBufferSize(2);
+    QSurfaceFormat::setDefaultFormat(sFmt);
+  }
 
   // Initialize thread components
   TThread::init();
@@ -531,11 +561,7 @@ int main(int argc, char *argv[]) {
   languagePathString += "\\" + Preferences::instance()->getCurrentLanguage();
 #endif
   QTranslator translator;
-#ifdef LINETEST
-  translator.load("linetest", languagePathString);
-#else
   translator.load("toonz", languagePathString);
-#endif
 
   // La installo
   a.installTranslator(&translator);
@@ -588,6 +614,11 @@ int main(int argc, char *argv[]) {
                      Qt::white);
   a.processEvents();
 
+  // Set default start icon theme
+  QIcon::setThemeName(Preferences::instance()->getIconTheme() ? "dark"
+                                                              : "light");
+  // qDebug() << "Icon theme name:" << QIcon::themeName();
+
   // stile
   QApplication::setStyle("windows");
 
@@ -626,15 +657,74 @@ int main(int argc, char *argv[]) {
   /*-- Layoutファイル名をMainWindowのctorに渡す --*/
   MainWindow w(argumentLayoutFileName);
 
+  if (isRunScript) {
+    // load script
+    if (TFileStatus(loadFilePath).doesExist()) {
+      // find project for this script file
+      TProjectManager *pm    = TProjectManager::instance();
+      TProjectP sceneProject = pm->loadSceneProject(loadFilePath);
+      TFilePath oldProjectPath;
+      if (!sceneProject) {
+        std::cerr << QObject::tr(
+                         "It is not possible to load the scene %1 because it "
+                         "does not "
+                         "belong to any project.")
+                         .arg(loadFilePath.getQString())
+                         .toStdString()
+                  << std::endl;
+        return 1;
+      }
+      if (sceneProject && !sceneProject->isCurrent()) {
+        oldProjectPath = pm->getCurrentProjectPath();
+        pm->setCurrentProjectPath(sceneProject->getProjectPath());
+      }
+      ScriptEngine engine;
+      QObject::connect(&engine, &ScriptEngine::output, script_output);
+      QString s = QString::fromStdWString(loadFilePath.getWideString())
+                      .replace("\\", "\\\\")
+                      .replace("\"", "\\\"");
+      QString cmd = QString("run(\"%1\")").arg(s);
+      engine.evaluate(cmd);
+      engine.wait();
+      if (!oldProjectPath.isEmpty()) pm->setCurrentProjectPath(oldProjectPath);
+      return 1;
+    } else {
+      std::cerr << QObject::tr("Script file %1 does not exists.")
+                       .arg(loadFilePath.getQString())
+                       .toStdString()
+                << std::endl;
+      return 1;
+    }
+  }
+
+#ifdef _WIN32
+  // http://doc.qt.io/qt-5/windows-issues.html#fullscreen-opengl-based-windows
+  if (w.windowHandle())
+    QWindowsWindowFunctions::setHasBorderInFullScreen(w.windowHandle(), true);
+#endif
+
+    // Qt have started to support Windows Ink from 5.12.
+    // Unlike WinTab API used in Qt 5.9 the tablet behaviors are different and
+    // are (at least, for OT) problematic. The customized Qt5.15.2 are made with
+    // cherry-picking the WinTab feature to be officially introduced from 6.0.
+    // See https://github.com/shun-iwasawa/qt5/releases/tag/v5.15.2_wintab for
+    // details. The following feature can only be used with the customized Qt,
+    // with WITH_WINTAB build option, and in Windows-x64 build.
+
+#ifdef WITH_WINTAB
+  bool useQtNativeWinInk = Preferences::instance()->isQtNativeWinInkEnabled();
+  QWindowsWindowFunctions::setWinTabEnabled(!useQtNativeWinInk);
+#endif
+
   splash.showMessage(offsetStr + "Loading style sheet ...", Qt::AlignCenter,
                      Qt::white);
   a.processEvents();
 
   // Carico lo styleSheet
-  QString currentStyle = Preferences::instance()->getCurrentStyleSheetPath();
+  QString currentStyle = Preferences::instance()->getCurrentStyleSheet();
   a.setStyleSheet(currentStyle);
 
-  w.setWindowTitle(applicationFullName);
+  w.setWindowTitle(QString::fromStdString(TEnv::getApplicationFullName()));
   if (TEnv::getIsPortable()) {
     splash.showMessage(offsetStr + "Starting OpenToonz Portable ...",
                        Qt::AlignCenter, Qt::white);
@@ -647,6 +737,8 @@ int main(int argc, char *argv[]) {
   TFilePath fp = ToonzFolder::getModuleFile("mainwindow.ini");
   QSettings settings(toQString(fp), QSettings::IniFormat);
   w.restoreGeometry(settings.value("MainWindowGeometry").toByteArray());
+
+  ExpressionReferenceManager::instance()->init();
 
 #ifndef MACOSX
   // Workaround for the maximized window case: Qt delivers two resize events,
@@ -675,13 +767,12 @@ int main(int argc, char *argv[]) {
   w.startupFloatingPanels();
 
   CommandManager::instance()->execute(T_Hand);
-  if (!loadScenePath.isEmpty()) {
+  if (!loadFilePath.isEmpty()) {
     splash.showMessage(
-        QString("Loading file '") + loadScenePath.getQString() + "'...",
+        QString("Loading file '") + loadFilePath.getQString() + "'...",
         Qt::AlignCenter, Qt::white);
-
-    loadScenePath = loadScenePath.withType("tnz");
-    if (TFileStatus(loadScenePath).doesExist()) IoCmd::loadScene(loadScenePath);
+    loadFilePath = loadFilePath.withType("tnz");
+    if (TFileStatus(loadFilePath).doesExist()) IoCmd::loadScene(loadFilePath);
   }
 
   QFont *myFont;

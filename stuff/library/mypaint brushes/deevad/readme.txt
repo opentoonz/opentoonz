@@ -8,7 +8,7 @@ what you want with it.
 
 If you accept this license, a new brush group named 'deevad-v6' will 
 be created. More infos on the brushes on my blog, or my deviant-art 
-account , under the ressources category.
+account , under the resources category.
 
 Released in end october 2012
 

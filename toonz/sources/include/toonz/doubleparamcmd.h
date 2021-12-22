@@ -18,6 +18,7 @@
 #endif
 
 class KeyframesUndo;
+class TSceneHandle;
 
 class DVAPI KeyframeSetter {
   TDoubleParamP m_param;
@@ -52,7 +53,7 @@ public:
   void selectKeyframe(int kIndex);
 
   // create a new keyframe, select it and returns its k-index
-  // (if a keyframe already exsist at frame then it is equivalent to
+  // (if a keyframe already exists at frame then it is equivalent to
   // selectKeyframe)
   // note: call createKeyframe() when no other keyframes are selected
   int createKeyframe(double frame);
@@ -91,7 +92,7 @@ public:
                     double similarShapeOffset);
 
   // addUndo is called automatically (if needed) in the dtor.
-  // it is also possible to call it explictly.
+  // it is also possible to call it explicitly.
   void addUndo();
 
   static void setValue(TDoubleParam *curve, double frame, double value) {
@@ -101,7 +102,8 @@ public:
   }
   static void removeKeyframeAt(TDoubleParam *curve, double frame);
 
-  static void enableCycle(TDoubleParam *curve, bool enabled);
+  static void enableCycle(TDoubleParam *curve, bool enabled,
+                          TSceneHandle *sceneHandle = nullptr);
 };
 
 #endif

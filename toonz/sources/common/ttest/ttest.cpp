@@ -16,7 +16,7 @@
 #include <set>
 #include <sstream>
 
-#if defined(LINUX)
+#if defined(LINUX) || defined(FREEBSD)
 #include <typeinfo>
 #endif
 

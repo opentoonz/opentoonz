@@ -1,43 +1,46 @@
 set(MOC_HEADERS
-    fullcolorbrushtool.h
     controlpointselection.h
-    ../include/tools/imagegrouping.h
     edittoolgadgets.h
     filltool.h
+    fullcolorbrushtool.h
+    fullcolorfilltool.h
+    plastictool.h
     skeletonsubtools.h
     tooloptionscontrols.h
-    plastictool.h
+    toonzrasterbrushtool.h
+    viewtools.h
+    controlpointeditortool.h
+    ../include/tools/imagegrouping.h
+    ../include/tools/screenpicker.h
     ../include/tools/toolhandle.h
     ../include/tools/tooloptions.h
-    ../include/tools/screenpicker.h
-    rgbpickertool.h
-    rulertool.h
-    stylepickertool.h
-	viewtools.h
-    toonzrasterbrushtool.h
 )
 
-set(HEADERS ${MOC_HEADERS}
+set(HEADERS
+    ${MOC_HEADERS}
     autofill.h
     bluredbrush.h
+    hookselection.h
+    mypainttoonzbrush.h
+    rasterselectiontool.h
+    rgbpickertool.h
+    rulertool.h
+    selectiontool.h
+    setsaveboxtool.h
+    shifttracetool.h
+    stylepickertool.h
+    toonzvectorbrushtool.h
+    vectorselectiontool.h
+    ../include/tools/RGBpicker.h
     ../include/tools/cursormanager.h
     ../include/tools/cursors.h
     ../include/tools/levelselection.h
     ../include/tools/rasterselection.h
-    hookselection.h
-    selectiontool.h
-    setsaveboxtool.h
-    rasterselectiontool.h
-    vectorselectiontool.h
     ../include/tools/strokeselection.h
     ../include/tools/stylepicker.h
     ../include/tools/tool.h
     ../include/tools/toolcommandids.h
     ../include/tools/toolutils.h
-    ../include/tools/RGBpicker.h
-    mypainttoonzbrush.h
-    shifttracetool.h
-	toonzvectorbrushtool.h
 )
 
 set(SOURCES
@@ -57,6 +60,7 @@ set(SOURCES
     filltool.cpp
     fullcolorbrushtool.cpp
     fullcolorerasertool.cpp
+    fullcolorfilltool.cpp
     geometrictool.cpp
     hooktool.cpp
     hookselection.cpp
@@ -106,7 +110,9 @@ set(RESOURCES tnztools.qrc)
 
 qt5_add_resources(SOURCES ${RESOURCES})
 
-add_translation(tnztools ${HEADERS} ${SOURCES})
+if(WITH_TRANSLATION)
+    add_translation(tnztools ${HEADERS} ${SOURCES})
+endif()
 
 qt5_wrap_cpp(SOURCES ${MOC_HEADERS})
 
@@ -116,7 +122,7 @@ add_definitions(
 )
 
 if(BUILD_ENV_APPLE)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-install_name,@rpath/libtnztools.dylib")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-install_name,@executable_path/libtnztools.dylib")
     add_dependencies(tnztools tnzcore tnzbase tnzext toonzlib toonzqt)
 endif()
 

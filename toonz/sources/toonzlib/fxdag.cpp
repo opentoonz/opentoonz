@@ -14,9 +14,6 @@
 // TnzCore includes
 #include "tstream.h"
 
-// tcg includes
-#include "tcg/function_types.h"
-
 // STD includes
 //#include <cwctypes>
 

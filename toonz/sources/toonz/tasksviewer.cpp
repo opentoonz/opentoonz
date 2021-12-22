@@ -39,7 +39,7 @@ bool isMovieType(std::string type) {
   return (type == "mov" || type == "avi" || type == "3gp" || type == "mp4" ||
           type == "webm");
 }
-};
+};  // namespace
 
 //=============================================================================
 
@@ -53,10 +53,10 @@ void TasksViewer::add(const QString &iconName, QString text, QToolBar *toolBar,
                       const char *slot, QString iconText) {
 #if QT_VERSION >= 0x050500
   QAction *action = new QAction(
-      createQIconOnOff(iconName.toLatin1().constData(), false), text, this);
+      createQIcon(iconName.toLatin1().constData(), false), text, this);
 #else
   QAction *action = new QAction(
-      createQIconOnOff(iconName.toAscii().constData(), false), text, this);
+      createQIcon(iconName.toAscii().constData(), false), text, this);
 #endif
   action->setIconText(iconText);
   bool ret = connect(action, SIGNAL(triggered(bool)),
@@ -80,19 +80,19 @@ QWidget *TasksViewer::createToolBar() {
   // Create toolbar. It is an horizontal layout with three internal toolbar.
   QWidget *toolBarWidget = new QWidget(this);
   QToolBar *cmdToolbar   = new QToolBar(toolBarWidget);
-  cmdToolbar->setIconSize(QSize(21, 17));
+  cmdToolbar->setIconSize(QSize(20, 20));
   cmdToolbar->clear();
   cmdToolbar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-  add("start", tr("&Start"), cmdToolbar, SLOT(start(bool)), tr("Start"));
+  add("play", tr("&Start"), cmdToolbar, SLOT(start(bool)), tr("Start"));
   add("stop", tr("&Stop"), cmdToolbar, SLOT(stop(bool)), tr("Stop"));
   cmdToolbar->addSeparator();
-  add("addrender", tr("&Add Render Task"), cmdToolbar,
+  add("render_add", tr("&Add Render Task"), cmdToolbar,
       SLOT(addRenderTask(bool)), tr("Add Render"));
-  add("addcleanup", tr("&Add Cleanup Task"), cmdToolbar,
+  add("cleanup_add", tr("&Add Cleanup Task"), cmdToolbar,
       SLOT(addCleanupTask(bool)), tr("Add Cleanup"));
 
   QToolBar *saveToolbar = new QToolBar(toolBarWidget);
-  saveToolbar->setIconSize(QSize(21, 17));
+  saveToolbar->setIconSize(QSize(20, 20));
   saveToolbar->clear();
   saveToolbar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
   add("save", tr("&Save Task List"), saveToolbar, SLOT(save(bool)), tr("Save"));
@@ -324,7 +324,7 @@ void TaskSheet::update(TFarmTask *task) {
   m_commandLine->setText(task->getCommandLine());
   m_server->setText(task->m_server);
   m_submittedBy->setText(task->m_user);
-  m_submittedOn->setText(task->m_submissionDate.toString());
+  m_submittedOn->setText(task->m_callerMachineName);
   m_priority->setText(QString::number(task->m_priority));
   m_submitDate->setText(task->m_submissionDate.toString());
   m_startDate->setText(task->m_startDate.toString());
@@ -1021,7 +1021,7 @@ TaskTreeView::TaskTreeView(TasksViewer *parent, TaskTreeModel *treeModel)
   if (!treeModel) treeModel = new TaskTreeModel(this);
   setModel(treeModel);
   setObjectName("taskeditortree");
-  setIconSize(QSize(21, 17));
+  setIconSize(QSize(35, 18));
 
   // connect(this, SIGNAL(pressed      (const QModelIndex &) ), this,
   // SLOT(onActivated(const QModelIndex &)));
@@ -1131,41 +1131,56 @@ QVariant TaskTreeModel::data(const QModelIndex &index, int role) const {
     case 0:
       return QVariant();
     case 1:
-      return QIcon(":Resources/farm_tasks.svg");
+      return createQIcon("tasks");
     case 2:
     case 3:
       TFarmTask *t         = item->getTask();
       bool sourceFileIsCLN = (t->m_taskFilePath.getType() == "cln");
       switch (t->m_status) {
       case Suspended:
-        return QIcon(t->m_isComposerTask
-                         ? ":Resources/render_suspended.svg"
-                         : (sourceFileIsCLN
-                                ? ":Resources/cln_suspended.svg"
-                                : ":Resources/cleanup_suspended.svg"));
+        return QIcon(
+            t->m_isComposerTask
+                ? getIconThemePath("actions/35/task_render_suspended.svg")
+                : (sourceFileIsCLN
+                       ? getIconThemePath("actions/35/task_cln_suspended.svg")
+                       : getIconThemePath(
+                             "actions/35/task_cleanup_suspended.svg")));
       case Waiting:
-        return QIcon(t->m_isComposerTask
-                         ? ":Resources/render_done_with_errors.svg"
-                         : (sourceFileIsCLN
-                                ? ":Resources/cln_done_with_errors.svg"
-                                : ":Resources/cleanup_done_with_errors.svg"));
+        return QIcon(
+            t->m_isComposerTask
+                ? getIconThemePath(
+                      "actions/35/task_render_completed_with_errors.svg")
+                : (sourceFileIsCLN
+                       ? getIconThemePath(
+                             "actions/35/task_cln_completed_with_errors.svg")
+                       : getIconThemePath(
+                             "actions/35/"
+                             "task_cleanup_completed_with_errors.svg")));
       case Running:
-        return QIcon(t->m_isComposerTask
-                         ? ":Resources/render_computing.svg"
-                         : (sourceFileIsCLN
-                                ? ":Resources/cln_computing.svg"
-                                : ":Resources/cleanup_computing.svg"));
+        return QIcon(
+            t->m_isComposerTask
+                ? getIconThemePath("actions/35/task_render_computing.svg")
+                : (sourceFileIsCLN
+                       ? getIconThemePath("actions/35/task_cln_computing.svg")
+                       : getIconThemePath(
+                             "actions/35/task_cleanup_computing.svg")));
       case Completed:
-        return QIcon(t->m_isComposerTask
-                         ? ":Resources/render_done.svg"
-                         : (sourceFileIsCLN ? ":Resources/cln_done.svg"
-                                            : ":Resources/cleanup_done.svg"));
+        return QIcon(
+            t->m_isComposerTask
+                ? getIconThemePath("actions/35/task_render_completed.svg")
+                : (sourceFileIsCLN
+                       ? getIconThemePath("actions/35/task_cln_completed.svg")
+                       : getIconThemePath(
+                             "actions/35/task_cleanup_completed.svg")));
       case Aborted:
       case TaskUnknown:
-        return QIcon(t->m_isComposerTask
-                         ? ":Resources/render_failed.svg"
-                         : (sourceFileIsCLN ? ":Resources/cln_failed.svg"
-                                            : ":Resources/cleanup_failed.svg"));
+        return QIcon(
+            t->m_isComposerTask
+                ? getIconThemePath("actions/35/task_render_failed.svg")
+                : (sourceFileIsCLN
+                       ? getIconThemePath("actions/35/task_cln_failed.svg")
+                       : getIconThemePath(
+                             "actions/35/task_cleanup_failed.svg")));
       default:
         assert(false);
       }

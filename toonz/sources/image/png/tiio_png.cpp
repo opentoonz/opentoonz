@@ -202,6 +202,13 @@ public:
     if (m_color_type == PNG_COLOR_TYPE_PALETTE) {
       m_info.m_valid = true;
       png_set_palette_to_rgb(m_png_ptr);
+
+      // treat the image as RGBA from now on
+      m_info.m_samplePerPixel =
+          4;  // there are 4 channels per pixel (R, G, B, and A)
+
+      // if there is no alpha channel, then fill it with "255" (full opacity)
+      png_set_filler(m_png_ptr, 0xFF, PNG_FILLER_AFTER);
     }
 
     if (m_color_type == PNG_COLOR_TYPE_GRAY && m_bit_depth < 8) {
@@ -342,7 +349,9 @@ public:
 
   void writeRow(char *buffer) {
     if (m_color_type == PNG_COLOR_TYPE_RGB_ALPHA ||
-        m_color_type == PNG_COLOR_TYPE_GRAY_ALPHA) {
+        m_color_type == PNG_COLOR_TYPE_GRAY_ALPHA ||
+        m_color_type == PNG_COLOR_TYPE_PALETTE) {  // PNG_COLOR_TYPE_PALETTE is
+                                                   // expanded to RGBA
       if (m_bit_depth == 16) {
         TPixel32 *pix = (TPixel32 *)buffer;
         int i         = -2;
@@ -370,6 +379,9 @@ public:
 #else
 #error "unknown channel order"
 #endif
+
+          // premultiply here
+          premult(pix[j]);
         }
       } else {
         TPixel32 *pix = (TPixel32 *)buffer;
@@ -381,23 +393,25 @@ public:
           pix[j].g = m_rowBuffer[i++];
           pix[j].b = m_rowBuffer[i++];
 #elif defined(TNZ_MACHINE_CHANNEL_ORDER_RGBM)
-          pix[j].r                 = m_rowBuffer[i++];
-          pix[j].g                 = m_rowBuffer[i++];
-          pix[j].b                 = m_rowBuffer[i++];
-          pix[j].m                 = m_rowBuffer[i++];
+          pix[j].r = m_rowBuffer[i++];
+          pix[j].g = m_rowBuffer[i++];
+          pix[j].b = m_rowBuffer[i++];
+          pix[j].m = m_rowBuffer[i++];
 #elif defined(TNZ_MACHINE_CHANNEL_ORDER_BGRM)
-          pix[j].b                 = m_rowBuffer[i++];
-          pix[j].g                 = m_rowBuffer[i++];
-          pix[j].r                 = m_rowBuffer[i++];
-          pix[j].m                 = m_rowBuffer[i++];
+          pix[j].b = m_rowBuffer[i++];
+          pix[j].g = m_rowBuffer[i++];
+          pix[j].r = m_rowBuffer[i++];
+          pix[j].m = m_rowBuffer[i++];
 #elif defined(TNZ_MACHINE_CHANNEL_ORDER_MBGR)
-          pix[j].m                 = m_rowBuffer[i++];
-          pix[j].b                 = m_rowBuffer[i++];
-          pix[j].g                 = m_rowBuffer[i++];
-          pix[j].r                 = m_rowBuffer[i++];
+          pix[j].m = m_rowBuffer[i++];
+          pix[j].b = m_rowBuffer[i++];
+          pix[j].g = m_rowBuffer[i++];
+          pix[j].r = m_rowBuffer[i++];
 #else
 #error "unknown channel order"
 #endif
+          // premultiply here
+          premult(pix[j]);
         }
       }
     } else  // qui gestisce RGB senza alpha.
@@ -432,9 +446,9 @@ public:
           pix[j].b = m_rowBuffer[i++];
 #elif defined(TNZ_MACHINE_CHANNEL_ORDER_MBGR) ||                               \
     defined(TNZ_MACHINE_CHANNEL_ORDER_BGRM)
-          pix[j].b                 = m_rowBuffer[i++];
-          pix[j].g                 = m_rowBuffer[i++];
-          pix[j].r                 = m_rowBuffer[i++];
+          pix[j].b = m_rowBuffer[i++];
+          pix[j].g = m_rowBuffer[i++];
+          pix[j].r = m_rowBuffer[i++];
 #else
 #error "unknown channel order"
 #endif
@@ -446,7 +460,9 @@ public:
 
   void writeRow(short *buffer) {
     if (m_color_type == PNG_COLOR_TYPE_RGB_ALPHA ||
-        m_color_type == PNG_COLOR_TYPE_GRAY_ALPHA) {
+        m_color_type == PNG_COLOR_TYPE_GRAY_ALPHA ||
+        m_color_type == PNG_COLOR_TYPE_PALETTE) {  // PNG_COLOR_TYPE_PALETTE is
+                                                   // expanded to RGBA
       TPixel64 *pix = (TPixel64 *)buffer;
       int i         = -2;  // 0;
       for (int j = 0; j < m_info.m_lx; j++) {
@@ -466,6 +482,9 @@ public:
 #error "unknown channel order"
 #endif
         // pix[j].m = 255;
+
+        // premultiply here
+        premult(pix[j]);
       }
     } else  // qui gestisce RGB senza alpha.
     {       // grayscale e' gestito come RGB perche' si usa png_set_gray_to_rgb
@@ -760,6 +779,8 @@ public:
   void flush() override;
 
   bool write64bitSupported() const override { return true; }
+  // m_matte is set to "Alpha Channel" property value in the function open()
+  bool writeAlphaSupported() const override { return m_matte; };
 };
 
 //---------------------------------------------------------
@@ -839,7 +860,7 @@ void PngWriter::open(FILE *file, const TImageInfo &info) {
     png_set_PLTE(m_png_ptr, m_info_ptr, palette, m_colormap->size());
   }
 
-// png_set_dither(m_png_ptr, palette, 256, 256, 0, 1);
+  // png_set_dither(m_png_ptr, palette, 256, 256, 0, 1);
 
 #if defined(TNZ_MACHINE_CHANNEL_ORDER_MBGR)
   png_set_bgr(m_png_ptr);
@@ -852,7 +873,6 @@ void PngWriter::open(FILE *file, const TImageInfo &info) {
 #error "unknownchannel order"
 #endif
 
-  png_write_info(m_png_ptr, m_info_ptr);
   png_set_pHYs(m_png_ptr, m_info_ptr, x_pixels_per_meter, y_pixels_per_meter,
                1);
 
@@ -863,6 +883,8 @@ void PngWriter::open(FILE *file, const TImageInfo &info) {
     bgcolor.index = 0;
     png_set_tRNS(m_png_ptr, m_info_ptr, alpha, 1, &bgcolor);
   }
+
+  png_write_info(m_png_ptr, m_info_ptr);
 }
 
 //---------------------------------------------------------
@@ -935,10 +957,10 @@ void PngWriter::writeLine(char *buffer) {
       tmp[k++] = depremult_pix.g;
       tmp[k++] = depremult_pix.r;
 #elif defined(TNZ_MACHINE_CHANNEL_ORDER_BGRM)
-      tmp[k++]                     = depremult_pix.b;
-      tmp[k++]                     = depremult_pix.g;
-      tmp[k++]                     = depremult_pix.r;
-      tmp[k++]                     = depremult_pix.m;
+      tmp[k++] = depremult_pix.b;
+      tmp[k++] = depremult_pix.g;
+      tmp[k++] = depremult_pix.r;
+      tmp[k++] = depremult_pix.m;
 #else
 #error "unknown channel order"
 #endif
@@ -951,7 +973,7 @@ void PngWriter::writeLine(char *buffer) {
 
     int k = 0;
     for (int j = 0; j < m_info.m_lx; j++) {
-// tmp = (pix->r&0xe0)|((pix->g&0xe0)>>3) | ((pix->b&0xc0)>>6);
+      // tmp = (pix->r&0xe0)|((pix->g&0xe0)>>3) | ((pix->b&0xc0)>>6);
 
 #if defined(TNZ_MACHINE_CHANNEL_ORDER_MRGB) ||                                 \
     defined(TNZ_MACHINE_CHANNEL_ORDER_RGBM)

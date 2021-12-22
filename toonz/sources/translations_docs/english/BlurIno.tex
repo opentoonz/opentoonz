@@ -1,0 +1,45 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[a4paper, total={180mm, 272mm}]{geometry}
+
+\usepackage{fontspec}
+\setmainfont[Path=fonts/, Extension=.ttf]{ipaexm}
+
+\setlength\parindent{3.5em}
+\setlength\parskip{0em}
+\renewcommand{\baselinestretch}{1.247}
+
+\begin{document}
+
+\thispagestyle{empty}
+
+\Large
+\noindent \\
+Blur Ino\medskip
+\par
+\normalsize
+Blurs the image.\par
+The method used for the blurring is a Gaussian distribution.\par
+Therefore, there is no directional result in the image.\\
+\par
+The image alpha channel will be taken into account.\\
+\\
+-{-}- \ Inputs \ -{-}-\\
+Source\par
+Connect the image to be processed.\\
+\\
+Reference\par
+Connect the reference image to assign the strength of the effect into each pixel.\\
+\\
+-{-}- \ Settings \ -{-}-\\
+Radius\par
+Specifies the radius of the blur.\par
+The unit used is mm.\\
+\\
+Reference\par
+Choose how the Reference image values are used to set the strength of the effect\par 
+into each pixel.\par
+Choose from Red/Green/Blue/Alpha/Luminance.\par
+Choose Nothing to disable the effect.\par
+The default value is Red.
+
+\end{document}

@@ -73,6 +73,8 @@ void TXshPaletteColumn::loadData(TIStream &is) {
       TPersist *p = 0;
       is >> p;
       if (TFx *fx = dynamic_cast<TFx *>(p)) setFx(fx);
+    } else if (loadCellMarks(tagName, is)) {
+      // do nothing
     } else {
       throw TException("TXshLevelColumn, unknown tag: " + tagName);
     }
@@ -107,6 +109,9 @@ void TXshPaletteColumn::saveData(TOStream &os) {
     os.closeChild();
   }
   os.child("fx") << m_fx;
+
+  // cell marks
+  saveCellMarks(os);
 }
 
 PERSIST_IDENTIFIER(TXshPaletteColumn, "paletteColumn")

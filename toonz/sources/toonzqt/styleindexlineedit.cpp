@@ -30,6 +30,8 @@ StyleIndexLineEdit::~StyleIndexLineEdit() {}
 void StyleIndexLineEdit::paintEvent(QPaintEvent *pe) {
   QLineEdit::paintEvent(pe);
 
+  if (!m_pltHandle->getPalette()) return;
+
   TColorStyle *style;
   // Aware of both "current" and translated string
   if (QString("current").contains(text()) || tr("current").contains(text()))

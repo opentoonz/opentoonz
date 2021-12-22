@@ -267,7 +267,8 @@ public:
 
 //-------------------------------------------------------------------
 
-class RandomNode final : public CalculatorNode {
+class RandomNode : public CalculatorNode {
+protected:
   std::unique_ptr<CalculatorNode> m_seed, m_min, m_max, m_arg;
 
 public:
@@ -309,6 +310,48 @@ public:
     if (m_seed.get()) m_seed->accept(visitor);
     if (m_min.get()) m_min->accept(visitor);
     if (m_max.get()) m_max->accept(visitor);
+  }
+};
+
+//-------------------------------------------------------------------
+
+class PeriodicRandomNode final : public RandomNode {
+  std::unique_ptr<CalculatorNode> m_period;
+
+public:
+  PeriodicRandomNode(Calculator *calc) : RandomNode(calc), m_period() {}
+
+  void setPeriod(CalculatorNode *arg) {
+    assert(m_period.get() == 0);
+    m_period.reset(arg);
+  }
+
+  double compute(double vars[3]) const override {
+    double s      = (m_seed.get() != 0) ? m_seed->compute(vars) : 0;
+    double period = m_period->compute(vars);
+    if (period == 0) period = 1;
+    double f = m_arg->compute(vars);
+
+    double f0    = period * std::floor(f / period);
+    double f1    = period * (std::floor(f / period) + 1);
+    double ratio = (f - f0) / (f1 - f0);
+
+    double r0 = RandomManager::instance()->getValue(s, fabs(f0));
+    double r1 = RandomManager::instance()->getValue(s, fabs(f1));
+    double r  = (1 - ratio) * r0 + ratio * r1;
+
+    if (m_min.get() == 0)
+      if (m_max.get() == 0)
+        return r;
+      else
+        return m_max->compute(vars) * r;
+    else
+      return (1 - r) * m_min->compute(vars) + r * m_max->compute(vars);
+  }
+
+  void accept(CalculatorNodeVisitor &visitor) override {
+    RandomNode::accept(visitor);
+    if (m_period.get()) m_period->accept(visitor);
   }
 };
 
@@ -538,7 +581,8 @@ public:
   bool matchToken(const std::vector<Token> &previousTokens,
                   const Token &token) const override {
     int i = (int)previousTokens.size();
-    return i == 1 && token.getText() == "?" || i == 3 && token.getText() == ":";
+    return ((i == 1 && token.getText() == "?") ||
+            (i == 3 && token.getText() == ":"));
   }
   bool isFinished(const std::vector<Token> &previousTokens,
                   const Token &token) const override {
@@ -571,8 +615,8 @@ public:
   }
   bool matchToken(const std::vector<Token> &previousTokens,
                   const Token &token) const override {
-    return previousTokens.empty() && token.getText() == "(" ||
-           previousTokens.size() == 2 && token.getText() == ")";
+    return ((previousTokens.empty() && token.getText() == "(") ||
+            (previousTokens.size() == 2 && token.getText() == ")"));
   }
   bool isFinished(const std::vector<Token> &previousTokens,
                   const Token &token) const override {
@@ -647,9 +691,9 @@ public:
   bool isFinished(const std::vector<Token> &previousTokens,
                   const Token &token) const override {
     if (previousTokens.empty()) return false;
-    return m_minArgCount == 0 && previousTokens.size() == 1 &&
-               token.getText() != "(" ||
-           previousTokens.back().getText() == ")";
+    return ((m_minArgCount == 0 && previousTokens.size() == 1 &&
+             token.getText() != "(") ||
+            (previousTokens.back().getText() == ")"));
   }
   TokenType getTokenType(const std::vector<Token> &previousTokens,
                          const Token &token) const override {
@@ -692,11 +736,11 @@ public:
       while (k > 0) nodes[--k] = popNode(stack);
     } else {
       while (k > 1) nodes[--k] = popNode(stack);
-      nodes[0]                 = new VariableNode(calc, CalculatorNode::FRAME);
+      nodes[0] = new VariableNode(calc, CalculatorNode::FRAME);
     }
 
     // add default values
-    for (int i         = 0; i < m; i++)
+    for (int i = 0; i < m; i++)
       nodes[n - m + i] = new NumberNode(calc, m_optionalArgDefaults[i]);
   }
 };
@@ -839,6 +883,36 @@ public:
       if (n > 1) randomNode->setMin(popNode(stack));
     }
     if (m_seed) randomNode->setSeed(popNode(stack));
+    stack.push_back(randomNode);
+  }
+};
+
+//-------------------------------------------------------------------
+
+class PeriodicRandomPattern final : public FunctionPattern {
+  bool m_seed;
+
+public:
+  PeriodicRandomPattern(std::string functionName, bool seed,
+                        std::string description)
+      : FunctionPattern(functionName, seed ? 2 : 1), m_seed(seed) {
+    allowImplicitArg(true);
+    addOptionalArg(0);
+    addOptionalArg(0);
+    setDescription(description);
+  }
+  void createNode(Calculator *calc, std::vector<CalculatorNode *> &stack,
+                  const std::vector<Token> &tokens) const override {
+    int n = ((int)tokens.size() - 1) / 2;
+    n--;
+    if (m_seed) n--;
+    PeriodicRandomNode *randomNode = new PeriodicRandomNode(calc);
+    if (n > 0) {
+      randomNode->setMax(popNode(stack));
+      if (n > 1) randomNode->setMin(popNode(stack));
+    }
+    if (m_seed) randomNode->setSeed(popNode(stack));
+    randomNode->setPeriod(popNode(stack));
     stack.push_back(randomNode);
   }
 };
@@ -1085,7 +1159,7 @@ public:
   double operator()(double x, double length, double height) const {
     if (length <= 0.0) return 0.0;
     if (height <= 0.0) height = length;
-    double q                  = x / length;
+    double q = x / length;
     return height * (q - floor(q));
   }
 };
@@ -1223,6 +1297,33 @@ Grammar::Grammar() : m_imp(new Imp()) {
                                "0,1)\nrnd_s(seed,max) = rnd_s(seed, "
                                "0,max)\nrnd_s(seed,min,max)\n" +
                                    rnd_s_desc));
+
+  const std::string rnd_p_desc =
+      rnd_desc + "; values are interpolated in periodic intervals";
+  addPattern(new PeriodicRandomPattern(
+      "random_p", false,
+      "random_p(period) = random_p(period,0,1)\nrandom_p(period,max) = "
+      "random_p(period,0,max)\nrandom_p(period,min,max)\n" +
+          rnd_p_desc));
+  addPattern(new PeriodicRandomPattern(
+      "rnd_p", false,
+      "rnd_p(period) = rnd_p(period,0,1)\nrnd_p(period,max) = "
+      "rnd_p(period,0,max)\nrnd_p(period,min,max)\n" +
+          rnd_p_desc));
+  const std::string rnd_ps_desc =
+      rnd_s_desc + "; values are interpolated in periodic intervals";
+  addPattern(new PeriodicRandomPattern(
+      "random_ps", true,
+      "random_ps(period,seed) = random_ps(period,seed, "
+      "0,1)\nrandom_ps(period,seed,max) = random_ps(period,seed, "
+      "0,max)\nrandom_ps(period,seed,min,max)\n" +
+          rnd_ps_desc));
+  addPattern(new PeriodicRandomPattern(
+      "rnd_ps", true,
+      "rnd_ps(period,seed) = rnd_ps(period,seed, "
+      "0,1)\nrnd_ps(period,seed,max) = rnd_ps(period,seed, "
+      "0,max)\nrnd_ps(period,seed,min,max)\n" +
+          rnd_ps_desc));
 
   addPattern(new CyclePattern("cycle"));
 }

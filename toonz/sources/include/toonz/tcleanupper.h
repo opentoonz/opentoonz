@@ -89,10 +89,11 @@ time, to unlock a possibly useful memory block.
 */
   CleanupPreprocessedImage *process(TRasterImageP &image, bool first_image,
                                     TRasterImageP &onlyResampledImage,
-                                    bool isCameraTest    = false,
-                                    bool returnResampled = false,
-                                    bool onlyForSwatch   = false,
-                                    TAffine *aff         = 0);
+                                    bool isCameraTest             = false,
+                                    bool returnResampled          = false,
+                                    bool onlyForSwatch            = false,
+                                    TAffine *aff                  = 0,
+                                    TRasterP templateForResampled = 0);
 
   void finalize(const TRaster32P &dst, CleanupPreprocessedImage *src);
   TToonzImageP finalize(CleanupPreprocessedImage *src,

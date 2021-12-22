@@ -29,9 +29,6 @@
 // Qt includes
 #include <QMetaObject>
 
-// tcg includes
-#include "tcg/tcg_function_types.h"
-
 // STD includes
 #include <fstream>
 #include <set>
@@ -261,8 +258,8 @@ bool setKeyframe(const TDoubleParamP &param, const TDoubleKeyframe &kf,
 
   TDoubleKeyframe kfCopy = kf;
 
-  kfCopy.m_frame                        = frame;
-  if (easeIn >= 0.0) kfCopy.m_speedIn   = TPointD(-easeIn, kfCopy.m_speedIn.y);
+  kfCopy.m_frame = frame;
+  if (easeIn >= 0.0) kfCopy.m_speedIn = TPointD(-easeIn, kfCopy.m_speedIn.y);
   if (easeOut >= 0.0) kfCopy.m_speedOut = TPointD(easeOut, kfCopy.m_speedOut.y);
 
   param->setKeyframe(kfCopy);
@@ -388,11 +385,11 @@ TStageObject::TStageObject(TStageObjectTree *tree, TStageObjectId id)
     , m_ikflag(0)
     , m_groupSelector(-1) {
   // NOTA: per le unita' di misura controlla anche tooloptions.cpp
-  m_x->setName("W_EW");
+  m_x->setName("W_X");
   m_x->setMeasureName("length.x");
   m_x->addObserver(this);
 
-  m_y->setName("W_NS");
+  m_y->setName("W_Y");
   m_y->setMeasureName("length.y");
   m_y->addObserver(this);
 
@@ -481,10 +478,7 @@ TStageObject::~TStageObject() {
 //-----------------------------------------------------------------------------
 
 const TStageObject::LazyData &TStageObject::lazyData() const {
-  typedef tcg::function<void (TStageObject::*)(LazyData &) const,
-                        &TStageObject::update>
-      Func;
-  return m_lazyData(tcg::bind1st(Func(), *this));
+  return m_lazyData([this](LazyData &ld) { this->update(ld); });
 }
 
 //-----------------------------------------------------------------------------
@@ -513,7 +507,7 @@ void TStageObject::onChange(const class TParamChange &c) {
   // one of its parameters. This means this function gets called A LOT.
 
   // Thus, we're just SCHEDULING for a data refresh. The actual refresh happens
-  // whenever the scheduled datas are accessed.
+  // whenever the scheduled data is accessed.
 
   if (c.m_keyframeChanged)
     m_lazyData.invalidate();  // Both invalidate placement AND keyframes
@@ -779,7 +773,7 @@ void TStageObject::setCenterAndOffset(const TPointD &center,
 //-----------------------------------------------------------------------------
 
 void TStageObject::setHandle(const std::string &s) {
-  m_handle                                = s;
+  m_handle = s;
   if (!s.empty() && s[0] == 'H') m_offset = m_center = TPointD();
 
   invalidate();
@@ -977,7 +971,7 @@ void TStageObject::removeKeyframeWithoutUndo(int frame) {
 
   if (m_skeletonDeformation) m_skeletonDeformation->deleteKeyframe(frame);
 
-  time                                          = -1;
+  time = -1;
   if ((int)keyframes.size() < 2) m_cycleEnabled = false;
 
   invalidate();
@@ -1310,17 +1304,17 @@ TAffine TStageObject::computeIkRootOffset(int t) {
   TAffine placement                   = foot->getPlacement(t).inv();
   int t0                              = 0;
   const TPinnedRangeSet::Range *range = foot->getPinnedRangeSet()->getRange(t);
-  if (range) t0                       = range->first;
+  if (range) t0 = range->first;
   while (t0 > 0) {
     TStageObject *oldFoot = getPinnedDescendant(t0 - 1);
     if (oldFoot == 0) break;  // oldFoot = this;
     assert(oldFoot != foot);
     TAffine changeFootAff =
         oldFoot->getPlacement(t0).inv() * foot->getPlacement(t0);
-    placement     = changeFootAff * placement;
-    foot          = oldFoot;
-    range         = oldFoot->getPinnedRangeSet()->getRange(t0 - 1);
-    t0            = 0;
+    placement = changeFootAff * placement;
+    foot      = oldFoot;
+    range     = oldFoot->getPinnedRangeSet()->getRange(t0 - 1);
+    t0        = 0;
     if (range) t0 = range->first;
   }
   m_ikflag--;
@@ -1418,7 +1412,7 @@ TAffine TStageObject::getPlacement(double t) {
   if (m_parent)
     place = m_parent->getPlacement(t) * computeLocalPlacement(tt);
   else
-    place        = computeLocalPlacement(tt);
+    place = computeLocalPlacement(tt);
   m_absPlacement = place;
   time           = t;
   return place;
@@ -1821,7 +1815,11 @@ void TStageObject::loadData(TIStream &is) {
     for (; itKfInd != keyframeIndexSet.end(); itKfInd++)
       setkey(m_scale, *itKfInd);
   }
-  updateKeyframes();
+  // Calling updateKeyframes() here may cause failure to load expressions
+  // especially if it refers to a curve which is to be loaded AFTER this
+  // function while loading scene process. So I will skip it assuming that
+  // updateKeyframes() will be called when it is actually needed.
+  // updateKeyframes();
   if (m_spline != 0 && isUppkEnabled())
     m_spline->addParam(m_posPath.getPointer());
   invalidate();
@@ -1857,8 +1855,8 @@ TStageObjectParams *TStageObject::getParams() const {
   data->m_cycleEnabled = m_cycleEnabled;
   data->m_spline       = m_spline;
 
-  data->m_handle                               = m_handle;
-  data->m_parentHandle                         = m_parentHandle;
+  data->m_handle       = m_handle;
+  data->m_parentHandle = m_parentHandle;
   if (m_pinnedRangeSet) data->m_pinnedRangeSet = m_pinnedRangeSet->clone();
 
   return data;
@@ -1924,7 +1922,7 @@ void TStageObject::assignParams(const TStageObjectParams *src,
   m_handle       = src->m_handle;
   m_parentHandle = src->m_parentHandle;
 
-  m_cycleEnabled                          = src->m_cycleEnabled;
+  m_cycleEnabled = src->m_cycleEnabled;
   if (m_pinnedRangeSet) *m_pinnedRangeSet = *src->m_pinnedRangeSet;
   updateKeyframes();
   if (m_spline && isUppkEnabled()) m_spline->addParam(m_posPath.getPointer());

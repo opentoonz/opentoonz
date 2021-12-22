@@ -82,7 +82,7 @@ public:
   void validateRegions(bool state = false);
   //! Get valid regions flags
   /*! Call validateRegions() after region/stroke changes
-*/
+   */
   bool areValidRegions();
 
   //! Return a clone of image
@@ -240,12 +240,12 @@ get the stroke nearest at point
                                                       //! index.
   void moveStrokes(int fromIndex, int count, int moveBefore);
   //! Find regions of a \b TVectorImage
-  void findRegions(bool fromSwf = false);
+  void findRegions();
 
 // Gmt. VA TOLTO IL PRIMA POSSIBILE.
 // E' una pessima cosa rendere platform dependent l'interfaccia pubblica di una
 // classe cosi' importante come la VectorImage
-#if defined(LINUX) || defined(MACOSX)
+#if defined(LINUX) || defined(FREEBSD) || defined(MACOSX)
   void render(const TVectorRenderData &rd, TRaster32P &ras);
 #endif
 
@@ -299,29 +299,29 @@ get the stroke nearest at point
 
   /*! Includes a (transformed) copy of imgs in this. If setSelected==true then
      selects imported strokes.
-          It also includes the color informations.
+          It also includes the color information.
           Try to assign the same stroke ids (if unused)
   */
   void enableRegionComputing(bool enabled, bool notIntersectingStrokes);
 
   /*! if enabled, region edges are joined together when possible. for flash
    * render, should be disabled!
-*/
+   */
   void enableMinimizeEdges(bool enabled);
   /*! Creates a new Image using the selected strokes. If removeFlag==true then
      removes selected strokes
-      It includes (in the new image) the color informations too.
-          It mantains stroke ids.
+      It includes (in the new image) the color information too.
+          It maintains stroke ids.
   */
   TVectorImageP splitSelected(bool removeFlag);
 
   //! Merge the image with the \b img.
-  void mergeImage(const TVectorImageP &img, const TAffine &affine,
-                  bool sameStrokeId = true);
+  int mergeImage(const TVectorImageP &img, const TAffine &affine,
+                 bool sameStrokeId = true);
 
-  void mergeImage(const TVectorImageP &img, const TAffine &affine,
-                  const std::map<int, int> &styleTable,
-                  bool sameStrokeId = true);
+  int mergeImage(const TVectorImageP &img, const TAffine &affine,
+                 const std::map<int, int> &styleTable,
+                 bool sameStrokeId = true);
   //! Merge the image with the vector of image \b images.
   void mergeImage(const std::vector<const TVectorImage *> &images);
 
@@ -428,7 +428,7 @@ public:
 //-----------------------------------------------------------------------------
 
 // GMT: DA TOGLIERE. vedi sopra
-#ifdef LINUX
+#if defined(LINUX) || defined(FREEBSD)
 DVAPI void hardRenderVectorImage(const TVectorRenderData &rd, TRaster32P &r,
                                  const TVectorImageP &vimg);
 #endif

@@ -1,0 +1,46 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[a4paper, total={180mm, 272mm}]{geometry}
+
+\usepackage{fontspec}
+\setmainfont[Path=fonts/, Extension=.ttf]{ipaexm}
+
+\setlength\parindent{3.5em}
+\setlength\parskip{0em}
+\renewcommand{\baselinestretch}{1.247}
+
+\begin{document}
+
+\thispagestyle{empty}
+
+\Large
+\noindent \\
+Pin Light Ino\medskip
+\par
+\normalsize
+Pin Light the image.\par
+When Fore is dark it uses Darken, when it is bright it uses Lighten.\par
+Formula = if (Fore < 0.5) then \textquotedbl Darken\textquotedbl \ else \textquotedbl Lighten\textquotedbl.\par
+The formula results in each RGB value ranging from 0 to 1.\\
+\\
+-{-}- \ Inputs \ -{-}-\par
+When both input ports are connected, they will be combined in the process.\par
+When the node Visibility switch is OFF it will display the Back port content.\par
+If there is only one port connected, it will display its content.\\
+Fore\par
+Connect the image that will be overlayed on top.\\
+Back\par
+Connect the base image.\\
+\\
+-{-}- \ Settings \ -{-}-\\
+Opacity\par
+Specifies the opacity of the image overlaid on top.\par
+When 0 the Fore image will be transparent.\par
+With the default value \textquotedbl 1.0\textquotedbl \ , the Fore image will be composed as opaque.\par
+Specify a value from 0 to 1.0.\\
+\\
+Clipping Mask\par
+When ON, it will take the Back port alpha information to define the alpha of the\par
+resulting image, leaving areas where the Alpha value is zero as transparent.\par
+The default value is ON.
+
+\end{document}

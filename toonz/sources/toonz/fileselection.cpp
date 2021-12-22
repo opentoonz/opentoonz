@@ -11,6 +11,7 @@
 #include "flipbook.h"
 #include "filebrowsermodel.h"
 #include "exportscenepopup.h"
+#include "separatecolorspopup.h"
 #include "tapp.h"
 
 #include "batches.h"
@@ -22,12 +23,16 @@
 #include "toonzqt/icongenerator.h"
 #include "toonzqt/gutil.h"
 #include "historytypes.h"
+#include "toonzqt/menubarcommand.h"
 
 // TnzLib includes
 #include "toonz/tproject.h"
 #include "toonz/toonzscene.h"
 #include "toonz/sceneresources.h"
 #include "toonz/preferences.h"
+#include "toonz/studiopalette.h"
+#include "toonz/palettecontroller.h"
+#include "toonz/tpalettehandle.h"
 
 // TnzCore includes
 #include "tfiletype.h"
@@ -183,8 +188,10 @@ public:
     return str;
   }
 };
+
+TPaletteP viewedPalette;
 //-----------------------------------------------------------------------------
-}
+}  // namespace
 
 //------------------------------------------------------------------------
 
@@ -225,6 +232,7 @@ void FileSelection::enableCommands() {
   enableCommand(this, MI_ImportScenes, &FileSelection::importScenes);
   enableCommand(this, MI_ExportScenes, &FileSelection::exportScenes);
   enableCommand(this, MI_SelectAll, &FileSelection::selectAll);
+  enableCommand(this, MI_SeparateColors, &FileSelection::separateFilesByColors);
 }
 
 //------------------------------------------------------------------------
@@ -325,12 +333,16 @@ void FileSelection::showFolderContents() {
     if (!model) return;
     folderPath = model->getFolder();
   }
-  if (TSystem::isUNC(folderPath))
-    QDesktopServices::openUrl(
+  if (TSystem::isUNC(folderPath)) {
+    bool ok = QDesktopServices::openUrl(
         QUrl(QString::fromStdWString(folderPath.getWideString())));
-  else
-    QDesktopServices::openUrl(QUrl::fromLocalFile(
-        QString::fromStdWString(folderPath.getWideString())));
+    if (ok) return;
+    // If the above fails, then try opening UNC path with the same way as the
+    // local files.. QUrl::fromLocalFile() seems to work for UNC path as well in
+    // our environment. (8/10/2021 shun-iwasawa)
+  }
+  QDesktopServices::openUrl(
+      QUrl::fromLocalFile(QString::fromStdWString(folderPath.getWideString())));
 }
 
 //------------------------------------------------------------------------
@@ -365,13 +377,22 @@ void FileSelection::viewFile() {
   getSelectedFiles(files);
   int i = 0;
   for (i = 0; i < files.size(); i++) {
-    if (!TFileType::isViewable(TFileType::getInfo(files[0]))) continue;
+    if (!TFileType::isViewable(TFileType::getInfo(files[i])) &&
+        files[i].getType() != "tpl")
+      continue;
 
     if (Preferences::instance()->isDefaultViewerEnabled() &&
         (files[i].getType() == "mov" || files[i].getType() == "avi" ||
          files[i].getType() == "3gp"))
       QDesktopServices::openUrl(QUrl("file:///" + toQString(files[i])));
-    else {
+    else if (files[i].getType() == "tpl") {
+      viewedPalette = StudioPalette::instance()->getPalette(files[i], false);
+      TApp::instance()
+          ->getPaletteController()
+          ->getCurrentLevelPalette()
+          ->setPalette(viewedPalette.getPointer());
+      CommandManager::instance()->execute("MI_OpenPalette");
+    } else {
       FlipBook *fb = ::viewFile(files[i]);
       if (fb) {
         FileBrowserPopup::setModalBrowserToParent(fb->parentWidget());
@@ -390,7 +411,7 @@ void FileSelection::convertFiles() {
   static ConvertPopup *popup = new ConvertPopup(false);
   if (popup->isConverting()) {
     DVGui::info(QObject::tr(
-        "A convertion task is in progress! wait until it stops or cancel it"));
+        "A conversion task is in progress! wait until it stops or cancel it"));
     return;
   }
   popup->setFiles(files);
@@ -461,8 +482,8 @@ void FileSelection::collectAssets() {
 
   if (count > 1) {
     QMainWindow *mw = TApp::instance()->getMainWindow();
-    ProgressDialog progress(tr("Collecting assets..."), tr("Abort"), 0, count,
-                            mw);
+    ProgressDialog progress(QObject::tr("Collecting assets..."),
+                            QObject::tr("Abort"), 0, count, mw);
     progress.setWindowModality(Qt::WindowModal);
 
     int i;
@@ -483,6 +504,25 @@ void FileSelection::collectAssets() {
     DVGui::info(QObject::tr("%1 assets imported").arg(collectedAssets));
   DvDirModel::instance()->refreshFolder(
       TProjectManager::instance()->getCurrentProjectPath().getParentDir());
+}
+
+//------------------------------------------------------------------------
+
+void FileSelection::separateFilesByColors() {
+  std::vector<TFilePath> files;
+  getSelectedFiles(files);
+  if (files.empty()) return;
+
+  static SeparateColorsPopup *popup = new SeparateColorsPopup();
+  if (popup->isConverting()) {
+    DVGui::MsgBox(INFORMATION, QObject::tr("A separation task is in progress! "
+                                           "wait until it stops or cancel it"));
+    return;
+  }
+  popup->setFiles(files);
+  popup->show();
+  popup->raise();
+  // popup->exec();
 }
 
 //------------------------------------------------------------------------
@@ -531,8 +571,8 @@ void FileSelection::importScenes() {
 
   if (count > 1) {
     QMainWindow *mw = TApp::instance()->getMainWindow();
-    ProgressDialog progress(tr("Importing scenes..."), tr("Abort"), 0, count,
-                            mw);
+    ProgressDialog progress(QObject::tr("Importing scenes..."),
+                            QObject::tr("Abort"), 0, count, mw);
     progress.setWindowModality(Qt::WindowModal);
 
     int i;
@@ -578,6 +618,6 @@ void FileSelection::selectAll() {
     QString name =
         getModel()->getItemData(*it, DvItemListModel::FullPath).toString();
     TFilePath fp(name.toStdWString());
-    FileBrowser::refreshFolder(fp.getParentDir());
+    FileBrowser::updateItemViewerPanel();
   }
 }

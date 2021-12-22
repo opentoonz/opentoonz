@@ -610,13 +610,13 @@ CleanupSettings::CleanupSettings(QWidget *parent)
 
   leftToolBar->setFixedWidth(110);
 
-  m_swatchAct = new QAction(createQIconOnOff("preview", true),
-                            tr("Toggle Swatch Preview"), this);
+  m_swatchAct =
+      new QAction(createQIcon("preview"), tr("Toggle Swatch Preview"), this);
   m_swatchAct->setCheckable(true);
   leftToolBar->addAction(m_swatchAct);
   leftToolBar->addSeparator();
 
-  m_opacityAct = new QAction(createQIconOnOff("opacitycheck", true),
+  m_opacityAct = new QAction(createQIcon("opacitycheck"),
                              tr("Toggle Opacity Check"), this);
   m_opacityAct->setCheckable(true);
   leftToolBar->addAction(m_opacityAct);
@@ -632,14 +632,14 @@ CleanupSettings::CleanupSettings(QWidget *parent)
   rightToolBar->setFixedWidth(110);
 
   QAction *saveAct =
-      new QAction(createQIconOnOff("save", false), tr("Save Settings"), this);
+      new QAction(createQIcon("save"), tr("Save Settings"), this);
   rightToolBar->addAction(saveAct);
   QAction *loadAct =
-      new QAction(createQIconOnOff("load", false), tr("Load Settings"), this);
+      new QAction(createQIcon("load"), tr("Load Settings"), this);
   rightToolBar->addAction(loadAct);
   rightToolBar->addSeparator();
-  QAction *resetAct = new QAction(createQIconOnOff("resetsize", false),
-                                  tr("Reset Settings"), this);
+  QAction *resetAct =
+      new QAction(createQIcon("settings_reset"), tr("Reset Settings"), this);
   rightToolBar->addAction(resetAct);
 
   //  Model-related stuff

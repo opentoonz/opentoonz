@@ -50,12 +50,12 @@ void drawSliderHandle(QPoint pos, QPainter& p, QColor color, bool selected) {
   p.drawConvexPolygon(points, 5);
   p.resetTransform();
 }
-};
+};  // namespace
 //-----------------------------------------------------------------------------
 
 CameraCaptureLevelHistogram::CameraCaptureLevelHistogram(QWidget* parent)
     : QFrame(parent)
-    , m_histogramCue(false)
+    //, m_histogramCue(false)
     , m_currentItem(None)
     , m_black(0)
     , m_white(255)
@@ -72,29 +72,27 @@ CameraCaptureLevelHistogram::CameraCaptureLevelHistogram(QWidget* parent)
 
 //-----------------------------------------------------------------------------
 
-void CameraCaptureLevelHistogram::updateHistogram(QImage& image) {
-  // obtain histogram only when clicked
-  if (!m_histogramCue) return;
+void CameraCaptureLevelHistogram::updateHistogram(cv::Mat& image) {
+  cv::Mat gray, hist;
+  cv::cvtColor(image, gray, cv::COLOR_RGB2GRAY);
 
-  QVector<int> tmpHisto(256);
-  tmpHisto.fill(0);
-  for (int y = 0; y < image.height(); y++) {
-    QRgb* rgb_p = (QRgb*)(image.scanLine(y));
-    for (int x = 0; x < image.width(); x++, rgb_p++) {
-      tmpHisto[qGray(*rgb_p)]++;
-    }
-  }
-  // obtain max value and normalize
-  int max = 0;
+  const int hdims[]     = {256};  // size of histogram
+  const float hranges[] = {0, 256};
+  const float* ranges[] = {hranges};  // min and max values for each bin
+  double max_val        = .0;
+
+  cv::calcHist(&gray, 1, 0, cv::Mat(), hist, 1, hdims, ranges);
+  // obtain the maximum value
+  cv::minMaxLoc(hist, 0, &max_val);
+  // scaling
+  hist = hist * (max_val ? HISTOGRAM_HEIGHT / max_val : 0.);
+
+  float* histVal = hist.ptr<float>(0);
   for (int c = 0; c < 256; c++) {
-    if (tmpHisto.at(c) > max) max = tmpHisto.at(c);
-  }
-  for (int c = 0; c < 256; c++) {
-    m_histogramData[c] = tmpHisto.at(c) * HISTOGRAM_HEIGHT / max;
+    m_histogramData[c] = int(histVal[c]);
   }
   histogramObtained = true;
   update();
-  m_histogramCue = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -106,7 +104,7 @@ void CameraCaptureLevelHistogram::paintEvent(QPaintEvent* event) {
 
   // draw histogram
   p.setPen(Qt::black);
-  p.setBrush((m_currentItem == Histogram) ? Qt::darkGray : QColor(32, 32, 32));
+  p.setBrush(QColor(32, 32, 32));
   p.drawRect(histoRect.adjusted(-1, -1, 0, 0));
 
   if (histogramObtained) {
@@ -116,10 +114,6 @@ void CameraCaptureLevelHistogram::paintEvent(QPaintEvent* event) {
       p.drawLine(histoRect.bottomLeft() + QPoint(c, 0),
                  histoRect.bottomLeft() + QPoint(c, -m_histogramData.at(c)));
     }
-  }
-  if (!histogramObtained || m_currentItem == Histogram) {
-    p.setPen(Qt::white);
-    p.drawText(histoRect, Qt::AlignCenter, tr("Click to Update Histogram"));
   }
 
   p.setRenderHint(QPainter::Antialiasing);
@@ -147,10 +141,6 @@ void CameraCaptureLevelHistogram::paintEvent(QPaintEvent* event) {
 
 void CameraCaptureLevelHistogram::mousePressEvent(QMouseEvent* event) {
   if (event->button() != Qt::LeftButton) return;
-  if (m_currentItem == Histogram) {
-    m_histogramCue = true;
-    return;
-  }
   if (m_currentItem == None) return;
   QPoint pos = event->pos();
   if (m_currentItem == BlackSlider)
@@ -168,7 +158,7 @@ void CameraCaptureLevelHistogram::mousePressEvent(QMouseEvent* event) {
 void CameraCaptureLevelHistogram::mouseMoveEvent(QMouseEvent* event) {
   QPoint pos = event->pos();
   if (event->buttons() & Qt::LeftButton) {
-    if (m_currentItem == None || m_currentItem == Histogram) return;
+    if (m_currentItem == None) return;
 
     int hPos     = pos.x() - SIDE_MARGIN - m_offset;
     bool changed = false;
@@ -185,7 +175,7 @@ void CameraCaptureLevelHistogram::mouseMoveEvent(QMouseEvent* event) {
       if (hPos < m_black + 1)
         hPos = m_black + 1;
       else if (hPos > m_white - 1)
-        hPos      = m_white - 1;
+        hPos = m_white - 1;
       float gamma = hPosToGamma(hPos, m_black, m_white);
       if (gamma != m_gamma) {
         m_gamma = gamma;
@@ -223,8 +213,7 @@ void CameraCaptureLevelHistogram::mouseMoveEvent(QMouseEvent* event) {
   setToolTip("");
   QRect histoRect(5, 1, 256, HISTOGRAM_HEIGHT);
   if (histoRect.contains(pos)) {
-    setToolTip(tr("Click to Update Histogram"));
-    m_currentItem = Histogram;
+    // do nothing
   } else {
     // slider handles
     QPoint sliderBasePos(SIDE_MARGIN, HISTOGRAM_HEIGHT + 2);
@@ -286,6 +275,7 @@ CameraCaptureLevelControl::CameraCaptureLevelControl(QWidget* parent)
   m_whiteFld     = new IntLineEdit(this, m_histogram->white(), 2, 255);
   m_thresholdFld = new IntLineEdit(this, m_histogram->threshold(), 0, 255);
   m_gammaFld     = new DoubleLineEdit(this, m_histogram->gamma());
+  m_lut          = cv::Mat(1, 256, CV_8U);
 
   m_blackFld->setToolTip(tr("Black Point Value"));
   m_whiteFld->setToolTip(tr("White Point Value"));
@@ -330,6 +320,10 @@ CameraCaptureLevelControl::CameraCaptureLevelControl(QWidget* parent)
 //-----------------------------------------------------------------------------
 
 void CameraCaptureLevelControl::onHistogramValueChanged(int itemId) {
+  if (itemId == CameraCaptureLevelHistogram::ThresholdSlider) {
+    m_thresholdFld->setValue(m_histogram->threshold());
+    return;
+  }
   if (itemId == CameraCaptureLevelHistogram::BlackSlider) {
     m_blackFld->setValue(m_histogram->black());
     m_whiteFld->setRange(m_histogram->black() + 2, 255);
@@ -338,9 +332,8 @@ void CameraCaptureLevelControl::onHistogramValueChanged(int itemId) {
     m_blackFld->setRange(0, m_histogram->white() - 2);
   } else if (itemId == CameraCaptureLevelHistogram::GammaSlider) {
     m_gammaFld->setValue(m_histogram->gamma());
-  } else if (itemId == CameraCaptureLevelHistogram::ThresholdSlider) {
-    m_thresholdFld->setValue(m_histogram->threshold());
   }
+  computeLut();
 }
 
 //-----------------------------------------------------------------------------
@@ -353,6 +346,7 @@ void CameraCaptureLevelControl::onFieldChanged() {
     m_histogram->setThreshold(m_thresholdFld->getValue());
 
   m_histogram->update();
+  computeLut();
 }
 
 //-----------------------------------------------------------------------------
@@ -366,4 +360,43 @@ void CameraCaptureLevelControl::setMode(bool color_grayscale) {
   m_gammaFld->setVisible(color_grayscale);
   m_thresholdFld->setVisible(!color_grayscale);
   update();
+}
+
+//-----------------------------------------------------------------------------
+
+void CameraCaptureLevelControl::adjustLevel(cv::Mat& image) {
+  int black   = m_histogram->black();
+  int white   = m_histogram->white();
+  float gamma = m_histogram->gamma();
+  if (black == 0 && white == 255 && gamma == 1.0) return;
+
+  cv::LUT(image, m_lut, image);
+}
+
+void CameraCaptureLevelControl::binarize(cv::Mat& image) {
+  cv::threshold(image, image, m_histogram->threshold(), 255, cv::THRESH_BINARY);
+}
+
+void CameraCaptureLevelControl::computeLut() {
+  int black   = m_histogram->black();
+  int white   = m_histogram->white();
+  float gamma = m_histogram->gamma();
+
+  const float maxChannelValueF = 255.0f;
+
+  float value;
+
+  uchar* p = m_lut.data;
+  for (int i = 0; i < 256; i++) {
+    if (i <= black)
+      value = 0.0f;
+    else if (i >= white)
+      value = 1.0f;
+    else {
+      value = (float)(i - black) / (float)(white - black);
+      value = std::pow(value, 1.0f / gamma);
+    }
+
+    p[i] = (uchar)std::floor(value * maxChannelValueF);
+  }
 }

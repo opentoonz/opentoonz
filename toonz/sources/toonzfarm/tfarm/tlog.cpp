@@ -18,7 +18,6 @@
 #else
 #include <syslog.h>
 #include <unistd.h>
-#include <sys/timeb.h>
 #endif
 
 #include "tthreadmessage.h"

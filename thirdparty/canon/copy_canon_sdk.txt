@@ -1,0 +1,2 @@
+Copy the Header and library folders from the Canon SDK to this folder.
+Make sure that the library is the one from the EDSDK_64 folder.

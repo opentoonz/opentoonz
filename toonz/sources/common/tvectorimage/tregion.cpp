@@ -820,13 +820,13 @@ int TRegion::Imp::leftScanlineIntersections(const TPointD &p,
         if (t0 <= s && s < t1) {
           double ys = getY(q, s);
 
-          solIdx[0] = (ys < m_y && m_y <= y0 || y0 <= m_y && m_y < ys) ? 0 : -1;
-          solIdx[1] = (ys < m_y && m_y < y1 || y1 < m_y && m_y < ys) ? 1 : -1;
+          solIdx[0] = ((ys < m_y && m_y <= y0) || (y0 <= m_y && m_y < ys)) ? 0 : -1;
+          solIdx[1] = ((ys < m_y && m_y < y1) || (y1 < m_y && m_y < ys)) ? 1 : -1;
         } else if (t1 < s && s <= t0) {
           double ys = getY(q, s);
 
-          solIdx[0] = (ys < m_y && m_y <= y0 || y0 <= m_y && m_y < ys) ? 1 : -1;
-          solIdx[1] = (ys < m_y && m_y < y1 || y1 < m_y && m_y < ys) ? 0 : -1;
+          solIdx[0] = ((ys < m_y && m_y <= y0) || (y0 <= m_y && m_y < ys)) ? 1 : -1;
+          solIdx[1] = ((ys < m_y && m_y < y1) || (y1 < m_y && m_y < ys)) ? 0 : -1;
         } else {
           solIdx[0] = isInYRange(y0, y1) ? (t0 < s) ? 0 : 1 : -1;
           solIdx[1] = -1;

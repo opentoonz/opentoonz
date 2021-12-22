@@ -79,7 +79,7 @@ private:
   void doPsdParser();
 
 protected slots:
-  void onModeChanged(const QString &mode);
+  void onModeChanged();
   void onFolderOptionChange(int id);
 };
 

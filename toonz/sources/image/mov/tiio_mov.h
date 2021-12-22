@@ -3,7 +3,7 @@
 #ifndef TIIO_MOV_H
 #define TIIO_MOV_H
 
-#ifdef x64
+#if defined(x64) || (defined(__GNUC__) && defined(_WIN32))
 #include "tiio_mov_proxy.h"
 #else
 

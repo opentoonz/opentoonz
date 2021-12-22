@@ -5,18 +5,18 @@
     <name>ArrowToolOptionsBox</name>
     <message>
         <source>Pick:</source>
-        <translation>Seleccionar:</translation>
+        <translation>Escoger:</translation>
     </message>
     <message>
         <source>Position</source>
         <translation>Posición</translation>
     </message>
     <message>
-        <source>E/W:</source>
+        <source>X:</source>
         <translation>X:</translation>
     </message>
     <message>
-        <source>N/S:</source>
+        <source>Y:</source>
         <translation>Y:</translation>
     </message>
     <message>
@@ -96,11 +96,11 @@
     </message>
     <message>
         <source>Hardness:</source>
-        <translation>Dureza:</translation>
+        <translation type="vanished">Dureza:</translation>
     </message>
     <message>
         <source>Accuracy:</source>
-        <translation>Precisión:</translation>
+        <translation type="vanished">Precisión:</translation>
     </message>
     <message>
         <source>Selective</source>
@@ -108,7 +108,7 @@
     </message>
     <message>
         <source>Preset:</source>
-        <translation>Ajustes:</translation>
+        <translation type="vanished">Ajustes:</translation>
     </message>
     <message>
         <source>Break Sharp Angles</source>
@@ -124,119 +124,119 @@
     </message>
     <message>
         <source>Cap</source>
-        <translation>Extremos</translation>
+        <translation type="vanished">Extremos</translation>
     </message>
     <message>
         <source>Join</source>
-        <translation>Esquinas</translation>
+        <translation type="vanished">Esquinas</translation>
     </message>
     <message>
         <source>Miter:</source>
-        <translation>Inglete:</translation>
+        <translation type="vanished">Inglete:</translation>
     </message>
     <message>
         <source>Size</source>
-        <translation>Tamaño</translation>
+        <translation type="vanished">Tamaño</translation>
     </message>
     <message>
         <source>Break</source>
-        <translation>Quebrar</translation>
+        <translation type="vanished">Quebrar</translation>
     </message>
     <message>
         <source>Pencil</source>
-        <translation>Lápiz</translation>
+        <translation type="vanished">Lápiz</translation>
     </message>
     <message>
         <source>Pressure</source>
-        <translation>Presión</translation>
+        <translation type="vanished">Presión</translation>
     </message>
     <message>
         <source>Smooth:</source>
-        <translation>Estabilidad:</translation>
+        <translation type="vanished">Estabilidad:</translation>
     </message>
     <message>
         <source>Range:</source>
-        <translation>Rango:</translation>
+        <translation type="vanished">Rango:</translation>
     </message>
     <message>
         <source>Snap</source>
-        <translation>Adherencia</translation>
+        <translation type="vanished">Adherencia</translation>
     </message>
     <message>
         <source>&lt;custom&gt;</source>
-        <translation>&lt;personalizado&gt;</translation>
+        <translation type="vanished">&lt;personalizado&gt;</translation>
     </message>
     <message>
         <source>Off</source>
-        <translation>no</translation>
+        <translation type="vanished">no</translation>
     </message>
     <message>
         <source>Linear</source>
-        <translation>Lineal</translation>
+        <translation type="vanished">Lineal</translation>
     </message>
     <message>
         <source>In</source>
-        <translation>Desacelerado</translation>
+        <translation type="vanished">Desacelerado</translation>
     </message>
     <message>
         <source>Out</source>
-        <translation>Acelerado</translation>
+        <translation type="vanished">Acelerado</translation>
     </message>
     <message>
         <source>In&amp;Out</source>
-        <translation>Ambos</translation>
+        <translation type="vanished">Ambos</translation>
     </message>
     <message>
         <source>Low</source>
-        <translation>Baja</translation>
+        <translation type="vanished">Baja</translation>
     </message>
     <message>
         <source>High</source>
-        <translation>Alta</translation>
+        <translation type="vanished">Alta</translation>
     </message>
     <message>
         <source>Butt cap</source>
-        <translation>Rectos</translation>
+        <translation type="vanished">Rectos</translation>
     </message>
     <message>
         <source>Round cap</source>
-        <translation>Redondeados</translation>
+        <translation type="vanished">Redondeados</translation>
     </message>
     <message>
         <source>Projecting cap</source>
-        <translation>Proyectantes</translation>
+        <translation type="vanished">Proyectantes</translation>
     </message>
     <message>
         <source>Miter join</source>
-        <translation>En inglete</translation>
+        <translation type="vanished">En inglete</translation>
     </message>
     <message>
         <source>Round join</source>
-        <translation>Redondeadas</translation>
+        <translation type="vanished">Redondeadas</translation>
     </message>
     <message>
         <source>Bevel join</source>
-        <translation>Biseladas</translation>
+        <translation type="vanished">Biseladas</translation>
     </message>
     <message>
         <source>Med</source>
-        <translation>Media</translation>
+        <translation type="vanished">Media</translation>
     </message>
     <message>
         <source>Draw Order:</source>
-        <translation>Orden:</translation>
+        <translation type="vanished">Orden:</translation>
     </message>
     <message>
         <source>Over All</source>
-        <translation>Por encima</translation>
+        <translation type="vanished">Por encima</translation>
     </message>
     <message>
         <source>Under All</source>
-        <translation>Por debajo</translation>
+        <translation type="vanished">Por debajo</translation>
     </message>
     <message>
         <source>Palette Order</source>
-        <translation>Según paleta</translation>
+        <translation type="vanished">Según paleta</translation>
     </message>
 </context>
 <context>
@@ -260,6 +260,34 @@
         <source>Auto Select Drawing</source>
         <translation>Seleccionar dibujo automáticamente</translation>
     </message>
+    <message>
+        <source>Snap</source>
+        <translation>Adherencia</translation>
+    </message>
+    <message>
+        <source>Type:</source>
+        <translation>Tipo:</translation>
+    </message>
+    <message>
+        <source>Rectangular</source>
+        <translation>Rectangular</translation>
+    </message>
+    <message>
+        <source>Freehand</source>
+        <translation>Lazo</translation>
+    </message>
+    <message>
+        <source>Low</source>
+        <translation>Baja</translation>
+    </message>
+    <message>
+        <source>Med</source>
+        <translation>Media</translation>
+    </message>
+    <message>
+        <source>High</source>
+        <translation>Alta</translation>
+    </message>
 </context>
 <context>
     <name>ControlPointSelection</name>
@@ -269,7 +297,7 @@
     </message>
     <message>
         <source>Set Nonlinear Control Point</source>
-        <translation>Punto de control Bézier</translation>
+        <translation>Punto de control Bezier</translation>
     </message>
 </context>
 <context>
@@ -294,19 +322,19 @@
         <translation>Clave global</translation>
     </message>
     <message>
-        <source>Lock Center E/W</source>
+        <source>Lock Center X</source>
         <translation>Bloquear centro X</translation>
     </message>
     <message>
-        <source>Lock Center N/S</source>
+        <source>Lock Center Y</source>
         <translation>Bloquear centro Y</translation>
     </message>
     <message>
-        <source>Lock Position E/W</source>
+        <source>Lock Position X</source>
         <translation>Bloquear posición X</translation>
     </message>
     <message>
-        <source>Lock Position N/S</source>
+        <source>Lock Position Y</source>
         <translation>Bloquear posición Y</translation>
     </message>
     <message>
@@ -334,7 +362,7 @@
         <translation>Bloquear escala global</translation>
     </message>
     <message>
-        <source>E/W and N/S Positions</source>
+        <source>X and Y Positions</source>
         <translation>Posiciones X e Y</translation>
     </message>
     <message>
@@ -438,7 +466,7 @@
     </message>
     <message>
         <source>Pencil Mode</source>
-        <translation>Modo lápiz</translation>
+        <translation>Lápiz</translation>
     </message>
     <message>
         <source>Normal</source>
@@ -468,6 +496,26 @@
         <source>Lines &amp; Areas</source>
         <translation>Líneas y áreas</translation>
     </message>
+    <message>
+        <source>Segment</source>
+        <translation>Segmento</translation>
+    </message>
+    <message>
+        <source>Linear</source>
+        <translation>Lineal</translation>
+    </message>
+    <message>
+        <source>Ease In</source>
+        <translation>Desaceleración suave</translation>
+    </message>
+    <message>
+        <source>Ease Out</source>
+        <translation>Aceleración suave</translation>
+    </message>
+    <message>
+        <source>Ease In/Out</source>
+        <translation>Aceleración y desaceleración suaves</translation>
+    </message>
 </context>
 <context>
     <name>FillTool</name>
@@ -493,7 +541,7 @@
     </message>
     <message>
         <source>Fill Depth</source>
-        <translation>Profundidad de relleno</translation>
+        <translation>Profundidad</translation>
     </message>
     <message>
         <source>Segment</source>
@@ -635,6 +683,20 @@
     <message>
         <source>Polyline</source>
         <translation>Línea poligonal</translation>
+    </message>
+</context>
+<context>
+    <name>FullColorFillTool</name>
+    <message>
+        <source>Fill Depth</source>
+        <translation>Profundidad</translation>
+    </message>
+</context>
+<context>
+    <name>HandToolOptionsBox</name>
+    <message>
+        <source>Reset Position</source>
+        <translation>Restablecer posición</translation>
     </message>
 </context>
 <context>
@@ -895,7 +957,7 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Pencil Mode</source>
-        <translation>Modo lápiz</translation>
+        <translation>Lápiz</translation>
     </message>
     <message>
         <source>Cap</source>
@@ -935,7 +997,7 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Polyline</source>
-        <translation>Curva Bézier</translation>
+        <translation>Curva Bezier</translation>
     </message>
     <message>
         <source>Arc</source>
@@ -980,6 +1042,14 @@ Do you want to proceed?</source>
     <message>
         <source>Med</source>
         <translation>Media</translation>
+    </message>
+    <message>
+        <source>MultiArc</source>
+        <translation>Arco múltiple</translation>
+    </message>
+    <message>
+        <source>Smooth</source>
+        <translation>Suavizar</translation>
     </message>
 </context>
 <context>
@@ -1145,19 +1215,51 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source> to Front</source>
-        <translation>al frente</translation>
+        <translation> al frente</translation>
     </message>
     <message>
         <source> to Forward</source>
-        <translation>hacia adelante</translation>
+        <translation> hacia adelante</translation>
     </message>
     <message>
         <source> to Back</source>
-        <translation>al fondo</translation>
+        <translation> al fondo</translation>
     </message>
     <message>
         <source> to Backward</source>
-        <translation>hacia atrás</translation>
+        <translation> hacia atrás</translation>
+    </message>
+    <message>
+        <source>The selection cannot be updated. It is not editable.</source>
+        <translation>La selección no puede ser actualizada. No es editable.</translation>
+    </message>
+    <message>
+        <source>The selection cannot be deleted. It is not editable.</source>
+        <translation>La selección no puede ser borrada. No es editable.</translation>
+    </message>
+    <message>
+        <source>The selection cannot be pasted. It is not editable.</source>
+        <translation>La selección no puede ser pegada. No es editable.</translation>
+    </message>
+    <message>
+        <source>The selection cannot be grouped. It is not editable.</source>
+        <translation>La selección no puede ser agrupada. No es editable.</translation>
+    </message>
+    <message>
+        <source>The selection cannot be entered. It is not editable.</source>
+        <translation>No es posible entrar a la selección. No es editable.</translation>
+    </message>
+    <message>
+        <source>The selection cannot be ungrouped. It is not editable.</source>
+        <translation>La selección no puede ser desagrupada. No es editable.</translation>
+    </message>
+    <message>
+        <source>The selection cannot be moved. It is not editable.</source>
+        <translation>La selección no puede ser movida. No es editable.</translation>
+    </message>
+    <message>
+        <source>Snap At Intersection</source>
+        <translation>Adherir a intersecciones</translation>
     </message>
 </context>
 <context>
@@ -1217,7 +1319,7 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Style Index:</source>
-        <translation>Índice del estilo:</translation>
+        <translation>Identificador del estilo:</translation>
     </message>
     <message>
         <source>Opacity:</source>
@@ -1257,6 +1359,13 @@ Do you want to proceed?</source>
     <message>
         <source>Rotate On Camera Center</source>
         <translation>Rotar en torno al centro de la cámara</translation>
+    </message>
+</context>
+<context>
+    <name>RotateToolOptionsBox</name>
+    <message>
+        <source>Reset Rotation</source>
+        <translation>Restablecer rotación</translation>
     </message>
 </context>
 <context>
@@ -1326,11 +1435,11 @@ Do you want to proceed?</source>
         <translation>Rotación</translation>
     </message>
     <message>
-        <source>E/W:</source>
+        <source>X:</source>
         <translation>X:</translation>
     </message>
     <message>
-        <source>N/S:</source>
+        <source>Y:</source>
         <translation>Y:</translation>
     </message>
     <message>
@@ -1339,7 +1448,34 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Link</source>
-        <translation>Vinculado</translation>
+        <translation>Vincular</translation>
+    </message>
+    <message>
+        <source>Scale</source>
+        <translation>Escala</translation>
+    </message>
+    <message>
+        <source>Position</source>
+        <translation>Posición</translation>
+    </message>
+</context>
+<context>
+    <name>ShiftTraceToolOptionBox</name>
+    <message>
+        <source>Reset Previous</source>
+        <translation>Restablecer anterior</translation>
+    </message>
+    <message>
+        <source>Reset Following</source>
+        <translation>Restablecer siguiente</translation>
+    </message>
+    <message>
+        <source>Previous Drawing</source>
+        <translation>Dibujo anterior</translation>
+    </message>
+    <message>
+        <source>Following Drawing</source>
+        <translation>Dibujo siguiente</translation>
     </message>
 </context>
 <context>
@@ -1419,6 +1555,160 @@ Do you want to proceed?</source>
 moved to the end of the first page of the palette.</source>
         <translation>Con esta opción activa, el estilo escogido será
 movido hacia el final de la primera página de la paleta.</translation>
+    </message>
+</context>
+<context>
+    <name>ToonzRasterBrushTool</name>
+    <message>
+        <source>Size</source>
+        <translation>Tamaño</translation>
+    </message>
+    <message>
+        <source>Hardness:</source>
+        <translation>Dureza:</translation>
+    </message>
+    <message>
+        <source>Smooth:</source>
+        <translation>Estabilidad:</translation>
+    </message>
+    <message>
+        <source>Draw Order:</source>
+        <translation>Orden:</translation>
+    </message>
+    <message>
+        <source>Over All</source>
+        <translation>Por encima</translation>
+    </message>
+    <message>
+        <source>Under All</source>
+        <translation>Por debajo</translation>
+    </message>
+    <message>
+        <source>Palette Order</source>
+        <translation>Según paleta</translation>
+    </message>
+    <message>
+        <source>Preset:</source>
+        <translation>Ajustes:</translation>
+    </message>
+    <message>
+        <source>&lt;custom&gt;</source>
+        <translation>&lt;personalizado&gt;</translation>
+    </message>
+    <message>
+        <source>Pencil</source>
+        <translation>Lápiz</translation>
+    </message>
+    <message>
+        <source>Pressure</source>
+        <translation>Presión</translation>
+    </message>
+</context>
+<context>
+    <name>ToonzVectorBrushTool</name>
+    <message>
+        <source>Size</source>
+        <translation>Tamaño</translation>
+    </message>
+    <message>
+        <source>Accuracy:</source>
+        <translation>Precisión:</translation>
+    </message>
+    <message>
+        <source>Smooth:</source>
+        <translation>Estabilidad:</translation>
+    </message>
+    <message>
+        <source>Preset:</source>
+        <translation>Ajustes:</translation>
+    </message>
+    <message>
+        <source>&lt;custom&gt;</source>
+        <translation>&lt;personalizado&gt;</translation>
+    </message>
+    <message>
+        <source>Break</source>
+        <translation>Quebrar</translation>
+    </message>
+    <message>
+        <source>Pressure</source>
+        <translation>Presión</translation>
+    </message>
+    <message>
+        <source>Cap</source>
+        <translation>Extremos</translation>
+    </message>
+    <message>
+        <source>Join</source>
+        <translation>Esquinas</translation>
+    </message>
+    <message>
+        <source>Miter:</source>
+        <translation>Inglete:</translation>
+    </message>
+    <message>
+        <source>Range:</source>
+        <translation>Rango:</translation>
+    </message>
+    <message>
+        <source>Snap</source>
+        <translation>Adherencia</translation>
+    </message>
+    <message>
+        <source>Off</source>
+        <translation>no</translation>
+    </message>
+    <message>
+        <source>Linear</source>
+        <translation>Lineal</translation>
+    </message>
+    <message>
+        <source>In</source>
+        <translation>Desacelerado</translation>
+    </message>
+    <message>
+        <source>Out</source>
+        <translation>Acelerado</translation>
+    </message>
+    <message>
+        <source>In&amp;Out</source>
+        <translation>Ambos</translation>
+    </message>
+    <message>
+        <source>Low</source>
+        <translation>Baja</translation>
+    </message>
+    <message>
+        <source>Med</source>
+        <translation>Media</translation>
+    </message>
+    <message>
+        <source>High</source>
+        <translation>Alta</translation>
+    </message>
+    <message>
+        <source>Butt cap</source>
+        <translation>Rectos</translation>
+    </message>
+    <message>
+        <source>Round cap</source>
+        <translation>Redondeados</translation>
+    </message>
+    <message>
+        <source>Projecting cap</source>
+        <translation>Proyectantes</translation>
+    </message>
+    <message>
+        <source>Miter join</source>
+        <translation>En inglete</translation>
+    </message>
+    <message>
+        <source>Round join</source>
+        <translation>Redondeadas</translation>
+    </message>
+    <message>
+        <source>Bevel join</source>
+        <translation>Biseladas</translation>
     </message>
 </context>
 <context>
@@ -1541,6 +1831,10 @@ movido hacia el final de la primera página de la paleta.</translation>
         <source>Bevel join</source>
         <translation>Biseladas</translation>
     </message>
+    <message>
+        <source>Include Intersection</source>
+        <translation>Incluir intersección</translation>
+    </message>
 </context>
 <context>
     <name>VectorTapeTool</name>
@@ -1583,6 +1877,13 @@ movido hacia el final de la primera página de la paleta.</translation>
     <message>
         <source>Rectangular</source>
         <translation>Rectangular</translation>
+    </message>
+</context>
+<context>
+    <name>ZoomToolOptionsBox</name>
+    <message>
+        <source>Reset Zoom</source>
+        <translation>Restablecer zoom</translation>
     </message>
 </context>
 </TS>

@@ -13,7 +13,6 @@
 #include "toonz/tframehandle.h"
 #include "toonz/tcolumnhandle.h"
 #include "toonz/txshlevelhandle.h"
-#include "toonz/txsheethandle.h"
 #include "toonz/toonzscene.h"
 #include "toonz/sceneproperties.h"
 #include "toonz/txsheet.h"
@@ -28,6 +27,7 @@
 #include "toonz/tonionskinmaskhandle.h"
 #include "toutputproperties.h"
 #include "toonz/preferences.h"
+#include "toonz/tproject.h"
 
 // TnzQt includes
 #include "toonzqt/menubarcommand.h"
@@ -61,8 +61,17 @@
 #include <QMenu>
 #include <QToolBar>
 #include <QMainWindow>
+#include <QSettings>
 
 #include "viewerpane.h"
+
+enum CV_Parts {
+  CVPARTS_None        = 0,
+  CVPARTS_PLAYBAR     = 0x1,
+  CVPARTS_FRAMESLIDER = 0x4,
+  CVPARTS_End         = 0x8,
+  CVPARTS_ALL         = CVPARTS_PLAYBAR | CVPARTS_FRAMESLIDER
+};
 
 using namespace DVGui;
 
@@ -77,17 +86,16 @@ SceneViewerPanel::SceneViewerPanel(QWidget *parent, Qt::WindowFlags flags)
 #else
 SceneViewerPanel::SceneViewerPanel(QWidget *parent, Qt::WFlags flags)
 #endif
-    : StyleShortcutSwitchablePanel(parent) {
-  QFrame *hbox = new QFrame(this);
-  hbox->setFrameStyle(QFrame::StyledPanel);
-  hbox->setObjectName("ViewerPanel");
+    : QFrame(parent) {
+  setFrameStyle(QFrame::StyledPanel);
+  setObjectName("ViewerPanel");
 
-  QVBoxLayout *mainLayout = new QVBoxLayout(hbox);
+  QVBoxLayout *mainLayout = new QVBoxLayout(this);
   mainLayout->setMargin(0);
   mainLayout->setSpacing(0);
 
   // Viewer
-  QWidget *viewer      = new QWidget(hbox);
+  QWidget *viewer      = new QWidget(this);
   QGridLayout *viewerL = new QGridLayout(viewer);
 
   ImageUtils::FullScreenWidget *fsWidget =
@@ -119,15 +127,13 @@ SceneViewerPanel::SceneViewerPanel(QWidget *parent, Qt::WFlags flags)
   m_keyFrameButton->setObjectHandle(app->getCurrentObject());
   m_keyFrameButton->setXsheetHandle(app->getCurrentXsheet());
 
-  int buttons = FlipConsole::cFullConsole;
+  std::vector<int> buttonMask = {FlipConsole::eFilledRaster,
+                                 FlipConsole::eDefineLoadBox,
+                                 FlipConsole::eUseLoadBox};
 
-  // buttons &= (~FlipConsole::eSound);
-  buttons &= (~FlipConsole::eFilledRaster);
-  buttons &= (~FlipConsole::eDefineLoadBox);
-  buttons &= (~FlipConsole::eUseLoadBox);
-
-  m_flipConsole = new FlipConsole(mainLayout, buttons, false, m_keyFrameButton,
-                                  "SceneViewerConsole", this, true);
+  m_flipConsole =
+      new FlipConsole(mainLayout, buttonMask, false, m_keyFrameButton,
+                      "SceneViewerConsole", this, true);
 
   m_flipConsole->enableButton(FlipConsole::eMatte, false, false);
   m_flipConsole->enableButton(FlipConsole::eSave, false, false);
@@ -157,6 +163,10 @@ SceneViewerPanel::SceneViewerPanel(QWidget *parent, Qt::WFlags flags)
 
   ret = ret && connect(m_sceneViewer, SIGNAL(previewStatusChanged()), this,
                        SLOT(update()));
+  ret = ret && connect(m_sceneViewer, SIGNAL(onFlipHChanged(bool)), this,
+                       SLOT(setFlipHButtonChecked(bool)));
+  ret = ret && connect(m_sceneViewer, SIGNAL(onFlipVChanged(bool)), this,
+                       SLOT(setFlipVButtonChecked(bool)));
 
   ret = ret && connect(app->getCurrentScene(), SIGNAL(sceneSwitched()), this,
                        SLOT(onSceneSwitched()));
@@ -171,15 +181,85 @@ SceneViewerPanel::SceneViewerPanel(QWidget *parent, Qt::WFlags flags)
                                   ->getFrameRate());
   updateFrameRange(), updateFrameMarkers();
 
-  hbox->setLayout(mainLayout);
+  setLayout(mainLayout);
 
-  setWidget(hbox);
+  m_visiblePartsFlag = CVPARTS_ALL;
+  updateShowHide();
 
-  initializeTitleBar(
-      getTitleBar());  // note: initializeTitleBar() refers to m_sceneViewer
+  setFocusProxy(m_sceneViewer);
 }
 
 //-----------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------
+/*! toggle show/hide of the widgets according to m_visibleFlag
+ */
+
+void SceneViewerPanel::updateShowHide() {
+  // flip console
+  m_flipConsole->showHidePlaybar(m_visiblePartsFlag & CVPARTS_PLAYBAR);
+  m_flipConsole->showHideFrameSlider(m_visiblePartsFlag & CVPARTS_FRAMESLIDER);
+  update();
+}
+
+//-----------------------------------------------------------------------------
+/*! showing the show/hide commands
+ */
+
+void SceneViewerPanel::contextMenuEvent(QContextMenuEvent *event) {
+  QMenu *menu = new QMenu(this);
+  addShowHideContextMenu(menu);
+  menu->exec(event->globalPos());
+}
+
+//-----------------------------------------------------------------------------
+
+void SceneViewerPanel::addShowHideContextMenu(QMenu *menu) {
+  QMenu *showHideMenu = menu->addMenu(tr("GUI Show / Hide"));
+
+  // actions
+  QAction *playbarSHAct     = showHideMenu->addAction(tr("Playback Toolbar"));
+  QAction *frameSliderSHAct = showHideMenu->addAction(tr("Frame Slider"));
+
+  playbarSHAct->setCheckable(true);
+  playbarSHAct->setChecked(m_visiblePartsFlag & CVPARTS_PLAYBAR);
+  playbarSHAct->setData((UINT)CVPARTS_PLAYBAR);
+
+  frameSliderSHAct->setCheckable(true);
+  frameSliderSHAct->setChecked(m_visiblePartsFlag & CVPARTS_FRAMESLIDER);
+  frameSliderSHAct->setData((UINT)CVPARTS_FRAMESLIDER);
+
+  QActionGroup *showHideActGroup = new QActionGroup(this);
+  showHideActGroup->setExclusive(false);
+  showHideActGroup->addAction(playbarSHAct);
+  showHideActGroup->addAction(frameSliderSHAct);
+
+  connect(showHideActGroup, SIGNAL(triggered(QAction *)), this,
+          SLOT(onShowHideActionTriggered(QAction *)));
+
+  showHideMenu->addSeparator();
+  showHideMenu->addAction(CommandManager::instance()->getAction(MI_ViewCamera));
+  showHideMenu->addAction(CommandManager::instance()->getAction(MI_ViewTable));
+  showHideMenu->addAction(CommandManager::instance()->getAction(MI_FieldGuide));
+  showHideMenu->addAction(CommandManager::instance()->getAction(MI_SafeArea));
+  showHideMenu->addAction(CommandManager::instance()->getAction(MI_ViewBBox));
+  showHideMenu->addAction(
+      CommandManager::instance()->getAction(MI_ViewColorcard));
+  showHideMenu->addAction(CommandManager::instance()->getAction(MI_ViewRuler));
+}
+
+//-----------------------------------------------------------------------------
+/*! slot function for show/hide the parts
+ */
+
+void SceneViewerPanel::onShowHideActionTriggered(QAction *act) {
+  CV_Parts part = (CV_Parts)act->data().toUInt();
+  assert(part < CVPARTS_End);
+
+  m_visiblePartsFlag ^= part;
+
+  updateShowHide();
+}
 
 void SceneViewerPanel::onDrawFrame(
     int frame, const ImagePainter::VisualSettings &settings) {
@@ -227,7 +307,6 @@ SceneViewerPanel::~SceneViewerPanel() {}
 //-----------------------------------------------------------------------------
 
 void SceneViewerPanel::showEvent(QShowEvent *event) {
-  StyleShortcutSwitchablePanel::showEvent(event);
   TApp *app                    = TApp::instance();
   TFrameHandle *frameHandle    = app->getCurrentFrame();
   TSceneHandle *sceneHandle    = app->getCurrentScene();
@@ -248,7 +327,9 @@ void SceneViewerPanel::showEvent(QShowEvent *event) {
 
   ret = ret && connect(sceneHandle, SIGNAL(nameSceneChanged()), this,
                        SLOT(changeWindowTitle()));
-
+  ret =
+      ret && connect(sceneHandle, SIGNAL(preferenceChanged(const QString &)),
+                     m_flipConsole, SLOT(onPreferenceChanged(const QString &)));
   ret = ret && connect(levelHandle, SIGNAL(xshLevelSwitched(TXshLevel *)), this,
                        SLOT(onXshLevelSwitched(TXshLevel *)));
   ret = ret && connect(levelHandle, SIGNAL(xshLevelChanged()), this,
@@ -273,12 +354,12 @@ void SceneViewerPanel::showEvent(QShowEvent *event) {
   // Aggiorno FPS al valore definito nel viewer corrente.
   // frameHandle->setPreviewFrameRate(m_fpsSlider->value());
   m_flipConsole->setActive(true);
+  m_flipConsole->onPreferenceChanged("");
 }
 
 //-----------------------------------------------------------------------------
 
 void SceneViewerPanel::hideEvent(QHideEvent *event) {
-  StyleShortcutSwitchablePanel::hideEvent(event);
   TApp *app                    = TApp::instance();
   TFrameHandle *frameHandle    = app->getCurrentFrame();
   TSceneHandle *sceneHandle    = app->getCurrentScene();
@@ -311,6 +392,8 @@ void SceneViewerPanel::hideEvent(QHideEvent *event) {
 
   disconnect(app->getCurrentTool(), SIGNAL(toolSwitched()), m_sceneViewer,
              SLOT(onToolSwitched()));
+  disconnect(app->getCurrentScene(), SIGNAL(preferenceChanged(const QString &)),
+             m_flipConsole, SLOT(onPreferenceChanged(const QString &)));
 
   m_flipConsole->setActive(false);
 }
@@ -337,8 +420,7 @@ void SceneViewerPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
   // buttons for show / hide toggle for the field guide and the safe area
   TPanelTitleBarButtonForSafeArea *safeAreaButton =
       new TPanelTitleBarButtonForSafeArea(
-          titleBar, ":Resources/pane_safe_off.svg",
-          ":Resources/pane_safe_over.svg", ":Resources/pane_safe_on.svg");
+          titleBar, getIconThemePath("actions/20/pane_safe.svg"));
   safeAreaButton->setToolTip(tr("Safe Area (Right Click to Select)"));
   titleBar->add(QPoint(x, 0), safeAreaButton);
   ret = ret && connect(safeAreaButton, SIGNAL(toggled(bool)),
@@ -351,9 +433,8 @@ void SceneViewerPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
   safeAreaButton->setPressed(
       CommandManager::instance()->getAction(MI_SafeArea)->isChecked());
 
-  button = new TPanelTitleBarButton(titleBar, ":Resources/pane_grid_off.svg",
-                                    ":Resources/pane_grid_over.svg",
-                                    ":Resources/pane_grid_on.svg");
+  button = new TPanelTitleBarButton(
+      titleBar, getIconThemePath("actions/20/pane_grid.svg"));
   button->setToolTip(tr("Field Guide"));
   x += 1 + iconWidth;
   titleBar->add(QPoint(x, 0), button);
@@ -367,38 +448,34 @@ void SceneViewerPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
       CommandManager::instance()->getAction(MI_FieldGuide)->isChecked());
 
   // view mode toggles
-  button = new TPanelTitleBarButton(titleBar, ":Resources/pane_table_off.svg",
-                                    ":Resources/pane_table_over.svg",
-                                    ":Resources/pane_table_on.svg");
+  button = new TPanelTitleBarButton(
+      titleBar, getIconThemePath("actions/20/pane_table.svg"));
   button->setToolTip(tr("Camera Stand View"));
   x += 10 + iconWidth;
   titleBar->add(QPoint(x, 0), button);
   button->setButtonSet(viewModeButtonSet, SceneViewer::NORMAL_REFERENCE);
   button->setPressed(true);
 
-  button = new TPanelTitleBarButton(titleBar, ":Resources/pane_3d_off.svg",
-                                    ":Resources/pane_3d_over.svg",
-                                    ":Resources/pane_3d_on.svg");
+  button = new TPanelTitleBarButton(titleBar,
+                                    getIconThemePath("actions/20/pane_3d.svg"));
   button->setToolTip(tr("3D View"));
-  x += 21;  // width of pane_table_off.svg = 20px
+  x += +1 + iconWidth;
   titleBar->add(QPoint(x, 0), button);
   button->setButtonSet(viewModeButtonSet, SceneViewer::CAMERA3D_REFERENCE);
 
-  button = new TPanelTitleBarButton(titleBar, ":Resources/pane_cam_off.svg",
-                                    ":Resources/pane_cam_over.svg",
-                                    ":Resources/pane_cam_on.svg");
+  button = new TPanelTitleBarButton(
+      titleBar, getIconThemePath("actions/20/pane_cam.svg"));
   button->setToolTip(tr("Camera View"));
-  x += 21;  // width of pane_3d_off.svg = 20px
+  x += +1 + iconWidth;
   titleBar->add(QPoint(x, 0), button);
   button->setButtonSet(viewModeButtonSet, SceneViewer::CAMERA_REFERENCE);
   ret = ret && connect(viewModeButtonSet, SIGNAL(selected(int)), m_sceneViewer,
                        SLOT(setReferenceMode(int)));
 
   // freeze button
-  button = new TPanelTitleBarButton(titleBar, ":Resources/pane_freeze_off.svg",
-                                    ":Resources/pane_freeze_over.svg",
-                                    ":Resources/pane_freeze_on.svg");
-  x += 10 + 20;  // width of pane_cam_off.svg = 20px
+  button = new TPanelTitleBarButton(
+      titleBar, getIconThemePath("actions/20/pane_freeze.svg"));
+  x += 10 + iconWidth;
 
   button->setToolTip(tr("Freeze"));  // RC1
   titleBar->add(QPoint(x, 0), button);
@@ -407,19 +484,16 @@ void SceneViewerPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
 
   // preview toggles
   m_previewButton = new TPanelTitleBarButton(
-      titleBar, ":Resources/pane_preview_off.svg",
-      ":Resources/pane_preview_over.svg", ":Resources/pane_preview_on.svg");
+      titleBar, getIconThemePath("actions/20/pane_preview.svg"));
   x += 10 + iconWidth;
   titleBar->add(QPoint(x, 0), m_previewButton);
   m_previewButton->setToolTip(tr("Preview"));
   ret = ret && connect(m_previewButton, SIGNAL(toggled(bool)),
                        SLOT(enableFullPreview(bool)));
 
-  m_subcameraPreviewButton =
-      new TPanelTitleBarButton(titleBar, ":Resources/pane_subpreview_off.svg",
-                               ":Resources/pane_subpreview_over.svg",
-                               ":Resources/pane_subpreview_on.svg");
-  x += 26;  // width of pane_preview_off.svg = 25px
+  m_subcameraPreviewButton = new TPanelTitleBarButton(
+      titleBar, getIconThemePath("actions/20/pane_subpreview.svg"));
+  x += +1 + 24;  // width of pane_preview.svg = 24px
 
   titleBar->add(QPoint(x, 0), m_subcameraPreviewButton);
   m_subcameraPreviewButton->setToolTip(tr("Sub-camera Preview"));
@@ -510,6 +584,7 @@ void SceneViewerPanel::onPlayingStatusChanged(bool playing) {
       TApp::instance()->getCurrentOnionSkin()->notifyOnionSkinMaskChanged();
     }
   }
+  m_sceneViewer->invalidateToolStatus();
 }
 
 //-----------------------------------------------------------------------------
@@ -519,9 +594,11 @@ void SceneViewerPanel::changeWindowTitle() {
   // zoom = sqrt(m_sceneViewer->getViewMatrix().det());
   ToonzScene *scene = app->getCurrentScene()->getScene();
   if (!scene) return;
+  if (!parentWidget()) return;
   int frame = app->getCurrentFrame()->getFrame();
   QString name;
   if (app->getCurrentFrame()->isEditingScene()) {
+    TProject *project = scene->getProject();
     QString sceneName = QString::fromStdWString(scene->getSceneName());
     if (sceneName.isEmpty()) sceneName = tr("Untitled");
     if (app->getCurrentScene()->getDirtyFlag()) sceneName += QString("*");
@@ -531,24 +608,27 @@ void SceneViewerPanel::changeWindowTitle() {
           name + tr("   ::   Frame: ") + tr(std::to_string(frame + 1).c_str());
     int col = app->getCurrentColumn()->getColumnIndex();
     if (col < 0) {
-      setWindowTitle(name);
+      parentWidget()->setWindowTitle(name);
       return;
     }
-    TXsheet *xsh  = app->getCurrentXsheet()->getXsheet();
-    TXshCell cell = xsh->getCell(frame, col);
+    TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
+    TXshCell cell;
+    if (app->getCurrentColumn()->getColumn() &&
+        !app->getCurrentColumn()->getColumn()->getSoundColumn())
+      cell = xsh->getCell(frame, col);
     if (cell.isEmpty()) {
       if (!m_sceneViewer->is3DView()) {
         TAffine aff = m_sceneViewer->getViewMatrix() *
                       m_sceneViewer->getNormalZoomScale().inv();
         if (m_sceneViewer->getIsFlippedX()) aff = aff * TScale(-1, 1);
         if (m_sceneViewer->getIsFlippedY()) aff = aff * TScale(1, -1);
-        name                                    = name + tr("  ::  Zoom : ") +
+        name = name + tr("  ::  Zoom : ") +
                QString::number(tround(100.0 * sqrt(aff.det()))) + "%";
         if (m_sceneViewer->getIsFlippedX() || m_sceneViewer->getIsFlippedY()) {
           name = name + tr(" (Flipped)");
         }
       }
-      setWindowTitle(name);
+      parentWidget()->setWindowTitle(name);
       return;
     }
     assert(cell.m_level.getPointer());
@@ -570,14 +650,14 @@ void SceneViewerPanel::changeWindowTitle() {
                   m_sceneViewer->getNormalZoomScale().inv();
     if (m_sceneViewer->getIsFlippedX()) aff = aff * TScale(-1, 1);
     if (m_sceneViewer->getIsFlippedY()) aff = aff * TScale(1, -1);
-    name                                    = name + tr("  ::  Zoom : ") +
+    name = name + tr("  ::  Zoom : ") +
            QString::number(tround(100.0 * sqrt(aff.det()))) + "%";
     if (m_sceneViewer->getIsFlippedX() || m_sceneViewer->getIsFlippedY()) {
       name = name + tr(" (Flipped)");
     }
   }
 
-  setWindowTitle(name);
+  parentWidget()->setWindowTitle(name);
 }
 
 //-----------------------------------------------------------------------------
@@ -688,13 +768,6 @@ void SceneViewerPanel::onFrameTypeChanged() {
 
 //-----------------------------------------------------------------------------
 
-void SceneViewerPanel::onPreferenceChanged(const QString &prefName) {
-  m_flipConsole->onPreferenceChanged(prefName);
-  StyleShortcutSwitchablePanel::onPreferenceChanged(prefName);
-}
-
-//-----------------------------------------------------------------------------
-
 void SceneViewerPanel::playAudioFrame(int frame) {
   if (m_first) {
     m_first = false;
@@ -704,7 +777,7 @@ void SceneViewerPanel::playAudioFrame(int frame) {
                 ->getProperties()
                 ->getOutputProperties()
                 ->getFrameRate();
-    m_samplesPerFrame = m_sound->getSampleRate() / abs(m_fps);
+    m_samplesPerFrame = m_sound->getSampleRate() / std::abs(m_fps);
   }
   if (!m_sound) return;
   m_viewerFps = m_flipConsole->getCurrentFps();
@@ -729,7 +802,15 @@ bool SceneViewerPanel::hasSoundtrack() {
   TXsheetHandle *xsheetHandle    = TApp::instance()->getCurrentXsheet();
   TXsheet::SoundProperties *prop = new TXsheet::SoundProperties();
   if (!m_sceneViewer->isPreviewEnabled()) prop->m_isPreview = true;
-  m_sound = xsheetHandle->getXsheet()->makeSound(prop);
+  try {
+    m_sound = xsheetHandle->getXsheet()->makeSound(prop);
+  } catch (TSoundDeviceException &e) {
+    if (e.getType() == TSoundDeviceException::NoDevice) {
+      std::cout << ::to_string(e.getMessage()) << std::endl;
+    } else {
+      throw TSoundDeviceException(e.getType(), e.getMessage());
+    }
+  }
   if (m_sound == NULL) {
     m_hasSoundtrack = false;
     return false;
@@ -743,4 +824,29 @@ void SceneViewerPanel::onButtonPressed(FlipConsole::EGadget button) {
   if (button == FlipConsole::eSound) {
     m_playSound = !m_playSound;
   }
+}
+
+void SceneViewerPanel::setFlipHButtonChecked(bool checked) {
+  m_flipConsole->setChecked(FlipConsole::eFlipHorizontal, checked);
+}
+
+void SceneViewerPanel::setFlipVButtonChecked(bool checked) {
+  m_flipConsole->setChecked(FlipConsole::eFlipVertical, checked);
+}
+
+//-----------------------------------------------------------------------------
+
+void SceneViewerPanel::setVisiblePartsFlag(UINT flag) {
+  m_visiblePartsFlag = flag;
+  updateShowHide();
+}
+
+// SaveLoadQSettings
+void SceneViewerPanel::save(QSettings &settings) const {
+  settings.setValue("visibleParts", m_visiblePartsFlag);
+}
+
+void SceneViewerPanel::load(QSettings &settings) {
+  m_visiblePartsFlag = settings.value("visibleParts", CVPARTS_ALL).toUInt();
+  updateShowHide();
 }

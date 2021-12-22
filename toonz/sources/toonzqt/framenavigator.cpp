@@ -20,7 +20,7 @@ using namespace DVGui;
 FrameNavigator::FrameNavigator(QWidget *parent)
     : QToolBar(parent), m_frame(0), m_lineEdit(0), m_frameHandle(0) {
   setMaximumWidth(130);
-  setIconSize(QSize(17, 17));
+  setIconSize(QSize(20, 20));
   setObjectName("WidePaddingToolBar");
   QAction *prevButton =
       new QAction(createQIcon("frameprev"), tr("Previous Frame"), this);
@@ -29,7 +29,7 @@ FrameNavigator::FrameNavigator(QWidget *parent)
 
   m_lineEdit = new DVGui::IntLineEdit(this);
 
-  m_lineEdit->setFixedHeight(16);
+  m_lineEdit->setFixedHeight(19);
   bool ret = connect(m_lineEdit, SIGNAL(editingFinished()), this,
                      SLOT(onEditingFinished()));
   addWidget(m_lineEdit);

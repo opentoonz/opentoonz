@@ -57,7 +57,10 @@ signals:
 //    DvDirTreeView  declaration
 //**********************************************************************************
 
-class DvDirTreeView final : public QTreeView, public TSelection {
+// StyledTreeView is inherited by DvDirTreeView and ExportSceneTreeView
+// ( see exportscenepopup.h )
+
+class StyledTreeView : public QTreeView {
   Q_OBJECT
 
   QColor m_textColor;                // text color (black)
@@ -75,6 +78,31 @@ class DvDirTreeView final : public QTreeView, public TSelection {
                  WRITE setSelectedFolderTextColor)
   Q_PROPERTY(QColor SelectedItemBackground READ getSelectedItemBackground WRITE
                  setSelectedItemBackground)
+public:
+  StyledTreeView(QWidget *parent = 0) : QTreeView(parent) {}
+
+  void setTextColor(const QColor &color) { m_textColor = color; }
+  QColor getTextColor() const { return m_textColor; }
+  void setSelectedTextColor(const QColor &color) {
+    m_selectedTextColor = color;
+  }
+  QColor getSelectedTextColor() const { return m_selectedTextColor; }
+  void setFolderTextColor(const QColor &color) { m_folderTextColor = color; }
+  QColor getFolderTextColor() const { return m_folderTextColor; }
+  void setSelectedFolderTextColor(const QColor &color) {
+    m_selectedFolderTextColor = color;
+  }
+  QColor getSelectedFolderTextColor() const {
+    return m_selectedFolderTextColor;
+  }
+  void setSelectedItemBackground(const QColor &color) {
+    m_selectedItemBackground = color;
+  }
+  QColor getSelectedItemBackground() const { return m_selectedItemBackground; }
+};
+
+class DvDirTreeView final : public StyledTreeView, public TSelection {
+  Q_OBJECT
 
 public:
   DvDirTreeView(QWidget *parent = 0);
@@ -108,28 +136,9 @@ public:
   DvItemListModel::Status getItemVersionControlStatus(
       DvDirVersionControlNode *node, const TFilePath &fp);
 
-  void setTextColor(const QColor &color) { m_textColor = color; }
-  QColor getTextColor() const { return m_textColor; }
-  void setSelectedTextColor(const QColor &color) {
-    m_selectedTextColor = color;
-  }
-  QColor getSelectedTextColor() const { return m_selectedTextColor; }
-  void setFolderTextColor(const QColor &color) { m_folderTextColor = color; }
-  QColor getFolderTextColor() const { return m_folderTextColor; }
-  void setSelectedFolderTextColor(const QColor &color) {
-    m_selectedFolderTextColor = color;
-  }
-  QColor getSelectedFolderTextColor() const {
-    return m_selectedFolderTextColor;
-  }
-  void setSelectedItemBackground(const QColor &color) {
-    m_selectedItemBackground = color;
-  }
-  QColor getSelectedItemBackground() const { return m_selectedItemBackground; }
-
 signals:
 
-  void currentNodeChanged();  //!< Emitted when user selectes a different node.
+  void currentNodeChanged();  //!< Emitted when user selects a different node.
 
 public slots:
 

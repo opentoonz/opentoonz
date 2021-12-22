@@ -31,6 +31,7 @@ class TXshSoundLevel;
 class ToonzScene;
 class TCamera;
 class TPropertyGroup;
+class TXsheet;
 
 namespace DVGui {
 class ProgressDialog;
@@ -125,22 +126,22 @@ public:
 
   std::vector<TXshLevel *> loadedLevels;  //!< [\p Out]     Levels loaded by
                                           //! resource loading procedures.
+
+  TFrameId xFrom, xTo;
+  std::wstring levelName;
+  int step, inc, frameCount;
+  bool doesFileActuallyExist;
+
+  enum CacheTlvBehavior {
+    ON_DEMAND = 0,  // image data will be loaded when needed
+    ALL_ICONS,      // icon data of all frames will be cached at the begininng
+    ALL_ICONS_AND_IMAGES  // both icon and image data of all frames will be
+                          // cached at the begininng
+  } cachingBehavior;
   //! Multiple
   //!               levels \a may be loaded for a single resource data.
 public:
-  /*-
-   * Resourceは常にLoadするように変更（ファイルをプロジェクトフォルダにコピー（=Import）したい場合は、ユーザが手動で行う）
-   * -*/
-  LoadResourceArguments()
-      : row0(-1)
-      , col0(-1)
-      , row1(-1)
-      , col1(-1)
-      , importPolicy(static_cast<ImportPolicy>(
-            Preferences::instance()->getDefaultImportPolicy()))
-      , expose(Preferences::instance()->isAutoExposeEnabled()) {}
-
-  LoadResourceArguments(const TFilePath &fp,
+  LoadResourceArguments(const TFilePath &fp   = TFilePath(),
                         const TFilePath &cast = TFilePath())
       : castFolder(cast)
       , row0(-1)
@@ -149,8 +150,16 @@ public:
       , col1(-1)
       , importPolicy(static_cast<ImportPolicy>(
             Preferences::instance()->getDefaultImportPolicy()))
-      , expose(Preferences::instance()->isAutoExposeEnabled()) {
-    resourceDatas.push_back(fp);
+      , expose(Preferences::instance()->isAutoExposeEnabled())
+      , xFrom(-1)
+      , xTo(-1)
+      , levelName(L"")
+      , step(-1)
+      , inc(-1)
+      , frameCount(-1)
+      , doesFileActuallyExist(true)
+      , cachingBehavior(ON_DEMAND) {
+    if (!fp.isEmpty()) resourceDatas.push_back(fp);
   }
 };
 
@@ -177,6 +186,7 @@ bool loadSubScene(const TFilePath &scenePath);
 enum SaveSceneFlags {
   SILENTLY_OVERWRITE = 0x1,
   SAVE_SUBXSHEET     = 0x2,
+  AUTO_SAVE          = 0x4
 };
 
 // ritorna true sse la scena e' stata salvata
@@ -187,7 +197,7 @@ enum SaveSceneFlags {
 // 0 salva comunque
 // tutta la scena, altrimenti solo il sottoxsheet
 bool saveScene(const TFilePath &fp, int flags);
-bool saveScene();
+bool saveScene(int flags = 0);
 
 bool saveLevel(const TFilePath &fp);
 bool saveLevel();
@@ -195,7 +205,7 @@ bool saveLevel();
 bool saveLevel(const TFilePath &fp, TXshSimpleLevel *sl, bool overwrite);
 bool saveLevel(TXshSimpleLevel *sl);
 
-bool saveAll();
+bool saveAll(int flags = 0);
 
 void saveNonSceneFiles();
 
@@ -205,33 +215,23 @@ bool saveSound(TXshSoundLevel *sc);
 /*! \note     Will fallback to loadResourceFolders() in case all
               argument paths are folders.                                 */
 
-enum CacheTlvBehavior {
-  ON_DEMAND = 0,  // image data will be loaded when needed
-  ALL_ICONS,      // icon data of all frames will be cached at the begininng
-  ALL_ICONS_AND_IMAGES  // both icon and image data of all frames will be cached
-                        // at the begininng
-};
-
 int loadResources(
     LoadResourceArguments &args,  //!< Resources to be loaded.
     bool updateRecentFiles =
         true,  //!< Whether Toonz's <I>Recent Files</I> list must be updated.
     LoadResourceArguments::ScopedBlock *sb =
-        0,  //!< Load block. May be nonzero in order to extend block data
-            //!  access and finalization.
-            //!< Loads a group of resources by path.
-            //!  \return  The actually loaded levels count.
-    int xFrom = -1,
-    int xTo = -1, std::wstring levelName = L"", int step = -1, int inc = -1,
-    int frameCount = -1, bool doesFileActuallyExist = true,
-    CacheTlvBehavior cachingBehavior = ON_DEMAND);
+        0  //!< Load block. May be nonzero in order to extend block data
+           //!  access and finalization.
+           //!< Loads a group of resources by path.
+           //!  \return  The actually loaded levels count.
+);
 
 int loadResourceFolders(
     LoadResourceArguments &args,  //!< Resource folders to be loaded.
     LoadResourceArguments::ScopedBlock *sb =
         0  //!< Load block. May be nonzero in order to extend block data
            //!  access and finalization.
-    );     //!< Loads the specified folders in current xsheet.
+);         //!< Loads the specified folders in current xsheet.
            //!  \return  The actually loaded levels count.
 bool exposeLevel(TXshSimpleLevel *sl, int row, int col, bool insert = false,
                  bool overWrite = false);
@@ -256,8 +256,9 @@ bool importLipSync(TFilePath levelPath, QList<TFrameId> frameList,
 // cast.
 // if the cast contains the level specified with $scenefolder alias,
 // open a warning popup notifying that such level will lose link.
-bool takeCareSceneFolderItemsOnSaveSceneAs(ToonzScene *scene,
-                                           const TFilePath &newPath);
+bool takeCareSceneFolderItemsOnSaveSceneAs(
+    ToonzScene *scene, const TFilePath &newPath, TXsheet *subxsh,
+    QHash<TXshLevel *, TFilePath> &orgLevelPaths);
 
 }  // namespace IoCmd
 

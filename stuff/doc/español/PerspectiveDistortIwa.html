@@ -1,0 +1,45 @@
+<html lang="ja">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+      <title>Perspective Distort (Distorsión en perspectiva) Iwa</title>
+    </head>
+<body bgcolor="#f5f5f5" text="#220011">
+<h1><img src = ".\img\fx_iwa_perspective_distort.png" width = 30 height = 30 >   Perspective Distort (Distorsión en perspectiva) Iwa</h1>
+
+<h4>● Descripción</h4>
+Permite generar un efecto de movimiento con paralaje sobre la imagen conectada a Source,<br>
+donde los elementos en primer plano se mueven más rápido que los que se encuentran en el<br>
+fondo.<br>
+El ancho de la imagen es estirado lateralmente, para transformarla en un trapecio, sin<br>
+embargo ésta no será estirada en forma vertical.<br>
+En otras palabras, la contracción en la dirección vertical causada por la profundidad,<br>
+deberá ser incorporada de antemano en la imagen.<br>
+Además, si se deseara aplicar este efecto a un fondo en movimiento, el movimiento del fondo<br>
+deberá ser colapsado antes en una Sub-planilla.<br><br>
+<img src = ".\img\perspective_distort.png">
+
+<h4>● Entradas</h4>
+<UL>
+<LI><b>Source (Origen)</b> : Permite conectar la imagen a ser procesada.</LI>
+</UL>
+
+<h4>● Opciones</h4>
+<UL>
+<LI><b>Vanishing Point (Punto de fuga)</b> : Es el punto hacia el cual se procesará la<br>
+deformación.<br>
+En caso de una proyección en perspectiva, éste es el punto de fuga.</LI>
+<LI><b>Anchor Point (Horizonte)</b> : Permite definir la posición vertical que será la<br>
+base de la deformación.<br>
+Los píxeles por encima de este punto no aparecerán en el efecto (quedarán ocultos).<br>
+También define la línea del horizonte para la imagen deformada, donde se mantendrá el<br>
+ancho original de la imagen.</LI>
+<LI><b>Precision (Precisión)</b> : Debido a que la deformación se produce únicamente por<br>
+un estiramiento expansivo, la resolución se verá afectada. Para minimizar el deterioro de<br>
+la resolución, la resolución original de la imagen será multiplicada por este valor antes<br>
+de que la deformación sea procesada.<br>
+No tendrá sentido ingresar en Precision un valor mayor que el resultado de dividir la<br>
+"Resolución de captura" del fondo por la "Resolución de salida".</LI>
+</UL>
+</body>
+
+</html>

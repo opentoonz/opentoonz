@@ -246,7 +246,7 @@ to_v =to_hsv[2]/255.;
         }
       }
       // premultiply(*pix);
-      *pix++;
+      pix++;
     }
   }
   raster32->unlock();

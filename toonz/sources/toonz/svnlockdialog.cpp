@@ -23,7 +23,6 @@
 #include <QLabel>
 #include <QPlainTextEdit>
 #include <QTime>
-#include <QFormLayout>
 #include <QCheckBox>
 #include <QHeaderView>
 #include <QTreeWidget>
@@ -154,14 +153,14 @@ SVNLockDialog::SVNLockDialog(QWidget *parent, const QString &workingDir,
 
   addButtonBarWidget(m_lockButton, m_cancelButton);
 
-  // 0. Connect for svn errors (that may occurs everythings)
+  // 0. Connect for svn errors (that may occur every time)
   connect(&m_thread, SIGNAL(error(const QString &)), this,
           SLOT(onError(const QString &)));
 
   // 1. Getting status
   connect(&m_thread, SIGNAL(statusRetrieved(const QString &)), this,
           SLOT(onStatusRetrieved(const QString &)));
-  m_thread.getSVNStatus(m_workingDir);
+  m_thread.getSVNStatus(m_workingDir, true);
 }
 
 //-----------------------------------------------------------------------------
@@ -186,20 +185,24 @@ void SVNLockDialog::onStatusRetrieved(const QString &xmlResponse) {
 
     switchToCloseButton();
   } else {
+    int height = m_lock ? 160 : 50;
+    if (m_treeWidget->isVisible())
+      height += (m_filesToEdit.size() * (m_lock ? 25 : 50));
+
+    setMinimumSize(300, std::min(height, 350));
+
     m_waitingLabel->hide();
 
     if (m_lock)
       m_textLabel->setText(
           tr("%1 items to edit.")
-              .arg(m_filesToEdit.size() == 1
-                       ? 1
-                       : m_filesToEdit.size() - m_sceneIconAdded));
+              .arg(m_filesToEdit.size() == 1 ? 1 : m_filesToEdit.size() -
+                                                       m_sceneIconAdded));
     else
       m_textLabel->setText(
           tr("%1 items to unlock.")
-              .arg(m_filesToEdit.size() == 1
-                       ? 1
-                       : m_filesToEdit.size() - m_sceneIconAdded));
+              .arg(m_filesToEdit.size() == 1 ? 1 : m_filesToEdit.size() -
+                                                       m_sceneIconAdded));
 
     m_lockButton->show();
   }
@@ -268,15 +271,13 @@ void SVNLockDialog::executeCommand() {
   if (m_lock)
     m_textLabel->setText(
         tr("Editing %1 items...")
-            .arg(m_filesToEdit.size() == 1
-                     ? 1
-                     : m_filesToEdit.size() - m_sceneIconAdded));
+            .arg(m_filesToEdit.size() == 1 ? 1 : m_filesToEdit.size() -
+                                                     m_sceneIconAdded));
   else
     m_textLabel->setText(
         tr("Unlocking %1 items...")
-            .arg(m_filesToEdit.size() == 1
-                     ? 1
-                     : m_filesToEdit.size() - m_sceneIconAdded));
+            .arg(m_filesToEdit.size() == 1 ? 1 : m_filesToEdit.size() -
+                                                     m_sceneIconAdded));
 
   QStringList args;
   if (m_lock)

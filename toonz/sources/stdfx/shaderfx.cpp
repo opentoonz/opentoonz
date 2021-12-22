@@ -29,10 +29,6 @@
 // Glew include
 #include <GL/glew.h>
 
-// tcg includes
-#include "tcg/tcg_function_types.h"
-#include "tcg/tcg_unique_ptr.h"
-
 // Boost includes
 #include <boost/any.hpp>
 #include <boost/iterator/transform_iterator.hpp>
@@ -135,7 +131,8 @@ static const TParamUIConcept::Type
         TParamUIConcept::ANGLE,   TParamUIConcept::POINT,
         TParamUIConcept::POINT_2, TParamUIConcept::VECTOR,
         TParamUIConcept::POLAR,   TParamUIConcept::SIZE,
-        TParamUIConcept::QUAD,    TParamUIConcept::RECT};
+        TParamUIConcept::QUAD,    TParamUIConcept::RECT,
+        TParamUIConcept::COMPASS, TParamUIConcept::COMPASS_SPIN};
 
 // Functions
 
@@ -314,6 +311,8 @@ Suggestions are welcome as this is a tad beyond ridiculous...
             "This system configuration does not support OpenGL Shader "
             "Programs. Shader Fxs will not be able to render."));
         break;
+      default:
+        break;
       }
 
       sentMsg = true;
@@ -402,7 +401,7 @@ void ShaderFx::initialize() {
         TParamUIConcept &uiConcept = m_this->m_uiConcepts.back();
         uiConcept.m_type           = ::l_conceptTypes[siParam.m_concept.m_type -
                                             ShaderInterface::UI_CONCEPTS];
-        uiConcept.m_label = siParam.m_concept.m_label.toStdString();
+        uiConcept.m_label          = siParam.m_concept.m_label.toStdString();
         uiConcept.m_params.push_back(param);
       }
     }
@@ -475,6 +474,8 @@ void ShaderFx::initialize() {
       case ShaderInterface::ANGLE_UI:
         param->setMeasureName(l_measureNames[ANGLE]);
         break;
+      default:
+        break;
       }
 
       m_params.push_back(param);
@@ -514,6 +515,8 @@ void ShaderFx::initialize() {
       case ShaderInterface::ANGLE_UI:
         param->getX()->setMeasureName(l_measureNames[ANGLE]);
         param->getY()->setMeasureName(l_measureNames[ANGLE]);
+        break;
+      default:
         break;
       }
 
@@ -556,6 +559,8 @@ void ShaderFx::initialize() {
                 *boost::unsafe_any_cast<TPixelParamP>(&m_params.back()));
       break;
     }
+    default:
+      break;
     }
   }
 
@@ -784,6 +789,8 @@ void ShaderFx::bindParameters(QOpenGLShaderProgram *program, double frame) {
           (GLfloat)value.m / 255.0f);
       break;
     }
+    default:
+      break;
     }
   }
 }
@@ -954,12 +961,9 @@ void ShaderFx::doCompute(TTile &tile, double frame,
       }
 
       ~TexturesStorage() {
-        typedef tcg::function<void (ShadingContext::*)(GLuint),
-                              &ShadingContext::unloadTexture>
-            UnloadFunc;
-
-        std::for_each(m_texIds.begin(), m_texIds.end(),
-                      tcg::bind1st(UnloadFunc(), m_ctx));
+        for (auto const &texId : m_texIds) {
+          m_ctx.unloadTexture(texId);
+        }
       }
 
       void load(const TRasterP &ras, GLuint texUnit) {
@@ -1008,7 +1012,7 @@ void ShaderFx::doCompute(TTile &tile, double frame,
   // Calculate input tiles
   ::ContextLocker cLocker(context);
 
-  tcg::unique_ptr<TTile[]> inTiles(
+  std::unique_ptr<TTile[]> inTiles(
       new TTile[pCount]);  // NOTE: Input tiles must be STORED - they cannot
   // be passed immediately to OpenGL, since *other shader
   if (pCount > 0)  // fxs*, with the very same host context, could lie
@@ -1055,7 +1059,7 @@ void ShaderFx::doCompute(TTile &tile, double frame,
 
     // Input tiles are NOT supplied to OpenGL here - but rather just before
     // drawing.
-    // It's probably beacuse a uniform integer variable must have already been
+    // It's probably because a uniform integer variable must have already been
     // bound
     // to prepare the associated sampler variable in the linkes program...
   }

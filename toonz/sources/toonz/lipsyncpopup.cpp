@@ -432,7 +432,8 @@ void LipSyncPopup::onApplyButton() {
 
   if (m_restToEnd->isChecked()) {
     int r0, r1, step;
-    XsheetGUI::getPlayRange(r0, r1, step);
+    TApp::instance()->getCurrentXsheet()->getXsheet()->getCellRange(m_col, r0,
+                                                                    r1);
     if (lastFrame < r1 + 1) lastFrame = r1 + 1;
   }
   std::vector<TFrameId> previousFrameIds;
@@ -486,7 +487,8 @@ void LipSyncPopup::paintEvent(QPaintEvent *) {
     while (i < 10) {
       QPixmap pm;
       if (m_sl)
-        pm = IconGenerator::instance()->getIcon(m_sl, m_activeFrameIds[i]);
+        pm = IconGenerator::instance()->getSizedIcon(
+            m_sl, m_activeFrameIds[i], "_lips", TDimension(160, 90));
 
       if (m_cl) {
         TFrameId currentFrameId = m_activeFrameIds[i];
@@ -507,7 +509,7 @@ void LipSyncPopup::paintEvent(QPaintEvent *) {
         m_pixmaps[i] = pm;
         m_imageLabels[i]->setPixmap(m_pixmaps[i]);
         m_textLabels[i]->setText(
-            "Drawing: " + QString::number(m_activeFrameIds[i].getNumber()));
+            tr("Drawing: ") + QString::number(m_activeFrameIds[i].getNumber()));
       }
       i++;
     }

@@ -479,7 +479,7 @@ TThickPoint TStrokeBenderDeformation::getDisplacement(const TStroke &s,
   if (m_vect) {
     double outVal = 0.0;
 
-    if (fabs(diff) <= m_lengthOfDeformation)
+    if (fabs(diff) <= m_lengthOfDeformation) {
       if (m_versus == INNER) {
         diff *= (1.0 / m_lengthOfDeformation) * c_maxLengthOfGaussian;
         outVal = gaussianPotential(diff);
@@ -490,6 +490,7 @@ TThickPoint TStrokeBenderDeformation::getDisplacement(const TStroke &s,
                                     strokeLengthAtParameter;
         outVal = 1.0 - gaussianPotential(valForGaussian);
       }
+    }
 
     TPointD cp = convert(s.getControlPointAtParameter(w));
     TPointD p  = cp;

@@ -143,6 +143,8 @@ Can be different from getSelectionBound() after a free deform transformation. */
   void pasteSelection();
 
   bool isTransformed();
+
+  bool isEditable();
 };
 
 #endif  // RASTER_SELECTION_H

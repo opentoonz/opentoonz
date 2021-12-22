@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1">
+<TS version="2.1" language="it" sourcelanguage="en">
 <context>
     <name>ArrowToolOptionsBox</name>
     <message>
@@ -12,12 +12,12 @@
         <translation>Posizione</translation>
     </message>
     <message>
-        <source>E/W:</source>
-        <translation>E/O:</translation>
+        <source>X:</source>
+        <translation>X:</translation>
     </message>
     <message>
-        <source>N/S:</source>
-        <translation>N/S:</translation>
+        <source>Y:</source>
+        <translation>Y:</translation>
     </message>
     <message>
         <source>Z:</source>
@@ -96,11 +96,11 @@
     </message>
     <message>
         <source>Hardness:</source>
-        <translation>Durezza:</translation>
+        <translation type="vanished">Durezza:</translation>
     </message>
     <message>
         <source>Accuracy:</source>
-        <translation>Accuratezza:</translation>
+        <translation type="vanished">Accuratezza:</translation>
     </message>
     <message>
         <source>Selective</source>
@@ -108,7 +108,7 @@
     </message>
     <message>
         <source>Preset:</source>
-        <translation>Pennello Predefinito:</translation>
+        <translation type="vanished">Pennello Predefinito:</translation>
     </message>
     <message>
         <source>Break Sharp Angles</source>
@@ -124,119 +124,19 @@
     </message>
     <message>
         <source>Cap</source>
-        <translation>Estremo</translation>
+        <translation type="vanished">Estremo</translation>
     </message>
     <message>
         <source>Join</source>
-        <translation>Angolo</translation>
+        <translation type="vanished">Angolo</translation>
     </message>
     <message>
         <source>Miter:</source>
-        <translation>Smusso:</translation>
-    </message>
-    <message>
-        <source>Size</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Break</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Pencil</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Pressure</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Smooth:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Range:</source>
-        <translation type="unfinished"></translation>
+        <translation type="vanished">Smusso:</translation>
     </message>
     <message>
         <source>Snap</source>
-        <translation type="unfinished">Calamita</translation>
-    </message>
-    <message>
-        <source>&lt;custom&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Off</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Linear</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>In</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Out</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>In&amp;Out</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Low</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>High</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Butt cap</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Round cap</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Projecting cap</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Miter join</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Round join</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Bevel join</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Med</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Draw Order:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Over All</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Under All</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Palette Order</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Calamita</translation>
     </message>
 </context>
 <context>
@@ -259,6 +159,34 @@
     <message>
         <source>Auto Select Drawing</source>
         <translation>Selezione Automatica dei Disegni</translation>
+    </message>
+    <message>
+        <source>Snap</source>
+        <translation type="unfinished">Calamita</translation>
+    </message>
+    <message>
+        <source>Type:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rectangular</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Freehand</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Low</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Med</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>High</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -294,20 +222,20 @@
         <translation>Chiave Globale</translation>
     </message>
     <message>
-        <source>Lock Center E/W</source>
-        <translation>Blocca il Centro E/O</translation>
+        <source>Lock Center X</source>
+        <translation>Blocca il Centro X</translation>
     </message>
     <message>
-        <source>Lock Center N/S</source>
-        <translation>Blocca il Centro N/S</translation>
+        <source>Lock Center Y</source>
+        <translation>Blocca il Centro Y</translation>
     </message>
     <message>
-        <source>Lock Position E/W</source>
-        <translation>Blocca la Posizione E/O</translation>
+        <source>Lock Position X</source>
+        <translation>Blocca la Posizione X</translation>
     </message>
     <message>
-        <source>Lock Position N/S</source>
-        <translation>Blocca la Posizione N/S</translation>
+        <source>Lock Position Y</source>
+        <translation>Blocca la Posizione Y</translation>
     </message>
     <message>
         <source>Lock Rotation</source>
@@ -334,8 +262,8 @@
         <translation>Blocca la Scalatura Globale</translation>
     </message>
     <message>
-        <source>E/W and N/S Positions</source>
-        <translation>Posizioni E/O e N/S</translation>
+        <source>X and Y Positions</source>
+        <translation>Posizioni X e Y</translation>
     </message>
     <message>
         <source>Z Position</source>
@@ -466,6 +394,26 @@
     </message>
     <message>
         <source>Lines &amp; Areas</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Segment</source>
+        <translation type="unfinished">Segmento</translation>
+    </message>
+    <message>
+        <source>Linear</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ease In</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ease Out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ease In/Out</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -634,6 +582,20 @@
     </message>
     <message>
         <source>Polyline</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>FullColorFillTool</name>
+    <message>
+        <source>Fill Depth</source>
+        <translation type="unfinished">Profondità di Riempimento</translation>
+    </message>
+</context>
+<context>
+    <name>HandToolOptionsBox</name>
+    <message>
+        <source>Reset Position</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -980,6 +942,14 @@ Procedere?</translation>
         <source>Med</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>MultiArc</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Smooth</source>
+        <translation type="unfinished">Liscio</translation>
+    </message>
 </context>
 <context>
     <name>PumpTool</name>
@@ -1158,6 +1128,38 @@ Procedere?</translation>
         <source> to Backward</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>The selection cannot be updated. It is not editable.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The selection cannot be deleted. It is not editable.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The selection cannot be pasted. It is not editable.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The selection cannot be grouped. It is not editable.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The selection cannot be entered. It is not editable.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The selection cannot be ungrouped. It is not editable.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The selection cannot be moved. It is not editable.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Snap At Intersection</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RGBPickerTool</name>
@@ -1259,6 +1261,13 @@ Procedere?</translation>
     </message>
 </context>
 <context>
+    <name>RotateToolOptionsBox</name>
+    <message>
+        <source>Reset Rotation</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>RulerToolOptionsBox</name>
     <message>
         <source>X:</source>
@@ -1325,12 +1334,12 @@ Procedere?</translation>
         <translation>Rotazione</translation>
     </message>
     <message>
-        <source>E/W:</source>
-        <translation>E/O:</translation>
+        <source>X:</source>
+        <translation>X:</translation>
     </message>
     <message>
-        <source>N/S:</source>
-        <translation>N/S:</translation>
+        <source>Y:</source>
+        <translation>Y:</translation>
     </message>
     <message>
         <source>Thickness</source>
@@ -1339,6 +1348,33 @@ Procedere?</translation>
     <message>
         <source>Link</source>
         <translation>Vincola</translation>
+    </message>
+    <message>
+        <source>Scale</source>
+        <translation type="unfinished">Scala</translation>
+    </message>
+    <message>
+        <source>Position</source>
+        <translation type="unfinished">Posizione</translation>
+    </message>
+</context>
+<context>
+    <name>ShiftTraceToolOptionBox</name>
+    <message>
+        <source>Reset Previous</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reset Following</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previous Drawing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Following Drawing</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1416,6 +1452,160 @@ Procedere?</translation>
     <message>
         <source>With this option being activated, the picked style will be
 moved to the end of the first page of the palette.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ToonzRasterBrushTool</name>
+    <message>
+        <source>Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hardness:</source>
+        <translation type="unfinished">Durezza:</translation>
+    </message>
+    <message>
+        <source>Smooth:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Draw Order:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Over All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Under All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Palette Order</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preset:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;custom&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pencil</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pressure</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ToonzVectorBrushTool</name>
+    <message>
+        <source>Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Accuracy:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Smooth:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preset:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;custom&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Break</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pressure</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cap</source>
+        <translation type="unfinished">Estremo</translation>
+    </message>
+    <message>
+        <source>Join</source>
+        <translation type="unfinished">Angolo</translation>
+    </message>
+    <message>
+        <source>Miter:</source>
+        <translation type="unfinished">Smusso:</translation>
+    </message>
+    <message>
+        <source>Range:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Snap</source>
+        <translation type="unfinished">Calamita</translation>
+    </message>
+    <message>
+        <source>Off</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Linear</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In&amp;Out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Low</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Med</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>High</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Butt cap</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Round cap</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Projecting cap</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Miter join</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Round join</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bevel join</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1539,6 +1729,10 @@ moved to the end of the first page of the palette.</source>
         <source>Bevel join</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Include Intersection</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>VectorTapeTool</name>
@@ -1580,6 +1774,13 @@ moved to the end of the first page of the palette.</source>
     </message>
     <message>
         <source>Rectangular</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ZoomToolOptionsBox</name>
+    <message>
+        <source>Reset Zoom</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -235,7 +235,8 @@ void CBlurMatrix::print() const {
                    for( vector<SXYD>::const_iterator pp=m_m[0][i].begin();
                             pp!=m_m[0][i].end();
                             ++pp,++j ) {
-                          sprintf(s,"(%d,%d,%d,%d) ",i,j,pp->x,pp->y);
+                          snprintf(s, sizeof(s),
+                            "(%d,%d,%d,%d) ",i,j,pp->x,pp->y);
                           OutputDebugString(s);
                   }
                   OutputDebugString("\n");

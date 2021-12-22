@@ -7,7 +7,6 @@
 #include "tconvert.h"
 #include "tstopwatch.h"
 #include "tlevel_io.h"
-#include "tflash.h"
 #include "trasterimage.h"
 #include "ttoonzimage.h"
 #include "tvectorimage.h"
@@ -38,7 +37,6 @@
 #include "toonz/levelset.h"
 #include "toonz/txshchildlevel.h"
 #include "toonz/fxdag.h"
-#include "toonz/tcolumnfx.h"
 #include "toonz/tcolumnfxset.h"
 #include "toonz/stage.h"
 #include "toonz/fill.h"
@@ -291,7 +289,8 @@ static int getEnlargement(const std::vector<TRasterFxRenderDataP> &fxs,
 //-------------------------------------------------------------------
 
 static void applyPaletteFilter(TPalette *&plt, bool keep,
-                               const set<int> &colors, const TPalette *srcPlt) {
+                               const std::set<int> &colors,
+                               const TPalette *srcPlt) {
   if (colors.empty()) return;
 
   if (!plt) plt = srcPlt->clone();
@@ -377,7 +376,7 @@ static std::vector<int> getAllBut(std::vector<int> &colorIds) {
 //! Image
 //! will be destroyed at the most appropriate time. You should definitely *COPY*
 //! all
-//! necessary informations before calling it - however, since the intent was
+//! necessary information before calling it - however, since the intent was
 //! that of
 //! optimizing memory usage, please avoid copying the entire image buffer...
 
@@ -416,7 +415,7 @@ static TImageP applyCmappedFx(TToonzImageP &ti,
                PaletteFilterData->m_type == eApplyToInksAndPaints) {
       bool keep = PaletteFilterData->m_keep;
 
-      set<int> colors;
+      std::set<int> colors;
       colors.insert(PaletteFilterData->m_colors.begin(),
                     PaletteFilterData->m_colors.end());
 
@@ -452,7 +451,7 @@ static TImageP applyCmappedFx(TToonzImageP &ti,
       std::vector<int> indexes;
       indexes.resize(PaletteFilterData->m_colors.size());
 
-      set<int>::const_iterator jt = PaletteFilterData->m_colors.begin();
+      std::set<int>::const_iterator jt = PaletteFilterData->m_colors.begin();
       for (int j = 0; j < (int)indexes.size(); ++j, ++jt) indexes[j] = *jt;
 
       if (copyRas == TRasterCM32P())
@@ -470,9 +469,10 @@ static TImageP applyCmappedFx(TToonzImageP &ti,
                                          // sicuramente devo cancellare dei
                                          // paint
         TRop::eraseColors(
-            copyRas, PaletteFilterData->m_type == eApplyToInksDeletingAllPaints
-                         ? 0
-                         : &indexes,
+            copyRas,
+            PaletteFilterData->m_type == eApplyToInksDeletingAllPaints
+                ? 0
+                : &indexes,
             false);
 
       /*-- Inkの消去 --*/
@@ -482,10 +482,11 @@ static TImageP applyCmappedFx(TToonzImageP &ti,
                                          // sicuramente devo cancellare degli
                                          // ink
         TRop::eraseColors(
-            copyRas, PaletteFilterData->m_type == eApplyToPaintsDeletingAllInks
-                         ? 0
-                         : &indexes,
-            true);
+            copyRas,
+            PaletteFilterData->m_type == eApplyToPaintsDeletingAllInks
+                ? 0
+                : &indexes,
+            true, PaletteFilterData->m_type == eApplyToInksAndPaints_NoGap);
     }
   }
 
@@ -680,7 +681,7 @@ static void applyCmappedFx(TVectorImageP &vi,
   TRasterP ras;
   bool keep = false;
   TPaletteP modPalette;
-  set<int> colors;
+  std::set<int> colors;
   std::vector<TRasterFxRenderDataP>::const_iterator it = fxs.begin();
 
   // prima tutti gli effetti che agiscono sulla paletta....
@@ -1159,6 +1160,12 @@ void TLevelColumnFx::doCompute(TTile &tile, double frame,
         ras = ti->getRaster();
 
       if (sl->getProperties()->antialiasSoftness() > 0) {
+        // convert colormap raster to fullcolor raster before applying antialias
+        if (ti) {
+          TRaster32P convRas(ras->getSize());
+          TRop::convert(convRas, ras, ti->getPalette(), TRect(), false, true);
+          ras = convRas;
+        }
         TRasterP appRas = ras->create(ras->getLx(), ras->getLy());
         TRop::antialias(ras, appRas, 10,
                         sl->getProperties()->antialiasSoftness());
@@ -1207,7 +1214,7 @@ void TLevelColumnFx::doCompute(TTile &tile, double frame,
       // Observe that inTile is in the standard reference, ie image's minus the
       // center coordinates
 
-      if (ti) {
+      if ((TRasterCM32P)ras) {
         // In the colormapped case, we have to convert the cmap to fullcolor
         TPalette *palette = ti->getPalette();
 
@@ -1418,7 +1425,7 @@ bool TLevelColumnFx::doGetBBox(double frame, TRectD &bBox,
     bBox = img->getBBox();
   }
 
-  // Add the enlargement of the bbox due to Tzp render datas
+  // Add the enlargement of the bbox due to Tzp render data
   if (info.m_data.size()) {
     TRectD imageBBox(bBox);
     for (unsigned int i = 0; i < info.m_data.size(); ++i) {
@@ -1536,17 +1543,6 @@ int TLevelColumnFx::getColumnIndex() const {
 //-------------------------------------------------------------------
 
 TXshColumn *TLevelColumnFx::getXshColumn() const { return m_levelColumn; }
-
-//-------------------------------------------------------------------
-
-void TLevelColumnFx::compute(TFlash &flash, int frame) {
-  if (!m_levelColumn) return;
-
-  TImageP img = m_levelColumn->getCell(frame).getImage(false);
-  if (!img) return;
-
-  flash.draw(img, 0);
-}
 
 //-------------------------------------------------------------------
 
@@ -1689,10 +1685,6 @@ std::string TPaletteColumnFx::getAlias(double frame,
   TFilePath palettePath = getPalettePath(frame);
   return "TPaletteColumnFx[" + ::to_string(palettePath.getWideString()) + "]";
 }
-
-//-------------------------------------------------------------------
-
-void TPaletteColumnFx::compute(TFlash &flash, int frame) {}
 
 //-------------------------------------------------------------------
 

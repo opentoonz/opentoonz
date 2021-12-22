@@ -3,6 +3,9 @@
 #ifndef VECTORIZER_SWATCH_H
 #define VECTORIZER_SWATCH_H
 
+// TnzCore includes
+#include "tpalette.h"
+
 // Toonz includes
 #include "tthread.h"
 #include "timage.h"
@@ -95,8 +98,11 @@ class VectorizationSwatchTask final : public TThread::Runnable {
 
   std::unique_ptr<VectorizerConfiguration> m_config;
 
+  TPaletteP m_substitutePalette;
+
 public:
-  VectorizationSwatchTask(int row, int col);
+  VectorizationSwatchTask(int row, int col,
+                          TPaletteP substitutePalette = TPaletteP());
 
   void run() override;
   void onStarted(TThread::RunnableP task) override;

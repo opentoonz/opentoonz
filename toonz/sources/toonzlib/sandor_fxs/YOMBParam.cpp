@@ -18,7 +18,6 @@
 #include "STColSelPic.h"
 #include "BlurMatrix.h"
 #include "SDef.h"
-#include "STColSelPic.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -31,27 +30,28 @@ void CYOMBParam::print() {
   char s[1024];
 
   OutputDebugString("   ----- YOMB Param -----\n");
-  sprintf(s,"   Name=%s\n",m_name.c_str());
+  snprintf(s, sizeof(s), "   Name=%s\n",m_name.c_str());
   OutputDebugString(s);
-  sprintf(s,"   RandomSampling=%d\n",m_isRandomSampling);
+  snprintf(s, sizeof(s), "   RandomSampling=%d\n",m_isRandomSampling);
   OutputDebugString(s);
-  sprintf(s,"   ShowSelection=%d\n",m_isShowSelection);
+  snprintf(s, sizeof(s), "   ShowSelection=%d\n",m_isShowSelection);
   OutputDebugString(s);
-  sprintf(s,"   StopAtContour=%d\n",m_isStopAtContour);
+  snprintf(s, sizeof(s), "   StopAtContour=%d\n",m_isStopAtContour);
   OutputDebugString(s);
-  sprintf(s,"   dSample=%f\n",m_dSample);
+  snprintf(s, sizeof(s), "   dSample=%f\n",m_dSample);
   OutputDebugString(s);
-  sprintf(s,"   nbSample=%d\n",m_nbSample);
+  snprintf(s, sizeof(s), "   nbSample=%d\n",m_nbSample);
   OutputDebugString(s);
-  sprintf(s,"   dA=%f\n",m_dA);
+  snprintf(s, sizeof(s), "   dA=%f\n",m_dA);
   OutputDebugString(s);
-  sprintf(s,"   dAB=%f\n",m_dAB);
+  snprintf(s, sizeof(s), "   dAB=%f\n",m_dAB);
   OutputDebugString(s);
 
   for( vector<I_PIXEL>::iterator p=m_color.begin();
            p!=m_color.end();
            ++p ) {
-          sprintf(s,"   RGBM=(%d,%d,%d,%d)\n",p->r,p->g,p->b,p->m);
+          snprintf(s, sizeof(s), "   RGBM=(%d,%d,%d,%d)\n",
+            p->r,p->g,p->b,p->m);
           OutputDebugString(s);
   }
   OutputDebugString("   ----------------------\n");

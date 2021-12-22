@@ -18,7 +18,7 @@ int IKEngine::addJoint(const TPointD &pos, int indexParent) {
   m_skeleton.setParent(index, indexParent);
   return index;
 }
-// la root deve coincidere con un punto bloccato!
+// The root must be a pinned point!
 void IKEngine::setRoot(const TPointD &pos) {
   m_skeleton.addNode(new IKNode());
   m_skeleton.setNode(0, pos, IKNode::JOINT);
@@ -64,7 +64,7 @@ void IKEngine::drag(TPointD &pos) {
   // se lo scheletro è vuoto non succede nulla
   if (m_skeleton.getNodeCount() == 0) return;
 
-  // afferro l'ultimo punto della catena
+  // Grab the last point of the chain
   int indexDrag = m_skeleton.getNodeCount() - 1;
   if (m_skeleton.getNode(indexDrag)->getParent()->IsEffector()) return;
   m_skeleton.setPurpose(indexDrag, IKNode::EFFECTOR);

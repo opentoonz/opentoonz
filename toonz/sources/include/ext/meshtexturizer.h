@@ -39,7 +39,7 @@
             to the \a number of allowed textures, there \a are limits to the \b
   size of said
             textures, which can be tested by asking OpenGL whether it can
-  accomodate specific
+  accommodate specific
             texture requests or not.
 
             Technically, the MeshTexturizer class acts as a virtualization
@@ -143,7 +143,7 @@ private:
 
   \details  The purpose of MeshTexturizer is that of storing in VRAM a set of
   textures
-            cut up into tiles. This struture holds the data about the
+            cut up into tiles. This structure holds the data about the
   end-product of
             texture loading into a MeshTexturizer instance.
 */

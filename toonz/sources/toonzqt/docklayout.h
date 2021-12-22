@@ -97,8 +97,8 @@ public:
 
   void update();        // Re-applies partition found
   void redistribute();  // Calculates partition
-  void applyTransform(const QTransform &transform);  // Applies tranformation to
-                                                     // known parition - Da
+  void applyTransform(const QTransform &transform);  // Applies transformation to
+                                                     // known partition - Da
                                                      // rimuovere, non serve...
 
   DockWidget *getMaximized() { return m_maximizedDock; }
@@ -171,9 +171,13 @@ class DVAPI DockWidget : public QFrame {
 public:
   void maximizeDock();
 
+  bool getCanFixWidth() { return m_canFixWidth; }
+  void setCanFixWidth(bool fixed) { m_canFixWidth = fixed; }
+
 protected:
   // Private attributes for dragging purposes
-  bool m_floating;   // Whether this window is floating or docked
+  bool m_floating;  // Whether this window is floating or docked
+  bool m_wasFloating;
   bool m_dragging;   // Whether this window is being dragged
   bool m_undocking;  // Still docked, but after a mouse button press on a title
                      // bar.
@@ -185,6 +189,12 @@ protected:
 
   // Maximization
   bool m_maximized;
+
+  // Level Strip and Style Editor use a fixed width on 
+  // window resize to minimize user frustration
+  // This variable is only used by Level Strip right now.
+  // This is only true if the level strip is vertical.
+  bool m_canFixWidth = false;
 
 private:
   QPoint m_dragInitialPos;
@@ -211,6 +221,8 @@ public:
   DockLayout *parentLayout() const { return m_parentLayout; }
 
   bool isFloating() const { return m_floating; }
+  bool wasFloating() const { return m_wasFloating; }
+  void clearWasFloating() { m_wasFloating = false; }
   bool isMaximized() const { return m_maximized; }
 
   // Query functions
@@ -266,7 +278,7 @@ public:
   // Decorations allocator
   void setDecoAllocator(DockDecoAllocator *decoAllocator);
 
-  // reimpremented in FlipbookPanel
+  // reimplemented in FlipbookPanel
   virtual void onDock(bool docked) {}
 
 private:
@@ -370,7 +382,7 @@ private:
 //    Dock Placeholder
 //---------------------------
 
-//! A dock placeholder contains the necessary informations about a possible
+//! A dock placeholder contains the necessary information about a possible
 //! docking solution.
 
 /*!
@@ -393,11 +405,11 @@ class DockPlaceholder : public QWidget {
   friend class DockLayout;  // DockLayout is granted access to placeholders'
                             // privates
 
-  // Docking informations - private
+  // Docking information - private
   Region *m_region;
   int m_idx;
 
-  // Docking informations - public
+  // Docking information - public
   int m_attributes;
 
   // Owner
@@ -466,7 +478,7 @@ private:
   Every subRegion, if present, has opposite subdivision direction with
   respect to parent one. In addition, regions possess lists of separators
   and placeholders found along its subdivision direction.
-  Region informations are owned by the DockLayout who allocates it; however,
+  Region information is owned by the DockLayout who allocates it; however,
   they are read-only accessible by the user.
 
   \sa DockLayout, DockWidget, DockSeparator and DockPlaceholder classes.
@@ -520,6 +532,9 @@ public:
   DockPlaceholder *placeholder(int i) const { return m_placeholders[i]; }
 
   unsigned int find(const Region *subRegion) const;
+
+  bool checkWidgetsToBeFixedWidth(std::vector<QWidget *> &widgets,
+                                  bool &fromDocking);
 
 private:
   // Setters - private

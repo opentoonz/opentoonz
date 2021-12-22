@@ -772,7 +772,7 @@ void outlineVectorize(TVectorImageP &vi, const TRasterImageP &ri,
   vi->transform(conf.m_affine);
   vi->findRegions();
 
-  if (!conf.m_leaveUnpainted)
+  if (!conf.m_leaveUnpainted || conf.m_alignBoundaryStrokesDirection)
     // Finally, build region colors.
     buildColorsRGBM(vi, reader.scHash());
 }
@@ -798,7 +798,8 @@ void outlineVectorize(TVectorImageP &vi, const TToonzImageP &ti,
   vi->transform(conf.m_affine);
   vi->findRegions();
 
-  if (!conf.m_leaveUnpainted) buildColorsCM(vi, reader.scHash());
+  if (!conf.m_leaveUnpainted || conf.m_alignBoundaryStrokesDirection)
+    buildColorsCM(vi, reader.scHash());
 }
 
 }  // namespace

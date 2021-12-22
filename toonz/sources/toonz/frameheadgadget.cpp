@@ -140,7 +140,7 @@ void FrameHeadGadget::drawOnionSkinSelection(QPainter &p,
     if (i > 0 || mos > 0) {
       int ya = y;
       int yb;
-      if (i == 0 || mos > 0 && osMask.getMos(i - 1) < 0) {
+      if (i == 0 || (mos > 0 && osMask.getMos(i - 1) < 0)) {
         ya = index2y(currentRow) + 10;
         yb = index2y(currentRow + mos) + 4;
       } else
@@ -177,7 +177,7 @@ bool FrameHeadGadget::eventFilter(QObject *obj, QEvent *e) {
     int x                   = mouseEvent->pos().x();
     int y                   = mouseEvent->pos().y() - index2y(frame);
 
-    if (x > 24 || x > 12 && frame != currentFrame) return false;
+    if (x > 24 || (x > 12 && frame != currentFrame)) return false;
     if (y < 12) {
       bool isMosArea = x < 6;
       // click nel quadratino bianco.
@@ -206,7 +206,7 @@ bool FrameHeadGadget::eventFilter(QObject *obj, QEvent *e) {
     int currentFrame        = getCurrentFrame();
     int x                   = mouseEvent->pos().x();
     int y                   = mouseEvent->pos().y() - index2y(frame);
-    if (x > 24 || x > 12 && frame != currentFrame) return false;
+    if (x > 24 || (x > 12 && frame != currentFrame)) return false;
     if (mouseEvent->button() == Qt::RightButton) return false;
     if (x < 12 && y < 12 && frame == currentFrame &&
         m_buttonPressCellIndex == frame) {
@@ -297,6 +297,8 @@ FilmstripFrameHeadGadget::FilmstripFrameHeadGadget(FilmstripFrames *filmstrip)
     : m_filmstrip(filmstrip)
     , m_dy(m_filmstrip->getIconSize().height() + fs_frameSpacing +
            fs_iconMarginTop + fs_iconMarginBottom)
+    , m_dx(m_filmstrip->getIconSize().width() + fs_frameSpacing +
+           fs_leftMargin + fs_rightMargin + fs_iconMarginLR)
     , m_highlightedghostFrame(-1) {}
 
 int FilmstripFrameHeadGadget::getY() const { return 50; }
@@ -304,6 +306,12 @@ int FilmstripFrameHeadGadget::getY() const { return 50; }
 int FilmstripFrameHeadGadget::index2y(int index) const { return index * m_dy; }
 
 int FilmstripFrameHeadGadget::y2index(int y) const { return y / m_dy; }
+
+int FilmstripFrameHeadGadget::getX() const { return 50; }
+
+int FilmstripFrameHeadGadget::index2x(int index) const { return index * m_dx; }
+
+int FilmstripFrameHeadGadget::x2index(int x) const { return x / m_dx; }
 
 void FilmstripFrameHeadGadget::setCurrentFrame(int index) const {
   TXshSimpleLevel *level = m_filmstrip->getLevel();
@@ -339,6 +347,7 @@ void FilmstripFrameHeadGadget::drawOnionSkinSelection(QPainter &p,
   int i;
   // OnionSkinの円の左上座標のｙ値
   int onionDotYPos = m_dy / 2 - 5;
+  int onionDotXPos = m_dx / 2 - 5;
 
   p.setPen(Qt::red);
   //--- OnionSkinが有効なら実線、無効なら点線
@@ -356,8 +365,12 @@ void FilmstripFrameHeadGadget::drawOnionSkinSelection(QPainter &p,
     //上向きのハンドル：1フレーム目のときは描画しない
     if (currentRow > 0) {
       int y0 = index2y(currentRow) - 15;
+      int x0 = index2x(currentRow) - 15;
       p.setBrush(QBrush(backColor));
-      p.drawChord(handleRect.translated(0, y0), 0, angle180);
+      if (m_filmstrip->m_isVertical)
+        p.drawChord(handleRect.translated(0, y0), 0, angle180);
+      else
+        p.drawChord(handleRect.translated(x0, 0), 16 * 90, angle180);
     }
 
     //下向きのハンドル：最終フレームの時は描画しない
@@ -366,8 +379,13 @@ void FilmstripFrameHeadGadget::drawOnionSkinSelection(QPainter &p,
     int frameCount = (int)fids.size();
     if (currentRow < frameCount - 1) {
       int y1 = index2y(currentRow + 1) - 15;
+      int x1 = index2x(currentRow + 1) - 15;
       p.setBrush(QBrush(frontColor));
-      p.drawChord(handleRect.translated(0, y1), angle180, angle180);
+
+      if (m_filmstrip->m_isVertical)
+        p.drawChord(handleRect.translated(0, y1), angle180, angle180);
+      else
+        p.drawChord(handleRect.translated(x1, 0), 16 * 90, -angle180);
     }
 
     //--- 動く Onion Skinの描画 その1
@@ -376,7 +394,7 @@ void FilmstripFrameHeadGadget::drawOnionSkinSelection(QPainter &p,
     int minMos = 0;
     int maxMos = 0;
     for (i = 0; i < mosCount; i++) {
-      int mos                  = osMask.getMos(i);
+      int mos = osMask.getMos(i);
       if (minMos > mos) minMos = mos;
       if (maxMos < mos) maxMos = mos;
     }
@@ -384,15 +402,29 @@ void FilmstripFrameHeadGadget::drawOnionSkinSelection(QPainter &p,
     // min/maxが更新されていたら、線を描く
     if (minMos < 0)  //上方向に伸ばす線
     {
-      int y0 = index2y(currentRow + minMos) + onionDotYPos + 10;  // 10は●の直径
-      int y1 = index2y(currentRow) - 15;
-      p.drawLine(15, y0, 15, y1);
+      if (m_filmstrip->m_isVertical) {
+        int y0 =
+            index2y(currentRow + minMos) + onionDotYPos + 10;  // 10は●の直径
+        int y1 = index2y(currentRow) - 15;
+        p.drawLine(15, y0, 15, y1);
+      } else {
+        int x0 =
+            index2x(currentRow + minMos) + onionDotXPos + 10;  // 10は●の直径
+        int x1 = index2x(currentRow) - 15;
+        p.drawLine(x0, 15, x1, 15);
+      }
     }
     if (maxMos > 0)  //下方向に伸ばす線
     {
-      int y0 = index2y(currentRow + 1) + 15;
-      int y1 = index2y(currentRow + maxMos) + onionDotYPos;
-      p.drawLine(15, y0, 15, y1);
+      if (m_filmstrip->m_isVertical) {
+        int y0 = index2y(currentRow + 1) + 15;
+        int y1 = index2y(currentRow + maxMos) + onionDotYPos;
+        p.drawLine(15, y0, 15, y1);
+      } else {
+        int x0 = index2x(currentRow + 1) + 15;
+        int x1 = index2x(currentRow + maxMos) + onionDotXPos;
+        p.drawLine(x0, 15, x1, 15);
+      }
     }
   }
 
@@ -401,11 +433,15 @@ void FilmstripFrameHeadGadget::drawOnionSkinSelection(QPainter &p,
     int fos = osMask.getFos(i);
     // if(fos == currentRow) continue;
     int y = index2y(fos) + onionDotYPos;
+    int x = index2x(fos) + onionDotXPos;
     p.setPen(Qt::red);
     // OnionSkinがDisableなら中空にする
     p.setBrush(osMask.isEnabled() ? QBrush(QColor(0, 255, 255, 128))
                                   : Qt::NoBrush);
-    p.drawEllipse(0, y, 10, 10);
+    if (m_filmstrip->m_isVertical)
+      p.drawEllipse(0, y, 10, 10);
+    else
+      p.drawEllipse(x, 0, 10, 10);
   }
   //---
 
@@ -420,10 +456,14 @@ void FilmstripFrameHeadGadget::drawOnionSkinSelection(QPainter &p,
     if (currentRow + mos == m_highlightedMosFrame) continue;
 
     int y = index2y(currentRow + mos) + onionDotYPos;
+    int x = index2x(currentRow + mos) + onionDotXPos;
 
     p.setBrush(mos < 0 ? backColor : frontColor);
 
-    p.drawEllipse(10, y, 10, 10);
+    if (m_filmstrip->m_isVertical)
+      p.drawEllipse(10, y, 10, 10);
+    else
+      p.drawEllipse(x, 10, 10, 10);
   }
 
   // Fix Onion Skin ハイライトの描画
@@ -432,14 +472,20 @@ void FilmstripFrameHeadGadget::drawOnionSkinSelection(QPainter &p,
   if (m_highlightedFosFrame >= 0 && m_highlightedFosFrame != currentRow) {
     p.setPen(QColor(255, 128, 0));
     p.setBrush(QBrush(QColor(255, 255, 0, 200)));
-    p.drawEllipse(0, index2y(m_highlightedFosFrame) + onionDotYPos, 10, 10);
+    if (m_filmstrip->m_isVertical)
+      p.drawEllipse(0, index2y(m_highlightedFosFrame) + onionDotYPos, 10, 10);
+    else
+      p.drawEllipse(index2x(m_highlightedFosFrame) + onionDotXPos, 0, 10, 10);
   }
 
   //通常のOnion Skin ハイライトの描画
   if (m_highlightedMosFrame >= 0 && m_highlightedMosFrame != currentRow) {
     p.setPen(QColor(255, 128, 0));
     p.setBrush(QBrush(QColor(255, 255, 0, 200)));
-    p.drawEllipse(10, index2y(m_highlightedMosFrame) + onionDotYPos, 10, 10);
+    if (m_filmstrip->m_isVertical)
+      p.drawEllipse(10, index2y(m_highlightedMosFrame) + onionDotYPos, 10, 10);
+    else
+      p.drawEllipse(index2x(m_highlightedMosFrame) + onionDotXPos, 10, 10, 10);
   }
 }
 
@@ -463,23 +509,43 @@ void FilmstripFrameHeadGadget::drawShiftTraceMarker(QPainter &p) {
 
   const int shiftTraceDotSize    = 12;
   const int shiftTraceDotXOffset = 3;
+  const int shiftTraceDotYOffset = 3;
   int dotYPos                    = (m_dy - shiftTraceDotSize) / 2;
+  int dotXPos                    = (m_dx - shiftTraceDotSize) / 2;
 
   if (currentRow > 0 && prevOffset < 0)  // previous ghost
   {
-    p.setPen(backColor);
-    int y0 = index2y(currentRow + prevOffset) + dotYPos + shiftTraceDotSize;
-    int y1 = index2y(currentRow);
-    p.drawLine(shiftTraceDotXOffset + shiftTraceDotSize / 2, y0,
-               shiftTraceDotXOffset + shiftTraceDotSize / 2, y1);
+    if (m_filmstrip->m_isVertical) {
+      p.setPen(backColor);
+      int y0 = index2y(currentRow + prevOffset) + dotYPos + shiftTraceDotSize;
+      int y1 = index2y(currentRow);
+      p.drawLine(shiftTraceDotXOffset + shiftTraceDotSize / 2, y0,
+                 shiftTraceDotXOffset + shiftTraceDotSize / 2, y1);
+    } else {
+      p.setPen(backColor);
+      int x0 = index2x(currentRow + prevOffset) + dotXPos + shiftTraceDotSize;
+      int x1 = index2x(currentRow);
+      p.drawLine(x0, shiftTraceDotYOffset + shiftTraceDotSize / 2, x1,
+                 shiftTraceDotYOffset + shiftTraceDotSize / 2);
+    }
   }
   if (forwardOffset > 0)  // forward ghost
   {
-    p.setPen(frontColor);
-    int y0 = index2y(currentRow + 1);
-    int y1 = index2y(currentRow + forwardOffset) + dotYPos + shiftTraceDotSize;
-    p.drawLine(shiftTraceDotXOffset + shiftTraceDotSize / 2, y0,
-               shiftTraceDotXOffset + shiftTraceDotSize / 2, y1);
+    if (m_filmstrip->m_isVertical) {
+      p.setPen(frontColor);
+      int y0 = index2y(currentRow + 1);
+      int y1 =
+          index2y(currentRow + forwardOffset) + dotYPos + shiftTraceDotSize;
+      p.drawLine(shiftTraceDotXOffset + shiftTraceDotSize / 2, y0,
+                 shiftTraceDotXOffset + shiftTraceDotSize / 2, y1);
+    } else {
+      p.setPen(frontColor);
+      int x0 = index2x(currentRow + 1);
+      int x1 =
+          index2x(currentRow + forwardOffset) + dotXPos + shiftTraceDotSize;
+      p.drawLine(x0, shiftTraceDotYOffset + shiftTraceDotSize / 2, x1,
+                 shiftTraceDotYOffset + shiftTraceDotSize / 2);
+    }
   }
   // draw dots
   std::vector<int> offsVec      = {prevOffset, 0, forwardOffset};
@@ -493,9 +559,17 @@ void FilmstripFrameHeadGadget::drawShiftTraceMarker(QPainter &p) {
     if (i != 1 && offsVec[i] == 0) continue;
     p.setPen(colorsVec[i]);
     p.setBrush(Qt::gray);
-    int topPos = index2y(currentRow + offsVec[i]) + dotYPos;
-    QRect dotRect(shiftTraceDotXOffset, topPos, shiftTraceDotSize,
-                  shiftTraceDotSize);
+    int topPos;
+    QRect dotRect;
+    if (m_filmstrip->m_isVertical) {
+      topPos  = index2y(currentRow + offsVec[i]) + dotYPos;
+      dotRect = QRect(shiftTraceDotXOffset, topPos, shiftTraceDotSize,
+                      shiftTraceDotSize);
+    } else {
+      topPos  = index2x(currentRow + offsVec[i]) + dotXPos;
+      dotRect = QRect(topPos, shiftTraceDotYOffset, shiftTraceDotSize,
+                      shiftTraceDotSize);
+    }
     p.drawRect(dotRect);
 
     // draw shortcut numbers
@@ -508,9 +582,17 @@ void FilmstripFrameHeadGadget::drawShiftTraceMarker(QPainter &p) {
   if (m_highlightedghostFrame >= 0) {
     p.setPen(QColor(255, 255, 0));
     p.setBrush(QColor(255, 255, 0, 180));
-    int topPos = index2y(m_highlightedghostFrame) + dotYPos;
-    QRect dotRect(shiftTraceDotXOffset, topPos, shiftTraceDotSize,
-                  shiftTraceDotSize);
+    int topPos;
+    QRect dotRect;
+    if (m_filmstrip->m_isVertical) {
+      topPos  = index2y(m_highlightedghostFrame) + dotYPos;
+      dotRect = QRect(shiftTraceDotXOffset, topPos, shiftTraceDotSize,
+                      shiftTraceDotSize);
+    } else {
+      topPos  = index2x(m_highlightedghostFrame) + dotXPos;
+      dotRect = QRect(topPos, shiftTraceDotYOffset, shiftTraceDotSize,
+                      shiftTraceDotSize);
+    }
     p.drawRect(dotRect);
   }
 }
@@ -518,6 +600,10 @@ void FilmstripFrameHeadGadget::drawShiftTraceMarker(QPainter &p) {
 //-----------------------------------------------------------------------------
 
 bool FilmstripFrameHeadGadget::eventFilter(QObject *obj, QEvent *e) {
+  if (e->type() != QEvent::MouseButtonPress &&
+      e->type() != QEvent::MouseButtonDblClick &&
+      e->type() != QEvent::MouseMove)
+    return false;
   // shift & trace case
   if (CommandManager::instance()->getAction(MI_ShiftTrace)->isChecked())
     return shiftTraceEventFilter(obj, e);
@@ -538,14 +624,22 @@ bool FilmstripFrameHeadGadget::eventFilter(QObject *obj, QEvent *e) {
     //それぞれのパーツの位置Rectの指定。各フレームの右上座標からのオフセットも含む。
     // OnionSkinの円の左上座標のｙ値
     int onionDotYPos = m_dy / 2 - 5;
+    int onionDotXPos = m_dx / 2 - 5;
     // OnionSkinの●のRect
     QRect onionDotRect(10, onionDotYPos, 10, 10);
+    if (!m_filmstrip->m_isVertical)
+      onionDotRect = QRect(onionDotXPos, 10, 10, 10);
     // FixedOnionSkinの●のRect
     QRect fixedOnionDotRect(0, onionDotYPos, 10, 10);
+    if (!m_filmstrip->m_isVertical)
+      fixedOnionDotRect = QRect(onionDotXPos, 0, 10, 10);
     //上方向のOnionSkinタブのRect
     QRect backOnionTabRect(0, m_dy - 15, 30, 15);
+    if (!m_filmstrip->m_isVertical)
+      backOnionTabRect = QRect(m_dx - 15, 0, 15, 30);
     //下方向のOnionSkinタブのRect
     QRect frontOnionTabRect(0, 0, 30, 15);
+    if (!m_filmstrip->m_isVertical) frontOnionTabRect = QRect(0, 0, 15, 30);
     //-----
 
     //----- ハイライト表示、actionのリセット
@@ -565,11 +659,14 @@ bool FilmstripFrameHeadGadget::eventFilter(QObject *obj, QEvent *e) {
     //クリックされたフレームを取得
     QMouseEvent *mouseEvent = dynamic_cast<QMouseEvent *>(e);
     int frame               = y2index(mouseEvent->pos().y());
-    m_buttonPressCellIndex  = frame;
-    int currentFrame        = getCurrentFrame();
+    if (!m_filmstrip->m_isVertical) frame = x2index(mouseEvent->pos().x());
+    m_buttonPressCellIndex = frame;
+    int currentFrame       = getCurrentFrame();
 
     //各フレーム左上からの位置
     QPoint clickedPos = mouseEvent->pos() + QPoint(0, -index2y(frame));
+    if (!m_filmstrip->m_isVertical)
+      clickedPos = mouseEvent->pos() + QPoint(-index2x(frame), 0);
 
     //カレントフレームの場合、無視
     if (frame == currentFrame) return false;
@@ -609,14 +706,20 @@ bool FilmstripFrameHeadGadget::eventFilter(QObject *obj, QEvent *e) {
     QMouseEvent *mouseEvent = dynamic_cast<QMouseEvent *>(e);
     if (mouseEvent->buttons() & Qt::LeftButton) {
       int frame = y2index(mouseEvent->pos().y());
+      if (!m_filmstrip->m_isVertical) frame = x2index(mouseEvent->pos().x());
       //各フレーム左上からの位置
       QPoint clickedPos = mouseEvent->pos() + QPoint(0, -index2y(frame));
+      if (!m_filmstrip->m_isVertical)
+        clickedPos = mouseEvent->pos() + QPoint(-index2x(frame), 0);
       //カレントフレーム
       int currentFrame = getCurrentFrame();
       //上方向のOnionSkinタブのRect
       QRect backOnionTabRect(0, m_dy - 15, 30, 15);
+      if (!m_filmstrip->m_isVertical)
+        backOnionTabRect = QRect(m_dx - 15, 0, 15, 30);
       //下方向のOnionSkinタブのRect
       QRect frontOnionTabRect(0, 0, 30, 15);
+      if (!m_filmstrip->m_isVertical) frontOnionTabRect = QRect(0, 0, 15, 30);
       if ((currentFrame - 1 == frame &&
            backOnionTabRect.contains(clickedPos)) ||
           (currentFrame + 1 == frame &&
@@ -631,8 +734,11 @@ bool FilmstripFrameHeadGadget::eventFilter(QObject *obj, QEvent *e) {
   else if (e->type() == QEvent::MouseMove) {
     QMouseEvent *mouseEvent = dynamic_cast<QMouseEvent *>(e);
     int frame               = y2index(mouseEvent->pos().y());
+    if (!m_filmstrip->m_isVertical) frame = x2index(mouseEvent->pos().x());
     //各フレーム左上からの位置
     QPoint clickedPos = mouseEvent->pos() + QPoint(0, -index2y(frame));
+    if (!m_filmstrip->m_isVertical)
+      clickedPos = mouseEvent->pos() + QPoint(-index2x(frame), 0);
     //カレントフレーム
     int currentFrame = getCurrentFrame();
     //マウスボタンが押されていない場合
@@ -641,15 +747,22 @@ bool FilmstripFrameHeadGadget::eventFilter(QObject *obj, QEvent *e) {
       //それぞれのパーツの位置Rectの指定。各フレームの右上座標からのオフセットも含む。
       // OnionSkinの円の左上座標のｙ値
       int onionDotYPos = m_dy / 2 - 5;
-      // OnionSkinの●のRect
+      int onionDotXPos = m_dx / 2 - 5;
+
       QRect onionDotRect(10, onionDotYPos, 10, 10);
+      if (!m_filmstrip->m_isVertical)
+        onionDotRect = QRect(onionDotXPos, 10, 10, 10);
       // FixedOnionSkinの●のRect
       QRect fixedOnionDotRect(0, onionDotYPos, 10, 10);
+      if (!m_filmstrip->m_isVertical)
+        fixedOnionDotRect = QRect(onionDotXPos, 0, 10, 10);
       //上方向のOnionSkinタブのRect
       QRect backOnionTabRect(0, m_dy - 15, 30, 15);
+      if (!m_filmstrip->m_isVertical)
+        backOnionTabRect = QRect(m_dx - 15, 0, 15, 30);
       //下方向のOnionSkinタブのRect
       QRect frontOnionTabRect(0, 0, 30, 15);
-      //-----
+      if (!m_filmstrip->m_isVertical) frontOnionTabRect = QRect(0, 0, 15, 30);
 
       //----- Fixed Onion Skin の ハイライト
       int highlightedFrame;
@@ -737,9 +850,15 @@ bool FilmstripFrameHeadGadget::shiftTraceEventFilter(QObject *obj, QEvent *e) {
 
   const int shiftTraceDotSize    = 12;
   const int shiftTraceDotXOffset = 3;
+  const int shiftTraceDotYOffset = 3;
   int dotYPos                    = (m_dy - shiftTraceDotSize) / 2;
+  int dotXPos                    = (m_dx - shiftTraceDotSize) / 2;
   QRect dotRect(shiftTraceDotXOffset, dotYPos, shiftTraceDotSize,
                 shiftTraceDotSize);
+  if (!m_filmstrip->m_isVertical) {
+    dotRect = QRect(dotXPos, shiftTraceDotYOffset, shiftTraceDotSize,
+                    shiftTraceDotSize);
+  }
 
   // reset highlight
   if (m_highlightedghostFrame >= 0) {
@@ -749,12 +868,20 @@ bool FilmstripFrameHeadGadget::shiftTraceEventFilter(QObject *obj, QEvent *e) {
 
   QMouseEvent *mouseEvent = dynamic_cast<QMouseEvent *>(e);
   int frame               = y2index(mouseEvent->pos().y());
+  if (!m_filmstrip->m_isVertical) frame = x2index(mouseEvent->pos().x());
   // position from top-left of the frame
-  QPoint mousePos  = mouseEvent->pos() + QPoint(0, -index2y(frame));
+  QPoint mousePos = mouseEvent->pos() + QPoint(0, -index2y(frame));
+  if (!m_filmstrip->m_isVertical)
+    mousePos = mouseEvent->pos() + QPoint(-index2x(frame), 0);
   int currentFrame = getCurrentFrame();
 
-  if (mousePos.x() < dotRect.left() || mousePos.x() > dotRect.right())
-    return false;
+  if (m_filmstrip->m_isVertical) {
+    if (mousePos.x() < dotRect.left() || mousePos.x() > dotRect.right())
+      return false;
+  } else {
+    if (mousePos.y() < dotRect.top() || mousePos.y() > dotRect.bottom())
+      return false;
+  }
 
   if (e->type() == QEvent::MouseButtonPress) {
     if (frame == currentFrame) {

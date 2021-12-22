@@ -73,11 +73,11 @@ Iwa_TileFx::Iwa_TileFx()
 
   bindParam(this, "leftQuantity", m_leftQuantity);
   m_leftQuantity->addItem(eOneTile, "1 Tile");
-  m_leftQuantity->addItem(eMultipleTiles, "Mutiple Tiles");
+  m_leftQuantity->addItem(eMultipleTiles, "Multiple Tiles");
 
   bindParam(this, "rightQuantity", m_rightQuantity);
   m_rightQuantity->addItem(eOneTile, "1 Tile");
-  m_rightQuantity->addItem(eMultipleTiles, "Mutiple Tiles");
+  m_rightQuantity->addItem(eMultipleTiles, "Multiple Tiles");
 
   bindParam(this, "xMirror", m_xMirror);
 
@@ -86,11 +86,11 @@ Iwa_TileFx::Iwa_TileFx()
 
   bindParam(this, "topQuantity", m_topQuantity);
   m_topQuantity->addItem(eOneTile, "1 Tile");
-  m_topQuantity->addItem(eMultipleTiles, "Mutiple Tiles");
+  m_topQuantity->addItem(eMultipleTiles, "Multiple Tiles");
 
   bindParam(this, "bottomQuantity", m_bottomQuantity);
   m_bottomQuantity->addItem(eOneTile, "1 Tile");
-  m_bottomQuantity->addItem(eMultipleTiles, "Mutiple Tiles");
+  m_bottomQuantity->addItem(eMultipleTiles, "Multiple Tiles");
 
   bindParam(this, "yMirror", m_yMirror);
 

@@ -102,6 +102,8 @@ protected:
 
   bool m_isMaxRangeLimited;
 
+  bool m_isLinear;
+
 public:
   DoubleValuePairField(QWidget *parent, bool isMaxRangeLimited,
                        DoubleValueLineEdit *leftLineEdit,
@@ -174,6 +176,7 @@ protected:
   void mouseMoveEvent(QMouseEvent *event) override;
   void mouseReleaseEvent(QMouseEvent *event) override;
 
+  void setLinearSlider(bool linear) { m_isLinear = linear; }
 protected slots:
   /*! Set current left value to value in left text field; if necessary, if left
                   value is greater than right, change also current right value.
@@ -210,7 +213,7 @@ signals:
                         DoublePairField* doublePairFieldExample = new
    DoublePairField(this);
                         doublePairFieldExample->setLeftText(tr("Left Value:"));
-                        doublePairFieldExample->setRightText(tr("Rigth
+                        doublePairFieldExample->setRightText(tr("Right
    Value:"));
                         doublePairFieldExample->setRange(0,10);
                         doublePairFieldExample->setValues(std::make_pair(3.58,7.65));
@@ -237,7 +240,7 @@ public:
                         MeasuredDoublePairField* doublePairFieldExample = new
    MeasuredDoublePairField(this);
                         doublePairFieldExample->setLeftText(tr("Left Value:"));
-                        doublePairFieldExample->setRightText(tr("Rigth
+                        doublePairFieldExample->setRightText(tr("Right
    Value:"));
                         doublePairFieldExample->setRange(0,10);
                         doublePairFieldExample->setValues(std::make_pair(3.58,7.65));

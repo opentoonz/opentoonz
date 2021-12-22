@@ -105,14 +105,16 @@ public:
     m_affine.a13 = m_affine.a23 = 0;
   }
 
-  void leftButtonDrag(const TPointD &pos, const TMouseEvent &) override {
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) override {
     if (m_lockCenterX && m_lockCenterY) return;
     double factor = 1.0 / Stage::inch;
+    // precise control with pressing Alt key
+    if (e.isAltPressed()) factor *= 0.1;
     TPointD delta = pos - m_firstPos;
     if (m_lockCenterX)
       delta = TPointD(0.0, delta.y);
     else if (m_lockCenterY)
-      delta  = TPointD(delta.x, 0.0);
+      delta = TPointD(delta.x, 0.0);
     m_center = m_oldCenter + (m_affine * delta) * factor;
     TTool::getApplication()
         ->getCurrentTool()
@@ -121,7 +123,11 @@ public:
         ->setCenter(m_objId, m_frame, m_center);
   }
   void leftButtonUp(const TPointD &pos, const TMouseEvent &) override {
-    if ((m_lockCenterX && m_lockCenterY) || m_firstPos == pos) return;
+    if (m_firstPos == pos) return;
+    leftButtonUp();
+  }
+  void leftButtonUp() override {
+    if (m_lockCenterX && m_lockCenterY) return;
     UndoStageObjectCenterMove *undo =
         new UndoStageObjectCenterMove(m_objId, m_frame, m_oldCenter, m_center);
     TTool::Application *app = TTool::getApplication();
@@ -227,7 +233,11 @@ public:
   }
 
   void leftButtonUp(const TPointD &pos, const TMouseEvent &) override {
-    if (!m_isStarted || m_firstPos == pos)
+    if (m_firstPos == pos) return;
+    leftButtonUp();
+  }
+  void leftButtonUp() override {
+    if (!m_isStarted)
       return;
     else
       m_isStarted = false;
@@ -276,6 +286,8 @@ public:
         delta.x = 0;
     }
     double factor = 1.0 / Stage::inch;
+    // precise control with pressing Alt key
+    if (e.isAltPressed()) factor *= 0.1;
     setValues(getOldValue(0) + delta.x * factor,
               getOldValue(1) + delta.y * factor);
   }
@@ -389,7 +401,7 @@ public:
     m_center   = getCenter();
     start();
   }
-  void leftButtonDrag(const TPointD &pos, const TMouseEvent &) override {
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) override {
     if (m_lockRotation) return;
     TPointD a = m_lastPos - m_center;
     TPointD b = pos - m_center;
@@ -408,6 +420,8 @@ a = m_viewer->mouseToTool(gc) - m_curCenter;
     if (a2 < eps || b2 < eps) return;
 
     double dang = asin(cross(a, b) / sqrt(a2 * b2)) * M_180_PI;
+    // precise control with pressing Alt key
+    if (e.isAltPressed()) dang *= 0.1;
     setValue(getValue(0) + dang);
   }
 };
@@ -441,6 +455,8 @@ public:
     // TPointD a = m_firstPos - m_center;
     double r1 = norm(pos - m_center);
     if (r1 < 0.0001) return;
+    // precise control with pressing Alt key
+    if (e.isAltPressed()) r1 = m_r0 + (r1 - m_r0) * 0.1;
     setValue(getOldValue(0) * r1 / m_r0);
   }
 };
@@ -480,10 +496,10 @@ public:
     const double eps = 1e-8;
     if (norm2(a) < eps || norm2(b) < eps) return;
 
-    double fx            = b.x / a.x;
-    if (fabs(fx) > 1) fx = tsign(fx) * sqrt(abs(fx));
-    double fy            = b.y / a.y;
-    if (fabs(fy) > 1) fy = tsign(fy) * sqrt(abs(fy));
+    double fx = b.x / a.x;
+    if (fabs(fx) > 1) fx = tsign(fx) * sqrt(std::abs(fx));
+    double fy = b.y / a.y;
+    if (fabs(fy) > 1) fy = tsign(fy) * sqrt(std::abs(fy));
 
     int constraint = m_constraint;
     if (constraint == ScaleConstraints::None && e.isShiftPressed())
@@ -503,11 +519,15 @@ public:
       fy = byax / bxay;
     }
     if (fabs(fx) > eps && fabs(fy) > eps) {
-      double oldv0                   = getOldValue(0);
-      double oldv1                   = getOldValue(1);
+      double oldv0 = getOldValue(0);
+      double oldv1 = getOldValue(1);
       if (fabs(oldv0) < 0.001) oldv0 = 0.001;
       if (fabs(oldv1) < 0.001) oldv1 = 0.001;
-
+      // precise control with pressing Alt key
+      if (e.isAltPressed()) {
+        fx = 1.0 + (fx - 1.0) * 0.1;
+        fy = 1.0 + (fy - 1.0) * 0.1;
+      }
       double valueX = oldv0 * fx;
       double valueY = oldv1 * fy;
       if (m_lockScaleH)
@@ -560,6 +580,11 @@ public:
       else
         fx = 0;
     }
+    // precise control with pressing Alt key
+    if (e.isAltPressed()) {
+      fx *= 0.1;
+      fy *= 0.1;
+    }
     setValues(getOldValue(0) + 0.01 * fx, getOldValue(1) + 0.01 * fy);
   }
 };
@@ -586,6 +611,8 @@ public:
   }
   void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) override {
     double dz = m_viewer->projectToZ(e.m_pos - m_lastPos);
+    // precise control with pressing Alt key
+    if (e.isAltPressed()) dz *= 0.1;
     m_lastPos = e.m_pos;
     if (dz != 0.0) {
       m_dz += dz;
@@ -593,6 +620,17 @@ public:
     }
   }
 };
+
+bool hasVisibleChildColumn(const TStageObject *obj, const TXsheet *xsh) {
+  if (!(obj->getId().isColumn())) return false;  // just in case
+  TXshColumn *column = xsh->getColumn(obj->getId().getIndex());
+  if (!column) return false;
+  if (column->isCamstandVisible()) return true;
+  for (const auto child : obj->getChildren()) {
+    if (hasVisibleChildColumn(child, xsh)) return true;
+  }
+  return false;
+}
 
 //=============================================================================
 }  // namespace
@@ -639,6 +677,8 @@ class EditTool final : public TTool {
   double m_currentScaleFactor;
   FxGadgetController *m_fxGadgetController;
 
+  bool m_isAltPressed;
+
   TEnumProperty m_scaleConstraint;
   TEnumProperty m_autoSelect;
   TBoolProperty m_globalKeyframes;
@@ -678,6 +718,7 @@ public:
 
   bool doesApply() const;  // ritorna vero se posso deformare l'oggetto corrente
   void saveOldValues();
+  bool transformEnabled() const;
 
   const TStroke *getSpline() const;
 
@@ -717,6 +758,8 @@ public:
   }
 
   void drawText(const TPointD &p, double unit, std::string text);
+
+  QString updateEnabled(int rowIndex, int columnIndex) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -732,17 +775,17 @@ EditTool::EditTool()
     , m_scaleConstraint("Scale Constraint:")  // W_ToolOptions_ScaleConstraint
     , m_autoSelect("Auto Select Column")      // W_ToolOptions_AutoSelect
     , m_globalKeyframes("Global Key", false)  // W_ToolsOptions_GlobalKeyframes
-    , m_lockCenterX("Lock Center E/W", false)
-    , m_lockCenterY("Lock Center N/S", false)
-    , m_lockPositionX("Lock Position E/W", false)
-    , m_lockPositionY("Lock Position N/S", false)
+    , m_lockCenterX("Lock Center X", false)
+    , m_lockCenterY("Lock Center Y", false)
+    , m_lockPositionX("Lock Position X", false)
+    , m_lockPositionY("Lock Position Y", false)
     , m_lockRotation("Lock Rotation", false)
     , m_lockShearH("Lock Shear H", false)
     , m_lockShearV("Lock Shear V", false)
     , m_lockScaleH("Lock Scale H", false)
     , m_lockScaleV("Lock Scale V", false)
     , m_lockGlobalScale("Lock Global Scale", false)
-    , m_showEWNSposition("E/W and N/S Positions", true)
+    , m_showEWNSposition("X and Y Positions", true)
     , m_showZposition("Z Position", true)
     , m_showSOposition("SO", true)
     , m_showRotation("Rotation", true)
@@ -752,7 +795,8 @@ EditTool::EditTool()
     , m_showCenterPosition("Center Position", true)
     , m_dragTool(0)
     , m_firstTime(true)
-    , m_activeAxis("Active Axis") {
+    , m_activeAxis("Active Axis")
+    , m_isAltPressed(false) {
   bind(TTool::AllTargets);
   m_prop.bind(m_scaleConstraint);
   m_prop.bind(m_autoSelect);
@@ -824,17 +868,17 @@ void EditTool::updateTranslation() {
   m_autoSelect.setItemUIName(L"Pegbar", tr("Pegbar"));
 
   m_globalKeyframes.setQStringName(tr("Global Key"));
-  m_lockCenterX.setQStringName(tr("Lock Center E/W"));
-  m_lockCenterY.setQStringName(tr("Lock Center N/S"));
-  m_lockPositionX.setQStringName(tr("Lock Position E/W"));
-  m_lockPositionY.setQStringName(tr("Lock Position N/S"));
+  m_lockCenterX.setQStringName(tr("Lock Center X"));
+  m_lockCenterY.setQStringName(tr("Lock Center Y"));
+  m_lockPositionX.setQStringName(tr("Lock Position X"));
+  m_lockPositionY.setQStringName(tr("Lock Position Y"));
   m_lockRotation.setQStringName(tr("Lock Rotation"));
   m_lockShearH.setQStringName(tr("Lock Shear H"));
   m_lockShearV.setQStringName(tr("Lock Shear V"));
   m_lockScaleH.setQStringName(tr("Lock Scale H"));
   m_lockScaleV.setQStringName(tr("Lock Scale V"));
   m_lockGlobalScale.setQStringName(tr("Lock Global Scale"));
-  m_showEWNSposition.setQStringName(tr("E/W and N/S Positions"));
+  m_showEWNSposition.setQStringName(tr("X and Y Positions"));
   m_showZposition.setQStringName(tr("Z Position"));
   m_showSOposition.setQStringName(tr("SO"));
   m_showRotation.setQStringName(tr("Rotation"));
@@ -864,6 +908,16 @@ bool EditTool::doesApply() const {
     if (column && column->getSoundColumn()) return false;
   }
   return true;
+}
+
+//-----------------------------------------------------------------------------
+
+bool EditTool::transformEnabled() const {
+  // check if the column transformation is enabled
+  TXsheet *xsh = getXsheet();
+  TStageObjectId objId(getObjectId());
+  TStageObject *pegbar = xsh->getStageObject(objId);
+  return (!objId.isColumn() || hasVisibleChildColumn(pegbar, xsh));
 }
 
 //-----------------------------------------------------------------------------
@@ -907,6 +961,9 @@ void EditTool::mouseMove(const TPointD &, const TMouseEvent &e) {
     m_fxGadgetController->selectById(selectedDevice);
     invalidate();
   }
+
+  // for adding decoration to the cursor while pressing Alt key
+  m_isAltPressed = e.isAltPressed();
 }
 
 //-----------------------------------------------------------------------------
@@ -946,7 +1003,7 @@ void EditTool::leftButtonDown(const TPointD &ppos, const TMouseEvent &e) {
     m_dragTool = m_fxGadgetController->createDragTool(m_highlightedDevice);
   }
 
-  if (!m_dragTool) {
+  if (!m_dragTool && transformEnabled()) {
     switch (m_what) {
     case Center:
       m_dragTool = new DragCenterTool(m_lockCenterX.getValue(),
@@ -1004,9 +1061,8 @@ void EditTool::onEditAllLeftButtonDown(TPointD &pos, const TMouseEvent &e) {
   m_what             = selectedDevice >= 0 ? selectedDevice : Translation;
 
   if (selectedDevice < 0 && m_autoSelect.getValue() != L"None") {
-    pos = getMatrix() * pos;
-    int columnIndex =
-        getViewer()->posToColumnIndex(e.m_pos, 5 * getPixelSize(), false);
+    pos             = getMatrix() * pos;
+    int columnIndex = getViewer()->posToColumnIndex(e.m_pos, 5.0, false);
     if (columnIndex >= 0) {
       TStageObjectId id      = TStageObjectId::ColumnId(columnIndex);
       int currentColumnIndex = getColumnIndex();
@@ -1364,6 +1420,12 @@ void EditTool::draw() {
 
   /*-- Show nothing on Level Editing mode --*/
   if (TTool::getApplication()->getCurrentFrame()->isEditingLevel()) return;
+
+  // if the column and its children are all hidden, only draw fx gadgets
+  if (!transformEnabled()) {
+    m_fxGadgetController->draw(isPicking());
+    return;
+  }
   const TPixel32 normalColor(250, 127, 240);
   const TPixel32 highlightedColor(150, 255, 140);
 
@@ -1371,10 +1433,11 @@ void EditTool::draw() {
   TXsheet *xsh = getXsheet();
   /*-- Obtain ID of the current editing stage object --*/
   TStageObjectId objId = getObjectId();
-  int frame            = getFrame();
-  TAffine parentAff    = xsh->getParentPlacement(objId, frame);
-  TAffine aff          = xsh->getPlacement(objId, frame);
-  TPointD center       = Stage::inch * xsh->getCenter(objId, frame);
+
+  int frame         = getFrame();
+  TAffine parentAff = xsh->getParentPlacement(objId, frame);
+  TAffine aff       = xsh->getPlacement(objId, frame);
+  TPointD center    = Stage::inch * xsh->getCenter(objId, frame);
 
   /*-- Enable Z translation on 3D view --*/
   if (getViewer()->is3DView()) {
@@ -1417,7 +1480,7 @@ void EditTool::draw() {
     tglColor(normalColor);
     glPushMatrix();
     TStageObjectId currentCamId =
-        xsh->getStageObjectTree()->getCurrentCameraId();
+        TStageObjectId::CameraId(xsh->getCameraColumnIndex());
     TAffine camParentAff = xsh->getParentPlacement(currentCamId, frame);
     TAffine camAff       = xsh->getPlacement(currentCamId, frame);
     tglMultMatrix(camParentAff.inv() *
@@ -1553,16 +1616,26 @@ m_foo.setFxHandle(getApplication()->getCurrentFx());
 
   TStageObjectId objId = getObjectId();
   if (objId == TStageObjectId::NoneId) {
-    int index              = getColumnIndex();
-    if (index == -1) objId = TStageObjectId::CameraId(0);
-    objId                  = TStageObjectId::ColumnId(index);
+    int index    = getColumnIndex();
+    TXsheet *xsh = TTool::getApplication()->getCurrentXsheet()->getXsheet();
+    if (index == -1)
+      objId = TStageObjectId::CameraId(xsh->getCameraColumnIndex());
+    else
+      objId = TStageObjectId::ColumnId(index);
   }
   TTool::getApplication()->getCurrentObject()->setObjectId(objId);
 }
 
 //=============================================================================
 
-void EditTool::onDeactivate() {}
+void EditTool::onDeactivate() {
+  if (m_dragTool) {
+    m_dragTool->leftButtonUp();
+    TUndoManager::manager()->endBlock();
+    delete m_dragTool;
+    m_dragTool = nullptr;
+  }
+}
 
 //-----------------------------------------------------------------------------
 
@@ -1644,56 +1717,116 @@ bool EditTool::onPropertyChanged(std::string propertyName) {
 //-----------------------------------------------------------------------------
 
 int EditTool::getCursorId() const {
-  /*--- FxParameter操作中のカーソル ---*/
-  if (m_highlightedDevice >= 1000) return ToolCursor::FxGadgetCursor;
-
-  /*--- カーソルをアクティブな軸に応じて選ぶ --*/
-  std::wstring activeAxis = m_activeAxis.getValue();
-  if (activeAxis == L"Position") {
-    if (m_highlightedDevice == ZTranslation)
-      return ToolCursor::MoveZCursor;
-    else if (LockPositionX && LockPositionY)
-      return ToolCursor::DisableCursor;
-    else if (LockPositionX)
-      return ToolCursor::MoveNSCursor;
-    else if (LockPositionY)
-      return ToolCursor::MoveEWCursor;
-    else
-      return ToolCursor::MoveCursor;
-  } else if (activeAxis == L"Rotation") {
-    return ToolCursor::RotCursor;
-  } else if (activeAxis == L"Scale") {
-    if (m_highlightedDevice == ScaleXY) {
-      if (LockScaleH && LockScaleV)
+  int ret;
+  // cursor for controlling the fx gadget
+  if (m_highlightedDevice >= 1000)
+    ret = ToolCursor::FxGadgetCursor;
+  else if (transformEnabled()) {
+    // switch cursors depending on the active axis
+    std::wstring activeAxis = m_activeAxis.getValue();
+    if (activeAxis == L"Position") {
+      if (m_highlightedDevice == ZTranslation)
+        ret = ToolCursor::MoveZCursor;
+      else if (LockPositionX && LockPositionY)
         return ToolCursor::DisableCursor;
-      else if (LockScaleH)
-        return ToolCursor::ScaleVCursor;
-      else if (LockScaleV)
-        return ToolCursor::ScaleHCursor;
+      else if (LockPositionX)
+        ret = ToolCursor::MoveNSCursor;
+      else if (LockPositionY)
+        ret = ToolCursor::MoveEWCursor;
       else
-        return ToolCursor::ScaleHVCursor;
+        ret = ToolCursor::MoveCursor;
+    } else if (activeAxis == L"Rotation") {
+      ret = ToolCursor::RotCursor;
+    } else if (activeAxis == L"Scale") {
+      if (m_highlightedDevice == ScaleXY) {
+        if (LockScaleH && LockScaleV)
+          return ToolCursor::DisableCursor;
+        else if (LockScaleH)
+          ret = ToolCursor::ScaleVCursor;
+        else if (LockScaleV)
+          ret = ToolCursor::ScaleHCursor;
+        else
+          ret = ToolCursor::ScaleHVCursor;
+      } else
+        ret = ToolCursor::ScaleGlobalCursor;
+    } else if (activeAxis == L"Shear") {
+      if (LockShearH && LockShearV)
+        return ToolCursor::DisableCursor;
+      else if (LockShearH)
+        ret = ToolCursor::ScaleVCursor;
+      else if (LockShearV)
+        ret = ToolCursor::ScaleHCursor;
+      else
+        ret = ToolCursor::ScaleCursor;
+    } else if (activeAxis == L"Center") {
+      if (LockCenterX && LockCenterY)
+        return ToolCursor::DisableCursor;
+      else if (LockCenterX)
+        ret = ToolCursor::MoveNSCursor;
+      else if (LockCenterY)
+        ret = ToolCursor::MoveEWCursor;
+      else
+        ret = ToolCursor::MoveCursor;
     } else
-      return ToolCursor::ScaleGlobalCursor;
-  } else if (activeAxis == L"Shear") {
-    if (LockShearH && LockShearV)
-      return ToolCursor::DisableCursor;
-    else if (LockShearH)
-      return ToolCursor::ScaleVCursor;
-    else if (LockShearV)
-      return ToolCursor::ScaleHCursor;
-    else
-      return ToolCursor::ScaleCursor;
-  } else if (activeAxis == L"Center") {
-    if (LockCenterX && LockCenterY)
-      return ToolCursor::DisableCursor;
-    else if (LockCenterX)
-      return ToolCursor::MoveNSCursor;
-    else if (LockCenterY)
-      return ToolCursor::MoveEWCursor;
-    else
-      return ToolCursor::MoveCursor;
+      ret = ToolCursor::StrokeSelectCursor;
   } else
-    return ToolCursor::StrokeSelectCursor;
+    return ToolCursor::DisableCursor;
+  // precise control with pressing Alt key
+  if (m_isAltPressed) ret = ret | ToolCursor::Ex_Precise;
+  return ret;
+}
+
+//-----------------------------------------------------------------------------
+// overriding TTool::updateEnabled()
+QString EditTool::updateEnabled(int rowIndex, int columnIndex) {
+  // toolType = TTool::ColumnTool
+  // targetType = TTool::AllTargets;
+
+  // Disable every tool during playback
+  if (m_application->getCurrentFrame()->isPlaying())
+    return (enable(false), QString());
+
+  // Disable in Level Strip
+  if (m_application->getCurrentFrame()->isEditingLevel())
+    return (
+        enable(false),
+        QObject::tr("The current tool cannot be used in Level Strip mode."));
+
+  // if an object other than column is selected, then enable the tool
+  // regardless of the current column state
+  TStageObjectId objId = m_application->getCurrentObject()->getObjectId();
+  if (!objId.isColumn()) return (enable(true), QString());
+
+  // Retrieve vars and view modes
+  TXsheet *xsh = m_application->getCurrentXsheet()->getXsheet();
+  // if a column object is selected, switch the inspected column to it
+  TXshColumn *column = xsh->getColumn(objId.getIndex());
+
+  // disable if the column is empty
+  if (!column || column->isEmpty()) return (enable(false), QString());
+
+  if (column->getSoundColumn())
+    return (enable(false),
+            QObject::tr("It is not possible to edit the audio column."));
+
+  else if (column->getSoundTextColumn())
+    return (enable(false),
+            QObject::tr(
+                "Note columns can only be edited in the xsheet or timeline."));
+
+  // Enable to control Fx gadgets even on the locked or hidden columns
+  if (m_fxGadgetController && m_fxGadgetController->hasGadget())
+    return (enable(true), QString());
+
+  // Check against unplaced columns
+  if (column->isLocked())
+    return (enable(false), QObject::tr("The current column is locked."));
+
+  // check if the current column and all of its child columns are hidden
+  if (!hasVisibleChildColumn(xsh->getStageObject(objId), xsh))
+    return (enable(false), QObject::tr("The current column is hidden."));
+
+  return (enable(true), QString());
 }
 
 //=============================================================================

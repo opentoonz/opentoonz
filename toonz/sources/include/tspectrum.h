@@ -38,7 +38,11 @@ private:
     assert(!m_sortedKeys.empty());
     typename std::vector<ColorKey>::const_iterator b;
     b = std::lower_bound(m_sortedKeys.begin(), m_sortedKeys.end(),
-                         ColorKey(s, T()));
+                         ColorKey(s, T()),
+                         [](const ColorKey &a, const ColorKey &b) {
+                           return a.first < b.first;
+                         });  // compare only key postions
+
     if (b == m_sortedKeys.end())
       return m_sortedKeys.rbegin()->second;
     else if (b == m_sortedKeys.begin() || areAlmostEqual(b->first, s))

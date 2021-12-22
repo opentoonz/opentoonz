@@ -41,10 +41,6 @@
         <source>Skipping frame.</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Malformed frame name</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>TCenterLineStrokeStyle</name>

@@ -257,7 +257,7 @@ void Signaturemap::readRasterData(const TRasterPT<T> &ras, int threshold) {
 
 //--------------------------------------------------------------------------
 
-// Minority check for amiguous turning directions
+// Minority check for ambiguous turning directions
 inline bool getMinorityCheck(const Signaturemap &ras, int x, int y) {
   // Assumes (x,y) is ambiguous case: 2 immediate surrounding pixels are white
   // and 2 black
@@ -378,7 +378,7 @@ static RawBorder *extractPath(Signaturemap &ras, int x0, int y0, int pathType,
 
   // If the inner region's overall area is under a given threshold,
   // then erase it (intended as image noise).
-  if (abs(area) < despeckling) {
+  if (std::abs(area) < despeckling) {
     setSignature(ras, *path, invalid);
     delete path;
     path = 0;
@@ -416,11 +416,13 @@ static BorderList *extractBorders(const TRasterP &ras, int threshold,
         if ((signature = byteImage.getSignature(x, y)) == none) {
           // We've found a border
           if ((foundPath = extractPath(byteImage, x, y, !enteredRegionType,
-                                       xOuterPixel, despeckling)))
-            if (enteredRegionType == outer)
+                                       xOuterPixel, despeckling))) {
+            if (enteredRegionType == outer) {
               innerBorders.push_back(foundPath);
-            else
+            } else {
               outerBorders.push_back(foundPath);
+	    }
+          }
         }
 
         // If leaving a white region, remember it - in order to establish

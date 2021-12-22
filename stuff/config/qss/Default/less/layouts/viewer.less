@@ -6,12 +6,24 @@
   & Toolbar {
     border-bottom: 1 solid @accent; // accent line against viewport
     &::separator:horizontal {
-      // workaround for first tool button
-      // which helps with alignment
       margin: 0 0 0 2;
+      padding: 0;
     }
     & QToolButton {
-      margin: 2 0 3 2;
+      margin: 0;
+      margin-bottom: 3; // Add 1px more margin here to allow the border-bottom
+                        // of ToolBar to show.
+      margin-left: 2;
+      margin-right: 0;
+      margin-top: 2;
+      padding-top: 1;
+      padding-left: 1;
+      padding-right: 0;
+      padding-bottom: 0;
+    }
+    & QToolButton#qt_toolbar_ext_button {
+      margin-bottom: 1;
+      qproperty-icon: url('@{img-url}/toolbar_extension_horizontal.png');
     }
   }
 }
@@ -25,7 +37,7 @@
 FlipBook {
   & #ToolBarContainer {
     background-color: transparent;
-    border-top: 2 solid @accent;
+    border-top: 1 solid @accent;
     border-bottom: 1 solid @accent;
     padding-right: -1; // hides right border on #ScrollRightButton when
                        // fps slider is disabled
@@ -47,14 +59,33 @@ FlipBook {
 
 QToolBar#FlipConsolePlayToolBar {
   &::separator:horizontal {
-    margin: 0 3;
+    border-color: @accent;
+    margin: 0 1 0 1;
   }
   & QToolButton {
-    margin-top: 2;
-    margin-bottom: 2;
-    height: 16;
-    padding-left: 1;
+    padding-left: 0;
+    padding-top: -1;
+    padding-right: -1;
+    padding-bottom: -2;
+    margin: 2 1 2 1;
+  }
+
+  #KeyNo,
+  #KeyPartial,
+  #KeyTotal,
+  #PreviousKey,
+  #NextKey {
     padding-right: 1;
+    padding-left: 1;
+    max-width: 20px;
+    max-height: 20px;
+    padding-bottom: 0;
+    padding-top: 0;
+  }
+  
+  #PreviousKey,
+  #NextKey {
+    margin: 0 2;
   }
 }
 
@@ -115,6 +146,10 @@ QToolBar#FlipConsolePlayToolBar {
   }
 }
 
+FlipConsole {
+  qproperty-FpsFieldColor: @input-bg-color;
+}
+
 FlipSlider {
   qproperty-PBHeight: 15;
 
@@ -138,8 +173,23 @@ FlipSlider {
 Ruler {
   qproperty-ParentBGColor: @viewer-ruler-bg-color;
   qproperty-ScaleColor: @viewer-ruler-scale-color;
+  qproperty-HandleColor: @viewer-ruler-handle-color;
+  qproperty-HandleDragColor: @viewer-ruler-handle-drag-color;
+  qproperty-BorderColor: @viewer-ruler-border-color;
 }
 
 #RulerToolOptionValues {
   color: @viewer-ruler-ToolOptionValues-color;
+}
+
+#enableBlankFrameButton {
+  &:extend(.Button all);
+  background-color: transparent;
+  border-color: transparent;
+  color: @text-color-disabled;
+  padding: 0;
+  font-weight: bold;
+  &:checked {
+    border-width: 2px;
+  }
 }

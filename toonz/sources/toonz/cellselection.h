@@ -45,6 +45,7 @@ public:
 
   void copyCells();
   void pasteCells();
+  void pasteDuplicateCells();
   void deleteCells();
   void cutCells();
   void cutCells(bool withoutCopy);
@@ -92,6 +93,10 @@ public:
   void setKeyframes();
   void pasteKeyframesInto();
 
+  void shiftKeyframes(int direction);
+  void shiftKeyframesUp() { shiftKeyframes(-1); }
+  void shiftKeyframesDown() { shiftKeyframes(1); }
+
   void cloneLevel();
   void insertCells();
 
@@ -109,6 +114,8 @@ public:
   void convertVectortoVector();
 
   void reframeWithEmptyInbetweens();
+  void duplicateFrame(int row, int col, bool multiple);
+  void duplicateFrames();
 
   void renameCells(TXshCell &cell);
   // rename cells for each columns with correspondent item in the list
@@ -116,6 +123,8 @@ public:
 
   static bool isEnabledCommand(std::string commandId);
 
+  void createBlankDrawing(int row, int col, bool inRange);
+  void createBlankDrawings();
   void fillEmptyCell();
 };
 

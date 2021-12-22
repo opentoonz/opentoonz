@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="16px" height="16px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g transform="matrix(1,0,0,1,-70,-250)">
+        <g id="prevstep">
+            <g id="bg" transform="matrix(0.110345,0,0,0.121212,53.7793,231.091)">
+                <rect x="147" y="156" width="145" height="132" style="fill:rgb(135,135,135);fill-opacity:0;"/>
+            </g>
+            <g transform="matrix(-1,0,0,1,87,246.999)">
+                <path d="M8.993,15.001C8.993,15.38 9.207,15.726 9.545,15.895C9.884,16.065 10.289,16.028 10.592,15.801C12.178,14.613 14.563,12.826 15.932,11.8C16.184,11.611 16.332,11.315 16.332,11C16.332,10.685 16.184,10.389 15.932,10.2C14.563,9.174 12.178,7.387 10.592,6.199C10.289,5.972 9.884,5.935 9.545,6.105C9.207,6.274 8.993,6.62 8.993,6.999L8.993,15.001Z"/>
+            </g>
+            <g transform="matrix(-1.5,0,0,1.5,89,244.499)">
+                <circle cx="4" cy="9" r="2"/>
+            </g>
+        </g>
+    </g>
+</svg>

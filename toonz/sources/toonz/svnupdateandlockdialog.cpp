@@ -130,7 +130,7 @@ SVNUpdateAndLockDialog::SVNUpdateAndLockDialog(QWidget *parent,
 
   addButtonBarWidget(m_updateAndLockButton, m_lockButton, m_cancelButton);
 
-  // 0. Connect for svn errors (that may occurs)
+  // 0. Connect for svn errors (that may occur)
   connect(&m_thread, SIGNAL(error(const QString &)), this,
           SLOT(onError(const QString &)));
 
@@ -156,6 +156,8 @@ void SVNUpdateAndLockDialog::onStatusRetrieved(const QString &xmlResponse) {
     m_commentLabel->show();
     switchToCloseButton();
   } else {
+    setMinimumSize(300, 150);
+
     m_waitingLabel->hide();
 
     m_textLabel->setText(

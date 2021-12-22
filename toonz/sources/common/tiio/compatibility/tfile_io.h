@@ -9,13 +9,13 @@ extern "C" {
 
 #include <stdio.h>
 
-#if defined(MACOSX) || defined(LINUX)
+#if defined(MACOSX) || defined(LINUX) || defined(FREEBSD)
 #include <stddef.h>
 #endif
 
 char *convertWCHAR2CHAR(const wchar_t *fname);
 
-#if defined(MACOSX) || defined(LINUX)
+#if defined(MACOSX) || defined(LINUX) || defined(FREEBSD)
 
 #include <sys/types.h>
 #include <sys/stat.h>

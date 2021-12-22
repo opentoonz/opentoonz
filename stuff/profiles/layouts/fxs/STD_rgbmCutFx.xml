@@ -1,5 +1,5 @@
 <fxlayout>
-  <page name="RGBM Cut">
+  <page name="RGBA Cut">
      <control>r_range</control>
      <control>g_range</control>
      <control>b_range</control>

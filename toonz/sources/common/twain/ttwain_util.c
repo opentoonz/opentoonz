@@ -441,17 +441,18 @@ l'immagine)
   /*---------------------------------------------------------------------------*/
   char *TTWAIN_GetVersion(void) {
     static char version[5 + 1 + 5 + 1 + 32 + 1];
-    sprintf(version, "%d.", TTwainData.sourceId.Version.MajorNum);
-    sprintf(&version[strlen(version)], "%d ",
-            TTwainData.sourceId.Version.MinorNum);
-    strcat(version, (char *)TTwainData.sourceId.Version.Info);
+    snprintf(version, sizeof(version), "%d.%d %s",
+             TTwainData.sourceId.Version.MajorNum,
+	     TTwainData.sourceId.Version.MinorNum,
+	     (char *)TTwainData.sourceId.Version.Info);
     return version;
   }
   /*---------------------------------------------------------------------------*/
   char *TTWAIN_GetTwainVersion(void) {
     static char version[5 + 1 + 5 + 1];
-    sprintf(version, "%d.%d", TTwainData.sourceId.ProtocolMajor,
-            TTwainData.sourceId.ProtocolMinor);
+    snprintf(version, sizeof(version), "%d.%d",
+             TTwainData.sourceId.ProtocolMajor,
+             TTwainData.sourceId.ProtocolMinor);
     return version;
   }
   /*---------------------------------------------------------------------------*/
@@ -882,11 +883,13 @@ TTwainData.transferInfo.multiTransfer = status;
     TTWAIN_InitVar();
     if (TTWAIN_DSM_HasEntryPoint()) return TRUE;
 
-    if (TTwainData.twainAvailable == AVAIABLE_DONTKNOW)
-      if (TTWAIN_LoadSourceManager())
+    if (TTwainData.twainAvailable == AVAIABLE_DONTKNOW) {
+      if (TTWAIN_LoadSourceManager()) {
         TTWAIN_UnloadSourceManager();
-      else
+      } else {
         TTwainData.twainAvailable = AVAIABLE_NO;
+      }
+    }
 
     return (TTwainData.twainAvailable == AVAIABLE_YES);
   }

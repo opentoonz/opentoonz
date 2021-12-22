@@ -3,6 +3,7 @@
 #ifndef FUNCTION_SEGMENT_VIEWER_H
 #define FUNCTION_SEGMENT_VIEWER_H
 
+#include <array>
 #include <QLabel>
 #include <QComboBox>
 
@@ -31,7 +32,7 @@ namespace DVGui {
 class MeasuredDoubleLineEdit;
 class ExpressionField;
 class FileField;
-}
+}  // namespace DVGui
 
 //-----------------------------------------------------------------------------
 
@@ -51,8 +52,8 @@ class FunctionSegmentViewer final : public QFrame, public TParamObserver {
   DVGui::LineEdit *m_stepFld;
   QStackedWidget *m_parametersPanel;
 
-  FunctionSegmentPage *m_pages[9];
-  int m_typeId[9];
+  std::array<FunctionSegmentPage *, 9> m_pages;
+  std::array<int, 9> m_typeId;
 
   FunctionSheet *m_sheet;
   TXsheetHandle *m_xshHandle;
@@ -76,7 +77,7 @@ public:
 
   void refresh();
 
-  // overriden from TDoubleParamObserver
+  // overridden from TDoubleParamObserver
   void onChange(const TParamChange &) override { refresh(); }
 
   void setXsheetHandle(TXsheetHandle *xshHandle) { m_xshHandle = xshHandle; }
@@ -199,7 +200,7 @@ public:
   void refresh() override;
   void apply() override;
 
-  // return false if a circular reference is occured
+  // return false if a circular reference is occurred
   bool getGuiValues(std::string &expressionText, std::string &unitName);
 
   void init(int segmentLength) override;

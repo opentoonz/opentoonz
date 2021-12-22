@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="20px" height="20px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g transform="matrix(1,0,0,1,-10,-250)">
+        <g id="geometric_ellipse">
+            <g transform="matrix(1,0,0,1,0,240)">
+                <rect x="10" y="10" width="20" height="20" style="fill-opacity:0;"/>
+            </g>
+            <g transform="matrix(0,0.625,-1,0,160,247.5)">
+                <path d="M20,132C24.415,132 28,135.585 28,140C28,144.415 24.415,148 20,148C15.585,148 12,144.415 12,140C12,135.585 15.585,132 20,132ZM20,134C21.204,134 22.152,134.614 22.942,135.404C24.117,136.579 24.8,138.209 24.8,140C24.8,141.791 24.117,143.421 22.942,144.596C22.152,145.386 21.204,146 20,146C18.796,146 17.848,145.386 17.058,144.596C15.883,143.421 15.2,141.791 15.2,140C15.2,138.209 15.883,136.579 17.058,135.404C17.848,134.614 18.796,134 20,134Z"/>
+            </g>
+        </g>
+    </g>
+</svg>

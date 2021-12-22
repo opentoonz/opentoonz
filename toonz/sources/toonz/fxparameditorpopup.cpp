@@ -59,6 +59,7 @@ FxParamEditorPopup::FxParamEditorPopup()
 }
 
 //=============================================================================
-
+/*
 OpenPopupCommandHandler<FxParamEditorPopup> openFxParamEditorPopup(
     MI_FxParamEditor);
+*/

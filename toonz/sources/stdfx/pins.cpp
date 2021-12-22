@@ -9,11 +9,6 @@
 #include <cmath>
 
 //------------------------------------------------------------------------------
-#ifdef _MSC_VER
-#define ISNAN _isnan
-#else
-#define ISNAN std::isnan
-#endif
 
 namespace {
 
@@ -31,13 +26,13 @@ bool lineIntersection(const TPointD &P, const TPointD &R, const TPointD &Q,
   double r;
   if (u.y * v.x - u.x * v.y != 0) {
     r = (P.x * u.y - Q.x * u.y + u.x * (Q.y - P.y)) / (u.y * v.x - u.x * v.y);
-    assert(!ISNAN(r));
+    assert(!std::isnan(r));
     ret = Q + v * r;
-    assert(!ISNAN(ret.x) && !ISNAN(ret.y));
+    assert(!std::isnan(ret.x) && !std::isnan(ret.y));
     return true;
   } else {
     ret = P;
-    assert(!ISNAN(ret.x) && !ISNAN(ret.y));
+    assert(!std::isnan(ret.x) && !std::isnan(ret.y));
     return false;
   }
 }
@@ -146,7 +141,7 @@ void subCompute(TRasterFxPort &m_input, TTile &tile, double frame,
   //#ifdef _WIN32
   offScreenRendering.makeCurrent();
 //#else
-//#if defined(LINUX) || defined(MACOSX)
+//#if defined(LINUX) || defined(FREEBSD) || defined(MACOSX)
 // offScreenRendering.m_offlineGL->makeCurrent();
 //#endif
 #endif
@@ -473,7 +468,7 @@ static int splitMatrix(double **a, int n, int *index) {
       vv[imax] = vv[j];
     }
     index[j] = imax;
-    if (fabsf(a[j][j]) <= TINY && (j != n - 1)) {
+    if (std::abs(a[j][j]) <= TINY && (j != n - 1)) {
       /*printf("Cazzo, E' singolare %f!\n", a[j][j] );*/
       return imax + 1;
     }

@@ -10,7 +10,7 @@
 
   NOTE: Current LocalBlurFx is effectively flawed. Following implementation
   relies on the idea that
-        the blurring filter is separable and therefore appliable on rows and
+        the blurring filter is separable and therefore applicable on rows and
   columns, in sequence.
 
         It actually is not. It can be easily verified applying the fx on a

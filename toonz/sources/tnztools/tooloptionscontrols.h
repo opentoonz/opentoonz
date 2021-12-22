@@ -95,8 +95,6 @@ public:
   ToolOptionCheckbox(TTool *tool, TBoolProperty *property,
                      ToolHandle *toolHandle = 0, QWidget *parent = 0);
   void updateStatus() override;
-public slots:
-  void doClick(bool);
 
 protected:
   void nextCheckState() override;
@@ -117,10 +115,7 @@ public:
   void updateStatus() override;
 
 protected slots:
-
   void onValueChanged(bool isDragging);
-  void increase();
-  void decrease();
 };
 
 //-----------------------------------------------------------------------------
@@ -139,12 +134,7 @@ public:
   void updateStatus() override;
 
 protected slots:
-
   void onValuesChanged(bool isDragging);
-  void increaseMaxValue();
-  void decreaseMaxValue();
-  void increaseMinValue();
-  void decreaseMinValue();
 };
 
 //-----------------------------------------------------------------------------
@@ -163,12 +153,7 @@ public:
   void updateStatus() override;
 
 protected slots:
-
   void onValuesChanged(bool isDragging);
-  void increaseMaxValue();
-  void decreaseMaxValue();
-  void increaseMinValue();
-  void decreaseMinValue();
 };
 
 //-----------------------------------------------------------------------------
@@ -186,10 +171,7 @@ public:
   void updateStatus() override;
 
 protected slots:
-
   void onValueChanged(bool isDragging);
-  void increase();
-  void decrease();
 };
 
 //-----------------------------------------------------------------------------
@@ -211,8 +193,6 @@ public slots:
   void reloadComboBoxList(std::string);
   void loadEntries();
   void onActivated(int);
-  void doShowPopup();
-  void doOnActivated(int);
 };
 
 //-----------------------------------------------------------------------------
@@ -232,9 +212,7 @@ public:
   TEnumProperty *getProperty() const { return m_property; }
 
 public slots:
-
   void onActivated(int);
-  void doShowPopup();
 };
 
 //-----------------------------------------------------------------------------
@@ -252,11 +230,8 @@ public:
   TEnumProperty *getProperty() { return m_property; }
 
 public slots:
-
   void onActivated(int);
-  void doShowPopup();
   void doSetCurrentIndex(int);
-  void doOnActivated(int);
 };
 
 //-----------------------------------------------------------------------------

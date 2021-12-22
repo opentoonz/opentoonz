@@ -32,7 +32,7 @@ public:
       , m_shutterEnd(0.05)
       , m_traceResolution(4)
       , m_motionObjectType(new TIntEnumParam(OBJTYPE_OWN, "Own Motion"))
-      , m_motionObjectIndex(0) {
+      , m_motionObjectIndex(1) {
     m_shutterStart->setValueRange(0.0, 1.0);
     m_shutterEnd->setValueRange(0.0, 1.0);
     m_traceResolution->setValueRange(1, 20);

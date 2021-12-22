@@ -34,7 +34,7 @@ typedef void (*TPROC_FUNC)(void);
 
 /**********************************************************************
 Runs without sospending executable filename. A set of arguments to be
-passed can be setted in the NULL-terminated array argv. First argument
+passed can be set in the NULL-terminated array argv. First argument
 MUST NOT be executable name.
 **********************************************************************/
 
@@ -42,7 +42,7 @@ TNZAPI T_PID tproc_run_process(char *filename, char *argv[]);
 
 /**********************************************************************
 Runs sospending executable filename. A set of arguments to be
-passed can be setted in the NULL-terminated array argv. First argument
+passed can be set in the NULL-terminated array argv. First argument
 MUST NOT be executable name. Returns TRUE if specified process was
 successfully executed, FALSE otherwise.
 **********************************************************************/

@@ -7,7 +7,7 @@
 #include "tproperty.h"
 #include "tiio.h"
 
-#if !(defined(x64) || defined(__LP64__) || defined(LINUX))
+#if !defined(x64) && !defined(__LP64__) && !(defined(LINUX) || defined(FREEBSD)) && !(defined(__GNUC__) && defined(_WIN32))
 
 //*******************************************************************************
 //    32-bit version
@@ -112,7 +112,8 @@ void visitAtoms(const QTAtomContainer &atoms, const QTAtom &parent,
     int sonCount = QTCountChildrenOfType(atoms, curr, 0);
 
     char buffer[1024];
-    sprintf(buffer, "%d %d %d", (int)atomType, (int)id, sonCount);
+    snprintf(buffer, sizeof(buffer), "%d %d %d",
+      (int)atomType, (int)id, sonCount);
     string str(buffer);
 
     if (sonCount > 0) {

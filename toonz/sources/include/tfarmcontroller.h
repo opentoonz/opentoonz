@@ -5,8 +5,6 @@
 
 #include <vector>
 
-using std::vector;
-
 #include "tfarmtask.h"
 //#include "texception.h"
 #include "tconvert.h"
@@ -86,10 +84,11 @@ public:
   virtual void activateTask(const QString &id) = 0;
   virtual void restartTask(const QString &id)  = 0;
 
-  virtual void getTasks(vector<QString> &tasks) = 0;
-  virtual void getTasks(const QString &parentId, vector<QString> &tasks) = 0;
+  virtual void getTasks(std::vector<QString> &tasks)       = 0;
   virtual void getTasks(const QString &parentId,
-                        vector<TaskShortInfo> &tasks) = 0;
+                        std::vector<QString> &tasks)       = 0;
+  virtual void getTasks(const QString &parentId,
+                        std::vector<TaskShortInfo> &tasks) = 0;
 
   virtual void queryTaskInfo(const QString &id, TFarmTask &task) = 0;
 
@@ -115,7 +114,7 @@ public:
   virtual void taskCompleted(const QString &taskId, int exitCode) = 0;
 
   // fills the servers vector with the identities of the servers
-  virtual void getServers(vector<ServerIdentity> &servers) = 0;
+  virtual void getServers(std::vector<ServerIdentity> &servers) = 0;
 
   // returns the state of the server whose id has been specified
   virtual ServerState queryServerState2(const QString &id) = 0;

@@ -284,7 +284,7 @@ void ViewerDraw::drawGridAndGuides(SceneViewer *viewer, double sc, Ruler *vr,
   double ymax = std::max({p00.y, p01.y, p10.y, p11.y});
 
   double step  = 10;
-  double absSc = abs(sc);
+  double absSc = std::abs(sc);
   if (absSc * step < 4)
     while (absSc * step < 4) step *= 5;
   else if (absSc * step > 20)

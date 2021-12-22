@@ -95,8 +95,8 @@ Returns image converted.*/
                        const VectorizerConfiguration &c);
   void applyFillColors(TRegion *r, const TRasterP &ras, TPalette *palette,
                        const CenterlineConfiguration &c, int regionCount);
-  void applyFillColors(TRegion *r, const TRasterP &ras, TPalette *palette,
-                       const OutlineConfiguration &c, int regionCount);
+  // void applyFillColors(TRegion *r, const TRasterP &ras, TPalette *palette,
+  //                     const OutlineConfiguration &c, int regionCount);
 
   //! Traduces the input VectorizerConfiguration into an edible form.
   VectorizerConfiguration traduceConfiguration(

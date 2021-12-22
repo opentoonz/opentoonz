@@ -5,7 +5,6 @@
 #include "tcolorfunctions.h"
 #include "trandom.h"
 #include "colorfxutils.h"
-#include "tflash.h"
 #include "tregion.h"
 #include "tcurves.h"
 #include "tmathutil.h"
@@ -157,16 +156,6 @@ void MovingSolidColor::drawRegion(const TColorFunction *cf,
                                   const bool antiAliasing,
                                   TRegionOutline &boundary) const {
   TSolidColorStyle::drawRegion(cf, true, boundary);
-}
-
-//------------------------------------------------------------
-
-void MovingSolidColor::drawRegion(TFlash &flash, const TRegion *r) const {
-  SFlashUtils rdf(r);
-  rdf.computeRegionOutline();
-  m_regionOutlineModifier->modify(rdf.m_ro);
-  flash.setFillColor(getMainColor());
-  rdf.drawRegionOutline(flash, false);
 }
 
 //***************************************************************************
@@ -431,122 +420,6 @@ glEnd();
 
 //------------------------------------------------------------
 
-/*
-int ShadowStyle::drawPolyline(TFlash& flash, std::vector<T3DPointD> &polyline,
-                                                           TPointD
-shadowDirection, const bool isDraw) const
-{
-  int i;
-  int stepNumber;
-  double distance;
-
-  TPointD v1,v2,diff,midPoint,ratio;
-  double len;
-
-
-  TRegionOutline::PointVector::iterator it;
-  TRegionOutline::PointVector::iterator it_b = polyline.begin();
-  TRegionOutline::PointVector::iterator it_e = polyline.end();
-
-
-  std::vector<TSegment> segmentArray;
-
-  v1.x = polyline.back().x;
-  v1.y = polyline.back().y;
-
-  for(it = it_b; it!= it_e; ++it)
-  {
-    v2.x = it->x;
-    v2.y = it->y;
-    if (v1==v2)
-      continue;
-
-
-    diff = normalize(rotate90(v2-v1));
-    len=diff*shadowDirection;
-
-    if(len>0)
-    {
-      distance = tdistance(v1,v2)*m_density;
-
-      ratio= (v2-v1)*(1.0/distance);
-      midPoint=v1;
-      stepNumber= (int)distance;
-
-      for(i=0; i<stepNumber;i++ )
-      {
-                  std::vector<TSegment> sa;
-
-                  TPointD p0=midPoint;
-                  TPointD p1=midPoint+(shadowDirection*len*m_len*0.5);
-                  TPointD p2=midPoint+(shadowDirection*len*m_len);
-
-                  segmentArray.push_back(TSegment(p1,p0));
-                  segmentArray.push_back(TSegment(p1,p2));
-
-          midPoint += ratio;
-      }
-
-    }
-
-    v1=v2;
-  }
-
-
-  if ( isDraw && segmentArray.size()>0 ) {
-        flash.setLineColor(m_shadowColor);
-        flash.drawSegments(segmentArray, true);
-  }
-
-  if ( segmentArray.size()>0 )
-         return 1;
-  return 0;
-}
-
-void ShadowStyle::drawRegion( TFlash& flash, const TRegion* r) const
-{
-  SFlashUtils rdf(r);
-  rdf.computeRegionOutline();
-
-  TRegionOutline::Boundary::iterator regions_it;
-  TRegionOutline::Boundary::iterator regions_it_b =
-rdf.m_ro.m_exterior->begin();
-  TRegionOutline::Boundary::iterator regions_it_e = rdf.m_ro.m_exterior->end();
-
-
-// In the GL version the shadow lines are not croped into the filled region.
-// This is the reason why I don't calculate the number of shadow lines.
-//  int nbDraw=0;
-//  for( regions_it = regions_it_b ; regions_it!= regions_it_e; ++regions_it)
-//	  nbDraw+=drawPolyline(flash,*regions_it, m_shadowDirection,false);
-
-//  regions_it_b = rdf.m_ro.m_interior->begin();
-//  regions_it_e = rdf.m_ro.m_interior->end();
-//  for( regions_it = regions_it_b ; regions_it!= regions_it_e; ++regions_it)
-//     nbDraw+=drawPolyline(flash,*regions_it,-m_shadowDirection,false);
-
-
-// Only the bbox rectangle is croped.
-  flash.drawRegion(*r,1);
-  flash.setFillColor(getMainColor());
-  flash.drawRectangle(rdf.m_ro.m_bbox);
-
-  regions_it_b = rdf.m_ro.m_exterior->begin();
-  regions_it_e = rdf.m_ro.m_exterior->end();
-  for( regions_it = regions_it_b ; regions_it!= regions_it_e; ++regions_it)
-          drawPolyline(flash,*regions_it, m_shadowDirection);
-
-  regions_it_b = rdf.m_ro.m_interior->begin();
-  regions_it_e = rdf.m_ro.m_interior->end();
-  for( regions_it = regions_it_b ; regions_it!= regions_it_e; ++regions_it)
-     drawPolyline(flash,*regions_it,-m_shadowDirection);
-
-
-}
-*/
-
-//------------------------------------------------------------
-
 TPixel32 ShadowStyle::getColorParamValue(int index) const {
   return index == 0 ? m_shadowColor : TSolidColorStyle::getMainColor();
 }
@@ -711,63 +584,6 @@ void drawShadowLine(TPixel32 shadowColor, TPixel32 color, TPointD v1,
 
   glEnd();
 }
-
-int drawShadowLine(TFlash &flash, TPixel32 shadowColor, TPixel32 color,
-                   TPointD v1, TPointD v2, TPointD diff1, TPointD diff2,
-                   const bool isDraw = true) {
-  int nbDraw = 0;
-
-  v1    = v1 + diff1;
-  v2    = v2 + diff2;
-  diff1 = -diff1;
-  diff2 = -diff2;
-
-  TPointD vv1, vv2, ovv1, ovv2;
-  TPixel32 oc;
-  double r1, r2;
-  double t     = 0.0;
-  bool isFirst = true;
-  flash.setThickness(0.0);
-  SFlashUtils sfu;
-  for (; t <= 1; t += 0.1) {
-    if (isFirst) {
-      r1 = t * t * t;
-      r2 = 1 - r1;
-      oc = TPixel32((int)(color.r * r2 + shadowColor.r * r1),
-                    (int)(color.g * r2 + shadowColor.g * r1),
-                    (int)(color.b * r2 + shadowColor.b * r1),
-                    (int)(color.m * r2 + shadowColor.m * r1));
-      ovv1    = v1 + t * diff1;
-      ovv2    = v2 + t * diff2;
-      isFirst = false;
-    } else {
-      r1 = t * t * t;
-      r2 = 1 - r1;
-      TPixel32 c((int)(color.r * r2 + shadowColor.r * r1),
-                 (int)(color.g * r2 + shadowColor.g * r1),
-                 (int)(color.b * r2 + shadowColor.b * r1),
-                 (int)(color.m * r2 + shadowColor.m * r1));
-      vv1 = (v1 + t * diff1);
-      vv2 = (v2 + t * diff2);
-
-      std::vector<TPointD> pv;
-      pv.push_back(ovv1);
-      pv.push_back(ovv2);
-      pv.push_back(vv2);
-      pv.push_back(vv1);
-
-      int nbDV = nbDiffVerts(pv);
-      if (nbDV >= 3 && nbDV <= 4) nbDraw++;
-
-      if (isDraw) sfu.drawGradedPolyline(flash, pv, oc, c);
-
-      oc   = c;
-      ovv1 = vv1;
-      ovv2 = vv2;
-    }
-  }
-  return nbDraw;
-}
 }
 
 //------------------------------------------------------------
@@ -898,97 +714,6 @@ void ShadowStyle2::drawRegion(const TColorFunction *cf, const bool antiAliasing,
   // tglColor(TPixel32::White);
 
   stenc->disableMask();
-}
-
-//------------------------------------------------------------
-
-int ShadowStyle2::drawPolyline(TFlash &flash, std::vector<T3DPointD> &polyline,
-                               TPointD shadowDirection,
-                               const bool isDraw) const {
-  int nbDraw = 0;
-
-  TPointD v0, v1, diff;
-  double len1, len2;
-  TPixel32 color, shadowColor;
-  color       = TSolidColorStyle::getMainColor();
-  shadowColor = m_shadowColor;
-
-  TRegionOutline::PointVector::iterator it;
-  TRegionOutline::PointVector::iterator it_b = polyline.begin();
-  TRegionOutline::PointVector::iterator it_e = polyline.end();
-
-  int size = polyline.size();
-  std::vector<double> lens(size);
-  v0.x      = polyline.back().x;
-  v0.y      = polyline.back().y;
-  int count = 0;
-  for (it = it_b; it != it_e; ++it) {
-    v1.x = it->x;
-    v1.y = it->y;
-    if (v1 != v0) {
-      diff               = normalize(rotate90(v1 - v0));
-      len1               = diff * shadowDirection;
-      if (len1 < 0) len1 = 0;
-      lens[count++]      = len1;
-    } else
-      lens[count++] = 0;
-
-    v0 = v1;
-  }
-
-  double firstVal = lens.front();
-  for (count = 0; count != size - 1; count++) {
-    lens[count] = (lens[count] + lens[count + 1]) * 0.5;
-  }
-  lens[size - 1] = (lens[size - 1] + firstVal) * 0.5;
-
-  for (count = 0; count != size - 1; count++) {
-    v0.x = polyline[count].x;
-    v0.y = polyline[count].y;
-    v1.x = polyline[count + 1].x;
-    v1.y = polyline[count + 1].y;
-    len1 = lens[count];
-    len2 = lens[count + 1];
-
-    if (v0 != v1 && len1 >= 0 && len2 >= 0 && (len1 + len2) > 0)
-      nbDraw += drawShadowLine(flash, shadowColor, color, v0, v1,
-                               shadowDirection * len1 * m_shadowLength,
-                               shadowDirection * len2 * m_shadowLength, isDraw);
-  }
-  v0.x = polyline[count].x;
-  v0.y = polyline[count].y;
-  v1.x = polyline.front().x;
-  v1.y = polyline.front().y;
-  len1 = lens[count];
-  len2 = lens[0];
-  if (v0 != v1 && len1 >= 0 && len2 >= 0 && (len1 + len2) > 0)
-    nbDraw += drawShadowLine(flash, shadowColor, color, v0, v1,
-                             shadowDirection * len1 * m_shadowLength,
-                             shadowDirection * len2 * m_shadowLength, isDraw);
-
-  return nbDraw;
-}
-
-//------------------------------------------------------------
-
-void ShadowStyle2::drawRegion(TFlash &flash, const TRegion *r) const {
-  SFlashUtils rdf(r);
-  rdf.computeRegionOutline();
-
-  TRegionOutline::Boundary::iterator regions_it;
-  TRegionOutline::Boundary::iterator regions_it_b = rdf.m_ro.m_exterior.begin();
-  TRegionOutline::Boundary::iterator regions_it_e = rdf.m_ro.m_exterior.end();
-
-  int nbDraw = 0;
-  for (regions_it = regions_it_b; regions_it != regions_it_e; ++regions_it)
-    nbDraw += drawPolyline(flash, *regions_it, m_shadowDirection, false);
-
-  flash.drawRegion(*r, nbDraw + 1);
-  flash.setFillColor(getMainColor());
-  flash.drawRectangle(rdf.m_ro.m_bbox);
-
-  for (regions_it = regions_it_b; regions_it != regions_it_e; ++regions_it)
-    drawPolyline(flash, *regions_it, m_shadowDirection);
 }
 
 //***************************************************************************
@@ -1127,16 +852,6 @@ void TRubberFillStyle::drawRegion(const TColorFunction *cf,
                                   const bool antiAliasing,
                                   TRegionOutline &boundary) const {
   TSolidColorStyle::drawRegion(cf, true, boundary);
-}
-
-void TRubberFillStyle::drawRegion(TFlash &flash, const TRegion *r) const {
-  SFlashUtils rdf(r);
-  rdf.computeRegionOutline();
-  m_regionOutlineModifier->modify(rdf.m_ro);
-  flash.setFillColor(getMainColor());
-  rdf.drawRegionOutline(flash);
-  //  If Valentina prefers the angled version use this
-  //	rdf.drawRegionOutline(flash,false);
 }
 
 //***************************************************************************
@@ -1363,47 +1078,6 @@ void TPointShadowFillStyle::shadowOnEdge_parallel(const TPointD &p0,
 
 //------------------------------------------------------------
 
-int TPointShadowFillStyle::shadowOnEdge_parallel(
-    TFlash &flash, const TPointD &p0, const TPointD &p1, const TPointD &p2,
-    TRandom &rnd, const double radius, const bool isDraw) const {
-  int nbDraw = 0;
-
-  if (p0 == p1 || p1 == p2) return 0;
-
-  TPointD diff = normalize(rotate90(p1 - p0));
-  double len1  = diff * m_shadowDirection;
-  len1         = std::max(0.0, len1);
-
-  diff        = normalize(rotate90(p2 - p1));
-  double len2 = diff * m_shadowDirection;
-  len2        = std::max(0.0, len2);
-
-  if ((len1 + len2) > 0) {
-    TPointD la = p1 + m_shadowDirection * len1 * m_shadowSize;
-    TPointD lb = p2 + m_shadowDirection * len2 * m_shadowSize;
-    double t   = triangleArea(p1, p2, lb) + triangleArea(p2, lb, la);
-    int nb     = (int)(m_density * t);
-    for (int i = 0; i < nb; i++) {
-      double q  = rnd.getUInt(1001) / 1000.0;
-      double r  = rnd.getUInt(1001) / 1000.0;
-      r         = r * r;
-      TPointD u = p1 + (p2 - p1) * q;
-      u         = u +
-          r * (len1 * (1.0 - q) + len2 * q) * m_shadowDirection * m_shadowSize;
-      nbDraw++;
-      if (isDraw) {
-        flash.setFillColor(TPixel32(m_shadowColor.r, m_shadowColor.g,
-                                    m_shadowColor.b, (int)((1.0 - r) * 255)));
-        flash.drawEllipse(u, radius, radius);
-        // flash.drawDot(u,radius);
-      }
-    }
-  }
-  return nbDraw;
-}
-
-//------------------------------------------------------------
-
 void TPointShadowFillStyle::deleteSameVerts(
     TRegionOutline::Boundary::iterator &rit, std::vector<T3DPointD> &pv) const {
   pv.clear();
@@ -1488,65 +1162,6 @@ void TPointShadowFillStyle::drawRegion(const TColorFunction *cf,
 
   glPointSize(pointSizeSave);
   stenc->disableMask();
-}
-
-//------------------------------------------------------------
-
-void TPointShadowFillStyle::drawRegion(TFlash &flash, const TRegion *r) const {
-  SFlashUtils rdf(r);
-  rdf.computeRegionOutline();
-
-  TRegionOutline::Boundary::iterator regions_it;
-  TRegionOutline::Boundary::iterator regions_it_b = rdf.m_ro.m_exterior.begin();
-  TRegionOutline::Boundary::iterator regions_it_e = rdf.m_ro.m_exterior.end();
-
-  TPixel32 color = m_shadowColor;
-  TRandom rnd;
-  rnd.reset();
-
-  double sizes[2] = {0.15, 10.0};
-  double radius   = (sizes[0] + (sizes[1] - sizes[0]) * m_pointSize * 0.01);
-
-  int nbDraw = 0;
-  for (regions_it = regions_it_b; regions_it != regions_it_e; ++regions_it) {
-    std::vector<T3DPointD> pv;
-    deleteSameVerts(regions_it, pv);
-    if (pv.size() < 3) continue;
-    std::vector<T3DPointD>::iterator it_beg  = pv.begin();
-    std::vector<T3DPointD>::iterator it_end  = pv.end();
-    std::vector<T3DPointD>::iterator it_last = it_end - 1;
-    std::vector<T3DPointD>::iterator it0, it1, it2;
-    for (it1 = it_beg; it1 != it_end; it1++) {
-      it0 = it1 == it_beg ? it_last : it1 - 1;
-      it2 = it1 == it_last ? it_beg : it1 + 1;
-      nbDraw += shadowOnEdge_parallel(
-          flash, TPointD(it0->x, it0->y), TPointD(it1->x, it1->y),
-          TPointD(it2->x, it2->y), rnd, radius, false);
-    }
-  }
-
-  rnd.reset();
-  flash.drawRegion(*r, nbDraw + 1);  // +1 bbox
-  flash.setFillColor(getMainColor());
-  flash.drawRectangle(rdf.m_ro.m_bbox);
-
-  flash.setThickness(0.0);
-  for (regions_it = regions_it_b; regions_it != regions_it_e; ++regions_it) {
-    std::vector<T3DPointD> pv;
-    deleteSameVerts(regions_it, pv);
-    if (pv.size() < 3) continue;
-    std::vector<T3DPointD>::iterator it_beg  = pv.begin();
-    std::vector<T3DPointD>::iterator it_end  = pv.end();
-    std::vector<T3DPointD>::iterator it_last = it_end - 1;
-    std::vector<T3DPointD>::iterator it0, it1, it2;
-    for (it1 = it_beg; it1 != it_end; it1++) {
-      it0 = it1 == it_beg ? it_last : it1 - 1;
-      it2 = it1 == it_last ? it_beg : it1 + 1;
-      shadowOnEdge_parallel(flash, TPointD(it0->x, it0->y),
-                            TPointD(it1->x, it1->y), TPointD(it2->x, it2->y),
-                            rnd, radius, true);
-    }
-  }
 }
 
 //***************************************************************************
@@ -1740,32 +1355,6 @@ int TDottedFillStyle::nbClip(const double LDotDist, const bool LIsShifted,
     for (; x <= bbox.x1; x += LDotDist) nbClipLayers++;
   }
   return nbClipLayers;
-}
-
-//------------------------------------------------------------
-
-void TDottedFillStyle::drawRegion(TFlash &flash, const TRegion *r) const {
-  double LDotDist = std::max(m_dotDist, 0.1);
-  double LDotSize = m_dotSize;
-  bool LIsShifted = m_isShifted;
-  TRectD bbox(r->getBBox());
-
-  flash.setFillColor(TPixel::Black);
-  flash.drawRegion(*r, true);
-  int nClip = nbClip(LDotDist, LIsShifted, bbox);
-
-  flash.drawRegion(*r, nClip);
-
-  flash.setFillColor(getMainColor());
-  flash.drawRectangle(bbox);
-  flash.setFillColor(m_pointColor);
-
-  int i = 0;
-  for (double y = bbox.y0; y <= bbox.y1; y += LDotDist, ++i) {
-    double x = LIsShifted && (i % 2) == 1 ? bbox.x0 + LDotDist / 2.0 : bbox.x0;
-    for (; x <= bbox.x1; x += LDotDist)
-      flash.drawEllipse(TPointD(x, y), LDotSize, LDotSize);
-  }
 }
 
 //***************************************************************************
@@ -2084,55 +1673,6 @@ int TCheckedFillStyle::nbClip(const TRectD &bbox) const {
   return nbClip;
 }
 
-//------------------------------------------------------------
-
-void TCheckedFillStyle::drawRegion(TFlash &flash, const TRegion *r) const {
-  TRectD bbox(r->getBBox());
-
-  //	flash.drawRegion(*r,true);
-  flash.drawRegion(*r, nbClip(bbox));
-
-  flash.setFillColor(getMainColor());
-  flash.drawRectangle(bbox);
-
-  flash.setFillColor(m_pointColor);
-  // Horizontal Lines
-  double lx   = bbox.x1 - bbox.x0;
-  double ly   = bbox.y1 - bbox.y0;
-  double beg  = bbox.y0;
-  double end  = bbox.y1;
-  beg         = m_HAngle <= 0 ? beg : beg - lx * tan(degree2rad(m_HAngle));
-  end         = m_HAngle >= 0 ? end : end - lx * tan(degree2rad(m_HAngle));
-  double dist = m_HDist / cos(degree2rad(m_HAngle));
-  for (double y = beg; y <= end; y += dist) {
-    TPointD p0, p1, p2, p3;
-    getHThickline(TPointD(bbox.x0, y), lx, p0, p1, p2, p3);
-    std::vector<TPointD> v;
-    v.push_back(p0);
-    v.push_back(p1);
-    v.push_back(p2);
-    v.push_back(p3);
-    flash.drawPolyline(v);
-  }
-
-  // Vertical lines
-  beg  = bbox.x0;
-  end  = bbox.x1;
-  beg  = (-m_VAngle) <= 0 ? beg : beg - ly * tan(degree2rad(-m_VAngle));
-  end  = (-m_VAngle) >= 0 ? end : end - ly * tan(degree2rad(-m_VAngle));
-  dist = m_VDist / cos(degree2rad(-m_VAngle));
-  for (double x = beg; x <= end; x += dist) {
-    TPointD p0, p1, p2, p3;
-    getVThickline(TPointD(x, bbox.y0), ly, p0, p1, p2, p3);
-    std::vector<TPointD> v;
-    v.push_back(p0);
-    v.push_back(p1);
-    v.push_back(p2);
-    v.push_back(p3);
-    flash.drawPolyline(v);
-  }
-}
-
 //***************************************************************************
 //    ArtisticModifier  implementation
 //***************************************************************************
@@ -2337,16 +1877,6 @@ void ArtisticSolidColor::drawRegion(const TColorFunction *cf,
                                     const bool antiAliasing,
                                     TRegionOutline &boundary) const {
   TSolidColorStyle::drawRegion(cf, true, boundary);
-}
-
-//------------------------------------------------------------
-
-void ArtisticSolidColor::drawRegion(TFlash &flash, const TRegion *r) const {
-  SFlashUtils rdf(r);
-  rdf.computeRegionOutline();
-  m_regionOutlineModifier->modify(rdf.m_ro);
-  flash.setFillColor(getMainColor());
-  rdf.drawRegionOutline(flash, false);
 }
 
 //***************************************************************************
@@ -2556,69 +2086,6 @@ void TChalkFillStyle::drawRegion(const TColorFunction *cf,
   glDeleteLists(chalkId, 1);
 
   stenc->disableMask();
-}
-
-//------------------------------------------------------------
-
-void TChalkFillStyle::drawRegion(TFlash &flash, const TRegion *r) const {
-  TPixel32 bgColor = TSolidColorStyle::getMainColor();
-
-  double minDensity;
-  double maxDensity;
-
-  getParamRange(0, minDensity, maxDensity);
-
-  double r1 = (m_density - minDensity) / (maxDensity - minDensity);
-  double r2 = 1.0 - r1;
-
-  TPixel32 color((int)(bgColor.r * r2 + m_color0.r * r1),
-                 (int)(bgColor.g * r2 + m_color0.g * r1),
-                 (int)(bgColor.b * r2 + m_color0.b * r1),
-                 (int)(bgColor.m * r2 + m_color0.m * r1));
-
-  flash.setFillColor(color);
-  flash.drawRegion(*r);
-
-  /*
-  SFlashUtils rdf(r);
-  rdf.computeRegionOutline();
-
-TRandom rnd;
-
-const bool isTransparent=m_color0.m<255;
-
-  TRegionOutline::Boundary& exter=*(rdf.m_ro.m_exterior);
-  TRegionOutline::Boundary& inter=*(rdf.m_ro.m_interior);
-
-TPixel32 color0=m_color0;
-
-  double lx=rdf.m_ro.m_bbox.x1-rdf.m_ro.m_bbox.x0;
-  double ly=rdf.m_ro.m_bbox.y1-rdf.m_ro.m_bbox.y0;
-
-// cioe' imposta una densita' tale, per cui in una regione che ha bbox 200x200
-// inserisce esattamente m_density punti
-int pointNumber= (int)(m_density*((lx*ly)*0.000025));
-
-flash.drawRegion(*r,pointNumber+1); // -1 i don't know why
-
-flash.setFillColor(getMainColor());
-flash.drawRectangle(TRectD(TPointD(rdf.m_ro.m_bbox.x0,rdf.m_ro.m_bbox.y0),
-                           TPointD(rdf.m_ro.m_bbox.x1,rdf.m_ro.m_bbox.y1)));
-
-flash.setThickness(0.0);
-for( int i=0;i< pointNumber; i++ ) {
- TPixel32 tmpcolor=color0;
- double shiftx=rdf.m_ro.m_bbox.x0+rnd.getFloat()*lx;
- double shifty=rdf.m_ro.m_bbox.y0+rnd.getFloat()*ly;
- tmpcolor.m=(UCHAR)(tmpcolor.m*rnd.getFloat());
- flash.setFillColor(tmpcolor);
- flash.pushMatrix();
-     TTranslation tM(shiftx, shifty);
- flash.multMatrix(tM);
- flash.drawRectangle(TRectD(TPointD(-1,-1),TPointD(1,1)));
- flash.popMatrix();
-  }
-*/
 }
 
 //***************************************************************************
@@ -2864,50 +2331,6 @@ void TChessFillStyle::drawRegion(const TColorFunction *cf,
 
   stenc->disableMask();
   glDeleteLists(chessId, 1);
-}
-
-//------------------------------------------------------------
-
-void TChessFillStyle::drawRegion(TFlash &flash, const TRegion *r) const {
-  TRectD bbox(r->getBBox());
-
-  TPointD vert[4];
-  vert[0].x = -0.5;
-  vert[0].y = 0.5;
-  vert[1].x = -0.5;
-  vert[1].y = -0.5;
-  vert[2].x = 0.5;
-  vert[2].y = -0.5;
-  vert[3].x = 0.5;
-  vert[3].y = 0.5;
-
-  TRotation rotM(m_Angle);
-  TScale scaleM(m_HDist, m_VDist);
-  for (int i = 0; i < 4; i++) vert[i] = rotM * scaleM * vert[i];
-
-  int nbClip = 1;  // just for the getMainColor() rectangle
-  std::vector<TPointD> grid;
-  makeGrid(bbox, rotM, grid, nbClip);
-
-  //	flash.drawRegion(*r,true);
-  flash.drawRegion(*r, nbClip);
-
-  flash.setFillColor(getMainColor());
-  flash.drawRectangle(bbox);
-
-  flash.setFillColor(m_pointColor);
-
-  std::vector<TPointD>::const_iterator it  = grid.begin();
-  std::vector<TPointD>::const_iterator ite = grid.end();
-  for (; it != ite; it++) {
-    TTranslation trM(it->x, it->y);
-    std::vector<TPointD> lvert;
-    lvert.push_back(trM * vert[0]);
-    lvert.push_back(trM * vert[1]);
-    lvert.push_back(trM * vert[2]);
-    lvert.push_back(trM * vert[3]);
-    flash.drawPolyline(lvert);
-  }
 }
 
 //***************************************************************************
@@ -3249,57 +2672,6 @@ int TStripeFillStyle::nbClip(const TRectD &bbox) const {
 
 //------------------------------------------------------------
 
-void TStripeFillStyle::drawRegion(TFlash &flash, const TRegion *r) const {
-  TRectD bbox(r->getBBox());
-
-  //	flash.drawRegion(*r,true);
-  flash.drawRegion(*r, nbClip(bbox));  // -1 i don't know why
-
-  flash.setFillColor(getMainColor());
-  flash.drawRectangle(bbox);
-
-  flash.setFillColor(m_pointColor);
-  // Horizontal Lines
-  if (fabs(m_Angle) != 90) {
-    double lx = bbox.x1 - bbox.x0;
-    // double ly=bbox.y1-bbox.y0;
-    double beg  = bbox.y0;
-    double end  = bbox.y1;
-    beg         = m_Angle <= 0 ? beg : beg - lx * tan(degree2rad(m_Angle));
-    end         = m_Angle >= 0 ? end : end - lx * tan(degree2rad(m_Angle));
-    double dist = m_Dist / cos(degree2rad(m_Angle));
-    for (double y = beg; y <= end; y += dist) {
-      TPointD p0, p1, p2, p3;
-      getThickline(TPointD(bbox.x0, y), lx, p0, p1, p2, p3);
-      std::vector<TPointD> v;
-      v.push_back(p0);
-      v.push_back(p1);
-      v.push_back(p2);
-      v.push_back(p3);
-      flash.drawPolyline(v);
-    }
-  } else {
-    double beg = bbox.x0;
-    double end = bbox.x1;
-    double y0  = bbox.y0;
-    double y1  = bbox.y1;
-    for (double x = beg; x <= end; x += m_Dist) {
-      TPointD p0(x, y0);
-      TPointD p1(x + m_Thickness, y0);
-      TPointD p2(x, y1);
-      TPointD p3(x + m_Thickness, y1);
-      std::vector<TPointD> v;
-      v.push_back(p0);
-      v.push_back(p1);
-      v.push_back(p3);
-      v.push_back(p2);
-      flash.drawPolyline(v);
-    }
-  }
-}
-
-//------------------------------------------------------------
-
 void TStripeFillStyle::makeIcon(const TDimension &d) {
   // Saves the values of member variables and sets the right icon values
   double LDist      = m_Dist;
@@ -3581,89 +2953,6 @@ void TLinGradFillStyle::drawRegion(const TColorFunction *cf,
   stenc->disableMask();
 }
 
-//------------------------------------------------------------
-
-// It is the new version, which uses XPos, YPos, Smooth parameters.
-// There is a gap between the flat and graded regions. This is the reason,
-// why the old version (without XPos, YPos, Smooth parameters) is used.
-void TLinGradFillStyle::drawRegion(TFlash &flash, const TRegion *r) const {
-  TRectD bbox(r->getBBox());
-  std::vector<TPointD> rect;
-
-  TPointD center((bbox.x1 + bbox.x0) / 2.0, (bbox.y1 + bbox.y0) / 2.0);
-  center = center + TPointD(m_XPos * 0.01 * (bbox.x1 - bbox.x0) * 0.5,
-                            m_YPos * 0.01 * (bbox.y1 - bbox.y0) * 0.5);
-  double l = tdistance(TPointD(bbox.x0, bbox.y0), TPointD(bbox.x1, bbox.y1));
-
-  TAffine M(TTranslation(center) * TRotation(m_Angle));
-
-  rect.push_back(M * TPointD(-m_Size, l));
-  rect.push_back(M * TPointD(-m_Size, -l));
-  rect.push_back(M * TPointD(m_Size, -l));
-  rect.push_back(M * TPointD(m_Size, l));
-
-  flash.setThickness(0.0);
-
-  SFlashUtils sfu;
-  sfu.drawGradedRegion(flash, rect, m_pointColor, getMainColor(), *r);
-}
-
-/*
-// --- Old version ---
-void TLinGradFillStyle::drawRegion(TFlash& flash, const TRegion* r) const
-{
-  flash.drawRegion(*r,1);
-  TRectD bbox(r->getBBox());
-  TPointD p0,p1,p2,p3;
-  p0=TPointD(bbox.x0,bbox.y0);
-  p1=TPointD(bbox.x0,bbox.y1);
-  p2=TPointD(bbox.x1,bbox.y0);
-  p3=TPointD(bbox.x1,bbox.y1);
-  std::vector<TPointD> pv;
-  if ( fabs(m_Angle)!=90 ) {
-                double tga=tan(degree2rad(fabs(m_Angle)));
-                double lx=bbox.x1-bbox.x0;
-                double ly=bbox.y1-bbox.y0;
-                double ax=lx/(tga*tga+1);
-                double bx=lx-ax;
-                double mx=ax*tga;
-                double rlylx=ly/lx;
-                double ay=ax*rlylx;
-                double by=bx*rlylx;
-                double my=mx*rlylx;
-                if ( m_Angle<=0.0) {
-                        p0=p0+TPointD(-my,by);
-                        p1=p1+TPointD(bx,mx);
-                        p2=p2+TPointD(-bx,-mx);
-                        p3=p3+TPointD(my,-by);
-                } else {
-                        p0=p0+TPointD(bx,-mx);
-                        p1=p1+TPointD(-my,-by);
-                        p2=p2+TPointD(my,by);
-                        p3=p3+TPointD(-bx,mx);
-                }
-                pv.push_back(p0);
-                pv.push_back(p1);
-                pv.push_back(p3);
-                pv.push_back(p2);
-  } else {
-                if ( m_Angle==-90 ) {
-                        pv.push_back(p1);
-                        pv.push_back(p3);
-                        pv.push_back(p2);
-                        pv.push_back(p0);
-                } else {
-                        pv.push_back(p0);
-                        pv.push_back(p2);
-                        pv.push_back(p3);
-                        pv.push_back(p1);
-                }
-  }
-  SFlashUtils sfu;
-  sfu.drawGradedPolyline(flash,pv,m_pointColor,getMainColor());
-}
-*/
-
 //***************************************************************************
 //    TRadGradFillStyle  implementation
 //***************************************************************************
@@ -3899,27 +3188,6 @@ void TRadGradFillStyle::drawRegion(const TColorFunction *cf,
   glEnd();
 
   stenc->disableMask();
-}
-
-//------------------------------------------------------------
-
-void TRadGradFillStyle::drawRegion(TFlash &flash, const TRegion *r) const {
-  TRectD bbox(r->getBBox());
-  double lx = bbox.x1 - bbox.x0;
-  double ly = bbox.y1 - bbox.y0;
-  double r1 = 0.5 * std::max(lx, ly) * m_Radius * 0.01;
-  if (m_Smooth < 50) r1 *= (0.3 * ((100 - m_Smooth) / 50.0) + 0.7);
-  TPointD center((bbox.x1 + bbox.x0) / 2.0, (bbox.y1 + bbox.y0) / 2.0);
-  center = center + TPointD(m_XPos * 0.01 * lx * 0.5, m_YPos * 0.01 * ly * 0.5);
-
-  flash.setThickness(0.0);
-  TPixel32 mc(getMainColor());
-  flash.setGradientFill(false, m_pointColor, mc, m_Smooth);
-  const double flashGrad = 16384.0;  // size of gradient square
-  TTranslation tM(center.x, center.y);
-  TScale sM(2.0 * r1 / (flashGrad), 2.0 * r1 / (flashGrad));
-  flash.setFillStyleMatrix(tM * sM);
-  flash.drawRegion(*r);
 }
 
 //***************************************************************************
@@ -4203,44 +3471,6 @@ void TCircleStripeFillStyle::drawRegion(const TColorFunction *cf,
   }
 
   stenc->disableMask();
-}
-
-//------------------------------------------------------------
-
-void TCircleStripeFillStyle::drawRegion(TFlash &flash, const TRegion *r) const {
-  TRectD bbox(r->getBBox());
-
-  double lx = bbox.x1 - bbox.x0;
-  double ly = bbox.y1 - bbox.y0;
-  TPointD center((bbox.x1 + bbox.x0) * 0.5, (bbox.y1 + bbox.y0) * 0.5);
-  center.x = center.x + m_XPos * 0.01 * 0.5 * lx;
-  center.y = center.y + m_YPos * 0.01 * 0.5 * ly;
-
-  double maxDist = 0.0;
-  maxDist = std::max(tdistance(center, TPointD(bbox.x0, bbox.y0)), maxDist);
-  maxDist = std::max(tdistance(center, TPointD(bbox.x0, bbox.y1)), maxDist);
-  maxDist = std::max(tdistance(center, TPointD(bbox.x1, bbox.y0)), maxDist);
-  maxDist = std::max(tdistance(center, TPointD(bbox.x1, bbox.y1)), maxDist);
-
-  int nbClip = 2;
-  double d   = m_Dist;
-  for (; d <= maxDist; d += m_Dist) nbClip++;
-  flash.setFillColor(TPixel::Black);
-  flash.drawRegion(*r, nbClip);
-
-  flash.setFillColor(getMainColor());
-  flash.drawRectangle(bbox);
-
-  flash.setFillColor(m_pointColor);
-  flash.setLineColor(m_pointColor);
-  flash.setThickness(0.0);
-  d = m_Thickness / 2.0;
-  flash.drawEllipse(center, d, d);
-
-  flash.setFillColor(TPixel32(0, 0, 0, 0));
-  flash.setLineColor(m_pointColor);
-  flash.setThickness(m_Thickness / 2.0);
-  for (d = m_Dist; d <= maxDist; d += m_Dist) flash.drawEllipse(center, d, d);
 }
 
 //***************************************************************************
@@ -4533,39 +3763,6 @@ void TMosaicFillStyle::drawRegion(const TColorFunction *cf,
   // tglColor(TPixel32::White);
 
   stenc->disableMask();
-}
-
-//------------------------------------------------------------
-
-void TMosaicFillStyle::drawRegion(TFlash &flash, const TRegion *r) const {
-  TRectD bbox(r->getBBox());
-
-  std::vector<TPointD> pos;
-  int posLX, posLY;
-  TRandom rand;
-  TPointD quad[4];
-
-  preaprePos(bbox, pos, posLX, posLY, rand);
-
-  if (pos.size() <= 0) return;
-
-  int nbClip = (posLX - 1) * (posLY - 1) + 1;
-  flash.drawRegion(*r, nbClip);
-
-  flash.setFillColor(TSolidColorStyle::getMainColor());
-  flash.setThickness(0);
-  flash.drawRectangle(bbox);
-  for (int y = 0; y < (posLY - 1); y++)
-    for (int x = 0; x < (posLX - 1); x++)
-      if (getQuad(x, y, posLX, posLY, pos, quad, rand)) {
-        std::vector<TPointD> lvert;
-        lvert.push_back(quad[0]);
-        lvert.push_back(quad[1]);
-        lvert.push_back(quad[2]);
-        lvert.push_back(quad[3]);
-        flash.setFillColor(m_pointColor[rand.getInt(0, 4)]);
-        flash.drawPolyline(lvert);
-      }
 }
 
 //***************************************************************************
@@ -4911,91 +4108,4 @@ int TPatchFillStyle::nbClip(const int lX, const int lY,
       }
     }
   return nbC;
-}
-
-//------------------------------------------------------------
-
-void TPatchFillStyle::drawFlashQuad(TFlash &flash, const TPointD *quad) const {
-  std::vector<TPointD> lvert;
-  lvert.push_back(quad[0]);
-  lvert.push_back(quad[1]);
-  lvert.push_back(quad[2]);
-  lvert.push_back(quad[3]);
-  flash.drawPolyline(lvert);
-
-  double r = tdistance(quad[0], quad[1]) / 2.0;
-  flash.drawEllipse(quad[0] * 0.5 + quad[1] * 0.5, r, r);
-  flash.drawEllipse(quad[2] * 0.5 + quad[3] * 0.5, r, r);
-}
-
-//------------------------------------------------------------
-
-void TPatchFillStyle::drawFlashTriangle(TFlash &flash, const TPointD &p1,
-                                        const TPointD &p2,
-                                        const TPointD &p3) const {
-  std::vector<TPointD> lvert;
-  lvert.push_back(p1);
-  lvert.push_back(p2);
-  lvert.push_back(p3);
-  flash.drawPolyline(lvert);
-}
-
-//------------------------------------------------------------
-
-void TPatchFillStyle::drawRegion(TFlash &flash, const TRegion *r) const {
-  TRectD bbox(r->getBBox());
-
-  std::vector<TPointD> pos;
-  int posLX, posLY;
-  TRandom rand;
-  TPointD quad[4];
-
-  preaprePos(bbox, pos, posLX, posLY, rand);
-  if (pos.size() <= 0) return;
-  flash.drawRegion(*r, nbClip(posLX, posLY, pos));
-
-  flash.setThickness(0.0);
-  int x;
-  for (x = 2; x < (posLX - 2); x += 2)
-    for (int y = 1; y < posLY; y++) {
-      std::vector<TPointD> lvert;
-      if ((x % 4) == 2) {
-        lvert.push_back(pos[(x - 1) * posLY + y]);
-        lvert.push_back(pos[(x)*posLY + y]);
-        lvert.push_back(pos[(x + 1) * posLY + y]);
-        lvert.push_back(pos[(x + 2) * posLY + y]);
-        lvert.push_back(pos[(x + 1) * posLY + y - 1]);
-        lvert.push_back(pos[(x)*posLY + y - 1]);
-      } else {
-        lvert.push_back(pos[(x - 1) * posLY + y - 1]);
-        lvert.push_back(pos[(x)*posLY + y - 1]);
-        lvert.push_back(pos[(x + 1) * posLY + y - 1]);
-        lvert.push_back(pos[(x + 2) * posLY + y - 1]);
-        lvert.push_back(pos[(x + 1) * posLY + y]);
-        lvert.push_back(pos[(x)*posLY + y]);
-      }
-      flash.setFillColor(m_pointColor[rand.getInt(0, 6)]);
-      flash.drawPolyline(lvert);
-    }
-
-  flash.setFillColor(TSolidColorStyle::getMainColor());
-  flash.setThickness(0.0);
-  double thickn = tcrop(m_thickness, 0.0, 100.0) * 0.01 * 5.0;
-  if (thickn > 0.001)
-    for (x = 0; x < (posLX - 1); x++) {
-      int nb = x % 4;
-      for (int y = 0; y < posLY; y++) {
-        if (getQuadLine(pos[x * posLY + y], pos[(x + 1) * posLY + y], thickn,
-                        quad))
-          drawFlashQuad(flash, quad);
-        if (y > 0 && nb == 1)
-          if (getQuadLine(pos[x * posLY + y], pos[(x + 1) * posLY + y - 1],
-                          thickn, quad))
-            drawFlashQuad(flash, quad);
-        if (y < (posLY - 1) && nb == 3)
-          if (getQuadLine(pos[x * posLY + y], pos[(x + 1) * posLY + y + 1],
-                          thickn, quad))
-            drawFlashQuad(flash, quad);
-      }
-    }
 }

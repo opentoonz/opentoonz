@@ -12,12 +12,7 @@
 #include "tfilepath.h"
 #include "timage.h"
 
-// boost includes
-#include <boost/container/vector.hpp>
-
 #include <QMap>
-
-namespace bc = boost::container;
 
 //================================================
 
@@ -74,7 +69,7 @@ private:
 
   std::unique_ptr<LevelUpdater> m_updater;  //!< The cleanup level updater.
 
-  bc::vector<CleanupLevel>
+  std::vector<CleanupLevel>
       m_cleanupLevels;        //!< List of levels to be cleanupped.
   std::pair<int, int> m_idx,  //!< Current cleanup list position.
       m_completion;        //!< Count of completed frames versus total frames.
@@ -149,6 +144,7 @@ public:
   OverwriteDialog();
 
   void reset() override;
+  void enableOptions(bool writingOnSource);
 
 private:
   DVGui::LineEdit *m_suffix;

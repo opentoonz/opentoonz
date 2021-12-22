@@ -296,7 +296,7 @@ bool TPSDReader::readLayerInfo(int i) {
 
     // layer name
     li->nameno = (char *)malloc(16);
-    sprintf(li->nameno, "layer%d", i + 1);
+    snprintf(li->nameno, 16, "layer%d", i + 1);
     namelen  = fgetc(m_file);
     li->name = (char *)mymalloc(NEXT4(namelen + 1));
     fread(li->name, 1, NEXT4(namelen + 1) - 1, m_file);
@@ -651,7 +651,7 @@ void TPSDReader::readImageData(TRasterP &rasP, TPSDLayerInfo *li,
   // L'indice è riferito al livello.
   // Nota che nel file photoshop le righe sono memorizzate dall'ultima alla
   // prima.
-  int rowOffset = abs(sby1) % m_shrinkY;
+  int rowOffset = std::abs(sby1) % m_shrinkY;
   int rowCount  = rowOffset;
   // if(m_shrinkY==3) rowCount--;
   for (j = 0; j < smallRas->getLy(); j++) {

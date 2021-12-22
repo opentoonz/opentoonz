@@ -25,10 +25,11 @@ const char *s_version = "version",
            *s_thicknessRatio = "thicknessRatio", *s_makeFrame = "makeFrame",
            *s_naaSource = "naaSource",
 
-           *s_accuracy            = "accuracy",
-           *s_thicknessRatioFirst = "thicknessRatioFirst",
-           *s_thicknessRatioLast  = "thicknessRatioLast",
-           *s_paintFill           = "paintFill",
+           *s_accuracy                      = "accuracy",
+           *s_thicknessRatioFirst           = "thicknessRatioFirst",
+           *s_thicknessRatioLast            = "thicknessRatioLast",
+           *s_paintFill                     = "paintFill",
+           *s_alignBoundaryStrokesDirection = "alignBoundaryStrokesDirection",
 
            *s_Outline = "Outline", *s_adherenceTol = "adherenceTol",
            *s_angleTol = "angleTol", *s_relativeTol = "relativeTol",
@@ -180,7 +181,9 @@ void convert(const CenterlineConfiguration &conf,
   params.m_cThicknessRatioLast  = conf.m_thicknessRatio;
   params.m_cMakeFrame           = conf.m_makeFrame;
   params.m_cPaintFill           = !conf.m_leaveUnpainted;
-  params.m_cNaaSource           = conf.m_naaSource;
+  params.m_cAlignBoundaryStrokesDirection =
+      conf.m_alignBoundaryStrokesDirection;
+  params.m_cNaaSource = conf.m_naaSource;
 }
 
 //-------------------------------------------------------
@@ -196,6 +199,8 @@ void convert(const NewOutlineConfiguration &conf,
   params.m_oToneThreshold    = conf.m_toneTol;
   params.m_oTransparentColor = conf.m_transparentColor;
   params.m_oPaintFill        = !conf.m_leaveUnpainted;
+  params.m_oAlignBoundaryStrokesDirection =
+      conf.m_alignBoundaryStrokesDirection;
 }
 
 }  // namespace
@@ -232,9 +237,10 @@ CenterlineConfiguration VectorizerParameters::getCenterlineConfiguration(
   // conf.m_thicknessRatio   = m_cThicknessRatio;
   conf.m_thicknessRatio =
       (1 - frame) * m_cThicknessRatioFirst + frame * m_cThicknessRatioLast;
-  conf.m_leaveUnpainted = !m_cPaintFill;
-  conf.m_makeFrame      = m_cMakeFrame;
-  conf.m_naaSource      = m_cNaaSource;
+  conf.m_leaveUnpainted                = !m_cPaintFill;
+  conf.m_alignBoundaryStrokesDirection = m_cAlignBoundaryStrokesDirection;
+  conf.m_makeFrame                     = m_cMakeFrame;
+  conf.m_naaSource                     = m_cNaaSource;
 
   return conf;
 }
@@ -245,16 +251,17 @@ NewOutlineConfiguration VectorizerParameters::getOutlineConfiguration(
     double frame) const {
   NewOutlineConfiguration conf;
 
-  conf.m_outline          = true;
-  conf.m_despeckling      = m_oDespeckling;
-  conf.m_adherenceTol     = m_oAdherence * 0.01;
-  conf.m_angleTol         = m_oAngle / 180.0;
-  conf.m_relativeTol      = m_oRelative * 0.01;
-  conf.m_mergeTol         = 5.0 - m_oAccuracy * 0.5;
-  conf.m_leaveUnpainted   = !m_oPaintFill;
-  conf.m_maxColors        = m_oMaxColors;
-  conf.m_transparentColor = m_oTransparentColor;
-  conf.m_toneTol          = m_oToneThreshold;
+  conf.m_outline                       = true;
+  conf.m_despeckling                   = m_oDespeckling;
+  conf.m_adherenceTol                  = m_oAdherence * 0.01;
+  conf.m_angleTol                      = m_oAngle / 180.0;
+  conf.m_relativeTol                   = m_oRelative * 0.01;
+  conf.m_mergeTol                      = 5.0 - m_oAccuracy * 0.5;
+  conf.m_leaveUnpainted                = !m_oPaintFill;
+  conf.m_alignBoundaryStrokesDirection = m_oAlignBoundaryStrokesDirection;
+  conf.m_maxColors                     = m_oMaxColors;
+  conf.m_transparentColor              = m_oTransparentColor;
+  conf.m_toneTol                       = m_oToneThreshold;
 
   return conf;
 }
@@ -276,6 +283,8 @@ void VectorizerParameters::saveData(TOStream &os) {
     os.child(s_thicknessRatioLast) << m_cThicknessRatioLast;
     os.child(s_makeFrame) << (m_cMakeFrame ? 1 : 0);
     os.child(s_paintFill) << (m_cPaintFill ? 1 : 0);
+    os.child(s_alignBoundaryStrokesDirection)
+        << (m_cAlignBoundaryStrokesDirection ? 1 : 0);
     os.child(s_naaSource) << (m_cNaaSource ? 1 : 0);
   }
   os.closeChild();
@@ -291,6 +300,8 @@ void VectorizerParameters::saveData(TOStream &os) {
     os.child(s_toneThreshold) << m_oToneThreshold;
     os.child(s_transparentColor) << m_oTransparentColor;
     os.child(s_paintFill) << (m_oPaintFill ? 1 : 0);
+    os.child(s_alignBoundaryStrokesDirection)
+        << (m_oAlignBoundaryStrokesDirection ? 1 : 0);
   }
   os.closeChild();
 }
@@ -333,6 +344,9 @@ void VectorizerParameters::loadData(TIStream &is) {
           is >> val, m_cMakeFrame = (val != 0), is.matchEndTag();
         else if (tagName == s_paintFill)
           is >> val, m_cPaintFill = (val != 0), is.matchEndTag();
+        else if (tagName == s_alignBoundaryStrokesDirection)
+          is >> val, m_cAlignBoundaryStrokesDirection = (val != 0),
+                     is.matchEndTag();
         else if (tagName == s_naaSource)
           is >> val, m_cNaaSource = (val != 0), is.matchEndTag();
         else
@@ -360,6 +374,9 @@ void VectorizerParameters::loadData(TIStream &is) {
           is >> m_oTransparentColor, is.matchEndTag();
         else if (tagName == s_paintFill)
           is >> val, m_oPaintFill = (val != 0), is.matchEndTag();
+        else if (tagName == s_alignBoundaryStrokesDirection)
+          is >> val, m_oAlignBoundaryStrokesDirection = (val != 0),
+                     is.matchEndTag();
         else
           is.skipCurrentTag();
       }

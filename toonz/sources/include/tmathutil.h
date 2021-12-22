@@ -46,7 +46,7 @@ public:
   \par A array of coeff
   \par n size of matrix
   \par indx array with permutation from pivoting
-  \par d +1/-1 and depend wheter the number of row interchanges (even or odd)
+  \par d +1/-1 and depend whether the number of row interchanges (even or odd)
   \note If error a TException is thrown.
   \include mathutils_ex2.cpp
  */

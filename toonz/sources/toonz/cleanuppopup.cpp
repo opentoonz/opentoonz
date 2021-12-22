@@ -49,15 +49,11 @@
 #include <QMainWindow>
 #include <QGroupBox>
 
-// boost includes
-#include <boost/bind.hpp>
-#include <boost/functional.hpp>
-#include <boost/mem_fn.hpp>
-
 // STL includes
 #include <set>
 #include <map>
 #include <numeric>
+#include <functional>
 
 //*****************************************************************************
 //    Local namespace stuff
@@ -314,6 +310,9 @@ CleanupPopup::CleanupPopup()
   m_imgViewBox->setChecked(false);
   m_imageViewer->setVisible(false);
   m_imageViewer->resize(406, 306);
+  ImagePainter::VisualSettings settings;
+  settings.m_bg = 0x80000;  // set to white regardless of the flipbook bg
+  m_imageViewer->setVisual(settings);
 
   //---layout
   QVBoxLayout *mainLayout = new QVBoxLayout();
@@ -460,7 +459,7 @@ void CleanupPopup::buildCleanupList() {
           levelsList.push_back(sl);
         }
         /*---TFrameIdを登録---*/
-        it->second.insert(cell.getFrameId()).second;
+        it->second.insert(cell.getFrameId());
       }
     }
   }
@@ -486,7 +485,7 @@ void CleanupPopup::buildCleanupList() {
           levelsList.push_back(sl);
         }
         /*---TFrameIdを登録---*/
-        it->second.insert(cell.getFrameId()).second;
+        it->second.insert(cell.getFrameId());
       }
     }
   }
@@ -521,9 +520,8 @@ bool CleanupPopup::analyzeCleanupList() {
   QList<TXshSimpleLevel *> levelsToBeDeleted;
 
   // Traverse the cleanup list
-  bc::vector<CleanupLevel>::iterator clt, clEnd = m_cleanupLevels.end();
-  for (clt = m_cleanupLevels.begin(); clt != clEnd; ++clt) {
-    TXshSimpleLevel *sl = clt->m_sl;
+  for (auto &clt : m_cleanupLevels) {
+    TXshSimpleLevel *sl = clt.m_sl;
 
     /*--- Cleanup対象LevelのCleanupSettingを取得 ---*/
     loadCleanupParams(m_params.get(),
@@ -531,7 +529,7 @@ bool CleanupPopup::analyzeCleanupList() {
 
     // Check level existence
     /*--- Cleanup後に得られるであろうTLVのパス ---*/
-    TFilePath outputPath = scene->decodeFilePath(clt->m_outputPath);
+    TFilePath outputPath = scene->decodeFilePath(clt.m_outputPath);
     {
       /*-- 出力先にTLVファイルが無ければ問題なし(このLevelはCleanupする) --*/
       if (!TSystem::doesExistFileOrLevel(outputPath)) {
@@ -567,9 +565,12 @@ bool CleanupPopup::analyzeCleanupList() {
           m_overwriteDialog->reset();
       }
 
+      m_overwriteDialog->enableOptions(inputPath == outputPath);
+
       // Prompt user for file conflict resolution
-      switch (clt->m_resolution =
-                  Resolution(m_overwriteDialog->execute(&clt->m_outputPath))) {
+      clt.m_resolution =
+          Resolution(m_overwriteDialog->execute(&clt.m_outputPath));
+      switch (clt.m_resolution) {
       case CANCEL:
         return false;
 
@@ -596,12 +597,14 @@ bool CleanupPopup::analyzeCleanupList() {
           m_levelAlreadyExists[sl] = false;
           continue;
         }
+      default:
+        break;
       }
 
       TLevelP level(0);  // Current level info. Yeah the init is a shame... :(
       /*--- 元のLevelと新しいCleanup結果が混合する場合。REPLACE以外 ---*/
-      if (clt->m_resolution == OVERWRITE || clt->m_resolution == WRITE_NEW ||
-          clt->m_resolution == NOPAINT_ONLY) {
+      if (clt.m_resolution == OVERWRITE || clt.m_resolution == WRITE_NEW ||
+          clt.m_resolution == NOPAINT_ONLY) {
         // Check output resolution consistency
         // Retrieve file resolution
         /*---現在在るTLVのサイズと、CleanupSettingsのサイズが一致しているかチェック---*/
@@ -633,7 +636,7 @@ bool CleanupPopup::analyzeCleanupList() {
         TPointD outDpi;
         m_params->getOutputImageInfo(outRes, outDpi.x, outDpi.y);
 
-        if (oldRes != outRes) {
+        if (oldRes != outRes && inputPath != outputPath) {
           DVGui::warning(
               tr("The resulting resolution of level \"%1\"\ndoes not match "
                  "with that of previously cleaned up level drawings.\n\nPlease "
@@ -646,7 +649,7 @@ bool CleanupPopup::analyzeCleanupList() {
         }
       }
       /*--- REPLACEの場合、消されるファイルパスのリストを作る ---*/
-      else if (clt->m_resolution == REPLACE) {
+      else if (clt.m_resolution == REPLACE) {
         filePathsToBeDeleted.push_back(outputPath);
 
         levelsToBeDeleted.push_back(sl);
@@ -671,15 +674,15 @@ bool CleanupPopup::analyzeCleanupList() {
 
       // Finally, apply resolution to individual frames.
       /*--- WRITE_NEW は、「未Cleanupのフレームだけ処理する」オプション ---*/
-      if (clt->m_resolution == WRITE_NEW) {
+      if (clt.m_resolution == WRITE_NEW) {
         const TLevel::Table *table = level->getTable();
 
-        clt->m_frames.erase(
-            std::remove_if(clt->m_frames.begin(), clt->m_frames.end(),
+        clt.m_frames.erase(
+            std::remove_if(clt.m_frames.begin(), clt.m_frames.end(),
                            [table](TLevel::Table::key_type const &key) {
                              return table->count(key);
                            }),
-            clt->m_frames.end());
+            clt.m_frames.end());
       }
     }
   }
@@ -743,7 +746,7 @@ bool CleanupPopup::analyzeCleanupList() {
   /*--- Cleanup対象フレームが無くなったLevelを対象から外す ---*/
   m_cleanupLevels.erase(
       std::remove_if(m_cleanupLevels.begin(), m_cleanupLevels.end(),
-                     boost::mem_fn(&CleanupLevel::empty)),
+                     std::mem_fn(&CleanupLevel::empty)),
       m_cleanupLevels.end());
 
   return true;
@@ -788,7 +791,13 @@ TImageP CleanupPopup::currentImage() const {
   if (!isValidPosition(m_idx)) return TImageP();
 
   const CleanupLevel &cl = m_cleanupLevels[m_idx.first];
-  return cl.m_sl->getFrameToCleanup(cl.m_frames[m_idx.second]);
+
+  // if lines are not processed, obtain the original sampled image
+  bool toBeLineProcessed =
+      TCleanupper::instance()->getParameters()->m_lineProcessingMode != lpNone;
+
+  return cl.m_sl->getFrameToCleanup(cl.m_frames[m_idx.second],
+                                    toBeLineProcessed);
 }
 
 //-----------------------------------------------------------------------------
@@ -937,6 +946,33 @@ QString CleanupPopup::setupLevel() {
        notLineProcessed = (sl->getType() != TZP_XSHLEVEL);
 
   if (lineProcessing) {
+    /*--- Keep original palette which will be reverted after cleanup ---*/
+    if (m_keepOriginalPalette) {
+      if ((sl->getType() == TZP_XSHLEVEL || sl->getType() == TZI_XSHLEVEL) &&
+          sl->getPalette() != NULL)
+        m_originalPalette = sl->getPalette()->clone();
+      else /*--- In case the level has been already cleanupped,
+           and is cleanupped again from raster level ---*/
+      {
+        /*--- Load and keep the palette from destination TLV ---*/
+        TFilePath targetPalettePath = outputPath.getParentDir() +
+                                      TFilePath(outputPath.getName() + ".tpl");
+        TFileStatus pfs(targetPalettePath);
+        if (pfs.doesExist() && pfs.isReadable()) {
+          TIStream is(targetPalettePath);
+          std::string tagName;
+          if (!is.matchTag(tagName) || tagName != "palette") {
+            DVGui::warning(QString(
+                "CleanupDefaultPalette file: This is not palette file"));
+            return NULL;
+          }
+          m_originalPalette = new TPalette();
+          m_originalPalette->loadData(is);
+        } else
+          m_originalPalette = 0;
+      }
+    }
+
     if (notLineProcessed) {
       /*-- Type, Pathを切り替えてTLVにする --*/
       // The level type changes to TLV
@@ -973,32 +1009,6 @@ QString CleanupPopup::setupLevel() {
     TPaletteP palette =
         TCleanupper::instance()->createToonzPaletteFromCleanupPalette();
 
-    /*--- Cleanup後にPaletteを元に戻すため、Paletteを保持しておく ---*/
-    if (m_keepOriginalPalette) {
-      if ((sl->getType() == TZP_XSHLEVEL || sl->getType() == TZI_XSHLEVEL) &&
-          sl->getPalette() != NULL)
-        m_originalPalette = sl->getPalette()->clone();
-      else /*--- 既にCleanup済みだが、再びTIFファイルからCleanupを行う場合 ---*/
-      {
-        /*--- Cleanup先のPaletteをロードして取っておく ---*/
-        TFilePath targetPalettePath = outputPath.getParentDir() +
-                                      TFilePath(outputPath.getName() + ".tpl");
-        TFileStatus pfs(targetPalettePath);
-        if (pfs.doesExist() && pfs.isReadable()) {
-          TIStream is(targetPalettePath);
-          std::string tagName;
-          if (!is.matchTag(tagName) || tagName != "palette") {
-            DVGui::warning(QString(
-                "CleanupDefaultPalette file: This is not palette file"));
-            return NULL;
-          }
-          m_originalPalette = new TPalette();
-          m_originalPalette->loadData(is);
-        } else
-          m_originalPalette = 0;
-      }
-    }
-
     sl->setPalette(palette.getPointer());
 
     /*--- カレントPaletteを切り替える ---*/
@@ -1006,7 +1016,7 @@ QString CleanupPopup::setupLevel() {
       app->getPaletteController()->getCurrentLevelPalette()->setPalette(
           palette.getPointer());
 
-    // Notify the xsheet that the level has changed visual type informations
+    // Notify the xsheet that the level has changed visual type information
     // (either the level type,
     // cleanup status, etc)
     app->getCurrentXsheet()->notifyXsheetChanged();
@@ -1193,19 +1203,35 @@ void CleanupPopup::cleanupFrame() {
     TCleanupper *cl                 = TCleanupper::instance();
     const CleanupParameters *params = cl->getParameters();
 
+    // Obtain the source dpi. Changed it to be done once at the first frame of
+    // each level in order to avoid the following problem:
+    // If the original raster level has no dpi (such as TGA images), obtaining
+    // dpi in every frame causes dpi mismatch between the first frame and the
+    // following frames, since the value
+    // TXshSimpleLevel::m_properties->getDpi() will be changed to the
+    // dpi of cleanup camera (= TLV's dpi) after finishing the first frame.
+    if (m_firstLevelFrame) {
+      TPointD dpi;
+      original->getDpi(dpi.x, dpi.y);
+      if (dpi.x == 0 && dpi.y == 0) dpi = sl->getProperties()->getDpi();
+      cl->setSourceDpi(dpi);
+    }
+
     if (params->m_lineProcessingMode == lpNone) {
       // No line processing
 
       TRasterImageP ri(original);
-      if (params->m_autocenterType != CleanupTypes::AUTOCENTER_NONE) {
+      /*if (params->m_autocenterType != CleanupTypes::AUTOCENTER_NONE) {
         bool autocentered;
         ri = cl->autocenterOnly(original, false, autocentered);
         if (!autocentered)
           DVGui::warning(
               QObject::tr("The autocentering failed on the current drawing."));
-      }
+      }*/
+      cl->process(original, false, ri, false, true, true, nullptr,
+                  ri->getRaster());
 
-      sl->setFrame(fid, ri);
+      if (TRaster32P(ri->getRaster())) sl->setFrame(fid, ri);
 
       // Update the associated file. In case the operation throws, oh well the
       // image gets skipped.
@@ -1217,20 +1243,6 @@ void CleanupPopup::cleanupFrame() {
       IconGenerator::instance()->invalidate(sl, fid);
     } else {
       // Perform main processing
-
-      // Obtain the source dpi. Changed it to be done once at the first frame of
-      // each level in order to avoid the following problem:
-      // If the original raster level has no dpi (such as TGA images), obtaining
-      // dpi in every frame causes dpi mismatch between the first frame and the
-      // following frames, since the value
-      // TXshSimpleLevel::m_properties->getDpi() will be changed to the
-      // dpi of cleanup camera (= TLV's dpi) after finishing the first frame.
-      if (m_firstLevelFrame) {
-        TPointD dpi;
-        original->getDpi(dpi.x, dpi.y);
-        if (dpi.x == 0 && dpi.y == 0) dpi = sl->getProperties()->getDpi();
-        cl->setSourceDpi(dpi);
-      }
 
       CleanupPreprocessedImage *cpi;
       {
@@ -1255,7 +1267,9 @@ void CleanupPopup::cleanupFrame() {
       // Update the level data about the cleanupped frame
       sl->setFrameStatus(fid,
                          sl->getFrameStatus(fid) | TXshSimpleLevel::Cleanupped);
-      sl->setFrame(fid, TImageP());  // Invalidate the old image data
+
+      // sl->setFrame(fid, TImageP());  // Invalidate the old image data
+      sl->setFrame(fid, ti);  // replace with the new image data
 
       // Output the cleanupped image to disk
       try {
@@ -1471,7 +1485,7 @@ CleanupPopup::OverwriteDialog::OverwriteDialog()
 
     suffixLayout->addWidget(m_suffix);
   }
-  addLayout(suffixLayout);  // Couldnt' place it right after allocation,
+  addLayout(suffixLayout);  // Couldn't place it right after allocation,
                             // DVGui::Dialog::addLayout() crashed...
   // Option 5: NOPAINT_ONLY
   radioButton = new QRadioButton(this);
@@ -1495,6 +1509,14 @@ CleanupPopup::OverwriteDialog::OverwriteDialog()
 void CleanupPopup::OverwriteDialog::reset() {
   ValidatedChoiceDialog::reset();
   m_suffixText.clear();
+}
+
+//-----------------------------------------------------------------------------
+
+void CleanupPopup::OverwriteDialog::enableOptions(bool writingOnSource) {
+  if (writingOnSource && m_buttonGroup->button(REPLACE)->isChecked())
+    m_buttonGroup->button(OVERWRITE)->setChecked(true);
+  m_buttonGroup->button(REPLACE)->setDisabled(writingOnSource);
 }
 
 //-----------------------------------------------------------------------------
@@ -1574,7 +1596,7 @@ void CleanupPopup::onImgViewBoxToggled(bool on) {
 
 //-----------------------------------------------------------------------------
 /*!	Show the progress in the mainwindow's title bar
-*/
+ */
 void CleanupPopup::updateTitleString() {
   if (!TApp::instance()->getMainWindow()) return;
   MainWindow *mainWin =

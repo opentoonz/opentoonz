@@ -4,6 +4,7 @@
 #define XSHEETEXPR_INCLUDED
 
 #include "tgrammar.h"
+#include <QSet>
 
 #undef DVAPI
 #undef DVVAR
@@ -24,5 +25,7 @@ class TExpression;
 DVAPI TSyntax::Grammar *createXsheetGrammar(TXsheet *xsh);
 DVAPI bool dependsOn(TExpression &expr, TDoubleParam *possiblyDependentParam);
 DVAPI bool dependsOn(TDoubleParam *param, TDoubleParam *possiblyDependentParam);
+DVAPI void referenceParams(TExpression &expr, QSet<int> &columnIndices,
+                           QSet<TDoubleParam *> &params);
 
 #endif  // XSHEETEXPR_INCLUDED

@@ -103,6 +103,13 @@ public:
   int getStartFrame() { return m_frame0; }
   int getEndFrame() { return m_frame1; }
 
+  void emitTriggerNextKeyframe(QWidget *panel) {
+    emit triggerNextKeyframe(panel);
+  }
+  void emitTriggerPrevKeyframe(QWidget *panel) {
+    emit triggerPrevKeyframe(panel);
+  }
+
 public slots:
 
   void nextFrame(TFrameId = 0);
@@ -117,6 +124,9 @@ signals:
   void scrubStopped();
   void frameTypeChanged();
   void isPlayingStatusChanged();
+
+  void triggerNextKeyframe(QWidget *panel);
+  void triggerPrevKeyframe(QWidget *panel);
 
 protected:
   void timerEvent(QTimerEvent *event) override;

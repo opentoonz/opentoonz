@@ -71,7 +71,9 @@ void TCellKeyframeSelection::copyCellsKeyframes() {
     QClipboard *clipboard       = QApplication::clipboard();
     TXsheet *xsh                = m_xsheetHandle->getXsheet();
     TKeyframeData *keyframeData = new TKeyframeData();
-    keyframeData->setKeyframes(m_keyframeSelection->getSelection(), xsh);
+    TKeyframeData::Position startPos(r0, c0);
+    keyframeData->setKeyframes(m_keyframeSelection->getSelection(), xsh,
+                               startPos);
     data->setKeyframeData(keyframeData);
   }
   // Set the cliboard
@@ -120,7 +122,8 @@ void TCellKeyframeSelection::selectCellsKeyframes(int r0, int c0, int r1,
   for (c = c0; c <= c1; c++)
     for (r = r0; r <= r1; r++) {
       TStageObjectId id =
-          c < 0 ? TStageObjectId::CameraId(0) : TStageObjectId::ColumnId(c);
+          c < 0 ? TStageObjectId::CameraId(xsh->getCameraColumnIndex())
+                : TStageObjectId::ColumnId(c);
       TStageObject *stObj = xsh->getStageObject(id);
       if (stObj->isKeyframe(r)) m_keyframeSelection->select(r, c);
     }
@@ -132,7 +135,8 @@ void TCellKeyframeSelection::selectCellKeyframe(int row, int col) {
   m_cellSelection->selectCell(row, col);
   TXsheet *xsh = m_xsheetHandle->getXsheet();
   TStageObjectId id =
-      col < 0 ? TStageObjectId::CameraId(0) : TStageObjectId::ColumnId(col);
+      col < 0 ? TStageObjectId::CameraId(xsh->getCameraColumnIndex())
+              : TStageObjectId::ColumnId(col);
   TStageObject *stObj = xsh->getStageObject(id);
   m_keyframeSelection->clear();
   if (stObj->isKeyframe(row)) m_keyframeSelection->select(row, col);

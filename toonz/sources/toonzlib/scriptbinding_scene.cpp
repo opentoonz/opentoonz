@@ -206,10 +206,10 @@ QScriptValue Scene::getCell(int row, int col) {
   if (sl) {
     QScriptValue level = create(engine(), new Level(sl));
     QScriptValue fid;
-    if (cell.m_frameId.getLetter() == 0)
+    if (cell.m_frameId.getLetter().isEmpty())
       fid = cell.m_frameId.getNumber();
     else
-      fid               = QString::fromStdString(cell.m_frameId.expand());
+      fid = QString::fromStdString(cell.m_frameId.expand());
     QScriptValue result = engine()->newObject();
     result.setProperty("level", level);
     result.setProperty("fid", fid);

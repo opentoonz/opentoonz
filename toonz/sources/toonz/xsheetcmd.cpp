@@ -33,7 +33,6 @@
 #include "toonz/txshsoundtextlevel.h"
 #include "toonz/tstageobjecttree.h"
 #include "toonz/tstageobjectkeyframe.h"
-#include "toonz/txshcolumn.h"
 #include "toonz/stageobjectutil.h"
 #include "toonz/toonzfolders.h"
 #include "toonz/txshchildlevel.h"
@@ -60,6 +59,7 @@
 #include "duplicatepopup.h"
 #include "menubarcommandids.h"
 #include "columncommand.h"
+#include "xshcellviewer.h"  // SetCellMarkUndo
 
 // Qt includes
 #include <QClipboard>
@@ -102,7 +102,8 @@ bool isKeyframe(int r, int c) {
   TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
 
   TStageObjectId objectId =
-      (c == -1) ? TStageObjectId::CameraId(0) : TStageObjectId::ColumnId(c);
+      (c == -1) ? TStageObjectId::CameraId(xsh->getCameraColumnIndex())
+                : TStageObjectId::ColumnId(c);
 
   TStageObject *object = xsh->getStageObject(objectId);
   assert(object);
@@ -161,17 +162,14 @@ void InsertSceneFrameUndo::doInsertSceneFrame(int frame) {
   for (c = -1; c < colsCount; ++c) {
     TStageObjectId objectId;
 
-    if (c == -1) {
-#ifdef LINETEST
-      objectId = TStageObjectId::CameraId(0);
-#else
-      continue;
-#endif
-    } else
+    if (c == -1)
+      objectId = TStageObjectId::CameraId(xsh->getCameraColumnIndex());
+    else {
       objectId = TStageObjectId::ColumnId(c);
 
-    xsh->insertCells(frame, c);
-    xsh->setCell(frame, c, xsh->getCell(frame + 1, c));
+      xsh->insertCells(frame, c);
+      xsh->setCell(frame, c, xsh->getCell(frame + 1, c));
+    }
 
     if (!xsh->getColumn(c) || xsh->getColumn(c)->isLocked()) continue;
 
@@ -188,16 +186,13 @@ void InsertSceneFrameUndo::doRemoveSceneFrame(int frame) {
   for (int c = -1; c != xsh->getColumnCount(); ++c) {
     TStageObjectId objectId;
 
-    if (c == -1) {
-#ifdef LINETEST
-      objectId = TStageObjectId::CameraId(0);
-#else
-      continue;
-#endif
-    } else
+    if (c == -1)
+      objectId = TStageObjectId::CameraId(xsh->getCameraColumnIndex());
+    else {
       objectId = TStageObjectId::ColumnId(c);
 
-    xsh->removeCells(frame, c);
+      xsh->removeCells(frame, c);
+    }
 
     if (!xsh->getColumn(c) || xsh->getColumn(c)->isLocked()) continue;
 
@@ -224,8 +219,8 @@ public:
   void execute() override {
     bool currentTimeIndEnabled =
         Preferences::instance()->isCurrentTimelineIndicatorEnabled();
-    Preferences::instance()->enableCurrentTimelineIndicator(
-        !currentTimeIndEnabled);
+    Preferences::instance()->setValue(currentTimelineEnabled,
+                                      !currentTimeIndEnabled);
   }
 } toggleCurrentTimeIndicatorComman;
 
@@ -259,7 +254,8 @@ public:
     m_keyframes.resize(colsCount + 1);
 
     // Inserting the eventual camera keyframe at the end
-    TStageObject *cameraObj = xsh->getStageObject(TStageObjectId::CameraId(0));
+    TStageObject *cameraObj = xsh->getStageObject(
+        TStageObjectId::CameraId(xsh->getCameraColumnIndex()));
     if (cameraObj->isKeyframe(m_frame))
       m_keyframes[colsCount] = cameraObj->getKeyframe(m_frame);
 
@@ -286,8 +282,8 @@ public:
 
     // Deal with the eventual camera keyframe
     if (m_keyframes[cellsCount].m_isKeyframe) {
-      TStageObject *cameraObj =
-          xsh->getStageObject(TStageObjectId::CameraId(0));
+      TStageObject *cameraObj = xsh->getStageObject(
+          TStageObjectId::CameraId(xsh->getCameraColumnIndex()));
       cameraObj->setKeyframeWithoutUndo(m_frame, m_keyframes[cellsCount]);
     }
 
@@ -366,28 +362,20 @@ void GlobalKeyframeUndo::doInsertGlobalKeyframes(
     int frame, const std::vector<int> &columns) {
   TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
 
-  int i, colsCount = columns.size();
-  for (i = 0; i != colsCount; ++i) {
+  for (const int c : columns) {
     TStageObjectId objectId;
-
-    int c = columns[i];
 
     TXshColumn *column = xsh->getColumn(c);
     if (column && column->getSoundColumn()) continue;
 
-    if (c == -1) {
-#ifdef LINETEST
-      objectId = TStageObjectId::CameraId(0);
-#else
-      continue;
-#endif
-    } else
+    if (c == -1)
+      objectId = TStageObjectId::CameraId(xsh->getCameraColumnIndex());
+    else
       objectId = TStageObjectId::ColumnId(c);
 
     TXshColumn *xshColumn = xsh->getColumn(c);
-    if ((!xshColumn || xshColumn->isLocked() ||
-         xshColumn->isCellEmpty(frame)) &&
-        !objectId.isCamera())
+    if (!xshColumn || xshColumn->isLocked() ||
+        (xshColumn->isCellEmpty(frame) && !objectId.isCamera()))
       continue;
 
     TStageObject *obj = xsh->getStageObject(objectId);
@@ -401,22 +389,15 @@ void GlobalKeyframeUndo::doRemoveGlobalKeyframes(
     int frame, const std::vector<int> &columns) {
   TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
 
-  int i, colsCount = columns.size();
-  for (i = 0; i != colsCount; ++i) {
+  for (const int c : columns) {
     TStageObjectId objectId;
-
-    int c = columns[i];
 
     TXshColumn *column = xsh->getColumn(c);
     if (column && column->getSoundColumn()) continue;
 
-    if (c == -1) {
-#ifdef LINETEST
-      objectId = TStageObjectId::CameraId(0);
-#else
-      continue;
-#endif
-    } else
+    if (c == -1)
+      objectId = TStageObjectId::CameraId(xsh->getCameraColumnIndex());
+    else
       objectId = TStageObjectId::ColumnId(c);
 
     if (xsh->getColumn(c) && xsh->getColumn(c)->isLocked()) continue;
@@ -499,8 +480,9 @@ public:
       static TStageObject::Keyframe getKeyframe(int r, int c) {
         TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
 
-        TStageObjectId objectId = (c == -1) ? TStageObjectId::CameraId(0)
-                                            : TStageObjectId::ColumnId(c);
+        TStageObjectId objectId =
+            (c == -1) ? TStageObjectId::CameraId(xsh->getCameraColumnIndex())
+                      : TStageObjectId::ColumnId(c);
 
         TStageObject *object = xsh->getStageObject(objectId);
         assert(object);
@@ -531,8 +513,9 @@ public:
     for (c = 0; c != cCount; ++c) {
       int col = m_columns[c];
 
-      TStageObjectId objectId = (col == -1) ? TStageObjectId::CameraId(0)
-                                            : TStageObjectId::ColumnId(col);
+      TStageObjectId objectId =
+          (col == -1) ? TStageObjectId::CameraId(xsh->getCameraColumnIndex())
+                      : TStageObjectId::ColumnId(col);
 
       TStageObject *object = xsh->getStageObject(objectId);
       object->setKeyframeWithoutUndo(m_frame, m_keyframes[c]);
@@ -700,64 +683,93 @@ private:
   int m_row;
   int m_col;
   int m_count;
+  bool m_selected;
+  TCellSelection::Range m_range;
+  std::vector<std::pair<int, int>> emptyCells;
+  typedef std::map<std::pair<int, int>, int> FramesMap;
+  FramesMap m_frameRanges;
 
 public:
-  DrawingSubtitutionGroupUndo(int dir, int row, int col)
-      : m_direction(dir), m_col(col), m_row(row) {
-    m_count       = 1;
-    TXshCell cell = TTool::getApplication()
-                        ->getCurrentScene()
-                        ->getScene()
-                        ->getXsheet()
-                        ->getCell(m_row, m_col);
-    if (!cell.m_level ||
-        !(cell.m_level->getSimpleLevel() || cell.m_level->getChildLevel() ||
-          cell.m_level->getSoundTextLevel()))
-      return;
+  DrawingSubtitutionGroupUndo(int dir, int row, int col, bool selected,
+                              TCellSelection::Range range)
+      : m_direction(dir)
+      , m_col(col)
+      , m_row(row)
+      , m_selected(selected)
+      , m_range(range) {
+    TXsheet *xsh =
+        TTool::getApplication()->getCurrentScene()->getScene()->getXsheet();
 
-    TFrameId id = cell.m_frameId;
+    if (!selected) {
+      m_range.m_c0 = col;
+      m_range.m_r0 = row;
+      m_range.m_c1 = col;
+      m_range.m_r1 = row;
+    }
 
-    TXshCell nextCell = TTool::getApplication()
-                            ->getCurrentScene()
-                            ->getScene()
-                            ->getXsheet()
-                            ->getCell(m_row + m_count, m_col);
-    if (!nextCell.m_level ||
-        !(nextCell.m_level->getSimpleLevel() ||
-          nextCell.m_level->getChildLevel() ||
-          nextCell.m_level->getSoundTextLevel()))
-      return;
+    for (int c = m_range.m_c0; c <= m_range.m_c1; c++) {
+      for (int r = m_range.m_r0; r <= m_range.m_r1; r++) {
+        TXshCell baseCell = xsh->getCell(r, c);
 
-    TFrameId nextId = nextCell.m_frameId;
+        // Find the 1st populated cell in the column
+        if (baseCell.isEmpty()) continue;
 
-    while (id == nextId) {
-      m_count++;
-      nextCell = TTool::getApplication()
-                     ->getCurrentScene()
-                     ->getScene()
-                     ->getXsheet()
-                     ->getCell(m_row + m_count, m_col);
-      nextId = nextCell.m_frameId;
+        FramesMap::key_type frameBaseKey(r, c);
+        int frameCount    = 1;
+        TXshCell nextCell = xsh->getCell((r + frameCount), c);
+        while (nextCell == baseCell ||
+               (nextCell.isEmpty() && (r + frameCount) <= m_range.m_r1)) {
+          if (nextCell.isEmpty())
+            emptyCells.push_back(std::make_pair((r + frameCount), c));
+
+          frameCount++;
+          nextCell = xsh->getCell((r + frameCount), c);
+        }
+        m_frameRanges.insert(std::make_pair(frameBaseKey, 0));
+        m_frameRanges[frameBaseKey] = frameCount;
+        r = r + (frameCount - 1);  // Skip frames in range we've processed
+      }
     }
   }
 
   void undo() const override {
-    int n = 1;
-    DrawingSubtitutionUndo::changeDrawing(-m_direction, m_row, m_col);
-    while (n < m_count) {
-      DrawingSubtitutionUndo::changeDrawing(-m_direction, m_row + n, m_col);
-      n++;
+    TXsheet *xsh =
+        TTool::getApplication()->getCurrentScene()->getScene()->getXsheet();
+    FramesMap::const_iterator ct;
+    for (ct = m_frameRanges.begin(); ct != m_frameRanges.end(); ++ct) {
+      int n = 0;
+      while (n < ct->second) {
+        int row = ct->first.first + n;
+        int col = ct->first.second;
+        std::vector<std::pair<int, int>>::const_iterator it;
+        bool found = false;
+        for (it = emptyCells.begin(); it != emptyCells.end(); ++it) {
+          if (it->first == row && it->second == col) {
+            xsh->clearCells(row, col);
+            found = true;
+          }
+        }
+
+        if (!found)
+          DrawingSubtitutionUndo::changeDrawing(-m_direction, row, col);
+        n++;
+      }
     }
+
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
     TApp::instance()->getCurrentScene()->setDirtyFlag(true);
   }
 
   void redo() const override {
-    int n = 1;
-    DrawingSubtitutionUndo::changeDrawing(m_direction, m_row, m_col);
-    while (n < m_count) {
-      DrawingSubtitutionUndo::changeDrawing(m_direction, m_row + n, m_col);
-      n++;
+    FramesMap::const_iterator ct;
+    for (ct = m_frameRanges.begin(); ct != m_frameRanges.end(); ++ct) {
+      int n = 0;
+      while (n < ct->second) {
+        int row = ct->first.first + n;
+        int col = ct->first.second;
+        DrawingSubtitutionUndo::changeDrawing(m_direction, row, col);
+        n++;
+      }
     }
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
     TApp::instance()->getCurrentScene()->setDirtyFlag(true);
@@ -782,19 +794,17 @@ bool DrawingSubtitutionUndo::changeDrawing(int delta, int row, int col) {
   bool usePrevCell        = false;
   if (cell.isEmpty()) {
     TXshCell prevCell = xsh->getCell(row - 1, col);
-    if (prevCell.isEmpty() ||
-        !(prevCell.m_level->getSimpleLevel() ||
-          prevCell.m_level->getChildLevel() ||
-          prevCell.m_level->getSoundTextLevel()))
+    if (prevCell.isEmpty() || !(prevCell.m_level->getSimpleLevel() ||
+                                prevCell.m_level->getChildLevel() ||
+                                prevCell.m_level->getSoundTextLevel()))
       return false;
     cell        = prevCell;
     usePrevCell = true;
-  } else if (!cell.m_level ||
-             !(cell.m_level->getSimpleLevel() ||
-               cell.m_level->getChildLevel() ||
-               cell.m_level->getSoundTextLevel()))
+  } else if (!cell.m_level || !(cell.m_level->getSimpleLevel() ||
+                                cell.m_level->getChildLevel() ||
+                                cell.m_level->getSoundTextLevel()))
     return false;
-  TXshLevel *level  = cell.m_level->getSimpleLevel();
+  TXshLevel *level = cell.m_level->getSimpleLevel();
   if (!level) level = cell.m_level->getChildLevel();
   if (!level) level = cell.m_level->getSoundTextLevel();
 
@@ -872,7 +882,7 @@ static void drawingSubstituion(int dir) {
   TCellSelection::Range range;
   bool selected = false;
   if (selection) {
-    range                            = selection->getSelectedCells();
+    range = selection->getSelectedCells();
     if (!(range.isEmpty())) selected = true;
   }
   int row = TTool::getApplication()->getCurrentFrame()->getFrame();
@@ -886,15 +896,19 @@ static void drawingSubstituion(int dir) {
 }
 
 static void drawingSubstituionGroup(int dir) {
+  TCellSelection *selection = dynamic_cast<TCellSelection *>(
+      TTool::getApplication()->getCurrentSelection()->getSelection());
+  TCellSelection::Range range;
+  bool selected = false;
+  if (selection) {
+    range = selection->getSelectedCells();
+    if (!(range.isEmpty())) selected = true;
+  }
   int row = TTool::getApplication()->getCurrentFrame()->getFrame();
   int col = TTool::getApplication()->getCurrentColumn()->getColumnIndex();
-  TXshCell cell =
-      TApp::instance()->getCurrentScene()->getScene()->getXsheet()->getCell(
-          row, col);
-  bool isEmpty = cell.isEmpty();
-  if (isEmpty) return;
+
   DrawingSubtitutionGroupUndo *undo =
-      new DrawingSubtitutionGroupUndo(dir, row, col);
+      new DrawingSubtitutionGroupUndo(dir, row, col, selected, range);
   TUndoManager::manager()->add(undo);
   undo->redo();
 }
@@ -980,6 +994,8 @@ static void newNoteLevel() {
   TTool::Application *app = TTool::getApplication();
   TXsheet *xsh            = app->getCurrentScene()->getScene()->getXsheet();
   int col = TTool::getApplication()->getCurrentColumn()->getColumnIndex();
+  if (col < 0)
+    col = 0;  // Normally insert before. In case of camera, insert after
   TXshSoundTextColumn *textSoundCol = new TXshSoundTextColumn();
 
   textSoundCol->setXsheet(xsh);
@@ -1035,7 +1051,10 @@ static void removeEmptyColumns() {
     if (!column || column->isEmpty()) indices.insert(i);
   }
 
-  if (indices.size()) ColumnCmd::deleteColumns(indices, false, false);
+  if (indices.empty()) return;
+  if (!ColumnCmd::checkExpressionReferences(indices)) return;
+
+  ColumnCmd::deleteColumns(indices, false, false);
 
   app->getCurrentXsheet()->notifyXsheetChanged();
 }
@@ -1071,13 +1090,10 @@ public:
     int col;
     for (col = -1; col < xsh->getColumnCount(); col++) {
       TStageObjectId objectId;
-#ifdef LINETEST
-      if (col == -1) objectId = TStageObjectId::CameraId(0);
-#else
-      if (col == -1) continue;
-#endif
+      if (col == -1 && Preferences::instance()->isXsheetCameraColumnVisible())
+        objectId = TStageObjectId::CameraId(xsh->getCameraColumnIndex());
       else
-        objectId           = TStageObjectId::ColumnId(col);
+        objectId = TStageObjectId::ColumnId(col);
       TStageObject *pegbar = xsh->getStageObject(objectId);
       if (pegbar->isKeyframe(row)) selection->select(row, col);
     }
@@ -1094,18 +1110,19 @@ public:
 
   void execute() override {
     TApp *app                     = TApp::instance();
+    ToonzScene *scene             = app->getCurrentScene()->getScene();
+    TXsheet *xsh                  = scene->getXsheet();
     TKeyframeSelection *selection = dynamic_cast<TKeyframeSelection *>(
         app->getCurrentSelection()->getSelection());
     if (!selection) return;
     int col                 = app->getCurrentColumn()->getColumnIndex();
     TStageObjectId objectId = app->getCurrentObject()->getObjectId();
-    if (app->getCurrentObject()->getObjectId() == TStageObjectId::CameraId(0)) {
-      objectId = TStageObjectId::CameraId(0);
+    if (app->getCurrentObject()->getObjectId() ==
+        TStageObjectId::CameraId(xsh->getCameraColumnIndex())) {
+      objectId = TStageObjectId::CameraId(xsh->getCameraColumnIndex());
       col      = -1;
     }
     selection->selectNone();
-    ToonzScene *scene    = app->getCurrentScene()->getScene();
-    TXsheet *xsh         = scene->getXsheet();
     TStageObject *pegbar = xsh->getStageObject(objectId);
     TStageObject::KeyframeMap keyframes;
     pegbar->getKeyframes(keyframes);
@@ -1135,13 +1152,10 @@ public:
     int col;
     for (col = -1; col < xsh->getColumnCount(); col++) {
       TStageObjectId objectId;
-#ifdef LINETEST
-      if (col == -1) objectId = TStageObjectId::CameraId(0);
-#else
-      if (col == -1) continue;
-#endif
+      if (col == -1 && Preferences::instance()->isXsheetCameraColumnVisible())
+        objectId = TStageObjectId::CameraId(xsh->getCameraColumnIndex());
       else
-        objectId           = TStageObjectId::ColumnId(col);
+        objectId = TStageObjectId::ColumnId(col);
       TStageObject *pegbar = xsh->getStageObject(objectId);
       TStageObject::KeyframeMap keyframes;
       pegbar->getKeyframes(keyframes);
@@ -1175,13 +1189,10 @@ public:
     TXsheet *xsh      = scene->getXsheet();
     for (int col = -1; col < xsh->getColumnCount(); col++) {
       TStageObjectId objectId;
-#ifdef LINETEST
-      if (col == -1) objectId = TStageObjectId::CameraId(0);
-#else
-      if (col == -1) continue;
-#endif
+      if (col == -1 && Preferences::instance()->isXsheetCameraColumnVisible())
+        objectId = TStageObjectId::CameraId(xsh->getCameraColumnIndex());
       else
-        objectId           = TStageObjectId::ColumnId(col);
+        objectId = TStageObjectId::ColumnId(col);
       TStageObject *pegbar = xsh->getStageObject(objectId);
       TStageObject::KeyframeMap keyframes;
       pegbar->getKeyframes(keyframes);
@@ -1217,13 +1228,10 @@ public:
     int col;
     for (col = -1; col < xsh->getColumnCount(); col++) {
       TStageObjectId objectId;
-#ifdef LINETEST
-      if (col == -1) objectId = TStageObjectId::CameraId(0);
-#else
-      if (col == -1) continue;
-#endif
+      if (col == -1 && Preferences::instance()->isXsheetCameraColumnVisible())
+        objectId = TStageObjectId::CameraId(xsh->getCameraColumnIndex());
       else
-        objectId           = TStageObjectId::ColumnId(col);
+        objectId = TStageObjectId::ColumnId(col);
       TStageObject *pegbar = xsh->getStageObject(objectId);
       TStageObject::KeyframeMap keyframes;
       pegbar->getKeyframes(keyframes);
@@ -1260,9 +1268,9 @@ public:
 
     TStageObjectId objectId =
         TApp::instance()->getCurrentObject()->getObjectId();
-#ifdef LINETEST
-    if (objectId == TStageObjectId::CameraId(0)) currentColumn = -1;
-#endif
+    if (objectId == TStageObjectId::CameraId(xsh->getCameraColumnIndex()) &&
+        Preferences::instance()->isXsheetCameraColumnVisible())
+      currentColumn = -1;
     TStageObject *pegbar = xsh->getStageObject(objectId);
     TStageObject::KeyframeMap keyframes;
     pegbar->getKeyframes(keyframes);
@@ -1297,9 +1305,9 @@ public:
     TXsheet *xsh      = scene->getXsheet();
     TStageObjectId objectId =
         TApp::instance()->getCurrentObject()->getObjectId();
-#ifdef LINETEST
-    if (objectId == TStageObjectId::CameraId(0)) currentColumn = -1;
-#endif
+    if (objectId == TStageObjectId::CameraId(xsh->getCameraColumnIndex()) &&
+        Preferences::instance()->isXsheetCameraColumnVisible())
+      currentColumn = -1;
     TStageObject *pegbar = xsh->getStageObject(objectId);
     TStageObject::KeyframeMap keyframes;
     pegbar->getKeyframes(keyframes);
@@ -1335,13 +1343,10 @@ public:
     int col;
     for (col = -1; col <= currentColumn; col++) {
       TStageObjectId objectId;
-#ifdef LINETEST
-      if (col == -1) objectId = TStageObjectId::CameraId(0);
-#else
-      if (col == -1) continue;
-#endif
+      if (col == -1 && Preferences::instance()->isXsheetCameraColumnVisible())
+        objectId = TStageObjectId::CameraId(xsh->getCameraColumnIndex());
       else
-        objectId           = TStageObjectId::ColumnId(col);
+        objectId = TStageObjectId::ColumnId(col);
       TStageObject *pegbar = xsh->getStageObject(objectId);
       TStageObject::KeyframeMap keyframes;
       pegbar->getKeyframes(keyframes);
@@ -1373,22 +1378,23 @@ public:
     int currentRow    = app->getCurrentFrame()->getFrame();
     int currentColumn = app->getCurrentColumn()->getColumnIndex();
 
-    TStageObjectId objectId =
-        TApp::instance()->getCurrentObject()->getObjectId();
-#ifdef LINETEST
-    if (objectId == TStageObjectId::CameraId(0)) currentColumn = -1;
-#endif
-
-    selection->selectNone();
     ToonzScene *scene = app->getCurrentScene()->getScene();
     TXsheet *xsh      = scene->getXsheet();
+
+    TStageObjectId objectId =
+        TApp::instance()->getCurrentObject()->getObjectId();
+    if (objectId == TStageObjectId::CameraId(xsh->getCameraColumnIndex()) &&
+        Preferences::instance()->isXsheetCameraColumnVisible())
+      currentColumn = -1;
+
+    selection->selectNone();
     int col;
     for (col = currentColumn; col < xsh->getColumnCount(); col++) {
       TStageObjectId objectId;
       if (col == -1)
-        objectId = TStageObjectId::CameraId(0);
+        objectId = TStageObjectId::CameraId(xsh->getCameraColumnIndex());
       else
-        objectId           = TStageObjectId::ColumnId(col);
+        objectId = TStageObjectId::ColumnId(col);
       TStageObject *pegbar = xsh->getStageObject(objectId);
       TStageObject::KeyframeMap keyframes;
       pegbar->getKeyframes(keyframes);
@@ -1422,13 +1428,10 @@ public:
     int col;
     for (col = -1; col < xsh->getColumnCount(); col++) {
       TStageObjectId objectId;
-#ifdef LINETEST
-      if (col == -1) objectId = TStageObjectId::CameraId(0);
-#else
-      if (col == -1) continue;
-#endif
+      if (col == -1 && Preferences::instance()->isXsheetCameraColumnVisible())
+        objectId = TStageObjectId::CameraId(xsh->getCameraColumnIndex());
       else
-        objectId           = TStageObjectId::ColumnId(col);
+        objectId = TStageObjectId::ColumnId(col);
       TStageObject *pegbar = xsh->getStageObject(objectId);
       TStageObject::KeyframeMap keyframes;
       pegbar->getKeyframes(keyframes);
@@ -1687,6 +1690,63 @@ public:
 
 } ResetArrowCommand;
 
+//-----------------------------------------------------------------------------
+// Unify commands for all types of interpolation
+class SetInterpolation final : public MenuItemHandler {
+  TDoubleKeyframe::Type m_type;
+
+public:
+  SetInterpolation(CommandId cmdId, TDoubleKeyframe::Type type)
+      : MenuItemHandler(cmdId), m_type(type) {}
+
+  void execute() override {
+    TApp *app    = TApp::instance();
+    TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
+    int row      = app->getCurrentFrame()->getFrame();
+
+    TStageObjectId objectId = app->getCurrentObject()->getObjectId();
+    TStageObject *pegbar    = xsh->getStageObject(objectId);
+    if (!pegbar) return;
+
+    int r0, r1;
+    double ease0, ease1;
+
+    pegbar->getKeyframeSpan(row, r0, ease0, r1, ease1);
+
+    KeyFrameHandleCommandUndo *undo =
+        new KeyFrameHandleCommandUndo(objectId, r0, r1);
+
+    TStageObject::Keyframe k0 = pegbar->getKeyframe(r0);
+    TStageObject::Keyframe k1 = pegbar->getKeyframe(r1);
+
+    for (int i = 0; i < TStageObject::T_ChannelCount; i++) {
+      k0.m_channels[i].m_type     = m_type;
+      k1.m_channels[i].m_prevType = m_type;
+    }
+    pegbar->setKeyframeWithoutUndo(r0, k0);
+    pegbar->setKeyframeWithoutUndo(r1, k1);
+
+    TUndoManager::manager()->add(undo);
+
+    TApp::instance()->getCurrentScene()->setDirtyFlag(true);
+    TApp::instance()->getCurrentObject()->notifyObjectIdChanged(false);
+  }
+
+} UseLinearInterpolation(MI_UseLinearInterpolation, TDoubleKeyframe::Linear),
+    UseSpeedInOutInterpolation(MI_UseSpeedInOutInterpolation,
+                               TDoubleKeyframe::SpeedInOut),
+    UseEaseInOutInterpolation(MI_UseEaseInOutInterpolation,
+                              TDoubleKeyframe::EaseInOut),
+    UseEaseInOutPctInterpolation(MI_UseEaseInOutPctInterpolation,
+                                 TDoubleKeyframe::EaseInOutPercentage),
+    UseExponentialInterpolation(MI_UseExponentialInterpolation,
+                                TDoubleKeyframe::Exponential),
+    UseExpressionInterpolation(MI_UseExpressionInterpolation,
+                               TDoubleKeyframe::Expression),
+    UseFileInterpolation(MI_UseFileInterpolation, TDoubleKeyframe::File),
+    UseConstantInterpolation(MI_UseConstantInterpolation,
+                             TDoubleKeyframe::Constant);
+
 //===========================================================
 //    To Be Reworked
 //===========================================================
@@ -1721,9 +1781,9 @@ void readParameters() {
     while (is.matchTag(tagName)) {
       if (tagName == "page") {
         std::string s;
-        s                                       = is.getTagAttribute("rows");
-        if (s != "" && isInt(s)) rowsPerPage    = std::stoi(s);
-        s                                       = is.getTagAttribute("columns");
+        s = is.getTagAttribute("rows");
+        if (s != "" && isInt(s)) rowsPerPage = std::stoi(s);
+        s = is.getTagAttribute("columns");
         if (s != "" && isInt(s)) columnsPerPage = std::stoi(s);
       } else if (tagName == "info") {
         std::string name  = is.getTagAttribute("name");
@@ -1879,7 +1939,7 @@ void XsheetWriter::numericColumnHeader(ostream &os, int c) {
 void XsheetWriter::cell(ostream &os, int r, int c) {
   TXshCell prevCell;
   if (r > 0) prevCell = m_xsh->getCell(r - 1, c);
-  TXshCell cell       = m_xsh->getCell(r, c);
+  TXshCell cell = m_xsh->getCell(r, c);
   if (cell.isEmpty())
     os << "<td class='emptycell'>&nbsp;</td>";
   else {
@@ -1924,7 +1984,7 @@ void XsheetWriter::numericCell(ostream &os, int r, int c) {
   TMeasure *measure = curve->getMeasure();
   if (measure) {
     const TUnit *unit = measure->getCurrentUnit();
-    if (unit) v       = unit->convertTo(v);
+    if (unit) v = unit->convertTo(v);
   }
 
   os << "<td class='" << (c > 0 ? "numeric" : "first_numeric") << "'>";
@@ -2063,3 +2123,64 @@ void PrintXsheetCommand::execute() {
 
   TSystem::showDocument(fp);
 }
+
+//-----------------------------------------------------------------------------
+
+class ToggleXsheetCameraColumnCommand final : public MenuItemHandler {
+public:
+  ToggleXsheetCameraColumnCommand()
+      : MenuItemHandler(MI_ToggleXsheetCameraColumn) {}
+
+  void execute() override {
+    Preferences *pref = Preferences::instance();
+    if (!pref->isShowKeyframesOnXsheetCellAreaEnabled()) {
+      DVGui::warning(
+          QObject::tr("Please enable \"Show Keyframes on Cell Area\" to show "
+                      "or hide the camera column."));
+      return;
+    }
+
+    pref->setValue(showXsheetCameraColumn,
+                   !pref->isXsheetCameraColumnVisible());
+    TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+  }
+
+} ToggleXsheetCameraColumnCommand;
+
+//-----------------------------------------------------------------------------
+
+class SetCellMarkCommand final : public MenuItemHandler {
+  int m_markId;
+
+public:
+  SetCellMarkCommand(int markId)
+      : MenuItemHandler(
+            ((std::string)MI_SetCellMark + std::to_string(markId)).c_str())
+      , m_markId(markId) {}
+
+  void execute() override {
+    TApp *app         = TApp::instance();
+    TXsheet *xsh      = app->getCurrentXsheet()->getXsheet();
+    int currentRow    = app->getCurrentFrame()->getFrame();
+    int currentColumn = app->getCurrentColumn()->getColumnIndex();
+    if (!xsh->getColumn(currentColumn)) return;
+    TXshCellColumn *cellColumn = xsh->getColumn(currentColumn)->getCellColumn();
+    if (!cellColumn) return;
+    XsheetGUI::SetCellMarkUndo *undo =
+        new XsheetGUI::SetCellMarkUndo(currentRow, currentColumn, m_markId);
+    undo->redo();
+    TUndoManager::manager()->add(undo);
+  }
+};
+SetCellMarkCommand CellMarkCommand0(0);
+SetCellMarkCommand CellMarkCommand1(1);
+SetCellMarkCommand CellMarkCommand2(2);
+SetCellMarkCommand CellMarkCommand3(3);
+SetCellMarkCommand CellMarkCommand4(4);
+SetCellMarkCommand CellMarkCommand5(5);
+SetCellMarkCommand CellMarkCommand6(6);
+SetCellMarkCommand CellMarkCommand7(7);
+SetCellMarkCommand CellMarkCommand8(8);
+SetCellMarkCommand CellMarkCommand9(9);
+SetCellMarkCommand CellMarkCommand10(10);
+SetCellMarkCommand CellMarkCommand11(11);

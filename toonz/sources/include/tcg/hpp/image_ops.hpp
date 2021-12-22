@@ -6,7 +6,6 @@
 // tcg includes
 #include "../image_ops.h"
 #include "../pixel.h"
-#include "../unique_ptr.h"
 
 // STD includes
 #include <assert.h>
@@ -177,7 +176,7 @@ void blurRows(const ImgIn &imgIn, ImgOut &imgOut, int radius, Scalar) {
       outWrap = image_traits<ImgOut>::wrap(imgOut);
 
   // Allocate an intermediate line of pixels to store sum values
-  tcg::unique_ptr<PixSum[]> sums(new PixSum[inLx]);
+  std::unique_ptr<PixSum[]> sums(new PixSum[inLx]);
 
   // Filter rows
   for (int y = 0; y != inLy; ++y) {
@@ -210,8 +209,8 @@ void blurRows(const ImgIn &imgIn, ImgOut &imgOut, int radius,
       outWrap = image_traits<ImgOut>::wrap(imgOut);
 
   // Allocate an intermediate line of pixels to store sum values
-  tcg::unique_ptr<PixSum[]> sums(new PixSum[inLx]);
-  tcg::unique_ptr<int[]> counts(new int[inLx]);
+  std::unique_ptr<PixSum[]> sums(new PixSum[inLx]);
+  std::unique_ptr<int[]> counts(new int[inLx]);
 
   // Filter rows
   for (int y = 0; y != inLy; ++y) {
@@ -244,7 +243,7 @@ void blurCols(const ImgIn &imgIn, ImgOut &imgOut, int radius, Scalar) {
       outWrap = image_traits<ImgOut>::wrap(imgOut);
 
   // Allocate an intermediate line of pixels to store sum values
-  tcg::unique_ptr<PixSum[]> sums(new PixSum[inLy]);
+  std::unique_ptr<PixSum[]> sums(new PixSum[inLy]);
 
   // Filter columns
   for (int x = 0; x != inLx; ++x) {
@@ -278,8 +277,8 @@ void blurCols(const ImgIn &imgIn, ImgOut &imgOut, int radius,
       outWrap = image_traits<ImgOut>::wrap(imgOut);
 
   // Allocate an intermediate line of pixels to store sum values
-  tcg::unique_ptr<PixSum[]> sums(new PixSum[inLy]);
-  tcg::unique_ptr<int[]> counts(new int[inLy]);
+  std::unique_ptr<PixSum[]> sums(new PixSum[inLy]);
+  std::unique_ptr<int[]> counts(new int[inLy]);
 
   // Filter columns
   for (int x = 0; x != inLx; ++x) {

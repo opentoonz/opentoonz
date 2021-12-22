@@ -6,7 +6,6 @@
 #include "timagecache.h"
 #include "tstopwatch.h"
 #include "tfiletype.h"
-#include "ttimer.h"
 
 // Images includes
 #include "trasterimage.h"
@@ -39,7 +38,6 @@
 #include "toonz/toonzscene.h"
 #include "toonz/txshlevel.h"
 #include "toonz/txsheet.h"
-#include "toonz/sceneproperties.h"
 #include "toonz/tcamera.h"
 #include "toonz/palettecontroller.h"
 
@@ -78,13 +76,13 @@ The most important method of the class is \b getRaster(), which attempts
 retrieval of a certain
 frame and, if the frame was not calculated yet, makes the Previewer build it.
 \n
-The update() slot is provided to refresh the cached informations about the
+The update() slot is provided to refresh the cached information about the
 entire collection
 of currently stored frames. Updated frames are recalculated only upon a new
 getRaster(), in case the previously
-stored informations no more match the current frame description.
+stored information no more match the current frame description.
 \n
-The clear() methods make the Previewer erase all stored informations about one
+The clear() methods make the Previewer erase all stored information about one
 or all frames,
 so that the following getRaster() will forcibly recalculate the requested frame.
 */
@@ -116,7 +114,7 @@ void buildNodeTreeDescription(std::string &desc, const TFxP &root);
 inline bool contains(const QRegion &region, const TRect &rect) {
   return QRegion(toQRect(rect)).subtracted(region).isEmpty();
 }
-}
+}  // namespace
 
 //======================================================================================
 //    Internal classes declaration
@@ -385,7 +383,7 @@ void Previewer::Imp::updateFrameRange() {
   // Resize the progress bar status
   int i, oldSize = m_pbStatus.size();
   m_pbStatus.resize(newFrameCount);
-  for (i          = oldSize; i < newFrameCount; ++i)
+  for (i = oldSize; i < newFrameCount; ++i)
     m_pbStatus[i] = FlipSlider::PBFrameNotStarted;
 }
 
@@ -467,10 +465,9 @@ void Previewer::Imp::updateAliases() {
     std::string newAlias =
         fxPair.m_frameA ? fxPair.m_frameA->getAlias(it->first, m_renderSettings)
                         : "";
-    newAlias =
-        newAlias + (fxPair.m_frameB
-                        ? fxPair.m_frameB->getAlias(it->first, m_renderSettings)
-                        : "");
+    newAlias = newAlias + (fxPair.m_frameB ? fxPair.m_frameB->getAlias(
+                                                 it->first, m_renderSettings)
+                                           : "");
 
     if (newAlias != it->second.m_alias) {
       // Clear the remaining frame infos
@@ -485,16 +482,14 @@ void Previewer::Imp::updateAliasKeyword(const std::string &keyword) {
   std::map<int, FrameInfo>::iterator it;
   for (it = m_frames.begin(); it != m_frames.end(); ++it) {
     if (it->second.m_alias.find(keyword) != std::string::npos) {
-      TFxPair fxPair = buildSceneFx(it->first);
-      it->second.m_alias =
-          fxPair.m_frameA
-              ? fxPair.m_frameA->getAlias(it->first, m_renderSettings)
-              : "";
-      it->second.m_alias =
-          it->second.m_alias +
-          (fxPair.m_frameB
-               ? fxPair.m_frameB->getAlias(it->first, m_renderSettings)
-               : "");
+      TFxPair fxPair     = buildSceneFx(it->first);
+      it->second.m_alias = fxPair.m_frameA ? fxPair.m_frameA->getAlias(
+                                                 it->first, m_renderSettings)
+                                           : "";
+      it->second.m_alias = it->second.m_alias +
+                           (fxPair.m_frameB ? fxPair.m_frameB->getAlias(
+                                                  it->first, m_renderSettings)
+                                            : "");
 
       // Clear the remaining frame infos
       it->second.m_renderedRegion = QRegion();
@@ -623,7 +618,7 @@ inline void Previewer::Imp::notifyUpdate() {
 
 //-----------------------------------------------------------------------------
 
-//! Adds the renderized image to TImageCache; listeneres are advised too.
+//! Adds the renderized image to TImageCache; listeners are advised too.
 void Previewer::Imp::onRenderRasterStarted(const RenderData &renderData) {
   // Emit the started signal to execute code in the main thread
   m_owner->emitStartedFrame(renderData);
@@ -645,7 +640,7 @@ void Previewer::Imp::doOnRenderRasterStarted(const RenderData &renderData) {
 
 //-----------------------------------------------------------------------------
 
-//! Adds the renderized image to TImageCache; listeneres are advised too.
+//! Adds the renderized image to TImageCache; listeners are advised too.
 void Previewer::Imp::onRenderRasterCompleted(const RenderData &renderData) {
   if (renderData.m_rasB) {
     RenderData _renderData = renderData;
@@ -739,7 +734,7 @@ void Previewer::Imp::onRenderFailure(const RenderData &renderData,
 
 //-----------------------------------------------------------------------------
 
-//! Adds the renderized image to TImageCache; listeneres are advised too.
+//! Adds the renderized image to TImageCache; listeners are advised too.
 void Previewer::Imp::doOnRenderRasterFailed(const RenderData &renderData) {
   m_computingFrameCount--;
 
@@ -819,8 +814,9 @@ class SavePreviewedPopup final : public FileBrowserPopup {
   Previewer *m_p;
 
 public:
-  SavePreviewedPopup() : FileBrowserPopup(tr("Save Previewed Images")) {
-    setOkText(tr("Save"));
+  SavePreviewedPopup()
+      : FileBrowserPopup(QObject::tr("Save Previewed Images")) {
+    setOkText(QObject::tr("Save"));
   }
 
   void setPreview(Previewer *p) { m_p = p; }
@@ -857,14 +853,14 @@ bool Previewer::Imp::doSaveRenderedFrames(TFilePath fp) {
     fp  = fp.withType(ext);
   }
   if (fp.getName() == "") {
-    DVGui::warning(
-        tr("The file name cannot be empty or contain any of the following "
-           "characters:(new line)  \\ / : * ? \"  |"));
+    DVGui::warning(QObject::tr(
+        "The file name cannot be empty or contain any of the following "
+        "characters:(new line)  \\ / : * ? \"  |"));
     return false;
   }
 
   if (!formats.contains(QString::fromStdString(ext))) {
-    DVGui::warning("Unsopporter raster format, cannot save");
+    DVGui::warning(QObject::tr("Unsopporter raster format, cannot save"));
     return false;
   }
 
@@ -883,18 +879,22 @@ bool Previewer::Imp::doSaveRenderedFrames(TFilePath fp) {
       TSystem::mkDir(parent);
       DvDirModel::instance()->refreshFolder(parent.getParentDir());
     } catch (TException &e) {
-      error("Cannot create " + toQString(fp.getParentDir()) + " : " +
-            QString(::to_string(e.getMessage()).c_str()));
+      error(QObject::tr("Cannot create %1 : %2",
+                        "Previewer warning %1:path %2:message")
+                .arg(toQString(fp.getParentDir()))
+                .arg(QString(::to_string(e.getMessage()).c_str())));
       return false;
     } catch (...) {
-      error("Cannot create " + toQString(fp.getParentDir()));
+      error(QObject::tr("Cannot create %1", "Previewer warning %1:path")
+                .arg(toQString(fp.getParentDir())));
       return false;
     }
   }
 
   if (TSystem::doesExistFileOrLevel(fp)) {
-    QString question(tr("File %1 already exists.\nDo you want to overwrite it?")
-                         .arg(toQString(fp)));
+    QString question(
+        QObject::tr("File %1 already exists.\nDo you want to overwrite it?")
+            .arg(toQString(fp)));
     int ret = DVGui::MsgBox(question, QObject::tr("Overwrite"),
                             QObject::tr("Cancel"), 0);
     if (ret == 2) return false;
@@ -936,7 +936,7 @@ void Previewer::Imp::saveFrame() {
     if (!Pd) break;
 
     // Ensure that current frame actually have to be saved
-    int currFrameToSave = m_currentFrameToSave - 1;
+    int currFrameToSave                   = m_currentFrameToSave - 1;
     std::map<int, FrameInfo>::iterator it = m_frames.find(currFrameToSave);
     if (it == m_frames.end()) continue;
 
@@ -961,12 +961,14 @@ void Previewer::Imp::saveFrame() {
   }
 
   // Output the save result
-  QString str = "Saved " + QString(std::to_string(savedFrames).c_str()) +
-                " frames out of " +
-                QString(std::to_string(frameCount).c_str()) + " in " +
-                QString(::to_string(m_lw->getFilePath()).c_str());
+  QString str =
+      QObject::tr("Saved %1 frames out of %2 in %3",
+                  "Previewer %1:savedframes %2:framecount %3:filepath")
+          .arg(QString(std::to_string(savedFrames).c_str()))
+          .arg(QString(std::to_string(frameCount).c_str()))
+          .arg(QString(::to_string(m_lw->getFilePath()).c_str()));
 
-  if (!Pd) str = "Canceled! " + str;
+  if (!Pd) str = QObject::tr("Canceled! ", "Previewer") + str;
 
   ProgressBarMessager(eEnd, 0, str).send();
 
@@ -1101,16 +1103,16 @@ void Previewer::saveFrame() { m_imp->saveFrame(); }
 
 void Previewer::saveRenderedFrames() {
   if (TApp::instance()->getCurrentXsheet()->getXsheet()->getFrameCount() == 0) {
-    info("No frame to save!");
+    info(QObject::tr("No frame to save!"));
     return;
   }
   if (m_imp->m_currentFrameToSave != 0) {
-    info("Already saving!");
+    info(QObject::tr("Already saving!"));
     return;
   }
 
   static SavePreviewedPopup *savePopup = 0;
-  if (!savePopup) savePopup            = new SavePreviewedPopup;
+  if (!savePopup) savePopup = new SavePreviewedPopup;
 
   savePopup->setPreview(this);
 

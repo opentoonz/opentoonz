@@ -52,7 +52,7 @@ void LineEdit::keyPressEvent(QKeyEvent *event) {
       case Qt::Key_Bar:
       case Qt::Key_Period:
         DVGui::info(
-            tr("A file name cannot contains any of the following chracters: "
+            tr("A file name cannot contains any of the following characters: "
                "/\\:*?\"<>|."));
         return;
       default:

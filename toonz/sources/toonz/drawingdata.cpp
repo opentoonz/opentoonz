@@ -441,7 +441,7 @@ void DrawingData::getFrames(std::set<TFrameId> &frames) const {
 //-----------------------------------------------------------------------------
 
 DrawingData::~DrawingData() {
-  // cannot do that here! if you have cloned this class, the images in the cahce
+  // cannot do that here! if you have cloned this class, the images in the cache
   // are still used...
   // int i;
   // for(i=0; i<m_imageSet.size(); i++)

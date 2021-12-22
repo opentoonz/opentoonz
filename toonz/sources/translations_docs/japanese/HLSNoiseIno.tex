@@ -1,0 +1,422 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[a4paper, total={180mm, 272mm}]{geometry}
+
+\usepackage{fontspec}
+\setmainfont[Path=fonts/, Extension=.ttf]{ipaexm}
+
+\setlength\parindent{3.5em}
+\setlength\parskip{0em}
+\renewcommand{\baselinestretch}{1.247}
+
+\usepackage{eepic}
+\usepackage{xcolor}
+
+\usepackage{graphicx}
+\graphicspath{{images/}}
+
+\begin{document}
+
+\thispagestyle{empty}
+
+\Large
+\noindent \\
+HLS Noise Ino\medskip
+\par
+\normalsize
+色相、明度、彩度、Alpha にドットノイズを加えます。\par
+セル画調の絵にノイズを加え、背景の絵に馴染ませることを目的と\par
+して開発しました。\\
+\par
+Alpha チャンネルによってノイズの強さが決まります。よって、滑\par
+らかなエッジは滑らかなままです。\par
+Alpha チャンネル自身のノイズの強さも、自身の値を見ます。\\
+\par
+結果をチェックするときは、サブカメラを使わないでください。\par
+サブカメラは入力画像の範囲が違うため、ノイズパターンが変わっ\par
+てしまいます。\\
+\\
+-{-}- \ 入力 \ -{-}-\\
+Source\par
+処理をする画像を接続します。\\
+Reference\par
+Pixel 毎に効果の強弱をつけるための参照画像を接続します。\\
+\\
+-{-}- \ 設定 \ -{-}-\\
+Hue\par
+色相(hue)についてノイズの強さを指定します。\par
+Pixel 値(8 or 16bits)をゼロから1の値として指定します。\par
+最小は0、最大は1です。\par
+0のときは色相(hue)に対するノイズがかかりません。\par
+初期値は0.025です。\\
+\\
+Lightness\par
+明度(lightness)についてノイズの強さを指定します。\par
+Pixel 値(8 or 16bits)をゼロから1の値として指定します。\par
+最小は0、最大は1です。\par
+0のときは明度(lightness)に対するノイズがかかりません。\par
+初期値は0.035です。\\
+\\
+Saturation\par
+彩度(saturation)についてノイズの強さを指定します。\par
+Pixel 値(8 or 16bits)をゼロから1の値として指定します。\par
+最小は0、最大は1です。\par
+0のときは彩度(saturation)に対するノイズがかかりません。\par
+初期値は0.0です。
+
+\newpage
+
+\thispagestyle{empty}
+
+\ \vspace{-0.2em}
+\par
+\noindent Alpha\par
+Alpha チャンネルについてノイズの強さを指定します。\par
+Pixel 値(8 or 16bits)をゼロから1の値として指定します。\par
+最小は0、最大は1です。\par
+0のときは Alpha チャンネルに対するノイズがかかりません。\par
+初期値は0.0です。\\
+\\
+Seed\par
+画像のノイズパターンを決定するための値です。\par
+ゼロ以上の整数値を指定します。\par
+この値が同じであれば、パターンを再現します。\par
+違う値でノイズを加えれば違うパターンになります。\par
+初期値は1です。\\
+\\
+NBlur\par
+ノイズ成分をぼかして、ドット感を減らします。\par
+最小は0、最大は1です。\par
+ドットに隣接するピクセルだけで計算しているので、非\par
+常に軽いボカシの感じになります。\par
+ゼロだとボカシはかからず、1.0で隣接するピクセルとの\par
+平均をとります。\par
+初期値は1です。\\
+\\
+Limits\par
+明度(Lightness), 彩度(Saturation), 不透明度(Alpha)の、\par
+端値(0 or 1付近)に対する効果調整をします。\par
+ゼロや1付近でノイズをかけると、ゼロ以下あるいは1以上の値が\par
+現われますが、表現できないので、それぞれゼロあるいは1に切り\par
+詰められます。その切り詰めを補填する効果です。\par
+-{-}> \textquotedbl 端値における Noise 効果調整 \ \ 図1 \ \ 比較\textquotedbl 参照\par
+-{-}> \textquotedbl 端値における Noise 効果調整 \ \ 図2 \ \ 説明\textquotedbl 参照\\
+\par
+\noindent \ \ \, Effective\par
+この効果(Limits)の強さを決めます。\par
+ゼロならなにも効果はありません。ゼロより大きい値で効果が表\par
+われます。1が最強です。\par
+初期値はゼロです。\\
+\par
+\noindent \ \ \, Center\par
+効果の中心です。\par
+ノイズ範囲のずれ幅、あるいは、ノイズ幅の減少の効果は、ゼロ\par
+あるいは1の端値の部分で最も強く、中心では効果がありません。
+
+\newpage
+
+\thispagestyle{empty}
+
+\ \vspace{-0.2em}
+\par
+この効果のない中心値の位置をきめます。\par
+ゼロから1の間で指定します。\par
+ゼロだと、値がゼロの Pixel には効果がでなくなります。\par
+1だと、値が1の Pixel には効果がでなくなります。\par
+初期値は0.5が中心です。\\
+\par
+\noindent \ \ \, Type\par
+効果のタイプを撰択します。\par
+\textquotedbl Keep Noise\textquotedbl を選ぶと、(全体的に)ノイズ範囲をずらしノイズ幅\par
+を維持、画像全体のコントラストは縮小します。\par
+\textquotedbl Keep Contrast\textquotedbl を選ぶと、端のみでノイズ幅を減らしコントラス\par
+トを維持します。\par
+初期値は\textquotedbl Keep Noise\textquotedbl です。\\
+\\
+Premultiply\par
+ON なら、RGB に対して Premultiply 済の\par
+（Alpha チャンネルの値があらかじめ RGB チャンネルに乗算されている)\par
+画像として処理します。\par
+そのとき、Alpha にも処理を加えてしまうと、正しい画像にならない場合があります。\par
+初期値は ON です。\\
+\\
+Reference\par
+Pixel 毎に効果の強弱をつけるための参照画像の値の取り方を選択します。\par
+入力の\textquotedbl Reference\textquotedbl に画像を接続し、\par
+Red/Green/Blue/Alpha/Luminance/Nothing から選びます。\par
+この効果をつけたくないときは Nothing を選ぶか、接続を切ります。\par
+初期値は Red です。
+
+\newpage
+
+\thispagestyle{empty}
+
+\ \vspace{1.5em}
+\par
+\noindent \hskip 2.2em 図1 端値における Noise 効果比較\\[0.4em]
+\par
+\scriptsize
+\noindent \hskip 3.4em Original\par
+\noindent \hskip 3.4em Effective がゼロ\par
+\noindent \hskip 3.4em Keep Noise\par
+\noindent \hskip 3.4em Keep Contrast
+
+\large
+\noindent \begin{picture}(0,0)
+\put(55.5,-6.5){\includegraphics[width=29.6em, height=1em]{HLSNoiseInoNoiseEffectOriginal}}
+\put(55.5,-22.5){\includegraphics[width=29.6em, height=1em]{HLSNoiseInoNoiseEffectEffectiveZero}}
+\put(55.5,-38.5){\includegraphics[width=29.6em, height=1em]{HLSNoiseInoNoiseEffectKeepNoise}}
+\put(55.5,-54.5){\includegraphics[width=29.6em, height=1em]{HLSNoiseInoNoiseEffectKeepContrast}}
+\linethickness{0.01em}
+\put(126,64){\line(-1,0){56}}
+\put(126,53){\line(-1,0){14}}
+\put(126,41){\line(-1,0){42}}
+\put(126,29.5){\line(-1,0){28}}
+\put(126,15){\line(-1,0){93}}
+\put(126,64){\line(0,-1){49}}
+\put(33,15){\line(0,-1){58}}
+\put(33,0){\line(1,0){14}}
+\put(47,0){\line(-3,2){6}}
+\put(47,0){\line(-3,-2){6}}
+\put(33,-14){\line(1,0){14}}
+\put(47,-14){\line(-3,2){6}}
+\put(47,-14){\line(-3,-2){6}}
+\put(33,-28){\line(1,0){14}}
+\put(47,-28){\line(-3,2){6}}
+\put(47,-28){\line(-3,-2){6}}
+\put(33,-43){\line(1,0){14}}
+\put(47,-43){\line(-3,2){6}}
+\put(47,-43){\line(-3,-2){6}}
+\end{picture}\\[3.6em]
+
+\normalsize
+\noindent \hskip 2.2em 図2 端値における Noise 変化範囲説明図\\[0.5em]
+\par
+\footnotesize
+\noindent \hskip 2.65em Effective がゼロ \ \ 端値はノイズ値がカットされる(default)
+
+\large
+\noindent \begin{picture}(0,0)
+\linethickness{0.01em}
+\put(54.5,-37){\line(0,1){8}}
+\put(54.5,-37){\line(-2,3){3}}
+\put(54.5,-37){\line(2,3){3}}
+\put(482,-37){\line(0,1){8}}
+\put(482,-37){\line(-2,3){3}}
+\put(482,-37){\line(2,3){3}}
+\put(54.5,-58){\line(0,1){6}}
+\put(482,-58){\line(0,1){6}}
+
+\put(27,-45.5){\line(1,0){56}}
+\put(27,-45.5){\line(3,2){6}}
+\put(27,-45.5){\line(3,-2){6}}
+\put(83,-45.5){\line(-3,2){6}}
+\put(83,-45.5){\line(-3,-2){6}}
+
+\put(255,-45.5){\line(1,0){56}}
+\put(255,-45.5){\line(3,2){6}}
+\put(255,-45.5){\line(3,-2){6}}
+\put(311,-45.5){\line(-3,2){6}}
+\put(311,-45.5){\line(-3,-2){6}}
+
+\put(455,-45.5){\line(1,0){56}}
+\put(455,-45.5){\line(3,2){6}}
+\put(455,-45.5){\line(3,-2){6}}
+\put(511,-45.5){\line(-3,2){6}}
+\put(511,-45.5){\line(-3,-2){6}}
+
+\put(61,-67){\line(1,0){15}}
+\put(61,-67){\line(3,2){6}}
+\put(61,-67){\line(3,-2){6}}
+\put(52,-70){\scriptsize{0}}
+\put(78,-74){\footnotesize{0以下のノイズは0に制限される}}
+
+\put(471,-67){\line(-1,0){15}}
+\put(471,-67){\line(-3,2){6}}
+\put(471,-67){\line(-3,-2){6}}
+\put(476,-70){\scriptsize{1.0}}
+\put(312,-74){\footnotesize{1以上のノイズは1に制限される}}
+
+\linethickness{0.2em}
+\put(54.5,-38){\line(1,0){428}}
+\linethickness{2.8em}
+\put(49,-1.5){\line(1,0){439}}
+\linethickness{2.75em}
+\color{lightgray}
+\put(45.5,-1.5){\line(1,0){438}}
+\put(51,-0.5){\includegraphics[width=29.55em, height=1em]{HLSNoiseInoNoiseEffectOriginal}}
+\put(51,-16.5){\includegraphics[width=29.55em, height=1em]{HLSNoiseInoNoiseEffectEffectiveZero}}
+\end{picture}\\[5.7em]
+
+\footnotesize
+\noindent \hskip 2.65em Keep Noise \ \ シフトしてノイズを維持。コントラストは縮小。全体的にノイズ位置がずれる
+
+\large
+\noindent \begin{picture}(0,0)
+\linethickness{0.01em}
+\put(255,-45.5){\line(1,0){56}}
+\put(255,-45.5){\line(3,2){6}}
+\put(255,-45.5){\line(3,-2){6}}
+\put(311,-45.5){\line(-3,2){6}}
+\put(311,-45.5){\line(-3,-2){6}}
+
+\put(158,-60){\line(0,1){8}}
+\put(158,-60){\line(-2,3){3}}
+\put(158,-60){\line(2,3){3}}
+\put(400,-60){\line(0,1){8}}
+\put(400,-60){\line(-2,3){3}}
+\put(400,-60){\line(2,3){3}}
+
+\put(144,-68.5){\line(1,0){56}}
+\put(144,-68.5){\line(3,2){6}}
+\put(144,-68.5){\line(3,-2){6}}
+\put(200,-68.5){\line(-3,2){6}}
+\put(200,-68.5){\line(-3,-2){6}}
+
+\put(357,-68.5){\line(1,0){56}}
+\put(357,-68.5){\line(3,2){6}}
+\put(357,-68.5){\line(3,-2){6}}
+\put(413,-68.5){\line(-3,2){6}}
+\put(413,-68.5){\line(-3,-2){6}}
+
+\put(107,-83){\line(0,1){8}}
+\put(107,-83){\line(-2,3){3}}
+\put(107,-83){\line(2,3){3}}
+\put(442,-83){\line(0,1){8}}
+\put(442,-83){\line(-2,3){3}}
+\put(442,-83){\line(2,3){3}}
+
+\put(102,-91.5){\line(1,0){56}}
+\put(102,-91.5){\line(3,2){6}}
+\put(102,-91.5){\line(3,-2){6}}
+\put(158,-91.5){\line(-3,2){6}}
+\put(158,-91.5){\line(-3,-2){6}}
+
+\put(392,-91.5){\line(1,0){56}}
+\put(392,-91.5){\line(3,2){6}}
+\put(392,-91.5){\line(3,-2){6}}
+\put(448,-91.5){\line(-3,2){6}}
+\put(448,-91.5){\line(-3,-2){6}}
+
+\put(58,-106){\line(0,1){8}}
+\put(58,-106){\line(-2,3){3}}
+\put(58,-106){\line(2,3){3}}
+\put(478.5,-106){\line(0,1){8}}
+\put(478.5,-106){\line(-2,3){3}}
+\put(478.5,-106){\line(2,3){3}}
+
+\put(55,-114.5){\line(1,0){56}}
+\put(55,-114.5){\line(3,2){6}}
+\put(55,-114.5){\line(3,-2){6}}
+\put(111,-114.5){\line(-3,2){6}}
+\put(111,-114.5){\line(-3,-2){6}}
+
+\put(427,-114.5){\line(1,0){56}}
+\put(427,-114.5){\line(3,2){6}}
+\put(427,-114.5){\line(3,-2){6}}
+\put(483,-114.5){\line(-3,2){6}}
+\put(483,-114.5){\line(-3,-2){6}}
+
+\put(283,-106){\line(0,1){54}}
+\put(267,-123){\scriptsize{separate}}
+
+\linethickness{0.2em}
+\put(54.5,-38){\line(1,0){428}}
+\put(54.5,-61){\line(1,0){428}}
+\put(54.5,-84){\line(1,0){428}}
+\put(54.5,-107){\line(1,0){428}}
+\linethickness{2.8em}
+\put(49,-1.5){\line(1,0){439}}
+\linethickness{2.75em}
+\color{lightgray}
+\put(45.5,-1.5){\line(1,0){438}}
+\put(51,-0.5){\includegraphics[width=29.55em, height=1em]{HLSNoiseInoNoiseEffectOriginal}}
+\put(51,-16.5){\includegraphics[width=29.55em, height=1em]{HLSNoiseInoNoiseEffectKeepNoise}}
+\end{picture}\\[9.3em]
+
+\footnotesize
+\noindent \hskip 2.65em Keep Contrast \ \ ノイズ幅を減少。コントラストを維持。端のみでノイズ幅が減る
+
+\large
+\noindent \begin{picture}(0,0)
+\linethickness{0.01em}
+\put(255,-45.5){\line(1,0){56}}
+\put(255,-45.5){\line(3,2){6}}
+\put(255,-45.5){\line(3,-2){6}}
+\put(311,-45.5){\line(-3,2){6}}
+\put(311,-45.5){\line(-3,-2){6}}
+
+\put(86,-60){\line(0,1){8}}
+\put(86,-60){\line(-2,3){3}}
+\put(86,-60){\line(2,3){3}}
+\put(450,-60){\line(0,1){8}}
+\put(450,-60){\line(-2,3){3}}
+\put(450,-60){\line(2,3){3}}
+
+\put(58,-68.5){\line(1,0){56}}
+\put(58,-68.5){\line(3,2){6}}
+\put(58,-68.5){\line(3,-2){6}}
+\put(114,-68.5){\line(-3,2){6}}
+\put(114,-68.5){\line(-3,-2){6}}
+
+\put(423,-68.5){\line(1,0){56}}
+\put(423,-68.5){\line(3,2){6}}
+\put(423,-68.5){\line(3,-2){6}}
+\put(479,-68.5){\line(-3,2){6}}
+\put(479,-68.5){\line(-3,-2){6}}
+
+\put(70,-83){\line(0,1){8}}
+\put(70,-83){\line(-2,3){3}}
+\put(70,-83){\line(2,3){3}}
+\put(468,-83){\line(0,1){8}}
+\put(468,-83){\line(-2,3){3}}
+\put(468,-83){\line(2,3){3}}
+
+\put(55,-91.5){\line(1,0){28}}
+\put(55,-91.5){\line(3,2){6}}
+\put(55,-91.5){\line(3,-2){6}}
+\put(83,-91.5){\line(-3,2){6}}
+\put(83,-91.5){\line(-3,-2){6}}
+
+\put(454,-91.5){\line(1,0){28}}
+\put(454,-91.5){\line(3,2){6}}
+\put(454,-91.5){\line(3,-2){6}}
+\put(482,-91.5){\line(-3,2){6}}
+\put(482,-91.5){\line(-3,-2){6}}
+
+\put(61,-106){\line(0,1){8}}
+\put(61,-106){\line(-2,3){3}}
+\put(61,-106){\line(2,3){3}}
+\put(476.5,-106){\line(0,1){8}}
+\put(476.5,-106){\line(-2,3){3}}
+\put(476.5,-106){\line(2,3){3}}
+
+\put(55,-114.5){\line(1,0){12}}
+\put(55,-114.5){\line(3,2){6}}
+\put(55,-114.5){\line(3,-2){6}}
+\put(67,-114.5){\line(-3,2){6}}
+\put(67,-114.5){\line(-3,-2){6}}
+
+\put(471,-114.5){\line(1,0){12}}
+\put(471,-114.5){\line(3,2){6}}
+\put(471,-114.5){\line(3,-2){6}}
+\put(483,-114.5){\line(-3,2){6}}
+\put(483,-114.5){\line(-3,-2){6}}
+
+\put(283,-106){\line(0,1){54}}
+\put(267,-123){\scriptsize{separate}}
+
+\linethickness{0.2em}
+\put(54.5,-38){\line(1,0){428}}
+\put(54.5,-61){\line(1,0){428}}
+\put(54.5,-84){\line(1,0){428}}
+\put(54.5,-107){\line(1,0){428}}
+\linethickness{2.8em}
+\put(49,-1.5){\line(1,0){439}}
+\linethickness{2.75em}
+\color{lightgray}
+\put(45.5,-1.5){\line(1,0){438}}
+\put(51,-0.5){\includegraphics[width=29.55em, height=1em]{HLSNoiseInoNoiseEffectOriginal}}
+\put(51,-16.5){\includegraphics[width=29.55em, height=1em]{HLSNoiseInoNoiseEffectKeepContrast}}
+\end{picture}
+
+\end{document}

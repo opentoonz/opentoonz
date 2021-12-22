@@ -5,9 +5,6 @@
 
 #include <algorithm>
 
-using std::min;
-using std::max;
-
 // Identifies cells by frame and layer rather than row and column
 class CellPosition {
   int _frame;  // a frame number. corresponds to row in vertical xsheet
@@ -34,8 +31,8 @@ public:
     return CellPosition(_frame * mult._frame, _layer * mult._layer);
   }
   void ensureValid() {
-    if (_frame < 0) _frame = 0;
-    if (_layer < 0) _layer = 0;
+    if (_frame < 0) _frame  = 0;
+    if (_layer < -1) _layer = -1;
   }
 };
 
@@ -46,8 +43,10 @@ class CellRange {
 public:
   CellRange() {}
   CellRange(const CellPosition &from, const CellPosition &to)
-      : _from(min(from.frame(), to.frame()), min(from.layer(), to.layer()))
-      , _to(max(from.frame(), to.frame()), max(from.layer(), to.layer())) {}
+      : _from(std::min(from.frame(), to.frame()),
+              std::min(from.layer(), to.layer()))
+      , _to(std::max(from.frame(), to.frame()),
+            std::max(from.layer(), to.layer())) {}
 
   const CellPosition &from() const { return _from; }
   const CellPosition &to() const { return _to; }

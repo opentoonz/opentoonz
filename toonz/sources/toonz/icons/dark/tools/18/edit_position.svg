@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="18px" height="18px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g transform="matrix(1.05882,0,0,1.05882,-8.53484e-16,-8.53484e-16)">
+        <rect x="0" y="0" width="17" height="17" style="fill-opacity:0;"/>
+    </g>
+    <g transform="matrix(1,0,0,1,2,1)">
+        <g id="g9">
+            <path id="polygon12_1_" d="M5.5,4L7.5,1L9.5,4L5.5,4Z" style="fill:black;fill-rule:nonzero;"/>
+        </g>
+    </g>
+    <g transform="matrix(1,0,0,1,2,2)">
+        <g id="g14">
+            <path id="polygon12_2_" d="M7.5,15L5.5,12L9.5,12L7.5,15Z" style="fill:black;fill-rule:nonzero;"/>
+        </g>
+    </g>
+    <g transform="matrix(1,0,0,1,1,1)">
+        <g id="g19">
+            <path id="polygon12_3_" d="M1,8.5L4,6.5L4,10.5L1,8.5Z" style="fill:black;fill-rule:nonzero;"/>
+        </g>
+    </g>
+    <g transform="matrix(1,0,0,1,2,1)">
+        <g id="g24">
+            <path id="polygon12_4_" d="M15,8.5L12,10.5L12,6.5L15,8.5Z" style="fill:black;fill-rule:nonzero;"/>
+        </g>
+    </g>
+    <path id="rect4_1_" d="M10,9L15,9L15,10L10,10L10,15L9,15L9,10L4,10L4,9L9,9L9,4L10,4L10,9Z" style="fill:black;"/>
+</svg>

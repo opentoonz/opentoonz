@@ -96,6 +96,7 @@ signals:
 
   void colorAutoApplyEnabled(bool enabled);
   void colorSampleChanged(const TPixel32 &);
+  void checkPaletteLock();
 
   // used for "passive pick" feature in the tool options bar of the rgb picker
   // tool

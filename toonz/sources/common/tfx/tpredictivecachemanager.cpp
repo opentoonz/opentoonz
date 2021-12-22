@@ -156,7 +156,7 @@ void TPredictiveCacheManager::Imp::getResourceTestRun(
     it->second.m_usageCount++;
   else {
     // Already initializes usageCount at 1
-    m_resources.insert(std::make_pair(resource, PredictionData(resData))).first;
+    m_resources.insert(std::make_pair(resource, PredictionData(resData)));
   }
 }
 

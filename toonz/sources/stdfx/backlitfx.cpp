@@ -201,7 +201,7 @@ public:
   ~BacklitFx() {}
   bool doGetBBox(double frame, TRectD &bbox,
                  const TRenderSettings &info) override {
-    if (getActiveTimeRegion().contains(frame))
+    if (getActiveTimeRegion().contains(frame)) {
       if (m_light.isConnected()) {
         if (m_lighted.isConnected()) {
           TRectD b0, b1;
@@ -209,10 +209,13 @@ public:
           ret      = ret && m_lighted->doGetBBox(frame, b1, info);
           bbox     = b0.enlarge(tceil(m_value->getValue(frame))) + b1;
           return ret;
-        } else
+        } else {
           return m_light->doGetBBox(frame, bbox, info);
-      } else if (m_lighted.isConnected())
+	}
+      } else if (m_lighted.isConnected()) {
         return m_lighted->doGetBBox(frame, bbox, info);
+      }
+    }
     return false;
   }
 

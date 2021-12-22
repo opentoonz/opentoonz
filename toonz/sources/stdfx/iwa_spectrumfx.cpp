@@ -127,7 +127,7 @@ void Iwa_SpectrumFx::calcBubbleMap(float3 *bubbleColor, double frame,
 
       /* compute colors for two thickness values and fade them*/
       for (int fadeId = 0; fadeId < 2; fadeId++) {
-        // if composit ratio is 0, skip computing
+        // if composite ratio is 0, skip computing
         if (tmp_ratio[fadeId] == 0.0f) continue;
 
         /* calculate the thickness of film (μm) */

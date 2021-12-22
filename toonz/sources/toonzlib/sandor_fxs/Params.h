@@ -41,12 +41,12 @@ void print()
   int i;
 
   OutputDebugString("===== PARAMS =====\n");
-  sprintf(s,"Scale=%f\n",m_scale);
+  snprintf(s, sizeof(s), "Scale=%f\n",m_scale);
   OutputDebugString(s);
   i=0;
   for( vector<EParam>::iterator p=m_params.begin();
           p!=m_params.end(); ++p,++i ){
-          sprintf(s,"--- %d. Param ---\n",i);
+          snprintf(s, sizeof(s), "--- %d. Param ---\n",i);
           OutputDebugString(s);
           p->print();
   }

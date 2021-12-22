@@ -13,11 +13,9 @@
 #include "toonz/txshlevelcolumn.h"
 #include "toonz/txshsimplelevel.h"
 #include "toonz/cleanupcolorstyles.h"
-#include "toonz/studiopalette.h"
 #include "toonz/txshlevel.h"
 #include "toonz/toonzscene.h"
 #include "toonz/toonzimageutils.h"
-#include "toonz/cleanupcolorstyles.h"
 #include "toonz/preferences.h"
 
 // TnzCore includes
@@ -50,7 +48,7 @@
 
 //===================================================================
 
-void findPaletteLevels(set<TXshSimpleLevel *> &levels, int &rowIndex,
+void findPaletteLevels(std::set<TXshSimpleLevel *> &levels, int &rowIndex,
                        int &columnIndex, TPalette *palette, TXsheet *xsheet) {
   rowIndex = columnIndex = -1;
   int columnCount        = xsheet->getColumnCount();
@@ -93,7 +91,7 @@ bool isStyleUsed(const TVectorImageP vi, int styleId) {
   int regionCount = vi->getRegionCount();
   for (i = 0; i < regionCount; i++) {
     TRegion *region = vi->getRegion(i);
-    if (region || region->getStyle() != styleId) return true;
+    if (region && region->getStyle() == styleId) return true;
   }
   return false;
 }
@@ -138,7 +136,7 @@ bool isStyleUsed(const TImageP image, int styleId) {
 //===================================================================
 
 /*! Return true if one style is used. */
-bool areStylesUsed(const set<TXshSimpleLevel *> levels,
+bool areStylesUsed(const std::set<TXshSimpleLevel *> levels,
                    const std::vector<int> styleIds) {
   for (auto const level : levels) {
     std::vector<TFrameId> fids;
@@ -499,7 +497,7 @@ void PaletteCmd::addStyles(TPaletteHandle *paletteHandle, int pageIndex,
 
 namespace {
 
-void eraseStylesInLevels(const set<TXshSimpleLevel *> &levels,
+void eraseStylesInLevels(const std::set<TXshSimpleLevel *> &levels,
                          const std::vector<int> styleIds) {
   for (auto const level : levels) {
     std::vector<TFrameId> fids;
@@ -720,7 +718,7 @@ public:
     assert(page);
     m_pageName = page->getName();
     m_styles.resize(page->getStyleCount());
-    for (int i    = 0; i < page->getStyleCount(); i++)
+    for (int i = 0; i < page->getStyleCount(); i++)
       m_styles[i] = page->getStyleId(i);
   }
   void undo() const override {
@@ -842,7 +840,7 @@ int loadRefImage(TPaletteHandle *paletteHandle,
         }
       }
     }
-    levelPalette->setRefLevelFids(fids);
+    levelPalette->setRefLevelFids(fids, !frames.empty());
 
     const TLevel::Table *table = level->getTable();
 
@@ -923,7 +921,7 @@ int loadRefImage(TPaletteHandle *paletteHandle,
           // values
           std::set<TPixel32> colors;
           if (config.rasterPickType == PaletteCmd::PickEveryColors) {
-            // different colors will become sparate styles
+            // different colors will become separate styles
             TColorUtils::buildPrecisePalette(colors, raster,
                                              availableColorCount);
           } else {  //  config.rasterPickType ==
@@ -1020,7 +1018,7 @@ void PaletteCmd::removeReferenceImage(TPaletteHandle *paletteHandle) {
   levelPalette->setRefImgPath(TFilePath());
 
   std::vector<TFrameId> fids;
-  levelPalette->setRefLevelFids(fids);
+  levelPalette->setRefLevelFids(fids, false);
 
   levelPalette->setDirtyFlag(true);
   paletteHandle->notifyPaletteChanged();
@@ -1244,7 +1242,7 @@ public:
   }
   int getHistoryType() override { return HistoryType::Palette; }
 };
-}
+}  // namespace
 
 void PaletteCmd::organizePaletteStyle(
     TPaletteHandle *paletteHandle, int styleId,
@@ -1337,7 +1335,7 @@ TPixel32 pickColor(TRasterImageP ri, const TPoint &rasterPoint) {
 
   return TPixel32::Transparent;
 }
-}
+}  // namespace
 
 void PaletteCmd::pickColorByUsingPickedPosition(TPaletteHandle *paletteHandle,
                                                 TImageP img, int frame) {

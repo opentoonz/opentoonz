@@ -81,6 +81,29 @@ void OnioniSkinMaskGUI::OnionSkinSwitcher::setSingleLevel() {
   setMask(osm);
 }
 
+void OnioniSkinMaskGUI::OnionSkinSwitcher::clearFOS() {
+  OnionSkinMask osm = getMask();
+
+  for (int i = (osm.getFosCount() - 1); i >= 0; i--)
+    osm.setFos(osm.getFos(i), false);
+
+  setMask(osm);
+}
+
+void OnioniSkinMaskGUI::OnionSkinSwitcher::clearMOS() {
+  OnionSkinMask osm = getMask();
+
+  for (int i = (osm.getMosCount() - 1); i >= 0; i--)
+    osm.setMos(osm.getMos(i), false);
+
+  setMask(osm);
+}
+
+void OnioniSkinMaskGUI::OnionSkinSwitcher::clearOS() {
+  clearFOS();
+  clearMOS();
+}
+
 //------------------------------------------------------------------------------
 
 void OnioniSkinMaskGUI::addOnionSkinCommand(QMenu *menu, bool isFilmStrip) {
@@ -101,6 +124,23 @@ void OnioniSkinMaskGUI::addOnionSkinCommand(QMenu *menu, bool isFilmStrip) {
             menu->addAction(QString(QObject::tr("Extend Onion Skin To Scene")));
         menu->connect(extendOnionSkinToScene, SIGNAL(triggered()), &switcher,
                       SLOT(setWholeScene()));
+      }
+      OnionSkinMask osm = switcher.getMask();
+      if (osm.getFosCount() || osm.getMosCount()) {
+        QAction *clearAllOnionSkins = menu->addAction(
+            QString(QObject::tr("Clear All Onion Skin Markers")));
+        menu->connect(clearAllOnionSkins, SIGNAL(triggered()), &switcher,
+                      SLOT(clearOS()));
+      }
+      if (osm.getFosCount() && osm.getMosCount()) {
+        QAction *clearFixedOnionSkins = menu->addAction(
+            QString(QObject::tr("Clear All Fixed Onion Skin Markers")));
+        menu->connect(clearFixedOnionSkins, SIGNAL(triggered()), &switcher,
+                      SLOT(clearFOS()));
+        QAction *clearRelativeOnionSkins = menu->addAction(
+            QString(QObject::tr("Clear All Relative Onion Skin Markers")));
+        menu->connect(clearRelativeOnionSkins, SIGNAL(triggered()), &switcher,
+                      SLOT(clearMOS()));
       }
     }
   } else {

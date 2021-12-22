@@ -149,7 +149,7 @@ signals:
   void start(const QString &filepath);
 };
 
-class RasterFxPluginHost final : public TZeraryFx, public TPluginInterface {
+class RasterFxPluginHost final : public TRasterFx, public TPluginInterface {
   PluginInformation *pi_;
 
   std::vector<std::shared_ptr<TFxPort>> inputs_;

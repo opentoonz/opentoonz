@@ -101,7 +101,7 @@ void DVAPI convert(
         false /*-- ConvertPopup
                  での指定に合わせて、[レベル名].[フレーム番号].[拡張子]のうち、
                                                                                           [レベル名]と[フレーム番号]の間のドットを消す。 --*/
-    );        //!< Converts a saved level to fullcolor, and saves the result.
+);            //!< Converts a saved level to fullcolor, and saves the result.
 
 void DVAPI convertNaa2Tlv(
     const TFilePath &source,  //!< Level path to convert from.
@@ -124,7 +124,7 @@ void DVAPI convertOldLevel2Tlv(
     const TFrameId &to,       //!< Last source frame to convert.
     FrameTaskNotifier
         *frameNotifier  //!< Observer class for frame success notifications.
-    );
+);
 
 double DVAPI getQuantizedZoomFactor(double zf, bool forward);
 
@@ -140,8 +140,9 @@ void DVAPI assignFillingInformation(TVectorImage &vi,
                                     const std::vector<TFilledRegionInf> &regs);
 
 void DVAPI getStrokeStyleInformationInArea(
-    const TVectorImageP &vi, std::vector<std::pair<int, int>>
-                                 &strokesInfo,  // pair:strokeIndex, styleIndex
+    const TVectorImageP &vi,
+    std::vector<std::pair<int, int>>
+        &strokesInfo,  // pair:strokeIndex, styleIndex
     const TRectD &area);
 
 //*********************************************************************************************
@@ -221,7 +222,7 @@ public:
 protected:
   virtual bool zoom(
       bool zoomin,
-      bool resetZoom) = 0;  //!< Handler for zoom commands. Required.
+      bool resetView) = 0;  //!< Handler for zoom commands. Required.
   virtual bool fit() {
     return false;
   }  //!< Handler for 'fit to image' commands.
@@ -234,6 +235,15 @@ protected:
   virtual bool setFlipY() {
     return false;
   }  //!< Handler for 'flip viewer horizontally' commands.
+  virtual bool resetZoom() {
+    return false;
+  }  //!< Handler for 'reset zoom' commands.
+  virtual bool resetRotation() {
+    return false;
+  }  //!< Handler for 'reset rotation' commands.
+  virtual bool resetPosition() {
+    return false;
+  }  //!< Handler for 'reset position' commands.
   virtual bool toggleFullScreen(
       bool quit = false)  //!  Handler for 'toggle fullscreen' commands.
   {

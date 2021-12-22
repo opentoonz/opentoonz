@@ -254,7 +254,7 @@ and more.
 Fx writers may want to explicitly specify a parameter concept
 for the following reasons:
 
-  a. Impose a measure to the parameter (e.g. degress, inches, %)
+  a. Impose a measure to the parameter (e.g. degrees, inches, %)
 
   b. Make the parameter editable in camera-stand
 
@@ -265,7 +265,7 @@ The complete list of supported parameter concepts is the following:
 
   length             - Displayed in length units (inches, mm, cm, etc..)
 
-  angle              - Displayed in angular units 'º'
+  angle              - Displayed in angular units 'ï¿½'
 
   point              - A vec2 displayed in length units
 

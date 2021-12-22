@@ -967,7 +967,7 @@ TSoundTrackP TSop::gate(TSoundTrackP src, double threshold, double holdTime,
 
 //==============================================================================
 
-TSoundTrackP TSop::timeStrech(TSoundTrackP src, double ratio) {
+TSoundTrackP TSop::timeStretch(TSoundTrackP src, double ratio) {
   TINT32 sampleRate = (TINT32)(src->getSampleRate() * ratio);
 
   if (sampleRate > 100000) sampleRate = 100000;

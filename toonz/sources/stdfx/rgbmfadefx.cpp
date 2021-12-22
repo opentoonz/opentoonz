@@ -88,7 +88,7 @@ void RGBMFadeFx::doCompute(TTile &tile, double frame,
     if (raster64)
       doRGBMFade<TPixel64>(raster64, toPixel64(col), intensity);
     else
-      throw TException("RGBMFadeFx: unsupported Pixel Type");
+      throw TException("RGBAFadeFx: unsupported Pixel Type");
   }
 }
 

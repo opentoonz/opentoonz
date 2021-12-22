@@ -317,7 +317,7 @@ bool increaseControlPoints(TStroke &stroke, const TStrokeDeformation &deformer,
       // questa funzione trova il punto in cui si supera il valore maxdifference
 
       // if minimum is not found or is equal to previous value
-      //  use an euristic...
+      //  use an heuristic...
       if (minimum < 0 || w == minimum) {
         minimum = w + incr * 0.5;
         w += step;

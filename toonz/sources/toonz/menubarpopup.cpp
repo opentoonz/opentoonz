@@ -82,9 +82,7 @@ public:
     /*- Menu title will be translated if the title is registered in translation
      * file -*/
     setText(0, StackedMenuBar::tr(title.toStdString().c_str()));
-    QIcon subMenuIcon(":Resources/browser_folder_close.svg");
-    subMenuIcon.addFile(":Resources/browser_folder_open.svg", QSize(),
-                        QIcon::Normal, QIcon::On);
+    QIcon subMenuIcon(createQIcon("folder", true));
     setIcon(0, subMenuIcon);
     setToolTip(0, QObject::tr(
                       "[Drag] to move position, [Double Click] to edit title"));
@@ -106,7 +104,7 @@ MenuBarTree::MenuBarTree(TFilePath& path, QWidget* parent)
   setDropIndicatorShown(true);
   setDefaultDropAction(Qt::MoveAction);
   setDragDropMode(QAbstractItemView::DragDrop);
-  setIconSize(QSize(21, 17));
+  setIconSize(QSize(21, 18));
 
   setColumnCount(1);
   header()->close();
@@ -356,12 +354,10 @@ CommandListTree::CommandListTree(QWidget* parent) : QTreeWidget(parent) {
   setDragEnabled(true);
   setDragDropMode(QAbstractItemView::DragOnly);
   setColumnCount(1);
-  setIconSize(QSize(21, 17));
+  setIconSize(QSize(21, 18));
   header()->close();
 
-  QIcon menuFolderIcon(":Resources/browser_project_close.svg");
-  menuFolderIcon.addFile(":Resources/browser_project_open.svg", QSize(),
-                         QIcon::Normal, QIcon::On);
+  QIcon menuFolderIcon(createQIcon("folder_project", true));
   invisibleRootItem()->setIcon(0, menuFolderIcon);
 
   QTreeWidgetItem* menuCommandFolder = new QTreeWidgetItem(this);
@@ -378,12 +374,17 @@ CommandListTree::CommandListTree(QWidget* parent) : QTreeWidget(parent) {
   addFolder(ShortcutTree::tr("Xsheet"), MenuXsheetCommandType,
             menuCommandFolder);
   addFolder(ShortcutTree::tr("Cells"), MenuCellsCommandType, menuCommandFolder);
+  addFolder(ShortcutTree::tr("Play"), MenuPlayCommandType, menuCommandFolder);
+  addFolder(ShortcutTree::tr("Render"), MenuRenderCommandType,
+            menuCommandFolder);
   addFolder(ShortcutTree::tr("View"), MenuViewCommandType, menuCommandFolder);
   addFolder(ShortcutTree::tr("Windows"), MenuWindowsCommandType,
             menuCommandFolder);
+  addFolder(ShortcutTree::tr("Help"), MenuHelpCommandType, menuCommandFolder);
 
   addFolder(ShortcutTree::tr("Tools"), ToolCommandType);
-  addFolder(ShortcutTree::tr("Playback"), PlaybackCommandType);
+
+  sortItems(0, Qt::AscendingOrder);
 
   MenuBarSeparatorItem* sep = new MenuBarSeparatorItem(0);
   sep->setToolTip(0, QObject::tr("[Drag&Drop] to copy separator to menu bar"));

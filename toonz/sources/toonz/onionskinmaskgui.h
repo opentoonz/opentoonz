@@ -39,6 +39,9 @@ public slots:
   void deactivate();
   void setWholeScene();
   void setSingleLevel();
+  void clearFOS();
+  void clearMOS();
+  void clearOS();
 };
 
 //-----------------------------------------------------------------------------

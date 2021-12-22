@@ -15,7 +15,8 @@ LevelOptions::LevelOptions()
     , m_antialias(0)
     , m_dpiPolicy(DP_ImageDpi)
     , m_whiteTransp(false)
-    , m_premultiply(false) {}
+    , m_premultiply(false)
+    , m_isStopMotionLevel(false) {}
 
 //-----------------------------------------------------------------------------
 
@@ -24,6 +25,7 @@ bool LevelOptions::operator==(const LevelOptions &other) const {
           m_whiteTransp == other.m_whiteTransp &&
           m_dpiPolicy == other.m_dpiPolicy &&
           m_antialias == other.m_antialias &&
+          m_isStopMotionLevel == other.m_isStopMotionLevel &&
           (m_dpiPolicy == LevelOptions::DP_ImageDpi || m_dpi == other.m_dpi));
 }
 

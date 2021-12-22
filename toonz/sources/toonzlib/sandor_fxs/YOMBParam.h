@@ -166,7 +166,7 @@ public:
       int y = yy + xyd->y;
       if (x >= 0 && y >= 0 && x < pic.m_lX && y < pic.m_lY) {
         int xy = y * pic.m_lX + x;
-        if (*(pic.m_sel + xy) > (UCHAR)0)
+        if (*(pic.m_sel + xy) > (UCHAR)0) {
           if (bm.m_isSAC) {
             if (!isContourOnPath(xx, yy, pBS, pic)) {
               addPixel(p, pic, xxyy, xy);
@@ -176,6 +176,7 @@ public:
             addPixel(p, pic, xxyy, xy);
             nb++;
           }
+	}
       }
     }
 

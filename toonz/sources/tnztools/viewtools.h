@@ -37,9 +37,9 @@ public:
 
   int getCursorId() const override;
 
-  void updateTranslation() {
+  void updateTranslation() override {
     m_cameraCentered.setQStringName(tr("Rotate On Camera Center"));
   }
 };
 
-#endif VIEWTOOLS_H
+#endif  // VIEWTOOLS_H

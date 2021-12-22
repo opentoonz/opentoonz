@@ -62,7 +62,8 @@ public:
   void setLogScale(bool onOff) { m_logScale = onOff; }
   bool logScale() const { return m_logScale; }
 
-  void draw(QPainter *painter, QPoint translation = QPoint(0, 0));
+  void draw(QPainter *painter, QPoint translation = QPoint(0, 0),
+            int size = -1);
 
 protected:
   void paintEvent(QPaintEvent *pe) override;
@@ -75,11 +76,22 @@ protected:
 class DVAPI ChannelBar final : public QWidget {
   Q_OBJECT
 
+public:
+  enum Range { Range_0_255, Range_0_1 };
+
+private:
   QColor m_color;
   int m_colorBarLength;
 
   bool m_isHorizontal;
   bool m_drawNumbers;
+
+  QColor m_textColor;
+  Range m_range;
+
+  Q_PROPERTY(QColor TextColor READ getTextColor WRITE setTextColor)
+
+  int m_size;
 
 public:
   ChannelBar(QWidget *parent = 0, QColor m_color = QColor(),
@@ -91,7 +103,13 @@ public:
   void setDrawNumbers(bool onOff);
   bool drawNumbers() const { return m_drawNumbers; }
 
-  void draw(QPainter *painter, QPoint translation = QPoint(0, 0));
+  void draw(QPainter *painter, QPoint translation = QPoint(0, 0),
+            int size = -1);
+
+  void setTextColor(const QColor &color) { m_textColor = color; }
+  QColor getTextColor() const { return m_textColor; }
+
+  void setLabelRange(Range range) { m_range = range; }
 
 protected:
   void paintEvent(QPaintEvent *event) override;
@@ -129,7 +147,8 @@ public:
   void setValues(const int values[]);
   const QVector<int> &values() const { return m_histogramGraph->values(); }
 
-  void draw(QPainter *painter, QPoint translation = QPoint(0, 0));
+  void draw(QPainter *painter, QPoint translation = QPoint(0, 0),
+            int width = -1);
 };
 
 //=============================================================================

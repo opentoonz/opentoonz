@@ -26,7 +26,8 @@ public:
       m_errorPos;  //!< Position of the error in the expression's text
 
   bool m_isValid,       //!< Whether the expression is valid
-      m_hasBeenParsed;  //!< Whether the expression has already been parsed
+      m_hasBeenParsed,  //!< Whether the expression has already been parsed
+      m_hasReference;
 
 public:
   Imp()
@@ -35,7 +36,8 @@ public:
       , m_calculator(0)
       , m_errorPos(0, -1)
       , m_isValid(false)
-      , m_hasBeenParsed(true) {}
+      , m_hasBeenParsed(true)
+      , m_hasReference(false) {}
   ~Imp() { delete m_calculator; }
 };
 
@@ -60,6 +62,7 @@ TExpression::TExpression(const TExpression &src) : m_imp(new Imp()) {
   m_imp->m_error         = src.m_imp->m_error;
   m_imp->m_errorPos      = src.m_imp->m_errorPos;
   m_imp->m_hasBeenParsed = false;
+  m_imp->m_hasReference  = src.m_imp->m_hasReference;
 }
 
 //--------------------------------------------------------------------------
@@ -85,11 +88,12 @@ const TSyntax::Grammar *TExpression::getGrammar() const {
 //--------------------------------------------------------------------------
 
 void TExpression::setText(std::string text) {
-  if (m_imp->m_text != text) {
+  if (m_imp->m_text != text || m_imp->m_hasReference) {
     m_imp->m_text = text;
     delete m_imp->m_calculator;
     m_imp->m_calculator    = 0;
     m_imp->m_isValid       = false;
+    m_imp->m_hasReference  = false;
     m_imp->m_hasBeenParsed = false;
     m_imp->m_error         = "";
     m_imp->m_errorPos      = std::make_pair(0, -1);
@@ -142,8 +146,9 @@ void TExpression::parse() {
   delete m_imp->m_calculator;
   m_imp->m_calculator = 0;
 
-  m_imp->m_errorPos = std::make_pair(0, -1);
-  m_imp->m_error    = std::string();
+  m_imp->m_errorPos     = std::make_pair(0, -1);
+  m_imp->m_error        = std::string();
+  m_imp->m_hasReference = false;
 
   if (!m_imp->m_grammar) {
     m_imp->m_error   = "No grammar defined";
@@ -156,7 +161,8 @@ void TExpression::parse() {
     if (m_imp->m_calculator)
       m_imp->m_calculator->setOwnerParameter(m_imp->m_param);
 
-    m_imp->m_isValid = parser.isValid();
+    m_imp->m_isValid      = parser.isValid();
+    m_imp->m_hasReference = parser.hasReference();
 
     if (!m_imp->m_isValid) {
       m_imp->m_error    = parser.getError();

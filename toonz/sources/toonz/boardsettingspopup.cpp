@@ -5,6 +5,7 @@
 #include "filebrowser.h"
 
 // TnzQt includes
+#include "toonzqt/gutil.h"
 #include "toonzqt/filefield.h"
 #include "toonzqt/colorfield.h"
 #include "toonzqt/intfield.h"
@@ -70,7 +71,7 @@ void editListWidgetItem(QListWidgetItem* listItem, BoardItem* item) {
     listItem->setIcon(QIcon(iconPm));
   }
 }
-}
+}  // namespace
 
 //=============================================================================
 
@@ -324,10 +325,8 @@ ItemInfoView::ItemInfoView(QWidget* parent) : QStackedWidget(parent) {
   m_textEdit        = new QTextEdit(this);
   m_imgPathField    = new DVGui::FileField(this);
   m_fontCombo       = new QFontComboBox(this);
-  m_boldButton =
-      new QPushButton(QIcon(":Resources/bold_on.png"), tr("Bold"), this);
-  m_italicButton =
-      new QPushButton(QIcon(":Resources/italic_on.png"), tr("Italic"), this);
+  m_boldButton      = new QPushButton(createQIcon("bold"), tr("Bold"), this);
+  m_italicButton = new QPushButton(createQIcon("italic"), tr("Italic"), this);
   m_fontColorField =
       new DVGui::ColorField(this, true, TPixel32(0, 0, 0, 255), 25, false, 54);
   m_imgARModeCombo = new QComboBox(this);
@@ -343,10 +342,10 @@ ItemInfoView::ItemInfoView(QWidget* parent) : QStackedWidget(parent) {
   m_textEdit->setStyleSheet(
       "background:white;\ncolor:black;\nborder:1 solid black;");
 
-  m_boldButton->setIconSize(QSize(30, 30));
+  m_boldButton->setIconSize(QSize(16, 16));
   m_boldButton->setFixedHeight(25);
   m_boldButton->setCheckable(true);
-  m_italicButton->setIconSize(QSize(30, 30));
+  m_italicButton->setIconSize(QSize(16, 16));
   m_italicButton->setFixedHeight(25);
   m_italicButton->setCheckable(true);
 
@@ -658,17 +657,15 @@ void ItemInfoView::onImgARModeComboActivated() {
 
 ItemListView::ItemListView(QWidget* parent) : QWidget(parent) {
   QPushButton* newItemBtn =
-      new QPushButton(QIcon(":Resources/plus.svg"), tr("Add"), this);
-  m_deleteItemBtn =
-      new QPushButton(QIcon(":Resources/delete_on.svg"), tr("Remove"), this);
-  m_moveUpBtn =
-      new QPushButton(QIcon(":Resources/up.svg"), tr("Move Up"), this);
+      new QPushButton(createQIcon("plus"), tr("Add"), this);
+  m_deleteItemBtn = new QPushButton(createQIcon("delete"), tr("Remove"), this);
+  m_moveUpBtn     = new QPushButton(createQIcon("fb_up"), tr("Move Up"), this);
   m_moveDownBtn =
-      new QPushButton(QIcon(":Resources/down.svg"), tr("Move Down"), this);
+      new QPushButton(createQIcon("fb_down"), tr("Move Down"), this);
 
   m_list = new QListWidget(this);
 
-  QSize iconSize(20, 20);
+  QSize iconSize(16, 16);
 
   newItemBtn->setIconSize(iconSize);
   m_deleteItemBtn->setIconSize(iconSize);
@@ -857,9 +854,9 @@ BoardSettingsPopup::BoardSettingsPopup(QWidget* parent)
   m_durationEdit = new DVGui::IntLineEdit(this, 1, 0);
 
   QPushButton* loadPresetBtn =
-      new QPushButton(QIcon(":Resources/load_on.svg"), tr("Load Preset"), this);
-  QPushButton* savePresetBtn = new QPushButton(QIcon(":Resources/save_on.svg"),
-                                               tr("Save as Preset"), this);
+      new QPushButton(createQIcon("load"), tr("Load Preset"), this);
+  QPushButton* savePresetBtn =
+      new QPushButton(createQIcon("saveas"), tr("Save as Preset"), this);
 
   QPushButton* closeButton = new QPushButton(tr("Close"), this);
 
@@ -967,7 +964,7 @@ void BoardSettingsPopup::hideEvent(QHideEvent* event) {
 
 // called on changing the current row of ItemListView
 void BoardSettingsPopup::onCurrentItemSwitched(int index) {
-  // updat Info
+  // update Info
   m_itemInfoView->setCurrentItem(index);
 
   m_boardView->update();

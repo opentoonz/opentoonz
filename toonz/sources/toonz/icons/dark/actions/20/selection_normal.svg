@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="20px" height="20px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g transform="matrix(1,0,0,1,-40,-10)">
+        <g id="selection_normal" transform="matrix(1,0,0,1,30,0)">
+            <rect x="10" y="10" width="20" height="20" style="fill-opacity:0;"/>
+            <g transform="matrix(1,0,0,1,9,9)">
+                <path d="M11,3.5C11,3.224 10.776,3 10.5,3C10.224,3 10,3.224 10,3.5L10,6.5C10,6.776 10.224,7 10.5,7C10.776,7 11,6.776 11,6.5L11,3.5Z"/>
+            </g>
+            <g transform="matrix(0.707107,-0.707107,0.676801,0.676801,4.69142,18.5407)">
+                <path d="M11,3.522C11,3.234 10.776,3 10.5,3C10.224,3 10,3.234 10,3.522L10,6.478C10,6.766 10.224,7 10.5,7C10.776,7 11,6.766 11,6.478L11,3.522Z"/>
+            </g>
+            <g transform="matrix(6.12323e-17,1,-1,6.12323e-17,29,7)">
+                <path d="M11,3.5C11,3.224 10.776,3 10.5,3C10.224,3 10,3.224 10,3.5L10,6.5C10,6.776 10.224,7 10.5,7C10.776,7 11,6.776 11,6.5L11,3.5Z"/>
+            </g>
+            <g transform="matrix(0.707107,0.707107,-0.676801,0.676801,19.4593,3.69142)">
+                <path d="M11,3.522C11,3.234 10.776,3 10.5,3C10.224,3 10,3.234 10,3.522L10,6.478C10,6.766 10.224,7 10.5,7C10.776,7 11,6.766 11,6.478L11,3.522Z"/>
+            </g>
+            <g transform="matrix(6.12323e-17,1,-1,6.12323e-17,20,7)">
+                <path d="M11,3.5C11,3.224 10.776,3 10.5,3C10.224,3 10,3.224 10,3.5L10,6.5C10,6.776 10.224,7 10.5,7C10.776,7 11,6.776 11,6.5L11,3.5Z"/>
+            </g>
+            <g transform="matrix(0.53202,-0.229157,0.26998,0.626797,-0.7633,9.68182)">
+                <path d="M26,22L32.6,35L27.5,32.936L27.5,39L24.5,39L24.5,32.936L19.4,35L26,22Z"/>
+            </g>
+        </g>
+    </g>
+</svg>

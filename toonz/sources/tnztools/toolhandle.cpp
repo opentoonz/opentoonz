@@ -6,8 +6,8 @@
 #include "tools/toolcommandids.h"
 #include "timage.h"
 //#include "tapp.h"
-#include "toonz/stage2.h"
 #include "toonzqt/menubarcommand.h"
+#include "toonz/preferences.h"
 #include <QAction>
 #include <QMap>
 #include <QDebug>
@@ -42,7 +42,7 @@ void ToolHandle::setTool(QString name) {
 
   if (m_tool) m_tool->onDeactivate();
 
-  // Camera test uses the automaticly activated CameraTestTool
+  // Camera test uses the automatically activated CameraTestTool
   if (name != "T_CameraTest" && CameraTestCheck::instance()->isEnabled())
     CameraTestCheck::instance()->setIsEnabled(false);
 
@@ -73,7 +73,8 @@ void ToolHandle::storeTool() {
 void ToolHandle::restoreTool() {
   // qDebug() << m_storedToolTime.elapsed();
   if (m_storedToolName != m_toolName && m_storedToolName != "" &&
-      m_storedToolTime.elapsed() > 500) {
+      m_storedToolTime.elapsed() >
+          Preferences::instance()->getTempToolSwitchTimer()) {
     setTool(m_storedToolName);
   }
 }

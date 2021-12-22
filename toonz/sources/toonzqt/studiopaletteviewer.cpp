@@ -5,7 +5,6 @@
 // TnzQt includes
 #include "toonzqt/menubarcommand.h"
 #include "toonzqt/paletteviewer.h"
-#include "toonzqt/dvdialog.h"
 #include "toonzqt/trepetitionguard.h"
 #include "toonzqt/gutil.h"
 #include "toonzqt/icongenerator.h"
@@ -21,8 +20,10 @@
 #include "toonz/sceneproperties.h"
 #include "toonz/txsheethandle.h"
 #include "toonz/txshlevelhandle.h"
+#include "toonz/preferences.h"
 
 // TnzCore includes
+#include "saveloadqsettings.h"
 #include "tconvert.h"
 #include "tundo.h"
 #include "tsystem.h"
@@ -30,6 +31,7 @@
 #include "../toonz/menubarcommandids.h"
 
 // Qt includes
+#include <QSettings>
 #include <QHeaderView>
 #include <QContextMenuEvent>
 #include <QMenu>
@@ -40,6 +42,7 @@
 #include <QInputDialog>
 #include <QPushButton>
 #include <QDrag>
+#include <QApplication>
 
 #include <time.h>
 
@@ -51,7 +54,7 @@ using namespace DVGui;
 namespace {
 //-----------------------------------------------------------------------------
 /*! Return true if path is in folder \b rootPath of \b StudioPalette.
-*/
+ */
 bool isInStudioPaletteFolder(TFilePath path, TFilePath rootPath) {
   if (path.getType() != "tpl") return false;
   StudioPalette *studioPalette = StudioPalette::instance();
@@ -69,7 +72,7 @@ bool isInStudioPaletteFolder(TFilePath path, TFilePath rootPath) {
 
 //-----------------------------------------------------------------------------
 /*! Return true if path is in a \b StudioPalette folder.
-*/
+ */
 bool isInStudioPalette(TFilePath path) {
   if (path.getType() != "tpl") return false;
   StudioPalette *studioPalette = StudioPalette::instance();
@@ -100,20 +103,16 @@ StudioPaletteTreeViewer::StudioPaletteTreeViewer(
     , m_xsheetHandle(xsheetHandle)
     , m_folderIcon(QIcon())
     , m_levelPaletteIcon(QIcon())
-    , m_studioPaletteIcon(QIcon()) {
+    , m_studioPaletteIcon(QIcon())
+    , m_startPos() {
   setIndentation(14);
   setAlternatingRowColors(true);
 
   header()->close();
   setUniformRowHeights(true);
-  setIconSize(QSize(21, 17));
+  setIconSize(QSize(21, 18));
 
   QList<QTreeWidgetItem *> paletteItems;
-
-  QString open  = QString(":Resources/folder_close.svg");
-  QString close = QString(":Resources/folder_open.svg");
-  m_folderIcon.addFile(close, QSize(21, 17), QIcon::Normal, QIcon::On);
-  m_folderIcon.addFile(open, QSize(21, 17), QIcon::Normal, QIcon::Off);
 
   QString levelPaletteIcon = QString(":Resources/palette.svg");
   m_levelPaletteIcon.addPixmap(levelPaletteIcon, QIcon::Normal, QIcon::On);
@@ -133,7 +132,7 @@ StudioPaletteTreeViewer::StudioPaletteTreeViewer(
 
   bool ret = connect(this, SIGNAL(itemChanged(QTreeWidgetItem *, int)),
                      SLOT(onItemChanged(QTreeWidgetItem *, int)));
-  ret = ret && connect(this, SIGNAL(itemClicked(QTreeWidgetItem *, int)),
+  ret      = ret && connect(this, SIGNAL(itemClicked(QTreeWidgetItem *, int)),
                        SLOT(onItemClicked(QTreeWidgetItem *, int)));
   ret =
       ret &&
@@ -198,7 +197,7 @@ QTreeWidgetItem *StudioPaletteTreeViewer::createRootItem(TFilePath path) {
   if (rootName != "Global Palettes") rootName = "Project Palettes";
   QTreeWidgetItem *rootItem =
       new QTreeWidgetItem((QTreeWidget *)0, QStringList(rootName));
-  rootItem->setIcon(0, m_folderIcon);
+  rootItem->setIcon(0, createQIcon("folder", true));
   rootItem->setData(1, Qt::UserRole, toQString(path));
 
   refreshItem(rootItem);
@@ -236,7 +235,7 @@ QTreeWidgetItem *StudioPaletteTreeViewer::createItem(const TFilePath path) {
       item->setIcon(0, m_levelPaletteIcon);
     item->setFlags(item->flags() | Qt::ItemNeverHasChildren);
   } else if (studioPalette->isFolder(path)) {
-    item->setIcon(0, m_folderIcon);
+    item->setIcon(0, createQIcon("folder", true));
     item->setFlags(item->flags() | Qt::ItemIsDropEnabled);
   }
   item->setData(1, Qt::UserRole, toQString(path));
@@ -301,7 +300,6 @@ QTreeWidgetItem *StudioPaletteTreeViewer::getFolderItem(QTreeWidgetItem *parent,
 
 void StudioPaletteTreeViewer::resetDropItem() {
   if (!m_dropItem) return;
-  m_dropItem->setTextColor(0, Qt::black);
   m_dropItem = 0;
 }
 
@@ -330,7 +328,7 @@ void StudioPaletteTreeViewer::refresh() {
 
 //-----------------------------------------------------------------------------
 /*!When expand a tree, prepare the child items of it
-*/
+ */
 void StudioPaletteTreeViewer::onTreeItemExpanded(QTreeWidgetItem *item) {
   if (!item) return;
 
@@ -343,14 +341,14 @@ void StudioPaletteTreeViewer::onTreeItemExpanded(QTreeWidgetItem *item) {
 
 //-----------------------------------------------------------------------------
 /*! Refresh tree only when this widget has focus
-*/
+ */
 void StudioPaletteTreeViewer::onRefreshTreeShortcutTriggered() {
   if (hasFocus()) refresh();
 }
 
 //-----------------------------------------------------------------------------
 /*! Update the content of item
-*/
+ */
 
 void StudioPaletteTreeViewer::refreshItem(QTreeWidgetItem *item) {
   struct Locals {
@@ -473,7 +471,7 @@ void StudioPaletteTreeViewer::onItemChanged(QTreeWidgetItem *item, int column) {
 
 //-----------------------------------------------------------------------------
 /*! Called when the current palette is switched
-*/
+ */
 void StudioPaletteTreeViewer::onCurrentItemChanged(QTreeWidgetItem *current,
                                                    QTreeWidgetItem *previous) {
   TFilePath oldPath = getItemPath(previous);
@@ -485,25 +483,38 @@ void StudioPaletteTreeViewer::onCurrentItemChanged(QTreeWidgetItem *current,
         m_currentPalette->getGlobalName());
     if (oldPath == newPath) return;
     wstring gname = m_currentPalette->getGlobalName();
-    QString question;
-    question = "The current palette " +
-               QString::fromStdWString(oldPath.getWideString()) +
-               " \nin the studio palette has been modified. Do you want to "
-               "save your changes?";
-    int ret = DVGui::MsgBox(question, QObject::tr("Save"),
-                            QObject::tr("Discard"), QObject::tr("Cancel"), 0);
+    QString question =
+        tr("The current palette %1\nin the studio palette has been modified. "
+           "Do you want to "
+           "save your changes?")
+            .arg(QString::fromStdWString(oldPath.getWideString()));
+    int ret =
+        DVGui::MsgBox(question, tr("Save"), tr("Discard"), tr("Cancel"), 0);
     if (ret == 3) {
       setCurrentItem(getItem(oldPath));
       return;
     }
     if (ret == 1) {
-      // If the palette is level palette (i.e. NOT stdio palette), just
-      // overwrite it
-      if (gname.empty())
-        StudioPalette::instance()->save(oldPath, m_currentPalette.getPointer());
-      else
-        StudioPalette::instance()->setPalette(
-            oldPath, m_currentPalette.getPointer(), false);
+      try {
+        // If the palette is level palette (i.e. NOT stdio palette), just
+        // overwrite it
+        if (gname.empty())
+          StudioPalette::instance()->save(oldPath,
+                                          m_currentPalette.getPointer());
+        else
+          StudioPalette::instance()->setPalette(
+              oldPath, m_currentPalette.getPointer(), false);
+      } catch (TSystemException se) {
+        DVGui::warning(QString::fromStdWString(se.getMessage()));
+        setCurrentItem(previous);
+        return;
+      } catch (...) {
+        DVGui::warning(
+            QString::fromStdWString(oldPath.getWideString() + L"\n") +
+            tr("Failed to save palette."));
+        setCurrentItem(previous);
+        return;
+      }
     }
     m_currentPalette->setDirtyFlag(false);
   }
@@ -556,7 +567,7 @@ void StudioPaletteTreeViewer::addNewFolder() {
 
 //-----------------------------------------------------------------------------
 /*! Convert level palette to studio palette.
-*/
+ */
 void StudioPaletteTreeViewer::convertToStudioPalette() {
   TFilePath path               = getItemPath(currentItem());
   StudioPalette *studioPalette = StudioPalette::instance();
@@ -573,11 +584,10 @@ void StudioPaletteTreeViewer::convertToStudioPalette() {
       return;
     }
 
-    QString question;
-    question = QString::fromStdWString(
-        L"Convert " + path.getWideString() +
-        L" to Studio Palette and Overwrite. \nAre you sure ?");
-    int ret = DVGui::MsgBox(question, QObject::tr("Yes"), QObject::tr("No"));
+    QString question =
+        tr("Convert %1 to Studio Palette and Overwrite. \nAre you sure ?")
+            .arg(QString::fromStdWString(path.getWideString()));
+    int ret = DVGui::MsgBox(question, tr("Convert"), tr("Cancel"));
     if (ret == 0 || ret == 2) return;
 
     // apply global name
@@ -604,7 +614,7 @@ void StudioPaletteTreeViewer::deleteItem(QTreeWidgetItem *item) {
   if (item->childCount() > 0) {
     QString question;
     question = tr("This folder is not empty. Delete anyway?");
-    int ret  = DVGui::MsgBox(question, QObject::tr("Yes"), QObject::tr("No"));
+    int ret  = DVGui::MsgBox(question, tr("Delete"), tr("Cancel"));
     if (ret == 0 || ret == 2) return;
   }
 
@@ -685,35 +695,28 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class AdjustPaletteDialog final : public DVGui::Dialog {
-private:
-  IntField *m_tolerance;
+AdjustPaletteDialog::AdjustPaletteDialog()
+    : Dialog(0, true, true, "Adjust Current Level to This Palette") {
+  setWindowTitle(tr("Adjust Current Level to This Palette"));
 
-public:
-  int getTolerance() { return m_tolerance->getValue(); }
+  beginVLayout();
+  m_tolerance = new IntField(this);
+  m_tolerance->setRange(0, 255);
+  m_tolerance->setValue(0);
+  addWidget(tr("Tolerance"), m_tolerance);
+  endVLayout();
 
-  AdjustPaletteDialog()
-      : Dialog(0, true, true, "Adjust Current Level to This Palette") {
-    setWindowTitle(tr("Adjust Current Level to This Palette"));
+  QPushButton *okBtn = new QPushButton(tr("Apply"), this);
+  okBtn->setDefault(true);
+  QPushButton *cancelBtn = new QPushButton(tr("Cancel"), this);
+  bool ret = connect(okBtn, SIGNAL(clicked()), this, SLOT(accept()));
+  ret      = ret && connect(cancelBtn, SIGNAL(clicked()), this, SLOT(reject()));
+  assert(ret);
 
-    beginVLayout();
-    m_tolerance = new IntField(this);
-    m_tolerance->setRange(0, 255);
-    m_tolerance->setValue(0);
-    addWidget(tr("Tolerance"), m_tolerance);
-    endVLayout();
+  addButtonBarWidget(okBtn, cancelBtn);
+}
 
-    QPushButton *okBtn = new QPushButton(tr("Apply"), this);
-    okBtn->setDefault(true);
-    QPushButton *cancelBtn = new QPushButton(tr("Cancel"), this);
-    bool ret = connect(okBtn, SIGNAL(clicked()), this, SLOT(accept()));
-    ret = ret && connect(cancelBtn, SIGNAL(clicked()), this, SLOT(reject()));
-    assert(ret);
-
-    addButtonBarWidget(okBtn, cancelBtn);
-  }
-};
-
+int AdjustPaletteDialog::getTolerance() { return m_tolerance->getValue(); }
 //-------------------------------------------------------------------------------------------------
 
 void StudioPaletteTreeViewer::loadInCurrentPaletteAndAdaptLevel() {
@@ -722,6 +725,9 @@ void StudioPaletteTreeViewer::loadInCurrentPaletteAndAdaptLevel() {
 
   TPalette *palette = m_levelPaletteHandle->getPalette();
   if (!palette) return;
+
+  // prevent crash when the command is applied to the palette level
+  if (!m_currentLevelHandle->getSimpleLevel()) return;
 
   TPalette *newPalette =
       StudioPalette::instance()->getPalette(getItemPath(items[0]), true);
@@ -810,21 +816,20 @@ void StudioPaletteTreeViewer::replaceCurrentPalette() {
 
   QString label;
   if (count != 1)  // replacing to multiple palettes
-    label = QString::fromStdWString(
-        L"Replacing all selected palettes with the palette \"" +
-        current->getPaletteName() + L"\". \nAre you sure ?");
+    label = tr("Replacing all selected palettes with the palette \"%1\". \nAre "
+               "you sure ?")
+                .arg(QString::fromStdWString(current->getPaletteName()));
   else {
     TPalette *dstPalette =
         StudioPalette::instance()->getPalette(getItemPath(items[0]));
     if (!dstPalette) return;
-    label = QString::fromStdWString(
-        L"Replacing the palette \"" + dstPalette->getPaletteName() +
-        L"\" with the palette \"" + current->getPaletteName() +
-        L"\". \nAre you sure ?");
+    label = tr("Replacing the palette \"%1\" with the palette \"%2\". \nAre "
+               "you sure ?")
+                .arg(QString::fromStdWString(dstPalette->getPaletteName()))
+                .arg(QString::fromStdWString(current->getPaletteName()));
   }
 
-  int ret =
-      DVGui::MsgBox(label, QObject::tr("Replace"), QObject::tr("Cancel"), 1);
+  int ret = DVGui::MsgBox(label, tr("Replace"), tr("Cancel"), 1);
   if (ret == 0 || ret == 2) return;
 
   TUndoManager::manager()->beginBlock();
@@ -940,8 +945,8 @@ void StudioPaletteTreeViewer::contextMenuEvent(QContextMenuEvent *event) {
     QTreeWidgetItem *item = items[i];
     QRect rect            = visualItemRect(item);
     if (QRect(0, rect.y(), width(), rect.height()).contains(event->pos()))
-      isClickInSelection                             = true;
-    TFilePath path                                   = getItemPath(item);
+      isClickInSelection = true;
+    TFilePath path = getItemPath(item);
     if (studioPalette->isFolder(path)) areAllPalette = false;
   }
   if (!isClickInSelection) return;
@@ -973,10 +978,27 @@ void StudioPaletteTreeViewer::createMenuAction(QMenu &menu, const char *id,
 
 //-----------------------------------------------------------------------------
 
+void StudioPaletteTreeViewer::mousePressEvent(QMouseEvent *event) {
+  QTreeWidget::mousePressEvent(event);
+  // If left button is not pressed return
+  if (event->button() == Qt::LeftButton) m_startPos = event->pos();
+}
+
+//-----------------------------------------------------------------------------
+
 void StudioPaletteTreeViewer::mouseMoveEvent(QMouseEvent *event) {
   // If left button is not pressed return; is not drag event.
   if (!(event->buttons() & Qt::LeftButton)) return;
-  startDragDrop();
+  if (!m_startPos.isNull() && (m_startPos - event->pos()).manhattanLength() >=
+                                  QApplication::startDragDistance())
+    startDragDrop();
+}
+
+//-----------------------------------------------------------------------------
+
+void StudioPaletteTreeViewer::mouseReleaseEvent(QMouseEvent *event) {
+  QTreeWidget::mouseReleaseEvent(event);
+  if (event->button() == Qt::LeftButton) m_startPos = QPoint();
 }
 
 //-----------------------------------------------------------------------------
@@ -1024,7 +1046,7 @@ void StudioPaletteTreeViewer::dragEnterEvent(QDragEnterEvent *event) {
     for (i = 0; i < count; i++) {
       QUrl url = urls[i];
       TFilePath path(url.toLocalFile().toStdWString());
-      if (!path.isEmpty() &&
+      if (!path.isEmpty() && isInStudioPalette(path) &&
           (path.getType() == "tpl" || path.getType() == "pli" ||
            path.getType() == "tlv" || path.getType() == "tnz")) {
         isPalette = true;
@@ -1044,8 +1066,6 @@ void StudioPaletteTreeViewer::dragEnterEvent(QDragEnterEvent *event) {
 void StudioPaletteTreeViewer::dragMoveEvent(QDragMoveEvent *event) {
   QTreeWidgetItem *item = itemAt(event->pos());
   TFilePath newPath     = getItemPath(item);
-
-  if (m_dropItem) m_dropItem->setTextColor(0, Qt::black);
 
   if (item) {
     // drop will not be executed on the same item
@@ -1122,7 +1142,7 @@ void StudioPaletteTreeViewer::dropEvent(QDropEvent *event) {
     pltName = tr("the palette \"%1\"")
                   .arg(QString::fromStdWString(palettePaths[0].getWideName()));
   else
-    pltName       = tr("the selected palettes");
+    pltName = tr("the selected palettes");
   QString dstName = QString::fromStdWString(newPath.getWideName());
 
   QString question =
@@ -1130,6 +1150,7 @@ void StudioPaletteTreeViewer::dropEvent(QDropEvent *event) {
   int ret = DVGui::MsgBox(question, tr("Move"), tr("Cancel"));
   if (ret == 0 || ret == 2) return;
 
+  bool paletteMoved = false;
   TUndoManager::manager()->beginBlock();
   for (int i = 0; i < palettePaths.size(); i++) {
     TFilePath path = palettePaths[i];
@@ -1139,6 +1160,7 @@ void StudioPaletteTreeViewer::dropEvent(QDropEvent *event) {
           TFilePath(path.getWideName() + ::to_wstring(path.getDottedType()));
       try {
         StudioPaletteCmd::movePalette(newPalettePath, path);
+        paletteMoved = true;
       } catch (TException &e) {
         error("Can't rename palette: " +
               QString(::to_string(e.getMessage()).c_str()));
@@ -1148,8 +1170,10 @@ void StudioPaletteTreeViewer::dropEvent(QDropEvent *event) {
     }
   }
   TUndoManager::manager()->endBlock();
-  event->setDropAction(Qt::MoveAction);
-  event->accept();
+  if (paletteMoved) {
+    event->setDropAction(Qt::MoveAction);
+    event->accept();
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -1191,17 +1215,17 @@ StudioPaletteViewer::StudioPaletteViewer(QWidget *parent,
   treeWidget->setLayout(treeVLayout);
 
   // Second Splitter Widget
-  PaletteViewer *studioPaletteViewer =
+  m_studioPaletteViewer =
       new PaletteViewer(this, PaletteViewerGUI::STUDIO_PALETTE);
-  studioPaletteViewer->setObjectName("PaletteViewerInStudioPalette");
-  studioPaletteViewer->setXsheetHandle(xsheetHandle);
-  studioPaletteViewer->setPaletteHandle(studioPaletteHandle);
-  studioPaletteViewer->setFrameHandle(frameHandle);
+  m_studioPaletteViewer->setObjectName("PaletteViewerInStudioPalette");
+  m_studioPaletteViewer->setXsheetHandle(xsheetHandle);
+  m_studioPaletteViewer->setPaletteHandle(studioPaletteHandle);
+  m_studioPaletteViewer->setFrameHandle(frameHandle);
 
   addWidget(treeWidget);
-  addWidget(studioPaletteViewer);
+  addWidget(m_studioPaletteViewer);
 
-  setFocusProxy(studioPaletteViewer);
+  setFocusProxy(m_studioPaletteViewer);
 }
 
 //-----------------------------------------------------------------------------
@@ -1210,7 +1234,30 @@ StudioPaletteViewer::~StudioPaletteViewer() {}
 
 //-----------------------------------------------------------------------------
 /*! In order to save current palette from the tool button in the PageViewer.
-*/
+ */
 TFilePath StudioPaletteViewer::getCurrentItemPath() {
   return m_studioPaletteTreeViewer->getCurrentItemPath();
+}
+
+//-----------------------------------------------------------------------------
+
+int StudioPaletteViewer::getViewMode() const {
+  return m_studioPaletteViewer->getViewMode();
+}
+
+//-----------------------------------------------------------------------------
+
+void StudioPaletteViewer::setViewMode(int mode) {
+  m_studioPaletteViewer->setViewMode(
+      (PaletteViewerGUI::PageViewer::ViewMode)mode);
+}
+
+//-----------------------------------------------------------------------------
+
+void StudioPaletteViewer::save(QSettings &settings) const {
+  m_studioPaletteViewer->save(settings);
+}
+
+void StudioPaletteViewer::load(QSettings &settings) {
+  m_studioPaletteViewer->load(settings);
 }

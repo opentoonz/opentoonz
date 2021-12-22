@@ -373,17 +373,17 @@ bool TSoundTrackWriterWav::save(const TSoundTrackP &sndtrack) {
 #if (!TNZ_LITTLE_ENDIAN)
   {
     if (fmtChunk.m_bitPerSample == 8)
-      memcpy((void *)waveData, (void *)sndtrack->getRawData(), soundDataLength);
+      memcpy((void *)waveData.get(), (void *)sndtrack->getRawData(), soundDataLength);
     else if (fmtChunk.m_bitPerSample == 16) {
-      swapAndCopySamples((short *)sndtrack->getRawData(), (short *)waveData,
+      swapAndCopySamples((short *)sndtrack->getRawData(), (short *)waveData.get(),
                          sndtrack->getSampleCount() * fmtChunk.m_chans);
     } else if (fmtChunk.m_bitPerSample == 24) {  // swap e togliere quarto byte
       UCHAR *begin = (UCHAR *)sndtrack->getRawData();
       for (int i = 0; i < (int)sndtrack->getSampleCount() * fmtChunk.m_chans;
            ++i) {
-        *(waveData + 3 * i)     = *(begin + 4 * i + 3);
-        *(waveData + 3 * i + 1) = *(begin + 4 * i + 2);
-        *(waveData + 3 * i + 2) = *(begin + 4 * i + 1);
+        *(waveData.get() + 3 * i)     = *(begin + 4 * i + 3);
+        *(waveData.get() + 3 * i + 1) = *(begin + 4 * i + 2);
+        *(waveData.get() + 3 * i + 2) = *(begin + 4 * i + 1);
       }
     }
   }

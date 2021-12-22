@@ -24,6 +24,7 @@ class FxSchematicGroupEditor;
 class FxSchematicMacroEditor;
 class TMacroFx;
 
+enum SearchDirection { Both = 0, Input, Output };
 //==================================================================
 //
 // FXSchematic
@@ -137,8 +138,8 @@ public:
   void simulateDisconnectSelection(bool disconnect);
 
   //! Updates all Group Editors containing fx.
-  //! Each fx is only in one group, but each gruop can contains othe group. All
-  //! nested Groups must be updated.
+  //! Each fx is only in one group, but each group can contains other groups.
+  //! All nested Groups must be updated.
   void updateNestedGroupEditors(FxSchematicNode *node, const QPointF &newPos);
   void closeInnerMacroEditor(int groupId);
   void resizeNodes(bool maximizedNode);
@@ -178,11 +179,16 @@ private:
   void placeNodeAndParents(TFx *fx, double x, double &maxX, double &maxY);
 
   QPointF nearestPoint(const QPointF &point);
-  void highlightLinks(FxSchematicNode *node, bool value);
+
+  void highlightLinks(FxSchematicNode *node, bool value,
+                      SearchDirection direction = Both);
+
   void updatePosition(FxSchematicNode *node, const TPointD &pos);
   void simulateInsertSelection(SchematicLink *link, bool connect);
   void updatePositionOnResize(TFx *fx, bool maximizedNode);
   void removeRetroLinks(TFx *fx, double &maxX);
+
+  bool isAnEmptyZone_withParentFx(const QRectF &rect, const TFx *parent);
 
 signals:
   void showPreview(TFxP);
@@ -227,6 +233,8 @@ protected slots:
   void onEditGroup();
 
   void onIconifyNodesToggled(bool iconified);
+
+  void onNodeChangedSize();
 
 private:
   void setEnableCache(bool toggle);

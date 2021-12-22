@@ -3,8 +3,12 @@
 #ifndef PALETTEVIEWER_H
 #define PALETTEVIEWER_H
 
+#include "saveloadqsettings.h"
 #include "paletteviewergui.h"
 #include "toonz/tpalettehandle.h"
+#include "toonz/preferences.h"
+#include <QVBoxLayout>
+#include <QHBoxLayout>
 
 #undef DVAPI
 #undef DVVAR
@@ -18,6 +22,7 @@
 
 // forward declaration
 class QScrollArea;
+class DvScrollWidget;
 class QToolBar;
 class PaletteKeyframeNavigator;
 class TFrameHandle;
@@ -40,7 +45,7 @@ class TXsheetHandle;
 // PaletteViewer
 //-----------------------------------------------------------------------------
 
-class DVAPI PaletteViewer final : public QFrame {
+class DVAPI PaletteViewer final : public QFrame, public SaveLoadQSettings {
   Q_OBJECT
 
 public:
@@ -78,16 +83,20 @@ public:
 
   void enableSaveAction(bool enable);
 
+  // SaveLoadQSettings
+  virtual void save(QSettings &settings) const override;
+  virtual void load(QSettings &settings) override;
+
 protected:
   TPaletteHandle *m_paletteHandle;
   TFrameHandle *m_frameHandle;
   TXsheetHandle *m_xsheetHandle;
+  TXshLevelHandle *m_levelHandle;
 
   QScrollArea *m_pageViewerScrollArea;
   PaletteViewerGUI::PageViewer *m_pageViewer;
   TabBarContainter *m_tabBarContainer;
   PaletteTabBar *m_pagesBar;
-
   QToolBar *m_paletteToolBar;
   QToolBar *m_savePaletteToolBar;
 
@@ -106,6 +115,11 @@ protected:
 
   QAction *m_lockPaletteAction;
   QToolButton *m_lockPaletteToolButton;
+
+  bool m_toolbarOnTop;
+  QAction *m_showToolbarOnTopAct;
+  DvScrollWidget *m_toolbarContainer;
+  QHBoxLayout *m_hLayout;
 
 protected:
   void createTabBar();
@@ -128,6 +142,7 @@ protected:
 
   void resizeEvent(QResizeEvent *event) override;
   void contextMenuEvent(QContextMenuEvent *event) override;
+  void mousePressEvent(QMouseEvent *event) override;
 
   void showEvent(QShowEvent *) override;
   void hideEvent(QHideEvent *) override;
@@ -162,6 +177,11 @@ protected slots:
 
   void onNameDisplayMode(QAction *);
   void setIsLocked(bool lock);
+
+  void onSwitchToPage(int pageIndex);
+  void onShowNewStyleButtonToggled();
+
+  void toggleToolbarOnTop();
 };
 
 #endif  // PALETTEVIEWER_H

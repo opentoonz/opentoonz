@@ -28,12 +28,7 @@
 using namespace DVGui;
 #define REF_LAYER_BY_NAME
 
-QStringList modesDescription =
-    (QStringList()
-     << "Flatten visible document layers into a single image. Layer styles are "
-        "maintained."
-     << "Load document layers as frames into a single xsheet column."
-     << "Load document layers as xhseet columns.");
+QStringList modesDescription;
 
 // Per adesso non appare
 // Costruisce la stringa delle info della psd da caricare che comparirà nel
@@ -121,6 +116,14 @@ PsdSettingsPopup::PsdSettingsPopup()
 
   setWindowTitle(tr("Load PSD File"));
 
+  if (modesDescription.isEmpty()) {
+    modesDescription
+        << tr("Flatten visible document layers into a single image. Layer "
+              "styles are maintained.")
+        << tr("Load document layers as frames into a single xsheet column.")
+        << tr("Load document layers as xhseet columns.");
+  }
+
   m_filename = new QLabel(tr(""));
   m_filename->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
   m_filename->setFixedHeight(WidgetHeight);
@@ -153,11 +156,9 @@ PsdSettingsPopup::PsdSettingsPopup()
   addSeparator();
 
   m_loadMode = new QComboBox();
-  QStringList modes;
-  modes.push_back("Single Image");
-  modes.push_back("Frames");
-  modes.push_back("Columns");
-  m_loadMode->addItems(modes);
+  m_loadMode->addItem(tr("Single Image"), QString("Single Image"));
+  m_loadMode->addItem(tr("Frames"), QString("Frames"));
+  m_loadMode->addItem(tr("Columns"), QString("Columns"));
   m_loadMode->setFixedHeight(WidgetHeight);
   m_loadMode->setFixedWidth(120);
 
@@ -225,13 +226,13 @@ PsdSettingsPopup::PsdSettingsPopup()
   addLayout(folderOptLayout, false);
 
   ret = ret && connect(m_loadMode, SIGNAL(currentIndexChanged(const QString &)),
-                       SLOT(onModeChanged(const QString &)));
+                       SLOT(onModeChanged()));
   assert(ret);
   ret = ret && connect(m_psdFolderOptions, SIGNAL(buttonClicked(int)), this,
                        SLOT(onFolderOptionChange(int)));
   assert(ret);
-  m_okBtn     = new QPushButton("OK", this);
-  m_cancelBtn = new QPushButton("Cancel", this);
+  m_okBtn     = new QPushButton(tr("OK"), this);
+  m_cancelBtn = new QPushButton(tr("Cancel"), this);
   connect(m_okBtn, SIGNAL(clicked()), this, SLOT(onOk()));
   connect(m_cancelBtn, SIGNAL(clicked()), this, SLOT(close()));
   addButtonBarWidget(m_okBtn, m_cancelBtn);
@@ -263,7 +264,8 @@ int PsdSettingsPopup::levelNameType() {
   return m_levelNameType->currentIndex();
 }
 
-void PsdSettingsPopup::onModeChanged(const QString &mode) {
+void PsdSettingsPopup::onModeChanged() {
+  QString mode = m_loadMode->currentData().toString();
   if (mode == "Single Image") {
     m_mode = FLAT;
     m_modeDescription->setText(modesDescription[0]);

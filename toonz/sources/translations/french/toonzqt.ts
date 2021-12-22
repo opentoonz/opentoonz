@@ -204,12 +204,12 @@ Possibly the preset file has been corrupted</source>
         <translation type="vanished">Closest:</translation>
     </message>
     <message>
-        <source>E/W:</source>
+        <source>X:</source>
         <translation type="vanished">E/O:</translation>
     </message>
     <message>
-        <source>N/S:</source>
-        <translation type="vanished">N/S:</translation>
+        <source>Y:</source>
+        <translation type="vanished">Y:</translation>
     </message>
     <message>
         <source>DPI:</source>
@@ -240,11 +240,11 @@ Possibly the preset file has been corrupted</source>
         <translation type="vanished">Informations de niveau résultant</translation>
     </message>
     <message>
-        <source>N/S</source>
+        <source>Y</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>E/W</source>
+        <source>X</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -256,7 +256,7 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>&amp;Open Subxsheet</source>
-        <translation>&amp;Ouvrir le Sub-xsheet</translation>
+        <translation type="vanished">&amp;Ouvrir le Sub-xsheet</translation>
     </message>
 </context>
 <context>
@@ -289,11 +289,11 @@ Possibly the preset file has been corrupted</source>
     <name>DVGui</name>
     <message>
         <source>OK</source>
-        <translation>OK</translation>
+        <translation type="vanished">OK</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Annuler</translation>
+        <translation type="vanished">Annuler</translation>
     </message>
 </context>
 <context>
@@ -695,6 +695,41 @@ Possibly the preset file has been corrupted</source>
         <source>&amp;Locator</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Viewer Controls</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Zoom In</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Zoom Out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Flip Horizontally</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Flip Vertically</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Reset View</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>FontParamField</name>
+    <message>
+        <source>Style:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Size:</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>FrameNavigator</name>
@@ -994,19 +1029,47 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>Step 1</source>
-        <translation>Pas 1</translation>
+        <translation type="vanished">Pas 1</translation>
     </message>
     <message>
         <source>Step 2</source>
-        <translation>Pas 2</translation>
+        <translation type="vanished">Pas 2</translation>
     </message>
     <message>
         <source>Step 3</source>
-        <translation>Pas 3</translation>
+        <translation type="vanished">Pas 3</translation>
     </message>
     <message>
         <source>Step 4</source>
-        <translation>Pas 4</translation>
+        <translation type="vanished">Pas 4</translation>
+    </message>
+    <message>
+        <source>Activate Cycle</source>
+        <translation type="unfinished">Activer le Cycle</translation>
+    </message>
+    <message>
+        <source>Deactivate Cycle</source>
+        <translation type="unfinished">Deactiver le Cycle</translation>
+    </message>
+    <message>
+        <source>Show Inbetween Values</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hide Inbetween Values</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Interpolation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Step</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Similar Shape Interpolation</source>
+        <translation type="unfinished">Interpolation par Forme Similaire</translation>
     </message>
 </context>
 <context>
@@ -1065,6 +1128,10 @@ Possibly the preset file has been corrupted</source>
         <source>Table</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Hide Selected</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>FxColumnPainter</name>
@@ -1086,7 +1153,7 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>&amp;Open Subxsheet</source>
-        <translation>&amp;Ouvrir le Sub-xsheet</translation>
+        <translation type="vanished">&amp;Ouvrir le Sub-xsheet</translation>
     </message>
     <message>
         <source>&amp;Uncache Fx</source>
@@ -1202,6 +1269,13 @@ Possibly the preset file has been corrupted</source>
     </message>
 </context>
 <context>
+    <name>FxSchematicOutputNode</name>
+    <message>
+        <source>Output</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>FxSchematicPort</name>
     <message>
         <source>&amp;Disconnect from Xsheet</source>
@@ -1231,6 +1305,13 @@ Sélectionnez les nœuds FX et les liens connexes avant de copier ou couper la s
 Select FX nodes and related links before copying or cutting the selection you want to paste.</source>
         <translation>Il n&apos;est pas possible de Coller Remplaçant une sélection de nœuds FX deconnectés.
 Sélectionnez les nœuds FX et les liens connexes avant de copier ou couper la sélection que vous souhaitez coller.</translation>
+    </message>
+</context>
+<context>
+    <name>FxSchematicXSheetNode</name>
+    <message>
+        <source>XSheet</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1344,13 +1425,6 @@ Sélectionnez les nœuds FX et les liens connexes avant de copier ou couper la s
     <message>
         <source>A file name cannot contains any of the following chracters: /\:*?&quot;&lt;&gt;|.</source>
         <translation type="vanished">Un nom de fichier ne peut pas contenir l&apos;une des chracters suivants: / \: * &quot;|?.</translation>
-    </message>
-</context>
-<context>
-    <name>MyPaintBrushStyleChooserPage</name>
-    <message>
-        <source>Plain color</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1562,6 +1636,17 @@ Sélectionnez les nœuds FX et les liens connexes avant de copier ou couper la s
     </message>
 </context>
 <context>
+    <name>PlaneViewer</name>
+    <message>
+        <source>Reset View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fit To Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>PointParamField</name>
     <message>
         <source>Y:</source>
@@ -1641,19 +1726,19 @@ Sélectionnez les nœuds FX et les liens connexes avant de copier ou couper la s
     </message>
     <message>
         <source>Save</source>
-        <translation>Enregistrer</translation>
+        <translation type="vanished">Enregistrer</translation>
     </message>
     <message>
         <source>Discard</source>
-        <translation>Jeter</translation>
+        <translation type="vanished">Jeter</translation>
     </message>
     <message>
         <source>Yes</source>
-        <translation>Oui</translation>
+        <translation type="vanished">Oui</translation>
     </message>
     <message>
         <source>No</source>
-        <translation>Non</translation>
+        <translation type="vanished">Non</translation>
     </message>
     <message>
         <source>Stage Schematic</source>
@@ -1975,10 +2060,6 @@ Are you sure?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Replace</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Modify Fx Param : %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2100,7 +2181,39 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>OpenToonz 1.2</source>
+        <source>Custom Texture</source>
+        <comment>TextureStyleChooserPage</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current Frame: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File History</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Plain color</source>
+        <comment>VectorBrushStyleChooserPage</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Plain color</source>
+        <comment>MyPaintBrushStyleChooserPage</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Plain color</source>
+        <comment>SpecialStyleChooserPage</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished">OK</translation>
+    </message>
+    <message>
+        <source>That is a reserved file name and cannot be used.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2116,6 +2229,17 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     <message>
         <source>Toonz</source>
         <translation type="vanished">Toonz</translation>
+    </message>
+</context>
+<context>
+    <name>RgbLinkButtons</name>
+    <message>
+        <source>Copy RGB : %1 &gt; %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Swap %1 and %2</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2164,6 +2288,22 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
         <source>&amp;Swtich output port display mode</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>&amp;Toggle node icons</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Selection Mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Zoom Mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Hand Mode</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SchematicWindowEditor</name>
@@ -2195,7 +2335,7 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     <name>SpecialStyleChooserPage</name>
     <message>
         <source>Plain color</source>
-        <translation>Couleur plan</translation>
+        <translation type="vanished">Couleur plan</translation>
     </message>
 </context>
 <context>
@@ -2242,6 +2382,17 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     <message>
         <source>&amp;Load Motion Path...</source>
         <translation>&amp;Charger la Trajectoire...</translation>
+    </message>
+</context>
+<context>
+    <name>StageSchematicNode</name>
+    <message>
+        <source>Toggle Autorotate Along Motion Path</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle Link Motion Path to Control Points</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2328,6 +2479,50 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     <message>
         <source>Cancel</source>
         <translation type="unfinished">Annuler</translation>
+    </message>
+    <message>
+        <source>The current palette %1
+in the studio palette has been modified. Do you want to save your changes?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation type="unfinished">Enregistrer</translation>
+    </message>
+    <message>
+        <source>Discard</source>
+        <translation type="unfinished">Jeter</translation>
+    </message>
+    <message>
+        <source>Convert %1 to Studio Palette and Overwrite. 
+Are you sure ?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation type="obsolete">Oui</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation type="obsolete">Non</translation>
+    </message>
+    <message>
+        <source>Replacing all selected palettes with the palette &quot;%1&quot;. 
+Are you sure ?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Replacing the palette &quot;%1&quot; with the palette &quot;%2&quot;. 
+Are you sure ?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Replace</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Convert</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2546,6 +2741,17 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     </message>
 </context>
 <context>
+    <name>SwatchViewer</name>
+    <message>
+        <source>Reset View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fit To Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>TMessageViewer</name>
     <message>
         <source>Errors</source>
@@ -2594,7 +2800,7 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     <name>VectorBrushStyleChooserPage</name>
     <message>
         <source>Plain color</source>
-        <translation>Il est impossible de supprimer %1.</translation>
+        <translation type="vanished">Il est impossible de supprimer %1.</translation>
     </message>
 </context>
 <context>

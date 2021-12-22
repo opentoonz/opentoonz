@@ -53,10 +53,6 @@ public:
   PlasticDeformer();
   ~PlasticDeformer();
 
-  friend void swap(PlasticDeformer &a, PlasticDeformer &b) {
-    std::swap(a.m_imp, b.m_imp);
-  }
-
   /*!
 Returns whether the last compilation procedure succeeded, or it either failed
 or was never invoked after the last initialize() call.

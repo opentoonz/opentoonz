@@ -99,7 +99,7 @@ public:
 //    Cache Management internals
 //************************************************************************************************
 
-//! The ResourceDeclaration structure contains the informations retrieved in the
+//! The ResourceDeclaration structure contains the information retrieved in the
 //! predictive processes performed before a render process. It can be retrieved
 //! via the TFxCacheManager::getResource() method or passed directly by it to
 //! TFxCacheManagerDelegate instances.
@@ -182,7 +182,7 @@ TFxCacheManagerDelegate instances.
 Access to a cache resource is performed through the getResource() method, which
 requires
 a description of the resource (as specified in the TCacheResource class)
-and some informations - namely, the fx, render settings and frame - about the
+and some information - namely, the fx, render settings and frame - about the
 circumstances
 of the request. If the resource is managed by some manager delegate, it will be
 returned.

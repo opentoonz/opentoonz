@@ -86,6 +86,8 @@ public:
   bool m_isEditingLevel;
   bool m_isVisibleinOSM;  // Whether the current frame is in the onion skin
   int m_isGuidedDrawingEnabled = 0;
+  int m_guidedFrontStroke      = -1;
+  int m_guidedBackStroke       = -1;
   TXshSimpleLevel *m_sl;  //!< (not owned) The player's simple level
   TFrameId m_fid;         //!< The player's frame in m_sl
   TFrameId
@@ -104,6 +106,7 @@ public:
 
   static double m_onionSkinFrontSize;
   static double m_onionSkinBackSize;
+  static double m_firstFrontOnionSkin;
   static double m_firstBackOnionSkin;
   static double m_lastBackVisibleSkin;
 

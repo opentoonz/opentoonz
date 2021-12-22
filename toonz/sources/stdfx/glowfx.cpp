@@ -147,7 +147,7 @@ public:
 
   bool doGetBBox(double frame, TRectD &bbox,
                  const TRenderSettings &info) override {
-    if (getActiveTimeRegion().contains(frame))
+    if (getActiveTimeRegion().contains(frame)) {
       if (m_light.isConnected()) {
         TRectD b0, b1;
         bool ret = m_light->doGetBBox(frame, b0, info);
@@ -157,8 +157,10 @@ public:
           bbox += b1;
         }
         return ret;
-      } else if (m_lighted.isConnected())
+      } else if (m_lighted.isConnected()) {
         return m_lighted->doGetBBox(frame, bbox, info);
+      }
+    }
 
     return false;
   }

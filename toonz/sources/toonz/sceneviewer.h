@@ -22,6 +22,7 @@
 #include "pane.h"
 #include "previewer.h"
 
+#include <array>
 #include <QMatrix4x4>
 #include <QTouchDevice>
 
@@ -37,6 +38,7 @@ class QGestureEvent;
 class QTouchEvent;
 class QOpenGLFramebufferObject;
 class LutCalibrator;
+class StopMotion;
 
 namespace ImageUtils {
 class FullScreenWidget;
@@ -73,12 +75,13 @@ class SceneViewer final : public GLWidgetForHighDpi,
   bool m_tabletEvent, m_tabletMove;
   enum TabletState {
     None = 0,
-    Touched,
+    Touched,      // Pressed for mouse
     StartStroke,  // this state is to detect the first call
                   // of TabletMove just after TabletPress
     OnStroke,
     Released
-  } m_tabletState = None;
+  } m_tabletState = None,
+    m_mouseState  = None;
   // used to handle wrong mouse drag events!
   bool m_buttonClicked, m_toolSwitched;
   bool m_shownOnce                       = false;
@@ -97,11 +100,11 @@ class SceneViewer final : public GLWidgetForHighDpi,
   bool m_isMouseEntered, m_forceGlFlush;
   bool m_isFlippedX = false, m_isFlippedY = false;
   /*!  FreezedStatus:
-*  \li NO_FREEZED freezed is not active;
-*  \li NORMAL_FREEZED freezed is active: show grab image;
-*  \li UPDATE_FREEZED freezed is active: draw last unfreezed image and grab
-* view;
-*/
+   *  \li NO_FREEZED freezed is not active;
+   *  \li NORMAL_FREEZED freezed is active: show grab image;
+   *  \li UPDATE_FREEZED freezed is active: draw last unfreezed image and grab
+   * view;
+   */
   enum FreezedStatus {
     NO_FREEZED     = 0,
     NORMAL_FREEZED = 1,
@@ -123,7 +126,7 @@ class SceneViewer final : public GLWidgetForHighDpi,
 
   // current pan/zoom matrix (two different matrices are used for editing scenes
   // and leves)
-  TAffine m_viewAff[2];
+  std::array<TAffine, 2> m_viewAff;
   int m_viewMode;
 
   TPointD m_dpiScale;
@@ -142,7 +145,12 @@ class SceneViewer final : public GLWidgetForHighDpi,
   TRaster32P m_3DSideL;
   TRaster32P m_3DSideR;
   TRaster32P m_3DTop;
-
+#if defined(x64)
+  TRasterImageP m_stopMotionImage, m_stopMotionLineUpImage;
+  StopMotion *m_stopMotion        = NULL;
+  bool m_hasStopMotionImage       = false;
+  bool m_hasStopMotionLineUpImage = false;
+#endif
   TPointD m_sideRasterPos;
   TPointD m_topRasterPos;
   QString m_toolDisableReason;
@@ -176,6 +184,10 @@ class SceneViewer final : public GLWidgetForHighDpi,
   // used for updating viewer where the animated guide appears
   // updated in drawScene() and used in GLInvalidateRect()
   TRectD m_guidedDrawingBBox;
+
+  double m_rotationAngle[2];
+
+  bool m_firstInitialized = true;
 
 public:
   enum ReferenceMode {
@@ -248,8 +260,8 @@ public:
   bool canSwapCompared() const;
 
   bool isEditPreviewSubcamera() const { return m_editPreviewSubCamera; }
-  bool getIsFlippedX() const { return m_isFlippedX; }
-  bool getIsFlippedY() const { return m_isFlippedY; }
+  bool getIsFlippedX() const override { return m_isFlippedX; }
+  bool getIsFlippedY() const override { return m_isFlippedY; }
   void setEditPreviewSubcamera(bool enabled) {
     m_editPreviewSubCamera = enabled;
   }
@@ -270,10 +282,10 @@ public:
 
   void setIsLocator() { m_isLocator = true; }
   void setIsStyleShortcutSwitchable() { m_isStyleShortcutSwitchable = true; }
-  int getVGuideCount();
-  int getHGuideCount();
-  double getVGuide(int index);
-  double getHGuide(int index);
+  int getVGuideCount() override;
+  int getHGuideCount() override;
+  double getVGuide(int index) override;
+  double getHGuide(int index) override;
 
   void bindFBO() override;
   void releaseFBO() override;
@@ -349,10 +361,10 @@ protected:
   // center: window coordinate, pixels, topleft origin
   void zoomQt(const QPoint &center, double scaleFactor);
 
-  // overriden from TTool::Viewer
+  // overridden from TTool::Viewer
   void pan(const TPointD &delta) override { panQt(QPointF(delta.x, delta.y)); }
 
-  // overriden from TTool::Viewer
+  // overridden from TTool::Viewer
   void zoom(const TPointD &center, double factor) override;
   void rotate(const TPointD &center, double angle) override;
   void rotate3D(double dPhi, double dTheta) override;
@@ -393,9 +405,14 @@ protected:
 public slots:
 
   void resetSceneViewer();
+  void resetZoom();
+  void resetRotation();
+  void resetPosition();
   void setActualPixelSize();
   void flipX();
   void flipY();
+  void zoomIn();
+  void zoomOut();
   void onXsheetChanged();
   void onObjectSwitched();
   // when tool options are changed, update tooltip immediately
@@ -415,6 +432,7 @@ public slots:
 
   void onButtonPressed(FlipConsole::EGadget button);
   void fitToCamera();
+  void fitToCameraOutline();
   void swapCompared();
   void regeneratePreviewFrame();
   void regeneratePreview();
@@ -427,9 +445,17 @@ public slots:
   void releaseBusyOnTabletMove() { m_isBusyOnTabletMove = false; }
 
   void onContextAboutToBeDestroyed();
+#if defined(x64)
+  void onNewStopMotionImageReady();
+  void onStopMotionLiveViewStopped();
+#endif
+  void onPreferenceChanged(const QString &prefName);
+
 signals:
 
   void onZoomChanged();
+  void onFlipHChanged(bool);
+  void onFlipVChanged(bool);
   void freezeStateChanged(bool);
   void previewStatusChanged();
   // when pan/zoom on the viewer, notify to level strip in order to update the
@@ -437,6 +463,8 @@ signals:
   void refreshNavi();
   // for updating the titlebar
   void previewToggled();
+  // to notify FilmStripFrames and safely disconnect with this
+  void aboutToBeDestroyed();
 };
 
 // Functions

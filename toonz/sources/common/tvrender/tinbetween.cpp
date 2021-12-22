@@ -229,8 +229,8 @@ static void detectCorners(const TStroke *stroke, double minDegree,
     }
   }
 
-  const double ratioLen   = 2.5;
-  const double ratioAngle = 0.2;
+  const double ratioLen                            = 2.5;
+  const double ratioAngle                          = 0.2;
   std::vector<std::pair<int, double>>::iterator it = corners.begin();
 
   for (j = 1; j < (int)quadCount1;
@@ -241,8 +241,9 @@ static void detectCorners(const TStroke *stroke, double minDegree,
       continue;
     }
 
-    if (j - 2 >= 0 && (corners.empty() || it == corners.begin() ||
-                       j - 1 != (*(it - 1)).first) &&
+    if (j - 2 >= 0 &&
+        (corners.empty() || it == corners.begin() ||
+         j - 1 != (*(it - 1)).first) &&
         j + 1 < (int)quadCount1 &&
         (corners.empty() || it == corners.end() || j + 1 != (*it).first)) {
       speed1 = stroke->getChunk(j - 2)->getSpeed(1);
@@ -255,7 +256,7 @@ static void detectCorners(const TStroke *stroke, double minDegree,
         if (tan1 * tan2 < 0) {
           angle = 180 - asin(tcrop(vectorialProduct, -1.0, 1.0)) * M_180_PI;
 
-          metaCornerLen = ratioLen * (stroke->getChunk(j - 1)->getLength() +
+          metaCornerLen  = ratioLen * (stroke->getChunk(j - 1)->getLength() +
                                       stroke->getChunk(j)->getLength());
           partialLen     = 0;
           bool goodAngle = false;
@@ -688,7 +689,7 @@ void TInbetween::Imp::computeTransformation() {
   std::vector<TPointD> samplingPoint1(samplingPointNumber),
       samplingPoint2(samplingPointNumber);
   TStroke *stroke1, *stroke2;
-  std::vector<double> ratioSampling, weigths, subStrokeXScaling,
+  std::vector<double> ratioSampling, weights, subStrokeXScaling,
       subStrokeYScaling;
 
   UINT strokeCount1 = m_firstImage->getStrokeCount();
@@ -1010,8 +1011,8 @@ debugStream <<"num angoli 2: "<< angles2.size() << endl;
 
           ratioSampling.clear();
           ratioSampling.reserve(samplingPointNumber);
-          weigths.clear();
-          weigths.reserve(samplingPointNumber);
+          weights.clear();
+          weights.reserve(samplingPointNumber);
 
           TPointD pOld, pNew;
           // double totalW=0;
@@ -1023,7 +1024,7 @@ debugStream <<"num angoli 2: "<< angles2.size() << endl;
             if (pNew == stroke2Centroid) continue;
             versor1 = normalize(pOld - stroke1Centroid);
             versor2 = normalize(pNew - stroke2Centroid);
-            weigths.push_back(tdistance(pOld, stroke1Centroid) +
+            weights.push_back(tdistance(pOld, stroke1Centroid) +
                               tdistance(pNew, stroke2Centroid));
             cs       = versor1 * versor2;
             sn       = cross(versor1, versor2);
@@ -1035,7 +1036,7 @@ debugStream <<"num angoli 2: "<< angles2.size() << endl;
           subStroke1 = 0;
           subStroke2 = 0;
 
-          double radRotation = weightedAverage(ratioSampling, weigths);
+          double radRotation = weightedAverage(ratioSampling, weights);
 
           totalRadRotation += radRotation;
         }
@@ -1480,8 +1481,8 @@ TVectorImageP TInbetween::Imp::tween(double t) const {
             len1 += step1;
             len2 += step2;
           }
-          point2 = subStroke2->getThickPointAtLength(totalLen2);
-          point2 = TThickPoint(m_transformation[i].m_inverse *
+          point2     = subStroke2->getThickPointAtLength(totalLen2);
+          point2     = TThickPoint(m_transformation[i].m_inverse *
                                    subStroke2->getThickPointAtLength(totalLen2),
                                point2.thick);
           finalPoint = subStroke1->getThickPointAtLength(totalLen1) * (1 - t) +
@@ -1552,5 +1553,22 @@ void TInbetween::Imp::transferColor(const TVectorImageP &destination) const {
 //-------------------------------------------------------------------
 
 TVectorImageP TInbetween::tween(double t) const { return m_imp->tween(t); }
+
+//-------------------------------------------------------------------
+
+double TInbetween::interpolation(double t, enum TweenAlgorithm algorithm) {
+  // in tutte le interpolazioni : s(0) = 0, s(1) = 1
+  switch (algorithm) {
+  case EaseInInterpolation:  // s'(1) = 0
+    return t * (2 - t);
+  case EaseOutInterpolation:  // s'(0) = 0
+    return t * t;
+  case EaseInOutInterpolation:  // s'(0) = s'(1) = 0
+    return t * t * (3 - 2 * t);
+  case LinearInterpolation:
+  default:
+    return t;
+  }
+}
 
 //-------------------------------------------------------------------

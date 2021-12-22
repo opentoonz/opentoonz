@@ -84,7 +84,7 @@ public:
     Tile(const TRasterCM32P &ras, const TPoint &p);
     ~Tile();
     QString id() const override {
-      return "TileCM" + QString::number((uintptr_t)this);
+      return "TileCM" + QString::number((uintptr_t) this);
     }
 
     Tile *clone() const override;
@@ -124,7 +124,7 @@ public:
     Tile(const TRasterP &ras, const TPoint &p);
     ~Tile();
     QString id() const override {
-      return "TTileSet32::Tile" + QString::number((uintptr_t)this);
+      return "TTileSet32::Tile" + QString::number((uintptr_t) this);
     }
 
     Tile *clone() const override;
@@ -146,6 +146,7 @@ public:
   void add(const TRasterP &ras, TRect rect) override;
 
   const Tile *getTile(int index) const;
+  Tile *editTile(int index) const;
 
   TTileSetFullColor *clone() const override;
 };

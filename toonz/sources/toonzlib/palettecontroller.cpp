@@ -62,6 +62,14 @@ void PaletteController::setCurrentPalette(TPaletteHandle *paletteHandle) {
   // perform signal BROADCASTING to all palette handles implicitly mapping to
   // the associated palette:
 
+  // in case the handle is not changed, skip the reconnection
+  if (m_originalCurrentPalette == paletteHandle) {
+    if (!paletteHandle) return;
+    m_currentPalette->setPalette(paletteHandle->getPalette(),
+                                 paletteHandle->getStyleIndex());
+    return;
+  }
+
   if (m_originalCurrentPalette) {
     m_originalCurrentPalette->disconnectBroadcasts(m_currentPalette);
     m_currentPalette->disconnectBroadcasts(m_originalCurrentPalette);
@@ -82,6 +90,7 @@ void PaletteController::setCurrentPalette(TPaletteHandle *paletteHandle) {
 
 void PaletteController::editLevelPalette() {
   setCurrentPalette(m_currentLevelPalette);
+  emit(checkPaletteLock());
 }
 
 //-----------------------------------------------------------------------------

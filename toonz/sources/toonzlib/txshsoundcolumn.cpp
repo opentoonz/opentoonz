@@ -6,77 +6,15 @@
 #include "toonz/toonzscene.h"
 #include "toonz/tproject.h"
 #include "toonz/sceneproperties.h"
-#include "toonz/txshsoundlevel.h"
 
 #include "tstream.h"
 #include "toutputproperties.h"
 #include "tsop.h"
 #include "tconvert.h"
+#include "toonz/preferences.h"
 
 #include <QAudioFormat>
 #include <QAudioDeviceInfo>
-
-//=============================================================================
-//  ColumnLevel
-//=============================================================================
-
-class ColumnLevel {
-  TXshSoundLevelP m_soundLevel;
-
-  /*!Offsets: in frames. Start offset is a positive number.*/
-  int m_startOffset;
-  /*!Offsets: in frames. End offset is a positive number(to subtract to..).*/
-  int m_endOffset;
-
-  //! Starting frame in the timeline
-  int m_startFrame;
-
-  //! frameRate
-  double m_fps;
-
-public:
-  ColumnLevel(TXshSoundLevel *soundLevel = 0, int startFrame = -1,
-              int startOffset = -1, int endOffset = -1, double fps = -1);
-  ~ColumnLevel();
-  ColumnLevel *clone() const;
-
-  //! Overridden from TXshLevel
-  TXshSoundLevel *getSoundLevel() const { return m_soundLevel.getPointer(); }
-  void setSoundLevel(TXshSoundLevelP level) { m_soundLevel = level; }
-
-  void loadData(TIStream &is);
-  void saveData(TOStream &os);
-
-  void setStartOffset(int value);
-  int getStartOffset() const { return m_startOffset; }
-
-  void setEndOffset(int value);
-  int getEndOffset() const { return m_endOffset; }
-
-  void setOffsets(int startOffset, int endOffset);
-
-  //! Return the starting frame without offsets.
-  void setStartFrame(int frame) { m_startFrame = frame; }
-  int getStartFrame() const { return m_startFrame; }
-
-  //! Return the ending frame without offsets.
-  int getEndFrame() const;
-
-  //! Return frame count without offset.
-  int getFrameCount() const;
-
-  //! Return frame count with offset.
-  int getVisibleFrameCount() const;
-
-  //! Return start frame with offset.
-  int getVisibleStartFrame() const;
-  //! Return last frame with offset.
-  int getVisibleEndFrame() const;
-  //! Updates m_startOfset and m_endOffset.
-  void updateFrameRate(double newFrameRate);
-
-  void setFrameRate(double fps) { m_fps = fps; }
-};
 
 //=============================================================================
 
@@ -112,7 +50,7 @@ void ColumnLevel::loadData(TIStream &is) {
   if (tagName == "SoundCells") {
     TPersist *p = 0;
     is >> m_startOffset >> m_endOffset >> m_startFrame >> p;
-    TXshSoundLevel *xshLevel   = dynamic_cast<TXshSoundLevel *>(p);
+    TXshSoundLevel *xshLevel = dynamic_cast<TXshSoundLevel *>(p);
     if (xshLevel) m_soundLevel = xshLevel;
   }
   is.closeChild();
@@ -137,9 +75,8 @@ void ColumnLevel::setStartOffset(int value) {
 
 void ColumnLevel::setEndOffset(int value) {
   if (!m_soundLevel) return;
-  if (value < 0 ||
-      getStartFrame() + getFrameCount() - value <
-          getStartFrame() + getStartOffset() + 1)
+  if (value < 0 || getStartFrame() + getFrameCount() - value <
+                       getStartFrame() + getStartOffset() + 1)
     return;
   m_endOffset = value;
 }
@@ -151,9 +88,8 @@ void ColumnLevel::setOffsets(int startOffset, int endOffset) {
 
   if (startOffset < 0 || startOffset > getFrameCount() - endOffset - 1) return;
   m_startOffset = startOffset;
-  if (endOffset < 0 ||
-      getStartFrame() + getFrameCount() - endOffset <
-          getStartFrame() + getStartOffset() + 1)
+  if (endOffset < 0 || getStartFrame() + getFrameCount() - endOffset <
+                           getStartFrame() + getStartOffset() + 1)
     return;
   m_endOffset = endOffset;
 }
@@ -213,7 +149,7 @@ bool lessThan(const ColumnLevel *s1, const ColumnLevel *s2) {
 }
 
 //-----------------------------------------------------------------------------
-}
+}  // namespace
 //=============================================================================
 
 TXshSoundColumn::TXshSoundColumn()
@@ -324,6 +260,13 @@ void TXshSoundColumn::loadData(TIStream &is) {
     is >> status;
     setStatusWord(status);
   }
+
+  std::string tagName;
+  while (is.openChild(tagName)) {
+    if (!loadCellMarks(tagName, is))
+      throw TException("TXshLevelColumn, unknown tag: " + tagName);
+    is.closeChild();
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -336,6 +279,8 @@ void TXshSoundColumn::saveData(TOStream &os) {
   int i;
   for (i = 0; i < levelsCount; i++) m_levels.at(i)->saveData(os);
   os << getStatusWord();
+  // cell marks
+  saveCellMarks(os);
 }
 
 //-----------------------------------------------------------------------------
@@ -381,14 +326,30 @@ const TXshCell &TXshSoundColumn::getCell(int row) const {
   if (!l) return emptyCell;
   TXshSoundLevel *soundLevel = l->getSoundLevel();
   TXshCell *cell = new TXshCell(soundLevel, TFrameId(row - l->getStartFrame()));
-  // La nuova cella aggiunge un reference al TXshSoundLevel; poiche' le celle
-  // delle
-  // TXshSoundColumn non sono strutture persistenti ma sono strutture dinamiche
-  // (vengono ricreate ogni volta) devo occuparmi di fare il release altrimenti
-  // il
-  // TXshSoundLevel non viene mai buttato.
+  // The new cell adds a reference to the TXshSoundLevel;
+  // since the cells of the TXshSoundColumn are not persistent structures
+  // but are dynamic structures (they are recreated every time) I have to take
+  // care of making the release otherwise the TXshSoundLevel is never thrown
+  // away.
   soundLevel->release();
   return *cell;
+}
+
+//-----------------------------------------------------------------------------
+
+TXshCell TXshSoundColumn::getSoundCell(int row) {
+  static TXshCell emptyCell;
+
+  ColumnLevel *l = getColumnLevelByFrame(row);
+  if (row < 0 || row < getFirstRow() || row > getMaxFrame()) {
+    if (l) emptyCell.m_level = l->getSoundLevel();
+    return emptyCell;
+  }
+
+  if (!l) return emptyCell;
+  TXshSoundLevel *soundLevel = l->getSoundLevel();
+  TXshCell cell(soundLevel, TFrameId(row - l->getStartFrame()));
+  return cell;
 }
 
 //-----------------------------------------------------------------------------
@@ -539,7 +500,7 @@ bool TXshSoundColumn::setCells(int row, int rowCount, const TXshCell cells[]) {
   bool ret = false;
   int r;
   for (r = ra; r <= rb; r++) {
-    bool isOneCellSet     = setCell(r, cells[r - ra]);
+    bool isOneCellSet = setCell(r, cells[r - ra]);
     if (isOneCellSet) ret = isOneCellSet;
   }
   return ret;
@@ -690,7 +651,7 @@ int TXshSoundColumn::modifyCellRange(int row, int delta,
   if (modifyStartValue) {
     // Evito che vada oltre il limite infieriore
     if (endVisibleFrame < startVisibleFrame + delta)
-      delta            = endVisibleFrame - startVisibleFrame;
+      delta = endVisibleFrame - startVisibleFrame;
     int newStartOffset = l->getStartOffset() + delta;
     // Evito che vada oltre il limite superiore
     if (newStartOffset < 0) newStartOffset = 0;
@@ -704,7 +665,7 @@ int TXshSoundColumn::modifyCellRange(int row, int delta,
   if (startVisibleFrame > endVisibleFrame + delta)
     delta = startVisibleFrame - endVisibleFrame;
   // Evito che vada oltre il limite inferiore
-  int newEndOffset                   = l->getEndOffset() - delta;
+  int newEndOffset = l->getEndOffset() - delta;
   if (newEndOffset < 0) newEndOffset = 0;
   l->setEndOffset(newEndOffset);
   checkColumn();
@@ -845,17 +806,25 @@ void TXshSoundColumn::play(ColumnLevel *columnLevel, int currentFrame) {
 //-----------------------------------------------------------------------------
 
 void TXshSoundColumn::play(int currentFrame) {
-  TSoundTrackP soundTrack = getOverallSoundTrack(currentFrame);
+  try {
+    TSoundTrackP soundTrack = getOverallSoundTrack(currentFrame);
 
-  if (!soundTrack) return;
+    if (!soundTrack) return;
 
-  int spf        = m_levels.at(0)->getSoundLevel()->getSamplePerFrame();
-  int startFrame = (currentFrame - getFirstRow());
+    int spf        = m_levels.at(0)->getSoundLevel()->getSamplePerFrame();
+    int startFrame = (currentFrame - getFirstRow());
 
-  int s0 = startFrame * spf;
-  int s1 = getMaxFrame() * spf;
+    int s0 = startFrame * spf;
+    int s1 = getMaxFrame() * spf;
 
-  play(soundTrack, s0, s1, false);
+    play(soundTrack, s0, s1, false);
+  } catch (TSoundDeviceException &e) {
+    if (e.getType() == TSoundDeviceException::NoDevice) {
+      std::cout << ::to_string(e.getMessage()) << std::endl;
+    } else {
+      throw TSoundDeviceException(e.getType(), e.getMessage());
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -880,7 +849,7 @@ bool TXshSoundColumn::isPlaying() const {
 void TXshSoundColumn::insertColumnLevel(ColumnLevel *columnLevel, int index) {
   if (index == -1) index = m_levels.size();
   m_levels.insert(index, columnLevel);
-  qSort(m_levels.begin(), m_levels.end(), lessThan);
+  std::sort(m_levels.begin(), m_levels.end(), lessThan);
 }
 
 //-----------------------------------------------------------------------------
@@ -943,10 +912,17 @@ void TXshSoundColumn::onTimerOut() {
 
 void TXshSoundColumn::scrub(int fromFrame, int toFrame) {
   if (!isCamstandVisible()) return;
-  TSoundTrackP soundTrack = getOverallSoundTrack(fromFrame, toFrame + 1);
-  if (!soundTrack) return;
-
-  play(soundTrack, 0, soundTrack->getSampleCount(), false);
+  try {
+    TSoundTrackP soundTrack = getOverallSoundTrack(fromFrame, toFrame + 1);
+    if (!soundTrack) return;
+    play(soundTrack, 0, soundTrack->getSampleCount(), false);
+  } catch (TSoundDeviceException &e) {
+    if (e.getType() == TSoundDeviceException::NoDevice) {
+      std::cout << ::to_string(e.getMessage()) << std::endl;
+    } else {
+      throw TSoundDeviceException(e.getType(), e.getMessage());
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -958,12 +934,12 @@ TSoundTrackP TXshSoundColumn::getOverallSoundTrack(int fromFrame, int toFrame,
 
   if (levelsCount == 0) return 0;
 
-  if (fps == -1) fps             = m_levels[0]->getSoundLevel()->getFrameRate();
+  if (fps == -1) fps = m_levels[0]->getSoundLevel()->getFrameRate();
   if (fromFrame == -1) fromFrame = getFirstRow();
-  if (toFrame == -1) toFrame     = getMaxFrame();
+  if (toFrame == -1) toFrame = getMaxFrame();
 
   if (format.m_sampleRate == 0) {
-    // Found the best format inside the soundsequences
+    // Find the best format inside the soundsequences
     int sampleRate    = 0;
     int bitsPerSample = 8;
     int channels      = 1;
@@ -1000,12 +976,13 @@ TSoundTrackP TXshSoundColumn::getOverallSoundTrack(int fromFrame, int toFrame,
     format.m_signedSample = true;
   }
 
-// We prefer to have 22050 as a maximum sampleRate (to avoid crashes or
-// another issues)
 #ifdef _WIN32
-  if (format.m_sampleRate >= 44100) format.m_sampleRate = 22050;
+  if (format.m_sampleRate > 44100) format.m_sampleRate = 44100;
 #else
   QAudioDeviceInfo info(QAudioDeviceInfo::defaultOutputDevice());
+  if (info.deviceName().length() == 0)
+    throw TSoundDeviceException(TSoundDeviceException::NoDevice,
+                                "No device found, check QAudio backends");
   QList<int> ssrs = info.supportedSampleRates();
   if (!ssrs.contains(format.m_sampleRate)) format.m_sampleRate = 44100;
   QAudioFormat qFormat;
@@ -1017,10 +994,10 @@ TSoundTrackP TXshSoundColumn::getOverallSoundTrack(int fromFrame, int toFrame,
   qFormat.setChannelCount(format.m_channelCount);
   qFormat.setByteOrder(QAudioFormat::LittleEndian);
   if (!info.isFormatSupported((qFormat))) {
-    qFormat               = info.nearestFormat(qFormat);
+    qFormat = info.nearestFormat(qFormat);
     format.m_bitPerSample = qFormat.sampleSize();
     format.m_channelCount = qFormat.channelCount();
-    format.m_sampleRate   = qFormat.sampleRate();
+    format.m_sampleRate = qFormat.sampleRate();
     if (qFormat.sampleType() == QAudioFormat::SignedInt)
       format.m_signedSample = true;
     else
@@ -1070,12 +1047,12 @@ TSoundTrackP TXshSoundColumn::getOverallSoundTrack(int fromFrame, int toFrame,
     if (!s) continue;
     TSoundTrackP soundTrack = TSop::convert(s, format);
 
-    int s0delta                              = 0;
+    int s0delta = 0;
     if (fromFrame > levelStartFrame) s0delta = fromFrame - levelStartFrame;
 
     int s0 = (l->getStartOffset() + s0delta) * samplePerFrame;
 
-    int s1delta                          = 0;
+    int s1delta = 0;
     if (toFrame < levelEndFrame) s1delta = levelEndFrame - toFrame;
     int s1 = (soundLevel->getFrameCount() - l->getEndOffset() - s1delta) *
              samplePerFrame;
@@ -1113,9 +1090,9 @@ TSoundTrackP TXshSoundColumn::mixingTogether(
   TXshSoundLevel *soundLevel = l->getSoundLevel();
   assert(soundLevel);
 
-  if (fps == -1) fps             = soundLevel->getFrameRate();
+  if (fps == -1) fps = soundLevel->getFrameRate();
   if (fromFrame == -1) fromFrame = 0;
-  if (toFrame == -1) toFrame     = getXsheet()->getFrameCount();
+  if (toFrame == -1) toFrame = getXsheet()->getFrameCount();
 
   if (!soundLevel->getSoundTrack()) return mix;
   TSoundTrackFormat format = soundLevel->getSoundTrack()->getFormat();
@@ -1143,9 +1120,9 @@ TSoundTrackP TXshSoundColumn::mixingTogether(
   }
 
   // Per ora perche mov vuole solo 16 bit
-  TSoundTrackFormat fmt                            = mix->getFormat();
+  TSoundTrackFormat fmt = mix->getFormat();
   if (fmt.m_bitPerSample != 16) fmt.m_bitPerSample = 16;
-  mix                                              = TSop::convert(mix, fmt);
+  mix = TSop::convert(mix, fmt);
   return mix;
 }
 

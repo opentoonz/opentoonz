@@ -52,11 +52,11 @@ void level_ctable_template_(const unsigned int channels,
                             const bool *act_sw,          // user setting
                             const int *in_min,           // image pixel value
                             const int *in_max,           // image pixel value
-                            const double *in_min_shift,  // user settting
-                            const double *in_max_shift,  // user settting
-                            const double *out_min,       // user settting
-                            const double *out_max,       // user settting
-                            const double *gamma,         // user settting
+                            const double *in_min_shift,  // user setting
+                            const double *in_max_shift,  // user setting
+                            const double *out_min,       // user setting
+                            const double *out_max,       // user setting
+                            const double *gamma,         // user setting
                             const unsigned int div_num,
                             std::vector<std::vector<unsigned int>> &table_array
                             /*

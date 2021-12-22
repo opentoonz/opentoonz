@@ -25,6 +25,8 @@ class TPaletteHandle;
 namespace DVGui {
 
 class DVAPI StyleIndexLineEdit : public LineEdit {
+  Q_OBJECT
+
   TPaletteHandle *m_pltHandle;
 
 public:

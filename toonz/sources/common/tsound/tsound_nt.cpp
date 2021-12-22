@@ -1915,7 +1915,7 @@ std::string getMixerLineName(DWORD lineID) {
   assert(false);
   return "";
 #else
-  return std::string(mxl.szName);
+  return QString::fromWCharArray(mxl.szName).toStdString();
 #endif
 }
 

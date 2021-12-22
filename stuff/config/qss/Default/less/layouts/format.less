@@ -3,24 +3,19 @@
 ----------------------------------------------------------------------------- */
 
 #CleanupSettings {
-  & QLabel {}
   & #CleanupSettingsFrame {
     // space out the boxes vertically
     // needs margin for good placement
+    &:extend(.frame all);
     margin-top: 2;
     margin-bottom: 4;
   }
   & QGroupBox {
     margin-bottom: 3;
   }
-}
-
-#CleanupSettingsFrame {
-  &:extend(.frame all);
-}
-
-#CleanupSettingsShowButton {
-  &:extend(.button-show all);
+  & QScrollArea {
+    &:extend(.frame all);
+  }
 }
 
 ParamsPage {
@@ -55,16 +50,17 @@ ParamsPage {
     &:extend(.RadioButton::indicator all);
     background-color: transparent;
     border: 0;
-    height: 21;
     margin: 0;
-    width: 11;
   }
 }
 
 #ForceSquaredPixelButton {
   &:extend(.button-tool all); // Apply a button style
-  .icon-fsp;                  // Apply an icon
   margin: 0;
+  height: 16;
+  width: 16;
+  border: @toolbutton-border-size solid @toolbutton-border-color;
+  padding: 2;
 }
 
 /* -----------------------------------------------------------------------------
@@ -81,8 +77,4 @@ ParamsPage {
 
 #OutputSettingsCameraBox {
   &:extend(.frame all);
-}
-
-#OutputSettingsShowButton {
-  &:extend(.button-show all);
 }

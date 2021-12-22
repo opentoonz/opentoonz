@@ -24,6 +24,7 @@
 
 // Qt includes
 #include <QPainter>
+#include <QPainterPath>
 #include <QMouseEvent>
 #include <QWheelEvent>
 #include <QMenu>
@@ -263,13 +264,11 @@ FunctionPanel::FunctionPanel(QWidget *parent, bool isFloating)
 
   if (m_isFloating) {
     // load the dialog size
-    TFilePath fp(ToonzFolder::getMyModuleDir() + TFilePath(mySettingsFileName));
-    QSettings mySettings(toQString(fp), QSettings::IniFormat);
+    TFilePath fp(ToonzFolder::getMyModuleDir() + TFilePath("popups.ini"));
+    QSettings settings(toQString(fp), QSettings::IniFormat);
 
-    mySettings.beginGroup("Dialogs");
     setGeometry(
-        mySettings.value("FunctionCurves", QRect(500, 500, 400, 300)).toRect());
-    mySettings.endGroup();
+        settings.value("FunctionCurves", QRect(500, 500, 400, 300)).toRect());
   }
 }
 
@@ -278,12 +277,10 @@ FunctionPanel::FunctionPanel(QWidget *parent, bool isFloating)
 FunctionPanel::~FunctionPanel() {
   if (m_isFloating) {
     // save the dialog size
-    TFilePath fp(ToonzFolder::getMyModuleDir() + TFilePath(mySettingsFileName));
-    QSettings mySettings(toQString(fp), QSettings::IniFormat);
+    TFilePath fp(ToonzFolder::getMyModuleDir() + TFilePath("popups.ini"));
+    QSettings settings(toQString(fp), QSettings::IniFormat);
 
-    mySettings.beginGroup("Dialogs");
-    mySettings.setValue("FunctionCurves", geometry());
-    mySettings.endGroup();
+    settings.setValue("FunctionCurves", geometry());
   }
 
   delete m_dragTool;
@@ -523,9 +520,9 @@ QPainterPath FunctionPanel::getSegmentPainterPath(TDoubleParam *curve,
 //-----------------------------------------------------------------------------
 
 void FunctionPanel::drawCurrentFrame(QPainter &painter) {
-  int currentframe                = 0;
+  int currentframe = 0;
   if (m_frameHandle) currentframe = m_frameHandle->getFrame();
-  int x                           = frameToX(currentframe);
+  int x = frameToX(currentframe);
   if (m_currentFrameStatus == 0)
     painter.setPen(Qt::magenta);
   else if (m_currentFrameStatus == 1)
@@ -759,6 +756,8 @@ void FunctionPanel::updateGadgets(TDoubleParam *curve) {
         m_gadgets.push_back(Gadget(EaseInPercentage, i, q, 6, 15));
         break;
       }
+      default:
+        break;
       }
 
       // Right handle
@@ -788,6 +787,8 @@ void FunctionPanel::updateGadgets(TDoubleParam *curve) {
           m_gadgets.push_back(Gadget(EaseOutPercentage, i, q, 6, 15));
           break;
         }
+        default:
+          break;
         }
       }
     }
@@ -862,8 +863,9 @@ void FunctionPanel::updateGadgets(TDoubleParam *curve) {
     //       So, keyframe data could be shared, but adjacent segment lengths
     //       could not...
 
-    if (it != iLast && (kf.m_type == TDoubleKeyframe::SpeedInOut ||
-                        kf.m_type == TDoubleKeyframe::EaseInOut) &&
+    if (it != iLast &&
+        (kf.m_type == TDoubleKeyframe::SpeedInOut ||
+         kf.m_type == TDoubleKeyframe::EaseInOut) &&
         kf.m_speedOut.x != 0) {
       QPointF p(frameToX(frame + kf.m_speedOut.x), groupHandleY);
       Gadget gadget((FunctionPanel::Handle)101, -1, p, 6, 15);  // type value...
@@ -997,6 +999,8 @@ void FunctionPanel::drawCurrentCurve(QPainter &painter) {
       painter.setPen(isHighlighted ? QColor(255, 126, 0) : m_selectedColor);
       painter.drawLine(p.x(), p.y() - 15, p.x(), p.y() + 15);
       break;
+    default:
+      break;
     }
   }
 
@@ -1058,6 +1062,8 @@ void FunctionPanel::drawGroupKeyframes(QPainter &painter) {
       pp.lineTo(p + QPointF(0, h));
       pp.lineTo(p + QPointF(d, h));
       painter.drawPath(pp);
+      break;
+    default:
       break;
     }
   }
@@ -1141,8 +1147,8 @@ void FunctionPanel::paintEvent(QPaintEvent *e) {
     if (currentCurve) {
       const TUnit *unit = 0;
       if (currentCurve->getMeasure())
-        unit                 = currentCurve->getMeasure()->getCurrentUnit();
-      double displayValue    = m_cursor.value;
+        unit = currentCurve->getMeasure()->getCurrentUnit();
+      double displayValue = m_cursor.value;
       if (unit) displayValue = unit->convertTo(displayValue);
       // painter.setClipRect(0,oy0,height(),height()-oy0);
       int y = valueToY(currentCurve, m_cursor.value);
@@ -1175,9 +1181,13 @@ void FunctionPanel::paintEvent(QPaintEvent *e) {
 void FunctionPanel::mousePressEvent(QMouseEvent *e) {
   m_cursor.visible = false;
 
-  // m_dragTool should be 0. just in case...
-  assert(m_dragTool == 0);
-  m_dragTool = 0;
+  // m_dragTool can be non-zero when both the left and the mid buttons are
+  // pressed
+  if (m_dragTool) {
+    m_dragTool->release(e);
+    delete m_dragTool;
+    m_dragTool = nullptr;
+  }
 
   if (e->button() == Qt::MidButton) {
     // mid mouse click => panning
@@ -1231,8 +1241,8 @@ void FunctionPanel::mousePressEvent(QMouseEvent *e) {
   FunctionTreeModel::Channel *currentChannel =
       m_functionTreeModel ? m_functionTreeModel->getCurrentChannel() : 0;
   if (!currentChannel ||
-      getCurveDistance(currentChannel->getParam(), winPos) > maxDistance &&
-          closestGadgetId < 0) {
+      (getCurveDistance(currentChannel->getParam(), winPos) > maxDistance &&
+       closestGadgetId < 0)) {
     // if current channel is undefined or its curve is too far from the clicked
     // point
     // the user is possibly trying to select a different curve
@@ -1343,9 +1353,11 @@ int kIndex = dragTool->createKeyframe(frame);
 //-----------------------------------------------------------------------------
 
 void FunctionPanel::mouseReleaseEvent(QMouseEvent *e) {
-  if (m_dragTool) m_dragTool->release(e);
-  delete m_dragTool;
-  m_dragTool           = 0;
+  if (m_dragTool) {
+    m_dragTool->release(e);
+    delete m_dragTool;
+    m_dragTool = nullptr;
+  }
   m_cursor.visible     = true;
   m_currentFrameStatus = 0;
   update();
@@ -1449,11 +1461,11 @@ void FunctionPanel::fitGraphToWindow(bool currentCurveOnly) {
     TDoubleParam *curve = channel->getParam();
     if (currentCurveOnly && curve != getCurrentCurve()) continue;
 
-    const TUnit *unit             = 0;
+    const TUnit *unit = 0;
     if (curve->getMeasure()) unit = curve->getMeasure()->getCurrentUnit();
-    int n                         = curve->getKeyframeCount();
+    int n = curve->getKeyframeCount();
     if (n == 0) {
-      double v    = curve->getDefaultValue();
+      double v = curve->getDefaultValue();
       if (unit) v = unit->convertTo(v);
       if (v0 > v1)
         v0 = v1 = v;
@@ -1470,19 +1482,19 @@ void FunctionPanel::fitGraphToWindow(bool currentCurveOnly) {
         f0 = fa;
         f1 = fb;
       } else {
-        f0 = qMin(f0, fa);
-        f1 = qMax(f1, fb);
+        f0 = std::min(f0, fa);
+        f1 = std::max(f1, fb);
       }
-      double v        = curve->getValue(fa);
-      if (unit) v     = unit->convertTo(v);
+      double v = curve->getValue(fa);
+      if (unit) v = unit->convertTo(v);
       if (v0 > v1) v0 = v1 = v;
-      int m                = 50;
+      int m = 50;
       for (int j = 0; j < m; j++) {
-        double t    = (double)j / (double)(m - 1);
-        double v    = curve->getValue((1 - t) * fa + t * fb);
+        double t = (double)j / (double)(m - 1);
+        double v = curve->getValue((1 - t) * fa + t * fb);
         if (unit) v = unit->convertTo(v);
-        v0          = qMin(v0, v);
-        v1          = qMax(v1, v);
+        v0 = std::min(v0, v);
+        v1 = std::max(v1, v);
       }
     }
   }

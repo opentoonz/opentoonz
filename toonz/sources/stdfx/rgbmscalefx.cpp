@@ -4,10 +4,11 @@
 #include "tfxparam.h"
 #include "texception.h"
 #include "stdfx.h"
+#include "globalcontrollablefx.h"
 
 //===================================================================
 
-class RGBMScaleFx final : public TStandardRasterFx {
+class RGBMScaleFx final : public GlobalControllableFx {
   FX_PLUGIN_DECLARATION(RGBMScaleFx)
   TRasterFxPort m_input;
   TDoubleParamP m_red;

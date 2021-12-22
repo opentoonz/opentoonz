@@ -17,17 +17,17 @@
 <context>
     <name>GifWriterProperties</name>
     <message>
-        <location filename="../../image/ffmpeg/tiio_gif.cpp" line="255"/>
+        <location filename="../../image/ffmpeg/tiio_gif.cpp" line="257"/>
         <source>Scale</source>
         <translation>Масштаб</translation>
     </message>
     <message>
-        <location filename="../../image/ffmpeg/tiio_gif.cpp" line="256"/>
+        <location filename="../../image/ffmpeg/tiio_gif.cpp" line="258"/>
         <source>Looping</source>
         <translation>Зациклить</translation>
     </message>
     <message>
-        <location filename="../../image/ffmpeg/tiio_gif.cpp" line="257"/>
+        <location filename="../../image/ffmpeg/tiio_gif.cpp" line="259"/>
         <source>Generate Palette</source>
         <translation>Создать палитру</translation>
     </message>
@@ -35,12 +35,12 @@
 <context>
     <name>Mp4WriterProperties</name>
     <message>
-        <location filename="../../image/ffmpeg/tiio_mp4.cpp" line="232"/>
+        <location filename="../../image/ffmpeg/tiio_mp4.cpp" line="234"/>
         <source>Quality</source>
         <translation>Качество</translation>
     </message>
     <message>
-        <location filename="../../image/ffmpeg/tiio_mp4.cpp" line="233"/>
+        <location filename="../../image/ffmpeg/tiio_mp4.cpp" line="235"/>
         <source>Scale</source>
         <translation>Масштаб</translation>
     </message>
@@ -48,7 +48,7 @@
 <context>
     <name>PngWriterProperties</name>
     <message>
-        <location filename="../../image/png/tiio_png.cpp" line="738"/>
+        <location filename="../../image/png/tiio_png.cpp" line="757"/>
         <source>Alpha Channel</source>
         <translation>Альфа канал</translation>
     </message>
@@ -70,52 +70,52 @@ Please try raising the FFmpeg timeout in Preferences.</source>
 <context>
     <name>SgiWriterProperties</name>
     <message>
-        <location filename="../../image/sgi/filesgi.cpp" line="1225"/>
+        <location filename="../../image/sgi/filesgi.cpp" line="1229"/>
         <source>Bits Per Pixel</source>
         <translation>Битов на пиксель</translation>
     </message>
     <message>
-        <location filename="../../image/sgi/filesgi.cpp" line="1226"/>
+        <location filename="../../image/sgi/filesgi.cpp" line="1230"/>
         <source>24 bits</source>
         <translation>24 бита</translation>
     </message>
     <message>
-        <location filename="../../image/sgi/filesgi.cpp" line="1227"/>
+        <location filename="../../image/sgi/filesgi.cpp" line="1231"/>
         <source>32 bits</source>
         <translation>32 бита</translation>
     </message>
     <message>
-        <location filename="../../image/sgi/filesgi.cpp" line="1228"/>
+        <location filename="../../image/sgi/filesgi.cpp" line="1232"/>
         <source>48 bits</source>
-        <translation>48 бита</translation>
+        <translation>48 бит</translation>
     </message>
     <message>
-        <location filename="../../image/sgi/filesgi.cpp" line="1229"/>
+        <location filename="../../image/sgi/filesgi.cpp" line="1233"/>
         <source>64 bits</source>
         <translation>64 бита</translation>
     </message>
     <message>
-        <location filename="../../image/sgi/filesgi.cpp" line="1230"/>
+        <location filename="../../image/sgi/filesgi.cpp" line="1234"/>
         <source>8 bits (Greyscale)</source>
         <translation>8 бита (оттенки серого)</translation>
     </message>
     <message>
-        <location filename="../../image/sgi/filesgi.cpp" line="1231"/>
+        <location filename="../../image/sgi/filesgi.cpp" line="1235"/>
         <source>Endianess</source>
-        <translation>Порядок байтов</translation>
+        <translation>Endianess</translation>
     </message>
     <message>
-        <location filename="../../image/sgi/filesgi.cpp" line="1232"/>
+        <location filename="../../image/sgi/filesgi.cpp" line="1236"/>
         <source>Big Endian</source>
-        <translation type="unfinished"></translation>
+        <translation>Big Endian</translation>
     </message>
     <message>
-        <location filename="../../image/sgi/filesgi.cpp" line="1233"/>
+        <location filename="../../image/sgi/filesgi.cpp" line="1237"/>
         <source>Little Endian</source>
-        <translation type="unfinished"></translation>
+        <translation>Little Endian</translation>
     </message>
     <message>
-        <location filename="../../image/sgi/filesgi.cpp" line="1234"/>
+        <location filename="../../image/sgi/filesgi.cpp" line="1238"/>
         <source>RLE-Compressed</source>
         <translation>RLE-сжатие</translation>
     </message>
@@ -181,37 +181,37 @@ Please try raising the FFmpeg timeout in Preferences.</source>
 <context>
     <name>SvgWriterProperties</name>
     <message>
-        <location filename="../../image/svg/tiio_svg.cpp" line="1954"/>
+        <location filename="../../image/svg/tiio_svg.cpp" line="1969"/>
         <source>Stroke Mode</source>
         <translation>Режим обводки</translation>
     </message>
     <message>
-        <location filename="../../image/svg/tiio_svg.cpp" line="1955"/>
+        <location filename="../../image/svg/tiio_svg.cpp" line="1970"/>
         <source>Outline Quality</source>
         <translation>Качество контура</translation>
     </message>
     <message>
-        <location filename="../../image/svg/tiio_svg.cpp" line="1956"/>
+        <location filename="../../image/svg/tiio_svg.cpp" line="1971"/>
         <source>Centerline</source>
         <translation>Осевая линия</translation>
     </message>
     <message>
-        <location filename="../../image/svg/tiio_svg.cpp" line="1957"/>
+        <location filename="../../image/svg/tiio_svg.cpp" line="1972"/>
         <source>Outline</source>
         <translation>Контур</translation>
     </message>
     <message>
-        <location filename="../../image/svg/tiio_svg.cpp" line="1958"/>
+        <location filename="../../image/svg/tiio_svg.cpp" line="1973"/>
         <source>High</source>
         <translation>Высокая</translation>
     </message>
     <message>
-        <location filename="../../image/svg/tiio_svg.cpp" line="1959"/>
+        <location filename="../../image/svg/tiio_svg.cpp" line="1974"/>
         <source>Medium</source>
         <translation>Средняя</translation>
     </message>
     <message>
-        <location filename="../../image/svg/tiio_svg.cpp" line="1960"/>
+        <location filename="../../image/svg/tiio_svg.cpp" line="1975"/>
         <source>Low</source>
         <translation>Низкая</translation>
     </message>
@@ -282,13 +282,21 @@ Please try raising the FFmpeg timeout in Preferences.</source>
         <translation> 8(ОТТЕНКИСЕРОГО)</translation>
     </message>
     <message>
-        <location filename="../../image/tif/tiio_tif.cpp" line="737"/>
         <source>32(RGBM)</source>
+        <translation type="obsolete">32(RGBA)</translation>
+    </message>
+    <message>
+        <source>64(RGBM)</source>
+        <translation type="obsolete">64(RGBA)</translation>
+    </message>
+    <message>
+        <location filename="../../image/tif/tiio_tif.cpp" line="737"/>
+        <source>32(RGBA)</source>
         <translation>32(RGBA)</translation>
     </message>
     <message>
         <location filename="../../image/tif/tiio_tif.cpp" line="738"/>
-        <source>64(RGBM)</source>
+        <source>64(RGBA)</source>
         <translation>64(RGBA)</translation>
     </message>
     <message>
@@ -338,14 +346,204 @@ Please try raising the FFmpeg timeout in Preferences.</source>
     </message>
 </context>
 <context>
+    <name>Tiio::AviWriterProperties</name>
+    <message>
+        <source>Codec</source>
+        <translation type="vanished">Кодек</translation>
+    </message>
+    <message>
+        <source>Uncompressed</source>
+        <translation type="vanished">Без сжатия</translation>
+    </message>
+</context>
+<context>
+    <name>Tiio::PngWriterProperties</name>
+    <message>
+        <source>Alpha Channel</source>
+        <translation type="vanished">Альфа канал</translation>
+    </message>
+</context>
+<context>
+    <name>Tiio::SgiWriterProperties</name>
+    <message>
+        <source>Bits Per Pixel</source>
+        <translation type="vanished">Битов на пиксель</translation>
+    </message>
+    <message>
+        <source>24 bits</source>
+        <translation type="vanished">24 бита</translation>
+    </message>
+    <message>
+        <source>32 bits</source>
+        <translation type="vanished">32 бита</translation>
+    </message>
+    <message>
+        <source>48 bits</source>
+        <translation type="vanished">48 бита</translation>
+    </message>
+    <message>
+        <source>64 bits</source>
+        <translation type="vanished">64 бита</translation>
+    </message>
+    <message>
+        <source>8 bits (Greyscale)</source>
+        <translation type="vanished">8 бита (оттенки серого)</translation>
+    </message>
+    <message>
+        <source>Endianess</source>
+        <translation type="vanished">Порядок байтов</translation>
+    </message>
+    <message>
+        <source>Big Endian</source>
+        <translation type="vanished">От старшего к младшему</translation>
+    </message>
+    <message>
+        <source>Little Endian</source>
+        <translation type="vanished">От младшего к старшему</translation>
+    </message>
+    <message>
+        <source>RLE-Compressed</source>
+        <translation type="vanished">RLE-сжатие</translation>
+    </message>
+</context>
+<context>
+    <name>Tiio::SvgWriterProperties</name>
+    <message>
+        <source>Stroke Mode</source>
+        <translation type="vanished">Режим обводки</translation>
+    </message>
+    <message>
+        <source>Outline Quality</source>
+        <translation type="vanished">Качество контура</translation>
+    </message>
+    <message>
+        <source>Centerline</source>
+        <translation type="vanished">Осевая линия</translation>
+    </message>
+    <message>
+        <source>Outline</source>
+        <translation type="vanished">Контур</translation>
+    </message>
+    <message>
+        <source>High</source>
+        <translation type="vanished">Высокая</translation>
+    </message>
+    <message>
+        <source>Medium</source>
+        <translation type="vanished">Средняя</translation>
+    </message>
+    <message>
+        <source>Low</source>
+        <translation type="vanished">Низкая</translation>
+    </message>
+</context>
+<context>
+    <name>Tiio::TgaWriterProperties</name>
+    <message>
+        <source>Bits Per Pixel</source>
+        <translation type="vanished">Битов на пиксель</translation>
+    </message>
+    <message>
+        <source>16 bits</source>
+        <translation type="vanished">16 битов</translation>
+    </message>
+    <message>
+        <source>24 bits</source>
+        <translation type="vanished">24 бита</translation>
+    </message>
+    <message>
+        <source>32 bits</source>
+        <translation type="vanished">32 бита</translation>
+    </message>
+    <message>
+        <source>Compression</source>
+        <translation type="vanished">Сжатие</translation>
+    </message>
+</context>
+<context>
+    <name>Tiio::TifWriterProperties</name>
+    <message>
+        <source>Byte Ordering</source>
+        <translation type="vanished">Порядок следования байтов</translation>
+    </message>
+    <message>
+        <source>Compression Type</source>
+        <translation type="vanished">Тип сжатия</translation>
+    </message>
+    <message>
+        <source>Bits Per Pixel</source>
+        <translation type="vanished">Битов на пиксель</translation>
+    </message>
+    <message>
+        <source>24(RGB)</source>
+        <translation type="vanished">24(RGB)</translation>
+    </message>
+    <message>
+        <source>48(RGB)</source>
+        <translation type="vanished">48(RGB)</translation>
+    </message>
+    <message>
+        <source> 1(BW)</source>
+        <translation type="vanished"> 1(ЧБ)</translation>
+    </message>
+    <message>
+        <source> 8(GREYTONES)</source>
+        <translation type="vanished"> 8(ОТТЕНКИСЕРОГО)</translation>
+    </message>
+    <message>
+        <source>32(RGBM)</source>
+        <translation type="vanished">32(RGBA)</translation>
+    </message>
+    <message>
+        <source>64(RGBM)</source>
+        <translation type="vanished">64(RGBA)</translation>
+    </message>
+    <message>
+        <source>Orientation</source>
+        <translation type="vanished">Расположение</translation>
+    </message>
+    <message>
+        <source>Top Left</source>
+        <translation type="vanished">Сверху слева</translation>
+    </message>
+    <message>
+        <source>Top Right</source>
+        <translation type="vanished">Сверху справа</translation>
+    </message>
+    <message>
+        <source>Bottom Right</source>
+        <translation type="vanished">Снизу справа</translation>
+    </message>
+    <message>
+        <source>Bottom Left</source>
+        <translation type="vanished">Снизу слева</translation>
+    </message>
+    <message>
+        <source>Left Top</source>
+        <translation type="vanished">Слева сверху</translation>
+    </message>
+    <message>
+        <source>Left Bottom</source>
+        <translation type="vanished">Слева снизу</translation>
+    </message>
+    <message>
+        <source>Right Top</source>
+        <translation type="vanished">Справа снизу</translation>
+    </message>
+    <message>
+        <source>Right Bottom</source>
+        <translation type="vanished">Справа снизу</translation>
+    </message>
+</context>
+<context>
     <name>WebmWriterProperties</name>
     <message>
-        <location filename="../../image/ffmpeg/tiio_webm.cpp" line="231"/>
+        <location filename="../../image/ffmpeg/tiio_webm.cpp" line="235"/>
         <source>Quality</source>
         <translation>Качество</translation>
     </message>
     <message>
-        <location filename="../../image/ffmpeg/tiio_webm.cpp" line="232"/>
+        <location filename="../../image/ffmpeg/tiio_webm.cpp" line="236"/>
         <source>Scale</source>
         <translation>Масштаб</translation>
     </message>

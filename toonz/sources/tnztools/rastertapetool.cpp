@@ -205,7 +205,7 @@ public:
   }
 
   //------------------------------------------------------------
-  /*--  AutoCloseが実行されたらtrue,実行されなければfalseを返す --*/
+  /*--  AutoClose Returns true if executed, false otherwise --*/
   bool applyAutoclose(const TToonzImageP &ti, const TRectD &selRect = TRectD(),
                       TStroke *stroke = 0) {
     if (!ti) return false;
@@ -219,7 +219,7 @@ public:
         TTool::getApplication()
             ->getCurrentLevelStyleIndex();  // TApp::instance()->getCurrentPalette()->getStyleIndex();
     if (isInt(inkString)) inkIndex = std::stoi(inkString);
-    params.m_inkIndex              = inkIndex;
+    params.m_inkIndex = inkIndex;
 
     TPoint delta;
     TRasterCM32P ras, raux = ti->getRaster();

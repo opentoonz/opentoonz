@@ -151,7 +151,7 @@ public:
   // Helper methods
 
   void prepareForStart();
-  void addSoundtrack(int r0, int r1, double fps);
+  void addSoundtrack(int r0, int r1, double fps, int boardDuration = 0);
   void postProcessImage(const TRasterImageP &img, bool has64bitOutputSupport,
                         const TRasterP &mark, int frame);
 
@@ -162,7 +162,8 @@ public:
                                  const std::pair<TRasterP, TRasterP> &rasters);
   std::string getRenderCacheId();
 
-  void addBoard();
+  // returns board duration in frame
+  int addBoard();
 };
 
 //---------------------------------------------------------
@@ -300,7 +301,8 @@ void MovieRenderer::Imp::prepareForStart() {
 
 //---------------------------------------------------------
 
-void MovieRenderer::Imp::addSoundtrack(int r0, int r1, double fps) {
+void MovieRenderer::Imp::addSoundtrack(int r0, int r1, double fps,
+                                       int boardDuration) {
   TCG_ASSERT(r0 <= r1, return );
 
   TXsheet::SoundProperties *prop =
@@ -334,6 +336,10 @@ void MovieRenderer::Imp::addSoundtrack(int r0, int r1, double fps) {
 
   m_st = TSop::insertBlank(m_st, fromSample, numSample + m_whiteSample);
   m_st->copy(snd1, TINT32(fromSample + m_whiteSample));
+
+  // insert blank sound for clapperboard
+  if (boardDuration > 0)
+    m_st = TSop::insertBlank(m_st, 0, TINT32(boardDuration * samplePerFrame));
 
   m_whiteSample = 0;
 }
@@ -398,7 +404,7 @@ std::pair<bool, int> MovieRenderer::Imp::saveFrame(
         has64bitOutputSupport = writerA->is64bitOutputSupported();
 
       // NOTE: If the writer could not be retrieved, the updater will throw.
-      // Failure will be catched then.
+      // Failure will be caught then.
     }
 
     // Prepare the images to be flushed
@@ -467,6 +473,8 @@ void MovieRenderer::Imp::doRenderRasterCompleted(const RenderData &renderData) {
   // Build soundtrack at the first time a frame is completed - and the filetype
   // is that of a movie.
   if (m_firstCompletedRaster && m_movieType && !m_st) {
+    int boardDuration = addBoard();
+
     int from, to;
     getRange(m_scene, false, from, to);
 
@@ -478,15 +486,14 @@ void MovieRenderer::Imp::doRenderRasterCompleted(const RenderData &renderData) {
 
     addSoundtrack(
         from, to,
-        m_scene->getProperties()->getOutputProperties()->getFrameRate());
+        m_scene->getProperties()->getOutputProperties()->getFrameRate(),
+        boardDuration);
 
     if (m_st) {
       m_levelUpdaterA->getLevelWriter()->saveSoundTrack(m_st.getPointer());
       if (m_levelUpdaterB.get())
         m_levelUpdaterB->getLevelWriter()->saveSoundTrack(m_st.getPointer());
     }
-
-    addBoard();
   }
 
   // Output frames must be *cloned*, since the supplied rasters will be
@@ -747,12 +754,12 @@ void MovieRenderer::Imp::onRenderFinished(bool isCanceled) {
 
 //---------------------------------------------------------
 
-void MovieRenderer::Imp::addBoard() {
+int MovieRenderer::Imp::addBoard() {
   BoardSettings *boardSettings =
       m_scene->getProperties()->getOutputProperties()->getBoardSettings();
-  if (!boardSettings->isActive()) return;
+  if (!boardSettings->isActive()) return 0;
   int duration = boardSettings->getDuration();
-  if (duration == 0) return;
+  if (duration == 0) return 0;
   // Get the image size
   int shrinkX = m_renderSettings.m_shrinkX,
       shrinkY = m_renderSettings.m_shrinkY;
@@ -777,6 +784,7 @@ void MovieRenderer::Imp::addBoard() {
       // Failure is reported.
     }
   }
+  return duration;
 }
 
 //======================================================================================
@@ -868,7 +876,7 @@ TRenderer *MovieRenderer::getTRenderer() {
   // MovieRenderer instance.
   // Since a TRenderer is already smart-pointer-like, we could just return a
   // copy - however, it really
-  // shouln't be that way. Maybe one day we'll revert that and actually use a
+  // shouldn't be that way. Maybe one day we'll revert that and actually use a
   // smart pointer class.
 
   // For now, no use of this function seems to access the returned pointer

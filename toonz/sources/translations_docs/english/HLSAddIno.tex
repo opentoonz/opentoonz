@@ -1,0 +1,89 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[a4paper, total={180mm, 272mm}]{geometry}
+
+\usepackage{fontspec}
+\setmainfont[Path=fonts/, Extension=.ttf]{ipaexm}
+
+\setlength\parindent{3.5em}
+\setlength\parskip{0em}
+\renewcommand{\baselinestretch}{1.247}
+
+\begin{document}
+
+\thispagestyle{empty}
+
+\Large
+\noindent \\
+HLS Add Ino\medskip
+\par
+\normalsize
+Adds the values of the specified channel of the image connected to the Noise port,\par 
+to the Hue, Lightness, Saturation, or Alpha channels of the image connected\par
+to the Source port.\\
+\par
+The specified channel of the image connected to the Reference port will determine\par
+the intensity of the effect.\\
+\\
+-{-}- \ Inputs \ -{-}-\\
+Source\par
+Connect the image to be processed.\\
+Noise\par
+Connect the image to be added to the source image.\\
+Reference\par
+Connect the image for setting the intensity of the effect.\\
+\\
+-{-}- \ Settings \ -{-}-\\
+From RGBA\par
+Specify which channel to use from the image connected to the Noise port.\par
+Choose from one of the \textquotedbl Red\textquotedbl, \ \textquotedbl Green\textquotedbl, \ \textquotedbl Blue\textquotedbl  \ or \textquotedbl Alpha\textquotedbl \ channels.\par
+The default value is \textquotedbl Red\textquotedbl .\\
+\\
+Offset\par
+An offset for the original pixel values of the image connected to the Noise port.\par
+Pixel values for 8 or 16bits images are values ranging from 0 to 1,\par
+you can specify an offset between -1.0 and 1.0.\par
+When the pixel value is the same as the one specified here it will not change.\par
+The rest of the pixel values will change depending on their magnitudes.\par
+The default value is 0.5.\\
+\\
+Hue\par
+It specifies the intensity of the Hue change.\par
+The Hue value will scale around the Offset value.\par
+You can use a value from -1.0 to 1.0.\par
+The image Hue will not change when the value is 0.\par
+The default value is 0.0.\\
+\newpage
+
+\thispagestyle{empty}
+
+\ \vspace{-0.2em}
+\\
+Lightness\par
+It specifies the intensity of the Lightness change.\par
+The default value is 0.25.\par
+Other options are the same as for \textquotedbl Hue\textquotedbl .\\
+\\
+Saturation\par
+It specifies the intensity of the Saturation change.\par
+The default value is 0.0.\par
+Other options are the same as for \textquotedbl Hue\textquotedbl .\\
+\\
+Alpha\par
+It specifies the intensity of the Alpha change.\par
+The default value is 0.0.\par
+Other options are the same as for \textquotedbl Hue\textquotedbl .\\
+\\
+Premultiplied\par
+When ON, the image will be processed as if having a Premultiplied Alpha channel\par 
+(Alpha value already multiplied by RGB channels).\par
+If image is not premultiplied, the image may not look correct.\par
+The default setting is ON.\\
+\\
+Reference\par
+Specify which channel to use from the image connected to the Reference port to\par 
+drive the intensity of the effect.\par
+Choose from Red/Green/Blue/Alpha/Luminance.\par
+Choose Nothing to disable the effect.\par
+The default value is \textquotedbl Red\textquotedbl .
+
+\end{document}

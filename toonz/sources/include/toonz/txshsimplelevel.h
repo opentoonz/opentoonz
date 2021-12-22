@@ -202,7 +202,8 @@ table) it returns the proper insertion index
   // load icon (and image) data of all frames into cache
   void loadAllIconsAndPutInCache(bool cacheImagesAsWell);
 
-  TRasterImageP getFrameToCleanup(const TFrameId &fid) const;
+  TRasterImageP getFrameToCleanup(const TFrameId &fid,
+                                  bool toBeLineProcessed) const;
 
   std::string getImageId(const TFrameId &fid, int frameStatus = -1) const;
   std::string getIconId(const TFrameId &fid, int frameStatus = -1) const;
@@ -242,6 +243,10 @@ Editable range is contained in \b m_editableRange.
                                            //! fullcolor to tlv (colormap),
   //!  and assigns the specified level path.
   TImageP createEmptyFrame();
+
+  void initializePalette();
+  void initializeResolutionAndDpi(const TDimension &dim = TDimension(),
+                                  double dpi            = 0);
 
   TDimension getResolution();
 
@@ -301,6 +306,8 @@ The oldFp is used when the current scene path change...
   //! Renumbers the level frames to the specified fids (fids and this->fids()
   //! must have the same size).
   void renumber(const std::vector<TFrameId> &fids);
+
+  bool isFrameReadOnly(TFrameId fid);
 
 public:
   // Auxiliary files management: hooks, tpl, etc.

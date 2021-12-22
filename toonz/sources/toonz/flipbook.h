@@ -186,10 +186,11 @@ public:
   enum Flags { eDontKeepFilesOpened = 0x1 };
 
   FlipBook(QWidget *parent = 0, QString viewerTitle = QString(),
-           UINT flipConsoleButtonMask = FlipConsole::cFullConsole &
-                                        (~(FlipConsole::eFilledRaster |
-                                           FlipConsole::eDefineSubCamera |
-                                           FlipConsole::eLocator)),
+           std::vector<int> flipConsoleButtonMask =
+               {FlipConsole::eFilledRaster, FlipConsole::eDefineSubCamera,
+                FlipConsole::eLocator, FlipConsole::eZoomIn,
+                FlipConsole::eZoomOut, FlipConsole::eFlipHorizontal,
+                FlipConsole::eFlipVertical, FlipConsole::eResetView},
            UCHAR flags = 0, bool isColorModel = false);
   ~FlipBook();
   void setLevel(const TFilePath &path, TPalette *palette = 0, int from = -1,

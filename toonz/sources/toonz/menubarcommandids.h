@@ -95,12 +95,8 @@
 #define MI_OpenCommandToolbar "MI_OpenCommandToolbar"
 #define MI_OpenToolOptionBar "MI_OpenToolOptionBar"
 #define MI_OpenLevelView "MI_OpenLevelView"
-#ifdef LINETEST
-#define MI_OpenExport "MI_OpenExport"
-#define MI_OpenLineTestView "MI_OpenLineTestView"
-#define MI_OpenLineTestCapture "MI_OpenLineTestCapture"
-#define MI_Capture "MI_Capture"
-#endif
+#define MI_OpenStopMotionPanel "MI_OpenStopMotionPanel"
+//#define MI_OpenExport "MI_OpenExport"
 #define MI_BrightnessAndContrast "MI_BrightnessAndContrast"
 #define MI_Antialias "MI_Antialias"
 #define MI_AdjustLevels "MI_AdjustLevels"
@@ -147,6 +143,7 @@
 
 #define MI_PasteNew "MI_PasteNew"
 #define MI_Autorenumber "MI_Autorenumber"
+#define MI_CreateBlankDrawing "MI_CreateBlankDrawing"
 #define MI_FillEmptyCell "MI_FillEmptyCell"
 
 #define MI_MergeFrames "MI_MergeFrames"
@@ -175,9 +172,6 @@
 #define MI_ViewBBox "MI_ViewBBox"
 #define MI_ViewTable "MI_ViewTable"
 #define MI_FieldGuide "MI_FieldGuide"
-#ifdef LINETEST
-#define MI_CapturePanelFieldGuide "MI_CapturePanelFieldGuide"
-#endif
 #define MI_RasterizePli "MI_RasterizePli"
 #define MI_SafeArea "MI_SafeArea"
 #define MI_ViewColorcard "MI_ViewColorcard"
@@ -200,6 +194,7 @@
 
 #define MI_Link "MI_Link"
 #define MI_Play "MI_Play"
+#define MI_ShortPlay "MI_ShortPlay"
 #define MI_Loop "MI_Loop"
 #define MI_Pause "MI_Pause"
 #define MI_FirstFrame "MI_FirstFrame"
@@ -210,6 +205,8 @@
 #define MI_PrevDrawing "MI_PrevDrawing"
 #define MI_NextStep "MI_NextStep"
 #define MI_PrevStep "MI_PrevStep"
+#define MI_NextKeyframe "MI_NextKeyframe"
+#define MI_PrevKeyframe "MI_PrevKeyframe"
 
 #define MI_RedChannel "MI_RedChannel"
 #define MI_GreenChannel "MI_GreenChannel"
@@ -272,10 +269,22 @@
 #define MI_SelectFollowingKeysInRow "MI_SelectFollowingKeysInRow"
 #define MI_InvertKeyframeSelection "MI_InvertKeyframeSelection"
 
+#define MI_ShiftKeyframesDown "MI_ShiftKeyframesDown"
+#define MI_ShiftKeyframesUp "MI_ShiftKeyframesUp"
+
 #define MI_SetAcceleration "MI_SetAcceleration"
 #define MI_SetDeceleration "MI_SetDeceleration"
 #define MI_SetConstantSpeed "MI_SetConstantSpeed"
 #define MI_ResetInterpolation "MI_ResetInterpolation"
+
+#define MI_UseLinearInterpolation "MI_UseLinearInterpolation"
+#define MI_UseSpeedInOutInterpolation "MI_UseSpeedInOutInterpolation"
+#define MI_UseEaseInOutInterpolation "MI_UseEaseInOutInterpolation"
+#define MI_UseEaseInOutPctInterpolation "MI_UseEaseInOutPctInterpolation"
+#define MI_UseExponentialInterpolation "MI_UseExponentialInterpolation"
+#define MI_UseExpressionInterpolation "MI_UseExpressionInterpolation"
+#define MI_UseFileInterpolation "MI_UseFileInterpolation"
+#define MI_UseConstantInterpolation "MI_UseConstantInterpolation"
 
 #define MI_ActivateThisColumnOnly "MI_ActivateThisColumnOnly"
 #define MI_ActivateSelectedColumns "MI_ActivateSelectedColumns"
@@ -297,6 +306,7 @@
 #define MI_ToggleColumnLocks "MI_ToggleColumnLocks"
 #define MI_ToggleXSheetToolbar "MI_ToggleXSheetToolbar"
 #define MI_FoldColumns "MI_FoldColumns"
+#define MI_ToggleXsheetCameraColumn "MI_ToggleXsheetCameraColumn"
 #define MI_ToggleCurrentTimeIndicator "MI_ToggleCurrentTimeIndicator"
 
 #define MI_LoadIntoCurrentPalette "MI_LoadIntoCurrentPalette"
@@ -317,10 +327,81 @@
 #define MI_Reframe4 "MI_Reframe4"
 #define MI_ReframeWithEmptyInbetweens "MI_ReframeWithEmptyInbetweens"
 
+#define MI_EditNextMode "MI_EditNextMode"
+#define MI_EditPosition "MI_EditPosition"
+#define MI_EditRotation "MI_EditRotation"
+#define MI_EditScale "MI_EditScale"
+#define MI_EditShear "MI_EditShear"
+#define MI_EditCenter "MI_EditCenter"
+#define MI_EditAll "MI_EditAll"
+
+#define MI_SelectionNextType "MI_SelectionNextType"
+#define MI_SelectionRectangular "MI_SelectionRectangular"
+#define MI_SelectionFreehand "MI_SelectionFreehand"
+#define MI_SelectionPolyline "MI_SelectionPolyline"
+
+#define MI_GeometricNextShape "MI_GeometricNextShape"
+#define MI_GeometricRectangle "MI_GeometricRectangle"
+#define MI_GeometricCircle "MI_GeometricCircle"
+#define MI_GeometricEllipse "MI_GeometricEllipse"
+#define MI_GeometricLine "MI_GeometricLine"
+#define MI_GeometricPolyline "MI_GeometricPolyline"
+#define MI_GeometricArc "MI_GeometricArc"
+#define MI_GeometricMultiArc "MI_GeometricMultiArc"
+#define MI_GeometricPolygon "MI_GeometricPolygon"
+
+#define MI_TypeNextStyle "MI_TypeNextStyle"
+#define MI_TypeOblique "MI_TypeOblique"
+#define MI_TypeRegular "MI_TypeRegular"
+#define MI_TypeBoldOblique "MI_TypeBoldOblique"
+#define MI_TypeBold "MI_TypeBold"
+
+#define MI_FillNextType "MI_FillNextType"
+#define MI_FillNormal "MI_FillNormal"
+#define MI_FillRectangular "MI_FillRectangular"
+#define MI_FillFreehand "MI_FillFreehand"
+#define MI_FillPolyline "MI_FillPolyline"
+#define MI_FillNextMode "MI_FillNextMode"
 #define MI_FillAreas "MI_FillAreas"
 #define MI_FillLines "MI_FillLines"
+#define MI_FillLinesAndAreas "MI_FillLinesAndAreas"
+
+#define MI_EraserNextType "MI_EraserNextType"
+#define MI_EraserNormal "MI_EraserNormal"
+#define MI_EraserRectangular "MI_EraserRectangular"
+#define MI_EraserFreehand "MI_EraserFreehand"
+#define MI_EraserPolyline "MI_EraserPolyline"
+#define MI_EraserSegment "MI_EraserSegment"
+
+#define MI_TapeNextType "MI_TapeNextType"
+#define MI_TapeNormal "MI_TapeNormal"
+#define MI_TapeRectangular "MI_TapeRectangular"
+#define MI_TapeNextMode "MI_TapeNextMode"
+#define MI_TapeEndpointToEndpoint "MI_TapeEndpointToEndpoint"
+#define MI_TapeEndpointToLine "MI_TapeEndpointToLine"
+#define MI_TapeLineToLine "MI_TapeLineToLine"
+
+#define MI_PickStyleNextMode "MI_PickStyleNextMode"
 #define MI_PickStyleAreas "MI_PickStyleAreas"
 #define MI_PickStyleLines "MI_PickStyleLines"
+#define MI_PickStyleLinesAndAreas "MI_PickStyleLinesAndAreas"
+
+#define MI_RGBPickerNextType "MI_RGBPickerNextType"
+#define MI_RGBPickerNormal "MI_RGBPickerNormal"
+#define MI_RGBPickerRectangular "MI_RGBPickerRectangular"
+#define MI_RGBPickerFreehand "MI_RGBPickerFreehand"
+#define MI_RGBPickerPolyline "MI_RGBPickerPolyline"
+
+#define MI_SkeletonNextMode "MI_SkeletonNextMode"
+#define MI_SkeletonBuildSkeleton "MI_SkeletonBuildSkeleton"
+#define MI_SkeletonAnimate "MI_SkeletonAnimate"
+#define MI_SkeletonInverseKinematics "MI_SkeletonInverseKinematics"
+
+#define MI_PlasticNextMode "MI_PlasticNextMode"
+#define MI_PlasticEditMesh "MI_PlasticEditMesh"
+#define MI_PlasticPaintRigid "MI_PlasticPaintRigid"
+#define MI_PlasticBuildSkeleton "MI_PlasticBuildSkeleton"
+#define MI_PlasticAnimate "MI_PlasticAnimate"
 
 #define MI_DeactivateUpperColumns "MI_DeactivateUpperColumns"
 #define MI_CompareToSnapshot "MI_CompareToSnapshot"
@@ -333,5 +414,48 @@
 #define MI_LipSyncPopup "MI_LipSyncPopup"
 #define MI_AutoInputCellNumber "MI_AutoInputCellNumber"
 #define MI_TouchGestureControl "MI_TouchGestureControl"
+#define MI_SeparateColors "MI_SeparateColors"
 
+#define MI_StopMotionCapture "MI_StopMotionCapture"
+#define MI_StopMotionRaiseOpacity "MI_StopMotionRaiseOpacity"
+#define MI_StopMotionLowerOpacity "MI_StopMotionLowerOpacity"
+#define MI_StopMotionToggleLiveView "MI_StopMotionToggleLiveView"
+#define MI_StopMotionToggleZoom "MI_StopMotionToggleZoom"
+#define MI_StopMotionToggleUseLiveViewImages                                   \
+  "MI_StopMotionToggleUseLiveViewImages"
+#define MI_StopMotionLowerSubsampling "MI_StopMotionLowerSubsampling"
+#define MI_StopMotionRaiseSubsampling "MI_StopMotionRaiseSubsampling"
+#define MI_StopMotionJumpToCamera "MI_StopMotionJumpToCamera"
+#define MI_StopMotionPickFocusCheck "MI_StopMotionPickFocusCheck"
+#define MI_StopMotionExportImageSequence "MI_StopMotionExportImageSequence"
+#define MI_StopMotionRemoveFrame "MI_StopMotionRemoveFrame"
+#define MI_StopMotionNextFrame "MI_StopMotionNextFrame"
+
+#define MI_OpenOnlineManual "MI_OpenOnlineManual"
+#define MI_OpenWhatsNew "MI_OpenWhatsNew"
+#define MI_OpenCommunityForum "MI_OpenCommunityForum"
+#define MI_OpenReportABug "MI_OpenReportABug"
+
+#define MI_ClearCacheFolder "MI_ClearCacheFolder"
+
+#define MI_VectorGuidedDrawing "MI_VectorGuidedDrawing"
+#define MI_OpenGuidedDrawingControls "MI_OpenGuidedDrawingControls"
+
+#define MI_SelectNextGuideStroke "MI_SelectNextGuideStroke"
+#define MI_SelectPrevGuideStroke "MI_SelectPrevGuideStroke"
+#define MI_SelectGuideStrokeReset "MI_SelectGuideStrokeReset"
+#define MI_TweenGuideStrokes "MI_TweenGuideStrokes"
+#define MI_TweenGuideStrokeToSelected "MI_TweenGuideStrokeToSelected"
+#define MI_SelectBothGuideStrokes "MI_SelectBothGuideStrokes"
+#define MI_SelectGuidesAndTweenMode "MI_SelectGuidesAndTweenMode"
+
+#define MI_FlipNextGuideStroke "MI_FlipNextGuideStroke"
+#define MI_FlipPrevGuideStroke "MI_FlipPrevGuideStroke"
+
+#define MI_ExportXDTS "MI_ExportXDTS"
+#define MI_ExportTvpJson "MI_ExportTvpJson"
+#define MI_ExportXsheetPDF "MI_ExportXsheetPDF"
+
+// mark id is added for each actual command (i.g. MI_SetCellMark1)
+#define MI_SetCellMark "MI_SetCellMark"
 #endif

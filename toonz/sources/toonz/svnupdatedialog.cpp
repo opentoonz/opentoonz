@@ -131,7 +131,7 @@ SVNUpdateDialog::SVNUpdateDialog(QWidget *parent, const QString &workingDir,
 
   addButtonBarWidget(m_updateButton, m_closeButton, m_cancelButton);
 
-  // 0. Connect for svn errors (that may occurs everythings)
+  // 0. Connect for svn errors (that may occur every time)
   connect(&m_thread, SIGNAL(error(const QString &)), this,
           SLOT(onError(const QString &)));
 
@@ -226,7 +226,7 @@ void SVNUpdateDialog::checkFiles() {
              s.m_repoStatus == "modified" || s.m_repoStatus == "modified") {
       if (s.m_path.endsWith(".tnz") &&
           (s.m_item == "missing" ||
-           s.m_item == "none" && s.m_repoStatus == "added")) {
+           (s.m_item == "none" && s.m_repoStatus == "added"))) {
         TFilePath scenePath =
             TFilePath(m_workingDir.toStdWString()) + s.m_path.toStdWString();
         TFilePath iconPath = ToonzScene::getIconPath(scenePath);
@@ -256,6 +256,8 @@ void SVNUpdateDialog::updateFiles() {
     switchToCloseButton();
     return;
   }
+
+  setMinimumSize(300, 200);
 
   if (m_updateSceneContentsCheckBox) m_updateSceneContentsCheckBox->hide();
   m_updateButton->setEnabled(false);

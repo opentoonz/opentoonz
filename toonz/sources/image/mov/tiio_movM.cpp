@@ -996,7 +996,7 @@ TLevelWriterMov::~TLevelWriterMov() {
     QTMetaDataRef metaDataRef;
     if ((mderr = QTCopyMovieMetaData(m_movie, &metaDataRef)) != noErr)
       throw TImageException(getFilePath(),
-                            "can't access metadata informations");
+                            "can't access metadata information");
 
     if ((mderr = QTMetaDataAddItem(
              metaDataRef, kQTMetaDataStorageFormatUserData,
@@ -1004,7 +1004,7 @@ TLevelWriterMov::~TLevelWriterMov() {
              firstFrameKeySize, (const UInt8 *)(&m_firstFrame), sizeof(int),
              kQTMetaDataTypeUnsignedIntegerBE, 0)) != noErr)
       throw TImageException(getFilePath(),
-                            "can't insert metadata informations");
+                            "can't insert metadata information");
 
     QTMetaDataRelease(metaDataRef);
   }
@@ -1229,7 +1229,7 @@ TLevelP TLevelReaderMov::loadToonzOutputFormatInfo() {
   // atom.
   QTMetaDataRef metaDataRef;
   if ((mderr = QTCopyMovieMetaData(m_movie, &metaDataRef)) != noErr)
-    throw TImageException(m_path, "can't access metadata informations");
+    throw TImageException(m_path, "can't access metadata information");
 
   QTMetaDataItem firstFrameItem;
 
@@ -1247,7 +1247,7 @@ TLevelP TLevelReaderMov::loadToonzOutputFormatInfo() {
     if ((mderr = QTMetaDataGetItemValue(metaDataRef, firstFrameItem,
                                         (UInt8 *)(&firstFrame), sizeof(int),
                                         0) != noErr))
-      throw TImageException(m_path, "can't read metadata informations");
+      throw TImageException(m_path, "can't read metadata information");
   }
 
   mderr = 0;

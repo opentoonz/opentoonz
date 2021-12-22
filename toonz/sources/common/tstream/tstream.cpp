@@ -24,8 +24,9 @@ namespace {
 string escape(string v) {
   int i = 0;
   for (;;) {
-// Removing escaping of apostrophe from Windows and OSX as it's not needed and causes problems
-#ifdef LINUX
+// Removing escaping of apostrophe from Windows and OSX as it's not needed and
+// causes problems
+#if defined(LINUX) || defined(FREEBSD)
     i = v.find_first_of("\\\'\"", i);
 #else
     i = v.find_first_of("\\\"", i);
@@ -353,10 +354,11 @@ TOStream &TOStream::operator<<(string v) {
   }
   int i;
   for (i = 0; i < len; i++)
-    if ((!iswalnum(v[i]) && v[i] != '_' && v[i] != '%')
-		|| v[i] < 32   // Less than ASCII for SPACE
-		|| v[i] > 126  // Greater than ASCII for ~
-		) break;
+    if ((!iswalnum(v[i]) && v[i] != '_' && v[i] != '%') ||
+        v[i] < 32      // Less than ASCII for SPACE
+        || v[i] > 126  // Greater than ASCII for ~
+        )
+      break;
   if (i == len)
     os << v << " ";
   else {
@@ -381,10 +383,11 @@ TOStream &TOStream::operator<<(QString _v) {
   }
   int i;
   for (i = 0; i < len; i++)
-	  if ((!iswalnum(v[i]) && v[i] != '_' && v[i] != '%')
-		  || v[i] < 32   // Less than ASCII for SPACE
-		  || v[i] > 126  // Greater than ASCII for ~
-		  ) break;
+    if ((!iswalnum(v[i]) && v[i] != '_' && v[i] != '%') ||
+        v[i] < 32      // Less than ASCII for SPACE
+        || v[i] > 126  // Greater than ASCII for ~
+        )
+      break;
   if (i == len)
     os << v << " ";
   else {
@@ -467,7 +470,7 @@ TOStream &TOStream::operator<<(const TPixel64 &v) {
 
 void TOStream::cr() {
   *(m_imp->m_os) << endl;
-  for (int i           = 0; i < m_imp->m_tab; i++) *(m_imp->m_os) << "  ";
+  for (int i = 0; i < m_imp->m_tab; i++) *(m_imp->m_os) << "  ";
   m_imp->m_justStarted = false;
 }
 
@@ -582,6 +585,10 @@ bool TOStream::checkStatus() const {
 
   m_imp->m_os->flush();
   return m_imp->m_os->rdstate() == ios_base::goodbit;
+}
+
+std::string TOStream::getCurrentTagName() {
+  return (m_imp->m_tagStack.empty()) ? "" : m_imp->m_tagStack.back();
 }
 
 //===============================================================
@@ -1071,9 +1078,15 @@ TIStream &TIStream::operator>>(TFilePath &v) {
   is.get(c);
   if (c == '"') {
     is.get(c);
-    while (is && c != '"') {
+    bool escapeChar = false;
+    // If processing double-quote ("), if it's escaped, keep reading.
+    while (is && (c != '"' || escapeChar)) {
       // if(c=='\\')
       //   is.get(c);
+      if (c == '\\' && !escapeChar)
+        escapeChar = true;
+      else
+        escapeChar = false;
       s.append(1, c);
       is.get(c);
     }
@@ -1109,8 +1122,8 @@ TIStream &TIStream::operator>>(TPersist *&v) {
   m_imp->m_currentTag = StreamTag();
   string tagName      = tag.m_name;
   std::map<std::string, string>::iterator it;
-  int id                               = -1;
-  it                                   = tag.m_attributes.find("id");
+  int id = -1;
+  it     = tag.m_attributes.find("id");
   if (it != tag.m_attributes.end()) id = atoi(it->second.c_str());
   // cout << "tagname = " << tagName << " id = " << id << endl;
 
@@ -1141,7 +1154,7 @@ TIStream &TIStream::operator>>(TPersist *&v) {
 //---------------------------------------------------------------
 
 bool TIStream::matchEndTag() {
-  if (m_imp->m_tagStack.empty()) throw TException("tag stack emtpy");
+  if (m_imp->m_tagStack.empty()) throw TException("tag stack empty");
   if (!m_imp->matchTag()) return false;
   if (m_imp->m_currentTag.m_type != StreamTag::EndTag) return false;
   if (m_imp->m_currentTag.m_name != m_imp->m_tagStack.back())
@@ -1268,3 +1281,7 @@ void TIStream::setVersion(const VersionNumber &version) {
 //---------------------------------------------------------------
 
 void TIStream::skipCurrentTag() { m_imp->skipCurrentTag(); }
+
+//---------------------------------------------------------------
+
+std::string TIStream::getCurrentTagName() { return m_imp->m_tagStack.back(); }

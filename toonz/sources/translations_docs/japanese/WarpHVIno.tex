@@ -1,0 +1,70 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[a4paper, total={180mm, 272mm}]{geometry}
+
+\usepackage{fontspec}
+\setmainfont[Path=fonts/, Extension=.ttf]{ipaexm}
+
+\setlength\parindent{3.5em}
+\setlength\parskip{0em}
+\renewcommand{\baselinestretch}{1.247}
+
+\begin{document}
+
+\thispagestyle{empty}
+
+\Large
+\noindent \\
+Warp HV Ino\medskip
+\par
+\normalsize
+参照画を元に絵をゆがませます。\\
+\\
+-{-}- \ 入力 \ -{-}-\\
+Source\par
+処理をする画像を接続します。\\
+Hori\par
+横方向にゆがませるための参照画像を接続します。\\
+Vert\par
+縦方向にゆがませるための参照画像を接続します。\\
+\\
+-{-}- \ 設定 \ -{-}-\\
+H MaxLen\par
+水平方向に絵を歪ませます。\par
+歪みの最大値を指定します。\par
+単位は mm で、0から100の値を与えます。\par
+初期値は0で変化しないので何か値をいれてください。\\
+\par
+\textquotedbl Hori\textquotedbl 参照画像の赤値から各ピクセルの歪みが決まります。\par
+8bits 画像の場合\par
+\noindent \hskip 7em 1なら-MaxLen(mm)\par
+\noindent \hskip 7em 128なら歪みなし\par
+\noindent \hskip 7em 255なら MaxLen(mm)\par
+16bits 画像の場合\par
+\noindent \hskip 7em 1なら-MaxLen(mm)\par
+\noindent \hskip 7em 32768なら歪みなし\par
+\noindent \hskip 7em 65535なら MaxLen(mm)\par
+の歪みとなります。\\
+\\
+V MaxLen\par
+垂直方向に絵をゆがませます。\par
+\textquotedbl Vert\textquotedbl 参照画像の赤値から各ピクセルの歪みが決まります。\par
+他は\textquotedbl H MaxLen\textquotedbl と同様です。\\
+\\
+Alpha Rendering\par
+OFFのとき Alphaチャンネルにはなにもしません。\par
+ONで Alphaにも処理をします。\par
+初期値は ONです。\\
+\\
+Anti Aliasing\par
+OFFのときは絵のジャギーを維持します。
+
+\newpage
+
+\thispagestyle{empty}
+
+\ \vspace{-0.2em}
+\par
+ON ならジャギーの少ない絵に処理します。\par
+初期値は ON です。
+
+\end{document}

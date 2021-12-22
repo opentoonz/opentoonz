@@ -15,6 +15,12 @@
 #include "ruler.h"
 #include "comboviewerpane.h"
 #include "locatorpopup.h"
+#include "cellselection.h"
+#include "styleshortcutswitchablepanel.h"
+
+#if defined(x64)
+#include "stopmotion.h"
+#endif
 
 // TnzQt includes
 #include "toonzqt/tselectionhandle.h"
@@ -70,7 +76,7 @@ namespace {
 
 void initToonzEvent(TMouseEvent &toonzEvent, QMouseEvent *event,
                     int widgetHeight, double pressure, int devPixRatio) {
-  toonzEvent.m_pos = TPointD(event->pos().x() * devPixRatio,
+  toonzEvent.m_pos      = TPointD(event->pos().x() * devPixRatio,
                              widgetHeight - 1 - event->pos().y() * devPixRatio);
   toonzEvent.m_mousePos = event->pos();
   toonzEvent.m_pressure = 1.0;
@@ -87,7 +93,8 @@ void initToonzEvent(TMouseEvent &toonzEvent, QMouseEvent *event,
 //-----------------------------------------------------------------------------
 
 void initToonzEvent(TMouseEvent &toonzEvent, QTabletEvent *event,
-                    int widgetHeight, double pressure, int devPixRatio) {
+                    int widgetHeight, double pressure, int devPixRatio,
+                    bool isHighFrequent = false) {
   toonzEvent.m_pos = TPointD(
       event->posF().x() * (float)devPixRatio,
       (float)widgetHeight - 1.0f - event->posF().y() * (float)devPixRatio);
@@ -97,9 +104,10 @@ void initToonzEvent(TMouseEvent &toonzEvent, QTabletEvent *event,
   toonzEvent.setModifiers(event->modifiers() & Qt::ShiftModifier,
                           event->modifiers() & Qt::AltModifier,
                           event->modifiers() & Qt::ControlModifier);
-  toonzEvent.m_buttons  = event->buttons();
-  toonzEvent.m_button   = event->button();
-  toonzEvent.m_isTablet = true;
+  toonzEvent.m_buttons        = event->buttons();
+  toonzEvent.m_button         = event->button();
+  toonzEvent.m_isTablet       = true;
+  toonzEvent.m_isHighFrequent = isHighFrequent;
   // this delays autosave during stylus button press until after the next
   // brush stroke - this minimizes problems from interruptions to tablet input
   TApp::instance()->getCurrentTool()->setToolBusy(true);
@@ -214,6 +222,24 @@ void SceneViewer::onButtonPressed(FlipConsole::EGadget button) {
     m_locator->raise();
     m_locator->activateWindow();
     break;
+
+  case FlipConsole::eZoomIn:
+    zoomIn();
+    break;
+  case FlipConsole::eZoomOut:
+    zoomOut();
+    break;
+  case FlipConsole::eFlipHorizontal:
+    flipX();
+    break;
+  case FlipConsole::eFlipVertical:
+    flipY();
+    break;
+  case FlipConsole::eResetView:
+    resetSceneViewer();
+    break;
+  default:
+    break;
   }
 }
 
@@ -271,12 +297,28 @@ void SceneViewer::tabletEvent(QTabletEvent *e) {
     // So, in such case set m_tabletEvent = FALSE and let the mousePressEvent to
     // work.
     if (e->button() == Qt::LeftButton) {
-      TMouseEvent mouseEvent;
-      initToonzEvent(mouseEvent, e, height(), m_pressure, getDevPixRatio());
-      m_tabletState = Touched;
-      onPress(mouseEvent);
+      // Process the 1st tabletPress encountered and ignore back-to-back
+      // tabletPress events. Treat it as if it happened so a following
+      // mousePressEvent gets ignored
+      if (m_tabletState == Released || m_tabletState == None) {
+        TMouseEvent mouseEvent;
+        initToonzEvent(mouseEvent, e, height(), m_pressure, getDevPixRatio());
+        m_tabletState = Touched;
+        onPress(mouseEvent);
+      } else if (m_tabletState == Touched) {
+        m_tabletState = StartStroke;
+      }
     } else
       m_tabletEvent = false;
+#endif
+
+#if defined(LINUX) || defined(FREEBSD)
+    // for Linux, create context menu on right click here.
+    // could possibly merge with OSX code above
+    if (e->button() == Qt::RightButton) {
+      m_mouseButton = Qt::NoButton;
+      onContextMenu(e->pos(), e->globalPos());
+    }
 #endif
 
   } break;
@@ -317,6 +359,22 @@ void SceneViewer::tabletEvent(QTabletEvent *e) {
     }
 #endif
     QPointF curPos = e->posF() * getDevPixRatio();
+#if defined(_WIN32) && QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
+    // Use the application attribute Qt::AA_CompressTabletEvents instead of the
+    // delay timer
+    // 21/4/2021 High frequent tablet event caused slowness when deforming with
+    // Raster Selection Tool. So I re-introduced the delay timer to make
+    // necessary interval for it. Deformation will be processed at interval of
+    // 20msec. (See RasterSelectionTool::leftButtonDrag())
+    if (curPos != m_lastMousePos) {
+      TMouseEvent mouseEvent;
+      initToonzEvent(mouseEvent, e, height(), m_pressure, getDevPixRatio(),
+                     m_isBusyOnTabletMove);
+      if (!m_isBusyOnTabletMove) {
+        m_isBusyOnTabletMove = true;
+        QTimer::singleShot(20, this, SLOT(releaseBusyOnTabletMove()));
+      }
+#else
     // It seems that the tabletEvent is called more often than mouseMoveEvent.
     // So I fire the interval timer in order to limit the following process
     // to be called in 50fps in maximum.
@@ -325,6 +383,8 @@ void SceneViewer::tabletEvent(QTabletEvent *e) {
       TMouseEvent mouseEvent;
       initToonzEvent(mouseEvent, e, height(), m_pressure, getDevPixRatio());
       QTimer::singleShot(20, this, SLOT(releaseBusyOnTabletMove()));
+#endif
+
       // cancel stroke to prevent drawing while floating
       // 23/1/2018 There is a case that the pressure becomes zero at the start
       // and the end of stroke. For such case, stroke should not be cancelled.
@@ -403,7 +463,21 @@ void SceneViewer::onEnter() {
     tool->onEnter();
   }
 
-  setFocus();
+  // grab the focus, unless a line-edit is focused currently
+  bool shouldSetFocus = true;
+
+  QWidget *focusWidget = qApp->focusWidget();
+  if (focusWidget) {
+    QLineEdit *lineEdit = dynamic_cast<QLineEdit *>(focusWidget);
+    if (lineEdit) {
+      shouldSetFocus = false;
+    }
+  }
+
+  if (shouldSetFocus) {
+    setFocus();
+  }
+
   update();
 }
 
@@ -447,12 +521,12 @@ void SceneViewer::onMove(const TMouseEvent &event) {
 
   // if the "compare with snapshot" mode is activated, change the mouse cursor
   // on the border handle
-  if (m_visualSettings.m_doCompare) {
-    if (abs(curPos.x() - width() * m_compareSettings.m_compareX) < 20) {
+  if (m_visualSettings.m_doCompare && isPreviewEnabled()) {
+    if (std::abs(curPos.x() - width() * m_compareSettings.m_compareX) < 20) {
       cursorSet = true;
       setToolCursor(this, ToolCursor::ScaleHCursor);
-    } else if (abs((height() - curPos.y()) -
-                   height() * m_compareSettings.m_compareY) < 20) {
+    } else if (std::abs((height() - curPos.y()) -
+                        height() * m_compareSettings.m_compareY) < 20) {
       cursorSet = true;
       setToolCursor(this, ToolCursor::ScaleVCursor);
     }
@@ -521,6 +595,15 @@ void SceneViewer::onMove(const TMouseEvent &event) {
     TPointD worldPos = winToWorld(curPos);
     TPointD pos      = tool->getMatrix().inv() * worldPos;
 
+#ifdef WITH_CANON
+    // grab screen picking for stop motion live view zoom
+    if ((event.buttons() & Qt::LeftButton) &&
+        StopMotion::instance()->m_canon->m_pickLiveViewZoom) {
+      StopMotion::instance()->m_canon->makeZoomPoint(pos);
+      return;
+    }
+#endif
+
     if (m_locator) {
       m_locator->onChangeViewAff(worldPos);
     }
@@ -539,6 +622,7 @@ void SceneViewer::onMove(const TMouseEvent &event) {
     if (m_tabletEvent &&
         (m_tabletState == OnStroke || m_tabletState == StartStroke) &&
         m_tabletMove) {
+      if (m_toolSwitched) tool->leftButtonDown(pos, event);
       tool->leftButtonDrag(pos, event);
       m_tabletState = OnStroke;
     }
@@ -546,13 +630,23 @@ void SceneViewer::onMove(const TMouseEvent &event) {
     else if (m_mouseButton == Qt::LeftButton) {
       // sometimes the mousePressedEvent is postponed to a wrong  mouse move
       // event!
-      if (m_buttonClicked && !m_toolSwitched) tool->leftButtonDrag(pos, event);
+      //      if (m_buttonClicked && !m_toolSwitched) tool->leftButtonDrag(pos,
+      //      event);
+      if (m_toolSwitched) tool->leftButtonDown(pos, event);
+      tool->leftButtonDrag(pos, event);
+      m_mouseState = OnStroke;
     } else if (m_pressure == 0.0) {
       tool->mouseMove(pos, event);
     }
     if (!cursorSet) setToolCursor(this, tool->getCursorId());
-    m_pos        = curPos;
-    m_tabletMove = false;
+
+#ifdef WITH_CANON
+    if (StopMotion::instance()->m_canon->m_pickLiveViewZoom)
+      setToolCursor(this, ToolCursor::ZoomCursor);
+#endif
+    m_pos          = curPos;
+    m_tabletMove   = false;
+    m_toolSwitched = false;
   } else if (m_mouseButton == Qt::MidButton) {
     if ((event.buttons() & Qt::MidButton) == 0) m_mouseButton = Qt::NoButton;
     // scrub with shift and middle click
@@ -593,6 +687,7 @@ void SceneViewer::mousePressEvent(QMouseEvent *event) {
   // and will cancel the onPress operation called here.
 
   TMouseEvent mouseEvent;
+  m_mouseState = Touched;
   initToonzEvent(mouseEvent, event, height(), 1.0, getDevPixRatio());
   onPress(mouseEvent);
 }
@@ -601,11 +696,20 @@ void SceneViewer::mousePressEvent(QMouseEvent *event) {
 
 void SceneViewer::onPress(const TMouseEvent &event) {
   if (m_mouseButton != Qt::NoButton) {
-    // if some button is pressed while another button being active,
-    // finish the action for the previous button first.
-    TMouseEvent preEvent = event;
-    preEvent.m_button    = m_mouseButton;
-    onRelease(preEvent);
+    if (event.m_isTablet && m_mouseState != None) {
+      //      qDebug() << "[onPress] Switched from MousePress to TabletPress";
+      // TabletPress came immediately after MousePress. Let's switch to
+      // tabletPress but not end the prior action or it leaves an extra
+      // stroke
+      m_mouseState    = None;
+      m_buttonClicked = false;
+    } else {
+      // if some button is pressed while another button being active,
+      // finish the action for the previous button first.
+      TMouseEvent preEvent = event;
+      preEvent.m_button    = m_mouseButton;
+      onRelease(preEvent);
+    }
   }
 
   // evita i press ripetuti
@@ -631,20 +735,22 @@ void SceneViewer::onPress(const TMouseEvent &event) {
     if (!PreviewSubCameraManager::instance()->mousePressEvent(this, event))
       return;
   } else if (m_mouseButton == Qt::LeftButton && m_visualSettings.m_doCompare) {
-    if (abs(m_pos.x() - width() * m_compareSettings.m_compareX) < 20) {
+    if (std::abs(m_pos.x() - width() * m_compareSettings.m_compareX) < 20) {
       m_compareSettings.m_dragCompareX = true;
       m_compareSettings.m_dragCompareY = false;
       m_compareSettings.m_compareY     = ImagePainter::DefaultCompareValue;
       update();
       m_tabletEvent = false;
+      m_tabletState = None;
       return;
-    } else if (abs((height() - m_pos.y()) -
-                   height() * m_compareSettings.m_compareY) < 20) {
+    } else if (std::abs((height() - m_pos.y()) -
+                        height() * m_compareSettings.m_compareY) < 20) {
       m_compareSettings.m_dragCompareY = true;
       m_compareSettings.m_dragCompareX = false;
       m_compareSettings.m_compareX     = ImagePainter::DefaultCompareValue;
       update();
       m_tabletEvent = false;
+      m_tabletState = None;
       return;
     } else
       m_compareSettings.m_dragCompareX = m_compareSettings.m_dragCompareY =
@@ -656,6 +762,7 @@ void SceneViewer::onPress(const TMouseEvent &event) {
   TTool *tool = TApp::instance()->getCurrentTool()->getTool();
   if (!tool || !tool->isEnabled()) {
     m_tabletEvent = false;
+    m_tabletState = None;
     return;
   }
   tool->setViewer(this);
@@ -663,6 +770,7 @@ void SceneViewer::onPress(const TMouseEvent &event) {
     tool = TApp::instance()->getCurrentTool()->getTool();
     if (!tool || !tool->isEnabled()) {
       m_tabletEvent = false;
+      m_tabletState = None;
       return;
     }
     tool->setViewer(this);
@@ -677,12 +785,22 @@ void SceneViewer::onPress(const TMouseEvent &event) {
     pos.x /= m_dpiScale.x;
     pos.y /= m_dpiScale.y;
   }
+
+#ifdef WITH_CANON
+  // grab screen picking for stop motion live view zoom
+  if (StopMotion::instance()->m_canon->m_pickLiveViewZoom) {
+    StopMotion::instance()->m_canon->makeZoomPoint(pos);
+    return;
+  }
+#endif
+
   // separate tablet and mouse events
   if (m_tabletEvent && m_tabletState == Touched) {
     TApp::instance()->getCurrentTool()->setToolBusy(true);
     m_tabletState = StartStroke;
     tool->leftButtonDown(pos, event);
   } else if (m_mouseButton == Qt::LeftButton) {
+    m_mouseState = StartStroke;
     TApp::instance()->getCurrentTool()->setToolBusy(true);
     tool->leftButtonDown(pos, event);
   }
@@ -713,6 +831,7 @@ void SceneViewer::mouseReleaseEvent(QMouseEvent *event) {
   }
 
   TMouseEvent mouseEvent;
+  if (m_mouseState != None) m_mouseState = Released;
   initToonzEvent(mouseEvent, event, height(), 1.0, getDevPixRatio());
   onRelease(mouseEvent);
 }
@@ -780,16 +899,17 @@ void SceneViewer::onRelease(const TMouseEvent &event) {
 
 quit:
   m_mouseButton = Qt::NoButton;
-  // If m_tabletState is "Touched", we've been called by tabletPress event.
-  // Don't clear it out table state so the tablePress event will process
-  // correctly.
-  if (m_tabletState != Touched) m_tabletState = None;
-  m_tabletMove                                = false;
-  m_pressure                                  = 0;
   // Leave m_tabletEvent as-is in order to check whether the onRelease is called
   // from tabletEvent or not in mouseReleaseEvent.
   if (m_tabletState == Released)  // only clear if tabletRelease event
     m_tabletEvent = false;
+  // If m_tabletState is "Touched", we've been called by tabletPress event.
+  // Don't clear it out table state so the tablePress event will process
+  // correctly.
+  if (m_tabletState != Touched) m_tabletState = None;
+  m_mouseState = None;
+  m_tabletMove = false;
+  m_pressure   = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -841,12 +961,12 @@ void SceneViewer::wheelEvent(QWheelEvent *event) {
 
   default:  // Qt::MouseEventSynthesizedByQt,
             // Qt::MouseEventSynthesizedByApplication
-    {
-      std::cout << "not supported event: Qt::MouseEventSynthesizedByQt, "
-                   "Qt::MouseEventSynthesizedByApplication"
-                << std::endl;
-      break;
-    }
+  {
+    std::cout << "not supported event: Qt::MouseEventSynthesizedByQt, "
+                 "Qt::MouseEventSynthesizedByApplication"
+              << std::endl;
+    break;
+  }
 
   }  // end switch
 
@@ -881,6 +1001,7 @@ void SceneViewer::wheelEvent(QWheelEvent *event) {
               m_touchDevice == QTouchDevice::TouchScreen) ||
              m_gestureActive == false) {
       zoomQt(event->pos() * getDevPixRatio(), exp(0.001 * delta));
+      m_panning = false;
     }
   }
   event->accept();
@@ -899,6 +1020,8 @@ void SceneViewer::gestureEvent(QGestureEvent *e) {
     QPinchGesture *gesture = static_cast<QPinchGesture *>(pinch);
     QPinchGesture::ChangeFlags changeFlags = gesture->changeFlags();
     QPoint firstCenter                     = gesture->centerPoint().toPoint();
+    if (m_touchDevice == QTouchDevice::TouchScreen)
+      firstCenter = mapFromGlobal(firstCenter);
 
     if (gesture->state() == Qt::GestureStarted) {
       m_gestureActive = true;
@@ -931,17 +1054,19 @@ void SceneViewer::gestureEvent(QGestureEvent *e) {
         }
         if (m_zooming) {
           zoomQt(firstCenter * getDevPixRatio(), scaleFactor);
+          m_panning = false;
         }
         m_gestureActive = true;
       }
       if (changeFlags & QPinchGesture::RotationAngleChanged) {
         qreal rotationDelta =
             gesture->rotationAngle() - gesture->lastRotationAngle();
+        if (m_isFlippedX != m_isFlippedY) rotationDelta = -rotationDelta;
         TAffine aff    = getViewMatrix().inv();
         TPointD center = aff * TPointD(0, 0);
         if (!m_rotating && !m_zooming) {
           m_rotationDelta += rotationDelta;
-          double absDelta = abs(m_rotationDelta);
+          double absDelta = std::abs(m_rotationDelta);
           if (absDelta >= 10) {
             m_rotating = true;
           }
@@ -966,6 +1091,8 @@ void SceneViewer::gestureEvent(QGestureEvent *e) {
 
 void SceneViewer::touchEvent(QTouchEvent *e, int type) {
   if (type == QEvent::TouchBegin) {
+    if (m_tabletEvent) return;
+
     m_touchActive   = true;
     m_firstPanPoint = e->touchPoints().at(0).pos();
     m_undoPoint     = m_firstPanPoint;
@@ -1015,19 +1142,82 @@ void SceneViewer::touchEvent(QTouchEvent *e, int type) {
 //-----------------------------------------------------------------------------
 
 bool SceneViewer::event(QEvent *e) {
-  if (CommandManager::instance()
+  /*
+  switch (e->type()) {
+  //	case QEvent::Enter:
+  //	qDebug() << "[enter] ************************** Enter";
+  //	break;
+  //	case QEvent::Leave:
+  //	qDebug() << "[enter] ************************** Leave";
+  //	break;
+
+  case QEvent::TabletPress: {
+    QTabletEvent *te = static_cast<QTabletEvent *>(e);
+    qDebug() << "[enter] ************************** TabletPress mouseState("
+             << m_mouseState << ") tabletState(" << m_tabletState
+             << ") pressure(" << m_pressure << ") pointerType("
+             << te->pointerType() << ") device(" << te->device() << ")";
+  } break;
+  //	case QEvent::TabletMove:
+  //	qDebug() << "[enter] ************************** TabletMove
+  //mouseState("<<m_mouseState<<") tabletState("<<m_tabletState<<") pressure("
+  //<< m_pressure << ")";
+  //	break;
+  case QEvent::TabletRelease:
+    qDebug() << "[enter] ************************** TabletRelease mouseState("
+             << m_mouseState << ") tabletState(" << m_tabletState << ")";
+    break;
+
+  case QEvent::TouchBegin:
+    qDebug() << "[enter] ************************** TouchBegin";
+    break;
+  case QEvent::TouchEnd:
+    qDebug() << "[enter] ************************** TouchEnd";
+    break;
+  case QEvent::TouchCancel:
+    qDebug() << "[enter] ************************** TouchCancel";
+    break;
+
+  case QEvent::Gesture:
+    qDebug() << "[enter] ************************** Gesture";
+    break;
+
+  case QEvent::MouseButtonPress:
+    qDebug()
+        << "[enter] ************************** MouseButtonPress mouseState("
+        << m_mouseState << ") tabletState(" << m_tabletState << ") pressure("
+        << m_pressure << ") tabletEvent(" << m_tabletEvent << ")";
+    break;
+  //	case QEvent::MouseMove:
+  //	qDebug() << "[enter] ************************** MouseMove mouseState("
+  //<< m_mouseState << ") tabletState("<<m_tabletState<<") pressure(" <<
+  //m_pressure << ")";
+  //	break;
+  case QEvent::MouseButtonRelease:
+    qDebug()
+        << "[enter] ************************** MouseButtonRelease mouseState("
+        << m_mouseState << ") tabletState(" << m_tabletState << ")";
+    break;
+
+  case QEvent::MouseButtonDblClick:
+    qDebug() << "[enter] ============================== MouseButtonDblClick";
+    break;
+  }
+  */
+  if (e->type() == QEvent::Gesture && CommandManager::instance()
+                                          ->getAction(MI_TouchGestureControl)
+                                          ->isChecked()) {
+    gestureEvent(static_cast<QGestureEvent *>(e));
+    return true;
+  }
+  if ((e->type() == QEvent::TouchBegin || e->type() == QEvent::TouchEnd ||
+       e->type() == QEvent::TouchCancel || e->type() == QEvent::TouchUpdate) &&
+      CommandManager::instance()
           ->getAction(MI_TouchGestureControl)
           ->isChecked()) {
-    if (e->type() == QEvent::Gesture) {
-      gestureEvent(static_cast<QGestureEvent *>(e));
-      return true;
-    }
-    if (e->type() == QEvent::TouchBegin || e->type() == QEvent::TouchEnd ||
-        e->type() == QEvent::TouchCancel || e->type() == QEvent::TouchUpdate) {
-      touchEvent(static_cast<QTouchEvent *>(e), e->type());
-      m_gestureActive = true;
-      return true;
-    }
+    touchEvent(static_cast<QTouchEvent *>(e), e->type());
+    m_gestureActive = true;
+    return true;
   }
   if (e->type() == QEvent::ShortcutOverride || e->type() == QEvent::KeyPress) {
     if (!((QKeyEvent *)e)->isAutoRepeat()) {
@@ -1054,6 +1244,12 @@ bool SceneViewer::event(QEvent *e) {
       e->accept();
     }
 
+    // Disable keyboard shortcuts while the tool is busy with a mouse drag
+    // operation.
+    if (tool->isDragging()) {
+      e->accept();
+    }
+
     return true;
   }
   if (e->type() == QEvent::KeyRelease) {
@@ -1077,44 +1273,6 @@ bool SceneViewer::event(QEvent *e) {
     clock.start();
   }
 
-  /*
-  switch(e->type())
-  {
-  case QEvent::Enter:
-  qDebug() << "************************** Enter";
-  break;
-  case QEvent::Leave:
-  qDebug() << "************************** Leave";
-  break;
-
-  case QEvent::TabletPress:
-  qDebug() << "************************** TabletPress"  << m_pressure;
-  break;
-  case QEvent::TabletMove:
-  qDebug() << "************************** TabletMove";
-  break;
-  case QEvent::TabletRelease:
-  qDebug() << "************************** TabletRelease";
-  break;
-
-
-  case QEvent::MouseButtonPress:
-  qDebug() << "**************************MouseButtonPress"  << m_pressure << " "
-  << m_tabletEvent;
-  break;
-  case QEvent::MouseMove:
-  qDebug() << "**************************MouseMove" <<  m_pressure;
-  break;
-  case QEvent::MouseButtonRelease:
-  qDebug() << "**************************MouseButtonRelease";
-  break;
-
-  case QEvent::MouseButtonDblClick:
-  qDebug() << "============================== MouseButtonDblClick";
-  break;
-  }
-  */
-
   return QOpenGLWidget::event(e);
 }
 
@@ -1124,11 +1282,11 @@ class ViewerZoomer final : public ImageUtils::ShortcutZoomer {
 public:
   ViewerZoomer(SceneViewer *parent) : ShortcutZoomer(parent) {}
 
-  bool zoom(bool zoomin, bool resetZoom) override {
+  bool zoom(bool zoomin, bool resetView) override {
     SceneViewer *sceneViewer = static_cast<SceneViewer *>(getWidget());
 
-    resetZoom ? sceneViewer->resetSceneViewer()
-              : sceneViewer->zoomQt(zoomin, resetZoom);
+    resetView ? sceneViewer->resetSceneViewer()
+              : sceneViewer->zoomQt(zoomin, resetView);
 
     return true;
   }
@@ -1153,6 +1311,21 @@ public:
     return true;
   }
 
+  bool resetZoom() override {
+    static_cast<SceneViewer *>(getWidget())->resetZoom();
+    return true;
+  }
+
+  bool resetRotation() override {
+    static_cast<SceneViewer *>(getWidget())->resetRotation();
+    return true;
+  }
+
+  bool resetPosition() override {
+    static_cast<SceneViewer *>(getWidget())->resetPosition();
+    return true;
+  }
+
   bool toggleFullScreen(bool quit) override {
     if (ImageUtils::FullScreenWidget *fsWidget =
             dynamic_cast<ImageUtils::FullScreenWidget *>(
@@ -1167,7 +1340,7 @@ public:
 
 bool changeFrameSkippingHolds(QKeyEvent *e) {
   if ((e->modifiers() & Qt::ShiftModifier) == 0 ||
-      e->key() != Qt::Key_Down && e->key() != Qt::Key_Up)
+      (e->key() != Qt::Key_Down && e->key() != Qt::Key_Up))
     return false;
   TApp *app        = TApp::instance();
   TFrameHandle *fh = app->getCurrentFrame();
@@ -1204,6 +1377,49 @@ void SceneViewer::keyPressEvent(QKeyEvent *event) {
   if (m_freezedStatus != NO_FREEZED) return;
   int key = event->key();
 
+#ifdef WITH_CANON
+  if ((m_stopMotion->m_canon->m_pickLiveViewZoom ||
+       m_stopMotion->m_canon->m_zooming) &&
+      (key == Qt::Key_Left || key == Qt::Key_Right || key == Qt::Key_Up ||
+       key == Qt::Key_Down || key == Qt::Key_2 || key == Qt::Key_4 ||
+       key == Qt::Key_6 || key == Qt::Key_8)) {
+    if (m_stopMotion->m_canon->m_liveViewZoomReadyToPick == true) {
+      if (key == Qt::Key_Left || key == Qt::Key_4) {
+        m_stopMotion->m_canon->m_liveViewZoomPickPoint.x -= 10;
+      }
+      if (key == Qt::Key_Right || key == Qt::Key_6) {
+        m_stopMotion->m_canon->m_liveViewZoomPickPoint.x += 10;
+      }
+      if (key == Qt::Key_Up || key == Qt::Key_8) {
+        m_stopMotion->m_canon->m_liveViewZoomPickPoint.y += 10;
+      }
+      if (key == Qt::Key_Down || key == Qt::Key_2) {
+        m_stopMotion->m_canon->m_liveViewZoomPickPoint.y -= 10;
+      }
+      if (m_stopMotion->m_canon->m_zooming) {
+        m_stopMotion->m_canon->setZoomPoint();
+      }
+    }
+    m_stopMotion->m_canon->calculateZoomPoint();
+    event->accept();
+    return;
+  } else if (m_stopMotion->m_canon->m_pickLiveViewZoom &&
+             (key == Qt::Key_Escape || key == Qt::Key_Enter ||
+              key == Qt::Key_Return)) {
+    m_stopMotion->m_canon->toggleZoomPicking();
+    event->accept();
+    return;
+  } else
+#endif
+#if defined(x64)
+      if (m_stopMotion->m_liveViewStatus == 2 &&
+          (key == Qt::Key_Enter || key == Qt::Key_Return)) {
+    m_stopMotion->captureImage();
+    event->accept();
+    return;
+  }
+#endif
+
   // resolving priority and tool-specific key events in this lambda
   auto ret = [&]() -> bool {
     TTool *tool = TApp::instance()->getCurrentTool()->getTool();
@@ -1223,6 +1439,15 @@ void SceneViewer::keyPressEvent(QKeyEvent *event) {
            event->modifiers() == Qt::KeypadModifier) &&
           ((Qt::Key_0 <= key && key <= Qt::Key_9) || key == Qt::Key_Tab ||
            key == Qt::Key_Backtab)) {
+        // When the viewer is in full screen mode, directly call the style
+        // shortcut function since the viewer is retrieved from the parent
+        // panel.
+        if (parentWidget() &&
+            parentWidget()->windowState() & Qt::WindowFullScreen) {
+          StyleShortcutSwitchablePanel::onKeyPress(event);
+          return true;
+        }
+
         event->ignore();
         return true;
       }
@@ -1274,6 +1499,7 @@ void SceneViewer::keyPressEvent(QKeyEvent *event) {
     if (changeFrameSkippingHolds(event)) return;
 
     TFrameHandle *fh = TApp::instance()->getCurrentFrame();
+    int origFrame    = fh->getFrame();
 
     if (key == Qt::Key_Up || key == Qt::Key_Left)
       fh->prevFrame();
@@ -1299,6 +1525,21 @@ void SceneViewer::keyPressEvent(QKeyEvent *event) {
       fh->firstFrame();
     else if (key == Qt::Key_End)
       fh->lastFrame();
+
+    // Use arrow keys to shift the cell selection.
+    if (Preferences::instance()->isUseArrowKeyToShiftCellSelectionEnabled() &&
+        fh->getFrameType() != TFrameHandle::LevelFrame) {
+      TCellSelection *cellSel =
+          dynamic_cast<TCellSelection *>(TSelection::getCurrent());
+      if (cellSel && !cellSel->isEmpty()) {
+        int r0, c0, r1, c1;
+        cellSel->getSelectedCells(r0, c0, r1, c1);
+        int shiftFrame = fh->getFrame() - origFrame;
+
+        cellSel->selectCells(r0 + shiftFrame, c0, r1 + shiftFrame, c1);
+        TApp::instance()->getCurrentSelection()->notifySelectionChanged();
+      }
+    }
   }
   update();
   // TODO: devo accettare l'evento?
@@ -1431,11 +1672,18 @@ void SceneViewer::onContextMenu(const QPoint &pos, const QPoint &globalPos) {
 
   menu->addLevelCommands(columnIndices);
 
-  ComboViewerPanel *cvp = qobject_cast<ComboViewerPanel *>(
-      parentWidget()->parentWidget()->parentWidget());
+  ComboViewerPanel *cvp =
+      qobject_cast<ComboViewerPanel *>(parentWidget()->parentWidget());
   if (cvp) {
     menu->addSeparator();
     cvp->addShowHideContextMenu(menu);
+  }
+
+  SceneViewerPanel *svp = qobject_cast<SceneViewerPanel *>(
+      parentWidget()->parentWidget()->parentWidget());
+  if (svp) {
+    menu->addSeparator();
+    svp->addShowHideContextMenu(menu);
   }
 
   menu->exec(globalPos);
@@ -1460,10 +1708,13 @@ void SceneViewer::dragEnterEvent(QDragEnterEvent *event) {
 
   const QMimeData *mimeData = event->mimeData();
 
-  if (acceptResourceOrFolderDrop(mimeData->urls()))
-    event->acceptProposedAction();
-  else
+  if (acceptResourceOrFolderDrop(mimeData->urls())) {
+    // Force CopyAction
+    event->setDropAction(Qt::CopyAction);
+    event->accept();
+  } else {
     event->ignore();
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -1475,12 +1726,20 @@ void SceneViewer::dropEvent(QDropEvent *e) {
   if (mimeData->hasUrls()) {
     IoCmd::LoadResourceArguments args;
 
-    foreach (const QUrl &url, mimeData->urls()) {
+    for (const QUrl &url : mimeData->urls()) {
       TFilePath fp(url.toLocalFile().toStdWString());
       args.resourceDatas.push_back(fp);
     }
 
     IoCmd::loadResources(args);
+
+    if (acceptResourceOrFolderDrop(mimeData->urls())) {
+      // Force Copy Action
+      e->setDropAction(Qt::CopyAction);
+      // For files, don't accept original proposed action in case it's a move
+      e->accept();
+      return;
+    }
   }
   e->acceptProposedAction();
 }
@@ -1493,7 +1752,10 @@ void SceneViewer::onToolSwitched() {
   invalidateToolStatus();
 
   TTool *tool = TApp::instance()->getCurrentTool()->getTool();
-  if (tool) tool->updateMatrix();
+  if (tool) {
+    tool->updateMatrix();
+    if (tool->getViewer()) tool->getViewer()->setGuidedStrokePickerMode(0);
+  }
 
   onLevelChanged();
   update();

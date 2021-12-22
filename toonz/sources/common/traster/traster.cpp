@@ -65,7 +65,7 @@ m_buffer = BigMemoryManager.getMemoryChunk(lx*ly*pixelSize, this);
 //m_buffer = new UCHAR[lx*ly*pixelSize];
 m_totalMemory += ((lx*ly*pixelSize)>>10);
 #ifdef _WIN32
-MessageBox( NULL, "Run out of contiguos phisical memory: please save all and
+MessageBox( NULL, "Run out of contiguous phisical memory: please save all and
 restart toonz!", "Warning", MB_OK);
 #endif
 }*/

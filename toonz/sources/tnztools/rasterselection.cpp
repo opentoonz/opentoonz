@@ -24,7 +24,10 @@
 #include "toonz/toonzscene.h"
 #include "toonz/tcamera.h"
 #include "toonz/trasterimageutils.h"
-#include "toonz/toonzimageutils.h"
+#include "toonz/tcolumnhandle.h"
+#include "toonz/tframehandle.h"
+#include "toonz/txsheethandle.h"
+#include "toonz/tstageobject.h"
 
 #include <QApplication>
 #include <QClipboard>
@@ -793,6 +796,19 @@ TStroke getIntersectedStroke(TStroke &stroke, TRectD bbox) {
       TThickPoint p  = getIntersectionPoint(bbox, stroke.getChunk(chunkIndex),
                                            currentSegmentIndex,
                                            chunkIndex == precChunkIndex);
+
+      // exactly match the position with the edge of bbox
+      // or the pasted raster may offset by 1pixel due to truncation in
+      // ToonzImageUtils::convertWorldToRaster()
+      if (areAlmostEqual(p.x, bbox.getP00().x, 1e-6))
+        p.x = bbox.getP00().x;
+      else if (areAlmostEqual(p.x, bbox.getP11().x, 1e-6))
+        p.x = bbox.getP11().x;
+      if (areAlmostEqual(p.y, bbox.getP00().y, 1e-6))
+        p.y = bbox.getP00().y;
+      else if (areAlmostEqual(p.y, bbox.getP11().y, 1e-6))
+        p.y = bbox.getP11().y;
+
       precChunkIndex = chunkIndex;
       addPointToVector(p, outPoints, (int)outPoints.size() % 2 == 1);
       if (!isPrecPointInternal && points.size() > 0 && outPoints.size() > 0) {
@@ -915,7 +931,7 @@ void RasterSelection::notify() {
 
 //! Empty the selection.
 //! If the selection is floating, the floating image is pasted using the current
-//! tranformation.
+//! transformation.
 void RasterSelection::selectNone() {
   if (isFloating()) {
     pasteFloatingSelection();
@@ -1004,6 +1020,9 @@ void RasterSelection::transform(const TAffine &affine) {
 void RasterSelection::makeFloating() {
   if (isEmpty()) return;
   if (!m_currentImage) return;
+
+  if (!isEditable()) return;
+
   m_floatingSelection         = getImageFromSelection(m_currentImage, *this);
   m_originalfloatingSelection = m_floatingSelection->clone();
   deleteSelectionWithoutUndo(m_currentImage, m_strokes);
@@ -1051,6 +1070,12 @@ void RasterSelection::deleteSelection() {
   if (!m_currentImage) return;
   TTool::Application *app = TTool::getApplication();
   TXshSimpleLevel *level  = app->getCurrentLevel()->getSimpleLevel();
+  if (!isEditable()) {
+    DVGui::error(
+        QObject::tr("The selection cannot be deleted. It is not editable."));
+    return;
+  }
+
   // we have to remove all undo transformation and the undo for the makeFloating
   // operation!
   if (isFloating()) {
@@ -1151,7 +1176,7 @@ void RasterSelection::pasteSelection(const RasterImageData *riData) {
     m_originalfloatingSelection = m_floatingSelection->clone();
   TScale sc;
   if (dpiX != 0 && dpiY != 0 && currentDpiX != 0 && currentDpiY != 0)
-    sc     = TScale(currentDpiX / dpiX, currentDpiY / dpiY);
+    sc = TScale(currentDpiX / dpiX, currentDpiY / dpiY);
   m_affine = m_affine * sc;
 }
 
@@ -1160,9 +1185,18 @@ void RasterSelection::pasteSelection(const RasterImageData *riData) {
 void RasterSelection::pasteSelection() {
   TTool::Application *app = TTool::getApplication();
   TTool *tool             = app->getCurrentTool()->getTool();
-  TImageP image           = tool->getImage(true);
-  m_currentImage          = image;
-  m_fid                   = tool->getCurrentFid();
+  TImageP image           = tool->touchImage();
+
+  if (!image) return;
+
+  if (!isEditable()) {
+    DVGui::error(
+        QObject::tr("The selection cannot be pasted. It is not editable."));
+    return;
+  }
+
+  m_currentImage = image;
+  m_fid          = tool->getCurrentFid();
 
   QClipboard *clipboard = QApplication::clipboard();
   const RasterImageData *riData =
@@ -1207,6 +1241,42 @@ bool RasterSelection::isTransformed() { return !m_affine.isIdentity(); }
 
 //-----------------------------------------------------------------------------
 
+bool RasterSelection::isEditable() {
+  TTool::Application *app = TTool::getApplication();
+  TXshSimpleLevel *level  = app->getCurrentLevel()->getSimpleLevel();
+
+  TFrameHandle *frame = app->getCurrentFrame();
+  bool filmstrip      = frame->isEditingLevel();
+
+  if (level) {
+    if (level->isReadOnly()) return false;
+
+    TFrameId frameId = app->getCurrentTool()->getTool()->getCurrentFid();
+    if (level->isFrameReadOnly(frameId)) return false;
+  }
+
+  if (!filmstrip) {
+    int colIndex = app->getCurrentTool()->getTool()->getColumnIndex();
+    int rowIndex = frame->getFrame();
+    if (app->getCurrentTool()->getTool()->isColumnLocked(colIndex))
+      return false;
+
+    TXsheet *xsh      = app->getCurrentXsheet()->getXsheet();
+    TStageObject *obj = xsh->getStageObject(TStageObjectId::ColumnId(colIndex));
+    // Test for Mesh-deformed levels
+    const TStageObjectId &parentId = obj->getParent();
+    if (parentId.isColumn() && obj->getParentHandle()[0] != 'H') {
+      TXshSimpleLevel *parentSl =
+          xsh->getCell(rowIndex, parentId.getIndex()).getSimpleLevel();
+      if (parentSl && parentSl->getType() == MESH_XSHLEVEL) return false;
+    }
+  }
+
+  return true;
+}
+
+//-----------------------------------------------------------------------------
+
 TRectD RasterSelection::getStrokesBound(std::vector<TStroke> strokes) const {
   int i;
   TRectD box = TRectD();
@@ -1218,7 +1288,7 @@ TRectD RasterSelection::getStrokesBound(std::vector<TStroke> strokes) const {
 
 TRectD RasterSelection::getSelectionBound() const {
   if (m_strokes.size() == 0) return TRectD();
-  TRectD selectionBox            = getStrokesBound(m_strokes);
+  TRectD selectionBox = getStrokesBound(m_strokes);
   if (isFloating()) selectionBox = m_affine * selectionBox;
   return selectionBox;
 }
@@ -1233,7 +1303,7 @@ TRectD RasterSelection::getOriginalSelectionBound() const {
 //-----------------------------------------------------------------------------
 
 TRectD RasterSelection::getSelectionBbox() const {
-  TRectD rect            = m_selectionBbox;
+  TRectD rect = m_selectionBbox;
   if (isFloating()) rect = m_affine * m_selectionBbox;
   return rect;
 }

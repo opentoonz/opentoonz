@@ -44,7 +44,12 @@ public:
       : QTreeWidgetItem(parent, UserType), m_action(action) {
     setFlags(Qt::ItemIsSelectable | Qt::ItemIsDragEnabled | Qt::ItemIsEnabled |
              Qt::ItemNeverHasChildren);
-    setText(0, m_action->text().remove("&"));
+    QString tempText = m_action->text();
+    // removing accelerator key indicator
+    tempText = tempText.replace(QRegExp("&([^& ])"), "\\1");
+    // removing doubled &s
+    tempText = tempText.replace("&&", "&");
+    setText(0, tempText);
     setToolTip(0, QObject::tr("[Drag] to move position"));
   }
   QAction* getAction() const { return m_action; }
@@ -284,12 +289,10 @@ CommandBarListTree::CommandBarListTree(QWidget* parent) : QTreeWidget(parent) {
   setDragEnabled(true);
   setDragDropMode(QAbstractItemView::DragOnly);
   setColumnCount(1);
-  setIconSize(QSize(21, 17));
+  setIconSize(QSize(21, 18));
   header()->close();
 
-  QIcon menuFolderIcon(":Resources/browser_project_close.svg");
-  menuFolderIcon.addFile(":Resources/browser_project_open.svg", QSize(),
-                         QIcon::Normal, QIcon::On);
+  QIcon menuFolderIcon(createQIcon("folder_project", true));
   invisibleRootItem()->setIcon(0, menuFolderIcon);
 
   QTreeWidgetItem* menuCommandFolder = new QTreeWidgetItem(this);
@@ -306,19 +309,24 @@ CommandBarListTree::CommandBarListTree(QWidget* parent) : QTreeWidget(parent) {
   addFolder(ShortcutTree::tr("Xsheet"), MenuXsheetCommandType,
             menuCommandFolder);
   addFolder(ShortcutTree::tr("Cells"), MenuCellsCommandType, menuCommandFolder);
+  addFolder(ShortcutTree::tr("Play"), MenuPlayCommandType, menuCommandFolder);
+  addFolder(ShortcutTree::tr("Render"), MenuRenderCommandType,
+            menuCommandFolder);
   addFolder(ShortcutTree::tr("View"), MenuViewCommandType, menuCommandFolder);
   addFolder(ShortcutTree::tr("Windows"), MenuWindowsCommandType,
             menuCommandFolder);
+  addFolder(ShortcutTree::tr("Help"), MenuHelpCommandType, menuCommandFolder);
 
   addFolder(ShortcutTree::tr("Tools"), ToolCommandType);
-  addFolder(ShortcutTree::tr("Playback"), PlaybackCommandType);
   addFolder(ShortcutTree::tr("Fill"), FillCommandType);
   addFolder(ShortcutTree::tr("Right-click Menu Commands"),
             RightClickMenuCommandType);
   addFolder(ShortcutTree::tr("Tool Modifiers"), ToolModifierCommandType);
-  addFolder(ShortcutTree::tr("Visualization"), ZoomCommandType);
+  addFolder(ShortcutTree::tr("Visualization"), VisualizationButtonCommandType);
   addFolder(ShortcutTree::tr("Misc"), MiscCommandType);
   addFolder(ShortcutTree::tr("RGBA Channels"), RGBACommandType);
+
+  sortItems(0, Qt::AscendingOrder);
 
   CommandBarSeparatorItem* sep = new CommandBarSeparatorItem(0);
   sep->setToolTip(0, QObject::tr("[Drag&Drop] to copy separator to menu bar"));

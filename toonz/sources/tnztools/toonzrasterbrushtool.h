@@ -109,6 +109,9 @@ private:
   int m_readIndex;
   std::vector<TThickPoint> m_rawPoints;
   std::vector<TThickPoint> m_outputPoints;
+
+  int m_resampledIndex;
+  std::vector<TThickPoint> m_resampledPoints;
 };
 //************************************************************************
 //   Toonz Raster Brush Tool declaration
@@ -156,6 +159,8 @@ public:
   void addPreset(QString name);
   void removePreset();
 
+  void loadLastBrush();
+
   void finishRasterBrush(const TPointD &pos, double pressureVal);
   // return true if the pencil mode is active in the Brush / PaintBrush / Eraser
   // Tools.
@@ -177,6 +182,7 @@ protected:
   TBoolProperty m_pencil;
   TBoolProperty m_pressure;
   TDoubleProperty m_modifierSize;
+  TBoolProperty m_modifierLockAlpha;
 
   RasterStrokeGenerator *m_rasterTrack;
   TTileSetCM32 *m_tileSet;
@@ -221,11 +227,15 @@ protected:
   QElapsedTimer m_brushTimer;
   int m_minCursorThick, m_maxCursorThick;
 
+  bool m_propertyUpdating = false;
+
 protected:
   static void drawLine(const TPointD &point, const TPointD &centre,
                        bool horizontal, bool isDecimal);
   static void drawEmptyCircle(TPointD point, int thick, bool isLxEven,
                               bool isLyEven, bool isPencil);
+
+  TPointD getCenteredCursorPos(const TPointD &originalCursorPos);
 };
 
 //------------------------------------------------------------

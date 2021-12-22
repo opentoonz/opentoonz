@@ -326,7 +326,7 @@ void tglDraw(const TMeshImage &meshImage, const DrawableTextureData &texData,
                GL_HINT_BIT);  // Preserve original status bits
 
   glEnable(GL_BLEND);
-
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glEnable(GL_LINE_SMOOTH);
   glLineWidth(1.0f);
 

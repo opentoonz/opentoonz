@@ -47,6 +47,7 @@
       <file>Resources/picker_style_organize.png</file>
       <file>Resources/picker_rgb.png</file>
       <file>Resources/picker_rgb_white.png</file>
+      <file>Resources/pointing_hand.png</file>
       <file>Resources/karasu.png</file>
       <file>Resources/ruler_modify.png</file>
       <file>Resources/ruler_new.png</file>
@@ -77,8 +78,14 @@
       <file>Resources/ex_style_line_left.png</file>
       <file>Resources/ex_z.png</file>
       <file>Resources/ex_z_left.png</file>
+      <file>Resources/ex_precise.png</file>
+      <file>Resources/ex_precise_left.png</file>
       <file>Resources/brush_large.png</file>
       <file>Resources/brush_crosshair.png</file>
       <file>Resources/tracker.png</file>
+      <file>Resources/ex_prev.png</file>
+      <file>Resources/ex_prev_left.png</file>
+      <file>Resources/ex_next.png</file>
+      <file>Resources/ex_next_left.png</file>
     </qresource>
 </RCC>

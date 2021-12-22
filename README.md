@@ -4,7 +4,8 @@
 
 [![](https://ci.appveyor.com/api/projects/status/oa5l5pc964h8fv49/branch/master?svg=true)](https://ci.appveyor.com/project/opentoonz/opentoonz)
 [![](https://travis-ci.org/opentoonz/opentoonz.svg?branch=master)](https://travis-ci.org/opentoonz/opentoonz)
-
+[![](https://github.com/opentoonz/opentoonz/workflows/Build/badge.svg?branch=master)](https://github.com/opentoonz/opentoonz/actions)
+[![Translation status](https://hosted.weblate.org/widgets/opentoonz/-/svg-badge.svg)](https://hosted.weblate.org/engage/opentoonz/)
 ## What is OpenToonz?
 
 OpenToonz is a 2D animation software published by 
@@ -28,6 +29,7 @@ Older versions and unstable nightly build are also available at <https://github.
 - [Windows](./doc/how_to_build_win.md)
 - [OS X](./doc/how_to_build_macosx.md)
 - [Linux](./doc/how_to_build_linux.md)
+- [BSD](./doc/how_to_build_bsd.md)
 
 For instructions on how to build stylesheets, please [see here](./doc/how_to_stylesheet.md).
 

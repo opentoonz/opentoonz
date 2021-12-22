@@ -5,6 +5,7 @@
 
 #include "toonzqt/selection.h"
 #include "toonz/tstageobjectid.h"
+#include "toonz/txshcolumn.h"
 #include "tgeometry.h"
 #include <QList>
 #include <QPair>
@@ -76,6 +77,7 @@ public:
   const QList<QPair<TStageObjectId, TStageObjectId>> &getLinks() const {
     return m_selectedLinks;
   }
+  const QList<int> &getSplines() const { return m_selectedSplines; }
 
   void setXsheetHandle(TXsheetHandle *xshHandle) { m_xshHandle = xshHandle; }
   void setObjectHandle(TObjectHandle *objHandle) { m_objHandle = objHandle; }
@@ -96,6 +98,8 @@ private:
 signals:
   void doCollapse(QList<TStageObjectId>);
   void doExplodeChild(QList<TStageObjectId>);
+  void doDelete();
+  void columnPasted(const QList<TXshColumnP> &);
 };
 
 #endif

@@ -13,7 +13,6 @@
 
 // tcg includes
 #include "tcg/tcg_misc.h"
-#include "tcg/tcg_function_types.h"
 
 // STL includes
 #include <memory>
@@ -645,24 +644,14 @@ int PlasticSkeletonDeformation::skeletonsCount() const {
 
 //------------------------------------------------------------------
 
-namespace {
-namespace skeletonIds {
-typedef boost::bimap<int, PlasticSkeletonP>::left_map::const_iterator iter_type;
-typedef iter_type::value_type value_type;
-
-inline int func_(const value_type &val) { return val.first; }
-}
-}  // namespace ::skeletonIds
-
 void PlasticSkeletonDeformation::skeletonIds(skelId_iterator &begin,
                                              skelId_iterator &end) const {
-  using namespace ::skeletonIds;
+  auto const f = [](const SkeletonSet::left_map::value_type &val) {
+    return val.first;
+  };
 
-  typedef tcg::function<int (*)(const value_type &), func_> func;
-  typedef boost::transform_iterator<func, iter_type> adapt_it;
-
-  begin = adapt_it(m_imp->m_skeletons.left.begin());
-  end   = adapt_it(m_imp->m_skeletons.left.end());
+  begin = boost::make_transform_iterator(m_imp->m_skeletons.left.begin(), f);
+  end   = boost::make_transform_iterator(m_imp->m_skeletons.left.end(), f);
 }
 
 //------------------------------------------------------------------
@@ -744,54 +733,34 @@ SkVD *PlasticSkeletonDeformation::vertexDeformation(int skelId, int v) const {
 
 //------------------------------------------------------------------
 
-namespace {
-namespace vertexDeformations {
-inline std::pair<const QString *, SkVD *> func_(const VDKey &vdKey) {
-  return std::make_pair(&vdKey.m_name, &vdKey.m_vd);
-}
-}
-}  // namespace ::vertexDeformations
-
 void PlasticSkeletonDeformation::vertexDeformations(vd_iterator &begin,
                                                     vd_iterator &end) const {
-  using namespace ::vertexDeformations;
+  auto const f = [](const VDKey &vdKey) {
+    return std::make_pair(&vdKey.m_name, &vdKey.m_vd);
+  };
 
-  typedef std::pair<const QString *, SkVD *> (*func_type)(const VDKey &vdKey);
-  typedef tcg::function<func_type, func_> func;
-  typedef boost::transform_iterator<func, SkVDSet::const_iterator> adapt_it;
-
-  begin = adapt_it(m_imp->m_vds.begin());
-  end   = adapt_it(m_imp->m_vds.end());
+  begin = boost::make_transform_iterator(m_imp->m_vds.begin(), f);
+  end   = boost::make_transform_iterator(m_imp->m_vds.end(), f);
 }
 
 //------------------------------------------------------------------
 
-namespace {
-namespace vdSkeletonVertices {
-inline std::pair<int, int> func_(const std::map<int, int>::value_type &val) {
-  return std::make_pair(val.first, val.second);
-}
-}
-}  // namespace ::vdSkeletonVertices
-
 void PlasticSkeletonDeformation::vdSkeletonVertices(const QString &vertexName,
                                                     vx_iterator &begin,
                                                     vx_iterator &end) const {
-  using namespace ::vdSkeletonVertices;
-
-  typedef std::pair<int, int> (*func_type)(
-      const std::map<int, int>::value_type &);
-  typedef tcg::function<func_type, func_> func;
-  typedef boost::transform_iterator<func, std::map<int, int>::const_iterator>
-      adapt_it;
+  auto const f = [](const std::map<int, int>::value_type &val) {
+    return std::make_pair(val.first, val.second);
+  };
 
   SkVDSet::const_iterator nt(m_imp->m_vds.find(vertexName));
 
-  if (nt == m_imp->m_vds.end())
-    begin = adapt_it(), end = adapt_it();
-  else
-    begin = adapt_it(nt->m_vIndices.begin()),
-    end   = adapt_it(nt->m_vIndices.end());
+  if (nt == m_imp->m_vds.end()) {
+    begin = vx_iterator();
+    end   = vx_iterator();
+  } else {
+    begin = boost::make_transform_iterator(nt->m_vIndices.begin(), f);
+    end   = boost::make_transform_iterator(nt->m_vIndices.end(), f);
+  }
 }
 
 //------------------------------------------------------------------

@@ -2,9 +2,10 @@
 #include "tfxparam.h"
 #include "stdfx.h"
 
+#include "globalcontrollablefx.h"
 #include "ino_common.h"
 //------------------------------------------------------------
-class ino_negate final : public TStandardRasterFx {
+class ino_negate final : public GlobalControllableFx {
   FX_PLUGIN_DECLARATION(ino_negate)
   TRasterFxPort m_input;
   TBoolParamP m_red;
@@ -68,7 +69,7 @@ void fx_(TRasterP in_ras, const bool sw_array[4]) {
   ino::arr_to_ras(in_gr8->getRawData(), ino::channels(), in_ras, 0);
   in_gr8->unlock();
 }
-}
+}  // namespace
 //------------------------------------------------------------
 void ino_negate::doCompute(TTile &tile, double frame,
                            const TRenderSettings &rend_sets) {

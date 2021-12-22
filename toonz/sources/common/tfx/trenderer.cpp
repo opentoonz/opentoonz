@@ -26,9 +26,6 @@
 #include <QWriteLocker>
 #include <QThreadStorage>
 
-// tcg includes
-#include "tcg/tcg_deleter_types.h"
-
 // Debug
 //#define DIAGNOSTICS
 //#include "diagnostics.h"
@@ -1384,7 +1381,7 @@ void TRendererImp::startRendering(
     std::vector<RenderTask *> &m_tasksVector;
     ~TasksCleaner() {
       std::for_each(m_tasksVector.begin(), m_tasksVector.end(),
-                    tcg::deleter<RenderTask>());
+                    std::default_delete<RenderTask>());
     }
   } tasksCleaner = {tasksVector};
 

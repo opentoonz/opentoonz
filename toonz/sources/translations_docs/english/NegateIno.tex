@@ -1,0 +1,48 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[a4paper, total={180mm, 272mm}]{geometry}
+
+\usepackage{fontspec}
+\setmainfont[Path=fonts/, Extension=.ttf]{ipaexm}
+
+\setlength\parindent{3.5em}
+\setlength\parskip{0em}
+\renewcommand{\baselinestretch}{1.247}
+
+\begin{document}
+
+\thispagestyle{empty}
+
+\Large
+\noindent \\
+Negate Ino\medskip
+\par
+\normalsize
+Inverts each color channel in the image.\\
+\par
+\ \ 8bits image: 0-{-}> \ \ \ 255、1-{-}> \ \ \, 254、... \ \ \ \ 254-{-}>1、 \ \ \, 255-{-}>0\par
+16bits image: 0-{-}>65535、1-{-}>65534、... 65534-{-}>1、65535-{-}>0\par
+Values are inverted as in the above example.\\
+\par
+When there is an Alpha channel, the inversion takes into account the Alpha values.\par
+Alpha Value \ \ \ \ 0: 0-{-}> \ \ \, 0、1-{-}> \ \ \ 0、... 254-{-}>0、255-{-}>0\par
+Alpha Value 128: 0-{-}>128、1-{-}>127、... 127-{-}>1、128-{-}>0、...255-{-}>0\par
+Alpha Value 255: 0-{-}>255、1-{-}>254、... 254-{-}>1、255-{-}>0\par
+Subsequently, cell images will be reversed as expected.\\
+\\
+-{-}- \ Inputs \ -{-}-\\
+Source\par
+Connect the image to be processed.\\
+\\
+-{-}- \ Settings \ -{-}-\\
+Allows to specify whether to do the inversion in each color channel.\\
+\\
+Red \ \ \ \, Red channel inversion switch\\
+Green \ Green channel inversion switch\\
+Blue \ \ \, Blue channel inversion switch\\
+Alpha \ \ Alpha channel inversion switch\\
+\\
+When inactive it does not do anything to that channel.\\
+When active, it will invert the target channel.\\
+The default settings for Red, Green, Blue is active, and Alpha is inactive.
+
+\end{document}

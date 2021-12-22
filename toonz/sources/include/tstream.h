@@ -155,6 +155,8 @@ reimplementation of the TPersist::loadData() function.
   void skipCurrentTag();  //!< Silently ignores the content of currently opened
                           //! tag up to its end.
 
+  std::string getCurrentTagName();
+
 private:
   // Not copyable
   TIStream(const TIStream &);             //!< Not implemented
@@ -197,7 +199,7 @@ public:
 \param compressed   Enables compression of the whole file
 
 \note     Stream construction <I> does not throw </I>. However, the stream
-        status could be invalid. Remeber to check the stream validity using
+        status could be invalid. Remember to check the stream validity using
         operator bool().
 
 \warning  Stream compression has been verified to be unsafe.
@@ -265,6 +267,8 @@ checking the status.
 \return   Whether the stream is in a good state (no fails in writing to).
 */
   bool checkStatus() const;  //!< \b Flushes the stream and checks its validity.
+
+  std::string getCurrentTagName();
 
 private:
   // Not copyable

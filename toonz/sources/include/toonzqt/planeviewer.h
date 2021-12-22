@@ -13,6 +13,7 @@
 
 // Qt includes
 #include <QOpenGLWidget>
+#include <QTouchDevice>
 
 #undef DVAPI
 #undef DVVAR
@@ -30,6 +31,8 @@
 class TRasterImageP;
 class TToonzImageP;
 class TVectorImageP;
+class QTouchEvent;
+class QGestureEvent;
 
 //----------------------------------------------------------------------------
 
@@ -61,6 +64,18 @@ obsolete class until the shader fx being overhauled. 2016/6/22 Shun
 */
 
 class DVAPI PlaneViewer : public GLWidgetForHighDpi {
+  Q_OBJECT
+  bool m_touchActive                     = false;
+  bool m_gestureActive                   = false;
+  QTouchDevice::DeviceType m_touchDevice = QTouchDevice::TouchScreen;
+  bool m_zooming                         = false;
+  bool m_panning                         = false;
+  double m_scaleFactor;  // used for zoom gesture
+
+  bool m_stylusUsed = false;
+
+  bool m_firstDraw;
+
 public:
   PlaneViewer(QWidget *parent);
 
@@ -99,8 +114,6 @@ public:
   TAffine &viewAff() { return m_aff; }
   const TAffine &viewAff() const { return m_aff; }
 
-  void resetView();
-
   void zoomIn();
   void zoomOut();
 
@@ -123,6 +136,11 @@ public:
   TRaster32P rasterBuffer();
   void flushRasterBuffer();
 
+public slots:
+
+  void resetView();
+  void fitView();
+
 protected:
   int m_xpos, m_ypos;  //!< Mouse position on mouse operations.
   TAffine m_aff;       //!< Affine transform from world to widget coords.
@@ -135,12 +153,24 @@ protected:
 
   double m_zoomRange[2];  //!< Viewport zoom range (default: [-1024, 1024]).
 
+  TRect m_imageBounds;
+
+  double m_dpiX, m_dpiY;
+
 protected:
+  virtual void contextMenuEvent(QContextMenuEvent *event) override;
   virtual void mouseMoveEvent(QMouseEvent *event) override;
   virtual void mousePressEvent(QMouseEvent *event) override;
+  virtual void mouseReleaseEvent(QMouseEvent *event) override;
   virtual void wheelEvent(QWheelEvent *event) override;
   virtual void keyPressEvent(QKeyEvent *event) override;
   virtual void hideEvent(QHideEvent *event) override;
+
+  virtual void mouseDoubleClickEvent(QMouseEvent *event) override;
+  virtual void tabletEvent(QTabletEvent *e) override;
+  void touchEvent(QTouchEvent *e, int type);
+  void gestureEvent(QGestureEvent *e);
+  virtual bool event(QEvent *e) override;
 
   void initializeGL() override final;
   void resizeGL(int width, int height) override final;
@@ -150,6 +180,7 @@ private:
   bool m_firstResize;
   int m_width;
   int m_height;
+  QPointF m_firstPanPoint;
 };
 
 #endif  // PLANE_VIEWER_H

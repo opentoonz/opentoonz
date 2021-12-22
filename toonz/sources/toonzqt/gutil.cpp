@@ -1,6 +1,7 @@
 
 
 #include "toonzqt/gutil.h"
+#include "toonz/preferences.h"
 
 // TnzQt includes
 #include "toonzqt/dvdialog.h"
@@ -203,21 +204,206 @@ int getDevPixRatio() {
 
 //-----------------------------------------------------------------------------
 
-QIcon createQIcon(const char *iconSVGName) {
-  QString normal = QString(":Resources/") + iconSVGName + ".svg";
-  QString click  = QString(":Resources/") + iconSVGName + "_click.svg";
-  QString over   = QString(":Resources/") + iconSVGName + "_over.svg";
+QString getIconThemePath(const QString &fileSVGPath) {
+  // Use as follows:
+  // QPixmap pixmapIcon = getIconThemePath("path/to/file.svg");
+  // Is equal to:            :icons/*theme*/path/to/file.svg
+
+  // Set themeable directory
+  static QString theme = Preferences::instance()->getIconTheme()
+                             ? ":icons/dark/"
+                             : ":icons/light/";
+
+  // If no file in light icon theme directory, fallback to dark directory
+  if (!QFile::exists(QString(theme + fileSVGPath))) theme = ":icons/dark/";
+
+  return theme + fileSVGPath;
+}
+
+//-----------------------------------------------------------------------------
+
+QPixmap compositePixmap(QPixmap pixmap, const qreal &opacity, const QSize &size,
+                        const int leftAdj, const int topAdj, QColor bgColor) {
+  static int devPixRatio = getDevPixRatio();
+
+  // Sets size of destination pixmap for source to be drawn onto, if size is
+  // empty use source pixmap size, else use custom size.
+  QPixmap destination(size.isEmpty() ? pixmap.size() : size * devPixRatio);
+  destination.setDevicePixelRatio(devPixRatio);
+  destination.fill(bgColor);
+
+  if (!pixmap.isNull()) {
+    QPainter p(&destination);
+    pixmap = pixmap.scaled(pixmap.size(), Qt::KeepAspectRatio);
+    pixmap.setDevicePixelRatio(devPixRatio);
+    p.setBackgroundMode(Qt::TransparentMode);
+    p.setBackground(QBrush(Qt::transparent));
+    p.eraseRect(pixmap.rect());
+    p.setOpacity(opacity);
+    p.drawPixmap(leftAdj, topAdj, pixmap);
+  }
+  return destination;
+}
+
+//-----------------------------------------------------------------------------
+
+QPixmap recolorPixmap(QPixmap pixmap, QColor color) {
+  // Change black pixels to any chosen color
+  QImage img = pixmap.toImage().convertToFormat(QImage::Format_ARGB32);
+  for (int y = 0; y < img.height(); y++) {
+    QRgb *pixel = reinterpret_cast<QRgb *>(img.scanLine(y));
+    QRgb *end   = pixel + img.width();
+    for (; pixel != end; pixel++) {
+      // Only recolor zero value (black) pixels
+      if (QColor::fromRgba(*pixel).value() == 0)
+        *pixel =
+            QColor(color.red(), color.green(), color.blue(), qAlpha(*pixel))
+                .rgba();
+    }
+  }
+  pixmap = QPixmap::fromImage(img);
+  return pixmap;
+}
+
+//-----------------------------------------------------------------------------
+
+QIcon createQIcon(const char *iconSVGName, bool useFullOpacity,
+                  bool isForMenuItem) {
+  static int devPixRatio = getDevPixRatio();
+
+  QIcon themeIcon = QIcon::fromTheme(iconSVGName);
+
+  // Get icon dimensions
+  QSize iconSize(0, 0);
+  for (QList<QSize> sizes = themeIcon.availableSizes(); !sizes.isEmpty();
+       sizes.removeFirst())
+    if (sizes.first().width() > iconSize.width())
+      iconSize = sizes.first() * devPixRatio;
+
+  // Control lightness of the icons
+  const qreal activeOpacity   = 1;
+  const qreal baseOpacity     = useFullOpacity ? 1 : 0.8;
+  const qreal disabledOpacity = 0.15;
+
+  // Pseudo state name strings
+  QString overStr = QString(iconSVGName) + "_over";
+  QString onStr   = QString(iconSVGName) + "_on";
+
+  //----------
+
+  // Base pixmap
+  QPixmap themeIconPixmap(recolorPixmap(themeIcon.pixmap(iconSize)));
+  if (!themeIconPixmap.isNull()) {  // suppress message
+    themeIconPixmap.setDevicePixelRatio(devPixRatio);
+    themeIconPixmap = themeIconPixmap.scaled(iconSize, Qt::KeepAspectRatio,
+                                             Qt::SmoothTransformation);
+  }
+
+  // Over pixmap
+  QPixmap overPixmap(recolorPixmap(QIcon::fromTheme(overStr).pixmap(iconSize)));
+  if (!overPixmap.isNull()) {  // suppress message
+    overPixmap.setDevicePixelRatio(devPixRatio);
+    overPixmap = overPixmap.scaled(iconSize, Qt::KeepAspectRatio,
+                                   Qt::SmoothTransformation);
+  }
+
+  // On pixmap
+  QPixmap onPixmap(recolorPixmap(QIcon::fromTheme(onStr).pixmap(iconSize)));
+  if (!onPixmap.isNull()) {  // suppress message
+    onPixmap.setDevicePixelRatio(devPixRatio);
+    onPixmap = onPixmap.scaled(iconSize, Qt::KeepAspectRatio,
+                               Qt::SmoothTransformation);
+  }
+
+  //----------
 
   QIcon icon;
-  icon.addFile(normal, QSize(), QIcon::Normal, QIcon::Off);
-  if (QFile::exists(click))
-    icon.addFile(click, QSize(), QIcon::Normal, QIcon::On);
-  else
-    icon.addFile(normal, QSize(), QIcon::Normal, QIcon::On);
-  if (QFile::exists(over))
-    icon.addFile(over, QSize(), QIcon::Active);
-  else
-    icon.addFile(normal, QSize(), QIcon::Active);
+
+#ifdef _WIN32
+  bool showIconInMenu = Preferences::instance()->getBoolValue(showIconsInMenu);
+  // set transparent icon
+  if (isForMenuItem &&
+      themeIconPixmap.size() == QSize(16 * devPixRatio, 16 * devPixRatio) &&
+      !showIconInMenu) {
+    static QPixmap emptyPm(16 * devPixRatio, 16 * devPixRatio);
+    emptyPm.fill(Qt::transparent);
+
+    icon.addPixmap(emptyPm, QIcon::Normal, QIcon::Off);
+    icon.addPixmap(emptyPm, QIcon::Normal, QIcon::On);
+    icon.addPixmap(emptyPm, QIcon::Disabled, QIcon::Off);
+    icon.addPixmap(emptyPm, QIcon::Disabled, QIcon::On);
+    icon.addPixmap(emptyPm, QIcon::Active);
+  } else
+#endif
+  {
+    // Base icon
+    icon.addPixmap(compositePixmap(themeIconPixmap, baseOpacity), QIcon::Normal,
+                   QIcon::Off);
+    icon.addPixmap(compositePixmap(themeIconPixmap, disabledOpacity),
+                   QIcon::Disabled, QIcon::Off);
+
+    // Over icon
+    icon.addPixmap(!overPixmap.isNull()
+                       ? compositePixmap(overPixmap, activeOpacity)
+                       : compositePixmap(themeIconPixmap, activeOpacity),
+                   QIcon::Active);
+
+    // On icon
+    if (!onPixmap.isNull()) {
+      icon.addPixmap(compositePixmap(onPixmap, activeOpacity), QIcon::Normal,
+                     QIcon::On);
+      icon.addPixmap(compositePixmap(onPixmap, disabledOpacity),
+                     QIcon::Disabled, QIcon::On);
+    } else {
+      icon.addPixmap(compositePixmap(themeIconPixmap, activeOpacity),
+                     QIcon::Normal, QIcon::On);
+      icon.addPixmap(compositePixmap(themeIconPixmap, disabledOpacity),
+                     QIcon::Disabled, QIcon::On);
+    }
+  }
+  //----------
+
+  // For icons intended for menus that are 16x16 in dimensions, to repurpose
+  // them for use in toolbars that are set for 20x20 we want to draw them onto a
+  // 20x20 pixmap so they don't get resized in the GUI, they will be loaded into
+  // the icon along with the original 16x16 pixmap.
+
+  if (themeIconPixmap.size() == QSize(16 * devPixRatio, 16 * devPixRatio)) {
+    const QSize drawOnSize(20, 20);
+    const int x = (drawOnSize.width() - 16) / 2;   // left adjust
+    const int y = (drawOnSize.height() - 16) / 2;  // top adjust
+
+    // Base icon
+    icon.addPixmap(
+        compositePixmap(themeIconPixmap, baseOpacity, drawOnSize, x, y),
+        QIcon::Normal, QIcon::Off);
+    icon.addPixmap(
+        compositePixmap(themeIconPixmap, disabledOpacity, drawOnSize, x, y),
+        QIcon::Disabled, QIcon::Off);
+
+    // Over icon
+    icon.addPixmap(
+        !overPixmap.isNull()
+            ? compositePixmap(overPixmap, activeOpacity, drawOnSize, x, y)
+            : compositePixmap(themeIconPixmap, activeOpacity, drawOnSize, x, y),
+        QIcon::Active);
+
+    // On icon
+    if (!onPixmap.isNull()) {
+      icon.addPixmap(compositePixmap(onPixmap, activeOpacity, drawOnSize, x, y),
+                     QIcon::Normal, QIcon::On);
+      icon.addPixmap(
+          compositePixmap(onPixmap, disabledOpacity, drawOnSize, x, y),
+          QIcon::Disabled, QIcon::On);
+    } else {
+      icon.addPixmap(
+          compositePixmap(themeIconPixmap, activeOpacity, drawOnSize, x, y),
+          QIcon::Normal, QIcon::On);
+      icon.addPixmap(
+          compositePixmap(themeIconPixmap, disabledOpacity, drawOnSize, x, y),
+          QIcon::Disabled, QIcon::On);
+    }
+  }
 
   return icon;
 }
@@ -239,23 +425,6 @@ QIcon createQIconPNG(const char *iconPNGName) {
 
 //-----------------------------------------------------------------------------
 
-QIcon createQIconOnOff(const char *iconSVGName, bool withOver) {
-  QString on   = QString(":Resources/") + iconSVGName + "_on.svg";
-  QString off  = QString(":Resources/") + iconSVGName + "_off.svg";
-  QString over = QString(":Resources/") + iconSVGName + "_over.svg";
-
-  QIcon icon;
-  icon.addFile(off, QSize(), QIcon::Normal, QIcon::Off);
-  icon.addFile(on, QSize(), QIcon::Normal, QIcon::On);
-  if (withOver)
-    icon.addFile(over, QSize(), QIcon::Active);
-  else
-    icon.addFile(on, QSize(), QIcon::Active);
-  return icon;
-}
-
-//-----------------------------------------------------------------------------
-
 QIcon createQIconOnOffPNG(const char *iconPNGName, bool withOver) {
   QString on   = QString(":Resources/") + iconPNGName + "_on.png";
   QString off  = QString(":Resources/") + iconPNGName + "_off.png";
@@ -269,6 +438,88 @@ QIcon createQIconOnOffPNG(const char *iconPNGName, bool withOver) {
   else
     icon.addFile(on, QSize(), QIcon::Active);
 
+  return icon;
+}
+
+//-----------------------------------------------------------------------------
+
+QIcon createTemporaryIconFromName(const char *commandName) {
+  const int visibleIconSize   = 20;
+  const int menubarIconSize   = 16;
+  const qreal activeOpacity   = 1;
+  const qreal baseOpacity     = 0.8;
+  const qreal disabledOpacity = 0.15;
+  QString name(commandName);
+  QList<QChar> iconChar;
+
+  for (int i = 0; i < name.length(); i++) {
+    QChar c = name.at(i);
+    if (c.isUpper() && iconChar.size() < 2)
+      iconChar.append(c);
+    else if (c.isDigit()) {
+      if (iconChar.isEmpty())
+        iconChar.append(c);
+      else if (iconChar.size() <= 2) {
+        if (iconChar.size() == 2) iconChar.removeLast();
+        iconChar.append(c);
+        break;
+      }
+    }
+  }
+
+  if (iconChar.isEmpty()) iconChar.append(name.at(0));
+
+  QString iconStr;
+  for (auto c : iconChar) iconStr.append(c);
+
+  QIcon icon;
+  // prepare for both normal and high dpi
+  for (int devPixelRatio = 1; devPixelRatio <= 2; devPixelRatio++) {
+    QPixmap transparentPm(menubarIconSize * devPixelRatio,
+                          menubarIconSize * devPixelRatio);
+    transparentPm.fill(Qt::transparent);
+
+    int pxSize = visibleIconSize * devPixelRatio;
+
+    QPixmap pixmap(pxSize, pxSize);
+    QPainter painter;
+    pixmap.fill(Qt::transparent);
+    painter.begin(&pixmap);
+
+    painter.setPen(Preferences::instance()->getIconTheme() ? Qt::black
+                                                           : Qt::white);
+
+    QRect rect(0, -2, pxSize, pxSize);
+    if (iconStr.size() == 2) {
+      painter.scale(0.6, 1.0);
+      rect.setRight(pxSize / 0.6);
+    }
+    QFont font = painter.font();
+    font.setPixelSize(pxSize);
+    painter.setFont(font);
+
+    painter.drawText(rect, Qt::AlignCenter, iconStr);
+
+    painter.end();
+
+    // For menu only
+    icon.addPixmap(transparentPm, QIcon::Normal, QIcon::Off);
+    icon.addPixmap(transparentPm, QIcon::Active);
+    icon.addPixmap(transparentPm, QIcon::Normal, QIcon::On);
+    icon.addPixmap(transparentPm, QIcon::Disabled, QIcon::Off);
+    icon.addPixmap(transparentPm, QIcon::Disabled, QIcon::On);
+
+    // For toolbars
+    icon.addPixmap(compositePixmap(pixmap, baseOpacity), QIcon::Normal,
+                   QIcon::Off);
+    icon.addPixmap(compositePixmap(pixmap, disabledOpacity), QIcon::Disabled,
+                   QIcon::Off);
+    icon.addPixmap(compositePixmap(pixmap, activeOpacity), QIcon::Active);
+    icon.addPixmap(compositePixmap(pixmap, activeOpacity), QIcon::Normal,
+                   QIcon::On);
+    icon.addPixmap(compositePixmap(pixmap, disabledOpacity), QIcon::Disabled,
+                   QIcon::On);
+  }
   return icon;
 }
 
@@ -310,6 +561,33 @@ bool isValidFileName_message(const QString &fileName) {
                                 "of the following "
                                 "characters: (new line) \\ / : * ? \" |")),
                 false);
+}
+
+//-----------------------------------------------------------------------------
+
+bool isReservedFileName(const QString &fileName) {
+#ifdef _WIN32
+  std::vector<QString> invalidNames{
+      "AUX",  "CON",  "NUL",  "PRN",  "COM1", "COM2", "COM3", "COM4",
+      "COM5", "COM6", "COM7", "COM8", "COM9", "LPT1", "LPT2", "LPT3",
+      "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9"};
+
+  if (std::find(invalidNames.begin(), invalidNames.end(), fileName) !=
+      invalidNames.end())
+    return true;
+#endif
+
+  return false;
+}
+
+//-----------------------------------------------------------------------------
+
+bool isReservedFileName_message(const QString &fileName) {
+  return isReservedFileName(fileName)
+             ? (DVGui::error(QObject::tr(
+                    "That is a reserved file name and cannot be used.")),
+                true)
+             : false;
 }
 
 //-----------------------------------------------------------------------------
@@ -387,7 +665,7 @@ bool isResourceOrFolder(const QUrl &url) {
 
 bool acceptResourceDrop(const QList<QUrl> &urls) {
   int count = 0;
-  foreach (const QUrl &url, urls) {
+  for (const QUrl &url : urls) {
     if (isResource(url))
       ++count;
     else
@@ -401,7 +679,7 @@ bool acceptResourceDrop(const QList<QUrl> &urls) {
 
 bool acceptResourceOrFolderDrop(const QList<QUrl> &urls) {
   int count = 0;
-  foreach (const QUrl &url, urls) {
+  for (const QUrl &url : urls) {
     if (isResourceOrFolder(url))
       ++count;
     else
@@ -449,17 +727,12 @@ void TabBarContainter::paintEvent(QPaintEvent *event) {
 
 ToolBarContainer::ToolBarContainer(QWidget *parent) : QFrame(parent) {
   setObjectName("ToolBarContainer");
-  setFrameStyle(QFrame::StyledPanel);
   setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
 }
 
 //-----------------------------------------------------------------------------
 
-void ToolBarContainer::paintEvent(QPaintEvent *event) {
-  QPainter p(this);
-  p.setPen(QColor(120, 120, 120));
-  p.drawLine(0, 0, width(), 0);
-}
+void ToolBarContainer::paintEvent(QPaintEvent *event) { QPainter p(this); }
 
 //=============================================================================
 

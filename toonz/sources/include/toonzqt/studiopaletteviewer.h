@@ -5,6 +5,8 @@
 
 #include "toonz/studiopalette.h"
 #include "toonz/tproject.h"
+#include "toonzqt/dvdialog.h"
+#include "saveloadqsettings.h"
 
 #include <QTreeWidget>
 #include <QSplitter>
@@ -26,6 +28,10 @@ class TFrameHandle;
 class PalettesScanPopup;
 class TXsheetHandle;
 class TXshLevelHandle;
+class PaletteViewer;
+namespace DVGui {
+class IntField;
+}
 
 //=============================================================================
 //!	The StudioPaletteTreeViewer class provides an object to view and manage
@@ -59,6 +65,8 @@ class DVAPI StudioPaletteTreeViewer final : public QTreeWidget,
   // keep the checked item list in order to avoid multiple check
   QSet<QTreeWidgetItem *> m_openedItems;
 
+  QPoint m_startPos;
+
 public:
   StudioPaletteTreeViewer(QWidget *parent, TPaletteHandle *studioPaletteHandle,
                           TPaletteHandle *levelPaletteHandle,
@@ -77,19 +85,19 @@ public:
   void setStdPaletteHandle(TPaletteHandle *stdPaletteHandle);
   TPaletteHandle *getStdPaletteHandle() const { return m_studioPaletteHandle; }
 
-  /*!	Overriden from StudioPalette::Listener. */
+  /*!	Overridden from StudioPalette::Listener. */
   void onStudioPaletteTreeChange() override { refresh(); }
-  /*!	Overriden from StudioPalette::Listener. */
+  /*!	Overridden from StudioPalette::Listener. */
   void onStudioPaletteMove(const TFilePath &dstPath,
                            const TFilePath &srcPath) override {
     refresh();
   }
-  /*!	Overriden from StudioPalette::Listener. */
+  /*!	Overridden from StudioPalette::Listener. */
   void onStudioPaletteChange(const TFilePath &palette) override { refresh(); }
 
-  /*!	Overriden from TProjectManager::Listener. */
+  /*!	Overridden from TProjectManager::Listener. */
   void onProjectSwitched() override { resetProjectPaletteFolder(); }
-  /*!	Overriden from TProjectManager::Listener. */
+  /*!	Overridden from TProjectManager::Listener. */
   void onProjectChanged() override { resetProjectPaletteFolder(); }
 
   TFilePath getCurrentItemPath() { return getItemPath(currentItem()); }
@@ -172,7 +180,9 @@ protected:
   void createMenuAction(QMenu &menu, const char *id, QString name,
                         const char *slot);
   /*! If button left is pressed start drag and drop. */
+  void mousePressEvent(QMouseEvent *event) override;
   void mouseMoveEvent(QMouseEvent *event) override;
+  void mouseReleaseEvent(QMouseEvent *event) override;
   /*! If path related to current item exist and is a palette execute drag. */
   void startDragDrop();
   /*! Verify drag enter data, if it has an url and it's path is a palette or
@@ -203,10 +213,12 @@ protected:
                 allows to show and modify current studio palette selected in
    tree.
 */
-class DVAPI StudioPaletteViewer final : public QSplitter {
+class DVAPI StudioPaletteViewer final : public QSplitter,
+                                        public SaveLoadQSettings {
   Q_OBJECT
 
   StudioPaletteTreeViewer *m_studioPaletteTreeViewer;
+  PaletteViewer *m_studioPaletteViewer;
 
 public:
   StudioPaletteViewer(QWidget *parent, TPaletteHandle *studioPaletteHandle,
@@ -217,6 +229,25 @@ public:
 
   /*! In order to save current palette from the tool button in the PageViewer.*/
   TFilePath getCurrentItemPath();
+
+  int getViewMode() const;
+  void setViewMode(int mode);
+
+  // SaveLoadQSettings
+  virtual void save(QSettings &settings) const override;
+  virtual void load(QSettings &settings) override;
+};
+
+//-----------------------------------------------------------------------------
+
+class AdjustPaletteDialog final : public DVGui::Dialog {
+  Q_OBJECT
+private:
+  DVGui::IntField *m_tolerance;
+
+public:
+  int getTolerance();
+  AdjustPaletteDialog();
 };
 
 #endif  // STUDIOPALETTEVIEWER_H

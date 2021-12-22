@@ -16,7 +16,7 @@
 #define CALLBACK
 #endif
 // To avoid linking problems with HP ZX2000
-#ifdef LINUX
+#if defined(LINUX) || defined(FREEBSD)
 #ifdef GLU_VERSION_1_2
 #undef GLU_VERSION_1_2
 #endif
@@ -94,7 +94,7 @@ static void CALLBACK myCombine(GLdouble coords[3], GLdouble *d[4], GLfloat w[4],
 typedef GLvoid(CALLBACK *GluCallback)(void);
 #endif
 
-#if defined(MACOSX) || defined(LINUX)
+#if defined(MACOSX) || defined(LINUX) || defined(FREEBSD)
 
 typedef GLvoid (*GluCallback)();
 

@@ -214,12 +214,29 @@ public:
 
     if (!m_properties) m_properties = new Tiio::JpgWriterProperties();
 
-    jpeg_set_quality(
-        &m_cinfo,
-        ((TIntProperty *)(m_properties->getProperty("Quality")))->getValue(),
-        TRUE);
+    int quality =
+        ((TIntProperty *)(m_properties->getProperty("Quality")))->getValue();
+
+    jpeg_set_quality(&m_cinfo, quality, TRUE);
     m_cinfo.smoothing_factor =
         ((TIntProperty *)(m_properties->getProperty("Smoothing")))->getValue();
+
+    // set horizontal and vertical chroma subsampling factor to encoder
+    // according to the quality value.
+    if (quality >= 70) {  // none chroma-subsampling (4:4:4)
+      m_cinfo.comp_info[0].h_samp_factor = 1;
+      m_cinfo.comp_info[0].v_samp_factor = 1;
+    } else if (quality >= 30) {  // medium chroma-subsampling (4:2:2)
+      m_cinfo.comp_info[0].h_samp_factor = 2;
+      m_cinfo.comp_info[0].v_samp_factor = 1;
+    } else {  // quality < 30, high chroma-subsampling (4:1:1)
+      m_cinfo.comp_info[0].h_samp_factor = 2;
+      m_cinfo.comp_info[0].v_samp_factor = 2;
+    }
+    m_cinfo.comp_info[1].h_samp_factor = 1;
+    m_cinfo.comp_info[1].v_samp_factor = 1;
+    m_cinfo.comp_info[2].h_samp_factor = 1;
+    m_cinfo.comp_info[2].v_samp_factor = 1;
 
     int row_stride = m_cinfo.image_width * m_cinfo.input_components;
     m_buffer = (*m_cinfo.mem->alloc_sarray)((j_common_ptr)&m_cinfo, JPOOL_IMAGE,
@@ -256,6 +273,9 @@ public:
     }
     jpeg_write_scanlines(&m_cinfo, m_buffer, 1);
   }
+
+  // jpeg format does not support alpha channel
+  bool writeAlphaSupported() const override { return false; }
 };
 
 //----

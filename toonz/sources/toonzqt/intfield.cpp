@@ -11,6 +11,10 @@
 #include <QFocusEvent>
 #include <QPainter>
 
+namespace {
+const int NonLinearSliderPrecision = 2;
+}
+
 using namespace DVGui;
 
 //=============================================================================
@@ -198,11 +202,25 @@ void IntLineEdit::focusOutEvent(QFocusEvent *e) {
 
 // for fps edit in flip console
 void IntLineEdit::setLineEditBackgroundColor(QColor color) {
-  QString sheet = QString("background-color: rgb(") +
-                  QString::number(color.red()) + QString(",") +
-                  QString::number(color.green()) + QString(",") +
-                  QString::number(color.blue()) + QString(",") +
-                  QString::number(color.alpha()) + QString(");");
+  // Set text color based on luminescence of bg color
+  int value           = 0;
+  double luminescence = ((0.299 * color.red()) + (0.587 * color.green()) +
+                         (0.114 * color.blue())) /
+                        255;
+  if (luminescence > 0.5)
+    value = 0;  // black
+  else
+    value = 255;  // white
+
+  QString sheet =
+      QString("background-color: rgb(") + QString::number(color.red()) +
+      QString(",") + QString::number(color.green()) + QString(",") +
+      QString::number(color.blue()) + QString(",") +
+      QString::number(color.alpha()) +
+      QString(");" +
+              QString("color: rgb(" + QString::number(value) + QString(",") +
+                      QString::number(value) + QString(",") +
+                      QString::number(value) + QString(");")));
   setStyleSheet(sheet);
 }
 
@@ -250,7 +268,8 @@ IntField::IntField(QWidget *parent, bool isMaxRangeLimited, bool isRollerHide)
     , m_lineEdit(0)
     , m_slider(0)
     , m_roller(0)
-    , m_isMaxRangeLimited(isMaxRangeLimited) {
+    , m_isMaxRangeLimited(isMaxRangeLimited)
+    , m_isLinearSlider(true) {
   setObjectName("IntField");
   QHBoxLayout *layout = new QHBoxLayout(this);
   layout->setMargin(0);
@@ -309,7 +328,11 @@ void IntField::setRange(int minValue, int maxValue) {
   m_lineEdit->setRange(minValue, m_isMaxRangeLimited
                                      ? maxValue
                                      : (std::numeric_limits<int>::max)());
-  m_slider->setRange(minValue, maxValue);
+  if (m_isLinearSlider)
+    m_slider->setRange(minValue, maxValue);
+  else
+    m_slider->setRange(minValue * pow(10., NonLinearSliderPrecision),
+                       maxValue * pow(10., NonLinearSliderPrecision));
   m_roller->setRange(minValue, maxValue);
 }
 
@@ -318,7 +341,7 @@ void IntField::setRange(int minValue, int maxValue) {
 void IntField::setValue(int value) {
   if (m_lineEdit->getValue() == value) return;
   m_lineEdit->setValue(value);
-  m_slider->setSliderPosition(value);
+  m_slider->setSliderPosition(value2pos(value));
   m_roller->setValue((double)value);
 }
 
@@ -369,7 +392,50 @@ void IntField::setLineEditBackgroundColor(QColor color) {
 
 //-----------------------------------------------------------------------------
 
-void IntField::onSliderChanged(int value) {
+int IntField::pos2value(int x) const {
+  if (m_isLinearSlider) return x;
+
+  // nonlinear slider case
+  double rangeSize = (double)(m_slider->maximum() - m_slider->minimum());
+  double posRatio  = (double)(x - m_slider->minimum()) / rangeSize;
+  double t;
+  if (posRatio <= 0.5)
+    t = 0.04 * posRatio;
+  else if (posRatio <= 0.75)
+    t = -0.02 + 0.08 * posRatio;
+  else if (posRatio <= 0.9)
+    t = -0.26 + 0.4 * posRatio;
+  else
+    t              = -8.0 + 9.0 * posRatio;
+  double sliderVal = (double)m_slider->minimum() + rangeSize * t;
+  return (int)round(sliderVal * pow(0.1, NonLinearSliderPrecision));
+}
+
+//-----------------------------------------------------------------------------
+
+int IntField::value2pos(int v) const {
+  if (m_isLinearSlider) return v;
+
+  // nonlinear slider case
+  double sliderVal  = (double)v * pow(10., NonLinearSliderPrecision);
+  double rangeSize  = (double)(m_slider->maximum() - m_slider->minimum());
+  double valueRatio = (double)(sliderVal - m_slider->minimum()) / rangeSize;
+  double t;
+  if (valueRatio <= 0.02)
+    t = valueRatio / 0.04;
+  else if (valueRatio <= 0.04)
+    t = (valueRatio + 0.02) / 0.08;
+  else if (valueRatio <= 0.1)
+    t = (valueRatio + 0.26) / 0.4;
+  else
+    t = (valueRatio + 8.0) / 9.0;
+  return m_slider->minimum() + (int)(t * rangeSize);
+}
+
+//-----------------------------------------------------------------------------
+
+void IntField::onSliderChanged(int sliderPos) {
+  int value = pos2value(sliderPos);
   // Controllo necessario per evitare che il segnale di cambiamento venga emesso
   // piu' volte.
   if (m_lineEdit->getValue() == value ||
@@ -390,10 +456,10 @@ void IntField::onEditingFinished() {
   double value = m_lineEdit->getValue();
   // Controllo necessario per evitare che il segnale di cambiamento venga emesso
   // piu' volte.
-  if ((m_slider->value() == value && m_slider->isVisible()) ||
-      (int)m_roller->getValue() == value && m_roller->isVisible())
+  if ((pos2value(m_slider->value()) == value && m_slider->isVisible()) ||
+      ((int)m_roller->getValue() == value && m_roller->isVisible()))
     return;
-  m_slider->setValue(value);
+  m_slider->setValue(value2pos(value));
   m_roller->setValue((double)value);
   emit valueChanged(false);
 }
@@ -403,13 +469,13 @@ void IntField::onEditingFinished() {
 void IntField::onRollerValueChanged(bool isDragging) {
   int value = m_roller->getValue();
   if (value == m_lineEdit->getValue()) {
-    assert(m_slider->value() == value || !m_slider->isVisible());
+    assert(pos2value(m_slider->value()) == value || !m_slider->isVisible());
     // Se isDragging e' falso e' giusto che venga emessa la notifica di
     // cambiamento.
     if (!isDragging) emit valueChanged(isDragging);
     return;
   }
-  m_slider->setValue(value);
+  m_slider->setValue(value2pos(value));
   m_lineEdit->setValue(value);
 
   // Faccio in modo che il cursore sia sulla prima cifra, cosi' se la stringa

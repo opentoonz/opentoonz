@@ -182,46 +182,50 @@ signals:
 class DVAPI FlipConsole final : public QWidget {
   Q_OBJECT
 
+  QColor m_fpsFieldColor;
+  Q_PROPERTY(QColor FpsFieldColor READ getFpsFieldColor WRITE setFpsFieldColor)
+
 public:
   enum EGadget {
-    eBegin           = 0,
-    ePlay            = 0x1,
-    eLoop            = 0x2,
-    ePause           = 0x4,
-    ePrev            = 0x8,
-    eNext            = 0x10,
-    eFirst           = 0x20,
-    eLast            = 0x40,
-    eRed             = 0x80,
-    eGreen           = 0x100,
-    eBlue            = 0x200,
-    eGRed            = 0x400,
-    eGGreen          = 0x800,
-    eGBlue           = 0x1000,
-    eMatte           = 0x2000,
-    eFrames          = 0x4000,
-    eRate            = 0x8000,
-    eSound           = 0x10000,
-    eHisto           = 0x20000,
-    eBlackBg         = 0x40000,
-    eWhiteBg         = 0x80000,
-    eCheckBg         = 0x100000,
-    eSaveImg         = 0x200000,
-    eCompare         = 0x400000,
-    eCustomize       = 0x800000,
-    eSave            = 0x1000000,
-    eDefineSubCamera = 0x2000000,
-    eFilledRaster    = 0x4000000,  // Used only in LineTest
-    eDefineLoadBox   = 0x8000000,
-    eUseLoadBox      = 0x10000000,
-    eLocator         = 0x20000000,
-    eEnd             = 0x40000000
+    eBegin,
+    ePlay,
+    eLoop,
+    ePause,
+    ePrev,
+    eNext,
+    eFirst,
+    eLast,
+    eRed,
+    eGreen,
+    eBlue,
+    eGRed,
+    eGGreen,
+    eGBlue,
+    eMatte,
+    eFrames,
+    eRate,
+    eSound,
+    eHisto,
+    eSaveImg,
+    eCompare,
+    eCustomize,
+    eSave,
+    eDefineSubCamera,
+    eFilledRaster,  // Used only in LineTest
+    eDefineLoadBox,
+    eUseLoadBox,
+    eLocator,
+    eZoomIn,
+    eZoomOut,
+    eFlipHorizontal,
+    eFlipVertical,
+    eResetView,
+    // following values are hard-coded in ImagePainter
+    eBlackBg = 0x40000,
+    eWhiteBg = 0x80000,
+    eCheckBg = 0x100000,
+    eEnd
   };
-
-  static const UINT cFullConsole = eEnd - 1;
-  static const UINT cFilterRgb   = eRed | eGreen | eBlue;
-  static const UINT cFilterGRgb  = eGRed | eGGreen | eGBlue;
-  static const UINT eFilterRgbm  = cFilterRgb | eMatte;
 
   static FlipConsole *m_currentConsole;
   static QList<FlipConsole *> m_visibleConsoles;
@@ -230,11 +234,12 @@ public:
 
   // blanksEnabled==true->at begin of each loop a number of blank frames are
   // drawn (according to rpeferences settings)
-  FlipConsole(QVBoxLayout *layout, UINT gadgetsMask, bool isLinkable,
-              QWidget *customWidget, const QString &customizeId,
+  FlipConsole(QVBoxLayout *layout, std::vector<int> gadgetsMask,
+              bool isLinkable, QWidget *customWidget,
+              const QString &customizeId,
               FlipConsoleOwner *consoleOwner,  // call
                                                // consoleOwner->onDrawFrame()
-                                               // intead of emitting drawFrame
+                                               // instead of emitting drawFrame
                                                // signal
               bool enableBlanks = false);
   void enableBlanks(bool state);
@@ -281,6 +286,8 @@ public:
   void pressButton(EGadget buttonId);
 
   void showHideAllParts(bool);
+  void showHidePlaybar(bool);
+  void showHideFrameSlider(bool);
 
   void enableProgressBar(bool enable);
   void setProgressBarStatus(const std::vector<UCHAR> *status);
@@ -293,6 +300,15 @@ public:
   bool isLinkable() const { return m_isLinkable; }
   void playNextFrame();
   void updateCurrentFPS(int val);
+
+  bool hasButton(std::vector<int> buttonMask, FlipConsole::EGadget buttonId) {
+    if (buttonMask.size() == 0) return true;
+    return std::find(buttonMask.begin(), buttonMask.end(), buttonId) ==
+           buttonMask.end();
+  }
+
+  void setFpsFieldColor(const QColor &color) { m_fpsFieldColor = color; }
+  QColor getFpsFieldColor() const { return m_fpsFieldColor; }
 
 signals:
 
@@ -309,7 +325,7 @@ private:
 
   QAction *m_customSep, *m_rateSep, *m_histoSep, *m_bgSep, *m_vcrSep,
       *m_compareSep, *m_saveSep, *m_colorFilterSep, *m_soundSep, *m_subcamSep,
-      *m_filledRasterSep;
+      *m_filledRasterSep, *m_viewerSep;
 
   QToolBar *m_playToolBar;
   QActionGroup *m_colorFilterGroup;
@@ -325,7 +341,7 @@ private:
   QFrame *createFpsSlider();
   QAction *m_doubleRedAction, *m_doubleGreenAction, *m_doubleBlueAction;
   DoubleButton *m_doubleRed, *m_doubleGreen, *m_doubleBlue;
-  UINT m_gadgetsMask;
+  std::vector<int> m_gadgetsMask;
   int m_from, m_to, m_step;
   int m_currentFrame, m_framesCount;
   ImagePainter::VisualSettings m_settings;
@@ -358,7 +374,7 @@ private:
                               QActionGroup *group, DoubleButton *&w);
 
   QFrame *createFrameSlider();
-  void createPlayToolBar(bool withCustomWidget);
+  void createPlayToolBar(QWidget *customWidget);
   DVGui::IntLineEdit *m_editCurrFrame;
   FlipSlider *m_currFrameSlider;
 

@@ -11,50 +11,51 @@
 @img-url: '../Default/imgs/white';
 
 @bg: #303030;
-@accent: darken(@bg, 10);
-@text-color: rgb(206, 206, 206);
-@dock-bg-color: darken(@bg, 14);
-@dialogButtonFrame-bg-color: darken(@bg, 3);
-
-// -----------------------------------------------------------------------------
-// Trees
-// -----------------------------------------------------------------------------
-
-@tree-bg-color: darken(@bg, 4);
-
-// -----------------------------------------------------------------------------
-// Tabs
-// -----------------------------------------------------------------------------
-
-// Container
+@accent: darken(@bg, 12);
+@dock-bg-color: darken(@bg, 12);
 @tabbar-bg-color: darken(@bg, 4);
 
 // -----------------------------------------------------------------------------
-// Titlebars
+// Menu
 // -----------------------------------------------------------------------------
 
-@title-bg-color: darken(@bg, 4);
+@menu-bg-color: darken(@bg, 4);
+@menu-border-color: lighten(@menu-bg-color, 10);
 
 // -----------------------------------------------------------------------------
-// Scroll Bars
+// File Browser / Trees
 // -----------------------------------------------------------------------------
 
-// Frame
-@scrollbar-bg-color: darken(@bg, 4);
+@tree-bg-color: darken(@bg, 4);
+@browser-itemview-bg-color: darken(@bg, 0);
+@prefs-tree-bg-color: darken(@bg, 4);
+
+// -----------------------------------------------------------------------------
+// Scrollbars
+// -----------------------------------------------------------------------------
+
+@scrollbar-bg-color: darken(@bg, 5);
 
 // -----------------------------------------------------------------------------
 // Textfield
 // -----------------------------------------------------------------------------
 
 @input-bg-color: darken(@bg, 8);
-@input-border-color: lighten(@bg, 5);
+@input-border-color: lighten(@bg, 10);
 
 // -----------------------------------------------------------------------------
 // CheckBox
 // -----------------------------------------------------------------------------
 
 @checkbox-border-color: @input-border-color;
-@checkbox-border-color-disabled: darken(@bg, 9);
+@checkbox-border-color-disabled: @input-border-color-disabled;
+@checkbox-border-color-hover: lighten(@bg, 70);
+@checkbox-border-color-checked: @checkbox-bg-color-checked;
+
+// For RadioButton
+@radiobutton-img-unchecked: 'radiobutton-dark_unchecked.svg';
+@radiobutton-img-unchecked-hover: 'radiobutton-dark_unchecked_hover.svg';
+@radiobutton-img-unchecked-disabled: 'radiobutton-dark_unchecked_disabled.svg';
 
 // -----------------------------------------------------------------------------
 // Slider
@@ -74,23 +75,32 @@
 // Flip Slider
 @flipmarker-img: 'flipmarker_dark.svg';
 @flipslider-img: 'flipslider_dark.svg';
-@flipslider-base-color: darken(@bg, 8);
+@flipslider-base-color: darken(@bg, 5);
+
+// -----------------------------------------------------------------------------
+// Progress Bar
+// -----------------------------------------------------------------------------
+
+@progressbar-bg-color: darken(@bg, 4);
+
+// -----------------------------------------------------------------------------
+// Titlebars
+// -----------------------------------------------------------------------------
+
+@title-bg-color: darken(@bg, 4);
 
 // -----------------------------------------------------------------------------
 // XSheet
 // -----------------------------------------------------------------------------
 
-@xsheet-bg-color:                           darken(@bg, 3);
-
-@xsheet-LightLine-color:                    darken(#2c2c2c, 5);
-@xsheet-VerticalLine-color:                 darken(#626262, 35);
-
-@xsheet-EmptyColumnHead-color:              lighten(@bg, 8);
-
-@xsheet-EmptyCell-color:                    @bg;
-@xsheet-NotEmptyColumn-color:               lighten(@bg, 3);
-
-@xsheet-LightLightBG-color:                 @xsheet-EmptyCell-color;
+@xsheet-LightLine-color:                    rgba(0, 0, 0, 0.3);
+@xsheet-VerticalLine-color:                 rgba(0, 0, 0, 0.4);
+@xsheet-bg-color:                           @bg;
+@xsheet-OnionSkinAreaBG-color:              darken(@bg, 3);
+@xsheet-NotEmptyColumn-color:               @bg;
+@xsheet-LightLightBG-color:                 darken(@bg, 3);
+@xsheet-PlayRange-Color:                    lighten(@bg, 3);
+@xsheet-EmptyCell-color:                    darken(@bg, 3);
 
 // -----------------------------------------------------------------------------
 // Function Editor
@@ -98,3 +108,14 @@
 
 // Function Curve Panel
 @function-panel-OtherCurves-color: lighten(@function-panel-bg-color, 30);
+
+// Function Spreadsheet Viewer
+@function-ColumnHeaderBorder-color: lighten(@bg, 10);
+@function-ColumnHeaderBG-color: darken(@bg, 4);
+
+// -----------------------------------------------------------------------------
+// Schematic Viewer
+// -----------------------------------------------------------------------------
+
+// Node Viewer
+@schematic-viewer-bg-color:  darken(@bg, 4);

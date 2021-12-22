@@ -50,7 +50,7 @@ bool FfmpegAudio::checkFfmpeg() {
   path = path + ".exe";
 #endif
   if (TSystem::doesExistFileOrLevel(TFilePath(path))) {
-    Preferences::instance()->setFfmpegPath(QDir::currentPath().toStdString());
+    Preferences::instance()->setValue(ffmpegPath, QDir::currentPath());
     return true;
   }
 

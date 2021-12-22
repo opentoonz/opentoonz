@@ -1,0 +1,53 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[a4paper, total={180mm, 272mm}]{geometry}
+
+\usepackage{fontspec}
+\setmainfont[Path=fonts/, Extension=.ttf]{ipaexm}
+
+\setlength\parindent{3.5em}
+\setlength\parskip{0em}
+\renewcommand{\baselinestretch}{1.247}
+
+\begin{document}
+
+\thispagestyle{empty}
+
+\Large
+\noindent \\
+PN Clouds Ino\medskip
+\par
+\normalsize
+Generates a cloud pattern image.\\
+\par
+The pixel values of the noise will be centered at:\par
+\noindent \hskip 7em \ \ 8bits Image: 128 (0x80)\par
+\noindent \hskip 7em 16bits Image: 32768 (0x8000)\par
+Note that larger and smaller values are not necessarily even.\\
+\\
+-{-}- \ Settings \ -{-}-\\
+Size\par
+Defines the size of the pattern.\par
+Smaller values result in a smaller pattern, bigger ones in a bigger pattern.\par
+The unit is mm.\par
+The default value is 10.\\
+\\
+Z\par
+Allows for changing the pattern over time.\par
+For example, from frame 1 to 24 it can change from 0 to 1.\par
+The default value is 0.\\
+\\
+Octaves\par
+Defines the detail level for the cloud pattern.\par
+Specify an integer from 1 to 10.\par
+With higher values there will be more detail in the noise.\par
+The default value is 1.\\
+\\
+Persistance\par
+Specify the strength of the noise in the cloud pattern.\\
+\\
+Alpha Rendering\par
+When inactive it fills in the maximum Alpha value, so the entire image will be opaque.\par
+When active, it feeds the same image in the Alpha channel, as in the RGB channels.\par
+The default setting is active.
+
+\end{document}

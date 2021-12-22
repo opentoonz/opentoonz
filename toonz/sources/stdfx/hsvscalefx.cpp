@@ -5,8 +5,9 @@
 #include <math.h>
 #include "stdfx.h"
 #include "hsvutil.h"
+#include "globalcontrollablefx.h"
 
-class HSVScaleFx final : public TStandardRasterFx {
+class HSVScaleFx final : public GlobalControllableFx {
   FX_PLUGIN_DECLARATION(HSVScaleFx)
 
   TRasterFxPort m_input;

@@ -62,10 +62,14 @@ int TTWAIN_GetCapCurrent(TW_UINT16 cap_id, TW_UINT16 conType, void *data,
 /*------------------------------------------------------------------------*/
 int TTWAIN_GetCapQuery(TW_UINT16 cap_id, TW_UINT16 *pattern) {
   int rc;
-  TW_ONEVALUE data;
+  /* GCC9 during compilation shows that this code possible call
+   * TTWAIN_GetCapability() with case TWON_TWON(TWON_RANGE, TWON_RANGE)
+   * whitch cause stack corruption, so make 'data' big enough to store
+   * TW_ONEVALUE. */
+  TW_ONEVALUE data[1 + (sizeof(TW_RANGE) / sizeof(TW_ONEVALUE))];
   rc = TTWAIN_GetCapability(MSG_QUERYSUPPORT, cap_id, TWON_ONEVALUE, &data, 0);
   if (!rc) return FALSE;
-  *pattern = (TW_UINT16)data.Item;
+  *pattern = (TW_UINT16)data[0].Item;
   return TRUE;
 }
 /*------------------------------------------------------------------------*/

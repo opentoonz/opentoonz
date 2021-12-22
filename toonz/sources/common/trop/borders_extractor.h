@@ -29,7 +29,7 @@ namespace borders {
   For example, if we want to extract the borders of a fullcolor image
   that separate bright areas from dark ones, we can just have a pixel selector
   cast each pixel to the integer value 0 if the pixel's value is below the
-  brigthness threshold, and 1 if above.
+  brightness threshold, and 1 if above.
 \n\n
   Also, pixel selectors tell whether pixels are to be intended as
   completely transparent (virtual pixels outside the raster boundaries are).

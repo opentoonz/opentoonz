@@ -538,7 +538,7 @@ AutocenterPopup::AutocenterPopup() : DVGui::Dialog(0, false, true) {
   settingsLayout->addWidget(m_pegbarHoles, row, 1, Qt::AlignLeft);
   ++row;
 
-  // Feld Guide
+  // Field Guide
   settingsLayout->addWidget(new QLabel(tr("Field Guide:")), row, 0,
                             Qt::AlignRight);
   m_fieldGuide = new QComboBox(this);

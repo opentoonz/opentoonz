@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="ja_JP">
+<TS version="2.1" language="ja_JP" sourcelanguage="en">
 <context>
     <name>Preferences</name>
     <message>
@@ -281,11 +281,11 @@
         <translation>回転角を変更</translation>
     </message>
     <message>
-        <source>Move E/W</source>
+        <source>Move X</source>
         <translation>左右に移動</translation>
     </message>
     <message>
-        <source>Move N/S</source>
+        <source>Move Y</source>
         <translation>上下に移動</translation>
     </message>
     <message>
@@ -346,7 +346,7 @@
     </message>
     <message>
         <source>Update Colors by Using Picked Positions in Palette %1</source>
-        <translation>パレット%1　サンプル位置を用いて色を更新</translation>
+        <translation>パレット%1&#x3000;サンプル位置を用いて色を更新</translation>
     </message>
     <message>
         <source>Can&apos;t save</source>
@@ -435,6 +435,20 @@
     <message>
         <source>Timeline</source>
         <translation>タイムライン</translation>
+    </message>
+    <message>
+        <source>Failed to save the following resources:
+</source>
+        <translation>以下の素材の保存に失敗しました：
+</translation>
+    </message>
+    <message>
+        <source>Failed to save palette.</source>
+        <translation>パレットの保存に失敗しました。</translation>
+    </message>
+    <message>
+        <source>and %1 more item(s).</source>
+        <translation>さらに %1 個のファイル。</translation>
     </message>
 </context>
 <context>

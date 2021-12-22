@@ -5,7 +5,6 @@
 #include "tools/cursors.h"
 #include "tools/toolcommandids.h"
 #include "tools/toolutils.h"
-#include "tools/toolutils.h"
 #include "tools/toolhandle.h"
 
 #include "historytypes.h"
@@ -109,7 +108,7 @@ void eraseImage(const TRasterImageP &ri, const TRaster32P &image,
     TPixel32 *outPix    = workRas->pixels(y);
     TPixel32 *outEndPix = outPix + workRas->getLx();
     TPixel32 *inPix     = image->pixels(y);
-    for (outPix; outPix != outEndPix; outPix++, inPix++) {
+    for (; outPix != outEndPix; outPix++, inPix++) {
       if (outPix->m == 0) continue;
       TPixel32 pix = depremultiply(*outPix);
       pix.m =
@@ -369,7 +368,7 @@ private:
 
 FullColorEraserTool::FullColorEraserTool(std::string name)
     : TTool(name)
-    , m_size("Size:", 1, 100, 5, false)
+    , m_size("Size:", 1, 1000, 5, false)
     , m_opacity("Opacity:", 0, 100, 100)
     , m_hardness("Hardness:", 0, 100, 100)
     , m_eraseType("Type:")
@@ -386,6 +385,8 @@ FullColorEraserTool::FullColorEraserTool(std::string name)
     , m_isXsheetCell(false) {
   bind(TTool::RasterImage);
 
+  m_size.setNonLinearSlider();
+
   m_prop.bind(m_size);
   m_prop.bind(m_hardness);
   m_prop.bind(m_opacity);
@@ -397,6 +398,10 @@ FullColorEraserTool::FullColorEraserTool(std::string name)
   m_eraseType.addValue(RECTERASE);
   m_eraseType.addValue(FREEHANDERASE);
   m_eraseType.addValue(POLYLINEERASE);
+
+  m_eraseType.setId("Type");
+  m_invertOption.setId("Invert");
+  m_multi.setId("FrameRange");
 }
 
 //---------------------------------------------------------------------------------------------------
@@ -527,6 +532,8 @@ void FullColorEraserTool::leftButtonDown(const TPointD &pos,
 
 void FullColorEraserTool::leftButtonDrag(const TPointD &pos,
                                          const TMouseEvent &e) {
+  if (!m_mousePressed) return;
+
   m_brushPos = m_mousePos = pos;
   m_mouseEvent            = e;
   double pixelSize2       = getPixelSize() * getPixelSize();
@@ -982,7 +989,7 @@ void FullColorEraserTool::update(const TRasterImageP &ri, TRectD selArea,
   tileSet->add(raster, TRasterImageUtils::convertWorldToRaster(selArea, ri));
   TUndo *undo;
 
-  undo = new RectFullColorUndo(tileSet, selArea, TStroke(),
+  undo       = new RectFullColorUndo(tileSet, selArea, TStroke(),
                                m_eraseType.getValue(), level.getPointer(),
                                m_invertOption.getValue(), frameId);
   TRect rect = TRasterImageUtils::eraseRect(ri, selArea);

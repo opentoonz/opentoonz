@@ -11,7 +11,7 @@ http://www.sentex.net/~mwandel/jhead/
 
 #include <stdlib.h>
 
-// undefining ReadAllTags will load only resolution infomation
+// undefining ReadAllTags will load only resolution information
 #define ReadAllTags
 #undef ReadAllTags
 

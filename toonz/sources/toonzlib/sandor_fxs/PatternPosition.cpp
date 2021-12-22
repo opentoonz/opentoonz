@@ -57,7 +57,7 @@ void CPatternPosition::makeRandomPositions(const int nbPat, const int nbPixel,
         }
   } catch (exception) {
     char s[50];
-    sprintf(s, "in Pattern Position Generation");
+    snprintf(s, sizeof(s), "in Pattern Position Generation");
     throw SMemAllocError(s);
   }
 }
@@ -157,7 +157,7 @@ void CPatternPosition::prepareCircle(vector<SPOINT> &v, const double r) {
         }
   } catch (exception) {
     char s[50];
-    sprintf(s, "Position Generation");
+    snprintf(s, sizeof(s), "Position Generation");
     throw SMemAllocError(s);
   }
 }
@@ -188,7 +188,7 @@ void CPatternPosition::makeDDPositions(const int lX, const int lY, UCHAR *sel,
   std::unique_ptr<UCHAR[]> lSel(new UCHAR[lX * lY]);
   if (!lSel) {
     char s[50];
-    sprintf(s, "in Pattern Position Generation");
+    snprintf(s, sizeof(s), "in Pattern Position Generation");
     throw SMemAllocError(s);
   }
   memcpy(lSel.get(), sel, lX * lY * sizeof(UCHAR));
@@ -209,7 +209,7 @@ void CPatternPosition::makeDDPositions(const int lX, const int lY, UCHAR *sel,
     }
   } catch (exception) {
     char s[50];
-    sprintf(s, "in Pattern Position Generation");
+    snprintf(s, sizeof(s), "in Pattern Position Generation");
     throw SMemAllocError(s);
   }
   //	memcpy(sel,lSel,lX*lY);

@@ -69,7 +69,7 @@ public:
   void onActivate();
   void onEnter();
 };
-}
+}  // namespace
 class FillTool final : public QObject, public TTool {
   // Q_DECLARE_TR_FUNCTIONS(FillTool)
   Q_OBJECT
@@ -125,7 +125,8 @@ public:
   void onImageChanged() override;
   void draw() override;
 
-  int pick(const TImageP &image, const TPointD &pos);
+  // if frame = -1 it uses current frame
+  int pick(const TImageP &image, const TPointD &pos, const int frame = -1);
   int pickOnionColor(const TPointD &pos);
 
   void onEnter() override;

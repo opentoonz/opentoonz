@@ -29,7 +29,6 @@ using namespace std;
 #ifndef _WIN32
 #include <sys/param.h>
 #include <unistd.h>
-#include <sys/timeb.h>
 #endif
 
 int inline STRICMP(const QString &a, const QString &b) {
@@ -70,8 +69,7 @@ TFilePath getGlobalRoot() {
 // Leggo la globalRoot da File txt
 #ifdef MACOSX
   // If MACOSX, change to MACOSX path
-  std::string unixpath = "./" + tver.getAppName() + "_" +
-                         tver.getAppVersionString() +
+  std::string unixpath = "./" + tver.getAppName() +
                          ".app/Contents/Resources/configfarmroot.txt";
 #else
   // set path to something suitable for most linux (Unix?) systems
@@ -106,8 +104,7 @@ TFilePath getLocalRoot() {
   TFilePath lroot;
 
 #ifdef _WIN32
-std:
-  string regpath = "SOFTWARE\\" + tver.getAppName() + "\\" + tver.getAppName() +
+  std::string regpath = "SOFTWARE\\" + tver.getAppName() + "\\" + tver.getAppName() +
                    "\\" + tver.getAppVersionString() + "\\FARMROOT";
   TFilePath name(regpath);
   lroot = TFilePath(TSystem::getSystemValue(name).toStdString()) +
@@ -116,12 +113,15 @@ std:
 // Leggo la localRoot da File txt
 #ifdef MACOSX
   // If MACOSX, change to MACOSX path
-  std::string unixpath = "./" + tver.getAppName() + "_" +
-                         tver.getAppVersionString() +
+  std::string unixpath = "./" + tver.getAppName() +
                          ".app/Contents/Resources/configfarmroot.txt";
 #else
   // set path to something suitable for most linux (Unix?) systems
+#ifdef FREEBSD
+  std::string unixpath = "/usr/local/etc/" + tver.getAppName() + "/opentoonz.conf";
+#else
   std::string unixpath = "/etc/" + tver.getAppName() + "/opentoonz.conf";
+#endif
 #endif
   TFilePath name(unixpath);
   Tifstream is(name);
@@ -1158,8 +1158,8 @@ CtrlFarmTask *FarmController::getTaskToStart(FarmServerProxy *server) {
     CtrlFarmTask *task = itTask->second;
     if ((!server || (task->m_platform == NoPlatform ||
                      task->m_platform == server->m_platform)) &&
-        ((task->m_status == Waiting && task->m_priority > maxPriority) ||
-         (task->m_status == Aborted && task->m_failureCount < 3) &&
+        (((task->m_status == Waiting && task->m_priority > maxPriority) ||
+          (task->m_status == Aborted && task->m_failureCount < 3)) &&
              task->m_parentId != "")) {
       bool dependenciesCompleted = true;
 
@@ -2174,7 +2174,7 @@ void FarmController::activateReadyServers() {
     ServerState state = queryServerState2(server->getId());
     int tasksCount    = server->m_tasks.size();
     if (state == Ready ||
-        state == Busy && tasksCount < server->m_maxTaskCount) {
+        (state == Busy && tasksCount < server->m_maxTaskCount)) {
       for (int i = 0; i < (server->m_maxTaskCount - tasksCount); ++i) {
         // cerca un task da sottomettere al server
         CtrlFarmTask *task = getTaskToStart(server);
@@ -2253,8 +2253,7 @@ void ControllerService::onStart(int argc, char *argv[]) {
     TFilePath logFilePath = lRootDir + "controller.log";
     m_userLog             = new TUserLog(logFilePath);
   }
-std:
-  string appverinfo = tver.getAppVersionInfo("Farm Controller") + "\n\n";
+  std::string appverinfo = tver.getAppVersionInfo("Farm Controller") + "\n\n";
   m_userLog->info(appverinfo.c_str());
 
   TFilePath globalRoot = getGlobalRoot();

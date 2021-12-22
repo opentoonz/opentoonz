@@ -1,5 +1,5 @@
 
-#ifdef LINUX
+#if defined(LINUX) || defined(FREEBSD)
 #define GL_GLEXT_PROTOTYPES
 #endif
 
@@ -11,6 +11,9 @@
 #include "menubarcommandids.h"
 #include "ruler.h"
 #include "locatorpopup.h"
+#if defined(x64)
+#include "../stopmotion/stopmotion.h"
+#endif
 
 // TnzTools includes
 #include "tools/cursors.h"
@@ -24,6 +27,7 @@
 #include "toonzqt/gutil.h"
 #include "toonzqt/imageutils.h"
 #include "toonzqt/lutcalibrator.h"
+#include "toonzqt/viewcommandids.h"
 
 // TnzLib includes
 #include "toonz/tscenehandle.h"
@@ -56,7 +60,6 @@
 #include "toonz/cleanupparameters.h"
 #include "toonz/toonzimageutils.h"
 #include "toonz/txshleveltypes.h"
-#include "toonz/preferences.h"
 #include "subcameramanager.h"
 
 // TnzCore includes
@@ -296,6 +299,16 @@ void invalidateIcons() {
   s.m_paintIndex = mask & ToonzCheck::ePaint ? tc->getColorIndex() : -1;
   IconGenerator::instance()->setSettings(s);
 
+  // Force icons to refresh for Toonz Vector levels
+  TXshLevel *sl = TApp::instance()->getCurrentLevel()->getLevel();
+  if (sl && sl->getType() == PLI_XSHLEVEL) {
+    std::vector<TFrameId> fids;
+    sl->getFids(fids);
+
+    for (int i = 0; i < (int)fids.size(); i++)
+      IconGenerator::instance()->invalidate(sl, fids[i]);
+  }
+
   // Do not remove icons here as they will be re-used for updating icons in the
   // level strip
 
@@ -452,6 +465,276 @@ public:
   }
 } resetShiftTraceCommand;
 
+//-----------------------------------------------------------------------------
+// Following commands (VB_***) are registered for command bar buttons.
+// They are separatd from the original visalization commands
+// so that they will not break a logic of ShortcutZoomer.
+
+class TViewResetCommand final : public MenuItemHandler {
+public:
+  TViewResetCommand() : MenuItemHandler(VB_ViewReset) {}
+  void execute() override {
+    if (TApp::instance()->getActiveViewer())
+      TApp::instance()->getActiveViewer()->resetSceneViewer();
+  }
+} viewResetCommand;
+
+class TZoomResetCommand final : public MenuItemHandler {
+public:
+  TZoomResetCommand() : MenuItemHandler(VB_ZoomReset) {}
+  void execute() override {
+    if (TApp::instance()->getActiveViewer())
+      TApp::instance()->getActiveViewer()->resetZoom();
+  }
+} zoomResetCommand;
+
+class TZoomFitCommand final : public MenuItemHandler {
+public:
+  TZoomFitCommand() : MenuItemHandler(VB_ZoomFit) {}
+  void execute() override {
+    if (TApp::instance()->getActiveViewer())
+      TApp::instance()->getActiveViewer()->fitToCamera();
+  }
+} zoomFitCommand;
+
+class TActualPixelSizeCommand final : public MenuItemHandler {
+public:
+  TActualPixelSizeCommand() : MenuItemHandler(VB_ActualPixelSize) {}
+  void execute() override {
+    if (TApp::instance()->getActiveViewer())
+      TApp::instance()->getActiveViewer()->setActualPixelSize();
+  }
+} actualPixelSizeCommand;
+
+class TFlipViewerXCommand final : public MenuItemHandler {
+public:
+  TFlipViewerXCommand() : MenuItemHandler(VB_FlipX) {}
+  void execute() override {
+    if (TApp::instance()->getActiveViewer())
+      TApp::instance()->getActiveViewer()->flipX();
+  }
+} flipViewerXCommand;
+
+class TFlipViewerYCommand final : public MenuItemHandler {
+public:
+  TFlipViewerYCommand() : MenuItemHandler(VB_FlipY) {}
+  void execute() override {
+    if (TApp::instance()->getActiveViewer())
+      TApp::instance()->getActiveViewer()->flipY();
+  }
+} flipViewerYCommand;
+
+class TRotateResetCommand final : public MenuItemHandler {
+public:
+  TRotateResetCommand() : MenuItemHandler(VB_RotateReset) {}
+  void execute() override {
+    if (TApp::instance()->getActiveViewer())
+      TApp::instance()->getActiveViewer()->resetRotation();
+  }
+} rotateResetCommand;
+
+class TPositionResetCommand final : public MenuItemHandler {
+public:
+  TPositionResetCommand() : MenuItemHandler(VB_PositionReset) {}
+  void execute() override {
+    if (TApp::instance()->getActiveViewer())
+      TApp::instance()->getActiveViewer()->resetPosition();
+  }
+} positionResetCommand;
+
+class TVectorGuidedDrawingToggleCommand final : public MenuItemHandler {
+public:
+  TVectorGuidedDrawingToggleCommand()
+      : MenuItemHandler(MI_VectorGuidedDrawing) {}
+  void execute() override {
+    CommandManager *cm = CommandManager::instance();
+    QAction *action    = cm->getAction(MI_VectorGuidedDrawing);
+    Preferences::instance()->setValue(guidedDrawingType,
+                                      action->isChecked() ? 1 : 0);
+    TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+    TApp::instance()->getCurrentScene()->notifyPreferenceChanged(
+        "GuidedDrawingFrame");
+  }
+
+  bool isChecked(CommandId id) const {
+    QAction *action = CommandManager::instance()->getAction(id);
+    return action != 0 && action->isChecked();
+  }
+} vectorGuidedDrawingToggleCommand;
+
+class TSelectGuideStrokeResetCommand final : public MenuItemHandler {
+public:
+  TSelectGuideStrokeResetCommand()
+      : MenuItemHandler(MI_SelectGuideStrokeReset) {}
+  void execute() override {
+    TVectorImageP vi = (TVectorImageP)TTool::getImage(false);
+    if (!vi) return;
+
+    TTool *tool = TApp::instance()->getCurrentTool()->getTool();
+    if (!tool) return;
+
+    tool->getViewer()->setGuidedStrokePickerMode(0);
+    tool->getViewer()->setGuidedBackStroke(-1);
+    tool->getViewer()->setGuidedFrontStroke(-1);
+    tool->getViewer()->invalidateAll();
+  }
+} SelectGuideStrokeResetCommand;
+
+class TSelectGuideStrokeNextCommand final : public MenuItemHandler {
+public:
+  TSelectGuideStrokeNextCommand() : MenuItemHandler(MI_SelectNextGuideStroke) {}
+  void execute() override {
+    TVectorImageP vi = (TVectorImageP)TTool::getImage(false);
+    if (!vi) return;
+
+    Preferences *pref = Preferences::instance();
+    if (!pref->isOnionSkinEnabled() || (pref->getGuidedDrawingType() != 1 &&
+                                        pref->getGuidedDrawingType() != 2))
+      return;
+
+    TTool *tool = TApp::instance()->getCurrentTool()->getTool();
+    if (!tool) return;
+
+    tool->getViewer()->setGuidedStrokePickerMode(1);
+  }
+} selectGuideStrokeNextCommand;
+
+class TSelectGuideStrokePrevCommand final : public MenuItemHandler {
+public:
+  TSelectGuideStrokePrevCommand() : MenuItemHandler(MI_SelectPrevGuideStroke) {}
+  void execute() override {
+    TVectorImageP vi = (TVectorImageP)TTool::getImage(false);
+    if (!vi) return;
+
+    Preferences *pref = Preferences::instance();
+    if (!pref->isOnionSkinEnabled() || (pref->getGuidedDrawingType() != 1 &&
+                                        pref->getGuidedDrawingType() != 2))
+      return;
+
+    TTool *tool = TApp::instance()->getCurrentTool()->getTool();
+    if (!tool) return;
+
+    tool->getViewer()->setGuidedStrokePickerMode(-1);
+  }
+} selectGuideStrokePrevCommand;
+
+class TSelectBothGuideStrokesCommand final : public MenuItemHandler {
+public:
+  TSelectBothGuideStrokesCommand()
+      : MenuItemHandler(MI_SelectBothGuideStrokes) {}
+  void execute() override {
+    TVectorImageP vi = (TVectorImageP)TTool::getImage(false);
+    if (!vi) return;
+
+    Preferences *pref = Preferences::instance();
+    if (!pref->isOnionSkinEnabled() || (pref->getGuidedDrawingType() != 1 &&
+                                        pref->getGuidedDrawingType() != 2))
+      return;
+
+    TTool *tool = TApp::instance()->getCurrentTool()->getTool();
+    if (!tool) return;
+
+    tool->getViewer()->setGuidedStrokePickerMode(-2);
+  }
+} selectBothGuideStrokesCommand;
+
+class TTweenGuideStrokesCommand final : public MenuItemHandler {
+public:
+  TTweenGuideStrokesCommand() : MenuItemHandler(MI_TweenGuideStrokes) {}
+  void execute() override {
+    TVectorImageP vi = (TVectorImageP)TTool::getImage(false);
+    if (!vi) return;
+
+    Preferences *pref = Preferences::instance();
+    if (!pref->isOnionSkinEnabled() || (pref->getGuidedDrawingType() != 1 &&
+                                        pref->getGuidedDrawingType() != 2))
+      return;
+
+    TTool *tool = TApp::instance()->getCurrentTool()->getTool();
+    if (!tool) return;
+
+    tool->tweenSelectedGuideStrokes();
+  }
+} tweenGuideStrokesCommand;
+
+class TTweenGuideStrokeToSelectedCommand final : public MenuItemHandler {
+public:
+  TTweenGuideStrokeToSelectedCommand()
+      : MenuItemHandler(MI_TweenGuideStrokeToSelected) {}
+  void execute() override {
+    TVectorImageP vi = (TVectorImageP)TTool::getImage(false);
+    if (!vi) return;
+
+    Preferences *pref = Preferences::instance();
+    if (!pref->isOnionSkinEnabled() || (pref->getGuidedDrawingType() != 1 &&
+                                        pref->getGuidedDrawingType() != 2))
+      return;
+
+    TTool *tool = TApp::instance()->getCurrentTool()->getTool();
+    if (!tool) return;
+
+    tool->tweenGuideStrokeToSelected();
+  }
+} tweenGuideStrokeToSelectedCommand;
+
+class TSelectGuidesAndTweenCommand final : public MenuItemHandler {
+public:
+  TSelectGuidesAndTweenCommand()
+      : MenuItemHandler(MI_SelectGuidesAndTweenMode) {}
+  void execute() override {
+    TVectorImageP vi = (TVectorImageP)TTool::getImage(false);
+    if (!vi) return;
+
+    Preferences *pref = Preferences::instance();
+    if (!pref->isOnionSkinEnabled() || (pref->getGuidedDrawingType() != 1 &&
+                                        pref->getGuidedDrawingType() != 2))
+      return;
+
+    TTool *tool = TApp::instance()->getCurrentTool()->getTool();
+    if (!tool) return;
+
+    tool->getViewer()->setGuidedStrokePickerMode(-3);
+  }
+} selectGuidesAndTweenCommand;
+
+class TFlipNextStrokeDirectionCommand final : public MenuItemHandler {
+public:
+  TFlipNextStrokeDirectionCommand() : MenuItemHandler(MI_FlipNextGuideStroke) {}
+  void execute() override {
+    TVectorImageP vi = (TVectorImageP)TTool::getImage(false);
+    if (!vi) return;
+
+    Preferences *pref = Preferences::instance();
+    if (!pref->isOnionSkinEnabled() || (pref->getGuidedDrawingType() != 1 &&
+                                        pref->getGuidedDrawingType() != 2))
+      return;
+
+    TTool *tool = TApp::instance()->getCurrentTool()->getTool();
+    if (!tool) return;
+
+    tool->flipGuideStrokeDirection(1);
+  }
+} flipNextStrokeDirectionCommand;
+
+class TFlipPrevStrokeDirectionCommand final : public MenuItemHandler {
+public:
+  TFlipPrevStrokeDirectionCommand() : MenuItemHandler(MI_FlipPrevGuideStroke) {}
+  void execute() override {
+    TVectorImageP vi = (TVectorImageP)TTool::getImage(false);
+    if (!vi) return;
+
+    Preferences *pref = Preferences::instance();
+    if (!pref->isOnionSkinEnabled() || (pref->getGuidedDrawingType() != 1 &&
+                                        pref->getGuidedDrawingType() != 2))
+      return;
+
+    TTool *tool = TApp::instance()->getCurrentTool()->getTool();
+    if (!tool) return;
+
+    tool->flipGuideStrokeDirection(-1);
+  }
+} flipPrevStrokeDirectionCommand;
+
 //=============================================================================
 // SceneViewer
 //-----------------------------------------------------------------------------
@@ -500,6 +783,9 @@ SceneViewer::SceneViewer(ImageUtils::FullScreenWidget *parent)
     , m_isBusyOnTabletMove(false) {
   m_visualSettings.m_sceneProperties =
       TApp::instance()->getCurrentScene()->getScene()->getProperties();
+#if defined(x64)
+  m_stopMotion = StopMotion::instance();
+#endif
   // Enables multiple key input.
   setAttribute(Qt::WA_KeyCompression);
   // Enables input methods for Asian languages.
@@ -512,8 +798,10 @@ SceneViewer::SceneViewer(ImageUtils::FullScreenWidget *parent)
   this->setTabletTracking(true);
 #endif
 
-  for (int i = 0; i < tArrayCount(m_viewAff); i++)
+  for (int i = 0; i < m_viewAff.size(); ++i) {
     setViewMatrix(getNormalZoomScale(), i);
+    m_rotationAngle[i] = 0.0;
+  }
 
   m_3DSideR = rasterFromQPixmap(svgToPixmap(":Resources/3Dside_r.svg"));
   m_3DSideL = rasterFromQPixmap(svgToPixmap(":Resources/3Dside_l.svg"));
@@ -528,6 +816,8 @@ SceneViewer::SceneViewer(ImageUtils::FullScreenWidget *parent)
 
   if (Preferences::instance()->isColorCalibrationEnabled())
     m_lutCalibrator = new LutCalibrator();
+  if (Preferences::instance()->is30bitDisplayEnabled())
+    setTextureFormat(TGL_TexFmt10);
 }
 
 //-----------------------------------------------------------------------------
@@ -545,6 +835,9 @@ void SceneViewer::setVisual(const ImagePainter::VisualSettings &settings) {
 //-----------------------------------------------------------------------------
 
 SceneViewer::~SceneViewer() {
+  // notify FilmStripFrames and safely disconnect with this
+  emit aboutToBeDestroyed();
+
   if (m_fbo) delete m_fbo;
 
   // release all the registered context (once when exit the software)
@@ -728,45 +1021,63 @@ void SceneViewer::showEvent(QShowEvent *) {
   TApp *app = TApp::instance();
 
   TSceneHandle *sceneHandle = app->getCurrentScene();
-  connect(sceneHandle, SIGNAL(sceneSwitched()), this, SLOT(resetSceneViewer()));
-  connect(sceneHandle, SIGNAL(sceneChanged()), this, SLOT(onSceneChanged()));
+  bool ret = connect(sceneHandle, SIGNAL(sceneSwitched()), this,
+                     SLOT(resetSceneViewer()));
+  ret      = ret && connect(sceneHandle, SIGNAL(sceneChanged()), this,
+                       SLOT(onSceneChanged()));
+  ret = ret && connect(sceneHandle, SIGNAL(preferenceChanged(const QString &)),
+                       this, SLOT(onPreferenceChanged(const QString &)));
 
   TFrameHandle *frameHandle = app->getCurrentFrame();
-  connect(frameHandle, SIGNAL(frameSwitched()), this, SLOT(onFrameSwitched()));
+  ret = ret && connect(frameHandle, SIGNAL(frameSwitched()), this,
+                       SLOT(onFrameSwitched()));
 
   TPaletteHandle *paletteHandle =
       app->getPaletteController()->getCurrentLevelPalette();
-  connect(paletteHandle, SIGNAL(colorStyleChanged(bool)), this, SLOT(update()));
+  ret = ret && connect(paletteHandle, SIGNAL(colorStyleChanged(bool)), this,
+                       SLOT(update()));
 
-  connect(app->getCurrentObject(), SIGNAL(objectSwitched()), this,
-          SLOT(onObjectSwitched()));
-  connect(app->getCurrentObject(), SIGNAL(objectChanged(bool)), this,
-          SLOT(update()));
+  ret = ret && connect(app->getCurrentObject(), SIGNAL(objectSwitched()), this,
+                       SLOT(onObjectSwitched()));
+  ret = ret && connect(app->getCurrentObject(), SIGNAL(objectChanged(bool)),
+                       this, SLOT(update()));
 
-  connect(app->getCurrentOnionSkin(), SIGNAL(onionSkinMaskChanged()), this,
-          SLOT(onOnionSkinMaskChanged()));
+  ret =
+      ret && connect(app->getCurrentOnionSkin(), SIGNAL(onionSkinMaskChanged()),
+                     this, SLOT(onOnionSkinMaskChanged()));
 
-  connect(app->getCurrentLevel(), SIGNAL(xshLevelChanged()), this,
-          SLOT(update()));
-  connect(app->getCurrentLevel(), SIGNAL(xshCanvasSizeChanged()), this,
-          SLOT(update()));
+  ret = ret && connect(app->getCurrentLevel(), SIGNAL(xshLevelChanged()), this,
+                       SLOT(update()));
+  ret = ret && connect(app->getCurrentLevel(), SIGNAL(xshCanvasSizeChanged()),
+                       this, SLOT(update()));
   // when level is switched, update m_dpiScale in order to show white background
   // for Ink&Paint work properly
-  connect(app->getCurrentLevel(), SIGNAL(xshLevelSwitched(TXshLevel *)), this,
-          SLOT(onLevelSwitched()));
+  ret = ret &&
+        connect(app->getCurrentLevel(), SIGNAL(xshLevelSwitched(TXshLevel *)),
+                this, SLOT(onLevelSwitched()));
 
-  connect(app->getCurrentXsheet(), SIGNAL(xsheetChanged()), this,
-          SLOT(onXsheetChanged()));
-  connect(app->getCurrentXsheet(), SIGNAL(xsheetSwitched()), this,
-          SLOT(update()));
+  ret = ret && connect(app->getCurrentXsheet(), SIGNAL(xsheetChanged()), this,
+                       SLOT(onXsheetChanged()));
+  ret = ret && connect(app->getCurrentXsheet(), SIGNAL(xsheetSwitched()), this,
+                       SLOT(update()));
 
   // update tooltip when tool options are changed
-  connect(app->getCurrentTool(), SIGNAL(toolChanged()), this,
-          SLOT(onToolChanged()));
-  connect(app->getCurrentTool(), SIGNAL(toolCursorTypeChanged()), this,
-          SLOT(onToolChanged()));
+  ret = ret && connect(app->getCurrentTool(), SIGNAL(toolChanged()), this,
+                       SLOT(onToolChanged()));
+  ret = ret && connect(app->getCurrentTool(), SIGNAL(toolCursorTypeChanged()),
+                       this, SLOT(onToolChanged()));
 
-  connect(app, SIGNAL(tabletLeft()), this, SLOT(resetTabletStatus()));
+  ret = ret &&
+        connect(app, SIGNAL(tabletLeft()), this, SLOT(resetTabletStatus()));
+#if defined(x64)
+  if (m_stopMotion) {
+    ret = ret && connect(m_stopMotion, SIGNAL(newLiveViewImageReady()), this,
+                         SLOT(onNewStopMotionImageReady()));
+    ret = ret && connect(m_stopMotion, SIGNAL(liveViewStopped()), this,
+                         SLOT(onStopMotionLiveViewStopped()));
+  }
+#endif
+  assert(ret);
 
   if (m_hRuler && m_vRuler) {
     if (!viewRulerToggle.getStatus()) {
@@ -783,6 +1094,7 @@ void SceneViewer::showEvent(QShowEvent *) {
   }
   TApp::instance()->setActiveViewer(this);
 
+  onPreferenceChanged("ColorCalibration");
   update();
 }
 
@@ -822,6 +1134,16 @@ void SceneViewer::hideEvent(QHideEvent *) {
   if (toolHandle) toolHandle->disconnect(this);
 
   disconnect(app, SIGNAL(tabletLeft()), this, SLOT(resetTabletStatus()));
+
+#if defined(x64)
+  if (m_stopMotion) {
+    disconnect(m_stopMotion, SIGNAL(newImageReady()), this,
+               SLOT(onNewStopMotionImageReady()));
+    disconnect(m_stopMotion, SIGNAL(liveViewStopped()), this,
+               SLOT(onStopMotionLiveViewStopped()));
+  }
+#endif
+
   // hide locator
   if (m_locator && m_locator->isVisible()) m_locator->hide();
 }
@@ -842,15 +1164,78 @@ int SceneViewer::getHGuideCount() {
 double SceneViewer::getVGuide(int index) { return m_vRuler->getGuide(index); }
 double SceneViewer::getHGuide(int index) { return m_hRuler->getGuide(index); }
 
+#if defined(x64)
 //-----------------------------------------------------------------------------
 
+void SceneViewer::onNewStopMotionImageReady() {
+  if (m_stopMotion->m_hasLineUpImage) {
+    // if (m_hasStopMotionLineUpImage) delete m_stopMotionLineUpImage;
+    m_stopMotionLineUpImage =
+        (TRasterImageP)m_stopMotion->m_lineUpImage->clone();
+    m_stopMotionLineUpImage->setDpi(m_stopMotion->m_liveViewDpi.x,
+                                    m_stopMotion->m_liveViewDpi.y);
+    m_hasStopMotionLineUpImage = true;
+  }
+  if (m_stopMotion->m_hasLiveViewImage) {
+    // if (m_hasStopMotionImage) delete m_stopMotionImage;
+    m_stopMotionImage = m_stopMotion->m_liveViewImage->clone();
+    m_stopMotionImage->setDpi(m_stopMotion->m_liveViewDpi.x,
+                              m_stopMotion->m_liveViewDpi.y);
+    m_hasStopMotionImage = true;
+    if (m_stopMotion->m_canon->m_pickLiveViewZoom) {
+      setToolCursor(this, ToolCursor::ZoomCursor);
+    }
+    onSceneChanged();
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+void SceneViewer::onStopMotionLiveViewStopped() {
+  m_hasStopMotionImage       = false;
+  m_hasStopMotionLineUpImage = false;
+  onSceneChanged();
+}
+
+#endif  // x64
+//-----------------------------------------------------------------------------
+
+void SceneViewer::onPreferenceChanged(const QString &prefName) {
+  if (prefName == "ColorCalibration") {
+    if (Preferences::instance()->isColorCalibrationEnabled()) {
+      // if the window is so shriked that the gl widget is empty,
+      // showEvent can be called before creating the context.
+      if (!context()) return;
+      makeCurrent();
+      if (!m_lutCalibrator)
+        m_lutCalibrator = new LutCalibrator();
+      else
+        m_lutCalibrator->cleanup();
+      m_lutCalibrator->initialize();
+      connect(context(), SIGNAL(aboutToBeDestroyed()), this,
+              SLOT(onContextAboutToBeDestroyed()));
+      if (m_lutCalibrator->isValid() && !m_fbo) {
+        if (Preferences::instance()->is30bitDisplayEnabled()) {
+          QOpenGLFramebufferObjectFormat format;
+          format.setInternalTextureFormat(TGL_TexFmt10);
+          m_fbo = new QOpenGLFramebufferObject(width(), height(), format);
+        } else  // normally, initialize with GL_RGBA8 format
+          m_fbo = new QOpenGLFramebufferObject(width(), height());
+      }
+      doneCurrent();
+    }
+    update();
+  }
+}
+
+//-----------------------------------------------------------------------------
 void SceneViewer::initializeGL() {
   initializeOpenGLFunctions();
 
   registerContext();
 
   // to be computed once through the software
-  if (m_lutCalibrator) {
+  if (m_lutCalibrator && !m_lutCalibrator->isInitialized()) {
     m_lutCalibrator->initialize();
     connect(context(), SIGNAL(aboutToBeDestroyed()), this,
             SLOT(onContextAboutToBeDestroyed()));
@@ -858,6 +1243,15 @@ void SceneViewer::initializeGL() {
 
   // glClearColor(1.0,1.0,1.0,1);
   glClear(GL_COLOR_BUFFER_BIT);
+
+  if (m_firstInitialized)
+    m_firstInitialized = false;
+  else {
+    resizeGL(width(), height());
+    update();
+  }
+  // re-computing the display list for the table
+  m_tableDLId = -1;
 }
 
 //-----------------------------------------------------------------------------
@@ -885,7 +1279,12 @@ void SceneViewer::resizeGL(int w, int h) {
   // remake fbo with new size
   if (m_lutCalibrator && m_lutCalibrator->isValid()) {
     if (m_fbo) delete m_fbo;
-    m_fbo = new QOpenGLFramebufferObject(w, h);
+    if (Preferences::instance()->is30bitDisplayEnabled()) {
+      QOpenGLFramebufferObjectFormat format;
+      format.setInternalTextureFormat(TGL_TexFmt10);
+      m_fbo = new QOpenGLFramebufferObject(w, h, format);
+    } else  // normally, initialize with GL_RGBA8 format
+      m_fbo = new QOpenGLFramebufferObject(w, h);
   }
 
   // for updating the navigator in levelstrip
@@ -1088,7 +1487,8 @@ void SceneViewer::drawCameraStand() {
 
     TImageP image = tool->getImage(false);
 
-    TToonzImageP ti = image;
+    TToonzImageP ti  = image;
+    TRasterImageP ri = image;
     if (ti) {
       TRect imgRect(0, 0, ti->getSize().lx - 1, ti->getSize().ly - 1);
       TRectD bbox = ToonzImageUtils::convertRasterToWorld(imgRect, ti);
@@ -1098,8 +1498,22 @@ void SceneViewer::drawCameraStand() {
       if (ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg)
         imgRectColor = TPixel::Black;
       else
-        imgRectColor = TPixel::White;
+        imgRectColor = Preferences::instance()->getLevelEditorBoxColor();
       ToolUtils::fillRect(bbox * ti->getSubsampling(), imgRectColor);
+    } else if (ri) {
+      TRectD bbox = ri->getBBox();
+      bbox.x0 -= ri->getBBox().getLx() * 0.5;
+      bbox.x1 -= ri->getBBox().getLx() * 0.5;
+      bbox.y0 -= ri->getBBox().getLy() * 0.5;
+      bbox.y1 -= ri->getBBox().getLy() * 0.5;
+
+      TPixel32 imgRectColor;
+      // draw black rectangle instead, if the BlackBG check is ON
+      if (ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg)
+        imgRectColor = TPixel::Black;
+      else
+        imgRectColor = Preferences::instance()->getLevelEditorBoxColor();
+      ToolUtils::fillRect(bbox * ri->getSubsampling(), imgRectColor);
     }
     glPopMatrix();
   }
@@ -1168,7 +1582,7 @@ void SceneViewer::drawPreview() {
   }
 
   if (!previewer->isFrameReady(row) ||
-      app->getCurrentFrame()->isPlaying() && previewer->isBusy()) {
+      (app->getCurrentFrame()->isPlaying() && previewer->isBusy())) {
     glColor3d(1, 0, 0);
 
     tglDrawRect(frameRect);
@@ -1202,8 +1616,8 @@ void SceneViewer::drawOverlay() {
   if (!m_drawCameraTest) {
     // draw grid & guides
     if (viewGuideToggle.getStatus() &&
-        (m_vRuler && m_vRuler->getGuideCount() ||
-         m_hRuler && m_hRuler->getGuideCount())) {
+        ((m_vRuler && m_vRuler->getGuideCount()) ||
+         (m_hRuler && m_hRuler->getGuideCount()))) {
       glPushMatrix();
       tglMultMatrix(getViewMatrix());
       ViewerDraw::drawGridAndGuides(
@@ -1230,6 +1644,41 @@ void SceneViewer::drawOverlay() {
         glPopMatrix();
       }
     }
+
+#ifdef WITH_CANON
+    if (m_stopMotion->m_liveViewStatus == StopMotion::LiveViewOpen &&
+        app->getCurrentFrame()->getFrame() ==
+            m_stopMotion->getXSheetFrameNumber() - 1) {
+      int x0, x1, y0, y1;
+      rect().getCoords(&x0, &y0, &x1, &y1);
+      x0 = (-(x1 / 2)) + 15;
+      y0 = ((y1 / 2)) - 15;
+      tglDrawDisk(TPointD(x0, y0), 10);
+    }
+
+    // draw Stop Motion Zoom Box
+    if (m_stopMotion->m_liveViewStatus == 2 &&
+        m_stopMotion->m_canon->m_pickLiveViewZoom) {
+      glPushMatrix();
+      tglMultMatrix(m_drawCameraAff);
+      m_pixelSize = sqrt(tglGetPixelSize2()) * getDevPixRatio();
+      TRect rect  = m_stopMotion->m_canon->m_zoomRect;
+
+      glColor3d(1.0, 0.0, 0.0);
+
+      // border
+      glBegin(GL_LINE_STRIP);
+      glVertex2d(rect.x0, rect.y0);
+      glVertex2d(rect.x0, rect.y1 - m_pixelSize);
+      glVertex2d(rect.x1 - m_pixelSize, rect.y1 - m_pixelSize);
+      glVertex2d(rect.x1 - m_pixelSize, rect.y0);
+      glVertex2d(rect.x0, rect.y0);
+      glEnd();
+
+      glPopMatrix();
+    }
+
+#endif
 
     // safe area
     if (safeAreaToggle.getStatus() && m_drawEditingLevel == false &&
@@ -1330,7 +1779,7 @@ void SceneViewer::drawOverlay() {
     // outside the draw() methods:
     // using special style there was a conflict between the draw() methods of
     // the tool
-    // and the genaration of the icon inside the style editor (makeIcon()) which
+    // and the generation of the icon inside the style editor (makeIcon()) which
     // use
     // another glContext
     if (tool->getName() == "T_RGBPicker") tool->onImageChanged();
@@ -1398,9 +1847,9 @@ void SceneViewer::paintGL() {
   }
 #endif
 #ifdef MACOSX
-  // followin lines are necessary to solve a problem on iMac20
+  // following lines are necessary to solve a problem on iMac20
   // It seems that for some errors in the openGl implementation, buffers are not
-  // set corretly.
+  // set correctly.
   if (m_isMouseEntered && m_forceGlFlush) {
     m_isMouseEntered = false;
     m_forceGlFlush   = false;
@@ -1507,7 +1956,10 @@ void SceneViewer::drawScene() {
   TXshSimpleLevel::m_fillFullColorRaster = false;
 
   // Guided Drawing Check
-  int useGuidedDrawing = Preferences::instance()->getGuidedDrawing();
+  int useGuidedDrawing  = Preferences::instance()->getGuidedDrawingType();
+  TTool *tool           = app->getCurrentTool()->getTool();
+  int guidedFrontStroke = tool ? tool->getViewer()->getGuidedFrontStroke() : -1;
+  int guidedBackStroke  = tool ? tool->getViewer()->getGuidedBackStroke() : -1;
 
   m_minZ = 0;
   if (is3DView()) {
@@ -1538,6 +1990,8 @@ void SceneViewer::drawScene() {
             ->getCell(app->getCurrentFrame()->getFrame(), args.m_col)
             .getFrameId();
     args.m_isGuidedDrawingEnabled = useGuidedDrawing;
+    args.m_guidedFrontStroke      = guidedFrontStroke;
+    args.m_guidedBackStroke       = guidedBackStroke;
 
     // args.m_currentFrameId = app->getCurrentFrame()->getFid();
     Stage::visit(painter, args);
@@ -1571,7 +2025,8 @@ void SceneViewer::drawScene() {
       Stage::visit(painter, app->getCurrentLevel()->getLevel(),
                    app->getCurrentFrame()->getFid(),
                    app->getCurrentOnionSkin()->getOnionSkinMask(),
-                   frameHandle->isPlaying(), useGuidedDrawing);
+                   frameHandle->isPlaying(), useGuidedDrawing, guidedBackStroke,
+                   guidedFrontStroke);
     } else {
       std::pair<TXsheet *, int> xr;
       int xsheetLevel = 0;
@@ -1590,12 +2045,73 @@ void SceneViewer::drawScene() {
       args.m_osm         = &osm;
       args.m_xsheetLevel = xsheetLevel;
       args.m_isPlaying   = frameHandle->isPlaying();
-      args.m_currentFrameId =
-          app->getCurrentXsheet()
-              ->getXsheet()
-              ->getCell(app->getCurrentFrame()->getFrame(), args.m_col)
-              .getFrameId();
+      if (app->getCurrentLevel() && app->getCurrentLevel()->getLevel() &&
+          !app->getCurrentLevel()->getLevel()->getSoundLevel())
+        args.m_currentFrameId =
+            app->getCurrentXsheet()
+                ->getXsheet()
+                ->getCell(app->getCurrentFrame()->getFrame(), args.m_col)
+                .getFrameId();
       args.m_isGuidedDrawingEnabled = useGuidedDrawing;
+      args.m_guidedFrontStroke      = guidedFrontStroke;
+      args.m_guidedBackStroke       = guidedBackStroke;
+
+#if defined(x64)
+      if (m_stopMotion->m_alwaysUseLiveViewImages &&
+          m_stopMotion->m_liveViewStatus > 0 &&
+          frame != m_stopMotion->getXSheetFrameNumber() - 1 &&
+          m_hasStopMotionImage && !m_stopMotion->m_reviewTimer->isActive()) {
+        TRaster32P image;
+        bool hasImage = m_stopMotion->loadLiveViewImage(frame, image);
+        if (hasImage) {
+          Stage::Player smPlayer;
+          double dpiX, dpiY;
+          m_stopMotionImage->getDpi(dpiX, dpiY);
+          smPlayer.m_dpiAff    = TScale(Stage::inch / dpiX, Stage::inch / dpiY);
+          smPlayer.m_opacity   = 255;
+          smPlayer.m_sl        = m_stopMotion->m_sl;
+          args.m_liveViewImage = static_cast<TRasterImageP>(image);
+          args.m_liveViewPlayer = smPlayer;
+          // painter.onRasterImage(static_cast<TRasterImageP>(image).getPointer(),
+          //                      smPlayer);
+        }
+      }
+      if (  //! m_stopMotion->m_drawBeneathLevels &&
+          m_stopMotion->m_liveViewStatus == 2 &&
+          (  //! frameHandle->isPlaying() ||
+              frame == m_stopMotion->getXSheetFrameNumber() - 1)) {
+        if (m_hasStopMotionLineUpImage && m_stopMotion->m_showLineUpImage) {
+          Stage::Player smPlayer;
+          double dpiX, dpiY;
+          m_stopMotionLineUpImage->getDpi(dpiX, dpiY);
+          smPlayer.m_dpiAff   = TScale(Stage::inch / dpiX, Stage::inch / dpiY);
+          smPlayer.m_opacity  = 255;
+          smPlayer.m_sl       = m_stopMotion->m_sl;
+          args.m_lineupImage  = m_stopMotionLineUpImage;
+          args.m_lineupPlayer = smPlayer;
+          // painter.onRasterImage(m_stopMotionLineUpImage.getPointer(),
+          // smPlayer);
+        }
+        if (m_hasStopMotionImage) {
+          Stage::Player smPlayer;
+          double dpiX, dpiY;
+          m_stopMotionImage->getDpi(dpiX, dpiY);
+          smPlayer.m_dpiAff = TScale(Stage::inch / dpiX, Stage::inch / dpiY);
+          bool hide_opacity = false;
+#ifdef WITH_CANON
+          hide_opacity = m_stopMotion->m_canon->m_zooming ||
+                         m_stopMotion->m_canon->m_pickLiveViewZoom ||
+                         !m_hasStopMotionLineUpImage;
+#endif
+          smPlayer.m_opacity =
+              hide_opacity ? 255.0 : m_stopMotion->getOpacity();
+          smPlayer.m_sl         = m_stopMotion->m_sl;
+          args.m_liveViewImage  = m_stopMotionImage;
+          args.m_liveViewPlayer = smPlayer;
+          // painter.onRasterImage(m_stopMotionImage.getPointer(), smPlayer);
+        }
+      }
+#endif  // x64
       Stage::visit(painter, args);
     }
 
@@ -1636,7 +2152,7 @@ double SceneViewer::projectToZ(const TPointD &delta) {
   GLint viewport[4];
   double modelview[16], projection[16];
   glGetIntegerv(GL_VIEWPORT, viewport);
-  for (int i      = 0; i < 16; i++)
+  for (int i = 0; i < 16; i++)
     projection[i] = (double)m_projectionMatrix.constData()[i];
   glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
 
@@ -1798,8 +2314,9 @@ void SceneViewer::zoomQt(bool forward, bool reset) {
     if (reset || ((m_zoomScale3D < 500 || !forward) &&
                   (m_zoomScale3D > 0.01 || forward))) {
       double oldZoomScale = m_zoomScale3D;
-      m_zoomScale3D       = reset ? 1 : ImageUtils::getQuantizedZoomFactor(
-                                      m_zoomScale3D, forward);
+      m_zoomScale3D =
+          reset ? 1
+                : ImageUtils::getQuantizedZoomFactor(m_zoomScale3D, forward);
 
       m_pan3D = -(m_zoomScale3D / oldZoomScale) * -m_pan3D;
     }
@@ -1820,17 +2337,18 @@ void SceneViewer::zoomQt(bool forward, bool reset) {
     int i;
 
     for (i = 0; i < 2; i++) {
-      TAffine &viewAff          = m_viewAff[i];
+      TAffine &viewAff = m_viewAff[i];
       if (m_isFlippedX) viewAff = viewAff * TScale(-1, 1);
       if (m_isFlippedX) viewAff = viewAff * TScale(1, -1);
-      double scale2             = abs(viewAff.det());
+      double scale2 = std::abs(viewAff.det());
       if (m_isFlippedX) viewAff = viewAff * TScale(-1, 1);
       if (m_isFlippedX) viewAff = viewAff * TScale(1, -1);
       if (reset || ((scale2 < 100000 || !forward) &&
                     (scale2 > 0.001 * 0.05 || forward))) {
         double oldZoomScale = sqrt(scale2) * dpiFactor;
-        double zoomScale    = reset ? 1 : ImageUtils::getQuantizedZoomFactor(
-                                           oldZoomScale, forward);
+        double zoomScale =
+            reset ? 1
+                  : ImageUtils::getQuantizedZoomFactor(oldZoomScale, forward);
 
         // threshold value -0.001 is intended to absorb the error of calculation
         if ((oldZoomScale - zoomScaleFittingWithScreen) *
@@ -1888,17 +2406,27 @@ double SceneViewer::getDpiFactor() {
   // If the option "ActualPixelViewOnSceneEditingMode" is ON,
   // use  current level's DPI set in the level settings.
   else if (Preferences::instance()
-               ->isActualPixelViewOnSceneEditingModeEnabled() &&
-           !CleanupPreviewCheck::instance()->isEnabled() &&
-           !CameraTestCheck::instance()->isEnabled()) {
-    TXshSimpleLevel *sl;
-    sl = TApp::instance()->getCurrentLevel()->getSimpleLevel();
-    if (!sl) return Stage::inch / cameraDpi;
-    if (sl->getType() == PLI_XSHLEVEL) return Stage::inch / cameraDpi;
-    if (sl->getDpi() == TPointD()) return Stage::inch / cameraDpi;
-    // use default value for the argument of getDpi() (=TFrameId::NO_FRAME）
-    // so that the dpi of the first frame in the level will be returned.
-    return Stage::inch / sl->getDpi().x;
+               ->isActualPixelViewOnSceneEditingModeEnabled()) {
+    if (CleanupPreviewCheck::instance()->isEnabled() ||
+        CameraTestCheck::instance()->isEnabled()) {
+      double cleanupCameraDpi = TApp::instance()
+                                    ->getCurrentScene()
+                                    ->getScene()
+                                    ->getProperties()
+                                    ->getCleanupParameters()
+                                    ->m_camera.getDpi()
+                                    .x;
+      return Stage::inch / cleanupCameraDpi;
+    } else {
+      TXshSimpleLevel *sl;
+      sl = TApp::instance()->getCurrentLevel()->getSimpleLevel();
+      if (!sl) return Stage::inch / cameraDpi;
+      if (sl->getType() == PLI_XSHLEVEL) return Stage::inch / cameraDpi;
+      if (sl->getDpi() == TPointD()) return Stage::inch / cameraDpi;
+      // use default value for the argument of getDpi() (=TFrameId::NO_FRAME）
+      // so that the dpi of the first frame in the level will be returned.
+      return Stage::inch / sl->getDpi().x;
+    }
   }
   // When the scene editing mode without any option, use the camera dpi
   else {
@@ -1972,16 +2500,18 @@ void SceneViewer::zoomQt(const QPoint &center, double factor) {
       TAffine &viewAff = m_viewAff[i];
       double scale2    = fabs(viewAff.det());
       if ((scale2 < 100000 || factor < 1) &&
-          (scale2 > 0.001 * 0.05 || factor > 1))
-        if (i == m_viewMode)
+          (scale2 > 0.001 * 0.05 || factor > 1)) {
+        if (i == m_viewMode) {
           // viewAff = TTranslation(delta) * TScale(factor) *
           // TTranslation(-delta) * viewAff;
           setViewMatrix(TTranslation(delta) * TScale(factor) *
                             TTranslation(-delta) * viewAff,
                         i);
-        else
+        } else {
           // viewAff = TScale(factor) * viewAff;
           setViewMatrix(TScale(factor) * viewAff, i);
+        }
+      }
     }
   }
 
@@ -1996,21 +2526,57 @@ void SceneViewer::zoom(const TPointD &center, double factor) {
 //-----------------------------------------------------------------------------
 
 void SceneViewer::flipX() {
-  m_viewAff[0] = m_viewAff[0] * TScale(-1, 1);
-  m_viewAff[1] = m_viewAff[1] * TScale(-1, 1);
+  double flipAngle0 = (m_rotationAngle[0] * -1) * 2;
+  double flipAngle1 = (m_rotationAngle[1] * -1) * 2;
+  m_rotationAngle[0] += flipAngle0;
+  m_rotationAngle[1] += flipAngle1;
+  if (m_isFlippedX != m_isFlippedY) {
+    flipAngle0 = -flipAngle0;
+    flipAngle1 = -flipAngle1;
+  }
+  m_viewAff[0] = m_viewAff[0] * TRotation(flipAngle0) * TScale(-1, 1);
+  m_viewAff[1] = m_viewAff[1] * TRotation(flipAngle1) * TScale(-1, 1);
+  m_viewAff[0].a13 *= -1;
+  m_viewAff[1].a13 *= -1;
   m_isFlippedX = !m_isFlippedX;
   invalidateAll();
   emit onZoomChanged();
+  emit onFlipHChanged(m_isFlippedX);
 }
 
 //-----------------------------------------------------------------------------
 
 void SceneViewer::flipY() {
-  m_viewAff[0] = m_viewAff[0] * TScale(1, -1);
-  m_viewAff[1] = m_viewAff[1] * TScale(1, -1);
+  double flipAngle0 = (m_rotationAngle[0] * -1) * 2;
+  double flipAngle1 = (m_rotationAngle[1] * -1) * 2;
+  m_rotationAngle[0] += flipAngle0;
+  m_rotationAngle[1] += flipAngle1;
+  if (m_isFlippedX != m_isFlippedY) {
+    flipAngle0 = -flipAngle0;
+    flipAngle1 = -flipAngle1;
+  }
+  m_viewAff[0] = m_viewAff[0] * TRotation(flipAngle0) * TScale(1, -1);
+  m_viewAff[1] = m_viewAff[1] * TRotation(flipAngle1) * TScale(1, -1);
+  m_viewAff[0].a23 *= -1;
+  m_viewAff[1].a23 *= -1;
   m_isFlippedY = !m_isFlippedY;
   invalidateAll();
   emit onZoomChanged();
+  emit onFlipVChanged(m_isFlippedY);
+}
+
+//-----------------------------------------------------------------------------
+
+void SceneViewer::zoomIn() {
+  m_lastMousePos = rect().center();
+  zoomQt(true, false);
+}
+
+//-----------------------------------------------------------------------------
+
+void SceneViewer::zoomOut() {
+  m_lastMousePos = rect().center();
+  zoomQt(false, false);
 }
 
 //-----------------------------------------------------------------------------
@@ -2018,7 +2584,8 @@ void SceneViewer::flipY() {
 void SceneViewer::rotate(const TPointD &center, double angle) {
   if (angle == 0) return;
   if (m_isFlippedX != m_isFlippedY) angle = -angle;
-  TPointD realCenter                      = m_viewAff[m_viewMode] * center;
+  m_rotationAngle[m_viewMode] += angle;
+  TPointD realCenter = m_viewAff[m_viewMode] * center;
   setViewMatrix(TRotation(realCenter, angle) * m_viewAff[m_viewMode],
                 m_viewMode);
   invalidateAll();
@@ -2064,6 +2631,9 @@ void SceneViewer::fitToCamera() {
   bool tempIsFlippedY = m_isFlippedY;
   resetSceneViewer();
 
+  m_isFlippedX = tempIsFlippedX;
+  m_isFlippedY = tempIsFlippedY;
+
   TXsheet *xsh            = TApp::instance()->getCurrentXsheet()->getXsheet();
   int frame               = TApp::instance()->getCurrentFrame()->getFrame();
   TStageObjectId cameraId = xsh->getStageObjectTree()->getCurrentCameraId();
@@ -2081,9 +2651,9 @@ void SceneViewer::fitToCamera() {
   TPointD P11       = cameraAff * cameraRect.getP11();
   TPointD p0        = TPointD(std::min({P00.x, P01.x, P10.x, P11.x}),
                        std::min({P00.y, P01.y, P10.y, P11.y}));
-  TPointD p1 = TPointD(std::max({P00.x, P01.x, P10.x, P11.x}),
+  TPointD p1        = TPointD(std::max({P00.x, P01.x, P10.x, P11.x}),
                        std::max({P00.y, P01.y, P10.y, P11.y}));
-  cameraRect = TRectD(p0.x, p0.y, p1.x, p1.y);
+  cameraRect        = TRectD(p0.x, p0.y, p1.x, p1.y);
 
   // Pan
   if (!is3DView()) {
@@ -2102,6 +2672,49 @@ void SceneViewer::fitToCamera() {
   // Scale and center on the center of \a rect.
   QPoint c = viewRect.center();
   zoom(TPointD(c.x(), c.y()), ratio);
+  emit onFlipHChanged(m_isFlippedX);
+  emit onFlipVChanged(m_isFlippedY);
+}
+
+//-----------------------------------------------------------------------------
+
+void SceneViewer::fitToCameraOutline() {
+  TXsheet *xsh            = TApp::instance()->getCurrentXsheet()->getXsheet();
+  int frame               = TApp::instance()->getCurrentFrame()->getFrame();
+  TStageObjectId cameraId = xsh->getStageObjectTree()->getCurrentCameraId();
+  TStageObject *camera    = xsh->getStageObject(cameraId);
+  TAffine cameraPlacement = camera->getPlacement(frame);
+  double cameraZ          = camera->getZ(frame);
+  TAffine cameraAff =
+      getViewMatrix() * cameraPlacement * TScale((1000 + cameraZ) / 1000);
+
+  QRect viewRect    = rect();
+  TRectD cameraRect = ViewerDraw::getCameraRect();
+  TPointD P00       = cameraAff * cameraRect.getP00();
+  TPointD P10       = cameraAff * cameraRect.getP10();
+  TPointD P01       = cameraAff * cameraRect.getP01();
+  TPointD P11       = cameraAff * cameraRect.getP11();
+  TPointD p0        = TPointD(std::min({P00.x, P01.x, P10.x, P11.x}),
+                       std::min({P00.y, P01.y, P10.y, P11.y}));
+  TPointD p1        = TPointD(std::max({P00.x, P01.x, P10.x, P11.x}),
+                       std::max({P00.y, P01.y, P10.y, P11.y}));
+  cameraRect        = TRectD(p0.x, p0.y, p1.x, p1.y);
+
+  // Pan
+  if (!is3DView()) {
+    TPointD cameraCenter = (cameraRect.getP00() + cameraRect.getP11()) * 0.5;
+    panQt(QPoint(-cameraCenter.x, cameraCenter.y));
+  }
+
+  double xratio = (double)viewRect.width() / cameraRect.getLx();
+  double yratio = (double)viewRect.height() / cameraRect.getLy();
+  double ratio  = std::min(xratio, yratio);
+  if (ratio == 0.0) return;
+
+  // Scale and center on the center of \a rect.
+  QPoint c = viewRect.center();
+  zoom(TPointD(c.x(), c.y()), ratio);
+  zoom(TPointD(c.x(), c.y()), 0.95);
 }
 
 //-----------------------------------------------------------------------------
@@ -2110,8 +2723,10 @@ void SceneViewer::resetSceneViewer() {
   m_visualSettings.m_sceneProperties =
       TApp::instance()->getCurrentScene()->getScene()->getProperties();
 
-  for (int i = 0; i < tArrayCount(m_viewAff); i++)
+  for (int i = 0; i < m_viewAff.size(); ++i) {
     setViewMatrix(getNormalZoomScale(), i);
+    m_rotationAngle[i] = 0.0;
+  }
 
   m_pos         = QPoint(0, 0);
   m_pan3D       = TPointD(0, 0);
@@ -2120,7 +2735,49 @@ void SceneViewer::resetSceneViewer() {
   m_phi3D       = 30;
   m_isFlippedX  = false;
   m_isFlippedY  = false;
+  fitToCameraOutline();
   emit onZoomChanged();
+  emit onFlipHChanged(m_isFlippedX);
+  emit onFlipVChanged(m_isFlippedY);
+  invalidateAll();
+}
+
+//-----------------------------------------------------------------------------
+
+void SceneViewer::resetZoom() {
+  TPointD realCenter(m_viewAff[m_viewMode].a13, m_viewAff[m_viewMode].a23);
+  TAffine aff =
+      getNormalZoomScale() * TRotation(realCenter, m_rotationAngle[m_viewMode]);
+  aff.a13 = realCenter.x;
+  aff.a23 = realCenter.y;
+  if (m_isFlippedX) aff = aff * TScale(-1, 1);
+  if (m_isFlippedY) aff = aff * TScale(1, -1);
+  setViewMatrix(aff, m_viewMode);
+  invalidateAll();
+  emit onZoomChanged();
+}
+
+//-----------------------------------------------------------------------------
+
+void SceneViewer::resetRotation() {
+  double reverseRotatation = m_rotationAngle[m_viewMode] * -1;
+  if (m_isFlippedX) reverseRotatation *= -1;
+  if (m_isFlippedY) reverseRotatation *= -1;
+  TTool *tool    = TApp::instance()->getCurrentTool()->getTool();
+  TPointD center = m_viewAff[m_viewMode].inv() * TPointD(0, 0);
+  if (tool->getName() == "T_Rotate" &&
+      tool->getProperties(0)
+              ->getProperty("Rotate On Camera Center")
+              ->getValueAsString() == "1")
+    center = TPointD(0, 0);
+  rotate(center, reverseRotatation);
+}
+
+//-----------------------------------------------------------------------------
+
+void SceneViewer::resetPosition() {
+  m_viewAff[m_viewMode].a13 = 0.0;
+  m_viewAff[m_viewMode].a23 = 0.0;
   invalidateAll();
 }
 
@@ -2149,16 +2806,17 @@ void SceneViewer::setActualPixelSize() {
   } else
     dpi = sl->getDpi(fid);
 
-  const double inch             = Stage::inch;
-  TAffine tempAff               = getNormalZoomScale();
-  if (m_isFlippedX) tempAff     = tempAff * TScale(-1, 1);
-  if (m_isFlippedY) tempAff     = tempAff * TScale(1, -1);
-  TPointD tempScale             = dpi;
+  const double inch = Stage::inch;
+  TAffine tempAff   = getNormalZoomScale();
+  if (m_isFlippedX) tempAff = tempAff * TScale(-1, 1);
+  if (m_isFlippedY) tempAff = tempAff * TScale(1, -1);
+  TPointD tempScale = dpi;
   if (m_isFlippedX) tempScale.x = -tempScale.x;
   if (m_isFlippedY) tempScale.y = -tempScale.y;
-  for (int i = 0; i < tArrayCount(m_viewAff); i++)
-    setViewMatrix(dpi == TPointD(0, 0) ? tempAff : TScale(tempScale.x / inch,
-                                                          tempScale.y / inch),
+  for (int i = 0; i < m_viewAff.size(); ++i)
+    setViewMatrix(dpi == TPointD(0, 0)
+                      ? tempAff
+                      : TScale(tempScale.x / inch, tempScale.y / inch),
                   i);
 
   m_pos         = QPoint(0, 0);
@@ -2189,6 +2847,7 @@ void SceneViewer::onLevelChanged() {
  * for Ink&Paint work properly
  */
 void SceneViewer::onLevelSwitched() {
+  invalidateToolStatus();
   TApp *app        = TApp::instance();
   TTool *tool      = app->getCurrentTool()->getTool();
   TXshLevel *level = app->getCurrentLevel()->getLevel();
@@ -2261,8 +2920,8 @@ int SceneViewer::pick(const TPointD &point) {
   assert(glGetError() == GL_NO_ERROR);
   GLint viewport[4];
   glGetIntegerv(GL_VIEWPORT, viewport);
-  GLuint selectBuffer[512];
-  glSelectBuffer(tArrayCount(selectBuffer), selectBuffer);
+  std::array<GLuint, 512> selectBuffer;
+  glSelectBuffer(selectBuffer.size(), selectBuffer.data());
   glRenderMode(GL_SELECT);
 
   // definisco la matrice di proiezione
@@ -2321,7 +2980,7 @@ int SceneViewer::pick(const TPointD &point) {
   // conto gli hits
   int ret      = -1;
   int hitCount = glRenderMode(GL_RENDER);
-  GLuint *p    = selectBuffer;
+  GLuint *p    = selectBuffer.data();
   for (int i = 0; i < hitCount; ++i) {
     GLuint nameCount = *p++;
     GLuint zmin      = *p++;
@@ -2360,8 +3019,9 @@ void SceneViewer::posToColumnIndexes(const TPointD &p,
   OnionSkinMask osm      = app->getCurrentOnionSkin()->getOnionSkinMask();
 
   TPointD pos = TPointD(p.x - width() / 2, p.y - height() / 2);
-  Stage::Picker picker(getViewMatrix(), pos, m_visualSettings);
-  picker.setDistance(distance);
+  Stage::Picker picker(getViewMatrix(), pos, m_visualSettings,
+                       getDevPixRatio());
+  picker.setMinimumDistance(distance);
 
   TXshSimpleLevel::m_rasterizePli = 0;
 
@@ -2399,8 +3059,9 @@ int SceneViewer::posToRow(const TPointD &p, double distance,
   OnionSkinMask osm   = app->getCurrentOnionSkin()->getOnionSkinMask();
 
   TPointD pos = TPointD(p.x - width() / 2, p.y - height() / 2);
-  Stage::Picker picker(getViewMatrix(), pos, m_visualSettings);
-  picker.setDistance(distance);
+  Stage::Picker picker(getViewMatrix(), pos, m_visualSettings,
+                       getDevPixRatio());
+  picker.setMinimumDistance(distance);
 
   if (app->getCurrentFrame()->isEditingLevel()) {
     Stage::visit(picker, app->getCurrentLevel()->getLevel(),
@@ -2440,7 +3101,7 @@ void drawSpline(const TAffine &viewMatrix, const TRect &clipRect, bool camera3d,
 
   TStageObject *pegbar =
       objId != TStageObjectId::NoneId ? xsh->getStageObject(objId) : 0;
-  const TStroke *stroke                     = 0;
+  const TStroke *stroke = 0;
   if (pegbar && pegbar->getSpline()) stroke = pegbar->getSpline()->getStroke();
   if (!stroke) return;
 
@@ -2626,6 +3287,8 @@ void SceneViewer::onContextAboutToBeDestroyed() {
   makeCurrent();
   m_lutCalibrator->cleanup();
   doneCurrent();
+  disconnect(context(), SIGNAL(aboutToBeDestroyed()), this,
+             SLOT(onContextAboutToBeDestroyed()));
 }
 
 //-----------------------------------------------------------------------------

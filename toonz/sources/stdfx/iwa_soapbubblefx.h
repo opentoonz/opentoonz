@@ -32,7 +32,7 @@ protected:
   TDoubleParamP m_center_opacity;
   TBoolParamP m_fit_thickness;
 
-  // obsolete parameter. to be conerted to m_center_opacity
+  // obsolete parameter. to be converted to m_center_opacity
   TBoolParamP m_mask_center;
 
   // noise parameters

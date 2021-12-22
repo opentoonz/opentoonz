@@ -60,8 +60,11 @@ TOfflineGL *currentOfflineGL = 0;
 // Utility functions
 //=============================================================================
 namespace {
-
-const VersionNumber l_currentVersion(71, 0);
+// tentatively update the scene file version from 71.0 to 71.1 in order to
+// manage PNG level settings
+const VersionNumber l_currentVersion(71, 1);
+// TODO: Revise VersionNumber with OT version (converting 71.0 -> 14.0 , 71.1
+// -> 15.0)
 
 //-----------------------------------------------------------------------------
 
@@ -169,71 +172,33 @@ void deleteUntitledScene(const TFilePath &fp) {
 }
 
 //-----------------------------------------------------------------------------
-/*-- TODO: オプション化して復活させるか、検討のこと --*/
-/*
-void saveBackup(const TFilePath &fp)
-{
-  if(!TFileStatus(fp).doesExist()) return;
-        wstring sceneName = fp.getWideName();
-  TFilePath bckDir = fp.getParentDir() + "backups" + sceneName;
-  if(!TFileStatus(bckDir).doesExist())
-  {
-    try {TSystem::mkDir(bckDir);}
-    catch(...) {return;}
-  }
 
-  std::map<int, TFilePath> oldBackups;
-  TFilePathSet lst = TSystem::readDirectory(bckDir);
-  for(TFilePathSet::iterator it = lst.begin(); it != lst.end(); ++it)
-  {
-    TFilePath fp2 = *it;
-    if(fp2.getType() != "tnz" && fp2.getType() != "tab") continue;
-    wstring name = fp2.getWideName();
-    if(name.find_first_of(L"0123456789") == wstring::npos) continue;
-                int i = name.find(sceneName);
-                if(i != wstring::npos)
-                        name = name.substr(sceneName.size()+1);
-    if(name == L"" || name.find_first_not_of(L"0123456789") != wstring::npos)
-      continue;
-    int index = toInt(name);
-    assert(0<index);
-    assert(oldBackups.count(index)==0);
-    oldBackups[index] = fp2;
-  }
-
-  int m = 3;
-  if((int)oldBackups.size()>m)
-  {
-    std::map<int, TFilePath>::iterator it = oldBackups.begin();
-    for(int i=0;i+m<(int)oldBackups.size();i++)
-    {
-      assert(it != oldBackups.end());
-      TFilePath toKill = it->second;
-      try {TSystem::deleteFile(toKill); } catch(...) {}
-      ++it;
+static void saveBackup(TFilePath path) {
+  int totalBackups = Preferences::instance()->getBackupKeepCount();
+  totalBackups -= 1;
+  TFilePath backup = path.withType(path.getType() + ".bak");
+  TFilePath prevBackup =
+      path.withType(path.getType() + ".bak" + std::to_string(totalBackups));
+  while (--totalBackups >= 0) {
+    std::string bakExt =
+        ".bak" + (totalBackups > 0 ? std::to_string(totalBackups) : "");
+    backup = path.withType(path.getType() + bakExt);
+    if (TSystem::doesExistFileOrLevel(backup)) {
+      try {
+        TSystem::copyFileOrLevel_throw(prevBackup, backup);
+      } catch (...) {
+      }
     }
+    prevBackup = backup;
   }
 
-  TFilePath bckFp;
-  if(oldBackups.empty())
-  {
-    if(fp.getType() == "tnz")
-      bckFp = bckDir + TFilePath(sceneName + L"_1.tnz");
-    else if(fp.getType() == "tab")
-      bckFp = bckDir + TFilePath(sceneName + L"_1.tab");
+  try {
+    if (TSystem::doesExistFileOrLevel(backup))
+      TSystem::removeFileOrLevel_throw(backup);
+    TSystem::copyFileOrLevel_throw(backup, path);
+  } catch (...) {
   }
-  else
-  {
-    int id = oldBackups.rbegin()->first + 1;
-    if(fp.getType() == "tnz")
-      bckFp = bckDir + TFilePath(sceneName + L"_" + ::to_wstring(id) + L".tnz");
-    else if(fp.getType() == "tab")
-      bckFp = bckDir + TFilePath(sceneName + L"_" + ::to_wstring(id) + L".tab");
-  }
-
-  TSystem::renameFile(bckFp, fp);
 }
-*/
 
 //-----------------------------------------------------------------------------
 
@@ -311,7 +276,8 @@ static void deleteAllUntitledScenes() {
 //=============================================================================
 // ToonzScene
 
-ToonzScene::ToonzScene() : m_contentHistory(0), m_isUntitled(true) {
+ToonzScene::ToonzScene()
+    : m_contentHistory(0), m_isUntitled(true), m_isLoading(false) {
   m_childStack = new ChildStack(this);
   m_properties = new TSceneProperties();
   m_levelSet   = new TLevelSet();
@@ -383,12 +349,16 @@ bool ToonzScene::isUntitled() const {
 //-----------------------------------------------------------------------------
 
 void ToonzScene::load(const TFilePath &path, bool withProgressDialog) {
-  loadNoResources(path);              // This loads a version number ..
-  loadResources(withProgressDialog);  // .. this uses the version number ..
-
-  setVersionNumber(
-      VersionNumber());  // .. but scene instances in memory do not retain
-}  // a version number beyond resource loading
+  setIsLoading(true);
+  try {
+    loadNoResources(path);
+    loadResources(withProgressDialog);
+  } catch (...) {
+    setIsLoading(false);
+    throw;
+  }
+  setIsLoading(false);
+}
 
 //-----------------------------------------------------------------------------
 
@@ -494,7 +464,9 @@ void ToonzScene::loadTnzFile(const TFilePath &fp) {
       while (is.matchTag(tagName)) {
         if (tagName == "generator") {
           std::string program = is.getString();
-          reading22           = program.find("2.2") != std::string::npos;
+          // TODO: This obsolete condition should be removed before releasing OT
+          // v2.2 !
+          reading22 = program.find("2.2") != std::string::npos;
         } else if (tagName == "properties")
           m_properties->loadData(is, false);
         else if (tagName == "palette")  // per compatibilita' beta1
@@ -635,7 +607,9 @@ void ToonzScene::save(const TFilePath &fp, TXsheet *subxsh) {
   TFilePath scenePathTemp(scenePath.getWideString() +
                           QString(".tmp").toStdWString());
 
-  // if(TFileStatus(scenePath).doesExist()) saveBackup(scenePath);
+  if (Preferences::instance()->isBackupEnabled() &&
+      oldScenePath == newScenePath && TFileStatus(scenePath).doesExist())
+    saveBackup(scenePath);
 
   if (TFileStatus(scenePathTemp).doesExist())
     TSystem::removeFileOrLevel(scenePathTemp);
@@ -651,7 +625,7 @@ void ToonzScene::save(const TFilePath &fp, TXsheet *subxsh) {
     if (!os.checkStatus())
       throw TException("Could not open temporary save file");
 
-    TXsheet *xsh      = subxsh;
+    TXsheet *xsh = subxsh;
     if (xsh == 0) xsh = m_childStack->getTopXsheet();
 
     std::map<std::string, std::string> attr;
@@ -721,6 +695,8 @@ void ToonzScene::save(const TFilePath &fp, TXsheet *subxsh) {
   } else {
     if (wasUntitled) deleteUntitledScene(oldScenePath.getParentDir());
   }
+  // update the last saved version
+  setVersionNumber(l_currentVersion);
 }
 
 //-----------------------------------------------------------------------------
@@ -909,7 +885,7 @@ TXshLevel *ToonzScene::createNewLevel(int type, std::wstring levelName,
       /*-- LevelSetの中に同じファイルパスのLevelがあるかをチェック --*/
       if (type != CHILD_XSHLEVEL && type != PLT_XSHLEVEL) {
         if (fp.isEmpty()) fp = getDefaultLevelPath(type, levelName);
-        TFilePath actualFp   = decodeFilePath(fp);
+        TFilePath actualFp = decodeFilePath(fp);
 
         if (TSystem::doesExistFileOrLevel(
                 actualFp))  // if(TFileStatus(actualFp).doesExist()) continue;
@@ -964,46 +940,8 @@ TXshLevel *ToonzScene::createNewLevel(int type, std::wstring levelName,
     sl->setPath(fp);
     sl->setDirtyFlag(true);
 
-    if (type == TZP_XSHLEVEL || type == PLI_XSHLEVEL)
-      sl->setPalette(new TPalette());
-
-    if (type == OVL_XSHLEVEL)
-      sl->setPalette(FullColorPalette::instance()->getPalette(this));
-
-    TPalette *palette = sl->getPalette();
-    if (palette && type != OVL_XSHLEVEL) {
-      palette->setPaletteName(sl->getName());
-      palette->setDirtyFlag(true);
-    }
-
-    if (type == TZP_XSHLEVEL || type == OVL_XSHLEVEL) {
-      double dpiY = dpi;
-      sl->getProperties()->setDpiPolicy(LevelProperties::DP_ImageDpi);
-      if (dim == TDimension()) {
-        double w, h;
-        Preferences *pref = Preferences::instance();
-        if (pref->isNewLevelSizeToCameraSizeEnabled()) {
-          TDimensionD camSize = getCurrentCamera()->getSize();
-          w                   = camSize.lx;
-          h                   = camSize.ly;
-          sl->getProperties()->setDpiPolicy(LevelProperties::DP_CustomDpi);
-          dpi  = getCurrentCamera()->getDpi().x;
-          dpiY = getCurrentCamera()->getDpi().y;
-        } else {
-          w    = pref->getDefLevelWidth();
-          h    = pref->getDefLevelHeight();
-          dpi  = pref->getDefLevelDpi();
-          dpiY = dpi;
-        }
-
-        sl->getProperties()->setImageRes(
-            TDimension(tround(w * dpi), tround(h * dpiY)));
-      } else
-        sl->getProperties()->setImageRes(dim);
-
-      sl->getProperties()->setImageDpi(TPointD(dpi, dpiY));
-      sl->getProperties()->setDpi(dpi);
-    }
+    sl->initializePalette();
+    sl->initializeResolutionAndDpi();
 
     xl = sl;
   }
@@ -1078,6 +1016,8 @@ static LevelType getLevelType(const TFilePath &fp) {
   case TFileType::MESH_IMAGE:
   case TFileType::MESH_LEVEL:
     ret.m_ltype = MESH_XSHLEVEL;
+    break;
+  default:
     break;
   }
 
@@ -1197,7 +1137,7 @@ TXshLevel *ToonzScene::loadLevel(const TFilePath &actualPath,
   }
 
   NameModifier nm(levelName);
-  levelName                                         = nm.getNext();
+  levelName = nm.getNext();
   while (m_levelSet->hasLevel(levelName)) levelName = nm.getNext();
 
   // Discriminate sound levels
@@ -1247,7 +1187,7 @@ TXshLevel *ToonzScene::loadLevel(const TFilePath &actualPath,
       const Preferences &prefs = *Preferences::instance();
       int formatIdx            = prefs.matchLevelFormat(
           levelPath);  // Should I use actualPath here? It's mostly
-                       // irrelevant anyway, it's for old tzp/tzu...
+                                  // irrelevant anyway, it's for old tzp/tzu...
       if (formatIdx >= 0)
         lp->options() = prefs.levelFormat(formatIdx).m_options;
       else {
@@ -1290,7 +1230,7 @@ TXshLevel *ToonzScene::loadLevel(const TFilePath &actualPath,
 
 TFilePath ToonzScene::decodeFilePath(const TFilePath &path) const {
   TProject *project   = getProject();
-  bool projectIsEmpty = false;
+  bool projectIsEmpty = project->getFolderCount() ? false : true;
   TFilePath fp        = path;
 
   std::wstring head;
@@ -1319,8 +1259,8 @@ TFilePath ToonzScene::decodeFilePath(const TFilePath &path) const {
           return dir + tail;
       }
       if (project) {
-        h                       = ::to_string(head.substr(1));
-        TFilePath f             = project->getFolder(h);
+        h           = ::to_string(head.substr(1));
+        TFilePath f = project->getFolder(h);
         if (f != TFilePath()) s = f.getWideString();
       }
     }
@@ -1452,9 +1392,8 @@ TFilePath ToonzScene::getDefaultLevelPath(int levelType,
     levelPath = TFilePath(levelName + L"..png");
   }
 
-  if (!isUntitled() &&
-      Preferences::instance()->getPathAliasPriority() ==
-          Preferences::SceneFolderAlias)
+  if (!isUntitled() && Preferences::instance()->getPathAliasPriority() ==
+                           Preferences::SceneFolderAlias)
     return TFilePath("$scenefolder") + levelPath;
 
   std::string folderName = getFolderName(levelType);

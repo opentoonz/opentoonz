@@ -6,6 +6,7 @@
 // TnzQt includes
 #include "toonzqt/dvdialog.h"
 #include "toonzqt/selection.h"
+#include "saveloadqsettings.h"
 
 // Qt includes
 #include <QScrollArea>
@@ -48,6 +49,10 @@ public:
 #endif
   ~FilmstripFrames();
 
+  bool m_isVertical    = true;
+  bool m_showNavigator = true;
+  bool m_showComboBox  = true;
+
   void setBGColor(const QColor &color) { m_bgColor = color; }
   QColor getBGColor() const { return m_bgColor; }
   void setLightLineColor(const QColor &color) { m_lightLineColor = color; }
@@ -65,6 +70,10 @@ public:
   int y2index(int y) const;
   int index2y(int index) const;
 
+  // convert mouse coordinate x to a frame index and vice versa
+  int x2index(int x) const;
+  int index2x(int index) const;
+
   // returns the frame id of the provided index if index >= 0
   // otherwise returns TFrameId()
   TFrameId index2fid(int index) const;
@@ -75,6 +84,9 @@ public:
   // returns the height of all frames plus a blank one
   int getFramesHeight() const;
 
+  // returns the width of all frames plus a blank one
+  int getFramesWidth() const;
+
   // aggiorna le dimensioni del QWidget in base al numero di fotogrammi del
   // livello
   // la dimensione verticale e' sempre >= minimumHeight. Questo permette di
@@ -83,6 +95,7 @@ public:
   // se minimumHeight == -1 viene utilizzato
   // visibleRegion().boundingRect().bottom()
   void updateContentHeight(int minimumHeight = -1);
+  void updateContentWidth(int minimumHeight = -1);
 
   // makes sure that the indexed frame is visible (scrolling if necessary)
   void showFrame(int index);
@@ -92,7 +105,7 @@ public:
   // lo scroll e' illimitato verso il basso. aggiorna contentHeight
   void scroll(int dy);
 
-  // overriden from TSelection::View
+  // overridden from TSelection::View
   void onSelectionChanged() override { update(); }
 
   enum SelectionMode {
@@ -106,6 +119,16 @@ public:
   void select(int index, SelectionMode mode = SIMPLE_SELECT);
 
   int getOneFrameHeight();
+  int getOneFrameWidth();
+  void setOrientation(bool isVertical);
+  void setNavigator(bool showNavigator);
+  void setComboBox(bool showComboBox);
+
+signals:
+  void orientationToggledSignal(bool);
+  void comboBoxToggledSignal();
+  void navigatorToggledSignal();
+  void levelSelectedSignal(int);
 
 protected:
   void showEvent(QShowEvent *) override;
@@ -131,11 +154,10 @@ protected:
   void stopAutoPanning();
   void timerEvent(QTimerEvent *) override;
   TFrameId getCurrentFrameId();
-  void getViewer();
   void contextMenuEvent(QContextMenuEvent *event) override;
 
   void startDragDrop();
-
+  void createSelectLevelMenu(QMenu *menu);
   void inbetween();
 
   void execNavigatorPan(const QPoint &point);
@@ -145,6 +167,12 @@ protected slots:
   void onLevelChanged();
   void onLevelSwitched(TXshLevel *);
   void onFrameSwitched();
+  void getViewer();
+  void orientationToggled(bool);
+  void comboBoxToggled(bool);
+  void navigatorToggled(bool);
+  void levelSelected(int);
+  void onViewerAboutToBeDestroyed();
 
 private:
   // QSS Properties
@@ -166,7 +194,6 @@ private:
   FilmstripFrameHeadGadget *m_frameHeadGadget;
   InbetweenDialog *m_inbetweenDialog;
   SceneViewer *m_viewer;
-  bool m_isGhibli              = false;
   bool m_justStartedSelection  = false;
   int m_indexForResetSelection = -1;
   bool m_allowResetSelection   = false;
@@ -197,7 +224,7 @@ private:
 // Filmstrip
 //-----------------------------------------------------------------------------
 
-class Filmstrip final : public QWidget {
+class Filmstrip final : public QWidget, public SaveLoadQSettings {
   Q_OBJECT
 
   FilmstripFrames *m_frames;
@@ -207,6 +234,9 @@ class Filmstrip final : public QWidget {
 
   std::vector<TXshSimpleLevel *> m_levels;
   std::map<TXshSimpleLevel *, TFrameId> m_workingFrames;
+  bool m_isVertical    = true;
+  bool m_showNavigator = true;
+  bool m_showComboBox  = true;
 
 public:
 #if QT_VERSION >= 0x050500
@@ -216,7 +246,12 @@ public:
 #endif
   ~Filmstrip();
 
+  // SaveLoadQSettings
+  virtual void save(QSettings &settings) const override;
+  virtual void load(QSettings &settings) override;
+
 protected:
+  void setOrientation(bool isVertical);
   void showEvent(QShowEvent *) override;
   void hideEvent(QHideEvent *) override;
   void resizeEvent(QResizeEvent *) override;
@@ -238,6 +273,9 @@ public slots:
   void onChooseLevelComboChanged(int index);
 
   void onFrameSwitched();
+  void orientationToggled(bool);
+  void comboBoxToggled();
+  void navigatorToggled();
 
 private:
   void updateWindowTitle();

@@ -43,7 +43,7 @@
     </message>
     <message>
         <source>Malformed frame name</source>
-        <translation>Nombre de fotograma malformado</translation>
+        <translation type="vanished">Nombre de fotograma malformado</translation>
     </message>
 </context>
 <context>

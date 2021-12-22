@@ -609,6 +609,12 @@ public:
   void writeLine32rle(char *buffer);
 
   void writeLine(char *buffer) override { (this->*m_writeLineProc)(buffer); }
+
+  // m_header.ImagePixelSize is set to "Bits Per Pixel" property value
+  // in the function open()
+  bool writeAlphaSupported() const override {
+    return m_header.ImagePixelSize == 32;
+  }
 };
 
 //------------------------------------------------------------

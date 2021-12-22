@@ -177,7 +177,8 @@ TVectorImageP VectorizerCore::centerlineVectorize(
       converter.setPalette(palette);
 
       QList<int> dummy;
-      if (ti = converter.makeTlv(true, dummy))  // Transparent synthetic inks
+      ti = converter.makeTlv(true, dummy);
+      if (ti)  // Transparent synthetic inks
       {
         image = ti;
         ras   = ti->getRaster();

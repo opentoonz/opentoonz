@@ -31,10 +31,9 @@ public slots:
 
   void enterVectorImageGroup();
   void exitVectorImageGroup();
-  void setGuidedDrawingOff();
-  void setGuidedDrawingClosest();
-  void setGuidedDrawingFarthest();
-  void setGuidedDrawingAll();
+  void setGuidedDrawingType(QAction *);
+  void setGuidedAutoInbetween();
+  void setGuidedInterpolationState(QAction *);
 
   void onShowHide();
   void onSetCurrent();

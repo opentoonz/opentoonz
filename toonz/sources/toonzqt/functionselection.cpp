@@ -444,6 +444,11 @@ void FunctionSelection::enableCommands() {
   enableCommand(this, "MI_Cut", &FunctionSelection::doCut);
   enableCommand(this, "MI_Clear", &FunctionSelection::doDelete);
   enableCommand(this, "MI_Insert", &FunctionSelection::insertCells);
+
+  enableCommand(this, "MI_ResetStep", &FunctionSelection::setStep1);
+  enableCommand(this, "MI_Step2", &FunctionSelection::setStep2);
+  enableCommand(this, "MI_Step3", &FunctionSelection::setStep3);
+  enableCommand(this, "MI_Step4", &FunctionSelection::setStep4);
 }
 void FunctionSelection::doCopy() {
   if (isEmpty()) return;
@@ -516,12 +521,12 @@ void FunctionSelection::doCut() {
 
   KeyframesMoveUndo *moveUndo = new KeyframesMoveUndo();
   for (int i = 0; i < m_selectedKeyframes.size(); i++) {
-    TDoubleParam *curve       = m_selectedKeyframes[i].first;
-    QSet<int> &kk             = m_selectedKeyframes[i].second;
-    double delta              = 0;
+    TDoubleParam *curve = m_selectedKeyframes[i].first;
+    QSet<int> &kk       = m_selectedKeyframes[i].second;
+    double delta        = 0;
     if (cellsSelection) delta = -m_selectedCells.height();
-    int n                     = curve ? curve->getKeyframeCount() : 0;
-    int j                     = 0;
+    int n = curve ? curve->getKeyframeCount() : 0;
+    int j = 0;
     for (int i = 0; i < n; i++) {
       if (kk.contains(i)) {
         if (i + 1 < n && kk.contains(i + 1) && !cellsSelection)
@@ -585,6 +590,125 @@ void FunctionSelection::insertCells() {
   TUndoManager::manager()->add(undo);
 }
 
+void FunctionSelection::setStep(int step, bool inclusive) {
+  if (isEmpty()) return;
+  TUndoManager::manager()->beginBlock();
+
+  int row = getSelectedCells().top();
+  for (const auto &col : m_selectedKeyframes) {
+    TDoubleParam *curve = col.first;
+    // need to have at least one segment
+    if (!curve || curve->getKeyframeCount() <= 1) continue;
+
+    // consider the keyframe just before the top row of the selected cells
+    if (inclusive) {
+      int topIndex = curve->getPrevKeyframe(row);
+      if (topIndex != -1 && topIndex != curve->getKeyframeCount() - 1 &&
+          !col.second.contains(topIndex))
+        KeyframeSetter(curve, topIndex).setStep(step);
+    }
+
+    for (const int &kIndex : col.second) {
+      // ignore the last key
+      if (kIndex == curve->getKeyframeCount() - 1) continue;
+      KeyframeSetter(curve, kIndex).setStep(step);
+    }
+  }
+
+  TUndoManager::manager()->endBlock();
+}
+
+int FunctionSelection::getCommonStep(bool inclusive) {
+  if (isEmpty()) return -1;
+
+  int step = -1;
+  int row  = getSelectedCells().top();
+  for (const auto &col : m_selectedKeyframes) {
+    TDoubleParam *curve = col.first;
+    // need to have at least one segment
+    if (!curve || curve->getKeyframeCount() <= 1) continue;
+
+    // consider the keyframe just before the top row of the selected cells
+    if (inclusive) {
+      int topIndex = curve->getPrevKeyframe(row);
+      if (topIndex != -1 && topIndex != curve->getKeyframeCount() - 1 &&
+          !col.second.contains(topIndex))
+        step = curve->getKeyframe(topIndex).m_step;
+    }
+
+    for (const int &kIndex : col.second) {
+      // ignore the last key
+      if (kIndex == curve->getKeyframeCount() - 1) continue;
+      int tmpStep = curve->getKeyframe(kIndex).m_step;
+      if (step == -1)
+        step = tmpStep;
+      else if (step != tmpStep)
+        return 0;
+    }
+  }
+  return step;
+}
+
+void FunctionSelection::setSegmentType(TDoubleKeyframe::Type type,
+                                       bool inclusive) {
+  if (isEmpty()) return;
+  TUndoManager::manager()->beginBlock();
+
+  int row = getSelectedCells().top();
+  for (const auto &col : m_selectedKeyframes) {
+    TDoubleParam *curve = col.first;
+    // need to have at least one segment
+    if (!curve || curve->getKeyframeCount() <= 1) continue;
+
+    // consider the keyframe just before the top row of the selected cells
+    if (inclusive) {
+      int topIndex = curve->getPrevKeyframe(row);
+      if (topIndex != -1 && topIndex != curve->getKeyframeCount() - 1 &&
+          !col.second.contains(topIndex))
+        KeyframeSetter(curve, topIndex).setType(type);
+    }
+
+    for (const int &kIndex : col.second) {
+      // ignore the last key
+      if (kIndex == curve->getKeyframeCount() - 1) continue;
+      KeyframeSetter(curve, kIndex).setType(type);
+    }
+  }
+
+  TUndoManager::manager()->endBlock();
+}
+
+int FunctionSelection::getCommonSegmentType(bool inclusive) {
+  if (isEmpty()) return -1;
+
+  int type = -1;
+  int row  = getSelectedCells().top();
+  for (const auto &col : m_selectedKeyframes) {
+    TDoubleParam *curve = col.first;
+    // need to have at least one segment
+    if (!curve || curve->getKeyframeCount() <= 1) continue;
+
+    // consider the keyframe just before the top row of the selected cells
+    if (inclusive) {
+      int topIndex = curve->getPrevKeyframe(row);
+      if (topIndex != -1 && topIndex != curve->getKeyframeCount() - 1 &&
+          !col.second.contains(topIndex))
+        type = (int)(curve->getKeyframe(topIndex).m_type);
+    }
+
+    for (const int &kIndex : col.second) {
+      // ignore the last key
+      if (kIndex == curve->getKeyframeCount() - 1) continue;
+      int tmpType = (int)(curve->getKeyframe(kIndex).m_type);
+      if (type == -1)
+        type = tmpType;
+      else if (type != tmpType)
+        return 0;
+    }
+  }
+  return type;
+}
+
 //=============================================================================
 //
 // FunctionKeyframesData
@@ -645,7 +769,7 @@ int FunctionKeyframesData::getRowCount() const {
   for (int c = 0; c < (int)m_keyframes.size(); c++) {
     const Keyframes &keyframes = m_keyframes[c];
     if (!keyframes.empty()) {
-      int row                          = (int)(keyframes.rbegin()->m_frame);
+      int row = (int)(keyframes.rbegin()->m_frame);
       if (row + 1 > rowCount) rowCount = row + 1;
     }
   }

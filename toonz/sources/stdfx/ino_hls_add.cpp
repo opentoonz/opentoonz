@@ -3,8 +3,9 @@
 #include "stdfx.h"
 
 #include "ino_common.h"
+#include "globalcontrollablefx.h"
 //------------------------------------------------------------
-class ino_hls_add final : public TStandardRasterFx {
+class ino_hls_add final : public GlobalControllableFx {
   FX_PLUGIN_DECLARATION(ino_hls_add)
   TRasterFxPort m_input;
   TRasterFxPort m_noise;
@@ -117,7 +118,8 @@ void fx_(TRasterP in_ras, const TRasterP noise_ras, const TRasterP refer_ras,
           ,
       in_ras->getLy(), in_ras->getLx()  // Not use in_ras->getWrap()
       ,
-      ino::channels(), ino::bits(in_ras)
+      ino::channels(),
+      ino::bits(in_ras)
 
       //,noise_ras->getRawData() // BGRA
       //,&refer_vec.at(0) // RGBA
@@ -151,7 +153,7 @@ void fx_(TRasterP in_ras, const TRasterP noise_ras, const TRasterP refer_ras,
   noise_gr8->unlock();
   in_gr8->unlock();
 }
-}
+}  // namespace
 //------------------------------------------------------------
 void ino_hls_add::doCompute(TTile &tile, double frame,
                             const TRenderSettings &rend_sets) {
@@ -199,7 +201,7 @@ void ino_hls_add::doCompute(TTile &tile, double frame,
                     tile.getRaster()->getLx(),
                     tile.getRaster()
                         ->getLy()) /* ここtile.getRaster()->getSize()と同じ、将来修正する
-                                      */
+                                    */
         ,
         tile.getRaster(), frame, rend_sets);
   }
@@ -237,7 +239,7 @@ void ino_hls_add::doCompute(TTile &tile, double frame,
         ,
         xoffset, yoffset, from_rgba, offset, hue_scale, lig_scale, sat_scale,
         alp_scale, anti_alias_sw  // --> add_blend_sw, default is true
-        );
+    );
     if (refer_tile.getRaster() != nullptr) {
       refer_tile.getRaster()->unlock();
     }

@@ -40,10 +40,10 @@ typedef enum TWAINSTATE {
 struct TRANSFER_INFO {
   TTWAIN_TRANSFER_MECH transferMech; /*current transfer mechanism      */
   TTWAIN_USAGE_MODE usageMode;
-  /*used by buffered memory tranfer */
+  /*used by buffered memory transfer */
   unsigned char *memoryBuffer;
   unsigned long memorySize;
-  /*used by native tranfer          */
+  /*used by native transfer          */
   void *hDib;
   /*common to all the transfer mode */
   int preferredLx;

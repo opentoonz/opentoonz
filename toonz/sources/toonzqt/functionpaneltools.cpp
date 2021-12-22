@@ -106,6 +106,7 @@ MovePointDragTool::MovePointDragTool(FunctionPanel *panel, TDoubleParam *curve)
     , m_speed1Index(-1)
     , m_groupEnabled(false)
     , m_selection(0) {
+  // This undo block is closed in the destructor
   TUndoManager::manager()->beginBlock();
 
   if (curve) {

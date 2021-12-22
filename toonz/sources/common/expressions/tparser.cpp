@@ -66,13 +66,15 @@ public:
   std::vector<SyntaxToken> m_syntaxTokens;
   Grammar::Position m_position;
   // Pattern *m_lastPattern;
+  bool m_hasReference;
 
   Imp(const Grammar *grammar)
       : m_grammar(grammar)
       , m_errorString("")
       , m_isValid(false)
       , m_calculator(0)
-      , m_position(Grammar::ExpressionStart) {}
+      , m_position(Grammar::ExpressionStart)
+      , m_hasReference(false) {}
   ~Imp() {
     clearPointerContainer(m_nodeStack);
     delete m_calculator;
@@ -235,14 +237,24 @@ bool Parser::Imp::parseExpression(bool checkOnly) {
 Calculator *Parser::parse(std::string text) {
   m_imp->m_tokenizer.setBuffer(text);
   clearPointerContainer(m_imp->m_nodeStack);
-  m_imp->m_errorString = "";
-  m_imp->m_isValid     = false;
-  m_imp->m_calculator  = new Calculator();
-  bool ret             = m_imp->parseExpression(false);
+  m_imp->m_errorString  = "";
+  m_imp->m_isValid      = false;
+  m_imp->m_hasReference = false;
+  m_imp->m_calculator   = new Calculator();
+  bool ret              = m_imp->parseExpression(false);
   if (ret && !m_imp->m_nodeStack.empty()) {
     m_imp->m_calculator->setRootNode(m_imp->m_nodeStack.back());
+
+    for (auto node : m_imp->m_nodeStack) {
+      if (node->hasReference()) {
+        m_imp->m_hasReference = true;
+        break;
+      }
+    }
+
     m_imp->m_nodeStack.pop_back();
     m_imp->m_isValid = true;
+
   } else {
     delete m_imp->m_calculator;
     m_imp->m_calculator = 0;
@@ -303,6 +315,10 @@ std::string Parser::getCurrentPatternString(std::string text) {
 //-------------------------------------------------------------------
 
 bool Parser::isValid() const { return m_imp->m_isValid; }
+
+//-------------------------------------------------------------------
+
+bool Parser::hasReference() const { return m_imp->m_hasReference; }
 
 //-------------------------------------------------------------------
 

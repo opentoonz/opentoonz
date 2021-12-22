@@ -57,7 +57,8 @@ DVAPI void overlayCmapped(TRasterCM32P rasOut, const TRasterCM32P &rasUp,
 // keepInks=false);
 
 DVAPI void eraseColors(TRasterCM32P ras, std::vector<int> *colorIds,
-                       bool eraseInks);  // colorsId==0 ->erase ALL
+                       bool eraseInks,
+                       bool noGap = false);  // colorsId==0 ->erase ALL
 // DVAPI void  eraseColors(TRasterCM32P ras, vector<int>& colorIds, bool
 // eraseInks, bool keepColor);
 DVAPI void eraseStyleIds(TToonzImage *image, const std::vector<int> styleIds);

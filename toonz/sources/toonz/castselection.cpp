@@ -138,8 +138,9 @@ int SoundCastItem::getFrameCount() const {
 //-----------------------------------------------------------------------------
 
 QPixmap SoundCastItem::getPixmap(bool isSelected) const {
-  static QPixmap loudspeaker(svgToPixmap(
-      ":Resources/audio.svg", m_itemPixmapSize, Qt::KeepAspectRatio));
+  static QPixmap loudspeaker(
+      svgToPixmap(getIconThemePath("mimetypes/60/audio_icon.svg"),
+                  m_itemPixmapSize, Qt::KeepAspectRatio));
   return loudspeaker;
 }
 

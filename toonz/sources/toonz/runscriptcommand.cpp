@@ -10,7 +10,6 @@
 #include "toonz/toonzscene.h"
 #include "toonz/toonzfolders.h"
 #include "filebrowserpopup.h"
-#include "toonz/tproject.h"
 #include "floatingpanelcommand.h"
 #include "scriptconsolepanel.h"
 #include "tsystem.h"

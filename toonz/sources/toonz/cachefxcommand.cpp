@@ -85,13 +85,13 @@ CacheFxCommand::CacheFxCommand() {
   TApp *app = TApp::instance();
   bool ret  = true;
 
-  // Connect the variuos handles to the associated function in the
+  // Connect the various handles to the associated function in the
   // CacheFxCommand singleton.
   // Please observe that these connections are performed BEFORE rendering
   // classes are instanced -
   // which is needed to ensure that the proper cache updates have already been
   // performed when
-  // rendering instaces receive the update signal.
+  // rendering instances receive the update signal.
 
   // ret = ret &&
   // connect(app->getCurrentLevel(),SIGNAL(xshLevelChanged()),this,SLOT(onLevelChanged()));
@@ -202,7 +202,7 @@ for(j=0; j<size; ++j)
 
 //Now, if the XSheetFx is user-cache enabled, propagate to terminal fxs (which
 were not
-//automatical, since connections to them do not exist).
+//automatic, since connections to them do not exist).
 if(xshFx->isCacheEnabled())
 {
 std::set<TFx*> terminalFxs;

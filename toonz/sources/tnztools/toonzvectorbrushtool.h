@@ -81,7 +81,7 @@ public:
 //************************************************************************
 
 class ToonzVectorBrushTool final : public TTool {
-  Q_DECLARE_TR_FUNCTIONS(BrushTool)
+  Q_DECLARE_TR_FUNCTIONS(ToonzVectorBrushTool)
 
 public:
   ToonzVectorBrushTool(std::string name, int targetType);
@@ -107,7 +107,11 @@ public:
   void onEnter() override;
   void onLeave() override;
 
-  int getCursorId() const override { return ToolCursor::PenCursor; }
+  int getCursorId() const override {
+    if (m_viewer && m_viewer->getGuidedStrokePickerMode())
+      return m_viewer->getGuidedStrokePickerCursor();
+    return ToolCursor::PenCursor;
+  }
 
   TPropertyGroup *getProperties(int targetType) override;
   bool onPropertyChanged(std::string propertyName) override;
@@ -118,6 +122,8 @@ public:
   void addPreset(QString name);
   void removePreset();
 
+  void loadLastBrush();
+
   // return true if the pencil mode is active in the Brush / PaintBrush / Eraser
   // Tools.
   bool isPencilModeActive() override;
@@ -126,9 +132,16 @@ public:
   void flushTrackPoint();
   bool doFrameRangeStrokes(TFrameId firstFrameId, TStroke *firstStroke,
                            TFrameId lastFrameId, TStroke *lastStroke,
-                           bool drawFirstStroke = true);
+                           int interpolationType, bool breakAngles,
+                           bool autoGroup = false, bool autoFill = false,
+                           bool drawFirstStroke = true,
+                           bool drawLastStroke = true, bool withUndo = true);
   void checkGuideSnapping(bool beforeMousePress, bool invertCheck);
   void checkStrokeSnapping(bool beforeMousePress, bool invertCheck);
+  bool doGuidedAutoInbetween(TFrameId cFid, const TVectorImageP &cvi,
+                             TStroke *cStroke, bool breakAngles,
+                             bool autoGroup = false, bool autoFill = false,
+                             bool drawStroke = true);
 
 protected:
   TPropertyGroup m_prop[2];
@@ -192,6 +205,11 @@ protected:
   作業中のFrameIdをクリック時に保存し、マウスリリース時（Undoの登録時）に別のフレームに
   移動していたときの不具合を修正する。---*/
   TFrameId m_workingFrameId;
+
+  TPointD m_lastDragPos;        //!< Position where mouse was last dragged.
+  TMouseEvent m_lastDragEvent;  //!< Previous mouse-drag event.
+
+  bool m_propertyUpdating = false;
 };
 
 #endif  // TOONZVECTORBRUSHTOOL_H

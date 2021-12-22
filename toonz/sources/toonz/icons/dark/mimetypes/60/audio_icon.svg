@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="60px" height="60px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <rect x="0" y="0" width="60" height="60" style="fill:rgb(184,184,184);fill-opacity:0;"/>
+    <g id="page">
+        <g id="base" transform="matrix(1,0,0,1,-1,1)">
+            <path d="M53,57L8,57L8,1L42,1L42,2L43,2L43,3L44,3L44,4L45,4L45,5L46,5L46,6L47,6L47,7L48,7L48,8L49,8L49,9L50,9L50,10L51,10L51,11L52,11L52,12L53,12L53,57Z" style="fill:rgb(64,181,185);fill-rule:nonzero;"/>
+        </g>
+        <g transform="matrix(1,0,0,1,-1,0)">
+            <path d="M41,14L41,2L42,2L42,3L43,3L43,4L44,4L44,5L45,5L45,6L46,6L46,7L47,7L47,8L48,8L48,9L49,9L49,10L50,10L50,11L51,11L51,12L52,12L52,13L53,13L53,14L41,14Z" style="fill:rgb(173,225,226);fill-rule:nonzero;"/>
+        </g>
+        <g transform="matrix(1,0,0,1,-1,1)">
+            <path d="M41,13L52,13L52,24L41,13Z" style="fill-opacity:0.25;"/>
+        </g>
+        <g id="outline" transform="matrix(1,0,0,1,-1,1)">
+            <path d="M53,57L8,57L8,1L42,1L42,2L43,2L43,3L44,3L44,4L45,4L45,5L46,5L46,6L47,6L47,7L48,7L48,8L49,8L49,9L50,9L50,10L51,10L51,11L52,11L52,12L53,12L53,57ZM41,2L9,2L9,56L52,56L52,13L41,2Z" style="fill:rgb(24,91,93);"/>
+        </g>
+        <g transform="matrix(1,0,0,1,2,2)">
+            <path d="M21,42.259L21,24.5L38,19L38,39.5C38,41.984 35.984,44 33.5,44C31.016,44 29,41.984 29,39.5C29,37.016 31.016,35 33.5,35C34.425,35 35.285,35.279 36,35.759L36,23.927L23,28.214L23,45.5L22.972,45.5C22.991,45.664 23,45.831 23,46C23,48.484 20.984,50.5 18.5,50.5C16.016,50.5 14,48.484 14,46C14,43.516 16.016,41.5 18.5,41.5C19.425,41.5 20.285,41.779 21,42.259Z" style="fill-opacity:0.3;"/>
+        </g>
+        <g transform="matrix(1,0,0,1,2,1)">
+            <path d="M21,42.259L21,24.5L38,19L38,39.5C38,41.984 35.984,44 33.5,44C31.016,44 29,41.984 29,39.5C29,37.016 31.016,35 33.5,35C34.425,35 35.285,35.279 36,35.759L36,23.927L23,28.214L23,45.5L22.972,45.5C22.991,45.664 23,45.831 23,46C23,48.484 20.984,50.5 18.5,50.5C16.016,50.5 14,48.484 14,46C14,43.516 16.016,41.5 18.5,41.5C19.425,41.5 20.285,41.779 21,42.259Z" style="fill:white;"/>
+        </g>
+    </g>
+</svg>

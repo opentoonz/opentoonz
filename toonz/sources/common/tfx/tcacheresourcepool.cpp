@@ -197,11 +197,13 @@ TCacheResource *TCacheResourcePool::getResource(const std::string &name,
   // Search for an already allocated resource
   if (m_searchIterator == m_memResources.end()) {
     m_searchIterator = m_memResources.lower_bound(name);
-    if (m_searchIterator != m_memResources.end())
-      if (!(name < m_searchIterator->first))
+    if (m_searchIterator != m_memResources.end()) {
+      if (!(name < m_searchIterator->first)) {
         m_foundIterator = true;
-      else if (m_searchIterator != m_memResources.begin())
+      } else if (m_searchIterator != m_memResources.begin()) {
         m_searchIterator--;
+      }
+    }
   }
 
   if (m_foundIterator) {

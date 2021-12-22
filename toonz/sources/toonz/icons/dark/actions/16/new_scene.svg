@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="16px" height="16px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g transform="matrix(1,0,0,1,-50,-490)">
+        <g id="new_scene" transform="matrix(1,0,0,1,-39.9997,200)">
+            <g id="bg" transform="matrix(0.110345,0,0,0.121212,73.7797,271.091)">
+                <rect x="147" y="156" width="145" height="132" style="fill:rgb(135,135,135);fill-opacity:0;"/>
+            </g>
+            <g id="add" transform="matrix(1,0,0,1,85,285)">
+                <path d="M17.5,14C19.432,14 21,15.568 21,17.5C21,19.432 19.432,21 17.5,21C15.568,21 14,19.432 14,17.5C14,15.568 15.568,14 17.5,14ZM18,17L20,17L20,18L18,18L18,20L17,20L17,18L15,18L15,17L17,17L17,15L18,15L18,17Z"/>
+            </g>
+            <path d="M101.14,298C99.208,298.584 97.8,300.378 97.8,302.5C97.8,303.418 98.064,304.276 98.52,305L90,305L90,298L101.14,298ZM90,297L90,296.037C89.985,295.208 90.491,294.422 91.313,294.122L93.75,293.23L93.75,295.36L92,296L104,296L104,297L90,297ZM96.75,294.263L95.25,294.811L95.25,292.682L96.75,292.133L96.75,294.263ZM99.75,293.166L98.25,293.714L98.25,291.585L99.75,291.036L99.75,293.166ZM101.25,290.488L102.583,290L103.27,291.878L101.25,292.617L101.25,290.488Z"/>
+        </g>
+    </g>
+</svg>

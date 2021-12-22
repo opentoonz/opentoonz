@@ -1,0 +1,107 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[a4paper, total={180mm, 272mm}]{geometry}
+
+\usepackage{fontspec}
+\setmainfont[Path=fonts/, Extension=.ttf]{ipaexm}
+
+\setlength\parindent{3.5em}
+\setlength\parskip{0em}
+\renewcommand{\baselinestretch}{1.247}
+
+\begin{document}
+
+\thispagestyle{empty}
+
+\Large
+\noindent \\
+Fog Ino\medskip
+\par
+\normalsize
+It scatters light.\par
+Allows for the creation of light scattering effects in water, bath, fog, etc.,\par
+It aims at creating effects like fog and diffusion in optical filters, but it does\par 
+not actually simulate light.\\
+\par
+Each pixel, is affected by the shining of brighter nearby pixels.\par
+Effect from closer pixels will be stronger, while it will have a weaker impact from\par 
+distant pixels.\\
+\par
+When \textquotedbl Alpha Rendering\textquotedbl \ is active, Alpha channel will be processed first,\par
+then it will process all RGB pixels where the Alpha channel is not zero.\\
+\par
+When \textquotedbl Alpha Rendering\textquotedbl \ is inactive, Alpha channel will not be taken into account,\par
+so the RGB image changes will not be masked, causing jagged edges.\\
+\\
+-{-}- \ Inputs \ -{-}-\\
+Source\par
+Connect the image to be processed.\\
+\\
+-{-}- \ Settings \ -{-}-\\
+Radius\par
+The extent to which scatter light, specified as a circle radius.\par
+The unit is millimeters.\par
+Specify a value greater than or equal to 0. The maximum is 100.\par
+When the value is smaller than a pixel, no light will be scattered and fog will not\par 
+be applied.\par
+The larger the Radius, the longer it will take to process.\par
+The default value is 1.\\
+\\
+Curve\par
+The attenuation curve of scattered light.\par
+Specify a value greater than 0.01. The maximum is 100.\par
+The effect will be weaker on farther pixels,\par
+the change is represented by a Gamma curve.\par
+When the value is 1.0 brightness will be linearly attenuated.\par
+The smaller the value, the narrower the brightness becomes (the effects is reduced\par 
+more abruptly),\par
+The larger the value, the broader the brightness becomes (the effect is emphasized).\par
+The default value is 1.
+
+\newpage
+
+\thispagestyle{empty}
+
+\ \vspace{-0.2em}
+\par
+\noindent Power\par
+Changes the intesity of the light.\par
+Specify a value in the range 0 to 1.\par
+It is possible to specify values above 1.0, up to a maximum 2.0, to emphasize the\par 
+light.\par
+Such an emphasis may prove useful to emit light from dark portions such as ink\par 
+lines.\par
+When the value is 0.0 light will not be scattered, and fog will not be applied.\par
+It is possible to specify negative values, down to a minimum of -2.0.\par
+In such a case there will be no light scattering, but darkness scattering.\par
+The default value is 1.\\
+\\
+Threshold Min\\
+Threshold Max\par
+Pixels with this luminosity value or higher will emit light.\\
+\par
+In additionn to being affected by the brightness from brighter neraby pixels,\par
+pixels with values higher than (\textquotedbl Threshold Min\textquotedbl ) will emit light themselves.\par
+The brightness, will be determined by the L value (of HLS) of the pixels.\\
+\par
+Values specified can range from 0.0 to 1.01.\\
+\par
+If both values are set to 1.01, fog will not be applied.\\
+\par
+When \textquotedbl Threshold Max\textquotedbl \ is greater than \textquotedbl Threshold Min\textquotedbl ,\par
+the fog intensity will change linearly from Min and Max.\\
+\par
+By setting \textquotedbl Threshold Max\textquotedbl \ to zero (and less than Min),\par
+light will be emitted from pixels with a brightness of \textquotedbl Threshold Min\textquotedbl \ or more.\par
+Setting \textquotedbl Threshold Min\textquotedbl \ to 0 will produce a full fog.\\
+\par
+The default value is 0 for both parameters.\\
+\\
+Alpha Rendering\par
+This option is valid only when there is an Alpha channel.\par
+When inactive, it masks the changes in the RGB values using the original Alpha\par 
+of the image.\par
+When active, the effect will be able to modify the Alpha channel, extending it\par 
+as necessary to reproduce the full span of the effect.\par
+The default setting is inactive.
+
+\end{document}

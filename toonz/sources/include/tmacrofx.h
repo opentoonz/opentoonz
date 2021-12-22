@@ -30,6 +30,9 @@ class DVAPI TMacroFx final : public TRasterFx {
 
   bool isaLeaf(TFx *fx) const;
 
+  bool m_isLoading          = false;
+  TMacroFx *m_waitingLinkFx = nullptr;
+
 public:
   static bool analyze(const std::vector<TFxP> &fxs, TFxP &root,
                       std::vector<TFxP> &roots, std::vector<TFxP> &leafs);
@@ -77,6 +80,10 @@ public:
 
   void compatibilityTranslatePort(int majorVersion, int minorVersion,
                                   std::string &portName) override;
+
+  void linkParams(TFx *src) override;
+  bool isLoading() { return m_isLoading; }
+  void setWaitingLinkFx(TMacroFx *linkFx) { m_waitingLinkFx = linkFx; }
 
 private:
   // non implementati

@@ -3,5 +3,11 @@
     <control>opacity</control>
     <control>clipping_mask</control>
     <control>alpha_rendering</control>
+    <separator/>
+    <control>linear</control>
+    <vbox modeSensitive="linear" mode="1">
+      <control>gamma</control>
+      <control>premultiplied</control>
+    </vbox>
   </page>
 </fxlayout>

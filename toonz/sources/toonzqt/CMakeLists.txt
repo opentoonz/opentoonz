@@ -1,19 +1,23 @@
 set(MOC_HEADERS
+    palettesscanpopup.h
+    pluginhost.h
+    stageobjectselection.h
+    tdockwindows.h
     ../include/toonzqt/addfxcontextmenu.h
+    ../include/toonzqt/camerasettingswidget.h
     ../include/toonzqt/checkbox.h
+    ../include/toonzqt/cleanupcamerasettingswidget.h
     ../include/toonzqt/colorfield.h
-    docklayout.h
+    ../include/toonzqt/combohistogram.h
     ../include/toonzqt/doublefield.h
     ../include/toonzqt/doublepairfield.h
     ../include/toonzqt/dvdialog.h
-    ../include/toonzqt/dvmimedata.h
     ../include/toonzqt/dvscrollwidget.h
     ../include/toonzqt/dvtextedit.h
     ../include/toonzqt/expressionfield.h
     ../include/toonzqt/filefield.h
     ../include/toonzqt/flipconsole.h
     ../include/toonzqt/framenavigator.h
-    ../include/toonzqt/freelayout.h
     ../include/toonzqt/functionkeyframenavigator.h
     ../include/toonzqt/functionpanel.h
     ../include/toonzqt/functionsegmentviewer.h
@@ -22,13 +26,12 @@ set(MOC_HEADERS
     ../include/toonzqt/functiontoolbar.h
     ../include/toonzqt/functiontreeviewer.h
     ../include/toonzqt/functionviewer.h
-    fxdata.h
     ../include/toonzqt/fxhistogramrender.h
+    ../include/toonzqt/fxiconmanager.h
     ../include/toonzqt/fxschematicnode.h
     ../include/toonzqt/fxschematicscene.h
     ../include/toonzqt/fxselection.h
     ../include/toonzqt/fxsettings.h
-	../include/toonzqt/fxtypes.h
     ../include/toonzqt/gutil.h
     ../include/toonzqt/histogram.h
     ../include/toonzqt/icongenerator.h
@@ -38,71 +41,70 @@ set(MOC_HEADERS
     ../include/toonzqt/intpairfield.h
     ../include/toonzqt/keyframenavigator.h
     ../include/toonzqt/lineedit.h
+    ../include/toonzqt/marksbar.h
     ../include/toonzqt/menubarcommand.h
-    ../include/toonzqt/multipleselection.h
-    palettedata.h
-    palettesscanpopup.h
     ../include/toonzqt/paletteviewer.h
     ../include/toonzqt/paletteviewergui.h
     ../include/toonzqt/paramfield.h
     ../include/toonzqt/planeviewer.h
     ../include/toonzqt/popupbutton.h
-    ../include/toonzqt/rasterimagedata.h
-    ../include/toonzqt/schematicnode.h
     ../include/toonzqt/schematicgroupeditor.h
+    ../include/toonzqt/schematicnode.h
     ../include/toonzqt/schematicviewer.h
+    ../include/toonzqt/screenboard.h
     ../include/toonzqt/scriptconsole.h
-    ../include/toonzqt/selectioncommandids.h
-    ../include/toonzqt/selection.h
-    stageobjectselection.h
-    ../include/toonzqt/stageobjectsdata.h
     ../include/toonzqt/spectrumfield.h
     ../include/toonzqt/spreadsheetviewer.h
     ../include/toonzqt/stageschematicnode.h
     ../include/toonzqt/stageschematicscene.h
-    ../include/toonzqt/strokesdata.h
     ../include/toonzqt/studiopaletteviewer.h
-    styledata.h
     ../include/toonzqt/styleeditor.h
     ../include/toonzqt/styleindexlineedit.h
-    ../include/toonzqt/styleselection.h
+    ../include/toonzqt/stylenameeditor.h
     ../include/toonzqt/swatchviewer.h
     ../include/toonzqt/tabbar.h
-    tdockwindows.h
+    ../include/toonzqt/tmessageviewer.h
     ../include/toonzqt/tonecurvefield.h
     ../include/toonzqt/treemodel.h
     ../include/toonzqt/tselectionhandle.h
     ../include/toonzqt/updatechecker.h
     ../include/toonzqt/validatedchoicedialog.h
-    ../include/toonzqt/viewcommandids.h
-    ../include/toonzqt/trepetitionguard.h
-    ../include/toonzqt/camerasettingswidget.h
-    ../include/toonzqt/cleanupcamerasettingswidget.h
-    ../include/toonzqt/pickrgbutils.h
-    ../include/toonzqt/screenboard.h
-    ../include/toonzqt/marksbar.h
-    ../include/toonzqt/tmessageviewer.h
-    ../include/toonzqt/stylenameeditor.h
-    ../include/historytypes.h
-    ../include/toonzqt/flipconsoleowner.h
-    ../include/toonzqt/combohistogram.h
-    ../include/toonzqt/fxiconmanager.h
-    ../include/toonzqt/glwidget_for_highdpi.h
-    ../include/toonzqt/lutcalibrator.h
-    pluginhost.h
 )
 
 set(HEADERS
     ${MOC_HEADERS}
+    ../include/tools/cursormanager.h
+    docklayout.h
     functionpaneltools.h
+    fxdata.h
+    palettedata.h
+    plugin_fxnode_interface.h
+    plugin_port_interface.h
+    plugin_tile_interface.h
+    styledata.h
     toonz_hostif.h
     toonz_plugin.h
-    plugin_tile_interface.h
-    plugin_port_interface.h
-    plugin_fxnode_interface.h
+    ../include/historytypes.h
+    ../include/toonzqt/dvmimedata.h
+    ../include/toonzqt/flipconsoleowner.h
+    ../include/toonzqt/freelayout.h
+    ../include/toonzqt/fxtypes.h
+    ../include/toonzqt/glwidget_for_highdpi.h
+    ../include/toonzqt/lutcalibrator.h
+    ../include/toonzqt/multipleselection.h
+    ../include/toonzqt/pickrgbutils.h
+    ../include/toonzqt/rasterimagedata.h
+    ../include/toonzqt/selection.h
+    ../include/toonzqt/selectioncommandids.h
+    ../include/toonzqt/stageobjectsdata.h
+    ../include/toonzqt/strokesdata.h
+    ../include/toonzqt/styleselection.h
+    ../include/toonzqt/trepetitionguard.h
+    ../include/toonzqt/viewcommandids.h
 )
 
 set(SOURCES
+    ../tnztools/cursormanager.cpp
     checkbox.cpp
     colorfield.cpp
     docklayout.cpp
@@ -200,7 +202,9 @@ set(SOURCES
 
 set(RESOURCES toonzqt.qrc)
 
-add_translation(toonzqt ${HEADERS} ${SOURCES})
+if(WITH_TRANSLATION)
+    add_translation(toonzqt ${HEADERS} ${SOURCES})
+endif()
 
 get_target_property(QW_LOC Qt5::Widgets INTERFACE_INCLUDE_DIRECTORIES)
 
@@ -217,7 +221,7 @@ qt5_wrap_cpp(SOURCES ${MOC_HEADERS} OPTIONS ${incs})
 
 add_library(toonzqt SHARED ${HEADERS} ${SOURCES} ${RESOURCES})
 if(BUILD_ENV_APPLE)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-install_name,@rpath/libtoonzqt.dylib")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-install_name,@executable_path/libtoonzqt.dylib")
     add_dependencies(toonzqt tnzcore tnzbase tnzext toonzlib sound)
 endif()
 

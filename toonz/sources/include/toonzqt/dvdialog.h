@@ -49,12 +49,6 @@ class MessageAndCheckboxDialog;
 
 //=============================================================================
 
-//-----------------------------------------------------------------------------
-
-void DVAPI setDialogTitle(const QString &dialogTitle);
-
-//-----------------------------------------------------------------------------
-
 void DVAPI MsgBoxInPopup(MsgType type, const QString &text);
 
 // ATTENZIONE: Valore di ritorno
@@ -170,7 +164,6 @@ protected:
 
 class DVAPI Dialog : public QDialog {
   Q_OBJECT
-  static QSettings *m_settings;
   // If the dialog has button then is modal too.
   bool m_hasButton;
   QString m_name;
@@ -183,7 +176,6 @@ protected:
   QHBoxLayout *m_buttonLayout;
   QList<QLabel *> m_labelList;
   void resizeEvent(QResizeEvent *e) override;
-  void moveEvent(QMoveEvent *e) override;
 
 public:
   QVBoxLayout *m_topLayout;

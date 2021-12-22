@@ -24,6 +24,23 @@
 #include "tproperty.h"
 #include "tiio.h"
 
+namespace {
+const TSceneProperties::CellMark cellMarkDefault[12] = {
+    {QObject::tr("Red"), TPixel32(167, 55, 55)},
+    {QObject::tr("Orange"), TPixel32(195, 115, 40)},
+    {QObject::tr("Yellow"), TPixel32(214, 183, 22)},
+    {QObject::tr("Light Green"), TPixel32(165, 179, 57)},
+    {QObject::tr("Green"), TPixel32(82, 157, 79)},
+    {QObject::tr("Light Blue"), TPixel32(71, 142, 165)},
+    {QObject::tr("Blue"), TPixel32(64, 103, 172)},
+    {QObject::tr("Dark Blue"), TPixel32(60, 49, 187)},
+    {QObject::tr("Purple"), TPixel32(108, 66, 170)},
+    {QObject::tr("Pink"), TPixel32(161, 75, 140)},
+    {QObject::tr("Dark Pink"), TPixel32(111, 29, 108)},
+    {QObject::tr("White"), TPixel32(255, 255, 255)}};
+
+}
+
 //=============================================================================
 
 TSceneProperties::TSceneProperties()
@@ -50,6 +67,9 @@ TSceneProperties::TSceneProperties()
   m_notesColor.push_back(TPixel32(145, 240, 145));
   m_notesColor.push_back(TPixel32(130, 255, 210));
   m_notesColor.push_back(TPixel32(150, 245, 255));
+
+  // Default Cell Marks
+  for (int i = 0; i < 12; i++) m_cellMarks.push_back(cellMarkDefault[i]);
 }
 
 //-----------------------------------------------------------------------------
@@ -82,7 +102,7 @@ void TSceneProperties::assign(const TSceneProperties *sprop) {
 
   if (sprop != this) {
     m_cameras = sprop->m_cameras;
-    for (int i     = 0; i < (int)m_cameras.size(); i++)
+    for (int i = 0; i < (int)m_cameras.size(); i++)
       m_cameras[i] = new TCamera(*m_cameras[i]);
   }
   m_bgColor                   = sprop->m_bgColor;
@@ -149,7 +169,7 @@ void TSceneProperties::setFieldGuideSize(int size) {
 
 void TSceneProperties::setFieldGuideAspectRatio(double ar) {
   assert(ar >= 0);
-  if (ar <= 0) ar         = 1;
+  if (ar <= 0) ar = 1;
   m_fieldGuideAspectRatio = ar;
 }
 
@@ -203,8 +223,8 @@ void TSceneProperties::saveData(TOStream &os) const {
     os.child("threadsIndex") << out.getThreadIndex();
     os.child("maxTileSizeIndex") << out.getMaxTileSizeIndex();
     os.child("subcameraPrev") << (out.isSubcameraPreview() ? 1 : 0);
-    os.child("stereoscopic") << (rs.m_stereoscopic ? 1 : 0)
-                             << rs.m_stereoscopicShift;
+    os.child("stereoscopic")
+        << (rs.m_stereoscopic ? 1 : 0) << rs.m_stereoscopicShift;
 
     switch (rs.m_quality) {
     case TRenderSettings::StandardResampleQuality:
@@ -323,6 +343,12 @@ void TSceneProperties::saveData(TOStream &os) const {
   os.openChild("noteColors");
   for (i = 0; i < m_notesColor.size(); i++) os << m_notesColor.at(i);
   os.closeChild();
+
+  if (!hasDefaultCellMarks()) {
+    os.openChild("cellMarks");
+    for (auto mark : m_cellMarks) os << mark.name.toStdString() << mark.color;
+    os.closeChild();
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -423,7 +449,7 @@ void TSceneProperties::loadData(TIStream &is, bool isLoadingProject) {
           if (name == "preview")
             outPtr = m_previewProp;
           else if (name == "main")
-            outPtr               = m_outputProp;
+            outPtr = m_outputProp;
           TOutputProperties &out = *outPtr;
           TRenderSettings renderSettings;
           if (globFrom != -1)
@@ -707,6 +733,15 @@ void TSceneProperties::loadData(TIStream &is, bool isLoadingProject) {
       assert(i == 7);
     } else if (tagName == "cameraCaputureSaveInPath") {
       is >> m_camCapSaveInPath;
+    } else if (tagName == "cellMarks") {
+      int i = 0;
+      while (!is.eos()) {
+        TPixel32 color;
+        std::string name;
+        is >> name >> color;
+        m_cellMarks.replace(i, {QString::fromStdString(name), color});
+        i++;
+      }
     } else {
       throw TException("unexpected property tag: " + tagName);
     }
@@ -779,4 +814,35 @@ TPixel32 TSceneProperties::getNoteColor(int colorIndex) const {
 
 void TSceneProperties::setNoteColor(TPixel32 color, int colorIndex) {
   m_notesColor[colorIndex] = color;
+}
+
+//-----------------------------------------------------------------------------
+
+QList<TSceneProperties::CellMark> TSceneProperties::getCellMarks() const {
+  return m_cellMarks;
+}
+
+//-----------------------------------------------------------------------------
+
+TSceneProperties::CellMark TSceneProperties::getCellMark(int index) const {
+  return m_cellMarks[index];
+}
+
+//-----------------------------------------------------------------------------
+
+void TSceneProperties::setCellMark(const TSceneProperties::CellMark &mark,
+                                   int index) {
+  m_cellMarks[index] = mark;
+}
+
+//-----------------------------------------------------------------------------
+// check if the cell mark settings are modified
+bool TSceneProperties::hasDefaultCellMarks() const {
+  if (m_cellMarks.size() != 12) return false;
+  for (int i = 0; i < 12; i++) {
+    if (m_cellMarks.at(i).name != cellMarkDefault[i].name ||
+        m_cellMarks.at(i).color != cellMarkDefault[i].color)
+      return false;
+  }
+  return true;
 }

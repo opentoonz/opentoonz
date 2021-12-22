@@ -1,0 +1,48 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[a4paper, total={180mm, 272mm}]{geometry}
+
+\usepackage{fontspec}
+\setmainfont[Path=fonts/, Extension=.ttf]{ipaexm}
+
+\setlength\parindent{3.5em}
+\setlength\parskip{0em}
+\renewcommand{\baselinestretch}{1.247}
+
+\begin{document}
+
+\thispagestyle{empty}
+
+\Large
+\noindent \\
+Density Ino\medskip
+\par
+\normalsize
+半透明画像の濃度を調節します。\par
+流線タッチ効果線を強調するために作成しました。\par
+Alphaチャンネルに半透明値が必要です。\\
+\\
+-{-}- \ 入力 \ -{-}-\\
+Source\par
+処理をする画像を接続します。\\
+Reference\par
+Pixel 毎に効果の強弱をつけるための参照画像を接続します。\\
+\\
+-{-}- \ 設定 \ -{-}-\\
+Density\par
+濃度を指定します。\par
+画像の半透明 Pixel に対して濃度が変化します。\par
+ゼロ以上の値で指定します。最大は10です。\par
+1より大きい値のとき、画像は濃くなります。\par
+1のときは等濃度で変化しません。\par
+1より小さくゼロより大きい値のとき、画像は薄くなります。\par
+ゼロのときは濃度ゼロなので画像は消えます。\par
+初期値は1です。\\
+\\
+Reference\par
+Pixel 毎に効果の強弱をつけるための参照画像の値の取り方を選択します。\par
+入力の\textquotedbl Reference\textquotedbl に画像を接続し、\par
+Red/Green/Blue/Alpha/Luminance/Nothingから選びます。\par
+この効果をつけたくないときは Nothingを選ぶか、接続を切ります。\par
+初期値は Red です。
+
+\end{document}

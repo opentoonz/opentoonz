@@ -1,19 +1,28 @@
-  <commandbar>
-
-    <command>MI_NewVectorLevel</command>
+<?xml version="1.0" encoding="UTF-8"?>
+<commandbar>
     <command>MI_NewToonzRasterLevel</command>
     <command>MI_NewRasterLevel</command>
-    <separator/>	
+    <command>MI_NewVectorLevel</command>
+    <separator/>
+    <command>MI_Collapse</command>
+    <command>MI_OpenChild</command>
+    <command>MI_CloseChild</command>
+    <command>MI_ToggleEditInPlace</command>
+    <separator/>
+    <command>MI_CreateBlankDrawing</command>
+    <command>MI_Duplicate</command>
+    <command>MI_AutoInputCellNumber</command>
+    <command>MI_FillEmptyCell</command>
+    <separator/>
+    <command>MI_DecreaseStep</command>
+    <command>MI_IncreaseStep</command>
+    <separator/>
     <command>MI_Reframe1</command>
     <command>MI_Reframe2</command>
     <command>MI_Reframe3</command>
     <separator/>
     <command>MI_Dup</command>
-    <separator/>
-    <command>MI_Collapse</command> 
-    <command>MI_OpenChild</command>
-    <command>MI_CloseChild</command>
-    <command>MI_ToggleEditInPlace</command>    
-    
-  </commandbar>
-
+    <command>MI_Reverse</command>
+    <command>MI_Swing</command>
+    <command>MI_Random</command>
+</commandbar>

@@ -106,6 +106,8 @@ void keepSubgroup(QMap<int, QList<SchematicNode *>> &editedGroup) {
   }
 }
 
+bool resizingNodes = false;
+bool updatingScene = false;
 }  // namespace
 
 //==================================================================
@@ -194,6 +196,8 @@ void StageSchematicScene::onSelectionSwitched(TSelection *oldSel,
 //------------------------------------------------------------------
 
 void StageSchematicScene::updateScene() {
+  if (updatingScene) return;
+  updatingScene = true;
   clearAllItems();
 
   QPointF firstPos = sceneRect().center();
@@ -351,6 +355,7 @@ void StageSchematicScene::updateScene() {
     }
   }
   m_nodesToPlace.clear();
+  updatingScene = false;
 }
 
 //------------------------------------------------------------------
@@ -367,6 +372,7 @@ StageSchematicNode *StageSchematicScene::addStageSchematicNode(
   connect(node, SIGNAL(currentColumnChanged(int)), this,
           SLOT(onCurrentColumnChanged(int)));
   connect(node, SIGNAL(editObject()), this, SIGNAL(editObject()));
+  connect(node, SIGNAL(nodeChangedSize()), this, SLOT(onNodeChangedSize()));
 
   // specify the node position
   if (pegbar->getDagNodePos() == TConst::nowhere) {
@@ -474,7 +480,7 @@ void StageSchematicScene::updateEditedGroups(
     const QMap<int, QList<SchematicNode *>> &editedGroup) {
   QMap<int, QList<SchematicNode *>>::const_iterator it;
   for (it = editedGroup.begin(); it != editedGroup.end(); it++) {
-    int zValue = 2;
+    int zValue                                            = 2;
     QMap<int, QList<SchematicNode *>>::const_iterator it2 = editedGroup.begin();
     while (it2 != editedGroup.end()) {
       StageSchematicNode *placedObj =
@@ -539,6 +545,7 @@ void StageSchematicScene::updateNestedGroupEditors(StageSchematicNode *node,
 //------------------------------------------------------------------
 
 void StageSchematicScene::resizeNodes(bool maximizedNode) {
+  resizingNodes             = true;
   m_gridDimension           = maximizedNode ? eLarge : eSmall;
   TStageObjectTree *pegTree = m_xshHandle->getXsheet()->getStageObjectTree();
   pegTree->setDagGridDimension(m_gridDimension);
@@ -578,6 +585,7 @@ void StageSchematicScene::resizeNodes(bool maximizedNode) {
   for (it2 = m_groupEditorTable.begin(); it2 != m_groupEditorTable.end(); it2++)
     it2.value()->resizeNodes(maximizedNode);
   updateScene();
+  resizingNodes = false;
 }
 
 //------------------------------------------------------------------
@@ -585,6 +593,7 @@ void StageSchematicScene::resizeNodes(bool maximizedNode) {
 void StageSchematicScene::updatePositionOnResize(TStageObject *obj,
                                                  bool maximizedNode) {
   TPointD oldPos = obj->getDagNodePos();
+  if (oldPos == TConst::nowhere) return;
   double oldPosY = oldPos.y - 25500;
   double newPosY = maximizedNode ? oldPosY * 2 : oldPosY * 0.5;
   obj->setDagNodePos(TPointD(oldPos.x, newPosY + 25500));
@@ -595,6 +604,7 @@ void StageSchematicScene::updatePositionOnResize(TStageObject *obj,
 void StageSchematicScene::updateSplinePositionOnResize(TStageObjectSpline *spl,
                                                        bool maximizedNode) {
   TPointD oldPos = spl->getDagNodePos();
+  if (oldPos == TConst::nowhere) return;
   double oldPosY = oldPos.y - 25500;
   double newPosY = maximizedNode ? oldPosY * 2 : oldPosY * 0.5;
   spl->setDagNodePos(TPointD(oldPos.x, newPosY + 25500));
@@ -618,7 +628,7 @@ StageSchematicSplineNode *StageSchematicScene::addSchematicSplineNode(
 
 //------------------------------------------------------------------
 /*! create node according to the type of StageObject
-*/
+ */
 StageSchematicNode *StageSchematicScene::createStageSchematicNode(
     StageSchematicScene *scene, TStageObject *pegbar) {
   TStageObjectId id = pegbar->getId();
@@ -723,7 +733,9 @@ void StageSchematicScene::findRoots(std::vector<TreeStageNode *> &roots) {
   for (i = 0; i < pegTree->getStageObjectCount(); i++) {
     TStageObject *pegbar = pegTree->getStageObject(i);
     // only cameras and pegbars can be roots
-    if (pegbar->getId().isCamera() || pegbar->getId().isTable()) {
+    // check if the id is contained in the table in case the object is grouped
+    if ((pegbar->getId().isCamera() || pegbar->getId().isTable()) &&
+        m_nodeTable.contains(pegbar->getId())) {
       StageSchematicNode *node = m_nodeTable[pegbar->getId()];
       TreeStageNode *treeNode  = new TreeStageNode(node);
       roots.push_back(treeNode);
@@ -784,7 +796,7 @@ void StageSchematicScene::placeChildren(TreeStageNode *treeNode, double &xPos,
 
 //------------------------------------------------------------------
 /*! define the position of nodes which is not specified manually
-*/
+ */
 void StageSchematicScene::placeNode(StageSchematicNode *node) {
   double xFirstPos = m_firstPos.x - 500;
   double yFirstPos = m_firstPos.y + 500;
@@ -1248,4 +1260,11 @@ void StageSchematicScene::onEditGroup() {
 
 TStageObjectId StageSchematicScene::getCurrentObject() {
   return m_objHandle->getObjectId();
+}
+
+//------------------------------------------------------------------
+
+void StageSchematicScene::onNodeChangedSize() {
+  if (resizingNodes) return;
+  updateScene();
 }

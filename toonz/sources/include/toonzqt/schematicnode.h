@@ -144,13 +144,13 @@ signals:
 class SchematicToggle_SplineOptions final : public SchematicToggle {
   Q_OBJECT
 public:
-  SchematicToggle_SplineOptions(SchematicNode *parent, const QPixmap &pixmap,
+  SchematicToggle_SplineOptions(SchematicNode *parent, const QIcon &imageIcon,
                                 int flags)
-      : SchematicToggle(parent, QIcon(pixmap), QColor(0, 0, 0, 0), flags) {}
-  SchematicToggle_SplineOptions(SchematicNode *parent, const QPixmap &pixmap1,
-                                const QPixmap &pixmap2, int flags)
-      : SchematicToggle(parent, QIcon(pixmap1), QIcon(pixmap2),
-                        QColor(0, 0, 0, 0), flags) {}
+      : SchematicToggle(parent, imageIcon, QColor(0, 0, 0, 0), flags) {}
+  SchematicToggle_SplineOptions(SchematicNode *parent, const QIcon &imageIcon,
+                                const QIcon &imageIcon2, int flags)
+      : SchematicToggle(parent, imageIcon, imageIcon2, QColor(0, 0, 0, 0),
+                        flags) {}
 
   void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
              QWidget *widget = 0) override;
@@ -257,13 +257,13 @@ public:
   SchematicPort *getEndPort() const { return m_endPort; }
 
   /*! Returns the other SchematicPort linked to the specified \b port.\n
-    Returns 0 if \b port isn't neither the start SchematicPort eihter the end
+    Returns 0 if \b port isn't neither the start SchematicPort either the end
     SchematicPort of this link.*/
   SchematicPort *getOtherPort(const SchematicPort *port) const;
   /*! Returns the other SchematicNode linked to the specified \b node.\n
     Returns 0 if \b node isn't neither the parent node of the start
     SchematicPort
-    eihter the parent node of the end SchematicPort of the link.*/
+    either the parent node of the end SchematicPort of the link.*/
   SchematicNode *getOtherNode(const SchematicNode *node) const;
 
   //! Returns true if the link is line shaped.
@@ -294,7 +294,7 @@ protected:
         links but can begin to draw links.\n
   A SchematicPort has got a hook thet is a position where links starts or
   ends.\n
-        A SchematicPort can be linked to an arbitriary number of links.
+        A SchematicPort can be linked to an arbitrary number of links.
         A SchematicPort handles a container of all links to retrieve all linked
   node; each link is indexed using a
         progressive number assigned when the link is inserted to the container.
@@ -451,6 +451,7 @@ protected:
 signals:
   void sceneChanged();
   void xsheetChanged();
+  void nodeChangedSize();
 };
 
 #endif  // SCHEMATICNODE_H

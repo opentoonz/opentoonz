@@ -164,7 +164,7 @@ struct TRenderPort::RenderData {
 //! discouraged. Further
 //! improvements of the TRenderer's API will eventually make the need for these
 //! calls obsolete. However,
-//! we've implemented the possibilty to rely on TRenderer's management support
+//! we've implemented the possibility to rely on TRenderer's management support
 //! even in those cases -
 //! it can be done by declaring the render process' interesting events through
 //! the apposite <a> declare..() <\a>

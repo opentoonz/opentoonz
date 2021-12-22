@@ -132,7 +132,6 @@ public:
     ANIM_SR_CYCLE
   };
   enum { TOP_YOUNGER, TOP_OLDER, TOP_SMALLER, TOP_BIGGER, TOP_RANDOM };
-  enum { CTRL_NONE = -1, CTRL_1, CTRL_2 };
   /*- 計算モード （背景＋粒子／粒子／背景／照明された粒子） -*/
   enum { REND_ALL, REND_PARTICLES, REND_BG, REND_ILLUMINATED };
 
@@ -163,7 +162,6 @@ public:
   void doDryCompute(TRectD &rect, double frame,
                     const TRenderSettings &info) override;
   void doCompute(TTile &tile, double frame, const TRenderSettings &ri) override;
-  void compute(TFlash &flash, int frame) override;
 
   void getParamUIs(TParamUIConcept *&concepts, int &length) override;
 

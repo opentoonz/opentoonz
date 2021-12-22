@@ -161,7 +161,7 @@ SVNDeleteDialog::SVNDeleteDialog(QWidget *parent, const QString &workingDir,
 
   addButtonBarWidget(m_deleteLocalButton, m_deleteServerButton, m_cancelButton);
 
-  // 0. Connect for svn errors (that may occurs)
+  // 0. Connect for svn errors (that may occur)
   connect(&m_thread, SIGNAL(error(const QString &)), this,
           SLOT(onError(const QString &)));
 }
@@ -169,8 +169,15 @@ SVNDeleteDialog::SVNDeleteDialog(QWidget *parent, const QString &workingDir,
 //-----------------------------------------------------------------------------
 
 void SVNDeleteDialog::showEvent(QShowEvent *e) {
+  if (!m_isFolder) {
+    initTreeWidget();
+
+    int height = 50;
+    if (m_treeWidget->isVisible()) height += (m_files.size() * 50);
+
+    setMinimumSize(300, std::min(height, 350));
+  }
   QDialog::showEvent(e);
-  if (!m_isFolder) initTreeWidget();
 }
 
 //-----------------------------------------------------------------------------
@@ -260,6 +267,10 @@ void SVNDeleteDialog::onDeleteServerButtonClicked() {
              SLOT(onDeleteServerButtonClicked()));
   m_deleteServerButton->setText(tr("Delete"));
   connect(m_deleteServerButton, SIGNAL(clicked()), this, SLOT(deleteFiles()));
+
+  int height = 175;
+  if (m_treeWidget->isVisible()) height += (m_files.size() * 50);
+  setMinimumSize(300, std::min(height, 350));
 
   m_textLabel->setText(
       tr("You are deleting items also on repository. Are you sure ?"));

@@ -8,10 +8,14 @@
 .icon-lock() {
   border: @toolbutton-border-size solid @toolbutton-border-color;
   height: 18;
-  padding: 0;
-  width: 18;
+  padding: 0 -1 0 1;
+  width: 19;
+  margin-left: 1;
   &:unchecked {
-    image: url('@{img-url}/lock_off.svg');
+    image: url('@{img-url}/lock.svg');
+    &:hover {
+      image: url('@{img-url}/lock_over.svg');
+    }
   }
   &:checked {
     background-color: @toolbutton-lock-bg-color-checked;

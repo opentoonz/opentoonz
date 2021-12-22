@@ -80,7 +80,7 @@ endif()
 add_library(tnzext SHARED ${HEADERS} ${SOURCES} ${OBJCSOURCES})
 
 if(BUILD_ENV_APPLE)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-install_name,@rpath/libtnzext.dylib")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-install_name,@executable_path/libtnzext.dylib")
     add_dependencies(tnzext tnzcore tnzbase)
 endif()
 
@@ -117,8 +117,8 @@ if(BUILD_ENV_MSVC)
     )
 elseif(BUILD_ENV_APPLE)
     set(EXTRA_LIBS
-        ${CMAKE_CURRENT_BINARY_DIR}/../tnzcore/libtnzcore.dylib
-        ${CMAKE_CURRENT_BINARY_DIR}/../tnzbase/libtnzbase.dylib
+	"$<TARGET_FILE:tnzcore>"
+	"$<TARGET_FILE:tnzbase>"
     )
 
     target_link_libraries(tnzext

@@ -45,8 +45,8 @@ public:
       if (!m_sel) throw SMemAllocError(" in initColorSelection");
     } else {
       char s[200];
-      sprintf(s, " in initColorSelection lXY=(%d,%d)\n", CSTPic<P>::m_lX,
-              CSTPic<P>::m_lY);
+      snprintf(s, sizeof(s), " in initColorSelection lXY=(%d,%d)\n",
+               CSTPic<P>::m_lX, CSTPic<P>::m_lY);
       throw SMemAllocError(s);
     }
   }
@@ -233,7 +233,7 @@ public:
 
   int makeSelectionRGB1(const std::vector<I_PIXEL> &col, const double dA) {
     P *pPic     = CSTPic<P>::m_pic;
-    UCHAR *pSel = m_sel;
+    UCHAR *pSel = m_sel.get();
     I_PIXEL ip;
     int xy, lxy = CSTPic<P>::m_lX * CSTPic<P>::m_lY;
     int nbPixel = 0;
@@ -313,7 +313,7 @@ return false;
 
     nbPixel = 0;
     pPic    = CSTPic<P>::m_pic;
-    pSel    = m_sel;
+    pSel    = m_sel.get();
     lxy     = CSTPic<P>::m_lX * CSTPic<P>::m_lY;
     for (xy = 0; xy < lxy; xy++, pPic++, pSel++) {
       //		if ( pPic->m>0 ) {
@@ -340,7 +340,7 @@ return false;
   int makeSelectionRGB3(const std::vector<I_PIXEL> &col, const double dA,
                         const double dAB) {
     P *pPic     = CSTPic<P>::m_pic;
-    UCHAR *pSel = m_sel;
+    UCHAR *pSel = m_sel.get();
     I_PIXEL ip;
     int xy, nbPixel = 0;
     int lxy    = CSTPic<P>::m_lX * CSTPic<P>::m_lY;
@@ -390,7 +390,7 @@ return false;
                            const double dAB, const int i, const int j,
                            const int k) {
     P *pPic     = CSTPic<P>::m_pic;
-    UCHAR *pSel = m_sel;
+    UCHAR *pSel = m_sel.get();
     I_PIXEL ip;
     int nbPixel = 0;
     double dA2  = dA * dA;
@@ -418,7 +418,7 @@ return false;
 
   void setSel01() {
     int xy   = CSTPic<P>::m_lX * CSTPic<P>::m_lY;
-    UCHAR *p = m_sel;
+    UCHAR *p = m_sel.get();
     for (int i = 0; i < xy; i++, p++) *p = *p > (UCHAR)0 ? (UCHAR)1 : (UCHAR)0;
   }
 
@@ -429,7 +429,7 @@ return false;
     int fcolor;
 
     lxy             = CSTPic<P>::m_lX * CSTPic<P>::m_lY;
-    pSel            = m_sel;
+    pSel            = m_sel.get();
     pPic            = CSTPic<P>::m_pic;
     bool isRGBMType = CSTPic<P>::getType() == ST_RGBM;
     fcolor          = isRGBMType ? 255 : 65535;
@@ -500,7 +500,7 @@ if (*pSel==(UCHAR)250) {
     box.x1      = -1;
     box.y0      = CSTPic<P>::m_lY;
     box.y1      = -1;
-    UCHAR *pSel = m_sel;
+    UCHAR *pSel = m_sel.get();
     for (int y = 0; y < CSTPic<P>::m_lY; y++)
       for (int x = 0; x < CSTPic<P>::m_lX; x++, pSel++)
         if (*pSel > (UCHAR)0) {
@@ -515,7 +515,7 @@ if (*pSel==(UCHAR)250) {
     for (int y = box.y0; y <= (box.y1); y += step) {
       int l       = 0;
       bool isIn   = false;
-      UCHAR *pSel = m_sel + y * CSTPic<P>::m_lX + box.x0;
+      UCHAR *pSel = m_sel.get() + y * CSTPic<P>::m_lX + box.x0;
       for (int x = box.x0; x <= box.x1; x++, pSel++) {
         if (isIn && *pSel == (UCHAR)0) {
           rl += l;
@@ -541,7 +541,7 @@ if (*pSel==(UCHAR)250) {
       int l     = 0;
       bool isIn = false;
       for (int y = box.y0; y <= box.y1; y++) {
-        UCHAR *pSel = m_sel + y * CSTPic<P>::m_lX + x;
+        UCHAR *pSel = m_sel.get() + y * CSTPic<P>::m_lX + x;
         if (isIn && *pSel == (UCHAR)0) {
           rl += l;
           nbRl++;
@@ -579,7 +579,7 @@ if (*pSel==(UCHAR)250) {
   void hlsNoise(const double d) {
     int xy      = CSTPic<P>::m_lX * CSTPic<P>::m_lY;
     P *p        = CSTPic<P>::m_pic;
-    UCHAR *pSel = m_sel;
+    UCHAR *pSel = m_sel.get();
     for (int i = 0; i < xy; i++, p++, pSel++)
       if (p->m > 0 && (*pSel) > (UCHAR)0) {
         double h, l, s, q;

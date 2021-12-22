@@ -31,11 +31,11 @@ echo ""
 echo "checkout libmypaint"
 echo ""
 
-BRANCH="testing"
+BRANCH="libmypaint-v1"
 if [ -d "libmypaint/.git" ]; then
     cd libmypaint && git fetch && git reset --hard "origin/$BRANCH" && cd ..
 else
-    git clone https://github.com/blackwarthog/libmypaint.git --branch $BRANCH
+    git clone https://github.com/mypaint/libmypaint.git --branch $BRANCH
 fi
 
 cd ..

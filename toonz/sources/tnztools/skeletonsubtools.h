@@ -86,6 +86,7 @@ public:
 
 class DragPositionTool final : public DragChannelTool {
   TPointD m_firstPos;
+  bool m_firstDrag = false;
 
 public:
   DragPositionTool(SkeletonTool *tool);
@@ -161,9 +162,10 @@ class IKTool final : public DragTool {
   int m_columnIndex;
   IKEngine m_engine;
   bool m_valid;
+  bool m_rootInvolved;
   TAffine m_footPlacement, m_firstFootPlacement;
   TStageObject *m_foot, *m_firstFoot;
-  bool m_IHateIK;
+  bool m_frameOnNewPin;
   IKToolUndo *m_undo;
 
   struct Joint {

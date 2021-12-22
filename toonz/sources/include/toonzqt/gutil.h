@@ -8,6 +8,7 @@
 #include <QFrame>
 #include <QColor>
 #include "traster.h"
+#include "toonz/preferences.h"
 
 #undef DVAPI
 #undef DVVAR
@@ -45,6 +46,10 @@ class QIcon;
 class TFilePath;
 class QPainterPath;
 class TStroke;
+
+//-----------------------------------------------------------------------------
+
+QString DVAPI getIconThemePath(const QString &filePath);
 
 //-----------------------------------------------------------------------------
 
@@ -102,10 +107,20 @@ svgToPixmap(const QString &svgFilePath, const QSize &size = QSize(),
 int DVAPI getDevPixRatio();
 
 //-----------------------------------------------------------------------------
-QIcon DVAPI createQIcon(const char *iconSVGName);
+
+QPixmap DVAPI compositePixmap(QPixmap pixmap, const qreal &opacity = 0.8,
+                              const QSize &size = QSize(),
+                              const int leftAdj = 0, const int topAdj = 0,
+                              QColor bgColor = Qt::transparent);
+QPixmap DVAPI recolorPixmap(
+    QPixmap pixmap, QColor color = Preferences::instance()->getIconTheme()
+                                       ? Qt::black
+                                       : Qt::white);
+QIcon DVAPI createQIcon(const char *iconSVGName, bool useFullOpacity = false,
+                        bool isForMenuItem = false);
 QIcon DVAPI createQIconPNG(const char *iconPNGName);
-QIcon DVAPI createQIconOnOff(const char *iconSVGName, bool withOver = true);
 QIcon DVAPI createQIconOnOffPNG(const char *iconPNGName, bool withOver = true);
+QIcon DVAPI createTemporaryIconFromName(const char *commandName);
 
 inline QSize dimension2QSize(const TDimension &sz) {
   return QSize(sz.lx, sz.ly);
@@ -117,6 +132,8 @@ QString DVAPI toQString(const TFilePath &path);
 bool DVAPI isSpaceString(const QString &str);
 bool DVAPI isValidFileName(const QString &fileName);
 bool DVAPI isValidFileName_message(const QString &fileName);
+bool DVAPI isReservedFileName(const QString &fileName);
+bool DVAPI isReservedFileName_message(const QString &fileName);
 
 QString DVAPI elideText(const QString &columnName, const QFont &font,
                         int width);

@@ -148,11 +148,8 @@ void CleanupPaletteViewer::buildGUI() {
 
   if (m_greyMode) {
     m_scrollArea->setMinimumSize(0, 60);
-    m_scrollArea->setStyleSheet("QScrollArea { border: none; }");
   } else {
     m_scrollArea->setMinimumSize(0, 120);
-    m_scrollArea->setStyleSheet(
-        "QScrollArea { border: 1px solid rgb(190, 190, 190); }");
   }
 
   m_add->setVisible(!m_greyMode);

@@ -42,10 +42,11 @@ class DVAPI ColumnFan {
   std::map<int, int> m_table;
   int m_firstFreePos;
   int m_unfolded, m_folded;
-
+  bool m_cameraActive;
+  int m_cameraColumnDim;
   /*!
-Called by activate() and deactivate() to update columns coordinates.
-*/
+  Called by activate() and deactivate() to update columns coordinates.
+  */
   void update();
 
 public:
@@ -55,7 +56,7 @@ Constructs a ColumnFan with default value.
   ColumnFan();
 
   //! Adjust column sizes when switching orientation
-  void setDimension(int unfolded);
+  void setDimensions(int unfolded, int cameraColumn);
 
   /*!
 Set column \b col not folded.
@@ -92,6 +93,9 @@ of column identified by \b col.
 
   void saveData(TOStream &os);
   void loadData(TIStream &is);
+
+  void rollLeftFoldedState(int index, int count);
+  void rollRightFoldedState(int index, int count);
 };
 
 #endif

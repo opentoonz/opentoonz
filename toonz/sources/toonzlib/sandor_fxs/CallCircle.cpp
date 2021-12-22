@@ -70,7 +70,7 @@ void CCallCircle::print() {
 
 void CCallCircle::draw(UCHAR *drawB, const int lX, const int lY, const int xx,
                        const int yy, const double r) {
-  double aa = 2.0 * r / 3.0;  // Size of antialising
+  double aa = 2.0 * r / 3.0;  // Size of antialiasing
 
   for (int i = 0; i < m_nb && m_c[i].w <= r; i++) {
     double w = m_c[i].w;

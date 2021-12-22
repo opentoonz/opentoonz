@@ -13,7 +13,7 @@
 #define DVVAR DV_IMPORT_VAR
 #endif
 
-#if !(defined(x64) || defined(__LP64__) || defined(LINUX))
+#if !defined(x64) && !defined(__LP64__) && !(defined(LINUX) || defined(FREEBSD)) && !(defined(__GNUC__) && defined(_WIN32))
 
 #ifdef _WIN32
 

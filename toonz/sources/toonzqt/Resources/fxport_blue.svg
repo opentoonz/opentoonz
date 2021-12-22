@@ -1,1 +1,11 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg width="100%" height="100%" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;"><g id="Layer1"><rect x="0" y="0" width="16" height="16" style="fill:none;"/><path d="M13,8l-10,5l0,-10l10,5Z" style="fill:none;stroke:#002851;stroke-width:2px;"/><path d="M13,8l-10,5l0,-10l10,5Z" style="fill:#3e8ad8;"/></g></svg>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="18px" height="18px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g id="Layer1" transform="matrix(1,0,0,1,1,1)">
+        <g transform="matrix(1.125,0,0,1.125,-1,-1)">
+            <rect x="0" y="0" width="16" height="16" style="fill-opacity:0;"/>
+        </g>
+        <path d="M13,8L4,13L4,3L13,8Z" style="fill:rgb(62,138,216);"/>
+        <path d="M13.486,8.874C13.803,8.698 14,8.363 14,8C14,7.637 13.803,7.302 13.486,7.126L4.486,2.126C4.176,1.954 3.798,1.958 3.493,2.138C3.187,2.318 3,2.646 3,3L3,13C3,13.354 3.187,13.682 3.493,13.862C3.798,14.042 4.176,14.046 4.486,13.874L13.486,8.874ZM13,8L4,13L4,3L13,8Z" style="fill:rgb(0,40,81);"/>
+    </g>
+</svg>

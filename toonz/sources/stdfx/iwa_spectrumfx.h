@@ -8,7 +8,6 @@
 #ifndef IWA_SPECTRUM_H
 #define IWA_SPECTRUM_H
 
-#include "tfxparam.h"
 #include "stdfx.h"
 #include "tfxparam.h"
 

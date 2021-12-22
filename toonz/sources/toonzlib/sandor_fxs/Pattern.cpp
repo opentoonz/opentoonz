@@ -202,7 +202,7 @@ void CPattern::optimalizeSize() {
     std::unique_ptr<UC_PIXEL[]> nPat(new UC_PIXEL[nLX * nLY]);
     if (!nPat) {
       char s[200];
-      sprintf(s, "in Pattern Optimalization \n");
+      snprintf(s, sizeof(s), "in Pattern Optimalization \n");
       throw SMemAllocError(s);
     }
     for (int y = bb.y0; y <= bb.y1; y++)
@@ -239,7 +239,7 @@ void CPattern::rotate(const double angle) {
   std::unique_ptr<UC_PIXEL[]> nPat(new UC_PIXEL[nLXY * nLXY]);
   if (!nPat) {
     char s[200];
-    sprintf(s, "in Pattern Rotation \n");
+    snprintf(s, sizeof(s), "in Pattern Rotation \n");
     throw SMemAllocError(s);
   }
   eraseBuffer(nLXY, nLXY, nPat.get());

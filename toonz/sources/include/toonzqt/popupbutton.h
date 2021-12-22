@@ -20,7 +20,6 @@
 #include <QPushButton>
 #include <QString>
 #include <QIcon>
-#include <QPushButton>
 #include <QList>
 
 // Forward declarations

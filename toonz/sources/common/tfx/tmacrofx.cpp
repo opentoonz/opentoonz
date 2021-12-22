@@ -220,9 +220,9 @@ TFx *TMacroFx::clone(bool recursive) const {
     assert(fx);
     clones[i] = fx->clone(false);
     assert(table.count(fx) == 0);
-    table[fx]                                = i;
+    table[fx] = i;
     if (fx == m_root.getPointer()) rootIndex = i;
-    TFx *linkedFx                            = fx->getLinkedFx();
+    TFx *linkedFx = fx->getLinkedFx();
     if (linkedFx && table.find(linkedFx) != table.end())
       clones[i]->linkParams(clones[table[linkedFx]].getPointer());
   }
@@ -476,9 +476,14 @@ void TMacroFx::loadData(TIStream &is) {
   std::string tagName;
   while (is.openChild(tagName)) {
     if (tagName == "root") {
+      // set the flag here in order to prevent the leaf macro fx in the tree
+      // to try to link this fx before finish loading
+      m_isLoading = true;
       TPersist *p = 0;
       is >> p;
       m_root = dynamic_cast<TFx *>(p);
+      // release the flag
+      m_isLoading = false;
     } else if (tagName == "nodes") {
       while (!is.eos()) {
         TPersist *p = 0;
@@ -491,6 +496,14 @@ void TMacroFx::loadData(TIStream &is) {
         if (TFx *fx = dynamic_cast<TFx *>(p)) {
           m_fxs.push_back(fx);
         }
+      }
+      // collecting params just after loading nodes since they may need on
+      // loading "super" tag in case it is linked with another macro fx
+      collectParams(this);
+      // link parameters if there is a waiting fx for linking with this
+      if (m_waitingLinkFx) {
+        m_waitingLinkFx->linkParams(this);
+        m_waitingLinkFx = nullptr;
       }
     } else if (tagName == "ports") {
       int i = 0;
@@ -533,7 +546,6 @@ void TMacroFx::loadData(TIStream &is) {
       throw TException("unexpected tag " + tagName);
     is.closeChild();
   }
-  collectParams(this);
 }
 
 //--------------------------------------------------
@@ -562,6 +574,21 @@ void TMacroFx::saveData(TOStream &os) {
   os.openChild("super");
   TRasterFx::saveData(os);
   os.closeChild();
+}
+
+//--------------------------------------------------
+
+void TMacroFx::linkParams(TFx *src) {
+  // in case the src fx is not yet loaded
+  // (i.e. we are in loading the src fx tree),
+  // wait linking the parameters until loading src is completed
+  TMacroFx *srcMacroFx = dynamic_cast<TMacroFx *>(src);
+  if (srcMacroFx && srcMacroFx->isLoading()) {
+    srcMacroFx->setWaitingLinkFx(this);
+    return;
+  }
+
+  TFx::linkParams(src);
 }
 
 //--------------------------------------------------

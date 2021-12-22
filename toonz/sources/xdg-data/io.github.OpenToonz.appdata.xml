@@ -19,7 +19,8 @@
       with Digital Video and Studio Ghibli.
     </p>
   </description>
-  <url type="homepage">https://opentoonz.github.io</url>
+  <url type="homepage">https://opentoonz.github.io/e/</url>
+  <url type="bugtracker">https://github.com/opentoonz/opentoonz/issues</url>
   <screenshots>
     <screenshot type="default">
       <image>https://raw.githubusercontent.com/flathub/io.github.OpenToonz/master/screenshot1.png</image>
@@ -27,6 +28,6 @@
   </screenshots>
   <content_rating type="oars-1.1" />
   <releases>
-    <release version="1.2.1" date="2018-06-28"></release>
+    <release version="1.5.0" date="2021-03-25"></release>
   </releases>
 </component>

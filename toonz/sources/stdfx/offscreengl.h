@@ -2,7 +2,7 @@
 
 #ifndef OFFSCREENGL_H
 #define OFFSCREENGL_H
-#if defined(LINUX) || defined(MACOSX)
+#if defined(LINUX) || defined(FREEBSD) || defined(MACOSX)
 #include "tofflinegl.h"
 #endif
 
@@ -71,7 +71,7 @@ public:
           assert(ret == TRUE);
     */
 #else
-#if defined(LINUX) || defined(MACOSX)
+#if defined(LINUX) || defined(FREEBSD) || defined(MACOSX)
     m_offlineGL = new TOfflineGL(TDimension(width, height));
 #endif
 #endif
@@ -93,7 +93,7 @@ public:
     DeleteObject(m_offDIB);
     DeleteObject(m_offHdc);
 #else
-#if defined(LINUX) || defined(MACOSX)
+#if defined(LINUX) || defined(FREEBSD) || defined(MACOSX)
 
     delete m_offlineGL;
 #endif
@@ -127,7 +127,7 @@ public:
   HGLRC m_hglRC;
   BITMAPINFO m_info;
 #else
-#if defined(LINUX) || defined(MACOSX)
+#if defined(LINUX) || defined(FREEBSD) || defined(MACOSX)
   TOfflineGL *m_offlineGL;
 #endif
 #endif

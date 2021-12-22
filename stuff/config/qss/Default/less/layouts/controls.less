@@ -1,6 +1,6 @@
 
-// The Less compiler has trouble compiling Qt selectors when they have been
-// extended to, so extend Qt selectors to mixins as workaround for now
+// Note: The compiler has trouble with Qt names when they have been extended to
+// so we extend Qt names to mixins as a workaround for now.
 
 /* -----------------------------------------------------------------------------
    Push Button
@@ -8,7 +8,9 @@
 
 .Button {
   background-color: @button-bg-color;
-  border: 1 solid @button-border-color;
+  border-color: @button-border-color;
+  border-width: @button-border-width;
+  border-style: solid;
   border-radius: 2;
   color: @button-text-color;
   margin: 0;
@@ -29,6 +31,7 @@
     color: @button-text-color-checked;
     &:hover {
       background-color: @button-bg-color-checked-hover;
+      border-color: @button-border-color-checked-hover;
       &:pressed {
         background: @button-bg-color-checked-hover-pressed;
       }
@@ -50,35 +53,66 @@ QPushButton {
 }
 
 /* -----------------------------------------------------------------------------
-   Combo Box
+   ComboBox
 ----------------------------------------------------------------------------- */
 
 .ComboBox {
   &:extend(.Button);
   padding: 1 0 1 4;
   margin: 1 0;
+  &:editable {  /* for editable ComboBox */
+    color: @input-text-color;
+    background-color: @input-bg-color;
+    border-color: @input-border-color;
+    padding: 1 0 1 3;
+    selection-background-color: @input-selection-bg-color;
+    selection-color: @input-selection-text-color;
+  }
   &:hover {
-    &:extend(.Button:hover);
+    background-color: @button-bg-color-hover;
+    &:editable {
+      background-color: @input-bg-color;
+    }
   }
   &:checked {
-    &:extend(.ComboBox);
+    border-color: @input-border-color-focus;
+  }
+  &:focus {
+    border-color: @input-border-color-focus;
   }
   &:disabled {
     &:extend(.Button:disabled);
   }
   &::drop-down {
+    border: 0;
     image: url('@{img-url}/combo_downarrow.svg');
     image-position: center center;
     width: 16;
+    &:editable {
+      background-color: @button-bg-color;
+      border-left: @combobox-dropdown-border-size solid @button-border-color;
+      border-top-right-radius: @combobox-dropdown-border-radius;
+      border-bottom-right-radius: @combobox-dropdown-border-radius;
+    }
+    &:hover {
+      border-color: @combobox-dropdown-border-color-hover;
+      &:editable {
+        background-color: @button-bg-color-hover;
+        border-color: @button-border-color;
+      }
+    }
     &:disabled {
       image: url('@{img-url}/combo_downarrow_disabled.svg');
+      &:editable {
+        background-color: @combobox-dropdown-bg-color-disabled-editable;
+      }
     }
   }
   & QAbstractItemView {
     background-color: @menu-bg-color;
     border: 1 solid @menu-border-color;
-    selection-background-color: @hl-bg-color;
-    selection-color: @hl-text-color;
+    selection-background-color: @menu-item-bg-color-selected;
+    selection-color: @menu-item-text-color-selected;
   }
 }
 
@@ -93,7 +127,7 @@ QComboBox {
 .LineEdit {
   background-color: @input-bg-color;
   border: 1 solid @input-border-color;
-  border-radius: 2;
+  border-radius: @input-border-radius;
   color: @input-text-color;
   selection-background-color: @input-selection-bg-color;
   selection-color: @input-selection-text-color;
@@ -110,8 +144,22 @@ QComboBox {
   }
 }
 
-QLineEdit {
+QPlainTextEdit,
+QLineEdit,
+QTextEdit {
   &:extend(.LineEdit all);
+}
+
+// reset all styles for read-only QtextEdit
+QTextEdit[readOnly="true"]{
+  &:extend(QWidget all);
+  border: 0;
+  &:focus,
+  &:disabled {
+    background-color: @bg;
+    color: @text-color;
+    border: 0;
+  }
 }
 
 /* -----------------------------------------------------------------------------
@@ -129,10 +177,10 @@ QLineEdit {
   &::indicator {
     background-color: @checkbox-bg-color;
     border: 1 solid @checkbox-border-color;
-    border-radius: 2;
-    height: 9;      /* fix for QGroupBox */
+    border-radius: @checkbox-border-radius;
+    height: @checkbox-size;      /* fix for QGroupBox */
     padding: 1;
-    width: 9;       /* fix for QMenu */
+    width: @checkbox-size;       /* fix for QMenu */
     &:hover {
       background-color: @checkbox-bg-color-hover;
       border-color: @checkbox-border-color-hover;
@@ -140,14 +188,29 @@ QLineEdit {
     &:checked {
       background-color: @checkbox-bg-color-checked;
       border-color: @checkbox-border-color-checked;
-      image: url('@{img-url}/checkmark.svg');
+      image: url('@{img-url}/@{checkbox-img}');
+      &:hover {
+        &:extend(.CheckBox::indicator:hover);
+        background-color: @checkbox-bg-color-checked-hover;
+        border-color: @checkbox-border-color-checked-hover;
+      }
+      &:disabled {
+        background-color: @checkbox-bg-color-checked-disabled;
+        border-color: @checkbox-border-color-checked-disabled;
+        image: url('@{img-url}/@{checkbox-img-disabled}');
+      }
+    }
+    &:indeterminate {
+      background-color: @checkbox-bg-color-checked;
+      border-color: @checkbox-border-color-checked;
+      image: url('@{img-url}/@{checkbox-partially-img}');
       &:hover {
         &:extend(.CheckBox::indicator:hover);
       }
       &:disabled {
-        background-color: @checkbox-bg-color-disabled;
-        border-color: @checkbox-border-color-disabled;
-        image: url('@{img-url}/checkmark_disabled.svg');
+        background-color: @checkbox-bg-color-checked-disabled;
+        border-color: @checkbox-border-color-checked-disabled;
+        image: url('@{img-url}/@{checkbox-partially-img-disabled}');
       }
     }
     &:disabled {
@@ -162,21 +225,44 @@ QCheckBox {
 }
 
 /* -----------------------------------------------------------------------------
-   Radio Button
+   RadioButton
 ----------------------------------------------------------------------------- */
 
 .RadioButton {
+  color: @text-color;
   &:hover {
-    &:extend(.CheckBox:hover);
+    color: @checkbox-text-color-hover;
   }
+  &:checked {
+    color: @text-color;
+  }
+  &:disabled {
+    color: @text-color-disabled;
+  }
+  padding: 0;
+  margin: 0;
   &::indicator {
+    @size: 13;
+    width: @size;
+    height: @size;
+    background-color: transparent;
+    border: 0;
+    image-position: center center;
     &:unchecked {
-      image: url('@{img-url}/radiobutton_unchecked.svg');
-      image-position: center center;
+      image: url('@{img-url}/@{radiobutton-img-unchecked}');
+      &:hover {
+        image: url('@{img-url}/@{radiobutton-img-unchecked-hover}');
+      }
     }
     &:checked {
-      image: url('@{img-url}/radiobutton_checked.svg');
-      image-position: center center;
+      image: url('@{img-url}/@{radiobutton-img-checked}');
+      &:disabled {
+        background-color: transparent;
+        image: url('@{img-url}/@{radiobutton-img-checked-disabled}');
+      }
+    }
+    &:disabled {
+      image: url('@{img-url}/@{radiobutton-img-unchecked-disabled}');
     }
   }
 }
@@ -224,24 +310,41 @@ QGroupBox {
 ----------------------------------------------------------------------------- */
 
 .Slider {
-  &::groove:horizontal {
+  &::groove{
     background-color: transparent;
     background-image: url('@{img-url}/@{slider-groove-img}');
     background-position: center center;
-    background-repeat: repeat-x;
     margin: 0;
+    &:horizontal {
+    background-repeat: repeat-x;
     height: 20;
     min-height: 20;
+    }
+    &:vertical {
+      background-repeat: repeat-y;
+      width: 20;
+      min-width: 20;
+    }
     &:disabled {
       background-image: url('@{img-url}/@{slider-groove-img-disabled}');
     }
   }
-  &::handle:horizontal {
-    width: @slider-handle-width;
-    margin: @slider-handle-margin;
-    image: url('@{img-url}/@{slider-handle-img}');
-    &:disabled {
-      image: url('@{img-url}/@{slider-handle-img-disabled}');
+  &::handle{
+    &:horizontal {
+      margin: @slider-handle-margin;
+      width: @slider-handle-width;
+      image: url('@{img-url}/@{slider-handle-img}');
+      &:disabled {
+        image: url('@{img-url}/@{slider-handle-img-disabled}');
+      }
+    }
+    &:vertical {
+      margin: @slider-v-handle-margin;
+      height: @slider-handle-width;
+      image: url('@{img-url}/@{slider-v-handle-img}');
+      &:disabled {
+        image: url('@{img-url}/@{slider-v-handle-img-disabled}');
+      }
     }
   }
 }
@@ -266,4 +369,22 @@ QSlider {
 
 	qproperty-HandleLeftGrayPixmap: url("@{img-url}/@{slider-left-handle-disabled}");
   qproperty-HandleRightGrayPixmap: url("@{img-url}/@{slider-right-handle-disabled}");
+}
+
+/* -----------------------------------------------------------------------------
+   Progress Bar
+----------------------------------------------------------------------------- */
+
+QProgressBar {
+  text-align: center;
+  background-color: @progressbar-bg-color;
+  border: 1 solid @progressbar-border-color;
+  border-radius: 3; /* 2 fits inside 3 */
+  padding: 0;
+  &::chunk {
+    margin: -1; /* hide border of chunk except for right side */
+    background-color: @progressbar-chunk-bg-color;
+    border: 1 solid @progressbar-chunk-border-color;
+    border-radius: 2;
+  }
 }

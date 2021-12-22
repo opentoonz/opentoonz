@@ -6,10 +6,11 @@
 #include "tpixelutils.h"
 #include "tparamset.h"
 #include "trop.h"
+#include "globalcontrollablefx.h"
 
 //===================================================================
 
-class AdjustLevelsFx final : public TStandardRasterFx {
+class AdjustLevelsFx final : public GlobalControllableFx {
   FX_PLUGIN_DECLARATION(AdjustLevelsFx)
 
   TRasterFxPort m_input;

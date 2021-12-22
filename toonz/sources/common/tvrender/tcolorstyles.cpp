@@ -9,7 +9,6 @@
 #include "tconvert.h"
 #include "tofflinegl.h"
 #include "tpixelutils.h"
-#include "tflash.h"
 #include "tcolorstyles.h"
 
 //*****************************************************************************
@@ -476,43 +475,6 @@ static double computeAverageThickness(const TStroke *s, double &minThickness,
   return resThick / (s->getControlPointCount() - 4);
 }
 
-void TColorStyle::drawStroke(TFlash &flash, const TStroke *s) const {
-  bool isCenterline = false;
-  double minThickness, maxThickness = 0;
-  std::wstring quality = flash.getLineQuality();
-  double thickness     = computeAverageThickness(s, minThickness, maxThickness);
-  if (minThickness == maxThickness && minThickness == 0) return;
-  if (quality == TFlash::ConstantLines)
-    isCenterline = true;
-  else if (quality == TFlash::MixedLines &&
-           (maxThickness == 0 || minThickness / maxThickness > 0.5))
-    isCenterline = true;
-  else if (quality == TFlash::VariableLines &&
-           maxThickness - minThickness <
-               0.16)  // Quando si salva il pli, si approssima al thick.
-                      // L'errore di approx e' sempre 0.1568...
-    isCenterline = true;
-  // else	assert(false);
-
-  flash.setFillColor(getAverageColor());
-  // flash.setFillColor(TPixel::Red);
-
-  TStroke *saux = const_cast<TStroke *>(s);
-  if (isCenterline) {
-    saux->setAverageThickness(thickness);
-    flash.setThickness(s->getAverageThickness());
-    flash.setLineColor(getAverageColor());
-    flash.drawCenterline(s, false);
-  } else {
-    saux->setAverageThickness(0);
-    if (!flash.drawOutline(saux)) {
-      flash.setThickness(thickness);
-      flash.setLineColor(getAverageColor());
-      flash.drawCenterline(s, false);
-    }
-  }
-}
-
 //-----------------------------------------------------------------------------
 // Format: _123 |global name
 // _123 = flag; optional (*)
@@ -525,7 +487,7 @@ void TColorStyle::drawStroke(TFlash &flash, const TStroke *s) const {
 void TColorStyle::save(TOutputStreamInterface &os) const {
   std::wstring name = getName();
   bool numberedName =
-      !name.empty() && ('0' <= name[0] && name[0] <= '9' || name[0] == '_');
+      !name.empty() && (('0' <= name[0] && name[0] <= '9') || name[0] == '_');
 
   if (m_flags > 0 || (name.length() == 1 && numberedName))
     os << ("_" + QString::number(m_flags)).toStdString();

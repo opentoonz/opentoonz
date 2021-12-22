@@ -1,0 +1,100 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[a4paper, total={180mm, 272mm}]{geometry}
+
+\usepackage{fontspec}
+\setmainfont[Path=fonts/, Extension=.ttf]{ipaexm}
+
+\setlength\parindent{3.5em}
+\setlength\parskip{0em}
+\renewcommand{\baselinestretch}{1.247}
+
+\begin{document}
+
+\thispagestyle{empty}
+
+\Large
+\noindent \\
+HSV Adjust Ino\medskip
+\par
+\normalsize
+Allows to modify the Hue (H), Saturation (S), and Value (V) values of the image,\par 
+multiplying them by the Scale parameter, and then Shifted by the specified amount.\\
+\\
+-{-}- \ Inputs \ -{-}-\\
+\\
+Source\par
+Connect the image to be processed.\\
+Reference\par
+Connect the reference image to assign the strength of the effect into each pixel.\\
+\\
+-{-}- \ Settings \ -{-}-\\
+\\
+Pivot\par
+Specify the central value from where to apply the Scale.\\
+
+\noindent \ \ \, Hue\par
+Specify the central value for scaling the Hue.\par
+Minimum is 0.0, maximum is 360.0.\par
+\noindent \ \ \, Saturation\par
+Specify the central value for scaling the Saturation.\par
+Minimum is 0.0, maximum is 1.0.\par
+The default value is 0.0.\par
+\noindent \ \ \, Value\par
+Specify the central value for scaling the Value.\par
+Minimum is 0.0, maximum is 1.0.\par
+The default value is 0.0.\\
+\\
+Scale\par
+\noindent \ \ \, Enlarge or reduce the HSV range by multipliying the Scale around the Pivot value.\par
+\noindent \ \ \, Hue value will be applied recursively around the color circle,\par
+\noindent \ \ \, Saturation and Value values will be in the range from 0 to 1.\\
+
+\noindent \ \ \, Hue\par
+Multiplication factor for the Hue.\par
+Minimum value is 0.0.\par
+The default value is 1.0.\par
+\noindent \ \ \, Saturation\par
+Multiplication factor for the Saturation.\par
+Minimum value is 0.0.\par
+The default value is 1.0.\par
+
+\newpage
+
+\thispagestyle{empty}
+
+\ \vspace{-0.2em}
+\par
+\noindent \ \ \, Value\par
+Multiplication factor for the Value.\par
+Minimum value is 0.0.\par
+The default value is 1.0.\\
+\\
+Shift\par
+\noindent \ \ \, This will Shift the values in HSV color space.\par
+\noindent \ \ \, Hue value will be shifted recursively around the color circle.\par
+\noindent \ \ \, Saturation and Value values will range from 0 to 1.\\
+\par
+\noindent \ \ \, Hue\par
+Shift for the Hue.\par
+The default value is 0.0.\par
+\noindent \ \ \, Saturation\par
+Shift for the Saturation.\par
+The default value is 0.0.\\
+\noindent \ \ \, Value\par
+Shift for the Value.\par
+The default value is 0.0.\\
+\\
+Premultiplied\par
+When ON, the image will be processed as if having a Premultiplied Alpha channel\par 
+(Alpha value already multiplied by RGB channels).\par
+If image is not premultiplied, the image may not look correct.\par
+The default setting is ON.\\
+\\
+Reference\par
+Specify which channel to use from the image connected to the Reference port to\par 
+drive the intensity of the effect.\par
+Choose from Red/Green/Blue/Alpha/Luminance.\par
+Choose Nothing to disable the effect.\par
+The default value is \textquotedbl Red\textquotedbl .
+
+\end{document}

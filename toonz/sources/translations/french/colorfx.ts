@@ -9,11 +9,11 @@
     </message>
     <message>
         <source>Horiz Offset</source>
-        <translation>Décalage Horizontal</translation>
+        <translation>Décalage horizontal</translation>
     </message>
     <message>
         <source>Vert Offset</source>
-        <translation>Décalage Vertical</translation>
+        <translation>Décalage vertical</translation>
     </message>
     <message>
         <source>Noise</source>
@@ -28,30 +28,30 @@
     </message>
     <message>
         <source>Horiz Offset</source>
-        <translation>Décalage Horizontal</translation>
+        <translation>Décalage horizontal</translation>
     </message>
     <message>
         <source>Vert Offset</source>
-        <translation>Décalage Vertical</translation>
+        <translation>Décalage vertical</translation>
     </message>
 </context>
 <context>
     <name>OutlineViewerStyle</name>
     <message>
         <source>OutlineViewer(OnlyDebug)</source>
-        <translation></translation>
+        <translation>Visualiseur de contours (Débogage uniquement)</translation>
     </message>
     <message>
         <source>Control Point</source>
-        <translation>Point de Contrôle</translation>
+        <translation>Point de contrôle</translation>
     </message>
     <message>
         <source>Center Line</source>
-        <translation>Ligne Centrale</translation>
+        <translation>Ligne de centrage</translation>
     </message>
     <message>
         <source>Outline Mode</source>
-        <translation>Modalité Contour</translation>
+        <translation>Type de contour</translation>
     </message>
     <message>
         <source>Distance</source>
@@ -59,14 +59,14 @@
     </message>
     <message>
         <source>distance</source>
-        <translation>Distance</translation>
+        <translation>distance</translation>
     </message>
 </context>
 <context>
     <name>ShadowStyle</name>
     <message>
         <source>Hatched Shading</source>
-        <translation>Ombre Hachurée</translation>
+        <translation>Ombres hachurées</translation>
     </message>
     <message>
         <source>Angle</source>
@@ -85,7 +85,7 @@
     <name>ShadowStyle2</name>
     <message>
         <source>Plain Shadow</source>
-        <translation>Ombre Plaine</translation>
+        <translation>Ombre pleine</translation>
     </message>
     <message>
         <source>Angle</source>
@@ -104,7 +104,7 @@
     </message>
     <message>
         <source>Blur value</source>
-        <translation>Flou</translation>
+        <translation>Valeur de flou</translation>
     </message>
 </context>
 <context>
@@ -118,7 +118,7 @@
     <name>TBlendRasterStyle</name>
     <message>
         <source>Blend</source>
-        <translation>Mélange</translation>
+        <translation>Fusion</translation>
     </message>
 </context>
 <context>
@@ -129,33 +129,33 @@
     </message>
     <message>
         <source>Border Fade</source>
-        <translation>Fondu des Frontières</translation>
+        <translation>Fondu de bordure</translation>
     </message>
     <message>
         <source>Fade In</source>
-        <translation>Fondu Initial</translation>
+        <translation>Ouverture en fondu</translation>
     </message>
     <message>
         <source>Fade Out</source>
-        <translation>Fondu Final</translation>
+        <translation>Fermeture en fondu</translation>
     </message>
 </context>
 <context>
     <name>TBraidStrokeStyle</name>
     <message>
         <source>Plait</source>
-        <translation>Tresse</translation>
+        <translation>Tresser</translation>
     </message>
     <message>
         <source>Twirl</source>
-        <translation>Tressage</translation>
+        <translation>Tournoyer</translation>
     </message>
 </context>
 <context>
     <name>TBubbleStrokeStyle</name>
     <message>
         <source>Bubbles</source>
-        <translation>Bubbles</translation>
+        <translation>Bulles</translation>
     </message>
 </context>
 <context>
@@ -177,7 +177,7 @@
     </message>
     <message>
         <source>Dot Size</source>
-        <translation>Taille des Points</translation>
+        <translation>Taille de point</translation>
     </message>
 </context>
 <context>
@@ -188,7 +188,7 @@
     </message>
     <message>
         <source>Border Fade</source>
-        <translation>Fondu des Frontières</translation>
+        <translation>Fondu de bordure</translation>
     </message>
     <message>
         <source>Density</source>
@@ -196,11 +196,11 @@
     </message>
     <message>
         <source>Fade In</source>
-        <translation>Fondu Initial</translation>
+        <translation>Ouverture en fondu</translation>
     </message>
     <message>
         <source>Fade Out</source>
-        <translation>Fondu Final</translation>
+        <translation>Fermeture en fondu</translation>
     </message>
     <message>
         <source>Noise</source>
@@ -215,19 +215,19 @@
     </message>
     <message>
         <source>Horiz Dist</source>
-        <translation>Distance Horizontale</translation>
+        <translation>Distance horizontale</translation>
     </message>
     <message>
         <source>Horiz Angle</source>
-        <translation>Angle Horizontal</translation>
+        <translation>Angle horizontal</translation>
     </message>
     <message>
         <source>Vert Dist</source>
-        <translation>Distance Verticale</translation>
+        <translation>Distance verticale</translation>
     </message>
     <message>
         <source>Vert Angle</source>
-        <translation>Angle Vertical</translation>
+        <translation>Angle vertical</translation>
     </message>
     <message>
         <source>Thickness</source>
@@ -242,11 +242,11 @@
     </message>
     <message>
         <source>Horiz Size</source>
-        <translation>Taille Horizontale</translation>
+        <translation>Taille horizontale</translation>
     </message>
     <message>
         <source>Vert Size</source>
-        <translation>Taille Verticale</translation>
+        <translation>Taille verticale</translation>
     </message>
     <message>
         <source>Angle</source>
@@ -299,11 +299,11 @@
     </message>
     <message>
         <source>Dot Size</source>
-        <translation>Taille des Pois</translation>
+        <translation>Taille des points</translation>
     </message>
     <message>
         <source>Dot Distance</source>
-        <translation>Distance des Pois</translation>
+        <translation>Distance entre les points</translation>
     </message>
 </context>
 <context>
@@ -314,7 +314,7 @@
     </message>
     <message>
         <source>Fade In</source>
-        <translation>Fondu Initial</translation>
+        <translation>Ouverture en fondu</translation>
     </message>
     <message>
         <source>Dash</source>
@@ -322,7 +322,7 @@
     </message>
     <message>
         <source>Fade Out</source>
-        <translation>Fondu Final</translation>
+        <translation>Fermeture en fondu</translation>
     </message>
     <message>
         <source>Gap</source>
@@ -348,7 +348,7 @@
     </message>
     <message>
         <source>Twirl</source>
-        <translation>Tressage</translation>
+        <translation>Tournoyer</translation>
     </message>
     <message>
         <source>Thickness</source>
@@ -385,7 +385,7 @@
     <name>TLinGradFillStyle</name>
     <message>
         <source>Linear Gradient</source>
-        <translation>Dégradé Linéaire</translation>
+        <translation>Dégradé linéaire</translation>
     </message>
     <message>
         <source>Angle</source>
@@ -401,7 +401,7 @@
     </message>
     <message>
         <source>Smoothness</source>
-        <translation>Douceur</translation>
+        <translation>Régularité</translation>
     </message>
 </context>
 <context>
@@ -412,7 +412,7 @@
     </message>
     <message>
         <source>Distance</source>
-        <translation></translation>
+        <translation>Distance</translation>
     </message>
 </context>
 <context>
@@ -442,11 +442,11 @@
     </message>
     <message>
         <source>Min Thick</source>
-        <translation>Épais Min</translation>
+        <translation>Épaisseur minimale</translation>
     </message>
     <message>
         <source>Max Thick</source>
-        <translation>Épais Max</translation>
+        <translation>Épaisseur maximale</translation>
     </message>
 </context>
 <context>
@@ -487,11 +487,11 @@
     </message>
     <message>
         <source>Light X Pos</source>
-        <translation>Position X de la Lumière</translation>
+        <translation>Position X de la lumière</translation>
     </message>
     <message>
         <source>Light Y Pos</source>
-        <translation>Position Y de la Lumière</translation>
+        <translation>Position Y de la lumière</translation>
     </message>
     <message>
         <source>Shininess</source>
@@ -525,7 +525,7 @@
     <name>TPointShadowFillStyle</name>
     <message>
         <source>Sponge Shading</source>
-        <translation>Ombre Épongée</translation>
+        <translation>Ombre épongée</translation>
     </message>
     <message>
         <source>Angle</source>
@@ -541,14 +541,14 @@
     </message>
     <message>
         <source>Point Size</source>
-        <translation>Taille des Points</translation>
+        <translation>Taille des points</translation>
     </message>
 </context>
 <context>
     <name>TRadGradFillStyle</name>
     <message>
         <source>Radial Gradient</source>
-        <translation>Dégradé Radial</translation>
+        <translation>Dégradé radial</translation>
     </message>
     <message>
         <source>X Position</source>
@@ -560,11 +560,11 @@
     </message>
     <message>
         <source>Radius</source>
-        <translation>Radius</translation>
+        <translation>Rayon</translation>
     </message>
     <message>
         <source>Smoothness</source>
-        <translation>Douceur</translation>
+        <translation>Régularité</translation>
     </message>
 </context>
 <context>
@@ -630,7 +630,7 @@
     </message>
     <message>
         <source>Border Fade</source>
-        <translation>Fondu des Frontières</translation>
+        <translation>Fondu de bordure</translation>
     </message>
     <message>
         <source>Density</source>
@@ -672,7 +672,7 @@
     </message>
     <message>
         <source>Border Size</source>
-        <translation>Taille de Bordure</translation>
+        <translation>Taille de bordure</translation>
     </message>
 </context>
 <context>
@@ -683,11 +683,11 @@
     </message>
     <message>
         <source>Twirl</source>
-        <translation>Tressage</translation>
+        <translation>Tournoyer</translation>
     </message>
     <message>
         <source>Shade</source>
-        <translation>Nuance</translation>
+        <translation>Ombre</translation>
     </message>
 </context>
 <context>
@@ -705,23 +705,23 @@
     </message>
     <message>
         <source>Min Distance</source>
-        <translation>Distance Minimale</translation>
+        <translation>Distance minimale</translation>
     </message>
     <message>
         <source>Max Distance</source>
-        <translation>Distance Maximale</translation>
+        <translation>Distance maximale</translation>
     </message>
     <message>
         <source>Min Angle</source>
-        <translation>Angle Minimale</translation>
+        <translation>Angle minimal</translation>
     </message>
     <message>
         <source>Max Angle</source>
-        <translation>Angle Maximale</translation>
+        <translation>Angle maximal</translation>
     </message>
     <message>
         <source>Thickness</source>
-        <translation>Epaisseur</translation>
+        <translation>Épaisseur</translation>
     </message>
 </context>
 </TS>

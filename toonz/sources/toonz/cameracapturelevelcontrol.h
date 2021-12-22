@@ -5,11 +5,12 @@
 
 #include <QFrame>
 #include <QVector>
+#include "opencv2/opencv.hpp"
 
 namespace DVGui {
 class IntLineEdit;
 class DoubleLineEdit;
-}
+}  // namespace DVGui
 //=============================================================================
 // CameraCaptureLevelHistogram
 //-----------------------------------------------------------------------------
@@ -22,15 +23,12 @@ public:
     WhiteSlider,
     GammaSlider,
     ThresholdSlider,
-    Histogram,
     NumItems
   };
   enum LevelControlMode { Color_GrayScale, BlackAndWhite, NumModes };
 
 private:
-  bool m_histogramCue;
   QVector<int> m_histogramData;
-
   LevelControlItem m_currentItem;
 
   int m_black, m_white, m_threshold;
@@ -42,7 +40,7 @@ private:
 public:
   CameraCaptureLevelHistogram(QWidget* parent = 0);
 
-  void updateHistogram(QImage& image);
+  void updateHistogram(cv::Mat& image);
 
   int black() { return m_black; }
   int white() { return m_white; }
@@ -78,19 +76,18 @@ class CameraCaptureLevelControl : public QFrame {
   CameraCaptureLevelHistogram* m_histogram;
   DVGui::IntLineEdit *m_blackFld, *m_whiteFld, *m_thresholdFld;
   DVGui::DoubleLineEdit* m_gammaFld;
+  cv::Mat m_lut;
+
+  void computeLut();
 
 public:
   CameraCaptureLevelControl(QWidget* parent = 0);
 
-  void updateHistogram(QImage& image) { m_histogram->updateHistogram(image); }
+  void updateHistogram(cv::Mat& image) { m_histogram->updateHistogram(image); }
   void setMode(bool color_grayscale);
 
-  void getValues(int& black, int& white, float& gamma) {
-    black = m_histogram->black();
-    white = m_histogram->white();
-    gamma = m_histogram->gamma();
-  }
-  float getThreshold() { return m_histogram->threshold(); }
+  void adjustLevel(cv::Mat& image);
+  void binarize(cv::Mat& image);
 
 protected slots:
   void onHistogramValueChanged(int itemId);

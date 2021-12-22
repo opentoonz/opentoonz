@@ -229,7 +229,7 @@ void erodilate_chan(const TRasterPT<Pix> &src, const TRasterPT<Chan> &dst,
   // perform a cache-friendly iteration in the separable/square kernel case
   int x, y, lx = src->getLx(), ly = src->getLy();
 
-  // Peform rows erodilation
+  // Perform rows erodilation
   TRasterPT<Chan> temp(ly, lx);  // Notice transposition plz
 
   {

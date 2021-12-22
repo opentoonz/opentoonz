@@ -60,7 +60,7 @@ SVNPurgeDialog::SVNPurgeDialog(QWidget *parent, const QString &workingDir)
 
   addButtonBarWidget(m_purgeButton, m_cancelButton);
 
-  // 0. Connect for svn errors (that may occurs everythings)
+  // 0. Connect for svn errors (that may occur every time)
   connect(&m_thread, SIGNAL(error(const QString &)), this,
           SLOT(onError(const QString &)));
 

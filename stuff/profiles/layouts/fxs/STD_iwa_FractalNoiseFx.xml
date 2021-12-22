@@ -1,0 +1,38 @@
+<fxlayout>
+	<page name="Fractal Noise Iwa">
+    <control>fractalType</control>
+    <control>noiseType</control>
+    <control>invert</control>
+<separator label="Transform"/>
+    <control>rotation</control>
+    <control>uniformScaling</control>
+    <vbox modeSensitive="uniformScaling" mode="1">
+    <control>scale</control>
+    </vbox>
+    <vbox modeSensitive="uniformScaling" mode="0">
+    <control>scaleW</control>
+    <control>scaleH</control>
+    </vbox>
+    <control>offsetTurbulence</control>
+    <control>perspectiveOffset</control>
+<separator/>
+    <control>complexity</control>
+<separator label="Sub Settings"/>
+    <control>subInfluence</control>
+    <control>subScaling</control>
+    <control>subRotation</control>
+    <control>subOffset</control>
+    <control>centerSubscale</control>
+<separator label="Evolution Options"/>
+    <control>evolution</control>
+    <control>cycleEvolution</control>
+    <vbox modeSensitive="cycleEvolution" mode="1">
+    <control>cycleEvolutionRange</control>
+    </vbox>
+<separator/>
+    <vbox modeSensitive="fractalType" mode="4,5">
+    <control>dynamicIntensity</control>
+    </vbox>
+    <control>alphaRendering</control>
+	</page>
+</fxlayout>

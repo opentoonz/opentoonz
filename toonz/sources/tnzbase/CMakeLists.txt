@@ -55,7 +55,6 @@ set(HEADERS ${MOC_HEADERS}
     ../include/tcli.h
     ../include/tcolorutils.h
     ../include/tparamundo.h
-    ../include/ttimer.h
     ../include/ttest.h
     ../include/texpression.h
     ../include/tgrammar.h
@@ -103,7 +102,6 @@ set(SOURCES
     ../common/tapptools/tcli.cpp
     ../common/tapptools/tcolorutils.cpp
     ../common/tapptools/tparamundo.cpp
-    ../common/tapptools/ttimer.cpp
     ../common/ttest/ttest.cpp
     ../common/expressions/texpression.cpp
     ../common/expressions/tgrammar.cpp
@@ -165,7 +163,7 @@ qt5_wrap_cpp(SOURCES ${MOC_HEADERS})
 add_library(tnzbase SHARED ${HEADERS} ${SOURCES} ${OBJCSOURCES})
 
 if(BUILD_ENV_APPLE)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-install_name,@rpath/libtnzbase.dylib")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-install_name,@executable_path/libtnzbase.dylib")
     add_dependencies(tnzbase tnzcore)
 endif()
 
@@ -200,7 +198,7 @@ elseif(BUILD_ENV_APPLE)
     find_library(COCOA_LIB Cocoa)
 
     set(EXTRA_LIBS
-        ${CMAKE_CURRENT_BINARY_DIR}/../tnzcore/libtnzcore.dylib
+        "$<TARGET_FILE:tnzcore>"
         ${USB_LIB}
         ${TWAIN_LIB}
         ${IOKIT_LIB}
@@ -208,15 +206,6 @@ elseif(BUILD_ENV_APPLE)
     )
 elseif(BUILD_ENV_UNIXLIKE)
     _find_toonz_library(EXTRA_LIBS "tnzcore")
-    if(NOT BUILD_TARGET_WIN)
-        set(EXTRA_LIBS ${EXTRA_LIBS}
-            ${SDL_LIB_LIBRARIES}
-        )
-        include_directories(
-            SYSTEM
-            ${SDL_LIB_INCLUDE_DIRS}
-        )
-    endif()
 endif()
 
 target_link_libraries(tnzbase Qt5::Core Qt5::Gui ${EXTRA_LIBS})

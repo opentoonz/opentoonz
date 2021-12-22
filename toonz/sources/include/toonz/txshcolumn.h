@@ -9,6 +9,7 @@
 
 #include <QPair>
 #include <QString>
+#include <QMap>
 
 #undef DVAPI
 #undef DVVAR
@@ -40,7 +41,7 @@ class TFx;
    \b TXshCellColumn, \b TXshSoundColumn and TXshPaletteColumn.
 
    The class contains all features about a generic xsheet column and gives
-   all methods to access to these informations.
+   all methods to access to these information.
 
    The createEmpty() static method creates an new empty column.
 
@@ -265,6 +266,8 @@ Set column color tag to \b colorTag.
   TPixel32 getFilterColor();
   static QPair<QString, TPixel32> getFilterInfo(FilterColor key);
   static void initColorFilters();
+
+  void resetColumnProperties();
 };
 
 #ifdef _WIN32
@@ -301,6 +304,9 @@ class DVAPI TXshCellColumn : public TXshColumn {
 protected:
   std::vector<TXshCell> m_cells;
   int m_first;
+
+  // cell marks information key:frame value:id
+  QMap<int, int> m_cellMarkIds;
 
 public:
   /*!
@@ -396,6 +402,13 @@ last row with not empty cell of same level.
   bool getLevelRange(int row, int &r0, int &r1) const override;
 
   // virtual void updateIcon() = 0;
+
+  void saveCellMarks(TOStream &os);
+  bool loadCellMarks(std::string tagName, TIStream &is);
+  void setCellMark(int frame, int id);
+  int getCellMark(int frame) const;
+  QMap<int, int> getCellMarks() const;
+  void clearCellMarks();
 };
 
 #endif

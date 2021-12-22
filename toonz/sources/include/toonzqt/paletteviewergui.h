@@ -50,22 +50,6 @@ class StyleNameEditor;
 
 namespace PaletteViewerGUI {
 
-// class for managing the palette's default style chip size
-class DVAPI ChipSizeManager {
-public:
-  int chipSize_Palette;
-  int chipSize_Cleanup;
-  int chipSize_Studio;
-  static ChipSizeManager *instance() {
-    static ChipSizeManager _instance;
-    return &_instance;
-  }
-
-private:
-  ChipSizeManager()
-      : chipSize_Palette(2), chipSize_Cleanup(2), chipSize_Studio(2) {}
-};
-
 enum PaletteViewType  //! Possible palette contents of a Palette Viewer.
 { LEVEL_PALETTE,      //!< Content palette is from a level.
   CLEANUP_PALETTE,    //!< Content palette is from cleanup settings.
@@ -81,6 +65,41 @@ class DVAPI PageViewer final : public QFrame, public TSelection::View {
 
   QColor m_textColor;  // text color used for list view
   Q_PROPERTY(QColor TextColor READ getTextColor WRITE setTextColor)
+
+  // list view chip separator color
+  QColor m_separatorColor;
+  Q_PROPERTY(
+      QColor SeparatorColor READ getSeparatorColor WRITE setSeparatorColor)
+
+  // selected chip border color
+  QColor m_selectedBorderColor;
+  Q_PROPERTY(QColor SelectedBorderColor READ getSelectedBorderColor WRITE
+                 setSelectedBorderColor)
+
+  // numpad shortcut key style
+  QColor m_numpadShortcutBgColor;  // bg
+  Q_PROPERTY(QColor NumpadShortcutBgColor READ getNumpadShortcutBgColor WRITE
+                 setNumpadShortcutBgColor)
+
+  QColor m_numpadShortcutBorderColor;  // border
+  Q_PROPERTY(QColor NumpadShortcutBorderColor READ getNumpadShortcutBorderColor
+                 WRITE setNumpadShortcutBorderColor)
+
+  // list view current cell color
+  QColor m_currentCellColor;
+  Q_PROPERTY(QColor CurrentCellColor READ getCurrentCellColor WRITE
+                 setCurrentCellColor)
+
+  // list view selected cell color
+  QColor m_selectedCellColor;
+  Q_PROPERTY(QColor SelectedCellColor READ getSelectedCellColor WRITE
+                 setSelectedCellColor)
+
+  // list view numpad shortcut border color
+  QColor m_listNumpadShortcutBorderColor;
+  Q_PROPERTY(
+      QColor ListNumpadShortcutBorderColor READ getListNumpadShortcutBorderColor
+          WRITE setListNumpadShortcutBorderColor)
 
 public:
   enum ViewMode         //! Possible view modes for a Palette Viewer.
@@ -129,6 +148,7 @@ public:
 
   ViewMode getViewMode() const { return m_viewMode; }
   void setViewMode(ViewMode mode);
+  NameDisplayMode getNameDisplayMode() const { return m_nameDisplayMode; }
   void setNameDisplayMode(NameDisplayMode mode);
 
   PaletteViewerGUI::PaletteViewType getViewType() const { return m_viewType; }
@@ -152,6 +172,46 @@ public:
 
   void setTextColor(const QColor &color) { m_textColor = color; }
   QColor getTextColor() const { return m_textColor; }
+
+  // list view chip separator color
+  void setSeparatorColor(const QColor &color) { m_separatorColor = color; }
+  QColor getSeparatorColor() const { return m_separatorColor; }
+
+  void setSelectedBorderColor(const QColor &color) {
+    m_selectedBorderColor = color;
+  }
+  QColor getSelectedBorderColor() const { return m_selectedBorderColor; }
+
+  // numpad shortcut key style
+  void setNumpadShortcutBgColor(const QColor &color) {
+    m_numpadShortcutBgColor = color;
+  }
+  QColor getNumpadShortcutBgColor() const { return m_numpadShortcutBgColor; }
+
+  void setNumpadShortcutBorderColor(const QColor &color) {
+    m_numpadShortcutBorderColor = color;
+  }
+  QColor getNumpadShortcutBorderColor() const {
+    return m_numpadShortcutBorderColor;
+  }
+
+  // list view current cell color
+  void setCurrentCellColor(const QColor &color) { m_currentCellColor = color; }
+  QColor getCurrentCellColor() const { return m_currentCellColor; }
+
+  // list view selected cell color
+  void setSelectedCellColor(const QColor &color) {
+    m_selectedCellColor = color;
+  }
+  QColor getSelectedCellColor() const { return m_selectedCellColor; }
+
+  // list view numpad shortcut border color
+  void setListNumpadShortcutBorderColor(const QColor &color) {
+    m_listNumpadShortcutBorderColor = color;
+  }
+  QColor getListNumpadShortcutBorderColor() const {
+    return m_listNumpadShortcutBorderColor;
+  }
 
 public slots:
 
@@ -227,6 +287,7 @@ private:
 
 signals:
   void changeWindowTitleSignal();
+  void switchToPage(int);
 };
 
 //****************************************************************************

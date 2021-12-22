@@ -58,6 +58,9 @@ class PumpTool final : public TTool {
   bool m_cursorEnabled;  //!< Whether the 'pump preview cursor' can be seen
   bool m_draw;           //!< Should be removed...?
 
+  bool m_isCtrlPressed;  //!< Whether control key is held down or not
+  int m_lockedStrokeIndex;
+
   TPointD m_oldPoint, m_downPoint;  //!< Mouse positions upon editing
   TThickPoint m_cursor;             //!< Pump preview cursor data
   int m_cursorId;
@@ -115,7 +118,11 @@ public:
   void mouseMove(const TPointD &pos, const TMouseEvent &e) override;
   bool moveCursor(const TPointD &pos);
 
-  int getCursorId() const override { return m_cursorId; }
+  int getCursorId() const override {
+    if (m_viewer && m_viewer->getGuidedStrokePickerMode())
+      return m_viewer->getGuidedStrokePickerCursor();
+    return m_cursorId;
+  }
   void invalidateCursorArea();
 
   void onDeactivate() override;
@@ -124,6 +131,10 @@ private:
   double actionRadius(double strokeLength);
   void splitStroke(TStroke *s);
   TStroke *mergeStrokes(const std::vector<TStroke *> &strokes);
+
+  bool getNearestStrokeWithLock(const TPointD &p, double &outW,
+                                UINT &strokeIndex, double &dist2,
+                                bool onlyInCurrentGroup = false);
 
 } PumpToolInstance;
 
@@ -177,7 +188,7 @@ void PumpTool::draw() {
       tglDrawCircle(m_cursor, m_cursor.thick + 4 * getPixelSize());
     }
 
-    if (vi->getNearestStroke(m_cursor, w, index, dist, true)) {
+    if (getNearestStrokeWithLock(m_cursor, w, index, dist, true)) {
       TStroke *stroke  = vi->getStroke(index);
       double totalLen  = stroke->getLength();
       double actionLen = actionRadius(totalLen);
@@ -194,18 +205,22 @@ void PumpTool::draw() {
         double len = stroke->getLength(w);
 
         double len1 = len - actionLen;
-        if (len1 < 0)
-          if (stroke->isSelfLoop())
+        if (len1 < 0) {
+          if (stroke->isSelfLoop()) {
             len1 += totalLen;
-          else
+          } else {
             len1 = 0;
+          }
+        }
 
         double len2 = len + actionLen;
-        if (len2 > totalLen)
-          if (stroke->isSelfLoop())
+        if (len2 > totalLen) {
+          if (stroke->isSelfLoop()) {
             len2 -= totalLen;
-          else
+          } else {
             len2 = totalLen;
+          }
+        }
 
         w1 = stroke->getParameterAtLength(len1);
         w2 = stroke->getParameterAtLength(len2);
@@ -257,8 +272,15 @@ void PumpTool::draw() {
 
 //----------------------------------------------------------------------
 
-void PumpTool::leftButtonDown(const TPointD &pos, const TMouseEvent &) {
+void PumpTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
+  if (getViewer() && getViewer()->getGuidedStrokePickerMode()) {
+    getViewer()->doPickGuideStroke(pos);
+    return;
+  }
+
   if (m_active || !m_enabled) return;
+
+  m_isCtrlPressed = e.isCtrlPressed();
 
   assert(m_undo == 0);
   m_active = false;
@@ -284,7 +306,7 @@ void PumpTool::leftButtonDown(const TPointD &pos, const TMouseEvent &) {
   int i;
   UINT index;
 
-  if (vi->getNearestStroke(pos, m_actionW, index, dist2)) {
+  if (getNearestStrokeWithLock(pos, m_actionW, index, dist2)) {
     // A stroke near the pressed point was found - modify it
     m_active      = true;
     m_strokeIndex = index;
@@ -335,6 +357,8 @@ void PumpTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
   TVectorImageP vi(getImage(true));
   if (!vi || !m_outStroke) return;
 
+  m_isCtrlPressed = e.isCtrlPressed();
+
   QMutexLocker lock(vi->getMutex());
 
   // Revert current deformation, recovering the one from button press
@@ -372,7 +396,7 @@ void PumpTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
 
   // Apply deformation
   std::vector<TStroke *> splitStrokesCopy(m_splitStrokes);
-  splitStrokesCopy[m_stroke1Idx]              = stroke1;
+  splitStrokesCopy[m_stroke1Idx] = stroke1;
   if (stroke2) splitStrokesCopy[m_stroke2Idx] = stroke2;
 
   m_outStroke = mergeStrokes(splitStrokesCopy);
@@ -385,13 +409,15 @@ void PumpTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
 
 //----------------------------------------------------------------------
 
-void PumpTool::leftButtonUp(const TPointD &pos, const TMouseEvent &) {
+void PumpTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
   TVectorImageP vi;
 
   if (!m_active || !m_enabled) goto cleanup;
 
   vi = TVectorImageP(getImage(true));
   if (!vi) goto cleanup;
+
+  m_isCtrlPressed = e.isCtrlPressed();
 
   {
     m_active = false;
@@ -402,8 +428,8 @@ void PumpTool::leftButtonUp(const TPointD &pos, const TMouseEvent &) {
     double t;
     UINT index;
     double dist2;
-    if (vi->getNearestStroke(pos, t, index, dist2)) {
-      TStroke *nearestStroke      = vi->getStroke(index);
+    if (getNearestStrokeWithLock(pos, t, index, dist2)) {
+      TStroke *nearestStroke = vi->getStroke(index);
       if (nearestStroke) m_cursor = nearestStroke->getThickPoint(t);
     }
 
@@ -465,6 +491,8 @@ void PumpTool::invalidateCursorArea() {
 void PumpTool::mouseMove(const TPointD &pos, const TMouseEvent &e) {
   if (m_active || !m_enabled) return;
 
+  m_isCtrlPressed = e.isCtrlPressed();
+
   // Cursor preview updates on 3-pixel steps
   if (tdistance2(pos, m_oldPoint) < 9.0 * sq(getPixelSize())) return;
 
@@ -489,7 +517,7 @@ bool PumpTool::moveCursor(const TPointD &pos) {
     double t;
     UINT index;
     double dist2;
-    if (vi->getNearestStroke(pos, t, index, dist2)) {
+    if (getNearestStrokeWithLock(pos, t, index, dist2)) {
       TStroke *stroke = vi->getStroke(index);
       if (stroke) {
         m_cursor = stroke->getThickPoint(t);
@@ -546,15 +574,15 @@ void PumpTool::onLeave() {
 //*****************************************************************************
 
 double PumpTool::actionRadius(double strokeLength) {
-  double toolSize         = std::max(m_toolSize.getValue(), 5.0);
+  double toolSize         = m_toolSize.getValue();
   double toolPercent      = toolSize * 0.01;
   double interpolationVal = pow(toolPercent, 5);
-  double indipendentValue = 7.0 * toolSize;
+  double independentValue = 7.0 * toolSize;
 
-  double actionRadius = (indipendentValue) * (1.0 - interpolationVal) +
+  double actionRadius = (independentValue) * (1.0 - interpolationVal) +
                         (strokeLength * toolPercent) * interpolationVal;
 
-  return std::max(actionRadius, indipendentValue);
+  return std::max(actionRadius, independentValue);
 }
 
 //----------------------------------------------------------------------
@@ -677,7 +705,7 @@ void PumpTool::splitStroke(TStroke *s) {
       cpCount = stroke2->getControlPointCount();
       m_cpLenDiff2.resize(cpCount);
 
-      for (i            = 0; i < cpCount; ++i)
+      for (i = 0; i < cpCount; ++i)
         m_cpLenDiff2[i] = stroke2->getLengthAtControlPoint(i) - m_actionS2;
     }
   }
@@ -739,4 +767,30 @@ TStroke *PumpTool::mergeStrokes(const std::vector<TStroke *> &strokes) {
   mergedStroke->invalidate();
 
   return mergedStroke;
+}
+
+bool PumpTool::getNearestStrokeWithLock(const TPointD &p, double &outW,
+                                        UINT &strokeIndex, double &dist2,
+                                        bool onlyInCurrentGroup) {
+  TVectorImageP vi = TImageP(getImage(false));
+  if (!vi) return false;
+
+  if (m_lockedStrokeIndex >= vi->getStrokeCount()) {
+    m_lockedStrokeIndex = -1;
+  }
+
+  if (m_isCtrlPressed && m_lockedStrokeIndex >= 0) {
+    TStroke *stroke = vi->getStroke(m_lockedStrokeIndex);
+    strokeIndex     = m_lockedStrokeIndex;
+    return stroke->getNearestW(p, outW, dist2);
+  }
+
+  UINT index;
+  if (vi->getNearestStroke(p, outW, index, dist2, onlyInCurrentGroup)) {
+    m_lockedStrokeIndex = index;
+    strokeIndex         = index;
+    return true;
+  }
+
+  return false;
 }

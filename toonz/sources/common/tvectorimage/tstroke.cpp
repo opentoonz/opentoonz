@@ -1,6 +1,5 @@
 
 
-#include "tmachine.h"
 #include "tmathutil.h"
 #include "tstrokeutil.h"
 #include "tstrokeoutline.h"
@@ -1187,7 +1186,7 @@ DEFINE_CLASS_CODE(TStroke, 15)
 
 //-----------------------------------------------------------------------------
 
-// Costructor
+// Constructor
 TStroke::TStroke() : TSmartObject(m_classCode) {
   vector<TThickPoint> p(3);
   p[0] = TThickPoint(0, 0, 0);
@@ -2856,7 +2855,7 @@ int intersect(const TStroke &stroke, const TPointD &center, double radius,
 
 #if defined(DEBUG) || defined(_DEBUG)
   /*
-cout<<"interesections:";
+cout<<"intersections:";
 copy( intersections.begin(), intersections.end(), ostream_iterator<double>(
 cout, " " ) );
 cout<<endl;
@@ -3109,7 +3108,7 @@ double *reparameterize3D(const TThickCubic &cubic,
 
   for (int i = 0; i < size; i++) {
     uPrime[i] = NewtonRaphsonRootFind3D(cubic, *(pointsArrayBegin + i), u[i]);
-    if (!_finite(uPrime[i])) {
+    if (!std::isfinite(uPrime[i])) {
       delete[] uPrime;
       return NULL;
     }
@@ -3355,17 +3354,17 @@ void computeQuadraticsFromCubic(const TThickCubic &cubic, double error,
 #ifdef _DEBUG
             TThickQuadratic *lastTq = chunkArray.back();
             TThickPoint pDeb        = lastTq->getThickP0();
-            assert(_finite(pDeb.x));
-            assert(_finite(pDeb.y));
-            assert(_finite(pDeb.thick));
+            assert(std::isfinite(pDeb.x));
+            assert(std::isfinite(pDeb.y));
+            assert(std::isfinite(pDeb.thick));
             pDeb = lastTq->getThickP1();
-            assert(_finite(pDeb.x));
-            assert(_finite(pDeb.y));
-            assert(_finite(pDeb.thick));
+            assert(std::isfinite(pDeb.x));
+            assert(std::isfinite(pDeb.y));
+            assert(std::isfinite(pDeb.thick));
             pDeb = lastTq->getThickP2();
-            assert(_finite(pDeb.x));
-            assert(_finite(pDeb.y));
-            assert(_finite(pDeb.thick));
+            assert(std::isfinite(pDeb.x));
+            assert(std::isfinite(pDeb.y));
+            assert(std::isfinite(pDeb.thick));
 #endif
             numSaved++;  //  variabile debug: compatibilita' precedente funzione
             return;
@@ -3404,21 +3403,21 @@ TStroke *computeQuadStroke(const TCubicStroke &cubic) {
 #ifdef _DEBUG
     {
       TThickPoint p = tmp.getThickP0();
-      assert(_finite(p.x));
-      assert(_finite(p.y));
-      assert(_finite(p.thick));
+      assert(std::isfinite(p.x));
+      assert(std::isfinite(p.y));
+      assert(std::isfinite(p.thick));
       p = tmp.getThickP1();
-      assert(_finite(p.x));
-      assert(_finite(p.y));
-      assert(_finite(p.thick));
+      assert(std::isfinite(p.x));
+      assert(std::isfinite(p.y));
+      assert(std::isfinite(p.thick));
       p = tmp.getThickP2();
-      assert(_finite(p.x));
-      assert(_finite(p.y));
-      assert(_finite(p.thick));
+      assert(std::isfinite(p.x));
+      assert(std::isfinite(p.y));
+      assert(std::isfinite(p.thick));
       p = tmp.getThickP3();
-      assert(_finite(p.x));
-      assert(_finite(p.y));
-      assert(_finite(p.thick));
+      assert(std::isfinite(p.x));
+      assert(std::isfinite(p.y));
+      assert(std::isfinite(p.thick));
     }
 #endif
 
@@ -3492,20 +3491,20 @@ TCubicStroke::TCubicStroke(const vector<T3DPointD> &pointsArray3D, double error,
   for (int i = 1; i < (int)corners.size(); i++) {
     int size       = corners[i] - corners[i - 1] + 1;
     int firstPoint = corners[i - 1];
-    T3DPointD tanLeft, tanRigth;
+    T3DPointD tanLeft, tanRight;
     assert(size > 0);
     if (size > 1)  //  capita che corners[i] = corners[i - 1] ("clic" senza drag
                    //  oppure bug (noto!!!) del cornerDetector)
     {
       tanLeft  = -pointsArray3D[firstPoint + 1] + pointsArray3D[firstPoint];
-      tanRigth = pointsArray3D[firstPoint + size - 2] -
+      tanRight = pointsArray3D[firstPoint + size - 2] -
                  pointsArray3D[firstPoint + size - 1];
 
       if (norm2(tanLeft) > 0) tanLeft = normalize(tanLeft);
 
-      if (norm2(tanRigth) > 0) tanRigth = normalize(tanRigth);
+      if (norm2(tanRight) > 0) tanRight = normalize(tanRight);
 
-      fitCubic3D(&pointsArray3D[firstPoint], size, tanLeft, tanRigth, error);
+      fitCubic3D(&pointsArray3D[firstPoint], size, tanLeft, tanRight, error);
     } else if (pointsArray3D.size() == 1) {
       //  caso in cui i non calcola nessun corner a meno di quello iniziale
       //  e finale coincidenti: 1 solo punto campionato ("clic" senza drag)
@@ -3735,9 +3734,9 @@ TStroke *TStroke::interpolate(const vector<TThickPoint> &points, double error,
   TThickPoint p;
   for (; cpIndex != (UINT)stroke->getControlPointCount(); cpIndex++) {
     p = stroke->getControlPoint(cpIndex);
-    assert(_finite(p.x));
-    assert(_finite(p.y));
-    assert(_finite(p.thick));
+    assert(std::isfinite(p.x));
+    assert(std::isfinite(p.y));
+    assert(std::isfinite(p.thick));
   }
 #endif
 

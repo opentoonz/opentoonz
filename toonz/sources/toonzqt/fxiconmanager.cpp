@@ -4,6 +4,8 @@
 
 FxIconPixmapManager::FxIconPixmapManager() {}
 
+FxIconPixmapManager::~FxIconPixmapManager() {}
+
 FxIconPixmapManager *FxIconPixmapManager::instance() {
   static FxIconPixmapManager _instance;
   return &_instance;

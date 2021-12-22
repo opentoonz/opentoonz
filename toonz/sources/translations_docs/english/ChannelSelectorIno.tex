@@ -1,0 +1,80 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[a4paper, total={180mm, 272mm}]{geometry}
+
+\usepackage{fontspec}
+\setmainfont[Path=fonts/, Extension=.ttf]{ipaexm}
+
+\setlength\parindent{3.5em}
+\setlength\parskip{0em}
+\renewcommand{\baselinestretch}{1.247}
+
+\begin{document}
+
+\thispagestyle{empty}
+
+\Large
+\noindent \\
+Channel Selector Ino\medskip
+\par
+\normalsize
+Allows to select each RGBA channel in the resulting image from multiple inputs\par 
+(Source1,2,3,4).\\
+\\
+-{-}- \ Inputs \ -{-}-\\
+Source1\\
+Source2\\
+Source3\\
+Source4\par
+Connect one or more images to be processed.\par
+You can connect up to a maximum of four images.\\
+\\
+-{-}- \ Settings \ -{-}-\\
+Red\par
+\noindent \ \, Source\par
+Specifies the input image to be used as the Red channel.\par
+Choose from among Source1/Source2/Source3/Source4.\par
+You can input a value from 1 to 4.\par
+The default value is 1.\\
+\par
+\noindent \ \, Channel\par
+The source image channel to be used as the Red channel,\par
+Choose from Red/Green/Blue/Alpha.\par
+The default value is Red.\\
+\\
+Green\par
+\noindent \ \, Source\par
+Specifies the input image to be used as the Green channel.\par
+Options are the same as for the \textquotedbl Red Source\textquotedbl .\\
+\par
+\noindent \ \, Channel\par
+The source image channel to be used as the Green channel,\par
+Choose from Red/Green/Blue/Alpha.\par
+The default value is Green.\\
+\\
+Blue\par
+\noindent \ \, Source\par
+Specifies the input image to be used as the Blue channel.\par
+Options are the same as for the \textquotedbl Red Source\textquotedbl .\\
+
+\newpage
+
+\thispagestyle{empty}
+
+\ \vspace{-0.2em}
+\par
+\noindent \ \, Channel\par
+The source image channel to be used as the Blue channel,\par
+Choose from Red/Green/Blue/Alpha.\par
+The default value is Blue.\\
+\\
+Alpha\par
+\noindent \ \, Source\par
+Specifies the input image to be used as the Alpha channel.\par
+Options are the same as the \textquotedbl Red Source\textquotedbl .\\
+\par
+\noindent \ \, Channel\par
+The source image channel to be used as the Alpha channel,\par
+Choose from Red/Green/Blue/Alpha.\par
+The default value is Alpha.
+
+\end{document}

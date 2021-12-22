@@ -39,6 +39,7 @@ public:
   int getColumnIndex() const { return m_columnIndex; }
   void setColumnIndex(int index);
 
+  void notifyColumnIndexSwitched() { emit columnIndexSwitched(); }
 signals:
 
   void columnIndexSwitched();

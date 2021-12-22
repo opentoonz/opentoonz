@@ -36,12 +36,14 @@ public:
   enum Type {
     NONE = 0,
 
-    RADIUS,  // Distance from a point (radius). Represented by     {
-             // [TDoubleParamP], TPointParamP }
-    WIDTH,   // Width, as distance from a line with given angle.   {
-             // [TDoubleParamP], TDoubleParamP }
-    ANGLE,   // An angle.                                          {
-             // [TDoubleParamP] }
+    RADIUS,   // Distance from a point (radius). Represented by     {
+              // [TDoubleParamP], TPointParamP }
+    WIDTH,    // Width, as distance from a line with given angle.   {
+              // [TDoubleParamP], TDoubleParamP }
+    ANGLE,    // An angle.                                          {
+              // [TDoubleParamP] }
+    ANGLE_2,  // An angle range defined with start and end angles.
+              // { [2 TDoubleParamP], TDoubleParamP }
 
     POINT,    // A Point.                                           {
               // [TPointParamP] }
@@ -59,8 +61,14 @@ public:
     RECT,  // A Rect, with width, height and center.             { [2
            // TDoubleParamP], TPointParamP }
 
-    DIAMOND,  // A diagonally laid square.                          {
-              // [TDoubleParamP] }
+    DIAMOND,       // A diagonally laid square.                          {
+                   // [TDoubleParamP] }
+    LINEAR_RANGE,  // A band-like range between two points.
+                   // { [2 TPointParamP] }
+    COMPASS,       // a line widget pointing toward some point. [TPointParamP]
+    COMPASS_SPIN,  // ... with guides in rotational direction.
+
+    RAINBOW_WIDTH,
 
     TYPESCOUNT
   };

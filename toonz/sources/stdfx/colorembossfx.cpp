@@ -136,9 +136,9 @@ void doColorEmboss(TRasterPT<PIXEL> ras, TRasterPT<PIXEL> srcraster,
                         ? (val > 0 ? (CHANNEL_TYPE)val : 0)
                         : PIXEL::maxChannelValue;
       (pixout)->m = (pix)->m;
-      *pix++;
-      *pixout++;
-      *ctrpix++;
+      pix++;
+      pixout++;
+      ctrpix++;
     }
   }
   ras->unlock();

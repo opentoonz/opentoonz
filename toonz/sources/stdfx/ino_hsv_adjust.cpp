@@ -3,8 +3,9 @@
 #include "stdfx.h"
 
 #include "ino_common.h"
+#include "globalcontrollablefx.h"
 //------------------------------------------------------------
-class ino_hsv_adjust final : public TStandardRasterFx {
+class ino_hsv_adjust final : public GlobalControllableFx {
   FX_PLUGIN_DECLARATION(ino_hsv_adjust)
   TRasterFxPort m_input;
   TRasterFxPort m_refer;
@@ -124,7 +125,8 @@ void fx_(TRasterP in_ras, const TRasterP refer_ras, const int refer_mode,
 
       ,
       hue_pivot, hue_scale, hue_shift, sat_pivot, sat_scale, sat_shift,
-      val_pivot, val_scale, val_shift
+      val_pivot, val_scale,
+      val_shift
 
       //,true	/* add_blend_sw */
       ,
@@ -135,7 +137,7 @@ void fx_(TRasterP in_ras, const TRasterP refer_ras, const int refer_mode,
   ino::arr_to_ras(in_gr8->getRawData(), ino::channels(), in_ras, 0);
   in_gr8->unlock();
 }
-}
+}  // namespace
 //------------------------------------------------------------
 void ino_hsv_adjust::doCompute(TTile &tile, double frame,
                                const TRenderSettings &rend_sets) {
@@ -216,7 +218,7 @@ void ino_hsv_adjust::doCompute(TTile &tile, double frame,
         hue_scale, hue_shift, sat_pivot, sat_scale, sat_shift, val_pivot,
         val_scale, val_shift,
         anti_alias_sw  // --> add_blend_sw, default is true
-        );
+    );
     if (refer_tile.getRaster() != nullptr) {
       refer_tile.getRaster()->unlock();
     }

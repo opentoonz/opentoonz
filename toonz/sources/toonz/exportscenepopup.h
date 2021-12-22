@@ -7,6 +7,7 @@
 #include "toonzqt/lineedit.h"
 #include "tfilepath.h"
 #include "filebrowsermodel.h"
+#include "dvdirtreeview.h"
 
 #include <QTreeView>
 #include <QItemDelegate>
@@ -29,8 +30,8 @@ public:
       : DvDirModelFileFolderNode(parent, path) {}
 
   DvDirModelNode *makeChild(std::wstring name) override;
-  DvDirModelFileFolderNode *createExposeSceneNode(DvDirModelNode *parent,
-                                                  const TFilePath &path);
+  virtual DvDirModelFileFolderNode *createExposeSceneNode(
+      DvDirModelNode *parent, const TFilePath &path);
 };
 
 //=============================================================================
@@ -59,7 +60,11 @@ public:
                                    const TFilePath &path)
       : ExportSceneDvDirModelFileFolderNode(parent, path) {}
   void makeCurrent() {}
+  bool isCurrent() const;
   QPixmap getPixmap(bool isOpen) const override;
+
+  virtual DvDirModelFileFolderNode *createExposeSceneNode(
+      DvDirModelNode *parent, const TFilePath &path) override;
 };
 
 //=============================================================================
@@ -123,7 +128,7 @@ public:
 //=============================================================================
 // ExportSceneTreeView
 
-class ExportSceneTreeView final : public QTreeView {
+class ExportSceneTreeView final : public StyledTreeView {
   Q_OBJECT
   ExportSceneDvDirModel *m_model;
 

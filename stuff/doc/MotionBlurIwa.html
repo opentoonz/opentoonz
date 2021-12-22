@@ -6,37 +6,39 @@
 <body bgcolor="#f5f5f5" text="#220011">
 <h1><img src = ".\img\fx_iwa_motionblur.png" width = 30 height = 30 >   MotionBlurFx Iwa</h1>
 
-<h4>● 概要</h4>
-モーションブラーを生成するためのエフェクトです。<br>
-「現在のフレームの前後の、シャッターを開放している時間」を指定すると、<br>
-その間のオブジェクトの軌跡に合わせてブラーをかけます。<br>
-iwa_BokehFxと同様、RGB値を露光値に変換してからブラーをかけますので、<br>
-ハイライトの部分はぼかしても明るさを損なうことがありません。
+<h4>● Overview</h4>
+This effect generates motion blur.<br>
+If you specify "Time during which the shutter is open before and after the current frame",<br>
+the image will be blurred according to the object's path.<br>
+As with iwa_BokehFx, the RGB values are converted into an exposure value before blurring,<br>
+Therefore, even if the highlight part is blurred, the brightness is not impaired.
 
-<h4>● 入力ポート</h4>
+<h4>● Input Port</h4>
 <UL>
-<LI><b>Source</b> : 入力画像を接続します。</LI>
+<LI><b>Source</b> : Connect the input image.</LI>
 </UL>
-<h4>● パラメータ</h4>
+<h4>● Parameters</h4>
 <img src = ".\img\motionblur.png">
 <UL>
-<LI><b>Reference Object, Index</b> : 動きを追うオブジェクトを指定します。<br>
-"Own Motion"に指定している場合は、入力画像のカラムの動きを追跡します。</LI>
-<LI><b>Shutter Start</b> : 現フレームのどれくらい前からシャッターを開放するかを指定します。<br>
-単位はフレームです。値が大きいほど、大きくブラーがかかります。</LI>
-<LI><b>Start Value</b> : シャッター開放時のブラーフィルタの強度を指定します。</LI>
-<LI><b>Start Curve</b> : シャッター開放時から現フレームまでのブラーのかかりかたを指定します。<br>
-デフォルト値は１で、ブラーフィルタはリニアに変化します。</LI><br>
-<LI><b>Shutter End</b> : 現フレームのどれくらい後にシャッターを閉じるかを指定します。<br>
-単位はフレームです。値が大きいほど、大きくブラーがかかります。</LI>
-<LI><b>End Value</b> : シャッター閉鎖時のブラーフィルタの強度を指定します。</LI>
-<LI><b>End Curve</b> : 現フレームからシャッター閉鎖時までのブラーのかかりかたを指定します。<br>
-デフォルト値は１で、ブラーフィルタはリニアに変化します。</LI><br>
-<LI><b>Trace Resolution</b> : シャッターの開いている間の、オブジェクトの軌跡をを追跡する細かさを指定します。<br>
-この値が1だと、曲線で移動しているオブジェクトでも、軌跡は直線になります。</LI>
-<LI><b>Hardness</b> : フィルムのガンマ値。RGB値と露光量の変換に用います。この値が大きいほど、ハイライトが強調されます。</LI>
-<LI><b>Zanzo Mode</b> : ONのとき、滑らかなブラーの代わりに、"Trace Resolution"の細かさで追跡した位置に、<br>
-飛び飛びに残像を描画します。</LI>
+<LI><b>Reference Object, Index</b> : Specify the object to follow the movement.<br>
+When "Own Motion" is specified, the column movement of the input image is tracked.</LI>
+<LI><b>Shutter Start</b> : Specify how long before the current frame the shutter should be opened.<br>
+The unit is in frames. The higher the value, the bigger the blur.</LI>
+<LI><b>Start Value</b> : Specify the strength of the blur when the shutter is opened.</LI>
+<LI><b>Start Curve</b> : Specify how to apply the blur, from the time the shutter is opened up to<br>
+the current frame. The default value is 1, with it the blur changes linearly.</LI>
+<LI><b>Shutter End</b> : Specify how long after the current frame the shutter should be closed.<br>
+The unit is in frames. The higher the value, the bigger the blur.</LI>
+<LI><b>End Value</b> : Specify the strength of the blur when the shutter is closed.</LI>
+<LI><b>End Curve</b> : Specify how to apply the blur, from the current frame up to the time<br>
+the shutter is closed. The default value is 1, with it the blur changes linearly.</LI>
+<LI><b>Trace Resolution</b> : Defines how detailed will be the tracking of the object's trajectory,<br>
+while the shutter is open.<br>
+At 1, the blur trajectory will be a straight line, even if the object is moving along a curve.</LI>
+<LI><b>Hardness</b> : Gamma value of the film. It is used to convert the RGB values and exposure<br>
+amount. The higher the value, the brighter the effect.</LI>
+<LI><b>Afterimage Mode</b> : When active, instead of a smooth blur, an afterimage is drawn at the<br>
+position traced, using the detail set with the "Trace Resolution" parameter.</LI>
 </UL>
 </body>
 

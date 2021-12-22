@@ -46,7 +46,7 @@ public:
   bool operator!=(const FourPoints &fp) const { return !(*this == fp); }
 };
 
-// this function computes the perspective trasformation defined with
+// this function computes the perspective transformation defined with
 //-transfFrom, transfTo- (the points in transfFrom goes in transfTo)
 // and applies it on the fourPoints from, and returns the result)
 FourPoints computeTransformed(const FourPoints &transfFrom,

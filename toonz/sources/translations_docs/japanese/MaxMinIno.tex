@@ -1,0 +1,87 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[a4paper, total={180mm, 272mm}]{geometry}
+
+\usepackage{fontspec}
+\setmainfont[Path=fonts/, Extension=.ttf]{ipaexm}
+
+\setlength\parindent{3.5em}
+\setlength\parskip{0em}
+\renewcommand{\baselinestretch}{1.247}
+
+\begin{document}
+
+\thispagestyle{empty}
+
+\Large
+\noindent \\
+Max Min Ino\medskip
+\par
+\normalsize
+画像の明るい(暗い)部分を膨らませます。\\
+\par
+丸く(あるいは多角形に)ふくらみます。\par
+また、変化は滑らかです。\\
+\par
+初めに、指定あれば Alphaチャンネルに対して処理します。\par
+次に、Alphaチャンネルがゼロでない Pixel の RGBを処理します。\\
+\\
+-{-}- \ 入力 \ -{-}-\\
+Source\par
+処理をする画像を接続します。\\
+Reference\par
+Pixel 毎に膨らむ効果の強弱をつけるための参照画像を接続します。\\
+\\
+-{-}- \ 設定 \ -{-}-\\
+Max Min Select\par
+処理方法を撰択します。\par
+\textquotedbl Max\textquotedbl \ -> 明るい部分を膨らませる\par
+\textquotedbl Min\textquotedbl \ -> 暗い部分を膨らませる\par
+\textquotedbl Min\textquotedbl の場合、セル画像の輪郭の墨線は、その外側の透過領域がゼ\par
+ロで塗られているため、透過領域が膨らみ墨線が消えていきます。\par
+同様に Alphaも透過領域が増します。\par
+初期設定は\textquotedbl Max\textquotedbl です。\\
+\\
+Radius\par
+膨らむ大きさを、円半径で指定します。\par
+単位はミリメートルです。\par
+ゼロ以上の値を指定します。\par
+Smoothingと足して(ピクセル単位で)1より小さい時は膨らみません。\par
+よって値が小さいと、細かい画像で効果があるのに、\par
+荒い画像ではかからないことがあります。\par
+半径は大きくするほど処理に時間がかかります。\\
+\\
+Polygon Number\par
+円に膨らますか、多角形に膨らますかを指定します。\par
+整数値で指定します。\par
+2の時は丸く膨らみます。\par
+3以上を指定すると、その角数の多角形に膨らみます。最大は16です。\par
+膨らむ中心の真右から始まる多角形です。\par
+初期値は2です。
+
+\newpage
+
+\thispagestyle{empty}
+
+\ \vspace{-0.2em}
+\\
+\par
+\noindent Degree\par
+\textquotedbl Polygon Number\textquotedbl が3以上の時の、多角形膨らみの傾きを指定します。\par
+\textquotedbl Polygon Number\textquotedbl が2のときは意味ありません。\par
+ゼロ以上の Degree単位で指定します。\par
+時計回りに回転します。\par
+初期値は0です。\\
+\\
+Alpha Rendering\par
+ONで Alphaにも処理をします。\par
+OFFのときは RGBにのみ処理します。Alphaチャンネルのない BG 画で使います。\par
+初期値は ONです。\\
+\\
+Reference\par
+Pixel 毎に効果の強弱をつけるための参照画像の値の取り方を選択します。\par
+入力の\textquotedbl Reference\textquotedbl に画像を接続し、\par
+Red/Green/Blue/Alpha/Luminance/Nothingから選びます。\par
+この効果をつけたくないときは Nothingを選ぶか、接続を切ります。\par
+初期値は Red です。
+
+\end{document}

@@ -137,8 +137,8 @@ void doEmboss(TRasterPT<PIXEL> ras, TRasterPT<PIXEL> srcraster, double azimuth,
       (pixout)->b = pixout->r;
       (pixout)->m = (pix)->m;
       *pixout     = premultiply(*pixout);
-      *pix++;
-      *pixout++;
+      pix++;
+      pixout++;
     }
   }
 

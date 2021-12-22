@@ -3,7 +3,6 @@
 // System includes
 #include "tsystem.h"
 #include "timagecache.h"
-#include "ttimer.h"
 
 // Geometry
 #include "tgeometry.h"
@@ -65,7 +64,6 @@
 // Other widgets
 #include "toonzqt/flipconsole.h"
 #include "toonzqt/dvdialog.h"
-#include "toonzqt/gutil.h"
 #include "filmstripselection.h"
 #include "castselection.h"
 #include "histogrampopup.h"
@@ -75,7 +73,6 @@
 #include <QDesktopWidget>
 #include <QSettings>
 #include <QPainter>
-#include <QVBoxLayout>
 #include <QDialogButtonBox>
 #include <QAbstractButton>
 #include <QLabel>
@@ -90,7 +87,6 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QPushButton>
-#include <QLabel>
 
 #include <stdint.h>  // for uintptr_t
 
@@ -165,36 +161,35 @@ inline TRectD getImageBoundsD(const TImageP &img) {
     \sa FlipBookPool class.
 */
 FlipBook::FlipBook(QWidget *parent, QString viewerTitle,
-                   UINT flipConsoleButtonMask, UCHAR flags,
+                   std::vector<int> flipConsoleButtonMask, UCHAR flags,
                    bool isColorModel)  //, bool showOnlyPlayBackgroundButton)
-    : QWidget(parent),
-      m_viewerTitle(viewerTitle),
-      m_levelNames(),
-      m_levels(),
-      m_playSound(false),
-      m_snd(0),
-      m_player(0)
-      //, m_doCompare(false)
-      ,
-      m_currentFrameToSave(0),
-      m_lw(),
-      m_lr(),
-      m_loadPopup(0),
-      m_savePopup(0),
-      m_shrink(1),
-      m_isPreviewFx(false),
-      m_previewedFx(0),
-      m_previewXsh(0),
-      m_previewUpdateTimer(this),
-      m_xl(0),
-      m_title1(),
-      m_poolIndex(-1),
-      m_freezed(false),
-      m_loadbox(),
-      m_dim(),
-      m_loadboxes(),
-      m_freezeButton(0),
-      m_flags(flags) {
+    : QWidget(parent)
+    , m_viewerTitle(viewerTitle)
+    , m_levelNames()
+    , m_levels()
+    , m_playSound(false)
+    , m_snd(0)
+    , m_player(0)
+    //, m_doCompare(false)
+    , m_currentFrameToSave(0)
+    , m_lw()
+    , m_lr()
+    , m_loadPopup(0)
+    , m_savePopup(0)
+    , m_shrink(1)
+    , m_isPreviewFx(false)
+    , m_previewedFx(0)
+    , m_previewXsh(0)
+    , m_previewUpdateTimer(this)
+    , m_xl(0)
+    , m_title1()
+    , m_poolIndex(-1)
+    , m_freezed(false)
+    , m_loadbox()
+    , m_dim()
+    , m_loadboxes()
+    , m_freezeButton(0)
+    , m_flags(flags) {
   setAcceptDrops(true);
   setFocusPolicy(Qt::StrongFocus);
 
@@ -204,7 +199,9 @@ FlipBook::FlipBook(QWidget *parent, QString viewerTitle,
       new ImageUtils::FullScreenWidget(this);
 
   m_imageViewer = new ImageViewer(
-      fsWidget, this, flipConsoleButtonMask == FlipConsole::cFullConsole);
+      fsWidget, this,
+      std::find(flipConsoleButtonMask.begin(), flipConsoleButtonMask.end(),
+                FlipConsole::eHisto) == flipConsoleButtonMask.end());
   fsWidget->setWidget(m_imageViewer);
 
   setFocusProxy(m_imageViewer);
@@ -269,8 +266,7 @@ void FlipBook::addFreezeButtonToTitleBar() {
   if (panel) {
     TPanelTitleBar *titleBar = panel->getTitleBar();
     m_freezeButton           = new TPanelTitleBarButton(
-        titleBar, ":Resources/pane_freeze_off.svg",
-        ":Resources/pane_freeze_over.svg", ":Resources/pane_freeze_on.svg");
+        titleBar, getIconThemePath("actions/20/pane_freeze.svg"));
     m_freezeButton->setToolTip("Freeze");
     titleBar->add(QPoint(-64, 0), m_freezeButton);
     connect(m_freezeButton, SIGNAL(toggled(bool)), this, SLOT(freeze(bool)));
@@ -467,7 +463,7 @@ bool LoadImagesPopup::execute() { return doLoad(false); }
 
 //-----------------------------------------------------------------------------
 /*! Append images with apply button
-*/
+ */
 bool LoadImagesPopup::executeApply() { return doLoad(true); }
 
 //-----------------------------------------------------------------------------
@@ -506,8 +502,8 @@ void LoadImagesPopup::onFilePathClicked(const TFilePath &fp) {
 
   if (!level || level->getFrameCount() == 0) goto clear;
 
-  it = level->begin();
-  m_to, m_from = it->first.getNumber();
+  it   = level->begin();
+  m_to = m_from = it->first.getNumber();
 
   for (; it != level->end(); ++it) m_to = it->first.getNumber();
 
@@ -577,7 +573,11 @@ void FlipBook::saveImages() {
                               ->getScene()
                               ->getProperties()
                               ->getOutputProperties();
-  m_savePopup->setFolder(op->getPath().getParentDir());
+  m_savePopup->setFolder(TApp::instance()
+                             ->getCurrentScene()
+                             ->getScene()
+                             ->decodeFilePath(op->getPath())
+                             .getParentDir());
   m_savePopup->setFilename(op->getPath().withFrame().withoutParentDir());
 
   m_savePopup->show();
@@ -791,24 +791,32 @@ void FlipBook::onButtonPressed(FlipConsole::EGadget button) {
     TImageP clonedImg;
     if (ri)
       clonedImg = TRasterImageP(ri->getRaster()->clone());
-    else
+    else {
       clonedImg = TToonzImageP(ti->getRaster()->clone(), ti->getSavebox());
+      clonedImg->setPalette(ti->getPalette());
+    }
     TImageCache::instance()->add(QString("TnzCompareImg"), clonedImg);
+    // to update the histogram of compare snapshot image
+    m_imageViewer->invalidateCompHisto();
     break;
   }
 
   case FlipConsole::eCompare:
-    if ((TVectorImageP)getCurrentImage(m_flipConsole->getCurrentFrame())) {
+    if (m_flipConsole->isChecked(FlipConsole::eCompare) &&
+        (TVectorImageP)getCurrentImage(m_flipConsole->getCurrentFrame())) {
       DVGui::warning(
           tr("It is not possible to take or compare snapshots for Toonz vector "
              "levels."));
-      m_flipConsole->setChecked(FlipConsole::eCompare, false);
+      // cancel the button pressing
+      m_flipConsole->pressButton(FlipConsole::eCompare);
       return;
     }
     break;
 
   case FlipConsole::eSave:
     saveImages();
+    break;
+  default:
     break;
   }
 }
@@ -1100,7 +1108,7 @@ void FlipBook::setLevel(const TFilePath &fp, TPalette *palette, int from,
         fromIndex = level->begin()->first.getNumber();
         toIndex   = (--level->end())->first.getNumber();
         if (m_imageViewer->isColorModel())
-          current           = m_flipConsole->getCurrentFrame();
+          current = m_flipConsole->getCurrentFrame();
         incrementalIndexing = true;
       } else {
         TLevel::Iterator it = level->begin();
@@ -1138,10 +1146,9 @@ void FlipBook::setLevel(const TFilePath &fp, TPalette *palette, int from,
       levelToPush.m_incrementalIndexing = incrementalIndexing;
 
       int formatIdx = Preferences::instance()->matchLevelFormat(fp);
-      if (formatIdx >= 0 &&
-          Preferences::instance()
-              ->levelFormat(formatIdx)
-              .m_options.m_premultiply) {
+      if (formatIdx >= 0 && Preferences::instance()
+                                ->levelFormat(formatIdx)
+                                .m_options.m_premultiply) {
         levelToPush.m_premultiply = true;
       }
 
@@ -1410,7 +1417,7 @@ void FlipBook::freezePreview() {
 
   m_freezed = true;
 
-  // sync the button state when triggered by shotcut
+  // sync the button state when triggered by shortcut
   if (m_freezeButton) m_freezeButton->setPressed(true);
 }
 
@@ -1423,7 +1430,7 @@ void FlipBook::unfreezePreview() {
 
   m_freezed = false;
 
-  // sync the button state when triggered by shotcut
+  // sync the button state when triggered by shortcut
   if (m_freezeButton) m_freezeButton->setPressed(false);
 }
 
@@ -1592,6 +1599,9 @@ TImageP FlipBook::getCurrentImage(int frame) {
       lx = m_loadbox.getLx();
     }
 
+    if (Preferences::instance()->is30bitDisplayEnabled())
+      ir->enable16BitRead(true);
+
     TImageP img = ir->load();
 
     if (img) {
@@ -1657,7 +1667,7 @@ else*/
 //-----------------------------------------------------------------------------
 
 /*! Set current level frame to image viewer. Add the view image in cache.
-*/
+ */
 void FlipBook::onDrawFrame(int frame, const ImagePainter::VisualSettings &vs) {
   try {
     m_imageViewer->setVisual(vs);
@@ -1763,12 +1773,13 @@ void ImageViewer::showHistogram() {
 
 void FlipBook::dragEnterEvent(QDragEnterEvent *e) {
   const QMimeData *mimeData = e->mimeData();
-  if (!acceptResourceDrop(mimeData->urls()) &&
+  bool isResourceDrop       = acceptResourceDrop(mimeData->urls());
+  if (!isResourceDrop &&
       !mimeData->hasFormat("application/vnd.toonz.drawings") &&
       !mimeData->hasFormat(CastItems::getMimeFormat()))
     return;
 
-  foreach (QUrl url, mimeData->urls()) {
+  for (const QUrl &url : mimeData->urls()) {
     TFilePath fp(url.toLocalFile().toStdWString());
     std::string type = fp.getType();
     if (type == "tzp" || type == "tzu" || type == "tnz" || type == "scr" ||
@@ -1787,18 +1798,31 @@ void FlipBook::dragEnterEvent(QDragEnterEvent *e) {
     }
   }
 
-  e->acceptProposedAction();
+  if (isResourceDrop) {
+    // Force CopyAction
+    e->setDropAction(Qt::CopyAction);
+    // For files, don't accept original proposed action in case it's a move
+    e->accept();
+  } else
+    e->acceptProposedAction();
 }
 
 //-----------------------------------------------------------------------------
 
 void FlipBook::dropEvent(QDropEvent *e) {
   const QMimeData *mimeData = e->mimeData();
+  bool isResourceDrop       = acceptResourceDrop(mimeData->urls());
   if (mimeData->hasUrls()) {
-    foreach (QUrl url, mimeData->urls()) {
+    for (const QUrl &url : mimeData->urls()) {
       TFilePath fp(url.toLocalFile().toStdWString());
       if (TFileType::getInfo(fp) != TFileType::UNKNOW_FILE) setLevel(fp);
-      e->acceptProposedAction();
+      if (isResourceDrop) {
+        // Force CopyAction
+        e->setDropAction(Qt::CopyAction);
+        // For files, don't accept original proposed action in case it's a move
+        e->accept();
+      } else
+        e->acceptProposedAction();
       return;
     }
   } else if (mimeData->hasFormat(
@@ -2129,7 +2153,7 @@ void FlipBook::minimize(bool doMinimize) {
 */
 void FlipBook::loadAndCacheAllTlvImages(Level level, int fromFrame,
                                         int toFrame) {
-  TFilePath fp                                   = level.m_fp;
+  TFilePath fp = level.m_fp;
   if (!m_lr || (fp != m_lr->getFilePath())) m_lr = TLevelReaderP(fp);
   if (!m_lr) return;
 
@@ -2201,12 +2225,12 @@ void FlipBook::loadAndCacheAllTlvImages(Level level, int fromFrame,
 FlipBook *viewFile(const TFilePath &path, int from, int to, int step,
                    int shrink, TSoundTrack *snd, FlipBook *flipbook,
                    bool append, bool isToonzOutput) {
-  // In case the step and shrink informations are invalid, load them from
+  // In case the step and shrink information is invalid, load them from
   // preferences
   if (step == -1 || shrink == -1) {
     int _step = 1, _shrink = 1;
     Preferences::instance()->getViewValues(_shrink, _step);
-    if (step == -1) step     = _step;
+    if (step == -1) step = _step;
     if (shrink == -1) shrink = _shrink;
   }
 
@@ -2223,7 +2247,7 @@ FlipBook *viewFile(const TFilePath &path, int from, int to, int step,
   if (path.getType() == "scr") return NULL;
 
   // Avi and movs may be viewed by an external viewer, depending on preferences
-  if (path.getType() == "mov" || path.getType() == "avi" && !flipbook) {
+  if ((path.getType() == "mov" || path.getType() == "avi") && !flipbook) {
     QString str;
     QSettings().value("generatedMovieViewEnabled", str);
     if (str.toInt() != 0) {

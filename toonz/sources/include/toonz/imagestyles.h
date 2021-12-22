@@ -145,10 +145,8 @@ public:
                   TRegionOutline &outline) const override;
   // void drawRegion( const TVectorRenderData &rd, TRegionOutline &boundary )
   // const;
-  void drawRegion(TFlash &flash, const TRegion *r) const override;
   void drawStroke(const TColorFunction *cf, TStrokeOutline *outline,
                   const TStroke *stroke) const override;
-  // void drawStroke(TFlash& flash, const TStroke* s) const;
 
   TRasterStyleFx *getRasterStyleFx() override { return this; }
 
@@ -165,7 +163,6 @@ public:
   int getTagId() const override;
 
   // static TRaster32P loadTexture(const TFilePath &path);
-  void setFill(TFlash &flash) const override;
 
   bool isPaintStyle() const override { return true; }
   bool isInkStyle() const override { return true; }

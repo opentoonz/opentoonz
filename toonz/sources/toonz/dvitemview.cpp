@@ -40,6 +40,7 @@
 #include <QFileDialog>
 #include <QTextStream>
 #include <qdrawutil.h>
+#include <QMimeData>
 
 #include <stdint.h>  // for uint64_t
 
@@ -306,6 +307,9 @@ int DvItemListModel::compareData(DataType dataType, int firstIndex,
 
   case VersionControlStatus:
     return firstValue.toInt() < secondValue.toInt();
+
+  default:
+    break;
   }
 
   return 0;
@@ -817,6 +821,8 @@ void DvItemViewerPanel::setVisibility(DvItemListModel::DataType dataType,
   case DvItemListModel::VersionControlStatus:
     BrowserVersionControlStatusisVisible = value;
     break;
+  default:
+    break;
   }
 }
 
@@ -1022,7 +1028,8 @@ void DvItemViewerPanel::paintThumbnailItem(QPainter &p, int index) {
   if (!thumbnail.isNull()) p.drawPixmap(iconRect.topLeft(), thumbnail);
   //}
   else {
-    static QPixmap missingPixmap = QPixmap(":Resources/missing.svg");
+    static QPixmap missingPixmap =
+        QPixmap(getIconThemePath("mimetypes/60/missing_icon.svg"));
     QRect pixmapRect(rect.left() + (rect.width() - missingPixmap.width()) / 2,
                      rect.top(), missingPixmap.width(), missingPixmap.height());
     p.drawPixmap(pixmapRect.topLeft(), missingPixmap);
@@ -1149,6 +1156,9 @@ void DvItemViewerPanel::paintTableItem(QPainter &p, int index) {
                Qt::AlignLeft | Qt::AlignVCenter,
                elideText(value, p.font(), lx));
     x += lx;
+    // If status icon is show, shift the next column left by the width of the
+    // icon
+    if (i == 0 && !statusPixmap.isNull()) x -= 15;
   }
   if (n > 1) {
     p.setPen(QColor(0, 0, 0, 100));  // column line
@@ -1297,6 +1307,7 @@ void DvItemViewerPanel::mouseReleaseEvent(QMouseEvent *) {}
 void DvItemViewerPanel::mouseDoubleClickEvent(QMouseEvent *event) {
   int index = pos2index(event->pos());
   if (index < 0 || index >= getItemCount()) return;
+  if (m_viewer) m_viewer->notifyDoubleClick(index);
   if (!getModel()->canRenameItem(index)) return;
   QRect captionRect = getCaptionRect(index);
   if (!captionRect.contains(event->pos())) return;
@@ -1512,15 +1523,29 @@ void DvItemViewer::resetVerticalScrollBar() {
 //-----------------------------------------------------------------------------
 
 void DvItemViewer::dragEnterEvent(QDragEnterEvent *event) {
-  if (m_model && m_model->acceptDrop(event->mimeData()))
-    event->acceptProposedAction();
+  const QMimeData *mimeData = event->mimeData();
+  if (m_model && m_model->acceptDrop(mimeData)) {
+    if (acceptResourceOrFolderDrop(mimeData->urls())) {
+      // Force CopyAction
+      event->setDropAction(Qt::CopyAction);
+      event->accept();
+    } else
+      event->acceptProposedAction();
+  }
 }
 
 //-----------------------------------------------------------------------------
 
 void DvItemViewer::dropEvent(QDropEvent *event) {
-  if (m_model && m_model->drop(event->mimeData()))
-    event->acceptProposedAction();
+  const QMimeData *mimeData = event->mimeData();
+  if (m_model && m_model->drop(mimeData)) {
+    if (acceptResourceOrFolderDrop(mimeData->urls())) {
+      // Force CopyAction
+      event->setDropAction(Qt::CopyAction);
+      event->accept();
+    } else
+      event->acceptProposedAction();
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -1730,14 +1755,14 @@ void DvItemViewerTitleBar::paintEvent(QPaintEvent *) {
   m_itemViewer->getPanel()->getColumns(columns);
   QRect rect(0, 0, width(), height());
 
-  QBrush nb = QBrush(Qt::NoBrush);
-  QPalette pal =
-      QPalette(nb, nb, QBrush(QColor(255, 255, 255, 30)), QBrush(QColor(0, 0, 0, 110)),
-               QBrush(QColor(Qt::gray)), nb, nb, nb, nb);
+  QBrush nb    = QBrush(Qt::NoBrush);
+  QPalette pal = QPalette(nb, nb, QBrush(QColor(getColBorderColor())),
+                          QBrush(QColor(getColBorderColor())),
+                          QBrush(QColor(Qt::gray)), nb, nb, nb, nb);
 
-  p.fillRect(rect, QColor(0, 0, 0, 90));  // bg color
+  p.fillRect(rect, getColColor());
 
-  p.setPen(QColor(200, 200, 200, 255));  // text color
+  p.setPen(getColTextColor());
   int h  = 0;  // fontMetrics().descent();
   int y  = rect.top();
   int ly = rect.height();
@@ -1754,11 +1779,11 @@ void DvItemViewerTitleBar::paintEvent(QPaintEvent *) {
     // paint background
     QColor bgColor;
     if (dataType == model->getCurrentOrderType())
-      bgColor = QColor(255, 255, 255, 30);
+      bgColor = QColor(getColSortedColor());
     else
       bgColor = QColor(0, 0, 0, 0);
 
-    QRect typeRect(x, y, columnLx, ly);
+    QRect typeRect(x - 1, y - 1, columnLx + 1, ly + 1);
     QBrush brush(bgColor);
     qDrawShadePanel(&p, typeRect, pal, false, 1, &brush);
 
@@ -1769,7 +1794,7 @@ void DvItemViewerTitleBar::paintEvent(QPaintEvent *) {
         arrowIcon = createQIconPNG("arrow_up");
       else
         arrowIcon = createQIconPNG("arrow_down");
-      p.drawPixmap(QRect(x + columnLx - 10, y + 6, 8, 8),
+      p.drawPixmap(QRect(x + columnLx - 11, y + 6, 8, 8),
                    arrowIcon.pixmap(8, 8));
     }
 
@@ -1793,20 +1818,11 @@ DvItemViewerButtonBar::DvItemViewerButtonBar(DvItemViewer *itemViewer,
                                              QWidget *parent)
     : QToolBar(parent) {
   setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-  setIconSize(QSize(17, 17));
   setObjectName("buttonBar");
-  // buttonBar->setIconSize(QSize(10,10));
+  setIconSize(QSize(16, 16));
 
-  QString backButtonEnable  = QString(":Resources/fb_history_back_enable.svg");
-  QString backButtonDisable = QString(":Resources/fb_history_back_disable.svg");
-  QString fwdButtonEnable   = QString(":Resources/fb_history_fwd_enable.svg");
-  QString fwdButtonDisable  = QString(":Resources/fb_history_fwd_disable.svg");
-
-  QIcon backButtonIcon, fwdButtonIcon;
-  backButtonIcon.addFile(backButtonEnable, QSize(), QIcon::Normal);
-  backButtonIcon.addFile(backButtonDisable, QSize(), QIcon::Disabled);
-  fwdButtonIcon.addFile(fwdButtonEnable, QSize(), QIcon::Normal);
-  fwdButtonIcon.addFile(fwdButtonDisable, QSize(), QIcon::Disabled);
+  QIcon backButtonIcon = createQIcon("fb_back");
+  QIcon fwdButtonIcon  = createQIcon("fb_fwd");
 
   m_folderBack = new QAction(backButtonIcon, tr("Back"), this);
   m_folderBack->setIconText("");
@@ -1815,13 +1831,13 @@ DvItemViewerButtonBar::DvItemViewerButtonBar(DvItemViewer *itemViewer,
   m_folderFwd->setIconText("");
   addAction(m_folderFwd);
 
-  QIcon folderUpIcon = createQIcon("folderup");
+  QIcon folderUpIcon = createQIcon("fb_up");
   QAction *folderUp  = new QAction(folderUpIcon, tr("Up One Level"), this);
   folderUp->setIconText(tr("Up"));
   addAction(folderUp);
   addSeparator();
 
-  QIcon newFolderIcon = createQIcon("newfolder");
+  QIcon newFolderIcon = createQIcon("folder_new");
   QAction *newFolder  = new QAction(newFolderIcon, tr("New Folder"), this);
   newFolder->setIconText(tr("New"));
   addAction(newFolder);
@@ -1831,7 +1847,7 @@ DvItemViewerButtonBar::DvItemViewerButtonBar(DvItemViewer *itemViewer,
   QActionGroup *actions = new QActionGroup(this);
   actions->setExclusive(true);
 
-  QIcon thumbViewIcon = createQIconOnOff("viewicon");
+  QIcon thumbViewIcon = createQIcon("viewicon");
   QAction *thumbView  = new QAction(thumbViewIcon, tr("Icons View"), this);
   thumbView->setCheckable(true);
   thumbView->setIconText(tr("Icon"));
@@ -1842,7 +1858,7 @@ DvItemViewerButtonBar::DvItemViewerButtonBar(DvItemViewer *itemViewer,
   actions->addAction(thumbView);
   addAction(thumbView);
 
-  QIcon listViewIcon = createQIconOnOff("viewlist");
+  QIcon listViewIcon = createQIcon("viewlist");
   QAction *listView  = new QAction(listViewIcon, tr("List View"), this);
   listView->setCheckable(true);
   listView->setIconText(tr("List"));
@@ -1862,8 +1878,8 @@ DvItemViewerButtonBar::DvItemViewerButtonBar(DvItemViewer *itemViewer,
 
   // button to export file list to csv
   QAction *exportFileListAction = new QAction(tr("Export File List"), this);
+  exportFileListAction->setIcon(createQIcon("export"));
   addAction(exportFileListAction);
-  addSeparator();
 
   if (itemViewer->m_windowType == DvItemViewer::Browser &&
       !Preferences::instance()->isWatchFileSystemEnabled()) {

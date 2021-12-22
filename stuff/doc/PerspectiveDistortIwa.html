@@ -6,26 +6,34 @@
 <body bgcolor="#f5f5f5" text="#220011">
 <h1><img src = ".\img\fx_iwa_perspective_distort.png" width = 30 height = 30 >   Perspective Distort Fx Iwa</h1>
 
-<h4>● 概要</h4>
-Follow時の地面の動き（手前が速く、奥が遅く動く＝運動視差）を生成するためのエフェクトです。<br>
-絵を左右に引き伸ばして台形に変形しますので、上下には歪みません。<br>
-つまり、奥行きによる垂直方向の収縮はあらかじめ入力画像に盛り込まれている必要があります。<br>
-また、並行移動する背景にこのエフェクトを適用する場合、背景の移動はSubXsheetの中にたたむ必要があります。<br><br>
+<h4>● Overview</h4>
+Allows to generate a motion parallax movement effect on the Source image, where things in<br>
+front move faster than things in the back.<br>
+The image width is stretched to the sides, to transform it into a trapezoid, but it will not<br>
+be stretched vertically.<br>
+In other words, the contraction in the vertical direction caused by depth, should be<br>
+incorporated beforehand in the image.<br>
+Also, if you want to apply this effect to a moving background, the movement of the background<br>
+must be collapsed into a SubXsheet.<br><br>
 <img src = ".\img\perspective_distort.png">
 
-<h4>● 入力ポート</h4>
+<h4>● Input Port</h4>
 <UL>
-<LI><b>Source</b> : 入力画像を接続します。</LI>
+<LI><b>Source</b> : Connect the input image.</LI>
 </UL>
 
-<h4>● パラメータ</h4>
+<h4>● Parameters</h4>
 <UL>
-<LI><b>Vanishing Point</b> : 変形時の中心となる点です。透視投影の場合は、消失点にあたります。</LI>
-<LI><b>Anchor Point</b> : 変形の基準となる垂直位置を決める点です。この点より上のピクセルは描画されません（透明になります）。
-また、この点を通る水平線上の絵は、サイズが変わりません。</LI>
-<LI><b>Precision</b> : 変形は拡大によってのみ行うので、解像度が落ちてしまいます。解像度の劣化を最大限緩和するために、
-あらかじめこの値の倍率だけ細かい解像度で入力画像を計算して変形します。「背景の取り込み解像度」を
-「出力解像度」で割った値よりPrecisionを高くしても意味はありません。</LI>
+<LI><b>Vanishing Point</b> : The center point for the deformation. In the case of perspective<br>
+projection, this is the vanishing point.</LI>
+<LI><b>Anchor Point</b> : Defines the vertical position that will be the basis for the deformation.<br>
+Pixels above this point will not be drawn (become transparent).<br>
+It also defines the horizon line for the deformed image, maintaining the original image width.</LI>
+<LI><b>Precision</b> : Since the deformation is carried out only by expansion, the resolution will<br>
+suffer. In order to minimize resolution deterioration, the original image resolution is<br>
+multiplied by this value before being deformed.<br>
+There is no point in making Precision higher than the value obtained by dividing the<br>
+"Capture resolution of the background" by the "Output resolution".</LI>
 </UL>
 </body>
 

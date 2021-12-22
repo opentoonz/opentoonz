@@ -46,6 +46,7 @@
 #include "tcolorstyles.h"
 #include "tstroke.h"
 #include "tpersistset.h"
+#include "columncommand.h"
 
 // Qt includes
 #include <QFrame>
@@ -190,6 +191,17 @@ void getSelectedFids(std::vector<TFrameId> &fids, TXshSimpleLevel *level,
   for (fst = fidsSet.begin(); fst != fsEnd; ++fst) fids.push_back(*fst);
 }
 
+// Toonz Raster Level may have palette including MyPaint styles,
+// which cannot be rendered in vector levels.
+// In such case replace MyPaint styles by solid color styles.
+void replaceMyPaintBrushStyles(TPalette *palette) {
+  for (int s = 0; s < palette->getStyleCount(); s++) {
+    TColorStyle *style = palette->getStyle(s);
+    if (style->getTagId() == 4001)  // TMyPaintBrushStyle
+      palette->setStyle(s, style->getMainColor());
+  }
+}
+
 }  // namespace
 
 //*****************************************************************************
@@ -264,7 +276,7 @@ void Vectorizer::setLevel(const TXshSimpleLevelP &level) {
 
     switch (m_dialog->getChoice()) {
     case OverwriteDialog::KEEP_OLD:
-      xl          = scene->getLevelSet()->getLevel(levelName);
+      xl = scene->getLevelSet()->getLevel(levelName);
       if (!xl) xl = scene->loadLevel(dstPath);
 
       m_vLevel = xl->getSimpleLevel();
@@ -288,10 +300,12 @@ void Vectorizer::setLevel(const TXshSimpleLevelP &level) {
     vl->setName(levelName);
   }
 
-  TPalette *palette                          = 0;
-  if (sl->getType() == TZP_XSHLEVEL) palette = sl->getPalette();
-
-  palette = palette ? palette->clone() : new TPalette;
+  TPalette *palette = 0;
+  if (sl->getType() == TZP_XSHLEVEL) {
+    palette = sl->getPalette()->clone();
+    replaceMyPaintBrushStyles(palette);
+  } else
+    palette = new TPalette;
 
   palette->setPaletteName(vl->getName());
   vl->setPalette(palette);
@@ -402,7 +416,7 @@ int Vectorizer::doVectorize() {
 void Vectorizer::run() { doVectorize(); }
 
 //*****************************************************************************
-//    VectorizerPopup implentation
+//    VectorizerPopup implementation
 //*****************************************************************************
 
 #if QT_VERSION >= 0x050500
@@ -600,6 +614,18 @@ paramsLayout->addWidget(m_cThicknessRatio, row++, 1);*/
   }
 
   {
+    static const QString name = tr("Align Boundary Strokes Direction");
+    locals.addParameter(l_centerlineParamGroups, name);
+
+    m_cAlignBoundaryStrokesDirection = new CheckBox(name, this);
+    m_cAlignBoundaryStrokesDirection->setFixedHeight(WidgetHeight);
+    m_cAlignBoundaryStrokesDirection->setToolTip(
+        tr("Align boundary strokes direction to be the same.\n(clockwise, i.e. "
+           "left to right as viewed from inside of the shape)"));
+    m_paramsLayout->addWidget(m_cAlignBoundaryStrokesDirection, row++, 1);
+  }
+
+  {
     static const QString name = tr("Add Border");
     locals.addParameter(l_centerlineParamGroups, name);
 
@@ -655,6 +681,17 @@ paramsLayout->addWidget(m_cThicknessRatio, row++, 1);*/
     m_paramsLayout->addWidget(m_oPaintFill, row++, 1);
   }
 
+  {
+    static const QString name = tr("Align Boundary Strokes Direction");
+    locals.addParameter(l_outlineParamGroups, name);
+
+    m_oAlignBoundaryStrokesDirection = new CheckBox(name, this);
+    m_oAlignBoundaryStrokesDirection->setFixedHeight(WidgetHeight);
+    m_oAlignBoundaryStrokesDirection->setToolTip(
+        tr("Align boundary strokes direction to be the same.\n(clockwise, i.e. "
+           "left to right as viewed from inside of the shape)"));
+    m_paramsLayout->addWidget(m_oAlignBoundaryStrokesDirection, row++, 1);
+  }
   locals.addParameterGroup(l_outlineParamGroups, group++, row + 1, row);
 
   m_oCornersSeparator = new Separator(tr("Corners"));
@@ -729,25 +766,26 @@ paramsLayout->addWidget(m_cThicknessRatio, row++, 1);*/
 
   m_swatchArea = new VectorizerSwatchArea(this);
   splitter->addWidget(m_swatchArea);
-  m_swatchArea->setEnabled(false);  // Initally not enabled
+  m_swatchArea->setEnabled(false);  // Initially not enabled
 
   connect(this, SIGNAL(valuesChanged()), m_swatchArea,
           SLOT(invalidateContents()));
 
   //---------------------- Toolbar --------------------------
 
-  QAction *swatchAct = new QAction(createQIconOnOff("preview", true),
-                                   tr("Toggle Swatch Preview"), this);
+  QAction *swatchAct =
+      new QAction(createQIcon("preview"), tr("Toggle Swatch Preview"), this);
   swatchAct->setCheckable(true);
   leftToolBar->addAction(swatchAct);
 
-  QAction *centerlineAct = new QAction(createQIconOnOff("opacitycheck", true),
+  QAction *centerlineAct = new QAction(createQIcon("centerline"),
                                        tr("Toggle Centerlines Check"), this);
   centerlineAct->setCheckable(true);
   leftToolBar->addAction(centerlineAct);
 
   QToolButton *visibilityButton = new QToolButton(this);
-  visibilityButton->setIcon(createQIcon("options"));
+  visibilityButton->setIcon(createQIcon("menu"));
+  visibilityButton->setText(tr("Options"));
   visibilityButton->setPopupMode(QToolButton::InstantPopup);
 
   QMenu *visibilityMenu = new QMenu(visibilityButton);
@@ -757,15 +795,15 @@ paramsLayout->addWidget(m_cThicknessRatio, row++, 1);*/
   rightToolBar->addSeparator();
 
   QAction *saveAct =
-      new QAction(createQIconOnOff("save", false), tr("Save Settings"), this);
+      new QAction(createQIcon("save"), tr("Save Settings"), this);
   rightToolBar->addAction(saveAct);
   QAction *loadAct =
-      new QAction(createQIconOnOff("load", false), tr("Load Settings"), this);
+      new QAction(createQIcon("load"), tr("Load Settings"), this);
   rightToolBar->addAction(loadAct);
   rightToolBar->addSeparator();
 
-  QAction *resetAct = new QAction(createQIconOnOff("resetsize", false),
-                                  tr("Reset Settings"), this);
+  QAction *resetAct =
+      new QAction(createQIcon("settings_reset"), tr("Reset Settings"), this);
   rightToolBar->addAction(resetAct);
 
   connect(swatchAct, SIGNAL(triggered(bool)), m_swatchArea,
@@ -810,6 +848,8 @@ paramsLayout->addWidget(m_cThicknessRatio, row++, 1);*/
           SLOT(onValueEdited()));
   connect(m_cMakeFrame, SIGNAL(stateChanged(int)), this, SLOT(onValueEdited()));
   connect(m_cPaintFill, SIGNAL(stateChanged(int)), this, SLOT(onValueEdited()));
+  connect(m_cAlignBoundaryStrokesDirection, SIGNAL(stateChanged(int)), this,
+          SLOT(onValueEdited()));
   connect(m_cNaaSource, SIGNAL(stateChanged(int)), this, SLOT(onValueEdited()));
 
   connect(m_oAccuracy, SIGNAL(valueChanged(bool)), this,
@@ -817,6 +857,8 @@ paramsLayout->addWidget(m_cThicknessRatio, row++, 1);*/
   connect(m_oDespeckling, SIGNAL(valueChanged(bool)), this,
           SLOT(onValueEdited(bool)));
   connect(m_oPaintFill, SIGNAL(stateChanged(int)), this, SLOT(onValueEdited()));
+  connect(m_oAlignBoundaryStrokesDirection, SIGNAL(stateChanged(int)), this,
+          SLOT(onValueEdited()));
   connect(m_oAdherence, SIGNAL(valueChanged(bool)), this,
           SLOT(onValueEdited(bool)));
   connect(m_oAngle, SIGNAL(valueChanged(bool)), this,
@@ -890,6 +932,7 @@ bool VectorizerPopup::apply() {
   int r1               = 0;
   int c1               = 0;
   bool isCellSelection = getSelectedLevels(levels, r0, c0, r1, c1);
+  if (c0 < 0) c0 = 0;
   if (levels.empty()) {
     error(tr("The current selection is invalid."));
     return false;
@@ -936,6 +979,7 @@ bool VectorizerPopup::apply() {
                        SLOT(onFinished()), Qt::QueuedConnection);
   assert(ret);
 
+  std::set<int> newColumnIndices;
   int newIndexColumn = c1 + 1;
   for (auto const level : levels) {
     TXshSimpleLevel *sl = dynamic_cast<TXshSimpleLevel *>(level);
@@ -1003,15 +1047,21 @@ bool VectorizerPopup::apply() {
           }
         }
       }
+      newColumnIndices.insert(newIndexColumn);
       newIndexColumn += 1;
     } else if (vl) {
       std::vector<TFrameId> gomi;
+      newColumnIndices.insert(scene->getXsheet()->getFirstFreeColumnIndex());
       scene->getXsheet()->exposeLevel(
           0, scene->getXsheet()->getFirstFreeColumnIndex(), vl, gomi);
     }
 
     if (m_vectorizer->isCanceled()) break;
   }
+
+  // Add undo object
+  if (!m_vectorizer->isCanceled())
+    ColumnCmd::addConvertToVectorUndo(newColumnIndices);
 
   m_progressDialog->close();
   delete m_vectorizer;
@@ -1089,6 +1139,8 @@ void VectorizerPopup::updateSceneSettings() {
     vParams->m_oToneThreshold    = m_oToneThreshold->getValue();
     vParams->m_oTransparentColor = m_oTransparentColor->getColor();
     vParams->m_oPaintFill        = m_oPaintFill->isChecked();
+    vParams->m_oAlignBoundaryStrokesDirection =
+        m_oAlignBoundaryStrokesDirection->isChecked();
   } else {
     vParams->m_cThreshold    = m_cThreshold->getValue();
     vParams->m_cAccuracy     = m_cAccuracy->getValue();
@@ -1099,7 +1151,9 @@ void VectorizerPopup::updateSceneSettings() {
     vParams->m_cThicknessRatioLast = m_cThicknessRatioLast->getValue() * 100.0;
     vParams->m_cMakeFrame          = m_cMakeFrame->isChecked();
     vParams->m_cPaintFill          = m_cPaintFill->isChecked();
-    vParams->m_cNaaSource          = m_cNaaSource->isChecked();
+    vParams->m_cAlignBoundaryStrokesDirection =
+        m_cAlignBoundaryStrokesDirection->isChecked();
+    vParams->m_cNaaSource = m_cNaaSource->isChecked();
   }
 }
 
@@ -1188,7 +1242,7 @@ void VectorizerPopup::setType(bool outline) {
   disconnect(m_typeMenu, SIGNAL(currentIndexChanged(int)), this,
              SLOT(onTypeChange(int)));
 
-  // Setting child visibility alot invokes several layout updates - causing
+  // Setting child visibility a lot invokes several layout updates - causing
   // extensive flickering
   m_paramsWidget->layout()->setEnabled(false);
 
@@ -1211,6 +1265,7 @@ void VectorizerPopup::setType(bool outline) {
   m_cThicknessRatioLast->setVisible(centerline);
 
   m_cPaintFill->setVisible(centerline);
+  m_cAlignBoundaryStrokesDirection->setVisible(centerline);
   m_cMakeFrame->setVisible(centerline);
   m_cNaaSourceSeparator->setVisible(centerline);
   m_cNaaSource->setVisible(centerline);
@@ -1220,6 +1275,7 @@ void VectorizerPopup::setType(bool outline) {
   m_oDespecklingLabel->setVisible(outline);
   m_oDespeckling->setVisible(outline);
   m_oPaintFill->setVisible(outline);
+  m_oAlignBoundaryStrokesDirection->setVisible(outline);
   m_oCornersSeparator->setVisible(outline);
   m_oAngleLabel->setVisible(outline);
   m_oAngle->setVisible(outline);
@@ -1270,6 +1326,8 @@ void VectorizerPopup::loadConfiguration(bool isOutline) {
     m_oRelative->setValue(vParams->m_oRelative);
     m_oAccuracy->setValue(vParams->m_oAccuracy);
     m_oPaintFill->setChecked(vParams->m_oPaintFill);
+    m_oAlignBoundaryStrokesDirection->setChecked(
+        vParams->m_oAlignBoundaryStrokesDirection);
     m_oMaxColors->setValue(vParams->m_oMaxColors);
     m_oTransparentColor->setColor(vParams->m_oTransparentColor);
     m_oToneThreshold->setValue(vParams->m_oToneThreshold);
@@ -1277,6 +1335,8 @@ void VectorizerPopup::loadConfiguration(bool isOutline) {
     m_cThreshold->setValue(vParams->m_cThreshold);
     m_cDespeckling->setValue(vParams->m_cDespeckling);
     m_cPaintFill->setChecked(vParams->m_cPaintFill);
+    m_cAlignBoundaryStrokesDirection->setChecked(
+        vParams->m_cAlignBoundaryStrokesDirection);
     m_cMakeFrame->setChecked(vParams->m_cMakeFrame);
     m_cNaaSource->setChecked(vParams->m_cNaaSource);
     m_cMaxThickness->setValue(vParams->m_cMaxThickness);
@@ -1365,9 +1425,10 @@ void VectorizerPopup::populateVisibilityMenu() {
   menu->clear();
 
   VectorizerParameters *vParams = getParameters();
-  locals.addActions(menu, vParams->m_isOutline ? l_outlineParamGroups
-                                               : l_centerlineParamGroups,
-                    vParams->m_visibilityBits);
+  locals.addActions(
+      menu,
+      vParams->m_isOutline ? l_outlineParamGroups : l_centerlineParamGroups,
+      vParams->m_visibilityBits);
 }
 
 //-----------------------------------------------------------------------------

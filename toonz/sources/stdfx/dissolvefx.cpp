@@ -57,7 +57,7 @@ void doDissolve(const TRasterPT<PIXEL> &ras, const double intensity,
           pix->r = pix->g = pix->b = pix->m = 0;
         }
       }
-      *pix++;
+      pix++;
     }
   }
   ras->unlock();

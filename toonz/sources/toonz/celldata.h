@@ -55,6 +55,9 @@ If skipEmptyCells == false do not skip setting empty cells in data*/
   //! Return true if cell in TCellData can be set in \b xsh xsheet.
   bool canChange(TXsheet *xsh, int c0) const;
 
+  // This is used when pasting duplicate frames
+  void replaceCells(std::vector<TXshCell> newCells) { m_cells = newCells; }
+
 protected:
   bool canChange(TXshColumn *column, int index) const;
   void cloneZeraryFx(int index, std::vector<TXshCell> &cells) const;

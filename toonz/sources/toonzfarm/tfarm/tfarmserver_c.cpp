@@ -17,7 +17,7 @@ public:
   // TFarmServer interface implementation
   int addTask(const QString &taskid, const QString &cmdline) override;
   int terminateTask(const QString &taskid) override;
-  int getTasks(vector<QString> &tasks) override;
+  int getTasks(std::vector<QString> &tasks) override;
 
   void queryHwInfo(HwInfo &hwInfo) override;
 
@@ -55,12 +55,12 @@ int FarmServerProxy::terminateTask(const QString &taskid) {
 }
 //------------------------------------------------------------------------------
 
-int FarmServerProxy::getTasks(vector<QString> &tasks) {
+int FarmServerProxy::getTasks(std::vector<QString> &tasks) {
   QString data("getTasks");
   QString reply = sendToStub(data);
 
   // la stringa restituita contiene le informazioni desiderate separate da ","
-  vector<QString> argv;
+  std::vector<QString> argv;
   int count = extractArgs(reply, argv);
 
   assert(count > 0);
@@ -81,7 +81,7 @@ void FarmServerProxy::queryHwInfo(HwInfo &hwInfo) {
   QString reply = sendToStub(data);
 
   // la stringa restituita contiene le informazioni desiderate separate da ","
-  vector<QString> argv;
+  std::vector<QString> argv;
   extractArgs(reply, argv);
 
   assert(argv.size() > 4);

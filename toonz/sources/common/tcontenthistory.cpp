@@ -73,7 +73,7 @@ inline QString blanks(const QString &str, int count = 15) {
 //--------------------------------------------------------------------
 
 inline QString getStr(const TFrameId &id) {
-  if (id.getLetter() != 0)
+  if (!id.getLetter().isEmpty())
     return QString::number(id.getNumber()) + id.getLetter();
   else
     return QString::number(id.getNumber());
@@ -159,7 +159,7 @@ const QString TContentHistory::currentToString() const {
     dateSorted.insert(pair<QDateTime, TFrameId>(it->second, it->first));
 
   std::multimap<QDateTime, TFrameId>::const_iterator it1 = dateSorted.begin();
-  QDateTime currDate = it1->first;
+  QDateTime currDate                                     = it1->first;
 
   while (it1 != dateSorted.end()) {
     set<TFrameId> frames;

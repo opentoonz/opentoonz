@@ -46,8 +46,8 @@ protected:
   void mousePressEvent(QMouseEvent *event) override;
   void mouseMoveEvent(QMouseEvent *event) override;
   void mouseReleaseEvent(QMouseEvent *event) override;
-  void enterEvent(QEvent *);
-  void leaveEvent(QEvent *);
+  void enterEvent(QEvent *) override;
+  void leaveEvent(QEvent *) override;
   bool event(QEvent *event) override;
 
 private:

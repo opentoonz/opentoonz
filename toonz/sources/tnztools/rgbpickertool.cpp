@@ -91,6 +91,13 @@ public:
     } else {
       controller->setColorSample(color);
     }
+    TTool::Application *app = TTool::getApplication();
+    TXshSimpleLevel *level  = app->getCurrentLevel()->getSimpleLevel();
+    if (level) {
+      std::vector<TFrameId> fids;
+      level->getFids(fids);
+      invalidateIcons(level, fids);
+    }
   }
 
   void undo() const override { setColor(m_oldValue); }
@@ -232,21 +239,23 @@ void RGBPickerTool::updateTranslation() {
 // Used to notify and set the currentColor outside the draw() methods:
 // using special style there was a conflict between the draw() methods of the
 // tool
-// and the genaration of the icon inside the style editor (makeIcon()) which use
+// and the generation of the icon inside the style editor (makeIcon()) which use
 // another glContext
 
 void RGBPickerTool::onImageChanged() {
+  TTool::Application *app = TTool::getApplication();
+  TXshSimpleLevel *level  = app->getCurrentLevel()->getSimpleLevel();
   if (m_currentStyleId != 0 && m_makePick &&
       (m_pickType.getValue() == POLYLINE_PICK ||
        m_pickType.getValue() == RECT_PICK)) {
-    TTool::Application *app = TTool::getApplication();
-    TPaletteHandle *ph      = app->getPaletteController()->getCurrentPalette();
-    int styleId             = ph->getStyleIndex();
-    TPalette *palette       = ph->getPalette();
-    TXshSimpleLevel *level  = app->getCurrentLevel()->getSimpleLevel();
+    TPaletteHandle *ph = app->getPaletteController()->getCurrentPalette();
+    int styleId        = ph->getStyleIndex();
+    TPalette *palette  = ph->getPalette();
     if (palette)
       TUndoManager::manager()->add(
           new UndoPickRGBM(palette, styleId, m_currentValue, level));
+  }
+  if (m_makePick) {
     setCurrentColor(m_currentValue);
     if (level) {
       std::vector<TFrameId> fids;
@@ -372,7 +381,7 @@ void RGBPickerTool::leftButtonUp(const TPointD &pos, const TMouseEvent &) {
   }
   if (m_pickType.getValue() == FREEHAND_PICK) {
     closeFreehand();
-    if (m_currentStyleId != 0) m_makePick = true;
+    m_makePick = true;
   }
   invalidate();
 }
@@ -460,18 +469,6 @@ void RGBPickerTool::pick() {
   TXshSimpleLevel *level = app->getCurrentLevel()->getSimpleLevel();
   UndoPickRGBM *cmd = new UndoPickRGBM(palette, styleId, m_currentValue, level);
   TUndoManager::manager()->add(cmd);
-  cmd->redo();
-
-  m_makePick = false;
-  /*
-setCurrentColor(m_currentValue);
-if(level)
-{
-vector<TFrameId> fids;
-level->getFids(fids);
-invalidateIcons(level,fids);
-}
-*/
 }
 //---------------------------------------------------------
 
@@ -527,12 +524,6 @@ void RGBPickerTool::pickStroke() {
     TXshSimpleLevel *level = app->getCurrentLevel()->getSimpleLevel();
     TUndoManager::manager()->add(
         new UndoPickRGBM(palette, styleId, m_currentValue, level));
-    setCurrentColor(m_currentValue);
-    if (level) {
-      std::vector<TFrameId> fids;
-      level->getFids(fids);
-      invalidateIcons(level, fids);
-    }
   }
 }
 
@@ -668,7 +659,7 @@ void RGBPickerTool::closePolyline(const TPointD &drawingPos,
 
 //---------------------------------------------------------
 /*! Flipbook上でPassive Pickを有効にする
-*/
+ */
 void RGBPickerTool::showFlipPickedColor(const TPixel32 &pix) {
   if (m_passivePick.getValue()) {
     QColor col((int)pix.r, (int)pix.g, (int)pix.b);

@@ -13,6 +13,7 @@
 
 // TnzLib includes
 #include "toonz/imagepainter.h"
+#include "stageplayer.h"
 
 #undef DVAPI
 #undef DVVAR
@@ -33,7 +34,6 @@ class TXsheet;
 class TXshSimpleLevel;
 class TXshLevel;
 class TFrameId;
-class TFlash;
 class OnionSkinMask;
 class TFx;
 class TXshColumn;
@@ -99,6 +99,8 @@ public:
   virtual void onImage(
       const Player &player) = 0;  //!< The \a visitation function.
 
+  virtual void onRasterImage(TRasterImage *ri, const Stage::Player &data) = 0;
+
   // I've not checked the actual meaning of the methods below. They are unused
   // in Toonz, but *are*
   // used in Toonz derivative works such as Tab or LineTest. They deal with
@@ -133,6 +135,14 @@ struct DVAPI VisitArgs {
   bool m_checkPreviewVisibility;
   bool m_rasterizePli;
   int m_isGuidedDrawingEnabled;
+  int m_guidedFrontStroke;
+  int m_guidedBackStroke;
+#if defined(x64)
+  TRasterImageP m_liveViewImage = 0;
+  TRasterImageP m_lineupImage   = 0;
+  Stage::Player m_liveViewPlayer;
+  Stage::Player m_lineupPlayer;
+#endif
 
 public:
   VisitArgs()
@@ -147,6 +157,8 @@ public:
       , m_onlyVisible(false)
       , m_checkPreviewVisibility(false)
       , m_isGuidedDrawingEnabled(0)
+      , m_guidedFrontStroke(-1)
+      , m_guidedBackStroke(-1)
       , m_rasterizePli(false) {}
 };
 
@@ -261,7 +273,7 @@ public:
 
   void onImage(const Stage::Player &data) override;
   void onVectorImage(TVectorImage *vi, const Stage::Player &data);
-  void onRasterImage(TRasterImage *ri, const Stage::Player &data);
+  void onRasterImage(TRasterImage *ri, const Stage::Player &data) override;
   void onToonzImage(TToonzImage *ri, const Stage::Player &data);
 
   void beginMask() override;
@@ -292,16 +304,19 @@ class DVAPI Picker final : public Visitor {
   TPointD m_point;
   TAffine m_viewAff;
   double m_minDist2;
+  int m_devPixRatio;
 
   int m_currentColumnIndex = -1;
 
 public:
   Picker(const TAffine &viewAff, const TPointD &p,
-         const ImagePainter::VisualSettings &vs);
+         const ImagePainter::VisualSettings &vs, int devPixRatio = 1);
 
-  void setDistance(double d);
+  // minimum distance to pick thin vector strokes.
+  void setMinimumDistance(double d);
 
   void onImage(const Stage::Player &data) override;
+  void onRasterImage(TRasterImage *ri, const Stage::Player &data) override{};
   void beginMask() override;
   void endMask() override;
   void enableMask() override;

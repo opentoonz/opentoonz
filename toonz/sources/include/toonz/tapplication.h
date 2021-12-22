@@ -49,7 +49,8 @@ public:
   // Current Palette (PaletteController) methods
   virtual TColorStyle *getCurrentLevelStyle() const = 0;
   virtual int getCurrentLevelStyleIndex() const     = 0;
-  virtual void setCurrentLevelStyleIndex(int index) = 0;
+  virtual void setCurrentLevelStyleIndex(int index,
+                                         bool forceUpdate = false) = 0;
 };
 
 #endif  // TAPPLICATION_H

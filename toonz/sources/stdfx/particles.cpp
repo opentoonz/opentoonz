@@ -52,7 +52,8 @@ Particle::Particle(int g_lifetime, int seed, std::map<int, TTile *> porttiles,
   /*- 初期座標値をつくる -*/
   /*-- Perspective DistributionがONかつ、SizeのControlImageが刺さっている場合
    * --*/
-  if (myregions.size() && values.scale_ctrl_val != ParticlesFx::CTRL_NONE &&
+  if (myregions.size() &&
+      porttiles.find(values.scale_ctrl_val) != porttiles.end() &&
       values.perspective_distribution_val) {
     float size = myWeight[255];
     /*- 候補の中のIndex -*/
@@ -74,7 +75,7 @@ Particle::Particle(int g_lifetime, int seed, std::map<int, TTile *> porttiles,
   }
   /*- 領域がある かつ 発生領域のControlImageが刺さっている場合 -*/
   else if (myregions.size() &&
-           values.source_ctrl_val != ParticlesFx::CTRL_NONE) {
+           porttiles.find(values.source_ctrl_val) != porttiles.end()) {
     /*- howmany：発生Particlesのうち、何番目に発生させたものか。
             myregionが複数有る場合は、均等に割り振ることになる。 -*/
     int regionindex = howmany % myregions.size();
@@ -117,7 +118,8 @@ Particle::Particle(int g_lifetime, int seed, std::map<int, TTile *> porttiles,
        it != porttiles.end(); ++it) {
     if ((values.lifetime_ctrl_val == it->first ||
          values.speed_ctrl_val == it->first ||
-         values.scale_ctrl_val == it->first || values.rot_ctrl_val == it->first
+         values.scale_ctrl_val == it->first ||
+         values.rot_ctrl_val == it->first
          /*-  Speed Angleを明るさでコントロールする場合 -*/
          || (values.speeda_ctrl_val == it->first &&
              !values.speeda_use_gradient_val)) &&
@@ -148,12 +150,14 @@ Particle::Particle(int g_lifetime, int seed, std::map<int, TTile *> porttiles,
 
   /*- Speed Angleの制御。RangeモードとGradientモードがある -*/
   if (values.speeda_ctrl_val &&
-      (porttiles.find(values.speeda_ctrl_val) != porttiles.end())) {
+      (porttiles.find(values.speeda_ctrl_val) != porttiles.end() ||
+       porttiles.find(values.speeda_ctrl_val + Ctrl_64_Offset) !=
+           porttiles.end())) {
     if (values.speeda_use_gradient_val) {
       /*- 参照画像のGradientを得る関数を利用して角度を得る -*/
       float dir_x, dir_y;
-      get_image_gravity(porttiles[values.speeda_ctrl_val], values, dir_x,
-                        dir_y);
+      get_image_gravity(porttiles[values.speeda_ctrl_val + Ctrl_64_Offset],
+                        values, dir_x, dir_y);
       if (dir_x == 0.0f && dir_y == 0.0f)
         random_s_a_range = values.speed_val.first;
       else
@@ -245,13 +249,13 @@ void Particle::create_Swing(const particles_values &values,
     smperiody = changesigny;
   }
   if (values.rotswingmode_val == ParticlesFx::SWING_SMOOTH) {
-    smswinga = abs((int)(values.rotsca_val.first +
+    smswinga  = abs((int)(values.rotsca_val.first +
                          random.getFloat() * (ranges.rotsca_range)));
     smperioda = changesigna;
   }
-  signx = random.getInt(0, 1) > 0 ? 1 : -1;
-  signy = random.getInt(0, 1) > 0 ? 1 : -1;
-  signa = random.getInt(0, 1) > 0 ? 1 : -1;
+  signx = random.getBool() ? 1 : -1;
+  signy = random.getBool() ? 1 : -1;
+  signa = random.getBool() ? 1 : -1;
 }
 
 /*-----------------------------------------------------------------*/
@@ -267,7 +271,7 @@ void Particle::create_Colors(const particles_values &values,
         (porttiles.find(values.gencol_ctrl_val) != porttiles.end()))
       get_image_reference(porttiles[values.gencol_ctrl_val], values, color);
     else
-      color        = values.gencol_val.getPremultipliedValue(random.getFloat());
+      color = values.gencol_val.getPremultipliedValue(random.getFloat());
     gencol.fadecol = values.genfadecol_val;
     if (values.gencol_spread_val) spread_color(color, values.gencol_spread_val);
     gencol.col = color;
@@ -394,7 +398,7 @@ void Particle::update_Animation(const particles_values &values, int first,
   case ParticlesFx::ANIM_SR_CYCLE:
     if (!keep || frame != keep - 1) {
       if (!animswing && frame < last - 1) {
-        frame                            = (frame + 1);
+        frame = (frame + 1);
         if (frame == last - 1) animswing = 1;
       } else
         frame = (frame - 1);
@@ -556,67 +560,41 @@ void Particle::get_image_reference(TTile *ctrl, const particles_values &values,
 /*-----------------------------------------------------------------*/
 void Particle::get_image_gravity(TTile *ctrl1, const particles_values &values,
                                  float &gx, float &gy) {
-  TRaster32P raster32 = ctrl1->getRaster();
+  TRaster64P raster64 = ctrl1->getRaster();
   TPointD tmp(x, y);
   tmp -= ctrl1->m_pos;
-  int radius = 4;
+  int radius = 2;
   gx         = 0;
   gy         = 0;
-//#define OLDSTUFF
-#ifdef OLDSTUFF
-  int i;
-#endif
-  raster32->lock();
-#ifdef OLDSTUFF
-  if (!values.gravity_radius_val) {
-    radius = 4;
-    if (raster32 && tmp.x >= radius && tmp.x < raster32->getLx() - radius &&
-        tmp.y >= radius && tmp.y < raster32->getLy() - radius) {
-      TPixel32 *pix = &(raster32->pixels(troundp(tmp.y))[(int)tmp.x]);
-      double norm   = 1 / ((double)TPixelGR8::maxChannelValue);
-      for (i = 1; i < radius; i++) {
-        gx += TPixelGR8::from(*(pix + i)).value;
-        gx -= TPixelGR8::from(*(pix - i)).value;
-        gy += TPixelGR8::from(*(pix + raster32->getWrap() * i)).value;
-        gy -= TPixelGR8::from(*(pix - raster32->getWrap() * i)).value;
-      }
-      gx = gx * norm;
-      gy = gy * norm;
+  raster64->lock();
+  if (raster64 && tmp.x >= radius && tmp.x < raster64->getLx() - radius &&
+      tmp.y >= radius && tmp.y < raster64->getLy() - radius) {
+    TPixel64 *pix = &(raster64->pixels(troundp(tmp.y))[(int)tmp.x]);
+
+    gx += 2 * TPixelGR16::from(*(pix + 1)).value;
+    gx += TPixelGR16::from(*(pix + 1 + raster64->getWrap() * 1)).value;
+    gx += TPixelGR16::from(*(pix + 1 - raster64->getWrap() * 1)).value;
+
+    gx -= 2 * TPixelGR16::from(*(pix - 1)).value;
+    gx -= TPixelGR16::from(*(pix - 1 + raster64->getWrap() * 1)).value;
+    gx -= TPixelGR16::from(*(pix - 1 - raster64->getWrap() * 1)).value;
+
+    gy += 2 * TPixelGR16::from(*(pix + raster64->getWrap() * 1)).value;
+    gy += TPixelGR16::from(*(pix + raster64->getWrap() * 1 + 1)).value;
+    gy += TPixelGR16::from(*(pix + raster64->getWrap() * 1 - 1)).value;
+
+    gy -= 2 * TPixelGR16::from(*(pix - raster64->getWrap() * 1)).value;
+    gy -= TPixelGR16::from(*(pix - raster64->getWrap() * 1 + 1)).value;
+    gy -= TPixelGR16::from(*(pix - raster64->getWrap() * 1 - 1)).value;
+
+    double norm = std::sqrt(gx * gx + gy * gy);
+    if (norm) {
+      double inorm = 0.1 / norm;
+      gx           = gx * inorm;
+      gy           = gy * inorm;
     }
-  } else {
-#endif
-    radius = 2;
-    if (raster32 && tmp.x >= radius && tmp.x < raster32->getLx() - radius &&
-        tmp.y >= radius && tmp.y < raster32->getLy() - radius) {
-      TPixel32 *pix = &(raster32->pixels(troundp(tmp.y))[(int)tmp.x]);
-
-      gx += 2 * TPixelGR8::from(*(pix + 1)).value;
-      gx += TPixelGR8::from(*(pix + 1 + raster32->getWrap() * 1)).value;
-      gx += TPixelGR8::from(*(pix + 1 - raster32->getWrap() * 1)).value;
-
-      gx -= 2 * TPixelGR8::from(*(pix - 1)).value;
-      gx -= TPixelGR8::from(*(pix - 1 + raster32->getWrap() * 1)).value;
-      gx -= TPixelGR8::from(*(pix - 1 - raster32->getWrap() * 1)).value;
-
-      gy += 2 * TPixelGR8::from(*(pix + raster32->getWrap() * 1)).value;
-      gy += TPixelGR8::from(*(pix + raster32->getWrap() * 1 + 1)).value;
-      gy += TPixelGR8::from(*(pix + raster32->getWrap() * 1 - 1)).value;
-
-      gy -= 2 * TPixelGR8::from(*(pix - raster32->getWrap() * 1)).value;
-      gy -= TPixelGR8::from(*(pix - raster32->getWrap() * 1 + 1)).value;
-      gy -= TPixelGR8::from(*(pix - raster32->getWrap() * 1 - 1)).value;
-
-      double norm = sqrt(gx * gx + gy * gy);
-      if (norm) {
-        double inorm = 0.1 / norm;
-        gx           = gx * inorm;
-        gy           = gy * inorm;
-      }
-    }
-#ifdef OLDSTUFF
   }
-#endif
-  raster32->unlock();
+  raster64->unlock();
 }
 
 /*-----------------------------------------------------------------*/
@@ -652,11 +630,9 @@ void Particle::move(std::map<int, TTile *> porttiles,
                     float xgravity, float ygravity, float dpicorr,
                     int lastframe) {
   struct pos_dummy dummy;
-  float frictx, fricty;
   // int time;
   std::map<int, double> imagereferences;
   dummy.x = dummy.y = dummy.a = 0.0;
-  frictx = fricty = 0.0;
 
   double frictreference     = 1;
   double scalereference     = 0;
@@ -699,40 +675,35 @@ void Particle::move(std::map<int, TTile *> porttiles,
   // time=genlifetime-lifetime-1;
   // if(time<0) time=0;
   if (values.gravity_ctrl_val &&
-      (porttiles.find(values.gravity_ctrl_val) != porttiles.end())) {
-    get_image_gravity(porttiles[values.gravity_ctrl_val], values, xgravity,
-                      ygravity);
+      (porttiles.find(values.gravity_ctrl_val + Ctrl_64_Offset) !=
+       porttiles.end())) {
+    get_image_gravity(porttiles[values.gravity_ctrl_val + Ctrl_64_Offset],
+                      values, xgravity, ygravity);
     xgravity *= values.gravity_val;
     ygravity *= values.gravity_val;
   }
 
-  if (values.friction_val * frictreference) {
-    if (vx) {
-      frictx = vx * (1 + values.friction_val * frictreference) +
-               (10 / vx) * values.friction_val * frictreference;
-      if ((frictx / vx) < 0) frictx = 0;
-      vx                            = frictx;
+  if (double friction = values.friction_val * frictreference) {
+    if (vx || vy) {
+      double v           = std::sqrt(vx * vx + vy * vy);
+      double frictined_v = v * (1 + friction) + (10 / v) * friction;
+      if (frictined_v < 0) frictined_v = 0;
+
+      double f_ratio = frictined_v / v;
+      if (vx) vx *= f_ratio;
+      if (vy) vy *= f_ratio;
     }
-    if (!frictx &&
-        fabs(values.friction_val * frictreference * 10) > fabs(xgravity)) {
+    if (!vx && fabs(friction * 10) > fabs(xgravity)) {
       xgravity = 0;
       dummy.x  = 0;
       dummy.a  = 0;
       windx    = 0;
     }
-
-    if (vy) {
-      fricty = vy * (1 + values.friction_val * frictreference) +
-               (10 / vy) * values.friction_val * frictreference;
-      if ((fricty / vy) < 0) fricty = 0;
-      vy                            = fricty;
-    }
-    if (!fricty &&
-        fabs(values.friction_val * frictreference * 10) > fabs(ygravity)) {
-      ygravity = 0;
-      dummy.y  = 0;
+    if (!vy && fabs(friction * 10) > fabs(xgravity)) {
+      xgravity = 0;
+      dummy.x  = 0;
       dummy.a  = 0;
-      windy    = 0;
+      windx    = 0;
     }
   }
 

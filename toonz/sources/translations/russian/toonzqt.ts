@@ -4,32 +4,32 @@
 <context>
     <name>AddFxContextMenu</name>
     <message>
-        <location filename="../../toonzqt/addfxcontextmenu.cpp" line="163"/>
+        <location filename="../../toonzqt/addfxcontextmenu.cpp" line="162"/>
         <source>Insert FX</source>
         <translation>Вставить FX</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/addfxcontextmenu.cpp" line="165"/>
+        <location filename="../../toonzqt/addfxcontextmenu.cpp" line="164"/>
         <source>Add FX</source>
         <translation>Добавить FX</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/addfxcontextmenu.cpp" line="167"/>
+        <location filename="../../toonzqt/addfxcontextmenu.cpp" line="166"/>
         <source>Replace FX</source>
         <translation>Заменить FX</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/addfxcontextmenu.cpp" line="623"/>
+        <location filename="../../toonzqt/addfxcontextmenu.cpp" line="622"/>
         <source>Insert </source>
         <translation>Вставить </translation>
     </message>
     <message>
-        <location filename="../../toonzqt/addfxcontextmenu.cpp" line="626"/>
+        <location filename="../../toonzqt/addfxcontextmenu.cpp" line="625"/>
         <source>Add </source>
         <translation>Добавить </translation>
     </message>
     <message>
-        <location filename="../../toonzqt/addfxcontextmenu.cpp" line="629"/>
+        <location filename="../../toonzqt/addfxcontextmenu.cpp" line="628"/>
         <source>Replace </source>
         <translation>Заменить </translation>
     </message>
@@ -68,22 +68,22 @@
 <context>
     <name>AdjustPaletteDialog</name>
     <message>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="697"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="700"/>
         <source>Adjust Current Level to This Palette</source>
         <translation>Отрегулируйте текущий уровень до этой палитры</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="703"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="706"/>
         <source>Tolerance</source>
         <translation>Допуск</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="706"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="709"/>
         <source>Apply</source>
         <translation>Применить</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="708"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="711"/>
         <source>Cancel</source>
         <translation>Отмена</translation>
     </message>
@@ -91,12 +91,12 @@
 <context>
     <name>CameraPainter</name>
     <message>
-        <location filename="../../toonzqt/stageschematicnode.cpp" line="597"/>
+        <location filename="../../toonzqt/stageschematicnode.cpp" line="506"/>
         <source>&amp;Reset Center</source>
         <translation>&amp;Сброс центра</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/stageschematicnode.cpp" line="600"/>
+        <location filename="../../toonzqt/stageschematicnode.cpp" line="509"/>
         <source>&amp;Activate</source>
         <translation>&amp;Активировать</translation>
     </message>
@@ -104,110 +104,135 @@
 <context>
     <name>CameraSettingsWidget</name>
     <message>
-        <location filename="../../toonzqt/camerasettingswidget.cpp" line="198"/>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="210"/>
         <source>DPI</source>
         <translation>DPI</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/camerasettingswidget.cpp" line="195"/>
-        <location filename="../../toonzqt/camerasettingswidget.cpp" line="199"/>
-        <location filename="../../toonzqt/camerasettingswidget.cpp" line="398"/>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="206"/>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="211"/>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="410"/>
         <source>Pixels</source>
         <translation>Пиксели</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/camerasettingswidget.cpp" line="200"/>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="182"/>
+        <source>cm</source>
+        <translation>см</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="183"/>
+        <source>mm</source>
+        <translation>мм</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="184"/>
+        <source>inch</source>
+        <translation>дюйм</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="185"/>
+        <source>field</source>
+        <translation>поле</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="186"/>
+        <source>pixel</source>
+        <translation>пиксель</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="212"/>
         <source>x</source>
         <translation>x</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/camerasettingswidget.cpp" line="204"/>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="216"/>
         <source>Use Current Level Settings</source>
         <translation>Использовать настройки текущего уровня</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/camerasettingswidget.cpp" line="207"/>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="219"/>
         <source>Add</source>
         <translation>Добавить</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/camerasettingswidget.cpp" line="208"/>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="220"/>
         <source>Remove</source>
         <translation>Удалить</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/camerasettingswidget.cpp" line="246"/>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="257"/>
         <source>Force Squared Pixel</source>
         <translation>Force Squared Pixel</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/camerasettingswidget.cpp" line="292"/>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="304"/>
         <source>A/R</source>
-        <translation type="unfinished"></translation>
+        <translation>A/R</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/camerasettingswidget.cpp" line="406"/>
-        <location filename="../../toonzqt/camerasettingswidget.cpp" line="824"/>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="419"/>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="842"/>
         <source>&lt;custom&gt;</source>
         <translation>&lt;пользовательский&gt;</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/camerasettingswidget.cpp" line="870"/>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="888"/>
         <source>Bad camera preset</source>
         <translation>Плохой пресет камеры</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/camerasettingswidget.cpp" line="871"/>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="889"/>
         <source>&apos;%1&apos; doesn&apos;t seem a well formed camera preset. 
 Possibly the preset file has been corrupted</source>
         <translation>&quot;%1&quot; не кажется правильно сформированным пресетом камеры.
-Возможно пресет поврежден</translation>
+Возможно предустановка повреждена</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/camerasettingswidget.cpp" line="904"/>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="922"/>
         <source>Preset name</source>
-        <translation>Имя пресета</translation>
+        <translation>Имя предустановки</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/camerasettingswidget.cpp" line="905"/>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="923"/>
         <source>Enter the name for %1</source>
         <translation>Введите имя для %1</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/camerasettingswidget.cpp" line="910"/>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="928"/>
         <source>Error : Preset Name is Invalid</source>
-        <translation>Ошибка: имя пресета недействительно</translation>
+        <translation>Ошибка: имя предустановки недействительно</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/camerasettingswidget.cpp" line="911"/>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="929"/>
         <source>The preset name must not use &apos;,&apos;(comma).</source>
-        <translation>Имя пресета не должно содержать &quot;,&quot; (запятую).</translation>
+        <translation>Имя предустановки не должно содержать &quot;,&quot; (запятую).</translation>
     </message>
 </context>
 <context>
     <name>ChannelHisto</name>
     <message>
-        <location filename="../../toonzqt/combohistogram.cpp" line="219"/>
+        <location filename="../../toonzqt/combohistogram.cpp" line="220"/>
         <source>Red</source>
         <translation>Красный (R)</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/combohistogram.cpp" line="223"/>
+        <location filename="../../toonzqt/combohistogram.cpp" line="224"/>
         <source>Green</source>
         <translation>Зеленый (G)</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/combohistogram.cpp" line="227"/>
+        <location filename="../../toonzqt/combohistogram.cpp" line="228"/>
         <source>Blue</source>
         <translation>Голубой (B)</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/combohistogram.cpp" line="231"/>
+        <location filename="../../toonzqt/combohistogram.cpp" line="232"/>
         <source>Alpha</source>
         <translation>Альфа</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/combohistogram.cpp" line="235"/>
+        <location filename="../../toonzqt/combohistogram.cpp" line="236"/>
         <source>RGBA</source>
         <translation>RGBA</translation>
     </message>
@@ -216,32 +241,81 @@ Possibly the preset file has been corrupted</source>
     <name>CleanupCameraSettingsWidget</name>
     <message>
         <location filename="../../toonzqt/cleanupcamerasettingswidget.cpp" line="57"/>
-        <source>N/S</source>
+        <source>Y</source>
         <translation>Y</translation>
     </message>
     <message>
         <location filename="../../toonzqt/cleanupcamerasettingswidget.cpp" line="60"/>
-        <source>E/W</source>
+        <source>X</source>
         <translation>X</translation>
+    </message>
+</context>
+<context>
+    <name>ColorChannelControl</name>
+    <message>
+        <source>R</source>
+        <translation type="vanished">R</translation>
+    </message>
+    <message>
+        <source>G</source>
+        <translation type="vanished">G</translation>
+    </message>
+    <message>
+        <source>B</source>
+        <translation type="vanished">B</translation>
+    </message>
+    <message>
+        <source>A</source>
+        <translation type="vanished">A</translation>
+    </message>
+    <message>
+        <source>H</source>
+        <translation type="vanished">H</translation>
+    </message>
+    <message>
+        <source>S</source>
+        <translation type="vanished">S</translation>
+    </message>
+    <message>
+        <source>V</source>
+        <translation type="vanished">V</translation>
+    </message>
+</context>
+<context>
+    <name>ColorField</name>
+    <message>
+        <source>R:</source>
+        <translation type="vanished">R:</translation>
+    </message>
+    <message>
+        <source>G:</source>
+        <translation type="vanished">G:</translation>
+    </message>
+    <message>
+        <source>B:</source>
+        <translation type="vanished">B:</translation>
+    </message>
+    <message>
+        <source>A:</source>
+        <translation type="vanished">A:</translation>
     </message>
 </context>
 <context>
     <name>ColumnPainter</name>
     <message>
-        <location filename="../../toonzqt/stageschematicnode.cpp" line="276"/>
+        <location filename="../../toonzqt/stageschematicnode.cpp" line="208"/>
         <source>&amp;Reset Center</source>
         <translation>&amp;Сброс центра</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/stageschematicnode.cpp" line="279"/>
         <source>&amp;Open Subxsheet</source>
-        <translation>&amp;Открыть Subxsheet</translation>
+        <translation type="obsolete">&amp;Открыть Subxsheet</translation>
     </message>
 </context>
 <context>
     <name>ComboHistoRGBLabel</name>
     <message>
-        <location filename="../../toonzqt/combohistogram.cpp" line="342"/>
+        <location filename="../../toonzqt/combohistogram.cpp" line="343"/>
         <source>R:%1 G:%2 B:%3</source>
         <translation>R:%1 G:%2 B:%3</translation>
     </message>
@@ -249,22 +323,22 @@ Possibly the preset file has been corrupted</source>
 <context>
     <name>ComboHistogram</name>
     <message>
-        <location filename="../../toonzqt/combohistogram.cpp" line="375"/>
+        <location filename="../../toonzqt/combohistogram.cpp" line="376"/>
         <source>Picked Color</source>
-        <translation type="unfinished"></translation>
+        <translation>Выбранный цвет</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/combohistogram.cpp" line="379"/>
+        <location filename="../../toonzqt/combohistogram.cpp" line="380"/>
         <source>Average Color (Ctrl + Drag)</source>
-        <translation type="unfinished"></translation>
+        <translation>Средний цвет (потянуть при нажатом Ctrl)</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/combohistogram.cpp" line="387"/>
+        <location filename="../../toonzqt/combohistogram.cpp" line="388"/>
         <source>X:</source>
         <translation>X:</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/combohistogram.cpp" line="391"/>
+        <location filename="../../toonzqt/combohistogram.cpp" line="392"/>
         <source>Y:</source>
         <translation>Y:</translation>
     </message>
@@ -272,45 +346,43 @@ Possibly the preset file has been corrupted</source>
 <context>
     <name>DVGui</name>
     <message>
-        <location filename="../../toonzqt/dvdialog.cpp" line="1352"/>
         <source>OK</source>
-        <translation>OK</translation>
+        <translation type="obsolete">OK</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/dvdialog.cpp" line="1354"/>
         <source>Cancel</source>
-        <translation>Отмена</translation>
+        <translation type="obsolete">Отмена</translation>
     </message>
 </context>
 <context>
     <name>DVGui::CleanupColorField</name>
     <message>
-        <location filename="../../toonzqt/colorfield.cpp" line="641"/>
+        <location filename="../../toonzqt/colorfield.cpp" line="654"/>
         <source>Brightness:</source>
         <translation>Яркость:</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/colorfield.cpp" line="644"/>
+        <location filename="../../toonzqt/colorfield.cpp" line="657"/>
         <source>Contrast:</source>
         <translation>Контраст:</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/colorfield.cpp" line="649"/>
+        <location filename="../../toonzqt/colorfield.cpp" line="662"/>
         <source>Color Thres</source>
         <translation>Цветовой порог</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/colorfield.cpp" line="652"/>
+        <location filename="../../toonzqt/colorfield.cpp" line="665"/>
         <source>White Thres</source>
         <translation>Порог белого</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/colorfield.cpp" line="657"/>
+        <location filename="../../toonzqt/colorfield.cpp" line="670"/>
         <source>H Range</source>
         <translation>H Range</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/colorfield.cpp" line="660"/>
+        <location filename="../../toonzqt/colorfield.cpp" line="673"/>
         <source>Line Width</source>
         <translation>Ширина линии</translation>
     </message>
@@ -318,22 +390,22 @@ Possibly the preset file has been corrupted</source>
 <context>
     <name>DVGui::ColorField</name>
     <message>
-        <location filename="../../toonzqt/colorfield.cpp" line="358"/>
+        <location filename="../../toonzqt/colorfield.cpp" line="368"/>
         <source>R:</source>
         <translation>R:</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/colorfield.cpp" line="361"/>
+        <location filename="../../toonzqt/colorfield.cpp" line="372"/>
         <source>G:</source>
         <translation>G:</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/colorfield.cpp" line="364"/>
+        <location filename="../../toonzqt/colorfield.cpp" line="376"/>
         <source>B:</source>
         <translation>B:</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/colorfield.cpp" line="367"/>
+        <location filename="../../toonzqt/colorfield.cpp" line="380"/>
         <source>A:</source>
         <translation>A:</translation>
     </message>
@@ -341,32 +413,32 @@ Possibly the preset file has been corrupted</source>
 <context>
     <name>DVGui::DvTextEdit</name>
     <message>
-        <location filename="../../toonzqt/dvtextedit.cpp" line="153"/>
+        <location filename="../../toonzqt/dvtextedit.cpp" line="152"/>
         <source>Bold</source>
         <translation>Bold</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/dvtextedit.cpp" line="158"/>
+        <location filename="../../toonzqt/dvtextedit.cpp" line="156"/>
         <source>Italic</source>
         <translation>Italic</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/dvtextedit.cpp" line="163"/>
+        <location filename="../../toonzqt/dvtextedit.cpp" line="161"/>
         <source>Underline</source>
         <translation>Подчеркивание</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/dvtextedit.cpp" line="178"/>
+        <location filename="../../toonzqt/dvtextedit.cpp" line="175"/>
         <source>Align Left</source>
         <translation>Выровнять по левому краю</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/dvtextedit.cpp" line="181"/>
+        <location filename="../../toonzqt/dvtextedit.cpp" line="179"/>
         <source>Align Center</source>
         <translation>Выровнять по центру</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/dvtextedit.cpp" line="184"/>
+        <location filename="../../toonzqt/dvtextedit.cpp" line="182"/>
         <source>Align Right</source>
         <translation>Выровнять по правому краю</translation>
     </message>
@@ -374,7 +446,7 @@ Possibly the preset file has been corrupted</source>
 <context>
     <name>DVGui::FileField</name>
     <message>
-        <location filename="../../toonzqt/filefield.cpp" line="30"/>
+        <location filename="../../toonzqt/filefield.cpp" line="31"/>
         <source>...</source>
         <translation>...</translation>
     </message>
@@ -390,7 +462,7 @@ Possibly the preset file has been corrupted</source>
 <context>
     <name>DVGui::ProgressDialog</name>
     <message>
-        <location filename="../../toonzqt/dvdialog.cpp" line="901"/>
+        <location filename="../../toonzqt/dvdialog.cpp" line="894"/>
         <source>OpenToonz</source>
         <translation>OpenToonz</translation>
     </message>
@@ -399,10 +471,10 @@ Possibly the preset file has been corrupted</source>
     <name>DVGui::RadioButtonDialog</name>
     <message>
         <source>Toonz</source>
-        <translation type="vanished">Toonz</translation>
+        <translation type="obsolete">Toonz</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/dvdialog.cpp" line="831"/>
+        <location filename="../../toonzqt/dvdialog.cpp" line="824"/>
         <source>OpenToonz</source>
         <translation>OpenToonz</translation>
     </message>
@@ -411,7 +483,7 @@ Possibly the preset file has been corrupted</source>
     <name>DVGui::StyleIndexLineEdit</name>
     <message>
         <location filename="../../toonzqt/styleindexlineedit.cpp" line="19"/>
-        <location filename="../../toonzqt/styleindexlineedit.cpp" line="35"/>
+        <location filename="../../toonzqt/styleindexlineedit.cpp" line="37"/>
         <source>current</source>
         <translation>текущий</translation>
     </message>
@@ -419,9 +491,24 @@ Possibly the preset file has been corrupted</source>
 <context>
     <name>DVGui::ToneCurveField</name>
     <message>
-        <location filename="../../toonzqt/tonecurvefield.cpp" line="753"/>
+        <location filename="../../toonzqt/tonecurvefield.cpp" line="902"/>
         <source>Channel:</source>
         <translation>Канал:</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/tonecurvefield.cpp" line="905"/>
+        <source>Range:</source>
+        <translation>Диапазон:</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/tonecurvefield.cpp" line="923"/>
+        <source>Output:</source>
+        <translation>Вывод:</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/tonecurvefield.cpp" line="926"/>
+        <source>Input:</source>
+        <translation>Ввод:</translation>
     </message>
 </context>
 <context>
@@ -443,16 +530,43 @@ Possibly the preset file has been corrupted</source>
     </message>
 </context>
 <context>
-    <name>EaseInOutSegmentPage</name>
+    <name>DvTextEdit</name>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="380"/>
-        <source>Ease In:</source>
-        <translation>Ease In:</translation>
+        <source>Bold</source>
+        <translation type="vanished">Жирный</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="383"/>
+        <source>Italic</source>
+        <translation type="vanished">Курсив</translation>
+    </message>
+    <message>
+        <source>Underline</source>
+        <translation type="vanished">Подчеркнутый</translation>
+    </message>
+    <message>
+        <source>Align Left</source>
+        <translation type="vanished">Выровнять по левому краю</translation>
+    </message>
+    <message>
+        <source>Align Center</source>
+        <translation type="vanished">Выровнять по центру</translation>
+    </message>
+    <message>
+        <source>Align Right</source>
+        <translation type="vanished">Выровнять по правому краю</translation>
+    </message>
+</context>
+<context>
+    <name>EaseInOutSegmentPage</name>
+    <message>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="384"/>
+        <source>Ease In:</source>
+        <translation>Замедление:</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="381"/>
         <source>Ease Out:</source>
-        <translation>Ease Out:</translation>
+        <translation>Ускорение:</translation>
     </message>
 </context>
 <context>
@@ -469,19 +583,26 @@ Possibly the preset file has been corrupted</source>
     </message>
 </context>
 <context>
+    <name>FileField</name>
+    <message>
+        <source>...</source>
+        <translation type="vanished">...</translation>
+    </message>
+</context>
+<context>
     <name>FileSegmentPage</name>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="680"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="683"/>
         <source>File Path:</source>
         <translation>Путь к файлу:</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="687"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="690"/>
         <source>Column:</source>
         <translation>Столбец:</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="690"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="693"/>
         <source>Unit:</source>
         <translation>Ед. изм:</translation>
     </message>
@@ -489,230 +610,287 @@ Possibly the preset file has been corrupted</source>
 <context>
     <name>FlipConsole</name>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="791"/>
-        <location filename="../../toonzqt/flipconsole.cpp" line="870"/>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1458"/>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1503"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="809"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="888"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1565"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1626"/>
         <source> FPS </source>
         <translation> FPS </translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1075"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1117"/>
         <source>Save</source>
         <translation>Сохранить</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1078"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1121"/>
         <source>Snapshot</source>
         <translation>Snapshot</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1081"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1124"/>
         <source>Define Sub-camera</source>
         <translation>Определить подкамеру</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1083"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1126"/>
         <source>Define Loading Box</source>
         <translation>Определить Loading Box</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1085"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1128"/>
         <source>Use Loading Box</source>
         <translation>Использовать Loading Box</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1089"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1133"/>
         <source>Background Colors</source>
         <translation>Фоновые цвета</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1091"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1163"/>
         <source>Framerate</source>
         <translation>Частота кадров</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1093"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1135"/>
         <source>Playback Controls</source>
         <translation>Управление воспроизведением</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1097"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1139"/>
         <source>Color Channels</source>
         <translation>Цветовые каналы</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1099"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1150"/>
         <source>Set Key</source>
         <translation>Установить ключ</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1101"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1145"/>
         <source>Histogram</source>
         <translation>Гистограмма</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1104"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1142"/>
+        <source>Sound</source>
+        <translation>Звук</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1148"/>
+        <source>Locator</source>
+        <translation>Локатор</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1153"/>
         <source>Display Areas as Filled</source>
         <translation>Отобразить область заполненной</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1128"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1160"/>
+        <source>Viewer Controls</source>
+        <translation>Управление просмотрщиком</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1188"/>
         <source>&amp;Save Images</source>
         <translation>&amp;Сохранить изображения</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1135"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1195"/>
         <source>&amp;Snapshot</source>
         <translation>&amp;Snapshot</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1139"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1199"/>
         <source>&amp;Compare to Snapshot</source>
         <translation>&amp;Сравнить с Snapshot</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1148"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1208"/>
         <source>&amp;Define Sub-camera</source>
         <translation>&amp;Определить подкамеру</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1153"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1213"/>
         <source>&amp;Define Loading Box</source>
         <translation>&amp;Определить Loading Box</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1157"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1217"/>
         <source>&amp;Use Loading Box</source>
         <translation>&amp;Использовать Loading Box</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1166"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1226"/>
         <source>&amp;White Background</source>
         <translation>&amp;Белый фон</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1169"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1229"/>
         <source>&amp;Black Background</source>
         <translation>&amp;Черный фон</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1173"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1233"/>
         <source>&amp;Checkered Background</source>
         <translation>&amp;Клетчатый фон</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1179"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1240"/>
         <source>&amp;First Frame</source>
         <translation>&amp;Первый кадр</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1181"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1242"/>
         <source>&amp;Previous Frame</source>
         <translation>&amp;Предыдущий кадр</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1183"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1244"/>
         <source>Pause</source>
         <translation>Pause</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1186"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1247"/>
         <source>Play</source>
         <translation>Play</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1189"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1250"/>
         <source>Loop</source>
         <translation>Loop</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1193"/>
         <source>&amp;Next frame</source>
+        <translation type="vanished">&amp;Следующий кадр</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1254"/>
+        <source>&amp;Next Frame</source>
         <translation>&amp;Следующий кадр</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1195"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1256"/>
         <source>&amp;Last Frame</source>
         <translation>&amp;Последний кадр</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1204"/>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1207"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1265"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1268"/>
         <source>Red Channel</source>
         <translation>Красный канал</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1208"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1269"/>
         <source>Red Channel in Grayscale</source>
         <translation>Красный канал в оттенках серого</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1211"/>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1214"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1272"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1276"/>
         <source>Green Channel</source>
         <translation>Зеленый канал</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1215"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1277"/>
         <source>Green Channel in Grayscale</source>
         <translation>Зеленый канал в оттенках серого</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1218"/>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1221"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1280"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1283"/>
         <source>Blue Channel</source>
         <translation>Синий канал</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1222"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1284"/>
         <source>Blue Channel in Grayscale</source>
         <translation>Синий канал в оттенках серого</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1228"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1290"/>
         <source>Alpha Channel</source>
         <translation>Альфа-канал</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1238"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1300"/>
         <source>&amp;Soundtrack </source>
         <translation>&amp;Звуковая дорожка </translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1242"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1304"/>
         <source>&amp;Histogram</source>
         <translation>&amp;Гистограмма</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1244"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1306"/>
         <source>&amp;Locator</source>
         <translation>&amp;Локатор</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1251"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1313"/>
         <source>&amp;Display Areas as Filled</source>
         <translation>&amp;Отобразить область заливкой</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1462"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1327"/>
+        <source>&amp;Zoom In</source>
+        <translation>&amp;Приближение</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1329"/>
+        <source>&amp;Zoom Out</source>
+        <translation>&amp;Отдаление</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1331"/>
+        <source>&amp;Flip Horizontally</source>
+        <translation>&amp;Отразить по горизонтали</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1333"/>
+        <source>&amp;Flip Vertically</source>
+        <translation>&amp;Отразить по вертикали</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1335"/>
+        <source>&amp;Reset View</source>
+        <translation>&amp;Восстановить вид по умолчанию</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1570"/>
         <source> FPS	</source>
         <translation> FPS	</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1618"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1748"/>
         <source>Set the current frame</source>
         <translation>Установите текущий кадр</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1622"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1752"/>
         <source>Drag to play the animation</source>
         <translation>Перетащите, чтобы воспроизвести анимацию</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1674"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1804"/>
         <source>Set the playback frame rate</source>
         <translation>Установите частоту кадров воспроизведения</translation>
+    </message>
+</context>
+<context>
+    <name>FontParamField</name>
+    <message>
+        <location filename="../../toonzqt/paramfield.cpp" line="1651"/>
+        <source>Style:</source>
+        <translation>Начертания:</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/paramfield.cpp" line="1655"/>
+        <source>Size:</source>
+        <translation>Кегль:</translation>
     </message>
 </context>
 <context>
@@ -731,18 +909,18 @@ Possibly the preset file has been corrupted</source>
 <context>
     <name>FunctionExpressionSegmentPage</name>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="488"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="489"/>
         <source>Unit:</source>
         <translation>Ед. изм:</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="501"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="502"/>
         <source>Expression:</source>
         <translation>Выражение:</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="595"/>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="645"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="596"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="646"/>
         <source>There is a circular reference in the definition of the interpolation.</source>
         <translation>В определении интерполяции имеется круговой референс.</translation>
     </message>
@@ -750,132 +928,132 @@ Possibly the preset file has been corrupted</source>
 <context>
     <name>FunctionPanel</name>
     <message>
-        <location filename="../../toonzqt/functionpanel.cpp" line="250"/>
+        <location filename="../../toonzqt/functionpanel.cpp" line="251"/>
         <source>Function Curves</source>
         <translation>Кривые функции</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionpanel.cpp" line="1527"/>
+        <location filename="../../toonzqt/functionpanel.cpp" line="1532"/>
         <source>Link Handles</source>
         <translation>Связать Handles</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionpanel.cpp" line="1528"/>
+        <location filename="../../toonzqt/functionpanel.cpp" line="1533"/>
         <source>Unlink Handles</source>
         <translation>Разъединить Handles</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionpanel.cpp" line="1529"/>
+        <location filename="../../toonzqt/functionpanel.cpp" line="1534"/>
         <source>Reset Handles</source>
         <translation>Сбросить Handles</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionpanel.cpp" line="1530"/>
+        <location filename="../../toonzqt/functionpanel.cpp" line="1535"/>
         <source>Delete</source>
         <translation>Удалить</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionpanel.cpp" line="1531"/>
+        <location filename="../../toonzqt/functionpanel.cpp" line="1536"/>
         <source>Set Key</source>
         <translation>Установить ключ</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionpanel.cpp" line="1532"/>
+        <location filename="../../toonzqt/functionpanel.cpp" line="1537"/>
         <source>Activate Cycle</source>
         <translation>Активировать цикл</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionpanel.cpp" line="1533"/>
+        <location filename="../../toonzqt/functionpanel.cpp" line="1538"/>
         <source>Deactivate Cycle</source>
         <translation>Деактивировать цикл</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionpanel.cpp" line="1534"/>
+        <location filename="../../toonzqt/functionpanel.cpp" line="1539"/>
         <source>Linear Interpolation</source>
         <translation>Линейная интерполяция</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionpanel.cpp" line="1535"/>
+        <location filename="../../toonzqt/functionpanel.cpp" line="1540"/>
         <source>Speed In / Speed Out Interpolation</source>
-        <translation>Интерполяция Speed In / Speed Out</translation>
+        <translation>Интерполяция Ускорение в начале/в конце</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionpanel.cpp" line="1536"/>
+        <location filename="../../toonzqt/functionpanel.cpp" line="1541"/>
         <source>Ease In / Ease Out Interpolation</source>
-        <translation>Ease In / Ease Out Интерполяция</translation>
+        <translation>Интерполяция Медленное начало/конец</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionpanel.cpp" line="1537"/>
+        <location filename="../../toonzqt/functionpanel.cpp" line="1542"/>
         <source>Ease In / Ease Out (%) Interpolation</source>
-        <translation>Ease In / Ease Out (%) Интерполяция</translation>
+        <translation>Интерполяция Медленное начало/конец (%)</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionpanel.cpp" line="1538"/>
+        <location filename="../../toonzqt/functionpanel.cpp" line="1543"/>
         <source>Exponential Interpolation</source>
         <translation>Экспоненциальная интерполяция</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionpanel.cpp" line="1539"/>
+        <location filename="../../toonzqt/functionpanel.cpp" line="1544"/>
         <source>Expression Interpolation</source>
         <translation>Интерполяция выражений</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionpanel.cpp" line="1540"/>
+        <location filename="../../toonzqt/functionpanel.cpp" line="1545"/>
         <source>File Interpolation</source>
-        <translation>Интерполяция файлов</translation>
+        <translation>Интерполяция из файла</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionpanel.cpp" line="1541"/>
+        <location filename="../../toonzqt/functionpanel.cpp" line="1546"/>
         <source>Constant Interpolation</source>
         <translation>Равномерная интерполяция</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionpanel.cpp" line="1542"/>
+        <location filename="../../toonzqt/functionpanel.cpp" line="1547"/>
         <source>Similar Shape Interpolation</source>
         <translation>Интерполяция аналогичной формы</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionpanel.cpp" line="1543"/>
+        <location filename="../../toonzqt/functionpanel.cpp" line="1548"/>
         <source>Fit Selection</source>
         <translation>Подогнать выделенное</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionpanel.cpp" line="1544"/>
+        <location filename="../../toonzqt/functionpanel.cpp" line="1549"/>
         <source>Fit</source>
         <translation>Подогнать</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionpanel.cpp" line="1545"/>
+        <location filename="../../toonzqt/functionpanel.cpp" line="1550"/>
         <source>Step 1</source>
         <translation>Шаг 1</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionpanel.cpp" line="1546"/>
+        <location filename="../../toonzqt/functionpanel.cpp" line="1551"/>
         <source>Step 2</source>
         <translation>Шаг 2</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionpanel.cpp" line="1547"/>
+        <location filename="../../toonzqt/functionpanel.cpp" line="1552"/>
         <source>Step 3</source>
         <translation>Шаг 3</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionpanel.cpp" line="1548"/>
+        <location filename="../../toonzqt/functionpanel.cpp" line="1553"/>
         <source>Step 4</source>
         <translation>Шаг 4</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionpanel.cpp" line="1620"/>
+        <location filename="../../toonzqt/functionpanel.cpp" line="1625"/>
         <source>Smooth</source>
         <translation>Плавно</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionpanel.cpp" line="1621"/>
+        <location filename="../../toonzqt/functionpanel.cpp" line="1626"/>
         <source>Frame Based</source>
         <translation>Frame Based</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionpanel.cpp" line="1622"/>
+        <location filename="../../toonzqt/functionpanel.cpp" line="1627"/>
         <source>Curve Shape</source>
         <translation>Форма кривой</translation>
     </message>
@@ -883,126 +1061,132 @@ Possibly the preset file has been corrupted</source>
 <context>
     <name>FunctionSegmentViewer</name>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="906"/>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="1406"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="909"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="1415"/>
         <source>Linear</source>
         <translation>Линейная</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="907"/>
-        <source>Speed In / Speed Out</source>
-        <translation>Speed In / Speed Out</translation>
-    </message>
-    <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="908"/>
-        <source>Ease In / Ease Out</source>
-        <translation>Ease In / Ease Out</translation>
-    </message>
-    <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="909"/>
-        <source>Ease In / Ease Out %</source>
-        <translation>Ease In / Ease Out %</translation>
-    </message>
-    <message>
         <location filename="../../toonzqt/functionsegmentviewer.cpp" line="910"/>
+        <source>Speed In / Speed Out</source>
+        <translation>Ускорение в начале/в конце</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="911"/>
+        <source>Ease In / Ease Out</source>
+        <translation>Замедление в начале/в конце</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="912"/>
+        <source>Ease In / Ease Out %</source>
+        <translation>Замедление в начале/в конце %</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="913"/>
         <source>Exponential</source>
         <translation>Экспоненциальная</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="911"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="914"/>
         <source>Expression</source>
         <translation>Выражение</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="912"/>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="1424"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="915"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="1433"/>
         <source>File</source>
         <translation>Файл</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="913"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="916"/>
         <source>Constant</source>
         <translation>Постоянная</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="914"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="917"/>
         <source>Similar Shape</source>
         <translation>Аналогичная форма</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="922"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="925"/>
         <source>Interpolation:</source>
         <translation>Интерполяция:</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="935"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="937"/>
         <source>Apply</source>
         <translation>Применить</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="989"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="978"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="979"/>
+        <source>Link/Unlink Handles</source>
+        <translation>Связать/разъединить Handles</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="998"/>
         <source>From</source>
         <translation>От</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="992"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="1001"/>
         <source>To</source>
         <translation>До</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="995"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="1004"/>
         <source>Step</source>
         <translation>Шаг</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="1162"/>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="1231"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="1171"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="1240"/>
         <source>&lt; </source>
         <translation>&lt; </translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="1170"/>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="1214"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="1179"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="1223"/>
         <source> &gt;</source>
         <translation> &gt;</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="1409"/>
-        <source>Speed</source>
-        <translation>Speed</translation>
-    </message>
-    <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="1412"/>
-        <source>Ease</source>
-        <translation>Ease</translation>
-    </message>
-    <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="1415"/>
-        <source>Ease%</source>
-        <translation>Ease%</translation>
-    </message>
-    <message>
         <location filename="../../toonzqt/functionsegmentviewer.cpp" line="1418"/>
-        <source>Expo</source>
-        <translation>Expo</translation>
+        <source>Speed</source>
+        <translation>Ускорение</translation>
     </message>
     <message>
         <location filename="../../toonzqt/functionsegmentviewer.cpp" line="1421"/>
-        <source>Expr</source>
-        <translation>Expr</translation>
+        <source>Ease</source>
+        <translation>Замедление</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="1424"/>
+        <source>Ease%</source>
+        <translation>Замедление %</translation>
     </message>
     <message>
         <location filename="../../toonzqt/functionsegmentviewer.cpp" line="1427"/>
+        <source>Expo</source>
+        <translation>Экспо</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="1430"/>
+        <source>Expr</source>
+        <translation>Выраж</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="1436"/>
         <source>Const</source>
         <translation>Const</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="1430"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="1439"/>
         <source>Similar</source>
         <translation>Аналогичная</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="1433"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="1442"/>
         <source>????</source>
         <translation>????</translation>
     </message>
@@ -1010,7 +1194,7 @@ Possibly the preset file has been corrupted</source>
 <context>
     <name>FunctionSelection</name>
     <message>
-        <location filename="../../toonzqt/functionselection.cpp" line="500"/>
+        <location filename="../../toonzqt/functionselection.cpp" line="505"/>
         <source>There is a circular reference in the definition of the interpolation.</source>
         <translation>В определении интерполяции имеется круговой референс.</translation>
     </message>
@@ -1018,206 +1202,258 @@ Possibly the preset file has been corrupted</source>
 <context>
     <name>FunctionSheet</name>
     <message>
-        <location filename="../../toonzqt/functionsheet.cpp" line="975"/>
+        <location filename="../../toonzqt/functionsheet.cpp" line="1148"/>
         <source>Function Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>Редактор функций</translation>
     </message>
 </context>
 <context>
     <name>FunctionSheetCellViewer</name>
     <message>
-        <location filename="../../toonzqt/functionsheet.cpp" line="824"/>
+        <location filename="../../toonzqt/functionsheet.cpp" line="991"/>
         <source>Delete Key</source>
         <translation>Удалить ключ</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsheet.cpp" line="825"/>
+        <location filename="../../toonzqt/functionsheet.cpp" line="992"/>
         <source>Set Key</source>
         <translation>Установить ключ</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsheet.cpp" line="826"/>
+        <location filename="../../toonzqt/functionsheet.cpp" line="995"/>
         <source>Linear Interpolation</source>
         <translation>Линейная интерполяция</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsheet.cpp" line="827"/>
+        <location filename="../../toonzqt/functionsheet.cpp" line="996"/>
         <source>Speed In / Speed Out Interpolation</source>
-        <translation>Speed In / Speed Out Интерполяция</translation>
+        <translation>Интерполяция ускорения в начале/в конце</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsheet.cpp" line="828"/>
+        <location filename="../../toonzqt/functionsheet.cpp" line="997"/>
         <source>Ease In / Ease Out Interpolation</source>
-        <translation>Ease In / Ease Out Интерполяция</translation>
+        <translation>Интерполяция замедления в нач./в конце</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsheet.cpp" line="829"/>
+        <location filename="../../toonzqt/functionsheet.cpp" line="998"/>
         <source>Ease In / Ease Out (%) Interpolation</source>
-        <translation>Ease In / Ease Out (%) Интерполяция</translation>
+        <translation>Замедление в начале/в конце (%) Интерполяция</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsheet.cpp" line="830"/>
+        <location filename="../../toonzqt/functionsheet.cpp" line="999"/>
         <source>Exponential Interpolation</source>
         <translation>Экспоненциальная интерполяция</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsheet.cpp" line="831"/>
+        <location filename="../../toonzqt/functionsheet.cpp" line="1000"/>
         <source>Expression Interpolation</source>
         <translation>Интерполяция выражений</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsheet.cpp" line="832"/>
+        <location filename="../../toonzqt/functionsheet.cpp" line="1000"/>
         <source>File Interpolation</source>
-        <translation>Интерполяция файлов</translation>
+        <translation>Интерполяция из файла</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsheet.cpp" line="833"/>
+        <location filename="../../toonzqt/functionsheet.cpp" line="1001"/>
+        <source>Similar Shape Interpolation</source>
+        <translation>Интерполяция аналогичной формы</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/functionsheet.cpp" line="995"/>
         <source>Constant Interpolation</source>
         <translation>Равномерная интерполяция</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsheet.cpp" line="834"/>
         <source>Step 1</source>
-        <translation>Шаг 1</translation>
+        <translation type="obsolete">Шаг 1</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsheet.cpp" line="835"/>
         <source>Step 2</source>
-        <translation>Шаг 2</translation>
+        <translation type="obsolete">Шаг 2</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsheet.cpp" line="836"/>
         <source>Step 3</source>
-        <translation>Шаг 3</translation>
+        <translation type="obsolete">Шаг 3</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsheet.cpp" line="837"/>
         <source>Step 4</source>
-        <translation>Шаг 4</translation>
+        <translation type="obsolete">Шаг 4</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/functionsheet.cpp" line="1002"/>
+        <source>Activate Cycle</source>
+        <translation>Включить цикл</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/functionsheet.cpp" line="1003"/>
+        <source>Deactivate Cycle</source>
+        <translation>Выключить цикл</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/functionsheet.cpp" line="1004"/>
+        <source>Show Inbetween Values</source>
+        <translation>Показать промежуточные значения кадра</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/functionsheet.cpp" line="1005"/>
+        <source>Hide Inbetween Values</source>
+        <translation>Скрыть промежуточные значения кадра</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/functionsheet.cpp" line="1055"/>
+        <source>Change Interpolation</source>
+        <translation>Изменить интерполяцию</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/functionsheet.cpp" line="1070"/>
+        <source>Change Step</source>
+        <translation>Изменить шаг</translation>
+    </message>
+</context>
+<context>
+    <name>FunctionSheetColumnHeadViewer</name>
+    <message>
+        <location filename="../../toonzqt/functionsheet.cpp" line="413"/>
+        <source>Some key(s) in this parameter loses original reference in expression.
+Manually changing any keyframe will clear the warning.</source>
+        <translation>Некоторые ключи в этом параметре теряют исходную ссылку в выражении.
+При изменении любого ключевого кадра вручную предупреждение будет снято.</translation>
     </message>
 </context>
 <context>
     <name>FunctionToolbar</name>
     <message>
-        <location filename="../../toonzqt/functiontoolbar.cpp" line="52"/>
+        <location filename="../../toonzqt/functiontoolbar.cpp" line="53"/>
         <source>Value</source>
         <translation>Значение</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functiontoolbar.cpp" line="67"/>
+        <location filename="../../toonzqt/functiontoolbar.cpp" line="68"/>
         <source>&amp;Open Function Curve Editor</source>
         <translation>&amp;Открыть редактор кривых</translation>
     </message>
     <message>
         <source>&amp;Function Editor Toggle</source>
-        <translation type="vanished">&amp;Переключатель редактора функций</translation>
+        <translation type="obsolete">&amp;Переключатель редактора функций</translation>
     </message>
 </context>
 <context>
     <name>FunctionTreeModel</name>
     <message>
-        <location filename="../../toonzqt/functiontreeviewer.cpp" line="828"/>
+        <location filename="../../toonzqt/functiontreeviewer.cpp" line="636"/>
+        <source>Some key(s) in this parameter loses original reference in expression.
+Manually changing any keyframe will clear the warning.</source>
+        <translation>Некоторые ключи в этом параметре теряют исходную ссылку в выражении.
+При изменении любого ключевого кадра вручную предупреждение будет снято.</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/functiontreeviewer.cpp" line="859"/>
         <source>Stage</source>
-        <translation type="unfinished"></translation>
+        <translation>Сцена</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functiontreeviewer.cpp" line="829"/>
+        <location filename="../../toonzqt/functiontreeviewer.cpp" line="860"/>
         <source>FX</source>
-        <translation type="unfinished"></translation>
+        <translation>FX</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functiontreeviewer.cpp" line="992"/>
+        <location filename="../../toonzqt/functiontreeviewer.cpp" line="1023"/>
         <source>Plastic Skeleton</source>
-        <translation type="unfinished"></translation>
+        <translation>Plastic Skeleton</translation>
     </message>
 </context>
 <context>
     <name>FunctionTreeView</name>
     <message>
-        <location filename="../../toonzqt/functiontreeviewer.cpp" line="282"/>
+        <location filename="../../toonzqt/functiontreeviewer.cpp" line="273"/>
         <source>Table</source>
-        <translation type="unfinished"></translation>
+        <translation>Стол</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functiontreeviewer.cpp" line="1579"/>
+        <location filename="../../toonzqt/functiontreeviewer.cpp" line="1606"/>
         <source>Save Curve</source>
         <translation>Сохранить кривую</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functiontreeviewer.cpp" line="1580"/>
+        <location filename="../../toonzqt/functiontreeviewer.cpp" line="1607"/>
         <source>Load Curve</source>
         <translation>Загрузить кривую</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functiontreeviewer.cpp" line="1581"/>
+        <location filename="../../toonzqt/functiontreeviewer.cpp" line="1608"/>
         <source>Export Data</source>
         <translation>Экспорт данных</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functiontreeviewer.cpp" line="1607"/>
-        <location filename="../../toonzqt/functionsheet.cpp" line="459"/>
+        <location filename="../../toonzqt/functiontreeviewer.cpp" line="1634"/>
+        <location filename="../../toonzqt/functionsheet.cpp" line="538"/>
         <source>Show Animated Only</source>
         <translation>Показать только анимированные</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functiontreeviewer.cpp" line="1608"/>
-        <location filename="../../toonzqt/functionsheet.cpp" line="460"/>
+        <location filename="../../toonzqt/functiontreeviewer.cpp" line="1635"/>
+        <location filename="../../toonzqt/functionsheet.cpp" line="539"/>
         <source>Show All</source>
         <translation>Показать все</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/functionsheet.cpp" line="540"/>
+        <source>Hide Selected</source>
+        <translation>Скрыть выбранное</translation>
     </message>
 </context>
 <context>
     <name>FxColumnPainter</name>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="331"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="267"/>
         <source>&amp;Disconnect from Xsheet</source>
         <translation>&amp;Отсоединить от Xsheet</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="335"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="271"/>
         <source>&amp;Connect to Xsheet</source>
         <translation>&amp;Присоединить к Xsheet</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="342"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="278"/>
         <source>&amp;Paste Add</source>
         <translation>&amp;Вставить Добавить</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="345"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="281"/>
         <source>&amp;Preview</source>
         <translation>&amp;Предпросмотр</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="352"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="288"/>
         <source>&amp;Uncache Fx</source>
         <translation>&amp;Очистить кэш Fx</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="352"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="288"/>
         <source>&amp;Cache FX</source>
         <translation>&amp;Кэшировать FX</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="360"/>
         <source>&amp;Open Subxsheet</source>
-        <translation>&amp;Открыть Subxsheet</translation>
+        <translation type="obsolete">&amp;Открыть Subxsheet</translation>
     </message>
 </context>
 <context>
     <name>FxOutputPainter</name>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="1210"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="1055"/>
         <source>Output</source>
         <translation>Вывод</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="1228"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="1073"/>
         <source>&amp;Delete</source>
         <translation>&amp;Удалить</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="1231"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="1076"/>
         <source>&amp;Activate</source>
         <translation>&amp;Активировать</translation>
     </message>
@@ -1225,77 +1461,77 @@ Possibly the preset file has been corrupted</source>
 <context>
     <name>FxPainter</name>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="850"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="703"/>
         <source>&amp;Open Group</source>
         <translation>&amp;Открыть группу</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="853"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="706"/>
         <source>&amp;Paste Replace</source>
         <translation>&amp;Вставить Заменить</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="856"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="709"/>
         <source>&amp;Paste Add</source>
         <translation>&amp;Вставить Добавить</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="862"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="715"/>
         <source>&amp;Delete</source>
         <translation>&amp;Удалить</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="866"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="719"/>
         <source>&amp;Disconnect from Xsheet</source>
         <translation>&amp;Отсоединить от Xsheet</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="870"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="723"/>
         <source>&amp;Connect to Xsheet</source>
         <translation>&amp;Присоединить к Xsheet</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="874"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="727"/>
         <source>&amp;Create Linked FX</source>
         <translation>&amp;Создать связанный FX</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="877"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="730"/>
         <source>&amp;Unlink</source>
         <translation>&amp;Разъединить</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="880"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="733"/>
         <source>&amp;Make Macro FX</source>
         <translation>&amp;Сделать Macro FX</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="883"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="736"/>
         <source>&amp;Explode Macro FX</source>
         <translation>&amp;Разбить Makro FX</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="887"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="740"/>
         <source>&amp;Open Macro FX</source>
         <translation>&amp;Открыть Makro FX</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="890"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="743"/>
         <source>&amp;Save As Preset...</source>
         <translation>&amp;Сохранить как пресет...</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="893"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="746"/>
         <source>&amp;Preview</source>
         <translation>&amp;Предпросмотр</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="899"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="752"/>
         <source>&amp;Uncache FX</source>
         <translation>&amp;Очистить кэш Fx</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="899"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="752"/>
         <source>&amp;Cache FX</source>
         <translation>&amp;Кэшировать FX</translation>
     </message>
@@ -1303,17 +1539,17 @@ Possibly the preset file has been corrupted</source>
 <context>
     <name>FxPalettePainter</name>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="560"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="483"/>
         <source>&amp;Disconnect from Xsheet</source>
         <translation>&amp;Отсоединить от Xsheet</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="564"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="487"/>
         <source>&amp;Connect to Xsheet</source>
         <translation>&amp;Присоединить к Xsheet</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="568"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="491"/>
         <source>&amp;Preview</source>
         <translation>&amp;Предпросмотр</translation>
     </message>
@@ -1321,25 +1557,33 @@ Possibly the preset file has been corrupted</source>
 <context>
     <name>FxSchematicLink</name>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="1276"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="1121"/>
         <source>&amp;Delete</source>
         <translation>&amp;Удалить</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="1279"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="1124"/>
         <source>&amp;Paste Insert</source>
-        <translation>&amp;Вставить вставку</translation>
+        <translation>&amp;Вставить</translation>
+    </message>
+</context>
+<context>
+    <name>FxSchematicOutputNode</name>
+    <message>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="2215"/>
+        <source>Output</source>
+        <translation>Вывод</translation>
     </message>
 </context>
 <context>
     <name>FxSchematicPort</name>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="1724"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="1577"/>
         <source>&amp;Disconnect from Xsheet</source>
         <translation>&amp;Отсоединить от Xsheet</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="1728"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="1581"/>
         <source>&amp;Connect to Xsheet</source>
         <translation>&amp;Присоединить к Xsheet</translation>
     </message>
@@ -1347,21 +1591,21 @@ Possibly the preset file has been corrupted</source>
 <context>
     <name>FxSchematicScene</name>
     <message>
-        <location filename="../../toonzqt/fxschematicscene.cpp" line="1615"/>
+        <location filename="../../toonzqt/fxschematicscene.cpp" line="1760"/>
         <source>Cannot Paste Insert a selection of unconnected FX nodes.
 Select FX nodes and related links before copying or cutting the selection you want to paste.</source>
         <translation>Невозможно вставить выбранные неподключенные узлы FX.
 Выберите FX-узлы и связи перед копированием или сокращением выбора, который вы хотите вставить.</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxschematicscene.cpp" line="1625"/>
+        <location filename="../../toonzqt/fxschematicscene.cpp" line="1770"/>
         <source>Cannot Paste Add a selection of unconnected FX nodes.
 Select FX nodes and related links before copying or cutting the selection you want to paste.</source>
         <translation>Невозможно вставить (добавить) выбранные неподключенные узлы FX.
 Выберите FX-узлы и связи перед копированием или сокращением выбора, который вы хотите вставить.</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxschematicscene.cpp" line="1635"/>
+        <location filename="../../toonzqt/fxschematicscene.cpp" line="1780"/>
         <source>Cannot Paste Replace a selection of unconnected FX nodes.
 Select FX nodes and related links before copying or cutting the selection you want to paste.</source>
         <translation>Невозможно вставить (заменить) выбранные неподключенные узлы FX.
@@ -1369,39 +1613,47 @@ Select FX nodes and related links before copying or cutting the selection you wa
     </message>
 </context>
 <context>
+    <name>FxSchematicXSheetNode</name>
+    <message>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="2292"/>
+        <source>XSheet</source>
+        <translation>Xsheet</translation>
+    </message>
+</context>
+<context>
     <name>FxSettings</name>
     <message>
-        <location filename="../../toonzqt/fxsettings.cpp" line="1206"/>
+        <location filename="../../toonzqt/fxsettings.cpp" line="1279"/>
         <source>&amp;Camera Preview</source>
         <translation>&amp;Предпросмотр камеры</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxsettings.cpp" line="1212"/>
+        <location filename="../../toonzqt/fxsettings.cpp" line="1285"/>
         <source>&amp;Preview</source>
         <translation>&amp;Предпросмотр</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxsettings.cpp" line="1225"/>
+        <location filename="../../toonzqt/fxsettings.cpp" line="1298"/>
         <source>&amp;White Background</source>
         <translation>&amp;Белый фон</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxsettings.cpp" line="1233"/>
+        <location filename="../../toonzqt/fxsettings.cpp" line="1306"/>
         <source>&amp;Black Background</source>
         <translation>&amp;Черный фон</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxsettings.cpp" line="1240"/>
+        <location filename="../../toonzqt/fxsettings.cpp" line="1313"/>
         <source>&amp;Checkered Background</source>
         <translation>&amp;Клетчатый фон</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxsettings.cpp" line="1312"/>
+        <location filename="../../toonzqt/fxsettings.cpp" line="1385"/>
         <source>Fx Settings</source>
         <translation>Настройки эффектов</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxsettings.cpp" line="1314"/>
+        <location filename="../../toonzqt/fxsettings.cpp" line="1387"/>
         <source> : </source>
         <translation> : </translation>
     </message>
@@ -1409,17 +1661,17 @@ Select FX nodes and related links before copying or cutting the selection you wa
 <context>
     <name>FxXSheetPainter</name>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="1097"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="951"/>
         <source>XSheet</source>
-        <translation type="unfinished"></translation>
+        <translation>Xsheet</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="1131"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="985"/>
         <source>&amp;Paste Add</source>
         <translation>&amp;Вставить Добавить</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="1134"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="988"/>
         <source>&amp;Preview</source>
         <translation>&amp;Предпросмотр</translation>
     </message>
@@ -1427,7 +1679,7 @@ Select FX nodes and related links before copying or cutting the selection you wa
 <context>
     <name>GroupPainter</name>
     <message>
-        <location filename="../../toonzqt/stageschematicnode.cpp" line="423"/>
+        <location filename="../../toonzqt/stageschematicnode.cpp" line="349"/>
         <source>&amp;Open Group</source>
         <translation>&amp;Открыть группу</translation>
     </message>
@@ -1435,37 +1687,37 @@ Select FX nodes and related links before copying or cutting the selection you wa
 <context>
     <name>Histogram</name>
     <message>
-        <location filename="../../toonzqt/histogram.cpp" line="518"/>
+        <location filename="../../toonzqt/histogram.cpp" line="538"/>
         <source>Logarithmic Scale</source>
         <translation>Логарифмическая шкала</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/histogram.cpp" line="544"/>
+        <location filename="../../toonzqt/histogram.cpp" line="564"/>
         <source>Value</source>
         <translation>Значение</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/histogram.cpp" line="546"/>
+        <location filename="../../toonzqt/histogram.cpp" line="566"/>
         <source>RGB</source>
         <translation>RGB</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/histogram.cpp" line="546"/>
+        <location filename="../../toonzqt/histogram.cpp" line="566"/>
         <source>Red</source>
         <translation>Красный</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/histogram.cpp" line="546"/>
+        <location filename="../../toonzqt/histogram.cpp" line="566"/>
         <source>Green</source>
         <translation>Зеленый</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/histogram.cpp" line="546"/>
+        <location filename="../../toonzqt/histogram.cpp" line="566"/>
         <source>Blue</source>
         <translation>Синий</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/histogram.cpp" line="547"/>
+        <location filename="../../toonzqt/histogram.cpp" line="567"/>
         <source>Alpha</source>
         <translation>Альфа</translation>
     </message>
@@ -1481,29 +1733,35 @@ Select FX nodes and related links before copying or cutting the selection you wa
 <context>
     <name>KeyframeNavigator</name>
     <message>
-        <location filename="../../toonzqt/keyframenavigator.cpp" line="50"/>
+        <location filename="../../toonzqt/keyframenavigator.cpp" line="46"/>
         <source>Previous Key</source>
         <translation>Предыдущий ключ</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/keyframenavigator.cpp" line="57"/>
-        <location filename="../../toonzqt/keyframenavigator.cpp" line="62"/>
-        <location filename="../../toonzqt/keyframenavigator.cpp" line="66"/>
+        <location filename="../../toonzqt/keyframenavigator.cpp" line="55"/>
+        <location filename="../../toonzqt/keyframenavigator.cpp" line="64"/>
+        <location filename="../../toonzqt/keyframenavigator.cpp" line="73"/>
         <source>Set Key</source>
         <translation>Установить ключ</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/keyframenavigator.cpp" line="75"/>
+        <location filename="../../toonzqt/keyframenavigator.cpp" line="82"/>
         <source>Next Key</source>
         <translation>Следующий ключ</translation>
     </message>
 </context>
 <context>
+    <name>LineEdit</name>
+    <message>
+        <source>A file name cannot contains any of the following chracters: /\:*?&quot;&lt;&gt;|.</source>
+        <translation type="vanished">Имя файла не может содержать ни одного из следующих символов: / \: *? &quot;&lt;&gt; |.</translation>
+    </message>
+</context>
+<context>
     <name>MyPaintBrushStyleChooserPage</name>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="2235"/>
         <source>Plain color</source>
-        <translation>Простой цвет</translation>
+        <translation type="obsolete">Простой цвет</translation>
     </message>
 </context>
 <context>
@@ -1525,141 +1783,189 @@ Select FX nodes and related links before copying or cutting the selection you wa
     </message>
 </context>
 <context>
+    <name>PageViewer</name>
+    <message>
+        <source>- No Styles -</source>
+        <translation type="vanished">- Нет стилей -</translation>
+    </message>
+    <message>
+        <source>Name Editor</source>
+        <translation type="vanished">Редактор имен</translation>
+    </message>
+    <message>
+        <source>New Style</source>
+        <translation type="vanished">Новый стиль</translation>
+    </message>
+    <message>
+        <source>New Page</source>
+        <translation type="vanished">Новая страница</translation>
+    </message>
+</context>
+<context>
     <name>PaletteViewer</name>
     <message>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="273"/>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="455"/>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="554"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="224"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="459"/>
+        <source>Set Toolbar Below Styles</source>
+        <translation>Установить панель инструментов под стилями</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="228"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="461"/>
+        <source>Set Toolbar Above Styles</source>
+        <translation>Установить панель инструментов над стилями</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="336"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="524"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="623"/>
         <source>&amp;Save Palette As</source>
         <translation>&amp;Сохранить палитру как</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="274"/>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="459"/>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="555"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="337"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="528"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="624"/>
         <source>&amp;Save Palette</source>
         <translation>&amp;Сохранить палитру</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="310"/>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="328"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="371"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="384"/>
         <source>Lock Palette</source>
         <translation>Блокировать палитру</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="332"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="388"/>
         <source>&amp;Lock Palette</source>
         <translation>&amp;Блокировать палитру</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="355"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="411"/>
         <source>Options</source>
         <translation>Опции</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="362"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="428"/>
         <source>&amp;Small Thumbnails View</source>
         <translation>&amp;Маленькие иконки</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="365"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="429"/>
         <source>&amp;Medium Thumbnails View</source>
         <translation>&amp;Средние иконки</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="368"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="430"/>
         <source>&amp;Large Thumbnails View</source>
         <translation>&amp;Большие иконки</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="371"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="431"/>
         <source>&amp;List View</source>
         <translation>&amp;Посмотреть список</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="379"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="451"/>
         <source>Style Name</source>
         <translation>Имя стиля</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="382"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="452"/>
         <source>StudioPalette Name</source>
         <translation>StudioPalette Имя</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="384"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="453"/>
         <source>Both Names</source>
         <translation>Оба имени</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="414"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="466"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="1234"/>
+        <source>Hide New Style Button</source>
+        <translation>Скрыть кнопку нового стиля</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="467"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="1235"/>
+        <source>Show New Style Button</source>
+        <translation>Показать  кнопку нового стиля</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="483"/>
         <source>&amp;New Page</source>
         <translation>&amp;Новая страница</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="422"/>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="534"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="491"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="603"/>
         <source>&amp;New Style</source>
         <translation>&amp;Новый стиль</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="471"/>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="716"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="540"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="806"/>
         <source>&amp;Move Palette</source>
         <translation>&amp;Переместить палитру</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="556"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="625"/>
         <source>&amp;Palette Gizmo</source>
         <translation>&amp;Палитра Gizmo</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="593"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="662"/>
         <source>New Page</source>
         <translation>Новая страница</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="605"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="674"/>
         <source>Delete Page</source>
         <translation>Удалить страницу</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="910"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="1017"/>
         <source>Overwrite</source>
         <translation>Перезаписать</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="910"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="1017"/>
         <source>Don&apos;t Overwrite</source>
         <translation>Не перезаписывать</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="1037"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="1026"/>
+        <source>Failed to save palette.</source>
+        <translation>Не удалось сохранить палитру.</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="1164"/>
         <source>Palette</source>
         <translation>Палитра</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="1041"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="1168"/>
         <source>Level Palette: </source>
         <translation>Палитра уровней: </translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="1048"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="1175"/>
         <source>Cleanup Palette</source>
         <translation>Палитра очистки</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="1059"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="1186"/>
         <source>Studio Palette</source>
         <translation>Studio Палитра</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="1066"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="1193"/>
         <source>     (Color Model: </source>
-        <translation>     (Цветная модель: </translation>
+        <translation>     (Цветовая модель: </translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="1068"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="1195"/>
         <source>)</source>
         <translation>)</translation>
     </message>
@@ -1667,22 +1973,29 @@ Select FX nodes and related links before copying or cutting the selection you wa
 <context>
     <name>PaletteViewerGUI::PageViewer</name>
     <message>
-        <location filename="../../toonzqt/paletteviewergui.cpp" line="573"/>
+        <location filename="../../toonzqt/paletteviewergui.cpp" line="584"/>
         <source>- No Styles -</source>
         <translation>- Нет стилей -</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewergui.cpp" line="1094"/>
+        <location filename="../../toonzqt/paletteviewergui.cpp" line="663"/>
+        <location filename="../../toonzqt/paletteviewergui.cpp" line="908"/>
+        <source> + </source>
+        <translation> + </translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/paletteviewergui.cpp" line="1147"/>
         <source>Name Editor</source>
         <translation>Редактор имен</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewergui.cpp" line="1148"/>
+        <location filename="../../toonzqt/paletteviewergui.cpp" line="1201"/>
+        <location filename="../../toonzqt/paletteviewergui.cpp" line="1379"/>
         <source>New Style</source>
         <translation>Новый стиль</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewergui.cpp" line="1150"/>
+        <location filename="../../toonzqt/paletteviewergui.cpp" line="1203"/>
         <source>New Page</source>
         <translation>Новая страница</translation>
     </message>
@@ -1709,72 +2022,100 @@ Select FX nodes and related links before copying or cutting the selection you wa
         <source>&lt;files&gt;</source>
         <translation>&lt;файлы&gt;</translation>
     </message>
+    <message>
+        <location filename="../../toonzqt/palettesscanpopup.cpp" line="196"/>
+        <source>Failed to import palette.</source>
+        <translation>Не удалось импортировать палитру.</translation>
+    </message>
 </context>
 <context>
     <name>ParamViewer</name>
     <message>
-        <location filename="../../toonzqt/fxsettings.cpp" line="950"/>
+        <location filename="../../toonzqt/fxsettings.cpp" line="1019"/>
         <source>Swatch Viewer</source>
-        <translatorcomment>можно &quot;просмотрщик образцов&quot;</translatorcomment>
-        <translation>Swatch Viewer</translation>
+        <translation>Просмотрщик образцов</translation>
     </message>
 </context>
 <context>
     <name>ParamsPageSet</name>
     <message>
-        <location filename="../../toonzqt/fxsettings.cpp" line="668"/>
         <source>Fx Help</source>
-        <translation>Fx Help</translation>
+        <translation type="vanished">FX Помощь</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/fxsettings.cpp" line="714"/>
+        <source>View help page</source>
+        <translation>Просмотреть страницу справки</translation>
     </message>
 </context>
 <context>
     <name>PegbarPainter</name>
     <message>
-        <location filename="../../toonzqt/stageschematicnode.cpp" line="495"/>
+        <location filename="../../toonzqt/stageschematicnode.cpp" line="416"/>
         <source>&amp;Reset Center</source>
         <translation>&amp;Сброс центра</translation>
     </message>
 </context>
 <context>
+    <name>PlaneViewer</name>
+    <message>
+        <location filename="../../toonzqt/planeviewer.cpp" line="303"/>
+        <source>Reset View</source>
+        <translation>Восстановить вид по умолчанию</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/planeviewer.cpp" line="308"/>
+        <source>Fit To Window</source>
+        <translation>Подогнать к окну</translation>
+    </message>
+</context>
+<context>
     <name>PointParamField</name>
     <message>
-        <location filename="../../toonzqt/paramfield.cpp" line="857"/>
+        <location filename="../../toonzqt/paramfield.cpp" line="934"/>
         <source>X:</source>
         <translation>X:</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paramfield.cpp" line="859"/>
+        <location filename="../../toonzqt/paramfield.cpp" line="936"/>
         <source>Y:</source>
         <translation>Y:</translation>
+    </message>
+</context>
+<context>
+    <name>ProgressDialog</name>
+    <message>
+        <source>OpenToonz</source>
+        <translation type="vanished">OpenToonz</translation>
     </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
         <source>&lt;custom&gt;</source>
-        <translation type="vanished">&lt;пользовательский&gt;</translation>
+        <translation type="obsolete">&lt;пользовательский&gt;</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/camerasettingswidget.cpp" line="931"/>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="949"/>
         <source>Deleting &quot;%1&quot;.
 Are you sure?</source>
         <translation>Удаление «%1».
 Вы уверены?</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/camerasettingswidget.cpp" line="933"/>
-        <location filename="../../include/toonzqt/paramfield.h" line="183"/>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="951"/>
+        <location filename="../../include/toonzqt/paramfield.h" line="257"/>
         <source>Delete</source>
         <translation>Удалить</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/camerasettingswidget.cpp" line="933"/>
-        <location filename="../../toonzqt/styleselection.cpp" line="1035"/>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="494"/>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="827"/>
-        <location filename="../../toonzqt/dvdialog.cpp" line="860"/>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="951"/>
+        <location filename="../../toonzqt/styleselection.cpp" line="768"/>
+        <location filename="../../toonzqt/styleselection.cpp" line="1071"/>
+        <location filename="../../toonzqt/dvdialog.cpp" line="853"/>
+        <location filename="../../toonzqt/dvdialog.cpp" line="1347"/>
+        <location filename="../../toonzqt/dvdialog.cpp" line="1433"/>
         <location filename="../../toonzqt/dvdialog.cpp" line="1440"/>
-        <location filename="../../toonzqt/dvdialog.cpp" line="1447"/>
         <source>Cancel</source>
         <translation>Отмена</translation>
     </message>
@@ -1810,67 +2151,91 @@ Are you sure?</source>
         <translation>Здесь невозможно вставлять стили</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleselection.cpp" line="996"/>
+        <location filename="../../toonzqt/styleselection.cpp" line="754"/>
+        <source>There are no unused styles.</source>
+        <translation>Нет неиспользованных стилей.</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/styleselection.cpp" line="761"/>
+        <source>and %1 more styles.</source>
+        <translation>и еще%1 стилей.</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/styleselection.cpp" line="764"/>
+        <source>Erasing unused styles with following indices. Are you sure?
+
+%1</source>
+        <translation>Стирание неиспользуемых стилей со следующими индексами. Уверены ли вы?
+
+%1</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/styleselection.cpp" line="768"/>
+        <source>Erase</source>
+        <translation>Стереть</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/styleselection.cpp" line="1032"/>
         <source>  to Palette : %1</source>
         <translation>  к палитре : %1</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleselection.cpp" line="999"/>
+        <location filename="../../toonzqt/styleselection.cpp" line="1035"/>
         <source>Paste Color &amp;&amp; Name%1</source>
         <translation>Вставить цвет &amp;&amp; Имя%1</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleselection.cpp" line="1001"/>
+        <location filename="../../toonzqt/styleselection.cpp" line="1037"/>
         <source>Paste Name%1</source>
         <translation>Вставить имя%1</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleselection.cpp" line="1003"/>
+        <location filename="../../toonzqt/styleselection.cpp" line="1039"/>
         <source>Paste Color%1</source>
         <translation>Вставить цвет%1</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleselection.cpp" line="1005"/>
+        <location filename="../../toonzqt/styleselection.cpp" line="1041"/>
         <source>Paste%1</source>
         <translation>Вставить%1</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleselection.cpp" line="1021"/>
+        <location filename="../../toonzqt/styleselection.cpp" line="1057"/>
         <source>Can&apos;t modify color #0</source>
         <translation>Не удается изменить цвет # 0</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleselection.cpp" line="1031"/>
+        <location filename="../../toonzqt/styleselection.cpp" line="1067"/>
         <source>There are more cut/copied styles than selected. Paste anyway (adding styles)?</source>
         <translation>Есть больше вырезанных / скопированных стилей, чем выбрано. Вставить в любом случае (добавление стилей)?</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleselection.cpp" line="1035"/>
+        <location filename="../../toonzqt/styleselection.cpp" line="1071"/>
         <source>Paste</source>
         <translation>Вставить</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleselection.cpp" line="1268"/>
+        <location filename="../../toonzqt/styleselection.cpp" line="1304"/>
         <source>Blend Colors  in Palette : %1</source>
         <translation>Цвета смешивания в палитре : %1</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleselection.cpp" line="1398"/>
+        <location filename="../../toonzqt/styleselection.cpp" line="1434"/>
         <source>Toggle Link  in Palette : %1</source>
         <translation>Переключить связь в палитре : %1</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleselection.cpp" line="1588"/>
+        <location filename="../../toonzqt/styleselection.cpp" line="1624"/>
         <source>Remove Reference  in Palette : %1</source>
         <translation>Удалить референс в палитре : %1</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleselection.cpp" line="1705"/>
+        <location filename="../../toonzqt/styleselection.cpp" line="1741"/>
         <source>Get Color from Studio Palette</source>
         <translation>Взять цвет из палитры Studio</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/stageobjectselection.cpp" line="100"/>
+        <location filename="../../toonzqt/stageobjectselection.cpp" line="101"/>
         <source>Paste Object  </source>
         <translation>Встаить объект  </translation>
     </message>
@@ -1895,38 +2260,38 @@ Are you sure?</source>
         <translation>Переместить ключевой кадр</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/stageschematicscene.cpp" line="979"/>
+        <location filename="../../toonzqt/stageschematicscene.cpp" line="995"/>
         <source>Save Motion Path</source>
         <translation>Сохранить траекторию движения</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/stageschematicscene.cpp" line="981"/>
-        <location filename="../../toonzqt/stageschematicscene.cpp" line="1016"/>
+        <location filename="../../toonzqt/stageschematicscene.cpp" line="997"/>
+        <location filename="../../toonzqt/stageschematicscene.cpp" line="1032"/>
         <source>Motion Path files (*.mpath)</source>
         <translation>Файлы траектории движения (* .mpath)</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/stageschematicscene.cpp" line="1004"/>
+        <location filename="../../toonzqt/stageschematicscene.cpp" line="1020"/>
         <source>It is not possible to save the motion path.</source>
         <translation>Невозможно сохранить траекторию движения.</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/stageschematicscene.cpp" line="1014"/>
+        <location filename="../../toonzqt/stageschematicscene.cpp" line="1030"/>
         <source>Load Motion Path</source>
         <translation>Загрузить траекторию движения</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/stageschematicscene.cpp" line="1044"/>
+        <location filename="../../toonzqt/stageschematicscene.cpp" line="1060"/>
         <source>It is not possible to load the motion path.</source>
         <translation>Невозможно загрузить траекторию движения.</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="697"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="1077"/>
         <source>Stage Schematic</source>
         <translation>Stage Schematic</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="719"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="1099"/>
         <source>FX Schematic</source>
         <translation>FX Schematic</translation>
     </message>
@@ -1936,104 +2301,121 @@ Are you sure?</source>
         <translation>Изменить стиль   Палитра : %1  Стиль#%2  [R%3 G%4 B%5] -&gt; [R%6 G%7 B%8]</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="493"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="2060"/>
+        <source>Plain color</source>
+        <comment>VectorBrushStyleChooserPage</comment>
+        <translation>Простой цвет</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/styleeditor.cpp" line="2238"/>
+        <source>Custom Texture</source>
+        <comment>TextureStyleChooserPage</comment>
+        <translation>Пользовательская текстура</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/styleeditor.cpp" line="2304"/>
+        <source>Plain color</source>
+        <comment>MyPaintBrushStyleChooserPage</comment>
+        <translation>Простой цвет</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/styleeditor.cpp" line="2453"/>
+        <source>Plain color</source>
+        <comment>SpecialStyleChooserPage</comment>
+        <translation>Простой цвет</translation>
+    </message>
+    <message>
         <source>Save</source>
-        <translation>Сохранить</translation>
+        <translation type="obsolete">Сохранить</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="494"/>
         <source>Discard</source>
-        <translation>Сбросить</translation>
+        <translation type="obsolete">Сбросить</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="580"/>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="607"/>
         <source>Yes</source>
-        <translation>Да</translation>
+        <translation type="obsolete">Да</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="580"/>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="607"/>
         <source>No</source>
-        <translation>Нет</translation>
+        <translation type="obsolete">Нет</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="827"/>
         <source>Replace</source>
-        <translation>Заменить</translation>
+        <translation type="obsolete">Заменить</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paramfield.cpp" line="52"/>
+        <location filename="../../toonzqt/paramfield.cpp" line="54"/>
+        <location filename="../../toonzqt/paramfield.cpp" line="479"/>
         <source>Modify Fx Param : %1</source>
         <translation>Изменить Fx Параметр : %1</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paramfield.cpp" line="237"/>
-        <location filename="../../toonzqt/paramfield.cpp" line="272"/>
-        <location filename="../../toonzqt/paramfield.cpp" line="442"/>
+        <location filename="../../toonzqt/paramfield.cpp" line="239"/>
+        <location filename="../../toonzqt/paramfield.cpp" line="274"/>
+        <location filename="../../toonzqt/paramfield.cpp" line="444"/>
         <source>Modify Fx Param : %1 : %2 -&gt; %3</source>
         <translation>Изменить Fx Параметры : %1 : %2 -&gt; %3</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paramfield.cpp" line="304"/>
-        <location filename="../../toonzqt/paramfield.cpp" line="581"/>
+        <location filename="../../toonzqt/paramfield.cpp" line="306"/>
+        <location filename="../../toonzqt/paramfield.cpp" line="615"/>
         <source>Modify Fx Param : </source>
         <translation>Изменить Fx Параметр : </translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paramfield.cpp" line="306"/>
+        <location filename="../../toonzqt/paramfield.cpp" line="308"/>
         <source>ON : %1</source>
         <translation>ON : %1</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paramfield.cpp" line="308"/>
+        <location filename="../../toonzqt/paramfield.cpp" line="310"/>
         <source>OFF : %1</source>
         <translation>OFF : %1</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paramfield.cpp" line="407"/>
+        <location filename="../../toonzqt/paramfield.cpp" line="409"/>
         <source>Modify Fx Param : %1 : %2 Key</source>
         <translation>Изменить Fx Параметр : %1 : %2 Ключ</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paramfield.cpp" line="409"/>
-        <location filename="../../toonzqt/paramfield.cpp" line="545"/>
+        <location filename="../../toonzqt/paramfield.cpp" line="411"/>
+        <location filename="../../toonzqt/paramfield.cpp" line="579"/>
         <source>Add</source>
         <translation>Добавить</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paramfield.cpp" line="409"/>
-        <location filename="../../toonzqt/paramfield.cpp" line="545"/>
+        <location filename="../../toonzqt/paramfield.cpp" line="411"/>
+        <location filename="../../toonzqt/paramfield.cpp" line="579"/>
         <source>Remove</source>
         <translation>Удалить</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paramfield.cpp" line="543"/>
+        <location filename="../../toonzqt/paramfield.cpp" line="577"/>
         <source>Modify Fx Param : %1 : %2 Point</source>
         <translation>Изменить Fx Параметр : %1 : %2 Точка</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paramfield.cpp" line="583"/>
+        <location filename="../../toonzqt/paramfield.cpp" line="617"/>
         <source>%1 : Linear ON</source>
         <translation>%1 : линейный вкл</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paramfield.cpp" line="585"/>
+        <location filename="../../toonzqt/paramfield.cpp" line="619"/>
         <source>%1 : Linear OFF</source>
         <translation>%1 : линейный откл</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewergui.cpp" line="1617"/>
         <source>Palette</source>
-        <translation>Палитра</translation>
+        <translation type="vanished">Палитра</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="894"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="994"/>
         <source>Overwrite</source>
         <translation>Перезаписать</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="895"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="995"/>
         <source>Don&apos;t Overwrite</source>
         <translation>Не перезаписывать</translation>
     </message>
@@ -2043,14 +2425,24 @@ Are you sure?</source>
         <translation>Невозможно назначить ярлык с модификаторами для команд визуализации.</translation>
     </message>
     <message>
+        <location filename="../../toonzqt/infoviewer.cpp" line="174"/>
+        <source>Current Frame: </source>
+        <translation>Текущий кадр: </translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/infoviewer.cpp" line="177"/>
+        <source>File History</source>
+        <translation>История файла</translation>
+    </message>
+    <message>
         <location filename="../../toonzqt/infoviewer.cpp" line="185"/>
         <source>Fullpath:     </source>
-        <translation>Полный путь:</translation>
+        <translation>Полный путь:     </translation>
     </message>
     <message>
         <location filename="../../toonzqt/infoviewer.cpp" line="186"/>
         <source>File Type:    </source>
-        <translation>Тип файла:</translation>
+        <translation>Тип файла:    </translation>
     </message>
     <message>
         <location filename="../../toonzqt/infoviewer.cpp" line="187"/>
@@ -2165,7 +2557,7 @@ Are you sure?</source>
     <message>
         <location filename="../../toonzqt/infoviewer.cpp" line="214"/>
         <source>Camera Dpi:       </source>
-        <translation>Камера Dpi:       </translation>
+        <translation>DPI Камеры:       </translation>
     </message>
     <message>
         <location filename="../../toonzqt/infoviewer.cpp" line="215"/>
@@ -2213,265 +2605,325 @@ Are you sure?</source>
         <translation>Файл %1 не существует.</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/imageutils.cpp" line="140"/>
+        <location filename="../../toonzqt/imageutils.cpp" line="144"/>
         <source>It is not possible to find the %1 level.</source>
         <translation>Невозможно найти уровень %1.</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/imageutils.cpp" line="167"/>
+        <location filename="../../toonzqt/imageutils.cpp" line="171"/>
         <source>There was an error copying %1</source>
         <translation>Ошибка копирования %1</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/imageutils.cpp" line="189"/>
+        <location filename="../../toonzqt/imageutils.cpp" line="193"/>
         <source>It is not possible to find the level %1</source>
         <translation>Невозможно найти уровень %1</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/imageutils.cpp" line="196"/>
-        <location filename="../../toonzqt/imageutils.cpp" line="204"/>
-        <location filename="../../toonzqt/imageutils.cpp" line="265"/>
+        <location filename="../../toonzqt/imageutils.cpp" line="200"/>
+        <location filename="../../toonzqt/imageutils.cpp" line="208"/>
+        <location filename="../../toonzqt/imageutils.cpp" line="269"/>
         <source>Cannot premultiply the selected file.</source>
         <translation>Невозможен premultiply выбранного файла.</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/imageutils.cpp" line="200"/>
+        <location filename="../../toonzqt/imageutils.cpp" line="204"/>
         <source>Cannot premultiply a vector-based level.</source>
         <translation>Невозможен premultiply векторного уровня.</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/imageutils.cpp" line="271"/>
+        <location filename="../../toonzqt/imageutils.cpp" line="275"/>
         <source>Level %1 premultiplied.</source>
         <translation>Premultiply %1 уровня.</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/imageutils.cpp" line="425"/>
-        <location filename="../../toonzqt/imageutils.cpp" line="454"/>
+        <location filename="../../toonzqt/imageutils.cpp" line="429"/>
+        <location filename="../../toonzqt/imageutils.cpp" line="458"/>
         <source>Frame %1 : conversion failed!</source>
-        <translation>Конверсия кадра %1 не выполнена!</translation>
+        <translation>Конверсия кадра %1 не удалась!</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/imageutils.cpp" line="692"/>
+        <location filename="../../toonzqt/imageutils.cpp" line="695"/>
+        <location filename="../../toonzqt/imageutils.cpp" line="724"/>
+        <location filename="../../toonzqt/imageutils.cpp" line="731"/>
         <source>The source image seems not suitable for this kind of conversion</source>
         <translation>Исходное изображение кажется непригодным для такой конверсии</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/gutil.cpp" line="309"/>
+        <location filename="../../toonzqt/gutil.cpp" line="558"/>
         <source>The file name cannot be empty or contain any of the following characters: (new line) \ / : * ? &quot; |</source>
         <translation>Имя файла не может быть пустым или содержать любой из следующих символов: (новая строка) \ /: *? &quot;|</translation>
     </message>
     <message>
+        <location filename="../../toonzqt/gutil.cpp" line="585"/>
+        <source>That is a reserved file name and cannot be used.</source>
+        <translation>Это зарезервированное имя файла, его нельзя использовать.</translation>
+    </message>
+    <message>
         <source>OpenToonz 1.1</source>
-        <translation type="vanished">OpenToonz 1.1</translation>
+        <translation type="obsolete">OpenToonz 1.1</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/dvdialog.cpp" line="36"/>
         <source>OpenToonz 1.2</source>
-        <translation>OpenToonz 1.2</translation>
+        <translation type="obsolete">OpenToonz 1.2</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/dvdialog.cpp" line="77"/>
+        <source>OpenToonz 1.3</source>
+        <translation type="obsolete">OpenToonz 1.3</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/dvdialog.cpp" line="79"/>
         <source>Information</source>
         <translation>Информация</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/dvdialog.cpp" line="80"/>
+        <location filename="../../toonzqt/dvdialog.cpp" line="82"/>
         <source>Warning</source>
-        <translation>Внимание</translation>
+        <translation>Предупреждение</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/dvdialog.cpp" line="83"/>
+        <location filename="../../toonzqt/dvdialog.cpp" line="85"/>
         <source>Critical</source>
-        <translation>Критический</translation>
+        <translation>Критическая ошибка</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/dvdialog.cpp" line="86"/>
+        <location filename="../../toonzqt/dvdialog.cpp" line="88"/>
         <source>Question</source>
-        <translation>Вопрос</translation>
+        <translation>Подтверждение</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/dvdialog.cpp" line="858"/>
+        <location filename="../../toonzqt/dvdialog.cpp" line="851"/>
         <source>Apply</source>
         <translation>Применить</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/dvdialog.cpp" line="1433"/>
+        <location filename="../../toonzqt/dvdialog.cpp" line="1345"/>
+        <source>OK</source>
+        <translation>OK</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/dvdialog.cpp" line="1426"/>
         <source>Styles you are going to delete are used to paint lines and areas in the animation level.
 </source>
         <translation>Стили, которые вы собираетесь удалить, используются для рисования линий и областей на уровне анимации.
 </translation>
     </message>
     <message>
-        <location filename="../../toonzqt/dvdialog.cpp" line="1436"/>
+        <location filename="../../toonzqt/dvdialog.cpp" line="1429"/>
         <source>How do you want to proceed?</source>
         <translation>Как вы хотите поступить?</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/dvdialog.cpp" line="1438"/>
+        <location filename="../../toonzqt/dvdialog.cpp" line="1431"/>
         <source>Delete Styles Only</source>
         <translation>Удалить только стили</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/dvdialog.cpp" line="1439"/>
+        <location filename="../../toonzqt/dvdialog.cpp" line="1432"/>
         <source>Delete Styles, Lines and Areas</source>
         <translation>Удалить стили, линии и области</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/dvdialog.cpp" line="1447"/>
+        <location filename="../../toonzqt/dvdialog.cpp" line="1440"/>
         <source>Ok</source>
         <translation>Ok</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/dvdialog.cpp" line="1450"/>
+        <location filename="../../toonzqt/dvdialog.cpp" line="1443"/>
         <source>Deletion of Lines and Areas from raster-based levels is not undoable.
 Are you sure?</source>
         <translation>Удаление строк и областей из растровых уровней не отменяется.
 Вы уверены?</translation>
     </message>
     <message>
-        <location filename="../../include/toonzqt/paramfield.h" line="182"/>
+        <location filename="../../include/toonzqt/paramfield.h" line="256"/>
         <source>Modify Fx Param : %1 Key : %2  Frame %3</source>
         <translation>Изменить Fx Параметр : %1 Ключ : %2  Кадр %3</translation>
     </message>
     <message>
-        <location filename="../../include/toonzqt/paramfield.h" line="183"/>
+        <location filename="../../include/toonzqt/paramfield.h" line="257"/>
         <source>Set</source>
         <translation>Установить</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/lutcalibrator.cpp" line="239"/>
+        <location filename="../../toonzqt/lutcalibrator.cpp" line="252"/>
         <source>Failed to compile m_textureShader.vert.</source>
         <comment>gl</comment>
         <translation>Не удалось скомпилировать m_textureShader.vert.</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/lutcalibrator.cpp" line="260"/>
+        <location filename="../../toonzqt/lutcalibrator.cpp" line="273"/>
         <source>Failed to compile m_shader.frag.</source>
         <comment>gl</comment>
         <translation>Не удалось скомпилировать m_shader.frag.</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/lutcalibrator.cpp" line="266"/>
+        <location filename="../../toonzqt/lutcalibrator.cpp" line="279"/>
         <source>Failed to add m_shader.vert.</source>
         <comment>gl</comment>
         <translation>Не удалось добавить m_shader.vert.</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/lutcalibrator.cpp" line="269"/>
+        <location filename="../../toonzqt/lutcalibrator.cpp" line="282"/>
         <source>Failed to add m_shader.frag.</source>
         <comment>gl</comment>
         <translation>Не удалось добавить m_shader.frag.</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/lutcalibrator.cpp" line="273"/>
+        <location filename="../../toonzqt/lutcalibrator.cpp" line="286"/>
         <source>Failed to link simple shader: %1</source>
         <comment>gl</comment>
         <translation>Не удалось связать простой шейдер: %1</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/lutcalibrator.cpp" line="279"/>
-        <location filename="../../toonzqt/lutcalibrator.cpp" line="284"/>
+        <location filename="../../toonzqt/lutcalibrator.cpp" line="292"/>
+        <location filename="../../toonzqt/lutcalibrator.cpp" line="297"/>
         <source>Failed to get attribute location of %1</source>
         <comment>gl</comment>
         <translation>Не удалось получить расположение атрибута %1</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/lutcalibrator.cpp" line="289"/>
-        <location filename="../../toonzqt/lutcalibrator.cpp" line="293"/>
-        <location filename="../../toonzqt/lutcalibrator.cpp" line="296"/>
+        <location filename="../../toonzqt/lutcalibrator.cpp" line="302"/>
+        <location filename="../../toonzqt/lutcalibrator.cpp" line="306"/>
+        <location filename="../../toonzqt/lutcalibrator.cpp" line="309"/>
         <source>Failed to get uniform location of %1</source>
         <comment>gl</comment>
         <translation>Не удалось получить одинаковое расположение %1</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/lutcalibrator.cpp" line="457"/>
+        <location filename="../../toonzqt/lutcalibrator.cpp" line="480"/>
         <source>Failed to Open 3DLUT File.</source>
         <translation>Не удалось открыть файл 3DLUT.</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/lutcalibrator.cpp" line="469"/>
+        <location filename="../../toonzqt/lutcalibrator.cpp" line="492"/>
         <source>Failed to Load 3DLUT File.
 It should start with &quot;3DMESH&quot; keyword.</source>
         <translation>Не удалось загрузить 3DLUT файл.
 Он должен начинаться с дескриптора &quot;3DMESH&quot;.</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/lutcalibrator.cpp" line="480"/>
+        <location filename="../../toonzqt/lutcalibrator.cpp" line="503"/>
         <source>Failed to Load 3DLUT File.
 The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;</source>
         <translation>Не удалось загрузить файл 3DLUT.
-Вторая строка должна быть &quot;Mesh [Input bit depth] [Output bit depth]&quot;</translation>
+Вторая строка должна быть &quot;Mesh [глубина цвета на входе] [глубина цвета на выходе]&quot;</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/lutcalibrator.cpp" line="496"/>
-        <location filename="../../toonzqt/lutcalibrator.cpp" line="512"/>
+        <location filename="../../toonzqt/lutcalibrator.cpp" line="519"/>
+        <location filename="../../toonzqt/lutcalibrator.cpp" line="536"/>
         <source>Failed to Load 3DLUT File.</source>
         <translation>Не удалось загрузить файл 3DLUT.</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/paletteviewergui.cpp" line="1668"/>
+        <source>Click &amp; Drag Palette into Studio Palette</source>
+        <translation>Нажмите и перетащите палитру в палитру Studio</translation>
     </message>
 </context>
 <context>
     <name>QPushButton</name>
     <message>
-        <location filename="../../toonzqt/dvdialog.cpp" line="1070"/>
+        <location filename="../../toonzqt/dvdialog.cpp" line="1063"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
 </context>
 <context>
+    <name>RadioButtonDialog</name>
+    <message>
+        <source>OpenToonz</source>
+        <translation type="vanished">OpenToonz</translation>
+    </message>
+</context>
+<context>
+    <name>RgbLinkButtons</name>
+    <message>
+        <location filename="../../toonzqt/paramfield.cpp" line="1113"/>
+        <source>Copy RGB : %1 &gt; %2</source>
+        <translation>Копировать RGB : %1 &gt; %2</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/paramfield.cpp" line="1114"/>
+        <source>Swap %1 and %2</source>
+        <translation>Поменять местами %1 и %2</translation>
+    </message>
+</context>
+<context>
     <name>SchematicViewer</name>
     <message>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="573"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="920"/>
         <source>&amp;Fit to Window</source>
         <translation>&amp;По размеру окна</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="579"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="926"/>
         <source>&amp;Focus on Current</source>
         <translation>&amp;Фокус на текущем</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="584"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="931"/>
         <source>&amp;Reorder Nodes</source>
         <translation>&amp;Изменение порядка узлов</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="590"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="937"/>
         <source>&amp;Reset Size</source>
         <translation>&amp;Сбросить размер</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="596"/>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="744"/>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="803"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="944"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="1124"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="1180"/>
         <source>&amp;Minimize Nodes</source>
         <translation>&amp;Минимизировать узлы</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="597"/>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="745"/>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="804"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="944"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="1125"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="1181"/>
         <source>&amp;Maximize Nodes</source>
         <translation>&amp;Максимизировать узлы</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="603"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="950"/>
+        <source>&amp;Selection Mode</source>
+        <translation>&amp;Режим выделения</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="955"/>
+        <source>&amp;Zoom Mode</source>
+        <translation>&amp;Режим приближения</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="960"/>
+        <source>&amp;Hand Mode</source>
+        <translation>&amp;Ручной режим</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="968"/>
         <source>&amp;New Pegbar</source>
         <translation>&amp;Новый Pegbar</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="610"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="975"/>
         <source>&amp;New Camera</source>
         <translation>&amp;Новая камера</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="617"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="982"/>
         <source>&amp;New Motion Path</source>
         <translation>&amp;Новая траектория движения</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="625"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="990"/>
         <source>&amp;Swtich output port display mode</source>
         <translation>&amp;Переключение отображения выходного порта</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="1009"/>
+        <source>&amp;Toggle node icons</source>
+        <translation>&amp;Переключить иконки узлов</translation>
     </message>
 </context>
 <context>
@@ -2483,24 +2935,31 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     </message>
 </context>
 <context>
+    <name>SettingsPage</name>
+    <message>
+        <source>Reset to default</source>
+        <translation type="vanished">Сбросить по умолчанию</translation>
+    </message>
+</context>
+<context>
     <name>SimilarShapeSegmentPage</name>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="788"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="791"/>
         <source>Reference Curve:</source>
         <translation>Референсная кривая:</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="794"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="797"/>
         <source>Frame Offset:</source>
         <translation>Смещение кадра:</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="851"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="854"/>
         <source>There is a syntax error in the definition of the interpolation.</source>
         <translation>В определении интерполяции имеется синтаксическая ошибка.</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="856"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="859"/>
         <source>There is a circular reference in the definition of the interpolation.</source>
         <translation>В определении интерполяции имеется круговой референс.</translation>
     </message>
@@ -2508,42 +2967,41 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
 <context>
     <name>SpecialStyleChooserPage</name>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="2384"/>
         <source>Plain color</source>
-        <translation>Простой цвет</translation>
+        <translation type="obsolete">Простой цвет</translation>
     </message>
 </context>
 <context>
     <name>SpeedInOutSegmentPage</name>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="91"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="92"/>
         <source>First Speed:</source>
         <translation>Первая скорость:</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="95"/>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="105"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="96"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="106"/>
         <source>Handle:</source>
         <translation>Handle:</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="98"/>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="108"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="99"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="109"/>
         <source>/</source>
         <translation>/</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="101"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="102"/>
         <source>Last Speed:</source>
         <translation>Последняя скорость:</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="158"/>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="189"/>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="227"/>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="259"/>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="294"/>
-        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="304"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="159"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="190"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="228"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="260"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="295"/>
+        <location filename="../../toonzqt/functionsegmentviewer.cpp" line="305"/>
         <source>---</source>
         <translation>---</translation>
     </message>
@@ -2551,35 +3009,48 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
 <context>
     <name>SplinePainter</name>
     <message>
-        <location filename="../../toonzqt/stageschematicnode.cpp" line="774"/>
+        <location filename="../../toonzqt/stageschematicnode.cpp" line="680"/>
         <source>&amp;Delete</source>
         <translation>&amp;Удалить</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/stageschematicnode.cpp" line="777"/>
+        <location filename="../../toonzqt/stageschematicnode.cpp" line="683"/>
         <source>&amp;Save Motion Path...</source>
         <translation>&amp;Сохранить траекторию движения...</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/stageschematicnode.cpp" line="779"/>
+        <location filename="../../toonzqt/stageschematicnode.cpp" line="685"/>
         <source>&amp;Load Motion Path...</source>
         <translation>&amp;Загрузить траекторию движения...</translation>
     </message>
 </context>
 <context>
+    <name>StageSchematicNode</name>
+    <message>
+        <location filename="../../toonzqt/stageschematicnode.cpp" line="1333"/>
+        <source>Toggle Autorotate Along Motion Path</source>
+        <translation>Переключить автоматическое вращение в соответствии с траекторией движения</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/stageschematicnode.cpp" line="1334"/>
+        <source>Toggle Link Motion Path to Control Points</source>
+        <translation>Переключить соединение траектории движения с контрольными точками</translation>
+    </message>
+</context>
+<context>
     <name>StageSchematicScene</name>
     <message>
-        <location filename="../../toonzqt/stageschematicscene.cpp" line="1119"/>
+        <location filename="../../toonzqt/stageschematicscene.cpp" line="1135"/>
         <source>&amp;New Pegbar</source>
         <translation>&amp;Новый Pegbar</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/stageschematicscene.cpp" line="1123"/>
+        <location filename="../../toonzqt/stageschematicscene.cpp" line="1139"/>
         <source>&amp;New Motion Path</source>
         <translation>&amp;Новая траектория движения</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/stageschematicscene.cpp" line="1127"/>
+        <location filename="../../toonzqt/stageschematicscene.cpp" line="1143"/>
         <source>&amp;New Camera</source>
         <translation>&amp;Новая камера</translation>
     </message>
@@ -2587,90 +3058,156 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
 <context>
     <name>StudioPaletteTreeViewer</name>
     <message>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="606"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="487"/>
+        <source>The current palette %1
+in the studio palette has been modified. Do you want to save your changes?</source>
+        <translation>Текущая палитра %1
+в Studio Palette была изменена. Сохранить изменения?</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="492"/>
+        <source>Save</source>
+        <translation>Сохранить</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="492"/>
+        <source>Discard</source>
+        <translation>Отменить</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="588"/>
+        <source>Convert %1 to Studio Palette and Overwrite. 
+Are you sure ?</source>
+        <translation>Конвертировать %1 в Studio Palette и перезаписать.
+Вы уверены?</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation type="obsolete">Да</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation type="obsolete">Нет</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="616"/>
         <source>This folder is not empty. Delete anyway?</source>
         <translation>Эта папка не пуста. Удалить в любом случае?</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="888"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="590"/>
+        <source>Convert</source>
+        <translation>Конвертировать</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="514"/>
+        <source>Failed to save palette.</source>
+        <translation>Не удалось сохранить палитру.</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="819"/>
+        <source>Replacing all selected palettes with the palette &quot;%1&quot;. 
+Are you sure ?</source>
+        <translation>Все выбранные палитры заменены на «%1».
+Вы уверены?</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="826"/>
+        <source>Replacing the palette &quot;%1&quot; with the palette &quot;%2&quot;. 
+Are you sure ?</source>
+        <translation>Палитра &quot;%1&quot; будет заменена палитрой &quot;%2&quot;.
+Вы уверены?</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="832"/>
+        <source>Replace</source>
+        <translation>Заменить</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="893"/>
         <source>New Palette</source>
         <translation>Новая палитра</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="889"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="894"/>
         <source>New Folder</source>
         <translation>Новая папка</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="896"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="901"/>
         <source>Delete Folder</source>
         <translation>Удалить папку</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="900"/>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="951"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="905"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="956"/>
         <source>Load into Current Palette</source>
         <translation>Загрузка в текущую палитру</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="903"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="908"/>
         <source>Adjust Current Level to This Palette</source>
         <translation>Отрегулируйте текущий уровень до этой палитры</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="906"/>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="953"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="911"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="958"/>
         <source>Merge to Current Palette</source>
         <translation>Слияние с текущей палитрой</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="910"/>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="955"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="915"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="960"/>
         <source>Replace with Current Palette</source>
         <translation>Заменить текущую палитру</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="913"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="918"/>
         <source>Delete Palette</source>
         <translation>Удалить палитру</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="920"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="925"/>
         <source>Convert to Studio Palette and Overwrite</source>
         <translation>Конвертировать в Studio Palette и перезаписать</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="927"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="932"/>
         <source>Search for Palettes</source>
         <translation>Поиск палитр</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="959"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="617"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="964"/>
         <source>Delete</source>
         <translation>Удалить</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="1122"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="1142"/>
         <source>the palette &quot;%1&quot;</source>
         <translation>палитра &quot;%1&quot;</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="1125"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="1145"/>
         <source>the selected palettes</source>
         <translation>выбранных палитр</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="1129"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="1149"/>
         <source>Move %1 to &quot;%2&quot;. Are you sure ?</source>
         <translation>Перемещение %1 в &quot;%2&quot;, вы уверены?</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="1130"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="1150"/>
         <source>Move</source>
         <translation>Переместить</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="1130"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="492"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="590"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="617"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="832"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="1150"/>
         <source>Cancel</source>
         <translation>Отмена</translation>
     </message>
@@ -2678,153 +3215,165 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
 <context>
     <name>StyleEditor</name>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="3145"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="3204"/>
         <source>Generated</source>
-        <translation type="unfinished"></translation>
+        <translation>Сформирован</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="3146"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="3205"/>
         <source>Trail</source>
-        <translation type="unfinished"></translation>
+        <translation>Хвост</translation>
     </message>
     <message>
         <source>Auto  
 Apply</source>
-        <translation type="vanished">Авто  
+        <translation type="obsolete">Авто  
 применение</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="2982"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="3035"/>
         <source>Show or hide parts of the Color Page.</source>
-        <translation type="unfinished"></translation>
+        <translation>Показать или скрыть части цветовой страницы.</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="2987"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="3040"/>
         <source>Toggle orientation of the Color Page.</source>
-        <translation type="unfinished"></translation>
+        <translation>Переключить ориентацию цветовой страницы.</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="3078"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="3137"/>
         <source>Auto</source>
         <translation>Автоматически</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="3081"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="3140"/>
         <source>Apply</source>
         <translation>Применить</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="3086"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="3145"/>
         <source>Apply changes to current style</source>
         <translation>Применить изменения к текущему стилю</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="3091"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="3150"/>
         <source>Automatically update style changes</source>
         <translation>Автообновление изменений стиля</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="3095"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="3154"/>
         <source>Return To Previous Style</source>
         <translation>Вернуться в предыдущий стиль</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="3098"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="3157"/>
         <source>Current Style</source>
         <translation>Текущий стиль</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="3285"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="3346"/>
         <source>No Style Selected</source>
         <translation>Стиль не выбран</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="3309"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="3363"/>
+        <source>Cleanup </source>
+        <translation>Очистка </translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/styleeditor.cpp" line="3365"/>
+        <source>Studio </source>
+        <translation>Studio </translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/styleeditor.cpp" line="3367"/>
+        <source>Level </source>
+        <translation>Уровень </translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/styleeditor.cpp" line="3370"/>
         <source>Palette</source>
         <translation>Палитра</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="3323"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="3384"/>
         <source>Style Editor - No Valid Style Selected</source>
-        <translation type="unfinished"></translation>
+        <translation>Редактор стилей - не выбран правильный стиль</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="3302"/>
         <source>[CLEANUP]  </source>
-        <translation type="unfinished"></translation>
+        <translation type="vanished">[ОЧИСТКА]  </translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="2958"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="3012"/>
         <source>Wheel</source>
         <translation>Круг</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="2959"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="3013"/>
         <source>HSV</source>
         <translation>HSV</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="2960"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="3014"/>
         <source>Alpha</source>
         <translation>Альфа</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="2961"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="3015"/>
         <source>RGB</source>
         <translation>RGB</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="3304"/>
         <source>[STUDIO]  </source>
-        <translation type="unfinished"></translation>
+        <translation type="vanished">[STUDIO]  </translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="3306"/>
         <source>[LEVEL]  </source>
-        <translation>[УРОВЕНЬ]  </translation>
+        <translation type="vanished">[УРОВЕНЬ]  </translation>
     </message>
     <message>
         <source>Plain</source>
-        <translation type="vanished">Простой</translation>
+        <translation type="obsolete">Простой</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="3207"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="3266"/>
         <source>Texture</source>
         <translation>Текстура</translation>
     </message>
     <message>
         <source>Special</source>
-        <translation type="vanished">Особый</translation>
+        <translation type="obsolete">Особый</translation>
     </message>
     <message>
         <source>Custom</source>
-        <translation type="vanished">Пользовательский</translation>
+        <translation type="obsolete">Пользовательский</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="3147"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="3206"/>
         <source>Vector Brush</source>
         <translation>Векторная кисть</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="3206"/>
-        <location filename="../../toonzqt/styleeditor.cpp" line="3212"/>
-        <location filename="../../toonzqt/styleeditor.cpp" line="3214"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="3265"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="3271"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="3273"/>
         <source>Color</source>
         <translation>Цвет</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="3208"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="3267"/>
         <source>Vector</source>
         <translation>Вектор</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="3209"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="3268"/>
         <source>Raster</source>
         <translation>Растр</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="3210"/>
-        <location filename="../../toonzqt/styleeditor.cpp" line="3215"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="3269"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="3274"/>
         <source>Settings</source>
         <translation>Настройки</translation>
     </message>
@@ -2832,37 +3381,37 @@ Apply</source>
 <context>
     <name>StyleEditorGUI::ColorChannelControl</name>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="1229"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="1273"/>
         <source>R</source>
         <translation>R</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="1229"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="1273"/>
         <source>G</source>
         <translation>G</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="1229"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="1273"/>
         <source>B</source>
         <translation>B</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="1229"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="1273"/>
         <source>A</source>
         <translation>A</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="1229"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="1273"/>
         <source>H</source>
         <translation>H</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="1229"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="1273"/>
         <source>S</source>
         <translation>S</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="1230"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="1274"/>
         <source>V</source>
         <translation>V</translation>
     </message>
@@ -2871,11 +3420,11 @@ Apply</source>
     <name>StyleEditorGUI::PlainColorPage</name>
     <message>
         <source>Wheel</source>
-        <translation type="vanished">Колесо</translation>
+        <translation type="obsolete">Колесо</translation>
     </message>
     <message>
         <source>HSV</source>
-        <translation type="vanished">HSV</translation>
+        <translation type="obsolete">HSV</translation>
     </message>
     <message>
         <source>Alpha</source>
@@ -2883,24 +3432,31 @@ Apply</source>
     </message>
     <message>
         <source>Matte</source>
-        <translation type="vanished">Matte</translation>
+        <translation type="obsolete">Matte</translation>
     </message>
     <message>
         <source>RGB</source>
-        <translation type="vanished">RGB</translation>
+        <translation type="obsolete">RGB</translation>
     </message>
 </context>
 <context>
     <name>StyleEditorGUI::SettingsPage</name>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="2535"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="2590"/>
         <source>Autopaint for Lines</source>
         <translation>Автозаливка линий</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="2687"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="2743"/>
         <source>Reset to default</source>
         <translation>Сбросить по умолчанию</translation>
+    </message>
+</context>
+<context>
+    <name>StyleIndexLineEdit</name>
+    <message>
+        <source>current</source>
+        <translation type="vanished">текущий</translation>
     </message>
 </context>
 <context>
@@ -2942,6 +3498,19 @@ Apply</source>
     </message>
 </context>
 <context>
+    <name>SwatchViewer</name>
+    <message>
+        <location filename="../../toonzqt/swatchviewer.cpp" line="844"/>
+        <source>Reset View</source>
+        <translation>Восстановить вид по умолчанию</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/swatchviewer.cpp" line="849"/>
+        <source>Fit To Window</source>
+        <translation>Подогнать к окну</translation>
+    </message>
+</context>
+<context>
     <name>TMessageViewer</name>
     <message>
         <location filename="../../toonzqt/tmessageviewer.cpp" line="151"/>
@@ -2965,7 +3534,7 @@ Apply</source>
     </message>
     <message>
         <source>Infos</source>
-        <translation type="vanished">Информация</translation>
+        <translation type="obsolete">Информация</translation>
     </message>
     <message>
         <location filename="../../toonzqt/tmessageviewer.cpp" line="173"/>
@@ -2976,22 +3545,28 @@ Apply</source>
 <context>
     <name>TablePainter</name>
     <message>
-        <location filename="../../toonzqt/stageschematicnode.cpp" line="681"/>
+        <location filename="../../toonzqt/stageschematicnode.cpp" line="586"/>
         <source>Table</source>
-        <translation type="unfinished"></translation>
+        <translation>Стол</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/stageschematicnode.cpp" line="691"/>
+        <location filename="../../toonzqt/stageschematicnode.cpp" line="596"/>
         <source>&amp;Reset Center</source>
         <translation>&amp;Сброс центра</translation>
     </message>
 </context>
 <context>
+    <name>ToneCurveField</name>
+    <message>
+        <source>Channel:</source>
+        <translation type="vanished">Канал:</translation>
+    </message>
+</context>
+<context>
     <name>VectorBrushStyleChooserPage</name>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="1994"/>
         <source>Plain color</source>
-        <translation>Простой цвет</translation>
+        <translation type="obsolete">Простой цвет</translation>
     </message>
 </context>
 <context>

@@ -78,14 +78,16 @@ public:
   void normalize_values(struct particles_values &values,
                         const TRenderSettings &ri);
 
-  void render_particles(
-      TFlash *flash, TTile *tile, std::vector<TRasterFxPort *> part_ports,
-      const TRenderSettings &ri, TDimension &p_size, TPointD &p_offset,
-      std::map<int, TRasterFxPort *> ctrl_ports, std::vector<TLevelP> partLevel,
-      float dpi, int curr_frame, int shrink, double startx, double starty,
-      double endx, double endy, std::vector<int> lastframe, unsigned long fxId);
+  void render_particles(TTile *tile, std::vector<TRasterFxPort *> part_ports,
+                        const TRenderSettings &ri, TDimension &p_size,
+                        TPointD &p_offset,
+                        std::map<int, TRasterFxPort *> ctrl_ports,
+                        std::vector<TLevelP> partLevel, float dpi,
+                        int curr_frame, int shrink, double startx,
+                        double starty, double endx, double endy,
+                        std::vector<int> lastframe, unsigned long fxId);
 
-  void do_render(TFlash *flash, Iwa_Particle *part, TTile *tile,
+  void do_render(Iwa_Particle *part, TTile *tile,
                  std::vector<TRasterFxPort *> part_ports,
                  std::map<int, TTile *> porttiles, const TRenderSettings &ri,
                  TDimension &p_size, TPointD &p_offset, int lastframe,

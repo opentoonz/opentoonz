@@ -148,11 +148,81 @@ void TToneCurveParam::setCurrentChannel(ToneChannel channel) {
 //---------------------------------------------------------
 
 QList<TPointD> TToneCurveParam::getValue(double frame) const {
+  // compute the handle angle and length
+  // in case the handle length is 0 on one side, take the oppositte handle to
+  // calculate the angle
+  auto handleAngleLength = [](TPointParamP handle, TPointParamP cp,
+                              TPointParamP opposite, double f,
+                              bool isLeft = true) {
+    TPointD vec_h_cp = handle->getValue(f) - cp->getValue(f);
+    double angle;
+    if (vec_h_cp.x == 0 && vec_h_cp.y == 0) {
+      TPointD vec_h_op = handle->getValue(f) - opposite->getValue(f);
+      angle            = std::atan2(vec_h_op.y, vec_h_op.x);
+    } else
+      angle = std::atan2(vec_h_cp.y, vec_h_cp.x);
+
+    // make the angle continuous
+    if (isLeft && angle < 0) angle += M_2PI;
+    double length =
+        std::sqrt(vec_h_cp.x * vec_h_cp.x + vec_h_cp.y * vec_h_cp.y);
+    return TPointD(angle, length);
+  };
+  auto angleLengthToPos = [](TPointD anLen) {
+    return TPointD(anLen.y * std::cos(anLen.x), anLen.y * std::sin(anLen.x));
+  };
+
+  std::set<double> frames;
+  getCurrentParamSet()->getKeyframes(frames);
+  std::set<double>::iterator prevIt = frames.lower_bound(frame);
+  std::set<double>::iterator nextIt = frames.upper_bound(frame);
+  bool isNotInSegment               = getCurrentParamSet()->isKeyframe(frame) ||
+                        prevIt == frames.begin() || nextIt == frames.end();
+  if (prevIt != frames.begin()) prevIt--;
+
   int i;
   QList<TPointD> points;
-  for (i = 0; i < getCurrentParamSet()->getParamCount(); i++) {
-    TPointParamP pointParam = getCurrentParamSet()->getParam(i);
-    points.push_back(pointParam->getValue(frame));
+  int pointCount = getCurrentParamSet()->getParamCount();
+  for (i = 0; i < pointCount; i++) {
+    // control point case or the current frame is not between the keys
+    if (i % 3 == 0 || isNotInSegment) {
+      TPointParamP pointParam = getCurrentParamSet()->getParam(i);
+      points.push_back(pointParam->getValue(frame));
+    } else {
+      double prevF = (*prevIt);
+      double nextF = (*nextIt);
+      double ratio = (frame - prevF) / (nextF - prevF);
+      if (i % 3 == 2) {  // left handle
+        TPointParamP left_Param  = getCurrentParamSet()->getParam(i);
+        TPointParamP cp_Param    = getCurrentParamSet()->getParam(i + 1);
+        TPointParamP right_Param = (i == pointCount - 2)
+                                       ? cp_Param
+                                       : TPointParamP(getCurrentParamSet()->getParam(i + 2));
+
+        TPointD prevAnLen =
+            handleAngleLength(left_Param, cp_Param, right_Param, prevF);
+        TPointD nextAnLen =
+            handleAngleLength(left_Param, cp_Param, right_Param, nextF);
+        // linear interpolation of angle & length
+        TPointD handle =
+            angleLengthToPos(prevAnLen * (1.0 - ratio) + nextAnLen * (ratio));
+        points.push_back(cp_Param->getValue(frame) + handle);
+      } else {  // right handle
+        TPointParamP right_Param = getCurrentParamSet()->getParam(i);
+        TPointParamP cp_Param    = getCurrentParamSet()->getParam(i - 1);
+        TPointParamP left_Param =
+            (i == 1) ? cp_Param : TPointParamP(getCurrentParamSet()->getParam(i - 2));
+
+        TPointD prevAnLen =
+            handleAngleLength(right_Param, cp_Param, left_Param, prevF, false);
+        TPointD nextAnLen =
+            handleAngleLength(right_Param, cp_Param, left_Param, nextF, false);
+        // linear interpolation of angle & length
+        TPointD handle =
+            angleLengthToPos(prevAnLen * (1.0 - ratio) + nextAnLen * (ratio));
+        points.push_back(cp_Param->getValue(frame) + handle);
+      }
+    }
   }
   return points;
 }

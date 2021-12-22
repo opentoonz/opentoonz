@@ -29,10 +29,9 @@ using namespace TVER;
 #else
 #include <sys/param.h>
 #include <unistd.h>
-#include <sys/timeb.h>
 #endif
 
-//#define REDIRECT_OUPUT
+//#define REDIRECT_OUTPUT
 
 #ifdef _WIN32
 #define QUOTE_STR "\""
@@ -44,14 +43,6 @@ using namespace TVER;
 
 #ifndef _WIN32
 #define NO_ERROR 0
-#endif
-
-#ifdef MACOSX
-#include <sys/sysctl.h>  //To retrieve MAC HW infos
-#endif
-
-#ifdef LINUX
-#include <sys/sysctl.h>
 #endif
 
 // forward declaration
@@ -76,8 +67,7 @@ TFilePath getGlobalRoot() {
 // Leggo la localRoot da File txt
 #ifdef MACOSX
   // If MACOSX, change to MACOSX path
-  std::string unixpath = "./" + tver.getAppName() + "_" +
-                         tver.getAppVersionString() +
+  std::string unixpath = "./" + tver.getAppName() +
                          ".app/Contents/Resources/configfarmroot.txt";
 #else
   // set path to something suitable for most linux (Unix?) systems
@@ -121,12 +111,15 @@ TFilePath getLocalRoot() {
 #else
 #ifdef MACOSX
   // If MACOSX, change to MACOSX path
-  std::string unixpath = "./" + tver.getAppName() + "_" +
-                         tver.getAppVersionString() +
+  std::string unixpath = "./" + tver.getAppName() + 
                          ".app/Contents/Resources/configfarmroot.txt";
 #else
   // set path to something suitable for most linux (Unix?) systems
+#ifdef FREEBSD
+  std::string unixpath = "/usr/local/etc/" + tver.getAppName() + "/opentoonz.conf";
+#else
   std::string unixpath = "/etc/" + tver.getAppName() + "/opentoonz.conf";
+#endif
 #endif
   TFilePath name(unixpath);
   Tifstream is(name);
@@ -209,7 +202,7 @@ public:
   void onStart(int argc, char *argv[]) override;
   void onStop() override;
 
-  void loadControllerData(QString &hostName, string &ipAddr, int &port);
+  void loadControllerData(QString &hostName, std::string &ipAddr, int &port);
 #ifdef _WIN32
   void loadDiskMountingPoints(const TFilePath &fp);
 
@@ -217,7 +210,7 @@ public:
   void unmountDisks();
 
   std::map<std::string, std::string> m_disks;
-  vector<std::string> m_disksMounted;
+  std::vector<std::string> m_disksMounted;
 #endif
 
   int m_port;
@@ -298,14 +291,14 @@ public:
     m_controller = controller;
   }
   TFarmController *getController() const { return m_controller.getPointer(); }
-  void setAppPaths(const vector<TFilePath> &);
+  void setAppPaths(const std::vector<TFilePath> &);
 
-  QString execute(const vector<QString> &argv) override;
+  QString execute(const std::vector<QString> &argv) override;
 
   // TFarmServer overrides
   int addTask(const QString &taskid, const QString &cmdline) override;
   int terminateTask(const QString &taskid) override;
-  int getTasks(vector<QString> &tasks) override;
+  int getTasks(std::vector<QString> &tasks) override;
 
   void queryHwInfo(HwInfo &hwInfo) override;
 
@@ -331,7 +324,7 @@ private:
   FarmControllerProxyP m_controller;
 
   TThread::Mutex m_mux;
-  vector<QString> m_tasks;
+  std::vector<QString> m_tasks;
 
   TUserLog *m_userLog;
 
@@ -378,15 +371,14 @@ private:
 };
 
 //-------------------------------------------------------------------
-QString getExeName(bool isComposer) {
+static QString getExeName(bool isComposer) {
   QString name = isComposer ? "tcomposer" : "tcleanup";
 
 #ifdef _WIN32
   return name + ".exe ";
-#elif MACOSX
+#elif defined(MACOSX)
   TVER::ToonzVersion tver;
-  return "\"./" + QString::fromStdString(tver.getAppName()) + "_" +
-         QString::fromStdString(tver.getAppVersionString()) +
+  return "\"./" + QString::fromStdString(tver.getAppName()) +
          ".app/Contents/MacOS/" + name + "\" ";
 #else
   return name;
@@ -433,7 +425,7 @@ void Task::run() {
 
   m_log->info(logMsg);
 
-// ===========
+  // ===========
 
 #ifdef _WIN32
   if (m_cmdline.contains("runcasm")) service.mountDisks();
@@ -456,10 +448,7 @@ void Task::run() {
 
     // cerco se il nome dell'applicazione e' tra quelle del file di
     // configurazione
-    bool foundApp                  = false;
-    vector<TFilePath>::iterator it = m_server->m_appPaths.begin();
-    for (; it != m_server->m_appPaths.end(); ++it) {
-      TFilePath appPath = *it;
+    for (auto const &appPath : m_server->m_appPaths) {
       if (appPath.getName() == appName.toStdString()) {
         exename = QString::fromStdWString(appPath.getWideString());
         break;
@@ -523,7 +512,7 @@ FarmServer::FarmServer(int port, TUserLog *log)
 FarmServer::~FarmServer() { delete m_executor; }
 
 //------------------------------------------------------------------------------
-QString FarmServer::execute(const vector<QString> &argv) {
+QString FarmServer::execute(const std::vector<QString> &argv) {
   if (argv.size() > 0) {
     if (argv[0] == "addTask" && argv.size() == 3) {
       // assert(!"Da fare");
@@ -533,19 +522,18 @@ QString FarmServer::execute(const vector<QString> &argv) {
       int ret = terminateTask(argv[1]);
       return QString::number(ret);
     } else if (argv[0] == "getTasks") {
-      vector<QString> tasks;
+      std::vector<QString> tasks;
       int ret = getTasks(tasks);
 
       QString reply(QString::number(ret));
       reply += ",";
 
-      vector<QString>::iterator it = tasks.begin();
-      for (; it != tasks.end(); ++it) {
-        reply += *it;
+      for (auto const &e : tasks) {
+        reply += e;
         reply += ",";
       }
 
-      if (!reply.isEmpty()) reply.left(reply.size() - 1);
+      if (!reply.isEmpty()) reply = reply.left(reply.size() - 1);
 
       return reply;
     } else if (argv[0] == "queryHwInfo") {
@@ -643,7 +631,7 @@ int FarmServer::terminateTask(const QString &taskid) {
 
 //------------------------------------------------------------------------------
 
-int FarmServer::getTasks(vector<QString> &tasks) {
+int FarmServer::getTasks(std::vector<QString> &tasks) {
   QMutexLocker sl(&m_mux);
   tasks = m_tasks;
   return m_tasks.size();
@@ -663,35 +651,16 @@ void FarmServer::queryHwInfo(HwInfo &hwInfo) {
   hwInfo.m_cpuCount     = TSystem::getProcessorCount();
   hwInfo.m_type         = Windows;
 #else
-#ifdef __sgi
-  hwInfo.m_cpuCount = sysconf(_SC_NPROC_CONF);
-  hwInfo.m_type     = Irix;
-#else
-
-#ifdef MACOSX
-  int mib[2];
-  TINT64 physMemSize;
-  size_t len;
-
-  mib[0] = CTL_HW;
-  mib[1] = HW_MEMSIZE;
-  len    = sizeof(physMemSize);
-  sysctl(mib, 2, &physMemSize, &len, NULL, 0);
-#endif
-
-#ifdef LINUX
-  TINT64 physMemSize =
-      (TINT64)sysconf(_SC_PHYS_PAGES) * (TINT64)sysconf(_SC_PAGE_SIZE);
-#endif
-
-  hwInfo.m_cpuCount = TSystem::getProcessorCount();
-
   // We can just retrieve the overall physical memory - the rest is defaulted to
   // 500 MB
-  hwInfo.m_totPhysMem   = physMemSize;
-  hwInfo.m_availPhysMem = 500000000;
+  hwInfo.m_totPhysMem   = TSystem::getMemorySize(true);
+  hwInfo.m_availPhysMem = TSystem::getFreeMemorySize(true);
   hwInfo.m_totVirtMem   = 500000000;
   hwInfo.m_availVirtMem = 500000000;
+  hwInfo.m_cpuCount     = TSystem::getProcessorCount();
+#ifdef __sgi
+  hwInfo.m_type         = Irix;
+#else
   hwInfo.m_type         = Linux;
 #endif
 #endif
@@ -716,7 +685,7 @@ void FarmServer::detachController(const ControllerData &data) {
 
 void FarmServer::removeTask(const QString &id) {
   QMutexLocker sl(&m_mux);
-  vector<QString>::iterator it = find(m_tasks.begin(), m_tasks.end(), id);
+  std::vector<QString>::iterator it = find(m_tasks.begin(), m_tasks.end(), id);
   if (it != m_tasks.end()) m_tasks.erase(it);
 }
 
@@ -730,14 +699,17 @@ std::string getLine(std::istream &is) {
 
   while (!is.eof()) {
     is.get(c);
-    if (c != '\r')
-      if (c != '\n')
-        if (!is.fail())
+    if (c != '\r') {
+      if (c != '\n') {
+        if (!is.fail()) {
           out.append(1, c);
-        else
+        } else {
           break;
-      else
+	}
+      } else {
         break;
+      }
+    }
   }
   return out;
 }
@@ -879,8 +851,7 @@ void FarmServerService::onStart(int argc, char *argv[]) {
     m_userLog             = new TUserLog(logFilePath);
   }
 
-std:
-  string appverinfo = tver.getAppVersionInfo("Farm Server") + "\n\n";
+  std::string appverinfo = tver.getAppVersionInfo("Farm Server") + "\n\n";
   m_userLog->info(appverinfo.c_str());
 
   // legge dal file di configurazione dei server il numero di porta da
@@ -994,8 +965,8 @@ void FarmServerService::onStop() {
   } catch (TException & /*e*/) {
   }
 
-// i dischi vengono montati al primo task di tipo "runcasm"
-// e smontati allo stop del servizio
+  // i dischi vengono montati al primo task di tipo "runcasm"
+  // e smontati allo stop del servizio
 
 #ifdef _WIN32
   unmountDisks();
@@ -1039,7 +1010,7 @@ void FarmServerService::loadDiskMountingPoints(const TFilePath &fp) {
     while (*t) t++;
     while (t > s && isBlank(*(t - 1))) t--;
     if (t == s) continue;  // non dovrebbe succedere mai: dst vuoto
-    string dst(s, t - s);
+    std::string dst(s, t - s);
     m_disks[from] = dst;
   }
 }
@@ -1098,10 +1069,7 @@ void FarmServerService::mountDisks() {
 //------------------------------------------------------------------------------
 
 void FarmServerService::unmountDisks() {
-  vector<std::string>::iterator it = m_disksMounted.begin();
-  for (; it != m_disksMounted.end(); ++it) {
-    std::string drive = *it;
-
+  for (auto const &drive : m_disksMounted) {
     DWORD res =
         WNetCancelConnection2(drive.c_str(),           // resource name
                               CONNECT_UPDATE_PROFILE,  // connection type

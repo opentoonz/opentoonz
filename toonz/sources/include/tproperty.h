@@ -112,7 +112,8 @@ public:
       : TProperty(name)
       , m_range(minValue, maxValue)
       , m_value(minValue)
-      , m_isMaxRangeLimited(isMaxRangeLimited) {
+      , m_isMaxRangeLimited(isMaxRangeLimited)
+      , m_isLinearSlider(true) {
     setValue(value);
   }
 
@@ -138,10 +139,14 @@ public:
 
   bool isMaxRangeLimited() const { return m_isMaxRangeLimited; }
 
+  void setNonLinearSlider() { m_isLinearSlider = false; }
+  bool isLinearSlider() { return m_isLinearSlider; }
+
 private:
   Range m_range;
   T m_value;
   bool m_isMaxRangeLimited;
+  bool m_isLinearSlider;
 };
 
 //---------------------------------------------------------
@@ -160,7 +165,8 @@ public:
                       double v0, double v1, bool isMaxRangeLimited = true)
       : TProperty(name)
       , m_range(Range(minValue, maxValue))
-      , m_isMaxRangeLimited(isMaxRangeLimited) {
+      , m_isMaxRangeLimited(isMaxRangeLimited)
+      , m_isLinearSlider(true) {
     setValue(Value(v0, v1));
   }
 
@@ -184,10 +190,14 @@ public:
   }
   void accept(Visitor &v) override { v.visit(this); };
 
+  void setNonLinearSlider() { m_isLinearSlider = false; }
+  bool isLinearSlider() { return m_isLinearSlider; }
+
 private:
   Range m_range;
   Value m_value;
   bool m_isMaxRangeLimited;
+  bool m_isLinearSlider;
 };
 
 //---------------------------------------------------------
@@ -201,7 +211,8 @@ public:
                    bool isMaxRangeLimited = true)
       : TProperty(name)
       , m_range(minValue, maxValue)
-      , m_isMaxRangeLimited(isMaxRangeLimited) {
+      , m_isMaxRangeLimited(isMaxRangeLimited)
+      , m_isLinearSlider(true) {
     setValue(Value(v0, v1));
   }
 
@@ -225,10 +236,14 @@ public:
   }
   void accept(Visitor &v) override { v.visit(this); };
 
+  void setNonLinearSlider() { m_isLinearSlider = false; }
+  bool isLinearSlider() { return m_isLinearSlider; }
+
 private:
   Range m_range;
   Value m_value;
   bool m_isMaxRangeLimited;
+  bool m_isLinearSlider;
 };
 
 //---------------------------------------------------------

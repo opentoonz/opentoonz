@@ -37,7 +37,11 @@ class DVAPI TXshZeraryFxColumn final : public TXshCellColumn {
   TZeraryColumnFx *m_zeraryColumnFx;
   TXshZeraryFxLevel *m_zeraryFxLevel;
 
+  bool m_iconVisible;
+
 public:
+  bool isIconVisible() { return m_iconVisible; }
+  void setIconVisible(bool visible) { m_iconVisible = visible; }
   /*!
 Constructs a TXshZeraryFxColumn with default value.
 */

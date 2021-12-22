@@ -48,6 +48,7 @@ public:
   void evaluate(const QString &cmd);
   void interrupt();
   bool isEvaluating() const;
+  bool wait(unsigned long time = ULONG_MAX);
 
   enum OutputType {
     SimpleText,

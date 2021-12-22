@@ -454,7 +454,7 @@ height = image->pixmap.ysize;
                     tfp, TIFFTAG_XPOSITION,
                     image->pixmap.h_pos / image->pixmap.y_dpi + 8.0);
   }
-  /*sprintf(str, "TOONZ %s", versione_del_software);*/
+  /*snprintf(str, sizeof(str), "TOONZ %s", versione_del_software);*/
   TIFFSetField(tfp, TIFFTAG_SOFTWARE, str);
 
   /* Aggiungo le informazioni relative alla savebox a all'history */

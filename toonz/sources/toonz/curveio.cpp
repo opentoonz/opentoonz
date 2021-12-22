@@ -75,8 +75,8 @@ public:
 class SaveCurvePopup final : public CurvePopup {
 public:
   SaveCurvePopup(const TFilePath folderPath, TDoubleParam *curve)
-      : CurvePopup(tr("Save Curve"), folderPath, curve) {
-    setOkText(tr("Save"));
+      : CurvePopup(QObject::tr("Save Curve"), folderPath, curve) {
+    setOkText(QObject::tr("Save"));
     setFilterType("curve");
   }
 
@@ -110,8 +110,8 @@ bool SaveCurvePopup::execute() {
 class LoadCurvePopup final : public CurvePopup {
 public:
   LoadCurvePopup(const TFilePath folderPath, TDoubleParam *curve)
-      : CurvePopup(tr("Load Curve"), folderPath, curve) {
-    setOkText(tr("Load"));
+      : CurvePopup(QObject::tr("Load Curve"), folderPath, curve) {
+    setOkText(QObject::tr("Load"));
     setFilterType("curve");
   }
 
@@ -154,8 +154,9 @@ class ExportCurvePopup final : public CurvePopup {
 public:
   ExportCurvePopup(const TFilePath folderPath, TDoubleParam *curve,
                    const std::string &name)
-      : CurvePopup(tr("Export Curve"), folderPath, curve), m_name(name) {
-    setOkText(tr("Export"));
+      : CurvePopup(QObject::tr("Export Curve"), folderPath, curve)
+      , m_name(name) {
+    setOkText(QObject::tr("Export"));
     setFilterType("dat");
   }
 

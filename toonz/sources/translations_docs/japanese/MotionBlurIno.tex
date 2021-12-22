@@ -1,0 +1,104 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[a4paper, total={180mm, 272mm}]{geometry}
+
+\usepackage{fontspec}
+\setmainfont[Path=fonts/, Extension=.ttf]{ipaexm}
+
+\setlength\parindent{3.5em}
+\setlength\parskip{0em}
+\renewcommand{\baselinestretch}{1.247}
+
+\begin{document}
+
+\thispagestyle{empty}
+
+\Large
+\noindent \\
+Motion Blur Ino\medskip
+\par
+\normalsize
+平行移動によるカメラシャッター風のぼかしを行ないます。\par
+オプション指定によりぶれ残像効果も可能です。\\
+\par
+初めに、(ON 指定ならば)Alpha チャンネルに対して処理し、次に、\par
+Alpha チャンネルがゼロでないピクセルの RGB を処理します。\\
+\par
+Alpha チャンネルに対して処理しない(OFF)指定をしたときは、\par
+RGB 画像の変化をマスクします。よって、滑らかなエッジは滑らか\par
+なままです。\\
+\\
+-{-}- \ 入力 \ -{-}-\\
+Source\par
+処理をする画像を接続します。\\
+\\
+-{-}- \ 設定 \ -{-}-\\
+Depend Move\par
+\noindent \ \ \, P1 -> P2\par
+以下の X1,Y1,X2,Y2により、\par
+固定した方向と大きさで移動を指定します。\\
+\par
+\noindent \ \ \, Motion\par
+Geometry の、X,Y からフレーム毎に移動を指定します。\par
+X1,Y1,X2,Y2の指定値は無視します。\\
+\\
+X1\\
+Y1\\
+X2\\
+Y2\par
+平行移動ぼかしの始点座標値と終点座標値を指定します。\par
+座標系は左下が原点です。\par
+単位はミリメートルです。\par
+小数点以下の指定により、微妙な長短の変化がつきます。\par
+始点と終点の距離が処理上1/16Pixel 以上ないと効果はでません。\par
+初期値は\par
+\noindent \hskip 7em X1 Y1 -> 0.0 0.0\par
+\noindent \hskip 7em X2 Y2 -> 1.0 1.0\par
+です。
+
+\newpage
+
+\thispagestyle{empty}
+
+\ \vspace{-0.2em}
+\par
+\noindent Scale\par
+平行移動ぼかしの長さに対してスケール調整をします。\par
+例えば、\par
+\noindent \hskip 7em X1 Y1 -> 0.0 0.0\par
+\noindent \hskip 7em X2 Y2 -> 1.0 -1.0\par
+\noindent \hskip 7em Scale -> 100\par
+は、\par
+\noindent \hskip 7em X1 Y1 -> 0.0 0.0\par
+\noindent \hskip 7em X2 Y2 -> 100.0 -100.0\par
+と同じ効果となります。\par
+ゼロを指定するとぼかしはかからなくなります。\par
+初期値は1でスケールはかかりません。\\
+\\
+Curve\par
+ぼかしの強さに対して調整をします。\par
+10.0以下、1より大きくすると、ぼかしが強くなり、\par
+0.1以上、1より小さくすると、ぼかしは薄くなります。\par
+初期値は1で等減衰です。\\
+\\
+Zanzo Length\par
+残像効果のずれ位置を指定します\par
+単位はミリメートルです。\par
+ゼロ以上の値で指定します。\par
+例えば、幅が3の線の残像を出したいときは、\par
+3以上の値を指定しないと残像はでません。\par
+初期値は0で残像はでません\\
+\\
+Zanzo Power\par
+残像をだすときの強さを決めます。\par
+最弱が0で、残像効果はかかりません。\par
+値が大きくなるほど、\par
+ぼかしは薄まり、残像効果が強くなります。\par
+初期値は1で最強です。ぼかしはかからず残像効果のみとなります。\\
+\\
+Alpha Rendering\par
+Alpha チャンネルがあるときのみ有効なスイッチです。\par
+OFF のときは、RGB 値の変化を Alpha 値でマスクします。\par
+ON で Alpha にも処理をします。マスクはしません。\par
+初期値は ON です。
+
+\end{document}

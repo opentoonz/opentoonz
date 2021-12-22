@@ -1,0 +1,21 @@
+<fxlayout>
+	<page name="Text Iwa">
+ 	<vbox>
+		<control>targetType</control>
+		<vbox modeSensitive="targetType" mode="1">
+			<control>columnIndex</control>
+		</vbox>
+		<vbox modeSensitive="targetType" mode="2">
+			<control>text</control>
+		</vbox>
+		<control>hAlign</control>
+		<control>center</control>
+		<control>width</control>
+		<control>height</control>
+		<control>font</control>
+		<control>textColor</control>
+		<control>boxColor</control>
+		<control>showBorder</control>
+  	</vbox>
+  	</page>
+</fxlayout>

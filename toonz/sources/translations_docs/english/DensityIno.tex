@@ -1,0 +1,48 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[a4paper, total={180mm, 272mm}]{geometry}
+
+\usepackage{fontspec}
+\setmainfont[Path=fonts/, Extension=.ttf]{ipaexm}
+
+\setlength\parindent{3.5em}
+\setlength\parskip{0em}
+\renewcommand{\baselinestretch}{1.247}
+
+\begin{document}
+
+\thispagestyle{empty}
+
+\Large
+\noindent \\
+Density Ino\medskip
+\par
+\normalsize
+Adjusts the density of a semi-transparent image.\par
+It allows to emphasize streamlined touch effects.\par
+The Alpha channel requires semi-transparent values.\\
+\\
+-{-}- \ Inputs \ -{-}-\\
+Source\par
+Connect the image to be processed.\\
+Reference\par
+Connect the reference image to assign the strength of the effect into each pixel.\\
+\\
+-{-}- \ Settings \ -{-}-\\
+Density\par
+Specifies the density.\par
+The density will change with the semi-transparent pixels of the image.\par
+Specify a value greater than or equal to 0. The maximum is 10.\par
+A value greater than 1, will make the image more opaque.\par
+While at 1 it will not change the original density of the image.\par
+When values are greater than 0 and smaller than 1, the image will be semi-transparent.\par
+If the value is 0, the image will disappear.\par
+The default value is 1.\\
+\\
+Reference\par
+Choose how the Reference image values are used to set the strength of the effect\par 
+into each pixel.\par
+Choose from Red/Green/Blue/Alpha/Luminance.\par
+Choose Nothing to disable the effect.\par
+The default value is Red.
+
+\end{document}

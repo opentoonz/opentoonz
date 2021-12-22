@@ -92,7 +92,7 @@ TLevelWriterGif::~TLevelWriterGif() {
   preIArgs << "-v";
   preIArgs << "warning";
   preIArgs << "-r";
-  preIArgs << QString::number(m_frameRate);
+  preIArgs << QString::number((m_frameRate < 1 ? 12.0 : m_frameRate));
   if (m_palette) {
     postIArgs << "-i";
     postIArgs << palette;
@@ -119,7 +119,7 @@ TLevelWriterGif::~TLevelWriterGif() {
 TImageWriterP TLevelWriterGif::getFrameWriter(TFrameId fid) {
   // if (IOError != 0)
   //	throw TImageException(m_path, buildGifExceptionString(IOError));
-  if (fid.getLetter() != 0) return TImageWriterP(0);
+  if (!fid.getLetter().isEmpty()) return TImageWriterP(0);
   int index            = fid.getNumber();
   TImageWriterGif *iwg = new TImageWriterGif(m_path, index, this);
   return TImageWriterP(iwg);
@@ -194,8 +194,6 @@ TLevelReaderGif::TLevelReaderGif(const TFilePath &path)
   m_lx                    = m_size.lx;
   m_ly                    = m_size.ly;
 
-  ffmpegReader->getFramesFromMovie();
-  m_frameCount = ffmpegReader->getGifFrameCount();
   // set values
   m_info                   = new TImageInfo();
   m_info->m_frameRate      = fps;
@@ -226,7 +224,7 @@ TLevelP TLevelReaderGif::loadInfo() {
 TImageReaderP TLevelReaderGif::getFrameReader(TFrameId fid) {
   // if (IOError != 0)
   //	throw TImageException(m_path, buildAVIExceptionString(IOError));
-  if (fid.getLetter() != 0) return TImageReaderP(0);
+  if (!fid.getLetter().isEmpty()) return TImageReaderP(0);
   int index            = fid.getNumber();
   TImageReaderGif *irm = new TImageReaderGif(m_path, index, this, m_info);
   return TImageReaderP(irm);
@@ -239,6 +237,10 @@ TDimension TLevelReaderGif::getSize() { return m_size; }
 //------------------------------------------------
 
 TImageP TLevelReaderGif::load(int frameIndex) {
+  if (!ffmpegFramesCreated) {
+    ffmpegReader->getFramesFromMovie();
+    ffmpegFramesCreated = true;
+  }
   return ffmpegReader->getImage(frameIndex);
 }
 

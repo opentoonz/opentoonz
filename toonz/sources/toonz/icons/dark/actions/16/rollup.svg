@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="16px" height="16px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g transform="matrix(1,0,0,1,-90,-190)">
+        <g id="rollup">
+            <g id="bg" transform="matrix(0.110345,0,0,0.121212,73.7797,171.091)">
+                <rect x="147" y="156" width="145" height="132" style="fill:rgb(135,135,135);fill-opacity:0;"/>
+            </g>
+            <path d="M101.999,198.5C101.999,196.35 101.998,194 101.998,194L103,194C103,194 102.999,196.35 102.999,198.5L102.999,199.5C102.999,202.536 100.535,205 97.499,205C94.463,205 91.999,202.536 91.999,199.5L91.999,198.5C91.999,198.224 92.223,198 92.499,198C92.775,198 92.999,198.224 92.999,198.5L92.999,199.5C92.999,201.984 95.015,204 97.499,204C99.983,204 101.999,201.984 101.999,199.5L101.999,198.5ZM102.5,190.818L105.682,194L99.318,194L102.5,190.818Z"/>
+        </g>
+    </g>
+</svg>

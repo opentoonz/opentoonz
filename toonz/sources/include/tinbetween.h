@@ -24,6 +24,15 @@ class DVAPI TInbetween {
   std::unique_ptr<Imp> m_imp;
 
 public:
+  enum TweenAlgorithm {
+    LinearInterpolation,
+    EaseInInterpolation,
+    EaseOutInterpolation,
+    EaseInOutInterpolation
+  };
+
+  static double interpolation(double t, enum TweenAlgorithm);
+
   TInbetween(const TVectorImageP firstImage, const TVectorImageP lastImage);
 
   virtual ~TInbetween();

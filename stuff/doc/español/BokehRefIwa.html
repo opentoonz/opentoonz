@@ -1,0 +1,93 @@
+<html lang="ja">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+      <title>Bokeh (Desenfoque) Ref Iwa</title>
+    </head>
+<body bgcolor="#f5f5f5" text="#220011">
+<h1><img src = ".\img\fx_iwa_bokeh_ref.png" width = 30 height = 30 >   Bokeh (Desenfoque) Ref Iwa</h1>
+
+<h4>● Descripción</h4>
+Este efecto reproduce el desenfoque de una lente de cámara, dividiendo la imagen de<br>
+entrada en varias capas, según el gradiente en la imagen de referencia de profundidad.<br>
+Los valores RVA de cada capa se convierten en valores de exposición, se desenfocan<br>
+con la forma del diafragma y se componen.<br>
+Para lograr una mayor velocidad, se utiliza la transformación de Fourier durante el<br>
+procesamiento del filtro. Antes de efectuar el desenfoque, se realiza un proceso de<br>
+extensión de las partes de cada capa que estarán ocultas en primer plano, usando un<br>
+filtro de tipo Mediana.
+
+<h4>● Entradas</h4>
+<UL>
+<LI><b>Iris (Diafragma)</b> : Permite conectar una imagen para definir la forma del diafragma<br>
+de la cámara. El valor de luminancia de la imagen de entrada se utilizará para el<br>
+efecto. Si no hubiera nada conectado al conector Iris, no se realizarán cálculos.<br>
+Es posible conectar imágenes RVAα de 8 bits o 16 bits.
+<LI><b>Source (Origen)</b> : Permite conectar la imagen a ser procesada. Si no hubiera ninguna<br>
+imagen conectada, el cálculo no se realizará.
+<LI><b>Depth (Profundidad)</b> : Permite conectar una imagen de referencia de profundidad.<br>
+El brillo de cada píxel determinará la profundidad. Cuanto más claro sea el valor, más<br>
+lejos estará de la cámara.
+</UL>
+
+<h4>● Opciones</h4>
+<UL>
+<LI><b>On-Focus Distance (Distancia de enfoque)</b> : Si hay una capa en esa posicion, se verá<br>
+enfocada y se compondrá normalmente. 0 representa la posición de la cámara.<br>
+(Rango 0.0-1.0)
+<LI><b>Bokeh Amount (Cantidad de desenfoque)</b> : Permite especificar el tamaño máximo del<br>
+desenfoque (en mm). Cuando la posición de enfoque y la de la capa estén a una distancia<br>
+de 1.0 entre sí, la imagen del diafragma se ampliará hasta que el ancho de la misma<br>
+alcance este valor.
+<LI><b>Hardness (Dureza)</b> : Valor del gama de la película. Se utiliza para convertir entre valor<br>
+RVA y la exposición. Esto es equivalente al aumento en el valor RVA (0.0 a 1.0) cuando la<br>
+exposición aumenta 10 veces. Cuanto más bajo sea el valor, más se enfatizarán los destellos.<br>
+(Rango 0.05-3.0)
+<LI><b>Distance Precision (Precisión de la distancia)</b> : La cantidad de divisiones de la imagen de<br>
+referencia de profundidad. Cuanto mayor sea el valor, más fina será la gradación del tamaño<br>
+del desenfoque, pero más lento será el procesamiento. (Rango 3-128)
+</UL>
+
+<h4>● A tener en cuenta</h4>
+<UL>
+<LI>Al procesar múltiples fotogramas, deberán existir fotogramas para las imágenes del diafragma<br>
+y de las capas, para todo el rango de fotogramas procesados.
+<LI>Este efecto hace un uso intensivo de memoria RAM.
+</UL>
+
+<h4>● Información de licencia</h4>
+<UL>
+<LI>Este efecto utiliza una biblioteca de código abierto llamada Kiss FFT para la transformación<br>
+de Fourier.<br>
+</UL>
+<font size = "-1">
+<blockquote>
+This is the BSD-style license for the KissFFT.<br>
+<br>
+Copyright (c) 2003-2010 Mark Borgerding<br>
+<br>
+All rights reserved.<br>
+<br>
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that<br>
+the following conditions are met:<br>
+<br>
+    * Redistributions of source code must retain the above copyright notice, this list of conditions and the following<br>
+disclaimer.<br>
+    * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the<br>
+following disclaimer in the documentation and/or other materials provided with the distribution.<br>
+    * Neither the author nor the names of any contributors may be used to endorse or promote products derived<br>
+from this software without specific prior written permission.<br>
+<br>
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY<br>
+EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES<br>
+OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT<br>
+SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,<br>
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT<br>
+OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)<br>
+HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,<br>
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS<br>
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+</blockquote>
+</font>
+</body>
+
+</html>

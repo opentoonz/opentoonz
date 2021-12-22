@@ -115,8 +115,11 @@ DVAPI void readDirectoryTree(TFilePathSet &fpset, const TFilePathSet &pathSet,
 DVAPI void readDirectory(TFilePathSet &groupFpSet, TFilePathSet &allFpSet,
                          const TFilePath &path);
 
-// return the file list which is readable and executable
+// return the folder path list which is readable and executable
 DVAPI void readDirectory_Dir_ReadExe(TFilePathSet &dst, const TFilePath &path);
+
+// return the folder item list which is readable and executable (only names)
+DVAPI void readDirectory_DirItems(QStringList &dst, const TFilePath &path);
 
 // creano un set nuovo
 DVAPI TFilePathSet readDirectory(const TFilePath &path, bool groupFrames = true,
@@ -198,7 +201,7 @@ DVAPI TINT64 getMemorySize(bool onlyPhisicalMemory);
 /*! return true if not enough memory. It can happen for 2 reasons:
       1) free phisical memory is close to 0;
       2) the calling process has allocated the maximum amount of memory  allowed
-   for a single process(tipically, for a 32 bits machine, 2GB)*/
+   for a single process(typically, for a 32 bits machine, 2GB)*/
 
 DVAPI bool memoryShortage();
 

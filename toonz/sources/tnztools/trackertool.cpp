@@ -112,6 +112,7 @@ hook->setAPos(fid, hook->getBPos(fid));
 }
     makeCurrent();
 return TDataP(); */
+    return (NULL);
   }
 
   TDataP pasteData(const TDataP &data) { return TDataP(); }
@@ -324,11 +325,8 @@ void TrackerTool::draw() {
       glPushMatrix();
       glTranslated(hook->getPos(fid).x, hook->getPos(fid).y, 0);
       glScaled(pixelSize, pixelSize, 1);
-      int objectId     = hook->getTrackerObjectId();
-      char *objectChar = (char *)malloc(2);
-      objectChar[0]    = (char)(objectId + 65);
-      objectChar[1]    = '\0';
-      std::string text(objectChar);
+      int objectId = hook->getTrackerObjectId();
+      std::string text({static_cast<char>('A' + objectId)});
       tglDrawText(TPointD(-15, 10), text);
       glPopMatrix();
     }

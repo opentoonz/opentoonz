@@ -31,11 +31,11 @@ const int MY_ERROR = -1;
 //-----------------------------------------------------------------------------
 
 // index must be between 0 and controlPointCount-1
-inline bool isIncluded(int index, int left, int rigth) {
-  if (left < rigth) {
-    return left <= index && index <= rigth;
+inline bool isIncluded(int index, int left, int right) {
+  if (left < right) {
+    return left <= index && index <= right;
   } else {
-    return left <= index || index <= rigth;
+    return left <= index || index <= right;
   }
 }
 
@@ -87,6 +87,11 @@ public:
   }
 
   void leftButtonDown(const TPointD &pos, const TMouseEvent &) override {
+    if (getViewer() && getViewer()->getGuidedStrokePickerMode()) {
+      getViewer()->doPickGuideStroke(pos);
+      return;
+    }
+
     if (m_active) return;
     assert(m_undo == 0);
     m_active = false;
@@ -505,7 +510,11 @@ Altrimenti non si fa altro che aumentarli i punti di controllo
 
   void onLeave() override { m_draw = false; }
 
-  int getCursorId() const override { return m_cursorId; }
+  int getCursorId() const override {
+    if (m_viewer && m_viewer->getGuidedStrokePickerMode())
+      return m_viewer->getGuidedStrokePickerCursor();
+    return m_cursorId;
+  }
   void onEnter() override {
     m_draw = true;
     if ((TVectorImageP)getImage(false))

@@ -389,7 +389,6 @@ inline bool getOutputOutlines(LinkedQuadraticList &inputBoundaries,
   // int count=0;
 
   while (!inputBoundaries.empty()) {
-    // outputOutlines.push_back(TFlash::Polyline());
     vector<TPointD> v;
     LinkedQuadraticList::iterator it = inputBoundaries.begin();
     // std::advance(it, count+1);

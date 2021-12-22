@@ -85,7 +85,7 @@ public:
   void pasteStylesColor();
   void pasteStylesName();
   void deleteStyles();
-  void eraseUnsedStyle();
+  void eraseUnusedStyle();
   void blendStyles();
   void toggleLink();
   void eraseToggleLink();

@@ -3,35 +3,16 @@
 ----------------------------------------------------------------------------- */
 
 #StyleEditor {
-  & QPushButton {
-    // Adds spacing to buttons, but this setting may be temporary
-    margin: 2 1;
-    padding: 0;
-  }
-  & #TabBarContainer {
-    margin-left: -4; // reset left edge margin
-  }
   & #bottomWidget {
     border-top: 1 solid @accent;
     padding: 3 2 8 3;
     & QPushButton {
-      // override above margin reset
       padding: 3 5;
     }
   }
 }
 
-#StyleEditorTabBar {
-  &::tab {
-    &:extend(.tab-flat all);
-    &::first {
-      // add a border to first item on
-      // the left side due to the spacer
-      // coded in the cpp file
-      border-left: 1 solid @accent;
-    }
-  }
-}
+//#StyleEditorTabBar {}
 
 #HexagonalColorWheel {
   qproperty-BGColor: @bg;
@@ -40,7 +21,6 @@
 /* -------------------------------------------------------------------------- */
 
 /* Horizontal QSlider */
-
 #colorSlider {
   &::groove:horizontal {
     height: 1;
@@ -59,7 +39,7 @@
   image-position: center center;
   min-height: 16;
   padding: 0;
-  min-width: 18;
+  min-width: 10;
   &:hover {
     &:extend(.button-tool:hover);
   }
@@ -83,10 +63,8 @@
   }
 }
 
-#colorSliderLabel, 
-#colorSliderField {
-  // Placeholder
-}
+//#colorSliderLabel, 
+//#colorSliderField {}
 
 /* -----------------------------------------------------------------------------
    Palette Viewer / Studio Palette
@@ -96,58 +74,68 @@ PaletteViewer {
   & DvScrollWidget {
     & QPushButton {
       border-top: 0;
-      margin-bottom: 1;
+      margin-bottom: 0;
       max-width: 15;
       min-width: 15;
     }
     & #ScrollLeftButton {
       border-radius: 0;
-      margin-bottom: 1;
+      margin-bottom: 0;
       max-width: 16;
       min-width: 16;
     }
     & #ScrollRightButton {
       border-radius: 0;
       margin-left: 1;
-      margin-bottom: 1;
+      margin-bottom: 0;
       max-width: 16;
       min-width: 16;
     }
   }
   & QToolBar {
-    background: none;
-    border-bottom: 1 solid @accent;
-    padding: 0;
-    margin: 0;
+    background: transparent;
     &::separator:horizontal {
-      margin: 0; // very compact space
-                 // so remove margin
+      margin: 0; // very compact space so we remove margin
     }
     & QToolButton {
-      &:extend(.button-flat all); // Use flat button style
-      margin: 0 0 1 0; // Forces extra height to QToolBar
-      padding: 1 0 2 0;
+      &:extend(.button-flat all); // use flat style for button
+      padding: 0;
+      padding-right: -2;
+      padding-left: -1;
+    }
+    & #keyFrameNavigator {
+      & #NextKey,
+      #PreviousKey,
+      #KeyNo,
+      #KeyPartial,
+      #KeyTotal {
+        // Adjust for pixel perfect alignment
+        max-width: 20px;
+        max-height: 20px;
+        padding: 1;
+        border: 0;
+        margin: 0;
+      }
     }
   }
 }
 
-#StudioPalette {
-  // placeholder
-}
-
-#PaletteTabBar {
-  &::tab {
-    &:extend(.tab-flat all);
-  }
-}
+// #StudioPalette {}
 
 #PageViewer {
   qproperty-TextColor: @text-color;
+  qproperty-SelectedBorderColor: @palette-SelectedBorderColor;
+  qproperty-NumpadShortcutBgColor: @palette-NumpadShortcutBgColor;
+  qproperty-NumpadShortcutBorderColor: @palette-NumpadShortcutBorderColor;
+
+  qproperty-SeparatorColor: @palette-SeparatorColor;
+  qproperty-CurrentCellColor: @palette-CurrentCellColor;
+  qproperty-SelectedCellColor: @palette-SelectedCellColor;
+  qproperty-ListNumpadShortcutBorderColor: @palette-ListNumpadShortcutBorderColor;
 }
 
 #PaletteLockButton {
   border-radius: 0;
-  margin: 0 0 1 1;
   &:checked {
     background-color: @toolbutton-lock-bg-color-checked;
     border-color: @toolbutton-lock-border-color-checked;
@@ -158,15 +146,17 @@ PaletteViewer {
   }
 }
 
+#PltPageViewerScrollArea {
+  border-bottom: 1px solid @accent;
+}
+
 /* -----------------------------------------------------------------------------
    Quick Renamer
 ----------------------------------------------------------------------------- */
 
 #WordButton {
   &:extend(.QPushButton all);
-  // remove horizontal padding
-  // otherwise moderate length text
-  // gets clipped
+  // remove horizontal padding otherwise moderate length text gets clipped
   padding-right: 0;
   padding-left: 0;
 }

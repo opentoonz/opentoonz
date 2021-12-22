@@ -66,6 +66,8 @@ public:
 
   void setSceneHandle(TSceneHandle *tsh) { m_sceneHandle = tsh; }
 
+  bool isEditable();
+
 public:
   // Commands
 
@@ -78,6 +80,8 @@ public:
   void removeEndpoints();
 
   void enableCommands() override;
+
+  void selectAll();
 
 private:
   TVectorImageP m_vi;          //!< Selected vector image.

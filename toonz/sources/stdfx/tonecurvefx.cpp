@@ -6,6 +6,7 @@
 #include "tparamset.h"
 #include "ttonecurveparam.h"
 #include "tcurves.h"
+#include "globalcontrollablefx.h"
 
 //===================================================================
 
@@ -33,6 +34,25 @@ int getLinearYfromX(TSegment t, int x, double &s0, double &s1) {
     return getLinearYfromX(t, x, s, s1);
 }
 
+void truncateSpeeds(double aFrame, double bFrame, TPointD &aSpeedTrunc,
+                    TPointD &bSpeedTrunc) {
+  double deltaX = bFrame - aFrame;
+  if (aSpeedTrunc.x < 0) aSpeedTrunc.x = 0;
+  if (bSpeedTrunc.x > 0) bSpeedTrunc.x = 0;
+
+  if (aFrame + aSpeedTrunc.x > bFrame) {
+    if (aSpeedTrunc.x != 0) {
+      aSpeedTrunc = aSpeedTrunc * (deltaX / aSpeedTrunc.x);
+    }
+  }
+
+  if (bFrame + bSpeedTrunc.x < aFrame) {
+    if (bSpeedTrunc.x != 0) {
+      bSpeedTrunc = -bSpeedTrunc * (deltaX / bSpeedTrunc.x);
+    }
+  }
+}
+
 template <typename PIXEL, typename T>
 void fill_lut(QList<TPointD> points, std::vector<T> &lut, bool isLinear) {
   int i;
@@ -45,19 +65,23 @@ void fill_lut(QList<TPointD> points, std::vector<T> &lut, bool isLinear) {
     TPointD p2 = points.at(++i);
     TPointD p3 = points.at(++i);
     if (!isLinear) {
+      // truncate speed
+      TPointD aSpeed(p1 - p0);
+      TPointD bSpeed(p2 - p3);
+      truncateSpeeds(p0.x, p3.x, aSpeed, bSpeed);
       cubic.setP0(p0);
-      cubic.setP1(p1);
-      cubic.setP2(p2);
+      cubic.setP1(p0 + aSpeed);
+      cubic.setP2(p3 + bSpeed);
       cubic.setP3(p3);
       int x = (int)p0.x;
       while (x < 0) x++;
       while (x < p3.x && x < PIXEL::maxChannelValue + 1) {
         double s1 = 1.0;
         int y     = getCubicYfromX(cubic, x, s0, s1);
-        if (y > PIXEL::maxChannelValue + 1)
+        if (y > PIXEL::maxChannelValue)
           y = PIXEL::maxChannelValue;
         else if (y < 0)
-          y    = 0;
+          y = 0;
         lut[x] = y;
         x++;
       }
@@ -69,10 +93,10 @@ void fill_lut(QList<TPointD> points, std::vector<T> &lut, bool isLinear) {
       while (x < p3.x && x < PIXEL::maxChannelValue + 1) {
         double s1 = 1.0;
         int y     = getLinearYfromX(segment, x, s0, s1);
-        if (y > PIXEL::maxChannelValue + 1)
+        if (y > PIXEL::maxChannelValue)
           y = PIXEL::maxChannelValue;
         else if (y < 0)
-          y    = 0;
+          y = 0;
         lut[x] = y;
         x++;
       }
@@ -85,7 +109,7 @@ void fill_lut(QList<TPointD> points, std::vector<T> &lut, bool isLinear) {
 
 //===================================================================
 
-class ToneCurveFx final : public TStandardRasterFx {
+class ToneCurveFx final : public GlobalControllableFx {
   FX_PLUGIN_DECLARATION(ToneCurveFx)
 
   TRasterFxPort m_input;
@@ -138,7 +162,7 @@ QList<TPointD> getParamSetPoints(const TParamSet *paramSet, int frame) {
   }
   return points;
 }
-}
+}  // namespace
 
 //-------------------------------------------------------------------
 

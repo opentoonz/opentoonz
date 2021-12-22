@@ -61,7 +61,7 @@ class TTileSaverFullColor;
 
 //=============================================================================
 
-// returns true if the savebox is changed 9tipically, if you fill the bg)
+// returns true if the savebox is changed typically, if you fill the bg)
 DVAPI bool fill(const TRasterCM32P &r, const FillParameters &params,
                 TTileSaverCM32 *saver = 0);
 
@@ -80,6 +80,9 @@ void DVAPI rectFillInk(const TRasterCM32P &ras, const TRect &r, int color);
 
 void DVAPI fillautoInks(TRasterCM32P &r, TRect &rect,
                         const TRasterCM32P &rbefore, TPalette *plt);
+
+void DVAPI fullColorFill(const TRaster32P &ras, const FillParameters &params,
+                         TTileSaverFullColor *saver = 0);
 
 //=============================================================================
 //! The class AreaFiller allows to fill a raster area, delimited by rect or
@@ -106,7 +109,7 @@ Fill \b rect in raster with \b color.
 else if \b fillInks is false fill only paint delimited by ink;
 else fill ink and paint in rect.
 */
-  void rectFill(const TRect &rect, int color, bool onlyUnfilled,
+  bool rectFill(const TRect &rect, int color, bool onlyUnfilled,
                 bool fillPaints, bool fillInks);
 
   /*!

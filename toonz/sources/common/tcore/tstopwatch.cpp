@@ -8,11 +8,7 @@
 #include <stdlib.h>
 #else  //_WIN32
 
-#if defined(__APPLE_CC__)
 #include <unistd.h>
-#else
-#include <sys/unistd.h>
-#endif
 #include <limits.h>
 #include <sys/times.h>
 #include <sys/types.h>

@@ -73,6 +73,7 @@ public:
       m_drawRegions,        //!< Inks only mode.
       m_tcheckEnabled,      //!< Transparency check mode.
       m_inkCheckEnabled,    //!< Ink check mode.
+      m_ink1CheckEnabled,   //!< Ink #1 check mode.
       m_paintCheckEnabled,  //!< Paint check mode.
       m_blackBgEnabled,     //!< Black background mode.
       m_isIcon,             //!< Whether image rendering is for an icon.
@@ -108,6 +109,7 @@ public:
       , m_drawRegions(true)      // Paint regions painted
       , m_tcheckEnabled(false)   // No checks
       , m_inkCheckEnabled(false)
+      , m_ink1CheckEnabled(false)
       , m_paintCheckEnabled(false)
       , m_blackBgEnabled(false)
       , m_isIcon(false)    // Not an icon by default
@@ -140,6 +142,7 @@ public:
       , m_drawRegions(true)      // Paint regions painted
       , m_tcheckEnabled(false)   // No checks
       , m_inkCheckEnabled(false)
+      , m_ink1CheckEnabled(false)
       , m_paintCheckEnabled(false)
       , m_blackBgEnabled(false)
       , m_isIcon(false)             // Not an icon by default
@@ -169,6 +172,7 @@ public:
       , m_drawRegions(other.m_drawRegions)
       , m_tcheckEnabled(other.m_tcheckEnabled)
       , m_inkCheckEnabled(other.m_inkCheckEnabled)
+      , m_ink1CheckEnabled(other.m_ink1CheckEnabled)
       , m_paintCheckEnabled(other.m_paintCheckEnabled)
       , m_blackBgEnabled(other.m_blackBgEnabled)
       , m_isIcon(other.m_isIcon)
@@ -200,6 +204,7 @@ public:
       , m_drawRegions(true)
       , m_tcheckEnabled(false)
       , m_inkCheckEnabled(false)
+      , m_ink1CheckEnabled(false)
       , m_paintCheckEnabled(false)
       , m_blackBgEnabled(false)
       , m_isIcon(false)

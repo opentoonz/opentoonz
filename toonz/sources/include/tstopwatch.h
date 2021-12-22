@@ -86,7 +86,7 @@ public:
 
   /*!Returns the number of milliseconds that have elapsed in all the
 start()-stop() intervals since
-the stopWatch was resetted up to the getTotalTime() call. The method can be
+the stopWatch was reset up to the getTotalTime() call. The method can be
 called during a start()-stop() interval */
   TUINT32 getTotalTime();
 

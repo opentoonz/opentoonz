@@ -200,12 +200,11 @@ double overlay_ch_(const double dn, const double dn_a, const double up,
       dn, dn_a, up, up_a, up_opacity);
 }
 double soft_light_(const double dn, const double up) {
-  return (
-      (up < 0.5)
-          ? (dn + (dn - dn * dn) * (2 * up - 1))
-          : ((dn < 0.25)
-                 ? (dn + (2 * up - 1) * (((16 * dn - 12) * dn + 4) * dn - dn))
-                 : (dn + (2 * up - 1) * (sqrt(dn) - dn))));
+  return ((up < 0.5)
+              ? (dn + (dn - dn * dn) * (2 * up - 1))
+              : ((dn < 0.25) ? (dn + (2 * up - 1) *
+                                         (((16 * dn - 12) * dn + 4) * dn - dn))
+                             : (dn + (2 * up - 1) * (sqrt(dn) - dn))));
 }
 double soft_light_ch_(const double dn, const double dn_a, const double up,
                       const double up_a, const double up_opacity) {
@@ -268,12 +267,12 @@ R,G,Bそれぞれの値に、重み付けをして3で割り、
   return (0.298912 * dn_r + 0.586611 * dn_g + 0.114478 * dn_b) <
          (0.298912 * up_r + 0.586611 * up_g + 0.114478 * up_b);
 }
-}
+}  // namespace
 //--------------------------------------------------------------------
 // 01
 void igs::color::over(double &dn_r, double &dn_g, double &dn_b, double &dn_a,
                       const double up_r, double up_g, double up_b, double up_a,
-                      const double up_opacity) {
+                      const double up_opacity, const bool do_clamp) {
   if (up_a <= 0) {
     return;
   }                /* upが透明のときはdown値を表示 */
@@ -288,12 +287,16 @@ void igs::color::over(double &dn_r, double &dn_g, double &dn_b, double &dn_a,
   dn_b = up_add_dn_ch_(dn_b, up_b, up_a, up_opacity);
   dn_a = up_add_dn_ch_(dn_a, up_a, up_a, up_opacity);
 
-  clamp_rgba_(dn_r, dn_g, dn_b, dn_a); /* 0と1で範囲制限 */
+  if (do_clamp)
+    clamp_rgba_(dn_r, dn_g, dn_b, dn_a); /* 0と1で範囲制限 */
+  else
+    dn_a = clamp_ch_(dn_a);
 }
 // 02
 void igs::color::darken(double &dn_r, double &dn_g, double &dn_b, double &dn_a,
                         const double up_r, double up_g, double up_b,
-                        double up_a, const double up_opacity) {
+                        double up_a, const double up_opacity,
+                        const bool do_clamp) {
   if (up_a <= 0) {
     return;
   }                /* upが透明のときはdown値を表示 */
@@ -308,12 +311,16 @@ void igs::color::darken(double &dn_r, double &dn_g, double &dn_b, double &dn_a,
   dn_b = darken_ch_(dn_b, dn_a, up_b, up_a, up_opacity);
   dn_a = up_add_dn_ch_(dn_a, up_a, up_a, up_opacity);
 
-  clamp_rgba_(dn_r, dn_g, dn_b, dn_a); /* 0と1で範囲制限 */
+  if (do_clamp)
+    clamp_rgba_(dn_r, dn_g, dn_b, dn_a); /* 0と1で範囲制限 */
+  else
+    dn_a = clamp_ch_(dn_a);
 }
 // 03
 void igs::color::multiply(double &dn_r, double &dn_g, double &dn_b,
                           double &dn_a, const double up_r, double up_g,
-                          double up_b, double up_a, const double up_opacity) {
+                          double up_b, double up_a, const double up_opacity,
+                          const bool do_clamp) {
   if (up_a <= 0) {
     return;
   }                /* upが透明のときはdown値を表示 */
@@ -333,13 +340,17 @@ void igs::color::multiply(double &dn_r, double &dn_g, double &dn_b,
   dn_b = multiply_ch_(dn_b, dn_a, up_b, up_a, up_opacity);
   dn_a = up_add_dn_ch_(dn_a, up_a, up_a, up_opacity);
 
-  clamp_rgba_(dn_r, dn_g, dn_b, dn_a); /* 0と1で範囲制限 */
+  if (do_clamp)
+    clamp_rgba_(dn_r, dn_g, dn_b, dn_a); /* 0と1で範囲制限 */
+  else
+    dn_a = clamp_ch_(dn_a);
 }
 // 04
 void igs::color::color_burn(/* 焼き込みカラー */
                             double &dn_r, double &dn_g, double &dn_b,
                             double &dn_a, const double up_r, double up_g,
-                            double up_b, double up_a, const double up_opacity) {
+                            double up_b, double up_a, const double up_opacity,
+                            const bool do_clamp) {
   if (up_a <= 0) {
     return;
   }                /* upが透明のときはdown値を表示 */
@@ -354,14 +365,17 @@ void igs::color::color_burn(/* 焼き込みカラー */
   dn_b = color_burn_ch_(dn_b, dn_a, up_b, up_a, up_opacity);
   dn_a = up_add_dn_ch_(dn_a, up_a, up_a, up_opacity);
 
-  clamp_rgba_(dn_r, dn_g, dn_b, dn_a); /* 0と1で範囲制限 */
+  if (do_clamp)
+    clamp_rgba_(dn_r, dn_g, dn_b, dn_a); /* 0と1で範囲制限 */
+  else
+    dn_a = clamp_ch_(dn_a);
 }
 // 05
 void igs::color::linear_burn(/* 焼き込みリニア */
                              double &dn_r, double &dn_g, double &dn_b,
                              double &dn_a, const double up_r, double up_g,
-                             double up_b, double up_a,
-                             const double up_opacity) {
+                             double up_b, double up_a, const double up_opacity,
+                             const bool do_clamp) {
   if (up_a <= 0) {
     return;
   }                /* upが透明のときはdown値を表示 */
@@ -376,13 +390,16 @@ void igs::color::linear_burn(/* 焼き込みリニア */
   dn_b = linear_burn_ch_(dn_b, dn_a, up_b, up_a, up_opacity);
   dn_a = up_add_dn_ch_(dn_a, up_a, up_a, up_opacity);
 
-  clamp_rgba_(dn_r, dn_g, dn_b, dn_a); /* 0と1で範囲制限 */
+  if (do_clamp)
+    clamp_rgba_(dn_r, dn_g, dn_b, dn_a); /* 0と1で範囲制限 */
+  else
+    dn_a = clamp_ch_(dn_a);
 }
 // 06
 void igs::color::darker_color(double &dn_r, double &dn_g, double &dn_b,
                               double &dn_a, const double up_r, double up_g,
-                              double up_b, double up_a,
-                              const double up_opacity) {
+                              double up_b, double up_a, const double up_opacity,
+                              const bool do_clamp) {
   if (up_a <= 0) {
     return;
   }                /* upが透明のときはdown値を表示 */
@@ -399,12 +416,16 @@ void igs::color::darker_color(double &dn_r, double &dn_g, double &dn_b,
   dn_b = darker_color_ch_(dn_b, dn_a, up_b, up_a, up_opacity, up_lt_sw);
   dn_a = up_add_dn_ch_(dn_a, up_a, up_a, up_opacity);
 
-  clamp_rgba_(dn_r, dn_g, dn_b, dn_a); /* 0と1で範囲制限 */
+  if (do_clamp)
+    clamp_rgba_(dn_r, dn_g, dn_b, dn_a); /* 0と1で範囲制限 */
+  else
+    dn_a = clamp_ch_(dn_a);
 }
 // 07
 void igs::color::lighten(double &dn_r, double &dn_g, double &dn_b, double &dn_a,
                          const double up_r, double up_g, double up_b,
-                         double up_a, const double up_opacity) {
+                         double up_a, const double up_opacity,
+                         const bool do_clamp) {
   if (up_a <= 0) {
     return;
   }                /* upが透明のときはdown値を表示 */
@@ -419,12 +440,16 @@ void igs::color::lighten(double &dn_r, double &dn_g, double &dn_b, double &dn_a,
   dn_b = lighten_ch_(dn_b, dn_a, up_b, up_a, up_opacity);
   dn_a = up_add_dn_ch_(dn_a, up_a, up_a, up_opacity);
 
-  clamp_rgba_(dn_r, dn_g, dn_b, dn_a); /* 0と1で範囲制限 */
+  if (do_clamp)
+    clamp_rgba_(dn_r, dn_g, dn_b, dn_a); /* 0と1で範囲制限 */
+  else
+    dn_a = clamp_ch_(dn_a);
 }
 // 08
 void igs::color::screen(double &dn_r, double &dn_g, double &dn_b, double &dn_a,
                         const double up_r, double up_g, double up_b,
-                        double up_a, const double up_opacity) {
+                        double up_a, const double up_opacity,
+                        const bool do_clamp) {
   if (up_a <= 0) {
     return;
   }                /* upが透明のときはdown値を表示 */
@@ -439,14 +464,17 @@ void igs::color::screen(double &dn_r, double &dn_g, double &dn_b, double &dn_a,
   dn_b = screen_(dn_b, up_b * up_opacity);
   dn_a = up_add_dn_ch_(dn_a, up_a, up_a, up_opacity);
 
-  clamp_rgba_(dn_r, dn_g, dn_b, dn_a); /* 0と1で範囲制限 */
+  if (do_clamp)
+    clamp_rgba_(dn_r, dn_g, dn_b, dn_a); /* 0と1で範囲制限 */
+  else
+    dn_a = clamp_ch_(dn_a);
 }
 // 09
 void igs::color::color_dodge(/* 覆い焼きカラー */
                              double &dn_r, double &dn_g, double &dn_b,
                              double &dn_a, const double up_r, double up_g,
-                             double up_b, double up_a,
-                             const double up_opacity) {
+                             double up_b, double up_a, const double up_opacity,
+                             const bool do_clamp) {
   if (up_a <= 0) {
     return;
   }                /* upが透明のときはdown値を表示 */
@@ -461,14 +489,17 @@ void igs::color::color_dodge(/* 覆い焼きカラー */
   dn_b = color_dodge_ch_(dn_b, dn_a, up_b, up_a, up_opacity);
   dn_a = up_add_dn_ch_(dn_a, up_a, up_a, up_opacity);
 
-  clamp_rgba_(dn_r, dn_g, dn_b, dn_a); /* 0と1で範囲制限 */
+  if (do_clamp)
+    clamp_rgba_(dn_r, dn_g, dn_b, dn_a); /* 0と1で範囲制限 */
+  else
+    dn_a = clamp_ch_(dn_a);
 }
 // 10
 void igs::color::linear_dodge(/* 覆い焼きリニア(単純加算ではない) */
                               double &dn_r, double &dn_g, double &dn_b,
                               double &dn_a, const double up_r, double up_g,
-                              double up_b, double up_a,
-                              const double up_opacity) {
+                              double up_b, double up_a, const double up_opacity,
+                              const bool do_clamp) {
   if (up_a <= 0) {
     return;
   }                /* upが透明のときはdown値を表示 */
@@ -483,13 +514,16 @@ void igs::color::linear_dodge(/* 覆い焼きリニア(単純加算ではない)
   dn_b = linear_dodge_ch_(dn_b, dn_a, up_b, up_a, up_opacity);
   dn_a = up_add_dn_ch_(dn_a, up_a, up_a, up_opacity);
 
-  clamp_rgba_(dn_r, dn_g, dn_b, dn_a); /* 0と1で範囲制限 */
+  if (do_clamp)
+    clamp_rgba_(dn_r, dn_g, dn_b, dn_a); /* 0と1で範囲制限 */
+  else
+    dn_a = clamp_ch_(dn_a);
 }
 // 11
 void igs::color::lighter_color(double &dn_r, double &dn_g, double &dn_b,
                                double &dn_a, const double up_r, double up_g,
                                double up_b, double up_a,
-                               const double up_opacity) {
+                               const double up_opacity, const bool do_clamp) {
   if (up_a <= 0) {
     return;
   }                /* upが透明のときはdown値を表示 */
@@ -506,12 +540,16 @@ void igs::color::lighter_color(double &dn_r, double &dn_g, double &dn_b,
   dn_b = lighter_color_ch_(dn_b, dn_a, up_b, up_a, up_opacity, up_lt_sw);
   dn_a = up_add_dn_ch_(dn_a, up_a, up_a, up_opacity);
 
-  clamp_rgba_(dn_r, dn_g, dn_b, dn_a); /* 0と1で範囲制限 */
+  if (do_clamp)
+    clamp_rgba_(dn_r, dn_g, dn_b, dn_a); /* 0と1で範囲制限 */
+  else
+    dn_a = clamp_ch_(dn_a);
 }
 // 12
 void igs::color::overlay(double &dn_r, double &dn_g, double &dn_b, double &dn_a,
                          const double up_r, double up_g, double up_b,
-                         double up_a, const double up_opacity) {
+                         double up_a, const double up_opacity,
+                         const bool do_clamp) {
   if (up_a <= 0) {
     return;
   }                /* upが透明のときはdown値を表示 */
@@ -526,12 +564,16 @@ void igs::color::overlay(double &dn_r, double &dn_g, double &dn_b, double &dn_a,
   dn_b = overlay_ch_(dn_b, dn_a, up_b, up_a, up_opacity);
   dn_a = up_add_dn_ch_(dn_a, up_a, up_a, up_opacity);
 
-  clamp_rgba_(dn_r, dn_g, dn_b, dn_a); /* 0と1で範囲制限 */
+  if (do_clamp)
+    clamp_rgba_(dn_r, dn_g, dn_b, dn_a); /* 0と1で範囲制限 */
+  else
+    dn_a = clamp_ch_(dn_a);
 }
 // 13
 void igs::color::soft_light(double &dn_r, double &dn_g, double &dn_b,
                             double &dn_a, const double up_r, double up_g,
-                            double up_b, double up_a, const double up_opacity) {
+                            double up_b, double up_a, const double up_opacity,
+                            const bool do_clamp) {
   if (up_a <= 0) {
     return;
   }                /* upが透明のときはdown値を表示 */
@@ -546,12 +588,16 @@ void igs::color::soft_light(double &dn_r, double &dn_g, double &dn_b,
   dn_b = soft_light_ch_(dn_b, dn_a, up_b, up_a, up_opacity);
   dn_a = up_add_dn_ch_(dn_a, up_a, up_a, up_opacity);
 
-  clamp_rgba_(dn_r, dn_g, dn_b, dn_a); /* 0と1で範囲制限 */
+  if (do_clamp)
+    clamp_rgba_(dn_r, dn_g, dn_b, dn_a); /* 0と1で範囲制限 */
+  else
+    dn_a = clamp_ch_(dn_a);
 }
 // 14
 void igs::color::hard_light(double &dn_r, double &dn_g, double &dn_b,
                             double &dn_a, const double up_r, double up_g,
-                            double up_b, double up_a, const double up_opacity) {
+                            double up_b, double up_a, const double up_opacity,
+                            const bool do_clamp) {
   if (up_a <= 0) {
     return;
   }                /* upが透明のときはdown値を表示 */
@@ -566,13 +612,16 @@ void igs::color::hard_light(double &dn_r, double &dn_g, double &dn_b,
   dn_b = hard_light_ch_(dn_b, dn_a, up_b, up_a, up_opacity);
   dn_a = up_add_dn_ch_(dn_a, up_a, up_a, up_opacity);
 
-  clamp_rgba_(dn_r, dn_g, dn_b, dn_a); /* 0と1で範囲制限 */
+  if (do_clamp)
+    clamp_rgba_(dn_r, dn_g, dn_b, dn_a); /* 0と1で範囲制限 */
+  else
+    dn_a = clamp_ch_(dn_a);
 }
 // 15
 void igs::color::vivid_light(double &dn_r, double &dn_g, double &dn_b,
                              double &dn_a, const double up_r, double up_g,
-                             double up_b, double up_a,
-                             const double up_opacity) {
+                             double up_b, double up_a, const double up_opacity,
+                             const bool do_clamp) {
   if (up_a <= 0) {
     return;
   }                /* upが透明のときはdown値を表示 */
@@ -587,13 +636,16 @@ void igs::color::vivid_light(double &dn_r, double &dn_g, double &dn_b,
   dn_b = vivid_light_ch_(dn_b, dn_a, up_b, up_a, up_opacity);
   dn_a = up_add_dn_ch_(dn_a, up_a, up_a, up_opacity);
 
-  clamp_rgba_(dn_r, dn_g, dn_b, dn_a); /* 0と1で範囲制限 */
+  if (do_clamp)
+    clamp_rgba_(dn_r, dn_g, dn_b, dn_a); /* 0と1で範囲制限 */
+  else
+    dn_a = clamp_ch_(dn_a);
 }
 // 16
 void igs::color::linear_light(double &dn_r, double &dn_g, double &dn_b,
                               double &dn_a, const double up_r, double up_g,
-                              double up_b, double up_a,
-                              const double up_opacity) {
+                              double up_b, double up_a, const double up_opacity,
+                              const bool do_clamp) {
   if (up_a <= 0) {
     return;
   }                /* upが透明のときはdown値を表示 */
@@ -608,12 +660,16 @@ void igs::color::linear_light(double &dn_r, double &dn_g, double &dn_b,
   dn_b = linear_light_ch_(dn_b, dn_a, up_b, up_a, up_opacity);
   dn_a = up_add_dn_ch_(dn_a, up_a, up_a, up_opacity);
 
-  clamp_rgba_(dn_r, dn_g, dn_b, dn_a); /* 0と1で範囲制限 */
+  if (do_clamp)
+    clamp_rgba_(dn_r, dn_g, dn_b, dn_a); /* 0と1で範囲制限 */
+  else
+    dn_a = clamp_ch_(dn_a);
 }
 // 17
 void igs::color::pin_light(double &dn_r, double &dn_g, double &dn_b,
                            double &dn_a, const double up_r, double up_g,
-                           double up_b, double up_a, const double up_opacity) {
+                           double up_b, double up_a, const double up_opacity,
+                           const bool do_clamp) {
   if (up_a <= 0) {
     return;
   }                /* upが透明のときはdown値を表示 */
@@ -628,12 +684,16 @@ void igs::color::pin_light(double &dn_r, double &dn_g, double &dn_b,
   dn_b = pin_light_ch_(dn_b, dn_a, up_b, up_a, up_opacity);
   dn_a = up_add_dn_ch_(dn_a, up_a, up_a, up_opacity);
 
-  clamp_rgba_(dn_r, dn_g, dn_b, dn_a); /* 0と1で範囲制限 */
+  if (do_clamp)
+    clamp_rgba_(dn_r, dn_g, dn_b, dn_a); /* 0と1で範囲制限 */
+  else
+    dn_a = clamp_ch_(dn_a);
 }
 // 18
 void igs::color::hard_mix(double &dn_r, double &dn_g, double &dn_b,
                           double &dn_a, const double up_r, double up_g,
-                          double up_b, double up_a, const double up_opacity) {
+                          double up_b, double up_a, const double up_opacity,
+                          const bool do_clamp) {
   if (up_a <= 0) {
     return;
   }                /* upが透明のときはdown値を表示 */
@@ -648,7 +708,10 @@ void igs::color::hard_mix(double &dn_r, double &dn_g, double &dn_b,
   dn_b = hard_mix_ch_(dn_b, dn_a, up_b, up_a, up_opacity);
   dn_a = up_add_dn_ch_(dn_a, up_a, up_a, up_opacity);
 
-  clamp_rgba_(dn_r, dn_g, dn_b, dn_a); /* 0と1で範囲制限 */
+  if (do_clamp)
+    clamp_rgba_(dn_r, dn_g, dn_b, dn_a); /* 0と1で範囲制限 */
+  else
+    dn_a = clamp_ch_(dn_a);
 }
 //------------------------------------------------------------------------
 namespace {
@@ -656,12 +719,12 @@ double cross_dissolve_ch_(const double dn, const double up,
                           const double up_opacity) {
   return dn * (1.0 - up_opacity) + up * up_opacity;
 }
-}
+}  // namespace
 // 19
 void igs::color::cross_dissolve(double &dn_r, double &dn_g, double &dn_b,
                                 double &dn_a, const double up_r, double up_g,
                                 double up_b, double up_a,
-                                const double up_opacity) {
+                                const double up_opacity, const bool do_clamp) {
   if ((up_a <= 0) && (dn_a <= 0)) {
     return;
   } /* up/dnとも透明ならdn値を表示 */
@@ -672,13 +735,16 @@ void igs::color::cross_dissolve(double &dn_r, double &dn_g, double &dn_b,
   dn_b = cross_dissolve_ch_(dn_b, up_b, up_opacity);
   dn_a = cross_dissolve_ch_(dn_a, up_a, up_opacity);
 
-  clamp_rgba_(dn_r, dn_g, dn_b, dn_a); /* 0と1で範囲制限 */
+  if (do_clamp)
+    clamp_rgba_(dn_r, dn_g, dn_b, dn_a); /* 0と1で範囲制限 */
+  else
+    dn_a = clamp_ch_(dn_a);
 }
 // 20
 void igs::color::subtract(double &dn_r, double &dn_g, double &dn_b,
                           double &dn_a, const double up_r, double up_g,
                           double up_b, double up_a, const double up_opacity,
-                          const bool alpha_rendering_sw) {
+                          const bool alpha_rendering_sw, const bool do_clamp) {
   if (up_a <= 0) {
     return;
   }                /* upが透明のときはdown値を表示 */
@@ -696,13 +762,16 @@ void igs::color::subtract(double &dn_r, double &dn_g, double &dn_b,
     dn_a -= up_a * up_opacity;
   }
 
-  clamp_rgba_(dn_r, dn_g, dn_b, dn_a); /* 0と1で範囲制限 */
+  if (do_clamp)
+    clamp_rgba_(dn_r, dn_g, dn_b, dn_a); /* 0と1で範囲制限 */
+  else
+    dn_a = clamp_ch_(dn_a);
 }
 // 21
 void igs::color::add(/* 覆い焼きリニア */
                      double &dn_r, double &dn_g, double &dn_b, double &dn_a,
                      const double up_r, double up_g, double up_b, double up_a,
-                     const double up_opacity) {
+                     const double up_opacity, const bool do_clamp) {
   if (up_a <= 0) {
     return;
   }                /* upが透明のときはdown値を表示 */
@@ -718,12 +787,16 @@ void igs::color::add(/* 覆い焼きリニア */
   dn_b += up_b * up_opacity;
   dn_a += up_a * up_opacity;
 
-  clamp_rgba_(dn_r, dn_g, dn_b, dn_a); /* 0と1で範囲制限 */
+  if (do_clamp)
+    clamp_rgba_(dn_r, dn_g, dn_b, dn_a); /* 0と1で範囲制限 */
+  else
+    dn_a = clamp_ch_(dn_a);
 }
 // 22
 void igs::color::divide(double &dn_r, double &dn_g, double &dn_b, double &dn_a,
                         const double up_r, double up_g, double up_b,
-                        double up_a, const double up_opacity) {
+                        double up_a, const double up_opacity,
+                        const bool do_clamp) {
   if (up_a <= 0) {
     return;
   }                /* upが透明のときはdown値を表示 */
@@ -738,5 +811,8 @@ void igs::color::divide(double &dn_r, double &dn_g, double &dn_b, double &dn_a,
   dn_b = divide_ch_(dn_b, dn_a, up_b, up_a, up_opacity);
   dn_a = up_add_dn_ch_(dn_a, up_a, up_a, up_opacity);
 
-  clamp_rgba_(dn_r, dn_g, dn_b, dn_a); /* 0と1で範囲制限 */
+  if (do_clamp)
+    clamp_rgba_(dn_r, dn_g, dn_b, dn_a); /* 0と1で範囲制限 */
+  else
+    dn_a = clamp_ch_(dn_a);
 }

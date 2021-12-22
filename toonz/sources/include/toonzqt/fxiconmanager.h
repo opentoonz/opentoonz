@@ -8,6 +8,17 @@
 #define FXICONMANAGER_H
 
 #include "tcommon.h"
+#include <QPixmap>
+
+#undef DVAPI
+#undef DVVAR
+#ifdef TOONZQT_EXPORTS
+#define DVAPI DV_EXPORT_API
+#define DVVAR DV_EXPORT_VAR
+#else
+#define DVAPI DV_IMPORT_API
+#define DVVAR DV_IMPORT_VAR
+#endif
 
 class QPixmap;
 
@@ -136,13 +147,17 @@ const struct {
     {0, 0}};
 };
 
-class FxIconPixmapManager {  // singleton
 
-  std::map<std::string, QPixmap> m_pms;
-
-  FxIconPixmapManager();
+class DVAPI FxIconPixmapManager final : public QObject {  // singleton
+  Q_OBJECT
 
 public:
+  std::map<std::string, QPixmap> m_pms;
+
+public:
+  FxIconPixmapManager();
+  ~FxIconPixmapManager();
+
   static FxIconPixmapManager *instance();
 
   const QPixmap &getFxIconPm(std::string type);

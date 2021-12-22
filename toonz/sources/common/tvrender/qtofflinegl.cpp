@@ -153,7 +153,7 @@ void QtOfflineGL::createContext(TDimension rasterSize,
   fmt.setPlane(0);
   fmt.setDirectRendering(false);
 #endif
-#elif defined(LINUX)
+#elif defined(LINUX) || defined(FREEBSD)
   fmt = QGLFormat::defaultFormat();
   // printf("GL Version: %s\n",glGetString(GL_VERSION));
   fmt.setVersion(2, 1); /* XXX? */
@@ -178,7 +178,7 @@ void QtOfflineGL::createContext(TDimension rasterSize,
   m_fbo->bind();
 
   printf("create context:%p [thread:0x%x]\n", m_context.get(),
-         QThread::currentThreadId());
+         (unsigned int)(size_t)QThread::currentThreadId());
 
   // Creo il contesto OpenGL - assicurandomi che sia effettivamente creato
   // NOTA: Se il contesto non viene creato, di solito basta ritentare qualche
@@ -299,7 +299,7 @@ SPECIFICHE  MAC = depth_size 24, stencil_size 8, alpha_size 1
   fmt.setStencil(true);
   fmt.setAccum(false);
   fmt.setPlane(0);
-#elif defined(LINUX)
+#elif defined(LINUX) || defined(FREEBSD)
   fmt.setAlphaBufferSize(1);
   fmt.setAlpha(false);
   fmt.setRgba(true);

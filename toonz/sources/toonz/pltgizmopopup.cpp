@@ -166,7 +166,7 @@ public:
       tmpmatte = 0;
     else if (tmpmatte > 255)
       tmpmatte = 255;
-    color.m    = tmpmatte;
+    color.m = tmpmatte;
     return color;
   }
 };
@@ -186,7 +186,7 @@ public:
       tmpmatte = 0;
     else if (tmpmatte > 255)
       tmpmatte = 255;
-    color.m    = tmpmatte;
+    color.m = tmpmatte;
     return color;
   }
 };
@@ -361,6 +361,11 @@ void modifyColor(const T &modifier) {
   TPaletteHandle *paletteHandle =
       TApp::instance()->getPaletteController()->getCurrentLevelPalette();
   TPaletteP palette = paletteHandle->getPalette();
+  if (!palette) {
+    QMessageBox::warning(0, QObject::tr("Error"),
+                         QObject::tr("No Palette loaded."));
+    return;
+  }
   if (palette->isLocked()) {
     QMessageBox::warning(0, QObject::tr("Warning"),
                          QObject::tr("Palette is locked."));
@@ -372,11 +377,11 @@ void modifyColor(const T &modifier) {
   TUndo *undo;
   TStyleSelection *selection = dynamic_cast<TStyleSelection *>(
       TApp::instance()->getCurrentSelection()->getSelection());
-  if (selection) {
+  if (selection && !selection->isEmpty()) {
     undo = new GizmoUndo(*selection);
     getStyleIds(styleIds, *selection);
   }
-  /*-- StyleSelectionが有効でない場合はカレントStyleを用いる --*/
+  // modify the current style if the style selection is not active or is empty
   else {
     TStyleSelection tmpSelection;
     tmpSelection.setPaletteHandle(paletteHandle);

@@ -16,7 +16,7 @@
 #define DVVAR DV_IMPORT_VAR
 #endif
 
-class QString;
+#include <QString>
 
 //-----------------------------------------------------------------------------
 /*
@@ -28,8 +28,8 @@ class QString;
 //! figures and, in case, by a character (necessary for added frames)
 class DVAPI TFrameId {
   int m_frame;
-  char m_letter;  // serve per i frame "aggiunti" del tipo pippo.0001a.tzp =>
-                  // f=1 c='a'
+  QString m_letter;  // serve per i frame "aggiunti" del tipo pippo.0001a.tzp =>
+                     // f=1 c='a'
   int m_zeroPadding;
   char m_startSeqInd;
 
@@ -50,13 +50,13 @@ public:
   };  // pippo_1.tif
 
   TFrameId(int f = EMPTY_FRAME)
-      : m_frame(f), m_letter(0), m_zeroPadding(4), m_startSeqInd('.') {}
-  TFrameId(int f, char c)
-      : m_frame(f), m_letter(c), m_zeroPadding(4), m_startSeqInd('.') {}
-  TFrameId(int f, char c, int p)
-      : m_frame(f), m_letter(c), m_zeroPadding(p), m_startSeqInd('.') {}
-  TFrameId(int f, char c, int p, char s)
-      : m_frame(f), m_letter(c), m_zeroPadding(p), m_startSeqInd(s) {}
+      : m_frame(f), m_letter(""), m_zeroPadding(4), m_startSeqInd('.') {}
+  TFrameId(int f, char c, int p = 4, char s = '.')
+      : m_frame(f), m_zeroPadding(p), m_startSeqInd(s) {
+    m_letter = (c == '\0') ? "" : QString(c);
+  }
+  TFrameId(int f, QString str, int p = 4, char s = '.')
+      : m_frame(f), m_letter(str), m_zeroPadding(p), m_startSeqInd(s) {}
 
   inline bool operator==(const TFrameId &f) const {
     return f.m_frame == m_frame && f.m_letter == m_letter;
@@ -66,7 +66,8 @@ public:
   }
   inline bool operator<(const TFrameId &f) const {
     return (m_frame < f.m_frame ||
-            (m_frame == f.m_frame && m_letter < f.m_letter));
+            (m_frame == f.m_frame &&
+             QString::localeAwareCompare(m_letter, f.m_letter) < 0));
   }
   inline bool operator>(const TFrameId &f) const { return f < *this; }
   inline bool operator>=(const TFrameId &f) const { return !operator<(f); }
@@ -89,7 +90,7 @@ public:
   // operator string() const;
   std::string expand(FrameFormat format = FOUR_ZEROS) const;
   int getNumber() const { return m_frame; }
-  char getLetter() const { return m_letter; }
+  QString getLetter() const { return m_letter; }
 
   void setZeroPadding(int p) { m_zeroPadding = p; }
   int getZeroPadding() const { return m_zeroPadding; }
@@ -132,7 +133,23 @@ inline std::ostream &operator<<(std::ostream &out, const TFrameId &f) {
    constructor.*/
 class DVAPI TFilePath {
   static bool m_underscoreFormatAllowed;
+
+  // specifies file path condition for sequential image for each project.
+  // See filepathproperties.h
+  static bool m_useStandard;
+  static bool m_acceptNonAlphabetSuffix;
+  static int m_letterCountForSuffix;
+
   std::wstring m_path;
+
+  struct TFilePathInfo {
+    QString parentDir;  // with slash
+    QString levelName;
+    QChar sepChar;  // either "." or "_"
+    TFrameId fId;
+    QString extension;
+  };
+
   void setPath(std::wstring path);
 
 public:
@@ -141,6 +158,23 @@ public:
   static void setUnderscoreFormatAllowed(bool state) {
     m_underscoreFormatAllowed = state;
   }
+
+  // called from TProjectManager::getCurrentProject() and
+  // ProjectPopup::updateProjectFromFields
+  // returns true if something changed
+  static bool setFilePathProperties(bool useStandard, bool acceptNonAlphaSuffix,
+                                    int letterCountForSuffix) {
+    if (m_useStandard == useStandard &&
+        m_acceptNonAlphabetSuffix == acceptNonAlphaSuffix &&
+        m_letterCountForSuffix == letterCountForSuffix)
+      return false;
+    m_useStandard             = useStandard;
+    m_acceptNonAlphabetSuffix = acceptNonAlphaSuffix;
+    m_letterCountForSuffix    = letterCountForSuffix;
+    return true;
+  }
+  static bool useStandard() { return m_useStandard; }
+  static QString fidRegExpStr();
 
   /*!This constructor creates a string removing redundances ('//', './',etc.)
 and final slashes,
@@ -191,6 +225,7 @@ If the path is "<alpha>:" a slash will be added*/
   std::string getType() const {
     return getUndottedType();
   }  // ritorna l'estensione SENZA PUNTO
+
   /*!Returns the base filename (no extension, no dots, no slash)*/
   std::string getName() const;       // noDot! noSlash!
   std::wstring getWideName() const;  // noDot! noSlash!
@@ -274,6 +309,8 @@ type is a string that indicate the filename extension(ex:. bmp or .bmp)*/
 
   // '/a/b/c.txt' => head='a' tail='b/c.txt'
   void split(std::wstring &head, TFilePath &tail) const;
+
+  TFilePathInfo analyzePath() const;
 };
 
 //-----------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="zh_CN">
+<TS version="2.1" language="zh_CN" sourcelanguage="en">
 <context>
     <name>ArrowToolOptionsBox</name>
     <message>
@@ -12,11 +12,11 @@
         <translation>位置</translation>
     </message>
     <message>
-        <source>E/W:</source>
+        <source>X:</source>
         <translation>左右:</translation>
     </message>
     <message>
-        <source>N/S:</source>
+        <source>Y:</source>
         <translation>上下:</translation>
     </message>
     <message>
@@ -96,11 +96,11 @@
     </message>
     <message>
         <source>Hardness:</source>
-        <translation>硬度:</translation>
+        <translation type="vanished">硬度:</translation>
     </message>
     <message>
         <source>Accuracy:</source>
-        <translation>精度:</translation>
+        <translation type="vanished">精度:</translation>
     </message>
     <message>
         <source>Selective</source>
@@ -108,7 +108,7 @@
     </message>
     <message>
         <source>Preset:</source>
-        <translation>预设:</translation>
+        <translation type="vanished">预设:</translation>
     </message>
     <message>
         <source>Break Sharp Angles</source>
@@ -124,119 +124,119 @@
     </message>
     <message>
         <source>Cap</source>
-        <translation>端点</translation>
+        <translation type="vanished">端点</translation>
     </message>
     <message>
         <source>Join</source>
-        <translation>连接</translation>
+        <translation type="vanished">连接</translation>
     </message>
     <message>
         <source>Miter:</source>
-        <translation>斜接比例:</translation>
+        <translation type="vanished">斜接比例:</translation>
     </message>
     <message>
         <source>Size</source>
-        <translation>大小</translation>
+        <translation type="vanished">大小</translation>
     </message>
     <message>
         <source>Break</source>
-        <translation>断裂</translation>
+        <translation type="vanished">断裂</translation>
     </message>
     <message>
         <source>Pencil</source>
-        <translation>铅笔</translation>
+        <translation type="vanished">铅笔</translation>
     </message>
     <message>
         <source>Pressure</source>
-        <translation>压感</translation>
+        <translation type="vanished">压感</translation>
     </message>
     <message>
         <source>Smooth:</source>
-        <translation>平滑:</translation>
+        <translation type="vanished">平滑:</translation>
     </message>
     <message>
         <source>Range:</source>
-        <translation>范围:</translation>
+        <translation type="vanished">范围:</translation>
     </message>
     <message>
         <source>Snap</source>
-        <translation>吸附</translation>
+        <translation type="vanished">吸附</translation>
     </message>
     <message>
         <source>&lt;custom&gt;</source>
-        <translation>&lt;定制&gt;</translation>
+        <translation type="vanished">&lt;定制&gt;</translation>
     </message>
     <message>
         <source>Off</source>
-        <translation>关闭</translation>
+        <translation type="vanished">关闭</translation>
     </message>
     <message>
         <source>Linear</source>
-        <translation>线性</translation>
+        <translation type="vanished">线性</translation>
     </message>
     <message>
         <source>In</source>
-        <translation>内</translation>
+        <translation type="vanished">内</translation>
     </message>
     <message>
         <source>Out</source>
-        <translation>外</translation>
+        <translation type="vanished">外</translation>
     </message>
     <message>
         <source>In&amp;Out</source>
-        <translation>内&amp;外</translation>
+        <translation type="vanished">内&amp;外</translation>
     </message>
     <message>
         <source>Low</source>
-        <translation>低</translation>
+        <translation type="vanished">低</translation>
     </message>
     <message>
         <source>High</source>
-        <translation>高</translation>
+        <translation type="vanished">高</translation>
     </message>
     <message>
         <source>Butt cap</source>
-        <translation>平头</translation>
+        <translation type="vanished">平头</translation>
     </message>
     <message>
         <source>Round cap</source>
-        <translation>圆头</translation>
+        <translation type="vanished">圆头</translation>
     </message>
     <message>
         <source>Projecting cap</source>
-        <translation>方头</translation>
+        <translation type="vanished">方头</translation>
     </message>
     <message>
         <source>Miter join</source>
-        <translation>斜接连接</translation>
+        <translation type="vanished">斜接连接</translation>
     </message>
     <message>
         <source>Round join</source>
-        <translation>圆角连接</translation>
+        <translation type="vanished">圆角连接</translation>
     </message>
     <message>
         <source>Bevel join</source>
-        <translation>斜角连接</translation>
+        <translation type="vanished">斜角连接</translation>
     </message>
     <message>
         <source>Med</source>
-        <translation>中</translation>
+        <translation type="vanished">中</translation>
     </message>
     <message>
         <source>Draw Order:</source>
-        <translation>绘制顺序:</translation>
+        <translation type="vanished">绘制顺序:</translation>
     </message>
     <message>
         <source>Over All</source>
-        <translation>在最上</translation>
+        <translation type="vanished">在最上</translation>
     </message>
     <message>
         <source>Under All</source>
-        <translation>在最下</translation>
+        <translation type="vanished">在最下</translation>
     </message>
     <message>
         <source>Palette Order</source>
-        <translation>按调色板顺序</translation>
+        <translation type="vanished">按调色板顺序</translation>
     </message>
 </context>
 <context>
@@ -259,6 +259,34 @@
     <message>
         <source>Auto Select Drawing</source>
         <translation>自动选择绘图</translation>
+    </message>
+    <message>
+        <source>Snap</source>
+        <translation>吸附</translation>
+    </message>
+    <message>
+        <source>Type:</source>
+        <translation>类型:</translation>
+    </message>
+    <message>
+        <source>Rectangular</source>
+        <translation>矩形</translation>
+    </message>
+    <message>
+        <source>Freehand</source>
+        <translation>手绘</translation>
+    </message>
+    <message>
+        <source>Low</source>
+        <translation>低</translation>
+    </message>
+    <message>
+        <source>Med</source>
+        <translation>中</translation>
+    </message>
+    <message>
+        <source>High</source>
+        <translation>高</translation>
     </message>
 </context>
 <context>
@@ -294,19 +322,19 @@
         <translation>全局关键帧</translation>
     </message>
     <message>
-        <source>Lock Center E/W</source>
+        <source>Lock Center X</source>
         <translation>锁定中心点(左右)</translation>
     </message>
     <message>
-        <source>Lock Center N/S</source>
+        <source>Lock Center Y</source>
         <translation>锁定中心点(上下)</translation>
     </message>
     <message>
-        <source>Lock Position E/W</source>
+        <source>Lock Position X</source>
         <translation>锁定位置(左右)</translation>
     </message>
     <message>
-        <source>Lock Position N/S</source>
+        <source>Lock Position Y</source>
         <translation>锁定位置(上下)</translation>
     </message>
     <message>
@@ -334,7 +362,7 @@
         <translation>锁定缩放(全局)</translation>
     </message>
     <message>
-        <source>E/W and N/S Positions</source>
+        <source>X and Y Positions</source>
         <translation>左右和上下位置</translation>
     </message>
     <message>
@@ -467,6 +495,26 @@
     <message>
         <source>Lines &amp; Areas</source>
         <translation>线和区域</translation>
+    </message>
+    <message>
+        <source>Segment</source>
+        <translation>自动分段</translation>
+    </message>
+    <message>
+        <source>Linear</source>
+        <translation>线性</translation>
+    </message>
+    <message>
+        <source>Ease In</source>
+        <translation>渐入</translation>
+    </message>
+    <message>
+        <source>Ease Out</source>
+        <translation>渐出</translation>
+    </message>
+    <message>
+        <source>Ease In/Out</source>
+        <translation>渐入/出</translation>
     </message>
 </context>
 <context>
@@ -639,6 +687,20 @@
     <message>
         <source>Polyline</source>
         <translation>折线</translation>
+    </message>
+</context>
+<context>
+    <name>FullColorFillTool</name>
+    <message>
+        <source>Fill Depth</source>
+        <translation>填充深度</translation>
+    </message>
+</context>
+<context>
+    <name>HandToolOptionsBox</name>
+    <message>
+        <source>Reset Position</source>
+        <translation>重置位置</translation>
     </message>
 </context>
 <context>
@@ -985,6 +1047,14 @@ Do you want to proceed?</source>
         <source>Med</source>
         <translation>中</translation>
     </message>
+    <message>
+        <source>MultiArc</source>
+        <translation>多段弧形</translation>
+    </message>
+    <message>
+        <source>Smooth</source>
+        <translation>平滑</translation>
+    </message>
 </context>
 <context>
     <name>PumpTool</name>
@@ -1163,6 +1233,38 @@ Do you want to proceed?</source>
         <source> to Backward</source>
         <translation> 向后</translation>
     </message>
+    <message>
+        <source>The selection cannot be updated. It is not editable.</source>
+        <translation>所选择的不能被更新。它不是可编辑的。</translation>
+    </message>
+    <message>
+        <source>The selection cannot be deleted. It is not editable.</source>
+        <translation>所选择的不能被删除。它不是可编辑的。</translation>
+    </message>
+    <message>
+        <source>The selection cannot be pasted. It is not editable.</source>
+        <translation>所选择的不能被粘贴。它不是可编辑的。</translation>
+    </message>
+    <message>
+        <source>The selection cannot be grouped. It is not editable.</source>
+        <translation>所选择的不能被成组。它不是可编辑的。</translation>
+    </message>
+    <message>
+        <source>The selection cannot be entered. It is not editable.</source>
+        <translation>所选择的不能被进入。它不是可编辑的。</translation>
+    </message>
+    <message>
+        <source>The selection cannot be ungrouped. It is not editable.</source>
+        <translation>所选择的不能被取消群组。它不是可编辑的。</translation>
+    </message>
+    <message>
+        <source>The selection cannot be moved. It is not editable.</source>
+        <translation>所选择的不能被移动。它不是可编辑的。</translation>
+    </message>
+    <message>
+        <source>Snap At Intersection</source>
+        <translation>吸附在交点</translation>
+    </message>
 </context>
 <context>
     <name>RGBPickerTool</name>
@@ -1206,7 +1308,7 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Modify Savebox</source>
-        <translation type="unfinished">修改保险框</translation>
+        <translation>修改保险框</translation>
     </message>
 </context>
 <context>
@@ -1261,6 +1363,13 @@ Do you want to proceed?</source>
     <message>
         <source>Rotate On Camera Center</source>
         <translation>以相机中心旋转</translation>
+    </message>
+</context>
+<context>
+    <name>RotateToolOptionsBox</name>
+    <message>
+        <source>Reset Rotation</source>
+        <translation>重置旋转</translation>
     </message>
 </context>
 <context>
@@ -1330,11 +1439,11 @@ Do you want to proceed?</source>
         <translation>旋转</translation>
     </message>
     <message>
-        <source>E/W:</source>
+        <source>X:</source>
         <translation>左右:</translation>
     </message>
     <message>
-        <source>N/S:</source>
+        <source>Y:</source>
         <translation>上下:</translation>
     </message>
     <message>
@@ -1344,6 +1453,33 @@ Do you want to proceed?</source>
     <message>
         <source>Link</source>
         <translation>保持长宽比</translation>
+    </message>
+    <message>
+        <source>Scale</source>
+        <translation>缩放</translation>
+    </message>
+    <message>
+        <source>Position</source>
+        <translation>位置</translation>
+    </message>
+</context>
+<context>
+    <name>ShiftTraceToolOptionBox</name>
+    <message>
+        <source>Reset Previous</source>
+        <translation>重置前面的</translation>
+    </message>
+    <message>
+        <source>Reset Following</source>
+        <translation>重置后面的</translation>
+    </message>
+    <message>
+        <source>Previous Drawing</source>
+        <translation>前面的绘图</translation>
+    </message>
+    <message>
+        <source>Following Drawing</source>
+        <translation>后面的绘图</translation>
     </message>
 </context>
 <context>
@@ -1422,6 +1558,160 @@ Do you want to proceed?</source>
         <source>With this option being activated, the picked style will be
 moved to the end of the first page of the palette.</source>
         <translation>打开这个选项，选中的样式将被移到色板第一页的最后。</translation>
+    </message>
+</context>
+<context>
+    <name>ToonzRasterBrushTool</name>
+    <message>
+        <source>Size</source>
+        <translation>大小</translation>
+    </message>
+    <message>
+        <source>Hardness:</source>
+        <translation>硬度:</translation>
+    </message>
+    <message>
+        <source>Smooth:</source>
+        <translation>平滑:</translation>
+    </message>
+    <message>
+        <source>Draw Order:</source>
+        <translation>绘制顺序:</translation>
+    </message>
+    <message>
+        <source>Over All</source>
+        <translation>在最上</translation>
+    </message>
+    <message>
+        <source>Under All</source>
+        <translation>在最下</translation>
+    </message>
+    <message>
+        <source>Palette Order</source>
+        <translation>按调色板顺序</translation>
+    </message>
+    <message>
+        <source>Preset:</source>
+        <translation>预设:</translation>
+    </message>
+    <message>
+        <source>&lt;custom&gt;</source>
+        <translation>&lt;定制&gt;</translation>
+    </message>
+    <message>
+        <source>Pencil</source>
+        <translation>铅笔</translation>
+    </message>
+    <message>
+        <source>Pressure</source>
+        <translation>压感</translation>
+    </message>
+</context>
+<context>
+    <name>ToonzVectorBrushTool</name>
+    <message>
+        <source>Size</source>
+        <translation>大小</translation>
+    </message>
+    <message>
+        <source>Accuracy:</source>
+        <translation>精度:</translation>
+    </message>
+    <message>
+        <source>Smooth:</source>
+        <translation>平滑:</translation>
+    </message>
+    <message>
+        <source>Preset:</source>
+        <translation>预设:</translation>
+    </message>
+    <message>
+        <source>&lt;custom&gt;</source>
+        <translation>&lt;定制&gt;</translation>
+    </message>
+    <message>
+        <source>Break</source>
+        <translation>断裂</translation>
+    </message>
+    <message>
+        <source>Pressure</source>
+        <translation>压感</translation>
+    </message>
+    <message>
+        <source>Cap</source>
+        <translation>端点</translation>
+    </message>
+    <message>
+        <source>Join</source>
+        <translation>连接</translation>
+    </message>
+    <message>
+        <source>Miter:</source>
+        <translation>斜接比例:</translation>
+    </message>
+    <message>
+        <source>Range:</source>
+        <translation>范围:</translation>
+    </message>
+    <message>
+        <source>Snap</source>
+        <translation>吸附</translation>
+    </message>
+    <message>
+        <source>Off</source>
+        <translation>关闭</translation>
+    </message>
+    <message>
+        <source>Linear</source>
+        <translation>线性</translation>
+    </message>
+    <message>
+        <source>In</source>
+        <translation>内</translation>
+    </message>
+    <message>
+        <source>Out</source>
+        <translation>外</translation>
+    </message>
+    <message>
+        <source>In&amp;Out</source>
+        <translation>内&amp;外</translation>
+    </message>
+    <message>
+        <source>Low</source>
+        <translation>低</translation>
+    </message>
+    <message>
+        <source>Med</source>
+        <translation>中</translation>
+    </message>
+    <message>
+        <source>High</source>
+        <translation>高</translation>
+    </message>
+    <message>
+        <source>Butt cap</source>
+        <translation>平头</translation>
+    </message>
+    <message>
+        <source>Round cap</source>
+        <translation>圆头</translation>
+    </message>
+    <message>
+        <source>Projecting cap</source>
+        <translation>方头</translation>
+    </message>
+    <message>
+        <source>Miter join</source>
+        <translation>斜接连接</translation>
+    </message>
+    <message>
+        <source>Round join</source>
+        <translation>圆角连接</translation>
+    </message>
+    <message>
+        <source>Bevel join</source>
+        <translation>斜角连接</translation>
     </message>
 </context>
 <context>
@@ -1544,6 +1834,10 @@ moved to the end of the first page of the palette.</source>
         <source>Bevel join</source>
         <translation>斜角连接</translation>
     </message>
+    <message>
+        <source>Include Intersection</source>
+        <translation>包括交点</translation>
+    </message>
 </context>
 <context>
     <name>VectorTapeTool</name>
@@ -1586,6 +1880,13 @@ moved to the end of the first page of the palette.</source>
     <message>
         <source>Rectangular</source>
         <translation>矩形</translation>
+    </message>
+</context>
+<context>
+    <name>ZoomToolOptionsBox</name>
+    <message>
+        <source>Reset Zoom</source>
+        <translation>重置缩放</translation>
     </message>
 </context>
 </TS>

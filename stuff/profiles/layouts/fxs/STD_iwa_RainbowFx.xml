@@ -1,0 +1,11 @@
+<fxlayout>
+	<page name="Rainbow Iwa">
+	<control>center</control> 
+	<control>radius</control>
+	<control>intensity</control>
+	<control>width_scale</control> 
+	<control>inside</control> 
+	<control>secondary_rainbow</control> 
+	<control>alpha_rendering</control>
+	</page>
+</fxlayout>

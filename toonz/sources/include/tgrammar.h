@@ -31,7 +31,7 @@ class TUnit;
 namespace TSyntax {
 class Token;
 class Calculator;
-}
+}  // namespace TSyntax
 
 //==============================================
 
@@ -62,6 +62,8 @@ public:
   virtual double compute(double vars[3]) const = 0;
 
   virtual void accept(CalculatorNodeVisitor &visitor) = 0;
+
+  virtual bool hasReference() const { return false; }
 
 private:
   // Non-copyable

@@ -167,6 +167,7 @@ class DVAPI IntField : public QWidget {
   IntLineEdit *m_lineEdit;
   QSlider *m_slider;
   bool m_isMaxRangeLimited;
+  bool m_isLinearSlider;
 
 public:
   IntField(QWidget *parent = 0, bool isMaxRangeLimited = true,
@@ -204,6 +205,13 @@ public:
   bool rollerIsEnabled();
 
   void setLineEditBackgroundColor(QColor color);
+
+protected:
+  void setLinearSlider(bool linear) { m_isLinearSlider = linear; }
+
+private:
+  int pos2value(int x) const;
+  int value2pos(int v) const;
 
 protected slots:
   /*! Set to value the text field. If text field value is different from \b

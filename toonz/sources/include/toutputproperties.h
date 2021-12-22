@@ -24,7 +24,7 @@ class BoardSettings;
 
 //=============================================================================
 //! The TOutputProperties class provides a container for output properties and
-//! gives all methods to access to these informations.
+//! gives all methods to access to these information.
 /*!The class contains all features necessaries to compute output and provides a
    collection of functions that return the various feature, and enable
    manipulation of these.
@@ -42,18 +42,18 @@ class BoardSettings;
    The getWhichLevels() function return a value is used to characterize which
    levels are in output:
 
-   \li If value is TOutputProperties::AllLevels all levels are coputed in
+   \li If value is TOutputProperties::AllLevels all levels are computed in
    output.
    \li If value is TOutputProperties::SelectedOnly only selectecd levels are
-   coputed in output.
+   computed in output.
    \li If value is TOutputProperties::AnimatedOnly only animated levels are
-   coputed in output.
+   computed in output.
 
    It can be set by setWhichLevels().
 
-   The getFileFormatProperties(string ext) function return file of fomat \b ext
+   The getFileFormatProperties(string ext) function return file of format \b ext
    properties \b TPropertyGroup. It's possibile set different format and have
-   appropriete properties.
+   appropriate properties.
 
    The getRenderSettings() function return render settings \b TRenderSettings,
    it can be change using setRenderSettings().
@@ -64,7 +64,7 @@ class DVAPI TOutputProperties {
 public:
   /*!
 This enum type is used to characterize which levels are in output.
-Can set in output all lavel, only selectecd levels or only animated levels.
+Can set in output to all levels, only selectecd levels or only animated levels.
 \sa getWhichLevels(), setWhichLevels()
 */
   enum { AllLevels, SelectedOnly, AnimatedOnly };

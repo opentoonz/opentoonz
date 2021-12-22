@@ -65,7 +65,7 @@ efficiently store
 Now, the principal classes dealing with this job are:
 
  - One TFxCacheManager per render instance, used to store predictive
-informations.
+information.
  - A set of TFxCacheManagerDelegate per render instance, used to store
 references to cache resources
    and providing reasons for caching results.

@@ -124,8 +124,8 @@ void invert_pixel_(const int channels, double *pixel) {
 void rgb_to_lightness_(const double re, const double gr, const double bl,
                        double &li) {
   li = ((re < gr) ? ((gr < bl) ? bl : gr)
-                  : ((re < bl) ? bl : re) + (gr < re) ? ((bl < gr) ? bl : gr)
-                                                      : ((bl < re) ? bl : re)) /
+                  : (((re < bl) ? bl : re) + ((gr < re) ? ((bl < gr) ? bl : gr)
+                                                        : ((bl < re) ? bl : re)))) /
        2.0;
 }
 double get_lightness_(const int channels, const double *pixel

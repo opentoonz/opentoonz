@@ -5,7 +5,12 @@
 #include "menubarcommandids.h"
 #include "cellselection.h"
 #include "columnselection.h"
-#include "penciltestpopup.h"  // for FrameNumberLineEdit
+
+#if defined(x64)
+#include "penciltestpopup.h"
+#else
+#include "penciltestpopup_qt.h"
+#endif
 
 // TnzQt includes
 #include "toonzqt/intfield.h"
@@ -31,7 +36,6 @@
 #include <iostream>
 
 namespace {
-
 class AutoInputCellNumberUndo final : public TUndo {
   int m_increment, m_interval, m_step, m_repeat;
   int m_from, m_to;
@@ -64,7 +68,7 @@ public:
 
   int rowsCount() { return m_rowsCount; }
 };
-};
+};  // namespace
 
 //-----------------------------------------------------------------------------
 // executing this on column selection, set r1 = -1.
@@ -197,9 +201,9 @@ AutoInputCellNumberPopup::AutoInputCellNumberPopup()
              "AutoInputCellNumberPopup") {
   setWindowTitle(tr("Auto Input Cell Number"));
 
-  m_from      = new FrameNumberLineEdit(this);
+  m_from      = new FrameNumberLineEdit(this, TFrameId(1), false);
   m_increment = new DVGui::IntLineEdit(this, 0, 0);
-  m_to        = new FrameNumberLineEdit(this);
+  m_to        = new FrameNumberLineEdit(this, TFrameId(1), false);
   m_interval  = new DVGui::IntLineEdit(this, 0, 0);
   m_step      = new DVGui::IntLineEdit(this, 1, 1);
   m_repeat    = new DVGui::IntLineEdit(this, 1, 1);
@@ -273,7 +277,7 @@ AutoInputCellNumberPopup::AutoInputCellNumberPopup()
   bool ret = true;
   ret      = ret && connect(m_overwriteBtn, SIGNAL(clicked()), this,
                        SLOT(onOverwritePressed()));
-  ret = ret &&
+  ret      = ret &&
         connect(m_insertBtn, SIGNAL(clicked()), this, SLOT(onInsertPressed()));
   ret = ret && connect(cancelBtn, SIGNAL(clicked()), this, SLOT(close()));
   assert(ret);
@@ -302,8 +306,8 @@ void AutoInputCellNumberPopup::doExecute(bool overwrite) {
   }
   AutoInputCellNumberUndo *undo = new AutoInputCellNumberUndo(
       m_increment->getValue(), m_interval->getValue(), m_step->getValue(),
-      m_repeat->getValue(), m_from->getValue(), m_to->getValue(), r0, r1,
-      overwrite, columnIndices, levels);
+      m_repeat->getValue(), m_from->getValue().getNumber(),
+      m_to->getValue().getNumber(), r0, r1, overwrite, columnIndices, levels);
   // if no cells will be arranged, then return
   if (undo->rowsCount() == 0) {
     DVGui::MsgBox(DVGui::WARNING,
@@ -325,7 +329,7 @@ void AutoInputCellNumberPopup::doExecute(bool overwrite) {
     cellSelection->selectCells(r0, c0, r0 + undo->rowsCount() - 1, c1);
     TApp::instance()->getCurrentSelection()->notifySelectionChanged();
   }
-  // If exection is properly completed, then close this popup
+  // If execution is properly completed, then close this popup
   close();
 }
 
@@ -389,7 +393,7 @@ bool AutoInputCellNumberPopup::getTarget(std::vector<int> &columnIndices,
   // something must be selected
   if (selection->isEmpty()) return false;
 
-  // selection must be cells or collumns
+  // selection must be cells or columns
   TCellSelection *cellSelection = dynamic_cast<TCellSelection *>(selection);
   TColumnSelection *columnSelection =
       dynamic_cast<TColumnSelection *>(selection);

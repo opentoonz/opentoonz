@@ -5,6 +5,7 @@
     <control>period</control>
     <control>color2</control>
 	<rgb_link_button>color1 color2</rgb_link_button>
+    <control>curveType</control>
   </page>
   
 </fxlayout>

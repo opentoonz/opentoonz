@@ -40,6 +40,9 @@ public:
   //! return true if the last parsed string was correct
   bool isValid() const;
 
+  //! return true if the last parsed string was correct
+  bool hasReference() const;
+
   //! return the last parsed string
   std::string getText() const;
 

@@ -10,7 +10,6 @@
 #else
 #include <dlfcn.h>
 #endif
-#include <string>
 #include <map>
 #include <type_traits>
 #include <functional>
@@ -32,7 +31,6 @@
 #include "plugin_param_view_interface.h"
 #include "plugin_ui_page_interface.h"
 #include "plugin_utilities.h"
-#include "toonz_params.h"
 #include <QFileInfo>
 #include <QDir>
 #include <QLabel>
@@ -58,7 +56,7 @@ bool PluginLoader::load_entries(const std::string &basepath) {
   if (!aw) {
     aw = new PluginLoadController(basepath, NULL);
   }
-  bool ret    = aw->wait(16 /* ms */);
+  bool ret = aw->wait(16 /* ms */);
   if (ret) aw = NULL; /* deleteLater で消えるはず */
   return ret;
 }
@@ -154,7 +152,7 @@ PluginDescription::PluginDescription(const plugin_probe_t *const probe) {
 }
 
 RasterFxPluginHost::RasterFxPluginHost(PluginInformation *pinfo)
-    : TZeraryFx(), pi_(pinfo), user_data_(nullptr) {
+    : TRasterFx(), pi_(pinfo), user_data_(nullptr) {
   pi_->add_ref();
 }
 
@@ -1403,7 +1401,7 @@ toonz_plugin_info で検索し、なければ toonz_plugin_probe() を呼び出�
       if (problist) {
         if (!is_compatible<plugin_probe_list_t, 1, 0>(*problist))
           throw std::domain_error(
-              "invaid toonz_plugin_info_list: version unmatched");
+              "invalid toonz_plugin_info_list: version unmatched");
         probinfo_begin = problist->begin;
         probinfo_end   = problist->end;
       }
@@ -1500,7 +1498,7 @@ toonz_plugin_info で検索し、なければ toonz_plugin_probe() を呼び出�
               throw std::domain_error("not found _toonz_plugin_init");
             }
           } catch (const std::exception &e) {
-            printf("Exception occured after plugin loading: %s\n", e.what());
+            printf("Exception occurred after plugin loading: %s\n", e.what());
           }
 
           if (pi->handler_ && pi->handler_->setup) {
@@ -1519,7 +1517,7 @@ toonz_plugin_info で検索し、なければ toonz_plugin_probe() を呼び出�
         }
       }
     } catch (const std::exception &e) {
-      printf("Exception occured while plugin loading: %s\n", e.what());
+      printf("Exception occurred while plugin loading: %s\n", e.what());
       delete pi;
       pi = NULL;
     }
@@ -1562,7 +1560,7 @@ PluginLoadController::PluginLoadController(const std::string &basedir,
   connect(&work_entity, &QThread::finished, ld, &QObject::deleteLater);
   /* AddFxContextMenu から呼ばれていたが、プラグインの検索が load_entries()
      を通じて起動時に呼ばれるようにした関係で,
-     (あまりよくはないが)listner の有無によって receiver を分けるようにしている.
+     (あまりよくはないが)listener の有無によって receiver を分けるようにしている.
      listener がいる場合は従来通り context menu の構築のために
      AddFxContextMenu::fixup() に接続するが
      それ以外では plugin_dict_ への追加のため PluginLoadController::finished

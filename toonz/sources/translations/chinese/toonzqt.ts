@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="zh_CN">
+<TS version="2.1" language="zh_CN" sourcelanguage="en">
 <context>
     <name>AddFxContextMenu</name>
     <message>
@@ -179,6 +179,26 @@ Possibly the preset file has been corrupted</source>
         <source>&lt;custom&gt;</source>
         <translation>&lt;定制&gt;</translation>
     </message>
+    <message>
+        <source>cm</source>
+        <translation>厘米</translation>
+    </message>
+    <message>
+        <source>mm</source>
+        <translation>毫米</translation>
+    </message>
+    <message>
+        <source>inch</source>
+        <translation>英尺</translation>
+    </message>
+    <message>
+        <source>field</source>
+        <translation>视场</translation>
+    </message>
+    <message>
+        <source>pixel</source>
+        <translation>像素</translation>
+    </message>
 </context>
 <context>
     <name>ChannelHisto</name>
@@ -210,11 +230,11 @@ Possibly the preset file has been corrupted</source>
         <translation type="vanished">最靠近的:</translation>
     </message>
     <message>
-        <source>E/W:</source>
+        <source>X:</source>
         <translation type="vanished">左右:</translation>
     </message>
     <message>
-        <source>N/S:</source>
+        <source>Y:</source>
         <translation type="vanished">上下:</translation>
     </message>
     <message>
@@ -246,11 +266,11 @@ Possibly the preset file has been corrupted</source>
         <translation type="vanished">结果层级信息</translation>
     </message>
     <message>
-        <source>N/S</source>
+        <source>Y</source>
         <translation>上下</translation>
     </message>
     <message>
-        <source>E/W</source>
+        <source>X</source>
         <translation>左右</translation>
     </message>
 </context>
@@ -262,7 +282,7 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>&amp;Open Subxsheet</source>
-        <translation>打开子摄影表(&amp;O)</translation>
+        <translation type="vanished">打开子摄影表(&amp;O)</translation>
     </message>
 </context>
 <context>
@@ -295,11 +315,11 @@ Possibly the preset file has been corrupted</source>
     <name>DVGui</name>
     <message>
         <source>OK</source>
-        <translation>确定</translation>
+        <translation type="vanished">确定</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>取消</translation>
+        <translation type="vanished">取消</translation>
     </message>
 </context>
 <context>
@@ -432,6 +452,18 @@ Possibly the preset file has been corrupted</source>
         <source>Channel:</source>
         <translation>通道:</translation>
     </message>
+    <message>
+        <source>Range:</source>
+        <translation>范围:</translation>
+    </message>
+    <message>
+        <source>Output:</source>
+        <translation>输出:</translation>
+    </message>
+    <message>
+        <source>Input:</source>
+        <translation>输入:</translation>
+    </message>
 </context>
 <context>
     <name>DVGui::ValidatedChoiceDialog</name>
@@ -523,7 +555,7 @@ Possibly the preset file has been corrupted</source>
     <name>FlipConsole</name>
     <message>
         <source> FPS </source>
-        <translation>FPS</translation>
+        <translation> FPS </translation>
     </message>
     <message>
         <source>Save</source>
@@ -615,7 +647,7 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>&amp;Next frame</source>
-        <translation>下一帧(&amp;N)</translation>
+        <translation type="vanished">下一帧(&amp;N)</translation>
     </message>
     <message>
         <source>&amp;Last Frame</source>
@@ -700,6 +732,53 @@ Possibly the preset file has been corrupted</source>
     <message>
         <source>&amp;Locator</source>
         <translation>定位器(&amp;L)</translation>
+    </message>
+    <message>
+        <source>Viewer Controls</source>
+        <translation>查看器控件</translation>
+    </message>
+    <message>
+        <source>&amp;Zoom In</source>
+        <translation>放大(&amp;Z)</translation>
+    </message>
+    <message>
+        <source>&amp;Zoom Out</source>
+        <translation>缩小(&amp;Z)</translation>
+    </message>
+    <message>
+        <source>&amp;Flip Horizontally</source>
+        <translation>水平翻转(&amp;F)</translation>
+    </message>
+    <message>
+        <source>&amp;Flip Vertically</source>
+        <translation>垂直翻转(&amp;F)</translation>
+    </message>
+    <message>
+        <source>&amp;Reset View</source>
+        <translation>重置视图(&amp;R)</translation>
+    </message>
+    <message>
+        <source>Sound</source>
+        <translation>声音</translation>
+    </message>
+    <message>
+        <source>Locator</source>
+        <translation>定位器</translation>
+    </message>
+    <message>
+        <source>&amp;Next Frame</source>
+        <translation>下一帧(&amp;N)</translation>
+    </message>
+</context>
+<context>
+    <name>FontParamField</name>
+    <message>
+        <source>Style:</source>
+        <translation>样式:</translation>
+    </message>
+    <message>
+        <source>Size:</source>
+        <translation>大小:</translation>
     </message>
 </context>
 <context>
@@ -941,6 +1020,10 @@ Possibly the preset file has been corrupted</source>
         <source>Step</source>
         <translation>步长</translation>
     </message>
+    <message>
+        <source>Link/Unlink Handles</source>
+        <translation>链接/断开手柄</translation>
+    </message>
 </context>
 <context>
     <name>FunctionSelection</name>
@@ -1000,19 +1083,56 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>Step 1</source>
-        <translation>第 1 步</translation>
+        <translation type="vanished">第 1 步</translation>
     </message>
     <message>
         <source>Step 2</source>
-        <translation>第 2 步</translation>
+        <translation type="vanished">第 2 步</translation>
     </message>
     <message>
         <source>Step 3</source>
-        <translation>第 3 步</translation>
+        <translation type="vanished">第 3 步</translation>
     </message>
     <message>
         <source>Step 4</source>
-        <translation>第 4 步</translation>
+        <translation type="vanished">第 4 步</translation>
+    </message>
+    <message>
+        <source>Activate Cycle</source>
+        <translation>启用循环</translation>
+    </message>
+    <message>
+        <source>Deactivate Cycle</source>
+        <translation>禁用循环</translation>
+    </message>
+    <message>
+        <source>Show Inbetween Values</source>
+        <translation>显示中间帧的值</translation>
+    </message>
+    <message>
+        <source>Hide Inbetween Values</source>
+        <translation>隐藏中间帧的值</translation>
+    </message>
+    <message>
+        <source>Change Interpolation</source>
+        <translation>更改插值方式</translation>
+    </message>
+    <message>
+        <source>Change Step</source>
+        <translation>改变步长</translation>
+    </message>
+    <message>
+        <source>Similar Shape Interpolation</source>
+        <translation>相似形状插值</translation>
+    </message>
+</context>
+<context>
+    <name>FunctionSheetColumnHeadViewer</name>
+    <message>
+        <source>Some key(s) in this parameter loses original reference in expression.
+Manually changing any keyframe will clear the warning.</source>
+        <translation>在表达式中此参数的某些关键帧丢失原引用。
+手工更改任意的关键帧将清理该警告。</translation>
     </message>
 </context>
 <context>
@@ -1044,6 +1164,12 @@ Possibly the preset file has been corrupted</source>
         <source>Plastic Skeleton</source>
         <translation>塑料骨架</translation>
     </message>
+    <message>
+        <source>Some key(s) in this parameter loses original reference in expression.
+Manually changing any keyframe will clear the warning.</source>
+        <translation>在表达式中此参数的某些关键帧丢失原引用。
+手工更改任意的关键帧将清理该警告。</translation>
+    </message>
 </context>
 <context>
     <name>FunctionTreeView</name>
@@ -1071,6 +1197,10 @@ Possibly the preset file has been corrupted</source>
         <source>Table</source>
         <translation>动画台</translation>
     </message>
+    <message>
+        <source>Hide Selected</source>
+        <translation>隐藏被选中的</translation>
+    </message>
 </context>
 <context>
     <name>FxColumnPainter</name>
@@ -1092,7 +1222,7 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>&amp;Open Subxsheet</source>
-        <translation>打开子摄影表(&amp;O)</translation>
+        <translation type="vanished">打开子摄影表(&amp;O)</translation>
     </message>
     <message>
         <source>&amp;Uncache Fx</source>
@@ -1212,6 +1342,13 @@ Possibly the preset file has been corrupted</source>
     </message>
 </context>
 <context>
+    <name>FxSchematicOutputNode</name>
+    <message>
+        <source>Output</source>
+        <translation>输出</translation>
+    </message>
+</context>
+<context>
     <name>FxSchematicPort</name>
     <message>
         <source>&amp;Disconnect from Xsheet</source>
@@ -1241,6 +1378,13 @@ Select FX nodes and related links before copying or cutting the selection you wa
 Select FX nodes and related links before copying or cutting the selection you want to paste.</source>
         <translation>无法“粘贴替换”多个未连接的特效节点。
 请在拷贝或剪切选区之前，选择特效节点和它的关联链接。</translation>
+    </message>
+</context>
+<context>
+    <name>FxSchematicXSheetNode</name>
+    <message>
+        <source>XSheet</source>
+        <translation>摄影表</translation>
     </message>
 </context>
 <context>
@@ -1364,7 +1508,7 @@ Select FX nodes and related links before copying or cutting the selection you wa
     <name>MyPaintBrushStyleChooserPage</name>
     <message>
         <source>Plain color</source>
-        <translation>纯色</translation>
+        <translation type="vanished">纯色</translation>
     </message>
 </context>
 <context>
@@ -1469,7 +1613,7 @@ Select FX nodes and related links before copying or cutting the selection you wa
     </message>
     <message>
         <source>Level Palette: </source>
-        <translation>层级调色板:</translation>
+        <translation>层级调色板: </translation>
     </message>
     <message>
         <source>Cleanup Palette</source>
@@ -1531,6 +1675,26 @@ Select FX nodes and related links before copying or cutting the selection you wa
         <source>)</source>
         <translation>)</translation>
     </message>
+    <message>
+        <source>Hide New Style Button</source>
+        <translation>隐藏新建样式按钮</translation>
+    </message>
+    <message>
+        <source>Show New Style Button</source>
+        <translation>显示新建样式按钮</translation>
+    </message>
+    <message>
+        <source>Failed to save palette.</source>
+        <translation>保存调色板失败。</translation>
+    </message>
+    <message>
+        <source>Set Toolbar Below Styles</source>
+        <translation>使工具条在样式下方</translation>
+    </message>
+    <message>
+        <source>Set Toolbar Above Styles</source>
+        <translation>使工具条在样式上方</translation>
+    </message>
 </context>
 <context>
     <name>PaletteViewerGUI::PageViewer</name>
@@ -1554,6 +1718,10 @@ Select FX nodes and related links before copying or cutting the selection you wa
         <source>Name Editor</source>
         <translation>名字编辑器</translation>
     </message>
+    <message>
+        <source> + </source>
+        <translation></translation>
+    </message>
 </context>
 <context>
     <name>PalettesScanPopup</name>
@@ -1573,6 +1741,10 @@ Select FX nodes and related links before copying or cutting the selection you wa
         <source>&lt;files&gt;</source>
         <translation>&lt;文件&gt;</translation>
     </message>
+    <message>
+        <source>Failed to import palette.</source>
+        <translation>导入调色板失败。</translation>
+    </message>
 </context>
 <context>
     <name>ParamViewer</name>
@@ -1585,7 +1757,11 @@ Select FX nodes and related links before copying or cutting the selection you wa
     <name>ParamsPageSet</name>
     <message>
         <source>Fx Help</source>
-        <translation>特效帮助</translation>
+        <translation type="vanished">特效帮助</translation>
+    </message>
+    <message>
+        <source>View help page</source>
+        <translation>查看帮助页</translation>
     </message>
 </context>
 <context>
@@ -1612,6 +1788,17 @@ Select FX nodes and related links before copying or cutting the selection you wa
     <message>
         <source>RGB</source>
         <translation type="vanished">RGB</translation>
+    </message>
+</context>
+<context>
+    <name>PlaneViewer</name>
+    <message>
+        <source>Reset View</source>
+        <translation>重置视图</translation>
+    </message>
+    <message>
+        <source>Fit To Window</source>
+        <translation>适合到窗口</translation>
     </message>
 </context>
 <context>
@@ -1657,7 +1844,8 @@ Select FX nodes and related links before copying or cutting the selection you wa
     <message>
         <source>Styles you are going to delete are used to paint lines and areas in the animation level.
 </source>
-        <translation>您要删除的样式已经用于动画层级的线和区域。</translation>
+        <translation>您要删除的样式已经用于绘制动画层级的线和区域。
+</translation>
     </message>
     <message>
         <source>How do you want to proceed?</source>
@@ -1693,19 +1881,19 @@ Select FX nodes and related links before copying or cutting the selection you wa
     </message>
     <message>
         <source>Save</source>
-        <translation>保存</translation>
+        <translation type="vanished">保存</translation>
     </message>
     <message>
         <source>Discard</source>
-        <translation>放弃更改</translation>
+        <translation type="vanished">放弃更改</translation>
     </message>
     <message>
         <source>Yes</source>
-        <translation>是</translation>
+        <translation type="vanished">是</translation>
     </message>
     <message>
         <source>No</source>
-        <translation>否</translation>
+        <translation type="vanished">否</translation>
     </message>
     <message>
         <source>Stage Schematic</source>
@@ -1749,7 +1937,7 @@ Select FX nodes and related links before copying or cutting the selection you wa
     </message>
     <message>
         <source>Palette</source>
-        <translation>调色板</translation>
+        <translation type="vanished">调色板</translation>
     </message>
     <message>
         <source>Apply</source>
@@ -1761,75 +1949,75 @@ Select FX nodes and related links before copying or cutting the selection you wa
     </message>
     <message>
         <source>Fullpath:     </source>
-        <translation>完整路径:</translation>
+        <translation>完整路径:     </translation>
     </message>
     <message>
         <source>File Type:    </source>
-        <translation>文件类型:</translation>
+        <translation>文件类型:    </translation>
     </message>
     <message>
         <source>Frames:       </source>
-        <translation>帧:</translation>
+        <translation>帧:       </translation>
     </message>
     <message>
         <source>Owner:        </source>
-        <translation>所有者:</translation>
+        <translation>所有者:        </translation>
     </message>
     <message>
         <source>Size:         </source>
-        <translation>大小:</translation>
+        <translation>大小:         </translation>
     </message>
     <message>
         <source>Created:      </source>
-        <translation>创建于:</translation>
+        <translation>创建于:      </translation>
     </message>
     <message>
         <source>Modified:     </source>
-        <translation>修改于:</translation>
+        <translation>修改于:     </translation>
     </message>
     <message>
         <source>Last Access:  </source>
-        <translation>最近访问于:</translation>
+        <translation>最近访问于:  </translation>
     </message>
     <message>
         <source>Image Size:   </source>
-        <translation>图像大小:</translation>
+        <translation>图像大小:   </translation>
     </message>
     <message>
         <source>SaveBox:      </source>
-        <translation>保存框:</translation>
+        <translation>保存框:      </translation>
     </message>
     <message>
         <source>Bits/Sample:  </source>
-        <translation>色深:</translation>
+        <translation>色深:  </translation>
     </message>
     <message>
         <source>Sample/Pixel: </source>
-        <translation>通道数量:</translation>
+        <translation>通道数量: </translation>
     </message>
     <message>
         <source>Dpi:          </source>
-        <translation>DPI:</translation>
+        <translation>DPI:          </translation>
     </message>
     <message>
         <source>Orientation:  </source>
-        <translation>方向:</translation>
+        <translation>方向:  </translation>
     </message>
     <message>
         <source>Compression:  </source>
-        <translation>压缩:</translation>
+        <translation>压缩:  </translation>
     </message>
     <message>
         <source>Quality:      </source>
-        <translation>画质:</translation>
+        <translation>画质:      </translation>
     </message>
     <message>
         <source>Smoothing:    </source>
-        <translation>平滑:</translation>
+        <translation>平滑:    </translation>
     </message>
     <message>
         <source>Codec:        </source>
-        <translation>编码器:</translation>
+        <translation>编码器:        </translation>
     </message>
     <message>
         <source>Alpha Channel:</source>
@@ -1853,27 +2041,27 @@ Select FX nodes and related links before copying or cutting the selection you wa
     </message>
     <message>
         <source>Camera Size:      </source>
-        <translation>摄影机大小:</translation>
+        <translation>摄影机大小:      </translation>
     </message>
     <message>
         <source>Camera Dpi:       </source>
-        <translation>摄影机 DPI:</translation>
+        <translation>摄影机 DPI:       </translation>
     </message>
     <message>
         <source>Number of Frames: </source>
-        <translation>帧数:</translation>
+        <translation>帧数: </translation>
     </message>
     <message>
         <source>Number of Levels: </source>
-        <translation>层级数:</translation>
+        <translation>层级数: </translation>
     </message>
     <message>
         <source>Output Path:      </source>
-        <translation>输出路径:</translation>
+        <translation>输出路径:      </translation>
     </message>
     <message>
         <source>Endianess:      </source>
-        <translation>字节次序:</translation>
+        <translation>字节次序:      </translation>
     </message>
     <message>
         <source>It is not possible to delete the style #</source>
@@ -1897,19 +2085,19 @@ Select FX nodes and related links before copying or cutting the selection you wa
     </message>
     <message>
         <source>Length:       </source>
-        <translation>长度:</translation>
+        <translation>长度:       </translation>
     </message>
     <message>
         <source>Channels: </source>
-        <translation>通道:</translation>
+        <translation>通道: </translation>
     </message>
     <message>
         <source>Sample Rate: </source>
-        <translation>采样率:</translation>
+        <translation>采样率: </translation>
     </message>
     <message>
         <source>Sample Size:      </source>
-        <translation>采样大小:</translation>
+        <translation>采样大小:      </translation>
     </message>
     <message>
         <source>The file %1 does not exist.</source>
@@ -2027,7 +2215,7 @@ Are you sure?</source>
     </message>
     <message>
         <source>Replace</source>
-        <translation>替换</translation>
+        <translation type="vanished">替换</translation>
     </message>
     <message>
         <source>Modify Fx Param : %1</source>
@@ -2168,7 +2356,71 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     </message>
     <message>
         <source>OpenToonz 1.2</source>
-        <translation>OpenToonz 1.2</translation>
+        <translation type="vanished">OpenToonz 1.2</translation>
+    </message>
+    <message>
+        <source>Custom Texture</source>
+        <comment>TextureStyleChooserPage</comment>
+        <translation>自定纹理</translation>
+    </message>
+    <message>
+        <source>Current Frame: </source>
+        <translation>当前帧: </translation>
+    </message>
+    <message>
+        <source>File History</source>
+        <translation>文件历史</translation>
+    </message>
+    <message>
+        <source>OpenToonz 1.3</source>
+        <translation type="obsolete">OpenToonz 1.3</translation>
+    </message>
+    <message>
+        <source>Plain color</source>
+        <comment>VectorBrushStyleChooserPage</comment>
+        <translation>纯色</translation>
+    </message>
+    <message>
+        <source>Plain color</source>
+        <comment>MyPaintBrushStyleChooserPage</comment>
+        <translation>纯色</translation>
+    </message>
+    <message>
+        <source>Plain color</source>
+        <comment>SpecialStyleChooserPage</comment>
+        <translation>纯色</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation>确定</translation>
+    </message>
+    <message>
+        <source>That is a reserved file name and cannot be used.</source>
+        <translation>被保留的文件名不可使用。</translation>
+    </message>
+    <message>
+        <source>There are no unused styles.</source>
+        <translation>没有未使用的样式。</translation>
+    </message>
+    <message>
+        <source>and %1 more styles.</source>
+        <translation>和 %1 更多样式。</translation>
+    </message>
+    <message>
+        <source>Erasing unused styles with following indices. Are you sure?
+
+%1</source>
+        <translation>擦除未使用的样式时有如下问题。你确认吗？
+
+%1</translation>
+    </message>
+    <message>
+        <source>Erase</source>
+        <translation>擦除</translation>
+    </message>
+    <message>
+        <source>Click &amp; Drag Palette into Studio Palette</source>
+        <translation>点击 &amp; 拖放调色板到工作室调色板</translation>
     </message>
 </context>
 <context>
@@ -2187,6 +2439,17 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     <message>
         <source>OpenToonz</source>
         <translation type="vanished">OpenToonz</translation>
+    </message>
+</context>
+<context>
+    <name>RgbLinkButtons</name>
+    <message>
+        <source>Copy RGB : %1 &gt; %2</source>
+        <translation>拷贝RGB : %1 &gt; %2</translation>
+    </message>
+    <message>
+        <source>Swap %1 and %2</source>
+        <translation>互换%1 和 %2</translation>
     </message>
 </context>
 <context>
@@ -2235,6 +2498,22 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
         <source>&amp;Swtich output port display mode</source>
         <translation>切换输出端口显示模式(&amp;S)</translation>
     </message>
+    <message>
+        <source>&amp;Toggle node icons</source>
+        <translation>开关节点图标(&amp;T)</translation>
+    </message>
+    <message>
+        <source>&amp;Selection Mode</source>
+        <translation>选择模式(&amp;S0</translation>
+    </message>
+    <message>
+        <source>&amp;Zoom Mode</source>
+        <translation>缩放模式(&amp;Z）</translation>
+    </message>
+    <message>
+        <source>&amp;Hand Mode</source>
+        <translation>抓手模式(&amp;H)</translation>
+    </message>
 </context>
 <context>
     <name>SchematicWindowEditor</name>
@@ -2273,7 +2552,7 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     <name>SpecialStyleChooserPage</name>
     <message>
         <source>Plain color</source>
-        <translation>纯色</translation>
+        <translation type="vanished">纯色</translation>
     </message>
 </context>
 <context>
@@ -2320,6 +2599,17 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     <message>
         <source>&amp;Load Motion Path...</source>
         <translation>加载运动路径(&amp;L)...</translation>
+    </message>
+</context>
+<context>
+    <name>StageSchematicNode</name>
+    <message>
+        <source>Toggle Autorotate Along Motion Path</source>
+        <translation>打开/关闭追随移动路径自动旋转</translation>
+    </message>
+    <message>
+        <source>Toggle Link Motion Path to Control Points</source>
+        <translation>打开/关闭链接移动路径到控制点</translation>
     </message>
 </context>
 <context>
@@ -2406,6 +2696,58 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     <message>
         <source>Cancel</source>
         <translation>取消</translation>
+    </message>
+    <message>
+        <source>The current palette %1
+in the studio palette has been modified. Do you want to save your changes?</source>
+        <translation>当前调色板 %1
+在工作室调色板中已经被修改了。您要保存所做的改动吗？</translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation>保存</translation>
+    </message>
+    <message>
+        <source>Discard</source>
+        <translation>放弃更改</translation>
+    </message>
+    <message>
+        <source>Convert %1 to Studio Palette and Overwrite. 
+Are you sure ?</source>
+        <translation>转换 %1 到工作室调色板并覆盖。
+您确定要这样做吗？</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation type="obsolete">是</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation type="obsolete">否</translation>
+    </message>
+    <message>
+        <source>Replacing all selected palettes with the palette &quot;%1&quot;. 
+Are you sure ?</source>
+        <translation>用调色板 &quot;%1&quot; 替换所有被选中的调色版。
+您确定要这样做吗？</translation>
+    </message>
+    <message>
+        <source>Replacing the palette &quot;%1&quot; with the palette &quot;%2&quot;. 
+Are you sure ?</source>
+        <translation>用调色板 &quot;%2&quot; 替换调色板 &quot;%1&quot;。
+您确定要这样做吗？</translation>
+    </message>
+    <message>
+        <source>Replace</source>
+        <translation>替换</translation>
+    </message>
+    <message>
+        <source>Convert</source>
+        <translation>转换</translation>
+    </message>
+    <message>
+        <source>Failed to save palette.</source>
+        <translation>保存调色板失败。</translation>
     </message>
 </context>
 <context>
@@ -2499,15 +2841,15 @@ Apply</source>
     </message>
     <message>
         <source>[CLEANUP]  </source>
-        <translation>[清稿]  </translation>
+        <translation type="vanished">[清稿]  </translation>
     </message>
     <message>
         <source>[STUDIO]  </source>
-        <translation>[工作室]  </translation>
+        <translation type="vanished">[工作室]  </translation>
     </message>
     <message>
         <source>[LEVEL]  </source>
-        <translation>[层级]  </translation>
+        <translation type="vanished">[层级]  </translation>
     </message>
     <message>
         <source>- Style is Not Valid -</source>
@@ -2515,11 +2857,11 @@ Apply</source>
     </message>
     <message>
         <source>Generated</source>
-        <translation>已生成</translation>
+        <translation>已生成的</translation>
     </message>
     <message>
         <source>Trail</source>
-        <translation type="unfinished"></translation>
+        <translation>轨迹</translation>
     </message>
     <message>
         <source>Color</source>
@@ -2568,6 +2910,18 @@ Apply</source>
     <message>
         <source>Palette</source>
         <translation>调色板</translation>
+    </message>
+    <message>
+        <source>Cleanup </source>
+        <translation>清理 </translation>
+    </message>
+    <message>
+        <source>Studio </source>
+        <translation>工作室 </translation>
+    </message>
+    <message>
+        <source>Level </source>
+        <translation>层级 </translation>
     </message>
 </context>
 <context>
@@ -2671,6 +3025,17 @@ Apply</source>
     </message>
 </context>
 <context>
+    <name>SwatchViewer</name>
+    <message>
+        <source>Reset View</source>
+        <translation>重置视图</translation>
+    </message>
+    <message>
+        <source>Fit To Window</source>
+        <translation>适合窗口</translation>
+    </message>
+</context>
+<context>
     <name>TMessageViewer</name>
     <message>
         <source>Errors</source>
@@ -2719,7 +3084,7 @@ Apply</source>
     <name>VectorBrushStyleChooserPage</name>
     <message>
         <source>Plain color</source>
-        <translation>纯色</translation>
+        <translation type="vanished">纯色</translation>
     </message>
 </context>
 <context>

@@ -18,7 +18,6 @@
 
 #include "ext/StraightCornerDeformation.h"
 #include "ext/CornerDeformation.h"
-#include "ext/SmoothDeformation.h"
 
 #include "ext/StrokeDeformationImpl.h"
 #include "DeformationSelector.h"

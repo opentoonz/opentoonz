@@ -46,7 +46,6 @@
 #include "trop.h"
 #include "tconvert.h"
 #include "tfiletype.h"
-#include "tflash.h"
 #include "timagecache.h"
 #include "tthreadmessage.h"
 
@@ -219,7 +218,6 @@ public:
   }
 
   bool init(bool isPreview);  // true if r0<=r1
-  void flashRender();
   void rasterRender(bool isPreview);
   void multimediaRender();
   void onRender();
@@ -346,54 +344,6 @@ sprop->getOutputProperties()->setRenderSettings(rso);*/
 
 //===================================================================
 
-void RenderCommand::flashRender() {
-  ToonzScene *scene       = TApp::instance()->getCurrentScene()->getScene();
-  TSceneProperties *sprop = scene->getProperties();
-  FILE *fileP             = fopen(m_fp, "wb");
-  if (!fileP) return;
-  DVGui::ProgressDialog pb("rendering " + toQString(m_fp), "Cancel", 0,
-                           m_numFrames);
-  pb.show();
-
-  TDimension cameraSize = scene->getCurrentCamera()->getRes();
-  double frameRate      = sprop->getOutputProperties()->getFrameRate();
-  TFlash flash(cameraSize.lx, cameraSize.ly, m_numFrames, frameRate,
-               sprop->getOutputProperties()->getFileFormatProperties("swf"));
-  flash.setBackgroundColor(sprop->getBgColor());
-
-  std::vector<TXshSoundColumn *> columns;
-  scene->getSoundColumns(columns);
-  if (!columns.empty()) {
-    TXsheet::SoundProperties *prop = new TXsheet::SoundProperties();
-    prop->m_frameRate              = frameRate;
-    TSoundTrack *st                = scene->getXsheet()->makeSound(prop);
-    if (st) flash.putSound(st, 0);
-  }
-
-  int i = 0;
-  for (i = 0; i < m_numFrames; ++i, m_r += m_stepd) {
-    flash.beginFrame(m_step * i + 1);
-    TRasterFxP rfx = buildSceneFx(scene, m_r, 0, false);
-    assert(rfx);
-    rfx->compute(flash,
-                 tround(m_r));  // WARNING: This should accept a DOUBLE...
-    flash.endFrame(i == m_numFrames - 1, 0, true);
-    if (pb.wasCanceled()) break;
-    pb.setValue(i + 1);
-  }
-
-  flash.writeMovie(fileP);
-  fclose(fileP);
-
-  TSystem::showDocument(m_fp);
-  // QDesktopServices::openUrl(QUrl(toQString(m_fp)));
-
-  TImageCache::instance()->remove(::to_string(m_fp.getWideString() + L".0"));
-  TNotifier::instance()->notify(TSceneNameChange());
-}
-
-//===================================================================
-
 class RenderListener final : public DVGui::ProgressDialog,
                              public MovieRenderer::Listener {
   QString m_progressBarString;
@@ -417,8 +367,10 @@ class RenderListener final : public DVGui::ProgressDialog,
       if (m_frame == -1)
         m_pb->hide();
       else {
-        m_pb->setLabelText("Rendering frame " + QString::number(m_frame) + "/" +
-                           m_labelText);
+        m_pb->setLabelText(
+            QObject::tr("Rendering frame %1 / %2", "RenderListener")
+                .arg(m_frame)
+                .arg(m_labelText));
         m_pb->setValue(m_frame);
       }
     }
@@ -428,9 +380,10 @@ public:
   RenderListener(TRenderer *renderer, const TFilePath &path, int steps,
                  bool isPreview)
       : DVGui::ProgressDialog(
-            "Precomputing " + QString::number(steps) + " Frames" +
-                ((isPreview) ? "" : " of " + toQString(path)),
-            "Cancel", 0, steps, TApp::instance()->getMainWindow())
+            QObject::tr("Precomputing %1 Frames", "RenderListener").arg(steps) +
+                ((isPreview) ? "" : QObject::tr(" of %1", "RenderListener")
+                                        .arg(toQString(path))),
+            QObject::tr("Cancel"), 0, steps, TApp::instance()->getMainWindow())
       , m_renderer(renderer)
       , m_frameCounter(0)
       , m_error(false) {
@@ -443,7 +396,10 @@ public:
 #endif
     setWindowFlags(Qt::Dialog | Qt::WindowTitleHint | Qt::CustomizeWindowHint);
     m_progressBarString =
-        QString::number(steps) + ((isPreview) ? "" : " of " + toQString(path));
+        QString::number(steps) +
+        ((isPreview)
+             ? ""
+             : QObject::tr(" of %1", "RenderListener").arg(toQString(path)));
     // setMinimumDuration (0);
     m_totalFrames = steps;
     show();
@@ -455,7 +411,8 @@ public:
     if (m_frameCounter + 1 < m_totalFrames)
       Message(this, ret ? -1 : ++m_frameCounter, m_progressBarString).send();
     else
-      setLabelText(tr("Finalizing render, please wait."));
+      setLabelText(
+          QObject::tr("Finalizing render, please wait.", "RenderListener"));
     return !ret;
   }
   bool onFrameFailed(int frame, TException &) override {
@@ -471,7 +428,7 @@ public:
 
   void onCancel() override {
     m_isCanceled = true;
-    setLabelText("Aborting render...");
+    setLabelText(QObject::tr("Aborting render...", "RenderListener"));
     reset();
     hide();
     RenderCommand::resetBgColor();
@@ -512,13 +469,20 @@ void RenderCommand::rasterRender(bool isPreview) {
 
   TPixel32 currBgColor = scene->getProperties()->getBgColor();
   m_priorBgColor       = currBgColor;
-  // fixes background colors for non alpha-enabled export types (eventually
+  // fixes background colors for non alpha-enabled movie types (eventually
   // transparent gif would be good)
-  if (ext == "jpg" || ext == "avi" || ext == "bmp" || ext == "mp4" ||
-      ext == "webm" || ext == "gif") {
-    currBgColor.m = 255;
+  currBgColor.m = 255;
+  // Mov may have alpha channel under some settings (Millions of Colors+ color
+  // depth). I tried to make OT to detect the mov settings and adaptively switch
+  // the behavior, but ended in vain :-(
+  // So I just omitted every mov from applying solid background as a quick fix.
+  if (isMovieType(ext) && ext != "mov") {
     scene->getProperties()->setBgColor(currBgColor);
   }
+  // for non alpha-enabled images (like jpg), background color will be inserted
+  // in  TImageWriter::save() (see timage_io.cpp)
+  else
+    TImageWriter::setBackgroundColor(currBgColor);
 
   // Extract output properties
   TOutputProperties *prop = isPreview
@@ -581,7 +545,8 @@ void RenderCommand::rasterRender(bool isPreview) {
   buildSceneProgressBar->setMaximum(m_numFrames - 1);
   buildSceneProgressBar->setValue(0);
   buildSceneProgressBar->move(600, 500);
-  buildSceneProgressBar->setWindowTitle("Building Schematic...");
+  buildSceneProgressBar->setWindowTitle(
+      QObject::tr("Building Schematic...", "RenderCommand"));
   buildSceneProgressBar->show();
 
   for (int i = 0; i < m_numFrames; ++i, m_r += m_stepd) {
@@ -618,6 +583,10 @@ TPixel32 RenderCommand::m_priorBgColor;
 void RenderCommand::resetBgColor() {
   ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
   scene->getProperties()->setBgColor(m_priorBgColor);
+
+  // revert background color settings
+  TImageWriter::setBackgroundColor(
+      Preferences::instance()->getRasterBackgroundColor());
 }
 
 //===================================================================
@@ -655,13 +624,18 @@ class MultimediaProgressBar final : public DVGui::ProgressDialog,
       if (m_pbValue == -1)
         m_pb->hide();
       else {
-        QString modeStr(m_pb->m_renderer->getMultimediaMode() ==
-                                MultimediaRenderer::COLUMNS
-                            ? "column "
-                            : "layer ");
-        m_pb->setLabelText("Rendering " + modeStr + QString::number(m_column) +
-                           ", frame " + QString::number(m_frame) + "/" +
-                           m_labelText);
+        QString modeStr(
+            m_pb->m_renderer->getMultimediaMode() == MultimediaRenderer::COLUMNS
+                ? QObject::tr("column ",
+                              "MultimediaProgressBar label (mode name)")
+                : QObject::tr("layer ",
+                              "MultimediaProgressBar label (mode name)"));
+        m_pb->setLabelText(QObject::tr("Rendering %1%2, frame %3 / %4",
+                                       "MultimediaProgressBar label")
+                               .arg(modeStr)
+                               .arg(m_column)
+                               .arg(m_frame)
+                               .arg(m_labelText));
         m_pb->setValue(m_pbValue);
       }
     }
@@ -672,9 +646,10 @@ class MultimediaProgressBar final : public DVGui::ProgressDialog,
 public:
   MultimediaProgressBar(MultimediaRenderer *renderer)
       : ProgressDialog(
-            "Rendering " + QString::number(renderer->getFrameCount()) +
-                " frames " + " of " + toQString(renderer->getFilePath()),
-            "Cancel", 0,
+            QObject::tr("Rendering %1 frames of %2", "MultimediaProgressBar")
+                .arg(renderer->getFrameCount())
+                .arg(toQString(renderer->getFilePath())),
+            QObject::tr("Cancel"), 0,
             renderer->getFrameCount() * renderer->getColumnsCount())
       , m_renderer(renderer)
       , m_frameCounter(0)
@@ -688,8 +663,11 @@ public:
     setWindowModality(Qt::ApplicationModal);
 #endif
     setWindowFlags(Qt::WindowTitleHint | Qt::CustomizeWindowHint);
-    m_progressBarString = QString::number(m_renderer->getFrameCount()) +
-                          " of " + toQString(m_renderer->getFilePath());
+    m_progressBarString =
+        QObject::tr("%1 of %2",
+                    "MultimediaProgressBar - [totalframe] of [path]")
+            .arg(m_renderer->getFrameCount())
+            .arg(toQString(m_renderer->getFilePath()));
     show();
   }
 
@@ -723,7 +701,7 @@ public:
 
   void onCancel() override {
     m_isCanceled = true;
-    setLabelText("Aborting render...");
+    setLabelText(QObject::tr("Aborting render...", "MultimediaProgressBar"));
     TRenderer *trenderer(m_renderer->getTRenderer());
     if (m_renderer) trenderer->stopRendering(true);
     reset();
@@ -733,8 +711,7 @@ public:
 
 //---------------------------------------------------------
 
-//! Specialized render invocation for multimedia rendering. Flash rendering
-//! is currently not supported in this mode.
+//! Specialized render invocation for multimedia rendering.
 void RenderCommand::multimediaRender() {
   ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
   std::string ext   = m_fp.getType();
@@ -868,9 +845,11 @@ void RenderCommand::doRender(bool isPreview) {
     }
   }
   if (!isWritable) {
-    std::string str = "It is not possible to write the output:  the file";
-    str += isMultiFrame ? "s are read only." : " is read only.";
-    DVGui::warning(QString::fromStdString(str));
+    QString str = QObject::tr(
+        "It is not possible to write the output:  the file", "RenderCommand");
+    str += isMultiFrame ? QObject::tr("s are read only.", "RenderCommand")
+                        : QObject::tr(" is read only.", "RenderCommand");
+    DVGui::warning(str);
     return;
   }
 
@@ -882,12 +861,9 @@ void RenderCommand::doRender(bool isPreview) {
             MultipleRender で Schematic Flows または Fx Schematic Terminal Nodes
     が選択されている場合
     --*/
-    if (m_multimediaRender &&
-        m_fp.getType() !=
-            "swf")  // swf is not currently supported on multimedia...
+    if (m_multimediaRender)
       multimediaRender();
-    else if (!isPreview && m_fp.getType() == "swf")
-      flashRender();
+
     else
       /*-- 通常のRendering --*/
       rasterRender(isPreview);

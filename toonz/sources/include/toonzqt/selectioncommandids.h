@@ -10,6 +10,7 @@
 #define MI_Paste "MI_Paste"
 #define MI_PasteAbove "MI_PasteAbove"
 #define MI_PasteInto "MI_PasteInto"
+#define MI_PasteDuplicate "MI_PasteDuplicate"
 #define MI_PasteValues "MI_PasteValues"
 #define MI_PasteColors "MI_PasteColors"
 #define MI_PasteNames "MI_PasteNames"

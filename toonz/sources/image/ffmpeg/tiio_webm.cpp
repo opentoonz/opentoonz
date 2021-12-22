@@ -101,7 +101,7 @@ TLevelWriterWebm::~TLevelWriterWebm() {
 TImageWriterP TLevelWriterWebm::getFrameWriter(TFrameId fid) {
   // if (IOError != 0)
   //	throw TImageException(m_path, buildGifExceptionString(IOError));
-  if (fid.getLetter() != 0) return TImageWriterP(0);
+  if (!fid.getLetter().isEmpty()) return TImageWriterP(0);
   int index             = fid.getNumber();
   TImageWriterWebm *iwg = new TImageWriterWebm(m_path, index, this);
   return TImageWriterP(iwg);
@@ -174,8 +174,6 @@ TLevelReaderWebm::TLevelReaderWebm(const TFilePath &path) : TLevelReader(path) {
   m_lx                    = m_size.lx;
   m_ly                    = m_size.ly;
 
-  ffmpegReader->getFramesFromMovie();
-
   // set values
   m_info                   = new TImageInfo();
   m_info->m_frameRate      = fps;
@@ -206,7 +204,7 @@ TLevelP TLevelReaderWebm::loadInfo() {
 TImageReaderP TLevelReaderWebm::getFrameReader(TFrameId fid) {
   // if (IOError != 0)
   //	throw TImageException(m_path, buildAVIExceptionString(IOError));
-  if (fid.getLetter() != 0) return TImageReaderP(0);
+  if (!fid.getLetter().isEmpty()) return TImageReaderP(0);
   int index = fid.getNumber();
 
   TImageReaderWebm *irm = new TImageReaderWebm(m_path, index, this, m_info);
@@ -220,6 +218,10 @@ TDimension TLevelReaderWebm::getSize() { return m_size; }
 //------------------------------------------------
 
 TImageP TLevelReaderWebm::load(int frameIndex) {
+  if (!ffmpegFramesCreated) {
+    ffmpegReader->getFramesFromMovie();
+    ffmpegFramesCreated = true;
+  }
   return ffmpegReader->getImage(frameIndex);
 }
 

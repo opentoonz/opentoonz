@@ -4,6 +4,7 @@ if(WITH_SYSTEM_SUPERLU)
     set(_header_hints)
     set(_header_suffixes
         superlu
+        SuperLU
     )
     set(_lib_suffixes)
 else()

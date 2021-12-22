@@ -51,6 +51,8 @@
 #include <QMenu>
 #include <QContextMenuEvent>
 #include <QMainWindow>
+#include <QLineEdit>
+#include <QLabel>
 
 #include <memory>
 
@@ -86,56 +88,117 @@ TFx *createPresetFxByName(TFilePath path) {
 }
 
 //-----------------------------------------------------------------------------
+// same as createMacroFxByPath() in addfxcontextmenu.cpp
 
 TFx *createMacroFxByPath(TFilePath path) {
-  TIStream is(path);
-  TPersist *p = 0;
-  is >> p;
-  TMacroFx *fx = dynamic_cast<TMacroFx *>(p);
-  if (!fx) return 0;
-  fx->setName(path.getWideName());
-  // Assign a unic ID to each fx in the macro!
-  TApp *app    = TApp::instance();
-  TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
-  if (!xsh) return fx;
-  FxDag *fxDag = xsh->getFxDag();
-  if (!fxDag) return fx;
-  std::vector<TFxP> fxs;
-  fxs = fx->getFxs();
-  QMap<std::wstring, std::wstring> oldNewId;
-  int i;
-  for (i = 0; i < fxs.size(); i++) {
-    std::wstring oldId = fxs[i]->getFxId();
-    fxDag->assignUniqueId(fxs[i].getPointer());
-    oldNewId[oldId] = fxs[i]->getFxId();
-  }
+  try {
+    TIStream is(path);
+    TPersist *p = 0;
+    is >> p;
+    TMacroFx *fx = dynamic_cast<TMacroFx *>(p);
+    if (!fx) return 0;
+    fx->setName(path.getWideName());
+    // Assign a unic ID to each fx in the macro!
+    TApp *app    = TApp::instance();
+    TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
+    if (!xsh) return fx;
+    FxDag *fxDag = xsh->getFxDag();
+    if (!fxDag) return fx;
+    std::vector<TFxP> fxs;
+    fxs = fx->getFxs();
+    QMap<std::wstring, std::wstring> oldNewId;
+    int i;
+    for (i = 0; i < fxs.size(); i++) {
+      std::wstring oldId = fxs[i]->getFxId();
+      fxDag->assignUniqueId(fxs[i].getPointer());
+      std::wstring newId = fxs[i]->getFxId();
+      oldNewId[oldId]    = newId;
 
-  QStack<QPair<std::string, TFxPort *>> newPortNames;
+      // changing the id of the internal effects of a macro breaks the links
+      // between the name of the port and the port to which it is linked :
+      // I have to change the names of the ports and remap them within the macro
+      int j;
+      for (j = 0; j < fx->getInputPortCount(); j++) {
+        QString inputName = QString::fromStdString(fx->getInputPortName(j));
+        if (inputName.endsWith(QString::fromStdWString(oldId))) {
+          QString newInputName = inputName;
+          newInputName.replace(QString::fromStdWString(oldId),
+                               QString::fromStdWString(newId));
+          fx->renamePort(inputName.toStdString(), newInputName.toStdString());
+        }
+      }
+    }
 
-  // Devo cambiare il nome alle porte: contengono l'id dei vecchi effetti
-  for (i = fx->getInputPortCount() - 1; i >= 0; i--) {
-    std::string oldPortName = fx->getInputPortName(i);
-    std::string inFxOldId   = oldPortName;
-    inFxOldId.erase(0, inFxOldId.find_last_of("_") + 1);
-    assert(oldNewId.contains(::to_wstring(inFxOldId)));
-    std::string inFxNewId   = ::to_string(oldNewId[::to_wstring(inFxOldId)]);
-    std::string newPortName = oldPortName;
-    newPortName.erase(newPortName.find_last_of("_") + 1,
-                      newPortName.size() - 1);
-    newPortName.append(inFxNewId);
-    TFxPort *fxPort = fx->getInputPort(i);
-    newPortNames.append(QPair<std::string, TFxPort *>(newPortName, fxPort));
-    fx->removeInputPort(oldPortName);
+    return fx;
+  } catch (...) {
+    return 0;
   }
-  while (!newPortNames.isEmpty()) {
-    QPair<std::string, TFxPort *> newPort = newPortNames.pop();
-    fx->addInputPort(newPort.first, *newPort.second);
-  }
-  return fx;
 }
 
 }  // anonymous namespace
 //-----------------------------------------------------------------------------
+
+//=============================================================================
+// FxTree
+//=============================================================================
+
+void FxTree::displayAll(QTreeWidgetItem *item) {
+  int childCount = item->childCount();
+  for (int i = 0; i < childCount; ++i) {
+    displayAll(item->child(i));
+  }
+  item->setHidden(false);
+  item->setExpanded(false);
+}
+
+//-------------------------------------------------------------------
+
+void FxTree::hideAll(QTreeWidgetItem *item) {
+  int childCount = item->childCount();
+  for (int i = 0; i < childCount; ++i) {
+    hideAll(item->child(i));
+  }
+  item->setHidden(true);
+  item->setExpanded(false);
+}
+
+//-------------------------------------------------------------------
+
+void FxTree::searchItems(const QString &searchWord) {
+  // if search word is empty, show all items
+  if (searchWord.isEmpty()) {
+    int itemCount = topLevelItemCount();
+    for (int i = 0; i < itemCount; ++i) {
+      displayAll(topLevelItem(i));
+    }
+    update();
+    return;
+  }
+
+  // hide all items first
+  int itemCount = topLevelItemCount();
+  for (int i = 0; i < itemCount; ++i) {
+    hideAll(topLevelItem(i));
+  }
+
+  QList<QTreeWidgetItem *> foundItems =
+      findItems(searchWord, Qt::MatchContains | Qt::MatchRecursive, 0);
+  if (foundItems.isEmpty()) {  // if nothing is found, do nothing but update
+    update();
+    return;
+  }
+
+  // for each item found, show it and show its parent
+  for (auto item : foundItems) {
+    while (item) {
+      item->setHidden(false);
+      item->setExpanded(true);
+      item = item->parent();
+    }
+  }
+
+  update();
+}
 
 //=============================================================================
 /*! \class InsertFxPopup
@@ -157,25 +220,27 @@ InsertFxPopup::InsertFxPopup()
   setTopMargin(0);
   setTopSpacing(0);
 
-  m_fxTree = new QTreeWidget();
-  m_fxTree->setIconSize(QSize(21, 17));
+  QHBoxLayout *searchLay = new QHBoxLayout();
+  QLineEdit *searchEdit  = new QLineEdit(this);
+
+  searchLay->setMargin(0);
+  searchLay->setSpacing(5);
+  searchLay->addWidget(new QLabel(tr("Search:"), this), 0);
+  searchLay->addWidget(searchEdit);
+  addLayout(searchLay);
+  connect(searchEdit, SIGNAL(textChanged(const QString &)), this,
+          SLOT(onSearchTextChanged(const QString &)));
+
+  m_fxTree = new FxTree();
+  m_fxTree->setIconSize(QSize(21, 18));
   m_fxTree->setColumnCount(1);
   m_fxTree->header()->close();
 
   m_fxTree->setObjectName("FxTreeView");
   m_fxTree->setAlternatingRowColors(true);
 
-  QString open  = QString(":Resources/folder_close.svg");
-  QString close = QString(":Resources/folder_open.svg");
-  m_folderIcon.addFile(close, QSize(22, 22), QIcon::Normal, QIcon::On);
-  m_folderIcon.addFile(open, QSize(22, 22), QIcon::Normal, QIcon::Off);
-
-  QString presetOpen  = QString(":Resources/folderpreset_close.svg");
-  QString presetClose = QString(":Resources/folderpreset_open.svg");
-  m_presetIcon.addFile(presetClose, QSize(22, 22), QIcon::Normal, QIcon::On);
-  m_presetIcon.addFile(presetOpen, QSize(22, 22), QIcon::Normal, QIcon::Off);
-
-  m_fxIcon = QIcon(QString(":Resources/fx.svg"));
+  m_presetIcon = createQIcon("folder_preset", true);
+  m_fxIcon     = createQIcon("fx");
 
   QList<QTreeWidgetItem *> fxItems;
 
@@ -188,7 +253,7 @@ InsertFxPopup::InsertFxPopup()
   // add 'Plugins' directory
   auto plugins =
       new QTreeWidgetItem((QTreeWidget *)NULL, QStringList("Plugins"));
-  plugins->setIcon(0, m_folderIcon);
+  plugins->setIcon(0, createQIcon("folder", true));
   m_fxTree->addTopLevelItem(plugins);
 
   // create vendor / Fx
@@ -198,7 +263,7 @@ InsertFxPopup::InsertFxPopup()
       PluginLoader::create_menu_items(
           [&](QTreeWidgetItem *firstlevel_item) {
             plugins->addChild(firstlevel_item);
-            firstlevel_item->setIcon(0, m_folderIcon);
+            firstlevel_item->setIcon(0, createQIcon("folder"));
           },
           [&](QTreeWidgetItem *secondlevel_item) {
             secondlevel_item->setIcon(0, m_fxIcon);
@@ -212,19 +277,32 @@ InsertFxPopup::InsertFxPopup()
 
   QPushButton *insertBtn = new QPushButton(tr("Insert"), this);
   insertBtn->setFixedSize(65, 25);
+  insertBtn->setObjectName("PushButton_NoPadding");
   connect(insertBtn, SIGNAL(clicked()), this, SLOT(onInsert()));
   insertBtn->setDefault(true);
   m_buttonLayout->addWidget(insertBtn);
 
   QPushButton *addBtn = new QPushButton(tr("Add"), this);
   addBtn->setFixedSize(65, 25);
+  addBtn->setObjectName("PushButton_NoPadding");
   connect(addBtn, SIGNAL(clicked()), this, SLOT(onAdd()));
   m_buttonLayout->addWidget(addBtn);
 
   QPushButton *replaceBtn = new QPushButton(tr("Replace"), this);
   replaceBtn->setFixedHeight(25);
+  replaceBtn->setObjectName("PushButton_NoPadding");
   connect(replaceBtn, SIGNAL(clicked()), this, SLOT(onReplace()));
   m_buttonLayout->addWidget(replaceBtn);
+}
+
+//-------------------------------------------------------------------
+
+void InsertFxPopup::onSearchTextChanged(const QString &text) {
+  static bool busy = false;
+  if (busy) return;
+  busy = true;
+  m_fxTree->searchItems(text);
+  busy = false;
 }
 
 //-------------------------------------------------------------------
@@ -251,7 +329,7 @@ void InsertFxPopup::loadFolder(QTreeWidgetItem *parent) {
 
       std::unique_ptr<QTreeWidgetItem> folder(
           new QTreeWidgetItem((QTreeWidget *)0, QStringList(folderName)));
-      folder->setIcon(0, m_folderIcon);
+      folder->setIcon(0, createQIcon("folder", true));
 
       loadFolder(folder.get());
       m_is->closeChild();
@@ -334,7 +412,7 @@ void InsertFxPopup::loadMacro() {
       QTreeWidgetItem *macroFolder =
           new QTreeWidgetItem((QTreeWidget *)0, QStringList(tr("Macro")));
       macroFolder->setData(0, Qt::UserRole, QVariant(toQString(fp)));
-      macroFolder->setIcon(0, m_folderIcon);
+      macroFolder->setIcon(0, createQIcon("folder", true));
       m_fxTree->addTopLevelItem(macroFolder);
       for (TFilePathSet::iterator it = macros.begin(); it != macros.end();
            ++it) {
@@ -422,8 +500,9 @@ TFx *InsertFxPopup::createFx() {
   TXsheet *xsh      = scene->getXsheet();
 
   QTreeWidgetItem *item = m_fxTree->currentItem();
-  QString text          = item->data(0, Qt::UserRole).toString();
+  if (item == NULL) return 0;
 
+  QString text = item->data(0, Qt::UserRole).toString();
   if (text.isEmpty()) return 0;
 
   TFx *fx;

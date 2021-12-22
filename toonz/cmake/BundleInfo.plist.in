@@ -4,28 +4,26 @@
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
+	<key>CFBundleDisplayName</key>
+	<string>OpenToonz</string>
 	<key>CFBundleExecutable</key>
-	<string>OpenToonz_1.2</string>
-	<key>CFBundleGetInfoString</key>
-	<string></string>
+	<string>OpenToonz</string>
 	<key>CFBundleIconFile</key>
 	<string>OpenToonz.icns</string>
 	<key>CFBundleIdentifier</key>
 	<string>io.github.opentoonz.OpenToonz</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
-	<key>CFBundleLongVersionString</key>
-	<string></string>
 	<key>CFBundleName</key>
-	<string></string>
+	<string>OpenToonz</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string></string>
+	<string>1.5.0</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string></string>
+	<string>1.5</string>
 	<key>CSResourcesFileMapped</key>
 	<true/>
 	<key>LSRequiresCarbon</key>
@@ -33,6 +31,10 @@
 	<key>NSHighResolutionCapable</key>
 	<true/>
 	<key>NSHumanReadableCopyright</key>
-	<string></string>
+	<string>This Open Source Program is developed from Toonz, a software originally created by Digital Video, S.p.A., Rome Italy</string>
+	<key>NSCameraUsageDescription</key>
+  <string>OpenToonz needs access to the camera in order to use Camera Capture</string>
+  <key>NSMicrophoneUsageDescription</key>
+  <string>OpenToonz needs access to the microphone in order to use Record Audio</string>
 </dict>
 </plist>

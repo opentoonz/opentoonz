@@ -21,7 +21,7 @@
 #define GLUT_NO_WARNING_DISABLE
 #endif
 
-#ifdef LINUX
+#if defined(LINUX) || defined(FREEBSD)
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <GL/glut.h>
@@ -67,6 +67,12 @@ class TCubic;
 #else
 #define TGL_TYPE GL_UNSIGNED_BYTE
 #endif
+
+//=============================================================================
+// settings for 30bit display
+
+#define TGL_TexFmt10 GL_RGB10_A2
+#define TGL_TYPE16 GL_UNSIGNED_SHORT
 
 //=============================================================================
 

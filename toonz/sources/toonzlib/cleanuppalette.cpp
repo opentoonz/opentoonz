@@ -94,11 +94,11 @@ TPalette *createToonzPalette(TPalette *cleanupPalette, int colorParamIndex) {
 void TargetColors::update(TPalette *palette, bool noAntialias) {
   m_colors.clear();
 
-  TargetColor tranparent(TPixel32(255, 255, 255, 0) /*TPixel32::Transparent*/,
+  TargetColor transparent(TPixel32(255, 255, 255, 0) /*TPixel32::Transparent*/,
                          0,  // BackgroundStyle,
                          0, 0, 0, 0);
 
-  m_colors.push_back(tranparent);
+  m_colors.push_back(transparent);
 
   for (int i = 0; i < palette->getPage(0)->getStyleCount(); i++) {
     int styleId     = palette->getPage(0)->getStyleId(i);

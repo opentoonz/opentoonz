@@ -136,8 +136,8 @@ bool PreviewSubCameraManager::mouseMoveEvent(SceneViewer *viewer,
   QPointF curPos(event.mousePos() * getDevPixRatio());
   if (event.buttons() == Qt::LeftButton) {
     if (!bitwiseContains(m_dragType, INNER)) {
-      if (abs(curPos.x() - m_mousePressPos.x()) > 10 ||
-          abs(curPos.y() - m_mousePressPos.y()) > 10)
+      if (std::abs(curPos.x() - m_mousePressPos.x()) > 10 ||
+          std::abs(curPos.y() - m_mousePressPos.y()) > 10)
         m_clickAndDrag = true;
     }
 

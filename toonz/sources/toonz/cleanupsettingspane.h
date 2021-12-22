@@ -24,7 +24,7 @@ namespace DVGui {
 
 class DoubleField;
 class IntField;
-}
+}  // namespace DVGui
 
 /*
 "Save In"
@@ -62,6 +62,8 @@ private:
   QLabel *m_aaValueLabel;
   DVGui::IntField *m_aaValue;
   QComboBox *m_lineProcessing;
+  QLabel *m_lpNoneFormatLabel;
+  QComboBox *m_lpNoneFormat;
   //----Cleanup Palette
   CleanupPaletteViewer *m_paletteViewer;
   //----Bottom Parts
@@ -70,6 +72,8 @@ private:
 
   CleanupParameters m_backupParams;
   bool m_attached;
+
+  QList<QWidget *> m_lpWidgets;
 
 public:
   CleanupSettingsPane(QWidget *parent = 0);

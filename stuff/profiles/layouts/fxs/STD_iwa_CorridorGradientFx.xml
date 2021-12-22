@@ -1,0 +1,18 @@
+<fxlayout>
+  <page name="Corridor Gradient Iwa">
+    <control>shape</control>
+    <control>curveType</control>
+   <separator label="Inner Shape"/>
+    <control>bottom_left_in</control>
+    <control>bottom_right_in</control>
+    <control>top_left_in</control>
+    <control>top_right_in</control>
+    <control>inner_color</control>
+   <separator label="Outer Shape"/>
+    <control>bottom_left_out</control>
+    <control>bottom_right_out</control>
+    <control>top_left_out</control>
+    <control>top_right_out</control>
+    <control>outer_color</control>
+  </page>
+</fxlayout>

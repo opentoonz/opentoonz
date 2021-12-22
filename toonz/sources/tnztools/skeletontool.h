@@ -35,7 +35,7 @@ public:
       : m_h0(h0), m_h1(h1), m_dist2(dist2) {}
   bool operator<(const MagicLink &link) const { return m_dist2 < link.m_dist2; }
 };
-}
+}  // namespace SkeletonSubtools
 
 class SkeletonTool : public TTool {
   Q_DECLARE_TR_FUNCTIONS(SkeletonTool)
@@ -79,25 +79,25 @@ public:
   SkeletonTool();
   ~SkeletonTool();
 
-  ToolType getToolType() const { return TTool::ColumnTool; }
+  ToolType getToolType() const override { return TTool::ColumnTool; }
 
-  void updateTranslation();  // QString localization stuff
+  void updateTranslation() override;  // QString localization stuff
 
   bool doesApply() const;  // ritorna vero se posso deformare l'oggetto corrente
 
-  void onEnter() {}
-  void leftButtonDown(const TPointD &pos, const TMouseEvent &);
-  void leftButtonDrag(const TPointD &pos, const TMouseEvent &);
-  void leftButtonUp(const TPointD &pos, const TMouseEvent &);
-  void mouseMove(const TPointD &, const TMouseEvent &e);
+  void onEnter() override {}
+  void leftButtonDown(const TPointD &pos, const TMouseEvent &) override;
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &) override;
+  void leftButtonUp(const TPointD &pos, const TMouseEvent &) override;
+  void mouseMove(const TPointD &, const TMouseEvent &e) override;
 
-  void onImageChanged() { invalidate(); }
+  void onImageChanged() override { invalidate(); }
 
-  void reset() { m_temporaryPinnedColumns.clear(); }
+  void reset() override { m_temporaryPinnedColumns.clear(); }
 
-  bool onPropertyChanged(std::string propertyName);
+  bool onPropertyChanged(std::string propertyName) override;
 
-  void draw();
+  void draw() override;
 
   void drawSkeleton(const Skeleton &skeleton, int row);
   void drawLevelBoundingBox(int frame, int columnIndex);
@@ -122,21 +122,21 @@ public:
 
   bool keyDown(QKeyEvent *event) override;
 
-  void onActivate();
-  void onDeactivate();
+  void onActivate() override;
+  void onDeactivate() override;
 
   int getMagicLinkCount() const { return (int)m_magicLinks.size(); }
   SkeletonSubtools::MagicLink getMagicLink(int index) const;
 
   void magicLink(int index);
 
-  int getCursorId() const;
+  int getCursorId() const override;
 
   // TRaster32P getToolIcon() const {return Pixmaps::arrow;}
-  TPropertyGroup *getProperties(int targetType) { return &m_prop; }
+  TPropertyGroup *getProperties(int targetType) override { return &m_prop; }
 
-  void updateMatrix() { setMatrix(getCurrentObjectParentMatrix()); }
-  void addContextMenuItems(QMenu *menu);
+  void updateMatrix() override { setMatrix(getCurrentObjectParentMatrix()); }
+  void addContextMenuItems(QMenu *menu) override;
   bool select(const TSelection *) { return false; }
 
   void togglePinnedStatus(int columnIndex, int frame, bool shiftPressed);

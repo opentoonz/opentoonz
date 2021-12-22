@@ -15,7 +15,8 @@
 
 TXshZeraryFxColumn::TXshZeraryFxColumn(int frameCount)
     : m_zeraryColumnFx(new TZeraryColumnFx())
-    , m_zeraryFxLevel(new TXshZeraryFxLevel()) {
+    , m_zeraryFxLevel(new TXshZeraryFxLevel())
+    , m_iconVisible(false) {
   m_zeraryColumnFx->addRef();
   m_zeraryColumnFx->setColumn(this);
   m_zeraryFxLevel->addRef();
@@ -28,7 +29,8 @@ TXshZeraryFxColumn::TXshZeraryFxColumn(int frameCount)
 
 TXshZeraryFxColumn::TXshZeraryFxColumn(const TXshZeraryFxColumn &src)
     : m_zeraryColumnFx(new TZeraryColumnFx())
-    , m_zeraryFxLevel(new TXshZeraryFxLevel()) {
+    , m_zeraryFxLevel(new TXshZeraryFxLevel())
+    , m_iconVisible(false) {
   m_zeraryColumnFx->addRef();
   m_zeraryColumnFx->setColumn(this);
   m_zeraryFxLevel->addRef();
@@ -160,6 +162,8 @@ void TXshZeraryFxColumn::loadData(TIStream &is) {
           throw TException("expected <cell>");
         is.closeChild();
       }
+    } else if (loadCellMarks(tagName, is)) {
+      // do nothing
     } else
       throw TException("expected <status> or <cells>");
     is.closeChild();
@@ -184,6 +188,8 @@ void TXshZeraryFxColumn::saveData(TOStream &os) {
     }
     os.closeChild();
   }
+  // cell marks
+  saveCellMarks(os);
 }
 
 //-----------------------------------------------------------------------------

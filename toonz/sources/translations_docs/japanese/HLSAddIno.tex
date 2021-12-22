@@ -1,0 +1,100 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[a4paper, total={180mm, 272mm}]{geometry}
+
+\usepackage{fontspec}
+\setmainfont[Path=fonts/, Extension=.ttf]{ipaexm}
+
+\setlength\parindent{3.5em}
+\setlength\parskip{0em}
+\renewcommand{\baselinestretch}{1.247}
+
+\begin{document}
+
+\thispagestyle{empty}
+
+\Large
+\noindent \\
+HLS Add Ino\medskip
+\par
+\normalsize
+参照画像(Noise)の指定チャンネルの値で肌合いを加えます。\par
+色相、明度、彩度、あるいは Alpha が変化します。\\
+\par
+セル調の画像に、色相、明度、彩度、あるいは Alpha でノイズを加え、\par
+背景の絵に馴染ませる等々に使います。\par
+同様な事をノイズツールで行うと、1ドット毎のノイズなので絵が１本調子になります。\par
+それとは違い、ノイズを参照画像としてユーザーが用意し、\par
+その絵をノイズ成分として計算し、画像の肌合いを決めます。\\
+\par
+あくまで、２次元上の静止画像に対する処理なので、立体を感じさ\par
+せる場合や、動画の場合は、別の考察、処理（？）が必要です。\\
+\par
+Alpha チャンネルによって効果の強さが決まります。よって、\par
+Alpha によるマスクエッジが滑らかであればその状態を保持します。\\
+\\
+-{-}- \ 入力 \ -{-}-\\
+Source\par
+処理をする画像を接続します。\\
+Noise\par
+Pixel 毎に HLS 値によってノイズを加えるための画像を接続します。\\
+Reference\par
+Pixel 毎に効果の強弱をつけるための参照画像を接続します。\\
+\\
+-{-}- \ 設定 \ -{-}-\\
+From RGBA\par
+参照画像(Noise)のどの channel を使用するかを指定します。\par
+\textquotedbl Red\textquotedbl \ \textquotedbl Green\textquotedbl \ \textquotedbl Blue\textquotedbl \ \textquotedbl Alpha\textquotedbl のどれかを選びます。\par
+初期値は\textquotedbl Red\textquotedbl です。\\
+\\
+Offset\par
+参照画像(Noise)の Pixel 値に対する offset 値です。\par
+Pixel 値(8 or 16bits)をゼロから1の値として、-1.0から1.0の間\par
+の値で指定します。\par
+参照 Pixel 値がここでの指定と同じ値のときは変化しません。\par
+この値に対する参照 Pixel 値の大小によって、変化がおきます。\par
+初期値は0.5です。\\
+\\
+Hue\par
+色相(Hue)変化の強さを指定します。\par
+offset 値を中心としてスケールがかります。
+
+\newpage
+
+\thispagestyle{empty}
+
+\ \vspace{-0.2em}
+\par
+-1.0から1.0の間の値で指定します。\par
+ゼロだとなにも変化しません。\par
+初期値は0.0です。\\
+\\
+Lightness\par
+明度(Lightness)変化の強さを指定します。\par
+初期値は0.25です。\par
+他は\textquotedbl Hue\textquotedbl と同様です。\\
+\\
+Saturation\par
+彩度(Saturation)変化の強さを指定します。\par
+初期値は0.0です。\par
+他は\textquotedbl Hue\textquotedbl と同様です。\\
+\\
+Alpha\par
+不透明度(Alpha)変化の強さを指定します。\par
+初期値は0.0です。\par
+他は\textquotedbl Hue\textquotedbl と同様です。\\
+\\
+Premultiplied\par
+ON なら、RGB に対して Premultiply 済の\par
+（Alpha チャンネルの値があらかじめ RGB チャンネルに乗算されている)\par
+画像として処理します。\par
+そのとき、Alpha にも処理を加えてしまうと、正しい画像にならない場合があります。\par
+初期値は ON です。\\
+\\
+Reference\par
+Pixel 毎に効果の強弱をつけるための参照画像の値の取り方を選択します。\par
+入力の\textquotedbl Reference\textquotedbl に画像を接続し、\par
+Red/Green/Blue/Alpha/Luminance/Nothing から選びます。\par
+この効果をつけたくないときは Nothing を選ぶか、接続を切ります。\par
+初期値は Red です。
+
+\end{document}

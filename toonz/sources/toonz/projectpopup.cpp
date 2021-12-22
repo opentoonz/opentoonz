@@ -17,14 +17,13 @@
 #include "toonzqt/checkbox.h"
 #include "toonzqt/gutil.h"
 
-// TnzLic includes
-#ifdef LINETEST
-#include "tnzcamera.h"
-#endif
+// TnzLib
+#include "toonz/filepathproperties.h"
 
 // TnzCore includes
 #include "tsystem.h"
 #include "tenv.h"
+#include "tfilepath.h"
 
 // Qt includes
 #include <QPushButton>
@@ -33,8 +32,18 @@
 #include <QLabel>
 #include <QMainWindow>
 #include <QComboBox>
+#include <QTabWidget>
+#include <QStackedWidget>
+#include <QButtonGroup>
+#include <QRadioButton>
 
 using namespace DVGui;
+
+namespace {
+
+enum { Rule_Standard = 0, Rule_Custom };
+
+}
 
 //=============================================================================
 // ProjectDvDirModelProjectNode
@@ -42,9 +51,9 @@ using namespace DVGui;
 
 QPixmap ProjectDvDirModelProjectNode::getPixmap(bool isOpen) const {
   static QPixmap openProjectPixmap(
-      svgToPixmap(":Resources/browser_project_open.svg"));
+      svgToPixmap(getIconThemePath("actions/18/folder_project_on.svg")));
   static QPixmap closeProjectPixmap(
-      svgToPixmap(":Resources/browser_project_close.svg"));
+      svgToPixmap(getIconThemePath("actions/18/folder_project.svg")));
   return isOpen ? openProjectPixmap : closeProjectPixmap;
 }
 
@@ -97,7 +106,8 @@ void ProjectDvDirModelRootNode::refreshChildren() {
       ProjectDvDirModelSpecialFileFolderNode *projectRootNode =
           new ProjectDvDirModelSpecialFileFolderNode(
               this, L"Project root (" + rootDir + L")", projectRoot);
-      projectRootNode->setPixmap(svgToPixmap(":Resources/projects.svg"));
+      projectRootNode->setPixmap(
+          svgToPixmap(getIconThemePath("actions/18/folder_project_root.svg")));
       addChild(projectRootNode);
     }
 
@@ -145,7 +155,7 @@ DvDirModelNode *ProjectDirModel::getNode(const QModelIndex &index) const {
 QModelIndex ProjectDirModel::index(int row, int column,
                                    const QModelIndex &parent) const {
   if (column != 0) return QModelIndex();
-  DvDirModelNode *parentNode       = m_root;
+  DvDirModelNode *parentNode = m_root;
   if (parent.isValid()) parentNode = getNode(parent);
   if (row < 0 || row >= parentNode->getChildCount()) return QModelIndex();
   DvDirModelNode *node = parentNode->getChild(row);
@@ -283,62 +293,136 @@ ProjectPopup::ProjectPopup(bool isModal)
   m_model              = new ProjectDirModel;
   m_treeView           = new DvDirTreeView(this);
 
+  m_rulePreferenceBG       = new QButtonGroup(this);
+  QRadioButton *standardRB = new QRadioButton(tr("Standard"), this);
+  QRadioButton *customRB =
+      new QRadioButton(QString("[Experimental]  ") + tr("Custom"), this);
+  m_acceptNonAlphabetSuffixCB =
+      new CheckBox(tr("Accept Non-alphabet Suffix"), this);
+  m_letterCountCombo = new QComboBox(this);
+
+  QTabWidget *tabWidget = new QTabWidget(this);
+
+  //-----
+
   m_nameFld->setMaximumHeight(WidgetHeight);
   m_treeView->setModel(m_model);
-  m_treeView->setStyleSheet("border:1px solid rgb(120,120,120);");
+
+  m_rulePreferenceBG->addButton(standardRB, Rule_Standard);
+  m_rulePreferenceBG->addButton(customRB, Rule_Custom);
+  m_rulePreferenceBG->setExclusive(true);
+  standardRB->setToolTip(tr(
+      "In the standard mode files with the following file name are handled as sequencial images:\n\
+[LEVEL_NAME][\".\"or\"_\"][FRAME_NUMBER][SUFFIX].[EXTENSION]\n\
+For [SUFFIX] zero or one occurrences of alphabet (a-z, A-Z) can be used in the standard mode."));
+  customRB->setToolTip(
+      tr("In the custom mode you can customize the file path rules.\n\
+Note that this mode uses regular expression for file name validation and may slow the operation."));
+
+  m_letterCountCombo->addItem(tr("1"), 1);
+  m_letterCountCombo->addItem(tr("2"), 2);
+  m_letterCountCombo->addItem(tr("3"), 3);
+  m_letterCountCombo->addItem(tr("5"), 5);
+  m_letterCountCombo->addItem(tr("Unlimited"), 0);
 
   //----layout
   m_topLayout->setMargin(5);
   m_topLayout->setSpacing(10);
   {
-    m_topLayout->addWidget(m_treeView, 0);
+    m_topLayout->addWidget(tabWidget, 1);
 
-    QGridLayout *upperLayout = new QGridLayout();
-    upperLayout->setMargin(5);
-    upperLayout->setHorizontalSpacing(5);
-    upperLayout->setVerticalSpacing(10);
+    // project folder settings
+
+    QWidget *projectFolderPanel = new QWidget(this);
+    QVBoxLayout *pfLayout       = new QVBoxLayout();
+    pfLayout->setMargin(5);
+    pfLayout->setSpacing(10);
     {
-      upperLayout->addWidget(m_choosePrjLabel, 0, 0,
-                             Qt::AlignRight | Qt::AlignVCenter);
-      upperLayout->addWidget(m_chooseProjectCombo, 0, 1);
+      pfLayout->addWidget(m_treeView, 0);
 
-      upperLayout->addWidget(m_prjNameLabel, 1, 0,
-                             Qt::AlignRight | Qt::AlignVCenter);
-      upperLayout->addWidget(m_nameFld, 1, 1);
-    }
-    upperLayout->setColumnStretch(0, 0);
-    upperLayout->setColumnStretch(1, 1);
+      QGridLayout *upperLayout = new QGridLayout();
+      upperLayout->setMargin(5);
+      upperLayout->setHorizontalSpacing(5);
+      upperLayout->setVerticalSpacing(10);
+      {
+        upperLayout->addWidget(m_choosePrjLabel, 0, 0,
+                               Qt::AlignRight | Qt::AlignVCenter);
+        upperLayout->addWidget(m_chooseProjectCombo, 0, 1);
 
-    std::vector<std::string> folderNames;
-    pm->getFolderNames(folderNames);
-    int i;
-    for (i = 0; i < (int)folderNames.size(); i++) {
-      std::string name = folderNames[i];
-      QString qName    = QString::fromStdString(name);
-      FileField *ff    = new FileField(0, qName);
-      m_folderFlds.append(qMakePair(name, ff));
-      upperLayout->addWidget(new QLabel("+" + qName, this), i + 2, 0,
-                             Qt::AlignRight | Qt::AlignVCenter);
-      upperLayout->addWidget(ff, i + 2, 1);
-    }
-    struct {
-      QString name;
-      std::string folderName;
-    } cbs[] = {{tr("Append $scenepath to +drawings"), TProject::Drawings},
-               {tr("Append $scenepath to +inputs"), TProject::Inputs},
-               {tr("Append $scenepath to +extras"), TProject::Extras}};
-    int currentRow = upperLayout->rowCount();
+        upperLayout->addWidget(m_prjNameLabel, 1, 0,
+                               Qt::AlignRight | Qt::AlignVCenter);
+        upperLayout->addWidget(m_nameFld, 1, 1);
+      }
+      upperLayout->setColumnStretch(0, 0);
+      upperLayout->setColumnStretch(1, 1);
 
-    for (i = 0; i < tArrayCount(cbs); i++) {
-      CheckBox *cb = new CheckBox(cbs[i].name);
-      cb->setMaximumHeight(WidgetHeight);
-      upperLayout->addWidget(cb, currentRow + i, 1);
-      m_useScenePathCbs.append(qMakePair(cbs[i].folderName, cb));
+      std::vector<std::string> folderNames;
+      pm->getFolderNames(folderNames);
+      int i;
+      for (i = 0; i < (int)folderNames.size(); i++) {
+        std::string name = folderNames[i];
+        QString qName    = QString::fromStdString(name);
+        FileField *ff    = new FileField(0, qName);
+        m_folderFlds.append(qMakePair(name, ff));
+        upperLayout->addWidget(new QLabel("+" + qName, this), i + 2, 0,
+                               Qt::AlignRight | Qt::AlignVCenter);
+        upperLayout->addWidget(ff, i + 2, 1);
+      }
+      std::vector<std::tuple<QString, std::string>> cbs = {
+          std::make_tuple(tr("Append $scenepath to +drawings"),
+                          TProject::Drawings),
+          std::make_tuple(tr("Append $scenepath to +inputs"), TProject::Inputs),
+          std::make_tuple(tr("Append $scenepath to +extras"),
+                          TProject::Extras)};
+      int currentRow = upperLayout->rowCount();
+
+      for (int i = 0; i < cbs.size(); ++i) {
+        auto const &name       = std::get<0>(cbs[i]);
+        auto const &folderName = std::get<1>(cbs[i]);
+        CheckBox *cb           = new CheckBox(name);
+        cb->setMaximumHeight(WidgetHeight);
+        upperLayout->addWidget(cb, currentRow + i, 1);
+        m_useScenePathCbs.append(qMakePair(folderName, cb));
+      }
+      pfLayout->addLayout(upperLayout);
     }
-    m_topLayout->addLayout(upperLayout);
+    projectFolderPanel->setLayout(pfLayout);
+    tabWidget->addTab(projectFolderPanel, tr("Project Folder"));
+
+    // file path settings
+    QWidget *filePathPanel = new QWidget(this);
+    QVBoxLayout *fpLayout  = new QVBoxLayout();
+    fpLayout->setMargin(5);
+    fpLayout->setSpacing(10);
+    {
+      fpLayout->addWidget(standardRB, 0);
+      fpLayout->addWidget(customRB, 0);
+
+      // add some indent
+      QGridLayout *customLay = new QGridLayout();
+      customLay->setMargin(10);
+      customLay->setHorizontalSpacing(10);
+      customLay->setVerticalSpacing(10);
+      {
+        customLay->addWidget(m_acceptNonAlphabetSuffixCB, 0, 0, 1, 2);
+        customLay->addWidget(
+            new QLabel(tr("Maximum Letter Count For Suffix"), this), 1, 0);
+        customLay->addWidget(m_letterCountCombo, 1, 1);
+      }
+      customLay->setColumnStretch(2, 1);
+      fpLayout->addLayout(customLay, 0);
+
+      fpLayout->addStretch(1);
+    }
+    filePathPanel->setLayout(fpLayout);
+    tabWidget->addTab(filePathPanel, tr("File Path Rules"));
   }
 
   pm->addListener(this);
+
+  //---------
+  connect(m_rulePreferenceBG, SIGNAL(idToggled(int, bool)), this,
+          SLOT(onRulePreferenceToggled(int, bool)));
 }
 
 //-----------------------------------------------------------------------------
@@ -347,13 +431,14 @@ void ProjectPopup::updateChooseProjectCombo() {
   m_projectPaths.clear();
   m_chooseProjectCombo->clear();
 
-  TFilePath sandboxFp = TProjectManager::instance()->getSandboxProjectFolder() +
-                        "sandbox_otprj.xml";
+  TProjectManager *pm = TProjectManager::instance();
+
+  TFilePath sandboxFp = pm->getSandboxProjectFolder() + "sandbox_otprj.xml";
   m_projectPaths.push_back(sandboxFp);
   m_chooseProjectCombo->addItem("sandbox");
 
   std::vector<TFilePath> prjRoots;
-  TProjectManager::instance()->getProjectRoots(prjRoots);
+  pm->getProjectRoots(prjRoots);
   for (int i = 0; i < prjRoots.size(); i++) {
     TFilePathSet fps;
     TSystem::readDirectory_Dir_ReadExe(fps, prjRoots[i]);
@@ -361,17 +446,24 @@ void ProjectPopup::updateChooseProjectCombo() {
     TFilePathSet::iterator it;
     for (it = fps.begin(); it != fps.end(); ++it) {
       TFilePath fp(*it);
-      if (TProjectManager::instance()->isProject(fp)) {
-        m_projectPaths.push_back(
-            TProjectManager::instance()->projectFolderToProjectPath(fp));
-        m_chooseProjectCombo->addItem(QString::fromStdString(fp.getName()));
+      if (pm->isProject(fp)) {
+        m_projectPaths.push_back(pm->projectFolderToProjectPath(fp));
+        TFilePath prjFile = pm->getProjectPathByProjectFolder(fp);
+        m_chooseProjectCombo->addItem(
+            QString::fromStdString(prjFile.getName()));
       }
     }
   }
-
+  // Add in project of current project if outside known Project root folders
+  TProjectP currentProject   = pm->getCurrentProject();
+  TFilePath currentProjectFP = currentProject->getProjectPath();
+  if (m_projectPaths.indexOf(currentProjectFP) == -1) {
+    m_projectPaths.push_back(currentProjectFP);
+    m_chooseProjectCombo->addItem(
+        QString::fromStdString(currentProject->getName().getName()));
+  }
   for (int i = 0; i < m_projectPaths.size(); i++) {
-    if (TProjectManager::instance()->getCurrentProjectPath() ==
-        m_projectPaths[i]) {
+    if (pm->getCurrentProjectPath() == m_projectPaths[i]) {
       m_chooseProjectCombo->setCurrentIndex(i);
       break;
     }
@@ -397,6 +489,17 @@ void ProjectPopup::updateFieldsFromProject(TProject *project) {
     cb->setCheckState(cbState);
     cb->blockSignals(signalesAlreadyBlocked);
   }
+
+  // file path
+  FilePathProperties *fpProp = project->getFilePathProperties();
+  bool useStandard           = fpProp->useStandard();
+  bool acceptNonAlphabet     = fpProp->acceptNonAlphabetSuffix();
+  int letterCount            = fpProp->letterCountForSuffix();
+  m_rulePreferenceBG->button((useStandard) ? Rule_Standard : Rule_Custom)
+      ->setChecked(true);
+  m_acceptNonAlphabetSuffixCB->setChecked(acceptNonAlphabet);
+  m_letterCountCombo->setCurrentIndex(
+      m_letterCountCombo->findData(letterCount));
 }
 
 //-----------------------------------------------------------------------------
@@ -414,6 +517,20 @@ void ProjectPopup::updateProjectFromFields(TProject *project) {
     bool useScenePath      = cbState == Qt::Checked;
     project->setUseScenePath(folderName, cbState);
   }
+
+  // file path
+  FilePathProperties *fpProp = project->getFilePathProperties();
+  bool useStandard           = m_rulePreferenceBG->checkedId() == Rule_Standard;
+  bool acceptNonAlphabet     = m_acceptNonAlphabetSuffixCB->isChecked();
+  int letterCount            = m_letterCountCombo->currentData().toInt();
+  fpProp->setUseStandard(useStandard);
+  fpProp->setAcceptNonAlphabetSuffix(acceptNonAlphabet);
+  fpProp->setLetterCountForSuffix(letterCount);
+
+  if (TFilePath::setFilePathProperties(useStandard, acceptNonAlphabet,
+                                       letterCount))
+    DvDirModel::instance()->refreshFolderChild(QModelIndex());  // refresh all
+
   TProjectManager::instance()->notifyProjectChanged();
 }
 
@@ -434,6 +551,13 @@ void ProjectPopup::showEvent(QShowEvent *) {
   TProjectP currentProject = TProjectManager::instance()->getCurrentProject();
   updateFieldsFromProject(currentProject.getPointer());
   updateChooseProjectCombo();
+}
+
+//-----------------------------------------------------------------------------
+
+void ProjectPopup::onRulePreferenceToggled(int id, bool on) {
+  m_acceptNonAlphabetSuffixCB->setEnabled((id == Rule_Custom) == on);
+  m_letterCountCombo->setEnabled((id == Rule_Custom) == on);
 }
 
 //=============================================================================
@@ -457,16 +581,23 @@ ProjectSettingsPopup::ProjectSettingsPopup() : ProjectPopup(false) {
   int i;
   for (i = 0; i < m_folderFlds.size(); i++) {
     FileField *ff = m_folderFlds[i].second;
-    connect(ff, SIGNAL(pathChanged()), this, SLOT(onFolderChanged()));
+    connect(ff, SIGNAL(pathChanged()), this, SLOT(onSomethingChanged()));
   }
   for (i = 0; i < m_useScenePathCbs.size(); i++) {
     CheckBox *cb = m_useScenePathCbs[i].second;
-    connect(cb, SIGNAL(stateChanged(int)), this,
-            SLOT(onUseSceneChekboxChanged(int)));
+    connect(cb, SIGNAL(stateChanged(int)), this, SLOT(onSomethingChanged()));
   }
 
   connect(m_chooseProjectCombo, SIGNAL(activated(int)), this,
           SLOT(onChooseProjectChanged(int)));
+
+  // file path settings
+  connect(m_rulePreferenceBG, SIGNAL(idClicked(int)), this,
+          SLOT(onSomethingChanged()));
+  connect(m_acceptNonAlphabetSuffixCB, SIGNAL(clicked(bool)), this,
+          SLOT(onSomethingChanged()));
+  connect(m_letterCountCombo, SIGNAL(activated(int)), this,
+          SLOT(onSomethingChanged()));
 }
 
 //-----------------------------------------------------------------------------
@@ -474,9 +605,18 @@ ProjectSettingsPopup::ProjectSettingsPopup() : ProjectPopup(false) {
 void ProjectSettingsPopup::onChooseProjectChanged(int index) {
   TFilePath projectFp = m_projectPaths[index];
 
-  TProjectManager::instance()->setCurrentProjectPath(projectFp);
+  TProjectManager *pm = TProjectManager::instance();
+  pm->setCurrentProjectPath(projectFp);
+
   TProject *projectP =
       TProjectManager::instance()->getCurrentProject().getPointer();
+
+  // In case the project file was upgraded to current version, save it now
+  if (projectP->getProjectPath() != projectFp) {
+    m_projectPaths[index] = projectP->getProjectPath();
+    projectP->save();
+  }
+
   updateFieldsFromProject(projectP);
   IoCmd::saveSceneIfNeeded("Change project");
   IoCmd::newScene();
@@ -484,21 +624,7 @@ void ProjectSettingsPopup::onChooseProjectChanged(int index) {
 
 //-----------------------------------------------------------------------------
 
-void ProjectSettingsPopup::onFolderChanged() {
-  TProjectP project = TProjectManager::instance()->getCurrentProject();
-  updateProjectFromFields(project.getPointer());
-  try {
-    project->save();
-  } catch (TSystemException se) {
-    DVGui::warning(QString::fromStdWString(se.getMessage()));
-    return;
-  }
-  DvDirModel::instance()->refreshFolder(project->getProjectFolder());
-}
-
-//-----------------------------------------------------------------------------
-
-void ProjectSettingsPopup::onUseSceneChekboxChanged(int) {
+void ProjectSettingsPopup::onSomethingChanged() {
   TProjectP project = TProjectManager::instance()->getCurrentProject();
   updateProjectFromFields(project.getPointer());
   try {
@@ -552,17 +678,16 @@ ProjectCreatePopup::ProjectCreatePopup() : ProjectPopup(true) {
 void ProjectCreatePopup::createProject() {
   if (!IoCmd::saveSceneIfNeeded(QObject::tr("Create project"))) return;
 
-#ifdef LINETEST
-  TnzCamera *camera = TnzCamera::instance();
-  if (camera->isCameraConnected()) camera->cameraDisconnect();
-#endif
-
   QFileInfo fi(m_nameFld->text());
 
   if (!isValidFileName(fi.baseName())) {
     error(
         tr("Project Name cannot be empty or contain any of the following "
            "characters:\n \\ / : * ? \" < > |"));
+    return;
+  }
+
+  if (isReservedFileName_message(fi.baseName())) {
     return;
   }
 
@@ -639,6 +764,11 @@ void ProjectCreatePopup::showEvent(QShowEvent *) {
   index                          = m_model->index(0, 0, QModelIndex());
   selection->select(index, QItemSelectionModel::Select);
   m_treeView->setSelectionModel(selection);
+
+  // default file path settings
+  m_rulePreferenceBG->button(Rule_Standard)->setChecked(true);
+  m_acceptNonAlphabetSuffixCB->setChecked(false);
+  m_letterCountCombo->setCurrentIndex(m_letterCountCombo->findData(1));
 }
 
 //-----------------------------------------------------------------------------

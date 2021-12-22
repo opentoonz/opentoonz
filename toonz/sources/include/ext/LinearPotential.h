@@ -48,7 +48,7 @@ private:
 * @brief Range of mapping
 *
 * Only an interval of potential function will be used to
-* map the tranformation.
+* map the transformation.
 */
       range_,
       par_,            //! Parameter of selection.

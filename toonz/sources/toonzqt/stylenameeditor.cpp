@@ -115,7 +115,7 @@ AddWordButton::AddWordButton(const int col, QWidget* parent)
   static QString columnLabel[WORD_COLUMN_AMOUNT] = {tr("Character"), tr("Part"),
                                                     tr("Suffix")};
   // setFixedSize(23, 23);
-  setIcon(QIcon(":Resources/plus.svg"));
+  setIcon(createQIcon("plus"));
   setIconSize(QSize(16, 16));
   setToolTip(tr("Add New Word for %1").arg(columnLabel[col]));
 }

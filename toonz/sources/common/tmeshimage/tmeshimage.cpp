@@ -5,7 +5,6 @@
 
 // tcg includes
 #include "tcg/tcg_misc.h"
-#include "tcg/tcg_iterator_ops.h"
 
 #define INCLUDE_HPP
 #include "tmeshimage.h"
@@ -23,10 +22,6 @@ typedef tcg::TriMesh<TTextureVertex, tcg::Edge, tcg::FaceN<3>> TriMesh_base;
 
 DEFINE_CLASS_CODE(TTextureMesh, 120)
 PERSIST_IDENTIFIER(TTextureMesh, "mesh")
-
-static TTextureMeshP cloneMesh_(const TTextureMeshP &other) {
-  return TTextureMeshP(new TTextureMesh(*other));
-}
 
 static void static_check() {
   /* input iterator */
@@ -54,35 +49,6 @@ static void static_check() {
       std::is_constructible<TTextureMeshP,
                             std::iterator_traits<std::vector<
                                 TTextureMeshP>::iterator>::reference>::value ==
-          true,
-      "akan");
-
-  /* converted iterator */
-  std::vector<TTextureMeshP> vec;
-  auto it = vec.end();
-  auto c  = tcg::make_cast_it(it, cloneMesh_);
-
-  static_assert(
-      std::is_same<std::iterator_traits<decltype(c)>::iterator_category,
-                   std::random_access_iterator_tag>::value == true,
-      "random");
-
-  static_assert(
-      std::is_base_of<
-          std::input_iterator_tag,
-          std::iterator_traits<decltype(c)>::iterator_category>::value == true,
-      "input");
-
-  static_assert(
-      std::is_base_of<
-          std::forward_iterator_tag,
-          std::iterator_traits<decltype(c)>::iterator_category>::value == true,
-      "forward");
-
-  // TTextureMeshP p(std::iterator_traits< decltype(c) >::reference);
-  static_assert(
-      std::is_constructible<
-          TTextureMeshP, std::iterator_traits<decltype(c)>::reference>::value ==
           true,
       "akan");
 }
@@ -310,11 +276,11 @@ public:
 
   Imp() : m_dpiX(), m_dpiY() {}
 
-  Imp(const Imp &other)
-      : m_meshes(tcg::make_cast_it(other.m_meshes.begin(), cloneMesh),
-                 tcg::make_cast_it(other.m_meshes.end(), cloneMesh))
-      , m_dpiX(other.m_dpiX)
-      , m_dpiY(other.m_dpiY) {}
+  Imp(const Imp &other) : m_dpiX(other.m_dpiX), m_dpiY(other.m_dpiY) {
+    for (auto const &e : other.m_meshes) {
+      m_meshes.push_back(cloneMesh(e));
+    }
+  }
 
 private:
   static TTextureMeshP cloneMesh(const TTextureMeshP &other) {

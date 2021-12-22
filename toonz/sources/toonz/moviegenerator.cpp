@@ -3,7 +3,6 @@
 #include "moviegenerator.h"
 
 #include "timage.h"
-#include "tflash.h"
 #include "tpalette.h"
 #include "tvectorimage.h"
 #include "trasterimage.h"
@@ -23,7 +22,6 @@
 #include "toonz/txshcolumn.h"
 #include "toonz/sceneproperties.h"
 #include "toonz/onionskinmask.h"
-#include "toonz/screensavermaker.h"
 #include "toonz/tstageobject.h"
 #include "toonz/dpiscale.h"
 #include "toonz/stage.h"
@@ -301,154 +299,6 @@ false,0);
 };
 
 //=============================================================================
-// FlashStagePainter
-//-----------------------------------------------------------------------------
-
-class FlashStagePainter final : public Stage::Visitor {
-  TFlash &m_flash;
-  TAffine m_cameraAff;
-  TPixel32 m_bgColor;
-
-public:
-  FlashStagePainter(TFlash &flash, TAffine &cameraAff,
-                    const ImagePainter::VisualSettings &vs,
-                    const TPixel32 &bgColor)
-      : Visitor(vs)
-      , m_flash(flash)
-      , m_cameraAff(cameraAff)
-      , m_bgColor(bgColor) {}
-
-  void onImage(const Stage::Player &player) override {
-    const TImageP &img = player.image();
-    m_flash.pushMatrix();
-    m_flash.multMatrix(m_cameraAff * player.m_placement * player.m_dpiAff);
-
-    TColorFunction *cf = 0;
-    TColorFader fader;
-    if (player.m_onionSkinDistance != c_noOnionSkin) {
-      fader = TColorFader(m_bgColor, OnionSkinMask::getOnionSkinFade(
-                                         player.m_onionSkinDistance));
-      cf = &fader;
-    }
-
-    if (img->getPalette()) img->getPalette()->setFrame(player.m_frame);
-    m_flash.draw(img, cf);
-
-    m_flash.popMatrix();
-  }
-  void beginMask() override { m_flash.beginMask(); }
-  void endMask() override { m_flash.endMask(); }
-  void enableMask() override { m_flash.enableMask(); }
-  void disableMask() override { m_flash.disableMask(); }
-};
-
-//=============================================================================
-// FlashMovieGenerator
-//-----------------------------------------------------------------------------
-
-class FlashMovieGenerator final : public MovieGenerator::Imp {
-public:
-  TFlash m_flash;
-  TAffine m_viewAff;
-  int m_frameIndex;
-  int m_sceneIndex;
-  int m_frameCountLoader;
-  bool m_screenSaverMode;
-
-  FlashMovieGenerator(const TFilePath &fp, const TDimension cameraSize,
-                      TOutputProperties &properties)
-      : Imp(fp, cameraSize, properties.getFrameRate())
-      , m_flash(cameraSize.lx, cameraSize.ly, 0, properties.getFrameRate(),
-                properties.getFileFormatProperties("swf"))
-      , m_frameIndex(0)
-      , m_sceneIndex(0)
-      , m_frameCountLoader(0)
-      , m_screenSaverMode(false) {
-    TPointD center(0.5 * cameraSize.lx, 0.5 * cameraSize.ly);
-    m_viewAff         = TAffine();
-    m_screenSaverMode = fp.getType() == "scr";
-  }
-
-  void addSoundtrack(const ToonzScene &scene, int frameOffset,
-                     int sceneFrameCount) override {}
-
-  void startScene(const ToonzScene &scene, int r) override {
-    m_flash.cleanCachedImages();
-    m_flash.setBackgroundColor(m_bgColor);
-    TXsheet::SoundProperties *prop = new TXsheet::SoundProperties();
-    prop->m_frameRate              = m_fps;
-    TSoundTrackP snd               = scene.getXsheet()->makeSound(prop);
-    if (snd) {
-      if (m_useMarkers) {
-        long samplePerFrame = snd->getSampleRate() / m_fps;
-        snd = snd->extract((TINT32)(m_renderRange.first * samplePerFrame),
-                           (TINT32)(m_renderRange.second * samplePerFrame));
-      }
-      m_flash.putSound(snd, 0);
-    }
-    if (m_sceneIndex == 0 && m_sceneCount == 1) {
-      if (m_renderRange.first == m_renderRange.second)
-        m_frameCountLoader = 0;
-      else
-        m_frameCountLoader = 1;
-    } else if (m_sceneIndex == 0)
-      m_frameCountLoader = m_renderRange.second - m_renderRange.first + 1;
-    m_sceneIndex++;
-  }
-
-  bool addFrame(ToonzScene &scene, int row, bool isLast) override {
-    TAffine cameraView =
-        scene.getXsheet()->getPlacement(TStageObjectId::CameraId(0), row).inv();
-    TPixel32 bgColor = scene.getProperties()->getBgColor();
-
-    TStageObject *cameraPegbar =
-        scene.getXsheet()->getStageObject(TStageObjectId::CameraId(0));
-    assert(cameraPegbar);
-    TCamera *camera = cameraPegbar->getCamera();
-    assert(camera);
-    TAffine dpiAff = getDpiAffine(camera).inv();
-
-    TAffine aff = cameraView * dpiAff;
-
-    Stage::VisitArgs args;
-    args.m_scene = &scene;
-    args.m_xsh   = scene.getXsheet();
-    args.m_row   = row;
-    args.m_col   = m_columnIndex;
-    args.m_osm   = &m_osMask;
-
-    ImagePainter::VisualSettings vs;
-    FlashStagePainter painter(m_flash, aff, vs, bgColor);
-    m_flash.beginFrame(++m_frameIndex);
-
-    Stage::visit(painter, args);
-    /*
-                 &scene,
-                             scene.getXsheet(),
-                                                     row,
-                                                     m_columnIndex,
-                                                     m_osMask,
-                                                     false, 0);
-     */
-
-    m_frameIndex = m_flash.endFrame(isLast, m_frameCountLoader,
-                                    (m_sceneCount == m_sceneIndex));
-    return true;
-  }
-
-  void close() override {
-    TFilePath flashFn = m_filepath.withType("swf");
-    FILE *fp          = fopen(flashFn, "wb");
-    if (!fp) throw TException("Can't open file");
-    m_flash.writeMovie(fp);
-    fclose(fp);
-    if (m_screenSaverMode) {
-      makeScreenSaver(m_filepath, flashFn, "prova");
-    }
-  }
-};
-
-//=============================================================================
 // MovieGenerator
 //-----------------------------------------------------------------------------
 
@@ -456,10 +306,7 @@ MovieGenerator::MovieGenerator(const TFilePath &path,
                                const TDimension &resolution,
                                TOutputProperties &outputProperties,
                                bool useMarkers) {
-  if (path.getType() == "swf" || path.getType() == "scr")
-    m_imp.reset(new FlashMovieGenerator(path, resolution, outputProperties));
-  else
-    m_imp.reset(new RasterMovieGenerator(path, resolution, outputProperties));
+  m_imp.reset(new RasterMovieGenerator(path, resolution, outputProperties));
   m_imp->m_useMarkers = useMarkers;
 }
 

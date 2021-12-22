@@ -22,7 +22,11 @@
 #include "toonz/tscenehandle.h"
 #include "tools/tool.h"*/
 
+#ifndef _WIN32
+#define PRINTF(args...)
+#else
 #define PRINTF
+#endif
 
 struct s_segm {
   int xa, xb, region;
@@ -1010,7 +1014,7 @@ static void assign_prob3(int prob[], int i, int j)
                  BIG_TO_DOUBLE(F_work.array[j].by) / F_work.array[j].npix);
 
   delta_forma_mom =
-      abs(sqrt(delta_momx1 + delta_momy1) - sqrt(delta_momx2 + delta_momy2));
+      std::abs(sqrt(delta_momx1 + delta_momy1) - sqrt(delta_momx2 + delta_momy2));
 
   delta_forma1 = ROUNDP(
       1000 * (((double)F_reference.array[i].per / F_reference.array[i].npix -

@@ -4,7 +4,6 @@
 #include "tools/toolutils.h"
 #include "tools/cursors.h"
 #include "tools/tool.h"
-#include "tools/toolutils.h"
 #include "tools/toolhandle.h"
 
 #include "bluredbrush.h"
@@ -92,19 +91,21 @@ class RectRasterUndo final : public TRasterUndo {
   std::wstring m_eraseType;
   bool m_selective;
   bool m_invert;
+  bool m_pencilMode;
 
 public:
   RectRasterUndo(TTileSetCM32 *tileSet, const TRectD &modifyArea,
                  TStroke stroke, int styleId, std::wstring eraseType,
                  std::wstring colorType, TXshSimpleLevel *level, bool selective,
-                 bool invert, const TFrameId &frameId)
+                 bool invert, bool pencil, const TFrameId &frameId)
       : TRasterUndo(tileSet, level, frameId, false, false, 0)
       , m_modifyArea(modifyArea)
       , m_styleId(styleId)
       , m_eraseType(eraseType)
       , m_colorType(colorType)
       , m_selective(selective)
-      , m_invert(invert) {
+      , m_invert(invert)
+      , m_pencilMode(pencil) {
     m_stroke = new TStroke(stroke);
   }
 
@@ -121,8 +122,8 @@ public:
     } else if (m_eraseType == FREEHANDERASE || m_eraseType == POLYLINEERASE) {
       if (m_level) {
         TPoint pos;
-        TRaster32P ras =
-            convertStrokeToImage(m_stroke, ti->getRaster()->getBounds(), pos);
+        TRaster32P ras = convertStrokeToImage(
+            m_stroke, ti->getRaster()->getBounds(), pos, m_pencilMode);
         if (!ras) return;
         ToonzImageUtils::eraseImage(ti, ras, pos, m_invert, eraseInk,
                                     erasePaint, m_selective, m_styleId);
@@ -177,7 +178,7 @@ public:
     TToonzImageP image = m_level->getFrame(m_frameId, true);
     TRasterCM32P ras   = image->getRaster();
     RasterStrokeGenerator m_rasterTrack(ras, ERASE, m_colorType, 0, m_points[0],
-                                        m_selective, m_colorSelected,
+                                        m_selective, m_colorSelected, false,
                                         !m_isPencil);
     m_rasterTrack.setPointsSequence(m_points);
     m_rasterTrack.generateStroke(m_isPencil);
@@ -269,12 +270,13 @@ public:
 
 void eraseStroke(const TToonzImageP &ti, TStroke *stroke,
                  std::wstring eraseType, std::wstring colorType, bool invert,
-                 bool selective, int styleId, const TXshSimpleLevelP &level,
-                 const TFrameId &frameId) {
+                 bool selective, bool pencil, int styleId,
+                 const TXshSimpleLevelP &level, const TFrameId &frameId) {
   assert(stroke);
   TPoint pos;
   TRasterCM32P ras = ti->getRaster();
-  TRaster32P image = convertStrokeToImage(stroke, ras->getBounds(), pos);
+  TRaster32P image =
+      convertStrokeToImage(stroke, ras->getBounds(), pos, pencil);
   if (!image) return;
 
   TRect rasterErasedArea = image->getBounds() + pos;
@@ -287,7 +289,7 @@ void eraseStroke(const TToonzImageP &ti, TStroke *stroke,
   tileSet->add(ras, area);
   TUndoManager::manager()->add(new RectRasterUndo(
       tileSet, convert(area), *stroke, selective ? styleId : -1, eraseType,
-      colorType, level.getPointer(), selective, invert, frameId));
+      colorType, level.getPointer(), selective, invert, pencil, frameId));
   bool eraseInk   = colorType == LINES || colorType == ALL;
   bool erasePaint = colorType == AREAS || colorType == ALL;
   ToonzImageUtils::eraseImage(ti, image, pos, invert, eraseInk, erasePaint,
@@ -495,6 +497,8 @@ public:
   void onDeactivate() override;
   /*-- Brush、PaintBrush、EraserToolがPencilModeのときにTrueを返す --*/
   bool isPencilModeActive() override;
+  TPointD getCenteredCursorPos(const TPointD &originalCursorPos);
+  TPointD fixMousePos(TPointD pos, bool precise = false);
 
 private:
   /*-- 終了処理 --*/
@@ -564,13 +568,13 @@ EraserTool inkPaintEraserTool("T_Eraser");
 
 //==================================================================================================
 //
-//  InkPaintTool implemention
+//  InkPaintTool implementation
 //
 //------------------------------------------------------------------------
 
 EraserTool::EraserTool(std::string name)
     : TTool(name)
-    , m_toolSize("Size:", 1, 100, 10, false)  // W_ToolOptions_EraserToolSize
+    , m_toolSize("Size:", 1, 1000, 10, false)  // W_ToolOptions_EraserToolSize
     , m_hardness("Hardness:", 0, 100, 100)
     , m_eraseType("Type:")                // W_ToolOptions_Erasetype
     , m_colorType("Mode:")                // W_ToolOptions_InkOrPaint
@@ -592,6 +596,8 @@ EraserTool::EraserTool(std::string name)
     , m_workingFrameId(TFrameId())
     , m_isLeftButtonPressed(false) {
   bind(TTool::ToonzImage);
+
+  m_toolSize.setNonLinearSlider();
 
   m_prop.bind(m_toolSize);
   m_prop.bind(m_hardness);
@@ -640,6 +646,36 @@ void EraserTool::updateTranslation() {
   m_invertOption.setQStringName(tr("Invert"));
   m_multi.setQStringName(tr("Frame Range"));
   m_pencil.setQStringName(tr("Pencil Mode"));
+}
+
+//-------------------------------------------------------------------------------------------------------
+
+TPointD EraserTool::getCenteredCursorPos(const TPointD &originalCursorPos) {
+  TXshLevelHandle *levelHandle = m_application->getCurrentLevel();
+  TXshSimpleLevel *level = levelHandle ? levelHandle->getSimpleLevel() : 0;
+  TDimension resolution =
+      level ? level->getProperties()->getImageRes() : TDimension(0, 0);
+
+  bool xEven = (resolution.lx % 2 == 0);
+  bool yEven = (resolution.ly % 2 == 0);
+
+  TPointD centeredCursorPos = originalCursorPos;
+
+  if (xEven) centeredCursorPos.x -= 0.5;
+  if (yEven) centeredCursorPos.y -= 0.5;
+
+  return centeredCursorPos;
+}
+
+//-----------------------------------------------------------------------------
+
+TPointD EraserTool::fixMousePos(TPointD pos, bool precise) {
+  TPointD fixedPos = getCenteredCursorPos(pos);
+  if (precise) {
+    TPointD pp(tround(fixedPos.x), tround(fixedPos.y));
+    fixedPos = pp;
+  }
+  return fixedPos;
 }
 
 //------------------------------------------------------------------------
@@ -843,10 +879,10 @@ void EraserTool::update(const TToonzImageP &ti, TRectD selArea,
   TUndo *undo;
 
   std::wstring inkPaint = m_colorType.getValue();
-  undo =
-      new RectRasterUndo(tileSet, selArea, TStroke(), selective ? styleId : -1,
-                         m_eraseType.getValue(), inkPaint, level.getPointer(),
-                         selective, m_invertOption.getValue(), frameId);
+  undo                  = new RectRasterUndo(
+      tileSet, selArea, TStroke(), selective ? styleId : -1,
+      m_eraseType.getValue(), inkPaint, level.getPointer(), selective,
+      m_invertOption.getValue(), m_pencil.getValue(), frameId);
 
   ToonzImageUtils::eraseRect(ti, selArea, selective ? styleId : -1,
                              inkPaint == LINES || inkPaint == ALL,
@@ -877,13 +913,14 @@ void EraserTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
     }
     if (m_eraseType.getValue() == NORMALERASE) {
       TRasterCM32P raster = ti->getRaster();
+      TPointD fixedPos    = fixMousePos(pos);
       TThickPoint intPos;
       /*--Areasタイプの時は常にPencilと同じ消し方にする--*/
       if (m_pencil.getValue() || m_colorType.getValue() == AREAS)
-        intPos = TThickPoint(pos + convert(raster->getCenter()),
+        intPos = TThickPoint(fixedPos + convert(raster->getCenter()),
                              m_toolSize.getValue());
       else
-        intPos = TThickPoint(pos + convert(raster->getCenter()),
+        intPos = TThickPoint(fixedPos + convert(raster->getCenter()),
                              m_toolSize.getValue() - 1);
       int currentStyle = 0;
       if (m_currentStyle.getValue())
@@ -892,7 +929,7 @@ void EraserTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
       m_tileSaver    = new TTileSaverCM32(raster, m_tileSet);
       TPointD halfThick(m_toolSize.getValue() * 0.5,
                         m_toolSize.getValue() * 0.5);
-      invalidateRect = TRectD(pos - halfThick, pos + halfThick);
+      invalidateRect = TRectD(fixedPos - halfThick, fixedPos + halfThick);
       if (m_hardness.getValue() == 100 || m_pencil.getValue() ||
           m_colorType.getValue() == AREAS) {
         if (m_colorType.getValue() == LINES) {
@@ -902,7 +939,7 @@ void EraserTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
         if (m_colorType.getValue() == ALL) m_colorTypeEraser   = INKNPAINT;
         m_normalEraser = new RasterStrokeGenerator(
             raster, ERASE, m_colorTypeEraser, 0, intPos,
-            m_currentStyle.getValue(), currentStyle,
+            m_currentStyle.getValue(), currentStyle, false,
             !(m_pencil.getValue() || m_colorType.getValue() == AREAS));
         m_tileSaver->save(m_normalEraser->getLastRect());
         m_normalEraser->generateLastPieceOfStroke(
@@ -913,7 +950,7 @@ void EraserTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
         m_workRas   = TRaster32P(raster->getSize());
         m_workRas->clear();
         TPointD center = raster->getCenterD();
-        TThickPoint point(pos + center, m_toolSize.getValue());
+        TThickPoint point(fixedPos + center, m_toolSize.getValue());
         m_points.push_back(point);
         m_bluredBrush = new BluredBrush(m_workRas, m_toolSize.getValue(),
                                         m_brushPad, false);
@@ -970,7 +1007,8 @@ void EraserTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
 
   double pixelSize2 = getPixelSize() * getPixelSize();
 
-  m_brushPos = m_mousePos = pos;
+  m_mousePos = pos;
+  m_brushPos = fixMousePos(pos);
   if (!m_selecting) return;
 
   TImageP image(getImage(true));
@@ -993,10 +1031,11 @@ void EraserTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
       invalidate(invalidateRect.enlarge(2));
     }
     if (m_eraseType.getValue() == NORMALERASE) {
+      TPointD fixedPos = fixMousePos(pos);
       if (m_normalEraser &&
           (m_hardness.getValue() == 100 || m_pencil.getValue() ||
            m_colorType.getValue() == AREAS)) {
-        TPointD pp(pos.x, pos.y);
+        TPointD pp(fixedPos.x, fixedPos.y);
         TThickPoint intPos;
         if (m_pencil.getValue() || m_colorType.getValue() == AREAS)
           intPos = TThickPoint(pp + convert(ti->getRaster()->getCenter()),
@@ -1028,10 +1067,10 @@ void EraserTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
         assert(m_workRas.getPointer() && m_backupRas.getPointer());
 
         TThickPoint old = m_points.back();
-        if (norm2(pos - old) < 4) return;
+        if (norm2(fixedPos - old) < 4) return;
 
         int thickness = m_toolSize.getValue();
-        TThickPoint point(pos + rasCenter, thickness);
+        TThickPoint point(fixedPos + rasCenter, thickness);
         TThickPoint mid((old + point) * 0.5, (point.thick + old.thick) * 0.5);
         m_points.push_back(mid);
         m_points.push_back(point);
@@ -1180,6 +1219,7 @@ void EraserTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
       }
     }
     if (m_eraseType.getValue() == NORMALERASE) {
+      TPointD fixedPos          = fixMousePos(pos);
       TTool::Application *app   = TTool::getApplication();
       int currentStyle          = app->getCurrentLevelStyleIndex();
       TXshLevel *level          = app->getCurrentLevel()->getLevel();
@@ -1204,7 +1244,7 @@ void EraserTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
       } else {
         if (m_points.size() != 1) {
           TPointD rasCenter = ti->getRaster()->getCenterD();
-          TThickPoint point(pos + rasCenter, m_toolSize.getValue());
+          TThickPoint point(fixedPos + rasCenter, m_toolSize.getValue());
           m_points.push_back(point);
           int m = m_points.size();
           std::vector<TThickPoint> points;
@@ -1295,7 +1335,8 @@ void EraserTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
         TFrameId frameId          = getFrameId();
         eraseStroke(image, stroke, m_eraseType.getValue(),
                     m_colorType.getValue(), m_invertOption.getValue(),
-                    m_currentStyle.getValue(), styleId, simLevel, frameId);
+                    m_currentStyle.getValue(), m_pencil.getValue(), styleId,
+                    simLevel, frameId);
         notifyImageChanged();
         if (m_invertOption.getValue())
           invalidate();
@@ -1373,8 +1414,8 @@ void EraserTool::leftButtonDoubleClick(const TPointD &pos,
     TFrameId frameId          = getFrameId();
     TToonzImageP ti           = (TToonzImageP)getImage(true);
     eraseStroke(ti, stroke, m_eraseType.getValue(), m_colorType.getValue(),
-                m_invertOption.getValue(), m_currentStyle.getValue(), styleId,
-                simLevel, frameId);
+                m_invertOption.getValue(), m_currentStyle.getValue(),
+                m_pencil.getValue(), styleId, simLevel, frameId);
     notifyImageChanged();
     if (m_invertOption.getValue())
       invalidate();
@@ -1480,7 +1521,7 @@ void EraserTool::mouseMove(const TPointD &pos, const TMouseEvent &e) {
   }
 
   default:
-    m_brushPos = pos;
+    m_brushPos = fixMousePos(pos);
     break;
   }
 
@@ -1600,11 +1641,13 @@ void EraserTool::doMultiEraser(const TImageP &img, double t,
   if (t == 0)
     eraseStroke(img, firstImage->getStroke(0), m_eraseType.getValue(),
                 m_colorType.getValue(), m_invertOption.getValue(),
-                m_currentStyle.getValue(), styleId, sl, fid);
+                m_currentStyle.getValue(), m_pencil.getValue(), styleId, sl,
+                fid);
   else if (t == 1)
     eraseStroke(img, lastImage->getStroke(0), m_eraseType.getValue(),
                 m_colorType.getValue(), m_invertOption.getValue(),
-                m_currentStyle.getValue(), styleId, sl, fid);
+                m_currentStyle.getValue(), m_pencil.getValue(), styleId, sl,
+                fid);
   else {
     assert(firstImage->getStrokeCount() == 1);
     assert(lastImage->getStrokeCount() == 1);
@@ -1612,13 +1655,14 @@ void EraserTool::doMultiEraser(const TImageP &img, double t,
     assert(vi->getStrokeCount() == 1);
     eraseStroke(img, vi->getStroke(0), m_eraseType.getValue(),
                 m_colorType.getValue(), m_invertOption.getValue(),
-                m_currentStyle.getValue(), styleId, sl, fid);
+                m_currentStyle.getValue(), m_pencil.getValue(), styleId, sl,
+                fid);
   }
 }
 
 //--------------------------------------------------------------------------------------------------
 /*!ドラッグ中にツールが切り替わった時、終了処理を行う
-*/
+ */
 
 void EraserTool::onDeactivate() {
   if (!m_isLeftButtonPressed || !m_selecting) return;
@@ -1687,7 +1731,7 @@ void EraserTool::storeUndoAndRefresh() {
 
 //--------------------------------------------------------------------------------------------------
 /*! Brush、PaintBrush、EraserToolがPencilModeのときにTrueを返す
-*/
+ */
 bool EraserTool::isPencilModeActive() {
   return m_eraseType.getValue() == NORMALERASE && m_pencil.getValue();
 }

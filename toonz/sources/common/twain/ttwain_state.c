@@ -46,7 +46,11 @@ static void TTWAIN_FreeVar(void);
 
 #define CEIL(x) ((int)(x) < (x) ? (int)(x) + 1 : (int)(x))
 
+#ifndef _WIN32
+#define PRINTF(args...)
+#else
 #define PRINTF
+#endif
 /*---------------------------------------------------------------------------*/
 /* LOCAL PROTOTYPES
  */
@@ -133,7 +137,8 @@ int TTWAIN_SelectImageSource(void *hwnd) {
         TTWAIN_MGR(DG_CONTROL, DAT_IDENTITY, MSG_USERSELECT, &newSourceId);
   } else {
     char msg[2048];
-    sprintf(msg, "Unable to open Source Manager (%s)", DSM_FILENAME);
+    snprintf(msg, sizeof(msg), "Unable to open Source Manager (%s)",
+             DSM_FILENAME);
     TTWAIN_ErrorBox(msg);
     return FALSE;
   }
@@ -588,7 +593,8 @@ void *TTWAIN_AcquireNative(void *hwnd) {
     if (!TTWAIN_OpenSourceManager(hwnd)) /* Bring up to state 4 */
     {
       char msg[2048];
-      sprintf(msg, "Unable to open Source Manager (%s)", DSM_FILENAME);
+      snprintf(msg, sizeof(msg), "Unable to open Source Manager (%s)",
+               DSM_FILENAME);
       TTWAIN_ErrorBox(msg);
       return 0;
     }
@@ -642,7 +648,7 @@ static BOOL CALLBACK myHackEnumFunction(HWND hwnd, LPARAM lParam) {
   if (len && !strncmp(title, TTwainData.sourceId.ProductName, len)) {
     /*
 char dbg_str[1024];
-sprintf(dbg_str,"set focus on 0x%8x %s\n",hwnd, title);
+snprintf(dbg_str, sizeof(dbg_str), "set focus on 0x%8x %s\n",hwnd, title);
 OutputDebugString(dbg_str);
 */
     f = (MyFun *)lParam;

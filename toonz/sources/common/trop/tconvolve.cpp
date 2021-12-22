@@ -118,24 +118,24 @@ void doConvolve_cm32_row_9_i(PIXOUT *pixout, int n, TPixelCM32 *pixarr[],
     }
 
     pixout->r = (typename PIXOUT::Channel)(
-        (val[1].r * w1 + val[2].r * w2 + val[3].r * w3 + val[4].r * w4 +
-         val[5].r * w5 + val[6].r * w6 + val[7].r * w7 + val[8].r * w8 +
-         val[9].r * w9 + (1 << 15)) >>
+        (val[0].r * w1 + val[1].r * w2 + val[2].r * w3 + val[3].r * w4 +
+         val[4].r * w5 + val[5].r * w6 + val[6].r * w7 + val[7].r * w8 +
+         val[8].r * w9 + (1 << 15)) >>
         16);
     pixout->g = (typename PIXOUT::Channel)(
-        (val[1].g * w1 + val[2].g * w2 + val[3].g * w3 + val[4].g * w4 +
-         val[5].g * w5 + val[6].g * w6 + val[7].g * w7 + val[8].g * w8 +
-         val[9].g * w9 + (1 << 15)) >>
+        (val[0].g * w1 + val[1].g * w2 + val[2].g * w3 + val[3].g * w4 +
+         val[4].g * w5 + val[5].g * w6 + val[6].g * w7 + val[7].g * w8 +
+         val[8].g * w9 + (1 << 15)) >>
         16);
     pixout->b = (typename PIXOUT::Channel)(
-        (val[1].b * w1 + val[2].b * w2 + val[3].b * w3 + val[4].b * w4 +
-         val[5].b * w5 + val[6].b * w6 + val[7].b * w7 + val[8].b * w8 +
-         val[9].b * w9 + (1 << 15)) >>
+        (val[0].b * w1 + val[1].b * w2 + val[2].b * w3 + val[3].b * w4 +
+         val[4].b * w5 + val[5].b * w6 + val[6].b * w7 + val[7].b * w8 +
+         val[8].b * w9 + (1 << 15)) >>
         16);
     pixout->m = (typename PIXOUT::Channel)(
-        (val[1].m * w1 + val[2].m * w2 + val[3].m * w3 + val[4].m * w4 +
-         val[5].m * w5 + val[6].m * w6 + val[7].m * w7 + val[8].m * w8 +
-         val[9].m * w9 + (1 << 15)) >>
+        (val[0].m * w1 + val[1].m * w2 + val[2].m * w3 + val[3].m * w4 +
+         val[4].m * w5 + val[5].m * w6 + val[6].m * w7 + val[7].m * w8 +
+         val[8].m * w9 + (1 << 15)) >>
         16);
     p1++;
     p2++;

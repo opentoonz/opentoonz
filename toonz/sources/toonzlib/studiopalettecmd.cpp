@@ -33,6 +33,23 @@
 namespace {
 //-----------------------------------------------------------------------------
 
+bool trySetStudioPalette(const TFilePath &palettePath, const TPalette *plt,
+                         bool notifyPaletteChanged) {
+  try {
+    StudioPalette::instance()->setPalette(palettePath, plt,
+                                          notifyPaletteChanged);
+  } catch (TSystemException se) {
+    DVGui::warning(QString::fromStdWString(se.getMessage()));
+    return false;
+  } catch (...) {
+    DVGui::warning(
+        QString::fromStdWString(palettePath.getWideString() + L"\n") +
+        QObject::tr("Failed to save palette."));
+    return false;
+  }
+  return true;
+}
+
 //=============================================================================
 // PaletteAssignUndo : Undo for the "Load into Current Palette" command.
 
@@ -91,13 +108,11 @@ public:
       , m_paletteHandle(paletteHandle) {}
 
   void undo() const override {
-    StudioPalette *sp = StudioPalette::instance();
-    sp->setPalette(m_fp, m_oldPalette.getPointer(), true);
+    trySetStudioPalette(m_fp, m_oldPalette.getPointer(), true);
     m_paletteHandle->notifyPaletteChanged();
   }
   void redo() const override {
-    StudioPalette *sp = StudioPalette::instance();
-    sp->setPalette(m_fp, m_newPalette.getPointer(), true);
+    trySetStudioPalette(m_fp, m_newPalette.getPointer(), true);
     m_paletteHandle->notifyPaletteChanged();
   }
 
@@ -127,8 +142,7 @@ public:
   }
 
   void undo() const override {
-    StudioPalette::instance()->setPalette(m_palettePath, m_palette->clone(),
-                                          true);
+    trySetStudioPalette(m_palettePath, m_palette->clone(), true);
   }
   void redo() const override {
     StudioPalette::instance()->deletePalette(m_palettePath);
@@ -157,8 +171,7 @@ public:
     StudioPalette::instance()->deletePalette(m_palettePath);
   }
   void redo() const override {
-    StudioPalette::instance()->setPalette(m_palettePath, m_palette->clone(),
-                                          true);
+    trySetStudioPalette(m_palettePath, m_palette->clone(), true);
   }
   int getSize() const override { return sizeof(*this) + sizeof(TPalette); }
   QString getHistoryString() override {
@@ -195,8 +208,8 @@ public:
          it != m_pathSet.end(); it++) {
       TFilePath path = *it;
       if (path.getType() == "tpl")  // Is a palette
-        StudioPalette::instance()->setPalette(
-            path, m_paletteList.at(++paletteCount)->clone(), true);
+        trySetStudioPalette(path, m_paletteList.at(++paletteCount)->clone(),
+                            true);
       else  // Is a folder
         StudioPalette::instance()->createFolder(path.getParentDir(),
                                                 path.getWideName());
@@ -399,7 +412,7 @@ int findClosest(const TPixel &color, std::map<TPixel, int> &colorMap,
     if ((dm = (color.m - it->first.m) * (color.m - it->first.m)) > tolerance)
       continue;
 
-    int currDist                    = dr + dg + db + dm;
+    int currDist = dr + dg + db + dm;
     if (currDist < minDist) minDist = currDist, index = it->second;
   }
   ToleranceMap[color] = index;
@@ -493,13 +506,16 @@ void adaptLevelToPalette(TXshLevelHandle *currentLevelHandle,
   QApplication::restoreOverrideCursor();
 
   currentLevelHandle->getSimpleLevel()->setPalette(plt);
+
+  std::wstring oldGlobalName = paletteHandle->getPalette()->getGlobalName();
   paletteHandle->setPalette(plt);
+  paletteHandle->getPalette()->setGlobalName(oldGlobalName);
   plt->setDirtyFlag(true);
   paletteHandle->notifyPaletteChanged();
   currentLevelHandle->notifyLevelChange();
 }
 
-}  // namespaxce
+}  // namespace
 
 //-----------------------------------------------------------------------------
 
@@ -575,7 +591,7 @@ void StudioPaletteCmd::mergeIntoCurrentPalette(TPaletteHandle *paletteHandle,
   TUndoManager::manager()->add(
       new PaletteAssignUndo(current, old, current->clone(), paletteHandle));
 
-  palette->setDirtyFlag(true);
+  current->setDirtyFlag(true);
   paletteHandle->notifyPaletteChanged();
 }
 
@@ -602,7 +618,11 @@ void StudioPaletteCmd::replaceWithCurrentPalette(
   // put back the global name
   palette->setGlobalName(oldGlobalName);
 
-  sp->setPalette(fp, current, true);
+  if (!trySetStudioPalette(fp, current, true)) {
+    palette->assign(old);
+    return;
+  }
+
   TUndoManager::manager()->add(
       new StudioPaletteAssignUndo(fp, old, current->clone(), paletteHandle));
 
@@ -679,12 +699,16 @@ TFilePath StudioPaletteCmd::createPalette(const TFilePath &folderName,
                                           const TPalette *palette) {
   TFilePath palettePath;
   TFileStatus status(folderName);
+  // exception will be caught either in StudioPaletteTreeViewer::addNewPalette()
+  // or StudioPaletteTreeViewer::dropEvent()
   if (!status.isDirectory()) throw TException("Select a folder.");
   if (!status.doesExist()) {
     TSystem::mkDir(folderName);
     FolderListenerManager::instance()->notifyFolderChanged(
         folderName.getParentDir());
   }
+  // StudioPalette::setPalette() and createPalette() may throw exception on
+  // saving, it will be caught in the upper functions as wel
   palettePath =
       StudioPalette::instance()->createPalette(folderName, paletteName);
   if (palette)

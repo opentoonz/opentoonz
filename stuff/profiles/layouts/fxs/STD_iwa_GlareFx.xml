@@ -1,0 +1,28 @@
+<fxlayout help_command="iexplore" help_file="BokehIwa.html">
+	<page name="Glare Iwa">
+		<control>renderMode</control>
+		<control>irisMode</control>
+		<vbox modeSensitive="irisMode" mode="1,2,3,4">
+			<separator/>
+			<control>irisScale</control>
+			<control>irisSymmetry</control>
+			<control>irisAppearance</control>
+		</vbox>
+		<vbox modeSensitive="irisMode" mode="4">
+			<control>irisGearEdgeCount</control>
+			<control>irisRandomSeed</control>
+		</vbox>
+		<vbox modeSensitive="irisMode" mode="1,2,3,4">
+			<separator/>
+		</vbox>
+		<control>intensity</control>
+		<control>size</control>
+		<control>rotation</control>
+		<control>aberration</control>
+		<control>noise_factor</control>
+		<control>noise_size</control>
+		<control>noise_octave</control>
+		<control>noise_evolution</control>
+		<control>noise_offset</control>
+	</page>
+</fxlayout>

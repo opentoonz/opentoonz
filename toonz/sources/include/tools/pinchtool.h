@@ -63,41 +63,41 @@ public:
   PinchTool();
   virtual ~PinchTool();
 
-  ToolType getToolType() const { return TTool::LevelWriteTool; }
+  ToolType getToolType() const override { return TTool::LevelWriteTool; }
 
   void setShowSelector(bool show) { m_showSelector = show; }
 
-  void onEnter();
-  void onLeave();
+  void onEnter() override;
+  void onLeave() override;
 
-  void updateTranslation();
+  void updateTranslation() override;
 
-  void draw();
+  void draw() override;
 
-  void leftButtonDown(const TPointD &pos, const TMouseEvent &);
+  void leftButtonDown(const TPointD &pos, const TMouseEvent &) override;
 
-  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e);
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) override;
 
-  void leftButtonUp(const TPointD &pos, const TMouseEvent &e);
+  void leftButtonUp(const TPointD &pos, const TMouseEvent &e) override;
 
   void invalidateCursorArea();
 
-  void mouseMove(const TPointD &pos, const TMouseEvent &e);
+  void mouseMove(const TPointD &pos, const TMouseEvent &e) override;
 
   bool moveCursor(const TPointD &pos);
 
   bool keyDown(QKeyEvent *) override;
 
-  void onActivate();
-  void onDeactivate();
+  void onActivate() override;
+  void onDeactivate() override;
 
   // viene usato??
   void update(const TGlobalChange &);
 
-  void onImageChanged();
+  void onImageChanged() override;
 
-  int getCursorId() const { return updateCursor(); }
-  TPropertyGroup *getProperties(int targetType) { return &m_prop; }
+  int getCursorId() const override { return updateCursor(); }
+  TPropertyGroup *getProperties(int targetType) override { return &m_prop; }
 };
 
 #endif  // PINCHTOOL_H

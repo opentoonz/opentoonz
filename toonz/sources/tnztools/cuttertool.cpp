@@ -1,4 +1,5 @@
-
+#include "tenv.h"
+#include "tproperty.h"
 
 #include "tools/tool.h"
 #include "tools/toolutils.h"
@@ -8,7 +9,6 @@
 #include "toonz/tcolumnhandle.h"
 #include "toonz/txshlevelhandle.h"
 #include "tools/strokeselection.h"
-#include "tools/tool.h"
 
 #include "tmathutil.h"
 #include "tstroke.h"
@@ -23,6 +23,8 @@
 #include "tgl.h"
 
 using namespace ToolUtils;
+
+TEnv::IntVar SnapAtIntersection("CutterToolSnapAtIntersection", 0);
 
 //=============================================================================
 namespace {
@@ -162,11 +164,19 @@ public:
   int m_cursorId;
   double m_pW;
 
+  int m_lockedStrokeIndex;
+
+  TPropertyGroup m_prop;
+  TBoolProperty m_snapAtIntersection;
+
   CutterTool()
       : TTool("T_Cutter")
       , m_mouseDown(false)
-      , m_cursorId(ToolCursor::CutterCursor) {
+      , m_cursorId(ToolCursor::CutterCursor)
+      , m_snapAtIntersection("Snap At Intersection", false) {
     bind(TTool::VectorImage);
+    m_prop.bind(m_snapAtIntersection);
+    m_snapAtIntersection.setId("Snap");
   }
 
   ToolType getToolType() const override { return TTool::LevelWriteTool; }
@@ -195,7 +205,109 @@ public:
     // glPopMatrix();
   }
 
-  void leftButtonDown(const TPointD &pos, const TMouseEvent &) override {
+  double getNearestSnapAtIntersection(TStroke *selfStroke, double w) {
+    TVectorImageP vi = TImageP(getImage(false));
+    if (!vi) {
+      return w;
+    }
+
+    std::vector<DoublePair> intersections;
+    int i, strokeNumber = vi->getStrokeCount();
+    double diff;
+    double nearestW = 1000;
+    double minDiff  = 1000;
+
+    // check self intersection first
+    intersect(selfStroke, selfStroke, intersections, false);
+    for (auto &intersection : intersections) {
+      if (areAlmostEqual(intersection.first, 0, 1e-6)) {
+        continue;
+      }
+      if (areAlmostEqual(intersection.second, 1, 1e-6)) {
+        continue;
+      }
+
+      diff = std::abs(intersection.first - w);
+      if (diff < minDiff) {
+        minDiff  = diff;
+        nearestW = intersection.first;
+      }
+
+      diff = std::abs(intersection.second - w);
+      if (diff < minDiff) {
+        minDiff  = diff;
+        nearestW = intersection.second;
+      }
+
+      if (selfStroke->isSelfLoop()) {
+        diff = std::abs(1 - intersection.first) + w;
+        if (diff < minDiff) {
+          minDiff  = diff;
+          nearestW = intersection.first;
+        }
+
+        diff = intersection.first + std::abs(1 - w);
+        if (diff < minDiff) {
+          minDiff  = diff;
+          nearestW = intersection.first;
+        }
+
+        diff = std::abs(1 - intersection.second) + w;
+        if (diff < minDiff) {
+          minDiff  = diff;
+          nearestW = intersection.second;
+        }
+
+        diff = intersection.second + std::abs(1 - w);
+        if (diff < minDiff) {
+          minDiff  = diff;
+          nearestW = intersection.second;
+        }
+      }
+    }
+
+    for (i = 0; i < strokeNumber; ++i) {
+      TStroke *stroke = vi->getStroke(i);
+      if (stroke == selfStroke) {
+        continue;
+      }
+
+      intersect(selfStroke, stroke, intersections, false);
+      for (auto &intersection : intersections) {
+        diff = std::abs(intersection.first - w);
+        if (diff < minDiff) {
+          minDiff  = diff;
+          nearestW = intersection.first;
+        }
+
+        if (selfStroke->isSelfLoop()) {
+          diff = std::abs(1 - intersection.first) + w;
+          if (diff < minDiff) {
+            minDiff  = diff;
+            nearestW = intersection.first;
+          }
+
+          diff = intersection.first + std::abs(1 - w);
+          if (diff < minDiff) {
+            minDiff  = diff;
+            nearestW = intersection.first;
+          }
+        }
+      }
+    }
+
+    if (nearestW >= 0 && nearestW <= 1) {
+      return nearestW;
+    }
+    return w;
+  }
+
+  void leftButtonDown(const TPointD &pos, const TMouseEvent &e) override {
+    if (getViewer() && getViewer()->getGuidedStrokePickerMode()) {
+      getViewer()->doPickGuideStroke(pos);
+      return;
+    }
+
     TVectorImageP vi = TImageP(getImage(true));
     if (!vi) return;
     QMutexLocker sl(vi->getMutex());
@@ -205,8 +317,9 @@ public:
 
     TStroke *strokeRef;
 
-    if (vi->getNearestStroke(pos, pW, strokeIndex, dist) && pW >= 0 &&
-        pW <= 1) {
+    if (getNearestStrokeWithLock(pos, pW, strokeIndex, dist,
+                                 e.isCtrlPressed()) &&
+        pW >= 0 && pW <= 1) {
       double w;
 
       strokeRef = vi->getStroke(strokeIndex);
@@ -232,6 +345,10 @@ public:
         if (len > totalLen) len -= totalLen;
 
         w = strokeRef->getParameterAtLength(len);
+      }
+
+      if (m_snapAtIntersection.getValue()) {
+        w = getNearestSnapAtIntersection(strokeRef, w);
       }
 
       std::vector<DoublePair> *sortedWRanges = new std::vector<DoublePair>;
@@ -294,11 +411,16 @@ public:
     double dist, pW;
     UINT stroke;
 
-    if (vi->getNearestStroke(pos, pW, stroke, dist)) {
+    if (getNearestStrokeWithLock(pos, pW, stroke, dist, e.isCtrlPressed())) {
       TStroke *strokeRef = vi->getStroke(stroke);
-      m_speed            = strokeRef->getSpeed(pW);
-      m_cursor           = strokeRef->getThickPoint(pW);
-      m_pW               = pW;
+
+      if (m_snapAtIntersection.getValue()) {
+        pW = getNearestSnapAtIntersection(strokeRef, pW);
+      }
+
+      m_speed  = strokeRef->getSpeed(pW);
+      m_cursor = strokeRef->getThickPoint(pW);
+      m_pW     = pW;
     } else {
       m_speed = TPointD(0, 0);
     }
@@ -307,7 +429,9 @@ public:
 
   void onLeave() override { m_speed = TPointD(0, 0); }
 
-  void onActivate() override {}
+  void onActivate() override {
+    m_snapAtIntersection.setValue(SnapAtIntersection ? 1 : 0);
+  }
   void onEnter() override {
     if ((TVectorImageP)getImage(false))
       m_cursorId = ToolCursor::CutterCursor;
@@ -315,7 +439,47 @@ public:
       m_cursorId = ToolCursor::CURSOR_NO;
   }
 
-  int getCursorId() const override { return m_cursorId; }
+  int getCursorId() const override {
+    if (m_viewer && m_viewer->getGuidedStrokePickerMode())
+      return m_viewer->getGuidedStrokePickerCursor();
+    return m_cursorId;
+  }
+
+  void updateTranslation() override {
+    m_snapAtIntersection.setQStringName(QObject::tr("Snap At Intersection"));
+  }
+
+  TPropertyGroup *getProperties(int targetType) override { return &m_prop; }
+
+  bool onPropertyChanged(std::string propertyName) override {
+    SnapAtIntersection = (int)(m_snapAtIntersection.getValue());
+    return true;
+  }
+
+  bool getNearestStrokeWithLock(const TPointD &p, double &outW,
+                                UINT &strokeIndex, double &dist2, bool lock) {
+    TVectorImageP vi = TImageP(getImage(false));
+    if (!vi) return false;
+
+    if (m_lockedStrokeIndex >= vi->getStrokeCount()) {
+      m_lockedStrokeIndex = -1;
+    }
+
+    if (lock && m_lockedStrokeIndex >= 0) {
+      TStroke *stroke = vi->getStroke(m_lockedStrokeIndex);
+      strokeIndex     = m_lockedStrokeIndex;
+      return stroke->getNearestW(p, outW, dist2);
+    }
+
+    UINT index;
+    if (vi->getNearestStroke(p, outW, index, dist2)) {
+      m_lockedStrokeIndex = index;
+      strokeIndex         = index;
+      return true;
+    }
+
+    return false;
+  }
 
 } cutterTool;
 

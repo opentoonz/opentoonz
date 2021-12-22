@@ -19,6 +19,7 @@
 
 // Qt includes
 #include <QList>
+#include <QMap>
 
 #undef DVAPI
 #undef DVVAR
@@ -128,6 +129,12 @@ public:
   std::vector<TStageObjectId> restoreObjects(
       std::set<int> &columnIndices, std::list<int> &restoredSplinIds,
       TXsheet *xsheet, int fxFlags, const TPointD &pos = TConst::nowhere) const;
+
+  std::vector<TStageObjectId> restoreObjects(
+      std::set<int> &columnIndices, std::list<int> &restoredSplinIds,
+      TXsheet *xsheet, int fxFlags,
+      QMap<TStageObjectId, TStageObjectId> &idTable,
+      QMap<TFx *, TFx *> &fxTable, const TPointD &pos = TConst::nowhere) const;
 };
 
 #endif  // STAGEOBJECT_DATA_H

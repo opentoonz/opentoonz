@@ -73,7 +73,7 @@ bool StraightCornerDeformation::check_(const ContextStatus *status) {
   double w   = status->w_;
 
   // check extremes in another way.
-  if (!s->isSelfLoop() && areAlmostEqual(w, 0.0) || areAlmostEqual(w, 1.0)) {
+  if ((!s->isSelfLoop() && areAlmostEqual(w, 0.0)) || areAlmostEqual(w, 1.0)) {
     return isAStraightCorner(s, w, &this->getStraightsList());
   }
 

@@ -15,10 +15,11 @@
 #include <sys/param.h>
 #include <unistd.h>
 #include <sys/types.h>
-#include <sys/timeb.h>  // for ftime
+#ifndef FREEBSD
+#include <dirent.h>
+#endif
 #include <stdio.h>
 #include <unistd.h>
-#include <dirent.h>
 #include <sys/dir.h>
 #include <sys/param.h>  // for getfsstat
 #ifdef MACOSX
@@ -94,7 +95,7 @@ void TPluginManager::unloadPlugins() {
   for (PluginTable::iterator it = m_pluginTable.begin();
        it != m_pluginTable.end(); ++it) {
     Plugin::Handle handle = (*it)->getHandle();
-#ifndef LINUX
+#if !(defined(LINUX) || defined(FREEBSD))
 #ifdef _WIN32
     FreeLibrary(handle);
 #else
@@ -171,7 +172,7 @@ void TPluginManager::loadPlugin(const TFilePath &fp) {
 void TPluginManager::loadPlugins(const TFilePath &dir) {
 #if defined(_WIN32)
   const std::string extension = "dll";
-#elif defined(LINUX) || defined(__sgi)
+#elif defined(LINUX) || defined(FREEBSD) || defined(__sgi)
   const std::string extension = "so";
 #elif defined(MACOSX)
   const std::string extension = "dylib";

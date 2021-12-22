@@ -13,6 +13,16 @@
     <control>fov</control>
     <control>eyeLevel</control>
     <control>alpha_rendering</control>
-    <control>waveHeight</control>
+    <vbox modeSensitive="renderMode" mode="2,3,4">
+      <control>waveHeight</control>
+    </vbox>
+    <vbox modeSensitive="renderMode" mode="3">
+      <control>normalize_fresnel</control>
+      <control>normalize_margin</control>
+    </vbox>
+    <visibleToggle> 
+      <controller>normalize_fresnel</controller>
+      <on>normalize_margin</on>
+    </visibleToggle>
   </page>
 </fxlayout>

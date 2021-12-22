@@ -4,6 +4,7 @@
      <control>count</control>
      <control>cycle</control>
      <control>colors</control>
+     <control>curveType</control>
 <separator label="Distortion Wave"/>
      <control>wave_amplitude</control>
      <control>wave_frequency</control>

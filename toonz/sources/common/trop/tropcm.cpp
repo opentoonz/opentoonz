@@ -23,7 +23,7 @@ extern "C" {
 #include "toonz4.6/raster.h"
 }
 
-#ifdef _WIN32
+#if defined(_WIN32) && defined(x64)
 #define USE_SSE2
 #endif
 
@@ -75,7 +75,7 @@ void TRop::convert(const TRaster32P &rasOut, const TRasterCM32P &rasIn,
 
   rasOut->lock();
   rasIn->lock();
-#ifdef _WIN32
+#ifdef USE_SSE2
   if (TSystem::getCPUExtensions() & TSystem::CpuSupportsSse2) {
     __m128i zeros = _mm_setzero_si128();
     TPixelFloat *paints =
@@ -182,7 +182,7 @@ paints[i]  = TPixelFloat(paints2[i]);
       }
       paints[0] = TPixel32::Transparent;
     } else
-      for (int i  = 0; i < palette->getStyleCount(); i++)
+      for (int i = 0; i < palette->getStyleCount(); i++)
         paints[i] = inks[i] =
             ::premultiply(palette->getStyle(i)->getAverageColor());
 
@@ -542,16 +542,16 @@ void addColor(TPaletteP plt, int index, const TPaletteP &upPlt,
     usedInks[index] = index;
     return;
   }
-  int firstStyleId                     = plt->getFirstUnpagedStyle();
+  int firstStyleId = plt->getFirstUnpagedStyle();
   if (firstStyleId == -1) firstStyleId = plt->getStyleCount();
-  usedInks[index]                      = firstStyleId;
+  usedInks[index] = firstStyleId;
   plt->getPage(0)->addStyle(TPixel32::Red);
 }
 
 void addColor(TPaletteP plt, int index, std::map<int, int> &usedInks) {
-  int firstStyleId                     = plt->getFirstUnpagedStyle();
+  int firstStyleId = plt->getFirstUnpagedStyle();
   if (firstStyleId == -1) firstStyleId = plt->getStyleCount();
-  usedInks[index]                      = firstStyleId;
+  usedInks[index] = firstStyleId;
   plt->getPage(0)->addStyle(TPixel32::Red);
 }
 
@@ -757,10 +757,58 @@ void TRop::eraseColors(TRasterCM32P ras, vector<int> &colorIds, bool eraseInks,
 #endif
 
 /*------------------------------------------------------------------------*/
+namespace {
+void expandAreaAndFillGaps(TRasterCM32P ras) {
+  // expand neighbor pixels and fill the gaps
+  while (1) {
+    bool found = false;
+    for (int y = 0; y < ras->getLy(); y++) {
+      TPixelCM32 *pix   = ras->pixels(y);
+      TPixelCM32 *upPix = (y == 0) ? ras->pixels(y) : ras->pixels(y - 1);
+      TPixelCM32 *dnPix =
+          (y == ras->getLy() - 1) ? ras->pixels(y) : ras->pixels(y + 1);
+      for (int x = 0; x < ras->getLx(); x++, pix++, upPix++, dnPix++) {
+        // pixels which were filled in the previous loop
+        if (pix->getInk() == TPixelCM32::getMaxInk()) {
+          pix->setInk(0);
+          continue;
+        }
+        // pixels which are non-gap or already finished
+        if (pix->getPaint() != TPixelCM32::getMaxPaint()) continue;
+
+        int paint = TPixelCM32::getMaxPaint();
+        // check the neighbor pixels and take the smallest styleId
+        if (upPix != pix && upPix->getInk() != TPixelCM32::getMaxInk())
+          paint = upPix->getPaint();
+        if (dnPix != pix && dnPix->getInk() != TPixelCM32::getMaxInk())
+          paint = std::min(paint, dnPix->getPaint());
+        if (x != 0 && (pix - 1)->getInk() != TPixelCM32::getMaxInk())
+          paint = std::min(paint, (pix - 1)->getPaint());
+        if (x != ras->getLx() - 1 &&
+            (pix + 1)->getInk() != TPixelCM32::getMaxInk())
+          paint = std::min(paint, (pix + 1)->getPaint());
+
+        if (paint != TPixelCM32::getMaxPaint()) {
+          pix->setPaint(paint);
+          // use inkId = 4095 as mark of newly-filled pixels
+          // This pixel will be finalized in the next loop
+          pix->setInk(TPixelCM32::getMaxInk());
+        }
+        found = true;
+      }
+    }
+    if (!found) break;
+  }
+}
+}  // namespace
 
 void TRop::eraseColors(TRasterCM32P ras, std::vector<int> *colorIds,
-                       bool eraseInks) {
+                       bool eraseInks, bool noGap) {
+  // noGap option is available only when erasing Inks
+  assert(eraseInks || !noGap);
   if (colorIds) std::sort(colorIds->begin(), colorIds->end());
+
+  bool hasGapPixel = false;
 
   for (int y = 0; y < ras->getLy(); y++) {
     TPixelCM32 *pix = ras->pixels(y), *endPix = pix + ras->getLx();
@@ -771,18 +819,29 @@ void TRop::eraseColors(TRasterCM32P ras, std::vector<int> *colorIds,
 
       if (color == 0) continue;
 
-      if (colorIds) {
-        while (i < colorIds->size() && (*colorIds)[i] < color) i++;
-        if (i == colorIds->size() || color != (*colorIds)[i]) continue;
-      }
+      if (colorIds &&
+          !std::binary_search(colorIds->begin(), colorIds->end(), color))
+        continue;
 
       if (eraseInks) {
+        // no-gap case.
+        // even if some area is filled under the solid line, delete it and
+        // expand-fill again to make sure the colors will be separated at the
+        // center of the lines.
+        if (noGap && pix->getTone() == 0) {
+          pix->setPaint(
+              TPixelCM32::getMaxPaint());  // use paintId = 4095 as mark of
+                                           // pixels to be filled
+          hasGapPixel = true;
+        }
         pix->setInk(0);
         pix->setTone(TPixelCM32::getMaxTone());
       } else
         pix->setPaint(0);
     }
   }
+
+  if (hasGapPixel) expandAreaAndFillGaps(ras);
 }
 
 //--------------------------------
@@ -1170,7 +1229,7 @@ void TRop::zoomOutCm32Rgbm(const TRasterCM32P &rin, TRaster32P &rout,
   int count2 =
       std::max(count, TPixelCM32::getMaxInk(), TPixelCM32::getMaxPaint());
   std::vector<TPixel32> colors(count2);
-  for (i      = 0; i < plt.getStyleCount(); i++)
+  for (i = 0; i < plt.getStyleCount(); i++)
     colors[i] = ::premultiply(plt.getStyle(i)->getAverageColor());
 
   lx             = x2 - x1 + 1;
@@ -1332,7 +1391,7 @@ void TRop::makeIcon(TRaster32P &_rout, const TRasterCM32P &rin,
     rout = _rout->extract((dim.lx - newlx) / 2, (dim.ly - newly) / 2,
                           (dim.lx - newlx) / 2 + newlx - 1,
                           (dim.ly - newly) / 2 + newly - 1);
-    dim = rout->getSize();
+    dim  = rout->getSize();
   } else
     rout = _rout;
 

@@ -15,6 +15,8 @@
 #include <QButtonGroup>
 #include <QRadioButton>
 #include <QPushButton>
+#include <QTextEdit>
+#include <QPainterPath>
 
 #include "tgeometry.h"
 #include "tparam.h"
@@ -40,6 +42,7 @@ class QString;
 class QComboBox;
 class QHBoxLayout;
 class TFxHandle;
+class QFontComboBox;
 
 namespace DVGui {
 class LineEdit;
@@ -51,7 +54,7 @@ class ColorField;
 class SpectrumField;
 class ToneCurveField;
 class CheckBox;
-}
+}  // namespace DVGui
 
 //=============================================================================
 /*! \brief ParamField.
@@ -88,7 +91,7 @@ public:
 
   virtual void setPointValue(const TPointD &p){};
 
-  virtual QSize getPreferedSize() { return QSize(200, 28); }
+  virtual QSize getPreferredSize() { return QSize(200, 28); }
 
   static void setFxHandle(TFxHandle *fxHandle);
 
@@ -105,8 +108,41 @@ signals:
 
 class DVAPI ParamFieldKeyToggle final : public QWidget {
   Q_OBJECT
-
 public:
+  QPixmap m_pixmap;
+
+  // keyframe colors
+  QColor m_keyBorderOffColor;
+  QColor m_keyBorderOnColor;
+  QColor m_keyBorderModifiedColor;
+  QColor m_keyBorderInbetweenColor;
+  QColor m_keyBorderHighlightColor;
+  QColor m_keyOffColor;
+  QColor m_keyOnColor;
+  QColor m_keyModifiedColor;
+  QColor m_keyHighlightColor;
+  QColor m_keyInbetweenColor;
+
+  // keyframe colors
+  Q_PROPERTY(QColor KeyBorderOffColor READ getKeyBorderOffColor WRITE
+                 setKeyBorderOffColor)
+  Q_PROPERTY(QColor KeyBorderOnColor READ getKeyBorderOnColor WRITE
+                 setKeyBorderOnColor)
+  Q_PROPERTY(QColor KeyBorderModifiedColor READ getKeyBorderModifiedColor WRITE
+                 setKeyBorderModifiedColor)
+  Q_PROPERTY(QColor KeyBorderInbetweenColor READ getKeyBorderInbetweenColor
+                 WRITE setKeyBorderInbetweenColor)
+  Q_PROPERTY(QColor KeyBorderHighlightColor READ getKeyBorderHighlightColor
+                 WRITE setKeyBorderHighlightColor)
+  Q_PROPERTY(QColor KeyOffColor READ getKeyOffColor WRITE setKeyOffColor)
+  Q_PROPERTY(QColor KeyOnColor READ getKeyOnColor WRITE setKeyOnColor)
+  Q_PROPERTY(QColor KeyModifiedColor READ getKeyModifiedColor WRITE
+                 setKeyModifiedColor)
+  Q_PROPERTY(QColor KeyInbetweenColor READ getKeyInbetweenColor WRITE
+                 setKeyInbetweenColor)
+  Q_PROPERTY(QColor KeyHighlightColor READ getKeyHighlightColor WRITE
+                 setKeyHighlightColor)
+
   enum Status { NOT_ANIMATED, NOT_KEYFRAME, MODIFIED, KEYFRAME };
 
 private:
@@ -127,6 +163,44 @@ protected:
   void mousePressEvent(QMouseEvent *) override;
   void enterEvent(QEvent *) override;
   void leaveEvent(QEvent *) override;
+
+  // keyframe colors
+  void setKeyBorderOffColor(const QColor &color) {
+    m_keyBorderOffColor = color;
+  }
+  QColor getKeyBorderOffColor() const { return m_keyBorderOffColor; }
+  void setKeyBorderOnColor(const QColor &color) { m_keyBorderOnColor = color; }
+  QColor getKeyBorderOnColor() const { return m_keyBorderOnColor; }
+  void setKeyBorderModifiedColor(const QColor &color) {
+    m_keyBorderModifiedColor = color;
+  }
+  QColor getKeyBorderModifiedColor() const { return m_keyBorderModifiedColor; }
+  void setKeyBorderInbetweenColor(const QColor &color) {
+    m_keyBorderInbetweenColor = color;
+  }
+  QColor getKeyBorderInbetweenColor() const {
+    return m_keyBorderInbetweenColor;
+  }
+  void setKeyBorderHighlightColor(const QColor &color) {
+    m_keyBorderHighlightColor = color;
+  }
+  QColor getKeyBorderHighlightColor() const {
+    return m_keyBorderHighlightColor;
+  }
+  void setKeyOffColor(const QColor &color) { m_keyOffColor = color; }
+  QColor getKeyOffColor() const { return m_keyOffColor; }
+  void setKeyOnColor(const QColor &color) { m_keyOnColor = color; }
+  QColor getKeyOnColor() const { return m_keyOnColor; }
+  void setKeyModifiedColor(const QColor &color) { m_keyModifiedColor = color; }
+  QColor getKeyModifiedColor() const { return m_keyModifiedColor; }
+  void setKeyHighlightColor(const QColor &color) {
+    m_keyHighlightColor = color;
+  }
+  QColor getKeyHighlightColor() const { return m_keyHighlightColor; }
+  void setKeyInbetweenColor(const QColor &color) {
+    m_keyInbetweenColor = color;
+  }
+  QColor getKeyInbetweenColor() const { return m_keyInbetweenColor; }
 
 signals:
   void keyToggled();
@@ -295,7 +369,8 @@ public:
 
   void updateField(double value) override;
 
-  QSize getPreferedSize() override { return QSize(260, 28); }
+  QSize getPreferredSize() override { return QSize(260, 26); }
+  void setPrecision(int precision) override;
 
 protected slots:
   void onChange(bool);
@@ -318,7 +393,7 @@ public:
 
   void updateField(DoublePair value) override;
 
-  QSize getPreferedSize() override { return QSize(300, 20); }
+  QSize getPreferredSize() override { return QSize(300, 20); }
   void setPrecision(int precision) override;
 
 protected slots:
@@ -343,7 +418,7 @@ public:
 
   void updateField(TPointD value) override;
 
-  QSize getPreferedSize() override { return QSize(270, 28); }
+  QSize getPreferredSize() override { return QSize(270, 28); }
 
 protected slots:
   void onChange(bool);
@@ -365,7 +440,7 @@ public:
 
   void updateField(TPixel32 value) override;
 
-  QSize getPreferedSize() override { return QSize(480, 40); }
+  QSize getPreferredSize() override { return QSize(480, 40); }
 
   /*-- RgbLinkButtonの実行のため --*/
   TPixel32 getColor();
@@ -383,16 +458,17 @@ protected slots:
 // RGB Link Button
 //-----------------------------------------------------------------------------
 
-class DVAPI RgbLinkButton final : public QPushButton {
+class DVAPI RgbLinkButtons final : public QWidget {
   Q_OBJECT
   PixelParamField *m_field1, *m_field2;
 
 public:
-  RgbLinkButton(QString str, QWidget *parent, PixelParamField *field1,
-                PixelParamField *field2);
+  RgbLinkButtons(QString str1, QString str2, QWidget *parent,
+                 PixelParamField *field1, PixelParamField *field2);
 
 protected slots:
-  void onButtonClicked();
+  void onCopyButtonClicked();
+  void onSwapButtonClicked();
 };
 
 //=============================================================================
@@ -413,7 +489,7 @@ public:
 
   void setParams();
 
-  QSize getPreferedSize() override { return QSize(477, 60); }
+  QSize getPreferredSize() override { return QSize(477, 60); }
 
 protected slots:
   void onKeyToggled();
@@ -423,10 +499,39 @@ protected slots:
 };
 
 //=============================================================================
+// Mode Sensitive Box
+//-----------------------------------------------------------------------------
+
+class ModeChangerParamField : public ParamField {
+  Q_OBJECT
+public:
+  ModeChangerParamField(QWidget *parent, QString paramName,
+                        const TParamP &param, bool addEmptyLabel = true)
+      : ParamField(parent, paramName, param, addEmptyLabel) {}
+signals:
+  void modeChanged(int);
+};
+
+class DVAPI ModeSensitiveBox final : public QWidget {
+  Q_OBJECT
+  QList<int> m_modes;
+  int m_currentMode;
+
+public:
+  ModeSensitiveBox(QWidget *parent, ModeChangerParamField *modeChanger,
+                   QList<int> modes);
+  ModeSensitiveBox(QWidget *parent, QCheckBox *checkBox);
+  QList<int> modes() { return m_modes; }
+  bool isActive() { return m_modes.contains(m_currentMode); }
+protected slots:
+  void onModeChanged(int mode);
+};
+
+//=============================================================================
 // EnumParamField
 //-----------------------------------------------------------------------------
 
-class EnumParamField final : public ParamField {
+class EnumParamField final : public ModeChangerParamField {
   Q_OBJECT
 
   TIntEnumParamP m_currentParam, m_actualParam;
@@ -439,7 +544,7 @@ public:
                 int frame) override;
   void update(int frame) override;
 
-  QSize getPreferedSize() override { return QSize(150, 20); }
+  QSize getPreferredSize() override { return QSize(150, 20); }
 
 protected slots:
   void onChange(const QString &str);
@@ -449,7 +554,7 @@ protected slots:
 // BoolParamField
 //-----------------------------------------------------------------------------
 
-class DVAPI BoolParamField final : public ParamField {
+class DVAPI BoolParamField final : public ModeChangerParamField {
   Q_OBJECT
 
   TBoolParamP m_currentParam, m_actualParam;
@@ -462,7 +567,7 @@ public:
                 int frame) override;
   void update(int frame) override;
 
-  QSize getPreferedSize() override { return QSize(20, 15); }
+  QSize getPreferredSize() override { return QSize(20, 15); }
 
 protected slots:
   void onToggled(bool checked);
@@ -491,7 +596,7 @@ public:
                 int frame) override;
   void update(int frame) override;
 
-  QSize getPreferedSize() override { return QSize(50, 20); }
+  QSize getPreferredSize() override { return QSize(50, 19); }
 
 protected slots:
   void onChange(bool isDragging = false);
@@ -501,11 +606,28 @@ protected slots:
 // StringParamField
 //-----------------------------------------------------------------------------
 
+namespace component {
+class MyTextEdit : public QTextEdit {
+  Q_OBJECT
+public:
+  MyTextEdit(const QString &text, QWidget *parent = Q_NULLPTR)
+      : QTextEdit(text, parent) {}
+
+protected:
+  void keyPressEvent(QKeyEvent *event) override;
+  void focusOutEvent(QFocusEvent *e) override;
+
+signals:
+  void edited();
+};
+};  // namespace component
+
 class DVAPI StringParamField final : public ParamField {
   Q_OBJECT
 
   TStringParamP m_currentParam, m_actualParam;
-  DVGui::LineEdit *m_textFld;
+  DVGui::LineEdit *m_textFld            = nullptr;
+  component::MyTextEdit *m_multiTextFld = nullptr;
 
 public:
   StringParamField(QWidget *parent, QString name, const TStringParamP &param);
@@ -514,8 +636,41 @@ public:
                 int frame) override;
   void update(int frame) override;
 
-  QSize getPreferedSize() override { return QSize(100, 20); }
+  QSize getPreferredSize() override {
+    if (m_textFld)
+      return QSize(100, 20);
+    else
+      return QSize(100, 80);
+  }
 protected slots:
+  void onChange();
+};
+
+//=============================================================================
+// FontParamField
+//-----------------------------------------------------------------------------
+
+class FontParamField final : public ParamField {
+  Q_OBJECT
+
+  TFontParamP m_currentParam, m_actualParam;
+
+  QFontComboBox *m_fontCombo;
+  QComboBox *m_styleCombo;
+  DVGui::IntField *m_sizeField;
+
+public:
+  FontParamField(QWidget *parent, QString name, const TFontParamP &param);
+
+  void setParam(const TParamP &current, const TParamP &actual,
+                int frame) override;
+  void update(int frame) override;
+
+  QSize getPreferredSize() override { return QSize(150, 20); }
+
+protected slots:
+  void findStyles(const QFont &font);
+  void onSizeChange(bool);
   void onChange();
 };
 
@@ -537,7 +692,7 @@ public:
 
   void setParams();
 
-  QSize getPreferedSize() override { return QSize(400, 380); }
+  QSize getPreferredSize() override;
 
 protected slots:
   void onChannelChanged(int);
@@ -607,7 +762,7 @@ public:
 protected slots:
   void update_value(double);
 };
-}
+}  // namespace component
 
 namespace component {
 class DVAPI LineEdit_int final : public ParamField {

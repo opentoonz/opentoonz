@@ -45,7 +45,6 @@
 #include "ext/Selector.h"
 #include "ext/CornerDeformation.h"
 #include "ext/StraightCornerDeformation.h"
-#include "ext/StrokeDeformation.h"
 
 #include <memory>
 #include <algorithm>
@@ -74,13 +73,15 @@ PinchTool::PinchTool()
     , m_draw(false)
     , m_undo(0)
     , m_showSelector(true)
-    , m_toolRange("Size:", 1.0, 1000.0, 500.0)  // W_ToolOptions_PinchTool
+    , m_toolRange("Size:", 1.0, 10000.0, 500.0)  // W_ToolOptions_PinchTool
     , m_toolCornerSize("Corner:", 1.0, 180.0,
                        160.0)          // W_ToolOptions_PinchCorner
     , m_autoOrManual("Manual", false)  // W_ToolOptions_PinchManual
     , m_deformation(new ToonzExt::StrokeDeformation)
     , m_selector(500, 10, 1000) {
   bind(TTool::Vectors);
+
+  m_toolRange.setNonLinearSlider();
 
   m_prop.bind(m_toolCornerSize);
   m_prop.bind(m_autoOrManual);
@@ -139,7 +140,7 @@ void PinchTool::updateInterfaceStatus(const TMouseEvent &event) {
   m_status.key_event_ = ContextStatus::NONE;
 
   // mutual exclusive
-  if (event.isCtrlPressed()) m_status.key_event_  = ContextStatus::CTRL;
+  if (event.isCtrlPressed()) m_status.key_event_ = ContextStatus::CTRL;
   if (event.isShiftPressed()) m_status.key_event_ = ContextStatus::SHIFT;
 
   // TODO:  **DEVE** essere fatto dentro la costruzione di TMouseEvent
@@ -176,6 +177,9 @@ void PinchTool::updateStrokeStatus(TStroke *stroke, double w) {
 //-----------------------------------------------------------------------------
 
 int PinchTool::updateCursor() const {
+  if (m_viewer && m_viewer->getGuidedStrokePickerMode())
+    return m_viewer->getGuidedStrokePickerCursor();
+
   if (!(TVectorImageP)getImage(false)) return ToolCursor::CURSOR_NO;
 
   return m_deformation->getCursorId();
@@ -184,6 +188,11 @@ int PinchTool::updateCursor() const {
 //---------------------------------------------------------------------------
 
 void PinchTool::leftButtonDown(const TPointD &pos, const TMouseEvent &event) {
+  if (getViewer() && getViewer()->getGuidedStrokePickerMode()) {
+    getViewer()->doPickGuideStroke(pos);
+    return;
+  }
+
   m_curr = m_down = pos;
 
   if (!m_active && !m_selector.isSelected()) {
@@ -358,7 +367,7 @@ void PinchTool::onEnter() {
 //-----------------------------------------------------------------------------
 
 void PinchTool::onLeave() {
-  if (!m_active) m_draw   = false;
+  if (!m_active) m_draw = false;
   m_status.stroke2change_ = 0;
 
   // Abbiamo dovuto commentarlo perche' stranamente
@@ -454,8 +463,8 @@ void PinchTool::mouseMove(const TPointD &pos, const TMouseEvent &event) {
   m_curr                = pos;
 
   const int pixelRange = 3;
-  if (abs(m_lastMouseEvent.m_pos.x - event.m_pos.x) < pixelRange &&
-      abs(m_lastMouseEvent.m_pos.y - event.m_pos.y) < pixelRange &&
+  if (std::abs(m_lastMouseEvent.m_pos.x - event.m_pos.x) < pixelRange &&
+      std::abs(m_lastMouseEvent.m_pos.y - event.m_pos.y) < pixelRange &&
       m_lastMouseEvent.getModifiersMask() == event.getModifiersMask())
     return;
 
@@ -469,7 +478,7 @@ void PinchTool::mouseMove(const TPointD &pos, const TMouseEvent &event) {
     // update information about current stroke
     updateStrokeStatus(stroke, w);
 
-    // retrieve the currect m_deformation and
+    // retrieve the current m_deformation and
     // prepare to design and modify
     if (m_deformation) m_deformation->check(status);
 

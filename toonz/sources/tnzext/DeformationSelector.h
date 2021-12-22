@@ -15,7 +15,7 @@ namespace ToonzExt {
    * Priority can manage simply some strange case (corner that
    * seems to be straight corner and smooth corner).
    *
-   * @note Selection can be overriden by user.
+   * @note Selection can be overridden by user.
    * @note Private use only.
    */
 class DeformationSelector {
