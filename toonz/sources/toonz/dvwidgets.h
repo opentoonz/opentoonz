@@ -8,6 +8,7 @@
 
 #include "tproperty.h"
 #include "toonzqt/intfield.h"
+#include "toonzqt/doublefield.h"
 #include "toonzqt/lineedit.h"
 #include "toonzqt/checkbox.h"
 
@@ -85,6 +86,21 @@ class PropertyIntField final : public IntField, public PropertyWidget {
 
 public:
   PropertyIntField(QWidget *parent, TIntProperty *prop);
+
+protected slots:
+  void onValueChanged(bool isDragging);
+
+private:
+  void onPropertyChanged() override;
+};
+
+//-----------------------------------------------------------------------------
+
+class PropertyDoubleField final : public DoubleField, public PropertyWidget {
+  Q_OBJECT
+
+public:
+  PropertyDoubleField(QWidget *parent, TDoubleProperty *prop);
 
 protected slots:
   void onValueChanged(bool isDragging);

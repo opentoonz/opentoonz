@@ -160,8 +160,13 @@ TPropertyGroup *TOutputProperties::getFileFormatProperties(std::string ext) {
     TPropertyGroup *ret     = Tiio::makeWriterProperties(ext);
     m_formatProperties[ext] = ret;
     return ret;
-  } else
-    return it->second;
+  } else {
+    // Try to merge settings instead of overriding them
+    TPropertyGroup *ret = Tiio::makeWriterProperties(ext);
+    ret->setProperties(it->second);
+    m_formatProperties[ext] = ret;
+    return ret;
+  }
 }
 
 //-------------------------------------------------------------------
