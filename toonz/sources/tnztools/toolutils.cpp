@@ -59,7 +59,7 @@ void mapToVector(const std::map<int, VIStroke *> &theMap,
                  std::vector<int> &theVect) {
   assert(theMap.size() == theVect.size());
   std::map<int, VIStroke *>::const_iterator it = theMap.begin();
-  UINT i                                       = 0;
+  UINT i = 0;
   for (; it != theMap.end(); ++it) {
     theVect[i++] = it->first;
   }
@@ -533,12 +533,15 @@ void ToolUtils::TToolUndo::removeLevelAndFrameIfNeeded() const {
     m_level->eraseFrame(m_frameId);
     if (!m_isEditingLevel) {
       TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
+      TXshCell cell;
       for (const TTool::CellOps &cellOps : m_cellsData) {
-        TXshCell cell;
         if (cellOps.type == TTool::CellOps::ExistingToNew)
           cell = xsh->getCell(cellOps.r0 - 1, m_col);
         for (int r = cellOps.r0; r <= cellOps.r1; r++)
           xsh->setCell(r, m_col, cell);
+      }
+      if (m_cellsData.size() < 1) {
+        xsh->setCell(m_row, m_col, cell);
       }
     }
     if (m_createdLevel) {
@@ -706,7 +709,9 @@ void ToolUtils::TFullColorRasterUndo::undo() const {
   }
 
   removeLevelAndFrameIfNeeded();
-
+  if (m_level) {
+    m_level->setDirtyFlag(true);
+  }
   app->getCurrentXsheet()->notifyXsheetChanged();
   notifyImageChanged();
 }
@@ -1035,12 +1040,13 @@ int ToolUtils::UndoModifyListStroke::getSize() const {
 ToolUtils::UndoPencil::UndoPencil(
     TStroke *stroke, std::vector<TFilledRegionInf> *fillInformation,
     TXshSimpleLevel *level, const TFrameId &frameId, bool createdFrame,
-    bool createdLevel, bool autogroup, bool autofill)
+    bool createdLevel, bool autogroup, bool autofill, bool sendToBack)
     : TToolUndo(level, frameId, createdFrame, createdLevel, 0)
     , m_strokeId(stroke->getId())
     , m_fillInformation(fillInformation)
     , m_autogroup(autogroup)
-    , m_autofill(autofill) {
+    , m_autofill(autofill)
+    , m_sendToBack(sendToBack) {
   m_stroke = new TStroke(*stroke);
 }
 
@@ -1113,11 +1119,12 @@ void ToolUtils::UndoPencil::redo() const {
   QMutexLocker sl(image->getMutex());
   TStroke *stroke = new TStroke(*m_stroke);
   stroke->setId(m_strokeId);
-  image->addStroke(stroke);
+  int addedStrokeIndex = image->addStroke(stroke, true, m_sendToBack);
   if (image->isComputedRegionAlmostOnce()) image->findRegions();
 
   if (m_autogroup && stroke->isSelfLoop()) {
-    int index = image->getStrokeCount() - 1;
+    int index               = image->getStrokeCount() - 1;
+    if (m_sendToBack) index = addedStrokeIndex;
     image->group(index, 1);
     if (m_autofill) {
       // to avoid filling other strokes, I enter into the new stroke group
@@ -1785,8 +1792,9 @@ bool ToolUtils::doUpdateXSheet(TXshSimpleLevel *sl,
             cells[i].m_level->getType() == CHILD_XSHLEVEL) {
           TXshChildLevel *level = cells[i].m_level->getChildLevel();
           // make sure we haven't already checked the level
-          if (level && std::find(childLevels.begin(), childLevels.end(),
-                                 level) == childLevels.end()) {
+          if (level &&
+              std::find(childLevels.begin(), childLevels.end(), level) ==
+                  childLevels.end()) {
             childLevels.push_back(level);
             TXsheet *subXsh = level->getXsheet();
             ret |= doUpdateXSheet(sl, oldFids, newFids, subXsh, childLevels);
@@ -1819,15 +1827,6 @@ bool ToolUtils::doUpdateXSheet(TXshSimpleLevel *sl,
 
 bool ToolUtils::renumberForInsertFId(TXshSimpleLevel *sl, const TFrameId &fid,
                                      const TFrameId &maxFid, TXsheet *xsh) {
-  auto getNextLetter = [](const QString &letter) {
-    if (letter.isEmpty()) return QString('a');
-    if (letter == 'z' || letter == 'Z') return QString();
-    QByteArray byteArray = letter.toUtf8();
-    // return incrementing the last letter
-    byteArray.data()[byteArray.size() - 1]++;
-    return QString::fromUtf8(byteArray);
-  };
-
   std::vector<TFrameId> fids;
   std::vector<TFrameId> oldFrames;
   sl->getFids(oldFrames);
@@ -1841,10 +1840,10 @@ bool ToolUtils::renumberForInsertFId(TXshSimpleLevel *sl, const TFrameId &fid,
   for (auto itr = fidsSet.upper_bound(maxFid); itr != fidsSet.end(); ++itr) {
     if (*itr > tmpFid) break;
     fIdsToBeShifted.push_back(*itr);
-    if (!fid.getLetter().isEmpty()) {
-      QString nextLetter = getNextLetter((*itr).getLetter());
-      if (!nextLetter.isEmpty())
-        tmpFid = TFrameId((*itr).getNumber(), nextLetter);
+    if (fid.getLetter()) {
+      if ((*itr).getLetter() < 'z')
+        tmpFid = TFrameId((*itr).getNumber(),
+                          ((*itr).getLetter()) ? (*itr).getLetter() + 1 : 'a');
       else
         tmpFid = TFrameId((*itr).getNumber() + 1);
     } else
@@ -1855,10 +1854,11 @@ bool ToolUtils::renumberForInsertFId(TXshSimpleLevel *sl, const TFrameId &fid,
 
   for (TFrameId &tmpFid : fids) {
     if (fIdsToBeShifted.contains(tmpFid)) {
-      if (!fid.getLetter().isEmpty()) {
-        QString nextLetter = getNextLetter(tmpFid.getLetter());
-        if (!nextLetter.isEmpty())
-          tmpFid = TFrameId(tmpFid.getNumber(), nextLetter);
+      if (fid.getLetter()) {
+        if (tmpFid.getLetter() < 'z')
+          tmpFid =
+              TFrameId(tmpFid.getNumber(),
+                       (tmpFid.getLetter()) ? tmpFid.getLetter() + 1 : 'a');
         else
           tmpFid = TFrameId(tmpFid.getNumber() + 1);
       } else
