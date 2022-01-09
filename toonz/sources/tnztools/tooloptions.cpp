@@ -56,6 +56,7 @@
 #include <QToolButton>
 #include <QResizeEvent>
 #include <QList>
+#include <QSignalMapper>
 #include <QPropertyAnimation>
 #include <QEasingCurve>
 #include <QStackedWidget>
@@ -208,6 +209,36 @@ void ToolOptionControlBuilder::visit(TDoubleProperty *p) {
   hLayout()->addWidget(control, 100);
   // storing the control in the map for updating values later
   m_panel->addControl(control);
+  CommandManager *cm = CommandManager::instance();
+  if (p->getName() == "Size:") {
+    QAction *a;
+    a = cm->getAction("A_IncreaseMaxBrushThickness");
+    control->addAction(a);
+    QObject::connect(a, SIGNAL(triggered()), control, SLOT(increase()));
+    a = cm->getAction("A_DecreaseMaxBrushThickness");
+    control->addAction(a);
+    QObject::connect(a, SIGNAL(triggered()), control, SLOT(decrease()));
+  }
+  if (p->getName() == "ModifierSize") {
+    QAction *a;
+    a = cm->getAction("A_IncreaseMaxBrushThickness");
+    control->addAction(a);
+    QObject::connect(a, SIGNAL(triggered()), control,
+                     SLOT(increaseFractional()));
+    a = cm->getAction("A_DecreaseMaxBrushThickness");
+    control->addAction(a);
+    QObject::connect(a, SIGNAL(triggered()), control,
+                     SLOT(decreaseFractional()));
+  }
+  if (p->getName() == "Hardness:") {
+    QAction *a;
+    a = cm->getAction("A_IncreaseBrushHardness");
+    control->addAction(a);
+    QObject::connect(a, SIGNAL(triggered()), control, SLOT(increase()));
+    a = cm->getAction("A_DecreaseBrushHardness");
+    control->addAction(a);
+    QObject::connect(a, SIGNAL(triggered()), control, SLOT(decrease()));
+  }
   hLayout()->addSpacing(5);
 }
 
@@ -220,6 +251,23 @@ void ToolOptionControlBuilder::visit(TDoublePairProperty *p) {
       m_tool, p, QObject::tr("Min:"), QObject::tr("Max:"), m_toolHandle);
   hLayout()->addWidget(control, 150);
   m_panel->addControl(control);
+  if (p->getName() == "Size:" || p->getName() == "Size") {
+    CommandManager *cm = CommandManager::instance();
+    QAction *a;
+    a = cm->getAction("A_IncreaseMaxBrushThickness");
+    control->addAction(a);
+    QObject::connect(a, SIGNAL(triggered()), control, SLOT(increaseMaxValue()));
+    a = cm->getAction("A_DecreaseMaxBrushThickness");
+    control->addAction(a);
+    QObject::connect(a, SIGNAL(triggered()), control, SLOT(decreaseMaxValue()));
+
+    a = cm->getAction("A_IncreaseMinBrushThickness");
+    control->addAction(a);
+    QObject::connect(a, SIGNAL(triggered()), control, SLOT(increaseMinValue()));
+    a = cm->getAction("A_DecreaseMinBrushThickness");
+    control->addAction(a);
+    QObject::connect(a, SIGNAL(triggered()), control, SLOT(decreaseMinValue()));
+  }
   hLayout()->addSpacing(5);
 }
 
@@ -232,6 +280,24 @@ void ToolOptionControlBuilder::visit(TIntPairProperty *p) {
       m_tool, p, QObject::tr("Min:"), QObject::tr("Max:"), m_toolHandle);
   hLayout()->addWidget(control, 100);
   m_panel->addControl(control);
+  if (p->getName() == "Size:" || p->getName() == "Thickness" ||
+      p->getName() == "Size") {
+    CommandManager *cm = CommandManager::instance();
+    QAction *a;
+    a = cm->getAction("A_IncreaseMaxBrushThickness");
+    control->addAction(a);
+    QObject::connect(a, SIGNAL(triggered()), control, SLOT(increaseMaxValue()));
+    a = cm->getAction("A_DecreaseMaxBrushThickness");
+    control->addAction(a);
+    QObject::connect(a, SIGNAL(triggered()), control, SLOT(decreaseMaxValue()));
+
+    a = cm->getAction("A_IncreaseMinBrushThickness");
+    control->addAction(a);
+    QObject::connect(a, SIGNAL(triggered()), control, SLOT(increaseMinValue()));
+    a = cm->getAction("A_DecreaseMinBrushThickness");
+    control->addAction(a);
+    QObject::connect(a, SIGNAL(triggered()), control, SLOT(decreaseMinValue()));
+  }
   hLayout()->addSpacing(5);
 }
 
@@ -250,6 +316,16 @@ void ToolOptionControlBuilder::visit(TIntProperty *p) {
   }
   hLayout()->addWidget(control, 100);
   m_panel->addControl(control);
+  if (p->getName() == "Size:") {
+    CommandManager *cm = CommandManager::instance();
+    QAction *a;
+    a = cm->getAction("A_IncreaseMaxBrushThickness");
+    control->addAction(a);
+    QObject::connect(a, SIGNAL(triggered()), control, SLOT(increase()));
+    a = cm->getAction("A_DecreaseMaxBrushThickness");
+    control->addAction(a);
+    QObject::connect(a, SIGNAL(triggered()), control, SLOT(decrease()));
+  }
   hLayout()->addSpacing(5);
 }
 
@@ -260,6 +336,17 @@ void ToolOptionControlBuilder::visit(TBoolProperty *p) {
   hLayout()->addWidget(control, 0);
 
   m_panel->addControl(control);
+
+  if (p->getId() != "") {
+    std::string actionName = "A_ToolOption_" + p->getId();
+    QAction *a = CommandManager::instance()->getAction(actionName.c_str());
+    if (a) {
+      a->setCheckable(true);
+      control->addAction(a);
+      QObject::connect(a, SIGNAL(triggered(bool)), control,
+                       SLOT(doClick(bool)));
+    }
+  }
   hLayout()->addSpacing(5);
 }
 
@@ -317,6 +404,35 @@ void ToolOptionControlBuilder::visit(TEnumProperty *p) {
   hLayout()->addWidget(widget, 100);
   m_panel->addControl(control);
   hLayout()->addSpacing(5);
+
+  if (p->getId() != "") {
+    std::string actionName = "A_ToolOption_" + p->getId();
+    QAction *a = CommandManager::instance()->getAction(actionName.c_str());
+    if (a) {
+      widget->addAction(a);
+      QObject::connect(a, SIGNAL(triggered()), widget, SLOT(doShowPopup()));
+    }
+
+    TEnumProperty::Range range = p->getRange();
+    TEnumProperty::Range::iterator it;
+    QSignalMapper *signalMapper = 0;
+    int index                   = 0;
+    for (it = range.begin(); it != range.end(); ++it, ++index) {
+      std::string item           = ::to_string(*it);
+      std::string itemActionName = actionName + ":" + item;
+      a = CommandManager::instance()->getAction(itemActionName.c_str());
+      if (a) {
+        widget->addAction(a);
+        if (signalMapper == 0) {
+          signalMapper = new QSignalMapper(widget);
+          QObject::connect(signalMapper, SIGNAL(mapped(int)), widget,
+                           SLOT(doOnActivated(int)));
+        }
+        QObject::connect(a, SIGNAL(triggered()), signalMapper, SLOT(map()));
+        signalMapper->setMapping(a, index);
+      }
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -420,7 +536,7 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
   m_nsPosField =
       new PegbarChannelField(m_tool, TStageObject::T_Y, "field", frameHandle,
                              objHandle, xshHandle, this);
-  m_zField        = new PegbarChannelField(m_tool, TStageObject::T_Z, "field",
+  m_zField = new PegbarChannelField(m_tool, TStageObject::T_Z, "field",
                                     frameHandle, objHandle, xshHandle, this);
   m_noScaleZField = new NoScaleField(m_tool, "field");
 
@@ -549,7 +665,7 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
   m_zField->setPrecision(4);
   m_noScaleZField->setPrecision(4);
 
-  bool splined = isCurrentObjectSplined();
+  bool splined                        = isCurrentObjectSplined();
   if (splined != m_splined) m_splined = splined;
   setSplined(m_splined);
 
@@ -768,6 +884,38 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
   connect(m_currentStageObjectCombo, SIGNAL(activated(int)), this,
           SLOT(onCurrentStageObjectComboActivated(int)));
 
+  /* --- Assigning shortcut keys --- */
+  if (activeAxisProp->getId() != "") {
+    std::string actionName = "A_ToolOption_" + activeAxisProp->getId();
+    QAction *a = CommandManager::instance()->getAction(actionName.c_str());
+
+    if (a) {
+      m_chooseActiveAxisCombo->addAction(a);
+      QObject::connect(a, SIGNAL(triggered()), m_chooseActiveAxisCombo,
+                       SLOT(doShowPopup()));
+    }
+
+    TEnumProperty::Range range = activeAxisProp->getRange();
+    TEnumProperty::Range::iterator it;
+    QSignalMapper *signalMapper = 0;
+    int index                   = 0;
+    for (it = range.begin(); it != range.end(); ++it, ++index) {
+      std::string item           = ::to_string(*it);
+      std::string itemActionName = actionName + ":" + item;
+      a = CommandManager::instance()->getAction(itemActionName.c_str());
+      if (a) {
+        m_chooseActiveAxisCombo->addAction(a);
+        if (signalMapper == 0) {
+          signalMapper = new QSignalMapper(m_chooseActiveAxisCombo);
+          QObject::connect(signalMapper, SIGNAL(mapped(int)),
+                           m_chooseActiveAxisCombo, SLOT(doOnActivated(int)));
+        }
+        QObject::connect(a, SIGNAL(triggered()), signalMapper, SLOT(map()));
+        signalMapper->setMapping(a, index);
+      }
+    }
+  }
+
   if (scaleConstraintProp) {
     m_scaleHField->onScaleTypeChanged(m_maintainCombo->currentIndex());
     m_scaleVField->onScaleTypeChanged(m_maintainCombo->currentIndex());
@@ -791,6 +939,16 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
   connectLabelAndField(m_shearVLabel, m_shearVField);
   connectLabelAndField(m_ewCenterLabel, m_ewCenterField);
   connectLabelAndField(m_nsCenterLabel, m_nsCenterField);
+
+  if (globalKeyProp) {
+    std::string actionName = "A_ToolOption_" + globalKeyProp->getId();
+    QAction *a = CommandManager::instance()->getAction(actionName.c_str());
+    if (a) {
+      a->setCheckable(true);
+      m_globalKey->addAction(a);
+      connect(a, SIGNAL(triggered(bool)), m_globalKey, SLOT(doClick(bool)));
+    }
+  }
 
   onCurrentAxisChanged(activeAxisProp->getIndex());
 }
@@ -876,8 +1034,6 @@ void ArrowToolOptionsBox::updateStatus() {
   m_nsPosField->updateStatus();
   m_zField->updateStatus();
   m_noScaleZField->updateStatus();
-  m_lockEWPosCheckbox->updateStatus();
-  m_lockNSPosCheckbox->updateStatus();
   m_soField->updateStatus();
 
   // Rotation
@@ -887,23 +1043,15 @@ void ArrowToolOptionsBox::updateStatus() {
   m_globalScaleField->updateStatus();
   m_scaleHField->updateStatus();
   m_scaleVField->updateStatus();
-  m_lockScaleHCheckbox->updateStatus();
-  m_lockScaleVCheckbox->updateStatus();
   m_maintainCombo->updateStatus();
 
   // Shear
   m_shearHField->updateStatus();
   m_shearVField->updateStatus();
-  m_lockShearHCheckbox->updateStatus();
-  m_lockShearVCheckbox->updateStatus();
 
   // Center Position
   m_ewCenterField->updateStatus();
   m_nsCenterField->updateStatus();
-  m_lockEWCenterCheckbox->updateStatus();
-  m_lockNSCenterCheckbox->updateStatus();
-
-  m_globalKey->updateStatus();
 
   bool splined = isCurrentObjectSplined();
   if (splined != m_splined) setSplined(splined);
@@ -943,7 +1091,7 @@ void ArrowToolOptionsBox::updateStageObjectComboItems() {
 }
 
 //------------------------------------------------------------------------------
-/*! synchronize the current item in the combobox to the selected stage object
+/*! syncronize the current item in the combobox to the selected stage object
  */
 void ArrowToolOptionsBox::syncCurrentStageObjectComboItem() {
   TStageObjectId curObjId = m_objHandle->getObjectId();
@@ -1150,7 +1298,7 @@ SelectionToolOptionsBox::SelectionToolOptionsBox(QWidget *parent, TTool *tool,
   // assert(ret);
   bool ret = connect(m_scaleXField, SIGNAL(valueChange(bool)),
                      SLOT(onScaleXValueChanged(bool)));
-  ret      = ret && connect(m_scaleYField, SIGNAL(valueChange(bool)),
+  ret = ret && connect(m_scaleYField, SIGNAL(valueChange(bool)),
                        SLOT(onScaleYValueChanged(bool)));
   if (m_setSaveboxCheckbox)
     ret = ret && connect(m_setSaveboxCheckbox, SIGNAL(toggled(bool)),
@@ -1345,6 +1493,8 @@ GeometricToolOptionsBox::GeometricToolOptionsBox(QWidget *parent, TTool *tool,
   }
 
   if (tool->getTargetType() & TTool::Vectors) {
+    m_drawOrderCheckbox =
+        dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Draw Under"));
     m_snapCheckbox =
         dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Snap"));
     m_snapSensitivityCombo =
@@ -1486,13 +1636,9 @@ PaintbrushToolOptionsBox::PaintbrushToolOptionsBox(QWidget *parent, TTool *tool,
   m_colorMode = dynamic_cast<ToolOptionCombo *>(m_controls.value("Mode:"));
   m_selectiveMode =
       dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Selective"));
-  m_lockAlphaMode =
-      dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Lock Alpha"));
 
-  if (m_colorMode->getProperty()->getValue() == L"Lines") {
+  if (m_colorMode->getProperty()->getValue() == L"Lines")
     m_selectiveMode->setVisible(false);
-    m_lockAlphaMode->setVisible(false);
-  }
 
   bool ret = connect(m_colorMode, SIGNAL(currentIndexChanged(int)), this,
                      SLOT(onColorModeChanged(int)));
@@ -1513,7 +1659,6 @@ void PaintbrushToolOptionsBox::onColorModeChanged(int index) {
   const TEnumProperty::Range &range = m_colorMode->getProperty()->getRange();
   bool enabled                      = range[index] != L"Lines";
   m_selectiveMode->setVisible(enabled);
-  m_lockAlphaMode->setVisible(enabled);
 }
 
 //=============================================================================
@@ -1576,11 +1721,11 @@ FillToolOptionsBox::FillToolOptionsBox(QWidget *parent, TTool *tool,
 
   bool ret = connect(m_colorMode, SIGNAL(currentIndexChanged(int)), this,
                      SLOT(onColorModeChanged(int)));
-  ret      = ret && connect(m_toolType, SIGNAL(currentIndexChanged(int)), this,
+  ret = ret && connect(m_toolType, SIGNAL(currentIndexChanged(int)), this,
                        SLOT(onToolTypeChanged(int)));
-  ret      = ret && connect(m_onionMode, SIGNAL(toggled(bool)), this,
+  ret = ret && connect(m_onionMode, SIGNAL(toggled(bool)), this,
                        SLOT(onOnionModeToggled(bool)));
-  ret      = ret && connect(m_multiFrameMode, SIGNAL(toggled(bool)), this,
+  ret = ret && connect(m_multiFrameMode, SIGNAL(toggled(bool)), this,
                        SLOT(onMultiFrameModeToggled(bool)));
   assert(ret);
   if (m_colorMode->getProperty()->getValue() == L"Lines") {
@@ -1701,6 +1846,7 @@ BrushToolOptionsBox::BrushToolOptionsBox(QWidget *parent, TTool *tool,
     , m_joinStyleCombo(0)
     , m_snapCheckbox(0)
     , m_snapSensitivityCombo(0)
+    , m_drawOrderCheckbox(0)
     , m_miterField(0) {
   TPropertyGroup *props = tool->getProperties(0);
   assert(props->getPropertyCount() > 0);
@@ -1745,12 +1891,19 @@ BrushToolOptionsBox::BrushToolOptionsBox(QWidget *parent, TTool *tool,
     builder.setSingleValueWidgetType(ToolOptionControlBuilder::FIELD);
 
     addSeparator();
+    if (tool && tool->getProperties(1)) tool->getProperties(1)->accept(builder);
+    m_drawOrderCheckbox =
+        dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Draw Under"));
+    m_autoCloseCheckbox =
+        dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Auto Close"));
+    m_autoGroupCheckbox =
+        dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Auto Group"));
+    m_autoFillCheckbox =
+        dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Auto Fill"));
     m_snapCheckbox =
         dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Snap"));
     m_snapSensitivityCombo =
         dynamic_cast<ToolOptionCombo *>(m_controls.value("Sensitivity:"));
-
-    if (tool && tool->getProperties(1)) tool->getProperties(1)->accept(builder);
     m_joinStyleCombo =
         dynamic_cast<ToolOptionPopupButton *>(m_controls.value("Join"));
     m_miterField =
@@ -1784,18 +1937,16 @@ void BrushToolOptionsBox::filterControls() {
   for (QMap<std::string, QLabel *>::iterator it = m_labels.begin();
        it != m_labels.end(); it++) {
     bool isModifier = (it.key().substr(0, 8) == "Modifier");
-    bool isCommon   = (it.key() == "Lock Alpha" || it.key() == "Pressure" ||
-                     it.key() == "Preset:");
-    bool visible = isCommon || (isModifier == showModifiers);
+    bool isCommon   = (it.key() == "Pressure" || it.key() == "Preset:");
+    bool visible    = isCommon || (isModifier == showModifiers);
     it.value()->setVisible(visible);
   }
 
   for (QMap<std::string, ToolOptionControl *>::iterator it = m_controls.begin();
        it != m_controls.end(); it++) {
     bool isModifier = (it.key().substr(0, 8) == "Modifier");
-    bool isCommon   = (it.key() == "Lock Alpha" || it.key() == "Pressure" ||
-                     it.key() == "Preset:");
-    bool visible = isCommon || (isModifier == showModifiers);
+    bool isCommon   = (it.key() == "Pressure" || it.key() == "Preset:");
+    bool visible    = isCommon || (isModifier == showModifiers);
     if (QWidget *widget = dynamic_cast<QWidget *>(it.value()))
       widget->setVisible(visible);
   }
@@ -2182,9 +2333,9 @@ TapeToolOptionsBox::TapeToolOptionsBox(QWidget *parent, TTool *tool,
 
   bool ret = connect(m_typeMode, SIGNAL(currentIndexChanged(int)), this,
                      SLOT(onToolTypeChanged(int)));
-  ret      = ret && connect(m_toolMode, SIGNAL(currentIndexChanged(int)), this,
+  ret = ret && connect(m_toolMode, SIGNAL(currentIndexChanged(int)), this,
                        SLOT(onToolModeChanged(int)));
-  ret      = ret && connect(m_joinStrokesMode, SIGNAL(toggled(bool)), this,
+  ret = ret && connect(m_joinStrokesMode, SIGNAL(toggled(bool)), this,
                        SLOT(onJoinStrokesModeChanged()));
   assert(ret);
 }
@@ -2271,11 +2422,10 @@ protected:
       p.setPen(Qt::black);
     p.setBrush(Qt::NoBrush);
 
-    p.drawText(rect(), Qt::AlignCenter,
-               QString("R:%1 G:%2 B:%3")
-                   .arg(m_color.red())
-                   .arg(m_color.green())
-                   .arg(m_color.blue()));
+    p.drawText(rect(), Qt::AlignCenter, QString("R:%1 G:%2 B:%3")
+                                            .arg(m_color.red())
+                                            .arg(m_color.green())
+                                            .arg(m_color.blue()));
   }
 };
 
@@ -2432,16 +2582,16 @@ ShiftTraceToolOptionBox::ShiftTraceToolOptionBox(QWidget *parent, TTool *tool)
 
   m_resetPrevGhostBtn  = new QPushButton(tr("Reset Previous"), this);
   m_resetAfterGhostBtn = new QPushButton(tr("Reset Following"), this);
+  int buttonWidth      = fontMetrics().width(m_resetPrevGhostBtn->text()) + 10;
+  m_resetPrevGhostBtn->setFixedWidth(buttonWidth);
+  buttonWidth = fontMetrics().width(m_resetAfterGhostBtn->text()) + 10;
+  m_resetAfterGhostBtn->setFixedWidth(buttonWidth);
 
   m_prevRadioBtn  = new QRadioButton(tr("Previous Drawing"), this);
   m_afterRadioBtn = new QRadioButton(tr("Following Drawing"), this);
 
   m_prevFrame->setFixedSize(10, 21);
   m_afterFrame->setFixedSize(10, 21);
-  int buttonWidth = fontMetrics().width(m_resetPrevGhostBtn->text()) + 10;
-  m_resetPrevGhostBtn->setFixedWidth(buttonWidth);
-  buttonWidth = fontMetrics().width(m_resetAfterGhostBtn->text()) + 10;
-  m_resetAfterGhostBtn->setFixedWidth(buttonWidth);
 
   m_layout->addWidget(m_prevFrame, 0);
   m_layout->addWidget(m_prevRadioBtn, 0);
@@ -2620,7 +2770,7 @@ HandToolOptionsBox::HandToolOptionsBox(QWidget *parent, TTool *tool,
       CommandManager::instance()->getAction(VB_PositionReset);
 
   QPushButton *button = new QPushButton(tr("Reset Position"));
-  int buttonWidth     = fontMetrics().width(button->text()) + 10;
+  int buttonWidth     = fontMetrics().width(button->text()) + 20;
   button->setFixedWidth(buttonWidth);
   button->setFixedHeight(20);
   button->addAction(resetPositionAction);
@@ -2707,7 +2857,7 @@ void ToolOptions::onToolSwitched() {
   TTool *tool = app->getCurrentTool()->getTool();
   if (tool) {
     // c'e' un tool corrente
-    ToolOptionsBox *panel                            = 0;
+    ToolOptionsBox *panel = 0;
     std::map<TTool *, ToolOptionsBox *>::iterator it = m_panels.find(tool);
     if (it == m_panels.end()) {
       // ... senza panel associato
