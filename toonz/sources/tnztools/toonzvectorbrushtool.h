@@ -135,13 +135,14 @@ public:
                            int interpolationType, bool breakAngles,
                            bool autoGroup = false, bool autoFill = false,
                            bool drawFirstStroke = true,
-                           bool drawLastStroke = true, bool withUndo = true);
+                           bool drawLastStroke = true, bool withUndo = true,
+                           bool sendToBack = false);
   void checkGuideSnapping(bool beforeMousePress, bool invertCheck);
   void checkStrokeSnapping(bool beforeMousePress, bool invertCheck);
   bool doGuidedAutoInbetween(TFrameId cFid, const TVectorImageP &cvi,
                              TStroke *cStroke, bool breakAngles,
                              bool autoGroup = false, bool autoFill = false,
-                             bool drawStroke = true);
+                             bool drawStroke = true, bool sendToBack = false);
 
 protected:
   TPropertyGroup m_prop[2];
@@ -153,6 +154,10 @@ protected:
   TBoolProperty m_breakAngles;
   TBoolProperty m_pressure;
   TBoolProperty m_snap;
+  TBoolProperty m_sendToBack;
+  TBoolProperty m_autoFill;
+  TBoolProperty m_autoClose;
+  TBoolProperty m_autoGroup;
   TEnumProperty m_frameRange;
   TEnumProperty m_snapSensitivity;
   TEnumProperty m_capStyle;
@@ -175,7 +180,7 @@ protected:
       m_veryFirstCol, m_targetType;
   double m_w1, m_w2, m_pixelSize, m_currThickness, m_minDistance2;
   bool m_foundFirstSnap = false, m_foundLastSnap = false, m_dragDraw = true,
-       m_altPressed = false, m_snapSelf = false;
+       m_toggleSnap = false, m_snapSelf = false;
   TRectD m_modifiedRegion;
   TPointD m_dpiScale,
       m_mousePos,  //!< Current mouse position, in world coordinates.
@@ -201,15 +206,17 @@ protected:
                       //! substitution.
       m_firstTime, m_isPath, m_presetsLoaded, m_firstFrameRange;
 
-  /*---
-  作業中のFrameIdをクリック時に保存し、マウスリリース時（Undoの登録時）に別のフレームに
-  移動していたときの不具合を修正する。---*/
   TFrameId m_workingFrameId;
 
   TPointD m_lastDragPos;        //!< Position where mouse was last dragged.
   TMouseEvent m_lastDragEvent;  //!< Previous mouse-drag event.
 
   bool m_propertyUpdating = false;
+
+  std::vector<TPointD> m_assistantPoints;
+  bool m_addingAssistant = false;
+  TPointD m_firstPoint;
+  TPointD m_lastPoint;
 };
 
 #endif  // TOONZVECTORBRUSHTOOL_H
