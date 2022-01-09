@@ -154,15 +154,15 @@ private:
   QHBoxLayout *hLayout() { return m_panel->hLayout(); }
   QLabel *addLabel(TProperty *p);
 
-  void visit(TDoubleProperty *p) override;
-  void visit(TDoublePairProperty *p) override;
-  void visit(TIntPairProperty *p) override;
-  void visit(TIntProperty *p) override;
-  void visit(TBoolProperty *p) override;
-  void visit(TStringProperty *p) override;
-  void visit(TEnumProperty *p) override;
-  void visit(TStyleIndexProperty *p) override;
-  void visit(TPointerProperty *p) override;
+  void visit(TDoubleProperty *p);
+  void visit(TDoublePairProperty *p);
+  void visit(TIntPairProperty *p);
+  void visit(TIntProperty *p);
+  void visit(TBoolProperty *p);
+  void visit(TStringProperty *p);
+  void visit(TEnumProperty *p);
+  void visit(TStyleIndexProperty *p);
+  void visit(TPointerProperty *p);
 };
 
 //***********************************************************************************************
@@ -276,7 +276,7 @@ protected slots:
   void onFrameSwitched() { updateStatus(); }
   // update the object list in combobox
   void updateStageObjectComboItems();
-  // synchronize the current item in the combobox to the selected stage object
+  // syncronize the current item in the combobox to the selected stage object
   void syncCurrentStageObjectComboItem();
   // change the current stage object when user changes it via combobox by hand
   void onCurrentStageObjectComboActivated(int index);
@@ -410,7 +410,7 @@ class GeometricToolOptionsBox final : public ToolOptionsBox {
   ToolOptionCombo *m_shapeField;
   ToolOptionCheckbox *m_pencilMode;
   ToolOptionIntSlider *m_miterField;
-  ToolOptionCheckbox *m_snapCheckbox, *m_smoothCheckbox;
+  ToolOptionCheckbox *m_snapCheckbox, *m_smoothCheckbox, *m_drawOrderCheckbox;
   ToolOptionCombo *m_snapSensitivityCombo;
   TTool *m_tool;
 
@@ -458,7 +458,6 @@ class PaintbrushToolOptionsBox final : public ToolOptionsBox {
 
   ToolOptionCombo *m_colorMode;
   ToolOptionCheckbox *m_selectiveMode;
-  ToolOptionCheckbox *m_lockAlphaMode;
 
 public:
   PaintbrushToolOptionsBox(QWidget *parent, TTool *tool,
@@ -531,7 +530,8 @@ class BrushToolOptionsBox final : public ToolOptionsBox {
   ToolOptionPopupButton *m_joinStyleCombo;
   ToolOptionIntSlider *m_miterField;
   ToolOptionCombo *m_presetCombo;
-  ToolOptionCheckbox *m_snapCheckbox;
+  ToolOptionCheckbox *m_snapCheckbox, *m_drawOrderCheckbox,
+      *m_autoCloseCheckbox, *m_autoGroupCheckbox, *m_autoFillCheckbox;
   ToolOptionCombo *m_snapSensitivityCombo;
   QPushButton *m_addPresetButton;
   QPushButton *m_removePresetButton;
