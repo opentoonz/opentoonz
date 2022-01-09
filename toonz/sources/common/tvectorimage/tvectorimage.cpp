@@ -147,8 +147,7 @@ int TVectorImage::addStrokeToGroup(TStroke *stroke, int strokeIndex) {
 
 //-----------------------------------------------------------------------------
 
-int TVectorImage::addStroke(TStroke *stroke, bool discardPoints,
-                            bool sendToBack) {
+int TVectorImage::addStroke(TStroke *stroke, bool discardPoints) {
   if (discardPoints) {
     TRectD bBox = stroke->getBBox();
     if (bBox.x0 == bBox.x1 && bBox.y0 == bBox.y1)  // empty stroke: discard
@@ -159,21 +158,9 @@ int TVectorImage::addStroke(TStroke *stroke, bool discardPoints,
     int i;
     for (i = m_imp->m_strokes.size() - 1; i >= 0; i--)
       if (m_imp->m_insideGroup.isParentOf(m_imp->m_strokes[i]->m_groupId)) {
-        if (sendToBack) {
-          int k = i;
-          while (
-              m_imp->m_insideGroup.isParentOf(m_imp->m_strokes[k]->m_groupId)) {
-            k--;
-            if (k < 0) break;
-          }
-          m_imp->insertStrokeAt(
-              new VIStroke(stroke, m_imp->m_strokes[i]->m_groupId), k + 1);
-          return k + 1;
-        } else {
-          m_imp->insertStrokeAt(
-              new VIStroke(stroke, m_imp->m_strokes[i]->m_groupId), i + 1);
-          return i + 1;
-        }
+        m_imp->insertStrokeAt(
+            new VIStroke(stroke, m_imp->m_strokes[i]->m_groupId), i + 1);
+        return i + 1;
       }
   }
 
@@ -184,15 +171,9 @@ int TVectorImage::addStroke(TStroke *stroke, bool discardPoints,
   else
     gid = m_imp->m_strokes.back()->m_groupId;
 
-  if (!sendToBack)
-    m_imp->m_strokes.push_back(new VIStroke(stroke, gid));
-  else
-    m_imp->insertStrokeAt(new VIStroke(stroke, gid), 0);
+  m_imp->m_strokes.push_back(new VIStroke(stroke, gid));
   m_imp->m_areValidRegions = false;
-  if (sendToBack)
-    return 0;
-  else
-    return m_imp->m_strokes.size() - 1;
+  return m_imp->m_strokes.size() - 1;
 }
 
 //-----------------------------------------------------------------------------
