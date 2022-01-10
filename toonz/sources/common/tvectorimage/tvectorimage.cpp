@@ -147,7 +147,8 @@ int TVectorImage::addStrokeToGroup(TStroke *stroke, int strokeIndex) {
 
 //-----------------------------------------------------------------------------
 
-int TVectorImage::addStroke(TStroke *stroke, bool discardPoints) {
+int TVectorImage::addStroke(TStroke *stroke, bool discardPoints,
+                            bool sendToBack) {
   if (discardPoints) {
     TRectD bBox = stroke->getBBox();
     if (bBox.x0 == bBox.x1 && bBox.y0 == bBox.y1)  // empty stroke: discard
@@ -158,9 +159,21 @@ int TVectorImage::addStroke(TStroke *stroke, bool discardPoints) {
     int i;
     for (i = m_imp->m_strokes.size() - 1; i >= 0; i--)
       if (m_imp->m_insideGroup.isParentOf(m_imp->m_strokes[i]->m_groupId)) {
-        m_imp->insertStrokeAt(
-            new VIStroke(stroke, m_imp->m_strokes[i]->m_groupId), i + 1);
-        return i + 1;
+        if (sendToBack) {
+          int k = i;
+          while (
+              m_imp->m_insideGroup.isParentOf(m_imp->m_strokes[k]->m_groupId)) {
+            k--;
+            if (k < 0) break;
+          }
+          m_imp->insertStrokeAt(
+              new VIStroke(stroke, m_imp->m_strokes[i]->m_groupId), k + 1);
+          return k + 1;
+        } else {
+          m_imp->insertStrokeAt(
+              new VIStroke(stroke, m_imp->m_strokes[i]->m_groupId), i + 1);
+          return i + 1;
+        }
       }
   }
 
@@ -171,9 +184,15 @@ int TVectorImage::addStroke(TStroke *stroke, bool discardPoints) {
   else
     gid = m_imp->m_strokes.back()->m_groupId;
 
-  m_imp->m_strokes.push_back(new VIStroke(stroke, gid));
+  if (!sendToBack)
+    m_imp->m_strokes.push_back(new VIStroke(stroke, gid));
+  else
+    m_imp->insertStrokeAt(new VIStroke(stroke, gid), 0);
   m_imp->m_areValidRegions = false;
-  return m_imp->m_strokes.size() - 1;
+  if (sendToBack)
+    return 0;
+  else
+    return m_imp->m_strokes.size() - 1;
 }
 
 //-----------------------------------------------------------------------------
@@ -617,7 +636,7 @@ bool TVectorImage::getNearestStroke(const TPointD &p, double &outW,
 
 //-----------------------------------------------------------------------------
 
-#if defined(LINUX) || defined(MACOSX)
+#if defined(LINUX) || defined(FREEBSD) || defined(MACOSX)
 void TVectorImage::render(const TVectorRenderData &rd, TRaster32P &ras) {
   // hardRenderVectorImage(rd,ras,this);
 }
@@ -1220,7 +1239,7 @@ VIStroke::VIStroke(const VIStroke &s, bool sameId)
 
 //-----------------------------------------------------------------------------
 
-void TVectorImage::mergeImage(const TVectorImageP &img, const TAffine &affine,
+int TVectorImage::mergeImage(const TVectorImageP &img, const TAffine &affine,
                               bool sameStrokeId) {
   QMutexLocker sl(m_imp->m_mutex);
 
@@ -1244,16 +1263,16 @@ void TVectorImage::mergeImage(const TVectorImageP &img, const TAffine &affine,
   // mettere comunque un test qui
   if (srcPlt) mergePalette(tarPlt, styleTable, srcPlt, usedStyles);
 
-  mergeImage(img, affine, styleTable, sameStrokeId);
+  return mergeImage(img, affine, styleTable, sameStrokeId);
 }
 
 //-----------------------------------------------------------------------------
 
-void TVectorImage::mergeImage(const TVectorImageP &img, const TAffine &affine,
+int TVectorImage::mergeImage(const TVectorImageP &img, const TAffine &affine,
                               const std::map<int, int> &styleTable,
                               bool sameStrokeId) {
   int imageSize = img->getStrokeCount();
-  if (imageSize == 0) return;
+  if (imageSize == 0) return 0;
   QMutexLocker sl(m_imp->m_mutex);
 
   m_imp->m_computedAlmostOnce |= img->m_imp->m_computedAlmostOnce;
@@ -1352,6 +1371,7 @@ void TVectorImage::mergeImage(const TVectorImageP &img, const TAffine &affine,
 #ifdef _DEBUG
   checkIntersections();
 #endif
+  return insertAt;
 }
 
 //-----------------------------------------------------------------------------
@@ -2153,10 +2173,10 @@ VIStroke *TVectorImage::Imp::joinStroke(int index1, int index2, int cpIndex1,
   int cpCount2 = stroke2->getControlPointCount();
   int styleId  = stroke1->getStyle();
 
-  // check if the both ends are at the same postion
+  // check if the both ends are at the same position
   bool isSamePos = isAlmostZero(tdistance2(stroke1->getControlPoint(cpIndex1),
                                            stroke2->getControlPoint(cpIndex2)));
-  // connecting the ends in the same shape at the same postion
+  // connecting the ends in the same shape at the same position
   // means just making the shape self-looped
   if (isSamePos && index1 == index2) {
     stroke1->setSelfLoop();
