@@ -269,7 +269,7 @@ MatrixRmn &MatrixRmn::AddToDiagonal(double d)  // Adds d to each diagonal entry
   return *this;
 }
 
-// Aggiunge i temini del vettore alla diagonale
+// Adds the terms of the vector to the diagonal
 MatrixRmn &MatrixRmn::AddToDiagonal(
     const VectorRn &v)  // Adds d to each diagonal entry
 {

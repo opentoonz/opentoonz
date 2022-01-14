@@ -44,6 +44,7 @@
 #include "toonz/levelproperties.h"
 #include "toonz/tcamera.h"
 #include "toonz/preferences.h"
+#include "toonz/filepathproperties.h"
 
 // TnzCore includes
 #include "tsystem.h"
@@ -688,7 +689,6 @@ void MyVideoWidget::mouseReleaseEvent(QMouseEvent* event) {
 FrameNumberLineEdit::FrameNumberLineEdit(QWidget* parent, TFrameId fId,
                                          bool acceptLetter)
     : LineEdit(parent) {
-  setFixedWidth(60);
   if (acceptLetter) {
     QString regExpStr   = QString("^%1$").arg(TFilePath::fidRegExpStr());
     m_regexpValidator   = new QRegExpValidator(QRegExp(regExpStr), this);
@@ -701,6 +701,7 @@ FrameNumberLineEdit::FrameNumberLineEdit(QWidget* parent, TFrameId fId,
       new QRegExpValidator(QRegExp("^\\d{1,3}[A-Ia-i]?$"), this);
 
   updateValidator();
+  updateSize();
 
   setValue(fId);
 }
@@ -714,6 +715,22 @@ void FrameNumberLineEdit::updateValidator() {
     setValidator(m_regexpValidator);
 }
 
+//-----------------------------------------------------------------------------
+
+void FrameNumberLineEdit::updateSize() {
+  FilePathProperties* fpProp =
+      TProjectManager::instance()->getCurrentProject()->getFilePathProperties();
+  bool useStandard = fpProp->useStandard();
+  int letterCount  = fpProp->letterCountForSuffix();
+  if (useStandard)
+    setFixedWidth(60);
+  else {
+    // 4 digits + letters reserve 12 px each
+    int lc = (letterCount == 0) ? 9 : letterCount + 4;
+    setFixedWidth(12 * lc);
+  }
+  updateGeometry();
+}
 //-----------------------------------------------------------------------------
 
 void FrameNumberLineEdit::setValue(TFrameId fId) {
@@ -764,6 +781,7 @@ void FrameNumberLineEdit::onProjectSwitched() {
   m_regexpValidator = new QRegExpValidator(QRegExp(regExpStr), this);
   updateValidator();
   if (oldValidator) delete oldValidator;
+  updateSize();
 }
 
 void FrameNumberLineEdit::onProjectChanged() { onProjectSwitched(); }

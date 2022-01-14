@@ -1,4 +1,4 @@
-# Setting up the development environment for BSD operatings systems such as NetBSD, FreeBSD, Dragonfly BSD, or OpenBSD
+# Setting up the development environment for BSD operating systems such as NetBSD, FreeBSD, Dragonfly BSD, or OpenBSD
 
 ## Required software
 

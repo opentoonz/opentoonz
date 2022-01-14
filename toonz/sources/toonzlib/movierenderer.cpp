@@ -27,6 +27,7 @@
 
 // Qt includes
 #include <QCoreApplication>
+#include <QTimer>
 
 #include "toonz/movierenderer.h"
 
@@ -131,6 +132,8 @@ public:
   bool m_cacheResults;
   bool m_preview;
   bool m_movieType;
+  bool m_seqRequired;
+  bool m_waitAfterFinish;
 
 public:
   Imp(ToonzScene *scene, const TFilePath &moviePath, int threadCount,
@@ -185,13 +188,15 @@ MovieRenderer::Imp::Imp(ToonzScene *scene, const TFilePath &moviePath,
     , m_failure(false)  //  AFTER the first completed raster gets processed
     , m_cacheResults(cacheResults)
     , m_preview(moviePath.isEmpty())
-    , m_movieType(isMovieType(moviePath)) {
+    , m_movieType(isMovieType(moviePath))
+    , m_seqRequired(isSequencialRequired(moviePath)) {
   m_renderCacheId =
       m_fp.withName(m_fp.getName() + "#RENDERID" +
                     QString::number(m_renderSessionId).toStdString())
           .getLevelName();
 
   m_renderer.addPort(this);
+  m_waitAfterFinish = m_movieType && !m_seqRequired && threadCount > 1;
 }
 
 //---------------------------------------------------------
@@ -470,6 +475,9 @@ void MovieRenderer::Imp::doRenderRasterCompleted(const RenderData &renderData) {
 
   QMutexLocker locker(&m_mutex);
 
+  bool allowMT    = Preferences::instance()->getFfmpegMultiThread();
+  bool requireSeq = allowMT ? m_seqRequired : m_movieType;
+
   // Build soundtrack at the first time a frame is completed - and the filetype
   // is that of a movie.
   if (m_firstCompletedRaster && m_movieType && !m_st) {
@@ -523,7 +531,7 @@ void MovieRenderer::Imp::doRenderRasterCompleted(const RenderData &renderData) {
     // In the *movie type* case, frames must be saved sequentially.
     // If the frame is not the next one in the sequence, wait until *that* frame
     // is available.
-    if (m_movieType &&
+    if (requireSeq &&
         (ft->first != m_framesToBeRendered[m_nextFrameIdxToSave].first))
       break;
 
@@ -557,8 +565,8 @@ void MovieRenderer::Imp::doRenderRasterCompleted(const RenderData &renderData) {
         ~MutexUnlocker() {
           if (m_locker) m_locker->relock();
         }
-      } unlocker = {m_movieType ? (QMutexLocker *)0
-                                : (locker.unlock(), &locker)};
+      } unlocker = {requireSeq ? (QMutexLocker *)0
+                               : (locker.unlock(), &locker)};
 
       savedFrame = saveFrame(frame, rasters);
     }
@@ -683,6 +691,9 @@ void MovieRenderer::Imp::onRenderFailure(const RenderData &renderData,
                               // No sense making it later in this case!
   m_failure = true;
 
+  bool allowMT    = Preferences::instance()->getFfmpegMultiThread();
+  bool requireSeq = allowMT ? m_seqRequired : m_movieType;
+
   // If the saver object has already been destroyed - or it was never
   // created to begin with, nothing to be done
   if (!m_levelUpdaterA.get()) return;  // The preview case would fall here
@@ -694,7 +705,7 @@ void MovieRenderer::Imp::onRenderFailure(const RenderData &renderData,
   std::map<double, std::pair<TRasterP, TRasterP>>::iterator it =
       m_toBeSaved.begin();
   while (it != m_toBeSaved.end()) {
-    if (m_movieType &&
+    if (requireSeq &&
         (it->first != m_framesToBeRendered[m_nextFrameIdxToSave].first))
       break;
 
@@ -734,6 +745,15 @@ void MovieRenderer::Imp::onRenderFinished(bool isCanceled) {
       m_levelUpdaterA.get()
           ? m_fp
           : TFilePath(getPreviewName(m_renderSessionId).toStdWString()));
+
+  if (m_waitAfterFinish) {
+    // Wait half a second to add some stability before finalizing
+    QEventLoop eloop;
+    QTimer timer;
+    timer.connect(&timer, &QTimer::timeout, &eloop, &QEventLoop::quit);
+    timer.start(500);
+    eloop.exec();
+  }
 
   // Close updaters. After this, the output levels should be finalized on disk.
   m_levelUpdaterA.reset();

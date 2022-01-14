@@ -1436,6 +1436,7 @@ void SceneViewer::keyPressEvent(QKeyEvent *event) {
       if (m_isStyleShortcutSwitchable &&
           Preferences::instance()->isUseNumpadForSwitchingStylesEnabled() &&
           (event->modifiers() == Qt::NoModifier ||
+           event->modifiers() == Qt::ShiftModifier ||
            event->modifiers() == Qt::KeypadModifier) &&
           ((Qt::Key_0 <= key && key <= Qt::Key_9) || key == Qt::Key_Tab ||
            key == Qt::Key_Backtab)) {

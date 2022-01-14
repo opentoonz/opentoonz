@@ -312,7 +312,7 @@ ProjectPopup::ProjectPopup(bool isModal)
   m_rulePreferenceBG->addButton(customRB, Rule_Custom);
   m_rulePreferenceBG->setExclusive(true);
   standardRB->setToolTip(tr(
-      "In the standard mode files with the following file name are handled as sequencial images:\n\
+      "In the standard mode files with the following file name are handled as sequential images:\n\
 [LEVEL_NAME][\".\"or\"_\"][FRAME_NUMBER][SUFFIX].[EXTENSION]\n\
 For [SUFFIX] zero or one occurrences of alphabet (a-z, A-Z) can be used in the standard mode."));
   customRB->setToolTip(

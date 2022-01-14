@@ -183,7 +183,7 @@ inline std::string traduce(const TAffine &aff) {
       (areAlmostEqual(aff.a23, 0.0) ? "0" : ::to_string(aff.a23, 5));
 }
 
-}  // Local namespace
+}  // namespace
 
 //------------------------------------------------------------------------------
 
@@ -1073,7 +1073,8 @@ TRenderSettings::TRenderSettings()
     , m_isSwatch(false)
     , m_applyShrinkToViewer(false)
     , m_userCachable(true)
-    , m_isCanceled(NULL) {}
+    , m_isCanceled(NULL)
+    , m_getFullSizeBBox(false) {}
 
 //------------------------------------------------------------------------------
 

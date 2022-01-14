@@ -193,13 +193,13 @@ DVAPI TINT64 getFreeDiskSize(const TFilePath &);
 
 /*! returns available physical (+ virtual mem if boolean=true)  memory in KBytes
  */
-DVAPI TINT64 getFreeMemorySize(bool onlyPhisicalMemory);
+DVAPI TINT64 getFreeMemorySize(bool onlyPhysicalMemory);
 
 /*! return total physical (+ virtual mem if boolean=true) memory in kbytes */
-DVAPI TINT64 getMemorySize(bool onlyPhisicalMemory);
+DVAPI TINT64 getMemorySize(bool onlyPhysicalMemory);
 
 /*! return true if not enough memory. It can happen for 2 reasons:
-      1) free phisical memory is close to 0;
+      1) free physical memory is close to 0;
       2) the calling process has allocated the maximum amount of memory  allowed
    for a single process(typically, for a 32 bits machine, 2GB)*/
 

@@ -1040,7 +1040,7 @@ void TColorUtils::buildColorChipPalette(QList<QPair<TPixel32, TPoint>> &palette,
 
   QList<ColorChip> colorChips;
 
-  // make rectangles by serching in the corner points
+  // make rectangles by searching in the corner points
   for (int ep0 = 0; ep0 < edgePoints.size(); ep0++) {
     QMap<EdgePoint::QUADRANT, int> corners;
 

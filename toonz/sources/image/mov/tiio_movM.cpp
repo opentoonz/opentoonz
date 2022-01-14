@@ -63,7 +63,7 @@ public:
                            ANCHE su altri thread) e la chiamata a
                                       TerminateQTML() causerebbe un crash
                                       */
-    // std::cout << "destroing variable... Thread = " << GetCurrentThreadId() <<
+    // std::cout << "destroying variable... Thread = " << GetCurrentThreadId() <<
     // std::endl;
 
     //              std::cout <<"~QTCleanup"<< std::endl;

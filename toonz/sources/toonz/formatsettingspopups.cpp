@@ -64,6 +64,8 @@ FormatSettingsPopup::FormatSettingsPopup(QWidget *parent,
       buildPropertyComboBox(i, m_props);
     else if (dynamic_cast<TIntProperty *>(m_props->getProperty(i)))
       buildValueField(i, m_props);
+    else if (dynamic_cast<TDoubleProperty *>(m_props->getProperty(i)))
+      buildDoubleField(i, m_props);
     else if (dynamic_cast<TBoolProperty *>(m_props->getProperty(i)))
       buildPropertyCheckBox(i, m_props);
     else if (dynamic_cast<TStringProperty *>(m_props->getProperty(i)))
@@ -88,6 +90,14 @@ FormatSettingsPopup::FormatSettingsPopup(QWidget *parent,
             SLOT(onAviCodecConfigure()));
   }
 #endif
+
+  QPushButton *closeButton = new QPushButton(tr("Close"));
+  closeButton->setContentsMargins(4, 4, 4, 4);
+  closeButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+  connect(closeButton, SIGNAL(released()), this, SLOT(close()));
+
+  m_mainLayout->addWidget(closeButton, m_mainLayout->rowCount(), 0, 1, 2,
+                          Qt::AlignCenter);
 
   m_topLayout->addLayout(m_mainLayout, 1);
 }
@@ -158,6 +168,28 @@ void FormatSettingsPopup::buildValueField(int index, TPropertyGroup *props) {
 
   DVGui::PropertyIntField *v = new DVGui::PropertyIntField(this, prop);
   m_widgets[prop->getName()] = v;
+
+  int row = m_mainLayout->rowCount();
+  m_mainLayout->addWidget(new QLabel(prop->getQStringName() + ":", this), row,
+                          0, Qt::AlignRight | Qt::AlignVCenter);
+  m_mainLayout->addWidget(v, row, 1);
+  // get value here - bug loses value if the range doesn't start with 0
+  double value = prop->getValue();
+  v->setValues(prop->getValue(), prop->getRange().first,
+               prop->getRange().second);
+  if (prop->getValue() != value) {
+    prop->setValue(value);
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+void FormatSettingsPopup::buildDoubleField(int index, TPropertyGroup *props) {
+  TDoubleProperty *prop = (TDoubleProperty *)(props->getProperty(index));
+  assert(prop);
+
+  DVGui::PropertyDoubleField *v = new DVGui::PropertyDoubleField(this, prop);
+  m_widgets[prop->getName()]    = v;
 
   int row = m_mainLayout->rowCount();
   m_mainLayout->addWidget(new QLabel(prop->getQStringName() + ":", this), row,

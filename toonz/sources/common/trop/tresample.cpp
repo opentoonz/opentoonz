@@ -3059,7 +3059,7 @@ void do_resample(TRasterCM32P rout, const TRasterCM32P &rin,
                v * wrapin;  // Take the associated input pixel pointer
       tcm[0] = in_tcm[0];
       if (u < lu - 1 && v < lv - 1) {
-        // Also take their 4 next neighbours (we shall perform a kinf of bilinear
+        // Also take their 4 next neighbours (we shall perform a kind of bilinear
         // interpolation)
         tcm[1] = in_tcm[1];
         tcm[2] = in_tcm[wrapin];

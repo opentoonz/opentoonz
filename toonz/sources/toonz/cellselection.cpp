@@ -3038,7 +3038,7 @@ void TCellSelection::overWritePasteCells() {
     TCellData *beforeData = new TCellData();
     beforeData->setCells(xsh, r0, c0, r1, c1);
 
-    /*-- InsertをFalseにすることで、Ovewriteペーストになる
+    /*-- InsertをFalseにすることで、Overwriteペーストになる
             r1,c1はペースト範囲にあわせリサイズされる
     --*/
     bool isPaste = pasteCellsWithoutUndo(r0, c0, r1, c1, false);

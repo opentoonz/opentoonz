@@ -237,6 +237,7 @@ public:
   };
 
   virtual void restoreFloatingPanelState();
+  virtual void zoomContentsAndFitGeometry(bool forward);
 
 protected:
   void paintEvent(QPaintEvent *) override;

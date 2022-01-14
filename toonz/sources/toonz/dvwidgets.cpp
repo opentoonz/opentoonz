@@ -115,3 +115,26 @@ void PropertyIntField::onPropertyChanged() {
   TIntProperty *prop = dynamic_cast<TIntProperty *>(m_property);
   if (prop) this->setValue(prop->getValue());
 }
+
+//=============================================================================
+// PropertyDoubleField
+//-----------------------------------------------------------------------------
+
+PropertyDoubleField::PropertyDoubleField(QWidget *parent, TDoubleProperty *prop)
+    : DoubleField(parent), PropertyWidget(prop) {
+  connect(this, SIGNAL(valueChanged(bool)), this, SLOT(onValueChanged(bool)));
+}
+
+//-----------------------------------------------------------------------------
+
+void PropertyDoubleField::onValueChanged(bool isDragging) {
+  TDoubleProperty *prop = dynamic_cast<TDoubleProperty *>(m_property);
+  if (prop) prop->setValue(getValue());
+}
+
+//-----------------------------------------------------------------------------
+
+void PropertyDoubleField::onPropertyChanged() {
+  TDoubleProperty *prop = dynamic_cast<TDoubleProperty *>(m_property);
+  if (prop) this->setValue(prop->getValue());
+}

@@ -213,7 +213,7 @@ void IntLineEdit::setLineEditBackgroundColor(QColor color) {
     value = 255;  // white
 
   QString sheet =
-      QString("background-color: rgb(") + QString::number(color.red()) +
+      QString("background-color: rgba(") + QString::number(color.red()) +
       QString(",") + QString::number(color.green()) + QString(",") +
       QString::number(color.blue()) + QString(",") +
       QString::number(color.alpha()) +
@@ -298,7 +298,7 @@ IntField::IntField(QWidget *parent, bool isMaxRangeLimited, bool isRollerHide)
   m_slider = new QSlider(Qt::Horizontal, this);
   ret      = ret && connect(m_slider, SIGNAL(valueChanged(int)), this,
                        SLOT(onSliderChanged(int)));
-  ret = ret && connect(m_slider, SIGNAL(sliderReleased()), this,
+  ret      = ret && connect(m_slider, SIGNAL(sliderReleased()), this,
                        SLOT(onSliderReleased()));
 
   ret = ret && connect(m_lineEdit, SIGNAL(editingFinished()), this,
@@ -406,7 +406,7 @@ int IntField::pos2value(int x) const {
   else if (posRatio <= 0.9)
     t = -0.26 + 0.4 * posRatio;
   else
-    t              = -8.0 + 9.0 * posRatio;
+    t = -8.0 + 9.0 * posRatio;
   double sliderVal = (double)m_slider->minimum() + rangeSize * t;
   return (int)round(sliderVal * pow(0.1, NonLinearSliderPrecision));
 }

@@ -180,7 +180,7 @@ The complete recognized file structure is as follows:
 
     float radius                    // Parameter declaration
 
-    <Default>                       // Additional Paramater attributes (can be omitted)
+    <Default>                       // Additional Parameter attributes (can be omitted)
       10                            // The parameter default
     </Default>
     <Range>

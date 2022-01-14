@@ -425,7 +425,7 @@ public:
         return param;
 
       // in case the parameter has ui label
-      // ( paramters of plugin fxs and intensity of GlobalControllableFx)
+      // ( parameters of plugin fxs and intensity of GlobalControllableFx)
       if (param->hasUILabel()) {
         paramName = param->getUILabel();
         int i     = paramName.find_first_of(" -");

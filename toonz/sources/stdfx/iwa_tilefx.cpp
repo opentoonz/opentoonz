@@ -16,7 +16,7 @@ class Iwa_TileFx final : public TStandardRasterFx {
 
   enum tileQuantity { eNoTile = 1, eOneTile = 2, eMultipleTiles = 3 };
 
-  enum inputSize { eBoundingBox = 1, eCameraBox = 2 };
+  enum inputSize { eBoundingBox = 1, eCameraBox = 2, eImageSize = 3 };
 
   TIntEnumParamP m_inputSizeMode;
   TRasterFxPort m_input;
@@ -70,6 +70,7 @@ Iwa_TileFx::Iwa_TileFx()
 
   bindParam(this, "inputSize", m_inputSizeMode);
   m_inputSizeMode->addItem(eCameraBox, "Camera Box");
+  m_inputSizeMode->addItem(eImageSize, "Image Size");
 
   bindParam(this, "leftQuantity", m_leftQuantity);
   m_leftQuantity->addItem(eOneTile, "1 Tile");
@@ -182,7 +183,8 @@ void Iwa_TileFx::doCompute(TTile &tile, double frame,
   TRectD inputBox;
 
   int inputSizeMode =
-      m_inputSizeMode->getValue();  //	eBoundingBox = 1, eCameraBox = 2
+      m_inputSizeMode
+          ->getValue();  //	eBoundingBox = 1, eCameraBox = 2, eImageSize = 3
   if (inputSizeMode == eBoundingBox)
     m_input->getBBox(frame, inputBox, ri);
   else if (inputSizeMode == eCameraBox) {
@@ -191,6 +193,12 @@ void Iwa_TileFx::doCompute(TTile &tile, double frame,
     inputBox = TRectD(
         TPointD(ri.m_cameraBox.x0 + offset.x, ri.m_cameraBox.y0 + offset.y),
         TDimensionD(ri.m_cameraBox.getLx(), ri.m_cameraBox.getLy()));
+  } else if (inputSizeMode == eImageSize) {
+    TRenderSettings riAux(ri);
+    // set a tentative flag to obtain full image size. (see
+    // TLevelColumnFx::doGetBBox)
+    riAux.m_getFullSizeBBox = true;
+    m_input->getBBox(frame, inputBox, riAux);
   }
 
   double scale = sqrt(fabs(ri.m_affine.det()));
@@ -266,7 +274,7 @@ bool Iwa_TileFx::checkIfThisTileShouldBeComptedOrNot(int horizIndex,
 //------------------------------------------------------------------------------
 //! Make the tile of the image contained in \b inputTile in \b tile
 /*
-*/
+ */
 void Iwa_TileFx::makeTile(const TTile &inputTile, const TTile &tile) {
   tile.getRaster()->clear();
 

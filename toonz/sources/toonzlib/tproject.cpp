@@ -744,7 +744,7 @@ public:
 
         It is possible to handle more than one project root.
         The class maintains a container this purpose. All the projects roots
-   must be set by hand in the windows registery. By default, only one project
+   must be set by hand in the windows registry. By default, only one project
    root is created when toonz is installed.\n The project root container can be
    updated using addProjectsRoot(const TFilePath &root),
    addDefaultProjectsRoot() methods.

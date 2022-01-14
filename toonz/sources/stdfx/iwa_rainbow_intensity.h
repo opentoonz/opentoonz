@@ -2,7 +2,7 @@
 
 #ifndef RAINBOW_INTENSITY_H
 #define RAINBOW_INTENSITY_H
-// Scattering Intensity from water droplet for each wavelengh
+// Scattering Intensity from water droplet for each wavelength
 // and scattering angle
 // Numerical computation is done with MiePlot by Philip Laven
 // Parameters

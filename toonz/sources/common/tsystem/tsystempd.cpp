@@ -225,7 +225,7 @@ bool TSystem::memoryShortage() {
 
 //------------------------------------------------------------
 
-TINT64 TSystem::getFreeMemorySize(bool onlyPhisicalMemory) {
+TINT64 TSystem::getFreeMemorySize(bool onlyPhysicalMemory) {
   TINT64 totalFree = 0;
 
 #ifdef _WIN32
@@ -234,7 +234,7 @@ TINT64 TSystem::getFreeMemorySize(bool onlyPhisicalMemory) {
   buff.dwLength = sizeof(MEMORYSTATUSEX);
   GlobalMemoryStatusEx(&buff);
 
-  if (onlyPhisicalMemory)
+  if (onlyPhysicalMemory)
     return buff.ullAvailPhys >> 10;
   else
     return buff.ullAvailPageFile >> 10;
@@ -269,7 +269,7 @@ TINT64 TSystem::getFreeMemorySize(bool onlyPhisicalMemory) {
   struct sysinfo *sysInfo = (struct sysinfo *)calloc(1, sizeof(struct sysinfo));
 
   if (!sysinfo(sysInfo)) {
-    if (onlyPhisicalMemory)
+    if (onlyPhysicalMemory)
       totalFree = sysInfo->freeram;
     else
       totalFree = sysInfo->freeram + sysInfo->freeswap;
@@ -403,12 +403,12 @@ TINT64 TSystem::getFreeDiskSize(const TFilePath &diskName) {
 
 //------------------------------------------------------------
 
-TINT64 TSystem::getMemorySize(bool onlyPhisicalMemory) {
+TINT64 TSystem::getMemorySize(bool onlyPhysicalMemory) {
 #ifdef _WIN32
 
   MEMORYSTATUS buff;
   GlobalMemoryStatus(&buff);
-  if (onlyPhisicalMemory)
+  if (onlyPhysicalMemory)
     return buff.dwTotalPhys >> 10;
   else
     return buff.dwTotalPageFile >> 10;

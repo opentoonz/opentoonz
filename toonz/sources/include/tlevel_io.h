@@ -239,6 +239,19 @@ inline bool isMovieType(const TFilePath &fp) {
 
 //-----------------------------------------------------------
 
+inline bool isSequencialRequired(std::string type) {
+  return (type == "mov" || type == "avi" || type == "3gp");
+}
+
+//-----------------------------------------------------------
+
+inline bool isSequencialRequired(const TFilePath &fp) {
+  std::string type(fp.getType());
+  return isSequencialRequired(type);
+}
+
+//-----------------------------------------------------------
+
 inline bool doesSupportRandomAccess(const TFilePath &fp,
                                     bool isToonzOutput = false) {
   return (fp.getDots() == "..") || (isToonzOutput && fp.getType() == "mov");

@@ -552,11 +552,11 @@ struct TStroke::Imp {
 
   BYTE m_flag;
 
-  //! This flag checks if changes occurs and if it is neccessary to update
+  //! This flag checks if changes occurs and if it is necessary to update
   //! length.
   bool m_isValidLength;
 
-  //! This flag checks if changes occurs and if it is neccessary to update
+  //! This flag checks if changes occurs and if it is necessary to update
   //! outline.
   bool m_isOutlineValid;
 

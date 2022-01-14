@@ -1933,8 +1933,8 @@ void StopMotionController::onNewCameraSelected(int index, bool useWebcam) {
     m_resolutionCombo->hide();
     m_resolutionLabel->hide();
     m_cameraStatusLabel->hide();
-    m_pickZoomButton->setStyleSheet("border:1px solid rgb(0, 0, 0, 0);");
-    m_zoomButton->setStyleSheet("border:1px solid rgb(0, 0, 0, 0);");
+    m_pickZoomButton->setStyleSheet("border:1px solid rgba(0, 0, 0, 0);");
+    m_zoomButton->setStyleSheet("border:1px solid rgba(0, 0, 0, 0);");
     m_pickZoomButton->setChecked(false);
     m_zoomButton->setChecked(false);
     m_dslrFrame->hide();
@@ -2382,9 +2382,9 @@ void StopMotionController::onPictureStyleChangedSignal(QString text) {
 void StopMotionController::onFocusCheckToggled(bool on) {
 #ifdef WITH_CANON
   if (on) {
-    m_zoomButton->setStyleSheet("border:1px solid rgb(0, 255, 0, 255);");
+    m_zoomButton->setStyleSheet("border:1px solid rgba(0, 255, 0, 255);");
   } else {
-    m_zoomButton->setStyleSheet("border:1px solid rgb(0, 0, 0, 0);");
+    m_zoomButton->setStyleSheet("border:1px solid rgba(0, 0, 0, 0);");
   }
   m_zoomButton->blockSignals(true);
   m_zoomButton->setChecked(on);
@@ -2397,10 +2397,10 @@ void StopMotionController::onFocusCheckToggled(bool on) {
 void StopMotionController::onPickFocusCheckToggled(bool on) {
 #ifdef WITH_CANON
   if (on) {
-    m_pickZoomButton->setStyleSheet("border:1px solid rgb(0, 255, 0, 255);");
+    m_pickZoomButton->setStyleSheet("border:1px solid rgba(0, 255, 0, 255);");
 
   } else {
-    m_pickZoomButton->setStyleSheet("border:1px solid rgb(0, 0, 0, 0);");
+    m_pickZoomButton->setStyleSheet("border:1px solid rgba(0, 0, 0, 0);");
   }
   m_pickZoomButton->blockSignals(true);
   m_pickZoomButton->setChecked(on);

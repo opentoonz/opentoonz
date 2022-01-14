@@ -351,7 +351,7 @@ void TLevelReader::define(QString extension, int reader,
                           TLevelReaderCreateProc *proc) {
   LevelReaderKey key(extension, reader);
   LevelReaderTable[key] = proc;
-  // cout << "LevelReader " << extension << " registred" << endl;
+  // cout << "LevelReader " << extension << " registered" << endl;
 }
 
 //-----------------------------------------------------------
@@ -360,5 +360,5 @@ void TLevelWriter::define(QString extension, TLevelWriterCreateProc *proc,
                           bool isRenderFormat) {
   LevelWriterTable[extension] =
       std::pair<TLevelWriterCreateProc *, bool>(proc, isRenderFormat);
-  // cout << "LevelWriter " << extension << " registred" << endl;
+  // cout << "LevelWriter " << extension << " registered" << endl;
 }

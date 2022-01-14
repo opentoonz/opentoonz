@@ -81,6 +81,7 @@
 #include "./ffmpeg/tiio_mp4.h"
 #include "./mesh/tiio_mesh.h"
 #include "./sprite/tiio_sprite.h"
+#include "./exr/tiio_exr.h"
 
 //-------------------------------------------------------------------
 
@@ -179,6 +180,11 @@ void initImageIo(bool lightVersion) {
   TFileType::declare("spritesheet", TFileType::RASTER_LEVEL);
   Tiio::defineWriterProperties("spritesheet",
                                new Tiio::SpriteWriterProperties());
+
+  Tiio::defineReaderMaker("exr", Tiio::makeExrReader);
+  Tiio::defineWriterMaker("exr", Tiio::makeExrWriter, true);
+  TFileType::declare("exr", TFileType::RASTER_IMAGE);
+  Tiio::defineWriterProperties("exr", new Tiio::ExrWriterProperties());
 
 // ffmpeg
 #if !defined(_WIN32) || defined(x64) || (defined(_WIN32) && defined(__GNUC__))

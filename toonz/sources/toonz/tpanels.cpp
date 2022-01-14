@@ -97,6 +97,7 @@
 
 // Qt includes
 #include <QAction>
+#include <QScreen>
 
 //=============================================================================
 // XsheetViewer
@@ -1039,7 +1040,51 @@ OpenFloatingPanel openToolOptionsCommand(MI_OpenToolOptionBar, "ToolOptions",
 // FlipbookFactory
 //-----------------------------------------------------------------------------
 
-FlipbookPanel::FlipbookPanel(QWidget *parent) : TPanel(parent) {
+void FlipbookBasePanel::zoomContentsAndFitGeometry(bool forward) {
+  if (!isFloating()) return;
+  if (!m_flipbook->getImageViewer()->getImage()) {
+    TPanel::zoomContentsAndFitGeometry(forward);
+    return;
+  }
+  // resize the window leaving the top-left corner position unchanged
+  // in order to gain consistency with Photoshop
+  auto getScreen = [&]() {
+    QScreen *ret = nullptr;
+    ret          = QGuiApplication::screenAt(geometry().topLeft());
+    if (ret) return ret;
+    ret = QGuiApplication::screenAt(geometry().topRight());
+    if (ret) return ret;
+    ret = QGuiApplication::screenAt(geometry().center());
+    if (ret) return ret;
+    ret = QGuiApplication::screenAt(geometry().bottomLeft());
+    if (ret) return ret;
+    ret = QGuiApplication::screenAt(geometry().bottomRight());
+    return ret;
+  };
+  // Get screen geometry
+  QScreen *screen = getScreen();
+  if (!screen) return;
+  QRect screenGeom  = screen->availableGeometry();
+  QPoint oldTopLeft = geometry().topLeft();
+
+  m_flipbook->zoomAndAdaptGeometry(forward);
+
+  QRect newGeom(geometry());
+  newGeom.moveTopLeft(oldTopLeft);
+  if (newGeom.right() > screenGeom.right())
+    newGeom.moveRight(screenGeom.right());
+  else if (newGeom.left() < screenGeom.left())
+    newGeom.moveLeft(screenGeom.left());
+  if (newGeom.bottom() > screenGeom.bottom())
+    newGeom.moveBottom(screenGeom.bottom());
+  else if (newGeom.top() < screenGeom.top())
+    newGeom.moveTop(screenGeom.top());
+  setGeometry(newGeom);
+}
+
+//-----------------------------------------------------------------------------
+
+FlipbookPanel::FlipbookPanel(QWidget *parent) : FlipbookBasePanel(parent) {
   m_flipbook = new FlipBook(this);
   setWidget(m_flipbook);
   // minimize button and safearea toggle
@@ -1216,10 +1261,18 @@ public:
 class ColorModelViewerFactory final : public TPanelFactory {
 public:
   ColorModelViewerFactory() : TPanelFactory("ColorModel") {}
-  void initialize(TPanel *panel) override {
-    panel->setWidget(new ColorModelViewer(panel));
-    panel->resize(400, 300);
+
+  TPanel *createPanel(QWidget *parent) override {
+    FlipbookBasePanel *panel     = new FlipbookBasePanel(parent);
+    ColorModelViewer *colorModel = new ColorModelViewer(panel);
+    panel->setWidget(colorModel);
+    panel->setFlipbook(colorModel);
+    panel->setObjectName(getPanelType());
+    panel->setWindowTitle(getPanelType());
+    return panel;
   }
+
+  void initialize(TPanel *panel) override { assert(0); }
 } colorModelViewerFactory;
 
 //=============================================================================
@@ -1550,3 +1603,26 @@ public:
 OpenFloatingPanel openVectorGuidedDrawingPanelCommand(
     MI_OpenGuidedDrawingControls, "VectorGuidedDrawingPanel",
     QObject::tr("Vector Guided Drawing"));
+
+//-----------------------------------------------------------------------------
+
+namespace {
+
+void zoomAndFitPanel(bool forward) {
+  TPanel *panel = dynamic_cast<TPanel *>(qApp->activeWindow());
+  if (panel) panel->zoomContentsAndFitGeometry(forward);
+}
+
+}  // namespace
+
+class ZoomInAndFitPanel final : public MenuItemHandler {
+public:
+  ZoomInAndFitPanel() : MenuItemHandler("MI_ZoomInAndFitPanel") {}
+  void execute() override { zoomAndFitPanel(true); }
+} zoomInAndFitPanel;
+
+class ZoomOutAndFitPanel final : public MenuItemHandler {
+public:
+  ZoomOutAndFitPanel() : MenuItemHandler("MI_ZoomOutAndFitPanel") {}
+  void execute() override { zoomAndFitPanel(false); }
+} zoomOutAndFitPanel;

@@ -41,7 +41,7 @@ namespace {
 
       e = pixel size
       h = step
-      a = acceleration of curve (for a quadratic is a costant value)
+      a = acceleration of curve (for a quadratic is a constant value)
   */
 double localComputeStep(const TQuadratic &quad, double pixelSize) {
   double step = 2;
@@ -301,7 +301,7 @@ void splitCircularArcIntoQuadraticCurves(const TPointD &Center,
   // 60).
   // It supposes that Pstart and Pend are onto the circumference (so that their
   // lengths
-  // are equal to tha radius of the circumference), otherwise the resulting
+  // are equal to the radius of the circumference), otherwise the resulting
   // curves could
   // be unpredictable.
   // The last component in quadCurve[] is an ending void curve

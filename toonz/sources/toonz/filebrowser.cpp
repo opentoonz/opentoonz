@@ -338,7 +338,7 @@ void FileBrowser::storeFolderHistory() {
     m_indexHistoryList << currentModelIndex;
     m_currentPosition++;
   }
-  // If the next hitory item is the same as the current one, just move to it
+  // If the next history item is the same as the current one, just move to it
   else if (m_indexHistoryList[m_currentPosition + 1] == currentModelIndex) {
     m_currentPosition++;
   }
@@ -536,7 +536,7 @@ void FileBrowser::refreshCurrentFolderItems() {
   if (parentFp != TFilePath("") && parentFp != m_folder)
     m_items.push_back(Item(parentFp, true, false));
 
-  // register the all folder items by using the folde tree model
+  // register all folder items by using the folder tree model
   DvDirModel *model        = DvDirModel::instance();
   QModelIndex currentIndex = model->getIndexByPath(m_folder);
   if (currentIndex.isValid()) {

@@ -76,7 +76,7 @@ void TCellKeyframeSelection::copyCellsKeyframes() {
                                startPos);
     data->setKeyframeData(keyframeData);
   }
-  // Set the cliboard
+  // Set the clipboard
   QClipboard *clipboard = QApplication::clipboard();
   clipboard->setMimeData(data, QClipboard::Clipboard);
 }

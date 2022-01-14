@@ -1625,7 +1625,7 @@ void DvDirTreeView::getExpandedPathsRecursive(const QModelIndex &index,
       paths.append(path);
     }
   }
-  /*- serch child nodes if this node is expanded -*/
+  /*- search child nodes if this node is expanded -*/
   if (index != rootIndex() && !isExpanded(index)) return;
 
   int count = DvDirModel::instance()->rowCount(index);

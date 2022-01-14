@@ -733,7 +733,7 @@ void Naa2TlvConverter::assignColorTypes() {
 
 //-----------------------------------------------------------------------------
 
-void Naa2TlvConverter::addBorderInks()  // add syntethic inks: lines between two
+void Naa2TlvConverter::addBorderInks()  // add synthetic inks: lines between two
                                         // adjacent fill-regions
 {
   int lx                   = m_regionRas->getLx();

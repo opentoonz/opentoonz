@@ -1049,7 +1049,7 @@ void TifWriter::writeLine(char *buffer) {
 
 //============================================================
 #ifdef _DEBUG
-/* Error & Waring Handler per debug */
+/* Error & Warning Handler per debug */
 
 extern "C" {
 static void MyWarningHandler(const char *module, const char *fmt, va_list ap) {

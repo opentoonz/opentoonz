@@ -352,7 +352,7 @@ void Previewer::Imp::updateRenderSettings() {
   else
     renderSettings.m_shrinkY = renderSettings.m_shrinkX = 1;
 
-  // In case the settings changee, erase all previously cached images
+  // In case the settings changed, erase all previously cached images
   if (renderSettings != m_renderSettings) {
     m_renderSettings = renderSettings;
 

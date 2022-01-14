@@ -627,7 +627,7 @@ void Iwa_SoapBubbleFx::do_createBlurFilter(float* dst_p, int size,
       if (length2 >= radius2)
         *tmp_p = 0.0f;
       else {
-        /* normalize distace from the filter center, to 0-1 */
+        /* normalize distance from the filter center, to 0-1 */
         *tmp_p = 1.0f - std::sqrt(length2) / radius;
         sum += *tmp_p;
       }

@@ -42,9 +42,9 @@ class SceneViewerPanel final : public QFrame,
   TPanelTitleBarButton *m_subcameraPreviewButton;
   bool m_onionSkinActive = false;
   UINT m_visiblePartsFlag;
-  bool m_playSound       = true;
-  bool m_hasSoundtrack   = false;
-  bool m_playing         = false;
+  bool m_playSound     = true;
+  bool m_hasSoundtrack = false;
+  bool m_playing       = false;
   double m_fps;
   int m_viewerFps;
   double m_samplesPerFrame;
@@ -62,23 +62,23 @@ public:
   // toggle show/hide of the widgets according to m_visiblePartsFlag
   void setVisiblePartsFlag(UINT flag);
   void updateShowHide();
-  void addShowHideContextMenu(QMenu*);
+  void addShowHideContextMenu(QMenu *);
 
-  void onDrawFrame(int frame,
-                   const ImagePainter::VisualSettings &settings) override;
+  void onDrawFrame(int frame, const ImagePainter::VisualSettings &settings,
+                   QElapsedTimer *timer, qint64 targetInstant) override;
 
   void onEnterPanel() {
-      m_sceneViewer->setFocus(Qt::OtherFocusReason);
-      // activate shortcut key for this flipconsole
-      m_flipConsole->makeCurrent();
+    m_sceneViewer->setFocus(Qt::OtherFocusReason);
+    // activate shortcut key for this flipconsole
+    m_flipConsole->makeCurrent();
   }
   void onLeavePanel() { m_sceneViewer->clearFocus(); }
 
   // SaveLoadQSettings
-  virtual void save(QSettings& settings) const override;
-  virtual void load(QSettings& settings) override;
+  virtual void save(QSettings &settings) const override;
+  virtual void load(QSettings &settings) override;
 
-  void initializeTitleBar(TPanelTitleBar* titleBar);
+  void initializeTitleBar(TPanelTitleBar *titleBar);
 
 protected:
   void showEvent(QShowEvent *) override;
@@ -92,7 +92,7 @@ protected:
   void enableFlipConsoleForCamerastand(bool on);
   void playAudioFrame(int frame);
   bool hasSoundtrack();
-  void contextMenuEvent(QContextMenuEvent* event) override;
+  void contextMenuEvent(QContextMenuEvent *event) override;
 
 public slots:
 
@@ -112,7 +112,7 @@ protected slots:
   void onFrameTypeChanged();
   void onPlayingStatusChanged(bool playing);
   // for showing/hiding the parts
-  void onShowHideActionTriggered(QAction*);
+  void onShowHideActionTriggered(QAction *);
   void enableFullPreview(bool enabled);
   void enableSubCameraPreview(bool enabled);
 };

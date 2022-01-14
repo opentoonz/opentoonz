@@ -574,7 +574,7 @@ course,
               \par Features
               \li  Insertion indexes are automatically generated keys with the
 same
-                   access time of the undelying container (typically super-fast
+                   access time of the underlying container (typically super-fast
                    \p O(1)).
               \li  Stable indexes and iterators with respect to <I>every
 operation</I>.

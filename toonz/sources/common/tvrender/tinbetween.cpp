@@ -179,7 +179,7 @@ static void eraseSmallAngles(std::vector<std::pair<int, double>> &corners,
 // output:
 // min is the minimum angle greater or equal to minDegree (i.e the minimum angle
 // of the corners)
-// max is tha maximum angle greater or equal to minDegree
+// max is the maximum angle greater or equal to minDegree
 
 static void detectCorners(const TStroke *stroke, double minDegree,
                           std::vector<std::pair<int, double>> &corners,

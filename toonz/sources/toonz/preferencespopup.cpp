@@ -1173,6 +1173,7 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
       {ffmpegPath, tr("FFmpeg Path:")},
       {ffmpegTimeout, tr("FFmpeg Timeout:")},
       {fastRenderPath, tr("Fast Render Path:")},
+      {ffmpegMultiThread, tr("Allow Multi-Thread in FFMPEG Rendering (UNSTABLE)")},
 
       // Drawing
       {scanLevelType, tr("Scan File Format:")},
@@ -1786,6 +1787,13 @@ QWidget* PreferencesPopup::createImportExportPage() {
               "Render (MP4) to go."),
            lay);
   insertUI(fastRenderPath, lay);
+
+  putLabel("", lay);
+  putLabel(
+      tr("Enabling multi-thread rendering will render significantly faster "
+         "but a random crash might occur, use at your own risk."),
+      lay);
+  insertUI(ffmpegMultiThread, lay);
 
   lay->setRowStretch(lay->rowCount(), 1);
   insertFootNote(lay);

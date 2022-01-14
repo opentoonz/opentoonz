@@ -191,7 +191,7 @@ class XsheetViewer final : public QFrame, public SaveLoadQSettings {
 
   QColor m_lightLightBgColor;
   QColor m_lightBgColor;
-  QColor m_bgColor;  // row area backgroound
+  QColor m_bgColor;  // row area background
   QColor m_darkBgColor;
   QColor m_lightLineColor;  // horizontal lines (146,144,146)
   QColor m_darkLineColor;

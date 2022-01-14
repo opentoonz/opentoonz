@@ -2738,6 +2738,12 @@ void MainWindow::defineActions() {
                                              tr("Exit Full Screen Mode"));
   createViewerAction(MI_CompareToSnapshot, QT_TR_NOOP("Compare to Snapshot"),
                      "");
+  createViewerAction(MI_ZoomInAndFitPanel,
+                     QT_TR_NOOP("Zoom In And Fit Floating Panel"),
+                     "Ctrl+Alt++");
+  createViewerAction(MI_ZoomOutAndFitPanel,
+                     QT_TR_NOOP("Zoom Out And Fit Floating Panel"),
+                     "Ctrl+Alt+-");
 
   // Following actions are for adding "Visualization" menu items to the command
   // bar. They are separated from the original actions in order to avoid

@@ -172,6 +172,7 @@ OutputSettingsPopup::OutputSettingsPopup(bool isPreview)
     , m_applyShrinkChk(nullptr)
     , m_outputCameraOm(nullptr)
     , m_isPreviewSettings(isPreview)
+    , m_allowMT(Preferences::instance()->getFfmpegMultiThread())
     , m_presetCombo(nullptr) {
   setWindowTitle(isPreview ? tr("Preview Settings") : tr("Output Settings"));
   if (!isPreview) setObjectName("OutputSettingsPopup");
@@ -843,6 +844,11 @@ void OutputSettingsPopup::updateField() {
     m_multimediaOm->setCurrentIndex(prop->getMultimediaRendering());
   }
 
+  // Refresh format if allow-multithread was toggled
+  if (m_allowMT != Preferences::instance()->getFfmpegMultiThread()) {
+    onFormatChanged(m_fileFormat->currentText());
+  }
+
   // camera
   if (m_outputCameraOm) {
     m_outputCameraOm->blockSignals(true);
@@ -1046,19 +1052,21 @@ void OutputSettingsPopup::onNameChanged() {
 /*! Set current scene output format to new format set in popup field.
  */
 void OutputSettingsPopup::onFormatChanged(const QString &str) {
-  auto isMultiRenderInvalid = [](std::string ext) -> bool {
-    return ext == "mp4" || ext == "gif" || ext == "webm" ||
+  auto isMultiRenderInvalid = [](std::string ext, bool allowMT) -> bool {
+    return (!allowMT && (ext == "mp4" || ext == "gif" || ext == "webm")) ||
            ext == "spritesheet";
   };
 
   TOutputProperties *prop    = getProperties();
-  bool wasMultiRenderInvalid = isMultiRenderInvalid(prop->getPath().getType());
-  TFilePath fp               = prop->getPath().withType(str.toStdString());
+  bool wasMultiRenderInvalid =
+      isMultiRenderInvalid(prop->getPath().getType(), m_allowMT);
+  TFilePath fp = prop->getPath().withType(str.toStdString());
   prop->setPath(fp);
   TApp::instance()->getCurrentScene()->setDirtyFlag(true);
+  m_allowMT = Preferences::instance()->getFfmpegMultiThread();
 
   if (m_presetCombo) m_presetCombo->setCurrentIndex(0);
-  if (isMultiRenderInvalid(str.toStdString())) {
+  if (isMultiRenderInvalid(str.toStdString(), m_allowMT)) {
     m_threadsComboOm->setDisabled(true);
     m_threadsComboOm->setCurrentIndex(0);
   } else {

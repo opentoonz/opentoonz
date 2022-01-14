@@ -75,6 +75,7 @@ enum PreferencesItemId {
   ffmpegPath,
   ffmpegTimeout,
   fastRenderPath,
+  ffmpegMultiThread,
 
   //----------
   // Drawing

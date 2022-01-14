@@ -8,6 +8,7 @@
 #include "trasterimage.h"
 #include <QVector>
 #include <QStringList>
+#include <QProcess>
 
 struct ffmpegFileInfo {
   int m_lx, m_ly, m_frameCount;
@@ -54,6 +55,7 @@ private:
   QStringList m_audioArgs;
   TUINT32 m_sampleRate;
   QString cleanPathSymbols();
+  bool waitFfmpeg(const QProcess &ffmpeg);
 };
 
 #endif

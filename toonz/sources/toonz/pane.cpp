@@ -33,6 +33,7 @@
 #include <QDesktopWidget>
 #include <QDialog>
 #include <QLineEdit>
+#include <QScreen>
 
 extern TEnv::StringVar EnvSafeAreaName;
 
@@ -173,6 +174,58 @@ void TPanel::restoreFloatingPanelState() {
   if (SaveLoadQSettings *persistent =
           dynamic_cast<SaveLoadQSettings *>(widget()))
     persistent->load(settings);
+}
+
+//-----------------------------------------------------------------------------
+// if the panel has no contents to be zoomed, simply resize the panel here
+// currently only Flipbook and Color Model panels support resizing of contents
+void TPanel::zoomContentsAndFitGeometry(bool forward) {
+  if (!m_floating) return;
+
+  auto getScreen = [&]() {
+    QScreen *ret = nullptr;
+    ret          = QGuiApplication::screenAt(geometry().topLeft());
+    if (ret) return ret;
+    ret = QGuiApplication::screenAt(geometry().topRight());
+    if (ret) return ret;
+    ret = QGuiApplication::screenAt(geometry().center());
+    if (ret) return ret;
+    ret = QGuiApplication::screenAt(geometry().bottomLeft());
+    if (ret) return ret;
+    ret = QGuiApplication::screenAt(geometry().bottomRight());
+    return ret;
+  };
+
+  // Get screen geometry
+  QScreen *screen = getScreen();
+  if (!screen) return;
+  QRect screenGeom = screen->availableGeometry();
+
+  QSize newSize;
+  if (forward)
+    // x1.2 scale
+    newSize = QSize(width() * 6 / 5, height() * 6 / 5);
+  else
+    // 1/1.2 scale
+    newSize = QSize(width() * 5 / 6, height() * 5 / 6);
+
+  QRect newGeom(geometry().topLeft(), newSize);
+  if (!screenGeom.contains(newGeom)) {
+    if (newGeom.width() > screenGeom.width())
+      newGeom.setWidth(screenGeom.width());
+    if (newGeom.right() > screenGeom.right())
+      newGeom.moveRight(screenGeom.right());
+    else if (newGeom.left() < screenGeom.left())
+      newGeom.moveLeft(screenGeom.left());
+
+    if (newGeom.height() > screenGeom.height())
+      newGeom.setHeight(screenGeom.height());
+    if (newGeom.bottom() > screenGeom.bottom())
+      newGeom.moveBottom(screenGeom.bottom());
+    else if (newGeom.top() < screenGeom.top())
+      newGeom.moveTop(screenGeom.top());
+  }
+  setGeometry(newGeom);
 }
 
 //=============================================================================

@@ -1210,7 +1210,7 @@ void FlipBook::setLevel(const TFilePath &fp, TPalette *palette, int from,
                                  m_framesCount);                         // to
       }
 
-      // An old archived bug says that simulatenous open for read of the same
+      // An old archived bug says that simultaneous open for read of the same
       // tlv are not allowed...
       // if(m_lr && m_lr->getFilePath().getType()=="tlv")
       //  m_lr = TLevelReaderP();
@@ -1644,7 +1644,7 @@ TImageP FlipBook::getCurrentImage(int frame) {
       m_loadboxes[id] = showSub ? m_loadbox : TRect();
     }
 
-    // An old archived bug says that simulatenous open for read of the same tlv
+    // An old archived bug says that simultaneous open for read of the same tlv
     // are not allowed...
     // if(fp.getType()=="tlv")
     //  m_lr = TLevelReaderP();
@@ -1668,9 +1668,11 @@ else*/
 
 /*! Set current level frame to image viewer. Add the view image in cache.
  */
-void FlipBook::onDrawFrame(int frame, const ImagePainter::VisualSettings &vs) {
+void FlipBook::onDrawFrame(int frame, const ImagePainter::VisualSettings &vs,
+                           QElapsedTimer *timer, qint64 targetInstant) {
   try {
     m_imageViewer->setVisual(vs);
+    m_imageViewer->setTimerAndTargetInstant(timer, targetInstant);
 
     TImageP img = getCurrentImage(frame);
 
@@ -2115,7 +2117,7 @@ QPointF newViewerGeomCenter(
 
 //-----------------------------------------------------------------------------
 
-void FlipBook::onDoubleClick(QMouseEvent *me) {
+void FlipBook::adaptGeometryToCurrentSize() {
   TImageP img(m_imageViewer->getImage());
   if (!img) return;
 
@@ -2138,6 +2140,17 @@ void FlipBook::onDoubleClick(QMouseEvent *me) {
   // performing the inverse.
 
   adaptWidGeometry(pixGeom, pixGeom, false);
+}
+
+//-----------------------------------------------------------------------------
+
+void FlipBook::onDoubleClick(QMouseEvent *me) { adaptGeometryToCurrentSize(); }
+
+//-----------------------------------------------------------------------------
+
+void FlipBook::zoomAndAdaptGeometry(bool forward) {
+  m_imageViewer->zoomQt(forward, false);
+  adaptGeometryToCurrentSize();
 }
 
 //-----------------------------------------------------------------------------

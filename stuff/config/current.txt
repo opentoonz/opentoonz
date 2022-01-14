@@ -1450,6 +1450,11 @@
   <item>"STD_iwa_FractalNoiseFx.cycleEvolution"	"Cycle Evolution"	</item>
   <item>"STD_iwa_FractalNoiseFx.cycleEvolutionRange"	"Cycle (in Evolution)"	</item>
   <item>"STD_iwa_FractalNoiseFx.dynamicIntensity"	"Dynamic Intensity"	</item>
+  <item>"STD_iwa_FractalNoiseFx.doConical"	"Do Conical Transform"	</item>
+  <item>"STD_iwa_FractalNoiseFx.conicalAngle"	"Conical Angle"	</item>
+  <item>"STD_iwa_FractalNoiseFx.cameraFov"	"Camera FoV"	</item>
+  <item>"STD_iwa_FractalNoiseFx.zScale"	"Scale Depth"	</item>
+  <item>"STD_iwa_FractalNoiseFx.conicalEvolution"	"Conical Evolution"	</item>
   <item>"STD_iwa_FractalNoiseFx.alphaRendering"	"Alpha Rendering"	</item>
   
   <item>"STD_iwa_BloomFx" 			"Bloom Iwa" 	</item>
@@ -1468,7 +1473,7 @@
   <item>"STD_iwa_RainbowFx.intensity"	"Intensity"		</item>
   <item>"STD_iwa_RainbowFx.width_scale"	"Width Scale"		</item>
   <item>"STD_iwa_RainbowFx.inside"	"Inside Intensity"		</item>
-  <item>"STD_iwa_RainbowFx.secondary_rainbow"	"Secondary Rainbow Intesity"		</item>
+  <item>"STD_iwa_RainbowFx.secondary_rainbow"	"Secondary Rainbow Intensity"		</item>
   <item>"STD_iwa_RainbowFx.alpha_rendering"	"Alpha Rendering"		</item>
  
  <!------------------------------ Tiled Particles Iwa ------------------------------------------->

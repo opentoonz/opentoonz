@@ -514,7 +514,7 @@ static TUINT32 img_seek(IMAGERGB *image, unsigned int y, unsigned int z,
                      (y * image->xsize + z * image->xsize * image->ysize) *
                          BPP(image->type));
     default:
-      cout << "img_seek: wierd dim" << endl;
+      cout << "img_seek: weird dim" << endl;
       break;
     }
   } else if (ISRLE(image->type)) {
@@ -526,11 +526,11 @@ static TUINT32 img_seek(IMAGERGB *image, unsigned int y, unsigned int z,
     case 3:
       return img_optseek(image, offs + image->rowstart[y + z * image->ysize]);
     default:
-      cout << "img_seek: wierd dim" << endl;
+      cout << "img_seek: weird dim" << endl;
       break;
     }
   } else
-    cout << "img_seek: wierd image type" << endl;
+    cout << "img_seek: weird image type" << endl;
   return 0;
 }
 
@@ -566,7 +566,7 @@ static int new_getrow(IMAGERGB *image, void *buffer, UINT y, UINT z) {
         return image->xsize;
       }
     default:
-      cout << "getrow: wierd bpp" << endl;
+      cout << "getrow: weird bpp" << endl;
       break;
     }
   } else if (ISRLE(image->type)) {
@@ -818,7 +818,7 @@ static int new_putrow(IMAGERGB *image, void *buffer, UINT y, UINT z) {
       return image->xsize;
     }
   } else
-    fprintf(stderr, "putrow: wierd image type\n");
+    fprintf(stderr, "putrow: weird image type\n");
 
   return -1;
 }

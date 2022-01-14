@@ -204,7 +204,7 @@ void TLevelWriter3gp::save(const TImageP &img, int frameIndex) {
   }
 
   if (tipc::readMessage(stream, msg) != "ok")
-    throw TImageException(getFilePath(), "Couln't save image");
+    throw TImageException(getFilePath(), "Couldn't save image");
 }
 
 //------------------------------------------------------------------

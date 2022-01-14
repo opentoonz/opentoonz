@@ -1043,11 +1043,11 @@ PlacedFx FxBuilder::makePFfromUnaryFx(TFx *fx) {
       GlobalControllableFx *gcFx = dynamic_cast<GlobalControllableFx *>(fx);
       double val                 = gcFx->getGrobalControlValue(m_frame);
       if (val < 1.0) {
-        // insert cross disolve fx and mix with the input fx
+        // insert cross dissolve fx and mix with the input fx
         TFxP blendFx = TFx::create("blendFx");
         blendFx->connect("Source1", fx);
         blendFx->connect("Source2", inputFx);
-        // set the global intensity value to the cross disolve fx
+        // set the global intensity value to the cross dissolve fx
         dynamic_cast<TDoubleParam *>(blendFx->getParams()->getParam("value"))
             ->setDefaultValue(val * 100.0);
         m_globalControlledFx.insert(fx->getFxId(), {blendFx, true});
@@ -1138,12 +1138,12 @@ PlacedFx FxBuilder::makePFfromGenericFx(TFx *fx) {
       if (val < 1.0) {
         TFxP inputFx = fx->getInputPort(fx->getPreferredInputPort())->getFx();
         if (!inputFx) return pf;
-        // insert cross disolve fx and mix with the input fx
+        // insert cross dissolve fx and mix with the input fx
         TFxP blendFx = TFx::create("blendFx");
         blendFx->connect("Source1", fx);
         blendFx->connect("Source2", inputFx.getPointer());
         m_globalControlledFx.insert(fx->getFxId(), {blendFx, true});
-        // set the global intensity value to the cross disolve fx
+        // set the global intensity value to the cross dissolve fx
         dynamic_cast<TDoubleParam *>(blendFx->getParams()->getParam("value"))
             ->setDefaultValue(val * 100.0);
         return makePF(blendFx.getPointer());

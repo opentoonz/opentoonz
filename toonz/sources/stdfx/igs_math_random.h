@@ -8,7 +8,7 @@
 2001-04-25 update
 2001-06-19 rename to 'calculator_random_plus_long.h'
 2005-02-03 rename to 'ptbl_random.h'
-2005-02-10 separete to 'ptbl_random.h' and 'ptbl_random.cxx'
+2005-02-10 separate to 'ptbl_random.h' and 'ptbl_random.cxx'
 解説 (2005-02-03.thu wrote)
 疑似乱数整数列発生関数rand()は処理系定義であるため、
 たとえば、radhat9とWindowsとでは疑似乱数列が違う。

@@ -1122,7 +1122,7 @@ void ColumnArea::DrawHeader::drawThumbnail(QPixmap &iconPixmap) const {
                                                : PredefinedRect::THUMBNAIL)
                                  .translated(orig);
 
-  // pallete thumbnail
+  // palette thumbnail
   if (column->getPaletteColumn()) {
     p.drawPixmap(thumbnailImageRect, iconPixmap);
     return;

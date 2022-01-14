@@ -364,7 +364,14 @@ class RenderListener final : public DVGui::ProgressDialog,
         , m_labelText(labelText) {}
     TThread::Message *clone() const override { return new Message(*this); }
     void onDeliver() override {
-      if (m_frame == -1)
+      if (m_frame == -2) {
+        m_pb->setLabelText(
+            QObject::tr("Finalizing render, please wait.", "RenderListener"));
+        // Set busy indicator to progress bar
+        m_pb->setMinimum(0);
+        m_pb->setMaximum(0);
+        m_pb->setValue(0);
+      } else if (m_frame == -1)
         m_pb->hide();
       else {
         m_pb->setLabelText(
@@ -411,8 +418,7 @@ public:
     if (m_frameCounter + 1 < m_totalFrames)
       Message(this, ret ? -1 : ++m_frameCounter, m_progressBarString).send();
     else
-      setLabelText(
-          QObject::tr("Finalizing render, please wait.", "RenderListener"));
+      Message(this, -2, "").send();
     return !ret;
   }
   bool onFrameFailed(int frame, TException &) override {

@@ -3064,7 +3064,7 @@ public:
     int ret;
     if (sl && sl->getPath().getType() == "pli") {
       question = "Saving " + toQString(palettePath) +
-                 "\nThis command will ovewrite the level data as well.  Are "
+                 "\nThis command will overwrite the level data as well.  Are "
                  "you sure ?";
       ret =
           DVGui::MsgBox(question, QObject::tr("OK"), QObject::tr("Cancel"), 0);

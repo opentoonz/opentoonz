@@ -75,7 +75,7 @@ TPointD getCurvature(TStroke *stroke, double w) {
 //===========================================================================
 
 //
-// A point along a stroke: ths stroke itself, pos, w,s, crv
+// A point along a stroke: the stroke itself, pos, w,s, crv
 //
 struct StrokePoint {
   double w, s;
@@ -210,7 +210,7 @@ void StrokesIntersection::update(const StrokePointSet &psa,
 //---------------------------------------------------------------------------
 
 // the stroke is a self loop. the last intersection is mirrored before s=0
-// the first intersection is mirroed after s=length
+// the first intersection is mirrored after s=length
 void StrokesIntersection::wrap(std::vector<double> &is, TStroke *stroke) {
   assert(stroke->isSelfLoop());
   if (!is.empty()) {

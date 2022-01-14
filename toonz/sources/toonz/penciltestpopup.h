@@ -126,6 +126,7 @@ class FrameNumberLineEdit : public DVGui::LineEdit,
   QRegExpValidator *m_regexpValidator, *m_regexpValidator_alt;
 
   void updateValidator();
+  void updateSize();
   QString m_textOnFocusIn;
 
 public:

@@ -36,7 +36,7 @@ and for the different curves used (segments, quadratics, cubics)
 
 /*=====================================================================
 utility macro used to export classes from the dll
-(DVAPI: Digital Video Application Progam Interface)
+(DVAPI: Digital Video Application Program Interface)
 =====================================================================*/
 
 /*=====================================================================

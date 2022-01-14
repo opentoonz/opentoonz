@@ -452,7 +452,7 @@ DrawingData::~DrawingData() {
 
 void DrawingData::releaseData() {
   // do it when you're sure you no t need images anymore... (for example in an
-  // undo distructor)
+  // undo destructor)
   // int i;
   // for(i=0; i<m_imageSet.size(); i++)
   //  TImageCache::instance()->remove(m_imageSet[i]);

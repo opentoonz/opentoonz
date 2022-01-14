@@ -696,14 +696,14 @@ void TLevelWriterTzl::writeHeader(const TDimension &size) {
   assert(m_frameCountPos == 8 + CREATOR_LENGTH + 3 * sizeof(TINT32));
 
   // I put the place for the frameCount, which I will write in this position at
-  // the end  (see in the distructor)
+  // the end  (see in the destructor)
   tfwrite(&intval, 1, m_chan);
   // I put the place for the offsetTableOffset, which I will write in this
-  // position at the end  (see in the distructor)
+  // position at the end  (see in the destructor)
   intval = 0;
   tfwrite(&intval, 1, m_chan);
   // I put the place for the iconOffsetTableOffset, which I will write in this
-  // position at the end  (see in the distructor)
+  // position at the end  (see in the destructor)
   tfwrite(&intval, 1, m_chan);
   tfwrite(codec, codecLen, m_chan);
 }

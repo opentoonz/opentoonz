@@ -1046,6 +1046,11 @@ void RenameCellField::keyPressEvent(QKeyEvent *event) {
     }
     offset = m_viewer->orientation()->arrowShift(key);
     break;
+  case Qt::Key_Shift:
+    // prevent the field to lose focus when typing shift key
+    event->accept();
+    return;
+    break;
   default:
     QLineEdit::keyPressEvent(event);
     return;

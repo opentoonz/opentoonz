@@ -111,7 +111,7 @@ with it.
 
 /*! \fn void TCacheResource::clear()
 Clears the whole complex. This is an overloaded method equivalent to
-clear(getAvailableRegion()), supplied for convience.
+clear(getAvailableRegion()), supplied for convenience.
 */
 
 //====================================================================================================

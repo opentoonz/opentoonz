@@ -146,6 +146,11 @@ public:
   bool m_applyShrinkToViewer;  //!< Whether shrink must be considered.   \note
                                //! Should be moved to TOutputProperties.
 
+  // when this flag is true, TLevelColumnFx::doGetBBox returns full image sized
+  // box instead of the bounding box. It takes effect only for Toonz Raster /
+  // Raster levels. Currently used only in Tile Fx Iwa. (see iwa_tilefx.cpp)
+  bool m_getFullSizeBBox;
+
   /*-- カメラサイズ --*/
   TRectD m_cameraBox;
   /*-- 途中でPreview計算がキャンセルされたときのフラグ --*/

@@ -455,7 +455,7 @@ TaskStatusPage::Data::Data(TaskStatusPage *parent) {
   m_completionDateLbl   = new TLabel(parent, "completion date");
   m_stepCountLbl        = new TLabel(parent, "step count");
   m_failedStepsLbl      = new TLabel(parent, "failed steps");
-  m_successfullStepsLbl = new TLabel(parent, "successfull steps");
+  m_successfullStepsLbl = new TLabel(parent, "successful steps");
   m_dependenciesLbl     = new TLabel(parent, "dependencies");
   m_taskStatusLbl       = new TLabel(parent, "status");
   m_scrollVBar          = new TScrollbar(parent, "vscroll");

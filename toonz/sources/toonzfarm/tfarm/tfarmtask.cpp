@@ -26,7 +26,7 @@ using namespace TVER;
 #include <arpa/inet.h>  // inet_ntoa
 #else
 // these were included for OSX, i'm not sure if they are required for linux or
-// not? leaving them in as linux was building sucessfully already. damies13 -
+// not? leaving them in as linux was building successfully already. damies13 -
 // 2017-04-15.
 #include <netdb.h>      // gethostbyname
 #include <arpa/inet.h>  // inet_ntoa

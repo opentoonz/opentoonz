@@ -19,7 +19,7 @@
 //! \n \n
 //! For example, suppose that a render must be invoked upon a mousePressEvent,
 //! and that such event must have been completely processed before the
-//! corrispondant
+//! correspondent
 //! mouseReleaseEvent is invoked - calling the startRendering method *directly*
 //! by
 //! the mousePressEvent may cause the mouseReleaseEvent to be processed before

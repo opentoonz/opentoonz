@@ -2586,7 +2586,7 @@ int TVectorImage::areDifferentGroup(UINT index1, bool isRegion1, UINT index2,
 
 //-------------------------------------------------------------------
 /*this method is tricky.
-it is not allow to have not-adiacent strokes  of same group.
+it is not allow to have not-adjacent strokes  of same group.
 but it can happen when you group  some already-grouped strokes creating
 sub-groups.
 
@@ -2604,7 +2604,7 @@ after grouping became:
 2
 not allowed!
 
-this method moves strokes, so that  adiacent strokes have same group.
+this method moves strokes, so that adjacent strokes have same group.
 so after calling rearrangeMultiGroup the vi became:
 2
 2

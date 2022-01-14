@@ -48,7 +48,7 @@
 
 ### Dependent Libraries
 
-  The attached package is built by using the following libraries / softwares.
+  The attached package is built by using the following libraries/software:
 
   - OpenSSL Toolkit 1.1.1j 
     [Binary package from Shining Light Productions](https://slproweb.com/products/Win32OpenSSL.html)
