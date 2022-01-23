@@ -147,6 +147,7 @@ private:
   void onOnionColorChanged();
   // Colors
   void onTranspCheckDataChanged();
+  void onChessboardChanged();
   // Version Control
   void onSVNEnabledChanged();
   // Commonly used

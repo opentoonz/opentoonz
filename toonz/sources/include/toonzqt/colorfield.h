@@ -37,6 +37,25 @@ class TPaletteHandle;
 namespace DVGui {
 
 //=============================================================================
+// CommonChessboard singleton
+//-----------------------------------------------------------------------------
+
+class DVAPI CommonChessboard final : public QObject {
+  Q_OBJECT
+  TRaster32P m_bgRas;
+  QPixmap m_bgPix;
+  void setChessboardColors(const TPixel32 &col1, const TPixel32 &col2);
+
+public:
+  CommonChessboard();
+
+  const QPixmap &getPixmap() { return m_bgPix; }
+  void update();
+
+  static CommonChessboard *instance();
+};
+
+//=============================================================================
 // StyleSample
 //-----------------------------------------------------------------------------
 
@@ -49,6 +68,10 @@ class DVAPI StyleSample final : public QWidget {
   bool m_drawEnable;
   TPixel m_chessColor1;
   TPixel m_chessColor2;
+  bool m_cloneStyle;
+  bool m_sysChessboard;
+  bool m_stretch;
+  QColor m_currentColor;
 
   bool m_isEditing;
 
@@ -58,7 +81,7 @@ public:
 
   void enableClick(bool on) { m_clickEnabled = on; }
 
-  void setStyle(TColorStyle &style);
+  void setStyle(TColorStyle &style, int colorParameterIndex);
   TColorStyle *getStyle() const;
 
   void setColor(const TPixel32 &color);
@@ -73,13 +96,16 @@ public:
   void setEnable(bool drawEnable) { m_drawEnable = drawEnable; }
   bool isEnable() const { return m_drawEnable; }
 
+  void setCloneStyle(bool enable) { m_cloneStyle = enable; }
+  void setSystemChessboard(bool enable) { m_sysChessboard = enable; }
+
 protected:
   void paintEvent(QPaintEvent *event) override;
   void mousePressEvent(QMouseEvent *) override;
   void mouseDoubleClickEvent(QMouseEvent *event) override;
 
 signals:
-  void clicked(const TColorStyle &style);
+  void clicked();
 };
 
 //=============================================================================

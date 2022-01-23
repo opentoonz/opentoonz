@@ -748,7 +748,7 @@ bool TApp::eventFilter(QObject *watched, QEvent *e) {
     // if the user is painting very quickly with the pen, a number of events
     // could be still in the queue
     // the must be processed as tabled events (not mouse events)
-    qApp->processEvents();
+    if (m_isPenCloseToTablet) qApp->processEvents();
 
     m_isPenCloseToTablet = false;
     emit tabletLeft();

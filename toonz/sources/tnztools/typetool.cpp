@@ -1308,7 +1308,16 @@ void TypeTool::replaceText(std::wstring text, int from, int to) {
   for (unsigned int i = 0; i < (unsigned int)text.size(); i++) {
     wchar_t character = text[i];
 
-    if (vi) {
+    // line break case. This can happen when pasting text including the line
+    // break
+    if (character == '\r') {
+      TVectorImageP vi(new TVectorImage);
+      unsigned int index = from + i;
+      m_string.insert(m_string.begin() + index,
+                      StrokeChar(vi, -1., (int)(QChar('\r').unicode()), 0));
+    }
+
+    else if (vi) {
       TVectorImageP characterImage(new TVectorImage());
       unsigned int index = from + i;
       // se il font ha kerning bisogna tenere conto del carattere successivo
@@ -1334,7 +1343,7 @@ void TypeTool::replaceText(std::wstring text, int from, int to) {
       unsigned int index = from + i;
 
       if (instance->hasKerning() && (UINT)m_cursorIndex < m_string.size() &&
-          !m_string[index].isReturn())
+          index < m_string.size() - 1 && !m_string[index].isReturn())
         adv = instance->drawChar((TRasterCM32P &)newRasterCM, p, styleId,
                                  (wchar_t)character,
                                  (wchar_t)m_string[index].m_key);

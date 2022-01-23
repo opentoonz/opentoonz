@@ -292,13 +292,12 @@ void TColorStyle::makeIcon(const TDimension &d) {
   bbox = bbox.enlarge(TDimensionD(-10, -10));
   checkErrorsByGL;
 
-  double scx = 0.9 * d.lx / bbox.getLx();
-  double scy = 0.9 * d.ly / bbox.getLy();
-  double sc  = std::min(scx, scy);
-  double dx  = (d.lx - bbox.getLx() * sc) * 0.5;
-  double dy  = (d.ly - bbox.getLy() * sc) * 0.5;
-  TAffine aff =
-      TScale(scx, scy) * TTranslation(-bbox.getP00() + TPointD(dx, dy));
+  double scx  = 0.9 * d.lx / bbox.getLx();
+  double scy  = 0.9 * d.ly / bbox.getLy();
+  double sc   = std::min(scx, scy);
+  double dx   = (d.lx - bbox.getLx() * sc) * 0.5;
+  double dy   = (d.ly - bbox.getLy() * sc) * 0.5;
+  TAffine aff = TScale(sc) * TTranslation(-bbox.getP00() + TPointD(dx, dy));
 
   checkErrorsByGL;
   if (isRegionStyle() && !isStrokeStyle()) aff = aff * TTranslation(-10, -10);
@@ -388,7 +387,7 @@ class ColorStyleList {  // singleton
 public:
   static ColorStyleList *instance() {
     static ColorStyleList *_instance = 0;
-    if (!_instance) _instance        = new ColorStyleList();
+    if (!_instance) _instance = new ColorStyleList();
     return _instance;
   }
 

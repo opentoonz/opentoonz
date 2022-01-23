@@ -74,6 +74,35 @@ class LutCalibrator;
 
 //=============================================
 
+class HexLineEdit : public QLineEdit {
+  Q_OBJECT
+
+public:
+  HexLineEdit(const QString &contents, QWidget *parent);
+  ~HexLineEdit() {}
+
+  bool loadDefaultColorNames(bool reload);
+  bool hasUserColorNames();
+  bool loadUserColorNames(bool reload);
+  void setStyle(TColorStyle &style, int index);
+  void updateColor();
+  void setColor(TPixel color);
+  TPixel getColor() { return m_color; }
+  bool fromText(QString text);
+  bool fromHex(QString text);
+
+protected:
+  void loadColorTableXML(QMap<QString, QString> &table, const TFilePath &fp);
+  void mousePressEvent(QMouseEvent *event) override;
+  void focusOutEvent(QFocusEvent *event) override;
+  void showEvent(QShowEvent *event) override;
+
+  bool m_editing;
+  TPixel m_color;
+  static QMap<QString, QString> s_defcolornames;   // make it shared
+  static QMap<QString, QString> s_usercolornames;  // ...
+};
+
 //=============================================================================
 namespace StyleEditorGUI {
 //=============================================================================
@@ -238,14 +267,15 @@ signals:
 //=============================================================================
 /*! \brief The ColorSlider is used to set a color channel.
 
-                Inherits \b QSlider.
+                Inherits \b QAbstractSlider.
 
                 This object show a bar which colors differ from minimum to
    maximum channel color
                 value.
 */
-class DVAPI ColorSlider final : public QSlider {
+class DVAPI ColorSlider final : public QAbstractSlider {
   Q_OBJECT
+
 public:
   ColorSlider(Qt::Orientation orientation, QWidget *parent = 0);
 
@@ -259,6 +289,9 @@ protected:
   void paintEvent(QPaintEvent *event) override;
   void mousePressEvent(QMouseEvent *event) override;
   void mouseReleaseEvent(QMouseEvent *event) override;
+  void mouseMoveEvent(QMouseEvent *event) override;
+
+  void chandleMouse(int x, int y);
 
   //	QIcon getFirstArrowIcon();
   //	QIcon getLastArrowIcon();
@@ -268,6 +301,11 @@ protected:
 private:
   ColorChannel m_channel;
   ColorModel m_color;
+  static int s_chandle_size;
+  static int s_chandle_tall;
+
+public:
+  static int s_slider_appearance;
 };
 
 //=============================================================================
@@ -614,6 +652,7 @@ class DVAPI StyleEditor final : public QWidget, public SaveLoadQSettings {
   PaletteController *m_paletteController;
   TPaletteHandle *m_paletteHandle;
   TPaletteHandle *m_cleanupPaletteHandle;
+  HexLineEdit *m_hexLineEdit;
   QWidget *m_parent;
   TXshLevelHandle
       *m_levelHandle;  //!< for clearing the level cache when the color changed
@@ -652,6 +691,8 @@ class DVAPI StyleEditor final : public QWidget, public SaveLoadQSettings {
   QAction *m_hsvAction;
   QAction *m_alphaAction;
   QAction *m_rgbAction;
+  QAction *m_hexAction;
+  QActionGroup *m_sliderAppearanceAG;
 
   TColorStyleP
       m_oldStyle;  //!< A copy of current style \a before the last change.
@@ -727,7 +768,8 @@ protected slots:
   void onStyleSwitched();
   void onStyleChanged(bool isDragging);
   void onCleanupStyleChanged(bool isDragging);
-  void onOldStyleClicked(const TColorStyle &);
+  void onOldStyleClicked();
+  void onNewStyleClicked();
   void updateOrientationButton();
   void checkPaletteLock();
   // called (e.g.) by PaletteController when an other StyleEditor change the
@@ -752,9 +794,14 @@ protected slots:
 
   void onParamStyleChanged(bool isDragging);
 
+  void onHexChanged();
+
   void onSpecialButtonToggled(bool on);
   void onCustomButtonToggled(bool on);
   void onVectorBrushButtonToggled(bool on);
+
+  void onSliderAppearanceSelected(QAction *);
+  void onPopupMenuAboutToShow();
 
 private:
   QFrame *createBottomWidget();
