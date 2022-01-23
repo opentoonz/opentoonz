@@ -720,6 +720,7 @@ TFilePath ExportScenePopup::createNewProject() {
 
 //-----------------------------------------------------------------------------
 /*
+
 void ExportScenePopup::updateCommandLabel()
 {
   if(m_scenes.empty())
