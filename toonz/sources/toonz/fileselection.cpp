@@ -657,3 +657,4 @@ public:
     fs->exportScene(fp);
   }
 } ExportCurrentSceneCommandHandler;
+}
