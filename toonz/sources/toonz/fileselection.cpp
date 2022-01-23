@@ -632,7 +632,6 @@ void FileSelection::selectAll() {
     TFilePath fp(name.toStdWString());
     FileBrowser::updateItemViewerPanel();
   }
-}
 
 //------------------------------------------------------------------------
 
