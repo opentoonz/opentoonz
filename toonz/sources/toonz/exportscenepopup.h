@@ -5,6 +5,7 @@
 
 #include "toonzqt/dvdialog.h"
 #include "toonzqt/lineedit.h"
+#include "toonzqt/filefield.h"
 #include "tfilepath.h"
 #include "filebrowsermodel.h"
 #include "dvdirtreeview.h"
@@ -162,6 +163,9 @@ class ExportScenePopup final : public DVGui::Dialog {
   ExportSceneTreeView *m_projectTreeView;
   QRadioButton *m_newProjectButton;
   QRadioButton *m_chooseProjectButton;
+
+  QLabel *m_pathFieldLabel;
+  DVGui::FileField *m_projectLocationFld;
 
   bool m_createNewProject;
 

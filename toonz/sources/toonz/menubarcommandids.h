@@ -257,6 +257,7 @@
 #define MI_CollectAssets "MI_CollectAssets"
 #define MI_ImportScenes "MI_ImportScenes"
 #define MI_ExportScenes "MI_ExportScenes"
+#define MI_ExportCurrentScene "MI_ExportCurrentScene"
 
 #define MI_SelectRowKeyframes "MI_SelectRowKeyframes"
 #define MI_SelectColumnKeyframes "MI_SelectColumnKeyframes"

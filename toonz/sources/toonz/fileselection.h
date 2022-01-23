@@ -43,6 +43,7 @@ public:
   void collectAssets();
   void importScenes();
   void exportScenes();
+  void exportScene(TFilePath scenePath);
   void selectAll();
   void separateFilesByColors();
 };

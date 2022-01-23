@@ -28,8 +28,15 @@
 #include <QPainter>
 #include <QApplication>
 #include <QMainWindow>
+#include <QStandardPaths>
 
 using namespace DVGui;
+
+TFilePath getStdDocumentsPath() {
+  QString documentsPath =
+      QStandardPaths::standardLocations(QStandardPaths::DocumentsLocation)[0];
+  return TFilePath(documentsPath);
+}
 
 //------------------------------------------------------------------------
 namespace {
@@ -525,7 +532,7 @@ ExportScenePopup::ExportScenePopup(std::vector<TFilePath> scenes)
   chooseProjectLayout->addWidget(m_chooseProjectButton);
 
   m_projectTreeView = new ExportSceneTreeView(chooseProjectWidget);
-  m_projectTreeView->setMinimumWidth(200);
+  m_projectTreeView->setMinimumWidth(400);
   ret = ret && connect(m_projectTreeView, SIGNAL(focusIn()), this,
                        SLOT(onProjectTreeViweFocusIn()));
   chooseProjectLayout->addWidget(m_projectTreeView);
@@ -538,7 +545,7 @@ ExportScenePopup::ExportScenePopup(std::vector<TFilePath> scenes)
   QGridLayout *newProjectLayout = new QGridLayout(newProjectWidget);
 
   m_newProjectButton =
-      new QRadioButton(tr("Create New Project"), newProjectWidget);
+      new QRadioButton(tr("New Project"), newProjectWidget);
   group->addButton(m_newProjectButton, 1);
   newProjectLayout->addWidget(m_newProjectButton, 0, 0, 1, 2, Qt::AlignLeft);
 
@@ -551,6 +558,21 @@ ExportScenePopup::ExportScenePopup(std::vector<TFilePath> scenes)
                        SLOT(onProjectNameFocusIn()));
   newProjectLayout->setColumnStretch(1, 5);
   newProjectLayout->addWidget(m_newProjectName, 1, 1, 1, 1, Qt::AlignLeft);
+  
+    m_pathFieldLabel = new QLabel(tr("Create In:"), this);
+  QString defaultProjectLocation =
+      Preferences::instance()->getDefaultProjectPath();
+  m_projectLocationFld =
+      new DVGui::FileField(this, getStdDocumentsPath().getQString());
+  ret = ret && connect(m_projectLocationFld->getField(), SIGNAL(focusIn()),
+                       this, SLOT(onProjectNameFocusIn()));
+  if (TSystem::doesExistFileOrLevel(TFilePath(defaultProjectLocation))) {
+    m_projectLocationFld->setPath(defaultProjectLocation);
+  }
+
+  newProjectLayout->addWidget(m_pathFieldLabel, 2, 0,
+                              Qt::AlignRight | Qt::AlignVCenter);
+  newProjectLayout->addWidget(m_projectLocationFld, 2, 1);
 
   newProjectWidget->setLayout(chooseProjectLayout);
   layout->addWidget(newProjectWidget);
@@ -672,16 +694,16 @@ TFilePath ExportScenePopup::createNewProject() {
     DVGui::warning(tr("The project name you specified is already used."));
     return TFilePath();
   }
-
-  TFilePath currentProjectRoot;
-  DvDirModelFileFolderNode *node = dynamic_cast<DvDirModelFileFolderNode *>(
-      m_projectTreeView->getCurrentNode());
-  if (node)
-    currentProjectRoot = node->getPath();
-  else
-    currentProjectRoot    = pm->getCurrentProjectRoot();
-  TFilePath projectFolder = currentProjectRoot + projectName;
+  TFilePath newLocation   = TFilePath(m_projectLocationFld->getPath());
+  TFilePath projectFolder = newLocation + projectName;
   TFilePath projectPath   = pm->projectFolderToProjectPath(projectFolder);
+
+  if (TSystem::doesExistFileOrLevel(projectPath)) {
+    error(tr("Project '%1' already exists").arg(m_newProjectName->text()));
+    return TFilePath();
+  }
+
+  TProject *project = new TProject();rToProjectPath(projectFolder);
   TProject *project       = new TProject();
 
   TProjectP currentProject = pm->getCurrentProject();
