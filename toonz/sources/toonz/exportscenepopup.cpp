@@ -704,7 +704,8 @@ TFilePath ExportScenePopup::createNewProject() {
   }
 
   TProject *project = new TProject();rToProjectPath(projectFolder);
-  
+  TProject *project       = new TProject();
+
   TProjectP currentProject = pm->getCurrentProject();
   assert(currentProject);
   int i;
