@@ -632,7 +632,6 @@ void FileSelection::selectAll() {
     TFilePath fp(name.toStdWString());
     FileBrowser::updateItemViewerPanel();
   }
-}
 
 //------------------------------------------------------------------------
 
@@ -657,3 +656,4 @@ public:
     fs->exportScene(fp);
   }
 } ExportCurrentSceneCommandHandler;
+}

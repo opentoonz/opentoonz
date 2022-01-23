@@ -704,8 +704,7 @@ TFilePath ExportScenePopup::createNewProject() {
   }
 
   TProject *project = new TProject();rToProjectPath(projectFolder);
-  TProject *project       = new TProject();
-
+  
   TProjectP currentProject = pm->getCurrentProject();
   assert(currentProject);
   int i;
@@ -720,16 +719,16 @@ TFilePath ExportScenePopup::createNewProject() {
 
 //-----------------------------------------------------------------------------
 /*
+
 void ExportScenePopup::updateCommandLabel()
 {
   if(m_scenes.empty())
     return;
   int sceneCount= m_scenes.size();
   if(sceneCount==1)
-    m_command->setText(tr("Stai esportando la scena selezionata nel seguente
-progetto:"));
+    m_command->setText(tr("exporting the scene selected in the project"));
   else
-    m_command->setText(tr("Stai esportando ") + QString::number(sceneCount) +
-tr(" scene nel seguente progetto:"));
+    m_command->setText(tr("Exporting") + QString::number(sceneCount) +
+tr(" scenes in the project:"));
 }
 */
