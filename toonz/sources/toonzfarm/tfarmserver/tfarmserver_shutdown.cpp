@@ -16,21 +16,28 @@
 
 int call_socket(char *hostname, unsigned short portnum) {
   struct sockaddr_in sa;
-  struct hostent *hp;
+  struct addrinfo *ai = NULL;
+  struct addrinfo hints;
+  memset(&hints, 0, sizeof(struct addrinfo));
+  hints.ai_family = AF_INET;
   int s;
 
-  if ((hp = gethostbyname(hostname)) == NULL) /* do we know the host's */
+  int suc = getaddrinfo(hostname, NULL, &hints, &ai);
+  if (suc != 0) /* do we know the host's */
   {
     errno = ECONNREFUSED; /* address? */
     return (-1);          /* no */
   }
 
+  struct sockaddr_in *ai_addr;
+  ai_addr = (struct sockaddr_in *)ai->ai_addr;
+
   memset(&sa, 0, sizeof(sa));
-  memcpy((char *)&sa.sin_addr, hp->h_addr, hp->h_length); /* set address */
-  sa.sin_family = hp->h_addrtype;
+  sa.sin_addr = ai_addr->sin_addr;
+  sa.sin_family = ai_addr->sin_family;
   sa.sin_port   = htons((u_short)portnum);
 
-  if ((s = socket(hp->h_addrtype, SOCK_STREAM, 0)) < 0) /* get socket */
+  if ((s = socket(ai_addr->sin_family, SOCK_STREAM, 0)) < 0) /* get socket */
     return (-1);
   if (connect(s, (struct sockaddr *)&sa, sizeof sa) < 0) /* connect */
   {

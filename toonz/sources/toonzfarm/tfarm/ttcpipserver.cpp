@@ -447,15 +447,21 @@ void TTcpIpServer::sendReply(int socket, const QString &reply) {
 int establish(unsigned short portnum, int &sock) {
   char myname[MAXHOSTNAME + 1];
   struct sockaddr_in sa;
-  struct hostent *hp;
+  struct addrinfo *ai = NULL;
+  struct addrinfo hints;
+  memset(&hints, 0, sizeof(struct addrinfo));
+  hints.ai_family = AF_INET;
 
   memset(&sa, 0, sizeof(struct sockaddr_in)); /* clear our address */
   gethostname(myname, MAXHOSTNAME);           /* who are we? */
-  hp = gethostbyname(myname);                 /* get our address info */
-  if (hp == NULL)                             /* we don't exist !? */
+  int suc = getaddrinfo(myname, NULL, &hints, &ai); /* get our address info */
+  if (suc != 0)                             /* we don't exist !? */
     return (-1);
 
-  sa.sin_family = hp->h_addrtype; /* this is our host address */
+  struct sockaddr_in *ai_addr;
+  ai_addr = (struct sockaddr_in *)ai->ai_addr;
+
+  sa.sin_family = ai_addr->sin_family; /* this is our host address */
   sa.sin_port   = htons(portnum); /* this is our port number */
   if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) /* create socket */
   {

@@ -28,16 +28,23 @@ enum {
 //=============================================================================
 
 int askServer(string hostName, int portId, string question, string &answer) {
-  struct hostent *he = gethostbyname(hostName.c_str());
-  if (!he) return HOST_UNKNOWN;
+  struct addrinfo *ai = NULL;
+  struct addrinfo hints;
+  memset(&hints, 0, sizeof(struct addrinfo));
+  hints.ai_family = AF_INET;
+
+  int suc = getaddrinfo(hostName.c_str(), NULL, &hints, &ai);
+  if (suc != 0) return HOST_UNKNOWN;
 
   int socket_id = socket(AF_INET, SOCK_STREAM, 0);
+  struct sockaddr_in *ai_addr;
+  ai_addr = (struct sockaddr_in *)ai->ai_addr;
 
   struct sockaddr_in addr;
   memset((char *)&addr, 0, sizeof addr);
-  addr.sin_family = he->h_addrtype;
-  addr.sin_port   = htons(portId);
-  memcpy((char *)&(addr.sin_addr), he->h_addr, he->h_length);
+  addr.sin_family = ai_addr->sin_family;
+  addr.sin_port   = htons(port);
+  addr.sin_addr = ai_addr->sin_addr;
 
   int rcConnect = connect(socket_id, (struct sockaddr *)&(addr), sizeof addr);
   if (rcConnect == SOCKET_ERROR) return CONNECTION_FAILED;
@@ -82,16 +89,23 @@ TServerProxy::~TServerProxy() {
 //-----------------------------------------------------------------------------
 
 bool TServerProxy::testConnection() const {
-  struct hostent *he = gethostbyname(m_hostName.c_str());
-  if (!he) return false;
+  addrinfo *ai = NULL;
+  struct addrinfo hints;
+  memset(&hints, 0, sizeof(struct addrinfo));
+  hints.ai_family = AF_INET;
+
+  int suc = getaddrinfo(m_hostName.c_str(), NULL, &hints, &ai);
+  if (suc != 0) return false;
 
   int socket_id = socket(AF_INET, SOCK_STREAM, 0);
+  struct sockaddr_in *ai_addr;
+  ai_addr = (struct sockaddr_in *)ai->ai_addr;
 
   struct sockaddr_in addr;
   memset((char *)&addr, 0, sizeof addr);
-  addr.sin_family = he->h_addrtype;
-  addr.sin_port   = htons(m_portId);
-  memcpy((char *)&(addr.sin_addr), he->h_addr, he->h_length);
+  addr.sin_family = ai_addr->sin_family;
+  addr.sin_port   = htons(port);
+  addr.sin_addr = ai_addr->sin_addr;
 
   bool ret = (SOCKET_ERROR !=
               connect(socket_id, (struct sockaddr *)&(addr), sizeof addr));

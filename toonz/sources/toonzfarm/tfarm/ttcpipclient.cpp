@@ -49,12 +49,17 @@ int TTcpIpClient::connect(const QString &hostName, const QString &addrStr,
     unsigned long ipAddr = inet_addr(addrStr.c_str());
   }
 */
+  struct addrinfo *ai = NULL;
+  struct addrinfo hints;
+  memset(&hints, 0, sizeof(struct addrinfo));
+  hints.ai_family = AF_INET;
+
 #if QT_VERSION >= 0x050500
-  struct hostent *he = gethostbyname(hostName.toUtf8());
+  int suc = getaddrinfo(hostName.toUtf8(), NULL, &hints, &ai);
 #else
-  struct hostent *he = gethostbyname(hostName.toAscii());
+  int suc = getaddrinfo(hostName.toAscii(), NULL, &hints, &ai);
 #endif
-  if (!he) {
+  if (suc != 0) {
 #ifdef _WIN32
     int err = WSAGetLastError();
 #else
@@ -63,12 +68,14 @@ int TTcpIpClient::connect(const QString &hostName, const QString &addrStr,
   }
 
   int socket_id = socket(AF_INET, SOCK_STREAM, 0);
+  struct sockaddr_in *ai_addr;
+  ai_addr = (struct sockaddr_in *)ai->ai_addr;
 
   struct sockaddr_in addr;
   memset((char *)&addr, 0, sizeof addr);
-  addr.sin_family = he->h_addrtype;
+  addr.sin_family = ai_addr->sin_family;
   addr.sin_port   = htons(port);
-  memcpy((char *)&(addr.sin_addr), he->h_addr, he->h_length);
+  addr.sin_addr = ai_addr->sin_addr;
 
   int rcConnect = ::connect(socket_id, (struct sockaddr *)&(addr), sizeof addr);
   if (rcConnect == SOCKET_ERROR) {

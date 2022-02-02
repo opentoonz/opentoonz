@@ -22,13 +22,13 @@
 #elif defined(MACOSX)
 #include "tversion.h"
 using namespace TVER;
-#include <netdb.h>      // gethostbyname
+#include <netdb.h>      // getaddrinfo
 #include <arpa/inet.h>  // inet_ntoa
 #else
 // these were included for OSX, i'm not sure if they are required for linux or
 // not? leaving them in as linux was building successfully already. damies13 -
 // 2017-04-15.
-#include <netdb.h>      // gethostbyname
+#include <netdb.h>      // getaddrinfo
 #include <arpa/inet.h>  // inet_ntoa
 #endif
 
@@ -488,14 +488,23 @@ QString TFarmTask::getCommandLine(bool isFarmTask) const {
                    TSystem::toUNC(m_taskFilePath).getWideString()) +
                "\"";
 
+  struct addrinfo *ai = NULL;
+  struct addrinfo hints;
+  memset(&hints, 0, sizeof(struct addrinfo));
+  hints.ai_family = AF_INET;
+
   if (m_callerMachineName != "") {
 #if QT_VERSION >= 0x050500
-    struct hostent *he = gethostbyname(m_callerMachineName.toLatin1());
+    int suc = getaddrinfo(m_callerMachineName.toLatin1(), NULL, &hints, &ai);
 #else
-    struct hostent *he = gethostbyname(m_callerMachineName.toAscii());
+    int suc = getaddrinfo(m_callerMachineName.toAscii(), NULL, &hints, &ai);
 #endif
-    if (he) {
-      char *ipAddress = inet_ntoa(*(struct in_addr *)*(he->h_addr_list));
+    if (suc == 0) {
+      struct sockaddr_in *ai_addr;
+      ai_addr = (struct sockaddr_in *)ai->ai_addr;
+
+      char *ipAddress = inet_ntoa((struct in_addr)ai_addr->sin_addr);
+      //char *ipAddress = inet_ntoa(*(struct in_addr *)*(he->h_addr_list));
 #if QT_VERSION >= 0x050500
       cmdline += " -tmsg " + QString::fromUtf8(ipAddress);
 #else
