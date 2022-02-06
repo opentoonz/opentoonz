@@ -2,7 +2,8 @@
 
 #include "tserverproxy.h"
 #include <iostream.h>
-#include <Winsock.h>
+#include <winsock2.h>
+#include <ws2tcpip.h>
 #include <fcntl.h>
 #include <errno.h>
 #include <stdio.h>

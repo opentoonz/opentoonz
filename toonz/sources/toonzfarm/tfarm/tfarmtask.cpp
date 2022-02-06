@@ -18,7 +18,8 @@
 
 // MACOSX includes
 #ifdef _WIN32
-#include <winsock.h>
+#include <winsock2.h>
+#include <ws2tcpip.h>
 #elif defined(MACOSX)
 #include "tversion.h"
 using namespace TVER;
