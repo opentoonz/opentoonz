@@ -199,7 +199,7 @@ public:
 \param compressed   Enables compression of the whole file
 
 \note     Stream construction <I> does not throw </I>. However, the stream
-        status could be invalid. Remeber to check the stream validity using
+        status could be invalid. Remember to check the stream validity using
         operator bool().
 
 \warning  Stream compression has been verified to be unsafe.

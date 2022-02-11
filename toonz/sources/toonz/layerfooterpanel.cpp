@@ -26,20 +26,29 @@ LayerFooterPanel::LayerFooterPanel(XsheetViewer *viewer, QWidget *parent,
                                    Qt::WFlags flags)
 #endif
     : QWidget(parent, flags), m_viewer(viewer) {
-  const Orientation *o = Orientations::leftToRight();
-  QRect rect           = o->rect(PredefinedRect::LAYER_FOOTER_PANEL);
+  const Orientation *o = viewer->orientation();
 
   setObjectName("layerFooterPanel");
 
-  setFixedSize(rect.size());
-
   setMouseTracking(true);
 
-  m_frameZoomSlider = new QSlider(Qt::Horizontal, this);
+  Qt::Orientation ori =
+      (o->isVerticalTimeline()) ? Qt::Vertical : Qt::Horizontal;
+  bool invDirection  = o->isVerticalTimeline();
+  QString tooltipStr = (o->isVerticalTimeline())
+                           ? tr("Zoom in/out of xsheet")
+                           : tr("Zoom in/out of timeline");
+
+  m_frameZoomSlider = new QSlider(ori, this);
   m_frameZoomSlider->setMinimum(20);
   m_frameZoomSlider->setMaximum(100);
   m_frameZoomSlider->setValue(m_viewer->getFrameZoomFactor());
-  m_frameZoomSlider->setToolTip(tr("Zoom in/out of timeline"));
+  m_frameZoomSlider->setToolTip(tooltipStr);
+  m_frameZoomSlider->setInvertedAppearance(invDirection);
+  m_frameZoomSlider->setInvertedControls(invDirection);
+
+  // for minimal layout, hide the slider
+  if (o->rect(PredefinedRect::ZOOM_SLIDER).isEmpty()) m_frameZoomSlider->hide();
 
   connect(m_frameZoomSlider, SIGNAL(valueChanged(int)), this,
           SLOT(onFrameZoomSliderValueChanged(int)));
@@ -66,13 +75,13 @@ QRect shorter(const QRect original) { return original.adjusted(0, 2, 0, -2); }
 QLine leftSide(const QRect &r) { return QLine(r.topLeft(), r.bottomLeft()); }
 
 QLine rightSide(const QRect &r) { return QLine(r.topRight(), r.bottomRight()); }
-}
+}  // namespace
 
 void LayerFooterPanel::paintEvent(QPaintEvent *event) {
   QPainter p(this);
   p.setRenderHint(QPainter::SmoothPixmapTransform, true);
 
-  const Orientation *o = Orientations::leftToRight();
+  const Orientation *o = m_viewer->orientation();
 
   QRect zoomSliderRect = o->rect(PredefinedRect::ZOOM_SLIDER_AREA);
   p.fillRect(zoomSliderRect, Qt::NoBrush);
@@ -103,18 +112,35 @@ void LayerFooterPanel::paintEvent(QPaintEvent *event) {
   else
     p.drawPixmap(zoomOutImgRect, zoomOut);
 
-  p.setPen(m_viewer->getVerticalLineColor());
-
-  QLine line = {leftSide(shorter(zoomOutImgRect)).translated(-2, 0)};
-  p.drawLine(line);
+  if (!o->isVerticalTimeline()) {
+    p.setPen(m_viewer->getVerticalLineColor());
+    QLine line = {leftSide(shorter(zoomOutImgRect)).translated(-2, 0)};
+    p.drawLine(line);
+  }
 }
 
 void LayerFooterPanel::showOrHide(const Orientation *o) {
   QRect rect = o->rect(PredefinedRect::LAYER_FOOTER_PANEL);
-  if (rect.isEmpty())
-    hide();
+  setFixedSize(rect.size());
+  Qt::Orientation ori =
+      (o->isVerticalTimeline()) ? Qt::Vertical : Qt::Horizontal;
+  bool invDirection  = o->isVerticalTimeline();
+  QString tooltipStr = (o->isVerticalTimeline())
+                           ? tr("Zoom in/out of xsheet")
+                           : tr("Zoom in/out of timeline");
+
+  m_frameZoomSlider->setOrientation(ori);
+  m_frameZoomSlider->setToolTip(tooltipStr);
+  m_frameZoomSlider->setInvertedAppearance(invDirection);
+  m_frameZoomSlider->setInvertedControls(invDirection);
+
+  // for minimal layout, hide the slider
+  if (o->rect(PredefinedRect::ZOOM_SLIDER).isEmpty())
+    m_frameZoomSlider->hide();
   else
-    show();
+    m_frameZoomSlider->show();
+
+  show();
 }
 
 //-----------------------------------------------------------------------------
@@ -133,7 +159,7 @@ void LayerFooterPanel::leaveEvent(QEvent *) {
 }
 
 void LayerFooterPanel::mousePressEvent(QMouseEvent *event) {
-  const Orientation *o = Orientations::leftToRight();
+  const Orientation *o = m_viewer->orientation();
 
   if (event->button() == Qt::LeftButton) {
     // get mouse position
@@ -153,7 +179,7 @@ void LayerFooterPanel::mousePressEvent(QMouseEvent *event) {
 }
 
 void LayerFooterPanel::mouseMoveEvent(QMouseEvent *event) {
-  const Orientation *o = Orientations::leftToRight();
+  const Orientation *o = m_viewer->orientation();
 
   QPoint pos = event->pos();
 
@@ -188,6 +214,28 @@ bool LayerFooterPanel::event(QEvent *event) {
 
 //-----------------------------------------------------------------------------
 
+void LayerFooterPanel::contextMenuEvent(QContextMenuEvent *event) {
+  if (!m_viewer->orientation()->isVerticalTimeline()) {
+    event->ignore();
+    return;
+  }
+
+  QList<int> frames = m_viewer->availableFramesPerPage();
+  if (frames.isEmpty()) {
+    return;
+  }
+
+  QMenu *menu = new QMenu(this);
+  for (auto frame : frames) {
+    QAction *action = menu->addAction(tr("%1 frames per page").arg(frame));
+    action->setData(frame);
+    connect(action, SIGNAL(triggered()), this, SLOT(onFramesPerPageSelected()));
+  }
+  menu->exec(event->globalPos());
+}
+
+//-----------------------------------------------------------------------------
+
 void LayerFooterPanel::setZoomSliderValue(int val) {
   if (val > m_frameZoomSlider->maximum())
     val = m_frameZoomSlider->maximum();
@@ -203,6 +251,14 @@ void LayerFooterPanel::setZoomSliderValue(int val) {
 
 void LayerFooterPanel::onFrameZoomSliderValueChanged(int val) {
   m_viewer->zoomOnFrame(m_viewer->getCurrentRow(), val);
+}
+
+//-----------------------------------------------------------------------------
+
+void LayerFooterPanel::onFramesPerPageSelected() {
+  QAction *action = (QAction *)QObject::sender();
+  int frame       = action->data().toInt();
+  m_viewer->zoomToFramesPerPage(frame);
 }
 
 //-----------------------------------------------------------------------------

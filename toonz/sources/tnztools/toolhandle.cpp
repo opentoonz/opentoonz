@@ -42,7 +42,7 @@ void ToolHandle::setTool(QString name) {
 
   if (m_tool) m_tool->onDeactivate();
 
-  // Camera test uses the automaticly activated CameraTestTool
+  // Camera test uses the automatically activated CameraTestTool
   if (name != "T_CameraTest" && CameraTestCheck::instance()->isEnabled())
     CameraTestCheck::instance()->setIsEnabled(false);
 

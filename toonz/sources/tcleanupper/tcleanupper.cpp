@@ -411,7 +411,10 @@ static void cleanupLevel(TXshSimpleLevel *xl, std::set<TFrameId> fidsInXsheet,
                   QString::fromStdString(fid.expand()));
       continue;
     }
-    TRasterImageP original = xl->getFrameToCleanup(fid);
+    CleanupParameters *params = scene->getProperties()->getCleanupParameters();
+    // if lines are not processed, obtain the original sampled image
+    bool toBeLineProcessed = params->m_lineProcessingMode != lpNone;
+    TRasterImageP original = xl->getFrameToCleanup(fid, toBeLineProcessed);
     if (!original) {
       string err = "    *error* missed frame";
       m_userLog.error(err);
@@ -419,11 +422,9 @@ static void cleanupLevel(TXshSimpleLevel *xl, std::set<TFrameId> fidsInXsheet,
       continue;
     }
 
-    CleanupParameters *params = scene->getProperties()->getCleanupParameters();
-
     if (params->m_lineProcessingMode == lpNone) {
-      TRasterImageP ri;
-      if (params->m_autocenterType == CleanupTypes::AUTOCENTER_NONE)
+      TRasterImageP ri(original);
+      /*if (params->m_autocenterType == CleanupTypes::AUTOCENTER_NONE)
         ri = original;
       else {
         bool autocentered;
@@ -432,7 +433,9 @@ static void cleanupLevel(TXshSimpleLevel *xl, std::set<TFrameId> fidsInXsheet,
           m_userLog.error("The autocentering failed on the current drawing.");
           cout << "The autocentering failed on the current drawing." << endl;
         }
-      }
+      }*/
+      cl->process(original, false, ri, false, true, true, nullptr,
+                  ri->getRaster());
       updater.update(fid, ri);
       continue;
     }

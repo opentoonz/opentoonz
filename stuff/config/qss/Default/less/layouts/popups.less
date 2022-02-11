@@ -77,6 +77,18 @@ QDialog {
   }
 }
 
+#ShortcutViewer {
+  font-size: 17px;
+  & QLineEdit{
+    color:black;
+    border-color: rgb(184, 188, 127);
+    background-color: white;
+    &:focus{
+      background-color: rgb(171, 206, 255);
+    } 
+  }
+}
+
 /* -----------------------------------------------------------------------------
    New Project / Configure Project Window
 ----------------------------------------------------------------------------- */
@@ -114,4 +126,14 @@ ProjectPopup {
 #SubcameraButton {
   padding-left: 5px;
   padding-right: 5px;
+}
+
+/* -----------------------------------------------------------------------------
+   Frame format settings box in FormatSettingsPopup 
+----------------------------------------------------------------------------- */
+#FrameFormatBoxInput {
+  border-color: mix(@accent, rgba(255, 0, 0, 0.7), 40);
+}
+#FrameFormatBoxOutput {
+  border-color: mix(@accent, rgba(0, 0, 255, 0.7), 40);
 }

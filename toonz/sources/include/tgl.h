@@ -69,6 +69,12 @@ class TCubic;
 #endif
 
 //=============================================================================
+// settings for 30bit display
+
+#define TGL_TexFmt10 GL_RGB10_A2
+#define TGL_TYPE16 GL_UNSIGNED_SHORT
+
+//=============================================================================
 
 #ifdef _DEBUG
 #define CHECK_ERRORS_BY_GL                                                     \

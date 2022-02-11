@@ -33,6 +33,7 @@
 #include <QDesktopWidget>
 #include <QDialog>
 #include <QLineEdit>
+#include <QScreen>
 
 extern TEnv::StringVar EnvSafeAreaName;
 
@@ -64,7 +65,7 @@ TPanel::TPanel(QWidget *parent, Qt::WindowFlags flags,
 //-----------------------------------------------------------------------------
 
 TPanel::~TPanel() {
-  // On quitting, save the floating panel's geomtry and state in order to
+  // On quitting, save the floating panel's geometry and state in order to
   // restore them when opening the floating panel next time
   if (isFloating()) {
     TFilePath savePath =
@@ -175,6 +176,58 @@ void TPanel::restoreFloatingPanelState() {
     persistent->load(settings);
 }
 
+//-----------------------------------------------------------------------------
+// if the panel has no contents to be zoomed, simply resize the panel here
+// currently only Flipbook and Color Model panels support resizing of contents
+void TPanel::zoomContentsAndFitGeometry(bool forward) {
+  if (!m_floating) return;
+
+  auto getScreen = [&]() {
+    QScreen *ret = nullptr;
+    ret          = QGuiApplication::screenAt(geometry().topLeft());
+    if (ret) return ret;
+    ret = QGuiApplication::screenAt(geometry().topRight());
+    if (ret) return ret;
+    ret = QGuiApplication::screenAt(geometry().center());
+    if (ret) return ret;
+    ret = QGuiApplication::screenAt(geometry().bottomLeft());
+    if (ret) return ret;
+    ret = QGuiApplication::screenAt(geometry().bottomRight());
+    return ret;
+  };
+
+  // Get screen geometry
+  QScreen *screen = getScreen();
+  if (!screen) return;
+  QRect screenGeom = screen->availableGeometry();
+
+  QSize newSize;
+  if (forward)
+    // x1.2 scale
+    newSize = QSize(width() * 6 / 5, height() * 6 / 5);
+  else
+    // 1/1.2 scale
+    newSize = QSize(width() * 5 / 6, height() * 5 / 6);
+
+  QRect newGeom(geometry().topLeft(), newSize);
+  if (!screenGeom.contains(newGeom)) {
+    if (newGeom.width() > screenGeom.width())
+      newGeom.setWidth(screenGeom.width());
+    if (newGeom.right() > screenGeom.right())
+      newGeom.moveRight(screenGeom.right());
+    else if (newGeom.left() < screenGeom.left())
+      newGeom.moveLeft(screenGeom.left());
+
+    if (newGeom.height() > screenGeom.height())
+      newGeom.setHeight(screenGeom.height());
+    if (newGeom.bottom() > screenGeom.bottom())
+      newGeom.moveBottom(screenGeom.bottom());
+    else if (newGeom.top() < screenGeom.top())
+      newGeom.moveTop(screenGeom.top());
+  }
+  setGeometry(newGeom);
+}
+
 //=============================================================================
 // TPanelTitleBarButton
 //-----------------------------------------------------------------------------
@@ -225,34 +278,23 @@ void TPanelTitleBarButton::setPressed(bool pressed) {
 //-----------------------------------------------------------------------------
 
 void TPanelTitleBarButton::paintEvent(QPaintEvent *event) {
+  // Set unique pressed colors if filename contains the following words:
+  QColor bgColor = getPressedColor();
+  if (m_standardPixmapName.contains("freeze", Qt::CaseInsensitive))
+    bgColor = getFreezeColor();
+  if (m_standardPixmapName.contains("preview", Qt::CaseInsensitive))
+    bgColor = getPreviewColor();
+
+  QPixmap panePixmap    = recolorPixmap(svgToPixmap(m_standardPixmapName));
+  QPixmap panePixmapOff = compositePixmap(panePixmap, 0.8);
+  QPixmap panePixmapOver =
+      compositePixmap(panePixmap, 1, QSize(), 0, 0, getOverColor());
+  QPixmap panePixmapOn = compositePixmap(panePixmap, 1, QSize(), 0, 0, bgColor);
+
   QPainter painter(this);
-
-  // Create color states for the button
-  QPixmap normalPixmap(m_standardPixmap.size());
-  QPixmap onPixmap(m_standardPixmap.size());
-  QPixmap overPixmap(m_standardPixmap.size());
-  normalPixmap.fill(Qt::transparent);
-  onPixmap.fill(QColor(getPressedColor()));
-  overPixmap.fill(QColor(getOverColor()));
-
-  // Set unique 'pressed' colors if filename contains...
-  if (m_standardPixmapName.contains("freeze", Qt::CaseInsensitive)) {
-    onPixmap.fill(QColor(getFreezeColor()));
-  }
-  if (m_standardPixmapName.contains("preview", Qt::CaseInsensitive)) {
-    onPixmap.fill(QColor(getPreviewColor()));
-  }
-
-  // Compose the state colors
   painter.drawPixmap(
-      0, 0, m_pressed ? onPixmap : m_rollover ? overPixmap : normalPixmap);
-
-  // Icon
-  QPixmap panePixmap    = recolorPixmap(m_standardPixmap);
-  QPixmap paneOffPixmap = setOpacity(panePixmap, 0.8);
-  painter.drawPixmap(
-      0, 0, m_pressed ? panePixmap : m_rollover ? panePixmap : paneOffPixmap);
-
+      0, 0,
+      m_pressed ? panePixmapOn : m_rollover ? panePixmapOver : panePixmapOff);
   painter.end();
 }
 

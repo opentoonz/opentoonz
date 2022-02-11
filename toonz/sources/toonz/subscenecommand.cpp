@@ -695,7 +695,7 @@ std::set<int> explodeStageObjects(
                    objGroupData, groupId);
   }
 
-  // add colums;
+  // add columns;
   FxDag *innerDag            = subXsh->getFxDag();
   FxDag *outerDag            = xsh->getFxDag();
   TStageObjectId tmpParentId = parentId;
@@ -1300,7 +1300,7 @@ void collapseColumns(std::set<int> indices, bool columnsOnly) {
   data->storeColumns(indices, xsh, StageObjectsData::eDoClone);
   data->storeColumnFxs(indices, xsh, StageObjectsData::eDoClone);
 
-  ExpressionReferenceMonitor *monitor = xsh->getExpRefMonitor()->clone();
+  // ExpressionReferenceMonitor *monitor = xsh->getExpRefMonitor()->clone();
 
   ToonzScene *scene = app->getCurrentScene()->getScene();
   TXshLevel *xl     = scene->createNewLevel(CHILD_XSHLEVEL);
@@ -1323,6 +1323,7 @@ void collapseColumns(std::set<int> indices, bool columnsOnly) {
   if (!columnsOnly)
     bringPegbarsInsideChildXsheet(xsh, childXsh, indices, newIndices, idTable);
 
+  ExpressionReferenceManager::instance()->refreshXsheetRefInfo(childXsh);
   ExpressionReferenceManager::instance()->transferReference(xsh, childXsh,
                                                             idTable, fxTable);
 
@@ -1411,7 +1412,7 @@ void collapseColumns(std::set<int> indices,
                      StageObjectsData::eDoClone);
   data->storeColumnFxs(indices, xsh, StageObjectsData::eDoClone);
 
-  ExpressionReferenceMonitor *monitor = xsh->getExpRefMonitor()->clone();
+  // ExpressionReferenceMonitor *monitor = xsh->getExpRefMonitor()->clone();
 
   ToonzScene *scene = app->getCurrentScene()->getScene();
   TXshLevel *xl     = scene->createNewLevel(CHILD_XSHLEVEL);
@@ -1430,6 +1431,7 @@ void collapseColumns(std::set<int> indices,
                        fxTable);
   childXsh->updateFrameCount();
 
+  ExpressionReferenceManager::instance()->refreshXsheetRefInfo(childXsh);
   ExpressionReferenceManager::instance()->transferReference(xsh, childXsh,
                                                             idTable, fxTable);
 
@@ -1475,7 +1477,7 @@ void collapseColumns(std::set<int> indices, const std::set<TFx *> &fxs,
   data->storeColumns(indices, xsh, StageObjectsData::eDoClone);
   data->storeFxs(fxs, xsh, StageObjectsData::eDoClone);
 
-  ExpressionReferenceMonitor *monitor = xsh->getExpRefMonitor()->clone();
+  // ExpressionReferenceMonitor *monitor = xsh->getExpRefMonitor()->clone();
 
   ToonzScene *scene = app->getCurrentScene()->getScene();
   TXshLevel *xl     = scene->createNewLevel(CHILD_XSHLEVEL);
@@ -1494,6 +1496,7 @@ void collapseColumns(std::set<int> indices, const std::set<TFx *> &fxs,
   if (!columnsOnly)
     bringPegbarsInsideChildXsheet(xsh, childXsh, indices, newIndices, idTable);
 
+  ExpressionReferenceManager::instance()->refreshXsheetRefInfo(childXsh);
   ExpressionReferenceManager::instance()->transferReference(xsh, childXsh,
                                                             idTable, fxTable);
 
@@ -2490,13 +2493,13 @@ void SubsceneCmd::explode(int index) {
           childLevel->getXsheet(), index, removeColumn, ret == 2))
     return;
 
-  // Collect column stage object informations
+  // Collect column stage object information
   TStageObjectId colId    = TStageObjectId::ColumnId(index);
   TStageObjectId parentId = xsh->getStageObjectParent(colId);
   TStageObject *obj = xsh->getStageObjectTree()->getStageObject(colId, false);
   assert(obj);
 
-  // Collect StageObjects group informations
+  // Collect StageObjects group information
   QStack<int> objGroupIds;
   QStack<std::wstring> objGroupNames;
   int objEditingGroup = obj->getEditingGroupId();
@@ -2520,7 +2523,7 @@ void SubsceneCmd::explode(int index) {
   TFx *columnFx       = column->getFx();
   TFxAttributes *attr = columnFx->getAttributes();
 
-  // Collect Fx group informations
+  // Collect Fx group information
   QStack<int> fxGroupIds;
   QStack<std::wstring> fxGroupNames;
   int fxEditingGroup = attr->getEditingGroupId();

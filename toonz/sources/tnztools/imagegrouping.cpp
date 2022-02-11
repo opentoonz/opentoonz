@@ -258,7 +258,7 @@ std::vector<std::pair<TStroke *, int>> getSelectedGroups(TVectorImage *vimg,
   return ret;
 }
 
-}  // namepsace
+}  // namespace
 
 //--------------------------------------------------------------------------------------
 

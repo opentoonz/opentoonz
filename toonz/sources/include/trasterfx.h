@@ -38,7 +38,7 @@ class TPalette;
 //******************************************************************************
 
 /*!
-  \brief    Data class containing the relevant additional informations needed in
+  \brief    Data class containing the relevant additional information needed in
             a render process.
 
   \details  This class stores most of the data required by Toonz and single fxs
@@ -55,7 +55,7 @@ class TPalette;
   render
             on the default reference.
 
-  \sa       TRasterFx::compute() for further informations.
+  \sa       TRasterFx::compute() for further information.
 */
 
 class DVAPI TRenderSettings {
@@ -145,6 +145,11 @@ public:
 
   bool m_applyShrinkToViewer;  //!< Whether shrink must be considered.   \note
                                //! Should be moved to TOutputProperties.
+
+  // when this flag is true, TLevelColumnFx::doGetBBox returns full image sized
+  // box instead of the bounding box. It takes effect only for Toonz Raster /
+  // Raster levels. Currently used only in Tile Fx Iwa. (see iwa_tilefx.cpp)
+  bool m_getFullSizeBBox;
 
   /*-- カメラサイズ --*/
   TRectD m_cameraBox;

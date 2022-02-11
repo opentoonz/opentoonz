@@ -1438,7 +1438,7 @@ static bool isCloseEnoughP2P(double facMin, double facMax, TStroke *s1,
 
   dist2 = tdistance2(p0, p1);
 
-  /*!when closing beetween a normal stroke and a 0-thickness stroke (very
+  /*!when closing between a normal stroke and a 0-thickness stroke (very
    * typical) the thin  one is assumed to have same thickness of the other*/
   if (p0.thick == 0)
     p0.thick = p1.thick;
@@ -1618,7 +1618,7 @@ static bool isCloseEnoughP2L(double facMin, double facMax, TStroke *s1,
 
     TThickPoint p1 = s2->getChunk(index)->getThickPoint(t);
 
-    /*!when closing beetween a normal stroke and a 0-thickness stroke (very
+    /*!when closing between a normal stroke and a 0-thickness stroke (very
      * typical) the thin  one is assumed to have same thickness of the other*/
     if (p0.thick == 0)
       p0.thick = p1.thick;

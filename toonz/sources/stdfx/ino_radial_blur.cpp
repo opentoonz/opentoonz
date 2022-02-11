@@ -90,7 +90,7 @@ public:
         //,this->m_radius->getValue(frame) * scale
         ,
         0 /* debug:2012-02-01:ゼロ以上だとmarginが小さすぎになり画像が切れてしまう
-             */
+           */
 
         ,
         (this->m_anti_alias->getValue() ? 4 : 1));
@@ -143,7 +143,7 @@ public:
 
   // add 20140130
   void getParamUIs(TParamUIConcept *&concepts, int &length) override {
-    concepts = new TParamUIConcept[length = 2];
+    concepts = new TParamUIConcept[length = 3];
 
     concepts[0].m_type  = TParamUIConcept::POINT;
     concepts[0].m_label = "Center";
@@ -153,6 +153,9 @@ public:
     concepts[1].m_label = "Radius";
     concepts[1].m_params.push_back(m_radius);
     concepts[1].m_params.push_back(m_center);
+
+    concepts[2].m_type = TParamUIConcept::COMPASS;
+    concepts[2].m_params.push_back(m_center);
   }
   // add 20140130
 };
@@ -210,7 +213,7 @@ void fx_(const TRasterP in_ras  // with margin
   ino::arr_to_ras(in_gr8->getRawData(), ino::channels(), out_ras, margin);
   in_gr8->unlock();
 }
-}
+}  // namespace
 //------------------------------------------------------------
 void ino_radial_blur::doCompute(TTile &tile, double frame,
                                 const TRenderSettings &ri) {
@@ -282,7 +285,8 @@ void ino_radial_blur::doCompute(TTile &tile, double frame,
     std::ostringstream os;
     os << "params"
        << "  cx " << center.x << "  cy " << center.y << "  blur " << blur
-       << "  radius " << radius << "  twist " << twist
+       << "  radius " << radius << "  twist "
+       << twist
        // << "  twist_radius " << twist_radius
        << "  reference " << refer_mode << "  alpha_rendering " << alpha_rend_sw
        << "  anti_alias " << anti_alias_sw << "  render_center "

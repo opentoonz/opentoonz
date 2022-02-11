@@ -52,6 +52,8 @@ public:
                  std::map<std::pair<int, int>, double> &partScales);
 
   bool port_is_used(int i, struct particles_values &values);
+  bool port_is_used_for_value(int i, struct particles_values &values);
+  bool port_is_used_for_gradient(int i, struct particles_values &values);
 
   /*-
      do_source_gradationがONのとき、入力画像のアルファ値に比例して発生濃度を変える。
@@ -81,7 +83,7 @@ public:
   void normalize_array(std::vector<std::vector<TPointD>> &myregions,
                        TPointD pos, int lx, int ly, int regioncounter,
                        std::vector<int> &myarray, std::vector<int> &lista,
-                       std::vector<int> &listb, std::vector<int> & final);
+                       std::vector<int> &listb, std::vector<int> &final);
 
   void fill_array(TTile *ctrl1, int &regioncount, std::vector<int> &myarray,
                   std::vector<int> &lista, std::vector<int> &listb, int thres);

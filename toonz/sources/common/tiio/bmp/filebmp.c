@@ -1194,8 +1194,8 @@ static int skip_rowsBMPC4(FILE *fp, UINT rows)
         rows = 0;
         break;
       case 0x02:
-        c1 = getc(fp); /* x buffer offest */
-        c1 = getc(fp); /* y buffer offest */
+        c1 = getc(fp); /* x buffer offset */
+        c1 = getc(fp); /* y buffer offset */
         rows -= c1;
         break;
       default:
@@ -1473,8 +1473,8 @@ static int skip_rowsBMPC8(FILE *fp, UINT rows)
         rows = 0;
         break;
       case 0x02:
-        c1 = getc(fp); /* x buffer offest */
-        c1 = getc(fp); /* y buffer offest */
+        c1 = getc(fp); /* x buffer offset */
+        c1 = getc(fp); /* y buffer offset */
         rows -= c1;
         break;
       default:

@@ -2376,7 +2376,7 @@ void rop_resample_rgbm(TRasterPT<T> rout, const TRasterPT<T> &rin,
   // the *opposites* of fractionary parts (explained later).
   // NOTE: We'll assume we want to include in the filter mask all
   //*integer positions around a fractionary displacement of the origin*;
-  // so the approximations below are stricly necessary.
+  // so the approximations below are strictly necessary.
 
   min_pix_ref_u = intLE(min_pix_out_u_);
   min_pix_ref_v = intLE(min_pix_out_v_);
@@ -3059,7 +3059,7 @@ void do_resample(TRasterCM32P rout, const TRasterCM32P &rin,
                v * wrapin;  // Take the associated input pixel pointer
       tcm[0] = in_tcm[0];
       if (u < lu - 1 && v < lv - 1) {
-        // Also take their 4 next neighours (we shall perform a kinf of bilinear
+        // Also take their 4 next neighbours (we shall perform a kind of bilinear
         // interpolation)
         tcm[1] = in_tcm[1];
         tcm[2] = in_tcm[wrapin];

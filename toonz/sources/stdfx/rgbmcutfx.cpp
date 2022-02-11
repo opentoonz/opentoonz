@@ -5,8 +5,9 @@
 #include "tpixelutils.h"
 
 #include "tparamset.h"
+#include "globalcontrollablefx.h"
 
-class RGBMCutFx final : public TStandardRasterFx {
+class RGBMCutFx final : public GlobalControllableFx {
   FX_PLUGIN_DECLARATION(RGBMCutFx)
 
   TRasterFxPort m_input;

@@ -67,6 +67,7 @@ class OutputSettingsPopup : public DVGui::Dialog {
   DVGui::DoubleLineEdit *m_stereoShift;
   QComboBox *m_rasterGranularityOm;
   QComboBox *m_threadsComboOm;
+  bool m_allowMT;
 
   DVGui::DoubleLineEdit *m_frameRateFld;
   QPushButton *m_fileFormatButton;
@@ -99,6 +100,7 @@ protected:
   TOutputProperties *getProperties() const;
   void showEvent(QShowEvent *) override;
   void hideEvent(QHideEvent *) override;
+  bool eventFilter(QObject *, QEvent *) override;
 
 protected slots:
 

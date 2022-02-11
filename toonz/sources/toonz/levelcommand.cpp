@@ -62,6 +62,61 @@ public:
 
 }  // namespace
 
+//-----------------------------------------------------------------------------
+
+bool LevelCmd::removeUnusedLevelsFromCast(bool showMessage) {
+  TApp *app         = TApp::instance();
+  ToonzScene *scene = app->getCurrentScene()->getScene();
+
+  TLevelSet *levelSet = scene->getLevelSet();
+
+  std::set<TXshLevel *> usedLevels;
+  scene->getTopXsheet()->getUsedLevels(usedLevels);
+
+  std::vector<TXshLevel *> unused;
+
+  for (int i = 0; i < levelSet->getLevelCount(); i++) {
+    TXshLevel *xl = levelSet->getLevel(i);
+    if (usedLevels.count(xl) == 0) unused.push_back(xl);
+  }
+  if (unused.empty()) {
+    if (showMessage) DVGui::error(QObject::tr("No unused levels"));
+    return false;
+  } else {
+    TUndoManager *um = TUndoManager::manager();
+    um->beginBlock();
+    for (int i = 0; i < (int)unused.size(); i++) {
+      TXshLevel *xl = unused[i];
+      um->add(new DeleteLevelUndo(xl));
+      scene->getLevelSet()->removeLevel(xl);
+    }
+    TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+    TApp::instance()->getCurrentScene()->notifyCastChange();
+
+    um->endBlock();
+  }
+  return true;
+}
+
+bool LevelCmd::removeLevelFromCast(TXshLevel *level, ToonzScene *scene,
+                                   bool showMessage) {
+  if (!scene) scene = TApp::instance()->getCurrentScene()->getScene();
+  if (scene->getChildStack()->getTopXsheet()->isLevelUsed(level)) {
+    if (showMessage) {
+      DVGui::error(
+          QObject::tr("It is not possible to delete the used level %1.")
+              .arg(QString::fromStdWString(
+                  level->getName())));  //"E_CantDeleteUsedLevel_%1"
+    }
+    return false;
+  } else {
+    TUndoManager *um = TUndoManager::manager();
+    um->add(new DeleteLevelUndo(level));
+    scene->getLevelSet()->removeLevel(level);
+  }
+  return true;
+}
+
 //=============================================================================
 // RemoveUnusedLevelCommand
 //-----------------------------------------------------------------------------
@@ -70,38 +125,7 @@ class RemoveUnusedLevelsCommand final : public MenuItemHandler {
 public:
   RemoveUnusedLevelsCommand() : MenuItemHandler(MI_RemoveUnused) {}
 
-  void execute() override {
-    TApp *app         = TApp::instance();
-    ToonzScene *scene = app->getCurrentScene()->getScene();
-
-    TLevelSet *levelSet = scene->getLevelSet();
-
-    std::set<TXshLevel *> usedLevels;
-    scene->getTopXsheet()->getUsedLevels(usedLevels);
-
-    std::vector<TXshLevel *> unused;
-
-    for (int i = 0; i < levelSet->getLevelCount(); i++) {
-      TXshLevel *xl = levelSet->getLevel(i);
-      if (usedLevels.count(xl) == 0) unused.push_back(xl);
-    }
-    if (unused.empty()) {
-      DVGui::error(QObject::tr("No unused levels"));
-      return;
-    } else {
-      TUndoManager *um = TUndoManager::manager();
-      um->beginBlock();
-      for (int i = 0; i < (int)unused.size(); i++) {
-        TXshLevel *xl = unused[i];
-        um->add(new DeleteLevelUndo(xl));
-        scene->getLevelSet()->removeLevel(xl);
-      }
-      TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
-      TApp::instance()->getCurrentScene()->notifyCastChange();
-
-      um->endBlock();
-    }
-  }
+  void execute() override { LevelCmd::removeUnusedLevelsFromCast(); }
 } removeUnusedLevelsCommand;
 
 //=============================================================================
@@ -111,22 +135,6 @@ public:
 class RemoveLevelCommand final : public MenuItemHandler {
 public:
   RemoveLevelCommand() : MenuItemHandler(MI_RemoveLevel) {}
-
-  bool removeLevel(TXshLevel *level) {
-    TApp *app         = TApp::instance();
-    ToonzScene *scene = app->getCurrentScene()->getScene();
-    if (scene->getChildStack()->getTopXsheet()->isLevelUsed(level))
-      DVGui::error(
-          QObject::tr("It is not possible to delete the used level %1.")
-              .arg(QString::fromStdWString(
-                  level->getName())));  //"E_CantDeleteUsedLevel_%1"
-    else {
-      TUndoManager *um = TUndoManager::manager();
-      um->add(new DeleteLevelUndo(level));
-      scene->getLevelSet()->removeLevel(level);
-    }
-    return true;
-  }
 
   void execute() override {
     TXsheet *xsheet = TApp::instance()->getCurrentXsheet()->getXsheet();
@@ -142,7 +150,7 @@ public:
     }
     int count = 0;
     for (int i = 0; i < (int)levels.size(); i++)
-      if (removeLevel(levels[i])) count++;
+      if (LevelCmd::removeLevelFromCast(levels[i])) count++;
     if (count == 0) return;
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
     TApp::instance()->getCurrentScene()->notifyCastChange();
@@ -503,6 +511,14 @@ void LevelCmd::addMissingLevelsToCast(const QList<TXshColumnP> &columns) {
 }
 
 void LevelCmd::addMissingLevelsToCast(std::set<TXshLevel *> &levels) {
+  // remove zerary fx levels which are not registered in the cast
+  for (auto it = levels.begin(); it != levels.end();) {
+    if ((*it)->getZeraryFxLevel())
+      it = levels.erase(it);
+    else
+      ++it;
+  }
+
   if (levels.empty()) return;
   TUndoManager::manager()->beginBlock();
   TLevelSet *levelSet =
@@ -522,7 +538,24 @@ void LevelCmd::addMissingLevelsToCast(std::set<TXshLevel *> &levels) {
       std::wstring oldName = levelName;
       NameModifier nm(levelName);
       levelName = nm.getNext();
-      while (levelSet->hasLevel(levelName)) levelName = nm.getNext();
+      while (1) {
+        TXshLevel *existingLevel = levelSet->getLevel(levelName);
+        // if the level name is not used in the cast, nothing to do
+        if (!existingLevel) break;
+        // try if the existing level is unused in the xsheet and remove from the
+        // cast
+        else if (Preferences::instance()->isAutoRemoveUnusedLevelsEnabled() &&
+                 LevelCmd::removeLevelFromCast(
+                     existingLevel,
+                     TApp::instance()->getCurrentScene()->getScene(), false)) {
+          DVGui::info(
+              QObject::tr("Removed unused level %1 from the scene cast. (This "
+                          "behavior can be disabled in Preferences.)")
+                  .arg(QString::fromStdWString(levelName)));
+          break;
+        }
+        levelName = nm.getNext();
+      }
       addLevelToCastUndo *undo =
           new addLevelToCastUndo(level, levelName, oldName);
       undo->m_isLastInRedoBlock = false;  // prevent to emit signal

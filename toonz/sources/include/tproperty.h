@@ -391,7 +391,10 @@ public:
 
   void setValue(const std::wstring &value) {
     int idx = indexOf(value);
-    if (idx < 0) throw RangeError();
+    //if (idx < 0) throw RangeError();
+    if (idx < 0)
+      idx = 0;  // Avoid exception if program's item list doesn't contain
+                //  the selected item in scene file
     m_index = idx;
   }
 

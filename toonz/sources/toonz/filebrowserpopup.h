@@ -32,6 +32,7 @@ class QPushButton;
 class QComboBox;
 class QGroupBox;
 class QCheckBox;
+class FrameNumberLineEdit;
 
 namespace DVGui {
 class ColorField;
@@ -89,7 +90,7 @@ protected:
   std::set<TFilePath> m_selectedPaths;  //!< Paths in the active selection.
   TFilePath m_currentProjectPath;       //!< Path of current project.
   //!  \deprecated  Should not be cached...
-  // keep TFrameId list in order to speed up the loading of sequencial files
+  // keep TFrameId list in order to speed up the loading of sequential files
   std::list<std::vector<TFrameId>> m_currentFIdsSet;
   FileBrowser *m_browser;
 
@@ -184,7 +185,7 @@ protected:
 //! asks the user for a \a single file path to save something to.
 class GenericSaveFilePopup : public FileBrowserPopup {
 public:
-  GenericSaveFilePopup(const QString &title);
+  GenericSaveFilePopup(const QString &title, QWidget *customWidget = nullptr);
 
   /*!
 This function shows the popup and blocks until a suitable
@@ -266,11 +267,11 @@ class LoadLevelPopup final : public FileBrowserPopup {
   Q_OBJECT
 
   QFrame *m_subsequenceFrame;
-  DVGui::IntLineEdit *m_fromFrame, *m_toFrame;
+  FrameNumberLineEdit *m_fromFrame, *m_toFrame;
 
   QWidget *m_arrLvlPropWidget;
   QFrame *m_arrangementFrame;
-  DVGui::IntLineEdit *m_xFrom, *m_xTo;
+  FrameNumberLineEdit *m_xFrom, *m_xTo;
   QComboBox *m_stepCombo, *m_incCombo;
   DVGui::IntLineEdit *m_posFrom, *m_posTo;
 
@@ -322,7 +323,7 @@ protected slots:
   void onWhiteTranspClicked();
 
 private:
-  // update the fields acording to the current Path
+  // update the fields according to the current Path
   void updateBottomGUI(void);
   // if some option in the preferences is selected, load the level with removing
   // six letters of the scene name from the level name

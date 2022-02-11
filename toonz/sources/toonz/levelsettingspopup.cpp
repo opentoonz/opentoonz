@@ -10,6 +10,7 @@
 #include "castselection.h"
 #include "fileselection.h"
 #include "columnselection.h"
+#include "levelcommand.h"
 
 // TnzQt includes
 #include "toonzqt/menubarcommand.h"
@@ -950,16 +951,31 @@ void LevelSettingsPopup::onNameChanged() {
   TLevelSet *levelSet =
       TApp::instance()->getCurrentScene()->getScene()->getLevelSet();
 
+  TUndoManager::manager()->beginBlock();
+
+  // remove existing & unused level
+  if (Preferences::instance()->isAutoRemoveUnusedLevelsEnabled()) {
+    TXshLevel *existingLevel = levelSet->getLevel(text.toStdWString());
+    if (existingLevel &&
+        LevelCmd::removeLevelFromCast(existingLevel, nullptr, false))
+      DVGui::info(QObject::tr("Removed unused level %1 from the scene cast. "
+                              "(This behavior can be disabled in Preferences.)")
+                      .arg(text));
+  }
+
   if (!levelSet->renameLevel(level, text.toStdWString())) {
     error("The name " + text +
           " you entered for the level is already used.\nPlease enter a "
           "different name.");
     m_nameFld->setFocus();
+    TUndoManager::manager()->endBlock();
     return;
   }
 
   TUndoManager::manager()->add(
       new LevelSettingsUndo(level, LevelSettingsUndo::Name, oldName, text));
+
+  TUndoManager::manager()->endBlock();
 
   TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
   TApp::instance()->getCurrentScene()->notifyCastChange();
@@ -1122,7 +1138,7 @@ void LevelSettingsPopup::onScanPathChanged() {
   QString text = m_scanPathFld->getPath();
   TFilePath newScanPath(text.toStdWString());
 
-  // limit the avaiable formats for now
+  // limit the available formats for now
   if (newScanPath.getType() != "tif" && newScanPath.getType() != "tiff" &&
       newScanPath.getType() != "tzi") {
     m_scanPathFld->setPath(toQString(sl->getScannedPath()));

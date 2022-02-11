@@ -91,7 +91,7 @@ public:
 
   virtual void setPointValue(const TPointD &p){};
 
-  virtual QSize getPreferedSize() { return QSize(200, 28); }
+  virtual QSize getPreferredSize() { return QSize(200, 28); }
 
   static void setFxHandle(TFxHandle *fxHandle);
 
@@ -369,7 +369,8 @@ public:
 
   void updateField(double value) override;
 
-  QSize getPreferedSize() override { return QSize(260, 28); }
+  QSize getPreferredSize() override { return QSize(260, 26); }
+  void setPrecision(int precision) override;
 
 protected slots:
   void onChange(bool);
@@ -392,7 +393,7 @@ public:
 
   void updateField(DoublePair value) override;
 
-  QSize getPreferedSize() override { return QSize(300, 20); }
+  QSize getPreferredSize() override { return QSize(300, 20); }
   void setPrecision(int precision) override;
 
 protected slots:
@@ -417,7 +418,7 @@ public:
 
   void updateField(TPointD value) override;
 
-  QSize getPreferedSize() override { return QSize(270, 28); }
+  QSize getPreferredSize() override { return QSize(270, 28); }
 
 protected slots:
   void onChange(bool);
@@ -439,7 +440,7 @@ public:
 
   void updateField(TPixel32 value) override;
 
-  QSize getPreferedSize() override { return QSize(480, 40); }
+  QSize getPreferredSize() override { return QSize(480, 40); }
 
   /*-- RgbLinkButtonの実行のため --*/
   TPixel32 getColor();
@@ -488,7 +489,7 @@ public:
 
   void setParams();
 
-  QSize getPreferedSize() override { return QSize(477, 60); }
+  QSize getPreferredSize() override { return QSize(477, 60); }
 
 protected slots:
   void onKeyToggled();
@@ -514,11 +515,14 @@ signals:
 class DVAPI ModeSensitiveBox final : public QWidget {
   Q_OBJECT
   QList<int> m_modes;
+  int m_currentMode;
 
 public:
   ModeSensitiveBox(QWidget *parent, ModeChangerParamField *modeChanger,
                    QList<int> modes);
+  ModeSensitiveBox(QWidget *parent, QCheckBox *checkBox);
   QList<int> modes() { return m_modes; }
+  bool isActive() { return m_modes.contains(m_currentMode); }
 protected slots:
   void onModeChanged(int mode);
 };
@@ -540,7 +544,7 @@ public:
                 int frame) override;
   void update(int frame) override;
 
-  QSize getPreferedSize() override { return QSize(150, 20); }
+  QSize getPreferredSize() override { return QSize(150, 20); }
 
 protected slots:
   void onChange(const QString &str);
@@ -563,7 +567,7 @@ public:
                 int frame) override;
   void update(int frame) override;
 
-  QSize getPreferedSize() override { return QSize(20, 15); }
+  QSize getPreferredSize() override { return QSize(20, 15); }
 
 protected slots:
   void onToggled(bool checked);
@@ -592,7 +596,7 @@ public:
                 int frame) override;
   void update(int frame) override;
 
-  QSize getPreferedSize() override { return QSize(50, 20); }
+  QSize getPreferredSize() override { return QSize(50, 19); }
 
 protected slots:
   void onChange(bool isDragging = false);
@@ -632,7 +636,7 @@ public:
                 int frame) override;
   void update(int frame) override;
 
-  QSize getPreferedSize() override {
+  QSize getPreferredSize() override {
     if (m_textFld)
       return QSize(100, 20);
     else
@@ -662,7 +666,7 @@ public:
                 int frame) override;
   void update(int frame) override;
 
-  QSize getPreferedSize() override { return QSize(150, 20); }
+  QSize getPreferredSize() override { return QSize(150, 20); }
 
 protected slots:
   void findStyles(const QFont &font);
@@ -688,7 +692,7 @@ public:
 
   void setParams();
 
-  QSize getPreferedSize() override;
+  QSize getPreferredSize() override;
 
 protected slots:
   void onChannelChanged(int);

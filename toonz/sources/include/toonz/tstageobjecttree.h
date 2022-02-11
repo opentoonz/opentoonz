@@ -120,7 +120,7 @@ parent of the removed column.
   void removeColumn(int index);
 
   /*!
-          Remove from current stage objetc tree the stage objetc with \b
+          Remove from current stage object tree the stage object with \b
 TStageObjectId \b \e id.
    \n It doesn't delete the stage object.
 \sa insertStageObject() and removeColumn()
@@ -133,7 +133,7 @@ TStageObjectId \b \e id.
 */
   void insertStageObject(TStageObject *object);
   /*!
-          This method swaps colum \b \e i with column \b \e j.
+          This method swaps column \b \e i with column \b \e j.
           Columns \b \e i and \b \e j must exist.
   */
   void swapColumns(int i, int j);
@@ -187,7 +187,7 @@ Returns the numbers of the objects in the tree.
           An Handle Manager is an object that implements a method to retrieve
      the point position
           of the handle given its id and its name.
-          See TStageObject::getHandle() for an explanation of what an hanlde is.
+          See TStageObject::getHandle() for an explanation of what a handle is.
   */
   void setHandleManager(HandleManager *hm);
   /*!
@@ -271,7 +271,7 @@ index \b \e cameraIndex.
     return getCamera(TStageObjectId::CameraId(cameraIndex));
   }
   /*!
-Return a pointer to current stage objetc tree camera \b TCamera.
+Return a pointer to current stage object tree camera \b TCamera.
 \sa getCamera() and getCurrentCameraId()
 */
   inline TCamera *getCurrentCamera() { return getCamera(getCurrentCameraId()); }

@@ -6,6 +6,7 @@
 #include "toonz/toonzscene.h"
 #include "toonz/sceneproperties.h"
 #include "toonz/txshleveltypes.h"
+#include "toonz/cleanupcolorstyles.h"
 #include "tsystem.h"
 #include "tenv.h"
 #include "tconvert.h"
@@ -193,7 +194,10 @@ CleanupParameters::CleanupParameters()
     , m_dirtyFlag(false)
     //, m_resName("")
     , m_offx_lock(false)
-    , m_offy_lock(false) {}
+    , m_offy_lock(false)
+    , m_altBrightness(0)
+    , m_altContrast(50)
+    , m_lpNoneFormat("tif") {}
 
 //---------------------------------------------------------
 
@@ -300,8 +304,11 @@ void CleanupParameters::assign(const CleanupParameters *param,
   if (clonePalette && param->m_cleanupPalette)
     m_cleanupPalette = param->m_cleanupPalette->clone();
 
-  m_offx_lock = param->m_offx_lock;
-  m_offy_lock = param->m_offy_lock;
+  m_offx_lock     = param->m_offx_lock;
+  m_offy_lock     = param->m_offy_lock;
+  m_altBrightness = param->m_altBrightness;
+  m_altContrast   = param->m_altContrast;
+  m_lpNoneFormat  = param->m_lpNoneFormat;
 }
 
 //---------------------------------------------------------
@@ -330,10 +337,10 @@ void CleanupParameters::saveData(TOStream &os) const {
     attr.clear();
     std::string flip =
         std::string(m_flipx ? "x" : "") + std::string(m_flipy ? "y" : "");
-    if (flip != "") attr["flip"]      = flip;
+    if (flip != "") attr["flip"] = flip;
     if (m_rotate != 0) attr["rotate"] = std::to_string(m_rotate);
-    if (m_offx != 0.0) attr["xoff"]   = std::to_string(m_offx);
-    if (m_offy != 0.0) attr["yoff"]   = std::to_string(m_offy);
+    if (m_offx != 0.0) attr["xoff"] = std::to_string(m_offx);
+    if (m_offy != 0.0) attr["yoff"] = std::to_string(m_offy);
     os.openCloseChild("transform", attr);
   }
 
@@ -366,6 +373,8 @@ void CleanupParameters::saveData(TOStream &os) const {
   os.openCloseChild("fdg", attr);
   attr.clear();
   if (m_path != TFilePath()) os.child("path") << m_path;
+  os.child("altBrightnessContrast") << m_altBrightness << m_altContrast;
+  os.child("lpNoneFormat") << m_lpNoneFormat;
 }
 
 //---------------------------------------------------------
@@ -380,6 +389,9 @@ void CleanupParameters::loadData(TIStream &is, bool globalParams) {
   m_lineProcessingMode = lpNone;
   m_noAntialias        = false;
   m_postAntialias      = false;
+  // hold brightness and contrast values of another processing mode
+  m_altBrightness = -1.0;
+  m_altContrast   = -1.0;
 
   while (is.matchTag(tagName)) {
     if (tagName == "cleanupPalette") {
@@ -390,42 +402,42 @@ void CleanupParameters::loadData(TIStream &is, bool globalParams) {
       m_camera.loadData(is);
       is.closeChild();
     } else if (tagName == "autoCenter") {
-      m_autocenterType                          = AUTOCENTER_FDG;
-      std::string s                             = is.getTagAttribute("type");
+      m_autocenterType = AUTOCENTER_FDG;
+      std::string s    = is.getTagAttribute("type");
       if (s != "" && isInt(s)) m_autocenterType = (AUTOCENTER_TYPE)std::stoi(s);
-      s                                  = is.getTagAttribute("pegHoles");
+      s = is.getTagAttribute("pegHoles");
       if (s != "" && isInt(s)) m_pegSide = (PEGS_SIDE)std::stoi(s);
     } else if (tagName == "transform") {
-      std::string s                      = is.getTagAttribute("flip");
-      m_flipx                            = (s.find("x") != std::string::npos);
-      m_flipy                            = (s.find("y") != std::string::npos);
-      s                                  = is.getTagAttribute("rotate");
-      if (s != "" && isInt(s)) m_rotate  = std::stoi(s);
-      s                                  = is.getTagAttribute("xoff");
+      std::string s = is.getTagAttribute("flip");
+      m_flipx       = (s.find("x") != std::string::npos);
+      m_flipy       = (s.find("y") != std::string::npos);
+      s             = is.getTagAttribute("rotate");
+      if (s != "" && isInt(s)) m_rotate = std::stoi(s);
+      s = is.getTagAttribute("xoff");
       if (s != "" && isDouble(s)) m_offx = std::stod(s);
-      s                                  = is.getTagAttribute("yoff");
+      s = is.getTagAttribute("yoff");
       if (s != "" && isDouble(s)) m_offy = std::stod(s);
     } else if (tagName == "lineProcessing") {
-      m_lineProcessingMode                    = lpGrey;
-      std::string s                           = is.getTagAttribute("sharpness");
+      m_lineProcessingMode = lpGrey;
+      std::string s        = is.getTagAttribute("sharpness");
       if (s != "" && isDouble(s)) m_sharpness = std::stod(s);
       s = is.getTagAttribute("autoAdjust");
       if (s != "" && isDouble(s))
         m_autoAdjustMode = (CleanupTypes::AUTO_ADJ_MODE)std::stoi(s);
-      s                  = is.getTagAttribute("mode");
+      s = is.getTagAttribute("mode");
       if (s != "" && s == "color") m_lineProcessingMode = lpColor;
     } else if (tagName == "despeckling") {
-      std::string s                          = is.getTagAttribute("value");
+      std::string s = is.getTagAttribute("value");
       if (s != "" && isInt(s)) m_despeckling = std::stoi(s);
     } else if (tagName == "aaValue") {
-      std::string s                      = is.getTagAttribute("value");
+      std::string s = is.getTagAttribute("value");
       if (s != "" && isInt(s)) m_aaValue = std::stoi(s);
     } else if (tagName == "noAntialias")
       m_noAntialias = true;
     else if (tagName == "MLAA")
       m_postAntialias = true;
     else if (tagName == "closestField") {
-      std::string s                              = is.getTagAttribute("value");
+      std::string s = is.getTagAttribute("value");
       if (s != "" && isDouble(s)) m_closestField = std::stod(s);
     } else if (tagName == "fdg") {
       std::string s = is.getTagAttribute("name");
@@ -433,8 +445,24 @@ void CleanupParameters::loadData(TIStream &is, bool globalParams) {
     } else if (tagName == "path") {
       is >> m_path;
       is.closeChild();
+    } else if (tagName == "altBrightnessContrast") {
+      is >> m_altBrightness >> m_altContrast;
+      is.closeChild();
+    } else if (tagName == "lpNoneFormat") {
+      is >> m_lpNoneFormat;
+      is.closeChild();
     } else
       is.skipCurrentTag();
+  }
+
+  if ((m_altBrightness < 0.0 || m_altContrast < 0.0) && m_cleanupPalette &&
+      m_cleanupPalette->getStyleCount() >= 2) {
+    TCleanupStyle *blackStyle =
+        dynamic_cast<TCleanupStyle *>(m_cleanupPalette->getStyle(1));
+    if (blackStyle) {
+      m_altBrightness = blackStyle->getBrightness();
+      m_altContrast   = blackStyle->getContrast();
+    }
   }
 
   CleanupParameters::LastSavedParameters.assign(this);

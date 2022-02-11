@@ -167,7 +167,7 @@ SVNCommitDialog::SVNCommitDialog(QWidget *parent, const QString &workingDir,
 
   addButtonBarWidget(m_commitButton, m_cancelButton);
 
-  // 0. Connect for svn errors (that may occurs everythings)
+  // 0. Connect for svn errors (that may occur every time)
   connect(&m_thread, SIGNAL(error(const QString &)), this,
           SLOT(onError(const QString &)));
 
@@ -994,7 +994,7 @@ SVNCommitFrameRangeDialog::SVNCommitFrameRangeDialog(QWidget *parent,
 
   addButtonBarWidget(m_commitButton, m_cancelButton);
 
-  // 0. Connect for svn errors (that may occurs)
+  // 0. Connect for svn errors (that may occur)
   connect(&m_thread, SIGNAL(error(const QString &)), this,
           SLOT(onError(const QString &)));
 }

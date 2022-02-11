@@ -6,6 +6,7 @@
 #include "tsmartpointer.h"
 #include "tgeometry.h"
 #include "tpersist.h"
+#include <QObject>
 
 #undef DVAPI
 #undef DVVAR
@@ -44,6 +45,14 @@ class DVAPI TStageObjectSpline final : public TSmartObject, public TPersist {
   std::string m_name;
   bool m_isOpened;
   std::vector<TDoubleParam *> m_posPathParams;
+
+  // For Tahoma2D Motion Path compatibility
+  bool m_externalDataFound;
+  QList<TPointD> m_interpolationStroke;
+  bool m_active;
+  int m_color;
+  int m_steps;
+  int m_width;
 
 public:
   TStageObjectSpline();

@@ -672,7 +672,7 @@ void RecursiveReferenceLinearizator::subdivideCenterline(
 
 /*
   Quick container to store all the linearization features to be supported.
-  \note The set should be appropriately ordered so that linearizator dependance
+  \note The set should be appropriately ordered so that linearizator dependence
   can be supported (linearizators may work depending on knowledge of the other
   linearized points)
 */

@@ -1,0 +1,9 @@
+<fxlayout>
+  <page name="GPU HSL Blend">
+    <control>bhue</control>
+    <control>bsat</control>
+    <control>blum</control>
+    <control>balpha</control>
+    <control>bmask</control>
+  </page>
+</fxlayout>

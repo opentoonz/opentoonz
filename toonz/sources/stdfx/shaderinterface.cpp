@@ -47,9 +47,10 @@ const static QString l_typeNames[ShaderInterface::TYPESCOUNT] = {
     "int", "ivec2", "ivec3", "ivec4", "rgba", "rgb"};
 
 const static QString l_conceptNames[ShaderInterface::CONCEPTSCOUNT] = {
-    "none",      "percent",  "length",   "angle",    "point",
-    "radius_ui", "width_ui", "angle_ui", "point_ui", "xy_ui",
-    "vector_ui", "polar_ui", "size_ui",  "quad_ui",  "rect_ui"};
+    "none",       "percent",        "length",   "angle",    "point",
+    "radius_ui",  "width_ui",       "angle_ui", "point_ui", "xy_ui",
+    "vector_ui",  "polar_ui",       "size_ui",  "quad_ui",  "rect_ui",
+    "compass_ui", "compass_spin_ui"};
 
 const static QString l_hwtNames[ShaderInterface::HWTCOUNT] = {"none", "any",
                                                               "isotropic"};

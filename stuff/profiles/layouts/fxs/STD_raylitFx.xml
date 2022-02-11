@@ -6,6 +6,7 @@
         <control>intensity</control>
         <control>decay</control>
         <control>smoothness</control>
+        <control>radius</control>
         <control>includeInput</control>
         <control>invert</control>
   </page>

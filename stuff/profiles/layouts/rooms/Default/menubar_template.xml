@@ -29,6 +29,8 @@
             <command>MI_SoundTrack</command>
             <command>MI_ExportXDTS</command>
             <command>MI_StopMotionExportImageSequence</command>
+            <command>MI_ExportTvpJson</command>
+            <command>MI_ExportXsheetPDF</command>
         </menu>
         <separator/>
         <command>MI_PrintXsheet</command>

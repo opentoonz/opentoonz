@@ -405,7 +405,7 @@ void CleanupSettingsModel::rebuildPreview() {
 void CleanupSettingsModel::processFrame(TXshSimpleLevel *sl, TFrameId fid) {
   assert(sl);
 
-  TRasterImageP imageToCleanup = sl->getFrameToCleanup(fid);
+  TRasterImageP imageToCleanup = sl->getFrameToCleanup(fid, true);
   if (!imageToCleanup) return;
 
   // Store the original image
@@ -741,5 +741,6 @@ TFilePath CleanupSettingsModel::getOutputPath(TXshSimpleLevel *sl,
   const TFilePath &outDir = params->getPath(scene);
 
   return lineProcessing ? (outDir + inPath.getWideName()).withType("tlv")
-                        : (outDir + inPath.getLevelNameW()).withType("tif");
+                        : (outDir + inPath.getLevelNameW())
+                              .withType(params->m_lpNoneFormat);
 }

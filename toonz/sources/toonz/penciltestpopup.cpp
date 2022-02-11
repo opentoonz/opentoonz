@@ -21,6 +21,7 @@
 #include "toonzqt/tselectionhandle.h"
 #include "cameracapturelevelcontrol.h"
 #include "iocommand.h"
+#include "filebrowser.h"
 
 // TnzQt includes
 #include "toonzqt/menubarcommand.h"
@@ -44,6 +45,7 @@
 #include "toonz/levelproperties.h"
 #include "toonz/tcamera.h"
 #include "toonz/preferences.h"
+#include "toonz/filepathproperties.h"
 
 // TnzCore includes
 #include "tsystem.h"
@@ -86,6 +88,8 @@
 
 #include <QVideoSurfaceFormat>
 #include <QThreadPool>
+#include <QHostInfo>
+#include <QDesktopServices>
 
 #ifdef _WIN32
 #include <dshow.h>
@@ -113,6 +117,7 @@ TEnv::StringVar CamCapSaveInPopupScene("CamCapSaveInPopupScene", "1");
 TEnv::IntVar CamCapSaveInPopupAutoSubName("CamCapSaveInPopupAutoSubName", 1);
 TEnv::IntVar CamCapSaveInPopupCreateSceneInFolder(
     "CamCapSaveInPopupCreateSceneInFolder", 0);
+TEnv::IntVar CamCapDoCalibration("CamCapDoCalibration", 0);
 
 namespace {
 
@@ -347,19 +352,25 @@ QString fidsToString(const std::vector<TFrameId>& fids,
   } else {
     bool beginBlock = true;
     for (int f = 0; f < fids.size() - 1; f++) {
-      int num      = fids[f].getNumber();
-      int next_num = fids[f + 1].getNumber();
-      if (num + 1 == next_num) {
+      int num             = fids[f].getNumber();
+      QString letter      = fids[f].getLetter();
+      int next_num        = fids[f + 1].getNumber();
+      QString next_letter = fids[f + 1].getLetter();
+
+      if (num + 1 == next_num && letter.isEmpty() && next_letter.isEmpty()) {
         if (beginBlock) {
           retStr += QString::number(num) + " - ";
           beginBlock = false;
         }
       } else {
-        retStr += QString::number(num) + ", ";
+        retStr += QString::number(num);
+        if (!letter.isEmpty()) retStr += letter;
+        retStr += ", ";
         beginBlock = true;
       }
     }
     retStr += QString::number(fids.back().getNumber());
+    if (!fids.back().getLetter().isEmpty()) retStr += fids.back().getLetter();
   }
   return retStr;
 }
@@ -679,42 +690,62 @@ void MyVideoWidget::mouseReleaseEvent(QMouseEvent* event) {
 
 //=============================================================================
 
-FrameNumberLineEdit::FrameNumberLineEdit(QWidget* parent, int value)
+FrameNumberLineEdit::FrameNumberLineEdit(QWidget* parent, TFrameId fId,
+                                         bool acceptLetter)
     : LineEdit(parent) {
-  setFixedWidth(54);
-  m_intValidator = new QIntValidator(this);
-  setValue(value);
-  m_intValidator->setRange(1, 9999);
+  if (acceptLetter) {
+    QString regExpStr   = QString("^%1$").arg(TFilePath::fidRegExpStr());
+    m_regexpValidator   = new QRegExpValidator(QRegExp(regExpStr), this);
+    TProjectManager* pm = TProjectManager::instance();
+    pm->addListener(this);
+  } else
+    m_regexpValidator = new QRegExpValidator(QRegExp("^\\d{1,4}$"), this);
 
-  QRegExp rx("^[0-9]{1,4}[A-Ia-i]?$");
-  m_regexpValidator = new QRegExpValidator(rx, this);
+  m_regexpValidator_alt =
+      new QRegExpValidator(QRegExp("^\\d{1,3}[A-Ia-i]?$"), this);
 
   updateValidator();
+  updateSize();
+
+  setValue(fId);
 }
 
 //-----------------------------------------------------------------------------
 
 void FrameNumberLineEdit::updateValidator() {
   if (Preferences::instance()->isShowFrameNumberWithLettersEnabled())
-    setValidator(m_regexpValidator);
+    setValidator(m_regexpValidator_alt);
   else
-    setValidator(m_intValidator);
+    setValidator(m_regexpValidator);
 }
 
 //-----------------------------------------------------------------------------
 
-void FrameNumberLineEdit::setValue(int value) {
-  if (value <= 0)
-    value = 1;
-  else if (value > 9999)
-    value = 9999;
+void FrameNumberLineEdit::updateSize() {
+  FilePathProperties* fpProp =
+      TProjectManager::instance()->getCurrentProject()->getFilePathProperties();
+  bool useStandard = fpProp->useStandard();
+  int letterCount  = fpProp->letterCountForSuffix();
+  if (useStandard)
+    setFixedWidth(60);
+  else {
+    // 4 digits + letters reserve 12 px each
+    int lc = (letterCount == 0) ? 9 : letterCount + 4;
+    setFixedWidth(12 * lc);
+  }
+  updateGeometry();
+}
+//-----------------------------------------------------------------------------
 
+void FrameNumberLineEdit::setValue(TFrameId fId) {
   QString str;
   if (Preferences::instance()->isShowFrameNumberWithLettersEnabled()) {
-    str = convertToFrameWithLetter(value, 3);
+    if (!fId.getLetter().isEmpty()) {
+      // need some warning?
+    }
+    str = convertToFrameWithLetter(fId.getNumber(), 3);
   } else {
-    str.setNum(value);
-    while (str.length() < 4) str.push_front("0");
+    str = QString::fromStdString(fId.expand());
   }
   setText(str);
   setCursorPosition(0);
@@ -722,19 +753,42 @@ void FrameNumberLineEdit::setValue(int value) {
 
 //-----------------------------------------------------------------------------
 
-int FrameNumberLineEdit::getValue() {
+TFrameId FrameNumberLineEdit::getValue() {
   if (Preferences::instance()->isShowFrameNumberWithLettersEnabled()) {
     QString str = text();
+    int f;
     // if no letters added
     if (str.at(str.size() - 1).isDigit())
-      return str.toInt() * 10;
+      f = str.toInt() * 10;
     else {
-      return str.left(str.size() - 1).toInt() * 10 +
-             letterToNum(str.at(str.size() - 1));
+      f = str.left(str.size() - 1).toInt() * 10 +
+          letterToNum(str.at(str.size() - 1));
     }
-  } else
-    return text().toInt();
+    return TFrameId(f);
+  } else {
+    QString regExpStr = QString("^%1$").arg(TFilePath::fidRegExpStr());
+    QRegExp rx(regExpStr);
+    int pos = rx.indexIn(text());
+    if (pos < 0) return TFrameId();
+    if (rx.cap(2).isEmpty())
+      return TFrameId(rx.cap(1).toInt());
+    else
+      return TFrameId(rx.cap(1).toInt(), rx.cap(2));
+  }
 }
+
+//-----------------------------------------------------------------------------
+
+void FrameNumberLineEdit::onProjectSwitched() {
+  QRegExpValidator* oldValidator = m_regexpValidator;
+  QString regExpStr = QString("^%1$").arg(TFilePath::fidRegExpStr());
+  m_regexpValidator = new QRegExpValidator(QRegExp(regExpStr), this);
+  updateValidator();
+  if (oldValidator) delete oldValidator;
+  updateSize();
+}
+
+void FrameNumberLineEdit::onProjectChanged() { onProjectSwitched(); }
 
 //-----------------------------------------------------------------------------
 
@@ -829,7 +883,7 @@ PencilTestSaveInFolderPopup::PencilTestSaveInFolderPopup(QWidget* parent)
 
   QFrame* subFolderFrame = new QFrame(this);
 
-  QGroupBox* infoGroupBox    = new QGroupBox(tr("Infomation"), this);
+  QGroupBox* infoGroupBox    = new QGroupBox(tr("Information"), this);
   QGroupBox* subNameGroupBox = new QGroupBox(tr("Subfolder Name"), this);
 
   m_projectField  = new QLineEdit(this);
@@ -1267,17 +1321,15 @@ PencilTestPopup::PencilTestPopup()
   m_bgReductionFld       = new IntField(this);
   m_captureWhiteBGButton = new QPushButton(tr("Capture white BG"), this);
 
-  QGroupBox* displayFrame = new QGroupBox(tr("Display"), this);
-  m_onionSkinCB           = new QCheckBox(tr("Show onion skin"), this);
-  m_loadImageButton       = new QPushButton(tr("Load Selected Image"), this);
-  m_onionOpacityFld       = new IntField(this);
+  m_onionSkinGBox   = new QGroupBox(tr("Onion skin"), this);
+  m_loadImageButton = new QPushButton(tr("Load Selected Image"), this);
+  m_onionOpacityFld = new IntField(this);
 
-  QGroupBox* timerFrame = new QGroupBox(tr("Interval timer"), this);
-  m_timerCB             = new QCheckBox(tr("Use interval timer"), this);
-  m_timerIntervalFld    = new IntField(this);
-  m_captureTimer        = new QTimer(this);
-  m_countdownTimer      = new QTimer(this);
-  m_timer               = new QTimer(this);
+  m_timerGBox        = new QGroupBox(tr("Interval timer"), this);
+  m_timerIntervalFld = new IntField(this);
+  m_captureTimer     = new QTimer(this);
+  m_countdownTimer   = new QTimer(this);
+  m_timer            = new QTimer(this);
 
   m_captureButton          = new QPushButton(tr("Capture\n[Return key]"), this);
   QPushButton* closeButton = new QPushButton(tr("Close"), this);
@@ -1295,6 +1347,15 @@ PencilTestPopup::PencilTestPopup()
   m_subWidthFld         = new IntLineEdit(this);
   m_subHeightFld        = new IntLineEdit(this);
   QWidget* subCamWidget = new QWidget(this);
+
+  // Calibration
+  m_calibration.groupBox  = new QGroupBox(tr("Calibration"), this);
+  m_calibration.capBtn    = new QPushButton(tr("Capture"), this);
+  m_calibration.cancelBtn = new QPushButton(tr("Cancel"), this);
+  m_calibration.newBtn    = new QPushButton(tr("Start calibration"), this);
+  m_calibration.loadBtn   = new QPushButton(tr("Load"), this);
+  m_calibration.exportBtn = new QPushButton(tr("Export"), this);
+  m_calibration.label     = new QLabel(this);
 
   //----
 
@@ -1323,14 +1384,16 @@ PencilTestPopup::PencilTestPopup()
   m_bgReductionFld->setValue(0);
   m_bgReductionFld->setDisabled(true);
 
-  displayFrame->setObjectName("CleanupSettingsFrame");
-  m_onionSkinCB->setChecked(false);
+  m_onionSkinGBox->setObjectName("CleanupSettingsFrame");
+  m_onionSkinGBox->setCheckable(true);
+  m_onionSkinGBox->setChecked(false);
   m_onionOpacityFld->setRange(1, 100);
   m_onionOpacityFld->setValue(50);
   m_onionOpacityFld->setDisabled(true);
 
-  timerFrame->setObjectName("CleanupSettingsFrame");
-  m_timerCB->setChecked(false);
+  m_timerGBox->setObjectName("CleanupSettingsFrame");
+  m_timerGBox->setCheckable(true);
+  m_timerGBox->setChecked(false);
   m_timerIntervalFld->setRange(0, 60);
   m_timerIntervalFld->setValue(10);
   m_timerIntervalFld->setDisabled(true);
@@ -1366,6 +1429,18 @@ PencilTestPopup::PencilTestPopup()
   m_subcameraButton->setCheckable(true);
   m_subcameraButton->setChecked(false);
   subCamWidget->setHidden(true);
+
+  // Calibration
+  m_calibration.groupBox->setCheckable(true);
+  m_calibration.groupBox->setChecked(CamCapDoCalibration);
+  QAction* calibrationHelp =
+      new QAction(tr("Open Readme.txt for Camera calibration..."));
+  m_calibration.groupBox->addAction(calibrationHelp);
+  m_calibration.groupBox->setContextMenuPolicy(Qt::ActionsContextMenu);
+  m_calibration.capBtn->hide();
+  m_calibration.cancelBtn->hide();
+  m_calibration.label->hide();
+  m_calibration.exportBtn->setEnabled(false);
 
   //---- layout ----
   m_topLayout->setMargin(10);
@@ -1499,38 +1574,52 @@ PencilTestPopup::PencilTestPopup()
         imageFrame->setLayout(imageLay);
         rightLay->addWidget(imageFrame, 0);
 
-        QGridLayout* displayLay = new QGridLayout();
-        displayLay->setMargin(8);
-        displayLay->setHorizontalSpacing(3);
-        displayLay->setVerticalSpacing(5);
+        // Calibration
+        QGridLayout* calibLay = new QGridLayout();
+        calibLay->setMargin(8);
+        calibLay->setHorizontalSpacing(3);
+        calibLay->setVerticalSpacing(5);
         {
-          displayLay->addWidget(m_onionSkinCB, 0, 0, 1, 2);
-
-          displayLay->addWidget(new QLabel(tr("Opacity(%):"), this), 1, 0,
-                                Qt::AlignRight);
-          displayLay->addWidget(m_onionOpacityFld, 1, 1);
-          displayLay->addWidget(m_loadImageButton, 2, 0, 1, 2);
+          calibLay->addWidget(m_calibration.newBtn, 0, 0);
+          calibLay->addWidget(m_calibration.loadBtn, 0, 1);
+          calibLay->addWidget(m_calibration.exportBtn, 0, 2);
+          QHBoxLayout* lay = new QHBoxLayout();
+          lay->setMargin(0);
+          lay->setSpacing(5);
+          lay->addWidget(m_calibration.capBtn, 1);
+          lay->addWidget(m_calibration.label, 0);
+          lay->addWidget(m_calibration.cancelBtn, 1);
+          calibLay->addLayout(lay, 1, 0, 1, 3);
         }
-        displayLay->setColumnStretch(0, 0);
-        displayLay->setColumnStretch(1, 1);
-        displayFrame->setLayout(displayLay);
-        rightLay->addWidget(displayFrame);
+        calibLay->setColumnStretch(0, 1);
+        m_calibration.groupBox->setLayout(calibLay);
+        rightLay->addWidget(m_calibration.groupBox, 0);
 
-        QGridLayout* timerLay = new QGridLayout();
+        QGridLayout* onionSkinLay = new QGridLayout();
+        onionSkinLay->setMargin(8);
+        onionSkinLay->setHorizontalSpacing(3);
+        onionSkinLay->setVerticalSpacing(5);
+        {
+          onionSkinLay->addWidget(new QLabel(tr("Opacity(%):"), this), 0, 0,
+                                  Qt::AlignRight);
+          onionSkinLay->addWidget(m_onionOpacityFld, 0, 1);
+          onionSkinLay->addWidget(m_loadImageButton, 1, 0, 1, 2);
+        }
+        onionSkinLay->setColumnStretch(0, 0);
+        onionSkinLay->setColumnStretch(1, 1);
+        m_onionSkinGBox->setLayout(onionSkinLay);
+        rightLay->addWidget(m_onionSkinGBox);
+
+        QHBoxLayout* timerLay = new QHBoxLayout();
         timerLay->setMargin(8);
-        timerLay->setHorizontalSpacing(3);
-        timerLay->setVerticalSpacing(5);
+        timerLay->setSpacing(3);
         {
-          timerLay->addWidget(m_timerCB, 0, 0, 1, 2);
-
-          timerLay->addWidget(new QLabel(tr("Interval(sec):"), this), 1, 0,
+          timerLay->addWidget(new QLabel(tr("Interval(sec):"), this), 0,
                               Qt::AlignRight);
-          timerLay->addWidget(m_timerIntervalFld, 1, 1);
+          timerLay->addWidget(m_timerIntervalFld, 1);
         }
-        timerLay->setColumnStretch(0, 0);
-        timerLay->setColumnStretch(1, 1);
-        timerFrame->setLayout(timerLay);
-        rightLay->addWidget(timerFrame);
+        m_timerGBox->setLayout(timerLay);
+        rightLay->addWidget(m_timerGBox);
 
         rightLay->addStretch(1);
 
@@ -1564,7 +1653,7 @@ PencilTestPopup::PencilTestPopup()
                        SLOT(onColorTypeComboChanged(int)));
   ret = ret && connect(m_captureWhiteBGButton, SIGNAL(pressed()), this,
                        SLOT(onCaptureWhiteBGButtonPressed()));
-  ret = ret && connect(m_onionSkinCB, SIGNAL(toggled(bool)), this,
+  ret = ret && connect(m_onionSkinGBox, SIGNAL(toggled(bool)), this,
                        SLOT(onOnionCBToggled(bool)));
   ret = ret && connect(m_loadImageButton, SIGNAL(pressed()), this,
                        SLOT(onLoadImageButtonPressed()));
@@ -1572,7 +1661,7 @@ PencilTestPopup::PencilTestPopup()
                        SLOT(onOnionOpacityFldEdited()));
   ret = ret && connect(m_upsideDownCB, SIGNAL(toggled(bool)), m_videoWidget,
                        SLOT(onUpsideDownChecked(bool)));
-  ret = ret && connect(m_timerCB, SIGNAL(toggled(bool)), this,
+  ret = ret && connect(m_timerGBox, SIGNAL(toggled(bool)), this,
                        SLOT(onTimerCBToggled(bool)));
   ret = ret && connect(m_captureTimer, SIGNAL(timeout()), this,
                        SLOT(onCaptureTimerTimeout()));
@@ -1604,15 +1693,48 @@ PencilTestPopup::PencilTestPopup()
                        SLOT(onSubCameraResized(bool)));
 
   ret = ret && connect(m_timer, SIGNAL(timeout()), this, SLOT(onTimeout()));
+
+  // Calibration
+  ret = ret &&
+        connect(m_calibration.groupBox, &QGroupBox::toggled, [&](bool checked) {
+          CamCapDoCalibration = checked;
+          resetCalibSettingsFromFile();
+        });
+  // ret = ret && connect(m_calibration.groupBox, SIGNAL(toggled(bool)), this,
+  // SLOT(resetCalibSettingsFromFile()));
+  ret = ret && connect(m_calibration.capBtn, SIGNAL(clicked()), this,
+                       SLOT(onCalibCapBtnClicked()));
+  ret = ret && connect(m_calibration.newBtn, SIGNAL(clicked()), this,
+                       SLOT(onCalibNewBtnClicked()));
+  ret = ret && connect(m_calibration.cancelBtn, SIGNAL(clicked()), this,
+                       SLOT(resetCalibSettingsFromFile()));
+  ret = ret && connect(m_calibration.loadBtn, SIGNAL(clicked()), this,
+                       SLOT(onCalibLoadBtnClicked()));
+  ret = ret && connect(m_calibration.exportBtn, SIGNAL(clicked()), this,
+                       SLOT(onCalibExportBtnClicked()));
+  ret = ret && connect(calibrationHelp, SIGNAL(triggered()), this,
+                       SLOT(onCalibReadme()));
+
   assert(ret);
 
   refreshCameraList();
 
   int startupCamIndex = m_cameraListCombo->findText(
       QString::fromStdString(CamCapCameraName.getValue()));
+  // if previous camera is not found, then try to activate the connected default
+  // camera
+  if (startupCamIndex <= 0 && !QCameraInfo::defaultCamera().isNull()) {
+    startupCamIndex =
+        m_cameraListCombo->findText(QCameraInfo::defaultCamera().description());
+  }
   if (startupCamIndex > 0) {
     m_cameraListCombo->setCurrentIndex(startupCamIndex);
     onCameraListComboActivated(startupCamIndex);
+  }
+  // just in case, try to activate any connected camera
+  else if (m_cameraListCombo->count() >= 2) {
+    m_cameraListCombo->setCurrentIndex(1);
+    onCameraListComboActivated(1);
   }
 
   QString resStr = QString::fromStdString(CamCapCameraResolution.getValue());
@@ -1792,19 +1914,29 @@ void PencilTestPopup::onResolutionComboActivated() {
     m_subHeightFld->setValue(m_allowedCameraSize.height());
   }
 
+  m_calibration.isValid = false;
+  m_calibration.exportBtn->setEnabled(false);
+  resetCalibSettingsFromFile();
+
   m_timer->start(40);
 }
 
 //-----------------------------------------------------------------------------
 
 void PencilTestPopup::onFileFormatOptionButtonPressed() {
-  if (m_fileTypeCombo->currentIndex() == 0) return;
   // Tentatively use the preview output settings
   ToonzScene* scene = TApp::instance()->getCurrentScene()->getScene();
   if (!scene) return;
   TOutputProperties* prop = scene->getProperties()->getPreviewProperties();
   std::string ext         = m_fileTypeCombo->currentText().toStdString();
-  openFormatSettingsPopup(this, ext, prop->getFileFormatProperties(ext));
+  TFrameId oldTmplFId     = scene->getProperties()->formatTemplateFIdForInput();
+  openFormatSettingsPopup(this, ext, prop->getFileFormatProperties(ext),
+                          &scene->getProperties()->formatTemplateFIdForInput());
+
+  TFrameId newTmplFId = scene->getProperties()->formatTemplateFIdForInput();
+  if (oldTmplFId.getZeroPadding() != newTmplFId.getZeroPadding() ||
+      oldTmplFId.getStartSeqInd() != newTmplFId.getStartSeqInd())
+    refreshFrameInfo();
 }
 
 //-----------------------------------------------------------------------------
@@ -1832,8 +1964,8 @@ void PencilTestPopup::onPreviousName() {
 
   std::wstring levelName;
 
-  // if the current level name is non-sequencial, then try to switch the last
-  // sequencial level in the scene.
+  // if the current level name is non-sequential, then try to switch the last
+  // sequential level in the scene.
   if (!nameCreator->setCurrent(m_levelNameEdit->text().toStdWString())) {
     TLevelSet* levelSet =
         TApp::instance()->getCurrentScene()->getScene()->getLevelSet();
@@ -2074,6 +2206,13 @@ void PencilTestPopup::onFrameCaptured(cv::Mat& image) {
     m_bgReductionFld->setEnabled(true);
   }
 
+  // capture calibration reference
+  if (m_calibration.captureCue) {
+    m_calibration.captureCue = false;
+    captureCalibrationRefImage(image);
+    return;
+  }
+
   processImage(image);
 
   QImage::Format format = (m_colorTypeCombo->currentIndex() == 0)
@@ -2088,13 +2227,26 @@ void PencilTestPopup::onFrameCaptured(cv::Mat& image) {
     if (importImage(qimg)) {
       m_videoWidget->setPreviousImage(qimg.copy());
       if (Preferences::instance()->isShowFrameNumberWithLettersEnabled()) {
-        int f = m_frameNumberEdit->getValue();
+        TFrameId fId = m_frameNumberEdit->getValue();
+        int f        = fId.getNumber();
         if (f % 10 == 0)  // next number
-          m_frameNumberEdit->setValue(((int)(f / 10) + 1) * 10);
+          m_frameNumberEdit->setValue(TFrameId(((int)(f / 10) + 1) * 10));
         else  // next alphabet
-          m_frameNumberEdit->setValue(f + 1);
-      } else
-        m_frameNumberEdit->setValue(m_frameNumberEdit->getValue() + 1);
+          m_frameNumberEdit->setValue(TFrameId(f + 1));
+      } else {
+        TFrameId fId = m_frameNumberEdit->getValue();
+
+        if (fId.getLetter().isEmpty() || fId.getLetter() == "Z" ||
+            fId.getLetter() == "z")  // next number
+          m_frameNumberEdit->setValue(TFrameId(fId.getNumber() + 1));
+        else {  // next alphabet
+          QByteArray byteArray = fId.getLetter().toUtf8();
+          // return incrementing the last letter
+          byteArray.data()[byteArray.size() - 1]++;
+          m_frameNumberEdit->setValue(
+              TFrameId(fId.getNumber(), QString::fromUtf8(byteArray)));
+        }
+      }
 
       /* notify */
       TApp::instance()->getCurrentScene()->notifySceneChanged();
@@ -2102,7 +2254,7 @@ void PencilTestPopup::onFrameCaptured(cv::Mat& image) {
       TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
 
       // restart interval timer for capturing next frame (it is single shot)
-      if (m_timerCB->isChecked() && m_captureButton->isChecked()) {
+      if (m_timerGBox->isChecked() && m_captureButton->isChecked()) {
         m_captureTimer->start(m_timerIntervalFld->getValue() * 1000);
         // restart the count down as well (for aligning the timing. It is not
         // single shot)
@@ -2110,9 +2262,90 @@ void PencilTestPopup::onFrameCaptured(cv::Mat& image) {
       }
     }
     // if capture was failed, stop interval capturing
-    else if (m_timerCB->isChecked()) {
+    else if (m_timerGBox->isChecked()) {
       m_captureButton->setChecked(false);
       onCaptureButtonClicked(false);
+    }
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+void PencilTestPopup::captureCalibrationRefImage(cv::Mat& image) {
+  cv::cvtColor(image, image, cv::COLOR_RGB2GRAY);
+  std::vector<cv::Point2f> corners;
+  bool found = cv::findChessboardCorners(
+      image, m_calibration.boardSize, corners,
+      cv::CALIB_CB_ADAPTIVE_THRESH | cv::CALIB_CB_FILTER_QUADS);
+  if (found) {
+    // compute corners in detail
+    cv::cornerSubPix(
+        image, corners, cv::Size(11, 11), cv::Size(-1, -1),
+        cv::TermCriteria(cv::TermCriteria::EPS | cv::TermCriteria::MAX_ITER, 30,
+                         0.1));
+    // count up
+    m_calibration.refCaptured++;
+    // register corners
+    m_calibration.image_points.push_back(corners);
+    // register 3d points in real world space
+    std::vector<cv::Point3f> obj;
+    for (int i = 0;
+         i < m_calibration.boardSize.width * m_calibration.boardSize.height;
+         i++)
+      obj.push_back(cv::Point3f(i / m_calibration.boardSize.width,
+                                i % m_calibration.boardSize.width, 0.0f));
+    m_calibration.obj_points.push_back(obj);
+
+    // needs 10 references
+    if (m_calibration.refCaptured < 10) {
+      // update label
+      m_calibration.label->setText(
+          QString("%1/%2").arg(m_calibration.refCaptured).arg(10));
+    } else {
+      // swap UIs
+      m_calibration.label->hide();
+      m_calibration.capBtn->hide();
+      m_calibration.cancelBtn->hide();
+      m_calibration.newBtn->show();
+      m_calibration.loadBtn->show();
+      m_calibration.exportBtn->show();
+
+      cv::Mat intrinsic          = cv::Mat(3, 3, CV_32FC1);
+      intrinsic.ptr<float>(0)[0] = 1.f;
+      intrinsic.ptr<float>(1)[1] = 1.f;
+      cv::Mat distCoeffs;
+      std::vector<cv::Mat> rvecs;
+      std::vector<cv::Mat> tvecs;
+      cv::calibrateCamera(m_calibration.obj_points, m_calibration.image_points,
+                          image.size(), intrinsic, distCoeffs, rvecs, tvecs);
+
+      cv::Mat mapR          = cv::Mat::eye(3, 3, CV_64F);
+      cv::Mat new_intrinsic = cv::getOptimalNewCameraMatrix(
+          intrinsic, distCoeffs, image.size(),
+          0.0);  // setting the last argument to 1.0 will include all source
+                 // pixels in the frame
+      cv::initUndistortRectifyMap(intrinsic, distCoeffs, mapR, new_intrinsic,
+                                  image.size(), CV_32FC1, m_calibration.mapX,
+                                  m_calibration.mapY);
+
+      // save calibration settings
+      QString calibFp = getCurrentCalibFilePath();
+      cv::FileStorage fs(calibFp.toStdString(), cv::FileStorage::WRITE);
+      if (!fs.isOpened()) {
+        DVGui::warning(tr("Failed to save calibration settings."));
+        return;
+      }
+      fs << "identifier"
+         << "OpenToonzCameraCalibrationSettings";
+      fs << "resolution"
+         << cv::Size(m_resolution.width(), m_resolution.height());
+      fs << "instrinsic" << intrinsic;
+      fs << "distCoeffs" << distCoeffs;
+      fs << "new_intrinsic" << new_intrinsic;
+      fs.release();
+
+      m_calibration.isValid = true;
+      m_calibration.exportBtn->setEnabled(true);
     }
   }
 }
@@ -2146,7 +2379,7 @@ void PencilTestPopup::hideEvent(QHideEvent* event) {
   if (action) action->setShortcut(QKeySequence("Return"));
 
   // stop interval timer if it is active
-  if (m_timerCB->isChecked() && m_captureButton->isChecked()) {
+  if (m_timerGBox->isChecked() && m_captureButton->isChecked()) {
     m_captureButton->setChecked(false);
     onCaptureButtonClicked(false);
   }
@@ -2197,6 +2430,12 @@ bool PencilTestPopup::event(QEvent* event) {
 //-----------------------------------------------------------------------------
 
 void PencilTestPopup::processImage(cv::Mat& image) {
+  // perform calibration
+  if (m_calibration.groupBox->isChecked() && m_calibration.isValid) {
+    cv::remap(image, image, m_calibration.mapX, m_calibration.mapY,
+              cv::INTER_LINEAR);
+  }
+
   //  void PencilTestPopup::processImage(QImage& image) {
   if (m_upsideDownCB->isChecked())
     cv::flip(image, image, -1);  // flip in both directions
@@ -2228,7 +2467,6 @@ void PencilTestPopup::onCaptureWhiteBGButtonPressed() {
 
 void PencilTestPopup::onOnionCBToggled(bool on) {
   m_videoWidget->setShowOnionSkin(on);
-  m_onionOpacityFld->setEnabled(on);
 }
 
 //-----------------------------------------------------------------------------
@@ -2291,7 +2529,7 @@ void PencilTestPopup::onLoadImageButtonPressed() {
     QPainter painter(&qi2);
     painter.drawImage(0, 0, qi);
     m_videoWidget->setPreviousImage(qi2);
-    m_onionSkinCB->setChecked(true);
+    m_onionSkinGBox->setChecked(true);
     free(buffer);
   }
 }
@@ -2306,7 +2544,6 @@ void PencilTestPopup::onOnionOpacityFldEdited() {
 //-----------------------------------------------------------------------------
 
 void PencilTestPopup::onTimerCBToggled(bool on) {
-  m_timerIntervalFld->setEnabled(on);
   m_captureButton->setCheckable(on);
   if (on)
     m_captureButton->setText(tr("Start Capturing\n[Return key]"));
@@ -2317,8 +2554,8 @@ void PencilTestPopup::onTimerCBToggled(bool on) {
 //-----------------------------------------------------------------------------
 
 void PencilTestPopup::onCaptureButtonClicked(bool on) {
-  if (m_timerCB->isChecked()) {
-    m_timerCB->setDisabled(on);
+  if (m_timerGBox->isChecked()) {
+    m_timerGBox->setDisabled(on);
     m_timerIntervalFld->setDisabled(on);
     // start interval capturing
     if (on) {
@@ -2365,7 +2602,7 @@ bool PencilTestPopup::importImage(QImage image) {
     return false;
   }
 
-  int frameNumber = m_frameNumberEdit->getValue();
+  TFrameId fId = m_frameNumberEdit->getValue();
 
   /* create parent directory if it does not exist */
   TFilePath parentDir =
@@ -2385,9 +2622,12 @@ bool PencilTestPopup::importImage(QImage image) {
     }
   }
 
+  TFrameId tmplFId = scene->getProperties()->formatTemplateFIdForInput();
+
   TFilePath levelFp = TFilePath(m_saveInFileFld->getPath()) +
-                      TFilePath(levelName + L".." +
-                                m_fileTypeCombo->currentText().toStdWString());
+                      TFilePath(levelName + L"." +
+                                m_fileTypeCombo->currentText().toStdWString())
+                          .withFrame(tmplFId);
   TFilePath actualLevelFp = scene->decodeFilePath(levelFp);
 
   TXshSimpleLevel* sl = 0;
@@ -2424,8 +2664,13 @@ bool PencilTestPopup::importImage(QImage image) {
           "The captured image size does not match with the existing level."));
       return false;
     }
+
+    // if the level already has a frame, use the same zero padding regardless of
+    // the frame format setting
+    sl->formatFId(fId, tmplFId);
+
     /* if the level already have the same frame, then ask if overwrite it */
-    TFilePath frameFp(actualLevelFp.withFrame(frameNumber));
+    TFilePath frameFp(actualLevelFp.withFrame(fId));
     if (TFileStatus(frameFp).doesExist()) {
       if (!m_alwaysOverwrite) {
         QString question =
@@ -2459,9 +2704,12 @@ bool PencilTestPopup::importImage(QImage image) {
             "The captured image size does not match with the existing level."));
         return false;
       }
+      // if the level already has a frame, use the same zero padding regardless
+      // of the frame format setting
+      sl->formatFId(fId, tmplFId);
 
       /* confirm overwrite */
-      TFilePath frameFp(actualLevelFp.withFrame(frameNumber));
+      TFilePath frameFp(actualLevelFp.withFrame(fId));
       if (TFileStatus(frameFp).doesExist()) {
         if (!m_alwaysOverwrite) {
           QString question =
@@ -2503,12 +2751,12 @@ bool PencilTestPopup::importImage(QImage image) {
       sl->getProperties()->setImageDpi(dpi);
       sl->getProperties()->setImageRes(
           TDimension(image.width(), image.height()));
+      sl->formatFId(fId, tmplFId);
     }
 
     state = NEWLEVEL;
   }
 
-  TFrameId fid(frameNumber);
   TPointD levelDpi = sl->getDpi();
   /* create the raster */
   TRaster32P raster(image.width(), image.height());
@@ -2517,7 +2765,7 @@ bool PencilTestPopup::importImage(QImage image) {
   TRasterImageP ri(raster);
   ri->setDpi(levelDpi.x, levelDpi.y);
   /* setting the frame */
-  sl->setFrame(fid, ri);
+  sl->setFrame(fId, ri);
 
   /* set dirty flag */
   sl->getProperties()->setDirtyFlag(true);
@@ -2535,7 +2783,7 @@ bool PencilTestPopup::importImage(QImage image) {
       col += 1;
       xsh->insertColumn(col);
     }
-    xsh->setCell(row, col, TXshCell(sl, fid));
+    xsh->setCell(row, col, TXshCell(sl, fId));
     app->getCurrentColumn()->setColumnIndex(col);
     return true;
   }
@@ -2547,7 +2795,7 @@ bool PencilTestPopup::importImage(QImage image) {
   int foundCol, foundRow = -1;
   // most possibly, it's in the current column
   int rowCheck;
-  if (findCell(xsh, col, TXshCell(sl, fid), rowCheck)) return true;
+  if (findCell(xsh, col, TXshCell(sl, fId), rowCheck)) return true;
   if (rowCheck >= 0) {
     foundRow = rowCheck;
     foundCol = col;
@@ -2555,7 +2803,7 @@ bool PencilTestPopup::importImage(QImage image) {
   // search entire xsheet
   for (int c = 0; c < xsh->getColumnCount(); c++) {
     if (c == col) continue;
-    if (findCell(xsh, c, TXshCell(sl, fid), rowCheck)) return true;
+    if (findCell(xsh, c, TXshCell(sl, fId), rowCheck)) return true;
     if (rowCheck >= 0) {
       foundRow = rowCheck;
       foundCol = c;
@@ -2567,7 +2815,7 @@ bool PencilTestPopup::importImage(QImage image) {
     int tmpRow = foundRow + 1;
     while (1) {
       if (xsh->getCell(tmpRow, foundCol).isEmpty()) {
-        xsh->setCell(tmpRow, foundCol, TXshCell(sl, fid));
+        xsh->setCell(tmpRow, foundCol, TXshCell(sl, fId));
         app->getCurrentColumn()->setColumnIndex(foundCol);
         break;
       }
@@ -2581,7 +2829,7 @@ bool PencilTestPopup::importImage(QImage image) {
       col += 1;
       xsh->insertColumn(col);
     }
-    xsh->setCell(row, col, TXshCell(sl, fid));
+    xsh->setCell(row, col, TXshCell(sl, fId));
     app->getCurrentColumn()->setColumnIndex(col);
   }
 
@@ -2637,7 +2885,7 @@ void PencilTestPopup::refreshFrameInfo() {
   TLevelSet* levelSet      = currentScene->getLevelSet();
 
   std::wstring levelName = m_levelNameEdit->text().toStdWString();
-  int frameNumber        = m_frameNumberEdit->getValue();
+  TFrameId fId           = m_frameNumberEdit->getValue();
 
   TDimension camRes;
   if (m_subcameraButton->isChecked())
@@ -2654,9 +2902,12 @@ void PencilTestPopup::refreshFrameInfo() {
   // level with the same name
   TXshLevel* level_sameName = levelSet->getLevel(levelName);
 
+  TFrameId tmplFId = currentScene->getProperties()->formatTemplateFIdForInput();
+
   TFilePath levelFp = TFilePath(m_saveInFileFld->getPath()) +
-                      TFilePath(levelName + L".." +
-                                m_fileTypeCombo->currentText().toStdWString());
+                      TFilePath(levelName + L"." +
+                                m_fileTypeCombo->currentText().toStdWString())
+                          .withFrame(tmplFId);
 
   // level with the same path
   TXshLevel* level_samePath = levelSet->getLevel(*(currentScene), levelFp);
@@ -2667,7 +2918,7 @@ void PencilTestPopup::refreshFrameInfo() {
   bool levelExist = TSystem::doesExistFileOrLevel(actualLevelFp);
 
   // frame existence
-  TFilePath frameFp(actualLevelFp.withFrame(frameNumber));
+  TFilePath frameFp(actualLevelFp.withFrame(fId));
   bool frameExist = false;
   if (levelExist) frameExist = TFileStatus(frameFp).doesExist();
 
@@ -2708,8 +2959,11 @@ void PencilTestPopup::refreshFrameInfo() {
       int frameCount      = level_p->getFrameCount();
       TLevel::Iterator it = level_p->begin();
       std::vector<TFrameId> fids;
-      for (int i = 0; it != level_p->end(); ++it, ++i)
+      for (int i = 0; it != level_p->end(); ++it, ++i) {
         fids.push_back(it->first);
+        // in case fId with different format
+        if (!frameExist && fId == it->first) frameExist = true;
+      }
 
       tooltipStr +=
           tr("The level is not registered in the scene, but exists in the file "
@@ -2807,7 +3061,7 @@ void PencilTestPopup::refreshFrameInfo() {
       // Check if the target frame already exist in the level
       bool hasFrame = false;
       for (int f = 0; f < frameCount; f++) {
-        if (fids.at(f).getNumber() == frameNumber) {
+        if (fids.at(f) == fId) {
           hasFrame = true;
           break;
         }
@@ -2926,6 +3180,174 @@ void PencilTestPopup::onSubCameraSizeEdited() {
 
 //-----------------------------------------------------------------------------
 
+void PencilTestPopup::onCalibCapBtnClicked() {
+  m_calibration.captureCue = true;
+}
+
+//-----------------------------------------------------------------------------
+
+void PencilTestPopup::onCalibNewBtnClicked() {
+  if (m_calibration.isValid) {
+    QString question = tr("Do you want to restart camera calibration?");
+    int ret =
+        DVGui::MsgBox(question, QObject::tr("Restart"), QObject::tr("Cancel"));
+    if (ret == 0 || ret == 2) return;
+  }
+  // initialize calibration parameter
+  m_calibration.captureCue  = false;
+  m_calibration.refCaptured = 0;
+  m_calibration.obj_points.clear();
+  m_calibration.image_points.clear();
+  m_calibration.isValid = false;
+
+  // initialize label
+  m_calibration.label->setText(
+      QString("%1/%2").arg(m_calibration.refCaptured).arg(10));
+  // swap UIs
+  m_calibration.newBtn->hide();
+  m_calibration.loadBtn->hide();
+  m_calibration.exportBtn->hide();
+  m_calibration.label->show();
+  m_calibration.capBtn->show();
+  m_calibration.cancelBtn->show();
+}
+
+//-----------------------------------------------------------------------------
+
+void PencilTestPopup::resetCalibSettingsFromFile() {
+  if (m_calibration.capBtn->isVisible()) {
+    // swap UIs
+    m_calibration.label->hide();
+    m_calibration.capBtn->hide();
+    m_calibration.cancelBtn->hide();
+    m_calibration.newBtn->show();
+    m_calibration.loadBtn->show();
+    m_calibration.exportBtn->show();
+  }
+  if (m_calibration.groupBox->isChecked() && !m_calibration.isValid) {
+    QString calibFp = getCurrentCalibFilePath();
+    std::cout << calibFp.toStdString() << std::endl;
+    if (!calibFp.isEmpty() && QFileInfo(calibFp).exists()) {
+      cv::Mat intrinsic, distCoeffs, new_intrinsic;
+      cv::FileStorage fs(calibFp.toStdString(), cv::FileStorage::READ);
+      if (!fs.isOpened()) return;
+      std::string identifierStr;
+      fs["identifier"] >> identifierStr;
+      if (identifierStr != "OpenToonzCameraCalibrationSettings") return;
+      cv::Size resolution;
+      fs["resolution"] >> resolution;
+      if (m_resolution != QSize(resolution.width, resolution.height)) return;
+      fs["instrinsic"] >> intrinsic;
+      fs["distCoeffs"] >> distCoeffs;
+      fs["new_intrinsic"] >> new_intrinsic;
+      fs.release();
+
+      cv::Mat mapR = cv::Mat::eye(3, 3, CV_64F);
+      cv::initUndistortRectifyMap(
+          intrinsic, distCoeffs, mapR, new_intrinsic,
+          cv::Size(m_resolution.width(), m_resolution.height()), CV_32FC1,
+          m_calibration.mapX, m_calibration.mapY);
+
+      m_calibration.isValid = true;
+      m_calibration.exportBtn->setEnabled(true);
+    }
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+QString PencilTestPopup::getCurrentCalibFilePath() {
+  QString cameraName = m_cameraListCombo->currentText();
+  if (cameraName.isEmpty()) return QString();
+  QString resolution   = m_resolutionCombo->currentText();
+  QString hostName     = QHostInfo::localHostName();
+  TFilePath folderPath = ToonzFolder::getLibraryFolder() + "camera calibration";
+  return folderPath.getQString() + "\\" + hostName + "_" + cameraName + "_" +
+         resolution + ".xml";
+}
+
+//-----------------------------------------------------------------------------
+
+void PencilTestPopup::onCalibLoadBtnClicked() {
+  LoadCalibrationFilePopup popup(this);
+
+  QString fp = popup.getPath().getQString();
+  if (fp.isEmpty()) return;
+  try {
+    cv::FileStorage fs(fp.toStdString(), cv::FileStorage::READ);
+    if (!fs.isOpened())
+      throw TException(fp.toStdWString() + L": Can't open file");
+
+    std::string identifierStr;
+    fs["identifier"] >> identifierStr;
+    if (identifierStr != "OpenToonzCameraCalibrationSettings")
+      throw TException(fp.toStdWString() + L": Identifier does not match");
+    cv::Size resolution;
+    fs["resolution"] >> resolution;
+    if (m_resolution != QSize(resolution.width, resolution.height))
+      throw TException(fp.toStdWString() + L": Resolution does not match");
+  } catch (const TException& se) {
+    DVGui::warning(QString::fromStdWString(se.getMessage()));
+    return;
+  } catch (...) {
+    DVGui::error(tr("Couldn't load %1").arg(fp));
+    return;
+  }
+
+  if (m_calibration.isValid) {
+    QString question = tr("Overwriting the current calibration. Are you sure?");
+    int ret = DVGui::MsgBox(question, QObject::tr("OK"), QObject::tr("Cancel"));
+    if (ret == 0 || ret == 2) return;
+    m_calibration.isValid = false;
+  }
+
+  TSystem::copyFile(TFilePath(getCurrentCalibFilePath()), TFilePath(fp), true);
+  resetCalibSettingsFromFile();
+}
+
+//-----------------------------------------------------------------------------
+
+void PencilTestPopup::onCalibExportBtnClicked() {
+  // just in case
+  if (!m_calibration.isValid) return;
+  if (!QFileInfo(getCurrentCalibFilePath()).exists()) return;
+
+  ExportCalibrationFilePopup popup(this);
+
+  QString fp = popup.getPath().getQString();
+  if (fp.isEmpty()) return;
+
+  try {
+    {
+      QFileInfo fs(fp);
+      if (fs.exists() && !fs.isWritable()) {
+        throw TSystemException(
+            TFilePath(fp),
+            L"The file cannot be saved: it is a read only file.");
+      }
+    }
+    TSystem::copyFile(TFilePath(fp), TFilePath(getCurrentCalibFilePath()),
+                      true);
+  } catch (const TSystemException& se) {
+    DVGui::warning(QString::fromStdWString(se.getMessage()));
+  } catch (...) {
+    DVGui::error(tr("Couldn't save %1").arg(fp));
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+void PencilTestPopup::onCalibReadme() {
+  TFilePath readmeFp =
+      ToonzFolder::getLibraryFolder() + "camera calibration" + "readme.txt";
+  if (!TFileStatus(readmeFp).doesExist()) return;
+  if (TSystem::isUNC(readmeFp))
+    QDesktopServices::openUrl(QUrl(readmeFp.getQString()));
+  else
+    QDesktopServices::openUrl(QUrl::fromLocalFile(readmeFp.getQString()));
+}
+//-----------------------------------------------------------------------------
+
 OpenPopupCommandHandler<PencilTestPopup> openPencilTestPopup(MI_PencilTest);
 
 // specialized in order to call openSaveInFolderPopup()
@@ -2936,4 +3358,36 @@ void OpenPopupCommandHandler<PencilTestPopup>::execute() {
   m_popup->raise();
   m_popup->activateWindow();
   if (CamCapOpenSaveInPopupOnLaunch != 0) m_popup->openSaveInFolderPopup();
+}
+
+//=============================================================================
+
+ExportCalibrationFilePopup::ExportCalibrationFilePopup(QWidget* parent)
+    : GenericSaveFilePopup(tr("Export Camera Calibration Settings")) {
+  Qt::WindowFlags flags = windowFlags();
+  setParent(parent);
+  setWindowFlags(flags);
+  m_browser->enableGlobalSelection(false);
+  setFilterTypes(QStringList("xml"));
+}
+
+void ExportCalibrationFilePopup::showEvent(QShowEvent* e) {
+  FileBrowserPopup::showEvent(e);
+  setFolder(ToonzFolder::getLibraryFolder() + "camera calibration");
+}
+
+//=============================================================================
+
+LoadCalibrationFilePopup::LoadCalibrationFilePopup(QWidget* parent)
+    : GenericLoadFilePopup(tr("Load Camera Calibration Settings")) {
+  Qt::WindowFlags flags = windowFlags();
+  setParent(parent);
+  setWindowFlags(flags);
+  m_browser->enableGlobalSelection(false);
+  setFilterTypes(QStringList("xml"));
+}
+
+void LoadCalibrationFilePopup::showEvent(QShowEvent* e) {
+  FileBrowserPopup::showEvent(e);
+  setFolder(ToonzFolder::getLibraryFolder() + "camera calibration");
 }

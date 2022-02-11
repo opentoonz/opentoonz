@@ -46,9 +46,9 @@ struct ProgressCallbacks {
   virtual ~ProgressCallbacks() {}
 
   virtual void setProcessedName(const QString &name) = 0;
-  virtual void setRange(int min, int max) = 0;
-  virtual void setValue(int val) = 0;
-  virtual bool canceled() const  = 0;
+  virtual void setRange(int min, int max)            = 0;
+  virtual void setValue(int val)                     = 0;
+  virtual bool canceled() const                      = 0;
 };
 
 //************************************************************************************
@@ -79,12 +79,15 @@ struct ExportLevelOptions {
                     //!  \li Transparent pixels mapped to white
   bool m_noAntialias;  //!< Whether antialias must be removed from images.
 
+  TFrameId m_formatTemplateFId;
+
 public:
   ExportLevelOptions()
       : m_props(0)
       , m_bgColor(TPixel32::Transparent)
       , m_forRetas(false)
-      , m_noAntialias(false) {
+      , m_noAntialias(false)
+      , m_formatTemplateFId() {
     m_thicknessTransform[0][0] = 0.0, m_thicknessTransform[0][1] = 1.0;
     m_thicknessTransform[1][0] = 0.0, m_thicknessTransform[1][1] = 1.0;
   }
@@ -111,13 +114,13 @@ TImageP exportedImage(
     const TXshSimpleLevel &sl,  //!< Level host of the image to be exported.
     const TFrameId &fid,        //!< Frame of the image in sl.
     const ExportLevelOptions &opts = ExportLevelOptions()  //!< Export options.
-    );
+);
 
 //---------------------------------------------------------------------
 
 /*!
   \brief    Exports passed level to the specified path.
-  \return   Wheter the level was successfully exported <I>in its entirety</I>.
+  \return   Whether the level was successfully exported <I>in its entirety</I>.
             User cancels are reported as failures, even if a part of the level
             has been successfully exported.
 
@@ -142,7 +145,7 @@ bool exportLevel(
         0,  //!< External callbacks to overwrite requests.
     ProgressCallbacks *progressCB =
         0  //!< External callbacks to progress notifications.
-    );
+);
 
 }  // namespace IoCmd
 

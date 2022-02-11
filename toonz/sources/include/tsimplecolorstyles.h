@@ -41,7 +41,7 @@ class TVectorImage;
 //**********************************************************************************
 
 /*!
-  Base classs for stroke color styles.
+  Base class for stroke color styles.
 */
 
 class DVAPI TSimpleStrokeStyle : public TColorStyle {

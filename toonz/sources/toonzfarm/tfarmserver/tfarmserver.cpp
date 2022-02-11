@@ -31,7 +31,7 @@ using namespace TVER;
 #include <unistd.h>
 #endif
 
-//#define REDIRECT_OUPUT
+//#define REDIRECT_OUTPUT
 
 #ifdef _WIN32
 #define QUOTE_STR "\""

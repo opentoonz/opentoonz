@@ -27,6 +27,7 @@
 #include <QMenu>
 #include <QApplication>  //for drag&drop
 #include <QDrag>
+#include <QPushButton>
 
 //********************************************************************************
 //    Local namespace stuff
@@ -187,6 +188,48 @@ public:
 };
 
 //********************************************************************************
+//    FunctionSheetButtonArea  implementation
+//********************************************************************************
+
+FunctionSheetButtonArea::FunctionSheetButtonArea(QWidget *parent)
+    : QWidget(parent) {
+  m_syncSizeBtn = new QPushButton("", this);
+  m_syncSizeBtn->setCheckable(true);
+  m_syncSizeBtn->setFixedSize(20, 20);
+  static QPixmap syncScaleImg =
+      recolorPixmap(svgToPixmap(getIconThemePath("actions/17/syncscale.svg")));
+  QPixmap offPm(17, 17);
+  offPm.fill(Qt::transparent);
+  {
+    QPainter p(&offPm);
+    p.setOpacity(0.7);
+    p.drawPixmap(0, 0, syncScaleImg);
+  }
+  QIcon icon;
+  icon.addPixmap(offPm);
+  icon.addPixmap(syncScaleImg, QIcon::Normal, QIcon::On);
+  m_syncSizeBtn->setIcon(icon);
+
+  m_syncSizeBtn->setToolTip(tr("Toggle synchronizing zoom with xsheet"));
+
+  QVBoxLayout *layout = new QVBoxLayout();
+  layout->setMargin(2);
+  layout->setSpacing(0);
+  {
+    layout->addStretch();
+    layout->addWidget(m_syncSizeBtn, 0, Qt::AlignCenter);
+  }
+  setLayout(layout);
+
+  connect(m_syncSizeBtn, SIGNAL(clicked(bool)), this,
+          SIGNAL(syncSizeBtnToggled(bool)));
+}
+
+void FunctionSheetButtonArea::setSyncSizeBtnState(bool on) {
+  m_syncSizeBtn->setChecked(on);
+}
+
+//********************************************************************************
 //    FunctionSheetRowViewer  implementation
 //********************************************************************************
 
@@ -285,8 +328,8 @@ void FunctionSheetColumnHeadViewer::paintEvent(QPaintEvent *e) {
 
   int y0 = 0;
   int y1 = 17;  // needs work
-  int y2 = 34;
   int y3 = 53;
+  if (m_sheet->isSmallHeader()) y3 = 34;
 
   /*--- Fill header with background color ---*/
   for (int c = c0; c <= c1; c++) {
@@ -358,9 +401,9 @@ void FunctionSheetColumnHeadViewer::paintEvent(QPaintEvent *e) {
 
     QString text = channel->getShortName();
     int d        = 8;
-    painter.drawText(x0 + d, y1, width - d, y3 - y1 + 1,
-                     Qt::TextWrapAnywhere | Qt::AlignLeft | Qt::AlignVCenter,
-                     text);
+    int flags    = Qt::AlignLeft | Qt::AlignVCenter;
+    if (!m_sheet->isSmallHeader()) flags |= Qt::TextWrapAnywhere;
+    painter.drawText(x0 + d, y1, width - d, y3 - y1 + 1, flags, text);
 
     // warning of losing expression reference
     TXsheet *xsh = m_sheet->getViewer()->getXsheetHandle()->getXsheet();
@@ -655,6 +698,11 @@ void FunctionSheetCellViewer::drawCells(QPainter &painter, int r0, int c0,
 
   TXsheet *xsh = m_sheet->getViewer()->getXsheetHandle()->getXsheet();
 
+  bool simpleView = getViewer()->getFrameZoomFactor() <=
+                    Orientations::topToBottom()->dimension(
+                        PredefinedDimension::SCALE_THRESHOLD);
+  bool showIbtwn = !simpleView && m_sheet->isIbtwnValueVisible();
+
   // top and bottom pos
   int y0 = getViewer()->rowToY(r0);
   int y1 = getViewer()->rowToY(r1 + 1) - 1;
@@ -723,7 +771,7 @@ void FunctionSheetCellViewer::drawCells(QPainter &painter, int r0, int c0,
 
           // when the inbetween values are hidden, change the cell colors to
           // semi-transparent if the frame is in middle of the value step
-          if (!m_sheet->isIbtwnValueVisible()) {
+          if (!showIbtwn) {
             TDoubleKeyframe kf =
                 curve->getKeyframe(curve->getPrevKeyframe(row));
             int step = kf.m_step;
@@ -751,9 +799,8 @@ void FunctionSheetCellViewer::drawCells(QPainter &painter, int r0, int c0,
           }
         }
 
-        drawValue = (curve->isKeyframe(row))
-                        ? Key
-                        : (m_sheet->isIbtwnValueVisible()) ? Inbetween : None;
+        drawValue =
+            (curve->isKeyframe(row)) ? Key : (showIbtwn) ? Inbetween : None;
 
       }
       // empty cells
@@ -1138,7 +1185,8 @@ FunctionSheet::FunctionSheet(QWidget *parent, bool isFloating)
     : SpreadsheetViewer(parent)
     , m_selectedCells()
     , m_selection(0)
-    , m_isFloating(isFloating) {
+    , m_isFloating(isFloating)
+    , m_buttonArea(nullptr) {
   setColumnsPanel(m_columnHeadViewer = new FunctionSheetColumnHeadViewer(this));
   setRowsPanel(m_rowViewer = new FunctionSheetRowViewer(this));
   setCellsPanel(m_cellViewer = new FunctionSheetCellViewer(this));
@@ -1156,6 +1204,10 @@ FunctionSheet::FunctionSheet(QWidget *parent, bool isFloating)
     setGeometry(settings.value("FunctionSpreadsheet", QRect(500, 500, 400, 300))
                     .toRect());
   }
+
+  setButtonAreaWidget(m_buttonArea = new FunctionSheetButtonArea(this));
+  connect(m_buttonArea, SIGNAL(syncSizeBtnToggled(bool)), this,
+          SLOT(onSyncSizeBtnToggled(bool)));
 }
 
 //-----------------------------------------------------------------------------
@@ -1189,6 +1241,12 @@ void FunctionSheet::setSelection(FunctionSelection *selection) {
 void FunctionSheet::showEvent(QShowEvent *e) {
   m_frameScroller.registerFrameScroller();
   SpreadsheetViewer::showEvent(e);
+
+  if (m_xshHandle && m_syncSize) {
+    connect(m_xshHandle, SIGNAL(zoomScaleChanged()), this,
+            SLOT(onZoomScaleChanged()));
+    onZoomScaleChanged();
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -1196,6 +1254,11 @@ void FunctionSheet::showEvent(QShowEvent *e) {
 void FunctionSheet::hideEvent(QHideEvent *e) {
   m_frameScroller.unregisterFrameScroller();
   SpreadsheetViewer::hideEvent(e);
+
+  if (m_xshHandle && m_syncSize) {
+    disconnect(m_xshHandle, SIGNAL(zoomScaleChanged()), this,
+               SLOT(onZoomScaleChanged()));
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -1343,4 +1406,49 @@ TStageObject *FunctionSheet::getStageObject(int column) {
   if (!stageItem) return nullptr;
 
   return stageItem->getStageObject();
+}
+
+//-----------------------------------------------------------------------------
+
+void FunctionSheet::setSyncSize(bool on) {
+  m_syncSize = on;
+  m_buttonArea->setSyncSizeBtnState(on);
+  update();
+}
+
+//-----------------------------------------------------------------------------
+
+int FunctionSheet::getFrameZoomFactor() const {
+  if (m_syncSize && m_xshHandle) {
+    int zoomFactor = m_xshHandle->getZoomFactor();
+    return 50 + (zoomFactor - 20) * 5 / 8;
+  }
+  return 100;
+}
+
+//-----------------------------------------------------------------------------
+
+void FunctionSheet::onSyncSizeBtnToggled(bool on) {
+  // switch the flag
+  m_syncSize = on;
+
+  if (m_xshHandle) {
+    if (on)
+      connect(m_xshHandle, SIGNAL(zoomScaleChanged()), this,
+              SLOT(onZoomScaleChanged()));
+    else
+      disconnect(m_xshHandle, SIGNAL(zoomScaleChanged()), this,
+                 SLOT(onZoomScaleChanged()));
+    onZoomScaleChanged();
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+void FunctionSheet::onZoomScaleChanged() {
+  QPoint xyOrig = positionToXY(CellPosition(getCurrentFrame(), -1));
+  setScaleFactor(getFrameZoomFactor());
+  QPoint xyNew = positionToXY(CellPosition(getCurrentFrame(), -1));
+  scroll(xyNew - xyOrig);
+  update();
 }

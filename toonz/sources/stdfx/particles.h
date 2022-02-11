@@ -7,6 +7,8 @@
 #include "tspectrum.h"
 #include "trandom.h"
 
+const int Ctrl_64_Offset = 1000;
+
 //------------------------------------------------------------------------------
 
 struct particles_values {

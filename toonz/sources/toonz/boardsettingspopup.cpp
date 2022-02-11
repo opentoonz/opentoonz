@@ -964,7 +964,7 @@ void BoardSettingsPopup::hideEvent(QHideEvent* event) {
 
 // called on changing the current row of ItemListView
 void BoardSettingsPopup::onCurrentItemSwitched(int index) {
-  // updat Info
+  // update Info
   m_itemInfoView->setCurrentItem(index);
 
   m_boardView->update();

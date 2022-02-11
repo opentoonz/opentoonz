@@ -310,24 +310,41 @@ QGroupBox {
 ----------------------------------------------------------------------------- */
 
 .Slider {
-  &::groove:horizontal {
+  &::groove{
     background-color: transparent;
     background-image: url('@{img-url}/@{slider-groove-img}');
     background-position: center center;
-    background-repeat: repeat-x;
     margin: 0;
+    &:horizontal {
+    background-repeat: repeat-x;
     height: 20;
     min-height: 20;
+    }
+    &:vertical {
+      background-repeat: repeat-y;
+      width: 20;
+      min-width: 20;
+    }
     &:disabled {
       background-image: url('@{img-url}/@{slider-groove-img-disabled}');
     }
   }
-  &::handle:horizontal {
-    width: @slider-handle-width;
-    margin: @slider-handle-margin;
-    image: url('@{img-url}/@{slider-handle-img}');
-    &:disabled {
-      image: url('@{img-url}/@{slider-handle-img-disabled}');
+  &::handle{
+    &:horizontal {
+      margin: @slider-handle-margin;
+      width: @slider-handle-width;
+      image: url('@{img-url}/@{slider-handle-img}');
+      &:disabled {
+        image: url('@{img-url}/@{slider-handle-img-disabled}');
+      }
+    }
+    &:vertical {
+      margin: @slider-v-handle-margin;
+      height: @slider-handle-width;
+      image: url('@{img-url}/@{slider-v-handle-img}');
+      &:disabled {
+        image: url('@{img-url}/@{slider-v-handle-img-disabled}');
+      }
     }
   }
 }

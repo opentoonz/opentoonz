@@ -46,7 +46,7 @@ class StrokeDeformationImpl;
 
 /**
    * @brief This class is the interface for manipulation
-   *        algorihms.
+   *        algorithms.
    *
    * StrokeDeformation is a wrapper for for StrokeDeformationImpl,
    * its function is to verify state and parameteres before

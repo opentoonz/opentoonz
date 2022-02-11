@@ -182,6 +182,8 @@ public:
         .arg(QString::fromStdWString(m_level->getName()))
         .arg(QString::number(m_frameId.getNumber()));
   }
+
+  void onAdd() override;
 };
 
 //================================================================================================

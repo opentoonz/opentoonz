@@ -127,7 +127,7 @@ public:
   std::vector<TXshLevel *> loadedLevels;  //!< [\p Out]     Levels loaded by
                                           //! resource loading procedures.
 
-  int xFrom, xTo;
+  TFrameId xFrom, xTo;
   std::wstring levelName;
   int step, inc, frameCount;
   bool doesFileActuallyExist;
@@ -186,6 +186,7 @@ bool loadSubScene(const TFilePath &scenePath);
 enum SaveSceneFlags {
   SILENTLY_OVERWRITE = 0x1,
   SAVE_SUBXSHEET     = 0x2,
+  AUTO_SAVE          = 0x4
 };
 
 // ritorna true sse la scena e' stata salvata
@@ -196,7 +197,7 @@ enum SaveSceneFlags {
 // 0 salva comunque
 // tutta la scena, altrimenti solo il sottoxsheet
 bool saveScene(const TFilePath &fp, int flags);
-bool saveScene();
+bool saveScene(int flags = 0);
 
 bool saveLevel(const TFilePath &fp);
 bool saveLevel();
@@ -204,7 +205,7 @@ bool saveLevel();
 bool saveLevel(const TFilePath &fp, TXshSimpleLevel *sl, bool overwrite);
 bool saveLevel(TXshSimpleLevel *sl);
 
-bool saveAll();
+bool saveAll(int flags = 0);
 
 void saveNonSceneFiles();
 

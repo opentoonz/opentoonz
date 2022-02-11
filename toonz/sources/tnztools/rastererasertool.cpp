@@ -178,7 +178,7 @@ public:
     TToonzImageP image = m_level->getFrame(m_frameId, true);
     TRasterCM32P ras   = image->getRaster();
     RasterStrokeGenerator m_rasterTrack(ras, ERASE, m_colorType, 0, m_points[0],
-                                        m_selective, m_colorSelected,
+                                        m_selective, m_colorSelected, false,
                                         !m_isPencil);
     m_rasterTrack.setPointsSequence(m_points);
     m_rasterTrack.generateStroke(m_isPencil);
@@ -568,7 +568,7 @@ EraserTool inkPaintEraserTool("T_Eraser");
 
 //==================================================================================================
 //
-//  InkPaintTool implemention
+//  InkPaintTool implementation
 //
 //------------------------------------------------------------------------
 
@@ -939,7 +939,7 @@ void EraserTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
         if (m_colorType.getValue() == ALL) m_colorTypeEraser   = INKNPAINT;
         m_normalEraser = new RasterStrokeGenerator(
             raster, ERASE, m_colorTypeEraser, 0, intPos,
-            m_currentStyle.getValue(), currentStyle,
+            m_currentStyle.getValue(), currentStyle, false,
             !(m_pencil.getValue() || m_colorType.getValue() == AREAS));
         m_tileSaver->save(m_normalEraser->getLastRect());
         m_normalEraser->generateLastPieceOfStroke(

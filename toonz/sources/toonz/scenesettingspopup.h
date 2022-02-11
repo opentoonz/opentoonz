@@ -13,6 +13,25 @@
 // forward declaration
 class TSceneProperties;
 class QComboBox;
+class QLineEdit;
+
+class CellMarksPopup final : public QDialog {
+  Q_OBJECT
+  struct MarkerField {
+    int id;
+    DVGui::ColorField *colorField;
+    QLineEdit *nameField;
+  };
+
+  QList<MarkerField> m_fields;
+
+public:
+  CellMarksPopup(QWidget *parent);
+  void update();
+protected slots:
+  void onColorChanged(const TPixel32 &, bool);
+  void onNameChanged();
+};
 
 //=============================================================================
 // SceneSettingsPopup
@@ -36,6 +55,8 @@ class SceneSettingsPopup final : public QDialog {
   DVGui::CheckBox *m_colorFilterOnRenderCB;
 
   TSceneProperties *getProperties() const;
+
+  CellMarksPopup *m_cellMarksPopup;
 
 public:
   SceneSettingsPopup();
@@ -61,6 +82,8 @@ public slots:
   void setBgColor(const TPixel32 &value, bool isDragging);
 
   void onColorFilterOnRenderChanged();
+
+  void onEditCellMarksButtonClicked();
 };
 
 #endif  // SCENESETTINGSPOPUP_H

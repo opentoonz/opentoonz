@@ -2,7 +2,7 @@
     "comment": "MyPaint brush file",
     "description": "A brush to simulate furs, just to smudging",
     "group": "",
-    "notes": "Brush package optimized for OpenToonz v0.1\n\nAuthor: Anderson Prado (aka AndeOn)\nLicense: CC0/Public Domain",
+    "notes": "Brush package optimized for OpenToonz v0.2\n\nAuthor: Anderson Prado (aka AndeOn)\nLicense: CC0/Public Domain",
     "parent_brush_name": "",
     "settings": {
         "anti_aliasing": {
@@ -41,15 +41,15 @@
             "inputs": {}
         },
         "color_h": {
-            "base_value": 0.41366933434700215,
+            "base_value": 0.0,
             "inputs": {}
         },
         "color_s": {
-            "base_value": 0.7604166666666666,
+            "base_value": 0.0,
             "inputs": {}
         },
         "color_v": {
-            "base_value": 0.59375,
+            "base_value": 0.0,
             "inputs": {}
         },
         "colorize": {
@@ -58,21 +58,10 @@
         },
         "custom_input": {
             "base_value": 0.0,
-            "inputs": {
-                "pressure": [
-                    [
-                        0.0,
-                        0.0
-                    ],
-                    [
-                        1.0,
-                        1.0
-                    ]
-                ]
-            }
+            "inputs": {}
         },
         "custom_input_slowness": {
-            "base_value": 0.71,
+            "base_value": 0.0,
             "inputs": {}
         },
         "dabs_per_actual_radius": {
@@ -226,7 +215,7 @@
             "inputs": {}
         },
         "posterize_num": {
-            "base_value": 0.05000000074505806,
+            "base_value": 0.0,
             "inputs": {}
         },
         "pressure_gain_log": {

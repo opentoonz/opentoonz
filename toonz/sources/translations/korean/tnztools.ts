@@ -210,31 +210,31 @@
     </message>
     <message>
         <source>Snap</source>
-        <translation type="unfinished">스냅</translation>
+        <translation>스냅</translation>
     </message>
     <message>
         <source>Type:</source>
-        <translation type="unfinished">유형:</translation>
+        <translation>유형:</translation>
     </message>
     <message>
         <source>Rectangular</source>
-        <translation type="unfinished">직사각형</translation>
+        <translation>직사각형</translation>
     </message>
     <message>
         <source>Freehand</source>
-        <translation type="unfinished">올가미</translation>
+        <translation>올가미</translation>
     </message>
     <message>
         <source>Low</source>
-        <translation type="unfinished">낮은</translation>
+        <translation>낮은</translation>
     </message>
     <message>
         <source>Med</source>
-        <translation type="unfinished">중간</translation>
+        <translation>중간</translation>
     </message>
     <message>
         <source>High</source>
-        <translation type="unfinished">높은</translation>
+        <translation>높은</translation>
     </message>
 </context>
 <context>
@@ -418,7 +418,7 @@
     </message>
     <message>
         <source>Polyline</source>
-        <translation>다각형</translation>
+        <translation>폴리선</translation>
     </message>
     <message>
         <source>Hardness:</source>
@@ -446,23 +446,23 @@
     </message>
     <message>
         <source>Segment</source>
-        <translation type="unfinished">세그먼트</translation>
+        <translation>세그먼트</translation>
     </message>
     <message>
         <source>Linear</source>
-        <translation type="unfinished">선형</translation>
+        <translation>선형</translation>
     </message>
     <message>
         <source>Ease In</source>
-        <translation type="unfinished"></translation>
+        <translation>가속</translation>
     </message>
     <message>
         <source>Ease Out</source>
-        <translation type="unfinished"></translation>
+        <translation>감속</translation>
     </message>
     <message>
         <source>Ease In/Out</source>
-        <translation type="unfinished"></translation>
+        <translation>가속/감속</translation>
     </message>
 </context>
 <context>
@@ -489,7 +489,7 @@
     </message>
     <message>
         <source>Polyline</source>
-        <translation>다각형</translation>
+        <translation>폴리선</translation>
     </message>
     <message>
         <source>Selective</source>
@@ -610,7 +610,7 @@
     </message>
     <message>
         <source>Polyline</source>
-        <translation>다각형</translation>
+        <translation>올가미</translation>
     </message>
     <message>
         <source>Invert</source>
@@ -881,7 +881,7 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Polyline</source>
-        <translation>다각형</translation>
+        <translation>폴리선</translation>
     </message>
     <message>
         <source>Arc</source>
@@ -981,11 +981,11 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>MultiArc</source>
-        <translation type="unfinished"></translation>
+        <translation>멀티아크</translation>
     </message>
     <message>
         <source>Smooth</source>
-        <translation type="unfinished">부드러운</translation>
+        <translation>부드러운</translation>
     </message>
 </context>
 <context>
@@ -1187,7 +1187,7 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Snap At Intersection</source>
-        <translation type="unfinished"></translation>
+        <translation>교차점에서 스냅</translation>
     </message>
 </context>
 <context>
@@ -1210,7 +1210,7 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Polyline</source>
-        <translation>다각형</translation>
+        <translation>폴리선</translation>
     </message>
     <message>
         <source>Passive Pick</source>
@@ -1259,7 +1259,7 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Polyline</source>
-        <translation>다각형</translation>
+        <translation>폴리선</translation>
     </message>
     <message>
         <source>Distance:</source>
@@ -1767,7 +1767,7 @@ moved to the end of the first page of the palette.</source>
     </message>
     <message>
         <source>Include Intersection</source>
-        <translation type="unfinished"></translation>
+        <translation>인터페이스 포함</translation>
     </message>
 </context>
 <context>

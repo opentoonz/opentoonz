@@ -441,7 +441,7 @@ void ColorModelViewer::changePickType() {
 
 //-----------------------------------------------------------------------------
 /*! If current palette level exists reset image viewer and set current viewer
-    to refences image path level.
+    to reference image path level.
 */
 
 void ColorModelViewer::updateViewer() { getImageViewer()->repaint(); }

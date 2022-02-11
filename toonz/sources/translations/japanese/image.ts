@@ -48,7 +48,7 @@
 <context>
     <name>PngWriterProperties</name>
     <message>
-        <location filename="../../image/png/tiio_png.cpp" line="746"/>
+        <location filename="../../image/png/tiio_png.cpp" line="757"/>
         <source>Alpha Channel</source>
         <translation>アルファチャンネル</translation>
     </message>

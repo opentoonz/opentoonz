@@ -68,22 +68,22 @@
 <context>
     <name>AdjustPaletteDialog</name>
     <message>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="697"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="700"/>
         <source>Adjust Current Level to This Palette</source>
         <translation>Přizpůsobit nynější úroveň této paletě</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="703"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="706"/>
         <source>Tolerance</source>
         <translation>Tolerance</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="706"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="709"/>
         <source>Apply</source>
         <translation>Použít</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="708"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="711"/>
         <source>Cancel</source>
         <translation>Zrušit</translation>
     </message>
@@ -104,82 +104,107 @@
 <context>
     <name>CameraSettingsWidget</name>
     <message>
-        <location filename="../../toonzqt/camerasettingswidget.cpp" line="194"/>
-        <location filename="../../toonzqt/camerasettingswidget.cpp" line="198"/>
-        <location filename="../../toonzqt/camerasettingswidget.cpp" line="397"/>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="182"/>
+        <source>cm</source>
+        <translation>cm</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="183"/>
+        <source>mm</source>
+        <translation>mm</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="184"/>
+        <source>inch</source>
+        <translation>palec</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="185"/>
+        <source>field</source>
+        <translation>pole</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="186"/>
+        <source>pixel</source>
+        <translation>pixel</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="206"/>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="211"/>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="410"/>
         <source>Pixels</source>
         <translation>Pixely</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/camerasettingswidget.cpp" line="197"/>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="210"/>
         <source>DPI</source>
         <translation>DPI</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/camerasettingswidget.cpp" line="199"/>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="212"/>
         <source>x</source>
         <translation>x</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/camerasettingswidget.cpp" line="203"/>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="216"/>
         <source>Use Current Level Settings</source>
         <translation>Použít nastavení nynější úrovně</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/camerasettingswidget.cpp" line="206"/>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="219"/>
         <source>Add</source>
         <translation>Přidat</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/camerasettingswidget.cpp" line="207"/>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="220"/>
         <source>Remove</source>
         <translation>Odstranit</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/camerasettingswidget.cpp" line="244"/>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="257"/>
         <source>Force Squared Pixel</source>
         <translation>Vynutit čtvercové obrazové body</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/camerasettingswidget.cpp" line="291"/>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="304"/>
         <source>A/R</source>
         <translation>A/R</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/camerasettingswidget.cpp" line="405"/>
-        <location filename="../../toonzqt/camerasettingswidget.cpp" line="828"/>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="419"/>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="842"/>
         <source>&lt;custom&gt;</source>
         <translation>&lt;vlastní&gt;</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/camerasettingswidget.cpp" line="874"/>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="888"/>
         <source>Bad camera preset</source>
         <translation>Špatné přednastavení kamery</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/camerasettingswidget.cpp" line="875"/>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="889"/>
         <source>&apos;%1&apos; doesn&apos;t seem a well formed camera preset. 
 Possibly the preset file has been corrupted</source>
         <translation>Zdá se, že &apos;%1&apos; není dobře udělané přednastavení kamery.
 Možná byl soubor s přednastavením poškozen</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/camerasettingswidget.cpp" line="908"/>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="922"/>
         <source>Preset name</source>
         <translation>Název přednastavení</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/camerasettingswidget.cpp" line="909"/>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="923"/>
         <source>Enter the name for %1</source>
         <translation>Zadejte název pro %1</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/camerasettingswidget.cpp" line="914"/>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="928"/>
         <source>Error : Preset Name is Invalid</source>
         <translation>Chyba: Název přednastavení je neplatný</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/camerasettingswidget.cpp" line="915"/>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="929"/>
         <source>The preset name must not use &apos;,&apos;(comma).</source>
         <translation>Název přednastavení nesmí používat&apos;,&apos;(čárku).</translation>
     </message>
@@ -384,7 +409,7 @@ Možná byl soubor s přednastavením poškozen</translation>
 <context>
     <name>DVGui::ProgressDialog</name>
     <message>
-        <location filename="../../toonzqt/dvdialog.cpp" line="891"/>
+        <location filename="../../toonzqt/dvdialog.cpp" line="894"/>
         <source>OpenToonz</source>
         <translation>OpenToonz</translation>
     </message>
@@ -392,7 +417,7 @@ Možná byl soubor s přednastavením poškozen</translation>
 <context>
     <name>DVGui::RadioButtonDialog</name>
     <message>
-        <location filename="../../toonzqt/dvdialog.cpp" line="821"/>
+        <location filename="../../toonzqt/dvdialog.cpp" line="824"/>
         <source>OpenToonz</source>
         <translation>OpenToonz</translation>
     </message>
@@ -1654,156 +1679,168 @@ Vyberte uzly efektů a příbuzné odkazy, jež chcete vložit, před kopírová
 <context>
     <name>PaletteViewer</name>
     <message>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="280"/>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="458"/>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="557"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="224"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="459"/>
+        <source>Set Toolbar Below Styles</source>
+        <translation>Nastavit panel nástrojů pod styly</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="228"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="461"/>
+        <source>Set Toolbar Above Styles</source>
+        <translation>Nastavit panel nástrojů nad styly</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="336"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="524"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="623"/>
         <source>&amp;Save Palette As</source>
         <translation>&amp;Uložit paletu jako</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="281"/>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="462"/>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="558"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="337"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="528"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="624"/>
         <source>&amp;Save Palette</source>
         <translation>&amp;Uložit paletu</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="315"/>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="328"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="371"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="384"/>
         <source>Lock Palette</source>
         <translation>Uzamknout paletu</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="332"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="388"/>
         <source>&amp;Lock Palette</source>
         <translation>&amp;Uzamknout paletu</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="355"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="411"/>
         <source>Options</source>
         <translation>Volby</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="372"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="428"/>
         <source>&amp;Small Thumbnails View</source>
         <translation>&amp;Malé náhledy</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="373"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="429"/>
         <source>&amp;Medium Thumbnails View</source>
         <translation>&amp;Střední náhledy</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="374"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="430"/>
         <source>&amp;Large Thumbnails View</source>
         <translation>&amp;Velké náhledy</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="375"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="431"/>
         <source>&amp;List View</source>
         <translation>&amp;Pohled se seznamem</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="395"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="451"/>
         <source>Style Name</source>
         <translation>Název stylu</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="396"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="452"/>
         <source>StudioPalette Name</source>
         <translation>Název studiové palety</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="397"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="453"/>
         <source>Both Names</source>
         <translation>Oba názvy</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="400"/>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="1168"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="466"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="1234"/>
         <source>Hide New Style Button</source>
         <translation>Skrýt tlačítko nového stylu</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="401"/>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="1169"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="467"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="1235"/>
         <source>Show New Style Button</source>
         <translation>Ukázat tlačítko nového stylu</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="417"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="483"/>
         <source>&amp;New Page</source>
         <translation>&amp;Nová strana</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="425"/>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="537"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="491"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="603"/>
         <source>&amp;New Style</source>
         <translation>&amp;Nový styl</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="474"/>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="740"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="540"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="806"/>
         <source>&amp;Move Palette</source>
         <translation>&amp;Posunout paletu</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="559"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="625"/>
         <source>&amp;Palette Gizmo</source>
         <translation>Upravit &amp;paletu</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="596"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="662"/>
         <source>New Page</source>
         <translation>Nová strana</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="608"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="674"/>
         <source>Delete Page</source>
         <translation>Smazat stranu</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="951"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="1017"/>
         <source>Overwrite</source>
         <translation>Přepsat</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="951"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="1017"/>
         <source>Don&apos;t Overwrite</source>
         <translation>Nepřepisovat</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="960"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="1026"/>
         <source>Failed to save palette.</source>
         <translation>Nepodařilo se uložit paletu.</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="1098"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="1164"/>
         <source>Palette</source>
         <translation>Paleta</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="1102"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="1168"/>
         <source>Level Palette: </source>
         <translation>Paleta úrovně: </translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="1109"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="1175"/>
         <source>Cleanup Palette</source>
         <translation>Vyčistit paletu</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="1120"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="1186"/>
         <source>Studio Palette</source>
         <translation>Studiová paleta</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="1127"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="1193"/>
         <source>     (Color Model: </source>
         <translation> (Barevný model: </translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="1129"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="1195"/>
         <source>)</source>
         <translation>)</translation>
     </message>
@@ -1993,26 +2030,26 @@ Druhý řádek by měl být &quot;Mesh [Input bit depth] [Output bit depth]&quot
         <translation>Nepodařilo se nahrát soubor 3DLUT.</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/camerasettingswidget.cpp" line="935"/>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="949"/>
         <source>Deleting &quot;%1&quot;.
 Are you sure?</source>
         <translation>Maže se &quot;%1&quot;
 Jste si jistý?</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/camerasettingswidget.cpp" line="937"/>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="951"/>
         <location filename="../../include/toonzqt/paramfield.h" line="257"/>
         <source>Delete</source>
         <translation>Smazat</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/camerasettingswidget.cpp" line="937"/>
+        <location filename="../../toonzqt/camerasettingswidget.cpp" line="951"/>
         <location filename="../../toonzqt/styleselection.cpp" line="768"/>
         <location filename="../../toonzqt/styleselection.cpp" line="1071"/>
-        <location filename="../../toonzqt/dvdialog.cpp" line="850"/>
-        <location filename="../../toonzqt/dvdialog.cpp" line="1344"/>
-        <location filename="../../toonzqt/dvdialog.cpp" line="1430"/>
-        <location filename="../../toonzqt/dvdialog.cpp" line="1437"/>
+        <location filename="../../toonzqt/dvdialog.cpp" line="853"/>
+        <location filename="../../toonzqt/dvdialog.cpp" line="1347"/>
+        <location filename="../../toonzqt/dvdialog.cpp" line="1433"/>
+        <location filename="../../toonzqt/dvdialog.cpp" line="1440"/>
         <source>Cancel</source>
         <translation>Zrušit</translation>
     </message>
@@ -2183,12 +2220,12 @@ Jste si jistý?</translation>
         <translation>Není možné nahrát cestu pohybu.</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="1070"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="1077"/>
         <source>Stage Schematic</source>
         <translation>Náčrtek jeviště</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="1092"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="1099"/>
         <source>FX Schematic</source>
         <translation>Náčrtek efektu</translation>
     </message>
@@ -2198,25 +2235,25 @@ Jste si jistý?</translation>
         <translation>Změnit styl   Paleta: %1  Styl #%2  [R%3 G%4 B%5] -&gt; [R%6 G%7 B%8]</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="2048"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="2060"/>
         <source>Plain color</source>
         <comment>VectorBrushStyleChooserPage</comment>
         <translation>Normální barva</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="2226"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="2238"/>
         <source>Custom Texture</source>
         <comment>TextureStyleChooserPage</comment>
         <translation>Vlastní textura (povrch)</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="2292"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="2304"/>
         <source>Plain color</source>
         <comment>MyPaintBrushStyleChooserPage</comment>
         <translation>Normální barva</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="2441"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="2453"/>
         <source>Plain color</source>
         <comment>SpecialStyleChooserPage</comment>
         <translation>Normální barva</translation>
@@ -2307,12 +2344,12 @@ Jste si jistý?</translation>
         <translation type="vanished">Paleta</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="928"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="994"/>
         <source>Overwrite</source>
         <translation>Přepsat</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/paletteviewer.cpp" line="929"/>
+        <location filename="../../toonzqt/paletteviewer.cpp" line="995"/>
         <source>Don&apos;t Overwrite</source>
         <translation>Nepřepisovat</translation>
     </message>
@@ -2502,57 +2539,57 @@ Jste si jistý?</translation>
         <translation>Soubor %1 neexistuje.</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/imageutils.cpp" line="140"/>
+        <location filename="../../toonzqt/imageutils.cpp" line="144"/>
         <source>It is not possible to find the %1 level.</source>
         <translation>Úroveň %1 nelze najít.</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/imageutils.cpp" line="167"/>
+        <location filename="../../toonzqt/imageutils.cpp" line="171"/>
         <source>There was an error copying %1</source>
         <translation>Při kopírování %1 se vyskytla chyba</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/imageutils.cpp" line="189"/>
+        <location filename="../../toonzqt/imageutils.cpp" line="193"/>
         <source>It is not possible to find the level %1</source>
         <translation>Není možné najít úroveň %1</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/imageutils.cpp" line="196"/>
-        <location filename="../../toonzqt/imageutils.cpp" line="204"/>
-        <location filename="../../toonzqt/imageutils.cpp" line="265"/>
+        <location filename="../../toonzqt/imageutils.cpp" line="200"/>
+        <location filename="../../toonzqt/imageutils.cpp" line="208"/>
+        <location filename="../../toonzqt/imageutils.cpp" line="269"/>
         <source>Cannot premultiply the selected file.</source>
         <translation>Nelze přednásobit vybraný soubor.</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/imageutils.cpp" line="200"/>
+        <location filename="../../toonzqt/imageutils.cpp" line="204"/>
         <source>Cannot premultiply a vector-based level.</source>
         <translation>Nelze přednásobit na vektorech založenou úroveň.</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/imageutils.cpp" line="271"/>
+        <location filename="../../toonzqt/imageutils.cpp" line="275"/>
         <source>Level %1 premultiplied.</source>
         <translation>Úroveň %1 přednásobena.</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/imageutils.cpp" line="425"/>
-        <location filename="../../toonzqt/imageutils.cpp" line="454"/>
+        <location filename="../../toonzqt/imageutils.cpp" line="429"/>
+        <location filename="../../toonzqt/imageutils.cpp" line="458"/>
         <source>Frame %1 : conversion failed!</source>
         <translation>Snímek %1: převod selhal!</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/imageutils.cpp" line="692"/>
-        <location filename="../../toonzqt/imageutils.cpp" line="721"/>
-        <location filename="../../toonzqt/imageutils.cpp" line="728"/>
+        <location filename="../../toonzqt/imageutils.cpp" line="695"/>
+        <location filename="../../toonzqt/imageutils.cpp" line="724"/>
+        <location filename="../../toonzqt/imageutils.cpp" line="731"/>
         <source>The source image seems not suitable for this kind of conversion</source>
         <translation>Zdá se, že zdrojový obrázek není vhodný pro tento druh převodu</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/gutil.cpp" line="374"/>
+        <location filename="../../toonzqt/gutil.cpp" line="558"/>
         <source>The file name cannot be empty or contain any of the following characters: (new line) \ / : * ? &quot; |</source>
         <translation>Název souboru nesmí být prázdný nebo obsahovat následující znaky: (nový řádek)  \ / : * ? &quot;  |</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/gutil.cpp" line="401"/>
+        <location filename="../../toonzqt/gutil.cpp" line="585"/>
         <source>That is a reserved file name and cannot be used.</source>
         <translation>Toto je vyhrazený název souboru a nelze jej použít.</translation>
     </message>
@@ -2561,64 +2598,64 @@ Jste si jistý?</translation>
         <translation type="vanished">OpenToonz 1.3</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/dvdialog.cpp" line="76"/>
+        <location filename="../../toonzqt/dvdialog.cpp" line="79"/>
         <source>Information</source>
         <translation>Informace</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/dvdialog.cpp" line="79"/>
+        <location filename="../../toonzqt/dvdialog.cpp" line="82"/>
         <source>Warning</source>
         <translation>Varování</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/dvdialog.cpp" line="82"/>
+        <location filename="../../toonzqt/dvdialog.cpp" line="85"/>
         <source>Critical</source>
         <translation>Važné</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/dvdialog.cpp" line="85"/>
+        <location filename="../../toonzqt/dvdialog.cpp" line="88"/>
         <source>Question</source>
         <translation>Otázka</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/dvdialog.cpp" line="848"/>
+        <location filename="../../toonzqt/dvdialog.cpp" line="851"/>
         <source>Apply</source>
         <translation>Použít</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/dvdialog.cpp" line="1342"/>
+        <location filename="../../toonzqt/dvdialog.cpp" line="1345"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/dvdialog.cpp" line="1423"/>
+        <location filename="../../toonzqt/dvdialog.cpp" line="1426"/>
         <source>Styles you are going to delete are used to paint lines and areas in the animation level.
 </source>
         <translation>Styly, jež se chystáte smazat, se používají k malování čar a ploch v animační úrovni.
 </translation>
     </message>
     <message>
-        <location filename="../../toonzqt/dvdialog.cpp" line="1426"/>
+        <location filename="../../toonzqt/dvdialog.cpp" line="1429"/>
         <source>How do you want to proceed?</source>
         <translation>Jak chcete pokračovat?</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/dvdialog.cpp" line="1428"/>
+        <location filename="../../toonzqt/dvdialog.cpp" line="1431"/>
         <source>Delete Styles Only</source>
         <translation>Smazat jen styly</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/dvdialog.cpp" line="1429"/>
+        <location filename="../../toonzqt/dvdialog.cpp" line="1432"/>
         <source>Delete Styles, Lines and Areas</source>
         <translation>Smazat styly, čáry a plochy</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/dvdialog.cpp" line="1437"/>
+        <location filename="../../toonzqt/dvdialog.cpp" line="1440"/>
         <source>Ok</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/dvdialog.cpp" line="1440"/>
+        <location filename="../../toonzqt/dvdialog.cpp" line="1443"/>
         <source>Deletion of Lines and Areas from raster-based levels is not undoable.
 Are you sure?</source>
         <translation>Smazání čar a ploch z na rastrech založených úrovní se nedá vrátit zpět.
@@ -2643,7 +2680,7 @@ Jste si jistý?</translation>
 <context>
     <name>QPushButton</name>
     <message>
-        <location filename="../../toonzqt/dvdialog.cpp" line="1060"/>
+        <location filename="../../toonzqt/dvdialog.cpp" line="1063"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
@@ -2664,76 +2701,76 @@ Jste si jistý?</translation>
 <context>
     <name>SchematicViewer</name>
     <message>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="913"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="920"/>
         <source>&amp;Fit to Window</source>
         <translation>&amp;Přizpůsobit oknu</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="919"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="926"/>
         <source>&amp;Focus on Current</source>
         <translation>&amp;Zaměřit na nynější předmět</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="924"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="931"/>
         <source>&amp;Reorder Nodes</source>
         <translation>&amp;Přeuspořádat uzly</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="930"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="937"/>
         <source>&amp;Reset Size</source>
         <translation>&amp;Obnovit výchozí velikost</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="937"/>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="1117"/>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="1173"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="944"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="1124"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="1180"/>
         <source>&amp;Minimize Nodes</source>
         <translation>&amp;Zmenšit uzly</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="937"/>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="1118"/>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="1174"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="944"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="1125"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="1181"/>
         <source>&amp;Maximize Nodes</source>
         <translation>&amp;Zvětšit uzly</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="943"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="950"/>
         <source>&amp;Selection Mode</source>
         <translation>Režim &amp;výběru</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="948"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="955"/>
         <source>&amp;Zoom Mode</source>
         <translation>Režim &amp;zvětšení</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="953"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="960"/>
         <source>&amp;Hand Mode</source>
         <translation>&amp;Ruční režim</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="961"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="968"/>
         <source>&amp;New Pegbar</source>
         <translation>&amp;Nový pruh na kolíky</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="968"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="975"/>
         <source>&amp;New Camera</source>
         <translation>&amp;Nová kamera</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="975"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="982"/>
         <source>&amp;New Motion Path</source>
         <translation>&amp;Nová cesta pohybu</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="983"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="990"/>
         <source>&amp;Swtich output port display mode</source>
         <translation>&amp;Přepnout režim zobrazení výstupní přípojky (port)</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="1002"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="1009"/>
         <source>&amp;Toggle node icons</source>
         <translation>&amp;Přepnout ikony uzlů</translation>
     </message>
@@ -2863,24 +2900,24 @@ Jste si jistý?</translation>
 <context>
     <name>StudioPaletteTreeViewer</name>
     <message>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="484"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="487"/>
         <source>The current palette %1
 in the studio palette has been modified. Do you want to save your changes?</source>
         <translation>Nynější paleta %1
 ve studiové paletě byla změněna. Chcete uložit změny?</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="489"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="492"/>
         <source>Save</source>
         <translation>Uložit</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="489"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="492"/>
         <source>Discard</source>
         <translation>Zahodit</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="585"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="588"/>
         <source>Convert %1 to Studio Palette and Overwrite. 
 Are you sure ?</source>
         <translation>Převést %1 do studiové palety a přepsat.
@@ -2895,124 +2932,124 @@ Jste si jistý?</translation>
         <translation type="obsolete">Ne</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="613"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="616"/>
         <source>This folder is not empty. Delete anyway?</source>
         <translation>Tato složka je prázdná. Přesto smazat?</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="587"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="590"/>
         <source>Convert</source>
         <translation>Převést</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="511"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="514"/>
         <source>Failed to save palette.</source>
         <translation>Nepodařilo se uložit paletu.</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="816"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="819"/>
         <source>Replacing all selected palettes with the palette &quot;%1&quot;. 
 Are you sure ?</source>
         <translation>Všechny vybrané palety se nahrazují paletou &quot;%1&quot;.
 Jste si jistý?</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="823"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="826"/>
         <source>Replacing the palette &quot;%1&quot; with the palette &quot;%2&quot;. 
 Are you sure ?</source>
         <translation>Paleta &quot;%1&quot; se nahrazuje paletou &quot;%2&quot;.
 Jste si jistý?</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="829"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="832"/>
         <source>Replace</source>
         <translation>Nahradit</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="890"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="893"/>
         <source>New Palette</source>
         <translation>Nová paleta</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="891"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="894"/>
         <source>New Folder</source>
         <translation>Nová složka</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="898"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="901"/>
         <source>Delete Folder</source>
         <translation>Smazat složku</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="902"/>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="953"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="905"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="956"/>
         <source>Load into Current Palette</source>
         <translation>Nahrát do nynější palety</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="905"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="908"/>
         <source>Adjust Current Level to This Palette</source>
         <translation>Přizpůsobit nynější úroveň této paletě</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="908"/>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="955"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="911"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="958"/>
         <source>Merge to Current Palette</source>
         <translation>Sloučit do nynější palety</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="912"/>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="957"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="915"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="960"/>
         <source>Replace with Current Palette</source>
         <translation>Nahradit nynější paletou</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="915"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="918"/>
         <source>Delete Palette</source>
         <translation>Smazat paletu</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="922"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="925"/>
         <source>Convert to Studio Palette and Overwrite</source>
         <translation>Převést do studiové palety a přepsat</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="929"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="932"/>
         <source>Search for Palettes</source>
         <translation>Hledat palety</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="614"/>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="961"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="617"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="964"/>
         <source>Delete</source>
         <translation>Smazat</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="1140"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="1142"/>
         <source>the palette &quot;%1&quot;</source>
         <translation>paleta &quot;%1&quot;</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="1143"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="1145"/>
         <source>the selected palettes</source>
         <translation>vybraná paleta</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="1147"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="1149"/>
         <source>Move %1 to &quot;%2&quot;. Are you sure ?</source>
         <translation>Přesunout %1 do &quot;%2&quot;. Jste si jistý?</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="1148"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="1150"/>
         <source>Move</source>
         <translation>Přesunout</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="489"/>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="587"/>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="614"/>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="829"/>
-        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="1148"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="492"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="590"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="617"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="832"/>
+        <location filename="../../toonzqt/studiopaletteviewer.cpp" line="1150"/>
         <source>Cancel</source>
         <translation>Zrušit</translation>
     </message>
@@ -3020,125 +3057,125 @@ Jste si jistý?</translation>
 <context>
     <name>StyleEditor</name>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="3003"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="3012"/>
         <source>Wheel</source>
         <translation>Barevné kolo</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="3004"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="3013"/>
         <source>HSV</source>
         <translation>HSV</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="3005"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="3014"/>
         <source>Alpha</source>
         <translation>Alfa</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="3006"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="3015"/>
         <source>RGB</source>
         <translation>RGB</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="3026"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="3035"/>
         <source>Show or hide parts of the Color Page.</source>
         <translation>Ukázat nebo skrýt části barevné strany.</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="3031"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="3040"/>
         <source>Toggle orientation of the Color Page.</source>
         <translation>Přepnout natočeníi barevné strany.</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="3128"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="3137"/>
         <source>Auto</source>
         <translation>Automaticky</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="3131"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="3140"/>
         <source>Apply</source>
         <translation>Použít</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="3136"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="3145"/>
         <source>Apply changes to current style</source>
         <translation>Použít změny na nynější styl</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="3141"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="3150"/>
         <source>Automatically update style changes</source>
         <translation>Automaticky aktualizovat změny stylu</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="3145"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="3154"/>
         <source>Return To Previous Style</source>
         <translation>Vrátit se k předchozímu stylu</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="3148"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="3157"/>
         <source>Current Style</source>
         <translation>Nynější styl</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="3195"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="3204"/>
         <source>Generated</source>
         <translation>Vytvořeno</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="3196"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="3205"/>
         <source>Trail</source>
         <translation>Stopa</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="3197"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="3206"/>
         <source>Vector Brush</source>
         <translation>Vektorový štětec</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="3256"/>
-        <location filename="../../toonzqt/styleeditor.cpp" line="3262"/>
-        <location filename="../../toonzqt/styleeditor.cpp" line="3264"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="3265"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="3271"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="3273"/>
         <source>Color</source>
         <translation>Barva</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="3257"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="3266"/>
         <source>Texture</source>
         <translation>Textura (povrch)</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="3258"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="3267"/>
         <source>Vector</source>
         <translation>Vektor</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="3259"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="3268"/>
         <source>Raster</source>
         <translation>Rastr</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="3260"/>
-        <location filename="../../toonzqt/styleeditor.cpp" line="3265"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="3269"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="3274"/>
         <source>Settings</source>
         <translation>Nastavení</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="3337"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="3346"/>
         <source>No Style Selected</source>
         <translation>Nevybrán žádný styl</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="3354"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="3363"/>
         <source>Cleanup </source>
         <translation>Vyčištění </translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="3356"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="3365"/>
         <source>Studio </source>
         <translation>Studio </translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="3358"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="3367"/>
         <source>Level </source>
         <translation>Úroveň </translation>
     </message>
@@ -3155,12 +3192,12 @@ Jste si jistý?</translation>
         <translation type="vanished">[ÚROVEŇ]  </translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="3361"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="3370"/>
         <source>Palette</source>
         <translation>Paleta</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="3375"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="3384"/>
         <source>Style Editor - No Valid Style Selected</source>
         <translation>Editor stylu - Nevybrán žádný platný styl</translation>
     </message>
@@ -3168,37 +3205,37 @@ Jste si jistý?</translation>
 <context>
     <name>StyleEditorGUI::ColorChannelControl</name>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="1271"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="1273"/>
         <source>R</source>
         <translation>Č</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="1271"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="1273"/>
         <source>G</source>
         <translation>Z</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="1271"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="1273"/>
         <source>B</source>
         <translation>M</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="1271"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="1273"/>
         <source>A</source>
         <translation>A</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="1271"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="1273"/>
         <source>H</source>
         <translation>O</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="1271"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="1273"/>
         <source>S</source>
         <translation>S</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="1272"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="1274"/>
         <source>V</source>
         <translation>V</translation>
     </message>
@@ -3206,12 +3243,12 @@ Jste si jistý?</translation>
 <context>
     <name>StyleEditorGUI::SettingsPage</name>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="2578"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="2590"/>
         <source>Autopaint for Lines</source>
         <translation>Automatické malování pro čáry</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/styleeditor.cpp" line="2731"/>
+        <location filename="../../toonzqt/styleeditor.cpp" line="2743"/>
         <source>Reset to default</source>
         <translation>Vrátit na výchozí</translation>
     </message>

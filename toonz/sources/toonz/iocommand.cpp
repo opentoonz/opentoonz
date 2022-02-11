@@ -21,6 +21,7 @@
 #include "cachefxcommand.h"
 #include "xdtsio.h"
 #include "expressionreferencemanager.h"
+#include "levelcommand.h"
 
 // TnzTools includes
 #include "tools/toolhandle.h"
@@ -322,7 +323,8 @@ bool beforeCellsInsert(TXsheet *xsh, int row, int &col, int rowCount,
 
   for (i = 0; i < rowCount && xsh->getCell(row + i, col).isEmpty(); i++) {
   }
-  int type = column ? column->getColumnType() : newLevelColumnType;
+  int type = (column && !column->isEmpty()) ? column->getColumnType()
+                                            : newLevelColumnType;
   // If some used cells in range or column type mismatch must insert a column.
   if (col < 0 || i < rowCount || newLevelColumnType != type) {
     col += 1;
@@ -353,6 +355,37 @@ int getLevelType(const TFilePath &actualPath) {
     return PLI_XSHLEVEL;
   } else
     return UNKNOWN_XSHLEVEL;
+}
+
+//===========================================================================
+// removeSameNamedUnusedLevel(scene, actualPath, levelName);
+//---------------------------------------------------------------------------
+
+void removeSameNamedUnusedLevel(ToonzScene *scene, const TFilePath actualPath,
+                                std::wstring levelName) {
+  if (QString::fromStdWString(levelName).isEmpty()) {
+    // if the option is set in the preferences,
+    // remove the scene numbers("c####_") from the file name
+    levelName = scene->getLevelNameWithoutSceneNumber(actualPath.getWideName());
+  }
+
+  TLevelSet *levelSet = scene->getLevelSet();
+  NameModifier nm(levelName);
+  levelName = nm.getNext();
+  while (1) {
+    TXshLevel *existingLevel = levelSet->getLevel(levelName);
+    // if the level name is not used in the cast, nothing to do
+    if (!existingLevel) return;
+    // try if the existing level is unused in the xsheet and remove from the
+    // cast
+    else if (LevelCmd::removeLevelFromCast(existingLevel, scene, false)) {
+      DVGui::info(QObject::tr("Removed unused level %1 from the scene cast. "
+                              "(This behavior can be disabled in Preferences.)")
+                      .arg(QString::fromStdWString(levelName)));
+      return;
+    }
+    levelName = nm.getNext();
+  }
 }
 
 //===========================================================================
@@ -858,9 +891,9 @@ TXshLevel *loadLevel(ToonzScene *scene,
                      const IoCmd::LoadResourceArguments::ResourceData &rd,
                      const TFilePath &castFolder, int row0, int &col0, int row1,
                      int &col1, bool expose, std::vector<TFrameId> &fIds,
-                     int xFrom = -1, int xTo = -1, std::wstring levelName = L"",
-                     int step = -1, int inc = -1, int frameCount = -1,
-                     bool doesFileActuallyExist = true) {
+                     TFrameId xFrom = TFrameId(), TFrameId xTo = TFrameId(),
+                     std::wstring levelName = L"", int step = -1, int inc = -1,
+                     int frameCount = -1, bool doesFileActuallyExist = true) {
   TFilePath actualPath = scene->decodeFilePath(rd.m_path);
 
   LoadLevelUndo *undo                  = 0;
@@ -874,6 +907,11 @@ TXshLevel *loadLevel(ToonzScene *scene,
   TXshLevel *xl     = getLevelByPath(scene, actualPath);
   bool isFirstTime  = !xl;
   std::wstring name = actualPath.getWideName();
+
+  if (isFirstTime && expose &&
+      Preferences::instance()->isAutoRemoveUnusedLevelsEnabled()) {
+    removeSameNamedUnusedLevel(scene, actualPath, levelName);
+  }
 
   IoCmd::ConvertingPopup *convertingPopup = new IoCmd::ConvertingPopup(
       TApp::instance()->getMainWindow(),
@@ -984,12 +1022,15 @@ TXshLevel *loadLevel(ToonzScene *scene,
 // loadResource(scene, path, castFolder, row, col, expose)
 //---------------------------------------------------------------------------
 
-TXshLevel *loadResource(
-    ToonzScene *scene, const IoCmd::LoadResourceArguments::ResourceData &rd,
-    const TFilePath &castFolder, int row0, int &col0, int row1, int &col1,
-    bool expose, std::vector<TFrameId> fIds = std::vector<TFrameId>(),
-    int xFrom = -1, int xTo = -1, std::wstring levelName = L"", int step = -1,
-    int inc = -1, int frameCount = -1, bool doesFileActuallyExist = true) {
+TXshLevel *loadResource(ToonzScene *scene,
+                        const IoCmd::LoadResourceArguments::ResourceData &rd,
+                        const TFilePath &castFolder, int row0, int &col0,
+                        int row1, int &col1, bool expose,
+                        std::vector<TFrameId> fIds = std::vector<TFrameId>(),
+                        TFrameId xFrom = TFrameId(), TFrameId xTo = TFrameId(),
+                        std::wstring levelName = L"", int step = -1,
+                        int inc = -1, int frameCount = -1,
+                        bool doesFileActuallyExist = true) {
   IoCmd::LoadResourceArguments::ResourceData actualRd(rd);
   actualRd.m_path = scene->decodeFilePath(rd.m_path);
 
@@ -1365,6 +1406,7 @@ void IoCmd::newScene() {
 bool IoCmd::saveScene(const TFilePath &path, int flags) {
   bool overwrite     = (flags & SILENTLY_OVERWRITE) != 0;
   bool saveSubxsheet = (flags & SAVE_SUBXSHEET) != 0;
+  bool isAutosave    = (flags & AUTO_SAVE) != 0;
   TApp *app          = TApp::instance();
 
   assert(!path.isEmpty());
@@ -1403,6 +1445,15 @@ bool IoCmd::saveScene(const TFilePath &path, int flags) {
 
   TXsheet *xsheet = 0;
   if (saveSubxsheet) xsheet = TApp::instance()->getCurrentXsheet()->getXsheet();
+
+  // Automatically remove unused levels
+  if (!saveSubxsheet && !isAutosave &&
+      Preferences::instance()->isAutoRemoveUnusedLevelsEnabled()) {
+    if (LevelCmd::removeUnusedLevelsFromCast(false))
+      DVGui::info(
+          QObject::tr("Removed unused levels from the scene cast. (This "
+                      "behavior can be disabled in Preferences.)"));
+  }
 
   // If the scene will be saved in the different folder, check out the scene
   // cast.
@@ -1510,7 +1561,7 @@ bool IoCmd::saveScene(const TFilePath &path, int flags) {
 // IoCmd::saveScene()
 //---------------------------------------------------------------------------
 
-bool IoCmd::saveScene() {
+bool IoCmd::saveScene(int flags) {
   TSelection *oldSelection =
       TApp::instance()->getCurrentSelection()->getSelection();
   ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
@@ -1528,7 +1579,7 @@ bool IoCmd::saveScene() {
   } else {
     TFilePath fp = scene->getScenePath();
     // salva la scena con il nome fp. se fp esiste gia' lo sovrascrive
-    return saveScene(fp, SILENTLY_OVERWRITE);
+    return saveScene(fp, SILENTLY_OVERWRITE | flags);
   }
 }
 
@@ -1673,10 +1724,10 @@ bool IoCmd::saveLevel(TXshSimpleLevel *sl) {
 // IoCmd::saveAll()
 //---------------------------------------------------------------------------
 
-bool IoCmd::saveAll() {
+bool IoCmd::saveAll(int flags) {
   // try to save as much as possible
   // if anything is wrong, return false
-  bool result = saveScene();
+  bool result = saveScene(flags);
 
   TApp *app         = TApp::instance();
   ToonzScene *scene = app->getCurrentScene()->getScene();
@@ -1803,7 +1854,7 @@ bool IoCmd::loadScene(const TFilePath &path, bool updateRecentFile,
   if (TSystem::doesExistFileOrLevel(scenePathTemp)) {
     QString question =
         QObject::tr(
-            "A prior save of Scene '%1' was critically interupted. \n\
+            "A prior save of Scene '%1' was critically interrupted. \n\
 \nA partial save file was generated and changes may be manually salvaged from '%2'.\n\
 \nDo you wish to continue loading the last good save or stop and try to salvage the prior save?")
             .arg(QString::fromStdWString(scenePath.getWideString()))
@@ -2206,7 +2257,7 @@ static int loadPSDResource(IoCmd::LoadResourceArguments &args,
     assert(childLevel);
     childXsh = childLevel->getXsheet();
   }
-  int subCol0 = args.col0;
+  int subCol0 = 0;
   loadedPsdLevelIndex.clear();
   // for each layer in psd
   for (int i = 0; i < popup->getPsdLevelCount(); i++) {
@@ -2218,7 +2269,7 @@ static int loadPSDResource(IoCmd::LoadResourceArguments &args,
         count +=
             createSubXSheetFromPSDFolder(args, childXsh, subCol0, i, popup);
       else
-        count += createSubXSheetFromPSDFolder(args, xsh, subCol0, i, popup);
+        count += createSubXSheetFromPSDFolder(args, xsh, col0, i, popup);
     } else {
       TFilePath psdpath = popup->getPsdPath(i);
       TXshLevel *xl     = 0;
@@ -2233,14 +2284,14 @@ static int loadPSDResource(IoCmd::LoadResourceArguments &args,
         // lo importo nell'xsheet
         if (popup->subxsheet() && childXsh) {
           childXsh->exposeLevel(0, subCol0, xl);
+          subCol0++;
+        } else {
+          // move the current column to the right
+          col0++;
+          app->getCurrentColumn()->setColumnIndex(col0);
         }
         args.loadedLevels.push_back(xl);
-        subCol0++;
         count++;
-
-        // move the current column to the right
-        col0++;
-        app->getCurrentColumn()->setColumnIndex(col0);
       }
     }
   }
@@ -3013,7 +3064,7 @@ public:
     int ret;
     if (sl && sl->getPath().getType() == "pli") {
       question = "Saving " + toQString(palettePath) +
-                 "\nThis command will ovewrite the level data as well.  Are "
+                 "\nThis command will overwrite the level data as well.  Are "
                  "you sure ?";
       ret =
           DVGui::MsgBox(question, QObject::tr("OK"), QObject::tr("Cancel"), 0);

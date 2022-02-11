@@ -48,7 +48,7 @@ public:
   /*! Helper function. */
   virtual void setPoints(const TPointD &p0, const TPointD &p1,
                          const TPointD &p2, const TPointD &p3) = 0;
-  virtual void deformImage() = 0;
+  virtual void deformImage()                                   = 0;
 };
 
 //=============================================================================
@@ -152,15 +152,18 @@ public:
 
   SelectionTool *getTool() const { return m_tool; }
 
-  virtual void transform(TAffine aff, double angle){}
-  virtual void transform(TAffine aff){}
-  virtual TPointD transform(int index, TPointD newPos) { return TPointD(); }
-  virtual void addTransformUndo(){}
+  virtual void transform(TAffine aff, double angle) {}
+  virtual void transform(TAffine aff) {}
+  virtual TPointD transform(int index, TPointD newPos,
+                            bool onFastDragging = false) {
+    return TPointD();
+  }
+  virtual void addTransformUndo() {}
 
   virtual void leftButtonDown(const TPointD &pos, const TMouseEvent &) = 0;
   virtual void leftButtonDrag(const TPointD &pos, const TMouseEvent &) = 0;
   virtual void leftButtonUp(const TPointD &pos, const TMouseEvent &)   = 0;
-  virtual void draw() = 0;
+  virtual void draw()                                                  = 0;
 };
 
 //=============================================================================
@@ -177,7 +180,7 @@ protected:
 public:
   DeformTool(SelectionTool *tool);
 
-  virtual void applyTransform(FourPoints bbox) = 0;
+  virtual void applyTransform(FourPoints bbox, bool onFastDragging = false) = 0;
   virtual void applyTransform(TAffine aff){};
 
   void addTransformUndo() override = 0;
@@ -234,6 +237,7 @@ class FreeDeform {
 public:
   FreeDeform(DeformTool *deformTool);
   void leftButtonDrag(const TPointD &pos, const TMouseEvent &e);
+  void leftButtonUp();
 };
 
 //=============================================================================
@@ -254,11 +258,7 @@ public:
 // Scale
 //-----------------------------------------------------------------------------
 
-enum class ScaleType {
-  GLOBAL = 0,
-  HORIZONTAL,
-  VERTICAL
-};
+enum class ScaleType { GLOBAL = 0, HORIZONTAL, VERTICAL };
 
 class Scale {
   TPointD m_startCenter;
@@ -270,7 +270,6 @@ class Scale {
   DeformTool *m_deformTool;
 
 public:
-
   ScaleType m_type;
   Scale(DeformTool *deformTool, ScaleType type);
 
@@ -301,12 +300,13 @@ compute scaleValue. */
 
   void leftButtonDown(const TPointD &pos, const TMouseEvent &e);
   void leftButtonDrag(const TPointD &pos, const TMouseEvent &e);
+  void leftButtonUp();
 
   std::vector<FourPoints> getStartBboxs() const { return m_startBboxs; }
   TPointD getStartCenter() const { return m_startCenter; }
   bool scaleInCenter() const { return m_scaleInCenter; }
 };
-};
+};  // namespace DragSelectionTool
 
 //=============================================================================
 // Utility
@@ -315,7 +315,8 @@ compute scaleValue. */
 DragSelectionTool::DragTool *createNewMoveSelectionTool(SelectionTool *st);
 DragSelectionTool::DragTool *createNewRotationTool(SelectionTool *st);
 DragSelectionTool::DragTool *createNewFreeDeformTool(SelectionTool *st);
-DragSelectionTool::DragTool *createNewScaleTool(SelectionTool *st, DragSelectionTool::ScaleType type);
+DragSelectionTool::DragTool *createNewScaleTool(
+    SelectionTool *st, DragSelectionTool::ScaleType type);
 
 //=============================================================================
 // SelectionTool
@@ -420,7 +421,7 @@ public:
                        int index = 0);
 
   FreeDeformer *getFreeDeformer(int index = 0) const;
-  virtual void setNewFreeDeformer()       = 0;
+  virtual void setNewFreeDeformer() = 0;
   void clearDeformers();
 
   int getSelectedPoint() const { return m_selectedPoint; }

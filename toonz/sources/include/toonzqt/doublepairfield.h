@@ -213,7 +213,7 @@ signals:
                         DoublePairField* doublePairFieldExample = new
    DoublePairField(this);
                         doublePairFieldExample->setLeftText(tr("Left Value:"));
-                        doublePairFieldExample->setRightText(tr("Rigth
+                        doublePairFieldExample->setRightText(tr("Right
    Value:"));
                         doublePairFieldExample->setRange(0,10);
                         doublePairFieldExample->setValues(std::make_pair(3.58,7.65));
@@ -240,7 +240,7 @@ public:
                         MeasuredDoublePairField* doublePairFieldExample = new
    MeasuredDoublePairField(this);
                         doublePairFieldExample->setLeftText(tr("Left Value:"));
-                        doublePairFieldExample->setRightText(tr("Rigth
+                        doublePairFieldExample->setRightText(tr("Right
    Value:"));
                         doublePairFieldExample->setRange(0,10);
                         doublePairFieldExample->setValues(std::make_pair(3.58,7.65));

@@ -98,10 +98,11 @@ void DVAPI convert(
     const TPixel &bgColor =
         TPixel::Transparent,  //!< Destination Background color.
     bool removeDotBeforeFrameNumber =
-        false /*-- ConvertPopup
-                 での指定に合わせて、[レベル名].[フレーム番号].[拡張子]のうち、
-                                                                                          [レベル名]と[フレーム番号]の間のドットを消す。 --*/
-);            //!< Converts a saved level to fullcolor, and saves the result.
+        false,                            /*-- ConvertPopup
+                                            での指定に合わせて、[レベル名].[フレーム番号].[拡張子]のうち、
+                                                                                                                     [レベル名]と[フレーム番号]の間のドットを消す。 --*/
+    const TFrameId &tmplFId = TFrameId()  //!< frame format template
+);  //!< Converts a saved level to fullcolor, and saves the result.
 
 void DVAPI convertNaa2Tlv(
     const TFilePath &source,  //!< Level path to convert from.

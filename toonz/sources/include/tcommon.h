@@ -68,7 +68,7 @@ namespace TConsts {
 const double epsilon = 1e-8;
 }
 
-// use macros insted of constexprs, because MSVC2013 does not support
+// use macros instead of constexprs, because MSVC2013 does not support
 // `constexpr`.
 #define M_PI_3 (M_PI / 3)
 #define M_PI_180 (M_PI_4 / 45)

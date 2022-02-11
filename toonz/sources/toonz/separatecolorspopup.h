@@ -174,7 +174,7 @@ protected:
   void hideEvent(QHideEvent* e);
 
 public slots:
-  // starts the convertion
+  // starts the conversion
   void separate();
   void onSeparateFinished();
   void onPreviewBtnPressed();

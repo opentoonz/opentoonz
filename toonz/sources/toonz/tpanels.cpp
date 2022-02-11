@@ -97,6 +97,7 @@
 
 // Qt includes
 #include <QAction>
+#include <QScreen>
 
 //=============================================================================
 // XsheetViewer
@@ -531,7 +532,7 @@ void PaletteViewerPanel::reset() {
 void PaletteViewerPanel::initializeTitleBar() {
   m_freezeButton = new TPanelTitleBarButton(
       getTitleBar(), getIconThemePath("actions/20/pane_freeze.svg"));
-  m_freezeButton->setToolTip("Freeze");
+  m_freezeButton->setToolTip(tr("Freeze"));
   getTitleBar()->add(QPoint(-54, 0), m_freezeButton);
   m_freezeButton->setPressed(m_isFrozen);
   connect(m_freezeButton, SIGNAL(toggled(bool)),
@@ -569,6 +570,7 @@ void PaletteViewerPanel::onFreezeButtonToggled(bool frozen) {
 
   // Cambio il livello corrente
   if (!frozen) {
+    m_frozenPalette = nullptr;
     std::set<TXshSimpleLevel *> levels;
     TXsheet *xsheet = app->getCurrentXsheet()->getXsheet();
     int row, column;
@@ -600,6 +602,7 @@ void PaletteViewerPanel::onFreezeButtonToggled(bool frozen) {
     app->getCurrentLevel()->setLevel(level);
     m_paletteViewer->setPaletteHandle(ph);
   } else {
+    m_frozenPalette = ph->getPalette();
     m_paletteHandle->setPalette(ph->getPalette());
     m_paletteViewer->setPaletteHandle(m_paletteHandle);
   }
@@ -784,30 +787,31 @@ void ColorFieldEditorController::edit(DVGui::ColorField *colorField) {
   connect(m_currentColorField, SIGNAL(colorChanged(const TPixel32 &, bool)),
           SLOT(onColorChanged(const TPixel32 &, bool)));
   connect(m_colorFieldHandle, SIGNAL(colorStyleChanged(bool)),
-          SLOT(onColorStyleChanged()));
+          SLOT(onColorStyleChanged(bool)));
 }
 
 //-----------------------------------------------------------------------------
 
 void ColorFieldEditorController::hide() {
   disconnect(m_colorFieldHandle, SIGNAL(colorStyleChanged(bool)), this,
-             SLOT(onColorStyleChanged()));
+             SLOT(onColorStyleChanged(bool)));
 }
 
 //-----------------------------------------------------------------------------
 
-void ColorFieldEditorController::onColorStyleChanged() {
+void ColorFieldEditorController::onColorStyleChanged(bool isDragging) {
   if (!m_currentColorField) return;
   assert(!!m_palette);
   TPixel32 color = m_palette->getStyle(1)->getMainColor();
-  if (m_currentColorField->getColor() == color) return;
+  if (m_currentColorField->getColor() == color && isDragging) return;
   m_currentColorField->setColor(color);
-  m_currentColorField->notifyColorChanged(color, false);
+  m_currentColorField->notifyColorChanged(color, isDragging);
 }
 
 //-----------------------------------------------------------------------------
 
-void ColorFieldEditorController::onColorChanged(const TPixel32 &color, bool) {
+void ColorFieldEditorController::onColorChanged(const TPixel32 &color,
+                                                bool isDragging) {
   if (!m_currentColorField) return;
   TColorStyle *style = m_palette->getStyle(1);
   if (style->getMainColor() == color) return;
@@ -815,7 +819,7 @@ void ColorFieldEditorController::onColorChanged(const TPixel32 &color, bool) {
   TApp::instance()
       ->getPaletteController()
       ->getCurrentPalette()
-      ->notifyColorStyleChanged();
+      ->notifyColorStyleChanged(isDragging);
 }
 
 //=============================================================================
@@ -1036,7 +1040,51 @@ OpenFloatingPanel openToolOptionsCommand(MI_OpenToolOptionBar, "ToolOptions",
 // FlipbookFactory
 //-----------------------------------------------------------------------------
 
-FlipbookPanel::FlipbookPanel(QWidget *parent) : TPanel(parent) {
+void FlipbookBasePanel::zoomContentsAndFitGeometry(bool forward) {
+  if (!isFloating()) return;
+  if (!m_flipbook->getImageViewer()->getImage()) {
+    TPanel::zoomContentsAndFitGeometry(forward);
+    return;
+  }
+  // resize the window leaving the top-left corner position unchanged
+  // in order to gain consistency with Photoshop
+  auto getScreen = [&]() {
+    QScreen *ret = nullptr;
+    ret          = QGuiApplication::screenAt(geometry().topLeft());
+    if (ret) return ret;
+    ret = QGuiApplication::screenAt(geometry().topRight());
+    if (ret) return ret;
+    ret = QGuiApplication::screenAt(geometry().center());
+    if (ret) return ret;
+    ret = QGuiApplication::screenAt(geometry().bottomLeft());
+    if (ret) return ret;
+    ret = QGuiApplication::screenAt(geometry().bottomRight());
+    return ret;
+  };
+  // Get screen geometry
+  QScreen *screen = getScreen();
+  if (!screen) return;
+  QRect screenGeom  = screen->availableGeometry();
+  QPoint oldTopLeft = geometry().topLeft();
+
+  m_flipbook->zoomAndAdaptGeometry(forward);
+
+  QRect newGeom(geometry());
+  newGeom.moveTopLeft(oldTopLeft);
+  if (newGeom.right() > screenGeom.right())
+    newGeom.moveRight(screenGeom.right());
+  else if (newGeom.left() < screenGeom.left())
+    newGeom.moveLeft(screenGeom.left());
+  if (newGeom.bottom() > screenGeom.bottom())
+    newGeom.moveBottom(screenGeom.bottom());
+  else if (newGeom.top() < screenGeom.top())
+    newGeom.moveTop(screenGeom.top());
+  setGeometry(newGeom);
+}
+
+//-----------------------------------------------------------------------------
+
+FlipbookPanel::FlipbookPanel(QWidget *parent) : FlipbookBasePanel(parent) {
   m_flipbook = new FlipBook(this);
   setWidget(m_flipbook);
   // minimize button and safearea toggle
@@ -1213,10 +1261,18 @@ public:
 class ColorModelViewerFactory final : public TPanelFactory {
 public:
   ColorModelViewerFactory() : TPanelFactory("ColorModel") {}
-  void initialize(TPanel *panel) override {
-    panel->setWidget(new ColorModelViewer(panel));
-    panel->resize(400, 300);
+
+  TPanel *createPanel(QWidget *parent) override {
+    FlipbookBasePanel *panel     = new FlipbookBasePanel(parent);
+    ColorModelViewer *colorModel = new ColorModelViewer(panel);
+    panel->setWidget(colorModel);
+    panel->setFlipbook(colorModel);
+    panel->setObjectName(getPanelType());
+    panel->setWindowTitle(getPanelType());
+    return panel;
   }
+
+  void initialize(TPanel *panel) override { assert(0); }
 } colorModelViewerFactory;
 
 //=============================================================================
@@ -1547,3 +1603,26 @@ public:
 OpenFloatingPanel openVectorGuidedDrawingPanelCommand(
     MI_OpenGuidedDrawingControls, "VectorGuidedDrawingPanel",
     QObject::tr("Vector Guided Drawing"));
+
+//-----------------------------------------------------------------------------
+
+namespace {
+
+void zoomAndFitPanel(bool forward) {
+  TPanel *panel = dynamic_cast<TPanel *>(qApp->activeWindow());
+  if (panel) panel->zoomContentsAndFitGeometry(forward);
+}
+
+}  // namespace
+
+class ZoomInAndFitPanel final : public MenuItemHandler {
+public:
+  ZoomInAndFitPanel() : MenuItemHandler("MI_ZoomInAndFitPanel") {}
+  void execute() override { zoomAndFitPanel(true); }
+} zoomInAndFitPanel;
+
+class ZoomOutAndFitPanel final : public MenuItemHandler {
+public:
+  ZoomOutAndFitPanel() : MenuItemHandler("MI_ZoomOutAndFitPanel") {}
+  void execute() override { zoomAndFitPanel(false); }
+} zoomOutAndFitPanel;

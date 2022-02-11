@@ -50,6 +50,7 @@
 #include <QScrollArea>
 #include <QPropertyAnimation>
 #include <QSpacerItem>
+#include <QEvent>
 //-----------------------------------------------------------------------------
 namespace {
 
@@ -171,6 +172,7 @@ OutputSettingsPopup::OutputSettingsPopup(bool isPreview)
     , m_applyShrinkChk(nullptr)
     , m_outputCameraOm(nullptr)
     , m_isPreviewSettings(isPreview)
+    , m_allowMT(Preferences::instance()->getFfmpegMultiThread())
     , m_presetCombo(nullptr) {
   setWindowTitle(isPreview ? tr("Preview Settings") : tr("Output Settings"));
   if (!isPreview) setObjectName("OutputSettingsPopup");
@@ -338,6 +340,8 @@ QFrame *OutputSettingsPopup::createCameraSettingsBox(bool isPreview) {
     m_cameraSettings    = new CameraSettingsPopup();
     cameraParametersBox = new QFrame(this);
     cameraParametersBox->setObjectName("OutputSettingsCameraBox");
+    m_outputCameraOm->setFocusPolicy(Qt::StrongFocus);
+    m_outputCameraOm->installEventFilter(this);
   } else {
     // Subcamera checkbox
     m_subcameraChk = new DVGui::CheckBox(tr("Use Sub-Camera"));
@@ -482,6 +486,16 @@ QFrame *OutputSettingsPopup::createFileSettingsBox(bool isPreview) {
     Tiio::Writer::getSupportedFormats(formats, true);
     formats.sort();
     m_fileFormat->addItems(formats);
+    m_fileFormat->setFocusPolicy(Qt::StrongFocus);
+    m_resampleBalanceOm->setFocusPolicy(Qt::StrongFocus);
+    m_channelWidthOm->setFocusPolicy(Qt::StrongFocus);
+    m_threadsComboOm->setFocusPolicy(Qt::StrongFocus);
+    m_rasterGranularityOm->setFocusPolicy(Qt::StrongFocus);
+    m_fileFormat->installEventFilter(this);
+    m_resampleBalanceOm->installEventFilter(this);
+    m_channelWidthOm->installEventFilter(this);
+    m_threadsComboOm->installEventFilter(this);
+    m_rasterGranularityOm->installEventFilter(this);
   }
 
   //-----
@@ -605,6 +619,8 @@ QFrame *OutputSettingsPopup::createMoreSettingsBox() {
   QStringList dominantField;
   dominantField << tr("Odd (NTSC)") << tr("Even (PAL)") << tr("None");
   m_dominantFieldOm->addItems(dominantField);
+  m_dominantFieldOm->setFocusPolicy(Qt::StrongFocus);
+  m_dominantFieldOm->installEventFilter(this);
   m_stretchFromFld->setRange(1, 1000);
   m_stretchToFld->setRange(1, 1000);
   m_stretchFromFld->setDecimals(2);
@@ -614,6 +630,8 @@ QFrame *OutputSettingsPopup::createMoreSettingsBox() {
   multimediaTypes << tr("None") << tr("Fx Schematic Flows")
                   << tr("Fx Schematic Terminal Nodes");
   m_multimediaOm->addItems(multimediaTypes);
+  m_multimediaOm->setFocusPolicy(Qt::StrongFocus);
+  m_multimediaOm->installEventFilter(this);
   m_stereoShift->setEnabled(false);
 
   //-----
@@ -643,7 +661,7 @@ QFrame *OutputSettingsPopup::createMoreSettingsBox() {
     lay->addWidget(m_frameRateFld, 3, 1, Qt::AlignLeft | Qt::AlignVCenter);
     lay->addWidget(new QLabel(tr("(linked to Scene Settings)"), this), 3, 2, 1,
                    2, Qt::AlignLeft | Qt::AlignVCenter);
-    // Strech
+    // Stretch
     lay->addWidget(new QLabel(tr("Stretch from FPS:"), this), 4, 0,
                    Qt::AlignRight | Qt::AlignVCenter);
     lay->addWidget(m_stretchFromFld, 4, 1, Qt::AlignLeft | Qt::AlignVCenter);
@@ -748,6 +766,16 @@ void OutputSettingsPopup::hideEvent(QHideEvent *e) {
 }
 
 //-----------------------------------------------------------------------------
+// ignore wheelevent on comboboxes
+bool OutputSettingsPopup::eventFilter(QObject *obj, QEvent *e) {
+  if (e->type() == QEvent::Wheel) {
+    QComboBox *combo = qobject_cast<QComboBox *>(obj);
+    if (combo && !combo->hasFocus()) return true;
+  }
+  return QObject::eventFilter(obj, e);
+}
+
+//-----------------------------------------------------------------------------
 
 void OutputSettingsPopup::onApplyShrinkChecked(int state) {
   TRenderSettings rs       = getProperties()->getRenderSettings();
@@ -814,6 +842,11 @@ void OutputSettingsPopup::updateField() {
     m_fileFormat->setCurrentIndex(
         m_fileFormat->findText(QString::fromStdString(path.getType())));
     m_multimediaOm->setCurrentIndex(prop->getMultimediaRendering());
+  }
+
+  // Refresh format if allow-multithread was toggled
+  if (m_allowMT != Preferences::instance()->getFfmpegMultiThread()) {
+    onFormatChanged(m_fileFormat->currentText());
   }
 
   // camera
@@ -1019,19 +1052,21 @@ void OutputSettingsPopup::onNameChanged() {
 /*! Set current scene output format to new format set in popup field.
  */
 void OutputSettingsPopup::onFormatChanged(const QString &str) {
-  auto isMultiRenderInvalid = [](std::string ext) -> bool {
-    return ext == "mp4" || ext == "gif" || ext == "webm" ||
+  auto isMultiRenderInvalid = [](std::string ext, bool allowMT) -> bool {
+    return (!allowMT && (ext == "mp4" || ext == "gif" || ext == "webm")) ||
            ext == "spritesheet";
   };
 
-  TOutputProperties *prop    = getProperties();
-  bool wasMultiRenderInvalid = isMultiRenderInvalid(prop->getPath().getType());
-  TFilePath fp               = prop->getPath().withType(str.toStdString());
+  TOutputProperties *prop = getProperties();
+  bool wasMultiRenderInvalid =
+      isMultiRenderInvalid(prop->getPath().getType(), m_allowMT);
+  TFilePath fp = prop->getPath().withType(str.toStdString());
   prop->setPath(fp);
   TApp::instance()->getCurrentScene()->setDirtyFlag(true);
+  m_allowMT = Preferences::instance()->getFfmpegMultiThread();
 
   if (m_presetCombo) m_presetCombo->setCurrentIndex(0);
-  if (isMultiRenderInvalid(str.toStdString())) {
+  if (isMultiRenderInvalid(str.toStdString(), m_allowMT)) {
     m_threadsComboOm->setDisabled(true);
     m_threadsComboOm->setCurrentIndex(0);
   } else {
@@ -1056,9 +1091,25 @@ void OutputSettingsPopup::onFormatChanged(const QString &str) {
 void OutputSettingsPopup::openSettingsPopup() {
   TOutputProperties *prop = getProperties();
   std::string ext         = prop->getPath().getType();
-  openFormatSettingsPopup(this, ext, prop->getFileFormatProperties(ext));
+
+  TFrameId oldTmplFId = prop->formatTemplateFId();
+
+  bool ret =
+      openFormatSettingsPopup(this, ext, prop->getFileFormatProperties(ext),
+                              &prop->formatTemplateFId(), false);
+
+  if (!ret) return;
 
   if (m_presetCombo) m_presetCombo->setCurrentIndex(0);
+
+  if (oldTmplFId.getZeroPadding() !=
+          prop->formatTemplateFId().getZeroPadding() ||
+      oldTmplFId.getStartSeqInd() !=
+          prop->formatTemplateFId().getStartSeqInd()) {
+    TFilePath fp =
+        prop->getPath().withNoFrame().withFrame(prop->formatTemplateFId());
+    prop->setPath(fp);
+  }
 }
 
 //-----------------------------------------------------------------------------

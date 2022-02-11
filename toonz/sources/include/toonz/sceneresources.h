@@ -300,11 +300,11 @@ used in subXsheet.
   void save(const TFilePath newScenePath);
 
   /*!
-Update all resouces paths.
+Update all resources paths.
 */
   void updatePaths();
   /*!
-Set all resouces paths to old paths.
+Set all resources paths to old paths.
 */
   void rollbackPaths();
   /*!

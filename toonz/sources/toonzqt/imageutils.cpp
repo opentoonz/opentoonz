@@ -592,7 +592,8 @@ static void convertFromVector(const TLevelReaderP &lr, const TLevelWriterP &lw,
 void convert(const TFilePath &source, const TFilePath &dest,
              const TFrameId &from, const TFrameId &to, double framerate,
              TPropertyGroup *prop, FrameTaskNotifier *frameNotifier,
-             const TPixel &bgColor, bool removeDotBeforeFrameNumber) {
+             const TPixel &bgColor, bool removeDotBeforeFrameNumber,
+             const TFrameId &tmplFId) {
   std::string dstExt = dest.getType(), srcExt = source.getType();
 
   // Load source level structure
@@ -621,13 +622,14 @@ void convert(const TFilePath &source, const TFilePath &dest,
   // Write the destination level
   TLevelWriterP lw(dest, prop);
   lw->setFrameRate(framerate);
+  lw->setFrameFormatTemplateFId(tmplFId);
 
   if (srcExt == "tlv")
     convertFromCM(lr, level->getPalette(), lw, frames, TAffine(),
                   TRop::Triangle, frameNotifier, bgColor,
                   removeDotBeforeFrameNumber);
   else if (srcExt == "pli")
-    // assert(!"Conversion from pli files is currently diabled");
+    // assert(!"Conversion from pli files is currently disabled");
     convertFromVector(lr, lw, frames, frameNotifier);
   else
     convertFromFullRaster(lr, lw, frames, TAffine(), TRop::Triangle,
@@ -909,7 +911,7 @@ bool FullScreenWidget::toggleFullScreen(
     //=============================================================
 
     const bool kfApplicationQuitInProgress)  // Indicates whether the
-                                             // application is quiting.
+                                             // application is quitting.
 
 /*
  *  DESCRIPTION:
@@ -948,7 +950,7 @@ bool FullScreenWidget::toggleFullScreen(
     fFullScreenStateToggled = true;
   } else {
     // There's no point to switching into full screen if the
-    // application is in the process of quiting.
+    // application is in the process of quitting.
     if (!kfApplicationQuitInProgress) {
       //==============================================================
       //

@@ -10,13 +10,67 @@
 #include "tcolorstyles.h"
 #include "trop.h"
 #include "toonzqt/lutcalibrator.h"
+#include "styledata.h"
 
+// Qt includes
+#include <QApplication>
+#include <QClipboard>
 #include <QLayout>
 #include <QPainter>
 #include <QMouseEvent>
 #include <QLabel>
 
 using namespace DVGui;
+
+namespace {
+
+void drawChessBoard(QPainter &p) {
+  for (int x = 0; x < 4; x++) {
+    for (int y = 0; y < 4; y++) {
+      QColor col((x + y) % 2 == 0 ? Qt::black : Qt::white);
+      p.fillRect(x * 4, y * 4, 4, 4, col);
+    }
+  }
+}
+
+QPixmap getIconPm(const QColor &color) {
+  QPixmap retPm(16, 16);
+  if (color.alpha() == 255) {
+    retPm.fill(color);
+    return retPm;
+  }
+  QPainter p(&retPm);
+  drawChessBoard(p);
+  p.fillRect(0, 0, 16, 16, color);
+  return retPm;
+}
+
+}  // namespace
+
+//=============================================================================
+
+CommonChessboard *CommonChessboard::instance() {
+  static CommonChessboard _instance;
+  return &_instance;
+}
+
+CommonChessboard::CommonChessboard() : m_bgRas(40.0, 40.0) { update(); }
+
+void CommonChessboard::setChessboardColors(const TPixel32 &col1,
+                                           const TPixel32 &col2) {
+  TRop::checkBoard(m_bgRas, col1, col2,
+                   TDimensionD(m_bgRas->getLx() / 8, m_bgRas->getLy() / 8),
+                   TPointD(0, 0));
+  QImage img(m_bgRas->getRawData(), m_bgRas->getLx(), m_bgRas->getLy(),
+             QImage::Format_ARGB32);
+  m_bgPix = QPixmap::fromImage(img);
+}
+
+void CommonChessboard::update() {
+  TPixel32 col1, col2;
+  Preferences::instance()->getChessboardColors(col1, col2);
+  setChessboardColors(col1, col2);
+}
 
 //=============================================================================
 /*! \class DVGui::StyleSample
@@ -53,6 +107,8 @@ StyleSample::StyleSample(QWidget *parent, int sizeX, int sizeY)
     , m_clickEnabled(false)
     , m_chessColor1(0, 0, 0)
     , m_chessColor2(255, 255, 255)
+    , m_sysChessboard(false)
+    , m_stretch(true)
     , m_isEditing(false) {
   setMinimumSize(sizeX, sizeY);
   setColor(TPixel32::Transparent);
@@ -77,17 +133,39 @@ TColorStyle *StyleSample::getStyle() const { return m_style; }
 /*! Update current square colore and, if click event is enable set current
                 StyleSample \b TColorStyle style to \b style.
 */
-void StyleSample::setStyle(TColorStyle &style) {
+void StyleSample::setStyle(TColorStyle &style, int colorParameterIndex) {
+  // Store current color
+  TPixel32 color = style.getColorParamValue(colorParameterIndex);
+  m_currentColor = QColor(color.r, color.g, color.b, color.m);
+  if (LutManager::instance()->isValid())
+    LutManager::instance()->convert(m_currentColor);
+
   /*-- TSolidColorStyleの場合のみ、単色塗りつぶし --*/
-  if (style.getTagId() == 3)
+  if (style.getTagId() == 3) {
     setColor(style.getMainColor());
-  else {
-    TRaster32P icon =
-        style.getIcon(qsize2Dimension(m_samplePixmap.rect().size()));
+    m_stretch = true;
+  } else {
+    TDimension iconDim(width(), height());
+
+    // obtain square icon for the TMyPaintBrushStyle
+    // so that the checkerboard color will become consistent with solido style
+    // when the main color is semi-transparent.
+    if (style.getTagId() == 4001) {
+      int d   = std::min(width(), height());
+      iconDim = TDimension(d, d);
+    }
+
+    TRaster32P icon = style.getIcon(iconDim);
+    // TRaster32P icon =
+    //  style.getIcon(qsize2Dimension(m_samplePixmap.rect().size()));
     m_samplePixmap = rasterToQImage(icon, false);  // modified in 6.2
+    m_stretch      = false;
     update();
   }
-  if (m_clickEnabled) m_style = style.clone();
+  if (m_cloneStyle) {
+    if (m_style) delete m_style;  // avoid memory leak
+    m_style = style.clone();
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -120,10 +198,24 @@ void StyleSample::setChessboardColors(const TPixel32 &col1,
 void StyleSample::paintEvent(QPaintEvent *event) {
   if (!isEnable()) return;
   QPainter painter(this);
-  QImage img(m_bgRas->getRawData(), m_bgRas->getLx(), m_bgRas->getLy(),
-             QImage::Format_ARGB32);
-  painter.drawImage(0, 0, img.scaled(size()));
-  painter.drawImage(0, 0, m_samplePixmap.scaled(size()));
+  if (m_sysChessboard) {
+    painter.drawTiledPixmap(rect(),
+                            DVGui::CommonChessboard::instance()->getPixmap());
+  } else {
+    QImage img(m_bgRas->getRawData(), m_bgRas->getLx(), m_bgRas->getLy(),
+               QImage::Format_ARGB32);
+    painter.drawImage(0, 0, img.scaled(size()));
+  }
+  if (m_stretch) {
+    painter.drawImage(0, 0, m_samplePixmap.scaled(size()));
+  } else {
+    // put the icon on the left
+    int x = 0;
+    // int x = (width() - m_samplePixmap.width()) / 2;
+    int y = (height() - m_samplePixmap.height()) / 2;
+    painter.fillRect(rect(), m_currentColor);
+    painter.drawImage(x, y, m_samplePixmap);
+  }
   if (m_isEditing) {
     // QRect rect(0,0,m_bgRas->getLx(),m_bgRas->getLy());
     painter.setPen(Qt::white);
@@ -139,8 +231,8 @@ void StyleSample::paintEvent(QPaintEvent *event) {
                 clicked(const TColorStyle &style).
 */
 void StyleSample::mousePressEvent(QMouseEvent *event) {
-  if (m_style && m_clickEnabled)
-    emit clicked(*m_style);
+  if (m_clickEnabled)
+    emit clicked();
   else
     event->ignore();
 }
@@ -397,7 +489,7 @@ ColorField::ColorField(QWidget *parent, bool isAlphaActive, TPixel32 color,
 */
 
 void ColorField::setAlphaActive(bool active) {
-  if (active && !m_alphaChannel->isVisible()) {
+  if (active && !m_alphaChannel->isVisibleTo(this)) {
     m_alphaChannel->show();
     connect(m_alphaChannel, SIGNAL(valueChanged(int, bool)),
             SLOT(onAlphaChannelChanged(int, bool)));
@@ -406,7 +498,7 @@ void ColorField::setAlphaActive(bool active) {
     m_color.m = 0;
     m_colorSample->setColor(m_color);
     emit colorChanged(m_color, false);
-  } else if (!active && m_alphaChannel->isVisible()) {
+  } else if (!active && m_alphaChannel->isVisibleTo(this)) {
     m_alphaChannel->hide();
     disconnect(m_alphaChannel, SIGNAL(valueChanged(int, bool)), this,
                SLOT(onAlphaChannelChanged(int, bool)));
@@ -505,6 +597,51 @@ void ColorField::hideEvent(QHideEvent *) {
 }
 
 //-----------------------------------------------------------------------------
+
+void ColorField::contextMenuEvent(QContextMenuEvent *event) {
+  bool hasColor = QApplication::clipboard()->mimeData()->hasColor();
+  const StyleData *data =
+      dynamic_cast<const StyleData *>(QApplication::clipboard()->mimeData());
+
+  QMenu menu(this);
+  if (hasColor) {  // pasting QColor
+    QColor color = qvariant_cast<QColor>(
+        QApplication::clipboard()->mimeData()->colorData());
+    QAction *action = new QAction(tr("Paste Color"), this);
+    action->setIcon(QIcon(getIconPm(color)));
+    action->setData(color);
+
+    connect(action, SIGNAL(triggered()), this, SLOT(onPasteColor()));
+    menu.addAction(action);
+    menu.addSeparator();
+  } else if (data && data->getStyleCount() > 0) {  // pasting styles colors
+    // show 10 styles in maximum
+    int styleCount = std::min(10, data->getStyleCount());
+    for (int i = 0; i < styleCount; i++) {
+      QString styleName = QString::fromStdWString(data->getStyle(i)->getName());
+      TPixel32 color    = data->getStyle(i)->getMainColor();
+      QColor _color(color.r, color.g, color.b, color.m);
+
+      QAction *action =
+          new QAction(tr("Paste Color of %1").arg(styleName), this);
+      action->setIcon(QIcon(getIconPm(_color)));
+      action->setData(_color);
+
+      connect(action, SIGNAL(triggered()), this, SLOT(onPasteColor()));
+      menu.addAction(action);
+    }
+    menu.addSeparator();
+  }
+
+  QAction *copyAction = new QAction(tr("Copy Color"), this);
+  connect(copyAction, SIGNAL(triggered()), this, SLOT(onCopyColor()));
+  menu.addAction(copyAction);
+
+  menu.exec(event->globalPos());
+  event->accept();
+}
+
+//-----------------------------------------------------------------------------
 /*! If current red channel value of color is different from \b value set it,
                 change \b StyleSample color and emit signal \b
    colorChanged(const TPixel32 &).
@@ -562,6 +699,28 @@ void ColorField::onAlphaChannelChanged(int value, bool isDragging) {
   m_color = TPixel32(m_color.r, m_color.g, m_color.b, value);
   m_colorSample->setColor(m_color);
   emit colorChanged(m_color, isDragging);
+}
+
+//-----------------------------------------------------------------------------
+
+void ColorField::onPasteColor() {
+  QColor color = qobject_cast<QAction *>(sender())->data().value<QColor>();
+
+  m_color = TPixel32(color.red(), color.green(), color.blue(), color.alpha());
+  if (!m_alphaChannel->isVisible()) m_color.m = 255;
+  m_colorSample->setColor(m_color);
+  updateChannels();
+  emit colorChanged(m_color, false);
+}
+
+//-----------------------------------------------------------------------------
+
+void ColorField::onCopyColor() {
+  QColor color(m_color.r, m_color.g, m_color.b, m_color.m);
+
+  QMimeData *data = new QMimeData();
+  data->setColorData(color);
+  QApplication::clipboard()->setMimeData(data);
 }
 
 //-----------------------------------------------------------------------------
@@ -675,7 +834,7 @@ CleanupColorField::CleanupColorField(QWidget *parent,
     }
   }
 
-  m_colorSample->setStyle(*cleanupStyle);
+  m_colorSample->setStyle(*cleanupStyle, 0);
 
   //---- layout
 
@@ -732,7 +891,7 @@ CleanupColorField::CleanupColorField(QWidget *parent,
 void CleanupColorField::updateColor() {
   if (m_cleanupStyle->canUpdate()) {
     m_cleanupStyle->invalidateIcon();
-    m_colorSample->setStyle(*m_cleanupStyle);
+    m_colorSample->setStyle(*m_cleanupStyle, 0);
 
     m_brightnessChannel->setChannel(m_cleanupStyle->getBrightness());
     if (m_cleanupStyle->isContrastEnabled())
@@ -764,7 +923,7 @@ void CleanupColorField::setColor(const TPixel32 &color) {
 
   m_cleanupStyle->setMainColor(color);
   m_cleanupStyle->invalidateIcon();
-  m_colorSample->setStyle(*m_cleanupStyle);
+  m_colorSample->setStyle(*m_cleanupStyle, 0);
   m_ph->notifyColorStyleChanged(false);
 }
 
@@ -781,7 +940,7 @@ void CleanupColorField::setOutputColor(const TPixel32 &color) {
 
   m_cleanupStyle->setColorParamValue(1, color);
   m_cleanupStyle->invalidateIcon();
-  m_colorSample->setStyle(*m_cleanupStyle);
+  m_colorSample->setStyle(*m_cleanupStyle, 0);
   m_ph->notifyColorStyleChanged();
 }
 
@@ -795,7 +954,7 @@ void CleanupColorField::setStyle(TColorStyle *style) {
   m_cleanupStyle->setMainColor(style->getMainColor());
   m_cleanupStyle->setColorParamValue(1, style->getColorParamValue(1));
   m_cleanupStyle->invalidateIcon();
-  m_colorSample->setStyle(*m_cleanupStyle);
+  m_colorSample->setStyle(*m_cleanupStyle, 0);
   m_ph->notifyColorStyleChanged();
 }
 

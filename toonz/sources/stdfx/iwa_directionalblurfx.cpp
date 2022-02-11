@@ -143,38 +143,12 @@ void Iwa_DirectionalBlurFx::doCompute(TTile &tile, double frame,
              ,
              TDimensionD(/*- Render画像上(Pixel単位)のサイズ  -*/
                          tile.getRaster()->getLx(), tile.getRaster()->getLy()));
-  /*- 上下左右のマージンを得る -*/
-  double minX, maxX, minY, maxY;
-  if (blur.x > 0.0) /*- X成分が正の場合 -*/
-  {
-    maxX = blur.x;
-    minX = (bidirectional) ? -blur.x : 0.0;
-  } else /*- X成分が負の場合 -*/
-  {
-    maxX = (bidirectional) ? -blur.x : 0.0;
-    minX = blur.x;
-  }
-  if (blur.y > 0.0) /*- Y成分が正の場合 -*/
-  {
-    maxY = blur.y;
-    minY = (bidirectional) ? -blur.y : 0.0;
-  } else /*-  Y成分が負の場合 -*/
-  {
-    maxY = (bidirectional) ? -blur.y : 0.0;
-    minY = blur.y;
-  }
-  int marginLeft   = (int)ceil(std::abs(minX));
-  int marginRight  = (int)ceil(std::abs(maxX));
-  int marginTop    = (int)ceil(std::abs(maxY));
-  int marginBottom = (int)ceil(std::abs(minY));
 
-  /*- マージンは、フィルタの上下左右を反転した寸法になる -*/
-  TRectD enlargedBBox(bBox.x0 - (double)marginRight,
-                      bBox.y0 - (double)marginTop, bBox.x1 + (double)marginLeft,
-                      bBox.y1 + (double)marginBottom);
+  int marginH = (int)ceil(std::abs(blur.x));
+  int marginV = (int)ceil(std::abs(blur.y));
 
-  std::cout << "Margin Left:" << marginLeft << " Right:" << marginRight
-            << " Bottom:" << marginBottom << " Top:" << marginTop << std::endl;
+  TRectD enlargedBBox(bBox.x0 - (double)marginH, bBox.y0 - (double)marginV,
+                      bBox.x1 + (double)marginH, bBox.y1 + (double)marginV);
 
   TDimensionI enlargedDimIn(/*- Pixel単位に四捨五入 -*/
                             (int)(enlargedBBox.getLx() + 0.5),
@@ -211,12 +185,11 @@ void Iwa_DirectionalBlurFx::doCompute(TTile &tile, double frame,
   //-------------------------------------------------------
   /*- 計算範囲 -*/
   TDimensionI dimOut(tile.getRaster()->getLx(), tile.getRaster()->getLy());
-  TDimensionI filterDim(marginLeft + marginRight + 1,
-                        marginTop + marginBottom + 1);
+  TDimensionI filterDim(2 * marginH + 1, 2 * marginV + 1);
 
-  doCompute_CPU(tile, frame, settings, blur, bidirectional, marginLeft,
-                marginRight, marginTop, marginBottom, enlargedDimIn,
-                enlarge_tile, dimOut, filterDim, reference_host);
+  doCompute_CPU(tile, frame, settings, blur, bidirectional, marginH, marginH,
+                marginV, marginV, enlargedDimIn, enlarge_tile, dimOut,
+                filterDim, reference_host);
 
   /*-  参照画像が刺さっている場合、メモリを解放する -*/
   if (reference_host) {
@@ -308,7 +281,7 @@ void Iwa_DirectionalBlurFx::doCompute_CPU(
               /*- フィルター値が０ならcontinue -*/
               if ((*filter_p) == 0.0f) continue;
               /*- サンプル座標 -*/
-              int2 samplePos = {tround((float)x - (float)filx * (*ref_p)),
+              int2 samplePos  = {tround((float)x - (float)filx * (*ref_p)),
                                 tround((float)y - (float)fily * (*ref_p))};
               int sampleIndex = samplePos.y * enlargedDimIn.lx + samplePos.x;
 
@@ -443,7 +416,7 @@ void Iwa_DirectionalBlurFx::makeDirectionalBlurFilter_CPU(
         else {
           float2 vec_p1_sample = {static_cast<float>(fx - p1.x),
                                   static_cast<float>(fy - p1.y)};
-          dist2 = vec_p1_sample.x * vec_p1_sample.x +
+          dist2                = vec_p1_sample.x * vec_p1_sample.x +
                   vec_p1_sample.y * vec_p1_sample.y;
           framePosRatio = 1.0f;
         }
@@ -561,34 +534,11 @@ bool Iwa_DirectionalBlurFx::doGetBBox(double frame, TRectD &bBox,
   blur.x = intensity * cos(angle);
   blur.y = intensity * sin(angle);
 
-  /*- 上下左右のマージンを得る -*/
-  double minX, maxX, minY, maxY;
-  if (blur.x > 0.0) /*- X成分が正の場合 -*/
-  {
-    maxX = blur.x;
-    minX = (bidirectional) ? -blur.x : 0.0;
-  } else /*- X成分が負の場合 -*/
-  {
-    maxX = (bidirectional) ? -blur.x : 0.0;
-    minX = blur.x;
-  }
-  if (blur.y > 0.0) /*- Y成分が正の場合 -*/
-  {
-    maxY = blur.y;
-    minY = (bidirectional) ? -blur.y : 0.0;
-  } else /*-  Y成分が負の場合 -*/
-  {
-    maxY = (bidirectional) ? -blur.y : 0.0;
-    minY = blur.y;
-  }
-  int marginLeft   = (int)ceil(std::abs(minX));
-  int marginRight  = (int)ceil(std::abs(maxX));
-  int marginTop    = (int)ceil(std::abs(maxY));
-  int marginBottom = (int)ceil(std::abs(minY));
+  int marginH = (int)ceil(std::abs(blur.x));
+  int marginV = (int)ceil(std::abs(blur.y));
 
-  TRectD enlargedBBox(
-      bBox.x0 - (double)marginLeft, bBox.y0 - (double)marginBottom,
-      bBox.x1 + (double)marginRight, bBox.y1 + (double)marginTop);
+  TRectD enlargedBBox(bBox.x0 - (double)marginH, bBox.y0 - (double)marginV,
+                      bBox.x1 + (double)marginH, bBox.y1 + (double)marginV);
 
   bBox = enlargedBBox;
 

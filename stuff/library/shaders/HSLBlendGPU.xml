@@ -1,0 +1,69 @@
+<MainProgram>
+  <Name>
+    SHADER_HSLBlendGPU
+  </Name>
+  <ProgramFile>
+    "programs/HSLBlendGPU.frag"
+  </ProgramFile>
+</MainProgram>
+
+<InputPorts>
+  <InputPort>
+    "BlendSrc"
+  </InputPort>
+  <InputPort>
+    "BaseSrc"
+  </InputPort>
+
+  <PortsProgram>
+    <Name>
+      SHADER_HSLBlendGPU_ports
+    </Name>
+    <ProgramFile>
+      "programs/HSLBlendGPU_ports.vert"
+    </ProgramFile>
+  </PortsProgram>
+</InputPorts>
+
+<HandledWorldTransforms>
+  isotropic
+</HandledWorldTransforms>
+
+<Parameters>
+  <Parameter>
+    bool bhue
+    <Default>
+      1
+    </Default>
+  </Parameter>
+  <Parameter>
+    bool bsat
+    <Default>
+      1
+    </Default>
+  </Parameter>
+  <Parameter>
+    bool blum
+    <Default>
+      0
+    </Default>
+  </Parameter>
+  <Parameter>
+    float balpha
+    <Concept>
+      percent
+    </Concept>
+    <Default>
+      1.0
+    </Default>
+    <Range>
+      0 1
+    </Range>
+  </Parameter>
+  <Parameter>
+    bool bmask
+    <Default>
+      0
+    </Default>
+  </Parameter>
+</Parameters>

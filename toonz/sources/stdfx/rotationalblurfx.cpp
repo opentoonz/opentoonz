@@ -52,7 +52,7 @@ public:
     if (dist > radius)
       blurangle = intensity * ((dist - radius));
     else
-      blurangle                     = 0;
+      blurangle = 0;
     if (blurangle > M_PI) blurangle = M_PI;
     return tround(4 * blurangle * dist);
   }
@@ -88,7 +88,7 @@ public:
   }
 
   void getParamUIs(TParamUIConcept *&concepts, int &length) override {
-    concepts = new TParamUIConcept[length = 2];
+    concepts = new TParamUIConcept[length = 3];
 
     concepts[0].m_type  = TParamUIConcept::POINT;
     concepts[0].m_label = "Center";
@@ -98,6 +98,9 @@ public:
     concepts[1].m_label = "Radius";
     concepts[1].m_params.push_back(m_radius);
     concepts[1].m_params.push_back(m_point);
+
+    concepts[2].m_type = TParamUIConcept::COMPASS_SPIN;
+    concepts[2].m_params.push_back(m_point);
   }
 };
 
@@ -141,9 +144,9 @@ void doSpinBlur(const TRasterPT<PIXEL> rout, const TRasterPT<PIXEL> rin,
       if (dist > radius)
         blurangle = intensity * ((dist - radius));
       else
-        blurangle                     = 0;
+        blurangle = 0;
       if (blurangle > M_PI) blurangle = M_PI;
-      range                           = (int)(4 * blurangle * dist);
+      range = (int)(4 * blurangle * dist);
       if (range >= 1) {
         angle = atan2((double)vy, (double)vx) - blurangle;
         ddist = 0.5 / dist;

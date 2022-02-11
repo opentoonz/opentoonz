@@ -269,7 +269,7 @@ MatrixRmn &MatrixRmn::AddToDiagonal(double d)  // Adds d to each diagonal entry
   return *this;
 }
 
-// Aggiunge i temini del vettore alla diagonale
+// Adds the terms of the vector to the diagonal
 MatrixRmn &MatrixRmn::AddToDiagonal(
     const VectorRn &v)  // Adds d to each diagonal entry
 {
@@ -1552,7 +1552,7 @@ void Jacobian::CalcDeltaThetasSDLS() {
     // Calculate the dTheta from pure pseudoinverse considerations
     double scale =
         alpha *
-        wiInv;  // This times i-th column of V is the psuedoinverse response
+        wiInv;  // This times i-th column of V is the pseudoinverse response
     dPreTheta.LoadScaled(V.GetColumnPtr(i), scale);
     // Now rescale the dTheta values.
     double max     = dPreTheta.MaxAbs();

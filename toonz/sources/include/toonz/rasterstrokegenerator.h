@@ -37,6 +37,7 @@ class DVAPI RasterStrokeGenerator {
   bool m_doAnArc;
   bool m_isPaletteOrder;  // Used in the Draw Order option of Brush Tool,
                           // use style order to define line stacking order
+  bool m_modifierLockAlpha;
   QSet<int> m_aboveStyleIds;
 
   // Ricalcola i punti in un nuovo sistema di riferimento
@@ -50,13 +51,14 @@ class DVAPI RasterStrokeGenerator {
 public:
   RasterStrokeGenerator(const TRasterCM32P &raster, Tasks task,
                         ColorType colorType, int styleId, const TThickPoint &p,
-                        bool selective, int selectedStyle, bool keepAntialias,
-                        bool isPaletteOrder = false);
+                        bool selective, int selectedStyle, bool lockAlpha,
+                        bool keepAntialias, bool isPaletteOrder = false);
   ~RasterStrokeGenerator();
   void setRaster(const TRasterCM32P &ras) { m_raster = ras; }
   void setStyle(int styleId) { m_styleId = styleId; }
   int getStyleId() const { return m_styleId; }
   bool isSelective() { return m_selective; }
+  bool isAlphaLocked() { return m_modifierLockAlpha; }
 
   bool isPaletteOrder() { return m_isPaletteOrder; }
   void setAboveStyleIds(QSet<int> &ids) { m_aboveStyleIds = ids; }

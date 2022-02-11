@@ -28,6 +28,7 @@ class DVAPI TXsheetHandle final : public QObject {
   Q_OBJECT
 
   TXsheet *m_xsheet;
+  int m_zoomFactor;
 
 public:
   TXsheetHandle();
@@ -39,12 +40,18 @@ public:
   void notifyXsheetSwitched() { emit xsheetSwitched(); }
   void notifyXsheetSoundChanged() { emit xsheetSoundChanged(); }
   void changeXsheetCamera(int index) { emit xsheetCameraChange(index); }
+  void notifyZoomScaleChanged(int factor) {
+    m_zoomFactor = factor;
+    emit zoomScaleChanged();
+  }
+  int getZoomFactor() { return m_zoomFactor; }
 
 signals:
   void xsheetSwitched();
   void xsheetChanged();
   void xsheetSoundChanged();
   void xsheetCameraChange(int);
+  void zoomScaleChanged();
 };
 
 #endif  // TXSHEETHANDLE_H

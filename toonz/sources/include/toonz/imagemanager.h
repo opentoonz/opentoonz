@@ -282,7 +282,7 @@ protected:
   //! external data.
   virtual bool getInfo(TImageInfo &info, int imFlags, void *extData) = 0;
 
-  // load icon (and image) data of all frames into cache. impremented in
+  // load icon (and image) data of all frames into cache. implemented in
   // ImageLoader
   virtual void buildAllIconsAndPutInCache(TXshSimpleLevel *,
                                           std::vector<TFrameId>,

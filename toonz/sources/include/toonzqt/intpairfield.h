@@ -67,7 +67,7 @@ namespace DVGui {
                         IntPairField* intPairFieldExample = new
    IntPairField(this);
                         intPairFieldExample->setLeftText(tr("Left Value:"));
-                        intPairFieldExample->setRightText(tr("Rigth Value:"));
+                        intPairFieldExample->setRightText(tr("Right Value:"));
                         intPairFieldExample->setRange(0,10);
                         intPairFieldExample->setValues(std::make_pair(3,8));
                 \endcode

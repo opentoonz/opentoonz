@@ -142,7 +142,7 @@ public:
   double xToFrame(double x) const;
   double frameToX(double frame) const;
 
-  // note: the y-unit depends on the unit (e.g. degress, inches,..) and
+  // note: the y-unit depends on the unit (e.g. degrees, inches,..) and
   // therefore on the curve
   double valueToY(TDoubleParam *curve, double value) const;
   double yToValue(TDoubleParam *curve, double y) const;

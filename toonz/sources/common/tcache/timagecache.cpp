@@ -824,7 +824,7 @@ void TImageCache::Imp::doCompress() {
       assert(uitem);
       item->m_cantCompress = true;
       CacheItemP newItem   = new CompressedOnMemoryCacheItem(
-          item->getImage());  // WARNING the codec buffer  allocation can CHANGE
+          item->getImage());  // WARNING the codec buffer allocation can CHANGE
                               // the cache.
       item->m_cantCompress = false;
       if (newItem->getSize() ==
@@ -838,7 +838,7 @@ void TImageCache::Imp::doCompress() {
       m_compressedItems[id] = newItem;
       item                  = CacheItemP();
       uitem                 = UncompressedOnMemoryCacheItemP();
-      // doCompress();//restart, since interators can have been changed (see
+      // doCompress();//restart, since iterators could have been changed (see
       // comment above)
       // return;
       itu = m_itemHistory.begin();
@@ -1921,13 +1921,13 @@ void TImageCache::Imp::outputMap(UINT chunkRequested, std::string filename) {
             "\n";
   // os<<"***bigmem available" +
   // std::to_string((int)TBigMemoryManager::instance()->getAvailableMemoryinKb());
-  os << "***uncompressed NOT compressable(refcount>1)   " +
+  os << "***uncompressed NOT compressible(refcount>1)   " +
             std::to_string(umcount1) + " " + std::to_string(umsize1 / 1024.0) +
             " MB\n";
-  os << "***uncompressed NOT compressable(cantCompress)   " +
+  os << "***uncompressed NOT compressible(cantCompress)   " +
             std::to_string(umcount2) + " " + std::to_string(umsize2 / 1024.0) +
             " MB\n";
-  os << "***uncompressed compressable   " + std::to_string(umcount3) + " " +
+  os << "***uncompressed compressible   " + std::to_string(umcount3) + " " +
             std::to_string(umsize3 / 1024.0) + " MB\n";
   os << "***compressed on mem  " + std::to_string(cmcount) + " " +
             std::to_string((int)cmsize / 1048576.0) + " MB\n";

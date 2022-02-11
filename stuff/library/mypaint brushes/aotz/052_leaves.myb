@@ -2,7 +2,7 @@
     "comment": "MyPaint brush file",
     "description": "A brush to simulate leaves",
     "group": "",
-    "notes": "Brush package optimized for OpenToonz v0.1\n\nAuthor: Anderson Prado (aka Andeon)\nLicense: CC0/Public Domain",
+    "notes": "Brush package optimized for OpenToonz v0.2\n\nAuthor: Anderson Prado (aka Andeon)\nLicense: CC0/Public Domain",
     "parent_brush_name": "",
     "settings": {
         "anti_aliasing": {
@@ -30,15 +30,15 @@
             "inputs": {}
         },
         "color_h": {
-            "base_value": 0.35913724128472313,
+            "base_value": 0.0,
             "inputs": {}
         },
         "color_s": {
-            "base_value": 0.45357713925324744,
+            "base_value": 0.0,
             "inputs": {}
         },
         "color_v": {
-            "base_value": 0.9571982431049525,
+            "base_value": 0.0,
             "inputs": {}
         },
         "colorize": {
@@ -61,7 +61,7 @@
             }
         },
         "custom_input_slowness": {
-            "base_value": 0.71,
+            "base_value": 0.69,
             "inputs": {}
         },
         "dabs_per_actual_radius": {
@@ -226,7 +226,7 @@
             "inputs": {}
         },
         "posterize_num": {
-            "base_value": 0.05000000074505806,
+            "base_value": 0.0,
             "inputs": {}
         },
         "pressure_gain_log": {
@@ -239,28 +239,7 @@
         },
         "radius_logarithmic": {
             "base_value": 2.58,
-            "inputs": {
-                "custom": [
-                    [
-                        -2.0,
-                        0.45
-                    ],
-                    [
-                        2.0,
-                        -0.45
-                    ]
-                ],
-                "pressure": [
-                    [
-                        0.0,
-                        -0.473333
-                    ],
-                    [
-                        1.0,
-                        0.71
-                    ]
-                ]
-            }
+            "inputs": {}
         },
         "restore_color": {
             "base_value": 0.0,
@@ -283,15 +262,15 @@
                         0.94
                     ],
                     [
-                        0.648148,
-                        0.76375
+                        0.649148,
+                        0.77375
                     ],
                     [
                         0.833333,
                         0.5875
                     ],
                     [
-                        0.916667,
+                        0.926667,
                         0.362292
                     ],
                     [

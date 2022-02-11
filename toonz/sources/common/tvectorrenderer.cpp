@@ -351,7 +351,7 @@ GLXPixmap make_pixmap(Display *dpy, Window win, unsigned int width,
 
 /*
     * IMPORTANT:
-    *   Use the glXCreateGLXPixmapMESA funtion when using Mesa because
+    *   Use the glXCreateGLXPixmapMESA function when using Mesa because
     *   Mesa needs to know the colormap associated with a pixmap in order
     *   to render correctly.  This is because Mesa allows RGB rendering
     *   into any kind of visual, not just TrueColor or DirectColor.

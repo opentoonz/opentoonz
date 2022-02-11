@@ -129,6 +129,9 @@ inline void setFxParamToCurrentScene(TFx *fx, TXsheet *xsh) {
 void initializeFx(TXsheet *xsh, TFx *fx) {
   if (TZeraryColumnFx *zcfx = dynamic_cast<TZeraryColumnFx *>(fx))
     fx = zcfx->getZeraryFx();
+  // if the fx has not unique name then let assignUniqueId() set the default
+  // name
+  if (fx->getName() != L"" && fx->getName() == fx->getFxId()) fx->setName(L"");
 
   xsh->getFxDag()->assignUniqueId(fx);
   setFxParamToCurrentScene(fx, xsh);
@@ -1010,6 +1013,12 @@ void DuplicateFxUndo::initialize() {
     FxCommandUndo::cloneGroupStack(m_fx.getPointer(), fx);
 
     m_dupFx = fx;
+  }
+
+  // place duplicated nodes lower-right position from the original ones
+  if (fx->getAttributes()->getDagNodePos() != TConst::nowhere) {
+    TPointD dupFxPos = fx->getAttributes()->getDagNodePos() + TPointD(50, 50);
+    m_dupFx->getAttributes()->setDagNodePos(dupFxPos);
   }
 }
 
@@ -2329,7 +2338,7 @@ static void deleteFxs(const std::list<TFxP> &fxs, TXsheetHandle *xshHandle,
     std::unique_ptr<FxCommandUndo> undo(
         new DeleteFxOrColumnUndo(*ft, xshHandle, fxHandle));
     if (undo->isConsistent()) {
-      // prevent emiting xsheetChanged signal for every undos which will cause
+      // prevent emitting xsheetChanged signal for every undos which will cause
       // multiple triggers of preview rendering
       undo->m_isLastInRedoBlock = false;
       undo->redo();
@@ -2382,7 +2391,7 @@ static void deleteColumns(const std::list<int> &columns,
     std::unique_ptr<FxCommandUndo> undo(
         new DeleteFxOrColumnUndo(cols[c]->getIndex(), xshHandle, fxHandle));
     if (undo->isConsistent()) {
-      // prevent emiting xsheetChanged signal for every undos which will cause
+      // prevent emitting xsheetChanged signal for every undos which will cause
       // multiple triggers of preview rendering
       undo->m_isLastInRedoBlock = false;
       undo->redo();

@@ -630,7 +630,7 @@ m_unitFld->setText("");
 }
 
 //-----------------------------------------------------------------------------
-/*! return false if a circular reference is occured
+/*! return false if a circular reference is occurred
  */
 bool FunctionExpressionSegmentPage::getGuiValues(std::string &expressionText,
                                                  std::string &unitName) {

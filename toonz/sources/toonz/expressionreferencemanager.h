@@ -79,6 +79,7 @@ public:
 
   bool askIfParamIsIgnoredOnSave(bool saveSubXsheet);
 
+  void refreshXsheetRefInfo(TXsheet* xsh);
 protected slots:
   void onSceneSwitched();
   void onXsheetSwitched();

@@ -15,7 +15,7 @@ namespace ToonzExt {
 //---------------------------------------------------------------------------
 /**
    *@class StrokeStatus
-   *@brief This class mantains interal data for Dragger manipulator.
+   *@brief This class maintains internal data for Dragger manipulator.
    */
 
 StrokeStatus::StrokeStatus(TStroke *stroke2change, unsigned int n, double w,

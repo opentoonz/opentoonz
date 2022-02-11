@@ -9,6 +9,7 @@
 #include "tcommon.h"
 #include "tgeometry.h"
 #include "tpixel.h"
+#include "tfilepath.h"
 
 // TnzLib includes
 #include "toonz/levelproperties.h"
@@ -36,7 +37,6 @@
 
 //    Forward declarations
 
-class TFilePath;
 class QSettings;
 
 //==============================================================
@@ -110,6 +110,12 @@ public:
     ShowGraphEditorInPopup = 0,
     ShowFunctionSpreadsheetInPopup,
     ToggleBetweenGraphAndSpreadsheet
+  };
+
+  enum LevelNameDisplayType {
+    ShowLevelName_Default = 0,
+    ShowLevelNameOnEachMarker,
+    ShowLevelNameOnColumnHeader
   };
 
   //--- callbacks
@@ -213,14 +219,8 @@ public:
   bool isActualPixelViewOnSceneEditingModeEnabled() const {
     return getBoolValue(actualPixelViewOnSceneEditingMode);
   }
-  bool isLevelNameOnEachMarkerEnabled() const {
-    return getBoolValue(levelNameOnEachMarkerEnabled);
-  }
   bool isShowRasterImagesDarkenBlendedInViewerEnabled() const {
     return getBoolValue(showRasterImagesDarkenBlendedInViewer);
-  }
-  bool isShowFrameNumberWithLettersEnabled() const {
-    return getBoolValue(showFrameNumberWithLetters);
   }
   TDimension getIconSize() const { return getSizeValue(iconSize); }
   void getViewValues(int &shrink, int &step) const {
@@ -235,7 +235,7 @@ public:
   }
   void setColorCalibrationLutPath(QString monitorName, QString path);
   QString getColorCalibrationLutPath(QString &monitorName) const;
-
+  bool is30bitDisplayEnabled() const { return getBoolValue(displayIn30bit); }
   // Visualization  tab
   bool getShow0ThickLines() const { return getBoolValue(show0ThickLines); }
   bool getRegionAntialias() const { return getBoolValue(regionAntialias); }
@@ -270,6 +270,9 @@ public:
   int matchLevelFormat(const TFilePath &fp)
       const;  //!< Returns the \a nonnegative index of the first level format
               //!  matching the specified file path, <I>or \p -1 if none</I>.
+  bool isAutoRemoveUnusedLevelsEnabled() const {
+    return isAutoExposeEnabled() && getBoolValue(autoRemoveUnusedLevels);
+  }
 
   // Saving tab
   TPixel getRasterBackgroundColor() const {
@@ -280,9 +283,11 @@ public:
   QString getFfmpegPath() const { return getStringValue(ffmpegPath); }
   int getFfmpegTimeout() { return getIntValue(ffmpegTimeout); }
   QString getFastRenderPath() const { return getStringValue(fastRenderPath); }
+  bool getFfmpegMultiThread() const { return getBoolValue(ffmpegMultiThread); }
 
   // Drawing  tab
-  QString getScanLevelType() const { return getStringValue(scanLevelType); }
+  QString getDefRasterFormat() const { return getStringValue(DefRasterFormat); }
+  // QString getScanLevelType() const { return getStringValue(scanLevelType); }
   int getDefLevelType() const { return getIntValue(DefLevelType); }
   bool isNewLevelSizeToCameraSizeEnabled() const {
     return getBoolValue(newLevelSizeToCameraSizeEnabled);
@@ -320,9 +325,9 @@ public:
   }
 
   // Tools Tab
-  bool getDropdownShortcutsCycleOptions() {
-    return getIntValue(dropdownShortcutsCycleOptions) == 1;
-  }
+  // bool getDropdownShortcutsCycleOptions() {
+  //  return getIntValue(dropdownShortcutsCycleOptions) == 1;
+  //}
   bool getFillOnlySavebox() const { return getBoolValue(FillOnlysavebox); }
   bool isMultiLayerStylePickerEnabled() const {
     return getBoolValue(multiLayerStylePickerEnabled);
@@ -393,6 +398,16 @@ public:
   }
   void getCurrentColumnData(TPixel &color) const {
     color = getColorValue(currentColumnColor);
+  }
+
+  LevelNameDisplayType getLevelNameDisplayType() const {
+    return LevelNameDisplayType(getIntValue(levelNameDisplayType));
+  }
+  bool isLevelNameOnEachMarkerEnabled() const {
+    return getLevelNameDisplayType() == ShowLevelNameOnEachMarker;
+  }
+  bool isShowFrameNumberWithLettersEnabled() const {
+    return getBoolValue(showFrameNumberWithLetters);
   }
 
   // Animation  tab
@@ -469,6 +484,9 @@ public:
 
   // Tablet tab
   bool isWinInkEnabled() const { return getBoolValue(winInkEnabled); }
+  bool isQtNativeWinInkEnabled() const {
+    return getBoolValue(useQtNativeWinInk);
+  }
 
   // Others (not appeared in the popup)
   // Shortcut popup settings

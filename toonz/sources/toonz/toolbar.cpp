@@ -29,12 +29,12 @@
 #include <QVBoxLayout>
 #include <QObject>
 
-TEnv::IntVar ShowAllToolsToggle("ShowAllToolsToggle", 0);
+TEnv::IntVar ShowAllToolsToggle("ShowAllToolsToggle", 1);
 
 namespace {
 struct {
   const char *toolName;
-  bool collapsable;
+  bool collapsible;
   QAction *action;
 } buttonLayout[] = {{T_Edit, false, 0},        {T_Selection, false, 0},
                     {"Separator_1", false, 0}, {T_Brush, false, 0},
@@ -178,7 +178,7 @@ void Toolbar::updateToolbar() {
         (m_toolbarLevel & LEVELCOLUMN_XSHLEVEL))
       enable = true;
 
-    if (!m_isExpanded && buttonLayout[idx].collapsable) continue;
+    if (!m_isExpanded && buttonLayout[idx].collapsible) continue;
 
     if (!buttonLayout[idx].action) {
       if (isSeparator)

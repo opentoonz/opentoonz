@@ -1,40 +1,37 @@
 
 # Building on Windows
 
-This software can be built using Visual Studio 2015 or above and Qt 5.9 (later Qt versions still not working correctly.)
+This software can be built using Visual Studio 2019 and Qt 5.x
 
 ## Required Software
 
-### Visual Studio Express 2015 or higher for Windows Desktop
-- https://www.visualstudio.com/vs/older-downloads/
-- Make sure the target platform is "for Windows Desktop", not "for Windows".
-- Community and Professional versions of Visual Studio for Windows Desktop also work.
+### Visual Studio Community 2019
+- https://www.visualstudio.microsoft.com
 - During the installation, make sure to select all the Visual C++ packages.
 
 ### CMake
 - https://cmake.org/download/
-- This will be used to create the `MSVC 2015` project file.
+- This will be used to create the `MSVC 2019` project file.
 
 ### Qt
 - https://www.qt.io/download-open-source/
 - Qt is a cross-platform GUI framework.
-- Install Qt 5.9 or higher (64-bit version, tested up to 5.9.9) with the [Qt Online Installer for Windows](http://download.qt.io/official_releases/online_installers/qt-unified-windows-x86-online.exe).
+- Install Qt 5.9 or higher (64-bit version, tested up to 5.15.2) with the [Qt Online Installer for Windows](http://download.qt.io/official_releases/online_installers/qt-unified-windows-x86-online.exe).
+
+#### Customized Qt v5.15.2 with WinTab support
+- Qt have started to support Windows Ink from 5.12. Unlike WinTab API used in Qt 5.9 the tablet behaviors are different and are (at least, for OT) problematic.
+- The customized Qt5.15.2 are made with cherry-picking the WinTab feature to be officially introduced from 6.0.
+- You can build OT with WinTab support by using the prebuilt package of the customized version of Qt for MSVC2019-x64 provided [here](https://github.com/shun-iwasawa/qt5/releases/tag/v5.15.2_wintab) and checking the `WITH_WINTAB` checkbox in CMake to build.
 
 ### boost
-- Boost 1.55.0 or later is required (tested up to 1.61.0).
-- http://www.boost.org/users/history/version_1_61_0.html
+- Boost 1.55.0 or later is required (tested up to 1.73.0).
+- http://www.boost.org/users/history/version_1_73_0.html
 - Download boost_1_73_0.zip from the above link. Extract all contents to the - '$opentoonz/thirdparty/boost' directory.
-- Install the following patch (Make the changes listed in the patch file), if you use Boost 1.55.0 with Visual Studio 2013.
-- https://svn.boost.org/trac/boost/attachment/ticket/9369/vc12_fix_has_member_function_callable_with.patch
 
 ### OpenCV
 - v4.1.0 and later
 - https://opencv.org/
 - On configuring with CMake or in the environmental variables, specify `OpenCV_DIR` to the `build` folder in the install folder of OpenCV (like `C:/opencv/build`).
-
-### libjpeg-turbo
-- https://www.libjpeg-turbo.org/
-- Copy the lib and include folders from libjpeg-turbo64 into `$opentoonz/thirdparty/libjpeg-turbo64`.
 
 ## Acquiring the Source Code
 - Note: You can also perform these next commands with Github for Desktop client.
@@ -58,7 +55,7 @@ This software can be built using Visual Studio 2015 or above and Qt 5.9 (later Q
 - If the build directory is in the git repository, be sure to add the directory to .gitignore
 - If the build directory is different from the one above, be sure to change to the specified directory where appropriate below.
 -Click on Configure and select the version of Visual Studio you are using.
--If Qt was installed to a directory other than the default, and the error Specify QT_PATH properly appears, navigate to the `QT_DIR` install folder and specify the path to `msvc2015_64`. Rerun Configure.
+-If Qt was installed to a directory other than the default, and the error Specify QT_PATH properly appears, navigate to the `QT_DIR` install folder and specify the path to `msvc2019_64`. Rerun Configure.
 -If red lines appear in the bottom box, you can safely ignore them.
 -Click Generate
 -Should the CMakeLists.txt file change, such as during automatic build cleanup, there is no need to rerun CMake.
@@ -149,7 +146,7 @@ OpenToonz utilizes the QuickTime SDK's `mov` and associated file formats.  Since
 
 ### Qt
 - https://www.qt.io/download-open-source/
-- Install Qt 5.9 (32-bit version) by the  by [Qt Online Installer for Windows](http://download.qt.io/official_releases/online_installers/qt-unified-windows-x86-online.exe).
+- Install Qt 5.x (32-bit version) by the  by [Qt Online Installer for Windows](http://download.qt.io/official_releases/online_installers/qt-unified-windows-x86-online.exe).
 
 ### QuickTime SDK
 1. Sign in using your Apple developer ID and download `QuickTime 7.3 SDK for Windows.zip` from the following url.
@@ -159,7 +156,7 @@ OpenToonz utilizes the QuickTime SDK's `mov` and associated file formats.  Since
 ### Using CMake to Create a Visual Studio 32-bit Project
 - Follow the same instructions as for the 64-bit version, but change the following:
   - `$opentoonz/toonz/build` to `$opentoonz/toonz/build32`
-  - `Visual Studio 14 2015 Win64` to `Visual Studio 14 2015`
+  - `Visual Studio 16 2019 x64` to `Visual Studio 16 2019 Win32`
 - Change `QT_PATH` to the path of your 32-bit version of Qt
 
 ### Building the 32-bit Version
@@ -170,10 +167,13 @@ OpenToonz utilizes the QuickTime SDK's `mov` and associated file formats.  Since
   - From `$opentoonz/toonz/build32/Release`
     - t32bitsrv.exe
     - image.dll
+    - tnzbase.dll
     - tnzcore.dll
+    - tnzext.dll
+    - toonzlib.dll
   - From the 32-bit version of Qt
-    - Qt5Core.dll
-    - Qt5Network.dll
+    - run `windeployqt` to obtain required libraries
+    - additionally, Qt5Gui.dll
   - `$opentoonz/thirdparty/glut/3.7.6/lib/glut32.dll`
 
 ## Creating Translation Files

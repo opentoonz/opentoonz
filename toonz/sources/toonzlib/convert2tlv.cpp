@@ -539,6 +539,8 @@ void Convert2Tlv::buildToonzRaster(TRasterCM32P &rout, const TRasterP &rin1,
 //----------------------------------------------
 
 TPalette *Convert2Tlv::buildPalette() {
+  m_palette->setDirtyFlag(true);  // make sure to be overwritten
+
   std::map<TPixel, int>::const_iterator it = m_colorMap.begin();
   TPalette::Page *page                     = m_palette->getPage(0);
 

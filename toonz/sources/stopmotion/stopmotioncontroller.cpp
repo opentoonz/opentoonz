@@ -28,6 +28,7 @@
 // TnzQt includes
 #include "toonzqt/filefield.h"
 #include "toonzqt/intfield.h"
+#include "toonzqt/doublefield.h"
 #include "toonzqt/menubarcommand.h"
 
 // Qt includes
@@ -229,7 +230,7 @@ StopMotionController::StopMotionController(QWidget *parent) : QWidget(parent) {
   m_previousXSheetFrameButton        = new QToolButton(this);
   m_onionOpacityFld                  = new DVGui::IntField(this);
 
-  // should choosing the file type is disabled for simplicty
+  // should choosing the file type is disabled for simplicity
   // too many options can be a bad thing
   m_fileTypeCombo          = new QComboBox(this);
   m_fileFormatOptionButton = new QPushButton(tr("Options"), this);
@@ -573,7 +574,7 @@ StopMotionController::StopMotionController(QWidget *parent) : QWidget(parent) {
     webcamSettingsLayout->setSpacing(0);
     webcamSettingsLayout->setMargin(5);
     QHBoxLayout *webcamLabelLayout = new QHBoxLayout();
-    m_webcamLabel = new QLabel("insert webcam name here", this);
+    m_webcamLabel = new QLabel(tr("insert webcam name here"), this);
     webcamLabelLayout->addStretch();
     webcamLabelLayout->addWidget(m_webcamLabel);
     webcamLabelLayout->addStretch();
@@ -682,33 +683,52 @@ StopMotionController::StopMotionController(QWidget *parent) : QWidget(parent) {
     // Make Options Page
     QGroupBox *webcamBox  = new QGroupBox(tr("Webcam Options"), this);
     QGroupBox *dslrBox    = new QGroupBox(tr("DSLR Options"), this);
-    QGroupBox *timerFrame = new QGroupBox(tr("Time Lapse"), this);
-    m_timerCB             = new QCheckBox(tr("Use time lapse"), this);
-    m_timerIntervalFld    = new DVGui::IntField(this);
-    timerFrame->setObjectName("CleanupSettingsFrame");
+    m_timerCB             = new QGroupBox(tr("Use Time Lapse"), this);
+    m_timerIntervalFld    = new DVGui::DoubleField(this, true, 1);
+    m_timerCB->setCheckable(true);
+    m_timerCB->setObjectName("CleanupSettingsFrame");
     m_timerCB->setChecked(false);
-    m_timerIntervalFld->setRange(0, 60);
-    m_timerIntervalFld->setValue(10);
-    m_timerIntervalFld->setDisabled(true);
+    m_timerIntervalFld->setRange(0.0, 60.0);
+    m_timerIntervalFld->setValue(0.0);
 
-    m_postCaptureReviewFld = new DVGui::IntField(this);
-    m_postCaptureReviewFld->setRange(0, 10);
+    m_postCaptureReviewFld = new DVGui::DoubleField(this, true, 1);
+    m_postCaptureReviewFld->setRange(0.0, 10.0);
+    m_postCaptureReviewFld->setValue(0.0);
 
     m_subsamplingFld = new DVGui::IntField(this);
     m_subsamplingFld->setRange(1, 30);
     m_subsamplingFld->setDisabled(true);
 
-    m_placeOnXSheetCB = new QCheckBox(this);
+    m_placeOnXSheetCB = new QCheckBox(tr("Place on XSheet"), this);
     m_placeOnXSheetCB->setToolTip(tr("Place the frame in the XSheet"));
 
-    m_useScaledFullSizeImages = new QCheckBox(this);
-    m_directShowLabel = new QLabel(tr("Use Direct Show Webcam Drivers"), this);
-    m_directShowCB    = new QCheckBox(this);
-    m_useMjpgCB       = new QCheckBox(this);
-    m_useNumpadCB     = new QCheckBox(this);
-    m_drawBeneathCB   = new QCheckBox(this);
+    m_useScaledFullSizeImages =
+        new QCheckBox(tr("Use Reduced Resolution Images"), this);
+    m_directShowCB = new QCheckBox(tr("Use Direct Show Webcam Drivers"), this);
+    m_useMjpgCB    = new QCheckBox(tr("Use MJPG with Webcam"), this);
+    m_useNumpadCB = new QCheckBox(tr("Use Numpad Shortcuts When Active"), this);
+    m_useNumpadCB->setToolTip(
+        tr("Requires restarting camera when toggled\n"
+           "NP 1 = Previous Frame\n"
+           "NP 2 = Next Frame\n"
+           "NP 3 = Jump To Camera\n"
+           "NP 5 = Toggle Live View\n"
+           "NP 6 = Short Play\n"
+           "NP 8 = Loop\n"
+           "NP 0 = Play\n"
+           "Period = Use Live View Images\n"
+           "Plus = Raise Opacity\n"
+           "Minus = Lower Opacity\n"
+           "Enter = Capture\n"
+           "BackSpace = Remove Frame\n"
+           "Multiply = Toggle Zoom\n"
+           "Divide = Focus Check"));
+    m_drawBeneathCB = new QCheckBox(tr("Show Camera Below Other Levels"), this);
+    m_liveViewOnAllFramesCB =
+        new QCheckBox(tr("Show Live View on All Frames"), this);
+    m_playSound = new QCheckBox(tr("Play Sound on Capture"), this);
+    m_playSound->setToolTip(tr("Make a click sound on each capture"));
 
-    m_liveViewOnAllFramesCB           = new QCheckBox(this);
     QVBoxLayout *optionsOutsideLayout = new QVBoxLayout;
     QGridLayout *optionsLayout        = new QGridLayout;
     optionsLayout->setSpacing(3);
@@ -717,20 +737,15 @@ StopMotionController::StopMotionController(QWidget *parent) : QWidget(parent) {
     QGridLayout *dslrLayout     = new QGridLayout;
     QGridLayout *checkboxLayout = new QGridLayout;
 
-    dslrLayout->addWidget(m_useScaledFullSizeImages, 1, 0, Qt::AlignRight);
-    dslrLayout->addWidget(new QLabel(tr("Use Reduced Resolution Images")), 1, 1,
-                          Qt::AlignLeft);
+    dslrLayout->addWidget(m_useScaledFullSizeImages, 1, 0, 1, 2);
     dslrLayout->setColumnStretch(1, 30);
     dslrBox->setLayout(dslrLayout);
     dslrBox->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
     optionsOutsideLayout->addWidget(dslrBox, Qt::AlignCenter);
     dslrBox->hide();
 
-    webcamLayout->addWidget(m_directShowCB, 0, 0, Qt::AlignRight);
-    webcamLayout->addWidget(m_directShowLabel, 0, 1, Qt::AlignLeft);
-    webcamLayout->addWidget(m_useMjpgCB, 1, 0, Qt::AlignRight);
-    webcamLayout->addWidget(new QLabel(tr("Use MJPG with Webcam")), 1, 1,
-                            Qt::AlignLeft);
+    webcamLayout->addWidget(m_directShowCB, 0, 0, 1, 2);
+    webcamLayout->addWidget(m_useMjpgCB, 1, 0, 1, 2);
     webcamLayout->setColumnStretch(1, 30);
     webcamBox->setLayout(webcamLayout);
     webcamBox->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
@@ -742,36 +757,24 @@ StopMotionController::StopMotionController(QWidget *parent) : QWidget(parent) {
     timerLay->setHorizontalSpacing(3);
     timerLay->setVerticalSpacing(5);
     {
-      timerLay->addWidget(m_timerCB, 0, 0, 1, 2);
-
       timerLay->addWidget(new QLabel(tr("Interval(sec):"), this), 1, 0,
                           Qt::AlignRight);
       timerLay->addWidget(m_timerIntervalFld, 1, 1);
     }
     timerLay->setColumnStretch(0, 0);
     timerLay->setColumnStretch(1, 1);
-    timerFrame->setLayout(timerLay);
-    optionsOutsideLayout->addWidget(timerFrame);
+    m_timerCB->setLayout(timerLay);
+    optionsOutsideLayout->addWidget(m_timerCB);
 
-    checkboxLayout->addWidget(m_placeOnXSheetCB, 0, 0, 1, 1, Qt::AlignRight);
-    // checkboxLayout->addWidget(new QLabel(tr("Place on XSheet")), 0, 1,
-    //                          Qt::AlignLeft);
+    checkboxLayout->addWidget(m_placeOnXSheetCB, 0, 0, 1, 2);
     m_placeOnXSheetCB->hide();
-    checkboxLayout->addWidget(m_drawBeneathCB, 1, 0, Qt::AlignRight);
-    // checkboxLayout->addWidget(new QLabel(tr("Show Camera Below Other
-    // Levels")),
-    //                          1, 1, Qt::AlignLeft);
+    checkboxLayout->addWidget(m_drawBeneathCB, 1, 0, 1, 2);
     m_drawBeneathCB->hide();
 
-    checkboxLayout->addWidget(m_useNumpadCB, 2, 0, Qt::AlignRight);
-    checkboxLayout->addWidget(
-        new QLabel(tr("Use Numpad Shortcuts When Active")), 2, 1,
-        Qt::AlignLeft);
-    checkboxLayout->addWidget(m_liveViewOnAllFramesCB, 3, 0, Qt::AlignRight);
+    checkboxLayout->addWidget(m_useNumpadCB, 2, 0, 1, 2);
+    checkboxLayout->addWidget(m_liveViewOnAllFramesCB, 3, 0, 1, 2);
     m_liveViewOnAllFramesCB->hide();
-    // checkboxLayout->addWidget(new QLabel(tr("Show Live View on All Frames")),
-    // 3,
-    //                          1, Qt::AlignLeft);
+    checkboxLayout->addWidget(m_playSound, 4, 0, 1, 2);
 
     checkboxLayout->setColumnStretch(1, 30);
     optionsOutsideLayout->addLayout(checkboxLayout, Qt::AlignLeft);
@@ -1019,7 +1022,8 @@ StopMotionController::StopMotionController(QWidget *parent) : QWidget(parent) {
                        this, SLOT(onScaleFullSizeImagesChanged(int)));
   ret = ret && connect(m_liveViewOnAllFramesCB, SIGNAL(stateChanged(int)), this,
                        SLOT(onLiveViewOnAllFramesChanged(int)));
-
+  ret = ret && connect(m_playSound, SIGNAL(toggled(bool)), this,
+                       SLOT(onPlaySoundToggled(bool)));
   ret = ret && connect(m_placeOnXSheetCB, SIGNAL(stateChanged(int)), this,
                        SLOT(onPlaceOnXSheetChanged(int)));
   ret = ret && connect(m_directShowCB, SIGNAL(stateChanged(int)), this,
@@ -1058,6 +1062,8 @@ StopMotionController::StopMotionController(QWidget *parent) : QWidget(parent) {
                        this, SLOT(onDrawBeneathSignal(bool)));
   ret = ret && connect(m_stopMotion, SIGNAL(reviewTimeChangedSignal(int)), this,
                        SLOT(onReviewTimeChangedSignal(int)));
+  ret = ret && connect(m_stopMotion, SIGNAL(playCaptureSignal(bool)), this,
+                       SLOT(onPlayCaptureSignal(bool)));
 
   // From Stop Motion Main
   ret = ret && connect(m_stopMotion, SIGNAL(newDimensions()), this,
@@ -1252,6 +1258,7 @@ StopMotionController::StopMotionController(QWidget *parent) : QWidget(parent) {
   m_useNumpadCB->setChecked(m_stopMotion->getUseNumpadShortcuts());
   m_drawBeneathCB->setChecked(m_stopMotion->m_drawBeneathLevels);
   m_liveViewOnAllFramesCB->setChecked(m_stopMotion->getAlwaysLiveView());
+  m_playSound->setChecked(m_stopMotion->getPlayCaptureSound());
   m_blackScreenForCapture->setChecked(
       m_stopMotion->m_light->getBlackCapture() == true ? true : false);
   if (m_stopMotion->m_light->getBlackCapture()) {
@@ -1259,7 +1266,8 @@ StopMotionController::StopMotionController(QWidget *parent) : QWidget(parent) {
     m_screen2Box->setDisabled(true);
     m_screen3Box->setDisabled(true);
   }
-  m_postCaptureReviewFld->setValue(m_stopMotion->getReviewTime());
+  m_postCaptureReviewFld->setValue(m_stopMotion->getReviewTimeDSec() / 10.0);
+  m_timerIntervalFld->setValue(m_stopMotion->getIntervalDSec() / 10.0);
 
   refreshCameraList(QString(""));
   onSceneSwitched();
@@ -1268,7 +1276,6 @@ StopMotionController::StopMotionController(QWidget *parent) : QWidget(parent) {
 
 #ifndef _WIN32
   m_directShowCB->hide();
-  m_directShowLabel->hide();
 #endif
 }
 
@@ -1491,19 +1498,25 @@ void StopMotionController::onDrawBeneathSignal(bool on) {
 //-----------------------------------------------------------------------------
 
 void StopMotionController::onCaptureReviewFldEdited() {
-  m_stopMotion->setReviewTime(m_postCaptureReviewFld->getValue());
+  m_stopMotion->setReviewTimeDSec(m_postCaptureReviewFld->getValue() * 10.0);
 }
 
 //-----------------------------------------------------------------------------
 
 void StopMotionController::onCaptureReviewSliderChanged(bool ignore) {
-  m_stopMotion->setReviewTime(m_postCaptureReviewFld->getValue());
+  m_stopMotion->setReviewTimeDSec(m_postCaptureReviewFld->getValue() * 10.0);
 }
 
 //-----------------------------------------------------------------------------
 
 void StopMotionController::onReviewTimeChangedSignal(int time) {
-  m_postCaptureReviewFld->setValue(time);
+  m_postCaptureReviewFld->setValue(time / 10.0);
+}
+
+//-----------------------------------------------------------------------------
+
+void StopMotionController::onPlayCaptureSignal(bool on) {
+  m_playSound->setChecked(on);
 }
 
 //-----------------------------------------------------------------------------
@@ -1688,7 +1701,8 @@ void StopMotionController::refreshMode() {
   QString mode    = m_stopMotion->m_canon->getMode();
   QString battery = m_stopMotion->m_canon->getCurrentBatteryLevel();
   m_cameraModeLabel->setText(tr("Mode: ") + mode);
-  m_cameraStatusLabel->setText("Mode: " + mode + " - Battery: " + battery);
+  m_cameraStatusLabel->setText(tr("Mode: ") + mode + tr(" - Battery: ") +
+                               battery);
 #endif
 }
 
@@ -1785,7 +1799,7 @@ void StopMotionController::refreshExposureList() {
   if (m_exposureCombo->count() == 0) {
     m_exposureCombo->addItem(tr("Disabled"));
     m_exposureCombo->setDisabled(true);
-    m_exposureCombo->setMaximumWidth(fontMetrics().width("Disabled") + 25);
+    m_exposureCombo->setMaximumWidth(fontMetrics().width(tr("Disabled")) + 25);
   } else {
     m_exposureCombo->setEnabled(true);
     m_exposureCombo->setCurrentText(
@@ -1812,7 +1826,8 @@ void StopMotionController::refreshWhiteBalanceList() {
   if (m_whiteBalanceCombo->count() == 0) {
     m_whiteBalanceCombo->addItem(tr("Disabled"));
     m_whiteBalanceCombo->setDisabled(true);
-    m_whiteBalanceCombo->setMaximumWidth(fontMetrics().width("Disabled") + 25);
+    m_whiteBalanceCombo->setMaximumWidth(fontMetrics().width(tr("Disabled")) +
+                                         25);
   } else {
     m_whiteBalanceCombo->setEnabled(true);
     m_whiteBalanceCombo->setCurrentText(
@@ -1867,7 +1882,8 @@ void StopMotionController::refreshImageQualityList() {
   if (m_imageQualityCombo->count() == 0) {
     m_imageQualityCombo->addItem(tr("Disabled"));
     m_imageQualityCombo->setDisabled(true);
-    m_imageQualityCombo->setMaximumWidth(fontMetrics().width("Disabled") + 25);
+    m_imageQualityCombo->setMaximumWidth(fontMetrics().width(tr("Disabled")) +
+                                         25);
   } else {
     m_imageQualityCombo->setEnabled(true);
     m_imageQualityCombo->setCurrentText(
@@ -1895,7 +1911,8 @@ void StopMotionController::refreshPictureStyleList() {
   if (m_pictureStyleCombo->count() == 0) {
     m_pictureStyleCombo->addItem(tr("Disabled"));
     m_pictureStyleCombo->setDisabled(true);
-    m_pictureStyleCombo->setMaximumWidth(fontMetrics().width("Disabled") + 25);
+    m_pictureStyleCombo->setMaximumWidth(fontMetrics().width(tr("Disabled")) +
+                                         25);
   } else {
     m_pictureStyleCombo->setEnabled(true);
     m_pictureStyleCombo->setCurrentText(
@@ -1929,8 +1946,8 @@ void StopMotionController::onNewCameraSelected(int index, bool useWebcam) {
     m_resolutionCombo->hide();
     m_resolutionLabel->hide();
     m_cameraStatusLabel->hide();
-    m_pickZoomButton->setStyleSheet("border:1px solid rgb(0, 0, 0, 0);");
-    m_zoomButton->setStyleSheet("border:1px solid rgb(0, 0, 0, 0);");
+    m_pickZoomButton->setStyleSheet("border:1px solid rgba(0, 0, 0, 0);");
+    m_zoomButton->setStyleSheet("border:1px solid rgba(0, 0, 0, 0);");
     m_pickZoomButton->setChecked(false);
     m_zoomButton->setChecked(false);
     m_dslrFrame->hide();
@@ -2378,9 +2395,9 @@ void StopMotionController::onPictureStyleChangedSignal(QString text) {
 void StopMotionController::onFocusCheckToggled(bool on) {
 #ifdef WITH_CANON
   if (on) {
-    m_zoomButton->setStyleSheet("border:1px solid rgb(0, 255, 0, 255);");
+    m_zoomButton->setStyleSheet("border:1px solid rgba(0, 255, 0, 255);");
   } else {
-    m_zoomButton->setStyleSheet("border:1px solid rgb(0, 0, 0, 0);");
+    m_zoomButton->setStyleSheet("border:1px solid rgba(0, 0, 0, 0);");
   }
   m_zoomButton->blockSignals(true);
   m_zoomButton->setChecked(on);
@@ -2393,10 +2410,10 @@ void StopMotionController::onFocusCheckToggled(bool on) {
 void StopMotionController::onPickFocusCheckToggled(bool on) {
 #ifdef WITH_CANON
   if (on) {
-    m_pickZoomButton->setStyleSheet("border:1px solid rgb(0, 255, 0, 255);");
+    m_pickZoomButton->setStyleSheet("border:1px solid rgba(0, 255, 0, 255);");
 
   } else {
-    m_pickZoomButton->setStyleSheet("border:1px solid rgb(0, 0, 0, 0);");
+    m_pickZoomButton->setStyleSheet("border:1px solid rgba(0, 0, 0, 0);");
   }
   m_pickZoomButton->blockSignals(true);
   m_pickZoomButton->setChecked(on);
@@ -2653,7 +2670,7 @@ void StopMotionController::onIntervalTimerCBToggled(bool on) {
 //-----------------------------------------------------------------------------
 
 void StopMotionController::onIntervalSliderValueChanged(bool on) {
-  m_stopMotion->setIntervalAmount(m_timerIntervalFld->getValue());
+  m_stopMotion->setIntervalDSec(m_timerIntervalFld->getValue() * 10.0);
 }
 
 //-----------------------------------------------------------------------------
@@ -2676,14 +2693,13 @@ void StopMotionController::onIntervalCountDownTimeout() {
 //-----------------------------------------------------------------------------
 void StopMotionController::onIntervalAmountChanged(int value) {
   m_timerIntervalFld->blockSignals(true);
-  m_timerIntervalFld->setValue(value);
+  m_timerIntervalFld->setValue(value / 10.0);
   m_timerIntervalFld->blockSignals(false);
 }
 
 //-----------------------------------------------------------------------------
 void StopMotionController::onIntervalToggled(bool on) {
   m_timerCB->blockSignals(true);
-  m_timerIntervalFld->setEnabled(on);
   m_captureButton->setCheckable(on);
   if (on)
     m_captureButton->setText(tr("Start Capturing"));
@@ -2714,6 +2730,12 @@ void StopMotionController::onIntervalStopped() {
 
 //-----------------------------------------------------------------------------
 
+void StopMotionController::onPlaySoundToggled(bool on) {
+  m_stopMotion->setPlayCaptureSound(on);
+}
+
+//-----------------------------------------------------------------------------
+
 void StopMotionController::openSaveInFolderPopup() {
   if (m_saveInFolderPopup->exec()) {
     QString oldPath = m_saveInFileFld->getPath();
@@ -2735,7 +2757,7 @@ void StopMotionController::onFileTypeActivated() {
 //-----------------------------------------------------------------------------
 
 void StopMotionController::onFrameNumberChanged() {
-  m_stopMotion->setFrameNumber(m_frameNumberEdit->getValue());
+  m_stopMotion->setFrameNumber(m_frameNumberEdit->getValue().getNumber());
 }
 
 //-----------------------------------------------------------------------------

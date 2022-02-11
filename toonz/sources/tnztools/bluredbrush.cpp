@@ -27,7 +27,8 @@ QImage rasterToQImage(const TRasterP &ras, bool premultiplied = false) {
 //----------------------------------------------------------------------------------
 // drawOrderMode : 0=OverAll, 1=UnderAll, 2=PaletteOrder
 void putOnRasterCM(const TRasterCM32P &out, const TRaster32P &in, int styleId,
-                   int drawOrderMode, const QSet<int> &aboveStyleIds) {
+                   int drawOrderMode, bool lockAlpha,
+                   const QSet<int> &aboveStyleIds) {
   if (!out.getPointer() || !in.getPointer()) return;
   assert(out->getSize() == in->getSize());
   int x, y;
@@ -43,6 +44,12 @@ void putOnRasterCM(const TRasterCM32P &out, const TRaster32P &in, int styleId,
         TPixel32 *inPix = &in->pixels(y)[x];
         if (inPix->m == 0) continue;
         TPixelCM32 *outPix = &out->pixels(y)[x];
+        if (lockAlpha && !outPix->isPureInk() && outPix->getPaint() == 0 &&
+            outPix->getTone() == 255) {
+          *outPix = TPixelCM32(outPix->getInk(), outPix->getPaint(),
+                               outPix->getTone());
+          continue;
+        }
         bool sameStyleId   = styleId == outPix->getInk();
         // line with the same style : multiply tones
         // line with different style : pick darker tone
@@ -66,6 +73,12 @@ void putOnRasterCM(const TRasterCM32P &out, const TRaster32P &in, int styleId,
         TPixel32 *inPix = &in->pixels(y)[x];
         if (inPix->m == 0) continue;
         TPixelCM32 *outPix = &out->pixels(y)[x];
+        if (lockAlpha && !outPix->isPureInk() && outPix->getPaint() == 0 &&
+            outPix->getTone() == 255) {
+          *outPix = TPixelCM32(outPix->getInk(), outPix->getPaint(),
+                               outPix->getTone());
+          continue;
+        }
         bool sameStyleId   = styleId == outPix->getInk();
         // line with the same style : multiply tones
         // line with different style : pick darker tone
@@ -83,6 +96,12 @@ void putOnRasterCM(const TRasterCM32P &out, const TRaster32P &in, int styleId,
         TPixel32 *inPix = &in->pixels(y)[x];
         if (inPix->m == 0) continue;
         TPixelCM32 *outPix = &out->pixels(y)[x];
+        if (lockAlpha && !outPix->isPureInk() && outPix->getPaint() == 0 &&
+            outPix->getTone() == 255) {
+          *outPix = TPixelCM32(outPix->getInk(), outPix->getPaint(),
+                               outPix->getTone());
+          continue;
+        }
         bool sameStyleId   = styleId == outPix->getInk();
         // line with the same style : multiply tones
         // line with different style : pick darker tone
@@ -155,12 +174,12 @@ TRasterP rasterFromQImage(
 //=======================================================
 
 BluredBrush::BluredBrush(const TRaster32P &ras, int size,
-                         const QRadialGradient &gradient, bool doDinamicOpacity)
+                         const QRadialGradient &gradient, bool doDynamicOpacity)
     : m_ras(ras)
     , m_size(size)
     , m_lastPoint(0, 0)
     , m_oldOpacity(0)
-    , m_enableDinamicOpacity(doDinamicOpacity) {
+    , m_enableDynamicOpacity(doDynamicOpacity) {
   m_rasImage = rasterToQImage(m_ras, false);
   m_gradient = gradient;
 
@@ -188,7 +207,7 @@ void BluredBrush::addPoint(const TThickPoint &p, double opacity) {
   painter.setMatrix(
       QMatrix(scaleFactor, 0.0, 0.0, scaleFactor, p.x - radius, p.y - radius),
       false);
-  if (m_enableDinamicOpacity) painter.setOpacity(opacity);
+  if (m_enableDynamicOpacity) painter.setOpacity(opacity);
   painter.drawEllipse(0, 0, m_size, m_size);
   painter.end();
 
@@ -219,7 +238,7 @@ void BluredBrush::addArc(const TThickPoint &pa, const TThickPoint &pb,
     painter.setMatrix(QMatrix(scaleFactor, 0.0, 0.0, scaleFactor,
                               point.x - radius, point.y - radius),
                       false);
-    if (m_enableDinamicOpacity) {
+    if (m_enableDynamicOpacity) {
       double opacity = opacityA + ((opacityC - opacityA) * t);
       if (fabs(opacity - m_oldOpacity) > 0.01)
         opacity =
@@ -294,7 +313,7 @@ void BluredBrush::updateDrawing(const TRasterP ras, const TRasterP rasBackup,
     p.end();
 
     p.begin(&image);
-    p.setOpacity(m_enableDinamicOpacity ? 1 : opacity);
+    p.setOpacity(m_enableDynamicOpacity ? 1 : opacity);
     p.drawImage(qTargetRect, app, app.rect());
     p.end();
   } else {
@@ -303,7 +322,7 @@ void BluredBrush::updateDrawing(const TRasterP ras, const TRasterP rasBackup,
         QImage::Format_ARGB32_Premultiplied, colorTable);
 
     QPainter p(&targetImage);
-    p.setOpacity(m_enableDinamicOpacity ? 1 : opacity);
+    p.setOpacity(m_enableDynamicOpacity ? 1 : opacity);
     p.drawImage(QPoint(), app, app.rect());
     p.end();
     targetImage =
@@ -365,7 +384,7 @@ void BluredBrush::eraseDrawing(const TRasterP ras, const TRasterP rasBackup,
 void BluredBrush::updateDrawing(const TRasterCM32P rasCM,
                                 const TRasterCM32P rasBackupCM,
                                 const TRect &bbox, int styleId,
-                                int drawOrderMode) const {
+                                int drawOrderMode, bool lockAlpha) const {
   if (!rasCM) return;
 
   TRect rasRect    = rasCM->getBounds();
@@ -374,7 +393,7 @@ void BluredBrush::updateDrawing(const TRasterCM32P rasCM,
 
   rasCM->copy(rasBackupCM->extract(targetRect), targetRect.getP00());
   putOnRasterCM(rasCM->extract(targetRect), m_ras->extract(targetRect), styleId,
-                drawOrderMode, m_aboveStyleIds);
+                drawOrderMode, lockAlpha, m_aboveStyleIds);
 }
 
 //----------------------------------------------------------------------------------

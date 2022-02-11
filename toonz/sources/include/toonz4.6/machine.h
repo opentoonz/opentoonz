@@ -22,7 +22,7 @@
 #elif defined(MACOSX)
 #define TNZ_MACHINE_CHANNEL_ORDER_MRGB 1
 #else
-@UNKNOW PLATFORM @
+@UNKNOWN PLATFORM @
 #endif
 
 #if !defined(TNZ_LITTLE_ENDIAN)

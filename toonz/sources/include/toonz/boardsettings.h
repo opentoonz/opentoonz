@@ -62,7 +62,7 @@ private:
   // font color
   QColor m_color;
 
-  // font (familiy, bold, italic)
+  // font (family, bold, italic)
   QFont m_font;
 
   QString m_text;

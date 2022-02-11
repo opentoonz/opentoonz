@@ -76,13 +76,13 @@ The most important method of the class is \b getRaster(), which attempts
 retrieval of a certain
 frame and, if the frame was not calculated yet, makes the Previewer build it.
 \n
-The update() slot is provided to refresh the cached informations about the
+The update() slot is provided to refresh the cached information about the
 entire collection
 of currently stored frames. Updated frames are recalculated only upon a new
 getRaster(), in case the previously
-stored informations no more match the current frame description.
+stored information no more match the current frame description.
 \n
-The clear() methods make the Previewer erase all stored informations about one
+The clear() methods make the Previewer erase all stored information about one
 or all frames,
 so that the following getRaster() will forcibly recalculate the requested frame.
 */
@@ -352,7 +352,7 @@ void Previewer::Imp::updateRenderSettings() {
   else
     renderSettings.m_shrinkY = renderSettings.m_shrinkX = 1;
 
-  // In case the settings changee, erase all previously cached images
+  // In case the settings changed, erase all previously cached images
   if (renderSettings != m_renderSettings) {
     m_renderSettings = renderSettings;
 
@@ -618,7 +618,7 @@ inline void Previewer::Imp::notifyUpdate() {
 
 //-----------------------------------------------------------------------------
 
-//! Adds the renderized image to TImageCache; listeneres are advised too.
+//! Adds the renderized image to TImageCache; listeners are advised too.
 void Previewer::Imp::onRenderRasterStarted(const RenderData &renderData) {
   // Emit the started signal to execute code in the main thread
   m_owner->emitStartedFrame(renderData);
@@ -640,7 +640,7 @@ void Previewer::Imp::doOnRenderRasterStarted(const RenderData &renderData) {
 
 //-----------------------------------------------------------------------------
 
-//! Adds the renderized image to TImageCache; listeneres are advised too.
+//! Adds the renderized image to TImageCache; listeners are advised too.
 void Previewer::Imp::onRenderRasterCompleted(const RenderData &renderData) {
   if (renderData.m_rasB) {
     RenderData _renderData = renderData;
@@ -734,7 +734,7 @@ void Previewer::Imp::onRenderFailure(const RenderData &renderData,
 
 //-----------------------------------------------------------------------------
 
-//! Adds the renderized image to TImageCache; listeneres are advised too.
+//! Adds the renderized image to TImageCache; listeners are advised too.
 void Previewer::Imp::doOnRenderRasterFailed(const RenderData &renderData) {
   m_computingFrameCount--;
 

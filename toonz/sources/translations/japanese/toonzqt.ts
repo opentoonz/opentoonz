@@ -173,6 +173,26 @@ Possibly the preset file has been corrupted</source>
         <source>&lt;custom&gt;</source>
         <translation>&lt;カスタム&gt;</translation>
     </message>
+    <message>
+        <source>cm</source>
+        <translation>cm</translation>
+    </message>
+    <message>
+        <source>mm</source>
+        <translation>mm</translation>
+    </message>
+    <message>
+        <source>inch</source>
+        <translation>inch</translation>
+    </message>
+    <message>
+        <source>field</source>
+        <translation>フィールド</translation>
+    </message>
+    <message>
+        <source>pixel</source>
+        <translation>ピクセル</translation>
+    </message>
 </context>
 <context>
     <name>ChannelHisto</name>
@@ -1652,6 +1672,14 @@ Select FX nodes and related links before copying or cutting the selection you wa
     <message>
         <source>Failed to save palette.</source>
         <translation>パレットの保存に失敗しました。</translation>
+    </message>
+    <message>
+        <source>Set Toolbar Below Styles</source>
+        <translation>ツールバーを下に配置</translation>
+    </message>
+    <message>
+        <source>Set Toolbar Above Styles</source>
+        <translation>ツールバーを上に配置</translation>
     </message>
 </context>
 <context>

@@ -4,8 +4,9 @@
 #include "tparamset.h"
 
 #include "ino_common.h"
+#include "globalcontrollablefx.h"
 //------------------------------------------------------------
-class ino_level_rgba final : public TStandardRasterFx {
+class ino_level_rgba final : public GlobalControllableFx {
   FX_PLUGIN_DECLARATION(ino_level_rgba)
   TRasterFxPort m_input;
   TRasterFxPort m_refer;
@@ -270,7 +271,7 @@ void ino_level_rgba::doCompute(TTile &tile, double frame,
         true  // alpha_rendering_sw
         ,
         anti_alias_sw  // --> add_blend_sw, default is true
-        );
+    );
 
     ino::arr_to_ras(in_gr8->getRawData(), ino::channels(), in_ras, 0);
 

@@ -85,19 +85,19 @@ public:
   void setStdPaletteHandle(TPaletteHandle *stdPaletteHandle);
   TPaletteHandle *getStdPaletteHandle() const { return m_studioPaletteHandle; }
 
-  /*!	Overriden from StudioPalette::Listener. */
+  /*!	Overridden from StudioPalette::Listener. */
   void onStudioPaletteTreeChange() override { refresh(); }
-  /*!	Overriden from StudioPalette::Listener. */
+  /*!	Overridden from StudioPalette::Listener. */
   void onStudioPaletteMove(const TFilePath &dstPath,
                            const TFilePath &srcPath) override {
     refresh();
   }
-  /*!	Overriden from StudioPalette::Listener. */
+  /*!	Overridden from StudioPalette::Listener. */
   void onStudioPaletteChange(const TFilePath &palette) override { refresh(); }
 
-  /*!	Overriden from TProjectManager::Listener. */
+  /*!	Overridden from TProjectManager::Listener. */
   void onProjectSwitched() override { resetProjectPaletteFolder(); }
-  /*!	Overriden from TProjectManager::Listener. */
+  /*!	Overridden from TProjectManager::Listener. */
   void onProjectChanged() override { resetProjectPaletteFolder(); }
 
   TFilePath getCurrentItemPath() { return getItemPath(currentItem()); }

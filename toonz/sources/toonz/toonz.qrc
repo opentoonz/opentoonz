@@ -166,7 +166,8 @@
 		<file>icons/dark/mimetypes/60/svg_icon.svg</file>
 		<file>icons/dark/mimetypes/60/audio_icon.svg</file>
 		<file>icons/dark/mimetypes/60/script_icon.svg</file>
-		<file>icons/dark/mimetypes/60/broken_icon.svg</file>
+    <file>icons/dark/mimetypes/60/broken_icon.svg</file>
+    <file>icons/dark/mimetypes/60/json_icon.svg</file>
 
 		<!-- Render -->
 		<file>icons/dark/actions/16/render.svg</file>
@@ -530,6 +531,7 @@
 		<file>icons/dark/actions/16/tool_options.svg</file>
 		<file>icons/dark/actions/16/view_file.svg</file>
 		<file>icons/dark/actions/16/level_strip.svg</file>
+    <file>icons/dark/actions/17/syncscale.svg</file>
 
 		<!-- Keyframe -->
 		<file>icons/dark/actions/20/key_off.svg</file>
@@ -561,6 +563,7 @@
 		<file>Resources/brush.png</file>
 		<file>Resources/camera.svg</file>
 		<file>Resources/camera_small.svg</file>
+		<file>Resources/camera_snap.wav</file>
 		<file>Resources/center.png</file>
 		<file>Resources/clapboard.png</file>
 		<file>Resources/curve.svg</file>

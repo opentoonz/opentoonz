@@ -25,7 +25,6 @@ jobs:
         }
         brew update
         checkPkgAndInstall pkg-config glew lz4 libjpeg libpng lzo qt@5 boost libusb libmypaint ccache jpeg-turbo ninja
-        brew unlink gcc@8
         brew unlink gcc@9
         checkPkgAndInstall opencv
         

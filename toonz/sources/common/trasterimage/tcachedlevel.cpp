@@ -1021,7 +1021,7 @@ int ZFile::read(BYTE buf[], int size, TINT64 qwOffset) const {
 #define DWORDLONG_LO_DWORD(dwl64) ((DWORD)(dwl64))
 #define DWORDLONG_HI_DWORD(dwl64) ((DWORD)(dwl64 >> 32))
 
-  // set the overlapped stucture with the offsets
+  // set the overlapped structure with the offsets
   overLapped.Offset     = DWORDLONG_LO_DWORD(qwOffset);
   overLapped.OffsetHigh = DWORDLONG_HI_DWORD(qwOffset);
 
@@ -1040,7 +1040,7 @@ int ZFile::read(BYTE buf[], int size, TINT64 qwOffset) const {
                         (void *)buf,   // buffer to store data
                         bytesToRead,   // num bytes to read
                         &bytesRead,    // bytes read
-                        &overLapped);  // stucture for file offsets
+                        &overLapped);  // structure for file offsets
 
   if (!result) {
     DWORD error = GetLastError();
@@ -1074,7 +1074,7 @@ int ZFile::write(BYTE buf[], int size, TINT64 qwOffset) const {
 
   char msg[2048] = "";
   unsigned long bytesToWrite;      // Padded number of bytes to write.
-  unsigned long bytesWritten = 0;  // count of bytes actually writtten
+  unsigned long bytesWritten = 0;  // count of bytes actually written
 
   int result;
 
@@ -1082,7 +1082,7 @@ int ZFile::write(BYTE buf[], int size, TINT64 qwOffset) const {
     OVERLAPPED *overLapped = new OVERLAPPED;
     memset(overLapped, 0, sizeof(OVERLAPPED));
 
-    // set the overlapped stucture with the offsets
+    // set the overlapped structure with the offsets
     overLapped->Offset     = DWORDLONG_LO_DWORD(qwOffset);
     overLapped->OffsetHigh = DWORDLONG_HI_DWORD(qwOffset);
     overLapped->hEvent     = NULL;
@@ -1092,7 +1092,7 @@ int ZFile::write(BYTE buf[], int size, TINT64 qwOffset) const {
     result = WriteFileEx(m_fileHandle,  // file handle
                          (void *)buf,   // data buffer
                          bytesToWrite,  // num bytes to write
-                         overLapped,    // stucture for file offsets
+                         overLapped,    // structure for file offsets
                          &ZFile::FileIOCompletionRoutine);
 
     ResetEvent(m_writeNotPending);
@@ -1100,7 +1100,7 @@ int ZFile::write(BYTE buf[], int size, TINT64 qwOffset) const {
     OVERLAPPED overLapped;
     memset(&overLapped, 0, sizeof(overLapped));
 
-    // set the overlapped stucture with the offsets
+    // set the overlapped structure with the offsets
     overLapped.Offset     = DWORDLONG_LO_DWORD(qwOffset);
     overLapped.OffsetHigh = DWORDLONG_HI_DWORD(qwOffset);
     overLapped.hEvent     = NULL;
@@ -1111,7 +1111,7 @@ int ZFile::write(BYTE buf[], int size, TINT64 qwOffset) const {
                        (void *)buf,    // data buffer
                        bytesToWrite,   // num bytes to read
                        &bytesWritten,  // bytes read
-                       &overLapped);   // stucture for file offsets
+                       &overLapped);   // structure for file offsets
   }
 
   if (!result) {

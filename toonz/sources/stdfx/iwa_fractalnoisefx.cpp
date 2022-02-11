@@ -2,6 +2,8 @@
 #include "iwa_noise1234.h"
 #include "tparamuiconcept.h"
 
+#include <QVector3D>
+
 namespace {
 // convert sRGB color space to power space
 template <typename T = double>
@@ -31,7 +33,8 @@ inline const T &clamp(const T &v, const T &lo, const T &hi) {
 
 const double turbulentGamma = 2.2;
 // magic number to offset evolution between generations
-const double evolutionOffsetStep = 19.82;
+const double evolutionOffsetStep  = 19.82;
+const double evolutionOffsetStepW = 31.1;
 }  // namespace
 //------------------------------------------------------------------
 
@@ -57,7 +60,12 @@ Iwa_FractalNoiseFx::Iwa_FractalNoiseFx()
     , m_cycleEvolutionRange(1.0)
     ///, m_randomSeed(0)
     , m_dynamicIntensity(1.0)
-    , m_alphaRendering(false) {
+    , m_alphaRendering(false)
+    , m_doConical(false)
+    , m_conicalEvolution(0.0)
+    , m_conicalAngle(60.0)
+    , m_cameraFov(60.0)
+    , m_zScale(2.0) {
   m_fractalType->addItem(TurbulentSmooth, "Turbulent Smooth");
   m_fractalType->addItem(TurbulentBasic, "Turbulent Basic");
   m_fractalType->addItem(TurbulentSharp, "Turbulent Sharp");
@@ -92,6 +100,11 @@ Iwa_FractalNoiseFx::Iwa_FractalNoiseFx()
   m_cycleEvolutionRange->setValueRange(0.1, 30.0);
   m_dynamicIntensity->setValueRange(-10.0, 10.0);
 
+  m_conicalEvolution->setValueRange(-100, 100.0);
+  m_conicalAngle->setValueRange(0.0, 89.9);
+  m_cameraFov->setValueRange(10.0, 170.0);
+  m_zScale->setValueRange(0.0, 3.0);
+
   bindParam(this, "fractalType", m_fractalType);
   bindParam(this, "noiseType", m_noiseType);
   bindParam(this, "invert", m_invert);
@@ -113,6 +126,12 @@ Iwa_FractalNoiseFx::Iwa_FractalNoiseFx()
   bindParam(this, "cycleEvolutionRange", m_cycleEvolutionRange);
   /// bindParam(this, "randomSeed", m_randomSeed);
   bindParam(this, "dynamicIntensity", m_dynamicIntensity);
+
+  bindParam(this, "doConical", m_doConical);
+  bindParam(this, "conicalEvolution", m_conicalEvolution);
+  bindParam(this, "conicalAngle", m_conicalAngle);
+  bindParam(this, "cameraFov", m_cameraFov);
+  bindParam(this, "zScale", m_zScale);
 
   bindParam(this, "alphaRendering", m_alphaRendering);
 }
@@ -148,8 +167,7 @@ void Iwa_FractalNoiseFx::doCompute(TTile &tile, double frame,
   double *work_buf = (double *)work_buf_ras->getRawData();
 
   // affine transformations
-  TAffine globalAff       = TTranslation(-tile.m_pos) * ri.m_affine;
-  TAffine parentOffsetAff = TTranslation(param.offsetTurbulence);
+  TAffine globalAff = TTranslation(-tile.m_pos) * ri.m_affine;
   TAffine parentAff =
       TScale(param.scale.lx, param.scale.ly) * TRotation(-param.rotation);
   TAffine subAff = TTranslation(param.subOffset) * TScale(param.subScaling) *
@@ -171,81 +189,261 @@ void Iwa_FractalNoiseFx::doCompute(TTile &tile, double frame,
 
   int genCount = (int)std::ceil(param.complexity);
 
-  // accumulate base noise pattern for each generation
-  for (int gen = 0; gen < genCount; gen++) {
-    // affine transformation for the current generation
-    TAffine currentAff =
-        (globalAff * parentOffsetAff * parentAff * genAff).inv();
-    // scale of the current pattern ( used for the Dynamic / Dynamic Twist
-    // offset )
-    double scale = sqrt(std::abs(currentAff.det()));
+  if (!param.doConical) {
+    TAffine parentOffsetAff = TTranslation(param.offsetTurbulence);
+    // accumulate base noise pattern for each generation
+    for (int gen = 0; gen < genCount; gen++) {
+      // affine transformation for the current generation
+      TAffine currentAff =
+          (globalAff * parentOffsetAff * parentAff * genAff).inv();
+      // scale of the current pattern ( used for the Dynamic / Dynamic Twist
+      // offset )
+      double scale = sqrt(std::abs(currentAff.det()));
+      // for each pixel
+      double *buf_p = work_buf;
+      for (int y = 0; y < outDim.ly; y++) {
+        for (int x = 0; x < outDim.lx; x++, buf_p++) {
+          // obtain sampling position
+          // For Dynamic and Dynamic Twist patterns, the position offsets using
+          // gradient / rotation of the parent pattern
+          TPointD samplePos =
+              getSamplePos(x, y, outDim, out_buf, gen, scale, param);
+          // multiply affine transformation
+          samplePos = currentAff * samplePos;
+          // adjust position for the block pattern
+          if (param.noiseType == Block)
+            samplePos = TPointD(std::floor(samplePos.x) + 0.5,
+                                std::floor(samplePos.y) + 0.5);
+          // calculate the base noise
+          if (param.cycleEvolution)
+            *buf_p = (pn.noise(samplePos.x, samplePos.y, evolution_zw.x,
+                               evolution_zw.y) +
+                      1.0) *
+                     0.5;
+          else
+            *buf_p =
+                (pn.noise(samplePos.x, samplePos.y, evolution_z) + 1.0) * 0.5;
 
-    // for each pixel
-    double *buf_p = work_buf;
-    for (int y = 0; y < outDim.ly; y++) {
-      for (int x = 0; x < outDim.lx; x++, buf_p++) {
-        // obtain sampling position
-        // For Dynamic and Dynamic Twist patterns, the position offsets using
-        // gradient / rotation of the parent pattern
-        TPointD samplePos =
-            getSamplePos(x, y, outDim, out_buf, gen, scale, param);
-        // multiply affine transformation
-        samplePos = currentAff * samplePos;
-        // adjust postion for the block pattern
-        if (param.noiseType == Block)
-          samplePos = TPointD(std::floor(samplePos.x) + 0.5,
-                              std::floor(samplePos.y) + 0.5);
-        // calculate the base noise
-        if (param.cycleEvolution)
-          *buf_p = (pn.noise(samplePos.x, samplePos.y, evolution_zw.x,
-                             evolution_zw.y) +
-                    1.0) *
-                   0.5;
-        else
-          *buf_p =
-              (pn.noise(samplePos.x, samplePos.y, evolution_z) + 1.0) * 0.5;
+          // convert the noise
+          convert(buf_p, param);
+        }
+      }
 
-        // convert the noise
-        convert(buf_p, param);
+      // just copy the values for the first generation
+      if (gen == 0) {
+        memcpy(out_buf, work_buf, outDim.lx * outDim.ly * sizeof(double));
+      } else {
+        // intensity of the last generation will take the fraction part of
+        // complexity
+        double genIntensity = std::min(1.0, param.complexity - (double)gen);
+        // influence of the current generation
+        double influence =
+            genIntensity * std::pow(param.subInfluence, (double)gen);
+        // composite the base noise pattern
+        buf_p         = work_buf;
+        double *out_p = out_buf;
+        for (int i = 0; i < outDim.lx * outDim.ly; i++, buf_p++, out_p++)
+          composite(out_p, buf_p, influence, param);
+      }
+
+      // update affine transformations (for the next generation loop)
+      genAff *= subAff;
+      // When the "Perspective Offset" option is ON, reduce the offset amount
+      // according to the sub scale
+      if (param.perspectiveOffset)
+        parentOffsetAff = TScale(param.subScaling) *
+                          TRotation(-param.subRotation) * parentOffsetAff *
+                          TRotation(param.subRotation) *
+                          TScale(1 / param.subScaling);
+
+      if (param.cycleEvolution)
+        evolution_zw.x += evolutionOffsetStep;
+      else
+        evolution_z += evolutionOffsetStep;
+    }
+  }
+
+  // conical noise
+  else {
+    // angle of slope of the cone
+    double theta_n = param.conicalAngle * M_PI_180;
+    // half of the vertical fov
+    double phi_2       = param.cameraFov * 0.5 * M_PI_180;
+    double z_scale     = std::pow(10.0, param.zScale);
+    double evolution_w = param.conicalEvolution;
+
+    // pixel distance between camera and the screen
+    double D = ri.m_cameraBox.getLy() * 0.5 / std::tan(phi_2);
+    // the line on the slope :  d = U * z + V
+    double U = -1.0 / std::tan(theta_n);
+    double V = ri.m_cameraBox.getLy() * 0.5;
+
+    TPointD center = ri.m_affine * param.offsetTurbulence;
+
+    // accumulate base noise pattern for each generation
+    for (int gen = 0; gen < genCount; gen++) {
+      // affine transformation for the current generation
+      TAffine currentAff = (globalAff * parentAff * genAff).inv();
+      // scale of the current pattern ( used for the Dynamic / Dynamic Twist
+      // offset )
+      double scale = sqrt(std::abs(currentAff.det()));
+
+      // for each pixel
+      double *buf_p = work_buf;
+      for (int y = 0; y < outDim.ly; y++) {
+        for (int x = 0; x < outDim.lx; x++, buf_p++) {
+          double dx, dy, dz;
+          if (theta_n == 0.0) {
+            dx = x;
+            dy = y;
+            dz = 0.0;
+          } else {
+            // conical, without offset
+            if (center == TPointD()) {
+              TPointD p = TTranslation(tile.m_pos) * TPointD(x, y);
+              // pixel distance from the screen center
+              double d = tdistance(p, TPointD());
+              // line of sight : d = S * z + T
+              double S  = d / D;
+              double T  = d;
+              dz        = (V - T) / (S - U);
+              double dp = S * dz + T;
+              if (d != 0.0) {
+                p.x *= dp / d;
+                p.y *= dp / d;
+              }
+              p += center * (dp / V);
+              p  = TTranslation(tile.m_pos).inv() * p;
+              dx = p.x;
+              dy = p.y;
+              dz /= z_scale;
+            }
+            // conical, with offset
+            else {
+              // compute the intersecting point between the "noise cone" and the
+              // line of sight
+              TPointD _p = TTranslation(tile.m_pos) * TPointD(x, y);
+              // offset by combination of offsets of A) projection position and
+              // B) eye positon.
+              //
+              // A) 0.5 * projection position offset
+              QVector3D p(_p.x - center.x * 0.5, _p.y - center.y * 0.5, 0.0);
+              QVector3D cone_C(0.0, 0.0, V * std::tan(theta_n));
+              QVector3D cone_a(0, 0, -1);
+              // B) 0.5 * eye position offset
+              double offsetAdj = 0.5 * (D + cone_C.z()) / cone_C.z();
+              QVector3D eye_O(center.x * offsetAdj, center.y * offsetAdj, -D);
+              QVector3D eye_d  = (p - eye_O).normalized();
+              double cos_ConeT = std::sin(theta_n);
+
+              float d_a   = QVector3D::dotProduct(eye_d, cone_a);
+              float Ca_Oa = QVector3D::dotProduct(cone_C, cone_a) -
+                            QVector3D::dotProduct(eye_O, cone_a);
+
+              // A * t^2 + B * t + C = 0
+              float A =
+                  d_a * d_a - eye_d.lengthSquared() * cos_ConeT * cos_ConeT;
+              float B = 2.0 *
+                            (QVector3D::dotProduct(eye_d, cone_C) -
+                             QVector3D::dotProduct(eye_d, eye_O)) *
+                            cos_ConeT * cos_ConeT -
+                        2.0 * Ca_Oa * d_a;
+              float C = Ca_Oa * Ca_Oa -
+                        cos_ConeT * cos_ConeT *
+                            (cone_C.lengthSquared() -
+                             2.0 * QVector3D::dotProduct(eye_O, cone_C) +
+                             eye_O.lengthSquared());
+
+              // obtain t
+              double t1 = (-B + std::sqrt(B * B - 4.0 * A * C)) / (2.0 * A);
+              double t2 = (-B - std::sqrt(B * B - 4.0 * A * C)) / (2.0 * A);
+              if (t1 < 0)
+                t1 = t2;
+              else if (t2 < 0)
+                t2 = t1;
+              double t = std::min(t1, t2);
+
+              // intersecting point
+              QVector3D sampleP = eye_O + eye_d * t;
+              _p.x              = sampleP.x();
+              _p.y              = sampleP.y();
+              _p                = TTranslation(tile.m_pos).inv() * _p;
+              dx                = _p.x;
+              dy                = _p.y;
+              dz                = sampleP.z() / z_scale;
+            }
+            if (param.cycleEvolution) {
+              double cycle_theta =
+                  2.0 * M_PI * (param.evolution + param.conicalEvolution + dz) /
+                  param.cycleEvolutionRange;
+              double cycle_d = param.cycleEvolutionRange / (2.0 * M_PI);
+              evolution_zw.x = cycle_d * cos(cycle_theta);
+              evolution_zw.y = cycle_d * sin(cycle_theta);
+            }
+          }
+          // obtain sampling position
+          // For Dynamic and Dynamic Twist patterns, the position offsets using
+          // gradient / rotation of the parent pattern
+          TPointD samplePosOffset =
+              getSamplePos(x, y, outDim, out_buf, gen, scale, param) -
+              TPointD(x, y);
+          TPointD samplePos =
+              TPointD(dx, dy) + samplePosOffset * (D / (D + dz));
+          // multiply affine transformation
+          samplePos = currentAff * samplePos;
+          // adjust position for the block pattern
+          if (param.noiseType == Block)
+            samplePos = TPointD(std::floor(samplePos.x) + 0.5,
+                                std::floor(samplePos.y) + 0.5);
+          // calculate the base noise
+          if (param.cycleEvolution)
+            *buf_p = (pn.noise(samplePos.x, samplePos.y, evolution_zw.x,
+                               evolution_zw.y) +
+                      1.0) *
+                     0.5;
+          else
+            *buf_p = (pn.noise(samplePos.x, samplePos.y, evolution_z,
+                               evolution_w + dz) +
+                      1.0) *
+                     0.5;
+
+          // convert the noise
+          convert(buf_p, param);
+        }
+      }
+
+      // just copy the values for the first generation
+      if (gen == 0) {
+        memcpy(out_buf, work_buf, outDim.lx * outDim.ly * sizeof(double));
+      } else {
+        // intensity of the last generation will take the fraction part of
+        // complexity
+        double genIntensity = std::min(1.0, param.complexity - (double)gen);
+        // influence of the current generation
+        double influence =
+            genIntensity * std::pow(param.subInfluence, (double)gen);
+        // composite the base noise pattern
+        buf_p         = work_buf;
+        double *out_p = out_buf;
+        for (int i = 0; i < outDim.lx * outDim.ly; i++, buf_p++, out_p++)
+          composite(out_p, buf_p, influence, param);
+      }
+
+      // update affine transformations (for the next generation loop)
+      genAff *= subAff;
+
+      if (param.cycleEvolution)
+        evolution_zw.x += evolutionOffsetStep;
+      else {
+        evolution_z += evolutionOffsetStep;
+        evolution_w += evolutionOffsetStepW;
       }
     }
-
-    // just copy the values for the first generation
-    if (gen == 0) {
-      memcpy(out_buf, work_buf, outDim.lx * outDim.ly * sizeof(double));
-    } else {
-      // intensity of the last generation will take the fraction part of
-      // complexity
-      double genIntensity = std::min(1.0, param.complexity - (double)gen);
-      // influence of the current generation
-      double influence =
-          genIntensity * std::pow(param.subInfluence, (double)gen);
-      // composite the base noise pattern
-      buf_p         = work_buf;
-      double *out_p = out_buf;
-      for (int i = 0; i < outDim.lx * outDim.ly; i++, buf_p++, out_p++)
-        composite(out_p, buf_p, influence, param);
-    }
-
-    // update affine transformations (for the next generation loop)
-    genAff *= subAff;
-    // When the "Perspective Offset" option is ON, reduce the offset amount
-    // according to the sub scale
-    if (param.perspectiveOffset)
-      parentOffsetAff = TScale(param.subScaling) *
-                        TRotation(-param.subRotation) * parentOffsetAff *
-                        TRotation(param.subRotation) *
-                        TScale(1 / param.subScaling);
-
-    if (param.cycleEvolution)
-      evolution_zw.x += evolutionOffsetStep;
-    else
-      evolution_z += evolutionOffsetStep;
   }
 
   work_buf_ras->unlock();
 
-  // finalize pattern (coverting the color space)
+  // finalize pattern (converting the color space)
   if (param.fractalType == TurbulentSmooth ||
       param.fractalType == TurbulentBasic ||
       param.fractalType == TurbulentSharp) {
@@ -302,7 +500,14 @@ void Iwa_FractalNoiseFx::obtainParams(FNParam &param, const double frame,
   param.cycleEvolution      = m_cycleEvolution->getValue();
   param.cycleEvolutionRange = m_cycleEvolutionRange->getValue(frame);
   param.dynamicIntensity    = m_dynamicIntensity->getValue(frame) * 10.0;
-  param.alphaRendering      = m_alphaRendering->getValue();
+
+  param.doConical        = m_doConical->getValue();
+  param.conicalEvolution = m_conicalEvolution->getValue(frame);
+  param.conicalAngle     = m_conicalAngle->getValue(frame);
+  param.cameraFov        = m_cameraFov->getValue(frame);
+  param.zScale           = m_zScale->getValue(frame);
+
+  param.alphaRendering = m_alphaRendering->getValue();
 }
 
 //------------------------------------------------------------------
@@ -342,43 +547,61 @@ void Iwa_FractalNoiseFx::getParamUIs(TParamUIConcept *&concepts, int &length) {
 //------------------------------------------------------------------
 // For Dynamic and Dynamic Twist patterns, the position offsets using gradient /
 // rotation of the parent pattern
-TPointD Iwa_FractalNoiseFx::getSamplePos(int x, int y, const TDimension outDim,
+TPointD Iwa_FractalNoiseFx::getSamplePos(double x, double y,
+                                         const TDimension outDim,
                                          const double *out_buf, const int gen,
                                          const double scale,
                                          const FNParam &param) {
   // the position does not offset in the first generation
   if (gen == 0 || param.dynamicIntensity == 0.0 ||
       (param.fractalType != Dynamic && param.fractalType != DynamicTwist))
-    return TPointD((double)x, (double)y);
+    return TPointD(x, y);
 
-  auto clampPos = [&](int x, int y) {
-    if (x < 0)
-      x = 0;
-    else if (x >= outDim.lx)
-      x = outDim.lx - 1;
-    if (y < 0)
-      y = 0;
-    else if (y >= outDim.ly)
-      y = outDim.ly - 1;
-    return TPoint(x, y);
+  auto clampPos = [&](double x, double y) {
+    if (x < 0.0)
+      x = 0.0;
+    else if (x > (double)(outDim.lx - 1))
+      x = (double)(outDim.lx - 1);
+    if (y < 0.0)
+      y = 0.0;
+    else if (y > (double)(outDim.ly - 1))
+      y = (double)(outDim.ly - 1);
+    return TPointD(x, y);
   };
 
-  auto val    = [&](const TPoint &p) { return out_buf[p.y * outDim.lx + p.x]; };
-  int range   = std::max(2, (int)(0.1 / scale));
-  TPoint left = clampPos(x - range, y);
-  TPoint right = clampPos(x + range, y);
-  TPoint down  = clampPos(x, y - range);
-  TPoint up    = clampPos(x, y + range);
+  auto val = [&](const TPoint &p) {
+    return out_buf[std::min(p.y, outDim.ly - 1) * outDim.lx +
+                   std::min(p.x, outDim.lx - 1)];
+  };
+  auto lerp = [](double v0, double v1, double ratio) {
+    return (1.0 - ratio) * v0 + ratio * v1;
+  };
+  auto lerpVal = [&](const TPointD &p) {
+    int id_x       = (int)std::floor(p.x);
+    double ratio_x = p.x - (double)id_x;
+    int id_y       = (int)std::floor(p.y);
+    double ratio_y = p.y - (double)id_y;
+    return lerp(
+        lerp(val(TPoint(id_x, id_y)), val(TPoint(id_x + 1, id_y)), ratio_x),
+        lerp(val(TPoint(id_x, id_y + 1)), val(TPoint(id_x + 1, id_y + 1)),
+             ratio_x),
+        ratio_y);
+  };
+  int range     = std::max(2, (int)(0.1 / scale));
+  TPointD left  = clampPos(x - range, y);
+  TPointD right = clampPos(x + range, y);
+  TPointD down  = clampPos(x, y - range);
+  TPointD up    = clampPos(x, y + range);
 
   double dif_x = param.dynamicIntensity * (1 / scale) *
-                 (val(left) - val(right)) / (left.x - right.x);
-  double dif_y = param.dynamicIntensity * (1 / scale) * (val(up) - val(down)) /
-                 (up.y - down.y);
+                 (lerpVal(left) - lerpVal(right)) / (left.x - right.x);
+  double dif_y = param.dynamicIntensity * (1 / scale) *
+                 (lerpVal(up) - lerpVal(down)) / (up.y - down.y);
 
   if (param.fractalType == Dynamic)
-    return TPointD((double)x + dif_x, (double)y + dif_y);  // gradient
-  else                                                     // Dynamic_twist
-    return TPointD((double)x + dif_y, (double)y - dif_x);  // rotation
+    return TPointD(x + dif_x, y + dif_y);  // gradient
+  else                                     // Dynamic_twist
+    return TPointD(x + dif_y, y - dif_x);  // rotation
 }
 
 //------------------------------------------------------------------
@@ -405,7 +628,7 @@ void Iwa_FractalNoiseFx::convert(double *buf, const FNParam &param) {
     *buf = std::abs(*buf - 0.5) * 1.96;
     break;
   case Rocky:
-    // convertion LUT for the range from 0.43 to 0.57, every 0.01
+    // conversion LUT for the range from 0.43 to 0.57, every 0.01
     static double table[15] = {
         0.25,        0.256658635, 0.275550218, 0.30569519,  0.345275591,
         0.392513494, 0.440512,    0.5,         0.555085147, 0.607486506,
@@ -458,7 +681,7 @@ void Iwa_FractalNoiseFx::composite(double *out, double *buf,
 }
 
 //------------------------------------------------------------------
-// finalize pattern (coverting the color space)
+// finalize pattern (converting the color space)
 void Iwa_FractalNoiseFx::finalize(double *out, const FNParam &param) {
   assert(param.fractalType == TurbulentSmooth ||
          param.fractalType == TurbulentBasic ||

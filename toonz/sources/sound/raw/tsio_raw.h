@@ -42,7 +42,7 @@ public:
   ~TSoundTrackWriterRaw() {}
 
   /*!
-Saves the informations of the soundtrack in .raw audio file
+Saves the information of the soundtrack in .raw audio file
 whose path has been specified in the constructor.
 */
   bool save(const TSoundTrackP &) override;

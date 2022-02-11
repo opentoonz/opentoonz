@@ -33,8 +33,11 @@
 
 #include "../stdfx/motionawarebasefx.h"
 #include "../stdfx/textawarebasefx.h"
+#include "../stdfx/globalcontrollablefx.h"
 
 #include "toonz/scenefx.h"
+
+#include <QList>
 
 /*
   TODO: Some parts of the following render-tree building procedure should be
@@ -238,6 +241,7 @@ public:
   double m_z;         //!< Z value for this fx's column
   double m_so;        //!< Same as above, for stacking order
   int m_columnIndex;  //!< This fx's column index
+  bool m_isPostXsheetNode;
 
   TFxP m_fx;      //!< The referenced fx
   TAffine m_aff;  //!<
@@ -251,14 +255,16 @@ public:
       , m_columnIndex(-1)
       , m_fx(0)
       , m_aff()
-      , m_leftXsheetPort(0) {}
+      , m_leftXsheetPort(0)
+      , m_isPostXsheetNode(false) {}
   explicit PlacedFx(const TFxP &fx)
       : m_z(0)
       , m_so(0)
       , m_columnIndex(-1)
       , m_fx(fx)
       , m_aff()
-      , m_leftXsheetPort(0) {}
+      , m_leftXsheetPort(0)
+      , m_isPostXsheetNode(false) {}
 
   bool operator<(const PlacedFx &pf) const {
     return (m_z < pf.m_z)
@@ -548,6 +554,13 @@ public:
   // (at least) of a particle Fx
   int m_particleDescendentCount;
 
+  // fxid and pointer to the correspondent blend fx for the global
+  // control. Boolean is the flag indicating that the makePF is just called
+  // from the blend fx. If the flag is true then just compute the
+  // global controlled Fx without inserting the same blend fx in order to
+  // prevent infinite loop.
+  QMap<std::wstring, QPair<TFxP, bool>> m_globalControlledFx;
+
 public:
   FxBuilder(ToonzScene *scene, TXsheet *xsh, double frame, int whichLevels,
             bool isPreview = false, bool expandXSheet = true);
@@ -700,13 +713,21 @@ PlacedFx FxBuilder::makePF(TFx *fx) {
 
 PlacedFx FxBuilder::makePF(TXsheetFx *fx) {
   if (!m_expandXSheet)  // Xsheet expansion is typically blocked for render-tree
-                        // building of
-    return PlacedFx(fx);  // post-xsheet fxs only.
+                        // building of post-xsheet fxs only.
+  {
+    PlacedFx ret(fx);
+    ret.m_isPostXsheetNode = true;
+    return ret;
+  }
 
   // Expand the render-tree from terminal fxs
   TFxSet *fxs = m_xsh->getFxDag()->getTerminalFxs();
   int m       = fxs->getFxCount();
-  if (m == 0) return PlacedFx();
+  if (m == 0) {
+    PlacedFx ret;
+    ret.m_isPostXsheetNode = true;
+    return ret;
+  }
 
   std::vector<PlacedFx> pfs(m);
   int i;
@@ -747,7 +768,9 @@ PlacedFx FxBuilder::makePF(TXsheetFx *fx) {
     }
   }
 
-  return PlacedFx(currentFx);
+  PlacedFx ret(currentFx);
+  ret.m_isPostXsheetNode = true;
+  return ret;
 }
 
 //-------------------------------------------------------------------
@@ -765,7 +788,8 @@ PlacedFx FxBuilder::makePF(TLevelColumnFx *lcfx) {
   assert(m_scene);
   assert(lcfx);
   assert(lcfx->getColumn());
-  if (!lcfx || !lcfx->getColumn()) return PlacedFx();
+  if (!lcfx || !lcfx->getColumn() || lcfx->getColumn()->isEmpty())
+    return PlacedFx();
 
   if (!lcfx->getColumn()->isPreviewVisible())  // This is the 'eye' icon
                                                // property in the column header
@@ -778,7 +802,9 @@ PlacedFx FxBuilder::makePF(TLevelColumnFx *lcfx) {
   int levelFrame = cell.m_frameId.getNumber() - 1;
 
   /*--  ParticlesFxに繋がっておらず、空セルの場合は 中身無しを返す --*/
-  if (m_particleDescendentCount == 0 && cell.isEmpty()) return PlacedFx();
+  // -> even if the cell is empty, pass the affine infotmation of the column to
+  // the subsequent nodes
+  // if (m_particleDescendentCount == 0 && cell.isEmpty()) return PlacedFx();
 
   if (m_whichLevels == TOutputProperties::AnimatedOnly) {
     // In case only 'animated levels' are selected to be rendered, exclude all
@@ -789,6 +815,12 @@ PlacedFx FxBuilder::makePF(TLevelColumnFx *lcfx) {
     // it anywhere :\ ?
 
     TXshLevel *xl = cell.m_level.getPointer();
+    // if the cell is empty, use a level of the first occupied cell instead.
+    if (!xl) {
+      int r0, r1;
+      if (lcfx->getColumn()->getRange(r0, r1) > 0)
+        xl = lcfx->getColumn()->getCell(r0).m_level.getPointer();
+    }
 
     /*-- ParticleFxのTextureポートに繋がっていない場合 --*/
     if (m_particleDescendentCount == 0) {
@@ -809,11 +841,14 @@ PlacedFx FxBuilder::makePF(TLevelColumnFx *lcfx) {
   // common (image) levels
   PlacedFx pf;
   pf.m_columnIndex = lcfx->getColumn()->getIndex();
-  pf.m_fx          = lcfx;
-
   // Build column placement
   bool columnVisible =
       getColumnPlacement(pf, m_xsh, m_frame, pf.m_columnIndex, m_isPreview);
+
+  // if the cell is empty, only inherits its placement
+  if ((m_particleDescendentCount == 0 && cell.isEmpty())) return pf;
+
+  pf.m_fx = lcfx;
 
   /*-- subXsheetのとき、その中身もBuildFxを実行 --*/
   if (!cell.isEmpty() && cell.m_level->getChildLevel()) {
@@ -869,17 +904,14 @@ PlacedFx FxBuilder::makePF(TLevelColumnFx *lcfx) {
        * 空セルのとき、Dpiアフィン変換には、その素材が入っている一番上のセルのものを使う
        * --*/
       TXshLevelColumn *column = lcfx->getColumn();
-      int i;
-      for (i = 0; i < column->getRowCount(); i++) {
-        TXshCell dpiCell = lcfx->getColumn()->getCell(i);
-        if (dpiCell.isEmpty()) continue;
 
-        sl = dpiCell.m_level->getSimpleLevel();
-        if (!sl) break;
-
-        TAffine dpiAff = ::getDpiAffine(sl, dpiCell.m_frameId, true);
-        pf.m_fx        = TFxUtil::makeAffine(pf.m_fx, dpiAff);
-        break;
+      int r0, r1;
+      if (column->getRange(r0, r1) > 0)
+        sl = column->getCell(r0).m_level->getSimpleLevel();
+      if (sl) {
+        TAffine dpiAff =
+            ::getDpiAffine(sl, column->getCell(r0).m_frameId, true);
+        pf.m_fx = TFxUtil::makeAffine(pf.m_fx, dpiAff);
       }
     }
 
@@ -934,15 +966,24 @@ PlacedFx FxBuilder::makePF(TZeraryColumnFx *zcfx) {
     return PlacedFx();
 
   TXshCell cell = zcfx->getColumn()->getCell(tfloor(m_frame));
-  if (cell.isEmpty()) return PlacedFx();
 
   // Build
   PlacedFx pf;
   pf.m_columnIndex = zcfx->getColumn()->getIndex();
+
+  // Add the column placement NaAffineFx
+  if (!getColumnPlacement(pf, m_xsh, m_frame, pf.m_columnIndex, m_isPreview))
+    return PlacedFx();
+
+  // if the cell is empty, only inherits its placement
+  if (cell.isEmpty()) return pf;
+
+  // set m_fx only when the current cell is not empty
   pf.m_fx =
       fx->clone(false);  // Detach the fx with a clone. Why? It's typically done
                          // to build fx connections in the render-tree freely.
                          // Here, it's used just for particles, I guess...
+
   // Deal with input sub-trees
   for (int i = 0; i < fx->getInputPortCount(); ++i) {
     // Note that only particles should end up here, currently
@@ -983,11 +1024,7 @@ PlacedFx FxBuilder::makePF(TZeraryColumnFx *zcfx) {
     }
   }
 
-  // Add the column placement NaAffineFx
-  if (getColumnPlacement(pf, m_xsh, m_frame, pf.m_columnIndex, m_isPreview))
-    return pf;
-  else
-    return PlacedFx();
+  return pf;
 }
 
 //-------------------------------------------------------------------
@@ -1000,8 +1037,35 @@ PlacedFx FxBuilder::makePFfromUnaryFx(TFx *fx) {
   TFx *inputFx = fx->getInputPort(0)->getFx();
   if (!inputFx) return PlacedFx();
 
+  // global controllable fx
+  if (fx->getAttributes()->hasGlobalControl()) {
+    if (!m_globalControlledFx.contains(fx->getFxId())) {
+      GlobalControllableFx *gcFx = dynamic_cast<GlobalControllableFx *>(fx);
+      double val                 = gcFx->getGrobalControlValue(m_frame);
+      if (val < 1.0) {
+        // insert cross dissolve fx and mix with the input fx
+        TFxP blendFx = TFx::create("blendFx");
+        blendFx->connect("Source1", fx);
+        blendFx->connect("Source2", inputFx);
+        // set the global intensity value to the cross dissolve fx
+        dynamic_cast<TDoubleParam *>(blendFx->getParams()->getParam("value"))
+            ->setDefaultValue(val * 100.0);
+        m_globalControlledFx.insert(fx->getFxId(), {blendFx, true});
+        return makePF(blendFx.getPointer());
+      }
+    } else if (m_globalControlledFx.value(fx->getFxId()).second)
+      m_globalControlledFx[fx->getFxId()].second = false;
+    else {
+      m_globalControlledFx[fx->getFxId()].second = true;
+      return makePF(
+          m_globalControlledFx.value(fx->getFxId()).first.getPointer());
+    }
+  }
+
   PlacedFx pf = makePF(inputFx);  // Build sub-render-tree
-  if (!pf.m_fx) return PlacedFx();
+  if (pf.m_columnIndex < 0 && !pf.m_isPostXsheetNode) return PlacedFx();
+  // inherit the column placement even if the current cell is empty
+  if (!pf.m_fx) return pf;
 
   if (fx->getAttributes()->isEnabled()) {
     // Fx is enabled, so insert it in the render-tree
@@ -1066,6 +1130,33 @@ PlacedFx FxBuilder::makePFfromGenericFx(TFx *fx) {
     return pf;
   }
 
+  // global controllable fx
+  if (fx->getAttributes()->hasGlobalControl()) {
+    if (!m_globalControlledFx.contains(fx->getFxId())) {
+      GlobalControllableFx *gcFx = dynamic_cast<GlobalControllableFx *>(fx);
+      double val                 = gcFx->getGrobalControlValue(m_frame);
+      if (val < 1.0) {
+        TFxP inputFx = fx->getInputPort(fx->getPreferredInputPort())->getFx();
+        if (!inputFx) return pf;
+        // insert cross dissolve fx and mix with the input fx
+        TFxP blendFx = TFx::create("blendFx");
+        blendFx->connect("Source1", fx);
+        blendFx->connect("Source2", inputFx.getPointer());
+        m_globalControlledFx.insert(fx->getFxId(), {blendFx, true});
+        // set the global intensity value to the cross dissolve fx
+        dynamic_cast<TDoubleParam *>(blendFx->getParams()->getParam("value"))
+            ->setDefaultValue(val * 100.0);
+        return makePF(blendFx.getPointer());
+      }
+    } else if (m_globalControlledFx.value(fx->getFxId()).second)
+      m_globalControlledFx[fx->getFxId()].second = false;
+    else {
+      m_globalControlledFx[fx->getFxId()].second = true;
+      return makePF(
+          m_globalControlledFx.value(fx->getFxId()).first.getPointer());
+    }
+  }
+
   // Multi-input fxs are always cloned - since at least one of its input ports
   // will have an NaAffineFx
   // injected just before its actual input fx.
@@ -1078,16 +1169,20 @@ PlacedFx FxBuilder::makePFfromGenericFx(TFx *fx) {
     if (TFxP inputFx = fx->getInputPort(i)->getFx()) {
       PlacedFx inputPF = makePF(inputFx.getPointer());
       inputFx          = inputPF.m_fx;
-      if (!inputFx) continue;
+      // check the column index instead of inputFx
+      // so that the firstly-found input column always inherits
+      // its placement even if the current cell is empty.
+      if (inputPF.m_columnIndex < 0 && !inputPF.m_isPostXsheetNode) continue;
 
       if (firstInput) {
         firstInput = false;
 
         // The first found input PlacedFx carries its placement infos up
-        pf.m_aff         = inputPF.m_aff;
-        pf.m_columnIndex = inputPF.m_columnIndex;
-        pf.m_z           = inputPF.m_z;
-        pf.m_so          = inputPF.m_so;
+        pf.m_aff              = inputPF.m_aff;
+        pf.m_columnIndex      = inputPF.m_columnIndex;
+        pf.m_z                = inputPF.m_z;
+        pf.m_so               = inputPF.m_so;
+        pf.m_isPostXsheetNode = inputPF.m_isPostXsheetNode;
 
         /*-- 軌跡を取得するBinaryFxの場合 --*/
         if (pf.m_fx->getAttributes()->isSpeedAware()) {
@@ -1107,7 +1202,11 @@ PlacedFx FxBuilder::makePFfromGenericFx(TFx *fx) {
           }
         }
 
-      } else {
+        if (!inputFx) continue;
+
+      } else if (!inputFx)
+        continue;
+      else {
         // The follow-ups traduce their PlacedFx::m_aff into an NaAffineFx,
         // instead
         inputFx = getFxWithColumnMovements(inputPF);

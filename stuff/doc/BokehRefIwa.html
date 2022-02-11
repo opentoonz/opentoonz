@@ -12,7 +12,7 @@ based on the gradation of the Depth reference image, and the RGB values of each 
 layer are converted into exposure values, blurred using the Iris shape, and combined.<br>
 Higher speed is achieved by using the discrete Fourier transform. Before blurring,<br>
 a process of extending the parts of each layer that is hidden in the foreground with a<br>
-Median filter is performed.
+Median filter can be performed.
 
 <h4>● Input Port</h4>
 <UL>
@@ -39,7 +39,10 @@ is increased 10 times. The lower the value, the more the highlights are emphasiz
 <LI><b>Distance Precision</b> : The number of divisions of the depth reference image. The larger<br>
 the value, the finer the gradation of the blur size, but the slower the processing.<br>
 (Range 3-128)
-</UL>
+<LI><b>Fill Gap</b> : Specifies whether to extend the further segmented layer pixels in order to fill gap.
+<LI><b>Use Median Filter</b> : Specifies whether to use median filter for the extension. <br>
+  This option is recommended when the depth is distributed discretely.
+  </UL>
 
 <h4>● Notes</h4>
 <UL>

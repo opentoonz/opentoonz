@@ -1,0 +1,60 @@
+<fxlayout help_command="iexplore" help_file="BokehAdvancedIwa.html">
+	<page name="iwa Bokeh Advanced">
+ 	<vbox>
+		<control>on_focus_distance</control>
+		<control>bokeh_amount</control>
+		<control>masterHardness</control>
+		<control>hardnessPerSource</control>
+  	</vbox>
+  
+   	<vbox shrink="1" label="Source1">
+		<control>distance1</control>
+		<control>bokeh_adjustment1</control>
+		<control>hardness1</control>
+		<control>depth_ref1</control>
+		<control>depthRange1</control>
+   	</vbox>
+
+   	<vbox shrink="0" label="Source2">
+		<control>distance2</control>
+		<control>bokeh_adjustment2</control>
+		<control>hardness2</control>
+		<control>depth_ref2</control>
+		<control>depthRange2</control>
+   	</vbox>
+
+   	<vbox shrink="0" label="Source3">
+		<control>distance3</control>
+		<control>bokeh_adjustment3</control>
+		<control>hardness3</control>
+		<control>depth_ref3</control>
+		<control>depthRange3</control>
+   	</vbox>
+
+   	<vbox shrink="0" label="Source4">
+		<control>distance4</control>
+		<control>bokeh_adjustment4</control>
+		<control>hardness4</control>
+		<control>depth_ref4</control>
+		<control>depthRange4</control>
+   	</vbox>
+
+   	<vbox shrink="0" label="Source5">
+		<control>distance5</control>
+		<control>bokeh_adjustment5</control>
+		<control>hardness5</control>
+		<control>depth_ref5</control>
+		<control>depthRange5</control>
+   	</vbox>
+
+	<visibleToggle>
+		<controller>hardnessPerSource</controller>
+		<on>hardness1</on>
+		<on>hardness2</on>
+		<on>hardness3</on>
+		<on>hardness4</on>
+		<on>hardness5</on>
+	</visibleToggle>
+
+	</page>
+</fxlayout>

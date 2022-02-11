@@ -29,6 +29,8 @@
         <file>Resources/h_chandleDown.png</file>
         <file>Resources/h_chandleCenter.png</file>
         <file>Resources/h_chandleUp.png</file>
+        <file>Resources/h_chandle_arrow.svg</file>
+        <file>Resources/v_chandle_arrow.svg</file>
         <file>Resources/schematic_palette.png</file>
         <file>Resources/schematic_tablenode.png</file>
         <file>Resources/port_red.svg</file>
@@ -40,6 +42,7 @@
         <file>Resources/spline_parent_port.svg</file>
         <file>Resources/fxport_red.svg</file>
         <file>Resources/fxport_blue.svg</file>
+        <file>Resources/fxport_pt_red.svg</file>
         <file>Resources/cachefx.png</file>
         <file>Resources/schematic_link.svg</file>
         <file>Resources/schematic_link_small.svg</file>

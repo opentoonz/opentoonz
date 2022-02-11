@@ -144,6 +144,7 @@ public:
   OverwriteDialog();
 
   void reset() override;
+  void enableOptions(bool writingOnSource);
 
 private:
   DVGui::LineEdit *m_suffix;

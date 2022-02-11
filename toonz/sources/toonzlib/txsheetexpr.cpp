@@ -423,6 +423,20 @@ public:
       if (paramName == paramNameToCheck ||
           toLower(paramName) == toLower(paramNameToCheck))
         return param;
+
+      // in case the parameter has ui label
+      // ( parameters of plugin fxs and intensity of GlobalControllableFx)
+      if (param->hasUILabel()) {
+        paramName = param->getUILabel();
+        int i     = paramName.find_first_of(" -");
+        while (i != std::string::npos) {
+          paramName.erase(i, 1);
+          i = paramName.find_first_of(" -");
+        }
+        if (paramName == paramNameToCheck ||
+            toLower(paramName) == toLower(paramNameToCheck))
+          return param;
+      }
     }
     return 0;
   }

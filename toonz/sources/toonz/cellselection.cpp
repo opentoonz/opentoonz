@@ -54,6 +54,8 @@
 #include "toonz/tstageobjecttree.h"
 #include "toonz/stage.h"
 #include "vectorizerpopup.h"
+#include "toonz/sceneproperties.h"
+#include "toutputproperties.h"
 
 // TnzCore includes
 #include "timagecache.h"
@@ -607,7 +609,9 @@ bool pasteRasterImageInCellWithoutUndo(int row, int col,
   TXshSimpleLevel *sl = 0;
   TFrameId fid(1);
   ToonzScene *scene = app->getCurrentScene()->getScene();
-  TCamera *camera   = scene->getCurrentCamera();
+  TFrameId tmplFId  = scene->getProperties()->formatTemplateFIdForInput();
+
+  TCamera *camera = scene->getCurrentCamera();
   if (cell.isEmpty()) {
     if (row > 0) cell = xsh->getCell(row - 1, col);
     sl = cell.getSimpleLevel();
@@ -635,6 +639,10 @@ bool pasteRasterImageInCellWithoutUndo(int row, int col,
         img = sl->createEmptyFrame();
       } else
         return false;
+
+      // modify frameId to be with the same frame format as existing frames
+      sl->formatFId(fid, tmplFId);
+
       sl->setFrame(fid, img);
       app->getCurrentLevel()->setLevel(sl);
       app->getCurrentLevel()->notifyLevelChange();
@@ -647,6 +655,10 @@ bool pasteRasterImageInCellWithoutUndo(int row, int col,
       std::vector<TFrameId> fids;
       sl->getFids(fids);
       if (fids.size() > 0) fid = TFrameId(fids.back().getNumber() + 1);
+
+      // modify frameId to be with the same frame format as existing frames
+      sl->formatFId(fid, tmplFId);
+
       sl->setFrame(fid, img);
     }
     xsh->setCell(row, col, TXshCell(sl, fid));
@@ -1662,6 +1674,12 @@ static void pasteRasterImageInCell(int row, int col,
   if (!isPaste) return;
   cell = xsh->getCell(row, col);
 
+  // The flag TTool::m_isLevelRenumbererd is evaluated in the undo.
+  // We need to reset the flag here as the operation does not call
+  // TTool::touchImage(). Currently the flag can be always false as the
+  // operation does not renumber cells regardless of the preferences.
+  TTool::m_isLevelRenumbererd = false;
+
   TTileSetCM32 *cm32Tiles           = dynamic_cast<TTileSetCM32 *>(tiles);
   TTileSetFullColor *fullColorTiles = dynamic_cast<TTileSetFullColor *>(tiles);
   if (cm32Tiles) {
@@ -1879,14 +1897,14 @@ void TCellSelection::pasteCells() {
         dynamic_cast<const FullColorImageData *>(rasterImageData);
     TToonzImageP ti(img);
     TVectorImageP vi(img);
-    if (!initUndo) {
-      initUndo = true;
-      TUndoManager::manager()->beginBlock();
-    }
     if (fullColData && (vi || ti)) {
       DVGui::error(QObject::tr(
           "The copied selection cannot be pasted in the current drawing."));
       return;
+    }
+    if (!initUndo) {
+      initUndo = true;
+      TUndoManager::manager()->beginBlock();
     }
     if (vi) {
       TXshSimpleLevel *sl = xsh->getCell(r0, c0).getSimpleLevel();
@@ -2708,7 +2726,8 @@ static void dRenumberCells(int col, int r0, int r1) {
       TXshSimpleLevel *sl = cell.getSimpleLevel();
 
       TFrameId oldFid = cell.getFrameId();
-      TFrameId newFid = TFrameId(r + 1);
+      TFrameId newFid =
+          TFrameId(r + 1, 0, oldFid.getZeroPadding(), oldFid.getStartSeqInd());
 
       toCell.m_level   = sl;
       toCell.m_frameId = newFid;
@@ -2718,6 +2737,13 @@ static void dRenumberCells(int col, int r0, int r1) {
         levelsTable[sl].push_back(std::make_pair(oldFid, newFid));
     }
   }
+  auto getNextLetter = [](const QString &letter) {
+    if (letter.isEmpty()) return QString('a');
+    QByteArray byteArray = letter.toUtf8();
+    // return incrementing the last letter
+    byteArray.data()[byteArray.size() - 1]++;
+    return QString::fromUtf8(byteArray);
+  };
 
   // Ensure renumber consistency in case some destination fid would overwrite
   // some unrenumbered fid in the level
@@ -2727,8 +2753,8 @@ static void dRenumberCells(int col, int r0, int r1) {
       if (cellsMap.find(it->second) == cellsMap.end() &&
           it->first.getSimpleLevel()->isFid(it->second.getFrameId())) {
         TFrameId &fid = it->second.m_frameId;
-        fid           = TFrameId(fid.getNumber(),
-                       fid.getLetter() ? fid.getLetter() + 1 : 'a');
+        fid = TFrameId(fid.getNumber(), getNextLetter(fid.getLetter()),
+                       fid.getZeroPadding(), fid.getStartSeqInd());
       }
     }
   }
@@ -2915,9 +2941,13 @@ static void createNewDrawing(TXsheet *xsh, int row, int col,
   TFrameId fid(row + 1);
   if (sl->isFid(fid)) {
     fid = TFrameId(fid.getNumber(), 'a');
-    while (fid.getLetter() < 'z' && sl->isFid(fid))
-      fid = TFrameId(fid.getNumber(), fid.getLetter() + 1);
+    while (fid.getLetter().toUtf8().at(0) < 'z' && sl->isFid(fid))
+      fid = TFrameId(fid.getNumber(), fid.getLetter().toUtf8().at(0) + 1);
   }
+  // modify frameId to be with the same frame format as existing frames
+  TFrameId tmplFId =
+      xsh->getScene()->getProperties()->formatTemplateFIdForInput();
+  sl->formatFId(fid, tmplFId);
   // add the new frame
   sl->setFrame(fid, sl->createEmptyFrame());
   TApp::instance()->getCurrentLevel()->notifyLevelChange();
@@ -3024,7 +3054,7 @@ void TCellSelection::overWritePasteCells() {
     TCellData *beforeData = new TCellData();
     beforeData->setCells(xsh, r0, c0, r1, c1);
 
-    /*-- InsertをFalseにすることで、Ovewriteペーストになる
+    /*-- InsertをFalseにすることで、Overwriteペーストになる
             r1,c1はペースト範囲にあわせリサイズされる
     --*/
     bool isPaste = pasteCellsWithoutUndo(r0, c0, r1, c1, false);

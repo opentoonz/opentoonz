@@ -36,7 +36,7 @@ and for the different curves used (segments, quadratics, cubics)
 
 /*=====================================================================
 utility macro used to export classes from the dll
-(DVAPI: Digital Video Application Progam Interface)
+(DVAPI: Digital Video Application Program Interface)
 =====================================================================*/
 
 /*=====================================================================
@@ -204,7 +204,7 @@ public:
 
 //=====================================================================
 /*!
-All the geometric tags that contains curve informations are
+All the geometric tags that contains curve information are
 instantiations of this template class
  */
 
@@ -319,7 +319,7 @@ public:
   StyleTag();
   StyleTag(int id, USHORT pagePaletteindex, int m_numParams,
            TStyleParam *m_params);
-  StyleTag(const StyleTag &trasformationTag);
+  StyleTag(const StyleTag &transformationTag);
   ~StyleTag();
 };
 
@@ -333,7 +333,7 @@ public:
   GeometricTransformationTag();
   GeometricTransformationTag(const TAffine &affine, PliGeometricTag *m_object);
   GeometricTransformationTag(
-      const GeometricTransformationTag &trasformationTag);
+      const GeometricTransformationTag &transformationTag);
   ~GeometricTransformationTag();
 };
 

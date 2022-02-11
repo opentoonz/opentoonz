@@ -787,7 +787,7 @@ void FxPainter::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) {
       menu.addAction(connectToXSheet);
     menu.addAction(duplicateFx);
     if ((zsrc && zsrc->getZeraryFx() &&
-            zsrc->getZeraryFx()->getLinkedFx() != zsrc->getZeraryFx()) ||
+         zsrc->getZeraryFx()->getLinkedFx() != zsrc->getZeraryFx()) ||
         fx->getLinkedFx() != fx)
       menu.addAction(unlinkFx);
   }
@@ -822,7 +822,7 @@ void FxPainter::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) {
 
 //------------------------------------------------------------------------
 /*! for small-scaled display
-*/
+ */
 void FxPainter::paint_small(QPainter *painter) {
   FxSchematicScene *sceneFx = dynamic_cast<FxSchematicScene *>(scene());
   if (!sceneFx) return;
@@ -1139,17 +1139,19 @@ void FxSchematicLink::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) {
 //*****************************************************
 
 FxSchematicPort::FxSchematicPort(FxSchematicDock *parent, int type)
-    : SchematicPort(parent, parent->getNode(), type), m_currentTargetPort(0) {
+    : SchematicPort(parent, parent->getNode(), type)
+    , m_currentTargetPort(0)
+    , m_isPassThrough(false) {
   QRectF rect = boundingRect();
   if (getType() == eFxInputPort || getType() == eFxGroupedInPort)
     m_hook = QPointF(rect.left(), (rect.top() + rect.bottom()) * 0.5);
   else if (getType() == eFxOutputPort || getType() == eFxGroupedOutPort)
     m_hook = QPointF(rect.right(), (rect.top() + rect.bottom()) * 0.5);
   else  // link port
-    m_hook  = QPointF(rect.right(), (rect.top() + rect.bottom()) * 0.5);
-  m_ownerFx = getOwnerFx();
+    m_hook = QPointF(rect.right(), (rect.top() + rect.bottom()) * 0.5);
+  m_ownerFx              = getOwnerFx();
   TZeraryColumnFx *colFx = dynamic_cast<TZeraryColumnFx *>(m_ownerFx);
-  if (colFx) m_ownerFx   = colFx->getZeraryFx();
+  if (colFx) m_ownerFx = colFx->getZeraryFx();
 }
 
 //-----------------------------------------------------
@@ -1159,6 +1161,8 @@ FxSchematicPort::~FxSchematicPort() {}
 //-----------------------------------------------------
 
 QRectF FxSchematicPort::boundingRect() const {
+  if (m_isPassThrough) return QRectF(0, 0, 15, 15);
+
   // large scaled
   if (getDock()->getNode()->isNormalIconView()) {
     switch (getType()) {
@@ -1234,6 +1238,8 @@ QRectF FxSchematicPort::boundingRect() const {
 void FxSchematicPort::paint(QPainter *painter,
                             const QStyleOptionGraphicsItem *option,
                             QWidget *widget) {
+  if (m_isPassThrough && getLinkCount() > 0) return;
+
   // large scaled
   if (getDock()->getNode()->isNormalIconView()) {
     switch (getType()) {
@@ -1242,8 +1248,11 @@ void FxSchematicPort::paint(QPainter *painter,
       QRect sourceRect =
           scene()->views()[0]->matrix().mapRect(boundingRect()).toRect();
       static QIcon fxPortRedIcon(":Resources/fxport_red.svg");
-      QPixmap redPm = fxPortRedIcon.pixmap(sourceRect.size());
-      sourceRect    = QRect(0, 0, sourceRect.width() * getDevPixRatio(),
+      static QIcon fxPortPassThroughRedIcon(":Resources/fxport_pt_red.svg");
+      QPixmap redPm = (m_isPassThrough)
+                          ? fxPortPassThroughRedIcon.pixmap(sourceRect.size())
+                          : fxPortRedIcon.pixmap(sourceRect.size());
+      sourceRect = QRect(0, 0, sourceRect.width() * getDevPixRatio(),
                          sourceRect.height() * getDevPixRatio());
       painter->drawPixmap(boundingRect(), redPm, sourceRect);
     } break;
@@ -1334,6 +1343,18 @@ SchematicLink *FxSchematicPort::makeLink(SchematicPort *port) {
   port->addLink(link);
   link->updatePath();
   return link;
+}
+
+//-----------------------------------------------------
+
+void FxSchematicPort::setIsPassThrough() {
+  m_isPassThrough = true;
+  // recompute the hook position
+  QRectF rect = boundingRect();
+  if (getType() == eFxInputPort)
+    m_hook = QPointF(rect.right(), (rect.top() + rect.bottom()) * 0.5);
+  else if (getType() == eFxOutputPort)
+    m_hook = QPointF(rect.left(), (rect.top() + rect.bottom()) * 0.5);
 }
 
 //-----------------------------------------------------
@@ -1490,7 +1511,7 @@ void FxSchematicPort::handleSnappedLinksOnDynamicPortFx(
     int startIndex) {
   FxSchematicNode *node = dynamic_cast<FxSchematicNode *>(getNode());
   if (!m_ownerFx->hasDynamicPortGroups() || !node) return;
-  int groupedPortCount           = groupedPorts.size();
+  int groupedPortCount = groupedPorts.size();
   if (startIndex < 0) startIndex = groupedPortCount - 1;
   if (startIndex >= groupedPortCount || targetIndex >= groupedPortCount) return;
   int i;
@@ -1613,7 +1634,7 @@ void FxSchematicPort::mouseMoveEvent(QGraphicsSceneMouseEvent *me) {
   m_currentTargetPort    = targetPort;
   TFx *targetFx          = targetPort->getOwnerFx();
   TZeraryColumnFx *colFx = dynamic_cast<TZeraryColumnFx *>(targetFx);
-  if (colFx) targetFx    = colFx->getZeraryFx();
+  if (colFx) targetFx = colFx->getZeraryFx();
   if (targetPort->getType() != eFxInputPort ||
       !targetFx->hasDynamicPortGroups() || targetPort == this)
     return;
@@ -1670,11 +1691,11 @@ void FxSchematicPort::mouseReleaseEvent(QGraphicsSceneMouseEvent *me) {
     SchematicPort::mouseReleaseEvent(me);
     return;
   }
-  TFx *targetOwnerFx       = targetPort->getOwnerFx();
-  TZeraryColumnFx *colFx   = dynamic_cast<TZeraryColumnFx *>(targetOwnerFx);
+  TFx *targetOwnerFx     = targetPort->getOwnerFx();
+  TZeraryColumnFx *colFx = dynamic_cast<TZeraryColumnFx *>(targetOwnerFx);
   if (colFx) targetOwnerFx = colFx->getZeraryFx();
 
-  // if the target fx has no dynamic port or has dinamic ports but the tatgert
+  // if the target fx has no dynamic port or has dynamic ports but the target
   // port is not an input port: do nothing!
   if (!targetOwnerFx || !targetOwnerFx->hasDynamicPortGroups() ||
       targetPort->getType() != eFxInputPort) {
@@ -1697,7 +1718,7 @@ void FxSchematicPort::mouseReleaseEvent(QGraphicsSceneMouseEvent *me) {
   int groupedPortCount = groupedPorts.size();
   if (targetOwnerFx != m_ownerFx && me->modifiers() == Qt::ControlModifier &&
       linkTo(targetPort, true)) {
-    // trying to link different fxs insertin the new link and shifting the
+    // trying to link different fxs inserting the new link and shifting the
     // others
     int targetIndex = getIndex(targetFxPort, groupedPorts);
     if (targetIndex == -1) {
@@ -1806,7 +1827,7 @@ FxSchematicDock::FxSchematicDock(FxSchematicNode *parent, const QString &name,
           }
         } else {
           TZeraryColumnFx *zeraryFx = dynamic_cast<TZeraryColumnFx *>(inputFx);
-          if (zeraryFx) inputFx     = zeraryFx->getZeraryFx();
+          if (zeraryFx) inputFx = zeraryFx->getZeraryFx();
           setToolTip(QString::fromStdWString(inputFx->getName()));
         }
       }
@@ -2375,7 +2396,7 @@ bool isMatteFx(std::string id) {
   else
     return false;
 }
-};
+};  // namespace
 
 FxSchematicNormalFxNode::FxSchematicNormalFxNode(FxSchematicScene *scene,
                                                  TFx *fx)
@@ -2462,6 +2483,7 @@ FxSchematicNormalFxNode::FxSchematicNormalFxNode(FxSchematicScene *scene,
 
   m_linkedNode = 0;
   //-----
+  m_nameItem->setDefaultTextColor(viewer->getTextColor());
   m_nameItem->setName(m_name);
   m_renderToggle->setIsActive(m_fx->getAttributes()->isEnabled());
 
@@ -2734,6 +2756,7 @@ FxSchematicZeraryNode::FxSchematicZeraryNode(FxSchematicScene *scene,
   m_linkedNode = 0;
 
   //---
+  m_nameItem->setDefaultTextColor(viewer->getTextColor());
   m_nameItem->setName(m_name);
   m_nameItem->hide();
 
@@ -2989,6 +3012,7 @@ FxSchematicColumnNode::FxSchematicColumnNode(FxSchematicScene *scene,
   m_linkDock   = 0;
 
   //-----
+  m_nameItem->setDefaultTextColor(viewer->getTextColor());
   m_nameItem->setName(m_name);
 
   int levelType;
@@ -3034,7 +3058,7 @@ FxSchematicColumnNode::FxSchematicColumnNode(FxSchematicScene *scene,
   bool ret = true;
   ret      = ret && connect(m_resizeItem, SIGNAL(toggled(bool)), this,
                        SLOT(onChangedSize(bool)));
-  ret = ret &&
+  ret      = ret &&
         connect(m_nameItem, SIGNAL(focusOut()), this, SLOT(onNameChanged()));
   ret = ret && connect(m_renderToggle, SIGNAL(toggled(bool)), this,
                        SLOT(onRenderToggleClicked(bool)));
@@ -3277,6 +3301,7 @@ FxSchematicPaletteNode::FxSchematicPaletteNode(FxSchematicScene *scene,
   QString paletteName = getPaletteName();
   setToolTip(QString("%1 : %2").arg(m_name, paletteName));
 
+  m_nameItem->setDefaultTextColor(viewer->getTextColor());
   m_nameItem->setName(m_name);
 
   addPort(0, m_outDock->getPort());
@@ -3473,6 +3498,7 @@ FxGroupNode::FxGroupNode(FxSchematicScene *scene, const QList<TFxP> &groupedFx,
   m_linkDock   = 0;
 
   //-----
+  m_nameItem->setDefaultTextColor(viewer->getTextColor());
   m_nameItem->setName(m_name);
   m_renderToggle->setIsActive(m_fx->getAttributes()->isEnabled());
 
@@ -3691,11 +3717,287 @@ bool FxGroupNode::isCached() const {
   for (i = 0; i < m_roots.size(); i++) {
     TFx *fx = m_roots[i].getPointer();
     if (TZeraryColumnFx *zcFx = dynamic_cast<TZeraryColumnFx *>(fx))
-      isCached =
-          isCached &&
-          TPassiveCacheManager::instance()->cacheEnabled(zcFx->getZeraryFx());
+      isCached = isCached && TPassiveCacheManager::instance()->cacheEnabled(
+                                 zcFx->getZeraryFx());
     else
       isCached = isCached && TPassiveCacheManager::instance()->cacheEnabled(fx);
   }
   return isCached;
+}
+
+//*****************************************************
+//
+// FxPassThroughPainter
+//
+//*****************************************************
+
+FxPassThroughPainter::FxPassThroughPainter(FxSchematicPassThroughNode *parent,
+                                           double width, double height,
+                                           const QString &name, bool showName)
+    : QGraphicsItem(parent)
+    , m_width(width)
+    , m_height(height)
+    , m_name(name)
+    , m_showName(showName)
+    , m_parent(parent) {
+  setFlag(QGraphicsItem::ItemIsMovable, false);
+  setFlag(QGraphicsItem::ItemIsSelectable, false);
+  setFlag(QGraphicsItem::ItemIsFocusable, false);
+}
+
+//-----------------------------------------------------
+
+FxPassThroughPainter::~FxPassThroughPainter() {}
+
+//-----------------------------------------------------
+
+QRectF FxPassThroughPainter::boundingRect() const {
+  return QRectF(-5, -5, m_width + 10, m_height + 10);
+}
+
+//-----------------------------------------------------
+
+void FxPassThroughPainter::paint(QPainter *painter,
+                                 const QStyleOptionGraphicsItem *option,
+                                 QWidget *widget) {
+  FxSchematicScene *sceneFx = dynamic_cast<FxSchematicScene *>(scene());
+  if (!sceneFx) return;
+
+  SchematicViewer *viewer = sceneFx->getSchematicViewer();
+
+  painter->setBrush(viewer->getPassThroughColor());
+  painter->setPen(Qt::NoPen);
+  painter->drawRoundedRect(QRectF(0, 0, m_width, m_height), 5, 5);
+
+  if (!m_showName) return;
+
+  QFont fnt = painter->font();
+  int width = QFontMetrics(fnt).width(m_name) + 1;
+  QRectF nameArea(0, 0, width, 14);
+
+  if (m_parent->isNormalIconView()) {
+    nameArea.adjust(-(width / 2) + 6, -51, 0, 0);
+  } else {
+    nameArea = QRect(4, 2, 78, 22);
+
+    fnt.setPixelSize(fnt.pixelSize() * 2);
+    painter->setFont(fnt);
+  }
+
+  painter->setPen(viewer->getTextColor());
+
+  if (!m_parent->isNameEditing()) {
+    // if this is a current object
+    if (sceneFx->getCurrentFx() == m_parent->getFx())
+      painter->setPen(viewer->getSelectedNodeTextColor());
+    painter->drawText(nameArea, Qt::AlignLeft | Qt::AlignVCenter, m_name);
+  }
+}
+
+//-----------------------------------------------------
+
+void FxPassThroughPainter::contextMenuEvent(
+    QGraphicsSceneContextMenuEvent *cme) {
+  FxSchematicScene *fxScene = dynamic_cast<FxSchematicScene *>(scene());
+  QMenu menu(fxScene->views()[0]);
+
+  if (cme->modifiers() & Qt::ControlModifier) {
+    menu.addAction(fxScene->getAgainAction(AddFxContextMenu::Add |
+                                           AddFxContextMenu::Insert));
+    if (!menu.actions().isEmpty()) {
+      menu.exec(cme->screenPos());
+      return;
+    }
+  }
+
+  QMenu *insertMenu = fxScene->getInsertFxMenu();
+  fxScene->initCursorScenePos();
+  QMenu *addMenu = fxScene->getAddFxMenu();
+
+  QAction *addOutputFx =
+      CommandManager::instance()->getAction("MI_NewOutputFx");
+
+  QAction *addPaste = new QAction(tr("&Paste Add"), &menu);
+  connect(addPaste, SIGNAL(triggered()), fxScene, SLOT(onAddPaste()));
+
+  QAction *preview = new QAction(tr("&Preview"), &menu);
+  connect(preview, SIGNAL(triggered()), fxScene, SLOT(onPreview()));
+
+  menu.addMenu(insertMenu);
+  menu.addMenu(addMenu);
+  menu.addSeparator();
+  menu.addAction(addPaste);
+  menu.addAction(addOutputFx);
+  menu.addAction(preview);
+  menu.exec(cme->screenPos());
+}
+
+//*****************************************************
+//
+// FxSchematicPassThroughNode
+//
+//*****************************************************
+
+FxSchematicPassThroughNode::FxSchematicPassThroughNode(FxSchematicScene *scene,
+                                                       TFx *fx)
+    : FxSchematicNode(scene, fx, 15, 15, eNormalFx) {
+  SchematicViewer *viewer = scene->getSchematicViewer();
+
+  m_linkedNode = 0;
+  m_linkDock   = 0;
+  m_showName   = false;
+
+  m_name = QString::fromStdWString(fx->getName());
+
+  m_nameItem              = new SchematicName(this, 72, 20);  // for rename
+  m_outDock               = new FxSchematicDock(this, "", 0, eFxOutputPort);
+  FxSchematicDock *inDock = new FxSchematicDock(this, "", 0, eFxInputPort);
+  m_passThroughPainter =
+      new FxPassThroughPainter(this, m_width, m_height, m_name, false);
+
+  m_outDock->getPort()->setIsPassThrough();
+  inDock->getPort()->setIsPassThrough();
+
+  addPort(0, m_outDock->getPort());
+  addPort(1, inDock->getPort());
+
+  m_inDocks.push_back(inDock);
+
+  m_outDock->setPos(15, 0);
+  inDock->setPos(-15, 0);
+
+  m_outDock->setZValue(2);
+  inDock->setZValue(2);
+  m_passThroughPainter->setZValue(1);
+
+  if (!m_name.contains("PassThrough")) {
+    setToolTip(m_name + tr(" (Pass Through)"));
+    m_showName = true;
+  } else {
+    setToolTip(m_name);
+    m_showName = false;
+  }
+
+  m_passThroughPainter->setShowName(m_showName);
+
+  //---
+  m_nameItem->setDefaultTextColor(viewer->getTextColor());
+  m_nameItem->setName(m_name);
+  m_nameItem->hide();
+
+  // define positions
+  if (m_isNormalIconView) {
+    QRectF recF = m_nameItem->boundingRect();
+    m_nameItem->setPos(-(recF.width() / 2) + 6, -30);
+  } else {
+    QFont fnt = m_nameItem->font();
+    fnt.setPixelSize(fnt.pixelSize() * 2);
+    m_nameItem->setFont(fnt);
+
+    m_nameItem->setPos(-1, 0);
+  }
+
+  m_nameItem->setZValue(3);
+
+  connect(m_nameItem, SIGNAL(focusOut()), this, SLOT(onNameChanged()));
+}
+
+//-----------------------------------------------------
+
+FxSchematicPassThroughNode::~FxSchematicPassThroughNode() {}
+
+//-----------------------------------------------------
+
+QRectF FxSchematicPassThroughNode::boundingRect() const {
+  int xAdj    = 0;
+  int yAdj    = 0;
+  qreal width = m_width;
+  QRectF recF = m_nameItem->boundingRect();
+  if (m_showName) {
+    width                     = recF.width();
+    if (width > m_width) xAdj = (width - m_width) / 2;
+    yAdj                      = 30;
+  }
+  return QRectF(-5 - xAdj, -5 - yAdj, std::max(m_width, width) + 10,
+                m_height + 10 + yAdj);
+}
+
+//-----------------------------------------------------
+
+void FxSchematicPassThroughNode::paint(QPainter *painter,
+                                       const QStyleOptionGraphicsItem *option,
+                                       QWidget *widget) {
+  FxSchematicNode::paint(painter, option, widget);
+}
+
+//-----------------------------------------------------
+
+void FxSchematicPassThroughNode::mouseDoubleClickEvent(
+    QGraphicsSceneMouseEvent *me) {
+  QString fontName = Preferences::instance()->getInterfaceFont();
+  if (fontName == "") {
+#ifdef _WIN32
+    fontName = "Arial";
+#else
+    fontName = "Helvetica";
+#endif
+  }
+  static QFont font(fontName, 10, QFont::Normal);
+  int width = QFontMetrics(font).width(m_name);
+  QRectF nameArea(0, 0, width, 14);
+
+  m_nameItem->setPlainText(m_name);
+  m_nameItem->show();
+  m_nameItem->setFocus();
+  setFlag(QGraphicsItem::ItemIsSelectable, false);
+}
+
+//-----------------------------------------------------
+
+void FxSchematicPassThroughNode::mousePressEvent(QGraphicsSceneMouseEvent *me) {
+  FxSchematicNode::mousePressEvent(me);
+
+  QAction *fxEditorPopup =
+      CommandManager::instance()->getAction(MI_FxParamEditor);
+  // this signal cause the update the contents of the FxSettings
+  if (fxEditorPopup->isVisible()) emit fxNodeDoubleClicked();
+}
+
+//-----------------------------------------------------
+
+void FxSchematicPassThroughNode::onNameChanged() {
+  m_nameItem->hide();
+  m_name = m_nameItem->toPlainText();
+
+  if (m_name.isEmpty()) {
+    m_name = QString::fromStdWString(m_fx->getFxId());
+    m_nameItem->setPlainText(m_name);
+  }
+
+  m_passThroughPainter->setName(m_name);
+
+  if (m_isNormalIconView) {
+    QRectF recF = m_nameItem->boundingRect();
+    m_nameItem->setPos(-(recF.width() / 2) + 6, -30);
+  }
+
+  if (!m_name.contains("PassThrough")) {
+    setToolTip(m_name + tr(" (Pass Through)"));
+    m_showName = true;
+  } else {
+    setToolTip(m_name);
+    m_showName = false;
+  }
+  m_passThroughPainter->setShowName(m_showName);
+
+  setFlag(QGraphicsItem::ItemIsSelectable, true);
+
+  FxSchematicScene *fxScene = dynamic_cast<FxSchematicScene *>(scene());
+  if (!fxScene) return;
+  TFxCommand::renameFx(m_fx.getPointer(), m_name.toStdWString(),
+                       fxScene->getXsheetHandle());
+  updateOutputDockToolTips(m_name);
+
+  prepareGeometryChange();
+  update();
 }

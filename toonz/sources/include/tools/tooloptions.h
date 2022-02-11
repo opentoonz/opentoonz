@@ -154,15 +154,15 @@ private:
   QHBoxLayout *hLayout() { return m_panel->hLayout(); }
   QLabel *addLabel(TProperty *p);
 
-  void visit(TDoubleProperty *p);
-  void visit(TDoublePairProperty *p);
-  void visit(TIntPairProperty *p);
-  void visit(TIntProperty *p);
-  void visit(TBoolProperty *p);
-  void visit(TStringProperty *p);
-  void visit(TEnumProperty *p);
-  void visit(TStyleIndexProperty *p);
-  void visit(TPointerProperty *p);
+  void visit(TDoubleProperty *p) override;
+  void visit(TDoublePairProperty *p) override;
+  void visit(TIntPairProperty *p) override;
+  void visit(TIntProperty *p) override;
+  void visit(TBoolProperty *p) override;
+  void visit(TStringProperty *p) override;
+  void visit(TEnumProperty *p) override;
+  void visit(TStyleIndexProperty *p) override;
+  void visit(TPointerProperty *p) override;
 };
 
 //***********************************************************************************************
@@ -276,7 +276,7 @@ protected slots:
   void onFrameSwitched() { updateStatus(); }
   // update the object list in combobox
   void updateStageObjectComboItems();
-  // syncronize the current item in the combobox to the selected stage object
+  // synchronize the current item in the combobox to the selected stage object
   void syncCurrentStageObjectComboItem();
   // change the current stage object when user changes it via combobox by hand
   void onCurrentStageObjectComboActivated(int index);
@@ -458,6 +458,7 @@ class PaintbrushToolOptionsBox final : public ToolOptionsBox {
 
   ToolOptionCombo *m_colorMode;
   ToolOptionCheckbox *m_selectiveMode;
+  ToolOptionCheckbox *m_lockAlphaMode;
 
 public:
   PaintbrushToolOptionsBox(QWidget *parent, TTool *tool,

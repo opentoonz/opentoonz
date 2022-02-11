@@ -100,7 +100,7 @@ types to be displayed in the file browser.
 
   void setFolder(const TFilePath &fp, bool expandNode = false,
                  bool forceUpdate = false);
-  // process when inputting the folder which is not regitered in the folder tree
+  // process when inputting the folder which is not registered in the folder tree
   // (e.g. UNC path in Windows)
   void setUnregisteredFolder(const TFilePath &fp);
 
@@ -209,7 +209,7 @@ signals:
   void filePathClicked(const TFilePath &);
   void filePathDoubleClicked(const TFilePath &);
   // reuse the list of TFrameId in order to skip loadInfo() when loading the
-  // level with sequencial frames.
+  // level with sequential frames.
   void filePathsSelected(const std::set<TFilePath> &,
                          const std::list<std::vector<TFrameId>> &);
   void treeFolderChanged(const TFilePath &);
@@ -231,7 +231,7 @@ private:
 
     bool m_isFolder;
     bool m_isLink;
-    // calling loadInfo to the level with sequencial frames is time consuming.
+    // calling loadInfo to the level with sequential frames is time consuming.
     // so keep the list of frameIds at the first time and try to reuse it.
     std::vector<TFrameId> m_frameIds;
 
@@ -291,7 +291,7 @@ private:
   // TPropertyGroup* getFormatProperties(const std::string &ext);
 
 public slots:
-  //! Starts the convertion.
+  //! Starts the conversion.
   // void onConvert();
   // void onOptionsClicked();
   void onOk();

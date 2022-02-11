@@ -17,24 +17,17 @@ TFrameId qstringToFrameId(QString str) {
     return TFrameId::EMPTY_FRAME;
   else if (str == "-" || str == "-2")
     return TFrameId::NO_FRAME;
-  TFrameId fid;
-  int s = 0;
-  QString number;
-  char letter(0);
-  for (s = 0; s < str.size(); s++) {
-    QChar c = str.at(s);
-    if (c.isNumber()) number.append(c);
-#if QT_VERSION >= 0x050500
-    else
-      letter = c.toLatin1();
-#else
-    else
-      letter = c.toAscii();
-#endif
-  }
-  return TFrameId(number.toInt(), letter);
+
+  QString regExpStr = QString("^%1$").arg(TFilePath::fidRegExpStr());
+  QRegExp rx(regExpStr);
+  int pos = rx.indexIn(str);
+  if (pos < 0) return TFrameId();
+  if (rx.cap(2).isEmpty())
+    return TFrameId(rx.cap(1).toInt());
+  else
+    return TFrameId(rx.cap(1).toInt(), rx.cap(2));
 }
-}
+}  // namespace
 
 //-----------------------------------------------------------------------------
 
@@ -123,13 +116,13 @@ void TXshLevelColumn::loadData(TIStream &is) {
       while (is.openChild(tagName)) {
         if (tagName == "cell") {
           TPersist *p = 0;
-          QString str;
+          std::string str;
           int row = 1, rowCount = 1, increment = 0;
           TFilePath path;
           is >> row >> rowCount >> p >> str >> increment;
-          TFrameId fid = qstringToFrameId(str);
-          assert((fid.getLetter() == 0 && rowCount >= 0) ||
-                 (fid.getLetter() != 0 && rowCount == 1));
+          TFrameId fid = qstringToFrameId(QString::fromStdString(str));
+          assert((fid.getLetter().isEmpty() && rowCount >= 0) ||
+                 (!fid.getLetter().isEmpty() && rowCount == 1));
           TXshLevel *xshLevel = dynamic_cast<TXshLevel *>(p);
           if (xshLevel) {
             int fidNumber = fid.getNumber();
@@ -158,9 +151,10 @@ void TXshLevelColumn::loadData(TIStream &is) {
     {
       TFxSet fxSet;
       fxSet.loadData(is);
-    } else {
+    } else if (loadCellMarks(tagName, is)) {
+      // do nothing
+    } else
       throw TException("TXshLevelColumn, unknown tag: " + tagName);
-    }
     is.closeChild();
   }
 }
@@ -182,11 +176,11 @@ void TXshLevelColumn::saveData(TOStream &os) {
       int n = 1, inc = 0, dr = fid.getNumber();
       // If fid has not letter save more than one cell and its incrementation;
       // otherwise save one cell.
-      if (r < r1 && fid.getLetter() == 0) {
+      if (r < r1 && fid.getLetter().isEmpty()) {
         TXshCell cell2 = getCell(r + 1);
         TFrameId fid2  = cell2.m_frameId;
         if (cell2.m_level.getPointer() == cell.m_level.getPointer() &&
-            fid2.getLetter() == 0) {
+            fid2.getLetter().isEmpty()) {
           inc = cell2.m_frameId.getNumber() - dr;
           n++;
           for (;;) {
@@ -194,7 +188,7 @@ void TXshLevelColumn::saveData(TOStream &os) {
             cell2         = getCell(r + n);
             TFrameId fid2 = cell2.m_frameId;
             if (cell2.m_level.getPointer() != cell.m_level.getPointer() ||
-                fid2.getLetter() != 0)
+                !fid2.getLetter().isEmpty())
               break;
             if (fid2.getNumber() != dr + n * inc) break;
             n++;
@@ -208,6 +202,9 @@ void TXshLevelColumn::saveData(TOStream &os) {
     os.closeChild();
   }
   os.child("fx") << m_fx;
+
+  // cell marks
+  saveCellMarks(os);
 }
 
 //-----------------------------------------------------------------------------

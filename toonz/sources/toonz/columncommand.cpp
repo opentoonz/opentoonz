@@ -43,6 +43,8 @@
 // TnzBase includes
 #include "tfx.h"
 #include "tfxattributes.h"
+#include "tparamcontainer.h"
+#include "tparamset.h"
 
 // TnzCore includes
 #include "tstroke.h"
@@ -98,9 +100,24 @@ void getColumnLinkedFxs(TFx *startFx, TFx *newStartFx,
   }
 }
 
+//------------------------------------------------------
+
+template <typename ParamCont>
+void setGrammerToParams(const ParamCont *cont,
+                        const TSyntax::Grammar *grammer) {
+  for (int p = 0; p != cont->getParamCount(); ++p) {
+    TParam &param = *cont->getParam(p);
+    if (TDoubleParam *dp = dynamic_cast<TDoubleParam *>(&param))
+      dp->setGrammar(grammer);
+    else if (TParamSet *paramSet = dynamic_cast<TParamSet *>(&param))
+      setGrammerToParams(paramSet, grammer);
+  }
+}
+
 //-----------------------------------------------------------------------------
 
-void cloneNotColumnLinkedFxsAndOutputsFx(TXsheet *xsh, TXsheet *newXsh) {
+void cloneNotColumnLinkedFxsAndOutputsFx(
+    TXsheet *xsh, TXsheet *newXsh, QMap<TFx *, TFx *> *fxTable = nullptr) {
   int columnCount = xsh->getColumnCount();
   assert(newXsh->getColumnCount() == columnCount);
 
@@ -134,6 +151,9 @@ void cloneNotColumnLinkedFxsAndOutputsFx(TXsheet *xsh, TXsheet *newXsh) {
       newFxDag->getInternalFxs()->addFx(newFx);
       if (fxDag->getTerminalFxs()->containsFx(fx))
         newFxDag->getTerminalFxs()->addFx(newFx);
+      // if the fx has not unique name then let assignUniqueId() set the default
+      // name
+      if (newFx->getName() == newFx->getFxId()) newFx->setName(L"");
       newFxDag->assignUniqueId(newFx);
       clonedFxs[fx] = newFx;
       notColumnLinkedClonedFxs.append(newFx);
@@ -200,6 +220,17 @@ void cloneNotColumnLinkedFxsAndOutputsFx(TXsheet *xsh, TXsheet *newXsh) {
       TFx *newInputFx = clonedFxs[inputFx];
       newOutputFx->getInputPort(0)->setFx(newInputFx);
     }
+  }
+
+  // reset grammers for all parameters of cloned fxs
+  // or they fails to refer to other parameters via expression
+  TSyntax::Grammar *grammer = newXsh->getStageObjectTree()->getGrammar();
+  QMap<TFx *, TFx *>::const_iterator it;
+  for (it = clonedFxs.constBegin(); it != clonedFxs.constEnd(); ++it) {
+    setGrammerToParams(it.value()->getParams(), grammer);
+
+    // register to the fx table for expression management
+    if (fxTable) fxTable->insert(it.key(), it.value());
   }
 }
 
@@ -1075,11 +1106,13 @@ void ColumnCmd::cloneChild(int index) {
   data->storeColumns(indices, childXsh, 0);
   data->storeColumnFxs(indices, childXsh, 0);
   std::list<int> restoredSplineIds;
+  QMap<TStageObjectId, TStageObjectId> idTable;
+  QMap<TFx *, TFx *> fxTable;
   data->restoreObjects(indices, restoredSplineIds, newChildXsh,
-                       StageObjectsData::eDoClone);
+                       StageObjectsData::eDoClone, idTable, fxTable);
   delete data;
 
-  cloneNotColumnLinkedFxsAndOutputsFx(childXsh, newChildXsh);
+  cloneNotColumnLinkedFxsAndOutputsFx(childXsh, newChildXsh, &fxTable);
   cloneXsheetTStageObjectTree(childXsh, newChildXsh);
   /*--以下は、Clone SubXsheet
   するときに、SubXsheet内にある子SubXsheetをクローンする関数
@@ -1091,6 +1124,10 @@ void ColumnCmd::cloneChild(int index) {
 --*/
   newChildXsh->getFxDag()->getXsheetFx()->getAttributes()->setDagNodePos(
       childXsh->getFxDag()->getXsheetFx()->getAttributes()->getDagNodePos());
+
+  ExpressionReferenceManager::instance()->refreshXsheetRefInfo(newChildXsh);
+  ExpressionReferenceManager::instance()->transferReference(
+      childXsh, newChildXsh, idTable, fxTable);
 
   newChildXsh->updateFrameCount();
 
@@ -1209,7 +1246,7 @@ void ColumnCmd::clearCells(int index) {
 // - If onlyColumns is true, it means that only columns with specified indices
 // will be removed.
 // - If onlyColumns is false, it means that the relevant pegbars will be removed
-// as well (when collapsing collumns).
+// as well (when collapsing columns).
 // - Note that relevant Fxs will be removed / collapsed regardless of
 // onlyColumns.
 // - When checkInvert is true, check references both side from the main xsheet

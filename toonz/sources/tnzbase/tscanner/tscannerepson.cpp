@@ -75,13 +75,13 @@ static unsigned char NotReady   = 1 << 6;
 
 #define log(_str)
 
-class TScannerExpection final : public TException {
+class TScannerException final : public TException {
   TString m_scannerMsg;
 
 public:
-  TScannerExpection(const std::vector<std::string> &notFatal,
+  TScannerException(const std::vector<std::string> &notFatal,
                     const std::string &fatal)
-      : TException("Scanner Expection") {
+      : TException("Scanner Exception") {
     m_scannerMsg = ::to_wstring(fatal);
     for (int i = notFatal.size(); i; i--)
       m_scannerMsg += L"\n" + ::to_wstring(notFatal[i - 1]);
@@ -412,7 +412,7 @@ fclose(myFile);*/
       (params.m_paperFeeder.m_value == 1.)) {
     if (!ESCI_command_1b('e', 1, true)) {
       std::vector<std::string> notFatal;
-      throw TScannerExpection(notFatal, "Scanner error (un)loading paper");
+      throw TScannerException(notFatal, "Scanner error (un)loading paper");
     }
     unsigned char p = 0x0C;
     bool status     = true;
@@ -571,7 +571,7 @@ void TScannerEpson::doSettings(const TScannerParameters &params,
           (params.m_paperFeeder.m_value == 1.)) {
         unsigned char v = (params.m_paperFeeder.m_value == 1.) ? 0x01 : 0x00;
         if (!ESCI_command_1b('e', v, true))
-          throw TScannerExpection(notFatal, "Scanner error (un)loading paper");
+          throw TScannerException(notFatal, "Scanner error (un)loading paper");
         if (v) {
           unsigned char p = 0x19;
           bool status     = true;
@@ -583,7 +583,7 @@ void TScannerEpson::doSettings(const TScannerParameters &params,
     unsigned char setParamCmd[2] = {0x1C, 0x57};
     int wrote                    = send(&setParamCmd[0], 2);
     if (wrote != 2)
-      throw TScannerExpection(notFatal,
+      throw TScannerException(notFatal,
                               "Error setting scanner parameters - W -");
 
     if (!expectACK()) {
@@ -592,7 +592,7 @@ void TScannerEpson::doSettings(const TScannerParameters &params,
     }
     wrote = send(&cmd[0], 0x40);
     if (wrote != 0x40)
-      throw TScannerExpection(notFatal,
+      throw TScannerException(notFatal,
                               "Error setting scanner parameters - D -");
 
     if (!expectACK()) {
@@ -603,7 +603,7 @@ void TScannerEpson::doSettings(const TScannerParameters &params,
     break;
   }
   if (retryCount <= 0)
-    throw TScannerExpection(
+    throw TScannerException(
         notFatal, "Error setting scanner parameters, too many retries");
   log("doSettings:OK");
 }

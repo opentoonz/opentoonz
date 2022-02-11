@@ -191,7 +191,7 @@ class XsheetViewer final : public QFrame, public SaveLoadQSettings {
 
   QColor m_lightLightBgColor;
   QColor m_lightBgColor;
-  QColor m_bgColor;  // row area backgroound
+  QColor m_bgColor;  // row area background
   QColor m_darkBgColor;
   QColor m_lightLineColor;  // horizontal lines (146,144,146)
   QColor m_darkLineColor;
@@ -1238,7 +1238,7 @@ public:
     return m_layerHeaderLockOverImage;
   }
 
-  void getButton(int &btype, QColor &bgColor, QImage &iconImage,
+  void getButton(const int &btype, QColor &bgColor, QImage &iconImage,
                  bool isTimeline = false);
 
   // convert the last one digit of the frame number to alphabet
@@ -1253,6 +1253,9 @@ public:
   virtual void load(QSettings &settings) override;
 
   QString getXsheetLayout() const { return m_xsheetLayout; }
+  // returns a list of frame amount per page displayable in the current size
+  QList<int> availableFramesPerPage();
+  void zoomToFramesPerPage(int frames);
 
 protected:
   void scrollToColumn(int col);
@@ -1302,12 +1305,12 @@ public slots:
   void resetXsheetNotes();
 
   void onOrientationChanged(const Orientation *newOrientation);
-  void onPrepareToScrollOffset(const QPoint &offset);
-  void onZoomScrollAdjust(QPoint &offset, bool toZoom);
+  void onPrepareToScrollOffset(const QPointF &offset);
+  void onZoomScrollAdjust(QPointF &offset, bool toZoom);
 
   void setFrameZoomFactor(int f) { m_frameZoomFactor = f; }
   int getFrameZoomFactor() const;
-  int getFrameZoomAdjustment();
+  QPoint getFrameZoomAdjustment();
 
   void zoomOnFrame(int frame, int factor);
 };

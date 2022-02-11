@@ -8,6 +8,7 @@
 #include "levelsettingspopup.h"
 #include "tapp.h"
 #include "cleanupsettingsmodel.h"
+#include "formatsettingspopups.h"
 
 // TnzQt includes
 #include "toonzqt/tabbar.h"
@@ -312,6 +313,87 @@ void PreferencesPopup::AdditionalStyleEdit::onApply() {
   Preferences::instance()->setValue(additionalStyleSheet,
                                     m_edit->toPlainText());
   emit additionalSheetEdited();
+}
+
+//**********************************************************************************
+//   PreferencesPopup::Display30bitCheckerView  implementation
+//**********************************************************************************
+
+PreferencesPopup::Display30bitChecker::GLView::GLView(QWidget* parent,
+                                                      bool is30bit)
+    : QOpenGLWidget(parent), m_is30bit(is30bit) {
+  setFixedSize(500, 100);
+  if (m_is30bit) setTextureFormat(TGL_TexFmt10);
+}
+
+void PreferencesPopup::Display30bitChecker::GLView::initializeGL() {
+  initializeOpenGLFunctions();
+  glClear(GL_COLOR_BUFFER_BIT);
+}
+void PreferencesPopup::Display30bitChecker::GLView::resizeGL(int width,
+                                                             int height) {
+  glViewport(0, 0, width, height);
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+  glOrtho(0, 1, 0, 1, -1, 1);
+  glMatrixMode(GL_MODELVIEW);
+  glLoadIdentity();
+}
+void PreferencesPopup::Display30bitChecker::GLView::paintGL() {
+  initializeOpenGLFunctions();
+  glPushMatrix();
+  glBegin(GL_QUADS);
+  glColor3d(0.071, 0.153, 0.0);
+  glVertex3d(0, 0, 0);
+  glVertex3d(0, 1, 0);
+  glColor3d(0.141, 0.239, 0.0);
+  glVertex3d(1, 1, 0);
+  glVertex3d(1, 0, 0);
+  glEnd();
+  glPopMatrix();
+}
+
+//-------------------------
+
+PreferencesPopup::Display30bitChecker::Display30bitChecker(
+    PreferencesPopup* parent)
+    : QDialog(parent) {
+  setModal(true);
+  m_currentDefaultFormat = QSurfaceFormat::defaultFormat();
+
+  setWindowTitle(tr("Check 30bit display availability"));
+
+  QSurfaceFormat sFmt = m_currentDefaultFormat;
+  sFmt.setRedBufferSize(10);
+  sFmt.setGreenBufferSize(10);
+  sFmt.setBlueBufferSize(10);
+  sFmt.setAlphaBufferSize(2);
+  QSurfaceFormat::setDefaultFormat(sFmt);
+
+  GLView* view8bit      = new GLView(this, false);
+  GLView* view10bit     = new GLView(this, true);
+  QPushButton* closeBtn = new QPushButton(tr("Close"), this);
+  QString infoLabel     = tr(
+      "If the lower gradient looks smooth and has no banding compared to the upper gradient,\n\
+30bit display is available in the current configuration.");
+
+  QVBoxLayout* lay = new QVBoxLayout();
+  lay->setMargin(10);
+  lay->setSpacing(10);
+  {
+    lay->addWidget(view8bit);
+    lay->addWidget(view10bit);
+    lay->addWidget(new QLabel(infoLabel, this));
+    lay->addWidget(closeBtn, 0, Qt::AlignCenter);
+  }
+  setLayout(lay);
+  lay->setSizeConstraint(QLayout::SetFixedSize);
+
+  connect(closeBtn, SIGNAL(clicked()), this, SLOT(accept()));
+}
+
+PreferencesPopup::Display30bitChecker::~Display30bitChecker() {
+  QSurfaceFormat::setDefaultFormat(m_currentDefaultFormat);
 }
 
 //**********************************************************************************
@@ -625,6 +707,12 @@ void PreferencesPopup::onTranspCheckDataChanged() { invalidateIcons(); }
 
 //-----------------------------------------------------------------------------
 
+void PreferencesPopup::onChessboardChanged() {
+  CommonChessboard::instance()->update();
+}
+
+//-----------------------------------------------------------------------------
+
 void PreferencesPopup::onSVNEnabledChanged() {
   if (m_pref->getBoolValue(SVNEnabled)) {
     if (!VersionControl::instance()->testSetup())
@@ -721,6 +809,13 @@ void PreferencesPopup::onLutPathChanged() {
   m_pref->setColorCalibrationLutPath(LutManager::instance()->getMonitorName(),
                                      lutPathFileField->getPath());
   onColorCalibrationChanged();
+}
+
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onCheck30bitDisplay() {
+  Display30bitChecker checker(this);
+  checker.exec();
 }
 
 //-----------------------------------------------------------------------------
@@ -949,15 +1044,26 @@ void PreferencesPopup::insertUI(PreferencesItemId id, QGridLayout* layout,
 
   // CheckBox contains label in itself
   if (item.type == QMetaType::Bool)
-    layout->addWidget(widget, layout->rowCount(), 0, 1, 2);
+    layout->addWidget(widget, layout->rowCount(), 0, 1, 3, Qt::AlignLeft);
   else {  // insert labels for other types
     int row = layout->rowCount();
     layout->addWidget(new QLabel(getUIString(id), this), row, 0,
                       Qt::AlignRight | Qt::AlignVCenter);
     if (isFileField)
       layout->addWidget(widget, row, 1, 1, 2);
-    else
-      layout->addWidget(widget, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    else {
+      bool isWideComboBox = false;
+      for (auto cbItem : comboItems) {
+        if (widget->fontMetrics().width(cbItem.first) > 100) {
+          isWideComboBox = true;
+          break;
+        }
+      }
+      if (id == interfaceFont) isWideComboBox = true;
+
+      layout->addWidget(widget, row, 1, 1, (isWideComboBox) ? 2 : 1,
+                        Qt::AlignLeft | Qt::AlignVCenter);
+    }
   }
 }
 
@@ -992,7 +1098,7 @@ void PreferencesPopup::insertFootNote(QGridLayout* layout) {
   QLabel* note = new QLabel(
       tr("* Changes will take effect the next time you run OpenToonz"));
   note->setStyleSheet("font-size: 10px; font: italic;");
-  layout->addWidget(note, layout->rowCount(), 0, 1, 2,
+  layout->addWidget(note, layout->rowCount(), 0, 1, 3,
                     Qt::AlignLeft | Qt::AlignVCenter);
 }
 
@@ -1043,11 +1149,8 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
           "Area")},
       {actualPixelViewOnSceneEditingMode,
        tr("Enable Actual Pixel View on Scene Editing Mode")},
-      {levelNameOnEachMarkerEnabled, tr("Display Level Name on Each Marker")},
       {showRasterImagesDarkenBlendedInViewer,
        tr("Show Raster Images Darken Blended")},
-      {showFrameNumberWithLetters,
-       tr("Show \"ABC\" Appendix to the Frame Number in Xsheet Cell")},
       {iconSize, tr("Level Strip Thumbnail Size*:")},
       {viewShrink, tr("Viewer Shrink:")},
       {viewStep, tr("Step:")},
@@ -1059,6 +1162,8 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
       {colorCalibrationLutPaths,
        tr("3DLUT File for [%1]:")
            .arg(LutManager::instance()->getMonitorName())},
+      {displayIn30bit, tr("30bit Display*")},
+      {showIconsInMenu, tr("Show Icons In Menu*")},
 
       // Visualization
       {show0ThickLines, tr("Show Lines with Thickness 0")},
@@ -1067,6 +1172,8 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
       // Loading
       {importPolicy, tr("Default File Import Behavior:")},
       {autoExposeEnabled, tr("Expose Loaded Levels in Xsheet")},
+      {autoRemoveUnusedLevels,
+       tr("Automatically Remove Unused Levels From Scene Cast")},
       {subsceneFolderEnabled,
        tr("Create Sub-folder when Importing Sub-Xsheet")},
       {removeSceneNumberFromLoadedLevelName,
@@ -1084,9 +1191,12 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
       {ffmpegPath, tr("FFmpeg Path:")},
       {ffmpegTimeout, tr("FFmpeg Timeout:")},
       {fastRenderPath, tr("Fast Render Path:")},
+      {ffmpegMultiThread,
+       tr("Allow Multi-Thread in FFMPEG Rendering (UNSTABLE)")},
 
       // Drawing
-      {scanLevelType, tr("Scan File Format:")},
+      {DefRasterFormat, tr("Default Raster / Scan Level Format:")},
+      //{scanLevelType, tr("Scan File Format:")},
       {DefLevelType, tr("Default Level Type:")},
       {newLevelSizeToCameraSizeEnabled,
        tr("New Levels Default to the Current Camera Size")},
@@ -1112,7 +1222,7 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
        tr("Use higher DPI for calculations - Slower but more accurate")},
 
       // Tools
-      {dropdownShortcutsCycleOptions, tr("Dropdown Shortcuts:")},
+      // {dropdownShortcutsCycleOptions, tr("Dropdown Shortcuts:")}, // removed
       {FillOnlysavebox, tr("Use the TLV Savebox to Limit Filling Operations")},
       {multiLayerStylePickerEnabled,
        tr("Multi Layer Style Picker: Switch Levels by Picking")},
@@ -1148,6 +1258,11 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
       {currentTimelineEnabled,
        tr("Show Current Time Indicator (Timeline Mode only)")},
       {currentColumnColor, tr("Current Column Color:")},
+      //{ levelNameOnEachMarkerEnabled, tr("Display Level Name on Each Marker")
+      //},
+      {levelNameDisplayType, tr("Level Name Display:")},
+      {showFrameNumberWithLetters,
+       tr("Show \"ABC\" Appendix to the Frame Number in Xsheet Cell")},
 
       // Animation
       {keyframeType, tr("Default Interpolation:")},
@@ -1160,7 +1275,7 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
       {blanksCount, tr("Blank Frames:")},
       {blankColor, tr("Blank Frames Color:")},
       {rewindAfterPlayback, tr("Rewind after Playback")},
-      {shortPlayFrameCount, tr("Number of Frames to Play for Short Play:")},
+      {shortPlayFrameCount, tr("Number of Frames to Play \nfor Short Play:")},
       {previewAlwaysOpenNewFlip, tr("Display in a New Flipbook Window")},
       {fitToFlipbook, tr("Fit to Flipbook")},
       {generatedMovieViewEnabled, tr("Open Flipbook after Rendering")},
@@ -1196,7 +1311,11 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
       // Touch / Tablet Settings
       // TounchGestureControl // Touch Gesture is a checkable command and not in
       // preferences.ini
-      {winInkEnabled, tr("Enable Windows Ink Support* (EXPERIMENTAL)")}};
+      {winInkEnabled, tr("Enable Windows Ink Support* (EXPERIMENTAL)")},
+      {useQtNativeWinInk,
+       tr("Use Qt's Native Windows Ink Support*\n(CAUTION: This options is for "
+          "maintenance purpose. \n Do not activate this option or the tablet "
+          "won't work properly.)")}};
 
   return uiStringTable.value(id, QString());
 }
@@ -1241,7 +1360,8 @@ QList<ComboBoxItem> PreferencesPopup::getComboItemList(
       {columnIconLoadingPolicy,
        {{tr("At Once"), Preferences::LoadAtOnce},
         {tr("On Demand"), Preferences::LoadOnDemand}}},
-      {scanLevelType, {{"tif", "tif"}, {"png", "png"}}},
+      {DefRasterFormat, {{"tif", "tif"}, {"png", "png"}}},
+      //{scanLevelType, {{"tif", "tif"}, {"png", "png"}}},
       {DefLevelType,
        {{tr("Toonz Vector Level"), PLI_XSHLEVEL},
         {tr("Toonz Raster Level"), TZP_XSHLEVEL},
@@ -1250,9 +1370,9 @@ QList<ComboBoxItem> PreferencesPopup::getComboItemList(
        {{tr("Incremental"), 0}, {tr("Use Xsheet as Animation Sheet"), 1}}},
       {vectorSnappingTarget,
        {{tr("Strokes"), 0}, {tr("Guides"), 1}, {tr("All"), 2}}},
-      {dropdownShortcutsCycleOptions,
-       {{tr("Open the dropdown to display all options"), 0},
-        {tr("Cycle through the available options"), 1}}},
+      //{dropdownShortcutsCycleOptions,
+      // {{tr("Open the dropdown to display all options"), 0},
+      //  {tr("Cycle through the available options"), 1}}},
       {cursorBrushType,
        {{tr("Small"), "Small"},
         {tr("Large"), "Large"},
@@ -1268,7 +1388,13 @@ QList<ComboBoxItem> PreferencesPopup::getComboItemList(
       {xsheetLayoutPreference,
        {{tr("Classic"), "Classic"},
         {tr("Classic-revised"), "Classic-revised"},
-        {tr("Compact"), "Compact"}}},
+        {tr("Compact"), "Compact"},
+        {tr("Minimum"), "Minimum"}}},
+      {levelNameDisplayType,
+       {{tr("Default"), Preferences::ShowLevelName_Default},
+        {tr("Display on Each Marker"), Preferences::ShowLevelNameOnEachMarker},
+        {tr("Display on Column Header"),
+         Preferences::ShowLevelNameOnColumnHeader}}},
       {DragCellsBehaviour,
        {{tr("Cells Only"), 0}, {tr("Cells and Column Data"), 1}}},
       {keyframeType,  // note that the value starts from 1, not 0
@@ -1295,7 +1421,7 @@ inline T PreferencesPopup::getUI(PreferencesItemId id) {
 }
 
 //**********************************************************************************
-//    PrefencesPopup's  constructor
+//    PreferencesPopup's  constructor
 //**********************************************************************************
 
 PreferencesPopup::PreferencesPopup()
@@ -1472,6 +1598,7 @@ QWidget* PreferencesPopup::createInterfacePage() {
 
   QPushButton* additionalStyleSheetBtn =
       new QPushButton(tr("Edit Additional Style Sheet.."));
+  QPushButton* check30bitBtn = new QPushButton(tr("Check Availability"));
 
   QWidget* widget  = new QWidget(this);
   QGridLayout* lay = new QGridLayout();
@@ -1479,7 +1606,7 @@ QWidget* PreferencesPopup::createInterfacePage() {
 
   insertUI(CurrentStyleSheetName, lay, styleSheetItemList);
   int row = lay->rowCount();
-  lay->addWidget(additionalStyleSheetBtn, row - 1, 3);
+  lay->addWidget(additionalStyleSheetBtn, row - 1, 2, Qt::AlignRight);
 
   lay->addWidget(new QLabel(tr("Icon Theme*:"), this), 2, 0,
                  Qt::AlignRight | Qt::AlignVCenter);
@@ -1491,15 +1618,13 @@ QWidget* PreferencesPopup::createInterfacePage() {
 
   lay->addWidget(new QLabel(tr("Pixels Only:"), this), 5, 0,
                  Qt::AlignRight | Qt::AlignVCenter);
-  lay->addWidget(createUI(pixelsOnly), 5, 1);
+  lay->addWidget(createUI(pixelsOnly), 5, 1, 1, 2, Qt::AlignLeft);
 
   insertUI(CurrentRoomChoice, lay, roomItemList);
   insertUI(functionEditorToggle, lay, getComboItemList(functionEditorToggle));
   insertUI(moveCurrentFrameByClickCellArea, lay);
   insertUI(actualPixelViewOnSceneEditingMode, lay);
-  insertUI(levelNameOnEachMarkerEnabled, lay);
   insertUI(showRasterImagesDarkenBlendedInViewer, lay);
-  insertUI(showFrameNumberWithLetters, lay);
   insertUI(iconSize, lay);
   insertDualUIs(viewShrink, viewStep, lay);
   insertUI(viewerZoomCenter, lay, getComboItemList(viewerZoomCenter));
@@ -1508,6 +1633,10 @@ QWidget* PreferencesPopup::createInterfacePage() {
   insertUI(interfaceFontStyle, lay, buildFontStyleList());
   QGridLayout* colorCalibLay = insertGroupBoxUI(colorCalibrationEnabled, lay);
   { insertUI(colorCalibrationLutPaths, colorCalibLay); }
+  insertUI(displayIn30bit, lay);
+  row = lay->rowCount();
+  lay->addWidget(check30bitBtn, row - 1, 2, Qt::AlignRight);
+  insertUI(showIconsInMenu, lay);
 
   lay->setRowStretch(lay->rowCount(), 1);
   insertFootNote(lay);
@@ -1525,6 +1654,8 @@ QWidget* PreferencesPopup::createInterfacePage() {
                        SLOT(onPixelUnitExternallySelected(bool)));
   ret      = ret && connect(additionalStyleSheetBtn, SIGNAL(clicked()), this,
                        SLOT(onEditAdditionalStyleSheet()));
+  ret      = ret && connect(check30bitBtn, SIGNAL(clicked()), this,
+                       SLOT(onCheck30bitDisplay()));
   assert(ret);
 
   m_onEditedFuncMap.insert(CurrentStyleSheetName,
@@ -1573,7 +1704,8 @@ QWidget* PreferencesPopup::createLoadingPage() {
   setupLayout(lay);
 
   insertUI(importPolicy, lay, getComboItemList(importPolicy));
-  insertUI(autoExposeEnabled, lay);
+  QGridLayout* autoExposeLay = insertGroupBoxUI(autoExposeEnabled, lay);
+  { insertUI(autoRemoveUnusedLevels, autoExposeLay); }
   insertUI(subsceneFolderEnabled, lay);
   insertUI(removeSceneNumberFromLoadedLevelName, lay);
   insertUI(IgnoreImageDpi, lay);
@@ -1677,6 +1809,13 @@ QWidget* PreferencesPopup::createImportExportPage() {
            lay);
   insertUI(fastRenderPath, lay);
 
+  putLabel("", lay);
+  putLabel(
+      tr("Enabling multi-thread rendering will render significantly faster \n"
+         "but a random crash might occur, use at your own risk."),
+      lay);
+  insertUI(ffmpegMultiThread, lay);
+
   lay->setRowStretch(lay->rowCount(), 1);
   insertFootNote(lay);
   widget->setLayout(lay);
@@ -1690,7 +1829,7 @@ QWidget* PreferencesPopup::createDrawingPage() {
   QGridLayout* lay = new QGridLayout();
   setupLayout(lay);
 
-  insertUI(scanLevelType, lay, getComboItemList(scanLevelType));
+  insertUI(DefRasterFormat, lay, getComboItemList(DefRasterFormat));
   insertUI(DefLevelType, lay, getComboItemList(DefLevelType));
   insertUI(newLevelSizeToCameraSizeEnabled, lay);
   insertDualUIs(DefLevelWidth, DefLevelHeight, lay);
@@ -1740,8 +1879,8 @@ QWidget* PreferencesPopup::createToolsPage() {
   QGridLayout* lay = new QGridLayout();
   setupLayout(lay);
 
-  insertUI(dropdownShortcutsCycleOptions, lay,
-           getComboItemList(dropdownShortcutsCycleOptions));
+  // insertUI(dropdownShortcutsCycleOptions, lay,
+  //         getComboItemList(dropdownShortcutsCycleOptions));
   insertUI(FillOnlysavebox, lay);
   insertUI(multiLayerStylePickerEnabled, lay);
   QGridLayout* cursorOptionsLay = insertGroupBox(tr("Cursor Options"), lay);
@@ -1777,6 +1916,7 @@ QWidget* PreferencesPopup::createXsheetPage() {
 
   insertUI(xsheetLayoutPreference, lay,
            getComboItemList(xsheetLayoutPreference));
+  insertUI(levelNameDisplayType, lay, getComboItemList(levelNameDisplayType));
   insertUI(xsheetStep, lay);
   insertUI(xsheetAutopanEnabled, lay);
   insertUI(DragCellsBehaviour, lay, getComboItemList(DragCellsBehaviour));
@@ -1793,6 +1933,7 @@ QWidget* PreferencesPopup::createXsheetPage() {
   insertUI(syncLevelRenumberWithXsheet, lay);
   insertUI(currentTimelineEnabled, lay);
   insertUI(currentColumnColor, lay);
+  insertUI(showFrameNumberWithLetters, lay);
 
   lay->setRowStretch(lay->rowCount(), 1);
   insertFootNote(lay);
@@ -1923,6 +2064,10 @@ QWidget* PreferencesPopup::createColorsPage() {
                            &PreferencesPopup::notifySceneChanged);
   m_onEditedFuncMap.insert(chessboardColor2,
                            &PreferencesPopup::notifySceneChanged);
+  m_onEditedFuncMap.insert(chessboardColor1,
+                           &PreferencesPopup::onChessboardChanged);
+  m_onEditedFuncMap.insert(chessboardColor2,
+                           &PreferencesPopup::onChessboardChanged);
 
   return widget;
 }
@@ -1967,6 +2112,9 @@ QWidget* PreferencesPopup::createTouchTabletPage() {
 
   lay->addWidget(enableTouchGestures, 0, 0, 1, 2);
   if (winInkAvailable) insertUI(winInkEnabled, lay);
+#ifdef WITH_WINTAB
+  insertUI(useQtNativeWinInk, lay);
+#endif
 
   lay->setRowStretch(lay->rowCount(), 1);
   if (winInkAvailable) insertFootNote(lay);

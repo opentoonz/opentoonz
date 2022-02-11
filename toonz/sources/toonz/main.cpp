@@ -359,12 +359,13 @@ int main(int argc, char *argv[]) {
 
 #ifdef Q_OS_WIN
   //	Since currently OpenToonz does not work with OpenGL of software or
-  // angle,
-  //	force Qt to use desktop OpenGL
+  // angle,	force Qt to use desktop OpenGL
+  // FIXME: This options should be called before constructing the application.
+  // Thus, ANGLE seems to be enabled as of now.
   a.setAttribute(Qt::AA_UseDesktopOpenGL, true);
 #endif
 
-  // Some Qt objects are destroyed badly withouth a living qApp. So, we must
+  // Some Qt objects are destroyed badly without a living qApp. So, we must
   // enforce a way to either
   // postpone the application destruction until the very end, OR ensure that
   // sensible objects are
@@ -398,10 +399,25 @@ int main(int argc, char *argv[]) {
 
   // Enable to render smooth icons on high dpi monitors
   a.setAttribute(Qt::AA_UseHighDpiPixmaps);
+#if defined(_WIN32) && QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
+  // Compress tablet events with application attributes instead of implementing
+  // the delay-timer by ourselves
+  a.setAttribute(Qt::AA_CompressHighFrequencyEvents);
+  a.setAttribute(Qt::AA_CompressTabletEvents);
+#endif
+
+#ifdef _WIN32
+  // This attribute is set to make menubar icon to be always (16 x devPixRatio).
+  // Without this attribute the menu bar icon size becomes the same as tool bar
+  // when Windows scale is in 125%. Currently hiding the menu bar icon is done
+  // by setting transparent pixmap only in menu bar icon size. So the size must
+  // be different between for menu bar and for tool bar.
+  a.setAttribute(Qt::AA_Use96Dpi);
+#endif
 
   // Set the app's locale for numeric stuff to standard C. This is important for
   // atof() and similar
-  // calls that are locale-dependant.
+  // calls that are locale-dependent.
   setlocale(LC_NUMERIC, "C");
 
 // Set current directory to the bundle/application path - this is needed to have
@@ -473,6 +489,16 @@ int main(int argc, char *argv[]) {
 
   // Toonz environment
   initToonzEnv(argumentPathValues);
+
+  // prepare for 30bit display
+  if (Preferences::instance()->is30bitDisplayEnabled()) {
+    QSurfaceFormat sFmt = QSurfaceFormat::defaultFormat();
+    sFmt.setRedBufferSize(10);
+    sFmt.setGreenBufferSize(10);
+    sFmt.setBlueBufferSize(10);
+    sFmt.setAlphaBufferSize(2);
+    QSurfaceFormat::setDefaultFormat(sFmt);
+  }
 
   // Initialize thread components
   TThread::init();
@@ -675,6 +701,19 @@ int main(int argc, char *argv[]) {
   // http://doc.qt.io/qt-5/windows-issues.html#fullscreen-opengl-based-windows
   if (w.windowHandle())
     QWindowsWindowFunctions::setHasBorderInFullScreen(w.windowHandle(), true);
+#endif
+
+    // Qt have started to support Windows Ink from 5.12.
+    // Unlike WinTab API used in Qt 5.9 the tablet behaviors are different and
+    // are (at least, for OT) problematic. The customized Qt5.15.2 are made with
+    // cherry-picking the WinTab feature to be officially introduced from 6.0.
+    // See https://github.com/shun-iwasawa/qt5/releases/tag/v5.15.2_wintab for
+    // details. The following feature can only be used with the customized Qt,
+    // with WITH_WINTAB build option, and in Windows-x64 build.
+
+#ifdef WITH_WINTAB
+  bool useQtNativeWinInk = Preferences::instance()->isQtNativeWinInkEnabled();
+  QWindowsWindowFunctions::setWinTabEnabled(!useQtNativeWinInk);
 #endif
 
   splash.showMessage(offsetStr + "Loading style sheet ...", Qt::AlignCenter,

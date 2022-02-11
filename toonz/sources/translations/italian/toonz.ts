@@ -533,6 +533,17 @@ Stop it or wait for its completion before removing it.</source>
     </message>
 </context>
 <context>
+    <name>Canon</name>
+    <message>
+        <source>AC Power</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Full</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>CanvasSizePopup</name>
     <message>
         <source>Canvas Size</source>
@@ -5136,10 +5147,6 @@ Decrementa lo spessore minimo del pennello</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Toggle Edit in Place</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>&amp;ComboViewer</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5578,10 +5585,6 @@ or you may delete necessary files for it.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Save All</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>&amp;Paste as a Copy</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5651,26 +5654,6 @@ or you may delete necessary files for it.</source>
     </message>
     <message>
         <source>Previous Key</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>About OpenToonz...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Online Manual...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>What&apos;s New...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Community Forum...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Report a Bug...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5995,6 +5978,26 @@ or you may delete necessary files for it.</source>
     </message>
     <message>
         <source>Plastic Tool - Animate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Export Stop Motion Image Sequence</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pick Focus Check Location</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove frame before Stop Motion Camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next Frame including Stop Motion Camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show original live view images.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6681,6 +6684,13 @@ Lo vuoi sovrascrivere?</translation>
 What do you want to do?</source>
         <translation>Il file &quot;%1&quot; esiste già.
 Cosa vuoi fare?</translation>
+    </message>
+</context>
+<context>
+    <name>PaletteViewerPanel</name>
+    <message>
+        <source>Freeze</source>
+        <translation type="unfinished">Disattiva l&apos;aggiornamento</translation>
     </message>
 </context>
 <context>
@@ -8144,6 +8154,16 @@ in non alpha-enabled image format.</source>
     </message>
     <message>
         <source>Icon Theme*:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Icons In Menu*</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use Qt&apos;s Native Windows Ink Support*
+(CAUTION: This options is for maintenance purpose. 
+ Do not activate this option or the tablet won&apos;t work properly.)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -10485,6 +10505,14 @@ Do you want to create it?</source>
         <source>Script file %1 does not exists.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Add Level to Scene Cast : %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The Premultiply options in the following levels are disabled, since PNG files are premultiplied on loading in the current version: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ReframePopup</name>
@@ -12301,6 +12329,10 @@ Per favore sottometti o ripristina i cambiamenti prima di proseguire.</translati
         <source>Help</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Stop Motion</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ShortcutViewer</name>
@@ -12796,7 +12828,47 @@ WARNING : Image size mismatch. The size of level with the same path is %1 x %2.<
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Cannot capture webcam image unless live view is active.</source>
+        <source>Please start live view before using time lapse.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot capture image unless live view is active.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No level exists with the current name.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is not an image level.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is not a stop motion level.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not find an xsheet level with  the current level</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No export path given.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not find the source file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Overwrite existing files?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error occurred.  Aborting.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Successfully exported %1 images.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -12876,14 +12948,6 @@ WARNING : Image size mismatch. The size of level with the same path is %1 x %2.<
     </message>
     <message>
         <source>Start Live View</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Zoom</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Pick Zoom</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -12991,10 +13055,6 @@ WARNING : Image size mismatch. The size of level with the same path is %1 x %2.<
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Black Screen for Capture</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Use Reduced Resolution Images</source>
         <translation type="unfinished"></translation>
     </message>
@@ -13003,23 +13063,11 @@ WARNING : Image size mismatch. The size of level with the same path is %1 x %2.<
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Place on XSheet</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Use Numpad Shortcuts When Active</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Show Live View on All Frames</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Capture Review Time: </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Level Subsampling: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -13052,6 +13100,141 @@ WARNING : Image size mismatch. The size of level with the same path is %1 x %2.<
     </message>
     <message>
         <source>Stop Live View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Light</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Motion</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera Status</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show original live view images in timeline</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Check</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zoom in to check focus</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pick</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set focus check location</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a camera to change settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>insert webcam name here</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manual Focus</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Focus: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Brightness: </source>
+        <translation type="unfinished">Luminosità:</translation>
+    </message>
+    <message>
+        <source>Contrast: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Gain: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Saturation: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>More</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Time Lapse</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use time lapse</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Interval(sec):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Blackout all Screens</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Test</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Screen 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Screen 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Screen 3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Motion Control</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Port: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> - Battery: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Aperture: Auto</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Shutter Speed: Auto</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start Capturing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop Capturing</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>StopMotionSerial</name>
+    <message>
+        <source>No Device</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

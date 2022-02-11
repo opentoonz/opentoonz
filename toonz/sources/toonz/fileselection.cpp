@@ -23,12 +23,16 @@
 #include "toonzqt/icongenerator.h"
 #include "toonzqt/gutil.h"
 #include "historytypes.h"
+#include "toonzqt/menubarcommand.h"
 
 // TnzLib includes
 #include "toonz/tproject.h"
 #include "toonz/toonzscene.h"
 #include "toonz/sceneresources.h"
 #include "toonz/preferences.h"
+#include "toonz/studiopalette.h"
+#include "toonz/palettecontroller.h"
+#include "toonz/tpalettehandle.h"
 
 // TnzCore includes
 #include "tfiletype.h"
@@ -184,6 +188,8 @@ public:
     return str;
   }
 };
+
+TPaletteP viewedPalette;
 //-----------------------------------------------------------------------------
 }  // namespace
 
@@ -327,12 +333,16 @@ void FileSelection::showFolderContents() {
     if (!model) return;
     folderPath = model->getFolder();
   }
-  if (TSystem::isUNC(folderPath))
-    QDesktopServices::openUrl(
+  if (TSystem::isUNC(folderPath)) {
+    bool ok = QDesktopServices::openUrl(
         QUrl(QString::fromStdWString(folderPath.getWideString())));
-  else
-    QDesktopServices::openUrl(QUrl::fromLocalFile(
-        QString::fromStdWString(folderPath.getWideString())));
+    if (ok) return;
+    // If the above fails, then try opening UNC path with the same way as the
+    // local files.. QUrl::fromLocalFile() seems to work for UNC path as well in
+    // our environment. (8/10/2021 shun-iwasawa)
+  }
+  QDesktopServices::openUrl(
+      QUrl::fromLocalFile(QString::fromStdWString(folderPath.getWideString())));
 }
 
 //------------------------------------------------------------------------
@@ -367,13 +377,22 @@ void FileSelection::viewFile() {
   getSelectedFiles(files);
   int i = 0;
   for (i = 0; i < files.size(); i++) {
-    if (!TFileType::isViewable(TFileType::getInfo(files[0]))) continue;
+    if (!TFileType::isViewable(TFileType::getInfo(files[i])) &&
+        files[i].getType() != "tpl")
+      continue;
 
     if (Preferences::instance()->isDefaultViewerEnabled() &&
         (files[i].getType() == "mov" || files[i].getType() == "avi" ||
          files[i].getType() == "3gp"))
       QDesktopServices::openUrl(QUrl("file:///" + toQString(files[i])));
-    else {
+    else if (files[i].getType() == "tpl") {
+      viewedPalette = StudioPalette::instance()->getPalette(files[i], false);
+      TApp::instance()
+          ->getPaletteController()
+          ->getCurrentLevelPalette()
+          ->setPalette(viewedPalette.getPointer());
+      CommandManager::instance()->execute("MI_OpenPalette");
+    } else {
       FlipBook *fb = ::viewFile(files[i]);
       if (fb) {
         FileBrowserPopup::setModalBrowserToParent(fb->parentWidget());
@@ -392,7 +411,7 @@ void FileSelection::convertFiles() {
   static ConvertPopup *popup = new ConvertPopup(false);
   if (popup->isConverting()) {
     DVGui::info(QObject::tr(
-        "A convertion task is in progress! wait until it stops or cancel it"));
+        "A conversion task is in progress! wait until it stops or cancel it"));
     return;
   }
   popup->setFiles(files);

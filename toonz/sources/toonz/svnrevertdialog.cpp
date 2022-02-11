@@ -107,7 +107,7 @@ SVNRevertDialog::SVNRevertDialog(QWidget *parent, const QString &workingDir,
 
   addButtonBarWidget(m_revertButton, m_cancelButton);
 
-  // 0. Connect for svn errors (that may occurs everythings)
+  // 0. Connect for svn errors (that may occur every time)
   connect(&m_thread, SIGNAL(error(const QString &)), this,
           SLOT(onError(const QString &)));
 
@@ -411,7 +411,7 @@ void SVNRevertFrameRangeDialog::revertFiles() {
     QStringList list = qDir.entryList(QDir::Files);
     m_files          = list.filter(regExp);
 
-    // 0. Connect for svn errors (that may occurs everythings)
+    // 0. Connect for svn errors (that may occur every time)
     connect(&m_thread, SIGNAL(error(const QString &)), this,
             SLOT(onError(const QString &)));
 

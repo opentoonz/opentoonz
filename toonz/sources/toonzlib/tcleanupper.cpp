@@ -160,7 +160,7 @@ HSVColor HSVColor::fromRGB(double r, double g, double b) {
       h = 2.0 + (b - r) / delta;
     else if (b == max)
       h = 4.0 + (r - g) / delta;
-    h   = h * 60.0;
+    h = h * 60.0;
     if (h < 0) h += 360.0;
   }
 
@@ -569,7 +569,7 @@ TRasterP TCleanupper::processColors(const TRasterP &rin) {
 CleanupPreprocessedImage *TCleanupper::process(
     TRasterImageP &image, bool first_image, TRasterImageP &onlyResampledImage,
     bool isCameraTest, bool returnResampled, bool onlyForSwatch,
-    TAffine *resampleAff) {
+    TAffine *resampleAff, TRasterP templateForResampled) {
   TAffine aff;
   double blur;
   TDimension outDim(0, 0);
@@ -682,7 +682,9 @@ CleanupPreprocessedImage *TCleanupper::process(
   TRasterP tmp_ras;
 
   if (returnResampled || (fromGr8 && toGr8)) {
-    if (fromGr8 && toGr8)
+    if (templateForResampled)
+      tmp_ras = templateForResampled->create(outDim.lx, outDim.ly);
+    else if (fromGr8 && toGr8)
       tmp_ras = TRasterGR8P(outDim);
     else
       tmp_ras = TRaster32P(outDim);
@@ -709,7 +711,7 @@ CleanupPreprocessedImage *TCleanupper::process(
     flt_type = TRop::Hann2;
   TRop::resample(tmp_ras, image->getRaster(), aff, flt_type, blur);
 
-  if ((TRaster32P)tmp_ras)
+  if ((TRaster32P)tmp_ras && !templateForResampled)
     // Add white background to deal with semitransparent pixels
     TRop::addBackground(tmp_ras, TPixel32::White);
 

@@ -14,7 +14,8 @@ TFxAttributes::TFxAttributes()
     , m_speed()
     , m_groupSelector(-1)
     , m_passiveCacheDataIdx(-1)
-    , m_fxVersion(1) {}
+    , m_fxVersion(1)
+    , m_hasGlobalControl(false) {}
 
 //----------------------------------------------------------------------
 

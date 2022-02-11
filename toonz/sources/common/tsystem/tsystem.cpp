@@ -540,7 +540,7 @@ void TSystem::readDirectory(TFilePathSet &groupFpSet, TFilePathSet &allFpSet,
     // store all file paths
     fileSet_all.insert(son);
 
-    // in case of the sequencial files
+    // in case of the sequential files
     if (son.getDots() == "..") son = son.withFrame();
 
     // store the group. insersion avoids duplication of the item

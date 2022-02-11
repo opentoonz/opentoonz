@@ -442,8 +442,15 @@ bool IoCmd::exportLevel(const TFilePath &path, TXshSimpleLevel *sl,
               QString::fromStdString(m_sl->index2fid(i).expand()) + "." +
               QString::fromStdString(m_path.getType());
           fpout = TFilePath(pathOut.toStdString());
-        } else
-          fpout = TFilePath(m_path.withFrame(m_sl->index2fid(i)));
+        } else {
+          // change frame format for saving
+          TFrameId formattedFId(m_sl->index2fid(i));
+          formattedFId.setZeroPadding(
+              m_opts.m_formatTemplateFId.getZeroPadding());
+          formattedFId.setStartSeqInd(
+              m_opts.m_formatTemplateFId.getStartSeqInd());
+          fpout = TFilePath(m_path.withFrame(formattedFId));
+        }
 
         // Ask for overwrite permission in case a level with the built path
         // already exists

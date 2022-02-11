@@ -75,7 +75,7 @@ public:
     TToonzImageP image = m_level->getFrame(m_frameId, true);
     TRasterCM32P ras   = image->getRaster();
     RasterStrokeGenerator m_rasterTrack(ras, FINGER, INK, m_styleId,
-                                        m_points[0], m_invert, 0, false);
+                                        m_points[0], m_invert, 0, false, false);
     m_rasterTrack.setPointsSequence(m_points);
     m_rasterTrack.generateStroke(true);
     image->setSavebox(image->getSavebox() +
@@ -302,7 +302,7 @@ FingerTool fingerTool;
 
 //=============================================================================
 //
-//  InkPaintTool implemention
+//  InkPaintTool implementation
 //
 //-----------------------------------------------------------------------------
 
@@ -409,7 +409,7 @@ void FingerTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
       m_rasterTrack         = new RasterStrokeGenerator(
           ras, FINGER, INK, styleId,
           TThickPoint(pos + convert(ras->getCenter()), thickness),
-          m_invert.getValue(), 0, false);
+          m_invert.getValue(), 0, false, false);
 
       /*-- 作業中Fidを現在のFIDにする --*/
       m_workingFrameId = getFrameId();

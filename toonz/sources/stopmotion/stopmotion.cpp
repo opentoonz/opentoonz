@@ -44,9 +44,11 @@
 TEnv::IntVar StopMotionOpacity("StopMotionOpacity", 100);
 TEnv::IntVar StopMotionAlwaysLiveView("StopMotionAlwaysLiveView", 0);
 TEnv::IntVar StopMotionPlaceOnXSheet("StopMotionPlaceOnXSheet", 1);
-TEnv::IntVar StopMotionReviewTime("StopMotionReviewTime", 1);
+TEnv::IntVar StopMotionReviewDSec("StopMotionReviewDSec", 10);
+TEnv::IntVar StopMotionIntervalDSec("StopMotionIntervalDSec", 100);
 TEnv::IntVar StopMotionUseNumpad("StopMotionUseNumpad", 0);
 TEnv::IntVar StopMotionDrawBeneathLevels("StopMotionDrawBeneathLevels", 1);
+TEnv::IntVar StopMotionPlayCaptureSound("StopMotionPlayCaptureSound", 0);
 
 // Connected camera
 TEnv::StringVar StopMotionCameraName("CamCapCameraName", "");
@@ -213,9 +215,11 @@ StopMotion::StopMotion() {
   m_alwaysLiveView = StopMotionAlwaysLiveView;
 
   m_placeOnXSheet      = StopMotionPlaceOnXSheet;
-  m_reviewTime         = StopMotionReviewTime;
+  m_reviewTimeDSec     = StopMotionReviewDSec;
+  m_intervalDSec       = StopMotionIntervalDSec;
   m_useNumpadShortcuts = StopMotionUseNumpad;
   m_drawBeneathLevels  = StopMotionDrawBeneathLevels;
+  m_playCaptureSound   = StopMotionPlayCaptureSound;
   m_numpadForStyleSwitching =
       Preferences::instance()->isUseNumpadForSwitchingStylesEnabled();
   setUseNumpadShortcuts(m_useNumpadShortcuts);
@@ -226,6 +230,7 @@ StopMotion::StopMotion() {
   m_intervalTimer      = new QTimer(this);
   m_countdownTimer     = new QTimer(this);
   m_webcamOverlayTimer = new QTimer(this);
+  m_camSnapSound       = new QSound(":Resources/camera_snap.wav");
 
   // Make the interval timer single-shot. When the capture finished, restart
   // timer for next frame.
@@ -473,10 +478,10 @@ void StopMotion::setPlaceOnXSheet(bool on) {
 
 //-----------------------------------------------------------------
 
-void StopMotion::setReviewTime(int time) {
-  m_reviewTime         = time;
-  StopMotionReviewTime = time;
-  emit(reviewTimeChangedSignal(time));
+void StopMotion::setReviewTimeDSec(int timeDSec) {
+  m_reviewTimeDSec     = timeDSec;
+  StopMotionReviewDSec = timeDSec;
+  emit(reviewTimeChangedSignal(timeDSec));
 }
 
 //-----------------------------------------------------------------
@@ -575,8 +580,8 @@ void StopMotion::toggleInterval(bool on) {
 
 void StopMotion::startInterval() {
   if (m_liveViewStatus > 1) {
-    m_intervalTimer->start(m_intervalTime * 1000);
-    if (m_intervalTime != 0) m_countdownTimer->start(100);
+    m_intervalTimer->start(m_intervalDSec * 100);
+    if (m_intervalDSec != 0) m_countdownTimer->start(100);
     m_intervalStarted = true;
     emit(intervalStarted());
   } else {
@@ -597,8 +602,9 @@ void StopMotion::stopInterval() {
 
 //-----------------------------------------------------------------
 
-void StopMotion::setIntervalAmount(int value) {
-  m_intervalTime = value;
+void StopMotion::setIntervalDSec(int value) {
+  m_intervalDSec         = value;
+  StopMotionIntervalDSec = value;
   emit(intervalAmountChanged(value));
 }
 
@@ -619,10 +625,10 @@ void StopMotion::onIntervalCaptureTimerTimeout() {
 void StopMotion::restartInterval() {
   // restart interval timer for capturing next frame (it is single shot)
   if (m_isTimeLapse && m_intervalStarted) {
-    m_intervalTimer->start(m_intervalTime * 1000);
+    m_intervalTimer->start(m_intervalDSec * 100);
     // restart the count down as well (for aligning the timing. It is not
     // single shot)
-    if (m_intervalTime != 0) m_countdownTimer->start(100);
+    if (m_intervalDSec != 0) m_countdownTimer->start(100);
   }
 }
 
@@ -1182,8 +1188,8 @@ void StopMotion::previousName() {
 
   std::wstring levelName;
 
-  // if the current level name is non-sequencial, then try to switch the last
-  // sequencial level in the scene.
+  // if the current level name is non-sequential, then try to switch the last
+  // sequential level in the scene.
   if (!nameCreator->setCurrent(m_levelName.toStdWString())) {
     TLevelSet *levelSet =
         TApp::instance()->getCurrentScene()->getScene()->getLevelSet();
@@ -1259,6 +1265,14 @@ void StopMotion::getSubsampling() {
       emit(subsamplingChanged(-1));
   } else
     emit(subsamplingChanged(-1));
+}
+
+//-----------------------------------------------------------------------------
+
+void StopMotion::setPlayCaptureSound(bool on) {
+  m_playCaptureSound         = on;
+  StopMotionPlayCaptureSound = on;
+  emit(playCaptureSignal(on));
 }
 
 //-----------------------------------------------------------------------------
@@ -1661,9 +1675,9 @@ bool StopMotion::importImage() {
   // for now always save.  This can be tweaked later
   sl->save();
   m_sl = sl;
-  if (getReviewTime() > 0 && !m_isTimeLapse) {
+  if (getReviewTimeDSec() > 0 && !m_isTimeLapse) {
     m_liveViewStatus = LiveViewPaused;
-    m_reviewTimer->start(getReviewTime() * 1000);
+    m_reviewTimer->start(getReviewTimeDSec() * 100);
   }
 
   /* placement in xsheet */
@@ -1683,7 +1697,7 @@ bool StopMotion::importImage() {
     xsh->insertCells(row, col);
     xsh->setCell(row, col, TXshCell(sl, fid));
     app->getCurrentColumn()->setColumnIndex(col);
-    if (getReviewTime() == 0 || m_isTimeLapse)
+    if (getReviewTimeDSec() == 0 || m_isTimeLapse)
       app->getCurrentFrame()->setFrame(row + 1);
     m_xSheetFrameNumber = row + 2;
     emit(xSheetFrameNumberChanged(m_xSheetFrameNumber));
@@ -1732,7 +1746,7 @@ bool StopMotion::importImage() {
     xsh->insertCells(row, foundCol);
     xsh->setCell(row, foundCol, TXshCell(sl, fid));
     app->getCurrentColumn()->setColumnIndex(foundCol);
-    if (getReviewTime() == 0 || m_isTimeLapse)
+    if (getReviewTimeDSec() == 0 || m_isTimeLapse)
       app->getCurrentFrame()->setFrame(row + 1);
     m_xSheetFrameNumber = row + 2;
     emit(xSheetFrameNumberChanged(m_xSheetFrameNumber));
@@ -1746,7 +1760,7 @@ bool StopMotion::importImage() {
     }
     xsh->setCell(row, col, TXshCell(sl, fid));
     app->getCurrentColumn()->setColumnIndex(col);
-    if (getReviewTime() == 0 || m_isTimeLapse)
+    if (getReviewTimeDSec() == 0 || m_isTimeLapse)
       app->getCurrentFrame()->setFrame(row + 1);
     m_xSheetFrameNumber = row + 2;
     emit(xSheetFrameNumberChanged(m_xSheetFrameNumber));
@@ -1758,6 +1772,9 @@ bool StopMotion::importImage() {
 //-----------------------------------------------------------------
 
 void StopMotion::captureImage() {
+  if (m_playCaptureSound) {
+    m_camSnapSound->play();
+  }
   if (m_isTimeLapse && !m_intervalStarted) {
     startInterval();
     return;
@@ -1794,7 +1811,7 @@ void StopMotion::captureWebcamImage() {
     m_light->showOverlays();
     m_webcamOverlayTimer->start(500);
   } else {
-    if (getReviewTime() > 0 && !m_isTimeLapse) {
+    if (getReviewTimeDSec() > 0 && !m_isTimeLapse) {
       m_timer->stop();
       if (m_liveViewStatus > LiveViewClosed) {
         // m_liveViewStatus = LiveViewPaused;
@@ -1810,7 +1827,7 @@ void StopMotion::captureWebcamImage() {
 
 //-----------------------------------------------------------------------------
 void StopMotion::captureWebcamOnTimeout() {
-  if (getReviewTime() > 0 && !m_isTimeLapse) {
+  if (getReviewTimeDSec() > 0 && !m_isTimeLapse) {
     m_timer->stop();
     if (m_liveViewStatus > LiveViewClosed) {
       // m_liveViewStatus = LiveViewPaused;
@@ -1828,7 +1845,7 @@ void StopMotion::captureWebcamOnTimeout() {
 void StopMotion::captureDslrImage() {
   m_light->showOverlays();
 
-  if (getReviewTime() > 0 && !m_isTimeLapse) {
+  if (getReviewTimeDSec() > 0 && !m_isTimeLapse) {
     m_timer->stop();
   }
 
@@ -2210,11 +2227,9 @@ bool StopMotion::exportImageSequence() {
       return false;
     }
   }
-  QString message1 = tr("Successfully exported ");
-  QString message2 = tr(" images.");
-  QString finalMessage =
-      message1 + QString::number(exportFrameNumber - 1) + message2;
-  DVGui::MsgBoxInPopup(DVGui::MsgType(DVGui::INFORMATION), finalMessage);
+  QString msg = tr("Successfully exported %1 images.")
+                    .arg(QString::number(exportFrameNumber - 1));
+  DVGui::MsgBoxInPopup(DVGui::MsgType(DVGui::INFORMATION), msg);
   return true;
 }
 

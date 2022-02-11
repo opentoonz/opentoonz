@@ -1401,7 +1401,7 @@ toonz_plugin_info で検索し、なければ toonz_plugin_probe() を呼び出�
       if (problist) {
         if (!is_compatible<plugin_probe_list_t, 1, 0>(*problist))
           throw std::domain_error(
-              "invaid toonz_plugin_info_list: version unmatched");
+              "invalid toonz_plugin_info_list: version unmatched");
         probinfo_begin = problist->begin;
         probinfo_end   = problist->end;
       }
@@ -1498,7 +1498,7 @@ toonz_plugin_info で検索し、なければ toonz_plugin_probe() を呼び出�
               throw std::domain_error("not found _toonz_plugin_init");
             }
           } catch (const std::exception &e) {
-            printf("Exception occured after plugin loading: %s\n", e.what());
+            printf("Exception occurred after plugin loading: %s\n", e.what());
           }
 
           if (pi->handler_ && pi->handler_->setup) {
@@ -1517,7 +1517,7 @@ toonz_plugin_info で検索し、なければ toonz_plugin_probe() を呼び出�
         }
       }
     } catch (const std::exception &e) {
-      printf("Exception occured while plugin loading: %s\n", e.what());
+      printf("Exception occurred while plugin loading: %s\n", e.what());
       delete pi;
       pi = NULL;
     }
@@ -1560,7 +1560,7 @@ PluginLoadController::PluginLoadController(const std::string &basedir,
   connect(&work_entity, &QThread::finished, ld, &QObject::deleteLater);
   /* AddFxContextMenu から呼ばれていたが、プラグインの検索が load_entries()
      を通じて起動時に呼ばれるようにした関係で,
-     (あまりよくはないが)listner の有無によって receiver を分けるようにしている.
+     (あまりよくはないが)listener の有無によって receiver を分けるようにしている.
      listener がいる場合は従来通り context menu の構築のために
      AddFxContextMenu::fixup() に接続するが
      それ以外では plugin_dict_ への追加のため PluginLoadController::finished

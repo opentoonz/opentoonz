@@ -53,7 +53,7 @@ public:
 
   // client side
   // 'send' returns false if the tmessage is not active in the application
-  // (tipically, in console applications such as tcomposer)
+  // (typically, in console applications such as tcomposer)
   bool send(DVGui::MsgType type, const QString &message);
   void connectTo(const QString &address = "");
 

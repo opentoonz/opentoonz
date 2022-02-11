@@ -190,7 +190,7 @@ layout, a collection of
 must recall
                 endVLayout(), this add horizontal layout to first part of
 dialog.
-                This struct permit you to allign the object you insert.
+                This struct permit you to align the object you insert.
 \n	If you need vertical layout you can use an implemented vertical box
 layout composed
                 of two column, the function beginVLayout() initialize the
@@ -198,7 +198,7 @@ vertical box layout,
                 a collection of function permit to insert object in this layout.
                 All this functions insert a pair of object in two vertical
 layout and permit
-                to allign the objects, all pairs you insert are tabulated.
+                to align the objects, all pairs you insert are tabulated.
                 At the end you must recall endVLayout(), this add vertical
 layout to first part of
                 dialog.
@@ -679,7 +679,7 @@ void Dialog::addSeparator(QString name) {
 }
 
 //-----------------------------------------------------------------------------
-/*! Set the alignement of the main layout
+/*! Set the alignment of the main layout
  */
 void Dialog::setAlignment(Qt::Alignment alignment) {
   m_mainFrame->layout()->setAlignment(alignment);

@@ -236,6 +236,12 @@ inline TPixel32 quickOverPixPremult(const TPixel32 &bot, const TPixel32 &top) {
 
 //-----------------------------------------------------------------------------
 
+inline TPixel64 quickOverPixPremult(const TPixel64 &bot, const TPixel64 &top) {
+  return quickOverPixPremultT<TPixel64, USHORT>(bot, top);
+}
+
+//-----------------------------------------------------------------------------
+
 inline TPixel64 quickOverPix(const TPixel64 &bot, const TPixel64 &top) {
   return quickOverPixT<TPixel64, USHORT>(bot, top);
 }
@@ -294,7 +300,7 @@ inline TPixel32 overPixOnBlack(const TPixel32 &top) {
 //-----------------------------------------------------------------------------
 
 /*! this function combines two GR8 pixels returning the darker.
-*/
+ */
 
 inline TPixelGR8 over(const TPixelGR8 &bot, const TPixelGR8 &top) {
   return TPixelGR8(std::min(bot.value, top.value));
@@ -528,26 +534,30 @@ void sub(T &pixout, const T &pixin, double v) {
 template <class T>
 void mult(T &pixout, const T &pixin, double v) {
   double r, g, b, m;
-  r = pixin.r + v;
-  g = pixin.g + v;
-  b = pixin.b + v;
-  m = pixin.m + v;
-  pixout.r =
-      (r < 0) ? 0 : ((r < T::maxChannelValue)
-                         ? troundp(r * (pixout.r / (double)T::maxChannelValue))
-                         : pixout.r);
-  pixout.g =
-      (g < 0) ? 0 : ((g < T::maxChannelValue)
-                         ? troundp(g * (pixout.g / (double)T::maxChannelValue))
-                         : pixout.g);
-  pixout.b =
-      (b < 0) ? 0 : ((b < T::maxChannelValue)
-                         ? troundp(b * (pixout.b / (double)T::maxChannelValue))
-                         : pixout.b);
-  pixout.m =
-      (m < 0) ? 0 : ((m < T::maxChannelValue)
-                         ? troundp(m * (pixout.m / (double)T::maxChannelValue))
-                         : pixout.m);
+  r        = pixin.r + v;
+  g        = pixin.g + v;
+  b        = pixin.b + v;
+  m        = pixin.m + v;
+  pixout.r = (r < 0)
+                 ? 0
+                 : ((r < T::maxChannelValue)
+                        ? troundp(r * (pixout.r / (double)T::maxChannelValue))
+                        : pixout.r);
+  pixout.g = (g < 0)
+                 ? 0
+                 : ((g < T::maxChannelValue)
+                        ? troundp(g * (pixout.g / (double)T::maxChannelValue))
+                        : pixout.g);
+  pixout.b = (b < 0)
+                 ? 0
+                 : ((b < T::maxChannelValue)
+                        ? troundp(b * (pixout.b / (double)T::maxChannelValue))
+                        : pixout.b);
+  pixout.m = (m < 0)
+                 ? 0
+                 : ((m < T::maxChannelValue)
+                        ? troundp(m * (pixout.m / (double)T::maxChannelValue))
+                        : pixout.m);
 }
 
 //---------------------------------------------------------------------------------------

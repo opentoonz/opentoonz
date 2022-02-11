@@ -62,6 +62,8 @@ private:
   QLabel *m_aaValueLabel;
   DVGui::IntField *m_aaValue;
   QComboBox *m_lineProcessing;
+  QLabel *m_lpNoneFormatLabel;
+  QComboBox *m_lpNoneFormat;
   //----Cleanup Palette
   CleanupPaletteViewer *m_paletteViewer;
   //----Bottom Parts

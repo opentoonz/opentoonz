@@ -276,7 +276,8 @@ static void deleteAllUntitledScenes() {
 //=============================================================================
 // ToonzScene
 
-ToonzScene::ToonzScene() : m_contentHistory(0), m_isUntitled(true) {
+ToonzScene::ToonzScene()
+    : m_contentHistory(0), m_isUntitled(true), m_isLoading(false) {
   m_childStack = new ChildStack(this);
   m_properties = new TSceneProperties();
   m_levelSet   = new TLevelSet();
@@ -348,8 +349,15 @@ bool ToonzScene::isUntitled() const {
 //-----------------------------------------------------------------------------
 
 void ToonzScene::load(const TFilePath &path, bool withProgressDialog) {
-  loadNoResources(path);
-  loadResources(withProgressDialog);
+  setIsLoading(true);
+  try {
+    loadNoResources(path);
+    loadResources(withProgressDialog);
+  } catch (...) {
+    setIsLoading(false);
+    throw;
+  }
+  setIsLoading(false);
 }
 
 //-----------------------------------------------------------------------------
@@ -1365,20 +1373,19 @@ TFilePath ToonzScene::getDefaultLevelPath(int levelType,
   TProject *project = getProject();
   assert(project);
   TFilePath levelPath;
-  QString scanLevelType;
   switch (levelType) {
   case TZI_XSHLEVEL:
-    scanLevelType = Preferences::instance()->getScanLevelType();
-    levelPath     = TFilePath(levelName + L".." + scanLevelType.toStdWString());
-    break;
+  case OVL_XSHLEVEL: {
+    QString rasterLevelType = Preferences::instance()->getDefRasterFormat();
+    TFrameId tmplFId        = getProperties()->formatTemplateFIdForInput();
+    levelPath = TFilePath(levelName + L"." + rasterLevelType.toStdWString())
+                    .withFrame(tmplFId);
+  } break;
   case PLI_XSHLEVEL:
     levelPath = TFilePath(levelName).withType("pli");
     break;
   case TZP_XSHLEVEL:
     levelPath = TFilePath(levelName).withType("tlv");
-    break;
-  case OVL_XSHLEVEL:
-    levelPath = TFilePath(levelName + L"..tif");
     break;
   default:
     levelPath = TFilePath(levelName + L"..png");

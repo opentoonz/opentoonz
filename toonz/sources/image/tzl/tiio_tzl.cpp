@@ -25,8 +25,7 @@
 TNZ_LITTLE_ENDIAN undefined !!
 #endif
 
-    const int CURRENT_VERSION = 14;
-const int CREATOR_LENGTH      = 40;
+    const int CREATOR_LENGTH = 40;
 
 namespace {
 
@@ -40,6 +39,13 @@ char *reverse(char *buffer, int size) {
   }
   return buffer;
 }
+
+// switch the saving version according to the file path property
+int currentVersion() {
+  if (TFilePath::useStandard()) return 14;
+  return 15;
+}
+
 }  // namespace
 
 static int tfwrite(const char *data, const unsigned int count, FILE *f) {
@@ -138,6 +144,8 @@ bool readVersion(FILE *chan, int &version) {
     version = 13;
   } else if (memcmp(magic, "TLV14", 5) == 0) {
     version = 14;
+  } else if (memcmp(magic, "TLV15", 5) == 0) {
+    version = 15;
   } else {
     return false;
   }
@@ -162,7 +170,7 @@ bool readHeaderAndOffsets(FILE *chan, TzlOffsetMap &frameOffsTable,
   if (!readVersion(chan, version)) return false;
 
   // read creator
-  if (version == 14) {
+  if (version >= 14) {
     char buffer[CREATOR_LENGTH + 1];
     memset(buffer, 0, sizeof buffer);
     fread(&buffer, sizeof(char), CREATOR_LENGTH, chan);
@@ -201,9 +209,18 @@ bool readHeaderAndOffsets(FILE *chan, TzlOffsetMap &frameOffsTable,
     TFrameId oldFid(TFrameId::EMPTY_FRAME);
     for (int i = 0; i < (int)frameCount; i++) {
       TINT32 number, offs, length;
-      char letter;
+      QByteArray suffix;
       fread(&number, sizeof(TINT32), 1, chan);
-      fread(&letter, sizeof(char), 1, chan);
+      if (version >= 15) {
+        TINT32 suffixLength;
+        fread(&suffixLength, sizeof(TINT32), 1, chan);
+        suffix.resize(suffixLength);
+        fread(suffix.data(), sizeof(char), suffixLength, chan);
+      } else {
+        char letter;
+        fread(&letter, sizeof(char), 1, chan);
+        suffix = QByteArray(&letter, 1);
+      }
       fread(&offs, sizeof(TINT32), 1, chan);
       if (version >= 12) fread(&length, sizeof(TINT32), 1, chan);
 
@@ -215,7 +232,7 @@ bool readHeaderAndOffsets(FILE *chan, TzlOffsetMap &frameOffsTable,
       //		std::cout << "#" << i << std::hex << " n 0x" << number
       //<< " l 0x" << letter << " o 0x" << offs << std::dec << std::endl;
 
-      TFrameId fid(number, letter);
+      TFrameId fid(number, QString::fromUtf8(suffix));
       // assert(i==0 || oldFid<fid);
 
       if (version >= 12) {
@@ -241,9 +258,18 @@ bool readHeaderAndOffsets(FILE *chan, TzlOffsetMap &frameOffsTable,
 
       for (int i = 0; i < (int)frameCount; i++) {
         TINT32 number, thumbnailOffs, thumbnailLength;
-        char letter;
+        QByteArray suffix;
         fread(&number, sizeof(TINT32), 1, chan);
-        fread(&letter, sizeof(char), 1, chan);
+        if (version >= 15) {
+          TINT32 suffixLength;
+          fread(&suffixLength, sizeof(TINT32), 1, chan);
+          suffix.resize(suffixLength);
+          fread(suffix.data(), sizeof(char), suffixLength, chan);
+        } else {
+          char letter;
+          fread(&letter, sizeof(char), 1, chan);
+          suffix = QByteArray(&letter, 1);
+        }
         fread(&thumbnailOffs, sizeof(TINT32), 1, chan);
         fread(&thumbnailLength, sizeof(TINT32), 1, chan);
 
@@ -252,7 +278,7 @@ bool readHeaderAndOffsets(FILE *chan, TzlOffsetMap &frameOffsTable,
         thumbnailOffs   = swapTINT32(thumbnailOffs);
         thumbnailLength = swapTINT32(thumbnailLength);
 #endif
-        TFrameId fid(number, letter);
+        TFrameId fid(number, QString::fromUtf8(suffix));
         iconOffsTable[fid] = TzlChunk(thumbnailOffs, thumbnailLength);
       }
     }
@@ -460,7 +486,7 @@ void TLevelWriterTzl::buildFreeChunksTable() {
                   // dati relativi alle immagini
   if (m_version == 13)
     curPos = 6 * sizeof(TINT32) + 4 * sizeof(char) + 8 * sizeof(char);
-  else if (m_version == 14)
+  else if (m_version >= 14)
     curPos = 6 * sizeof(TINT32) + 4 * sizeof(char) + 8 * sizeof(char) +
              CREATOR_LENGTH * sizeof(char);
   else
@@ -495,7 +521,7 @@ TLevelWriterTzl::TLevelWriterTzl(const TFilePath &path, TPropertyGroup *info)
     , m_palette(0)
     , m_res(0, 0)
     , m_exists(false)
-    , m_version(CURRENT_VERSION)
+    , m_version(currentVersion())
     , m_updatedIconsSize(false)
     , m_currentIconSize(0, 0)
     , m_iconSize(TDimension(80, 60))
@@ -506,13 +532,14 @@ TLevelWriterTzl::TLevelWriterTzl(const TFilePath &path, TPropertyGroup *info)
   m_path        = path;
   m_palettePath = path.withNoFrame().withType("tpl");
   TFileStatus fs(path);
-  m_magic     = "TLV14B1a";  // actual version
+  m_magic     = (m_version == 14) ? "TLV14B1a" : "TLV15B1a";  // actual version
   erasedFrame = false;
   // version TLV10B1a: first version
   // version TLV11B1a: added frameIds
   // version TLV12B1a: incremental writings
   // version TLV13B1a: added thumbnails
-  // version TLV15B1a: add creator string (fixed size = CREATOR_LENGTH char)
+  // version TLV14B1a: add creator string (fixed size = CREATOR_LENGTH char)
+  // version TLV15B1a: support multiple suffixes
 
   if (fs.doesExist()) {
     // if (!fs.isWritable())
@@ -530,7 +557,7 @@ TLevelWriterTzl::TLevelWriterTzl(const TFilePath &path, TPropertyGroup *info)
       if (m_version >= 12) buildFreeChunksTable();
       m_headerWritten = true;
       m_exists        = true;
-      if (m_version == 14)
+      if (m_version >= 14)
         m_frameCountPos = 8 + CREATOR_LENGTH + 3 * sizeof(TINT32);
       else
         m_frameCountPos = 8 + 3 * sizeof(TINT32);
@@ -555,9 +582,9 @@ TLevelWriterTzl::TLevelWriterTzl(const TFilePath &path, TPropertyGroup *info)
 //-------------------------------------------------------------------
 
 TLevelWriterTzl::~TLevelWriterTzl() {
-  if (m_version < CURRENT_VERSION) {
+  if (m_version < currentVersion()) {
     if (!convertToLatestVersion()) return;
-    assert(m_version == CURRENT_VERSION);
+    assert(m_version == currentVersion());
   }
   delete m_codec;
 
@@ -573,13 +600,18 @@ TLevelWriterTzl::~TLevelWriterTzl() {
 
   TzlOffsetMap::iterator it = m_frameOffsTable.begin();
   for (; it != m_frameOffsTable.end(); ++it) {
-    TFrameId fid  = it->first;
-    TINT32 num    = fid.getNumber();
-    char letter   = fid.getLetter();
-    TINT32 offs   = it->second.m_offs;
-    TINT32 length = it->second.m_length;
+    TFrameId fid      = it->first;
+    TINT32 num        = fid.getNumber();
+    QByteArray suffix = fid.getLetter().toUtf8();
+    TINT32 offs       = it->second.m_offs;
+    TINT32 length     = it->second.m_length;
     tfwrite(&num, 1, m_chan);
-    tfwrite(&letter, 1, m_chan);
+    if (m_version >= 15) {  // write the suffix length before data
+      TINT32 suffixLength = suffix.size();
+      tfwrite(&suffixLength, 1, m_chan);
+      tfwrite(suffix.constData(), suffixLength, m_chan);
+    } else  // write only the first byte
+      tfwrite(suffix.constData(), 1, m_chan);
     tfwrite(&offs, 1, m_chan);
     tfwrite(&length, 1, m_chan);
   }
@@ -593,11 +625,16 @@ TLevelWriterTzl::~TLevelWriterTzl() {
   for (; iconIt != m_iconOffsTable.end(); ++iconIt) {
     TFrameId fid           = iconIt->first;
     TINT32 num             = fid.getNumber();
-    char letter            = fid.getLetter();
+    QByteArray suffix      = fid.getLetter().toUtf8();
     TINT32 thumbnailOffs   = iconIt->second.m_offs;
     TINT32 thumbnailLength = iconIt->second.m_length;
     tfwrite(&num, 1, m_chan);
-    tfwrite(&letter, 1, m_chan);
+    if (m_version >= 15) {  // write the suffix length before data
+      TINT32 suffixLength = suffix.size();
+      tfwrite(&suffixLength, 1, m_chan);
+      tfwrite(suffix.constData(), suffixLength, m_chan);
+    } else  // write only the first byte
+      tfwrite(suffix.constData(), 1, m_chan);
     tfwrite(&thumbnailOffs, 1, m_chan);
     tfwrite(&thumbnailLength, 1, m_chan);
   }
@@ -659,14 +696,14 @@ void TLevelWriterTzl::writeHeader(const TDimension &size) {
   assert(m_frameCountPos == 8 + CREATOR_LENGTH + 3 * sizeof(TINT32));
 
   // I put the place for the frameCount, which I will write in this position at
-  // the end  (see in the distructor)
+  // the end  (see in the destructor)
   tfwrite(&intval, 1, m_chan);
   // I put the place for the offsetTableOffset, which I will write in this
-  // position at the end  (see in the distructor)
+  // position at the end  (see in the destructor)
   intval = 0;
   tfwrite(&intval, 1, m_chan);
   // I put the place for the iconOffsetTableOffset, which I will write in this
-  // position at the end  (see in the distructor)
+  // position at the end  (see in the destructor)
   tfwrite(&intval, 1, m_chan);
   tfwrite(codec, codecLen, m_chan);
 }
@@ -774,7 +811,7 @@ bool TLevelWriterTzl::convertToLatestVersion() {
   if (!m_chan) return false;
   if (!writeVersionAndCreator(m_chan, m_magic, m_creator)) return false;
   m_creatorWritten = true;
-  m_version        = CURRENT_VERSION;
+  m_version        = currentVersion();
   TLevelReaderP lr(tempPath);
   if (!lr) return false;
   TLevelP level = lr->loadInfo();
@@ -798,13 +835,18 @@ bool TLevelWriterTzl::convertToLatestVersion() {
 
   TzlOffsetMap::iterator it2 = m_frameOffsTable.begin();
   for (; it2 != m_frameOffsTable.end(); ++it2) {
-    TFrameId fid  = it2->first;
-    TINT32 num    = fid.getNumber();
-    char letter   = fid.getLetter();
-    TINT32 offs   = it2->second.m_offs;
-    TINT32 length = it2->second.m_length;
+    TFrameId fid      = it2->first;
+    TINT32 num        = fid.getNumber();
+    QByteArray suffix = fid.getLetter().toUtf8();
+    TINT32 offs       = it2->second.m_offs;
+    TINT32 length     = it2->second.m_length;
     tfwrite(&num, 1, m_chan);
-    tfwrite(&letter, 1, m_chan);
+    if (m_version >= 15) {  // write the suffix length before data
+      TINT32 suffixLength = suffix.size();
+      tfwrite(&suffixLength, 1, m_chan);
+      tfwrite(suffix.constData(), suffixLength, m_chan);
+    } else  // write only the first byte
+      tfwrite(suffix.constData(), 1, m_chan);
     tfwrite(&offs, 1, m_chan);
     tfwrite(&length, 1, m_chan);
   }
@@ -816,11 +858,16 @@ bool TLevelWriterTzl::convertToLatestVersion() {
   for (; iconIt != m_iconOffsTable.end(); ++iconIt) {
     TFrameId fid           = iconIt->first;
     TINT32 num             = fid.getNumber();
-    char letter            = fid.getLetter();
+    QByteArray suffix      = fid.getLetter().toUtf8();
     TINT32 thumbnailOffs   = iconIt->second.m_offs;
     TINT32 thumbnailLength = iconIt->second.m_length;
     tfwrite(&num, 1, m_chan);
-    tfwrite(&letter, 1, m_chan);
+    if (m_version >= 15) {  // write the suffix length before data
+      TINT32 suffixLength = suffix.size();
+      tfwrite(&suffixLength, 1, m_chan);
+      tfwrite(suffix.constData(), suffixLength, m_chan);
+    } else  // write only the first byte
+      tfwrite(suffix.constData(), 1, m_chan);
     tfwrite(&thumbnailOffs, 1, m_chan);
     tfwrite(&thumbnailLength, 1, m_chan);
   }
@@ -856,7 +903,7 @@ bool TLevelWriterTzl::convertToLatestVersion() {
   m_headerWritten = true;
   m_exists        = true;
   m_frameCountPos = 8 + CREATOR_LENGTH + 3 * sizeof(TINT32);
-  assert(m_version == CURRENT_VERSION);
+  assert(m_version == currentVersion());
   if (!m_renumberTable.empty()) renumberFids(m_renumberTable);
   return true;
 }
@@ -867,9 +914,9 @@ void TLevelWriterTzl::saveImage(const TImageP &img, const TFrameId &_fid,
   if (!m_chan) return;
 
   // se il file è di una versione precedente allora lo converto prima
-  if (m_version < CURRENT_VERSION) {
+  if (m_version < currentVersion()) {
     if (!convertToLatestVersion()) return;
-    assert(m_version == CURRENT_VERSION);
+    assert(m_version == currentVersion());
   }
 
   if (!m_updatedIconsSize && m_exists)
@@ -1348,7 +1395,7 @@ float TLevelWriterTzl::getFreeSpace() {
     if (m_version == 13)
       totalSpace = m_offsetTablePos - 6 * sizeof(TINT32) - 4 * sizeof(char) -
                    8 * sizeof(char);
-    else if (m_version == 14)
+    else if (m_version >= 14)
       totalSpace = m_offsetTablePos - 6 * sizeof(TINT32) - 4 * sizeof(char) -
                    8 * sizeof(char) - CREATOR_LENGTH * sizeof(char);
     assert(totalSpace > 0);
@@ -2282,6 +2329,10 @@ TImageP TImageReaderTzl::load() {
       image = load13();
     break;
   case 14:
+    if (!m_lrp->m_frameOffsTable.empty() && !m_lrp->m_iconOffsTable.empty())
+      image = load14();
+    break;
+  case 15:  // same as v14
     if (!m_lrp->m_frameOffsTable.empty() && !m_lrp->m_iconOffsTable.empty())
       image = load14();
     break;

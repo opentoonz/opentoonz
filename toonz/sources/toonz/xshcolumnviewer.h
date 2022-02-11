@@ -27,6 +27,7 @@ class TXsheetHandle;
 class TStageObjectId;
 class TXshColumn;
 class QComboBox;
+class QPushButton;
 class Orientation;
 class TApp;
 class TXsheet;
@@ -89,6 +90,7 @@ public:
 
 protected:
   void mouseMoveEvent(QMouseEvent *event) override;
+  void wheelEvent(QWheelEvent *event) override;
   void focusOutEvent(QFocusEvent *e) override;
   void focusInEvent(QFocusEvent *e) override {}
   void selectCurrent(const QString &text);
@@ -214,8 +216,11 @@ class ColumnTransparencyPopup final : public QWidget {
 
   QComboBox *m_filterColorCombo;
 
+  XsheetViewer *m_viewer;
+  QPushButton *m_lockBtn;
+
 public:
-  ColumnTransparencyPopup(QWidget *parent);
+  ColumnTransparencyPopup(XsheetViewer *viewer, QWidget *parent);
   void setColumn(TXshColumn *column);
 
 protected:
@@ -229,6 +234,7 @@ protected slots:
   void onValueChanged(const QString &);
 
   void onFilterColorChanged(int id);
+  void onLockButtonClicked(bool on);
 };
 
 class SoundColumnPopup final : public QWidget {
@@ -381,12 +387,13 @@ protected slots:
   void openSoundColumnPopup();
   void openCameraColumnPopup(QPoint pos);
   void onCameraColumnChangedTriggered();
+  void onCameraColumnLockToggled(bool);
   void onXsheetCameraChange(int);
   void onSetMask(int);
 };
 
 //-----------------------------------------------------------------------------
-}  // namespace XsheetGUI;
+}  // namespace XsheetGUI
 //-----------------------------------------------------------------------------
 
 #endif  // XSHCOLUMNVIEWER_H

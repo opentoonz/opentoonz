@@ -1115,7 +1115,7 @@ ULONG TSystem::getFreeMemorySize() {
 #ifdef __sgi
   // check for virtual memory
   int numberOfResources =
-      swapctl(SC_GETNSWP, 0); /* get number of swapping resources configued */
+      swapctl(SC_GETNSWP, 0); /* get number of swapping resources configured */
 
   if (numberOfResources == 0) return 0;
 

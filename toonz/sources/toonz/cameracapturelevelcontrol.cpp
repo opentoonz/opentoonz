@@ -346,6 +346,7 @@ void CameraCaptureLevelControl::onFieldChanged() {
     m_histogram->setThreshold(m_thresholdFld->getValue());
 
   m_histogram->update();
+  computeLut();
 }
 
 //-----------------------------------------------------------------------------

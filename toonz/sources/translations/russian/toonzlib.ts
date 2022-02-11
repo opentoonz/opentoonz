@@ -184,7 +184,7 @@
         <translation>Adobe Photoshop</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/preferences.cpp" line="112"/>
+        <location filename="../../toonzlib/preferences.cpp" line="204"/>
         <source>PNG</source>
         <translation>PNG</translation>
     </message>

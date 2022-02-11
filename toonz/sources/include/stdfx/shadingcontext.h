@@ -55,7 +55,7 @@ public:
 
   /*!
 Resizes the output buffer to the specified size. Requires that
-the contex is made current before invocation. In case lx or ly are 0,
+the context is made current before invocation. In case lx or ly are 0,
 the context's output buffer is destroyed.
 */
   void resize(int lx, int ly, const QOpenGLFramebufferObjectFormat &fmt =

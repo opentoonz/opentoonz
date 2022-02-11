@@ -6,6 +6,7 @@
 #include <QDialog>
 #include <QTreeWidget>
 #include <QComboBox>
+#include <QKeySequenceEdit>
 #include "filebrowserpopup.h"
 #include "toonzqt/dvdialog.h"
 
@@ -22,7 +23,7 @@ class ShortcutItem;
 // Per cancellarlo bisogna chiamare removeShortcut()
 //-----------------------------------------------------------------------------
 
-class ShortcutViewer final : public QWidget {
+class ShortcutViewer final : public QKeySequenceEdit {
   Q_OBJECT
   QAction *m_action;
 
@@ -31,15 +32,13 @@ public:
   ~ShortcutViewer();
 
 protected:
-  void paintEvent(QPaintEvent *) override;
-  bool event(QEvent *event) override;
-  void keyPressEvent(QKeyEvent *event) override;
   void enterEvent(QEvent *event) override;
   void leaveEvent(QEvent *event) override;
-
+  void keyPressEvent(QKeyEvent *event) override;
 public slots:
   void setAction(QAction *action);
   void removeShortcut();
+  void onEditingFinished();
 
 signals:
   void shortcutChanged();
@@ -76,6 +75,8 @@ public slots:
   void onCurrentItemChanged(QTreeWidgetItem *current,
                             QTreeWidgetItem *previous);
   void onShortcutChanged();
+
+  void onItemClicked(const QModelIndex &);
 
 signals:
   void actionSelected(QAction *);
@@ -114,7 +115,7 @@ private:
   bool showConfirmDialog();
   bool showOverwriteDialog(QString name);
   void importPreset();
-  QStringList buildPresets();
+  void buildPresets();
   void showEvent(QShowEvent *se) override;
   void setCurrentPresetPref(QString preset);
   void getCurrentPresetPref();
@@ -122,7 +123,7 @@ private:
 protected slots:
   void clearAllShortcuts(bool warning = true);
   void onSearchTextChanged(const QString &text);
-  void onPresetChanged(int index);
+  void onPresetChanged();
   void onExportButton(TFilePath fp = TFilePath());
   void onDeletePreset();
   void onSavePreset();

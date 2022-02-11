@@ -9,9 +9,11 @@
 // TnzStdfx includes
 #include "stdfx.h"
 
+#include "globalcontrollablefx.h"
+
 //--------------------------------------------------------------------------
 
-class DespeckleFx final : public TStandardRasterFx {
+class DespeckleFx final : public GlobalControllableFx {
   FX_PLUGIN_DECLARATION(DespeckleFx)
 
   TRasterFxPort m_input;

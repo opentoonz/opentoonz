@@ -583,7 +583,7 @@ void Iwa_MotionBlurCompFx::composeBackgroundExposure_CPU(
       bgExposure.y *= (*bg_p).w;
       bgExposure.z *= (*bg_p).w;
 
-      /* Over composte with front layers */
+      /* Over composite with front layers */
       (*out_p).x = (*out_p).x + bgExposure.x * (1.0f - (*out_p).w);
       (*out_p).y = (*out_p).y + bgExposure.y * (1.0f - (*out_p).w);
       (*out_p).z = (*out_p).z + bgExposure.z * (1.0f - (*out_p).w);
@@ -870,7 +870,7 @@ bool Iwa_MotionBlurCompFx::doGetBBox(double frame, TRectD &bBox,
     return false;
   }
 
-  /* Rough implemetation - return infinite size if the background is connected
+  /* Rough implementation - return infinite size if the background is connected
    */
   if (m_background.isConnected()) {
     bool _ret = m_background->doGetBBox(frame, bBox, info);

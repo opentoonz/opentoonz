@@ -332,7 +332,7 @@ void TLevelWriterAvi::createBitmap(int lx, int ly) {
 TImageWriterP TLevelWriterAvi::getFrameWriter(TFrameId fid) {
   if (IOError != 0)
     throw TImageException(m_path, buildAVIExceptionString(IOError));
-  if (fid.getLetter() != 0) return TImageWriterP(0);
+  if (!fid.getLetter().isEmpty()) return TImageWriterP(0);
   int index            = fid.getNumber() - 1;
   TImageWriterAvi *iwa = new TImageWriterAvi(m_path, index, this);
   return TImageWriterP(iwa);
@@ -879,7 +879,7 @@ TLevelP TLevelReaderAvi::loadInfo() {
 TImageReaderP TLevelReaderAvi::getFrameReader(TFrameId fid) {
   if (IOError != 0)
     throw TImageException(m_path, buildAVIExceptionString(IOError));
-  if (fid.getLetter() != 0) return TImageReaderP(0);
+  if (!fid.getLetter().isEmpty()) return TImageReaderP(0);
   int index = fid.getNumber() - 1;
 
   TImageReaderAvi *ira = new TImageReaderAvi(m_path, index, this);

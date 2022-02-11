@@ -121,6 +121,8 @@ set(MOC_HEADERS
     xshtoolbar.h
 	xdtsimportpopup.h
 	expressionreferencemanager.h
+    tooloptionsshortcutinvoker.h
+    exportxsheetpdf.h
 )
 
 if(PLATFORM EQUAL 64)
@@ -192,6 +194,7 @@ set(HEADERS
     metnum.h
     processor.h
     predict3d.h
+    tvpjson_io.h
 )
 
 set(SOURCES
@@ -359,6 +362,9 @@ set(SOURCES
     xdtsio.cpp
 	xdtsimportpopup.cpp
 	expressionreferencemanager.cpp
+    tooloptionsshortcutinvoker.cpp
+    tvpjson_io.cpp
+    exportxsheetpdf.cpp
 # Tracker file
     dummyprocessor.cpp
     metnum.cpp
@@ -448,6 +454,10 @@ if (WITH_CANON)
     add_definitions(-DWITH_CANON)
 endif()
 
+if (WITH_WINTAB AND BUILD_TARGET_WIN AND (PLATFORM EQUAL 64))
+    add_definitions(-DWITH_WINTAB)
+endif()
+
 if(BUILD_ENV_APPLE)
     include_directories(../../sources/mousedragfilter)
     if(PLATFORM EQUAL 64)
@@ -535,7 +545,7 @@ if(BUILD_ENV_APPLE)
     message("CMAKE_RUNTIME_OUTPUT_DIRECTORY:" ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 endif()
 
-# copy utilty executables onto the directory after build
+# copy utility executables onto the directory after build
 if(LZODRIVER_FOUND)
     add_custom_command(TARGET OpenToonz POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:lzocompress> ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} DEPENDS lzocompress)
     add_custom_command(TARGET OpenToonz POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:lzodecompress> ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} DEPENDS lzodecompress)

@@ -24,8 +24,8 @@ extern "C" long sysconf(int);
 #endif
 #endif
 
-#define MAXSWNAMELENGHT 40
-#define MAXSWTIMELENGHT 12
+#define MAXSWNAMELENGTH 40
+#define MAXSWTIMELENGTH 12
 
 TStopWatch TStopWatch::StopWatch[10];
 

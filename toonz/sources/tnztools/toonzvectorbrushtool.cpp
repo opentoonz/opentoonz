@@ -794,7 +794,7 @@ void ToonzVectorBrushTool::leftButtonDrag(const TPointD &pos,
   invalidateRect += TRectD(m_brushPos - halfThick, m_brushPos + halfThick);
 
   if (!invalidateRect.isEmpty()) {
-    // for motion path, call the invalidate function directry to ignore dpi of
+    // for motion path, call the invalidate function directly to ignore dpi of
     // the current level
     if (m_isPath)
       m_viewer->GLInvalidateRect(invalidateRect.enlarge(2));

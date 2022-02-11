@@ -44,6 +44,7 @@
 #include <QMenu>
 #include <QApplication>
 #include <QGraphicsSceneContextMenuEvent>
+#include <QStack>
 
 TEnv::IntVar IconifyFxSchematicNodes("IconifyFxSchematicNodes", 0);
 
@@ -164,6 +165,18 @@ QList<TFxP> getRoots(const QList<TFxP> &fxs, TFxSet *terminals) {
 
 bool resizingNodes = false;
 bool updatingScene = false;
+
+bool nodePosDefined(const TFx *fx1, const TFx *fx2) {
+  bool isPosDefined[2] = {
+      fx1->getAttributes()->getDagNodePos() != TConst::nowhere,
+      fx2->getAttributes()->getDagNodePos() != TConst::nowhere};
+
+  if (isPosDefined[0] == isPosDefined[1])
+    return fx1->getIdentifier() < fx2->getIdentifier();
+  else
+    return isPosDefined[0];
+}
+
 }  // namespace
 
 //==================================================================
@@ -425,6 +438,7 @@ void FxSchematicScene::updateScene() {
   }
 
   // Add normalFx
+  QList<TFx *> fxsToBePlaced;
   for (i = 0; i < fxSet->getFxCount(); i++) {
     TFx *fx         = fxSet->getFx(i);
     TMacroFx *macro = dynamic_cast<TMacroFx *>(fx);
@@ -444,9 +458,17 @@ void FxSchematicScene::updateScene() {
       }
       continue;
     }
+    fxsToBePlaced.append(fx);
+  }
+
+  // sorting fxs so that fxs with specified positions are placed first
+  qSort(fxsToBePlaced.begin(), fxsToBePlaced.end(), nodePosDefined);
+
+  for (auto fx : fxsToBePlaced) {
     SchematicNode *node = addFxSchematicNode(fx);
     if (fx->getAttributes()->isGrouped())
       editedGroup[fx->getAttributes()->getEditingGroupId()].append(node);
+    TMacroFx *macro = dynamic_cast<TMacroFx *>(fx);
     // If adding an unedited macro and nodes are not yet set, let's position the
     // internal nodes now
     if (macro) {
@@ -638,6 +660,9 @@ FxSchematicNode *FxSchematicScene::createFxSchematicNode(TFx *fx) {
     return new FxSchematicXSheetNode(this, xfx);
   else if (TOutputFx *ofx = dynamic_cast<TOutputFx *>(fx))
     return new FxSchematicOutputNode(this, ofx);
+  else if (fx && fx->getFxType().find("nothingFx") !=
+                     std::string::npos)  // pass-through node
+    return new FxSchematicPassThroughNode(this, fx);
   else
     return new FxSchematicNormalFxNode(this, fx);
 }
@@ -763,7 +788,9 @@ void FxSchematicScene::placeNode(FxSchematicNode *node) {
             inputFx->getAttributes()->getDagNodePos() + TPointD(150, 0);
         pos = QPointF(dagPos.x, dagPos.y);
         nodeRect.moveTopLeft(pos);
-        while (!isAnEmptyZone(nodeRect)) nodeRect.translate(0, -step);
+
+        while (!isAnEmptyZone_withParentFx(nodeRect, inputFx))
+          nodeRect.translate(0, -step);
         pos = nodeRect.topLeft();
       } else {
         m_nodesToPlace[inputFx].append(node);
@@ -1832,35 +1859,54 @@ void FxSchematicScene::onEditGroup() {
 
 //------------------------------------------------------------------
 
-void FxSchematicScene::highlightLinks(FxSchematicNode *node, bool value) {
-  int i, portCount = node->getInputPortCount();
-  // SchematicLink* ghostLink = m_supportLinks.getDisconnectionLink(eGhost);
-  for (i = 0; i < portCount; i++) {
-    FxSchematicPort *port = node->getInputPort(i);
-    int j, linkCount = port->getLinkCount();
-    for (j = 0; j < linkCount; j++) {
-      SchematicLink *link = port->getLink(j);
-      if (!link) continue;
-      if (m_disconnectionLinks.isABridgeLink(link)) continue;
-      link->setHighlighted(value);
-      link->update();
-      m_highlightedLinks.push_back(link);
+void FxSchematicScene::highlightLinks(FxSchematicNode *node, bool value,
+                                      SearchDirection direction) {
+  int i;
+  if (direction == Both || direction == Input) {
+    int portCount = node->getInputPortCount();
+    // SchematicLink* ghostLink = m_supportLinks.getDisconnectionLink(eGhost);
+    for (i = 0; i < portCount; i++) {
+      FxSchematicPort *port = node->getInputPort(i);
+      int j, linkCount = port->getLinkCount();
+      for (j = 0; j < linkCount; j++) {
+        SchematicLink *link = port->getLink(j);
+        if (!link) continue;
+        if (m_disconnectionLinks.isABridgeLink(link)) continue;
+        link->setHighlighted(value);
+        link->update();
+        m_highlightedLinks.push_back(link);
+
+        if (FxSchematicPassThroughNode *ptNode =
+                dynamic_cast<FxSchematicPassThroughNode *>(
+                    link->getOtherNode(node)))
+          highlightLinks(ptNode, value, Input);
+      }
     }
   }
 
-  FxSchematicPort *port = node->getOutputPort();
-  if (port) {
-    int linkCount = port->getLinkCount();
-    for (i = 0; i < linkCount; i++) {
-      SchematicLink *link = port->getLink(i);
-      if (!link) continue;
-      if (m_disconnectionLinks.isABridgeLink(link)) continue;
-      link->setHighlighted(value);
-      link->update();
-      m_highlightedLinks.push_back(link);
+  if (direction == Both || direction == Output) {
+    FxSchematicPort *port = node->getOutputPort();
+    if (port) {
+      int linkCount = port->getLinkCount();
+      for (i = 0; i < linkCount; i++) {
+        SchematicLink *link = port->getLink(i);
+        if (!link) continue;
+        if (m_disconnectionLinks.isABridgeLink(link)) continue;
+        link->setHighlighted(value);
+        link->update();
+        m_highlightedLinks.push_back(link);
+
+        if (FxSchematicPassThroughNode *ptNode =
+                dynamic_cast<FxSchematicPassThroughNode *>(
+                    link->getOtherNode(node)))
+          highlightLinks(ptNode, value, Output);
+      }
     }
   }
-  port = node->getLinkPort();
+
+  if (direction != Both) return;
+
+  FxSchematicPort *port = node->getLinkPort();
   if (port) {
     SchematicLink *link = port->getLink(0);
     if (link && !m_disconnectionLinks.isABridgeLink(link)) {
@@ -2134,4 +2180,32 @@ void FxSchematicScene::updatePositionOnResize(TFx *fx, bool maximizedNode) {
 void FxSchematicScene::onNodeChangedSize() {
   if (resizingNodes) return;
   updateScene();
+}
+
+//------------------------------------------------------------------
+
+bool FxSchematicScene::isAnEmptyZone_withParentFx(const QRectF &rect,
+                                                  const TFx *parent) {
+  QList<QGraphicsItem *> allItems = items();
+  for (auto const level : allItems) {
+    SchematicNode *node = dynamic_cast<SchematicNode *>(level);
+    if (!node) continue;
+    FxSchematicNode *fxNode = dynamic_cast<FxSchematicNode *>(node);
+    if (fxNode && fxNode->isA(eXSheetFx)) continue;
+    // check only the fxs sharing the same parent
+    if (!fxNode) continue;
+    TFx *fx = fxNode->getFx();
+    if (TZeraryColumnFx *zfx = dynamic_cast<TZeraryColumnFx *>(fx))
+      fx = zfx->getZeraryFx();
+    if (!fx || fx == parent) continue;
+    for (int p = 0; p < fx->getInputPortCount(); p++) {
+      if (parent == fx->getInputPort(p)->getFx()) {
+        if (node->boundingRect().translated(node->scenePos()).intersects(rect))
+          return false;
+        else
+          break;
+      }
+    }
+  }
+  return true;
 }

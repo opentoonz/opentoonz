@@ -105,7 +105,7 @@ public:
   // lo scroll e' illimitato verso il basso. aggiorna contentHeight
   void scroll(int dy);
 
-  // overriden from TSelection::View
+  // overridden from TSelection::View
   void onSelectionChanged() override { update(); }
 
   enum SelectionMode {

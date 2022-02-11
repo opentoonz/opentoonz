@@ -23,7 +23,7 @@ class BluredBrush {
   QRadialGradient m_gradient;
   TThickPoint m_lastPoint;
   double m_oldOpacity;
-  bool m_enableDinamicOpacity;
+  bool m_enableDynamicOpacity;
 
   QSet<int> m_aboveStyleIds;
 
@@ -31,7 +31,7 @@ class BluredBrush {
 
 public:
   BluredBrush(const TRaster32P &ras, int size, const QRadialGradient &gradient,
-              bool doDinamicOpacity);
+              bool doDynamicOpacity);
   ~BluredBrush();
 
   void addPoint(const TThickPoint &p, double opacity);
@@ -40,7 +40,8 @@ public:
   TRect getBoundFromPoints(const std::vector<TThickPoint> &points) const;
   // colormapped
   void updateDrawing(const TRasterCM32P rasCM, const TRasterCM32P rasBackupCM,
-                     const TRect &bbox, int styleId, int drawOrderMode) const;
+                     const TRect &bbox, int styleId, int drawOrderMode,
+                     bool lockAlpha) const;
   void eraseDrawing(const TRasterCM32P rasCM, const TRasterCM32P rasBackupCM,
                     const TRect &bbox, bool selective, int selectedStyleId,
                     const std::wstring &mode) const;

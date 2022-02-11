@@ -478,7 +478,7 @@ void PinchTool::mouseMove(const TPointD &pos, const TMouseEvent &event) {
     // update information about current stroke
     updateStrokeStatus(stroke, w);
 
-    // retrieve the currect m_deformation and
+    // retrieve the current m_deformation and
     // prepare to design and modify
     if (m_deformation) m_deformation->check(status);
 

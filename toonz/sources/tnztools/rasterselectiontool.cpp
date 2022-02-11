@@ -246,7 +246,8 @@ DragSelectionTool::RasterDeformTool::RasterDeformTool(RasterSelectionTool *tool,
 
 //-----------------------------------------------------------------------------
 
-void DragSelectionTool::RasterDeformTool::applyTransform(FourPoints bbox) {
+void DragSelectionTool::RasterDeformTool::applyTransform(FourPoints bbox,
+                                                         bool onFastDragging) {
   RasterSelectionTool *tool = (RasterSelectionTool *)getTool();
   tool->setNewFreeDeformer();
   if (!m_deformUndo) m_deformUndo = new UndoRasterDeform(tool);
@@ -257,7 +258,8 @@ void DragSelectionTool::RasterDeformTool::applyTransform(FourPoints bbox) {
   RasterFreeDeformer *freeDeformer =
       (RasterFreeDeformer *)tool->getFreeDeformer();
   if (!freeDeformer) return;
-  freeDeformer->setNoAntialiasing(tool->getNoAntialiasingValue());
+  freeDeformer->setNoAntialiasing(tool->getNoAntialiasingValue() |
+                                  onFastDragging);
   freeDeformer->setPoints(realBbox.getP00(), realBbox.getP10(),
                           realBbox.getP11(), realBbox.getP01());
   freeDeformer->deformImage();
@@ -361,6 +363,14 @@ void DragSelectionTool::RasterFreeDeformTool::leftButtonDrag(
   m_freeDeform->leftButtonDrag(pos, e);
 }
 
+//-----------------------------------------------------------------------------
+
+void DragSelectionTool::RasterFreeDeformTool::leftButtonUp(
+    const TPointD &pos, const TMouseEvent &e) {
+  m_freeDeform->leftButtonUp();
+  RasterDeformTool::leftButtonUp(pos, e);
+}
+
 //=============================================================================
 // RasterMoveSelectionTool
 //-----------------------------------------------------------------------------
@@ -404,8 +414,8 @@ DragSelectionTool::RasterScaleTool::RasterScaleTool(RasterSelectionTool *tool,
 
 //-----------------------------------------------------------------------------
 
-TPointD DragSelectionTool::RasterScaleTool::transform(int index,
-                                                      TPointD newPos) {
+TPointD DragSelectionTool::RasterScaleTool::transform(int index, TPointD newPos,
+                                                      bool onFastDragging) {
   SelectionTool *tool = getTool();
   TPointD scaleValue  = tool->m_deformValues.m_scaleValue;
 
@@ -419,7 +429,7 @@ TPointD DragSelectionTool::RasterScaleTool::transform(int index,
   if (!m_scale->scaleInCenter())
     tool->setCenter(m_scale->getNewCenter(index, startBboxs[0], scaleValue));
 
-  applyTransform(bbox);
+  applyTransform(bbox, onFastDragging);
 
   tool->setBBox(bbox);
 
@@ -439,6 +449,14 @@ void DragSelectionTool::RasterScaleTool::leftButtonDown(const TPointD &pos,
 void DragSelectionTool::RasterScaleTool::leftButtonDrag(const TPointD &pos,
                                                         const TMouseEvent &e) {
   m_scale->leftButtonDrag(pos, e);
+}
+
+//-----------------------------------------------------------------------------
+
+void DragSelectionTool::RasterScaleTool::leftButtonUp(const TPointD &pos,
+                                                      const TMouseEvent &e) {
+  m_scale->leftButtonUp();
+  RasterDeformTool::leftButtonUp(pos, e);
 }
 
 TEnv::IntVar ModifySavebox("ModifySavebox", 0);
@@ -605,9 +623,13 @@ void RasterSelectionTool::leftButtonDrag(const TPointD &pos,
     invalidate();
     return;
   }
-  if (m_dragTool) {
-    if (!m_rasterSelection.isEditable()) return;
 
+  double pixelSize = getPixelSize();
+  if (m_dragTool) {
+    // Even in Windows version deformation is processed at interval of 20msec.
+    // (See SceneViewer::tabletEvent)
+    if (e.isHighFrequent()) return;
+    if (!m_rasterSelection.isEditable()) return;
     m_dragTool->leftButtonDrag(pos, e);
     invalidate();
     return;
@@ -646,7 +668,6 @@ void RasterSelectionTool::leftButtonDrag(const TPointD &pos,
     return;
   }
 
-  double pixelSize        = getPixelSize();
   TTool::Application *app = TTool::getApplication();
   if (!app || m_justSelected || !m_selecting ||
       tdistance2(pos, m_curPos) < 9.0 * pixelSize * pixelSize)

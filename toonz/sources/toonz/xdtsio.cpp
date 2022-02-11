@@ -32,10 +32,22 @@
 #include <QApplication>
 #include <QDesktopServices>
 #include <QUrl>
+#include <QComboBox>
+#include <QLabel>
 using namespace XdtsIo;
 namespace {
 static QByteArray identifierStr("exchangeDigitalTimeSheet Save Data");
+
+QIcon getColorChipIcon(TPixel32 color) {
+  QPixmap pm(15, 15);
+  pm.fill(QColor(color.r, color.g, color.b));
+  return QIcon(pm);
 }
+
+int _tick1Id          = -1;
+int _tick2Id          = -1;
+bool _exportAllColumn = true;
+}  // namespace
 //-----------------------------------------------------------------------------
 void XdtsHeader::read(const QJsonObject &json) {
   QRegExp rx("\\d{1,4}");
@@ -60,21 +72,31 @@ void XdtsHeader::write(QJsonObject &json) const {
 //-----------------------------------------------------------------------------
 
 TFrameId XdtsFrameDataItem::str2Fid(const QString &str) const {
+  if (str.isEmpty()) return TFrameId::EMPTY_FRAME;
   bool ok;
   int frame = str.toInt(&ok);
   if (ok) return TFrameId(frame);
-  // separate the last word as suffix
-  frame = str.left(str.size() - 1).toInt(&ok);
-  if (!ok) return TFrameId(-1);                              // EMPTY
-  if (!str[str.size() - 1].isLetter()) return TFrameId(-1);  // EMPTY
-  char c = str[str.size() - 1].toLatin1();
 
-  return TFrameId(frame, c);
+  QString regExpStr = QString("^%1$").arg(TFilePath::fidRegExpStr());
+  QRegExp rx(regExpStr);
+  int pos = rx.indexIn(str);
+  if (pos < 0) return TFrameId();
+  if (rx.cap(2).isEmpty())
+    return TFrameId(rx.cap(1).toInt());
+  else
+    return TFrameId(rx.cap(1).toInt(), rx.cap(2));
 }
 
 QString XdtsFrameDataItem::fid2Str(const TFrameId &fid) const {
-  if (fid.getLetter() == 0) return QString::number(fid.getNumber());
-  return QString::number(fid.getNumber()) + QString(fid.getLetter());
+  if (fid.getNumber() == -1)
+    return QString("SYMBOL_NULL_CELL");
+  else if (fid.getNumber() == SYMBOL_TICK_1)
+    return QString("SYMBOL_TICK_1");
+  else if (fid.getNumber() == SYMBOL_TICK_2)
+    return QString("SYMBOL_TICK_2");
+  else if (fid.getLetter().isEmpty())
+    return QString::number(fid.getNumber());
+  return QString::number(fid.getNumber()) + fid.getLetter();
 }
 
 void XdtsFrameDataItem::read(const QJsonObject &json) {
@@ -101,11 +123,13 @@ TFrameId XdtsFrameDataItem::getFrameId() const {
   if (val == "SYMBOL_NULL_CELL")
     return TFrameId(-1);  // EMPTY
                           // ignore sheet symbols for now
-  else if (val == "SYMBOL_HYPHEN" || val == "SYMBOL_TICK_1" ||
-           val == "SYMBOL_TICK_2")
+  else if (val == "SYMBOL_HYPHEN")
     return TFrameId(-2);  // IGNORE
-                          // return -1;
-                          // return cell number
+  else if (val == "SYMBOL_TICK_1")
+    return TFrameId(SYMBOL_TICK_1);
+  else if (val == "SYMBOL_TICK_2")
+    return TFrameId(SYMBOL_TICK_2);
+  // return cell number
   return str2Fid(m_values.at(0));
 }
 
@@ -169,7 +193,8 @@ static bool frameLessThan(const QPair<int, TFrameId> &v1,
   return v1.first < v2.first;
 }
 
-QVector<TFrameId> XdtsFieldTrackItem::getCellFrameIdTrack() const {
+QVector<TFrameId> XdtsFieldTrackItem::getCellFrameIdTrack(
+    QList<int> &tick1, QList<int> &tick2) const {
   QList<QPair<int, TFrameId>> frameFids;
   for (const XdtsTrackFrameItem &frame : m_frames)
     frameFids.append(frame.frameFid());
@@ -193,7 +218,15 @@ QVector<TFrameId> XdtsFieldTrackItem::getCellFrameIdTrack() const {
     TFrameId cellFid = frameFid.second;
     if (cellFid.getNumber() == -2)  // IGNORE case
       cells.append((cells.isEmpty()) ? TFrameId(-1) : cells.last());
-    else
+    else if (cellFid.getNumber() ==
+             XdtsFrameDataItem::SYMBOL_TICK_1) {  // SYMBOL_TICK_1
+      cells.append((cells.isEmpty()) ? TFrameId(-1) : cells.last());
+      tick1.append(currentFrame);
+    } else if (cellFid.getNumber() ==
+               XdtsFrameDataItem::SYMBOL_TICK_2) {  // SYMBOL_TICK_2
+      cells.append((cells.isEmpty()) ? TFrameId(-1) : cells.last());
+      tick2.append(currentFrame);
+    } else
       cells.append(cellFid);
     currentFrame++;
   }
@@ -217,8 +250,14 @@ QString XdtsFieldTrackItem::build(TXshCellColumn *column) {
     // handle as the empty cell
     if (!level || cell.m_level != level) cell = TXshCell();
     // continue if the cell is continuous
-    if (prevCell == cell) continue;
-
+    if (prevCell == cell) {
+      // cell mark to ticks
+      if (_tick1Id >= 0 && column->getCellMark(row) == _tick1Id)
+        addFrame(row, TFrameId(XdtsFrameDataItem::SYMBOL_TICK_1));
+      else if (_tick2Id >= 0 && column->getCellMark(row) == _tick2Id)
+        addFrame(row, TFrameId(XdtsFrameDataItem::SYMBOL_TICK_2));
+      continue;
+    }
     if (cell.isEmpty())
       addFrame(row, TFrameId(-1));
     else
@@ -266,29 +305,37 @@ QList<int> XdtsTimeTableFieldItem::getOccupiedColumns() const {
   return ret;
 }
 
-QVector<TFrameId> XdtsTimeTableFieldItem::getColumnTrack(int col) const {
+QVector<TFrameId> XdtsTimeTableFieldItem::getColumnTrack(
+    int col, QList<int> &tick1, QList<int> &tick2) const {
   for (const XdtsFieldTrackItem &track : m_tracks) {
     if (track.getTrackNo() != col) continue;
-    return track.getCellFrameIdTrack();
+    return track.getCellFrameIdTrack(tick1, tick2);
   }
   return QVector<TFrameId>();
 }
 
 void XdtsTimeTableFieldItem::build(TXsheet *xsheet, QStringList &columnLabels) {
-  m_fieldId = CELL;
+  m_fieldId     = CELL;
+  int exportCol = 0;
   for (int col = 0; col < xsheet->getFirstFreeColumnIndex(); col++) {
     if (xsheet->isColumnEmpty(col)) {
       columnLabels.append("");
+      exportCol++;
       continue;
     }
     TXshCellColumn *column = xsheet->getColumn(col)->getCellColumn();
+    // skip non-cell column
     if (!column) {
-      columnLabels.append("");
       continue;
     }
-    XdtsFieldTrackItem track(col);
+    // skip inactive column
+    if (!_exportAllColumn && !column->isPreviewVisible()) {
+      continue;
+    }
+    XdtsFieldTrackItem track(exportCol);
     columnLabels.append(track.build(column));
     if (!track.isEmpty()) m_tracks.append(track);
+    exportCol++;
   }
 }
 //-----------------------------------------------------------------------------
@@ -501,6 +548,11 @@ bool XdtsIo::loadXdtsScene(ToonzScene *scene, const TFilePath &scenePath) {
     return false;
   }
 
+  int tick1Id, tick2Id;
+  popup.getMarkerIds(tick1Id, tick2Id);
+
+  TFrameId tmplFId = scene->getProperties()->formatTemplateFIdForInput();
+
   TXsheet *xsh                       = scene->getXsheet();
   XdtsTimeTableFieldItem cellField   = xdtsData.timeTable().getCellField();
   XdtsTimeTableHeaderItem cellHeader = xdtsData.timeTable().getCellHeader();
@@ -508,24 +560,40 @@ bool XdtsIo::loadXdtsScene(ToonzScene *scene, const TFilePath &scenePath) {
   QStringList layerNames             = cellHeader.getLayerNames();
   QList<int> columns                 = cellField.getOccupiedColumns();
   for (int column : columns) {
-    QString levelName       = layerNames.at(column);
-    TXshLevel *level        = levels.value(levelName);
-    QVector<TFrameId> track = cellField.getColumnTrack(column);
+    QString levelName   = layerNames.at(column);
+    TXshLevel *level    = levels.value(levelName);
+    TXshSimpleLevel *sl = level->getSimpleLevel();
+    QList<int> tick1, tick2;
+    QVector<TFrameId> track = cellField.getColumnTrack(column, tick1, tick2);
 
     int row = 0;
     std::vector<TFrameId>::iterator it;
     for (TFrameId fid : track) {
       if (fid.getNumber() == -1)  // EMPTY cell case
         row++;
-      else
+      else {
+        // modify frameId to be with the same frame format as existing frames
+        if (sl) sl->formatFId(fid, tmplFId);
         xsh->setCell(row++, column, TXshCell(level, fid));
+      }
     }
     // if the last cell is not "SYMBOL_NULL_CELL", continue the cell
     // to the end of the sheet
     TFrameId lastFid = track.last();
     if (lastFid.getNumber() != -1) {
+      // modify frameId to be with the same frame format as existing frames
+      if (sl) sl->formatFId(lastFid, tmplFId);
       for (; row < duration; row++)
         xsh->setCell(row, column, TXshCell(level, TFrameId(lastFid)));
+    }
+
+    // set cell marks
+    TXshCellColumn *cellColumn = xsh->getColumn(column)->getCellColumn();
+    if (tick1Id >= 0) {
+      for (auto tick1f : tick1) cellColumn->setCellMark(tick1f, tick1Id);
+    }
+    if (tick2Id >= 0) {
+      for (auto tick2f : tick2) cellColumn->setCellMark(tick2f, tick2Id);
     }
 
     TStageObject *pegbar =
@@ -569,18 +637,80 @@ void ExportXDTSCommand::execute() {
   else
     duration = xsheet->getFrameCount();
 
-  XdtsData xdtsData;
-  xdtsData.build(xsheet, QString::fromStdString(fp.getName()), duration);
-  if (xdtsData.isEmpty()) {
-    DVGui::error(QObject::tr("No columns can be exported."));
-    return;
+  {
+    _tick1Id         = -1;
+    _tick2Id         = -1;
+    _exportAllColumn = true;
+    XdtsData pre_xdtsData;
+    pre_xdtsData.build(xsheet, QString::fromStdString(fp.getName()), duration);
+    if (pre_xdtsData.isEmpty()) {
+      DVGui::error(QObject::tr("No columns can be exported."));
+      return;
+    }
   }
 
   static GenericSaveFilePopup *savePopup = 0;
+  static QComboBox *tick1Id              = nullptr;
+  static QComboBox *tick2Id              = nullptr;
+  static QComboBox *targetColumnCombo    = nullptr;
+
+  auto refreshCellMarkComboItems = [](QComboBox *combo) {
+    int current = -1;
+    if (combo->count()) current = combo->currentData().toInt();
+
+    combo->clear();
+    QList<TSceneProperties::CellMark> marks = TApp::instance()
+                                                  ->getCurrentScene()
+                                                  ->getScene()
+                                                  ->getProperties()
+                                                  ->getCellMarks();
+    combo->addItem(tr("None"), -1);
+    int curId = 0;
+    for (auto mark : marks) {
+      QString label = QString("%1: %2").arg(curId).arg(mark.name);
+      combo->addItem(getColorChipIcon(mark.color), label, curId);
+      curId++;
+    }
+    if (current >= 0) combo->setCurrentIndex(combo->findData(current));
+  };
+
   if (!savePopup) {
+    // create custom widget
+    QWidget *custonWidget = new QWidget();
+    tick1Id               = new QComboBox();
+    tick2Id               = new QComboBox();
+    refreshCellMarkComboItems(tick1Id);
+    refreshCellMarkComboItems(tick2Id);
+    tick1Id->setCurrentIndex(tick1Id->findData(0));
+    tick2Id->setCurrentIndex(tick2Id->findData(1));
+    targetColumnCombo = new QComboBox();
+    targetColumnCombo->addItem(tr("All columns"), true);
+    targetColumnCombo->addItem(tr("Only active columns"), false);
+    targetColumnCombo->setCurrentIndex(targetColumnCombo->findData(true));
+
+    QGridLayout *customLay = new QGridLayout();
+    customLay->setMargin(0);
+    customLay->setSpacing(10);
+    {
+      customLay->addWidget(new QLabel(tr("Inbetween symbol mark")), 0, 0,
+                           Qt::AlignRight | Qt::AlignVCenter);
+      customLay->addWidget(tick1Id, 0, 1);
+      customLay->addWidget(new QLabel(tr("Reverse sheet symbol mark")), 1, 0,
+                           Qt::AlignRight | Qt::AlignVCenter);
+      customLay->addWidget(tick2Id, 1, 1);
+      customLay->addWidget(new QLabel(tr("Target column")), 2, 0,
+                           Qt::AlignRight | Qt::AlignVCenter);
+      customLay->addWidget(targetColumnCombo, 2, 1);
+    }
+    customLay->setColumnStretch(0, 1);
+    custonWidget->setLayout(customLay);
+
     savePopup = new GenericSaveFilePopup(
-        QObject::tr("Export Exchange Digital Time Sheet (XDTS)"));
+        QObject::tr("Export Exchange Digital Time Sheet (XDTS)"), custonWidget);
     savePopup->addFilterType("xdts");
+  } else {
+    refreshCellMarkComboItems(tick1Id);
+    refreshCellMarkComboItems(tick2Id);
   }
   if (!scene->isUntitled())
     savePopup->setFolder(fp.getParentDir());
@@ -595,6 +725,16 @@ void ExportXDTSCommand::execute() {
 
   if (!saveFile.open(QIODevice::WriteOnly)) {
     qWarning("Couldn't open save file.");
+    return;
+  }
+
+  _tick1Id         = tick1Id->currentData().toInt();
+  _tick2Id         = tick2Id->currentData().toInt();
+  _exportAllColumn = targetColumnCombo->currentData().toBool();
+  XdtsData xdtsData;
+  xdtsData.build(xsheet, QString::fromStdString(fp.getName()), duration);
+  if (xdtsData.isEmpty()) {
+    DVGui::error(QObject::tr("No columns can be exported."));
     return;
   }
 

@@ -100,7 +100,7 @@ TLevelWriterMp4::~TLevelWriterMp4() {
 TImageWriterP TLevelWriterMp4::getFrameWriter(TFrameId fid) {
   // if (IOError != 0)
   //	throw TImageException(m_path, buildMp4ExceptionString(IOError));
-  if (fid.getLetter() != 0) return TImageWriterP(0);
+  if (!fid.getLetter().isEmpty()) return TImageWriterP(0);
   int index            = fid.getNumber();
   TImageWriterMp4 *iwg = new TImageWriterMp4(m_path, index, this);
   return TImageWriterP(iwg);
@@ -203,7 +203,7 @@ TLevelP TLevelReaderMp4::loadInfo() {
 TImageReaderP TLevelReaderMp4::getFrameReader(TFrameId fid) {
   // if (IOError != 0)
   //	throw TImageException(m_path, buildAVIExceptionString(IOError));
-  if (fid.getLetter() != 0) return TImageReaderP(0);
+  if (!fid.getLetter().isEmpty()) return TImageReaderP(0);
   int index = fid.getNumber();
 
   TImageReaderMp4 *irm = new TImageReaderMp4(m_path, index, this, m_info);

@@ -62,7 +62,7 @@ private:
   class Swatch;
 
 private:
-  // GUI memebers
+  // GUI members
 
   DVGui::MeasuredDoubleField *m_edgesLength;  //!< Target length of mesh edges.
   DVGui::DoubleLineEdit

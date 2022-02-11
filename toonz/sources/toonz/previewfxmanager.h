@@ -31,7 +31,7 @@ rendering classes and Flipbooks.
 \n \n
 The showNewPreview() method invocation takes place when users activate the
 'Preview' command from the
-right-click menu of fxs in the schematic. It inizializes a TRenderer object and
+right-click menu of fxs in the schematic. It initializes a TRenderer object and
 starts the
 render of passed fx over the preview properties range; at the same time, a new
 Flipbook is opened to

@@ -15,34 +15,15 @@
 
 #include "tcommon.h"
 
-class DVAPI Ratio {
-  int m_num, m_denom;
-
-  void normalize();
-  Ratio normalized() const;
-
-public:
-  Ratio(int num, int denom);
-
-  friend Ratio operator+(const Ratio &a, const Ratio &b);
-  friend Ratio operator-(const Ratio &a, const Ratio &b);
-  friend Ratio operator*(const Ratio &a, const Ratio &b);
-  friend Ratio operator/(const Ratio &a, const Ratio &b);
-
-  friend int operator*(const Ratio &a, int b);
-
-  bool operator!() const { return m_num == 0; }
-};
-
 class DVAPI CellPositionRatio {
-  Ratio m_frame, m_layer;
+  double m_frameRatio, m_layerRatio;
 
 public:
-  CellPositionRatio(const Ratio &frame, const Ratio &layer)
-      : m_frame(frame), m_layer(layer) {}
+  CellPositionRatio(const double frameRatio, const double layerRatio)
+      : m_frameRatio(frameRatio), m_layerRatio(layerRatio) {}
 
-  Ratio frame() const { return m_frame; }
-  Ratio layer() const { return m_layer; }
+  double frame() const { return m_frameRatio; }
+  double layer() const { return m_layerRatio; }
 };
 
 #endif

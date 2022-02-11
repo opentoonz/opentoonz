@@ -53,7 +53,7 @@ class QTimer;
             available content space in that direction. They are \a empty by
   default,
             but can be filled in or styled with a style sheet.
-            In the latter case, they are given an object name dependant on the
+            In the latter case, they are given an object name dependent on the
             scroll orientation - in the form
   <TT>Scroll<Left/Right/Up/Down>Button</TT>.
 

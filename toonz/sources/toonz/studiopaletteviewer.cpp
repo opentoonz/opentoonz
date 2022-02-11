@@ -90,13 +90,13 @@ bool isInStudioPalette(TFilePath path) {
                 the three root folder of \b StudioPalette.
 */
 /*!	\fn void StudioPaletteTreeViewer::onStudioPaletteTreeChange()
-                Overriden from StudioPalette::Listener.
+                Overridden from StudioPalette::Listener.
                 \fn void StudioPaletteTreeViewer::onStudioPaletteMove(const
    TFilePath &dstPath, const TFilePath &srcPath)
-                Overriden from StudioPalette::Listener.
+                Overridden from StudioPalette::Listener.
                 \fn void StudioPaletteTreeViewer::onStudioPaletteChange(const
    TFilePath &palette)
-                Overriden from StudioPalette::Listener.
+                Overridden from StudioPalette::Listener.
 */
 StudioPaletteTreeViewer::StudioPaletteTreeViewer(
     QWidget *parent, TPaletteHandle *studioPaletteHandle,
@@ -198,7 +198,7 @@ QTreeWidgetItem *StudioPaletteTreeViewer::createRootItem(TFilePath path,
 }
 
 //-----------------------------------------------------------------------------
-/*! Return true if \b item is a root item; false otherwis.
+/*! Return true if \b item is a root item; false otherwise.
 */
 bool StudioPaletteTreeViewer::isRootItem(QTreeWidgetItem *item) {
   assert(item);

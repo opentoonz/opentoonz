@@ -97,7 +97,7 @@ Return a pointer to current xsheet.
 */
   TXsheet *getXsheet() const { return m_xsheet; }
 
-  // NON USARE. Serve solo per un truccaccio sporchissimo in
+  // DO NOT USE. It's just for a very dirty make up in
   // xshcolumnselection.cpp
   void setXsheet(TXsheet *xsheet) { m_xsheet = xsheet; }
 
@@ -110,7 +110,7 @@ Useful by edit in place. Oss.: \b row of current xsheet.
 
   /*!
 Set aff to ancestor affine in \b row. Return true if all ancestors are
-visibile in \b row.
+visible in \b row.
 */
   bool getAncestorAffine(TAffine &aff, int row) const;
 

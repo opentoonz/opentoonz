@@ -65,7 +65,7 @@ struct OutlinizationData {
   which includes its position, and eventual forward and backward derivative-like
   directions. Thickness data is included in the structure.
 
-  These informations are necessary and sufficient to build associated outline
+  This information is necessary and sufficient to build associated outline
   points,
   and eventual additional points related to caps.
 */
@@ -74,7 +74,7 @@ struct CenterlinePoint {
   double m_t;      //!< The quadratic parameter where this point can be found
 
   TThickPoint m_p;  //!< The point's thick coordinates
-  bool m_posBuilt;  //!< Wheteher m_p has been calculated
+  bool m_posBuilt;  //!< Whether m_p has been calculated
 
   TThickPoint m_prevD;  //!< The backward direction
   bool m_hasPrevD;      //!< If the point has (envelopable) backward direction

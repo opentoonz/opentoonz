@@ -173,6 +173,26 @@ E&apos; possibile che il file sia corrotto.</translation>
         <source>&lt;custom&gt;</source>
         <translation type="unfinished">&lt;custom&gt;</translation>
     </message>
+    <message>
+        <source>cm</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>mm</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>inch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>field</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>pixel</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ChannelHisto</name>
@@ -1633,6 +1653,14 @@ Seleziona i nodi Effetto ed i relativi collegamenti prima di copiare o tagliare 
     </message>
     <message>
         <source>Failed to save palette.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set Toolbar Below Styles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set Toolbar Above Styles</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

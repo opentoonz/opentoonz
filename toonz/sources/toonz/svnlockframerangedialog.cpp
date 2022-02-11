@@ -124,7 +124,7 @@ SVNLockFrameRangeDialog::SVNLockFrameRangeDialog(QWidget *parent,
 
   addButtonBarWidget(m_lockButton, m_cancelButton);
 
-  // 0. Connect for svn errors (that may occurs)
+  // 0. Connect for svn errors (that may occur)
   connect(&m_thread, SIGNAL(error(const QString &)), this,
           SLOT(onError(const QString &)));
 
@@ -458,7 +458,7 @@ SVNLockMultiFrameRangeDialog::SVNLockMultiFrameRangeDialog(
 
   addButtonBarWidget(m_lockButton, m_cancelButton);
 
-  // 0. Connect for svn errors (that may occurs)
+  // 0. Connect for svn errors (that may occur)
   connect(&m_thread, SIGNAL(error(const QString &)), this,
           SLOT(onError(const QString &)));
 
@@ -706,7 +706,7 @@ SVNUnlockFrameRangeDialog::SVNUnlockFrameRangeDialog(QWidget *parent,
 
   addButtonBarWidget(m_unlockButton, m_cancelButton);
 
-  // 0. Connect for svn errors (that may occurs)
+  // 0. Connect for svn errors (that may occur)
   connect(&m_thread, SIGNAL(error(const QString &)), this,
           SLOT(onError(const QString &)));
 }
@@ -942,7 +942,7 @@ SVNUnlockMultiFrameRangeDialog::SVNUnlockMultiFrameRangeDialog(
 
   addButtonBarWidget(m_unlockButton, m_cancelButton);
 
-  // 0. Connect for svn errors (that may occurs)
+  // 0. Connect for svn errors (that may occur)
   connect(&m_thread, SIGNAL(error(const QString &)), this,
           SLOT(onError(const QString &)));
 
@@ -1076,7 +1076,7 @@ SVNFrameRangeLockInfoDialog::SVNFrameRangeLockInfoDialog(
 
   addButtonBarWidget(closeButton);
 
-  // 0. Connect for svn errors (that may occurs)
+  // 0. Connect for svn errors (that may occur)
   connect(&m_thread, SIGNAL(error(const QString &)), this,
           SLOT(onError(const QString &)));
 
@@ -1174,7 +1174,7 @@ SVNMultiFrameRangeLockInfoDialog::SVNMultiFrameRangeLockInfoDialog(
 
   addButtonBarWidget(closeButton);
 
-  // 0. Connect for svn errors (that may occurs)
+  // 0. Connect for svn errors (that may occur)
   connect(&m_thread, SIGNAL(error(const QString &)), this,
           SLOT(onError(const QString &)));
 

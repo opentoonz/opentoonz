@@ -101,7 +101,7 @@ TLevelWriterWebm::~TLevelWriterWebm() {
 TImageWriterP TLevelWriterWebm::getFrameWriter(TFrameId fid) {
   // if (IOError != 0)
   //	throw TImageException(m_path, buildGifExceptionString(IOError));
-  if (fid.getLetter() != 0) return TImageWriterP(0);
+  if (!fid.getLetter().isEmpty()) return TImageWriterP(0);
   int index             = fid.getNumber();
   TImageWriterWebm *iwg = new TImageWriterWebm(m_path, index, this);
   return TImageWriterP(iwg);
@@ -204,7 +204,7 @@ TLevelP TLevelReaderWebm::loadInfo() {
 TImageReaderP TLevelReaderWebm::getFrameReader(TFrameId fid) {
   // if (IOError != 0)
   //	throw TImageException(m_path, buildAVIExceptionString(IOError));
-  if (fid.getLetter() != 0) return TImageReaderP(0);
+  if (!fid.getLetter().isEmpty()) return TImageReaderP(0);
   int index = fid.getNumber();
 
   TImageReaderWebm *irm = new TImageReaderWebm(m_path, index, this, m_info);

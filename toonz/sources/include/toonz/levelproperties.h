@@ -212,7 +212,7 @@ public:
 ie
           only \a fully white pixels will be replaced with transparent.
           This implicityl restrains its applicability to images <I>without
-          antialias</I>. This is therefore coupled with antialiasing settins.
+          antialias</I>. This is therefore coupled with antialiasing settings.
 \sa       The setDoAntialias() method.                                        */
 
   void setWhiteTransp(bool whiteTransp)  //!  Whether full white pixels should

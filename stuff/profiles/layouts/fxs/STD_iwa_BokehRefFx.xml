@@ -7,6 +7,10 @@
 		<control>distance_precision</control>
 		<control>fill_gap</control>
 		<control>fill_gap_with_median_filter</control>
-  	</vbox>
+  </vbox>
+	<visibleToggle>
+		<controller>fill_gap</controller>
+		<on>fill_gap_with_median_filter</on>
+	</visibleToggle>
 	</page>
 </fxlayout>

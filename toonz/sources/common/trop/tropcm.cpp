@@ -777,7 +777,7 @@ void expandAreaAndFillGaps(TRasterCM32P ras) {
         if (pix->getPaint() != TPixelCM32::getMaxPaint()) continue;
 
         int paint = TPixelCM32::getMaxPaint();
-        // check the neibor pixes and take the smallest styleId
+        // check the neighbor pixels and take the smallest styleId
         if (upPix != pix && upPix->getInk() != TPixelCM32::getMaxInk())
           paint = upPix->getPaint();
         if (dnPix != pix && dnPix->getInk() != TPixelCM32::getMaxInk())

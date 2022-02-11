@@ -931,7 +931,7 @@ void RasterSelection::notify() {
 
 //! Empty the selection.
 //! If the selection is floating, the floating image is pasted using the current
-//! tranformation.
+//! transformation.
 void RasterSelection::selectNone() {
   if (isFloating()) {
     pasteFloatingSelection();

@@ -193,7 +193,7 @@ void do_filtering(T *row1, T *row2, int length, double coeff, int brad,
   for (i = 0; i < length; i++) /* for the ith point the previous computing is
                                   used, with the values */
   {
-    /* stored in the auxiliar variables sigma1 and sigma2. */
+    /* stored in the auxiliary variables sigma1 and sigma2. */
     rsum = ((Mblur - i) * sigma1.r + sigma2.r) / coeff;
     gsum = ((Mblur - i) * sigma1.g + sigma2.g) / coeff;
     bsum = ((Mblur - i) * sigma1.b + sigma2.b) / coeff;
@@ -532,7 +532,7 @@ void DirectionalBlurBaseFx::doCompute(TTile &tile, double frame,
     m_input->getBBox(frame, bboxIn, ri);
     if (bboxIn == TConsts::infiniteRectD) bboxIn = rectTile;
     TPointD blur = (1.0 / shrink) * (aff * blurVector);
-    // enlarge must be bidirectional, because we need pixel on the ohter side of
+    // enlarge must be bidirectional, because we need pixel on the other side of
     // blur
     enlargeDir(bboxIn, blur, true);
     rectTile = bboxIn * rectTile.enlarge(fabs(blur.x), fabs(blur.y));

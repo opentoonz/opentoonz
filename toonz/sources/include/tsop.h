@@ -71,10 +71,10 @@ DVAPI void echo(TSoundTrackP &dst, const TSoundTrackP &src, double delayTime,
                 double decayFactor, double extendTime);
 
 /*!
-    Streches the soundtrack src with the specified feature and
+    Stretches the soundtrack src with the specified feature and
     returns the obtained soundtrack
   */
-DVAPI TSoundTrackP timeStrech(TSoundTrackP src, double ratio);
+DVAPI TSoundTrackP timeStretch(TSoundTrackP src, double ratio);
 
 /*!
     Do the mixing between the two soundtrack a1 and a2 must be inside [0.0,1.0]

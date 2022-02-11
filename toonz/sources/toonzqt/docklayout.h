@@ -97,8 +97,8 @@ public:
 
   void update();        // Re-applies partition found
   void redistribute();  // Calculates partition
-  void applyTransform(const QTransform &transform);  // Applies tranformation to
-                                                     // known parition - Da
+  void applyTransform(const QTransform &transform);  // Applies transformation to
+                                                     // known partition - Da
                                                      // rimuovere, non serve...
 
   DockWidget *getMaximized() { return m_maximizedDock; }
@@ -278,7 +278,7 @@ public:
   // Decorations allocator
   void setDecoAllocator(DockDecoAllocator *decoAllocator);
 
-  // reimpremented in FlipbookPanel
+  // reimplemented in FlipbookPanel
   virtual void onDock(bool docked) {}
 
 private:
@@ -382,7 +382,7 @@ private:
 //    Dock Placeholder
 //---------------------------
 
-//! A dock placeholder contains the necessary informations about a possible
+//! A dock placeholder contains the necessary information about a possible
 //! docking solution.
 
 /*!
@@ -405,11 +405,11 @@ class DockPlaceholder : public QWidget {
   friend class DockLayout;  // DockLayout is granted access to placeholders'
                             // privates
 
-  // Docking informations - private
+  // Docking information - private
   Region *m_region;
   int m_idx;
 
-  // Docking informations - public
+  // Docking information - public
   int m_attributes;
 
   // Owner
@@ -478,7 +478,7 @@ private:
   Every subRegion, if present, has opposite subdivision direction with
   respect to parent one. In addition, regions possess lists of separators
   and placeholders found along its subdivision direction.
-  Region informations are owned by the DockLayout who allocates it; however,
+  Region information is owned by the DockLayout who allocates it; however,
   they are read-only accessible by the user.
 
   \sa DockLayout, DockWidget, DockSeparator and DockPlaceholder classes.

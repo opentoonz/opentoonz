@@ -77,7 +77,7 @@ public:
 
   void refresh();
 
-  // overriden from TDoubleParamObserver
+  // overridden from TDoubleParamObserver
   void onChange(const TParamChange &) override { refresh(); }
 
   void setXsheetHandle(TXsheetHandle *xshHandle) { m_xshHandle = xshHandle; }
@@ -200,7 +200,7 @@ public:
   void refresh() override;
   void apply() override;
 
-  // return false if a circular reference is occured
+  // return false if a circular reference is occurred
   bool getGuiValues(std::string &expressionText, std::string &unitName);
 
   void init(int segmentLength) override;

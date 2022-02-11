@@ -4,6 +4,8 @@
 #include "tsound.h"
 
 #include <QProcess>
+#include <QEventLoop>
+#include <QTimer>
 #include <QDir>
 #include <QtGui/QImage>
 #include <QRegExp>
@@ -166,25 +168,21 @@ void Ffmpeg::runFfmpeg(QStringList preIArgs, QStringList postIArgs,
   // write the file
   QProcess ffmpeg;
   ffmpeg.start(m_ffmpegPath + "/ffmpeg", args);
-  if (ffmpeg.waitForFinished(m_ffmpegTimeout)) {
+  if (waitFfmpeg(ffmpeg)) {
     QString results = ffmpeg.readAllStandardError();
     results += ffmpeg.readAllStandardOutput();
     int exitCode = ffmpeg.exitCode();
-    ffmpeg.close();
     std::string strResults = results.toStdString();
-  } else {
-    DVGui::warning(
-        QObject::tr("FFmpeg timed out.\n"
-                    "Please check the file for errors.\n"
-                    "If the file doesn't play or is incomplete, \n"
-                    "Please try raising the FFmpeg timeout in Preferences."));
   }
+  ffmpeg.close();
 }
 
 QString Ffmpeg::runFfprobe(QStringList args) {
   QProcess ffmpeg;
   ffmpeg.start(m_ffmpegPath + "/ffprobe", args);
-  ffmpeg.waitForFinished(m_ffmpegTimeout);
+  if (!waitFfmpeg(ffmpeg)) {
+    throw TImageException(m_path, "error accessing ffprobe.");
+  }
   QString results = ffmpeg.readAllStandardError();
   results += ffmpeg.readAllStandardOutput();
   int exitCode = ffmpeg.exitCode();
@@ -194,6 +192,34 @@ QString Ffmpeg::runFfprobe(QStringList args) {
   if (exitCode > 0) throw TImageException(m_path, "error reading info.");
   std::string strResults = results.toStdString();
   return results;
+}
+
+bool Ffmpeg::waitFfmpeg(const QProcess &ffmpeg) {
+  QEventLoop eloop;
+  QTimer timer;
+  timer.connect(&timer, &QTimer::timeout, &eloop, [&eloop] { eloop.exit(-2); });
+  ffmpeg.connect(&ffmpeg, &QProcess::errorOccurred, &eloop,
+                 [&eloop] { eloop.exit(-1); });
+  ffmpeg.connect(&ffmpeg,
+                 static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(
+                     &QProcess::finished),
+                 &eloop, &QEventLoop::quit);
+  timer.start(m_ffmpegTimeout);
+
+  int exitCode = eloop.exec();
+  if (exitCode == 0) return true;
+  if (exitCode == -1) {
+    DVGui::warning(
+        QObject::tr("FFmpeg returned error-code: %1").arg(ffmpeg.exitCode()));
+  }
+  if (exitCode == -2) {
+    DVGui::warning(
+        QObject::tr("FFmpeg timed out.\n"
+                    "Please check the file for errors.\n"
+                    "If the file doesn't play or is incomplete, \n"
+                    "Please try raising the FFmpeg timeout in Preferences."));
+  }
+  return false;
 }
 
 void Ffmpeg::saveSoundTrack(TSoundTrack *st) {

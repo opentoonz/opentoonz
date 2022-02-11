@@ -9,7 +9,8 @@
 #include <QColor>
 
 namespace {
-void putOnRasterCM(const TRasterCM32P &out, const TRaster32P &in, int styleId) {
+void putOnRasterCM(const TRasterCM32P &out, const TRaster32P &in, int styleId,
+                   bool lockAlpha) {
   if (!out.getPointer() || !in.getPointer()) return;
   assert(out->getSize() == in->getSize());
   int x, y;
@@ -24,7 +25,13 @@ void putOnRasterCM(const TRasterCM32P &out, const TRaster32P &in, int styleId) {
       TPixel32 *inPix = &in->pixels(y)[x];
       if (inPix->m == 0) continue;
       TPixelCM32 *outPix = &out->pixels(y)[x];
-      bool sameStyleId   = styleId == outPix->getInk();
+      if (lockAlpha && !outPix->isPureInk() && outPix->getPaint() == 0 &&
+          outPix->getTone() == 255) {
+        *outPix =
+            TPixelCM32(outPix->getInk(), outPix->getPaint(), outPix->getTone());
+        continue;
+      }
+      bool sameStyleId = styleId == outPix->getInk();
       // line with the same style : multiply tones
       // line with different style : pick darker tone
       int tone = sameStyleId ? outPix->getTone() * (255 - inPix->m) / 255
@@ -196,7 +203,8 @@ void MyPaintToonzBrush::strokeTo(const TPointD &point, double pressure,
 
 void MyPaintToonzBrush::updateDrawing(const TRasterCM32P rasCM,
                                       const TRasterCM32P rasBackupCM,
-                                      const TRect &bbox, int styleId) const {
+                                      const TRect &bbox, int styleId,
+                                      bool lockAlpha) const {
   if (!rasCM) return;
 
   TRect rasRect    = rasCM->getBounds();
@@ -204,6 +212,6 @@ void MyPaintToonzBrush::updateDrawing(const TRasterCM32P rasCM,
   if (targetRect.isEmpty()) return;
 
   rasCM->copy(rasBackupCM->extract(targetRect), targetRect.getP00());
-  putOnRasterCM(rasCM->extract(targetRect), m_ras->extract(targetRect),
-                styleId);
+  putOnRasterCM(rasCM->extract(targetRect), m_ras->extract(targetRect), styleId,
+                lockAlpha);
 }

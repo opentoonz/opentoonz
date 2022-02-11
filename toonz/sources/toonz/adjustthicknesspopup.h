@@ -83,7 +83,7 @@ public:
 
   public:
     /*! \remark  Value STROKES restricts m_framesType to SELECTED_FRAMES, and
-     m_frameIdxs to a sigle element.                                    */
+     m_frameIdxs to a single element.                                   */
     ContentType m_contentType;  //!< Content type of the selection.
     FramesType m_framesType;    //!< Frames type of the selection.
 

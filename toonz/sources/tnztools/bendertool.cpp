@@ -480,9 +480,9 @@ void BenderTool::findCurves(TVectorImageP &vi) {
 
     TStroke *s = vi->getStroke(i);  // a useful reference
 
-    std::vector<DoublePair> pair_intersection;  // informations about extremes
+    std::vector<DoublePair> pair_intersection;  // information about extremes
 
-    // if there is interesection between stroke and bender tool
+    // if there is intersection between stroke and bender tool
 
     if (intersect(*s, m_benderSegment, pair_intersection)) {
       if (s->isSelfLoop()) {

@@ -15,6 +15,11 @@
 #include "convertpopup.h"
 #include "matchline.h"
 #include "colormodelbehaviorpopup.h"
+#if defined(x64)
+#include "penciltestpopup.h"  // FrameNumberLineEdit
+#else
+#include "penciltestpopup_qt.h"
+#endif
 
 // TnzQt includes
 #include "toonzqt/gutil.h"
@@ -449,8 +454,9 @@ TFilePath GenericLoadFilePopup::getPath() {
 //    GenericSaveFilePopup  implementation
 //***********************************************************************************
 
-GenericSaveFilePopup::GenericSaveFilePopup(const QString &title)
-    : FileBrowserPopup(title, Options(FOR_SAVING)) {
+GenericSaveFilePopup::GenericSaveFilePopup(const QString &title,
+                                           QWidget *customWidget)
+    : FileBrowserPopup(title, Options(FOR_SAVING), "", customWidget) {
   connect(m_nameField, SIGNAL(returnPressedNow()), m_okButton,
           SLOT(animateClick()));
 }
@@ -683,8 +689,8 @@ LoadLevelPopup::LoadLevelPopup()
   QPushButton *showSubsequenceButton = createShowButton(this);
   QLabel *subsequenceLabel = new QLabel(tr("Load Subsequence Level"), this);
   m_subsequenceFrame       = new QFrame(this);
-  m_fromFrame              = new DVGui::IntLineEdit(this, 1, 1);
-  m_toFrame                = new DVGui::IntLineEdit(this, 1, 1);
+  m_fromFrame              = new FrameNumberLineEdit(this, TFrameId(1));
+  m_toFrame                = new FrameNumberLineEdit(this, TFrameId(1));
 
   //----Arrangement in Xsheet
   m_arrLvlPropWidget                 = new QWidget(this);
@@ -692,8 +698,8 @@ LoadLevelPopup::LoadLevelPopup()
   QLabel *arrangementLabel =
       new QLabel(tr("Level Settings & Arrangement in Xsheet"), this);
   m_arrangementFrame = new QFrame(this);
-  m_xFrom            = new DVGui::IntLineEdit(this, 1, 1);
-  m_xTo              = new DVGui::IntLineEdit(this, 1, 1);
+  m_xFrom            = new FrameNumberLineEdit(this, TFrameId(1));
+  m_xTo              = new FrameNumberLineEdit(this, TFrameId(1));
   m_stepCombo        = new QComboBox(this);
   m_incCombo         = new QComboBox(this);
   m_posFrom          = new DVGui::IntLineEdit(this, 1, 1);
@@ -756,7 +762,7 @@ LoadLevelPopup::LoadLevelPopup()
   LevelOptions options;
   setLevelProperties(options);
 
-  //"FILE DOES NOT EXIST" lavel
+  //"FILE DOES NOT EXIST" label
   m_notExistLabel->setObjectName("FileDoesNotExistLabel");
   m_notExistLabel->hide();
 
@@ -944,12 +950,12 @@ void LoadLevelPopup::onNameSetEditted() {
     } else {
       m_notExistLabel->show();
 
-      m_fromFrame->setText("1");
-      m_toFrame->setText("1");
+      m_fromFrame->setValue(TFrameId(1));
+      m_toFrame->setValue(TFrameId(1));
       m_subsequenceFrame->setEnabled(true);
 
-      m_xFrom->setText("1");
-      m_xTo->setText("1");
+      m_xFrom->setValue(TFrameId(1));
+      m_xTo->setValue(TFrameId(1));
 
       m_levelName->setText(QString::fromStdString(path.getName()));
 
@@ -966,7 +972,7 @@ void LoadLevelPopup::onNameSetEditted() {
 //-----------------------------------------------------------------------
 
 void LoadLevelPopup::updatePosTo() {
-  // calcurate how mane frames to be occupied in the xsheet
+  // calculate how many frames to be occupied in the xsheet
   TFilePath fp = getCurrentPath();
 
   if (QString::fromStdString(fp.getType()) == "tpl") {
@@ -974,26 +980,39 @@ void LoadLevelPopup::updatePosTo() {
     return;
   }
 
-  int xFrom = m_xFrom->text().toInt();
-  int xTo   = m_xTo->text().toInt();
+  TFrameId xFrom = m_xFrom->getValue();
+  TFrameId xTo   = m_xTo->getValue();
 
   int frameLength;
 
   bool isScene = (QString::fromStdString(fp.getType()) == "tnz");
+
+  if (isScene) {  // scene does not consider frame suffixes
+    xFrom = TFrameId(xFrom.getNumber());
+    xTo   = TFrameId(xTo.getNumber());
+  }
+
+  auto frameLengthBetweenFIds = [&]() {
+    if (xFrom > xTo) return 0;
+    int ret = xTo.getNumber() - xFrom.getNumber() + 1;
+    if (!xTo.getLetter().isEmpty()) ret++;
+    return ret;
+  };
 
   //--- if loading the "missing" level
   if (m_notExistLabel->isVisible()) {
     int inc = m_incCombo->currentIndex();
     if (inc == 0)  // Inc = Auto
     {
-      frameLength = (xTo - xFrom + 1) * ((m_stepCombo->currentIndex() == 0)
-                                             ? 1
-                                             : m_stepCombo->currentIndex());
+      frameLength =
+          frameLengthBetweenFIds() * ((m_stepCombo->currentIndex() == 0)
+                                          ? 1
+                                          : m_stepCombo->currentIndex());
 
     } else  // Inc =! Auto
     {
       int loopAmount;
-      loopAmount  = tceil((double)(xTo - xFrom + 1) / (double)inc);
+      loopAmount  = tceil((double)(frameLengthBetweenFIds()) / (double)inc);
       frameLength = loopAmount * ((m_stepCombo->currentIndex() == 0)
                                       ? inc
                                       : m_stepCombo->currentIndex());
@@ -1004,40 +1023,31 @@ void LoadLevelPopup::updatePosTo() {
   else if (m_incCombo->currentIndex() == 0)  // Inc = Auto
   {
     if (isScene) {
-      frameLength = xTo - xFrom + 1;
+      frameLength = frameLengthBetweenFIds();
     } else {
       std::vector<TFrameId> fIds = getCurrentFIds();
-      //--- If loading the level with sequencial files, reuse the list of
+      //--- If loading the level with sequential files, reuse the list of
       // TFrameId
       if (fIds.size() != 0) {
         if (m_stepCombo->currentIndex() == 0)  // Step = Auto
         {
+          frameLength = 0;
           std::vector<TFrameId>::iterator it;
-          int firstFrame = 0;
-          int lastFrame  = 0;
           for (it = fIds.begin(); it != fIds.end(); it++) {
-            if (xFrom <= it->getNumber()) {
-              firstFrame = it->getNumber();
+            if (xFrom <= *it && *it <= xTo)
+              frameLength++;
+            else if (xTo < *it)
               break;
-            }
           }
-          for (it = fIds.begin(); it != fIds.end(); it++) {
-            if (it->getNumber() <= xTo) {
-              lastFrame = it->getNumber();
-            }
-          }
-          frameLength = lastFrame - firstFrame + 1;
         } else  // Step != Auto
         {
           std::vector<TFrameId>::iterator it;
           int loopAmount = 0;
           for (it = fIds.begin(); it != fIds.end(); it++) {
-            if (xFrom <= it->getNumber() && it->getNumber() <= xTo)
-              loopAmount++;
+            if (xFrom <= *it && *it <= xTo) loopAmount++;
           }
           frameLength = loopAmount * m_stepCombo->currentIndex();
         }
-
       }
       // loading another type of level such as tlv
       else {
@@ -1050,29 +1060,20 @@ void LoadLevelPopup::updatePosTo() {
 
           if (m_stepCombo->currentIndex() == 0)  // Step = Auto
           {
+            frameLength = 0;
             TLevel::Iterator it;
-            int firstFrame = 0;
-            int lastFrame  = 0;
             for (it = level->begin(); it != level->end(); it++) {
-              if (xFrom <= it->first.getNumber()) {
-                firstFrame = it->first.getNumber();
+              if (xFrom <= it->first && it->first <= xTo)
+                frameLength++;
+              else if (xTo < it->first)
                 break;
-              }
             }
-            for (it = level->begin(); it != level->end(); it++) {
-              if (it->first.getNumber() <= xTo) {
-                lastFrame = it->first.getNumber();
-              }
-            }
-            frameLength = lastFrame - firstFrame + 1;
           } else  // Step != Auto
           {
             TLevel::Iterator it;
             int loopAmount = 0;
             for (it = level->begin(); it != level->end(); it++) {
-              if (xFrom <= it->first.getNumber() &&
-                  it->first.getNumber() <= xTo)
-                loopAmount++;
+              if (xFrom <= it->first && it->first <= xTo) loopAmount++;
             }
             frameLength = loopAmount * m_stepCombo->currentIndex();
           }
@@ -1086,7 +1087,7 @@ void LoadLevelPopup::updatePosTo() {
   else {
     int inc = m_incCombo->currentIndex();
     int loopAmount;
-    loopAmount  = tceil((double)(xTo - xFrom + 1) / (double)inc);
+    loopAmount  = tceil((double)(frameLengthBetweenFIds()) / (double)inc);
     frameLength = loopAmount * ((m_stepCombo->currentIndex() == 0)
                                     ? inc
                                     : m_stepCombo->currentIndex());
@@ -1099,8 +1100,8 @@ void LoadLevelPopup::updatePosTo() {
 /*! if the from / to values in the subsequent box, update m_xFrom and m_xTo
  */
 void LoadLevelPopup::onSubsequentFrameChanged() {
-  m_xFrom->setText(m_fromFrame->text());
-  m_xTo->setText(m_toFrame->text());
+  m_xFrom->setValue(m_fromFrame->getValue());
+  m_xTo->setValue(m_toFrame->getValue());
   updatePosTo();
 }
 
@@ -1168,15 +1169,15 @@ bool LoadLevelPopup::execute() {
     //---- SubSequent load
     // if loading the "missing" level
     if (m_notExistLabel->isVisible()) {
-      int firstFrameNumber = m_fromFrame->text().toInt();
-      int lastFrameNumber  = m_toFrame->text().toInt();
-      setLoadingLevelRange(firstFrameNumber, lastFrameNumber);
+      TFrameId firstLoadingFId = m_fromFrame->getValue();
+      TFrameId lastLoadingFId  = m_toFrame->getValue();
+      setLoadingLevelRange(firstLoadingFId, lastLoadingFId);
     } else if (m_subsequenceFrame->isEnabled() &&
                m_subsequenceFrame->isVisible()) {
       std::vector<TFrameId> fIds = getCurrentFIds();
       TFrameId firstFrame;
       TFrameId lastFrame;
-      // if the level is sequencial and there is a reusable list of TFrameId
+      // if the level is sequential and there is a reusable list of TFrameId
       if (fIds.size() != 0) {
         firstFrame = fIds[0];
         lastFrame  = fIds[fIds.size() - 1];
@@ -1196,11 +1197,10 @@ bool LoadLevelPopup::execute() {
           return false;
         }
       }
-      int firstFrameNumber = m_fromFrame->text().toInt();
-      int lastFrameNumber  = m_toFrame->text().toInt();
-      if (firstFrame.getNumber() != firstFrameNumber ||
-          lastFrame.getNumber() != lastFrameNumber)
-        setLoadingLevelRange(firstFrameNumber, lastFrameNumber);
+      TFrameId firstLoadingFId = m_fromFrame->getValue();
+      TFrameId lastLoadingFId  = m_toFrame->getValue();
+      if (firstFrame != firstLoadingFId || lastFrame != lastLoadingFId)
+        setLoadingLevelRange(firstLoadingFId, lastLoadingFId);
     }
 
     IoCmd::LoadResourceArguments args(fp);
@@ -1213,20 +1213,27 @@ bool LoadLevelPopup::execute() {
       args.frameIdsSet.push_back(*getCurrentFIdsSet().begin());
 
     else if (m_notExistLabel->isVisible()) {
-      int firstFrameNumber = m_fromFrame->text().toInt();
-      int lastFrameNumber  = m_toFrame->text().toInt();
+      TFrameId firstLoadingFId = m_fromFrame->getValue();
+      TFrameId lastLoadingFId  = m_toFrame->getValue();
       // putting the Fids in order to avoid LoadInfo later
       std::vector<TFrameId> tmp_fids;
-      for (int i = firstFrameNumber; i <= lastFrameNumber; i++) {
+      int i = firstLoadingFId.getNumber();
+      if (!firstLoadingFId.getLetter().isEmpty()) {
+        tmp_fids.push_back(firstLoadingFId);
+        i++;
+      }
+      for (; i <= lastLoadingFId.getNumber(); i++) {
         tmp_fids.push_back(TFrameId(i));
       }
+      if (!lastLoadingFId.getLetter().isEmpty())
+        tmp_fids.push_back(lastLoadingFId);
       args.frameIdsSet.push_back(tmp_fids);
     }
 
-    int xFrom = m_xFrom->text().toInt();
-    if (xFrom) args.xFrom = xFrom;
-    int xTo = m_xTo->text().toInt();
-    if (xTo) args.xTo = xTo;
+    TFrameId xFrom = m_xFrom->getValue();
+    if (!xFrom.isEmptyFrame()) args.xFrom = xFrom;
+    TFrameId xTo = m_xTo->getValue();
+    if (!xTo.isEmptyFrame()) args.xTo = xTo;
 
     args.levelName             = m_levelName->text().toStdWString();
     args.step                  = m_stepCombo->currentIndex();
@@ -1348,9 +1355,8 @@ void LoadLevelPopup::updateBottomGUI() {
     disableAll();
     return;
   } else if (ext == "tpl") {
-    QString str;
-    m_fromFrame->setText(str.number(1));
-    m_toFrame->setText(str.number(1));
+    m_fromFrame->setText("1");
+    m_toFrame->setText("1");
     m_subsequenceFrame->setEnabled(false);
 
     m_xFrom->setText("1");
@@ -1396,13 +1402,12 @@ void LoadLevelPopup::updateBottomGUI() {
         return;
       }
     }
-
-    m_fromFrame->setText(QString().number(firstFrame.getNumber()));
-    m_toFrame->setText(QString().number(lastFrame.getNumber()));
+    m_fromFrame->setValue(firstFrame);
+    m_toFrame->setValue(lastFrame);
     m_subsequenceFrame->setEnabled(true);
 
-    m_xFrom->setText(m_fromFrame->text());
-    m_xTo->setText(m_toFrame->text());
+    m_xFrom->setValue(firstFrame);
+    m_xTo->setValue(lastFrame);
 
     // if some option in the preferences is selected, load the level with
     // removing
@@ -2089,7 +2094,7 @@ bool ReplaceParentDirectoryPopup::execute() {
       }
     }
   } else {
-    // calcurate scene length
+    // calculate scene length
     int frameLength           = xsh->getFrameCount();
     std::set<int>::iterator i = m_columnRange.begin();
     while (i != m_columnRange.end()) {

@@ -12,7 +12,7 @@ namespace perlin_noise {
 IGS_PERLIN_NOISE_EXPORT void change(
     unsigned char *image_array, const int height  // pixel
     ,
-    const int width  // pixel
+    const int width, const int wrap  // pixel
     ,
     const int channels, const int bits, const bool alpha_rendering_sw = true
 
@@ -28,8 +28,8 @@ IGS_PERLIN_NOISE_EXPORT void change(
     const int octaves_end = 9  // 0...
     ,
     const double persistence = 1. / 1.7320508  // not 0
-    );
+);
 }
-}
+}  // namespace igs
 
 #endif /* !igs_perlin_noise_h */

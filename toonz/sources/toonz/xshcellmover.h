@@ -33,6 +33,9 @@ class CellsMover {
 
   const Orientation *m_orientation;
 
+  // keeping the implicit cell arrangement when start shift + dragging
+  QList<QMap<int, TXshCell>> m_implicitCellInfo;
+
   // helper method
   TXsheet *getXsheet() const;
 
@@ -44,6 +47,8 @@ class CellsMover {
 
   // m_columnsData <- xsheet columns data
   void getColumnsData(int c0, int c1);
+
+  void getImplicitCellInfo();
 
 public:
   enum Qualifier {

@@ -1,13 +1,12 @@
 # ビルド手順（Windows）
 
-Visual Studio 2015 と Qt 5.9 でビルドできることを確認しています。
+Visual Studio 2019 (2015以降) と Qt 5.15 (5.9以降) でビルドできることを確認しています。
 
 ## 必要なソフトウェアの導入
 
-### Visual Studio Express 2015 for Windows Desktop
-- https://www.visualstudio.com/ja-jp/products/visual-studio-express-vs.aspx
-- Express 版はターゲットプラットフォームごとにバージョンが分かれています。 `for Windows` ではなく `for Windows Desktop` を使用します
-- Community 版や Professional 版などでも構いません
+### Visual Studio Community 2019
+- https://www.visualstudio.microsoft.com
+- C++ によるデスクトップ開発の環境をインストールします。
 
 ### CMake
 - https://cmake.org/download/
@@ -29,12 +28,22 @@ Visual Studio 2015 と Qt 5.9 でビルドできることを確認していま�
 ### Qt
 - https://www.qt.io/download-open-source/
 - クロスプラットフォームの GUI フレームワークです
-- 上記の URL から以下のファイルをダウンロードして Qt 5.9 (64 ビット版) を適当なフォルダにインストールします
+- 上記の URL から以下のファイルをダウンロードして Qt 5.15 (64 ビット版) を適当なフォルダにインストールします
   - [Qt Online Installer for Windows](http://download.qt.io/official_releases/online_installers/qt-unified-windows-x86-online.exe)
 
+#### WinTabサポート付きカスタマイズ版 Qt5.15.2
+- Qtは5.12以降Windows Ink APIをネイティブで使用しています。5.9まで使用されていたWinTab APIとはタブレットの挙動が異なり、それによる不具合が報告されています。
+- そこで、公式には6.0から導入されるWinTab APIへの切り替え機能をcherry-pickしたカスタマイズ版の5.15.2を頒布しています。
+- MSVC2019-x64向けのビルド済みパッケージは [こちら](https://github.com/shun-iwasawa/qt5/releases/tag/v5.15.2_wintab) から入手できます。さらにCMakeで`WITH_WINTAB`オプションを有効にすることで、WinTabAPIへの切り替えが可能になります。
+
+### OpenCV
+- v4.1.0 以降
+- https://opencv.org/
+- CMake上、または環境変数で`OpenCV_DIR` の値をOpenCVのインストールフォルダ内の`build`フォルダの場所に設定します。（例： `C:/opencv/build`）
+
 ### boost
-- http://www.boost.org/users/history/version_1_61_0.html
-- 上記の URL から boost_1_61_0.zip をダウンロードして解凍し、 boost_1_61_0 を `$opentoonz/thirdparty/boost` にコピーします
+- http://www.boost.org/users/history/version_1_73_0.html
+- 上記の URL から boost_1_73_0.zip をダウンロードして解凍し、 boost_1_61_0 を `$opentoonz/thirdparty/boost` にコピーします
 
 ## ビルド
 
@@ -45,7 +54,7 @@ Visual Studio 2015 と Qt 5.9 でビルドできることを確認していま�
   - 他の場所でも構いません
   - チェックアウトしたフォルダ内に作成する場合は、buildから開始するフォルダ名にするとgitから無視されます
   - ビルド先を変更した場合は、以下の説明を適宜読み替えてください
-4. Configure をクリックして、 Visual Studio 14 2015 Win64 を選択します
+4. Configure をクリックして、 Visual Studio 16 2019 Win64 を選択します
 5. Qt のインストール先がデフォルトではない場合、 `Specify QT_PATH properly` というエラーが表示されるので、 `QT_PATH` に Qt5 をインストールしたパスを指定します
 6. Generate をクリック
   - CMakeLists.txt に変更があった場合は、ビルド時に自動的に処理が走るので、以降は CMake を直接使用する必要はありません
@@ -61,16 +70,14 @@ Visual Studio 2015 と Qt 5.9 でビルドできることを確認していま�
 1. `$opentoonz/toonz/build/OpenToonz.sln` を開いて Release 構成を選択してビルドします
 2. `$opentoonz/toonz/build/Release` にファイルが生成されます
 
-## ストップモーション機能とキヤノン製デジタルカメラのサポートを有効にするには
+## キヤノン製デジタルカメラのサポートを有効にするには
 
-以下の３つのライブラリが追加で必要です。
-  - [OpenCV](https://opencv.org/) (v4.1.0以上)
-  - [libjpeg-turbo](https://www.libjpeg-turbo.org/)
+以下のライブラリが追加で必要です。
   - Canon EOS Digital SDK (EDSDK)：入手方法の詳細は[キヤノンマーケティングジャパン株式会社Webサイト](https://cweb.canon.jp/eos/info/api-package/)をご参照下さい。
 
-CMake上で、`WITH_STOPMOTION` オプションをONにします。CMake上、または環境変数で`OpenCV_DIR` の値をOpenCVのインストールフォルダ内の`build`フォルダの場所に設定します。（例： `C:/opencv/build`）
+CMake上で、`WITH_CANON` オプションをONにします。
 
-実行時にはOpenCV、libjpeg-turboならびにCanon EDSDKの.dllファイルを`OpenToonz.exe` と同じフォルダにコピーします。
+実行時にはCanon EDSDKの.dllファイルを`OpenToonz.exe` と同じフォルダにコピーします。
 
 ## 実行
 ### 実行可能ファイルなどの配置
@@ -80,6 +87,7 @@ CMake上で、`WITH_STOPMOTION` オプションをONにします。CMake上、�
 3. 下記のファイルを `OpenToonz.exe` と同じフォルダにコピーします
   - `$opentoonz/thirdparty/glut/3.7.6/lib/glut64.dll`
   - `$opentoonz/thirdparty/glew/glew-1.9.0/bin/64bit/glew32.dll`
+  - OpenCV、libjpeg-turboの.dllファイル
 4. バイナリ版の OpenToonz のインストール先にある `srv` フォルダを `OpenToonz.exe` と同じフォルダにコピーします
   - `srv` が無くても OpenToonz は動作しますが、 mov 形式などに対応できません
   - `srv` 内のファイルの生成方法は後述します
@@ -101,7 +109,7 @@ OpenToonz は QuickTime SDK を用いて mov 形式などへ対応していま�
 
 ### Qt
 - https://www.qt.io/download-open-source/
-- 64 ビット版と同じインストーラーで Qt 5.9 (32 ビット版) を適当なフォルダにインストールします
+- 64 ビット版と同じインストーラーで Qt 5.x (32 ビット版) を適当なフォルダにインストールします
 
 ### QuickTime SDK
 1. Apple の開発者登録をして下記のURLから `QuickTime 7.3 SDK for Windows.zip` をダウンロードします
@@ -111,7 +119,7 @@ OpenToonz は QuickTime SDK を用いて mov 形式などへ対応していま�
 ### CMake で Visual Studio の 32 ビット版のプロジェクトを生成する
 - 64 ビット版と同様の手順で、次のようにフォルダ名とターゲットを読み替えます
   - `$opentoonz/toonz/build` → `$opentoonz/toonz/build32`
-  - Visual Studio 14 2015 Win64 → Visual Studio 14 2015
+  - Visual Studio 16 2019 x64 → Visual Studio 16 2019 Win32
 - `QT_PATH` には 32 ビット版の Qt のパスを指定します
 
 ### 32 ビット版のビルド
@@ -122,10 +130,13 @@ OpenToonz は QuickTime SDK を用いて mov 形式などへ対応していま�
   - `$opentoonz/toonz/build32/Release` から
     - t32bitsrv.exe
     - image.dll
+    - tnzbase.dll
     - tnzcore.dll
+    - tnzext.dll
+    - toonzlib.dll
   - Qt の 32ビット版のインストール先から
-    - Qt5Core.dll
-    - Qt5Network.dll
+    - `windeployqt.exe`を実行して必要なライブラリを入手
+    - 追加で Qt5Gui.dll
   - `$opentoonz/thirdparty/glut/3.7.6/lib/glut32.dll`
 
 ## 翻訳ファイルの生成

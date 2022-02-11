@@ -5,10 +5,11 @@
 //#include "trop.h"
 #include <math.h>
 #include "tpixelutils.h"
+#include "globalcontrollablefx.h"
 
 //==================================================================
 
-class ChannelMixerFx final : public TStandardRasterFx {
+class ChannelMixerFx final : public GlobalControllableFx {
   FX_PLUGIN_DECLARATION(ChannelMixerFx)
 
   TRasterFxPort m_input;
@@ -109,7 +110,7 @@ void depremult(PIXEL *pix) {
   pix->g           = (CHANNEL_TYPE)(pix->g * depremult);
   pix->b           = (CHANNEL_TYPE)(pix->b * depremult);
 }
-}
+}  // namespace
 
 template <typename PIXEL, typename CHANNEL_TYPE>
 void doChannelMixer(TRasterPT<PIXEL> ras, double r_r, double r_g, double r_b,

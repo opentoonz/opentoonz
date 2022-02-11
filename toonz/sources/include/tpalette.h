@@ -74,7 +74,7 @@ Index \p 1
 current
     implementation</I>, copy and assignment are \a forbidden. This behavior is
 somewhat
-    inconsitent since a palette \b is currently \a clonable and \a assignable
+    inconsistent since a palette \b is currently \a clonable and \a assignable
 with the
     appropriate functions. Normalization to common C++ syntax should be enforced
 ASAP.
@@ -204,10 +204,10 @@ private:
 
   bool m_isLocked;          //!< Whether the palette is locked.
   bool m_askOverwriteFlag;  //!< This variable is quite unique. This flag is to
-                            //! acheive following beghavior:
+                            //! achieve following behavior:
   //! When saving the level with the palette being edited, ask whether the
   //! palette
-  //! should be overwitten ONLY ONCE AT THE FIRST TIME.
+  //! should be overwritten ONLY ONCE AT THE FIRST TIME.
   //! The confirmation dialog will not be opened unless the palette is edited
   //! again,
   //! even if the palette's dirtyflag is true.
@@ -333,7 +333,7 @@ between RGBA color components.
               bool isFromStudioPalette = false);  //!< Copies src's page, color
                                                   //! styles an animation table
   //! to the
-  //!  correspondig features of the palette.
+  //!  corresponding features of the palette.
   //!  if the palette is copied from studio palette, this function will modify
   //!  the original names.
   void merge(const TPalette *src,
@@ -362,7 +362,7 @@ between RGBA color components.
      //! palette.
   void setRefImg(const TImageP &img);  //!< Associates an image to this palette,
                                        //! that is an image in the frame
-  //!  builded or modified using this palette.
+  //!  built or modified using this palette.
 
   const TFilePath getRefImgPath() const {
     return m_refImgPath;

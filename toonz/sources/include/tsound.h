@@ -73,7 +73,7 @@ public:
 
 /*!
   The class TSoundTrack contains all features about a sound track
-  and gives all methods to access to these informations
+  and gives all methods to access to these information
 */
 class DVAPI TSoundTrack : public TSmartObject {
   DECLARE_CLASS_CODE
@@ -186,7 +186,7 @@ Blanks the soundtrack in the given range. Range is expressed in seconds.
   void blank(double t0, double t1);
 
   /*!
-Returns a new soundtrack obtained applying the given sound tranform
+Returns a new soundtrack obtained applying the given sound transform
 to the soundtrack
 */
   virtual TSoundTrackP apply(TSoundTransform *) = 0;

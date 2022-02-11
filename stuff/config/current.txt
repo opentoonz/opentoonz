@@ -187,6 +187,7 @@
   <item>"STD_colorRaylitFx.intensity"		"Intensity"	</item>
   <item>"STD_colorRaylitFx.decay"		"Decay"		</item>
   <item>"STD_colorRaylitFx.smoothness"		"Smoothness"	</item>
+  <item>"STD_colorRaylitFx.radius"		"Radius"		</item>
   <item>"STD_colorRaylitFx.includeInput"	"Keep Image"	</item>
 
   <item>"STD_erodeDilateFx"			"Erode/Dilate"	</item>
@@ -370,6 +371,7 @@
   <item>"STD_raylitFx.intensity"	"Intensity"	</item>
   <item>"STD_raylitFx.decay"		"Decay"		</item>
   <item>"STD_raylitFx.smoothness"	"Smoothness"	</item>
+  <item>"STD_raylitFx.radius"		"Radius"		</item>
   <item>"STD_raylitFx.includeInput"	"Keep Image"	</item>
   <item>"STD_raylitFx.invert"		"Invert"	</item>
 
@@ -528,6 +530,13 @@
   <item>"SHADER_spinblurGPU.center"		"Center"	</item>
   <item>"SHADER_spinblurGPU.radius"		"Safe Radius"	</item>
   <item>"SHADER_spinblurGPU.blur"		"Blur"	</item>
+
+  <item>"SHADER_HSLBlendGPU"			"GPU HSL Blend"    </item>
+  <item>"SHADER_HSLBlendGPU.bhue"			"Hue"    </item>
+  <item>"SHADER_HSLBlendGPU.bsat"			"Saturation"    </item>
+  <item>"SHADER_HSLBlendGPU.blum"			"Luminosity"    </item>
+  <item>"SHADER_HSLBlendGPU.balpha"			"Opacity"    </item>
+  <item>"SHADER_HSLBlendGPU.bmask"			"Clipping Mask"    </item>
 
 <!---------------------------------------------------------------------------------------->
 
@@ -838,67 +847,130 @@
   <item>"STD_inoColorBurnFx"	"Color Burn Ino"	</item>
   <item>"STD_inoColorBurnFx.opacity"	"Opacity"	</item>
   <item>"STD_inoColorBurnFx.clipping_mask"	"Clipping Mask"	</item>
+  <item>"STD_inoColorBurnFx.linear"	"Linear Color Space"	</item>
+  <item>"STD_inoColorBurnFx.gamma"	"Gamma"	</item>
+  <item>"STD_inoColorBurnFx.premultiplied"	"Source is Premultiplied"	</item>
   <item>"STD_inoColorDodgeFx"	"Color Dodge Ino"	</item>
   <item>"STD_inoColorDodgeFx.opacity"	"Opacity"	</item>
   <item>"STD_inoColorDodgeFx.clipping_mask"	"Clipping Mask"	</item>
+  <item>"STD_inoColorDodgeFx.linear"	"Linear Color Space"	</item>
+  <item>"STD_inoColorDodgeFx.gamma"	"Gamma"	</item>
+  <item>"STD_inoColorDodgeFx.premultiplied"	"Source is Premultiplied"	</item>
   <item>"STD_inoCrossDissolveFx"	"Cross Dissolve Ino"	</item>
   <item>"STD_inoCrossDissolveFx.opacity"	"Opacity"	</item>
   <item>"STD_inoCrossDissolveFx.clipping_mask"	"Clipping Mask"	</item>
+  <item>"STD_inoCrossDissolveFx.linear"	"Linear Color Space"	</item>
+  <item>"STD_inoCrossDissolveFx.gamma"	"Gamma"	</item>
+  <item>"STD_inoCrossDissolveFx.premultiplied"	"Source is Premultiplied"	</item>
   <item>"STD_inoDarkenFx"	"Darken Ino"	</item>
   <item>"STD_inoDarkenFx.opacity"	"Opacity"	</item>
   <item>"STD_inoDarkenFx.clipping_mask"	"Clipping Mask"	</item>
+  <item>"STD_inoDarkenFx.linear"	"Linear Color Space"	</item>
+  <item>"STD_inoDarkenFx.gamma"	"Gamma"	</item>
+  <item>"STD_inoDarkenFx.premultiplied"	"Source is Premultiplied"	</item>
   <item>"STD_inoDarkerColorFx"	"Darker Color Ino"	</item>
   <item>"STD_inoDarkerColorFx.opacity"	"Opacity"	</item>
   <item>"STD_inoDarkerColorFx.clipping_mask"	"Clipping Mask"	</item>
+  <item>"STD_inoDarkerColorFx.linear"	"Linear Color Space"	</item>
+  <item>"STD_inoDarkerColorFx.gamma"	"Gamma"	</item>
+  <item>"STD_inoDarkerColorFx.premultiplied"	"Source is Premultiplied"	</item>
   <item>"STD_inoDivideFx"	"Divide Ino"	</item>
   <item>"STD_inoDivideFx.opacity"	"Opacity"	</item>
   <item>"STD_inoDivideFx.clipping_mask"	"Clipping Mask"	</item>
+  <item>"STD_inoDivideFx.linear"	"Linear Color Space"	</item>
+  <item>"STD_inoDivideFx.gamma"	"Gamma"	</item>
+  <item>"STD_inoDivideFx.premultiplied"	"Source is Premultiplied"	</item>
   <item>"STD_inoHardLightFx"	"Hard Light Ino"	</item>
   <item>"STD_inoHardLightFx.opacity"	"Opacity"	</item>
   <item>"STD_inoHardLightFx.clipping_mask"	"Clipping Mask"	</item>
+  <item>"STD_inoHardLightFx.linear"	"Linear Color Space"	</item>
+  <item>"STD_inoHardLightFx.gamma"	"Gamma"	</item>
+  <item>"STD_inoHardLightFx.premultiplied"	"Source is Premultiplied"	</item>
   <item>"STD_inoHardMixFx"	"Hard Mix Ino"	</item>
   <item>"STD_inoHardMixFx.opacity"	"Opacity"	</item>
   <item>"STD_inoHardMixFx.clipping_mask"	"Clipping Mask"	</item>
+  <item>"STD_inoHardMixFx.linear"	"Linear Color Space"	</item>
+  <item>"STD_inoHardMixFx.gamma"	"Gamma"	</item>
+  <item>"STD_inoHardMixFx.premultiplied"	"Source is Premultiplied"	</item>
   <item>"STD_inoLightenFx"	"Lighten Ino"	</item>
   <item>"STD_inoLightenFx.opacity"	"Opacity"	</item>
   <item>"STD_inoLightenFx.clipping_mask"	"Clipping Mask"	</item>
+  <item>"STD_inoLightenFx.linear"	"Linear Color Space"	</item>
+  <item>"STD_inoLightenFx.gamma"	"Gamma"	</item>
+  <item>"STD_inoLightenFx.premultiplied"	"Source is Premultiplied"	</item>
   <item>"STD_inoLighterColorFx"	"Lighter Color Ino"	</item>
   <item>"STD_inoLighterColorFx.opacity"	"Opacity"	</item>
   <item>"STD_inoLighterColorFx.clipping_mask"	"Clipping Mask"	</item>
+  <item>"STD_inoLighterColorFx.linear"	"Linear Color Space"	</item>
+  <item>"STD_inoLighterColorFx.gamma"	"Gamma"	</item>
+  <item>"STD_inoLighterColorFx.premultiplied"	"Source is Premultiplied"	</item>
   <item>"STD_inoLinearBurnFx"	"Linear Burn Ino"	</item>
   <item>"STD_inoLinearBurnFx.opacity"	"Opacity"	</item>
   <item>"STD_inoLinearBurnFx.clipping_mask"	"Clipping Mask"	</item>
+  <item>"STD_inoLinearBurnFx.linear"	"Linear Color Space"	</item>
+  <item>"STD_inoLinearBurnFx.gamma"	"Gamma"	</item>
+  <item>"STD_inoLinearBurnFx.premultiplied"	"Source is Premultiplied"	</item>
   <item>"STD_inoLinearDodgeFx"	"Linear Dodge Ino"	</item>
   <item>"STD_inoLinearDodgeFx.opacity"	"Opacity"	</item>
   <item>"STD_inoLinearDodgeFx.clipping_mask"	"Clipping Mask"	</item>
+  <item>"STD_inoLinearDodgeFx.linear"	"Linear Color Space"	</item>
+  <item>"STD_inoLinearDodgeFx.gamma"	"Gamma"	</item>
+  <item>"STD_inoLinearDodgeFx.premultiplied"	"Source is Premultiplied"	</item>
   <item>"STD_inoLinearLightFx"	"Linear Light Ino"	</item>
   <item>"STD_inoLinearLightFx.opacity"	"Opacity"	</item>
   <item>"STD_inoLinearLightFx.clipping_mask"	"Clipping Mask"	</item>
+  <item>"STD_inoLinearLightFx.linear"	"Linear Color Space"	</item>
+  <item>"STD_inoLinearLightFx.gamma"	"Gamma"	</item>
+  <item>"STD_inoLinearLightFx.premultiplied"	"Source is Premultiplied"	</item>
   <item>"STD_inoMultiplyFx"	"Multiply Ino"	</item>
   <item>"STD_inoMultiplyFx.opacity"	"Opacity"	</item>
   <item>"STD_inoMultiplyFx.clipping_mask"	"Clipping Mask"	</item>
+  <item>"STD_inoMultiplyFx.linear"	"Linear Color Space"	</item>
+  <item>"STD_inoMultiplyFx.gamma"	"Gamma"	</item>
+  <item>"STD_inoMultiplyFx.premultiplied"	"Source is Premultiplied"	</item>
   <item>"STD_inoOverFx"	"Over Ino"	</item>
   <item>"STD_inoOverFx.opacity"	"Opacity"	</item>
   <item>"STD_inoOverFx.clipping_mask"	"Clipping Mask"	</item>
+  <item>"STD_inoOverFx.linear"	"Linear Color Space"	</item>
+  <item>"STD_inoOverFx.gamma"	"Gamma"	</item>
+  <item>"STD_inoOverFx.premultiplied"	"Source is Premultiplied"	</item>
   <item>"STD_inoOverlayFx"	"Overlay Ino"	</item>
   <item>"STD_inoOverlayFx.opacity"	"Opacity"	</item>
   <item>"STD_inoOverlayFx.clipping_mask"	"Clipping Mask"	</item>
+  <item>"STD_inoOverlayFx.linear"	"Linear Color Space"	</item>
+  <item>"STD_inoOverlayFx.gamma"	"Gamma"	</item>
+  <item>"STD_inoOverlayFx.premultiplied"	"Source is Premultiplied"	</item>
   <item>"STD_inoPinLightFx"	"Pin Light Ino"	</item>
   <item>"STD_inoPinLightFx.opacity"	"Opacity"	</item>
   <item>"STD_inoPinLightFx.clipping_mask"	"Clipping Mask"	</item>
+  <item>"STD_inoPinLightFx.linear"	"Linear Color Space"	</item>
+  <item>"STD_inoPinLightFx.gamma"	"Gamma"	</item>
+  <item>"STD_inoPinLightFx.premultiplied"	"Source is Premultiplied"	</item>
   <item>"STD_inoScreenFx"	"Screen Ino"	</item>
   <item>"STD_inoScreenFx.opacity"	"Opacity"	</item>
   <item>"STD_inoScreenFx.clipping_mask"	"Clipping Mask"	</item>
+  <item>"STD_inoScreenFx.linear"	"Linear Color Space"	</item>
+  <item>"STD_inoScreenFx.gamma"	"Gamma"	</item>
+  <item>"STD_inoScreenFx.premultiplied"	"Source is Premultiplied"	</item>
   <item>"STD_inoSoftLightFx"	"Soft Light Ino"	</item>
   <item>"STD_inoSoftLightFx.opacity"	"Opacity"	</item>
   <item>"STD_inoSoftLightFx.clipping_mask"	"Clipping Mask"	</item>
+  <item>"STD_inoSoftLightFx.linear"	"Linear Color Space"	</item>
+  <item>"STD_inoSoftLightFx.gamma"	"Gamma"	</item>
+  <item>"STD_inoSoftLightFx.premultiplied"	"Source is Premultiplied"	</item>
   <item>"STD_inoSubtractFx"	"Subtract Ino"	</item>
   <item>"STD_inoSubtractFx.opacity"	"Opacity"	</item>
   <item>"STD_inoSubtractFx.clipping_mask"	"Clipping Mask"	</item>
   <item>"STD_inoSubtractFx.alpha_rendering"	"Alpha Rendering"	</item>
+  <item>"STD_inoSubtractFx.linear"	"Linear Color Space"	</item>
+  <item>"STD_inoSubtractFx.gamma"	"Gamma"	</item>
+  <item>"STD_inoSubtractFx.premultiplied"	"Source is Premultiplied"	</item>
   <item>"STD_inoVividLightFx"	"Vivid Light Ino"	</item>
   <item>"STD_inoVividLightFx.opacity"	"Opacity"	</item>
   <item>"STD_inoVividLightFx.clipping_mask"	"Clipping Mask"	</item>
+  <item>"STD_inoVividLightFx.linear"	"Linear Color Space"	</item>
+  <item>"STD_inoVividLightFx.gamma"	"Gamma"	</item>
+  <item>"STD_inoVividLightFx.premultiplied"	"Source is Premultiplied"	</item>
   <item>"STD_inoBlurFx"	"Blur Ino"	</item>
   <item>"STD_inoBlurFx.radius"	"Radius"	</item>
   <item>"STD_inoBlurFx.reference"	"Reference"	</item>
@@ -1185,6 +1257,7 @@
   <item>"STD_iwa_PNPerspectiveFx.eyeLevel"		"Eye Level"</item>
   <item>"STD_iwa_PNPerspectiveFx.alpha_rendering"	"Alpha Rendering"</item>
   <item>"STD_iwa_PNPerspectiveFx.waveHeight"		"Wave Height"</item>
+  <item>"STD_iwa_PNPerspectiveFx.normalize_fresnel"		"Normalize Intensity"</item>
   
   <item>"STD_iwa_SoapBubbleFx"	"SoapBubble Iwa"	</item>
   <item>"STD_iwa_SoapBubbleFx.renderMode"	"Render Mode"	</item>
@@ -1218,21 +1291,16 @@
   <item>"STD_iwa_BokehFx.on_focus_distance"	"On-Focus Distance"</item>
   <item>"STD_iwa_BokehFx.bokeh_amount"	"Bokeh Amount"</item>
   <item>"STD_iwa_BokehFx.hardness"	"Hardness"</item>
-  <item>"STD_iwa_BokehFx.premultiply1"		"Layer1 Premultiply"</item>
-  <item>"STD_iwa_BokehFx.distance1"		"Layer1 Distance"</item>
-  <item>"STD_iwa_BokehFx.bokeh_adjustment1"	"Layer1 Bokeh Adjustment"</item>
-  <item>"STD_iwa_BokehFx.premultiply2"		"Layer2 Premultiply"</item>
-  <item>"STD_iwa_BokehFx.distance2"		"Layer2 Distance"</item>
-  <item>"STD_iwa_BokehFx.bokeh_adjustment2"	"Layer2 Bokeh Adjustment"</item>
-  <item>"STD_iwa_BokehFx.premultiply3"		"Layer3 Premultiply"</item>
-  <item>"STD_iwa_BokehFx.distance3"		"Layer3 Distance"</item>
-  <item>"STD_iwa_BokehFx.bokeh_adjustment3"	"Layer3 Bokeh Adjustment"</item>
-  <item>"STD_iwa_BokehFx.premultiply4"		"Layer4 Premultiply"</item>
-  <item>"STD_iwa_BokehFx.distance4"		"Layer4 Distance"</item>
-  <item>"STD_iwa_BokehFx.bokeh_adjustment4"	"Layer4 Bokeh Adjustment"</item>
-  <item>"STD_iwa_BokehFx.premultiply5"		"Layer5 Premultiply"</item>
-  <item>"STD_iwa_BokehFx.distance5"		"Layer5 Distance"</item>
-  <item>"STD_iwa_BokehFx.bokeh_adjustment5"	"Layer5 Bokeh Adjustment"</item>
+  <item>"STD_iwa_BokehFx.distance1"		"Source1 Distance"</item>
+  <item>"STD_iwa_BokehFx.bokeh_adjustment1"	"Source1 Bokeh Adjustment"</item>
+  <item>"STD_iwa_BokehFx.distance2"		"Source2 Distance"</item>
+  <item>"STD_iwa_BokehFx.bokeh_adjustment2"	"Source2 Bokeh Adjustment"</item>
+  <item>"STD_iwa_BokehFx.distance3"		"Source3 Distance"</item>
+  <item>"STD_iwa_BokehFx.bokeh_adjustment3"	"Source3 Bokeh Adjustment"</item>
+  <item>"STD_iwa_BokehFx.distance4"		"Source4 Distance"</item>
+  <item>"STD_iwa_BokehFx.bokeh_adjustment4"	"Source4 Bokeh Adjustment"</item>
+  <item>"STD_iwa_BokehFx.distance5"		"Source5 Distance"</item>
+  <item>"STD_iwa_BokehFx.bokeh_adjustment5"	"Source5 Bokeh Adjustment"</item>
   
   <item>"STD_iwa_BokehRefFx"	"Bokeh Ref Iwa"</item>
   <item>"STD_iwa_BokehRefFx.on_focus_distance"	"On-Focus Distance"</item>
@@ -1241,6 +1309,42 @@
   <item>"STD_iwa_BokehRefFx.distance_precision"	"Distance Precision"</item>
   <item>"STD_iwa_BokehRefFx.fill_gap"	"Fill Gap"</item>
   <item>"STD_iwa_BokehRefFx.fill_gap_with_median_filter"	"Use Median Filter"</item>
+
+  <item>"STD_iwa_BokehAdvancedFx"			"Bokeh Advanced Iwa"</item>
+  <item>"STD_iwa_BokehAdvancedFx.on_focus_distance"	"On-Focus Distance"</item>
+  <item>"STD_iwa_BokehAdvancedFx.bokeh_amount"		"Bokeh Amount"</item>
+  <item>"STD_iwa_BokehAdvancedFx.masterHardness"	"Master Hardness"</item>
+  <item>"STD_iwa_BokehAdvancedFx.hardnessPerSource"	"Hardness per Source"</item>
+
+  <item>"STD_iwa_BokehAdvancedFx.distance1"		"Source1 Distance"</item>
+  <item>"STD_iwa_BokehAdvancedFx.bokeh_adjustment1"	"Source1 Bokeh Adjustment"</item>
+  <item>"STD_iwa_BokehAdvancedFx.hardness1"		"Source1 Hardness"</item>
+  <item>"STD_iwa_BokehAdvancedFx.depth_ref1"		"Depth Image"</item>
+  <item>"STD_iwa_BokehAdvancedFx.depthRange1"	"Source1 Depth Range"</item>
+
+  <item>"STD_iwa_BokehAdvancedFx.distance2"		"Source2 Distance"</item>
+  <item>"STD_iwa_BokehAdvancedFx.bokeh_adjustment2"	"Source2 Bokeh Adjustment"</item>
+  <item>"STD_iwa_BokehAdvancedFx.hardness2"		"Source2 Hardness"</item>
+  <item>"STD_iwa_BokehAdvancedFx.depth_ref2"		"Depth Image"</item>
+  <item>"STD_iwa_BokehAdvancedFx.depthRange2"	"Source2 Depth Range"</item>
+
+  <item>"STD_iwa_BokehAdvancedFx.distance3"		"Source3 Distance"</item>
+  <item>"STD_iwa_BokehAdvancedFx.bokeh_adjustment3"	"Source3 Bokeh Adjustment"</item>
+  <item>"STD_iwa_BokehAdvancedFx.hardness3"		"Source3 Hardness"</item>
+  <item>"STD_iwa_BokehAdvancedFx.depth_ref3"		"Depth Image"</item>
+  <item>"STD_iwa_BokehAdvancedFx.depthRange3"	"Source3 Depth Range"</item>
+
+  <item>"STD_iwa_BokehAdvancedFx.distance4"		"Source4 Distance"</item>
+  <item>"STD_iwa_BokehAdvancedFx.bokeh_adjustment4"	"Source4 Bokeh Adjustment"</item>
+  <item>"STD_iwa_BokehAdvancedFx.hardness4"		"Source4 Hardness"</item>
+  <item>"STD_iwa_BokehAdvancedFx.depth_ref4"		"Depth Image"</item>
+  <item>"STD_iwa_BokehAdvancedFx.depthRange4"	"Source4 Depth Range"</item>
+
+  <item>"STD_iwa_BokehAdvancedFx.distance5"		"Source5 Distance"</item>
+  <item>"STD_iwa_BokehAdvancedFx.bokeh_adjustment5"	"Source5 Bokeh Adjustment"</item>
+  <item>"STD_iwa_BokehAdvancedFx.hardness5"		"Source5 Hardness"</item>
+  <item>"STD_iwa_BokehAdvancedFx.depth_ref5"		"Depth Image"</item>
+  <item>"STD_iwa_BokehAdvancedFx.depthRange5"	"Source5 Depth Range"</item>
 
   <item>"STD_iwa_TimeCodeFx"	"TimeCode Iwa"</item>
   <item>"STD_iwa_TimeCodeFx.displayType"	"Display Type"</item>
@@ -1346,14 +1450,32 @@
   <item>"STD_iwa_FractalNoiseFx.cycleEvolution"	"Cycle Evolution"	</item>
   <item>"STD_iwa_FractalNoiseFx.cycleEvolutionRange"	"Cycle (in Evolution)"	</item>
   <item>"STD_iwa_FractalNoiseFx.dynamicIntensity"	"Dynamic Intensity"	</item>
+  <item>"STD_iwa_FractalNoiseFx.doConical"	"Do Conical Transform"	</item>
+  <item>"STD_iwa_FractalNoiseFx.conicalAngle"	"Conical Angle"	</item>
+  <item>"STD_iwa_FractalNoiseFx.cameraFov"	"Camera FoV"	</item>
+  <item>"STD_iwa_FractalNoiseFx.zScale"	"Scale Depth"	</item>
+  <item>"STD_iwa_FractalNoiseFx.conicalEvolution"	"Conical Evolution"	</item>
   <item>"STD_iwa_FractalNoiseFx.alphaRendering"	"Alpha Rendering"	</item>
   
   <item>"STD_iwa_BloomFx" 			"Bloom Iwa" 	</item>
   <item>"STD_iwa_BloomFx.gamma"	"Gamma"		</item>
+  <item>"STD_iwa_BloomFx.auto_gain"	"Auto Gain"		</item>
+  <item>"STD_iwa_BloomFx.gain_adjust"	"Gain Adjustment"		</item>
   <item>"STD_iwa_BloomFx.gain"	"Gain"		</item>
+  <item>"STD_iwa_BloomFx.decay"	"Decay"		</item>
   <item>"STD_iwa_BloomFx.size"	"Size"		</item>
+  <item>"STD_iwa_BloomFx.alpha_mode"	"Alpha Mode"		</item>
   <item>"STD_iwa_BloomFx.alpha_rendering"	"Alpha Rendering"		</item>
 
+  <item>"STD_iwa_RainbowFx" 			"Rainbow Iwa" 	</item>
+  <item>"STD_iwa_RainbowFx.center"	"Center"		</item>
+  <item>"STD_iwa_RainbowFx.radius"	"Radius"		</item>
+  <item>"STD_iwa_RainbowFx.intensity"	"Intensity"		</item>
+  <item>"STD_iwa_RainbowFx.width_scale"	"Width Scale"		</item>
+  <item>"STD_iwa_RainbowFx.inside"	"Inside Intensity"		</item>
+  <item>"STD_iwa_RainbowFx.secondary_rainbow"	"Secondary Rainbow Intensity"		</item>
+  <item>"STD_iwa_RainbowFx.alpha_rendering"	"Alpha Rendering"		</item>
+ 
  <!------------------------------ Tiled Particles Iwa ------------------------------------------->
 
   <item>STD_iwa_TiledParticlesFx "Tiled Particles Iwa" </item>

@@ -128,6 +128,12 @@ public:
     int col          = pos.layer();
     m_firstCol       = col;
     m_firstRow       = row;
+    // First, check switching of the selection types. This may clear the
+    // previous selection.
+    if (m_modifier & Qt::ControlModifier)
+      getViewer()->getCellKeyframeSelection()->makeCurrent();
+    else
+      getViewer()->getCellSelection()->makeCurrent();
     if (m_modifier & Qt::ShiftModifier) {
       int r0, c0, r1, c1;
       getViewer()->getCellSelection()->getSelectedCells(r0, c0, r1, c1);
@@ -170,10 +176,6 @@ public:
       else
         getViewer()->getCellSelection()->selectCell(row, col);
     }
-    if (m_modifier & Qt::ControlModifier)
-      getViewer()->getCellKeyframeSelection()->makeCurrent();
-    else
-      getViewer()->getCellSelection()->makeCurrent();
     refreshCellsArea();
     refreshRowsArea();
   }
@@ -549,7 +551,7 @@ public:
     int i;
     for (i = 1; i < count; i++)
       if (m_sourceCells[i].m_level != cell.m_level ||
-          m_sourceCells[i].m_frameId.getLetter() != 0)
+          !m_sourceCells[i].m_frameId.getLetter().isEmpty())
         return;
 
     // check if all the selected cells have the same frame number
@@ -1659,12 +1661,28 @@ public:
       , m_offset(0)
       , m_origOffset(0) {}
 
-  void onClick(const CellPosition &pos) override {
+  void onClick(const QMouseEvent *event) override {
+    QPoint xy                   = event->pos();
+    CellPosition pos            = getViewer()->xyToPosition(xy);
     int col                     = pos.layer();
     TColumnSelection *selection = getViewer()->getColumnSelection();
     if (!selection->isColumnSelected(col)) {
-      selection->selectNone();
-      selection->selectColumn(col);
+      if (event->modifiers() & Qt::ControlModifier) {
+        selection->selectColumn(col, true);
+      } else if (event->modifiers() & Qt::ShiftModifier) {
+        int ia = col, ib = col;
+        int columnCount = getViewer()->getXsheet()->getColumnCount();
+        while (ia > 0 && !selection->isColumnSelected(ia - 1)) --ia;
+        if (ia == 0) ia = col;
+        while (ib < columnCount - 1 && !selection->isColumnSelected(ib + 1))
+          ++ib;
+        if (ib == columnCount - 1) ib = col;
+        int i;
+        for (i = ia; i <= ib; i++) selection->selectColumn(i, true);
+      } else {
+        selection->selectNone();
+        selection->selectColumn(col);
+      }
       selection->makeCurrent();
     }
     std::set<int> indices = selection->getIndices();

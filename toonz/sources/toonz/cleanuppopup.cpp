@@ -565,6 +565,8 @@ bool CleanupPopup::analyzeCleanupList() {
           m_overwriteDialog->reset();
       }
 
+      m_overwriteDialog->enableOptions(inputPath == outputPath);
+
       // Prompt user for file conflict resolution
       clt.m_resolution =
           Resolution(m_overwriteDialog->execute(&clt.m_outputPath));
@@ -634,7 +636,7 @@ bool CleanupPopup::analyzeCleanupList() {
         TPointD outDpi;
         m_params->getOutputImageInfo(outRes, outDpi.x, outDpi.y);
 
-        if (oldRes != outRes) {
+        if (oldRes != outRes && inputPath != outputPath) {
           DVGui::warning(
               tr("The resulting resolution of level \"%1\"\ndoes not match "
                  "with that of previously cleaned up level drawings.\n\nPlease "
@@ -789,7 +791,13 @@ TImageP CleanupPopup::currentImage() const {
   if (!isValidPosition(m_idx)) return TImageP();
 
   const CleanupLevel &cl = m_cleanupLevels[m_idx.first];
-  return cl.m_sl->getFrameToCleanup(cl.m_frames[m_idx.second]);
+
+  // if lines are not processed, obtain the original sampled image
+  bool toBeLineProcessed =
+      TCleanupper::instance()->getParameters()->m_lineProcessingMode != lpNone;
+
+  return cl.m_sl->getFrameToCleanup(cl.m_frames[m_idx.second],
+                                    toBeLineProcessed);
 }
 
 //-----------------------------------------------------------------------------
@@ -1008,7 +1016,7 @@ QString CleanupPopup::setupLevel() {
       app->getPaletteController()->getCurrentLevelPalette()->setPalette(
           palette.getPointer());
 
-    // Notify the xsheet that the level has changed visual type informations
+    // Notify the xsheet that the level has changed visual type information
     // (either the level type,
     // cleanup status, etc)
     app->getCurrentXsheet()->notifyXsheetChanged();
@@ -1195,19 +1203,35 @@ void CleanupPopup::cleanupFrame() {
     TCleanupper *cl                 = TCleanupper::instance();
     const CleanupParameters *params = cl->getParameters();
 
+    // Obtain the source dpi. Changed it to be done once at the first frame of
+    // each level in order to avoid the following problem:
+    // If the original raster level has no dpi (such as TGA images), obtaining
+    // dpi in every frame causes dpi mismatch between the first frame and the
+    // following frames, since the value
+    // TXshSimpleLevel::m_properties->getDpi() will be changed to the
+    // dpi of cleanup camera (= TLV's dpi) after finishing the first frame.
+    if (m_firstLevelFrame) {
+      TPointD dpi;
+      original->getDpi(dpi.x, dpi.y);
+      if (dpi.x == 0 && dpi.y == 0) dpi = sl->getProperties()->getDpi();
+      cl->setSourceDpi(dpi);
+    }
+
     if (params->m_lineProcessingMode == lpNone) {
       // No line processing
 
       TRasterImageP ri(original);
-      if (params->m_autocenterType != CleanupTypes::AUTOCENTER_NONE) {
+      /*if (params->m_autocenterType != CleanupTypes::AUTOCENTER_NONE) {
         bool autocentered;
         ri = cl->autocenterOnly(original, false, autocentered);
         if (!autocentered)
           DVGui::warning(
               QObject::tr("The autocentering failed on the current drawing."));
-      }
+      }*/
+      cl->process(original, false, ri, false, true, true, nullptr,
+                  ri->getRaster());
 
-      sl->setFrame(fid, ri);
+      if (TRaster32P(ri->getRaster())) sl->setFrame(fid, ri);
 
       // Update the associated file. In case the operation throws, oh well the
       // image gets skipped.
@@ -1219,20 +1243,6 @@ void CleanupPopup::cleanupFrame() {
       IconGenerator::instance()->invalidate(sl, fid);
     } else {
       // Perform main processing
-
-      // Obtain the source dpi. Changed it to be done once at the first frame of
-      // each level in order to avoid the following problem:
-      // If the original raster level has no dpi (such as TGA images), obtaining
-      // dpi in every frame causes dpi mismatch between the first frame and the
-      // following frames, since the value
-      // TXshSimpleLevel::m_properties->getDpi() will be changed to the
-      // dpi of cleanup camera (= TLV's dpi) after finishing the first frame.
-      if (m_firstLevelFrame) {
-        TPointD dpi;
-        original->getDpi(dpi.x, dpi.y);
-        if (dpi.x == 0 && dpi.y == 0) dpi = sl->getProperties()->getDpi();
-        cl->setSourceDpi(dpi);
-      }
 
       CleanupPreprocessedImage *cpi;
       {
@@ -1475,7 +1485,7 @@ CleanupPopup::OverwriteDialog::OverwriteDialog()
 
     suffixLayout->addWidget(m_suffix);
   }
-  addLayout(suffixLayout);  // Couldnt' place it right after allocation,
+  addLayout(suffixLayout);  // Couldn't place it right after allocation,
                             // DVGui::Dialog::addLayout() crashed...
   // Option 5: NOPAINT_ONLY
   radioButton = new QRadioButton(this);
@@ -1499,6 +1509,14 @@ CleanupPopup::OverwriteDialog::OverwriteDialog()
 void CleanupPopup::OverwriteDialog::reset() {
   ValidatedChoiceDialog::reset();
   m_suffixText.clear();
+}
+
+//-----------------------------------------------------------------------------
+
+void CleanupPopup::OverwriteDialog::enableOptions(bool writingOnSource) {
+  if (writingOnSource && m_buttonGroup->button(REPLACE)->isChecked())
+    m_buttonGroup->button(OVERWRITE)->setChecked(true);
+  m_buttonGroup->button(REPLACE)->setDisabled(writingOnSource);
 }
 
 //-----------------------------------------------------------------------------

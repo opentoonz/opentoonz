@@ -34,7 +34,7 @@ public:
   ~StencilControlManager() {}
 };
 
-}  // Local namepace
+}  // Local namespace
 
 //-----------------------------------------------------------------------------------------
 
@@ -43,7 +43,7 @@ public:
   int m_stencilBitCount;
   int m_pushCount;
   int m_currentWriting;  // current stencil bit plane.
-  // 0 is the first bit plane ; -1 menas no stencil mask is writing
+  // 0 is the first bit plane ; -1 means no stencil mask is writing
 
   int m_virtualState;
 // the state of the (eventually virtual) top mask.

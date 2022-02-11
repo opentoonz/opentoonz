@@ -34,6 +34,7 @@
 #include "tstream.h"
 #include "tsystem.h"
 #include "tcontenthistory.h"
+#include "tfilepath.h"
 
 // Qt includes
 #include <QDir>
@@ -484,7 +485,8 @@ int TXshSimpleLevel::guessStep() const {
 
   TFrameId firstFid = *ft++, secondFid = *ft++;
 
-  if (firstFid.getLetter() != 0 || secondFid.getLetter() != 0) return 1;
+  if (!firstFid.getLetter().isEmpty() || !secondFid.getLetter().isEmpty())
+    return 1;
 
   int step = secondFid.getNumber() - firstFid.getNumber();
   if (step == 1) return 1;
@@ -493,7 +495,7 @@ int TXshSimpleLevel::guessStep() const {
   // (cerco di limitare il numero di volte in cui devo controllare tutta la
   // lista)
   TFrameId lastFid = *m_frames.rbegin();
-  if (lastFid.getLetter() != 0) return 1;
+  if (!lastFid.getLetter().isEmpty()) return 1;
 
   if (lastFid.getNumber() != firstFid.getNumber() + step * (frameCount - 1))
     return 1;
@@ -501,7 +503,7 @@ int TXshSimpleLevel::guessStep() const {
   for (int i = 2; ft != m_frames.end(); ++ft, ++i) {
     const TFrameId &fid = *ft;
 
-    if (fid.getLetter() != 0) return 1;
+    if (!fid.getLetter().isEmpty()) return 1;
 
     if (fid.getNumber() != firstFid.getNumber() + step * i) return 1;
   }
@@ -641,7 +643,8 @@ void TXshSimpleLevel::loadAllIconsAndPutInCache(bool cacheImagesAsWell) {
 
 //-----------------------------------------------------------------------------
 
-TRasterImageP TXshSimpleLevel::getFrameToCleanup(const TFrameId &fid) const {
+TRasterImageP TXshSimpleLevel::getFrameToCleanup(const TFrameId &fid,
+                                                 bool toBeLineProcessed) const {
   assert(m_type != UNKNOWN_XSHLEVEL);
 
   FramesSet::const_iterator ft = m_frames.find(fid);
@@ -651,8 +654,12 @@ TRasterImageP TXshSimpleLevel::getFrameToCleanup(const TFrameId &fid) const {
   std::string imageId = getImageId(fid, flag ? Scanned : 0);
 
   ImageLoader::BuildExtData extData(this, fid, 1);
-  TRasterImageP img = ImageManager::instance()->getImage(
-      imageId, ImageManager::dontPutInCache, &extData);
+
+  UCHAR imFlags = ImageManager::dontPutInCache;
+  // if lines are not processed, obtain the original sampled image
+  if (!toBeLineProcessed) imFlags |= ImageManager::is64bitEnabled;
+  TRasterImageP img =
+      ImageManager::instance()->getImage(imageId, imFlags, &extData);
   if (!img) return img;
 
   double x_dpi, y_dpi;
@@ -771,6 +778,27 @@ TImageP buildIcon(const TImageP &img, const TDimension &size) {
 }
 
 }  // anonymous namespace
+
+//-----------------------------------------------------------------------------
+
+// modify frameId to be with the same frame format as existing frames
+void TXshSimpleLevel::formatFId(TFrameId &fid, TFrameId _tmplFId) {
+  if (m_type != OVL_XSHLEVEL && m_type != TZI_XSHLEVEL) return;
+
+  if (!m_frames.empty()) {
+    TFrameId tmplFId = *m_frames.begin();
+    fid.setZeroPadding(tmplFId.getZeroPadding());
+    fid.setStartSeqInd(tmplFId.getStartSeqInd());
+  }
+  // since there is no reference frame, take sepChar from the path
+  else {
+    // override sepchar by the path
+    QChar sepChar = m_path.getSepChar();
+    if (!sepChar.isNull()) _tmplFId.setStartSeqInd(sepChar.toLatin1());
+    fid.setZeroPadding(_tmplFId.getZeroPadding());
+    fid.setStartSeqInd(_tmplFId.getStartSeqInd());
+  }
+}
 
 //-----------------------------------------------------------------------------
 
@@ -1133,8 +1161,10 @@ void TXshSimpleLevel::load() {
   } else {
     // Not a scan + cleanup level
 
-    if (m_path.getType() == "psd" &&
-        this->getScene()->getVersionNumber().first < 71)
+    // Loading PSD files via load level command needs to convert layerID in the
+    // file path to layer name here. The conversion is not needed on loading
+    // scene as the file path loaded from the scene file is already converted.
+    if (m_path.getType() == "psd" && !this->getScene()->isLoading())
       m_path = getLevelPathAndSetNameWithPsdLevelName(this);
 
     TFilePath path = getScene()->decodeFilePath(m_path);

@@ -3,8 +3,9 @@
 #include "stdfx.h"
 #include "tfxparam.h"
 #include "tspectrumparam.h"
+#include "globalcontrollablefx.h"
 
-class MultiToneFx final : public TStandardRasterFx {
+class MultiToneFx final : public GlobalControllableFx {
   FX_PLUGIN_DECLARATION(MultiToneFx)
 
   TRasterFxPort m_input;

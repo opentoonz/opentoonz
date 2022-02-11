@@ -36,6 +36,9 @@ class DVAPI TFxAttributes {
   // to maintain backward compatibility in the fx
   int m_fxVersion;
 
+  bool m_hasGlobalControl;
+  double m_globalIntensity;
+
 public:
   TFxAttributes();
   ~TFxAttributes();
@@ -67,6 +70,10 @@ public:
   void setFxVersion(int version) { m_fxVersion = version; }
   int getFxVersion() const { return m_fxVersion; };
 
+  void setHasGlobalControl(bool yes) { m_hasGlobalControl = yes; }
+  bool hasGlobalControl() const { return m_hasGlobalControl; }
+  void setGlobalIntensity(double val) { m_globalIntensity = val; }
+  double getGlobalIntensity() { return m_globalIntensity; }
   // Group management
 
   int setGroupId(int value);

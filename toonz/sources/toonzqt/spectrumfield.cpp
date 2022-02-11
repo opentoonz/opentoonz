@@ -186,7 +186,7 @@ void SpectrumBar::paintEvent(QPaintEvent *e) {
 }
 
 //-----------------------------------------------------------------------------
-/*! Manage mouse press event. Search exsisting key near click position, if
+/*! Manage mouse press event. Search existing key near click position, if
                 there is set it as current key; otherwise add a new key in click
    position.
 */

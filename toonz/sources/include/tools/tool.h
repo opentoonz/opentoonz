@@ -97,6 +97,7 @@ public:
   QPointF m_mousePos;  // mouse position obtained with QMouseEvent::pos() or
                        // QTabletEvent::pos()
   bool m_isTablet;
+  bool m_isHighFrequent;
 
 public:
   TMouseEvent()
@@ -104,7 +105,8 @@ public:
       , m_modifiersMask(NO_KEY)
       , m_buttons(Qt::NoButton)
       , m_button(Qt::NoButton)
-      , m_isTablet(false) {}
+      , m_isTablet(false)
+      , m_isHighFrequent(false) {}
 
   bool isShiftPressed() const { return (m_modifiersMask & SHIFT_KEY); }
   bool isAltPressed() const { return (m_modifiersMask & ALT_KEY); }
@@ -115,6 +117,7 @@ public:
   Qt::MouseButton button() const { return m_button; }
   QPointF mousePos() const { return m_mousePos; }
   bool isTablet() const { return m_isTablet; }
+  bool isHighFrequent() const { return m_isHighFrequent; }
 
   void setModifiers(bool shiftPressed, bool altPressed, bool ctrlPressed) {
     m_modifiersMask = ModifierMask((shiftPressed << SHIFT_BITSHIFT) |
@@ -366,7 +369,7 @@ public:
   /*!
           Picks a region of the scene, using an OpenGL projection matrix to
           restrict drawing to a small regionaround \p p of the viewport.
-          Retuns -1 if no object's view has been changed.
+          Returns -1 if no object's view has been changed.
   */
   int pick(const TPointD &p);
   bool isPicking() const { return m_picking; }

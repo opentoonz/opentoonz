@@ -324,7 +324,7 @@ DoubleLineEdit::DoubleLineEdit(QWidget *parent, double value)
     : DoubleValueLineEdit(parent) {
   m_validator =
       new QDoubleValidator(-(std::numeric_limits<double>::max)(),
-                           (std::numeric_limits<double>::max)(), 8, this);
+                           (std::numeric_limits<double>::max)(), 5, this);
   setValidator(m_validator);
 
   setValue(value);

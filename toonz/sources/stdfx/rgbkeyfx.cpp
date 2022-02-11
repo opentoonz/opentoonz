@@ -6,8 +6,9 @@
 #include "stdfx.h"
 
 #include "tparamset.h"
+#include "globalcontrollablefx.h"
 
-class RGBKeyFx final : public TStandardRasterFx {
+class RGBKeyFx final : public GlobalControllableFx {
   FX_PLUGIN_DECLARATION(RGBKeyFx)
 
   TRasterFxPort m_input;
@@ -61,7 +62,7 @@ void update_param(int &param, TRaster64P ras) {
   param = param * 257;
   return;
 }
-}
+}  // namespace
 
 //-------------------------------------------------------------------
 

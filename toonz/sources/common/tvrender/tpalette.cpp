@@ -607,7 +607,7 @@ public:
   }
 
   /*!
-\details  Explicitly ovverrides the stream's version, returning m_version.
+\details  Explicitly overrides the stream's version, returning m_version.
         This is necessary since palettes have their \a own version number,
         which is \a not the TIStream's file one.
 */
@@ -1070,7 +1070,7 @@ void TPalette::setFrame(int frame) {
     TColorStyle *cs = getStyle(styleId);
     assert(cs);
 
-    // Buid the keyframes interval containing frame
+    // Build the keyframes interval containing frame
     StyleAnimation::iterator j0, j1;
 
     j1 = animation.lower_bound(

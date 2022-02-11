@@ -218,7 +218,7 @@ public:
 
   /*!
 Use this constructor with increasePoints.
- \param stroke a refernce to a stroke
+ \param stroke a reference to a stroke
  \param parameterOfNearest
  \param lengthOfDeformation
 */

@@ -1040,7 +1040,7 @@ void TColorUtils::buildColorChipPalette(QList<QPair<TPixel32, TPoint>> &palette,
 
   QList<ColorChip> colorChips;
 
-  // make rectangles by serching in the corner points
+  // make rectangles by searching in the corner points
   for (int ep0 = 0; ep0 < edgePoints.size(); ep0++) {
     QMap<EdgePoint::QUADRANT, int> corners;
 
@@ -1103,7 +1103,7 @@ void TColorUtils::buildColorChipPalette(QList<QPair<TPixel32, TPoint>> &palette,
                      edgePoints.at(corners[EdgePoint::LeftLower]).pos);
       if (chip.validate(raster, step)) colorChips.append(chip);
 
-      // remove the coner information from the corner point
+      // remove the corner information from the corner point
       QMap<EdgePoint::QUADRANT, int>::const_iterator i = corners.constBegin();
       while (i != corners.constEnd()) {
         edgePoints[i.value()].info &= ~i.key();

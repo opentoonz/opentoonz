@@ -24,28 +24,16 @@ TFrameId qstringToFrameId(QString str) {
   else if (str == "-" || str == "-2")
     return TFrameId::NO_FRAME;
 
-  TFrameId fid;
-
-  QString number;
-  char letter(0);
-
-  int s, strSize = str.size();
-  for (s = 0; s < strSize; ++s) {
-    QChar c = str.at(s);
-
-    if (c.isNumber())
-      number.append(c);
-    else
-#if QT_VERSION >= 0x050500
-      letter = c.toLatin1();
-#else
-      letter = c.toAscii();
-#endif
-  }
-
-  return TFrameId(number.toInt(), letter);
+  QString regExpStr = QString("^%1$").arg(TFilePath::fidRegExpStr());
+  QRegExp rx(regExpStr);
+  int pos = rx.indexIn(str);
+  if (pos < 0) return TFrameId();
+  if (rx.cap(2).isEmpty())
+    return TFrameId(rx.cap(1).toInt());
+  else
+    return TFrameId(rx.cap(1).toInt(), rx.cap(2));
 }
-}
+}  // namespace
 
 //*******************************************************************************
 //    TXshMeshColumn  implementation
@@ -94,12 +82,12 @@ void TXshMeshColumn::saveData(TOStream &os) {
 
         // If fid has no letter save more than one cell and its increment -
         // otherwise save just one cell
-        if (r < r1 && fid.getLetter() == 0) {
+        if (r < r1 && fid.getLetter().isEmpty()) {
           TXshCell cell2 = getCell(r + 1);
           TFrameId fid2  = cell2.m_frameId;
 
           if (cell2.m_level.getPointer() == cell.m_level.getPointer() &&
-              fid2.getLetter() == 0) {
+              fid2.getLetter().isEmpty()) {
             inc = cell2.m_frameId.getNumber() - dr;
             for (++n;; ++n) {
               if (r + n > r1) break;
@@ -108,7 +96,7 @@ void TXshMeshColumn::saveData(TOStream &os) {
               TFrameId fid2 = cell2.m_frameId;
 
               if (cell2.m_level.getPointer() != cell.m_level.getPointer() ||
-                  fid2.getLetter() != 0)
+                  !fid2.getLetter().isEmpty())
                 break;
 
               if (fid2.getNumber() != dr + n * inc) break;
@@ -123,6 +111,8 @@ void TXshMeshColumn::saveData(TOStream &os) {
     }
     os.closeChild();
   }
+  // cell marks
+  saveCellMarks(os);
 }
 
 //------------------------------------------------------------------
@@ -150,16 +140,16 @@ void TXshMeshColumn::loadData(TIStream &is) {
       while (is.openChild(tagName)) {
         if (tagName == "cell") {
           TPersist *p = 0;
-          QString str;
+          std::string str;
 
           int row = 1, rowCount = 1, increment = 0;
           TFilePath path;
 
           is >> row >> rowCount >> p >> str >> increment;
 
-          TFrameId fid = qstringToFrameId(str);
-          assert((fid.getLetter() == 0 && rowCount >= 0) ||
-                 (fid.getLetter() != 0 && rowCount == 1));
+          TFrameId fid = qstringToFrameId(QString::fromStdString(str));
+          assert((fid.getLetter().isEmpty() && rowCount >= 0) ||
+                 (!fid.getLetter().isEmpty() && rowCount == 1));
 
           TXshLevel *xshLevel = dynamic_cast<TXshLevel *>(p);
           if (xshLevel) {
@@ -179,6 +169,8 @@ void TXshMeshColumn::loadData(TIStream &is) {
           is.skipCurrentTag();
       }
 
+      is.closeChild();
+    } else if (loadCellMarks(tagName, is)) {
       is.closeChild();
     } else
       is.skipCurrentTag();

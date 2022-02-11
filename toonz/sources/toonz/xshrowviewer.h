@@ -64,7 +64,7 @@ class RowArea final : public QWidget {
 
   // Return when the item-menu setAutoMarkers can be enabled.
   bool canSetAutoMarkers();
-  // Return the number of the last non-empty cell finded. You can set the
+  // Return the number of the last non-empty cell found. You can set the
   // direction of the search.
   int getNonEmptyCell(int row, int column, Direction);
 

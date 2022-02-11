@@ -29,7 +29,7 @@ class StageSchematicGroupEditor;
 //
 //==================================================================
 //! Provide a structure representing a node af a tree.
-//! This class mantains information about a node of the stage schematic and its
+//! This class maintains information about a node of the stage schematic and its
 //! children.
 //! The tree is generated using the TStageObjectTree.
 //! The generated tree is used to oreder stage schematic nodes in the window.
@@ -74,7 +74,7 @@ public:
 //! QGraphicsScene for the Stage Schematic.
 //! All StageSchematicNode,  StageSchematicSplineNode and link are pleced and
 //! handled in this scene.
-//! The scene mantains two mapping:
+//! The scene maintains two mapping:
 //! one for StageSchematicNode and one for StageSchematicSplineNode. These
 //! mapping can be used to retrieve
 //! nodes and spline.\n

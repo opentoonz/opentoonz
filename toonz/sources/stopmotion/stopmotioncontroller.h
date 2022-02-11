@@ -11,6 +11,7 @@
 #include "toonzqt/tabbar.h"
 #include "toonzqt/gutil.h"
 #include "toonzqt/colorfield.h"
+#include "toonzqt/doublefield.h"
 
 // Qt includes
 #include <QWidget>
@@ -82,7 +83,7 @@ class StopMotionController final : public QWidget {
       *m_focusFar3Button, *m_captureFilterSettingsBtn, *m_testLightsButton;
   QHBoxLayout *m_focusAndZoomLayout;
   QLabel *m_frameInfoLabel, *m_cameraSettingsLabel, *m_cameraModeLabel,
-      *m_resolutionLabel, *m_directShowLabel, *m_cameraStatusLabel,
+      *m_resolutionLabel, *m_cameraStatusLabel,
       *m_apertureLabel, *m_kelvinValueLabel, *m_isoLabel, *m_shutterSpeedLabel,
       *m_webcamLabel;
   QToolButton *m_previousLevelButton, *m_previousFrameButton,
@@ -97,19 +98,20 @@ class StopMotionController final : public QWidget {
   LevelNameLineEdit *m_levelNameEdit;
   QCheckBox *m_blackScreenForCapture, *m_useScaledFullSizeImages,
       *m_placeOnXSheetCB, *m_directShowCB, *m_liveViewOnAllFramesCB,
-      *m_useMjpgCB, *m_useNumpadCB, *m_drawBeneathCB, *m_timerCB;
+      *m_useMjpgCB, *m_useNumpadCB, *m_drawBeneathCB, *m_playSound;
   DVGui::FileField *m_saveInFileFld;
   DVGui::IntLineEdit *m_xSheetFrameNumberEdit;
   FrameNumberLineEdit *m_frameNumberEdit;
-  DVGui::IntField *m_onionOpacityFld, *m_postCaptureReviewFld,
-      *m_subsamplingFld;
+  DVGui::IntField *m_onionOpacityFld, *m_subsamplingFld;
+  DVGui::DoubleField *m_postCaptureReviewFld;
   PencilTestSaveInFolderPopup *m_saveInFolderPopup;
-  DVGui::IntField *m_timerIntervalFld;
+  DVGui::DoubleField *m_timerIntervalFld;
   DVGui::ColorField *m_screen1ColorFld, *m_screen2ColorFld, *m_screen3ColorFld;
   QGroupBox *m_screen1Box;
   QGroupBox *m_screen2Box;
   QGroupBox *m_screen3Box;
   QGroupBox *m_webcamAutoFocusGB;
+  QGroupBox *m_timerCB;
   QTimer *m_lightTestTimer;
 
 public:
@@ -176,6 +178,9 @@ protected slots:
   void onIntervalToggled(bool);
   void onIntervalStarted();
   void onIntervalStopped();
+
+  // sound
+  void onPlaySoundToggled(bool);
 
   // lights and screens
   void setScreen1Color(const TPixel32 &value, bool isDragging);
@@ -251,6 +256,7 @@ protected slots:
   void onUseMjpgSignal(bool);
   void onUseDirectShowSignal(bool);
   void onReviewTimeChangedSignal(int);
+  void onPlayCaptureSignal(bool);
   void onUseNumpadSignal(bool);
   void onDrawBeneathSignal(bool);
   void onLiveViewChanged(bool);

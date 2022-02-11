@@ -29,10 +29,22 @@
     <vbox modeSensitive="cycleEvolution" mode="1">
     <control>cycleEvolutionRange</control>
     </vbox>
-<separator/>
     <vbox modeSensitive="fractalType" mode="4,5">
     <control>dynamicIntensity</control>
     </vbox>
+<separator label="Conical Transform"/>
+    <control>doConical</control>
+    <vbox modeSensitive="doConical" mode="1">
+    <control>conicalAngle</control>
+    <control>cameraFov</control>
+    <control>zScale</control>
+    <control>conicalEvolution</control>
+    </vbox>
+<separator/>
     <control>alphaRendering</control>
+    <visibleToggle> 
+        <controller>doConical</controller>
+        <off>perspectiveOffset</off>
+    </visibleToggle>
 	</page>
 </fxlayout>

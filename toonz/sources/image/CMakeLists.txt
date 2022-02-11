@@ -22,6 +22,8 @@ set(HEADERS
     ffmpeg/tiio_ffmpeg.h
     sprite/tiio_sprite.h
     mesh/tiio_mesh.h
+    exr/tinyexr_otmod.h
+    exr/tiio_exr.h
 )
 
 set(SOURCES
@@ -49,6 +51,7 @@ set(SOURCES
     ffmpeg/tiio_ffmpeg.cpp
     sprite/tiio_sprite.cpp
     mesh/tiio_mesh.cpp
+    exr/tiio_exr.cpp
 )
 
 
@@ -144,6 +147,10 @@ if(BUILD_TARGET_WIN AND PLATFORM EQUAL 32)
         ${SDKROOT}/quicktime/QT73SDK/CIncludes
     )
 endif()
+
+include_directories(
+    ${SDKROOT}/tinyexr
+)
 
 
 _find_toonz_library(TNZLIBS "tnzcore;tnzbase;toonzlib")

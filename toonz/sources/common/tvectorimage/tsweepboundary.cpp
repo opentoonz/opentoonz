@@ -183,7 +183,7 @@ static void splitCircularArcIntoQuadraticCurves(
   // 60).
   // It supposes that Pstart and Pend are onto the circumference (so that their
   // lengths
-  // are equal to tha radius of the circumference), otherwise the resulting
+  // are equal to the radius of the circumference), otherwise the resulting
   // curves could
   // be unpredictable.
   // The last component in quadCurve[] is an ending void curve

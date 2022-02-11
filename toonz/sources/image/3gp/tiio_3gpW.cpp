@@ -109,7 +109,9 @@ string buildQTErrorString(int ec) {
   case QTUnableToSetMovieBox:
     return "unable to set movie box";
 
-  default: { return "unknown error ('" + std::to_string(ec) + "')"; }
+  default: {
+    return "unknown error ('" + std::to_string(ec) + "')";
+  }
   }
 }
 
@@ -276,7 +278,7 @@ void copy(TRasterP rin, PixelXRGB *bufout, int lx, int ly) {
   }
   rin->unlock();
 }
-};
+};  // namespace
 
 //-----------------------------------------------------------
 void TImageWriter3gp::save(const TImageP &img) {
@@ -507,7 +509,9 @@ TLevelWriter3gp::TLevelWriter3gp(const TFilePath &path, TPropertyGroup *winfo)
 #else
 #define FailWithAction(cond, action, handler)                                  \
   if (cond) {                                                                  \
-    { action; }                                                                \
+    {                                                                          \
+      action;                                                                  \
+    }                                                                          \
     goto handler;                                                              \
   } else                                                                       \
     0
@@ -564,7 +568,7 @@ void TLevelWriter3gp::saveSoundTrack(TSoundTrack *st) {
   myMedia = NewTrackMedia(theTrack, SoundMediaType, st->getSampleRate(),
                           m_soundDataRef,
                           HandleDataHandlerSubType);  // track->rate >> 16
-  myErr = GetMoviesError();
+  myErr   = GetMoviesError();
   FailIf(myErr != noErr, Exit);
 
   // start a media editing session
@@ -741,7 +745,7 @@ TImageWriterP TLevelWriter3gp::getFrameWriter(TFrameId fid) {
   if (m_cancelled) return 0;
 
   if (m_IOError) throw TImageException(m_path, buildQTErrorString(m_IOError));
-  if (fid.getLetter() != 0) return TImageWriterP(0);
+  if (!fid.getLetter().isEmpty()) return TImageWriterP(0);
   int index = fid.getNumber() - 1;
 
   TImageWriter3gp *iwm = new TImageWriter3gp(m_path, index, this);
@@ -1010,7 +1014,7 @@ TImageReaderP TLevelReader3gp::getFrameReader(TFrameId fid) {
   if (m_IOError != QTNoError)
     throw TImageException(m_path, buildQTErrorString(m_IOError));
 
-  if (fid.getLetter() != 0) return TImageReaderP(0);
+  if (!fid.getLetter().isEmpty()) return TImageReaderP(0);
   int index = fid.getNumber() - 1;
 
   TImageReader3gp *irm = new TImageReader3gp(m_path, index, this);

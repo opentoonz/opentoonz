@@ -127,7 +127,7 @@ public:
 
   // add 20140130
   void getParamUIs(TParamUIConcept *&concepts, int &length) override {
-    concepts = new TParamUIConcept[length = 2];
+    concepts = new TParamUIConcept[length = 3];
 
     concepts[0].m_type  = TParamUIConcept::POINT;
     concepts[0].m_label = "Center";
@@ -137,6 +137,9 @@ public:
     concepts[1].m_label = "Radius";
     concepts[1].m_params.push_back(m_radius);
     concepts[1].m_params.push_back(m_center);
+
+    concepts[2].m_type = TParamUIConcept::COMPASS_SPIN;
+    concepts[2].m_params.push_back(m_center);
   }
   // add 20140130
 };
@@ -196,7 +199,7 @@ void fx_(const TRasterP in_ras  // with margin
   ino::arr_to_ras(in_gr8->getRawData(), ino::channels(), out_ras, margin);
   in_gr8->unlock();
 }
-}
+}  // namespace
 //------------------------------------------------------------
 void ino_spin_blur::doCompute(TTile &tile, double frame,
                               const TRenderSettings &ri) {

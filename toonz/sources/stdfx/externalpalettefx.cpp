@@ -8,10 +8,11 @@
 #include "toonz/txshcell.h"
 #include "toonz/txshsimplelevel.h"
 #include "toonz/txshpalettelevel.h"
+#include "globalcontrollablefx.h"
 
 //===================================================================
 
-class ExternalPaletteFx final : public TStandardRasterFx {
+class ExternalPaletteFx final : public GlobalControllableFx {
   FX_PLUGIN_DECLARATION(ExternalPaletteFx)
 
   TRasterFxPort m_input;
@@ -85,7 +86,7 @@ TPalette *getPalette(TFx *fx, double frame) {
 
   return 0;
 }
-}
+}  // namespace
 
 //-------------------------------------------------------------------
 

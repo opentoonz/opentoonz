@@ -49,7 +49,7 @@ namespace {
 
 template <class T>
 void computeBacklit(TRasterPT<T> dst, TRasterPT<T> src, const TPoint &srcPos,
-                    // cordinate di src[0,0] rispetto a dst;
+                    // coordinate di src[0,0] rispetto a dst;
                     // in genere srcPos.x,.y <= 0
                     const TPoint &center
                     // coordinate della sorgente di luce rispetto a dst;

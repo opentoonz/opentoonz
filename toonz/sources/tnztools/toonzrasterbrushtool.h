@@ -109,6 +109,9 @@ private:
   int m_readIndex;
   std::vector<TThickPoint> m_rawPoints;
   std::vector<TThickPoint> m_outputPoints;
+
+  int m_resampledIndex;
+  std::vector<TThickPoint> m_resampledPoints;
 };
 //************************************************************************
 //   Toonz Raster Brush Tool declaration
@@ -179,6 +182,7 @@ protected:
   TBoolProperty m_pencil;
   TBoolProperty m_pressure;
   TDoubleProperty m_modifierSize;
+  TBoolProperty m_modifierLockAlpha;
 
   RasterStrokeGenerator *m_rasterTrack;
   TTileSetCM32 *m_tileSet;

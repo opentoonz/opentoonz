@@ -660,44 +660,44 @@
 <context>
     <name>FullColorBrushTool</name>
     <message>
-        <location filename="../../tnztools/fullcolorbrushtool.cpp" line="181"/>
-        <location filename="../../tnztools/fullcolorbrushtool.cpp" line="186"/>
+        <location filename="../../tnztools/fullcolorbrushtool.cpp" line="182"/>
+        <location filename="../../tnztools/fullcolorbrushtool.cpp" line="187"/>
         <source>Size</source>
         <translation>Velikost</translation>
     </message>
     <message>
-        <location filename="../../tnztools/fullcolorbrushtool.cpp" line="182"/>
+        <location filename="../../tnztools/fullcolorbrushtool.cpp" line="183"/>
         <source>Pressure</source>
         <translation>Tlak</translation>
     </message>
     <message>
-        <location filename="../../tnztools/fullcolorbrushtool.cpp" line="183"/>
-        <location filename="../../tnztools/fullcolorbrushtool.cpp" line="187"/>
+        <location filename="../../tnztools/fullcolorbrushtool.cpp" line="184"/>
+        <location filename="../../tnztools/fullcolorbrushtool.cpp" line="188"/>
         <source>Opacity</source>
         <translation>Neprůhlednost</translation>
     </message>
     <message>
-        <location filename="../../tnztools/fullcolorbrushtool.cpp" line="184"/>
+        <location filename="../../tnztools/fullcolorbrushtool.cpp" line="185"/>
         <source>Hardness:</source>
         <translation>Tvrdost:</translation>
     </message>
     <message>
-        <location filename="../../tnztools/fullcolorbrushtool.cpp" line="185"/>
+        <location filename="../../tnztools/fullcolorbrushtool.cpp" line="186"/>
         <source>Preset:</source>
         <translation>Přednastavení:</translation>
     </message>
     <message>
-        <location filename="../../tnztools/fullcolorbrushtool.cpp" line="188"/>
+        <location filename="../../tnztools/fullcolorbrushtool.cpp" line="189"/>
         <source>Eraser</source>
         <translation>Guma</translation>
     </message>
     <message>
-        <location filename="../../tnztools/fullcolorbrushtool.cpp" line="189"/>
+        <location filename="../../tnztools/fullcolorbrushtool.cpp" line="190"/>
         <source>Lock Alpha</source>
         <translation>Zamknout alfu</translation>
     </message>
     <message>
-        <location filename="../../tnztools/fullcolorbrushtool.cpp" line="654"/>
+        <location filename="../../tnztools/fullcolorbrushtool.cpp" line="661"/>
         <source>&lt;custom&gt;</source>
         <translation>&lt;vlastní&gt;</translation>
     </message>
@@ -1222,13 +1222,13 @@ Chcete pokračovat?</translation>
     <name>QObject</name>
     <message>
         <location filename="../../tnztools/toonzvectorbrushtool.cpp" line="846"/>
-        <location filename="../../tnztools/geometrictool.cpp" line="1276"/>
+        <location filename="../../tnztools/geometrictool.cpp" line="1292"/>
         <source>Yes</source>
         <translation>Ano</translation>
     </message>
     <message>
         <location filename="../../tnztools/toonzvectorbrushtool.cpp" line="846"/>
-        <location filename="../../tnztools/geometrictool.cpp" line="1276"/>
+        <location filename="../../tnztools/geometrictool.cpp" line="1292"/>
         <source>No</source>
         <translation>Ne</translation>
     </message>
@@ -2051,22 +2051,22 @@ přesunut na konec první strany palety.</translation>
 <context>
     <name>TypeTool</name>
     <message>
-        <location filename="../../tnztools/typetool.cpp" line="455"/>
+        <location filename="../../tnztools/typetool.cpp" line="456"/>
         <source>Font:</source>
         <translation>Písmo:</translation>
     </message>
     <message>
-        <location filename="../../tnztools/typetool.cpp" line="456"/>
+        <location filename="../../tnztools/typetool.cpp" line="457"/>
         <source>Style:</source>
         <translation>Styl:</translation>
     </message>
     <message>
-        <location filename="../../tnztools/typetool.cpp" line="457"/>
+        <location filename="../../tnztools/typetool.cpp" line="458"/>
         <source>Vertical Orientation</source>
         <translation>Svislé natočení</translation>
     </message>
     <message>
-        <location filename="../../tnztools/typetool.cpp" line="458"/>
+        <location filename="../../tnztools/typetool.cpp" line="459"/>
         <source>Size:</source>
         <translation>Velikost:</translation>
     </message>

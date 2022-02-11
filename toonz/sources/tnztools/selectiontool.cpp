@@ -22,7 +22,9 @@ TEnv::StringVar SelectionType("SelectionType", "Rectangular");
 
 //-----------------------------------------------------------------------------
 
-template <typename Tv, typename Tr, typename... Args> DragSelectionTool::DragTool* createNewDragTool(SelectionTool* st, Args... args) {
+template <typename Tv, typename Tr, typename... Args>
+DragSelectionTool::DragTool *createNewDragTool(SelectionTool *st,
+                                               Args... args) {
   VectorSelectionTool *vst = dynamic_cast<VectorSelectionTool *>(st);
   RasterSelectionTool *rst = dynamic_cast<RasterSelectionTool *>(st);
   if (vst)
@@ -33,7 +35,8 @@ template <typename Tv, typename Tr, typename... Args> DragSelectionTool::DragToo
 }
 
 DragSelectionTool::DragTool *createNewMoveSelectionTool(SelectionTool *st) {
-  return createNewDragTool<VectorMoveSelectionTool, RasterMoveSelectionTool>(st);
+  return createNewDragTool<VectorMoveSelectionTool, RasterMoveSelectionTool>(
+      st);
 }
 
 DragSelectionTool::DragTool *createNewRotationTool(SelectionTool *st) {
@@ -44,7 +47,8 @@ DragSelectionTool::DragTool *createNewFreeDeformTool(SelectionTool *st) {
   return createNewDragTool<VectorFreeDeformTool, RasterFreeDeformTool>(st);
 }
 
-DragSelectionTool::DragTool *createNewScaleTool(SelectionTool *st, ScaleType type) {
+DragSelectionTool::DragTool *createNewScaleTool(SelectionTool *st,
+                                                ScaleType type) {
   return createNewDragTool<VectorScaleTool, RasterScaleTool>(st, type);
 }
 
@@ -476,10 +480,13 @@ void DragSelectionTool::FreeDeform::leftButtonDrag(const TPointD &pos,
                                                    const TMouseEvent &e) {
   SelectionTool *tool = m_deformTool->getTool();
   TPointD delta       = pos - m_deformTool->getCurPos();
-  TPointD center      = tool->getCenter();
-  int index           = tool->getSelectedPoint();
-  FourPoints bbox     = tool->getBBox();
-  FourPoints newBbox  = bbox;
+  double pixelSize    = tool->getPixelSize();
+  bool isFastDragging = norm2(delta) > 9.0 * pixelSize * pixelSize;
+
+  TPointD center     = tool->getCenter();
+  int index          = tool->getSelectedPoint();
+  FourPoints bbox    = tool->getBBox();
+  FourPoints newBbox = bbox;
   if (index < 4)
     bbox.setPoint(index, bbox.getPoint(index) + delta);
   else {
@@ -491,7 +498,13 @@ void DragSelectionTool::FreeDeform::leftButtonDrag(const TPointD &pos,
   }
   tool->setBBox(bbox);
   m_deformTool->setCurPos(pos);
-  m_deformTool->applyTransform(bbox);
+  m_deformTool->applyTransform(bbox, isFastDragging);
+}
+
+//-----------------------------------------------------------------------------
+
+void DragSelectionTool::FreeDeform::leftButtonUp() {
+  m_deformTool->applyTransform(m_deformTool->getTool()->getBBox());
 }
 
 //=============================================================================
@@ -528,7 +541,7 @@ void DragSelectionTool::MoveSelection::leftButtonDrag(const TPointD &pos,
       m_lastDelta = TPointD(0, (curPos - m_firstPos).y);
     aff *= TTranslation(m_lastDelta);
   } else
-    aff         = TTranslation(delta);
+    aff = TTranslation(delta);
   double factor = 1.0 / Stage::inch;
   m_deformTool->getTool()->m_deformValues.m_moveValue =
       m_deformTool->getTool()->m_deformValues.m_moveValue + factor * delta;
@@ -738,7 +751,7 @@ FourPoints DragSelectionTool::Scale::bboxScaleInCenter(
   if (areAlmostEqual(oldp.x, newPos.x, 1e-2) &&
       areAlmostEqual(oldp.y, newPos.y, 1e-2))
     return oldBbox;
-  FourPoints bbox                     = bboxScale(index, oldBbox, newPos);
+  FourPoints bbox = bboxScale(index, oldBbox, newPos);
   if (recomputeScaleValue) scaleValue = computeScaleValue(index, bbox);
   if (!m_scaleInCenter) return bbox;
   int symmetricIndex = m_deformTool->getSymmetricPointIndex(index);
@@ -788,7 +801,7 @@ void DragSelectionTool::Scale::leftButtonDrag(const TPointD &pos,
     if (!isBboxReset)
       delta = pos - m_deformTool->getCurPos();
     else
-      delta            = pos - m_deformTool->getStartPos();
+      delta = pos - m_deformTool->getStartPos();
     int symmetricIndex = m_deformTool->getSymmetricPointIndex(selectedIndex);
     TPointD symmetricPoint = tool->getBBox().getPoint(symmetricIndex);
     TPointD v              = normalize(point - symmetricPoint);
@@ -796,9 +809,28 @@ void DragSelectionTool::Scale::leftButtonDrag(const TPointD &pos,
     newPos                 = point + delta;
   }
   m_scaleInCenter = m_isAltPressed;
+
+  double pixelSize = tool->getPixelSize();
+  bool isFastDragging =
+      tdistance2(pos, m_deformTool->getCurPos()) > 9.0 * pixelSize * pixelSize;
+
   m_deformTool->setCurPos(pos);
-  TPointD scaleValue = m_deformTool->transform(selectedIndex, newPos);
+  TPointD scaleValue =
+      m_deformTool->transform(selectedIndex, newPos, isFastDragging);
   tool->m_deformValues.m_scaleValue = scaleValue;
+  TTool::getApplication()->getCurrentTool()->notifyToolChanged();
+}
+
+//-----------------------------------------------------------------------------
+
+void DragSelectionTool::Scale::leftButtonUp() {
+  SelectionTool *tool = m_deformTool->getTool();
+  TPointD newPos      = m_deformTool->getCurPos();
+  int selectedIndex   = tool->getSelectedPoint();
+  if (m_isShiftPressed && m_type == ScaleType::GLOBAL) {
+    newPos = tool->getBBox().getPoint(selectedIndex);
+  }
+  m_deformTool->transform(selectedIndex, newPos);
   TTool::getApplication()->getCurrentTool()->notifyToolChanged();
 }
 
@@ -1023,7 +1055,7 @@ void SelectionTool::updateAction(TPointD pos, const TMouseEvent &e) {
   }
   m_selectedPoint = NONE;
   if ((isLevelType() || isSelectedFramesType()) && !isSameStyleType()) {
-    m_what = Inside;
+    m_what     = Inside;
     m_cursorId = ToolCursor::LevelSelectCursor;
   }
 
@@ -1133,7 +1165,7 @@ bool SelectionTool::keyDown(QKeyEvent *event) {
   if (!ti && !vi && !ri) return false;
 
   std::unique_ptr<DragTool> dragTool(createNewMoveSelectionTool(this));
-  TAffine aff        = TTranslation(delta);
+  TAffine aff = TTranslation(delta);
   dragTool->transform(aff);
   double factor = 1.0 / Stage::inch;
   m_deformValues.m_moveValue += factor * delta;

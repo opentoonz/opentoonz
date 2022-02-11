@@ -160,6 +160,12 @@ public:
   /*--- オフセットを軸ごとにロックする ---*/
   bool m_offx_lock, m_offy_lock;
 
+  // hold brightness and contrast values for each line processing modes (grey
+  // and color).
+  double m_altBrightness, m_altContrast;
+  // exporting file format when Line Processing = None
+  std::string m_lpNoneFormat;
+
 public:
   CleanupParameters();
   CleanupParameters(const CleanupParameters &p) { assign(&p); }

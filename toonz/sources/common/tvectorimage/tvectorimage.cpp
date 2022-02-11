@@ -2154,10 +2154,10 @@ VIStroke *TVectorImage::Imp::joinStroke(int index1, int index2, int cpIndex1,
   int cpCount2 = stroke2->getControlPointCount();
   int styleId  = stroke1->getStyle();
 
-  // check if the both ends are at the same postion
+  // check if the both ends are at the same position
   bool isSamePos = isAlmostZero(tdistance2(stroke1->getControlPoint(cpIndex1),
                                            stroke2->getControlPoint(cpIndex2)));
-  // connecting the ends in the same shape at the same postion
+  // connecting the ends in the same shape at the same position
   // means just making the shape self-looped
   if (isSamePos && index1 == index2) {
     stroke1->setSelfLoop();
@@ -2586,7 +2586,7 @@ int TVectorImage::areDifferentGroup(UINT index1, bool isRegion1, UINT index2,
 
 //-------------------------------------------------------------------
 /*this method is tricky.
-it is not allow to have not-adiacent strokes  of same group.
+it is not allow to have not-adjacent strokes  of same group.
 but it can happen when you group  some already-grouped strokes creating
 sub-groups.
 
@@ -2604,7 +2604,7 @@ after grouping became:
 2
 not allowed!
 
-this method moves strokes, so that  adiacent strokes have same group.
+this method moves strokes, so that adjacent strokes have same group.
 so after calling rearrangeMultiGroup the vi became:
 2
 2

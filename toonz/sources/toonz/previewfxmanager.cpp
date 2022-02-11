@@ -41,7 +41,7 @@
 // Qt stuff
 #include <QMetaType>
 #include <QRegion>
-#include "toonzqt/gutil.h"  //For converions between TRects and QRects
+#include "toonzqt/gutil.h"  //For conversions between TRects and QRects
 
 // Preferences
 #include "toonz/preferences.h"
@@ -379,9 +379,9 @@ PreviewFxInstance::~PreviewFxInstance() {
 
 //-----------------------------------------------------------------------------------------
 
-//! Clears the preview instance informations about passed frame, including any
+//! Clears the preview instance information about passed frame, including any
 //! cached image.
-//! Informations needed to preview again are NOT rebuilt.
+//! Information needed to preview again are NOT rebuilt.
 void PreviewFxInstance::reset(int frame) {
   TImageCache::instance()->remove(getCacheId(m_fx, frame));
   std::map<int, FrameInfo>::iterator it = m_frameInfos.find(frame);
@@ -396,8 +396,8 @@ void PreviewFxInstance::reset(int frame) {
 
 //-----------------------------------------------------------------------------------------
 
-//! Clears the preview instance informations, including cached images.
-//! Informations needed
+//! Clears the preview instance information, including cached images.
+//! Information needed
 //! to preview again are rebuilt.
 void PreviewFxInstance::reset() {
   int i;
@@ -633,7 +633,7 @@ void PreviewFxInstance::updateFlipbookTitles() {
     std::set<FlipBook *>::iterator kt;
     for (kt = m_flipbooks.begin(); kt != m_flipbooks.end(); ++kt) {
       // In the full preview case, the title must display the frame range
-      // informations
+      // information
       (*kt)->setTitle(
           /*"Rendered Frames  ::  From " + QString::number(start) +
         " To " + QString::number(end) +
@@ -1070,7 +1070,9 @@ void PreviewFxInstance::doOnRenderRasterCompleted(
   /*-- 16bpcで計算された場合、結果をDitheringする --*/
   TRasterP rasA = renderData.m_rasA;
   TRasterP rasB = renderData.m_rasB;
-  if (rasA->getPixelSize() == 8)  // render in 64 bits
+  // dither the 16bpc image IF the "30bit display" preference option is OFF
+  if (rasA->getPixelSize() == 8 &&
+      !Preferences::instance()->is30bitDisplayEnabled())  // render in 64 bits
   {
     TRaster32P auxA(rasA->getLx(), rasA->getLy());
     TRop::convert(auxA, rasA);  // dithering

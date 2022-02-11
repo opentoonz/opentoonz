@@ -420,7 +420,9 @@ TImageP TImageReader::load0() {
       // assert(info.m_samplePerPixel == 3 || info.m_samplePerPixel == 4);
 
       TRasterP _ras;
-      if (info.m_bitsPerSample == 16) {
+      // currently m_bitsPerSample == 32 is only possible when loading
+      // full-float / uint EXR images
+      if (info.m_bitsPerSample == 16 || info.m_bitsPerSample == 32) {
         if (m_is64BitEnabled || m_path.getType() != "tif") {
           //  Standard 64-bit case.
 

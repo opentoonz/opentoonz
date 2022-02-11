@@ -18,7 +18,6 @@
 #include "tconvert.h"
 #include "tundo.h"
 #include "tbigmemorymanager.h"
-#include "tfilepath.h"
 #include "timage_io.h"
 
 // Qt includes
@@ -94,7 +93,7 @@ inline bool formatLess(const Preferences::LevelFormat &a,
 //=================================================================
 
 void getDefaultLevelFormats(LevelFormatVector &lfv) {
-  lfv.resize(3);
+  lfv.resize(2);
   {
     LevelFormat &lf = lfv[0];
 
@@ -206,7 +205,7 @@ void getValue(QSettings &settings,
         (*it).m_options.m_premultiply == true) {
       LevelOptions defaultValue;
       defaultValue.m_premultiply = true;
-      // if other parameters are the same as deafault, just erase the item
+      // if other parameters are the same as default, just erase the item
       if ((*it).m_options == defaultValue) it = lfv.erase(it);
       // if there are some adjustments by user, then disable only premultiply
       // option
@@ -214,6 +213,13 @@ void getValue(QSettings &settings,
         (*it).m_options.m_premultiply = false;
         ++it;
       }
+      changed = true;
+    }
+    // remove the "empty" condition which may inserted due to the previous bug
+    else if ((*it).m_name.isEmpty() &&
+             (*it).m_pathFormat == QRegExp(".*", Qt::CaseInsensitive) &&
+             (*it).m_priority == 1 && (*it).m_options == LevelOptions()) {
+      it      = lfv.erase(it);
       changed = true;
     } else
       ++it;
@@ -407,12 +413,8 @@ void Preferences::definePreferenceItems() {
          QMetaType::Bool, true);
   define(actualPixelViewOnSceneEditingMode, "actualPixelViewOnSceneEditingMode",
          QMetaType::Bool, false);
-  define(levelNameOnEachMarkerEnabled, "levelNameOnEachMarkerEnabled",
-         QMetaType::Bool, false);
   define(showRasterImagesDarkenBlendedInViewer,
          "showRasterImagesDarkenBlendedInViewer", QMetaType::Bool, false);
-  define(showFrameNumberWithLetters, "showFrameNumberWithLetters",
-         QMetaType::Bool, false);
   define(iconSize, "iconSize", QMetaType::QSize, QSize(80, 45), QSize(10, 10),
          QSize(400, 400));
   define(viewShrink, "viewShrink", QMetaType::Int, 1, 1, 20);
@@ -435,6 +437,16 @@ void Preferences::definePreferenceItems() {
          false);
   define(colorCalibrationLutPaths, "colorCalibrationLutPaths",
          QMetaType::QVariantMap, QVariantMap());
+  define(displayIn30bit, "displayIn30bit", QMetaType::Bool, false);
+
+  // hide menu icons by default in macOS since the icon color may not match with
+  // the system color theme
+#ifdef Q_OS_MACOS
+  bool defIconsVisible = false;
+#else
+  bool defIconsVisible = true;
+#endif
+  define(showIconsInMenu, "showIconsInMenu", QMetaType::Bool, defIconsVisible);
 
   setCallBack(pixelsOnly, &Preferences::setPixelsOnly);
   setCallBack(linearUnits, &Preferences::setUnits);
@@ -455,6 +467,9 @@ void Preferences::definePreferenceItems() {
          QMetaType::Int, 0);  // On Demand
   define(columnIconLoadingPolicy, "columnIconLoadingPolicy", QMetaType::Int,
          (int)LoadAtOnce);
+  define(autoRemoveUnusedLevels, "autoRemoveUnusedLevels", QMetaType::Bool,
+         false);
+
   //"levelFormats" need to be handle separately
 
   // Saving
@@ -482,9 +497,11 @@ void Preferences::definePreferenceItems() {
   define(ffmpegTimeout, "ffmpegTimeout", QMetaType::Int, 600, 1,
          std::numeric_limits<int>::max());
   define(fastRenderPath, "fastRenderPath", QMetaType::QString, "desktop");
+  define(ffmpegMultiThread, "ffmpegMultiThread", QMetaType::Bool, false);
 
   // Drawing
-  define(scanLevelType, "scanLevelType", QMetaType::QString, "tif");
+  define(DefRasterFormat, "DefRasterFormat", QMetaType::QString, "tif");
+  // define(scanLevelType, "scanLevelType", QMetaType::QString, "tif");
   define(DefLevelType, "DefLevelType", QMetaType::Int, TZP_XSHLEVEL);
   define(newLevelSizeToCameraSizeEnabled, "newLevelSizeToCameraSizeEnabled",
          QMetaType::Bool, false);
@@ -518,9 +535,10 @@ void Preferences::definePreferenceItems() {
          QMetaType::Bool, false);
 
   // Tools
-  define(dropdownShortcutsCycleOptions, "dropdownShortcutsCycleOptions",
-         QMetaType::Int,
-         1);  // Cycle through the available options (changed from bool to int)
+  // define(dropdownShortcutsCycleOptions, "dropdownShortcutsCycleOptions",
+  //       QMetaType::Int,
+  //       1);  // Cycle through the available options (changed from bool to
+  //       int)
   define(FillOnlysavebox, "FillOnlysavebox", QMetaType::Bool, false);
   define(multiLayerStylePickerEnabled, "multiLayerStylePickerEnabled",
          QMetaType::Bool, false);
@@ -563,6 +581,12 @@ void Preferences::definePreferenceItems() {
          true);
   define(currentColumnColor, "currentColumnColor", QMetaType::QColor,
          QColor(Qt::yellow));
+  // define(levelNameOnEachMarkerEnabled, "levelNameOnEachMarkerEnabled",
+  //  QMetaType::Bool, false);
+  define(levelNameDisplayType, "levelNameDisplayType", QMetaType::Int,
+         0);  // default
+  define(showFrameNumberWithLetters, "showFrameNumberWithLetters",
+         QMetaType::Bool, false);
 
   // Animation
   define(keyframeType, "keyframeType", QMetaType::Int, 2);  // Linear
@@ -625,6 +649,8 @@ void Preferences::definePreferenceItems() {
   // TounchGestureControl // Touch Gesture is a checkable command and not in
   // preferences.ini
   define(winInkEnabled, "winInkEnabled", QMetaType::Bool, false);
+  // This option will be shown & available only when WITH_WINTAB is defined
+  define(useQtNativeWinInk, "useQtNativeWinInk", QMetaType::Bool, false);
 
   // Others (not appeared in the popup)
   // Shortcut popup settings
@@ -744,6 +770,22 @@ void Preferences::resolveCompatibility() {
       setValue(NumberingSystem, 1);
       break;
     }
+  }
+  // "levelNameOnEachMarkerEnabled" is changed to "levelNameDisplayType", adding
+  // a new option
+  if (m_settings->contains("levelNameOnEachMarkerEnabled") &&
+      !m_settings->contains("levelNameDisplayType")) {
+    if (m_settings->value("levelNameOnEachMarkerEnabled")
+            .toBool())  // show level name on each marker
+      setValue(levelNameDisplayType, ShowLevelNameOnEachMarker);
+    else  // Default (level name on top of each cell block)
+      setValue(levelNameDisplayType, ShowLevelName_Default);
+  }
+  // "scanLevelType" is changed to "DefRasterFormat", enabling to specify
+  // default format for both the Scan and the Raster levels.
+  if (m_settings->contains("scanLevelType") &&
+      !m_settings->contains("DefRasterFormat")) {
+    setValue(DefRasterFormat, m_settings->value("scanLevelType").toString());
   }
 }
 

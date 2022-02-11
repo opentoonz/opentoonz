@@ -64,6 +64,10 @@ QString removeZeros(QString srcStr) {
   }
   return srcStr;
 }
+
+// Preference values of the unit - translation text
+QMap<QString, QString> unitTrMap;
+
 }  // namespace
 
 //=============================================================================
@@ -174,6 +178,14 @@ CameraSettingsWidget::CameraSettingsWidget(bool forCleanup)
     , m_arValue(0)
     , m_presetListFile("")
     , m_currentLevel(0) {
+  if (unitTrMap.isEmpty()) {
+    unitTrMap["cm"]    = tr("cm");
+    unitTrMap["mm"]    = tr("mm");
+    unitTrMap["inch"]  = tr("inch");
+    unitTrMap["field"] = tr("field");
+    unitTrMap["pixel"] = tr("pixel");
+  }
+
   m_xPrev    = new QRadioButton();
   m_yPrev    = new QRadioButton();
   m_arPrev   = new QRadioButton();
@@ -193,7 +205,8 @@ CameraSettingsWidget::CameraSettingsWidget(bool forCleanup)
   if (Preferences::instance()->getPixelsOnly())
     m_unitLabel->setText(tr("Pixels"));
   else
-    m_unitLabel->setText(Preferences::instance()->getCameraUnits());
+    m_unitLabel->setText(
+        unitTrMap.value(Preferences::instance()->getCameraUnits()));
   m_dpiLabel = new QLabel(tr("DPI"));
   m_resLabel = new QLabel(tr("Pixels"));
   m_xLabel   = new QLabel(tr("x"));
@@ -244,6 +257,9 @@ CameraSettingsWidget::CameraSettingsWidget(bool forCleanup)
   m_fspChk->setToolTip(tr("Force Squared Pixel"));
   m_fspChk->setObjectName("ForceSquaredPixelButton");
   m_fspChk->setIcon(createQIcon("squarepixel"));
+
+  m_presetListOm->setFocusPolicy(Qt::StrongFocus);
+  m_presetListOm->installEventFilter(this);
   m_addPresetBtn->setObjectName("PushButton_NoPadding");
   m_removePresetBtn->setObjectName("PushButton_NoPadding");
 
@@ -396,7 +412,8 @@ void CameraSettingsWidget::showEvent(QShowEvent *e) {
   if (Preferences::instance()->getPixelsOnly())
     m_unitLabel->setText(tr("Pixels"));
   else
-    m_unitLabel->setText(Preferences::instance()->getCameraUnits());
+    m_unitLabel->setText(
+        unitTrMap.value(Preferences::instance()->getCameraUnits()));
 }
 
 void CameraSettingsWidget::loadPresetList() {
@@ -526,6 +543,11 @@ bool CameraSettingsWidget::eventFilter(QObject *obj, QEvent *e) {
              (obj == m_xResFld ||
               obj == m_yResFld))  // dotPrev, fld = xres|yres
       m_inchPrev->setChecked(true);
+  }
+  // ignore wheelevent on the combobox
+  else if (e->type() == QEvent::Wheel) {
+    QComboBox *combo = qobject_cast<QComboBox *>(obj);
+    if (combo && !combo->hasFocus()) return true;
   }
 
   return QObject::eventFilter(obj, e);

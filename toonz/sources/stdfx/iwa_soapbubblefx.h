@@ -32,7 +32,7 @@ protected:
   TDoubleParamP m_center_opacity;
   TBoolParamP m_fit_thickness;
 
-  // obsolete parameter. to be conerted to m_center_opacity
+  // obsolete parameter. to be converted to m_center_opacity
   TBoolParamP m_mask_center;
 
   // noise parameters
@@ -67,7 +67,7 @@ protected:
 
   void do_createBlurFilter(float* dst_p, int size, float radius);
 
-  void do_applyFilter(float* depth_map_p, TDimensionI dim, float* distace_p,
+  void do_applyFilter(float* depth_map_p, TDimensionI dim, float* distance_p,
                       USHORT* binarized_p, float* blur_filter_p,
                       int blur_filter_size, double frame,
                       const TRenderSettings& settings);

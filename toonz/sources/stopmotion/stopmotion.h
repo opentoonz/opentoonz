@@ -29,6 +29,7 @@
 
 #include <QObject>
 #include <QThread>
+#include <QSound>
 
 class QCamera;
 class QCameraInfo;
@@ -70,6 +71,9 @@ private:
   std::map<std::string, QAction*> m_oldActionMap;
   std::map<int, TRaster32P> m_liveViewImageMap;
 
+  bool m_playCaptureSound = false;
+  QSound* m_camSnapSound  = 0;
+
 public:
   enum LiveViewStatus {
     LiveViewClosed = 0,
@@ -89,13 +93,13 @@ public:
   bool m_userCalledPause   = false;
   bool m_drawBeneathLevels = true;
   bool m_isTimeLapse       = false;
-  int m_reviewTime         = 2;
+  int m_reviewTimeDSec     = 20;
   QString m_tempFile;
   TXshSimpleLevel* m_sl;
 
   // timers
   QTimer* m_timer;
-  int m_intervalTime     = 10;
+  int m_intervalDSec     = 100;
   bool m_intervalStarted = false;
   QTimer* m_reviewTimer;
   QTimer *m_intervalTimer, *m_countdownTimer, *m_webcamOverlayTimer;
@@ -164,7 +168,8 @@ public:
   void toggleInterval(bool on);
   void startInterval();
   void stopInterval();
-  void setIntervalAmount(int value);
+  void setIntervalDSec(int value);
+  int getIntervalDSec() { return m_intervalDSec; };
   void restartInterval();
 
   // options
@@ -181,12 +186,14 @@ public:
   void toggleNumpadShortcuts(bool on);
   void toggleNumpadForFocusCheck(bool on);
   void setDrawBeneathLevels(bool on);
-  void setReviewTime(int time);
-  int getReviewTime() { return m_reviewTime; }
+  void setReviewTimeDSec(int timeDSec);
+  int getReviewTimeDSec() { return m_reviewTimeDSec; }
   void getSubsampling();
   void setSubsampling();
   int getSubsamplingValue() { return m_subsampling; }
   void setSubsamplingValue(int subsampling);
+  void setPlayCaptureSound(bool on);
+  bool getPlayCaptureSound() { return m_playCaptureSound; }
 
   // saving and loading
   void saveXmlFile();
@@ -238,6 +245,7 @@ signals:
   void useNumpadSignal(bool);
   void drawBeneathLevelsSignal(bool);
   void reviewTimeChangedSignal(int);
+  void playCaptureSignal(bool);
 
   // time lapse
   void intervalToggled(bool);

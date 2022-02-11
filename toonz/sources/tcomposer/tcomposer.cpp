@@ -673,7 +673,7 @@ int main(int argc, char *argv[]) {
 
   // Set the app's locale for numeric stuff to standard C. This is important for
   // atof() and similar
-  // calls that are locale-dependant.
+  // calls that are locale-dependent.
   setlocale(LC_NUMERIC, "C");
 
   // Install run out of contiguous memory callback

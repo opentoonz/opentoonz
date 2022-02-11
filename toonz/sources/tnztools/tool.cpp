@@ -34,6 +34,7 @@
 #include "toonz/dpiscale.h"
 #include "toonz/palettecontroller.h"
 #include "toonz/tonionskinmaskhandle.h"
+#include "toutputproperties.h"
 
 // TnzCore includes
 #include "tvectorimage.h"
@@ -102,8 +103,8 @@ TFrameId getNewFrameId(TXshSimpleLevel *sl, int row) {
   TFrameId fid(row + 1);
   if (sl->isFid(fid)) {
     fid = TFrameId(fid.getNumber(), 'a');
-    while (fid.getLetter() < 'z' && sl->isFid(fid))
-      fid = TFrameId(fid.getNumber(), fid.getLetter() + 1);
+    while (fid.getLetter().toUtf8().at(0) < 'z' && sl->isFid(fid))
+      fid = TFrameId(fid.getNumber(), fid.getLetter().toUtf8().at(0) + 1);
   }
   return fid;
 }
@@ -123,9 +124,15 @@ TFrameId getDesiredFId(TXshCellColumn *column, int r0, TXshSimpleLevel *sl,
     if (neighborFId.isEmptyFrame()) neighborFId = tmpFId;
     if (maxFId < tmpFId) maxFId = tmpFId;
   }
-  if (maxFId.getLetter() && maxFId.getLetter() < 'z' && maxFId == neighborFId)
-    return TFrameId(maxFId.getNumber(), maxFId.getLetter() + 1);
-  else
+
+  QByteArray suffix = maxFId.getLetter().toUtf8();
+  // increment letter
+  if (suffix.size() == 1 &&
+      ((suffix.at(0) >= 'A' && suffix.at(0) < 'Z') ||
+       (suffix.at(0) >= 'a' && suffix.at(0) < 'z')) &&
+      maxFId == neighborFId) {
+    return TFrameId(maxFId.getNumber(), suffix.at(0) + 1);
+  } else
     return TFrameId(maxFId.getNumber() + 1);
 }
 
@@ -306,6 +313,11 @@ TImage *TTool::touchImage() {
   TFrameHandle *currentFrame    = m_application->getCurrentFrame();
   TXshLevelHandle *currentLevel = m_application->getCurrentLevel();
 
+  TFrameId tmplFId = m_application->getCurrentScene()
+                         ->getScene()
+                         ->getProperties()
+                         ->formatTemplateFIdForInput();
+
   if (currentFrame->isEditingLevel()) {
     // Editing level
 
@@ -324,6 +336,8 @@ TImage *TTool::touchImage() {
 
       // create a new drawing
       img = sl->createEmptyFrame();
+      // modify frameId to be with the same frame format as existing frames
+      sl->formatFId(fid, tmplFId);
       sl->setFrame(fid, img);
       currentLevel->notifyLevelChange();
       m_isFrameCreated = true;
@@ -384,6 +398,8 @@ TImage *TTool::touchImage() {
       // create the new drawing
       TImageP img      = sl->createEmptyFrame();
       m_isFrameCreated = true;
+      // modify frameId to be with the same frame format as existing frames
+      sl->formatFId(fid, tmplFId);
       // insert the drawing in the level
       sl->setFrame(fid, img);
       // update the cell
@@ -463,6 +479,9 @@ TImage *TTool::touchImage() {
       // create the new drawing
       TImageP img      = sl->createEmptyFrame();
       m_isFrameCreated = true;
+
+      // modify frameId to be with the same frame format as existing frames
+      sl->formatFId(fid, tmplFId);
       // insert the drawing in the level
       sl->setFrame(fid, img);
       // update the cell
@@ -511,6 +530,8 @@ TImage *TTool::touchImage() {
   TFrameId fid = animationSheetEnabled ? getNewFrameId(sl, row) : TFrameId(1);
   TImageP img  = sl->createEmptyFrame();
   m_isFrameCreated = true;
+  // modify frameId to be with the same frame format as existing frames
+  sl->formatFId(fid, tmplFId);
   sl->setFrame(fid, img);
   cell = TXshCell(sl, fid);
   xsh->setCell(row, col, cell);
@@ -597,7 +618,7 @@ TTool::Application *TTool::getApplication() {
 //-----------------------------------------------------------------------------
 
 /*! Notify change of current image: update icon and notify level change.
-    If current object is a spline commit spline chenged.
+    If current object is a spline commit spline changed.
     If current mode is EditingLevel touch current frame.
 */
 void TTool::notifyImageChanged() {

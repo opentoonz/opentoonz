@@ -125,9 +125,10 @@ void CommandManager::define(CommandId id, CommandType type,
   node->m_qaction = qaction;
   node->m_qaction->setEnabled(
       (node->m_enabled &&
-          (node->m_handler || node->m_qaction->actionGroup() != 0)) ||
+       (node->m_handler || node->m_qaction->actionGroup() != 0)) ||
       node->m_type == MiscCommandType ||
-      node->m_type == ToolModifierCommandType);
+      node->m_type == ToolModifierCommandType ||
+      node->m_type == CellMarkCommandType);
 
   m_qactionTable[qaction] = node;
   qaction->setShortcutContext(Qt::ApplicationShortcut);
@@ -357,7 +358,7 @@ QAction *CommandManager::createAction(CommandId id, QObject *parent,
   if (!refAction) return 0;
   QString text = refAction->text();
   if (node->m_onText != "" && node->m_offText != "")
-    text          = state ? node->m_onText : node->m_offText;
+    text = state ? node->m_onText : node->m_offText;
   QAction *action = new QAction(text, parent);
   action->setShortcut(refAction->shortcut());
   return action;
@@ -519,24 +520,24 @@ void DVMenuAction::setActions(QList<QString> actions) {
 
 namespace {
 QString changeStringNumber(QString str, int index) {
-  QString newStr     = str;
-  int n              = 3;
+  QString newStr = str;
+  int n          = 3;
   if (index >= 10) n = 4;
   QString number;
   newStr.replace(0, n, number.number(index + 1) + QString(". "));
   return newStr;
 }
-}
+}  // namespace
 
 //-----------------------------------------------------------------------------
 
 void DVMenuAction::onTriggered(QAction *action) {
-  QVariant data                              = action->data();
+  QVariant data = action->data();
   if (data.isValid()) m_triggeredActionIndex = data.toInt();
   CommandManager::instance()->execute(action, menuAction());
   int oldIndex = m_triggeredActionIndex;
   if (m_triggeredActionIndex != -1) m_triggeredActionIndex = -1;
-  QString str                                              = data.toString();
+  QString str = data.toString();
   QAction *tableAction =
       CommandManager::instance()->getAction(str.toStdString().c_str());
   if (tableAction || oldIndex == 0) return;

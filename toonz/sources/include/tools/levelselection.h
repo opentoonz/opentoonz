@@ -35,7 +35,7 @@ class TVectorImage;
 //*******************************************************************************
 
 /*!
-  \brief    Selection type for level-based multi-frame selections targetting
+  \brief    Selection type for level-based multi-frame selections targeting
             primitives described by predefined filtering functions.
 */
 
@@ -50,7 +50,7 @@ public:
   };
 
   enum Filter          //!  Possible selection filters.
-  { EMPTY,             //!< Selection is empty - everyting is filtered out.
+  { EMPTY,             //!< Selection is empty - everything is filtered out.
     WHOLE,             //!< Selects everything - nothing is filtered out.
     SELECTED_STYLES,   //!< Acts only entities with selected palette styles.
     BOUNDARY_STROKES,  //!< Acts only on boundary strokes (applies only to

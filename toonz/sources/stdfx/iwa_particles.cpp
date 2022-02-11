@@ -56,7 +56,8 @@ Iwa_Particle::Iwa_Particle(
        it != porttiles.end(); ++it) {
     if ((values.lifetime_ctrl_val == it->first ||
          values.speed_ctrl_val == it->first ||
-         values.scale_ctrl_val == it->first || values.rot_ctrl_val == it->first
+         values.scale_ctrl_val == it->first ||
+         values.rot_ctrl_val == it->first
          /*- Speed Angleを明るさでコントロールする場合 -*/
          || (values.speeda_ctrl_val == it->first &&
              !values.speeda_use_gradient_val)) &&
@@ -228,7 +229,7 @@ void Iwa_Particle::create_Swing(const particles_values &values,
     smperiody = changesigny;
   }
   if (values.rotswingmode_val == Iwa_TiledParticlesFx::SWING_SMOOTH) {
-    smswinga = abs((int)(values.rotsca_val.first +
+    smswinga  = abs((int)(values.rotsca_val.first +
                          random.getFloat() * (ranges.rotsca_range)));
     smperioda = changesigna;
   }
@@ -248,7 +249,7 @@ void Iwa_Particle::create_Colors(const particles_values &values,
         (porttiles.find(values.gencol_ctrl_val) != porttiles.end()))
       get_image_reference(porttiles[values.gencol_ctrl_val], values, color);
     else
-      color        = values.gencol_val.getPremultipliedValue(random.getFloat());
+      color = values.gencol_val.getPremultipliedValue(random.getFloat());
     gencol.fadecol = values.genfadecol_val;
     if (values.gencol_spread_val) spread_color(color, values.gencol_spread_val);
     gencol.col = color;
@@ -375,7 +376,7 @@ void Iwa_Particle::update_Animation(const particles_values &values, int first,
   case Iwa_TiledParticlesFx::ANIM_SR_CYCLE:
     if (!keep || frame != keep - 1) {
       if (!animswing && frame < last - 1) {
-        frame                            = (frame + 1);
+        frame = (frame + 1);
         if (frame == last - 1) animswing = 1;
       } else
         frame = (frame - 1);
@@ -930,10 +931,8 @@ void Iwa_Particle::move(std::map<int, TTile *> porttiles,
                         float windy, float xgravity, float ygravity,
                         float dpicorr, int lastframe) {
   struct pos_dummy dummy;
-  float frictx, fricty;
   std::map<int, float> imagereferences;
   dummy.x = dummy.y = dummy.a = 0.0;
-  frictx = fricty = 0.0;
 
   float frictreference     = 1;
   float scalereference     = 0;
@@ -986,33 +985,27 @@ void Iwa_Particle::move(std::map<int, TTile *> porttiles,
     ygravity *= values.gravity_val;
   }
 
-  if (values.friction_val * frictreference) {
-    if (vx) {
-      frictx = vx * (1.0f + values.friction_val * frictreference) +
-               (10.0f / vx) * values.friction_val * frictreference;
-      if ((frictx / vx) < 0.0f) frictx = 0.0f;
-      vx                               = frictx;
-    }
-    if (!frictx &&
-        fabs(values.friction_val * frictreference * 10.0f) > fabs(xgravity)) {
-      xgravity = 0.0f;
-      dummy.x  = 0.0f;
-      dummy.a  = 0.0f;
-      windx    = 0.0f;
-    }
+  if (double friction = values.friction_val * frictreference) {
+    if (vx || vy) {
+      double v           = std::sqrt(vx * vx + vy * vy);
+      double frictined_v = v * (1 + friction) + (10 / v) * friction;
+      if (frictined_v < 0) frictined_v = 0;
 
-    if (vy) {
-      fricty = vy * (1.0f + values.friction_val * frictreference) +
-               (10.0f / vy) * values.friction_val * frictreference;
-      if ((fricty / vy) < 0.0f) fricty = 0.0f;
-      vy                               = fricty;
+      double f_ratio = frictined_v / v;
+      if (vx) vx *= f_ratio;
+      if (vy) vy *= f_ratio;
     }
-    if (!fricty &&
-        fabs(values.friction_val * frictreference * 10.0f) > fabs(ygravity)) {
-      ygravity = 0.0f;
-      dummy.y  = 0.0f;
-      dummy.a  = 0.0f;
-      windy    = 0.0f;
+    if (!vx && fabs(friction * 10) > fabs(xgravity)) {
+      xgravity = 0;
+      dummy.x  = 0;
+      dummy.a  = 0;
+      windx    = 0;
+    }
+    if (!vy && fabs(friction * 10) > fabs(xgravity)) {
+      xgravity = 0;
+      dummy.x  = 0;
+      dummy.a  = 0;
+      windx    = 0;
     }
   }
 

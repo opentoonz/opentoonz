@@ -308,7 +308,7 @@ struct set_param_default_t<tpbind_str_t, std::true_type> {
 template <>
 struct set_param_default_t<tpbind_spc_t, std::true_type> {
   static bool set_param_default(Param *param, const toonz_param_desc_t *desc) {
-    /* unfortunatly, TSpectrumParam's default values must be set within the
+    /* unfortunately, TSpectrumParam's default values must be set within the
      constructor, for now.
      see param_factory_< TSpectrumParam >() */
     return false;
@@ -407,7 +407,7 @@ inline T *param_factory_(const toonz_param_desc_t *desc) {
 
 template <>
 inline TPointParam *param_factory_(const toonz_param_desc_t *desc) {
-  return new TPointParam(TPointD(), true /* instanciate from plugin */);
+  return new TPointParam(TPointD(), true /* instantiate from plugin */);
 }
 
 template <>

@@ -25,7 +25,7 @@ class DVAPI ExpressionReferenceMonitorInfo {
   // true if the parameter is not monitored
   bool m_ignored = false;
   // column indices to which the parameter refers.
-  // note that the columns refered by the "cell" syntax will be
+  // note that the columns referred by the "cell" syntax will be
   // registered in this container, but not in the paramRefMap.
   QSet<int> m_colRefMap;
   // parameters to which the parameter refers

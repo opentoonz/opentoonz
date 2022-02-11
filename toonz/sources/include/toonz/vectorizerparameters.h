@@ -33,12 +33,12 @@ class TOStream;
 /*!
   \brief    Provides a base container for vectorization options.
 
-  \details  All vectorization options and informations are passed from higher
+  \details  All vectorization options and information are passed from higher
             (like \p VectorizerPopup) to lower layers (\p VectorizerCore) of
             the vectorization process inside a \p VectorizerConfiguration
   variable.
             This typically includes vectorization modes, various sensitivity and
-            accuracy parameters, and post-processing informations. This class
+            accuracy parameters, and post-processing information. This class
             merely acts as a base parameters container (although no pure virtual
             method is present) - meaning that every vectorization method
   inherits

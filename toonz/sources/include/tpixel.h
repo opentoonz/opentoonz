@@ -124,7 +124,7 @@ static inline TPixelRGBM32 from(const TPixelRGBM64 &pix);
 static TPixelRGBM32 from(const TPixelGR8 &pix);
 //!Converts TPixelGR16 into TPixelRGBM32
 static TPixelRGBM32 from(const TPixelGR16 &pix);
-//!In this conversion instead of truncating values fron 64 to 32 a randomic
+//!In this conversion instead of truncating values from 64 to 32 a randomic
 dithering is performed.
 //!r is a unsigned int random value
 static inline TPixelRGBM32 from(const TPixelRGBM64 &pix, TUINT32 r); // per il

@@ -257,13 +257,13 @@ public:
   SchematicPort *getEndPort() const { return m_endPort; }
 
   /*! Returns the other SchematicPort linked to the specified \b port.\n
-    Returns 0 if \b port isn't neither the start SchematicPort eihter the end
+    Returns 0 if \b port isn't neither the start SchematicPort either the end
     SchematicPort of this link.*/
   SchematicPort *getOtherPort(const SchematicPort *port) const;
   /*! Returns the other SchematicNode linked to the specified \b node.\n
     Returns 0 if \b node isn't neither the parent node of the start
     SchematicPort
-    eihter the parent node of the end SchematicPort of the link.*/
+    either the parent node of the end SchematicPort of the link.*/
   SchematicNode *getOtherNode(const SchematicNode *node) const;
 
   //! Returns true if the link is line shaped.
@@ -294,7 +294,7 @@ protected:
         links but can begin to draw links.\n
   A SchematicPort has got a hook thet is a position where links starts or
   ends.\n
-        A SchematicPort can be linked to an arbitriary number of links.
+        A SchematicPort can be linked to an arbitrary number of links.
         A SchematicPort handles a container of all links to retrieve all linked
   node; each link is indexed using a
         progressive number assigned when the link is inserted to the container.

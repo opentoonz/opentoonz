@@ -1408,16 +1408,19 @@ bool TLevelColumnFx::doGetBBox(double frame, TRectD &bBox,
     TImageInfo imageInfo;
     getImageInfo(imageInfo, sl, cell.m_frameId);
 
-    TRect imageSavebox(imageInfo.m_x0, imageInfo.m_y0, imageInfo.m_x1,
-                       imageInfo.m_y1);
     double cx = 0.5 * imageInfo.m_lx;
     double cy = 0.5 * imageInfo.m_ly;
-    double x0 = (imageSavebox.x0 - cx);
-    double y0 = (imageSavebox.y0 - cy);
-    double x1 = x0 + imageSavebox.getLx();
-    double y1 = y0 + imageSavebox.getLy();
-    bBox      = TRectD(x0, y0, x1, y1);
-
+    if (info.m_getFullSizeBBox) {
+      bBox = TRectD(-cx, -cy, cx, cy);
+    } else {
+      TRect imageSavebox(imageInfo.m_x0, imageInfo.m_y0, imageInfo.m_x1,
+                         imageInfo.m_y1);
+      double x0 = (imageSavebox.x0 - cx);
+      double y0 = (imageSavebox.y0 - cy);
+      double x1 = x0 + imageSavebox.getLx();
+      double y1 = y0 + imageSavebox.getLy();
+      bBox      = TRectD(x0, y0, x1, y1);
+    }
     dpi = imageInfo.m_dpix / Stage::inch;
   } else {
     TImageP img = m_levelColumn->getCell(row).getImage(false);

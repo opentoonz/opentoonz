@@ -33,6 +33,7 @@ set(MOC_HEADERS
     ../include/toonzqt/fxselection.h
     ../include/toonzqt/fxsettings.h
     ../include/toonzqt/gutil.h
+    ../include/toonzqt/hexcolornames.h
     ../include/toonzqt/histogram.h
     ../include/toonzqt/icongenerator.h
     ../include/toonzqt/imageutils.h
@@ -122,6 +123,7 @@ set(SOURCES
     fxhistogramrender.cpp
     fxsettings.cpp
     gutil.cpp
+    hexcolornames.cpp
     histogram.cpp
     icongenerator.cpp
     imageutils.cpp

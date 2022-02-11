@@ -27,6 +27,17 @@ class TDoubleParam;
 class TFrameHandle;
 class FunctionSelection;
 
+class FunctionSheetButtonArea final : public QWidget {
+  Q_OBJECT
+  QPushButton *m_syncSizeBtn;
+
+public:
+  FunctionSheetButtonArea(QWidget *parent);
+  void setSyncSizeBtnState(bool);
+signals:
+  void syncSizeBtnToggled(bool);
+};
+
 class FunctionSheetRowViewer final : public Spreadsheet::RowPanel {
   FunctionSheet *m_sheet;
 
@@ -98,7 +109,20 @@ private slots:
 
 class FunctionSheet final : public SpreadsheetViewer {
   Q_OBJECT
+
+  FunctionSheetRowViewer *m_rowViewer;
+  FunctionSheetColumnHeadViewer *m_columnHeadViewer;
+  FunctionSheetCellViewer *m_cellViewer;
+  FunctionSelection *m_selection;
+  FunctionTreeModel *m_functionTreeModel;
+  FunctionViewer *m_functionViewer;
+  FunctionSheetButtonArea *m_buttonArea;
+  TXsheetHandle *m_xshHandle;
+
+  QRect m_selectedCells;
+  bool m_isFloating;
   bool m_showIbtwnValue = true;
+  bool m_syncSize       = true;
 
 public:
   FunctionSheet(QWidget *parent = 0, bool isFloating = false);
@@ -138,20 +162,15 @@ public:
     update();
   }
 
+  bool isSyncSize() { return m_syncSize; }
+  void setSyncSize(bool on);
+  void setXsheetHandle(TXsheetHandle *xshHandle) { m_xshHandle = xshHandle; }
+
+  int getFrameZoomFactor() const override;
+
 protected:
   void showEvent(QShowEvent *e) override;
   void hideEvent(QHideEvent *e) override;
-
-private:
-  FunctionSheetRowViewer *m_rowViewer;
-  FunctionSheetColumnHeadViewer *m_columnHeadViewer;
-  FunctionSheetCellViewer *m_cellViewer;
-  FunctionSelection *m_selection;
-  FunctionTreeModel *m_functionTreeModel;
-  FunctionViewer *m_functionViewer;
-
-  QRect m_selectedCells;
-  bool m_isFloating;
 
 public slots:
 
@@ -160,6 +179,9 @@ public slots:
   /*---
    * カレントChannelが切り替わったら、NumericalColumnsがそのChannelを表示できるようにスクロールする。---*/
   void onCurrentChannelChanged(FunctionTreeModel::Channel *);
+
+  void onSyncSizeBtnToggled(bool);
+  void onZoomScaleChanged();
 };
 
 #endif

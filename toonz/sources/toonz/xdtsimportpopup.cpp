@@ -4,6 +4,8 @@
 #include "tsystem.h"
 #include "toonzqt/filefield.h"
 #include "toonz/toonzscene.h"
+#include "toonz/tscenehandle.h"
+#include "toonz/sceneproperties.h"
 
 #include <QMainWindow>
 #include <QTableView>
@@ -11,8 +13,19 @@
 #include <QScrollArea>
 #include <QGridLayout>
 #include <QLabel>
+#include <QComboBox>
 
 using namespace DVGui;
+
+namespace {
+QIcon getColorChipIcon(TPixel32 color) {
+  QPixmap pm(15, 15);
+  pm.fill(QColor(color.r, color.g, color.b));
+  return QIcon(pm);
+}
+}  // namespace
+
+//=============================================================================
 
 XDTSImportPopup::XDTSImportPopup(QStringList levelNames, ToonzScene* scene,
                                  TFilePath scenePath)
@@ -23,6 +36,26 @@ XDTSImportPopup::XDTSImportPopup(QStringList levelNames, ToonzScene* scene,
                      .arg(QString::fromStdString(scenePath.getLevelName())));
   QPushButton* loadButton   = new QPushButton(tr("Load"), this);
   QPushButton* cancelButton = new QPushButton(tr("Cancel"), this);
+
+  m_tick1Combo                            = new QComboBox(this);
+  m_tick2Combo                            = new QComboBox(this);
+  QList<TSceneProperties::CellMark> marks = TApp::instance()
+                                                ->getCurrentScene()
+                                                ->getScene()
+                                                ->getProperties()
+                                                ->getCellMarks();
+  for (int i = 0; i < 2; i++) {
+    QComboBox* combo = (i == 0) ? m_tick1Combo : m_tick2Combo;
+    combo->addItem(tr("None"), -1);
+    int curId = 0;
+    for (auto mark : marks) {
+      QString label = QString("%1: %2").arg(curId).arg(mark.name);
+      combo->addItem(getColorChipIcon(mark.color), label, curId);
+      curId++;
+    }
+  }
+  m_tick1Combo->setCurrentIndex(m_tick1Combo->findData(0));
+  m_tick2Combo->setCurrentIndex(m_tick2Combo->findData(1));
 
   QString description =
       tr("Please specify the level locations. Suggested paths "
@@ -61,6 +94,23 @@ XDTSImportPopup::XDTSImportPopup(QStringList levelNames, ToonzScene* scene,
   fieldsWidget->setLayout(fieldsLay);
   fieldsArea->setWidget(fieldsWidget);
   m_topLayout->addWidget(fieldsArea, 1);
+
+  // cell mark area
+  QGridLayout* markLay = new QGridLayout();
+  markLay->setMargin(0);
+  markLay->setHorizontalSpacing(10);
+  markLay->setVerticalSpacing(10);
+  {
+    markLay->addWidget(new QLabel(tr("Inbetween symbol mark"), this), 0, 0,
+                       Qt::AlignRight | Qt::AlignVCenter);
+    markLay->addWidget(m_tick1Combo, 0, 1);
+
+    markLay->addWidget(new QLabel(tr("Reverse sheet symbol mark"), this), 1, 0,
+                       Qt::AlignRight | Qt::AlignVCenter);
+    markLay->addWidget(m_tick2Combo, 1, 1);
+  }
+  markLay->setColumnStretch(2, 1);
+  m_topLayout->addLayout(markLay, 0);
 
   connect(loadButton, SIGNAL(clicked()), this, SLOT(accept()));
   connect(cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
@@ -178,8 +228,17 @@ void XDTSImportPopup::updateSuggestions(const QString samplePath) {
   }
 }
 
+//-----------------------------------------------------------------------------
+
 QString XDTSImportPopup::getLevelPath(QString levelName) {
   FileField* field = m_fields.value(levelName);
   if (!field) return QString();
   return field->getPath();
+}
+
+//-----------------------------------------------------------------------------
+
+void XDTSImportPopup::getMarkerIds(int& tick1Id, int& tick2Id) {
+  tick1Id = m_tick1Combo->currentData().toInt();
+  tick2Id = m_tick2Combo->currentData().toInt();
 }

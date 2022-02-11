@@ -34,10 +34,16 @@ class LevelCreatePopup final : public DVGui::Dialog {
   DVGui::MeasuredDoubleLineEdit *m_heightFld;
   DVGui::DoubleLineEdit *m_dpiFld;
 
+  QLabel *m_rasterFormatLabel;
+  QComboBox *m_rasterFormatOm;
+  QPushButton *m_frameFormatBtn;
+
 public:
   LevelCreatePopup();
 
   void setSizeWidgetEnable(bool isEnable);
+  void setRasterWidgetVisible(bool isVisible);
+
   int getLevelType() const;
 
   void update();
@@ -55,6 +61,7 @@ public slots:
   void onOkBtn();
 
   void onApplyButton();
+  void onFrameFormatButton();
 };
 
 #endif  // LEVELCREATEPOPUP_H

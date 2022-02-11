@@ -52,7 +52,7 @@ public:
   // Used to notify and set the currentColor outside the draw() methods:
   // using special style there was a conflict between the draw() methods of the
   // tool
-  // and the genaration of the icon inside the style editor (makeIcon()) which
+  // and the generation of the icon inside the style editor (makeIcon()) which
   // use
   // another glContext
 

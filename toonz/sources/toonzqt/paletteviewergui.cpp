@@ -81,7 +81,7 @@ using namespace DVGui;
    the style is
                 displayed as tooltip.
                 \li SmallChipsWithName:
-                displays styles as small squares with the name insde.
+                displays styles as small squares with the name inside.
                 \li LargeChips: displays the styles on top of the name of the
    style.
                 \li List:				List displays style
@@ -811,7 +811,7 @@ void PageViewer::paintEvent(QPaintEvent *e) {
         } else if (m_nameDisplayMode == StyleAndOriginal) {
           drawChipName(p, chipRect, name);
 
-          // display original name only whne LargeChip view
+          // display original name only when LargeChip view
           if (m_viewMode == LargeChips && origName != L"") {
             tmpFont.setItalic(true);
             tmpFont.setPixelSize(tmpFont.pixelSize() - 3);
@@ -1016,7 +1016,7 @@ void PageViewer::mousePressEvent(QMouseEvent *event) {
 }
 
 //-----------------------------------------------------------------------------
-/*! If left botton is pressed start drag.
+/*! If left button is pressed start drag.
  */
 void PageViewer::mouseMoveEvent(QMouseEvent *event) {
   if (!m_page) return;

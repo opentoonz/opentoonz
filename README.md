@@ -29,6 +29,7 @@ Older versions and unstable nightly build are also available at <https://github.
 - [Windows](./doc/how_to_build_win.md)
 - [OS X](./doc/how_to_build_macosx.md)
 - [Linux](./doc/how_to_build_linux.md)
+- [BSD](./doc/how_to_build_bsd.md)
 
 For instructions on how to build stylesheets, please [see here](./doc/how_to_stylesheet.md).
 

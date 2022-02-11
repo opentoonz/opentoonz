@@ -82,12 +82,11 @@ public:
 
   static FormatType getFormatType(std::string extension);
 
-  static void define(
-      QString extension, int reader,
-      // nel caso in cui ci siano piu' lettori per lo stesso formato
-      // (es. flash)
+  static void define(QString extension, int reader,
+                     // nel caso in cui ci siano piu' lettori per lo stesso
+                     // formato (es. flash)
 
-      TLevelReaderCreateProc *proc);
+                     TLevelReaderCreateProc *proc);
 
   static inline void define(QString extension, TLevelReaderCreateProc *proc) {
     define(extension, 0, proc);
@@ -135,6 +134,9 @@ protected:
   TPropertyGroup *m_properties;
   TContentHistory *m_contentHistory;
   QString m_creator;
+
+  // if template is not used, frame number is set to TFrameId::NO_FRAME
+  TFrameId m_frameFormatTemplateFId;
 
 public:
   TLevelWriter(const TFilePath &path,
@@ -203,6 +205,10 @@ public:
 
   static void define(QString extension, TLevelWriterCreateProc *proc,
                      bool isRenderFormat);
+
+  void setFrameFormatTemplateFId(const TFrameId &tmplFId) {
+    m_frameFormatTemplateFId = tmplFId;
+  }
 };
 
 //-----------------------------------------------------------
@@ -235,6 +241,19 @@ inline bool isMovieType(std::string type) {
 inline bool isMovieType(const TFilePath &fp) {
   std::string type(fp.getType());
   return isMovieType(type);
+}
+
+//-----------------------------------------------------------
+
+inline bool isSequencialRequired(std::string type) {
+  return (type == "mov" || type == "avi" || type == "3gp");
+}
+
+//-----------------------------------------------------------
+
+inline bool isSequencialRequired(const TFilePath &fp) {
+  std::string type(fp.getType());
+  return isSequencialRequired(type);
 }
 
 //-----------------------------------------------------------

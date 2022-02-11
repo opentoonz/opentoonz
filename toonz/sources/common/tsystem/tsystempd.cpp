@@ -196,7 +196,7 @@ bool TSystem::memoryShortage() {
          memStatus.ullTotalVirtual *
              0.6;  // if total memory used by this process(WorkingSetSize) is
 // half of max allocatable memory
-//(ullTotalVirtual: on 32bits machines, tipically it's 2GB)
+//(ullTotalVirtual: on 32bits machines, typically it's 2GB)
 // It's better "to stay large"; for values >0.6 this function may
 // returns that there is memory, but for fragmentation the malloc fails the
 // same!
@@ -225,7 +225,7 @@ bool TSystem::memoryShortage() {
 
 //------------------------------------------------------------
 
-TINT64 TSystem::getFreeMemorySize(bool onlyPhisicalMemory) {
+TINT64 TSystem::getFreeMemorySize(bool onlyPhysicalMemory) {
   TINT64 totalFree = 0;
 
 #ifdef _WIN32
@@ -234,7 +234,7 @@ TINT64 TSystem::getFreeMemorySize(bool onlyPhisicalMemory) {
   buff.dwLength = sizeof(MEMORYSTATUSEX);
   GlobalMemoryStatusEx(&buff);
 
-  if (onlyPhisicalMemory)
+  if (onlyPhysicalMemory)
     return buff.ullAvailPhys >> 10;
   else
     return buff.ullAvailPageFile >> 10;
@@ -243,7 +243,7 @@ TINT64 TSystem::getFreeMemorySize(bool onlyPhisicalMemory) {
 
   // check for virtual memory
   int numberOfResources =
-      swapctl(SC_GETNSWP, 0); /* get number of swapping resources configued */
+      swapctl(SC_GETNSWP, 0); /* get number of swapping resources configured */
 
   if (numberOfResources == 0) return 0;
 
@@ -269,7 +269,7 @@ TINT64 TSystem::getFreeMemorySize(bool onlyPhisicalMemory) {
   struct sysinfo *sysInfo = (struct sysinfo *)calloc(1, sizeof(struct sysinfo));
 
   if (!sysinfo(sysInfo)) {
-    if (onlyPhisicalMemory)
+    if (onlyPhysicalMemory)
       totalFree = sysInfo->freeram;
     else
       totalFree = sysInfo->freeram + sysInfo->freeswap;
@@ -403,12 +403,12 @@ TINT64 TSystem::getFreeDiskSize(const TFilePath &diskName) {
 
 //------------------------------------------------------------
 
-TINT64 TSystem::getMemorySize(bool onlyPhisicalMemory) {
+TINT64 TSystem::getMemorySize(bool onlyPhysicalMemory) {
 #ifdef _WIN32
 
   MEMORYSTATUS buff;
   GlobalMemoryStatus(&buff);
-  if (onlyPhisicalMemory)
+  if (onlyPhysicalMemory)
     return buff.dwTotalPhys >> 10;
   else
     return buff.dwTotalPageFile >> 10;

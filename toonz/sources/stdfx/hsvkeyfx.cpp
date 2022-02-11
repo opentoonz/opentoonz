@@ -5,8 +5,9 @@
 #include <math.h>
 #include "stdfx.h"
 #include "hsvutil.h"
+#include "globalcontrollablefx.h"
 
-class HSVKeyFx final : public TStandardRasterFx {
+class HSVKeyFx final : public GlobalControllableFx {
   FX_PLUGIN_DECLARATION(HSVKeyFx)
 
   TRasterFxPort m_input;

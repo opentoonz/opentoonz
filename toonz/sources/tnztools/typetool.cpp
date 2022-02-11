@@ -358,6 +358,7 @@ public:
   void setCursorIndexFromPoint(TPointD point);
 
   void mouseMove(const TPointD &pos, const TMouseEvent &) override;
+  bool preLeftButtonDown() override;
   void leftButtonDown(const TPointD &pos, const TMouseEvent &) override;
   void rightButtonDown(const TPointD &pos, const TMouseEvent &) override;
   bool keyDown(QKeyEvent *event) override;
@@ -1201,6 +1202,15 @@ void TypeTool::mouseMove(const TPointD &pos, const TMouseEvent &) {
 
 //---------------------------------------------------------
 
+bool TypeTool::preLeftButtonDown() {
+  if (getViewer() && getViewer()->getGuidedStrokePickerMode()) return false;
+
+  if (m_validFonts && !m_active) touchImage();
+  return true;
+}
+
+//---------------------------------------------------------
+
 void TypeTool::leftButtonDown(const TPointD &pos, const TMouseEvent &) {
   TSelection::setCurrent(0);
 
@@ -1211,11 +1221,7 @@ void TypeTool::leftButtonDown(const TPointD &pos, const TMouseEvent &) {
 
   if (!m_validFonts) return;
 
-  TImageP img;
-  if (!m_active)
-    img = touchImage();
-  else
-    img = getImage(true);
+  TImageP img      = getImage(true);
   TVectorImageP vi = img;
   TToonzImageP ti  = img;
 
@@ -1302,7 +1308,16 @@ void TypeTool::replaceText(std::wstring text, int from, int to) {
   for (unsigned int i = 0; i < (unsigned int)text.size(); i++) {
     wchar_t character = text[i];
 
-    if (vi) {
+    // line break case. This can happen when pasting text including the line
+    // break
+    if (character == '\r') {
+      TVectorImageP vi(new TVectorImage);
+      unsigned int index = from + i;
+      m_string.insert(m_string.begin() + index,
+                      StrokeChar(vi, -1., (int)(QChar('\r').unicode()), 0));
+    }
+
+    else if (vi) {
       TVectorImageP characterImage(new TVectorImage());
       unsigned int index = from + i;
       // se il font ha kerning bisogna tenere conto del carattere successivo
@@ -1328,7 +1343,7 @@ void TypeTool::replaceText(std::wstring text, int from, int to) {
       unsigned int index = from + i;
 
       if (instance->hasKerning() && (UINT)m_cursorIndex < m_string.size() &&
-          !m_string[index].isReturn())
+          index < m_string.size() - 1 && !m_string[index].isReturn())
         adv = instance->drawChar((TRasterCM32P &)newRasterCM, p, styleId,
                                  (wchar_t)character,
                                  (wchar_t)m_string[index].m_key);
@@ -1608,7 +1623,7 @@ bool TypeTool::keyDown(QKeyEvent *event) {
     invalidate();
     break;
 
-  /////////////////// end cursors
+    /////////////////// end cursors
 
   case Qt::Key_Escape:
     resetInputMethod();

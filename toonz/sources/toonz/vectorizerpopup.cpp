@@ -416,7 +416,7 @@ int Vectorizer::doVectorize() {
 void Vectorizer::run() { doVectorize(); }
 
 //*****************************************************************************
-//    VectorizerPopup implentation
+//    VectorizerPopup implementation
 //*****************************************************************************
 
 #if QT_VERSION >= 0x050500
@@ -766,7 +766,7 @@ paramsLayout->addWidget(m_cThicknessRatio, row++, 1);*/
 
   m_swatchArea = new VectorizerSwatchArea(this);
   splitter->addWidget(m_swatchArea);
-  m_swatchArea->setEnabled(false);  // Initally not enabled
+  m_swatchArea->setEnabled(false);  // Initially not enabled
 
   connect(this, SIGNAL(valuesChanged()), m_swatchArea,
           SLOT(invalidateContents()));
@@ -1242,7 +1242,7 @@ void VectorizerPopup::setType(bool outline) {
   disconnect(m_typeMenu, SIGNAL(currentIndexChanged(int)), this,
              SLOT(onTypeChange(int)));
 
-  // Setting child visibility alot invokes several layout updates - causing
+  // Setting child visibility a lot invokes several layout updates - causing
   // extensive flickering
   m_paramsWidget->layout()->setEnabled(false);
 

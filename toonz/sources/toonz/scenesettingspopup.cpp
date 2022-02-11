@@ -32,6 +32,7 @@
 #include <QApplication>
 #include <QMainWindow>
 #include <QPainter>
+#include <QPushButton>
 
 using namespace DVGui;
 
@@ -42,6 +43,46 @@ namespace {
 const int labelSize = 110;
 
 //-----------------------------------------------------------------------------
+
+class EditCellMarkUndo final : public TUndo {
+  int m_id;
+  TSceneProperties::CellMark m_markBefore, m_markAfter;
+
+  EditCellMarkUndo(int id) : m_id(id) {
+    m_markBefore = TApp::instance()
+                       ->getCurrentScene()
+                       ->getScene()
+                       ->getProperties()
+                       ->getCellMark(id);
+  }
+
+public:
+  EditCellMarkUndo(int id, TPixel32 color) : EditCellMarkUndo(id) {
+    m_markAfter = {m_markBefore.name, color};
+  }
+  EditCellMarkUndo(int id, QString name) : EditCellMarkUndo(id) {
+    m_markAfter = {name, m_markBefore.color};
+  }
+
+  void set(const TSceneProperties::CellMark &mark) const {
+    TApp::instance()
+        ->getCurrentScene()
+        ->getScene()
+        ->getProperties()
+        ->setCellMark(mark, m_id);
+    TApp::instance()->getCurrentScene()->notifySceneChanged();
+  }
+
+  void undo() const override { set(m_markBefore); }
+
+  void redo() const override { set(m_markAfter); }
+
+  int getSize() const override { return sizeof *this; }
+
+  QString getHistoryString() override {
+    return QObject::tr("Edit Cell Mark #%1").arg(QString::number(m_id));
+  }
+};
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
@@ -78,11 +119,128 @@ QImage::Format_ARGB32);
 */
 
 //=============================================================================
+// CellMarksPopup
+//-----------------------------------------------------------------------------
+
+CellMarksPopup::CellMarksPopup(QWidget *parent) : QDialog(parent) {
+  setWindowTitle(tr("Cell Marks Settings"));
+
+  QList<TSceneProperties::CellMark> marks = TApp::instance()
+                                                ->getCurrentScene()
+                                                ->getScene()
+                                                ->getProperties()
+                                                ->getCellMarks();
+
+  QGridLayout *layout = new QGridLayout();
+  layout->setMargin(10);
+  layout->setHorizontalSpacing(5);
+  layout->setVerticalSpacing(10);
+  {
+    int id = 0;
+    for (auto mark : marks) {
+      ColorField *colorF = new ColorField(this, false, mark.color, 20);
+      colorF->hideChannelsFields(true);
+      QLineEdit *nameF = new QLineEdit(mark.name, this);
+      m_fields.append({id, colorF, nameF});
+
+      int row = layout->rowCount();
+
+      layout->addWidget(new QLabel(QString("%1:").arg(id), this), row, 0,
+                        Qt::AlignRight | Qt::AlignVCenter);
+
+      layout->addWidget(colorF, row, 1);
+      layout->addWidget(nameF, row, 2);
+
+      connect(colorF, SIGNAL(colorChanged(const TPixel32 &, bool)), this,
+              SLOT(onColorChanged(const TPixel32 &, bool)));
+      connect(nameF, SIGNAL(editingFinished()), this, SLOT(onNameChanged()));
+      id++;
+    }
+  }
+  layout->setColumnStretch(2, 1);
+  setLayout(layout);
+}
+
+void CellMarksPopup::update() {
+  QList<TSceneProperties::CellMark> marks = TApp::instance()
+                                                ->getCurrentScene()
+                                                ->getScene()
+                                                ->getProperties()
+                                                ->getCellMarks();
+  assert(marks.count() == m_fields.count());
+  int id = 0;
+  for (auto mark : marks) {
+    assert(m_fields[id].id == id);
+    m_fields[id].colorField->setColor(mark.color);
+    m_fields[id].nameField->setText(mark.name);
+    id++;
+  }
+}
+
+void CellMarksPopup::onColorChanged(const TPixel32 &color, bool isDragging) {
+  if (isDragging) return;
+  // obtain id
+  int id             = -1;
+  ColorField *colorF = qobject_cast<ColorField *>(sender());
+  for (auto field : m_fields) {
+    if (field.colorField == colorF) {
+      id = field.id;
+      break;
+    }
+  }
+  if (id < 0) return;
+
+  // return if the value is unchanged
+  TPixel32 oldColor = TApp::instance()
+                          ->getCurrentScene()
+                          ->getScene()
+                          ->getProperties()
+                          ->getCellMark(id)
+                          .color;
+  if (color == oldColor) return;
+
+  EditCellMarkUndo *undo = new EditCellMarkUndo(id, color);
+  undo->redo();
+  TUndoManager::manager()->add(undo);
+}
+
+void CellMarksPopup::onNameChanged() {
+  // obtain id
+  int id           = -1;
+  QLineEdit *nameF = qobject_cast<QLineEdit *>(sender());
+  for (auto field : m_fields) {
+    if (field.nameField == nameF) {
+      id = field.id;
+      break;
+    }
+  }
+  if (id < 0) return;
+
+  // return if the value is unchanged
+  QString oldName = TApp::instance()
+                        ->getCurrentScene()
+                        ->getScene()
+                        ->getProperties()
+                        ->getCellMark(id)
+                        .name;
+  if (nameF->text() == oldName) return;
+  // reject empty string
+  if (nameF->text().isEmpty()) {
+    nameF->setText(oldName);
+    return;
+  }
+
+  EditCellMarkUndo *undo = new EditCellMarkUndo(id, nameF->text());
+  undo->redo();
+  TUndoManager::manager()->add(undo);
+}
+
+//=============================================================================
 // SceneSettingsPopup
 //-----------------------------------------------------------------------------
 
 SceneSettingsPopup::SceneSettingsPopup()
-    : QDialog(TApp::instance()->getMainWindow()) {
+    : QDialog(TApp::instance()->getMainWindow()), m_cellMarksPopup(nullptr) {
   setWindowTitle(tr("Scene Settings"));
   setObjectName("SceneSettings");
   TSceneProperties *sprop = getProperties();
@@ -124,6 +282,9 @@ SceneSettingsPopup::SceneSettingsPopup()
   m_colorFilterOnRenderCB->setChecked(
       sprop->isColumnColorFilterOnRenderEnabled());
 
+  QPushButton *editCellMarksButton =
+      new QPushButton(tr("Edit Cell Marks"), this);
+
   // layout
   QGridLayout *mainLayout = new QGridLayout();
   mainLayout->setMargin(10);
@@ -164,6 +325,12 @@ SceneSettingsPopup::SceneSettingsPopup()
 
     // Use Color Filter and Transparency for Rendering
     mainLayout->addWidget(m_colorFilterOnRenderCB, 6, 0, 1, 4);
+
+    // cell marks
+    mainLayout->addWidget(new QLabel(tr("Cell Marks:"), this), 7, 0,
+                          Qt::AlignRight | Qt::AlignVCenter);
+    mainLayout->addWidget(editCellMarksButton, 7, 1, 1, 4,
+                          Qt::AlignLeft | Qt::AlignVCenter);
   }
   mainLayout->setColumnStretch(0, 0);
   mainLayout->setColumnStretch(1, 0);
@@ -201,6 +368,9 @@ SceneSettingsPopup::SceneSettingsPopup()
   // Use Color Filter and Transparency for Rendering
   ret = ret && connect(m_colorFilterOnRenderCB, SIGNAL(stateChanged(int)), this,
                        SLOT(onColorFilterOnRenderChanged()));
+  // Cell Marks
+  ret = ret && connect(editCellMarksButton, SIGNAL(clicked()), this,
+                       SLOT(onEditCellMarksButtonClicked()));
   assert(ret);
 }
 
@@ -254,6 +424,8 @@ void SceneSettingsPopup::update() {
   m_startFrameFld->setValue(markerOffset + 1);
   m_colorFilterOnRenderCB->setChecked(
       sprop->isColumnColorFilterOnRenderEnabled());
+
+  if (m_cellMarksPopup) m_cellMarksPopup->update();
 }
 
 //-----------------------------------------------------------------------------
@@ -366,6 +538,14 @@ void SceneSettingsPopup::onColorFilterOnRenderChanged() {
   TSceneProperties *sprop = getProperties();
   sprop->enableColumnColorFilterOnRender(m_colorFilterOnRenderCB->isChecked());
   TApp::instance()->getCurrentScene()->notifySceneChanged();
+}
+
+//-----------------------------------------------------------------------------
+
+void SceneSettingsPopup::onEditCellMarksButtonClicked() {
+  if (!m_cellMarksPopup) m_cellMarksPopup = new CellMarksPopup(this);
+  m_cellMarksPopup->show();
+  m_cellMarksPopup->raise();
 }
 
 //=============================================================================

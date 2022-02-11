@@ -2,7 +2,7 @@
 
 //-----------------------------------------------------------------------------
 //  drawutil.h:
-//    Private header to common fuction in drawcurves.cpp and drawregions.cpp
+//    Private header to common function in drawcurves.cpp and drawregions.cpp
 //-----------------------------------------------------------------------------
 
 #ifndef DRAWUTIL_H

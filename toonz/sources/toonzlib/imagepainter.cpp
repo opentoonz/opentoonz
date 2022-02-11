@@ -205,7 +205,7 @@ void Painter::flushRasterImages(const TRect &loadbox, double compareX,
   glDisable(GL_STENCIL_TEST);
 
 #ifdef GL_EXT_convolution
-  if( GLEW_EXT_convolution ) {
+  if (GLEW_EXT_convolution) {
     glDisable(GL_CONVOLUTION_1D_EXT);
     glDisable(GL_CONVOLUTION_2D_EXT);
     glDisable(GL_SEPARABLE_2D_EXT);
@@ -213,14 +213,14 @@ void Painter::flushRasterImages(const TRect &loadbox, double compareX,
 #endif
 
 #ifdef GL_EXT_histogram
-  if( GLEW_EXT_histogram ) {
+  if (GLEW_EXT_histogram) {
     glDisable(GL_HISTOGRAM_EXT);
     glDisable(GL_MINMAX_EXT);
   }
 #endif
 
 #ifdef GL_EXT_texture3D
-  if( GL_EXT_texture3D ) {
+  if (GL_EXT_texture3D) {
     glDisable(GL_TEXTURE_3D_EXT);
   }
 #endif
@@ -268,9 +268,10 @@ void Painter::flushRasterImages(const TRect &loadbox, double compareX,
     if ((TToonzImageP)refimg || (TRasterImageP)refimg) {
       // draw left/up part of the screen...
       TRasterP raux, rref;
-      if ((TToonzImageP)refimg)
-        rref = ((TToonzImageP)refimg)->getCMapped();
-      else
+      if ((TToonzImageP)refimg) {
+        rref      = ((TToonzImageP)refimg)->getCMapped();
+        m_palette = refimg->getPalette();
+      } else
         rref = ((TRasterImageP)refimg)->getRaster();
 
       TRect rect = loadbox;
@@ -354,24 +355,36 @@ void Painter::doFlushRasterImages(const TRasterP &rin, int bg,
   if (m_vSettings.m_useTexture)
     bbox = m_bbox;
   else {
-    double delta = sqrt(fabs(m_finalAff.det()));
-    bbox         = m_bbox.enlarge(delta) * viewRect;
+    // double delta = sqrt(fabs(m_finalAff.det()));
+    // bbox = m_bbox.enlarge(delta) * viewRect;
+    bbox = m_bbox * viewRect;
   }
 
   UCHAR chan = m_vSettings.m_colorMask;
   TRect rect(tfloor(bbox.x0), tfloor(bbox.y0), tceil(bbox.x1), tceil(bbox.y1));
   if (rect.isEmpty()) return;
 
-  TRaster32P ras;
+  TRasterP ras;
+  // TRaster32P ras;
   TRasterP _rin = rin;
   TAffine aff;
+  bool is16bpc = false;
   if (m_vSettings.m_useTexture) {
     ras = _rin;
     aff = m_aff;
     // ras->clear();
   } else {
     int lx = rect.getLx(), ly = rect.getLy();
+    // when the "30bit display" preference option is enabled,
+    // image previewed in 16bpc is not dithered & converted to 8bpc,
+    // but is kept the channel depth as 16bpc.
+    if (_rin->getPixelSize() == 8) {
+      ras     = TRaster64P(lx, ly);
+      is16bpc = true;
+    } else
+      ras = TRaster32P(lx, ly);
 
+    /*
     // Following lines are used to solve a problem that occurs with some
     // graphics cards!
     // It seems that the glReadPixels() function is very slow if the lx length
@@ -389,12 +402,22 @@ void Painter::doFlushRasterImages(const TRasterP &rin, int bg,
                  TGL_TYPE, backgroundRas->getRawData());
     TRect r = rect - rect.getP00();
     ras     = backgroundRas->extract(r);
-
+    */
     aff = TTranslation(-rect.x0, -rect.y0) * m_finalAff;
     aff *= TTranslation(TPointD(0.5, 0.5));  // very quick and very dirty fix:
                                              // in camerastand the images seems
                                              // shifted of an half pixel...it's
                                              // a quickput approximation?
+    if (bg == 0x100000)
+      quickput(ras, buildCheckboard(bg, _rin->getSize()), m_palette, aff,
+               false);
+    else {
+      if (is16bpc)
+        ((TRaster64P)ras)
+            ->fill(bg == 0x40000 ? TPixel64::Black : TPixel64::White);
+      else
+        ((TRaster32P)ras)->fill(bg == 0x40000 ? TPixel::Black : TPixel::White);
+    }
   }
 
   ras->lock();
@@ -421,21 +444,6 @@ void Painter::doFlushRasterImages(const TRasterP &rin, int bg,
                                 ras->getSize(), true);
     ras->unlock();
   } else {
-    if (bg == 0x100000)
-      quickput(ras, buildCheckboard(bg, _rin->getSize()), m_palette, aff,
-               false);
-    else {
-      int lx = (m_imageSize.lx == 0 ? _rin->getLx() : m_imageSize.lx);
-      int ly = (m_imageSize.ly == 0 ? _rin->getLy() : m_imageSize.ly);
-
-      TRect rect = convert(aff * TRectD(0, 0, lx - 1, ly - 1));
-      // Image size is a 0 point.  Do nothing
-      if (rect.x0 == rect.x1 && rect.y0 == rect.y1) return;
-
-      TRaster32P raux = ras->extract(rect);
-      raux->fill(bg == 0x40000 ? TPixel::Black : TPixel::White);
-    }
-
     if (showChannelsOnMatte)
       quickput(ras, keepChannels(_rin, m_palette, chan), m_palette,
                m_vSettings.m_useTexture ? TAffine() : aff * TTranslation(offs),
@@ -462,8 +470,9 @@ void Painter::doFlushRasterImages(const TRasterP &rin, int bg,
     glRasterPos2d(rect.x0, rect.y0);
     glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
 
-    glDrawPixels(ras->getWrap(), ras->getLy(), TGL_FMT, TGL_TYPE,
-                 ras->getRawData());
+    glDrawPixels(ras->getWrap(), ras->getLy(), TGL_FMT,
+                 (is16bpc) ? TGL_TYPE16 : TGL_TYPE,
+                 (GLvoid *)ras->getRawData());
 
     CHECK_ERRORS_BY_GL
 
@@ -506,7 +515,7 @@ void Painter::onVectorImage(TVectorImage *vi) {
 
   TVectorRenderData rd(m_aff, clipRect, vi->getPalette(), 0,
                        true  // alfa enabled
-                       );
+  );
   if (m_vSettings.m_useChecks) {
     ToonzCheck *tc         = ToonzCheck::instance();
     int checks             = tc->getChecks();  // &ToonzCheck::eBlackBg
@@ -656,8 +665,9 @@ void ImagePainter::paintImage(const TImageP &image, const TDimension &imageSize,
   // be done on black bg!
   if (!vimg)
     painter.flushRasterImages(
-        loadbox, visualSettings.m_doCompare ? compareSettings.m_compareX
-                                            : DefaultCompareValue,
+        loadbox,
+        visualSettings.m_doCompare ? compareSettings.m_compareX
+                                   : DefaultCompareValue,
         visualSettings.m_doCompare ? compareSettings.m_compareY
                                    : DefaultCompareValue,
         compareSettings.m_swapCompared);

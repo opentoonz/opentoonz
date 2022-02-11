@@ -72,8 +72,11 @@ public:
 // ShortcutViewer
 //-----------------------------------------------------------------------------
 
-ShortcutViewer::ShortcutViewer(QWidget *parent) : QWidget(parent), m_action(0) {
+ShortcutViewer::ShortcutViewer(QWidget *parent)
+    : QKeySequenceEdit(parent), m_action(0) {
+  setObjectName("ShortcutViewer");
   setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+  connect(this, SIGNAL(editingFinished()), this, SLOT(onEditingFinished()));
 }
 
 //-----------------------------------------------------------------------------
@@ -82,66 +85,29 @@ ShortcutViewer::~ShortcutViewer() {}
 
 //-----------------------------------------------------------------------------
 
-void ShortcutViewer::paintEvent(QPaintEvent *) {
-  QPainter p(this);
-  // sfondo azzurro se il widget ha il focus (e quindi si accorge dei tasti
-  // premuti)
-  p.fillRect(1, 1, width() - 1, height() - 1,
-             QBrush(hasFocus() ? QColor(171, 206, 255) : Qt::white));
-  // bordo
-  p.setPen(QColor(184, 188, 127));
-  p.drawRect(0, 0, width() - 1, height() - 1);
-  if (m_action) {
-    // lo shortcut corrente
-    p.setPen(Qt::black);
-    p.drawText(10, 13, m_action->shortcut().toString());
-  }
-}
-
-//-----------------------------------------------------------------------------
-
 void ShortcutViewer::setAction(QAction *action) {
   m_action = action;
-  update();
-  setFocus();
-}
-
-//-----------------------------------------------------------------------------
-
-bool ShortcutViewer::event(QEvent *event) {
-  // quando si vuole assegnare una combinazione che gia' assegnata bisogna
-  // evitare che lo shortcut relativo agisca.
-  if (event->type() == QEvent::ShortcutOverride) {
-    event->accept();
-    return true;
-  } else
-    return QWidget::event(event);
+  if (m_action) {
+    setEnabled(true);
+    setKeySequence(m_action->shortcut());
+    setFocus();
+  } else {
+    setEnabled(false);
+    setKeySequence(QKeySequence());
+  }
 }
 
 //-----------------------------------------------------------------------------
 
 void ShortcutViewer::keyPressEvent(QKeyEvent *event) {
-  int key = event->key();
-  if (key == Qt::Key_Control || key == Qt::Key_Shift || key == Qt::Key_Alt) {
+  int key                         = event->key();
+  Qt::KeyboardModifiers modifiers = event->modifiers();
+  if (key == Qt::Key_Home || key == Qt::Key_End || key == Qt::Key_PageDown ||
+      key == Qt::Key_PageUp || key == Qt::Key_Escape || key == Qt::Key_Print ||
+      key == Qt::Key_Pause || key == Qt::Key_ScrollLock) {
     event->ignore();
     return;
   }
-  Qt::KeyboardModifiers modifiers = event->modifiers();
-
-  // Tasti che non possono essere utilizzati come shortcut
-  if ((modifiers | (Qt::CTRL | Qt::SHIFT | Qt::ALT)) !=
-          (Qt::CTRL | Qt::SHIFT | Qt::ALT) ||
-      key == Qt::Key_Home || key == Qt::Key_End || key == Qt::Key_PageDown ||
-      key == Qt::Key_PageUp || key == Qt::Key_Escape || key == Qt::Key_Print ||
-      key == Qt::Key_Pause || key == Qt::Key_ScrollLock) {
-    if (key != Qt::Key_Plus && key != Qt::Key_Minus &&
-        key != Qt::Key_Asterisk && key != Qt::Key_Slash) {
-      event->ignore();
-      return;
-    } else
-      modifiers = 0;
-  }
-
   // If "Use Numpad and Tab keys for Switching Styles" option is activated,
   // then prevent to assign such keys
   if (Preferences::instance()->isUseNumpadForSwitchingStylesEnabled() &&
@@ -149,28 +115,40 @@ void ShortcutViewer::keyPressEvent(QKeyEvent *event) {
     event->ignore();
     return;
   }
+  QKeySequenceEdit::keyPressEvent(event);
+}
+
+//-----------------------------------------------------------------------------
+
+void ShortcutViewer::onEditingFinished() {
+  // limit to one shortcut key input
+  QKeySequence keys = (keySequence().isEmpty())
+                          ? QKeySequence()
+                          : QKeySequence(keySequence()[0]);
 
   if (m_action) {
-    CommandManager *cm = CommandManager::instance();
-    QKeySequence keySequence(key + modifiers);
-    std::string shortcutString = keySequence.toString().toStdString();
+    CommandManager *cm         = CommandManager::instance();
+    std::string shortcutString = keys.toString().toStdString();
     QAction *oldAction =
-        cm->getActionFromShortcut(keySequence.toString().toStdString());
+        cm->getActionFromShortcut(keys.toString().toStdString());
     if (oldAction == m_action) return;
     if (oldAction) {
       QString msg = tr("%1 is already assigned to '%2'\nAssign to '%3'?")
-                        .arg(keySequence.toString())
+                        .arg(keys.toString())
                         .arg(oldAction->iconText())
                         .arg(m_action->iconText());
       int ret = DVGui::MsgBox(msg, tr("Yes"), tr("No"), 1);
       activateWindow();
-      if (ret == 2 || ret == 0) return;
+      if (ret == 2 || ret == 0) {
+        setKeySequence(m_action->shortcut());
+        setFocus();
+        return;
+      }
     }
     CommandManager::instance()->setShortcut(m_action, shortcutString);
     emit shortcutChanged();
   }
-  event->accept();
-  update();
+  setKeySequence(keys);
 }
 
 //-----------------------------------------------------------------------------
@@ -179,7 +157,7 @@ void ShortcutViewer::removeShortcut() {
   if (m_action) {
     CommandManager::instance()->setShortcut(m_action, "", false);
     emit shortcutChanged();
-    update();
+    clear();
   }
 }
 
@@ -227,6 +205,8 @@ ShortcutTree::ShortcutTree(QWidget *parent) : QTreeWidget(parent) {
   addFolder(tr("Help"), MenuHelpCommandType, menuCommandFolder);
 
   addFolder(tr("Right-click Menu Commands"), RightClickMenuCommandType);
+  QTreeWidgetItem *rcmSubFolder = m_folders.back();
+  addFolder(tr("Cell Mark"), CellMarkCommandType, rcmSubFolder);
 
   addFolder(tr("Tools"), ToolCommandType);
   addFolder(tr("Tool Modifiers"), ToolModifierCommandType);
@@ -240,6 +220,8 @@ ShortcutTree::ShortcutTree(QWidget *parent) : QTreeWidget(parent) {
   connect(
       this, SIGNAL(currentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)),
       this, SLOT(onCurrentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)));
+  connect(this, SIGNAL(clicked(const QModelIndex &)), this,
+          SLOT(onItemClicked(const QModelIndex &)));
 }
 
 //-----------------------------------------------------------------------------
@@ -357,6 +339,12 @@ void ShortcutTree::onShortcutChanged() {
   for (i = 0; i < (int)m_items.size(); i++) m_items[i]->updateText();
 }
 
+//-----------------------------------------------------------------------------
+
+void ShortcutTree::onItemClicked(const QModelIndex &index) {
+  isExpanded(index) ? collapse(index) : expand(index);
+}
+
 //=============================================================================
 // ShortcutPopup
 //-----------------------------------------------------------------------------
@@ -466,7 +454,7 @@ ShortcutPopup::ShortcutPopup()
   connect(searchEdit, SIGNAL(textChanged(const QString &)), this,
           SLOT(onSearchTextChanged(const QString &)));
   connect(m_presetChoiceCB, SIGNAL(currentIndexChanged(int)),
-          SLOT(onPresetChanged(int)));
+          SLOT(onPresetChanged()));
   connect(m_exportButton, SIGNAL(clicked()), SLOT(onExportButton()));
   connect(m_deletePresetButton, SIGNAL(clicked()), SLOT(onDeletePreset()));
   connect(m_savePresetButton, SIGNAL(clicked()), SLOT(onSavePreset()));
@@ -491,8 +479,8 @@ void ShortcutPopup::onSearchTextChanged(const QString &text) {
 
 //-----------------------------------------------------------------------------
 
-void ShortcutPopup::onPresetChanged(int index) {
-  if (m_presetChoiceCB->currentText() == "Load from file...") {
+void ShortcutPopup::onPresetChanged() {
+  if (m_presetChoiceCB->currentData().toString() == QString("LoadFromFile")) {
     importPreset();
   }
 }
@@ -603,7 +591,10 @@ void ShortcutPopup::onExportButton(TFilePath fp) {
     if (fp == TFilePath()) return;
   }
   showDialog(tr("Saving Shortcuts"));
-  QString shortcutString = "[shortcuts]\n";
+
+  QSettings preset(toQString(fp), QSettings::IniFormat);
+  preset.beginGroup("shortcuts");
+
   for (int commandType = UndefinedCommandType; commandType <= MenuCommandType;
        commandType++) {
     std::vector<QAction *> actions;
@@ -614,24 +605,22 @@ void ShortcutPopup::onExportButton(TFilePath fp) {
       std::string shortcut =
           CommandManager::instance()->getShortcutFromAction(action);
       if (shortcut != "") {
-        shortcutString = shortcutString + QString::fromStdString(id) + "=" +
-                         QString::fromStdString(shortcut) + "\n";
+        preset.setValue(QString::fromStdString(id),
+                        QString::fromStdString(shortcut));
       }
     }
   }
-  QFile file(fp.getQString());
-  file.open(QIODevice::WriteOnly | QIODevice::Text);
-  QTextStream out(&file);
-  out << shortcutString;
-  file.close();
+
+  preset.endGroup();
+
   m_dialog->hide();
 }
 
 //-----------------------------------------------------------------------------
 
 void ShortcutPopup::onDeletePreset() {
-  // change this to 4 once RETAS shortcuts are updated
-  if (m_presetChoiceCB->currentIndex() <= 3) {
+  // change this to 5 once RETAS shortcuts are updated
+  if (m_presetChoiceCB->currentIndex() <= 4) {
     DVGui::MsgBox(DVGui::CRITICAL, tr("Included presets cannot be deleted."));
     return;
   }
@@ -645,7 +634,7 @@ void ShortcutPopup::onDeletePreset() {
   }
   TFilePath presetDir =
       ToonzFolder::getMyModuleDir() + TFilePath("shortcutpresets");
-  QString presetName = m_presetChoiceCB->currentText();
+  QString presetName = m_presetChoiceCB->currentData().toString();
   if (TSystem::doesExistFileOrLevel(presetDir +
                                     TFilePath(presetName + ".ini"))) {
     TSystem::deleteFile(presetDir + TFilePath(presetName + ".ini"));
@@ -689,48 +678,26 @@ void ShortcutPopup::importPreset() {
 //-----------------------------------------------------------------------------
 
 void ShortcutPopup::onLoadPreset() {
-  QString preset = m_presetChoiceCB->currentText();
-  TFilePath presetDir =
-      ToonzFolder::getMyModuleDir() + TFilePath("shortcutpresets");
-  TFilePath defaultPresetDir =
-      ToonzFolder::getProfileFolder() + TFilePath("layouts/shortcuts");
-  if (preset == "") return;
-  if (preset == "Load from file...") {
+  QString preset = m_presetChoiceCB->currentData().toString();
+  TFilePath presetDir;
+  if (m_presetChoiceCB->currentIndex() <= 4)
+    presetDir =
+        ToonzFolder::getProfileFolder() + TFilePath("layouts/shortcuts");
+  else
+    presetDir = ToonzFolder::getMyModuleDir() + TFilePath("shortcutpresets");
+
+  if (preset.isEmpty()) return;
+  if (preset == QString("LoadFromFile")) {
     importPreset();
     return;
   }
 
   if (!showConfirmDialog()) return;
   showDialog(tr("Setting Shortcuts"));
-  if (preset == "OpenToonz") {
+  TFilePath presetFilePath(preset + ".ini");
+  if (TSystem::doesExistFileOrLevel(presetDir + presetFilePath)) {
     clearAllShortcuts(false);
-    TFilePath fp = defaultPresetDir + TFilePath("defopentoonz.ini");
-    setPresetShortcuts(fp);
-    return;
-  } else if (preset == "Toon Boom Harmony") {
-    clearAllShortcuts(false);
-    TFilePath fp = defaultPresetDir + TFilePath("otharmony.ini");
-    setPresetShortcuts(fp);
-    return;
-  } else if (preset == "Adobe Animate") {
-    clearAllShortcuts(false);
-    TFilePath fp = defaultPresetDir + TFilePath("otanimate.ini");
-    setPresetShortcuts(fp);
-    return;
-  } else if (preset == "Adobe Flash Pro") {
-    clearAllShortcuts(false);
-    TFilePath fp = defaultPresetDir + TFilePath("otadobe.ini");
-    setPresetShortcuts(fp);
-    return;
-  } else if (preset == "RETAS PaintMan") {
-    clearAllShortcuts(false);
-    TFilePath fp = defaultPresetDir + TFilePath("otretas.ini");
-    setPresetShortcuts(fp);
-    return;
-  } else if (TSystem::doesExistFileOrLevel(presetDir +
-                                           TFilePath(preset + ".ini"))) {
-    clearAllShortcuts(false);
-    TFilePath fp = presetDir + TFilePath(preset + ".ini");
+    TFilePath fp = presetDir + presetFilePath;
     setPresetShortcuts(fp);
     return;
   }
@@ -739,14 +706,16 @@ void ShortcutPopup::onLoadPreset() {
 
 //-----------------------------------------------------------------------------
 
-QStringList ShortcutPopup::buildPresets() {
-  QStringList presets;
-  presets << ""
-          << "OpenToonz"
-          //<< "RETAS PaintMan"
-          << "Toon Boom Harmony"
-          << "Adobe Animate"
-          << "Adobe Flash Pro";
+void ShortcutPopup::buildPresets() {
+  m_presetChoiceCB->clear();
+
+  m_presetChoiceCB->addItem("", QString(""));
+  m_presetChoiceCB->addItem("OpenToonz", QString("defopentoonz"));
+  // m_presetChoiceCB->addItem("RETAS PaintMan", QString("otretas"));
+  m_presetChoiceCB->addItem("Toon Boom Harmony", QString("otharmony"));
+  m_presetChoiceCB->addItem("Adobe Animate", QString("otanimate"));
+  m_presetChoiceCB->addItem("Adobe Flash Pro", QString("otadobe"));
+
   TFilePath presetDir =
       ToonzFolder::getMyModuleDir() + TFilePath("shortcutpresets");
   if (TSystem::doesExistFileOrLevel(presetDir)) {
@@ -759,12 +728,10 @@ QStringList ShortcutPopup::buildPresets() {
       }
     }
     customPresets.sort();
-    presets = presets + customPresets;
+    for (auto customPreset : customPresets)
+      m_presetChoiceCB->addItem(customPreset, customPreset);
   }
-  presets << tr("Load from file...");
-  m_presetChoiceCB->clear();
-  m_presetChoiceCB->addItems(presets);
-  return presets;
+  m_presetChoiceCB->addItem(tr("Load from file..."), QString("LoadFromFile"));
 }
 
 //-----------------------------------------------------------------------------
@@ -804,19 +771,9 @@ void ShortcutPopup::setCurrentPresetPref(QString name) {
 
 void ShortcutPopup::getCurrentPresetPref() {
   QString name = Preferences::instance()->getShortcutPreset();
-  if (name == "DELETED")
-    m_presetChoiceCB->setCurrentText("");
-  else if (name == "defopentoonz")
-    m_presetChoiceCB->setCurrentText("OpenToonz");
-  else if (name == "otharmony")
-    m_presetChoiceCB->setCurrentText("Toon Boom Harmony");
-  else if (name == "otadobe")
-    m_presetChoiceCB->setCurrentText("Adobe Animate(Flash)");
-  else if (name == "otretas")
-    m_presetChoiceCB->setCurrentText("RETAS PaintMan");
+  if (name == "DELETED") name = "";
 
-  else
-    m_presetChoiceCB->setCurrentText(name);
+  m_presetChoiceCB->setCurrentIndex(m_presetChoiceCB->findData(name));
 }
 
 OpenPopupCommandHandler<ShortcutPopup> openShortcutPopup(MI_ShortcutPopup);

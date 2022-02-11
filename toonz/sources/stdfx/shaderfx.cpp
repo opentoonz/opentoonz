@@ -131,7 +131,8 @@ static const TParamUIConcept::Type
         TParamUIConcept::ANGLE,   TParamUIConcept::POINT,
         TParamUIConcept::POINT_2, TParamUIConcept::VECTOR,
         TParamUIConcept::POLAR,   TParamUIConcept::SIZE,
-        TParamUIConcept::QUAD,    TParamUIConcept::RECT};
+        TParamUIConcept::QUAD,    TParamUIConcept::RECT,
+        TParamUIConcept::COMPASS, TParamUIConcept::COMPASS_SPIN};
 
 // Functions
 
@@ -400,7 +401,7 @@ void ShaderFx::initialize() {
         TParamUIConcept &uiConcept = m_this->m_uiConcepts.back();
         uiConcept.m_type           = ::l_conceptTypes[siParam.m_concept.m_type -
                                             ShaderInterface::UI_CONCEPTS];
-        uiConcept.m_label = siParam.m_concept.m_label.toStdString();
+        uiConcept.m_label          = siParam.m_concept.m_label.toStdString();
         uiConcept.m_params.push_back(param);
       }
     }
@@ -1058,7 +1059,7 @@ void ShaderFx::doCompute(TTile &tile, double frame,
 
     // Input tiles are NOT supplied to OpenGL here - but rather just before
     // drawing.
-    // It's probably beacuse a uniform integer variable must have already been
+    // It's probably because a uniform integer variable must have already been
     // bound
     // to prepare the associated sampler variable in the linkes program...
   }

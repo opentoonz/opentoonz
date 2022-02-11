@@ -90,7 +90,7 @@ Return an image with Reader information
 
 private:
   bool m_init;
-  //! struct which contanins reference to frame
+  //! struct which contains reference to frame
   std::map<TFrameId, pliFrameInfo> m_mapOfImage;
 
   //! Reference to pli palette

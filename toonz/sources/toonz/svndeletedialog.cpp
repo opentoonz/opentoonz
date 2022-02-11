@@ -161,7 +161,7 @@ SVNDeleteDialog::SVNDeleteDialog(QWidget *parent, const QString &workingDir,
 
   addButtonBarWidget(m_deleteLocalButton, m_deleteServerButton, m_cancelButton);
 
-  // 0. Connect for svn errors (that may occurs)
+  // 0. Connect for svn errors (that may occur)
   connect(&m_thread, SIGNAL(error(const QString &)), this,
           SLOT(onError(const QString &)));
 }

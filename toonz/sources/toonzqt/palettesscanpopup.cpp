@@ -146,7 +146,7 @@ void PalettesScanPopup::pop() {
 }
 
 //-----------------------------------------------------------------------------
-/*! Return true if direcories stack is not empty; otherwise return false.
+/*! Return true if directories stack is not empty; otherwise return false.
 \n	If stack is not empty check current directory:
 \li	if all files are checked recall \b pop();
 \li	if its path is a directory recall \b push(const TFilePath &fp);

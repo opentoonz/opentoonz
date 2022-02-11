@@ -172,6 +172,27 @@ TPixel32 StylePicker::pickColor(const TPointD &pos, double radius,
 
 //---------------------------------------------------------
 
+TPixel64 StylePicker::pickColor16(const TPointD &pos, double radius,
+                                  double scale2) const {
+  TToonzImageP ti  = m_image;
+  TRasterImageP ri = m_image;
+  TVectorImageP vi = m_image;
+  assert(ri && !ti && !vi);
+  if (!ri || ti || vi) return TPixel64::Transparent;
+
+  TRasterP raster = ri->getRaster();
+  if (raster->getPixelSize() != 8) return TPixel64::Transparent;
+
+  TPoint point = getRasterPoint(pos);
+  if (!raster->getBounds().contains(point)) return TPixel64::Transparent;
+
+  TRaster64P raster64 = raster;
+  if (!raster64) return TPixel64::Transparent;
+
+  return raster64->pixels(point.y)[point.x];
+}
+//---------------------------------------------------------
+
 TPixel32 StylePicker::pickAverageColor(const TRectD &rect) const {
   TRasterImageP ri = m_image;
   assert(ri);
@@ -216,8 +237,50 @@ TPixel32 StylePicker::pickAverageColor(const TRectD &rect) const {
 
 //---------------------------------------------------------
 
-namespace {
+TPixel64 StylePicker::pickAverageColor16(const TRectD &rect) const {
+  TRasterImageP ri = m_image;
+  assert(ri);
+  if (!ri) return TPixel64::Transparent;
+  TRasterP raster;
+  raster = ri->getRaster();
+  if (raster->getPixelSize() != 8) return TPixel64::Transparent;
 
+  TPoint topLeft     = getRasterPoint(rect.getP00());
+  TPoint bottomRight = getRasterPoint(rect.getP11());
+
+  if (!raster->getBounds().overlaps(TRect(topLeft, bottomRight)))
+    return TPixel64::Transparent;
+
+  topLeft.x     = std::max(0, topLeft.x);
+  topLeft.y     = std::max(0, topLeft.y);
+  bottomRight.x = std::min(raster->getLx(), bottomRight.x);
+  bottomRight.y = std::min(raster->getLy(), bottomRight.y);
+
+  TRaster64P raster64 = raster;
+  assert(raster64);
+  if (!raster64) return TPixel64::Transparent;
+
+  UINT r = 0, g = 0, b = 0, m = 0, size = 0;
+  for (int y = topLeft.y; y < bottomRight.y; y++) {
+    TPixel64 *p = &raster64->pixels(y)[topLeft.x];
+    for (int x = topLeft.x; x < bottomRight.x; x++, p++) {
+      r += p->r;
+      g += p->g;
+      b += p->b;
+      m += p->m;
+      size++;
+    }
+  }
+
+  if (size)
+    return TPixel64(r / size, g / size, b / size, m / size);
+  else
+    return TPixel64::Transparent;
+}
+
+//---------------------------------------------------------
+
+namespace {
 TPixel32 getAverageColor(const TRect &rect) {
   GLenum fmt =
 #if defined(TNZ_MACHINE_CHANNEL_ORDER_BGRM)
@@ -234,8 +297,8 @@ TPixel32 getAverageColor(const TRect &rect) {
 #endif
   UINT r = 0, g = 0, b = 0, m = 0;
   std::vector<TPixel32> buffer(rect.getLx() * rect.getLy());
-  glReadPixels(rect.x0, rect.y0, rect.getLx(), rect.getLy(), fmt,
-               GL_UNSIGNED_BYTE, &buffer[0]);
+  glReadPixels(rect.x0, rect.y0, rect.getLx(), rect.getLy(), fmt, TGL_TYPE,
+               &buffer[0]);
   int size = rect.getLx() * rect.getLy();
   for (int i = 0; i < size; i++) {
     r += buffer[i].r;
@@ -243,7 +306,7 @@ TPixel32 getAverageColor(const TRect &rect) {
     b += buffer[i].b;
   }
 
-  return TPixel32(b / size, g / size, r / size, 255);
+  return TPixel32(b / size, g / size, r / size, TPixel32::maxChannelValue);
 }
 
 //---------------------------------------------------------

@@ -107,8 +107,8 @@
 //    conditions are *BLOCKING*.
 
 // Thread-safety:
-//  * Most of the following code is mutex-protected, altough it might seem not -
-//  indeed,
+//  * Most of the following code is mutex-protected, although it may not seem
+//    like it - indeed,
 //    only *one* mutex is locked and unlocked all of the time. This 'transition
 //    mutex' is
 //    the key to thread-safety: we're considered to lie in a 'transition state'
@@ -475,7 +475,7 @@ inline bool Runnable::customConditions() {
   that the application must wait for the task to be finished, print logs
   or similar.
   This signal is always preceded by a canceled() signal, informing all
-  active tasks that thay should begin quitting on their own in a 'soft'
+  active tasks that they should begin quitting on their own in a 'soft'
   way before brute termination may occur.
 
   \sa \b Executor::shutdown static method and \b Runnable::canceled signal.
@@ -715,7 +715,7 @@ void Executor::init() {
 //! to terminate - this depends
 //! on the code connected to the terminated() signal and is under the user's
 //! responsibility (see the
-//! remarks specified in started() signal descritpion); if this is the intent
+//! remarks specified in started() signal description); if this is the intent
 //! and the terminated slot
 //! is invoked in the controller thread, you should remember to implement a
 //! local event loop in it (so that

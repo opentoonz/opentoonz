@@ -18,6 +18,9 @@
 #include <QComboBox>
 #include <QFontComboBox>
 #include <QTextEdit>
+#include <QOpenGLWidget>
+#include <QSurfaceFormat>
+#include <QOpenGLFunctions>
 
 //==============================================================
 
@@ -65,6 +68,7 @@ public:
 private:
   class FormatProperties;
   class AdditionalStyleEdit;
+  class Display30bitChecker;
 
 private:
   Preferences* m_pref;
@@ -143,6 +147,7 @@ private:
   void onOnionColorChanged();
   // Colors
   void onTranspCheckDataChanged();
+  void onChessboardChanged();
   // Version Control
   void onSVNEnabledChanged();
   // Commonly used
@@ -161,6 +166,7 @@ private slots:
   void onPixelUnitExternallySelected(bool on);
   void onInterfaceFontChanged(const QString& text);
   void onLutPathChanged();
+  void onCheck30bitDisplay();
 
   void onAddLevelFormat();
   void onRemoveLevelFormat();
@@ -219,6 +225,38 @@ private slots:
   void onApply();
 signals:
   void additionalSheetEdited();
+};
+
+//**********************************************************************************
+//   PreferencesPopup::Display30bitCheckerView  definition
+//**********************************************************************************
+
+class PreferencesPopup::Display30bitChecker final : public QDialog {
+  Q_OBJECT
+
+  QSurfaceFormat m_currentDefaultFormat;
+
+private:
+  class GLView;
+
+public:
+  Display30bitChecker(PreferencesPopup* parent);
+  ~Display30bitChecker();
+};
+
+class PreferencesPopup::Display30bitChecker::GLView final
+    : public QOpenGLWidget,
+      protected QOpenGLFunctions {
+  Q_OBJECT
+  bool m_is30bit;
+
+public:
+  GLView(QWidget* parent, bool is30bit);
+
+protected:
+  void initializeGL() override;
+  void resizeGL(int width, int height) override;
+  void paintGL() override;
 };
 
 #endif  // PREFERENCESPOPUP_H

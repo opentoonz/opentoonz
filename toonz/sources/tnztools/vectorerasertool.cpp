@@ -369,7 +369,7 @@ private:
 } eraserTool;
 
 //=============================================================================
-//  EraserTool implemention
+//  EraserTool implementation
 //-----------------------------------------------------------------------------
 
 EraserTool::EraserTool()
@@ -1406,7 +1406,7 @@ void EraserTool::eraseSegments(const TVectorImageP vi, TStroke *eraseStroke) {
     ranges = complement;
   }
 
-  // calculate how many lines are added for caculating the final index of added
+  // calculate how many lines are added for calculating the final index of added
   // strokes
   int added = 0;
   for (int i = touchedStrokeIndex.size() - 1; i >= 0; --i) {

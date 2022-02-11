@@ -88,52 +88,51 @@ TFx *createPresetFxByName(TFilePath path) {
 }
 
 //-----------------------------------------------------------------------------
+// same as createMacroFxByPath() in addfxcontextmenu.cpp
 
 TFx *createMacroFxByPath(TFilePath path) {
-  TIStream is(path);
-  TPersist *p = 0;
-  is >> p;
-  TMacroFx *fx = dynamic_cast<TMacroFx *>(p);
-  if (!fx) return 0;
-  fx->setName(path.getWideName());
-  // Assign a unic ID to each fx in the macro!
-  TApp *app    = TApp::instance();
-  TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
-  if (!xsh) return fx;
-  FxDag *fxDag = xsh->getFxDag();
-  if (!fxDag) return fx;
-  std::vector<TFxP> fxs;
-  fxs = fx->getFxs();
-  QMap<std::wstring, std::wstring> oldNewId;
-  int i;
-  for (i = 0; i < fxs.size(); i++) {
-    std::wstring oldId = fxs[i]->getFxId();
-    fxDag->assignUniqueId(fxs[i].getPointer());
-    oldNewId[oldId] = fxs[i]->getFxId();
-  }
+  try {
+    TIStream is(path);
+    TPersist *p = 0;
+    is >> p;
+    TMacroFx *fx = dynamic_cast<TMacroFx *>(p);
+    if (!fx) return 0;
+    fx->setName(path.getWideName());
+    // Assign a unic ID to each fx in the macro!
+    TApp *app    = TApp::instance();
+    TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
+    if (!xsh) return fx;
+    FxDag *fxDag = xsh->getFxDag();
+    if (!fxDag) return fx;
+    std::vector<TFxP> fxs;
+    fxs = fx->getFxs();
+    QMap<std::wstring, std::wstring> oldNewId;
+    int i;
+    for (i = 0; i < fxs.size(); i++) {
+      std::wstring oldId = fxs[i]->getFxId();
+      fxDag->assignUniqueId(fxs[i].getPointer());
+      std::wstring newId = fxs[i]->getFxId();
+      oldNewId[oldId]    = newId;
 
-  QStack<QPair<std::string, TFxPort *>> newPortNames;
+      // changing the id of the internal effects of a macro breaks the links
+      // between the name of the port and the port to which it is linked :
+      // I have to change the names of the ports and remap them within the macro
+      int j;
+      for (j = 0; j < fx->getInputPortCount(); j++) {
+        QString inputName = QString::fromStdString(fx->getInputPortName(j));
+        if (inputName.endsWith(QString::fromStdWString(oldId))) {
+          QString newInputName = inputName;
+          newInputName.replace(QString::fromStdWString(oldId),
+                               QString::fromStdWString(newId));
+          fx->renamePort(inputName.toStdString(), newInputName.toStdString());
+        }
+      }
+    }
 
-  // Devo cambiare il nome alle porte: contengono l'id dei vecchi effetti
-  for (i = fx->getInputPortCount() - 1; i >= 0; i--) {
-    std::string oldPortName = fx->getInputPortName(i);
-    std::string inFxOldId   = oldPortName;
-    inFxOldId.erase(0, inFxOldId.find_last_of("_") + 1);
-    assert(oldNewId.contains(::to_wstring(inFxOldId)));
-    std::string inFxNewId   = ::to_string(oldNewId[ ::to_wstring(inFxOldId)]);
-    std::string newPortName = oldPortName;
-    newPortName.erase(newPortName.find_last_of("_") + 1,
-                      newPortName.size() - 1);
-    newPortName.append(inFxNewId);
-    TFxPort *fxPort = fx->getInputPort(i);
-    newPortNames.append(QPair<std::string, TFxPort *>(newPortName, fxPort));
-    fx->removeInputPort(oldPortName);
+    return fx;
+  } catch (...) {
+    return 0;
   }
-  while (!newPortNames.isEmpty()) {
-    QPair<std::string, TFxPort *> newPort = newPortNames.pop();
-    fx->addInputPort(newPort.first, *newPort.second);
-  }
-  return fx;
 }
 
 }  // anonymous namespace

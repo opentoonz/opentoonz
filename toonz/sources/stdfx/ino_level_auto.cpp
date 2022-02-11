@@ -3,8 +3,9 @@
 #include "stdfx.h"
 
 #include "ino_common.h"
+#include "globalcontrollablefx.h"
 //------------------------------------------------------------
-class ino_level_auto final : public TStandardRasterFx {
+class ino_level_auto final : public GlobalControllableFx {
   FX_PLUGIN_DECLARATION(ino_level_auto)
   TRasterFxPort m_input;
   TDoubleParamP m_in_min_shift;
@@ -86,7 +87,7 @@ void fx_(TRasterP in_ras, bool *act_sw, double *in_min_shift,
   ino::arr_to_ras(in_gr8->getRawData(), ino::channels(), in_ras, 0);
   in_gr8->unlock();
 }
-}
+}  // namespace
 //------------------------------------------------------------
 void ino_level_auto::doCompute(TTile &tile, double frame,
                                const TRenderSettings &rend_sets) {
@@ -133,7 +134,7 @@ void ino_level_auto::doCompute(TTile &tile, double frame,
   if ((0 <= margin_h && 0 < margin_w)    /* 横方向のみ余白あり */
       || (0 < margin_h && 0 <= margin_w) /* 縦方向のみ余白あり */
       || (0 < margin_h && 0 < margin_w)  /* 縦横両方に余白あり */
-      ) {
+  ) {
     /*camera_x = static_cast<int>(ceil((double)margin_w / 2.));
     camera_y = static_cast<int>(ceil((double)margin_h / 2.));*/
     camera_x = margin_w / 2;

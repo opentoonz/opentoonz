@@ -67,6 +67,7 @@ enum class PredefinedRect {
   BEGIN_EXTENDER,           //! top / left extender
   KEYFRAME_AREA,            //! part of cell dedicated to key frames
   DRAG_AREA,                //! draggable side bar
+  CELL_MARK_AREA,           //! cell mark
   SOUND_TRACK,              //! area dedicated to waveform display
   PREVIEW_TRACK,            //! sound preview area
   BEGIN_SOUND_EDIT,         //! top sound resize
@@ -116,10 +117,11 @@ enum class PredefinedRect {
   FILTER_COLOR,        //! where to show layer's filter color
   CONFIG_AREA,  //! clickable area larger than the config icon, containing it
   CONFIG,       //! the config icon itself
-  CAMERA_CONFIG_AREA,  //! config area for the camera column
-  CAMERA_CONFIG,       //! the config icon for camera column
-  FRAME_MARKER_AREA,   //! Cell's frame indicator
-  FRAME_INDICATOR,     //! Row # indicator
+  CAMERA_CONFIG_AREA,        //! config area for the camera column
+  CAMERA_CONFIG,             //! the config icon for camera column
+  FRAME_MARKER_AREA,         //! Cell's frame indicator
+  CAMERA_FRAME_MARKER_AREA,  //! Cell's frame indicator for camera column
+  FRAME_INDICATOR,           //! Row # indicator
   ZOOM_SLIDER_AREA,
   ZOOM_SLIDER,
   ZOOM_IN_AREA,
@@ -151,7 +153,8 @@ enum class PredefinedDimension {
   ONION_TURN,            //! onion handle turn in degrees
   QBOXLAYOUT_DIRECTION,  //! direction of QBoxLayout
   CENTER_ALIGN,          //! horizontal / vertical align
-  CAMERA_LAYER           //! width of a camera column / height of camera row
+  CAMERA_LAYER,          //! width of a camera column / height of camera row
+  SCALE_THRESHOLD        //! scale threshold to simplify the view
 };
 enum class PredefinedPath {
   DRAG_HANDLE_CORNER,   //! triangle corner at drag sidebar
@@ -197,7 +200,8 @@ enum class PredefinedFlag {
   THUMBNAIL_AREA_BORDER,
   THUMBNAIL_AREA_VISIBLE,
   CAMERA_ICON_VISIBLE,
-  VOLUME_AREA_VERTICAL
+  VOLUME_AREA_VERTICAL,
+  NOTE_AREA_IN_POPUP
 };
 
 // Knows everything about geometry of a particular orientation.
@@ -213,11 +217,11 @@ protected:
 
 public:
   virtual CellPosition xyToPosition(const QPoint &xy,
-                                    const ColumnFan *fan) const          = 0;
+                                    const ColumnFan *fan) const           = 0;
   virtual QPoint positionToXY(const CellPosition &position,
-                              const ColumnFan *fan) const                = 0;
-  virtual CellPositionRatio xyToPositionRatio(const QPoint &xy) const    = 0;
-  virtual QPoint positionRatioToXY(const CellPositionRatio &ratio) const = 0;
+                              const ColumnFan *fan) const                 = 0;
+  virtual CellPositionRatio xyToPositionRatio(const QPointF &xy) const    = 0;
+  virtual QPointF positionRatioToXY(const CellPositionRatio &ratio) const = 0;
 
   virtual int colToLayerAxis(int layer, const ColumnFan *fan) const = 0;
   virtual int rowToFrameAxis(int frame) const                       = 0;

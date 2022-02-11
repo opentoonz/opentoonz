@@ -9,6 +9,7 @@ set(MOC_HEADERS
     tooloptionscontrols.h
     toonzrasterbrushtool.h
     viewtools.h
+    controlpointeditortool.h
     ../include/tools/imagegrouping.h
     ../include/tools/screenpicker.h
     ../include/tools/toolhandle.h

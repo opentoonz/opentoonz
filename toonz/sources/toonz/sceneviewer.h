@@ -39,6 +39,7 @@ class QTouchEvent;
 class QOpenGLFramebufferObject;
 class LutCalibrator;
 class StopMotion;
+class QElapsedTimer;
 
 namespace ImageUtils {
 class FullScreenWidget;
@@ -189,6 +190,10 @@ class SceneViewer final : public GLWidgetForHighDpi,
 
   bool m_firstInitialized = true;
 
+  // passed from PlaybackExecutor
+  QElapsedTimer *m_timer;
+  qint64 m_targetInstant;
+
 public:
   enum ReferenceMode {
     NORMAL_REFERENCE   = 1,
@@ -290,6 +295,11 @@ public:
   void bindFBO() override;
   void releaseFBO() override;
 
+  void setTimerAndTargetInstant(QElapsedTimer *timer, qint64 target) {
+    m_timer         = timer;
+    m_targetInstant = target;
+  }
+
 public:
   // SceneViewer's gadget public functions
   TPointD winToWorld(const QPointF &pos) const;
@@ -361,10 +371,10 @@ protected:
   // center: window coordinate, pixels, topleft origin
   void zoomQt(const QPoint &center, double scaleFactor);
 
-  // overriden from TTool::Viewer
+  // overridden from TTool::Viewer
   void pan(const TPointD &delta) override { panQt(QPointF(delta.x, delta.y)); }
 
-  // overriden from TTool::Viewer
+  // overridden from TTool::Viewer
   void zoom(const TPointD &center, double factor) override;
   void rotate(const TPointD &center, double angle) override;
   void rotate3D(double dPhi, double dTheta) override;

@@ -138,7 +138,7 @@ public:
 
 signals:
 
-  void currentNodeChanged();  //!< Emitted when user selectes a different node.
+  void currentNodeChanged();  //!< Emitted when user selects a different node.
 
 public slots:
 

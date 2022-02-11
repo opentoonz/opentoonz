@@ -373,7 +373,7 @@ TRasterPT<T> TRasterT<T>::extractT(TRect &rect) {
 //
 // metodi inline di TRasterPT
 // (n.b. se non si fanno esplicitament "inline" NT si confonde con dll
-// exort/import)
+// export/import)
 //
 
 template <class T>

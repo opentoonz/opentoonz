@@ -256,7 +256,7 @@ bool LutCalibrator::initializeLutTextureShader() {
       "#version 330 core \n"
       "// Interpolated values from the vertex shaders \n"
       "in vec2 UV; \n"
-      "// Ouput data \n"
+      "// Output data \n"
       "out vec4 color; \n"
       "// Values that stay constant for the whole mesh. \n"
       "uniform sampler2D tex; \n"
@@ -484,7 +484,7 @@ bool LutManager::loadLutFile(const QString& fp) {
 
   //---- read the 3DLUT files
 
-  // The first line shoud start from "3DMESH" keyword (case sensitive)
+  // The first line should start from "3DMESH" keyword (case sensitive)
   line = locals::readDataLine(stream);
   if (line != "3DMESH") {
     file.close();
@@ -572,7 +572,7 @@ void LutManager::convert(float& r, float& g, float& b) {
   for (int c = 0; c < 3; c++) {
     float val   = rawVal[c] * (float)(m_lut.meshSize - 1);
     index[c][0] = (int)val;
-    // boundary condition: if rawVal == 1 the value will not be interporated
+    // boundary condition: if rawVal == 1 the value will not be interpolated
     index[c][1] = (rawVal[c] >= 1.0f) ? index[c][0] : index[c][0] + 1;
     ratio[c]    = val - (float)index[c][0];
   }

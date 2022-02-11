@@ -3,8 +3,9 @@
 #include "stdfx.h"
 
 #include "ino_common.h"
+#include "globalcontrollablefx.h"
 //------------------------------------------------------------
-class ino_hsv_add final : public TStandardRasterFx {
+class ino_hsv_add final : public GlobalControllableFx {
   FX_PLUGIN_DECLARATION(ino_hsv_add)
   TRasterFxPort m_input;
   TRasterFxPort m_noise;
@@ -120,7 +121,8 @@ void fx_(TRasterP in_ras, const TRasterP noise_ras, const TRasterP refer_ras,
           ,
       in_ras->getLy(), in_ras->getLx()  // Not use in_ras->getWrap()
       ,
-      ino::channels(), ino::bits(in_ras)
+      ino::channels(),
+      ino::bits(in_ras)
 
       //,noise_ras->getRawData() // BGRA
       //,&refer_vec.at(0) // RGBA
@@ -154,7 +156,7 @@ void fx_(TRasterP in_ras, const TRasterP noise_ras, const TRasterP refer_ras,
   noise_gr8->unlock();
   in_gr8->unlock();
 }
-}
+}  // namespace
 //------------------------------------------------------------
 void ino_hsv_add::doCompute(TTile &tile, double frame,
                             const TRenderSettings &rend_sets) {
@@ -236,7 +238,7 @@ void ino_hsv_add::doCompute(TTile &tile, double frame,
         ,
         xoffset, yoffset, from_rgba, offset, hue_scale, sat_scale, val_scale,
         alp_scale, anti_alias_sw  // --> add_blend_sw, default is true
-        );
+    );
     if (refer_tile.getRaster() != nullptr) {
       refer_tile.getRaster()->unlock();
     }

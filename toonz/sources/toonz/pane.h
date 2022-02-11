@@ -229,7 +229,7 @@ public:
   virtual void setViewType(int viewType){};
 
   virtual bool widgetInThisPanelIsFocused() {
-    // by default, chech if the panel content itself has focus
+    // by default, check if the panel content itself has focus
     if (widget())
       return widget()->hasFocus();
     else
@@ -237,6 +237,7 @@ public:
   };
 
   virtual void restoreFloatingPanelState();
+  virtual void zoomContentsAndFitGeometry(bool forward);
 
 protected:
   void paintEvent(QPaintEvent *) override;

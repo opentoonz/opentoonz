@@ -261,10 +261,13 @@ void SceneViewerPanel::onShowHideActionTriggered(QAction *act) {
   updateShowHide();
 }
 
-void SceneViewerPanel::onDrawFrame(
-    int frame, const ImagePainter::VisualSettings &settings) {
+void SceneViewerPanel::onDrawFrame(int frame,
+                                   const ImagePainter::VisualSettings &settings,
+                                   QElapsedTimer *timer, qint64 targetInstant) {
   TApp *app = TApp::instance();
   m_sceneViewer->setVisual(settings);
+  m_sceneViewer->setTimerAndTargetInstant(timer, targetInstant);
+
   TFrameHandle *frameHandle = app->getCurrentFrame();
 
   if (m_sceneViewer->isPreviewEnabled()) {
@@ -298,6 +301,10 @@ void SceneViewerPanel::onDrawFrame(
 
   else if (settings.m_blankColor != TPixel::Transparent)
     m_sceneViewer->update();
+
+  // make sure to redraw the frame here.
+  // repaint() does NOT immediately redraw the frame for QOpenGLWidget
+  if (frameHandle->isPlaying()) qApp->processEvents();
 }
 
 //-----------------------------------------------------------------------------

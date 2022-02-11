@@ -41,7 +41,7 @@ public:
   ~TSoundTrackWriterAiff() {}
 
   /*!
-Saves the informations of the soundtrack in .aiff audio file
+Saves the information of the soundtrack in .aiff audio file
 whose path has been specified in the constructor.
 */
   bool save(const TSoundTrackP &) override;

@@ -185,6 +185,7 @@ table) it returns the proper insertion index
   //! from each entry to the next.
   int guessStep() const;
 
+  void formatFId(TFrameId &fid, TFrameId tmplFId);
   void setFrame(const TFrameId &fid, const TImageP &img);
 
   TImageP getFrame(const TFrameId &fid, UCHAR imgManagerParamsMask,
@@ -202,7 +203,8 @@ table) it returns the proper insertion index
   // load icon (and image) data of all frames into cache
   void loadAllIconsAndPutInCache(bool cacheImagesAsWell);
 
-  TRasterImageP getFrameToCleanup(const TFrameId &fid) const;
+  TRasterImageP getFrameToCleanup(const TFrameId &fid,
+                                  bool toBeLineProcessed) const;
 
   std::string getImageId(const TFrameId &fid, int frameStatus = -1) const;
   std::string getIconId(const TFrameId &fid, int frameStatus = -1) const;

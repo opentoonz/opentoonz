@@ -45,7 +45,7 @@ SVNCleanupDialog::SVNCleanupDialog(QWidget *parent, const QString &workingDir)
 
   addButtonBarWidget(m_closeButton);
 
-  // 0. Connect for svn errors (that may occurs everythings)
+  // 0. Connect for svn errors (that may occur every time)
   connect(&m_thread, SIGNAL(error(const QString &)), this,
           SLOT(onError(const QString &)));
 

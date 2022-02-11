@@ -537,6 +537,17 @@ Zastavte ji nebo počkejte na její dokončení, předtím než ji odstraníte.<
     </message>
 </context>
 <context>
+    <name>Canon</name>
+    <message>
+        <source>AC Power</source>
+        <translation>AC napájení</translation>
+    </message>
+    <message>
+        <source>Full</source>
+        <translation>Nabito</translation>
+    </message>
+</context>
+<context>
     <name>CanvasSizePopup</name>
     <message>
         <source>Canvas Size</source>
@@ -4132,7 +4143,7 @@ Pro odkaz, prosím, použijte čísla snímků.</translation>
     </message>
     <message>
         <source>Collapse</source>
-        <translation>Složit</translation>
+        <translation>Sbalit</translation>
     </message>
     <message>
         <source>&amp;Save Sub-xsheet As...</source>
@@ -5444,7 +5455,7 @@ Pro odkaz, prosím, použijte čísla snímků.</translation>
     </message>
     <message>
         <source>Toggle Edit in Place</source>
-        <translation>Přepnout úpravy v místě</translation>
+        <translation type="vanished">Přepnout úpravy v místě</translation>
     </message>
     <message>
         <source>Link Flipbooks</source>
@@ -5916,7 +5927,7 @@ protože jinak můžete smazat pro něj nezbytné soubory.</translation>
     </message>
     <message>
         <source>Save All</source>
-        <translation>Uložit vše</translation>
+        <translation type="vanished">Uložit vše</translation>
     </message>
     <message>
         <source>&amp;Paste as a Copy</source>
@@ -5992,23 +6003,23 @@ protože jinak můžete smazat pro něj nezbytné soubory.</translation>
     </message>
     <message>
         <source>About OpenToonz...</source>
-        <translation>O programu OpenToonz...</translation>
+        <translation type="vanished">O programu OpenToonz...</translation>
     </message>
     <message>
         <source>Online Manual...</source>
-        <translation>Internetová příručka...</translation>
+        <translation type="vanished">Internetová příručka...</translation>
     </message>
     <message>
         <source>What&apos;s New...</source>
-        <translation>Co je nového...</translation>
+        <translation type="vanished">Co je nového...</translation>
     </message>
     <message>
         <source>Community Forum...</source>
-        <translation>Společné fórum...</translation>
+        <translation type="vanished">Společné fórum...</translation>
     </message>
     <message>
         <source>Report a Bug...</source>
-        <translation>Nahlásit chybu...</translation>
+        <translation type="vanished">Nahlásit chybu...</translation>
     </message>
     <message>
         <source>Geometric Shape Rectangle</source>
@@ -6333,6 +6344,26 @@ protože jinak můžete smazat pro něj nezbytné soubory.</translation>
     <message>
         <source>Plastic Tool - Animate</source>
         <translation>Plastický nástroj - Animování</translation>
+    </message>
+    <message>
+        <source>&amp;Export Stop Motion Image Sequence</source>
+        <translation>&amp;Vyvést obrázkovou řadu pookénkové (fázové) animace</translation>
+    </message>
+    <message>
+        <source>Pick Focus Check Location</source>
+        <translation>Vyberte místo pro kontrolu zaměření</translation>
+    </message>
+    <message>
+        <source>Remove frame before Stop Motion Camera</source>
+        <translation>Odstranit snímek před kamery pookénkové (fázové) animace</translation>
+    </message>
+    <message>
+        <source>Next Frame including Stop Motion Camera</source>
+        <translation>Další snímek včetně kamery pookénkové (fázové) animace</translation>
+    </message>
+    <message>
+        <source>Show original live view images.</source>
+        <translation>Zobrazit původní obrázky živého náhledu.</translation>
     </message>
 </context>
 <context>
@@ -7047,6 +7078,13 @@ Co chcete dělat?</translation>
 Do you want to overwrite it?</source>
         <translation type="vanished">Soubor %1 již existuje.
 Chcete jej přepsat?</translation>
+    </message>
+</context>
+<context>
+    <name>PaletteViewerPanel</name>
+    <message>
+        <source>Freeze</source>
+        <translation>Pozastavit</translation>
     </message>
 </context>
 <context>
@@ -8613,6 +8651,18 @@ v obrázkových formátech, kde není povolen kanál alfa.</translation>
         <source>Icon Theme*:</source>
         <translation>Téma ikony*:</translation>
     </message>
+    <message>
+        <source>Show Icons In Menu*</source>
+        <translation>Ukázat ikony v nabídce*</translation>
+    </message>
+    <message>
+        <source>Use Qt&apos;s Native Windows Ink Support*
+(CAUTION: This options is for maintenance purpose. 
+ Do not activate this option or the tablet won&apos;t work properly.)</source>
+        <translation>Použijte vlastní podporu inkoustu Windows Qt*
+(UPOZORNĚNÍ: Tato volba slouží pro účely údržby.
+  Nezapínejte tuto volbu, jinak tablet nebude fungovat správně.)</translation>
+    </message>
 </context>
 <context>
     <name>PreferencesPopup:: FormatProperties</name>
@@ -10048,7 +10098,7 @@ Jste si jistý </translation>
     </message>
     <message>
         <source>Resequence :  Col%1</source>
-        <translation>Vyrovnat znovu snímky podzáběru: Col%1</translation>
+        <translation>Změnit pořadí snímků podzáběru: Col%1</translation>
     </message>
     <message>
         <source>Clone Sub-xsheet :  Col%1</source>
@@ -10987,7 +11037,7 @@ Chcete ji vytvořit?</translation>
     </message>
     <message>
         <source>Stop Motion Controller</source>
-        <translation>Zastavit ovládání pookénkové (fázové) animace</translation>
+        <translation>Ovládání pookénkové (fázové) animace</translation>
     </message>
     <message>
         <source>Camera Column Switch :  </source>
@@ -11076,6 +11126,14 @@ Chcete ji vytvořit?</translation>
     <message>
         <source>Script file %1 does not exists.</source>
         <translation>Soubor se skriptem %1 neexistuje.</translation>
+    </message>
+    <message>
+        <source>Add Level to Scene Cast : %1</source>
+        <translation>Přidat úroveň k obsazení výjevu: %1</translation>
+    </message>
+    <message>
+        <source>The Premultiply options in the following levels are disabled, since PNG files are premultiplied on loading in the current version: %1</source>
+        <translation>Volby předběžného rozmnožování jsou pro následující úrovně vypnuty, protože v nynější verzi jsou soubory PNG jsou při načítání předmnoženy:%1</translation>
     </message>
 </context>
 <context>
@@ -12938,6 +12996,10 @@ Chcete jej nahradit?</translation>
         <source>Help</source>
         <translation>Nápověda</translation>
     </message>
+    <message>
+        <source>Stop Motion</source>
+        <translation>Pookénková (fázová) animace</translation>
+    </message>
 </context>
 <context>
     <name>ShortcutViewer</name>
@@ -13457,7 +13519,51 @@ VAROVÁNÍ: Nesoulad ve velikosti obrázku. Velikost úrovně se stejnou cestou 
     </message>
     <message>
         <source>Cannot capture webcam image unless live view is active.</source>
-        <translation>Nelze pořídit snímek webové kamery, pokud není zapnuto živé zobrazení.</translation>
+        <translation type="vanished">Nelze pořídit snímek webové kamery, pokud není zapnuto živé zobrazení.</translation>
+    </message>
+    <message>
+        <source>Please start live view before using time lapse.</source>
+        <translation>Před použitím časové prodlevy spusťte živý náhled.</translation>
+    </message>
+    <message>
+        <source>Cannot capture image unless live view is active.</source>
+        <translation>Nelze pořídit snímek, pokud není zapnuto živé zobrazení.</translation>
+    </message>
+    <message>
+        <source>No level exists with the current name.</source>
+        <translation>Neexistuje žádná úroveň se současným názvem.</translation>
+    </message>
+    <message>
+        <source>This is not an image level.</source>
+        <translation>Toto není úroveň obrázku.</translation>
+    </message>
+    <message>
+        <source>This is not a stop motion level.</source>
+        <translation>Toto není úroveň pookénkové (fázové) animace.</translation>
+    </message>
+    <message>
+        <source>Could not find an xsheet level with  the current level</source>
+        <translation>Nepodařilo se najít tabulku s nynější úrovní</translation>
+    </message>
+    <message>
+        <source>No export path given.</source>
+        <translation>Nebyla zadána žádná cesta pro vyvedení.</translation>
+    </message>
+    <message>
+        <source>Could not find the source file.</source>
+        <translation>Nepodařilo se najít zdrojový soubor.</translation>
+    </message>
+    <message>
+        <source>Overwrite existing files?</source>
+        <translation>Přepsat stávající soubory?</translation>
+    </message>
+    <message>
+        <source>An error occurred.  Aborting.</source>
+        <translation>Vyskytla se chyba. Přerušuje se.</translation>
+    </message>
+    <message>
+        <source>Successfully exported %1 images.</source>
+        <translation>Úspěšně vyvedeno %1 obrázků.</translation>
     </message>
 </context>
 <context>
@@ -13540,11 +13646,11 @@ VAROVÁNÍ: Nesoulad ve velikosti obrázku. Velikost úrovně se stejnou cestou 
     </message>
     <message>
         <source>Zoom</source>
-        <translation>Zvětšení</translation>
+        <translation type="vanished">Zvětšení</translation>
     </message>
     <message>
         <source>Pick Zoom</source>
-        <translation>Zvolit zvětšení</translation>
+        <translation type="vanished">Zvolit zvětšení</translation>
     </message>
     <message>
         <source>&lt;</source>
@@ -13652,7 +13758,7 @@ VAROVÁNÍ: Nesoulad ve velikosti obrázku. Velikost úrovně se stejnou cestou 
     </message>
     <message>
         <source>Black Screen for Capture</source>
-        <translation>Černá obrazovka pro zachycení</translation>
+        <translation type="vanished">Černá obrazovka pro zachycení</translation>
     </message>
     <message>
         <source>Use Reduced Resolution Images</source>
@@ -13664,7 +13770,7 @@ VAROVÁNÍ: Nesoulad ve velikosti obrázku. Velikost úrovně se stejnou cestou 
     </message>
     <message>
         <source>Place on XSheet</source>
-        <translation>Umístit v záběru</translation>
+        <translation type="vanished">Umístit v záběru</translation>
     </message>
     <message>
         <source>Use Numpad Shortcuts When Active</source>
@@ -13672,7 +13778,7 @@ VAROVÁNÍ: Nesoulad ve velikosti obrázku. Velikost úrovně se stejnou cestou 
     </message>
     <message>
         <source>Show Live View on All Frames</source>
-        <translation>Ukázat živý pohled na všechny snímky</translation>
+        <translation type="vanished">Ukázat živý pohled na všechny snímky</translation>
     </message>
     <message>
         <source>Capture Review Time: </source>
@@ -13680,7 +13786,7 @@ VAROVÁNÍ: Nesoulad ve velikosti obrázku. Velikost úrovně se stejnou cestou 
     </message>
     <message>
         <source>Level Subsampling: </source>
-        <translation>Podvzorkování úrovně: </translation>
+        <translation type="vanished">Podvzorkování úrovně: </translation>
     </message>
     <message>
         <source>Opacity:</source>
@@ -13713,6 +13819,141 @@ VAROVÁNÍ: Nesoulad ve velikosti obrázku. Velikost úrovně se stejnou cestou 
     <message>
         <source>Stop Live View</source>
         <translation>Zastavit živý pohled</translation>
+    </message>
+    <message>
+        <source>Light</source>
+        <translation>Světlo</translation>
+    </message>
+    <message>
+        <source>Motion</source>
+        <translation>Pohyb</translation>
+    </message>
+    <message>
+        <source>Camera Status</source>
+        <translation>Stav kamery</translation>
+    </message>
+    <message>
+        <source>Show original live view images in timeline</source>
+        <translation>Zobrazit původní obrázky živého náhledu na časové ose</translation>
+    </message>
+    <message>
+        <source>Check</source>
+        <translation>Kontrolovat</translation>
+    </message>
+    <message>
+        <source>Zoom in to check focus</source>
+        <translation>Přiblížit pro kontrolu zaměření</translation>
+    </message>
+    <message>
+        <source>Pick</source>
+        <translation>Zvolit</translation>
+    </message>
+    <message>
+        <source>Set focus check location</source>
+        <translation>Nastavit místo pro kontrolu zaměření</translation>
+    </message>
+    <message>
+        <source>Select a camera to change settings.</source>
+        <translation>Vyberte kameru a změňte nastavení.</translation>
+    </message>
+    <message>
+        <source>insert webcam name here</source>
+        <translation>Zde zadejte název webové kamery</translation>
+    </message>
+    <message>
+        <source>Manual Focus</source>
+        <translation>Ruční zaměření</translation>
+    </message>
+    <message>
+        <source>Focus: </source>
+        <translation>Zaměření: </translation>
+    </message>
+    <message>
+        <source>Brightness: </source>
+        <translation>Jas: </translation>
+    </message>
+    <message>
+        <source>Contrast: </source>
+        <translation>Kontrast: </translation>
+    </message>
+    <message>
+        <source>Gain: </source>
+        <translation>Zesílení: </translation>
+    </message>
+    <message>
+        <source>Saturation: </source>
+        <translation>Sytost: </translation>
+    </message>
+    <message>
+        <source>More</source>
+        <translation>Více</translation>
+    </message>
+    <message>
+        <source>Time Lapse</source>
+        <translation>Časová prodleva</translation>
+    </message>
+    <message>
+        <source>Use time lapse</source>
+        <translation>Použít časovou prodlevu</translation>
+    </message>
+    <message>
+        <source>Interval(sec):</source>
+        <translation>Interval (s):</translation>
+    </message>
+    <message>
+        <source>Blackout all Screens</source>
+        <translation>Zatemnění všech obrazovek</translation>
+    </message>
+    <message>
+        <source>Test</source>
+        <translation>Zkouška</translation>
+    </message>
+    <message>
+        <source>Screen 1</source>
+        <translation>Obrazovka 1</translation>
+    </message>
+    <message>
+        <source>Screen 2</source>
+        <translation>Obrazovka 2</translation>
+    </message>
+    <message>
+        <source>Screen 3</source>
+        <translation>Obrazovka 3</translation>
+    </message>
+    <message>
+        <source>Motion Control</source>
+        <translation>Ovládání pohybu</translation>
+    </message>
+    <message>
+        <source>Port: </source>
+        <translation>Přípojka: </translation>
+    </message>
+    <message>
+        <source> - Battery: </source>
+        <translation> - Baterie: </translation>
+    </message>
+    <message>
+        <source>Aperture: Auto</source>
+        <translation>Clona: Automaticky</translation>
+    </message>
+    <message>
+        <source>Shutter Speed: Auto</source>
+        <translation>Rychlost závěrky: Automaticky</translation>
+    </message>
+    <message>
+        <source>Start Capturing</source>
+        <translation>Spustit zachytávání</translation>
+    </message>
+    <message>
+        <source>Stop Capturing</source>
+        <translation>Zastavit zachytávání</translation>
+    </message>
+</context>
+<context>
+    <name>StopMotionSerial</name>
+    <message>
+        <source>No Device</source>
+        <translation>Žádné zařízení</translation>
     </message>
 </context>
 <context>

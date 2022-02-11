@@ -113,6 +113,11 @@ TStageObjectSpline::TStageObjectSpline()
     , m_id(-1)
     , m_idBase(std::to_string(idBaseCode++))
     , m_name("")
+    , m_active(false)             // Needed for T2D compatibility
+    , m_color(0)                  // Needed for T2D compatibility
+    , m_steps(10)                 // Needed for T2D compatibility
+    , m_width(1)                  // Needed for T2D compatibility
+    , m_externalDataFound(false)  // Needed for T2D compatibility
     , m_isOpened(false) {
   double d = 30;
   std::vector<TThickPoint> points;
@@ -138,6 +143,12 @@ TStageObjectSpline *TStageObjectSpline::clone() const {
   clonedSpline->m_id               = m_id;
   clonedSpline->m_name             = m_name;
   clonedSpline->m_stroke           = new TStroke(*m_stroke);
+  clonedSpline->m_interpolationStroke =
+      m_interpolationStroke;          // Needed for T2D compatibility
+  clonedSpline->m_color  = m_color;   // Needed for T2D compatibility
+  clonedSpline->m_active = m_active;  // Needed for T2D compatibility
+  clonedSpline->m_steps  = m_steps;   // Needed for T2D compatibility
+  clonedSpline->m_width  = m_width;   // Needed for T2D compatibility
   for (int i = 0; i < (int)m_posPathParams.size(); i++)
     clonedSpline->m_posPathParams.push_back(
         (TDoubleParam *)m_posPathParams[i]->clone());
@@ -190,10 +201,24 @@ void TStageObjectSpline::loadData(TIStream &is) {
         is >> m_name;
       else if (tagName == "pos")
         is >> m_dagNodePos.x >> m_dagNodePos.y;
-      else if (tagName == "isOpened") {
+      else if (tagName == "color") {  // Needed for T2D compatibility
+        m_externalDataFound = true;
+        is >> m_color;
+      } else if (tagName == "width") {  // Needed for T2D compatibility
+        m_externalDataFound = true;
+        is >> m_width;
+      } else if (tagName == "steps") {  // Needed for T2D compatibility
+        m_externalDataFound = true;
+        is >> m_steps;
+      } else if (tagName == "isOpened") {
         int v = 0;
         is >> v;
         m_isOpened = (bool)v;
+      } else if (tagName == "active") {  // Needed for T2D compatibility
+        m_externalDataFound = true;
+        int v               = 0;
+        is >> v;
+        m_active = (bool)v;
       } else if (tagName == "stroke") {
         int i, n = 0;
         is >> n;
@@ -201,6 +226,17 @@ void TStageObjectSpline::loadData(TIStream &is) {
           TThickPoint p;
           is >> p.x >> p.y >> p.thick;
           points.push_back(p);
+        }
+      } else if (tagName ==
+                 "interpolationStroke") {  // Needed for T2D compatibility
+        m_externalDataFound = true;
+        m_interpolationStroke.clear();
+        int i, n = 0;
+        is >> n;
+        for (i = 0; i < n; i++) {
+          TPointD p;
+          is >> p.x >> p.y;
+          m_interpolationStroke.push_back(p);
         }
       }
       is.matchEndTag();
@@ -218,6 +254,12 @@ void TStageObjectSpline::saveData(TOStream &os) {
   if (!m_name.empty()) os.child("name") << m_name;
   os.child("isOpened") << (int)m_isOpened;
   os.child("pos") << m_dagNodePos.x << m_dagNodePos.y;
+  if (m_externalDataFound) {  // Needed for T2D compatibility
+    os.child("color") << (int)m_color;
+    os.child("active") << (int)m_active;
+    os.child("steps") << (int)m_steps;
+    os.child("width") << (int)m_width;
+  }
   os.openChild("stroke");
   int n = stroke->getControlPointCount();
   os << n;
@@ -226,6 +268,17 @@ void TStageObjectSpline::saveData(TOStream &os) {
     os << p.x << p.y << p.thick;
   }
   os.closeChild();
+  if (m_externalDataFound) {  // Needed for T2D compatibility
+    n = m_interpolationStroke.size();
+    if (n) {
+      os.openChild("interpolationStroke");
+      os << n;
+      for (auto p : m_interpolationStroke) {
+        os << p.x << p.y;
+      }
+      os.closeChild();
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------

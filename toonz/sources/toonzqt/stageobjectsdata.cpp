@@ -989,10 +989,20 @@ std::vector<TStageObjectId> StageObjectsData::restoreObjects(
               dynamic_cast<TXshZeraryFxColumn *>(pastedColumn)) {
         TZeraryColumnFx *zfx = zc->getZeraryColumnFx();
         TFx *zeraryFx        = zfx->getZeraryFx();
-        if (zeraryFx && doClone) {
-          std::wstring app = zeraryFx->getName();
-          fxDag->assignUniqueId(zeraryFx);
-          zeraryFx->setName(app);
+        if (zeraryFx) {
+          if (doClone) {
+            // if the fx has not unique name then let  assignUniqueId() set the
+            // default name
+            if (zeraryFx->getName() == zeraryFx->getFxId())
+              zeraryFx->setName(L"");
+            fxDag->assignUniqueId(zeraryFx);
+          } else
+            fxDag->updateFxIdTable(zeraryFx);
+          if (TXshZeraryFxColumn *orig_zc =
+                  dynamic_cast<TXshZeraryFxColumn *>(column)) {
+            if (TFx *origZeraryFx = orig_zc->getZeraryColumnFx()->getZeraryFx())
+              fxTable[origZeraryFx] = zeraryFx;
+          }
         }
       }
     }
@@ -1037,8 +1047,9 @@ std::vector<TStageObjectId> StageObjectsData::restoreObjects(
 
     if (doClone) {
       fx = fxOrig->clone(false);
-
-      fx->setName(fxOrig->getName());
+      // if the fx has not unique name then let assignUniqueId() set the default
+      // name
+      if (fx->getName() == fx->getFxId()) fx->setName(L"");
       fx->getAttributes()->setId(fxOrig->getAttributes()->getId());
       fx->getAttributes()->passiveCacheDataIdx() = -1;
 
@@ -1083,7 +1094,10 @@ std::vector<TStageObjectId> StageObjectsData::restoreObjects(
           linkedFx = fx->clone(false);
           linkedFx->linkParams(fx);
 
-          linkedFx->setName(oldLinkedFx->getName());
+          // if the fx has not unique name then let assignUniqueId() set the
+          // default name
+          if (linkedFx->getName() == linkedFx->getFxId())
+            linkedFx->setName(L"");
           linkedFx->getAttributes()->setId(
               oldLinkedFx->getAttributes()->getId());
           linkedFx->getAttributes()->passiveCacheDataIdx() = -1;

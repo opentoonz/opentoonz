@@ -407,7 +407,9 @@ void ScenePalette::rollbackPath() { m_pl->setPath(m_oldPath); }
 
 //-----------------------------------------------------------------------------
 
-bool ScenePalette::isDirty() { return m_pl->getPalette()->getDirtyFlag(); }
+bool ScenePalette::isDirty() {
+  return m_pl->getPalette() && m_pl->getPalette()->getDirtyFlag();
+}
 
 //-----------------------------------------------------------------------------
 

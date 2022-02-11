@@ -151,6 +151,7 @@ public slots:
   void onCurveChanged(bool isDragging);
   void onCurveSelected(TDoubleParam *);
   void onSelectionChanged();
+  void onPreferenceChanged(const QString &);
 
   void doSwitchCurrentObject(TStageObject *obj);
   void doSwitchCurrentFx(TFx *fx);

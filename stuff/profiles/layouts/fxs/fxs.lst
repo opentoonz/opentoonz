@@ -22,6 +22,7 @@
     STD_inoSpinBlurFx
     STD_iwa_BokehFx
     STD_iwa_BokehRefFx
+    STD_iwa_BokehAdvancedFx
   </Blur>
   <Distort>
     STD_freeDistortFx
@@ -126,6 +127,7 @@
     STD_targetSpotFx
     STD_iwa_GlareFx
     STD_iwa_BloomFx
+    STD_iwa_RainbowFx
   </Light>
   <Matte>
     STD_erodeDilateFx
@@ -182,6 +184,7 @@
   SHADER_wavy
   SHADER_radialblurGPU
   SHADER_spinblurGPU
+  SHADER_HSLBlendGPU
 </Shaders>
   <Utility>
     STD_nothingFx

@@ -28,9 +28,7 @@ enum PreferencesItemId {
   functionEditorToggle,
   moveCurrentFrameByClickCellArea,
   actualPixelViewOnSceneEditingMode,
-  levelNameOnEachMarkerEnabled,
   showRasterImagesDarkenBlendedInViewer,
-  showFrameNumberWithLetters,
   iconSize,
   viewShrink,
   viewStep,
@@ -40,6 +38,8 @@ enum PreferencesItemId {
   interfaceFontStyle,
   colorCalibrationEnabled,
   colorCalibrationLutPaths,
+  showIconsInMenu,
+  displayIn30bit,
 
   //----------
   // Visualization
@@ -56,6 +56,7 @@ enum PreferencesItemId {
   initialLoadTlvCachingBehavior,
   columnIconLoadingPolicy,
   levelFormats,  // need to be handle separately
+  autoRemoveUnusedLevels,
 
   //----------
   // Saving
@@ -74,10 +75,12 @@ enum PreferencesItemId {
   ffmpegPath,
   ffmpegTimeout,
   fastRenderPath,
+  ffmpegMultiThread,
 
   //----------
   // Drawing
-  scanLevelType,
+  DefRasterFormat,
+  // scanLevelType,// deprecated
   DefLevelType,
   newLevelSizeToCameraSizeEnabled,
   DefLevelWidth,
@@ -99,7 +102,7 @@ enum PreferencesItemId {
 
   //----------
   // Tools
-  dropdownShortcutsCycleOptions,
+  // dropdownShortcutsCycleOptions, // removed
   FillOnlysavebox,
   multiLayerStylePickerEnabled,
   cursorBrushType,
@@ -127,6 +130,8 @@ enum PreferencesItemId {
   syncLevelRenumberWithXsheet,
   currentTimelineEnabled,
   currentColumnColor,
+  levelNameDisplayType,
+  showFrameNumberWithLetters,
 
   //----------
   // Animation
@@ -177,6 +182,8 @@ enum PreferencesItemId {
   // TounchGestureControl // Touch Gesture is a checkable command and not in
   // preferences.ini
   winInkEnabled,
+  // This option will be shown & available only when WITH_WINTAB is defined
+  useQtNativeWinInk,
 
   //----------
   // Others (not appeared in the popup)

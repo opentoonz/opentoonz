@@ -123,7 +123,7 @@ class ItemViewPlayWidget final : public QWidget {
     /*! Increase current frame if icon is computed; return true if frame is
      * increased. */
     bool increaseCurrentFrame();
-    /*! If icon is computed return true, overwise start to compute it. */
+    /*! If icon is computed return true, otherwise start to compute it. */
     bool getCurrentFrame();
     /*! Return true if current frame index is less than fids size. */
     bool isFrameIndexInRange();

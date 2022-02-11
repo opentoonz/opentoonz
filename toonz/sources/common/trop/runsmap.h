@@ -11,10 +11,10 @@
 
 /*!
   The RunsMapP is an auxiliary raster greymap type used to store run-length
-  informations
+  information
   about an image.
 
-  Not every image pixel has valid informations. Only pixels corresponding to
+  Not every image pixel has valid information. Only pixels corresponding to
   run headers do, and those include the position of the next run header.
   This means that users must always iterate from the beginning of a line to get
   valid

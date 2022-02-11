@@ -1,6 +1,7 @@
 
 
-#if defined(x64) || defined(__LP64__) || defined(LINUX) || defined(FREEBSD) || (defined(_WIN32) && defined(__GNUC__))
+#if defined(x64) || defined(__LP64__) || defined(LINUX) || defined(FREEBSD) || \
+    (defined(_WIN32) && defined(__GNUC__))
 
 // Toonz includes
 #include "tfilepath.h"
@@ -164,7 +165,7 @@ void TLevelWriter3gp::setFrameRate(double fps) {
 //------------------------------------------------------------------
 
 TImageWriterP TLevelWriter3gp::getFrameWriter(TFrameId fid) {
-  if (fid.getLetter() != 0) return TImageWriterP(0);
+  if (!fid.getLetter().isEmpty()) return TImageWriterP(0);
 
   int index = fid.getNumber() - 1;
   return new TImageWriter3gpProxy(m_path, index, this);
@@ -203,7 +204,7 @@ void TLevelWriter3gp::save(const TImageP &img, int frameIndex) {
   }
 
   if (tipc::readMessage(stream, msg) != "ok")
-    throw TImageException(getFilePath(), "Couln't save image");
+    throw TImageException(getFilePath(), "Couldn't save image");
 }
 
 //------------------------------------------------------------------
@@ -340,7 +341,7 @@ TLevelReader3gp::~TLevelReader3gp() {
 //------------------------------------------------------------------
 
 TImageReaderP TLevelReader3gp::getFrameReader(TFrameId fid) {
-  if (fid.getLetter() != 0) return TImageReaderP(0);
+  if (!fid.getLetter().isEmpty()) return TImageReaderP(0);
 
   int index = fid.getNumber() - 1;
   return new TImageReader3gpProxy(m_path, index, this, m_info);

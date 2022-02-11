@@ -190,7 +190,7 @@ TLevelWriterSprite::~TLevelWriterSprite() {
 //-----------------------------------------------------------
 
 TImageWriterP TLevelWriterSprite::getFrameWriter(TFrameId fid) {
-  if (fid.getLetter() != 0) return TImageWriterP(0);
+  if (!fid.getLetter().isEmpty()) return TImageWriterP(0);
   int index               = fid.getNumber();
   TImageWriterSprite *iwg = new TImageWriterSprite(m_path, index, this);
   return TImageWriterP(iwg);
@@ -265,9 +265,9 @@ void TLevelWriterSprite::save(const TImageP &img, int frameIndex) {
     m_top       = t;
     m_bottom    = b;
   } else {
-    if (l < m_left) m_left     = l;
-    if (r > m_right) m_right   = r;
-    if (t < m_top) m_top       = t;
+    if (l < m_left) m_left = l;
+    if (r > m_right) m_right = r;
+    if (t < m_top) m_top = t;
     if (b > m_bottom) m_bottom = b;
   }
   QImage *newQi = new QImage(m_lx, m_ly, QImage::Format_ARGB32_Premultiplied);

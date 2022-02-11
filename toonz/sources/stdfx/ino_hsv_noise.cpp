@@ -3,8 +3,9 @@
 #include "stdfx.h"
 
 #include "ino_common.h"
+#include "globalcontrollablefx.h"
 //------------------------------------------------------------
-class ino_hsv_noise final : public TStandardRasterFx {
+class ino_hsv_noise final : public GlobalControllableFx {
   FX_PLUGIN_DECLARATION(ino_hsv_noise)
   TRasterFxPort m_input;
   TRasterFxPort m_refer;
@@ -152,7 +153,7 @@ void fx_(TRasterP in_ras, const TRasterP refer_ras, const int refer_mode
   ino::arr_to_ras(in_gr8->getRawData(), ino::channels(), in_ras, 0);
   in_gr8->unlock();
 }
-}
+}  // namespace
 //------------------------------------------------------------
 void ino_hsv_noise::doCompute(TTile &tile, double frame,
                               const TRenderSettings &rend_sets) {
@@ -205,7 +206,7 @@ void ino_hsv_noise::doCompute(TTile &tile, double frame,
   if ((0 <= margin_h && 0 < margin_w)    /* 横方向のみ余白あり */
       || (0 < margin_h && 0 <= margin_w) /* 縦方向のみ余白あり */
       || (0 < margin_h && 0 < margin_w)  /* 縦横両方に余白あり */
-      ) {
+  ) {
     /*camera_x = static_cast<int>(ceil((double)margin_w / 2.));
     camera_y = static_cast<int>(ceil((double)margin_h / 2.));*/
     camera_x = margin_w / 2;
@@ -265,7 +266,7 @@ void ino_hsv_noise::doCompute(TTile &tile, double frame,
         hue_range, sat_range, val_range, mat_range, random_seed, near_blur,
         term_effective, term_center, term_type, camera_x, camera_y, camera_w,
         camera_h, anti_alias_sw  // --> add_blend_sw, default is true
-        );
+    );
     if (refer_tile.getRaster() != nullptr) {
       refer_tile.getRaster()->unlock();
     }

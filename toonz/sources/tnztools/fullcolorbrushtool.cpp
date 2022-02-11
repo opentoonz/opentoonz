@@ -121,7 +121,7 @@ FullColorBrushTool::FullColorBrushTool(std::string name)
     , m_modifierSize("ModifierSize", -3, 3, 0, true)
     , m_modifierOpacity("ModifierOpacity", 0, 100, 100, true)
     , m_modifierEraser("ModifierEraser", false)
-    , m_modifierLockAlpha("ModifierLockAlpha", false)
+    , m_modifierLockAlpha("Lock Alpha", false)
     , m_preset("Preset:")
     , m_minCursorThick(0)
     , m_maxCursorThick(0)
@@ -889,6 +889,10 @@ void FullColorBrushTool::applyClassicToonzBrushSettings(
     mypaintBrush.setMappingPoint(MYPAINT_BRUSH_SETTING_OPAQUE,
                                  MYPAINT_BRUSH_INPUT_PRESSURE, 1, 1.0,
                                  maxOpacity - minOpacity);
+  }
+
+  if (m_modifierLockAlpha.getValue()) {
+    mypaintBrush.setBaseValue(MYPAINT_BRUSH_SETTING_LOCK_ALPHA, 1.0);
   }
 }
 

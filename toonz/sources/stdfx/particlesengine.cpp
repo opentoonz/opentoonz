@@ -160,14 +160,30 @@ void Particles_Engine::fill_range_struct(struct particles_values &values,
 }
 
 bool Particles_Engine::port_is_used(int i, struct particles_values &values) {
+  return port_is_used_for_value(i, values) ||
+         port_is_used_for_gradient(i, values);
+}
+
+// Returns true if the pixel value of control image is used.
+// Such image will be computed in 8bpc.
+bool Particles_Engine::port_is_used_for_value(int i,
+                                              struct particles_values &values) {
   return values.fincol_ctrl_val == i || values.foutcol_ctrl_val == i ||
          values.friction_ctrl_val == i || values.gencol_ctrl_val == i ||
-         values.gravity_ctrl_val == i || values.opacity_ctrl_val == i ||
-         values.rot_ctrl_val == i || values.scale_ctrl_val == i ||
-         values.scalestep_ctrl_val == i || values.source_ctrl_val == i ||
-         values.speed_ctrl_val == i || values.speeda_ctrl_val == i ||
+         values.opacity_ctrl_val == i || values.rot_ctrl_val == i ||
+         values.scale_ctrl_val == i || values.scalestep_ctrl_val == i ||
+         values.source_ctrl_val == i || values.speed_ctrl_val == i ||
+         (values.speeda_ctrl_val == i && !values.speeda_use_gradient_val) ||
          values.lifetime_ctrl_val == i || values.randomx_ctrl_val == i ||
          values.randomy_ctrl_val == i;
+}
+
+// Returns true if the gradient of control image is used.
+// Such image will be computed in 16bpc to get smooth result.
+bool Particles_Engine::port_is_used_for_gradient(
+    int i, struct particles_values &values) {
+  return values.gravity_ctrl_val == i ||
+         (values.speeda_ctrl_val == i && values.speeda_use_gradient_val);
 }
 /*-----------------------------------------------------------------*/
 /*-- Startフレームからカレントフレームまで順番に回す関数 --*/
@@ -255,7 +271,7 @@ void Particles_Engine::roll_particles(
   {
     /*- 新たに作るパーティクルの数だけ繰り返す -*/
     for (i = 0; i < newparticles; i++) {
-      int seed = (int)((std::numeric_limits<int>::max)() *
+      int seed  = (int)((std::numeric_limits<int>::max)() *
                        values.random_val->getFloat());
       int level = (int)(values.random_val->getFloat() * level_n);
 
@@ -291,7 +307,7 @@ void Particles_Engine::roll_particles(
     switch (values.toplayer_val) {
     case ParticlesFx::TOP_YOUNGER:
       for (i = 0; i < newparticles; i++) {
-        int seed = (int)((std::numeric_limits<int>::max)() *
+        int seed  = (int)((std::numeric_limits<int>::max)() *
                          values.random_val->getFloat());
         int level = (int)(values.random_val->getFloat() * level_n);
 
@@ -320,7 +336,7 @@ void Particles_Engine::roll_particles(
         for (int j = 0; j < tmp; j++, it++)
           ;
         {
-          int seed = (int)((std::numeric_limits<int>::max)() *
+          int seed     = (int)((std::numeric_limits<int>::max)() *
                            values.random_val->getFloat());
           int level    = (int)(values.random_val->getFloat() * level_n);
           int lifetime = 0;
@@ -344,7 +360,7 @@ void Particles_Engine::roll_particles(
 
     default:
       for (i = 0; i < newparticles; i++) {
-        int seed = (int)((std::numeric_limits<int>::max)() *
+        int seed     = (int)((std::numeric_limits<int>::max)() *
                          values.random_val->getFloat());
         int level    = (int)(values.random_val->getFloat() * level_n);
         int lifetime = 0;
@@ -402,9 +418,9 @@ void Particles_Engine::normalize_values(struct particles_values &values,
   (values.speeda_val.first)        = (values.speeda_val.first) * M_PI_180;
   (values.speeda_val.second)       = (values.speeda_val.second) * M_PI_180;
   if (values.step_val < 1) values.step_val = 1;
-  values.genfadecol_val                    = (values.genfadecol_val) * 0.01;
-  values.finfadecol_val                    = (values.finfadecol_val) * 0.01;
-  values.foutfadecol_val                   = (values.foutfadecol_val) * 0.01;
+  values.genfadecol_val  = (values.genfadecol_val) * 0.01;
+  values.finfadecol_val  = (values.finfadecol_val) * 0.01;
+  values.foutfadecol_val = (values.foutfadecol_val) * 0.01;
 }
 
 /*-----------------------------------------------------------------*/
@@ -492,6 +508,9 @@ void Particles_Engine::render_particles(
     TRenderSettings riAux(ri);
     riAux.m_affine = TAffine();
     riAux.m_bpp    = 32;
+    // control image using its gradient is computed in 64bpp
+    TRenderSettings riAux64(riAux);
+    riAux64.m_bpp = 64;
 
     int r_frame;  // Useful in case of negative roll frames
     if (frame < 0)
@@ -538,32 +557,74 @@ void Particles_Engine::render_particles(
             // dryComputed - so, declare the same here.
             (*it->second)->dryCompute(bbox, r_frame, riAux);
           } else {
-            tmp = new TTile;
+            // control image is used its gradient
+            if (port_is_used_for_gradient(it->first, values)) {
+              tmp = new TTile;
 
-            if (isPrecomputingEnabled)
-              (*it->second)
-                  ->allocateAndCompute(*tmp, bbox.getP00(),
-                                       convert(bbox).getSize(), 0, r_frame,
-                                       riAux);
-            else {
-              std::string alias =
-                  "CTRL: " + (*(it->second))->getAlias(r_frame, riAux);
-              TRasterImageP rimg = TImageCache::instance()->get(alias, false);
+              if (isPrecomputingEnabled)
+                (*it->second)
+                    ->allocateAndCompute(*tmp, bbox.getP00(),
+                                         convert(bbox).getSize(), 0, r_frame,
+                                         riAux64);
+              else {
+                std::string alias =
+                    "CTRL64: " + (*(it->second))->getAlias(r_frame, riAux64);
+                TRasterImageP rimg = TImageCache::instance()->get(alias, false);
 
-              if (rimg) {
+                if (rimg) {
+                  tmp->m_pos = bbox.getP00();
+                  tmp->setRaster(rimg->getRaster());
+                } else {
+                  (*it->second)
+                      ->allocateAndCompute(*tmp, bbox.getP00(),
+                                           convert(bbox).getSize(), 0, r_frame,
+                                           riAux64);
+
+                  addRenderCache(alias, TRasterImageP(tmp->getRaster()));
+                }
+              }
+
+              porttiles[it->first + Ctrl_64_Offset] = tmp;
+
+              // in case the control image is also used for non-gradient
+              if (port_is_used_for_value(it->first, values)) {
+                TRaster32P tileRas(tmp->getRaster()->getSize());
+                TRop::convert(tileRas, tmp->getRaster());
+                tmp        = new TTile;
                 tmp->m_pos = bbox.getP00();
-                tmp->setRaster(rimg->getRaster());
-              } else {
+                tmp->setRaster(tileRas);
+                porttiles[it->first] = tmp;
+              }
+            }
+            // control images used only for non-gradient
+            else {
+              tmp = new TTile;
+
+              if (isPrecomputingEnabled)
                 (*it->second)
                     ->allocateAndCompute(*tmp, bbox.getP00(),
                                          convert(bbox).getSize(), 0, r_frame,
                                          riAux);
+              else {
+                std::string alias =
+                    "CTRL: " + (*(it->second))->getAlias(r_frame, riAux);
+                TRasterImageP rimg = TImageCache::instance()->get(alias, false);
 
-                addRenderCache(alias, TRasterImageP(tmp->getRaster()));
+                if (rimg) {
+                  tmp->m_pos = bbox.getP00();
+                  tmp->setRaster(rimg->getRaster());
+                } else {
+                  (*it->second)
+                      ->allocateAndCompute(*tmp, bbox.getP00(),
+                                           convert(bbox).getSize(), 0, r_frame,
+                                           riAux);
+
+                  addRenderCache(alias, TRasterImageP(tmp->getRaster()));
+                }
               }
-            }
 
-            porttiles[it->first] = tmp;
+              porttiles[it->first] = tmp;
+            }
           }
         }
       }
@@ -849,7 +910,7 @@ void Particles_Engine::fill_array(TTile *ctrl1, int &regioncount,
           mask[1] = myarray[i - 1 + lx * (j - 1)];
         }
         if (i != lx - 1) mask[3] = myarray[i + 1 + lx * (j - 1)];
-        mask[2]                  = myarray[i + lx * (j - 1)];
+        mask[2] = myarray[i + lx * (j - 1)];
         if (!mask[0] && !mask[1] && !mask[2] && !mask[3]) {
           (regioncount)++;
           myarray[i + lx * j] = (regioncount);
@@ -883,7 +944,7 @@ void Particles_Engine::fill_array(TTile *ctrl1, int &regioncount,
 void Particles_Engine::normalize_array(
     std::vector<std::vector<TPointD>> &myregions, TPointD pos, int lx, int ly,
     int regioncounter, std::vector<int> &myarray, std::vector<int> &lista,
-    std::vector<int> &listb, std::vector<int> & final) {
+    std::vector<int> &listb, std::vector<int> &final) {
   int i, j, k, l;
 
   std::vector<int> tmp;
@@ -896,13 +957,13 @@ void Particles_Engine::normalize_array(
     j = lista[l];
     /*TMSG_INFO("j vale %d\n", j);*/
     while (final[j] != j) j = final[j];
-    k                       = listb[l];
+    k = listb[l];
     /*TMSG_INFO("k vale %d\n", k);*/
     while (final[k] != k) k = final[k];
-    if (j != k) final[j]    = k;
+    if (j != k) final[j] = k;
   }
   // TMSG_INFO("esco dal for\n");
-  for (j                                         = 1; j <= regioncounter; j++)
+  for (j = 1; j <= regioncounter; j++)
     while (final[j] != final[final[j]]) final[j] = final[final[j]];
 
   /*conto quante cavolo di regioni sono*/

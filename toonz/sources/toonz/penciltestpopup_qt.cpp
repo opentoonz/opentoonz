@@ -32,6 +32,7 @@
 #include "toonz/levelproperties.h"
 #include "toonz/tcamera.h"
 #include "toonz/preferences.h"
+#include "toonz/filepathproperties.h"
 
 // TnzCore includes
 #include "tsystem.h"
@@ -177,7 +178,7 @@ inline void doPixBinary(QRgb* pix, int threshold) {
     gray = 255;
   else
     gray = 0;
-  *pix   = qRgb(gray, gray, gray);
+  *pix = qRgb(gray, gray, gray);
 }
 
 //-----------------------------------------------------------------------------
@@ -220,7 +221,7 @@ void onChange(QImage& img, int black, int white, float gamma, bool doGray) {
 void onChangeBW(QImage& img, int threshold) {
   int lx = img.width(), y, ly = img.height();
   for (y = 0; y < ly; ++y) {
-    QRgb *pix = (QRgb *)img.scanLine(y), *endPix = (QRgb *)(pix + lx);
+    QRgb *pix = (QRgb*)img.scanLine(y), *endPix = (QRgb*)(pix + lx);
     while (pix < endPix) {
       doPixBinary(pix, threshold);
       ++pix;
@@ -476,7 +477,7 @@ bool getRasterLevelSize(TXshLevel* level, TDimension& dim) {
 void ApplyLutTask::run() {
   int lx = m_img.width();
   for (int y = m_fromY; y < m_toY; ++y) {
-    QRgb *pix = (QRgb *)m_img.scanLine(y), *endPix = (QRgb *)(pix + lx);
+    QRgb *pix = (QRgb*)m_img.scanLine(y), *endPix = (QRgb*)(pix + lx);
     while (pix < endPix) {
       doPix(pix, m_lut);
       ++pix;
@@ -487,7 +488,7 @@ void ApplyLutTask::run() {
 void ApplyGrayLutTask::run() {
   int lx = m_img.width();
   for (int y = m_fromY; y < m_toY; ++y) {
-    QRgb *pix = (QRgb *)m_img.scanLine(y), *endPix = (QRgb *)(pix + lx);
+    QRgb *pix = (QRgb*)m_img.scanLine(y), *endPix = (QRgb*)(pix + lx);
     while (pix < endPix) {
       doPixGray(pix, m_lut);
       ++pix;
@@ -883,42 +884,63 @@ void MyVideoWidget::mouseReleaseEvent(QMouseEvent* event) {
 
 //=============================================================================
 
-FrameNumberLineEdit::FrameNumberLineEdit(QWidget* parent, int value)
+FrameNumberLineEdit::FrameNumberLineEdit(QWidget* parent, TFrameId fId,
+                                         bool acceptLetter)
     : LineEdit(parent) {
-  setFixedWidth(54);
-  m_intValidator = new QIntValidator(this);
-  setValue(value);
-  m_intValidator->setRange(1, 9999);
+  if (acceptLetter) {
+    QString regExpStr   = QString("^%1$").arg(TFilePath::fidRegExpStr());
+    m_regexpValidator   = new QRegExpValidator(QRegExp(regExpStr), this);
+    TProjectManager* pm = TProjectManager::instance();
+    pm->addListener(this);
+  } else
+    m_regexpValidator = new QRegExpValidator(QRegExp("^\\d{1,4}$"), this);
 
-  QRegExp rx("^[0-9]{1,4}[A-Ia-i]?$");
-  m_regexpValidator = new QRegExpValidator(rx, this);
+  m_regexpValidator_alt =
+      new QRegExpValidator(QRegExp("^\\d{1,3}[A-Ia-i]?$"), this);
 
   updateValidator();
+  updateSize();
+
+  setValue(fId);
 }
 
 //-----------------------------------------------------------------------------
 
 void FrameNumberLineEdit::updateValidator() {
   if (Preferences::instance()->isShowFrameNumberWithLettersEnabled())
-    setValidator(m_regexpValidator);
+    setValidator(m_regexpValidator_alt);
   else
-    setValidator(m_intValidator);
+    setValidator(m_regexpValidator);
 }
 
 //-----------------------------------------------------------------------------
 
-void FrameNumberLineEdit::setValue(int value) {
-  if (value <= 0)
-    value = 1;
-  else if (value > 9999)
-    value = 9999;
+void FrameNumberLineEdit::updateSize() {
+  FilePathProperties* fpProp =
+      TProjectManager::instance()->getCurrentProject()->getFilePathProperties();
+  bool useStandard = fpProp->useStandard();
+  int letterCount  = fpProp->letterCountForSuffix();
+  if (useStandard)
+    setFixedWidth(60);
+  else {
+    // 4 digits + letters reserve 12 px each
+    int lc = (letterCount == 0) ? 9 : letterCount + 4;
+    setFixedWidth(12 * lc);
+  }
+  updateGeometry();
+}
 
+//-----------------------------------------------------------------------------
+
+void FrameNumberLineEdit::setValue(TFrameId fId) {
   QString str;
   if (Preferences::instance()->isShowFrameNumberWithLettersEnabled()) {
-    str = convertToFrameWithLetter(value, 3);
+    if (!fId.getLetter().isEmpty()) {
+      // need some warning?
+    }
+    str = convertToFrameWithLetter(fId.getNumber(), 3);
   } else {
-    str.setNum(value);
-    while (str.length() < 4) str.push_front("0");
+    str = QString::fromStdString(fId.expand());
   }
   setText(str);
   setCursorPosition(0);
@@ -926,19 +948,41 @@ void FrameNumberLineEdit::setValue(int value) {
 
 //-----------------------------------------------------------------------------
 
-int FrameNumberLineEdit::getValue() {
+TFrameId FrameNumberLineEdit::getValue() {
   if (Preferences::instance()->isShowFrameNumberWithLettersEnabled()) {
     QString str = text();
+    int f;
     // if no letters added
     if (str.at(str.size() - 1).isDigit())
-      return str.toInt() * 10;
+      f = str.toInt() * 10;
     else {
-      return str.left(str.size() - 1).toInt() * 10 +
-             letterToNum(str.at(str.size() - 1));
+      f = str.left(str.size() - 1).toInt() * 10 +
+          letterToNum(str.at(str.size() - 1));
     }
-  } else
-    return text().toInt();
+    return TFrameId(f);
+  } else {
+    QString regExpStr = QString("^%1$").arg(TFilePath::fidRegExpStr());
+    QRegExp rx(regExpStr);
+    int pos = rx.indexIn(text());
+    if (pos < 0) return TFrameId();
+    if (rx.cap(2).isEmpty())
+      return TFrameId(rx.cap(1).toInt());
+    else
+      return TFrameId(rx.cap(1).toInt(), rx.cap(2));
+  }
 }
+
+//-----------------------------------------------------------------------------
+
+void FrameNumberLineEdit::onProjectSwitched() {
+  QRegExpValidator* oldValidator = m_regexpValidator;
+  QString regExpStr = QString("^%1$").arg(TFilePath::fidRegExpStr());
+  m_regexpValidator = new QRegExpValidator(QRegExp(regExpStr), this);
+  updateValidator();
+  if (oldValidator) delete oldValidator;
+}
+
+void FrameNumberLineEdit::onProjectChanged() { onProjectSwitched(); }
 
 //-----------------------------------------------------------------------------
 
@@ -1033,7 +1077,7 @@ PencilTestSaveInFolderPopup::PencilTestSaveInFolderPopup(QWidget* parent)
 
   QFrame* subFolderFrame = new QFrame(this);
 
-  QGroupBox* infoGroupBox    = new QGroupBox(tr("Infomation"), this);
+  QGroupBox* infoGroupBox    = new QGroupBox(tr("Information"), this);
   QGroupBox* subNameGroupBox = new QGroupBox(tr("Subfolder Name"), this);
 
   m_projectField  = new QLineEdit(this);
@@ -1418,10 +1462,10 @@ void PencilTestSaveInFolderPopup::updateParentFolder() {
 
 PencilTestPopup::PencilTestPopup()
     // set the parent 0 in order to enable the popup behind the main window
-    : Dialog(0, false, false, "PencilTest"),
-      m_currentCamera(NULL),
-      m_captureWhiteBGCue(false),
-      m_captureCue(false) {
+    : Dialog(0, false, false, "PencilTest")
+    , m_currentCamera(NULL)
+    , m_captureWhiteBGCue(false)
+    , m_captureCue(false) {
   setWindowTitle(tr("Camera Capture"));
 
   // add maximize button to the dialog
@@ -1747,7 +1791,7 @@ PencilTestPopup::PencilTestPopup()
   bool ret = true;
   ret      = ret && connect(refreshCamListButton, SIGNAL(pressed()), this,
                        SLOT(refreshCameraList()));
-  ret = ret && connect(m_cameraListCombo, SIGNAL(activated(int)), this,
+  ret      = ret && connect(m_cameraListCombo, SIGNAL(activated(int)), this,
                        SLOT(onCameraListComboActivated(int)));
   ret = ret && connect(m_resolutionCombo, SIGNAL(activated(const QString&)),
                        this, SLOT(onResolutionComboActivated(const QString&)));
@@ -1997,13 +2041,19 @@ void PencilTestPopup::onResolutionComboActivated(const QString& itemText) {
 //-----------------------------------------------------------------------------
 
 void PencilTestPopup::onFileFormatOptionButtonPressed() {
-  if (m_fileTypeCombo->currentIndex() == 0) return;
   // Tentatively use the preview output settings
   ToonzScene* scene = TApp::instance()->getCurrentScene()->getScene();
   if (!scene) return;
   TOutputProperties* prop = scene->getProperties()->getPreviewProperties();
   std::string ext         = m_fileTypeCombo->currentText().toStdString();
-  openFormatSettingsPopup(this, ext, prop->getFileFormatProperties(ext));
+  TFrameId oldTmplFId     = scene->getProperties()->formatTemplateFIdForInput();
+  openFormatSettingsPopup(this, ext, prop->getFileFormatProperties(ext),
+                          &scene->getProperties()->formatTemplateFIdForInput());
+
+  TFrameId newTmplFId = scene->getProperties()->formatTemplateFIdForInput();
+  if (oldTmplFId.getZeroPadding() != newTmplFId.getZeroPadding() ||
+      oldTmplFId.getStartSeqInd() != newTmplFId.getStartSeqInd())
+    refreshFrameInfo();
 }
 
 //-----------------------------------------------------------------------------
@@ -2032,8 +2082,8 @@ void PencilTestPopup::onPreviousName() {
 
   std::wstring levelName;
 
-  // if the current level name is non-sequencial, then try to switch the last
-  // sequencial level in the scene.
+  // if the current level name is non-sequential, then try to switch the last
+  // sequential level in the scene.
   if (!nameCreator->setCurrent(m_levelNameEdit->text().toStdWString())) {
     TLevelSet* levelSet =
         TApp::instance()->getCurrentScene()->getScene()->getLevelSet();
@@ -2156,13 +2206,26 @@ void PencilTestPopup::onFrameCaptured(QImage& image) {
     if (importImage(image)) {
       m_videoWidget->setPreviousImage(image.copy());
       if (Preferences::instance()->isShowFrameNumberWithLettersEnabled()) {
-        int f = m_frameNumberEdit->getValue();
+        TFrameId fId = m_frameNumberEdit->getValue();
+        int f        = fId.getNumber();
         if (f % 10 == 0)  // next number
-          m_frameNumberEdit->setValue(((int)(f / 10) + 1) * 10);
+          m_frameNumberEdit->setValue(TFrameId(((int)(f / 10) + 1) * 10));
         else  // next alphabet
-          m_frameNumberEdit->setValue(f + 1);
-      } else
-        m_frameNumberEdit->setValue(m_frameNumberEdit->getValue() + 1);
+          m_frameNumberEdit->setValue(TFrameId(f + 1));
+      } else {
+        TFrameId fId = m_frameNumberEdit->getValue();
+
+        if (fId.getLetter() == '\0' || fId.getLetter() == 'Z' ||
+            fId.getLetter() == 'z')  // next number
+          m_frameNumberEdit->setValue(TFrameId(fId.getNumber() + 1));
+        else {  // next alphabet
+          QByteArray byteArray = fId.getLetter().toUtf8();
+          // return incrementing the last letter
+          byteArray.data()[byteArray.size() - 1]++;
+          m_frameNumberEdit->setValue(
+              TFrameId(fId.getNumber(), QString::fromUtf8(byteArray)));
+        }
+      }
 
       /* notify */
       TApp::instance()->getCurrentScene()->notifySceneChanged();
@@ -2454,7 +2517,7 @@ bool PencilTestPopup::importImage(QImage image) {
     return false;
   }
 
-  int frameNumber = m_frameNumberEdit->getValue();
+  TFrameId fId = m_frameNumberEdit->getValue();
 
   /* create parent directory if it does not exist */
   TFilePath parentDir =
@@ -2474,9 +2537,12 @@ bool PencilTestPopup::importImage(QImage image) {
     }
   }
 
+  TFrameId tmplFId = scene->getProperties()->formatTemplateFIdForInput();
+
   TFilePath levelFp = TFilePath(m_saveInFileFld->getPath()) +
-                      TFilePath(levelName + L".." +
-                                m_fileTypeCombo->currentText().toStdWString());
+                      TFilePath(levelName + L"." +
+                                m_fileTypeCombo->currentText().toStdWString())
+                          .withFrame(tmplFId);
   TFilePath actualLevelFp = scene->decodeFilePath(levelFp);
 
   TXshSimpleLevel* sl = 0;
@@ -2513,8 +2579,13 @@ bool PencilTestPopup::importImage(QImage image) {
           "The captured image size does not match with the existing level."));
       return false;
     }
+
+    // if the level already has a frame, use the same zero padding regardless of
+    // the frame format setting
+    sl->formatFId(fId, tmplFId);
+
     /* if the level already have the same frame, then ask if overwrite it */
-    TFilePath frameFp(actualLevelFp.withFrame(frameNumber));
+    TFilePath frameFp(actualLevelFp.withFrame(fId));
     if (TFileStatus(frameFp).doesExist()) {
       if (!m_alwaysOverwrite) {
         QString question =
@@ -2542,16 +2613,18 @@ bool PencilTestPopup::importImage(QImage image) {
 
       /* if the loaded level does not match in pixel size, then return */
       sl = level->getSimpleLevel();
-      if (!sl ||
-          sl->getProperties()->getImageRes() !=
-              TDimension(image.width(), image.height())) {
+      if (!sl || sl->getProperties()->getImageRes() !=
+                     TDimension(image.width(), image.height())) {
         error(tr(
             "The captured image size does not match with the existing level."));
         return false;
       }
+      // if the level already has a frame, use the same zero padding regardless
+      // of the frame format setting
+      sl->formatFId(fId, tmplFId);
 
       /* confirm overwrite */
-      TFilePath frameFp(actualLevelFp.withFrame(frameNumber));
+      TFilePath frameFp(actualLevelFp.withFrame(fId));
       if (TFileStatus(frameFp).doesExist()) {
         if (!m_alwaysOverwrite) {
           QString question =
@@ -2569,7 +2642,7 @@ bool PencilTestPopup::importImage(QImage image) {
     else {
       TXshLevel* level = scene->createNewLevel(OVL_XSHLEVEL, levelName,
                                                TDimension(), 0, levelFp);
-      sl = level->getSimpleLevel();
+      sl               = level->getSimpleLevel();
       sl->setPath(levelFp, true);
       sl->getProperties()->setDpiPolicy(LevelProperties::DP_CustomDpi);
       TPointD dpi;
@@ -2593,12 +2666,12 @@ bool PencilTestPopup::importImage(QImage image) {
       sl->getProperties()->setImageDpi(dpi);
       sl->getProperties()->setImageRes(
           TDimension(image.width(), image.height()));
+      sl->formatFId(fId, tmplFId);
     }
 
     state = NEWLEVEL;
   }
 
-  TFrameId fid(frameNumber);
   TPointD levelDpi = sl->getDpi();
   /* create the raster */
   TRaster32P raster(image.width(), image.height());
@@ -2607,7 +2680,7 @@ bool PencilTestPopup::importImage(QImage image) {
   TRasterImageP ri(raster);
   ri->setDpi(levelDpi.x, levelDpi.y);
   /* setting the frame */
-  sl->setFrame(fid, ri);
+  sl->setFrame(fId, ri);
 
   /* set dirty flag */
   sl->getProperties()->setDirtyFlag(true);
@@ -2625,7 +2698,7 @@ bool PencilTestPopup::importImage(QImage image) {
       col += 1;
       xsh->insertColumn(col);
     }
-    xsh->setCell(row, col, TXshCell(sl, fid));
+    xsh->setCell(row, col, TXshCell(sl, fId));
     app->getCurrentColumn()->setColumnIndex(col);
     return true;
   }
@@ -2637,7 +2710,7 @@ bool PencilTestPopup::importImage(QImage image) {
   int foundCol, foundRow = -1;
   // most possibly, it's in the current column
   int rowCheck;
-  if (findCell(xsh, col, TXshCell(sl, fid), rowCheck)) return true;
+  if (findCell(xsh, col, TXshCell(sl, fId), rowCheck)) return true;
   if (rowCheck >= 0) {
     foundRow = rowCheck;
     foundCol = col;
@@ -2645,7 +2718,7 @@ bool PencilTestPopup::importImage(QImage image) {
   // search entire xsheet
   for (int c = 0; c < xsh->getColumnCount(); c++) {
     if (c == col) continue;
-    if (findCell(xsh, c, TXshCell(sl, fid), rowCheck)) return true;
+    if (findCell(xsh, c, TXshCell(sl, fId), rowCheck)) return true;
     if (rowCheck >= 0) {
       foundRow = rowCheck;
       foundCol = c;
@@ -2657,7 +2730,7 @@ bool PencilTestPopup::importImage(QImage image) {
     int tmpRow = foundRow + 1;
     while (1) {
       if (xsh->getCell(tmpRow, foundCol).isEmpty()) {
-        xsh->setCell(tmpRow, foundCol, TXshCell(sl, fid));
+        xsh->setCell(tmpRow, foundCol, TXshCell(sl, fId));
         app->getCurrentColumn()->setColumnIndex(foundCol);
         break;
       }
@@ -2671,7 +2744,7 @@ bool PencilTestPopup::importImage(QImage image) {
       col += 1;
       xsh->insertColumn(col);
     }
-    xsh->setCell(row, col, TXshCell(sl, fid));
+    xsh->setCell(row, col, TXshCell(sl, fId));
     app->getCurrentColumn()->setColumnIndex(col);
   }
 
@@ -2727,7 +2800,7 @@ void PencilTestPopup::refreshFrameInfo() {
   TLevelSet* levelSet      = currentScene->getLevelSet();
 
   std::wstring levelName = m_levelNameEdit->text().toStdWString();
-  int frameNumber        = m_frameNumberEdit->getValue();
+  TFrameId fId           = m_frameNumberEdit->getValue();
 
   TDimension camRes;
   if (m_subcameraButton->isChecked())
@@ -2744,9 +2817,14 @@ void PencilTestPopup::refreshFrameInfo() {
   // level with the same name
   TXshLevel* level_sameName = levelSet->getLevel(levelName);
 
+  TOutputProperties* prop =
+      currentScene->getProperties()->getPreviewProperties();
+  TFrameId tmplFId = prop->formatTemplateFId();
+
   TFilePath levelFp = TFilePath(m_saveInFileFld->getPath()) +
-                      TFilePath(levelName + L".." +
-                                m_fileTypeCombo->currentText().toStdWString());
+                      TFilePath(levelName + L"." +
+                                m_fileTypeCombo->currentText().toStdWString())
+                          .withFrame(tmplFId);
 
   // level with the same path
   TXshLevel* level_samePath = levelSet->getLevel(*(currentScene), levelFp);
@@ -2757,8 +2835,8 @@ void PencilTestPopup::refreshFrameInfo() {
   bool levelExist = TSystem::doesExistFileOrLevel(actualLevelFp);
 
   // frame existence
-  TFilePath frameFp(actualLevelFp.withFrame(frameNumber));
-  bool frameExist            = false;
+  TFilePath frameFp(actualLevelFp.withFrame(fId));
+  bool frameExist = false;
   if (levelExist) frameExist = TFileStatus(frameFp).doesExist();
 
   // reset acceptable camera size
@@ -2798,8 +2876,11 @@ void PencilTestPopup::refreshFrameInfo() {
       int frameCount      = level_p->getFrameCount();
       TLevel::Iterator it = level_p->begin();
       std::vector<TFrameId> fids;
-      for (int i = 0; it != level_p->end(); ++it, ++i)
+      for (int i = 0; it != level_p->end(); ++it, ++i) {
         fids.push_back(it->first);
+        // in case fId with different format
+        if (!frameExist && fId == it->first) frameExist = true;
+      }
 
       tooltipStr +=
           tr("The level is not registered in the scene, but exists in the file "
@@ -2897,7 +2978,7 @@ void PencilTestPopup::refreshFrameInfo() {
       // Check if the target frame already exist in the level
       bool hasFrame = false;
       for (int f = 0; f < frameCount; f++) {
-        if (fids.at(f).getNumber() == frameNumber) {
+        if (fids.at(f) == fId) {
           hasFrame = true;
           break;
         }

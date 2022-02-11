@@ -1106,7 +1106,6 @@ void TStyleSelection::pasteStylesValues(bool pasteName, bool pasteColor) {
         dstType = STUDIOSTYLE;
       else
         dstType = LINKEDSTYLE;
-      //---- 追加ここまで iwasawa
 
       // For cleanup styles, do not duplicate the cleanup information. Just
       // paste color information.
@@ -1119,55 +1118,65 @@ void TStyleSelection::pasteStylesValues(bool pasteName, bool pasteColor) {
 
       // Process the global and original names according to the pasted style
       TColorStyle *pastedStyle = getPalette()->getStyle(styleId);
-      if (srcType == NORMALSTYLE) {
-        if (dstType == NORMALSTYLE) {
-        }  // 1. From normal to normal. Do nothing.
-        else if (dstType == STUDIOSTYLE)  // 2. From normal to studio. Restore
-                                          // the global name
-          pastedStyle->setGlobalName(dstGlobalName);
-        else  // dstType == LINKEDSTYLE		//3. From normal to linked.
-              // Restore both the global and the original name. Activate the
-              // edited flag.
+
+      // If paste color and name are both ON, then paste the link information.
+      if (pasteName) {
+        if (srcType == NORMALSTYLE) {
+          if (dstType == NORMALSTYLE) {
+          }  // 1. From normal to normal. Do nothing.
+          else if (dstType == STUDIOSTYLE)  // 2. From normal to studio. Restore
+                                            // the global name
+            pastedStyle->setGlobalName(dstGlobalName);
+          else  // dstType == LINKEDSTYLE		//3. From normal to
+                // linked. Restore both the global and the original name.
+                // Activate the edited flag.
+          {
+            pastedStyle->setGlobalName(dstGlobalName);
+            pastedStyle->setOriginalName(dstOriginalName);
+            pastedStyle->setIsEditedFlag(true);
+          }
+        } else if (srcType == STUDIOSTYLE) {
+          if (dstType ==
+              NORMALSTYLE)  // 4. From studio to normal. Set the studio
+                            // style's name to the original name.
+            pastedStyle->setOriginalName(data->getStyle(i)->getName());
+          else if (dstType == STUDIOSTYLE)  // 5. From studio to studio. Restore
+                                            // the global name.
+            pastedStyle->setGlobalName(dstGlobalName);
+          else  // dstType == LINKEDSTYLE		//6. From studio to
+                // linked. Set the studio style's name to the original name, and
+                // set the edited flag to off.
+          {
+            pastedStyle->setOriginalName(data->getStyle(i)->getName());
+            pastedStyle->setIsEditedFlag(false);
+          }
+        } else  // srcType == LINKEDSTYLE
         {
-          pastedStyle->setGlobalName(dstGlobalName);
-          pastedStyle->setOriginalName(dstOriginalName);
-          pastedStyle->setIsEditedFlag(true);
-        }
-      } else if (srcType == STUDIOSTYLE) {
-        if (dstType == NORMALSTYLE)  // 4. From studio to normal. Set the studio
-                                     // style's name to the original name.
-          pastedStyle->setOriginalName(data->getStyle(i)->getName());
-        else if (dstType == STUDIOSTYLE)  // 5. From studio to studio. Restore
-                                          // the global name.
-          pastedStyle->setGlobalName(dstGlobalName);
-        else  // dstStyle == LINKEDSTYLE		//6. From studio to
-              // linked. Set the studio style's name to the original name, and
-              // set the edited flag to off.
-        {
-          pastedStyle->setOriginalName(data->getStyle(i)->getName());
-          pastedStyle->setIsEditedFlag(false);
-        }
-      } else  // srcType == LINKEDSTYLE
-      {
-        if (dstType == NORMALSTYLE) {
-        }  // 7. From linked to normal. Do nothing.
-        else if (dstType == STUDIOSTYLE)  // 8. From linked to studio. Restore
-                                          // the global name. Delete the
-                                          // original name. Set the edited flag
-                                          // to off.
-        {
-          pastedStyle->setGlobalName(dstGlobalName);
-          pastedStyle->setOriginalName(L"");
-          pastedStyle->setIsEditedFlag(false);
-        } else  // dstStyle == LINKEDSTYLE		//9. From linked to
-                // linked.
-                // Do nothing (bring all information from the original).
-        {
+          if (dstType == NORMALSTYLE) {
+          }  // 7. From linked to normal. Do nothing.
+          else if (dstType == STUDIOSTYLE)  // 8. From linked to studio. Restore
+                                            // the global name. Delete the
+                                            // original name. Set the edited
+                                            // flag to off.
+          {
+            pastedStyle->setGlobalName(dstGlobalName);
+            pastedStyle->setOriginalName(L"");
+            pastedStyle->setIsEditedFlag(false);
+          } else  // dstType == LINKEDSTYLE		//9. From linked to
+                  // linked.
+                  // Do nothing (bring all information from the original).
+          {
+          }
         }
       }
+      // If paste color is ON and paste name is OFF, then revert the link
+      // information (i.e. "paste color" will paste color info only).
+      else {  // !pasteName
+        pastedStyle->setGlobalName(dstGlobalName);
+        pastedStyle->setOriginalName(dstOriginalName);
+        pastedStyle->setIsEditedFlag(dstType == LINKEDSTYLE);
 
-      // put back the name when "paste color"
-      if (!pasteName) {
+        // put back the name
         page->getStyle(indexInPage)->setName(styleName);
         page->getStyle(indexInPage)->setFlags(flags);
       }
@@ -1177,9 +1186,8 @@ void TStyleSelection::pasteStylesValues(bool pasteName, bool pasteColor) {
       page->getStyle(indexInPage)->setName(data->getStyle(i)->getName());
   }
 
-  // Se gli stili del data sono piu' di quelli selezionati faccio un paste degli
-  // stili che restano,
-  // inserisco i nuovi stili dopo indexInPage.
+  // If the styles of the data are more than those selected, make a paste of the
+  // styles that remain, inserting the new styles after indexInPage
   if (i < dataStyleCount) {
     StyleData *newData = new StyleData();
     int j;
@@ -1628,7 +1636,7 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-/*! remove link from studio palette. Delete the global and the orginal names.
+/*! remove link from studio palette. Delete the global and the original names.
  * return true if something changed
  */
 void TStyleSelection::removeLink() {

@@ -18,11 +18,12 @@
 
 class TPropertyGroup;
 class QLabel;
+class QComboBox;
 
 namespace DVGui {
 class PropertyWidget;
 class PropertyComboBox;
-}
+}  // namespace DVGui
 
 //==============================================================
 
@@ -35,7 +36,8 @@ class FormatSettingsPopup final : public DVGui::Dialog {
 
 public:
   FormatSettingsPopup(QWidget *parent, const std::string &format,
-                      TPropertyGroup *props);
+                      TPropertyGroup *props, TFrameId *tmplFrameId = nullptr,
+                      bool forInput = true);
 
   void setLevelPath(const TFilePath &path) { m_levelPath = path; }
   void setFormatProperties(TPropertyGroup *props);
@@ -59,9 +61,13 @@ private:
 
 #endif
 
+  TFrameId *m_tmplFId;
+  QComboBox *m_sepCharCB, *m_paddingCB;
+
 private:
   void buildPropertyComboBox(int index, TPropertyGroup *props);
   void buildValueField(int index, TPropertyGroup *props);
+  void buildDoubleField(int index, TPropertyGroup *props);
   void buildPropertyCheckBox(int index, TPropertyGroup *props);
   void buildPropertyLineEdit(int index, TPropertyGroup *props);
   void showEvent(QShowEvent *se) override;
@@ -69,6 +75,9 @@ private:
 private Q_SLOTS:
   void onComboBoxIndexChanged(const QString &);
   void onAviCodecConfigure();
+
+  void onSepCharCBChanged();
+  void onPaddingCBChanged();
 };
 
 //**********************************************************************************
@@ -100,14 +109,18 @@ private Q_SLOTS:
   format.
 */
 
-FormatSettingsPopup *openFormatSettingsPopup(
+bool openFormatSettingsPopup(
     QWidget *parent,            //!< Parent for the new format popup.
     const std::string &format,  //!< File extension of the displayed format.
     TPropertyGroup *props,      //!< Properties to be shown for the format.
+    TFrameId *tmplFId =
+        nullptr,  //!< Template TFrameId to specify frame number format
+    bool forInput =
+        true,  // specifies border color for the frame number format box
     const TFilePath &levelPath =
         TFilePath()  //!< May be used to choose available codecs
                      //!  depending on a level's resolution.
-    );               //!< Opens a suitable popup with settings
+);                   //!< Opens a suitable popup with settings
                      //!  for an input level format.
 
 #endif  // FORMATSETTINGSPOPUPS_H

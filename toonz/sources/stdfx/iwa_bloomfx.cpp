@@ -52,15 +52,36 @@ void blurByRotate(cv::Mat &mat) {
 // Iwa_BloomFx
 //--------------------------------------------
 Iwa_BloomFx::Iwa_BloomFx()
-    : m_gamma(2.2), m_gain(2.0), m_size(100.0), m_alpha_rendering(false) {
+    : m_gamma(2.2)
+    , m_auto_gain(false)
+    , m_gain_adjust(0.0)
+    , m_gain(2.0)
+    , m_decay(1)
+    , m_size(100.0)
+    , m_alpha_rendering(false)
+    , m_alpha_mode(new TIntEnumParam(NoAlpha, "No Alpha")) {
+  // Version 1 : gaussian filter applied with standard deviation 0
+  // Version 2 : standard deviation = blurRadius * 0.3
+  setFxVersion(2);
+
   addInputPort("Source", m_source);
   bindParam(this, "gamma", m_gamma);
+  bindParam(this, "auto_gain", m_auto_gain);
+  bindParam(this, "gain_adjust", m_gain_adjust);
   bindParam(this, "gain", m_gain);
+  bindParam(this, "decay", m_decay);
   bindParam(this, "size", m_size);
-  bindParam(this, "alpha_rendering", m_alpha_rendering);
+  bindParam(this, "alpha_mode", m_alpha_mode);
+  bindParam(this, "alpha_rendering", m_alpha_rendering, false,
+            true);  // obsolete
+
+  m_alpha_mode->addItem(Light, "Light");
+  m_alpha_mode->addItem(LightAndSource, "Light and Source");
 
   m_gamma->setValueRange(0.1, 5.0);
+  m_gain_adjust->setValueRange(-1.0, 1.0);
   m_gain->setValueRange(0.1, 10.0);
+  m_decay->setValueRange(0, 4);
   m_size->setValueRange(0.1, 1024.0);
 
   m_size->setMeasureName("fxLength");
@@ -111,12 +132,12 @@ void Iwa_BloomFx::setSourceTileToMat(const RASTER ras, cv::Mat &imgMat,
 //------------------------------------------------
 template <typename RASTER, typename PIXEL>
 void Iwa_BloomFx::setMatToOutput(const RASTER ras, const RASTER srcRas,
-                                 cv::Mat &ingMat, const double gamma,
-                                 const double gain, const bool withAlpha,
+                                 cv::Mat &imgMat, const double gamma,
+                                 const double gain, const AlphaMode alphaMode,
                                  const int margin) {
   double maxi = static_cast<double>(PIXEL::maxChannelValue);  // 255or65535
   for (int j = 0; j < ras->getLy(); j++) {
-    cv::Vec3f const *mat_p = ingMat.ptr<cv::Vec3f>(j);
+    cv::Vec3f const *mat_p = imgMat.ptr<cv::Vec3f>(j);
     PIXEL *pix             = ras->pixels(j);
     PIXEL *srcPix          = srcRas->pixels(j + margin) + margin;
 
@@ -135,15 +156,36 @@ void Iwa_BloomFx::setMatToOutput(const RASTER ras, const RASTER srcRas,
       pix->r = (typename PIXEL::Channel)(nonlinear_r * (maxi + 0.999999));
       pix->g = (typename PIXEL::Channel)(nonlinear_g * (maxi + 0.999999));
       pix->b = (typename PIXEL::Channel)(nonlinear_b * (maxi + 0.999999));
-      if (withAlpha) {
+      if (alphaMode == NoAlpha)
+        pix->m = (typename PIXEL::Channel)(PIXEL::maxChannelValue);
+      else {
         double chan_a =
             std::max(std::max(nonlinear_b, nonlinear_g), nonlinear_r);
-        pix->m = std::max((typename PIXEL::Channel)(chan_a * (maxi + 0.999999)),
-                          srcPix->m);
-      } else
-        pix->m = (typename PIXEL::Channel)(PIXEL::maxChannelValue);
+        if (alphaMode == Light)
+          pix->m = (typename PIXEL::Channel)(chan_a * (maxi + 0.999999));
+        else  // alphaMode == LightAndSource
+          pix->m = std::max(
+              (typename PIXEL::Channel)(chan_a * (maxi + 0.999999)), srcPix->m);
+      }
     }
   }
+}
+
+//------------------------------------------------
+
+double Iwa_BloomFx::computeAutoGain(cv::Mat &imgMat) {
+  double maxChanelValue = 0.0;
+  for (int j = 0; j < imgMat.size().height; j++) {
+    cv::Vec3f const *mat_p = imgMat.ptr<cv::Vec3f>(j);
+    for (int i = 0; i < imgMat.size().width; i++, mat_p++) {
+      for (int c = 0; c < 3; c++)
+        maxChanelValue = std::max(maxChanelValue, (double)(*mat_p)[c]);
+    }
+  }
+
+  if (maxChanelValue == 0.0) return 1.0;
+
+  return 1.0 / maxChanelValue;
 }
 
 //------------------------------------------------
@@ -156,10 +198,14 @@ void Iwa_BloomFx::doCompute(TTile &tile, double frame,
     return;
   }
   // obtain parameters
-  double gamma = m_gamma->getValue(frame);
-  double gain  = m_gain->getValue(frame);
-  double size  = getSizePixelAmount(m_size->getValue(frame), settings.m_affine);
-  bool withAlpha = m_alpha_rendering->getValue();
+  double gamma  = m_gamma->getValue(frame);
+  bool autoGain = m_auto_gain->getValue();
+  double gainAdjust =
+      (autoGain) ? std::pow(10.0, m_gain_adjust->getValue(frame)) : 1.0;
+  double gain    = (autoGain) ? 1.0 : m_gain->getValue(frame);
+  int blurRadius = (int)std::round(m_decay->getValue(frame));
+  double size = getSizePixelAmount(m_size->getValue(frame), settings.m_affine);
+  AlphaMode alphaMode = (AlphaMode)m_alpha_mode->getValue();
 
   int margin = static_cast<int>(std::ceil(size));
   TRectD _rect(tile.m_pos, TDimensionD(tile.getRaster()->getLx(),
@@ -187,15 +233,16 @@ void Iwa_BloomFx::doCompute(TTile &tile, double frame,
   // compute size and intensity ratios of resampled layers
   // resample size is reduced from the specified size, taking into account
   // that the gaussian blur (x 2) and the blur by rotation resampling (x sqrt2)
-  double no_blur_size = size / (2 * 1.5);
-  // find the mimimum "power of 2" value which is the same as or larger than the
+  double blurScale    = 1.0 + (double)blurRadius;
+  double no_blur_size = size / (blurScale * 1.5);
+  // find the minimum "power of 2" value which is the same as or larger than the
   // filter size
   int level         = 1;
   double power_of_2 = 1.0;
   while (1) {
     if (power_of_2 >= no_blur_size) break;
     level++;
-    power_of_2 *= 2.0;
+    power_of_2 *= 2;
   }
   // store the size of resampled layers
   QVector<cv::Size> sizes;
@@ -221,7 +268,9 @@ void Iwa_BloomFx::doCompute(TTile &tile, double frame,
   double intensity_front = 1.0 - (1.0 - intensity_all) * ratio;
 
   std::vector<cv::Mat> dst(level);
-  cv::Size const ksize(3, 3);
+  cv::Size const ksize(1 + blurRadius * 2, 1 + blurRadius * 2);
+  // standard deviation
+  double sdRatio = (getFxVersion() == 1) ? 0.0 : 0.3;
 
   cv::Mat tmp;
   int i;
@@ -233,7 +282,10 @@ void Iwa_BloomFx::doCompute(TTile &tile, double frame,
       imgMat = tmp;
     }
     // gaussian blur
-    cv::GaussianBlur(imgMat, dst[i], ksize, 0.0);
+    if (blurRadius == 0)
+      dst[i] = imgMat;
+    else
+      cv::GaussianBlur(imgMat, dst[i], ksize, (double)blurRadius * sdRatio);
     ++i;
   }
   // for each level of filter (from smaller to larger)
@@ -254,15 +306,20 @@ void Iwa_BloomFx::doCompute(TTile &tile, double frame,
                cv::Size(tile.getRaster()->getLx(), tile.getRaster()->getLy()));
   imgMat = imgMat(roi);
 
+  if (autoGain) {
+    gain =
+        to_linear_color_space(gainAdjust, 1.0, gamma) * computeAutoGain(imgMat);
+  }
+
   // set the result to the tile, converting to rgb channel values
   if (ras32)
     setMatToOutput<TRaster32P, TPixel32>(tile.getRaster(),
                                          sourceTile.getRaster(), imgMat, gamma,
-                                         gain, withAlpha, margin);
+                                         gain, alphaMode, margin);
   else if (ras64)
     setMatToOutput<TRaster64P, TPixel64>(tile.getRaster(),
                                          sourceTile.getRaster(), imgMat, gamma,
-                                         gain, withAlpha, margin);
+                                         gain, alphaMode, margin);
 }
 //------------------------------------------------
 
@@ -293,6 +350,16 @@ void Iwa_BloomFx::getParamUIs(TParamUIConcept *&concepts, int &length) {
   concepts[0].m_type  = TParamUIConcept::RADIUS;
   concepts[0].m_label = "Size";
   concepts[0].m_params.push_back(m_size);
+}
+//------------------------------------------------
+// This will be called in TFx::loadData when obsolete "alpha rendering" value is
+// loaded
+void Iwa_BloomFx::onObsoleteParamLoaded(const std::string &paramName) {
+  if (paramName != "alpha_rendering") return;
+  if (m_alpha_rendering->getValue())
+    m_alpha_mode->setValue(LightAndSource);
+  else
+    m_alpha_mode->setValue(NoAlpha);
 }
 //------------------------------------------------
 

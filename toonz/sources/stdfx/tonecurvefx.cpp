@@ -6,6 +6,7 @@
 #include "tparamset.h"
 #include "ttonecurveparam.h"
 #include "tcurves.h"
+#include "globalcontrollablefx.h"
 
 //===================================================================
 
@@ -108,7 +109,7 @@ void fill_lut(QList<TPointD> points, std::vector<T> &lut, bool isLinear) {
 
 //===================================================================
 
-class ToneCurveFx final : public TStandardRasterFx {
+class ToneCurveFx final : public GlobalControllableFx {
   FX_PLUGIN_DECLARATION(ToneCurveFx)
 
   TRasterFxPort m_input;

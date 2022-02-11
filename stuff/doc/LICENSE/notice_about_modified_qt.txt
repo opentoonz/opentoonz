@@ -1,0 +1,75 @@
+## Notice about modified Qt
+
+ If you are using Windows version of OpenToonz installed from the installer 
+ provided from OpenToonz website (https://opentoonz.github.io/), Qt libraries 
+ distributed with the software may be our customized version. 
+ The other OS versions (macOS, Linux) are not the case. 
+
+
+### To check whether the Qt libraries are customized.
+
+  - Launch OpenToonz.
+  - Open Preferences.
+  - Check if there is a checkbox "Use Qt's Native Windows Ink Support" in the 
+    "Touch / Tablet Settings" category.
+
+  If the option exists, Qt libraries are customized version (Qt 5.15.2 with WinTab support).
+
+----------
+
+## About Qt 5.15.2 with WinTab support
+
+  This version is made based on v5.15.2 with cherry-picking the following commit 
+  to the qtbase module, in order to make it enable to use WinTab API in Qt 5.15.2:
+
+  commit id: [4c4693cf964e9d7370c27a26e1d263a262aee568](https://github.com/shun-iwasawa/qtbase/commit/4c4693cf964e9d7370c27a26e1d263a262aee568)
+  commit title: Windows: Provide a way to switch between WinTab and Windows Ink at run-time
+
+
+### Source Code
+
+  You can find the source code tree to build this package and track the modification here:
+  https://github.com/shun-iwasawa/qt5/tree/v5.15.2_wintab
+
+
+### Build Configurations
+
+  The attached package is built by the following command lines:
+  ```
+  > configure -debug-and-release -opensource -confirm-license -prefix ../build -make libs -no-pch -openssl OPENSSL_PREFIX="path\to\OpenSSL-Win64" -opengl dynamic
+  
+  > jom -j4
+  
+  > jom module-qtscript -j4
+  
+  > jom install
+  ```
+
+
+### Dependent Libraries
+
+  The attached package is built by using the following libraries/software:
+
+  - OpenSSL Toolkit 1.1.1j 
+    [Binary package from Shining Light Productions](https://slproweb.com/products/Win32OpenSSL.html)
+  - Perl
+    [ActivePerl 5.28](https://www.activestate.com/products/perl/downloads/)
+  - [Python 2.7.18](https://www.python.org/downloads/release/python-2718/)
+  - [Ruby 2.7.2-1 (x64)](https://rubyinstaller.org/downloads/)
+  - ANGLE : already included in the repository.
+  - Microsoft Visual Studio Community 2019
+  - [jom](https://wiki.qt.io/Jom)
+  - ICU : Not used.
+
+
+#### Reference: 
+
+  - [Qt for Windows - Requirements](https://doc.qt.io/qt-5/windows-requirements.html)
+  - [Qt for Windows - Building from Source](https://doc.qt.io/qt-5/windows-building.html)
+
+
+----------
+March 26, 2021
+Shun Iwasawa, OpenToonz team
+
+

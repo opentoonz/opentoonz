@@ -44,12 +44,12 @@
 
             The classical cache concept is nothing more than that of a standard
   associative
-            map, tweaked to accomodate specific commodities - such as managing
+            map, tweaked to accommodate specific commodities - such as managing
   the cache
             size.
 
             However, sometimes resources could be considered to be effectively
-  indentical,
+  identical,
             to the point that assigning a key is merely a way to keep the
   objects
             distinct in the cache. Users are in the condition to require only

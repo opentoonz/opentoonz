@@ -55,7 +55,7 @@ public:
 
   // Other (misplaced) misc options
 
-  bool m_doCompare;      //!< Whehter must compare between two images
+  bool m_doCompare;      //!< Whether must compare between two images
   bool m_defineLoadbox;  //!< Flipbook-specific
   bool m_useLoadbox;     //!< Flipbook-specific
 
@@ -66,7 +66,7 @@ public:
   bool m_recomputeIfNeeded;
   bool m_drawBlankFrame;
   bool m_useChecks;  //!< whether to consider  paint check and ink check
-  bool m_forSceneIcon = false;  // whether it is redered for the scene icons
+  bool m_forSceneIcon = false;  // whether it is rendered for the scene icons
 public:
   VisualSettings();
 

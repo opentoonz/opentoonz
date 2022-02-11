@@ -123,7 +123,11 @@ public:
         ->setCenter(m_objId, m_frame, m_center);
   }
   void leftButtonUp(const TPointD &pos, const TMouseEvent &) override {
-    if ((m_lockCenterX && m_lockCenterY) || m_firstPos == pos) return;
+    if (m_firstPos == pos) return;
+    leftButtonUp();
+  }
+  void leftButtonUp() override {
+    if (m_lockCenterX && m_lockCenterY) return;
     UndoStageObjectCenterMove *undo =
         new UndoStageObjectCenterMove(m_objId, m_frame, m_oldCenter, m_center);
     TTool::Application *app = TTool::getApplication();
@@ -229,7 +233,11 @@ public:
   }
 
   void leftButtonUp(const TPointD &pos, const TMouseEvent &) override {
-    if (!m_isStarted || m_firstPos == pos)
+    if (m_firstPos == pos) return;
+    leftButtonUp();
+  }
+  void leftButtonUp() override {
+    if (!m_isStarted)
       return;
     else
       m_isStarted = false;
@@ -1620,7 +1628,14 @@ m_foo.setFxHandle(getApplication()->getCurrentFx());
 
 //=============================================================================
 
-void EditTool::onDeactivate() {}
+void EditTool::onDeactivate() {
+  if (m_dragTool) {
+    m_dragTool->leftButtonUp();
+    TUndoManager::manager()->endBlock();
+    delete m_dragTool;
+    m_dragTool = nullptr;
+  }
+}
 
 //-----------------------------------------------------------------------------
 
@@ -1703,7 +1718,7 @@ bool EditTool::onPropertyChanged(std::string propertyName) {
 
 int EditTool::getCursorId() const {
   int ret;
-  // cursor for controling the fx gadget
+  // cursor for controlling the fx gadget
   if (m_highlightedDevice >= 1000)
     ret = ToolCursor::FxGadgetCursor;
   else if (transformEnabled()) {

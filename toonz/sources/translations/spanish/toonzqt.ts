@@ -173,6 +173,26 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
         <source>&lt;custom&gt;</source>
         <translation>&lt;personalizada&gt;</translation>
     </message>
+    <message>
+        <source>cm</source>
+        <translation>cm</translation>
+    </message>
+    <message>
+        <source>mm</source>
+        <translation>mm</translation>
+    </message>
+    <message>
+        <source>inch</source>
+        <translation>pulgadas</translation>
+    </message>
+    <message>
+        <source>field</source>
+        <translation>campos</translation>
+    </message>
+    <message>
+        <source>pixel</source>
+        <translation>píxeles</translation>
+    </message>
 </context>
 <context>
     <name>ChannelHisto</name>
@@ -1652,6 +1672,14 @@ Seleccionar los nodos de efecto y sus vínculos relacionados antes de copiar o c
     <message>
         <source>Failed to save palette.</source>
         <translation>Falla al guardar paleta.</translation>
+    </message>
+    <message>
+        <source>Set Toolbar Below Styles</source>
+        <translation>Botones abajo</translation>
+    </message>
+    <message>
+        <source>Set Toolbar Above Styles</source>
+        <translation>Botones arriba</translation>
     </message>
 </context>
 <context>

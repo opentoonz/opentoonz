@@ -7,6 +7,7 @@
 #include "toonz/tscenehandle.h"
 #include "toonz/toonzscene.h"
 #include "toonz/toonzfolders.h"
+#include "toonz/cleanupcolorstyles.h"
 
 // ToonzQt includes
 #include "toonzqt/gutil.h"
@@ -101,6 +102,8 @@ CleanupSettingsPane::CleanupSettingsPane(QWidget *parent)
   m_aaValueLabel        = new QLabel(tr("MLAA Intensity:"));
   m_aaValue             = new IntField(this);
   m_lineProcessing      = new QComboBox(this);
+  m_lpNoneFormatLabel   = new QLabel(tr("Format:"));
+  m_lpNoneFormat        = new QComboBox(this);
   m_paletteViewer       = new CleanupPaletteViewer(this);
   m_pathField           = new CleanupSaveInField(this, QString(""));
 
@@ -142,6 +145,13 @@ CleanupSettingsPane::CleanupSettingsPane(QWidget *parent)
   items.clear();
   items << tr("None") << tr("Greyscale") << tr("Color");
   m_lineProcessing->addItems(items);
+
+  items.clear();
+  items << "tif"
+        << "png"
+        << "jpg"
+        << "tga";
+  m_lpNoneFormat->addItems(items);
 
   m_sharpness->setValues(90, 0, 100);
   m_despeckling->setValues(2, 0, 20);
@@ -223,15 +233,15 @@ CleanupSettingsPane::CleanupSettingsPane(QWidget *parent)
       lineProcLay->addWidget(m_aaValueLabel, 4, 0,
                              Qt::AlignRight | Qt::AlignVCenter);
       lineProcLay->addWidget(m_aaValue, 4, 1);
+      lineProcLay->addWidget(m_lpNoneFormatLabel, 5, 0,
+                             Qt::AlignRight | Qt::AlignVCenter);
+      lineProcLay->addWidget(m_lpNoneFormat, 5, 1,
+                             Qt::AlignLeft | Qt::AlignVCenter);
 
-      lineProcLay->addWidget(m_paletteViewer, 5, 0, 1, 2);
+      lineProcLay->addWidget(m_paletteViewer, 6, 0, 1, 2);
     }
-    lineProcLay->setRowStretch(0, 0);
-    lineProcLay->setRowStretch(1, 0);
-    lineProcLay->setRowStretch(2, 0);
-    lineProcLay->setRowStretch(3, 0);
-    lineProcLay->setRowStretch(4, 0);
-    lineProcLay->setRowStretch(5, 1);
+    for (int r = 0; r <= 5; r++) lineProcLay->setRowStretch(r, 0);
+    lineProcLay->setRowStretch(6, 1);
     lineProcLay->setColumnStretch(0, 0);
     lineProcLay->setColumnStretch(1, 1);
 
@@ -285,6 +295,8 @@ CleanupSettingsPane::CleanupSettingsPane(QWidget *parent)
   ret = ret && connect(m_antialias, SIGNAL(activated(int)),
                        SLOT(onGenericSettingsChange()));
   ret = ret && connect(m_lineProcessing, SIGNAL(activated(int)),
+                       SLOT(onGenericSettingsChange()));
+  ret = ret && connect(m_lpNoneFormat, SIGNAL(activated(int)),
                        SLOT(onGenericSettingsChange()));
   ret = ret && connect(m_despeckling, SIGNAL(valueChanged(bool)),
                        SLOT(onGenericSettingsChange()));
@@ -404,6 +416,8 @@ void CleanupSettingsPane::updateGui(CleanupParameters *params,
   m_sharpness->setValue(params->m_sharpness);
   m_despeckling->setValue(params->m_despeckling);
   m_aaValue->setValue(params->m_aaValue);
+  m_lpNoneFormat->setCurrentText(
+      QString::fromStdString(params->m_lpNoneFormat));
 
   updateVisibility();
 
@@ -462,6 +476,8 @@ void CleanupSettingsPane::updateVisibility() {
   for (QWidget *w : m_lpWidgets) w->setVisible(lp);
   m_aaValueLabel->setVisible(MLAA);
   m_aaValue->setVisible(MLAA);
+  m_lpNoneFormatLabel->setVisible(!lp);
+  m_lpNoneFormat->setVisible(!lp);
 
   m_paletteViewer->setMode(lpGrey);
   m_paletteViewer->setContrastEnabled(m_antialias->currentIndex() == 0);
@@ -525,15 +541,30 @@ void CleanupSettingsPane::onGenericSettingsChange() {
   params->m_flipy  = m_flipY->isChecked();
 
   //------
-
-  params->m_lineProcessingMode = m_lineProcessing->currentIndex();
-  params->m_noAntialias        = (m_antialias->currentIndex() > 0);
-  params->m_postAntialias      = (m_antialias->currentIndex() == 2);
-  params->m_despeckling        = m_despeckling->getValue();
-  params->m_aaValue            = m_aaValue->getValue();
-
-  if (params->m_lineProcessingMode == lpNone)
-    params->m_transparencyCheckEnabled = false;
+  if (params->m_lineProcessingMode != m_lineProcessing->currentIndex()) {
+    int oldMode                  = params->m_lineProcessingMode;
+    params->m_lineProcessingMode = m_lineProcessing->currentIndex();
+    if (params->m_lineProcessingMode == lpNone) {
+      params->m_transparencyCheckEnabled = false;
+    }
+    // When switching from/to Greyscale processing, replace the brightness and
+    // contrast values by the registered ones.
+    if (oldMode == lpGrey || params->m_lineProcessingMode == lpGrey) {
+      TCleanupStyle *blackStyle =
+          dynamic_cast<TCleanupStyle *>(params->m_cleanupPalette->getStyle(1));
+      double b                = params->m_altBrightness;
+      double c                = params->m_altContrast;
+      params->m_altBrightness = blackStyle->getBrightness();
+      params->m_altContrast   = blackStyle->getContrast();
+      blackStyle->setBrightness(b);
+      blackStyle->setContrast(c);
+    }
+  }
+  params->m_noAntialias   = (m_antialias->currentIndex() > 0);
+  params->m_postAntialias = (m_antialias->currentIndex() == 2);
+  params->m_despeckling   = m_despeckling->getValue();
+  params->m_aaValue       = m_aaValue->getValue();
+  params->m_lpNoneFormat  = m_lpNoneFormat->currentText().toStdString();
   //------
 
   m_cameraWidget->getFields(model->getCurrentParameters());

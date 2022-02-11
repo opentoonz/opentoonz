@@ -463,7 +463,7 @@ void TApp::onXsheetSwitched() {
   // update xsheetlevel
   updateXshLevel();
 
-  // no Fx is setted to current.
+  // no Fx is set to current.
   m_currentFx->setFx(0);
 }
 
@@ -706,9 +706,9 @@ void TApp::autosave() {
   pb.show();
   Preferences *pref = Preferences::instance();
   if (pref->isAutosaveSceneEnabled() && pref->isAutosaveOtherFilesEnabled()) {
-    IoCmd::saveAll();
+    IoCmd::saveAll(IoCmd::AUTO_SAVE);
   } else if (pref->isAutosaveSceneEnabled()) {
-    IoCmd::saveScene();
+    IoCmd::saveScene(IoCmd::AUTO_SAVE);
   } else if (pref->isAutosaveOtherFilesEnabled()) {
     IoCmd::saveNonSceneFiles();
   }
@@ -748,7 +748,7 @@ bool TApp::eventFilter(QObject *watched, QEvent *e) {
     // if the user is painting very quickly with the pen, a number of events
     // could be still in the queue
     // the must be processed as tabled events (not mouse events)
-    qApp->processEvents();
+    if (m_isPenCloseToTablet) qApp->processEvents();
 
     m_isPenCloseToTablet = false;
     emit tabletLeft();

@@ -61,7 +61,7 @@ class TTileSaverFullColor;
 
 //=============================================================================
 
-// returns true if the savebox is changed 9tipically, if you fill the bg)
+// returns true if the savebox is changed typically, if you fill the bg)
 DVAPI bool fill(const TRasterCM32P &r, const FillParameters &params,
                 TTileSaverCM32 *saver = 0);
 

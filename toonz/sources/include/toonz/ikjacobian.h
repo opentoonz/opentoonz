@@ -704,10 +704,10 @@ private:
 
   VectorRn dPreTheta;  // (vale solo per SDLS)
 
-  // Parameters for pseudorinverse
+  // Parameters for pseudoinverse
   static const double PseudoInverseThresholdFactor;
 
-  // Paremeters for the Damped Least Squares method
+  // Parameters for the Damped Least Squares method
   static const double DefaultDampingLambda;
   double DampingLambda;
   double DampingLambdaSq;

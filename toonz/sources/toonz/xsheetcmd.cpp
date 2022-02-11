@@ -59,6 +59,7 @@
 #include "duplicatepopup.h"
 #include "menubarcommandids.h"
 #include "columncommand.h"
+#include "xshcellviewer.h"  // SetCellMarkUndo
 
 // Qt includes
 #include <QClipboard>
@@ -2145,3 +2146,41 @@ public:
   }
 
 } ToggleXsheetCameraColumnCommand;
+
+//-----------------------------------------------------------------------------
+
+class SetCellMarkCommand final : public MenuItemHandler {
+  int m_markId;
+
+public:
+  SetCellMarkCommand(int markId)
+      : MenuItemHandler(
+            ((std::string)MI_SetCellMark + std::to_string(markId)).c_str())
+      , m_markId(markId) {}
+
+  void execute() override {
+    TApp *app         = TApp::instance();
+    TXsheet *xsh      = app->getCurrentXsheet()->getXsheet();
+    int currentRow    = app->getCurrentFrame()->getFrame();
+    int currentColumn = app->getCurrentColumn()->getColumnIndex();
+    if (!xsh->getColumn(currentColumn)) return;
+    TXshCellColumn *cellColumn = xsh->getColumn(currentColumn)->getCellColumn();
+    if (!cellColumn) return;
+    XsheetGUI::SetCellMarkUndo *undo =
+        new XsheetGUI::SetCellMarkUndo(currentRow, currentColumn, m_markId);
+    undo->redo();
+    TUndoManager::manager()->add(undo);
+  }
+};
+SetCellMarkCommand CellMarkCommand0(0);
+SetCellMarkCommand CellMarkCommand1(1);
+SetCellMarkCommand CellMarkCommand2(2);
+SetCellMarkCommand CellMarkCommand3(3);
+SetCellMarkCommand CellMarkCommand4(4);
+SetCellMarkCommand CellMarkCommand5(5);
+SetCellMarkCommand CellMarkCommand6(6);
+SetCellMarkCommand CellMarkCommand7(7);
+SetCellMarkCommand CellMarkCommand8(8);
+SetCellMarkCommand CellMarkCommand9(9);
+SetCellMarkCommand CellMarkCommand10(10);
+SetCellMarkCommand CellMarkCommand11(11);

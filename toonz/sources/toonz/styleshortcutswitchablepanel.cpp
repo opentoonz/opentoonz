@@ -26,11 +26,11 @@ void StyleShortcutSwitchablePanel::onKeyPress(QKeyEvent *event) {
   TTool *tool = TApp::instance()->getCurrentTool()->getTool();
   if (!tool) return;
   if (tool->getName() == T_Type && tool->isActive()) return;
-  if (event->modifiers() != Qt::NoModifier &&
-      event->modifiers() != Qt::KeypadModifier)
-    return;
   int key = event->key();
   if (Qt::Key_0 <= key && key <= Qt::Key_9) {
+    if (event->modifiers() != Qt::NoModifier &&
+        event->modifiers() != Qt::KeypadModifier)
+      return;
     TPaletteHandle *ph =
         TApp::instance()->getPaletteController()->getCurrentLevelPalette();
 
@@ -46,6 +46,9 @@ void StyleShortcutSwitchablePanel::onKeyPress(QKeyEvent *event) {
     }
     event->accept();
   } else if (key == Qt::Key_Tab || key == Qt::Key_Backtab) {
+    if (event->modifiers() != Qt::NoModifier &&
+        event->modifiers() != Qt::ShiftModifier)
+      return;
     TPaletteHandle *ph =
         TApp::instance()->getPaletteController()->getCurrentLevelPalette();
 

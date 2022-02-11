@@ -76,8 +76,9 @@ public:
   ParamsPage(QWidget *parent = 0, ParamViewer *paramViewer = 0);
   ~ParamsPage();
 
-  void setPage(TIStream &is, const TFxP &fx) {
+  void setPage(TIStream &is, const TFxP &fx, bool isFirstPage) {
     setPageField(is, fx);
+    if (isFirstPage) addGlobalControl(fx);
     setPageSpace();
   }
 
@@ -98,6 +99,7 @@ public:
 
 protected:
   void setPageField(TIStream &is, const TFxP &fx, bool isVertical = true);
+  void addGlobalControl(const TFxP &fx);
 
 public:
   void setPageSpace();

@@ -418,7 +418,7 @@ VectorizerSwatchArea::VectorizerSwatchArea(QWidget *parent) {
 
   setMinimumHeight(150);
 
-  // The followings help in re-establishing focus for wheel events
+  // The following help in re-establishing focus for wheel events
   m_leftSwatch->setFocusPolicy(Qt::WheelFocus);
   m_rightSwatch->setFocusPolicy(Qt::WheelFocus);
 }

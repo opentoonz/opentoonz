@@ -248,9 +248,13 @@ TXshSimpleLevel *createMeshLevel(TXshLevel *texturesLevel) {
       codedOrigPath = TFilePath(
           "+drawings/a");  // parent directory. Store them in "+drawings".
 
+    // temporarily disable underscore in order to get proper file path when the
+    // level name includes underscore like "sub_1"
+    TFilePath::setUnderscoreFormatAllowed(false);
     codedOrigPath = codedDstPath =
         codedOrigPath.withName(pathName).withType("mesh").withFrame(
             TFrameId::EMPTY_FRAME);
+    TFilePath::setUnderscoreFormatAllowed(true);
 
     origPath = dstPath = scene->decodeFilePath(codedOrigPath);
 
@@ -260,9 +264,10 @@ TXshSimpleLevel *createMeshLevel(TXshLevel *texturesLevel) {
       while (TSystem::doesExistFileOrLevel(dstPath) ||
              scene->getLevelSet()->hasLevel(*scene, codedDstPath)) {
         pathName = nameBuilder->getNext();
-
+        TFilePath::setUnderscoreFormatAllowed(false);
         codedDstPath = origPath.withName(pathName).withType("mesh").withFrame(
             TFrameId::EMPTY_FRAME);
+        TFilePath::setUnderscoreFormatAllowed(true);
         dstPath = scene->decodeFilePath(codedDstPath);
       }
 
@@ -532,7 +537,7 @@ public:
     } else if (m_xsh) {
       // Build reference change affines
 
-      // EXPLANATION: RasterPainter receives an affine specifiying the reference
+      // EXPLANATION: RasterPainter receives an affine specifying the reference
       // change
       // from world coordinates to the OpenGL viewport, where (0,0) corresponds
       // to the
@@ -862,7 +867,7 @@ TMeshImageP meshify(const TXshCell &cell, const MeshifyOptions &options) {
     slDpi = sl->getDpi();
     locals::checkEmptyDpi(slDpi);
 
-    // Due to a Toonz bug when loading a PLI, slDpi may actually aquire the
+    // Due to a Toonz bug when loading a PLI, slDpi may actually acquire the
     // camera dpi -
     // but it's always shown to be at the STANDARD world DPI, Stage::inch -
     // plus, the
@@ -1312,7 +1317,7 @@ public:
 
   void execute() override {
     static MeshifyPopup *thePopup = 0;
-    if (!thePopup) thePopup       = new MeshifyPopup;
+    if (!thePopup) thePopup = new MeshifyPopup;
 
     thePopup->raise();
     thePopup->show();

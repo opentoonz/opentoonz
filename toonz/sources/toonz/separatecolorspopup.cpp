@@ -1261,7 +1261,7 @@ void SeparateColorsPopup::doCompute(TRaster32P raster, TDimensionI& dim,
     matte_host = (uchar3*)matte_host_ras->getRawData();
   }
 
-  // input the souce image
+  // input the source image
   QVector3D* chann_p = src_host;
   for (int j = 0; j < dim.ly; j++) {
     TPixel32* pix = raster->pixels(j);
@@ -1447,7 +1447,7 @@ void SeparateColorsPopup::doCompute(TRaster32P raster, TDimensionI& dim,
     matte_host = (uchar4*)matte_host_ras->getRawData();
   }
 
-  // input the souce image
+  // input the source image
   QVector3D* chann_p = src_host;
   for (int j = 0; j < dim.ly; j++) {
     TPixel32* pix = raster->pixels(j);

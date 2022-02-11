@@ -706,7 +706,7 @@ void JpgExifReader::ProcessExifDir(unsigned char *DirStart,
       if (ImageInfo.Comments[0]) {  // We already have a jpeg comment.
         // Already have a comment (probably windows comment), skip this one.
         if (ShowTags)
-          printf("Windows XP commend and other comment in header\n");
+          printf("Windows XP comment and other comment in header\n");
         break;  // Already have a windows comment, skip this one.
       }
 
