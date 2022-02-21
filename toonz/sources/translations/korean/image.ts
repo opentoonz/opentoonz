@@ -13,6 +13,57 @@
     </message>
 </context>
 <context>
+    <name>ExrWriterProperties</name>
+    <message>
+        <source>Bits Per Pixel</source>
+        <translation type="unfinished">픽셀당 비트 수</translation>
+    </message>
+    <message>
+        <source>48(RGB Half Float)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>64(RGBA Half Float)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Compression Type</source>
+        <translation type="unfinished">압축</translation>
+    </message>
+    <message>
+        <source>No compression</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Run Length Encoding (RLE)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ZIP compression per Scanline (ZIPS)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ZIP compression per scanline band (ZIP)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PIZ-based wavelet compression (PIZ)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Storage Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scan-line based</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tile based</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>GifWriterProperties</name>
     <message>
         <source>Scale</source>
@@ -24,7 +75,67 @@
     </message>
     <message>
         <source>Generate Palette</source>
-        <translation>팔레트 생성</translation>
+        <translation type="vanished">팔레트 생성</translation>
+    </message>
+    <message>
+        <source>Global Palette</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Global Palette + Sierra Dither</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Global Palette + Bayer2 Dither</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Global Palette + Bayer1 Dither</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Diff Palette</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Diff Palette + Sierra Dither</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Diff Palette + Bayer2 Dither</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Diff Palette + Bayer1 Dither</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New Pal Per Frame</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New Pal Per Frame + Sierra Dither</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New Pal Per Frame + Bayer2 Dither</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New Pal Per Frame + Bayer1 Dither</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Opaque, Dither, 256 Colors Only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Max Colors</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -55,6 +166,10 @@ Please try raising the FFmpeg timeout in Preferences.</source>
         <translation>FFmpeg 시간초과.
 파일에 오류가 있는지 확인하십시요.
 파일이 재생되지 않거나 불완전 한 경우, 기본 설정에서 FFmpeg 시간초과를 설정하세요.</translation>
+    </message>
+    <message>
+        <source>FFmpeg returned error-code: %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

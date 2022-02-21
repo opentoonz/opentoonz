@@ -739,6 +739,10 @@
         <source>Lines &amp; Areas</source>
         <translation>線と塗り</translation>
     </message>
+    <message>
+        <source>Lock Alpha</source>
+        <translation type="unfinished">透明部分の保護</translation>
+    </message>
 </context>
 <context>
     <name>PinchTool</name>
@@ -1050,6 +1054,10 @@ Do you want to proceed?</source>
     <message>
         <source>Smooth</source>
         <translation>滑らかに連結</translation>
+    </message>
+    <message>
+        <source>Rotate</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1602,6 +1610,10 @@ moved to the end of the first page of the palette.</source>
     <message>
         <source>Pressure</source>
         <translation>圧力感知</translation>
+    </message>
+    <message>
+        <source>Lock Alpha</source>
+        <translation type="unfinished">透明部分の保護</translation>
     </message>
 </context>
 <context>

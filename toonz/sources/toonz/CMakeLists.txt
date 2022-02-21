@@ -55,6 +55,7 @@ set(MOC_HEADERS
     levelsettingspopup.h
     linesfadepopup.h
     lipsyncpopup.h
+    autolipsyncpopup.h
     loadfolderpopup.h
     locatorpopup.h
     magpiefileimportpopup.h
@@ -266,6 +267,7 @@ set(SOURCES
     levelcreatepopup.cpp
     levelsettingspopup.cpp
     lipsyncpopup.cpp
+    autolipsyncpopup.cpp
     magpiefileimportpopup.cpp
     outputsettingspopup.cpp
     overwritepopup.cpp

@@ -1831,15 +1831,16 @@ void FxGadgetController::draw(bool picking) {
 //---------------------------------------------------------------------------
 
 void FxGadgetController::selectById(unsigned int id) {
-  std::map<GLuint, FxGadget *>::iterator it;
-  it                       = m_idTable.find(id);
-  FxGadget *selectedGadget = it != m_idTable.end() ? it->second : 0;
+  std::map<GLuint, FxGadget *>::iterator it = m_idTable.find(id);
+  FxGadget *selectedGadget = it != m_idTable.end() ? it->second : nullptr;
   if (selectedGadget != m_selectedGadget) {
     if (m_selectedGadget) m_selectedGadget->select(-1);
     m_selectedGadget = selectedGadget;
-    if (m_selectedGadget)
-      m_selectedGadget->select(id - m_selectedGadget->getId());
   }
+  if (!m_selectedGadget) return;
+  int handleId = id - m_selectedGadget->getId();
+  if (!m_selectedGadget->isSelected(handleId))
+    m_selectedGadget->select(handleId);
 }
 
 //---------------------------------------------------------------------------

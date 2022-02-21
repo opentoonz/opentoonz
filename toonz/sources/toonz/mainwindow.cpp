@@ -1898,6 +1898,9 @@ void MainWindow::defineActions() {
   createMenuXsheetAction(MI_LipSyncPopup,
                          QT_TR_NOOP("&Apply Lip Sync Data to Column"), "Alt+L",
                          "dialogue");
+  createMenuXsheetAction(MI_AutoLipSyncPopup,
+                         QT_TR_NOOP("&Apply Auto Lip Sync to Column"), "Ctrl+Alt+L",
+                         "dialogue");
 
   // Menu - Cells
 

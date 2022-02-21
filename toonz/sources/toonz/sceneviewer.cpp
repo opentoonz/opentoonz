@@ -780,8 +780,7 @@ SceneViewer::SceneViewer(ImageUtils::FullScreenWidget *parent)
     , m_editPreviewSubCamera(false)
     , m_locator(NULL)
     , m_isLocator(false)
-    , m_isBusyOnTabletMove(false)
-    , m_timer(nullptr) {
+    , m_isBusyOnTabletMove(false) {
   m_visualSettings.m_sceneProperties =
       TApp::instance()->getCurrentScene()->getScene()->getProperties();
 #if defined(x64)
@@ -1937,14 +1936,6 @@ void SceneViewer::paintGL() {
 
   if (!m_isPicking && m_lutCalibrator && m_lutCalibrator->isValid())
     m_lutCalibrator->onEndDraw(m_fbo);
-
-  // wait to achieve precise fps
-  if (m_timer && m_timer->isValid()) {
-    qint64 currentInstant = m_timer->nsecsElapsed();
-    while (currentInstant < m_targetInstant) {
-      currentInstant = m_timer->nsecsElapsed();
-    }
-  }
 }
 
 //-----------------------------------------------------------------------------

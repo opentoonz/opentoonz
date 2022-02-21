@@ -450,6 +450,42 @@
         <source>and %1 more item(s).</source>
         <translation>さらに %1 個のファイル。</translation>
     </message>
+    <message>
+        <source>Orange</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yellow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Light Green</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Light Blue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dark Blue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Purple</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pink</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dark Pink</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>White</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>TScriptBinding::CenterlineVectorizer</name>

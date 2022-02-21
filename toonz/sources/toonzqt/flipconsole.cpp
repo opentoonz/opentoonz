@@ -219,9 +219,18 @@ void PlaybackExecutor::run() {
       shortTermDelayAdjuster -= delayAdjust;
 
       // Show the next frame, telling currently measured fps
-      // The wait time will be inserted at the end of paintGL in order to
-      // achieve precise playback
+      // For the Flipbook, the wait time will be inserted at the end of paintGL
+      // in order to achieve precise playback
       emit nextFrame(fps, &m_timer, targetInstant);
+
+      // Playing on Viewer / Combo Viewer will advance the current frame.
+      // Calling qApp->processEvents() on drawing frame causes repaint of other
+      // panels which slows playback. Therefore in Viewer / Combo Viewer panels
+      // it just calls update() and necessary wait will be inserted here.
+      qint64 currentInstant = m_timer.nsecsElapsed();
+      while (currentInstant < targetInstant) {
+        currentInstant = m_timer.nsecsElapsed();
+      }
 
       if (FlipConsole::m_areLinked) {
         // In case there are linked consoles, update them too.

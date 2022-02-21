@@ -33,6 +33,7 @@ protected:
   void focusOutEvent(QFocusEvent *fe) override;
 
   void keyPressEvent(QKeyEvent *ke) override;
+  void contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) override;
 
 signals:
   void focusOut();

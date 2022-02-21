@@ -412,6 +412,7 @@
 #define MI_PencilTest "MI_PencilTest"
 #define MI_AudioRecording "MI_AudioRecording"
 #define MI_LipSyncPopup "MI_LipSyncPopup"
+#define MI_AutoLipSyncPopup "MI_AutoLipSyncPopup"
 #define MI_AutoInputCellNumber "MI_AutoInputCellNumber"
 #define MI_TouchGestureControl "MI_TouchGestureControl"
 #define MI_SeparateColors "MI_SeparateColors"

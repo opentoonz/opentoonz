@@ -103,6 +103,10 @@ void SchematicName::focusInEvent(QFocusEvent *fe) {
   setTextCursor(cursor);
 }
 
+//--------------------------------------------------------
+
+void SchematicName::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) {}
+
 //========================================================
 //
 // class SchematicThumbnailToggle

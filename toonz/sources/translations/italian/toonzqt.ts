@@ -213,7 +213,7 @@ E&apos; possibile che il file sia corrotto.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>RGBA</source>
+        <source>RGB</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -304,6 +304,18 @@ E&apos; possibile che il file sia corrotto.</translation>
         <source>Y:</source>
         <translation type="unfinished">Y:</translation>
     </message>
+    <message>
+        <source>8bit (0-255)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>16bit (0-65535)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>0.0-1.0</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>DVGui</name>
@@ -369,6 +381,18 @@ E&apos; possibile che il file sia corrotto.</translation>
         <source>A:</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Paste Color</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Paste Color of %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copy Color</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>DVGui::DvTextEdit</name>
@@ -405,10 +429,97 @@ E&apos; possibile che il file sia corrotto.</translation>
     </message>
 </context>
 <context>
+    <name>DVGui::HexColorNamesEditor</name>
+    <message>
+        <source>Hex Color Names Editor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished">OK</translation>
+    </message>
+    <message>
+        <source>Apply</source>
+        <translation type="unfinished">Applica</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unselect</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add Color</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete Color</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User Defined Colors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default Main Colors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable Auto-Complete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Color Names</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Text or XML (*.txt *.xml);;Text files (*.txt);;XML files (*.xml)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hex Color Names Import</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do you want to merge with existing entries?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error importing color names XML</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save Color Names</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>XML files (*.xml);;Text files (*.txt)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error exporting color names XML</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>DVGui::LineEdit</name>
     <message>
         <source>A file name cannot contains any of the following chracters: /\:*?&quot;&lt;&gt;|.</source>
-        <translation type="unfinished">Il nome di un file non può contenere i seguenti caratteri: /\:*?&quot;|.</translation>
+        <translation type="obsolete">Il nome di un file non può contenere i seguenti caratteri: /\:*?&quot;|.</translation>
+    </message>
+    <message>
+        <source>A file name cannot contains any of the following characters: /\:*?&quot;&lt;&gt;|.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1034,6 +1145,13 @@ E&apos; possibile che il file sia corrotto.</translation>
     </message>
 </context>
 <context>
+    <name>FunctionSheetButtonArea</name>
+    <message>
+        <source>Toggle synchronizing zoom with xsheet</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>FunctionSheetCellViewer</name>
     <message>
         <source>Delete Key</source>
@@ -1319,6 +1437,17 @@ Manually changing any keyframe will clear the warning.</source>
     </message>
 </context>
 <context>
+    <name>FxPassThroughPainter</name>
+    <message>
+        <source>&amp;Paste Add</source>
+        <translation type="unfinished">&amp;Incolla Aggiungendo</translation>
+    </message>
+    <message>
+        <source>&amp;Preview</source>
+        <translation type="unfinished">&amp;Anteprima</translation>
+    </message>
+</context>
+<context>
     <name>FxSchematicLink</name>
     <message>
         <source>&amp;Delete</source>
@@ -1333,6 +1462,13 @@ Manually changing any keyframe will clear the warning.</source>
     <name>FxSchematicOutputNode</name>
     <message>
         <source>Output</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>FxSchematicPassThroughNode</name>
+    <message>
+        <source> (Pass Through)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2402,10 +2538,6 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
         <translation type="vanished">&amp;Diagramma Effetti/Scena</translation>
     </message>
     <message>
-        <source>&amp;Swtich output port display mode</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>&amp;Toggle node icons</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2419,6 +2551,10 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     </message>
     <message>
         <source>&amp;Hand Mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Switch output port display mode</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2740,10 +2876,6 @@ Are you sure ?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Toggle orientation of the Color Page.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>No Style Selected</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2781,6 +2913,30 @@ Are you sure ?</source>
     </message>
     <message>
         <source>Level </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hex</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Relative colored + Triangle handle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Absolute colored + Line handle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Slider Appearance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle Orientation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hex Color Names...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

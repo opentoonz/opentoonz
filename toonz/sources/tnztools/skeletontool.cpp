@@ -413,19 +413,22 @@ void SkeletonTool::leftButtonDown(const TPointD &ppos, const TMouseEvent &e) {
 
   // lock/unlock: modalita IK
   if (TD_LockStageObject <= m_device && m_device < TD_LockStageObject + 1000) {
-    Skeleton *skeleton = new Skeleton();
-    buildSkeleton(*skeleton, currentColumnIndex);
     int columnIndex = m_device - TD_LockStageObject;
     int frame       = app->getCurrentFrame()->getFrame();
-    if (skeleton->getBoneByColumnIndex(columnIndex) ==
-        skeleton->getRootBone()) {
-      app->getCurrentColumn()->setColumnIndex(columnIndex);
-      m_device = TD_Translation;
-    } else if (e.isShiftPressed()) {
+    if (e.isCtrlPressed() || e.isShiftPressed()) {
+      // ctrl + click : toggle pinned center
+      // shift + click : toggle temporary pin
       togglePinnedStatus(columnIndex, frame, e.isShiftPressed());
       invalidate();
       m_dragTool = 0;
       return;
+    }
+    Skeleton *skeleton = new Skeleton();
+    buildSkeleton(*skeleton, currentColumnIndex);
+    if (skeleton->getBoneByColumnIndex(columnIndex) ==
+        skeleton->getRootBone()) {
+      app->getCurrentColumn()->setColumnIndex(columnIndex);
+      m_device = TD_Translation;
     } else
       return;
   }

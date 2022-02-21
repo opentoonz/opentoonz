@@ -739,6 +739,10 @@
         <source>Lines &amp; Areas</source>
         <translation>Líneas y áreas</translation>
     </message>
+    <message>
+        <source>Lock Alpha</source>
+        <translation type="unfinished">Preservar alfa</translation>
+    </message>
 </context>
 <context>
     <name>PinchTool</name>
@@ -1050,6 +1054,10 @@ Do you want to proceed?</source>
     <message>
         <source>Smooth</source>
         <translation>Suavizar</translation>
+    </message>
+    <message>
+        <source>Rotate</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1602,6 +1610,10 @@ movido hacia el final de la primera página de la paleta.</translation>
     <message>
         <source>Pressure</source>
         <translation>Presión</translation>
+    </message>
+    <message>
+        <source>Lock Alpha</source>
+        <translation type="unfinished">Preservar alfa</translation>
     </message>
 </context>
 <context>

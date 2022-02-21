@@ -4,17 +4,17 @@
 <context>
     <name>Preferences</name>
     <message>
-        <location filename="../../toonzlib/preferences.cpp" line="101"/>
+        <location filename="../../toonzlib/preferences.cpp" line="100"/>
         <source>Retas Level Format</source>
         <translation>Formát úrovně RETAS</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/preferences.cpp" line="107"/>
+        <location filename="../../toonzlib/preferences.cpp" line="106"/>
         <source>Adobe Photoshop</source>
         <translation>Adobe Photoshop</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/preferences.cpp" line="204"/>
+        <location filename="../../toonzlib/preferences.cpp" line="203"/>
         <source>PNG</source>
         <translation>PNG</translation>
     </message>
@@ -219,98 +219,98 @@ Pravděpodobně kodek nemůže pracovat řádně.</translation>
         <translation>Obnovit barvy použitím vybraných poloh v paletě %1</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="902"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="905"/>
         <source>Add Fx  : </source>
         <translation>Přidat efekt: </translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="903"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="906"/>
         <source>Insert Fx  : </source>
         <translation>Vložit efekt: </translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="1059"/>
-        <location filename="../../toonzlib/fxcommand.cpp" line="1062"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="1068"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="1071"/>
         <source>Create Linked Fx  : %1</source>
         <translation>Vytvořit propojený efekt: %1</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="1284"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="1293"/>
         <source>Replace Fx  : </source>
         <translation>Nahradit efekt: %1</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="1350"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="1359"/>
         <source>Unlink Fx  : %1 - - %2</source>
         <translation>Zrušit propojení efektu: %1 - - %2</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="1391"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="1400"/>
         <source>Make Macro Fx  : %1</source>
         <translation>Vytvořit makro efekt: %1</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="1534"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="1543"/>
         <source>Explode Macro Fx  : %1</source>
         <translation>Rozbalit makro efekt: %1</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="1597"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="1606"/>
         <source>Create Output Fx</source>
         <translation>Vytvořit výstupní efekt</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="1688"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="1697"/>
         <source>Connect to Xsheet  : </source>
         <translation>Spojit s Xsheet: </translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="1748"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="1757"/>
         <source>Disconnect from Xsheet  : </source>
         <translation>Odpojit od Xsheet: </translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="2021"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="2030"/>
         <source>Delete Link</source>
         <translation>Smazat spojení</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="2308"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="2317"/>
         <source>Delete Fx Node : %1</source>
         <translation>Smazat uzel efektu: %1</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="2731"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="2740"/>
         <source>Paste Fx  :  </source>
         <translation>Vložit efekt:  </translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="3100"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="3109"/>
         <source>Disconnect Fx</source>
         <translation>Odpojit od efekt</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="3352"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="3361"/>
         <source>Connect Fx : %1 - %2</source>
         <translation>Spojit efekt: %1 - %2</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="3534"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="3543"/>
         <source>Rename Fx : %1 &gt; %2</source>
         <translation>Přejmenovat efekt: %1 - %2</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="3586"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="3595"/>
         <source>Group Fx</source>
         <translation>Seskupit efekt</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="3690"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="3699"/>
         <source>Ungroup Fx</source>
         <translation>Zrušit seskupení efektu</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/fxcommand.cpp" line="3792"/>
+        <location filename="../../toonzlib/fxcommand.cpp" line="3801"/>
         <source>Rename Group  : %1 &gt; %2</source>
         <translation>Přejmenovat skupinu: %1 &gt; %2</translation>
     </message>
@@ -335,38 +335,41 @@ Pravděpodobně kodek nemůže pracovat řádně.</translation>
         <translation>Přepnout volbu pro automatické malování  Paleta: %1  Styl #%2</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/txshcolumn.cpp" line="623"/>
-        <location filename="../../toonzlib/txshcolumn.cpp" line="651"/>
+        <location filename="../../toonzlib/txshcolumn.cpp" line="689"/>
+        <location filename="../../toonzlib/txshcolumn.cpp" line="717"/>
         <source>None</source>
         <translation>Žádný</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/txshcolumn.cpp" line="625"/>
+        <location filename="../../toonzlib/txshcolumn.cpp" line="691"/>
+        <location filename="../../toonzlib/sceneproperties.cpp" line="29"/>
         <source>Red</source>
         <translation>Červená</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/txshcolumn.cpp" line="627"/>
+        <location filename="../../toonzlib/txshcolumn.cpp" line="693"/>
+        <location filename="../../toonzlib/sceneproperties.cpp" line="33"/>
         <source>Green</source>
         <translation>Zelená</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/txshcolumn.cpp" line="629"/>
+        <location filename="../../toonzlib/txshcolumn.cpp" line="695"/>
+        <location filename="../../toonzlib/sceneproperties.cpp" line="35"/>
         <source>Blue</source>
         <translation>Modrá</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/txshcolumn.cpp" line="631"/>
+        <location filename="../../toonzlib/txshcolumn.cpp" line="697"/>
         <source>DarkYellow</source>
         <translation>Tmavá žlutá</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/txshcolumn.cpp" line="633"/>
+        <location filename="../../toonzlib/txshcolumn.cpp" line="699"/>
         <source>DarkCyan</source>
         <translation>Tmavá modrozelená</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/txshcolumn.cpp" line="635"/>
+        <location filename="../../toonzlib/txshcolumn.cpp" line="701"/>
         <source>DarkMagenta</source>
         <translation>Tmavá červenorudá</translation>
     </message>
@@ -493,29 +496,29 @@ Pravděpodobně kodek nemůže pracovat řádně.</translation>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/sceneresources.cpp" line="445"/>
+        <location filename="../../toonzlib/sceneresources.cpp" line="447"/>
         <source>Can&apos;t save</source>
         <translation>Nelze uložit</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/sceneresources.cpp" line="519"/>
+        <location filename="../../toonzlib/sceneresources.cpp" line="521"/>
         <source>and %1 more item(s).</source>
         <translation>a %1 další položku(y).</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/sceneresources.cpp" line="522"/>
+        <location filename="../../toonzlib/sceneresources.cpp" line="524"/>
         <source>Failed to save the following resources:
 </source>
         <translation>Nepodařilo se uložit následující zdroje:
 </translation>
     </message>
     <message>
-        <location filename="../../toonzlib/orientation.cpp" line="76"/>
+        <location filename="../../toonzlib/orientation.cpp" line="81"/>
         <source>Xsheet</source>
         <translation>Xsheet</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/orientation.cpp" line="141"/>
+        <location filename="../../toonzlib/orientation.cpp" line="148"/>
         <source>Timeline</source>
         <translation>Časová osa</translation>
     </message>
@@ -563,6 +566,51 @@ Pravděpodobně kodek nemůže pracovat řádně.</translation>
         <location filename="../../include/toonz/stageobjectutil.h" line="212"/>
         <source>Move Center   %1  Frame %2</source>
         <translation>Přesunout střed   %1 snímek %2</translation>
+    </message>
+    <message>
+        <location filename="../../toonzlib/sceneproperties.cpp" line="30"/>
+        <source>Orange</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../toonzlib/sceneproperties.cpp" line="31"/>
+        <source>Yellow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../toonzlib/sceneproperties.cpp" line="32"/>
+        <source>Light Green</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../toonzlib/sceneproperties.cpp" line="34"/>
+        <source>Light Blue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../toonzlib/sceneproperties.cpp" line="36"/>
+        <source>Dark Blue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../toonzlib/sceneproperties.cpp" line="37"/>
+        <source>Purple</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../toonzlib/sceneproperties.cpp" line="38"/>
+        <source>Pink</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../toonzlib/sceneproperties.cpp" line="39"/>
+        <source>Dark Pink</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../toonzlib/sceneproperties.cpp" line="40"/>
+        <source>White</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

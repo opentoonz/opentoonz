@@ -675,6 +675,10 @@
         <source>Selective</source>
         <translation>선택</translation>
     </message>
+    <message>
+        <source>Lock Alpha</source>
+        <translation type="unfinished">알파 잠금</translation>
+    </message>
 </context>
 <context>
     <name>PinchTool</name>
@@ -986,6 +990,10 @@ Do you want to proceed?</source>
     <message>
         <source>Smooth</source>
         <translation>부드러운</translation>
+    </message>
+    <message>
+        <source>Rotate</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1536,6 +1544,10 @@ moved to the end of the first page of the palette.</source>
     <message>
         <source>Pressure</source>
         <translation>압력</translation>
+    </message>
+    <message>
+        <source>Lock Alpha</source>
+        <translation type="unfinished">알파 잠금</translation>
     </message>
 </context>
 <context>
