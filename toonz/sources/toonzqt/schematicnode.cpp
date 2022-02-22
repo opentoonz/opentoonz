@@ -33,7 +33,10 @@
 //========================================================
 
 SchematicName::SchematicName(QGraphicsItem *parent, double width, double height)
-    : QGraphicsTextItem("", parent), m_width(width), m_height(height) {
+    : QGraphicsTextItem("", parent)
+    , m_width(width)
+    , m_height(height)
+    , m_noAllSelect(false) {
   setFlag(QGraphicsItem::ItemIsSelectable, true);
   setFlag(QGraphicsItem::ItemIsFocusable, true);
   setTextInteractionFlags(Qt::TextEditorInteraction);
