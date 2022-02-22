@@ -19,6 +19,7 @@ class SchematicName final : public QGraphicsTextItem {
   Q_OBJECT
   double m_width;
   double m_height;
+  bool m_noAllSelect;
 
 public:
   SchematicName(QGraphicsItem *parent, double width, double height);
@@ -35,11 +36,17 @@ protected:
   void keyPressEvent(QKeyEvent *ke) override;
   void contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) override;
 
+  void reFocus();
+
 signals:
   void focusOut();
 
 protected slots:
   void onContentsChanged();
+  void onCopy();
+  void onPaste();
+  void onCut();
+  void onSelectAll();
 };
 
 //========================================================

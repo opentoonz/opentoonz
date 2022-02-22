@@ -15,9 +15,16 @@
 #include <QMenuBar>
 #include <QPolygonF>
 #include <QDesktopWidget>
+#include <QClipboard>
 #include "tundo.h"
 #include "toonzqt/menubarcommand.h"
 #include "toonzqt/gutil.h"
+
+#define ACCEL_KEY(k)                                                           \
+  (!QCoreApplication::testAttribute(Qt::AA_DontShowShortcutsInContextMenus)    \
+       ? QLatin1Char('\t') +                                                   \
+             QKeySequence(k).toString(QKeySequence::NativeText)                \
+       : QString())
 
 //========================================================
 //
@@ -97,15 +104,119 @@ bool SchematicName::eventFilter(QObject *object, QEvent *event) {
 void SchematicName::focusInEvent(QFocusEvent *fe) {
   QGraphicsTextItem::focusInEvent(fe);
   qApp->installEventFilter(this);
-  QTextDocument *doc = document();
-  QTextCursor cursor(doc->begin());
-  cursor.select(QTextCursor::Document);
+  if (!m_noAllSelect) {
+    QTextDocument *doc = document();
+    QTextCursor cursor(doc->begin());
+    cursor.select(QTextCursor::Document);
+    setTextCursor(cursor);
+  }
+}
+
+//--------------------------------------------------------
+
+void SchematicName::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) {
+  QMenu *menu = new QMenu();
+
+  QAction *cut = menu->addAction(tr("Cu&t") + ACCEL_KEY(QKeySequence::Cut), this,
+                      SLOT(onCut()));
+  cut->setObjectName(QStringLiteral("edit-cut"));
+
+  QAction *copy = menu->addAction(tr("&Copy") + ACCEL_KEY(QKeySequence::Copy),
+                               this,
+                      SLOT(onCopy()));
+  copy->setObjectName(QStringLiteral("edit-copy"));
+
+  QAction *paste = menu->addAction(tr("&Paste") + ACCEL_KEY(QKeySequence::Paste),
+                               this,
+                      SLOT(onPaste()));
+  paste->setObjectName(QStringLiteral("edit-paste"));
+
+  menu->addSeparator();
+
+  QAction *selectAll =
+      menu->addAction(tr("Select &All") + ACCEL_KEY(QKeySequence::SelectAll),
+                      this, SLOT(onSelectAll()));
+  selectAll->setObjectName(QStringLiteral("select-all"));
+
+  menu->exec(cme->screenPos());
+  reFocus();
+  delete menu;
+}
+
+//--------------------------------------------------------
+
+void SchematicName::reFocus() {
+  m_noAllSelect = true;
+  setFocus();
+  m_noAllSelect = false;
+}
+
+//--------------------------------------------------------
+
+void SchematicName::onCut() {
+  QClipboard *clipboard = QApplication::clipboard();
+  QTextCursor cursor    = textCursor();
+  QString plainText     = toPlainText();
+
+  if (cursor.hasSelection()) {
+    int p = cursor.selectionStart();
+    int n = cursor.selectionEnd() - p;
+    QString selection = plainText.mid(p, n);
+    clipboard->setText(selection);
+    plainText.remove(p, n);
+    setName(plainText);
+    cursor.setPosition(p);
+    setTextCursor(cursor);
+  }
+}
+
+//--------------------------------------------------------
+
+void SchematicName::onCopy() {
+  QClipboard *clipboard = QApplication::clipboard();
+  QTextCursor cursor    = textCursor();
+  QString plainText     = toPlainText();
+
+  if (cursor.hasSelection()) {
+    int p = cursor.selectionStart();
+    int n = cursor.selectionEnd() - p;
+    clipboard->setText(plainText.mid(p, n));
+  } else {
+    clipboard->setText(plainText);
+  }
+}
+
+//--------------------------------------------------------
+
+void SchematicName::onPaste() {
+  QClipboard *clipboard = QApplication::clipboard();
+  QTextCursor cursor    = textCursor();
+  QString plainText     = toPlainText();
+  QString clipboardText = clipboard->text();
+  clipboardText.remove(QRegExp("[\\n\\r]")); // remove all newlines
+
+  int n, p = cursor.position();
+  if (cursor.hasSelection()) {
+    int p = cursor.selectionStart();
+    int n = cursor.selectionEnd() - p;
+    plainText.remove(p, n);
+    plainText.insert(p, clipboardText);
+  } else {
+    plainText.insert(p, clipboardText);
+  }
+  setName(plainText);
+  cursor.setPosition(p + clipboardText.length());
   setTextCursor(cursor);
 }
 
 //--------------------------------------------------------
 
-void SchematicName::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) {}
+void SchematicName::onSelectAll() {
+  QTextDocument *doc = document();
+  QTextCursor cursor(doc->begin());
+  cursor.select(QTextCursor::Document);
+  setTextCursor(cursor);
+}
 
 //========================================================
 //
