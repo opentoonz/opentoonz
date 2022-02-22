@@ -36,22 +36,61 @@ SchematicName::SchematicName(QGraphicsItem *parent, double width, double height)
     : QGraphicsTextItem("", parent)
     , m_width(width)
     , m_height(height)
-    , m_noAllSelect(false) {
+    , m_defName("")
+    , m_curName("")
+    , m_refocus(false) {
   setFlag(QGraphicsItem::ItemIsSelectable, true);
   setFlag(QGraphicsItem::ItemIsFocusable, true);
   setTextInteractionFlags(Qt::TextEditorInteraction);
 
+  popup = new QMenu();
+  popup->setObjectName(QLatin1String("qt_edit_menu"));
+
+  actionCut = popup->addAction(tr("Cu&t") + ACCEL_KEY(QKeySequence::Cut),
+                                 this, SLOT(onCut()));
+  actionCut->setObjectName(QStringLiteral("edit-cut"));
+
+  actionCopy = popup->addAction(tr("&Copy") + ACCEL_KEY(QKeySequence::Copy),
+                                  this, SLOT(onCopy()));
+  actionCopy->setObjectName(QStringLiteral("edit-copy"));
+
+  actionPaste = popup->addAction(
+      tr("&Paste") + ACCEL_KEY(QKeySequence::Paste), this, SLOT(onPaste()));
+  actionPaste->setObjectName(QStringLiteral("edit-paste"));
+
+  actionDelete = popup->addAction(
+      tr("&Delete") + ACCEL_KEY(QKeySequence::Delete), this, SLOT(onDelete()));
+  actionDelete->setObjectName(QStringLiteral("edit-delete"));
+
+  popup->addSeparator();
+
+  actionSelectAll =
+      popup->addAction(tr("Select &All") + ACCEL_KEY(QKeySequence::SelectAll),
+                      this, SLOT(onSelectAll()));
+  actionSelectAll->setObjectName(QStringLiteral("select-all"));
+
   connect(document(), SIGNAL(contentsChanged()), this,
           SLOT(onContentsChanged()));
+  connect(popup, SIGNAL(aboutToHide()), this, SLOT(onPopupHide()));
 }
 
 //--------------------------------------------------------
 
-SchematicName::~SchematicName() {}
+SchematicName::~SchematicName() { delete popup; }
 
 //--------------------------------------------------------
 
-void SchematicName::setName(const QString &name) { setPlainText(name); }
+void SchematicName::setName(const QString &name) {
+  m_defName = name;
+  setPlainText(name);
+}
+
+//--------------------------------------------------------
+
+void SchematicName::acceptName(const QString &name) {
+  m_curName = name;
+  setPlainText(name);
+}
 
 //--------------------------------------------------------
 
@@ -61,7 +100,8 @@ void SchematicName::onContentsChanged() {
   int position       = cursor.position();
   if (position > 0 && text.at(position - 1) == '\n') {
     text.remove("\n");
-    setPlainText(text);
+    if (text.isEmpty()) text = m_defName;
+    acceptName(text);
     ;
     emit focusOut();
   }
@@ -71,7 +111,10 @@ void SchematicName::onContentsChanged() {
 
 void SchematicName::focusOutEvent(QFocusEvent *fe) {
   qApp->removeEventFilter(this);
-  if (fe->reason() == Qt::MouseFocusReason) emit focusOut();
+  if (fe->reason() == Qt::MouseFocusReason) {
+    acceptName(toPlainText());
+    emit focusOut();
+  }
 }
 
 //--------------------------------------------------------
@@ -85,6 +128,9 @@ void SchematicName::keyPressEvent(QKeyEvent *ke) {
     else
       cursor.setPosition(currentPos + 1);
     setTextCursor(cursor);
+  } else if (ke->key() == Qt::Key_Escape) {
+    setPlainText(m_curName);
+    emit focusOut();
   } else
     QGraphicsTextItem::keyPressEvent(ke);
 }
@@ -107,51 +153,36 @@ bool SchematicName::eventFilter(QObject *object, QEvent *event) {
 void SchematicName::focusInEvent(QFocusEvent *fe) {
   QGraphicsTextItem::focusInEvent(fe);
   qApp->installEventFilter(this);
-  if (!m_noAllSelect) {
+  if (!m_refocus) {
     QTextDocument *doc = document();
     QTextCursor cursor(doc->begin());
     cursor.select(QTextCursor::Document);
     setTextCursor(cursor);
+    m_curName = toPlainText();
   }
 }
 
 //--------------------------------------------------------
 
 void SchematicName::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) {
-  QMenu *menu = new QMenu();
+  QClipboard *clipboard = QApplication::clipboard();
+  QTextCursor cursor    = textCursor();
 
-  QAction *cut = menu->addAction(tr("Cu&t") + ACCEL_KEY(QKeySequence::Cut), this,
-                      SLOT(onCut()));
-  cut->setObjectName(QStringLiteral("edit-cut"));
+  actionCut->setEnabled(cursor.hasSelection());
+  actionCopy->setEnabled(cursor.hasSelection());
+  actionPaste->setEnabled(!clipboard->text().isEmpty());
+  actionDelete->setEnabled(cursor.hasSelection());
+  actionSelectAll->setEnabled(cursor.selectedText() != toPlainText());
 
-  QAction *copy = menu->addAction(tr("&Copy") + ACCEL_KEY(QKeySequence::Copy),
-                               this,
-                      SLOT(onCopy()));
-  copy->setObjectName(QStringLiteral("edit-copy"));
-
-  QAction *paste = menu->addAction(tr("&Paste") + ACCEL_KEY(QKeySequence::Paste),
-                               this,
-                      SLOT(onPaste()));
-  paste->setObjectName(QStringLiteral("edit-paste"));
-
-  menu->addSeparator();
-
-  QAction *selectAll =
-      menu->addAction(tr("Select &All") + ACCEL_KEY(QKeySequence::SelectAll),
-                      this, SLOT(onSelectAll()));
-  selectAll->setObjectName(QStringLiteral("select-all"));
-
-  menu->exec(cme->screenPos());
-  reFocus();
-  delete menu;
+  popup->popup(cme->screenPos());
 }
 
 //--------------------------------------------------------
 
-void SchematicName::reFocus() {
-  m_noAllSelect = true;
+void SchematicName::onPopupHide() {
+  m_refocus = true;
   setFocus();
-  m_noAllSelect = false;
+  m_refocus = false;
 }
 
 //--------------------------------------------------------
@@ -167,7 +198,7 @@ void SchematicName::onCut() {
     QString selection = plainText.mid(p, n);
     clipboard->setText(selection);
     plainText.remove(p, n);
-    setName(plainText);
+    acceptName(plainText);
     cursor.setPosition(p);
     setTextCursor(cursor);
   }
@@ -200,16 +231,33 @@ void SchematicName::onPaste() {
 
   int n, p = cursor.position();
   if (cursor.hasSelection()) {
-    int p = cursor.selectionStart();
-    int n = cursor.selectionEnd() - p;
+    p = cursor.selectionStart();
+    n = cursor.selectionEnd() - p;
     plainText.remove(p, n);
     plainText.insert(p, clipboardText);
   } else {
     plainText.insert(p, clipboardText);
   }
-  setName(plainText);
+  acceptName(plainText);
   cursor.setPosition(p + clipboardText.length());
   setTextCursor(cursor);
+}
+
+//--------------------------------------------------------
+
+void SchematicName::onDelete() {
+  QClipboard *clipboard = QApplication::clipboard();
+  QTextCursor cursor    = textCursor();
+  QString plainText     = toPlainText();
+
+  if (cursor.hasSelection()) {
+    int p             = cursor.selectionStart();
+    int n             = cursor.selectionEnd() - p;
+    plainText.remove(p, n);
+    acceptName(plainText);
+    cursor.setPosition(p);
+    setTextCursor(cursor);
+  }
 }
 
 //--------------------------------------------------------
