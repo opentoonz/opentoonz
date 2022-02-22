@@ -68,7 +68,7 @@ public:
   class TypeError {};
   class RangeError {};
 
-  TProperty(std::string name) : m_name(name) {
+  TProperty(std::string name) : m_name(name), m_visible(true) {
     m_qstringName = QString::fromStdString(name);
   }
 
