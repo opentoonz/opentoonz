@@ -89,7 +89,8 @@ void SchematicName::setName(const QString &name) {
 
 void SchematicName::acceptName(const QString &name) {
   m_curName = name;
-  setPlainText(name);
+  m_curName.remove(QRegExp("[\\n\\r]"));  // remove all newlines
+  setPlainText(m_curName);
 }
 
 //--------------------------------------------------------
