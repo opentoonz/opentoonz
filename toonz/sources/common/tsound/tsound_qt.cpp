@@ -160,6 +160,7 @@ public:
     format.setSampleType( st->getFormat().m_signedSample
                         ? QAudioFormat::SignedInt
                         : QAudioFormat::UnSignedInt );
+    if (st->getBitPerSample() == 32) format.setSampleType(QAudioFormat::Float);
     format.setSampleRate(st->getSampleRate());
 
     QAudioDeviceInfo info(QAudioDeviceInfo::defaultOutputDevice());

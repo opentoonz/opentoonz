@@ -11,6 +11,10 @@
 
 #include <mmsystem.h>
 
+#ifndef WAVE_FORMAT_IEEE_FLOAT
+#define WAVE_FORMAT_IEEE_FLOAT 3
+#endif
+
 //=========================================================
 
 // forward declarations
@@ -490,7 +494,8 @@ TSoundOutputDeviceImp::~TSoundOutputDeviceImp() { delete m_whdrQueue; }
 
 bool TSoundOutputDeviceImp::doOpenDevice(const TSoundTrackFormat &format) {
   WAVEFORMATEX wf;
-  wf.wFormatTag      = WAVE_FORMAT_PCM;
+  wf.wFormatTag =
+      (format.m_bitPerSample >= 32) ? WAVE_FORMAT_IEEE_FLOAT : WAVE_FORMAT_PCM;
   wf.nChannels       = format.m_channelCount;
   wf.nSamplesPerSec  = format.m_sampleRate;
   wf.wBitsPerSample  = format.m_bitPerSample;
@@ -819,8 +824,12 @@ TSoundTrackFormat TSoundOutputDevice::getPreferredFormat(TUINT32 sampleRate,
 
   if (bitPerSample <= 8)
     bitPerSample = 8;
-  else if ((bitPerSample > 8 && bitPerSample < 16) || bitPerSample >= 16)
+  else if (bitPerSample <= 16)
     bitPerSample = 16;
+  else if (bitPerSample <= 24)
+    bitPerSample = 24;
+  else
+    bitPerSample = 32;
 
   if (bitPerSample >= 16)
     fmt.m_signedSample = true;
@@ -1715,8 +1724,12 @@ TSoundTrackFormat TSoundInputDevice::getPreferredFormat(TUINT32 sampleRate,
 
   if (bitPerSample <= 8)
     bitPerSample = 8;
-  else if ((bitPerSample > 8 && bitPerSample < 16) || bitPerSample >= 16)
+  else if (bitPerSample <= 16)
     bitPerSample = 16;
+  else if (bitPerSample <= 24)
+    bitPerSample = 24;
+  else
+    bitPerSample = 32;
 
   if (bitPerSample >= 16)
     fmt.m_signedSample = true;

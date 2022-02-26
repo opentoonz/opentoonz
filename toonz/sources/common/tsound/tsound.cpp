@@ -10,6 +10,8 @@
 #define TRK_S16 18
 #define TRK_M24 25
 #define TRK_S24 26
+#define TRK_M32 33
+#define TRK_S32 34
 
 //==============================================================================
 
@@ -111,6 +113,14 @@ TSoundTrackP TSoundTrack::create(TUINT32 sampleRate, int bitPerSample,
     st = new TSoundTrackStereo24(sampleRate, channelCount, sampleCount);
     break;
 
+  case TRK_M32:
+    st = new TSoundTrackMono32(sampleRate, channelCount, sampleCount);
+    break;
+
+  case TRK_S32:
+    st = new TSoundTrackStereo32(sampleRate, channelCount, sampleCount);
+    break;
+
   default:
     std::string s;
     s = "Type " + std::to_string(sampleRate) + " Hz " +
@@ -173,6 +183,16 @@ TSoundTrackP TSoundTrack::create(TUINT32 sampleRate, int bitPerSample,
   case TRK_S24:
     st = new TSoundTrackStereo24(sampleRate, channelCount, sampleCount,
                                  (TStereo24Sample *)buffer, 0);
+    break;
+
+  case TRK_M32:
+    st = new TSoundTrackMono32(sampleRate, channelCount, sampleCount,
+                               (TMono32Sample *)buffer, 0);
+    break;
+
+  case TRK_S32:
+    st = new TSoundTrackStereo32(sampleRate, channelCount, sampleCount,
+                                 (TStereo32Sample *)buffer, 0);
     break;
 
   default:

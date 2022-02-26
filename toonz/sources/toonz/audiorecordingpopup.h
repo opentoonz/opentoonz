@@ -95,7 +95,7 @@ class AudioWriterWAV : public QIODevice {
   Q_OBJECT
 public:
   AudioWriterWAV(const QAudioFormat &format);
-  bool restart(const QAudioFormat &format);
+  bool reset(const QAudioFormat &format);
 
   bool start(const QString &filename, bool useMem);
   bool stop();

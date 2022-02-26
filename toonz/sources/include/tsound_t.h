@@ -351,6 +351,8 @@ template class DVAPI TSoundTrackT<TMono16Sample>;
 template class DVAPI TSoundTrackT<TStereo16Sample>;
 template class DVAPI TSoundTrackT<TMono24Sample>;
 template class DVAPI TSoundTrackT<TStereo24Sample>;
+template class DVAPI TSoundTrackT<TMono32Sample>;
+template class DVAPI TSoundTrackT<TStereo32Sample>;
 #endif
 
 typedef TSoundTrackT<TMono8SignedSample> TSoundTrackMono8Signed;
@@ -361,6 +363,8 @@ typedef TSoundTrackT<TMono16Sample> TSoundTrackMono16;
 typedef TSoundTrackT<TStereo16Sample> TSoundTrackStereo16;
 typedef TSoundTrackT<TMono24Sample> TSoundTrackMono24;
 typedef TSoundTrackT<TStereo24Sample> TSoundTrackStereo24;
+typedef TSoundTrackT<TMono32Sample> TSoundTrackMono32;
+typedef TSoundTrackT<TStereo32Sample> TSoundTrackStereo32;
 
 //==============================================================================
 
@@ -379,6 +383,8 @@ public:
   virtual TSoundTrackP compute(const TSoundTrackStereo16 &) { return 0; };
   virtual TSoundTrackP compute(const TSoundTrackMono24 &) { return 0; };
   virtual TSoundTrackP compute(const TSoundTrackStereo24 &) { return 0; };
+  virtual TSoundTrackP compute(const TSoundTrackMono32 &) { return 0; };
+  virtual TSoundTrackP compute(const TSoundTrackStereo32 &) { return 0; };
 };
 
 //==============================================================================

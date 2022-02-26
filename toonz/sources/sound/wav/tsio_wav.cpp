@@ -7,6 +7,13 @@
 
 using namespace std;
 
+#ifndef WAVE_FORMAT_PCM
+#define WAVE_FORMAT_PCM 1
+#endif
+#ifndef WAVE_FORMAT_IEEE_FLOAT
+#define WAVE_FORMAT_IEEE_FLOAT 3
+#endif
+
 #if !defined(TNZ_LITTLE_ENDIAN)
 TNZ_LITTLE_ENDIAN undefined !!
 #endif
@@ -254,66 +261,15 @@ TSoundTrackP TSoundTrackReaderWav::load() {
                                 sampleCount, signedSample);
 
     if (track) {
-      switch (fmtChunk->m_bitPerSample) {
-      case 8:
+      if (!TNZ_LITTLE_ENDIAN && (fmtChunk->m_bitPerSample == 16))
+        swapAndCopySamples((short *)dataChunk->m_samples.get(),
+                           (short *)track->getRawData(),
+                           sampleCount * fmtChunk->m_chans);
+      else
         memcpy((void *)track->getRawData(),
                (void *)(dataChunk->m_samples.get()),
                sampleCount * fmtChunk->m_bytesPerSample);
-        break;
-      case 16:
-        if (!TNZ_LITTLE_ENDIAN)
-          swapAndCopySamples((short *)dataChunk->m_samples.get(),
-                             (short *)track->getRawData(),
-                             sampleCount * fmtChunk->m_chans);
-        else
-          memcpy((void *)track->getRawData(),
-                 (void *)(dataChunk->m_samples.get()),
-                 sampleCount * fmtChunk->m_bytesPerSample);
-        //#endif
-        break;
-      case 24:
-        if (!TNZ_LITTLE_ENDIAN) {
-          UCHAR *begin = (UCHAR *)track->getRawData();
-          for (int i = 0; i < (int)(sampleCount * fmtChunk->m_chans); ++i) {
-            *(begin + 4 * i)     = 0;
-            *(begin + 4 * i + 1) = *(dataChunk->m_samples.get() + 3 * i + 2);
-            *(begin + 4 * i + 2) = *(dataChunk->m_samples.get() + 3 * i + 1);
-            *(begin + 4 * i + 3) = *(dataChunk->m_samples.get() + 3 * i);
-          }
-        } else {
-          UCHAR *begin = (UCHAR *)track->getRawData();
-          for (int i = 0; i < (int)(sampleCount * fmtChunk->m_chans); ++i) {
-            memcpy((void *)(begin + 4 * i),
-                   (void *)(dataChunk->m_samples.get() + 3 * i), 3);
-            *(begin + 4 * i + 3) = 0;
-          }
-        }
-        //#endif
-        break;
-      }
     }
-
-    /*if (!TNZ_LITTLE_ENDIAN)
-{
-if (fmtChunk->m_bitPerSample > 8)
-{
-assert(fmtChunk->m_bitPerSample <= 16);
-swapAndCopySamples(
-(short*)dataChunk->m_samples,
-(short*)track->getRawData(),
-sampleCount*fmtChunk->m_chans);
-}
-else
-memcpy(
-    (void*)track->getRawData(),
-(void*)(dataChunk->m_samples),
-sampleCount*fmtChunk->m_bytesPerSample);
-}
-else
-memcpy(
-(void*)track->getRawData(),
-(void*)(dataChunk->m_samples),
-sampleCount*fmtChunk->m_bytesPerSample);*/
   }
 
   if (fmtChunk) delete fmtChunk;
@@ -353,7 +309,8 @@ bool TSoundTrackWriterWav::save(const TSoundTrackP &sndtrack) {
 
   TFMTChunk fmtChunk(16);
 
-  fmtChunk.m_encodingType      = 1;  // PCM
+  fmtChunk.m_encodingType =
+      sndtrack->getBitPerSample() ? WAVE_FORMAT_IEEE_FLOAT : WAVE_FORMAT_PCM;
   fmtChunk.m_chans             = sndtrack->getChannelCount();
   fmtChunk.m_sampleRate        = sndtrack->getSampleRate();
   fmtChunk.m_avgBytesPerSecond = (sndtrack->getBitPerSample() / 8) *
@@ -369,40 +326,13 @@ bool TSoundTrackWriterWav::save(const TSoundTrackP &sndtrack) {
 
   if (!TNZ_LITTLE_ENDIAN) RIFFChunkLength = swapTINT32(RIFFChunkLength);
 
-// era if defined(MACOSX)
-#if (!TNZ_LITTLE_ENDIAN)
-  {
-    if (fmtChunk.m_bitPerSample == 8)
-      memcpy((void *)waveData.get(), (void *)sndtrack->getRawData(), soundDataLength);
-    else if (fmtChunk.m_bitPerSample == 16) {
-      swapAndCopySamples((short *)sndtrack->getRawData(), (short *)waveData.get(),
-                         sndtrack->getSampleCount() * fmtChunk.m_chans);
-    } else if (fmtChunk.m_bitPerSample == 24) {  // swap e togliere quarto byte
-      UCHAR *begin = (UCHAR *)sndtrack->getRawData();
-      for (int i = 0; i < (int)sndtrack->getSampleCount() * fmtChunk.m_chans;
-           ++i) {
-        *(waveData.get() + 3 * i)     = *(begin + 4 * i + 3);
-        *(waveData.get() + 3 * i + 1) = *(begin + 4 * i + 2);
-        *(waveData.get() + 3 * i + 2) = *(begin + 4 * i + 1);
-      }
-    }
-  }
-#else
-  {
-    if (fmtChunk.m_bitPerSample != 24)
-      memcpy((void *)waveData.get(), (void *)sndtrack->getRawData(),
-             soundDataLength);
-    else {  // togliere quarto byte
-      UCHAR *begin = (UCHAR *)sndtrack->getRawData();
-      for (int i = 0; i < (int)sndtrack->getSampleCount() * fmtChunk.m_chans;
-           ++i) {
-        *(waveData.get() + 3 * i)     = *(begin + 4 * i);
-        *(waveData.get() + 3 * i + 1) = *(begin + 4 * i + 1);
-        *(waveData.get() + 3 * i + 2) = *(begin + 4 * i + 2);
-      }
-    }
-  }
-#endif
+  if (!TNZ_LITTLE_ENDIAN && (fmtChunk.m_bitPerSample == 16))
+    swapAndCopySamples((short *)sndtrack->getRawData(), (short *)waveData.get(),
+                       sndtrack->getSampleCount() * fmtChunk.m_chans);
+  else
+    memcpy((void *)waveData.get(), (void *)sndtrack->getRawData(),
+           soundDataLength);
+
   dataChunk.m_samples = std::move(waveData);
 
   os.write("RIFF", 4);

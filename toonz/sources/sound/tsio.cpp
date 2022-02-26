@@ -29,6 +29,13 @@ void initSoundIo() {
     TSoundTrackReader::define("mp3", TSoundTrackReaderMp3::create);
     // TSoundTrackWriter::define("mp3", TSoundTrackWriterMp3::create);
     TFileType::declare("mp3", TFileType::AUDIO_LEVEL);
+
+    // TSoundTrackReaderMp3 is so generic that will work for other ffmpeg
+    //  audio formats, nice :D
+    TSoundTrackReader::define("ogg", TSoundTrackReaderMp3::create);
+    TFileType::declare("ogg", TFileType::AUDIO_LEVEL);
+    TSoundTrackReader::define("flac", TSoundTrackReaderMp3::create);
+    TFileType::declare("flac", TFileType::AUDIO_LEVEL);
   }
   // return &info;
 }

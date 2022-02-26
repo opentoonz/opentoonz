@@ -51,6 +51,13 @@
 #include <QPainter>
 #include <QElapsedTimer>
 
+#ifndef WAVE_FORMAT_PCM
+#define WAVE_FORMAT_PCM 1
+#endif
+#ifndef WAVE_FORMAT_IEEE_FLOAT
+#define WAVE_FORMAT_IEEE_FLOAT 3
+#endif
+
 //=============================================================================
 
 AudioRecordingPopup::AudioRecordingPopup()
@@ -86,11 +93,16 @@ AudioRecordingPopup::AudioRecordingPopup()
   m_comboSamplerate->addItem(tr("44100 Hz"), QVariant::fromValue(44100));
   m_comboSamplerate->addItem(tr("48000 Hz"), QVariant::fromValue(48000));
   m_comboSamplerate->addItem(tr("96000 Hz"), QVariant::fromValue(96000));
+  m_comboSamplerate->addItem(tr("192000 Hz"), QVariant::fromValue(192000));
   m_comboSamplerate->setCurrentIndex(3);  // 44.1KHz
   m_comboSamplefmt->addItem(tr("Mono 8-Bits"), QVariant::fromValue(9));
   m_comboSamplefmt->addItem(tr("Stereo 8-Bits"), QVariant::fromValue(10));
   m_comboSamplefmt->addItem(tr("Mono 16-Bits"), QVariant::fromValue(17));
   m_comboSamplefmt->addItem(tr("Stereo 16-Bits"), QVariant::fromValue(18));
+  m_comboSamplefmt->addItem(tr("Mono 24-Bits"), QVariant::fromValue(25));
+  m_comboSamplefmt->addItem(tr("Stereo 24-Bits"), QVariant::fromValue(26));
+  m_comboSamplefmt->addItem(tr("Mono 32-Bits"), QVariant::fromValue(33));
+  m_comboSamplefmt->addItem(tr("Stereo 32-Bits"), QVariant::fromValue(34));
   m_comboSamplefmt->setCurrentIndex(2);  // Mono 16-Bits
 
   m_recordButton->setMaximumWidth(32);
@@ -276,7 +288,7 @@ void AudioRecordingPopup::onRecordButtonPressed() {
     // The audio writer support either writing to buffer or directly to disk
     // each method have their own pros and cons
     // For now using false to mimic previous QAudioRecorder behaviour
-    m_audioWriterWAV->restart(m_audioInput->format());
+    m_audioWriterWAV->reset(m_audioInput->format());
     if (!m_audioWriterWAV->start(m_filePath.getQString(), false)) {
       DVGui::warning(
           tr("Failed to save WAV file:\nMake sure you have write permissions "
@@ -670,15 +682,19 @@ void AudioRecordingPopup::reinitAudioInput() {
           .value<int>();
   int sampletype =
       m_comboSamplefmt->itemData(m_comboSamplefmt->currentIndex()).value<int>();
-  int bitdepth = sampletype & 56;
-  int channels = sampletype & 7;
+  int bitdepth = sampletype & 60;
+  int channels = sampletype & 3;
 
   QAudioFormat format;
   format.setSampleRate(samplerate);
   format.setChannelCount(channels);
   format.setSampleSize(bitdepth);
-  format.setSampleType(bitdepth == 8 ? QAudioFormat::UnSignedInt
-                                     : QAudioFormat::SignedInt);
+  if (bitdepth == 32)
+    format.setSampleType(QAudioFormat::Float);
+  else if (bitdepth == 8)
+    format.setSampleType(QAudioFormat::UnSignedInt);
+  else
+    format.setSampleType(QAudioFormat::SignedInt);
   format.setByteOrder(QAudioFormat::LittleEndian);
   format.setCodec("audio/pcm");
   if (!m_audioDeviceInfo.isFormatSupported(format)) {
@@ -690,7 +706,7 @@ void AudioRecordingPopup::reinitAudioInput() {
   // Recreate input
   delete m_audioInput;
   m_audioInput = new QAudioInput(m_audioDeviceInfo, format);
-  m_audioWriterWAV->restart(format);
+  m_audioWriterWAV->reset(format);
 }
 
 //-----------------------------------------------------------------------------
@@ -709,26 +725,29 @@ AudioWriterWAV::AudioWriterWAV(const QAudioFormat &format)
     , m_wrRawB(0)
     , m_wavFile(NULL)
     , m_wavBuff(NULL) {
-  restart(format);
+  reset(format);
 }
 
-bool AudioWriterWAV::restart(const QAudioFormat &format) {
+bool AudioWriterWAV::reset(const QAudioFormat &format) {
   m_format = format;
+  int samplesPerSec = m_format.sampleRate() * m_format.channelCount();
   if (m_format.sampleSize() == 8) {
-    m_rbytesms = 1000.0 / (m_format.sampleRate() * m_format.channelCount());
+    m_rbytesms = 1000.0 / samplesPerSec;
     m_maxAmp   = 127.0;
   } else if (m_format.sampleSize() == 16) {
-    m_rbytesms = 500.0 / (m_format.sampleRate() * m_format.channelCount());
+    m_rbytesms = 1000.0 / samplesPerSec * 2.0;
     m_maxAmp   = 32767.0;
-  } else {
-    // 32-bits isn't supported
-    m_rbytesms = 250.0 / (m_format.sampleRate() * m_format.channelCount());
-    m_maxAmp   = 1.0;
+  } else if (m_format.sampleSize() == 24) {
+    m_rbytesms = 1000.0 / samplesPerSec * 3.0;
+    m_maxAmp   = 127.0;   // for peak preview
+  } else {  // 32-bits
+    m_rbytesms = 1000.0 / samplesPerSec * 4.0;
+    m_maxAmp   = 32767.0; // for peak preview
   }
   m_wrRawB = 0;
   m_peakL  = 0.0;
   if (m_wavBuff) m_wavBuff->clear();
-  return this->reset();
+  return QIODevice::reset();
 }
 
 // Just a tiny define to avoid a magic number
@@ -791,7 +810,9 @@ void AudioWriterWAV::writeWAVHeader(QFile &file) {
   out.writeRawData("RIFF", 4);
   out << (quint32)(m_wrRawB + AWWAV_HEADER_SIZE);
   out.writeRawData("WAVEfmt ", 8);
-  out << (quint32)16 << (quint16)1; // magic numbers!
+  out << (quint32)16; // Chunk size
+  out << (quint16)(bitrate == 32 ? WAVE_FORMAT_IEEE_FLOAT
+                                 : WAVE_FORMAT_PCM);
   out << channels << samplerate;
   out << quint32(samplerate * channels * bitrate / 8);
   out << quint16(channels * bitrate / 8);
@@ -824,9 +845,20 @@ qint64 AudioWriterWAV::writeData(const char *data, qint64 len) {
       tmp = qAbs<int>(sdata[i]);
       if (tmp > peak) peak = tmp;
     }
-  } else {
-    // 32-bits isn't supported
-    peak = -1;
+  } else if (m_format.sampleSize() == 24) {
+    const qint8 *sdata = (const qint8 *)data;
+    int slen            = len / 3;
+    for (int i = 0; i < slen; ++i) {
+      tmp = qAbs<int>(sdata[i * 3 + 2]);
+      if (tmp > peak) peak = tmp;
+    }
+  } else { // 32-bits
+    const float *sdata = (const float *)data;
+    int slen           = len / 4;
+    for (int i = 0; i < slen; ++i) {
+      tmp = qAbs<int>(sdata[i] * 32767.0f);
+      if (tmp > peak) peak = tmp;
+    }
   }
   m_level = qreal(peak) / m_maxAmp;
   if (m_level > m_peakL) m_peakL = m_level;
