@@ -78,6 +78,7 @@ public:
   TCOMMChunk(string name, TINT32 length) : TAIFFChunk(name, length) {}
 
   bool read(ifstream &is) override {
+    long pos = is.tellg();
     is.read((char *)&m_chans, sizeof(m_chans));
     is.read((char *)&m_frames, sizeof(m_frames));
     is.read((char *)&m_bitPerSample, sizeof(m_bitPerSample));
@@ -92,6 +93,7 @@ public:
     memset(sampleRateBuffer, 0, 10);
     is.read((char *)&sampleRateBuffer, sizeof(sampleRateBuffer));
     m_sampleRate = convertToLong(sampleRateBuffer);
+    is.seekg(pos + (long)m_length, is.beg);
     return true;
   }
 
@@ -311,7 +313,7 @@ TSoundTrackP TSoundTrackReaderAiff::load() {
   formType[4] = '\0';
 
   // il formType DEVE essere uguale a "AIFF"
-  if ((string(formType, 4) != "AIFF"))
+  if ((string(formType, 4) != "AIFF") && (string(formType, 4) != "AIFC"))
     throw TException("The AIFF file doesn't contain the AIFF form");
 
   TCOMMChunk *commChunk = 0;
@@ -402,41 +404,44 @@ TSoundTrackP TSoundTrackReaderAiff::load() {
         track = new TSoundTrackStereo24(commChunk->m_sampleRate, 2,
                                         (TINT32)commChunk->m_frames);
 
-      if (!TNZ_LITTLE_ENDIAN) {
-        UCHAR *begin = (UCHAR *)track->getRawData();
-        for (int i = 0; i < (int)(commChunk->m_frames * commChunk->m_chans);
-             ++i) {  // dovrebbe andare bene anche adesso
-          *(begin + 4 * i) = 0;
-          *(begin + 4 * i + 1) =
-              *(ssndChunk->m_waveData.get() + ssndChunk->m_offset + 3 * i);
-          *(begin + 4 * i + 2) =
-              *(ssndChunk->m_waveData.get() + ssndChunk->m_offset + 3 * i + 1);
-          *(begin + 4 * i + 3) =
-              *(ssndChunk->m_waveData.get() + ssndChunk->m_offset + 3 * i + 2);
-        }
+       if (!TNZ_LITTLE_ENDIAN) {
+        memcpy((void *)track->getRawData(),
+               (void *)(ssndChunk->m_waveData.get() + ssndChunk->m_offset),
+               commChunk->m_frames * track->getSampleSize());
       } else {
         UCHAR *begin = (UCHAR *)track->getRawData();
+        UCHAR *wavdt = ssndChunk->m_waveData.get() + ssndChunk->m_offset;
+        for (int i = 0; i < (int)(commChunk->m_frames * commChunk->m_chans);
+             ++i) {  // dovrebbe andare bene anche adesso
+          *begin++ = wavdt[2];
+          *begin++ = wavdt[1];
+          *begin++ = wavdt[0];
+          wavdt += 3;
+        }
+      }
+      break;
+    case 32:
+      if (commChunk->m_chans == 1)
+        track = new TSoundTrackMono32(commChunk->m_sampleRate, 1,
+                                      (TINT32)commChunk->m_frames);
+      else  // due canali
+        track = new TSoundTrackStereo32(commChunk->m_sampleRate, 2,
+                                        (TINT32)commChunk->m_frames);
+
+       if (!TNZ_LITTLE_ENDIAN) {
+        memcpy((void *)track->getRawData(),
+               (void *)(ssndChunk->m_waveData.get() + ssndChunk->m_offset),
+               commChunk->m_frames * track->getSampleSize());
+      } else {
+        UCHAR *begin = (UCHAR *)track->getRawData();
+        UCHAR *wavdt = ssndChunk->m_waveData.get() + ssndChunk->m_offset;
         for (int i = 0; i < (int)(commChunk->m_frames * commChunk->m_chans);
              ++i) {
-          *(begin + 4 * i) =
-              *(ssndChunk->m_waveData.get() + ssndChunk->m_offset + 3 * i + 2);
-          *(begin + 4 * i + 1) =
-              *(ssndChunk->m_waveData.get() + ssndChunk->m_offset + 3 * i + 1);
-          *(begin + 4 * i + 2) =
-              *(ssndChunk->m_waveData.get() + ssndChunk->m_offset + 3 * i);
-          *(begin + 4 * i + 3) = 0;
-
-          /*
-*(begin + 4*i) = 0;
-*(begin + 4*i + 3) =
-*(ssndChunk->m_waveData+ssndChunk->m_offset + 3*i + 2);
-
-// sono i due byte che vengono invertiti
-*(begin + 4*i + 1) =
-*(ssndChunk->m_waveData+ssndChunk->m_offset + 3*i + 1);
-*(begin + 4*i + 2) =
-*(ssndChunk->m_waveData+ssndChunk->m_offset + 3*i);
-*/
+          *begin++ = wavdt[3];
+          *begin++ = wavdt[2];
+          *begin++ = wavdt[1];
+          *begin++ = wavdt[0];
+          wavdt += 4;
         }
       }
       break;
@@ -504,34 +509,29 @@ bool TSoundTrackWriterAiff::save(const TSoundTrackP &st) {
                          (TINT32)(commChunk.m_frames * commChunk.m_chans));
     } else if (commChunk.m_bitPerSample == 24) {
       UCHAR *begin = (UCHAR *)sndtrack->getRawData();
+      UCHAR *wavdt = waveData.get();
       for (int i = 0; i < (int)commChunk.m_frames * commChunk.m_chans; ++i) {
-        *(waveData.get() + 3 * i)     = *(begin + 4 * i + 2);
-        *(waveData.get() + 3 * i + 1) = *(begin + 4 * i + 1);
-        *(waveData.get() + 3 * i + 2) = *(begin + 4 * i);
-
-        /*
-*(waveData + 3*i + 2) = *(begin + 4*i + 3);
-
-// posiziona in modo corretto i due byte prima invertiti
-*(waveData + 3*i) = *(begin + 4*i + 2);
-*(waveData + 3*i + 1) = *(begin + 4*i + 1);
-*/
+        *wavdt++ = begin[2];
+        *wavdt++ = begin[1];
+        *wavdt++ = begin[0];
+        begin += 3;
+      }
+    } else if (commChunk.m_bitPerSample == 32) {
+      UCHAR *begin = (UCHAR *)sndtrack->getRawData();
+      UCHAR *wavdt = waveData.get();
+      for (int i = 0; i < (int)commChunk.m_frames * commChunk.m_chans; ++i) {
+        *wavdt++ = begin[3];
+        *wavdt++ = begin[2];
+        *wavdt++ = begin[1];
+        *wavdt++ = begin[0];
+        begin += 4;
       }
     } else
       memcpy((void *)waveData.get(), (void *)sndtrack->getRawData(),
              soundDataCount);
   } else {
-    if (commChunk.m_bitPerSample != 24)
-      memcpy((void *)waveData.get(), (void *)sndtrack->getRawData(),
-             soundDataCount);
-    else {
-      UCHAR *begin = (UCHAR *)sndtrack->getRawData();
-      for (int i = 0; i < (int)commChunk.m_frames * commChunk.m_chans; ++i) {
-        *(waveData.get() + 3 * i)     = *(begin + 4 * i + 1);
-        *(waveData.get() + 3 * i + 1) = *(begin + 4 * i + 2);
-        *(waveData.get() + 3 * i + 2) = *(begin + 4 * i + 3);
-      }
-    }
+    memcpy((void *)waveData.get(), (void *)sndtrack->getRawData(),
+           soundDataCount);
   }
 
   ssndChunk.m_waveData = std::move(waveData);
