@@ -881,7 +881,7 @@ public:
 
 WaveFormat::WaveFormat(unsigned char channelCount, TUINT32 sampleRate,
                        unsigned char bitPerSample) {
-  wFormatTag      = WAVE_FORMAT_PCM;
+  wFormatTag = (bitPerSample >= 32) ? WAVE_FORMAT_IEEE_FLOAT : WAVE_FORMAT_PCM;
   nChannels       = channelCount;
   nSamplesPerSec  = sampleRate;
   wBitsPerSample  = bitPerSample;
@@ -2173,7 +2173,8 @@ MMRESULT isaFormatSupported(int sampleRate, int channelCount, int bitPerSample,
   WAVEFORMATEX wf;
   MMRESULT ret;
 
-  wf.wFormatTag      = WAVE_FORMAT_PCM;
+  wf.wFormatTag =
+      (bitPerSample >= 32) ? WAVE_FORMAT_IEEE_FLOAT : WAVE_FORMAT_PCM;
   wf.nChannels       = channelCount;
   wf.nSamplesPerSec  = sampleRate;
   wf.wBitsPerSample  = bitPerSample;

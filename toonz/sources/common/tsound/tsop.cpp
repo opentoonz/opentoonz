@@ -394,8 +394,12 @@ dstSample += tmp;
       // assert(dstSample.getValue(0) == dstChannel[0]);
     }
 
+    // Removed tround() since it was destroying 32-bits float data
+    // for (int i = 0; i < src.getChannelCount(); i++)
+    //  dstSample.setValue(i, (ChannelValueType)(tround(dstChannel[i])));
+
     for (int i = 0; i < src.getChannelCount(); i++)
-      dstSample.setValue(i, (ChannelValueType)(tround(dstChannel[i])));
+      dstSample.setValue(i, (ChannelValueType)(dstChannel[i]));
 
     *(dst->samples() + id) = dstSample;
 

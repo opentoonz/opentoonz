@@ -468,7 +468,7 @@ inline TStereo16Sample operator+(const TStereo16Sample &s1,
 //=========================================================
 
 class DVAPI TMono24Sample {
-  UCHAR byte[3]; // LSB first
+  UCHAR byte[3];  // LSB first
 
 public:
   typedef TINT32 ChannelValueType;
@@ -482,7 +482,7 @@ public:
 
   inline TINT32 getValue(TSound::Channel) const {
     return byte[0] | (byte[1] << 8) | (byte[2] << 16) |
-           (byte[2] & 0x80 ? 0xFF000000 : 0);
+           (byte[2] & 0x80 ? ~0xFFFFFF : 0);
   }
 
   inline void setValue(TSound::Channel /*chan*/, TINT32 v) {
@@ -537,8 +537,8 @@ inline TMono24Sample operator+(const TMono24Sample &s1,
 class DVAPI TStereo24Sample {
   typedef struct {
     UCHAR byte[3];  // LSB first
-  } T3Sample;
-  T3Sample channel[2];  // l'ordine dei canali e' left,right
+  } TSample;
+  TSample channel[2];  // l'ordine dei canali e' left,right
 
 public:
   typedef TINT32 ChannelValueType;
@@ -556,17 +556,18 @@ public:
 
   inline TINT32 getValue(TSound::Channel chan) const {
     assert(chan <= 1);
-    const T3Sample &s = channel[chan];
+    const TSample &s = channel[chan];
     return s.byte[0] | (s.byte[1] << 8) | (s.byte[2] << 16) |
-           (s.byte[2] & 0x80 ? 0xFF000000 : 0);
+           (s.byte[2] & 0x80 ? ~0xFFFFFF : 0);
   }
 
   inline void setValue(TSound::Channel chan, TINT32 v) {
     assert(chan <= 1);
-    int iVal = tcrop<TINT32>(v, -8388608, 8388607);
-    channel[chan].byte[0] = iVal;
-    channel[chan].byte[1] = iVal >> 8;
-    channel[chan].byte[2] = iVal >> 16;
+    int iVal   = tcrop<TINT32>(v, -8388608, 8388607);
+    TSample &s = channel[chan];
+    s.byte[0]  = iVal;
+    s.byte[1]  = iVal >> 8;
+    s.byte[2]  = iVal >> 16;
   }
 
   inline double getPressure(TSound::Channel chan) const {
