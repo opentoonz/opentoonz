@@ -994,11 +994,6 @@ void FunctionPanel::drawCurrentCurve(QPainter &painter) {
                        p.y() + easeHeight + easeTick);
       break;
 
-      painter.setBrush(
-          Qt::NoBrush);  // isSelected ? QColor(255,126,0) : Qt::white);
-      painter.setPen(isHighlighted ? QColor(255, 126, 0) : m_selectedColor);
-      painter.drawLine(p.x(), p.y() - 15, p.x(), p.y() + 15);
-      break;
     default:
       break;
     }

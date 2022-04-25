@@ -19,6 +19,15 @@ class SchematicName final : public QGraphicsTextItem {
   Q_OBJECT
   double m_width;
   double m_height;
+  bool m_refocus;
+  QString m_defName;
+  QString m_curName;
+  QMenu *popup;
+  QAction *actionCut;
+  QAction *actionCopy;
+  QAction *actionPaste;
+  QAction *actionDelete;
+  QAction *actionSelectAll;
 
 public:
   SchematicName(QGraphicsItem *parent, double width, double height);
@@ -26,7 +35,8 @@ public:
 
   bool eventFilter(QObject *object, QEvent *event) override;
 
-  void setName(const QString &name);
+  void setName(const QString &name); // Act as default name
+  void acceptName(const QString &name);
 
 protected:
   void focusInEvent(QFocusEvent *fe) override;
@@ -40,6 +50,12 @@ signals:
 
 protected slots:
   void onContentsChanged();
+  void onPopupHide();
+  void onCut();
+  void onCopy();
+  void onPaste();
+  void onDelete();
+  void onSelectAll();
 };
 
 //========================================================

@@ -472,7 +472,7 @@ double tdistance(const TSegment &segment, const TPointD &point) {
 
 //-----------------------------------------------------------------------------
 /*
-This formule is derived from Graphic Gems pag. 600
+This formula is derived from Graphic Gems pag. 600
 
   e = h^2 |a|/8
 

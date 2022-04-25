@@ -8,6 +8,7 @@
 #include "tpalette.h"
 
 class TStroke;
+class QWidget;
 
 #undef DVAPI
 #undef DVVAR
@@ -22,15 +23,17 @@ class TStroke;
 class DVAPI StylePicker {
   TImageP m_image;
   TPaletteP m_palette;
+  const QWidget *m_widget;
 
 public:
-  StylePicker() {}
+  StylePicker(const QWidget *parent) : m_widget(parent) {}
 
   // usa come palette la palette dell'immagine
-  StylePicker(const TImageP &image);
+  StylePicker(const QWidget *parent, const TImageP &image);
 
   // palette esterna (ad es. se image e' di tipo raster)
-  StylePicker(const TImageP &image, const TPaletteP &palette);
+  StylePicker(const QWidget *parent, const TImageP &image,
+              const TPaletteP &palette);
 
   // pickStyleId(point, radius)
   //

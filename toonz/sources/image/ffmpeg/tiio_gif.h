@@ -82,6 +82,7 @@ class GifWriterProperties : public TPropertyGroup {
 public:
   TIntProperty m_scale;
   TBoolProperty m_looping;
+  TBoolProperty m_palette;
   TEnumProperty m_mode;
   TIntProperty m_maxcolors;
 

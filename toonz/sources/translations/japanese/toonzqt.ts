@@ -218,7 +218,7 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>RGB</source>
-        <translation type="unfinished">RGB</translation>
+        <translation>RGB</translation>
     </message>
 </context>
 <context>
@@ -310,15 +310,15 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>8bit (0-255)</source>
-        <translation type="unfinished"></translation>
+        <translation>8bit (0-255)</translation>
     </message>
     <message>
         <source>16bit (0-65535)</source>
-        <translation type="unfinished"></translation>
+        <translation>16bit (0-65535)</translation>
     </message>
     <message>
         <source>0.0-1.0</source>
-        <translation type="unfinished"></translation>
+        <translation>0.0-1.0</translation>
     </message>
 </context>
 <context>
@@ -387,15 +387,15 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>Paste Color</source>
-        <translation type="unfinished"></translation>
+        <translation>色を貼り付け</translation>
     </message>
     <message>
         <source>Paste Color of %1</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 の色を貼り付け</translation>
     </message>
     <message>
         <source>Copy Color</source>
-        <translation type="unfinished"></translation>
+        <translation>色をコピー</translation>
     </message>
 </context>
 <context>
@@ -436,83 +436,83 @@ Possibly the preset file has been corrupted</source>
     <name>DVGui::HexColorNamesEditor</name>
     <message>
         <source>Hex Color Names Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>16進数カラー名エディタ</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <source>Apply</source>
-        <translation type="unfinished">適用</translation>
+        <translation>適用</translation>
     </message>
     <message>
         <source>Close</source>
-        <translation type="unfinished"></translation>
+        <translation>閉じる</translation>
     </message>
     <message>
         <source>Unselect</source>
-        <translation type="unfinished"></translation>
+        <translation>選択解除</translation>
     </message>
     <message>
         <source>Add Color</source>
-        <translation type="unfinished"></translation>
+        <translation>色の追加</translation>
     </message>
     <message>
         <source>Delete Color</source>
-        <translation type="unfinished"></translation>
+        <translation>色の削除</translation>
     </message>
     <message>
         <source>User Defined Colors</source>
-        <translation type="unfinished"></translation>
+        <translation>ユーザー定義色</translation>
     </message>
     <message>
         <source>Default Main Colors</source>
-        <translation type="unfinished"></translation>
+        <translation>既定の色</translation>
     </message>
     <message>
         <source>Enable Auto-Complete</source>
-        <translation type="unfinished"></translation>
+        <translation>カラー名の自動補完</translation>
     </message>
     <message>
         <source>Import</source>
-        <translation type="unfinished"></translation>
+        <translation>読み込み</translation>
     </message>
     <message>
         <source>Export</source>
-        <translation type="unfinished"></translation>
+        <translation>書き出し</translation>
     </message>
     <message>
         <source>Open Color Names</source>
-        <translation type="unfinished"></translation>
+        <translation>カラー名ファイルを読み込み</translation>
     </message>
     <message>
         <source>Text or XML (*.txt *.xml);;Text files (*.txt);;XML files (*.xml)</source>
-        <translation type="unfinished"></translation>
+        <translation>テキストまたはXML (*.txt *.xml);;テキストファイル (*.txt);;XMLファイル (*.xml)</translation>
     </message>
     <message>
         <source>Hex Color Names Import</source>
-        <translation type="unfinished"></translation>
+        <translation>カラー名を読み込み</translation>
     </message>
     <message>
         <source>Do you want to merge with existing entries?</source>
-        <translation type="unfinished"></translation>
+        <translation>既存の一覧にマージしますか？</translation>
     </message>
     <message>
         <source>Error importing color names XML</source>
-        <translation type="unfinished"></translation>
+        <translation>カラー名XMLファイルの読み込みエラー</translation>
     </message>
     <message>
         <source>Save Color Names</source>
-        <translation type="unfinished"></translation>
+        <translation>カラー名を保存</translation>
     </message>
     <message>
         <source>XML files (*.xml);;Text files (*.txt)</source>
-        <translation type="unfinished"></translation>
+        <translation>XMファイル (*.xml);;テキストファイル (*.txt)</translation>
     </message>
     <message>
         <source>Error exporting color names XML</source>
-        <translation type="unfinished"></translation>
+        <translation>カラー名XMLファイルの書き出しエラー</translation>
     </message>
 </context>
 <context>
@@ -523,7 +523,7 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>A file name cannot contains any of the following characters: /\:*?&quot;&lt;&gt;|.</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイル名は次の記号を含むことができません： /\:*?&quot;&lt;&gt;|</translation>
     </message>
 </context>
 <context>
@@ -1152,7 +1152,7 @@ Possibly the preset file has been corrupted</source>
     <name>FunctionSheetButtonArea</name>
     <message>
         <source>Toggle synchronizing zoom with xsheet</source>
-        <translation type="unfinished"></translation>
+        <translation>タイムシートとのズーム同期の切り替え</translation>
     </message>
 </context>
 <context>
@@ -1450,11 +1450,11 @@ Manually changing any keyframe will clear the warning.</source>
     <name>FxPassThroughPainter</name>
     <message>
         <source>&amp;Paste Add</source>
-        <translation type="unfinished">貼り付けて追加 (&amp;P)</translation>
+        <translation>貼り付けて追加 (&amp;P)</translation>
     </message>
     <message>
         <source>&amp;Preview</source>
-        <translation type="unfinished">プレビュー (&amp;P)</translation>
+        <translation>プレビュー (&amp;P)</translation>
     </message>
 </context>
 <context>
@@ -1479,7 +1479,7 @@ Manually changing any keyframe will clear the warning.</source>
     <name>FxSchematicPassThroughNode</name>
     <message>
         <source> (Pass Through)</source>
-        <translation type="unfinished"></translation>
+        <translation> (Pass Through)</translation>
     </message>
 </context>
 <context>
@@ -2542,6 +2542,29 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     </message>
 </context>
 <context>
+    <name>SchematicName</name>
+    <message>
+        <source>Cu&amp;t</source>
+        <translation>切り取り (&amp;T)</translation>
+    </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>コピー (&amp;C)</translation>
+    </message>
+    <message>
+        <source>&amp;Paste</source>
+        <translation>貼り付け (&amp;P)</translation>
+    </message>
+    <message>
+        <source>&amp;Delete</source>
+        <translation>削除 (&amp;A)</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>すべて選択 (&amp;A)</translation>
+    </message>
+</context>
+<context>
     <name>SchematicViewer</name>
     <message>
         <source>&amp;Fit to Window</source>
@@ -2605,7 +2628,7 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     </message>
     <message>
         <source>&amp;Switch output port display mode</source>
-        <translation type="unfinished"></translation>
+        <translation>ポートの表示を切り替える (&amp;S)</translation>
     </message>
 </context>
 <context>
@@ -3005,27 +3028,27 @@ Apply</source>
     </message>
     <message>
         <source>Hex</source>
-        <translation type="unfinished"></translation>
+        <translation>16進数カラー</translation>
     </message>
     <message>
         <source>Relative colored + Triangle handle</source>
-        <translation type="unfinished"></translation>
+        <translation>相対色表示+三角のハンドル</translation>
     </message>
     <message>
         <source>Absolute colored + Line handle</source>
-        <translation type="unfinished"></translation>
+        <translation>絶対色表示+線のハンドル</translation>
     </message>
     <message>
         <source>Slider Appearance</source>
-        <translation type="unfinished"></translation>
+        <translation>スライダの外観</translation>
     </message>
     <message>
         <source>Toggle Orientation</source>
-        <translation type="unfinished"></translation>
+        <translation>レイアウト向きの切り替え</translation>
     </message>
     <message>
         <source>Hex Color Names...</source>
-        <translation type="unfinished"></translation>
+        <translation>16進数カラー名エディタ...</translation>
     </message>
 </context>
 <context>

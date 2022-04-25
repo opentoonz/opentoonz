@@ -1409,7 +1409,7 @@ Do you want to proceed?</source>
         <translation>Нет</translation>
     </message>
     <message>
-        <location filename="../../tnztools/edittoolgadgets.cpp" line="93"/>
+        <location filename="../../tnztools/edittoolgadgets.cpp" line="89"/>
         <source>Modify Fx Gadget  </source>
         <translation>Изменить Fx-гаджет  </translation>
     </message>

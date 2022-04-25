@@ -1160,10 +1160,14 @@
   <item>"STD_inoRadialBlurFx.center"	"Center"	</item>
   <item>"STD_inoRadialBlurFx.radius"	"Radius"	</item>
   <item>"STD_inoRadialBlurFx.blur"	"Blur"	</item>
+  <item>"STD_inoRadialBlurFx.type"	"Type"	</item>
   <item>"STD_inoRadialBlurFx.twist"	"Twist"	</item>
   <item>"STD_inoRadialBlurFx.alpha_rendering"	"Alpha Rendering"	</item>
   <item>"STD_inoRadialBlurFx.anti_alias"	"Anti Alias"	</item>
   <item>"STD_inoRadialBlurFx.reference"	"Reference"	</item>
+  <item>"STD_inoRadialBlurFx.ellipse_aspect_ratio"	"Ellipse Aspect Ratio"	</item>
+  <item>"STD_inoRadialBlurFx.ellipse_angle"	"Ellipse Angle"	</item>
+  <item>"STD_inoRadialBlurFx.intensity_correlation_with_ellipse"	"Intensity Correlation"	</item>
   <item>"STD_inoSpinBlurFx"	"Spin Blur Ino"	</item>
   <item>"STD_inoSpinBlurFx.center"	"Center"	</item>
   <item>"STD_inoSpinBlurFx.radius"	"Radius"	</item>
@@ -1172,6 +1176,8 @@
   <item>"STD_inoSpinBlurFx.alpha_rendering"	"Alpha Rendering"	</item>
   <item>"STD_inoSpinBlurFx.anti_alias"	"Anti Alias"	</item>
   <item>"STD_inoSpinBlurFx.reference"	"Reference"	</item>
+  <item>"STD_inoSpinBlurFx.ellipse_aspect_ratio"	"Ellipse Aspect Ratio"	</item>
+  <item>"STD_inoSpinBlurFx.ellipse_angle"	"Ellipse Angle"	</item>
   <item>"STD_inoWarphvFx"	"Warp HV Ino"	</item>
   <item>"STD_inoWarphvFx.h_maxlen"	"H MaxLen"	</item>
   <item>"STD_inoWarphvFx.v_maxlen"	"V MaxLen"	</item>

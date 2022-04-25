@@ -371,9 +371,9 @@ void FunctionViewer::refreshModel() {
 
     m_treeView->setCurrentScenePath(scenePath);
 
-    int distance, offset;
-    scene->getProperties()->getMarkers(distance, offset);
-    m_numericalColumns->setMarkRow(distance, offset);
+    int distance, offset, secDistance;
+    scene->getProperties()->getMarkers(distance, offset, secDistance);
+    m_numericalColumns->setMarkRow(distance, offset, secDistance);
   }
 
   m_treeView->updateAll();

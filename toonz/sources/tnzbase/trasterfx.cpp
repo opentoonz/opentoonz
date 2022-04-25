@@ -541,8 +541,11 @@ TAffine TRasterFx::handledAffine(const TRenderSettings &info, double frame) {
 bool TRasterFx::getBBox(double frame, TRectD &bBox,
                         const TRenderSettings &info) {
   bool ret = doGetBBox(frame, bBox, info);
-  bBox     = info.m_affine * bBox;
-  enlargeToI(bBox);
+  if (!bBox.isEmpty()) {  // TODO: check if bbox can always be empty when ret ==
+                          // false
+    bBox = info.m_affine * bBox;
+    enlargeToI(bBox);
+  }
   return ret;
 }
 

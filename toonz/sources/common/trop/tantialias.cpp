@@ -134,7 +134,7 @@ inline bool checkNeighbourHood(int x, int y, PIX *pix, int lx, int ly, int dx,
 
   // Connect by minority: if there are more pixels like those on the 00-11
   // diagonal, connect the other,
-  // and viceversa.
+  // and vice versa.
   return count1 > count2;
 }
 }

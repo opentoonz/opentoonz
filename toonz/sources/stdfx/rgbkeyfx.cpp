@@ -51,7 +51,7 @@ public:
   void doCompute(TTile &tile, double frame, const TRenderSettings &) override;
 
   bool canHandle(const TRenderSettings &info, double frame) override {
-    return true;
+    return false;
   }
 };
 

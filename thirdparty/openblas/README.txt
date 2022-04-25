@@ -62,3 +62,8 @@ So, follow this procedure:
 
 4. Wait until completion. It should complain that no dll could be created, but the .lib files should
    have been built correctly.
+
+----------
+Change Log
+
+Apr. 8, 2022 Removed ./xianyi-OpenBLAS-e6e87a2/lapack-3.4.1.tgz as it contains unredistributable files (see the issue #3928). The package is still available in http://www.netlib.org/lapack/ just in case.

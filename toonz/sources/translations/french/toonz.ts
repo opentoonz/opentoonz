@@ -13381,6 +13381,13 @@ S&apos;il vous plaît se référer à la guide de l&apos;utilisateur pour plus d
     </message>
 </context>
 <context>
+    <name>XsheetGUI::ChangeObjectParent</name>
+    <message>
+        <source>Table</source>
+        <translation>Table</translation>
+    </message>
+</context>
+<context>
     <name>XsheetGUI::ColumnArea</name>
     <message>
         <source>Click to select camera</source>

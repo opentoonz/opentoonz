@@ -171,8 +171,8 @@ TPoint TFont::drawChar(QImage &outImage, TPoint &unused, wchar_t charcode,
   // alphaMapForGlyph with a space character returns an invalid
   // QImage for some reason.
   // Bug 3604: https://github.com/opentoonz/opentoonz/issues/3604
-  // (21/1/2022) Use this workaround for all platforms as the crash also occured
-  // in windows when the display is scaled up.
+  // (21/1/2022) Use this workaround for all platforms as the crash also
+  // occurred in windows when the display is scaled up.
   if (chars[0].isSpace()) {
     int w = QFontMetrics(m_pimpl->m_font).horizontalAdvance(chars[0]);
     outImage =

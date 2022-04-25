@@ -509,6 +509,14 @@ void SceneViewer::mouseMoveEvent(QMouseEvent *event) {
 void SceneViewer::onMove(const TMouseEvent &event) {
   if (m_freezedStatus != NO_FREEZED) return;
 
+  // in case mouseReleaseEvent is not called, finish the action for the previous
+  // button first.
+  if (m_mouseButton != Qt::NoButton && event.m_buttons == Qt::NoButton) {
+    TMouseEvent preEvent = event;
+    preEvent.m_button    = m_mouseButton;
+    onRelease(preEvent);
+  }
+
   int devPixRatio = getDevPixRatio();
   QPointF curPos  = event.mousePos() * devPixRatio;
   bool cursorSet  = false;

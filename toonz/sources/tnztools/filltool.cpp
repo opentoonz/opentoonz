@@ -2172,7 +2172,7 @@ int FillTool::pick(const TImageP &image, const TPointD &pos, const int frame) {
   TVectorImageP vi = image;
   if (!ti && !vi) return 0;
 
-  StylePicker picker(image);
+  StylePicker picker(getViewer()->viewerWidget(), image);
   double scale2 = 1.0;
   if (vi) {
     TAffine aff = getViewer()->getViewMatrix() * getCurrentColumnMatrix(frame);

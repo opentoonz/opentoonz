@@ -312,7 +312,7 @@ class DVAPI SpreadsheetViewer : public QDialog {
   QPoint m_lastAutoPanPos;
   int m_rowCount, m_columnCount;
   int m_currentRow;
-  int m_markRowDistance, m_markRowOffset;
+  int m_markRowDistance, m_markRowOffset, m_markSecRowDistance;
   // QRect m_selectedCells; // x=col, y=row
   bool m_isComputingSize;
   // const Orientation *m_orientation;
@@ -453,17 +453,22 @@ public:
   bool isSelectedCell(int row, int col) const {
     return getSelectedCells().contains(QPoint(col, row));
   }
-  void setMarkRow(int distance, int offset) {
-    m_markRowDistance = distance;  // distance > 0 ? distance : 6;
-    m_markRowOffset   = offset;
+  void setMarkRow(int distance, int offset, int secDistance) {
+    m_markRowDistance    = distance;  // distance > 0 ? distance : 6;
+    m_markRowOffset      = offset;
+    m_markSecRowDistance = secDistance;
   }
   void getMarkRow(int &distance, int &offset) const {
     distance = m_markRowDistance;
     offset   = m_markRowOffset;
   }
-  int isMarkRow(int row) const {
+  bool isMarkRow(int row) const {
     return m_markRowDistance > 0 &&
-           ((row - m_markRowOffset) % m_markRowDistance) == 0;
+           ((row - m_markRowOffset) % m_markRowDistance) == 0 && row > 0;
+  }
+  bool isMarkSecRow(int row) const {
+    return m_markSecRowDistance > 0 &&
+           ((row - m_markRowOffset) % m_markSecRowDistance) == 0 && row > 0;
   }
 
   void setFrameHandle(TFrameHandle *frameHandle);

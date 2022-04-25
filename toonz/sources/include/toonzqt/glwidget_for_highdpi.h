@@ -19,6 +19,7 @@ public:
   int width() const { return QOpenGLWidget::width() * getDevPixRatio(); }
   int height() const { return QOpenGLWidget::height() * getDevPixRatio(); }
   QRect rect() const { return QRect(0, 0, width(), height()); }
+  int getDevPixRatio() const { return getDevicePixelRatio(this); }
 };
 
 #endif

@@ -96,7 +96,7 @@ void HooksData::storeHookPositions(const std::vector<int> &ids) {
   if (ids.empty()) return;
   TTool::Application *app = TTool::getApplication();
   TXshLevelP level        = app->getCurrentLevel()->getLevel();
-  assert(level = m_level);
+  assert(level == m_level);
   if (level != m_level || !m_level || m_level->getSimpleLevel()->isReadOnly())
     return;
   HookSet *hookSet = m_level->getHookSet();

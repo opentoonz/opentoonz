@@ -148,7 +148,7 @@ std::string PlasticDeformerFx::getAlias(double frame,
       meshColumnObj->getPlasticSkeletonDeformation();
   if (sd) alias += ", " + toString(sd, meshColumnObj->paramsTime(frame));
 
-  alias + "]";
+  alias += "]";
 
   return alias;
 }

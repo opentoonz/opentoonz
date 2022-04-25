@@ -17,13 +17,14 @@
 
 //---------------------------------------------------------
 
-StylePicker::StylePicker(const TImageP &image)
-    : m_image(image), m_palette(image->getPalette()) {}
+StylePicker::StylePicker(const QWidget *parent, const TImageP &image)
+    : m_widget(parent), m_image(image), m_palette(image->getPalette()) {}
 
 //---------------------------------------------------------
 
-StylePicker::StylePicker(const TImageP &image, const TPaletteP &palette)
-    : m_image(image), m_palette(palette) {}
+StylePicker::StylePicker(const QWidget *parent, const TImageP &image,
+                         const TPaletteP &palette)
+    : m_widget(parent), m_image(image), m_palette(palette) {}
 
 //---------------------------------------------------------
 
@@ -86,7 +87,7 @@ int StylePicker::pickStyleId(const TPointD &pos, double radius, double scale2,
     // la thickness, cioe' la min distance dalla outline e non dalla centerLine
     strokeFound = vi->getNearestStroke(pos, w, index, dist2);
     if (strokeFound) {
-      int devPixRatio = getDevPixRatio();
+      int devPixRatio = getDevicePixelRatio(m_widget);
       dist2 *= scale2;
       TStroke *stroke = vi->getStroke(index);
       thick           = stroke->getThickPoint(w).thick;

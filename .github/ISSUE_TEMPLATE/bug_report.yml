@@ -1,0 +1,95 @@
+name: Bug report
+description: File a bug report to help us improve
+labels: 'bug'
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please search existing issues before posting to avoid creating duplicates.
+        
+        We strongly urge you to test if your issue still persists on the latest nightly build which contains the latest bug fixes before making your report. You can find the latest build [here](https://github.com/opentoonz/opentoonz_nightlies/releases).
+  - type: textarea
+    attributes:
+      label: Description
+      placeholder: Please write a clear and concise description of what the bug is.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Steps to Reproduce
+      description: We are much more likely to fix your problem if you can provide clear steps for us to reproduce it.
+      value: |
+        1. 
+        2. 
+  - type: textarea
+    attributes:
+      label: Expected Behavior
+      placeholder: A clear and concise description of what you expected to happen.
+  - type: textarea
+    attributes:
+      label: Screenshots, Video & Crash Logs
+      placeholder: Include any screenshots, video or crash logs that helps illustrate your problem here.
+  - type: markdown
+    attributes:
+      value: |
+        ## System Information
+  - type: dropdown
+    attributes:
+      label: OpenToonz Version
+      description: You can find version information from the main menu bar [Help > About] within the software.
+      multiple: false
+      options:
+        - 1.6
+        - 1.5
+        - 1.4
+        - Nightly (Specify below)
+        - Other (Specify below)
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: OpenToonz Version Information
+      placeholder: Ex. built Mar 25 2016
+  - type: dropdown
+    attributes:
+      label: Operating System
+      multiple: false
+      options:
+        - Windows
+        - macOS
+        - Linux
+        - Other
+    validations:
+      required: true
+  - type: dropdown
+    attributes:
+      label: GPU
+      description: Please check that your graphics drivers are up to date before posting.
+      multiple: false
+      options:
+        - NVIDIA
+        - AMD
+        - Intel
+        - Other
+    validations:
+      required: true
+  - type: dropdown
+    attributes:
+      label: Graphics Tablet
+      description: If your problem relates to pen input please check that your graphics tablet drivers are up to date before posting.
+      multiple: false
+      options:
+        - Wacom
+        - XP-Pen
+        - Huion
+        - Xencelabs
+        - Ugee
+        - GAOMON
+        - Monoprice
+        - Parblo
+        - Other
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        Thank you for taking the time to fill out this bug report!

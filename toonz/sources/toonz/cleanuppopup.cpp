@@ -476,7 +476,7 @@ void CleanupPopup::buildCleanupList() {
         const TXshCell &cell = xsh->getCell(r, c);
         if (cell.isEmpty()) continue;
         TXshSimpleLevel *sl = cell.getSimpleLevel();
-        if (!sl && locals::supportsCleanup(sl)) continue;
+        if (!(sl && locals::supportsCleanup(sl))) continue;
         /*---もし新しいLevelなら、Levelのリストに登録---*/
         std::map<TXshSimpleLevel *, FramesList>::iterator it =
             cleanupList.find(sl);

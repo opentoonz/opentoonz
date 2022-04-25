@@ -887,7 +887,7 @@ void PlasticTool::onColumnSwitched() {
 void PlasticTool::onXsheetChanged() {
   onColumnSwitched();
   TTool::updateEnabled();  // Current cell may no longer be a mesh one (or
-                           // viceversa),
+                           // vice versa),
 }  // so tool enabled status must be updated.
 
 //------------------------------------------------------------------------

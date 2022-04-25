@@ -218,7 +218,7 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>RGB</source>
-        <translation type="unfinished">RVA</translation>
+        <translation>RVA</translation>
     </message>
 </context>
 <context>
@@ -310,15 +310,15 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>8bit (0-255)</source>
-        <translation type="unfinished"></translation>
+        <translation>8 bits (0-255)</translation>
     </message>
     <message>
         <source>16bit (0-65535)</source>
-        <translation type="unfinished"></translation>
+        <translation>16 bits (0-65535)</translation>
     </message>
     <message>
         <source>0.0-1.0</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -387,15 +387,15 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>Paste Color</source>
-        <translation type="unfinished"></translation>
+        <translation>Pegar color</translation>
     </message>
     <message>
         <source>Paste Color of %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Pegar color de %1</translation>
     </message>
     <message>
         <source>Copy Color</source>
-        <translation type="unfinished"></translation>
+        <translation>Copiar color</translation>
     </message>
 </context>
 <context>
@@ -436,83 +436,83 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     <name>DVGui::HexColorNamesEditor</name>
     <message>
         <source>Hex Color Names Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>Editor de nombres de colores hexadecimales</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished">Aceptar</translation>
+        <translation>Aceptar</translation>
     </message>
     <message>
         <source>Apply</source>
-        <translation type="unfinished">Aplicar</translation>
+        <translation>Aplicar</translation>
     </message>
     <message>
         <source>Close</source>
-        <translation type="unfinished"></translation>
+        <translation>Cerrar</translation>
     </message>
     <message>
         <source>Unselect</source>
-        <translation type="unfinished"></translation>
+        <translation>Deseleccionar</translation>
     </message>
     <message>
         <source>Add Color</source>
-        <translation type="unfinished"></translation>
+        <translation>Agregar color</translation>
     </message>
     <message>
         <source>Delete Color</source>
-        <translation type="unfinished"></translation>
+        <translation>Borrar color</translation>
     </message>
     <message>
         <source>User Defined Colors</source>
-        <translation type="unfinished"></translation>
+        <translation>Colores personalizados</translation>
     </message>
     <message>
         <source>Default Main Colors</source>
-        <translation type="unfinished"></translation>
+        <translation>Colores predefinidos</translation>
     </message>
     <message>
         <source>Enable Auto-Complete</source>
-        <translation type="unfinished"></translation>
+        <translation>Autocompletar</translation>
     </message>
     <message>
         <source>Import</source>
-        <translation type="unfinished"></translation>
+        <translation>Importar</translation>
     </message>
     <message>
         <source>Export</source>
-        <translation type="unfinished"></translation>
+        <translation>Exportar</translation>
     </message>
     <message>
         <source>Open Color Names</source>
-        <translation type="unfinished"></translation>
+        <translation>Abrir nombres de colores</translation>
     </message>
     <message>
         <source>Text or XML (*.txt *.xml);;Text files (*.txt);;XML files (*.xml)</source>
-        <translation type="unfinished"></translation>
+        <translation>Texto o XML (*.txt *.xml);;Archivos de texto (*.txt);;Archivos XML (*.xml)</translation>
     </message>
     <message>
         <source>Hex Color Names Import</source>
-        <translation type="unfinished"></translation>
+        <translation>Importar nombres de colores hexadecimales</translation>
     </message>
     <message>
         <source>Do you want to merge with existing entries?</source>
-        <translation type="unfinished"></translation>
+        <translation>¿Fusionar con entradas existentes?</translation>
     </message>
     <message>
         <source>Error importing color names XML</source>
-        <translation type="unfinished"></translation>
+        <translation>Error importando XML de nombres de colores</translation>
     </message>
     <message>
         <source>Save Color Names</source>
-        <translation type="unfinished"></translation>
+        <translation>Guardar nombres de colores</translation>
     </message>
     <message>
         <source>XML files (*.xml);;Text files (*.txt)</source>
-        <translation type="unfinished"></translation>
+        <translation>Archivos XML (*.xml);;Archivos de texto (*.txt)</translation>
     </message>
     <message>
         <source>Error exporting color names XML</source>
-        <translation type="unfinished"></translation>
+        <translation>Error exportando XML de nombres de colores</translation>
     </message>
 </context>
 <context>
@@ -523,7 +523,7 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>A file name cannot contains any of the following characters: /\:*?&quot;&lt;&gt;|.</source>
-        <translation type="unfinished"></translation>
+        <translation>El nombre de un archivo no puede contener ninguno de los siguientes caracteres: /\:*?&quot;&lt;&gt;|.</translation>
     </message>
 </context>
 <context>
@@ -696,7 +696,7 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>Set Key</source>
-        <translation>Marcar fotograma clave</translation>
+        <translation>Marcar clave</translation>
     </message>
     <message>
         <source>Histogram</source>
@@ -936,7 +936,7 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>Set Key</source>
-        <translation>Marcar fotograma clave</translation>
+        <translation>Marcar clave</translation>
     </message>
     <message>
         <source>Activate Cycle</source>
@@ -1152,18 +1152,18 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     <name>FunctionSheetButtonArea</name>
     <message>
         <source>Toggle synchronizing zoom with xsheet</source>
-        <translation type="unfinished"></translation>
+        <translation>Sincronizar zoom con la planilla</translation>
     </message>
 </context>
 <context>
     <name>FunctionSheetCellViewer</name>
     <message>
         <source>Delete Key</source>
-        <translation>Borrar fotograma clave</translation>
+        <translation>Borrar clave</translation>
     </message>
     <message>
         <source>Set Key</source>
-        <translation>Marcar fotograma clave</translation>
+        <translation>Marcar clave</translation>
     </message>
     <message>
         <source>Linear Interpolation</source>
@@ -1248,7 +1248,7 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
         <source>Some key(s) in this parameter loses original reference in expression.
 Manually changing any keyframe will clear the warning.</source>
         <translation>Algunos claves en este parámetro perderán su referencia original en la expresión.
-Cambiar el fotograma clave de forma manual eliminará la advertencia.</translation>
+Cambiar el clave de forma manual eliminará la advertencia.</translation>
     </message>
 </context>
 <context>
@@ -1284,7 +1284,7 @@ Cambiar el fotograma clave de forma manual eliminará la advertencia.</translati
         <source>Some key(s) in this parameter loses original reference in expression.
 Manually changing any keyframe will clear the warning.</source>
         <translation>Algunos claves en este parámetro perderán su referencia original en la expresión.
-Cambiar el fotograma clave de forma manual eliminará la advertencia.</translation>
+Cambiar el clave de forma manual eliminará la advertencia.</translation>
     </message>
 </context>
 <context>
@@ -1450,11 +1450,11 @@ Cambiar el fotograma clave de forma manual eliminará la advertencia.</translati
     <name>FxPassThroughPainter</name>
     <message>
         <source>&amp;Paste Add</source>
-        <translation type="unfinished">&amp;Pegar (agregar)</translation>
+        <translation>&amp;Pegar (agregar)</translation>
     </message>
     <message>
         <source>&amp;Preview</source>
-        <translation type="unfinished">&amp;Previsualizar</translation>
+        <translation>&amp;Previsualizar</translation>
     </message>
 </context>
 <context>
@@ -1479,7 +1479,7 @@ Cambiar el fotograma clave de forma manual eliminará la advertencia.</translati
     <name>FxSchematicPassThroughNode</name>
     <message>
         <source> (Pass Through)</source>
-        <translation type="unfinished"></translation>
+        <translation> (Redirección)</translation>
     </message>
 </context>
 <context>
@@ -1624,7 +1624,7 @@ Seleccionar los nodos de efecto y sus vínculos relacionados antes de copiar o c
     </message>
     <message>
         <source>Set Key</source>
-        <translation>Marcar fotograma clave</translation>
+        <translation>Marcar clave</translation>
     </message>
     <message>
         <source>Next Key</source>
@@ -2307,19 +2307,19 @@ Are you sure?</source>
     </message>
     <message>
         <source>Copy Keyframe</source>
-        <translation>Copiar fotograma clave</translation>
+        <translation>Copiar clave</translation>
     </message>
     <message>
         <source>Paste Keyframe  at Frame : %1</source>
-        <translation>Pegar fotograma clave en fotograma: %1</translation>
+        <translation>Pegar clave en fotograma: %1</translation>
     </message>
     <message>
         <source>Delete Keyframe</source>
-        <translation>Borrar fotograma clave</translation>
+        <translation>Borrar clave</translation>
     </message>
     <message>
         <source>Move Keyframe</source>
-        <translation>Mover fotograma clave</translation>
+        <translation>Mover clave</translation>
     </message>
     <message>
         <source>Change Style   Palette : %1  Style#%2  [R%3 G%4 B%5] -&gt; [R%6 G%7 B%8]</source>
@@ -2551,6 +2551,29 @@ La segunda línea debería tener la forma &quot;Mesh [profundidad de bits de ent
     </message>
 </context>
 <context>
+    <name>SchematicName</name>
+    <message>
+        <source>Cu&amp;t</source>
+        <translation>Cor&amp;tar</translation>
+    </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Copiar</translation>
+    </message>
+    <message>
+        <source>&amp;Paste</source>
+        <translation>&amp;Pegar</translation>
+    </message>
+    <message>
+        <source>&amp;Delete</source>
+        <translation>&amp;Borrar</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Seleccionar &amp;Todo</translation>
+    </message>
+</context>
+<context>
     <name>SchematicViewer</name>
     <message>
         <source>&amp;Fit to Window</source>
@@ -2614,7 +2637,7 @@ La segunda línea debería tener la forma &quot;Mesh [profundidad de bits de ent
     </message>
     <message>
         <source>&amp;Switch output port display mode</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Cambiar visualización de conectores</translation>
     </message>
 </context>
 <context>
@@ -3014,27 +3037,27 @@ Autom</translation>
     </message>
     <message>
         <source>Hex</source>
-        <translation type="unfinished"></translation>
+        <translation>Hex</translation>
     </message>
     <message>
         <source>Relative colored + Triangle handle</source>
-        <translation type="unfinished"></translation>
+        <translation>Color relativo + marcadores triangulares</translation>
     </message>
     <message>
         <source>Absolute colored + Line handle</source>
-        <translation type="unfinished"></translation>
+        <translation>Color absoluto + marcadores lineales</translation>
     </message>
     <message>
         <source>Slider Appearance</source>
-        <translation type="unfinished"></translation>
+        <translation>Apariencia deslizadores</translation>
     </message>
     <message>
         <source>Toggle Orientation</source>
-        <translation type="unfinished"></translation>
+        <translation>Cambiar orientación</translation>
     </message>
     <message>
         <source>Hex Color Names...</source>
-        <translation type="unfinished"></translation>
+        <translation>Nombres de colores hex...</translation>
     </message>
 </context>
 <context>

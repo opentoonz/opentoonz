@@ -194,7 +194,8 @@ DvDirModelFileFolderNode::DvDirModelFileFolderNode(DvDirModelNode *parent,
 //-----------------------------------------------------------------------------
 
 bool DvDirModelFileFolderNode::exists() {
-  return m_existsChecked ? m_exists : m_peeks
+  return m_existsChecked ? m_exists
+                         : m_peeks
              ? m_existsChecked = true,
                m_exists        = TFileStatus(m_path).doesExist() : true;
 }
@@ -1235,12 +1236,12 @@ void DvDirModelRootNode::updateSceneFolderNodeVisibility(bool forceHide) {
   bool show = (forceHide) ? false : !m_sceneFolderNode->getPath().isEmpty();
   if (show && m_sceneFolderNode->getRow() == -1) {
     int row = getChildCount();
-    DvDirModel::instance()->notifyBeginInsertRows(QModelIndex(), row, row + 1);
+    DvDirModel::instance()->notifyBeginInsertRows(QModelIndex(), row, row);
     addChild(m_sceneFolderNode);
     DvDirModel::instance()->notifyEndInsertRows();
   } else if (!show && m_sceneFolderNode->getRow() != -1) {
     int row = m_sceneFolderNode->getRow();
-    DvDirModel::instance()->notifyBeginRemoveRows(QModelIndex(), row, row + 1);
+    DvDirModel::instance()->notifyBeginRemoveRows(QModelIndex(), row, row);
     // remove the last child of the root node
     m_children.erase(m_children.begin() + row, m_children.begin() + row + 1);
     DvDirModel::instance()->notifyEndRemoveRows();
@@ -1335,7 +1336,7 @@ DvDirModelNode *DvDirModel::getNode(const QModelIndex &index) const {
 QModelIndex DvDirModel::index(int row, int column,
                               const QModelIndex &parent) const {
   if (column != 0) return QModelIndex();
-  DvDirModelNode *parentNode       = m_root;
+  DvDirModelNode *parentNode = m_root;
   if (parent.isValid()) parentNode = getNode(parent);
   if (row < 0 || row >= parentNode->getChildCount()) return QModelIndex();
   DvDirModelNode *node = parentNode->getChild(row);

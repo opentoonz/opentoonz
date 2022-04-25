@@ -556,18 +556,19 @@ void AddFxContextMenu::onAddFx(QAction *action) {
       m_currentCursorScenePos.setY(0);
     }
 
+    int colId = m_app->getCurrentColumn()->getColumnIndex();
+    // prevent crash when the camera column is selected
+    if (colId < 0) colId = 0;
+
     // the signal xsheetChanged is to be emitted in this function
-    TFxCommand::addFx(fx, fxs, m_app,
-                      m_app->getCurrentColumn()->getColumnIndex(),
+    TFxCommand::addFx(fx, fxs, m_app, colId,
                       m_app->getCurrentFrame()->getFrameIndex());
 
     // move the zerary fx node to the clicked position
     if (fx->isZerary() &&
         fx->getAttributes()->getDagNodePos() != TConst::nowhere) {
-      TXsheet *xsh = m_app->getCurrentXsheet()->getXsheet();
-      TXshZeraryFxColumn *column =
-          xsh->getColumn(m_app->getCurrentColumn()->getColumnIndex())
-              ->getZeraryFxColumn();
+      TXsheet *xsh               = m_app->getCurrentXsheet()->getXsheet();
+      TXshZeraryFxColumn *column = xsh->getColumn(colId)->getZeraryFxColumn();
       if (column)
         column->getZeraryColumnFx()->getAttributes()->setDagNodePos(
             fx->getAttributes()->getDagNodePos());

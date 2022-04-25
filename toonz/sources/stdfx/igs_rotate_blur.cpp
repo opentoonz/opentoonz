@@ -5,493 +5,367 @@
 #include <stdexcept>  // std::domain_error()
 #include "igs_ifx_common.h"
 #include "igs_rotate_blur.h"
+
+#include <QVector2D>
+#include <QTransform>
 namespace {
+
+enum Type { Accelerator = 0, Uniform_Angle, Uniform_Length };
+
 //------------------------------------------------------------------
-template <class T>
-class rotate_ {
+class Rotator {
+  const float* in_top_;
+  const int hh_;
+  const int ww_;
+  const int cc_;
+  const TPointD center_;
+  const bool antialias_sw_;
+  const bool alpha_rendering_sw_;
+  const double radian_;
+  const double blur_radius_;
+  const double spin_radius_;
+  const int type_;
+  const double ellipse_aspect_ratio_;
+  const double ellipse_angle_;
+  QTransform tr_, tr_inv_;
+
 public:
-  rotate_(const T *in_top, const int height, const int width,
-          const int channels, const double xc, const double yc,
-          const double sub_size, const int imax, const double dmax,
-          const double radian, const double blur_radius,
-          const double spin_radius)
+  Rotator(const float* in_top, const int height, const int width,
+          const int channels, const TPointD center, const bool antialias_sw,
+          const bool alpha_rendering_sw, const double radian,
+          const double blur_radius, const double spin_radius, const int type,
+          const double ellipse_aspect_ratio, const double ellipse_angle)
       : in_top_(in_top)
       , hh_(height)
       , ww_(width)
       , cc_(channels)
-      , xc_(xc)
-      , yc_(yc)
-      , sub_size_(sub_size)
-      , imax_(imax)
-      , dmax_(dmax)
+      , center_(center)
+      , antialias_sw_(antialias_sw)
+      , alpha_rendering_sw_(alpha_rendering_sw)
       , radian_(radian)
       , blur_radius_(blur_radius)
-      , spin_radius_(spin_radius) {}
-  void pixel_value(const T *in_current_pixel, const int xx, const int yy,
-                   const int z1, const int z2, const double ref_increase_val,
-                   const double ref_decrease_val,
-                   const double each_pixel_blur_ratio, T *result_pixel) {
+      , spin_radius_(spin_radius)
+      , type_(type)
+      , ellipse_aspect_ratio_(ellipse_aspect_ratio)
+      , ellipse_angle_(ellipse_angle) {
+    if (ellipse_aspect_ratio_ != 1.0) {
+      double axis_x =
+          2.0 * ellipse_aspect_ratio_ / (ellipse_aspect_ratio_ + 1.0);
+      double axis_y = axis_x / ellipse_aspect_ratio_;
+      tr_           = QTransform()
+                .rotateRadians(this->ellipse_angle_)
+                .scale(axis_x, axis_y);
+      tr_inv_ = QTransform(tr_).inverted();
+    }
+  }
+  void pixel_value(const float* in_current_pixel, const int xx, const int yy,
+                   const bool isRGB, const double refVal, float* result_pixel) {
+    auto in_pixel = [&](int x, int y) {
+      /* clamp */
+      x = (x < 0) ? 0 : ((this->ww_ <= x) ? this->ww_ - 1 : x);
+      y = (y < 0) ? 0 : ((this->hh_ <= y) ? this->hh_ - 1 : y);
+      return this->in_top_ + this->cc_ * y * this->ww_ + this->cc_ * x;
+    };
+    auto interp = [&](float v1, float v2, float r) {
+      return v1 * (1.f - r) + v2 * r;
+    };
+    auto accum_interp_in_values = [&](QPointF pos, std::vector<float>& accumP,
+                                      int z1, int z2, float weight) {
+      int xId          = (int)std::floor(pos.x());
+      float rx         = pos.x() - (float)xId;
+      int yId          = (int)std::floor(pos.y());
+      float ry         = pos.y() - (float)yId;
+      const float* p00 = in_pixel(xId, yId);
+      const float* p01 = in_pixel(xId + 1, yId);
+      const float* p10 = in_pixel(xId, yId + 1);
+      const float* p11 = in_pixel(xId + 1, yId + 1);
+      for (int zz = z1; zz <= z2; zz++) {
+        accumP[zz] += weight * interp(interp(p00[zz], p01[zz], rx),
+                                      interp(p10[zz], p11[zz], rx), ry);
+      }
+    };
+    auto accum_in_values = [&](QPointF pos, std::vector<float>& accumP, int z1,
+                               int z2, float weight) {
+      int xId        = (int)std::round(pos.x());
+      int yId        = (int)std::round(pos.y());
+      const float* p = in_pixel(xId, yId);
+      for (int zz = z1; zz <= z2; zz++) {
+        accumP[zz] += weight * p[zz];
+      }
+    };
+
+    int c1, c2;
+    if (isRGB) {
+#if defined RGBA_ORDER_OF_TOONZ6
+      c1 = igs::image::rgba::blu;
+      c2 = igs::image::rgba::red;
+#elif defined RGBA_ORDER_OF_OPENGL
+      c1 = igs::image::rgba::red;
+      c2 = igs::image::rgba::blu;
+#else
+      Must be define / DRGBA_ORDER_OF_TOONZ6 or / DRGBA_ORDER_OF_OPENGL
+#endif
+    } else {
+      c1 = igs::image::rgba::alp;
+      c2 = igs::image::rgba::alp;
+    }
+
+    const QPointF center(this->center_.x, this->center_.y);
     /* Pixel位置(0.5 1.5 2.5 ...) */
-    const double xp = static_cast<double>(xx) + 0.5;
-    const double yp = static_cast<double>(yy) + 0.5;
+    const QPointF p(static_cast<float>(xx) + 0.5f,
+                    static_cast<float>(yy) + 0.5f);
 
     /* 中心からPixel位置へのベクトルと長さ */
-    const double xv   = xp - this->xc_;
-    const double yv   = yp - this->yc_;
-    const double dist = sqrt(xv * xv + yv * yv);
+    const QVector2D v(p - center);
+    const float dist = v.length();
 
     /* 指定半径の範囲内なら何もしない */
-    if (dist <= this->blur_radius_) {
-      for (int zz = z1; zz <= z2; ++zz) {
-        result_pixel[zz] = in_current_pixel[zz];
+    bool is_in_blur_radius = false;
+    if (this->ellipse_aspect_ratio_ == 1.f) {
+      is_in_blur_radius = (dist <= this->blur_radius_);
+    } else {
+      is_in_blur_radius =
+          QVector2D(this->tr_inv_.map(v.toPointF())).lengthSquared() <=
+          (this->blur_radius_ * this->blur_radius_);
+    }
+    if (is_in_blur_radius) {
+      for (int c = c1; c <= c2; ++c) {
+        result_pixel[c] = in_current_pixel[c];
       }
       return;
     }
 
-    /* 中心からPixel位置への単位ベクトル */
-    const double cosval = xv / dist;
-    const double sinval = yv / dist;
-
-    /* 円周接線方向Sampling１つずらした位置への回転角度 */
-    const double xw = xv - this->sub_size_ * sinval;
-    const double yw = yv + this->sub_size_ * cosval;
-    const double sub_radian =
-        acos((xv * xw + yv * yw) /
-             (sqrt(xv * xv + yv * yv) * sqrt(xw * xw + yw * yw)));
-
     /* 積算値と積算回数 */
-    std::vector<double> accum_val(this->cc_);
-    int accum_counter = 0;
+    std::vector<float> accum_val(this->cc_);
+    float accum_counter = 0.f;  // TODO 重みづけを均一以外も選べるようにしたい
 
     /* 参照画像による強弱付加 */
-    double scale = this->radian_;
-    if (0.0 <= each_pixel_blur_ratio) {
-      scale *= each_pixel_blur_ratio;
+    float radian = this->radian_ * refVal;  // TODO: it can be bidirectional..
+
+    if (type_ == Accelerator) { /* 外への強調 */
+      radian *= (dist - this->blur_radius_) / this->spin_radius_;
+    } else if (type_ == Uniform_Length &&
+               dist > 0.) {  // decrease radian so that the blur length becomes
+                             // the same along radius
+      radian *= (this->spin_radius_ + this->blur_radius_) / dist;
+      radian = std::min(radian, 2.f * (float)M_PI);
     }
 
-    /* Radial方向Sampling */
-    for (double ss = this->sub_size_ / 2.0 - 0.5; ss < 0.5;
-         ss += this->sub_size_) {
-      /* Radial方向位置 */
-      const double xp2 = xp + ss * cosval;
-      const double yp2 = yp + ss * sinval;
+    // blur pixel length at the current pos
+    float spin_length_half = dist * radian * 0.5f;
 
-      /* ぼかす回転角度範囲range */
-      double radian = scale;
-
-      if (0.0 < this->spin_radius_) { /* 外への強調 */
-        const double xv2   = xp2 - this->xc_;
-        const double yv2   = yp2 - this->yc_;
-        const double dist2 = sqrt(xv2 * xv2 + yv2 * yv2);
-        radian *=
-            /**(dist2              - this->blur_radius_) /
-(this->spin_radius_ - this->blur_radius_);**/
-            (dist2 - this->blur_radius_) / this->spin_radius_;
+    // sampling in both directions
+    float sample_length = 0.f;
+    while (sample_length < spin_length_half) {
+      // compute weight
+      float weight = 1.f;
+      if (sample_length >= spin_length_half - 1.f) {
+        if (antialias_sw_)
+          weight = spin_length_half - sample_length;
+        else
+          break;
       }
+      // advance to the next sample
+      sample_length += weight;
 
-      /* Sampling回数 */
-      int sub_count = static_cast<int>(radian / sub_radian);
+      // compute for both side
+      float sample_radian = sample_length / dist;
+      QPointF vrot1, vrot2;
+      if (this->ellipse_aspect_ratio_ == 1.f) {
+        float cos = std::cos(sample_radian);
+        float sin = std::sin(sample_radian);
 
-      /* Sampling開始角度 */
-      const double sub_start =
-          (radian - sub_count * sub_radian) / 2.0 - radian / 2.0;
-
-      /* 円周方向Sampling */
-      for (double rr = sub_start; 0 < sub_count--; rr += sub_radian) {
-        /* Radial位置(xp2,yp2)から円周位置(xx,yy)へ */
-        const double cosval2 = cos(rr);
-        const double sinval2 = sin(rr);
-
-        const double xd = xp2 - this->xc_;
-        const double yd = yp2 - this->yc_;
-
-        int xx = static_cast<int>(xd * cosval2 - yd * sinval2 + this->xc_);
-        int yy = static_cast<int>(xd * sinval2 + yd * cosval2 + this->yc_);
-
-        /* clamp */
-        xx = (xx < 0) ? 0 : ((this->ww_ <= xx) ? this->ww_ - 1 : xx);
-        yy = (yy < 0) ? 0 : ((this->hh_ <= yy) ? this->hh_ - 1 : yy);
-
-        /* 画像のPixel位置 */
-        const T *in_current =
-            this->in_top_ + this->cc_ * yy * this->ww_ + this->cc_ * xx;
-
-        /* 積算 */
-        for (int zz = z1; zz <= z2; ++zz) {
-          accum_val[zz] += static_cast<double>(in_current[zz]);
-        }
-        ++accum_counter;
+        vrot1 = QPointF(cos * v.x() - sin * v.y(), sin * v.x() + cos * v.y());
+        vrot2 = QPointF(cos * v.x() + sin * v.y(), -sin * v.x() + cos * v.y());
+      } else {
+        vrot1 =
+            (this->tr_inv_ * QTransform(this->tr_).rotateRadians(sample_radian))
+                .map(v.toPointF());
+        vrot2 = (this->tr_inv_ *
+                 QTransform(this->tr_).rotateRadians(-sample_radian))
+                    .map(v.toPointF());
       }
+      if (antialias_sw_) {
+        accum_interp_in_values(vrot1 + center, accum_val, c1, c2, weight);
+        accum_interp_in_values(vrot2 + center, accum_val, c1, c2, weight);
+      } else {
+        accum_in_values(vrot1 + center, accum_val, c1, c2, weight);
+        accum_in_values(vrot2 + center, accum_val, c1, c2, weight);
+      }
+      accum_counter += weight * 2.f;
     }
+
+    // sample the original pos
+    if (antialias_sw_)
+      accum_interp_in_values(p, accum_val, c1, c2, 1.f);
+    else
+      accum_in_values(p, accum_val, c1, c2, 1.f);
+    accum_counter += 1.f;
+
+    //}
     /* 積算しなかったとき(念のためのCheck) */
-    if (accum_counter <= 0) {
-      for (int zz = z1; zz <= z2; ++zz) {
-        result_pixel[zz] = in_current_pixel[zz];
+    if (accum_counter <= 0.f) {
+      for (int c = c1; c <= c2; ++c) {
+        result_pixel[c] = in_current_pixel[c];
       }
       return;
     }
     /* ここで画像Pixelに保存 */
-    for (int zz = z1; zz <= z2; ++zz) {
-      accum_val[zz] /= static_cast<double>(accum_counter);
+    for (int c = c1; c <= c2; ++c) {
+      accum_val[c] /= accum_counter;
 
-      if ((0 <= ref_increase_val) && (in_current_pixel[zz] < accum_val[zz])) {
+      if (isRGB && !this->alpha_rendering_sw_ &&
+          (in_current_pixel[c] < accum_val[c]) &&
+          result_pixel[igs::image::rgba::alp] < 1.f) {
         /* 増分のみMask! */
-        accum_val[zz] =
-            static_cast<double>(in_current_pixel[zz]) +
-            (accum_val[zz] - in_current_pixel[zz]) * ref_increase_val;
-      } else if ((0 <= ref_decrease_val) &&
-                 (accum_val[zz] < in_current_pixel[zz])) {
-        /* 減分のみMask! */
-        accum_val[zz] =
-            static_cast<double>(in_current_pixel[zz]) +
-            (accum_val[zz] - in_current_pixel[zz]) * ref_decrease_val;
-      }
-
-      accum_val[zz] += 0.5; /* 誤差対策 */
-      if (this->dmax_ < accum_val[zz]) {
-        result_pixel[zz] = static_cast<T>(this->imax_);
-      } else if (accum_val[zz] < 0) {
-        result_pixel[zz] = 0;
+        result_pixel[c] =
+            in_current_pixel[c] + (accum_val[c] - in_current_pixel[c]) *
+                                      result_pixel[igs::image::rgba::alp];
       } else {
-        result_pixel[zz] = static_cast<T>(accum_val[zz]);
+        result_pixel[c] = accum_val[c];
       }
     }
   }
 
 private:
-  rotate_() {}
-
-  const T *in_top_;
-  const int hh_;
-  const int ww_;
-  const int cc_;
-  const double xc_;
-  const double yc_;
-  const double sub_size_;
-  const int imax_;
-  const double dmax_;
-  const double radian_;
-  const double blur_radius_;
-  const double spin_radius_;
-
-  /* copy constructorを無効化 */
-  rotate_(const rotate_ &);
-
-  /* 代入演算子を無効化 */
-  rotate_ &operator=(const rotate_ &);
+  // disable
+  Rotator();
+  Rotator(const Rotator&);
+  Rotator& operator=(const Rotator&) {}
 };
 //------------------------------------------------------------------
-const double pi = 3.14159265358979;
-template <class IT, class RT>
-void rotate_convert_template_(
-    const IT *in, const int margin /* 参照画像(in)がもつ余白 */
 
-    ,
-    const RT *ref /* 求める画像(out)と同じ高さ、幅、チャンネル数 */
-    ,
-    const int ref_bits, const int ref_mode  // R,G,B,A,luminance
-
-    ,
-    IT *out, const int hh /* 求める画像(out)の高さ */
-    ,
-    const int ww /* 求める画像(out)の幅 */
-    ,
-    const int cc, const double xc, const double yc, const double degree,
-    const double blur_radius /* ぼかしの始まる半径 */
-    ,
-    const double spin_radius /* ゼロ以上でspin指定となり、
+void rotate_convert(
+    const float* in, float* out, const int margin, /* 参照画像(in)がもつ余白 */
+    const TDimension out_dim,             /* 求める画像(out)のサイズ */
+    const int channels, const float* ref, /* 求める画像(out)と同じ高さ、幅 */
+    const TPointD center, const double degree,
+    const double blur_radius, /* ぼかしの始まる半径 */
+    const double spin_radius, /* ゼロ以上でspin指定となり、
                             かつぼかし強弱の一定になる半径となる */
-    ,
-    const int sub_div /* 1ならJaggy、2以上はAntialias */
-    ,
-    const bool alpha_rendering_sw) {
-  ref_bits;  // for warning
+    const int type,  // 0: Accelerator, 1: Uniform Angle, 2: Uniform Length
+    const bool antialias_sw, /*  when true, sampled pixel will be
+                                bilinear-interpolated */
+    const bool alpha_rendering_sw, const double ellipse_aspect_ratio,
+    const double ellipse_angle) {
+  assert(degree > 0.0);
 
-  /* 強度のないとき、または、サブ分割がないとき、なにもしない */
-  if (degree <= 0.0 || sub_div <= 0
-      // || spin_radius<=blur_radius
-      ) {
-    return;
-  }
+  Rotator rotator(in, out_dim.ly + margin * 2, out_dim.lx + margin * 2,
+                  channels, center, antialias_sw, alpha_rendering_sw,
+                  degree * M_PI_180, blur_radius, spin_radius, type,
+                  ellipse_aspect_ratio, ellipse_angle * M_PI_180);
 
-  rotate_<IT> cl_rota(in, hh + margin * 2, ww + margin * 2, cc, xc + margin,
-                      yc + margin, 1.0 / sub_div,
-                      std::numeric_limits<IT>::max(),
-                      static_cast<double>(std::numeric_limits<IT>::max()),
-                      degree * pi / 180.0, blur_radius, spin_radius);
+  const float* p_in =
+      in + margin * (out_dim.lx + margin * 2) * channels + margin * channels;
+  float* p_out       = out;
+  const float* p_ref = ref;  // may be nullptr
 
-#if defined RGBA_ORDER_OF_TOONZ6
-  const int z1 = igs::image::rgba::blu;
-  const int z2 = igs::image::rgba::red;
-#elif defined RGBA_ORDER_OF_OPENGL
-  const int z1 = igs::image::rgba::red;
-  const int z2 = igs::image::rgba::blu;
-#else
-  Must be define / DRGBA_ORDER_OF_TOONZ6 or
-      / DRGBA_ORDER_OF_OPENGL
-#endif
-
-  const IT *p_in = in + margin * (ww + margin * 2) * cc + margin * cc;
-  IT *pout       = out;
-
-  if (0 == ref) { /* 参照なし */
-    if (igs::image::rgba::siz == cc) {
+  for (int yy = margin; yy < out_dim.ly + margin;
+       ++yy, p_in += 2 * margin * channels) {
+    for (int xx = margin; xx < out_dim.lx + margin;
+         ++xx, p_in += channels, p_out += channels) {
       using namespace igs::image::rgba;
-      if (alpha_rendering_sw) { /* Alphaも処理する */
-        for (int yy = margin; yy < hh + margin; ++yy, p_in += 2 * margin * cc) {
-          for (int xx = margin; xx < ww + margin;
-               ++xx, p_in += cc, pout += cc) {
-            cl_rota.pixel_value(p_in, xx, yy, alp, alp, -1.0, -1.0, -1.0, pout);
-            if (0 == pout[alp]) {
-              pout[red] = p_in[red];
-              pout[gre] = p_in[gre];
-              pout[blu] = p_in[blu];
-              continue;
-            }
-            cl_rota.pixel_value(p_in, xx, yy, z1, z2, -1.0, -1.0, -1.0, pout);
-          }
-        }
-      } else { /* Alpha処理しない、RGB増分をAlphaでMaskする */
-        const unsigned int val_max = std::numeric_limits<IT>::max();
-        for (int yy = margin; yy < hh + margin; ++yy, p_in += 2 * margin * cc) {
-          for (int xx = margin; xx < ww + margin;
-               ++xx, p_in += cc, pout += cc) {
-            pout[alp] = p_in[alp];
-            if (0 == pout[alp]) {
-              pout[red] = p_in[red];
-              pout[gre] = p_in[gre];
-              pout[blu] = p_in[blu];
-              continue;
-            }
-            cl_rota.pixel_value(p_in, xx, yy, z1, z2,
-                                static_cast<double>(p_in[alp]) / val_max, -1.0,
-                                -1.0, pout);
-          }
-        }
-      }
-    } else { /* Alphaがない, RGB/Grayscale... */
-      for (int yy = margin; yy < hh + margin; ++yy, p_in += 2 * margin * cc) {
-        for (int xx = margin; xx < ww + margin; ++xx, p_in += cc, pout += cc) {
-          cl_rota.pixel_value(p_in, xx, yy, 0, cc - 1, -1.0, -1.0, -1.0, pout);
-        }
-      }
-    }
-  } else { /* 参照あり */
-    const RT *refe  = ref;
-    const int r_max = std::numeric_limits<RT>::max();
-    if (igs::image::rgba::siz == cc) {
-      using namespace igs::image::rgba;
-      if (alpha_rendering_sw) { /* Alphaも処理する */
-        for (int yy = margin; yy < hh + margin; ++yy, p_in += 2 * margin * cc) {
-          for (int xx = margin; xx < ww + margin;
-               ++xx, p_in += cc, pout += cc, refe += cc) {
-            const double refv =
-                igs::color::ref_value(refe, cc, r_max, ref_mode);
-            if (0 == refv) {
-              for (int zz = 0; zz < cc; ++zz) {
-                pout[zz] = p_in[zz];
-              }
-              continue;
-            }
+      float refVal = (ref) ? *p_ref : 1.f;
 
-            cl_rota.pixel_value(p_in, xx, yy, alp, alp, -1.0, -1.0, refv, pout);
-            if (0 == pout[alp]) {
-              pout[red] = p_in[red];
-              pout[gre] = p_in[gre];
-              pout[blu] = p_in[blu];
-              continue;
-            }
-            cl_rota.pixel_value(p_in, xx, yy, z1, z2, -1.0, -1.0, refv, pout);
-          }
-        }
-      } else { /* Alpha処理しない、RGB増分をAlphaでMaskする */
-        const unsigned int val_max = std::numeric_limits<IT>::max();
-        for (int yy = margin; yy < hh + margin; ++yy, p_in += 2 * margin * cc) {
-          for (int xx = margin; xx < ww + margin;
-               ++xx, p_in += cc, pout += cc, refe += cc) {
-            const double refv =
-                igs::color::ref_value(refe, cc, r_max, ref_mode);
-            if (0 == refv) {
-              for (int zz = 0; zz < cc; ++zz) {
-                pout[zz] = p_in[zz];
-              }
-              continue;
-            }
-
-            pout[alp] = p_in[alp];
-            if (0 == pout[alp]) {
-              pout[red] = p_in[red];
-              pout[gre] = p_in[gre];
-              pout[blu] = p_in[blu];
-              continue;
-            }
-            cl_rota.pixel_value(p_in, xx, yy, z1, z2,
-                                static_cast<double>(p_in[alp]) / val_max, -1.0,
-                                refv, pout);
-          }
-        }
+      // if the reference value is zero
+      if (refVal == 0.f) {
+        for (int c = 0; c < channels; ++c) p_out[c] = p_in[c];
+        p_ref++;
+        continue;
       }
-    } else { /* Alphaがない, RGB/Grayscale... */
-      for (int yy = margin; yy < hh + margin; ++yy, p_in += 2 * margin * cc) {
-        for (int xx = margin; xx < ww + margin;
-             ++xx, p_in += cc, pout += cc, refe += cc) {
-          const double refv = igs::color::ref_value(refe, cc, r_max, ref_mode);
-          if (0 == refv) {
-            for (int zz = 0; zz < cc; ++zz) {
-              pout[zz] = p_in[zz];
-            }
-            continue;
-          }
 
-          cl_rota.pixel_value(p_in, xx, yy, 0, cc - 1, -1.0, -1.0, refv, pout);
-        }
+      if (alpha_rendering_sw) {  // blur alpha
+        rotator.pixel_value(p_in, xx, yy, false, refVal, p_out);
+      } else {  // use the src alpha as-is
+        p_out[alp] = p_in[alp];
       }
+
+      if (p_out[alp] == 0.f) {
+        p_out[red] = p_in[red];
+        p_out[gre] = p_in[gre];
+        p_out[blu] = p_in[blu];
+        if (ref) p_ref++;
+        continue;
+      }
+
+      // blur RGB channels
+      rotator.pixel_value(p_in, xx, yy, true, refVal, p_out);
+
+      if (ref) p_ref++;
     }
   }
 }
+
 //------------------------------------------------------------------
-}
+}  // namespace
 
 void igs::rotate_blur::convert(
-    const unsigned char *in, const int margin /* 参照画像(in)がもつ余白 */
-
-    ,
-    const unsigned char *ref /* outと同じ高さ、幅、チャンネル数 */
-    ,
-    const int ref_bits, const int ref_mode  // R,G,B,A,luminance
-
-    ,
-    unsigned char *out
-
-    ,
-    const int height /* 求める画像(out)の高さ */
-    ,
-    const int width /* 求める画像(out)の幅 */
-    ,
-    const int channels, const int bits
-
-    ,
-    const double xc, const double yc, const double degree /* ぼかしの回転角度 */
-    ,
-    const double blur_radius /* ぼかしの始まる半径 */
-    ,
-    const double spin_radius /* ゼロ以上でspin指定となり、
+    const float* in, float* out, const int margin,
+    const TDimension out_dim,             /* 求める画像(out)の大きさ */
+    const int channels, const float* ref, /* outと同じ高さ、幅 */
+    const TPointD center, const double degree, /* ぼかしの回転角度 */
+    const double blur_radius,                  /* ぼかしの始まる半径 */
+    const double spin_radius, /* ゼロ以上でspin指定となり、
                             かつぼかし強弱の一定になる半径となる */
-    ,
-    const int sub_div /* 1ならJaggy、2以上はAntialias */
-    ,
-    const bool alpha_rendering_sw) {
-  if ((igs::image::rgba::siz != channels) &&
-      (igs::image::rgb::siz != channels) && (1 != channels) /* bit(monoBW) */
-      ) {
-    throw std::domain_error("Bad channels,Not rgba/rgb/grayscale");
-  }
-
-  if ((std::numeric_limits<unsigned char>::digits != bits) &&
-      (std::numeric_limits<unsigned short>::digits != bits)) {
-    throw std::domain_error("Bad in bits,Not uchar/ushort");
-  }
-  if ((0 != ref) && (std::numeric_limits<unsigned char>::digits != ref_bits) &&
-      (std::numeric_limits<unsigned short>::digits != ref_bits)) {
-    throw std::domain_error("Bad ref bits,Not uchar/ushort");
-  }
-
-  /* 強度のないとき、または、サブ分割がないとき */
-  if (degree <= 0.0 || sub_div <= 0
-      // || spin_radius<=blur_radius
-      ) {
-    if (std::numeric_limits<unsigned char>::digits == bits) {
-      igs::image::copy_except_margin(in, margin, out, height, width, channels);
-    } else if (std::numeric_limits<unsigned short>::digits == bits) {
-      igs::image::copy_except_margin(
-          reinterpret_cast<const unsigned short *>(in), margin,
-          reinterpret_cast<unsigned short *>(out), height, width, channels);
-    }
+    const int type,  // 0: Accelerator, 1: Uniform Angle, 2: Uniform Length
+    const bool antialias_sw, /* when true, sampled pixel will be
+                                bilinear-interpolated */
+    const bool alpha_rendering_sw, const double ellipse_aspect_ratio,
+    const double ellipse_angle) {
+  /* 強度のないとき */
+  if (degree <= 0.0) {
+    igs::image::copy_except_margin(in, margin, out, out_dim.ly, out_dim.lx,
+                                   channels);
     return;
   }
 
-  if (std::numeric_limits<unsigned char>::digits == ref_bits) {
-    if (std::numeric_limits<unsigned char>::digits == bits) {
-      rotate_convert_template_(in, margin, ref, ref_bits, ref_mode, out, height,
-                               width, channels, xc, yc, degree, blur_radius,
-                               spin_radius, sub_div, alpha_rendering_sw);
-    } else if (std::numeric_limits<unsigned short>::digits == bits) {
-      rotate_convert_template_(reinterpret_cast<const unsigned short *>(in),
-                               margin, ref, ref_bits, ref_mode,
-                               reinterpret_cast<unsigned short *>(out), height,
-                               width, channels, xc, yc, degree, blur_radius,
-                               spin_radius, sub_div, alpha_rendering_sw);
-    }
-  } else { /* ref_bitsがゼロでも(refがなくても)ここにくる */
-    if (std::numeric_limits<unsigned char>::digits == bits) {
-      rotate_convert_template_(
-          in, margin, reinterpret_cast<const unsigned short *>(ref), ref_bits,
-          ref_mode, out, height, width, channels, xc, yc, degree, blur_radius,
-          spin_radius, sub_div, alpha_rendering_sw);
-    } else if (std::numeric_limits<unsigned short>::digits == bits) {
-      rotate_convert_template_(
-          reinterpret_cast<const unsigned short *>(in), margin,
-          reinterpret_cast<const unsigned short *>(ref), ref_bits, ref_mode,
-          reinterpret_cast<unsigned short *>(out), height, width, channels, xc,
-          yc, degree, blur_radius, spin_radius, sub_div, alpha_rendering_sw);
-    }
-  }
+  rotate_convert(in, out, margin, out_dim, channels, ref, center, degree,
+                 blur_radius, spin_radius, type, antialias_sw,
+                 alpha_rendering_sw, ellipse_aspect_ratio, ellipse_angle);
 }
 //--------------------------------------------------------------------
 namespace {
-double reference_margin_length_(const double xc, const double yc,
-                                const double xp, const double yp, double radian,
+double reference_margin_length_(const TPointD center, const double xp,
+                                const double yp, double radian,
                                 const double blur_radius,
-                                const double spin_radius,
-                                const double sub_size) {
-  sub_size;  // for warning
+                                const double spin_radius, const int type) {
+  const QPointF c(center.x, center.y);
+  const QPointF p(xp, yp);
+  const QVector2D v(p - c);
+  const float dist = v.length();
 
-  const double xv = xp - xc;
-  const double yv = yp - yc;
-
-  if (0.0 < spin_radius) { /* 外への強調 */
-    const double dist = sqrt(xv * xv + yv * yv);
-    // radian *= (dist-blur_radius)/(spin_radius-blur_radius);
+  if (type == Accelerator) { /* 外への強調 */
     radian *= (dist - blur_radius) / spin_radius;
+  } else if (type == Uniform_Length &&
+             dist > 0.) {  // decrease radian so that the blur length becomes
+                           // the same along radius
+    radian *= (spin_radius + blur_radius) / dist;
+    radian = std::min(radian, 2. * M_PI);
   }
 
-  double cosval      = cos(radian / 2.0);
-  double sinval      = sin(radian / 2.0);
-  const double x1    = xv * cosval - yv * sinval + xc;
-  const double y1    = xv * sinval + yv * cosval + yc;
-  const double xv1   = x1 - xp;
-  const double yv1   = y1 - yp;
-  const double dist1 = sqrt(xv1 * xv1 + yv1 * yv1); /* 必ずプラス値 */
-
-  cosval             = cos(-radian / 2.0);
-  sinval             = sin(-radian / 2.0);
-  const double xp2   = xv * cosval - yv * sinval + xc;
-  const double yp2   = xv * sinval + yv * cosval + yc;
-  const double xv2   = xp2 - xp;
-  const double yv2   = yp2 - yp;
-  const double dist2 = sqrt(xv2 * xv2 + yv2 * yv2); /* 必ずプラス値 */
+  double cosval = cos(radian / 2.0);
+  double sinval = sin(radian / 2.0);
+  QPointF vrot1(v.x() * cosval - v.y() * sinval,
+                v.x() * sinval + v.y() * cosval);
+  QPointF vrot2(v.x() * cosval + v.y() * sinval,
+                -v.x() * sinval + v.y() * cosval);
+  float dist1 = QVector2D(vrot1 + c - p).length();
+  float dist2 = QVector2D(vrot2 + c - p).length();
 
   return (dist1 < dist2) ? dist2 : dist1;
 }
-}
+}  // namespace
 int igs::rotate_blur::reference_margin(
-    const int height /* 求める画像(out)の高さ */
-    ,
-    const int width /* 求める画像(out)の幅 */
-    ,
-    const double xc, const double yc, const double degree /* ぼかしの回転角度 */
-    ,
-    const double blur_radius /* ぼかしの始まる半径 */
-    ,
-    const double spin_radius /* ゼロ以上でspin指定となり、
+    const int height, /* 求める画像(out)の高さ */
+    const int width,  /* 求める画像(out)の幅 */
+    const TPointD center, const double degree, /* ぼかしの回転角度 */
+    const double blur_radius,                  /* ぼかしの始まる半径 */
+    const double spin_radius, /* ゼロ以上でspin指定となり、
                             かつぼかし強弱の一定になる半径となる */
-    ,
-    const int sub_div /* 1ならJaggy、2以上はAntialias */
-    ) {
-  /* 強度のないとき、または、サブ分割がないとき、なにもしない */
-  if (degree <= 0.0 || sub_div <= 0
-      // || spin_radius<=blur_radius
-      ) {
+    const int type  // 0: Accelerator, 1: Uniform Angle, 2: Uniform Length
+) {
+  /* 強度のないとき、なにもしない */
+  if (degree <= 0.0) {
     return 0;
   }
 
@@ -503,27 +377,27 @@ int igs::rotate_blur::reference_margin(
     deg = 180.0;
   }
 
-  margin1 = reference_margin_length_(xc, yc, -width / 2.0, -height / 2.0,
-                                     deg * pi / 180.0, blur_radius, spin_radius,
-                                     1.0 / sub_div);
+  margin1 =
+      reference_margin_length_(center, -width / 2.0, -height / 2.0,
+                               deg * M_PI_180, blur_radius, spin_radius, type);
 
-  margin2 = reference_margin_length_(xc, yc, -width / 2.0, height / 2.0,
-                                     deg * pi / 180.0, blur_radius, spin_radius,
-                                     1.0 / sub_div);
+  margin2 =
+      reference_margin_length_(center, -width / 2.0, height / 2.0,
+                               deg * M_PI_180, blur_radius, spin_radius, type);
   if (margin1 < margin2) {
     margin1 = margin2;
   }
 
-  margin2 = reference_margin_length_(xc, yc, width / 2.0, -height / 2.0,
-                                     deg * pi / 180.0, blur_radius, spin_radius,
-                                     1.0 / sub_div);
+  margin2 =
+      reference_margin_length_(center, width / 2.0, -height / 2.0,
+                               deg * M_PI_180, blur_radius, spin_radius, type);
   if (margin1 < margin2) {
     margin1 = margin2;
   }
 
-  margin2 = reference_margin_length_(xc, yc, width / 2.0, height / 2.0,
-                                     deg * pi / 180.0, blur_radius, spin_radius,
-                                     1.0 / sub_div);
+  margin2 =
+      reference_margin_length_(center, width / 2.0, height / 2.0,
+                               deg * M_PI_180, blur_radius, spin_radius, type);
   if (margin1 < margin2) {
     margin1 = margin2;
   }

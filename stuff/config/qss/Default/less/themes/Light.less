@@ -5,8 +5,6 @@
 // -----------------------------------------------------------------------------
 // This inherits from NEUTRAL theme, when updating NEUTRAL make sure to check
 // changes against LIGHT.
-//
-// NOTE: Compile Neutral.less before this.
 // -----------------------------------------------------------------------------
 
 // Override
@@ -17,12 +15,10 @@
 
 @bg:                    #DBDBDB;
 @accent:                darken(@bg, 20);
-@dock-bg-color:         darken(@bg, 30);
+@dock-bg-color:         darken(@bg, 50);
 @hl-bg-color:           #a0c1dd;
 @hl-text-color:         #000;
 @hl-bg-color-secondary: darken(@bg, 15);
-
-@dialogButtonFrame-bg-color: @bg;
 
 // -----------------------------------------------------------------------------
 // Tabs
@@ -90,7 +86,7 @@
 @input-text-color:         #000;
 @input-border-color:       @accent;
 @input-border-color-focus: saturate(darken(@hl-bg-color, 20), 20);
-@input-bg-color-disabled:  lighten(@bg, 8);
+@input-bg-color-disabled:  lighten(@bg, 4);
 
 // -----------------------------------------------------------------------------
 // CheckBox
@@ -112,7 +108,7 @@
 @flipslider-img:              'flipslider_light.svg';
 @flipslider-base-color:       darken(@bg, 10);
 @flipslider-notstarted-color: rgb(195, 60, 60);
-@flipslider-started-color:    rgb(16, 221, 64);
+@flipslider-started-color:    rgb(30, 192, 68);
 
 // Ruler
 @viewer-ruler-handle-color:      black;
@@ -123,9 +119,9 @@
 // -----------------------------------------------------------------------------
 
 // All views (except list);
-@palette-SelectedBorderColor:           rgb(66, 82, 100);
-@palette-NumpadShortcutBgColor:         rgba(0, 0, 0, 0.15);
-@palette-NumpadShortcutBorderColor:     rgb(128, 128, 128);
+@palette-SelectedBorderColor:           #697C9E;
+@palette-NumpadShortcutBgColor:         rgba(0, 68, 255, 0.15);
+@palette-NumpadShortcutBorderColor:     black;
 
 // List view
 @palette-ListNumpadShortcutBorderColor: rgb(105, 105, 105);
@@ -205,8 +201,10 @@
 @xsheet-MeshColumn-color:                   #b8a2cf;
 @xsheet-SoundColumn-color:                  #aad6d6;
 @xsheet-SoundTextColumn-color:              #c2c2c2;
-@xsheet-ActiveCamera-color:                 #79b5ee;
-@xsheet-OtherCamera-color:                  #6eb7c2;
+@xsheet-ActiveCamera-color:                 #b7dbfc;
+@xsheet-OtherCamera-color:                  #9ad9e2;
+@xsheet-Table-color:                        #cbcbe4;
+@xsheet-Peg-color:                          #dfb081;
 
 // Orientation: Timeline
 @timeline-IconLine-color:                   rgba(0, 0, 0, 0.144);
@@ -222,6 +220,10 @@
 
 // Node Viewer
 @schematic-viewer-bg-color: rgb(128, 128, 128);
+@schematic-ActiveCameraColor:      #79b5ee;
+@schematic-OtherCameraColor:       #6eb7c2;
+@schematic-ActiveOutputcolor:      @schematic-ActiveCameraColor;
+@schematic-OtherOutputcolor:       @schematic-OtherCameraColor;
 
 // Node Type Colors Adjustment
 @nodeLightness:  15;

@@ -270,8 +270,8 @@ SceneSettingsPopup::SceneSettingsPopup()
   m_tlvSubsamplingFld = new DVGui::IntLineEdit(this, tlvSubsampling, 1);
 
   // Marker Interval - Start Frame
-  int distance, offset;
-  sprop->getMarkers(distance, offset);
+  int distance, offset, secDistance;
+  sprop->getMarkers(distance, offset, secDistance);
   m_markerIntervalFld = new DVGui::IntLineEdit(this, distance, 0);
   m_startFrameFld     = new DVGui::IntLineEdit(this, offset);
 
@@ -294,7 +294,8 @@ SceneSettingsPopup::SceneSettingsPopup()
     // Frame Rate
     mainLayout->addWidget(new QLabel(tr("Frame Rate:"), this), 0, 0,
                           Qt::AlignRight | Qt::AlignVCenter);
-    mainLayout->addWidget(m_frameRateFld, 0, 1);
+    mainLayout->addWidget(m_frameRateFld, 0, 1, 1, 4,
+                          Qt::AlignLeft | Qt::AlignVCenter);
     // Camera BG color
     mainLayout->addWidget(new QLabel(tr("Camera BG Color:"), this), 1, 0,
                           Qt::AlignRight | Qt::AlignVCenter);
@@ -305,7 +306,8 @@ SceneSettingsPopup::SceneSettingsPopup()
     mainLayout->addWidget(m_fieldGuideFld, 2, 1);
     mainLayout->addWidget(new QLabel(tr("A/R:"), this), 2, 2,
                           Qt::AlignRight | Qt::AlignVCenter);
-    mainLayout->addWidget(m_aspectRatioFld, 2, 3);
+    mainLayout->addWidget(m_aspectRatioFld, 2, 3, 1, 2,
+                          Qt::AlignLeft | Qt::AlignVCenter);
     // Image Subsampling  - Tlv Subsampling
     mainLayout->addWidget(new QLabel(tr("Image Subsampling:"), this), 3, 0,
                           Qt::AlignRight | Qt::AlignVCenter);
@@ -362,9 +364,10 @@ SceneSettingsPopup::SceneSettingsPopup()
                          SLOT(onTlvSubsampEditingFinished()));
   // Marker Interval - Start Frame
   ret = ret && connect(m_markerIntervalFld, SIGNAL(editingFinished()), this,
-                       SLOT(onMakerIntervalEditingFinished()));
+                       SLOT(onMakerInformationChanged()));
   ret = ret && connect(m_startFrameFld, SIGNAL(editingFinished()), this,
-                       SLOT(onStartFrameEditingFinished()));
+                       SLOT(onMakerInformationChanged()));
+
   // Use Color Filter and Transparency for Rendering
   ret = ret && connect(m_colorFilterOnRenderCB, SIGNAL(stateChanged(int)), this,
                        SLOT(onColorFilterOnRenderChanged()));
@@ -418,8 +421,8 @@ void SceneSettingsPopup::update() {
   m_fullcolorSubsamplingFld->setValue(sprop->getFullcolorSubsampling());
   if (m_tlvSubsamplingFld)
     m_tlvSubsamplingFld->setValue(sprop->getTlvSubsampling());
-  int markerDistance = 0, markerOffset = 0;
-  sprop->getMarkers(markerDistance, markerOffset);
+  int markerDistance = 0, markerOffset = 0, secDistance;
+  sprop->getMarkers(markerDistance, markerOffset, secDistance);
   m_markerIntervalFld->setValue(markerDistance);
   m_startFrameFld->setValue(markerOffset + 1);
   m_colorFilterOnRenderCB->setChecked(
@@ -494,29 +497,14 @@ void SceneSettingsPopup::onTlvSubsampEditingFinished() {
 
 //-----------------------------------------------------------------------------
 
-void SceneSettingsPopup::onMakerIntervalEditingFinished() {
+void SceneSettingsPopup::onMakerInformationChanged() {
   TSceneProperties *sprop = getProperties();
-  int distance, offset;
-  sprop->getMarkers(distance, offset);
+  int distance, offset, secDistance;
+  sprop->getMarkers(distance, offset, secDistance);
   int markerDistance = m_markerIntervalFld->text().toInt();
   int markerOffset   = m_startFrameFld->text().toInt() - 1;
-  assert(offset == markerOffset);
-  if (distance == markerDistance) return;
-  sprop->setMarkers(markerDistance, markerOffset);
-  TApp::instance()->getCurrentScene()->notifySceneChanged();
-  TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
-}
 
-//-----------------------------------------------------------------------------
-
-void SceneSettingsPopup::onStartFrameEditingFinished() {
-  TSceneProperties *sprop = getProperties();
-  int distance, offset;
-  sprop->getMarkers(distance, offset);
-  int markerDistance = m_markerIntervalFld->text().toInt();
-  int markerOffset   = m_startFrameFld->text().toInt() - 1;
-  assert(markerDistance == distance);
-  if (offset == markerOffset) return;
+  if (distance == markerDistance && offset == markerOffset) return;
   sprop->setMarkers(markerDistance, markerOffset);
   TApp::instance()->getCurrentScene()->notifySceneChanged();
   TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();

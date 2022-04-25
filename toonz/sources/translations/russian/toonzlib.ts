@@ -666,19 +666,19 @@
     </message>
     <message>
         <location filename="../../toonzlib/txshcolumn.cpp" line="691"/>
-        <location filename="../../toonzlib/sceneproperties.cpp" line="29"/>
+        <location filename="../../toonzlib/sceneproperties.cpp" line="30"/>
         <source>Red</source>
         <translation>Красный</translation>
     </message>
     <message>
         <location filename="../../toonzlib/txshcolumn.cpp" line="693"/>
-        <location filename="../../toonzlib/sceneproperties.cpp" line="33"/>
+        <location filename="../../toonzlib/sceneproperties.cpp" line="34"/>
         <source>Green</source>
         <translation>Зеленый</translation>
     </message>
     <message>
         <location filename="../../toonzlib/txshcolumn.cpp" line="695"/>
-        <location filename="../../toonzlib/sceneproperties.cpp" line="35"/>
+        <location filename="../../toonzlib/sceneproperties.cpp" line="36"/>
         <source>Blue</source>
         <translation>Синий</translation>
     </message>
@@ -738,47 +738,47 @@
         <translation>Таймлайн</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/sceneproperties.cpp" line="30"/>
+        <location filename="../../toonzlib/sceneproperties.cpp" line="31"/>
         <source>Orange</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/sceneproperties.cpp" line="31"/>
+        <location filename="../../toonzlib/sceneproperties.cpp" line="32"/>
         <source>Yellow</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/sceneproperties.cpp" line="32"/>
+        <location filename="../../toonzlib/sceneproperties.cpp" line="33"/>
         <source>Light Green</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/sceneproperties.cpp" line="34"/>
+        <location filename="../../toonzlib/sceneproperties.cpp" line="35"/>
         <source>Light Blue</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/sceneproperties.cpp" line="36"/>
+        <location filename="../../toonzlib/sceneproperties.cpp" line="37"/>
         <source>Dark Blue</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/sceneproperties.cpp" line="37"/>
+        <location filename="../../toonzlib/sceneproperties.cpp" line="38"/>
         <source>Purple</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/sceneproperties.cpp" line="38"/>
+        <location filename="../../toonzlib/sceneproperties.cpp" line="39"/>
         <source>Pink</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/sceneproperties.cpp" line="39"/>
+        <location filename="../../toonzlib/sceneproperties.cpp" line="40"/>
         <source>Dark Pink</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../toonzlib/sceneproperties.cpp" line="40"/>
+        <location filename="../../toonzlib/sceneproperties.cpp" line="41"/>
         <source>White</source>
         <translation type="unfinished"></translation>
     </message>

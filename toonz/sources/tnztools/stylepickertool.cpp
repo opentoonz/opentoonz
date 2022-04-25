@@ -116,7 +116,7 @@ void StylePickerTool::pick(const TPointD &pos, const TMouseEvent &e,
         TAffine aff =
             getViewer()->getViewMatrix() * getColumnMatrix(superPickedColumnId);
         double scale2 = aff.det();
-        StylePicker superPicker(pickedImage);
+        StylePicker superPicker(getViewer()->viewerWidget(), pickedImage);
         int picked_subsampling =
             picked_level->getImageSubsampling(pickedCell.getFrameId());
         int superPicked_StyleId = superPicker.pickStyleId(
@@ -159,7 +159,7 @@ void StylePickerTool::pick(const TPointD &pos, const TMouseEvent &e,
   TAffine aff     = getViewer()->getViewMatrix() * getCurrentColumnMatrix();
   double scale2   = aff.det();
   int subsampling = level->getImageSubsampling(getCurrentFid());
-  StylePicker picker(image);
+  StylePicker picker(getViewer()->viewerWidget(), image);
   int styleId =
       picker.pickStyleId(TScale(1.0 / subsampling) * pos + TPointD(-0.5, -0.5),
                          10.0, scale2, modeValue);
@@ -215,7 +215,7 @@ void StylePickerTool::mouseMove(const TPointD &pos, const TMouseEvent &e) {
   TAffine aff     = getViewer()->getViewMatrix() * getCurrentColumnMatrix();
   double scale2   = aff.det();
   int subsampling = level->getImageSubsampling(getCurrentFid());
-  StylePicker picker(image);
+  StylePicker picker(getViewer()->viewerWidget(), image);
   TPointD pickPos(TScale(1.0 / subsampling) * pos + TPointD(-0.5, -0.5));
   int inkStyleId   = picker.pickStyleId(pickPos, 10.0, scale2, 1);
   int paintStyleId = picker.pickStyleId(pickPos, 10.0, scale2, 0);

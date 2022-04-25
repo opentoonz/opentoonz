@@ -26,6 +26,7 @@
 #include <QCoreApplication>
 
 #include <QDebug>
+#include <QGuiApplication>
 
 using namespace TFxUtil;
 
@@ -162,9 +163,9 @@ TRaster32P createCrossIcon() {
 //! Disegna una freccia lunga \b len pixel.
 /*!La punta della freccia si trova a coordinate (0,ly/2), la coda a
  * (len-1,ly/2).
-*/
+ */
 TRaster32P createArrowShape(int len) {
-  int d            = 5;
+  int d = 5;
   if (len < d) len = d;
   TPixel32 c0(210, 210, 210);
   TPixel32 c1(10, 10, 10);
@@ -557,11 +558,11 @@ void SwatchViewer::updateRaster() {
     assert(i0 != i1);
     assert(0 <= i0 && i0 < (int)m_points.size());
     assert(0 <= i1 && i1 < (int)m_points.size());
-    TPoint p0        = world2win(m_points[i0].m_param->getValue(m_frame));
-    TPoint p1        = world2win(m_points[i1].m_param->getValue(m_frame));
-    TPoint delta     = p1 - p0;
-    int len          = tround(sqrt((double)(delta * delta)));
-    double phi       = 0;
+    TPoint p0    = world2win(m_points[i0].m_param->getValue(m_frame));
+    TPoint p1    = world2win(m_points[i1].m_param->getValue(m_frame));
+    TPoint delta = p1 - p0;
+    int len      = tround(sqrt((double)(delta * delta)));
+    double phi   = 0;
     if (len > 0) phi = atan2((double)delta.y, (double)delta.x) * M_180_PI;
 
     if (len > 500) {
@@ -774,12 +775,12 @@ void SwatchViewer::wheelEvent(QWheelEvent *event) {
 
   default:  // Qt::MouseEventSynthesizedByQt,
             // Qt::MouseEventSynthesizedByApplication
-    {
-      std::cout << "not supported event: Qt::MouseEventSynthesizedByQt, "
-                   "Qt::MouseEventSynthesizedByApplication"
-                << std::endl;
-      break;
-    }
+  {
+    std::cout << "not supported event: Qt::MouseEventSynthesizedByQt, "
+                 "Qt::MouseEventSynthesizedByApplication"
+              << std::endl;
+    break;
+  }
 
   }  // end switch
 
@@ -1012,10 +1013,9 @@ bool SwatchViewer::event(QEvent *e) {
   }
   */
 
-  if (e->type() == QEvent::Gesture &&
-      CommandManager::instance()
-          ->getAction(MI_TouchGestureControl)
-          ->isChecked()) {
+  if (e->type() == QEvent::Gesture && CommandManager::instance()
+                                          ->getAction(MI_TouchGestureControl)
+                                          ->isChecked()) {
     gestureEvent(static_cast<QGestureEvent *>(e));
     return true;
   }
@@ -1056,6 +1056,19 @@ SwatchViewer::ContentRender::ContentRender(TRasterFx *fx, int frame,
           SLOT(onCanceled(TThread::RunnableP)),
           Qt::QueuedConnection);  // Starts will need to come *strictly before*
                                   // cancels
+
+  m_info.m_isSwatch  = true;
+  m_info.m_affine    = m_aff;
+  m_info.m_cameraBox = TRectD(-0.5 * TPointD(m_size.lx, m_size.ly),
+                              TDimensionD(m_size.lx, m_size.ly));
+
+  if (m_fx->getAlias(m_frame, m_info).find("plasticDeformerFx") !=
+          std::string::npos &&
+      QThread::currentThread() == qGuiApp->thread()) {
+    m_info.m_offScreenSurface.reset(new QOffscreenSurface());
+    m_info.m_offScreenSurface->setFormat(QSurfaceFormat::defaultFormat());
+    m_info.m_offScreenSurface->create();
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -1075,13 +1088,9 @@ void SwatchViewer::ContentRender::run() {
   m_viewer->m_renderer.declareRenderStart(renderId);
   m_viewer->m_renderer.declareFrameStart(m_frame);
 
-  TRenderSettings info;
-  info.m_isSwatch = true;
-  info.m_affine   = m_aff;
-
   TTile tile;
   m_fx->allocateAndCompute(tile, -0.5 * TPointD(m_size.lx, m_size.ly), m_size,
-                           0, (double)m_frame, info);
+                           0, (double)m_frame, m_info);
   m_raster = tile.getRaster();
 
   m_viewer->m_renderer.declareFrameEnd(m_frame);
@@ -1155,7 +1164,7 @@ void SwatchCacheManager::setFx(const TFxP &fx) {
 
         // In the zerary case, extract the actual fx
         TZeraryColumnFx *zcfx = dynamic_cast<TZeraryColumnFx *>(child);
-        if (zcfx) child       = zcfx->getZeraryFx();
+        if (zcfx) child = zcfx->getZeraryFx();
 
         assert(child && child->getIdentifier() != 0);
         m_childrenFxIds.insert(child->getIdentifier());

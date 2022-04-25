@@ -245,7 +245,7 @@ void ShiftTraceTool::drawControlRect() {  // TODO
                                           inksOnly);
     color       = (m_ghostIndex == 0) ? backOniColor : frontOniColor;
     double unit = sqrt(tglGetPixelSize2());
-    unit *= getDevPixRatio();
+    unit *= getDevicePixelRatio(m_viewer->viewerWidget());
     TRectD coloredBox = box.enlarge(3.0 * unit);
     tglColor(color);
     glBegin(GL_LINE_STRIP);
@@ -348,6 +348,10 @@ void ShiftTraceTool::onActivate() {
 }
 
 void ShiftTraceTool::onDeactivate() {
+  // Deactivating Shift and Trace mode resets the pseudo tool with keeping the
+  // Edit Shift checkbox unchanged
+  QAction *shiftTrace = CommandManager::instance()->getAction("MI_ShiftTrace");
+  if (!shiftTrace->isChecked()) return;
   QAction *action = CommandManager::instance()->getAction("MI_EditShift");
   action->setChecked(false);
 }

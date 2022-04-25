@@ -5,6 +5,9 @@
     <control>blur</control>
     <control>type</control>
     <control>alpha_rendering</control>
+    <separator label="Ellipse"/>
+      <control>ellipse_aspect_ratio</control>
+      <control>ellipse_angle</control>
     <separator label=""/>
       <control>anti_alias</control>
       <control>reference</control>

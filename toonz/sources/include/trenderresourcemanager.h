@@ -171,7 +171,7 @@ A variation of the MANAGER_FILESCOPE_DECLARATION macro used to declare
 dependencies between
 resource managers. A manager always receives start notifications \a after those
 from which
-it depends, and viceversa for end notifications. The same applies for
+it depends, and vice versa for end notifications. The same applies for
 constructors and destructors.
 \n \n
 The dependencies declarations list is a sequence of static \c

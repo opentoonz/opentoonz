@@ -1172,7 +1172,7 @@ bool Region::addItemSize(DockWidget *item) {
     m_maximumSize[vertical] = std::min(m_maximumSize[vertical],
                                        item->getDockedMaximumSize().height());
   } else {
-    // Viceversa
+    // Vice versa
     m_minimumSize[vertical] += item->getDockedMinimumSize().height() + sepWidth;
     m_maximumSize[vertical] += item->getDockedMaximumSize().height() + sepWidth;
 
@@ -1225,7 +1225,7 @@ bool Region::subItemSize(DockWidget *item) {
             m_maximumSize[vertical], m_childList[i]->getMaximumSize(vertical));
       }
   } else {
-    // Viceversa
+    // Vice versa
     m_minimumSize[vertical] -= item->minimumSize().height() + sepWidth;
     m_maximumSize[vertical] -= item->maximumSize().height() + sepWidth;
 

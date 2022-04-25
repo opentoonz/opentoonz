@@ -271,14 +271,16 @@ void ColorModelViewer::contextMenuEvent(QContextMenuEvent *event) {
 /*! If left button is pressed recall \b pick() in event pos.
  */
 void ColorModelViewer::mousePressEvent(QMouseEvent *event) {
-  if (event->button() == Qt::LeftButton) pick(event->pos() * getDevPixRatio());
+  if (event->button() == Qt::LeftButton)
+    pick(event->pos() * getDevicePixelRatio(this));
 }
 
 //-----------------------------------------------------------------------------
 /*! If left button is moved recall \b pick() in event pos.
  */
 void ColorModelViewer::mouseMoveEvent(QMouseEvent *event) {
-  if (event->buttons() & Qt::LeftButton) pick(event->pos() * getDevPixRatio());
+  if (event->buttons() & Qt::LeftButton)
+    pick(event->pos() * getDevicePixelRatio(this));
 }
 
 //-----------------------------------------------------------------------------
@@ -296,7 +298,7 @@ void ColorModelViewer::pick(const QPoint &p) {
   /*- 画面外ではPickできない -*/
   if (!m_imageViewer->rect().contains(p)) return;
 
-  StylePicker picker(img, currentPalette);
+  StylePicker picker(this, img, currentPalette);
 
   QPoint viewP = m_imageViewer->mapFrom(this, p);
   TPointD pos  = m_imageViewer->getViewAff().inv() *

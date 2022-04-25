@@ -147,23 +147,23 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>cm</source>
-        <translation type="unfinished"></translation>
+        <translation>cm</translation>
     </message>
     <message>
         <source>mm</source>
-        <translation type="unfinished"></translation>
+        <translation>mm</translation>
     </message>
     <message>
         <source>inch</source>
-        <translation type="unfinished"></translation>
+        <translation>inch</translation>
     </message>
     <message>
         <source>field</source>
-        <translation type="unfinished"></translation>
+        <translation>field</translation>
     </message>
     <message>
         <source>pixel</source>
-        <translation type="unfinished"></translation>
+        <translation>픽셀</translation>
     </message>
 </context>
 <context>
@@ -186,7 +186,7 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>RGB</source>
-        <translation type="unfinished"></translation>
+        <translation>RGB</translation>
     </message>
 </context>
 <context>
@@ -241,15 +241,15 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>8bit (0-255)</source>
-        <translation type="unfinished"></translation>
+        <translation>8bit (0-255)</translation>
     </message>
     <message>
         <source>16bit (0-65535)</source>
-        <translation type="unfinished"></translation>
+        <translation>16bit (0-65535)</translation>
     </message>
     <message>
         <source>0.0-1.0</source>
-        <translation type="unfinished"></translation>
+        <translation>0.0-1.0</translation>
     </message>
 </context>
 <context>
@@ -310,15 +310,15 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>Paste Color</source>
-        <translation type="unfinished"></translation>
+        <translation>색상 붙여넣기</translation>
     </message>
     <message>
         <source>Paste Color of %1</source>
-        <translation type="unfinished"></translation>
+        <translation>%1의 색상 붙여넣기</translation>
     </message>
     <message>
         <source>Copy Color</source>
-        <translation type="unfinished"></translation>
+        <translation>색상 복사</translation>
     </message>
 </context>
 <context>
@@ -359,83 +359,83 @@ Possibly the preset file has been corrupted</source>
     <name>DVGui::HexColorNamesEditor</name>
     <message>
         <source>Hex Color Names Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>16진수 색상 이름 편집기</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished">네</translation>
+        <translation>네</translation>
     </message>
     <message>
         <source>Apply</source>
-        <translation type="unfinished">적용</translation>
+        <translation>적용</translation>
     </message>
     <message>
         <source>Close</source>
-        <translation type="unfinished"></translation>
+        <translation>닫기</translation>
     </message>
     <message>
         <source>Unselect</source>
-        <translation type="unfinished"></translation>
+        <translation>선택 해제</translation>
     </message>
     <message>
         <source>Add Color</source>
-        <translation type="unfinished"></translation>
+        <translation>색상 추가</translation>
     </message>
     <message>
         <source>Delete Color</source>
-        <translation type="unfinished"></translation>
+        <translation>색상 삭제</translation>
     </message>
     <message>
         <source>User Defined Colors</source>
-        <translation type="unfinished"></translation>
+        <translation>정의된 색상</translation>
     </message>
     <message>
         <source>Default Main Colors</source>
-        <translation type="unfinished"></translation>
+        <translation>기본 메인 컬러</translation>
     </message>
     <message>
         <source>Enable Auto-Complete</source>
-        <translation type="unfinished"></translation>
+        <translation>자동 완성 사용</translation>
     </message>
     <message>
         <source>Import</source>
-        <translation type="unfinished"></translation>
+        <translation>수입</translation>
     </message>
     <message>
         <source>Export</source>
-        <translation type="unfinished"></translation>
+        <translation>수출</translation>
     </message>
     <message>
         <source>Open Color Names</source>
-        <translation type="unfinished"></translation>
+        <translation>색상 이름 열기</translation>
     </message>
     <message>
         <source>Text or XML (*.txt *.xml);;Text files (*.txt);;XML files (*.xml)</source>
-        <translation type="unfinished"></translation>
+        <translation>텍스트 또는 XML (*.txt *.xml);; 텍스트 파일 (*.txt);; XML 파일 (*.xml)</translation>
     </message>
     <message>
         <source>Hex Color Names Import</source>
-        <translation type="unfinished"></translation>
+        <translation>16진수 색상 이름 가져오기</translation>
     </message>
     <message>
         <source>Do you want to merge with existing entries?</source>
-        <translation type="unfinished"></translation>
+        <translation>기존 항목과 병합하시겠습니까?</translation>
     </message>
     <message>
         <source>Error importing color names XML</source>
-        <translation type="unfinished"></translation>
+        <translation>색상 이름 XML을 가져오는 중 오류 발생</translation>
     </message>
     <message>
         <source>Save Color Names</source>
-        <translation type="unfinished"></translation>
+        <translation>색상 이름 저장</translation>
     </message>
     <message>
         <source>XML files (*.xml);;Text files (*.txt)</source>
-        <translation type="unfinished"></translation>
+        <translation>XML 파일 (*.xml);; 텍스트 파일 (*.txt)</translation>
     </message>
     <message>
         <source>Error exporting color names XML</source>
-        <translation type="unfinished"></translation>
+        <translation>색 이름 XML 내보내기 오류</translation>
     </message>
 </context>
 <context>
@@ -446,7 +446,7 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>A file name cannot contains any of the following characters: /\:*?&quot;&lt;&gt;|.</source>
-        <translation type="unfinished"></translation>
+        <translation>파일 이름에는 다음 문자 중 하나를 포함할 수 없습니다: /\:*?&lt;&gt;\.</translation>
     </message>
 </context>
 <context>
@@ -478,15 +478,15 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>Range:</source>
-        <translation type="unfinished"></translation>
+        <translation>범위:</translation>
     </message>
     <message>
         <source>Output:</source>
-        <translation type="unfinished"></translation>
+        <translation>출력:</translation>
     </message>
     <message>
         <source>Input:</source>
-        <translation type="unfinished"></translation>
+        <translation>입력 :</translation>
     </message>
 </context>
 <context>
@@ -772,15 +772,15 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>Sound</source>
-        <translation type="unfinished"></translation>
+        <translation>소리</translation>
     </message>
     <message>
         <source>Locator</source>
-        <translation type="unfinished"></translation>
+        <translation>로케이터</translation>
     </message>
     <message>
         <source>&amp;Next Frame</source>
-        <translation type="unfinished"></translation>
+        <translation>다음 프레임(&amp;N)</translation>
     </message>
 </context>
 <context>
@@ -1027,7 +1027,7 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>Link/Unlink Handles</source>
-        <translation type="unfinished"></translation>
+        <translation>링크/링크 해제 핸들</translation>
     </message>
 </context>
 <context>
@@ -1048,7 +1048,7 @@ Possibly the preset file has been corrupted</source>
     <name>FunctionSheetButtonArea</name>
     <message>
         <source>Toggle synchronizing zoom with xsheet</source>
-        <translation type="unfinished"></translation>
+        <translation>xsheet와 확대/축소 동기화 전환</translation>
     </message>
 </context>
 <context>
@@ -1143,7 +1143,8 @@ Possibly the preset file has been corrupted</source>
     <message>
         <source>Some key(s) in this parameter loses original reference in expression.
 Manually changing any keyframe will clear the warning.</source>
-        <translation type="unfinished"></translation>
+        <translation>이 매개변수의 일부 키가 표현식에서 원래 참조를 잃습니다.
+키프레임을 수동으로 변경하면 경고가 지워집니다.</translation>
     </message>
 </context>
 <context>
@@ -1174,7 +1175,8 @@ Manually changing any keyframe will clear the warning.</source>
     <message>
         <source>Some key(s) in this parameter loses original reference in expression.
 Manually changing any keyframe will clear the warning.</source>
-        <translation type="unfinished"></translation>
+        <translation>이 매개변수의 일부 키가 표현식에서 원래 참조를 잃습니다.
+키프레임을 수동으로 변경하면 경고가 지워집니다.</translation>
     </message>
 </context>
 <context>
@@ -1332,11 +1334,11 @@ Manually changing any keyframe will clear the warning.</source>
     <name>FxPassThroughPainter</name>
     <message>
         <source>&amp;Paste Add</source>
-        <translation type="unfinished">붙여넣기 추가(&amp;P)</translation>
+        <translation>붙여넣기 추가(&amp;P)</translation>
     </message>
     <message>
         <source>&amp;Preview</source>
-        <translation type="unfinished">미리보기(&amp;P)</translation>
+        <translation>미리보기(&amp;P)</translation>
     </message>
 </context>
 <context>
@@ -1361,7 +1363,7 @@ Manually changing any keyframe will clear the warning.</source>
     <name>FxSchematicPassThroughNode</name>
     <message>
         <source> (Pass Through)</source>
-        <translation type="unfinished"></translation>
+        <translation> (통과)</translation>
     </message>
 </context>
 <context>
@@ -1665,23 +1667,23 @@ Select FX nodes and related links before copying or cutting the selection you wa
     </message>
     <message>
         <source>Hide New Style Button</source>
-        <translation type="unfinished"></translation>
+        <translation>새 스타일 버튼 숨기기</translation>
     </message>
     <message>
         <source>Show New Style Button</source>
-        <translation type="unfinished"></translation>
+        <translation>새 스타일 버튼 표시</translation>
     </message>
     <message>
         <source>Failed to save palette.</source>
-        <translation type="unfinished"></translation>
+        <translation>팔레트를 저장하지 못했습니다.</translation>
     </message>
     <message>
         <source>Set Toolbar Below Styles</source>
-        <translation type="unfinished"></translation>
+        <translation>스타일 아래에 도구 모음 설정</translation>
     </message>
     <message>
         <source>Set Toolbar Above Styles</source>
-        <translation type="unfinished"></translation>
+        <translation>스타일 위에 도구 모음 설정</translation>
     </message>
 </context>
 <context>
@@ -1704,7 +1706,7 @@ Select FX nodes and related links before copying or cutting the selection you wa
     </message>
     <message>
         <source> + </source>
-        <translation type="unfinished"></translation>
+        <translation> + </translation>
     </message>
 </context>
 <context>
@@ -1727,7 +1729,7 @@ Select FX nodes and related links before copying or cutting the selection you wa
     </message>
     <message>
         <source>Failed to import palette.</source>
-        <translation type="unfinished"></translation>
+        <translation>팔레트를 가져오지 못했습니다.</translation>
     </message>
 </context>
 <context>
@@ -1745,7 +1747,7 @@ Select FX nodes and related links before copying or cutting the selection you wa
     </message>
     <message>
         <source>View help page</source>
-        <translation type="unfinished"></translation>
+        <translation>도움말 페이지 보기</translation>
     </message>
 </context>
 <context>
@@ -2347,7 +2349,7 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     </message>
     <message>
         <source>Click &amp; Drag Palette into Studio Palette</source>
-        <translation type="unfinished"></translation>
+        <translation>팔레트를 클릭하여 스튜디오 팔레트로 끌어오기</translation>
     </message>
 </context>
 <context>
@@ -2435,7 +2437,7 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     </message>
     <message>
         <source>&amp;Switch output port display mode</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;출력 포트 표시 모드 전환</translation>
     </message>
 </context>
 <context>
@@ -2650,7 +2652,7 @@ Are you sure ?</source>
     </message>
     <message>
         <source>Failed to save palette.</source>
-        <translation type="unfinished"></translation>
+        <translation>팔레트를 저장하지 못했습니다.</translation>
     </message>
 </context>
 <context>
@@ -2761,39 +2763,39 @@ Are you sure ?</source>
     </message>
     <message>
         <source>Cleanup </source>
-        <translation type="unfinished"></translation>
+        <translation>정리</translation>
     </message>
     <message>
         <source>Studio </source>
-        <translation type="unfinished"></translation>
+        <translation>스튜디오</translation>
     </message>
     <message>
         <source>Level </source>
-        <translation type="unfinished"></translation>
+        <translation>레벨</translation>
     </message>
     <message>
         <source>Hex</source>
-        <translation type="unfinished"></translation>
+        <translation>Hex</translation>
     </message>
     <message>
         <source>Relative colored + Triangle handle</source>
-        <translation type="unfinished"></translation>
+        <translation>상대적 색상 + 삼각형 핸들</translation>
     </message>
     <message>
         <source>Absolute colored + Line handle</source>
-        <translation type="unfinished"></translation>
+        <translation>절대 컬러 + 라인 핸들</translation>
     </message>
     <message>
         <source>Slider Appearance</source>
-        <translation type="unfinished"></translation>
+        <translation>슬라이더 외관</translation>
     </message>
     <message>
         <source>Toggle Orientation</source>
-        <translation type="unfinished"></translation>
+        <translation>방향 전환</translation>
     </message>
     <message>
         <source>Hex Color Names...</source>
-        <translation type="unfinished"></translation>
+        <translation>16진수 색상 이름...</translation>
     </message>
 </context>
 <context>

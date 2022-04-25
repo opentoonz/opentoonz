@@ -106,7 +106,7 @@ SceneViewerPanel::SceneViewerPanel(QWidget *parent, Qt::WFlags flags)
 
   bool ret = true;
   ret      = ret && connect(m_sceneViewer, SIGNAL(onZoomChanged()),
-                       SLOT(changeWindowTitle()));
+                            SLOT(changeWindowTitle()));
 
   Ruler *vRuler = new Ruler(viewer, m_sceneViewer, true);
   Ruler *hRuler = new Ruler(viewer, m_sceneViewer, false);
@@ -542,7 +542,7 @@ void SceneViewerPanel::enableFlipConsoleForCamerastand(bool on) {
   m_flipConsole->enableButton(FlipConsole::eCheckBg, on, false);
 
   m_flipConsole->enableProgressBar(on);
-  m_flipConsole->enableBlanks(on);
+  // m_flipConsole->enableBlanks(on); // blank frames are now always enabled
   // m_flipConsole->update();
   update();
 }

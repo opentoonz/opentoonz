@@ -76,8 +76,7 @@ public slots:
 
   void onFullColorSubsampEditingFinished();
   void onTlvSubsampEditingFinished();
-  void onMakerIntervalEditingFinished();
-  void onStartFrameEditingFinished();
+  void onMakerInformationChanged();
 
   void setBgColor(const TPixel32 &value, bool isDragging);
 

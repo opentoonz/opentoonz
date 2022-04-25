@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="zh_CN" sourcelanguage="en">
+<TS version="2.1" language="zh_CN" sourcelanguage="en_US">
 <context>
     <name>AddFxContextMenu</name>
     <message>
@@ -224,7 +224,7 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>RGB</source>
-        <translation type="unfinished">RGB</translation>
+        <translation>RGB</translation>
     </message>
 </context>
 <context>
@@ -316,15 +316,15 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>8bit (0-255)</source>
-        <translation type="unfinished"></translation>
+        <translation>8位 (0-255)</translation>
     </message>
     <message>
         <source>16bit (0-65535)</source>
-        <translation type="unfinished"></translation>
+        <translation>16位 (0-65535)</translation>
     </message>
     <message>
         <source>0.0-1.0</source>
-        <translation type="unfinished"></translation>
+        <translation>0.0-1.0</translation>
     </message>
 </context>
 <context>
@@ -393,15 +393,15 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>Paste Color</source>
-        <translation type="unfinished"></translation>
+        <translation>粘贴颜色</translation>
     </message>
     <message>
         <source>Paste Color of %1</source>
-        <translation type="unfinished"></translation>
+        <translation>粘贴%1的颜色</translation>
     </message>
     <message>
         <source>Copy Color</source>
-        <translation type="unfinished"></translation>
+        <translation>复制颜色</translation>
     </message>
 </context>
 <context>
@@ -442,83 +442,83 @@ Possibly the preset file has been corrupted</source>
     <name>DVGui::HexColorNamesEditor</name>
     <message>
         <source>Hex Color Names Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>16进制颜色名编辑器</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished">确定</translation>
+        <translation>确定</translation>
     </message>
     <message>
         <source>Apply</source>
-        <translation type="unfinished">应用</translation>
+        <translation>应用</translation>
     </message>
     <message>
         <source>Close</source>
-        <translation type="unfinished"></translation>
+        <translation>关闭</translation>
     </message>
     <message>
         <source>Unselect</source>
-        <translation type="unfinished"></translation>
+        <translation>不选择</translation>
     </message>
     <message>
         <source>Add Color</source>
-        <translation type="unfinished"></translation>
+        <translation>添加颜色</translation>
     </message>
     <message>
         <source>Delete Color</source>
-        <translation type="unfinished"></translation>
+        <translation>删除颜色</translation>
     </message>
     <message>
         <source>User Defined Colors</source>
-        <translation type="unfinished"></translation>
+        <translation>用户定义颜色</translation>
     </message>
     <message>
         <source>Default Main Colors</source>
-        <translation type="unfinished"></translation>
+        <translation>默认主颜色</translation>
     </message>
     <message>
         <source>Enable Auto-Complete</source>
-        <translation type="unfinished"></translation>
+        <translation>启用自动完成</translation>
     </message>
     <message>
         <source>Import</source>
-        <translation type="unfinished"></translation>
+        <translation>导入</translation>
     </message>
     <message>
         <source>Export</source>
-        <translation type="unfinished"></translation>
+        <translation>导出</translation>
     </message>
     <message>
         <source>Open Color Names</source>
-        <translation type="unfinished"></translation>
+        <translation>打开颜色名</translation>
     </message>
     <message>
         <source>Text or XML (*.txt *.xml);;Text files (*.txt);;XML files (*.xml)</source>
-        <translation type="unfinished"></translation>
+        <translation>文本或者  XML (*.txt *.xml);;文本文件 (*.txt);;XML 文件 (*.xml)</translation>
     </message>
     <message>
         <source>Hex Color Names Import</source>
-        <translation type="unfinished"></translation>
+        <translation>16进制颜色名导入</translation>
     </message>
     <message>
         <source>Do you want to merge with existing entries?</source>
-        <translation type="unfinished"></translation>
+        <translation>你要与现有条目合并吗？</translation>
     </message>
     <message>
         <source>Error importing color names XML</source>
-        <translation type="unfinished"></translation>
+        <translation>导入颜色名错误 XML</translation>
     </message>
     <message>
         <source>Save Color Names</source>
-        <translation type="unfinished"></translation>
+        <translation>保存颜色名</translation>
     </message>
     <message>
         <source>XML files (*.xml);;Text files (*.txt)</source>
-        <translation type="unfinished"></translation>
+        <translation>XML 文件 (*.xml);;文本文件 (*.txt)</translation>
     </message>
     <message>
         <source>Error exporting color names XML</source>
-        <translation type="unfinished"></translation>
+        <translation>导出颜色名错误 XML</translation>
     </message>
 </context>
 <context>
@@ -529,7 +529,7 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>A file name cannot contains any of the following characters: /\:*?&quot;&lt;&gt;|.</source>
-        <translation type="unfinished"></translation>
+        <translation>文件名不能包含如下的任一字符: /\:*?&quot;&lt;&gt;|.</translation>
     </message>
 </context>
 <context>
@@ -806,7 +806,7 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source> FPS	</source>
-        <translation>FPS→</translation>
+        <translation> FPS	</translation>
     </message>
     <message>
         <source> Frame  </source>
@@ -1158,7 +1158,7 @@ Possibly the preset file has been corrupted</source>
     <name>FunctionSheetButtonArea</name>
     <message>
         <source>Toggle synchronizing zoom with xsheet</source>
-        <translation type="unfinished"></translation>
+        <translation>启用/停用与摄影表同步</translation>
     </message>
 </context>
 <context>
@@ -1229,11 +1229,11 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>Show Inbetween Values</source>
-        <translation>显示中间帧的值</translation>
+        <translation>显示过渡帧的值</translation>
     </message>
     <message>
         <source>Hide Inbetween Values</source>
-        <translation>隐藏中间帧的值</translation>
+        <translation>隐藏过渡帧的值</translation>
     </message>
     <message>
         <source>Change Interpolation</source>
@@ -1456,11 +1456,11 @@ Manually changing any keyframe will clear the warning.</source>
     <name>FxPassThroughPainter</name>
     <message>
         <source>&amp;Paste Add</source>
-        <translation type="unfinished">粘贴添加(&amp;P)</translation>
+        <translation>粘贴添加(&amp;P)</translation>
     </message>
     <message>
         <source>&amp;Preview</source>
-        <translation type="unfinished">预览(&amp;P)</translation>
+        <translation>预览(&amp;P)</translation>
     </message>
 </context>
 <context>
@@ -1485,7 +1485,7 @@ Manually changing any keyframe will clear the warning.</source>
     <name>FxSchematicPassThroughNode</name>
     <message>
         <source> (Pass Through)</source>
-        <translation type="unfinished"></translation>
+        <translation> (通过)</translation>
     </message>
 </context>
 <context>
@@ -1856,7 +1856,7 @@ Select FX nodes and related links before copying or cutting the selection you wa
     </message>
     <message>
         <source>Name Editor</source>
-        <translation>名字编辑器</translation>
+        <translation>名称编辑器</translation>
     </message>
     <message>
         <source> + </source>
@@ -1984,7 +1984,7 @@ Select FX nodes and related links before copying or cutting the selection you wa
     <message>
         <source>Styles you are going to delete are used to paint lines and areas in the animation level.
 </source>
-        <translation>您要删除的样式已经用于绘制动画层级的线和区域。
+        <translation>你要删除的样式已经用于绘制动画层级的线和区域。
 </translation>
     </message>
     <message>
@@ -2109,15 +2109,15 @@ Select FX nodes and related links before copying or cutting the selection you wa
     </message>
     <message>
         <source>Created:      </source>
-        <translation>创建于:      </translation>
+        <translation>创建时间:      </translation>
     </message>
     <message>
         <source>Modified:     </source>
-        <translation>修改于:     </translation>
+        <translation>修改时间:     </translation>
     </message>
     <message>
         <source>Last Access:  </source>
-        <translation>最近访问于:  </translation>
+        <translation>最近访问时间:  </translation>
     </message>
     <message>
         <source>Image Size:   </source>
@@ -2275,7 +2275,8 @@ Select FX nodes and related links before copying or cutting the selection you wa
     <message>
         <source>Deleting &quot;%1&quot;.
 Are you sure?</source>
-        <translation>您确定要删除“%1”吗？</translation>
+        <translation>删除 &quot;%1。
+你确定吗？</translation>
     </message>
     <message>
         <source>Delete</source>
@@ -2319,7 +2320,7 @@ Are you sure?</source>
     </message>
     <message>
         <source>Toggle Link  in Palette : %1</source>
-        <translation>在调色板 %1 切换链接</translation>
+        <translation>启用/停用链接调色板 %1</translation>
     </message>
     <message>
         <source>Remove Link  in Palette : %1</source>
@@ -2417,7 +2418,7 @@ Are you sure?</source>
         <source>Deletion of Lines and Areas from raster-based levels is not undoable.
 Are you sure?</source>
         <translation>从光栅层级删除线和区域，该操作将无法撤销。
-您确定吗？</translation>
+你确定吗？</translation>
     </message>
     <message>
         <source>Modify Fx Param : %1 Key : %2  Frame %3</source>
@@ -2501,7 +2502,7 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     <message>
         <source>Custom Texture</source>
         <comment>TextureStyleChooserPage</comment>
-        <translation>自定纹理</translation>
+        <translation>定制纹理</translation>
     </message>
     <message>
         <source>Current Frame: </source>
@@ -2593,6 +2594,29 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     </message>
 </context>
 <context>
+    <name>SchematicName</name>
+    <message>
+        <source>Cu&amp;t</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Paste</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Delete</source>
+        <translation type="unfinished">删除(&amp;D)</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>SchematicViewer</name>
     <message>
         <source>&amp;Fit to Window</source>
@@ -2640,7 +2664,7 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     </message>
     <message>
         <source>&amp;Toggle node icons</source>
-        <translation>开关节点图标(&amp;T)</translation>
+        <translation>显示/隐藏节点图标(&amp;T)</translation>
     </message>
     <message>
         <source>&amp;Selection Mode</source>
@@ -2656,7 +2680,7 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     </message>
     <message>
         <source>&amp;Switch output port display mode</source>
-        <translation type="unfinished"></translation>
+        <translation>切换输出端口显示模式(&amp;S)</translation>
     </message>
 </context>
 <context>
@@ -2749,11 +2773,11 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     <name>StageSchematicNode</name>
     <message>
         <source>Toggle Autorotate Along Motion Path</source>
-        <translation>打开/关闭追随移动路径自动旋转</translation>
+        <translation>启用/停止追随移动路径自动旋转</translation>
     </message>
     <message>
         <source>Toggle Link Motion Path to Control Points</source>
-        <translation>打开/关闭链接移动路径到控制点</translation>
+        <translation>启用/停止链接移动路径到控制点</translation>
     </message>
 </context>
 <context>
@@ -2845,7 +2869,7 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
         <source>The current palette %1
 in the studio palette has been modified. Do you want to save your changes?</source>
         <translation>当前调色板 %1
-在工作室调色板中已经被修改了。您要保存所做的改动吗？</translation>
+在工作室调色板中已经被修改了。你要保存所做的改动吗？</translation>
     </message>
     <message>
         <source>Save</source>
@@ -2859,7 +2883,7 @@ in the studio palette has been modified. Do you want to save your changes?</sour
         <source>Convert %1 to Studio Palette and Overwrite. 
 Are you sure ?</source>
         <translation>转换 %1 到工作室调色板并覆盖。
-您确定要这样做吗？</translation>
+你确定要这样做吗？</translation>
     </message>
     <message>
         <source>Yes</source>
@@ -2873,13 +2897,13 @@ Are you sure ?</source>
         <source>Replacing all selected palettes with the palette &quot;%1&quot;. 
 Are you sure ?</source>
         <translation>用调色板 &quot;%1&quot; 替换所有被选中的调色版。
-您确定要这样做吗？</translation>
+你确定要这样做吗？</translation>
     </message>
     <message>
         <source>Replacing the palette &quot;%1&quot; with the palette &quot;%2&quot;. 
 Are you sure ?</source>
         <translation>用调色板 &quot;%2&quot; 替换调色板 &quot;%1&quot;。
-您确定要这样做吗？</translation>
+你确定要这样做吗？</translation>
     </message>
     <message>
         <source>Replace</source>
@@ -3069,27 +3093,27 @@ Apply</source>
     </message>
     <message>
         <source>Hex</source>
-        <translation type="unfinished"></translation>
+        <translation>16进制</translation>
     </message>
     <message>
         <source>Relative colored + Triangle handle</source>
-        <translation type="unfinished"></translation>
+        <translation>相对色+三角手柄</translation>
     </message>
     <message>
         <source>Absolute colored + Line handle</source>
-        <translation type="unfinished"></translation>
+        <translation>绝对色+线条手柄</translation>
     </message>
     <message>
         <source>Slider Appearance</source>
-        <translation type="unfinished"></translation>
+        <translation>滑动器外观</translation>
     </message>
     <message>
         <source>Toggle Orientation</source>
-        <translation type="unfinished"></translation>
+        <translation>切换适应方向</translation>
     </message>
     <message>
         <source>Hex Color Names...</source>
-        <translation type="unfinished"></translation>
+        <translation>16进制颜色名...</translation>
     </message>
 </context>
 <context>
@@ -3161,7 +3185,7 @@ Apply</source>
     <name>StyleNameEditor</name>
     <message>
         <source>Name Editor</source>
-        <translation>名字编辑器</translation>
+        <translation>名称编辑器</translation>
     </message>
     <message>
         <source>OK</source>
@@ -3181,7 +3205,7 @@ Apply</source>
     </message>
     <message>
         <source>Name Editor: # %1</source>
-        <translation>名字编辑器: # %1</translation>
+        <translation>名称编辑器: # %1</translation>
     </message>
     <message>
         <source>Apply and Next</source>

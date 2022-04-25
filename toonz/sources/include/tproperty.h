@@ -68,7 +68,7 @@ public:
   class TypeError {};
   class RangeError {};
 
-  TProperty(std::string name) : m_name(name) {
+  TProperty(std::string name) : m_name(name), m_visible(true) {
     m_qstringName = QString::fromStdString(name);
   }
 
@@ -93,11 +93,15 @@ public:
   std::string getId() const { return m_id; }
   void setId(std::string id) { m_id = id; }
 
+  bool getVisible() const { return m_visible; }
+  void setVisible(bool state) { m_visible = state; }
+
 private:
   std::string m_name;
   QString m_qstringName;
   std::string m_id;
   std::vector<Listener *> m_listeners;
+  bool m_visible;
 };
 
 //---------------------------------------------------------

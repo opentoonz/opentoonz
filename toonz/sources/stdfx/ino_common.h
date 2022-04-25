@@ -11,12 +11,19 @@ namespace ino {
 /* 一時バッファとの変換機能 */
 void ras_to_arr(const TRasterP in_ras, const int channels,
                 unsigned char* out_arr);
+void ras_to_float_arr(const TRasterP in_ras, const int channels,
+                      float* out_arr);
 void arr_to_ras(const unsigned char* in_arr, const int channels,
                 TRasterP out_ras, const int margin);
+void float_arr_to_ras(const unsigned char* in_arr, const int channels,
+                      TRasterP out_ras, const int margin);
 void ras_to_vec(const TRasterP ras, const int channels,
                 std::vector<unsigned char>& vec);
 void vec_to_ras(std::vector<unsigned char>& vec, const int channels,
                 TRasterP ras, const int margin = 0);
+void ras_to_ref_float_arr(const TRasterP in_ras, float* out_arr,
+                          const int refer_mode);
+
 // void Lx_to_wrap( TRasterP ras );
 
 /* logのserverアクセスON/OFF,install時設定をするための機能 */

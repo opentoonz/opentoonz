@@ -677,7 +677,7 @@
     </message>
     <message>
         <source>Lock Alpha</source>
-        <translation type="unfinished">알파 잠금</translation>
+        <translation>잠금 알파</translation>
     </message>
 </context>
 <context>
@@ -993,7 +993,7 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Rotate</source>
-        <translation type="unfinished"></translation>
+        <translation>회전</translation>
     </message>
 </context>
 <context>
@@ -1547,7 +1547,7 @@ moved to the end of the first page of the palette.</source>
     </message>
     <message>
         <source>Lock Alpha</source>
-        <translation type="unfinished">알파 잠금</translation>
+        <translation>잠금 알파</translation>
     </message>
 </context>
 <context>

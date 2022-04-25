@@ -1,0 +1,16 @@
+name: Ask a question
+description: Questions relating to OpenToonz only
+labels: 'question'
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please search existing issues before posting to avoid creating duplicates.
+        
+        For general support please head over to the OpenToonz User Forum ([English](https://groups.google.com/g/opentoonz_en) | [日本語](https://groups.google.com/g/opentoonz)) or consult the [Manual](https://opentoonz.readthedocs.io/en/latest/).
+  - type: textarea
+    attributes:
+      label: Ask a question related to OpenToonz
+      placeholder: Ex. I'm having trouble building OpenToonz [...]. There's an undocumented feature, what does it do?
+    validations:
+      required: true

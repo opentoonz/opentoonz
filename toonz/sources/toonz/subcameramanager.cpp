@@ -31,7 +31,7 @@ inline bool bitwiseContains(UCHAR flag, UCHAR state) {
 inline bool bitwiseExclude(UCHAR flag, UCHAR state) {
   return bitwiseContains(~state, flag);
 }
-}
+}  // namespace
 
 //********************************************************************************
 //    Classes implementation
@@ -119,7 +119,7 @@ bool PreviewSubCameraManager::mousePressEvent(SceneViewer *viewer,
   if (viewer->is3DView()) return true;
 
   m_mousePressed  = true;
-  m_mousePressPos = event.mousePos() * getDevPixRatio();
+  m_mousePressPos = event.mousePos() * viewer->getDevPixRatio();
   m_dragType      = getSubCameraDragEnum(viewer, m_mousePressPos);
 
   if (bitwiseExclude(m_dragType, OUTER))
@@ -133,7 +133,7 @@ bool PreviewSubCameraManager::mousePressEvent(SceneViewer *viewer,
 bool PreviewSubCameraManager::mouseMoveEvent(SceneViewer *viewer,
                                              const TMouseEvent &event) {
   if (viewer->is3DView()) return true;
-  QPointF curPos(event.mousePos() * getDevPixRatio());
+  QPointF curPos(event.mousePos() * viewer->getDevPixRatio());
   if (event.buttons() == Qt::LeftButton) {
     if (!bitwiseContains(m_dragType, INNER)) {
       if (std::abs(curPos.x() - m_mousePressPos.x()) > 10 ||
@@ -334,7 +334,7 @@ TPoint PreviewSubCameraManager::getSubCameraDragDistance(
 
 //-----------------------------------------------------------------------------
 /*! Delete sub camera frame. Executed from context menu of the viewer.
-*/
+ */
 void PreviewSubCameraManager::deleteSubCamera(SceneViewer *viewer) {
   TCamera *camera =
       TApp::instance()->getCurrentScene()->getScene()->getCurrentCamera();

@@ -430,7 +430,7 @@ void RGBPickerTool::passivePick() {
   TRectD area = TRectD(m_mousePixelPosition.x, m_mousePixelPosition.y,
                        m_mousePixelPosition.x, m_mousePixelPosition.y);
 
-  StylePicker picker(image);
+  StylePicker picker(getViewer()->viewerWidget(), image);
 
   if (LutManager::instance()->isValid()) m_viewer->bindFBO();
 
@@ -458,7 +458,7 @@ void RGBPickerTool::pick() {
 
   TRectD area = TRectD(m_mousePixelPosition.x - 1, m_mousePixelPosition.y - 1,
                        m_mousePixelPosition.x + 1, m_mousePixelPosition.y + 1);
-  StylePicker picker(image, palette);
+  StylePicker picker(getViewer()->viewerWidget(), image, palette);
 
   if (LutManager::instance()->isValid()) m_viewer->bindFBO();
 
@@ -491,7 +491,7 @@ void RGBPickerTool::pickRect() {
   }
   m_selectingRect.empty();
   if (area.getLx() <= 1 || area.getLy() <= 1) return;
-  StylePicker picker(image, palette);
+  StylePicker picker(getViewer()->viewerWidget(), image, palette);
 
   if (LutManager::instance()->isValid()) m_viewer->bindFBO();
 
@@ -511,7 +511,7 @@ void RGBPickerTool::pickStroke() {
   TPalette *palette       = ph->getPalette();
   if (!palette) return;
 
-  StylePicker picker(image, palette);
+  StylePicker picker(getViewer()->viewerWidget(), image, palette);
   TStroke *stroke = new TStroke(*m_stroke);
 
   if (LutManager::instance()->isValid()) m_viewer->bindFBO();

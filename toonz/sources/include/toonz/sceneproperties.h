@@ -53,6 +53,9 @@ public:
   struct CellMark {
     QString name;
     TPixel32 color;
+    bool operator==(const CellMark &cm) {
+      return name == cm.name && color == cm.color;
+    }
   };
 
 private:
@@ -194,10 +197,8 @@ Set the distance between two markers to \p distance and \b offset to markers
 offset,
 \sa setMarkers()
   */
-  void getMarkers(int &distance, int &offset) const {
-    distance = m_markerDistance;
-    offset   = m_markerOffset;
-  }
+  void getMarkers(int &distance, int &offset, int &secDistance) const;
+
   /*!
           Sets information about xsheet markers, xsheet horizontal line.
           Sets the distance between two markers to \p distance and \b offset,row
@@ -206,6 +207,7 @@ of first
 \sa getMarkers()
   */
   void setMarkers(int distance, int offset);
+
   /*!
           Returns full-color images subsampling in scene. Subsampling value is
 the simplifying

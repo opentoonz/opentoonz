@@ -97,26 +97,17 @@ QMenuBar {
 #TopBarTab {
   margin: 0;
   padding: 0;
+  background-color: transparent;
   &::tab {
-    background-color: @rooms-tab-bg-color;
+    &:extend(.tab-flat all);
     border-top: 1 solid @tab-border-color;
-    border-right: 1 solid @tab-border-color;
-    color: @rooms-tab-text-color;
     margin: 0 0 -1 0;
     padding: 2 8 3 8;
-    &:hover {
-      background-color: @rooms-tab-bg-color-hover;
-      color: @tab-text-color-hover;
-    }
     &:selected {
-      background-color: @rooms-tab-bg-color-selected;
-      color: @rooms-tab-text-color-selected;
+      background-color: @hl-bg-color;
     }
     &:first {
-      border-left: 1 solid @accent;
-    }
-    &:last {
-      border-right: 1 solid @accent;
+      border-left: 1 solid @tab-border-color;
     }
   }
   & QToolButton {
@@ -516,24 +507,23 @@ DvScrollWidget {
 }
 
 /* -----------------------------------------------------------------------------
-   Tab Containers
------------------------------------------------------------------------------ */
-
-#TabBarContainer {
-  .tab-container;
-}
-
-QTabBar {
-  background-color: @tabbar-bg-color;
-}
-
-/* -----------------------------------------------------------------------------
    Tabs
 ----------------------------------------------------------------------------- */
 
+QTabWidget::Pane {
+  position: absolute;
+  top: -1; // move border under tabs
+  &:extend(.frame all); // frame border
+  margin: 0 3 3 3;
+}
+
 QTabBar {
+  background-color: transparent;
   &::tab {
-    &:extend(.tab-flat all);
+    &:extend(.tab-round all);
+    &::first {
+      margin-left: 3px;
+    }
   }
   & QToolButton {
     /* Scroll buttons */
@@ -548,6 +538,16 @@ QTabBar {
     }
     &:disabled {
       color: @text-color-disabled;
+    }
+  }
+}
+
+#TabBarContainer {
+  // Panels: Palette, Style Editor, Fx Editor, etc.
+  .tab-container;
+  & QTabBar {
+    &::tab {
+      &:extend(.tab-flat all);
     }
   }
 }
@@ -663,4 +663,21 @@ QListView {
       color: @button-text-color-disabled;
     }
   }
+}
+
+/* -----------------------------------------------------------------------------
+   QHeaderView
+----------------------------------------------------------------------------- */
+
+QHeaderView::section {
+  background-color: @browser-itemview-col-color;
+  border: 1 solid @browser-itemview-col-border-color;
+  padding-left: 4;
+  margin-left: -1;
+  margin-top: -1;
+}
+
+QTreeWidget {
+  background-color: @browser-itemview-bg-color-alt;
+  border: 1 solid @accent;
 }

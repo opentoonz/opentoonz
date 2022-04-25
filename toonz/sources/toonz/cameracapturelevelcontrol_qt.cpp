@@ -157,7 +157,7 @@ void CameraCaptureLevelHistogram::mousePressEvent(QMouseEvent* event) {
     m_offset = pos.x() - SIDE_MARGIN - m_black;
   else if (m_currentItem == GammaSlider)
     m_offset = pos.x() - SIDE_MARGIN - gammaToHPos(m_gamma, m_black, m_white);
-  else if (m_currentItem == BlackSlider)
+  else if (m_currentItem == WhiteSlider)
     m_offset = pos.x() - SIDE_MARGIN - m_white;
   else if (m_currentItem == ThresholdSlider)
     m_offset = pos.x() - SIDE_MARGIN - m_threshold;

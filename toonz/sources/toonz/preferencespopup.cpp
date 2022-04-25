@@ -1255,6 +1255,9 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
       {expandFunctionHeader,
        tr("Expand Function Editor Header to Match Xsheet Toolbar Height*")},
       {showColumnNumbers, tr("Show Column Numbers in Column Headers")},
+      {parentColorsInXsheetColumn,
+       tr("Show Column Parent's Color in the Xsheet")},
+      {highlightLineEverySecond, tr("Highlight Line Every Second")},
       {syncLevelRenumberWithXsheet,
        tr("Sync Level Strip Drawing Number Changes with the Xsheet")},
       {currentTimelineEnabled,
@@ -1635,6 +1638,9 @@ QWidget* PreferencesPopup::createInterfacePage() {
   insertUI(CurrentLanguageName, lay, languageItemList);
   insertUI(interfaceFont, lay);  // creates QFontComboBox
   insertUI(interfaceFontStyle, lay, buildFontStyleList());
+  qobject_cast<QComboBox*>(m_controlIdMap.key(interfaceFontStyle))
+      ->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+
   QGridLayout* colorCalibLay = insertGroupBoxUI(colorCalibrationEnabled, lay);
   { insertUI(colorCalibrationLutPaths, colorCalibLay); }
   insertUI(displayIn30bit, lay);
@@ -1695,7 +1701,8 @@ QWidget* PreferencesPopup::createVisualizationPage() {
 
 QWidget* PreferencesPopup::createLoadingPage() {
   m_levelFormatNames = new QComboBox;
-  m_editLevelFormat  = new QPushButton(tr("Edit"));
+  m_levelFormatNames->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+  m_editLevelFormat = new QPushButton(tr("Edit"));
 
   QPushButton* addLevelFormat    = new QPushButton("+");
   QPushButton* removeLevelFormat = new QPushButton("-");
@@ -1965,6 +1972,8 @@ QWidget* PreferencesPopup::createXsheetPage() {
   QGridLayout* xshToolbarLay = insertGroupBoxUI(showXSheetToolbar, lay);
   { insertUI(expandFunctionHeader, xshToolbarLay); }
   insertUI(showColumnNumbers, lay);
+  insertUI(parentColorsInXsheetColumn, lay);
+  insertUI(highlightLineEverySecond, lay);
   insertUI(syncLevelRenumberWithXsheet, lay);
   insertUI(currentTimelineEnabled, lay);
   insertUI(currentColumnColor, lay);

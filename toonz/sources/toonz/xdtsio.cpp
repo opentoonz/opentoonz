@@ -110,7 +110,9 @@ void XdtsFrameDataItem::read(const QJsonObject &json) {
 void XdtsFrameDataItem::write(QJsonObject &json) const {
   json["id"] = int(m_id);
   QJsonArray valuesArray;
-  foreach (const QString &value, m_values) { valuesArray.append(value); }
+  foreach (const QString &value, m_values) {
+    valuesArray.append(value);
+  }
   json["values"] = valuesArray;
 }
 
@@ -351,7 +353,9 @@ void XdtsTimeTableHeaderItem::read(const QJsonObject &json) {
 void XdtsTimeTableHeaderItem::write(QJsonObject &json) const {
   json["fieldId"] = int(m_fieldId);
   QJsonArray namesArray;
-  foreach (const QString name, m_names) { namesArray.append(name); }
+  foreach (const QString name, m_names) {
+    namesArray.append(name);
+  }
   json["names"] = namesArray;
 }
 
@@ -684,21 +688,23 @@ void ExportXDTSCommand::execute() {
     tick1Id->setCurrentIndex(tick1Id->findData(0));
     tick2Id->setCurrentIndex(tick2Id->findData(1));
     targetColumnCombo = new QComboBox();
-    targetColumnCombo->addItem(tr("All columns"), true);
-    targetColumnCombo->addItem(tr("Only active columns"), false);
+    targetColumnCombo->addItem(QObject::tr("All columns"), true);
+    targetColumnCombo->addItem(QObject::tr("Only active columns"), false);
     targetColumnCombo->setCurrentIndex(targetColumnCombo->findData(true));
 
     QGridLayout *customLay = new QGridLayout();
     customLay->setMargin(0);
     customLay->setSpacing(10);
     {
-      customLay->addWidget(new QLabel(tr("Inbetween symbol mark")), 0, 0,
-                           Qt::AlignRight | Qt::AlignVCenter);
+      customLay->addWidget(
+          new QLabel(QObject::tr("Cell Mark for Inbetween Symbol 1 (O)")), 0, 0,
+          Qt::AlignRight | Qt::AlignVCenter);
       customLay->addWidget(tick1Id, 0, 1);
-      customLay->addWidget(new QLabel(tr("Reverse sheet symbol mark")), 1, 0,
-                           Qt::AlignRight | Qt::AlignVCenter);
+      customLay->addWidget(
+          new QLabel(QObject::tr("Cell Mark for Inbetween Symbol 2 (*)")), 1, 0,
+          Qt::AlignRight | Qt::AlignVCenter);
       customLay->addWidget(tick2Id, 1, 1);
-      customLay->addWidget(new QLabel(tr("Target column")), 2, 0,
+      customLay->addWidget(new QLabel(QObject::tr("Target column")), 2, 0,
                            Qt::AlignRight | Qt::AlignVCenter);
       customLay->addWidget(targetColumnCombo, 2, 1);
     }

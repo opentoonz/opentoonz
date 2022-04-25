@@ -90,6 +90,11 @@ void TileFx::transform(double frame, int port, const TRectD &rectOnOutput,
                        TRenderSettings &infoOnInput) {
   infoOnInput = infoOnOutput;
 
+  if (!m_input.isConnected()) {
+    rectOnInput.empty();
+    return;
+  }
+
   TRectD inputBox;
   m_input->getBBox(frame, inputBox, infoOnOutput);
 
@@ -116,6 +121,8 @@ void TileFx::transform(double frame, int port, const TRectD &rectOnOutput,
 
 int TileFx::getMemoryRequirement(const TRectD &rect, double frame,
                                  const TRenderSettings &info) {
+  if (!m_input.isConnected()) return 0;
+
   TRectD inputBox;
   m_input->getBBox(frame, inputBox, info);
 
@@ -157,7 +164,7 @@ void TileFx::doCompute(TTile &tile, double frame, const TRenderSettings &ri) {
 //------------------------------------------------------------------------------
 //! Make the tile of the image contained in \b inputTile in \b tile
 /*
-*/
+ */
 void TileFx::makeTile(const TTile &inputTile, const TTile &tile) const {
   // Build the mirroring pattern. It obviously repeats itself out of 2x2 tile
   // blocks.

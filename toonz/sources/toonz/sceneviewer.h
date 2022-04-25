@@ -278,6 +278,7 @@ public:
   // the viewer
   // when using the stylepicker and the finger tools
   TRectD getGeometry() const override;
+  TRectD getCameraRect() const override;
 
   void setFocus(Qt::FocusReason reason) { QWidget::setFocus(reason); };
 

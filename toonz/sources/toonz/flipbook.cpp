@@ -2122,8 +2122,8 @@ void FlipBook::adaptGeometryToCurrentSize() {
   if (!img) return;
 
   TAffine toWidgetRef(m_imageViewer->getImgToWidgetAffine());
-  TRectD pixGeomD(TScale(1.0 / (double)getDevPixRatio()) * toWidgetRef *
-                  getImageBoundsD(img));
+  TRectD pixGeomD(TScale(1.0 / (double)getDevicePixelRatio(this)) *
+                  toWidgetRef * getImageBoundsD(img));
   // TRectD pixGeomD(toWidgetRef  * getImageBoundsD(img));
   TRect pixGeom(tceil(pixGeomD.x0), tceil(pixGeomD.y0), tfloor(pixGeomD.x1) - 1,
                 tfloor(pixGeomD.y1) - 1);

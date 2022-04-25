@@ -1264,7 +1264,7 @@ void EditTool::drawMainHandle() {
   TAffine parentAff    = xsh->getParentPlacement(objId, frame);
   TAffine aff          = xsh->getPlacement(objId, frame);
   TPointD center       = Stage::inch * xsh->getCenter(objId, frame);
-  int devPixRatio      = getDevPixRatio();
+  int devPixRatio      = getDevicePixelRatio(m_viewer->viewerWidget());
   // the gadget appears on the center of the level. orientation and dimension
   // are independent of the movement of the level
   glPushMatrix();

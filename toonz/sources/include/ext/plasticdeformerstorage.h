@@ -149,7 +149,7 @@ deform-related
   Cached data is uniquely associated with pairs of meshImage and deformed
 skeletons,
   meaning that the same meshImage can be deformed by multiple skeletons, and
-viceversa.
+vice versa.
   \n\n
   A deformer data request needs an affine transform in input, which is intended
 to

@@ -137,7 +137,7 @@ int getPixelLength(double measuredLength, TMeasure *measure, double dpi,
   double inchValue = measure->getCurrentUnit()->convertFrom(measuredLength);
   return tround(inchValue * dpi);
 }
-}
+}  // namespace
 //=============================================================================
 // PeggingWidget
 //-----------------------------------------------------------------------------
@@ -266,7 +266,7 @@ void PeggingWidget::on00() {
   m_01->setIcon(m_topPix.transformed(QMatrix().rotate(m_cutLx ? -90 : 90),
                                      Qt::SmoothTransformation));
   m_11->setIcon(
-      m_topRightPix.transformed(QMatrix().rotate(m_cutLx || m_cutLx ? -90 : 90),
+      m_topRightPix.transformed(QMatrix().rotate(m_cutLx || m_cutLy ? -90 : 90),
                                 Qt::SmoothTransformation));
   m_10->setIcon(m_topPix.transformed(QMatrix().rotate(m_cutLy ? 0 : 180),
                                      Qt::SmoothTransformation));
@@ -601,7 +601,7 @@ void CanvasSizePopup::showEvent(QShowEvent *e) {
   TPointD dpi    = m_sl->getDpi();
   double dimLx   = getMeasuredLength(dim.lx, m_xMeasure, dpi.x,
                                    m_unit->currentData().toString());
-  double dimLy = getMeasuredLength(dim.ly, m_yMeasure, dpi.y,
+  double dimLy   = getMeasuredLength(dim.ly, m_yMeasure, dpi.y,
                                    m_unit->currentData().toString());
   m_currentXSize->setText(QString::number(dimLx));
   m_currentYSize->setText(QString::number(dimLy));

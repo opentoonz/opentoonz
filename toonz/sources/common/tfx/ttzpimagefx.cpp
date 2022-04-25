@@ -14,7 +14,7 @@ void parseIndexes(std::string indexes, std::vector<std::string> &items) {
   char seps[] = " ,;";
   char *token;
   if (indexes == "all" || indexes == "All" || indexes == "ALL")
-    indexes     = "0-4095";
+    indexes = "0-4095";
   char *context = 0;
   token         = strtok_s((char *)(indexes.c_str()), seps, &context);
   while (token != NULL) {
@@ -26,7 +26,7 @@ void parseIndexes(std::string indexes, std::vector<std::string> &items) {
   char *token;
   if (indexes == "all" || indexes == "All" || indexes == "ALL")
     indexes = "0-4095";
-  token     = strtok((char *)(indexes.c_str()), seps);
+  token = strtok((char *)(indexes.c_str()), seps);
   while (token != NULL) {
     items.push_back(token);
     token = strtok(NULL, seps);
@@ -38,48 +38,30 @@ void parseIndexes(std::string indexes, std::vector<std::string> &items) {
 
 void insertIndexes(std::vector<std::string> items,
                    PaletteFilterFxRenderData *t) {
+  for (int i = 0; i < (int)items.size(); i++) {
+    char *starttoken, *endtoken;
+    char subseps[]  = "-";
+    std::string tmp = items[i];
 #ifdef _MSC_VER
-  for (int i = 0; i < (int)items.size(); i++) {
-    char *starttoken, *endtoken;
-    char subseps[]  = "-";
-    std::string tmp = items[i];
-    char *context   = 0;
-    starttoken      = strtok_s((char *)tmp.c_str(), subseps, &context);
-    endtoken        = strtok_s(NULL, subseps, &context);
-    if (!endtoken && isInt(starttoken)) {
-      int index;
-      index = std::stoi(starttoken);
-      t->m_colors.insert(index);
-    } else {
-      if (isInt(starttoken) && isInt(endtoken)) {
-        int start, end;
-        start = std::stoi(starttoken);
-        end   = std::stoi(endtoken);
-        for (int i = start; i <= end; i++) t->m_colors.insert(i);
-      }
-    }
-  }
+    char *context = 0;
+    starttoken    = strtok_s((char *)tmp.c_str(), subseps, &context);
+    endtoken      = strtok_s(NULL, subseps, &context);
 #else
-  for (int i = 0; i < (int)items.size(); i++) {
-    char *starttoken, *endtoken;
-    char subseps[]  = "-";
-    std::string tmp = items[i];
-    starttoken      = strtok((char *)tmp.c_str(), subseps);
-    endtoken        = strtok(NULL, subseps);
-    if (!endtoken && isInt(starttoken)) {
+    starttoken = strtok((char *)tmp.c_str(), subseps);
+    endtoken   = strtok(NULL, subseps);
+#endif
+    if (!starttoken || !isInt(starttoken)) continue;
+    if (!endtoken) {
       int index;
       index = std::stoi(starttoken);
       t->m_colors.insert(index);
-    } else {
-      if (isInt(starttoken) && isInt(endtoken)) {
-        int start, end;
-        start = std::stoi(starttoken);
-        end   = std::stoi(endtoken);
-        for (int i = start; i <= end; i++) t->m_colors.insert(i);
-      }
+    } else if (isInt(endtoken)) {
+      int start, end;
+      start = std::stoi(starttoken);
+      end   = std::stoi(endtoken);
+      for (int i = start; i <= end; i++) t->m_colors.insert(i);
     }
   }
-#endif
 }
 
 //**********************************************************************************************

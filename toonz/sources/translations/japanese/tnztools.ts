@@ -741,7 +741,7 @@
     </message>
     <message>
         <source>Lock Alpha</source>
-        <translation type="unfinished">透明部分の保護</translation>
+        <translation>透明部分の保護</translation>
     </message>
 </context>
 <context>
@@ -1057,7 +1057,7 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Rotate</source>
-        <translation type="unfinished"></translation>
+        <translation>作成後に回転</translation>
     </message>
 </context>
 <context>
@@ -1613,7 +1613,7 @@ moved to the end of the first page of the palette.</source>
     </message>
     <message>
         <source>Lock Alpha</source>
-        <translation type="unfinished">透明部分の保護</translation>
+        <translation>透明部分の保護</translation>
     </message>
 </context>
 <context>

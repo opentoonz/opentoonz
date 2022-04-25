@@ -1365,7 +1365,7 @@ Chcete pokračovat?</translation>
         <translation>Výběr nelze přesunout. Není upravitelný.</translation>
     </message>
     <message>
-        <location filename="../../tnztools/edittoolgadgets.cpp" line="93"/>
+        <location filename="../../tnztools/edittoolgadgets.cpp" line="89"/>
         <source>Modify Fx Gadget  </source>
         <translation>Změnit udělátko efektu</translation>
     </message>

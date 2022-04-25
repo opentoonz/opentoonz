@@ -134,6 +134,8 @@ TLevelWriterGif::~TLevelWriterGif() {
     break;
   }
 
+  preIArgs << "-r";
+  preIArgs << QString::number(framerate);
   preIArgs << "-v";
   preIArgs << "warning";
   postIArgs << "-vf";
@@ -285,6 +287,7 @@ TImageP TLevelReaderGif::load(int frameIndex) {
 Tiio::GifWriterProperties::GifWriterProperties()
     : m_scale("Scale", 1, 100, 100)
     , m_looping("Looping", true)
+    , m_palette("Generate Palette", true)
     , m_mode("Mode")
     , m_maxcolors("Max Colors", 2, 256, 256) {
 
@@ -318,8 +321,12 @@ Tiio::GifWriterProperties::GifWriterProperties()
   m_mode.setItemUIName(L"NEW3", tr("New Pal Per Frame + Bayer1 Dither"));
   m_mode.setItemUIName(L"NOPAL", tr("Opaque, Dither, 256 Colors Only"));
 
+  // Doesn't make Generate Palette property visible in the popup
+  m_palette.setVisible(false);
+
   bind(m_scale);
   bind(m_looping);
+  bind(m_palette);
   bind(m_mode);
   bind(m_maxcolors);
 }

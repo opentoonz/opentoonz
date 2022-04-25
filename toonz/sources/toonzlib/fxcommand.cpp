@@ -3416,7 +3416,7 @@ void SetParentUndo::initialize() {
   if (!m_parentFx) return;
 
   // NOTE: We cannot store this directly, since it's the actual out that owns
-  // the actual in, not viceversa
+  // the actual in, not vice versa
   TFx *parentFx = ::getActualIn(m_parentFx.getPointer());
 
   TXsheet *xsh = m_xshHandle->getXsheet();

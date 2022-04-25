@@ -25,21 +25,22 @@
 #include "tiio.h"
 
 namespace {
-const TSceneProperties::CellMark cellMarkDefault[12] = {
-    {QObject::tr("Red"), TPixel32(167, 55, 55)},
-    {QObject::tr("Orange"), TPixel32(195, 115, 40)},
-    {QObject::tr("Yellow"), TPixel32(214, 183, 22)},
-    {QObject::tr("Light Green"), TPixel32(165, 179, 57)},
-    {QObject::tr("Green"), TPixel32(82, 157, 79)},
-    {QObject::tr("Light Blue"), TPixel32(71, 142, 165)},
-    {QObject::tr("Blue"), TPixel32(64, 103, 172)},
-    {QObject::tr("Dark Blue"), TPixel32(60, 49, 187)},
-    {QObject::tr("Purple"), TPixel32(108, 66, 170)},
-    {QObject::tr("Pink"), TPixel32(161, 75, 140)},
-    {QObject::tr("Dark Pink"), TPixel32(111, 29, 108)},
-    {QObject::tr("White"), TPixel32(255, 255, 255)}};
-
+const QList<TSceneProperties::CellMark> getDefaultCellMarks() {
+  return QList<TSceneProperties::CellMark>{
+      {QObject::tr("Red"), TPixel32(167, 55, 55)},
+      {QObject::tr("Orange"), TPixel32(195, 115, 40)},
+      {QObject::tr("Yellow"), TPixel32(214, 183, 22)},
+      {QObject::tr("Light Green"), TPixel32(165, 179, 57)},
+      {QObject::tr("Green"), TPixel32(82, 157, 79)},
+      {QObject::tr("Light Blue"), TPixel32(71, 142, 165)},
+      {QObject::tr("Blue"), TPixel32(64, 103, 172)},
+      {QObject::tr("Dark Blue"), TPixel32(60, 49, 187)},
+      {QObject::tr("Purple"), TPixel32(108, 66, 170)},
+      {QObject::tr("Pink"), TPixel32(161, 75, 140)},
+      {QObject::tr("Dark Pink"), TPixel32(111, 29, 108)},
+      {QObject::tr("White"), TPixel32(255, 255, 255)}};
 }
+}  // namespace
 
 //=============================================================================
 
@@ -69,7 +70,7 @@ TSceneProperties::TSceneProperties()
   m_notesColor.push_back(TPixel32(150, 245, 255));
 
   // Default Cell Marks
-  for (int i = 0; i < 12; i++) m_cellMarks.push_back(cellMarkDefault[i]);
+  m_cellMarks = getDefaultCellMarks();
 }
 
 //-----------------------------------------------------------------------------
@@ -136,6 +137,19 @@ void TSceneProperties::onInitialize() {
 //-----------------------------------------------------------------------------
 
 void TSceneProperties::setBgColor(const TPixel32 &color) { m_bgColor = color; }
+
+//-----------------------------------------------------------------------------
+
+void TSceneProperties::getMarkers(int &distance, int &offset,
+                                  int &secDistance) const {
+  distance = m_markerDistance;
+  offset   = m_markerOffset;
+  // TODO: handle drop frame when the fps has decimal part
+  secDistance =
+      (Preferences::instance()->getBoolValue(highlightLineEverySecond))
+          ? (int)std::round(getOutputProperties()->getFrameRate())
+          : -1;
+}
 
 //-----------------------------------------------------------------------------
 
@@ -863,12 +877,7 @@ void TSceneProperties::setCellMark(const TSceneProperties::CellMark &mark,
 // check if the cell mark settings are modified
 bool TSceneProperties::hasDefaultCellMarks() const {
   if (m_cellMarks.size() != 12) return false;
-  for (int i = 0; i < 12; i++) {
-    if (m_cellMarks.at(i).name != cellMarkDefault[i].name ||
-        m_cellMarks.at(i).color != cellMarkDefault[i].color)
-      return false;
-  }
-  return true;
+  return m_cellMarks == getDefaultCellMarks();
 }
 
 //-----------------------------------------------------------------------------

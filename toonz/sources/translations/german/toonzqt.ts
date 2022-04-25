@@ -2552,6 +2552,29 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     </message>
 </context>
 <context>
+    <name>SchematicName</name>
+    <message>
+        <source>Cu&amp;t</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Paste</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Delete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>SchematicViewer</name>
     <message>
         <source>&amp;Fit to Window</source>

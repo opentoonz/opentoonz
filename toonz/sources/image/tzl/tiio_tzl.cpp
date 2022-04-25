@@ -103,13 +103,13 @@ static int tfwrite(double *data, unsigned int count, FILE *f) {
 
 namespace {
 
-bool erasedFrame;  // Vera se è stato rimosso almeno un frame.
+bool erasedFrame;  // True if at least one frame has been removed.
 
 bool writeVersionAndCreator(FILE *chan, const char *version, QString creator) {
   if (!chan) return false;
   tfwrite(version, strlen(version), chan);
 
-  // creator : CREATOR_LENGTH characater
+  // creator : CREATOR_LENGTH character
   char s[CREATOR_LENGTH];
   if (creator.length() == 0) creator = "UNKNOWN";
   memset(s, 0, sizeof s);
@@ -1206,11 +1206,11 @@ void TLevelWriterTzl::createIcon(const TImageP &imgIn, TImageP &imgOut) {
   if (!TRect(m_iconSize).contains(savebox))  // it should be better to use
                                              // tfloor instead of tround in the
                                              // previous lines:
-    // sometimes, for rounding problems, the savebox is outside 1 pixel the
+    // sometimes, for rounding problems, the savebox is outside the 1 pixel
     // raster size.
     // the best solution should be to replace tround with tfloor here
     // and in the icon reading of tzl 1.4 (method load14),
-    // but this way the old 1.4 tzl are not readed correctly (crash!)
+    // but this way the old 1.4 tzl are not read correctly (crash!)
     // so, this 'if' is a patch. vinz
     savebox = savebox * TRect(m_iconSize);
   thumbnailRas->clearOutside(savebox);
@@ -1328,7 +1328,7 @@ bool TLevelWriterTzl::resizeIcons(const TDimension &newSize) {
   if (!m_chan) return false;
   assert(m_version >= 13);
 
-  // faccio una copia di m_path per poi usarla per la resizeIcons()
+  // make a copy of m_path to be able to use it for resizeIcons()
   fclose(m_chan);
   m_chan = 0;
   TFileStatus fs(m_path);
@@ -1566,7 +1566,7 @@ bool TLevelReaderTzl::getIconSize(TDimension &iconSize) {
   fread(&iconLx, sizeof(TINT32), 1, m_chan);
   fread(&iconLy, sizeof(TINT32), 1, m_chan);
   assert(iconLx > 0 && iconLy > 0);
-  // ritorno alla posizione corrente
+  // return to the current position
   fseek(m_chan, currentPos, SEEK_SET);
   iconSize = TDimension(iconLx, iconLy);
   return true;
@@ -2054,7 +2054,7 @@ static TRect applyShrinkAndRegion(TRasterP &ras, int shrink, TRect region,
   if (shrink > 1) {
     ras = TRop::shrink(ras, shrink);
   }
-  // calcolo la nuova savebox
+  // calculate the new savebox
   savebox *= region;
   if (savebox == TRect() || savebox.getLx() <= 0 || savebox.getLy() <= 0)
     return TRect();
@@ -2359,7 +2359,7 @@ TImageP TImageReaderTzl::load() {
         ras->clear();
         savebox = m_region;
       } else {
-        // se sia la savebox che la regione sono vuote non faccio nulla
+        // if both the savebox and the region are empty, do nothing
       }
     }
     ti->setCMapped(ras);

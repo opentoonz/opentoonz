@@ -41,6 +41,32 @@ void ras_to_arr_(const TRasterPT<T> ras, U* arr, const int channels) {
     }
   }
 }
+
+// T is TPixel32 or TPixel64
+// normalize to 0.0 - 1.0
+template <class T>
+void ras_to_float_arr_(const TRasterPT<T> ras, float* arr, const int channels) {
+  using namespace igs::image::rgba;
+  float fac = 1.f / (float)T::maxChannelValue;
+  for (int yy = 0; yy < ras->getLy(); ++yy) {
+    const T* ras_sl = ras->pixels(yy);
+    for (int xx = 0; xx < ras->getLx(); ++xx, arr += channels) {
+      if (red < channels) {
+        arr[red] = (float)ras_sl[xx].r * fac;
+      }
+      if (gre < channels) {
+        arr[gre] = (float)ras_sl[xx].g * fac;
+      }
+      if (blu < channels) {
+        arr[blu] = (float)ras_sl[xx].b * fac;
+      }
+      if (alp < channels) {
+        arr[alp] = (float)ras_sl[xx].m * fac;
+      }
+    }
+  }
+}
+
 template <class U, class T>
 void arr_to_ras_(const U* arr, const int channels, TRasterPT<T> ras,
                  const int margin  // default is 0
@@ -70,6 +96,96 @@ void arr_to_ras_(const U* arr, const int channels, TRasterPT<T> ras,
     }
   }
 }
+
+template <class T>
+void float_arr_to_ras_(const float* arr, const int channels, TRasterPT<T> ras,
+                       const int margin  // default is 0
+) {
+  arr +=
+      (ras->getLx() + margin + margin) * margin * channels + margin * channels;
+
+  using namespace igs::image::rgba;
+  float fac = (float)T::maxChannelValue;
+
+  for (int yy = 0; yy < ras->getLy();
+       ++yy, arr += (ras->getLx() + margin + margin) * channels) {
+    const float* arrx = arr;
+    T* ras_sl         = ras->pixels(yy);
+    for (int xx = 0; xx < ras->getLx(); ++xx, arrx += channels) {
+      if (red < channels) {
+        ras_sl[xx].r = (arrx[red] >= 1.f)
+                           ? T::maxChannelValue
+                           : (arrx[red] <= 0.f)
+                                 ? (typename T::Channel)0
+                                 : (typename T::Channel)(
+                                       std::round(arrx[red] * fac + 0.5f));
+      }
+      if (gre < channels) {
+        ras_sl[xx].g = (arrx[gre] >= 1.f)
+                           ? T::maxChannelValue
+                           : (arrx[gre] <= 0.f)
+                                 ? (typename T::Channel)0
+                                 : (typename T::Channel)(
+                                       std::round(arrx[gre] * fac + 0.5f));
+      }
+      if (blu < channels) {
+        ras_sl[xx].b = (arrx[blu] >= 1.f)
+                           ? T::maxChannelValue
+                           : (arrx[blu] <= 0.f)
+                                 ? (typename T::Channel)0
+                                 : (typename T::Channel)(
+                                       std::round(arrx[blu] * fac + 0.5f));
+      }
+      if (alp < channels) {
+        ras_sl[xx].m = (arrx[alp] >= 1.f)
+                           ? T::maxChannelValue
+                           : (arrx[alp] <= 0.f)
+                                 ? (typename T::Channel)0
+                                 : (typename T::Channel)(
+                                       std::round(arrx[alp] * fac + 0.5f));
+      }
+    }
+  }
+}
+
+template <class T>
+float getFactor() {
+  return 1.f / (float)T::maxChannelValue;
+}
+
+// T is either TPixel32, TPixel64
+template <class T>
+void ras_to_ref_float_arr_(const TRasterPT<T> ras, float* arr,
+                           const int refer_mode) {
+  float fac = getFactor<T>();
+  for (int yy = 0; yy < ras->getLy(); ++yy) {
+    const T* ras_sl = ras->pixels(yy);
+    for (int xx = 0; xx < ras->getLx(); ++xx, arr++, ras_sl++) {
+      switch (refer_mode) {
+      case 0:
+        *arr = static_cast<float>(ras_sl->r) * fac;
+        break;
+      case 1:
+        *arr = static_cast<float>(ras_sl->g) * fac;
+        break;
+      case 2:
+        *arr = static_cast<float>(ras_sl->b) * fac;
+        break;
+      case 3:
+        *arr = static_cast<float>(ras_sl->m) * fac;
+        break;
+      case 4:
+        *arr = /* 輝度(Luminance)(CCIR Rec.601) */
+            (0.298912f * static_cast<float>(ras_sl->r) +
+             0.586611f * static_cast<float>(ras_sl->g) +
+             0.114478f * static_cast<float>(ras_sl->b)) *
+            fac;
+        break;
+      }
+    }
+  }
+}
+
 }  // namespace
 //--------------------
 void ino::ras_to_arr(const TRasterP in_ras, const int channels,
@@ -81,6 +197,14 @@ void ino::ras_to_arr(const TRasterP in_ras, const int channels,
         in_ras, reinterpret_cast<unsigned short*>(out_arr), channels);
   }
 }
+void ino::ras_to_float_arr(const TRasterP in_ras, const int channels,
+                           float* out_arr) {
+  if ((TRaster32P)in_ras) {
+    ras_to_float_arr_<TPixel32>(in_ras, out_arr, channels);
+  } else if ((TRaster64P)in_ras) {
+    ras_to_float_arr_<TPixel64>(in_ras, out_arr, channels);
+  }
+}
 void ino::arr_to_ras(const unsigned char* in_arr, const int channels,
                      TRasterP out_ras, const int margin) {
   if ((TRaster32P)out_ras) {
@@ -89,6 +213,16 @@ void ino::arr_to_ras(const unsigned char* in_arr, const int channels,
     arr_to_ras_<unsigned short, TPixel64>(
         reinterpret_cast<const unsigned short*>(in_arr), channels, out_ras,
         margin);
+  }
+}
+void ino::float_arr_to_ras(const unsigned char* in_arr, const int channels,
+                           TRasterP out_ras, const int margin) {
+  if ((TRaster32P)out_ras) {
+    float_arr_to_ras_<TPixel32>(reinterpret_cast<const float*>(in_arr),
+                                channels, out_ras, margin);
+  } else if ((TRaster64P)out_ras) {
+    float_arr_to_ras_<TPixel64>(reinterpret_cast<const float*>(in_arr),
+                                channels, out_ras, margin);
   }
 }
 //--------------------
@@ -105,6 +239,17 @@ void ino::vec_to_ras(std::vector<unsigned char>& in_vec, const int channels,
   ino::arr_to_ras(&in_vec.at(0), channels, out_ras, margin);
   in_vec.clear();
 }
+//--------------------
+
+void ino::ras_to_ref_float_arr(const TRasterP in_ras, float* out_arr,
+                               const int refer_mode) {
+  if ((TRaster32P)in_ras) {
+    ras_to_ref_float_arr_<TPixel32>(in_ras, out_arr, refer_mode);
+  } else if ((TRaster64P)in_ras) {
+    ras_to_ref_float_arr_<TPixel64>(in_ras, out_arr, refer_mode);
+  }
+}
+
 //--------------------
 #if 0   //---
 void ino::Lx_to_wrap( TRasterP ras ) {

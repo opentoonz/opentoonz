@@ -167,7 +167,7 @@ void CastTreeViewer::enableCommands() {
 
 void CastTreeViewer::onFolderChanged(QTreeWidgetItem *current,
                                      QTreeWidgetItem *previous) {
-  // rende la selezione corrente; serve per intercettare il comando MI_Clear
+  // makes the selection current; serves to intercept the MI_Clear command
   makeCurrent();
 }
 
@@ -728,7 +728,7 @@ QMenu *CastBrowser::getContextMenu(QWidget *parent, int index) {
   for (it = indices.begin(); it != indices.end(); ++it) {
     int index = *it;
     if (index < 0 || index >= m_castItems->getItemCount())
-      continue;  // non dovrebbe mai succedere
+      continue;  // should never happen
     TXshSimpleLevel *sl = m_castItems->getItem(index)->getSimpleLevel();
     if (!sl) {
       if (m_castItems->getItem(index)->getPaletteLevel())
@@ -762,7 +762,7 @@ QMenu *CastBrowser::getContextMenu(QWidget *parent, int index) {
     menu->addAction(cm->getAction(MI_EditLevel));
   if (!paletteSelected) menu->addAction(cm->getAction(MI_SaveLevel));
   menu->addSeparator();
-  // MI_ConvertToVectors se sono stati selezionati solo livelli non vettoriali
+  // MI_ConvertToVectors if only non-vector layers were selected
   if (!audioSelected && !paletteSelected && !vectorLevelSelected)
     menu->addAction(cm->getAction(MI_ConvertToVectors));
   menu->addSeparator();

@@ -106,9 +106,9 @@ void RowArea::drawRows(QPainter &p, int r0, int r1) {
   p.setFont(font);
 
   // marker interval
-  int distance, offset;
+  int distance, offset, secDistance;
   TApp::instance()->getCurrentScene()->getScene()->getProperties()->getMarkers(
-      distance, offset);
+      distance, offset, secDistance);
 
   // default value
   //  if (distance == 0) distance = 6;
@@ -131,9 +131,16 @@ void RowArea::drawRows(QPainter &p, int r0, int r1) {
     //--- draw horizontal line
     bool isAfterMarkers =
         (distance > 0 && ((r - offset) % distance) == 0 && r != 0);
-    QColor color = isAfterMarkers ? m_viewer->getMarkerLineColor()
-                                  : m_viewer->getLightLineColor();
-    p.setPen(color);
+    bool isAfterSecMarkers =
+        secDistance > 0 && ((r - offset) % secDistance) == 0 && r != 0;
+
+    QColor color = (isAfterSecMarkers || isAfterMarkers)
+                       ? m_viewer->getMarkerLineColor()
+                       : m_viewer->getLightLineColor();
+
+    p.setPen(
+        QPen(color, (isAfterSecMarkers) ? 3. : 1., Qt::SolidLine, Qt::FlatCap));
+    // p.setPen(color);
     QLine horizontalLine = o->horizontalLine(frameAxis, layerSide);
     if (!o->isVerticalTimeline()) {
       int x = horizontalLine.x1();

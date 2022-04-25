@@ -134,6 +134,11 @@ void Iwa_TileFx::transform(double frame, int port, const TRectD &rectOnOutput,
                            TRectD &rectOnInput, TRenderSettings &infoOnInput) {
   infoOnInput = infoOnOutput;
 
+  if (!m_input.isConnected()) {
+    rectOnInput.empty();
+    return;
+  }
+
   TRectD inputBox;
   m_input->getBBox(frame, inputBox, infoOnOutput);
 
@@ -161,6 +166,8 @@ void Iwa_TileFx::transform(double frame, int port, const TRectD &rectOnOutput,
 
 int Iwa_TileFx::getMemoryRequirement(const TRectD &rect, double frame,
                                      const TRenderSettings &info) {
+  if (!m_input.isConnected()) return 0;
+
   TRectD inputBox;
   m_input->getBBox(frame, inputBox, info);
 

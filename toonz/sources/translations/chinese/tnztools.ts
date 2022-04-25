@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="zh_CN" sourcelanguage="en">
+<TS version="2.1" language="zh_CN" sourcelanguage="en_US">
 <context>
     <name>ArrowToolOptionsBox</name>
     <message>
@@ -745,7 +745,7 @@
     </message>
     <message>
         <source>Lock Alpha</source>
-        <translation type="unfinished">锁定透明度</translation>
+        <translation>锁定透明度</translation>
     </message>
 </context>
 <context>
@@ -815,7 +815,7 @@
 Do you want to continue?</source>
         <translation>当前列已经包含了一个骨架组。替换它会换掉全部现有的顶点动画。
 
-您要继续吗？</translation>
+你要继续吗？</translation>
     </message>
     <message>
         <source>Ok</source>
@@ -875,7 +875,7 @@ Do you want to continue?</source>
 Do you want to proceed?</source>
         <translation>之前的顶点名称会被放弃，所有关联的关键帧也会丢失。
 
-您要继续吗？</translation>
+你要继续吗？</translation>
     </message>
     <message>
         <source>Edit Mesh</source>
@@ -1061,7 +1061,7 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Rotate</source>
-        <translation type="unfinished"></translation>
+        <translation>旋转</translation>
     </message>
 </context>
 <context>
@@ -1616,7 +1616,7 @@ moved to the end of the first page of the palette.</source>
     </message>
     <message>
         <source>Lock Alpha</source>
-        <translation type="unfinished">锁定透明度</translation>
+        <translation>锁定透明度</translation>
     </message>
 </context>
 <context>

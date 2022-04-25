@@ -606,47 +606,47 @@
     </message>
     <message>
         <source>Failed to save palette.</source>
-        <translation type="unfinished"></translation>
+        <translation>팔레트를 저장하지 못했습니다.</translation>
     </message>
     <message>
         <source>and %1 more item(s).</source>
-        <translation type="unfinished"></translation>
+        <translation>그리고 %1 더 많은 항목(s).</translation>
     </message>
     <message>
         <source>Orange</source>
-        <translation type="unfinished"></translation>
+        <translation>주황색</translation>
     </message>
     <message>
         <source>Yellow</source>
-        <translation type="unfinished"></translation>
+        <translation>노란색</translation>
     </message>
     <message>
         <source>Light Green</source>
-        <translation type="unfinished"></translation>
+        <translation>라이트 그린</translation>
     </message>
     <message>
         <source>Light Blue</source>
-        <translation type="unfinished"></translation>
+        <translation>라이트 블루</translation>
     </message>
     <message>
         <source>Dark Blue</source>
-        <translation type="unfinished"></translation>
+        <translation>다크 블루</translation>
     </message>
     <message>
         <source>Purple</source>
-        <translation type="unfinished"></translation>
+        <translation>보라색</translation>
     </message>
     <message>
         <source>Pink</source>
-        <translation type="unfinished"></translation>
+        <translation>분홍색</translation>
     </message>
     <message>
         <source>Dark Pink</source>
-        <translation type="unfinished"></translation>
+        <translation>다크 핑크</translation>
     </message>
     <message>
         <source>White</source>
-        <translation type="unfinished"></translation>
+        <translation>화이트</translation>
     </message>
 </context>
 <context>

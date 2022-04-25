@@ -190,6 +190,8 @@ void ArtContourFx::doDryCompute(TRectD &rect, double frame,
   TRectD controlBox;
   m_controller->getBBox(frame, controlBox, ri2);
 
+  if (controlBox == TConsts::infiniteRectD) controlBox = rect;
+
   TDimension dim = convert(controlBox).getSize();
   TRectD controlRect(controlBox.getP00(), TDimensionD(dim.lx, dim.ly));
 
@@ -223,6 +225,12 @@ void ArtContourFx::doCompute(TTile &tile, double frame,
 
   TRectD controlBox;
   m_controller->getBBox(frame, controlBox, ri2);
+
+  if (controlBox == TConsts::infiniteRectD) {
+    TDimension tileDim = tile.getRaster()->getSize();
+    controlBox = TRectD(tile.m_pos, TDimensionD(tileDim.lx, tileDim.ly));
+  }
+
   TTile ctrTile;
   ctrTile.m_pos  = controlBox.getP00();
   TDimension dim = convert(controlBox).getSize();

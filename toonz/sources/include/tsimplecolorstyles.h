@@ -118,6 +118,12 @@ public:
 
   virtual void drawStroke(const TColorFunction *cf, TStrokeOutline *outline,
                           const TStroke *stroke) const = 0;
+  // draw aliased stroke. currently reimplemented by TSolidColorStyle only
+  virtual void drawAliasedStroke(const TColorFunction *cf,
+                                 TStrokeOutline *outline,
+                                 const TStroke *stroke) const {
+    drawStroke(cf, outline, stroke);
+  };
 
 protected:
   // Not assignable
@@ -158,8 +164,17 @@ public:
   void drawRegion(const TColorFunction *cf, const bool antiAliasing,
                   TRegionOutline &outline) const override;
 
+  void doDrawStroke(const TColorFunction *cf, TStrokeOutline *outline,
+                    const TStroke *s, bool antialias) const;
+
   void drawStroke(const TColorFunction *cf, TStrokeOutline *outline,
-                  const TStroke *s) const override;
+                  const TStroke *s) const override {
+    doDrawStroke(cf, outline, s, true);
+  }
+  void drawAliasedStroke(const TColorFunction *cf, TStrokeOutline *outline,
+                         const TStroke *s) const override {
+    doDrawStroke(cf, outline, s, false);
+  }
 
   int getTagId() const override;
 

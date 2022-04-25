@@ -93,10 +93,14 @@ protected:
   void wheelEvent(QWheelEvent *event) override;
   void focusOutEvent(QFocusEvent *e) override;
   void focusInEvent(QFocusEvent *e) override {}
-  void selectCurrent(const QString &text);
+
+  void addText(const QString &text, const QString &display);
+  void addText(const QString &text, const QColor &textColor);
+  void addText(const TStageObjectId &id, const QString &display,
+               const QColor &identColor);
 
 protected slots:
-  virtual void onTextChanged(const QString &) = 0;
+  virtual void onItemSelected(QListWidgetItem *) = 0;
 };
 
 //=============================================================================
@@ -112,8 +116,11 @@ public:
 
   void refresh() override;
 
+  static QString getNameTr(const TStageObjectId id);
+  void selectCurrent(const TStageObjectId &id);
+
 protected slots:
-  void onTextChanged(const QString &) override;
+  void onItemSelected(QListWidgetItem *) override;
 };
 
 //=============================================================================
@@ -128,9 +135,10 @@ public:
   ~ChangeObjectHandle();
 
   void refresh() override;
+  void selectCurrent(const QString &text);
 
 protected slots:
-  void onTextChanged(const QString &) override;
+  void onItemSelected(QListWidgetItem *) override;
 };
 
 //=============================================================================

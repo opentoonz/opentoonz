@@ -20,6 +20,9 @@ class ino_spin_blur final : public TStandardRasterFx {
   TBoolParamP m_alpha_rendering;
   TBoolParamP m_anti_alias;
   TIntEnumParamP m_ref_mode;
+  // elliptical shape
+  TDoubleParamP m_ellipse_aspect_ratio;
+  TDoubleParamP m_ellipse_angle;
 
 public:
   ino_spin_blur()
@@ -29,7 +32,9 @@ public:
       , m_type(new TIntEnumParam(0, "Accelerator"))
       , m_alpha_rendering(true)
       , m_anti_alias(false)
-      , m_ref_mode(new TIntEnumParam(0, "Red")) {
+      , m_ref_mode(new TIntEnumParam(0, "Red"))
+      , m_ellipse_aspect_ratio(1.0)
+      , m_ellipse_angle(0.0) {
     this->m_center->getX()->setMeasureName("fxLength");
     this->m_center->getY()->setMeasureName("fxLength");
     this->m_radius->setMeasureName("fxLength");
@@ -44,11 +49,16 @@ public:
     bindParam(this, "alpha_rendering", this->m_alpha_rendering);
     bindParam(this, "anti_alias", this->m_anti_alias);
     bindParam(this, "reference", this->m_ref_mode);
+    bindParam(this, "ellipse_aspect_ratio", this->m_ellipse_aspect_ratio);
+    bindParam(this, "ellipse_angle", this->m_ellipse_angle);
 
     this->m_radius->setValueRange(0, (std::numeric_limits<double>::max)());
     /* 拡大のしすぎを防ぐためにMaxを制限する */
     this->m_blur->setValueRange(0.0, 180.0);
-    this->m_type->addItem(1, "Uniform");
+    this->m_ellipse_aspect_ratio->setValueRange(0.1, 10.0);
+    this->m_ellipse_angle->setValueRange(-180.0, 180.0);
+    this->m_type->addItem(1, "Uniform Angle");
+    this->m_type->addItem(2, "Uniform Length");
     this->m_ref_mode->addItem(1, "Green");
     this->m_ref_mode->addItem(2, "Blue");
     this->m_ref_mode->addItem(3, "Alpha");
@@ -74,10 +84,10 @@ public:
     /*--- margin計算...Twist時正確でない ---*/
     return igs::rotate_blur::reference_margin(
         static_cast<int>(ceil(bBox.getLy())),
-        static_cast<int>(ceil(bBox.getLx())), center.x, center.y,
+        static_cast<int>(ceil(bBox.getLx())), center,
         this->m_blur->getValue(frame), this->m_radius->getValue(frame) * scale,
         ((0 < this->m_type->getValue()) ? 0.0 : (bBox.getLy() / 2.0)),
-        (this->m_anti_alias->getValue() ? 4 : 1));
+        this->m_type->getValue());
   }
   void get_render_enlarge(const double frame, const TAffine affine,
                           TRectD &bBox) {
@@ -127,77 +137,67 @@ public:
 
   // add 20140130
   void getParamUIs(TParamUIConcept *&concepts, int &length) override {
-    concepts = new TParamUIConcept[length = 3];
+    concepts = new TParamUIConcept[length = 2];
 
-    concepts[0].m_type  = TParamUIConcept::POINT;
-    concepts[0].m_label = "Center";
+    concepts[0].m_type  = TParamUIConcept::ELLIPSE;
+    concepts[0].m_label = "Radius";
+    concepts[0].m_params.push_back(m_radius);
     concepts[0].m_params.push_back(m_center);
+    concepts[0].m_params.push_back(m_ellipse_aspect_ratio);
+    concepts[0].m_params.push_back(m_ellipse_angle);
 
-    concepts[1].m_type  = TParamUIConcept::RADIUS;
-    concepts[1].m_label = "Radius";
-    concepts[1].m_params.push_back(m_radius);
+    concepts[1].m_type = TParamUIConcept::COMPASS_SPIN;
     concepts[1].m_params.push_back(m_center);
-
-    concepts[2].m_type = TParamUIConcept::COMPASS_SPIN;
-    concepts[2].m_params.push_back(m_center);
+    concepts[1].m_params.push_back(m_ellipse_aspect_ratio);
+    concepts[1].m_params.push_back(m_ellipse_angle);
   }
   // add 20140130
 };
 FX_PLUGIN_IDENTIFIER(ino_spin_blur, "inoSpinBlurFx");
 //--------------------------------------------------------------------
 namespace {
-void fx_(const TRasterP in_ras  // with margin
-         ,
-         const int margin
-
-         /* ここではinとrefは同サイズで使用している */
-         ,
-         const TRasterP refer_ras  // no margin
-         ,
-         const int refer_mode
-
-         ,
-         TRasterP out_ras  // no margin
-
-         ,
-         const double xp, const double yp, const int type, const double blur,
+void fx_(const TRasterP in_ras,  // with margin
+         const int margin, /* ここではinとrefは同サイズで使用している */
+         const TRasterP refer_ras,  // no margin
+         const int refer_mode,
+         TRasterP out_ras,  // no margin
+         const TPointD center, const int type, const double blur,
          const double radius, const bool alpha_rendering_sw,
-         const bool anti_alias_sw) {
+         const bool anti_alias_sw, const double ellipse_aspect_ratio,
+         const double ellipse_angle) {
+  TRasterGR8P ref_gr8;
+  if ((refer_ras != nullptr) && (0 <= refer_mode)) {
+    ref_gr8 =
+        TRasterGR8P(refer_ras->getLy(), refer_ras->getLx() * sizeof(float));
+    ref_gr8->lock();
+    ino::ras_to_ref_float_arr(refer_ras,
+                              reinterpret_cast<float *>(ref_gr8->getRawData()),
+                              refer_mode);
+  }
+
   TRasterGR8P in_gr8(in_ras->getLy(),
-                     in_ras->getLx() * ino::channels() *
-                         ((TRaster64P)in_ras ? sizeof(unsigned short)
-                                             : sizeof(unsigned char)));
+                     in_ras->getLx() * ino::channels() * sizeof(float));
   in_gr8->lock();
+  ino::ras_to_float_arr(in_ras, ino::channels(),
+                        reinterpret_cast<float *>(in_gr8->getRawData()));
+
+  TRasterGR8P out_buffer(out_ras->getLy(),
+                         out_ras->getLx() * ino::channels() * sizeof(float));
+  out_buffer->lock();
 
   igs::rotate_blur::convert(
-      in_ras->getRawData()  // BGRA
-      ,
-      0 /* margin機能は使っていない、のでinとref画像は同サイズ */
+      reinterpret_cast<float *>(in_gr8->getRawData()),
+      reinterpret_cast<float *>(out_buffer->getRawData()), margin,
+      out_ras->getSize(), ino::channels(),
+      (ref_gr8) ? reinterpret_cast<float *>(ref_gr8->getRawData()) : nullptr,
+      center + TPointD(margin, margin), blur, /*degree*/
+      radius, (out_ras->getLy() / 2.0), type, anti_alias_sw, alpha_rendering_sw,
+      ellipse_aspect_ratio, ellipse_angle);
 
-      ,
-      (((refer_ras != nullptr) && (0 <= refer_mode)) ? refer_ras->getRawData()
-                                                     : nullptr)  // BGRA
-      ,
-      (((refer_ras != nullptr) && (0 <= refer_mode)) ? ino::bits(refer_ras)
-                                                     : 0),
-      refer_mode
-
-      ,
-      in_gr8->getRawData()  // BGRA
-
-      ,
-      in_ras->getLy(), in_ras->getLx(), ino::channels(), ino::bits(out_ras)
-
-                                                             ,
-      xp + margin, yp + margin, blur /*degree*/
-      ,
-      radius, ((0 < type) ? 0.0 : (out_ras->getLy() / 2.0))
-
-                  ,
-      (anti_alias_sw ? 4 : 1), alpha_rendering_sw);
-
-  ino::arr_to_ras(in_gr8->getRawData(), ino::channels(), out_ras, margin);
   in_gr8->unlock();
+  ino::float_arr_to_ras(out_buffer->getRawData(), ino::channels(), out_ras, 0);
+  out_buffer->unlock();
+  if (ref_gr8) ref_gr8->unlock();
 }
 }  // namespace
 //------------------------------------------------------------
@@ -220,6 +220,9 @@ void ino_spin_blur::doCompute(TTile &tile, double frame,
   const bool alpha_rend_sw = this->m_alpha_rendering->getValue();
   const bool anti_alias_sw = this->m_anti_alias->getValue();
   const int refer_mode     = this->m_ref_mode->getValue();
+  const double ellipse_aspect_ratio =
+      this->m_ellipse_aspect_ratio->getValue(frame);
+  const double ellipse_angle = this->m_ellipse_angle->getValue(frame);
 
   TPointD center = this->m_center->getValue(frame);
   TPointD render_center(
@@ -253,12 +256,9 @@ void ino_spin_blur::doCompute(TTile &tile, double frame,
   bool refer_sw = false;
   if (this->m_refer.isConnected()) {
     refer_sw = true;
-    this->m_refer->allocateAndCompute(
-        refer_tile, bBox.getP00(),
-        TDimensionI(/* Pixel単位で四捨五入 */
-                    static_cast<int>(bBox.getLx() + 0.5),
-                    static_cast<int>(bBox.getLy() + 0.5)),
-        tile.getRaster(), frame, ri);
+    this->m_refer->allocateAndCompute(refer_tile, tile.m_pos,
+                                      tile.getRaster()->getSize(),
+                                      tile.getRaster(), frame, ri);
   }
   /* ------ 保存すべき画像メモリを塗りつぶしクリア ---------- */
   tile.getRaster()->clear(); /* 塗りつぶしクリア */
@@ -295,17 +295,9 @@ void ino_spin_blur::doCompute(TTile &tile, double frame,
     if (refer_tile.getRaster() != nullptr) {
       refer_tile.getRaster()->lock();
     }
-    fx_(enlarge_tile.getRaster(), margin
-
-        ,
-        refer_tile.getRaster(), refer_mode
-
-        ,
-        tile.getRaster()
-
-            ,
-        render_center.x, render_center.y, type, blur, radius, alpha_rend_sw,
-        anti_alias_sw);
+    fx_(enlarge_tile.getRaster(), margin, refer_tile.getRaster(), refer_mode,
+        tile.getRaster(), render_center, type, blur, radius, alpha_rend_sw,
+        anti_alias_sw, ellipse_aspect_ratio, ellipse_angle);
     if (refer_tile.getRaster() != nullptr) {
       refer_tile.getRaster()->unlock();
     }

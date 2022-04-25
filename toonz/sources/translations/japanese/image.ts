@@ -19,150 +19,150 @@
     <message>
         <location filename="../../image/exr/tiio_exr.cpp" line="227"/>
         <source>Bits Per Pixel</source>
-        <translation type="unfinished">色深度</translation>
+        <translation>色深度</translation>
     </message>
     <message>
         <location filename="../../image/exr/tiio_exr.cpp" line="228"/>
         <source>48(RGB Half Float)</source>
-        <translation type="unfinished"></translation>
+        <translation>48ビット (RGB ハーフ浮動小数)</translation>
     </message>
     <message>
         <location filename="../../image/exr/tiio_exr.cpp" line="229"/>
         <source>64(RGBA Half Float)</source>
-        <translation type="unfinished"></translation>
+        <translation>64ビット (RGBA ハーフ浮動小数)</translation>
     </message>
     <message>
         <location filename="../../image/exr/tiio_exr.cpp" line="231"/>
         <source>Compression Type</source>
-        <translation type="unfinished">圧縮方式</translation>
+        <translation>圧縮方式</translation>
     </message>
     <message>
         <location filename="../../image/exr/tiio_exr.cpp" line="233"/>
         <source>No compression</source>
-        <translation type="unfinished"></translation>
+        <translation>圧縮なし</translation>
     </message>
     <message>
         <location filename="../../image/exr/tiio_exr.cpp" line="236"/>
         <source>Run Length Encoding (RLE)</source>
-        <translation type="unfinished"></translation>
+        <translation>Run-Length エンコーディング (RLE)</translation>
     </message>
     <message>
         <location filename="../../image/exr/tiio_exr.cpp" line="239"/>
         <source>ZIP compression per Scanline (ZIPS)</source>
-        <translation type="unfinished"></translation>
+        <translation>Zip圧縮 スキャンライン毎 (ZIPS)</translation>
     </message>
     <message>
         <location filename="../../image/exr/tiio_exr.cpp" line="242"/>
         <source>ZIP compression per scanline band (ZIP)</source>
-        <translation type="unfinished"></translation>
+        <translation>Zip圧縮 スキャンライン バンド毎 (ZIP)</translation>
     </message>
     <message>
         <location filename="../../image/exr/tiio_exr.cpp" line="245"/>
         <source>PIZ-based wavelet compression (PIZ)</source>
-        <translation type="unfinished"></translation>
+        <translation>PIZベース ウェーブレット圧縮 (PIZ)</translation>
     </message>
     <message>
         <location filename="../../image/exr/tiio_exr.cpp" line="247"/>
         <source>Storage Type</source>
-        <translation type="unfinished"></translation>
+        <translation>ストレージ タイプ</translation>
     </message>
     <message>
         <location filename="../../image/exr/tiio_exr.cpp" line="248"/>
         <source>Scan-line based</source>
-        <translation type="unfinished"></translation>
+        <translation>イメージをスキャンラインとして保管</translation>
     </message>
     <message>
         <location filename="../../image/exr/tiio_exr.cpp" line="249"/>
         <source>Tile based</source>
-        <translation type="unfinished"></translation>
+        <translation>イメージをタイルとして保管</translation>
     </message>
 </context>
 <context>
     <name>GifWriterProperties</name>
     <message>
-        <location filename="../../image/ffmpeg/tiio_gif.cpp" line="307"/>
-        <source>Global Palette</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../image/ffmpeg/tiio_gif.cpp" line="308"/>
-        <source>Global Palette + Sierra Dither</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../image/ffmpeg/tiio_gif.cpp" line="309"/>
-        <source>Global Palette + Bayer2 Dither</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../../image/ffmpeg/tiio_gif.cpp" line="310"/>
-        <source>Global Palette + Bayer1 Dither</source>
-        <translation type="unfinished"></translation>
+        <source>Global Palette</source>
+        <translation>グローバルパレット</translation>
     </message>
     <message>
         <location filename="../../image/ffmpeg/tiio_gif.cpp" line="311"/>
-        <source>Diff Palette</source>
-        <translation type="unfinished"></translation>
+        <source>Global Palette + Sierra Dither</source>
+        <translation>グローバルパレット + Sierraディザリング</translation>
     </message>
     <message>
         <location filename="../../image/ffmpeg/tiio_gif.cpp" line="312"/>
-        <source>Diff Palette + Sierra Dither</source>
-        <translation type="unfinished"></translation>
+        <source>Global Palette + Bayer2 Dither</source>
+        <translation>グローバルパレット + Bayerディザリング(スケール2)</translation>
     </message>
     <message>
         <location filename="../../image/ffmpeg/tiio_gif.cpp" line="313"/>
-        <source>Diff Palette + Bayer2 Dither</source>
-        <translation type="unfinished"></translation>
+        <source>Global Palette + Bayer1 Dither</source>
+        <translation>グローバルパレット + Bayerディザリング(スケール1)</translation>
     </message>
     <message>
         <location filename="../../image/ffmpeg/tiio_gif.cpp" line="314"/>
-        <source>Diff Palette + Bayer1 Dither</source>
-        <translation type="unfinished"></translation>
+        <source>Diff Palette</source>
+        <translation>フレーム差分から計算</translation>
     </message>
     <message>
         <location filename="../../image/ffmpeg/tiio_gif.cpp" line="315"/>
-        <source>New Pal Per Frame</source>
-        <translation type="unfinished"></translation>
+        <source>Diff Palette + Sierra Dither</source>
+        <translation>フレーム差分から計算 + Sierraディザリング</translation>
     </message>
     <message>
         <location filename="../../image/ffmpeg/tiio_gif.cpp" line="316"/>
-        <source>New Pal Per Frame + Sierra Dither</source>
-        <translation type="unfinished"></translation>
+        <source>Diff Palette + Bayer2 Dither</source>
+        <translation>フレーム差分から計算 + Bayerディザリング(スケール2)</translation>
     </message>
     <message>
         <location filename="../../image/ffmpeg/tiio_gif.cpp" line="317"/>
-        <source>New Pal Per Frame + Bayer2 Dither</source>
-        <translation type="unfinished"></translation>
+        <source>Diff Palette + Bayer1 Dither</source>
+        <translation>フレーム差分から計算 + Bayerディザリング(スケール1)</translation>
     </message>
     <message>
         <location filename="../../image/ffmpeg/tiio_gif.cpp" line="318"/>
-        <source>New Pal Per Frame + Bayer1 Dither</source>
-        <translation type="unfinished"></translation>
+        <source>New Pal Per Frame</source>
+        <translation>毎フレームパレットを作成</translation>
     </message>
     <message>
         <location filename="../../image/ffmpeg/tiio_gif.cpp" line="319"/>
-        <source>Opaque, Dither, 256 Colors Only</source>
-        <translation type="unfinished"></translation>
+        <source>New Pal Per Frame + Sierra Dither</source>
+        <translation>毎フレーム作成 + Sierraディザリング</translation>
     </message>
     <message>
-        <location filename="../../image/ffmpeg/tiio_gif.cpp" line="328"/>
+        <location filename="../../image/ffmpeg/tiio_gif.cpp" line="320"/>
+        <source>New Pal Per Frame + Bayer2 Dither</source>
+        <translation>毎フレーム作成 + Bayerディザリング(スケール2)</translation>
+    </message>
+    <message>
+        <location filename="../../image/ffmpeg/tiio_gif.cpp" line="321"/>
+        <source>New Pal Per Frame + Bayer1 Dither</source>
+        <translation>毎フレーム作成 + Bayerディザリング(スケール1)</translation>
+    </message>
+    <message>
+        <location filename="../../image/ffmpeg/tiio_gif.cpp" line="322"/>
+        <source>Opaque, Dither, 256 Colors Only</source>
+        <translation>パレット最適化なし</translation>
+    </message>
+    <message>
+        <location filename="../../image/ffmpeg/tiio_gif.cpp" line="335"/>
         <source>Scale</source>
         <translation>スケール(%)</translation>
     </message>
     <message>
-        <location filename="../../image/ffmpeg/tiio_gif.cpp" line="329"/>
+        <location filename="../../image/ffmpeg/tiio_gif.cpp" line="336"/>
         <source>Looping</source>
         <translation>繰り返し再生</translation>
     </message>
     <message>
-        <location filename="../../image/ffmpeg/tiio_gif.cpp" line="330"/>
+        <location filename="../../image/ffmpeg/tiio_gif.cpp" line="337"/>
         <source>Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>パレット最適化</translation>
     </message>
     <message>
-        <location filename="../../image/ffmpeg/tiio_gif.cpp" line="331"/>
+        <location filename="../../image/ffmpeg/tiio_gif.cpp" line="338"/>
         <source>Max Colors</source>
-        <translation type="unfinished"></translation>
+        <translation>最大色数</translation>
     </message>
     <message>
         <source>Generate Palette</source>
@@ -195,7 +195,7 @@
     <message>
         <location filename="../../image/ffmpeg/tiio_ffmpeg.cpp" line="213"/>
         <source>FFmpeg returned error-code: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>FFmpeg処理はエラーコード %1 で終了しました</translation>
     </message>
     <message>
         <location filename="../../image/ffmpeg/tiio_ffmpeg.cpp" line="217"/>

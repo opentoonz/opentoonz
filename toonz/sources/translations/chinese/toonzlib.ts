@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="zh_CN" sourcelanguage="en">
+<TS version="2.1" language="zh_CN" sourcelanguage="en_US">
 <context>
     <name>CenterlineVectorizer</name>
     <message>
@@ -576,7 +576,7 @@
     </message>
     <message>
         <source>Toggle Autopaint Option  Palette : %1  Style#%2</source>
-        <translation>开关自动填充选项  调色板: %1  样式#%2</translation>
+        <translation>启用/停止自动填充选项  调色板: %1  样式#%2</translation>
     </message>
     <message>
         <source>Can&apos;t undo rename palette</source>
@@ -622,39 +622,39 @@
     </message>
     <message>
         <source>Orange</source>
-        <translation type="unfinished"></translation>
+        <translation>橙色</translation>
     </message>
     <message>
         <source>Yellow</source>
-        <translation type="unfinished"></translation>
+        <translation>黄色</translation>
     </message>
     <message>
         <source>Light Green</source>
-        <translation type="unfinished"></translation>
+        <translation>浅绿色</translation>
     </message>
     <message>
         <source>Light Blue</source>
-        <translation type="unfinished"></translation>
+        <translation>浅蓝色</translation>
     </message>
     <message>
         <source>Dark Blue</source>
-        <translation type="unfinished"></translation>
+        <translation>深蓝色</translation>
     </message>
     <message>
         <source>Purple</source>
-        <translation type="unfinished"></translation>
+        <translation>紫色</translation>
     </message>
     <message>
         <source>Pink</source>
-        <translation type="unfinished"></translation>
+        <translation>粉色</translation>
     </message>
     <message>
         <source>Dark Pink</source>
-        <translation type="unfinished"></translation>
+        <translation>深粉色</translation>
     </message>
     <message>
         <source>White</source>
-        <translation type="unfinished"></translation>
+        <translation>白色</translation>
     </message>
 </context>
 <context>

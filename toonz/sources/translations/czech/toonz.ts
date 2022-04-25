@@ -9343,6 +9343,10 @@ but a random crash might occur, use at your own risk.</source>
         <source>Number of seconds to wait for Rhubarb to complete processing the audio:</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Show Column Parent&apos;s Color in the Xsheet</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>PreferencesPopup:: FormatProperties</name>
@@ -15797,6 +15801,13 @@ Podrobnosti najdete v uživatelské příručce.</translation>
     <message>
         <source>None</source>
         <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>XsheetGUI::ChangeObjectParent</name>
+    <message>
+        <source>Table</source>
+        <translation>Tabulka</translation>
     </message>
 </context>
 <context>

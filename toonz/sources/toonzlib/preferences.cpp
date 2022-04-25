@@ -578,6 +578,10 @@ void Preferences::definePreferenceItems() {
   define(showXSheetToolbar, "showXSheetToolbar", QMetaType::Bool, true);
   define(expandFunctionHeader, "expandFunctionHeader", QMetaType::Bool, false);
   define(showColumnNumbers, "showColumnNumbers", QMetaType::Bool, false);
+  define(parentColorsInXsheetColumn, "parentColorsInXsheetColumn",
+         QMetaType::Bool, false);
+  define(highlightLineEverySecond, "highlightLineEverySecond", QMetaType::Bool,
+         false);
   define(syncLevelRenumberWithXsheet, "syncLevelRenumberWithXsheet",
          QMetaType::Bool, true);
   define(currentTimelineEnabled, "currentTimelineEnabled", QMetaType::Bool,

@@ -971,7 +971,7 @@ void ImageViewer::pickColor(QMouseEvent *event, bool putValueToStyleEditor) {
     return;
   }
 
-  StylePicker picker(img);
+  StylePicker picker(this, img);
 
   TPointD pos =
       getViewAff().inv() * TPointD(curPos.x() - (qreal)(width()) / 2,
@@ -1040,7 +1040,7 @@ void ImageViewer::rectPickColor(bool putValueToStyleEditor) {
     return;
   }
 
-  StylePicker picker(img);
+  StylePicker picker(this, img);
 
   if (!img->raster()) {  // vector image
     TPointD pressedWinPos = convert(m_pressedMousePos) + m_winPosMousePosOffset;

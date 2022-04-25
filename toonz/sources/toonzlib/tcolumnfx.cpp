@@ -1042,6 +1042,10 @@ void TLevelColumnFx::doCompute(TTile &tile, double frame,
       TVectorRenderData rd(TVectorRenderData::ProductionSettings(), aff,
                            TRect(size), vpalette);
 
+      // obtain jaggy image when the Closest Pixel is set
+      if (info.m_quality == TRenderSettings::ClosestPixel_FilterResampleQuality)
+        rd.m_antiAliasing = false;
+
       if (!m_offlineContext || m_offlineContext->getLx() < size.lx ||
           m_offlineContext->getLy() < size.ly) {
         if (m_offlineContext) delete m_offlineContext;

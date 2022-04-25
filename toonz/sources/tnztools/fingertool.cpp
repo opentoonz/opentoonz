@@ -561,7 +561,7 @@ void FingerTool::pick(const TPointD &pos) {
 
   int subsampling = level->getImageSubsampling(getCurrentFid());
 
-  StylePicker picker(image);
+  StylePicker picker(getViewer()->viewerWidget(), image);
 
   int styleId =
       picker.pickStyleId(TScale(1.0 / subsampling) * pos + TPointD(-0.5, -0.5),

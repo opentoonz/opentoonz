@@ -324,7 +324,7 @@ void Iwa_FractalNoiseFx::doCompute(TTile &tile, double frame,
               // line of sight
               TPointD _p = TTranslation(tile.m_pos) * TPointD(x, y);
               // offset by combination of offsets of A) projection position and
-              // B) eye positon.
+              // B) eye position.
               //
               // A) 0.5 * projection position offset
               QVector3D p(_p.x - center.x * 0.5, _p.y - center.y * 0.5, 0.0);

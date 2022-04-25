@@ -135,7 +135,7 @@ from which it's created. It has no reference to the object.
 
   //----------------------------------------------------------------------------
 
-  //! Applies a transformation (echo, reverb, ect) to the object and returns the
+  //! Applies a transformation (echo, reverb, etc) to the object and returns the
   //! transformed soundtrack
   TSoundTrackP apply(TSoundTransform *transform) override;
   //----------------------------------------------------------------------------

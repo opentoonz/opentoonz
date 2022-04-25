@@ -999,7 +999,7 @@ void SquaredColorWheel::setChannel(int channel) {
 //    ColorSlider  implementation
 //*****************************************************************************
 
-// Adquire size later...
+// Acquire size later...
 int ColorSlider::s_chandle_size      = -1;
 int ColorSlider::s_chandle_tall      = -1;
 int ColorSlider::s_slider_appearance = -1;

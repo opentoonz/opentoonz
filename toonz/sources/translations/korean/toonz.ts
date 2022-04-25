@@ -142,98 +142,98 @@ Please select a different device or check the microphone.</source>
     </message>
     <message>
         <source>Sync with XSheet/Timeline</source>
-        <translation type="unfinished"></translation>
+        <translation>X시트/타임라인과 동기화</translation>
     </message>
     <message>
         <source>Device: </source>
-        <translation type="unfinished"></translation>
+        <translation>장치:</translation>
     </message>
     <message>
         <source>Sample rate: </source>
-        <translation type="unfinished"></translation>
+        <translation>샘플 비율:</translation>
     </message>
     <message>
         <source>Sample format: </source>
-        <translation type="unfinished"></translation>
+        <translation>샘플 포맷:</translation>
     </message>
     <message>
         <source>8000 Hz</source>
-        <translation type="unfinished"></translation>
+        <translation>8000 Hz</translation>
     </message>
     <message>
         <source>11025 Hz</source>
-        <translation type="unfinished"></translation>
+        <translation>11025 Hz</translation>
     </message>
     <message>
         <source>22050 Hz</source>
-        <translation type="unfinished"></translation>
+        <translation>22050 Hz</translation>
     </message>
     <message>
         <source>44100 Hz</source>
-        <translation type="unfinished"></translation>
+        <translation>44100 Hz</translation>
     </message>
     <message>
         <source>48000 Hz</source>
-        <translation type="unfinished"></translation>
+        <translation>48000 Hz</translation>
     </message>
     <message>
         <source>96000 Hz</source>
-        <translation type="unfinished"></translation>
+        <translation>96000 Hz</translation>
     </message>
     <message>
         <source>Mono 8-Bits</source>
-        <translation type="unfinished"></translation>
+        <translation>모노 8-비트</translation>
     </message>
     <message>
         <source>Stereo 8-Bits</source>
-        <translation type="unfinished"></translation>
+        <translation>스트레오 8-비트</translation>
     </message>
     <message>
         <source>Mono 16-Bits</source>
-        <translation type="unfinished"></translation>
+        <translation>모노 16-비트</translation>
     </message>
     <message>
         <source>Stereo 16-Bits</source>
-        <translation type="unfinished"></translation>
+        <translation>스트레오 16-비트</translation>
     </message>
     <message>
         <source>Audio input device to record</source>
-        <translation type="unfinished"></translation>
+        <translation>녹음할 음성입력장치</translation>
     </message>
     <message>
         <source>Number of samples per second, 44.1KHz = CD Quality</source>
-        <translation type="unfinished"></translation>
+        <translation>초당 샘플 수, 44. 1KHz = CD 품질</translation>
     </message>
     <message>
         <source>Number of channels and bits per sample, 16-bits recommended</source>
-        <translation type="unfinished"></translation>
+        <translation>샘플당 채널 및 비트 수, 16-비트 권장</translation>
     </message>
     <message>
         <source>Play animation from current frame while recording/playback</source>
-        <translation type="unfinished"></translation>
+        <translation>녹화/재생 중 현재 프레임에서 애니메이션 재생</translation>
     </message>
     <message>
         <source>Save recording and insert into new column</source>
-        <translation type="unfinished"></translation>
+        <translation>녹음을 저장하고 새 열에 삽입</translation>
     </message>
     <message>
         <source>Refresh list of connected audio input devices</source>
-        <translation type="unfinished"></translation>
+        <translation>연결된 오디오 입력 장치 목록 새로고침</translation>
     </message>
     <message>
         <source>Record failed: 
 Make sure there&apos;s XSheet or Timeline in the room.</source>
-        <translation type="unfinished"></translation>
+        <translation>기록실패: 방에 X시트 또는 타임라인이 있는지 확인하세요.</translation>
     </message>
     <message>
         <source>Failed to save WAV file:
 Make sure you have write permissions in folder.</source>
-        <translation type="unfinished"></translation>
+        <translation>WAV 파일저장 실패: 폴더에 쓰기 권한이 있는지 확인하십시오.</translation>
     </message>
     <message>
         <source>Audio format unsupported:
 Nearest format will be internally used.</source>
-        <translation type="unfinished"></translation>
+        <translation>지원되지 않는 오디오 형식: 가장 가까운 포맷은 내부적으로 사용됩니다.</translation>
     </message>
 </context>
 <context>
@@ -318,134 +318,134 @@ pick up all frames in the selected level.</source>
     <name>AutoLipSyncPopup</name>
     <message>
         <source>Auto Lip Sync</source>
-        <translation type="unfinished"></translation>
+        <translation>자동 립싱크</translation>
     </message>
     <message>
         <source>Apply</source>
-        <translation type="unfinished">적용</translation>
+        <translation>적용</translation>
     </message>
     <message>
         <source>A I Drawing</source>
-        <translation type="unfinished">A I 드로잉</translation>
+        <translation>A I 드로잉</translation>
     </message>
     <message>
         <source>O Drawing</source>
-        <translation type="unfinished">O 드로잉</translation>
+        <translation>O 드로잉</translation>
     </message>
     <message>
         <source>E Drawing</source>
-        <translation type="unfinished">E 드로잉</translation>
+        <translation>E 드로잉</translation>
     </message>
     <message>
         <source>U Drawing</source>
-        <translation type="unfinished">U 드로잉</translation>
+        <translation>U 드로잉</translation>
     </message>
     <message>
         <source>L Drawing</source>
-        <translation type="unfinished">L 드로잉</translation>
+        <translation>L 드로잉</translation>
     </message>
     <message>
         <source>W Q Drawing</source>
-        <translation type="unfinished">W Q 드로잉</translation>
+        <translation>W Q 드로잉</translation>
     </message>
     <message>
         <source>M B P Drawing</source>
-        <translation type="unfinished">M B P D 드로잉</translation>
+        <translation>M B P D 드로잉</translation>
     </message>
     <message>
         <source>F V Drawing</source>
-        <translation type="unfinished">F V 드로잉</translation>
+        <translation>F V 드로잉</translation>
     </message>
     <message>
         <source>Rest Drawing</source>
-        <translation type="unfinished">나머지 그림</translation>
+        <translation>나머지 그림</translation>
     </message>
     <message>
         <source>C D G K N R S Th Y Z</source>
-        <translation type="unfinished"></translation>
+        <translation> C D G K N R S Th Y Z</translation>
     </message>
     <message>
         <source>Extend Rest Drawing to End Marker</source>
-        <translation type="unfinished">나머지 그림을 끝까지 확장하여 표시</translation>
+        <translation>나머지 그림을 끝까지 확장하여 표시</translation>
     </message>
     <message>
         <source>Audio Source: </source>
-        <translation type="unfinished"></translation>
+        <translation>오디오 소스:</translation>
     </message>
     <message>
         <source>Audio Script (Optional, Improves accuracy): </source>
-        <translation type="unfinished"></translation>
+        <translation>오디오 스크립트(옵션, 정확도 향상):</translation>
     </message>
     <message>
         <source>A script significantly increases the accuracy of the lip sync.</source>
-        <translation type="unfinished"></translation>
+        <translation>스크립트는 립싱크의 정확도를 크게 높입니다.</translation>
     </message>
     <message>
         <source>Previous Drawing</source>
-        <translation type="unfinished">이전 그림</translation>
+        <translation>이전 그림</translation>
     </message>
     <message>
         <source>Next Drawing</source>
-        <translation type="unfinished">다음 그림</translation>
+        <translation>다음 그림</translation>
     </message>
     <message>
         <source>Insert at Frame: </source>
-        <translation type="unfinished">프레임 삽입:</translation>
+        <translation>프레임 삽입:</translation>
     </message>
     <message>
         <source>Thumbnails are not available for sub-Xsheets.
 Please use the frame numbers for reference.</source>
-        <translation type="unfinished">아래 X-시트에는 축소판을 사용할 수 없음.
+        <translation>아래 X-시트에는 축소판을 사용할 수 없음.
 참고할 프레임 번호를 사용하세요.</translation>
     </message>
     <message>
         <source>Unable to apply lip sync data to this column type</source>
-        <translation type="unfinished">이 열 유형에 립싱크 데이터를 적용할 수 없음.</translation>
+        <translation>이 열 유형에 립싱크 데이터를 적용할 수 없음.</translation>
     </message>
     <message>
         <source>Rhubarb not found, please set the location in Preferences.</source>
-        <translation type="unfinished"></translation>
+        <translation>루버브를 찾을 수가 없습니다. 환경설정에서 위치를 지정하십시오.</translation>
     </message>
     <message>
         <source>Choose File...</source>
-        <translation type="unfinished"></translation>
+        <translation>파일 선택...</translation>
     </message>
     <message>
         <source>Please choose an audio file and try again.</source>
-        <translation type="unfinished"></translation>
+        <translation>오디오 파일을 선택하고 다시 시도하십시오.</translation>
     </message>
     <message>
         <source>Rhubarb Processing Error:
 
 </source>
-        <translation type="unfinished"></translation>
+        <translation>루버브 처리오류.</translation>
     </message>
     <message>
         <source>Please choose a lip sync data file to continue.</source>
-        <translation type="unfinished"></translation>
+        <translation>계속하려면 립싱크 데이터 파일을 선택하십시오.</translation>
     </message>
     <message>
         <source>Cannot find the file specified. 
 Please choose a valid lip sync data file to continue.</source>
-        <translation type="unfinished"></translation>
+        <translation>지정된 파일을 찾을 수 없습니다. 계속하려면 유효한 립싱크 데이터 파일을 선택하십시오.</translation>
     </message>
     <message>
         <source>Unable to open the file: 
 </source>
-        <translation type="unfinished">파일을 열수가 없음:</translation>
+        <translation>파일을 열수가 없음:</translation>
     </message>
     <message>
         <source>Invalid data file.
  Please choose a valid lip sync data file to continue.</source>
-        <translation type="unfinished"></translation>
+        <translation>잘못된 데이터 파일입니다. 계속하려면 유효한 립싱크 데이터 파일을 선택하십시오.</translation>
     </message>
     <message>
         <source>SubXSheet Frame </source>
-        <translation type="unfinished">서브 X-시트 프레임</translation>
+        <translation>서브 X-시트 프레임</translation>
     </message>
     <message>
         <source>Drawing: </source>
-        <translation type="unfinished">그리기:</translation>
+        <translation>그리기:</translation>
     </message>
 </context>
 <context>
@@ -944,7 +944,7 @@ Do you want to crop the canvas?</source>
     <name>CellMarksPopup</name>
     <message>
         <source>Cell Marks Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>셀 마크 설정</translation>
     </message>
 </context>
 <context>
@@ -1245,7 +1245,7 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Format:</source>
-        <translation type="unfinished">포맷:</translation>
+        <translation>포맷:</translation>
     </message>
 </context>
 <context>
@@ -2040,7 +2040,7 @@ DPI 정보를 포함하면 현재 카메라 DPI가 적용됩니다. </translatio
     <name>ExportCalibrationFilePopup</name>
     <message>
         <source>Export Camera Calibration Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>카메라 보정 설정 내보내기</translation>
     </message>
 </context>
 <context>
@@ -2234,222 +2234,222 @@ DPI 정보를 포함하면 현재 카메라 DPI가 적용됩니다. </translatio
     <name>ExportXDTSCommand</name>
     <message>
         <source>None</source>
-        <translation type="unfinished">없음</translation>
+        <translation>없음</translation>
     </message>
     <message>
         <source>All columns</source>
-        <translation type="unfinished"></translation>
+        <translation>모든 열</translation>
     </message>
     <message>
         <source>Only active columns</source>
-        <translation type="unfinished"></translation>
+        <translation>활성 열만</translation>
     </message>
     <message>
         <source>Inbetween symbol mark</source>
-        <translation type="unfinished"></translation>
+        <translation>심볼 마크</translation>
     </message>
     <message>
         <source>Reverse sheet symbol mark</source>
-        <translation type="unfinished"></translation>
+        <translation>리버스 시트 심볼 마크</translation>
     </message>
     <message>
         <source>Target column</source>
-        <translation type="unfinished"></translation>
+        <translation>대상 열</translation>
     </message>
 </context>
 <context>
     <name>ExportXsheetPdfPopup</name>
     <message>
         <source>Export Xsheet PDF</source>
-        <translation type="unfinished"></translation>
+        <translation>X시트 PDF 내보기</translation>
     </message>
     <message>
         <source>Print Export DateTime</source>
-        <translation type="unfinished"></translation>
+        <translation>인쇄 내보내기 날짜시간</translation>
     </message>
     <message>
         <source>Print Scene Path</source>
-        <translation type="unfinished"></translation>
+        <translation>장면 겅로 인쇄</translation>
     </message>
     <message>
         <source>Print Soundtrack</source>
-        <translation type="unfinished"></translation>
+        <translation>사운드트랙 인쇄</translation>
     </message>
     <message>
         <source>Print Scene Name</source>
-        <translation type="unfinished"></translation>
+        <translation>장면 이름 인쇄</translation>
     </message>
     <message>
         <source>Put Serial Frame Numbers Over Pages</source>
-        <translation type="unfinished"></translation>
+        <translation>페이지에 일련 번호를 넣으십시오</translation>
     </message>
     <message>
         <source>Print Level Names On The Bottom</source>
-        <translation type="unfinished"></translation>
+        <translation>하단에 레벨 이름 인쇄</translation>
     </message>
     <message>
         <source>Print Dialogue</source>
-        <translation type="unfinished"></translation>
+        <translation>대화 인쇄</translation>
     </message>
     <message>
         <source>Text</source>
-        <translation type="unfinished">텍스트</translation>
+        <translation>텍스트</translation>
     </message>
     <message>
         <source>Image</source>
-        <translation type="unfinished">이미지</translation>
+        <translation>이미지</translation>
     </message>
     <message>
         <source>&lt; Prev</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt; 이전</translation>
     </message>
     <message>
         <source>Next &gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>다음 &gt;</translation>
     </message>
     <message>
         <source>Export PDF</source>
-        <translation type="unfinished"></translation>
+        <translation>PDF 내보내기</translation>
     </message>
     <message>
         <source>Export PNG</source>
-        <translation type="unfinished"></translation>
+        <translation>PNG 내보내기</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">취소</translation>
+        <translation>취소</translation>
     </message>
     <message>
         <source>ACTIONS</source>
-        <translation type="unfinished"></translation>
+        <translation>작업</translation>
     </message>
     <message>
         <source>CELLS</source>
-        <translation type="unfinished"></translation>
+        <translation>셀</translation>
     </message>
     <message>
         <source>Always</source>
-        <translation type="unfinished"></translation>
+        <translation>항상</translation>
     </message>
     <message>
         <source>More Than 3 Continuous Cells</source>
-        <translation type="unfinished"></translation>
+        <translation>3개 이상의 연속 셀</translation>
     </message>
     <message>
         <source>None</source>
-        <translation type="unfinished">없음</translation>
+        <translation>없음</translation>
     </message>
     <message>
         <source>Template Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>템플릿 설정</translation>
     </message>
     <message>
         <source>Template:</source>
-        <translation type="unfinished"></translation>
+        <translation>템플렛:</translation>
     </message>
     <message>
         <source>Line color:</source>
-        <translation type="unfinished"></translation>
+        <translation>라인 컬러</translation>
     </message>
     <message>
         <source>Template font:</source>
-        <translation type="unfinished"></translation>
+        <translation>템플릿 글꼴:</translation>
     </message>
     <message>
         <source>Logo:</source>
-        <translation type="unfinished"></translation>
+        <translation>로고:</translation>
     </message>
     <message>
         <source>Export Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>내보내기 설정</translation>
     </message>
     <message>
         <source>Output area:</source>
-        <translation type="unfinished"></translation>
+        <translation>출력 영역:</translation>
     </message>
     <message>
         <source>Output font:</source>
-        <translation type="unfinished"></translation>
+        <translation>출력 글꼴:</translation>
     </message>
     <message>
         <source>Continuous line:</source>
-        <translation type="unfinished"></translation>
+        <translation>연속 라인:</translation>
     </message>
     <message>
         <source>Inbetween mark:</source>
-        <translation type="unfinished"></translation>
+        <translation>마크 사이</translation>
     </message>
     <message>
         <source>Reverse sheet mark:</source>
-        <translation type="unfinished"></translation>
+        <translation>리버스 시트 마크</translation>
     </message>
     <message>
         <source>Keyframe mark:</source>
-        <translation type="unfinished"></translation>
+        <translation>키 프레임 마크:</translation>
     </message>
     <message>
         <source>Memo:</source>
-        <translation type="unfinished"></translation>
+        <translation>메모:</translation>
     </message>
     <message>
         <source>Save in:</source>
-        <translation type="unfinished">저장:</translation>
+        <translation>저장:</translation>
     </message>
     <message>
         <source>Name:</source>
-        <translation type="unfinished">이름:</translation>
+        <translation>이름:</translation>
     </message>
     <message>
         <source>B4 size, 3 seconds sheet</source>
-        <translation type="unfinished"></translation>
+        <translation>B4 사이즈, 3초 시트</translation>
     </message>
     <message>
         <source>B4 size, 6 seconds sheet</source>
-        <translation type="unfinished"></translation>
+        <translation>B4 사이즈, 6초 시트</translation>
     </message>
     <message>
         <source>A3 size, 3 seconds sheet</source>
-        <translation type="unfinished"></translation>
+        <translation>A3 사이즈, 3초 시트</translation>
     </message>
     <message>
         <source>A3 size, 6 seconds sheet</source>
-        <translation type="unfinished"></translation>
+        <translation>A3 사이즈, 6초 시트</translation>
     </message>
     <message>
         <source>Col%1</source>
-        <translation type="unfinished"></translation>
+        <translation>Col%1</translation>
     </message>
     <message>
         <source>The preset file %1 is not valid.</source>
-        <translation type="unfinished"></translation>
+        <translation>사전 설정된 파일 %1이 잘못되었습니다.</translation>
     </message>
     <message numerus="yes">
         <source>%n page(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n 페이지</numerusform>
         </translation>
     </message>
     <message>
         <source>%1 x %2 pages</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 x %2 페이지</translation>
     </message>
     <message>
         <source>Please specify the file name.</source>
-        <translation type="unfinished"></translation>
+        <translation>파일 이름을 지정하십시오.</translation>
     </message>
     <message>
         <source>The file %1 already exists.
 Do you want to overwrite it?</source>
-        <translation type="unfinished">파일이 %1 이미있음 덮어 쓰시겠습니까?</translation>
+        <translation>파일이 %1 이미있음 덮어 쓰시겠습니까?</translation>
     </message>
     <message>
         <source>A folder %1 does not exist.
 Do you want to create it?</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 폴더가 존재하지 않습니다. 생성하시겠습니까?</translation>
     </message>
     <message>
         <source>Failed to create folder %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>폴더 %1을 만들지 못했습니다.</translation>
     </message>
 </context>
 <context>
@@ -2904,31 +2904,31 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>. (period)</source>
-        <translation type="unfinished"></translation>
+        <translation>. (기간)</translation>
     </message>
     <message>
         <source>_ (underscore)</source>
-        <translation type="unfinished"></translation>
+        <translation>_(밑줄)</translation>
     </message>
     <message>
         <source>No padding</source>
-        <translation type="unfinished"></translation>
+        <translation>패딩 없음</translation>
     </message>
     <message>
         <source>Frame Number Format</source>
-        <translation type="unfinished"></translation>
+        <translation>프레임 번호 포맷</translation>
     </message>
     <message>
         <source>Separate Character:</source>
-        <translation type="unfinished"></translation>
+        <translation>별도의 문자:</translation>
     </message>
     <message>
         <source>Padding:</source>
-        <translation type="unfinished"></translation>
+        <translation>패딩:</translation>
     </message>
     <message>
         <source>Close</source>
-        <translation type="unfinished">닫기</translation>
+        <translation>닫기</translation>
     </message>
 </context>
 <context>
@@ -3199,11 +3199,11 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Zoom in/out of xsheet</source>
-        <translation type="unfinished"></translation>
+        <translation>엑스시트 확대/축소</translation>
     </message>
     <message>
         <source>%1 frames per page</source>
-        <translation type="unfinished"></translation>
+        <translation>페이지당 %1 프레임</translation>
     </message>
 </context>
 <context>
@@ -3327,11 +3327,11 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>Format:</source>
-        <translation type="unfinished">포맷:</translation>
+        <translation>포맷:</translation>
     </message>
     <message>
         <source>Frame Format</source>
-        <translation type="unfinished"></translation>
+        <translation>프레임 포맷</translation>
     </message>
 </context>
 <context>
@@ -3707,7 +3707,7 @@ Please use the frame numbers for reference.</source>
     <name>LoadCalibrationFilePopup</name>
     <message>
         <source>Load Camera Calibration Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>카메라 보정 설정 로드</translation>
     </message>
 </context>
 <context>
@@ -6372,27 +6372,27 @@ N.B. Open Toonz 다른 프로세스를 실행하고 있지 않은지 확인하�
     </message>
     <message>
         <source>&amp;Export Xsheet to PDF</source>
-        <translation type="unfinished"></translation>
+        <translation>X시트를 PDF로 내보내기(&amp;)</translation>
     </message>
     <message>
         <source>Export TVPaint JSON File</source>
-        <translation type="unfinished"></translation>
+        <translation>TVPaint JSON 파일 내보내기</translation>
     </message>
     <message>
         <source>&amp;Apply Auto Lip Sync to Column</source>
-        <translation type="unfinished"></translation>
+        <translation>열에 자동 립싱크 적용</translation>
     </message>
     <message>
         <source>Zoom In And Fit Floating Panel</source>
-        <translation type="unfinished"></translation>
+        <translation>확대 및 맞춤 플로팅 패널</translation>
     </message>
     <message>
         <source>Zoom Out And Fit Floating Panel</source>
-        <translation type="unfinished"></translation>
+        <translation>축소 및 맞춤 플로팅 패널</translation>
     </message>
     <message>
         <source>Set Cell Mark </source>
-        <translation type="unfinished"></translation>
+        <translation>셀 마크 설정</translation>
     </message>
 </context>
 <context>
@@ -7359,55 +7359,55 @@ WARNING : Image size mismatch. The size of level with the same path is %1 x %2.<
     </message>
     <message>
         <source>Onion skin</source>
-        <translation type="unfinished">어니언 스킨</translation>
+        <translation>어니언 스킨</translation>
     </message>
     <message>
         <source>Calibration</source>
-        <translation type="unfinished"></translation>
+        <translation>교정</translation>
     </message>
     <message>
         <source>Capture</source>
-        <translation type="unfinished">캡처</translation>
+        <translation>캡처</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">취소</translation>
+        <translation>취소</translation>
     </message>
     <message>
         <source>Start calibration</source>
-        <translation type="unfinished"></translation>
+        <translation>보정 시작</translation>
     </message>
     <message>
         <source>Load</source>
-        <translation type="unfinished">가져오기</translation>
+        <translation>가져오기</translation>
     </message>
     <message>
         <source>Export</source>
-        <translation type="unfinished">내보내기</translation>
+        <translation>내보내기</translation>
     </message>
     <message>
         <source>Open Readme.txt for Camera calibration...</source>
-        <translation type="unfinished"></translation>
+        <translation>리드미 열기.카메라 보정 TXT...</translation>
     </message>
     <message>
         <source>Failed to save calibration settings.</source>
-        <translation type="unfinished"></translation>
+        <translation>보정 설정을 저장하지 못했습니다.</translation>
     </message>
     <message>
         <source>Do you want to restart camera calibration?</source>
-        <translation type="unfinished"></translation>
+        <translation>카메라 보정을 다시 시작하시겠습니까?</translation>
     </message>
     <message>
         <source>Couldn&apos;t load %1</source>
-        <translation type="unfinished">%1을 가져오지 못음.</translation>
+        <translation>%1을 가져오지 못음.</translation>
     </message>
     <message>
         <source>Overwriting the current calibration. Are you sure?</source>
-        <translation type="unfinished"></translation>
+        <translation>현재 보정을 덮어쓰는 중입니다. 괜찮나요?</translation>
     </message>
     <message>
         <source>Couldn&apos;t save %1</source>
-        <translation type="unfinished">%1을 저장할 수 없음.</translation>
+        <translation>%1을 저장할 수 없음.</translation>
     </message>
 </context>
 <context>
@@ -7520,7 +7520,7 @@ Set the output folder path to the subfolder as well.</source>
     </message>
     <message>
         <source>Information</source>
-        <translation type="unfinished"></translation>
+        <translation>정보</translation>
     </message>
 </context>
 <context>
@@ -8550,79 +8550,79 @@ in non alpha-enabled image format.</source>
     </message>
     <message>
         <source>30bit Display*</source>
-        <translation type="unfinished"></translation>
+        <translation>30비트 디스플레이*</translation>
     </message>
     <message>
         <source>Automatically Remove Unused Levels From Scene Cast</source>
-        <translation type="unfinished"></translation>
+        <translation>장면 캐스팅에서 사용되지 않은 레벨 자동 제거</translation>
     </message>
     <message>
         <source>Allow Multi-Thread in FFMPEG Rendering (UNSTABLE)</source>
-        <translation type="unfinished"></translation>
+        <translation>FFMPEG 랜더링에서 멀티 스레드 허용(불안정)</translation>
     </message>
     <message>
         <source>Rhubarb Path:</source>
-        <translation type="unfinished"></translation>
+        <translation>Rhubarb 경로</translation>
     </message>
     <message>
         <source>Rhubarb Timeout:</source>
-        <translation type="unfinished"></translation>
+        <translation>Rhubar 시간초과:</translation>
     </message>
     <message>
         <source>Default Raster / Scan Level Format:</source>
-        <translation type="unfinished"></translation>
+        <translation>기본 래스터/스캔 레벨 형식:</translation>
     </message>
     <message>
         <source>Level Name Display:</source>
-        <translation type="unfinished"></translation>
+        <translation>레벨 이름 표시:</translation>
     </message>
     <message>
         <source>Number of Frames to Play 
 for Short Play:</source>
-        <translation type="unfinished"></translation>
+        <translation>짧은 재싱을 위해 재생할 프레임 수:</translation>
     </message>
     <message>
         <source>Minimum</source>
-        <translation type="unfinished"></translation>
+        <translation>최소값</translation>
     </message>
     <message>
         <source>Display on Each Marker</source>
-        <translation type="unfinished"></translation>
+        <translation>각 마커에 표시</translation>
     </message>
     <message>
         <source>Display on Column Header</source>
-        <translation type="unfinished"></translation>
+        <translation>열 머리글에 표시</translation>
     </message>
     <message>
         <source>Auto Lip-Sync</source>
-        <translation type="unfinished"></translation>
+        <translation>자동 립싱크</translation>
     </message>
     <message>
         <source>Check Availability</source>
-        <translation type="unfinished"></translation>
+        <translation>사용 가능 여부</translation>
     </message>
     <message>
         <source>Enabling multi-thread rendering will render significantly faster 
 but a random crash might occur, use at your own risk.</source>
-        <translation type="unfinished"></translation>
+        <translation>멀티 스레드 렌더링을 활성화하면 훨씬 더 빠르게 렌더링됩니다. 그러나 임의의 충돌이 발생할 수 있으므로 본인이 위험을 무릎쓰고 사용하십시오.</translation>
     </message>
     <message>
         <source>OpenToonz can use Rhubarb for auto lip-syncing.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>오픈툰즈는 자동 립싱크에 Raubarb를 사용할 수 있습니다.</translation>
     </message>
     <message>
         <source>Rhubarb is not bundled with OpenToonz.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Rhubarb은 오픈툰즈와 함께 제공되지 않습니다.</translation>
     </message>
     <message>
         <source>Please provide the path where Rhubarb is located on your computer.</source>
-        <translation type="unfinished"></translation>
+        <translation>컴퓨터에서 Rhubarb가 있는 경로를 입력하십시오.</translation>
     </message>
     <message>
         <source>Number of seconds to wait for Rhubarb to complete processing the audio:</source>
-        <translation type="unfinished"></translation>
+        <translation>Rhubarb가 오디오 처리를 완료할 떄까지 기다리는 시간(초):</translation>
     </message>
 </context>
 <context>
@@ -8648,16 +8648,17 @@ but a random crash might occur, use at your own risk.</source>
     <name>PreferencesPopup::Display30bitChecker</name>
     <message>
         <source>Check 30bit display availability</source>
-        <translation type="unfinished"></translation>
+        <translation>30비트 화면표시 가용성 확인</translation>
     </message>
     <message>
         <source>Close</source>
-        <translation type="unfinished">닫기</translation>
+        <translation>닫기</translation>
     </message>
     <message>
         <source>If the lower gradient looks smooth and has no banding compared to the upper gradient,
 30bit display is available in the current configuration.</source>
-        <translation type="unfinished"></translation>
+        <translation>아래쪽 기울기가 위쪽 기울기에 비해 매끄럽고 밴딩이 없는 경우,
+30비트 디스플레이는 현재 구성에서 사용할 수 있습니다.</translation>
     </message>
 </context>
 <context>
@@ -8795,58 +8796,58 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Standard</source>
-        <translation type="unfinished">표준</translation>
+        <translation>표준</translation>
     </message>
     <message>
         <source>Custom</source>
-        <translation type="unfinished"></translation>
+        <translation>사용자 정의</translation>
     </message>
     <message>
         <source>Accept Non-alphabet Suffix</source>
-        <translation type="unfinished"></translation>
+        <translation>알파벳이 아닌 접미사 허용</translation>
     </message>
     <message>
         <source>In the standard mode files with the following file name are handled as sequential images:
 [LEVEL_NAME][&quot;.&quot;or&quot;_&quot;][FRAME_NUMBER][SUFFIX].[EXTENSION]
 For [SUFFIX] zero or one occurrences of alphabet (a-z, A-Z) can be used in the standard mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>표준 모드에서 파일 이름이 다음과 같은 파일은 순차적 이미지로 처리됩니다. [LEVEL_NAME][&quot;.&quot;or&quot;_&quot;][FRAME_NUMBER][SUFFIX].[EXTENSION] [SUFFIX]의 경우 알파벳(a~z, A~Z)이 0개 또는 1개만 사용할 수 있습니다.</translation>
     </message>
     <message>
         <source>In the custom mode you can customize the file path rules.
 Note that this mode uses regular expression for file name validation and may slow the operation.</source>
-        <translation type="unfinished"></translation>
+        <translation>사용자 정의 모드에서 파일 경로 규칙을 사용자 정의할 수 있습니다.</translation>
     </message>
     <message>
         <source>1</source>
-        <translation type="unfinished"></translation>
+        <translation>1</translation>
     </message>
     <message>
         <source>2</source>
-        <translation type="unfinished"></translation>
+        <translation>2</translation>
     </message>
     <message>
         <source>3</source>
-        <translation type="unfinished"></translation>
+        <translation>3</translation>
     </message>
     <message>
         <source>5</source>
-        <translation type="unfinished"></translation>
+        <translation>5</translation>
     </message>
     <message>
         <source>Unlimited</source>
-        <translation type="unfinished"></translation>
+        <translation>제목없음</translation>
     </message>
     <message>
         <source>Project Folder</source>
-        <translation type="unfinished"></translation>
+        <translation>프로젝트 폴더</translation>
     </message>
     <message>
         <source>Maximum Letter Count For Suffix</source>
-        <translation type="unfinished"></translation>
+        <translation>접미사의 최대 글자 수</translation>
     </message>
     <message>
         <source>File Path Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>파일 경로 규칙</translation>
     </message>
 </context>
 <context>
@@ -11024,143 +11025,147 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>Restart</source>
-        <translation type="unfinished"></translation>
+        <translation>다시시작</translation>
     </message>
     <message>
         <source>+</source>
         <comment>XSheetPDF</comment>
-        <translation type="unfinished"></translation>
+        <translation>+</translation>
     </message>
     <message>
         <source>&apos;</source>
         <comment>XSheetPDF:second</comment>
-        <translation type="unfinished"></translation>
+        <translation>&apos;</translation>
     </message>
     <message>
         <source>&quot;</source>
         <comment>XSheetPDF:frame</comment>
-        <translation type="unfinished"></translation>
+        <translation>&quot;</translation>
     </message>
     <message>
         <source>TOT</source>
         <comment>XSheetPDF</comment>
-        <translation type="unfinished"></translation>
+        <translation>TOT</translation>
     </message>
     <message>
         <source>th</source>
         <comment>XSheetPDF</comment>
-        <translation type="unfinished"></translation>
+        <translation>th</translation>
     </message>
     <message>
         <source>None</source>
         <comment>XSheetPDF CellMark</comment>
-        <translation type="unfinished">없음</translation>
+        <translation>없음</translation>
     </message>
     <message>
         <source>Dot</source>
         <comment>XSheetPDF CellMark</comment>
-        <translation type="unfinished"></translation>
+        <translation>점</translation>
     </message>
     <message>
         <source>Circle</source>
         <comment>XSheetPDF CellMark</comment>
-        <translation type="unfinished"></translation>
+        <translation>원</translation>
     </message>
     <message>
         <source>Filled circle</source>
         <comment>XSheetPDF CellMark</comment>
-        <translation type="unfinished"></translation>
+        <translation>채워진 원</translation>
     </message>
     <message>
         <source>Asterisk</source>
         <comment>XSheetPDF CellMark</comment>
-        <translation type="unfinished"></translation>
+        <translation>별표(*)</translation>
     </message>
     <message>
         <source>ACTION</source>
         <comment>XSheetPDF</comment>
-        <translation type="unfinished"></translation>
+        <translation>작업</translation>
     </message>
     <message>
         <source>S</source>
         <comment>XSheetPDF</comment>
-        <translation type="unfinished"></translation>
+        <translation>S</translation>
     </message>
     <message>
         <source>CELL</source>
         <comment>XSheetPDF</comment>
-        <translation type="unfinished"></translation>
+        <translation>셀</translation>
     </message>
     <message>
         <source>CAMERA</source>
         <comment>XSheetPDF</comment>
-        <translation type="unfinished"></translation>
+        <translation>카메라</translation>
     </message>
     <message>
         <source>EPISODE</source>
         <comment>XSheetPDF</comment>
-        <translation type="unfinished"></translation>
+        <translation>삽화</translation>
     </message>
     <message>
         <source>SEQ.</source>
         <comment>XSheetPDF</comment>
-        <translation type="unfinished"></translation>
+        <translation>SEQ</translation>
     </message>
     <message>
         <source>SCENE</source>
         <comment>XSheetPDF</comment>
-        <translation type="unfinished"></translation>
+        <translation>장면</translation>
     </message>
     <message>
         <source>TIME</source>
         <comment>XSheetPDF</comment>
-        <translation type="unfinished"></translation>
+        <translation>입력 텍스트 전체 삭제4 / 5000듣기복사단어 매칭
+번역하기	
+시간</translation>
     </message>
     <message>
         <source>NAME</source>
         <comment>XSheetPDF</comment>
-        <translation type="unfinished"></translation>
+        <translation>이름</translation>
     </message>
     <message>
         <source>SHEET</source>
         <comment>XSheetPDF</comment>
-        <translation type="unfinished"></translation>
+        <translation>시트</translation>
     </message>
     <message>
         <source>TITLE</source>
         <comment>XSheetPDF</comment>
-        <translation type="unfinished"></translation>
+        <translation>제목</translation>
     </message>
     <message>
         <source>CAMERAMAN</source>
         <comment>XSheetPDF</comment>
-        <translation type="unfinished"></translation>
+        <translation>카메라맨</translation>
     </message>
     <message>
         <source>Create folder</source>
-        <translation type="unfinished"></translation>
+        <translation>폴더 생성</translation>
     </message>
     <message>
         <source>TVPaint JSON file cannot be exported from untitled scene. Save the scene first.</source>
-        <translation type="unfinished"></translation>
+        <translation>제목이 없는 장면에서 TVPaint JSON 파일을 내보낼 수 없습니다. 먼저 장면을 저장하십시오.</translation>
     </message>
     <message>
         <source>No columns can be exported. Please note the followings:
  - The level files must be placed at the same or child folder relative to the scene file.
  - Currently only the columns containing raster levels can be exported.</source>
-        <translation type="unfinished"></translation>
+        <translation>열을 내보낼 수 없습니다. 다음의 점에 주의해 주세요.
+- 레벨 파일은 씬(scene) 파일을 기준으로 동일한 폴더 또는 하위 폴더에 배치해야 합니다.
+- 현재는 래스터 수준을 포함하는 열만 내보낼 수 있습니다.</translation>
     </message>
     <message>
         <source>Export TVPaint JSON File</source>
-        <translation type="unfinished"></translation>
+        <translation>TVPaint JSON 파일 내보내기</translation>
     </message>
     <message>
         <source>Removed unused level %1 from the scene cast. (This behavior can be disabled in Preferences.)</source>
-        <translation type="unfinished"></translation>
+        <translation>장면 캐스트에서 사용하지 않는 레벨 %1를 제거했습니다. (이 동작은 기본 설정에서 비활성화할 수 있습니다.)</translation>
     </message>
     <message>
         <source>Removed unused levels from the scene cast. (This behavior can be disabled in Preferences.)</source>
-        <translation type="unfinished"></translation>
+        <translation>장면 캐스트에서 사용하지 않는 레벨을 제거했습니다. (이 동작은 기본 설정에서 비활성화할 수 있습니다.)</translation>
     </message>
     <message>
         <source>A prior save of Scene &apos;%1&apos; was critically interrupted. 
@@ -11168,28 +11173,28 @@ Do you want to create it?</source>
 A partial save file was generated and changes may be manually salvaged from &apos;%2&apos;.
 
 Do you wish to continue loading the last good save or stop and try to salvage the prior save?</source>
-        <translation type="unfinished"></translation>
+        <translation>장면 &apos;%1&apos;의 이전 저장이 심각하게 중단되었습니다. 부분 저장 파일이 생성되었으며 &apos;%2&apos;에서 변경 사항을 수동으로 복구할 수 있습니다. 마지막 정상 저장을 계속 로드하시겠습니까, 아니면 중지하고 이전 저장을 복원하시겠습니까?</translation>
     </message>
     <message>
         <source>Edit Cell Mark #%1</source>
-        <translation type="unfinished"></translation>
+        <translation>셀 마크 편집 #%1</translation>
     </message>
     <message>
         <source>A conversion task is in progress! wait until it stops or cancel it</source>
-        <translation type="unfinished"></translation>
+        <translation>변환 작업이 진행 중입니다. 작업이 중지될 때까지 기다리거나 취소하십시오.</translation>
     </message>
     <message>
         <source>None</source>
         <comment>Cell Mark</comment>
-        <translation type="unfinished">없음</translation>
+        <translation>없음</translation>
     </message>
     <message>
         <source>Set Cell Mark at Column %1  Frame %2 to %3</source>
-        <translation type="unfinished"></translation>
+        <translation>셀 마크를 열 %1 프레임 %2 ~ %3으로 설정</translation>
     </message>
     <message>
         <source>Apply Auto Lip Sync</source>
-        <translation type="unfinished"></translation>
+        <translation>자동 립싱크 적용</translation>
     </message>
 </context>
 <context>
@@ -12422,11 +12427,11 @@ Please commit or revert changes first.</source>
     </message>
     <message>
         <source>Edit Cell Marks</source>
-        <translation type="unfinished"></translation>
+        <translation>셀 마크 편집</translation>
     </message>
     <message>
         <source>Cell Marks:</source>
-        <translation type="unfinished"></translation>
+        <translation>셀 마크:</translation>
     </message>
 </context>
 <context>
@@ -13004,7 +13009,7 @@ Please commit or revert changes first.</source>
     </message>
     <message>
         <source>Cell Mark</source>
-        <translation type="unfinished"></translation>
+        <translation>셀 마크</translation>
     </message>
 </context>
 <context>
@@ -13950,7 +13955,7 @@ WARNING : Image size mismatch. The size of level with the same path is %1 x %2.<
     </message>
     <message>
         <source>Use Time Lapse</source>
-        <translation type="unfinished"></translation>
+        <translation>타임랩스 사용</translation>
     </message>
     <message>
         <source>Requires restarting camera when toggled
@@ -13968,19 +13973,19 @@ Enter = Capture
 BackSpace = Remove Frame
 Multiply = Toggle Zoom
 Divide = Focus Check</source>
-        <translation type="unfinished"></translation>
+        <translation>전환 시 카메라를 다시 시작해야 함 NP 1 = 이전 프레임 NP 2 = 다음 프레임 NP 3 = 카메라로 이동 NP 5 = 라이브 뷰 전환 NP 6 = 짧은 재생 NP 8 = 루프 NP 0 = 재생 기간 = 라이브 뷰 이미지 사용 플러스 = 불투명도 올리기 빼기 = 낮은 불투명도 Enter = 캡처 BackSpace = 프레임 제거 곱셈 = 토글 줌 분할 = 초점 확인</translation>
     </message>
     <message>
         <source>Show Camera Below Other Levels</source>
-        <translation type="unfinished"></translation>
+        <translation>다른 레벨 아래에 카메라 표시</translation>
     </message>
     <message>
         <source>Play Sound on Capture</source>
-        <translation type="unfinished"></translation>
+        <translation>캡처시 사운드 재생</translation>
     </message>
     <message>
         <source>Make a click sound on each capture</source>
-        <translation type="unfinished"></translation>
+        <translation>캡처할 떄마다 클릭 소리를 냅니다</translation>
     </message>
 </context>
 <context>
@@ -14768,15 +14773,15 @@ Please refer to the user guide for details.</source>
     </message>
     <message>
         <source>None</source>
-        <translation type="unfinished">없음</translation>
+        <translation>없음</translation>
     </message>
     <message>
         <source>Inbetween symbol mark</source>
-        <translation type="unfinished"></translation>
+        <translation>심볼 마크</translation>
     </message>
     <message>
         <source>Reverse sheet symbol mark</source>
-        <translation type="unfinished"></translation>
+        <translation>리버스 시트 심볼 마크</translation>
     </message>
 </context>
 <context>
@@ -14851,15 +14856,15 @@ Please refer to the user guide for details.</source>
     </message>
     <message>
         <source>Lip Sync</source>
-        <translation type="unfinished"></translation>
+        <translation>립싱크</translation>
     </message>
     <message>
         <source>Cell Mark</source>
-        <translation type="unfinished"></translation>
+        <translation>셀 마크</translation>
     </message>
     <message>
         <source>None</source>
-        <translation type="unfinished">없음</translation>
+        <translation>없음</translation>
     </message>
 </context>
 <context>
@@ -14978,19 +14983,19 @@ Please refer to the user guide for details.</source>
     </message>
     <message>
         <source>Unlock</source>
-        <translation type="unfinished">잠금 해제</translation>
+        <translation>잠금 해제</translation>
     </message>
     <message>
         <source>Lock</source>
-        <translation type="unfinished"></translation>
+        <translation>잠금</translation>
     </message>
     <message>
         <source>Click to select parent handle</source>
-        <translation type="unfinished"></translation>
+        <translation>클릭하여 상위 핸들을 선택하십시오</translation>
     </message>
     <message>
         <source>Click to select parent object</source>
-        <translation type="unfinished"></translation>
+        <translation>상위 개체를 선택하려면 클릭하십시오</translation>
     </message>
 </context>
 <context>
@@ -15005,7 +15010,7 @@ Please refer to the user guide for details.</source>
     </message>
     <message>
         <source>Lock Column</source>
-        <translation type="unfinished"></translation>
+        <translation>열 잠금</translation>
     </message>
 </context>
 <context>
@@ -15149,7 +15154,7 @@ Hold F3 Key on the Viewer to Show This Frame Only</source>
     <name>XsheetPdfPreviewArea</name>
     <message>
         <source>Fit To Window</source>
-        <translation type="unfinished">창에 맞춤</translation>
+        <translation>창에 맞춤</translation>
     </message>
 </context>
 <context>

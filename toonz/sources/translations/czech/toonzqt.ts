@@ -19,17 +19,17 @@
         <translation>Nahradit efekt</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/addfxcontextmenu.cpp" line="623"/>
+        <location filename="../../toonzqt/addfxcontextmenu.cpp" line="624"/>
         <source>Insert </source>
         <translation>Vložit</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/addfxcontextmenu.cpp" line="626"/>
+        <location filename="../../toonzqt/addfxcontextmenu.cpp" line="627"/>
         <source>Add </source>
         <translation>Přidat</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/addfxcontextmenu.cpp" line="629"/>
+        <location filename="../../toonzqt/addfxcontextmenu.cpp" line="630"/>
         <source>Replace </source>
         <translation>Nahradit</translation>
     </message>
@@ -657,155 +657,155 @@ Možná byl soubor s přednastavením poškozen</translation>
 <context>
     <name>FlipConsole</name>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="804"/>
-        <location filename="../../toonzqt/flipconsole.cpp" line="883"/>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1560"/>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1621"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="813"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="892"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1569"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1630"/>
         <source> FPS </source>
         <translation> FPS </translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1112"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1121"/>
         <source>Save</source>
         <translation>Uložit</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1116"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1125"/>
         <source>Snapshot</source>
         <translation>Snímek obrazovky</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1119"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1128"/>
         <source>Define Sub-camera</source>
         <translation>Určit podkameru</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1121"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1130"/>
         <source>Define Loading Box</source>
         <translation>Určit nahrávací box</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1123"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1132"/>
         <source>Use Loading Box</source>
         <translation>Použít nahrávací box</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1128"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1137"/>
         <source>Background Colors</source>
         <translation>Barvy pozadí</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1158"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1167"/>
         <source>Framerate</source>
         <translation>Počet snímků</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1130"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1139"/>
         <source>Playback Controls</source>
         <translation>Ovládání přehrávání</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1134"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1143"/>
         <source>Color Channels</source>
         <translation>Barevné kanály</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1145"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1154"/>
         <source>Set Key</source>
         <translation>Nastavit klíčový snímek</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1140"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1149"/>
         <source>Histogram</source>
         <translation>Histogram</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1137"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1146"/>
         <source>Sound</source>
         <translation>Zvuk</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1143"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1152"/>
         <source>Locator</source>
         <translation>Polohový maják</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1148"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1157"/>
         <source>Display Areas as Filled</source>
         <translation>Zobrazit plochy jako vyplněné</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1155"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1164"/>
         <source>Viewer Controls</source>
         <translation>Ovládání pohledu</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1183"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1192"/>
         <source>&amp;Save Images</source>
         <translation>&amp;Uložit obrázky</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1190"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1199"/>
         <source>&amp;Snapshot</source>
         <translation>&amp;Snímek obrazovky</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1194"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1203"/>
         <source>&amp;Compare to Snapshot</source>
         <translation>&amp;Porovnat se snímkem obrazovky</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1203"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1212"/>
         <source>&amp;Define Sub-camera</source>
         <translation>&amp;Určit podkameru</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1208"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1217"/>
         <source>&amp;Define Loading Box</source>
         <translation>&amp;Určit nahrávací box</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1212"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1221"/>
         <source>&amp;Use Loading Box</source>
         <translation>&amp;Použít nahrávací box</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1221"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1230"/>
         <source>&amp;White Background</source>
         <translation>&amp;Bílé pozadí</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1224"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1233"/>
         <source>&amp;Black Background</source>
         <translation>Č&amp;erné pozadí</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1228"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1237"/>
         <source>&amp;Checkered Background</source>
         <translation>Ša&amp;chovnicové pozadí</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1235"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1244"/>
         <source>&amp;First Frame</source>
         <translation>&amp;První snímek</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1237"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1246"/>
         <source>&amp;Previous Frame</source>
         <translation>&amp;Předchozí snímek</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1239"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1248"/>
         <source>Pause</source>
         <translation>Pozastavit</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1242"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1251"/>
         <source>Play</source>
         <translation>Přehrát</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1245"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1254"/>
         <source>Loop</source>
         <translation>Smyčka</translation>
     </message>
@@ -814,115 +814,115 @@ Možná byl soubor s přednastavením poškozen</translation>
         <translation type="vanished">&amp;Další snímek</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1249"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1258"/>
         <source>&amp;Next Frame</source>
         <translation>&amp;Další snímek</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1251"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1260"/>
         <source>&amp;Last Frame</source>
         <translation>&amp;Poslední snímek</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1260"/>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1263"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1269"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1272"/>
         <source>Red Channel</source>
         <translation>Červený kanál</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1264"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1273"/>
         <source>Red Channel in Grayscale</source>
         <translation>Červený kanál v odstínech šedi</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1267"/>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1271"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1276"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1280"/>
         <source>Green Channel</source>
         <translation>Zelený kanál</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1272"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1281"/>
         <source>Green Channel in Grayscale</source>
         <translation>Zelený kanál v odstínech šedi</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1275"/>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1278"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1284"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1287"/>
         <source>Blue Channel</source>
         <translation>Modrý kanál</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1279"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1288"/>
         <source>Blue Channel in Grayscale</source>
         <translation>Modrý kanál v odstínech šedi</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1285"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1294"/>
         <source>Alpha Channel</source>
         <translation>Alfa kanál</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1295"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1304"/>
         <source>&amp;Soundtrack </source>
         <translation>&amp;Zvukový doprovod</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1299"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1308"/>
         <source>&amp;Histogram</source>
         <translation>&amp;Histogram</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1301"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1310"/>
         <source>&amp;Locator</source>
         <translation>&amp;Polohový maják</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1308"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1317"/>
         <source>&amp;Display Areas as Filled</source>
         <translation>&amp;Zobrazit plochy jako vyplněné</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1322"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1331"/>
         <source>&amp;Zoom In</source>
         <translation>&amp;Přiblížit</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1324"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1333"/>
         <source>&amp;Zoom Out</source>
         <translation>&amp;Oddálit</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1326"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1335"/>
         <source>&amp;Flip Horizontally</source>
         <translation>Převrátit &amp;vodorovně</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1328"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1337"/>
         <source>&amp;Flip Vertically</source>
         <translation>Převrátit &amp;svisle</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1330"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1339"/>
         <source>&amp;Reset View</source>
         <translation>&amp;Obnovit výchozí pohled</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1565"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1574"/>
         <source> FPS	</source>
         <translation> FPS	</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1743"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1752"/>
         <source>Set the current frame</source>
         <translation>Nastavit nynější snímek</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1747"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1756"/>
         <source>Drag to play the animation</source>
         <translation>Táhnout pro přehrání animace</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/flipconsole.cpp" line="1799"/>
+        <location filename="../../toonzqt/flipconsole.cpp" line="1808"/>
         <source>Set the playback frame rate</source>
         <translation>Nastavit snímkování přehrávání</translation>
     </message>
@@ -1604,12 +1604,12 @@ Ruční změna libovolného klíčového snímku vymaže varování.</translatio
 <context>
     <name>FxPassThroughPainter</name>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="3820"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="3832"/>
         <source>&amp;Paste Add</source>
         <translation type="unfinished">&amp;Vložit/Přidat</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="3823"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="3835"/>
         <source>&amp;Preview</source>
         <translation type="unfinished">&amp;Náhled</translation>
     </message>
@@ -1630,7 +1630,7 @@ Ruční změna libovolného klíčového snímku vymaže varování.</translatio
 <context>
     <name>FxSchematicOutputNode</name>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="2236"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="2248"/>
         <source>Output</source>
         <translation>Výstup</translation>
     </message>
@@ -1638,8 +1638,8 @@ Ruční změna libovolného klíčového snímku vymaže varování.</translatio
 <context>
     <name>FxSchematicPassThroughNode</name>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="3874"/>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="3985"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="3886"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="3997"/>
         <source> (Pass Through)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1647,12 +1647,12 @@ Ruční změna libovolného klíčového snímku vymaže varování.</translatio
 <context>
     <name>FxSchematicPort</name>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="1598"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="1590"/>
         <source>&amp;Disconnect from Xsheet</source>
         <translation>&amp;Odpojit od Xsheet</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="1602"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="1594"/>
         <source>&amp;Connect to Xsheet</source>
         <translation>&amp;Spojit s Xsheet</translation>
     </message>
@@ -1684,7 +1684,7 @@ Vyberte uzly efektů a příbuzné odkazy, jež chcete vložit, před kopírová
 <context>
     <name>FxSchematicXSheetNode</name>
     <message>
-        <location filename="../../toonzqt/fxschematicnode.cpp" line="2313"/>
+        <location filename="../../toonzqt/fxschematicnode.cpp" line="2325"/>
         <source>XSheet</source>
         <translation>XSheet</translation>
     </message>
@@ -2388,12 +2388,12 @@ Jste si jistý?</translation>
         <translation>Není možné nahrát cestu pohybu.</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="1077"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="1078"/>
         <source>Stage Schematic</source>
         <translation>Náčrtek jeviště</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="1099"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="1100"/>
         <source>FX Schematic</source>
         <translation>Náčrtek efektu</translation>
     </message>
@@ -2752,12 +2752,12 @@ Jste si jistý?</translation>
         <translation>Zdá se, že zdrojový obrázek není vhodný pro tento druh převodu</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/gutil.cpp" line="560"/>
+        <location filename="../../toonzqt/gutil.cpp" line="598"/>
         <source>The file name cannot be empty or contain any of the following characters: (new line) \ / : * ? &quot; |</source>
         <translation>Název souboru nesmí být prázdný nebo obsahovat následující znaky: (nový řádek)  \ / : * ? &quot;  |</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/gutil.cpp" line="587"/>
+        <location filename="../../toonzqt/gutil.cpp" line="625"/>
         <source>That is a reserved file name and cannot be used.</source>
         <translation>Toto je vyhrazený název souboru a nelze jej použít.</translation>
     </message>
@@ -2867,73 +2867,101 @@ Jste si jistý?</translation>
     </message>
 </context>
 <context>
+    <name>SchematicName</name>
+    <message>
+        <location filename="../../toonzqt/schematicnode.cpp" line="49"/>
+        <source>Cu&amp;t</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/schematicnode.cpp" line="53"/>
+        <source>&amp;Copy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/schematicnode.cpp" line="57"/>
+        <source>&amp;Paste</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/schematicnode.cpp" line="62"/>
+        <source>&amp;Delete</source>
+        <translation type="unfinished">S&amp;mazat</translation>
+    </message>
+    <message>
+        <location filename="../../toonzqt/schematicnode.cpp" line="68"/>
+        <source>Select &amp;All</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>SchematicViewer</name>
     <message>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="920"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="921"/>
         <source>&amp;Fit to Window</source>
         <translation>&amp;Přizpůsobit oknu</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="926"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="927"/>
         <source>&amp;Focus on Current</source>
         <translation>&amp;Zaměřit na nynější předmět</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="931"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="932"/>
         <source>&amp;Reorder Nodes</source>
         <translation>&amp;Přeuspořádat uzly</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="937"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="938"/>
         <source>&amp;Reset Size</source>
         <translation>&amp;Obnovit výchozí velikost</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="944"/>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="1124"/>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="1180"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="945"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="1125"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="1181"/>
         <source>&amp;Minimize Nodes</source>
         <translation>&amp;Zmenšit uzly</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="944"/>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="1125"/>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="1181"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="945"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="1126"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="1182"/>
         <source>&amp;Maximize Nodes</source>
         <translation>&amp;Zvětšit uzly</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="950"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="951"/>
         <source>&amp;Selection Mode</source>
         <translation>Režim &amp;výběru</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="955"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="956"/>
         <source>&amp;Zoom Mode</source>
         <translation>Režim &amp;zvětšení</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="960"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="961"/>
         <source>&amp;Hand Mode</source>
         <translation>&amp;Ruční režim</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="968"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="969"/>
         <source>&amp;New Pegbar</source>
         <translation>&amp;Nový pruh na kolíky</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="975"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="976"/>
         <source>&amp;New Camera</source>
         <translation>&amp;Nová kamera</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="982"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="983"/>
         <source>&amp;New Motion Path</source>
         <translation>&amp;Nová cesta pohybu</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="990"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="991"/>
         <source>&amp;Switch output port display mode</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2942,7 +2970,7 @@ Jste si jistý?</translation>
         <translation type="vanished">&amp;Přepnout režim zobrazení výstupní přípojky (port)</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/schematicviewer.cpp" line="1009"/>
+        <location filename="../../toonzqt/schematicviewer.cpp" line="1010"/>
         <source>&amp;Toggle node icons</source>
         <translation>&amp;Přepnout ikony uzlů</translation>
     </message>
@@ -3041,12 +3069,12 @@ Jste si jistý?</translation>
 <context>
     <name>StageSchematicNode</name>
     <message>
-        <location filename="../../toonzqt/stageschematicnode.cpp" line="1333"/>
+        <location filename="../../toonzqt/stageschematicnode.cpp" line="1329"/>
         <source>Toggle Autorotate Along Motion Path</source>
         <translation>Přepnout automatické otáčení podle cesty pohybu</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/stageschematicnode.cpp" line="1334"/>
+        <location filename="../../toonzqt/stageschematicnode.cpp" line="1330"/>
         <source>Toggle Link Motion Path to Control Points</source>
         <translation>Přepnout spojení cesty pohybu na ovládací body</translation>
     </message>
@@ -3495,12 +3523,12 @@ Jste si jistý?</translation>
 <context>
     <name>SwatchViewer</name>
     <message>
-        <location filename="../../toonzqt/swatchviewer.cpp" line="844"/>
+        <location filename="../../toonzqt/swatchviewer.cpp" line="845"/>
         <source>Reset View</source>
         <translation>Obnovit výchozí pohled</translation>
     </message>
     <message>
-        <location filename="../../toonzqt/swatchviewer.cpp" line="849"/>
+        <location filename="../../toonzqt/swatchviewer.cpp" line="850"/>
         <source>Fit To Window</source>
         <translation>Přizpůsobit oknu</translation>
     </message>

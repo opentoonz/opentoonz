@@ -1,0 +1,18 @@
+name: Feature request
+description: Suggest an idea for this project
+labels: 'feature request'
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please search existing issues before posting to avoid creating duplicates.
+  - type: textarea
+    attributes:
+      label: Is your feature request related to a problem? Please describe
+      placeholder: A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+  - type: textarea
+    attributes:
+      label: Describe the solution you'd like
+      placeholder: A clear and concise description of what you want to happen.
+    validations:
+      required: true

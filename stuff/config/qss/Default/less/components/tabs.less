@@ -15,12 +15,15 @@
 // -----------------------------------------------------------------------------
 
 .tab-flat {
-  @horizontal-padding: 4;
   background-color: @tab-bg-color;
   border-right: 1 solid @tab-border-color;
   border-bottom: 1 solid @accent;
+  border-top: 0;
+  border-left: 0;
+  border-radius: 0;
   color: @tab-text-color;
-  padding: 3 @horizontal-padding 3 @horizontal-padding;
+  padding: 3 4 3 4;
+  margin: 0;
   &:hover {
     background-color: @tab-bg-color-hover;
     color: @tab-text-color-hover;
@@ -41,10 +44,7 @@
 .tab-round {
   @horizontal-padding: 7;
   background-color: @tab-bg-color;
-  border-top: 1 solid @accent;
-  border-right: 1 solid @accent;
-  border-left: 1 solid @accent;
-  border-bottom: 1 solid @accent;
+  border: 1 solid @accent;
   color: @tab-text-color;
   margin: 3 -1 0 0;
   padding: 2 @horizontal-padding 1 @horizontal-padding;

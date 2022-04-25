@@ -741,7 +741,7 @@
     </message>
     <message>
         <source>Lock Alpha</source>
-        <translation type="unfinished">Preservar alfa</translation>
+        <translation>Preservar alfa</translation>
     </message>
 </context>
 <context>
@@ -1057,7 +1057,7 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Rotate</source>
-        <translation type="unfinished"></translation>
+        <translation>Rotar</translation>
     </message>
 </context>
 <context>
@@ -1308,7 +1308,7 @@ Do you want to proceed?</source>
     <name>RasterSelectionTool</name>
     <message>
         <source>Modify Savebox</source>
-        <translation>Modificar marco delimitador</translation>
+        <translation>Editar marco delimitador</translation>
     </message>
     <message>
         <source>No Antialiasing</source>
@@ -1613,7 +1613,7 @@ movido hacia el final de la primera página de la paleta.</translation>
     </message>
     <message>
         <source>Lock Alpha</source>
-        <translation type="unfinished">Preservar alfa</translation>
+        <translation>Preservar alfa</translation>
     </message>
 </context>
 <context>

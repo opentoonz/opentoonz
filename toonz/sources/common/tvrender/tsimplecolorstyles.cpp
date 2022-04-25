@@ -311,6 +311,21 @@ void drawAntialiasedOutline(const std::vector<TOutlinePoint> &_v,
   outline.finish();
 }
 
+void drawAliasedOutline(const std::vector<TOutlinePoint> &_v,
+                        const TStroke *stroke) {
+  static const int stride = 2 * sizeof(TOutlinePoint);
+
+  glEnableClientState(GL_VERTEX_ARRAY);
+
+  glVertexPointer(2, GL_DOUBLE, stride, &_v[0]);
+  glDrawArrays(GL_LINE_STRIP, 0, _v.size() / 2);
+
+  glVertexPointer(2, GL_DOUBLE, stride, &_v[1]);
+  glDrawArrays(GL_LINE_STRIP, 0, _v.size() / 2);
+
+  glDisableClientState(GL_VERTEX_ARRAY);
+}
+
 }  // namespace
 
 //*************************************************************************************
@@ -609,9 +624,10 @@ void TSolidColorStyle::drawRegion(const TColorFunction *cf,
 
 //=============================================================================
 
-void TSolidColorStyle::drawStroke(const TColorFunction *cf,
-                                  TStrokeOutline *outline,
-                                  const TStroke *stroke) const {
+void TSolidColorStyle::doDrawStroke(const TColorFunction *cf,
+                                    TStrokeOutline *outline,
+                                    const TStroke *stroke,
+                                    bool antialias) const {
   struct locals {
     static inline void fillOutlinedStroke(const std::vector<TOutlinePoint> &v) {
       static const int stride = sizeof(TOutlinePoint);
@@ -655,12 +671,20 @@ stencil->endMask();
       locals::fillOutlinedStroke(v);
       stencil->endMask();
       stencil->enableMask(TStencilControl::SHOW_OUTSIDE);
-      drawAntialiasedOutline(v, stroke);
+
+      if (antialias)
+        drawAntialiasedOutline(v, stroke);
+      else
+        drawAliasedOutline(v, stroke);
+
       stencil->disableMask();
 
     } else {
       // outline with antialiasing
-      drawAntialiasedOutline(v, stroke);
+      if (antialias)
+        drawAntialiasedOutline(v, stroke);
+      else
+        drawAliasedOutline(v, stroke);
 
       // center line
       locals::fillOutlinedStroke(v);

@@ -142,98 +142,101 @@ Please select a different device or check the microphone.</source>
     </message>
     <message>
         <source>Sync with XSheet/Timeline</source>
-        <translation type="unfinished"></translation>
+        <translation>タイムシート/タイムラインと同期する</translation>
     </message>
     <message>
         <source>Device: </source>
-        <translation type="unfinished"></translation>
+        <translation>デバイス： </translation>
     </message>
     <message>
         <source>Sample rate: </source>
-        <translation type="unfinished"></translation>
+        <translation>サンプリング周波数： </translation>
     </message>
     <message>
         <source>Sample format: </source>
-        <translation type="unfinished"></translation>
+        <translation>サンプリング形式： </translation>
     </message>
     <message>
         <source>8000 Hz</source>
-        <translation type="unfinished"></translation>
+        <translation>8ｋHz</translation>
     </message>
     <message>
         <source>11025 Hz</source>
-        <translation type="unfinished"></translation>
+        <translation>11.025kHz</translation>
     </message>
     <message>
         <source>22050 Hz</source>
-        <translation type="unfinished"></translation>
+        <translation>22.05kHz</translation>
     </message>
     <message>
         <source>44100 Hz</source>
-        <translation type="unfinished"></translation>
+        <translation>44.1kHz</translation>
     </message>
     <message>
         <source>48000 Hz</source>
-        <translation type="unfinished"></translation>
+        <translation>48kHz</translation>
     </message>
     <message>
         <source>96000 Hz</source>
-        <translation type="unfinished"></translation>
+        <translation>96kHz</translation>
     </message>
     <message>
         <source>Mono 8-Bits</source>
-        <translation type="unfinished"></translation>
+        <translation>モノラル8ビット</translation>
     </message>
     <message>
         <source>Stereo 8-Bits</source>
-        <translation type="unfinished"></translation>
+        <translation>ステレオ8ビット</translation>
     </message>
     <message>
         <source>Mono 16-Bits</source>
-        <translation type="unfinished"></translation>
+        <translation>モノラル16ビット</translation>
     </message>
     <message>
         <source>Stereo 16-Bits</source>
-        <translation type="unfinished"></translation>
+        <translation>ステレオ16ビット</translation>
     </message>
     <message>
         <source>Audio input device to record</source>
-        <translation type="unfinished"></translation>
+        <translation>録音に用いる音声入力デバイス</translation>
     </message>
     <message>
         <source>Number of samples per second, 44.1KHz = CD Quality</source>
-        <translation type="unfinished"></translation>
+        <translation>1秒あたりのサンプル数。 44.1kHzでCDの音質</translation>
     </message>
     <message>
         <source>Number of channels and bits per sample, 16-bits recommended</source>
-        <translation type="unfinished"></translation>
+        <translation>チャンネル数とサンプルあたりのビット数。16ビットが推奨</translation>
     </message>
     <message>
         <source>Play animation from current frame while recording/playback</source>
-        <translation type="unfinished"></translation>
+        <translation>録音/再生中にアニメーションを再生する</translation>
     </message>
     <message>
         <source>Save recording and insert into new column</source>
-        <translation type="unfinished"></translation>
+        <translation>録音した音声を保存して新規列に挿入する</translation>
     </message>
     <message>
         <source>Refresh list of connected audio input devices</source>
-        <translation type="unfinished"></translation>
+        <translation>接続されている音声入力デバイスの一覧を更新する</translation>
     </message>
     <message>
         <source>Record failed: 
 Make sure there&apos;s XSheet or Timeline in the room.</source>
-        <translation type="unfinished"></translation>
+        <translation>録音に失敗しました： 
+ワークスペース内にタイムシートまたはタイムラインが開いていることを確認してください。</translation>
     </message>
     <message>
         <source>Failed to save WAV file:
 Make sure you have write permissions in folder.</source>
-        <translation type="unfinished"></translation>
+        <translation>WAVファイルの保存に失敗しました：
+フォルダへの書き込み権限があるかどうか確認してください。</translation>
     </message>
     <message>
         <source>Audio format unsupported:
 Nearest format will be internally used.</source>
-        <translation type="unfinished"></translation>
+        <translation>音声形式が非対応です：
+最も近い形式が内部で使用されます。</translation>
     </message>
 </context>
 <context>
@@ -319,135 +322,139 @@ pick up all frames in the selected level.</source>
     <name>AutoLipSyncPopup</name>
     <message>
         <source>Auto Lip Sync</source>
-        <translation type="unfinished"></translation>
+        <translation>自動リップシンク</translation>
     </message>
     <message>
         <source>Apply</source>
-        <translation type="unfinished">適用</translation>
+        <translation>適用</translation>
     </message>
     <message>
         <source>A I Drawing</source>
-        <translation type="unfinished">A I の作画</translation>
+        <translation>A I の作画</translation>
     </message>
     <message>
         <source>O Drawing</source>
-        <translation type="unfinished">O の作画</translation>
+        <translation>O の作画</translation>
     </message>
     <message>
         <source>E Drawing</source>
-        <translation type="unfinished">E の作画</translation>
+        <translation>E の作画</translation>
     </message>
     <message>
         <source>U Drawing</source>
-        <translation type="unfinished">U の作画</translation>
+        <translation>U の作画</translation>
     </message>
     <message>
         <source>L Drawing</source>
-        <translation type="unfinished">L の作画</translation>
+        <translation>L の作画</translation>
     </message>
     <message>
         <source>W Q Drawing</source>
-        <translation type="unfinished">W Q の作画</translation>
+        <translation>W Q の作画</translation>
     </message>
     <message>
         <source>M B P Drawing</source>
-        <translation type="unfinished">M B P の作画</translation>
+        <translation>M B P の作画</translation>
     </message>
     <message>
         <source>F V Drawing</source>
-        <translation type="unfinished">F V の作画</translation>
+        <translation>F V の作画</translation>
     </message>
     <message>
         <source>Rest Drawing</source>
-        <translation type="unfinished">閉じ口 の作画</translation>
+        <translation>閉じ口 の作画</translation>
     </message>
     <message>
         <source>C D G K N R S Th Y Z</source>
-        <translation type="unfinished"></translation>
+        <translation>C D G K N R S Th Y Z</translation>
     </message>
     <message>
         <source>Extend Rest Drawing to End Marker</source>
-        <translation type="unfinished">閉じ口の作画をエンドマーカーまで延長する</translation>
+        <translation>閉じ口の作画をエンドマーカーまで延長する</translation>
     </message>
     <message>
         <source>Audio Source: </source>
-        <translation type="unfinished"></translation>
+        <translation>音源： </translation>
     </message>
     <message>
         <source>Audio Script (Optional, Improves accuracy): </source>
-        <translation type="unfinished"></translation>
+        <translation>音声スクリプト （任意。精度が上がります）： </translation>
     </message>
     <message>
         <source>A script significantly increases the accuracy of the lip sync.</source>
-        <translation type="unfinished"></translation>
+        <translation>リップシンクの精度が大きく上がるスクリプト。</translation>
     </message>
     <message>
         <source>Previous Drawing</source>
-        <translation type="unfinished">前の画像</translation>
+        <translation>前の画像</translation>
     </message>
     <message>
         <source>Next Drawing</source>
-        <translation type="unfinished">次の画像</translation>
+        <translation>次の画像</translation>
     </message>
     <message>
         <source>Insert at Frame: </source>
-        <translation type="unfinished">挿入するフレーム: </translation>
+        <translation>挿入するフレーム: </translation>
     </message>
     <message>
         <source>Thumbnails are not available for sub-Xsheets.
 Please use the frame numbers for reference.</source>
-        <translation type="unfinished">サブシートではサムネイル表示が使用できません。
+        <translation>サブシートではサムネイル表示が使用できません。
 動画番号を参考にして設定を行ってください。</translation>
     </message>
     <message>
         <source>Unable to apply lip sync data to this column type</source>
-        <translation type="unfinished">この列の形式には、リップシンクデータを適用することができません</translation>
+        <translation>この列の形式には、リップシンクデータを適用することができません</translation>
     </message>
     <message>
         <source>Rhubarb not found, please set the location in Preferences.</source>
-        <translation type="unfinished"></translation>
+        <translation>Rhubarbが見つかりません。環境設定でパスを指定してください。</translation>
     </message>
     <message>
         <source>Choose File...</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイルを選択...</translation>
     </message>
     <message>
         <source>Please choose an audio file and try again.</source>
-        <translation type="unfinished"></translation>
+        <translation>音声ファイルを選択してから再度試してください。</translation>
     </message>
     <message>
         <source>Rhubarb Processing Error:
 
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Rhubarb処理エラー：
+
+</translation>
     </message>
     <message>
         <source>Please choose a lip sync data file to continue.</source>
-        <translation type="unfinished"></translation>
+        <translation>続けるにはリップシンクデータを選択してください。</translation>
     </message>
     <message>
         <source>Cannot find the file specified. 
 Please choose a valid lip sync data file to continue.</source>
-        <translation type="unfinished"></translation>
+        <translation>指定されたファイルが見つかりません。 
+続けるには有効なリップシンクデータファイルを選択してください。</translation>
     </message>
     <message>
         <source>Unable to open the file: 
 </source>
-        <translation type="unfinished">ファイルを開けません: 
+        <translation>ファイルを開けません: 
 </translation>
     </message>
     <message>
         <source>Invalid data file.
  Please choose a valid lip sync data file to continue.</source>
-        <translation type="unfinished"></translation>
+        <translation>無効なデータファイルです。
+ 続けるには有効なリップシンクデータを選択してください。</translation>
     </message>
     <message>
         <source>SubXSheet Frame </source>
-        <translation type="unfinished">サブシートのフレーム</translation>
+        <translation>サブシートのフレーム </translation>
     </message>
     <message>
         <source>Drawing: </source>
-        <translation type="unfinished">画像： </translation>
+        <translation>画像： </translation>
     </message>
 </context>
 <context>
@@ -946,7 +953,7 @@ Do you want to crop the canvas?</source>
     <name>CellMarksPopup</name>
     <message>
         <source>Cell Marks Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>コママーク設定</translation>
     </message>
 </context>
 <context>
@@ -1255,7 +1262,7 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Format:</source>
-        <translation type="unfinished"></translation>
+        <translation>形式：</translation>
     </message>
 </context>
 <context>
@@ -2118,7 +2125,7 @@ contain the dpi information, then the current camera dpi will be used.
     <name>ExportCalibrationFilePopup</name>
     <message>
         <source>Export Camera Calibration Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラキャリブレーション設定の書き出し</translation>
     </message>
 </context>
 <context>
@@ -2316,27 +2323,35 @@ contain the dpi information, then the current camera dpi will be used.
     <name>ExportXDTSCommand</name>
     <message>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation>なし</translation>
     </message>
     <message>
         <source>All columns</source>
-        <translation type="unfinished"></translation>
+        <translation type="vanished">全ての列</translation>
     </message>
     <message>
         <source>Only active columns</source>
-        <translation type="unfinished"></translation>
+        <translation type="vanished">表示中の列のみ</translation>
     </message>
     <message>
         <source>Inbetween symbol mark</source>
-        <translation type="unfinished"></translation>
+        <translation type="vanished">中割り記号</translation>
     </message>
     <message>
         <source>Reverse sheet symbol mark</source>
-        <translation type="unfinished"></translation>
+        <translation type="vanished">逆シート記号</translation>
     </message>
     <message>
         <source>Target column</source>
-        <translation type="unfinished"></translation>
+        <translation type="vanished">対象の列</translation>
+    </message>
+    <message>
+        <source>Cell Mark for Inbetween Symbol 2 (*)</source>
+        <translation type="vanished">中割り記号2 （●）に対応するコママーク</translation>
+    </message>
+    <message>
+        <source>Cell Mark for Inbetween Symbol 1 (O)</source>
+        <translation type="vanished">中割り記号1 （○）に対応するコママーク</translation>
     </message>
 </context>
 <context>
@@ -2525,23 +2540,31 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>Print Dialogue</source>
-        <translation type="unfinished"></translation>
+        <translation>台詞を出力する</translation>
     </message>
     <message>
         <source>Inbetween mark:</source>
-        <translation type="unfinished"></translation>
+        <translation type="vanished">中割り記号：</translation>
     </message>
     <message>
         <source>Reverse sheet mark:</source>
-        <translation type="unfinished"></translation>
+        <translation type="vanished">逆シート記号：</translation>
     </message>
     <message>
         <source>Keyframe mark:</source>
-        <translation type="unfinished"></translation>
+        <translation>原画記号：</translation>
     </message>
     <message>
         <source>Col%1</source>
-        <translation type="unfinished"></translation>
+        <translation>列%1</translation>
+    </message>
+    <message>
+        <source>Inbetween mark 1:</source>
+        <translation>中割り記号 1：</translation>
+    </message>
+    <message>
+        <source>Inbetween mark 2:</source>
+        <translation>中割り記号 2：</translation>
     </message>
 </context>
 <context>
@@ -2998,31 +3021,31 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>. (period)</source>
-        <translation type="unfinished"></translation>
+        <translation>. (ピリオド)</translation>
     </message>
     <message>
         <source>_ (underscore)</source>
-        <translation type="unfinished"></translation>
+        <translation>_ (アンダースコア)</translation>
     </message>
     <message>
         <source>No padding</source>
-        <translation type="unfinished"></translation>
+        <translation>ゼロ埋めなし</translation>
     </message>
     <message>
         <source>Frame Number Format</source>
-        <translation type="unfinished"></translation>
+        <translation>フレーム番号形式</translation>
     </message>
     <message>
         <source>Separate Character:</source>
-        <translation type="unfinished"></translation>
+        <translation>区切り文字：</translation>
     </message>
     <message>
         <source>Padding:</source>
-        <translation type="unfinished"></translation>
+        <translation>ゼロ埋め（パディング）：</translation>
     </message>
     <message>
         <source>Close</source>
-        <translation type="unfinished">閉じる</translation>
+        <translation>閉じる</translation>
     </message>
 </context>
 <context>
@@ -3305,11 +3328,11 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Zoom in/out of xsheet</source>
-        <translation type="unfinished"></translation>
+        <translation>タイムシートの拡大/縮小</translation>
     </message>
     <message>
         <source>%1 frames per page</source>
-        <translation type="unfinished"></translation>
+        <translation>%1フレーム／ページ</translation>
     </message>
 </context>
 <context>
@@ -3441,11 +3464,11 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>Format:</source>
-        <translation type="unfinished"></translation>
+        <translation>形式：</translation>
     </message>
     <message>
         <source>Frame Format</source>
-        <translation type="unfinished"></translation>
+        <translation>フレーム形式</translation>
     </message>
 </context>
 <context>
@@ -3830,7 +3853,7 @@ Please use the frame numbers for reference.</source>
     <name>LoadCalibrationFilePopup</name>
     <message>
         <source>Load Camera Calibration Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラキャリブレーション設定の読み込み</translation>
     </message>
 </context>
 <context>
@@ -6751,23 +6774,23 @@ or you may delete necessary files for it.</source>
     </message>
     <message>
         <source>Export TVPaint JSON File</source>
-        <translation type="unfinished"></translation>
+        <translation>TVPaint JSONファイルの書き出し</translation>
     </message>
     <message>
         <source>&amp;Apply Auto Lip Sync to Column</source>
-        <translation type="unfinished"></translation>
+        <translation>列に自動リップシンクを適用する (&amp;A)</translation>
     </message>
     <message>
         <source>Zoom In And Fit Floating Panel</source>
-        <translation type="unfinished"></translation>
+        <translation>ズームインしてウィンドウもリサイズ</translation>
     </message>
     <message>
         <source>Zoom Out And Fit Floating Panel</source>
-        <translation type="unfinished"></translation>
+        <translation>ズームアウトしてウィンドウもリサイズ</translation>
     </message>
     <message>
         <source>Set Cell Mark </source>
-        <translation type="unfinished"></translation>
+        <translation>コママークをセット </translation>
     </message>
 </context>
 <context>
@@ -7834,51 +7857,51 @@ WARNING : Image size mismatch. The saved image size is %1 x %2.</source>
     </message>
     <message>
         <source>Onion skin</source>
-        <translation type="unfinished">塗りつぶしツール - オニオンスキン</translation>
+        <translation>オニオンスキン</translation>
     </message>
     <message>
         <source>Calibration</source>
-        <translation type="unfinished"></translation>
+        <translation>キャリブレーション</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">キャンセル</translation>
+        <translation>キャンセル</translation>
     </message>
     <message>
         <source>Start calibration</source>
-        <translation type="unfinished"></translation>
+        <translation>キャリブレーションの開始</translation>
     </message>
     <message>
         <source>Load</source>
-        <translation type="unfinished"></translation>
+        <translation>読み込み</translation>
     </message>
     <message>
         <source>Export</source>
-        <translation type="unfinished">書き出し</translation>
+        <translation>書き出し</translation>
     </message>
     <message>
         <source>Open Readme.txt for Camera calibration...</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラキャリブレーションについての説明（Readme.txt）を開く...</translation>
     </message>
     <message>
         <source>Failed to save calibration settings.</source>
-        <translation type="unfinished"></translation>
+        <translation>キャリブレーション設定の保存に失敗しました。</translation>
     </message>
     <message>
         <source>Do you want to restart camera calibration?</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラキャリブレーションをやり直しますか？</translation>
     </message>
     <message>
         <source>Couldn&apos;t load %1</source>
-        <translation type="unfinished">%1 を読み込めませんでした</translation>
+        <translation>%1 を読み込めませんでした</translation>
     </message>
     <message>
         <source>Overwriting the current calibration. Are you sure?</source>
-        <translation type="unfinished"></translation>
+        <translation>現在のキャリブレーション設定が上書きされます。よろしいですか？</translation>
     </message>
     <message>
         <source>Couldn&apos;t save %1</source>
-        <translation type="unfinished">%1 を保存できませんでした</translation>
+        <translation>%1 を保存できませんでした</translation>
     </message>
 </context>
 <context>
@@ -7997,7 +8020,7 @@ Set the output folder path to the subfolder as well.</source>
     </message>
     <message>
         <source>Information</source>
-        <translation type="unfinished"></translation>
+        <translation>カット情報</translation>
     </message>
 </context>
 <context>
@@ -9178,79 +9201,85 @@ in non alpha-enabled image format.</source>
     </message>
     <message>
         <source>Automatically Remove Unused Levels From Scene Cast</source>
-        <translation type="unfinished"></translation>
+        <translation>シーンアセットからシーンに使われてないレベルを自動的に除外する</translation>
     </message>
     <message>
         <source>30bit Display*</source>
-        <translation type="unfinished"></translation>
+        <translation>30bitディスプレイ*</translation>
     </message>
     <message>
         <source>Allow Multi-Thread in FFMPEG Rendering (UNSTABLE)</source>
-        <translation type="unfinished"></translation>
+        <translation>FFmpegのマルチスレッド処理を有効にする （不安定です）</translation>
     </message>
     <message>
         <source>Rhubarb Path:</source>
-        <translation type="unfinished"></translation>
+        <translation>Rhubarbのパス：</translation>
     </message>
     <message>
         <source>Rhubarb Timeout:</source>
-        <translation type="unfinished"></translation>
+        <translation>Rhubarbのタイムアウト時間：</translation>
     </message>
     <message>
         <source>Default Raster / Scan Level Format:</source>
-        <translation type="unfinished"></translation>
+        <translation>既定のラスター／スキャンレベル形式：</translation>
     </message>
     <message>
         <source>Level Name Display:</source>
-        <translation type="unfinished"></translation>
+        <translation>レベル名の表示：</translation>
     </message>
     <message>
         <source>Number of Frames to Play 
 for Short Play:</source>
-        <translation type="unfinished"></translation>
+        <translation>「少し前から再生」のフレーム数：</translation>
     </message>
     <message>
         <source>Minimum</source>
-        <translation type="unfinished"></translation>
+        <translation>最小</translation>
     </message>
     <message>
         <source>Display on Each Marker</source>
-        <translation type="unfinished"></translation>
+        <translation>タイムシートの各マーカー上に表示</translation>
     </message>
     <message>
         <source>Display on Column Header</source>
-        <translation type="unfinished"></translation>
+        <translation>列のヘッダに表示する</translation>
     </message>
     <message>
         <source>Auto Lip-Sync</source>
-        <translation type="unfinished"></translation>
+        <translation>自動リップシンク</translation>
     </message>
     <message>
         <source>Check Availability</source>
-        <translation type="unfinished"></translation>
+        <translation>表示機能のチェック</translation>
     </message>
     <message>
         <source>Enabling multi-thread rendering will render significantly faster 
 but a random crash might occur, use at your own risk.</source>
-        <translation type="unfinished"></translation>
+        <translation>マルチスレッド処理を有効にすると処理が大幅に早くなりますが 
+不規則な異常終了が発生するかもしれません。自己責任でご使用ください。</translation>
     </message>
     <message>
         <source>OpenToonz can use Rhubarb for auto lip-syncing.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>OpenToonzは、Rhubarbを用いて自動リップシンクを行うことができます。</translation>
     </message>
     <message>
         <source>Rhubarb is not bundled with OpenToonz.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>RhubarbはOpenToonzパッケージには含まれていません。
+</translation>
     </message>
     <message>
         <source>Please provide the path where Rhubarb is located on your computer.</source>
-        <translation type="unfinished"></translation>
+        <translation>Rhubarbの実行ファイルの保存パスを入力してください。</translation>
     </message>
     <message>
         <source>Number of seconds to wait for Rhubarb to complete processing the audio:</source>
-        <translation type="unfinished"></translation>
+        <translation>Rhubarbと通信して音声処理を完了するまでの待機時間(秒)：</translation>
+    </message>
+    <message>
+        <source>Show Column Parent&apos;s Color in the Xsheet</source>
+        <translation>列の親オブジェクトの表示色を種類ごとに変える</translation>
     </message>
 </context>
 <context>
@@ -9276,16 +9305,17 @@ but a random crash might occur, use at your own risk.</source>
     <name>PreferencesPopup::Display30bitChecker</name>
     <message>
         <source>Check 30bit display availability</source>
-        <translation type="unfinished"></translation>
+        <translation>30bitディスプレイ機能のチェック</translation>
     </message>
     <message>
         <source>Close</source>
-        <translation type="unfinished">閉じる</translation>
+        <translation>閉じる</translation>
     </message>
     <message>
         <source>If the lower gradient looks smooth and has no banding compared to the upper gradient,
 30bit display is available in the current configuration.</source>
-        <translation type="unfinished"></translation>
+        <translation>上下のグラデーションを見比べて、もし下の方がマッハバンドが無く滑らかに見えるなら、
+現在の構成で30bitディスプレイ機能が使用可能です。</translation>
     </message>
 </context>
 <context>
@@ -9424,58 +9454,61 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Standard</source>
-        <translation type="unfinished">標準</translation>
+        <translation>標準</translation>
     </message>
     <message>
         <source>Custom</source>
-        <translation type="unfinished"></translation>
+        <translation>カスタム</translation>
     </message>
     <message>
         <source>Accept Non-alphabet Suffix</source>
-        <translation type="unfinished"></translation>
+        <translation>接尾語にアルファベット以外の文字も許可する</translation>
     </message>
     <message>
         <source>In the standard mode files with the following file name are handled as sequential images:
 [LEVEL_NAME][&quot;.&quot;or&quot;_&quot;][FRAME_NUMBER][SUFFIX].[EXTENSION]
 For [SUFFIX] zero or one occurrences of alphabet (a-z, A-Z) can be used in the standard mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>標準モードでは下記の規則に従う名前のファイルが連番として扱われます：
+[レベル名][&quot;.&quot;または&quot;_&quot;][フレーム番号][接尾辞].[拡張子]
+[接尾辞]は存在しないか、1文字のアルファベット(a-z、A-Z)のみが使用できます。</translation>
     </message>
     <message>
         <source>In the custom mode you can customize the file path rules.
 Note that this mode uses regular expression for file name validation and may slow the operation.</source>
-        <translation type="unfinished"></translation>
+        <translation>カスタムモードではファイルパスの規則をカスタマイズできます。
+このモードではファイル名の解析に正規表現を用いており、処理が重くなる恐れがあります。</translation>
     </message>
     <message>
         <source>1</source>
-        <translation type="unfinished"></translation>
+        <translation>1</translation>
     </message>
     <message>
         <source>2</source>
-        <translation type="unfinished"></translation>
+        <translation>2</translation>
     </message>
     <message>
         <source>3</source>
-        <translation type="unfinished"></translation>
+        <translation>3</translation>
     </message>
     <message>
         <source>5</source>
-        <translation type="unfinished"></translation>
+        <translation>5</translation>
     </message>
     <message>
         <source>Unlimited</source>
-        <translation type="unfinished"></translation>
+        <translation>無制限</translation>
     </message>
     <message>
         <source>Project Folder</source>
-        <translation type="unfinished"></translation>
+        <translation>プロジェクトフォルダ</translation>
     </message>
     <message>
         <source>Maximum Letter Count For Suffix</source>
-        <translation type="unfinished"></translation>
+        <translation>接尾辞の最大文字数</translation>
     </message>
     <message>
         <source>File Path Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイルパスの規則</translation>
     </message>
 </context>
 <context>
@@ -11746,11 +11779,11 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>Removed unused level %1 from the scene cast. (This behavior can be disabled in Preferences.)</source>
-        <translation type="unfinished"></translation>
+        <translation>シーンアセットからシーンで使われていないレベル%1を自動的に除外しました。（この挙動は環境設定でオフにできます。）</translation>
     </message>
     <message>
         <source>Removed unused levels from the scene cast. (This behavior can be disabled in Preferences.)</source>
-        <translation type="unfinished"></translation>
+        <translation>シーンアセットからシーンで使われていないレベルを自動的に除外しました。（この挙動は環境設定でオフにできます。）</translation>
     </message>
     <message>
         <source>A prior save of Scene &apos;%1&apos; was critically interrupted. 
@@ -11758,11 +11791,15 @@ Do you want to create it?</source>
 A partial save file was generated and changes may be manually salvaged from &apos;%2&apos;.
 
 Do you wish to continue loading the last good save or stop and try to salvage the prior save?</source>
-        <translation type="unfinished"></translation>
+        <translation>シーン &apos; %1 &apos; は直前の保存作業が不正に中断しました。
+
+生成された一時保存ファイル &apos;%2&apos; から直前の編集内容を手動で復旧できる可能性があります。
+
+最後に保存に成功したファイルの読み込みを続けますか、それとも一時保存ファイルから復旧を試みるために読み込みを中断しますか？</translation>
     </message>
     <message>
         <source>A conversion task is in progress! wait until it stops or cancel it</source>
-        <translation type="unfinished"></translation>
+        <translation>変換タスクの処理中です! 完了まで待つか、またはキャンセルして下さい</translation>
     </message>
     <message>
         <source>ACTION</source>
@@ -11811,17 +11848,19 @@ Do you wish to continue loading the last good save or stop and try to salvage th
     </message>
     <message>
         <source>TVPaint JSON file cannot be exported from untitled scene. Save the scene first.</source>
-        <translation type="unfinished"></translation>
+        <translation>TVPaint JSONファイルは未保存のシーンをエクスポートできません。先にシーンを保存してください。</translation>
     </message>
     <message>
         <source>No columns can be exported. Please note the followings:
  - The level files must be placed at the same or child folder relative to the scene file.
  - Currently only the columns containing raster levels can be exported.</source>
-        <translation type="unfinished"></translation>
+        <translation>書き出し可能な列がありません。以下をご確認ください：
+ - レベルファイルはシーンファイル(.tnz)と同じか下の階層のフォルダに保存されている必要があります。
+ - 現行バージョンでは、ラスターレベルが入った列だけが書き出しできます。</translation>
     </message>
     <message>
         <source>Export TVPaint JSON File</source>
-        <translation type="unfinished"></translation>
+        <translation>TVPaint JSONファイルの書き出し</translation>
     </message>
     <message>
         <source>EPISODE</source>
@@ -11855,7 +11894,7 @@ Do you wish to continue loading the last good save or stop and try to salvage th
     </message>
     <message>
         <source>Create folder</source>
-        <translation type="unfinished"></translation>
+        <translation>フォルダを作成</translation>
     </message>
     <message>
         <source>TITLE</source>
@@ -11869,49 +11908,69 @@ Do you wish to continue loading the last good save or stop and try to salvage th
     </message>
     <message>
         <source>Restart</source>
-        <translation type="unfinished"></translation>
+        <translation>再開</translation>
     </message>
     <message>
         <source>None</source>
         <comment>XSheetPDF CellMark</comment>
-        <translation type="unfinished"></translation>
+        <translation>なし</translation>
     </message>
     <message>
         <source>Dot</source>
         <comment>XSheetPDF CellMark</comment>
-        <translation type="unfinished"></translation>
+        <translation>点</translation>
     </message>
     <message>
         <source>Circle</source>
         <comment>XSheetPDF CellMark</comment>
-        <translation type="unfinished"></translation>
+        <translation>丸</translation>
     </message>
     <message>
         <source>Filled circle</source>
         <comment>XSheetPDF CellMark</comment>
-        <translation type="unfinished"></translation>
+        <translation>黒丸</translation>
     </message>
     <message>
         <source>Asterisk</source>
         <comment>XSheetPDF CellMark</comment>
-        <translation type="unfinished"></translation>
+        <translation>アスタリスク</translation>
     </message>
     <message>
         <source>Edit Cell Mark #%1</source>
-        <translation type="unfinished"></translation>
+        <translation>コママーク #%1 の編集</translation>
     </message>
     <message>
         <source>None</source>
         <comment>Cell Mark</comment>
-        <translation type="unfinished"></translation>
+        <translation>なし</translation>
     </message>
     <message>
         <source>Set Cell Mark at Column %1  Frame %2 to %3</source>
-        <translation type="unfinished"></translation>
+        <translation>列 %1 フレーム %3 のコママークを %3 に設定</translation>
     </message>
     <message>
         <source>Apply Auto Lip Sync</source>
-        <translation type="unfinished"></translation>
+        <translation>自動リップシンクの適用</translation>
+    </message>
+    <message>
+        <source>All columns</source>
+        <translation>全ての列</translation>
+    </message>
+    <message>
+        <source>Only active columns</source>
+        <translation>表示中の列のみ</translation>
+    </message>
+    <message>
+        <source>Cell Mark for Inbetween Symbol 1 (O)</source>
+        <translation>中割り記号1 （○）に対応するコママーク</translation>
+    </message>
+    <message>
+        <source>Cell Mark for Inbetween Symbol 2 (*)</source>
+        <translation>中割り記号2 （●）に対応するコママーク</translation>
+    </message>
+    <message>
+        <source>Target column</source>
+        <translation>対象の列</translation>
     </message>
 </context>
 <context>
@@ -13193,11 +13252,11 @@ Please commit or revert changes first.</source>
     </message>
     <message>
         <source>Edit Cell Marks</source>
-        <translation type="unfinished"></translation>
+        <translation>コママークを編集</translation>
     </message>
     <message>
         <source>Cell Marks:</source>
-        <translation type="unfinished"></translation>
+        <translation>コママーク：</translation>
     </message>
 </context>
 <context>
@@ -13791,7 +13850,7 @@ Please commit or revert changes first.</source>
     </message>
     <message>
         <source>Cell Mark</source>
-        <translation type="unfinished"></translation>
+        <translation>コママーク</translation>
     </message>
 </context>
 <context>
@@ -14755,7 +14814,7 @@ WARNING : Image size mismatch. The size of level with the same path is %1 x %2.<
     </message>
     <message>
         <source>Use Time Lapse</source>
-        <translation type="unfinished"></translation>
+        <translation>タイムラプスを使用する</translation>
     </message>
     <message>
         <source>Requires restarting camera when toggled
@@ -14773,19 +14832,33 @@ Enter = Capture
 BackSpace = Remove Frame
 Multiply = Toggle Zoom
 Divide = Focus Check</source>
-        <translation type="unfinished"></translation>
+        <translation>このオプションを切り替え後はカメラの再起動が必要です
+1 キー = 前のフレーム
+2 キー = 次のフレーム
+3 キー = 撮影フレームにジャンプ
+5 キー = ライブビュー開始/停止
+6 キー = 少し前から再生
+8 キー = ループ再生
+0 キー = 再生
+. キー = ライブビュー表示の切り替え
++ キー = 不透明度を上げる
+- キー = 不透明度を下げる
+Enter キー = 取り込み
+BackSpace キー = フレーム削除
+* キー = ズーム切り替え
+/ キー = フォーカスチェック</translation>
     </message>
     <message>
         <source>Show Camera Below Other Levels</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラ映像を他のレベルの下に表示</translation>
     </message>
     <message>
         <source>Play Sound on Capture</source>
-        <translation type="unfinished"></translation>
+        <translation>取り込み時に音を再生</translation>
     </message>
     <message>
         <source>Make a click sound on each capture</source>
-        <translation type="unfinished"></translation>
+        <translation>取り込み時にクリック音を出します</translation>
     </message>
 </context>
 <context>
@@ -15573,15 +15646,23 @@ Please refer to the user guide for details.</source>
     </message>
     <message>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation>なし</translation>
     </message>
     <message>
         <source>Inbetween symbol mark</source>
-        <translation type="unfinished"></translation>
+        <translation type="vanished">中割り記号</translation>
     </message>
     <message>
         <source>Reverse sheet symbol mark</source>
-        <translation type="unfinished"></translation>
+        <translation type="vanished">逆シート記号</translation>
+    </message>
+    <message>
+        <source>Cell Mark for Inbetween Symbol 2 (*)</source>
+        <translation>中割り記号2 （●）に対応するコママーク</translation>
+    </message>
+    <message>
+        <source>Cell Mark for Inbetween Symbol 1 (O)</source>
+        <translation>中割り記号1 （○）に対応するコママーク</translation>
     </message>
 </context>
 <context>
@@ -15687,15 +15768,22 @@ Please refer to the user guide for details.</source>
     </message>
     <message>
         <source>Lip Sync</source>
-        <translation type="unfinished"></translation>
+        <translation>リップシンク</translation>
     </message>
     <message>
         <source>Cell Mark</source>
-        <translation type="unfinished"></translation>
+        <translation>コママーク</translation>
     </message>
     <message>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation>なし</translation>
+    </message>
+</context>
+<context>
+    <name>XsheetGUI::ChangeObjectParent</name>
+    <message>
+        <source>Table</source>
+        <translation>テーブル</translation>
     </message>
 </context>
 <context>
@@ -15838,19 +15926,19 @@ Please refer to the user guide for details.</source>
     </message>
     <message>
         <source>Unlock</source>
-        <translation type="unfinished"></translation>
+        <translation>ロック解除</translation>
     </message>
     <message>
         <source>Lock</source>
-        <translation type="unfinished"></translation>
+        <translation>ロック</translation>
     </message>
     <message>
         <source>Click to select parent handle</source>
-        <translation type="unfinished"></translation>
+        <translation>［クリック］親ハンドルを選択</translation>
     </message>
     <message>
         <source>Click to select parent object</source>
-        <translation type="unfinished"></translation>
+        <translation>［クリック］親オブジェクトを選択</translation>
     </message>
 </context>
 <context>
@@ -15897,7 +15985,7 @@ Please refer to the user guide for details.</source>
     </message>
     <message>
         <source>Lock Column</source>
-        <translation type="unfinished"></translation>
+        <translation>列をロック</translation>
     </message>
 </context>
 <context>

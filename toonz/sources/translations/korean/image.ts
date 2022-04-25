@@ -16,51 +16,51 @@
     <name>ExrWriterProperties</name>
     <message>
         <source>Bits Per Pixel</source>
-        <translation type="unfinished">픽셀당 비트 수</translation>
+        <translation>픽셀당 비트 수</translation>
     </message>
     <message>
         <source>48(RGB Half Float)</source>
-        <translation type="unfinished"></translation>
+        <translation>48(RGB 하프 플로트)</translation>
     </message>
     <message>
         <source>64(RGBA Half Float)</source>
-        <translation type="unfinished"></translation>
+        <translation>64(RGB 하프 플로트)</translation>
     </message>
     <message>
         <source>Compression Type</source>
-        <translation type="unfinished">압축</translation>
+        <translation>압축</translation>
     </message>
     <message>
         <source>No compression</source>
-        <translation type="unfinished"></translation>
+        <translation>압축 없음</translation>
     </message>
     <message>
         <source>Run Length Encoding (RLE)</source>
-        <translation type="unfinished"></translation>
+        <translation>실행길이 인코팅(RLE)</translation>
     </message>
     <message>
         <source>ZIP compression per Scanline (ZIPS)</source>
-        <translation type="unfinished"></translation>
+        <translation>스캔 단위로 ZIP 압축(ZIPS)</translation>
     </message>
     <message>
         <source>ZIP compression per scanline band (ZIP)</source>
-        <translation type="unfinished"></translation>
+        <translation>스캔라인 밴드당 ZIP 압축(ZIP)</translation>
     </message>
     <message>
         <source>PIZ-based wavelet compression (PIZ)</source>
-        <translation type="unfinished"></translation>
+        <translation>PIZ-기반 웨이블릿 압축(PIZ)</translation>
     </message>
     <message>
         <source>Storage Type</source>
-        <translation type="unfinished"></translation>
+        <translation>저장 유형</translation>
     </message>
     <message>
         <source>Scan-line based</source>
-        <translation type="unfinished"></translation>
+        <translation>스캔-라인 기반</translation>
     </message>
     <message>
         <source>Tile based</source>
-        <translation type="unfinished"></translation>
+        <translation>티일기반</translation>
     </message>
 </context>
 <context>
@@ -79,63 +79,63 @@
     </message>
     <message>
         <source>Global Palette</source>
-        <translation type="unfinished"></translation>
+        <translation>전체 팔레트</translation>
     </message>
     <message>
         <source>Global Palette + Sierra Dither</source>
-        <translation type="unfinished"></translation>
+        <translation>잔체 팔레트 + 시에라 디더</translation>
     </message>
     <message>
         <source>Global Palette + Bayer2 Dither</source>
-        <translation type="unfinished"></translation>
+        <translation>전체 팔레트 + 바이엘2 디더</translation>
     </message>
     <message>
         <source>Global Palette + Bayer1 Dither</source>
-        <translation type="unfinished"></translation>
+        <translation>전체 팔레트 + 바이엘1 디더</translation>
     </message>
     <message>
         <source>Diff Palette</source>
-        <translation type="unfinished"></translation>
+        <translation>디프 팔레트</translation>
     </message>
     <message>
         <source>Diff Palette + Sierra Dither</source>
-        <translation type="unfinished"></translation>
+        <translation>디프 팔레트 + 시에라 더디</translation>
     </message>
     <message>
         <source>Diff Palette + Bayer2 Dither</source>
-        <translation type="unfinished"></translation>
+        <translation>디프 팔레트 + 바이엘2 디더</translation>
     </message>
     <message>
         <source>Diff Palette + Bayer1 Dither</source>
-        <translation type="unfinished"></translation>
+        <translation>디프 팔레트 + 바이엘2 디더</translation>
     </message>
     <message>
         <source>New Pal Per Frame</source>
-        <translation type="unfinished"></translation>
+        <translation>프레임당 새친구</translation>
     </message>
     <message>
         <source>New Pal Per Frame + Sierra Dither</source>
-        <translation type="unfinished"></translation>
+        <translation>프레임당 새친구 + 시에라 디더</translation>
     </message>
     <message>
         <source>New Pal Per Frame + Bayer2 Dither</source>
-        <translation type="unfinished"></translation>
+        <translation>프레임당 새친구 + 바이엘2 디더</translation>
     </message>
     <message>
         <source>New Pal Per Frame + Bayer1 Dither</source>
-        <translation type="unfinished"></translation>
+        <translation>프레임당 새친구 + 바이엘1 디더</translation>
     </message>
     <message>
         <source>Opaque, Dither, 256 Colors Only</source>
-        <translation type="unfinished"></translation>
+        <translation>불투명, 디더, 266색만</translation>
     </message>
     <message>
         <source>Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>모드</translation>
     </message>
     <message>
         <source>Max Colors</source>
-        <translation type="unfinished"></translation>
+        <translation>최대 색상</translation>
     </message>
 </context>
 <context>
@@ -169,7 +169,7 @@ Please try raising the FFmpeg timeout in Preferences.</source>
     </message>
     <message>
         <source>FFmpeg returned error-code: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>FFmpeg 시간초과 오류 코드: %1</translation>
     </message>
 </context>
 <context>
@@ -332,19 +332,19 @@ Please try raising the FFmpeg timeout in Preferences.</source>
     </message>
     <message>
         <source>24(RGB)</source>
-        <translation></translation>
+        <translation>24(RGBA)</translation>
     </message>
     <message>
         <source>48(RGB)</source>
-        <translation></translation>
+        <translation>48(RGBA)</translation>
     </message>
     <message>
         <source> 1(BW)</source>
-        <translation>1(흑백)</translation>
+        <translation>1(흑과 백)</translation>
     </message>
     <message>
         <source> 8(GREYTONES)</source>
-        <translation>8(그레이 스케일)</translation>
+        <translation>8(회색)</translation>
     </message>
     <message>
         <source>Orientation</source>
@@ -384,11 +384,11 @@ Please try raising the FFmpeg timeout in Preferences.</source>
     </message>
     <message>
         <source>32(RGBA)</source>
-        <translation type="unfinished"></translation>
+        <translation>32(RGBA)</translation>
     </message>
     <message>
         <source>64(RGBA)</source>
-        <translation type="unfinished"></translation>
+        <translation>64(RGBA)</translation>
     </message>
 </context>
 <context>

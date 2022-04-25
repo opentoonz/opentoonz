@@ -101,12 +101,14 @@ XDTSImportPopup::XDTSImportPopup(QStringList levelNames, ToonzScene* scene,
   markLay->setHorizontalSpacing(10);
   markLay->setVerticalSpacing(10);
   {
-    markLay->addWidget(new QLabel(tr("Inbetween symbol mark"), this), 0, 0,
-                       Qt::AlignRight | Qt::AlignVCenter);
+    markLay->addWidget(
+        new QLabel(tr("Cell Mark for Inbetween Symbol 1 (O)"), this), 0, 0,
+        Qt::AlignRight | Qt::AlignVCenter);
     markLay->addWidget(m_tick1Combo, 0, 1);
 
-    markLay->addWidget(new QLabel(tr("Reverse sheet symbol mark"), this), 1, 0,
-                       Qt::AlignRight | Qt::AlignVCenter);
+    markLay->addWidget(
+        new QLabel(tr("Cell Mark for Inbetween Symbol 2 (*)"), this), 1, 0,
+        Qt::AlignRight | Qt::AlignVCenter);
     markLay->addWidget(m_tick2Combo, 1, 1);
   }
   markLay->setColumnStretch(2, 1);

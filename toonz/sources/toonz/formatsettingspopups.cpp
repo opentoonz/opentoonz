@@ -76,15 +76,17 @@ FormatSettingsPopup::FormatSettingsPopup(QWidget *parent,
   if (m_props) {
     int i = 0;
     for (i = 0; i < m_props->getPropertyCount(); i++) {
-      if (dynamic_cast<TEnumProperty *>(m_props->getProperty(i)))
+      TProperty *prop = m_props->getProperty(i);
+      if (prop && !prop->getVisible()) continue;
+      if (dynamic_cast<TEnumProperty *>(prop))
         buildPropertyComboBox(i, m_props);
-      else if (dynamic_cast<TIntProperty *>(m_props->getProperty(i)))
+      else if (dynamic_cast<TIntProperty *>(prop))
         buildValueField(i, m_props);
-      else if (dynamic_cast<TDoubleProperty *>(m_props->getProperty(i)))
+      else if (dynamic_cast<TDoubleProperty *>(prop))
         buildDoubleField(i, m_props);
-      else if (dynamic_cast<TBoolProperty *>(m_props->getProperty(i)))
+      else if (dynamic_cast<TBoolProperty *>(prop))
         buildPropertyCheckBox(i, m_props);
-      else if (dynamic_cast<TStringProperty *>(m_props->getProperty(i)))
+      else if (dynamic_cast<TStringProperty *>(prop))
         buildPropertyLineEdit(i, m_props);
       else
         assert(false);

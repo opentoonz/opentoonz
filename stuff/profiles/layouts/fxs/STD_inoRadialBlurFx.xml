@@ -3,8 +3,13 @@
     <control>center</control>
     <control>radius</control>
     <control>blur</control>
+    <control>type</control>
     <control>twist</control>
     <control>alpha_rendering</control>
+    <separator label="Ellipse"/>
+      <control>ellipse_aspect_ratio</control>
+      <control>ellipse_angle</control>
+      <control>intensity_correlation_with_ellipse</control>
     <separator label=""/>
       <control>anti_alias</control>
       <control>reference</control>

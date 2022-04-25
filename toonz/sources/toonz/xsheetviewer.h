@@ -348,6 +348,12 @@ class XsheetViewer final : public QFrame, public SaveLoadQSettings {
                  setMeshColumnBorderColor)
   Q_PROPERTY(QColor SelectedMeshColumnColor READ getSelectedMeshColumnColor
                  WRITE setSelectedMeshColumnColor)
+  // Table color
+  QColor m_tableColor;
+  Q_PROPERTY(QColor TableColor READ getTableColor WRITE setTableColor)
+  // Peg node
+  QColor m_pegColor;
+  Q_PROPERTY(QColor PegColor READ getPegColor WRITE setPegColor)
   // SoundText column
   QColor m_soundTextColumnColor;
   QColor m_soundTextColumnBorderColor;
@@ -672,6 +678,7 @@ public:
   void setCurrentRow(int row);
 
   void scroll(QPoint delta);
+  int getColumnScrollValue();
 
   void setAutoPanSpeed(const QPoint &speed);
   void setAutoPanSpeed(const QRect &widgetBounds, const QPoint &mousePos);
@@ -935,6 +942,12 @@ public:
   QColor getSelectedMeshColumnColor() const {
     return m_selectedMeshColumnColor;
   }
+  // Table node
+  void setTableColor(const QColor &color) { m_tableColor = color; }
+  QColor getTableColor() const { return m_tableColor; }
+  // Peg node
+  void setPegColor(const QColor &color) { m_pegColor = color; }
+  QColor getPegColor() const { return m_pegColor; }
   // SoundText column
   void setSoundTextColumnColor(const QColor &color) {
     m_soundTextColumnColor = color;

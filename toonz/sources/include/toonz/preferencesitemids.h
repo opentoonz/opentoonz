@@ -129,6 +129,8 @@ enum PreferencesItemId {
   showXSheetToolbar,
   expandFunctionHeader,
   showColumnNumbers,
+  parentColorsInXsheetColumn,
+  highlightLineEverySecond,
   syncLevelRenumberWithXsheet,
   currentTimelineEnabled,
   currentColumnColor,

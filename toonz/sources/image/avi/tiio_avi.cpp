@@ -971,15 +971,15 @@ int TLevelReaderAvi::readFrameFromStream(void *bufferOut, DWORD &bufferSize,
                                          int frameIndex) const {
   assert(bufferOut && bufferSize > 0);
   LONG bytesReaded   = 0;
-  LONG samplesReaded = 0;
+  LONG samplesRead = 0;
 
   int rc = AVIStreamRead(m_videoStream, frameIndex, 1, bufferOut, bufferSize,
-                         &bytesReaded, &samplesReaded);
+                         &bytesReaded, &samplesRead);
   if (!rc) {
-    assert(samplesReaded == 1);  // deve aver letto un frame!!!
+    assert(samplesRead == 1);  // must have read a frame!!!
     assert(bytesReaded <=
-           (LONG)bufferSize);  // deve aver letto un numero di byte
-    // minore o uguale di quello che ci aspettiamo
+           (LONG)bufferSize);  // must have read a number of bytes
+    // less than or equal to what we expect
     bufferSize = bytesReaded;
   }
   return rc;

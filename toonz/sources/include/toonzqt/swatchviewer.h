@@ -161,6 +161,8 @@ public:
     SwatchViewer *m_viewer;
     bool m_started;
 
+    TRenderSettings m_info;
+
     ContentRender(TRasterFx *fx, int frame, const TDimension &size,
                   SwatchViewer *viewer);
     ~ContentRender();

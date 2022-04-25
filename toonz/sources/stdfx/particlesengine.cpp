@@ -752,15 +752,18 @@ void Particles_Engine::do_render(
 
     (*part_ports[part->level])->getBBox(ndx, bbox, riIdentity);
 
-    // A particle's bbox MUST be finite. Gradients and such which have an
-    // infinite bbox
-    // are just NOT rendered.
-
-    // NOTE: No fx returns half-planes or similar (ie if any coordinate is
-    // either
-    // (std::numeric_limits<double>::max)() or its opposite, then the rect IS
-    // THE infiniteRectD)
-    if (bbox.isEmpty() || bbox == TConsts::infiniteRectD) return;
+    // Now sources with infinite bounding box are retrieved with the output tile
+    // size. This is especially for levels deformed by plastic mesh which must
+    // have some finite bbox but return infinite bbox because "it's hard work to
+    // calculate". (see PlasticDeformerFx::doGetBBox() and the issue
+    // opentoonz#1330) NOTE: No fx returns half-planes or similar (ie if any
+    // coordinate is either (std::numeric_limits<double>::max)() or its
+    // opposite, then the rect IS THE infiniteRectD)
+    if (bbox.isEmpty())
+      return;
+    else if (bbox == TConsts::infiniteRectD)
+      bbox *= TRectD(tile->m_pos, TDimensionD(tile->getRaster()->getLx(),
+                                              tile->getRaster()->getLy()));
   }
 
   // Now, these are the particle rendering specifications

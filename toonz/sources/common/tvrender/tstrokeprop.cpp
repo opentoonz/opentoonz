@@ -247,7 +247,10 @@ void OutlineStrokeProp::draw(const TVectorRenderData &rd) {
       m_styleVersionNumber = m_colorStyle->getVersionNumber();
     }
 
-    m_colorStyle->drawStroke(rd.m_cf, &m_outline, m_stroke);
+    if (rd.m_antiAliasing)
+      m_colorStyle->drawStroke(rd.m_cf, &m_outline, m_stroke);
+    else
+      m_colorStyle->drawAliasedStroke(rd.m_cf, &m_outline, m_stroke);
   }
 
   glPopMatrix();

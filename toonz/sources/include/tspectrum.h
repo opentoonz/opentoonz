@@ -41,7 +41,7 @@ private:
                          ColorKey(s, T()),
                          [](const ColorKey &a, const ColorKey &b) {
                            return a.first < b.first;
-                         });  // compare only key postions
+                         });  // compare only key positions
 
     if (b == m_sortedKeys.end())
       return m_sortedKeys.rbegin()->second;

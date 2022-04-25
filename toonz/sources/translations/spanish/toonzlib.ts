@@ -262,11 +262,11 @@
     </message>
     <message>
         <source>Set Keyframe</source>
-        <translation>Marcar fotograma clave</translation>
+        <translation>Marcar clave</translation>
     </message>
     <message>
         <source>Remove Keyframe</source>
-        <translation>Eliminar fotograma clave</translation>
+        <translation>Eliminar clave</translation>
     </message>
     <message>
         <source>Cycle</source>
@@ -326,11 +326,11 @@
     </message>
     <message>
         <source>Set Keyframe   %1 at frame %2</source>
-        <translation>Marcar fotograma clave   %1 en fotograma %2</translation>
+        <translation>Marcar clave   %1 en fotograma %2</translation>
     </message>
     <message>
         <source>Remove Keyframe   %1 at frame %2</source>
-        <translation>Eliminar fotograma clave   %1 en fotograma %2</translation>
+        <translation>Eliminar clave   %1 en fotograma %2</translation>
     </message>
     <message>
         <source>Move Center   %1  Frame %2</source>
@@ -452,39 +452,39 @@
     </message>
     <message>
         <source>Orange</source>
-        <translation type="unfinished"></translation>
+        <translation>Naranja</translation>
     </message>
     <message>
         <source>Yellow</source>
-        <translation type="unfinished"></translation>
+        <translation>Amarillo</translation>
     </message>
     <message>
         <source>Light Green</source>
-        <translation type="unfinished"></translation>
+        <translation>Verde claro</translation>
     </message>
     <message>
         <source>Light Blue</source>
-        <translation type="unfinished"></translation>
+        <translation>Azul claro</translation>
     </message>
     <message>
         <source>Dark Blue</source>
-        <translation type="unfinished"></translation>
+        <translation>Azul oscuro</translation>
     </message>
     <message>
         <source>Purple</source>
-        <translation type="unfinished"></translation>
+        <translation>Morado</translation>
     </message>
     <message>
         <source>Pink</source>
-        <translation type="unfinished"></translation>
+        <translation>Rosa</translation>
     </message>
     <message>
         <source>Dark Pink</source>
-        <translation type="unfinished"></translation>
+        <translation>Rosa oscuro</translation>
     </message>
     <message>
         <source>White</source>
-        <translation type="unfinished"></translation>
+        <translation>Blanco</translation>
     </message>
 </context>
 <context>

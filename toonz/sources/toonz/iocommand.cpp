@@ -1316,6 +1316,10 @@ void IoCmd::newScene() {
 
   if (!saveSceneIfNeeded(QApplication::tr("New Scene"))) return;
 
+  // temporary clear the current level to prevent UI to access deleted level
+  // while switching scenes
+  app->getCurrentLevel()->setLevel(nullptr);
+
   IconGenerator::instance()->clearRequests();
   IconGenerator::instance()->clearSceneIcons();
   ImageManager::instance()->clear();
@@ -1909,6 +1913,11 @@ bool IoCmd::loadScene(const TFilePath &path, bool updateRecentFile,
   }
   QApplication::setOverrideCursor(Qt::WaitCursor);
 
+  TApp *app = TApp::instance();
+  // temporary clear the current level to prevent UI to access deleted level
+  // while switching scenes
+  app->getCurrentLevel()->setLevel(nullptr);
+
   TUndoManager::manager()->reset();
   IconGenerator::instance()->clearRequests();
   IconGenerator::instance()->clearSceneIcons();
@@ -1963,7 +1972,6 @@ bool IoCmd::loadScene(const TFilePath &path, bool updateRecentFile,
     project->setFolder("project", scenePath);
     scene->setProject(project);
   }
-  TApp *app = TApp::instance();
   app->getCurrentScene()->setScene(scene);
   app->getCurrentScene()->notifyNameSceneChange();
   app->getCurrentFrame()->setFrame(0);

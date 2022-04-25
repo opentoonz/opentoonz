@@ -151,6 +151,13 @@ public:
 
   bool hasGadget() { return m_gadgets.size() != 0; }
 
+  int getDevPixRatio();
+
+  // get the current viewer geometry
+  TRectD getGeometry();
+
+  TRectD getCameraRect();
+
 public slots:
 
   void onFxSwitched();
