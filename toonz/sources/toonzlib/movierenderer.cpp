@@ -81,6 +81,10 @@ void getRange(ToonzScene *scene, bool isPreview, int &from, int &to) {
       int r0, r1;
       xs->getCellRange(k, r0, r1);
 
+       TXshColumn *col         = xs->getColumn(k);
+      TXshSoundColumn *sndCol = col ? col->getSoundColumn() : 0;
+
+      if (sndCol) r0  = 0;
       from = std::min(from, r0), to = std::max(to, r1);
     }
   }
