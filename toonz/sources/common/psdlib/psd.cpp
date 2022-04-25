@@ -220,8 +220,8 @@ bool TPSDReader::doLayersInfo() {
     m_headerInfo.layersCount = -m_headerInfo.layersCount;
   }
   if (!m_headerInfo.linfoBlockEmpty) {
-    m_headerInfo.linfo = (TPSDLayerInfo *)mymalloc(
-        m_headerInfo.layersCount * sizeof(struct TPSDLayerInfo));
+    m_headerInfo.linfo = (TPSDLayerInfo *)mycalloc(
+        m_headerInfo.layersCount, sizeof(struct TPSDLayerInfo));
     int i = 0;
     for (i = 0; i < m_headerInfo.layersCount; i++) {
       readLayerInfo(i);
@@ -306,7 +306,9 @@ bool TPSDReader::readLayerInfo(int i) {
     }
 
     // process layer's 'additional info'
-
+    // Assumption: File will provide all layerIds or none at all.
+    // Set layer id, for now, knowing it may be overwritten if found in file
+    li->layerId = i + 1;
     li->additionalpos = ftell(m_file);
     li->additionallen = extrastart + extralen - li->additionalpos;
     doExtraData(li, li->additionallen);
