@@ -136,6 +136,15 @@ void *mymalloc(long n) {
   return NULL;
 }
 
+void *mycalloc(long n, int size) {
+  void *p = calloc(n, size);
+  if (p)
+    return p;
+  else {
+    // ALLOCATION ERROR
+  }
+  return NULL;
+}
 // ZIP COMPRESSION
 
 // ZIP WITHOUT PREDICTION
