@@ -36,6 +36,7 @@ void readrow(FILE *psd, TPSDChannelInfo *chan, psdPixel rowIndex,
 void skipBlock(FILE *f);
 
 void *mymalloc(long n);
+void *mycalloc(long n, int size);
 unsigned read2UBytes(FILE *f);
 int read2Bytes(FILE *f);
 long read4Bytes(FILE *f);
