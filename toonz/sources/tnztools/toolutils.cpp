@@ -59,7 +59,7 @@ void mapToVector(const std::map<int, VIStroke *> &theMap,
                  std::vector<int> &theVect) {
   assert(theMap.size() == theVect.size());
   std::map<int, VIStroke *>::const_iterator it = theMap.begin();
-  UINT i                                       = 0;
+  UINT i = 0;
   for (; it != theMap.end(); ++it) {
     theVect[i++] = it->first;
   }
@@ -603,17 +603,6 @@ void ToolUtils::TToolUndo::notifyImageChanged() const {
   }
 }
 
-//------------------------------------------------------------------------------------------
-
-void ToolUtils::TToolUndo::onAdd() {
-  // clean up the flags after registering undo
-  TTool::m_isLevelCreated     = false;
-  TTool::m_isFrameCreated     = false;
-  TTool::m_isLevelRenumbererd = false;
-}
-
-//------------------------------------------------------------------------------------------
-
 int ToolUtils::TToolUndo::m_idCount = 0;
 
 //================================================================================================
@@ -1046,12 +1035,13 @@ int ToolUtils::UndoModifyListStroke::getSize() const {
 ToolUtils::UndoPencil::UndoPencil(
     TStroke *stroke, std::vector<TFilledRegionInf> *fillInformation,
     TXshSimpleLevel *level, const TFrameId &frameId, bool createdFrame,
-    bool createdLevel, bool autogroup, bool autofill)
+    bool createdLevel, bool autogroup, bool autofill, bool sendToBack)
     : TToolUndo(level, frameId, createdFrame, createdLevel, 0)
     , m_strokeId(stroke->getId())
     , m_fillInformation(fillInformation)
     , m_autogroup(autogroup)
-    , m_autofill(autofill) {
+    , m_autofill(autofill)
+    , m_sendToBack(sendToBack) {
   m_stroke = new TStroke(*stroke);
 }
 
@@ -1124,11 +1114,12 @@ void ToolUtils::UndoPencil::redo() const {
   QMutexLocker sl(image->getMutex());
   TStroke *stroke = new TStroke(*m_stroke);
   stroke->setId(m_strokeId);
-  image->addStroke(stroke);
+  int addedStrokeIndex = image->addStroke(stroke, true, m_sendToBack);
   if (image->isComputedRegionAlmostOnce()) image->findRegions();
 
   if (m_autogroup && stroke->isSelfLoop()) {
-    int index = image->getStrokeCount() - 1;
+    int index               = image->getStrokeCount() - 1;
+    if (m_sendToBack) index = addedStrokeIndex;
     image->group(index, 1);
     if (m_autofill) {
       // to avoid filling other strokes, I enter into the new stroke group
@@ -1485,7 +1476,7 @@ double ToolUtils::ConeSubVolume::compute(double cover) {
   if (i == 20)
     return m_values[i];
   else
-    // Linear interpolation.
+    // Interpolazione lineare.
     return (-(x - (i + 1)) * m_values[i]) - (-(x - i) * m_values[i + 1]);
 }
 
@@ -1500,9 +1491,7 @@ void ToolUtils::drawBalloon(const TPointD &pos, std::string text,
                             const TPixel32 &color, TPoint delta,
                             double pixelSize, bool isPicking,
                             std::vector<TRectD> *otherBalloons) {
-  TTool::Viewer *viewer =
-      TTool::getApplication()->getCurrentTool()->getTool()->getViewer();
-  int devPixRatio = getDevicePixelRatio(viewer->viewerWidget());
+  int devPixRatio = getDevPixRatio();
   QString qText   = QString::fromStdString(text);
   QFont font("Arial");  // ,QFont::Bold);
   font.setPixelSize(13 * devPixRatio);
@@ -1555,6 +1544,9 @@ void ToolUtils::drawBalloon(const TPointD &pos, std::string text,
   int y1 = textRect.bottom() + mrg;
 
   if (isPicking) {
+    TTool::Viewer *viewer =
+        TTool::getApplication()->getCurrentTool()->getTool()->getViewer();
+
     if (viewer->is3DView()) {
       double x0 = pos.x + textRect.left() * pixelSize,
              y0 = pos.y + delta.y * pixelSize;
@@ -1607,14 +1599,14 @@ void ToolUtils::drawBalloon(const TPointD &pos, std::string text,
   pp.moveTo(x0, y - 8 * devPixRatio);
   pp.lineTo(0, y + delta.y);
   pp.lineTo(x0, y);
-  /* rounded edges
+  /* bordi arrotondati
   int arcSize = 10;
   pp.arcTo(x0,y1-arcSize,arcSize,arcSize,180,90);
   pp.arcTo(x1-arcSize,y1-arcSize,arcSize,arcSize,270,90);
   pp.arcTo(x1-arcSize,y0,arcSize,arcSize,0,90);
   pp.arcTo(x0,y0,arcSize,arcSize,90,90);
   */
-  // sharp edges
+  // bordi acuti
   pp.lineTo(x0, y1);
   pp.lineTo(x1, y1);
   pp.lineTo(x1, y0);
@@ -1644,9 +1636,7 @@ void ToolUtils::drawBalloon(const TPointD &pos, std::string text,
 
 void ToolUtils::drawHook(const TPointD &pos, ToolUtils::HookType type,
                          bool highlighted, bool onionSkin) {
-  TTool::Viewer *viewer =
-      TTool::getApplication()->getCurrentTool()->getTool()->getViewer();
-  int devPixRatio = getDevicePixelRatio(viewer->viewerWidget());
+  int devPixRatio = getDevPixRatio();
   int r = 10, d = r + r;
   QImage image(d * devPixRatio, d * devPixRatio, QImage::Format_ARGB32);
   image.fill(Qt::transparent);
@@ -1797,8 +1787,9 @@ bool ToolUtils::doUpdateXSheet(TXshSimpleLevel *sl,
             cells[i].m_level->getType() == CHILD_XSHLEVEL) {
           TXshChildLevel *level = cells[i].m_level->getChildLevel();
           // make sure we haven't already checked the level
-          if (level && std::find(childLevels.begin(), childLevels.end(),
-                                 level) == childLevels.end()) {
+          if (level &&
+              std::find(childLevels.begin(), childLevels.end(), level) ==
+                  childLevels.end()) {
             childLevels.push_back(level);
             TXsheet *subXsh = level->getXsheet();
             ret |= doUpdateXSheet(sl, oldFids, newFids, subXsh, childLevels);
@@ -1831,15 +1822,6 @@ bool ToolUtils::doUpdateXSheet(TXshSimpleLevel *sl,
 
 bool ToolUtils::renumberForInsertFId(TXshSimpleLevel *sl, const TFrameId &fid,
                                      const TFrameId &maxFid, TXsheet *xsh) {
-  auto getNextLetter = [](const QString &letter) {
-    if (letter.isEmpty()) return QString('a');
-    if (letter == 'z' || letter == 'Z') return QString();
-    QByteArray byteArray = letter.toUtf8();
-    // return incrementing the last letter
-    byteArray.data()[byteArray.size() - 1]++;
-    return QString::fromUtf8(byteArray);
-  };
-
   std::vector<TFrameId> fids;
   std::vector<TFrameId> oldFrames;
   sl->getFids(oldFrames);
@@ -1853,10 +1835,10 @@ bool ToolUtils::renumberForInsertFId(TXshSimpleLevel *sl, const TFrameId &fid,
   for (auto itr = fidsSet.upper_bound(maxFid); itr != fidsSet.end(); ++itr) {
     if (*itr > tmpFid) break;
     fIdsToBeShifted.push_back(*itr);
-    if (!fid.getLetter().isEmpty()) {
-      QString nextLetter = getNextLetter((*itr).getLetter());
-      if (!nextLetter.isEmpty())
-        tmpFid = TFrameId((*itr).getNumber(), nextLetter);
+    if (fid.getLetter()) {
+      if ((*itr).getLetter() < 'z')
+        tmpFid = TFrameId((*itr).getNumber(),
+                          ((*itr).getLetter()) ? (*itr).getLetter() + 1 : 'a');
       else
         tmpFid = TFrameId((*itr).getNumber() + 1);
     } else
@@ -1867,10 +1849,11 @@ bool ToolUtils::renumberForInsertFId(TXshSimpleLevel *sl, const TFrameId &fid,
 
   for (TFrameId &tmpFid : fids) {
     if (fIdsToBeShifted.contains(tmpFid)) {
-      if (!fid.getLetter().isEmpty()) {
-        QString nextLetter = getNextLetter(tmpFid.getLetter());
-        if (!nextLetter.isEmpty())
-          tmpFid = TFrameId(tmpFid.getNumber(), nextLetter);
+      if (fid.getLetter()) {
+        if (tmpFid.getLetter() < 'z')
+          tmpFid =
+              TFrameId(tmpFid.getNumber(),
+                       (tmpFid.getLetter()) ? tmpFid.getLetter() + 1 : 'a');
         else
           tmpFid = TFrameId(tmpFid.getNumber() + 1);
       } else
