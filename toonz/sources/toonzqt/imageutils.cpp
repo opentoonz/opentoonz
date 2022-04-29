@@ -895,6 +895,10 @@ FullScreenWidget::FullScreenWidget(QWidget *parent) : QWidget(parent) {
   layout->setSpacing(0);
 
   setLayout(layout);
+  
+#ifdef _WIN32
+  this->winId();
+#endif
 }
 
 //---------------------------------------------------------------------------------
