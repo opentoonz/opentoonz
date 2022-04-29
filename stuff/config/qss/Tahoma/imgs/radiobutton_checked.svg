@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="13px"
+   height="13px"
+   version="1.1"
+   xml:space="preserve"
+   style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"
+   id="svg12"
+   sodipodi:docname="radiobutton_checked.svg"
+   inkscape:version="1.0.1 (3bc2e813f5, 2020-09-07)"><metadata
+   id="metadata18"><rdf:RDF><cc:Work
+       rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+         rdf:resource="http://purl.org/dc/dcmitype/StillImage" /></cc:Work></rdf:RDF></metadata><defs
+   id="defs16" /><sodipodi:namedview
+   pagecolor="#ffffff"
+   bordercolor="#666666"
+   borderopacity="1"
+   objecttolerance="10"
+   gridtolerance="10"
+   guidetolerance="10"
+   inkscape:pageopacity="0"
+   inkscape:pageshadow="2"
+   inkscape:window-width="1920"
+   inkscape:window-height="1001"
+   id="namedview14"
+   showgrid="false"
+   inkscape:zoom="61.667873"
+   inkscape:cx="6.5"
+   inkscape:cy="6.5"
+   inkscape:window-x="-9"
+   inkscape:window-y="-9"
+   inkscape:window-maximized="1"
+   inkscape:current-layer="svg12"
+   inkscape:document-rotation="0" />
+    <g
+   transform="matrix(1.2402377,0,0,1.2474447,-0.35375096,-0.39338982)"
+   id="g4"
+   style="display:inline">
+        <circle
+   cx="5.5"
+   cy="5.5"
+   r="4.5"
+   style="display:inline;fill-opacity:0.5"
+   id="circle2" />
+    </g>
+    <g
+   transform="matrix(1.4,0,0,1.4,-1.2,-1.2)"
+   id="g8"
+   style="display:inline"
+   inkscape:label="g8">
+        <circle
+   cx="5.5"
+   cy="5.5"
+   r="2.5"
+   style="display:inline;fill:#a35293;fill-opacity:1"
+   id="circle6" />
+    </g>
+    <path
+   d="M 6.5,0 C 10.088,0 13,2.912 13,6.5 13,10.088 10.088,13 6.5,13 2.912,13 0,10.088 0,6.5 0,2.912 2.912,0 6.5,0 Z m 0,1 C 9.536,1 12,3.464 12,6.5 12,9.536 9.536,12 6.5,12 3.464,12 1,9.536 1,6.5 1,3.464 3.464,1 6.5,1 Z"
+   style="display:inline;fill:#a35293;fill-opacity:1"
+   id="path10" />
+</svg>
