@@ -122,7 +122,11 @@ protected:
   bool m_firstTime;
   bool m_mousePressed = false;
   TMouseEvent m_mouseEvent;
-
+  
+  bool m_isStraight = false;
+  TPointD m_firstPoint;
+  TPointD m_lastPoint;
+  
   bool m_propertyUpdating = false;
 };
 
