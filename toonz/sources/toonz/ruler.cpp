@@ -58,7 +58,7 @@ double Ruler::getGuide(int index) const {
 //-----------------------------------------------------------------------------
 
 double Ruler::getUnit() const {
-  double unit = getZoomScale() * Stage::inch;
+  double unit = getZoomScale() * (Stage::inch / Stage::standardDpi);
   return unit;
 }
 
@@ -142,7 +142,7 @@ void Ruler::drawVertical(QPainter &p) {
     p.fillRect(QRect(x0, y - 1, x1 - x0, 2), QBrush(color));
   }
 
-  double unit = getUnit() / UnitParameters::getFieldGuideAspectRatio();
+  double unit = getUnit() * 10;
 
   QColor color = m_scaleColor;
 
@@ -158,11 +158,11 @@ void Ruler::drawVertical(QPainter &p) {
       p.setPen(color);
       int h = i % 10;
       if (h == 0)
-        xa = xb - 5;
+        xa = xb - 6;
       else if (h == 5)
         xa = xb - 3;
       else
-        xa = xb - 2;
+        xa = xb - 1;
     }
     p.drawLine(xa, y, xb, y);
   }
@@ -181,7 +181,7 @@ void Ruler::drawHorizontal(QPainter &p) {
   p.drawLine(0, y1, w - 1, y1);
 
   double origin = getPan() + 0.5 * w;
-  double unit   = getUnit();
+  double unit   = getUnit() * 10;
   int i;
 
   QColor color = m_scaleColor;
@@ -209,11 +209,11 @@ void Ruler::drawHorizontal(QPainter &p) {
       p.setPen(color);
       int h = i % 10;
       if (h == 0)
-        ya = yb - 5;
+        ya = yb - 6;
       else if (h == 5)
         ya = yb - 3;
       else
-        ya = yb - 2;
+        ya = yb - 1;
     }
     p.drawLine(x, ya, x, yb);
   }
