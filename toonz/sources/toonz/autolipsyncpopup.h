@@ -93,7 +93,6 @@ protected:
   void refreshSoundLevels();
   void saveAudio();
   void runRhubarb();
-  bool checkRhubarb();
 
 public slots:
   void onApplyButton();

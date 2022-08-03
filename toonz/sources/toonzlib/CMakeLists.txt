@@ -65,6 +65,7 @@ set(HEADERS
     sandor_fxs/patternmap.h
     sandor_fxs/toonz4_6staff.h
     ../include/convert2tlv.h
+    ../include/thirdparty.h
     ../include/orientation.h
     ../include/toonz/Naa2TlvConverter.h
     ../include/toonz/autoclose.h
@@ -246,6 +247,7 @@ set(SOURCES
     tcolumnfxset.cpp
     tdistort.cpp
     texturemanager.cpp
+    thirdparty.cpp
     tlog.cpp
     tnewoutlinevectorize.cpp
     toonzfolders.cpp

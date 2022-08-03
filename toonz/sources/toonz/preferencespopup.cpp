@@ -1133,6 +1133,7 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
       //{ projectRoot,               tr("") },
       {customProjectRoot, tr("Custom Project Path(s):")},
       {pathAliasPriority, tr("Path Alias Priority:")},
+      {restartInitWizard, tr("Run Initialization Wizard Next Launch*")},
 
       // Interface
       {CurrentStyleSheetName, tr("Theme:")},
@@ -1516,6 +1517,7 @@ QWidget* PreferencesPopup::createGeneralPage() {
   insertUI(defaultViewerEnabled, lay);
   insertUI(rasterOptimizedMemory, lay);
   insertUI(startupPopupEnabled, lay);
+  insertUI(restartInitWizard, lay);
   insertUI(undoMemorySize, lay);
   insertUI(taskchunksize, lay);
   insertUI(sceneNumberingEnabled, lay);
@@ -1541,6 +1543,11 @@ QWidget* PreferencesPopup::createGeneralPage() {
   m_projectRootDesktop->setChecked(projectPaths & 0x02);
   m_projectRootCustom->setChecked(projectPaths & 0x01);
   if (!(projectPaths & 0x01)) customField->hide();
+
+  QCheckBox* restartInitWizardCB = getUI<QCheckBox*>(restartInitWizard);
+  restartInitWizardCB->setToolTip(
+      tr("Next time OpenToonz launch it will run an initialization wizard to "
+         "help setup user preferences and settings."));
 
   QComboBox* pathAliasPriorityCB = getUI<QComboBox*>(pathAliasPriority);
   pathAliasPriorityCB->setToolTip(

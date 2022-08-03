@@ -9,6 +9,7 @@
 #include "cleanupsettingspopup.h"
 #include "filebrowsermodel.h"
 #include "expressionreferencemanager.h"
+#include "initwizard.h"
 
 // TnzTools includes
 #include "tools/tool.h"
@@ -461,6 +462,13 @@ int main(int argc, char *argv[]) {
   TMessageRepository::instance();
 
   bool isRunScript = (loadFilePath.getType() == "toonzscript");
+
+  // Initialization wizard
+  if (OTZSetup::requireInitWizard()) {
+    OTZSetup::InitWizard initwiz;
+    if (initwiz.exec() == QDialog::Rejected) return 0;
+    OTZSetup::flagInitWizard(true);
+  }
 
   QSplashScreen splash(splashPixmap);
   if (!isRunScript) splash.show();

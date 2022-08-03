@@ -381,6 +381,7 @@ void Preferences::definePreferenceItems() {
   define(customProjectRoot, "customProjectRoot", QMetaType::QString, "");
   define(pathAliasPriority, "pathAliasPriority", QMetaType::Int,
          (int)ProjectFolderOnly);
+  define(restartInitWizard, "restartInitWizard", QMetaType::Bool, false);
 
   setCallBack(undoMemorySize, &Preferences::setUndoMemorySize);
 
@@ -660,6 +661,7 @@ void Preferences::definePreferenceItems() {
   define(useQtNativeWinInk, "useQtNativeWinInk", QMetaType::Bool, false);
 
   // Others (not appeared in the popup)
+  define(initWizardComplete, "initWizardComplete", QMetaType::Int, 0);
   // Shortcut popup settings
   define(shortcutPreset, "shortcutPreset", QMetaType::QString, "defopentoonz");
   // Viewer context menu

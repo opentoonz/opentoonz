@@ -13,6 +13,7 @@ enum PreferencesItemId {
   projectRoot,
   customProjectRoot,
   pathAliasPriority,
+  restartInitWizard,
 
   //----------
   // Interface
@@ -191,6 +192,7 @@ enum PreferencesItemId {
 
   //----------
   // Others (not appeared in the popup)
+  initWizardComplete,
   // Shortcut popup settings
   shortcutPreset,
   // Viewer context menu

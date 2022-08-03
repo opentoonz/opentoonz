@@ -48,6 +48,7 @@ set(MOC_HEADERS
     histogrampopup.h
     historypane.h
     imageviewer.h
+    initwizard.h
     insertfxpopup.h
     layerfooterpanel.h
     layerheaderpanel.h
@@ -362,6 +363,7 @@ set(SOURCES
 	boardsettingspopup.cpp
 	separatecolorsswatch.cpp
 	separatecolorspopup.cpp
+    initwizard.cpp
     xdtsio.cpp
     ocaio.cpp
 	xdtsimportpopup.cpp

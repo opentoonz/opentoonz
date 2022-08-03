@@ -23,6 +23,7 @@
 #include "tsound_io.h"
 #include "toutputproperties.h"
 #include "toonz/tproject.h"
+#include "thirdparty.h"
 
 // TnzCore includes
 #include "filebrowsermodel.h"
@@ -457,7 +458,7 @@ void AutoLipSyncPopup::showEvent(QShowEvent *) {
   m_startAt->setValue(row + 1);
   m_startAt->clearFocus();
 
-  if (checkRhubarb()) m_rhubarbPath = Preferences::instance()->getRhubarbPath();
+  if (ThirdParty::checkRhubarb()) m_rhubarbPath = ThirdParty::getRhubarbDir();
 
   TXshLevelHandle *level = app->getCurrentLevel();
   m_sl                   = level->getSimpleLevel();
@@ -672,32 +673,6 @@ void AutoLipSyncPopup::saveAudio() {
 
 //-----------------------------------------------------------------------------
 
-bool AutoLipSyncPopup::checkRhubarb() {
-  QString exe = "rhubarb";
-#if defined(_WIN32)
-  exe = exe + ".exe";
-#endif
-
-  // check the user defined path in preferences first
-  QString path = Preferences::instance()->getRhubarbPath() + "/" + exe;
-  if (TSystem::doesExistFileOrLevel(TFilePath(path))) return true;
-
-  // check the OpenToonz root directory next
-  path = QDir::currentPath() + "/rhubarb";
-#if defined(_WIN32)
-  path = path + ".exe";
-#endif
-  if (TSystem::doesExistFileOrLevel(TFilePath(path))) {
-    Preferences::instance()->setValue(rhubarbPath, QDir::currentPath());
-    return true;
-  }
-
-  // give up
-  return false;
-}
-
-//-----------------------------------------------------------------------------
-
 void AutoLipSyncPopup::runRhubarb() {
   QString cacheRoot = ToonzFolder::getCacheRootFolder().getQString();
   if (!TSystem::doesExistFileOrLevel(TFilePath(cacheRoot + "/rhubarb"))) {
@@ -739,11 +714,7 @@ void AutoLipSyncPopup::runRhubarb() {
   connect(m_rhubarb, &QProcess::readyReadStandardError, this,
           &AutoLipSyncPopup::onOutputReady);
 
-  QString rhubarbExe = m_rhubarbPath + "/rhubarb";
-#ifdef _WIN32
-  rhubarbExe = rhubarbExe + ".exe";
-#endif
-  m_rhubarb->start(rhubarbExe, args);
+  ThirdParty::runRhubarb(*m_rhubarb, args);
 }
 
 //-----------------------------------------------------------------------------
@@ -812,7 +783,7 @@ void AutoLipSyncPopup::onApplyButton() {
   }
 
   runRhubarb();
-  int rhubarbTimeout = Preferences::instance()->getRhubarbTimeout();
+  int rhubarbTimeout = ThirdParty::getRhubarbTimeout();
   if (rhubarbTimeout > 0)
     rhubarbTimeout *= 1000;
   else

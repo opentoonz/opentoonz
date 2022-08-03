@@ -7,6 +7,8 @@
 #include "tsound_t.h"
 #include "toonz/preferences.h"
 #include "toonz/toonzfolders.h"
+#include "thirdparty.h"
+
 #include <QDir>
 #include <QProcess>
 
@@ -36,28 +38,6 @@ TSoundTrackP TSoundTrackReaderMp3::load() {
   return track;
 }
 
-bool FfmpegAudio::checkFfmpeg() {
-  // check the user defined path in preferences first
-  QString path = Preferences::instance()->getFfmpegPath() + "/ffmpeg";
-#if defined(_WIN32)
-  path = path + ".exe";
-#endif
-  if (TSystem::doesExistFileOrLevel(TFilePath(path))) return true;
-
-  // check the OpenToonz root directory next
-  path = QDir::currentPath() + "/ffmpeg";
-#if defined(_WIN32)
-  path = path + ".exe";
-#endif
-  if (TSystem::doesExistFileOrLevel(TFilePath(path))) {
-    Preferences::instance()->setValue(ffmpegPath, QDir::currentPath());
-    return true;
-  }
-
-  // give up
-  return false;
-}
-
 TFilePath FfmpegAudio::getFfmpegCache() {
   QString cacheRoot = ToonzFolder::getCacheRootFolder().getQString();
   if (!TSystem::doesExistFileOrLevel(TFilePath(cacheRoot + "/ffmpeg"))) {
@@ -70,10 +50,8 @@ TFilePath FfmpegAudio::getFfmpegCache() {
 
 void FfmpegAudio::runFfmpeg(QStringList args) {
   // write the file
-  QString m_ffmpegPath      = Preferences::instance()->getFfmpegPath();
-  std::string strFfmpegPath = m_ffmpegPath.toStdString();
   QProcess ffmpeg;
-  ffmpeg.start(m_ffmpegPath + "/ffmpeg", args);
+  ThirdParty::runFFmpeg(ffmpeg, args);
   ffmpeg.waitForFinished(30000);
   QString results = ffmpeg.readAllStandardError();
   results += ffmpeg.readAllStandardOutput();

@@ -5,6 +5,7 @@
 // #include "tpluginmanager.h"
 #include "tsound_io.h"
 #include "tfiletype.h"
+#include "thirdparty.h"
 
 // static TPluginInfo info("soundIOPlugin");
 
@@ -25,7 +26,7 @@ void initSoundIo() {
   TSoundTrackWriter::define("raw", TSoundTrackWriterRaw::create);
   TFileType::declare("raw", TFileType::AUDIO_LEVEL);
 
-  if (FfmpegAudio::checkFfmpeg()) {
+  if (ThirdParty::checkFFmpeg()) {
     TSoundTrackReader::define("mp3", TSoundTrackReaderMp3::create);
     // TSoundTrackWriter::define("mp3", TSoundTrackWriterMp3::create);
     TFileType::declare("mp3", TFileType::AUDIO_LEVEL);

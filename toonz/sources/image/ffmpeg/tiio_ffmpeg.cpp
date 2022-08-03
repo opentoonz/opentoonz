@@ -12,70 +12,20 @@
 #include "toonz/preferences.h"
 #include "toonz/toonzfolders.h"
 #include "tmsgcore.h"
+#include "thirdparty.h"
 
 Ffmpeg::Ffmpeg() {
-  m_ffmpegPath         = Preferences::instance()->getFfmpegPath();
-  m_ffmpegTimeout      = Preferences::instance()->getFfmpegTimeout() * 1000;
-  std::string strPath  = m_ffmpegPath.toStdString();
+  m_ffmpegTimeout      = ThirdParty::getFFmpegTimeout() * 1000;
   m_intermediateFormat = "png";
   m_startNumber        = 2147483647;  // Lowest frame determines starting frame
 }
 Ffmpeg::~Ffmpeg() {}
 
-bool Ffmpeg::checkFfmpeg() {
-  // ffmpeg executable
-#if defined(_WIN32)
-  QString exe = "/ffmpeg.exe";
-#else
-  QString exe = "/ffmpeg";
-#endif
-
-  // check the user defined path in preferences first
-  QString path = Preferences::instance()->getFfmpegPath() + exe;
-  if (TSystem::doesExistFileOrLevel(TFilePath(path))) return true;
-
-  // check the OpenToonz root directory next
-  path = QDir::currentPath() + exe;
-  if (TSystem::doesExistFileOrLevel(TFilePath(path))) {
-    Preferences::instance()->setValue(ffmpegPath, QDir::currentPath());
-    return true;
-  }
-
-  // give up
-  return false;
-}
-
-bool Ffmpeg::checkFfprobe() {
-  // check the user defined path in preferences first
-  QString path = Preferences::instance()->getFfmpegPath() + "/ffprobe";
-#if defined(_WIN32)
-  path = path + ".exe";
-#endif
-  if (TSystem::doesExistFileOrLevel(TFilePath(path))) return true;
-
-  // check the OpenToonz root directory next
-  path = QDir::currentPath() + "/ffprobe";
-#if defined(_WIN32)
-  path = path + ".exe";
-#endif
-  if (TSystem::doesExistFileOrLevel(TFilePath(path))) {
-    Preferences::instance()->setValue(ffmpegPath, QDir::currentPath());
-    return true;
-  }
-
-  // give up
-  return false;
-}
-
 bool Ffmpeg::checkFormat(std::string format) {
-  QString path = Preferences::instance()->getFfmpegPath() + "/ffmpeg";
-#if defined(_WIN32)
-  path = path + ".exe";
-#endif
   QStringList args;
   args << "-formats";
   QProcess ffmpeg;
-  ffmpeg.start(path, args);
+  ThirdParty::runFFmpeg(ffmpeg, args);
   ffmpeg.waitForFinished();
   QString results = ffmpeg.readAllStandardError();
   results += ffmpeg.readAllStandardOutput();
@@ -145,7 +95,7 @@ void Ffmpeg::createIntermediateImage(const TImageP &img, int frameIndex) {
 
 void Ffmpeg::runFfmpeg(QStringList preIArgs, QStringList postIArgs,
                        bool includesInPath, bool includesOutPath,
-                       bool overWriteFiles) {
+                       bool overWriteFiles, bool asyncProcess) {
   QString tempName = "//" + QString::fromStdString(m_path.getName()) +
                      "tempOut%d." + m_intermediateFormat;
   tempName = getFfmpegCache().getQString() + tempName;
@@ -174,8 +124,8 @@ void Ffmpeg::runFfmpeg(QStringList preIArgs, QStringList postIArgs,
 
   // write the file
   QProcess ffmpeg;
-  ffmpeg.start(m_ffmpegPath + "/ffmpeg", args);
-  if (waitFfmpeg(ffmpeg)) {
+  ThirdParty::runFFmpeg(ffmpeg, args);
+  if (waitFfmpeg(ffmpeg, asyncProcess)) {
     QString results = ffmpeg.readAllStandardError();
     results += ffmpeg.readAllStandardOutput();
     int exitCode = ffmpeg.exitCode();
@@ -186,8 +136,8 @@ void Ffmpeg::runFfmpeg(QStringList preIArgs, QStringList postIArgs,
 
 QString Ffmpeg::runFfprobe(QStringList args) {
   QProcess ffmpeg;
-  ffmpeg.start(m_ffmpegPath + "/ffprobe", args);
-  if (!waitFfmpeg(ffmpeg)) {
+  ThirdParty::runFFprobe(ffmpeg, args);
+  if (!waitFfmpeg(ffmpeg, false)) {
     throw TImageException(m_path, "error accessing ffprobe.");
   }
   QString results = ffmpeg.readAllStandardError();
@@ -201,19 +151,20 @@ QString Ffmpeg::runFfprobe(QStringList args) {
   return results;
 }
 
-bool Ffmpeg::waitFfmpeg(const QProcess &ffmpeg) {
-  QEventLoop eloop;
-  QTimer timer;
-  timer.connect(&timer, &QTimer::timeout, &eloop, [&eloop] { eloop.exit(-2); });
-  ffmpeg.connect(&ffmpeg, &QProcess::errorOccurred, &eloop,
-                 [&eloop] { eloop.exit(-1); });
-  ffmpeg.connect(&ffmpeg,
-                 static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(
-                     &QProcess::finished),
-                 &eloop, &QEventLoop::quit);
-  timer.start(m_ffmpegTimeout);
+bool Ffmpeg::waitFfmpeg(QProcess &ffmpeg, bool asyncProcess) {
+  if (!asyncProcess) {
+    bool status = ffmpeg.waitForFinished(m_ffmpegTimeout);
+    if (!status) {
+      DVGui::warning(
+          QObject::tr("FFmpeg timed out.\n"
+                      "Please check the file for errors.\n"
+                      "If the file doesn't play or is incomplete, \n"
+                      "Please try raising the FFmpeg timeout in Preferences."));
+    }
+    return status;
+  }
 
-  int exitCode = eloop.exec();
+  int exitCode = ThirdParty::waitAsyncProcess(ffmpeg, m_ffmpegTimeout);
   if (exitCode == 0) return true;
   if (exitCode == -1) {
     DVGui::warning(
@@ -486,7 +437,7 @@ void Ffmpeg::getFramesFromMovie(int frame) {
 
     postIFrameArgs << tempName;
 
-    runFfmpeg(preIFrameArgs, postIFrameArgs, true, true, true);
+    runFfmpeg(preIFrameArgs, postIFrameArgs, true, true, true, false);
 
     for (int i = 1; i <= m_frameCount; i++) {
       QString number      = QString("%1").arg(i, 4, 10, QChar('0'));

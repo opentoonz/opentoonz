@@ -32,7 +32,6 @@ Returns a soundtrack reader able to read .mp3 audio files
 class FfmpegAudio {
 public:
   TFilePath getRawAudio(TFilePath path);
-  static bool checkFfmpeg();
 
 private:
   TFilePath getFfmpegCache();

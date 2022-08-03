@@ -2,6 +2,7 @@
 #include "tnzimage.h"
 #include "tiio.h"
 #include "tfiletype.h"
+#include "thirdparty.h"
 
 //-------------------------------------------------------------------
 
@@ -188,23 +189,22 @@ void initImageIo(bool lightVersion) {
 
 // ffmpeg
 #if !defined(_WIN32) || defined(x64) || (defined(_WIN32) && defined(__GNUC__))
-  if (Ffmpeg::checkFfmpeg()) {
-    bool ffprobe = Ffmpeg::checkFfprobe();
+  if (ThirdParty::checkFFmpeg()) {
     if (Ffmpeg::checkFormat("webm")) {
       TLevelWriter::define("webm", TLevelWriterWebm::create, true);
-      if (ffprobe) TLevelReader::define("webm", TLevelReaderWebm::create);
+      TLevelReader::define("webm", TLevelReaderWebm::create);
       TFileType::declare("webm", TFileType::RASTER_LEVEL);
       Tiio::defineWriterProperties("webm", new Tiio::WebmWriterProperties());
     }
     if (Ffmpeg::checkFormat("gif")) {
       TLevelWriter::define("gif", TLevelWriterGif::create, true);
-      if (ffprobe) TLevelReader::define("gif", TLevelReaderGif::create);
+      TLevelReader::define("gif", TLevelReaderGif::create);
       TFileType::declare("gif", TFileType::RASTER_LEVEL);
       Tiio::defineWriterProperties("gif", new Tiio::GifWriterProperties());
     }
     if (Ffmpeg::checkFormat("mp4")) {
       TLevelWriter::define("mp4", TLevelWriterMp4::create, true);
-      if (ffprobe) TLevelReader::define("mp4", TLevelReaderMp4::create);
+      TLevelReader::define("mp4", TLevelReaderMp4::create);
       TFileType::declare("mp4", TFileType::RASTER_LEVEL);
       Tiio::defineWriterProperties("mp4", new Tiio::Mp4WriterProperties());
     }
