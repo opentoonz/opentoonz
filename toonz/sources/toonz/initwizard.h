@@ -144,18 +144,20 @@ public:
 private:
   QLabel *m_roomsLabel;
   QComboBox *m_roomsCombo;
+  QPushButton *m_resetRoom;
 
   QLabel *m_themeLabel;
   QComboBox *m_themeCombo;
+  QLabel *m_dIconLabel;
+  QComboBox *m_dIconCombo;
   QLabel *m_themeIcon;
 
-  bool m_darkIcons;
-
   void initializePage();
+  bool validatePage();
 
 private slots:
-  void roomsChanged(int index);
   void themeChanged(int index);
+  void resetRoom();
 };
 
 //-----------------------------------------------------------------------------

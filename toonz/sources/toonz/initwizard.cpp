@@ -409,10 +409,13 @@ void RhubarbPage::browsePath() {
 UIPage::UIPage(QWidget *parent) : QWizardPage(parent) {
   m_roomsLabel = new QLabel();
   m_roomsCombo = new QComboBox();
+  m_resetRoom  = new QPushButton();
 
   m_themeLabel = new QLabel();
   m_themeCombo = new QComboBox();
-  m_darkIcons  = new QCheckBox();
+  m_dIconLabel = new QLabel();
+  m_dIconCombo = new QComboBox();
+
   m_themeIcon  = new QLabel();
 
   Preferences *pref = Preferences::instance();
@@ -428,6 +431,9 @@ UIPage::UIPage(QWidget *parent) : QWizardPage(parent) {
   for (auto const &style : styles) {
     m_themeCombo->addItem(style);
   }
+  m_dIconCombo->addItem("1");
+  m_dIconCombo->addItem("2");
+  m_dIconCombo->addItem("3");
 
   // find style
   int index = m_themeCombo->findText(
@@ -436,10 +442,9 @@ UIPage::UIPage(QWidget *parent) : QWizardPage(parent) {
   m_themeCombo->setCurrentIndex(index);
   themeChanged(index);  // generate preview
 
-  bool ret = connect(m_roomsCombo, SIGNAL(currentIndexChanged(int)), this,
-                     SLOT(roomsChanged(int)));
-  ret      = connect(m_themeCombo, SIGNAL(currentIndexChanged(int)), this,
-                SLOT(themeChanged(int)));
+  bool ret = connect(m_themeCombo, SIGNAL(currentIndexChanged(int)), this,
+                     SLOT(themeChanged(int)));
+  ret = ret && connect(m_resetRoom, SIGNAL(clicked()), this, SLOT(resetRoom()));
   if (!ret) throw TException();
 
   QGridLayout *layout = new QGridLayout();
@@ -447,9 +452,12 @@ UIPage::UIPage(QWidget *parent) : QWizardPage(parent) {
   layout->addWidget(m_roomsCombo, 0, 1);
   layout->addWidget(m_themeLabel, 1, 0);
   layout->addWidget(m_themeCombo, 1, 1);
+  layout->addWidget(m_dIconLabel, 1, 2, Qt::AlignRight);
+  layout->addWidget(m_dIconCombo, 1, 3);
   layout->setColumnStretch(1, 1);
   layout->setRowStretch(2, 1);
-  layout->addWidget(m_themeIcon, 3, 0, 1, 2, Qt::AlignCenter);
+  layout->addWidget(m_themeIcon, 3, 0, 1, 4, Qt::AlignCenter);
+  layout->addWidget(m_resetRoom, 3, 2, 1, 2, Qt::AlignBottom);
   setLayout(layout);
 }
 
@@ -461,15 +469,42 @@ void UIPage::initializePage() {
 
   m_roomsLabel->setText(tr("Rooms:"));
   m_themeLabel->setText(tr("Theme:"));
+  m_dIconLabel->setText(tr("Icons:"));
+  m_resetRoom->setText(tr(" Reset All Rooms "));
+  m_dIconCombo->setItemText(0, tr("Best"));
+  m_dIconCombo->setItemText(1, tr("Light"));
+  m_dIconCombo->setItemText(2, tr("Dark"));
 }
 
 //-----------------------------------------------------------------------------
 
-void UIPage::roomsChanged(int index) {
+bool UIPage::validatePage() {
+  Preferences *pref = Preferences::instance();
+
+  // Save rooms setting
   QString room = m_roomsCombo->currentText();
-  if (room != Preferences::instance()->getStringValue(CurrentRoomChoice)) {
-    Preferences::instance()->setValue(CurrentRoomChoice, room);
+  if (room != pref->getStringValue(CurrentRoomChoice)) {
+    pref->setValue(CurrentRoomChoice, room);
   }
+
+  // Setup and save dark icons
+  bool darkIcons = m_dIconCombo->currentIndex() == 2;
+  if (m_dIconCombo->currentIndex() == 0) {
+    // Is dark icons best for the theme?
+    QString name     = m_themeCombo->currentText();
+    std::string path = "qss/" + name.toStdString();
+    TFilePath fpDIco(TEnv::getConfigDir() + path + "/darkicons.txt");
+    darkIcons = TSystem::doesExistFileOrLevel(fpDIco);
+  }
+  if (darkIcons != pref->getBoolValue(iconTheme))
+    pref->setValue(iconTheme, darkIcons);
+
+  // Save theme setting
+  QString theme = m_themeCombo->currentText();
+  if (theme != pref->getStringValue(CurrentStyleSheetName))
+    pref->setValue(CurrentStyleSheetName, theme);
+
+  return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -478,9 +513,6 @@ void UIPage::themeChanged(int index) {
   QString name     = m_themeCombo->currentText();
   std::string path = "qss/" + name.toStdString();
   TFilePath fpPrev(TEnv::getConfigDir() + path + "/preview.png");
-  TFilePath fpDIco(TEnv::getConfigDir() + path + "/darkicons.txt");
-
-  m_darkIcons = TSystem::doesExistFileOrLevel(fpDIco);
 
   QPixmap preview = QPixmap(192, 108);
   if (TSystem::doesExistFileOrLevel(fpPrev))
@@ -488,11 +520,24 @@ void UIPage::themeChanged(int index) {
   else
     preview.fill(Qt::transparent);
   m_themeIcon->setPixmap(preview);
+}
 
-  QString theme = m_themeCombo->currentText();
-  if (theme != Preferences::instance()->getStringValue(CurrentStyleSheetName)) {
-    Preferences::instance()->setValue(CurrentStyleSheetName, theme);
-    Preferences::instance()->setValue(iconTheme, m_darkIcons);
+//-----------------------------------------------------------------------------
+
+void UIPage::resetRoom() {
+  QString message(tr("Reset rooms to their default?"));
+  message += "\n" + tr("All user rooms will be lost!");
+
+  QMessageBox::StandardButton ret = QMessageBox::question(
+      this, tr("Reset Rooms"), message,
+      QMessageBox::StandardButtons(QMessageBox::Yes | QMessageBox::No));
+
+  if (ret != QMessageBox::Yes) return;
+
+  // Reflect changes to mainwindow.cpp: void MainWindow::resetRoomsLayout()
+  TFilePath layoutDir = ToonzFolder::getMyRoomsDir();
+  if (layoutDir != TFilePath()) {
+    TSystem::rmDirTree(layoutDir);
   }
 }
 
@@ -726,9 +771,10 @@ void InitWizard::customNext() {
 
 void InitWizard::customCancel() {
   QMessageBox::StandardButton reply = QMessageBox::question(
-      this, tr("OpenToonz"), tr("Skip Wizard and Start OpenToonz?"),
+      this, tr("Initialization Wizard"), tr("Skip Wizard and Start OpenToonz?"),
                                 QMessageBox::Yes | QMessageBox::No);
   if (reply == QMessageBox::Yes) {
+    currentPage()->validatePage();
     QDialog::accept();
   }
 }
