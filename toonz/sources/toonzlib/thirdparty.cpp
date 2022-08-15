@@ -62,14 +62,15 @@ bool checkFFmpeg() {
 //-----------------------------------------------------------------------------
 
 QString autodetectFFmpeg() {
+  QString dir = Preferences::instance()->getFfmpegPath();
+  if (findFFmpeg(dir)) return dir;
+
   if (findFFmpeg(".")) return ".";
   if (findFFmpeg("./ffmpeg")) return "./ffmpeg";
   if (findFFmpeg("./ffmpeg/bin")) return "./ffmpeg/bin";
   if (findFFmpeg("./FFmpeg")) return "./FFmpeg";
   if (findFFmpeg("./FFmpeg/bin")) return "./FFmpeg/bin";
 
-  QString dir = Preferences::instance()->getFfmpegPath();
-  if (findFFmpeg(dir)) return dir;
   return "";
 }
 
@@ -160,13 +161,14 @@ bool checkRhubarb() {
 //-----------------------------------------------------------------------------
 
 QString autodetectRhubarb() {
+  QString dir = Preferences::instance()->getRhubarbPath();
+  if (findRhubarb(dir)) return dir;
+
   if (findRhubarb(".")) return ".";
   if (findRhubarb("./rhubarb")) return "./rhubarb";
   if (findRhubarb("./rhubarb/bin")) return "./rhubarb/bin";
   if (findRhubarb("./Rhubarb-Lip-Sync")) return "./Rhubarb-Lip-Sync";
 
-  QString dir = Preferences::instance()->getRhubarbPath();
-  if (findRhubarb(dir)) return dir;
   return "";
 }
 

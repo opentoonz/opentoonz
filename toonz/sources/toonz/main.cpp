@@ -463,13 +463,6 @@ int main(int argc, char *argv[]) {
 
   bool isRunScript = (loadFilePath.getType() == "toonzscript");
 
-  // Initialization wizard
-  if (OTZSetup::requireInitWizard()) {
-    OTZSetup::InitWizard initwiz;
-    if (initwiz.exec() == QDialog::Rejected) return 0;
-    OTZSetup::flagInitWizard(true);
-  }
-
   QSplashScreen splash(splashPixmap);
   if (!isRunScript) splash.show();
   a.processEvents();
@@ -496,6 +489,15 @@ int main(int argc, char *argv[]) {
 
   // Toonz environment
   initToonzEnv(argumentPathValues);
+
+  // Initialization wizard
+  if (OTZSetup::requireInitWizard()) {
+    splash.hide();
+    a.processEvents();
+    if (!OTZSetup::runInitWizard()) return 0;
+    splash.show();
+    a.processEvents();
+  }
 
   // prepare for 30bit display
   if (Preferences::instance()->is30bitDisplayEnabled()) {

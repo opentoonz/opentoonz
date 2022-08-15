@@ -31,10 +31,48 @@ namespace OTZSetup {
 
 //-----------------------------------------------------------------------------
 
+bool validateInstallment() {
+  // TODO: Add more files?
+
+  TFilePath configDir = TEnv::getConfigDir();
+  if (!TSystem::doesExistFileOrLevel(configDir)) return false;
+  if (!TSystem::doesExistFileOrLevel(configDir + "/current.txt")) return false;
+  if (!TSystem::doesExistFileOrLevel(configDir + "/qss")) return false;
+
+  return true;
+}
+
+//-----------------------------------------------------------------------------
+
 bool requireInitWizard() {
   Preferences *pref = Preferences::instance();
   if (pref->getBoolValue(restartInitWizard)) return true;
   return pref->getIntValue(initWizardComplete) < INITWIZARD_REVISION;
+}
+
+//-----------------------------------------------------------------------------
+
+bool runInitWizard() {
+  if (!validateInstallment()) {
+    QString msg =
+        QObject::tr("Folder '%1' has missing files or folders.")
+            .arg(QString::fromStdWString(TEnv::getStuffDir().getWideString())) +
+        "\n" +
+        QObject::tr("Installing %1 again could fix the problem.")
+            .arg(QString::fromStdString(TEnv::getApplicationFullName()));
+
+    QMessageBox::critical(NULL, QObject::tr("Error"), msg);
+    exit(0);
+  }
+
+  OTZSetup::InitWizard initwiz;
+
+  // CrashHandler::attachParentWindow(&initwiz);
+  if (initwiz.exec() == QDialog::Rejected) return false;
+  // CrashHandler::attachParentWindow(NULL);
+
+  OTZSetup::flagInitWizard(true);
+  return true;
 }
 
 //-----------------------------------------------------------------------------

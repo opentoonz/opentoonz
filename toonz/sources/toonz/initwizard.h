@@ -21,6 +21,16 @@ namespace OTZSetup {
 
 //-----------------------------------------------------------------------------
 
+bool validateInstallment();
+
+bool requireInitWizard();
+
+bool runInitWizard();
+
+void flagInitWizard(bool completed);
+
+//-----------------------------------------------------------------------------
+
 // List of launch wizard pages
 enum {
   LANGUAGE_PAGE,
@@ -30,14 +40,6 @@ enum {
   UI_PAGE,
   PROJECTS_PAGE
 };
-
-//-----------------------------------------------------------------------------
-
-bool requireInitWizard();
-
-// TODO: add button on perferences to reset initialize wizard
-
-void flagInitWizard(bool completed);
 
 //-----------------------------------------------------------------------------
 
