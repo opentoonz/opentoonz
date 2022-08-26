@@ -1,7 +1,7 @@
 <dvpreset fxId="STD_particlesFx" ver="1.0">
   <params>
     <source_ctrl>
-      0 
+      -1 
     </source_ctrl>
     <multi_source>
       0 0 
