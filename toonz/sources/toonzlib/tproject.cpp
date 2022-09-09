@@ -780,6 +780,10 @@ TProjectManager *TProjectManager::instance() {
 }
 
 //-------------------------------------------------------------------
+// Clear all projecs roots container.
+void TProjectManager::clearProjectsRoot() { m_projectsRoots.clear(); }
+
+//-------------------------------------------------------------------
 /*! Adds the specified folder \b fp in the projecs roots container.\n
         If \b fp is already contained in the container, the method does nothing.
         \note \b fp must be a folder and not a file path.*/

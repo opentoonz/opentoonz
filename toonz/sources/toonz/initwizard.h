@@ -29,6 +29,8 @@ bool runInitWizard();
 
 void flagInitWizard(bool completed);
 
+void rescanProjectFolders();
+
 //-----------------------------------------------------------------------------
 
 // List of launch wizard pages

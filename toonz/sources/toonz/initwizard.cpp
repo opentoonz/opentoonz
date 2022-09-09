@@ -1,6 +1,7 @@
 #include "initwizard.h"
 
 // Tnz6 includes
+#include "crashhandler.h"
 #include "tapp.h"
 
 // TnzBase includes
@@ -13,6 +14,7 @@
 // TnzLib includes
 #include "toonz/toonzfolders.h"
 #include "toonz/preferences.h"
+#include "toonz/tproject.h"
 #include "thirdparty.h"
 
 // TnzCore includes
@@ -67,11 +69,12 @@ bool runInitWizard() {
 
   OTZSetup::InitWizard initwiz;
 
-  // CrashHandler::attachParentWindow(&initwiz);
+  CrashHandler::attachParentWindow(&initwiz);
   if (initwiz.exec() == QDialog::Rejected) return false;
-  // CrashHandler::attachParentWindow(NULL);
+  CrashHandler::attachParentWindow(NULL);
 
   OTZSetup::flagInitWizard(true);
+  OTZSetup::rescanProjectFolders();
   return true;
 }
 
@@ -87,6 +90,18 @@ void flagInitWizard(bool completed) {
 
   // Mark as complete
   pref->setValue(initWizardComplete, completed ? INITWIZARD_REVISION : 0);
+}
+
+//-----------------------------------------------------------------------------
+
+void rescanProjectFolders() {
+  TProjectManager *projectManager = TProjectManager::instance();
+
+  TFilePathSet projectsRoots = ToonzFolder::getProjectsFolders();
+  TFilePathSet::iterator it;
+  projectManager->clearProjectsRoot();
+  for (it = projectsRoots.begin(); it != projectsRoots.end(); ++it)
+    projectManager->addProjectsRoot(*it);
 }
 
 //-----------------------------------------------------------------------------
@@ -150,14 +165,14 @@ void LanguagePage::initializePage() {
     QApplication::removeTranslator(m_translator);
     delete m_translator;
   }
-  std::string debugz = languagePathString.toStdString();
+
   m_translator = new QTranslator();
   m_translator->load("toonz", languagePathString);
   QApplication::installTranslator(m_translator);
 
   QStringList lines;
-  lines.append(
-      tr("This wizard will guide you through the initial configuration process."));
+  lines.append(tr(
+      "This wizard will guide you through the initial configuration process."));
   lines.append("");
   lines.append(tr("Select your preferred language:"));
   m_headLabel->setText(lines.join('\n'));
@@ -271,8 +286,7 @@ FFMPEGPage::FFMPEGPage(QWidget *parent) : QWizardPage(parent) {
   m_statusIcon  = new QLabel();
   m_statusLabel = new QLabel();
 
-  bool ret =
-      connect(m_pathBrowse, SIGNAL(clicked()), this, SLOT(browsePath()));
+  bool ret = connect(m_pathBrowse, SIGNAL(clicked()), this, SLOT(browsePath()));
   ret = ret && connect(m_pathEdit, SIGNAL(textChanged(const QString &)), this,
                        SLOT(testPath(const QString &)));
   if (!ret) throw TException();
@@ -338,11 +352,17 @@ void FFMPEGPage::browsePath() {
 #if defined(_WIN32)
   QString path = Preferences::instance()->getFfmpegPath() + "/ffmpeg.exe";
 #else
-  QString path = Preferences::instance()->getFfmpegPath() + "/ffmpeg";
+  QString path     = Preferences::instance()->getFfmpegPath() + "/ffmpeg";
 #endif
 
+#ifdef MACOSX
+  QString fileName = QFileDialog::getOpenFileName(
+      this, tr("Find FFmpeg executable"), path, tr("Any (*)"), nullptr,
+      QFileDialog::Option::DontUseNativeDialog);
+#else
   QString fileName = QFileDialog::getOpenFileName(
       this, tr("Find FFmpeg executable"), path, tr("All files (*.*)"));
+#endif
   if (fileName.isEmpty()) return;
 
   TFilePath fp = TFilePath(fileName);
@@ -366,8 +386,7 @@ RhubarbPage::RhubarbPage(QWidget *parent) : QWizardPage(parent) {
   m_statusIcon  = new QLabel();
   m_statusLabel = new QLabel();
 
-  bool ret =
-      connect(m_pathBrowse, SIGNAL(clicked()), this, SLOT(browsePath()));
+  bool ret = connect(m_pathBrowse, SIGNAL(clicked()), this, SLOT(browsePath()));
   ret = ret && connect(m_pathEdit, SIGNAL(textChanged(const QString &)), this,
                        SLOT(testPath(const QString &)));
   if (!ret) throw TException();
@@ -429,11 +448,17 @@ void RhubarbPage::browsePath() {
 #if defined(_WIN32)
   QString path = Preferences::instance()->getRhubarbPath() + "/rhubarb.exe";
 #else
-  QString path = Preferences::instance()->getRhubarbPath() + "/rhubarb";
+  QString path     = Preferences::instance()->getRhubarbPath() + "/rhubarb";
 #endif
 
+#ifdef MACOSX
+  QString fileName = QFileDialog::getOpenFileName(
+      this, tr("Find Rhubarb executable"), path, tr("Any (*)"), nullptr,
+      QFileDialog::Option::DontUseNativeDialog);
+#else
   QString fileName = QFileDialog::getOpenFileName(
       this, tr("Find Rhubarb executable"), path, tr("All files (*.*)"));
+#endif
   if (fileName.isEmpty()) return;
 
   TFilePath fp = TFilePath(fileName);
@@ -448,12 +473,10 @@ UIPage::UIPage(QWidget *parent) : QWizardPage(parent) {
   m_roomsLabel = new QLabel();
   m_roomsCombo = new QComboBox();
   m_resetRoom  = new QPushButton();
-
   m_themeLabel = new QLabel();
   m_themeCombo = new QComboBox();
   m_dIconLabel = new QLabel();
   m_dIconCombo = new QComboBox();
-
   m_themeIcon  = new QLabel();
 
   Preferences *pref = Preferences::instance();
@@ -608,7 +631,8 @@ ProjectsPage::ProjectsPage(QWidget *parent) : QWizardPage(parent) {
 
   bool ret = connect(m_customAdd, SIGNAL(clicked()), this, SLOT(addPath()));
   ret = ret && connect(m_customDel, SIGNAL(clicked()), this, SLOT(delPath()));
-  ret = ret && connect(m_customRefsh, SIGNAL(clicked()), this, SLOT(refreshPaths()));
+  ret = ret &&
+        connect(m_customRefsh, SIGNAL(clicked()), this, SLOT(refreshPaths()));
   ret = ret && connect(m_customCB, SIGNAL(stateChanged(int)), this,
                        SLOT(customCBChanged(int)));
   if (!ret) throw TException();
@@ -810,7 +834,7 @@ void InitWizard::customNext() {
 void InitWizard::customCancel() {
   QMessageBox::StandardButton reply = QMessageBox::question(
       this, tr("Initialization Wizard"), tr("Skip Wizard and Start OpenToonz?"),
-                                QMessageBox::Yes | QMessageBox::No);
+      QMessageBox::Yes | QMessageBox::No);
   if (reply == QMessageBox::Yes) {
     currentPage()->validatePage();
     QDialog::accept();

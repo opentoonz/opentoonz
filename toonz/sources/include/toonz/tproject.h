@@ -140,6 +140,7 @@ public:
 
   void saveTemplate(ToonzScene *scene);
 
+  void clearProjectsRoot();
   void addProjectsRoot(const TFilePath &fp);
   void addSVNProjectsRoot(const TFilePath &fp);
 
