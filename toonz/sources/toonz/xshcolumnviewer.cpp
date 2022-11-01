@@ -481,6 +481,11 @@ void ChangeObjectParent::refresh() {
       if (colx->getColumnType() != TXshColumn::eSoundTextType &&
           colx->getColumnType() != TXshColumn::eSoundType) {
         QColor unused;
+     if (colx->getColumnType() == TXshColumn::eSoundTextType ||
+          colx->getColumnType() == TXshColumn::eSoundType)
+        continue;
+
+      QColor unused;   
         viewer->getColumnColor(newTextBG, unused, id.getIndex(), xsh);
       }
     } else
@@ -1295,8 +1300,7 @@ void ColumnArea::DrawHeader::drawPegbarName() const {
 void ColumnArea::DrawHeader::drawParentHandleName() const {
   if (col < 0 || isEmpty ||
       !o->flag(PredefinedFlag::PARENT_HANDLE_NAME_VISIBILE) ||
-      column->getSoundColumn() || column->getSoundTextColumn() ||
-      column->getPaletteColumn())
+      column->getSoundColumn() || column->getSoundTextColumn()) 
     return;
 
   QRect parenthandleRect =
