@@ -1250,12 +1250,21 @@ void XsheetViewer::keyPressEvent(QKeyEvent *event) {
     stride.setFrame(cellSel->getSelectedCells().getRowCount());
 
     if (m_cellArea->isControlPressed()) {  // resize
-      if (r0 == r1 && shift.frame() < 0) return;
+
       if (c0 == c1 && shift.layer() < firstCol) return;
-      cellSel->selectCells(r0, c0, r1 + shift.frame(), c1 + shift.layer());
+
+      bool prevRow = r0 < getCurrentRow();
+      bool prevCol = c0 < getCurrentColumn();
+
+      if (!prevRow and !prevCol)  cellSel->selectCells(r0, c0, r1 + shift.frame(), c1 + shift.layer());
+      if ( prevRow and !prevCol)  cellSel->selectCells(r0 + shift.frame(), c0, r1, c1 + shift.layer());
+      if (!prevRow and  prevCol)  cellSel->selectCells(r0, c0 + shift.layer(), r1 + shift.frame(), c1);
+      if ( prevRow and  prevCol)  cellSel->selectCells(r0 + shift.frame(), c0 + shift.layer(), r1, c1);
+
       updateCells();
       TApp::instance()->getCurrentSelection()->notifySelectionChanged();
       return;
+
     } else {  // shift
       CellPosition offset(shift * stride);
       int movedR0   = std::max(0, r0 + offset.frame());
