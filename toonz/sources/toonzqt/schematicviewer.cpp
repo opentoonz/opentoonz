@@ -633,7 +633,7 @@ void SchematicSceneViewer::tabletEvent(QTabletEvent *e) {
     m_stylusUsed = false;
   }
 
-  e->accept();
+  //e->accept();
 }
 
 //------------------------------------------------------------------
