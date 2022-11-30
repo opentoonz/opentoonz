@@ -190,6 +190,7 @@ protected:
   TPixel32 m_currentColor;
   int m_styleId;
   double m_minThick, m_maxThick;
+  double m_oldMinThick, m_oldMaxThick;
 
   int m_targetType;
   TPointD m_dpiScale,

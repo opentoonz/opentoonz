@@ -1837,11 +1837,16 @@ void ToonzRasterBrushTool::mouseMove(const TPointD &pos, const TMouseEvent &e) {
   TRectD invalidateRect(m_brushPos - halfThick, m_brushPos + halfThick);
 
   if (e.isCtrlPressed() && e.isAltPressed() && !e.isShiftPressed() &&
-      Preferences::instance()->useCtrlAltToResizeBrushEnabled()) {
+  Preferences::instance()->useCtrlAltToResizeBrushEnabled()) {
+      if (!m_oldMaxThick && !m_oldMinThick) {
+          //keep previous values as an offset
+          m_oldMaxThick = m_maxThick;
+          m_oldMinThick = m_minThick;
+      }
     // Resize the brush if CTRL+ALT is pressed and the preference is enabled.
     const TPointD &diff = pos - m_mousePos;
-    double max          = diff.x / 2;
-    double min          = diff.y / 2;
+    double max          = m_oldMaxThick + diff.x / 2;
+    double min          = m_oldMinThick + diff.y / 2;
 
     locals.addMinMaxSeparate(m_rasThickness, min, max);
 
@@ -1850,6 +1855,10 @@ void ToonzRasterBrushTool::mouseMove(const TPointD &pos, const TMouseEvent &e) {
                              m_brushPos + TPointD(radius, radius));
 
   } else {
+    if (m_oldMaxThick && m_oldMinThick) {
+        m_oldMaxThick = 0;
+        m_oldMinThick = 0;
+    }
     m_mousePos = pos;
     m_brushPos = getCenteredCursorPos(pos);
 
