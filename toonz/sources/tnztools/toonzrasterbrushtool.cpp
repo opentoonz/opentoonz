@@ -1812,8 +1812,8 @@ void ToonzRasterBrushTool::mouseMove(const TPointD &pos, const TMouseEvent &e) {
       const TDoublePairProperty::Range &range = prop.getRange();
 
       TDoublePairProperty::Value value = prop.getValue();
-      value.first += min;
-      value.second += max;
+      value.first = min;
+      value.second = max;
       if (value.first > value.second) value.first = value.second;
       value.first  = tcrop(value.first, range.first, range.second);
       value.second = tcrop(value.second, range.first, range.second);
