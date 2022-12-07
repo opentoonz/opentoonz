@@ -1,20 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="16px" height="16px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
-    <g transform="matrix(1,0,0,1,-70,-410)">
-        <g id="render">
-            <g id="bg" transform="matrix(0.110345,0,0,0.121212,53.7793,391.091)">
-                <rect x="147" y="156" width="145" height="132" style="fill:rgb(135,135,135);fill-opacity:0;"/>
-            </g>
-            <g transform="matrix(1,0,0,1,-1,-5)">
-                <path d="M86,417C86,416.448 85.552,416 85,416L76,416C75.448,416 75,416.448 75,417L75,424C75,424.552 75.448,425 76,425L85,425C85.552,425 86,424.552 86,424L86,417ZM83.5,420.5L79,423L79,418L83.5,420.5Z"/>
-            </g>
-            <g transform="matrix(1,0,0,-1,-1,836)">
-                <path d="M84,414L74,414C73.448,414 73,414.448 73,415C73,417.146 73,422 73,422L74,422L74,415L84,415L84,414Z"/>
-            </g>
-            <g transform="matrix(1,0,0,-1,-1,836)">
-                <path d="M82,412L72,412C71.448,412 71,412.448 71,413C71,415.146 71,420 71,420L72,420L72,413L82,413L82,412Z"/>
-            </g>
-        </g>
+<svg width="100%" height="100%" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g id="render">
+        <rect id="bg" x="0" y="-0.01" width="16" height="16" style="fill:#878787;fill-opacity:0;"/>
+        <path d="M11,1.99l0,7c0,0.552 -0.448,1 -1,1l-9,0c-0.552,0 -1,-0.448 -1,-1l0,-7c0,-0.552 0.448,-1 1,-1l9,0c0.552,0 1,0.448 1,1Zm-3.172,3.073l-4.049,-2.578c-0.156,-0.099 -0.354,-0.105 -0.516,-0.016c-0.162,0.089 -0.263,0.259 -0.263,0.444l-0,5.154c0,0.185 0.101,0.355 0.263,0.444c0.162,0.089 0.36,0.083 0.516,-0.016l4.049,-2.578c0.146,-0.093 0.235,-0.254 0.235,-0.427c-0,-0.173 -0.089,-0.334 -0.235,-0.427Zm-5.828,5.927l8.992,0c0.267,0 0.524,-0.106 0.713,-0.295c0.189,-0.189 0.295,-0.446 0.295,-0.713l0.001,-5.992c0.264,0 0.519,0.105 0.706,0.293c0.188,0.187 0.293,0.441 0.293,0.706l0,6.001c-0,0.552 -0.448,1 -1,1l-9,0c-0.552,-0 -1,-0.448 -1,-1Zm2,2l8.973,0c0.273,0 0.534,-0.108 0.726,-0.301c0.193,-0.192 0.301,-0.453 0.301,-0.726l0,-5.973c0.552,0 1,0.448 1,1l0,6c-0,0.552 -0.448,1 -1,1l-9,0c-0.552,-0 -1,-0.448 -1,-1Z"/>
     </g>
 </svg>

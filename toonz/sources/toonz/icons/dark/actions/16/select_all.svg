@@ -1,20 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="16px" height="16px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;">
-    <g transform="matrix(1,0,0,1,-110,-130)">
-        <g id="select_all">
-            <g id="bg" transform="matrix(0.110345,0,0,0.121212,93.7793,111.091)">
-                <rect x="147" y="156" width="145" height="132" style="fill:rgb(135,135,135);fill-opacity:0;"/>
-            </g>
-            <g transform="matrix(0.833333,0,0,0.833333,-9.33328,94.5)">
-                <path d="M161.2,46.2C161.2,44.875 160.125,43.8 158.8,43.8L149.2,43.8C147.875,43.8 146.8,44.875 146.8,46.2L146.8,55.8C146.8,57.125 147.875,58.2 149.2,58.2L158.8,58.2C160.125,58.2 161.2,57.125 161.2,55.8L161.2,46.2ZM160,46.2C160,45.538 159.462,45 158.8,45L149.2,45C148.538,45 148,45.538 148,46.2L148,55.8C148,56.462 148.538,57 149.2,57L158.8,57C159.462,57 160,56.462 160,55.8L160,46.2Z"/>
-            </g>
-            <g transform="matrix(0.709099,0,0,0.709099,115.025,133.15)">
-                <path d="M1.375,5.181L4.444,8.25L9.969,2.725" style="fill:none;stroke:black;stroke-width:2.06px;"/>
-            </g>
-            <g transform="matrix(1,0,0,-1,-37.0003,189)">
-                <path d="M149,55C148.47,55 147.961,54.789 147.586,54.414C147.211,54.039 147,53.53 147,53L147,45C147,44.47 147.211,43.961 147.586,43.586C147.961,43.211 148.47,43 149,43L157,43C157.53,43 158.039,43.211 158.414,43.586C158.789,43.961 159,44.47 159,45L158,45C158,44.735 157.895,44.48 157.707,44.293C157.52,44.105 157.265,44 157,44L149,44C148.735,44 148.48,44.105 148.293,44.293C148.105,44.48 148,44.735 148,45L148,53C148,53.265 148.105,53.52 148.293,53.707C148.48,53.895 148.735,54 149,54L149,55Z"/>
-            </g>
-        </g>
+<svg width="100%" height="100%" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;">
+    <g id="select_all">
+        <rect id="bg" x="0" y="0" width="16" height="16" style="fill:#878787;fill-opacity:0;"/>
+        <path id="fileobject" d="M16,1.046l-0,10c0,0.553 -0.448,1 -1,1l-10,0c-0.552,0 -1,-0.447 -1,-1l0,-10c0,-0.552 0.448,-1 1,-1l10,0c0.552,0 1,0.448 1,1Zm-1,0l-10,0l-0,10l10,0l0,-10Z"/>
+        <path d="M7.453,5.329l2.176,2.176l3.918,-3.917" style="fill:none;stroke:#000;stroke-width:1.46px;"/>
+        <path d="M12,13.046l0,2c0,0.553 -0.448,1 -1,1l-10,0c-0.552,0 -1,-0.447 -1,-1l0,-10c0,-0.552 0.448,-1 1,-1l2,0l0,1l-2,0l0,10l10,0l0,-2l1,0Z"/>
     </g>
 </svg>

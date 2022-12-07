@@ -1,19 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="16px" height="16px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
-    <g transform="matrix(1,0,0,1,-210,-250)">
-        <g id="sub_xsheet" transform="matrix(1,0,0,1,180,-99.9995)">
-            <g id="bg" transform="matrix(0.110345,0,0,0.121212,13.7793,331.091)">
-                <rect x="147" y="156" width="145" height="132" style="fill:rgb(135,135,135);fill-opacity:0;"/>
-            </g>
-            <g>
-                <g transform="matrix(1,0,0,1,-180,120)">
-                    <path d="M224,240L211,240L211,241L224,241L224,240ZM224,237L214,237L214,238L224,238L224,237ZM224,234L218,234L218,235L224,235L224,234Z" style="fill-opacity:0.5;"/>
-                </g>
-                <g transform="matrix(1,0,0,1,-180,99.9995)">
-                    <path d="M225,263.5C225,263.776 224.776,264 224.5,264C221.949,264 210.5,264.001 210.5,264.001C210.224,264.001 210,263.777 210,263.501L210,257.497C210,257.223 210.222,257 210.496,257L213,257.001L213,254.501L213.002,254.501C213.023,254.221 213.256,254.001 213.541,254.001C214.634,254.001 217,254.001 217,254.001L217,251.532C217,251.239 217.238,251.001 217.531,251.001C218.989,251.001 223.041,251.001 224.483,251.001C224.62,251.001 224.752,251.055 224.849,251.152C224.946,251.249 225,251.381 225,251.518L225,263.5ZM217,255.001L214,255.001L214,263.001L215,263.001L215,263L217,263L217,255.001ZM213,263.001L211,263.001L211,258.001L213,258.001L213,263.001ZM224,259.127L224,259.127C224,255.801 224,252.001 224,252.001L218,252.001L218,263L224,263L224,259.127Z"/>
-                </g>
-            </g>
-        </g>
+<svg width="100%" height="100%" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g id="sub_xsheet">
+        <rect id="bg" x="-0.009" y="-0" width="16" height="16" style="fill:#878787;fill-opacity:0;"/>
+        <path d="M14.991,10l-14,0l0,1l14,-0l0,-1Zm0,-3l-11,0l0,1l11,-0l0,-1Zm0,-3l-7,-0l0,1l7,0l0,-1Z" style="fill-opacity:0.5;"/>
+        <path d="M14.991,14l-15,-0l0,-7l3,0l0,-3l4,0l0,-3l8,-0l0,13Zm-1,-5c0,-2.166 0,-7 0,-7l-6,0l0,11l6,0l0,-3l0,-1Zm-7,4l0,-8l-3,0l0,8l3,0Zm-4,0l0,-5l-2,0l0,5l2,0Z"/>
     </g>
 </svg>

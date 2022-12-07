@@ -1,12 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="16px" height="16px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
-    <g transform="matrix(1,0,0,1,-90,-110)">
-        <g id="set_cropbox">
-            <g id="bg" transform="matrix(0.110345,0,0,0.121212,73.7797,91.0909)">
-                <rect x="147" y="156" width="145" height="132" style="fill:rgb(135,135,135);fill-opacity:0;"/>
-            </g>
-            <path d="M95,110L95,121L106,121L106,123L103,123L103,126L101,126L101,123L95,123C94.47,123 93.961,122.789 93.586,122.414C93.211,122.039 93,121.53 93,121L93,115L90,115L90,113L93,113L93,110L95,110ZM103,120L101,120L101,115L96,115L96,113L101,113C101.53,113 102.039,113.211 102.414,113.586C102.789,113.961 103,114.47 103,115L103,120Z"/>
-        </g>
+<svg width="100%" height="100%" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g id="set_cropbox">
+        <rect id="bg" x="-0" y="0" width="16" height="16" style="fill:#878787;fill-opacity:0;"/>
+        <path id="crop" d="M5,3l6,0c0.53,-0 1.039,0.211 1.414,0.586c0.375,0.375 0.586,0.884 0.586,1.414l-0.001,5l-1.999,-0l-0,-5l-11,0l-0,-2l3,0l-0,-3l2,0l-0,3Zm-0,2.985l-0,5.015l11,-0l-0,2l-3.001,-0l0,3l-1.999,0l-0,-3l-6,-0c-0.531,0 -1.04,-0.211 -1.415,-0.586c-0.375,-0.375 -0.585,-0.884 -0.585,-1.414l-0,-5.015l2,-0Z"/>
     </g>
 </svg>

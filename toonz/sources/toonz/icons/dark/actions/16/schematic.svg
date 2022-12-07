@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="16px" height="16px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
-    <g transform="matrix(1,0,0,1,-30,-270)">
-        <g id="schematic">
-            <g id="bg" transform="matrix(0.110345,0,0,0.121212,13.7793,251.091)">
-                <rect x="147" y="156" width="145" height="132" style="fill:rgb(135,135,135);fill-opacity:0;"/>
-            </g>
-            <g transform="matrix(1,1.8378e-17,-1.8378e-17,1,-578,250)">
-                <path d="M622,31C622.552,31 623,31.448 623,32L623,34C623,34.552 622.552,35 622,35L619,35C618.448,35 618,34.552 618,34L618,32C618,31.448 618.448,31 619,31L622,31ZM610,28C610,27.448 610.448,27 611,27L620,27C620.552,27 621,27.448 621,28L621,31L622,31L619,31L620,31L620,28L611,28L611,31L612,31C612.552,31 613,31.448 613,32L613,34C613,34.552 612.552,35 612,35L609,35C608.448,35 608,34.552 608,34L608,32C608,31.448 608.448,31 609,31L610,31L610,28ZM614,24L617,24L616,24L616,27L615,27L615,24L614,24ZM617,20C617.552,20 618,20.448 618,21L618,23C618,23.552 617.552,24 617,24L614,24C613.448,24 613,23.552 613,23L613,21C613,20.448 613.448,20 614,20L617,20Z"/>
-            </g>
-        </g>
+<svg width="100%" height="100%" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g id="schematic">
+        <path id="bg" d="M0,0l0,16l16,0l0,-16l-16,0Z" style="fill:#878787;fill-opacity:0;"/>
+        <rect x="0" y="7" width="4" height="3"/>
+        <rect x="12" y="2" width="4" height="3"/>
+        <rect x="12" y="12" width="4" height="3"/>
+        <rect x="5" y="8" width="3" height="1"/>
+        <rect x="8" y="3" width="3" height="1"/>
+        <rect x="8" y="13" width="3" height="1"/>
+        <rect x="7" y="3" width="1" height="11"/>
     </g>
 </svg>

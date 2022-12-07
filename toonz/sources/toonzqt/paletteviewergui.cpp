@@ -1207,10 +1207,10 @@ void PageViewer::contextMenuEvent(QContextMenuEvent *event) {
 
   if (m_page) {
     menu.addSeparator();
-    QIcon newStyleIco = createQIcon("new_style", false, true);
+    QIcon newStyleIco = createQIcon("newstyle", false, true);
     QAction *newStyle = menu.addAction(newStyleIco, tr("New Style"));
     connect(newStyle, SIGNAL(triggered()), SLOT(addNewColor()));
-    QIcon newPageIco = createQIcon("new_page", false, true);
+    QIcon newPageIco = createQIcon("newpage", false, true);
     QAction *newPage = menu.addAction(newPageIco, tr("New Page"));
     connect(newPage, SIGNAL(triggered()), SLOT(addNewPage()));
   }

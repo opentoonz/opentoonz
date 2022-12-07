@@ -1,23 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="16px" height="16px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
-    <g transform="matrix(1,0,0,1,-210,-370)">
-        <g id="merge_levels" transform="matrix(1,0,0,1,100,140)">
-            <g id="bg" transform="matrix(0.110345,0,0,0.121212,93.7793,211.091)">
-                <rect x="147" y="156" width="145" height="132" style="fill:rgb(135,135,135);fill-opacity:0;"/>
-            </g>
-            <g transform="matrix(1,0,0,1,-99,-118)">
-                <path d="M211,351L211,360L224,360L224,357L225,357L225,360C225,360.552 224.552,361 224,361L211,361C210.448,361 210,360.552 210,360L210,357L211,357L211,354L210,354L210,351C210,350.448 210.448,350 211,350L221.876,350C222.276,350 222.659,350.159 222.941,350.441C223.397,350.897 224.105,351.605 224.561,352.061C224.842,352.342 225,352.723 225,353.121C225,353.534 225,354 225,354L224,354L224,353L222,353L222,351L211,351Z"/>
-            </g>
-            <g transform="matrix(1,7.66906e-17,-7.66906e-17,1,102,225)">
-                <path d="M9,12.999L8.99,12.999L8.955,12L13,12L13,10L15.5,12.5L13,15L13,13L9,12.999Z"/>
-            </g>
-            <g transform="matrix(-1,7.66906e-17,7.66906e-17,1,134.955,225)">
-                <path d="M9,12.999L8.99,12.999L8.955,12L13,12L13,10L15.5,12.5L13,15L13,13L9,12.999Z"/>
-            </g>
-            <g transform="matrix(1,0,0,1,-100,-118)">
-                <path d="M219,358L218,358L218,360L219,360L219,358ZM219,354L218,354L218,357L219,357L219,354ZM219,351L218,351L218,353L219,353L219,351Z" style="fill-opacity:0.5;"/>
-            </g>
-        </g>
+<svg width="100%" height="100%" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g id="merge_levels">
+        <rect id="bg" x="-0" y="0" width="16" height="16" style="fill:#878787;fill-opacity:0;"/>
+        <path d="M8,10l-1,0l-0,3l1,0l-0,-3Zm-0,-4l-1,0l-0,3l1,0l-0,-3Zm-0,-4l-1,0l-0,3l1,0l-0,-3Z" style="fill-opacity:0.5;"/>
+        <path d="M1,1l-0,13l13,0l-0,-3l1,0l0,4l-15,-0l-0,-4l1,0l-0,-7l-1,0l0,-4l11.876,0l3.124,3.121l-0,0.879l-1,0l-0,-1l-2,0l-0,-2l-11,0Z"/>
+        <path d="M-0,7.999l-0.01,0l-0.035,-0.999l4.045,0l-0,-2l2.5,2.5l-2.5,2.5l-0,-2l-4,-0.001Z"/>
+        <path d="M14.955,7.999l0.01,0l0.035,-0.999l-4.045,0l-0,-2l-2.5,2.5l2.5,2.5l-0,-2l4,-0.001Z"/>
     </g>
 </svg>

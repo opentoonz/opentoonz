@@ -1,15 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="16px" height="16px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
-    <g transform="matrix(1,0,0,1,-90,-490)">
-        <g id="paste_duplicate">
-            <g id="bg" transform="matrix(0.110345,0,0,0.121212,73.7797,471.091)">
-                <rect x="147" y="156" width="145" height="132" style="fill:rgb(135,135,135);fill-opacity:0;"/>
-            </g>
-            <path d="M98.759,505L92,505C91.448,505 91,504.552 91,504L91,492C91,491.448 91.448,491 92,491L94,491C94,490.448 94.448,490 95,490L99,490C99.552,490 100,490.448 100,491L102,491C102.552,491 103,491.448 103,492L103,498L102,498L102,492C102,492 100,492 100,492L100,492.013C99.993,492.559 99.548,493 99,493L95,493C94.448,493 94,492.552 94,492L92,492L92,504L98.256,504C98.382,504.356 98.552,504.692 98.759,505ZM99,491L95,491L95,492L99,492L99,491Z"/>
-            <g id="add" transform="matrix(1,0,0,1,85,485)">
-                <path d="M17.5,14C19.432,14 21,15.568 21,17.5C21,19.432 19.432,21 17.5,21C15.568,21 14,19.432 14,17.5C14,15.568 15.568,14 17.5,14ZM18,17L20,17L20,18L18,18L18,20L17,20L17,18L15,18L15,17L17,17L17,15L18,15L18,17Z"/>
-            </g>
-        </g>
+<svg width="100%" height="100%" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g id="paste_duplicate">
+        <rect id="bg" x="-0.015" y="-0.004" width="16" height="16" style="fill:#878787;fill-opacity:0;"/>
+        <path d="M8.985,0.996l0,1c0,0.552 -0.448,1 -1,1l-4,-0c-0.552,-0 -1,-0.448 -1,-1l0,-1c0,-0.553 0.448,-1 1,-1l4,-0c0.552,-0 1,0.447 1,1Zm-1,-0l-4,-0l0,1l4,-0l0,-1Z"/>
+        <path id="ad" d="M12.485,8.996c1.932,-0 3.5,1.568 3.5,3.5c0,1.931 -1.568,3.5 -3.5,3.5c-1.932,-0 -3.5,-1.569 -3.5,-3.5c0,-1.932 1.568,-3.5 3.5,-3.5Zm-0.5,3l-2,-0l0,1l2,-0l0,2l1,-0l0,-2l2,-0l0,-1l-2,-0l0,-2l-1,-0l0,2Z"/>
+        <path d="M8.744,14.996l-7.759,-0c-0.552,-0 -1,-0.448 -1,-1l0,-12c0,-0.553 0.448,-1 1,-1l3,-0l0,1l-3,-0l0,12l7.257,-0c0.126,0.356 0.295,0.691 0.502,1Zm2.241,-6.744l0,-6.256l-3,-0l0,-1l3,-0c0.552,-0 1,0.447 1,1l0,6.027c-0.347,0.039 -0.681,0.116 -1,0.229Z"/>
     </g>
 </svg>

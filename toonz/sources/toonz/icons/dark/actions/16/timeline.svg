@@ -1,14 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="16px" height="16px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
-    <g transform="matrix(1,0,0,1,-30,-210)">
-        <g id="timeline">
-            <g id="bg" transform="matrix(0.110345,0,0,0.121212,13.7793,191.091)">
-                <rect x="147" y="156" width="145" height="132" style="fill:rgb(135,135,135);fill-opacity:0;"/>
-            </g>
-            <path d="M35,213.2L35,225L34,225L34,213.2L32,210L37,210L35,213.2Z"/>
-            <path d="M31,225L45,225L45,212L37.165,212L37.79,211L45,211C45.265,211 45.52,211.105 45.707,211.293C45.895,211.48 46,211.735 46,212L46,225C46,225.265 45.895,225.52 45.707,225.707C45.52,225.895 45.265,226 45,226L31,226C30.448,226 30,225.552 30,225C30,222.276 30,214.747 30,212.011C30,211.463 30.441,211.018 30.989,211.012C31.062,211.01 31.137,211.009 31.214,211.007L31.835,212L31,212L31,225ZM35.75,212L33.25,212L32.625,211L36.375,211L35.75,212Z"/>
-            <path d="M32.8,222L32.8,223L31,223L31,222L32.8,222ZM35,223L34,223L34,222L35,222L35,223ZM36.2,222L45,222L45,223L36.2,223L36.2,222ZM32.8,218L32.8,219L31,219L31,218L32.8,218ZM35,219L34,219L34,218L35,218L35,219ZM36.2,218L45,218L45,219L36.2,219L36.2,218ZM32.8,213.544L32.8,215L31,215L31,212L31.835,212L32.8,213.544ZM35,213.2L35,215L34,215L34,213.2L33.25,212L35.75,212L35,213.2ZM37.165,212L45,212L45,215L36.2,215L36.2,213.544L37.165,212Z" style="fill-opacity:0.5;"/>
-        </g>
+<svg width="100%" height="100%" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g id="timeline">
+        <rect x="-0" y="0" width="16" height="16" style="fill:#878787;fill-opacity:0;"/>
+        <path d="M6,3.2l-0,10.8l-1,-0l-0,-10.8l-2,-3.2l5,-0l-2,3.2Z"/>
+        <path d="M4,14l-4,-0l-0,-13c-0,-0 2.137,0.009 2.214,0.007l0.621,0.993l-1.835,-0l-0,11l3,-0l-0,1Zm3,-1l8,-0l-0,-11l-6.835,-0l0.625,-1l7.21,-0l-0,13l-9,-0l-0,-1Z"/>
+        <path d="M4,10l-0,1l-3,-0l-0,-1l3,-0Zm3,-0l8,-0l-0,1l-8,-0l-0,-1Zm-3,-4l-0,1l-3,-0l-0,-1l3,-0Zm3,-0l8,-0l-0,1l-8,-0l-0,-1Zm-3,-2.216l-0,0.216l-3,-0l-0,-2l1.835,-0l1.165,1.784Zm4.165,-1.784l6.835,-0l-0,2l-8,-0l-0,-0.456l1.165,-1.544Z" style="fill-opacity:0.5;"/>
     </g>
 </svg>

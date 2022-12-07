@@ -1,21 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="16px" height="16px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
-    <g transform="matrix(1,0,0,1,-130,-270)">
-        <g id="run_script" transform="matrix(1,0,0,1,20,40)">
-            <g id="bg" transform="matrix(0.110345,0,0,0.121212,93.7793,211.091)">
-                <rect x="147" y="156" width="145" height="132" style="fill:rgb(135,135,135);fill-opacity:0;"/>
-            </g>
-            <path d="M120,231.5L123.5,235L120,235L120,231.5Z"/>
-            <g transform="matrix(1,0,0,1,-162.5,87.121)">
-                <path d="M278.226,147.121L282.833,150.997L278.226,154.879L277.167,153.799L280.55,151.01L277.167,148.201L278.226,147.121Z"/>
-            </g>
-            <g transform="matrix(1,0,0,1,105,225)">
-                <path d="M17.5,14C19.432,14 21,15.568 21,17.5C21,19.432 19.432,21 17.5,21C15.568,21 14,19.432 14,17.5C14,15.568 15.568,14 17.5,14ZM20,17.5L16,15L16,20L20,17.5Z"/>
-            </g>
-            <g transform="matrix(1,0,0,1,-20,-40)">
-                <path d="M138.52,285C138.324,284.689 138.164,284.354 138.045,284L133,284L133,272L140,272L143,275L143,277.826C143.346,277.863 143.681,277.937 144,278.045L144,275C144,274.735 143.895,274.48 143.707,274.293L140.707,271.293C140.52,271.105 140.265,271 140,271L133,271C132.448,271 132,271.448 132,272L132,284C132,284.552 132.448,285 133,285L138.52,285Z"/>
-            </g>
-        </g>
+<svg width="100%" height="100%" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;">
+    <g id="run_script">
+        <rect id="bg" x="0" y="-0" width="16" height="16" style="fill:#878787;fill-opacity:0;"/>
+        <path d="M14,15l-12,0l-0,-14l8,0l4,4l0,10Zm-1,-1l-0,-9l-3,0l-0,-3l-7,0l-0,12l10,0Z"/>
+        <path d="M4.402,7l2.598,2.598l-2.598,2.402" style="fill:none;stroke:#000;stroke-width:1px;"/>
+        <path d="M8,11.5l4,-0.007" style="fill:none;stroke:#000;stroke-width:1px;"/>
     </g>
 </svg>

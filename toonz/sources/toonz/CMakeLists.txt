@@ -82,6 +82,7 @@ set(MOC_HEADERS
     ruler.h
     savepresetpopup.h
     scanpopup.h
+    scenebrowser.h
     scenesettingspopup.h
     sceneviewer.h
     sceneviewercontextmenu.h
@@ -285,6 +286,8 @@ set(SOURCES
     runscriptcommand.cpp
     savepresetpopup.cpp
     scanpopup.cpp
+    scenebrowser.cpp
+    scenebrowserversioncontrol.cpp
     sceneviewercontextmenu.cpp
     scenesettingspopup.cpp
     scriptconsolepanel.cpp

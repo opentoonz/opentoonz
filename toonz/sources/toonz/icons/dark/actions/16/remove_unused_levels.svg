@@ -1,20 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="16px" height="16px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
-    <g transform="matrix(1,0,0,1,-150,-230)">
-        <g id="remove_unused_levels" transform="matrix(1,0,0,1,40,0)">
-            <g id="bg" transform="matrix(0.110345,0,0,0.121212,93.7793,211.091)">
-                <rect x="147" y="156" width="145" height="132" style="fill:rgb(135,135,135);fill-opacity:0;"/>
-            </g>
-            <g>
-                <path d="M120,231.5L123.5,235L120,235L120,231.5Z"/>
-                <g transform="matrix(1,0,0,1,-40,0)">
-                    <path d="M163,244L160,244L160,245L163,245C163.552,245 164,244.552 164,244L164,241L163,241L163,239L164,239L164,237L163,237L163,235L164,235C164,234.735 163.895,234.48 163.707,234.293L160.707,231.293C160.52,231.105 160.265,231 160,231L153,231C152.448,231 152,231.448 152,232L152,244C152,244.552 152.448,245 153,245L154,245L154,244L153,244L153,243L152,243L152,241L153,241L153,239L152,239L152,237L153,237L153,235L152,235L152,233L153,233L153,232L154,232L154,231L156,231L156,232L158,232L158,231L160,231L160,232L163,235L163,244ZM158,245L158,244L156,244L156,245L158,245Z"/>
-                </g>
-                <g transform="matrix(1,0,0,1,-40,0)">
-                    <path d="M158.036,238.631L155.488,236.083L154.851,236.72L157.399,239.268L154.851,241.815L155.488,242.452L158.036,239.905L160.583,242.452L161.22,241.815L158.672,239.268L161.22,236.72L160.583,236.083L158.036,238.631Z"/>
-                </g>
-            </g>
-        </g>
+<svg width="100%" height="100%" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g id="remove_unused_levels">
+        <rect id="bg" x="0.001" y="-0.04" width="16" height="16" style="fill:#878787;fill-opacity:0;"/>
+        <path id="deselect" d="M1.001,0.96l14,14" style="fill:none;stroke:#000;stroke-width:1.5px;"/>
+        <path d="M13.001,12.02l1,1l0,1.94l-4,-0l0,-1l3,-0l0,-1.94Zm0,-3.06l0,-2l1,-0l0,2l-1,-0Zm-3,-4l0,-4l4,4l-4,-0Zm-2,-4l0,1l-2,-0l0,-1l2,-0Zm-6,8l1,-0l0,2l-1,-0l0,-2Zm0,4l1,-0l0,1l1,-0l0,1l-2,-0l0,-2Zm0,-8l1,-0l0,2l-1,-0l0,-2Zm6,10l-2,-0l0,-1l2,-0l0,1Z"/>
     </g>
 </svg>

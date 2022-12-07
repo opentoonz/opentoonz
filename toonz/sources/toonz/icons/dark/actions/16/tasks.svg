@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="16px" height="16px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
-    <g transform="matrix(1,0,0,1,-30,-450)">
-        <g id="tasks">
-            <g id="bg" transform="matrix(0.110345,0,0,0.121212,13.7793,431.091)">
-                <rect x="147" y="156" width="145" height="132" style="fill:rgb(135,135,135);fill-opacity:0;"/>
-            </g>
-            <g transform="matrix(1,0,0,1,29,450)">
-                <path d="M4.5,16C3.672,16 3,15.328 3,14.5L3,2L5,2L5,6L13,6L13,2L15,2L15,14.462C15,14.87 14.838,15.261 14.55,15.55C14.261,15.838 13.87,16 13.462,16C10.546,16 4.5,16 4.5,16ZM8,11L5,11L5,14L8,14L8,11ZM9,12L9,13L13,13L13,12L9,12ZM6,12L7,12L7,13L6,13L6,12ZM8,7L5,7L5,10L8,10L8,7ZM6,8L7,8L7,9L6,9L6,8ZM13,8L9,8L9,9L13,9L13,8ZM12,5L6,5L6,2L7,2C7,0.896 7.896,0 9,0C10.104,0 11,0.896 11,2L12,2L12,5ZM9,1C9.552,1 10,1.448 10,2C10,2.552 9.552,3 9,3C8.448,3 8,2.552 8,2C8,1.448 8.448,1 9,1Z"/>
-            </g>
-        </g>
+<svg width="100%" height="100%" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g id="tasks">
+        <rect x="0" y="0" width="16" height="16" style="fill:#878787;fill-opacity:0;"/>
+        <path id="tick" d="M10.477,14.788l4.671,-4.645c0.196,-0.196 0.514,-0.195 0.709,0.002c0.196,0.196 0.195,0.514 -0.002,0.709l-5.026,5c-0.095,0.094 -0.223,0.147 -0.356,0.146c-0.133,-0.001 -0.261,-0.054 -0.354,-0.149l-2.974,-3c-0.194,-0.196 -0.194,-0.514 0.004,-0.709c0.196,-0.195 0.514,-0.194 0.709,0.003l2.619,2.643Z"/>
+        <path d="M7.867,15l-5.867,0l0,-14l12,0l0,8.874l-1,0.995l0,-8.869l-10,-0c0,-0 0,12 0,12l3.876,0l0.991,1Z"/>
+        <path d="M7,3l0,3l-3,-0l0,-3l3,-0Zm-1,1l-1,0l0,1l1,-0l0,-1Z"/>
+        <path d="M7,7l0,3l-3,-0l0,-3l3,-0Zm-1,1l-1,0l0,1l1,-0l0,-1Z"/>
+        <rect x="8" y="4" width="4" height="1"/>
+        <rect x="8" y="8" width="4" height="1"/>
     </g>
 </svg>

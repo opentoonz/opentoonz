@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="16px" height="16px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
-    <g transform="matrix(1,0,0,1,-190,-90)">
-        <g id="compare" transform="matrix(1,0,0,1,80,0)">
-            <g id="bg" transform="matrix(0.110345,0,0,0.121212,93.7793,71.0909)">
-                <rect x="147" y="156" width="145" height="132" style="fill:rgb(135,135,135);fill-opacity:0;"/>
-            </g>
-            <g transform="matrix(1,0,0,1,110,90)">
-                <path d="M7,2L7,1L8,1L8,15L7,15L7,14L3.5,14C2.672,14 2,13.328 2,12.5L2,3.5C2,2.672 2.672,2 3.5,2L7,2ZM12.733,12.68C12.899,12.501 13,12.262 13,12L13,4C13,3.448 12.552,3 12,3L9,3L9,2L12.5,2C13.328,2 14,2.672 14,3.5L14,12.5C14,13.328 13.328,14 12.5,14L9,14L9,8.2L12.733,12.68ZM4,13L7,13L7,8.2L3.267,12.68C3.45,12.877 3.71,13 4,13Z"/>
-            </g>
-        </g>
+<svg width="100%" height="100%" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g id="compare">
+        <rect id="bg" x="-0.015" y="0" width="16" height="16" style="fill:#878787;fill-opacity:0;"/>
+        <path d="M7.985,14l0,-12l4,0c1.104,0 2,0.896 2,2l0,8c0,1.104 -0.896,2 -2,2l-4,0Z" style="fill-opacity:0.25;"/>
+        <path d="M7.985,3l0,-1l6,0l0,12l-6,-0l0,-1l5,0l0,-10l-5,-0Z"/>
+        <path d="M6.985,2l0,12l-6,0l0,-12l6,0Zm-1,1c0,0 -4,0 -4,-0l0,10c0,0 4,0 4,0l0,-10Z"/>
+        <rect x="5.985" y="14" width="1" height="2"/>
+        <rect x="5.985" y="0" width="1" height="2"/>
     </g>
 </svg>

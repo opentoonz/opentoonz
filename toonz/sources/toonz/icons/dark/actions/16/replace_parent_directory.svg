@@ -1,26 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="16px" height="16px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
-    <g transform="matrix(1,0,0,1,-130,-170)">
-        <g id="replace_parent_directory" transform="matrix(1,0,0,1,100,-180)">
-            <g id="bg" transform="matrix(0.110345,0,0,0.121212,13.7793,331.091)">
-                <rect x="147" y="156" width="145" height="132" style="fill:rgb(135,135,135);fill-opacity:0;"/>
-            </g>
-            <g transform="matrix(1,0,0,1,-100,180)">
-                <path d="M143,176L143,179L142,179L142,177L135,177L135,179L134,179L134,176L138,176L138,175L135,175L135,170L138,170L138,171L142,171L142,175L139,175L139,176L143,176Z"/>
-            </g>
-            <g transform="matrix(1,0,0,1,-87,127)">
-                <g transform="matrix(1,0,0,1,1,-1)">
-                    <path d="M120,232.5L122.5,235L120,235L120,232.5Z"/>
-                </g>
-                <path d="M124,234C124,233.735 123.895,233.48 123.707,233.293L121.707,231.293C121.52,231.105 121.265,231 121,231L118,231C117.448,231 117,231.448 117,232L117,238C117,238.552 117.448,239 118,239L123,239C123.552,239 124,238.552 124,238L124,234ZM123,234L121,232L118,232L118,238L123,238L123,234Z"/>
-            </g>
-            <g transform="matrix(1,0,0,1,-78,127)">
-                <g transform="matrix(1,0,0,1,1,-1)">
-                    <path d="M120,232.5L122.5,235L120,235L120,232.5Z"/>
-                </g>
-                <path d="M124,234C124,233.735 123.895,233.48 123.707,233.293L121.707,231.293C121.52,231.105 121.265,231 121,231L118,231C117.448,231 117,231.448 117,232L117,238C117,238.552 117.448,239 118,239L123,239C123.552,239 124,238.552 124,238L124,234ZM123,234L121,232L118,232L118,238L123,238L123,234Z"/>
-            </g>
-        </g>
+<svg width="100%" height="100%" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g id="replace_parent_directory">
+        <rect id="bg" x="0" y="0" width="16" height="16" style="fill:#878787;fill-opacity:0;"/>
+        <path d="M8,12l-1,0l0,-1l-5.48,0c-0.138,0 -0.27,-0.055 -0.368,-0.152c-0.097,-0.098 -0.152,-0.23 -0.152,-0.368c0,-1.723 0,-7.237 0,-8.96c-0,-0.138 0.055,-0.27 0.152,-0.368c0.098,-0.097 0.23,-0.152 0.368,-0.152c1.279,0 4.48,0 4.48,0l2,2l5.48,0c0.138,-0 0.27,0.055 0.368,0.152c0.097,0.098 0.152,0.23 0.152,0.368c0,1.447 0,5.513 0,6.96c-0,0.138 -0.055,0.27 -0.152,0.368c-0.098,0.097 -0.23,0.152 -0.368,0.152c-1.457,0 -5.48,0 -5.48,0l0,1Z"/>
+        <rect x="9" y="14" width="5" height="1"/>
+        <rect x="1" y="14" width="5" height="1"/>
+        <path d="M10,12l-0,4l-5,0l-0,-4l5,0Zm-1,1l-3,-0l-0,2l3,0l-0,-2Z"/>
     </g>
 </svg>

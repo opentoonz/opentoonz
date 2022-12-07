@@ -1,17 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="16px" height="16px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
-    <g transform="matrix(1,0,0,1,-189,-490)">
-        <g id="view_vector_as_raster" transform="matrix(1,0,0,1,139,380.002)">
-            <g id="bg" transform="matrix(0.110345,0,0,0.121212,33.7793,91.0909)">
-                <rect x="147" y="156" width="145" height="132" style="fill:rgb(135,135,135);fill-opacity:0;"/>
-            </g>
-            <g transform="matrix(0.836128,0,0,0.836128,56.7581,118.602)">
-                <path d="M4.447,7.401L10.033,1.845C10.268,1.611 10.648,1.612 10.881,1.847C11.115,2.082 11.114,2.462 10.879,2.695L4.867,8.675C4.754,8.788 4.601,8.851 4.442,8.85C4.283,8.849 4.13,8.786 4.018,8.672L0.462,5.084C0.229,4.849 0.23,4.469 0.466,4.236C0.701,4.003 1.081,4.004 1.314,4.24L4.447,7.401Z"/>
-            </g>
-            <g transform="matrix(1,0,0,1,-139,-380.002)">
-                <path d="M196,500.05C195.539,500.144 195.1,500.369 194.741,500.724C193.757,501.697 193.752,503.282 194.724,504.263L196,505.55L196,505.94C192.056,505.447 189,502.078 189,498.002C189,493.925 192.056,490.556 196,490.064L196,500.05ZM197,500.05L197,490.002L200,490.002L200,492.002L203,492.002L203,495.002L205,495.002L205,498.05C204.208,497.89 203.352,498.115 202.736,498.729L199.486,501.961L198.277,500.741C197.916,500.375 197.469,500.144 197,500.05Z"/>
-            </g>
-        </g>
+<svg width="100%" height="100%" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g id="view_vector_as_raster">
+        <rect id="bg" x="0" y="0.003" width="16" height="16" style="fill:#878787;fill-opacity:0;"/>
+        <path d="M10.476,14.793l4.671,-4.645c0.196,-0.196 0.514,-0.195 0.709,0.002c0.196,0.196 0.195,0.514 -0.002,0.709l-5.026,5c-0.095,0.094 -0.223,0.147 -0.356,0.146c-0.133,-0.001 -0.261,-0.054 -0.354,-0.149l-2.974,-3c-0.194,-0.196 -0.194,-0.514 0.004,-0.709c0.196,-0.195 0.514,-0.194 0.709,0.003l2.619,2.643Z"/>
+        <path d="M7,0.065l0,10.502c-0.332,0.085 -0.647,0.257 -0.908,0.516c-0.783,0.776 -0.789,2.044 -0.012,2.828l0.92,0.929l0,1.101c-3.944,-0.492 -7,-3.861 -7,-7.938c0,-4.076 3.056,-7.445 7,-7.938Z"/>
+        <rect x="12" y="2.005" width="2" height="3" style="fill-opacity:0.25;"/>
+        <rect x="9" y="0.005" width="2" height="2" style="fill-opacity:0.65;"/>
+        <rect x="14" y="5.005" width="2" height="2" style="fill-opacity:0.65;"/>
+        <path d="M16,7.005l0,1.562c-0.661,-0.17 -1.392,0.003 -1.91,0.518l-3.606,3.587l-1.563,-1.577c-0.263,-0.265 -0.583,-0.442 -0.921,-0.528l0,-10.564l3,0l0,0.002l-2,-0l0,2l2,-0l0,-0.002l3,0l0,0.002l-2,-0l0,3l2,-0l0,2l2,-0Zm-2,-2.002l2,0l0,0.002l-2,-0l0,-0.002Z"/>
     </g>
 </svg>

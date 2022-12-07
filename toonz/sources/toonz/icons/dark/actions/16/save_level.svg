@@ -1,18 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="16px" height="16px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
-    <g transform="matrix(1,0,0,1,-110,-310)">
-        <g id="save_level" transform="matrix(1,0,0,1,0,80)">
-            <g id="bg" transform="matrix(0.110345,0,0,0.121212,93.7793,211.091)">
-                <rect x="147" y="156" width="145" height="132" style="fill:rgb(135,135,135);fill-opacity:0;"/>
-            </g>
-            <path d="M120,231.5L123.5,235L120,235L120,231.5Z"/>
-            <g transform="matrix(1,0,0,1,20,-80)">
-                <path d="M106,319L104,317L98,317C97.735,317 97.48,317.105 97.293,317.293C97.105,317.48 97,317.735 97,318C97,319.732 97,323.268 97,325C97,325.265 97.105,325.52 97.293,325.707C97.48,325.895 97.735,326 98,326L105,326C105.265,326 105.52,325.895 105.707,325.707C105.895,325.52 106,325.265 106,325C106,323.066 106,319 106,319ZM99,318L99,320L103,320L103,318L103.586,318L105,319.414L105,325C105,325 98,325 98,325C98,325 98,318 98,318L99,318ZM101.5,321C102.328,321 103,321.672 103,322.5C103,323.328 102.328,324 101.5,324C100.672,324 100,323.328 100,322.5C100,321.672 100.672,321 101.5,321ZM102,318L100,318L100,319L102,319L102,318Z"/>
-            </g>
-            <g transform="matrix(1,0,0,1,0,-80)">
-                <path d="M116,325L113,325C112.448,325 112,324.552 112,324L112,312C112,311.448 112.448,311 113,311L120,311C120.265,311 120.52,311.105 120.707,311.293L123.707,314.293C123.895,314.48 124,314.735 124,315L124,316L123,316L123,315L120,312L113,312L113,324L116,324L116,325Z"/>
-            </g>
-        </g>
+<svg width="100%" height="100%" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g id="save_level">
+        <rect id="bg" x="0.001" y="-0.04" width="16" height="16" style="fill:#878787;fill-opacity:0;"/>
+        <path id="sv" d="M16.001,8.96l0,7.01l-9,-0l0,-9l7,-0.01l2,2Zm-4.5,3.01c-0.828,-0 -1.5,0.672 -1.5,1.5c0,0.828 0.672,1.5 1.5,1.5c0.828,-0 1.5,-0.672 1.5,-1.5c0,-0.828 -0.672,-1.5 -1.5,-1.5Zm1.5,-4l-4,-0l0,2l4,-0l0,-2Z"/>
+        <path d="M6.001,14.96l-4,-0l0,-14l8,-0l4,4l0,1l-1,-0l0,-1l-3,-0l0,-3l-7,-0l0,12l3,-0l0,1Z"/>
     </g>
 </svg>

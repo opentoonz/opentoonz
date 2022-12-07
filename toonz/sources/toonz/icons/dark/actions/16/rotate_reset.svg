@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g id="rotate_reset">
+        <rect id="bg" x="-0.015" y="0" width="16" height="16" style="fill:#878787;fill-opacity:0;"/>
+        <path d="M8.985,2.019c-0.165,-0.013 -0.332,-0.019 -0.5,-0.019c-3.587,0 -6.5,2.913 -6.5,6.5c0,3.587 2.913,6.5 6.5,6.5c3.587,0 6.5,-2.913 6.5,-6.5c0,-1.503 -0.511,-2.887 -1.369,-3.989l-0.698,0.698c0.684,0.919 1.089,2.058 1.089,3.291c0,3.048 -2.474,5.522 -5.522,5.522c-3.048,0 -5.522,-2.474 -5.522,-5.522c0,-3.048 2.474,-5.522 5.522,-5.522c0.169,0 0.335,0.008 0.5,0.022l0,2l3,-2.5l-3,-2.5l0,2.019Z"/>
+        <path d="M10.985,7c-0,-0.552 -0.448,-1 -1,-1l-3,-0c-0.552,-0 -1,0.448 -1,1l0,3c0,0.552 0.448,1 1,1l3,0c0.552,0 1,-0.448 1,-1l-0,-3Z"/>
+    </g>
+</svg>

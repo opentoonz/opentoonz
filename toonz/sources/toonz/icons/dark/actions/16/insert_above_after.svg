@@ -1,18 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="16px" height="16px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
-    <g transform="matrix(1,0,0,1,-90,-310)">
-        <g id="insert_above_after" transform="matrix(1,0,0,1,-0.000385861,-140)">
-            <g id="bg" transform="matrix(0.110345,0,0,0.121212,73.7797,431.091)">
-                <rect x="147" y="156" width="145" height="132" style="fill:rgb(135,135,135);fill-opacity:0;"/>
-            </g>
-            <path d="M96.5,454C99.535,454 102,456.465 102,459.5C102,462.535 99.535,465 96.5,465C93.465,465 91,462.535 91,459.5C91,456.465 93.465,454 96.5,454ZM97,459L100,459L100,460L97,460L97,463L96,463L96,460L93,460L93,459L96,459L96,456L97,456L97,459Z"/>
-            <g transform="matrix(1,0,0,1,79,447)">
-                <path d="M20,6L15,6L17.5,3.5L20,6Z"/>
-            </g>
-            <g transform="matrix(1,0,0,1,86,447)">
-                <path d="M17,15L17,10L19.5,12.5L17,15Z"/>
-            </g>
-        </g>
+<svg width="100%" height="100%" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g id="insert_above_after">
+        <rect id="bg" x="0.015" y="-0.03" width="16" height="16" style="fill:#878787;fill-opacity:0;"/>
+        <path d="M6,4c3.303,-0 5.985,2.682 5.985,5.985c0,3.303 -2.682,5.985 -5.985,5.985c-3.303,0 -5.985,-2.682 -5.985,-5.985c-0,-3.303 2.682,-5.985 5.985,-5.985Zm1.015,5l-0,-3l-2,-0l-0,3l-3,-0l-0,2l3,-0l-0,3l2,-0l-0,-3l3,-0l-0,-2l-3,-0Z"/>
+        <path d="M2.896,3.727l3.104,-3.727l3.105,3.727c-0.936,-0.465 -1.99,-0.727 -3.105,-0.727c-1.115,-0 -2.169,0.262 -3.104,0.727Zm9.357,3.143l3.74,3.115l-3.74,3.115c0.468,-0.938 0.732,-1.996 0.732,-3.115c0,-1.119 -0.264,-2.177 -0.732,-3.115Z"/>
     </g>
 </svg>

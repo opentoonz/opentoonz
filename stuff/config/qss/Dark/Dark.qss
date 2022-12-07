@@ -1544,10 +1544,10 @@ QStatusBar #StatusBarLabel {
   qproperty-BGColor: #303030;
 }
 #StyleChooserPage {
-  qproperty-CommonChipBoxColor: #000000;
+  qproperty-CommonChipBoxColor: black;
   qproperty-PinnedChipBoxColor: #a0a0a0;
   qproperty-SolidChipBoxColor: #e41000;
-  qproperty-SelectedChipBoxColor: #ffffff;
+  qproperty-SelectedChipBoxColor: white;
   qproperty-SelectedChipBox2Color: #c7ca32;
 }
 /* -------------------------------------------------------------------------- */
@@ -2289,9 +2289,9 @@ Ruler {
 XsheetViewer {
   qproperty-TextColor: #e6e6e6;
   qproperty-ErrorTextColor: #ff7b7b;
+  qproperty-BGColor: #303030;
   qproperty-SelectedTextColor: #e6e6e6;
   qproperty-CurrentFrameTextColor: #e6e6e6;
-  qproperty-BGColor: #303030;
   qproperty-LightLineColor: rgba(0, 0, 0, 0.3);
   qproperty-MarkerLineColor: rgba(255, 255, 255, 0.15);
   qproperty-SecMarkerLineColor: rgba(255, 255, 255, 0.25);
@@ -2430,8 +2430,8 @@ FunctionTreeView {
 }
 FunctionPanel {
   qproperty-BGColor: #303030;
-  qproperty-ValueLineColor: rgba(0, 0, 0, 0.1);
-  qproperty-FrameLineColor: rgba(0, 0, 0, 0.1);
+  qproperty-ValueLineColor: #3a3a3a;
+  qproperty-FrameLineColor: #444444;
   qproperty-OtherCurvesColor: #7d7d7d;
   qproperty-RulerBackground: #282828;
   qproperty-TextColor: #e6e6e6;

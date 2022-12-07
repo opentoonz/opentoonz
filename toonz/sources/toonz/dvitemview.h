@@ -255,6 +255,9 @@ public:
   }
   QColor getSelectedItemBackground() const { return m_selectedItemBackground; }
 
+  //exposed view parameters
+  void setIconSize(QSize size) { m_iconSize = size; }
+
 private:
   ViewType to_enum(int n) {
     switch (n) {

@@ -1,26 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="16px" height="16px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
-    <g transform="matrix(1,0,0,1,-50,-70)">
-        <g id="colorfade">
-            <g id="bg" transform="matrix(0.110345,0,0,0.121212,33.7793,51.0909)">
-                <rect x="147" y="156" width="145" height="132" style="fill:rgb(135,135,135);fill-opacity:0;"/>
-            </g>
-            <g transform="matrix(1,0,0,1,48,68)">
-                <rect x="9" y="2" width="1" height="16"/>
-            </g>
-            <g transform="matrix(1,0,0,1,48,68)">
-                <path d="M10,3L10,4L3,4L3,16L10,16L10,17L3,17C2.448,17 2,16.552 2,16L2,4C2,3.448 2.448,3 3,3L10,3Z"/>
-            </g>
-            <g transform="matrix(1,0,0,1,48,68)">
-                <path d="M10,15L4,15L4,13.571L6.5,10L8.763,13.232L10,11.5L10,15Z"/>
-            </g>
-            <g transform="matrix(1,0,0,1,48,68)">
-                <path d="M11,3L17,3C17.552,3 18,3.448 18,4L18,16C18,16.552 17.552,17 17,17L11,17L11,16L17,16L17,4L11,4L11,3ZM11,10.1L12.5,8L16,12.9L16,15L11,15L11,10.1Z" style="fill-opacity:0.5;"/>
-            </g>
-            <g transform="matrix(1,0,0,1,48,68)">
-                <circle cx="6.5" cy="7.5" r="1.5"/>
-            </g>
-        </g>
+<svg width="100%" height="100%" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g id="color_fade">
+        <rect id="bg" x="-0" y="0.001" width="16" height="16" style="fill:#878787;fill-opacity:0;"/>
+        <path d="M16,1.001l0,13.999c0,0.552 -0.448,1 -1,1l-14,0c-0.552,0 -1,-0.448 -1,-1l-0,-13.999c-0,-0.552 0.448,-1 1,-1l14,-0c0.552,-0 1,0.448 1,1Zm-1,-0l-14,-0l-0,13.999c-0,-0.552 0.552,0 -0,0l14,0l-0,-13.999c-0,0.552 -0.552,-0 -0,-0Z"/>
+        <path d="M9,3l0,-2l2,-0l0,2l-2,-0Zm-2,-2l0,2l-2,0l0,2l2,-0l0,2l-2,0l0,2l2,-0l0,2l-2,0l0,2l2,-0l0,2l-6,-0l0,-14l6,-0Zm0,12l0,-2l2,-0l0,2l-2,-0Zm2,-2l0,-2l2,-0l0,2l-2,-0Zm0,-2l-2,-0l0,-2l2,-0l0,2Zm0,-2l0,-2l2,-0l0,2l-2,-0Zm0,-2l-2,-0l0,-2l2,-0l0,2Zm0,8l2,-0l0,2l-2,0l0,-2Z"/>
     </g>
 </svg>

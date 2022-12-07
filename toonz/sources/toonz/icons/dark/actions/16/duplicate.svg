@@ -1,17 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="16px" height="16px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
-    <g transform="matrix(1,0,0,1,-110,-110)">
-        <g id="duplicate" transform="matrix(1,0,0,1,113,111)">
-            <g id="bg" transform="matrix(0.110345,0,0,0.121212,-19.2207,-19.9091)">
-                <rect x="147" y="156" width="145" height="132" style="fill:rgb(135,135,135);fill-opacity:0;"/>
-            </g>
-            <g transform="matrix(1,0,0,1,-113,-111)">
-                <path d="M110,116C110,115.448 110.448,115 111,115C112.459,115 115,115 115,115L115,116L111,116L111,125L120,125L120,121L121,121L121,125C121,125.552 120.552,126 120,126C117.908,126 113.092,126 111,126C110.448,126 110,125.552 110,125L110,116Z"/>
-            </g>
-            <g transform="matrix(1,0,0,1,-112,-112)">
-                <path d="M125,112C125,111.448 124.552,111 124,111L115,111C114.448,111 114,111.448 114,112L114,121C114,121.552 114.448,122 115,122L124,122C124.552,122 125,121.552 125,121L125,112ZM120,116L122,116L122,117L120,117L120,119L119,119L119,117L117,117L117,116L119,116L119,114L120,114L120,116Z"/>
-            </g>
-        </g>
+<svg width="100%" height="100%" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g id="duplicate">
+        <rect id="bg" x="0.015" y="-0" width="16" height="16" style="fill:#878787;fill-opacity:0;"/>
+        <path d="M16.015,1c-0,-0.265 -0.105,-0.52 -0.293,-0.707c-0.188,-0.188 -0.442,-0.293 -0.707,-0.293c-2.26,-0 -7.74,-0 -10,-0c-0.265,-0 -0.52,0.105 -0.707,0.293c-0.188,0.187 -0.293,0.442 -0.293,0.707c-0,2.26 -0,7.74 -0,10c-0,0.265 0.105,0.52 0.293,0.707c0.187,0.188 0.442,0.293 0.707,0.293c2.26,-0 7.74,-0 10,-0c0.265,-0 0.519,-0.105 0.707,-0.293c0.188,-0.187 0.293,-0.442 0.293,-0.707l-0,-10Zm-5,4l3,-0l-0,2l-3,-0l-0,3l-2,-0l-0,-3l-3,-0l-0,-2l3,-0l-0,-3l2,-0l-0,3Z"/>
+        <path d="M12.015,13l-0,2c-0,0.552 -0.448,1 -1,1l-10,-0c-0.552,-0 -1,-0.448 -1,-1l-0,-10c-0,-0.552 0.448,-1 1,-1l2,-0l-0,1l-2,-0l-0,10l10,-0l-0,-2l1,-0Z"/>
     </g>
 </svg>

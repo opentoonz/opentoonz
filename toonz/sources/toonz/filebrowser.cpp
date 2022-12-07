@@ -2351,7 +2351,7 @@ calculateTask:
 
 //-----------------------------------------------------------------------------
 
-inline void FrameCountReader::stopReading() { m_executor.cancelAll(); }
+void FrameCountReader::stopReading() { m_executor.cancelAll(); }
 
 //=============================================================================
 // FrameCountTask methods

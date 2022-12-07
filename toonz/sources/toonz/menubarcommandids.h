@@ -85,6 +85,7 @@
 
 // #define MI_OpenCurrentScene  "MI_OpenCurrentScene"
 #define MI_OpenFileBrowser "MI_OpenFileBrowser"
+#define MI_OpenPreproductionBoard "MI_OpenPreproductionBoard"
 #define MI_OpenFileViewer "MI_OpenFileViewer"
 #define MI_OpenFilmStrip "MI_OpenFilmStrip"
 #define MI_OpenPalette "MI_OpenPalette"

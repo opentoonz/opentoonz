@@ -1,17 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="16px" height="16px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
-    <g transform="matrix(1,0,0,1,-110,-490)">
-        <g id="insert_frame" transform="matrix(1,0,0,1,112,492)">
-            <g id="bg" transform="matrix(1,0,0,1,-112,-392)">
-                <rect x="110" y="390" width="16" height="16" style="fill-opacity:0;"/>
-            </g>
-            <g transform="matrix(1,0,0,1,-112,-492)">
-                <path d="M126,499.673C125.715,499.32 125.378,499.012 125,498.759L125,494C125,493.448 124.552,493 124,493C121.423,493 114.577,493 112,493C111.448,493 111,493.448 111,494C111,495.916 111,500.084 111,502C111,502.552 111.448,503 112,503L118.028,503C118.066,503.347 118.144,503.682 118.256,504L117,504L117,505L118.759,505C119.012,505.378 119.32,505.715 119.673,506L110,506L110,490L126,490L126,499.673ZM113,504L111,504L111,505L113,505L113,504ZM116,504L114,504L114,505L116,505L116,504ZM116,491L114,491L114,492L116,492L116,491ZM119,491L117,491L117,492L119,492L119,491ZM113,491L111,491L111,492L113,492L113,491ZM122,491L120,491L120,492L122,492L122,491ZM125,491L123,491L123,492L125,492L125,491Z"/>
-            </g>
-            <g id="add" transform="matrix(1,0,0,1,-7,-7)">
-                <path d="M17.5,14C19.432,14 21,15.568 21,17.5C21,19.432 19.432,21 17.5,21C15.568,21 14,19.432 14,17.5C14,15.568 15.568,14 17.5,14ZM18,17L20,17L20,18L18,18L18,20L17,20L17,18L15,18L15,17L17,17L17,15L18,15L18,17Z"/>
-            </g>
-        </g>
+<svg width="100%" height="100%" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g id="insert_frame">
+        <rect id="bg" x="0.011" y="0" width="16" height="16" style="fill-opacity:0;"/>
+        <path id="ad" d="M12.511,9c1.931,-0 3.5,1.568 3.5,3.5c-0,1.932 -1.569,3.5 -3.5,3.5c-1.932,-0 -3.5,-1.568 -3.5,-3.5c-0,-1.932 1.568,-3.5 3.5,-3.5Zm-0.5,3l-2,-0l-0,1l2,-0l-0,2l1,-0l-0,-2l2,-0l-0,-1l-2,-0l-0,-2l-1,-0l-0,2Z"/>
+        <path d="M8.267,14l-7.256,0l-0,-13l14,-0l-0,7.759c-0.303,-0.203 -0.63,-0.369 -0.978,-0.495l-0,-0.264l-1,-0l-0,0.03c-0.172,-0.02 -0.346,-0.03 -0.522,-0.03c-0.169,-0 -0.336,0.009 -0.5,0.028l-0,-4.028c-0,-0.552 -0.448,-1 -1,-1l-6,-0c-0.553,0 -1,0.448 -1,1l-0,7c-0,0.552 0.447,1 1,1l3.027,0c-0.018,0.164 -0.027,0.331 -0.027,0.5c-0,0.526 0.09,1.031 0.256,1.5Zm5.766,-9l-1,-0l-0,2l1,-0l-0,-2Zm-11,6l-1,-0l-0,2l1,-0l-0,-2Zm-0,-9l-1,-0l-0,2l1,-0l-0,-2Zm-0,3l-1,-0l-0,2l1,-0l-0,-2Zm11,-3l-1,-0l-0,2l1,-0l-0,-2Zm-11,6l-1,-0l-0,2l1,-0l-0,-2Z"/>
     </g>
 </svg>

@@ -1,14 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="16px" height="16px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
-    <g transform="matrix(1,0,0,1,-90,-450)">
-        <g id="paste_numbers" transform="matrix(1,0,0,1,-20.0004,440)">
-            <g id="bg" transform="matrix(0.110345,0,0,0.121212,93.7793,-8.90909)">
-                <rect x="147" y="156" width="145" height="132" style="fill:rgb(135,135,135);fill-opacity:0;"/>
-            </g>
-            <g transform="matrix(1,0,0,1,-1,0)">
-                <path d="M125,15L124,15L124,12C124,11.448 123.552,11 123,11L121,11C121,10.448 120.552,10 120,10L116,10C115.448,10 115,10.448 115,11L113,11C112.448,11 112,11.448 112,12L112,24C112,24.552 112.448,25 113,25L125,25C125.552,25 126,24.552 126,24L126,16C126,15.448 125.552,15 125,15ZM119.942,22L121.942,22L121.589,24L122.589,24L122.942,22L124.942,22L125.118,21L123.118,21L123.471,19L125.471,19L125.647,18L123.647,18L124,16L123,16L122.647,18L120.647,18L121,16L120,16L119.647,18L117.647,18L117.471,19L119.471,19L119.118,21L117.118,21L116.942,22L118.942,22L118.589,24L119.589,24L119.942,22ZM122.118,21L122.471,19L120.471,19L120.118,21L122.118,21ZM120,11L116,11L116,12L120,12L120,11ZM123,15L123,12C123,12 121,12 121,12L121,12.013C120.993,12.559 120.548,13 120,13L116,13C115.448,13 115,12.552 115,12L113,12L113,24L116,24L116,16C116,15.448 116.448,15 117,15L123,15Z"/>
-            </g>
-        </g>
+<svg width="100%" height="100%" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g id="paste_numbers">
+        <rect id="bg" x="0" y="-0.004" width="16" height="16" style="fill:#878787;fill-opacity:0;"/>
+        <path d="M9,0.996l0,1c0,0.552 -0.448,1 -1,1l-4,-0c-0.552,-0 -1,-0.448 -1,-1l0,-1c0,-0.553 0.448,-1 1,-1l4,-0c0.552,-0 1,0.447 1,1Zm-1,-0l-4,-0l0,1l4,-0l0,-1Z"/>
+        <path d="M6,14.996l-5,-0c-0.552,-0 -1,-0.448 -1,-1l0,-12c0,-0.553 0.448,-1 1,-1l3,-0l0,1l-3,-0l0,12l4,-0c0,0.552 0.448,1 1,1Zm5,-10l0,-3l-3,-0l0,-1l3,-0c0.552,-0 1,0.447 1,1l0,3l-1,-0Z"/>
+        <path d="M15,5.996l0,8c0,0.552 -0.448,1 -1,1l-8,-0c-0.552,-0 -1,-0.448 -1,-1l0,-8c0,-0.552 0.448,-1 1,-1l8,-0c0.552,-0 1,0.448 1,1Zm-6.058,6l2,-0l-0.353,2l1,-0l0.353,-2l2,-0l0.176,-1l-2,-0l0.353,-2l2,-0l0.176,-1l-2,-0l0.353,-2l-1,-0l-0.353,2l-2,-0l0.353,-2l-1,-0l-0.353,2l-2,-0l-0.176,1l2,-0l-0.353,2l-2,-0l-0.176,1l2,-0l-0.353,2l1,-0l0.353,-2Zm2.176,-1l-2,-0l0.353,-2l2,-0l-0.353,2Z"/>
     </g>
 </svg>

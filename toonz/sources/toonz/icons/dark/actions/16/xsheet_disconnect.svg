@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g id="xsheet_disconnect">
+        <path id="bg" d="M0,0l0,16l16,0l0,-16l-16,0Z" style="fill-opacity:0;"/>
+        <path d="M7,10l-2,0l0,-1l5,0l0,1l-2,0l0,3l2,0l0,1l-3,0l0,-4Zm-2,-7l0,-1l3,0l0,4l2,0l0,1l-5,0l0,-1l2,0l0,-3l-2,0Z"/>
+        <path d="M4,1l-0,3l-4,0l-0,-3l4,0Zm-1,1l-2,0l-0,1l2,-0l0,-1Z"/>
+        <path d="M15,12l-0,3l-4,0l0,-3l4,0Zm-1,1l-2,0l-0,1l2,-0l0,-1Z"/>
+    </g>
+</svg>

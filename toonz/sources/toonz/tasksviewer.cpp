@@ -78,7 +78,7 @@ QWidget *TasksViewer::createToolBar() {
   add("play", tr("&Start"), cmdToolbar, SLOT(start(bool)), tr("Start"));
   add("stop", tr("&Stop"), cmdToolbar, SLOT(stop(bool)), tr("Stop"));
   cmdToolbar->addSeparator();
-  add("render_add", tr("&Add Render Task"), cmdToolbar,
+  add("new_scene", tr("&Add Render Task"), cmdToolbar,
       SLOT(addRenderTask(bool)), tr("Add Render"));
   add("cleanup_add", tr("&Add Cleanup Task"), cmdToolbar,
       SLOT(addCleanupTask(bool)), tr("Add Cleanup"));

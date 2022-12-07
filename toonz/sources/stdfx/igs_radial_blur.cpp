@@ -119,9 +119,8 @@ public:
 
     const QPointF center(this->center_.x, this->center_.y);
 
-    /* Pixel位置(0.5 1.5 2.5 ...) */
-    const QPointF p(static_cast<float>(xx) + 0.5f,
-                    static_cast<float>(yy) + 0.5f);
+    /* Pixel位置 */
+    const QPointF p(static_cast<float>(xx), static_cast<float>(yy));
 
     /* 中心からPixel位置へのベクトルと長さ */
     const QVector2D v(p - center);

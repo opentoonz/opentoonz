@@ -1086,9 +1086,9 @@ Qt::transparent)
 
     bbox = (bbox * icon->getBounds())
                .enlarge(-1);  // Add a 1 pixel transparent margin - this
-    if (bbox.getLx() > 0 &&
-        bbox.getLy() > 0)  // way the actual content doesn't look trimmed.
-      ::makeChessBackground(icon->extract(bbox));
+    //if (bbox.getLx() > 0 &&
+    //    bbox.getLy() > 0)  // way the actual content doesn't look trimmed.
+    //  ::makeChessBackground(icon->extract(bbox));
   } else
     icon->fill(TPixel32(255, 0, 0));
 

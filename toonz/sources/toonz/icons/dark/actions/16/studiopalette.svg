@@ -1,20 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="16px" height="16px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
-    <g transform="matrix(1,0,0,1,-30,-250)">
-        <g id="studiopalette">
-            <g id="bg" transform="matrix(0.110345,0,0,0.121212,13.7793,231.091)">
-                <rect x="147" y="156" width="145" height="132" style="fill:rgb(135,135,135);fill-opacity:0;"/>
-            </g>
-            <g transform="matrix(1,0,0,1,28,244)">
-                <path d="M17,17L14,17L14,16L17,16L17,14L18,14L18,16L17,16L17,17ZM6,14L8,14L8,16L6,16L6,14ZM9,14L11,14L11,16L9,16L9,14ZM14,14L14,15L13,15L13,16L12,16L12,14L14,14ZM14,13L14,11L15,11L15,10L18,10L18,11L15,11L15,13L17,13L17,14L15,14L15,13L14,13ZM6,11L8,11L8,13L6,13L6,11ZM9,11L11,11L11,13L9,13L9,11ZM13,11L13,13L12,13L12,11L13,11ZM6,8L8,8L8,10L6,10L6,8ZM9,8L11,8L11,10L9,10L9,8ZM14,10L12,10L12,8L14,8L14,10ZM17,9L15,9L15,8L17,8L17,9Z"/>
-            </g>
-            <path d="M33,261L33,253L32,253L32,262L41,262L41,261L33,261Z" style="fill-opacity:0.5;"/>
-            <path d="M33,261L33,253L32,253L32,262L41,262L41,261L33,261Z"/>
-            <g transform="matrix(1,0,0,1,-2,2)">
-                <path d="M33,261L33,253L32,253L32,262L45,262L45,261L33,261Z" style="fill-opacity:0.5;"/>
-                <path d="M33,261L33,253L32,253L32,262L45,262L45,261L33,261Z"/>
-            </g>
-        </g>
+<svg width="100%" height="100%" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g id="studiopalette">
+        <path id="bg" d="M0,-0l0,16l16,-0l0,-16l-16,-0Z" style="fill:#878787;fill-opacity:0;"/>
+        <path d="M1,14l0,-13l14,-0l0,13l-14,-0Zm13,-9l-0,-3l-12,0l0,3l12,-0Zm-4,-1.5c0,0.276 -0.224,0.5 -0.5,0.5l-3,-0c-0.276,-0 -0.5,-0.224 -0.5,-0.5c0,-0.276 0.224,-0.5 0.5,-0.5l3,-0c0.276,-0 0.5,0.224 0.5,0.5Zm4,9.5l-0,-3l-12,0l0,3l12,-0Zm-4,-1.5c0,0.276 -0.224,0.5 -0.5,0.5l-3,-0c-0.276,-0 -0.5,-0.224 -0.5,-0.5c0,-0.276 0.224,-0.5 0.5,-0.5l3,-0c0.276,-0 0.5,0.224 0.5,0.5Zm4,-2.5l-0,-3l-12,0l0,3l12,-0Zm-4,-1.5c0,0.276 -0.224,0.5 -0.5,0.5l-3,-0c-0.276,-0 -0.5,-0.224 -0.5,-0.5c0,-0.276 0.224,-0.5 0.5,-0.5l3,-0c0.276,-0 0.5,0.224 0.5,0.5Z"/>
+        <path d="M13,16l0,-3l-2,-0l0,3l2,-0Z"/>
+        <path d="M5,16l0,-3l-2,-0l0,3l2,-0Z"/>
     </g>
 </svg>

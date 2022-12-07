@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="16px" height="16px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
-    <g transform="matrix(1,0,0,1,-2,-2)">
-        <path id="path6" d="M4,12L6,12L6,14L4,14L4,12ZM7,12L9,12L9,14L7,14L7,12ZM10,12L12,12L12,14L10,14L10,12ZM15,12L15,14L13,14L13,12L15,12ZM4,9L6,9L6,11L4,11L4,9ZM7,9L9,9L9,11L7,11L7,9ZM10,9L12,9L12,11L10,11L10,9ZM13,9L15,9L15,11L13,11L13,9ZM4,6L6,6L6,8L4,8L4,6ZM7,6L9,6L9,8L7,8L7,6ZM10,6L12,6L12,8L10,8L10,6ZM15,6L13,6L13,8L15,8L15,6Z" style="fill:black;fill-rule:nonzero;"/>
+<svg width="100%" height="100%" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g id="palette">
+        <path id="bg" d="M0,0l0,16l16,0l0,-16l-16,0Z" style="fill:#878787;fill-opacity:0;"/>
+        <path d="M8,1c3.41,0 7,2.868 7,6.334c0,2.465 -1.414,4.237 -3.571,4.237c-0,0 -1.004,0 -1.01,0.001c-0.074,0.008 -0.25,0.04 -0.436,0.116c-0.158,0.064 -0.359,0.17 -0.355,0.413c0.134,0.383 0.237,0.682 0.237,1.017c-0,1.188 -0.826,1.882 -1.865,1.882c-3.383,0 -7,-3.134 -7,-7c-0,-3.866 3.617,-7 7,-7Zm-0,1c-2.9,0 -6,2.686 -6,6c-0,3.314 3.1,6 6,6c0.484,0 0.865,-0.328 0.865,-0.882c-0,-0.259 -0.11,-0.482 -0.218,-0.792c-0.239,-1.501 1.507,-1.744 1.749,-1.755l1.033,0c1.609,0 2.571,-1.398 2.571,-3.237c0,-2.947 -3.1,-5.334 -6,-5.334Zm-4,5c0.552,0 1,0.448 1,1c-0,0.552 -0.448,1 -1,1c-0.552,0 -1,-0.448 -1,-1c-0,-0.552 0.448,-1 1,-1Zm8,-1c0.552,0 1,0.448 1,1c0,0.552 -0.448,1 -1,1c-0.552,0 -1,-0.448 -1,-1c0,-0.552 0.448,-1 1,-1Zm-3,-2c0.552,0 1,0.448 1,1c0,0.552 -0.448,1 -1,1c-0.552,0 -1,-0.448 -1,-1c-0,-0.552 0.448,-1 1,-1Zm-3,0c0.552,0 1,0.448 1,1c-0,0.552 -0.448,1 -1,1c-0.552,0 -1,-0.448 -1,-1c-0,-0.552 0.448,-1 1,-1Z"/>
     </g>
 </svg>

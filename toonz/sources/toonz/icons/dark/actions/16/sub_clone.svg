@@ -1,20 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="16px" height="16px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
-    <g transform="matrix(1,0,0,1,-210,-190)">
-        <g id="sub_clone" transform="matrix(1,0,0,1,180,-160)">
-            <g id="bg" transform="matrix(0.110345,0,0,0.121212,13.7793,331.091)">
-                <rect x="147" y="156" width="145" height="132" style="fill:rgb(135,135,135);fill-opacity:0;"/>
-            </g>
-            <g transform="matrix(1,0,0,1,-180,140)">
-                <path d="M217,220L211,220L211,221.001L217,221L217,220ZM217,217L211,217L211,218.001L217,218C217,217.583 217,217 217,217Z" style="fill-opacity:0.5;"/>
-            </g>
-            <g transform="matrix(1,0,0,1,-180,160)">
-                <path d="M213.002,194.5C213.023,194.22 213.256,194 213.541,194C214.634,194 217,194 217,194L217,191.531C217,191.238 217.238,191 217.531,191C218.989,191 223.041,191 224.483,191C224.62,191 224.752,191.054 224.849,191.151C224.946,191.248 225,191.38 225,191.517C225,193.403 225,199.8 225,199.8L224.201,199.8C224.201,199.277 224.201,198.673 224.201,198C224.201,197.754 224.127,197.525 224,197.335L224,192L218,192L218,202.699C217.872,202.938 217.8,203.21 217.8,203.5L217.8,204L210.5,204C210.224,204 210,203.776 210,203.5L210,197.496C210,197.222 210.222,197 210.496,197L213,197L213,194.5L213.002,194.5ZM213,203L211,203L211,198L213,198L213,203ZM214,203L214,195L217,195L217,203L214,203Z"/>
-            </g>
-            <g transform="matrix(1,0,0,1,-179,161)">
-                <path d="M216,191L216,202C216,202.552 216.448,203 217,203L224,203C224.552,203 225,202.552 225,202L225,191C225,190.448 224.552,190 224,190L217,190C216.448,190 216,190.448 216,191ZM221,196L221,194L220,194L220,196L218,196L218,197L220,197L220,199L221,199L221,197L223,197L223,196L221,196Z"/>
-            </g>
-        </g>
+<svg width="100%" height="100%" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g id="sub_clone">
+        <rect id="bg" x="0" y="0" width="16" height="16" style="fill:#878787;fill-opacity:0;"/>
+        <path d="M7,10l-6,0l0,1.001l6,-0l0,-1.001Zm-0,-3l-6,0l0,1.001l6,-0.001c0,-0.417 -0,-1 -0,-1Z" style="fill-opacity:0.5;"/>
+        <path d="M3,4l4,0l0,10l-7,0l0,-7l3,0.001l0,-3.001Zm0,9l-2,0l0,-5l2,0l0,5Zm1,0l0,-8l3,0l0,8l-3,0Z"/>
+        <path d="M7,1l8,0l0,14l-8,0l0,-14Zm3,6l-2,0l0,2l2,0l0,2l2,0l0,-2l2,0l0,-2l-2,0l0,-2l-2,0l0,2Z"/>
     </g>
 </svg>

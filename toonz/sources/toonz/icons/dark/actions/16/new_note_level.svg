@@ -1,23 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="16px" height="16px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
-    <g transform="matrix(1,0,0,1,-130,-210)">
-        <g id="new_note_level" transform="matrix(1,0,0,1,20,-20)">
-            <g id="bg" transform="matrix(0.110345,0,0,0.121212,93.7793,211.091)">
-                <rect x="147" y="156" width="145" height="132" style="fill:rgb(135,135,135);fill-opacity:0;"/>
-            </g>
-            <g>
-                <g transform="matrix(1,0,0,1,1,0)">
-                    <path d="M120,231.5L123.5,235L120,235L120,231.5Z"/>
-                </g>
-                <path d="M125,235C125,234.735 124.895,234.48 124.707,234.293L121.707,231.293C121.52,231.105 121.265,231 121,231L112,231C111.448,231 111,231.448 111,232L111,244C111,244.552 111.448,245 112,245L124,245C124.552,245 125,244.552 125,244L125,235ZM124,235L121,232L112,232L112,244L124,244L124,235Z"/>
-            </g>
-            <g transform="matrix(1.33333,0,0,2,-66,-196)">
-                <path d="M141,216.5C141,216.224 140.664,216 140.25,216L135.75,216C135.336,216 135,216.224 135,216.5C135,216.776 135.336,217 135.75,217L140.25,217C140.664,217 141,216.776 141,216.5Z"/>
-            </g>
-            <g transform="matrix(-1.83697e-16,1,-2,-3.67394e-16,551,102)">
-                <path d="M141,216.5C141,216.224 140.552,216 140,216L136,216C135.448,216 135,216.224 135,216.5C135,216.776 135.448,217 136,217L140,217C140.552,217 141,216.776 141,216.5Z"/>
-            </g>
-        </g>
+<svg width="100%" height="100%" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g id="new_note_level">
+        <rect id="bg" x="0.001" y="-0.04" width="16" height="16" style="fill:#878787;fill-opacity:0;"/>
+        <rect x="4.501" y="4.235" width="5" height="1.45"/>
+        <rect x="4.501" y="7.235" width="7" height="1.45"/>
+        <rect x="4.501" y="10.235" width="6" height="1.45"/>
+        <path d="M15,5l0.019,10l-14.019,0l0,-14l10.001,0l3.999,4Zm-1,9l0,-9l-3,0l0,-3l-9,0l0,12l12,0Z"/>
     </g>
 </svg>

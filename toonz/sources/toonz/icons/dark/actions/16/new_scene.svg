@@ -1,15 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="16px" height="16px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
-    <g transform="matrix(1,0,0,1,-50,-490)">
-        <g id="new_scene" transform="matrix(1,0,0,1,-39.9997,200)">
-            <g id="bg" transform="matrix(0.110345,0,0,0.121212,73.7797,271.091)">
-                <rect x="147" y="156" width="145" height="132" style="fill:rgb(135,135,135);fill-opacity:0;"/>
-            </g>
-            <g id="add" transform="matrix(1,0,0,1,85,285)">
-                <path d="M17.5,14C19.432,14 21,15.568 21,17.5C21,19.432 19.432,21 17.5,21C15.568,21 14,19.432 14,17.5C14,15.568 15.568,14 17.5,14ZM18,17L20,17L20,18L18,18L18,20L17,20L17,18L15,18L15,17L17,17L17,15L18,15L18,17Z"/>
-            </g>
-            <path d="M101.14,298C99.208,298.584 97.8,300.378 97.8,302.5C97.8,303.418 98.064,304.276 98.52,305L90,305L90,298L101.14,298ZM90,297L90,296.037C89.985,295.208 90.491,294.422 91.313,294.122L93.75,293.23L93.75,295.36L92,296L104,296L104,297L90,297ZM96.75,294.263L95.25,294.811L95.25,292.682L96.75,292.133L96.75,294.263ZM99.75,293.166L98.25,293.714L98.25,291.585L99.75,291.036L99.75,293.166ZM101.25,290.488L102.583,290L103.27,291.878L101.25,292.617L101.25,290.488Z"/>
-        </g>
+<svg width="100%" height="100%" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g id="new_scene">
+        <rect id="bg" x="0" y="-0.01" width="16" height="16" style="fill:#878787;fill-opacity:0;"/>
+        <path id="ad" d="M12.485,8.99c1.932,0 3.5,1.568 3.5,3.5c0,1.932 -1.568,3.5 -3.5,3.5c-1.932,0 -3.5,-1.568 -3.5,-3.5c0,-1.932 1.568,-3.5 3.5,-3.5Zm-0.5,3l-2,0l0,1l2,0l0,2l1,0l0,-2l2,0l0,-1l-2,0l0,-2l-1,0l0,2Z"/>
+        <path id="clapboard" d="M8.764,14.989l-7.78,-0l0,-7.993l-0.02,0l0,-4l2.02,0l2,2l-1.982,1.983l0.99,-0l1.982,-1.983l2.131,0l-1.983,1.983l1.697,-0l1.983,-1.983l2.334,0l-1.983,1.983l1.697,-0l1.983,-1.983l1.151,0l0,3.738c-0.308,-0.204 -0.644,-0.371 -1,-0.495l0,-0.26c0,0 -12,-0 -12,0l0,6.01c0,-0 3.189,-0 6.278,-0c0.126,0.356 0.296,0.691 0.502,1Zm-1.036,-11.409l-2.587,0.583l-1.673,-1.674l2.586,-0.582l1.674,1.673Zm-0.288,-1.985l2.695,-0.607l1.673,1.673l-2.695,0.607l-1.673,-1.673Zm4.08,-0.919l3.047,-0.686l0.439,1.951l-1.813,0.408l-1.673,-1.673Z"/>
     </g>
 </svg>

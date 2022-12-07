@@ -1,23 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="16px" height="16px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
-    <g transform="matrix(1,0,0,1,-170,-310)">
-        <g id="save_level_as" transform="matrix(1,0,0,1,60,80)">
-            <g id="bg" transform="matrix(0.110345,0,0,0.121212,93.7793,211.091)">
-                <rect x="147" y="156" width="145" height="132" style="fill:rgb(135,135,135);fill-opacity:0;"/>
-            </g>
-            <path d="M120,231.5L123.5,235L120,235L120,231.5Z"/>
-            <g transform="matrix(1,0,0,1,-40,-80)">
-                <path d="M156,325L153,325C152.448,325 152,324.552 152,324L152,312C152,311.448 152.448,311 153,311L160,311C160.265,311 160.52,311.105 160.707,311.293L163.707,314.293C163.895,314.48 164,314.735 164,315L164,316L163,316L163,315L160,312L153,312L153,324L156,324L156,325Z"/>
-            </g>
-            <g transform="matrix(1,0,0,1,-13,0)">
-                <g transform="matrix(1,0,0,1,-60,-80)">
-                    <path d="M191,325L191,324L190,324L190,326L192,326L192,325L191,325Z"/>
-                </g>
-                <g transform="matrix(0.471405,0.471405,-0.676198,0.676198,259.374,-64.8646)">
-                    <path d="M195.5,314.739C195.5,314.162 194.828,313.694 194,313.694L191,313.694C190.172,313.694 189.5,314.162 189.5,314.739L189.5,323C189.5,323.277 189.658,323.543 189.939,323.739L191.439,324.785C192.025,325.194 192.975,325.194 193.561,324.785L195.061,323.739C195.342,323.543 195.5,323.277 195.5,323L195.5,314.739ZM194,314.739L191,314.739L191,323L192.5,324.046L194,323L194,314.739Z"/>
-                </g>
-            </g>
-        </g>
+<svg width="100%" height="100%" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g id="save_level_as">
+        <rect id="bg" x="0.001" y="-0.04" width="16" height="16" style="fill:#878787;fill-opacity:0;"/>
+        <path id="edit" d="M14.37,11.713l-3.551,3.55l-2.818,0.697l0.697,-2.818l3.55,-3.551l2.122,2.122Zm-1.394,-2.85l0.334,-0.334c0.281,-0.281 0.662,-0.439 1.06,-0.439c0.397,0 0.778,0.158 1.059,0.439l0.003,0.003c0.281,0.281 0.438,0.662 0.438,1.059c0,0.398 -0.157,0.779 -0.438,1.06l-0.334,0.334l-2.122,-2.122Z"/>
+        <path d="M7.218,14.96l-5.217,-0l0,-14l8,-0l4,4l0,2.158c-0.357,0.053 -0.699,0.183 -1,0.381l0,-2.539l-3,-0l0,-3l-7,-0l0,12l4.464,-0l-0.247,1Z"/>
     </g>
 </svg>

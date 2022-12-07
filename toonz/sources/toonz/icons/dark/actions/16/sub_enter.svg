@@ -1,17 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="16px" height="16px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
-    <g transform="matrix(1,0,0,1,-90,-50)">
-        <g id="sub_enter">
-            <g id="bg" transform="matrix(0.110345,0,0,0.121212,73.7797,31.0909)">
-                <rect x="147" y="156" width="145" height="132" style="fill:rgb(135,135,135);fill-opacity:0;"/>
-            </g>
-            <g transform="matrix(1,4.97897e-17,-4.97897e-17,1,81.519,48.005)">
-                <path d="M8.481,9.995L8.481,8.995L15.481,9L15.481,5.995L18.981,9.498L15.481,13L15.481,10L8.481,9.995Z"/>
-            </g>
-            <g transform="matrix(1,0,0,1,88,48)">
-                <path d="M5,6.997L5,3C5,2.448 5.448,2 6,2C8.092,2 12.908,2 15,2C15.552,2 16,2.448 16,3C16,5.727 16,13.273 16,16C16,16.552 15.552,17 15,17C12.908,17 8.092,17 6,17C5.448,17 5,16.552 5,16C5,14.541 5,12 5,12L6,12L6,16L15,16L15,3L6,3L6,6.997L5,6.997Z"/>
-            </g>
-        </g>
+<svg width="100%" height="100%" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g id="sub_enter">
+        <rect id="bg" x="0.044" y="0" width="16" height="16" style="fill:#878787;fill-opacity:0;"/>
+        <path id="contrast_arrow" d="M1.001,6.018l-0.001,2.964l6.003,0l-0.003,2.518l5.001,-4l-5.001,-4l0.003,2.518l-6.002,-0Z"/>
+        <path d="M5,4l-1,0l0,-4l10,-0l-0,15l-10,0l0,-4l1,0l0,3l8,0l0,-13l-8,0l-0,3Z"/>
     </g>
 </svg>
