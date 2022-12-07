@@ -1267,16 +1267,23 @@ void XsheetViewer::keyPressEvent(QKeyEvent *event) {
 
     if (m_cellArea->isControlPressed()) {  // resize
 
-      if (c0 == c1 && shift.layer() < firstCol) return;
+      // resize selection of frames/rows forward or backwards
+      if (r0 < getCurrentRow())
+        r0 += shift.frame();
+      else
+        r1 += shift.frame();
 
-      bool prevRow = r0 < getCurrentRow();
-      bool prevCol = c0 < getCurrentColumn();
+      // resize selection of layers/columns "up" or "down"
+      if (c0 < getCurrentColumn())
+        c0 += shift.layer();
+      else
+        c1 += shift.layer();
 
-      if (!prevRow and !prevCol)  cellSel->selectCells(r0, c0, r1 + shift.frame(), c1 + shift.layer());
-      if ( prevRow and !prevCol)  cellSel->selectCells(r0 + shift.frame(), c0, r1, c1 + shift.layer());
-      if (!prevRow and  prevCol)  cellSel->selectCells(r0, c0 + shift.layer(), r1 + shift.frame(), c1);
-      if ( prevRow and  prevCol)  cellSel->selectCells(r0 + shift.frame(), c0 + shift.layer(), r1, c1);
+      // keep selection inside the xsheet/timeline
+      if (c0 < firstCol || c1 < firstCol || r0 < 0 || r1 < 0) return;
 
+      // apply new selection rectangle
+      cellSel->selectCells(r0, c0, r1, c1);
       updateCells();
       TApp::instance()->getCurrentSelection()->notifySelectionChanged();
       return;
