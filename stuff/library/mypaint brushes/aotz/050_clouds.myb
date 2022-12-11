@@ -2,7 +2,7 @@
     "comment": "MyPaint brush file",
     "description": "A brush to simulate clouds",
     "group": "",
-    "notes": "Brush package v0.5 optimized for OpenToonz\n\nAuthor: Anderson Prado (aka AndeOn)\nLicense: CC0/Public Domain",
+    "notes": "Brush package optimized for OpenToonz\n\nAuthor: Anderson Prado (aka AndeOn)\nLicense: CC0/Public Domain",
     "parent_brush_name": "",
     "settings": {
         "anti_aliasing": {
@@ -54,15 +54,15 @@
             "inputs": {}
         },
         "dabs_per_actual_radius": {
-            "base_value": 0.17,
+            "base_value": 0.21,
             "inputs": {}
         },
         "dabs_per_basic_radius": {
-            "base_value": 0.17,
+            "base_value": 0.21,
             "inputs": {}
         },
         "dabs_per_second": {
-            "base_value": 1.42,
+            "base_value": 2.72,
             "inputs": {}
         },
         "direction_filter": {
@@ -85,7 +85,7 @@
             }
         },
         "elliptical_dab_ratio": {
-            "base_value": 2.14,
+            "base_value": 1.98,
             "inputs": {}
         },
         "eraser": {
@@ -165,7 +165,7 @@
             "inputs": {}
         },
         "opaque": {
-            "base_value": 0.51,
+            "base_value": 0.23,
             "inputs": {}
         },
         "opaque_linearize": {
@@ -208,7 +208,7 @@
             "inputs": {}
         },
         "radius_logarithmic": {
-            "base_value": 1.5,
+            "base_value": 1.55,
             "inputs": {
                 "speed1": [
                     [
@@ -277,7 +277,7 @@
             "inputs": {}
         },
         "smudge_length": {
-            "base_value": 0.5,
+            "base_value": 0.7,
             "inputs": {}
         },
         "smudge_length_log": {
@@ -285,7 +285,7 @@
             "inputs": {}
         },
         "smudge_radius_log": {
-            "base_value": 0.0,
+            "base_value": 0.5,
             "inputs": {}
         },
         "smudge_transparency": {
@@ -297,7 +297,7 @@
             "inputs": {}
         },
         "speed1_gamma": {
-            "base_value": 0.14,
+            "base_value": 0.25,
             "inputs": {}
         },
         "speed1_slowness": {
@@ -309,7 +309,7 @@
             "inputs": {}
         },
         "speed2_slowness": {
-            "base_value": 0.31,
+            "base_value": 0.53,
             "inputs": {}
         },
         "stroke_duration_logarithmic": {
@@ -325,7 +325,7 @@
             "inputs": {}
         },
         "tracking_noise": {
-            "base_value": 0.0,
+            "base_value": 0.07,
             "inputs": {}
         }
     },

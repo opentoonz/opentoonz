@@ -1514,6 +1514,52 @@
   <item>"STD_iwa_RainbowFx.secondary_rainbow"	"Secondary Rainbow Intensity"		</item>
   <item>"STD_iwa_RainbowFx.alpha_rendering"	"Alpha Rendering"		</item>
  
+  <item>"STD_iwa_TangentFlowFx"	"Tangent Flow Iwa"	</item>
+  <item>"STD_iwa_TangentFlowFx.iteration"	"Iteration"	</item>
+  <item>"STD_iwa_TangentFlowFx.kernelRadius"	"Kernel Radius"	</item>
+  <item>"STD_iwa_TangentFlowFx.threshold"	"Threshold"	</item>
+  <item>"STD_iwa_TangentFlowFx.alignDirection"	"Align Direction"	</item>
+  <item>"STD_iwa_TangentFlowFx.pivotAngle"	"Pivot Angle"	</item>
+
+  <item>"STD_iwa_FlowBlurFx"	"Flow Blur Iwa"	</item>
+  <item>"STD_iwa_FlowBlurFx.length"	"Length"	</item>
+  <item>"STD_iwa_FlowBlurFx.filterType"	"Filter Type"	</item>
+  <item>"STD_iwa_FlowBlurFx.linear"	"Linear Color Space"	</item>
+  <item>"STD_iwa_FlowBlurFx.gamma"	"Gamma"	</item>
+  <item>"STD_iwa_FlowBlurFx.referenceMode"	"Reference"	</item>
+
+  <item>"STD_iwa_FlowPaintBrushFx"	"Flow Paint Brush Iwa"	</item>
+  <item>"STD_iwa_FlowPaintBrushFx.h_density"	"Horizontal Density"	</item>
+  <item>"STD_iwa_FlowPaintBrushFx.v_density"	"Vertical Density"	</item>
+  <item>"STD_iwa_FlowPaintBrushFx.pos_randomness"	"Position Randomness"	</item>
+  <item>"STD_iwa_FlowPaintBrushFx.pos_wobble"	"Position Wobble by Frame"	</item>
+  <item>"STD_iwa_FlowPaintBrushFx.tip_width"	"Tip Width"	</item>
+  <item>"STD_iwa_FlowPaintBrushFx.tip_length"	"Tip Length"	</item>
+  <item>"STD_iwa_FlowPaintBrushFx.tip_alpha"	"Tip Alpha"	</item>
+  <item>"STD_iwa_FlowPaintBrushFx.tip_joints"	"Tip Joints"	</item>
+  <item>"STD_iwa_FlowPaintBrushFx.bidirectional"	"Bidirectional"	</item>
+  <item>"STD_iwa_FlowPaintBrushFx.width_randomness"	"Width Randomness"	</item>
+  <item>"STD_iwa_FlowPaintBrushFx.length_randomness"	"Length Randomness"	</item>
+  <item>"STD_iwa_FlowPaintBrushFx.angle_randomness"	"Angle Randomness"	</item>
+  <item>"STD_iwa_FlowPaintBrushFx.sustain_width_to_skew"	"Sustain Width to Skew"	</item>
+  <item>"STD_iwa_FlowPaintBrushFx.anti_jaggy"	"Prevent Jaggies by Texture Margin"	</item>
+  <item>"STD_iwa_FlowPaintBrushFx.origin_pos"	"Origin"	</item>
+  <item>"STD_iwa_FlowPaintBrushFx.horizontal_pos"	"Horizontal"	</item>
+  <item>"STD_iwa_FlowPaintBrushFx.vertical_pos"	"Vertical"	</item>
+  <item>"STD_iwa_FlowPaintBrushFx.curve_point"	"Curve Anchor"	</item>
+  <item>"STD_iwa_FlowPaintBrushFx.fill_gap_size"	"Fill Gap Size"	</item>
+  <item>"STD_iwa_FlowPaintBrushFx.reference_frame"	"Reference Frame"	</item>
+  <item>"STD_iwa_FlowPaintBrushFx.reference_prevalence"	"Reference Prevalence"	</item>
+  <item>"STD_iwa_FlowPaintBrushFx.random_seed"	"Random Seed"	</item>
+  <item>"STD_iwa_FlowPaintBrushFx.sort_by"	"Sort By"	</item>
+
+  <item>"STD_iwa_MotionFlowFx"	"Motion Flow Iwa"	</item>
+  <item>"STD_iwa_MotionFlowFx.shutterLength"	"Shutter Length"	</item>
+  <item>"STD_iwa_MotionFlowFx.motionObjectType"	"Reference Object"	</item>
+  <item>"STD_iwa_MotionFlowFx.motionObjectIndex" "Index"	</item>
+  <item>"STD_iwa_MotionFlowFx.normalizeType" "Normalize"	</item>
+  <item>"STD_iwa_MotionFlowFx.normalizeRange" "Maximum Length"	</item>
+
  <!------------------------------ Tiled Particles Iwa ------------------------------------------->
 
   <item>STD_iwa_TiledParticlesFx "Tiled Particles Iwa" </item>

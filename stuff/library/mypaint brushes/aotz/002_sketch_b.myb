@@ -2,7 +2,7 @@
     "comment": "MyPaint brush file",
     "description": "A pencil to sketch",
     "group": "",
-    "notes": "Brush package v0.5 optimized for OpenToonz\n\nAuthor: Anderson Prado (aka AndeOn)\nLicense: CC0/Public Domain",
+    "notes": "Brush package optimized for OpenToonz\n\nAuthor: Anderson Prado (aka AndeOn)\nLicense: CC0/Public Domain",
     "parent_brush_name": "",
     "settings": {
         "anti_aliasing": {
@@ -54,11 +54,11 @@
             "inputs": {}
         },
         "dabs_per_actual_radius": {
-            "base_value": 3.0,
+            "base_value": 5.0,
             "inputs": {}
         },
         "dabs_per_basic_radius": {
-            "base_value": 5.0,
+            "base_value": 3.0,
             "inputs": {}
         },
         "dabs_per_second": {
@@ -99,11 +99,11 @@
                 "pressure": [
                     [
                         0.0,
-                        -0.017384074800569513
+                        0.0
                     ],
                     [
                         1.0,
-                        0.57
+                        0.58
                     ]
                 ]
             }
@@ -141,28 +141,20 @@
             "inputs": {}
         },
         "offset_by_random": {
-            "base_value": 0.58,
+            "base_value": 0.47,
             "inputs": {
                 "pressure": [
                     [
                         0.0,
-                        1.4400000000000002
+                        0.0
                     ],
                     [
                         0.27273089828784297,
-                        1.246685472799499
-                    ],
-                    [
-                        0.380786590210895,
-                        0.4160072703678796
-                    ],
-                    [
-                        0.6,
-                        -1.2
+                        0.546685472799499
                     ],
                     [
                         1.0,
-                        -1.7012641502542696
+                        -2.7012641502542696
                     ]
                 ]
             }
@@ -188,7 +180,7 @@
             "inputs": {}
         },
         "opaque": {
-            "base_value": 0.75,
+            "base_value": 0.65,
             "inputs": {}
         },
         "opaque_linearize": {
@@ -201,7 +193,7 @@
                 "pressure": [
                     [
                         0.0,
-                        -0.004974744924814756
+                        0.0
                     ],
                     [
                         1.0,
@@ -231,7 +223,7 @@
             "inputs": {}
         },
         "radius_logarithmic": {
-            "base_value": 0.55,
+            "base_value": 0.65,
             "inputs": {
                 "pressure": [
                     [
@@ -254,11 +246,11 @@
             "inputs": {}
         },
         "slow_tracking": {
-            "base_value": 0.05,
+            "base_value": 3.75,
             "inputs": {}
         },
         "slow_tracking_per_dab": {
-            "base_value": 1.0,
+            "base_value": 4.15,
             "inputs": {}
         },
         "smudge": {

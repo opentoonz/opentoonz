@@ -1,10 +1,11 @@
 
 
-
 #include "strokestyles.h"
 #include "regionstyles.h"
 #include "rasterstyles.h"
 #include "colorfx.h"
+
+#include "flowlinestrokestyle.h"
 
 // static TPluginInfo info("ColorFxPlugin");
 
@@ -98,4 +99,6 @@ void initColorFx() {
   add(new TAirbrushRasterStyle(TPixel32::Black, 10));
   add(new TBlendRasterStyle(TPixel32::Black, 10));
   add(new TNoColorRasterStyle());
+
+  add(new FlowLineStrokeStyle());
 }

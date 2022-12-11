@@ -425,6 +425,8 @@ It is used when updates must be done after changes or creation of new styles.
     return m_versionNumber;
   }  //!< Returns the version number of the style.
 
+  virtual TRectD getStrokeBBox(const TStroke *stroke) const;
+
 protected:
   virtual void makeIcon(const TDimension &d);
 

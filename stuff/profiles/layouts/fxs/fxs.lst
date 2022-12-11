@@ -23,6 +23,7 @@
     STD_iwa_BokehFx
     STD_iwa_BokehRefFx
     STD_iwa_BokehAdvancedFx
+    STD_iwa_FlowBlurFx
   </Blur>
   <Distort>
     STD_freeDistortFx
@@ -156,6 +157,7 @@
     STD_iwa_TiledParticlesFx
     STD_iwa_TimeCodeFx
     STD_iwa_TextFx
+    STD_iwa_FlowPaintBrushFx
   </Render>
   <Stylize>
     STD_colorEmbossFx
@@ -164,7 +166,9 @@
     STD_mosaicFx
     STD_inoMotionWindFx
     STD_posterizeFx
-    STD_solarizeFx 
+    STD_solarizeFx
+    STD_iwa_TangentFlowFx
+    STD_iwa_MotionFlowFx
   </Stylize>
   <Toonz_Level>
     STD_artContourFx

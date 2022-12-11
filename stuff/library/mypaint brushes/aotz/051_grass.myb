@@ -2,7 +2,7 @@
     "comment": "MyPaint brush file",
     "description": "A brush to simulate grass",
     "group": "",
-    "notes": "Brush package v0.5 optimized for OpenToonz\n\nAuthor: Anderson Prado (aka AndeOn)\nLicense: CC0/Public Domain",
+    "notes": "Brush package optimized for OpenToonz\n\nAuthor: Anderson Prado (aka AndeOn)\nLicense: CC0/Public Domain",
     "parent_brush_name": "",
     "settings": {
         "anti_aliasing": {
@@ -278,7 +278,7 @@
             "inputs": {}
         },
         "opaque": {
-            "base_value": 1.05,
+            "base_value": 1.35,
             "inputs": {
                 "pressure": [
                     [
@@ -328,7 +328,7 @@
             "inputs": {}
         },
         "radius_by_random": {
-            "base_value": 0.0,
+            "base_value": 0.72,
             "inputs": {}
         },
         "radius_logarithmic": {

@@ -2,7 +2,7 @@
     "comment": "MyPaint brush file",
     "description": "A pencil to sketch",
     "group": "",
-    "notes": "Brush package v0.5 optimized for OpenToonz\n\nAuthor: Anderson Prado (aka AndeOn)\nLicense: CC0/Public Domain",
+    "notes": "Brush package optimized for OpenToonz\n\nAuthor: Anderson Prado (aka AndeOn)\nLicense: CC0/Public Domain",
 	"parent_brush_name": "",
     "settings": {
         "anti_aliasing": {
@@ -130,7 +130,7 @@
             "inputs": {}
         },
         "offset_by_random": {
-            "base_value": 0.03,
+            "base_value": 0.13,
             "inputs": {}
         },
         "offset_by_speed": {
@@ -154,7 +154,7 @@
             "inputs": {}
         },
         "opaque": {
-            "base_value": 0.17,
+            "base_value": 0.27,
             "inputs": {}
         },
         "opaque_linearize": {
@@ -220,11 +220,11 @@
             "inputs": {}
         },
         "slow_tracking": {
-            "base_value": 0.0,
+            "base_value": 1.3,
             "inputs": {}
         },
         "slow_tracking_per_dab": {
-            "base_value": 0.0,
+            "base_value": 1.8,
             "inputs": {}
         },
         "smudge": {

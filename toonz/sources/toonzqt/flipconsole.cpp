@@ -817,13 +817,18 @@ void FlipConsole::onNextFrame(int fps, QElapsedTimer *timer,
     else
       m_fpsField->setLineEditBackgroundColor(Qt::red);
   }
+  if (m_stopAt > 0 && m_currentFrame >= m_stopAt) {
+    doButtonPressed(ePause);
+    m_stopAt = -1;
+  }
 }
 
 //----------------------------------------------------------------------------
 
 void FlipConsole::playNextFrame(QElapsedTimer *timer, qint64 targetInstant) {
   int from = m_from, to = m_to;
-  if (m_markerFrom <= m_markerTo) from = m_markerFrom, to = m_markerTo;
+  if (m_markerFrom <= m_markerTo && m_stopAt == -1)
+    from = m_markerFrom, to = m_markerTo;
 
   if (m_framesCount == 0 ||
       (m_isPlay && m_currentFrame == (m_reverse ? from : to))) {
@@ -1458,6 +1463,7 @@ void FlipConsole::onButtonPressed(int button) {
           playingConsole->setChecked(eLoop, false);
           playingConsole->setChecked(ePause, true);
           stoppedOther = true;
+          m_stopAt = -1;
         }
       }
       if (stoppedOther) {
@@ -1532,7 +1538,8 @@ void FlipConsole::doButtonPressed(UINT button) {
   int from = m_from, to = m_to;
   // When the level editing mode, ignore the preview frame range marker
   if (m_markerFrom <= m_markerTo && m_frameHandle &&
-      m_frameHandle->isEditingScene())
+      m_frameHandle->isEditingScene() &&
+      m_stopAt == -1)
     from = m_markerFrom, to = m_markerTo;
 
   bool linked = m_areLinked && m_isLinkable;
@@ -1608,6 +1615,7 @@ void FlipConsole::doButtonPressed(UINT button) {
           playingConsole->setChecked(ePause, true);
         }
       }
+      m_stopAt = -1;
       return;
     }
 
@@ -1615,6 +1623,7 @@ void FlipConsole::doButtonPressed(UINT button) {
 
     if (m_playbackExecutor.isRunning()) m_playbackExecutor.abort();
 
+    m_stopAt       = -1;
     m_isPlay       = false;
     m_blanksToDraw = 0;
 
@@ -1741,6 +1750,10 @@ void FlipConsole::doButtonPressed(UINT button) {
 
   m_consoleOwner->onDrawFrame(m_currentFrame, m_settings);
 }
+
+//--------------------------------------------------------------------
+
+void FlipConsole::setStopAt(int frame) { m_stopAt = frame; }
 
 //--------------------------------------------------------------------
 

@@ -2438,6 +2438,185 @@ void VerticalPosFxGadget::leftButtonDrag(const TPointD &pos,
   if (m_yParam) setValue(m_yParam, pos.y);
 }
 
+//=============================================================================
+
+class ParallelogramFxGadget final : public FxGadget {
+  TPointParamP m_pcenter, m_phoriz, m_pvert;
+  VectorFxGadget *m_hVecGadget, *m_vVecGadget;
+  TPointD m_clickedPos;
+  TPointParamP m_pcurve;
+
+  enum HANDLE { Body = 0, CurveAnchor, Rotation, None } m_handle = None;
+
+public:
+  ParallelogramFxGadget(FxGadgetController *controller, const TPointParamP &pc,
+                        const TPointParamP &ph, const TPointParamP &pv)
+      : FxGadget(controller)
+      , m_pcenter(pc)
+      , m_phoriz(ph)
+      , m_pvert(pv)
+      , m_hVecGadget(new VectorFxGadget(controller, pc, ph))
+      , m_vVecGadget(new VectorFxGadget(controller, pc, pv)) {
+    addParam(pc->getX());
+    addParam(pc->getY());
+    addParam(ph->getX());
+    addParam(ph->getY());
+    addParam(pv->getX());
+    addParam(pv->getY());
+  }
+
+  ParallelogramFxGadget(FxGadgetController *controller, const TPointParamP &pc,
+                        const TPointParamP &ph, const TPointParamP &pv,
+                        const TPointParamP &pcurve)
+      : FxGadget(controller, 3)
+      , m_pcenter(pc)
+      , m_phoriz(ph)
+      , m_pvert(pv)
+      , m_pcurve(pcurve)
+      , m_hVecGadget(new VectorFxGadget(controller, pc, ph))
+      , m_vVecGadget(new VectorFxGadget(controller, pc, pv)) {
+    addParam(pc->getX());
+    addParam(pc->getY());
+    addParam(ph->getX());
+    addParam(ph->getY());
+    addParam(pv->getX());
+    addParam(pv->getY());
+  }
+
+  ~ParallelogramFxGadget() {
+    delete m_hVecGadget;
+    delete m_vVecGadget;
+  }
+
+  void draw(bool picking) override {
+    auto setColorById = [&](int id) {
+      if (isSelected(id))
+        glColor3dv(m_selectedColor);
+      else
+        glColor3d(0, 0, 1);
+    };
+
+    setPixelSize();
+    setColorById(Body);
+    glPushName(getId() + Body);
+
+    double pixelSize = getPixelSize();
+    double c         = pixelSize * 4;
+    TPointD pc       = getValue(m_pcenter);
+    TPointD ph       = getValue(m_phoriz);
+    TPointD pv       = getValue(m_pvert);
+
+    TPointD vec_h  = ph - pc;
+    TPointD vec_v  = pv - pc;
+    TPointD po     = ph + vec_v;
+    TPointD unit_h = vec_h * (1.0 / sqrt(norm2(vec_h)));
+    TPointD unit_v = vec_v * (1.0 / sqrt(norm2(vec_v)));
+
+    glLineStipple(1, 0xAAAA);
+    glEnable(GL_LINE_STIPPLE);
+    tglDrawSegment(ph + unit_v * c, po);
+    tglDrawSegment(pv + unit_h * c, po);
+    glDisable(GL_LINE_STIPPLE);
+    glPopName();
+
+    if (m_pcurve.getPointer()) {
+      TPointD pcurve = getValue(m_pcurve);
+      TPointD ppivot = pc + (pcurve.x + 0.5) * vec_h + (pcurve.y + 0.5) * vec_v;
+
+      setColorById(Body);
+      glPushName(getId() + Body);
+      glEnable(GL_LINE_STIPPLE);
+      if (pcurve == TPointD()) {
+        tglDrawSegment((pc + ph) * 0.5, vec_v + (pc + ph) * 0.5);
+        tglDrawSegment((pc + pv) * 0.5, vec_h + (pc + pv) * 0.5);
+      } else {
+        TPointD p[2][2] = {{pc + vec_h * 0.5, pc + vec_h * 0.5 + vec_v},
+                           {pc + vec_v * 0.5, pc + vec_v * 0.5 + vec_h}};
+        for (int k = 0; k < 2; k++) {  // ‚½‚Ä‚æ‚±
+          glBegin(GL_LINE_STRIP);
+          for (int i = 0; i <= 10; i++) {  // •ªŠ„
+            double t = (double)i * 0.1;
+            tglVertex((1.0 - t) * (1.0 - t) * p[k][0] +
+                      2.0 * (1.0 - t) * t * ppivot + t * t * p[k][1]);
+          }
+          glEnd();
+        }
+      }
+      glDisable(GL_LINE_STIPPLE);
+      glPopName();
+
+      setColorById(CurveAnchor);
+      glPushName(getId() + CurveAnchor);
+      glPushMatrix();
+      glTranslated(ppivot.x, ppivot.y, 0);
+      double r = pixelSize * 3;
+      tglDrawRect(-r, -r, r, r);
+      glPopMatrix();
+      glPopName();
+    }
+
+    setColorById(Rotation);
+    glPushName(getId() + Rotation);
+    double a = pixelSize * 10, b = pixelSize * 3;
+    TPointD diagonal = normalize(po - pc);
+    TPointD v        = rotate90(diagonal);
+    tglDrawSegment(po + v * a, po - v * a);
+    tglDrawSegment(po + diagonal * b + v * a, po + diagonal * b - v * a);
+    glPopName();
+
+    m_hVecGadget->draw(picking);
+    m_vVecGadget->draw(picking);
+  }
+
+  void leftButtonDown(const TPointD &pos, const TMouseEvent &) override {
+    m_handle = (HANDLE)m_selected;
+    if (m_handle == None) return;
+    m_clickedPos = pos;
+  }
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &) override {
+    if (m_handle == None) return;
+    if (m_handle == Body) {
+      TPointD d = pos - m_clickedPos;
+      setValue(m_pcenter, getValue(m_pcenter) + d);
+      setValue(m_phoriz, getValue(m_phoriz) + d);
+      setValue(m_pvert, getValue(m_pvert) + d);
+    } else if (m_handle == CurveAnchor && m_pcurve.getPointer()) {
+      TPointD pc    = getValue(m_pcenter);
+      TPointD ph    = getValue(m_phoriz);
+      TPointD pv    = getValue(m_pvert);
+      TPointD vec_h = ph - pc;
+      TPointD vec_v = pv - pc;
+      TAffine aff(vec_h.x, vec_v.x, pc.x, vec_h.y, vec_v.y, pc.y);
+      TPointD p_conv = aff.inv() * pos;
+      if (p_conv.x < 0.0)
+        p_conv.x = 0.0;
+      else if (p_conv.x > 1.0)
+        p_conv.x = 1.0;
+      if (p_conv.y < 0.0)
+        p_conv.y = 0.0;
+      else if (p_conv.y > 1.0)
+        p_conv.y = 1.0;
+      setValue(m_pcurve, p_conv - TPointD(0.5, 0.5));
+    } else if (m_handle == Rotation) {
+      TPointD ph     = getValue(m_phoriz);
+      TPointD pv     = getValue(m_pvert);
+      TPointD pivot  = (ph + pv) * 0.5;
+      TPointD before = m_clickedPos - pivot;
+      TPointD after  = pos - pivot;
+      double angle =
+          std::atan2(after.y, after.x) - std::atan2(before.y, before.x);
+      TAffine aff = TTranslation(pivot) * TRotation(angle * M_180_PI) *
+                    TTranslation(-pivot);
+
+      setValue(m_pcenter, aff * getValue(m_pcenter));
+      setValue(m_phoriz, aff * getValue(m_phoriz));
+      setValue(m_pvert, aff * getValue(m_pvert));
+    }
+    m_clickedPos = pos;
+  }
+  void leftButtonUp() override { m_handle = None; }
+};
+
 //*************************************************************************************
 //    FxGadgetController  implementation
 //*************************************************************************************
@@ -2677,6 +2856,19 @@ FxGadget *FxGadgetController::allocateGadget(const TParamUIConcept &uiConcept) {
                             ? (TIntEnumParamP)uiConcept.m_params[1]
                             : TIntEnumParamP());
     gadget = new VerticalPosFxGadget(this, uiConcept.m_params[0], mode);
+    break;
+  }
+
+  case TParamUIConcept::PARALLELOGRAM: {
+    assert(uiConcept.m_params.size() == 3 || uiConcept.m_params.size() == 4);
+    if (uiConcept.m_params.size() == 3) {
+      gadget = new ParallelogramFxGadget(this, uiConcept.m_params[0],
+                                         uiConcept.m_params[1],
+                                         uiConcept.m_params[2]);
+    } else
+      gadget = new ParallelogramFxGadget(
+          this, uiConcept.m_params[0], uiConcept.m_params[1],
+          uiConcept.m_params[2], uiConcept.m_params[3]);
     break;
   }
 

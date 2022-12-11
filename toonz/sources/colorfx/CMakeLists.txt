@@ -5,6 +5,7 @@ set(HEADERS
     regionstyles.h
     strokestyles.h
     zigzagstyles.h
+    flowlinestrokestyle.h
 )
 
 set(SOURCES
@@ -14,6 +15,7 @@ set(SOURCES
     regionstyles.cpp
     strokestyles.cpp
     zigzagstyles.cpp
+    flowlinestrokestyle.cpp
 )
 
 if(WITH_TRANSLATION)
@@ -40,4 +42,4 @@ _find_toonz_library(EXTRA_LIBS "tnzcore;tnzbase")
 
 message("FIND_FILE:" ${EXTRA_LIBS})
 
-target_link_libraries(colorfx Qt5::Core ${GL_LIB} ${EXTRA_LIBS})
+target_link_libraries(colorfx Qt5::Core Qt5::Gui ${GL_LIB} ${EXTRA_LIBS})

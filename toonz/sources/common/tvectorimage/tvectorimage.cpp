@@ -1,16 +1,16 @@
 
 
 #include "tcurves.h"
-//#include "tpalette.h"
+// #include "tpalette.h"
 #include "tvectorimage.h"
 #include "tvectorimageP.h"
 #include "tstroke.h"
-//#include "tgl.h"
+// #include "tgl.h"
 #include "tvectorrenderdata.h"
 #include "tmathutil.h"
-//#include "tdebugmessage.h"
+// #include "tdebugmessage.h"
 #include "tofflinegl.h"
-//#include "tcolorstyles.h"
+// #include "tcolorstyles.h"
 #include "tpaletteutil.h"
 #include "tthreadmessage.h"
 #include "tsimplecolorstyles.h"
@@ -572,16 +572,14 @@ TRectD TVectorImage::getBBox() const {
   TRectD bbox;
 
   for (UINT i = 0; i < strokeCount; ++i) {
-    TRectD r           = m_imp->m_strokes[i]->m_s->getBBox();
+    TStroke *stroke    = m_imp->m_strokes[i]->m_s;
     TColorStyle *style = 0;
     if (plt) style = plt->getStyle(m_imp->m_strokes[i]->m_s->getStyle());
-    if (dynamic_cast<TRasterImagePatternStrokeStyle *>(style) ||
-        dynamic_cast<TVectorImagePatternStrokeStyle *>(
-            style))  // con i pattern style, il render a volte taglia sulla bbox
-                     // dello stroke....
-      // aumento la bbox della meta' delle sue dimensioni:pezzaccia.
-      r = r.enlarge(std::max(r.getLx() * 0.25, r.getLy() * 0.25));
-    bbox = ((i == 0) ? r : bbox + r);
+    if (!style) continue;
+    // reimplemented in TRasterImagePatternStrokeStyle,
+    // TVectorImagePatternStrokeStyle and FlowLineStrokeStyle
+    TRectD r = style->getStrokeBBox(stroke);
+    bbox     = ((i == 0) ? r : bbox + r);
   }
 
   return bbox;
@@ -624,7 +622,7 @@ void TVectorImage::render(const TVectorRenderData &rd, TRaster32P &ras) {
 #endif
 
 //-----------------------------------------------------------------------------
-//#include "timage_io.h"
+// #include "timage_io.h"
 
 TRaster32P TVectorImage::render(bool onlyStrokes) {
   TRect bBox = convert(getBBox());
@@ -826,8 +824,7 @@ bool TVectorImage::Imp::selectFill(const TRectD &selArea, TStroke *s,
     for (UINT i = 0; i < m_regions.size(); i++) {
       int index, j = 0;
 
-      do
-        index = m_regions[i]->getEdge(j++)->m_index;
+      do index = m_regions[i]->getEdge(j++)->m_index;
       while (index < 0 && j < (int)m_regions[i]->getEdgeCount());
       // if index<0, means that the region is purely of autoclose strokes!
       if (m_insideGroup != TGroupId() && index >= 0 &&
@@ -1992,7 +1989,7 @@ static void computeEdgeList(TStroke *newS, const std::list<TEdge *> &edgeList1,
 //-----------------------------------------------------------------------------
 #ifdef _DEBUG
 
-//#include "tpalette.h"
+// #include "tpalette.h"
 #include "tcolorstyles.h"
 
 void printEdges(std::ofstream &os, char *str, TPalette *plt,

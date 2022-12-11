@@ -1,0 +1,32 @@
+<fxlayout>
+  <page name="Flow Paint Brush Iwa">
+  <separator label="Tip Placement"/>
+    <control>h_density</control>
+    <control>v_density</control>
+    <control>pos_randomness</control>
+    <control>pos_wobble</control>
+  <separator label="Source Area"/>
+    <control>origin_pos</control>
+    <control>horizontal_pos</control>
+    <control>vertical_pos</control>
+    <control>curve_point</control>
+    <control>fill_gap_size</control>
+  <separator label="Brush Tip Geometry"/>
+    <control>tip_width</control>
+    <control>width_randomness</control>
+    <control>sustain_width_to_skew</control>
+    <control>tip_length</control>
+    <control>length_randomness</control>
+    <control>angle_randomness</control>
+    <control>tip_alpha</control>
+    <control>tip_joints</control>
+    <control>bidirectional</control>
+    <control>anti_jaggy</control>
+  <separator label="Reference Frame"/>
+    <control>reference_frame</control decimals="0">
+    <control>reference_prevalence</control>
+  <separator/>
+    <control>random_seed</control>
+    <control>sort_by</control>
+  </page>
+</fxlayout>

@@ -301,6 +301,8 @@ public:
   double getParamValue(TColorStyle::double_tag, int index) const override;
   void setParamValue(int index, double value) override;
 
+  TRectD getStrokeBBox(const TStroke *stroke) const override;
+
 protected:
   void makeIcon(const TDimension &d) override;
 
@@ -378,6 +380,8 @@ public:
   void setParamValue(int index, double value) override;
 
   static void clearGlDisplayLists();
+
+  TRectD getStrokeBBox(const TStroke *stroke) const override;
 
 protected:
   void makeIcon(const TDimension &d) override;

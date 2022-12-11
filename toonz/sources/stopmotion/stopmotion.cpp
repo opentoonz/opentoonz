@@ -423,7 +423,7 @@ void StopMotion::onPlaybackChanged() {
 
   int frame     = TApp::instance()->getCurrentFrame()->getFrame();
   int lastFrame = TApp::instance()->getCurrentFrame()->getMaxFrameIndex();
-  if (frame == 0 || frame == lastFrame) {
+  if (m_xSheetFrameNumber - 1 == frame + 1) {
     TApp::instance()->getCurrentFrame()->setFrame(m_xSheetFrameNumber - 1);
   }
 }

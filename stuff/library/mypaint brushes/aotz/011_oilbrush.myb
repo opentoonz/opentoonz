@@ -2,7 +2,7 @@
     "comment": "MyPaint brush file",
     "description": "A brush to simulate oil",
     "group": "",
-    "notes": "Brush package v0.5 optimized for OpenToonz\n\nAuthor: Anderson Prado (aka AndeOn)\nLicense: CC0/Public Domain",
+    "notes": "Brush package optimized for OpenToonz\n\nAuthor: Anderson Prado (aka AndeOn)\nLicense: CC0/Public Domain",
     "parent_brush_name": "",
     "settings": {
         "anti_aliasing": {
@@ -222,7 +222,7 @@
             "inputs": {}
         },
         "opaque": {
-            "base_value": 1.21,
+            "base_value": 1.09,
             "inputs": {}
         },
         "opaque_linearize": {

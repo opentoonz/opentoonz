@@ -74,6 +74,8 @@ public:
 
     VERTICAL_POS,  // A horizontal line at given height
                    // { [TDoubleParamP] }
+    PARALLELOGRAM,
+
     TYPESCOUNT
   };
 

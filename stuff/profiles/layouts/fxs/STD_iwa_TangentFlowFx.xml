@@ -1,0 +1,11 @@
+<fxlayout>
+  <page name="Tangent Flow Iwa">
+    <control>iteration</control>
+    <control>kernelRadius</control>
+    <control>threshold</control>
+    <control>alignDirection</control>
+    <vbox modeSensitive="alignDirection" mode="1">
+    <control>pivotAngle</control>
+    </vbox>
+  </page>
+</fxlayout>

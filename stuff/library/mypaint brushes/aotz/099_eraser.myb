@@ -2,7 +2,7 @@
     "comment": "MyPaint brush file",
     "description": "A hard eraser",
     "group": "",
-    "notes": "Brush package v0.5 optimized for OpenToonz\n\nAuthor: Anderson Prado (aka AndeOn)\nLicense: CC0/Public Domain",
+    "notes": "Brush package optimized for OpenToonz\n\nAuthor: Anderson Prado (aka AndeOn)\nLicense: CC0/Public Domain",
     "parent_brush_name": "",
     "settings": {
         "anti_aliasing": {

@@ -1,0 +1,12 @@
+<fxlayout>
+  <page name="Flow Blur Iwa">
+    <control>length</control>
+    <control>filterType</control>
+    <separator/>
+    <control>linear</control>
+    <vbox modeSensitive="linear" mode="1">
+      <control>gamma</control>
+    </vbox>
+    <control>referenceMode</control>    
+  </page>
+</fxlayout>

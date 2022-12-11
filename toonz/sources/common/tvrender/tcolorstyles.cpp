@@ -652,3 +652,7 @@ std::string TColorStyle::getBrushIdNameParam(std::string brushIdName) {
 }
 
 //-------------------------------------------------------------------
+
+TRectD TColorStyle::getStrokeBBox(const TStroke *stroke) const {
+  return stroke->getBBox();
+}

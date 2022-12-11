@@ -1,0 +1,15 @@
+<fxlayout>
+	<page name="Motion Flow Iwa">
+	<vbox>
+		<hbox>
+			<control>motionObjectType</control>
+			<control>motionObjectIndex</control>
+		</hbox>
+		<control>shutterLength</control>
+		<control>normalizeType</control>
+		<vbox modeSensitive="normalizeType" mode="1">
+			<control>normalizeRange</control>
+		</vbox>
+		</vbox>
+	</page>
+</fxlayout>
