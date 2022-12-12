@@ -303,11 +303,11 @@ void SceneViewer::tabletEvent(QTabletEvent *e) {
       if (m_tabletState == Released || m_tabletState == None) {
         TMouseEvent mouseEvent;
         initToonzEvent(mouseEvent, e, height(), m_pressure, getDevPixRatio());
-        //m_tabletState = Touched;
+        m_tabletState = Touched;
         onPress(mouseEvent);
-      } //else if (m_tabletState == Touched) {
-        //m_tabletState = StartStroke;
-      //}
+      } else if (m_tabletState == Touched) {
+        m_tabletState = StartStroke;
+      }
     } else
       m_tabletEvent = false;
 #endif
