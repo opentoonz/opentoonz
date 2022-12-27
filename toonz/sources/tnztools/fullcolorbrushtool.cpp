@@ -19,7 +19,6 @@
 #include "toonz/txsheethandle.h"
 #include "toonz/txshlevelhandle.h"
 #include "toonz/tobjecthandle.h"
-#include "toonz/tframehandle.h"
 #include "toonz/ttileset.h"
 #include "toonz/ttilesaver.h"
 #include "toonz/strokegenerator.h"
@@ -121,7 +120,7 @@ FullColorBrushTool::FullColorBrushTool(std::string name)
     , m_modifierSize("ModifierSize", -3, 3, 0, true)
     , m_modifierOpacity("ModifierOpacity", 0, 100, 100, true)
     , m_modifierEraser("ModifierEraser", false)
-    , m_modifierLockAlpha("Lock Alpha", false)
+    , m_modifierLockAlpha("ModifierLockAlpha", false)
     , m_preset("Preset:")
     , m_minCursorThick(0)
     , m_maxCursorThick(0)
@@ -204,9 +203,7 @@ void FullColorBrushTool::onActivate() {
         QString::fromStdString(FullcolorBrushPreset.getValue()).toStdWString();
     if (wpreset != CUSTOM_WSTR) {
       initPresets();
-      if (!m_preset.isValue(wpreset)) wpreset = CUSTOM_WSTR;
       m_preset.setValue(wpreset);
-      FullcolorBrushPreset = m_preset.getValueAsString();
       loadPreset();
     } else
       loadLastBrush();
@@ -290,13 +287,7 @@ bool FullColorBrushTool::askWrite(const TRect &rect) {
 bool FullColorBrushTool::preLeftButtonDown() {
   touchImage();
 
-  if (m_isFrameCreated) {
-    setWorkAndBackupImages();
-    // When the xsheet frame is selected, whole viewer will be updated from
-    // SceneViewer::onXsheetChanged() on adding a new frame.
-    // We need to take care of a case when the level frame is selected.
-    if (m_application->getCurrentFrame()->isEditingLevel()) invalidate();
-  }
+  if (m_isFrameCreated) setWorkAndBackupImages();
 
   return true;
 }
@@ -313,9 +304,15 @@ void FullColorBrushTool::leftButtonDown(const TPointD &pos,
   if (!viewer) return;
 
   TRasterImageP ri = (TRasterImageP)getImage(true);
-  if (!ri) ri = (TRasterImageP)touchImage();
+  if (!ri) ri      = (TRasterImageP)touchImage();
 
   if (!ri) return;
+
+  if (e.isShiftPressed() || e.isCtrlPressed()) {
+    m_isStraight = true;
+    m_firstPoint = pos;
+    m_lastPoint  = pos;
+  }
 
   /* update color here since the current style might be switched with numpad
    * shortcut keys */
@@ -364,6 +361,47 @@ void FullColorBrushTool::leftButtonDown(const TPointD &pos,
 
 void FullColorBrushTool::leftButtonDrag(const TPointD &pos,
                                         const TMouseEvent &e) {
+  TRectD invalidateRect;
+  if (m_isStraight) {
+    invalidateRect = TRectD(m_firstPoint, m_lastPoint).enlarge(2);
+    m_lastPoint    = pos;
+    if (e.isCtrlPressed()) {
+      double distance = (m_brushPos.x - m_maxCursorThick + 1) * 0.5;
+      TRectD brushRect =
+          TRectD(TPointD(m_brushPos.x - distance, m_brushPos.y - distance),
+                 TPointD(m_brushPos.x + distance, m_brushPos.y + distance));
+      invalidateRect += (brushRect);
+      double denominator = m_lastPoint.x - m_firstPoint.x;
+      if (denominator == 0) denominator == 0.001;
+      double slope = ((m_lastPoint.y - m_firstPoint.y) / denominator);
+      double angle = std::atan(slope) * (180 / 3.14159);
+      int blah     = 0;
+      if (abs(angle) > 67.5)
+        m_lastPoint.x = m_firstPoint.x;
+      else if (abs(angle) < 22.5)
+        m_lastPoint.y = m_firstPoint.y;
+      else {
+        double xDistance = m_lastPoint.x - m_firstPoint.x;
+        double yDistance = m_lastPoint.y - m_firstPoint.y;
+        if (abs(xDistance) > abs(yDistance)) {
+          if (abs(yDistance) == yDistance)
+            m_lastPoint.y = m_firstPoint.y + abs(xDistance);
+          else
+            m_lastPoint.y = m_firstPoint.y - abs(xDistance);
+        } else {
+          if (abs(xDistance) == xDistance)
+            m_lastPoint.x = m_firstPoint.x + abs(yDistance);
+          else
+            m_lastPoint.x = m_firstPoint.x - abs(yDistance);
+        }
+      }
+    }
+    m_mousePos = pos;
+    m_brushPos = pos;
+    invalidate(invalidateRect);
+    return;
+  }
+
   TPointD previousBrushPos = m_brushPos;
   m_brushPos = m_mousePos = pos;
   m_mouseEvent            = e;
@@ -389,7 +427,7 @@ void FullColorBrushTool::leftButtonDrag(const TPointD &pos,
     ras->extract(updateRect)->copy(m_workRaster->extract(updateRect));
 
   TPointD thickOffset(m_maxCursorThick * 0.5, m_maxCursorThick * 0.5);
-  TRectD invalidateRect = convert(m_strokeSegmentRect) - rasCenter;
+  invalidateRect = convert(m_strokeSegmentRect) - rasCenter;
   invalidateRect += TRectD(m_brushPos - thickOffset, m_brushPos + thickOffset);
   invalidateRect +=
       TRectD(previousBrushPos - thickOffset, previousBrushPos + thickOffset);
@@ -410,7 +448,11 @@ void FullColorBrushTool::leftButtonUp(const TPointD &pos,
 
   TRasterP ras      = ri->getRaster();
   TPointD rasCenter = ras->getCenterD();
-  TPointD point(pos + rasCenter);
+  TPointD point;
+  if (!e.isCtrlPressed())
+    point = TPointD(pos + rasCenter);
+  else
+    point = TPointD(m_lastPoint + rasCenter);
   double pressure;
   if (getApplication()->getCurrentLevelStyle()->getTagId() ==
       4001)  // mypaint brush case
@@ -455,6 +497,7 @@ void FullColorBrushTool::leftButtonUp(const TPointD &pos,
   notifyImageChanged();
   m_strokeRect.empty();
   m_mousePressed = false;
+  m_isStraight   = false;
 }
 
 //---------------------------------------------------------------------------------------------------------------
@@ -522,6 +565,10 @@ void FullColorBrushTool::mouseMove(const TPointD &pos, const TMouseEvent &e) {
 
 void FullColorBrushTool::draw() {
   if (TRasterImageP ri = TRasterImageP(getImage(false))) {
+    if (m_isStraight) {
+      tglDrawSegment(m_firstPoint, m_lastPoint);
+    }
+
     // If toggled off, don't draw brush outline
     if (!Preferences::instance()->isCursorOutlineEnabled()) return;
 
@@ -716,7 +763,6 @@ void FullColorBrushTool::addPreset(QString name) {
 
   // Set the value to the specified one
   m_preset.setValue(preset.m_name);
-  FullcolorBrushPreset = m_preset.getValueAsString();
 }
 
 //------------------------------------------------------------------
@@ -730,7 +776,6 @@ void FullColorBrushTool::removePreset() {
 
   // No parameter change, and set the preset value to custom
   m_preset.setValue(CUSTOM_WSTR);
-  FullcolorBrushPreset = m_preset.getValueAsString();
 }
 
 //------------------------------------------------------------------
@@ -889,10 +934,6 @@ void FullColorBrushTool::applyClassicToonzBrushSettings(
     mypaintBrush.setMappingPoint(MYPAINT_BRUSH_SETTING_OPAQUE,
                                  MYPAINT_BRUSH_INPUT_PRESSURE, 1, 1.0,
                                  maxOpacity - minOpacity);
-  }
-
-  if (m_modifierLockAlpha.getValue()) {
-    mypaintBrush.setBaseValue(MYPAINT_BRUSH_SETTING_LOCK_ALPHA, 1.0);
   }
 }
 
