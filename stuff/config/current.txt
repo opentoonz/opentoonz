@@ -535,6 +535,7 @@
   <item>"SHADER_HSLBlendGPU.bhue"			"Hue"    </item>
   <item>"SHADER_HSLBlendGPU.bsat"			"Saturation"    </item>
   <item>"SHADER_HSLBlendGPU.blum"			"Luminosity"    </item>
+  <item>"SHADER_HSLBlendGPU.matte"			"Alpha"    </item>
   <item>"SHADER_HSLBlendGPU.balpha"			"Opacity"    </item>
   <item>"SHADER_HSLBlendGPU.bmask"			"Clipping Mask"    </item>
 

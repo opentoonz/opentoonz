@@ -11,6 +11,7 @@ uniform mat3      outputToInput[2];
 uniform bool bhue;    // Blend HUE?
 uniform bool bsat;    // Blend Saturation?
 uniform bool blum;    // Blend Luminosity?
+uniform bool matte;   // Use foreground alpha?
 uniform float balpha; // Blending Alpha
 uniform bool bmask;   // Base mask?
 
@@ -114,7 +115,11 @@ void main( void )
   // Perform blending
   if (fg_alpha > 0.0 && bg_alpha > 0.0) {
     vec3 o_pix = SetLumSat(bhue ? fg_pix : bg_pix, bsat ? fg_pix : bg_pix, blum ? fg_pix : bg_pix);
-    gl_FragColor.rgb = mix(bg_pix, o_pix, balpha);
+    if (matte) {
+      gl_FragColor.rgb = mix(bg_pix, o_pix, balpha * fg_frag.a);
+    } else {
+      gl_FragColor.rgb = mix(bg_pix, o_pix, balpha);
+    }
   } else if (fg_alpha > 0.0) {
     gl_FragColor.rgb = fg_pix;
   } else {
@@ -122,5 +127,9 @@ void main( void )
   }
 
   // Premultiplication
-  gl_FragColor.rgb *= gl_FragColor.a;
+  if (matte) {
+    gl_FragColor.rgb = gl_FragColor.rgb * gl_FragColor.a;
+  } else {
+    gl_FragColor.rgb *= gl_FragColor.a;
+  }
 }

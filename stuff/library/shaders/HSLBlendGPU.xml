@@ -48,6 +48,12 @@
       0
     </Default>
   </Parameter>
+    <Parameter>
+    bool matte
+    <Default>
+      0
+    </Default>
+  </Parameter>
   <Parameter>
     float balpha
     <Concept>
