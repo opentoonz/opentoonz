@@ -69,6 +69,8 @@ public:
   static DragTool *makeColumnLinkTool(XsheetViewer *viewer);
   static DragTool *makeColumnMoveTool(XsheetViewer *viewer);
   static DragTool *makeVolumeDragTool(XsheetViewer *viewer);
+
+  static DragTool *makeNavigationTagDragTool(XsheetViewer *viewer);
 };
 
 void setPlayRange(int r0, int r1, int step, bool withUndo = true);

@@ -1,6 +1,6 @@
 
 
-//#include "tpixelparam.h"
+// #include "tpixelparam.h"
 #include "tparamset.h"
 #include "tdoubleparam.h"
 #include "texception.h"
@@ -112,6 +112,14 @@ TPixel32 TPixelParam::getValue(double frame) const {
 
 //---------------------------------------------------------
 
+TPixel32 TPixelParam::getValue(double frame, bool linear,
+                               double colorSpaceGamma) const {
+  if (!linear) return getValue(frame);
+  return toPixel32(toLinear(getValueD(frame), colorSpaceGamma));
+}
+
+//---------------------------------------------------------
+
 TPixel64 TPixelParam::getValue64(double frame) const {
   return toPixel64(getValueD(frame));
 }
@@ -200,7 +208,7 @@ TDoubleParamP &TPixelParam::getMatte() { return m_data->m_m; }
 //---------------------------------------------------------
 
 void TPixelParam::enableMatte(bool on) {
-  m_data->m_isMatteEnabled     = on;
+  m_data->m_isMatteEnabled = on;
   if (on == false) m_data->m_m = new TDoubleParam(255.0);
 }
 //---------------------------------------------------------

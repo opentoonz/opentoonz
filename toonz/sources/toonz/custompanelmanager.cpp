@@ -36,8 +36,8 @@ MyScroller::MyScroller(Qt::Orientation orientation, CommandId command1,
 void MyScroller::paintEvent(QPaintEvent*) {
   QPainter p(this);
 
-  p.setPen(Qt::white);
-  p.setBrush(Qt::NoBrush);
+  p.setPen(m_scrollerBorderColor);
+  p.setBrush(m_scrollerBGColor);
 
   p.drawRect(rect().adjusted(0, 0, -1, -1));
 

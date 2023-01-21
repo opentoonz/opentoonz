@@ -1,16 +1,29 @@
-<fxlayout help_command="iexplore" help_file="BokehAdvancedIwa.html">
+<fxlayout>
 	<page name="iwa Bokeh Advanced">
  	<vbox>
 		<control>on_focus_distance</control>
 		<control>bokeh_amount</control>
-		<control>masterHardness</control>
+		<control>linearizeMode</control>
+    <vbox modeSensitive="linearizeMode" mode="1">
+			<control>masterHardness</control>
+		</vbox>
+    <vbox modeSensitive="linearizeMode" mode="0">
+			<control>masterGamma</control>
+			<control>masterGammaAdjust</control>
+		</vbox>
 		<control>hardnessPerSource</control>
   	</vbox>
   
    	<vbox shrink="1" label="Source1">
 		<control>distance1</control>
 		<control>bokeh_adjustment1</control>
-		<control>hardness1</control>
+    <vbox modeSensitive="linearizeMode" mode="1">
+			<control>hardness1</control>
+		</vbox>
+    <vbox modeSensitive="linearizeMode" mode="0">
+			<control>gamma1</control>
+			<control>gammaAdjust1</control>
+		</vbox>
 		<hbox>
 			<control>depth_ref1</control>
 			<control>fillGap1</control>
@@ -22,7 +35,13 @@
    	<vbox shrink="0" label="Source2">
 		<control>distance2</control>
 		<control>bokeh_adjustment2</control>
-		<control>hardness2</control>
+    <vbox modeSensitive="linearizeMode" mode="1">
+			<control>hardness2</control>
+		</vbox>
+    <vbox modeSensitive="linearizeMode" mode="0">
+			<control>gamma2</control>
+			<control>gammaAdjust2</control>
+		</vbox>
 		<hbox>
 			<control>depth_ref2</control>
 			<control>fillGap2</control>
@@ -34,7 +53,13 @@
    	<vbox shrink="0" label="Source3">
 		<control>distance3</control>
 		<control>bokeh_adjustment3</control>
-		<control>hardness3</control>
+    <vbox modeSensitive="linearizeMode" mode="1">
+			<control>hardness3</control>
+		</vbox>
+    <vbox modeSensitive="linearizeMode" mode="0">
+			<control>gamma3</control>
+			<control>gammaAdjust3</control>
+		</vbox>
 		<hbox>
 			<control>depth_ref3</control>
 			<control>fillGap3</control>
@@ -46,7 +71,13 @@
    	<vbox shrink="0" label="Source4">
 		<control>distance4</control>
 		<control>bokeh_adjustment4</control>
-		<control>hardness4</control>
+    <vbox modeSensitive="linearizeMode" mode="1">
+			<control>hardness4</control>
+		</vbox>
+    <vbox modeSensitive="linearizeMode" mode="0">
+			<control>gamma4</control>
+			<control>gammaAdjust4</control>
+		</vbox>
 		<hbox>
 			<control>depth_ref4</control>
 			<control>fillGap4</control>
@@ -58,7 +89,13 @@
    	<vbox shrink="0" label="Source5">
 		<control>distance5</control>
 		<control>bokeh_adjustment5</control>
-		<control>hardness5</control>
+    <vbox modeSensitive="linearizeMode" mode="1">
+			<control>hardness5</control>
+		</vbox>
+    <vbox modeSensitive="linearizeMode" mode="0">
+			<control>gamma5</control>
+			<control>gammaAdjust5</control>
+		</vbox>
 		<hbox>
 			<control>depth_ref5</control>
 			<control>fillGap5</control>
@@ -74,6 +111,16 @@
 		<on>hardness3</on>
 		<on>hardness4</on>
 		<on>hardness5</on>
+		<on>gamma1</on>
+		<on>gamma2</on>
+		<on>gamma3</on>
+		<on>gamma4</on>
+		<on>gamma5</on>
+		<on>gammaAdjust1</on>
+		<on>gammaAdjust2</on>
+		<on>gammaAdjust3</on>
+		<on>gammaAdjust4</on>
+		<on>gammaAdjust5</on>
 	</visibleToggle>
 	<visibleToggle>
 		<controller>fillGap1</controller>

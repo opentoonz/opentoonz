@@ -286,10 +286,10 @@ DVAPI void ropmin(const TRasterP &rup, const TRasterP &rdown,
 
 DVAPI void ropmax(const TRasterP &rup, const TRasterP &rdown,
                   const TRasterP &rout);
-DVAPI void linearburn(const TRasterP &rup, const TRasterP &rdown,
-                      const TRasterP &rout);
-DVAPI void overlay(const TRasterP &rup, const TRasterP &rdown,
-                   const TRasterP &rout);
+// DVAPI void linearburn(const TRasterP &rup, const TRasterP &rdown,
+//                       const TRasterP &rout);
+// DVAPI void overlay(const TRasterP &rup, const TRasterP &rdown,
+//                    const TRasterP &rout);
 
 //! Make a premultiply of all raster pixels
 DVAPI void premultiply(const TRasterP &ras);
@@ -411,5 +411,13 @@ DVAPI void lockRaster(_RASTER *raster);
 //! Surrenders the input raster's buffer to the cache. Should be called before
 //! inactivity periods.
 DVAPI void unlockRaster(_RASTER *raster);
+
+// conversion between sRGB <--> Linear RGB
+DVAPI void toLinearRGB(TRasterP raster, double gamma,
+                       bool sourceIsPremultiplied = true);
+DVAPI void tosRGB(TRasterP raster, double gamma,
+                  bool sourceIsPremultiplied = true);
+
+DVAPI void adjustGain(TRasterP raster, int gainStep, double gamma);
 
 }  // namespace TRop

@@ -151,7 +151,7 @@ of the ray we're tracing
                               (rayPos.x * ratio *
                                pow((double)(sq(rayPos.x * ratio) +
                                             sq(rayPos.y * ratio) + sq_z),
-                                   decay)) +
+                                          decay)) +
                           0.5);  // * ^-d...  0.5 rounds
           }
         } else
@@ -170,6 +170,176 @@ of the ray we're tracing
         pixOut->r = (val_r > max) ? max : val_r;
         pixOut->g = (val_g > max) ? max : val_g;
         pixOut->b = (val_b > max) ? max : val_b;
+        pixOut->m = (val_m > max) ? max : val_m;
+      }
+
+      // Increment variables along the x-axis
+      pixIn += dxIn, pixOut += dxOut;
+
+      rayPos.x += rayPosIncrementX, rayPos.y += rayPosIncrementY;
+
+      // Increment variables along the y-axis
+      if ((yIncrementCounter += ray_final_y) >= yIncrementThreshold) {
+        ++y, pixIn += dyIn, pixOut += dyOut;
+        yIncrementCounter -= yIncrementThreshold;
+      }
+    }
+  }
+}
+
+// specialization for floating point pixel
+
+template <>
+void performStandardRaylit<TPixelF>(TPixelF *bufIn, TPixelF *bufOut, int dxIn,
+                                    int dyIn, int dxOut, int dyOut,
+                                    const TRect &srcRect, const TRect &dstRect,
+                                    const TRop::RaylitParams &params) {
+  /* NOTATION:  Diagram assuming octant 1
+
+  /                   |
+ /                    |
+/  - ray_final_y      | octLy
+/ 1                    |
++----                   |
+_____  octLx
+
+
+So, octLx and octLy are the octant's lx and ly;  ray_final_y is the final height
+of the ray we're tracing
+*/
+
+  // Build colors-related variables
+  float max = TPixelF::maxChannelValue;
+  /*-- 透明部分の色 --*/
+  float transp_val = (params.m_invert) ? max : 0.f,
+        opaque_val = max - transp_val;
+  float value, val_r, val_g, val_b, val_m;
+  double lightness, r_fac, g_fac, b_fac, m_fac;
+  /*-- 8bit/ 32bit-Float の違いを吸収する係数 --*/
+  double factor = max / 255.0;
+
+  // NOTE: These variable initializations are, well,
+  // heuristic at least. They were probably tested
+  // to be good, but didn't quite make any REAL sense.
+  // They could be done MUCH better, but changing them
+  // would alter the way raylit has been applied until now.
+  // Should be changed at some point, though...
+
+  double scale      = params.m_scale;
+  double decay      = log(params.m_decay / 100.0 + 1.0) + 1.0;
+  double intensity  = 1e8 * log(params.m_intensity / 100.0 + 1.0) / scale;
+  double smoothness = log(params.m_smoothness * 5.0 / 100.0 + 1.0);
+  double radius     = params.m_radius;
+
+  /*-- 1ステップ進んだ時、次のピクセルで光源が無かったときの光の弱まる割合 --*/
+  double neg_delta_p = smoothness * intensity;
+  /*-- 1ステップ進んだ時、次のピクセルで光源が有ったときの光の強まる割合 --*/
+  double quot_delta_p = intensity / max;  //
+
+  /*--
+   * m_colorはRaylitFxのColor値。r_fac、g_fac、b_facは各チャンネルをPremultiplyした値
+   * --*/
+  TPixelF colorF = toPixelF(params.m_color);
+  m_fac          = colorF.m;
+  r_fac          = m_fac * colorF.r;
+  g_fac          = m_fac * colorF.g;
+  b_fac          = m_fac * colorF.b;
+
+  // Geometry-related variables
+  int x, y, ray_final_y;
+  int octLx = dstRect.x1 - dstRect.x0;
+
+  double rayPosIncrementX = 1.0 / scale;
+
+  double sq_z = sq(params.m_lightOriginSrc.z);  // We'll be making square
+                                                // distances from p, so square
+                                                // it once now
+
+  // Perform raylit
+  TPixelF *pixIn, *pixOut;
+
+  for (ray_final_y = 0; ray_final_y < octLx; ++ray_final_y) {
+    // Initialize increment variables
+    lightness = 0.0;
+
+    double rayPosIncrementY = rayPosIncrementX * (ray_final_y / (double)octLx);
+
+    // Use an integer counter to know when y must increase. Will add ray_final_y
+    // as long as
+    // a multiple of octLx-1 is reached, then increase
+    int yIncrementCounter = 0, yIncrementThreshold = octLx - 1;
+
+    // Trace a single ray of light
+    TPointD rayPos(rayPosIncrementX, rayPosIncrementY);
+
+    for (x = dstRect.x0, y = dstRect.y0, pixIn = bufIn, pixOut = bufOut;
+         (x < dstRect.x1) && (y < dstRect.y1); ++x) {
+      bool insideSrc = (x >= srcRect.x0) && (x < srcRect.x1) &&
+                       (y >= srcRect.y0) && (y < srcRect.y1);
+      if (insideSrc) {
+        // Add a light component depending on source's matte
+        if (areAlmostEqual((double)pixIn->m, (double)opaque_val))
+          lightness = std::max(
+              0.0, lightness - neg_delta_p);  // No light source - ray fading
+        else {
+          if (areAlmostEqual((double)pixIn->m, (double)transp_val))
+            lightness += intensity;  // Full light source - ray enforcing
+          else
+            lightness = std::max(
+                0.0, lightness +  // Half light source
+                         (params.m_invert ? pixIn->m : (max - pixIn->m)) *
+                             quot_delta_p);  //   matte-linear enforcing
+        }
+
+        if (params.m_includeInput) {
+          val_r = pixIn->r;
+          val_g = pixIn->g;
+          val_b = pixIn->b;
+          val_m = pixIn->m;
+        } else
+          val_r = val_g = val_b = val_m = 0.f;
+      } else {
+        if (!params.m_invert)
+          lightness += intensity;
+        else
+          lightness = std::max(0.0, lightness - neg_delta_p);
+
+        val_r = val_g = val_b = val_m = 0.f;
+      }
+
+      bool insideDst = (x >= 0) && (y >= 0);
+      if (insideDst) {
+        // Write the corresponding destination pixel
+        if (lightness > 0.0) {
+          if (radius == 0.0) {
+            value =
+                factor * lightness /
+                (rayPos.x * pow((double)(sq(rayPos.x) + sq(rayPos.y) + sq_z),
+                                decay));  // * ^-d...
+          } else {
+            double ratio = std::max(0.001, 1.0 - radius / norm(rayPos));
+            value        = factor * lightness /
+                    (rayPos.x * ratio *
+                     pow((double)(sq(rayPos.x * ratio) + sq(rayPos.y * ratio) +
+                                  sq_z),
+                         decay));  // * ^-d...
+          }
+        } else
+          value = 0.f;
+
+        // NOTE: pow() could be slow. If that is the case, it could be cached
+        // for the whole octant along the longest ray at integer positions,
+        // and then linearly interpolated between those... Have to profile this
+        // before resorting to that...
+
+        val_r += value * r_fac;
+        val_g += value * g_fac;
+        val_b += value * b_fac;
+        val_m += value * m_fac;
+
+        pixOut->r = val_r;
+        pixOut->g = val_g;
+        pixOut->b = val_b;
         pixOut->m = (val_m > max) ? max : val_m;
       }
 
@@ -322,6 +492,141 @@ void performColorRaylit(T *bufIn, T *bufOut, int dxIn, int dyIn, int dxOut,
   }
 }
 
+// specialization for floating point pixel
+
+template <>
+void performColorRaylit<TPixelF>(TPixelF *bufIn, TPixelF *bufOut, int dxIn,
+                                 int dyIn, int dxOut, int dyOut,
+                                 const TRect &srcRect, const TRect &dstRect,
+                                 const TRop::RaylitParams &params) {
+  // Build colors-related variables
+  float max = TPixelF::maxChannelValue;
+
+  float val_r, val_g, val_b, val_m;
+  double lightness_r, lightness_g, lightness_b;
+  double factor = max / 255.0;
+
+  // NOTE: These variable initializations are, well,
+  // heuristic at least. They were probably tested
+  // to be good, but didn't quite make any REAL sense.
+  // They could be done MUCH better, but changing them
+  // would alter the way raylit has been applied until now.
+  // Should be changed at some point, though...
+
+  double scale      = params.m_scale;
+  double decay      = log(params.m_decay / 100.0 + 1.0) + 1.0;
+  double intensity  = 1e8 * log(params.m_intensity / 100.0 + 1.0) / scale;
+  double smoothness = log(params.m_smoothness * 5.0 / 100.0 + 1.0);
+  double radius     = params.m_radius;
+
+  double neg_delta_p =
+      smoothness *
+      intensity;  // would alter the way raylit has been applied until now.
+  double quot_delta_p = intensity / max;  //
+  // Should be changed at some point, though...
+
+  // Geometry-related variables
+  int x, y, ray_final_y;
+  int octLx = dstRect.x1 - dstRect.x0;
+
+  double rayPosIncrementX = 1.0 / scale;
+
+  double fac, sq_z = sq(params.m_lightOriginSrc.z);  // We'll be making square
+                                                     // distances from p, so
+                                                     // square it once now
+
+  // Perform raylit
+  TPixelF *pixIn, *pixOut;
+
+  for (ray_final_y = 0; ray_final_y < octLx; ++ray_final_y) {
+    // Initialize increment variables
+    lightness_r = lightness_g = lightness_b = 0.0;
+    double l, l_max;
+
+    double rayPosIncrementY = rayPosIncrementX * (ray_final_y / (double)octLx);
+
+    // Use an integer counter to know when y must increase. Will add ray_final_y
+    // as long as
+    // a multiple of octLx-1 is reached, then increase
+    int yIncrementCounter = 0, yIncrementThreshold = octLx - 1;
+
+    // Trace a single ray of light
+    TPointD rayPos(rayPosIncrementX, rayPosIncrementY);
+
+    for (x = dstRect.x0, y = dstRect.y0, pixIn = bufIn, pixOut = bufOut;
+         (x < dstRect.x1) && (y < dstRect.y1); ++x) {
+      bool insideSrc = (x >= srcRect.x0) && (x < srcRect.x1) &&
+                       (y >= srcRect.y0) && (y < srcRect.y1);
+      if (insideSrc) {
+        val_r = pixIn->r;
+        val_g = pixIn->g;
+        val_b = pixIn->b;
+        val_m = pixIn->m;
+
+        lightness_r = std::max(0.0, val_r ? lightness_r + val_r * quot_delta_p
+                                          : lightness_r - neg_delta_p);
+        lightness_g = std::max(0.0, val_g ? lightness_g + val_g * quot_delta_p
+                                          : lightness_g - neg_delta_p);
+        lightness_b = std::max(0.0, val_b ? lightness_b + val_b * quot_delta_p
+                                          : lightness_b - neg_delta_p);
+
+        if (!params.m_includeInput) val_r = val_g = val_b = val_m = 0.f;
+      } else {
+        lightness_r = std::max(0.0, lightness_r - neg_delta_p);
+        lightness_g = std::max(0.0, lightness_g - neg_delta_p);
+        lightness_b = std::max(0.0, lightness_b - neg_delta_p);
+
+        val_r = val_g = val_b = val_m = 0.f;
+      }
+
+      bool insideDst = (x >= 0) && (y >= 0);
+      if (insideDst) {
+        // Write the corresponding destination pixel
+        if (radius == 0.0) {
+          fac = factor /
+                (rayPos.x *
+                 pow((double)(sq(rayPos.x) + sq(rayPos.y) + sq_z), decay));
+        } else {
+          double ratio = std::max(0.001, 1.0 - radius / norm(rayPos));
+          fac =
+              factor /
+              (rayPos.x * ratio *
+               pow((double)(sq(rayPos.x * ratio) + sq(rayPos.y * ratio) + sq_z),
+                   decay));
+        }
+
+        // NOTE: pow() could be slow. If that is the case, it could be cached
+        // for the whole octant along the longest ray at integer positions,
+        // and then linearly interpolated between those... Have to profile this
+        // before resorting to that...
+
+        val_r += l = fac * lightness_r;
+        l_max      = l;
+        val_g += l = fac * lightness_g;
+        l_max      = std::max(l, l_max);
+        val_b += l = fac * lightness_b;
+        l_max      = std::max(l, l_max);
+        val_m += l_max;
+
+        pixOut->r = val_r;
+        pixOut->g = val_g;
+        pixOut->b = val_b;
+        pixOut->m = (val_m > max) ? max : val_m;
+      }
+
+      // Increment variables along the x-axis
+      pixIn += dxIn, pixOut += dxOut;
+
+      rayPos.x += rayPosIncrementX, rayPos.y += rayPosIncrementY;
+
+      // Increment variables along the y-axis
+      if ((yIncrementCounter += ray_final_y) >= yIncrementThreshold) {
+        ++y, pixIn += dyIn, pixOut += dyOut;
+        yIncrementCounter -= yIncrementThreshold;
+      }
+    }
+  }
+}
 //--------------------------------------------------------------------------------------------
 /*-- ピザ状に8分割された領域の1つを計算する --*/
 template <typename T>
@@ -461,6 +766,8 @@ void TRop::raylit(const TRasterP &dstRas, const TRasterP &srcRas,
   else if ((TRaster64P)dstRas && (TRaster64P)srcRas)
     doRaylit<TPixel64>(srcRas, dstRas, params,
                        &performStandardRaylit<TPixel64>);
+  else if ((TRasterFP)dstRas && (TRasterFP)srcRas)
+    doRaylit<TPixelF>(srcRas, dstRas, params, &performStandardRaylit<TPixelF>);
   else
     throw TException("TRop::raylit unsupported pixel type");
 }
@@ -473,6 +780,8 @@ void TRop::glassRaylit(const TRasterP &dstRas, const TRasterP &srcRas,
     doRaylit<TPixel32>(srcRas, dstRas, params, &performColorRaylit<TPixel32>);
   else if ((TRaster64P)dstRas && (TRaster64P)srcRas)
     doRaylit<TPixel64>(srcRas, dstRas, params, &performColorRaylit<TPixel64>);
+  else if ((TRasterFP)dstRas && (TRasterFP)srcRas)
+    doRaylit<TPixelF>(srcRas, dstRas, params, &performColorRaylit<TPixelF>);
   else
     throw TException("TRop::raylit unsupported pixel type");
 }

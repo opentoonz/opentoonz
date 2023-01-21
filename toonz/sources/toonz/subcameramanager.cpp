@@ -31,6 +31,11 @@ inline bool bitwiseContains(UCHAR flag, UCHAR state) {
 inline bool bitwiseExclude(UCHAR flag, UCHAR state) {
   return bitwiseContains(~state, flag);
 }
+
+inline bool areNear(double v0, double v1, double thres = 20.0) {
+  return std::abs(v0 - v1) < thres;
+}
+
 }  // namespace
 
 //********************************************************************************
@@ -145,6 +150,27 @@ bool PreviewSubCameraManager::mouseMoveEvent(SceneViewer *viewer,
       TPointD worldCurPos(viewer->winToWorld(curPos));
 
       TApp *app = TApp::instance();
+
+      TCamera *camera = app->getCurrentScene()->getScene()->getCurrentCamera();
+      TRectD cameraStageRect(camera->getCameraToStageRef() *
+                             convert(TRect(camera->getRes())));
+
+      // Snap to the current camera frame
+      // horizontal
+      if (worldCurPos.x < worldMousePressPos.x &&
+          areNear(worldCurPos.x, cameraStageRect.x0))
+        worldCurPos.x = cameraStageRect.x0;
+      else if (worldCurPos.x > worldMousePressPos.x &&
+               areNear(worldCurPos.x, cameraStageRect.x1))
+        worldCurPos.x = cameraStageRect.x1;
+      // vertical
+      if (worldCurPos.y < worldMousePressPos.y &&
+          areNear(worldCurPos.y, cameraStageRect.y0))
+        worldCurPos.y = cameraStageRect.y0;
+      else if (worldCurPos.y > worldMousePressPos.y &&
+               areNear(worldCurPos.y, cameraStageRect.y1))
+        worldCurPos.y = cameraStageRect.y1;
+
       TAffine cameraAffInv(
           app->getCurrentXsheet()
               ->getXsheet()
@@ -160,15 +186,17 @@ bool PreviewSubCameraManager::mouseMoveEvent(SceneViewer *viewer,
           std::max(worldMousePressPos.x, worldCurPos.x),
           std::max(worldMousePressPos.y, worldCurPos.y));
 
-      TCamera *camera = app->getCurrentScene()->getScene()->getCurrentCamera();
       // camera->setInterestStageRect(worldPreviewSubCameraRect);
 
       TRectD previewSubCameraD(camera->getStageToCameraRef() *
                                worldPreviewSubCameraRect);
       m_editingInterestRect =
           TRect(previewSubCameraD.x0, previewSubCameraD.y0,
-                previewSubCameraD.x1 - 1, previewSubCameraD.y1 - 1) *
-          TRect(camera->getRes());
+                previewSubCameraD.x1 - 1, previewSubCameraD.y1 - 1);
+      // m_editingInterestRect =
+      //   TRect(previewSubCameraD.x0, previewSubCameraD.y0,
+      //     previewSubCameraD.x1 - 1, previewSubCameraD.y1 - 1) *
+      //   TRect(camera->getRes());
 
       viewer->update();
     } else {
@@ -192,7 +220,8 @@ bool PreviewSubCameraManager::mouseMoveEvent(SceneViewer *viewer,
           subRect.y1 = subRect.y1 + dragDistance.y;
       }
 
-      m_editingInterestRect = subRect * TRect(camera->getRes());
+      m_editingInterestRect = subRect;
+      // m_editingInterestRect = subRect * TRect(camera->getRes());
 
       viewer->update();
     }
@@ -299,10 +328,31 @@ UCHAR PreviewSubCameraManager::getSubCameraDragEnum(SceneViewer *viewer,
 
 //-----------------------------------------------------------------------------
 
-TPoint PreviewSubCameraManager::getSubCameraDragDistance(
-    SceneViewer *viewer, const QPointF &mousePos) {
+TPoint PreviewSubCameraManager::getSubCameraDragDistance(SceneViewer *viewer,
+                                                         QPointF &mousePos) {
   // Build the camera drag distance
   if (m_clickAndDrag) return TPoint();
+
+  // Snap to the current camera frame
+  TCamera *camera =
+      TApp::instance()->getCurrentScene()->getScene()->getCurrentCamera();
+  if (!bitwiseExclude(m_dragType, OUTER)) {
+    TPointD btmLft(cameraToWin(viewer, TPointD(0, 0)));
+    TPointD tpRght(
+        cameraToWin(viewer, TPointD(camera->getRes().lx, camera->getRes().ly)));
+    if (bitwiseContains(m_dragType, DRAG_LEFT) &&
+        areNear(mousePos.x(), btmLft.x))
+      mousePos.setX(btmLft.x);
+    else if (bitwiseContains(m_dragType, DRAG_RIGHT) &&
+             areNear(mousePos.x(), tpRght.x))
+      mousePos.setX(tpRght.x);
+    if (bitwiseContains(m_dragType, DRAG_BOTTOM) &&
+        areNear(mousePos.y(), (double)viewer->height() - btmLft.y))
+      mousePos.setY((double)viewer->height() - btmLft.y);
+    else if (bitwiseContains(m_dragType, DRAG_TOP) &&
+             areNear(mousePos.y(), (double)viewer->height() - tpRght.y))
+      mousePos.setY((double)viewer->height() - tpRght.y);
+  }
 
   TPointD cameraMousePos(winToCamera(viewer, mousePos));
 
@@ -311,8 +361,6 @@ TPoint PreviewSubCameraManager::getSubCameraDragDistance(
     return TPoint(resultD.x, resultD.y);
   }
 
-  TCamera *camera =
-      TApp::instance()->getCurrentScene()->getScene()->getCurrentCamera();
   TRect subCamera = camera->getInterestRect();
   TRectD subCameraD(subCamera.x0, subCamera.y0, subCamera.x1 + 1,
                     subCamera.y1 + 1);

@@ -16,6 +16,8 @@ public:
     addInputPort("Source", m_input);
     // m_gamma->setValueRange(0, std::numeric_limits<double>::max());
     m_gamma->setValueRange(0.0, 200.0);
+
+    enableComputeInFloat(true);
   }
 
   ~GammaFx(){};

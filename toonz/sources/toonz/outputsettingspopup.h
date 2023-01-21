@@ -58,6 +58,8 @@ class OutputSettingsPopup : public DVGui::Dialog {
   QComboBox *m_multimediaOm;
   QComboBox *m_resampleBalanceOm;
   QComboBox *m_channelWidthOm;
+  DVGui::CheckBox *m_linearColorSpaceChk;
+  DVGui::DoubleLineEdit *m_colorSpaceGammaFld;
   DVGui::DoubleLineEdit *m_gammaFld;
   QComboBox *m_dominantFieldOm;
   DVGui::CheckBox *m_applyShrinkChk;
@@ -79,8 +81,10 @@ class OutputSettingsPopup : public DVGui::Dialog {
   QPushButton *m_boardSettingsBtn;
 
   QScrollArea *m_scrollArea;
-  AnimatedLabel *m_cameraLabel, *m_fileLabel, *m_moreLabel;
-  QFrame *m_cameraBox, *m_fileBox, *m_moreBox;
+  AnimatedLabel *m_cameraLabel, *m_colorLabel, *m_fileLabel, *m_moreLabel;
+  QFrame *m_cameraBox, *m_colorBox, *m_fileBox, *m_moreBox;
+
+  DVGui::CheckBox *m_syncColorSettingsButton;
 
   bool m_isPreviewSettings;
 
@@ -89,6 +93,7 @@ class OutputSettingsPopup : public DVGui::Dialog {
 
   QFrame *createPanel(bool isPreview);
   QFrame *createCameraSettingsBox(bool isPreview);
+  QFrame *createColorSettingsBox(bool isPreview);
   QFrame *createFileSettingsBox(bool isPreview);
   QFrame *createMoreSettingsBox();
 
@@ -113,6 +118,8 @@ protected slots:
   void onFrameFldEditFinished();
   void onResampleChanged(int type);
   void onChannelWidthChanged(int type);
+  void onLinearColorSpaceChecked(int state);
+  void onColorSpaceGammaEdited();
   void onGammaFldEditFinished();
   void onDominantFieldChanged(int type);
   void onStretchFldEditFinished();
@@ -123,6 +130,7 @@ protected slots:
   void onRasterGranularityChanged(int type);
   void onStereoChecked(int);
   void onStereoChanged();
+  void onSyncColorSettingsChecked(int state);
   void onRenderClicked();
 
   /*-- OutputSettingsのPreset登録/削除/選択 --*/

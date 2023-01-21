@@ -47,7 +47,8 @@ const char *s_name = "name", *s_regexp = "regexp", *s_priority = "priority";
 
 const char *s_dpiPolicy = "dpiPolicy", *s_dpi = "dpi",
            *s_subsampling = "subsampling", *s_antialias = "antialias",
-           *s_premultiply = "premultiply", *s_whiteTransp = "whiteTransp";
+           *s_premultiply = "premultiply", *s_whiteTransp = "whiteTransp",
+           *s_colorSpaceGamma = "colorSpaceGamma";
 
 //=================================================================
 
@@ -124,6 +125,7 @@ void setValue(QSettings &settings, const LevelOptions &lo) {
   settings.setValue(s_antialias, lo.m_antialias);
   settings.setValue(s_premultiply, int(lo.m_premultiply));
   settings.setValue(s_whiteTransp, int(lo.m_whiteTransp));
+  settings.setValue(s_colorSpaceGamma, lo.m_colorSpaceGamma);
 }
 
 //-----------------------------------------------------------------
@@ -138,6 +140,8 @@ void getValue(const QSettings &settings, LevelOptions &lo) {
       (settings.value(s_premultiply, lo.m_premultiply).toInt() != 0);
   lo.m_whiteTransp =
       (settings.value(s_whiteTransp, lo.m_whiteTransp).toInt() != 0);
+  lo.m_colorSpaceGamma =
+      settings.value(s_colorSpaceGamma, lo.m_colorSpaceGamma).toDouble();
 }
 
 //-----------------------------------------------------------------

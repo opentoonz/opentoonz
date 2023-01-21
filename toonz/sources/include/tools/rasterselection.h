@@ -56,7 +56,7 @@ class DVAPI RasterSelection final : public TSelection {
   bool m_noAntialiasing;
 
 private:
-  void pasteSelection(const RasterImageData *data);
+  bool pasteSelection(const RasterImageData *data);
 
 public:
   RasterSelection();

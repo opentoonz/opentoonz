@@ -11,9 +11,7 @@
 TCamera::TCamera()
     //: m_size(12, 9), m_res(768, 576), m_xPrevalence(true)
     //: m_size(36, 20.25),
-    : m_size(16, 9),
-      m_res(1920, 1080),
-      m_xPrevalence(true) {}
+    : m_size(16, 9), m_res(1920, 1080), m_xPrevalence(true) {}
 
 //-------------------------------------------------------------------
 
@@ -110,15 +108,18 @@ TRectD TCamera::getStageRect() const {
 //-------------------------------------------------------------------
 
 void TCamera::setInterestRect(const TRect &rect) {
-  // Not using the TRect's common intersection. Unfortunately, in case
-  // the rect's coordinates have lx or ly < 0, the intersection returns
-  // the default (empty) rect. We want to maintain the coordinates instead.
-  // m_interestRect = rect * TRect(m_res);
-
-  m_interestRect.x0 = std::max(rect.x0, 0);
-  m_interestRect.y0 = std::max(rect.y0, 0);
-  m_interestRect.x1 = std::min(rect.x1, m_res.lx - 1);
-  m_interestRect.y1 = std::min(rect.y1, m_res.ly - 1);
+  // enable to preview outside of the original camera rect
+  m_interestRect = rect;
+  return;
+  //// Not using the TRect's common intersection. Unfortunately, in case
+  //// the rect's coordinates have lx or ly < 0, the intersection returns
+  //// the default (empty) rect. We want to maintain the coordinates instead.
+  //// m_interestRect = rect * TRect(m_res);
+  //
+  // m_interestRect.x0 = std::max(rect.x0, 0);
+  // m_interestRect.y0 = std::max(rect.y0, 0);
+  // m_interestRect.x1 = std::min(rect.x1, m_res.lx - 1);
+  // m_interestRect.y1 = std::min(rect.y1, m_res.ly - 1);
 }
 
 //-------------------------------------------------------------------

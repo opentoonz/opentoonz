@@ -53,6 +53,7 @@ class TFrameId;
 class Orientation;
 class TXsheetColumnChangeObserver;
 class ExpressionReferenceMonitor;
+class NavigationTags;
 
 //=============================================================================
 
@@ -158,6 +159,7 @@ private:
   std::unique_ptr<TXsheetImp> m_imp;
   TXshNoteSet *m_notes;
   SoundProperties *m_soundProperties;
+  NavigationTags *m_navigationTags;
 
   int m_cameraColumnIndex;
   TXshColumn *m_cameraColumn;
@@ -579,6 +581,10 @@ in TXsheetImp.
   void notifyFxAdded(const std::vector<TFx *> &fxs);
   void notifyStageObjectAdded(const TStageObjectId id);
   bool isReferenceManagementIgnored(TDoubleParam *);
+
+  NavigationTags *getNavigationTags() const { return m_navigationTags; }
+  bool isFrameTagged(int frame) const;
+  void toggleTaggedFrame(int frame);
 
 protected:
   bool checkCircularReferences(TXsheet *childCandidate);

@@ -28,6 +28,7 @@
 #include "tools/toolcommandids.h"
 #include "toonz/tstageobject.h"
 #include "toonz/tpinnedrangeset.h"
+#include "toonz/navigationtags.h"
 
 #include <QPainter>
 #include <QMouseEvent>
@@ -438,6 +439,50 @@ void RowArea::drawStopMotionCameraIndicator(QPainter &p) {
 
 //-----------------------------------------------------------------------------
 #endif
+
+void RowArea::drawNavigationTags(QPainter &p, int r0, int r1) {
+  TApp *app    = TApp::instance();
+  TXsheet *xsh = app->getCurrentScene()->getScene()->getXsheet();
+  assert(xsh);
+
+  QPoint frameAdj = m_viewer->getFrameZoomAdjustment();
+
+  NavigationTags *tags = xsh->getNavigationTags();
+
+  for (int r = r0; r <= r1; r++) {
+    if (!xsh->isFrameTagged(r)) continue;
+
+    QPoint topLeft = m_viewer->positionToXY(CellPosition(r, -1));
+    if (!m_viewer->orientation()->isVerticalTimeline())
+      topLeft.setY(0);
+    else
+      topLeft.setX(0);
+
+    QRect tagRect = m_viewer->orientation()
+                        ->rect(PredefinedRect::NAVIGATION_TAG_AREA)
+                        .translated(topLeft)
+                        .translated(-frameAdj / 2);
+
+    int frameMid, frameTop;
+    if (m_viewer->orientation()->isVerticalTimeline()) {
+      frameMid = tagRect.left() - 3;
+      frameTop = tagRect.top() + (tagRect.height() / 2);
+    } else {
+      frameMid = tagRect.left() + (tagRect.height() / 2) - 3;
+      frameTop = tagRect.top() + 1;
+    }
+
+    QPainterPath tag = m_viewer->orientation()
+                           ->path(PredefinedPath::NAVIGATION_TAG)
+                           .translated(QPoint(frameMid, frameTop));
+    p.setPen(Qt::black);
+    p.setBrush(tags->getTagColor(r));
+    p.drawPath(tag);
+    p.setBrush(Qt::NoBrush);
+  }
+}
+
+//-----------------------------------------------------------------------------
 
 void RowArea::drawOnionSkinBackground(QPainter &p, int r0, int r1) {
   const Orientation *o = m_viewer->orientation();
@@ -949,6 +994,8 @@ void RowArea::paintEvent(QPaintEvent *event) {
       Preferences::instance()->isCurrentTimelineIndicatorEnabled())
     drawCurrentTimeLine(p);
 
+  drawNavigationTags(p, r0, r1);
+
   drawRows(p, r0, r1);
 
   if (TApp::instance()->getCurrentFrame()->isEditingScene()) {
@@ -1064,7 +1111,13 @@ void RowArea::mousePressEvent(QMouseEvent *event) {
             PredefinedDimension::FRAME_AREA_EXPANSION);
       }
 
-      if (playR1 == -1) {  // getFrameCount = 0 i.e. xsheet is empty
+      if (xsh->getNavigationTags()->isTagged(row) &&
+          o->rect(PredefinedRect::NAVIGATION_TAG_AREA)
+              .adjusted(0, 0, -frameAdj.x(), -frameAdj.y())
+              .contains(mouseInCell)) {
+        setDragTool(XsheetGUI::DragTool::makeNavigationTagDragTool(m_viewer));
+        frameAreaIsClicked = true;
+      } else if (playR1 == -1) {  // getFrameCount = 0 i.e. xsheet is empty
         setDragTool(
             XsheetGUI::DragTool::makeCurrentFrameModifierTool(m_viewer));
         frameAreaIsClicked = true;
@@ -1259,7 +1312,14 @@ void RowArea::mouseMoveEvent(QMouseEvent *event) {
     m_tooltip = tr("Pinned Center : Col%1%2")
                     .arg(pinnedCenterColumnId + 1)
                     .arg((isRootBonePinned) ? " (Root)" : "");
-  else if (row == currentRow) {
+  else if (o->rect(PredefinedRect::NAVIGATION_TAG_AREA)
+               .adjusted(0, 0, -frameAdj.x(), -frameAdj.y())
+               .contains(mouseInCell)) {
+    TXsheet *xsh = m_viewer->getXsheet();
+    QString label = xsh->getNavigationTags()->getTagLabel(m_row);
+    if (label.isEmpty()) label = "-";
+    if (xsh->isFrameTagged(m_row)) m_tooltip = tr("Tag: %1").arg(label);
+  } else if (row == currentRow) {
     if (Preferences::instance()->isOnionSkinEnabled() &&
         o->rect(PredefinedRect::ONION)
             .translated(-frameAdj / 2)
@@ -1337,6 +1397,34 @@ void RowArea::contextMenuEvent(QContextMenuEvent *event) {
   menu->addAction(cmdManager->getAction(MI_EditShift));
   menu->addAction(cmdManager->getAction(MI_NoShift));
   menu->addAction(cmdManager->getAction(MI_ResetShift));
+
+  // Tags
+  menu->addSeparator();
+  menu->addAction(cmdManager->getAction(MI_ToggleTaggedFrame));
+  menu->addAction(cmdManager->getAction(MI_EditTaggedFrame));
+
+  QMenu *tagMenu          = menu->addMenu(tr("Tags"));
+  NavigationTags *navTags = m_viewer->getXsheet()->getNavigationTags();
+  QAction *tagAction;
+  if (!navTags->getCount()) {
+    tagAction = tagMenu->addAction("Empty");
+    tagAction->setEnabled(false);
+  } else {
+    std::vector<NavigationTags::Tag> tags = navTags->getTags();
+    for (int i = 0; i < tags.size(); i++) {
+      int frame     = tags[i].m_frame;
+      QString label = tr("Frame %1").arg(frame + 1);
+      if (!tags[i].m_label.isEmpty()) label += ": " + tags[i].m_label;
+      tagAction = tagMenu->addAction(label);
+      tagAction->setData(frame);
+      connect(tagAction, SIGNAL(triggered()), this, SLOT(onJumpToTag()));
+    }
+    tagMenu->addSeparator();
+    tagMenu->addAction(cmdManager->getAction(MI_ClearTags));
+  }
+
+  menu->addAction(cmdManager->getAction(MI_NextTaggedFrame));
+  menu->addAction(cmdManager->getAction(MI_PrevTaggedFrame));
 
   menu->exec(event->globalPos());
 }
@@ -1479,5 +1567,12 @@ void RowArea::onRemoveMarkers() {
 }
 
 //-----------------------------------------------------------------------------
+
+void RowArea::onJumpToTag() {
+  QAction *senderAction = qobject_cast<QAction *>(sender());
+  assert(senderAction);
+  int frame = senderAction->data().toInt();
+  m_viewer->setCurrentRow(frame);
+}
 
 }  // namespace XsheetGUI

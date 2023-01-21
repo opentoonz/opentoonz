@@ -23,8 +23,8 @@ class Iwa_RainbowFx final : public TStandardZeraryFx {
   TBoolParamP m_alpha_rendering;
 
   double getSizePixelAmount(const double val, const TAffine affine);
-  void buildRanbowColorMap(double3 *core, double3 *wide, double intensity,
-                           double inside, double secondary);
+  void buildRainbowColorMap(double3 *core, double3 *wide, double intensity,
+                            double inside, double secondary, bool doClamp);
   inline double3 angleToColor(double angle, double3 *core, double3 *wide);
 
   template <typename RASTER, typename PIXEL>
@@ -40,6 +40,9 @@ public:
                  const TRenderSettings &ri) override;
   void doCompute(TTile &tile, double frame, const TRenderSettings &ri) override;
   void getParamUIs(TParamUIConcept *&concepts, int &length) override;
+
+  bool toBeComputedInLinearColorSpace(bool settingsIsLinear,
+                                      bool tileIsLinear) const override;
 };
 
 #endif

@@ -36,7 +36,7 @@
 #include <QLabel>
 #include <QHBoxLayout>
 #include <QFormLayout>
-//#include <QtConcurrent>
+// #include <QtConcurrent>
 
 #include "plugin_param_traits.h"
 #include "../include/toonzqt/pluginloader.h"
@@ -451,7 +451,7 @@ RasterFxPluginHost *RasterFxPluginHost::newInstance(
 }
 
 const TPersistDeclaration *RasterFxPluginHost::getDeclaration() const {
-  printf("RasterFxPluginHost::getDeclaration()\n");
+  // printf("RasterFxPluginHost::getDeclaration()\n");
   return pi_->decl_;
 }
 
@@ -1560,11 +1560,10 @@ PluginLoadController::PluginLoadController(const std::string &basedir,
   connect(&work_entity, &QThread::finished, ld, &QObject::deleteLater);
   /* AddFxContextMenu から呼ばれていたが、プラグインの検索が load_entries()
      を通じて起動時に呼ばれるようにした関係で,
-     (あまりよくはないが)listener の有無によって receiver を分けるようにしている.
-     listener がいる場合は従来通り context menu の構築のために
-     AddFxContextMenu::fixup() に接続するが
-     それ以外では plugin_dict_ への追加のため PluginLoadController::finished
-     に接続する.
+     (あまりよくはないが)listener の有無によって receiver
+     を分けるようにしている. listener がいる場合は従来通り context menu
+     の構築のために AddFxContextMenu::fixup() に接続するが それ以外では
+     plugin_dict_ への追加のため PluginLoadController::finished に接続する.
   */
   if (listener) {
     AddFxContextMenu *a = qobject_cast<AddFxContextMenu *>(listener);
@@ -1619,4 +1618,4 @@ static bool copy_rendering_setting(toonz_rendering_setting_t *dst,
   return true;
 }
 
-//#include "pluginhost.moc"
+// #include "pluginhost.moc"

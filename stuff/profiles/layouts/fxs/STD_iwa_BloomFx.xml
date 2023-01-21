@@ -1,6 +1,7 @@
 <fxlayout>
 	<page name="Bloom Iwa">
 		<control>gamma</control>
+		<control>gammaAdjust</control>
 		<control>auto_gain</control>
 		<control>gain_adjust</control>
 		<control>gain</control>

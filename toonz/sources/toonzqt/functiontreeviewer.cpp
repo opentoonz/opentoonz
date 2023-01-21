@@ -272,7 +272,7 @@ QVariant StageObjectChannelGroup::data(int role) const {
     std::string name = (m_stageObject->getId().isTable())
                            ? FunctionTreeView::tr("Table").toStdString()
                            : m_stageObject->getName();
-    std::string id = m_stageObject->getId().toString();
+    std::string id   = m_stageObject->getId().toString();
 
     return (name == id) ? QString::fromStdString(name)
                         : QString::fromStdString(id + " (" + name + ")");
@@ -604,7 +604,8 @@ QVariant FunctionTreeModel::Channel::data(int role) const {
     if (isIgnored()) return isActive() ? paramIgnoredOn : paramIgnoredOff;
 
     return m_param->hasKeyframes() ? isActive() ? paramAnimOn : paramAnimOff
-                                   : isActive() ? paramOn : paramOff;
+           : isActive()            ? paramOn
+                                   : paramOff;
   } else if (role == Qt::DisplayRole) {
     if (m_param->hasUILabel()) {
       return QString::fromStdString(m_param->getUILabel());
@@ -1144,8 +1145,11 @@ void FunctionTreeModel::addChannels(TFx *fx, ChannelGroup *groupItem,
   const std::string &paramNamePref = fx->getFxType() + ".";
 
   int p, pCount = params->getParamCount();
-  for (p = 0; p != pCount; ++p)
+  for (p = 0; p != pCount; ++p) {
+    // hidden parameter are not displayed in the tree
+    if (params->isParamHidden(p)) continue;
     addParameter(fxItem, paramNamePref, fxId, params->getParam(p));
+  }
 }
 
 //-----------------------------------------------------------------------------

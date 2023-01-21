@@ -1181,6 +1181,8 @@ TXshLevel *ToonzScene::loadLevel(const TFilePath &actualPath,
     LevelProperties *lp = xl->getProperties();
     assert(lp);
 
+    bool formatSpecified = false;
+
     if (levelOptions)
       lp->options() = *levelOptions;
     else {
@@ -1188,9 +1190,10 @@ TXshLevel *ToonzScene::loadLevel(const TFilePath &actualPath,
       int formatIdx            = prefs.matchLevelFormat(
           levelPath);  // Should I use actualPath here? It's mostly
                                   // irrelevant anyway, it's for old tzp/tzu...
-      if (formatIdx >= 0)
-        lp->options() = prefs.levelFormat(formatIdx).m_options;
-      else {
+      if (formatIdx >= 0) {
+        lp->options()   = prefs.levelFormat(formatIdx).m_options;
+        formatSpecified = true;
+      } else {
         // Default subsampling values are assigned from scene properties
         if (xl->getType() == OVL_XSHLEVEL)
           lp->setSubsampling(getProperties()->getFullcolorSubsampling());
@@ -1216,6 +1219,17 @@ TXshLevel *ToonzScene::loadLevel(const TFilePath &actualPath,
         // Has dpi alright - assign it to custom dpi, too
         lp->setDpi(imageDpi);
       }
+    }
+
+    // for EXR level, set the color space gamma to the same value as the output
+    // settings. skip if the loading gamma is specified in the preferences.
+    if (xl->getType() == OVL_XSHLEVEL && levelPath.getType() == "exr" &&
+        !formatSpecified) {
+      double gamma = getProperties()
+                         ->getOutputProperties()
+                         ->getRenderSettings()
+                         .m_colorSpaceGamma;
+      lp->setColorSpaceGamma(gamma);
     }
 
     m_levelSet->insertLevel(xl);

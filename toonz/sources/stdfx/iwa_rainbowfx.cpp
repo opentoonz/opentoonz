@@ -3,6 +3,7 @@
 #include "iwa_xyz.h"
 #include "iwa_rainbow_intensity.h"
 #include "tparamuiconcept.h"
+#include "trop.h"
 
 //--------------------------------------------------------------
 double Iwa_RainbowFx::getSizePixelAmount(const double val,
@@ -23,9 +24,9 @@ double Iwa_RainbowFx::getSizePixelAmount(const double val,
 
 //------------------------------------------------------------
 
-void Iwa_RainbowFx::buildRanbowColorMap(double3* core, double3* wide,
-                                        double intensity, double inside,
-                                        double secondary) {
+void Iwa_RainbowFx::buildRainbowColorMap(double3* core, double3* wide,
+                                         double intensity, double inside,
+                                         double secondary, bool doClamp) {
   auto clamp01 = [](double val) { return std::min(1.0, std::max(0.0, val)); };
 
   int mapSize[2] = {301, 91};
@@ -76,15 +77,20 @@ void Iwa_RainbowFx::buildRanbowColorMap(double3* core, double3* wide,
               cie_d65[ram] * data[ram] * xyz[ram * 3 + c] * inside_ratio;
       }
       double tmp_intensity = intensity * 25000.0 * second_ratio;
-      out_p->r = clamp01((3.240479 * xyz_sum[0] - 1.537150 * xyz_sum[1] -
-                          0.498535 * xyz_sum[2]) *
-                         tmp_intensity);
-      out_p->g = clamp01((-0.969256 * xyz_sum[0] + 1.875992 * xyz_sum[1] +
-                          0.041556 * xyz_sum[2]) *
-                         tmp_intensity);
-      out_p->b = clamp01((0.055648 * xyz_sum[0] - 0.204043 * xyz_sum[1] +
-                          1.057311f * xyz_sum[2]) *
-                         tmp_intensity);
+      out_p->r             = (3.240479 * xyz_sum[0] - 1.537150 * xyz_sum[1] -
+                  0.498535 * xyz_sum[2]) *
+                 tmp_intensity;
+      out_p->g = (-0.969256 * xyz_sum[0] + 1.875992 * xyz_sum[1] +
+                  0.041556 * xyz_sum[2]) *
+                 tmp_intensity;
+      out_p->b = (0.055648 * xyz_sum[0] - 0.204043 * xyz_sum[1] +
+                  1.057311f * xyz_sum[2]) *
+                 tmp_intensity;
+      if (doClamp) {
+        out_p->r = clamp01(out_p->r);
+        out_p->g = clamp01(out_p->g);
+        out_p->b = clamp01(out_p->b);
+      }
     }
   }
 }
@@ -113,6 +119,27 @@ void Iwa_RainbowFx::setOutputRaster(const RASTER ras, TDimensionI dim,
   }
 }
 
+template <>
+void Iwa_RainbowFx::setOutputRaster<TRasterFP, TPixelF>(const TRasterFP ras,
+                                                        TDimensionI dim,
+                                                        double3* outBuf_p) {
+  bool withAlpha = m_alpha_rendering->getValue();
+  double3* out_p = outBuf_p;
+  for (int j = 0; j < dim.ly; j++) {
+    TPixelF* pix = ras->pixels(j);
+    for (int i = 0; i < dim.lx; i++, out_p++, pix++) {
+      pix->r = (float)(out_p->r);
+      pix->g = (float)(out_p->g);
+      pix->b = (float)(out_p->b);
+
+      if (withAlpha)
+        pix->m = std::max(std::max(pix->r, pix->g), pix->b);
+      else
+        pix->m = 1.f;
+    }
+  }
+}
+
 //------------------------------------------------------------
 
 Iwa_RainbowFx::Iwa_RainbowFx()
@@ -123,6 +150,11 @@ Iwa_RainbowFx::Iwa_RainbowFx()
     , m_inside(1.0)
     , m_secondary_rainbow(1.0)
     , m_alpha_rendering(false) {
+  // Fx Version 1: *2.2 Gamma when linear rendering (it duplicately applies
+  // gamma and is not correct) Fx Version 2: *1/2.2 Gamma when non-linear
+  // rendering
+  setFxVersion(2);
+
   bindParam(this, "center", m_center);
   bindParam(this, "radius", m_radius);
   bindParam(this, "intensity", m_intensity);
@@ -136,6 +168,8 @@ Iwa_RainbowFx::Iwa_RainbowFx()
   m_inside->setValueRange(0.0, 1.0);
   m_secondary_rainbow->setValueRange(0.0, 10.0);
   m_width_scale->setValueRange(0.1, 50.0);
+
+  enableComputeInFloat(true);
 }
 
 //------------------------------------------------------------
@@ -190,8 +224,11 @@ void Iwa_RainbowFx::doCompute(TTile& tile, double frame,
   double intensity = m_intensity->getValue(frame);
   double inside    = m_inside->getValue(frame);
   double secondary = m_secondary_rainbow->getValue(frame);
-  buildRanbowColorMap(rainbowColorCore_p, rainbowColorWide_p, intensity, inside,
-                      secondary);
+
+  bool doClamp = (tile.getRaster()->getPixelSize() != 16);
+
+  buildRainbowColorMap(rainbowColorCore_p, rainbowColorWide_p, intensity,
+                       inside, secondary, doClamp);
 
   // convert center position to render region coordinate
   TAffine aff = ri.m_affine;
@@ -232,10 +269,22 @@ void Iwa_RainbowFx::doCompute(TTile& tile, double frame,
   tile.getRaster()->clear();
   TRaster32P outRas32 = (TRaster32P)tile.getRaster();
   TRaster64P outRas64 = (TRaster64P)tile.getRaster();
+  TRasterFP outRasF   = (TRasterFP)tile.getRaster();
   if (outRas32)
     setOutputRaster<TRaster32P, TPixel32>(outRas32, dimOut, outBuf_p);
   else if (outRas64)
     setOutputRaster<TRaster64P, TPixel64>(outRas64, dimOut, outBuf_p);
+  else if (outRasF)
+    setOutputRaster<TRasterFP, TPixelF>(outRasF, dimOut, outBuf_p);
+
+  // modify gamma
+  if (getFxVersion() == 1 && tile.getRaster()->isLinear()) {
+    tile.getRaster()->setLinear(false);
+    TRop::toLinearRGB(tile.getRaster(), ri.m_colorSpaceGamma);
+  } else if (getFxVersion() >= 2 && !tile.getRaster()->isLinear()) {
+    tile.getRaster()->setLinear(true);
+    TRop::tosRGB(tile.getRaster(), ri.m_colorSpaceGamma);
+  }
 
   outBuf_ras->unlock();
 }
@@ -259,6 +308,13 @@ void Iwa_RainbowFx::getParamUIs(TParamUIConcept*& concepts, int& length) {
   concepts[2].m_params.push_back(m_width_scale);
   concepts[2].m_params.push_back(m_radius);
   concepts[2].m_params.push_back(m_center);
+}
+
+//------------------------------------------------------------
+
+bool Iwa_RainbowFx::toBeComputedInLinearColorSpace(bool settingsIsLinear,
+                                                   bool tileIsLinear) const {
+  return settingsIsLinear;
 }
 
 //==============================================================================

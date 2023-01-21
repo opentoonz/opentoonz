@@ -190,6 +190,12 @@ protected slots:
   void toggleTypeBoldOblique();
   void toggleTypeBold();
 
+  /*-- Paint Brush tool + mode switching shortcuts --*/
+  void togglePaintBrushNextMode();
+  void togglePaintBrushAreas();
+  void togglePaintBrushLines();
+  void togglePaintBrushLinesAndAreas();
+
   /*-- Fill tool + mode switching shortcuts --*/
   void toggleFillNextType();
   void toggleFillNormal();

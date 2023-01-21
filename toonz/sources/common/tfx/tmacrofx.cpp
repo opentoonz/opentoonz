@@ -200,7 +200,7 @@ bool TMacroFx::isaLeaf(TFx *fx) const {
 
 //--------------------------------------------------
 
-TMacroFx::TMacroFx() : m_isEditing(false) {}
+TMacroFx::TMacroFx() : m_isEditing(false) { enableComputeInFloat(true); }
 
 //--------------------------------------------------
 

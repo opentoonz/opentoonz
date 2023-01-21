@@ -46,6 +46,8 @@ public:
     this->m_size->setValueRange(0.0, 1000.0);
     this->m_persistance->setValueRange(0.1 * ino::param_range(),
                                        2.0 * ino::param_range());
+
+    enableComputeInFloat(true);
   }
   bool doGetBBox(double frame, TRectD &bBox,
                  const TRenderSettings &info) override {
@@ -79,7 +81,8 @@ void fx_(TRasterP in_ras, const double zz, const int octaves,
 void ino_pn_clouds::doCompute(TTile &tile, double frame,
                               const TRenderSettings &rend_sets) {
   /* ------ サポートしていないPixelタイプはエラーを投げる --- */
-  if (!((TRaster32P)tile.getRaster()) && !((TRaster64P)tile.getRaster())) {
+  if (!((TRaster32P)tile.getRaster()) && !((TRaster64P)tile.getRaster()) &&
+      !((TRasterFP)tile.getRaster())) {
     throw TRopException("unsupported input pixel type");
   }
 

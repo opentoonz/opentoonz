@@ -93,7 +93,7 @@ struct particles_values {
   bool pick_color_for_every_frame_val;
   bool perspective_distribution_val;
   bool motion_blur_val;
-  double motion_blur_gamma_val;
+  double motion_blur_gamma_adjust_val;
 };
 
 //------------------------------------------------------------------------------

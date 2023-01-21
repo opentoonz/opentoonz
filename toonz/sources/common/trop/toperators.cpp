@@ -92,6 +92,18 @@ inline double luminance(TPixel64 *pix) {
 
 //-----------------------------------------------------------------------------
 
+#define FOR_EACH_PIXEL_F_BEGIN_LOOP                                            \
+  assert(upF &&downF &&outF);                                                  \
+  FOR_EACH_PIXEL_BEGIN_LOOP(TPixelF, upF, TPixelF, downF, TPixelF, outF)
+
+//-----------------------------------------------------------------------------
+
+#define FOR_EACH_PIXEL_F_END_LOOP                                              \
+  assert(upF &&downF &&outF);                                                  \
+  FOR_EACH_PIXEL_END_LOOP(upF, downF, outF)
+
+//-----------------------------------------------------------------------------
+
 #define FOR_EACH_PIXEL_8_BEGIN_LOOP                                            \
   assert(up8 &&down8 &&out8);                                                  \
   FOR_EACH_PIXEL_BEGIN_LOOP(TPixelGR8, up8, TPixelGR8, down8, TPixelGR8, out8)
@@ -128,43 +140,63 @@ void TRop::add(const TRasterP &rup, const TRasterP &rdown, const TRasterP &rout,
     }
 
     FOR_EACH_PIXEL_32_END_LOOP
-  } else {
-    TRaster64P up64   = rup;
-    TRaster64P down64 = rdown;
-    TRaster64P out64  = rout;
-
-    if (up64 && down64 && out64) {
-      FOR_EACH_PIXEL_64_BEGIN_LOOP
-
-      TINT32 r, g, b, m;
-      r = downPix->r + tround(upPix->r * v);
-      g = downPix->g + tround(upPix->g * v);
-      b = downPix->b + tround(upPix->b * v);
-      m = downPix->m + tround(upPix->m * v);
-
-      outPix->r = (USHORT)tcrop<TINT32>(r, 0, 0xffff);
-      outPix->g = (USHORT)tcrop<TINT32>(g, 0, 0xffff);
-      outPix->b = (USHORT)tcrop<TINT32>(b, 0, 0xffff);
-      outPix->m = (USHORT)tcrop<TINT32>(m, 0, 0xffff);
-
-      FOR_EACH_PIXEL_64_END_LOOP
-    } else {
-      TRasterGR8P up8   = rup;
-      TRasterGR8P down8 = rdown;
-      TRasterGR8P out8  = rout;
-
-      if (up8 && down8 && out8) {
-        FOR_EACH_PIXEL_8_BEGIN_LOOP
-
-        USHORT value = troundp(upPix->value * v) + downPix->value;
-
-        outPix->value = (UCHAR)tcrop<USHORT>(value, 0, 255);
-
-        FOR_EACH_PIXEL_8_END_LOOP
-      } else
-        throw TRopException("TRop::add invalid raster combination");
-    }
+    return;
   }
+
+  TRaster64P up64   = rup;
+  TRaster64P down64 = rdown;
+  TRaster64P out64  = rout;
+
+  if (up64 && down64 && out64) {
+    FOR_EACH_PIXEL_64_BEGIN_LOOP
+
+    TINT32 r, g, b, m;
+    r = downPix->r + tround(upPix->r * v);
+    g = downPix->g + tround(upPix->g * v);
+    b = downPix->b + tround(upPix->b * v);
+    m = downPix->m + tround(upPix->m * v);
+
+    outPix->r = (USHORT)tcrop<TINT32>(r, 0, 0xffff);
+    outPix->g = (USHORT)tcrop<TINT32>(g, 0, 0xffff);
+    outPix->b = (USHORT)tcrop<TINT32>(b, 0, 0xffff);
+    outPix->m = (USHORT)tcrop<TINT32>(m, 0, 0xffff);
+
+    FOR_EACH_PIXEL_64_END_LOOP
+    return;
+  }
+
+  TRasterFP upF   = rup;
+  TRasterFP downF = rdown;
+  TRasterFP outF  = rout;
+
+  if (upF && downF && outF) {
+    FOR_EACH_PIXEL_F_BEGIN_LOOP
+
+    outPix->r = downPix->r + upPix->r * v;
+    outPix->g = downPix->g + upPix->g * v;
+    outPix->b = downPix->b + upPix->b * v;
+    outPix->m = tcrop<float>(downPix->m + upPix->m * v, 0.f, 1.f);
+
+    FOR_EACH_PIXEL_F_END_LOOP
+    return;
+  }
+
+  TRasterGR8P up8   = rup;
+  TRasterGR8P down8 = rdown;
+  TRasterGR8P out8  = rout;
+
+  if (up8 && down8 && out8) {
+    FOR_EACH_PIXEL_8_BEGIN_LOOP
+
+    USHORT value = troundp(upPix->value * v) + downPix->value;
+
+    outPix->value = (UCHAR)tcrop<USHORT>(value, 0, 255);
+
+    FOR_EACH_PIXEL_8_END_LOOP
+    return;
+  }
+
+  throw TRopException("TRop::add invalid raster combination");
 }
 
 //-----------------------------------------------------------------------------
@@ -190,43 +222,62 @@ void TRop::add(const TRasterP &rup, const TRasterP &rdown,
     outPix->m = (UCHAR)tcrop<USHORT>(m, 0, 255);
 
     FOR_EACH_PIXEL_32_END_LOOP
-  } else {
-    TRaster64P up64   = rup;
-    TRaster64P down64 = rdown;
-    TRaster64P out64  = rout;
-
-    if (up64 && down64 && out64) {
-      FOR_EACH_PIXEL_64_BEGIN_LOOP
-
-      TINT32 r, g, b, m;
-      r = downPix->r + upPix->r;
-      g = downPix->g + upPix->g;
-      b = downPix->b + upPix->b;
-      m = downPix->m + upPix->m;
-
-      outPix->r = (USHORT)tcrop<TINT32>(r, 0, 0xffff);
-      outPix->g = (USHORT)tcrop<TINT32>(g, 0, 0xffff);
-      outPix->b = (USHORT)tcrop<TINT32>(b, 0, 0xffff);
-      outPix->m = (USHORT)tcrop<TINT32>(m, 0, 0xffff);
-
-      FOR_EACH_PIXEL_64_END_LOOP
-    } else {
-      TRasterGR8P up8   = rup;
-      TRasterGR8P down8 = rdown;
-      TRasterGR8P out8  = rout;
-
-      if (up8 && down8 && out8) {
-        FOR_EACH_PIXEL_8_BEGIN_LOOP
-
-        USHORT value = upPix->value + downPix->value;
-
-        outPix->value = (UCHAR)tcrop<USHORT>(value, 0, 255);
-
-        FOR_EACH_PIXEL_8_END_LOOP
-      } else
-        throw TRopException("TRop::add invalid raster combination");
-    }
+    return;
   }
+  TRaster64P up64   = rup;
+  TRaster64P down64 = rdown;
+  TRaster64P out64  = rout;
+
+  if (up64 && down64 && out64) {
+    FOR_EACH_PIXEL_64_BEGIN_LOOP
+
+    TINT32 r, g, b, m;
+    r = downPix->r + upPix->r;
+    g = downPix->g + upPix->g;
+    b = downPix->b + upPix->b;
+    m = downPix->m + upPix->m;
+
+    outPix->r = (USHORT)tcrop<TINT32>(r, 0, 0xffff);
+    outPix->g = (USHORT)tcrop<TINT32>(g, 0, 0xffff);
+    outPix->b = (USHORT)tcrop<TINT32>(b, 0, 0xffff);
+    outPix->m = (USHORT)tcrop<TINT32>(m, 0, 0xffff);
+
+    FOR_EACH_PIXEL_64_END_LOOP
+    return;
+  }
+
+  TRasterFP upF   = rup;
+  TRasterFP downF = rdown;
+  TRasterFP outF  = rout;
+
+  if (upF && downF && outF) {
+    FOR_EACH_PIXEL_F_BEGIN_LOOP
+
+    outPix->r = downPix->r + upPix->r;
+    outPix->g = downPix->g + upPix->g;
+    outPix->b = downPix->b + upPix->b;
+    outPix->m = tcrop<float>(downPix->m + upPix->m, 0.f, 1.f);
+
+    FOR_EACH_PIXEL_F_END_LOOP
+    return;
+  }
+
+  TRasterGR8P up8   = rup;
+  TRasterGR8P down8 = rdown;
+  TRasterGR8P out8  = rout;
+
+  if (up8 && down8 && out8) {
+    FOR_EACH_PIXEL_8_BEGIN_LOOP
+
+    USHORT value = upPix->value + downPix->value;
+
+    outPix->value = (UCHAR)tcrop<USHORT>(value, 0, 255);
+
+    FOR_EACH_PIXEL_8_END_LOOP
+    return;
+  }
+
+  throw TRopException("TRop::add invalid raster combination");
 }
 
 //-----------------------------------------------------------------------------
@@ -277,21 +328,36 @@ void TRop::colordodge(const TRasterP &rup, const TRasterP &rdown,
 
       FOR_EACH_PIXEL_64_END_LOOP
     } else {
-      TRasterGR8P up8   = rup;
-      TRasterGR8P down8 = rdown;
-      TRasterGR8P out8  = rout;
+      TRasterFP upF   = rup;
+      TRasterFP downF = rdown;
+      TRasterFP outF  = rout;
 
-      if (up8 && down8 && out8) {
-        FOR_EACH_PIXEL_8_BEGIN_LOOP
-        USHORT value;
-        if (downPix->value)
-          value = (USHORT)((downPix->value << 8) / (255.0 - upPix->value));
+      if (upF && downF && outF) {
+        FOR_EACH_PIXEL_F_BEGIN_LOOP
 
-        outPix->value = (UCHAR)tcrop<USHORT>(value, 0, 255);
+        outPix->r = downPix->r / (1.f - upPix->r);
+        outPix->g = downPix->g / (1.f - upPix->g);
+        outPix->b = downPix->b / (1.f - upPix->b);
+        outPix->m = tcrop<float>(downPix->m + upPix->m, 0.f, 1.f);
 
-        FOR_EACH_PIXEL_8_END_LOOP
-      } else
-        throw TRopException("TRop::color dodge invalid raster combination");
+        FOR_EACH_PIXEL_F_END_LOOP
+      } else {
+        TRasterGR8P up8   = rup;
+        TRasterGR8P down8 = rdown;
+        TRasterGR8P out8  = rout;
+
+        if (up8 && down8 && out8) {
+          FOR_EACH_PIXEL_8_BEGIN_LOOP
+          USHORT value;
+          if (downPix->value)
+            value = (USHORT)((downPix->value << 8) / (255.0 - upPix->value));
+
+          outPix->value = (UCHAR)tcrop<USHORT>(value, 0, 255);
+
+          FOR_EACH_PIXEL_8_END_LOOP
+        } else
+          throw TRopException("TRop::color dodge invalid raster combination");
+      }
     }
   }
 }
@@ -392,8 +458,50 @@ void TRop::colorburn(const TRasterP &rup, const TRasterP &rdown,
         outPix = downPix;
       }
       FOR_EACH_PIXEL_64_END_LOOP
-    } else
-      throw TRopException("TRop::color burn invalid raster combination");
+    } else {
+      TRasterFP upF   = rup;
+      TRasterFP downF = rdown;
+      TRasterFP outF  = rout;
+
+      if (upF && downF && outF) {
+        FOR_EACH_PIXEL_F_BEGIN_LOOP
+        float r, g, b;
+        if (upPix->m > 0.f) {
+          if (downPix->r <= 0.f || downPix->r >= 1.f)
+            r = downPix->r;
+          else if (upPix->r)
+            r = 1.f - (1.f - downPix->r) / upPix->r;
+          else
+            r = 0.f;
+          if (downPix->g <= 0.f || downPix->g >= 1.f)
+            g = downPix->g;
+          else if (upPix->g)
+            g = 1.f - (1.f - downPix->g) / upPix->g;
+          else
+            g = 0.f;
+          if (downPix->b <= 0.f || downPix->b >= 1.f)
+            b = downPix->b;
+          else if (upPix->b)
+            b = 1.f - (1.f - downPix->b) / upPix->b;
+          else
+            b = 0.f;
+
+          if (upPix->m < 1.f) {
+            overPix<TPixelF, float>(*outPix, *downPix,
+                                    TPixelF(r, g, b, upPix->m));
+          } else {
+            outPix->r = r;
+            outPix->g = g;
+            outPix->b = b;
+            outPix->m = downPix->m;
+          }
+        } else {
+          outPix = downPix;
+        }
+        FOR_EACH_PIXEL_F_END_LOOP
+      } else
+        throw TRopException("TRop::color burn invalid raster combination");
+    }
   }
 }
 
@@ -428,54 +536,86 @@ void TRop::screen(const TRasterP &rup, const TRasterP &rdown,
       outPix->m = upPix->m;
     }
     FOR_EACH_PIXEL_32_END_LOOP
-  } else {
-    TRaster64P up64   = rup;
-    TRaster64P down64 = rdown;
-    TRaster64P out64  = rout;
-
-    if (up64 && down64 && out64) {
-      FOR_EACH_PIXEL_64_BEGIN_LOOP
-
-      double r, g, b;
-      r = 65536 - (65536 - upPix->r) * ((65536 - downPix->r) / 65536.0);
-      g = 65536 - (65536 - upPix->g) * ((65536 - downPix->g) / 65536.0);
-      b = 65536 - (65536 - upPix->b) * ((65536 - downPix->b) / 65536.0);
-
-      if (upPix->m != 65535) {
-        double m;
-        m = 65536 - (65536 - upPix->m) * ((65536 - downPix->m) / 65536.0);
-        TPixel64 tmpPix;
-        tmpPix.r = (USHORT)tcrop<double>(r, 0, 65535);
-        tmpPix.g = (USHORT)tcrop<double>(g, 0, 65535);
-        tmpPix.b = (USHORT)tcrop<double>(b, 0, 65535);
-        tmpPix.m = (USHORT)tcrop<double>(m, 0, 65535);
-        overPix<TPixel64, USHORT>(*outPix, *downPix, tmpPix);
-      } else {
-        outPix->r = (USHORT)tcrop<double>(r, 0, 65535);
-        outPix->g = (USHORT)tcrop<double>(g, 0, 65535);
-        outPix->b = (USHORT)tcrop<double>(b, 0, 65535);
-        outPix->m = upPix->m;
-      }
-
-      FOR_EACH_PIXEL_64_END_LOOP
-    } else {
-      TRasterGR8P up8   = rup;
-      TRasterGR8P down8 = rdown;
-      TRasterGR8P out8  = rout;
-
-      if (up8 && down8 && out8) {
-        FOR_EACH_PIXEL_8_BEGIN_LOOP
-        USHORT value;
-        if (downPix->value)
-          value = (USHORT)((downPix->value << 8) / (255.0 - upPix->value));
-
-        outPix->value = (UCHAR)tcrop<USHORT>(value, 0, 255);
-
-        FOR_EACH_PIXEL_8_END_LOOP
-      } else
-        throw TRopException("TRop::color dodge invalid raster combination");
-    }
+    return;
   }
+
+  TRaster64P up64   = rup;
+  TRaster64P down64 = rdown;
+  TRaster64P out64  = rout;
+
+  if (up64 && down64 && out64) {
+    FOR_EACH_PIXEL_64_BEGIN_LOOP
+
+    double r, g, b;
+    r = 65536 - (65536 - upPix->r) * ((65536 - downPix->r) / 65536.0);
+    g = 65536 - (65536 - upPix->g) * ((65536 - downPix->g) / 65536.0);
+    b = 65536 - (65536 - upPix->b) * ((65536 - downPix->b) / 65536.0);
+
+    if (upPix->m != 65535) {
+      double m;
+      m = 65536 - (65536 - upPix->m) * ((65536 - downPix->m) / 65536.0);
+      TPixel64 tmpPix;
+      tmpPix.r = (USHORT)tcrop<double>(r, 0, 65535);
+      tmpPix.g = (USHORT)tcrop<double>(g, 0, 65535);
+      tmpPix.b = (USHORT)tcrop<double>(b, 0, 65535);
+      tmpPix.m = (USHORT)tcrop<double>(m, 0, 65535);
+      overPix<TPixel64, USHORT>(*outPix, *downPix, tmpPix);
+    } else {
+      outPix->r = (USHORT)tcrop<double>(r, 0, 65535);
+      outPix->g = (USHORT)tcrop<double>(g, 0, 65535);
+      outPix->b = (USHORT)tcrop<double>(b, 0, 65535);
+      outPix->m = upPix->m;
+    }
+
+    FOR_EACH_PIXEL_64_END_LOOP
+    return;
+  }
+
+  TRasterFP upF   = rup;
+  TRasterFP downF = rdown;
+  TRasterFP outF  = rout;
+
+  if (upF && downF && outF) {
+    FOR_EACH_PIXEL_F_BEGIN_LOOP
+
+    float r, g, b;
+    r = 1.f - (1.f - upPix->r) * (1.f - downPix->r);
+    g = 1.f - (1.f - upPix->g) * (1.f - downPix->g);
+    b = 1.f - (1.f - upPix->b) * (1.f - downPix->b);
+
+    if (upPix->m <= 1.f) {
+      float m;
+      m = 1.f - (1.f - upPix->m) * (1.f - downPix->m);
+      TPixelF tmpPix(r, g, b, tcrop<float>(m, 0.f, 1.f));
+      overPix<TPixelF, float>(*outPix, *downPix, tmpPix);
+    } else {
+      outPix->r = r;
+      outPix->g = g;
+      outPix->b = b;
+      outPix->m = upPix->m;
+    }
+
+    FOR_EACH_PIXEL_F_END_LOOP
+    return;
+  }
+
+  TRasterGR8P up8   = rup;
+  TRasterGR8P down8 = rdown;
+  TRasterGR8P out8  = rout;
+
+  if (up8 && down8 && out8) {
+    FOR_EACH_PIXEL_8_BEGIN_LOOP
+    USHORT value;
+    if (downPix->value)
+      value = (USHORT)((downPix->value << 8) / (255.0 - upPix->value));
+
+    outPix->value = (UCHAR)tcrop<USHORT>(value, 0, 255);
+
+    FOR_EACH_PIXEL_8_END_LOOP
+    return;
+  }
+
+  throw TRopException("TRop::color dodge invalid raster combination");
 }
 
 //-----------------------------------------------------------------------------
@@ -500,40 +640,61 @@ void TRop::sub(const TRasterP &rup, const TRasterP &rdown, const TRasterP &rout,
       outPix->m = (UCHAR)tcrop<SHORT>(m, 0, 255);
 
       FOR_EACH_PIXEL_32_END_LOOP
-    } else {
-      TRaster64P up64   = rup;
-      TRaster64P down64 = rdown;
-      TRaster64P out64  = rout;
-
-      if (up64 && down64 && out64) {
-        FOR_EACH_PIXEL_64_BEGIN_LOOP
-
-        TINT32 r  = downPix->r - upPix->r;
-        TINT32 g  = downPix->g - upPix->g;
-        TINT32 b  = downPix->b - upPix->b;
-        TINT32 m  = downPix->m - upPix->m;
-        outPix->r = (USHORT)tcrop<TINT32>(r, 0, 0xffff);
-        outPix->g = (USHORT)tcrop<TINT32>(g, 0, 0xffff);
-        outPix->b = (USHORT)tcrop<TINT32>(b, 0, 0xffff);
-        outPix->m = (USHORT)tcrop<TINT32>(m, 0, 0xffff);
-
-        FOR_EACH_PIXEL_64_END_LOOP
-      } else {
-        TRasterGR8P up8   = rup;
-        TRasterGR8P down8 = rdown;
-        TRasterGR8P out8  = rout;
-
-        if (up8 && down8 && out8) {
-          FOR_EACH_PIXEL_8_BEGIN_LOOP
-
-          SHORT value   = upPix->value - downPix->value;
-          outPix->value = (UCHAR)tcrop<SHORT>(value, 0, 255);
-
-          FOR_EACH_PIXEL_8_END_LOOP
-        } else
-          throw TRopException("TRop::sub invalid raster combination");
-      }
+      return;
     }
+
+    TRaster64P up64   = rup;
+    TRaster64P down64 = rdown;
+    TRaster64P out64  = rout;
+
+    if (up64 && down64 && out64) {
+      FOR_EACH_PIXEL_64_BEGIN_LOOP
+
+      TINT32 r  = downPix->r - upPix->r;
+      TINT32 g  = downPix->g - upPix->g;
+      TINT32 b  = downPix->b - upPix->b;
+      TINT32 m  = downPix->m - upPix->m;
+      outPix->r = (USHORT)tcrop<TINT32>(r, 0, 0xffff);
+      outPix->g = (USHORT)tcrop<TINT32>(g, 0, 0xffff);
+      outPix->b = (USHORT)tcrop<TINT32>(b, 0, 0xffff);
+      outPix->m = (USHORT)tcrop<TINT32>(m, 0, 0xffff);
+
+      FOR_EACH_PIXEL_64_END_LOOP
+      return;
+    }
+
+    TRasterFP upF   = rup;
+    TRasterFP downF = rdown;
+    TRasterFP outF  = rout;
+
+    if (upF && downF && outF) {
+      FOR_EACH_PIXEL_F_BEGIN_LOOP
+
+      outPix->r = downPix->r - upPix->r;
+      outPix->g = downPix->g - upPix->g;
+      outPix->b = downPix->b - upPix->b;
+      outPix->m = tcrop<float>(downPix->m - upPix->m, 0.f, 1.f);
+
+      FOR_EACH_PIXEL_F_END_LOOP
+      return;
+    }
+
+    TRasterGR8P up8   = rup;
+    TRasterGR8P down8 = rdown;
+    TRasterGR8P out8  = rout;
+
+    if (up8 && down8 && out8) {
+      FOR_EACH_PIXEL_8_BEGIN_LOOP
+
+      SHORT value   = upPix->value - downPix->value;
+      outPix->value = (UCHAR)tcrop<SHORT>(value, 0, 255);
+
+      FOR_EACH_PIXEL_8_END_LOOP
+      return;
+    }
+
+    throw TRopException("TRop::sub invalid raster combination");
+
   } else {
     if (up32 && down32 && out32) {
       FOR_EACH_PIXEL_32_BEGIN_LOOP
@@ -549,40 +710,60 @@ void TRop::sub(const TRasterP &rup, const TRasterP &rdown, const TRasterP &rout,
       outPix->m = (UCHAR)tcrop<SHORT>(m, 0, 255);
 
       FOR_EACH_PIXEL_32_END_LOOP
-    } else {
-      TRaster64P up64   = rup;
-      TRaster64P down64 = rdown;
-      TRaster64P out64  = rout;
-
-      if (up64 && down64 && out64) {
-        FOR_EACH_PIXEL_64_BEGIN_LOOP
-
-        TINT32 r  = downPix->r - upPix->r;
-        TINT32 g  = downPix->g - upPix->g;
-        TINT32 b  = downPix->b - upPix->b;
-        TINT32 m  = downPix->m;  // - upPix->m;
-        outPix->r = (USHORT)tcrop<TINT32>(r, 0, 0xffff);
-        outPix->g = (USHORT)tcrop<TINT32>(g, 0, 0xffff);
-        outPix->b = (USHORT)tcrop<TINT32>(b, 0, 0xffff);
-        outPix->m = (USHORT)tcrop<TINT32>(m, 0, 0xffff);
-
-        FOR_EACH_PIXEL_64_END_LOOP
-      } else {
-        TRasterGR8P up8   = rup;
-        TRasterGR8P down8 = rdown;
-        TRasterGR8P out8  = rout;
-
-        if (up8 && down8 && out8) {
-          FOR_EACH_PIXEL_8_BEGIN_LOOP
-
-          SHORT value   = upPix->value - downPix->value;
-          outPix->value = (UCHAR)tcrop<SHORT>(value, 0, 255);
-
-          FOR_EACH_PIXEL_8_END_LOOP
-        } else
-          throw TRopException("TRop::sub invalid raster combination");
-      }
+      return;
     }
+
+    TRaster64P up64   = rup;
+    TRaster64P down64 = rdown;
+    TRaster64P out64  = rout;
+
+    if (up64 && down64 && out64) {
+      FOR_EACH_PIXEL_64_BEGIN_LOOP
+
+      TINT32 r  = downPix->r - upPix->r;
+      TINT32 g  = downPix->g - upPix->g;
+      TINT32 b  = downPix->b - upPix->b;
+      TINT32 m  = downPix->m;  // - upPix->m;
+      outPix->r = (USHORT)tcrop<TINT32>(r, 0, 0xffff);
+      outPix->g = (USHORT)tcrop<TINT32>(g, 0, 0xffff);
+      outPix->b = (USHORT)tcrop<TINT32>(b, 0, 0xffff);
+      outPix->m = (USHORT)tcrop<TINT32>(m, 0, 0xffff);
+
+      FOR_EACH_PIXEL_64_END_LOOP
+      return;
+    }
+
+    TRasterFP upF   = rup;
+    TRasterFP downF = rdown;
+    TRasterFP outF  = rout;
+
+    if (upF && downF && outF) {
+      FOR_EACH_PIXEL_F_BEGIN_LOOP
+
+      outPix->r = downPix->r - upPix->r;
+      outPix->g = downPix->g - upPix->g;
+      outPix->b = downPix->b - upPix->b;
+      outPix->m = tcrop<float>(downPix->m, 0.f, 1.f);
+
+      FOR_EACH_PIXEL_F_END_LOOP
+      return;
+    }
+
+    TRasterGR8P up8   = rup;
+    TRasterGR8P down8 = rdown;
+    TRasterGR8P out8  = rout;
+
+    if (up8 && down8 && out8) {
+      FOR_EACH_PIXEL_8_BEGIN_LOOP
+
+      SHORT value   = upPix->value - downPix->value;
+      outPix->value = (UCHAR)tcrop<SHORT>(value, 0, 255);
+
+      FOR_EACH_PIXEL_8_END_LOOP
+      return;
+    }
+
+    throw TRopException("TRop::sub invalid raster combination");
   }
 }
 
@@ -776,6 +957,76 @@ D_m)
     return;
   }
 
+  // 32-bit floating point images case
+  TRasterFP upF = rup, downF = rdown, outF = rout;
+
+  if (upF && downF && outF) {
+    float vf = (float)v / (float)(TPixel32::maxChannelValue);
+
+    if (matte) {
+      float outMf;
+
+      FOR_EACH_PIXEL_F_BEGIN_LOOP
+
+      outMf = downPix->m * upPix->m;
+
+      outPix->r = tcrop((upPix->r / upPix->m + vf) * (downPix->r / downPix->m),
+                        0.f, outMf);
+      outPix->g = tcrop((upPix->g / upPix->m + vf) * (downPix->g / downPix->m),
+                        0.f, outMf);
+      outPix->b = tcrop((upPix->b / upPix->m + vf) * (downPix->b / downPix->m),
+                        0.f, outMf);
+      outPix->m = outMf;
+
+      FOR_EACH_PIXEL_F_END_LOOP
+    } else {
+      float umdmf_norm, outMf;
+      float mSumf, uf, df, ufdf, normalizer;
+
+      FOR_EACH_PIXEL_F_BEGIN_LOOP
+
+      mSumf = upPix->m + downPix->m;
+      if (mSumf > 0.f) {
+        outMf = upPix->m + (1.f - upPix->m) * downPix->m;
+
+        normalizer = outMf / mSumf;
+        umdmf_norm = upPix->m * downPix->m;
+        ;
+
+        uf        = upPix->r + vf * umdmf_norm;
+        df        = downPix->r;
+        ufdf      = uf * df;
+        outPix->r = tcrop(
+            (uf * (1.f - downPix->m) + df * (1.f - upPix->m) + ufdf + ufdf) *
+                normalizer,
+            0.f, outMf);
+
+        uf        = upPix->g + vf * umdmf_norm;
+        df        = downPix->g;
+        ufdf      = uf * df;
+        outPix->g = tcrop(
+            (uf * (1.f - downPix->m) + df * (1.f - upPix->m) + ufdf + ufdf) *
+                normalizer,
+            0.f, outMf);
+
+        uf        = upPix->b + vf * umdmf_norm;
+        df        = downPix->b;
+        ufdf      = uf * df;
+        outPix->b = tcrop(
+            (uf * (1.f - downPix->m) + df * (1.f - upPix->m) + ufdf + ufdf) *
+                normalizer,
+            0.f, outMf);
+
+        outPix->m = outMf;
+      } else
+        *outPix = TPixelF::Transparent;
+
+      FOR_EACH_PIXEL_F_END_LOOP
+    }
+
+    return;
+  }
+
   // According to the specifics, throw an exception. I think it's not
   // appropriate, though.
   throw TRopException("TRop::mult invalid raster combination");
@@ -791,6 +1042,9 @@ void TRop::ropin(const TRasterP &source, const TRasterP &matte,
   TRaster64P source64 = source;
   TRaster64P matte64  = matte;
   TRaster64P out64    = rout;
+  TRasterFP sourceF   = source;
+  TRasterFP matteF    = matte;
+  TRasterFP outF      = rout;
 
   if (source32 && matte32 && out32) {
     FOR_EACH_PIXEL_BEGIN_LOOP(TPixelRGBM32, source32, TPixelRGBM32, matte32,
@@ -868,6 +1122,21 @@ outPix_packed_i = _mm_packus_epi16(outPix_packed_i, zeros);
     }
 
     FOR_EACH_PIXEL_END_LOOP(source64, matte64, out64)
+  } else if (sourceF && matteF && outF) {
+    FOR_EACH_PIXEL_BEGIN_LOOP(TPixelF, sourceF, TPixelF, matteF, TPixelF, outF)
+
+    if (downPix->m <= 0.f)
+      outPix->r = outPix->g = outPix->b = outPix->m = 0.f;
+    else if (downPix->m >= 1.f)
+      *outPix = *upPix;
+    else {
+      outPix->r = upPix->r * downPix->m;
+      outPix->g = upPix->g * downPix->m;
+      outPix->b = upPix->b * downPix->m;
+      outPix->m = upPix->m * downPix->m;
+    }
+
+    FOR_EACH_PIXEL_END_LOOP(sourceF, matteF, outF)
   } else
     throw TRopException("TRop::in invalid raster combination");
 }
@@ -882,6 +1151,9 @@ void TRop::ropout(const TRasterP &source, const TRasterP &matte,
   TRaster64P source64 = source;
   TRaster64P matte64  = matte;
   TRaster64P out64    = rout;
+  TRasterFP sourceF   = source;
+  TRasterFP matteF    = matte;
+  TRasterFP outF      = rout;
 
   if (source32 && matte32 && out32) {
     FOR_EACH_PIXEL_BEGIN_LOOP(TPixelRGBM32, source32, TPixelRGBM32, matte32,
@@ -920,6 +1192,23 @@ void TRop::ropout(const TRasterP &source, const TRasterP &matte,
     }
 
     FOR_EACH_PIXEL_END_LOOP(source64, matte64, out64)
+  } else if (sourceF && matteF && outF) {
+    FOR_EACH_PIXEL_BEGIN_LOOP(TPixelF, sourceF, TPixelF, matteF, TPixelF, outF)
+
+    if (downPix->m >= 1.f)
+      outPix->r = outPix->g = outPix->b = outPix->m = 0;
+    else if (downPix->m <= 0.f)
+      *outPix = *upPix;
+    else {
+      float fac = 1.f - downPix->m;
+
+      outPix->r = upPix->r * fac;
+      outPix->g = upPix->g * fac;
+      outPix->b = upPix->b * fac;
+      outPix->m = upPix->m * fac;
+    }
+
+    FOR_EACH_PIXEL_END_LOOP(sourceF, matteF, outF)
   } else
     throw TRopException("TRop::out invalid raster combination");
 }
@@ -937,6 +1226,9 @@ void TRop::atop(const TRasterP &rup, const TRasterP &rdown,
   TRaster64P up64   = rup;
   TRaster64P down64 = rdown;
   TRaster64P out64  = rout;
+  TRasterFP upF     = rup;
+  TRasterFP downF   = rdown;
+  TRasterFP outF    = rout;
 
   if (up32 && down32 && out32) {
     FOR_EACH_PIXEL_32_BEGIN_LOOP
@@ -971,6 +1263,19 @@ void TRop::atop(const TRasterP &rup, const TRasterP &rdown,
     overPix<TPixel64, USHORT>(*outPix, *downPix, tmpPix);
 
     FOR_EACH_PIXEL_64_END_LOOP
+  } else if (upF && downF && outF) {
+    FOR_EACH_PIXEL_F_BEGIN_LOOP
+
+    TPixelF tmpPix = TPixelF::Transparent;
+    if (downPix->m >= 0.f) {
+      tmpPix.r = upPix->r * downPix->m;
+      tmpPix.g = upPix->g * downPix->m;
+      tmpPix.b = upPix->b * downPix->m;
+      tmpPix.m = upPix->m * downPix->m;
+    }
+
+    overPix<TPixelF, float>(*outPix, *downPix, tmpPix);
+    FOR_EACH_PIXEL_F_END_LOOP
   } else
     throw TRopException("TRop::atop invalid raster combination");
 }
@@ -1031,6 +1336,9 @@ void TRop::crossDissolve(const TRasterP &rup, const TRasterP &rdown,
   TRaster64P up64   = rup;
   TRaster64P down64 = rdown;
   TRaster64P out64  = rout;
+  TRasterFP upF     = rup;
+  TRasterFP downF   = rdown;
+  TRasterFP outF    = rout;
 
   if (up32 && down32 && out32) {
     FOR_EACH_PIXEL_32_BEGIN_LOOP
@@ -1052,6 +1360,16 @@ void TRop::crossDissolve(const TRasterP &rup, const TRasterP &rdown,
     outPix->m = (upPix->m * vv + downPix->m * (65535 - vv)) / 65535;
 
     FOR_EACH_PIXEL_64_END_LOOP
+  } else if (upF && downF && outF) {
+    float vv = (float)v / 255.0f;
+    FOR_EACH_PIXEL_F_BEGIN_LOOP
+
+    outPix->r = upPix->r * vv + downPix->r * (1.f - vv);
+    outPix->g = upPix->g * vv + downPix->g * (1.f - vv);
+    outPix->b = upPix->b * vv + downPix->b * (1.f - vv);
+    outPix->m = upPix->m * vv + downPix->m * (1.f - vv);
+
+    FOR_EACH_PIXEL_F_END_LOOP
   } else
     throw TRopException("TRop::crossDissolve invalid raster combination");
 }
@@ -1200,59 +1518,102 @@ void TRop::ropmin(const TRasterP &rup, const TRasterP &rdown,
         *outPix = *downPix;
       FOR_EACH_PIXEL_32_END_LOOP
     }
-  } else {
-    TRaster64P up64   = rup;
-    TRaster64P down64 = rdown;
-    TRaster64P out64  = rout;
+    return;
+  }
 
-    if (up64 && down64 && out64) {
-      if (matte) {
-        FOR_EACH_PIXEL_64_BEGIN_LOOP
+  TRaster64P up64   = rup;
+  TRaster64P down64 = rdown;
+  TRaster64P out64  = rout;
 
+  if (up64 && down64 && out64) {
+    if (matte) {
+      FOR_EACH_PIXEL_64_BEGIN_LOOP
+
+      outPix->r = upPix->r < downPix->r ? upPix->r : downPix->r;
+      outPix->g = upPix->g < downPix->g ? upPix->g : downPix->g;
+      outPix->b = upPix->b < downPix->b ? upPix->b : downPix->b;
+      outPix->m = upPix->m < downPix->m ? upPix->m : downPix->m;
+
+      FOR_EACH_PIXEL_64_END_LOOP
+    } else {
+      FOR_EACH_PIXEL_32_BEGIN_LOOP
+      if (upPix->m >= 65535) {
         outPix->r = upPix->r < downPix->r ? upPix->r : downPix->r;
         outPix->g = upPix->g < downPix->g ? upPix->g : downPix->g;
         outPix->b = upPix->b < downPix->b ? upPix->b : downPix->b;
         outPix->m = upPix->m < downPix->m ? upPix->m : downPix->m;
 
-        FOR_EACH_PIXEL_64_END_LOOP
-      } else {
-        FOR_EACH_PIXEL_32_BEGIN_LOOP
-        if (upPix->m >= 65535) {
-          outPix->r = upPix->r < downPix->r ? upPix->r : downPix->r;
-          outPix->g = upPix->g < downPix->g ? upPix->g : downPix->g;
-          outPix->b = upPix->b < downPix->b ? upPix->b : downPix->b;
-          outPix->m = upPix->m < downPix->m ? upPix->m : downPix->m;
-
-        } else if (upPix->m) {
-          TPixel32 tmp;
-          tmp.r = upPix->r < downPix->r ? upPix->r : downPix->r;
-          tmp.g = upPix->g < downPix->g ? upPix->g : downPix->g;
-          tmp.b = upPix->b < downPix->b ? upPix->b : downPix->b;
-          // tmp.m = upPix->m < downPix->m ? upPix->m : downPix->m;
-          outPix->r = upPix->m * (tmp.r - downPix->r) / 65535.0 + downPix->r;
-          outPix->g = upPix->m * (tmp.g - downPix->g) / 65535.0 + downPix->g;
-          outPix->b = upPix->m * (tmp.b - downPix->b) / 65535.0 + downPix->b;
-          outPix->m = upPix->m * (tmp.m - downPix->m) / 65535.0 + downPix->m;
-        } else
-          *outPix = *downPix;
-        FOR_EACH_PIXEL_32_END_LOOP
-      }
-    } else {
-      TRasterGR8P up8   = rup;
-      TRasterGR8P down8 = rdown;
-      TRasterGR8P out8  = rout;
-
-      if (up8 && down8 && out8) {
-        FOR_EACH_PIXEL_8_BEGIN_LOOP
-
-        outPix->value =
-            upPix->value < downPix->value ? upPix->value : downPix->value;
-
-        FOR_EACH_PIXEL_8_END_LOOP
+      } else if (upPix->m) {
+        TPixel32 tmp;
+        tmp.r = upPix->r < downPix->r ? upPix->r : downPix->r;
+        tmp.g = upPix->g < downPix->g ? upPix->g : downPix->g;
+        tmp.b = upPix->b < downPix->b ? upPix->b : downPix->b;
+        // tmp.m = upPix->m < downPix->m ? upPix->m : downPix->m;
+        outPix->r = upPix->m * (tmp.r - downPix->r) / 65535.0 + downPix->r;
+        outPix->g = upPix->m * (tmp.g - downPix->g) / 65535.0 + downPix->g;
+        outPix->b = upPix->m * (tmp.b - downPix->b) / 65535.0 + downPix->b;
+        outPix->m = upPix->m * (tmp.m - downPix->m) / 65535.0 + downPix->m;
       } else
-        throw TRopException("TRop::min invalid raster combination");
+        *outPix = *downPix;
+      FOR_EACH_PIXEL_32_END_LOOP
     }
+    return;
   }
+
+  TRasterFP upF   = rup;
+  TRasterFP downF = rdown;
+  TRasterFP outF  = rout;
+
+  if (upF && downF && outF) {
+    if (matte) {
+      FOR_EACH_PIXEL_F_BEGIN_LOOP
+
+      outPix->r = upPix->r < downPix->r ? upPix->r : downPix->r;
+      outPix->g = upPix->g < downPix->g ? upPix->g : downPix->g;
+      outPix->b = upPix->b < downPix->b ? upPix->b : downPix->b;
+      outPix->m = upPix->m < downPix->m ? upPix->m : downPix->m;
+
+      FOR_EACH_PIXEL_F_END_LOOP
+    } else {
+      FOR_EACH_PIXEL_F_BEGIN_LOOP
+      if (upPix->m >= 1.f) {
+        outPix->r = upPix->r < downPix->r ? upPix->r : downPix->r;
+        outPix->g = upPix->g < downPix->g ? upPix->g : downPix->g;
+        outPix->b = upPix->b < downPix->b ? upPix->b : downPix->b;
+        outPix->m = upPix->m < downPix->m ? upPix->m : downPix->m;
+
+      } else if (upPix->m > 0.f) {
+        TPixelF tmp;
+        tmp.r = upPix->r < downPix->r ? upPix->r : downPix->r;
+        tmp.g = upPix->g < downPix->g ? upPix->g : downPix->g;
+        tmp.b = upPix->b < downPix->b ? upPix->b : downPix->b;
+        // tmp.m = upPix->m < downPix->m ? upPix->m : downPix->m;
+        outPix->r = upPix->m * (tmp.r - downPix->r) + downPix->r;
+        outPix->g = upPix->m * (tmp.g - downPix->g) + downPix->g;
+        outPix->b = upPix->m * (tmp.b - downPix->b) + downPix->b;
+        outPix->m = upPix->m * (tmp.m - downPix->m) + downPix->m;
+      } else
+        *outPix = *downPix;
+      FOR_EACH_PIXEL_F_END_LOOP
+    }
+    return;
+  }
+
+  TRasterGR8P up8   = rup;
+  TRasterGR8P down8 = rdown;
+  TRasterGR8P out8  = rout;
+
+  if (up8 && down8 && out8) {
+    FOR_EACH_PIXEL_8_BEGIN_LOOP
+
+    outPix->value =
+        upPix->value < downPix->value ? upPix->value : downPix->value;
+
+    FOR_EACH_PIXEL_8_END_LOOP
+    return;
+  }
+
+  throw TRopException("TRop::min invalid raster combination");
 }
 
 //-----------------------------------------------------------------------------
@@ -1272,39 +1633,56 @@ void TRop::ropmax(const TRasterP &rup, const TRasterP &rdown,
     outPix->m = upPix->m > downPix->m ? upPix->m : downPix->m;
 
     FOR_EACH_PIXEL_32_END_LOOP
-  } else {
-    TRaster64P up64   = rup;
-    TRaster64P down64 = rdown;
-    TRaster64P out64  = rout;
-
-    if (up64 && down64 && out64) {
-      FOR_EACH_PIXEL_64_BEGIN_LOOP
-
-      outPix->r = upPix->r > downPix->r ? upPix->r : downPix->r;
-      outPix->g = upPix->g > downPix->g ? upPix->g : downPix->g;
-      outPix->b = upPix->b > downPix->b ? upPix->b : downPix->b;
-      outPix->m = upPix->m > downPix->m ? upPix->m : downPix->m;
-
-      FOR_EACH_PIXEL_64_END_LOOP
-    } else {
-      TRasterGR8P up8   = rup;
-      TRasterGR8P down8 = rdown;
-      TRasterGR8P out8  = rout;
-
-      if (up8 && down8 && out8) {
-        FOR_EACH_PIXEL_8_BEGIN_LOOP
-
-        outPix->value =
-            upPix->value > downPix->value ? upPix->value : downPix->value;
-
-        FOR_EACH_PIXEL_8_END_LOOP
-      } else
-        throw TRopException("TRop::max invalid raster combination");
-    }
+    return;
   }
+  TRaster64P up64   = rup;
+  TRaster64P down64 = rdown;
+  TRaster64P out64  = rout;
+
+  if (up64 && down64 && out64) {
+    FOR_EACH_PIXEL_64_BEGIN_LOOP
+
+    outPix->r = upPix->r > downPix->r ? upPix->r : downPix->r;
+    outPix->g = upPix->g > downPix->g ? upPix->g : downPix->g;
+    outPix->b = upPix->b > downPix->b ? upPix->b : downPix->b;
+    outPix->m = upPix->m > downPix->m ? upPix->m : downPix->m;
+
+    FOR_EACH_PIXEL_64_END_LOOP
+    return;
+  }
+  TRasterFP upF   = rup;
+  TRasterFP downF = rdown;
+  TRasterFP outF  = rout;
+
+  if (upF && downF && outF) {
+    FOR_EACH_PIXEL_F_BEGIN_LOOP
+
+    outPix->r = upPix->r > downPix->r ? upPix->r : downPix->r;
+    outPix->g = upPix->g > downPix->g ? upPix->g : downPix->g;
+    outPix->b = upPix->b > downPix->b ? upPix->b : downPix->b;
+    outPix->m = upPix->m > downPix->m ? upPix->m : downPix->m;
+
+    FOR_EACH_PIXEL_F_END_LOOP
+    return;
+  }
+  TRasterGR8P up8   = rup;
+  TRasterGR8P down8 = rdown;
+  TRasterGR8P out8  = rout;
+
+  if (up8 && down8 && out8) {
+    FOR_EACH_PIXEL_8_BEGIN_LOOP
+
+    outPix->value =
+        upPix->value > downPix->value ? upPix->value : downPix->value;
+
+    FOR_EACH_PIXEL_8_END_LOOP
+    return;
+  }
+
+  throw TRopException("TRop::max invalid raster combination");
 }
 //-----------------------------------------------------------------------------
-
+/*
 void TRop::linearburn(const TRasterP &rup, const TRasterP &rdown,
                       const TRasterP &rout) {
   TRaster32P up32   = rup;
@@ -1497,12 +1875,14 @@ void TRop::overlay(const TRasterP &rup, const TRasterP &rdown,
     }
   }
 }
-
+*/
 //-----------------------------------------------------------------------------
 
 void TRop::premultiply(const TRasterP &ras) {
   ras->lock();
   TRaster32P ras32 = ras;
+  TRaster64P ras64 = ras;
+  TRasterFP rasF   = ras;
   if (ras32) {
     TPixel32 *endPix, *upPix = 0, *upRow = ras32->pixels();
     TPixel32 *lastPix =
@@ -1517,27 +1897,39 @@ void TRop::premultiply(const TRasterP &ras) {
       }
       upRow += ras32->getWrap();
     }
-  } else {
-    TRaster64P ras64 = ras;
-    if (ras64) {
-      TPixel64 *endPix, *upPix = 0, *upRow = ras64->pixels();
-      TPixel64 *lastPix =
-          upRow + ras64->getWrap() * (ras64->getLy() - 1) + ras64->getLx();
+  } else if (ras64) {
+    TPixel64 *endPix, *upPix = 0, *upRow = ras64->pixels();
+    TPixel64 *lastPix =
+        upRow + ras64->getWrap() * (ras64->getLy() - 1) + ras64->getLx();
 
-      while (upPix < lastPix) {
-        upPix  = upRow;
-        endPix = upPix + ras64->getLx();
-        while (upPix < endPix) {
-          premult(*upPix);
-          ++upPix;
-        }
-        upRow += ras64->getWrap();
+    while (upPix < lastPix) {
+      upPix  = upRow;
+      endPix = upPix + ras64->getLx();
+      while (upPix < endPix) {
+        premult(*upPix);
+        ++upPix;
       }
-    } else {
-      ras->unlock();
-      throw TException("TRop::premultiply invalid raster type");
+      upRow += ras64->getWrap();
     }
+  } else if (rasF) {
+    TPixelF *endPix, *upPix = nullptr, *upRow = rasF->pixels();
+    TPixelF *lastPix =
+        upRow + rasF->getWrap() * (rasF->getLy() - 1) + rasF->getLx();
+
+    while (upPix < lastPix) {
+      upPix  = upRow;
+      endPix = upPix + rasF->getLx();
+      while (upPix < endPix) {
+        premult(*upPix);
+        ++upPix;
+      }
+      upRow += rasF->getWrap();
+    }
+  } else {
+    ras->unlock();
+    throw TException("TRop::premultiply invalid raster type");
   }
+
   ras->unlock();
 }
 
@@ -1546,6 +1938,8 @@ void TRop::premultiply(const TRasterP &ras) {
 void TRop::depremultiply(const TRasterP &ras) {
   ras->lock();
   TRaster32P ras32 = ras;
+  TRaster64P ras64 = ras;
+  TRasterFP rasF   = ras;
   if (ras32) {
     TPixel32 *endPix, *upPix = 0, *upRow = ras32->pixels();
     TPixel32 *lastPix =
@@ -1560,26 +1954,37 @@ void TRop::depremultiply(const TRasterP &ras) {
       }
       upRow += ras32->getWrap();
     }
-  } else {
-    TRaster64P ras64 = ras;
-    if (ras64) {
-      TPixel64 *endPix, *upPix = 0, *upRow = ras64->pixels();
-      TPixel64 *lastPix =
-          upRow + ras64->getWrap() * (ras64->getLy() - 1) + ras64->getLx();
+  } else if (ras64) {
+    TPixel64 *endPix, *upPix = 0, *upRow = ras64->pixels();
+    TPixel64 *lastPix =
+        upRow + ras64->getWrap() * (ras64->getLy() - 1) + ras64->getLx();
 
-      while (upPix < lastPix) {
-        upPix  = upRow;
-        endPix = upPix + ras64->getLx();
-        while (upPix < endPix) {
-          if (upPix->m != 0) depremult(*upPix);
-          ++upPix;
-        }
-        upRow += ras64->getWrap();
+    while (upPix < lastPix) {
+      upPix  = upRow;
+      endPix = upPix + ras64->getLx();
+      while (upPix < endPix) {
+        if (upPix->m != 0) depremult(*upPix);
+        ++upPix;
       }
-    } else {
-      ras->unlock();
-      throw TException("TRop::depremultiply invalid raster type");
+      upRow += ras64->getWrap();
     }
+  } else if (rasF) {
+    TPixelF *endPix, *upPix = nullptr, *upRow = rasF->pixels();
+    TPixelF *lastPix =
+        upRow + rasF->getWrap() * (rasF->getLy() - 1) + rasF->getLx();
+
+    while (upPix < lastPix) {
+      upPix  = upRow;
+      endPix = upPix + rasF->getLx();
+      while (upPix < endPix) {
+        if (upPix->m > 0.f) depremult(*upPix);
+        ++upPix;
+      }
+      upRow += rasF->getWrap();
+    }
+  } else {
+    ras->unlock();
+    throw TException("TRop::depremultiply invalid raster type");
   }
   ras->unlock();
 }
@@ -1651,6 +2056,8 @@ void TRop::expandColor(const TRaster32P &ras32, bool precise) {
 void TRop::whiteTransp(const TRasterP &ras) {
   ras->lock();
   TRaster32P ras32 = ras;
+  TRaster64P ras64 = ras;
+  TRasterFP rasF   = ras;
   if (ras32) {
     TPixel32 *endPix, *upPix = 0, *upRow = ras32->pixels();
     TPixel32 *lastPix =
@@ -1665,26 +2072,40 @@ void TRop::whiteTransp(const TRasterP &ras) {
       }
       upRow += ras32->getWrap();
     }
-  } else {
-    TRaster64P ras64 = ras;
-    if (ras64) {
-      TPixel64 *endPix, *upPix = 0, *upRow = ras64->pixels();
-      TPixel64 *lastPix =
-          upRow + ras64->getWrap() * (ras64->getLy() - 1) + ras64->getLx();
+  } else if (ras64) {
+    TPixel64 *endPix, *upPix = 0, *upRow = ras64->pixels();
+    TPixel64 *lastPix =
+        upRow + ras64->getWrap() * (ras64->getLy() - 1) + ras64->getLx();
 
-      while (upPix < lastPix) {
-        upPix  = upRow;
-        endPix = upPix + ras64->getLx();
-        while (upPix < endPix) {
-          if (*upPix == TPixel64::White) *upPix = TPixel64::Transparent;
-          ++upPix;
-        }
-        upRow += ras64->getWrap();
+    while (upPix < lastPix) {
+      upPix  = upRow;
+      endPix = upPix + ras64->getLx();
+      while (upPix < endPix) {
+        if (*upPix == TPixel64::White) *upPix = TPixel64::Transparent;
+        ++upPix;
       }
-    } else {
-      ras->unlock();
-      throw TException("TRop::premultiply invalid raster type");
+      upRow += ras64->getWrap();
     }
+  } else if (rasF) {
+    TPixelF *endPix, *upPix = 0, *upRow = rasF->pixels();
+    TPixelF *lastPix =
+        upRow + rasF->getWrap() * (rasF->getLy() - 1) + rasF->getLx();
+
+    while (upPix < lastPix) {
+      upPix  = upRow;
+      endPix = upPix + rasF->getLx();
+      while (upPix < endPix) {
+        if ((*upPix).r >= TPixelF::maxChannelValue &&
+            (*upPix).g >= TPixelF::maxChannelValue &&
+            (*upPix).b >= TPixelF::maxChannelValue)
+          *upPix = TPixelF::Transparent;
+        ++upPix;
+      }
+      upRow += rasF->getWrap();
+    }
+  } else {
+    ras->unlock();
+    throw TException("TRop::premultiply invalid raster type");
   }
   ras->unlock();
 }

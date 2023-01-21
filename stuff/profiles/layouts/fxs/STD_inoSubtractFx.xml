@@ -4,9 +4,10 @@
     <control>clipping_mask</control>
     <control>alpha_rendering</control>
     <separator/>
-    <control>linear</control>
-    <vbox modeSensitive="linear" mode="1">
+    <control>colorSpaceMode</control>
+    <vbox modeSensitive="colorSpaceMode" mode="1">
       <control>gamma</control>
+      <control>gammaAdjust</control>
       <control>premultiplied</control>
     </vbox>
   </page>

@@ -250,6 +250,28 @@ void do_over(TRasterGR8P rout, const TRaster32P &rup) {
   }
 }
 
+//-----------------------------------------------------------------------------
+
+void do_over(TRasterFP rout, const TRasterFP &rup) {
+  assert(rout->getSize() == rup->getSize());
+  for (int y = 0; y < rout->getLy(); y++) {
+    TPixelF *out_pix       = rout->pixels(y);
+    TPixelF *const out_end = out_pix + rout->getLx();
+    const TPixelF *up_pix  = rup->pixels(y);
+
+    for (; out_pix < out_end; ++out_pix, ++up_pix) {
+      if (up_pix->m >= 1.f)
+        *out_pix = *up_pix;
+      else if (up_pix->m > 0.f) {
+        out_pix->r = up_pix->r + out_pix->r * (1.f - up_pix->m);
+        out_pix->g = up_pix->g + out_pix->g * (1.f - up_pix->m);
+        out_pix->b = up_pix->b + out_pix->b * (1.f - up_pix->m);
+        out_pix->m = up_pix->m + out_pix->m * (1.f - up_pix->m);
+      }
+    }
+  }
+}
+
 }  // namespace
 
 //-----------------------------------------------------------------------------
@@ -325,6 +347,7 @@ void TRop::over(const TRasterP &rout, const TRasterP &rup, const TPoint &pos) {
 
   TRaster32P rout32 = cRout, rup32 = cRup;
   TRaster64P rout64 = cRout, rup64 = cRup;
+  TRasterFP routF = cRout, rupF = cRup;
 
   TRasterGR8P rout8 = cRout, rup8 = cRup;
 
@@ -356,6 +379,8 @@ void TRop::over(const TRasterP &rout, const TRasterP &rup, const TPoint &pos) {
     TRop::copy(rout8, rup8);
   else if (routCM32 && rupCM32)
     do_over(routCM32, rupCM32);
+  else if (routF && rupF)
+    do_over(routF, rupF);
   else {
     rout->unlock();
     rup->unlock();

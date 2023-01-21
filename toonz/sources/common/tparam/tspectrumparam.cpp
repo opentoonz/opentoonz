@@ -181,6 +181,22 @@ TSpectrum64 TSpectrumParam::getValue64(double frame) const {
   }
   return TSpectrum64(keys.size(), &keys[0]);
 }
+
+//---------------------------------------------------------
+
+TSpectrumF TSpectrumParam::getValueF(double frame) const {
+  assert(m_imp);
+  std::vector<TSpectrumF::ColorKey> keys;
+  int keyCount = m_imp->getKeyCount();
+  for (int i = 0; i < keyCount; i++) {
+    ColorKeyParam paramKey = m_imp->getKey(i);
+    TSpectrumF::ColorKey key(paramKey.first->getValue(frame),
+                             toPixelF(paramKey.second->getValue(frame)));
+    keys.push_back(key);
+  }
+  return TSpectrumF(keys.size(), &keys[0]);
+}
+
 //---------------------------------------------------------
 
 void TSpectrumParam::setValue(double frame, const TSpectrum &spectrum,

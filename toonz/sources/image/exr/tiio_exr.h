@@ -17,6 +17,7 @@ public:
   TEnumProperty m_compressionType;
   TEnumProperty m_storageType;
   TEnumProperty m_bitsPerPixel;
+  TDoubleProperty m_colorSpaceGamma;
 
   ExrWriterProperties();
 

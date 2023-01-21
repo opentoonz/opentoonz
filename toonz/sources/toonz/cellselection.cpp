@@ -54,6 +54,8 @@
 #include "toonz/tstageobjecttree.h"
 #include "toonz/stage.h"
 #include "vectorizerpopup.h"
+#include "tools/rasterselection.h"
+#include "tools/strokeselection.h"
 #include "toonz/sceneproperties.h"
 #include "toutputproperties.h"
 
@@ -673,6 +675,16 @@ bool pasteRasterImageInCellWithoutUndo(int row, int col,
     }
   }
   if (img) {
+    // This seems redundant, but newly created levels were having an issue with
+    // pasting.
+    // Don't know why.
+    cell = xsh->getCell(row, col);
+    sl   = cell.getSimpleLevel();
+    fid  = cell.getFrameId();
+    img  = cell.getImage(true);
+    if (!img->getPalette()) {
+      img->setPalette(sl->getPalette());
+    }
     TRasterP ras;
     TRasterP outRas;
     double imgDpiX, imgDpiY;
@@ -788,10 +800,12 @@ public:
                                  TTileSetFullColor *tiles,
                                  TXshSimpleLevel *level, const TFrameId &id,
                                  TPaletteP oldPalette, bool createdFrame,
-                                 bool isLevelCreated)
+                                 bool isLevelCreated, int col = -1)
       : ToolUtils::TFullColorRasterUndo(tiles, level, id, createdFrame,
                                         isLevelCreated, oldPalette)
-      , m_rasterImageData(data->clone()) {}
+      , m_rasterImageData(data->clone()) {
+    if (col > 0) m_col = col;
+  }
 
   ~PasteFullColorImageInCellsUndo() { delete m_rasterImageData; }
 
@@ -801,6 +815,7 @@ public:
     bool isLevelCreated;
     pasteRasterImageInCellWithoutUndo(m_row, m_col, m_rasterImageData, &tiles,
                                       isLevelCreated);
+    m_level->setDirtyFlag(true);
     if (tiles) delete tiles;
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
   }
@@ -1643,24 +1658,38 @@ static void pasteStrokesInCell(int row, int col,
 //-----------------------------------------------------------------------------
 
 static void pasteRasterImageInCell(int row, int col,
-                                   const RasterImageData *rasterImageData) {
+                                   const RasterImageData *rasterImageData,
+                                   bool newLevel = false) {
   // to let the undo to know which frame is edited
   TTool::m_cellsData.clear();
 
   TXsheet *xsh         = TApp::instance()->getCurrentXsheet()->getXsheet();
-  TXshCell cell        = xsh->getCell(row, col);
   bool createdFrame    = false;
   bool isLevelCreated  = false;
   TPaletteP oldPalette = 0;
-  if (!cell.getSimpleLevel()) {
-    createdFrame        = true;
-    TXshSimpleLevel *sl = xsh->getCell(row - 1, col).getSimpleLevel();
-    if (sl) oldPalette = sl->getPalette();
-  } else {
-    TXshSimpleLevel *sl = cell.getSimpleLevel();
-    if (sl->getType() == OVL_XSHLEVEL && sl->getPath().isUneditable())
-      return;
-    oldPalette = sl->getPalette();
+
+  if (newLevel) {
+    while (!xsh->getCell(row, col).isEmpty()) {
+      col += 1;
+    }
+    createdFrame = true;
+  }
+  // get the current cell
+  TXshCell cell = xsh->getCell(row, col);
+  // if the cell doesn't have a level...
+  if (!newLevel) {
+    if (!cell.getSimpleLevel()) {
+      createdFrame = true;
+      // try the previous frame
+      TXshSimpleLevel *sl = xsh->getCell(row - 1, col).getSimpleLevel();
+      if (sl) oldPalette = sl->getPalette();
+    } else {
+      TXshSimpleLevel *sl = cell.getSimpleLevel();
+      // don't do anything to ffmpeg level types
+      if (sl->getType() == OVL_XSHLEVEL && sl->getPath().isUneditable())
+        return;
+      oldPalette = sl->getPalette();
+    }
   }
   if (oldPalette) oldPalette = oldPalette->clone();
   TTileSet *tiles = 0;
@@ -1685,7 +1714,7 @@ static void pasteRasterImageInCell(int row, int col,
   } else if (fullColorTiles) {
     TUndoManager::manager()->add(new PasteFullColorImageInCellsUndo(
         rasterImageData, fullColorTiles, cell.getSimpleLevel(),
-        cell.getFrameId(), oldPalette, createdFrame, isLevelCreated));
+        cell.getFrameId(), oldPalette, createdFrame, isLevelCreated, col));
   }
 }
 
@@ -1698,6 +1727,7 @@ void TCellSelection::pasteCells() {
   const QMimeData *mimeData = clipboard->mimeData();
   TXsheet *xsh              = TApp::instance()->getCurrentXsheet()->getXsheet();
   XsheetViewer *viewer      = TApp::instance()->getCurrentXsheetViewer();
+  ToolHandle *toolHandle    = TApp::instance()->getCurrentTool();
 
   bool initUndo = false;
   const TCellKeyframeData *cellKeyframeData =
@@ -1876,13 +1906,20 @@ void TCellSelection::pasteCells() {
     } else
       pasteStrokesInCell(r0, c0, strokesData);
   }
-  if (const RasterImageData *rasterImageData =
-          dynamic_cast<const RasterImageData *>(mimeData)) {
-    if (isEmpty())  // Se la selezione delle celle e' vuota ritorno.
+  // Raster Time
+  // See if an image was copied from outside OpenToonz
+  QImage clipImage = clipboard->image();
+  // See if the clipboard contains rasterData
+  const RasterImageData *rasterImageData =
+      dynamic_cast<const RasterImageData *>(mimeData);
+  if (rasterImageData || clipImage.height() > 0) {
+    if (isEmpty())  // Nothing selected.
       return;
 
+    // get the current image and find out the type
     TImageP img = xsh->getCell(r0, c0).getImage(false);
     if (!img && r0 > 0) {
+      // Try the previous cell.
       TXshCell cell = xsh->getCell(r0 - 1, c0);
       TXshLevel *xl = cell.m_level.getPointer();
       if (xl && (xl->getType() != OVL_XSHLEVEL ||
@@ -1894,23 +1931,119 @@ void TCellSelection::pasteCells() {
     TToonzImageP ti(img);
     TVectorImageP vi(img);
     if (fullColData && (vi || ti)) {
+      // Bail out if the level is Smart Raster or Vector with normal raster
+      // data.
       DVGui::error(QObject::tr(
           "The copied selection cannot be pasted in the current drawing."));
       return;
     }
+    // Convert non-plain raster data to strokes data
     if (!initUndo) {
       initUndo = true;
       TUndoManager::manager()->beginBlock();
     }
-    if (vi) {
+    if (vi && clipImage.isNull()) {
+      // Vector stuff
       TXshSimpleLevel *sl = xsh->getCell(r0, c0).getSimpleLevel();
       if (!sl) sl = xsh->getCell(r0 - 1, c0).getSimpleLevel();
       assert(sl);
       StrokesData *strokesData = rasterImageData->toStrokesData(sl->getScene());
       pasteStrokesInCell(r0, c0, strokesData);
-    } else
-      pasteRasterImageInCell(r0, c0, rasterImageData);
-  }
+      // end strokes stuff
+    } else {
+      TXshSimpleLevel *sl = xsh->getCell(r0, c0).getSimpleLevel();
+      if (!sl && r0 > 0) sl = xsh->getCell(r0 - 1, c0).getSimpleLevel();
+      bool newLevel = false;
+      TRasterImageP ri(img);
+
+      if (clipImage.height() > 0) {
+        // This stuff is only if we have a pasted image from outside OpenToonz
+        bool cancel = false;
+
+        if (sl && sl->getType() == OVL_XSHLEVEL) {
+          if (sl->getResolution().lx < clipImage.width() ||
+              sl->getResolution().ly < clipImage.height()) {
+            clipImage =
+                clipImage.scaled(sl->getResolution().lx, sl->getResolution().ly,
+                                 Qt::KeepAspectRatio);
+          }
+        } else {
+          QString question = QObject::tr(
+              "Pasting external image from clipboard.\n\nWhat do you want to do?");
+          int ret = DVGui::MsgBox(question, QObject::tr("New raster level"),
+                                  QObject::tr("Cancel"), 0);
+          if (ret == 1) {  // New level chosen
+            newLevel = true;
+          } else {  // Cancel or close
+            cancel = true;
+          }
+        }
+
+        if (cancel) {
+          // Cancel or dialog closed
+          if (initUndo) TUndoManager::manager()->endBlock();
+          return;
+        }
+
+        if (newLevel) {
+          if (sl) {
+            // find the next empty column
+            while (!xsh->isColumnEmpty(c0)) {
+              c0 += 1;
+            }
+          }
+          TXshColumn *col =
+              TApp::instance()->getCurrentXsheet()->getXsheet()->getColumn(c0);
+          TApp::instance()->getCurrentColumn()->setColumnIndex(c0);
+          TApp::instance()->getCurrentColumn()->setColumn(col);
+          TApp::instance()->getCurrentFrame()->setFrame(r0);
+        }
+
+        // create variables to go into the Full Color Raster Selection data
+        std::vector<TRectD> rects;
+        const std::vector<TStroke> strokes;
+        const std::vector<TStroke> originalStrokes;
+        TAffine aff;
+        TRasterP ras = rasterFromQImage(clipImage);
+        rects.push_back(TRectD(0.0 - clipImage.width() / 2,
+                               0.0 - clipImage.height() / 2,
+                               clipImage.width() / 2, clipImage.height() / 2));
+        FullColorImageData *qimageData = new FullColorImageData();
+        TPalette *p;
+        if (!ri || !ri->getPalette() || newLevel)
+          p = new TPalette();
+        else
+          p = ri->getPalette()->clone();
+        TDimension dim;
+        if (ri && !newLevel) {
+          dim = ri->getRaster()->getSize();
+        } else {
+          dim = TDimension(clipImage.width(), clipImage.height());
+        }
+        qimageData->setData(ras, p, 120.0, 120.0, dim, rects, strokes,
+                            originalStrokes, aff);
+        rasterImageData = qimageData;
+        // end of pasted from outside OpenToonz stuff
+        // rasterImageData holds all the info either way now.
+      }
+
+      if (sl && sl->getType() == OVL_XSHLEVEL) {
+        // make selection always work on new raster cells
+        if (toolHandle->getTool()->getName() == "T_Selection") {
+          TSelection *ts      = toolHandle->getTool()->getSelection();
+          RasterSelection *rs = dynamic_cast<RasterSelection *>(ts);
+          if (rs) {
+            toolHandle->getTool()->onDeactivate();
+            toolHandle->getTool()->onActivate();
+            rs->pasteSelection();
+            return;
+          }
+        }
+      }
+      pasteRasterImageInCell(r0, c0, rasterImageData, newLevel);
+
+    }  // end of full raster stuff
+  }    // end of raster stuff
   if (!initUndo) {
     DVGui::error(QObject::tr(
         "It is not possible to paste data: there is nothing to paste."));

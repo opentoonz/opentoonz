@@ -2,7 +2,7 @@
 
 #include "stdfx.h"
 #include "tfxparam.h"
-//#include "trop.h"
+// #include "trop.h"
 #include <math.h>
 #include "tpixelutils.h"
 #include "globalcontrollablefx.h"
@@ -83,6 +83,8 @@ public:
     m_m_g->setValueRange(0, 1);
     m_m_b->setValueRange(0, 1);
     m_m_m->setValueRange(0, 1);
+
+    enableComputeInFloat(true);
   }
   ~ChannelMixerFx(){};
 
@@ -146,6 +148,34 @@ void doChannelMixer(TRasterPT<PIXEL> ras, double r_r, double r_g, double r_b,
   }
   ras->unlock();
 }
+
+void doChannelMixer_Float(TRasterFP ras, double r_r, double r_g, double r_b,
+                          double r_m, double g_r, double g_g, double g_b,
+                          double g_m, double b_r, double b_g, double b_b,
+                          double b_m, double m_r, double m_g, double m_b,
+                          double m_m) {
+  int j;
+  ras->lock();
+  for (j = 0; j < ras->getLy(); j++) {
+    TPixelF *pix    = ras->pixels(j);
+    TPixelF *endPix = pix + ras->getLx();
+    while (pix < endPix) {
+      depremultiply(*pix);
+      double red   = pix->r * r_r + pix->g * g_r + pix->b * b_r + pix->m * m_r;
+      double green = pix->r * r_g + pix->g * g_g + pix->b * b_g + pix->m * m_g;
+      double blue  = pix->r * r_b + pix->g * g_b + pix->b * b_b + pix->m * m_b;
+      double matte = pix->r * r_m + pix->g * g_m + pix->b * b_m + pix->m * m_m;
+      pix->r       = (float)red;
+      pix->g       = (float)green;
+      pix->b       = (float)blue;
+      pix->m       = (float)matte;
+      *pix         = premultiply(*pix);
+      pix++;
+    }
+  }
+  ras->unlock();
+}
+
 //------------------------------------------------------------------------------
 
 void ChannelMixerFx::doCompute(TTile &tile, double frame,
@@ -172,19 +202,22 @@ void ChannelMixerFx::doCompute(TTile &tile, double frame,
   double m_m = m_m_m->getValue(frame);
 
   TRaster32P raster32 = tile.getRaster();
+  TRaster64P raster64 = tile.getRaster();
+  TRasterFP rasterF   = tile.getRaster();
   if (raster32)
     doChannelMixer<TPixel32, UCHAR>(raster32, r_r, r_g, r_b, r_m, g_r, g_g, g_b,
                                     g_m, b_r, b_g, b_b, b_m, m_r, m_g, m_b,
                                     m_m);
-  else {
-    TRaster64P raster64 = tile.getRaster();
-    if (raster64)
-      doChannelMixer<TPixel64, USHORT>(raster64, r_r, r_g, r_b, r_m, g_r, g_g,
-                                       g_b, g_m, b_r, b_g, b_b, b_m, m_r, m_g,
-                                       m_b, m_m);
-    else
-      throw TException("Brightness&Contrast: unsupported Pixel Type");
-  }
+  else if (raster64)
+    doChannelMixer<TPixel64, USHORT>(raster64, r_r, r_g, r_b, r_m, g_r, g_g,
+                                     g_b, g_m, b_r, b_g, b_b, b_m, m_r, m_g,
+                                     m_b, m_m);
+  else if (rasterF)
+    doChannelMixer_Float(rasterF, r_r, r_g, r_b, r_m, g_r, g_g, g_b, g_m, b_r,
+                         b_g, b_b, b_m, m_r, m_g, m_b, m_m);
+
+  else
+    throw TException("Brightness&Contrast: unsupported Pixel Type");
 }
 
 FX_PLUGIN_IDENTIFIER(ChannelMixerFx, "channelMixerFx")

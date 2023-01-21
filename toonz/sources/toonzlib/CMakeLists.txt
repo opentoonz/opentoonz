@@ -164,6 +164,7 @@ set(HEADERS
     ../include/toonz/txsheetcolumnchange.h
     ../include/toonz/expressionreferencemonitor.h
     ../include/toonz/filepathproperties.h
+    ../include/toonz/navigationtags.h
 )
 
 set(SOURCES
@@ -324,6 +325,7 @@ set(SOURCES
     textureutils.cpp
     boardsettings.cpp
     filepathproperties.cpp
+    navigationtags.cpp
 )
 
 if(BUILD_TARGET_WIN)

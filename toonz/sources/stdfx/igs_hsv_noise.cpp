@@ -395,10 +395,11 @@ void pixel_rgb_(const double red_in, const double gre_in, const double blu_in,
     sat += satnoise * alp_in;
     if (sat < 0.0) {
       sat = 0.0;
-    } else if (1.0 < sat) {
-      sat = 1.0;
     }
-    // if( 0.0 == sat ) hue = -1.0; // hsv_to_rgb(-)
+    // else if (1.0 < sat) {
+    //   sat = 1.0;
+    // }
+    //  if( 0.0 == sat ) hue = -1.0; // hsv_to_rgb(-)
   }
   if (0.0 != val_term.noise_range()) {
     double shift_value = 0;
@@ -406,11 +407,11 @@ void pixel_rgb_(const double red_in, const double gre_in, const double blu_in,
     val_term.exec(val, valnoise, shift_value);
     val += shift_value * alp_in;
     val += valnoise * alp_in;
-    if (val < 0.0) {
-      val = 0.0;
-    } else if (1.0 < val) {
-      val = 1.0;
-    }
+    // if (val < 0.0) {
+    //   val = 0.0;
+    // } else if (1.0 < val) {
+    //   val = 1.0;
+    // }
   }
   igs::color::hsv_to_rgb(hue, sat, val, red_out, gre_out, blu_out);
 }
@@ -482,7 +483,7 @@ Alpha値がゼロでもRGB値は存在する(してもよい) */
         if (((0.0 != hue_range) || (0.0 != val_term.noise_range()) ||
              (0.0 !=
               sat_term.noise_range())) /* ノイズがhsvのどれか一つはある */
-            ) {
+        ) {
           double rr1 = static_cast<double>(image_array[red]) / div_val,
                  gg1 = static_cast<double>(image_array[gre]) / div_val,
                  bb1 = static_cast<double>(image_array[blu]) / div_val,
@@ -496,6 +497,10 @@ Alpha値がゼロでもRGB値は存在する(してもよい) */
             gg2 = (gg2 - gg1) * refv + gg1;
             bb2 = (bb2 - bb1) * refv + bb1;
           }
+          rr2 = (rr2 < 0.) ? 0. : (rr2 > 1.) ? 1. : rr2;
+          gg2 = (gg2 < 0.) ? 0. : (gg2 > 1.) ? 1. : gg2;
+          bb2 = (bb2 < 0.) ? 0. : (bb2 > 1.) ? 1. : bb2;
+
           image_array[red] = static_cast<IT>(rr2 * mul_val);
           image_array[gre] = static_cast<IT>(gg2 * mul_val);
           image_array[blu] = static_cast<IT>(bb2 * mul_val);
@@ -515,7 +520,7 @@ Alpha値がゼロでもRGB値は存在する(してもよい) */
     using namespace igs::image::rgb;
     if (((0.0 != hue_range) || (0.0 != sat_term.noise_range()) ||
          (0.0 != val_term.noise_range())) /* ノイズがhsvのどれか一つはある */
-        ) {
+    ) {
       for (int yy = 0; yy < height; ++yy) {
         for (int xx = 0; xx < width; ++xx, image_array += channels) {
           /* 変化量初期値 */
@@ -539,6 +544,10 @@ Alpha値がゼロでもRGB値は存在する(してもよい) */
             gg2 = (gg2 - gg1) * refv + gg1;
             bb2 = (bb2 - bb1) * refv + bb1;
           }
+          rr2 = (rr2 < 0.) ? 0. : (rr2 > 1.) ? 1. : rr2;
+          gg2 = (gg2 < 0.) ? 0. : (gg2 > 1.) ? 1. : gg2;
+          bb2 = (bb2 < 0.) ? 0. : (bb2 > 1.) ? 1. : bb2;
+
           image_array[red] = static_cast<IT>(rr2 * mul_val);
           image_array[gre] = static_cast<IT>(gg2 * mul_val);
           image_array[blu] = static_cast<IT>(bb2 * mul_val);
@@ -578,41 +587,154 @@ Alpha値がゼロでもRGB値は存在する(してもよい) */
     }
   }
 }
+
+/*------ raster画像にノイズをのせる ------*/
+
+void change_(float *image_array, const int width, const int height,
+             const int channels,
+             const float *ref, /* 求める画像(out)と同じ高さ*/
+             noise_reference_ &noise, const double hue_range,
+             control_term_within_limits_ &sat_term,
+             control_term_within_limits_ &val_term,
+             control_term_within_limits_ &alp_term, const bool add_blend_sw) {
+  if (igs::image::rgba::siz == channels) {
+    using namespace igs::image::rgba;
+    for (int yy = 0; yy < height; ++yy) {
+      for (int xx = 0; xx < width; ++xx, image_array += channels) {
+        /* 変化量初期値 */
+        float refv = 1.f;
+
+        /* 参照画像あればピクセル単位の画像変化量を得る */
+        if (ref != nullptr) {
+          refv *= (*ref);
+          ref++; /* continue;の前に行うこと */
+        }
+        /* 加算合成で、Alpha値ゼロならRGB値を計算する必要はない */
+        if (add_blend_sw && (0 == image_array[alp])) {
+          continue;
+        }
+        /* 加算合成でなくAlpha合成の時は、
+Alpha値がゼロでもRGB値は存在する(してもよい) */
+
+        /* マスクSWがON、なら変化をMask */
+        if (add_blend_sw && (image_array[alp] < 1.f)) {
+          refv *= image_array[alp];
+        }
+
+        if (((0.0 != hue_range) || (0.0 != val_term.noise_range()) ||
+             (0.0 !=
+              sat_term.noise_range())) /* ノイズがhsvのどれか一つはある */
+        ) {
+          float rr1 = image_array[red], gg1 = image_array[gre],
+                bb1 = image_array[blu], aa1 = image_array[alp];
+          double rr2 = 0., gg2 = 0., bb2 = 0.;
+          pixel_rgb_(rr1, gg1, bb1, aa1, noise.hue_value(xx, yy),
+                     noise.sat_value(xx, yy), noise.val_value(xx, yy), sat_term,
+                     val_term, rr2, gg2, bb2);
+          if (refv != 1.f) {
+            rr2 = (rr2 - rr1) * refv + rr1;
+            gg2 = (gg2 - gg1) * refv + gg1;
+            bb2 = (bb2 - bb1) * refv + bb1;
+          }
+          image_array[red] = static_cast<float>(rr2);
+          image_array[gre] = static_cast<float>(gg2);
+          image_array[blu] = static_cast<float>(bb2);
+        }
+        if (0.0 != alp_term.noise_range()) {
+          double aa1 = static_cast<double>(image_array[alp]);
+          double aa2 = 0.;
+          pixel_a_(aa1, noise.alp_value(xx, yy), alp_term, aa2);
+          if (refv != 1.f) {
+            aa2 = (aa2 - aa1) * refv + aa1;
+          }
+          image_array[alp] = static_cast<float>(aa2);
+        }
+      }
+    }
+  } else if (igs::image::rgb::siz == channels) {
+    using namespace igs::image::rgb;
+    if (((0.0 != hue_range) || (0.0 != sat_term.noise_range()) ||
+         (0.0 != val_term.noise_range())) /* ノイズがhsvのどれか一つはある */
+    ) {
+      for (int yy = 0; yy < height; ++yy) {
+        for (int xx = 0; xx < width; ++xx, image_array += channels) {
+          /* 変化量初期値 */
+          float refv = 1.f;
+
+          /* 参照画像あればピクセル単位の画像変化量を得る */
+          if (ref != nullptr) {
+            refv *= (*ref);
+            ref++; /* continue;の前に行うこと */
+          }
+
+          float rr1 = image_array[red], gg1 = image_array[gre],
+                bb1  = image_array[blu];
+          double rr2 = 0., gg2 = 0., bb2 = 0.;
+          pixel_rgb_(rr1, gg1, bb1, 1.0, noise.hue_value(xx, yy),
+                     noise.sat_value(xx, yy), noise.val_value(xx, yy), sat_term,
+                     val_term, rr2, gg2, bb2);
+          if (refv != 1.f) {
+            rr2 = (rr2 - rr1) * refv + rr1;
+            gg2 = (gg2 - gg1) * refv + gg1;
+            bb2 = (bb2 - bb1) * refv + bb1;
+          }
+          image_array[red] = static_cast<float>(rr2);
+          image_array[gre] = static_cast<float>(gg2);
+          image_array[blu] = static_cast<float>(bb2);
+        }
+      }
+    }
+  } else if (1 == channels) { /* grayscale */
+    if (0.0 != val_term.noise_range()) {
+      for (int yy = 0; yy < height; ++yy) {
+        for (int xx = 0; xx < width; ++xx, ++image_array) {
+          /* 変化量初期値 */
+          float refv = 1.f;
+
+          /* 参照画像あればピクセル単位の画像変化量を得る */
+          if (ref != 0) {
+            refv *= (*ref);
+            ref++; /* continue;の前に行うこと */
+          }
+
+          double va1         = static_cast<double>(image_array[0]);
+          double shift_value = 0;
+          double val_noise   = noise.val_value(xx, yy);
+          val_term.exec(va1, val_noise, shift_value);
+
+          double va2 = va1;
+          va2 += shift_value;
+          va2 += val_noise;
+          va2 = (va2 < 0.0) ? 0.0 : ((1.0 < va2) ? 1.0 : va2);
+
+          if (refv != 1.f) {
+            va2 = va1 + (va2 - va1) * refv;
+          }
+
+          image_array[0] = static_cast<float>(va2);
+        }
+      }
+    }
+  }
 }
+
+}  // namespace
 //--------------------------------------------------------------------
 
 #include <stdexcept>  // std::domain_error
 #include "igs_hsv_noise.h"
 void igs::hsv_noise::change(
-    unsigned char *image_array
-
-    ,
-    const int height, const int width, const int channels, const int bits
-
-    ,
-    const unsigned char *ref /* 求める画像と同じ高、幅、channels数 */
-    ,
-    const int ref_bits /* refがゼロのときはここもゼロ */
-    ,
-    const int ref_mode /* 0=R,1=G,2=B,3=A,4=Luminance,5=Nothing */
-
+    float *image_array, const int height, const int width, const int channels,
+    const float *ref, /* 求める画像と同じ高、幅 */
     /* image_arrayに余白が変化してもノイズパターンが変わらない
             ようにするためにカメラエリアを指定する */
-    ,
     const int camera_x, const int camera_y, const int camera_w,
-    const int camera_h
-
-    ,
-    const double hue_range, const double sat_range, const double val_range,
-    const double alp_range, const unsigned long random_seed,
-    const double near_blur
-
-    ,
+    const int camera_h, const double hue_range, const double sat_range,
+    const double val_range, const double alp_range,
+    const unsigned long random_seed, const double near_blur,
     const double sat_effective, const double sat_center, const int sat_type,
     const double val_effective, const double val_center, const int val_type,
-    const double alp_effective, const double alp_center, const int alp_type
-
-    ,
+    const double alp_effective, const double alp_center, const int alp_type,
     const bool add_blend_sw) {
   if ((0.0 == hue_range) && (0.0 == sat_range) && (0.0 == val_range) &&
       (0.0 == alp_range)) {
@@ -621,7 +743,7 @@ void igs::hsv_noise::change(
 
   if ((igs::image::rgba::siz != channels) &&
       (igs::image::rgb::siz != channels) && (1 != channels) /* grayscale */
-      ) {
+  ) {
     throw std::domain_error("Bad channels,Not rgba/rgb/grayscale");
   }
 
@@ -638,35 +760,40 @@ void igs::hsv_noise::change(
   control_term_within_limits_ alp_term(alp_effective, alp_effective, alp_center,
                                        alp_type, alp_range);
 
-  /* rgb(a)画像にhsv(a)でドットノイズを加える */
-  if ((std::numeric_limits<unsigned char>::digits == bits) &&
-      ((std::numeric_limits<unsigned char>::digits == ref_bits) ||
-       (0 == ref_bits))) {
-    change_template_(image_array, width, height, channels, ref, ref_mode, noise,
-                     hue_range, sat_term, val_term, alp_term, add_blend_sw);
-    noise.clear(); /* ノイズ画像メモリ解放 */
-  } else if ((std::numeric_limits<unsigned short>::digits == bits) &&
-             ((std::numeric_limits<unsigned char>::digits == ref_bits) ||
-              (0 == ref_bits))) {
-    change_template_(reinterpret_cast<unsigned short *>(image_array), width,
-                     height, channels, ref, ref_mode, noise, hue_range,
-                     sat_term, val_term, alp_term, add_blend_sw);
-    noise.clear(); /* ノイズ画像メモリ解放 */
-  } else if ((std::numeric_limits<unsigned short>::digits == bits) &&
-             (std::numeric_limits<unsigned short>::digits == ref_bits)) {
-    change_template_(
-        reinterpret_cast<unsigned short *>(image_array), width, height,
-        channels, reinterpret_cast<const unsigned short *>(ref), ref_mode,
-        noise, hue_range, sat_term, val_term, alp_term, add_blend_sw);
-    noise.clear(); /* ノイズ画像メモリ解放 */
-  } else if ((std::numeric_limits<unsigned char>::digits == bits) &&
-             (std::numeric_limits<unsigned short>::digits == ref_bits)) {
-    change_template_(image_array, width, height, channels,
-                     reinterpret_cast<const unsigned short *>(ref), ref_mode,
-                     noise, hue_range, sat_term, val_term, alp_term,
-                     add_blend_sw);
-    noise.clear(); /* ノイズ画像メモリ解放 */
-  } else {
-    throw std::domain_error("Bad bits,Not uchar/ushort");
-  }
+  change_(image_array, width, height, channels, ref, noise, hue_range, sat_term,
+          val_term, alp_term, add_blend_sw);
+  noise.clear(); /* ノイズ画像メモリ解放 */
+
+  ///* rgb(a)画像にhsv(a)でドットノイズを加える */
+  // if ((std::numeric_limits<unsigned char>::digits == bits) &&
+  //     ((std::numeric_limits<unsigned char>::digits == ref_bits) ||
+  //      (0 == ref_bits))) {
+  //   change_template_(image_array, width, height, channels, ref, ref_mode,
+  //   noise,
+  //                    hue_range, sat_term, val_term, alp_term, add_blend_sw);
+  //   noise.clear(); /* ノイズ画像メモリ解放 */
+  // } else if ((std::numeric_limits<unsigned short>::digits == bits) &&
+  //            ((std::numeric_limits<unsigned char>::digits == ref_bits) ||
+  //             (0 == ref_bits))) {
+  //   change_template_(reinterpret_cast<unsigned short *>(image_array), width,
+  //                    height, channels, ref, ref_mode, noise, hue_range,
+  //                    sat_term, val_term, alp_term, add_blend_sw);
+  //   noise.clear(); /* ノイズ画像メモリ解放 */
+  // } else if ((std::numeric_limits<unsigned short>::digits == bits) &&
+  //            (std::numeric_limits<unsigned short>::digits == ref_bits)) {
+  //   change_template_(
+  //       reinterpret_cast<unsigned short *>(image_array), width, height,
+  //       channels, reinterpret_cast<const unsigned short *>(ref), ref_mode,
+  //       noise, hue_range, sat_term, val_term, alp_term, add_blend_sw);
+  //   noise.clear(); /* ノイズ画像メモリ解放 */
+  // } else if ((std::numeric_limits<unsigned char>::digits == bits) &&
+  //            (std::numeric_limits<unsigned short>::digits == ref_bits)) {
+  //   change_template_(image_array, width, height, channels,
+  //                    reinterpret_cast<const unsigned short *>(ref), ref_mode,
+  //                    noise, hue_range, sat_term, val_term, alp_term,
+  //                    add_blend_sw);
+  //   noise.clear(); /* ノイズ画像メモリ解放 */
+  // } else {
+  //   throw std::domain_error("Bad bits,Not uchar/ushort");
+  // }
 }

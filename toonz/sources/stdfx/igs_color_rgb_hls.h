@@ -7,10 +7,10 @@ namespace igs {
 namespace color {
 // Use add_hls & noise_hlsa
 void rgb_to_hls(const double red, const double gre, const double blu,
-                double &hue, double &lig, double &sat);
+                double &hue, double &lig, double &sat, bool cylindrical = true);
 void hls_to_rgb(const double hue, const double lig, const double sat,
-                double &red, double &gre, double &blu);
-}
-}
+                double &red, double &gre, double &blu, bool cylindrical = true);
+}  // namespace color
+}  // namespace igs
 
 #endif /* !igs_color_rgb_hls_h */

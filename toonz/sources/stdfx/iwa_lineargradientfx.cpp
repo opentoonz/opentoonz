@@ -36,6 +36,8 @@ Iwa_LinearGradientFx::Iwa_LinearGradientFx()
 
   bindParam(this, "startColor", m_startColor);
   bindParam(this, "endColor", m_endColor);
+
+  enableComputeInFloat(true);
 }
 
 //------------------------------------------------------------
@@ -123,7 +125,8 @@ void doLinearGradientT(RASTER ras, TDimensionI dim, TPointD startPos,
 
 void Iwa_LinearGradientFx::doCompute(TTile &tile, double frame,
                                      const TRenderSettings &ri) {
-  if (!((TRaster32P)tile.getRaster()) && !((TRaster64P)tile.getRaster())) {
+  if (!((TRaster32P)tile.getRaster()) && !((TRaster64P)tile.getRaster()) &&
+      !((TRasterFP)tile.getRaster())) {
     throw TRopException("unsupported input pixel type");
   }
 
@@ -144,11 +147,13 @@ void Iwa_LinearGradientFx::doCompute(TTile &tile, double frame,
   std::vector<TSpectrum::ColorKey> colors = {
       TSpectrum::ColorKey(0, m_startColor->getValue(frame)),
       TSpectrum::ColorKey(1, m_endColor->getValue(frame))};
+
   TSpectrumParamP m_colors = TSpectrumParamP(colors);
 
   tile.getRaster()->clear();
   TRaster32P outRas32 = (TRaster32P)tile.getRaster();
   TRaster64P outRas64 = (TRaster64P)tile.getRaster();
+  TRasterFP outRasF   = (TRasterFP)tile.getRaster();
   if (outRas32)
     doLinearGradientT<TRaster32P, TPixel32>(
         outRas32, dimOut, startPos, endPos, m_colors->getValue(frame),
@@ -157,6 +162,11 @@ void Iwa_LinearGradientFx::doCompute(TTile &tile, double frame,
   else if (outRas64)
     doLinearGradientT<TRaster64P, TPixel64>(
         outRas64, dimOut, startPos, endPos, m_colors->getValue64(frame),
+        (GradientCurveType)m_curveType->getValue(), w_amplitude, w_freq,
+        w_phase, aff.inv());
+  else if (outRasF)
+    doLinearGradientT<TRasterFP, TPixelF>(
+        outRasF, dimOut, startPos, endPos, m_colors->getValueF(frame),
         (GradientCurveType)m_curveType->getValue(), w_amplitude, w_freq,
         w_phase, aff.inv());
 }

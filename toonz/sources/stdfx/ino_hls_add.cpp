@@ -66,6 +66,8 @@ public:
     this->m_ref_mode->addItem(3, "Alpha");
     this->m_ref_mode->addItem(4, "Luminance");
     this->m_ref_mode->addItem(-1, "Nothing");
+
+    enableComputeInFloat(true);
   }
   bool doGetBBox(double frame, TRectD &bBox,
                  const TRenderSettings &info) override {
@@ -96,62 +98,44 @@ void fx_(TRasterP in_ras, const TRasterP noise_ras, const TRasterP refer_ras,
   std::vector<unsigned char> refer_vec;
   ino::ras_to_vec( noise_ras, ino::channels(), refer_vec );***/
 
+  TRasterGR8P ref_gr8;
+  if ((refer_ras != nullptr) && (0 <= refer_mode)) {
+    ref_gr8 = TRasterGR8P(in_ras->getLy(), in_ras->getLx() * sizeof(float));
+    ref_gr8->lock();
+    ino::ras_to_ref_float_arr(refer_ras,
+                              reinterpret_cast<float *>(ref_gr8->getRawData()),
+                              refer_mode);
+  }
+
   TRasterGR8P in_gr8(in_ras->getLy(),
-                     in_ras->getLx() * ino::channels() *
-                         ((TRaster64P)in_ras ? sizeof(unsigned short)
-                                             : sizeof(unsigned char)));
+                     in_ras->getLx() * ino::channels() * sizeof(float));
   in_gr8->lock();
-  ino::ras_to_arr(in_ras, ino::channels(), in_gr8->getRawData());
+  ino::ras_to_float_arr(in_ras, ino::channels(),
+                        reinterpret_cast<float *>(in_gr8->getRawData()));
 
   TRasterGR8P noise_gr8(noise_ras->getLy(),
-                        noise_ras->getLx() * ino::channels() *
-                            ((TRaster64P)noise_ras ? sizeof(unsigned short)
-                                                   : sizeof(unsigned char)));
+                        in_ras->getLx() * ino::channels() * sizeof(float));
   noise_gr8->lock();
-  ino::ras_to_arr(noise_ras, ino::channels(), noise_gr8->getRawData());
+  ino::ras_to_float_arr(noise_ras, ino::channels(),
+                        reinterpret_cast<float *>(noise_gr8->getRawData()));
 
   igs::hls_add::change(
-      // in_ras->getRawData() // BGRA
-      //&in_vec.at(0) // RGBA
-      in_gr8->getRawData()
-
-          ,
-      in_ras->getLy(), in_ras->getLx()  // Not use in_ras->getWrap()
+      reinterpret_cast<float *>(in_gr8->getRawData()), in_ras->getLy(),
+      in_ras->getLx()  // Not use in_ras->getWrap()
       ,
-      ino::channels(),
-      ino::bits(in_ras)
-
-      //,noise_ras->getRawData() // BGRA
-      //,&refer_vec.at(0) // RGBA
-      ,
-      noise_gr8->getRawData()
-
-          ,
-      noise_ras->getLy(), noise_ras->getLx(), ino::channels(),
-      ino::bits(noise_ras)
-
-          ,
-      (((refer_ras != nullptr) && (0 <= refer_mode)) ? refer_ras->getRawData()
-                                                     : nullptr)  // BGRA
-      ,
-      (((refer_ras != nullptr) && (0 <= refer_mode)) ? ino::bits(refer_ras)
-                                                     : 0),
-      refer_mode
-
-      ,
+      ino::channels(), reinterpret_cast<float *>(noise_gr8->getRawData()),
+      (ref_gr8) ? reinterpret_cast<float *>(ref_gr8->getRawData()) : nullptr,
       xoffset, yoffset, from_rgba, offset, hue_scale, lig_scale, sat_scale,
       alp_scale
 
       //,true	/* add_blend_sw */
       ,
-      anti_alias_sw);
-
-  /***ino::vec_to_ras( refer_vec, 0, 0 );
-  ino::vec_to_ras( in_vec, ino::channels(), in_ras, 0 );***/
-
-  ino::arr_to_ras(in_gr8->getRawData(), ino::channels(), in_ras, 0);
+      anti_alias_sw, !((TRasterFP)in_ras));
   noise_gr8->unlock();
+  ino::float_arr_to_ras(in_gr8->getRawData(), ino::channels(), in_ras, 0);
   in_gr8->unlock();
+
+  if (ref_gr8) ref_gr8->unlock();
 }
 }  // namespace
 //------------------------------------------------------------
@@ -166,7 +150,8 @@ void ino_hls_add::doCompute(TTile &tile, double frame,
   }
 
   /* ------ サポートしていないPixelタイプはエラーを投げる --- */
-  if (!((TRaster32P)tile.getRaster()) && !((TRaster64P)tile.getRaster())) {
+  if (!((TRaster32P)tile.getRaster()) && !((TRaster64P)tile.getRaster()) &&
+      !((TRasterFP)tile.getRaster())) {
     throw TRopException("unsupported input pixel type");
   }
 
@@ -193,7 +178,7 @@ void ino_hls_add::doCompute(TTile &tile, double frame,
   /*------ 参照画像生成 --------------------------------------*/
   TTile refer_tile;
   bool refer_sw = false;
-  if (this->m_refer.isConnected()) {
+  if (this->m_refer.isConnected() && this->m_ref_mode->getValue() >= 0) {
     refer_sw = true;
     this->m_refer->allocateAndCompute(
         refer_tile, tile.m_pos,

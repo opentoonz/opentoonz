@@ -2,9 +2,9 @@
 
 #include "stdfx.h"
 #include "tfxparam.h"
-//#include "trop.h"
+// #include "trop.h"
 #include "tdoubleparam.h"
-//#include "tnotanimatableparam.h"
+// #include "tnotanimatableparam.h"
 #include "tpixelgr.h"
 #include "trasterfx.h"
 
@@ -26,7 +26,7 @@ inline Status operator|(const Status &l, const Status &r) {
 }
 inline int operator&(const Status &l) { return int(l); }
 Status getFxStatus(const TRasterFxPort &port0, const TRasterFxPort &port1) {
-  Status status                    = StatusGood;
+  Status status = StatusGood;
   if (!port0.isConnected()) status = status | Port0NotConnected;
   if (!port1.isConnected()) status = status | Port1NotConnected;
   return status;
@@ -87,6 +87,57 @@ void doLocalTransparency(TRasterPT<T> out, TRasterPT<T> src, TRasterPT<T> ref,
   src->unlock();
 }
 
+template <>
+void doLocalTransparency<TPixelF, TPixelGRF, float>(TRasterFP out,
+                                                    TRasterFP src,
+                                                    TRasterFP ref,
+                                                    double transp) {
+  out->lock();
+  ref->lock();
+  src->lock();
+
+  TPixelF *outRow = out->pixels();
+  TPixelF *refRow = ref->pixels();
+  TPixelF *srcRow = src->pixels();
+  int outWrap     = out->getWrap();
+  int refWrap     = ref->getWrap();
+  int srcWrap     = src->getWrap();
+
+  TPixelF *outPix  = outRow;
+  TPixelF *srcPix  = srcRow;
+  TPixelF *refPix  = refRow;
+  TPixelF *lastPix = outRow + outWrap * out->getLy();
+
+  while (outPix < lastPix) {
+    TPixelF *endPix = outPix + out->getLx();
+    while (outPix < endPix) {
+      // clamp 0.f to 1.f in case computing HDR
+      float refv =
+          std::min(1.f, std::max(0.f, (TPixelGRF::from(*refPix).value)));
+      float local_transp = 1.f - refv * transp;
+      if (local_transp > 0.f) {
+        outPix->r = local_transp * srcPix->r;
+        outPix->g = local_transp * srcPix->g;
+        outPix->b = local_transp * srcPix->b;
+        outPix->m = local_transp * srcPix->m;
+      } else {
+        outPix->r = outPix->g = outPix->b = outPix->m = 0.f;
+      }
+      ++outPix;
+      ++refPix;
+      ++srcPix;
+    }
+    srcRow += srcWrap;
+    outRow += outWrap;
+    refRow += refWrap;
+    srcPix = srcRow;
+    outPix = outRow;
+    refPix = refRow;
+  }
+  out->unlock();
+  ref->unlock();
+  src->unlock();
+}
 //-------------------------------------------------------------------
 
 inline double func(int x, int y, int lx, int ly) {
@@ -109,7 +160,7 @@ void drawCheckboard(TRaster32P &raster) {
   }
   raster->unlock();
 }
-};
+};  // namespace
 
 //-------------------------------------------------------------------
 
@@ -125,6 +176,7 @@ public:
     addInputPort("Reference", m_ref);
     bindParam(this, "value", m_value);
     m_value->setValueRange(0, 100);
+    enableComputeInFloat(true);
   }
   virtual ~LocalTransparencyFx() {}
 
@@ -150,19 +202,28 @@ public:
     // TRaster32P ref32 (refTile.getRaster());
     TRaster32P out32(tile.getRaster());
     TRaster32P src32(srcTile.getRaster());
-    if (out32 && src32)
+    if (out32 && src32) {
       doLocalTransparency<TPixelRGBM32, TPixelGR8, UCHAR>(
           out32, src32, out32, m_value->getValue(frame) / 100.);
-    else {
-      // TRaster64P ref64(refTile.getRaster());
-      TRaster64P out64(tile.getRaster());
-      TRaster64P src64(srcTile.getRaster());
-      if (out64 && src64)
-        doLocalTransparency<TPixelRGBM64, TPixelGR16, USHORT>(
-            out64, src64, out64, m_value->getValue(frame) / 100.);
-      else
-        throw TException("LocalTransparencyFx: unsupported raster type");
+      return;
     }
+    // TRaster64P ref64(refTile.getRaster());
+    TRaster64P out64(tile.getRaster());
+    TRaster64P src64(srcTile.getRaster());
+    if (out64 && src64) {
+      doLocalTransparency<TPixelRGBM64, TPixelGR16, USHORT>(
+          out64, src64, out64, m_value->getValue(frame) / 100.);
+      return;
+    }
+    TRasterFP outF(tile.getRaster());
+    TRasterFP srcF(srcTile.getRaster());
+    if (outF && srcF) {
+      doLocalTransparency<TPixelF, TPixelGRF, float>(
+          outF, srcF, outF, m_value->getValue(frame) / 100.);
+      return;
+    }
+
+    throw TException("LocalTransparencyFx: unsupported raster type");
   }
 
   bool checkBeforeCompute(TTile &tile, double frame,

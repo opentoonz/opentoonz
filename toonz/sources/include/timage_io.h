@@ -3,9 +3,9 @@
 #ifndef TIMAGE_IO_INCLUDED
 #define TIMAGE_IO_INCLUDED
 
-//#include "trasterimage.h"
-//#include "texception.h"
-//#include "tfilepath.h"
+// #include "trasterimage.h"
+// #include "texception.h"
+// #include "tfilepath.h"
 #include <QStringList>
 
 #include "tfilepath_io.h"
@@ -28,7 +28,7 @@ class Reader;
 class Writer;
 class VectorReader;
 class VectorWriter;
-}
+}  // namespace Tiio
 class TPropertyGroup;
 class TImageInfo;
 
@@ -93,9 +93,11 @@ protected:
   bool isOpen() const;
   bool m_readGreytones;
   bool m_is64BitEnabled;
+  bool m_isFloatEnabled;
   int m_shrink;
   TRect m_region;
   static bool m_safeMode;
+  double m_colorSpaceGamma;
 
 public:
   static void setSafeModeReadingForTzl(bool activated) {
@@ -148,6 +150,9 @@ Note: if the region, or part of it, is not contained in the image
   void enable16BitRead(bool is64bitEnabled) {
     m_is64BitEnabled = is64bitEnabled;
   }
+  void enableFloatRead(bool isFloatEnabled) {
+    m_isFloatEnabled = isFloatEnabled;
+  }
 
   int getShrink() const { return m_shrink; }
   /*!
@@ -174,6 +179,10 @@ Region dimension doesn't consider shrink
   void getTzpPaletteColorNames(
       std::map<int, std::pair<std::string, std::string>>
           &pltColorNames);  // colorindex(<256: paint), pagename, colorname
+
+  void setColorSpaceGamma(const double colorSpaceGamma) {
+    m_colorSpaceGamma = colorSpaceGamma;
+  }
 };
 
 //-----------------------------------------------------------

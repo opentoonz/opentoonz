@@ -16,7 +16,7 @@
 #include "trop.h"
 
 // File I/O includes
-//#include "tstream.h"
+// #include "tstream.h"
 
 // Qt classes
 #include <QRegion>
@@ -134,6 +134,8 @@ inline int getRasterType(const TRasterP &ras) {
     return TCacheResource::RGBM32;
   else if ((TRaster64P)ras)
     return TCacheResource::RGBM64;
+  else if ((TRasterFP)ras)
+    return TCacheResource::RGBMFloat;
   else if ((TRasterCM32P)ras)
     return TCacheResource::CM32;
 
@@ -210,6 +212,8 @@ inline void loadCompressed(const TFilePath &fp, TRasterP &ras,
     ras = TRaster32P(latticeStep, latticeStep);
   else if (rasType == TCacheResource::RGBM64)
     ras = TRaster64P(latticeStep, latticeStep);
+  else if (rasType == TCacheResource::RGBMFloat)
+    ras = TRasterFP(latticeStep, latticeStep);
   else
     assert(false);
 
@@ -227,7 +231,7 @@ inline void loadCompressed(const TFilePath &fp, TRasterP &ras,
 
   ras->unlock();
 }
-}
+}  // namespace
 
 //****************************************************************************************************
 //    TCacheResourceP implementation
@@ -336,6 +340,8 @@ TRasterP TCacheResource::buildCompatibleRaster(const TDimension &size) {
     result = TRaster32P(size);
   else if (m_tileType == RGBM64)
     result = TRaster64P(size);
+  else if (m_tileType == RGBMFloat)
+    result = TRasterFP(size);
   else if (m_tileType == CM32)
     result = TRasterCM32P(size);
 
@@ -392,6 +398,9 @@ inline TRasterP TCacheResource::createCellRaster(int rasterType,
     img    = TRasterImageP(result);
   } else if (rasterType == TCacheResource::RGBM64) {
     result = TRaster64P(latticeStep, latticeStep);
+    img    = TRasterImageP(result);
+  } else if (rasterType == TCacheResource::RGBMFloat) {
+    result = TRasterFP(latticeStep, latticeStep);
     img    = TRasterImageP(result);
   } else if (rasterType == TCacheResource::CM32) {
     result = TRasterCM32P(latticeStep, latticeStep);
@@ -791,9 +800,10 @@ int TCacheResource::size() const {
   // NOTE: It's better to store the size incrementally. This complies
   // with the possibility of specifying a bbox to fit the stored cells to...
 
-  return m_tileType == NONE ? 0
-                            : m_tileType == RGBM64 ? (m_cellsCount << 11)
-                                                   : (m_cellsCount << 10);
+  return m_tileType == NONE        ? 0
+         : m_tileType == RGBM64    ? (m_cellsCount << 11)
+         : m_tileType == RGBMFloat ? (m_cellsCount << 12)
+                                   : (m_cellsCount << 10);
 }
 
 //****************************************************************************************************

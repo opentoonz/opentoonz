@@ -50,7 +50,10 @@
 		<file>icons/dark/actions/16/butt_cap.svg</file>
 		<file>icons/dark/actions/16/miter_join.svg</file>
 
-		<!-- File / Common -->
+    <file>icons/dark/actions/16/rotateleft.svg</file>
+    <file>icons/dark/actions/16/rotateright.svg</file>
+    
+    <!-- File / Common -->
 		<file>icons/dark/actions/16/menu.svg</file>
 		<file>icons/dark/actions/16/export.svg</file>
 		<file>icons/dark/actions/16/import.svg</file>
@@ -377,7 +380,11 @@
 		<file>icons/dark/actions/16/unlink.svg</file>
 		<file>icons/dark/actions/16/macro.svg</file>
 
-		<!-- Modes, Types, Options -->
+    <file>icons/dark/actions/16/toggle_nav_tag.svg</file>
+    <file>icons/dark/actions/16/next_nav_tag.svg</file>
+    <file>icons/dark/actions/16/prev_nav_tag.svg</file>
+
+    <!-- Modes, Types, Options -->
 		<file>icons/dark/actions/16/ink_check.svg</file>
 		<file>icons/dark/actions/16/inks_only.svg</file>
 		<file>icons/dark/actions/16/transparency_check.svg</file>

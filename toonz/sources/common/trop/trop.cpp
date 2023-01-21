@@ -2,13 +2,14 @@
 
 #include "trop.h"
 #include "tconvert.h"
-//#include "trastercm.h"
+// #include "trastercm.h"
 #ifndef TNZCORE_LIGHT
 #include "timagecache.h"
 #include "ttile.h"
 #include "trasterimage.h"
 #include "ttoonzimage.h"
 #endif
+#include "tpixelutils.h"
 
 TString TRopException::getMessage() const { return ::to_wstring(message); }
 
@@ -92,9 +93,9 @@ TRaster32P TRop::copyAndSwapRBChannels(const TRaster32P &srcRaster) {
 
 void TRop::copy(TRasterP dst, const TRasterP &src) {
   assert(!((TRasterCM32P)src) || (TRasterCM32P)dst);
-  if (dst->getPixelSize() == src->getPixelSize())
+  if (dst->getPixelSize() == src->getPixelSize()) {
     dst->copy(src);
-  else {
+  } else {
     if (dst->getBounds() != src->getBounds()) {
       TRect rect = dst->getBounds() * src->getBounds();
       if (rect.isEmpty()) return;
@@ -116,6 +117,11 @@ public:
     for (int i = 0; i <= insteps; i++)
       m_table.push_back(
           (Q)((outsteps) * (pow(i / inspace, 1.0 / gamma)) + 0.5));
+  }
+  Gamma_Lut(int insteps, double gamma) {  // compute in 0-1
+    float inspace = (float)(insteps);
+    for (int i = 0; i <= insteps; i++)
+      m_table.push_back((Q)(pow(i / inspace, 1.f / (float)gamma)));
   }
 };
 
@@ -141,6 +147,37 @@ pix->b= pix->b*pix->m/T::maxChannelValue;
     }
   }
 }
+
+template <>
+void doGammaCorrect<TPixelF, float>(TRasterFP raster, double gamma) {
+  Gamma_Lut<float> lut(TPixel64::maxChannelValue, gamma);  // compute in 0.0-1.0
+  double step      = 1.0 / double(TPixel64::maxChannelValue);
+  double invGamma  = 1.0 / gamma;
+  auto getLutValue = [&](float val) {
+    if (val < 0.f)
+      return val;  // keep the negative input unchanged (the same behavior as
+                   // Nuke)
+    else if (val >= 1.f)
+      return std::pow(val, (float)invGamma);
+    float v     = val * float(TPixel64::maxChannelValue);
+    int id      = (int)tfloor(v);
+    float ratio = v - float(id);
+    return lut.m_table[id] * (1.f - ratio) + lut.m_table[id + 1] * ratio;
+  };
+
+  // ? doesn't it need to consider alpha ?
+  for (int j = 0; j < raster->getLy(); j++) {
+    TPixelF *pix    = raster->pixels(j);
+    TPixelF *endPix = pix + raster->getLx();
+    while (pix < endPix) {
+      pix->r = getLutValue(pix->r);
+      pix->g = getLutValue(pix->g);
+      pix->b = getLutValue(pix->b);
+      pix++;
+    }
+  }
+}
+
 template <class T, class Q>
 void doGammaCorrectRGBM(TRasterPT<T> raster, double gammar, double gammag,
                         double gammab, double gammam) {
@@ -167,7 +204,30 @@ pix->b= pix->b*pix->m/T::maxChannelValue;
     }
   }
 }
+
+template <>
+void doGammaCorrectRGBM<TPixelF, float>(TRasterFP raster, double gammar,
+                                        double gammag, double gammab,
+                                        double gammam) {
+  double invGammaR = 1.0 / gammar;
+  double invGammaG = 1.0 / gammag;
+  double invGammaB = 1.0 / gammab;
+  double invGammaM = 1.0 / gammam;
+  for (int j = 0; j < raster->getLy(); j++) {
+    TPixelF *pix    = raster->pixels(j);
+    TPixelF *endPix = pix + raster->getLx();
+    while (pix < endPix) {
+      // keep the negative input unchanged (the same behavior as Nuke)
+      if (pix->r > 0.f) pix->r = (float)std::pow(pix->r, invGammaR);
+      if (pix->g > 0.f) pix->g = (float)std::pow(pix->g, invGammaG);
+      if (pix->b > 0.f) pix->b = (float)std::pow(pix->b, invGammaB);
+      if (pix->m > 0.f) pix->m = (float)std::pow(pix->m, invGammaM);
+      pix++;
+    }
+  }
 }
+
+}  // namespace
 //-------------------------------------------------------------------
 
 void TRop::gammaCorrect(TRasterP raster, double gamma) {
@@ -178,6 +238,8 @@ void TRop::gammaCorrect(TRasterP raster, double gamma) {
     doGammaCorrect<TPixel32, UCHAR>(raster, gamma);
   else if ((TRaster64P)raster)
     doGammaCorrect<TPixel64, USHORT>(raster, gamma);
+  else if ((TRasterFP)raster)
+    doGammaCorrect<TPixelF, float>(raster, gamma);
   else {
     raster->unlock();
     throw TRopException("isOpaque: unsupported pixel type");
@@ -200,6 +262,8 @@ void TRop::gammaCorrectRGBM(TRasterP raster, double gammar, double gammag,
   else if ((TRaster64P)raster)
     doGammaCorrectRGBM<TPixel64, USHORT>(raster, gammar, gammag, gammab,
                                          gammam);
+  else if ((TRasterFP)raster)
+    doGammaCorrectRGBM<TPixelF, float>(raster, gammar, gammag, gammab, gammam);
   else {
     raster->unlock();
     throw TRopException("isOpaque: unsupported pixel type");
@@ -261,6 +325,8 @@ void TRop::setChannel(const TRasterP &rin, TRasterP rout, UCHAR chan,
     doSetChannel<TPixel32>(rin, rout, chan, greytones);
   else if ((TRaster64P)rin && (TRaster64P)rout)
     doSetChannel<TPixel64>(rin, rout, chan, greytones);
+  else if ((TRasterFP)rin && (TRasterFP)rout)
+    doSetChannel<TPixelF>(rin, rout, chan, greytones);
   else {
     rout->unlock();
     throw TRopException("setChannel: unsupported pixel type");
@@ -282,9 +348,9 @@ TRasterP TRop::shrink(TRasterP rin, int shrink) {
   if ((TRaster32P)rin)
     rout = TRaster32P(lx, ly);
   else if ((TRaster64P)rin)
-    rout                      = TRaster64P(lx, ly);
+    rout = TRaster64P(lx, ly);
   if ((TRasterCM32P)rin) rout = TRasterCM32P(lx, ly);
-  if ((TRasterGR8P)rin) rout  = TRasterGR8P(lx, ly);
+  if ((TRasterGR8P)rin) rout = TRasterGR8P(lx, ly);
 
   int i, j;
 
@@ -370,6 +436,8 @@ void TTile::addInCache(const TRasterP &raster) {
     TImageCache::instance()->add(m_rasterId, TRasterImageP(rin));
   else if ((TRasterGR8P)rin || (TRasterGR16P)rin)
     TImageCache::instance()->add(m_rasterId, TRasterImageP(rin));
+  else if ((TRasterFP)rin)
+    TImageCache::instance()->add(m_rasterId, TRasterImageP(rin));
   else
     assert(false);
 }
@@ -393,3 +461,291 @@ TTile::~TTile() {
 }
 
 #endif
+
+//-------------------------------------------------------------------
+
+namespace {
+template <class Q>
+class Linear_Lut {
+public:
+  inline double toLinear(double val, double gamma) {
+    return std::pow(val, gamma);
+    // if (val <= 0.04045)
+    //   return val / 12.92;
+    // else
+    //   return std::pow((val + 0.055) / 1.055, 2.4);
+  }
+
+  std::vector<Q> m_table;
+  Linear_Lut(int insteps, int outsteps, double gamma) {
+    double inspace = (double)(insteps);
+    for (int i = 0; i <= insteps; i++) {
+      m_table.push_back(
+          (Q)((outsteps)*toLinear((double)i / inspace, gamma) + 0.5));
+    }
+  }
+  Linear_Lut(int insteps, double gamma) {  // compute in 0-1
+    double inspace = (double)(insteps);
+    for (int i = 0; i <= insteps; i++)
+      m_table.push_back((Q)(toLinear((double)i / inspace, gamma)));
+  }
+};
+
+template <class T, class Q>
+void doLinearRGB(TRasterPT<T> raster, double gamma) {
+  Linear_Lut<Q> lut(T::maxChannelValue, T::maxChannelValue, gamma);
+
+  int j;
+  for (j = 0; j < raster->getLy(); j++) {
+    T *pix    = raster->pixels(j);
+    T *endPix = pix + raster->getLx();
+    while (pix < endPix) {
+      if (pix->m > 0) {
+        pix->r = lut.m_table[pix->r];
+        pix->b = lut.m_table[pix->b];
+        pix->g = lut.m_table[pix->g];
+      }
+      pix++;
+    }
+  }
+}
+
+template <>
+void doLinearRGB<TPixelF, float>(TRasterFP raster, double gamma) {
+  Linear_Lut<float> lut(TPixel64::maxChannelValue,
+                        gamma);  // compute in 0.0-1.0
+
+  double step      = 1.0 / double(TPixel64::maxChannelValue);
+  auto getLutValue = [&](float val) {
+    if (val < 0.f)
+      return val;  // keep the negative input unchanged (the same behavior as
+                   // Nuke)
+    else if (val >= 1.f)
+      return (float)lut.toLinear(val, gamma);
+    float v     = val * float(TPixel64::maxChannelValue);
+    int id      = (int)tfloor(v);
+    float ratio = v - float(id);
+    return lut.m_table[id] * (1.f - ratio) + lut.m_table[id + 1] * ratio;
+  };
+
+  for (int j = 0; j < raster->getLy(); j++) {
+    TPixelF *pix    = raster->pixels(j);
+    TPixelF *endPix = pix + raster->getLx();
+    while (pix < endPix) {
+      if (pix->m > 0.f) {
+        pix->r = getLutValue(pix->r);
+        pix->g = getLutValue(pix->g);
+        pix->b = getLutValue(pix->b);
+      }
+      pix++;
+    }
+  }
+}
+
+template <class Q>
+class sRGB_Lut {
+public:
+  inline double to_sRGB(double lin, double gamma) {
+    double inv_gamma = 1.0 / gamma;
+    return std::pow(lin, inv_gamma);
+    // if (lin <= 0.0031308)
+    //   return 12.92 * lin;
+    // else
+    //   return 1.055 * std::pow(lin, 1.0 / 2.4) - 0.055;
+  }
+  std::vector<Q> m_table;
+
+  sRGB_Lut(int insteps, int outsteps, double gamma) {
+    double inspace = (double)(insteps);
+    for (int i = 0; i <= insteps; i++) {
+      m_table.push_back(
+          (Q)((outsteps)*to_sRGB((double)i / inspace, gamma) + 0.5));
+    }
+  }
+  sRGB_Lut(int insteps, double gamma) {  // compute in 0-1
+    double inspace = (double)(insteps);
+    for (int i = 0; i <= insteps; i++)
+      m_table.push_back((Q)(to_sRGB((double)i / inspace, gamma)));
+  }
+};
+
+template <class T, class Q>
+void do_sRGB(TRasterPT<T> raster, double gamma) {
+  sRGB_Lut<Q> lut(T::maxChannelValue, T::maxChannelValue, gamma);
+
+  int j;
+  for (j = 0; j < raster->getLy(); j++) {
+    T *pix    = raster->pixels(j);
+    T *endPix = pix + raster->getLx();
+    while (pix < endPix) {
+      if (pix->m > 0) {
+        pix->r = lut.m_table[pix->r];
+        pix->b = lut.m_table[pix->b];
+        pix->g = lut.m_table[pix->g];
+      }
+      pix++;
+    }
+  }
+}
+
+template <>
+void do_sRGB<TPixelF, float>(TRasterFP raster, double gamma) {
+  sRGB_Lut<float> lut(TPixel64::maxChannelValue, gamma);  // compute in 0.0-1.0
+
+  double step      = 1.0 / double(TPixel64::maxChannelValue);
+  auto getLutValue = [&](float val) {
+    if (val < 0.f)
+      return val;  // keep the negative input unchanged (the same behavior as
+                   // Nuke)
+    else if (val >= 1.f)
+      return (float)lut.to_sRGB(val, gamma);
+    float v     = val * float(TPixel64::maxChannelValue);
+    int id      = (int)tfloor(v);
+    float ratio = v - float(id);
+    return lut.m_table[id] * (1.f - ratio) + lut.m_table[id + 1] * ratio;
+  };
+
+  for (int j = 0; j < raster->getLy(); j++) {
+    TPixelF *pix    = raster->pixels(j);
+    TPixelF *endPix = pix + raster->getLx();
+    while (pix < endPix) {
+      if (pix->m > 0.f) {
+        pix->r = getLutValue(pix->r);
+        pix->g = getLutValue(pix->g);
+        pix->b = getLutValue(pix->b);
+      }
+      pix++;
+    }
+  }
+}
+
+}  // namespace
+
+void TRop::toLinearRGB(TRasterP raster, double gamma,
+                       bool sourceIsPremultiplied) {
+  // if raster is already in linear color space, do nothing
+  if (raster->isLinear()) return;
+
+  raster->lock();
+
+  if (sourceIsPremultiplied) TRop::depremultiply(raster);
+
+  if ((TRaster32P)raster)
+    doLinearRGB<TPixel32, UCHAR>(raster, gamma);
+  else if ((TRaster64P)raster)
+    doLinearRGB<TPixel64, USHORT>(raster, gamma);
+  else if ((TRasterFP)raster)
+    doLinearRGB<TPixelF, float>(raster, gamma);
+  else {
+    raster->unlock();
+    throw TRopException("toLinearRGB: unsupported pixel type");
+  }
+
+  raster->setLinear(true);
+
+  if (sourceIsPremultiplied) TRop::premultiply(raster);
+
+  raster->unlock();
+}
+
+void TRop::tosRGB(TRasterP raster, double gamma, bool sourceIsPremultiplied) {
+  // if raster is already in sRGB color space, do nothing
+  if (!raster->isLinear()) return;
+
+  raster->lock();
+
+  if (sourceIsPremultiplied) TRop::depremultiply(raster);
+
+  if ((TRaster32P)raster)
+    do_sRGB<TPixel32, UCHAR>(raster, gamma);
+  else if ((TRaster64P)raster)
+    do_sRGB<TPixel64, USHORT>(raster, gamma);
+  else if ((TRasterFP)raster)
+    do_sRGB<TPixelF, float>(raster, gamma);
+  else {
+    raster->unlock();
+    throw TRopException("tosRGB: unsupported pixel type");
+  }
+
+  raster->setLinear(false);
+
+  if (sourceIsPremultiplied) TRop::premultiply(raster);
+
+  raster->unlock();
+}
+
+namespace {
+template <class T>
+void do_adjustGain(TRasterPT<T> raster, const float gainScale) {
+  int j;
+  for (j = 0; j < raster->getLy(); j++) {
+    T *pix    = raster->pixels(j);
+    T *endPix = pix + raster->getLx();
+    while (pix < endPix) {
+      if (pix->m > 0) {
+        float val;
+        val    = (float)pix->r * gainScale + 0.5f;
+        pix->r = (typename T::Channel)((val > (float)T::maxChannelValue)
+                                           ? (float)T::maxChannelValue
+                                           : val);
+        val    = (float)pix->g * gainScale + 0.5f;
+        pix->g = (typename T::Channel)((val > (float)T::maxChannelValue)
+                                           ? (float)T::maxChannelValue
+                                           : val);
+        val    = (float)pix->b * gainScale + 0.5f;
+        pix->b = (typename T::Channel)((val > (float)T::maxChannelValue)
+                                           ? (float)T::maxChannelValue
+                                           : val);
+      }
+      pix++;
+    }
+  }
+}
+
+template <>
+void do_adjustGain<TPixelF>(TRasterFP raster, const float gainScale) {
+  for (int j = 0; j < raster->getLy(); j++) {
+    TPixelF *pix    = raster->pixels(j);
+    TPixelF *endPix = pix + raster->getLx();
+    while (pix < endPix) {
+      if (pix->m > 0.f) {
+        pix->r *= gainScale;
+        pix->g *= gainScale;
+        pix->b *= gainScale;
+      }
+      pix++;
+    }
+  }
+}
+}  // namespace
+
+// used in the gain adjustment feature of the flipbook
+void TRop::adjustGain(TRasterP raster, int gainStep, double gamma) {
+  if (gainStep == 0) return;
+
+  std::cout << "adjustGain gamma = " << gamma << std::endl;
+  float gainScale = std::pow(2., (double)gainStep / 2.);
+
+  raster->lock();
+
+  TRop::depremultiply(raster);
+
+  TRop::toLinearRGB(raster, gamma, false);
+
+  if ((TRaster32P)raster)
+    do_adjustGain<TPixel32>(raster, gainScale);
+  else if ((TRaster64P)raster)
+    do_adjustGain<TPixel64>(raster, gainScale);
+  else if ((TRasterFP)raster)
+    do_adjustGain<TPixelF>(raster, gainScale);
+  else {
+    raster->unlock();
+    throw TRopException("isOpaque: unsupported pixel type");
+  }
+
+  TRop::tosRGB(raster, gamma, false);
+
+  TRop::premultiply(raster);
+
+  raster->unlock();
+}

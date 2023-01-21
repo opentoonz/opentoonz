@@ -3,8 +3,15 @@
  	<vbox>
 		<control>on_focus_distance</control>
 		<control>bokeh_amount</control>
+		<control>linearizeMode</control>
+    <vbox modeSensitive="linearizeMode" mode="1">
 		<control>hardness</control>
-  	</vbox>
+		</vbox>
+    <vbox modeSensitive="linearizeMode" mode="0">
+		<control>gamma</control>
+		<control>gammaAdjust</control>
+	</vbox>
+	</vbox>
   
       	<separator label="Source1"/>
    	<vbox>

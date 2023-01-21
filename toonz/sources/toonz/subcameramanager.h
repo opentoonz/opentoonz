@@ -110,7 +110,7 @@ private:
   TPointD cameraToWin(SceneViewer *viewer, const TPointD &cameraPos) const;
 
   UCHAR getSubCameraDragEnum(SceneViewer *viewer, const QPointF &mousePos);
-  TPoint getSubCameraDragDistance(SceneViewer *viewer, const QPointF &mousePos);
+  TPoint getSubCameraDragDistance(SceneViewer *viewer, QPointF &mousePos);
 };
 
 #endif  // SUBCAMERAMANAGER_INCLUDED

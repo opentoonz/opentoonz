@@ -99,6 +99,49 @@ void change_(T *image_array, const int height, const int width,
     image_scanline += channels * wrap;
   }
 }
+template <>
+void change_(float *image_array, const int height, const int width,
+             const int wrap,  // pixel
+             const int channels, const bool alpha_rendering_sw,
+             const double a11  // geometry of 2D affine transformation
+             ,
+             const double a12, const double a13, const double a21,
+             const double a22, const double a23, const double zz,
+             const int octaves_start  // 0<=
+             ,
+             const int octaves_end  // 0<=
+             ,
+             const double persistence  // Not 0
+) {
+  const float max_div   = 1.f;
+  const float max_div_2 = 0.5f;
+
+  const double maxi =
+      perlin_noise_minmax_(octaves_start, octaves_end, persistence);
+
+  using namespace igs::image::rgba;
+  float *image_crnt;
+  float *image_scanline = image_array;
+  for (int yy = 0; yy < height; ++yy) {
+    image_crnt = image_scanline;
+    for (int xx = 0; xx < width; ++xx, image_crnt += channels) {
+      const float val = static_cast<float>(
+          perlin_noise_3d_(xx * a11 + yy * a12 + a13, xx * a21 + yy * a22 + a23,
+                           zz, octaves_start, octaves_end, persistence) /
+              maxi * 0.5f +
+          0.5f);
+      for (int zz = 0; zz < channels; ++zz) {
+        if (!alpha_rendering_sw && (alp == zz)) {
+          image_crnt[zz] = 1.f;
+        } else {
+          image_crnt[zz] = val;
+        }
+      }
+    }
+    image_scanline += channels * wrap;
+  }
+}
+
 }  // namespace
 // #include "igs_geometry2d.h"
 void igs::perlin_noise::change(
@@ -125,6 +168,10 @@ void igs::perlin_noise::change(
     change_(reinterpret_cast<unsigned short *>(image_array), height, width,
             wrap, channels, alpha_rendering_sw, a11, a12, a13, a21, a22, a23,
             zz, octaves_start, octaves_end, persistence);
+  } else if (std::numeric_limits<float>::digits == bits) {
+    change_(reinterpret_cast<float *>(image_array), height, width, wrap,
+            channels, alpha_rendering_sw, a11, a12, a13, a21, a22, a23, zz,
+            octaves_start, octaves_end, persistence);
   } else {
     throw std::domain_error("Bad bits,Not uchar/ushort");
   }

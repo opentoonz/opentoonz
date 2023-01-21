@@ -44,6 +44,8 @@ public:
 
     addInputPort("Source", m_input);
     m_radius->setValueRange(0.0, std::numeric_limits<double>::max());
+
+    enableComputeInFloat(true);
   }
 
   ~BaseRaylitFx() {}
@@ -174,7 +176,10 @@ void RaylitFx::doCompute(TTile &tileOut, double frame,
     params.m_lightOriginSrc.y = params.m_lightOriginDst.y = p.y;
     params.m_lightOriginSrc.z = params.m_lightOriginDst.z =
         (int)m_z->getValue(frame);
-    params.m_color        = m_color->getValue(frame);
+    // currently tile should be nonlinear
+    assert(!tileOut.getRaster()->isLinear());
+    params.m_color = m_color->getValue(frame, tileOut.getRaster()->isLinear(),
+                                       ri.m_colorSpaceGamma);
     params.m_intensity    = m_intensity->getValue(frame);
     params.m_decay        = m_decay->getValue(frame);
     params.m_smoothness   = m_smoothness->getValue(frame);

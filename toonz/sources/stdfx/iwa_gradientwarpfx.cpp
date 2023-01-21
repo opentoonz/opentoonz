@@ -4,6 +4,7 @@
 ------------------------------------*/
 
 #include "iwa_gradientwarpfx.h"
+#include "trop.h"
 
 /*------------------------------------------------------------
  ソース画像を０〜１に正規化してホストメモリに読み込む
@@ -31,6 +32,8 @@ void Iwa_GradientWarpFx::setSourceRaster(const RASTER srcRas, float4 *dstMem,
 template <typename RASTER, typename PIXEL>
 void Iwa_GradientWarpFx::setWarperRaster(const RASTER warperRas, float *dstMem,
                                          TDimensionI dim) {
+  auto clamp01 = [](float val) { return std::min(1.f, std::max(0.f, val)); };
+
   float *chann_p = dstMem;
   for (int j = 0; j < dim.ly; j++) {
     PIXEL *pix = warperRas->pixels(j);
@@ -39,7 +42,7 @@ void Iwa_GradientWarpFx::setWarperRaster(const RASTER warperRas, float *dstMem,
       float g = (float)pix->g / (float)PIXEL::maxChannelValue;
       float b = (float)pix->b / (float)PIXEL::maxChannelValue;
 
-      (*chann_p) = 0.298912f * r + 0.586611f * g + 0.114478f * b;
+      (*chann_p) = clamp01(0.298912f * r + 0.586611f * g + 0.114478f * b);
     }
   }
 }
@@ -77,6 +80,22 @@ void Iwa_GradientWarpFx::setOutputRaster(float4 *srcMem, const RASTER dstRas,
   }
 }
 
+template <>
+void Iwa_GradientWarpFx::setOutputRaster<TRasterFP, TPixelF>(
+    float4 *srcMem, const TRasterFP dstRas, TDimensionI dim, int2 margin) {
+  int out_j = 0;
+  for (int j = margin.y; j < dstRas->getLy() + margin.y; j++, out_j++) {
+    TPixelF *pix   = dstRas->pixels(out_j);
+    float4 *chan_p = srcMem;
+    chan_p += j * dim.lx + margin.x;
+    for (int i = 0; i < dstRas->getLx(); i++, pix++, chan_p++) {
+      pix->r = (*chan_p).x;
+      pix->g = (*chan_p).y;
+      pix->b = (*chan_p).z;
+      pix->m = (*chan_p).w;
+    }
+  }
+}
 //------------------------------------
 
 Iwa_GradientWarpFx::Iwa_GradientWarpFx()
@@ -97,6 +116,7 @@ Iwa_GradientWarpFx::Iwa_GradientWarpFx()
   m_sampling_size->setMeasureName("fxLength");
   m_sampling_size->setValueRange(0.1, 20.0);
 
+  enableComputeInFloat(true);
   // Version 1: sampling distance had been always 1 pixel.
   // Version 2: sampling distance can be specified with the parameter.
   // this must be called after binding the parameters (see onFxVersionSet())
@@ -146,7 +166,8 @@ void Iwa_GradientWarpFx::doCompute(TTile &tile, double frame,
   int margin = static_cast<int>(ceil((std::abs(hLength) < std::abs(vLength))
                                          ? std::abs(vLength)
                                          : std::abs(hLength)));
-  margin     = std::max(margin, static_cast<int>(std::ceil(sampling_size)) + 1);
+
+  margin = std::max(margin, static_cast<int>(std::ceil(sampling_size)) + 1);
 
   /*- 素材計算範囲を計算 -*/
   /*- 出力範囲 -*/
@@ -156,24 +177,30 @@ void Iwa_GradientWarpFx::doCompute(TTile &tile, double frame,
   TDimensionI enlargedDim((int)enlargedRect.getLx(), (int)enlargedRect.getLy());
 
   /*- ソース画像を正規化して格納 -*/
+  TTile sourceTile;
+  m_source->allocateAndCompute(sourceTile, enlargedRect.getP00(), enlargedDim,
+                               tile.getRaster(), frame, settings);
+
   float4 *source_host;
-  TRasterGR8P source_host_ras(enlargedDim.lx * sizeof(float4), enlargedDim.ly);
-  source_host_ras->lock();
-  source_host = (float4 *)source_host_ras->getRawData();
-  {
-    /*-
-     * タイルはこのフォーカス内だけ使用。正規化してsource_hostに取り込んだらもう使わない。
-     * -*/
-    TTile sourceTile;
-    m_source->allocateAndCompute(sourceTile, enlargedRect.getP00(), enlargedDim,
-                                 tile.getRaster(), frame, settings);
-    /*- タイルの画像を０〜１に正規化してホストメモリに読み込む -*/
-    TRaster32P ras32 = (TRaster32P)sourceTile.getRaster();
-    TRaster64P ras64 = (TRaster64P)sourceTile.getRaster();
-    if (ras32)
-      setSourceRaster<TRaster32P, TPixel32>(ras32, source_host, enlargedDim);
-    else if (ras64)
-      setSourceRaster<TRaster64P, TPixel64>(ras64, source_host, enlargedDim);
+  TRasterGR8P source_host_ras;
+  if (tile.getRaster()->getPixelSize() == 4 ||
+      tile.getRaster()->getPixelSize() == 8) {
+    source_host_ras =
+        TRasterGR8P(enlargedDim.lx * sizeof(float4), enlargedDim.ly);
+    source_host_ras->lock();
+    source_host = (float4 *)source_host_ras->getRawData();
+    {
+      /*- タイルの画像を０〜１に正規化してホストメモリに読み込む -*/
+      TRaster32P ras32 = (TRaster32P)sourceTile.getRaster();
+      TRaster64P ras64 = (TRaster64P)sourceTile.getRaster();
+      if (ras32)
+        setSourceRaster<TRaster32P, TPixel32>(ras32, source_host, enlargedDim);
+      else if (ras64)
+        setSourceRaster<TRaster64P, TPixel64>(ras64, source_host, enlargedDim);
+    }
+  } else if (tile.getRaster()->getPixelSize() == 16) {
+    source_host =
+        reinterpret_cast<float4 *>(sourceTile.getRaster()->getRawData());
   }
 
   /*- 参照画像を正規化して格納 -*/
@@ -188,13 +215,19 @@ void Iwa_GradientWarpFx::doCompute(TTile &tile, double frame,
     TTile warperTile;
     m_warper->allocateAndCompute(warperTile, enlargedRect.getP00(), enlargedDim,
                                  tile.getRaster(), frame, settings);
+    // nonlinearのはず
+    assert(!warperTile.getRaster()->isLinear());
+
     /*- タイルの画像の輝度値を０〜１に正規化してホストメモリに読み込む -*/
     TRaster32P ras32 = (TRaster32P)warperTile.getRaster();
     TRaster64P ras64 = (TRaster64P)warperTile.getRaster();
+    TRasterFP rasF   = (TRasterFP)warperTile.getRaster();
     if (ras32)
       setWarperRaster<TRaster32P, TPixel32>(ras32, warper_host, enlargedDim);
     else if (ras64)
       setWarperRaster<TRaster64P, TPixel64>(ras64, warper_host, enlargedDim);
+    else if (rasF)
+      setWarperRaster<TRasterFP, TPixelF>(rasF, warper_host, enlargedDim);
   }
 
   /*- 変位値をScale倍して増やす -*/
@@ -221,15 +254,19 @@ void Iwa_GradientWarpFx::doCompute(TTile &tile, double frame,
   tile.getRaster()->clear();
   TRaster32P outRas32 = (TRaster32P)tile.getRaster();
   TRaster64P outRas64 = (TRaster64P)tile.getRaster();
+  TRasterFP outRasF   = (TRasterFP)tile.getRaster();
   if (outRas32)
     setOutputRaster<TRaster32P, TPixel32>(source_host, outRas32, enlargedDim,
                                           yohaku);
   else if (outRas64)
     setOutputRaster<TRaster64P, TPixel64>(source_host, outRas64, enlargedDim,
                                           yohaku);
+  else if (outRasF)
+    setOutputRaster<TRasterFP, TPixelF>(source_host, outRasF, enlargedDim,
+                                        yohaku);
 
   /*- ソース画像のメモリ解放 -*/
-  source_host_ras->unlock();
+  if (source_host_ras) source_host_ras->unlock();
   /*- 参照画像のメモリ解放 -*/
   warper_host_ras->unlock();
   result_host_ras->unlock();

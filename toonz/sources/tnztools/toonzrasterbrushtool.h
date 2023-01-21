@@ -230,6 +230,11 @@ protected:
 
   bool m_propertyUpdating = false;
 
+  bool m_isStraight = false;
+  TPointD m_firstPoint;
+  TPointD m_lastPoint;
+  double m_maxPressure = -1.0;
+
 protected:
   static void drawLine(const TPointD &point, const TPointD &centre,
                        bool horizontal, bool isDecimal);

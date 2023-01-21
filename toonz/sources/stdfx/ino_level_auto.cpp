@@ -39,6 +39,7 @@ public:
                                    1.0 * ino::param_range());
     this->m_gamma->setValueRange(0.1 * ino::param_range(),
                                  10.0 * ino::param_range()); /* gamma値 */
+    enableComputeInFloat(true);
   }
   bool doGetBBox(double frame, TRectD &bBox,
                  const TRenderSettings &info) override {
@@ -65,8 +66,9 @@ void fx_(TRasterP in_ras, bool *act_sw, double *in_min_shift,
          const int camera_h) {
   TRasterGR8P in_gr8(in_ras->getLy(),
                      in_ras->getLx() * ino::channels() *
-                         ((TRaster64P)in_ras ? sizeof(unsigned short)
-                                             : sizeof(unsigned char)));
+                         ((TRaster64P)in_ras   ? sizeof(unsigned short)
+                          : (TRaster32P)in_ras ? sizeof(unsigned char)
+                                               : sizeof(float)));
   in_gr8->lock();
   ino::ras_to_arr(in_ras, ino::channels(), in_gr8->getRawData());
 
@@ -98,7 +100,8 @@ void ino_level_auto::doCompute(TTile &tile, double frame,
   }
 
   /* ------ サポートしていないPixelタイプはエラーを投げる --- */
-  if (!((TRaster32P)tile.getRaster()) && !((TRaster64P)tile.getRaster())) {
+  if (!((TRaster32P)tile.getRaster()) && !((TRaster64P)tile.getRaster()) &&
+      !((TRasterFP)tile.getRaster())) {
     throw TRopException("unsupported input pixel type");
   }
 

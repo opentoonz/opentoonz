@@ -76,8 +76,11 @@ private:
   TFrameId m_fid;    //!< Frame of the level to load
 
   bool m_64bitCompatible;  //!< Whether current image is 64-bit compatible
+  bool m_floatCompatible;  //!< Whether current image is float compatible
   int m_subsampling;       //!< Current image subsampling
   //!< NOTE: Should this be replaced by requests to the TImageCache?
+
+  double m_colorSpaceGamma;  // current gamma. only used in EXR levels
 };
 
 //-----------------------------------------------------------------------------

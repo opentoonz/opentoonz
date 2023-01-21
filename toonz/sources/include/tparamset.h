@@ -199,6 +199,7 @@ public:
   TPixel32 getDefaultValue() const;
   TPixelD getValueD(double frame) const;
   TPixel32 getValue(double frame) const;
+  TPixel32 getValue(double frame, bool linear, double colorSpaceGamma) const;
   TPixel64 getValue64(double frame) const;
   TPixel32 getPremultipliedValue(double frame) const;
 

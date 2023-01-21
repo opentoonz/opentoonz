@@ -25,6 +25,8 @@ class Iwa_BloomFx : public TStandardRasterFx {
 protected:
   TRasterFxPort m_source;
   TDoubleParamP m_gamma;
+  TDoubleParamP m_gammaAdjust;  // Gamma offset from the current color space
+                                // gamma (Version 3)
   TBoolParamP m_auto_gain;
   TDoubleParamP m_gain_adjust;
   TDoubleParamP m_gain;
@@ -55,6 +57,9 @@ public:
   bool canHandle(const TRenderSettings &info, double frame) override;
   void getParamUIs(TParamUIConcept *&concepts, int &length) override;
   void onObsoleteParamLoaded(const std::string &paramName) override;
+  void onFxVersionSet() override;
+  bool toBeComputedInLinearColorSpace(bool settingsIsLinear,
+                                      bool tileIsLinear) const override;
 };
 
 #endif

@@ -6,7 +6,7 @@
 #include <memory>
 
 #include "tparam.h"
-//#include "tfx.h"
+// #include "tfx.h"
 #include "tcommon.h"
 
 #undef DVAPI
@@ -26,6 +26,7 @@ class TParam;
 
 class DVAPI TParamVar {
   std::string m_name;
+  // hidden parameter will be hidden from the fx settings or the function editor
   bool m_isHidden;
   // Flag for an obsolete parameter used for maintaining backward-compatiblity.
   // - The obsolete parameter will call a special function

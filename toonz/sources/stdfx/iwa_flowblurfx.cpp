@@ -49,11 +49,13 @@ inline double clamp01(double val) {
 // convert sRGB color space to power space
 template <typename T = double>
 inline T to_linear_color_space(T nonlinear_color, T exposure, T gamma) {
+  if (nonlinear_color <= T(0)) return T(0);
   return std::pow(nonlinear_color, gamma) / exposure;
 }
 // convert power space to sRGB color space
 template <typename T = double>
 inline T to_nonlinear_color_space(T linear_color, T exposure, T gamma) {
+  if (linear_color <= T(0)) return T(0);
   return std::pow(linear_color * exposure, T(1) / gamma);
 }
 

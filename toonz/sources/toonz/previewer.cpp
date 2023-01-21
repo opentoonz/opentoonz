@@ -196,6 +196,9 @@ public:
   // are assumed correct.
   void refreshFrame(int frame);
 
+  void addRenderData(std::vector<TRenderer::RenderData> &datas, int frame);
+  void addFramesToRenderQueue(const std::vector<int> frames);
+
   // TRenderPort methods
   void onRenderRasterStarted(const RenderData &renderData) override;
   void onRenderRasterCompleted(const RenderData &renderData) override;
@@ -393,13 +396,11 @@ void Previewer::Imp::updateProgressBarStatus() {
   unsigned int i, pbSize = m_pbStatus.size();
   std::map<int, FrameInfo>::iterator it;
   for (i = 0; i < pbSize; ++i) {
-    it = m_frames.find(i);
-    m_pbStatus[i] =
-        (it == m_frames.end())
-            ? FlipSlider::PBFrameNotStarted
-            : ::contains(it->second.m_renderedRegion, m_previewRect)
-                  ? FlipSlider::PBFrameFinished
-                  : it->second.m_rectUnderRender.contains(m_previewRect)
+    it            = m_frames.find(i);
+    m_pbStatus[i] = (it == m_frames.end()) ? FlipSlider::PBFrameNotStarted
+                    : ::contains(it->second.m_renderedRegion, m_previewRect)
+                        ? FlipSlider::PBFrameFinished
+                    : it->second.m_rectUnderRender.contains(m_previewRect)
                         ? FlipSlider::PBFrameStarted
                         : FlipSlider::PBFrameNotStarted;
   }
@@ -675,6 +676,11 @@ void Previewer::Imp::doOnRenderRasterCompleted(const RenderData &renderData) {
 
   TRasterP ras(renderData.m_rasA);
 
+  // Linear Color Space -> sRGB
+  if (ras->isLinear()) {
+    TRop::tosRGB(ras, m_renderSettings.m_colorSpaceGamma);
+  }
+
   m_computingFrameCount--;
 
   // Find the render infos in the Previewer
@@ -706,21 +712,33 @@ void Previewer::Imp::doOnRenderRasterCompleted(const RenderData &renderData) {
       it->second
           .m_rectUnderRender);  // Extract may MODIFY IT! E.g. with shrinks..!
   cachedRas = cachedRas->extract(rectUnderRender);
+
   if (cachedRas) {
     cachedRas->copy(ras);
-    TImageCache::instance()->add(str, ri);
   }
 
-  // Update the FrameInfo
-  it->second.m_renderedRegion += toQRect(it->second.m_rectUnderRender);
-  it->second.m_rectUnderRender = TRect();
+  // Submit the image to the cache, for all cluster's frames
+  unsigned int i, size = renderData.m_frames.size();
+  for (i = 0; i < size; ++i) {
+    int f                                   = renderData.m_frames[i];
+    std::map<int, FrameInfo>::iterator f_it = m_frames.find(f);
+    if (f_it == m_frames.end()) continue;
 
-  // Update the progress bar status
-  if (frame < m_pbStatus.size())
-    m_pbStatus[frame] = FlipSlider::PBFrameFinished;
+    if (cachedRas) {
+      std::string f_str = m_cachePrefix + std::to_string(f);
+      TImageCache::instance()->add(f_str, ri);
+    }
 
-  // Notify listeners
-  notifyCompleted(frame);
+    // Update the FrameInfo
+    f_it->second.m_renderedRegion += toQRect(f_it->second.m_rectUnderRender);
+    f_it->second.m_rectUnderRender = TRect();
+
+    // Update the progress bar status
+    if (f < m_pbStatus.size()) m_pbStatus[f] = FlipSlider::PBFrameFinished;
+
+    // Notify listeners
+    notifyCompleted(f);
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -977,6 +995,69 @@ void Previewer::Imp::saveFrame() {
   savedFrames          = 0;
 }
 
+//-----------------------------------------------------------------------------
+
+void Previewer::Imp::addRenderData(std::vector<TRenderer::RenderData> &datas,
+                                   int frame) {
+  // Build the TFxPair to be passed to TRenderer
+  TFxPair fxPair = buildSceneFx(frame);
+
+  // Update the RenderInfos associated with frame
+  m_frames[frame].m_rectUnderRender = m_previewRect;
+  m_frames[frame].m_alias = fxPair.m_frameA->getAlias(frame, m_renderSettings);
+  if (fxPair.m_frameB)
+    m_frames[frame].m_alias =
+        m_frames[frame].m_alias +
+        fxPair.m_frameB->getAlias(frame, m_renderSettings);
+
+  // Retrieve the renderId of the rendering instance
+  m_frames[frame].m_renderId = m_renderer.nextRenderId();
+  std::string contextName("P");
+  contextName += m_subcamera ? "SC" : "FU";
+  contextName += std::to_string(frame);
+  TPassiveCacheManager::instance()->setContextName(m_frames[frame].m_renderId,
+                                                   contextName);
+
+  datas.push_back(TRenderer::RenderData(frame, m_renderSettings, fxPair));
+}
+
+//-----------------------------------------------------------------------------
+
+void Previewer::Imp::addFramesToRenderQueue(const std::vector<int> frames) {
+  if (suspendedRendering) return;
+  // Build the region to render
+  updatePreviewRect();
+  if (m_previewRect.getLx() <= 0 || m_previewRect.getLy() <= 0) return;
+
+  RenderDataVector *renderDatas = new RenderDataVector;
+
+  for (const auto &f : frames) {
+    std::map<int, FrameInfo>::iterator it = m_frames.find(f);
+    if (it == m_frames.end()) {
+      it = m_frames.insert(std::make_pair(f, FrameInfo())).first;
+      // In case the frame is not in the frame range, we add a temporary
+      // supplement
+      // to the progress bar.
+      if (f >= (int)m_pbStatus.size()) m_pbStatus.resize(f + 1);
+      addRenderData(*renderDatas, f);
+    } else if (f < m_pbStatus.size() &&
+               m_pbStatus[f] == FlipSlider::PBFrameNotStarted) {
+      // In case the rect we would render is contained in the frame's rendered
+      // region, quit
+      if (::contains(it->second.m_renderedRegion, m_previewRect)) return;
+      // Then, check the m_previewRect against the frame's m_rectUnderRendering.
+      // Ensure that we're not re-launching the very same render.
+      if (it->second.m_rectUnderRender == m_previewRect) return;
+      // Stop any frame's previously running render process
+      m_renderer.abortRendering(it->second.m_renderId);
+      addRenderData(*renderDatas, f);
+    }
+  }
+
+  // Finally, start rendering all frames which were not found in cache
+  m_renderer.startRendering(renderDatas);
+}
+
 //=============================================================================
 // Previewer
 //-----------------------------------------------------------------------------
@@ -1138,8 +1219,8 @@ void Previewer::saveRenderedFrames() {
 
 //-----------------------------------------------------------------------------
 
-/*! Restituisce un puntatore al raster randerizzato se il frame e' disponibile,
-    altrimenti comincia a calcolarlo*/
+/*! Returns a pointer to the rendered raster if the frame is available,
+    otherwise start calculating it */
 TRasterP Previewer::getRaster(int frame, bool renderIfNeeded) const {
   if (frame < 0) return TRasterP();
   std::map<int, Imp::FrameInfo>::iterator it = m_imp->m_frames.find(frame);
@@ -1152,7 +1233,7 @@ TRasterP Previewer::getRaster(int frame, bool renderIfNeeded) const {
             (TRasterImageP)TImageCache::instance()->get(str, false);
         if (rimg) {
           TRasterP ras = rimg->getRaster();
-          assert((TRaster32P)ras || (TRaster64P)ras);
+          assert((TRaster32P)ras || (TRaster64P)ras || (TRasterFP)ras);
           return ras;
         } else
           // Weird case - the frame was declared rendered, but no raster is
@@ -1171,7 +1252,7 @@ TRasterP Previewer::getRaster(int frame, bool renderIfNeeded) const {
         (TRasterImageP)TImageCache::instance()->get(str, false);
     if (rimg) {
       TRasterP ras = rimg->getRaster();
-      assert((TRaster32P)ras || (TRaster64P)ras);
+      assert((TRaster32P)ras || (TRaster64P)ras || (TRasterFP)ras);
       return ras;
     } else
       return TRasterP();
@@ -1180,6 +1261,13 @@ TRasterP Previewer::getRaster(int frame, bool renderIfNeeded) const {
     if (renderIfNeeded) m_imp->refreshFrame(frame);
     return TRasterP();
   }
+}
+
+//-----------------------------------------------------------------------------
+
+void Previewer::addFramesToRenderQueue(const std::vector<int> frames) const {
+  if (suspendedRendering) return;
+  m_imp->addFramesToRenderQueue(frames);
 }
 
 //-----------------------------------------------------------------------------

@@ -20,7 +20,6 @@ distributed with a 3-clause BSD-style license.
 #include <QVector>
 #include <QThread>
 
-#include "tools/kiss_fftnd.h"
 #include "iwa_bokeh_util.h"
 
 //------------------------------------
@@ -56,6 +55,8 @@ public:
 
   void doCompute(TTile& tile, double frame,
                  const TRenderSettings& settings) override;
+
+  void onFxVersionSet() final override;
 };
 
 #endif

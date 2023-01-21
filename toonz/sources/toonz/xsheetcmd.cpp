@@ -42,6 +42,7 @@
 #include "toonz/tfxhandle.h"
 #include "toonz/scenefx.h"
 #include "toonz/preferences.h"
+#include "toonz/navigationtags.h"
 
 // TnzQt includes
 #include "toonzqt/tselectionhandle.h"
@@ -49,6 +50,7 @@
 #include "toonzqt/menubarcommand.h"
 #include "toonzqt/stageobjectsdata.h"
 #include "historytypes.h"
+#include "xsheetviewer.h"
 
 // Tnz6 includes
 #include "cellselection.h"
@@ -60,6 +62,7 @@
 #include "menubarcommandids.h"
 #include "columncommand.h"
 #include "xshcellviewer.h"  // SetCellMarkUndo
+#include "navtageditorpopup.h"
 
 // Qt includes
 #include <QClipboard>
@@ -176,6 +179,8 @@ void InsertSceneFrameUndo::doInsertSceneFrame(int frame) {
     if (TStageObject *obj = xsh->getStageObject(objectId))
       insertFrame(obj, frame);
   }
+
+  xsh->getNavigationTags()->shiftTags(frame, 1);
 }
 
 //-----------------------------------------------------------------------------
@@ -199,6 +204,9 @@ void InsertSceneFrameUndo::doRemoveSceneFrame(int frame) {
     if (TStageObject *pegbar = xsh->getStageObject(objectId))
       removeFrame(pegbar, frame);
   }
+
+  if (xsh->isFrameTagged(frame)) xsh->getNavigationTags()->removeTag(frame);
+  xsh->getNavigationTags()->shiftTags(frame, -1);
 }
 
 //-----------------------------------------------------------------------------
@@ -242,6 +250,7 @@ public:
 class RemoveSceneFrameUndo final : public InsertSceneFrameUndo {
   std::vector<TXshCell> m_cells;
   std::vector<TStageObject::Keyframe> m_keyframes;
+  NavigationTags::Tag m_tag;
 
 public:
   RemoveSceneFrameUndo(int frame) : InsertSceneFrameUndo(frame) {
@@ -252,6 +261,7 @@ public:
 
     m_cells.resize(colsCount);
     m_keyframes.resize(colsCount + 1);
+    m_tag = xsh->getNavigationTags()->getTag(frame);
 
     // Inserting the eventual camera keyframe at the end
     TStageObject *cameraObj = xsh->getStageObject(
@@ -295,6 +305,10 @@ public:
         obj->setKeyframeWithoutUndo(m_frame, m_keyframes[c]);
       }
     }
+
+    // Restore tag if there was one
+    if (m_tag.m_frame != -1)
+      xsh->getNavigationTags()->addTag(m_tag.m_frame, m_tag.m_label);
 
     TApp::instance()->getCurrentScene()->setDirtyFlag(true);
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
@@ -2184,3 +2198,105 @@ SetCellMarkCommand CellMarkCommand8(8);
 SetCellMarkCommand CellMarkCommand9(9);
 SetCellMarkCommand CellMarkCommand10(10);
 SetCellMarkCommand CellMarkCommand11(11);
+
+//============================================================
+
+class ToggleTaggedFrame final : public MenuItemHandler {
+public:
+  ToggleTaggedFrame() : MenuItemHandler(MI_ToggleTaggedFrame) {}
+  void execute() override {
+    TApp *app = TApp::instance();
+    int frame = app->getCurrentFrame()->getFrame();
+    assert(frame >= 0);
+    TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
+
+    xsh->toggleTaggedFrame(frame);
+
+    NavigationTags *navTags = xsh->getNavigationTags();
+    CommandManager::instance()->enable(MI_EditTaggedFrame,
+                                       navTags->isTagged(frame));
+    CommandManager::instance()->enable(MI_ClearTags, (navTags->getCount() > 0));
+
+    TApp::instance()->getCurrentXsheetViewer()->update();
+  }
+} ToggleTaggedFrame;
+
+//============================================================
+
+class EditTaggedFrame final : public MenuItemHandler {
+public:
+  EditTaggedFrame() : MenuItemHandler(MI_EditTaggedFrame) {}
+  void execute() override {
+    TApp *app = TApp::instance();
+    int frame = app->getCurrentFrame()->getFrame();
+    assert(frame >= 0);
+    TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
+
+    NavigationTags *tags = xsh->getNavigationTags();
+    QString label        = tags->getTagLabel(frame);
+    QColor color         = tags->getTagColor(frame);
+    NavTagEditorPopup navTagEditor(frame, label, color);
+    if (navTagEditor.exec() != QDialog::Accepted) return;
+    tags->setTagLabel(frame, navTagEditor.getLabel());
+    tags->setTagColor(frame, navTagEditor.getColor());
+  }
+} EditTaggedFrame;
+
+//============================================================
+
+class NextTaggedFrame final : public MenuItemHandler {
+public:
+  NextTaggedFrame() : MenuItemHandler(MI_NextTaggedFrame) {}
+  void execute() override {
+    TApp *app = TApp::instance();
+    int frame = app->getCurrentFrame()->getFrame();
+    assert(frame >= 0);
+    TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
+
+    NavigationTags *navTags = xsh->getNavigationTags();
+    int nextFrame           = navTags->getNextTag(frame);
+    if (nextFrame != -1)
+      app->getCurrentXsheetViewer()->setCurrentRow(nextFrame);
+  }
+} NextTaggedFrame;
+
+//============================================================
+
+class PrevTaggedFrame final : public MenuItemHandler {
+public:
+  PrevTaggedFrame() : MenuItemHandler(MI_PrevTaggedFrame) {}
+  void execute() override {
+    TApp *app = TApp::instance();
+    int frame = app->getCurrentFrame()->getFrame();
+    assert(frame >= 0);
+    TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
+
+    NavigationTags *navTags = xsh->getNavigationTags();
+    int prevFrame           = navTags->getPrevTag(frame);
+    if (prevFrame != -1)
+      app->getCurrentXsheetViewer()->setCurrentRow(prevFrame);
+  }
+} PrevTaggedFrame;
+
+//============================================================
+
+class ClearTags final : public MenuItemHandler {
+public:
+  ClearTags() : MenuItemHandler(MI_ClearTags) {}
+  void execute() override {
+    TApp *app = TApp::instance();
+    int frame = app->getCurrentFrame()->getFrame();
+    assert(frame >= 0);
+    TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
+
+    NavigationTags *navTags = xsh->getNavigationTags();
+    navTags->clearTags();
+
+    CommandManager::instance()->enable(MI_NextTaggedFrame, false);
+    CommandManager::instance()->enable(MI_PrevTaggedFrame, false);
+    CommandManager::instance()->enable(MI_EditTaggedFrame, false);
+    CommandManager::instance()->enable(MI_ClearTags, false);
+
+    TApp::instance()->getCurrentXsheetViewer()->update();
+  }
+} ClearTags;

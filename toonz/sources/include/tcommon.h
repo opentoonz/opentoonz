@@ -62,6 +62,7 @@ int nanosleep(struct timespec *, int);
 #include <list>
 #include <vector>
 #include <map>
+#include <cmath>
 // .. and so on
 
 namespace TConsts {
@@ -118,6 +119,11 @@ inline int troundp(double x) { return ((int)((x) + 0.5F)); }
 /*! byteFromUshort(u) converts integer from [0..65535] to [0..255] */
 inline UCHAR byteFromUshort(USHORT u) {
   return ((256U * 255U + 1U) * u + (1 << 23)) >> 24;
+}
+
+/*! from[0. .. 1.] to [0..255] */
+inline UCHAR byteFromFloat(float f) {
+  return (f >= 1.f) ? 0xFF : (f <= 0.f) ? 0 : (UCHAR)(std::floor(f * 256.f));
 }
 
 /*! ditheredByteFromUshort(u) is like byteFromUshort().

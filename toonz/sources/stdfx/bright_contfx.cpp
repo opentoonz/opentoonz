@@ -19,6 +19,8 @@ public:
     m_bright->setValueRange(-127, 127);
     m_contrast->setValueRange(-127, 127);
     addInputPort("Source", m_input);
+
+    enableComputeInFloat(true);
   }
 
   ~Bright_ContFx(){};
@@ -114,6 +116,97 @@ void doBrightnessContrast(TRasterPT<PIXEL> ras, double contrast,
   ras->unlock();
 }
 
+void my_compute_lut_float(double contrast, double brightness,
+                          std::vector<float> &lut, float &d0, float &d1) {
+  int i;
+  float value, nvalue, power;
+
+  int half_maxChannelValue = tfloor(TPixel64::maxChannelValue / 2.0);
+
+  int lutSize = TPixel64::maxChannelValue + 1;
+  for (i = 0; i < lutSize; i++) {
+    value = i / float(TPixel64::maxChannelValue);
+    /*brightness*/
+    if (brightness < 0.0)
+      value = value * (1.f + brightness);
+    else
+      value = value + ((1.f - value) * brightness);
+    /*contrast*/
+    if (contrast < 0.f) {
+      if (value > 0.5f)
+        nvalue = 1.f - value;
+      else
+        nvalue = value;
+      if (nvalue < 0.f) nvalue = 0.f;
+      nvalue = 0.5f * pow(nvalue * 2.f, (double)(1.f + contrast));
+      if (value > 0.5f)
+        value = 1.0f - nvalue;
+      else
+        value = nvalue;
+    } else {
+      if (value > 0.5f)
+        nvalue = 1.f - value;
+      else
+        nvalue = value;
+      if (nvalue < 0.f) nvalue = 0.f;
+      power =
+          (contrast == 1.0f) ? half_maxChannelValue : 1.f / (1.f - contrast);
+      nvalue = 0.5f * pow(2.f * nvalue, power);
+      if (value > 0.5f)
+        value = 1.f - nvalue;
+      else
+        value = nvalue;
+    }
+    lut[i] = value;
+  }
+
+  d0 = (lut[1] - lut[0]) * float(TPixel64::maxChannelValue);
+  d1 = (lut[TPixel64::maxChannelValue] - lut[TPixel64::maxChannelValue - 1]) *
+       float(TPixel64::maxChannelValue);
+}
+
+void doBrightnessContrastFloat(TRasterFP ras, double contrast,
+                               double brightness) {
+  int lx = ras->getLx();
+  int ly = ras->getLy();
+
+  // create lut with 65536 levels
+  std::vector<float> lut(TPixel64::maxChannelValue + 1);
+  // values less than 0.0 and more than 1.0 will be linear
+  float d0, d1;
+  my_compute_lut_float(contrast, brightness, lut, d0, d1);
+
+  auto getLutValue = [&](float val) {
+    if (val < 0.f)
+      return lut[0] + d0 * val;
+    else if (val >= 1.f)
+      return lut[TPixel64::maxChannelValue] + d1 * (val - 1.f);
+    float v     = val * float(TPixel64::maxChannelValue);
+    int id      = (int)tfloor(v);
+    float ratio = v - float(id);
+    return lut[id] * (1.f - ratio) + lut[id + 1] * ratio;
+  };
+
+  int j;
+  ras->lock();
+  for (j = 0; j < ly; j++) {
+    TPixelF *pix    = ras->pixels(j);
+    TPixelF *endPix = pix + lx;
+    while (pix < endPix) {
+      if (pix->m) {
+        *pix   = depremultiply(*pix);
+        pix->r = getLutValue(pix->r);
+        pix->g = getLutValue(pix->g);
+        pix->b = getLutValue(pix->b);
+        pix->m = pix->m;
+        *pix   = premultiply(*pix);
+      }
+      pix++;
+    }
+  }
+  ras->unlock();
+}
+
 void Bright_ContFx::doCompute(TTile &tile, double frame,
                               const TRenderSettings &ri) {
   if (!m_input.isConnected()) return;
@@ -125,15 +218,16 @@ void Bright_ContFx::doCompute(TTile &tile, double frame,
   if (contrast > 1) contrast = 1;
   if (contrast < -1) contrast = -1;
   TRaster32P raster32 = tile.getRaster();
+  TRaster64P raster64 = tile.getRaster();
+  TRasterFP rasterF   = tile.getRaster();
   if (raster32)
     doBrightnessContrast<TPixel32, UCHAR>(raster32, contrast, brightness);
-  else {
-    TRaster64P raster64 = tile.getRaster();
-    if (raster64)
-      doBrightnessContrast<TPixel64, USHORT>(raster64, contrast, brightness);
-    else
-      throw TException("Brightness&Contrast: unsupported Pixel Type");
-  }
+  else if (raster64)
+    doBrightnessContrast<TPixel64, USHORT>(raster64, contrast, brightness);
+  else if (rasterF)
+    doBrightnessContrastFloat(rasterF, contrast, brightness);
+  else
+    throw TException("Brightness&Contrast: unsupported Pixel Type");
 }
 
 FX_PLUGIN_IDENTIFIER(Bright_ContFx, "brightContFx")

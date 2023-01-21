@@ -123,6 +123,11 @@ protected:
   bool m_mousePressed = false;
   TMouseEvent m_mouseEvent;
 
+  bool m_isStraight = false;
+  TPointD m_firstPoint;
+  TPointD m_lastPoint;
+  double m_maxPressure = -1.0;
+
   bool m_propertyUpdating = false;
 };
 

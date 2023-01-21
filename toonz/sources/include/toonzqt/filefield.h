@@ -92,6 +92,7 @@ public:
   void setValidator(const QValidator *v) { m_field->setValidator(v); }
   QString getPath();
   void setPath(const QString &path);
+  LineEdit *getField() { return m_field; }
 
   static void setBrowserPopupController(BrowserPopupController *controller);
   static BrowserPopupController *getBrowserPopupController();

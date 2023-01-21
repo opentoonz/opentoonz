@@ -61,6 +61,8 @@ class RowArea final : public QWidget {
   void drawStopMotionCameraIndicator(QPainter &p);
 #endif
 
+  void drawNavigationTags(QPainter &p, int r0, int r1);
+
   DragTool *getDragTool() const;
   void setDragTool(DragTool *dragTool);
 
@@ -101,6 +103,9 @@ protected slots:
 
   // set both the from and to markers at the specified row
   void onPreviewThis();
+
+protected slots:
+  void onJumpToTag();
 };
 
 }  // namespace XsheetGUI

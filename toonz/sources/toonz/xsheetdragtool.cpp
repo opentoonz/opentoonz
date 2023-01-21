@@ -50,6 +50,7 @@
 #include "toutputproperties.h"
 #include "toonz/preferences.h"
 #include "toonz/columnfan.h"
+#include "toonz/navigationtags.h"
 
 // TnzBase includes
 #include "tfx.h"
@@ -2199,4 +2200,50 @@ public:
 XsheetGUI::DragTool *XsheetGUI::DragTool::makeDragAndDropDataTool(
     XsheetViewer *viewer) {
   return new DataDragTool(viewer);
+}
+
+//=============================================================================
+//  NavigationTagDragTool
+//-----------------------------------------------------------------------------
+
+namespace {
+
+class NavigationTagDragTool final : public XsheetGUI::DragTool {
+  int m_taggedRow;
+
+public:
+  NavigationTagDragTool(XsheetViewer *viewer) : DragTool(viewer) {}
+
+  void onClick(const CellPosition &pos) override {
+    int row = pos.frame();
+    m_taggedRow = row;
+    refreshRowsArea();
+  }
+
+  void onDrag(const CellPosition &pos) override {
+    int row          = pos.frame();
+    if (row < 0) row = 0;
+    onRowChange(row);
+    refreshRowsArea();
+  }
+
+  void onRowChange(int row) {
+    if (row < 0) return;
+
+    TXsheet *xsh            = TApp::instance()->getCurrentXsheet()->getXsheet();
+    NavigationTags *navTags = xsh->getNavigationTags();
+
+    if (m_taggedRow == row || navTags->isTagged(row)) return;
+
+    navTags->moveTag(m_taggedRow, row);
+    m_taggedRow = row;
+  }
+};
+//-----------------------------------------------------------------------------
+}  // namespace
+//-----------------------------------------------------------------------------
+
+XsheetGUI::DragTool *XsheetGUI::DragTool::makeNavigationTagDragTool(
+    XsheetViewer *viewer) {
+  return new NavigationTagDragTool(viewer);
 }

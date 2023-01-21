@@ -710,6 +710,13 @@ void ToonzVectorBrushTool::leftButtonDown(const TPointD &pos,
     m_currentColor = TPixel32::Red;
     m_active       = true;
   }
+
+  TXshLevel *level = app->getCurrentLevel()->getLevel();
+  if (level == NULL && !m_isPath) {
+    m_active = false;
+    return;
+  }
+
   // assert(0<=m_styleId && m_styleId<2);
   m_track.clear();
   double thickness = (m_pressure.getValue() || m_isPath)
@@ -779,7 +786,39 @@ void ToonzVectorBrushTool::leftButtonDrag(const TPointD &pos,
     invalidateRect +=
         TRectD(m_lastSnapPoint - snapThick, m_lastSnapPoint + snapThick);
 
-  if (e.isShiftPressed()) {
+  if (e.isCtrlPressed()) {
+    TPointD m_firstPoint = m_track.getFirstPoint();
+
+    double denominator = m_lastSnapPoint.x - m_firstPoint.x;
+    if (denominator == 0) denominator == 0.001;
+    double slope = ((m_brushPos.y - m_firstPoint.y) / denominator);
+    double angle = std::atan(slope) * (180 / 3.14159);
+    if (abs(angle) > 67.5)
+      m_lastSnapPoint.x = m_firstPoint.x;
+    else if (abs(angle) < 22.5)
+      m_lastSnapPoint.y = m_firstPoint.y;
+    else {
+      double xDistance = m_lastSnapPoint.x - m_firstPoint.x;
+      double yDistance = m_lastSnapPoint.y - m_firstPoint.y;
+      if (abs(xDistance) > abs(yDistance)) {
+        if (abs(yDistance) == yDistance)
+          m_lastSnapPoint.y = m_firstPoint.y + abs(xDistance);
+        else
+          m_lastSnapPoint.y = m_firstPoint.y - abs(xDistance);
+      } else {
+        if (abs(xDistance) == xDistance)
+          m_lastSnapPoint.x = m_firstPoint.x + abs(yDistance);
+        else
+          m_lastSnapPoint.x = m_firstPoint.x - abs(yDistance);
+      }
+    }
+
+    m_smoothStroke.clearPoints();
+    m_track.add(TThickPoint(m_lastSnapPoint, thickness),
+                getPixelSize() * getPixelSize());
+    m_track.removeMiddlePoints();
+    invalidateRect += m_track.getModifiedRegion();
+  } else if (e.isShiftPressed()) {
     m_smoothStroke.clearPoints();
     m_track.add(TThickPoint(m_brushPos, thickness),
                 getPixelSize() * getPixelSize());

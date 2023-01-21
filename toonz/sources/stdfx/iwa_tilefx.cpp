@@ -48,6 +48,11 @@ public:
   bool checkIfThisTileShouldBeComptedOrNot(int horizIndex, int vertIndex);
   bool isInRange(int quantityMode, int index);
 
+  bool toBeComputedInLinearColorSpace(bool settingsIsLinear,
+                                      bool tileIsLinear) const override {
+    return tileIsLinear;
+  }
+
 private:
   void makeTile(const TTile &inputTile, const TTile &tile);
 };
@@ -97,6 +102,8 @@ Iwa_TileFx::Iwa_TileFx()
 
   bindParam(this, "vMargin", m_vmargin);
   m_vmargin->setMeasureName("fxLength");
+
+  enableComputeInFloat(true);
 }
 
 //------------------------------------------------------------------------------

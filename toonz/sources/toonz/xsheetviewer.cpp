@@ -35,6 +35,7 @@
 #include "toonz/txshlevelhandle.h"
 #include "toonz/tproject.h"
 #include "tconvert.h"
+#include "toonz/navigationtags.h"
 
 #include "tenv.h"
 
@@ -1390,6 +1391,18 @@ void XsheetViewer::onSceneSwitched() {
 void XsheetViewer::onXsheetChanged() {
   refreshContentSize(0, 0);
   updateAllAree();
+
+  int row                 = TApp::instance()->getCurrentFrame()->getFrame();
+  TXsheet *xsh            = getXsheet();
+  NavigationTags *navTags = xsh->getNavigationTags();
+  int lastTag             = navTags->getPrevTag(INT_MAX);
+  int firstTag            = navTags->getNextTag(-1);
+  CommandManager::instance()->enable(MI_NextTaggedFrame, (row < lastTag));
+  CommandManager::instance()->enable(MI_PrevTaggedFrame,
+                                     firstTag != -1 && row > firstTag);
+  CommandManager::instance()->enable(MI_EditTaggedFrame,
+                                     navTags->isTagged(row));
+  CommandManager::instance()->enable(MI_ClearTags, (navTags->getCount() > 0));
 }
 
 //-----------------------------------------------------------------------------
@@ -1414,6 +1427,16 @@ void XsheetViewer::onCurrentFrameSwitched() {
   }
   m_isCurrentFrameSwitched = false;
   scrollToRow(row);
+
+  TXsheet *xsh = getXsheet();
+  NavigationTags *navTags = xsh->getNavigationTags();
+  int lastTag             = navTags->getPrevTag(INT_MAX);
+  int firstTag            = navTags->getNextTag(-1);
+  CommandManager::instance()->enable(MI_NextTaggedFrame, (row < lastTag));
+  CommandManager::instance()->enable(MI_PrevTaggedFrame,
+                                     firstTag != -1 && row > firstTag);
+  CommandManager::instance()->enable(MI_EditTaggedFrame,
+                                     navTags->isTagged(row));
 }
 
 //-----------------------------------------------------------------------------

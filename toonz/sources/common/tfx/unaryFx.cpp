@@ -8,11 +8,14 @@
 #include "tfxparam.h"
 #include "tparamset.h"
 
-//#define ALLOW_SHEAR
+// #define ALLOW_SHEAR
 
 //==============================================================================
 
-TGeometryFx::TGeometryFx() { setName(L"Geometry"); }
+TGeometryFx::TGeometryFx() {
+  setName(L"Geometry");
+  enableComputeInFloat(true);
+}
 
 //---------------------------------------------------------------
 
@@ -28,7 +31,8 @@ void TGeometryFx::doCompute(TTile &tile, double frame,
     return;
   }
 
-  if (!TRaster32P(tile.getRaster()) && !TRaster64P(tile.getRaster()))
+  if (!TRaster32P(tile.getRaster()) && !TRaster64P(tile.getRaster()) &&
+      !TRasterFP(tile.getRaster()))
     throw TException("AffineFx unsupported pixel type");
 
   TAffine aff1 = getPlacement(frame);
@@ -109,6 +113,13 @@ void TGeometryFx::transform(double frame, int port, const TRectD &rectOnOutput,
 
   infoOnInput          = infoOnOutput;
   infoOnInput.m_affine = infoOnInput.m_affine * aff;
+}
+
+//--------------------------------------------------
+
+bool TGeometryFx::toBeComputedInLinearColorSpace(bool settingsIsLinear,
+                                                 bool tileIsLinear) const {
+  return tileIsLinear;
 }
 
 //==================================================
@@ -212,6 +223,7 @@ public:
     //   bindParam(this, "blue_channel" , m_blueChan);
     //   bindParam(this, "alpha_channel", m_alphaChan);
     setName(L"InvertFx");
+    enableComputeInFloat(true);
   };
 
   ~InvertFx(){};

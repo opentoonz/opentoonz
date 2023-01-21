@@ -12,7 +12,7 @@
 #include "tgeometry.h"
 #include "tfxattributes.h"
 #include "tparamuiconcept.h"
-//#include "timage_io.h"
+// #include "timage_io.h"
 
 /*---------------------------------------------------------------------------*/
 namespace {
@@ -165,6 +165,114 @@ inline void blur_code(T *row1, T *row2, int length, double coeff, double coeffq,
   }
 }
 
+template <>
+inline void blur_code<TPixelF>(TPixelF *row1, TPixelF *row2, int length,
+                               double coeff, double coeffq, int brad,
+                               double diff, double globmatte) {
+  int i;
+  double rsum, gsum, bsum, msum;
+
+  TPixelD sigma1, sigma2, sigma3, desigma;
+  TPixelF *pix1, *pix2, *pix3, *pix4;
+  // int max = T::maxChannelValue;
+
+  pix1 = row1;
+  pix2 = row1 - 1;
+
+  sigma1.r = pix1->r;
+  sigma1.g = pix1->g;
+  sigma1.b = pix1->b;
+  sigma1.m = pix1->m;
+  pix1++;
+
+  sigma2.r = sigma2.g = sigma2.b = sigma2.m = 0.0;
+  sigma3.r = sigma3.g = sigma3.b = sigma3.m = 0.0;
+
+  for (i = 1; i < brad; i++) {
+    sigma1.r += pix1->r;
+    sigma1.g += pix1->g;
+    sigma1.b += pix1->b;
+    sigma1.m += pix1->m;
+
+    sigma2.r += pix2->r;
+    sigma2.g += pix2->g;
+    sigma2.b += pix2->b;
+    sigma2.m += pix2->m;
+
+    sigma3.r += i * (pix1->r + pix2->r);
+    sigma3.g += i * (pix1->g + pix2->g);
+    sigma3.b += i * (pix1->b + pix2->b);
+    sigma3.m += i * (pix1->m + pix2->m);
+
+    pix1++;
+    pix2--;
+  }
+
+  rsum = (sigma1.r + sigma2.r) * coeff - sigma3.r * coeffq;
+  gsum = (sigma1.g + sigma2.g) * coeff - sigma3.g * coeffq;
+  bsum = (sigma1.b + sigma2.b) * coeff - sigma3.b * coeffq;
+  msum = (sigma1.m + sigma2.m) * coeff - sigma3.m * coeffq;
+
+  row2->r = rsum;
+  row2->g = gsum;
+  row2->b = bsum;
+  row2->m = tcrop((float)msum, 0.f, 1.f);
+
+  if (globmatte != 1.0) {
+    row2->r = row2->r * globmatte;
+    row2->g = row2->g * globmatte;
+    row2->b = row2->b * globmatte;
+    row2->m = row2->m * globmatte;
+  }
+  *row2 = overPix(*row1, *row2);
+  // overlayPixels<T>(*row1, *row2, *row2, globmatte);
+
+  // row2++;
+
+  sigma2.r += row1[-brad].r;
+  sigma2.g += row1[-brad].g;
+  sigma2.b += row1[-brad].b;
+  sigma2.m += row1[-brad].m;
+
+  pix1 = row1 + brad;
+  pix2 = row1;
+  pix3 = row1 - brad;
+  pix4 = row1 - brad + 1;
+
+  desigma.r = sigma1.r - sigma2.r;
+  desigma.g = sigma1.g - sigma2.g;
+  desigma.b = sigma1.b - sigma2.b;
+  desigma.m = sigma1.m - sigma2.m;
+
+  for (i = 1; i < length; i++) {
+    desigma.r += pix1->r - 2 * pix2->r + pix3->r;
+    desigma.g += pix1->g - 2 * pix2->g + pix3->g;
+    desigma.b += pix1->b - 2 * pix2->b + pix3->b;
+    desigma.m += pix1->m - 2 * pix2->m + pix3->m;
+
+    rsum += (desigma.r + diff * (pix1->r - pix4->r)) * coeffq;
+    gsum += (desigma.g + diff * (pix1->g - pix4->g)) * coeffq;
+    bsum += (desigma.b + diff * (pix1->b - pix4->b)) * coeffq;
+    msum += (desigma.m + diff * (pix1->m - pix4->m)) * coeffq;
+
+    row2->r = rsum;
+    row2->g = gsum;
+    row2->b = bsum;
+    row2->m = tcrop((float)msum, 0.f, 1.f);
+    if (globmatte != 1.0) {
+      row2->r = row2->r * globmatte;
+      row2->g = row2->g * globmatte;
+      row2->b = row2->b * globmatte;
+      row2->m = row2->m * globmatte;
+    }
+    *row2 = overPix(*pix2, *row2);
+    // overlayPixels<T>(*pix2, *row2, *row2, 0.8);
+
+    row2++;
+    pix1++, pix2++, pix3++, pix4++;
+  }
+}
+
 /*---------------------------------------------------------------------------*/
 
 template <class T>
@@ -226,6 +334,68 @@ void do_filtering(T *row1, T *row2, int length, double coeff, int brad,
   }
 }
 
+template <>
+void do_filtering<TPixelF>(TPixelF *row1, TPixelF *row2, int length,
+                           double coeff, int brad, double Mblur,
+                           double globmatte) {
+  int i;
+  double rsum, gsum, bsum, msum;
+  TPixelD sigma1, sigma2;
+
+  sigma1.r = sigma1.g = sigma1.b = sigma1.m = 0.0;
+  sigma2.r = sigma2.g = sigma2.b = sigma2.m = 0.0;
+
+  for (i = 0; i <= brad; i++) {
+    sigma1.r += row1[-i].r;
+    sigma1.g += row1[-i].g;
+    sigma1.b += row1[-i].b;
+    sigma1.m += row1[-i].m;
+
+    sigma2.r += -i * row1[-i].r;
+    sigma2.g += -i * row1[-i].g;
+    sigma2.b += -i * row1[-i].b;
+    sigma2.m += -i * row1[-i].m;
+  }
+
+  for (i = 0; i < length; i++) /* for the ith point the previous computing is
+                                  used, with the values */
+  {
+    /* stored in the auxiliary variables sigma1 and sigma2. */
+    rsum = ((Mblur - i) * sigma1.r + sigma2.r) / coeff;
+    gsum = ((Mblur - i) * sigma1.g + sigma2.g) / coeff;
+    bsum = ((Mblur - i) * sigma1.b + sigma2.b) / coeff;
+    msum = ((Mblur - i) * sigma1.m + sigma2.m) / coeff;
+
+    row2[i].r = rsum;
+    row2[i].g = gsum;
+    row2[i].b = bsum;
+    row2[i].m = std::min(msum, 1.0);
+    if (globmatte != 1.0) {
+      row2[i].r = row2[i].r * globmatte;
+      row2[i].g = row2[i].g * globmatte;
+      row2[i].b = row2[i].b * globmatte;
+      row2[i].m = row2[i].m * globmatte;
+    }
+    row2[i] = overPix(row1[i], row2[i]);
+    // overlayPixels<T>(row1[i], row2[i], row2[i], globmatte);
+
+    if (i < length - 1) {
+      sigma1.r += row1[i + 1].r - row1[i - brad].r;
+      sigma1.g += row1[i + 1].g - row1[i - brad].g;
+      sigma1.b += row1[i + 1].b - row1[i - brad].b;
+      sigma1.m += row1[i + 1].m - row1[i - brad].m;
+
+      sigma2.r += (double)(i + 1) * row2[i + 1].r -
+                  (double)(i - brad) * row1[i - brad].r;
+      sigma2.g += (double)(i + 1) * row2[i + 1].g -
+                  (double)(i - brad) * row1[i - brad].g;
+      sigma2.b += (double)(i + 1) * row2[i + 1].b -
+                  (double)(i - brad) * row1[i - brad].b;
+      sigma2.m += (double)(i + 1) * row2[i + 1].m -
+                  (double)(i - brad) * row1[i - brad].m;
+    }
+  }
+}
 /*---------------------------------------------------------------------------*/
 
 template <class T>
@@ -394,6 +564,8 @@ public:
     m_intensity->setValueRange(0, (std::numeric_limits<double>::max)());
 
     getAttributes()->setIsSpeedAware(true);
+
+    enableComputeInFloat(true);
   }
 
   TPointD getBlurVector(double frame) const {
@@ -562,6 +734,9 @@ void DirectionalBlurBaseFx::doCompute(TTile &tile, double frame,
     else if ((TRaster64P)rasIn && (TRaster64P)rasOut)
       directionalBlur<TPixel64>(rasOut, rasIn, blur, p,
                                 m_bidirectional->getValue());
+    else if ((TRasterFP)rasIn && (TRasterFP)rasOut)
+      directionalBlur<TPixelF>(rasOut, rasIn, blur, p,
+                               m_bidirectional->getValue());
   }
 }
 

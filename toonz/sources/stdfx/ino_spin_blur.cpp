@@ -64,6 +64,8 @@ public:
     this->m_ref_mode->addItem(3, "Alpha");
     this->m_ref_mode->addItem(4, "Luminance");
     this->m_ref_mode->addItem(-1, "Nothing");
+
+    enableComputeInFloat(true);
   }
   //------------------------------------------------------------
   TPointD get_render_center(const double frame, const TPointD &pos,
@@ -197,6 +199,7 @@ void fx_(const TRasterP in_ras,  // with margin
   in_gr8->unlock();
   ino::float_arr_to_ras(out_buffer->getRawData(), ino::channels(), out_ras, 0);
   out_buffer->unlock();
+
   if (ref_gr8) ref_gr8->unlock();
 }
 }  // namespace
@@ -209,7 +212,8 @@ void ino_spin_blur::doCompute(TTile &tile, double frame,
     return;
   }
   /*------ サポートしていないPixelタイプはエラーを投げる -----*/
-  if (!((TRaster32P)tile.getRaster()) && !((TRaster64P)tile.getRaster())) {
+  if (!((TRaster32P)tile.getRaster()) && !((TRaster64P)tile.getRaster()) &&
+      !((TRasterFP)tile.getRaster())) {
     throw TRopException("unsupported input pixel type");
   }
   /*------ パラメータを得る ----------------------------------*/

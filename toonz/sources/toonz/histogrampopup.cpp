@@ -87,6 +87,9 @@ void HistogramPopup::updateInfo(const TPixel64 &pix, const TPointD &imagePos) {
   m_histogram->updateInfo(pix, imagePos);
 }
 
+void HistogramPopup::updateInfo(const TPixelF &pix, const TPointD &imagePos) {
+  m_histogram->updateInfo(pix, imagePos);
+}
 //-----------------------------------------------------------------------------
 /*! show the average-picked color
  */
@@ -95,6 +98,10 @@ void HistogramPopup::updateAverageColor(const TPixel32 &pix) {
 }
 
 void HistogramPopup::updateAverageColor(const TPixel64 &pix) {
+  m_histogram->updateAverageColor(pix);
+}
+
+void HistogramPopup::updateAverageColor(const TPixelF &pix) {
   m_histogram->updateAverageColor(pix);
 }
 //-----------------------------------------------------------------------------

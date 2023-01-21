@@ -1,12 +1,13 @@
 
 
-//#include "trop.h"
+// #include "trop.h"
 #include "tfxparam.h"
 #include <math.h>
 #include "stdfx.h"
 
 #include "tparamset.h"
 #include "globalcontrollablefx.h"
+#include "tpixelutils.h"
 
 class RGBKeyFx final : public GlobalControllableFx {
   FX_PLUGIN_DECLARATION(RGBKeyFx)
@@ -34,6 +35,7 @@ public:
     m_grange->setValueRange(0.0, 255.0);
     m_brange->setValueRange(0.0, 255.0);
     addInputPort("Source", m_input);
+    enableComputeInFloat(true);
   }
 
   ~RGBKeyFx(){};
@@ -55,36 +57,44 @@ public:
   }
 };
 
-namespace {
-void update_param(int &param, TRaster32P ras) { return; }
-
-void update_param(int &param, TRaster64P ras) {
-  param = param * 257;
-  return;
-}
-}  // namespace
-
 //-------------------------------------------------------------------
 
-template <typename PIXEL, typename CHANNEL_TYPE>
-void doRGBKey(TRasterPT<PIXEL> ras, int highR, int highG, int highB, int lowR,
-              int lowG, int lowB, bool gender) {
-  update_param(highR, ras);
-  update_param(highG, ras);
-  update_param(highB, ras);
-  update_param(lowR, ras);
-  update_param(lowG, ras);
-  update_param(lowB, ras);
-
+template <typename PIXEL>
+void doRGBKey(TRasterPT<PIXEL> ras, PIXEL highColor, PIXEL lowColor,
+              bool gender) {
   int j;
   ras->lock();
   for (j = 0; j < ras->getLy(); j++) {
     PIXEL *pix    = ras->pixels(j);
     PIXEL *endPix = pix + ras->getLx();
     while (pix < endPix) {
-      bool condition = pix->r >= lowR && pix->r <= highR && pix->g >= lowG &&
-                       pix->g <= highG && pix->b >= lowB && pix->b <= highB;
+      bool condition = pix->r >= lowColor.r && pix->r <= highColor.r &&
+                       pix->g >= lowColor.g && pix->g <= highColor.g &&
+                       pix->b >= lowColor.b && pix->b <= highColor.b;
       if (condition != gender) *pix = PIXEL::Transparent;
+      pix++;
+    }
+  }
+  ras->unlock();
+}
+
+template <>
+void doRGBKey(TRasterFP ras, TPixelF highColor, TPixelF lowColor, bool gender) {
+  int j;
+  ras->lock();
+  for (j = 0; j < ras->getLy(); j++) {
+    TPixelF *pix    = ras->pixels(j);
+    TPixelF *endPix = pix + ras->getLx();
+    while (pix < endPix) {
+      // clamp 0.f to 1.f in case computing HDR
+      float clampedR = std::min(1.f, std::max(0.f, pix->r));
+      float clampedG = std::min(1.f, std::max(0.f, pix->g));
+      float clampedB = std::min(1.f, std::max(0.f, pix->b));
+
+      bool condition = clampedR >= lowColor.r && clampedR <= highColor.r &&
+                       clampedG >= lowColor.g && clampedG <= highColor.g &&
+                       clampedB >= lowColor.b && clampedB <= highColor.b;
+      if (condition != gender) *pix = TPixelF::Transparent;
       pix++;
     }
   }
@@ -98,31 +108,36 @@ void RGBKeyFx::doCompute(TTile &tile, double frame, const TRenderSettings &ri) {
 
   m_input->compute(tile, frame, ri);
 
-  int r_range          = (int)m_rrange->getValue(frame);
-  int g_range          = (int)m_grange->getValue(frame);
-  int b_range          = (int)m_brange->getValue(frame);
-  bool gender          = (int)m_gender->getValue();
-  const TPixel32 Color = m_color->getPremultipliedValue(frame);
-  TRaster32P raster32  = tile.getRaster();
+  double r_range = m_rrange->getValue(frame) / 255.0;
+  double g_range = m_grange->getValue(frame) / 255.0;
+  double b_range = m_brange->getValue(frame) / 255.0;
+  bool gender    = m_gender->getValue();
 
-  int lowR  = std::max(0, Color.r - r_range);
-  int highR = std::min(255, Color.r + r_range);
-  int lowG  = std::max(0, Color.g - g_range);
-  int highG = std::min(255, Color.g + g_range);
-  int lowB  = std::max(0, Color.b - b_range);
-  int highB = std::min(255, Color.b + b_range);
+  const TPixelF color = premultiply(toPixelF(m_color->getValueD(frame)));
 
-  if (raster32)
-    doRGBKey<TPixel32, UCHAR>(raster32, highR, highG, highB, lowR, lowG, lowB,
-                              gender);
-  else {
-    TRaster64P raster64 = tile.getRaster();
-    if (raster64)
-      doRGBKey<TPixel64, USHORT>(raster64, highR, highG, highB, lowR, lowG,
-                                 lowB, gender);
-    else
-      throw TException("RGBKeyFx: unsupported Pixel Type");
+  TPixelF lowColor(color.r - r_range, color.g - g_range, color.b - b_range);
+  TPixelF highColor(color.r + r_range, color.g + g_range, color.b + b_range);
+
+  // currently the tile should always be nonlinear
+  assert(!tile.getRaster()->isLinear());
+  if (tile.getRaster()->isLinear()) {
+    lowColor  = toLinear(lowColor, ri.m_colorSpaceGamma);
+    highColor = toLinear(highColor, ri.m_colorSpaceGamma);
   }
+
+  TRaster32P raster32 = tile.getRaster();
+  TRaster64P raster64 = tile.getRaster();
+  TRasterFP rasterF   = tile.getRaster();
+  if (raster32)
+    doRGBKey<TPixel32>(raster32, toPixel32(highColor), toPixel32(lowColor),
+                       gender);
+  else if (raster64)
+    doRGBKey<TPixel64>(raster64, toPixel64(highColor), toPixel64(lowColor),
+                       gender);
+  else if (rasterF)
+    doRGBKey<TPixelF>(rasterF, highColor, lowColor, gender);
+  else
+    throw TException("RGBKeyFx: unsupported Pixel Type");
 }
 
 //------------------------------------------------------------------

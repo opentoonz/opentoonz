@@ -60,6 +60,8 @@ Iwa_CorridorGradientFx::Iwa_CorridorGradientFx()
 
   bindParam(this, "inner_color", m_innerColor);
   bindParam(this, "outer_color", m_outerColor);
+
+  enableComputeInFloat(true);
 }
 
 //------------------------------------------------------------
@@ -295,7 +297,8 @@ void doCircleT(RASTER ras, TDimensionI dim, TPointD pos[2][4],
 
 void Iwa_CorridorGradientFx::doCompute(TTile &tile, double frame,
                                        const TRenderSettings &ri) {
-  if (!((TRaster32P)tile.getRaster()) && !((TRaster64P)tile.getRaster())) {
+  if (!((TRaster32P)tile.getRaster()) && !((TRaster64P)tile.getRaster()) &&
+      !((TRasterFP)tile.getRaster())) {
     throw TRopException("unsupported input pixel type");
   }
 
@@ -320,6 +323,7 @@ void Iwa_CorridorGradientFx::doCompute(TTile &tile, double frame,
   tile.getRaster()->clear();
   TRaster32P outRas32 = (TRaster32P)tile.getRaster();
   TRaster64P outRas64 = (TRaster64P)tile.getRaster();
+  TRasterFP outRasF   = (TRasterFP)tile.getRaster();
   if (m_shape->getValue() == 0) {  // Quadrangle
     if (outRas32)
       doQuadrangleT<TRaster32P, TPixel32>(
@@ -328,6 +332,10 @@ void Iwa_CorridorGradientFx::doCompute(TTile &tile, double frame,
     else if (outRas64)
       doQuadrangleT<TRaster64P, TPixel64>(
           outRas64, dimOut, pos, m_colors->getValue64(frame),
+          (GradientCurveType)m_curveType->getValue());
+    else if (outRasF)
+      doQuadrangleT<TRasterFP, TPixelF>(
+          outRasF, dimOut, pos, m_colors->getValueF(frame),
           (GradientCurveType)m_curveType->getValue());
   } else {  // m_shape == 1 : Circle
     if (outRas32)
@@ -338,6 +346,10 @@ void Iwa_CorridorGradientFx::doCompute(TTile &tile, double frame,
       doCircleT<TRaster64P, TPixel64>(
           outRas64, dimOut, pos, m_colors->getValue64(frame),
           (GradientCurveType)m_curveType->getValue());
+    else if (outRasF)
+      doCircleT<TRasterFP, TPixelF>(outRasF, dimOut, pos,
+                                    m_colors->getValueF(frame),
+                                    (GradientCurveType)m_curveType->getValue());
   }
 }
 

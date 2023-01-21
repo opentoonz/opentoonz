@@ -7,25 +7,28 @@ Iwa_PerspectiveDistortFx
 #include "iwa_perspectivedistortfx.h"
 
 #include "tparamuiconcept.h"
-//#include "ino_common.h"
+// #include "ino_common.h"
+#include "trop.h"
 
 namespace {
 
-float4 getSource_CPU(float4 *source_host, TDimensionI &dim, int pos_x,
-                     int pos_y) {
+inline float4 getSource_CPU(float4 *source_host, TDimensionI &dim, int pos_x,
+                            int pos_y) {
   if (pos_x < 0 || pos_x >= dim.lx || pos_y < 0 || pos_y >= dim.ly)
     return float4{0.0f, 0.0f, 0.0f, 0.0f};
 
   return source_host[pos_y * dim.lx + pos_x];
 }
 
-float4 interp_CPU(float4 val1, float4 val2, float ratio) {
-  return float4{(1.0f - ratio) * val1.x + ratio * val2.x,
-                (1.0f - ratio) * val1.y + ratio * val2.y,
-                (1.0f - ratio) * val1.z + ratio * val2.z,
-                (1.0f - ratio) * val1.w + ratio * val2.w};
+inline float4 interp_CPU(float4 val1, float4 val2, float ratio) {
+  float4 ret;
+  ret.x = (1.0f - ratio) * val1.x + ratio * val2.x;
+  ret.y = (1.0f - ratio) * val1.y + ratio * val2.y;
+  ret.z = (1.0f - ratio) * val1.z + ratio * val2.z;
+  ret.w = (1.0f - ratio) * val1.w + ratio * val2.w;
+  return ret;
 }
-}
+}  // namespace
 
 /*------------------------------------------------------------
  出力結果をChannel値に変換して格納
@@ -35,9 +38,6 @@ template <typename RASTER, typename PIXEL>
 void Iwa_PerspectiveDistortFx::setOutputRaster(float4 *srcMem,
                                                const RASTER dstRas,
                                                TDimensionI dim, int drawLevel) {
-  typename PIXEL::Channel halfChan =
-      (typename PIXEL::Channel)(PIXEL::maxChannelValue / 2);
-
   dstRas->fill(PIXEL::Transparent);
 
   float4 *chan_p = srcMem;
@@ -63,6 +63,23 @@ void Iwa_PerspectiveDistortFx::setOutputRaster(float4 *srcMem,
       pix->m = (typename PIXEL::Channel)((val > (float)PIXEL::maxChannelValue)
                                              ? (float)PIXEL::maxChannelValue
                                              : val);
+    }
+  }
+}
+
+template <>
+void Iwa_PerspectiveDistortFx::setOutputRaster<TRasterFP, TPixelF>(
+    float4 *srcMem, const TRasterFP dstRas, TDimensionI dim, int drawLevel) {
+  dstRas->fill(TPixelF::Transparent);
+  float4 *chan_p = srcMem;
+  for (int j = 0; j < drawLevel; j++) {
+    if (j >= dstRas->getLy()) break;
+    TPixelF *pix = dstRas->pixels(j);
+    for (int i = 0; i < dstRas->getLx(); i++, chan_p++, pix++) {
+      pix->r = (*chan_p).x;
+      pix->g = (*chan_p).y;
+      pix->b = (*chan_p).z;
+      pix->m = (*chan_p).w;
     }
   }
 }
@@ -106,6 +123,8 @@ Iwa_PerspectiveDistortFx::Iwa_PerspectiveDistortFx()
   m_anchorPoint->getY()->setMeasureName("fxLength");
 
   m_precision->setValueRange(1.0, 2.0);
+
+  enableComputeInFloat(true);
 }
 
 //------------------------------------
@@ -113,7 +132,7 @@ Iwa_PerspectiveDistortFx::Iwa_PerspectiveDistortFx()
 bool Iwa_PerspectiveDistortFx::doGetBBox(double frame, TRectD &bBox,
                                          const TRenderSettings &info) {
   if (m_source.isConnected()) {
-    bool ret      = m_source->doGetBBox(frame, bBox, info);
+    bool ret = m_source->doGetBBox(frame, bBox, info);
     if (ret) bBox = TConsts::infiniteRectD;
     return ret;
   }
@@ -171,22 +190,28 @@ void Iwa_PerspectiveDistortFx::doCompute(TTile &tile, double frame,
   /*- ソース画像を正規化して格納 -*/
   /*- 素材を拡大させて持ち込む -*/
   TDimensionI sourceDim(rectOut.getLx() * (int)tceil(precision), anchorPoint.y);
-  float4 *source_host;
-  TRasterGR8P source_host_ras(sourceDim.lx * sizeof(float4), sourceDim.ly);
-  source_host_ras->lock();
-  source_host = (float4 *)source_host_ras->getRawData();
-  {
-    TRenderSettings new_sets(rend_sets);
 
-    new_sets.m_affine *= TTranslation(vp.x, vp.y);
-    new_sets.m_affine *= TScale(precision, 1.0);
-    new_sets.m_affine *= TTranslation(-vp.x, -vp.y);
+  float4 *source_host = nullptr;
 
-    double sourcePosX = offs + precision * (tile.m_pos.x - offs);
+  TRenderSettings new_sets(rend_sets);
 
-    TTile sourceTile;
-    m_source->allocateAndCompute(sourceTile, TPointD(sourcePosX, tile.m_pos.y),
-                                 sourceDim, tile.getRaster(), frame, new_sets);
+  new_sets.m_affine *= TTranslation(vp.x, vp.y);
+  new_sets.m_affine *= TScale(precision, 1.0);
+  new_sets.m_affine *= TTranslation(-vp.x, -vp.y);
+
+  double sourcePosX = offs + precision * (tile.m_pos.x - offs);
+
+  TTile sourceTile;
+  m_source->allocateAndCompute(sourceTile, TPointD(sourcePosX, tile.m_pos.y),
+                               sourceDim, tile.getRaster(), frame, new_sets);
+
+  TRasterGR8P source_host_ras;
+
+  if (tile.getRaster()->getPixelSize() == 4 ||
+      tile.getRaster()->getPixelSize() == 8) {
+    source_host_ras = TRasterGR8P(sourceDim.lx * sizeof(float4), sourceDim.ly);
+    source_host_ras->lock();
+    source_host = (float4 *)source_host_ras->getRawData();
 
     /*- タイルの画像を０〜１に正規化してホストメモリに読み込む -*/
     TRaster32P ras32 = (TRaster32P)sourceTile.getRaster();
@@ -195,6 +220,11 @@ void Iwa_PerspectiveDistortFx::doCompute(TTile &tile, double frame,
       setSourceRaster<TRaster32P, TPixel32>(ras32, source_host, sourceDim);
     else if (ras64)
       setSourceRaster<TRaster64P, TPixel64>(ras64, source_host, sourceDim);
+  } else if (tile.getRaster()->getPixelSize() == 16) {
+    source_host =
+        reinterpret_cast<float4 *>(sourceTile.getRaster()->getRawData());
+  } else {
+    throw TRopException("unsupported input pixel type");
   }
 
   TDimensionI resultDim(rectOut.getLx(), anchorPoint.y);
@@ -208,17 +238,21 @@ void Iwa_PerspectiveDistortFx::doCompute(TTile &tile, double frame,
                 source_host, result_host, sourceDim, resultDim, precision,
                 offs);
 
-  source_host_ras->unlock();
+  if (source_host_ras) source_host_ras->unlock();
 
   /*- 出力結果をChannel値に変換して格納 -*/
   TRaster32P outRas32 = (TRaster32P)tile.getRaster();
   TRaster64P outRas64 = (TRaster64P)tile.getRaster();
+  TRasterFP outRasF   = (TRasterFP)tile.getRaster();
   if (outRas32)
     setOutputRaster<TRaster32P, TPixel32>(result_host, outRas32, outDim,
                                           resultDim.ly);
   else if (outRas64)
     setOutputRaster<TRaster64P, TPixel64>(result_host, outRas64, outDim,
                                           resultDim.ly);
+  else if (outRasF)
+    setOutputRaster<TRasterFP, TPixelF>(result_host, outRasF, outDim,
+                                        resultDim.ly);
 
   result_host_ras->unlock();
 }
@@ -265,5 +299,10 @@ void Iwa_PerspectiveDistortFx::getParamUIs(TParamUIConcept *&concepts,
 }
 
 //------------------------------------
+
+bool Iwa_PerspectiveDistortFx::toBeComputedInLinearColorSpace(
+    bool settingsIsLinear, bool tileIsLinear) const {
+  return tileIsLinear;
+}
 
 FX_PLUGIN_IDENTIFIER(Iwa_PerspectiveDistortFx, "iwa_PerspectiveDistortFx")

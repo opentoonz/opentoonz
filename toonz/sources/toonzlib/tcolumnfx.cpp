@@ -87,8 +87,8 @@ namespace {
 
 void setMaxMatte(TRasterP r) {
   TRaster32P r32 = (TRaster32P)r;
-
   TRaster64P r64 = (TRaster64P)r;
+  TRasterFP rF   = (TRasterFP)r;
 
   if (r32)
     for (int i = 0; i < r32->getLy(); i++) {
@@ -99,6 +99,12 @@ void setMaxMatte(TRasterP r) {
     for (int i = 0; i < r64->getLy(); i++) {
       TPixel64 *pix = r64->pixels(i);
       for (int j = 0; j < r64->getLx(); j++, pix++) pix->m = 65535;
+    }
+  else if (rF)
+    for (int i = 0; i < rF->getLy(); i++) {
+      TPixelF *pix = rF->pixels(i);
+      for (int j = 0; j < rF->getLx(); j++, pix++)
+        pix->m = TPixelF::maxChannelValue;
     }
 }
 
@@ -332,12 +338,12 @@ inline bool fxLess(TRasterFxRenderDataP a, TRasterFxRenderDataP b) {
       dynamic_cast<SandorFxRenderData *>(b.getPointer());
   if (!sandorDataB) return true;
 
-  int aIndex = sandorDataA->m_type == OutBorder
-                   ? 2
-                   : sandorDataA->m_type == BlendTz ? 1 : 0;
-  int bIndex = sandorDataB->m_type == OutBorder
-                   ? 2
-                   : sandorDataB->m_type == BlendTz ? 1 : 0;
+  int aIndex = sandorDataA->m_type == OutBorder ? 2
+               : sandorDataA->m_type == BlendTz ? 1
+                                                : 0;
+  int bIndex = sandorDataB->m_type == OutBorder ? 2
+               : sandorDataB->m_type == BlendTz ? 1
+                                                : 0;
 
   return aIndex < bIndex;
 }
@@ -725,7 +731,9 @@ class LevelFxBuilder final : public ResourceBuilder {
   TXshSimpleLevel *m_sl;
   TFrameId m_fid;
   TRectD m_tileGeom;
-  bool m_64bit;
+  int m_bpp;
+  // bool m_linear;
+  // bool m_64bit;
 
   TRect m_rasBounds;
 
@@ -737,23 +745,29 @@ public:
       , m_palette()
       , m_sl(sl)
       , m_fid(fid)
-      , m_64bit(rs.m_bpp == 64) {}
+      , m_bpp(rs.m_bpp) {}
+  //, m_linear(rs.m_linearColorSpace){}
 
   void setRasBounds(const TRect &rasBounds) { m_rasBounds = rasBounds; }
 
   void compute(const TRectD &tileRect) override {
+    UCHAR flag = ImageManager::dontPutInCache;
+    if (m_bpp == 64 || m_bpp == 128) flag = flag | ImageManager::is64bitEnabled;
+    if (m_bpp == 128) flag = flag | ImageManager::isFloatEnabled;
+    // if (m_linear)
+    //   flag = flag | ImageManager::isLinearEnabled;
+
     // Load the image
-    TImageP img(m_sl->getFullsampledFrame(
-        m_fid, (m_64bit ? ImageManager::is64bitEnabled : 0) |
-                   ImageManager::dontPutInCache));
+    TImageP img(m_sl->getFullsampledFrame(m_fid, flag));
 
     if (!img) return;
 
     TRasterImageP rimg(img);
     TToonzImageP timg(img);
 
-    m_loadedRas = rimg ? (TRasterP)rimg->getRaster()
-                       : timg ? (TRasterP)timg->getRaster() : TRasterP();
+    m_loadedRas = rimg   ? (TRasterP)rimg->getRaster()
+                  : timg ? (TRasterP)timg->getRaster()
+                         : TRasterP();
     assert(m_loadedRas);
 
     if (timg) m_palette = timg->getPalette();
@@ -804,6 +818,7 @@ public:
 TLevelColumnFx::TLevelColumnFx()
     : m_levelColumn(0), m_isCachable(true), m_mutex(), m_offlineContext(0) {
   setName(L"LevelColumn");
+  enableComputeInFloat(true);
 }
 
 //--------------------------------------------------
@@ -1087,13 +1102,15 @@ void TLevelColumnFx::doCompute(TTile &tile, double frame,
       ri  = 0;
       TRaster32P ras32(ras);
       TRaster64P ras64(ras);
+      TRasterFP rasF(ras);
 
       // Ensure that ras is either a 32 or 64 fullcolor.
       // Otherwise, we have to convert it.
-      if (!ras32 && !ras64) {
+      if (!ras32 && !ras64 && !rasF) {
         TRasterP tileRas(tile.getRaster());
         TRaster32P tileRas32(tileRas);
         TRaster64P tileRas64(tileRas);
+        TRasterFP tileRasF(tileRas);
 
         if (tileRas32) {
           ras32 = TRaster32P(ras->getLx(), ras->getLy());
@@ -1103,6 +1120,10 @@ void TLevelColumnFx::doCompute(TTile &tile, double frame,
           ras64 = TRaster64P(ras->getLx(), ras->getLy());
           TRop::convert(ras64, ras);
           ras = ras64;
+        } else if (tileRasF) {
+          rasF = TRasterFP(ras->getLx(), ras->getLy());
+          TRop::convert(rasF, ras);
+          ras = rasF;
         } else
           assert(0);
       }
@@ -1127,7 +1148,8 @@ void TLevelColumnFx::doCompute(TTile &tile, double frame,
         TRop::whiteTransp(appRas);
         ras = appRas;
       }
-      if (levelProp->antialiasSoftness() > 0) {
+      if (levelProp->antialiasSoftness() > 0 &&
+          !rasF) {  // temporarily disabled with float raster
         TRasterP appRas = ras->create(ras->getLx(), ras->getLy());
         TRop::antialias(ras, appRas, 10, levelProp->antialiasSoftness());
         ras = appRas;

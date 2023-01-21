@@ -34,6 +34,11 @@ public:
                  const TRenderSettings &infoOnOutput, TRectD &rectOnInput,
                  TRenderSettings &infoOnInput) override;
 
+  bool toBeComputedInLinearColorSpace(bool settingsIsLinear,
+                                      bool tileIsLinear) const override {
+    return tileIsLinear;
+  }
+
 private:
   void makeTile(const TTile &inputTile, const TTile &tile) const;
 };
@@ -53,6 +58,8 @@ TileFx::TileFx()
   bindParam(this, "margin", m_margin);
   m_mode->addItem(eTileHorizontally, "Tile Horizontally");
   m_mode->addItem(eTileVertically, "Tile Vertically");
+
+  enableComputeInFloat(true);
 }
 
 //------------------------------------------------------------------------------

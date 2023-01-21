@@ -12,7 +12,9 @@ const int KEY_ICON_WIDTH      = 11;
 const int KEY_ICON_HEIGHT     = 13;
 const int EASE_TRIANGLE_SIZE  = 4;
 const int PLAY_MARKER_SIZE    = 10;
-const int PINNED_SIZE         = 10;
+const int PINNED_SIZE         = 11;
+const int NAV_TAG_WIDTH       = 7;
+const int NAV_TAG_HEIGHT      = 13;
 const int FRAME_MARKER_SIZE   = 4;
 const int FOLDED_CELL_SIZE    = 9;
 const int SHIFTTRACE_DOT_SIZE = 12;
@@ -413,6 +415,10 @@ TopToBottomOrientation::TopToBottomOrientation() {
                 SHIFTTRACE_DOT_SIZE, SHIFTTRACE_DOT_SIZE));
   addRect(PredefinedRect::SHIFTTRACE_DOT_AREA,
           QRect(SHIFTTRACE_DOT_OFFSET, 0, SHIFTTRACE_DOT_SIZE, CELL_HEIGHT));
+  addRect(
+      PredefinedRect::NAVIGATION_TAG_AREA,
+      QRect((FRAME_HEADER_WIDTH - NAV_TAG_HEIGHT) / 2,
+            (CELL_HEIGHT - NAV_TAG_WIDTH) / 2, NAV_TAG_HEIGHT, NAV_TAG_WIDTH));
 
   // Column viewer
   addRect(PredefinedRect::LAYER_HEADER,
@@ -1000,6 +1006,14 @@ TopToBottomOrientation::TopToBottomOrientation() {
   }
   addPath(PredefinedPath::VOLUME_SLIDER_HEAD, head);
 
+  QPainterPath tag(QPointF(0, -3));
+  tag.lineTo(QPointF(9, -3));
+  tag.lineTo(QPointF(13, 0));
+  tag.lineTo(QPointF(9, 3));
+  tag.lineTo(QPointF(0, 3));
+  tag.lineTo(QPointF(0, -3));
+  addPath(PredefinedPath::NAVIGATION_TAG, tag);
+
   //
   // Points
   //
@@ -1197,6 +1211,11 @@ LeftToRightOrientation::LeftToRightOrientation() {
               .adjusted(-1, 0, -1, 0));
   addRect(PredefinedRect::SHIFTTRACE_DOT_AREA,
           QRect(0, SHIFTTRACE_DOT_OFFSET, CELL_WIDTH, SHIFTTRACE_DOT_SIZE));
+  addRect(PredefinedRect::NAVIGATION_TAG_AREA,
+          QRect((CELL_WIDTH - NAV_TAG_WIDTH) / 2,
+                (FRAME_HEADER_HEIGHT - NAV_TAG_HEIGHT) / 2, NAV_TAG_WIDTH,
+                NAV_TAG_HEIGHT));
+
 
   // Column viewer
   addRect(PredefinedRect::LAYER_HEADER,
@@ -1412,6 +1431,14 @@ LeftToRightOrientation::LeftToRightOrientation() {
   timeIndicator.lineTo(QPointF(9, -4));
   timeIndicator.lineTo(QPointF(0, 0));
   addPath(PredefinedPath::TIME_INDICATOR_HEAD, timeIndicator);
+
+  QPainterPath tag(QPointF(-3, 0));
+  tag.lineTo(QPointF(3, 0));
+  tag.lineTo(QPointF(3, 9));
+  tag.lineTo(QPointF(0, 13));
+  tag.lineTo(QPointF(-3, 9));
+  tag.lineTo(QPointF(-3, 0));
+  addPath(PredefinedPath::NAVIGATION_TAG, tag);
 
   //
   // Points

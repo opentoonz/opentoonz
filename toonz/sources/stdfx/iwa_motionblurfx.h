@@ -11,6 +11,7 @@
 
 #include "tfxparam.h"
 #include "stdfx.h"
+#include "iwa_bokeh_util.h"  // ExposureConverter
 
 #include "motionawarebasefx.h"
 
@@ -25,9 +26,9 @@ struct float3 {
 struct float4 {
   float x, y, z, w;
 };
-struct int2 {
-  int x, y;
-};
+// struct int2 {
+//   int x, y;
+// };
 
 /*- m_premultiTypeの取る値 -*/
 enum PremultiTypes {
@@ -43,7 +44,10 @@ protected:
   TRasterFxPort m_input;
   TRasterFxPort m_background;
 
-  TDoubleParamP m_hardness; /*- フィルムのガンマ値 -*/
+  TDoubleParamP m_hardness;     // gamma (version 1)
+  TDoubleParamP m_gamma;        // gamma (version 2)
+  TDoubleParamP m_gammaAdjust;  // Gamma offset from the current color space
+                                // gamma (version 3)
 
   /*-- 左右をぼかすためのパラメータ --*/
   TDoubleParamP m_startValue; /*- シャッター開け時のフィルタ値 -*/
@@ -85,7 +89,8 @@ protected:
 
   /*- RGB値(０〜１)を露光値に変換 -*/
   void convertRGBtoExposure_CPU(float4 *in_tile_p, TDimensionI &dim,
-                                float hardness, bool sourceIsPremultiplied);
+                                const ExposureConverter &conv,
+                                bool sourceIsPremultiplied);
 
   /*- 露光値をフィルタリングしてぼかす -*/
   void applyBlurFilter_CPU(float4 *in_tile_p, float4 *out_tile_p,
@@ -96,7 +101,7 @@ protected:
 
   /*- 露光値をdepremultipy→RGB値(０〜１)に戻す→premultiply -*/
   void convertExposureToRGB_CPU(float4 *out_tile_p, TDimensionI &dim,
-                                float hardness);
+                                const ExposureConverter &conv);
 
   /*- 背景があり、前景が動かない場合、単純にOverする -*/
   void composeWithNoMotion(TTile &tile, double frame,
@@ -107,7 +112,7 @@ protected:
                                      TDimensionI &enlargedDimIn,
                                      int marginRight, int marginTop,
                                      TTile &back_tile, TDimensionI &dimOut,
-                                     float hardness);
+                                     const ExposureConverter &conv);
 
 public:
   Iwa_MotionBlurCompFx();
@@ -116,7 +121,7 @@ public:
                  const TRenderSettings &settings) override;
 
   void doCompute_CPU(TTile &tile, double frame, const TRenderSettings &settings,
-                     float4 *pointsTable, int pointAmount, double hardness,
+                     float4 *pointsTable, int pointAmount, double gamma,
                      double shutterStart, double shutterEnd,
                      int traceResolution, float startValue, float startCurve,
                      float endValue, float endCurve, int marginLeft,
@@ -133,6 +138,10 @@ public:
           エイリアスは毎フレーム変える -*/
   std::string getAlias(double frame,
                        const TRenderSettings &info) const override;
+  void onFxVersionSet() final override;
+
+  bool toBeComputedInLinearColorSpace(bool settingsIsLinear,
+                                      bool tileIsLinear) const override;
 };
 
 #endif

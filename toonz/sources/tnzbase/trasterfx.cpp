@@ -22,7 +22,7 @@
 #include "trenderer.h"
 
 // Diagnostics
-//#define DIAGNOSTICS
+// #define DIAGNOSTICS
 #ifdef DIAGNOSTICS
 #include "diagnostics.h"
 
@@ -218,7 +218,7 @@ class TrFx final : public TBaseRasterFx {
   TRasterFx *m_fx;
 
 public:
-  TrFx() {}
+  TrFx() { enableComputeInFloat(true); }
   ~TrFx() {}
 
   //-----------------------------------------------------------
@@ -307,6 +307,13 @@ public:
     if (!buildInput(rect, frame, info, rectIn, infoIn, appliedAff)) return 0;
 
     return TRasterFx::memorySize(rectIn, info.m_bpp);
+  }
+
+  //-----------------------------------------------------------
+
+  bool toBeComputedInLinearColorSpace(bool settingsIsLinear,
+                                      bool tileIsLinear) const override {
+    return tileIsLinear;
   }
 
 private:
@@ -430,8 +437,10 @@ void FxResourceBuilder::buildTileToCalculate(const TRectD &tileGeom) {
     TRect rect(0, 0, requiredSize.lx - 1, requiredSize.ly - 1);
     ras = outRas->extract(rect);
     ras->clear();
-  } else
+  } else {
     ras = outRas->create(requiredSize.lx, requiredSize.ly);
+    ras->setLinear(outRas->isLinear());
+  }
 
   m_newTile.setRaster(ras);
 
@@ -489,7 +498,14 @@ public:
   std::string m_interactiveCacheId;
   mutable TThread::Mutex m_mutex;  // brutto
 
-  TRasterFxImp() : m_cacheEnabled(false), m_isEnabled(true), m_cachedTile(0) {}
+  bool m_canComputeInFloat;
+  bool m_canComputeInLinearColorSpace;
+
+  TRasterFxImp()
+      : m_cacheEnabled(false)
+      , m_isEnabled(true)
+      , m_cachedTile(0)
+      , m_canComputeInFloat(false) {}
 
   ~TRasterFxImp() {}
 
@@ -516,6 +532,9 @@ public:
     QMutexLocker sl(&m_mutex);  // a che serve
     m_isEnabled = on;
   }
+
+  void enableComputeInFloat(bool on) { m_canComputeInFloat = on; }
+  bool canComputeInFloat() { return m_canComputeInFloat; }
 };
 
 //--------------------------------------------------
@@ -680,7 +699,9 @@ void TRasterFx::dryCompute(TRectD &rect, double frame,
   }
 
   std::string alias = getAlias(frame, info) + "[" + ::traduce(info.m_affine) +
-                      "][" + std::to_string(info.m_bpp) + "]";
+                      "][" + std::to_string(info.m_bpp) + "][" +
+                      std::to_string(info.m_linearColorSpace) + "][" +
+                      std::to_string(info.m_colorSpaceGamma) + "]";
 
   int renderStatus =
       TRenderer::instance().getRenderStatus(TRenderer::renderId());
@@ -766,6 +787,8 @@ void TRasterFx::allocateAndCompute(TTile &tile, const TPointD &pos,
   if (templateRas) {
     TRaster32P ras32(templateRas);
     TRaster64P ras64(templateRas);
+    TRasterFP rasF(templateRas);
+    bool isLinear = templateRas->isLinear();
     templateRas = 0;  // Release the reference to templateRas before allocation
 
     TRasterP tileRas;
@@ -773,11 +796,13 @@ void TRasterFx::allocateAndCompute(TTile &tile, const TPointD &pos,
       tileRas = TRaster32P(size.lx, size.ly);
     else if (ras64)
       tileRas = TRaster64P(size.lx, size.ly);
+    else if (rasF)
+      tileRas = TRasterFP(size.lx, size.ly);
     else {
       assert(false);
       return;
     }
-
+    tileRas->setLinear(isLinear);
     tile.setRaster(tileRas);
   } else {
     if (info.m_bpp == 32) {
@@ -786,8 +811,12 @@ void TRasterFx::allocateAndCompute(TTile &tile, const TPointD &pos,
     } else if (info.m_bpp == 64) {
       TRaster64P tileRas(size.lx, size.ly);
       tile.setRaster(tileRas);
+    } else if (info.m_bpp == 128) {
+      TRasterFP tileRas(size.lx, size.ly);
+      tile.setRaster(tileRas);
     } else
       assert(false);
+    tile.getRaster()->setLinear(info.m_linearColorSpace);
   }
 
   tile.m_pos = pos;
@@ -862,17 +891,45 @@ void TRasterFx::compute(TTile &tile, double frame,
   // Retrieve tile's geometry
   TRectD tilePlacement = myConvert(tile.getRaster()->getBounds()) + tile.m_pos;
 
-  // Build the fx result alias (in other words, its name)
-  std::string alias = getAlias(frame, info) + "[" + ::traduce(info.m_affine) +
-                      "][" + std::to_string(info.m_bpp) +
-                      "]";  // To be moved below
-
   TRectD bbox;
   getBBox(frame, bbox, info);
   enlargeToI(bbox);
 
   TRectD interestingRect(tilePlacement * bbox);
   if (myIsEmpty(interestingRect)) return;
+
+  TDimension tileSize = tile.getRaster()->getSize();
+  // ひとつ前のノードが小数点対応しているかどうかによって、入ってくるラスタの形式が異なる
+  TRaster32P ras32 = tile.getRaster();
+  TRaster64P ras64 = tile.getRaster();
+  TRasterFP rasF   = tile.getRaster();
+  if (info.m_bpp == 128) {
+    if (rasF && !canComputeInFloat()) {
+      TRasterP rasAux = TRaster64P(tileSize);
+      TRop::convert(rasAux, tile.getRaster());
+      tile.setRaster(rasAux);
+    } else if ((ras32 || ras64) && canComputeInFloat()) {
+      TRasterFP rasAuxF = TRasterFP(tileSize);
+      TRop::convert(rasAuxF, tile.getRaster());
+      tile.setRaster(rasAuxF);
+    }
+  }
+  // linear化
+  bool isLinear = tile.getRaster()->isLinear();
+  bool computeInLinear =
+      toBeComputedInLinearColorSpace(info.m_linearColorSpace, isLinear);
+  if (isLinear != computeInLinear) {
+    if (isLinear) {  //  && !computeInLinear
+      TRop::tosRGB(tile.getRaster(), info.m_colorSpaceGamma);
+    } else  // !isLinear && computeInLinear
+      TRop::toLinearRGB(tile.getRaster(), info.m_colorSpaceGamma);
+  }
+
+  // Build the fx result alias (in other words, its name)
+  std::string alias = getAlias(frame, info) + "[" + ::traduce(info.m_affine) +
+                      "][" + std::to_string(info.m_bpp) + "][" +
+                      std::to_string(computeInLinear) + "][" +
+                      std::to_string(info.m_colorSpaceGamma) + "]";
 
   // Extract the interesting tile from requested one
   TTile interestingTile;
@@ -896,6 +953,29 @@ void TRasterFx::compute(TTile &tile, double frame,
   // Invoke the fx-specific computation process
   FxResourceBuilder rBuilder(alias, this, info, frame);
   rBuilder.build(interestingTile);
+
+  // linear化
+  if (isLinear != computeInLinear) {
+    if (isLinear)  //  && !computeInLinear
+      TRop::toLinearRGB(tile.getRaster(), info.m_colorSpaceGamma);
+    else  // !isLinear && computeInLinear
+      TRop::tosRGB(tile.getRaster(), info.m_colorSpaceGamma);
+  }
+
+  if (info.m_bpp == 128) {
+    if (rasF && !canComputeInFloat()) {
+      TRop::convert(rasF, tile.getRaster());
+      tile.setRaster(rasF);
+    } else if ((ras32 || ras64) && canComputeInFloat()) {
+      if (ras64) {
+        TRop::convert(ras64, tile.getRaster());
+        tile.setRaster(ras64);
+      } else {
+        TRop::convert(ras32, tile.getRaster());
+        tile.setRaster(ras32);
+      }
+    }
+  }
 
 #ifdef DIAGNOSTICS
   sw.stop();
@@ -982,7 +1062,7 @@ TRasterP TRasterFx::applyAffine(TTile &tileOut, const TTile &tileIn,
 
   TRectD rectInAfter = aff * myConvert(src_ras->getBounds());
   TAffine rasterAff  = TTranslation((aff * rectIn).getP00() - rectOut.getP00() -
-                                   rectInAfter.getP00()) *
+                                    rectInAfter.getP00()) *
                       aff;
 
   TRop::ResampleFilterType qual;
@@ -1055,6 +1135,18 @@ bool TRasterFx::isCacheEnabled() const { return m_rasFxImp->m_cacheEnabled; }
 
 void TRasterFx::enableCache(bool on) { m_rasFxImp->enableCache(on); }
 
+//--------------------------------------------------
+
+bool TRasterFx::canComputeInFloat() const {
+  return m_rasFxImp->canComputeInFloat();
+}
+
+//--------------------------------------------------
+
+void TRasterFx::enableComputeInFloat(bool on) {
+  m_rasFxImp->enableComputeInFloat(on);
+}
+
 //==============================================================================
 //
 // TRenderSettings
@@ -1077,7 +1169,9 @@ TRenderSettings::TRenderSettings()
     , m_applyShrinkToViewer(false)
     , m_userCachable(true)
     , m_isCanceled(NULL)
-    , m_getFullSizeBBox(false) {}
+    , m_getFullSizeBBox(false)
+    , m_linearColorSpace(false)
+    , m_colorSpaceGamma(2.2) {}
 
 //------------------------------------------------------------------------------
 
@@ -1096,7 +1190,8 @@ std::string TRenderSettings::toString() const {
       "," + std::to_string(m_affine.a21) + "," + std::to_string(m_affine.a22) +
       "," + std::to_string(m_affine.a23) + ";" + std::to_string(m_maxTileSize) +
       ";" + std::to_string(m_isSwatch) + ";" + std::to_string(m_userCachable) +
-      ";{";
+      ";" + std::to_string(m_linearColorSpace) + ";" +
+      std::to_string(m_colorSpaceGamma) + ";{";
   if (!m_data.empty()) {
     ss += m_data[0]->toString();
     for (int i = 1; i < (int)m_data.size(); i++)
@@ -1119,7 +1214,9 @@ bool TRenderSettings::operator==(const TRenderSettings &rhs) const {
       m_applyShrinkToViewer != rhs.m_applyShrinkToViewer ||
       m_maxTileSize != rhs.m_maxTileSize || m_affine != rhs.m_affine ||
       m_mark != rhs.m_mark || m_isSwatch != rhs.m_isSwatch ||
-      m_userCachable != rhs.m_userCachable)
+      m_userCachable != rhs.m_userCachable ||
+      m_linearColorSpace != rhs.m_linearColorSpace ||
+      m_colorSpaceGamma != rhs.m_colorSpaceGamma)
     return false;
 
   return std::equal(m_data.begin(), m_data.end(), rhs.m_data.begin(), areEqual);

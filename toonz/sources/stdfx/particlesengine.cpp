@@ -3,11 +3,11 @@
 #include "trop.h"
 #include "tfxparam.h"
 #include "tofflinegl.h"
-//#include "tstroke.h"
-//#include "drawutil.h"
+// #include "tstroke.h"
+// #include "drawutil.h"
 #include "tstopwatch.h"
-//#include "tpalette.h"
-//#include "tvectorrenderdata.h"
+// #include "tpalette.h"
+// #include "tvectorrenderdata.h"
 #include "tsystem.h"
 #include "timagecache.h"
 #include "tconvert.h"
@@ -139,8 +139,8 @@ void Particles_Engine::fill_value_struct(struct particles_values &myvalues,
   myvalues.perspective_distribution_val =
       m_parent->perspective_distribution_val->getValue();
   myvalues.motion_blur_val = m_parent->motion_blur_val->getValue();
-  myvalues.motion_blur_gamma_val =
-      m_parent->motion_blur_gamma_val->getValue(frame);
+  myvalues.motion_blur_gamma_adjust_val =
+      m_parent->motion_blur_gamma_adjust_val->getValue(frame);
 }
 
 /*-----------------------------------------------------------------*/
@@ -511,8 +511,9 @@ void Particles_Engine::render_particles(
     // Perform the roll
     /*- RenderSettingsを複製して現在のフレームの計算用にする -*/
     TRenderSettings riAux(ri);
-    riAux.m_affine = TAffine();
-    riAux.m_bpp    = 32;
+    riAux.m_affine           = TAffine();
+    riAux.m_bpp              = 32;
+    riAux.m_linearColorSpace = false;
     // control image using its gradient is computed in 64bpp
     TRenderSettings riAux64(riAux);
     riAux64.m_bpp = 64;
@@ -772,10 +773,11 @@ void Particles_Engine::do_render(
   }
 
   // Now, these are the particle rendering specifications
-  bbox            = bbox.enlarge(3);
-  standardRefBBox = bbox;
-  riNew.m_affine  = TScale(partScale);
-  bbox            = riNew.m_affine * bbox;
+  bbox                     = bbox.enlarge(3);
+  standardRefBBox          = bbox;
+  riNew.m_affine           = TScale(partScale);
+  bbox                     = riNew.m_affine * bbox;
+  riNew.m_linearColorSpace = false;
   /*- 縮小済みのParticleのサイズ -*/
   partResolution = TDimensionD(tceil(bbox.getLx()), tceil(bbox.getLy()));
 
@@ -864,7 +866,7 @@ void Particles_Engine::do_render(
   if (values.motion_blur_val) {
     if (do_render_motion_blur(part, tile, tileRas, rfinalpart, M, bbox,
                               values.trailopacity_val,
-                              values.motion_blur_gamma_val, ri))
+                              values.motion_blur_gamma_adjust_val, ri))
       return;
   }
 
@@ -890,12 +892,14 @@ void Particles_Engine::do_render(
 bool Particles_Engine::do_render_motion_blur(
     Particle *part, TTile *tile, TRasterP tileRas, TRaster32P rfinalpart,
     TAffine &M, const TRectD &bbox, const DoublePair &trailOpacity,
-    const double gamma, const TRenderSettings &ri) {
+    const double gamma_adjust, const TRenderSettings &ri) {
   QList<TPointD> points;
   QList<double> lengths;
 
   // do not render new-born particles as it has no trace
   if (part->genlifetime - part->lifetime == 0) return true;
+
+  double gamma = gamma_adjust + ri.m_colorSpaceGamma;
 
   TRectD partBBoxD =
       M * TTranslation(bbox.getP00()) * convert(rfinalpart->getBounds());

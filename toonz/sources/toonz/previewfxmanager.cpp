@@ -713,7 +713,7 @@ void PreviewFxInstance::updateRenderSettings() {
 
   m_subcamera = properties->isSubcameraPreview();
 
-  const TRenderSettings &renderSettings = properties->getRenderSettings();
+  TRenderSettings renderSettings = properties->getRenderSettings();
 
   if (m_renderSettings != renderSettings) {
     m_renderSettings = renderSettings;
@@ -1067,11 +1067,19 @@ void PreviewFxInstance::doOnRenderRasterCompleted(
   else
     ras = 0;
 
-  /*-- 16bpcで計算された場合、結果をDitheringする --*/
   TRasterP rasA = renderData.m_rasA;
   TRasterP rasB = renderData.m_rasB;
+
+  // Linear Color Space -> sRGB
+  if (rasA->isLinear()) {
+    TRop::tosRGB(rasA, m_renderSettings.m_colorSpaceGamma);
+    if (m_renderSettings.m_stereoscopic)
+      TRop::tosRGB(rasB, m_renderSettings.m_colorSpaceGamma);
+  }
+
+  /*-- 16bpcで計算された場合、結果をDitheringする --*/
   // dither the 16bpc image IF the "30bit display" preference option is OFF
-  if (rasA->getPixelSize() == 8 &&
+  if ((rasA->getPixelSize() == 8 || rasA->getPixelSize() == 16) &&
       !Preferences::instance()->is30bitDisplayEnabled())  // render in 64 bits
   {
     TRaster32P auxA(rasA->getLx(), rasA->getLy());

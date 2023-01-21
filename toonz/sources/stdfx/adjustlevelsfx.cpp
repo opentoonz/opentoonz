@@ -1,7 +1,7 @@
 
 
 #include "stdfx.h"
-//#include "tsystem.h"
+// #include "tsystem.h"
 #include "tfxparam.h"
 #include "tpixelutils.h"
 #include "tparamset.h"
@@ -64,7 +64,11 @@ public:
     bindParam(this, "gamma_b", m_gamma_b);
     bindParam(this, "gamma_m", m_gamma_m);
     addInputPort("Source", m_input);
-
+    // TODO: Floatでの計算が可能になるにあたって、
+    // 値の範囲を0-255で制限したくない
+    // →
+    // スライダは0-255のまま、入力フィールドは好きな数字を入れられるようにするか？
+    //   (Nuke の Histogramエフェクトのように)
     m_in_rgb->getMin()->setValueRange(0, 255);
     m_in_rgb->getMax()->setValueRange(0, 255);
     m_in_r->getMin()->setValueRange(0, 255);
@@ -90,6 +94,8 @@ public:
     m_gamma_g->setValueRange(0.0, 200.0);
     m_gamma_b->setValueRange(0.0, 200.0);
     m_gamma_m->setValueRange(0.0, 200.0);
+
+    enableComputeInFloat(true);
   }
 
   ~AdjustLevelsFx(){};

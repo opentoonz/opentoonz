@@ -1,6 +1,6 @@
 
 
-//#include "trop.h"
+// #include "trop.h"
 #include "tfxparam.h"
 #include <math.h>
 #include "stdfx.h"
@@ -42,6 +42,7 @@ public:
     m_srange->setValueRange(0.0, 1.0);
     m_vrange->setValueRange(0.0, 1.0);
     addInputPort("Source", m_input);
+    enableComputeInFloat(true);
   }
 
   ~HSVKeyFx(){};
@@ -110,17 +111,17 @@ void HSVKeyFx::doCompute(TTile &tile, double frame, const TRenderSettings &ri) {
   double highV = std::min(1.0, v_ref + v_range);
 
   TRaster32P raster32 = tile.getRaster();
+  TRaster64P raster64 = tile.getRaster();
+  TRasterFP rasterF   = tile.getRaster();
 
   if (raster32)
     doHSVKey<TPixel32>(raster32, lowH, highH, lowS, highS, lowV, highV, gender);
-  else {
-    TRaster64P raster64 = tile.getRaster();
-    if (raster64)
-      doHSVKey<TPixel64>(raster64, lowH, highH, lowS, highS, lowV, highV,
-                         gender);
-    else
-      throw TException("HSVKey: unsupported Pixel Type");
-  }
+  else if (raster64)
+    doHSVKey<TPixel64>(raster64, lowH, highH, lowS, highS, lowV, highV, gender);
+  else if (rasterF)
+    doHSVKey<TPixelF>(rasterF, lowH, highH, lowS, highS, lowV, highV, gender);
+  else
+    throw TException("HSVKey: unsupported Pixel Type");
 }
 
 //------------------------------------------------------------------

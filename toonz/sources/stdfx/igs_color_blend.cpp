@@ -156,7 +156,9 @@ double lighten_ch_(const double dn, const double dn_a, const double up,
                                  : dn_add_up_ch_(dn, dn_a, up, up_opacity);
 }
 double screen_(const double dn, const double up) {
-  return 1.0 - (1.0 - dn) * (1.0 - up);
+  return (dn <= 1.0 && up <= 1.0) ? 1.0 - (1.0 - dn) * (1.0 - up)
+         : (up > dn)              ? up
+                                  : dn;
 }
 double color_dodge_(const double dn, const double up) {
   return (1.0 <= up) ? 1.0 : clamp_min1_ch_(dn / (1.0 - up));

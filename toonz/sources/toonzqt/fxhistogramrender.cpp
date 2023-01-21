@@ -90,7 +90,8 @@ void FxHistogramRender::computeHistogram(TFxP fx, int frame) {
   if (!sceneProperties) return;
   TOutputProperties *outputProperties = sceneProperties->getPreviewProperties();
   if (!outputProperties) return;
-  const TRenderSettings rs = outputProperties->getRenderSettings();
+  TRenderSettings rs = outputProperties->getRenderSettings();
+
   TFxP buildedFx;
   if (m_isCameraViewMode)
     buildedFx =
@@ -167,8 +168,9 @@ void FxHistogramRender::remakeRender() {
   TRectD area(TPointD(-0.5 * size.lx, -0.5 * size.ly),
               TDimensionD(size.lx, size.ly));
   m_renderPort->setRenderArea(area);
-  const TRenderSettings rs =
+  TRenderSettings rs =
       m_scene->getProperties()->getPreviewProperties()->getRenderSettings();
+
   TFxP buildedFx =
       buildPartialSceneFx(m_scene, (double)m_lastFrameInfo.m_frame,
                           m_lastFrameInfo.m_fx, rs.m_shrinkX, true);

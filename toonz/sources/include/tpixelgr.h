@@ -28,6 +28,8 @@ class TPixelGR8;
 //! Gray Scale 2 byte/pixel
 class TPixelGR16;
 
+class TPixelF;
+
 //-----------------------------------------------------------------------------
 /*! grey tones, 8 bits
    A set of predefined colors are included as well.
@@ -106,6 +108,22 @@ public:
 
   static const TPixelGR16 White;
   static const TPixelGR16 Black;
+};
+
+//-----------------------------------------------------------------------------
+
+class DVAPI TPixelGRF {
+public:
+  typedef float Channel;
+
+  float value;
+  TPixelGRF(float v = 0.f) : value(v){};
+  TPixelGRF(const TPixelGRF &pix) : value(pix.value){};
+  inline bool operator==(const TPixelGRF &p) const { return value == p.value; };
+  inline bool operator<(const TPixelGRF &p) const { return value < p.value; };
+
+  inline void setValue(float _value) { value = (float)_value; }
+  static TPixelGRF from(const TPixelF &pix);
 };
 
 //-----------------------------------------------------------------------------

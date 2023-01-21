@@ -17,7 +17,9 @@
 #include "toonzqt/strokesdata.h"
 #include "toonzqt/rasterimagedata.h"
 #include "timagecache.h"
+#include "tools/toolhandle.h"
 #include "tools/toolutils.h"
+#include "tools/rasterselection.h"
 #include "toonzqt/icongenerator.h"
 
 #include "tundo.h"
@@ -1555,9 +1557,66 @@ void FilmstripCmd::paste(TXshSimpleLevel *sl, std::set<TFrameId> &frames) {
         (frames.size() == 1) ? !sl->isFid((*frames.begin())) : false;
     TTileSet *tileSet = 0;
     std::map<TFrameId, std::set<int>> indices;
-    TUndo *undo   = 0;
-    TPaletteP plt = sl->getPalette()->clone();
-    bool isPaste  = pasteAreasWithoutUndo(data, sl, frames, &tileSet, indices);
+    TUndo *undo      = 0;
+    TPaletteP plt    = sl->getPalette()->clone();
+    QImage clipImage = clipboard->image();
+
+    FullColorImageData *fullColorData =
+        dynamic_cast<FullColorImageData *>(data);
+
+    if ((!clipImage.isNull() || fullColorData) &&
+        sl->getType() != OVL_XSHLEVEL) {
+      DVGui::error(QObject::tr(
+          "Can't paste full raster data on a non full raster level."));
+      return;
+    }
+
+    if (sl->getType() == OVL_XSHLEVEL && !clipImage.isNull()) {
+      // This stuff is only if we have a pasted image from outside OpenToonz
+
+      if (sl->getResolution().lx < clipImage.width() ||
+          sl->getResolution().ly < clipImage.height()) {
+        clipImage =
+            clipImage.scaled(sl->getResolution().lx, sl->getResolution().ly,
+                             Qt::KeepAspectRatio);
+      }
+
+      // create variables to go into the Full Color Image data
+      std::vector<TRectD> rects;
+      const std::vector<TStroke> strokes;
+      const std::vector<TStroke> originalStrokes;
+      TAffine aff;
+      TRasterP ras = rasterFromQImage(clipImage);
+      rects.push_back(TRectD(0.0 - clipImage.width() / 2,
+                             0.0 - clipImage.height() / 2,
+                             clipImage.width() / 2, clipImage.height() / 2));
+      FullColorImageData *qimageData = new FullColorImageData();
+
+      TDimension dim = sl->getResolution();
+
+      qimageData->setData(ras, plt, 120.0, 120.0, dim, rects, strokes,
+                          originalStrokes, aff);
+      data = qimageData;
+      // end of pasted from outside OpenToonz stuff
+      // data holds all the info either way now.
+    }
+
+    if (sl && sl->getType() == OVL_XSHLEVEL) {
+      // make selection always work on new raster cells
+      ToolHandle *toolHandle = TApp::instance()->getCurrentTool();
+      if (toolHandle->getTool()->getName() == "T_Selection") {
+        TSelection *ts      = toolHandle->getTool()->getSelection();
+        RasterSelection *rs = dynamic_cast<RasterSelection *>(ts);
+        if (rs) {
+          toolHandle->getTool()->onDeactivate();
+          toolHandle->getTool()->onActivate();
+          rs->pasteSelection();
+          return;
+        }
+      }
+    }
+
+    bool isPaste = pasteAreasWithoutUndo(data, sl, frames, &tileSet, indices);
     RasterImageData *rasterImageData = dynamic_cast<RasterImageData *>(data);
     StrokesData *strokesData         = dynamic_cast<StrokesData *>(data);
     if (rasterImageData && tileSet)

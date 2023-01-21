@@ -24,6 +24,8 @@ void Iwa_DirectionalBlurFx::setReferenceRaster(const RASTER srcRas,
       (*dst_p) = ((float)pix->r * 0.3f + (float)pix->g * 0.59f +
                   (float)pix->b * 0.11f) /
                  (float)PIXEL::maxChannelValue;
+      // clamp
+      (*dst_p) = std::min(1.f, std::max(0.f, (*dst_p)));
     }
   }
 }
@@ -81,6 +83,23 @@ void Iwa_DirectionalBlurFx::setOutputRaster(float4 *srcMem, const RASTER dstRas,
   }
 }
 
+template <>
+void Iwa_DirectionalBlurFx::setOutputRaster<TRasterFP, TPixelF>(
+    float4 *srcMem, const TRasterFP dstRas, TDimensionI dim, int2 margin) {
+  int out_j = 0;
+  for (int j = margin.y; j < dstRas->getLy() + margin.y; j++, out_j++) {
+    TPixelF *pix   = dstRas->pixels(out_j);
+    float4 *chan_p = srcMem;
+    chan_p += j * dim.lx + margin.x;
+    for (int i = 0; i < dstRas->getLx(); i++, pix++, chan_p++) {
+      pix->r = (*chan_p).x;
+      pix->g = (*chan_p).y;
+      pix->b = (*chan_p).z;
+      pix->m = std::min((*chan_p).w, 1.f);
+    }
+  }
+}
+
 //------------------------------------
 
 Iwa_DirectionalBlurFx::Iwa_DirectionalBlurFx()
@@ -102,6 +121,8 @@ Iwa_DirectionalBlurFx::Iwa_DirectionalBlurFx()
 
   m_filterType->addItem(Gaussian, "Gaussian");
   m_filterType->addItem(Flat, "Flat");
+
+  enableComputeInFloat(true);
 }
 
 //------------------------------------
@@ -174,12 +195,16 @@ void Iwa_DirectionalBlurFx::doCompute(TTile &tile, double frame,
     /*- 参照画像の輝度を０〜１に正規化してホストメモリに読み込む -*/
     TRaster32P ras32 = (TRaster32P)reference_tile.getRaster();
     TRaster64P ras64 = (TRaster64P)reference_tile.getRaster();
+    TRasterFP rasF   = (TRasterFP)reference_tile.getRaster();
     if (ras32)
       setReferenceRaster<TRaster32P, TPixel32>(ras32, reference_host,
                                                enlargedDimIn);
     else if (ras64)
       setReferenceRaster<TRaster64P, TPixel64>(ras64, reference_host,
                                                enlargedDimIn);
+    else if (rasF)
+      setReferenceRaster<TRasterFP, TPixelF>(rasF, reference_host,
+                                             enlargedDimIn);
   }
 
   //-------------------------------------------------------
@@ -221,10 +246,13 @@ void Iwa_DirectionalBlurFx::doCompute_CPU(
   /*- ソース画像を０〜１に正規化してホストメモリに読み込む -*/
   TRaster32P ras32 = (TRaster32P)enlarge_tile.getRaster();
   TRaster64P ras64 = (TRaster64P)enlarge_tile.getRaster();
+  TRasterFP rasF   = (TRasterFP)enlarge_tile.getRaster();
   if (ras32)
     setSourceRaster<TRaster32P, TPixel32>(ras32, in, enlargedDimIn);
   else if (ras64)
     setSourceRaster<TRaster64P, TPixel64>(ras64, in, enlargedDimIn);
+  else if (rasF)
+    setSourceRaster<TRasterFP, TPixelF>(rasF, in, enlargedDimIn);
 
   /*- フィルタ作る -*/
   makeDirectionalBlurFilter_CPU(filter, blur, bidirectional, marginLeft,
@@ -282,7 +310,7 @@ void Iwa_DirectionalBlurFx::doCompute_CPU(
               if ((*filter_p) == 0.0f) continue;
               /*- サンプル座標 -*/
               int2 samplePos  = {tround((float)x - (float)filx * (*ref_p)),
-                                tround((float)y - (float)fily * (*ref_p))};
+                                 tround((float)y - (float)fily * (*ref_p))};
               int sampleIndex = samplePos.y * enlargedDimIn.lx + samplePos.x;
 
               /*- サンプルピクセルが透明ならcontinue -*/
@@ -350,11 +378,14 @@ void Iwa_DirectionalBlurFx::doCompute_CPU(
   tile.getRaster()->clear();
   TRaster32P outRas32 = (TRaster32P)tile.getRaster();
   TRaster64P outRas64 = (TRaster64P)tile.getRaster();
+  TRasterFP outRasF   = (TRasterFP)tile.getRaster();
   int2 margin         = {marginRight, marginTop};
   if (outRas32)
     setOutputRaster<TRaster32P, TPixel32>(out, outRas32, enlargedDimIn, margin);
   else if (outRas64)
     setOutputRaster<TRaster64P, TPixel64>(out, outRas64, enlargedDimIn, margin);
+  else if (outRasF)
+    setOutputRaster<TRasterFP, TPixelF>(out, outRasF, enlargedDimIn, margin);
 
   out_ras->unlock();
 }
@@ -488,8 +519,9 @@ void Iwa_DirectionalBlurFx::makeDirectionalBlurFilter_CPU(
       case Gaussian: {
         int index   = (int)floor(offset * 100.0f);
         float ratio = offset * 100.0f - (float)index;
-        bokeAsiVal =
-            gaussian[index] * (1.0f - ratio) + gaussian[index + 1] * ratio;
+        bokeAsiVal  = (ratio == 0.f) ? gaussian[index]
+                                     : gaussian[index] * (1.0f - ratio) +
+                                          gaussian[index + 1] * ratio;
       } break;
       case Flat:
         bokeAsiVal = 1.0f;

@@ -36,7 +36,9 @@ inline double param_range(void) { return 1.0; }  // 1 or 100%
 inline int channels(void) { return 4; }          // RGBM is 4 channels
 inline int bits(const TRasterP ras) {
   return ((TRaster64P)ras) ? (std::numeric_limits<unsigned short>::digits)
-                           : (std::numeric_limits<unsigned char>::digits);
+         : ((TRaster32P)ras)
+             ? (std::numeric_limits<unsigned char>::digits)
+             : (std::numeric_limits<float>::digits);  // TRasterFP
 }
 inline int pixel_bits(const TRasterP ras) {
   return ino::channels() * ino::bits(ras);
@@ -47,6 +49,9 @@ inline double pixel_per_mm(void) { return 1.; }
 }  // namespace ino
 
 class TBlendForeBackRasterFx : public TRasterFx {
+public:
+  enum ColorSpaceMode { Auto = 0, Linear, Nonlinear };
+
 protected:
   TRasterFxPort m_up;
   TRasterFxPort m_down;
@@ -54,7 +59,10 @@ protected:
   TBoolParamP m_clipping_mask;
 
   TBoolParamP m_linear;
+  TIntEnumParamP m_colorSpaceMode;
+
   TDoubleParamP m_gamma;
+  TDoubleParamP m_gammaAdjust;
 
   // If the pixel is premultiplied, divide color data by the alpha before
   // converting from the colorspace, and then multiply by the alpha afterwards.
@@ -69,7 +77,8 @@ protected:
 
   void doComputeFx(TRasterP& dn_ras_out, const TRasterP& up_ras,
                    const TPoint& pos, const double up_opacity,
-                   const double gamma);
+                   const double gammaDif, const double colorSpaceGamma,
+                   const bool linear_sw);
 
   template <class T, class Q>
   void nonlinearTmpl(TRasterPT<T> dn_ras_out, const TRasterPT<T>& up_ras,
@@ -77,14 +86,18 @@ protected:
 
   template <class T, class Q>
   void linearTmpl(TRasterPT<T> dn_ras_out, const TRasterPT<T>& up_ras,
-                  const double up_opacity, const double gamma);
+                  const double up_opacity, const double gammaDif);
+
+  template <class T, class Q>
+  void premultiToUnpremulti(TRasterPT<T> dn_ras, const TRasterPT<T>& up_ras,
+                            const double colorSpaceGamma);
 
   // when compute in xyz color space, do not clamp channel values in the kernel
   virtual void brendKernel(double& dnr, double& dng, double& dnb, double& dna,
                            const double up_, double upg, double upb, double upa,
                            const double upopacity,
                            const bool alpha_rendering_sw = true,
-                           const bool is_xyz             = false) = 0;
+                           const bool do_clamp           = true) = 0;
 
   void computeUpAndDown(TTile& tile, double frame, const TRenderSettings& rs,
                         TRasterP& dn_ras, TRasterP& up_ras,
@@ -92,6 +105,9 @@ protected:
 
 public:
   TBlendForeBackRasterFx(bool clipping_mask, bool has_alpha_option = false);
+
+  void onFxVersionSet() override;
+  void onObsoleteParamLoaded(const std::string&) override;
 
   bool canHandle(const TRenderSettings& rs, double frame) override {
     return true;
@@ -112,7 +128,24 @@ public:
   /* FX nodeが無効のときの、表示port番号 */
   int getPreferredInputPort() override { return 1; }
 
+  bool toBeComputedInLinearColorSpace(bool settingsIsLinear,
+                                      bool tileIsLinear) const override;
+
   std::string getPluginId() const override { return PLUGIN_PREFIX; }
 };
+
+template <>
+void TBlendForeBackRasterFx::nonlinearTmpl<TPixelF, float>(
+    TRasterFP dn_ras_out, const TRasterFP& up_ras, const double up_opacity);
+
+template <>
+void TBlendForeBackRasterFx::linearTmpl<TPixelF, float>(TRasterFP dn_ras_out,
+                                                        const TRasterFP& up_ras,
+                                                        const double up_opacity,
+                                                        const double gammaDif);
+
+template <>
+void TBlendForeBackRasterFx::premultiToUnpremulti<TPixelF, float>(
+    TRasterFP dn_ras, const TRasterFP& up_ras, const double colorSpaceGamma);
 
 #endif /* !ino_common_h */

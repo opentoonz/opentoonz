@@ -138,7 +138,7 @@ public:
 
   QMutex *getMutex() { return &m_mutex; }
 
-  enum Type { NONE, RGBM32, RGBM64, CM32 };
+  enum Type { NONE, RGBM32, RGBM64, RGBMFloat, CM32 };
   int getRasterType() const { return m_tileType; }
   TRasterP buildCompatibleRaster(const TDimension &size);
 

@@ -339,7 +339,7 @@ SceneSettingsPopup::SceneSettingsPopup()
   mainLayout->setColumnStretch(2, 0);
   mainLayout->setColumnStretch(3, 0);
   mainLayout->setColumnStretch(4, 1);
-  mainLayout->setRowStretch(7, 1);
+  mainLayout->setRowStretch(9, 1);
   setLayout(mainLayout);
 
   // signal-slot connections

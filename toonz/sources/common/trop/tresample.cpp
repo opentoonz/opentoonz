@@ -4,12 +4,12 @@
 #include "tpixelgr.h"
 #include "quickputP.h"
 
-//#include "tspecialstyleid.h"
+// #include "tspecialstyleid.h"
 #include "tsystem.h"
 
 #include "tcolorstyles.h"
 #include "tpixelutils.h"
-//#include "tstopwatch.h"
+// #include "tstopwatch.h"
 #ifndef TNZCORE_LIGHT
 #include "tpalette.h"
 #include "trastercm.h"
@@ -159,7 +159,7 @@ inline TINT32 Double2Int(double val) {
   (d2iaux = D, d2iaux += _double2fixmagic,                                     \
    (((TINT32 *)&(d2iaux))[iman_] >> _shiftamt))
 
-//#define USE_DOUBLE_TO_INT
+// #define USE_DOUBLE_TO_INT
 
 //===========================================================================
 
@@ -598,7 +598,7 @@ static inline void get_flt_fun_rad(TRop::ResampleFilterType flt_type,
     break;
   }
   if (flt_fun) *flt_fun = fun;
-  flt_rad               = rad;
+  flt_rad = rad;
 }
 
 //---------------------------------------------------------------------------
@@ -624,9 +624,9 @@ static FILTER *create_filter(TRop::ResampleFilterType flt_type, double blur,
     nodedist_u = blur; /* magnification */
   else
     nodedist_u = du_dx * blur; /* minification */
-  rad_u        = flt_rad * nodedist_u;
-  rad_x        = rad_u * dx_du;
-  nodefreq_u   = 1 / nodedist_u;
+  rad_u      = flt_rad * nodedist_u;
+  rad_x      = rad_u * dx_du;
+  nodefreq_u = 1 / nodedist_u;
   /*
 mu = lu - 1;
 */
@@ -658,11 +658,11 @@ NOT_MORE_THAN(mu, uhi)
         if (f->w[uhi]) break;
       if (ulo < ulomin) ulomin = ulo;
       if (uhi > uhimax) uhimax = uhi;
-      n                        = uhi - ulo + 1;
-      if (n > nmax) nmax       = n;
-      f->first                 = ulo;
-      f->last                  = uhi;
-      norm                     = 1 / sum;
+      n = uhi - ulo + 1;
+      if (n > nmax) nmax = n;
+      f->first = ulo;
+      f->last  = uhi;
+      norm     = 1 / sum;
       for (u = ulo; u <= uhi; u++) f->w[u] *= (float)norm;
     } else {
       f->w_base = 0;
@@ -955,7 +955,7 @@ void create_calc(const TRasterPT<T> &rin, int min_pix_ref_u, int max_pix_ref_u,
   calc_bytewrap   = p_calc_bytewrap;
   calc_bytesize   = calc_bytewrap * lv;  // lv * ceil(lu/8)
   if (calc_bytesize > p_calc_allocsize) {
-    if (p_calc_allocsize) delete[](p_calc);
+    if (p_calc_allocsize) delete[] (p_calc);
     // TMALLOC (*p_calc, calc_bytesize)
     p_calc = new UCHAR[calc_bytesize];
     assert(p_calc);
@@ -1349,6 +1349,255 @@ void resample_main_rgbm(TRasterPT<T> rout, const TRasterPT<T> &rin,
 
 //---------------------------------------------------------------------------
 
+template <>
+void resample_main_rgbm<TPixelF, double>(
+    TRasterFP rout, const TRasterFP &rin, const TAffine &aff_xy2uv,
+    const TAffine &aff0_uv2fg, int min_pix_ref_u, int min_pix_ref_v,
+    int max_pix_ref_u, int max_pix_ref_v, int n_pix, int *pix_ref_u,
+    int *pix_ref_v, int *pix_ref_f, int *pix_ref_g, short *filter) {
+  const double max_filter_val = 32767.0;
+
+  const TPixelF *buffer_in;
+  TPixelF *buffer_out;
+  TPixelF *pix_out;
+  int lu, lv, wrap_in, mu, mv;
+  int lx, ly, wrap_out;
+  int out_x, out_y;
+  double out_x_, out_y_;
+  double out_u_, out_v_;
+  int ref_u, ref_v;
+  int pix_u, pix_v;
+  double ref_out_u_, ref_out_v_;
+  double ref_out_f_, ref_out_g_;
+  int ref_out_f, ref_out_g;
+  int pix_out_f, pix_out_g;
+  int filter_mu, filter_mv;
+  UINT inside_limit_u, inside_limit_v;
+  int inside_nonempty;
+  int outside_min_u, outside_min_v;
+  int outside_max_u, outside_max_v;
+  UCHAR *calc;
+  int calc_allocsize;
+  int calc_bytewrap;
+  UCHAR calc_value;
+  bool must_calc;
+  TPixelF pix_value, default_value(0.f, 0.f, 0.f, 0.f);
+  double weight, sum_weights;
+  double inv_sum_weights;
+  float sum_contribs_r, sum_contribs_g, sum_contribs_b, sum_contribs_m;
+  double out_fval_r, out_fval_g, out_fval_b, out_fval_m;
+  double out_value_r, out_value_g, out_value_b, out_value_m;
+  int i;
+
+#ifdef USE_DOUBLE_TO_INT
+  double d2iaux;
+#endif
+
+  if (!(rout->getLx() > 0 && rout->getLy() > 0)) return;
+
+  if (!(rin->getLx() > 0 && rin->getLy() > 0)) {
+    rout->clear();
+    return;
+  }
+
+  calc           = 0;
+  calc_allocsize = 0;
+
+  // Create a bit array, each indicating whether a pixel has to be calculated or
+  // not
+  create_calc(rin, min_pix_ref_u, max_pix_ref_u, min_pix_ref_v, max_pix_ref_v,
+              calc, calc_allocsize, calc_bytewrap);
+
+  buffer_in  = rin->pixels();
+  buffer_out = rout->pixels();
+  lu         = rin->getLx();
+  lx         = rout->getLx();
+  lv         = rin->getLy();
+  ly         = rout->getLy();
+  wrap_in    = rin->getWrap();
+  wrap_out   = rout->getWrap();
+  mu         = lu - 1;
+  mv         = lv - 1;
+
+  filter_mu       = max_pix_ref_u - min_pix_ref_u;
+  filter_mv       = max_pix_ref_v - min_pix_ref_v;
+  inside_limit_u  = lu - filter_mu;
+  inside_limit_v  = lv - filter_mv;
+  inside_nonempty = (int)inside_limit_u > 0 && (int)inside_limit_v > 0;
+  outside_min_u   = -max_pix_ref_u;
+  outside_min_v   = -max_pix_ref_v;
+  outside_max_u   = mu - min_pix_ref_u;
+  outside_max_v   = mv - min_pix_ref_v;
+
+  // For every pixel of the output image
+  for (out_y = 0, out_y_ = 0.5; out_y < ly; out_y++, out_y_ += 1.0) {
+    for (out_x = 0, out_x_ = 0.5; out_x < lx; out_x++, out_x_ += 1.0) {
+      pix_out = buffer_out + out_y * wrap_out + out_x;
+
+      // Take the pre-image of the pixel through the passed affine
+      out_u_ = affMV1(aff_xy2uv, out_x_, out_y_);
+      out_v_ = affMV2(aff_xy2uv, out_x_, out_y_);
+
+      // Convert to integer coordinates
+      ref_u = intLE(out_u_);
+      ref_v = intLE(out_v_);
+
+      // NOTE: The following condition is equivalent to:
+      // (ref_u + min_pix_ref_u >= 0 && ref_v + min_pix_ref_v >= 0 &&
+      //  ref_u + max_pix_ref_u < lu && ref_v + max_pix_ref_v < lv)
+      // - since the presence of (UINT) makes integeres < 0 become >> 0
+      if (inside_nonempty && (UINT)(ref_u + min_pix_ref_u) < inside_limit_u &&
+          (UINT)(ref_v + min_pix_ref_v) < inside_limit_v) {
+        // The filter mask starting around (ref_u, ref_v) is completely
+        // contained
+        // in the source raster
+
+        // Get the calculation array mask byte
+        calc_value = calc[(ref_u >> 3) + ref_v * calc_bytewrap];
+        if (calc_value && ((calc_value >> (ref_u & 7)) &
+                           1))  // If the mask bit for this pixel is on
+        {
+          ref_out_u_ = ref_u - out_u_;  // Fractionary part of the pre-image
+          ref_out_v_ = ref_v - out_v_;
+          ref_out_f_ = aff0MV1(aff0_uv2fg, ref_out_u_,
+                               ref_out_v_);  // Make the image of it into fg
+          ref_out_g_ = aff0MV2(aff0_uv2fg, ref_out_u_, ref_out_v_);
+          ref_out_f  = tround(ref_out_f_);  // Convert to integer coordinates
+          ref_out_g  = tround(ref_out_g_);
+
+          sum_weights    = 0;
+          sum_contribs_r = 0;
+          sum_contribs_g = 0;
+          sum_contribs_b = 0;
+          sum_contribs_m = 0;
+
+          // Make the weighted sum of source pixels
+          for (i = n_pix - 1; i >= 0; --i) {
+            // Build the weight for this pixel
+            pix_out_f = pix_ref_f[i] + ref_out_f;  // image of the integer part
+                                                   // + that of the fractionary
+                                                   // part
+            pix_out_g = pix_ref_g[i] + ref_out_g;
+            weight    = (double)filter[pix_out_f] * (double)filter[pix_out_g] /
+                     (max_filter_val * max_filter_val);
+
+            // Add the weighted pixel contribute
+            pix_u = pix_ref_u[i] + ref_u;
+            pix_v = pix_ref_v[i] + ref_v;
+
+            pix_value = buffer_in[pix_u + pix_v * wrap_in];
+            sum_contribs_r += pix_value.r * weight;
+            sum_contribs_g += pix_value.g * weight;
+            sum_contribs_b += pix_value.b * weight;
+            sum_contribs_m += pix_value.m * weight;
+            sum_weights += weight;
+          }
+
+          inv_sum_weights = 1.0 / sum_weights;
+          out_fval_r      = sum_contribs_r * inv_sum_weights;
+          out_fval_g      = sum_contribs_g * inv_sum_weights;
+          out_fval_b      = sum_contribs_b * inv_sum_weights;
+          out_fval_m      = sum_contribs_m * inv_sum_weights;
+          // notLessThan(0.0, out_fval_r);
+          // notLessThan(0.0, out_fval_g);
+          // notLessThan(0.0, out_fval_b);
+          notLessThan(0.0, out_fval_m);
+          out_value_r = out_fval_r;
+          out_value_g = out_fval_g;
+          out_value_b = out_fval_b;
+          out_value_m = out_fval_m;
+          // notMoreThan(T::maxChannelValue, out_value_r);
+          // notMoreThan(T::maxChannelValue, out_value_g);
+          // notMoreThan(T::maxChannelValue, out_value_b);
+          notMoreThan(1.f, out_value_m);
+          pix_out->r = out_value_r;
+          pix_out->g = out_value_g;
+          pix_out->b = out_value_b;
+          pix_out->m = out_value_m;
+        } else
+          // The pixel is copied from the corresponding source...
+          *pix_out = buffer_in[ref_u + ref_v * wrap_in];
+      } else if (outside_min_u <= ref_u && ref_u <= outside_max_u &&
+                 outside_min_v <= ref_v && ref_v <= outside_max_v) {
+        if ((UINT)ref_u >= (UINT)lu || (UINT)ref_v >= (UINT)lv)
+          must_calc = true;
+        else {
+          calc_value = calc[(ref_u >> 3) + ref_v * calc_bytewrap];
+          must_calc  = calc_value && ((calc_value >> (ref_u & 7)) & 1);
+        }
+
+        if (must_calc) {
+          ref_out_u_     = ref_u - out_u_;
+          ref_out_v_     = ref_v - out_v_;
+          ref_out_f_     = aff0MV1(aff0_uv2fg, ref_out_u_, ref_out_v_);
+          ref_out_g_     = aff0MV2(aff0_uv2fg, ref_out_u_, ref_out_v_);
+          ref_out_f      = tround(ref_out_f_);
+          ref_out_g      = tround(ref_out_g_);
+          sum_weights    = 0;
+          sum_contribs_r = 0;
+          sum_contribs_g = 0;
+          sum_contribs_b = 0;
+          sum_contribs_m = 0;
+
+          for (i = n_pix - 1; i >= 0; --i) {
+            pix_out_f = pix_ref_f[i] + ref_out_f;
+            pix_out_g = pix_ref_g[i] + ref_out_g;
+            weight    = (double)filter[pix_out_f] * (double)filter[pix_out_g] /
+                     (max_filter_val * max_filter_val);
+            pix_u = pix_ref_u[i] + ref_u;
+            pix_v = pix_ref_v[i] + ref_v;
+
+            if (pix_u < 0 || pix_u > mu || pix_v < 0 || pix_v > mv) {
+              sum_weights += weight;  // 0-padding
+              continue;
+            }
+
+            notLessThan(0, pix_u);  // Copy-padding
+            notLessThan(0, pix_v);
+            notMoreThan(mu, pix_u);
+            notMoreThan(mv, pix_v);
+
+            pix_value = buffer_in[pix_u + pix_v * wrap_in];
+            sum_contribs_r += pix_value.r * weight;
+            sum_contribs_g += pix_value.g * weight;
+            sum_contribs_b += pix_value.b * weight;
+            sum_contribs_m += pix_value.m * weight;
+            sum_weights += weight;
+          }
+
+          inv_sum_weights = 1.0 / sum_weights;
+          out_fval_r      = sum_contribs_r * inv_sum_weights;
+          out_fval_g      = sum_contribs_g * inv_sum_weights;
+          out_fval_b      = sum_contribs_b * inv_sum_weights;
+          out_fval_m      = sum_contribs_m * inv_sum_weights;
+          // notLessThan(0.0, out_fval_r);
+          // notLessThan(0.0, out_fval_g);
+          // notLessThan(0.0, out_fval_b);
+          notLessThan(0.0, out_fval_m);
+          out_value_r = out_fval_r;
+          out_value_g = out_fval_g;
+          out_value_b = out_fval_b;
+          out_value_m = out_fval_m;
+          // notMoreThan(T::maxChannelValue, out_value_r);
+          // notMoreThan(T::maxChannelValue, out_value_g);
+          // notMoreThan(T::maxChannelValue, out_value_b);
+          notMoreThan(1.f, out_value_m);
+          pix_out->r = out_value_r;
+          pix_out->g = out_value_g;
+          pix_out->b = out_value_b;
+          pix_out->m = out_value_m;
+        } else
+          *pix_out = buffer_in[ref_u + ref_v * wrap_in];
+      } else
+        *pix_out = default_value;
+    }
+  }
+
+  delete[] calc;
+}
+
+//---------------------------------------------------------------------------
+
 #ifdef USE_SSE2
 
 namespace {
@@ -1518,74 +1767,75 @@ void resample_main_rgbm_SSE2(TRasterPT<T> rout, const TRasterPT<T> &rin,
         } else
           *pix_out = buffer_in[ref_u + ref_v * wrap_in];
       } else
-          // if( outside_min_u_ <= out_u_ && out_u_ <= outside_max_u_ &&
-          //    outside_min_v_ <= out_v_ && out_v_ <= outside_max_v_ )
-          if (outside_min_u <= ref_u && ref_u <= outside_max_u &&
-              outside_min_v <= ref_v && ref_v <= outside_max_v) {
-        if ((UINT)ref_u >= (UINT)lu || (UINT)ref_v >= (UINT)lv)
-          must_calc = true;
-        else {
-          calc_value = calc[(ref_u >> 3) + ref_v * calc_bytewrap];
-          must_calc  = calc_value && ((calc_value >> (ref_u & 7)) & 1);
-        }
-
-        if (must_calc) {
-          ref_out_u_          = ref_u - out_u_;
-          ref_out_v_          = ref_v - out_v_;
-          ref_out_f_          = aff0MV1(aff0_uv2fg, ref_out_u_, ref_out_v_);
-          ref_out_g_          = aff0MV2(aff0_uv2fg, ref_out_u_, ref_out_v_);
-          ref_out_f           = tround(ref_out_f_);
-          ref_out_g           = tround(ref_out_g_);
-          sum_weights         = 0;
-          sum_contribs_packed = _mm_setzero_ps();
-
-          for (i = n_pix - 1; i >= 0; i--) {
-            pix_out_f = pix_ref_f[i] + ref_out_f;
-            pix_out_g = pix_ref_g[i] + ref_out_g;
-            weight    = (float)((filter[pix_out_f] * filter[pix_out_g]) >> 16);
-            pix_u     = pix_ref_u[i] + ref_u;
-            pix_v     = pix_ref_v[i] + ref_v;
-
-            if (pix_u < 0 || pix_u > mu || pix_v < 0 || pix_v > mv) {
-              sum_weights += weight;
-              continue;
-            }
-
-            notLessThan(0, pix_u);
-            notLessThan(0, pix_v);
-            notMoreThan(mu, pix_u);
-            notMoreThan(mv, pix_v);
-
-            pix_value          = buffer_in[pix_u + pix_v * wrap_in];
-            pix_value_packed_i = _mm_unpacklo_epi8(
-                _mm_cvtsi32_si128(*(DWORD *)&pix_value), zeros);
-            pix_value_packed =
-                _mm_cvtepi32_ps(_mm_unpacklo_epi16(pix_value_packed_i, zeros));
-
-            weight_packed = _mm_load1_ps(&weight);
-            sum_contribs_packed =
-                _mm_add_ps(sum_contribs_packed,
-                           _mm_mul_ps(pix_value_packed, weight_packed));
-
-            sum_weights += weight;
+        // if( outside_min_u_ <= out_u_ && out_u_ <= outside_max_u_ &&
+        //    outside_min_v_ <= out_v_ && out_v_ <= outside_max_v_ )
+        if (outside_min_u <= ref_u && ref_u <= outside_max_u &&
+            outside_min_v <= ref_v && ref_v <= outside_max_v) {
+          if ((UINT)ref_u >= (UINT)lu || (UINT)ref_v >= (UINT)lv)
+            must_calc = true;
+          else {
+            calc_value = calc[(ref_u >> 3) + ref_v * calc_bytewrap];
+            must_calc  = calc_value && ((calc_value >> (ref_u & 7)) & 1);
           }
-          inv_sum_weights = 1.0f / sum_weights;
 
-          __m128 inv_sum_weights_packed = _mm_load1_ps(&inv_sum_weights);
-          __m128 out_fval_packed =
-              _mm_mul_ps(sum_contribs_packed, inv_sum_weights_packed);
-          out_fval_packed = _mm_max_ps(out_fval_packed, zeros2);
-          out_fval_packed = _mm_min_ps(out_fval_packed, maxChanneValue_packed);
+          if (must_calc) {
+            ref_out_u_          = ref_u - out_u_;
+            ref_out_v_          = ref_v - out_v_;
+            ref_out_f_          = aff0MV1(aff0_uv2fg, ref_out_u_, ref_out_v_);
+            ref_out_g_          = aff0MV2(aff0_uv2fg, ref_out_u_, ref_out_v_);
+            ref_out_f           = tround(ref_out_f_);
+            ref_out_g           = tround(ref_out_g_);
+            sum_weights         = 0;
+            sum_contribs_packed = _mm_setzero_ps();
 
-          __m128i out_value_packed_i = _mm_cvtps_epi32(out_fval_packed);
-          out_value_packed_i  = _mm_packs_epi32(out_value_packed_i, zeros);
-          out_value_packed_i  = _mm_packus_epi16(out_value_packed_i, zeros);
-          *(DWORD *)(pix_out) = _mm_cvtsi128_si32(out_value_packed_i);
-        } else
-          *pix_out = buffer_in[ref_u + ref_v * wrap_in];
-      } else {
-        *pix_out = default_value;
-      }
+            for (i = n_pix - 1; i >= 0; i--) {
+              pix_out_f = pix_ref_f[i] + ref_out_f;
+              pix_out_g = pix_ref_g[i] + ref_out_g;
+              weight = (float)((filter[pix_out_f] * filter[pix_out_g]) >> 16);
+              pix_u  = pix_ref_u[i] + ref_u;
+              pix_v  = pix_ref_v[i] + ref_v;
+
+              if (pix_u < 0 || pix_u > mu || pix_v < 0 || pix_v > mv) {
+                sum_weights += weight;
+                continue;
+              }
+
+              notLessThan(0, pix_u);
+              notLessThan(0, pix_v);
+              notMoreThan(mu, pix_u);
+              notMoreThan(mv, pix_v);
+
+              pix_value          = buffer_in[pix_u + pix_v * wrap_in];
+              pix_value_packed_i = _mm_unpacklo_epi8(
+                  _mm_cvtsi32_si128(*(DWORD *)&pix_value), zeros);
+              pix_value_packed = _mm_cvtepi32_ps(
+                  _mm_unpacklo_epi16(pix_value_packed_i, zeros));
+
+              weight_packed = _mm_load1_ps(&weight);
+              sum_contribs_packed =
+                  _mm_add_ps(sum_contribs_packed,
+                             _mm_mul_ps(pix_value_packed, weight_packed));
+
+              sum_weights += weight;
+            }
+            inv_sum_weights = 1.0f / sum_weights;
+
+            __m128 inv_sum_weights_packed = _mm_load1_ps(&inv_sum_weights);
+            __m128 out_fval_packed =
+                _mm_mul_ps(sum_contribs_packed, inv_sum_weights_packed);
+            out_fval_packed = _mm_max_ps(out_fval_packed, zeros2);
+            out_fval_packed =
+                _mm_min_ps(out_fval_packed, maxChanneValue_packed);
+
+            __m128i out_value_packed_i = _mm_cvtps_epi32(out_fval_packed);
+            out_value_packed_i  = _mm_packs_epi32(out_value_packed_i, zeros);
+            out_value_packed_i  = _mm_packus_epi16(out_value_packed_i, zeros);
+            *(DWORD *)(pix_out) = _mm_cvtsi128_si32(out_value_packed_i);
+          } else
+            *pix_out = buffer_in[ref_u + ref_v * wrap_in];
+        } else {
+          *pix_out = default_value;
+        }
     }
   }
   if (calc) delete[] calc;
@@ -1691,9 +1941,9 @@ static void get_prow_gr8(const TRasterGR8P &rin, double a11, double a12,
       prow[p] = (float)troundp(
           fu * gv *
               (((UINT)(u + 1) < lu && (UINT)v < lv) ? in_gr8[du] : BORDER) +
-          fu * fv * (((UINT)(u + 1) < lu && (UINT)(v + 1) < lv)
-                         ? in_gr8[du + dv]
-                         : BORDER) +
+          fu * fv *
+              (((UINT)(u + 1) < lu && (UINT)(v + 1) < lv) ? in_gr8[du + dv]
+                                                          : BORDER) +
           gu * gv * (((UINT)u < lu && (UINT)v < lv) ? in_gr8[0] : BORDER) +
           gu * fv *
               (((UINT)u < lu && (UINT)(v + 1) < lv) ? in_gr8[dv] : BORDER));
@@ -1714,9 +1964,9 @@ static void get_prow_gr8(const TRasterGR8P &rin, double a11, double a12,
       prow[p] = (float)troundp(
           fu * gv *
               (((UINT)(u + 1) < lu && (UINT)v < lv) ? in_gr8[du] : BORDER) +
-          fu * fv * (((UINT)(u + 1) < lu && (UINT)(v + 1) < lv)
-                         ? in_gr8[du + dv]
-                         : BORDER) +
+          fu * fv *
+              (((UINT)(u + 1) < lu && (UINT)(v + 1) < lv) ? in_gr8[du + dv]
+                                                          : BORDER) +
           gu * gv * (((UINT)u < lu && (UINT)v < lv) ? in_gr8[0] : BORDER) +
           gu * fv *
               (((UINT)u < lu && (UINT)(v + 1) < lv) ? in_gr8[dv] : BORDER));
@@ -1789,14 +2039,16 @@ static void get_prow_gr8(const TRaster32P &rin, double a11, double a12,
       gv      = 1. - fv;
       in_32   = bufin_32 + (u * du + v * dv);
       prow[p] = (float)troundp(
-          fu * gv * (((UINT)(u + 1) < lu && (UINT)v < lv) ? grey(in_32[du])
+          fu * gv *
+              (((UINT)(u + 1) < lu && (UINT)v < lv) ? grey(in_32[du])
+                                                    : BORDER) +
+          fu * fv *
+              (((UINT)(u + 1) < lu && (UINT)(v + 1) < lv) ? grey(in_32[du + dv])
                                                           : BORDER) +
-          fu * fv * (((UINT)(u + 1) < lu && (UINT)(v + 1) < lv)
-                         ? grey(in_32[du + dv])
-                         : BORDER) +
           gu * gv * (((UINT)u < lu && (UINT)v < lv) ? grey(in_32[0]) : BORDER) +
-          gu * fv * (((UINT)u < lu && (UINT)(v + 1) < lv) ? grey(in_32[dv])
-                                                          : BORDER));
+          gu * fv *
+              (((UINT)u < lu && (UINT)(v + 1) < lv) ? grey(in_32[dv])
+                                                    : BORDER));
     }
   p1 = p;
   for (p = pmax; p > p1; p--)
@@ -1812,14 +2064,16 @@ static void get_prow_gr8(const TRaster32P &rin, double a11, double a12,
       gv      = 1. - fv;
       in_32   = bufin_32 + (u * du + v * dv);
       prow[p] = (float)troundp(
-          fu * gv * (((UINT)(u + 1) < lu && (UINT)v < lv) ? grey(in_32[du])
+          fu * gv *
+              (((UINT)(u + 1) < lu && (UINT)v < lv) ? grey(in_32[du])
+                                                    : BORDER) +
+          fu * fv *
+              (((UINT)(u + 1) < lu && (UINT)(v + 1) < lv) ? grey(in_32[du + dv])
                                                           : BORDER) +
-          fu * fv * (((UINT)(u + 1) < lu && (UINT)(v + 1) < lv)
-                         ? grey(in_32[du + dv])
-                         : BORDER) +
           gu * gv * (((UINT)u < lu && (UINT)v < lv) ? grey(in_32[0]) : BORDER) +
-          gu * fv * (((UINT)u < lu && (UINT)(v + 1) < lv) ? grey(in_32[dv])
-                                                          : BORDER));
+          gu * fv *
+              (((UINT)u < lu && (UINT)(v + 1) < lv) ? grey(in_32[dv])
+                                                    : BORDER));
     }
   p2 = p;
   for (p = p1; p <= p2; p++)
@@ -1948,7 +2202,7 @@ TCALLOC (colval,    lu);*/
           flatcols = 1;
       else
         flatcols = 0;
-      flatval    = colval[u];
+      flatval = colval[u];
       if (flatcols >= flatdiamu) {
 #ifdef VECCHIA_MANIERA
         x_  = AFF_M_V_1(aff, u - flatradu, v - flatradv);
@@ -1967,7 +2221,7 @@ TCALLOC (colval,    lu);*/
         ylo = std::max(0, (int)ylo_);
         yhi = std::min(my, (int)yhi_);
         for (y = ylo; y <= yhi; y++)
-          for (x                        = xlo; x <= xhi; x++)
+          for (x = xlo; x <= xhi; x++)
             bufout_gr8[x + y * wrapout] = flatval, count++;
       }
       xlo_ += aff.a11;
@@ -2005,7 +2259,7 @@ TCALLOC (colval,    lu);*/
             nocheight[x] = 0;
       }
       if (topy < ly && colnoc[topy].first <= topq) {
-        for (x                                = 0; x < lx; x++)
+        for (x = 0; x < lx; x++)
           if (nocheight[x] < nocdiamy) xxx[x] = 1.0; /* 1.0 == calc */
       } else {
         for (x = 0; x < lx; x++) xxx[x] = 1.0; /* 1.0 == calc */
@@ -2020,7 +2274,7 @@ TCALLOC (colval,    lu);*/
         else {
           nocwidth++;
           if (nocwidth >= nocdiamx)
-            for (p    = rownoc[x].first; p <= rownoc[x].last; p++)
+            for (p = rownoc[x].first; p <= rownoc[x].last; p++)
               prow[p] = 1.0; /* 1.0 == nocalc */
         }
       get_prow_gr8(rin, invrot.a11, invrot.a12, invrot.a21, invrot.a22, pmin,
@@ -2157,7 +2411,7 @@ TCALLOC (colval,    lu);*/
           flatcols = 1;
       else
         flatcols = 0;
-      flatval    = colval[u];
+      flatval = colval[u];
       if (flatcols >= flatdiamu) {
 #ifdef VECCHIA_MANIERA
         x_  = AFF_M_V_1(aff, u - flatradu, v - flatradv);
@@ -2176,7 +2430,7 @@ TCALLOC (colval,    lu);*/
         ylo = std::max(0, (int)ylo_);
         yhi = std::min(my, (int)yhi_);
         for (y = ylo; y <= yhi; y++)
-          for (x                        = xlo; x <= xhi; x++)
+          for (x = xlo; x <= xhi; x++)
             bufout_gr8[x + y * wrapout] = flatval, count++;
       }
       xlo_ += aff.a11;
@@ -2214,7 +2468,7 @@ TCALLOC (colval,    lu);*/
             nocheight[x] = 0;
       }
       if (topy < ly && colnoc[topy].first <= topq) {
-        for (x                                = 0; x < lx; x++)
+        for (x = 0; x < lx; x++)
           if (nocheight[x] < nocdiamy) xxx[x] = 1.0; /* 1.0 == calc */
       } else {
         for (x = 0; x < lx; x++) xxx[x] = 1.0; /* 1.0 == calc */
@@ -2229,7 +2483,7 @@ TCALLOC (colval,    lu);*/
         else {
           nocwidth++;
           if (nocwidth >= nocdiamx)
-            for (p    = rownoc[x].first; p <= rownoc[x].last; p++)
+            for (p = rownoc[x].first; p <= rownoc[x].last; p++)
               prow[p] = 1.0; /* 1.0 == nocalc */
         }
       get_prow_gr8(rin, invrot.a11, invrot.a12, invrot.a21, invrot.a22, pmin,
@@ -2555,7 +2809,7 @@ void rop_resample_rgbm(TRasterPT<T> rout, const TRasterPT<T> &rin,
     if (min_pix_out_fg < min_filter_fg) {
       int delta = min_filter_fg - min_pix_out_fg;
 
-      for (f              = max_filter_fg; f >= min_filter_fg; f--)
+      for (f = max_filter_fg; f >= min_filter_fg; f--)
         filter[f + delta] = filter[f];
       filter += delta;
       for (f = min_filter_fg - 1; f >= min_pix_out_fg; f--) filter[f] = 0;
@@ -2576,7 +2830,12 @@ void rop_resample_rgbm(TRasterPT<T> rout, const TRasterPT<T> &rin,
                                pix_ref_f.get(), pix_ref_g.get(), filter);
   else
 #endif
-      if (n_pix >= 512 || T::maxChannelValue > 255)
+      if (std::is_same<T, TPixelF>::value)
+    resample_main_rgbm<T, double>(
+        rout, rin, aff_xy2uv, aff0_uv2fg, min_pix_ref_u, min_pix_ref_v,
+        max_pix_ref_u, max_pix_ref_v, n_pix, pix_ref_u.get(), pix_ref_v.get(),
+        pix_ref_f.get(), pix_ref_g.get(), filter);
+  else if (n_pix >= 512 || T::maxChannelValue > 255)
     resample_main_rgbm<T, TINT64>(
         rout, rin, aff_xy2uv, aff0_uv2fg, min_pix_ref_u, min_pix_ref_v,
         max_pix_ref_u, max_pix_ref_v, n_pix, pix_ref_u.get(), pix_ref_v.get(),
@@ -3014,7 +3273,7 @@ void do_resample(TRasterCM32P rout, const TRasterCM32P &rin,
         tone_tot                   = 0.0;
         some_pencil                = false;
         for (i = 0; i < 4; i++) {
-          tone                                        = tcm[i] & tone_mask;
+          tone = tcm[i] & tone_mask;
           if ((TUINT32)tone != tone_mask) some_pencil = true;
           tone_tot += tone * w[i];
           new_color_blob.val = tcm[i] & color_mask;
@@ -3059,8 +3318,8 @@ void do_resample(TRasterCM32P rout, const TRasterCM32P &rin,
                v * wrapin;  // Take the associated input pixel pointer
       tcm[0] = in_tcm[0];
       if (u < lu - 1 && v < lv - 1) {
-        // Also take their 4 next neighbours (we shall perform a kind of bilinear
-        // interpolation)
+        // Also take their 4 next neighbours (we shall perform a kind of
+        // bilinear interpolation)
         tcm[1] = in_tcm[1];
         tcm[2] = in_tcm[wrapin];
         tcm[3] = in_tcm[wrapin + 1];
@@ -3165,7 +3424,7 @@ void do_resample(TRasterCM32P rout, const TRasterCM32P &rin,
         tone_tot                   = 0.0;
         some_pencil                = false;
         for (i = 0; i < 4; i++) {
-          tone                                        = tcm[i] & tone_mask;
+          tone = tcm[i] & tone_mask;
           if ((TUINT32)tone != tone_mask) some_pencil = true;
           tone_tot += tone * w[i];
           new_color_blob.val = tcm[i] & color_mask;
@@ -3586,7 +3845,7 @@ void resample_main_cm32_rgbm_bigradius(
 
   std::vector<TPixel32> paints(colorCount);
   std::vector<TPixel32> inks(colorCount);
-  for (i      = 0; i < palette->getStyleCount(); i++)
+  for (i = 0; i < palette->getStyleCount(); i++)
     paints[i] = inks[i] =
         ::premultiply(palette->getStyle(i)->getAverageColor());
 
@@ -3775,7 +4034,7 @@ void resample_main_cm32_rgbm_bigradius(
 
   if (calc) delete[] calc;
 }
-}
+}  // namespace
 
 /*---------------------------------------------------------------------------*/
 
@@ -3871,7 +4130,7 @@ void resample_main_cm32_rgbm(TRasterPT<T> rout, const TRasterCM32P &rin,
 
   std::vector<TPixel32> paints(colorCount);
   std::vector<TPixel32> inks(colorCount);
-  for (i      = 0; i < palette->getStyleCount(); i++)
+  for (i = 0; i < palette->getStyleCount(); i++)
     paints[i] = inks[i] =
         ::premultiply(palette->getStyle(i)->getAverageColor());
 
@@ -4140,7 +4399,7 @@ resample_main_rgbm_bigradius<T>( rout, rin,
 
   std::vector<TPixel32> paints(colorCount);
   std::vector<TPixel32> inks(colorCount);
-  for (i      = 0; i < palette->getStyleCount(); i++)
+  for (i = 0; i < palette->getStyleCount(); i++)
     paints[i] = inks[i] =
         ::premultiply(palette->getStyle(i)->getAverageColor());
 
@@ -4585,7 +4844,7 @@ void rop_resample_rgbm_2(TRasterPT<T> rout, const TRasterCM32P &rin,
     if (min_pix_out_fg < min_filter_fg) {
       int delta = min_filter_fg - min_pix_out_fg;
 
-      for (f              = max_filter_fg; f >= min_filter_fg; f--)
+      for (f = max_filter_fg; f >= min_filter_fg; f--)
         filter[f + delta] = filter[f];
       filter += delta;
       for (f = min_filter_fg - 1; f >= min_pix_out_fg; f--) filter[f] = 0;
@@ -4663,42 +4922,49 @@ void TRop::resample(const TRasterP &rout, const TRasterP &rin,
   }
 
   TRaster32P rout32 = rout, rin32 = rin;
+  TRasterCM32P routCM32 = rout, rinCM32 = rin;
+  TRaster64P rout64 = rout, rin64 = rin;
+  TRasterGR8P routGR8 = rout, rinGR8 = rin;
+  TRasterFP routF = rout, rinF = rin;
+
   if (rout32) {
     if (!rin32) {
       rin32 = TRaster32P(rin->getLx(), rin->getLy());
       TRop::convert(rin32, rin);
     }
     do_resample<TPixel32>(rout32, rin32, aff, filterType, blur);
-  } else {
-#ifndef TNZCORE_LIGHT
-    TRasterCM32P routCM32 = rout, rinCM32 = rin;
-    if (routCM32 && rinCM32)
-      do_resample(routCM32, rinCM32, aff);
-    else
-#endif
-    {
-      TRaster64P rout64 = rout, rin64 = rin;
-      if (rout64) {
-        if (!rin64) {
-          rin64 = TRaster64P(rin->getLx(), rin->getLy());
-          TRop::convert(rin64, rin);
-        }
-        do_resample<TPixel64>(rout64, rin64, aff, filterType, blur);
-      } else {
-        TRasterGR8P routGR8 = rout, rinGR8 = rin;
-        TRaster32P rin32 = rin;
-        if (routGR8 && rinGR8)
-          do_resample(routGR8, rinGR8, aff, filterType, blur);
-        else if (routGR8 && rin32)
-          do_resample(routGR8, rin32, aff, filterType, blur);
-        else {
-          rin->unlock();
-          rout->unlock();
-          throw TRopException("unsupported pixel type");
-        }
-      }
+  } else if (routCM32 && rinCM32)
+    do_resample(routCM32, rinCM32, aff);
+  else if (rout64) {
+    if (!rin64) {
+      rin64 = TRaster64P(rin->getLx(), rin->getLy());
+      TRop::convert(rin64, rin);
     }
+    do_resample<TPixel64>(rout64, rin64, aff, filterType, blur);
+  } else if (routGR8) {
+    if (rinGR8)
+      do_resample(routGR8, rinGR8, aff, filterType, blur);
+    else if (routGR8 && rin32)
+      do_resample(routGR8, rin32, aff, filterType, blur);
+    else {
+      rin->unlock();
+      rout->unlock();
+      throw TRopException("unsupported pixel type");
+    }
+  } else if (routF) {
+    if (!rinF) {
+      rinF = TRasterFP(rin->getLx(), rin->getLy());
+      TRop::convert(rinF, rin);
+    }
+    do_resample<TPixelF>(routF, rinF, aff, filterType, blur);
+  } else {
+    rin->unlock();
+    rout->unlock();
+    throw TRopException("unsupported pixel type");
   }
+
+  rout->setLinear(rin->isLinear());
+
   rin->unlock();
   rout->unlock();
 }

@@ -67,6 +67,9 @@ public:
   bool m_drawBlankFrame;
   bool m_useChecks;  //!< whether to consider  paint check and ink check
   bool m_forSceneIcon = false;  // whether it is rendered for the scene icons
+
+  int m_gainStep;
+
 public:
   VisualSettings();
 
@@ -108,6 +111,6 @@ DVAPI void paintImage(const TImageP &image, const TDimension &imageSize,
                       const VisualSettings &visualSettings,
                       const CompareSettings &compareSettings,
                       const TRect &loadbox);
-}
+}  // namespace ImagePainter
 
 #endif  // IMAGEPAINTER_H

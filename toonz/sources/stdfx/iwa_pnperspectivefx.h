@@ -103,7 +103,7 @@ public:
   void doCompute(TTile &tile, double frame,
                  const TRenderSettings &rend_sets) override;
 
-  void doCompute_CPU(TTile &tile, double frame, const TRenderSettings &settings,
+  void doCompute_CPU(double frame, const TRenderSettings &settings,
                      double4 *out_host, TDimensionI &dimOut,
                      PN_Params &pnParams);
 

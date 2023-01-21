@@ -533,12 +533,15 @@ void ToolUtils::TToolUndo::removeLevelAndFrameIfNeeded() const {
     m_level->eraseFrame(m_frameId);
     if (!m_isEditingLevel) {
       TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
+      TXshCell cell;
       for (const TTool::CellOps &cellOps : m_cellsData) {
-        TXshCell cell;
         if (cellOps.type == TTool::CellOps::ExistingToNew)
           cell = xsh->getCell(cellOps.r0 - 1, m_col);
         for (int r = cellOps.r0; r <= cellOps.r1; r++)
           xsh->setCell(r, m_col, cell);
+      }
+      if (m_cellsData.size() < 1) {
+        xsh->setCell(m_row, m_col, cell);
       }
     }
     if (m_createdLevel) {
@@ -666,6 +669,9 @@ void ToolUtils::TRasterUndo::undo() const {
 
   removeLevelAndFrameIfNeeded();
 
+  if (m_level) {
+    m_level->setDirtyFlag(true);
+  }
   app->getCurrentXsheet()->notifyXsheetChanged();
   notifyImageChanged();
 }

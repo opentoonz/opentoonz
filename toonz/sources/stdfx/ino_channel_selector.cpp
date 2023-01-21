@@ -65,6 +65,8 @@ public:
     this->m_alp_channel->addItem(0, "Red");
     this->m_alp_channel->addItem(1, "Green");
     this->m_alp_channel->addItem(2, "Blue");
+
+    enableComputeInFloat(true);
   }
   bool doGetBBox(double frame, TRectD &bBox,
                  const TRenderSettings &info) override {
@@ -94,7 +96,7 @@ void fx_template(const TRasterPT<IN_PIXEL> in_ras, const int in_sel,
     IN_PIXEL *sl_in   = in_ras->pixels(yy);
     OUT_PIXEL *sl_out = out_ras->pixels(yy);
     for (int xx = 0; xx < out_ras->getLx(); ++xx, ++sl_in, ++sl_out) {
-      int val = 0;
+      typename IN_PIXEL::Channel val = 0;
       switch (in_sel) {
       case 0:
         val = sl_in->r;
@@ -120,7 +122,11 @@ void fx_template(const TRasterPT<IN_PIXEL> in_ras, const int in_sel,
         sl_out->b = val;
         break;
       case 3:
-        sl_out->m = val;
+        // clamp the alpha channel in case computing TPixelF
+        sl_out->m = (val < 0) ? 0
+                    : (val > OUT_PIXEL::maxChannelValue)
+                        ? OUT_PIXEL::maxChannelValue
+                        : val;
         break;
       }
     }
@@ -132,14 +138,17 @@ void fx_(const TRasterP in_ras, const int in_sel, TRasterP out_ras,
     fx_template<TPixel32, TPixel32>(in_ras, in_sel, out_ras, out_sel);
   } else if ((TRaster64P)in_ras && (TRaster64P)out_ras) {
     fx_template<TPixel64, TPixel64>(in_ras, in_sel, out_ras, out_sel);
+  } else if ((TRasterFP)in_ras && (TRasterFP)out_ras) {
+    fx_template<TPixelF, TPixelF>(in_ras, in_sel, out_ras, out_sel);
   }
 }
-}
+}  // namespace
 //------------------------------------------------------------
 void ino_channel_selector::doCompute(TTile &tile, double frame,
                                      const TRenderSettings &ri) {
   /* ------ サポートしていないPixelタイプはエラーを投げる --- */
-  if (!((TRaster32P)tile.getRaster()) && !((TRaster64P)tile.getRaster())) {
+  if (!((TRaster32P)tile.getRaster()) && !((TRaster64P)tile.getRaster()) &&
+      !((TRasterFP)tile.getRaster())) {
     throw TRopException("unsupported input pixel type");
   }
 

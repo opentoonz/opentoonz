@@ -76,6 +76,9 @@ void multiRadial(const TRasterP &ras, TPointD posTrasf,
   else if ((TRaster64P)ras)
     doComputeRadialT<TPixel64>(ras, posTrasf, colors->getValue64(frame), period,
                                count, cycle, aff, inner, type);
+  else if ((TRasterFP)ras)
+    doComputeRadialT<TPixelF>(ras, posTrasf, colors->getValueF(frame), period,
+                              count, cycle, aff, inner, type);
   else
     throw TException("MultiRadialGradientFx: unsupported Pixel Type");
 }
@@ -150,6 +153,9 @@ void multiLinear(const TRasterP &ras, TPointD posTrasf,
   else if ((TRaster64P)ras)
     doComputeLinearT<TPixel64>(ras, posTrasf, colors->getValue64(frame), period,
                                count, amplitude, freq, phase, cycle, aff, type);
+  else if ((TRasterFP)ras)
+    doComputeLinearT<TPixelF>(ras, posTrasf, colors->getValueF(frame), period,
+                              count, amplitude, freq, phase, cycle, aff, type);
   else
     throw TException("MultiLinearGradientFx: unsupported Pixel Type");
 }

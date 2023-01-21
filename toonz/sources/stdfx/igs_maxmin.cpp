@@ -10,7 +10,8 @@ void igs::maxmin::convert(
     const unsigned char *inn, unsigned char *out
 
     ,
-    const int height, const int width, const int channels, const int bits
+    const int height, const int width, const int channels,
+    const int bits
 
     /* Pixel毎に効果の強弱 */
     ,
@@ -41,10 +42,10 @@ void igs::maxmin::convert(
     /* Speed up */
     ,
     const int number_of_thread /* =1    1...24...INT_MAX */
-    ) {
+) {
   if ((igs::image::rgba::siz != channels) &&
       (igs::image::rgb::siz != channels) && (1 != channels) /* grayscale */
-      ) {
+  ) {
     throw std::domain_error("Bad channels,Not rgba/rgb/grayscale");
   }
 
@@ -104,7 +105,17 @@ void igs::maxmin::convert(
         alpha_rendering_sw, add_blend_sw, number_of_thread);
     mthread.run();
     mthread.clear();
+  } else if ((std::numeric_limits<float>::digits == bits) &&
+             ((std::numeric_limits<float>::digits == ref_bits) ||
+              (0 == ref_bits))) {
+    igs::maxmin::multithread<float, float> mthread(
+        reinterpret_cast<const float *>(inn), reinterpret_cast<float *>(out),
+        height, width, channels, reinterpret_cast<const float *>(ref), ref_mode,
+        radius, smooth_outer_range, polygon_number, roll_degree, min_sw,
+        alpha_rendering_sw, add_blend_sw, number_of_thread);
+    mthread.run();
+    mthread.clear();
   } else {
-    throw std::domain_error("Bad bits,Not uchar/ushort");
+    throw std::domain_error("Bad bits,Not uchar/ushort/float");
   }
 }

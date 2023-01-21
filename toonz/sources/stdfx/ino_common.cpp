@@ -42,7 +42,7 @@ void ras_to_arr_(const TRasterPT<T> ras, U* arr, const int channels) {
   }
 }
 
-// T is TPixel32 or TPixel64
+// T is TPixel32, TPixel64 or TPixelF
 // normalize to 0.0 - 1.0
 template <class T>
 void ras_to_float_arr_(const TRasterPT<T> ras, float* arr, const int channels) {
@@ -113,37 +113,56 @@ void float_arr_to_ras_(const float* arr, const int channels, TRasterPT<T> ras,
     T* ras_sl         = ras->pixels(yy);
     for (int xx = 0; xx < ras->getLx(); ++xx, arrx += channels) {
       if (red < channels) {
-        ras_sl[xx].r = (arrx[red] >= 1.f)
-                           ? T::maxChannelValue
-                           : (arrx[red] <= 0.f)
-                                 ? (typename T::Channel)0
-                                 : (typename T::Channel)(
-                                       std::round(arrx[red] * fac + 0.5f));
+        ras_sl[xx].r =
+            (arrx[red] >= 1.f) ? T::maxChannelValue
+            : (arrx[red] <= 0.f)
+                ? (typename T::Channel)0
+                : (typename T::Channel)(std::round(arrx[red] * fac + 0.5f));
       }
       if (gre < channels) {
-        ras_sl[xx].g = (arrx[gre] >= 1.f)
-                           ? T::maxChannelValue
-                           : (arrx[gre] <= 0.f)
-                                 ? (typename T::Channel)0
-                                 : (typename T::Channel)(
-                                       std::round(arrx[gre] * fac + 0.5f));
+        ras_sl[xx].g =
+            (arrx[gre] >= 1.f) ? T::maxChannelValue
+            : (arrx[gre] <= 0.f)
+                ? (typename T::Channel)0
+                : (typename T::Channel)(std::round(arrx[gre] * fac + 0.5f));
       }
       if (blu < channels) {
-        ras_sl[xx].b = (arrx[blu] >= 1.f)
-                           ? T::maxChannelValue
-                           : (arrx[blu] <= 0.f)
-                                 ? (typename T::Channel)0
-                                 : (typename T::Channel)(
-                                       std::round(arrx[blu] * fac + 0.5f));
+        ras_sl[xx].b =
+            (arrx[blu] >= 1.f) ? T::maxChannelValue
+            : (arrx[blu] <= 0.f)
+                ? (typename T::Channel)0
+                : (typename T::Channel)(std::round(arrx[blu] * fac + 0.5f));
       }
       if (alp < channels) {
-        ras_sl[xx].m = (arrx[alp] >= 1.f)
-                           ? T::maxChannelValue
-                           : (arrx[alp] <= 0.f)
-                                 ? (typename T::Channel)0
-                                 : (typename T::Channel)(
-                                       std::round(arrx[alp] * fac + 0.5f));
+        ras_sl[xx].m =
+            (arrx[alp] >= 1.f) ? T::maxChannelValue
+            : (arrx[alp] <= 0.f)
+                ? (typename T::Channel)0
+                : (typename T::Channel)(std::round(arrx[alp] * fac + 0.5f));
       }
+    }
+  }
+}
+
+template <>
+void float_arr_to_ras_<TPixelF>(const float* arr, const int channels,
+                                TRasterFP ras,
+                                const int margin  // default is 0
+) {
+  arr +=
+      (ras->getLx() + margin + margin) * margin * channels + margin * channels;
+
+  using namespace igs::image::rgba;
+
+  for (int yy = 0; yy < ras->getLy();
+       ++yy, arr += (ras->getLx() + margin + margin) * channels) {
+    const float* arrx = arr;
+    TPixelF* ras_sl   = ras->pixels(yy);
+    for (int xx = 0; xx < ras->getLx(); ++xx, arrx += channels) {
+      if (red < channels) ras_sl[xx].r = arrx[red];
+      if (gre < channels) ras_sl[xx].g = arrx[gre];
+      if (blu < channels) ras_sl[xx].b = arrx[blu];
+      if (alp < channels) ras_sl[xx].m = arrx[alp];
     }
   }
 }
@@ -153,7 +172,12 @@ float getFactor() {
   return 1.f / (float)T::maxChannelValue;
 }
 
-// T is either TPixel32, TPixel64
+template <>
+float getFactor<TPixelF>() {
+  return 1.f;
+}
+
+// T is either TPixel32, TPixel64, or TPixelF
 template <class T>
 void ras_to_ref_float_arr_(const TRasterPT<T> ras, float* arr,
                            const int refer_mode) {
@@ -182,6 +206,8 @@ void ras_to_ref_float_arr_(const TRasterPT<T> ras, float* arr,
             fac;
         break;
       }
+      // clamp 0.f to 1.f in case computing TPixelF
+      *arr = std::min(1.f, std::max(0.f, *arr));
     }
   }
 }
@@ -195,6 +221,8 @@ void ino::ras_to_arr(const TRasterP in_ras, const int channels,
   } else if ((TRaster64P)in_ras) {
     ras_to_arr_<TPixel64, unsigned short>(
         in_ras, reinterpret_cast<unsigned short*>(out_arr), channels);
+  } else if ((TRasterFP)in_ras) {
+    ras_to_float_arr(in_ras, channels, reinterpret_cast<float*>(out_arr));
   }
 }
 void ino::ras_to_float_arr(const TRasterP in_ras, const int channels,
@@ -203,6 +231,8 @@ void ino::ras_to_float_arr(const TRasterP in_ras, const int channels,
     ras_to_float_arr_<TPixel32>(in_ras, out_arr, channels);
   } else if ((TRaster64P)in_ras) {
     ras_to_float_arr_<TPixel64>(in_ras, out_arr, channels);
+  } else if ((TRasterFP)in_ras) {
+    ras_to_float_arr_<TPixelF>(in_ras, out_arr, channels);
   }
 }
 void ino::arr_to_ras(const unsigned char* in_arr, const int channels,
@@ -213,6 +243,9 @@ void ino::arr_to_ras(const unsigned char* in_arr, const int channels,
     arr_to_ras_<unsigned short, TPixel64>(
         reinterpret_cast<const unsigned short*>(in_arr), channels, out_ras,
         margin);
+  } else if ((TRasterFP)out_ras) {
+    arr_to_ras_<float, TPixelF>(reinterpret_cast<const float*>(in_arr),
+                                channels, out_ras, margin);
   }
 }
 void ino::float_arr_to_ras(const unsigned char* in_arr, const int channels,
@@ -223,6 +256,9 @@ void ino::float_arr_to_ras(const unsigned char* in_arr, const int channels,
   } else if ((TRaster64P)out_ras) {
     float_arr_to_ras_<TPixel64>(reinterpret_cast<const float*>(in_arr),
                                 channels, out_ras, margin);
+  } else if ((TRasterFP)out_ras) {
+    float_arr_to_ras_<TPixelF>(reinterpret_cast<const float*>(in_arr), channels,
+                               out_ras, margin);
   }
 }
 //--------------------
@@ -247,6 +283,8 @@ void ino::ras_to_ref_float_arr(const TRasterP in_ras, float* out_arr,
     ras_to_ref_float_arr_<TPixel32>(in_ras, out_arr, refer_mode);
   } else if ((TRaster64P)in_ras) {
     ras_to_ref_float_arr_<TPixel64>(in_ras, out_arr, refer_mode);
+  } else if ((TRasterFP)in_ras) {
+    ras_to_ref_float_arr_<TPixelF>(in_ras, out_arr, refer_mode);
   }
 }
 
@@ -322,12 +360,14 @@ inline void to_bgr(double* bgr, double const* xyz) {
 template <typename T = double>
 inline T to_linear_color_space(T nonlinear_color, T exposure, T gamma) {
   // return -std::log(T(1) - std::pow(nonlinear_color, gamma)) / exposure;
+  if (nonlinear_color <= T(0)) return T(0);
   return std::pow(nonlinear_color, gamma) / exposure;
 }
 // convert power space to sRGB color space
 template <typename T = double>
 inline T to_nonlinear_color_space(T linear_color, T exposure, T gamma) {
   // return std::pow(T(1) - std::exp(-exposure * linear_color), T(1) / gamma);
+  if (linear_color <= T(0)) return T(0);
   return std::pow(linear_color * exposure, T(1) / gamma);
 }
 
@@ -345,22 +385,68 @@ TBlendForeBackRasterFx::TBlendForeBackRasterFx(bool clipping_mask,
     , m_clipping_mask(clipping_mask)
     , m_linear(false)
     , m_gamma(2.2)
-    , m_premultiplied(true) {
+    , m_gammaAdjust(0.)
+    , m_premultiplied(true)
+    , m_colorSpaceMode(new TIntEnumParam(Auto, "Auto")) {
   addInputPort("Fore", this->m_up);
   addInputPort("Back", this->m_down);
   bindParam(this, "opacity", this->m_opacity);
   bindParam(this, "clipping_mask", this->m_clipping_mask);
-  bindParam(this, "linear", this->m_linear);
+  bindParam(this, "linear", this->m_linear, true, true);  // obsolete
+  bindParam(this, "colorSpaceMode", this->m_colorSpaceMode);
   bindParam(this, "gamma", this->m_gamma);
+  bindParam(this, "gammaAdjust", this->m_gammaAdjust);
   bindParam(this, "premultiplied", this->m_premultiplied);
   this->m_opacity->setValueRange(0, 1.0 * ino::param_range());
   this->m_gamma->setValueRange(0.2, 5.0);
+
+  this->m_gammaAdjust->setValueRange(-5., 5.);
+
+  m_colorSpaceMode->addItem(Linear, "Linear");
+  m_colorSpaceMode->addItem(Nonlinear, "Nonlinear");
 
   if (has_alpha_option) {
     m_alpha_rendering = TBoolParamP(true);
     bindParam(this, "alpha_rendering", this->m_alpha_rendering);
   }
+  enableComputeInFloat(true);
+
+  // version 1: Gamma had been diretory specified
+  // version 2: Gamma is computed by rs.m_colorSpaceGamma + gammaAdjust
+  setFxVersion(2);
 }
+//--------------------------------------------
+
+void TBlendForeBackRasterFx::onFxVersionSet() {
+  bool useGamma = getFxVersion() == 1;
+  if (useGamma) {
+    // Automatically update version
+    if (m_gamma->getKeyframeCount() == 0 &&
+        areAlmostEqual(m_gamma->getDefaultValue(), 2.2)) {
+      useGamma = false;
+      // call onObsoleteParamLoaded here in case loading the old fx before
+      // introducing the linear option
+      onObsoleteParamLoaded("linear");
+      setFxVersion(2);
+    }
+  }
+  getParams()->getParamVar("gamma")->setIsHidden(!useGamma);
+  getParams()->getParamVar("gammaAdjust")->setIsHidden(useGamma);
+}
+
+//------------------------------------------------
+// This will be called in TFx::loadData when obsolete "linear" value is
+// loaded
+void TBlendForeBackRasterFx::onObsoleteParamLoaded(
+    const std::string& paramName) {
+  if (paramName != "linear") return;
+
+  if (m_linear->getValue())
+    m_colorSpaceMode->setValue(Linear);
+  else
+    m_colorSpaceMode->setValue(Nonlinear);
+}
+
 //------------------------------------------------------------
 
 bool TBlendForeBackRasterFx::doGetBBox(double frame, TRectD& bBox,
@@ -443,7 +529,16 @@ void TBlendForeBackRasterFx::doCompute(TTile& tile, double frame,
   /* ------ 動作パラメータを得る ---------------------------- */
   const double up_opacity =
       this->m_opacity->getValue(frame) / ino::param_range();
-  const double gamma = this->m_gamma->getValue(frame);
+  double gamma;
+  if (getFxVersion() == 1)
+    gamma = this->m_gamma->getValue(frame);
+  else {
+    gamma = std::max(1., rs.m_colorSpaceGamma + m_gammaAdjust->getValue(frame));
+  }
+
+  bool linear_sw = toBeComputedInLinearColorSpace(rs.m_linearColorSpace,
+                                                  tile.getRaster()->isLinear());
+
   /* ------ (app_begin)log記憶 ------------------------------ */
   const bool log_sw = ino::log_enable_sw();
 
@@ -465,7 +560,8 @@ void TBlendForeBackRasterFx::doCompute(TTile& tile, double frame,
     if (up_ras) {
       up_ras->lock();
     }
-    doComputeFx(dn_ras, up_ras, TPoint(), up_opacity, gamma);
+    doComputeFx(dn_ras, up_ras, TPoint(), up_opacity,
+                gamma / rs.m_colorSpaceGamma, rs.m_colorSpaceGamma, linear_sw);
     // fx_(dn_ras, up_ras, TPoint(), up_opacity,
     // this->m_clipping_mask->getValue(),
     //  this->m_linear->getValue(), gamma, this->m_premultiplied->getValue());
@@ -505,11 +601,10 @@ void TBlendForeBackRasterFx::doCompute(TTile& tile, double frame,
 }
 
 //------------------------------------------------------------
-void TBlendForeBackRasterFx::doComputeFx(TRasterP& dn_ras_out,
-                                         const TRasterP& up_ras,
-                                         const TPoint& pos,
-                                         const double up_opacity,
-                                         const double gamma) {
+void TBlendForeBackRasterFx::doComputeFx(
+    TRasterP& dn_ras_out, const TRasterP& up_ras, const TPoint& pos,
+    const double up_opacity, const double gammaDif,
+    const double colorSpaceGamma, const bool linear_sw) {
   /* 交差したエリアを処理するようにする、いるのか??? */
   TRect outRect(dn_ras_out->getBounds());
   TRect upRect(up_ras->getBounds() + pos);
@@ -522,22 +617,38 @@ void TBlendForeBackRasterFx::doComputeFx(TRasterP& dn_ras_out,
 
   TRaster32P rout32 = cRout, rup32 = cRup;
   TRaster64P rout64 = cRout, rup64 = cRup;
+  TRasterFP routF = cRout, rupF = cRup;
 
-  bool linear_sw = this->m_linear->getValue();
+  bool premultiplied_sw = this->m_premultiplied->getValue();
 
   if (rout32 && rup32) {
-    if (linear_sw)
-      linearTmpl<TPixel32, UCHAR>(rout32, rup32, up_opacity, gamma);
+    if (linear_sw) {
+      if (!premultiplied_sw)
+        premultiToUnpremulti<TPixel32, UCHAR>(rout32, rup32, colorSpaceGamma);
+
+      linearTmpl<TPixel32, UCHAR>(rout32, rup32, up_opacity, gammaDif);
+    }
     // linearAdd<TPixel32, UCHAR>(rout32, rup32, up_opacity, clipping_mask_sw,
     //  gamma, premultiplied_sw);
     else
       nonlinearTmpl<TPixel32, UCHAR>(rout32, rup32, up_opacity);
     // tmpl_<TPixel32, UCHAR>(rout32, rup32, up_opacity, clipping_mask_sw);
   } else if (rout64 && rup64) {
-    if (linear_sw)
-      linearTmpl<TPixel64, USHORT>(rout64, rup64, up_opacity, gamma);
-    else
+    if (linear_sw) {
+      if (!premultiplied_sw)
+        premultiToUnpremulti<TPixel64, USHORT>(rout64, rup64, colorSpaceGamma);
+
+      linearTmpl<TPixel64, USHORT>(rout64, rup64, up_opacity, gammaDif);
+    } else
       nonlinearTmpl<TPixel64, USHORT>(rout64, rup64, up_opacity);
+  } else if (routF && rupF) {
+    if (linear_sw) {
+      if (!premultiplied_sw)
+        premultiToUnpremulti<TPixelF, float>(routF, rupF, colorSpaceGamma);
+
+      linearTmpl<TPixelF, float>(routF, rupF, up_opacity, gammaDif);
+    } else
+      nonlinearTmpl<TPixelF, float>(routF, rupF, up_opacity);
   } else {
     throw TRopException("unsupported pixel type");
   }
@@ -556,6 +667,7 @@ void TBlendForeBackRasterFx::nonlinearTmpl(TRasterPT<T> dn_ras_out,
   double maxi = static_cast<double>(T::maxChannelValue);  // 255or65535
 
   assert(dn_ras_out->getSize() == up_ras->getSize());
+  assert(dn_ras_out->isLinear() == up_ras->isLinear());
 
   for (int yy = 0; yy < dn_ras_out->getLy(); ++yy) {
     T* out_pix             = dn_ras_out->pixels(yy);
@@ -572,7 +684,7 @@ void TBlendForeBackRasterFx::nonlinearTmpl(TRasterPT<T> dn_ras_out,
       double dna = static_cast<double>(out_pix->m) / maxi;
       brendKernel(dnr, dng, dnb, dna, upr, upg, upb, upa,
                   clipping_mask_sw ? up_opacity * dna : up_opacity,
-                  alpha_rendering_sw);
+                  alpha_rendering_sw, true);
       out_pix->r = static_cast<Q>(dnr * (maxi + 0.999999));
       out_pix->g = static_cast<Q>(dng * (maxi + 0.999999));
       out_pix->b = static_cast<Q>(dnb * (maxi + 0.999999));
@@ -582,16 +694,48 @@ void TBlendForeBackRasterFx::nonlinearTmpl(TRasterPT<T> dn_ras_out,
 }
 
 //------------------------------------------------------------
-template <class T, class Q>
-void TBlendForeBackRasterFx::linearTmpl(TRasterPT<T> dn_ras_out,
-                                        const TRasterPT<T>& up_ras,
-                                        const double up_opacity,
-                                        const double gamma) {
+template <>
+void TBlendForeBackRasterFx::nonlinearTmpl<TPixelF, float>(
+    TRasterFP dn_ras_out, const TRasterFP& up_ras, const double up_opacity) {
   bool clipping_mask_sw   = this->m_clipping_mask->getValue();
   bool alpha_rendering_sw = (m_alpha_rendering.getPointer())
                                 ? this->m_alpha_rendering->getValue()
                                 : true;
-  bool premultiplied_sw = this->m_premultiplied->getValue();
+
+  assert(dn_ras_out->getSize() == up_ras->getSize());
+  assert(dn_ras_out->isLinear() == up_ras->isLinear());
+
+  for (int yy = 0; yy < dn_ras_out->getLy(); ++yy) {
+    TPixelF* out_pix             = dn_ras_out->pixels(yy);
+    const TPixelF* const out_end = out_pix + dn_ras_out->getLx();
+    const TPixelF* up_pix        = up_ras->pixels(yy);
+    for (; out_pix < out_end; ++out_pix, ++up_pix) {
+      double dnr = static_cast<double>(out_pix->r);
+      double dng = static_cast<double>(out_pix->g);
+      double dnb = static_cast<double>(out_pix->b);
+      double dna = static_cast<double>(out_pix->m);
+      brendKernel(dnr, dng, dnb, dna, up_pix->r, up_pix->g, up_pix->b,
+                  up_pix->m, clipping_mask_sw ? up_opacity * dna : up_opacity,
+                  alpha_rendering_sw, false);
+      out_pix->r = dnr;
+      out_pix->g = dng;
+      out_pix->b = dnb;
+      out_pix->m = dna;
+    }
+  }
+}
+
+//------------------------------------------------------------
+template <class T, class Q>
+void TBlendForeBackRasterFx::linearTmpl(TRasterPT<T> dn_ras_out,
+                                        const TRasterPT<T>& up_ras,
+                                        const double up_opacity,
+                                        const double gammaDif) {
+  bool clipping_mask_sw   = this->m_clipping_mask->getValue();
+  bool alpha_rendering_sw = (m_alpha_rendering.getPointer())
+                                ? this->m_alpha_rendering->getValue()
+                                : true;
+  bool premultiplied_sw   = this->m_premultiplied->getValue();
   double maxi  = static_cast<double>(T::maxChannelValue);  // 255or65535
   double limit = (maxi + 0.5) / (maxi + 1.0);
 
@@ -618,10 +762,12 @@ void TBlendForeBackRasterFx::linearTmpl(TRasterPT<T> dn_ras_out,
       if (dna > 0.0) {
         for (int c = 0; c < 3; c++) {
           if (premultiplied_sw)
-            dnBGR[c] = to_linear_color_space(dnBGR[c] / dna, 1.0, gamma) * dna;
+            dnBGR[c] =
+                to_linear_color_space(dnBGR[c] / dna, 1.0, gammaDif) * dna;
           else
-            dnBGR[c] = to_linear_color_space(dnBGR[c], 1.0, gamma);
+            dnBGR[c] = to_linear_color_space(dnBGR[c], 1.0, gammaDif);
         }
+
         to_xyz(dnXYZ, dnBGR);
       }
 
@@ -630,28 +776,29 @@ void TBlendForeBackRasterFx::linearTmpl(TRasterPT<T> dn_ras_out,
       upBGR[1]   = static_cast<double>(up_pix->g) / maxi;
       upBGR[2]   = static_cast<double>(up_pix->r) / maxi;
       double upa = static_cast<double>(up_pix->m) / maxi;
+
       for (int c = 0; c < 3; c++) {
         if (premultiplied_sw)
-          upBGR[c] = to_linear_color_space(upBGR[c] / upa, 1.0, gamma) * upa;
+          upBGR[c] = to_linear_color_space(upBGR[c] / upa, 1.0, gammaDif) * upa;
         else
-          upBGR[c] = to_linear_color_space(upBGR[c], 1.0, gamma);
+          upBGR[c] = to_linear_color_space(upBGR[c], 1.0, gammaDif);
       }
 
       double upXYZ[3];
       to_xyz(upXYZ, upBGR);
 
       brendKernel(dnXYZ[0], dnXYZ[1], dnXYZ[2], dna, upXYZ[0], upXYZ[1],
-                  upXYZ[2], upa, tmp_opacity, alpha_rendering_sw, true);
+                  upXYZ[2], upa, tmp_opacity, alpha_rendering_sw, false);
 
       to_bgr(dnBGR, dnXYZ);
 
       // premultiply the result
       double nonlinear_b =
-          to_nonlinear_color_space(dnBGR[0] / dna, 1.0, gamma) * dna;
+          to_nonlinear_color_space(dnBGR[0] / dna, 1.0, gammaDif) * dna;
       double nonlinear_g =
-          to_nonlinear_color_space(dnBGR[1] / dna, 1.0, gamma) * dna;
+          to_nonlinear_color_space(dnBGR[1] / dna, 1.0, gammaDif) * dna;
       double nonlinear_r =
-          to_nonlinear_color_space(dnBGR[2] / dna, 1.0, gamma) * dna;
+          to_nonlinear_color_space(dnBGR[2] / dna, 1.0, gammaDif) * dna;
 
       out_pix->r =
           static_cast<Q>(clamp(nonlinear_r, 0.0, 1.0) * (maxi + 0.999999));
@@ -666,13 +813,166 @@ void TBlendForeBackRasterFx::linearTmpl(TRasterPT<T> dn_ras_out,
 
 //------------------------------------------------------------
 
+template <>
+void TBlendForeBackRasterFx::linearTmpl<TPixelF, float>(TRasterFP dn_ras_out,
+                                                        const TRasterFP& up_ras,
+                                                        const double up_opacity,
+                                                        const double gammaDif) {
+  bool clipping_mask_sw   = this->m_clipping_mask->getValue();
+  bool alpha_rendering_sw = (m_alpha_rendering.getPointer())
+                                ? this->m_alpha_rendering->getValue()
+                                : true;
+  bool premultiplied_sw   = this->m_premultiplied->getValue();
+  // double maxi = static_cast<double>(T::maxChannelValue);  // 255or65535
+  // double limit = (maxi + 0.5) / (maxi + 1.0);
+
+  assert(dn_ras_out->getSize() == up_ras->getSize());
+
+  for (int yy = 0; yy < dn_ras_out->getLy(); ++yy) {
+    TPixelF* out_pix             = dn_ras_out->pixels(yy);
+    const TPixelF* const out_end = out_pix + dn_ras_out->getLx();
+    const TPixelF* up_pix        = up_ras->pixels(yy);
+    for (; out_pix < out_end; ++out_pix, ++up_pix) {
+      if (up_pix->m <= 0.f || up_opacity <= 0.f) {
+        continue;
+      }
+
+      double dna         = static_cast<double>(out_pix->m);
+      double tmp_opacity = clipping_mask_sw ? up_opacity * dna : up_opacity;
+      if (tmp_opacity <= 0.) continue;
+
+      double dnBGR[3];
+      dnBGR[0]        = static_cast<double>(out_pix->b);
+      dnBGR[1]        = static_cast<double>(out_pix->g);
+      dnBGR[2]        = static_cast<double>(out_pix->r);
+      double dnXYZ[3] = {0.0, 0.0, 0.0};
+      if (dna > 0.0) {
+        for (int c = 0; c < 3; c++) {
+          if (premultiplied_sw)
+            dnBGR[c] =
+                to_linear_color_space(dnBGR[c] / dna, 1.0, gammaDif) * dna;
+          else
+            dnBGR[c] = to_linear_color_space(dnBGR[c], 1.0, gammaDif);
+        }
+        to_xyz(dnXYZ, dnBGR);
+      }
+
+      double upBGR[3];
+      upBGR[0]   = static_cast<double>(up_pix->b);
+      upBGR[1]   = static_cast<double>(up_pix->g);
+      upBGR[2]   = static_cast<double>(up_pix->r);
+      double upa = static_cast<double>(up_pix->m);
+
+      for (int c = 0; c < 3; c++) {
+        if (premultiplied_sw)
+          upBGR[c] = to_linear_color_space(upBGR[c] / upa, 1.0, gammaDif) * upa;
+        else
+          upBGR[c] = to_linear_color_space(upBGR[c], 1.0, gammaDif);
+      }
+
+      double upXYZ[3];
+      to_xyz(upXYZ, upBGR);
+
+      brendKernel(dnXYZ[0], dnXYZ[1], dnXYZ[2], dna, upXYZ[0], upXYZ[1],
+                  upXYZ[2], upa, tmp_opacity, alpha_rendering_sw, false);
+
+      to_bgr(dnBGR, dnXYZ);
+
+      // premultiply the result
+      double nonlinear_b =
+          to_nonlinear_color_space(dnBGR[0] / dna, 1.0, gammaDif) * dna;
+      double nonlinear_g =
+          to_nonlinear_color_space(dnBGR[1] / dna, 1.0, gammaDif) * dna;
+      double nonlinear_r =
+          to_nonlinear_color_space(dnBGR[2] / dna, 1.0, gammaDif) * dna;
+
+      out_pix->r = nonlinear_r;
+      out_pix->g = nonlinear_g;
+      out_pix->b = nonlinear_b;
+      out_pix->m = dna;
+    }
+  }
+}
+
+//------------------------------------------------------------
+template <class T, class Q>
+void TBlendForeBackRasterFx::premultiToUnpremulti(
+    TRasterPT<T> dn_ras, const TRasterPT<T>& up_ras,
+    const double colorSpaceGamma) {
+  double maxi = static_cast<double>(T::maxChannelValue);  // 255or65535
+
+  assert(dn_ras->getSize() == up_ras->getSize());
+  assert(dn_ras->isLinear() == up_ras->isLinear());
+
+  for (int yy = 0; yy < dn_ras->getLy(); ++yy) {
+    T* dn_pix             = dn_ras->pixels(yy);
+    const T* const dn_end = dn_pix + dn_ras->getLx();
+    T* up_pix             = up_ras->pixels(yy);
+    for (; dn_pix < dn_end; ++dn_pix, ++up_pix) {
+      double upa = static_cast<double>(up_pix->m) / maxi;
+      if (upa > 0. && upa < 1.) {
+        double upr    = static_cast<double>(up_pix->r) / maxi;
+        double upg    = static_cast<double>(up_pix->g) / maxi;
+        double upb    = static_cast<double>(up_pix->b) / maxi;
+        double up_fac = std::pow(upa, colorSpaceGamma - 1.);
+        up_pix->r     = static_cast<Q>(upr * up_fac * (maxi + 0.999999));
+        up_pix->g     = static_cast<Q>(upg * up_fac * (maxi + 0.999999));
+        up_pix->b     = static_cast<Q>(upb * up_fac * (maxi + 0.999999));
+      }
+      double dna = static_cast<double>(dn_pix->m) / maxi;
+      if (dna > 0. && dna < 1.) {
+        double dnr    = static_cast<double>(dn_pix->r) / maxi;
+        double dng    = static_cast<double>(dn_pix->g) / maxi;
+        double dnb    = static_cast<double>(dn_pix->b) / maxi;
+        double dn_fac = std::pow(dna, colorSpaceGamma - 1.);
+        dn_pix->r     = static_cast<Q>(dnr * dn_fac * (maxi + 0.999999));
+        dn_pix->g     = static_cast<Q>(dng * dn_fac * (maxi + 0.999999));
+        dn_pix->b     = static_cast<Q>(dnb * dn_fac * (maxi + 0.999999));
+      }
+    }
+  }
+}
+
+//------------------------------------------------------------
+template <>
+void TBlendForeBackRasterFx::premultiToUnpremulti<TPixelF, float>(
+    TRasterFP dn_ras, const TRasterFP& up_ras, const double colorSpaceGamma) {
+  assert(dn_ras->getSize() == up_ras->getSize());
+  assert(dn_ras->isLinear() == up_ras->isLinear());
+
+  for (int yy = 0; yy < dn_ras->getLy(); ++yy) {
+    TPixelF* dn_pix             = dn_ras->pixels(yy);
+    const TPixelF* const dn_end = dn_pix + dn_ras->getLx();
+    TPixelF* up_pix             = up_ras->pixels(yy);
+    for (; dn_pix < dn_end; ++dn_pix, ++up_pix) {
+      if (up_pix->m > 0.f && up_pix->m < 1.f) {
+        float up_fac =
+            std::pow(up_pix->m, static_cast<float>(colorSpaceGamma - 1.));
+        up_pix->r *= up_fac;
+        up_pix->g *= up_fac;
+        up_pix->b *= up_fac;
+      }
+      if (dn_pix->m > 0.f && dn_pix->m < 1.f) {
+        float dn_fac =
+            std::pow(dn_pix->m, static_cast<float>(colorSpaceGamma - 1.));
+        dn_pix->r *= dn_fac;
+        dn_pix->g *= dn_fac;
+        dn_pix->b *= dn_fac;
+      }
+    }
+  }
+}
+
+//------------------------------------------------------------
+
 void TBlendForeBackRasterFx::computeUpAndDown(TTile& tile, double frame,
                                               const TRenderSettings& rs,
                                               TRasterP& dn_ras,
                                               TRasterP& up_ras,
                                               bool upComputesWholeTile) {
   /* ------ サポートしていないPixelタイプはエラーを投げる --- */
-  if (!((TRaster32P)tile.getRaster()) && !((TRaster64P)tile.getRaster())) {
+  if (!((TRaster32P)tile.getRaster()) && !((TRaster64P)tile.getRaster()) &&
+      !((TRasterFP)tile.getRaster())) {
     throw TRopException("unsupported input pixel type");
   }
   /*
@@ -757,4 +1057,13 @@ fxをreplaceすると、
                                : tile.getRaster()->extract(dnRect);
   up_ras = upTile.getRaster();
   assert(dn_ras->getSize() == up_ras->getSize());
+}
+
+//------------------------------------------------------------
+
+bool TBlendForeBackRasterFx::toBeComputedInLinearColorSpace(
+    bool settingsIsLinear, bool tileIsLinear) const {
+  ColorSpaceMode mode =
+      static_cast<ColorSpaceMode>(m_colorSpaceMode->getValue());
+  return mode == Linear || (mode == Auto && settingsIsLinear);
 }

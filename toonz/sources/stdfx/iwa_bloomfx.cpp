@@ -9,11 +9,13 @@ namespace {
 // convert sRGB color space to power space
 template <typename T = double>
 inline T to_linear_color_space(T nonlinear_color, T exposure, T gamma) {
+  if (nonlinear_color <= T(0)) return T(0);
   return std::pow(nonlinear_color, gamma) / exposure;
 }
 // convert power space to sRGB color space
 template <typename T = double>
 inline T to_nonlinear_color_space(T linear_color, T exposure, T gamma) {
+  if (linear_color <= T(0)) return T(0);
   return std::pow(linear_color * exposure, T(1) / gamma);
 }
 template <class T = double>
@@ -53,6 +55,7 @@ void blurByRotate(cv::Mat &mat) {
 //--------------------------------------------
 Iwa_BloomFx::Iwa_BloomFx()
     : m_gamma(2.2)
+    , m_gammaAdjust(0.)
     , m_auto_gain(false)
     , m_gain_adjust(0.0)
     , m_gain(2.0)
@@ -60,12 +63,9 @@ Iwa_BloomFx::Iwa_BloomFx()
     , m_size(100.0)
     , m_alpha_rendering(false)
     , m_alpha_mode(new TIntEnumParam(NoAlpha, "No Alpha")) {
-  // Version 1 : gaussian filter applied with standard deviation 0
-  // Version 2 : standard deviation = blurRadius * 0.3
-  setFxVersion(2);
-
   addInputPort("Source", m_source);
   bindParam(this, "gamma", m_gamma);
+  bindParam(this, "gammaAdjust", m_gammaAdjust);
   bindParam(this, "auto_gain", m_auto_gain);
   bindParam(this, "gain_adjust", m_gain_adjust);
   bindParam(this, "gain", m_gain);
@@ -79,12 +79,20 @@ Iwa_BloomFx::Iwa_BloomFx()
   m_alpha_mode->addItem(LightAndSource, "Light and Source");
 
   m_gamma->setValueRange(0.1, 5.0);
+  m_gammaAdjust->setValueRange(-5., 5.);
   m_gain_adjust->setValueRange(-1.0, 1.0);
   m_gain->setValueRange(0.1, 10.0);
   m_decay->setValueRange(0, 4);
   m_size->setValueRange(0.1, 1024.0);
 
   m_size->setMeasureName("fxLength");
+
+  enableComputeInFloat(true);
+
+  // Version 1 : gaussian filter applied with standard deviation 0
+  // Version 2 : standard deviation = blurRadius * 0.3
+  // Version 3: Gamma is computed by rs.m_colorSpaceGamma + gammaAdjust
+  setFxVersion(3);
 }
 //------------------------------------------------
 
@@ -107,7 +115,7 @@ double Iwa_BloomFx::getSizePixelAmount(const double val, const TAffine affine) {
 template <typename RASTER, typename PIXEL>
 void Iwa_BloomFx::setSourceTileToMat(const RASTER ras, cv::Mat &imgMat,
                                      const double gamma) {
-  double maxi = static_cast<double>(PIXEL::maxChannelValue);  // 255or65535
+  double maxi = static_cast<double>(PIXEL::maxChannelValue);  // 255or65535or1.0
   for (int j = 0; j < ras->getLy(); j++) {
     const PIXEL *pix = ras->pixels(j);
     cv::Vec3f *mat_p = imgMat.ptr<cv::Vec3f>(j);
@@ -118,12 +126,18 @@ void Iwa_BloomFx::setSourceTileToMat(const RASTER ras, cv::Mat &imgMat,
         continue;
       }
       double bgra[3];
-      bgra[0] = static_cast<double>(pix->b) / maxi;
-      bgra[1] = static_cast<double>(pix->g) / maxi;
-      bgra[2] = static_cast<double>(pix->r) / maxi;
-      for (int c = 0; c < 3; c++) {
-        // assuming that the source image is premultiplied
-        bgra[c] = to_linear_color_space(bgra[c] / pix_a, 1.0, gamma) * pix_a;
+      if (areAlmostEqual(gamma, 1.0)) {
+        bgra[0] = static_cast<double>(pix->b) / maxi;
+        bgra[1] = static_cast<double>(pix->g) / maxi;
+        bgra[2] = static_cast<double>(pix->r) / maxi;
+      } else {
+        bgra[0] = static_cast<double>(pix->b) / maxi;
+        bgra[1] = static_cast<double>(pix->g) / maxi;
+        bgra[2] = static_cast<double>(pix->r) / maxi;
+        for (int c = 0; c < 3; c++) {
+          // assuming that the source image is premultiplied
+          bgra[c] = to_linear_color_space(bgra[c] / pix_a, 1.0, gamma) * pix_a;
+        }
       }
       *mat_p = cv::Vec3f(bgra[0], bgra[1], bgra[2]);
     }
@@ -142,12 +156,19 @@ void Iwa_BloomFx::setMatToOutput(const RASTER ras, const RASTER srcRas,
     PIXEL *srcPix          = srcRas->pixels(j + margin) + margin;
 
     for (int i = 0; i < ras->getLx(); i++, pix++, srcPix++, mat_p++) {
-      double nonlinear_b =
-          to_nonlinear_color_space((double)(*mat_p)[0] * gain, 1.0, gamma);
-      double nonlinear_g =
-          to_nonlinear_color_space((double)(*mat_p)[1] * gain, 1.0, gamma);
-      double nonlinear_r =
-          to_nonlinear_color_space((double)(*mat_p)[2] * gain, 1.0, gamma);
+      double nonlinear_b, nonlinear_g, nonlinear_r;
+      if (areAlmostEqual(gamma, 1.)) {
+        nonlinear_b = (double)(*mat_p)[0] * gain;
+        nonlinear_g = (double)(*mat_p)[1] * gain;
+        nonlinear_r = (double)(*mat_p)[2] * gain;
+      } else {
+        nonlinear_b =
+            to_nonlinear_color_space((double)(*mat_p)[0] * gain, 1.0, gamma);
+        nonlinear_g =
+            to_nonlinear_color_space((double)(*mat_p)[1] * gain, 1.0, gamma);
+        nonlinear_r =
+            to_nonlinear_color_space((double)(*mat_p)[2] * gain, 1.0, gamma);
+      }
 
       nonlinear_b = clamp(nonlinear_b, 0.0, 1.0);
       nonlinear_g = clamp(nonlinear_g, 0.0, 1.0);
@@ -166,6 +187,43 @@ void Iwa_BloomFx::setMatToOutput(const RASTER ras, const RASTER srcRas,
         else  // alphaMode == LightAndSource
           pix->m = std::max(
               (typename PIXEL::Channel)(chan_a * (maxi + 0.999999)), srcPix->m);
+      }
+    }
+  }
+}
+
+template <>
+void Iwa_BloomFx::setMatToOutput<TRasterFP, TPixelF>(
+    const TRasterFP ras, const TRasterFP srcRas, cv::Mat &imgMat,
+    const double gamma, const double gain, const AlphaMode alphaMode,
+    const int margin) {
+  for (int j = 0; j < ras->getLy(); j++) {
+    cv::Vec3f const *mat_p = imgMat.ptr<cv::Vec3f>(j);
+    TPixelF *pix           = ras->pixels(j);
+    TPixelF *srcPix        = srcRas->pixels(j + margin) + margin;
+
+    for (int i = 0; i < ras->getLx(); i++, pix++, srcPix++, mat_p++) {
+      if (areAlmostEqual(gamma, 1.)) {
+        pix->b = (*mat_p)[0] * (float)gain;
+        pix->g = (*mat_p)[1] * (float)gain;
+        pix->r = (*mat_p)[2] * (float)gain;
+      } else {
+        pix->b = to_nonlinear_color_space((*mat_p)[0] * (float)gain, 1.f,
+                                          (float)gamma);
+        pix->g = to_nonlinear_color_space((*mat_p)[1] * (float)gain, 1.f,
+                                          (float)gamma);
+        pix->r = to_nonlinear_color_space((*mat_p)[2] * (float)gain, 1.f,
+                                          (float)gamma);
+      }
+
+      if (alphaMode == NoAlpha)
+        pix->m = 1.f;
+      else {
+        float chan_a = std::max(std::max(pix->b, pix->g), pix->r);
+        if (alphaMode == Light)
+          pix->m = chan_a;
+        else  // alphaMode == LightAndSource
+          pix->m = std::max(chan_a, srcPix->m);
       }
     }
   }
@@ -198,7 +256,15 @@ void Iwa_BloomFx::doCompute(TTile &tile, double frame,
     return;
   }
   // obtain parameters
-  double gamma  = m_gamma->getValue(frame);
+  double gamma;
+  if (getFxVersion() <= 2)
+    gamma = m_gamma->getValue(frame);
+  else
+    gamma = std::max(
+        1., settings.m_colorSpaceGamma + m_gammaAdjust->getValue(frame));
+  double adjustGamma = gamma;
+  if (tile.getRaster()->isLinear()) gamma /= settings.m_colorSpaceGamma;
+
   bool autoGain = m_auto_gain->getValue();
   double gainAdjust =
       (autoGain) ? std::pow(10.0, m_gain_adjust->getValue(frame)) : 1.0;
@@ -223,12 +289,16 @@ void Iwa_BloomFx::doCompute(TTile &tile, double frame,
   cv::Mat imgMat(cv::Size(dimSrc.lx, dimSrc.ly), CV_32FC3);
   TRaster32P ras32 = tile.getRaster();
   TRaster64P ras64 = tile.getRaster();
+  TRasterFP rasF   = tile.getRaster();
   if (ras32)
     setSourceTileToMat<TRaster32P, TPixel32>(sourceTile.getRaster(), imgMat,
                                              gamma);
   else if (ras64)
     setSourceTileToMat<TRaster64P, TPixel64>(sourceTile.getRaster(), imgMat,
                                              gamma);
+  else if (rasF)
+    setSourceTileToMat<TRasterFP, TPixelF>(sourceTile.getRaster(), imgMat,
+                                           gamma);
 
   // compute size and intensity ratios of resampled layers
   // resample size is reduced from the specified size, taking into account
@@ -307,8 +377,8 @@ void Iwa_BloomFx::doCompute(TTile &tile, double frame,
   imgMat = imgMat(roi);
 
   if (autoGain) {
-    gain =
-        to_linear_color_space(gainAdjust, 1.0, gamma) * computeAutoGain(imgMat);
+    gain = to_linear_color_space(gainAdjust, 1.0, adjustGamma) *
+           computeAutoGain(imgMat);
   }
 
   // set the result to the tile, converting to rgb channel values
@@ -320,6 +390,9 @@ void Iwa_BloomFx::doCompute(TTile &tile, double frame,
     setMatToOutput<TRaster64P, TPixel64>(tile.getRaster(),
                                          sourceTile.getRaster(), imgMat, gamma,
                                          gain, alphaMode, margin);
+  else if (rasF)
+    setMatToOutput<TRasterFP, TPixelF>(tile.getRaster(), sourceTile.getRaster(),
+                                       imgMat, gamma, gain, alphaMode, margin);
 }
 //------------------------------------------------
 
@@ -356,6 +429,12 @@ void Iwa_BloomFx::getParamUIs(TParamUIConcept *&concepts, int &length) {
 // loaded
 void Iwa_BloomFx::onObsoleteParamLoaded(const std::string &paramName) {
   if (paramName != "alpha_rendering") return;
+
+  // this condition is to prevent overwriting the alpha mode parameter
+  // when both "alpha rendering" and "alpha mode" are saved in the scene
+  // due to the previous bug
+  if (m_alpha_mode->getValue() != NoAlpha) return;
+
   if (m_alpha_rendering->getValue())
     m_alpha_mode->setValue(LightAndSource);
   else
@@ -363,4 +442,28 @@ void Iwa_BloomFx::onObsoleteParamLoaded(const std::string &paramName) {
 }
 //------------------------------------------------
 
+void Iwa_BloomFx::onFxVersionSet() {
+  bool useGamma = getFxVersion() <= 2;
+  if (getFxVersion() == 2) {
+    // Automatically update version
+    if (m_gamma->getKeyframeCount() == 0 &&
+        areAlmostEqual(m_gamma->getDefaultValue(), 2.2)) {
+      useGamma = false;
+      setFxVersion(3);
+    }
+  }
+  getParams()->getParamVar("gamma")->setIsHidden(!useGamma);
+  getParams()->getParamVar("gammaAdjust")->setIsHidden(useGamma);
+}
+
+//------------------------------------------------
+
+bool Iwa_BloomFx::toBeComputedInLinearColorSpace(bool settingsIsLinear,
+                                                 bool tileIsLinear) const {
+  // made this effect to compute always in nonlinear
+  return false;
+  // return tileIsLinear;
+}
+
+//------------------------------------------------
 FX_PLUGIN_IDENTIFIER(Iwa_BloomFx, "iwa_BloomFx")

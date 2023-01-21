@@ -119,6 +119,8 @@ public:
   ToneCurveFx() : m_toneCurve(new TToneCurveParam()) {
     bindParam(this, "curve", m_toneCurve);
     addInputPort("Source", m_input);
+
+    enableComputeInFloat(true);
   }
 
   ~ToneCurveFx(){};
@@ -147,6 +149,11 @@ void update_param(double &param, TRaster32P ras) { return; }
 
 void update_param(double &param, TRaster64P ras) {
   param = param * 257;
+  return;
+}
+
+void update_param(double &param, TRasterFP ras) {
+  param /= double(TPixel32::maxChannelValue);
   return;
 }
 
@@ -236,6 +243,97 @@ void doToneCurveFx(TRasterPT<PIXEL> ras, double frame,
   ras->unlock();
 }
 
+template <>
+void doToneCurveFx<TPixelF, float>(TRasterFP ras, double frame,
+                                   const TToneCurveParam *toneCurveParam) {
+  QList<QList<TPointD>> pointsList;
+  int e;
+  for (e = 0; e < 6; e++) {
+    TParamSet *paramSet =
+        toneCurveParam->getParamSet(TToneCurveParam::ToneChannel(e))
+            .getPointer();
+    QList<TPointD> points = getParamSetPoints(paramSet, frame);
+    pointsList.push_back(points);
+  }
+  bool isLinear = toneCurveParam->isLinear();
+
+  int i, t;
+  for (i = 0; i < pointsList.size(); i++) {
+    QList<TPointD> &points = pointsList[i];
+    for (t = 0; t < points.size(); t++) {
+      TPointD &p = points[t];
+      double &x  = p.x;
+      double &y  = p.y;
+      update_param(x, TRaster64P());
+      update_param(y, TRaster64P());
+    }
+  }
+
+  std::vector<USHORT> rgbaLut(TPixel64::maxChannelValue + 1);
+  std::vector<USHORT> rgbLut(TPixel64::maxChannelValue + 1);
+  std::vector<USHORT> rLut(TPixel64::maxChannelValue + 1);
+  std::vector<USHORT> gLut(TPixel64::maxChannelValue + 1);
+  std::vector<USHORT> bLut(TPixel64::maxChannelValue + 1);
+  std::vector<USHORT> aLut(TPixel64::maxChannelValue + 1);
+
+  fill_lut<TPixel64, USHORT>(pointsList[0], rgbaLut, isLinear);
+  fill_lut<TPixel64, USHORT>(pointsList[1], rgbLut, isLinear);
+  fill_lut<TPixel64, USHORT>(pointsList[2], rLut, isLinear);
+  fill_lut<TPixel64, USHORT>(pointsList[3], gLut, isLinear);
+  fill_lut<TPixel64, USHORT>(pointsList[4], bLut, isLinear);
+  fill_lut<TPixel64, USHORT>(pointsList[5], aLut, isLinear);
+
+  int lx = ras->getLx();
+  int ly = ras->getLy();
+
+  std::vector<float> rLutF(TPixel64::maxChannelValue + 1);
+  std::vector<float> gLutF(TPixel64::maxChannelValue + 1);
+  std::vector<float> bLutF(TPixel64::maxChannelValue + 1);
+  std::vector<float> aLutF(TPixel64::maxChannelValue + 1);
+
+  auto normalizeLut = [&](std::vector<float> &dst,
+                          std::vector<USHORT> &chanLut) {
+    for (int i = 0; i <= TPixel64::maxChannelValue; i++) {
+      int v  = rgbaLut[rgbLut[chanLut[i]]];
+      dst[i] = float(v) / float(TPixel64::maxChannelValue);
+    }
+  };
+  normalizeLut(rLutF, rLut);
+  normalizeLut(gLutF, gLut);
+  normalizeLut(bLutF, bLut);
+  for (int i = 0; i <= TPixel64::maxChannelValue; i++) {
+    int v    = rgbaLut[aLut[i]];
+    aLutF[i] = float(v) / float(TPixel64::maxChannelValue);
+  }
+
+  auto getLutValue = [&](std::vector<float> &lut, float val) {
+    if (val < 0.f)
+      return lut[0];
+    else if (val >= 1.f)
+      return lut[TPixel64::maxChannelValue];
+    float v     = val * float(TPixel64::maxChannelValue);
+    int id      = (int)tfloor(v);
+    float ratio = v - float(id);
+    return lut[id] * (1.f - ratio) + lut[id + 1] * ratio;
+  };
+
+  int j;
+  ras->lock();
+  for (j = 0; j < ly; j++) {
+    TPixelF *pix    = ras->pixels(j);
+    TPixelF *endPix = pix + lx;
+    while (pix < endPix) {
+      if (pix->m > 0.f) *pix = depremultiply(*pix);
+      pix->r = getLutValue(rLutF, pix->r);
+      pix->g = getLutValue(gLutF, pix->g);
+      pix->b = getLutValue(bLutF, pix->b);
+      pix->m = getLutValue(aLutF, pix->m);
+      if (pix->m > 0.f) *pix = premultiply(*pix);
+      pix++;
+    }
+  }
+  ras->unlock();
+}
 //-------------------------------------------------------------------
 
 void ToneCurveFx::doCompute(TTile &tile, double frame,
@@ -245,17 +343,17 @@ void ToneCurveFx::doCompute(TTile &tile, double frame,
   m_input->compute(tile, frame, ri);
 
   TRaster32P raster32 = tile.getRaster();
+  TRaster64P raster64 = tile.getRaster();
+  TRasterFP rasterF   = tile.getRaster();
 
   if (raster32)
     doToneCurveFx<TPixel32, UCHAR>(raster32, frame, m_toneCurve.getPointer());
-  else {
-    TRaster64P raster64 = tile.getRaster();
-    if (raster64)
-      doToneCurveFx<TPixel64, USHORT>(raster64, frame,
-                                      m_toneCurve.getPointer());
-    else
-      throw TException("Brightness&Contrast: unsupported Pixel Type");
-  }
+  else if (raster64)
+    doToneCurveFx<TPixel64, USHORT>(raster64, frame, m_toneCurve.getPointer());
+  else if (rasterF)
+    doToneCurveFx<TPixelF, float>(rasterF, frame, m_toneCurve.getPointer());
+  else
+    throw TException("Brightness&Contrast: unsupported Pixel Type");
 }
 
 FX_PLUGIN_IDENTIFIER(ToneCurveFx, "toneCurveFx");

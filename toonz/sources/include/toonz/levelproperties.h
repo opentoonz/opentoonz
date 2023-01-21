@@ -32,8 +32,9 @@
 
 class DVAPI LevelOptions {
 public:
-  enum DpiPolicy       //!  Describes the dpi policy used for a level.
-  { DP_ImageDpi  = 0,  //!< Level uses the natural dpi embedded in its images.
+  enum DpiPolicy  //!  Describes the dpi policy used for a level.
+  {
+    DP_ImageDpi  = 0,  //!< Level uses the natural dpi embedded in its images.
     DP_CustomDpi = 2   //!< Level uses a custom dpi set by the user.
   };
 
@@ -54,6 +55,12 @@ public:
       //!  premultiplied by Toonz for alpha compositing (because they
       //!  are not).
       m_isStopMotionLevel;
+
+  double m_colorSpaceGamma;  // gamma value to be used for converting
+                             // linear-based image file to nonlinear raster.
+                             // Curretly only used in EXR image levels.
+
+  static const double DefaultColorSpaceGamma;
 
 public:
   LevelOptions();  //!< Constructs with default values.
@@ -228,6 +235,11 @@ ie
     m_options.m_isStopMotionLevel = isStopMotion;
   }
   bool isStopMotionLevel() const { return m_options.m_isStopMotionLevel; }
+
+  // gamma value to be used for converting linear-based image file (EXR) to
+  // nonlinear raster.
+  void setColorSpaceGamma(double gamma) { m_options.m_colorSpaceGamma = gamma; }
+  double colorSpaceGamma() const { return m_options.m_colorSpaceGamma; }
 
 private:
   TPointD m_imageDpi;

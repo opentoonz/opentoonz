@@ -57,7 +57,7 @@ protected:
   TDoubleParamP m_noise_evolution;
   TPointParamP m_noise_offset;
 
-  enum { RendeMode_FilterPreview = 0, RendeMode_Render, RenderMode_Iris };
+  enum { RenderMode_FilterPreview = 0, RenderMode_Render, RenderMode_Iris };
 
   enum {
     Iris_InputImage = 0,
@@ -100,6 +100,8 @@ protected:
   // put the source tile's brightness to fft buffer
   template <typename RASTER, typename PIXEL>
   void setSourceTileToBuffer(const RASTER ras, kiss_fft_cpx *buf);
+  template <typename RASTER, typename PIXEL>
+  void setSourceTileToBuffer(const RASTER ras, kiss_fft_cpx *buf, int channel);
 
   void setGlarePatternToBuffer(const double3 *glare, kiss_fft_cpx *buf,
                                const int channel, const int dimIris,
@@ -124,6 +126,9 @@ public:
   bool canHandle(const TRenderSettings &info, double frame) override;
 
   void getParamUIs(TParamUIConcept *&concepts, int &length) override;
+
+  bool toBeComputedInLinearColorSpace(bool settingsIsLinear,
+                                      bool tileIsLinear) const override;
 };
 
 #endif

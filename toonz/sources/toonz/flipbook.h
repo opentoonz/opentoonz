@@ -135,7 +135,8 @@ protected:
         , m_step(step)
         , m_randomAccessRead(false)
         , m_incrementalIndexing(false)
-        , m_premultiply(false) {}
+        , m_premultiply(false)
+        , m_colorSpaceGamma(LevelOptions::DefaultColorSpaceGamma) {}
     TLevelP m_level;
     int m_fromIndex, m_toIndex, m_step;
     bool m_incrementalIndexing;
@@ -147,6 +148,11 @@ protected:
     // By default, PNG will be loaded with being premultiplied so that it will
     // be displayed properly.
     bool m_premultiply;
+
+    // Gamma value to be used when converting EXR files to nonlinear.
+    // It may be set to some value in the Preferences > Loading > "Level
+    // Settings by File Format".
+    double m_colorSpaceGamma;
 
     TFilePath m_fp;
 

@@ -1301,6 +1301,13 @@ QProgressBar::chunk {
   border-radius: 2;
 }
 /* -----------------------------------------------------------------------------
+   Custom Panel Widgets
+----------------------------------------------------------------------------- */
+MyScroller {
+  qproperty-ScrollerBorderColor: #000000;
+  qproperty-ScrollerBGColor: #6c6c6c;
+}
+/* -----------------------------------------------------------------------------
    File Browser
 ----------------------------------------------------------------------------- */
 /* Left Pane
@@ -2289,9 +2296,9 @@ Ruler {
 XsheetViewer {
   qproperty-TextColor: #000;
   qproperty-ErrorTextColor: #c01111;
-  qproperty-BGColor: #767676;
   qproperty-SelectedTextColor: #000;
   qproperty-CurrentFrameTextColor: #000;
+  qproperty-BGColor: #767676;
   qproperty-LightLineColor: rgba(0, 0, 0, 0.15);
   qproperty-MarkerLineColor: rgba(255, 255, 255, 0.2);
   qproperty-SecMarkerLineColor: rgba(255, 255, 255, 0.35);

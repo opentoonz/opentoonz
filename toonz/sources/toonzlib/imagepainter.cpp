@@ -28,23 +28,38 @@ namespace {
 
 //-----------------------------------------------------------------------------
 
-TRaster32P keepChannels(const TRasterP &rin, TPalette *palette, UCHAR channel) {
-  TRaster32P rout(rin->getSize());
+TRasterP keepChannels(const TRasterP &rin, TPalette *palette, UCHAR channel) {
+  TRasterP rout;
+  if ((TRasterFP)rin) {
+    rout = rin->clone();
 
-  if ((TRasterCM32P)rin)
-    TRop::convert(rout, (TRasterCM32P)rin, TPaletteP(palette));
-  else
-    TRop::copy(rout, rin);
+    TPixelF *pix = (TPixelF *)rout->getRawData();
 
-  TPixel32 *pix = (TPixel32 *)rout->getRawData();
+    assert(channel & TRop::MChan);
+    int i;
+    for (i = 0; i < rout->getLx() * rout->getLy(); i++, pix++) {
+      if (!(channel & TRop::RChan)) pix->r = 0.f;
+      if (!(channel & TRop::GChan)) pix->g = 0.f;
+      if (!(channel & TRop::BChan)) pix->b = 0.f;
+    }
+  } else {
+    rout = TRaster32P(rin->getSize());
 
-  assert(channel & TRop::MChan);
-  int i;
+    if ((TRasterCM32P)rin)
+      TRop::convert(rout, (TRasterCM32P)rin, TPaletteP(palette));
+    else
+      TRop::copy(rout, rin);
 
-  for (i = 0; i < rout->getLx() * rout->getLy(); i++, pix++) {
-    if (!(channel & TRop::RChan)) pix->r = 0;
-    if (!(channel & TRop::GChan)) pix->g = 0;
-    if (!(channel & TRop::BChan)) pix->b = 0;
+    TPixel32 *pix = (TPixel32 *)rout->getRawData();
+
+    assert(channel & TRop::MChan);
+    int i;
+
+    for (i = 0; i < rout->getLx() * rout->getLy(); i++, pix++) {
+      if (!(channel & TRop::RChan)) pix->r = 0;
+      if (!(channel & TRop::GChan)) pix->g = 0;
+      if (!(channel & TRop::BChan)) pix->b = 0;
+    }
   }
   return rout;
 }
@@ -172,7 +187,8 @@ public:
   void onRasterImage(TRasterImage *ri);
   void onToonzImage(TToonzImage *ti);
   void drawBlank();
-  TRaster32P buildCheckboard(int bg, const TDimension &dim);
+  TRasterP buildCheckboard(int bg, const TDimension &dim,
+                           TRasterP templateRas = TRaster32P());
 };
 
 //-----------------------------------------------------------------------------
@@ -303,35 +319,43 @@ void Painter::flushRasterImages(const TRect &loadbox, double compareX,
 
 //-----------------------------------------------------------------------------
 
-TRaster32P Painter::buildCheckboard(int bg, const TDimension &dim) {
-  TRaster32P checkBoard = TRaster32P(100, 100);
-  if (bg == 0x100000) {
-    TPixel col1, col2;
-    Preferences::instance()->getChessboardColors(col1, col2);
-    TPointD p = TPointD(0, 0);
-    if (m_vSettings.m_useTexture)
-      p = TPointD(m_bbox.x0 > 0 ? 0 : -m_bbox.x0,
-                  m_bbox.y0 > 0 ? 0 : -m_bbox.y0);
+TRasterP Painter::buildCheckboard(int bg, const TDimension &dim,
+                                  TRasterP templateRas) {
+  TRaster32P ras32(templateRas);
+  TRaster64P ras64(templateRas);
+  TRasterFP rasF(templateRas);
+  templateRas = 0;
+  TRasterP checkBoard;
+  if (ras32)
+    checkBoard = TRaster32P(100, 100);
+  else if (ras64)
+    checkBoard = TRaster64P(100, 100);
+  else if (rasF)
+    checkBoard = TRasterFP(100, 100);
 
-    assert(checkBoard.getPointer());
-    TRop::checkBoard(checkBoard, col1, col2, TDimensionD(50, 50), p);
-  } else {
-    TPixel pix = bg == 0x40000 ? TPixel::Black : TPixel::White;
-    assert(checkBoard.getPointer());
-    checkBoard->fill(pix);
-  }
+  TPixel col1, col2;
+  Preferences::instance()->getChessboardColors(col1, col2);
+  TPointD p = TPointD(0, 0);
+  if (m_vSettings.m_useTexture)
+    p = TPointD(m_bbox.x0 > 0 ? 0 : -m_bbox.x0, m_bbox.y0 > 0 ? 0 : -m_bbox.y0);
 
-  // TRaster32P textureBackGround;
-
-  // if(m_vSettings.m_useTexture)
-  //  textureBackGround = TRaster32P(dim.lx,dim.ly);
+  assert(checkBoard.getPointer());
+  TRop::checkBoard(checkBoard, col1, col2, TDimensionD(50, 50), p);
 
   assert(checkBoard.getPointer());
   int lx = (m_imageSize.lx == 0 ? dim.lx : m_imageSize.lx);
   int ly = (m_imageSize.ly == 0 ? dim.ly : m_imageSize.ly);
   int x, y;
 
-  TRaster32P checkBoardRas(lx, ly);
+  TRasterP checkBoardRas;
+
+  if (ras32)
+    checkBoardRas = TRaster32P(lx, ly);
+  else if (ras64)
+    checkBoardRas = TRaster64P(lx, ly);
+  else if (rasF)
+    checkBoardRas = TRasterFP(lx, ly);
+
   for (y = 0; y < ly; y += 100) {
     for (x = 0; x < lx; x += 100) {
       // TAffine checkTrans = TTranslation(x,y);
@@ -368,7 +392,8 @@ void Painter::doFlushRasterImages(const TRasterP &rin, int bg,
   // TRaster32P ras;
   TRasterP _rin = rin;
   TAffine aff;
-  bool is16bpc = false;
+  GLenum bpcType = TGL_TYPE;
+  // is16bpc = false;
   if (m_vSettings.m_useTexture) {
     ras = _rin;
     aff = m_aff;
@@ -380,7 +405,10 @@ void Painter::doFlushRasterImages(const TRasterP &rin, int bg,
     // but is kept the channel depth as 16bpc.
     if (_rin->getPixelSize() == 8) {
       ras     = TRaster64P(lx, ly);
-      is16bpc = true;
+      bpcType = TGL_TYPE16;
+    } else if (_rin->getPixelSize() == 16) {
+      ras     = TRasterFP(lx, ly);
+      bpcType = TGL_TYPE32F;
     } else
       ras = TRaster32P(lx, ly);
 
@@ -409,12 +437,14 @@ void Painter::doFlushRasterImages(const TRasterP &rin, int bg,
                                              // shifted of an half pixel...it's
                                              // a quickput approximation?
     if (bg == 0x100000)
-      quickput(ras, buildCheckboard(bg, _rin->getSize()), m_palette, aff,
+      quickput(ras, buildCheckboard(bg, _rin->getSize(), ras), m_palette, aff,
                false);
     else {
-      if (is16bpc)
+      if (bpcType == TGL_TYPE16)
         ((TRaster64P)ras)
             ->fill(bg == 0x40000 ? TPixel64::Black : TPixel64::White);
+      else if (bpcType == TGL_TYPE32F)
+        ((TRasterFP)ras)->fill(bg == 0x40000 ? TPixelF::Black : TPixelF::White);
       else
         ((TRaster32P)ras)->fill(bg == 0x40000 ? TPixel::Black : TPixel::White);
     }
@@ -470,8 +500,7 @@ void Painter::doFlushRasterImages(const TRasterP &rin, int bg,
     glRasterPos2d(rect.x0, rect.y0);
     glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
 
-    glDrawPixels(ras->getWrap(), ras->getLy(), TGL_FMT,
-                 (is16bpc) ? TGL_TYPE16 : TGL_TYPE,
+    glDrawPixels(ras->getWrap(), ras->getLy(), TGL_FMT, bpcType,
                  (GLvoid *)ras->getRawData());
 
     CHECK_ERRORS_BY_GL
@@ -593,7 +622,8 @@ ImagePainter::VisualSettings::VisualSettings()
     , m_sceneProperties(0)
     , m_recomputeIfNeeded(true)
     , m_drawBlankFrame(false)
-    , m_useChecks(false) {
+    , m_useChecks(false)
+    , m_gainStep(0) {
   if (FlipBookBlackBgToggle) m_bg = 0x40000;
   if (FlipBookWhiteBgToggle) m_bg = 0x80000;
   if (FlipBookCheckBgToggle) m_bg = 0x100000;
@@ -606,7 +636,8 @@ bool ImagePainter::VisualSettings::needRepaint(const VisualSettings &vs) const {
            m_bg == vs.m_bg && m_doCompare == vs.m_doCompare &&
            m_defineLoadbox == vs.m_defineLoadbox &&
            m_useLoadbox == vs.m_useLoadbox && m_useTexture == vs.m_useTexture &&
-           m_drawExternalBG == vs.m_drawExternalBG);
+           m_drawExternalBG == vs.m_drawExternalBG &&
+           m_gainStep == vs.m_gainStep);
 }
 
 //=============================================================================

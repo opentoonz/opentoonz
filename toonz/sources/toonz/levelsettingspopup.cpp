@@ -137,7 +137,8 @@ public:
     WhiteTransp,
     Softness,
     Subsampling,
-    LevelType
+    LevelType,
+    ColorSpaceGamma
   };
 
 private:
@@ -249,6 +250,20 @@ private:
     TApp::instance()->getCurrentLevel()->notifyLevelChange();
   }
 
+  void setColorSpaceGamma(double gamma) const {
+    TXshSimpleLevelP sl = m_xl->getSimpleLevel();
+    if (!sl || sl->getType() != OVL_XSHLEVEL) return;
+    sl->getProperties()->setColorSpaceGamma(gamma);
+    sl->invalidateFrames();
+    TApp::instance()->getCurrentScene()->setDirtyFlag(true);
+    TApp::instance()
+        ->getCurrentXsheet()
+        ->getXsheet()
+        ->getStageObjectTree()
+        ->invalidateAll();
+    TApp::instance()->getCurrentLevel()->notifyLevelChange();
+  }
+
   void setValue(const QVariant value) const {
     switch (m_type) {
     case Name:
@@ -279,6 +294,9 @@ private:
       break;
     case WhiteTransp:
       setWhiteTransp(value.toBool());
+      break;
+    case ColorSpaceGamma:
+      setColorSpaceGamma(value.toDouble());
       break;
     default:
       break;
@@ -360,6 +378,10 @@ LevelSettingsPopup::LevelSettingsPopup()
   m_softnessLabel     = new QLabel(tr("Antialias Softness:"), this);
   m_antialiasSoftness = new DVGui::IntLineEdit(0, 10, 0, 100);
 
+  m_colorSpaceGammaLabel = new QLabel(tr("Color Space Gamma:"));
+  m_colorSpaceGammaFld   = new DoubleLineEdit();
+  m_colorSpaceGammaFld->setRange(0.1, 10.);
+
   //----
 
   m_pathFld->setFileMode(QFileDialog::AnyFile);
@@ -422,6 +444,10 @@ LevelSettingsPopup::LevelSettingsPopup()
   m_activateFlags[m_antialiasSoftness] = rasterWidgetsFlag;
   m_activateFlags[m_subsamplingLabel]  = rasterWidgetsFlag;
   m_activateFlags[m_subsamplingFld]    = rasterWidgetsFlag;
+
+  unsigned int linearFlag                 = LinearRaster | MultiSelection;
+  m_activateFlags[m_colorSpaceGammaLabel] = linearFlag;
+  m_activateFlags[m_colorSpaceGammaFld]   = linearFlag;
 
   //----layout
   m_topLayout->setMargin(5);
@@ -505,6 +531,9 @@ LevelSettingsPopup::LevelSettingsPopup()
 
       bottomLay->addWidget(m_subsamplingLabel, 1, 0);
       bottomLay->addWidget(m_subsamplingFld, 1, 1);
+
+      bottomLay->addWidget(m_colorSpaceGammaLabel, 2, 0);
+      bottomLay->addWidget(m_colorSpaceGammaFld, 2, 1);
     }
     bottomLay->setColumnStretch(0, 0);
     bottomLay->setColumnStretch(1, 0);
@@ -537,6 +566,8 @@ LevelSettingsPopup::LevelSettingsPopup()
 
   connect(m_whiteTransp, SIGNAL(clicked(bool)), SLOT(onWhiteTranspClicked()));
 
+  connect(m_colorSpaceGammaFld, SIGNAL(editingFinished()),
+          SLOT(onColorSpaceGammaFieldChanged()));
   updateLevelSettings();
 }
 
@@ -642,8 +673,12 @@ SelectedLevelType LevelSettingsPopup::getType(TXshLevelP level_p) {
   switch (level_p->getType()) {
   case TZP_XSHLEVEL:
     return ToonzRaster;
-  case OVL_XSHLEVEL:
-    return Raster;
+  case OVL_XSHLEVEL: {
+    if (level_p->getPath().getType() == "exr")
+      return LinearRaster;
+    else
+      return NonLinearRaster;
+  }
   case MESH_XSHLEVEL:
     return Mesh;
   case PLI_XSHLEVEL:
@@ -683,7 +718,8 @@ LevelSettingsValues LevelSettingsPopup::getValues(TXshLevelP level) {
   case ToonzRaster:
     values.typeStr = tr("Toonz Raster level");
     break;
-  case Raster:
+  case NonLinearRaster:
+  case LinearRaster:
     values.typeStr = tr("Raster level");
     break;
   case Mesh:
@@ -718,7 +754,7 @@ LevelSettingsValues LevelSettingsPopup::getValues(TXshLevelP level) {
     // image dpi
     values.imageDpi = dpiToString(sl->getImageDpi());
 
-    if (levelType == ToonzRaster || levelType == Raster) {
+    if (levelType == ToonzRaster || levelType & Raster) {
       // size field
       TDimensionD size(0, 0);
       TDimension res = sl->getResolution();
@@ -748,6 +784,9 @@ LevelSettingsValues LevelSettingsPopup::getValues(TXshLevelP level) {
                                ? Qt::Checked
                                : Qt::Unchecked;
       values.softness    = sl->getProperties()->antialiasSoftness();
+
+      if (levelType == LinearRaster)
+        values.colorSpaceGamma = sl->getProperties()->colorSpaceGamma();
     }
   }
 
@@ -883,6 +922,7 @@ void LevelSettingsPopup::updateLevelSettings() {
     uniteValue(values.doAntialias, new_val.doAntialias, isFirst);
     uniteValue(values.softness, new_val.softness, isFirst);
     uniteValue(values.subsampling, new_val.subsampling, isFirst);
+    uniteValue(values.colorSpaceGamma, new_val.colorSpaceGamma, isFirst);
     uniteValue(values.isDirty, new_val.isDirty, isFirst);
 
     ++lvl_itr;
@@ -920,11 +960,22 @@ void LevelSettingsPopup::updateLevelSettings() {
     m_subsamplingFld->setText("");
   else
     m_subsamplingFld->setValue(values.subsampling);
+
+  if (values.colorSpaceGamma > 0)
+    m_colorSpaceGammaFld->setValue(values.colorSpaceGamma);
+  else if (m_colorSpaceGammaFld->isEnabled())
+    m_colorSpaceGammaFld->setText(tr("[Various]"));
+  else
+    m_colorSpaceGammaFld->setText("");
+
   // disable the softness field when the antialias is not active
   if (m_doAntialias->checkState() != Qt::Checked)
     m_antialiasSoftness->setDisabled(true);
   // disable the subsampling field when dirty level is selected
-  if (values.isDirty != Qt::Unchecked) m_subsamplingFld->setDisabled(true);
+  if (values.isDirty != Qt::Unchecked) {
+    m_subsamplingFld->setDisabled(true);
+    m_colorSpaceGammaFld->setDisabled(true);
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -1572,6 +1623,42 @@ void LevelSettingsPopup::onWhiteTranspClicked() {
   TUndoManager::manager()->endBlock();
   TApp::instance()->getCurrentLevel()->notifyLevelChange();
   updateLevelSettings();
+}
+
+//-----------------------------------------------------------------------------
+
+void LevelSettingsPopup::onColorSpaceGammaFieldChanged() {
+  double colorSpaceGamma = m_colorSpaceGammaFld->getValue();
+
+  bool somethingChanged = false;
+  TUndoManager::manager()->beginBlock();
+  QSetIterator<TXshLevelP> levelItr(m_selectedLevels);
+  while (levelItr.hasNext()) {
+    TXshLevelP levelP   = levelItr.next();
+    TXshSimpleLevelP sl = levelP->getSimpleLevel();
+    if (!sl || sl->getType() != OVL_XSHLEVEL) continue;
+    if (sl->getProperties()->getDirtyFlag()) continue;
+
+    double oldGamma = sl->getProperties()->colorSpaceGamma();
+    if (areAlmostEqual(colorSpaceGamma, oldGamma)) continue;
+
+    sl->getProperties()->setColorSpaceGamma(colorSpaceGamma);
+    sl->invalidateFrames();
+    TUndoManager::manager()->add(new LevelSettingsUndo(
+        levelP.getPointer(), LevelSettingsUndo::ColorSpaceGamma, oldGamma,
+        colorSpaceGamma));
+    somethingChanged = true;
+  }
+  TUndoManager::manager()->endBlock();
+  if (!somethingChanged) return;
+
+  TApp::instance()->getCurrentScene()->setDirtyFlag(true);
+  TApp::instance()
+      ->getCurrentXsheet()
+      ->getXsheet()
+      ->getStageObjectTree()
+      ->invalidateAll();
+  TApp::instance()->getCurrentLevel()->notifyLevelChange();
 }
 
 //-----------------------------------------------------------------------------

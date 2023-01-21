@@ -198,6 +198,13 @@ PreferencesPopup::FormatProperties::FormatProperties(PreferencesPopup* parent)
   m_subsampling = new DVGui::IntLineEdit(this, 1, 1);
   gridLayout->addWidget(m_subsampling, row++, 1);
 
+  QLabel* gammaLabel = new QLabel(LevelSettingsPopup::tr("Color Space Gamma:"));
+  gridLayout->addWidget(gammaLabel, row, 0, Qt::AlignRight);
+
+  m_colorSpaceGamma = new DVGui::DoubleLineEdit(this);
+  m_colorSpaceGamma->setRange(0.1, 10.);
+  gridLayout->addWidget(m_colorSpaceGamma, row++, 1);
+
   addLayout(gridLayout);
 
   endVLayout();
@@ -205,6 +212,10 @@ PreferencesPopup::FormatProperties::FormatProperties(PreferencesPopup* parent)
   // Establish connections
   bool ret = true;
 
+  // enable gamma field only when the regexp field contains ".exr"
+  ret = connect(m_regExp, SIGNAL(editingFinished()),
+                SLOT(updateEnabledStatus())) &&
+        ret;
   ret = connect(m_dpiPolicy, SIGNAL(currentIndexChanged(int)),
                 SLOT(updateEnabledStatus())) &&
         ret;
@@ -220,6 +231,9 @@ PreferencesPopup::FormatProperties::FormatProperties(PreferencesPopup* parent)
 void PreferencesPopup::FormatProperties::updateEnabledStatus() {
   m_dpi->setEnabled(m_dpiPolicy->currentIndex() == DP_CustomDpi);
   m_antialias->setEnabled(m_doAntialias->isChecked());
+
+  // enable gamma field only when the regexp field contains ".exr"
+  m_colorSpaceGamma->setEnabled(m_regExp->text().contains(".exr"));
 }
 
 //-----------------------------------------------------------------------------
@@ -240,6 +254,7 @@ void PreferencesPopup::FormatProperties::setLevelFormat(
   m_doAntialias->setChecked(lo.m_antialias > 0);
   m_antialias->setValue(lo.m_antialias);
   m_subsampling->setValue(lo.m_subsampling);
+  m_colorSpaceGamma->setValue(lo.m_colorSpaceGamma);
 
   updateEnabledStatus();
 }
@@ -264,6 +279,9 @@ Preferences::LevelFormat PreferencesPopup::FormatProperties::levelFormat()
       m_doAntialias->isChecked() ? m_antialias->getValue() : 0;
   lf.m_options.m_premultiply = m_premultiply->isChecked();
   lf.m_options.m_whiteTransp = m_whiteTransp->isChecked();
+
+  if (m_colorSpaceGamma->isEnabled())
+    lf.m_options.m_colorSpaceGamma = m_colorSpaceGamma->getValue();
 
   return lf;
 }
@@ -374,7 +392,7 @@ PreferencesPopup::Display30bitChecker::Display30bitChecker(
   GLView* view10bit     = new GLView(this, true);
   QPushButton* closeBtn = new QPushButton(tr("Close"), this);
   QString infoLabel     = tr(
-          "If the lower gradient looks smooth and has no banding compared to the upper gradient,\n\
+      "If the lower gradient looks smooth and has no banding compared to the upper gradient,\n\
 30bit display is available in the current configuration.");
 
   QVBoxLayout* lay = new QVBoxLayout();
@@ -1380,7 +1398,15 @@ QList<ComboBoxItem> PreferencesPopup::getComboItemList(
       {cursorBrushType,
        {{tr("Small"), "Small"},
         {tr("Large"), "Large"},
-        {tr("Crosshair"), "Crosshair"}}},
+        {tr("Crosshair"), "Crosshair"},
+        {tr("Triangle Top Left"), "Triangle Top Left"},
+        {tr("Triangle Top Right"), "Triangle Top Right"},
+        {tr("Triangle Bottom Left"), "Triangle Bottom Left"},
+        {tr("Triangle Bottom Right"), "Triangle Bottom Right"},
+        {tr("Triangle Up"), "Triangle Up"},
+        {tr("Triangle Down"), "Triangle Down"},
+        {tr("Triangle Left"), "Triangle Left"},
+        {tr("Triangle Right"), "Triangle Right"}}},
       {cursorBrushStyle,
        {{tr("Default"), "Default"},
         {tr("Left-Handed"), "Left-Handed"},

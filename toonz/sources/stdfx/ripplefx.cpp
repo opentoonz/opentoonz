@@ -60,6 +60,8 @@ public:
     m_cycle->setValueRange(0, (std::numeric_limits<double>::max)());
     m_count->setValueRange(0, (std::numeric_limits<double>::max)());
     m_angle->setMeasureName("angle");
+
+    enableComputeInFloat(true);
   }
   virtual ~RippleFx() {}
 

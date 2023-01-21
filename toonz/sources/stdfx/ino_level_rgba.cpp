@@ -113,6 +113,8 @@ public:
     this->m_ref_mode->addItem(3, "Alpha");
     this->m_ref_mode->addItem(4, "Luminance");
     this->m_ref_mode->addItem(-1, "Nothing");
+
+    enableComputeInFloat(true);
   }
   bool doGetBBox(double frame, TRectD &bBox,
                  const TRenderSettings &info) override {
@@ -141,7 +143,8 @@ void ino_level_rgba::doCompute(TTile &tile, double frame,
   }
 
   /* ------ サポートしていないPixelタイプはエラーを投げる --- */
-  if (!((TRaster32P)tile.getRaster()) && !((TRaster64P)tile.getRaster())) {
+  if (!((TRaster32P)tile.getRaster()) && !((TRaster64P)tile.getRaster()) &&
+      !((TRasterFP)tile.getRaster())) {
     throw TRopException("unsupported input pixel type");
   }
 
@@ -228,10 +231,12 @@ void ino_level_rgba::doCompute(TTile &tile, double frame,
   try {
     TRasterP in_ras = tile.getRaster();
 
-    TRasterGR8P in_gr8(in_ras->getLy(),
-                       in_ras->getLx() * ino::channels() *
-                           ((TRaster64P)in_ras ? sizeof(unsigned short)
-                                               : sizeof(unsigned char)));
+    TRasterGR8P in_gr8(
+        in_ras->getLy(),
+        in_ras->getLx() * ino::channels() *
+            ((TRaster64P)in_ras   ? sizeof(unsigned short)
+             : (TRaster32P)in_ras ? sizeof(unsigned char)
+                                  : sizeof(float)));  // TRasterFP case
 
     in_ras->lock();
     if (refer_tile.getRaster() != nullptr) {

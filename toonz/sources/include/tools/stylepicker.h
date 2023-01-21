@@ -3,7 +3,7 @@
 #ifndef STYLE_PICKER_H
 #define STYLE_PICKER_H
 
-//#include "timage.h"
+// #include "timage.h"
 #include "tcommon.h"
 #include "tpalette.h"
 
@@ -71,8 +71,11 @@ public:
   TPixel32 pickColor(const TPointD &point, double radius, double scale2) const;
   TPixel64 pickColor16(const TPointD &point, double radius,
                        double scale2) const;
+  TPixelF pickColor32F(const TPointD &point, double radius,
+                       double scale2) const;
   TPixel32 pickAverageColor(const TRectD &rect) const;
   TPixel64 pickAverageColor16(const TRectD &rect) const;
+  TPixelF pickAverageColor32F(const TRectD &rect) const;
 
   // ritorna il colore medio presente nell'area della finestra corrente openGL
   TPixel32 pickColor(const TRectD &area) const;

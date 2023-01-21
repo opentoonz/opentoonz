@@ -81,6 +81,26 @@ void Iwa_PNPerspectiveFx::setOutputRaster(double4 *srcMem, const RASTER dstRas,
   }
 }
 
+template <>
+void Iwa_PNPerspectiveFx::setOutputRaster<TRasterFP, TPixelF>(
+    double4 *srcMem, const TRasterFP dstRas, TDimensionI dim, int drawLevel,
+    const bool alp_rend_sw) {
+  if (alp_rend_sw)
+    dstRas->fill(TPixelF(0.5f, 0.5f, 0.5f, 0.5f));
+  else
+    dstRas->fill(TPixelF(0.5f, 0.5f, 0.5f));
+  double4 *chan_p = srcMem;
+  for (int j = 0; j < drawLevel; j++) {
+    TPixelF *pix = dstRas->pixels(j);
+    for (int i = 0; i < dstRas->getLx(); i++, chan_p++, pix++) {
+      pix->r = (float)(*chan_p).x;
+      pix->g = (float)(*chan_p).y;
+      pix->b = (float)(*chan_p).z;
+      pix->m = std::min((float)(*chan_p).w, 1.f);
+    }
+  }
+}
+
 //------------------------------------------------------------
 // obtain parameters
 void Iwa_PNPerspectiveFx::getPNParameters(TTile &tile, double frame,
@@ -243,6 +263,8 @@ Iwa_PNPerspectiveFx::Iwa_PNPerspectiveFx()
   m_waveHeight->setMeasureName("fxLength");
   m_waveHeight->setValueRange(1.0, 100.0);
   m_normalize_margin->setValueRange(0.0, 3.0);
+
+  enableComputeInFloat(true);
 }
 
 //------------------------------------------------------------
@@ -263,7 +285,8 @@ bool Iwa_PNPerspectiveFx::canHandle(const TRenderSettings &info, double frame) {
 
 void Iwa_PNPerspectiveFx::doCompute(TTile &tile, double frame,
                                     const TRenderSettings &settings) {
-  if (!((TRaster32P)tile.getRaster()) && !((TRaster64P)tile.getRaster())) {
+  if (!((TRaster32P)tile.getRaster()) && !((TRaster64P)tile.getRaster()) &&
+      !((TRasterFP)tile.getRaster())) {
     throw TRopException("unsupported input pixel type");
   }
 
@@ -288,23 +311,27 @@ void Iwa_PNPerspectiveFx::doCompute(TTile &tile, double frame,
   out_host_ras->lock();
   out_host = (double4 *)out_host_ras->getRawData();
 
-  doCompute_CPU(tile, frame, settings, out_host, dimOut, pnParams);
+  doCompute_CPU(frame, settings, out_host, dimOut, pnParams);
 
   tile.getRaster()->clear();
   TRaster32P outRas32 = (TRaster32P)tile.getRaster();
   TRaster64P outRas64 = (TRaster64P)tile.getRaster();
+  TRasterFP outRasF   = (TRasterFP)tile.getRaster();
   if (outRas32)
     setOutputRaster<TRaster32P, TPixel32>(
         out_host, outRas32, dimOut, pnParams.drawLevel, pnParams.alp_rend_sw);
   else if (outRas64)
     setOutputRaster<TRaster64P, TPixel64>(
         out_host, outRas64, dimOut, pnParams.drawLevel, pnParams.alp_rend_sw);
+  else if (outRasF)
+    setOutputRaster<TRasterFP, TPixelF>(
+        out_host, outRasF, dimOut, pnParams.drawLevel, pnParams.alp_rend_sw);
 
   out_host_ras->unlock();
 }
 
 //------------------------------------------------------------
-void Iwa_PNPerspectiveFx::doCompute_CPU(TTile &tile, double frame,
+void Iwa_PNPerspectiveFx::doCompute_CPU(double frame,
                                         const TRenderSettings &settings,
                                         double4 *out_host, TDimensionI &dimOut,
                                         PN_Params &pnParams) {
@@ -387,13 +414,13 @@ void Iwa_PNPerspectiveFx::calcPerinNoise_CPU(double4 *out_host,
 
       double val = val_sum / (double)count;
 
-      // clamp
-      val = (val < 0.0) ? 0.0 : ((val > 1.0) ? 1.0 : val);
-
       (*out_p).x = val;
       (*out_p).y = val;
       (*out_p).z = val;
-      (*out_p).w = (p.alp_rend_sw) ? val : 1.0;
+      if (p.alp_rend_sw)  // clamp
+        (*out_p).w = (val < 0.0) ? 0.0 : ((val > 1.0) ? 1.0 : val);
+      else
+        (*out_p).w = 1.0;
     }
   }
 }

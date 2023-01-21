@@ -122,7 +122,7 @@
         
         <hbox>
           <control>motion_blur</control>
-          <control>motion_blur_gamma</control>          
+          <control>motion_blur_gamma_adjust</control>          
         </hbox>
       <separator label="Size Increase"/>
         <control>scale_step</control>

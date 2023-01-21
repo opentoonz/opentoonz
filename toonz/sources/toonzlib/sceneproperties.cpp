@@ -233,6 +233,16 @@ void TSceneProperties::saveData(TOStream &os) const {
     os.child("fps") << out.getFrameRate();
     os.child("path") << outPath;
     os.child("bpp") << rs.m_bpp;
+    if (rs.m_linearColorSpace) {
+      os.child("linearColorSpace") << (rs.m_linearColorSpace ? 1 : 0);
+      os.child("nonlinearBpp") << out.getNonlinearBpp();
+    }
+    if (rs.m_colorSpaceGamma >= 1. &&
+        !areAlmostEqual(rs.m_colorSpaceGamma, 2.2))
+      os.child("colorSpaceGamma") << rs.m_colorSpaceGamma;
+    if (i == 1)  // preview
+      os.child("syncColorSettings") << (out.isColorSettingsSynced() ? 1 : 0);
+
     os.child("multimedia") << out.getMultimediaRendering();
     os.child("threadsIndex") << out.getThreadIndex();
     os.child("maxTileSizeIndex") << out.getMaxTileSizeIndex();
@@ -387,7 +397,9 @@ void TSceneProperties::loadData(TIStream &is, bool isLoadingProject) {
   int globFrom = -1, globTo = 0, globStep = 1;
   double globFrameRate = -1;
   std::string tagName;
-  *m_outputProp = *m_previewProp = TOutputProperties();
+  *m_outputProp  = TOutputProperties();
+  *m_previewProp = TOutputProperties();
+
   while (is.matchTag(tagName)) {
     if (tagName == "projectPath") {
       TFilePath projectPath;
@@ -538,7 +550,24 @@ void TSceneProperties::loadData(TIStream &is, bool isLoadingProject) {
             } else if (tagName == "bpp") {
               int j;
               is >> j;
-              if (j == 32 || j == 64) renderSettings.m_bpp = j;
+              if (j == 32 || j == 64 || j == 128) renderSettings.m_bpp = j;
+            } else if (tagName == "linearColorSpace") {
+              int linearColorSpace;
+              is >> linearColorSpace;
+              renderSettings.m_linearColorSpace = (linearColorSpace != 0);
+            } else if (tagName == "nonlinearBpp") {
+              int j;
+              is >> j;
+              if (j == 32 || j == 64 || j == 128) out.setNonlinearBpp(j);
+            } else if (tagName == "colorSpaceGamma") {
+              double colorSpaceGamma;
+              is >> colorSpaceGamma;
+              renderSettings.m_colorSpaceGamma = colorSpaceGamma;
+            } else if (tagName == "syncColorSettings") {
+              assert(name == "preview");
+              int syncColorSettings;
+              is >> syncColorSettings;
+              out.syncColorSettings(syncColorSettings != 0);
             } else if (tagName == "multimedia") {
               int j;
               is >> j;
@@ -784,6 +813,13 @@ void TSceneProperties::loadData(TIStream &is, bool isLoadingProject) {
       throw TException("unexpected property tag: " + tagName);
     }
     is.closeChild();
+  }
+
+  // in order to support scenes made in previous development version
+  if (m_previewProp->getRenderSettings().m_colorSpaceGamma < 0.) {
+    TRenderSettings rs(m_previewProp->getRenderSettings());
+    rs.m_colorSpaceGamma = m_outputProp->getRenderSettings().m_colorSpaceGamma;
+    m_previewProp->setRenderSettings(rs);
   }
 }
 

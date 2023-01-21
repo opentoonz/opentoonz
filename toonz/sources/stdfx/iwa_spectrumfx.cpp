@@ -16,6 +16,7 @@ const float PI = 3.14159265f;
  Calculate soap bubble color map
 ------------------------------------*/
 void Iwa_SpectrumFx::calcBubbleMap(float3 *bubbleColor, double frame,
+                                   bool isLinear, double colorSpaceGamma,
                                    bool computeAngularAxis) {
   int i, j, k;  /* bubbleColor[j][k] = [256][3] */
   float d;      /* Thickness of the film (μm) */
@@ -36,9 +37,18 @@ void Iwa_SpectrumFx::calcBubbleMap(float3 *bubbleColor, double frame,
   float refractiveIndex = (float)m_refractiveIndex->getValue(frame);
   float thickMax        = (float)m_thickMax->getValue(frame);
   float thickMin        = (float)m_thickMin->getValue(frame);
-  float rgbGamma[3]     = {(float)m_RGamma->getValue(frame),
-                       (float)m_GGamma->getValue(frame),
-                       (float)m_BGamma->getValue(frame)};
+
+  // Currently isLinear should be always false
+  assert(!isLinear);
+  float gammaAdjust = (getFxVersion() == 1 && isLinear) ? (float)colorSpaceGamma
+                      : (getFxVersion() >= 2 && !isLinear)
+                          ? 1.f / (float)colorSpaceGamma
+                          : 1.f;
+
+  float rgbGamma[3] = {(float)m_RGamma->getValue(frame) * gammaAdjust,
+                       (float)m_GGamma->getValue(frame) * gammaAdjust,
+                       (float)m_BGamma->getValue(frame) * gammaAdjust};
+
   float lensFactor = (float)m_lensFactor->getValue(frame);
   float shift      = (float)m_spectrumShift->getValue(frame);
   float fadeWidth  = (float)m_loopSpectrumFadeWidth->getValue(frame) / 2.0f;
@@ -182,7 +192,8 @@ void Iwa_SpectrumFx::calcBubbleMap(float3 *bubbleColor, double frame,
           /* gamma adjustment */
           tmp_rgb[fadeId][k] = powf((tmp_rgb[fadeId][k] / 255.0f), rgbGamma[k]);
 
-          if (tmp_rgb[fadeId][k] >= 1.0f) tmp_rgb[fadeId][k] = 1.0f;
+          // clamp will be done when storing the result raster
+          // if (tmp_rgb[fadeId][k] >= 1.0f) tmp_rgb[fadeId][k] = 1.0f;
         }
       }
       bubble_p->x = tmp_rgb[0][0] * tmp_ratio[0] + tmp_rgb[1][0] * tmp_ratio[1];
@@ -208,6 +219,11 @@ Iwa_SpectrumFx::Iwa_SpectrumFx()
     , m_lightIntensity(1.0)
     , m_loopSpectrumFadeWidth(0.0)
     , m_spectrumShift(0.0) {
+  // Fx Version 1: *2.2 Gamma when linear rendering (it duplicately applies
+  // gamma and is not correct) Fx Version 2: *1/2.2 Gamma when non-linear
+  // rendering
+  setFxVersion(2);
+
   addInputPort("Source", m_input);
   addInputPort("Light", m_light);
   bindParam(this, "intensity", m_intensity);
@@ -227,14 +243,16 @@ Iwa_SpectrumFx::Iwa_SpectrumFx()
   m_refractiveIndex->setValueRange(1.0, 3.0);
   m_thickMax->setValueRange(-1.5, 2.0);
   m_thickMin->setValueRange(-1.5, 2.0);
-  m_RGamma->setValueRange(0.001, 1.0);
-  m_GGamma->setValueRange(0.001, 1.0);
-  m_BGamma->setValueRange(0.001, 1.0);
+  m_RGamma->setValueRange(0.001, 5.0);
+  m_GGamma->setValueRange(0.001, 5.0);
+  m_BGamma->setValueRange(0.001, 5.0);
   m_lensFactor->setValueRange(0.01, 10.0);
   m_lightThres->setValueRange(-5.0, 1.0);
   m_lightIntensity->setValueRange(0.0, 1.0);
   m_loopSpectrumFadeWidth->setValueRange(0.0, 1.0);
   m_spectrumShift->setValueRange(-10.0, 10.0);
+
+  enableComputeInFloat(true);
 }
 
 //------------------------------------
@@ -253,7 +271,8 @@ void Iwa_SpectrumFx::doCompute(TTile &tile, double frame,
   bubbleColor = (float3 *)bubbleColor_ras->getRawData();
 
   /*- シャボン色マップの生成 -*/
-  calcBubbleMap(bubbleColor, frame);
+  calcBubbleMap(bubbleColor, frame, tile.getRaster()->isLinear(),
+                settings.m_colorSpaceGamma);
 
   /*- いったん素材をTileに収める -*/
   m_input->compute(tile, frame, settings);
@@ -273,6 +292,7 @@ void Iwa_SpectrumFx::doCompute(TTile &tile, double frame,
 
   TRaster32P ras32 = (TRaster32P)tile.getRaster();
   TRaster64P ras64 = (TRaster64P)tile.getRaster();
+  TRasterFP rasF   = (TRasterFP)tile.getRaster();
   {
     if (ras32) {
       if (lightRas)
@@ -290,11 +310,19 @@ void Iwa_SpectrumFx::doCompute(TTile &tile, double frame,
             (float)m_lightIntensity->getValue(frame));
       else
         convertRaster<TRaster64P, TPixel64>(ras64, dim, bubbleColor);
+    } else if (rasF) {
+      if (lightRas)
+        convertRasterWithLight<TRasterFP, TPixelF>(
+            rasF, dim, bubbleColor, (TRasterFP)lightRas,
+            (float)m_lightThres->getValue(frame),
+            (float)m_lightIntensity->getValue(frame));
+      else
+        convertRaster<TRasterFP, TPixelF>(rasF, dim, bubbleColor);
     }
   }
 
-  //メモリ解放
-  // brightness_ras->unlock();
+  // メモリ解放
+  //  brightness_ras->unlock();
   bubbleColor_ras->unlock();
   if (lightRas) lightRas->unlock();
 }
@@ -306,6 +334,9 @@ void Iwa_SpectrumFx::convertRaster(const RASTER ras, TDimensionI dim,
   float rr, gg, bb, aa;
   float spec_r, spec_g, spec_b;
   float brightness;
+
+  bool doClamp = (ras->getPixelSize() != 16);
+
   for (int j = 0; j < dim.ly; j++) {
     PIXEL *pix = ras->pixels(j);
     for (int i = 0; i < dim.lx; i++) {
@@ -344,20 +375,26 @@ void Iwa_SpectrumFx::convertRaster(const RASTER ras, TDimensionI dim,
         spec_b *= aa;
       }
       /*- 元のピクセルに書き戻す -*/
-      float val;
-      /*- チャンネル範囲にクランプ -*/
-      val    = spec_r * (float)PIXEL::maxChannelValue + 0.5f;
-      pix->r = (typename PIXEL::Channel)((val > (float)PIXEL::maxChannelValue)
-                                             ? (float)PIXEL::maxChannelValue
-                                             : val);
-      val    = spec_g * (float)PIXEL::maxChannelValue + 0.5f;
-      pix->g = (typename PIXEL::Channel)((val > (float)PIXEL::maxChannelValue)
-                                             ? (float)PIXEL::maxChannelValue
-                                             : val);
-      val    = spec_b * (float)PIXEL::maxChannelValue + 0.5f;
-      pix->b = (typename PIXEL::Channel)((val > (float)PIXEL::maxChannelValue)
-                                             ? (float)PIXEL::maxChannelValue
-                                             : val);
+      if (doClamp) {
+        float val;
+        /*- チャンネル範囲にクランプ -*/
+        val    = spec_r * (float)PIXEL::maxChannelValue + 0.5f;
+        pix->r = (typename PIXEL::Channel)((val > (float)PIXEL::maxChannelValue)
+                                               ? (float)PIXEL::maxChannelValue
+                                               : val);
+        val    = spec_g * (float)PIXEL::maxChannelValue + 0.5f;
+        pix->g = (typename PIXEL::Channel)((val > (float)PIXEL::maxChannelValue)
+                                               ? (float)PIXEL::maxChannelValue
+                                               : val);
+        val    = spec_b * (float)PIXEL::maxChannelValue + 0.5f;
+        pix->b = (typename PIXEL::Channel)((val > (float)PIXEL::maxChannelValue)
+                                               ? (float)PIXEL::maxChannelValue
+                                               : val);
+      } else {  // floating point case
+        pix->r = spec_r;
+        pix->g = spec_g;
+        pix->b = spec_b;
+      }
 
       pix++;
     }
@@ -374,6 +411,9 @@ void Iwa_SpectrumFx::convertRasterWithLight(const RASTER ras, TDimensionI dim,
   float rr, gg, bb, aa;
   float spec_r, spec_g, spec_b;
   float brightness;
+
+  bool doClamp = (ras->getPixelSize() != 16);
+
   for (int j = 0; j < dim.ly; j++) {
     PIXEL *light_pix = lightRas->pixels(j);
     PIXEL *pix       = ras->pixels(j);
@@ -435,21 +475,26 @@ void Iwa_SpectrumFx::convertRasterWithLight(const RASTER ras, TDimensionI dim,
       spec_b *= aa;
 
       /*- 元のピクセルに書き戻す -*/
-      float val;
-      /*- チャンネル範囲にクランプ -*/
-      val    = spec_r * (float)PIXEL::maxChannelValue + 0.5f;
-      pix->r = (typename PIXEL::Channel)((val > (float)PIXEL::maxChannelValue)
-                                             ? (float)PIXEL::maxChannelValue
-                                             : val);
-      val    = spec_g * (float)PIXEL::maxChannelValue + 0.5f;
-      pix->g = (typename PIXEL::Channel)((val > (float)PIXEL::maxChannelValue)
-                                             ? (float)PIXEL::maxChannelValue
-                                             : val);
-      val    = spec_b * (float)PIXEL::maxChannelValue + 0.5f;
-      pix->b = (typename PIXEL::Channel)((val > (float)PIXEL::maxChannelValue)
-                                             ? (float)PIXEL::maxChannelValue
-                                             : val);
-
+      if (doClamp) {
+        float val;
+        /*- チャンネル範囲にクランプ -*/
+        val    = spec_r * (float)PIXEL::maxChannelValue + 0.5f;
+        pix->r = (typename PIXEL::Channel)((val > (float)PIXEL::maxChannelValue)
+                                               ? (float)PIXEL::maxChannelValue
+                                               : val);
+        val    = spec_g * (float)PIXEL::maxChannelValue + 0.5f;
+        pix->g = (typename PIXEL::Channel)((val > (float)PIXEL::maxChannelValue)
+                                               ? (float)PIXEL::maxChannelValue
+                                               : val);
+        val    = spec_b * (float)PIXEL::maxChannelValue + 0.5f;
+        pix->b = (typename PIXEL::Channel)((val > (float)PIXEL::maxChannelValue)
+                                               ? (float)PIXEL::maxChannelValue
+                                               : val);
+      } else {  // floating point case
+        pix->r = spec_r;
+        pix->g = spec_g;
+        pix->b = spec_b;
+      }
       pix->m = light_pix->m;
 
       pix++;

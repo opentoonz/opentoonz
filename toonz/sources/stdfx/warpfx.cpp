@@ -5,7 +5,7 @@
 #include "trop.h"
 #include "warp.h"
 #include "trasterfx.h"
-//#include "timage_io.h"
+// #include "timage_io.h"
 
 //-------------------------------------------------------------------
 
@@ -28,6 +28,8 @@ public:
 
     m_intensity->setValueRange(-1000, 1000);
     m_gridStep->setValueRange(2, 20);
+
+    enableComputeInFloat(true);
   }
   virtual ~WarpFx() {}
 

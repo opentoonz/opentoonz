@@ -54,6 +54,7 @@ public:
 
   TSpectrum getValue(double frame) const;
   TSpectrum64 getValue64(double frame) const;
+  TSpectrumF getValueF(double frame) const;
   void setValue(double frame, const TSpectrum &value, bool undoing = false);
   void setDefaultValue(const TSpectrum &value);
 

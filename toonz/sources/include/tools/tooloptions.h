@@ -254,6 +254,10 @@ class ArrowToolOptionsBox final : public ToolOptionsBox {
 
   ToolOptionCheckbox *m_globalKey;
 
+  // Flip buttons
+  QPushButton *m_hFlipButton, *m_vFlipButton, *m_leftRotateButton,
+      *m_rightRotateButton;
+
   // enables adjusting value by dragging on the label
   void connectLabelAndField(ClickableLabel *label, MeasuredValueField *field);
 
@@ -282,6 +286,11 @@ protected slots:
   void onCurrentStageObjectComboActivated(int index);
 
   void onCurrentAxisChanged(int);
+
+  void onFlipHorizontal();
+  void onFlipVertical();
+  void onRotateLeft();
+  void onRotateRight();
 };
 
 //=============================================================================
@@ -378,6 +387,9 @@ class SelectionToolOptionsBox final : public ToolOptionsBox,
   ToolOptionPopupButton *m_joinStyle;
   ToolOptionIntSlider *m_miterField;
 
+  QPushButton *m_hFlipButton, *m_vFlipButton, *m_leftRotateButton,
+      *m_rightRotateButton;
+
 public:
   SelectionToolOptionsBox(QWidget *parent, TTool *tool,
                           TPaletteHandle *pltHandle, ToolHandle *toolHandle);
@@ -391,6 +403,10 @@ protected slots:
   void onScaleXValueChanged(bool addToUndo = true);
   void onScaleYValueChanged(bool addToUndo = true);
   void onSetSaveboxCheckboxChanged(bool);
+  void onFlipHorizontal();
+  void onFlipVertical();
+  void onRotateLeft();
+  void onRotateRight();
 };
 
 //=============================================================================

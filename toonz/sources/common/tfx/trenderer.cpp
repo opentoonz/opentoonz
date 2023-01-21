@@ -128,6 +128,8 @@ public:
       raster = TRaster32P(size);
     else if (bpp == 64)
       raster = TRaster64P(size);
+    else if (bpp == 128)
+      raster = TRasterFP(size);
     else
       assert(false);
 
@@ -1044,6 +1046,8 @@ void RenderTask::buildTile(TTile &tile) {
   tile.m_pos = m_framePos;
   tile.setRaster(
       m_rendererImp->m_rasterPool.getRaster(m_frameSize, m_info.m_bpp));
+  // set the linear flag
+  tile.getRaster()->setLinear(m_info.m_linearColorSpace);
 }
 
 //---------------------------------------------------------

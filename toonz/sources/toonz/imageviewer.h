@@ -54,7 +54,8 @@ class ImageViewer final : public GLWidgetForHighDpi {
   ImagePainter::VisualSettings m_visualSettings;
   ImagePainter::CompareSettings m_compareSettings;
 
-  TImageP m_image;
+  TImageP m_image;     // displayed image
+  TImageP m_orgImage;  // image without gain adjustment
   TAffine m_viewAff;
   QPoint m_pos;
   bool m_isHistogramEnable;
@@ -104,7 +105,7 @@ public:
 
   void setVisual(const ImagePainter::VisualSettings &settings);
 
-  void setImage(TImageP image);
+  void setImage(TImageP image, TImageP orgImage = TImageP());
   TImageP getImage() { return m_image; }
 
   TAffine getViewAff() { return m_viewAff; }

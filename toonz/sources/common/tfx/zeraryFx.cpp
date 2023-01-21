@@ -25,6 +25,7 @@ public:
     bindParam(this, "color", m_color);
     m_color->setDefaultValue(TPixel32::Green);
     setName(L"ColorCardFx");
+    enableComputeInFloat(true);
   }
 
   bool canHandle(const TRenderSettings &info, double frame) override {
@@ -37,18 +38,36 @@ public:
     return true;
   }
 
-  void doCompute(TTile &tile, double frame, const TRenderSettings &) override {
-    TRaster32P raster32 = tile.getRaster();
-    if (raster32)
-      raster32->fill(m_color->getPremultipliedValue(frame));
-    else {
-      TRaster64P ras64 = tile.getRaster();
-      if (ras64)
+  void doCompute(TTile &tile, double frame,
+                 const TRenderSettings &ri) override {
+    TRaster32P ras32 = tile.getRaster();
+    TRaster64P ras64 = tile.getRaster();
+    TRasterFP rasF   = tile.getRaster();
+    // currently the tile should always be nonlinear
+    assert(!tile.getRaster()->isLinear());
+    if (!tile.getRaster()->isLinear()) {
+      if (ras32)
+        ras32->fill(m_color->getPremultipliedValue(frame));
+      else if (ras64)
         ras64->fill(toPixel64(m_color->getPremultipliedValue(frame)));
+      else if (rasF)
+        rasF->fill(toPixelF(m_color->getPremultipliedValue(frame)));
+      else
+        throw TException("ColorCardFx unsupported pixel type");
+    } else {  // linear color space
+      if (ras32)
+        ras32->fill(toLinear(m_color->getPremultipliedValue(frame),
+                             ri.m_colorSpaceGamma));
+      else if (ras64)
+        ras64->fill(toLinear(toPixel64(m_color->getPremultipliedValue(frame)),
+                             ri.m_colorSpaceGamma));
+      else if (rasF)
+        rasF->fill(toLinear(toPixelF(m_color->getPremultipliedValue(frame)),
+                            ri.m_colorSpaceGamma));
       else
         throw TException("ColorCardFx unsupported pixel type");
     }
-  };
+  }
 };
 
 //==================================================================
@@ -71,6 +90,7 @@ public:
     m_size->setValueRange(1, 1000);
     m_size->setDefaultValue(50);
     setName(L"CheckBoardFx");
+    enableComputeInFloat(true);
   }
 
   bool canHandle(const TRenderSettings &info, double frame) override {
@@ -84,8 +104,13 @@ public:
 
   void doCompute(TTile &tile, double frame,
                  const TRenderSettings &info) override {
-    const TPixel32 &c1 = m_color1->getValue(frame);
-    const TPixel32 &c2 = m_color2->getValue(frame);
+    bool isLinear = tile.getRaster()->isLinear();
+    // currently the tile should always be nonlinear
+    assert(!isLinear);
+    const TPixel32 &c1 =
+        m_color1->getValue(frame, isLinear, info.m_colorSpaceGamma);
+    const TPixel32 &c2 =
+        m_color2->getValue(frame, isLinear, info.m_colorSpaceGamma);
 
     double size = m_size->getValue(frame);
 

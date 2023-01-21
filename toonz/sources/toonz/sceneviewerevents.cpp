@@ -13,7 +13,7 @@
 #include "menubarcommandids.h"
 #include "onionskinmaskgui.h"
 #include "ruler.h"
-#include "comboviewerpane.h"
+#include "viewerpane.h"
 #include "locatorpopup.h"
 #include "cellselection.h"
 #include "styleshortcutswitchablepanel.h"
@@ -1681,18 +1681,11 @@ void SceneViewer::onContextMenu(const QPoint &pos, const QPoint &globalPos) {
 
   menu->addLevelCommands(columnIndices);
 
-  ComboViewerPanel *cvp =
-      qobject_cast<ComboViewerPanel *>(parentWidget()->parentWidget());
-  if (cvp) {
+  BaseViewerPanel *bvp =
+      qobject_cast<BaseViewerPanel *>(parentWidget()->parentWidget());
+  if (bvp) {
     menu->addSeparator();
-    cvp->addShowHideContextMenu(menu);
-  }
-
-  SceneViewerPanel *svp = qobject_cast<SceneViewerPanel *>(
-      parentWidget()->parentWidget()->parentWidget());
-  if (svp) {
-    menu->addSeparator();
-    svp->addShowHideContextMenu(menu);
+    bvp->addShowHideContextMenu(menu);
   }
 
   menu->exec(globalPos);

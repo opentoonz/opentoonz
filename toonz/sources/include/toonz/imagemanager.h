@@ -112,6 +112,10 @@ public:
     toBeSaved = 0x8,  // User will save the image, reverts toBeModified
 
     is64bitEnabled = 0x10,  // Whether 64-bit rasters are allowed to return
+    isFloatEnabled = 0x20,  // Whether 128-bit float rasters are allowed to
+                            // return (for EXR format)
+    // isLinearEnabled = 0x40,  // Whether linear color space rasters are
+    // allowed to return (for EXR format)
 
     controlFlags = 0xF,  // Flags dealing with management control
     imageFlags =

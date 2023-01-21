@@ -31,6 +31,8 @@ public:
     this->m_ref_mode->addItem(3, "Alpha");
     this->m_ref_mode->addItem(4, "Luminance");
     this->m_ref_mode->addItem(-1, "Nothing");
+
+    enableComputeInFloat(true);
   }
   bool doGetBBox(double frame, TRectD &bBox,
                  const TRenderSettings &info) override {
@@ -52,37 +54,38 @@ FX_PLUGIN_IDENTIFIER(ino_density, "inoDensityFx");
 #include "igs_density.h"
 
 namespace {
+
 void fx_(TRasterP in_ras, TRasterP refer_ras, const int refer_mode,
          const double density) {
+  TRasterGR8P ref_gr8;
+  if ((refer_ras != nullptr) && (0 <= refer_mode)) {
+    ref_gr8 = TRasterGR8P(in_ras->getLy(), in_ras->getLx() * sizeof(float));
+    ref_gr8->lock();
+    ino::ras_to_ref_float_arr(refer_ras,
+                              reinterpret_cast<float *>(ref_gr8->getRawData()),
+                              refer_mode);
+  }
+
   TRasterGR8P in_gr8(in_ras->getLy(),
-                     in_ras->getLx() * ino::channels() *
-                         ((TRaster64P)in_ras ? sizeof(unsigned short)
-                                             : sizeof(unsigned char)));
+                     in_ras->getLx() * ino::channels() * sizeof(float));
   in_gr8->lock();
-  ino::ras_to_arr(in_ras, ino::channels(), in_gr8->getRawData());
+  ino::ras_to_float_arr(in_ras, ino::channels(),
+                        reinterpret_cast<float *>(in_gr8->getRawData()));
 
   igs::density::change(
-      in_gr8->getRawData()  // BGRA
+      reinterpret_cast<float *>(in_gr8->getRawData()), in_ras->getLy(),
+      in_ras->getLx()  // Not use in_ras->getWrap()
       ,
-      in_ras->getLy(), in_ras->getLx()  // Not use in_ras->getWrap()
-      ,
-      ino::channels(), ino::bits(in_ras)
-
-                           ,
-      (((refer_ras != nullptr) && (0 <= refer_mode)) ? refer_ras->getRawData()
-                                                     : nullptr)  // BGRA
-      ,
-      (((refer_ras != nullptr) && (0 <= refer_mode)) ? ino::bits(refer_ras)
-                                                     : 0),
-      refer_mode
-
-      ,
+      ino::channels(),
+      (ref_gr8) ? reinterpret_cast<float *>(ref_gr8->getRawData()) : nullptr,
       density);
 
-  ino::arr_to_ras(in_gr8->getRawData(), ino::channels(), in_ras, 0);
+  ino::float_arr_to_ras(in_gr8->getRawData(), ino::channels(), in_ras, 0);
   in_gr8->unlock();
+
+  if (ref_gr8) ref_gr8->unlock();
 }
-}
+}  // namespace
 //------------------------------------------------------------
 void ino_density::doCompute(TTile &tile, double frame,
                             const TRenderSettings &rend_sets) {
@@ -93,7 +96,8 @@ void ino_density::doCompute(TTile &tile, double frame,
   }
 
   /* ------ サポートしていないPixelタイプはエラーを投げる --- */
-  if (!((TRaster32P)tile.getRaster()) && !((TRaster64P)tile.getRaster())) {
+  if (!((TRaster32P)tile.getRaster()) && !((TRaster64P)tile.getRaster()) &&
+      !((TRasterFP)tile.getRaster())) {
     throw TRopException("unsupported input pixel type");
   }
 
@@ -107,7 +111,7 @@ void ino_density::doCompute(TTile &tile, double frame,
   /*------ 参照画像生成 --------------------------------------*/
   TTile refer_tile;
   bool refer_sw = false;
-  if (this->m_refer.isConnected()) {
+  if (this->m_refer.isConnected() && this->m_ref_mode->getValue() >= 0) {
     refer_sw = true;
     this->m_refer->allocateAndCompute(
         refer_tile, tile.m_pos,

@@ -84,6 +84,14 @@
 		<file>Resources/ex_precise_left.png</file>
 		<file>Resources/brush_large.png</file>
 		<file>Resources/brush_crosshair.png</file>
+		<file>Resources/brush_triangle_top_left.png</file>
+		<file>Resources/brush_triangle_top_right.png</file>
+		<file>Resources/brush_triangle_bottom_left.png</file>
+		<file>Resources/brush_triangle_bottom_right.png</file>
+		<file>Resources/brush_triangle_up.png</file>
+		<file>Resources/brush_triangle_down.png</file>
+		<file>Resources/brush_triangle_left.png</file>
+		<file>Resources/brush_triangle_right.png</file>
 		<file>Resources/tracker.png</file>
 		<file>Resources/ex_prev.png</file>
 		<file>Resources/ex_prev_left.png</file>

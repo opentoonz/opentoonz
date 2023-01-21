@@ -70,8 +70,9 @@ public:
 \sa       \p TXshSimpleLevel::getFrameStatus() and
           \p setFrameStatus() for further details.                  */
 
-  enum FrameStatusBit      //!  Describes a level's frame status.
-  { Normal         = 0x0,  //!< Frame has no special status.
+  enum FrameStatusBit  //!  Describes a level's frame status.
+  {
+    Normal         = 0x0,  //!< Frame has no special status.
     Scanned        = 0x1,  //!< A fullcolor frame (only tlv levels).
     Cleanupped     = 0x2,  //!< A cleanupped frame (only tlv levels).
     CleanupPreview = 0x4   //!< A cleanup preview (only fullcolor levels).
@@ -100,6 +101,12 @@ public:
   }
   void set16BitChannelLevel(bool value) {
     m_16BitChannelLevel = (value && getType() == OVL_XSHLEVEL);
+  }
+  bool isFloatChannelLevel() const {
+    return getType() == OVL_XSHLEVEL && m_floatChannelLevel;
+  }
+  void setFloatChannelLevel(bool value) {
+    m_floatChannelLevel = (value && getType() == OVL_XSHLEVEL);
   }
 
   bool isReadOnly() const { return m_isReadOnly; }
@@ -385,7 +392,7 @@ private:
   std::string m_idBase;
   std::wstring m_editableRangeUserInfo;
 
-  bool m_isSubsequence, m_16BitChannelLevel, m_isReadOnly,
+  bool m_isSubsequence, m_16BitChannelLevel, m_floatChannelLevel, m_isReadOnly,
       m_temporaryHookMerged;  //!< Used only during hook merge (and hence during
                               //! saving)
 

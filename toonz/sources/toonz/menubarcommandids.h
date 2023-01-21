@@ -55,6 +55,8 @@
 #define MI_FreezePreview "MI_FrezzePreview"
 #define MI_SavePreviewedFrames "MI_SavePreviewedFrames"
 // #define MI_SavePreview         "MI_SavePreview"
+#define MI_ToggleViewerPreview "MI_ToggleViewerPreview"
+#define MI_ToggleViewerSubCameraPreview "MI_ToggleViewerSubCameraPreview"
 #define MI_Print "MI_Print"
 #define MI_Preferences "MI_Preferences"
 #define MI_SavePreset "MI_SavePreset"
@@ -261,6 +263,7 @@
 #define MI_CollectAssets "MI_CollectAssets"
 #define MI_ImportScenes "MI_ImportScenes"
 #define MI_ExportScenes "MI_ExportScenes"
+#define MI_ExportCurrentScene "MI_ExportCurrentScene"
 
 #define MI_SelectRowKeyframes "MI_SelectRowKeyframes"
 #define MI_SelectColumnKeyframes "MI_SelectColumnKeyframes"
@@ -359,6 +362,11 @@
 #define MI_TypeRegular "MI_TypeRegular"
 #define MI_TypeBoldOblique "MI_TypeBoldOblique"
 #define MI_TypeBold "MI_TypeBold"
+
+#define MI_PaintBrushNextMode "MI_PaintBrushNextMode"
+#define MI_PaintBrushAreas "MI_PaintBrushAreas"
+#define MI_PaintBrushLines "MI_PaintBrushLines"
+#define MI_PaintBrushLinesAndAreas "MI_PaintBrushLinesAndAreas"
 
 #define MI_FillNextType "MI_FillNextType"
 #define MI_FillNormal "MI_FillNormal"
@@ -473,4 +481,12 @@
 #define MI_CustomPanelEditor "MI_CustomPanelEditor"
 
 #define MI_ConvertTZPInFolder "MI_ConvertTZPInFolder"
+
+// Navigation tags
+#define MI_ToggleTaggedFrame "MI_ToggleTaggedFrame"
+#define MI_EditTaggedFrame "MI_EditTaggedFrame"
+#define MI_NextTaggedFrame "MI_NextTaggedFrame"
+#define MI_PrevTaggedFrame "MI_PrevTaggedFrame"
+#define MI_ClearTags "MI_ClearTags"
+
 #endif

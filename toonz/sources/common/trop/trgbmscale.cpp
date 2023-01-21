@@ -24,7 +24,7 @@ void buildLUT(Chan *lut, double a, double k, int chanLow, int chanHigh) {
   int i, max = (std::numeric_limits<Chan>::max)();
 
   a += 0.5;  // round rather than trunc
-  for (i   = 0; i <= max; ++i)
+  for (i = 0; i <= max; ++i)
     lut[i] = tcrop((int)(a + i * k), chanLow, chanHigh);
 }
 
@@ -94,18 +94,21 @@ void do_rgbmScale_lut(TRasterPT<T> rout, TRasterPT<T> rin, const double *a,
   int out0M = std::max(fac * out0[3], 0),
       out1M = std::min(fac * out1[3], T::maxChannelValue);
 
+  double aFac[4];
+  for (int i = 0; i < 4; i++) aFac[i] = a[i] * (double)fac;
+
   // Build luts
   Channel *lut_r = new Channel[chanValuesCount];
-  buildLUT(lut_r, a[0], k[0], out0R, out1R);
+  buildLUT(lut_r, aFac[0], k[0], out0R, out1R);
 
   Channel *lut_g = new Channel[chanValuesCount];
-  buildLUT(lut_g, a[1], k[1], out0G, out1G);
+  buildLUT(lut_g, aFac[1], k[1], out0G, out1G);
 
   Channel *lut_b = new Channel[chanValuesCount];
-  buildLUT(lut_b, a[2], k[2], out0B, out1B);
+  buildLUT(lut_b, aFac[2], k[2], out0B, out1B);
 
   Channel *lut_m = new Channel[chanValuesCount];
-  buildLUT(lut_m, a[3], k[3], out0M, out1M);
+  buildLUT(lut_m, aFac[3], k[3], out0M, out1M);
 
   // Retrieve de/premultiplication luts
   const double *lut_prem   = premultiplyTable<Channel>();
@@ -162,6 +165,9 @@ void do_rgbmScale(TRasterPT<T> rout, TRasterPT<T> rin, const double *a,
   const double *lut_deprem = depremultiplyTable<Channel>();
   double premFac, depremFac;
 
+  double aFac[4];
+  for (int i = 0; i < 4; i++) aFac[i] = a[i] * (double)fac;
+
   // Process raster
   int y, lx = rin->getLx(), ly = rin->getLy();
   T *in, *end, *out;
@@ -169,17 +175,110 @@ void do_rgbmScale(TRasterPT<T> rout, TRasterPT<T> rin, const double *a,
   for (y = 0; y < ly; ++y) {
     in = rin->pixels(y), end = in + lx, out = rout->pixels(y);
     for (; in < end; ++in, ++out) {
-      m         = tcrop((int)(a[3] + k[3] * in->m), out0M, out1M);
+      m         = tcrop((int)(aFac[3] + k[3] * in->m), out0M, out1M);
       depremFac = lut_deprem[in->m];
       premFac   = lut_prem[m];
 
-      out->r =
-          premFac * tcrop((int)(a[0] + k[0] * in->r * depremFac), out0R, out1R);
-      out->g =
-          premFac * tcrop((int)(a[1] + k[1] * in->g * depremFac), out0G, out1G);
-      out->b =
-          premFac * tcrop((int)(a[2] + k[2] * in->b * depremFac), out0B, out1B);
+      out->r = premFac *
+               tcrop((int)(aFac[0] + k[0] * in->r * depremFac), out0R, out1R);
+      out->g = premFac *
+               tcrop((int)(aFac[1] + k[1] * in->g * depremFac), out0G, out1G);
+      out->b = premFac *
+               tcrop((int)(aFac[2] + k[2] * in->b * depremFac), out0B, out1B);
       out->m = m;
+    }
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+template <>
+void do_rgbmScale<TPixelF>(TRasterFP rout, TRasterFP rin, const double *a,
+                           const double *k, const int *out0, const int *out1) {
+  assert(rout->getSize() == rin->getSize());
+
+  float fac = 1.f / 255.f;
+
+  float out0R = std::max(fac * (float)out0[0], 0.f);
+  float out1R = std::min(fac * (float)out1[0], 1.f);
+  float out0G = std::max(fac * (float)out0[1], 0.f);
+  float out1G = std::min(fac * (float)out1[1], 1.f);
+  float out0B = std::max(fac * (float)out0[2], 0.f);
+  float out1B = std::min(fac * (float)out1[2], 1.f);
+  float out0M = std::max(fac * (float)out0[3], 0.f);
+  float out1M = std::min(fac * (float)out1[3], 1.f);
+
+  // Retrieve de/premultiplication luts
+  double premFac, depremFac;
+
+  float aFac[4];
+  for (int i = 0; i < 4; i++) aFac[i] = a[i] * (float)fac;
+
+  // Process raster
+  int y, lx = rin->getLx(), ly = rin->getLy();
+  TPixelF *in, *end, *out;
+  float m;
+
+  for (y = 0; y < ly; ++y) {
+    in = rin->pixels(y), end = in + lx, out = rout->pixels(y);
+    for (; in < end; ++in, ++out) {
+      m = tcrop(aFac[3] + (float)k[3] * in->m, out0M, out1M);
+
+      if (in->m <= 0.f) {
+        out->r = m * tcrop(aFac[0], out0R, out1R);
+        out->g = m * tcrop(aFac[1], out0G, out1G);
+        out->b = m * tcrop(aFac[2], out0B, out1B);
+        out->m = m;
+      } else {
+        out->r = m * tcrop(aFac[0] + (float)k[0] * in->r / in->m, out0R, out1R);
+        out->g = m * tcrop(aFac[1] + (float)k[1] * in->g / in->m, out0G, out1G);
+        out->b = m * tcrop(aFac[2] + (float)k[2] * in->b / in->m, out0B, out1B);
+        out->m = m;
+      }
+    }
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+void do_rgbmScaleFloat(TRasterFP rout, TRasterFP rin, const double *a,
+                       const double *k, const int *out0, const int *out1) {
+  assert(rout->getSize() == rin->getSize());
+  float fac   = 1.f / 255.f;
+  float out0R = std::max(fac * (float)out0[0], 0.f);
+  float out1R = fac * (float)out1[0];
+  float out0G = std::max(fac * (float)out0[1], 0.f);
+  float out1G = fac * (float)out1[1];
+  float out0B = std::max(fac * (float)out0[2], 0.f);
+  float out1B = fac * (float)out1[2];
+  float out0M = std::max(fac * (float)out0[3], 0.f);
+  float out1M = fac * (float)out1[3];
+
+  float aFac[4];
+  for (int i = 0; i < 4; i++) aFac[i] = a[i] * fac;
+
+  // Process raster
+  for (int y = 0; y < rin->getLy(); ++y) {
+    TPixelF *in = rin->pixels(y), *out = rout->pixels(y);
+    TPixelF *end = in + rin->getLx();
+    for (; in < end; ++in, ++out) {
+      out->m = tcrop(aFac[3] + (float)k[3] * in->m, out0M, out1M);
+      if (out->m == 0.f) {
+        out->r = 0.f;
+        out->g = 0.f;
+        out->b = 0.f;
+      } else if (in->m == 0.f) {
+        out->r = out->m * tcrop(aFac[0], out0R, out1R);
+        out->g = out->m * tcrop(aFac[1], out0G, out1G);
+        out->b = out->m * tcrop(aFac[2], out0B, out1B);
+      } else {
+        out->r =
+            out->m * tcrop(aFac[0] + (float)k[0] * in->r / in->m, out0R, out1R);
+        out->g =
+            out->m * tcrop(aFac[1] + (float)k[1] * in->g / in->m, out0G, out1G);
+        out->b =
+            out->m * tcrop(aFac[2] + (float)k[2] * in->b / in->m, out0B, out1B);
+      }
     }
   }
 }
@@ -189,7 +288,7 @@ void do_rgbmScale(TRasterPT<T> rout, TRasterPT<T> rin, const double *a,
 template <typename T, typename ScaleFunc>
 void do_rgbmAdjust(TRasterPT<T> rout, TRasterPT<T> rin, ScaleFunc scaleFunc,
                    const int *in0, const int *in1, const int *out0,
-                   const int *out1) {
+                   const int *out1, bool doClamp = true) {
   assert(rout->getSize() == rin->getSize());
 
   double a[5], k[5];
@@ -207,16 +306,25 @@ void do_rgbmAdjust(TRasterPT<T> rout, TRasterPT<T> rin, ScaleFunc scaleFunc,
 
   // Ensure that the output is cropped according to output params
   int out0i[4], out1i[4];
+  if (doClamp) {
+    out0i[0] = std::max(out0[0], tcrop((int)(a[0] + k[0] * out0[1]), 0, 255));
+    out1i[0] = std::min(out1[0], tcrop((int)(a[0] + k[0] * out1[1]), 0, 255));
 
-  out0i[0] = std::max(out0[0], tcrop((int)(a[0] + k[0] * out0[1]), 0, 255));
-  out1i[0] = std::min(out1[0], tcrop((int)(a[0] + k[0] * out1[1]), 0, 255));
+    out0i[1] = std::max(out0[0], tcrop((int)(a[0] + k[0] * out0[2]), 0, 255));
+    out1i[1] = std::min(out1[0], tcrop((int)(a[0] + k[0] * out1[2]), 0, 255));
 
-  out0i[1] = std::max(out0[0], tcrop((int)(a[0] + k[0] * out0[2]), 0, 255));
-  out1i[1] = std::min(out1[0], tcrop((int)(a[0] + k[0] * out1[2]), 0, 255));
+    out0i[2] = std::max(out0[0], tcrop((int)(a[0] + k[0] * out0[3]), 0, 255));
+    out1i[2] = std::min(out1[0], tcrop((int)(a[0] + k[0] * out1[3]), 0, 255));
+  } else {
+    out0i[0] = std::max(out0[0], (int)(a[0] + k[0] * out0[1]));
+    out1i[0] = std::min(out1[0], (int)(a[0] + k[0] * out1[1]));
 
-  out0i[2] = std::max(out0[0], tcrop((int)(a[0] + k[0] * out0[3]), 0, 255));
-  out1i[2] = std::min(out1[0], tcrop((int)(a[0] + k[0] * out1[3]), 0, 255));
+    out0i[1] = std::max(out0[0], (int)(a[0] + k[0] * out0[2]));
+    out1i[1] = std::min(out1[0], (int)(a[0] + k[0] * out1[2]));
 
+    out0i[2] = std::max(out0[0], (int)(a[0] + k[0] * out0[3]));
+    out1i[2] = std::min(out1[0], (int)(a[0] + k[0] * out1[3]));
+  }
   out0i[3] = out0[4];
   out1i[3] = out1[4];
 
@@ -245,6 +353,8 @@ void TRop::rgbmScale(TRasterP rout, TRasterP rin, const double *k,
     do_greyScale_lut<TPixelGR8>(rout, rin, a[0], k[0], out0[0], out1[0]);
   else if ((TRasterGR16P)rout && (TRasterGR16P)rin)
     do_greyScale_lut<TPixelGR16>(rout, rin, a[0], k[0], out0[0], out1[0]);
+  else if ((TRasterFP)rout && (TRasterFP)rin)
+    do_rgbmScale<TPixelF>(rout, rin, a, k, out0, out1);
   else {
     rout->unlock();
     rin->unlock();
@@ -292,7 +402,10 @@ void TRop::rgbmAdjust(TRasterP rout, TRasterP rin, const int *in0,
     else
       do_rgbmAdjust<TPixel64>(rout, rin, &do_rgbmScale_lut<TPixel64>, in0, in1,
                               out0, out1);
-  } else if ((TRasterGR8P)rout && (TRasterGR8P)rin)
+  } else if ((TRasterFP)rout && (TRasterFP)rin)
+    do_rgbmAdjust<TPixelF>(rout, rin, &do_rgbmScaleFloat, in0, in1, out0, out1,
+                           false);
+  else if ((TRasterGR8P)rout && (TRasterGR8P)rin)
     do_greyAdjust<TPixelGR8>(rout, rin, in0[0], in1[0], out0[0], out1[0]);
   else if ((TRasterGR16P)rout && (TRasterGR16P)rin)
     do_greyAdjust<TPixelGR16>(rout, rin, in0[0], in1[0], out0[0], out1[0]);

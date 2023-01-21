@@ -77,6 +77,8 @@ public:
     this->m_ref_mode->addItem(3, "Alpha");
     this->m_ref_mode->addItem(4, "Luminance");
     this->m_ref_mode->addItem(-1, "Nothing");
+
+    enableComputeInFloat(true);
   }
   bool doGetBBox(double frame, TRectD &bBox,
                  const TRenderSettings &info) override {
@@ -115,41 +117,35 @@ void fx_(TRasterP in_ras, const TRasterP refer_ras, const int refer_mode,
          unsigned long random_seed, double near_blur, double effective,
          double center, int type, const int camera_x, const int camera_y,
          const int camera_w, const int camera_h, const bool anti_alias_sw) {
+  TRasterGR8P ref_gr8;
+  if ((refer_ras != nullptr) && (0 <= refer_mode)) {
+    ref_gr8 = TRasterGR8P(in_ras->getLy(), in_ras->getLx() * sizeof(float));
+    ref_gr8->lock();
+    ino::ras_to_ref_float_arr(refer_ras,
+                              reinterpret_cast<float *>(ref_gr8->getRawData()),
+                              refer_mode);
+  }
+
   TRasterGR8P in_gr8(in_ras->getLy(),
-                     in_ras->getLx() * ino::channels() *
-                         ((TRaster64P)in_ras ? sizeof(unsigned short)
-                                             : sizeof(unsigned char)));
+                     in_ras->getLx() * ino::channels() * sizeof(float));
   in_gr8->lock();
-  ino::ras_to_arr(in_ras, ino::channels(), in_gr8->getRawData());
+  ino::ras_to_float_arr(in_ras, ino::channels(),
+                        reinterpret_cast<float *>(in_gr8->getRawData()));
 
-  /* igs::hls_noise::change(-)は今後つかわない2011-07-15 */
   igs::hls_noise::change(
-      // in_ras->getRawData() // BGRA
-      in_gr8->getRawData()
+      reinterpret_cast<float *>(in_gr8->getRawData()), in_ras->getLy(),
+      in_ras->getLx(),  // Must Not use in_ras->getWrap()
+      ino::channels(),
+      (ref_gr8) ? reinterpret_cast<float *>(ref_gr8->getRawData()) : nullptr,
+      camera_x, camera_y, camera_w, camera_h, hue_range, lig_range, sat_range,
+      alp_range, random_seed, near_blur, effective, center, type, effective,
+      center, type, effective, center, type, anti_alias_sw,
+      !((TRasterFP)in_ras));
 
-          ,
-      in_ras->getLy(), in_ras->getLx()  // Must Not use in_ras->getWrap()
-      ,
-      ino::channels(), ino::bits(in_ras)
-
-                           ,
-      (((refer_ras != nullptr) && (0 <= refer_mode)) ? refer_ras->getRawData()
-                                                     : nullptr)  // BGRA
-      ,
-      (((refer_ras != nullptr) && (0 <= refer_mode)) ? ino::bits(refer_ras)
-                                                     : 0),
-      refer_mode
-
-      ,
-      camera_x, camera_y, camera_w, camera_h
-
-      ,
-      hue_range, lig_range, sat_range, alp_range, random_seed, near_blur,
-      effective, center, type, effective, center, type, effective, center, type,
-      anti_alias_sw);
-
-  ino::arr_to_ras(in_gr8->getRawData(), ino::channels(), in_ras, 0);
+  ino::float_arr_to_ras(in_gr8->getRawData(), ino::channels(), in_ras, 0);
   in_gr8->unlock();
+
+  if (ref_gr8) ref_gr8->unlock();
 }
 }  // namespace
 //------------------------------------------------------------
@@ -162,7 +158,8 @@ void ino_hls_noise::doCompute(TTile &tile, double frame,
   }
 
   /* ------ サポートしていないPixelタイプはエラーを投げる --- */
-  if (!((TRaster32P)tile.getRaster()) && !((TRaster64P)tile.getRaster())) {
+  if (!((TRaster32P)tile.getRaster()) && !((TRaster64P)tile.getRaster()) &&
+      !((TRasterFP)tile.getRaster())) {
     throw TRopException("unsupported input pixel type");
   }
 

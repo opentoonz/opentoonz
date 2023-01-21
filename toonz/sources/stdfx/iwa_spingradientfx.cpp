@@ -38,6 +38,8 @@ Iwa_SpinGradientFx::Iwa_SpinGradientFx()
 
   bindParam(this, "startColor", m_startColor);
   bindParam(this, "endColor", m_endColor);
+
+  enableComputeInFloat(true);
 }
 
 //------------------------------------------------------------
@@ -109,7 +111,8 @@ void doSpinGradientT(RASTER ras, TDimensionI dim, TPointD centerPos,
 
 void Iwa_SpinGradientFx::doCompute(TTile &tile, double frame,
                                    const TRenderSettings &ri) {
-  if (!((TRaster32P)tile.getRaster()) && !((TRaster64P)tile.getRaster())) {
+  if (!((TRaster32P)tile.getRaster()) && !((TRaster64P)tile.getRaster()) &&
+      !((TRasterFP)tile.getRaster())) {
     throw TRopException("unsupported input pixel type");
   }
 
@@ -142,6 +145,7 @@ void Iwa_SpinGradientFx::doCompute(TTile &tile, double frame,
   tile.getRaster()->clear();
   TRaster32P outRas32 = (TRaster32P)tile.getRaster();
   TRaster64P outRas64 = (TRaster64P)tile.getRaster();
+  TRasterFP outRasF   = (TRasterFP)tile.getRaster();
   if (outRas32)
     doSpinGradientT<TRaster32P, TPixel32>(
         outRas32, dimOut, centerPos, startAngle, endAngle,
@@ -151,6 +155,10 @@ void Iwa_SpinGradientFx::doCompute(TTile &tile, double frame,
         outRas64, dimOut, centerPos, startAngle, endAngle,
         m_colors->getValue64(frame),
         (GradientCurveType)m_curveType->getValue());
+  else if (outRasF)
+    doSpinGradientT<TRasterFP, TPixelF>(
+        outRasF, dimOut, centerPos, startAngle, endAngle,
+        m_colors->getValueF(frame), (GradientCurveType)m_curveType->getValue());
 }
 
 //------------------------------------------------------------

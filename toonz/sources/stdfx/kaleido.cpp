@@ -84,6 +84,7 @@ public:
     addInputPort("Source", m_input);
 
     m_count->setValueRange(1, 100);
+    enableComputeInFloat(true);
   }
 
   ~KaleidoFx(){};
@@ -99,6 +100,11 @@ public:
 
   bool canHandle(const TRenderSettings &info, double frame) override {
     return isAlmostIsotropic(info.m_affine);
+  }
+
+  bool toBeComputedInLinearColorSpace(bool settingsIsLinear,
+                                      bool tileIsLinear) const override {
+    return tileIsLinear;
   }
 
 private:

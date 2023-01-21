@@ -54,8 +54,10 @@ TImageReader::TImageReader(const TFilePath &path)
     , m_readGreytones(true)
     , m_file(NULL)
     , m_is64BitEnabled(false)
+    , m_isFloatEnabled(false)
     , m_shrink(1)
-    , m_region(TRect()) {}
+    , m_region(TRect())
+    , m_colorSpaceGamma(2.2) {}
 
 //-----------------------------------------------------------
 
@@ -177,6 +179,12 @@ template <>
 struct pixel_traits<TPixel64> {
   typedef TPixel64 rgbm_pixel_type;
   typedef short buffer_type;
+};
+
+template <>
+struct pixel_traits<TPixelF> {
+  typedef TPixelF rgbm_pixel_type;
+  typedef float buffer_type;
 };
 
 template <>
@@ -352,6 +360,9 @@ TImageP TImageReader::load0() {
       y1 -= (y1 - y0) % m_shrink;
     }
 
+    if (m_path.getType() == "exr")
+      m_reader->setColorSpaceGamma(m_colorSpaceGamma);
+
     assert(x0 <= x1 && y0 <= y1);
 
     TDimension imageDimension =
@@ -422,7 +433,16 @@ TImageP TImageReader::load0() {
       TRasterP _ras;
       // currently m_bitsPerSample == 32 is only possible when loading
       // full-float / uint EXR images
-      if (info.m_bitsPerSample == 16 || info.m_bitsPerSample == 32) {
+      // EDIT: half float EXR images also set m_bitsPerSample to 32
+      // to obtain floating point images
+      // ‰æ‘œ‘¤‚Ìî•ñ‚ªinfo
+      if (info.m_bitsPerSample == 32 && m_isFloatEnabled) {
+        // ‚¢‚Á‚½‚ñƒmƒ“ƒŠƒjƒA‚É•ÏŠ·‚µ‚Ä“Ç‚Ýž‚Þ
+        TRasterFP ras(imageDimension);
+        readRaster<TPixelF>(ras, m_reader, x0, y0, x1, y1, info.m_lx, info.m_ly,
+                            m_shrink);
+        _ras = ras;
+      } else if (info.m_bitsPerSample == 16 || info.m_bitsPerSample == 32) {
         if (m_is64BitEnabled || m_path.getType() != "tif") {
           //  Standard 64-bit case.
 
@@ -550,6 +570,11 @@ static void convertForWriting(TRasterP &ras, const TRasterP &rin, int bpp) {
     ras = TRaster64P(rin->getSize());
     TRop::convert(ras, rin);
     break;
+  case 96:
+  case 128:
+    ras = TRasterFP(rin->getSize());
+    TRop::convert(ras, rin);
+    break;
   default:
     assert(false);
   }
@@ -576,6 +601,7 @@ void TImageWriter::save(const TImageP &img) {
     TRasterGR8P rasGr = ri->getRaster();
     TRaster32P ras32  = ri->getRaster();
     TRaster64P ras64  = ri->getRaster();
+    TRasterFP rasF    = ri->getRaster();
 
     TEnumProperty *p =
         m_properties
@@ -589,19 +615,20 @@ void TImageWriter::save(const TImageP &img) {
 
     int bpp = p ? std::stoi(p->getValue()) : 32;
 
-    //  bpp       1  8  16 24 32 40  48 56  64
-    int spp[] = {
-        1, 1, 1, 4, 4,
-        0, 4, 0, 4};  // 0s are for pixel sizes which are normally unsupported
-    int bps[] = {
-        1, 8,  16, 8, 8,
-        0, 16, 0,  16};  // by image formats, let alone by Toonz raster ones.
+    //  bpp       1  8  16 24 32 40  48 56  64  96 128
+    int spp[] = {1, 1, 1, 4, 4, 0,
+                 4, 0, 4, 4, 4};  // 0s are for pixel sizes which are normally
+                                  // unsupported
+    int bps[] = {1,  8, 16, 8,  8, 0,
+                 16, 0, 16, 32, 32};  // by image formats, let alone by Toonz
+                                      // raster ones.
     // The 24 and 48 cases get automatically promoted to 32 and 64.
-    int bypp = bpp / 8;
-    assert(bypp < boost::size(spp) && spp[bypp] && bps[bypp]);
+    int bypp    = bpp / 8;
+    int bypp_id = (bpp <= 64) ? bypp : (bpp == 96) ? 9 : 10;
+    assert(bypp_id < boost::size(spp) && spp[bypp_id] && bps[bypp_id]);
 
-    info.m_samplePerPixel = spp[bypp];
-    info.m_bitsPerSample  = bps[bypp];
+    info.m_samplePerPixel = spp[bypp_id];
+    info.m_bitsPerSample  = bps[bypp_id];
 
     if (rasGr) {
       if (bypp < 2)   // Seems 16 bit greymaps are not handled... why?
@@ -618,6 +645,11 @@ void TImageWriter::save(const TImageP &img) {
         ras = ras64;
       else
         convertForWriting(ras, ras64, bpp);
+    } else if (rasF) {
+      if (bpp == 96 || bpp == 128)
+        ras = rasF;
+      else
+        convertForWriting(ras, rasF, bpp);
     } else {
       fclose(file);
       throw TImageException(m_path, "unsupported raster type");
@@ -634,13 +666,18 @@ void TImageWriter::save(const TImageP &img) {
     writer->open(file, info);
 
     // add background colors for non alpha-enabled image types
-    if ((ras32 || ras64) && !writer->writeAlphaSupported() &&
+    if ((ras32 || ras64 || rasF) && !writer->writeAlphaSupported() &&
         TImageWriter::getBackgroundColor() != TPixel::Black) {
       if (bpp == 32 || bpp == 24)
         TRop::addBackground(ras, TImageWriter::getBackgroundColor());
       else if (bpp == 64 || bpp == 48) {
         TRaster64P bgRas(ras->getSize());
         bgRas->fill(toPixel64(TImageWriter::getBackgroundColor()));
+        TRop::over(bgRas, ras);
+        ras = bgRas;
+      } else if (bpp == 96 || bpp == 128) {
+        TRasterFP bgRas(ras->getSize());
+        bgRas->fill(toPixelF(TImageWriter::getBackgroundColor()));
         TRop::over(bgRas, ras);
         ras = bgRas;
       }  // for other bpp values, do nothing for now
@@ -652,6 +689,9 @@ void TImageWriter::save(const TImageP &img) {
       if (bpp == 1 || bpp == 8 || bpp == 24 || bpp == 32 || bpp == 16)
         for (int i = 0; i < ras->getLy(); i++)
           writer->writeLine((char *)ras->getRawData(0, i));
+      else if (bpp == 96 || bpp == 128)
+        for (int i = 0; i < ras->getLy(); i++)
+          writer->writeLine((float *)ras->getRawData(0, i));
       else
         for (int i = 0; i < ras->getLy(); i++)
           writer->writeLine((short *)ras->getRawData(0, i));
@@ -659,6 +699,9 @@ void TImageWriter::save(const TImageP &img) {
       if (bpp == 1 || bpp == 8 || bpp == 24 || bpp == 32 || bpp == 16)
         for (int i = ras->getLy() - 1; i >= 0; i--)
           writer->writeLine((char *)ras->getRawData(0, i));
+      else if (bpp == 96 || bpp == 128)
+        for (int i = ras->getLy() - 1; i >= 0; i--)
+          writer->writeLine((float *)ras->getRawData(0, i));
       else
         for (int i = ras->getLy() - 1; i >= 0; i--)
           writer->writeLine((short *)ras->getRawData(0, i));
@@ -688,7 +731,6 @@ void TImageWriter::save(const TImageP &img) {
 }
 
 //-----------------------------------------------------------
-
 TImageWriterP::TImageWriterP(const TFilePath &path) {
   m_pointer = new TImageWriter(path);
   m_pointer->addRef();

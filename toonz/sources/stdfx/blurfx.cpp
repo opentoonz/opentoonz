@@ -21,6 +21,8 @@ public:
 
     addInputPort("Source", m_input);
     m_value->setValueRange(0, std::numeric_limits<double>::max());
+
+    enableComputeInFloat(true);
   }
 
   ~BlurFx(){};

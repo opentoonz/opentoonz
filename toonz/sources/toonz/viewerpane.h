@@ -27,19 +27,33 @@ class Ruler;
 
 class FlipConsole;
 class TXshLevel;
-class SceneViewerPanel final : public QFrame,
-                               public FlipConsoleOwner,
-                               public SaveLoadQSettings {
-  Q_OBJECT
 
+enum VP_Parts {
+  VPPARTS_None        = 0,
+  VPPARTS_PLAYBAR     = 0x1,
+  VPPARTS_FRAMESLIDER = 0x2,
+  VPPARTS_TOOLBAR     = 0x4,
+  VPPARTS_TOOLOPTIONS = 0x8,
+  VPPARTS_End         = 0x10,
+
+  VPPARTS_ALL       = VPPARTS_PLAYBAR | VPPARTS_FRAMESLIDER,
+  VPPARTS_COMBO_ALL = VPPARTS_ALL | VPPARTS_TOOLBAR | VPPARTS_TOOLOPTIONS
+};
+
+class BaseViewerPanel : public QFrame,
+                        public FlipConsoleOwner,
+                        public SaveLoadQSettings {
+  Q_OBJECT
+protected:
   friend class SceneViewer;
+  QVBoxLayout *m_mainLayout;
   SceneViewer *m_sceneViewer;
+  ImageUtils::FullScreenWidget *m_fsWidget;
   FlipConsole *m_flipConsole;
   ViewerKeyframeNavigator *m_keyFrameButton;
-
   TPanelTitleBarButtonSet *m_referenceModeBs;
-  TPanelTitleBarButton *m_previewButton;
-  TPanelTitleBarButton *m_subcameraPreviewButton;
+  TPanelTitleBarButtonForPreview *m_previewButton;
+  TPanelTitleBarButtonForPreview *m_subcameraPreviewButton;
   bool m_onionSkinActive = false;
   UINT m_visiblePartsFlag;
   bool m_playSound     = true;
@@ -51,18 +65,17 @@ class SceneViewerPanel final : public QFrame,
   bool m_first         = true;
   TSoundTrack *m_sound = NULL;
 
+  bool m_isActive = false;
+
 public:
-#if QT_VERSION >= 0x050500
-  SceneViewerPanel(QWidget *parent = 0, Qt::WindowFlags flags = 0);
-#else
-  SceneViewerPanel(QWidget *parent = 0, Qt::WFlags flags = 0);
-#endif
-  ~SceneViewerPanel();
+  BaseViewerPanel(QWidget *parent = 0, Qt::WindowFlags flags = 0);
+  ~BaseViewerPanel() {}
+
+  virtual void updateShowHide();
+  virtual void addShowHideContextMenu(QMenu *);
 
   // toggle show/hide of the widgets according to m_visiblePartsFlag
   void setVisiblePartsFlag(UINT flag);
-  void updateShowHide();
-  void addShowHideContextMenu(QMenu *);
 
   void onDrawFrame(int frame, const ImagePainter::VisualSettings &settings,
                    QElapsedTimer *timer, qint64 targetInstant) override;
@@ -80,30 +93,30 @@ public:
 
   void initializeTitleBar(TPanelTitleBar *titleBar);
 
+  void getPreviewButtonStates(bool &prev, bool &subCamPrev);
+
 protected:
+  void contextMenuEvent(QContextMenuEvent *event) override;
   void showEvent(QShowEvent *) override;
   void hideEvent(QHideEvent *) override;
-  void resizeEvent(QResizeEvent *) override;
-  void createFrameToolBar();
-  void createPlayToolBar();
-  void addColorMaskButton(QWidget *parent, const char *iconSVGName, int id);
-  // reimplementation of TPanel::widgetFocusOnEnter
-
   void enableFlipConsoleForCamerastand(bool on);
   void playAudioFrame(int frame);
   bool hasSoundtrack();
-  void contextMenuEvent(QContextMenuEvent *event) override;
+
+  virtual void checkOldVersionVisblePartsFlags(QSettings &settings) = 0;
 
 public slots:
 
   void changeWindowTitle();
+  void updateFrameRange();
   void onSceneChanged();
   void onXshLevelSwitched(TXshLevel *);
-  void updateFrameRange();
   void updateFrameMarkers();
   void onButtonPressed(FlipConsole::EGadget button);
   void setFlipHButtonChecked(bool checked);
   void setFlipVButtonChecked(bool checked);
+  void enableFullPreview(bool enabled);
+  void enableSubCameraPreview(bool enabled);
 
 protected slots:
 
@@ -113,8 +126,18 @@ protected slots:
   void onPlayingStatusChanged(bool playing);
   // for showing/hiding the parts
   void onShowHideActionTriggered(QAction *);
-  void enableFullPreview(bool enabled);
-  void enableSubCameraPreview(bool enabled);
+  void onPreviewStatusChanged();
+  void onActiveViewerChanged();
+};
+
+class SceneViewerPanel final : public BaseViewerPanel {
+  Q_OBJECT
+public:
+  SceneViewerPanel(QWidget *parent = 0, Qt::WindowFlags flags = 0);
+  ~SceneViewerPanel() {}
+
+protected:
+  void checkOldVersionVisblePartsFlags(QSettings &settings) override;
 };
 
 #endif

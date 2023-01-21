@@ -42,8 +42,10 @@ TOutputProperties::TOutputProperties()
     , m_threadIndex(2)
     , m_subcameraPreview(false)
     , m_boardSettings(new BoardSettings())
-    , m_formatTemplateFId() {
+    , m_formatTemplateFId()
+    , m_syncColorSettings(true) {
   m_renderSettings = new TRenderSettings();
+  m_nonlinearBpp   = m_renderSettings->m_bpp;
 }
 
 //-------------------------------------------------------------------
@@ -63,7 +65,9 @@ TOutputProperties::TOutputProperties(const TOutputProperties &src)
     , m_threadIndex(src.m_threadIndex)
     , m_subcameraPreview(src.m_subcameraPreview)
     , m_boardSettings(new BoardSettings(*src.m_boardSettings))
-    , m_formatTemplateFId(src.m_formatTemplateFId) {
+    , m_formatTemplateFId(src.m_formatTemplateFId)
+    , m_syncColorSettings(src.m_syncColorSettings)
+    , m_nonlinearBpp(src.m_nonlinearBpp) {
   std::map<std::string, TPropertyGroup *>::iterator ft,
       fEnd = m_formatProperties.end();
   for (ft = m_formatProperties.begin(); ft != fEnd; ++ft) {
@@ -189,7 +193,8 @@ void TOutputProperties::getFileFormatPropertiesExtensions(
 
 void TOutputProperties::setRenderSettings(
     const TRenderSettings &renderSettings) {
-  assert(renderSettings.m_bpp == 32 || renderSettings.m_bpp == 64);
+  assert(renderSettings.m_bpp == 32 || renderSettings.m_bpp == 64 ||
+         renderSettings.m_bpp == 128);
   assert(renderSettings.m_gamma > 0);
   assert(renderSettings.m_quality == TRenderSettings::StandardResampleQuality ||
          renderSettings.m_quality == TRenderSettings::ImprovedResampleQuality ||

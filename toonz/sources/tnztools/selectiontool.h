@@ -322,8 +322,8 @@ DragSelectionTool::DragTool *createNewScaleTool(
 // SelectionTool
 //-----------------------------------------------------------------------------
 
-class SelectionTool : public TTool, public TSelection::View {
-  Q_DECLARE_TR_FUNCTIONS(SelectionTool)
+class SelectionTool : public QObject, public TTool, public TSelection::View {
+  Q_OBJECT
 
 protected:
   bool m_firstTime;
@@ -467,6 +467,12 @@ public:
   bool isEventAcceptable(QEvent *e) override;
 
   virtual bool isSelectionEditable() { return true; }
+
+signals:
+  void clickFlipHorizontal();
+  void clickFlipVertical();
+  void clickRotateLeft();
+  void clickRotateRight();
 };
 
 #endif  // SELECTIONTOOL_INCLUDED

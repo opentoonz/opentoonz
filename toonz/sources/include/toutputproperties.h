@@ -98,11 +98,18 @@ private:
   // such as new raster level, captured images by camera capture feature, etc.
   TFrameId m_formatTemplateFId;
 
+  // if true, channel width, linear color space and color space gamma will be
+  // shared between output and preview settings.
+  bool m_syncColorSettings;
+  // for restoring bpp when setting the color space back to nonlinear
+  int m_nonlinearBpp;
+
 public:
   /*!
 Constructs TOutputProperties with default value.
 */
   TOutputProperties();
+
   /*!
 Destroys the TOutputProperties object.
 */
@@ -227,6 +234,11 @@ machine's CPU).
   BoardSettings *getBoardSettings() const { return m_boardSettings; }
 
   TFrameId &formatTemplateFId() { return m_formatTemplateFId; }
+
+  bool isColorSettingsSynced() { return m_syncColorSettings; }
+  void syncColorSettings(bool sync) { m_syncColorSettings = sync; }
+  int getNonlinearBpp() { return m_nonlinearBpp; }
+  void setNonlinearBpp(int bpp) { m_nonlinearBpp = bpp; }
 };
 
 //--------------------------------------------

@@ -34,6 +34,7 @@ public:
     bindParam(this, "value", m_value);
 
     addInputPort("Source", m_input);
+    enableComputeInFloat(true);
   };
 
   ~FadeFx(){};
@@ -221,6 +222,7 @@ public:
     m_count->setValueRange(0, (std::numeric_limits<double>::max)());
     m_period->setMeasureName("fxLength");
     m_wave_amplitude->setMeasureName("fxLength");
+    enableComputeInFloat(true);
   }
   ~MultiLinearGradientFx(){};
 
@@ -288,6 +290,7 @@ public:
     m_wave_amplitude->setValueRange(0, std::numeric_limits<double>::max());
     m_period->setMeasureName("fxLength");
     m_wave_amplitude->setMeasureName("fxLength");
+    enableComputeInFloat(true);
   }
   ~LinearGradientFx(){};
 
@@ -358,7 +361,8 @@ void doComputeT(TRasterPT<T> ras, TPointD posTrasf,
 
 void LinearGradientFx::doCompute(TTile &tile, double frame,
                                  const TRenderSettings &ri) {
-  assert((TRaster32P)tile.getRaster() || (TRaster64P)tile.getRaster());
+  assert((TRaster32P)tile.getRaster() || (TRaster64P)tile.getRaster() ||
+         (TRasterFP)tile.getRaster());
 
   double period      = m_period->getValue(frame) / ri.m_shrinkX;
   double count       = 1.0;
@@ -398,7 +402,8 @@ throw TException("MultiLinearGradientFx: unsupported Pixel Type");
 
 void MultiLinearGradientFx::doCompute(TTile &tile, double frame,
                                       const TRenderSettings &ri) {
-  assert((TRaster32P)tile.getRaster() || (TRaster64P)tile.getRaster());
+  assert((TRaster32P)tile.getRaster() || (TRaster64P)tile.getRaster() ||
+         (TRasterFP)tile.getRaster());
 
   double period      = m_period->getValue(frame) / ri.m_shrinkX;
   double count       = m_count->getValue(frame);
@@ -464,6 +469,8 @@ public:
     bindParam(this, "curveType", m_curveType);
     m_period->setValueRange(0.0, std::numeric_limits<double>::max());
     m_innerperiod->setValueRange(0.0, std::numeric_limits<double>::max());
+
+    enableComputeInFloat(true);
   }
   ~RadialGradientFx(){};
 
@@ -532,6 +539,8 @@ public:
     m_period->setValueRange(0, (std::numeric_limits<double>::max)());
     m_cycle->setValueRange(0, (std::numeric_limits<double>::max)());
     m_count->setValueRange(0, (std::numeric_limits<double>::max)());
+
+    enableComputeInFloat(true);
   }
   ~MultiRadialGradientFx(){};
 
@@ -561,7 +570,8 @@ public:
 
 void MultiRadialGradientFx::doCompute(TTile &tile, double frame,
                                       const TRenderSettings &ri) {
-  assert((TRaster32P)tile.getRaster() || (TRaster64P)tile.getRaster());
+  assert((TRaster32P)tile.getRaster() || (TRaster64P)tile.getRaster() ||
+         (TRasterFP)tile.getRaster());
   double period = m_period->getValue(frame) / ri.m_shrinkX;
   double count  = m_count->getValue(frame);
   double cycle  = m_cycle->getValue(frame) / ri.m_shrinkX;
@@ -576,7 +586,8 @@ void MultiRadialGradientFx::doCompute(TTile &tile, double frame,
 
 void RadialGradientFx::doCompute(TTile &tile, double frame,
                                  const TRenderSettings &ri) {
-  assert((TRaster32P)tile.getRaster() || (TRaster64P)tile.getRaster());
+  assert((TRaster32P)tile.getRaster() || (TRaster64P)tile.getRaster() ||
+         (TRasterFP)tile.getRaster());
   double period      = m_period->getValue(frame) / ri.m_shrinkX;
   double innerperiod = m_innerperiod->getValue(frame) / ri.m_shrinkX;
   double count       = 1.0;

@@ -43,8 +43,8 @@ protected:
   TDoubleParamP m_lightIntensity;
 
   /*- シャボン色マップの生成 -*/
-  void calcBubbleMap(float3 *bubbleColor, double frame,
-                     bool computeAngularAxis = false);
+  void calcBubbleMap(float3 *bubbleColor, double frame, bool isLinear,
+                     double colorSpaceGamma, bool computeAngularAxis = false);
 
   template <typename RASTER, typename PIXEL>
   void convertRaster(const RASTER ras, TDimensionI dim, float3 *bubbleColor);

@@ -88,6 +88,7 @@ protected:
   // i costruttori sono qui per centralizzare la gestione della memoria
   // e' comunque impossibile fare new TRaster perche' e' una classe astratta
   // (clone, extract)
+  bool m_isLinear;  // linear color space
 
   // crea il buffer associato (NON fa addRef())
   TRaster(int lx, int ly, int pixelSize);
@@ -172,11 +173,18 @@ public:
   TRasterP getParent() { return m_parent; }
   // creazione di TRaster derivati
 
+  bool isLinear() const { return m_isLinear; }
+  void setLinear(const bool linear) {
+    if (m_isLinear == linear) return;
+    m_isLinear = linear;
+    if (m_parent) m_parent->setLinear(linear);
+  }
+
   // devono essere virtuali puri perche' il nuovo raster creato deve essere del
   // tipo giusto
-  virtual TRasterP clone() const        = 0;
-  virtual TRasterP extract(TRect &rect) = 0;
-  virtual TRasterP create() const       = 0;
+  virtual TRasterP clone() const                = 0;
+  virtual TRasterP extract(TRect &rect)         = 0;
+  virtual TRasterP create() const               = 0;
   virtual TRasterP create(int lx, int ly) const = 0;
 
   // definita in termini di extract(rect); non lo posso fare subito perche'
@@ -192,7 +200,7 @@ public:
   // getBounds()
   // e i due raster sono allineati in basso a sinistra (src[0,0] -> dst[offset])
   /*!Copies the content of the source raster in the current raster.
-*/
+   */
   void copy(const TRasterP &src, const TPoint &offset = TPoint());
 
   void xMirror();
@@ -328,6 +336,8 @@ public:
     if (isEmpty() || getBounds().overlaps(rect) == false) return TRasterP();
     rect = getBounds() * rect;
     // addRef();
+    // return TRasterP(new TRasterT<T>(rect.getLx(), rect.getLy(), m_wrap,
+    //  pixels(rect.y0) + rect.x0, this));
     return TRasterP(new TRasterT<T>(rect.getLx(), rect.getLy(), m_wrap,
                                     pixels(rect.y0) + rect.x0, this));
   };
@@ -429,6 +439,9 @@ template class DVAPI TRasterPT<TPixel32>;
 template class DVAPI TSmartPointerT<TRasterT<TPixel64>>;
 template class DVAPI TRasterPT<TPixel64>;
 
+template class DVAPI TSmartPointerT<TRasterT<TPixelF>>;
+template class DVAPI TRasterPT<TPixelF>;
+
 template class DVAPI TSmartPointerT<TRasterT<TPixelGR8>>;
 template class DVAPI TRasterPT<TPixelGR8>;
 
@@ -445,6 +458,7 @@ template class DVAPI TRasterPT<TPixelCY>;
 
 typedef TRasterPT<TPixel32> TRaster32P;
 typedef TRasterPT<TPixel64> TRaster64P;
+typedef TRasterPT<TPixelF> TRasterFP;
 typedef TRasterPT<TPixelGR8> TRasterGR8P;
 typedef TRasterPT<TPixelGR16> TRasterGR16P;
 typedef TRasterPT<TPixelGRD> TRasterGRDP;

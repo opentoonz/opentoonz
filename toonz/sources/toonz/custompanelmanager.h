@@ -17,10 +17,24 @@ class MyScroller : public QWidget {
   Qt::Orientation m_orientation;
   QAction* m_actions[2];
   int m_anchorPos;
+  QColor m_scrollerBorderColor;
+  QColor m_scrollerBGColor;
+
+  Q_PROPERTY(QColor ScrollerBorderColor READ getScrollerBorderColor WRITE
+                 setScrollerBorderColor);
+  Q_PROPERTY(QColor ScrollerBGColor READ getScrollerBGColor WRITE
+                 setScrollerBGColor);
 
 public:
   MyScroller(Qt::Orientation orientation, CommandId command1,
              CommandId command2, QWidget* parent = nullptr);
+
+  void setScrollerBorderColor(const QColor& color) {
+    m_scrollerBorderColor = color;
+  }
+  QColor getScrollerBorderColor() const { return m_scrollerBorderColor; }
+  void setScrollerBGColor(const QColor& color) { m_scrollerBGColor = color; }
+  QColor getScrollerBGColor() const { return m_scrollerBGColor; }
 
 protected:
   void paintEvent(QPaintEvent*) override;

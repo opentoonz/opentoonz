@@ -2,6 +2,8 @@
 #include "iwa_bokeh_util.h"
 
 #include "trop.h"
+#include "tparamcontainer.h"
+
 #include <array>
 
 #include <QSet>
@@ -62,21 +64,19 @@ void releaseAllRastersAndPlans(QList<TRasterGR8P>& rasterList,
 BokehUtils::MyThread::MyThread(Channel channel, TRasterP layerTileRas,
                                double4* result, double* alpha_bokeh,
                                kiss_fft_cpx* kissfft_comp_iris,
-                               double layerHardness, double masterHardness,
-                               bool doLightenComp)
+                               double layerGamma, double masterGamma)
     : m_channel(channel)
     , m_layerTileRas(layerTileRas)
     , m_result(result)
     , m_alpha_bokeh(alpha_bokeh)
     , m_kissfft_comp_iris(kissfft_comp_iris)
-    , m_layerHardness(layerHardness)
-    , m_masterHardness(masterHardness)
+    , m_layerGamma(layerGamma)
+    , m_masterGamma(masterGamma)
     , m_finished(false)
     , m_kissfft_comp_in(0)
     , m_kissfft_comp_out(0)
-    , m_isTerminated(false)
-    , m_doLightenComp(doLightenComp) {
-  if (m_masterHardness == 0.0) m_masterHardness = m_layerHardness;
+    , m_isTerminated(false) {
+  if (m_masterGamma == 0.0) m_masterGamma = m_layerGamma;
 }
 
 bool BokehUtils::MyThread::init() {
@@ -168,8 +168,7 @@ void BokehUtils::MyThread::setLayerRaster(const RASTER srcRas,
                                             : (double)pix->b;
         // multiply the exposure by alpha channel value
         dstMem[j * dim.lx + i].r =
-            valueToExposure(val / (double)PIXEL::maxChannelValue,
-                            m_layerHardness) *
+            m_conv->valueToExposure(val / (double)PIXEL::maxChannelValue) *
             ((double)pix->m / (double)PIXEL::maxChannelValue);
       }
     }
@@ -193,6 +192,7 @@ void BokehUtils::MyThread::run() {
 
   TRaster32P ras32 = (TRaster32P)m_layerTileRas;
   TRaster64P ras64 = (TRaster64P)m_layerTileRas;
+  TRasterFP rasF   = (TRasterFP)m_layerTileRas;
   // Prepare data for FFT.
   // Convert the RGB values to the exposure, then multiply it by the alpha
   // channel value
@@ -202,6 +202,8 @@ void BokehUtils::MyThread::run() {
       setLayerRaster<TRaster32P, TPixel32>(ras32, m_kissfft_comp_in, dim);
     else if (ras64)
       setLayerRaster<TRaster64P, TPixel64>(ras64, m_kissfft_comp_in, dim);
+    else if (rasF)
+      setLayerRaster<TRasterFP, TPixelF>(rasF, m_kissfft_comp_in, dim);
     else {
       lock.unlock();
       return;
@@ -221,7 +223,7 @@ void BokehUtils::MyThread::run() {
   // Filtering. Multiply by the iris FFT data
   {
     for (int i = 0; i < lx * ly; i++) {
-      float re, im;
+      kiss_fft_scalar re, im;
       re = m_kissfft_comp_out[i].r * m_kissfft_comp_iris[i].r -
            m_kissfft_comp_out[i].i * m_kissfft_comp_iris[i].i;
       im = m_kissfft_comp_out[i].r * m_kissfft_comp_iris[i].i +
@@ -251,6 +253,7 @@ void BokehUtils::MyThread::run() {
 
     double* alp_p  = m_alpha_bokeh;
     double4* res_p = m_result;
+
     for (int i = 0; i < dim.lx * dim.ly; i++, alp_p++, res_p++) {
       if ((*alp_p) < 0.00001) continue;
 
@@ -259,10 +262,16 @@ void BokehUtils::MyThread::run() {
           (double)(dim.lx * dim.ly);
 
       // convert to layer hardness
-      if (m_masterHardness != m_layerHardness)
-        exposure =
-            std::pow(exposure / (*alp_p), m_layerHardness / m_masterHardness) *
-            (*alp_p);
+      if (m_masterGamma != m_layerGamma) {
+        if (isGammaBased())
+          exposure =
+              std::pow(exposure / (*alp_p), m_masterGamma / m_layerGamma) *
+              (*alp_p);
+        else  // hardness based
+          exposure =
+              std::pow(exposure / (*alp_p), m_layerGamma / m_masterGamma) *
+              (*alp_p);
+      }
 
       double* res = (m_channel == Red)     ? (&((*res_p).x))
                     : (m_channel == Green) ? (&((*res_p).y))
@@ -343,7 +352,7 @@ void BokehUtils::BokehRefThread::run() {
 
   // multiply filter
   for (int i = 0; i < size; i++) {
-    float re, im;
+    kiss_fft_scalar re, im;
     re = m_fftcpx_channel[i].r * m_fftcpx_iris[i].r -
          m_fftcpx_channel[i].i * m_fftcpx_iris[i].i;
     im = m_fftcpx_channel[i].r * m_fftcpx_iris[i].i +
@@ -415,6 +424,8 @@ template void BokehUtils::setSourceRaster<TRaster32P, TPixel32>(
     const TRaster32P srcRas, double4* dstMem, TDimensionI dim);
 template void BokehUtils::setSourceRaster<TRaster64P, TPixel64>(
     const TRaster64P srcRas, double4* dstMem, TDimensionI dim);
+template void BokehUtils::setSourceRaster<TRasterFP, TPixelF>(
+    const TRasterFP srcRas, double4* dstMem, TDimensionI dim);
 
 template <typename RASTER, typename PIXEL>
 void BokehUtils::setSourceRaster(const RASTER srcRas, double4* dstMem,
@@ -439,6 +450,8 @@ template void BokehUtils::setDepthRaster<TRaster32P, TPixel32>(
     const TRaster32P srcRas, unsigned char* dstMem, TDimensionI dim);
 template void BokehUtils::setDepthRaster<TRaster64P, TPixel64>(
     const TRaster64P srcRas, unsigned char* dstMem, TDimensionI dim);
+template void BokehUtils::setDepthRaster<TRasterFP, TPixelF>(
+    const TRasterFP srcRas, unsigned char* dstMem, TDimensionI dim);
 
 template <typename RASTER, typename PIXEL>
 void BokehUtils::setDepthRaster(const RASTER srcRas, unsigned char* dstMem,
@@ -451,6 +464,9 @@ void BokehUtils::setDepthRaster(const RASTER srcRas, unsigned char* dstMem,
       double val = ((double)pix->r * 0.3 + (double)pix->g * 0.59 +
                     (double)pix->b * 0.11) /
                    (double)PIXEL::maxChannelValue;
+      // clamp
+      val = std::min(1., std::max(0., val));
+
       // convert to unsigned char
       (*depth_p) = (unsigned char)(val * (double)UCHAR_MAX + 0.5);
     }
@@ -641,7 +657,7 @@ void BokehUtils::defineSegemntDepth(
 // convert source image value rgb -> exposure
 //--------------------------------------------
 void BokehUtils::convertRGBToExposure(const double4* source_buff, int size,
-                                      double filmGamma) {
+                                      const ExposureConverter& conv) {
   double4* source_p = (double4*)source_buff;
   for (int i = 0; i < size; i++, source_p++) {
     // continue if alpha channel is 0
@@ -653,9 +669,9 @@ void BokehUtils::convertRGBToExposure(const double4* source_buff, int size,
     }
 
     // RGB value -> exposure
-    (*source_p).x = valueToExposure((*source_p).x, filmGamma);
-    (*source_p).y = valueToExposure((*source_p).y, filmGamma);
-    (*source_p).z = valueToExposure((*source_p).z, filmGamma);
+    (*source_p).x = conv.valueToExposure((*source_p).x);
+    (*source_p).y = conv.valueToExposure((*source_p).y);
+    (*source_p).z = conv.valueToExposure((*source_p).z);
 
     // multiply with alpha channel
     (*source_p).x *= (*source_p).w;
@@ -668,12 +684,12 @@ void BokehUtils::convertRGBToExposure(const double4* source_buff, int size,
 // convert result image value exposure -> rgb
 //--------------------------------------------
 void BokehUtils::convertExposureToRGB(const double4* result_buff, int size,
-                                      double filmGamma) {
+                                      const ExposureConverter& conv) {
   double4* res_p = (double4*)result_buff;
   for (int i = 0; i < size; i++, res_p++) {
-    (*res_p).x = clamp01(exposureToValue((*res_p).x, filmGamma));
-    (*res_p).y = clamp01(exposureToValue((*res_p).y, filmGamma));
-    (*res_p).z = clamp01(exposureToValue((*res_p).z, filmGamma));
+    (*res_p).x = conv.exposureToValue((*res_p).x);
+    (*res_p).y = conv.exposureToValue((*res_p).y);
+    (*res_p).z = conv.exposureToValue((*res_p).z);
   }
 }
 
@@ -1040,7 +1056,7 @@ void BokehUtils::multiplyFilter(kiss_fft_cpx* fftcpx_channel,  // dst
                                 kiss_fft_cpx* fftcpx_iris,     // filter
                                 int size) {
   for (int i = 0; i < size; i++) {
-    float re, im;
+    kiss_fft_scalar re, im;
     re = fftcpx_channel[i].r * fftcpx_iris[i].r -
          fftcpx_channel[i].i * fftcpx_iris[i].i;
     im = fftcpx_channel[i].r * fftcpx_iris[i].i +
@@ -1127,7 +1143,8 @@ void BokehUtils::interpolateExposureAndConvertToRGB(
 //--------------------------------------------
 //"Over" composite the layer to the output exposure.
 void BokehUtils::compositLayerAsIs(TTile& layerTile, double4* result,
-                                   TDimensionI& dimOut, double filmGamma) {
+                                   TDimensionI& dimOut,
+                                   const ExposureConverter& conv) {
   double4* layer_buff;
   TRasterGR8P layer_buff_ras(dimOut.lx * sizeof(double4), dimOut.ly);
   layer_buff_ras->lock();
@@ -1135,6 +1152,7 @@ void BokehUtils::compositLayerAsIs(TTile& layerTile, double4* result,
 
   TRaster32P ras32 = (TRaster32P)layerTile.getRaster();
   TRaster64P ras64 = (TRaster64P)layerTile.getRaster();
+  TRasterFP rasF   = (TRasterFP)layerTile.getRaster();
   lock.lockForRead();
   if (ras32)
     BokehUtils::setSourceRaster<TRaster32P, TPixel32>(ras32, layer_buff,
@@ -1142,6 +1160,8 @@ void BokehUtils::compositLayerAsIs(TTile& layerTile, double4* result,
   else if (ras64)
     BokehUtils::setSourceRaster<TRaster64P, TPixel64>(ras64, layer_buff,
                                                       dimOut);
+  else if (rasF)
+    BokehUtils::setSourceRaster<TRasterFP, TPixelF>(rasF, layer_buff, dimOut);
   lock.unlock();
 
   double4* lay_p = layer_buff;
@@ -1151,20 +1171,20 @@ void BokehUtils::compositLayerAsIs(TTile& layerTile, double4* result,
       continue;
     else if ((*lay_p).w < 1.0) {
       // composite exposure
-      (*res_p).x = valueToExposure((*lay_p).x, filmGamma) * (*lay_p).w +
+      (*res_p).x = conv.valueToExposure((*lay_p).x) * (*lay_p).w +
                    (*res_p).x * (1.0 - (*lay_p).w);
-      (*res_p).y = valueToExposure((*lay_p).y, filmGamma) * (*lay_p).w +
+      (*res_p).y = conv.valueToExposure((*lay_p).y) * (*lay_p).w +
                    (*res_p).y * (1.0 - (*lay_p).w);
-      (*res_p).z = valueToExposure((*lay_p).z, filmGamma) * (*lay_p).w +
+      (*res_p).z = conv.valueToExposure((*lay_p).z) * (*lay_p).w +
                    (*res_p).z * (1.0 - (*lay_p).w);
       // over composite alpha
       (*res_p).w = (*lay_p).w + ((*res_p).w * (1.0 - (*lay_p).w));
       (*res_p).w = clamp01((*res_p).w);
     } else  // replace by upper layer
     {
-      (*res_p).x = valueToExposure((*lay_p).x, filmGamma);
-      (*res_p).y = valueToExposure((*lay_p).y, filmGamma);
-      (*res_p).z = valueToExposure((*lay_p).z, filmGamma);
+      (*res_p).x = conv.valueToExposure((*lay_p).x);
+      (*res_p).y = conv.valueToExposure((*lay_p).y);
+      (*res_p).z = conv.valueToExposure((*lay_p).z);
       (*res_p).w = 1.0;
     }
   }
@@ -1200,6 +1220,7 @@ void BokehUtils::calcAlfaChannelBokeh(kiss_fft_cpx* kissfft_comp_iris,
 
   TRaster32P ras32 = (TRaster32P)layerTile.getRaster();
   TRaster64P ras64 = (TRaster64P)layerTile.getRaster();
+  TRasterFP rasF   = (TRasterFP)layerTile.getRaster();
   if (ras32) {
     for (int j = 0; j < ly; j++) {
       TPixel32* pix = ras32->pixels(j);
@@ -1216,6 +1237,14 @@ void BokehUtils::calcAlfaChannelBokeh(kiss_fft_cpx* kissfft_comp_iris,
         pix++;
       }
     }
+  } else if (rasF) {
+    for (int j = 0; j < ly; j++) {
+      TPixelF* pix = rasF->pixels(j);
+      for (int i = 0; i < lx; i++) {
+        kissfft_comp_in[j * lx + i].r = (double)pix->m;
+        pix++;
+      }
+    }
   } else
     return;
 
@@ -1227,7 +1256,7 @@ void BokehUtils::calcAlfaChannelBokeh(kiss_fft_cpx* kissfft_comp_iris,
 
   // Filtering. Multiply by the iris FFT data
   for (int i = 0; i < lx * ly; i++) {
-    float re, im;
+    kiss_fft_scalar re, im;
     re = kissfft_comp_out[i].r * kissfft_comp_iris[i].r -
          kissfft_comp_out[i].i * kissfft_comp_iris[i].i;
     im = kissfft_comp_out[i].r * kissfft_comp_iris[i].i +
@@ -1305,6 +1334,32 @@ void BokehUtils::setOutputRaster(double4* src, const RASTER dstRas,
   }
 }
 
+template <>
+void BokehUtils::setOutputRaster<TRasterFP, TPixelF>(double4* src,
+                                                     const TRasterFP dstRas,
+                                                     TDimensionI& dim,
+                                                     int2 margin) {
+  double4* src_p = src + (margin.y * dim.lx);
+
+  for (int j = 0; j < dstRas->getLy(); j++) {
+    TPixelF* outPix = dstRas->pixels(j);
+    src_p += margin.x;
+    for (int i = 0; i < dstRas->getLx(); i++, outPix++, src_p++) {
+      outPix->r = (typename TPixelF::Channel)(
+          (std::isfinite((*src_p).x) && (*src_p).x > 0.) ? (*src_p).x : 0.);
+      outPix->g = (typename TPixelF::Channel)(
+          (std::isfinite((*src_p).y) && (*src_p).y > 0.) ? (*src_p).y : 0.);
+      outPix->b = (typename TPixelF::Channel)(
+          (std::isfinite((*src_p).z) && (*src_p).z > 0.) ? (*src_p).z : 0.);
+
+      outPix->m =
+          (typename TPixelF::Channel)(((*src_p).w > 1.) ? 1. : (*src_p).w);
+      assert(outPix->m >= 0.0);
+    }
+    src_p += margin.x;
+  }
+}
+
 //-----------------------------------------------------
 // Get the pixel size of bokehAmount ( referenced ino_blur.cpp )
 double BokehUtils::getBokehPixelAmount(const double bokehAmount,
@@ -1324,7 +1379,12 @@ double BokehUtils::getBokehPixelAmount(const double bokehAmount,
 //-----------------------------------------------------
 
 Iwa_BokehCommonFx::Iwa_BokehCommonFx()
-    : m_onFocusDistance(0.5), m_bokehAmount(30.0), m_hardness(0.3) {
+    : m_onFocusDistance(0.5)
+    , m_bokehAmount(30.0)
+    , m_hardness(0.3)
+    , m_gamma(2.2)
+    , m_gammaAdjust(0.)
+    , m_linearizeMode(new TIntEnumParam(Gamma, "Gamma")) {
   addInputPort("Iris", m_iris);
 
   // Set the ranges of common parameters
@@ -1332,6 +1392,9 @@ Iwa_BokehCommonFx::Iwa_BokehCommonFx()
   m_bokehAmount->setValueRange(0.0, 300.0);
   m_bokehAmount->setMeasureName("fxLength");
   m_hardness->setValueRange(0.05, 3.0);
+  m_gamma->setValueRange(1.0, 10.0);
+  m_gammaAdjust->setValueRange(-5., 5.);
+  m_linearizeMode->addItem(Hardness, "Hardness");
 }
 
 //--------------------------------------------
@@ -1373,7 +1436,13 @@ void Iwa_BokehCommonFx::doFx(TTile& tile, double frame,
   // initialize
   std::fill_n(result, dimOut.lx * dimOut.ly, zero);
 
-  double masterHardness = m_hardness->getValue(frame);
+  double masterGamma;
+  if (m_linearizeMode->getValue() == Hardness)
+    masterGamma = m_hardness->getValue(frame);
+  else {  // gamma
+    masterGamma = m_gamma->getValue(frame);
+    if (tile.getRaster()->isLinear()) masterGamma /= settings.m_colorSpaceGamma;
+  }
 
   // cancel check
   if (settings.m_isCanceled && *settings.m_isCanceled) {
@@ -1400,15 +1469,15 @@ void Iwa_BokehCommonFx::doFx(TTile& tile, double frame,
       if (!layer.premultiply) TRop::depremultiply(layerTile->getRaster());
 
       doBokehRef(result, frame, settings, bokehPixelAmount, margin, dimOut,
-                 irisBBox, irisTile, kissfft_comp_iris, layer,
-                 ctrls[ctrlIndex]);
+                 irisBBox, irisTile, kissfft_comp_iris, layer, ctrls[ctrlIndex],
+                 tile.getRaster()->isLinear());
 
       continue;
     }
 
     //-------------------
 
-    double layerHardness = layer.layerHardness;
+    double layerGamma = layer.layerGamma;
     // The iris size of the current layer
     double irisSize = layer.irisSize;
 
@@ -1416,7 +1485,16 @@ void Iwa_BokehCommonFx::doFx(TTile& tile, double frame,
     if (-1.0 <= irisSize && 1.0 >= irisSize) {
       TTile* layerTile = layer.sourceTile;
       if (!layer.premultiply) TRop::depremultiply(layerTile->getRaster());
-      BokehUtils::compositLayerAsIs(*layerTile, result, dimOut, masterHardness);
+
+      if (m_linearizeMode->getValue() == Hardness)
+        BokehUtils::compositLayerAsIs(
+            *layerTile, result, dimOut,
+            HardnessBasedConverter(masterGamma, settings.m_colorSpaceGamma,
+                                   layerTile->getRaster()->isLinear()));
+      else
+        BokehUtils::compositLayerAsIs(*layerTile, result, dimOut,
+                                      GammaBasedConverter(masterGamma));
+
       // Continue to the next layer
       continue;
     }
@@ -1480,15 +1558,26 @@ void Iwa_BokehCommonFx::doFx(TTile& tile, double frame,
       return;
     }
 
-    BokehUtils::MyThread threadR(
-        BokehUtils::MyThread::Red, layerTile->getRaster(), result, alpha_bokeh,
-        kissfft_comp_iris, layerHardness, masterHardness);
-    BokehUtils::MyThread threadG(
-        BokehUtils::MyThread::Green, layerTile->getRaster(), result,
-        alpha_bokeh, kissfft_comp_iris, layerHardness, masterHardness);
-    BokehUtils::MyThread threadB(
-        BokehUtils::MyThread::Blue, layerTile->getRaster(), result, alpha_bokeh,
-        kissfft_comp_iris, layerHardness, masterHardness);
+    BokehUtils::MyThread threadR(BokehUtils::MyThread::Red,
+                                 layerTile->getRaster(), result, alpha_bokeh,
+                                 kissfft_comp_iris, layerGamma, masterGamma);
+    BokehUtils::MyThread threadG(BokehUtils::MyThread::Green,
+                                 layerTile->getRaster(), result, alpha_bokeh,
+                                 kissfft_comp_iris, layerGamma, masterGamma);
+    BokehUtils::MyThread threadB(BokehUtils::MyThread::Blue,
+                                 layerTile->getRaster(), result, alpha_bokeh,
+                                 kissfft_comp_iris, layerGamma, masterGamma);
+
+    std::shared_ptr<ExposureConverter> conv;
+    if (m_linearizeMode->getValue() == Hardness)
+      conv.reset(
+          new HardnessBasedConverter(layerGamma, settings.m_colorSpaceGamma,
+                                     layerTile->getRaster()->isLinear()));
+    else
+      conv.reset(new GammaBasedConverter(layerGamma));
+    threadR.setConverter(conv);
+    threadG.setConverter(conv);
+    threadB.setConverter(conv);
 
     // If you set this flag to true, the fx will be forced to compute in single
     // thread.
@@ -1596,13 +1685,20 @@ void Iwa_BokehCommonFx::doFx(TTile& tile, double frame,
   }
 
   // convert result image value exposure -> rgb
-  BokehUtils::convertExposureToRGB(result, dimOut.lx * dimOut.ly,
-                                   masterHardness);
+  if (m_linearizeMode->getValue() == Hardness)
+    BokehUtils::convertExposureToRGB(
+        result, dimOut.lx * dimOut.ly,
+        HardnessBasedConverter(masterGamma, settings.m_colorSpaceGamma,
+                               tile.getRaster()->isLinear()));
+  else
+    BokehUtils::convertExposureToRGB(result, dimOut.lx * dimOut.ly,
+                                     GammaBasedConverter(masterGamma));
 
   // clear result raster
   tile.getRaster()->clear();
   TRaster32P outRas32 = (TRaster32P)tile.getRaster();
   TRaster64P outRas64 = (TRaster64P)tile.getRaster();
+  TRasterFP outRasF   = (TRasterFP)tile.getRaster();
 
   int2 outMargin = {(dimOut.lx - tile.getRaster()->getSize().lx) / 2,
                     (dimOut.ly - tile.getRaster()->getSize().ly) / 2};
@@ -1614,18 +1710,19 @@ void Iwa_BokehCommonFx::doFx(TTile& tile, double frame,
   else if (outRas64)
     BokehUtils::setOutputRaster<TRaster64P, TPixel64>(result, outRas64, dimOut,
                                                       outMargin);
+  else if (outRasF)
+    BokehUtils::setOutputRaster<TRasterFP, TPixelF>(result, outRasF, dimOut,
+                                                    outMargin);
   lock.unlock();
 
   releaseAllRastersAndPlans(rasterList, planList);
 }
 
-void Iwa_BokehCommonFx::doBokehRef(double4* result, double frame,
-                                   const TRenderSettings& settings,
-                                   double bokehPixelAmount, int margin,
-                                   TDimensionI& dimOut, TRectD& irisBBox,
-                                   TTile& irisTile,
-                                   kiss_fft_cpx* kissfft_comp_iris,
-                                   LayerValue layer, unsigned char* ctrl) {
+void Iwa_BokehCommonFx::doBokehRef(
+    double4* result, double frame, const TRenderSettings& settings,
+    double bokehPixelAmount, int margin, TDimensionI& dimOut, TRectD& irisBBox,
+    TTile& irisTile, kiss_fft_cpx* kissfft_comp_iris, LayerValue layer,
+    unsigned char* ctrl, const bool isLinear) {
   QList<TRasterGR8P> rasterList;
   QList<kiss_fftnd_cfg> planList;
   // source image
@@ -1634,6 +1731,7 @@ void Iwa_BokehCommonFx::doBokehRef(double4* result, double frame,
 
   TRaster32P ras32 = (TRaster32P)layer.sourceTile->getRaster();
   TRaster64P ras64 = (TRaster64P)layer.sourceTile->getRaster();
+  TRasterFP rasF   = (TRasterFP)layer.sourceTile->getRaster();
   lock.lockForRead();
   if (ras32)
     BokehUtils::setSourceRaster<TRaster32P, TPixel32>(ras32, source_buff,
@@ -1641,6 +1739,8 @@ void Iwa_BokehCommonFx::doBokehRef(double4* result, double frame,
   else if (ras64)
     BokehUtils::setSourceRaster<TRaster64P, TPixel64>(ras64, source_buff,
                                                       dimOut);
+  else if (rasF)
+    BokehUtils::setSourceRaster<TRasterFP, TPixelF>(rasF, source_buff, dimOut);
   lock.unlock();
 
   // create the index map, which indicates which layer each pixel belongs to
@@ -1740,13 +1840,26 @@ void Iwa_BokehCommonFx::doBokehRef(double4* result, double frame,
   memset(result_main_buff, 0, sizeof(double4) * size);
   memset(result_sub_buff, 0, sizeof(double4) * size);
 
-  double masterHardness = (double)m_hardness->getValue(frame);
-  double layerHardness  = layer.layerHardness;
+  double masterGamma;
+  if (m_linearizeMode->getValue() == Hardness)
+    masterGamma = m_hardness->getValue(frame);
+  else {  // gamma
+    masterGamma = m_gamma->getValue(frame);
+    if (isLinear) masterGamma /= settings.m_colorSpaceGamma;
+  }
+  double layerGamma = layer.layerGamma;
 
   // convert source image value rgb -> exposure
   // note that premultiplied source image is already unpremultiplied before this
   // function
-  BokehUtils::convertRGBToExposure(source_buff, size, layerHardness);
+  if (m_linearizeMode->getValue() == Hardness)
+    BokehUtils::convertRGBToExposure(
+        source_buff, size,
+        HardnessBasedConverter(layerGamma, settings.m_colorSpaceGamma,
+                               layer.sourceTile->getRaster()->isLinear()));
+  else
+    BokehUtils::convertRGBToExposure(source_buff, size,
+                                     GammaBasedConverter(layerGamma));
 
   double focus  = m_onFocusDistance->getValue(frame);
   double adjust = layer.bokehAdjustment;
@@ -1894,12 +2007,15 @@ void Iwa_BokehCommonFx::doBokehRef(double4* result, double frame,
     return;
   }
 
-  BokehUtils::interpolateExposureAndConvertToRGB(
-      result_main_buff,    // result1
-      result_sub_buff,     // result2
-      mainSub_ratio_buff,  // ratio
-      result,              // dst
-      size, layerHardness / masterHardness);
+  double adjustFactor = (m_linearizeMode->getValue() == Hardness)
+                            ? layerGamma / masterGamma
+                            : masterGamma / layerGamma;
+
+  BokehUtils::interpolateExposureAndConvertToRGB(result_main_buff,    // result1
+                                                 result_sub_buff,     // result2
+                                                 mainSub_ratio_buff,  // ratio
+                                                 result,              // dst
+                                                 size, adjustFactor);
 
   // release rasters and plans
   releaseAllRastersAndPlans(rasterList, planList);

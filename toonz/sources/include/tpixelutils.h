@@ -29,6 +29,12 @@ inline T blend(const T &a, const T &b, double t) {
            troundp((1 - t) * a.b + t * b.b), troundp((1 - t) * a.m + t * b.m));
 }
 
+template <>
+inline TPixelF blend(const TPixelF &a, const TPixelF &b, double t) {
+  return TPixelF((1 - t) * a.r + t * b.r, (1 - t) * a.g + t * b.g,
+                 (1 - t) * a.b + t * b.b, (1 - t) * a.m + t * b.m);
+}
+
 //-----------------------------------------------------------------------------
 
 /*! this template function computes a linear interpolation between
@@ -76,6 +82,20 @@ inline T overPixT(const T &bot, const T &top) {
            (bot.m == max) ? max : max - (max - bot.m) * (max - top.m) / max);
 }
 
+template <>
+inline TPixelF overPixT<TPixelF, float>(const TPixelF &bot,
+                                        const TPixelF &top) {
+  if (top.m >= 1.f) return top;
+
+  if (top.m <= 0.f) return bot;
+
+  float r = top.r + bot.r * (1.f - top.m);
+  float g = top.g + bot.g * (1.f - top.m);
+  float b = top.b + bot.b * (1.f - top.m);
+  return TPixelF(r, g, b,
+                 (bot.m >= 1.f) ? bot.m : 1.f - (1.f - bot.m) * (1.f - top.m));
+}
+
 //-----------------------------------------------------------------------------
 template <class T, class S, class Q>
 inline T overPixGRT(const T &bot, const S &top) {
@@ -109,6 +129,16 @@ inline T quickOverPixT(const T &bot, const T &top) {
            (bot.m == max) ? max : max - (max - bot.m) * (max - top.m) / max);
 }
 
+template <>
+inline TPixelF quickOverPixT<TPixelF, float>(const TPixelF &bot,
+                                             const TPixelF &top) {
+  float r = top.r + bot.r * (1.f - top.m);
+  float g = top.g + bot.g * (1.f - top.m);
+  float b = top.b + bot.b * (1.f - top.m);
+  return TPixelF(r, g, b,
+                 (bot.m == 1.f) ? 1.f : 1.f - (1.f - bot.m) * (1.f - top.m));
+}
+
 //------------------------------------------------------------------------------------
 
 template <class T, class Q>
@@ -122,6 +152,17 @@ inline T quickOverPixPremultT(const T &bot, const T &top) {
            (b < max) ? (Q)b : (Q)max,
            (bot.m == max) ? max : max - (max - bot.m) * (max - top.m) / max);
 }
+
+template <>
+inline TPixelF quickOverPixPremultT<TPixelF, float>(const TPixelF &bot,
+                                                    const TPixelF &top) {
+  float r = top.r * top.m + bot.r * (1.f - top.m);
+  float g = top.g * top.m + bot.g * (1.f - top.m);
+  float b = top.b * top.m + bot.b * (1.f - top.m);
+  return TPixelF(r, g, b,
+                 (bot.m == 1.f) ? 1.f : 1.f - (1.f - bot.m) * (1.f - top.m));
+}
+
 //------------------------------------------------------------------------------------
 /*-- Show raster images darken-blended on the viewer --*/
 /* references from ino_blend_darken.cpp */
@@ -212,6 +253,12 @@ inline TPixel64 overPix(const TPixel64 &bot, const TPixel64 &top) {
 
 //-----------------------------------------------------------------------------
 
+inline TPixelF overPix(const TPixelF &bot, const TPixelF &top) {
+  return overPixT<TPixelF, float>(bot, top);
+}
+
+//-----------------------------------------------------------------------------
+
 inline TPixel32 quickOverPix(const TPixel32 &bot, const TPixelGR8 &top) {
   return quickOverPixGRT<TPixel32, TPixelGR8, UCHAR>(bot, top);
 }
@@ -246,6 +293,18 @@ inline TPixel64 quickOverPix(const TPixel64 &bot, const TPixel64 &top) {
   return quickOverPixT<TPixel64, USHORT>(bot, top);
 }
 
+//-----------------------------------------------------------------------------
+
+inline TPixelF quickOverPixPremult(const TPixelF &bot, const TPixelF &top) {
+  return quickOverPixPremultT<TPixelF, float>(bot, top);
+}
+
+//-----------------------------------------------------------------------------
+
+inline TPixelF quickOverPix(const TPixelF &bot, const TPixelF &top) {
+  return quickOverPixT<TPixelF, float>(bot, top);
+}
+
 //------------------------------------------------------------------------------------
 
 inline TPixel32 quickOverPixDarkenBlended(const TPixel32 &bot,
@@ -273,6 +332,20 @@ inline void overPix(T &outPix, const T &bot, const T &top) {
   }
 }
 
+template <>
+inline void overPix<TPixelF, float>(TPixelF &outPix, const TPixelF &bot,
+                                    const TPixelF &top) {
+  if (top.m >= 1.f)
+    outPix = top;
+  else if (top.m <= 0.f)
+    outPix = bot;
+  else {
+    outPix.r = top.r + bot.r * (1.f - top.m);
+    outPix.g = top.g + bot.g * (1.f - top.m);
+    outPix.b = top.b + bot.b * (1.f - top.m);
+    outPix.m = (bot.m >= 1.f) ? bot.m : 1.f - (1.f - bot.m) * (1.f - top.m);
+  }
+}
 //-----------------------------------------------------------------------------
 
 inline TPixel32 overPixOnWhite(const TPixel32 &top) {
@@ -351,6 +424,12 @@ inline void premult(TPixel64 &pix) {
   pix.b = pix.b * pix.m / 65535.0;
 }
 
+inline void premult(TPixelF &pix) {
+  pix.r = pix.r * pix.m;
+  pix.g = pix.g * pix.m;
+  pix.b = pix.b * pix.m;
+}
+
 inline void depremult(TPixel32 &pix) {
   float fac = 255.0f / pix.m;
   pix.r     = std::min(pix.r * fac, 255.0f);
@@ -365,6 +444,11 @@ inline void depremult(TPixel64 &pix) {
   pix.b      = std::min(pix.b * fac, 65535.0);
 }
 
+inline void depremult(TPixelF &pix) {
+  pix.r = pix.r / pix.m;
+  pix.g = pix.g / pix.m;
+  pix.b = pix.b / pix.m;
+}
 //-----------------------------------------------------------------------------
 
 template <typename Chan>
@@ -389,6 +473,11 @@ inline TPixel64 premultiply(const TPixel64 &pix) {
                   pix.b * pix.m / 65535.0, pix.m);
 }
 
+inline TPixelF premultiply(const TPixelF &pix) {
+  if (pix.m <= 0.f) return TPixelF(0.f, 0.f, 0.f, 0.f);
+  return TPixelF(pix.r * pix.m, pix.g * pix.m, pix.b * pix.m, pix.m);
+}
+
 inline TPixel32 depremultiply(const TPixel32 &pix) {
   return TPixel32(pix.r * 255.0 / pix.m, pix.g * 255.0 / pix.m,
                   pix.b * 255.0 / pix.m, pix.m);
@@ -397,6 +486,11 @@ inline TPixel32 depremultiply(const TPixel32 &pix) {
 inline TPixel64 depremultiply(const TPixel64 &pix) {
   return TPixel64(pix.r * 65535.0 / pix.m, pix.g * 65535.0 / pix.m,
                   pix.b * 65535.0 / pix.m, pix.m);
+}
+
+inline TPixelF depremultiply(const TPixelF &pix) {
+  if (pix.m <= 0.f) return TPixelF();
+  return TPixelF(pix.r / pix.m, pix.g / pix.m, pix.b / pix.m, pix.m);
 }
 
 //-----------------------------------------------------------------------------
@@ -443,15 +537,28 @@ DVAPI void rgb2hls(double r, double g, double b, double *h, double *l,
 DVAPI TPixel32 toPixel32(const TPixel64 &);
 DVAPI TPixel32 toPixel32(const TPixelD &);
 DVAPI TPixel32 toPixel32(const TPixelGR8 &);
+DVAPI TPixel32 toPixel32(const TPixelF &);
 
 DVAPI TPixel64 toPixel64(const TPixel32 &);
 DVAPI TPixel64 toPixel64(const TPixelD &);
 DVAPI TPixel64 toPixel64(const TPixelGR8 &);
+DVAPI TPixel64 toPixel64(const TPixelF &);
 
 DVAPI TPixelD toPixelD(const TPixel32 &);
 DVAPI TPixelD toPixelD(const TPixel64 &);
 DVAPI TPixelD toPixelD(const TPixelGR8 &);
+DVAPI TPixelD toPixelD(const TPixelF &);
 
+DVAPI TPixelF toPixelF(const TPixel32 &);
+DVAPI TPixelF toPixelF(const TPixelD &);
+DVAPI TPixelF toPixelF(const TPixel64 &);
+DVAPI TPixelF toPixelF(const TPixelGR8 &);
+
+DVAPI TPixel32 toLinear(const TPixel32 &, const double);
+DVAPI TPixel64 toLinear(const TPixel64 &, const double);
+DVAPI TPixelD toLinear(const TPixelD &, const double);
+DVAPI TPixelF toLinear(const TPixelF &, const double);
+DVAPI TPixelGR8 toLinear(const TPixelGR8 &, const double);
 //
 // nel caso in cui il tipo di destinazione sia il parametro di un template
 // es. template<PIXEL> ....
@@ -467,6 +574,7 @@ public:
   inline static T from(const TPixel64 &pix);
   inline static T from(const TPixelD &pix);
   inline static T from(const TPixelGR8 &pix);
+  inline static T from(const TPixelF &pix);
 };
 
 template <>
@@ -476,6 +584,7 @@ public:
   inline static TPixel32 from(const TPixel64 &pix) { return toPixel32(pix); }
   inline static TPixel32 from(const TPixelD &pix) { return toPixel32(pix); }
   inline static TPixel32 from(const TPixelGR8 &pix) { return toPixel32(pix); }
+  inline static TPixel32 from(const TPixelF &pix) { return toPixel32(pix); }
 };
 
 template <>
@@ -485,6 +594,7 @@ public:
   inline static TPixel64 from(const TPixel64 &pix) { return pix; }
   inline static TPixel64 from(const TPixelD &pix) { return toPixel64(pix); }
   inline static TPixel64 from(const TPixelGR8 &pix) { return toPixel64(pix); }
+  inline static TPixel64 from(const TPixelF &pix) { return toPixel64(pix); }
 };
 
 template <>
@@ -494,6 +604,17 @@ public:
   inline static TPixelD from(const TPixel64 &pix) { return toPixelD(pix); }
   inline static TPixelD from(const TPixelD &pix) { return pix; }
   inline static TPixelD from(const TPixelGR8 &pix) { return toPixelD(pix); }
+  inline static TPixelD from(const TPixelF &pix) { return toPixelD(pix); }
+};
+
+template <>
+class PixelConverter<TPixelF> {
+public:
+  inline static TPixelF from(const TPixel32 &pix) { return toPixelF(pix); }
+  inline static TPixelF from(const TPixel64 &pix) { return toPixelF(pix); }
+  inline static TPixelF from(const TPixelD &pix) { return toPixelF(pix); }
+  inline static TPixelF from(const TPixelGR8 &pix) { return toPixelF(pix); }
+  inline static TPixelF from(const TPixelF &pix) { return pix; }
 };
 
 //---------------------------------------------------------------------------------------

@@ -91,7 +91,7 @@ public:
   TBoolParamP pick_color_for_every_frame_val;
   TBoolParamP perspective_distribution_val;
   TBoolParamP motion_blur_val;
-  TDoubleParamP motion_blur_gamma_val;
+  TDoubleParamP motion_blur_gamma_adjust_val;
 
 public:
   enum { UNIT_SMALL_INCH, UNIT_INCH };

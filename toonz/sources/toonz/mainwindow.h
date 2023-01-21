@@ -221,6 +221,7 @@ protected slots:
   void onInk1CheckTriggered(bool on);
 
   void onUpdateCheckerDone(bool);
+  void onActiveViewerChanged();
 
 public slots:
   /*--- タイトルにシーン名を入れる ---*/

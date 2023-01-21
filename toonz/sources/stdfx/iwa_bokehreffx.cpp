@@ -82,11 +82,45 @@ Iwa_BokehRefFx::Iwa_BokehRefFx()
   bindParam(this, "on_focus_distance", m_onFocusDistance, false);
   bindParam(this, "bokeh_amount", m_bokehAmount, false);
   bindParam(this, "hardness", m_hardness, false);
+  bindParam(this, "gamma", m_gamma, false);
+  bindParam(this, "gammaAdjust", m_gammaAdjust, false);
   bindParam(this, "distance_precision", m_distancePrecision, false);
   bindParam(this, "fill_gap", m_fillGap, false);
   bindParam(this, "fill_gap_with_median_filter", m_doMedian, false);
+  bindParam(this, "linearizeMode", m_linearizeMode, false);
 
   m_distancePrecision->setValueRange(3, 128);
+
+  enableComputeInFloat(true);
+
+  // Version 1: Exposure is computed by using Hardness
+  //            E = std::pow(10.0, (value - 0.5) / hardness)
+  // Version 2: Exposure can also be computed by using Gamma, for easier
+  // combination with the linear color space
+  //            E = std::pow(value, gamma)
+  // this must be called after binding the parameters (see onFxVersionSet())
+  // Version 3: Gamma is computed by rs.m_colorSpaceGamma + gammaAdjust
+  setFxVersion(3);
+}
+
+//--------------------------------------------
+
+void Iwa_BokehRefFx::onFxVersionSet() {
+  bool useGamma = getFxVersion() == 2;
+  if (getFxVersion() == 1) {
+    m_linearizeMode->setValue(Hardness);
+    setFxVersion(3);
+  } else if (getFxVersion() == 2) {
+    // Automatically update version
+    if (m_linearizeMode->getValue() == Hardness ||
+        (m_gamma->getKeyframeCount() == 0 &&
+         areAlmostEqual(m_gamma->getDefaultValue(), 2.2))) {
+      useGamma = false;
+      setFxVersion(3);
+    }
+  }
+  getParams()->getParamVar("gamma")->setIsHidden(!useGamma);
+  getParams()->getParamVar("gammaAdjust")->setIsHidden(useGamma);
 }
 
 //--------------------------------------------
@@ -148,13 +182,12 @@ void Iwa_BokehRefFx::doCompute(TTile& tile, double frame,
   // rasterList.append(allocateRasterAndLock<double4>(&source_buff, dimOut));
 
   LayerValue layerValue;
-  TRenderSettings infoOnInput(settings);
-  infoOnInput.m_bpp = 64;
+  ;
   // source tile is used only in this focus.
   // normalized source image data is stored in source_buff.
   layerValue.sourceTile = new TTile();
   m_source->allocateAndCompute(*layerValue.sourceTile, rectOut.getP00(), dimOut,
-                               0, frame, infoOnInput);
+                               tile.getRaster(), frame, settings);
 
   // - - - iris image - - -
   // Get the original size of Iris image
@@ -173,6 +206,18 @@ void Iwa_BokehRefFx::doCompute(TTile& tile, double frame,
     releaseAllRasters(rasterList);
     tile.getRaster()->clear();
     return;
+  }
+
+  double masterGamma;
+  if (m_linearizeMode->getValue() == Hardness)
+    masterGamma = m_hardness->getValue(frame);
+  else {  // Gamma
+    if (getFxVersion() == 2)
+      masterGamma = m_gamma->getValue(frame);
+    else
+      masterGamma = std::max(
+          1., settings.m_colorSpaceGamma + m_gammaAdjust->getValue(frame));
+    if (tile.getRaster()->isLinear()) masterGamma /= settings.m_colorSpaceGamma;
   }
 
   // compute the reference image
@@ -199,6 +244,7 @@ void Iwa_BokehRefFx::doCompute(TTile& tile, double frame,
     TRasterGR16P rasGR16 = (TRasterGR16P)depthTile.getRaster();
     TRaster32P ras32     = (TRaster32P)depthTile.getRaster();
     TRaster64P ras64     = (TRaster64P)depthTile.getRaster();
+    TRasterFP rasF       = (TRasterFP)depthTile.getRaster();
     lock.lockForRead();
     if (rasGR8)
       setDepthRasterGray<TRasterGR8P, TPixelGR8>(rasGR8, depth_buff, dimOut);
@@ -210,12 +256,14 @@ void Iwa_BokehRefFx::doCompute(TTile& tile, double frame,
     else if (ras64)
       BokehUtils::setDepthRaster<TRaster64P, TPixel64>(ras64, depth_buff,
                                                        dimOut);
+    else if (rasF)
+      BokehUtils::setDepthRaster<TRasterFP, TPixelF>(rasF, depth_buff, dimOut);
     lock.unlock();
   }
   ctrls[1] = depth_buff;
 
   layerValue.premultiply       = false;
-  layerValue.layerHardness     = m_hardness->getValue(frame);
+  layerValue.layerGamma        = masterGamma;
   layerValue.depth_ref         = 1;
   layerValue.distance          = 0.5;
   layerValue.bokehAdjustment   = 1.0;

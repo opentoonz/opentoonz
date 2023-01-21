@@ -194,7 +194,7 @@ private:
 
   DVGui::LineEdit *m_name, *m_regExp;
 
-  DVGui::DoubleLineEdit* m_dpi;
+  DVGui::DoubleLineEdit *m_dpi, *m_colorSpaceGamma;
 
   DVGui::IntLineEdit *m_priority, *m_subsampling, *m_antialias;
 

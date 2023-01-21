@@ -41,7 +41,8 @@ inline int getCoord(int i, int j, int lx, int ly) {
 //--------------------------------------------
 
 Iwa_GlareFx::Iwa_GlareFx()
-    : m_renderMode(new TIntEnumParam(RendeMode_FilterPreview, "Filter Preview"))
+    : m_renderMode(
+          new TIntEnumParam(RenderMode_FilterPreview, "Filter Preview"))
     , m_irisMode(new TIntEnumParam(Iris_InputImage, "Input Image"))
     , m_irisScale(0.2)
     , m_irisGearEdgeCount(10)
@@ -59,14 +60,17 @@ Iwa_GlareFx::Iwa_GlareFx()
     , m_noise_offset(TPointD(0, 0)) {
   // Version 1 : lights had been constantly summed in all wavelength
   // Version 2 : intensities are weighted proportional to 1/(rambda^2)
-  setFxVersion(2);
+  // Version 3 : * 1/2.2 gamma to intensity when non-linear rendering
+  //             Source image is separated in each RGB channels
+  //             Filter is normalized with sum of green channel values
+  setFxVersion(3);
 
   // Bind the common parameters
   addInputPort("Source", m_source);
   addInputPort("Iris", m_iris);
 
   bindParam(this, "renderMode", m_renderMode);
-  m_renderMode->addItem(RendeMode_Render, "Render");
+  m_renderMode->addItem(RenderMode_Render, "Render");
   m_renderMode->addItem(RenderMode_Iris, "Iris");
 
   bindParam(this, "irisMode", m_irisMode);
@@ -114,6 +118,8 @@ Iwa_GlareFx::Iwa_GlareFx()
   m_aberration->setValueRange(-2.0, 2.0);
   m_noise_factor->setValueRange(0.0, 1.0);
   m_noise_size->setValueRange(0.01, 3.0);
+
+  enableComputeInFloat(true);
 }
 
 //--------------------------------------------------------------
@@ -280,7 +286,7 @@ void Iwa_GlareFx::doCompute(TTile& tile, double frame,
 
   int renderMode = m_renderMode->getValue();
   // If the source is not connected & it is render mode, then do nothing.
-  if (!m_source.isConnected() && renderMode == RendeMode_Render) {
+  if (!m_source.isConnected() && renderMode == RenderMode_Render) {
     tile.getRaster()->clear();
     return;
   }
@@ -321,6 +327,8 @@ void Iwa_GlareFx::doCompute(TTile& tile, double frame,
   while ((tile.getRaster()->getSize().lx - dimIris) % 2 != 0)
     dimIris = kiss_fft_next_fast_size(dimIris + 1);
   double irisResizeFactor = double(dimIris) * 0.5 / size;
+
+  bool isLinear = tile.getRaster()->isLinear();
 
   kiss_fft_cpx* kissfft_comp_iris;
   // create the iris data for FFT (in the same size as the source tile)
@@ -370,13 +378,16 @@ void Iwa_GlareFx::doCompute(TTile& tile, double frame,
   tile.getRaster()->clear();
   TRaster32P ras32 = tile.getRaster();
   TRaster64P ras64 = tile.getRaster();
-  if (ras32)
-    ras32->fill(TPixel32::Transparent);
-  else if (ras64)
-    ras64->fill(TPixel64::Transparent);
+  TRasterFP rasF   = tile.getRaster();
+  // if (ras32)
+  //   ras32->fill(TPixel32::Transparent);
+  // else if (ras64)
+  //   ras64->fill(TPixel64::Transparent);
+  // else if (rasF)
+  //   rasF->fill(TPixelF::Transparent);
 
   // filter preview mode
-  if (renderMode == RendeMode_FilterPreview) {
+  if (renderMode == RenderMode_FilterPreview) {
     int2 margin = {(dimIris - tile.getRaster()->getSize().lx) / 2,
                    (dimIris - tile.getRaster()->getSize().ly) / 2};
 
@@ -386,7 +397,14 @@ void Iwa_GlareFx::doCompute(TTile& tile, double frame,
     else if (ras64)
       setFilterPreviewToResult<TRaster64P, TPixel64>(ras64, glare_pattern,
                                                      dimIris, margin);
+    else if (rasF)
+      setFilterPreviewToResult<TRasterFP, TPixelF>(rasF, glare_pattern, dimIris,
+                                                   margin);
 
+    if (getFxVersion() >= 3 && !isLinear) {
+      tile.getRaster()->setLinear(true);
+      TRop::tosRGB(tile.getRaster(), settings.m_colorSpaceGamma);
+    }
     return;
   }
 
@@ -438,25 +456,46 @@ void Iwa_GlareFx::doCompute(TTile& tile, double frame,
   kiss_fftnd_cfg plan_fwd  = kiss_fftnd_alloc(dims, ndims, false, 0, 0);
   kiss_fftnd_cfg plan_bkwd = kiss_fftnd_alloc(dims, ndims, true, 0, 0);
 
-  // store the source image to tmp
-  {
-    // obtain the source tile
-    TTile sourceTile;
-    m_source->allocateAndCompute(sourceTile, _rectOut.getP00(), dimOut,
-                                 tile.getRaster(), frame, settings);
+  // obtain the source tile
+  TTile sourceTile;
+  m_source->allocateAndCompute(sourceTile, _rectOut.getP00(), dimOut,
+                               tile.getRaster(), frame, settings);
 
+  if (getFxVersion() >= 3 && !isLinear)
+    TRop::toLinearRGB(sourceTile.getRaster(), settings.m_colorSpaceGamma);
+
+  // store the source image to tmp
+  if (getFxVersion() < 3) {
     if (ras32)
       setSourceTileToBuffer<TRaster32P, TPixel32>(sourceTile.getRaster(),
                                                   kissfft_comp_tmp);
     else if (ras64)
       setSourceTileToBuffer<TRaster64P, TPixel64>(sourceTile.getRaster(),
                                                   kissfft_comp_tmp);
+    else if (rasF)
+      setSourceTileToBuffer<TRasterFP, TPixelF>(sourceTile.getRaster(),
+                                                kissfft_comp_tmp);
+    // FFT the source
+    kiss_fftnd(plan_fwd, kissfft_comp_tmp, kissfft_comp_source);
   }
-  // FFT the source
-  kiss_fftnd(plan_fwd, kissfft_comp_tmp, kissfft_comp_source);
 
   // compute for each rgb channels
   for (int ch = 0; ch < 3; ch++) {
+    // store the source image to tmp for each channel
+    if (getFxVersion() >= 3) {
+      if (ras32)
+        setSourceTileToBuffer<TRaster32P, TPixel32>(sourceTile.getRaster(),
+                                                    kissfft_comp_tmp, ch);
+      else if (ras64)
+        setSourceTileToBuffer<TRaster64P, TPixel64>(sourceTile.getRaster(),
+                                                    kissfft_comp_tmp, ch);
+      else if (rasF)
+        setSourceTileToBuffer<TRasterFP, TPixelF>(sourceTile.getRaster(),
+                                                  kissfft_comp_tmp, ch);
+      // FFT the source
+      kiss_fftnd(plan_fwd, kissfft_comp_tmp, kissfft_comp_source);
+    }
+
     kissfft_comp_tmp_ras->clear();
     // store the glare pattern to tmp
     setGlarePatternToBuffer(glare_pattern, kissfft_comp_tmp, ch, dimIris,
@@ -480,6 +519,14 @@ void Iwa_GlareFx::doCompute(TTile& tile, double frame,
     else if (ras64)
       setChannelToResult<TRaster64P, TPixel64>(ras64, kissfft_comp_tmp, ch,
                                                dimOut);
+    else if (rasF)
+      setChannelToResult<TRasterFP, TPixelF>(rasF, kissfft_comp_tmp, ch,
+                                             dimOut);
+  }
+
+  if (getFxVersion() >= 3 && !isLinear) {
+    tile.getRaster()->setLinear(true);
+    TRop::tosRGB(tile.getRaster(), settings.m_colorSpaceGamma);
   }
 
   kiss_fft_free(plan_fwd);
@@ -517,18 +564,19 @@ void Iwa_GlareFx::powerSpectrum2GlarePattern(
   };
 
   double factor =
-      (m_renderMode->getValue() == RendeMode_FilterPreview) ? -5 : -11;
+      (m_renderMode->getValue() == RenderMode_FilterPreview) ? -5 : -11;
 
   double* glarePattern_p;
   TRasterGR8P glarePattern_ras(dimIris * sizeof(double), dimIris);
   glarePattern_p = (double*)glarePattern_ras->getRawData();
   glarePattern_ras->lock();
   double* g_p = glarePattern_p;
+  double intensityFactor =
+      (getFxVersion() < 3) ? std::exp(intensity + factor) : 1.0;
   for (int j = 0; j < dimIris; j++) {
     for (int i = 0; i < dimIris; i++, g_p++) {
       kiss_fft_cpx sp_p = spectrum[getCoord(i, j, dimIris, dimIris)];
-      (*g_p)            = sqrt(sp_p.r * sp_p.r + sp_p.i * sp_p.i) *
-               std::exp(intensity + factor);
+      (*g_p) = sqrt(sp_p.r * sp_p.r + sp_p.i * sp_p.i) * intensityFactor;
     }
   }
 
@@ -551,7 +599,7 @@ void Iwa_GlareFx::powerSpectrum2GlarePattern(
   // old version had summed each wavelength constantly.
   // it was not physically-collect but keep it in order to maintain backward
   // compatibility.
-  bool isOldVersion = getFxVersion() < 2;
+  bool isVersion1 = getFxVersion() < 2;
 
   // accumurate xyz values for each optical wavelength
   for (int ram = 0; ram < 34; ram++) {
@@ -559,7 +607,7 @@ void Iwa_GlareFx::powerSpectrum2GlarePattern(
     // double scale = 0.55 / rambda;
     double scale = std::pow(0.55 / rambda, aberration);
     double intensity_scale =
-        (isOldVersion) ? 1.0 : std::pow(0.55 / rambda, 2.0 * aberration);
+        (isVersion1) ? 1.0 : std::pow(0.55 / rambda, 2.0 * aberration);
     scale *= irisResizeFactor;
     for (int j = 0; j < dimIris; j++) {
       double j_scaled = (double(j) - irisRadius) * scale + irisRadius;
@@ -578,9 +626,9 @@ void Iwa_GlareFx::powerSpectrum2GlarePattern(
 
         double gl =
             lerpGlarePtn(i_scaled, j_scaled, glarePattern_p) * intensity_scale;
-        g_xyz_p->x += gl * cie_d65[ram] * xyz[ram * 3 + 0];
-        g_xyz_p->y += gl * cie_d65[ram] * xyz[ram * 3 + 1];
-        g_xyz_p->z += gl * cie_d65[ram] * xyz[ram * 3 + 2];
+        g_xyz_p->x += gl * (double)cie_d65[ram] * (double)xyz[ram * 3 + 0];
+        g_xyz_p->y += gl * (double)cie_d65[ram] * (double)xyz[ram * 3 + 1];
+        g_xyz_p->z += gl * (double)cie_d65[ram] * (double)xyz[ram * 3 + 2];
       }
     }
   }
@@ -589,13 +637,36 @@ void Iwa_GlareFx::powerSpectrum2GlarePattern(
   // convert to rgb
   double3* g_xyz_p = glare_xyz;
   double3* g_out_p = glare;
+  double max_g     = 0.;
+  double sum_g     = 0.;
   for (int i = 0; i < dimIris * dimIris; i++, g_xyz_p++, g_out_p++) {
-    (*g_out_p).x = 3.240479f * (*g_xyz_p).x - 1.537150f * (*g_xyz_p).y -
-                   0.498535f * (*g_xyz_p).z;
-    (*g_out_p).y = -0.969256f * (*g_xyz_p).x + 1.875992f * (*g_xyz_p).y +
-                   0.041556f * (*g_xyz_p).z;
-    (*g_out_p).z = 0.055648f * (*g_xyz_p).x - 0.204043f * (*g_xyz_p).y +
-                   1.057311f * (*g_xyz_p).z;
+    (*g_out_p).x = 3.240479 * (*g_xyz_p).x - 1.537150 * (*g_xyz_p).y -
+                   0.498535 * (*g_xyz_p).z;
+    (*g_out_p).y = -0.969256 * (*g_xyz_p).x + 1.875992 * (*g_xyz_p).y +
+                   0.041556 * (*g_xyz_p).z;
+    (*g_out_p).z = 0.055648 * (*g_xyz_p).x - 0.204043 * (*g_xyz_p).y +
+                   1.057311 * (*g_xyz_p).z;
+
+    // get the maximum and sum the green channel
+    if ((*g_out_p).y > max_g) max_g = (*g_out_p).y;
+    sum_g += (*g_out_p).y;
+  }
+
+  if (getFxVersion() >= 3) {
+    double intensityFactor = std::exp(intensity);
+    // normalize with the brightest green channel
+    if (m_renderMode->getValue() == RenderMode_FilterPreview)
+      intensityFactor /= max_g;
+    // normalize with the sum of the intensity
+    else
+      intensityFactor /= sum_g;
+
+    g_out_p = glare;
+    for (int i = 0; i < dimIris * dimIris; i++, g_out_p++) {
+      (*g_out_p).x *= intensityFactor;
+      (*g_out_p).y *= intensityFactor;
+      (*g_out_p).z *= intensityFactor;
+    }
   }
 
   glare_xyz_ras->unlock();
@@ -713,7 +784,8 @@ void Iwa_GlareFx::setFilterPreviewToResult(const RASTER ras, double3* glare,
     if (chan > 1.0) return 1.0;
     return chan;
   };
-  int j = margin.y;
+  bool doClamp = (ras->getPixelSize() != 16);
+  int j        = margin.y;
   for (int out_j = 0; out_j < ras->getLy(); j++, out_j++) {
     if (j < 0)
       continue;
@@ -727,13 +799,19 @@ void Iwa_GlareFx::setFilterPreviewToResult(const RASTER ras, double3* glare,
       else if (i >= dimIris)
         break;
       double3 gl_p = glare[j * dimIris + i];
-      pix->r       = (typename PIXEL::Channel)(clamp01(gl_p.x) *
-                                         double(PIXEL::maxChannelValue));
-      pix->g       = (typename PIXEL::Channel)(clamp01(gl_p.y) *
-                                         double(PIXEL::maxChannelValue));
-      pix->b       = (typename PIXEL::Channel)(clamp01(gl_p.z) *
-                                         double(PIXEL::maxChannelValue));
-      pix->m       = PIXEL::maxChannelValue;
+      if (doClamp) {
+        pix->r = (typename PIXEL::Channel)(clamp01(gl_p.x) *
+                                           double(PIXEL::maxChannelValue));
+        pix->g = (typename PIXEL::Channel)(clamp01(gl_p.y) *
+                                           double(PIXEL::maxChannelValue));
+        pix->b = (typename PIXEL::Channel)(clamp01(gl_p.z) *
+                                           double(PIXEL::maxChannelValue));
+      } else {  // floating point case
+        pix->r = (typename PIXEL::Channel)gl_p.x;
+        pix->g = (typename PIXEL::Channel)gl_p.y;
+        pix->b = (typename PIXEL::Channel)gl_p.z;
+      }
+      pix->m = PIXEL::maxChannelValue;
     }
   }
 }
@@ -755,6 +833,26 @@ void Iwa_GlareFx::setSourceTileToBuffer(const RASTER ras, kiss_fft_cpx* buf) {
   }
 }
 
+// put the source tile's brightness to fft buffer
+template <typename RASTER, typename PIXEL>
+void Iwa_GlareFx::setSourceTileToBuffer(const RASTER ras, kiss_fft_cpx* buf,
+                                        int channel) {
+  kiss_fft_cpx* buf_p = buf;
+  for (int j = 0; j < ras->getLy(); j++) {
+    PIXEL* pix = ras->pixels(j);
+    for (int i = 0; i < ras->getLx(); i++, pix++, buf_p++) {
+      if (channel == 0)
+        (*buf_p).r = float(pix->r) / float(PIXEL::maxChannelValue);
+      else if (channel == 1)
+        (*buf_p).r = float(pix->g) / float(PIXEL::maxChannelValue);
+      else {  // if (channel == 2)
+        (*buf_p).r = float(pix->b) / float(PIXEL::maxChannelValue);
+      }
+      (*buf_p).i = 0.f;
+    }
+  }
+}
+
 //------------------------------------------------
 
 void Iwa_GlareFx::setGlarePatternToBuffer(const double3* glare,
@@ -767,9 +865,9 @@ void Iwa_GlareFx::setGlarePatternToBuffer(const double3* glare,
     const double3* glare_p = &glare[(j - margin_y) * dimIris];
     kiss_fft_cpx* buf_p    = &buf[j * dimOut.lx + margin_x];
     for (int i = margin_x; i < margin_x + dimIris; i++, buf_p++, glare_p++) {
-      (*buf_p).r = (channel == 0)
-                       ? (*glare_p).x
-                       : (channel == 1) ? (*glare_p).y : (*glare_p).z;
+      (*buf_p).r = (channel == 0)   ? (*glare_p).x
+                   : (channel == 1) ? (*glare_p).y
+                                    : (*glare_p).z;
     }
   }
 }
@@ -801,6 +899,8 @@ void Iwa_GlareFx::setChannelToResult(const RASTER ras, kiss_fft_cpx* buf,
   int margin_x = (dimOut.lx - ras->getSize().lx) / 2;
   int margin_y = (dimOut.ly - ras->getSize().ly) / 2;
 
+  bool doClamp = (ras->getPixelSize() != 16);
+
   for (int j = 0; j < ras->getLy(); j++) {
     // kiss_fft_cpx* buf_p = &buf[(j + margin_y)*dimOut.lx + margin_x];
     PIXEL* pix = ras->pixels(j);
@@ -808,16 +908,27 @@ void Iwa_GlareFx::setChannelToResult(const RASTER ras, kiss_fft_cpx* buf,
       kiss_fft_cpx fft_val =
           buf[getCoord(i + margin_x, j + margin_y, dimOut.lx, dimOut.ly)];
       double val = fft_val.r / (dimOut.lx * dimOut.ly);
-      if (channel == 0)
-        pix->r = (typename PIXEL::Channel)(clamp01(val) *
-                                           double(PIXEL::maxChannelValue));
-      else if (channel == 1)
-        pix->g = (typename PIXEL::Channel)(clamp01(val) *
-                                           double(PIXEL::maxChannelValue));
-      else if (channel == 2) {
-        pix->b = (typename PIXEL::Channel)(clamp01(val) *
-                                           double(PIXEL::maxChannelValue));
-        pix->m = PIXEL::maxChannelValue;
+      if (doClamp) {
+        if (channel == 0)
+          pix->r = (typename PIXEL::Channel)(clamp01(val) *
+                                             double(PIXEL::maxChannelValue));
+        else if (channel == 1)
+          pix->g = (typename PIXEL::Channel)(clamp01(val) *
+                                             double(PIXEL::maxChannelValue));
+        else if (channel == 2) {
+          pix->b = (typename PIXEL::Channel)(clamp01(val) *
+                                             double(PIXEL::maxChannelValue));
+          pix->m = PIXEL::maxChannelValue;
+        }
+      } else {  // floating point case
+        if (channel == 0)
+          pix->r = (typename PIXEL::Channel)val;
+        else if (channel == 1)
+          pix->g = (typename PIXEL::Channel)val;
+        else if (channel == 2) {
+          pix->b = (typename PIXEL::Channel)val;
+          pix->m = PIXEL::maxChannelValue;
+        }
       }
     }
   }
@@ -903,6 +1014,8 @@ void Iwa_GlareFx::convertIris(kiss_fft_cpx* kissfft_comp_iris_before,
   }
 }
 
+//------------------------------------------------
+
 void Iwa_GlareFx::getParamUIs(TParamUIConcept*& concepts, int& length) {
   concepts = new TParamUIConcept[length = 2];
 
@@ -913,6 +1026,13 @@ void Iwa_GlareFx::getParamUIs(TParamUIConcept*& concepts, int& length) {
   concepts[1].m_type  = TParamUIConcept::POINT;
   concepts[1].m_label = "Noise Offset";
   concepts[1].m_params.push_back(m_noise_offset);
+}
+
+//------------------------------------------------
+
+bool Iwa_GlareFx::toBeComputedInLinearColorSpace(bool settingsIsLinear,
+                                                 bool tileIsLinear) const {
+  return settingsIsLinear;
 }
 
 FX_PLUGIN_IDENTIFIER(Iwa_GlareFx, "iwa_GlareFx")

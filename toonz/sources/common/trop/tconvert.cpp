@@ -252,9 +252,9 @@ static void do_convert(const TRasterYUV422P &dst, const TRaster32P &src) {
 
     /* limit the chroma */
     if (u1 < -112) u1 = -112;
-    if (u1 > 111) u1  = 111;
+    if (u1 > 111) u1 = 111;
     if (v1 < -112) v1 = -112;
-    if (v1 > 111) v1  = 111;
+    if (v1 > 111) v1 = 111;
 
     /* limit the lum */
     if (y1 > 0x00dbffff) y1 = 0x00dbffff;
@@ -291,17 +291,17 @@ static void do_convert(const TRaster32P &dst, const TRasterYUV422P &src) {
     y2 -= 16;
     in++;
 
-    r                   = 76310 * y1 + 104635 * v;
+    r = 76310 * y1 + 104635 * v;
     if (r > 0xFFFFFF) r = 0xFFFFFF;
-    if (r <= 0xFFFF) r  = 0;
+    if (r <= 0xFFFF) r = 0;
 
-    g                   = 76310 * y1 + -25690 * u + -53294 * v;
+    g = 76310 * y1 + -25690 * u + -53294 * v;
     if (g > 0xFFFFFF) g = 0xFFFFFF;
-    if (g <= 0xFFFF) g  = 0;
+    if (g <= 0xFFFF) g = 0;
 
-    b                   = 76310 * y1 + 132278 * u;
+    b = 76310 * y1 + 132278 * u;
     if (b > 0xFFFFFF) b = 0xFFFFFF;
-    if (b <= 0xFFFF) b  = 0;
+    if (b <= 0xFFFF) b = 0;
 
     buf->r = (UCHAR)(r >> 16);
     buf->g = (UCHAR)(g >> 16);
@@ -309,23 +309,111 @@ static void do_convert(const TRaster32P &dst, const TRasterYUV422P &src) {
     buf->m = (UCHAR)255;
     buf++;
 
-    r                   = 76310 * y2 + 104635 * v;
+    r = 76310 * y2 + 104635 * v;
     if (r > 0xFFFFFF) r = 0xFFFFFF;
-    if (r <= 0xFFFF) r  = 0;
+    if (r <= 0xFFFF) r = 0;
 
-    g                   = 76310 * y2 + -25690 * u + -53294 * v;
+    g = 76310 * y2 + -25690 * u + -53294 * v;
     if (g > 0xFFFFFF) g = 0xFFFFFF;
-    if (g <= 0xFFFF) g  = 0;
+    if (g <= 0xFFFF) g = 0;
 
-    b                   = 76310 * y2 + 132278 * u;
+    b = 76310 * y2 + 132278 * u;
     if (b > 0xFFFFFF) b = 0xFFFFFF;
-    if (b <= 0xFFFF) b  = 0;
+    if (b <= 0xFFFF) b = 0;
 
     buf->r = (UCHAR)(r >> 16);
     buf->g = (UCHAR)(g >> 16);
     buf->b = (UCHAR)(b >> 16);
     buf->m = (UCHAR)255;
     buf++;
+  }
+}
+
+//******************************************************************
+//    Conversion from/to double raster
+//******************************************************************
+
+static void do_convert(const TRasterFP &dst, const TRaster32P &src) {
+  assert(dst->getSize() == src->getSize());
+  int lx = src->getLx();
+  for (int y = 0; y < src->getLy(); y++) {
+    TPixelF *outPix    = dst->pixels(y);
+    TPixel32 *inPix    = src->pixels(y);
+    TPixel32 *inEndPix = inPix + lx;
+    for (; inPix < inEndPix; ++outPix, ++inPix) {
+      outPix->r = (float)inPix->r / (float)TPixel32::maxChannelValue;
+      outPix->g = (float)inPix->g / (float)TPixel32::maxChannelValue;
+      outPix->b = (float)inPix->b / (float)TPixel32::maxChannelValue;
+      outPix->m = (float)inPix->m / (float)TPixel32::maxChannelValue;
+    }
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+static void do_convert(const TRasterFP &dst, const TRaster64P &src) {
+  assert(dst->getSize() == src->getSize());
+  int lx = src->getLx();
+  for (int y = 0; y < src->getLy(); y++) {
+    TPixelF *outPix    = dst->pixels(y);
+    TPixel64 *inPix    = src->pixels(y);
+    TPixel64 *inEndPix = inPix + lx;
+    for (; inPix < inEndPix; ++outPix, ++inPix) {
+      outPix->r = (float)inPix->r / (float)TPixel64::maxChannelValue;
+      outPix->g = (float)inPix->g / (float)TPixel64::maxChannelValue;
+      outPix->b = (float)inPix->b / (float)TPixel64::maxChannelValue;
+      outPix->m = (float)inPix->m / (float)TPixel64::maxChannelValue;
+    }
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+static void do_convert(const TRaster32P &dst, const TRasterFP &src) {
+  auto clamp01 = [](float val) {
+    return (val < 0.f) ? 0.f : (val > 1.f) ? 1.f : val;
+  };
+  assert(dst->getSize() == src->getSize());
+  int lx = src->getLx();
+  for (int y = 0; y < src->getLy(); y++) {
+    TPixel32 *outPix  = dst->pixels(y);
+    TPixelF *inPix    = src->pixels(y);
+    TPixelF *inEndPix = inPix + lx;
+    for (; inPix < inEndPix; ++outPix, ++inPix) {
+      outPix->r = (TPixel32::Channel)(
+          clamp01(inPix->r) * (float)TPixel32::maxChannelValue + 0.5f);
+      outPix->g = (TPixel32::Channel)(
+          clamp01(inPix->g) * (float)TPixel32::maxChannelValue + 0.5f);
+      outPix->b = (TPixel32::Channel)(
+          clamp01(inPix->b) * (float)TPixel32::maxChannelValue + 0.5f);
+      outPix->m = (TPixel32::Channel)(
+          clamp01(inPix->m) * (float)TPixel32::maxChannelValue + 0.5f);
+    }
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+static void do_convert(const TRaster64P &dst, const TRasterFP &src) {
+  auto clamp01 = [](float val) {
+    return (val < 0.f) ? 0.f : (val > 1.f) ? 1.f : val;
+  };
+  assert(dst->getSize() == src->getSize());
+  int lx = src->getLx();
+  for (int y = 0; y < src->getLy(); y++) {
+    TPixel64 *outPix  = dst->pixels(y);
+    TPixelF *inPix    = src->pixels(y);
+    TPixelF *inEndPix = inPix + lx;
+    for (; inPix < inEndPix; ++outPix, ++inPix) {
+      outPix->r = (TPixel64::Channel)(
+          clamp01(inPix->r) * (float)TPixel64::maxChannelValue + 0.5f);
+      outPix->g = (TPixel64::Channel)(
+          clamp01(inPix->g) * (float)TPixel64::maxChannelValue + 0.5f);
+      outPix->b = (TPixel64::Channel)(
+          clamp01(inPix->b) * (float)TPixel64::maxChannelValue + 0.5f);
+      outPix->m = (TPixel64::Channel)(
+          clamp01(inPix->m) * (float)TPixel64::maxChannelValue + 0.5f);
+    }
   }
 }
 
@@ -337,17 +425,19 @@ void TRop::convert(TRasterP dst, const TRasterP &src) {
   if (dst->getSize() != src->getSize())
     throw TRopException("convert: size mismatch");
 
-  TRaster32P dst32   = dst;
-  TRasterGR8P dst8   = dst;
-  TRasterGR16P dst16 = dst;
-  TRaster64P dst64   = dst;
-  TRasterCM32P dstCm = dst;
+  TRaster32P dst32      = dst;
+  TRasterGR8P dst8      = dst;
+  TRasterGR16P dst16    = dst;
+  TRaster64P dst64      = dst;
+  TRasterCM32P dstCm    = dst;
+  TRasterYUV422P dstYUV = dst;
+  TRasterFP dstF        = dst;
 
   TRaster32P src32      = src;
   TRasterGR8P src8      = src;
   TRaster64P src64      = src;
   TRasterYUV422P srcYUV = src;
-  TRasterYUV422P dstYUV = dst;
+  TRasterFP srcF        = src;
 
   src->lock();
   dst->lock();
@@ -372,6 +462,15 @@ void TRop::convert(TRasterP dst, const TRasterP &src) {
     do_convert(dstCm, src32);  //
   else if (dstCm && src8)
     do_convert(dstCm, src8);  //
+  // conversion from/to double
+  else if (dstF && src32)
+    do_convert(dstF, src32);
+  else if (dstF && src64)
+    do_convert(dstF, src64);
+  else if (dst32 && srcF)
+    do_convert(dst32, srcF);
+  else if (dst64 && srcF)
+    do_convert(dst64, srcF);
   else {
     dst->unlock();
     src->unlock();
@@ -379,6 +478,7 @@ void TRop::convert(TRasterP dst, const TRasterP &src) {
     throw TRopException("unsupported pixel type");
   }
 
+  dst->setLinear(src->isLinear());
   dst->unlock();
   src->unlock();
 }

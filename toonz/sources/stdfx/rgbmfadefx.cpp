@@ -21,6 +21,8 @@ public:
     m_intensity->setValueRange(0, 100);
     addInputPort("Source", m_input);
     m_color->enableMatte(false);
+
+    enableComputeInFloat(true);
   }
   ~RGBMFadeFx(){};
 
@@ -67,6 +69,25 @@ pix->m=(UCHAR)(pix->m+intensity*(col.m-pix->m));*/
   }
   ras->unlock();
 }
+
+template <>
+void doRGBMFade(TRasterFP &ras, const TPixelF &col, double intensity) {
+  int j;
+  ras->lock();
+  for (j = 0; j < ras->getLy(); j++) {
+    TPixelF *pix    = ras->pixels(j);
+    TPixelF *endPix = pix + ras->getLx();
+    while (pix < endPix) {
+      double factor = pix->m;
+      pix->r        = pix->r + intensity * (col.r * factor - pix->r);
+      pix->g        = pix->g + intensity * (col.g * factor - pix->g);
+      pix->b        = pix->b + intensity * (col.b * factor - pix->b);
+      ++pix;
+    }
+  }
+  ras->unlock();
+}
+
 //------------------------------------------------------------------------------
 
 void RGBMFadeFx::doCompute(TTile &tile, double frame,
@@ -80,16 +101,17 @@ void RGBMFadeFx::doCompute(TTile &tile, double frame,
   double intensity = tcrop(m_intensity->getValue(frame), min, max) / 100;
 
   TRaster32P raster32 = tile.getRaster();
+  TRaster64P raster64 = tile.getRaster();
+  TRasterFP rasterF   = tile.getRaster();
 
   if (raster32)
     doRGBMFade<TPixel32>(raster32, col, intensity);
-  else {
-    TRaster64P raster64 = tile.getRaster();
-    if (raster64)
-      doRGBMFade<TPixel64>(raster64, toPixel64(col), intensity);
-    else
-      throw TException("RGBAFadeFx: unsupported Pixel Type");
-  }
+  else if (raster64)
+    doRGBMFade<TPixel64>(raster64, toPixel64(col), intensity);
+  else if (rasterF)
+    doRGBMFade<TPixelF>(rasterF, toPixelF(col), intensity);
+  else
+    throw TException("RGBAFadeFx: unsupported Pixel Type");
 }
 
 FX_PLUGIN_IDENTIFIER(RGBMFadeFx, "rgbmFadeFx");

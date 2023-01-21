@@ -20,7 +20,6 @@ distributed with a 3-clause BSD-style license.
 #include <QList>
 #include <QThread>
 
-#include "tools/kiss_fftnd.h"
 #include "iwa_bokeh_util.h"
 
 const int LAYER_NUM = 5;
@@ -50,6 +49,8 @@ public:
 
   void doCompute(TTile &tile, double frame,
                  const TRenderSettings &settings) override;
+
+  void onFxVersionSet() final override;
 };
 
 #endif

@@ -14,7 +14,7 @@
 
 namespace {
 inline double dist(const TPointD &a, const TPointD &b) { return norm(b - a); }
-}
+}  // namespace
 
 //========================================================================================
 
@@ -27,11 +27,12 @@ typedef struct {
 //---------------------------------------------------------------------------------
 
 TPixelCM32 filterPixel(const TPointD &pos, const TRasterCM32P &rasIn) {
-  TPointD distance = TPointD(
-      areAlmostEqual(pos.x, tfloor(pos.x), 0.001) ? 0.0
-                                                  : fabs(pos.x - tfloor(pos.x)),
-      areAlmostEqual(pos.y, tfloor(pos.y), 0.001) ? 0.0 : fabs(pos.y -
-                                                               tfloor(pos.y)));
+  TPointD distance = TPointD(areAlmostEqual(pos.x, tfloor(pos.x), 0.001)
+                                 ? 0.0
+                                 : fabs(pos.x - tfloor(pos.x)),
+                             areAlmostEqual(pos.y, tfloor(pos.y), 0.001)
+                                 ? 0.0
+                                 : fabs(pos.y - tfloor(pos.y)));
   TPoint nearPos(tfloor(pos.x), tfloor(pos.y));
   if (distance == TPointD(0.0, 0.0)) {
     if (nearPos.x >= 0 && nearPos.x < rasIn->getLx() && nearPos.y >= 0 &&
@@ -45,7 +46,7 @@ TPixelCM32 filterPixel(const TPointD &pos, const TRasterCM32P &rasIn) {
   TPixelCM32 P[4];
 
   for (j = 0; j < 2; ++j)
-    for (i         = 0; i < 2; ++i)
+    for (i = 0; i < 2; ++i)
       P[i + 2 * j] = nearPos.x + i < rasIn->getLx() && nearPos.x + i >= 0 &&
                              nearPos.y + j < rasIn->getLy() &&
                              nearPos.y + j >= 0
@@ -56,7 +57,7 @@ TPixelCM32 filterPixel(const TPointD &pos, const TRasterCM32P &rasIn) {
 
   double w[4], sum = 0;
   for (j = 1; j >= 0; --j)
-    for (i          = 1; i >= 0; --i)
+    for (i = 1; i >= 0; --i)
       sum += w[k++] = fabs(distance.x - i) * fabs(distance.y - j);
 
   for (i = 0; i < 4; i++) w[i] /= sum;
@@ -339,7 +340,7 @@ PIXEL filterPixel(double a, double b, double c, double d,
 
   int xEnd = tceil(x1);
   for (int x = tfloor(x0); x < xEnd; ++x)
-    temp[x]  = filterPixel<PIXEL, CHANNEL_TYPE>(
+    temp[x] = filterPixel<PIXEL, CHANNEL_TYPE>(
         c, d, rasIn->pixels(0) + x, rasIn->getLy(), rasIn->getWrap());
 
   // Then, filter temp
@@ -375,7 +376,7 @@ void resample(const TRasterPT<T> &rasIn, TRasterPT<T> &rasOut,
   {
     TPointD *currOldInv = invs[0].get();
     int *oldCounts      = counts[0].get();
-    for (int x     = 0; x <= rasOut->getLx(); currOldInv += invsCount, ++x)
+    for (int x = 0; x <= rasOut->getLx(); currOldInv += invsCount, ++x)
       oldCounts[x] = distorter.invMap(shift + TPointD(x, 0.0), currOldInv);
   }
 
@@ -429,15 +430,19 @@ void distort(TRasterP &outRas, const TRasterP &inRas,
   TRaster32P inRas32      = inRas;
   TRaster64P inRas64      = inRas;
   TRasterCM32P inRasCM32  = inRas;
+  TRasterFP inRasF        = inRas;
   TRaster32P outRas32     = outRas;
   TRaster64P outRas64     = outRas;
   TRasterCM32P outRasCM32 = outRas;
+  TRasterFP outRasF       = outRas;
 
   if (filter == TRop::Bilinear) {
     if (inRas32)
       ::resample<TPixel32, UCHAR>(inRas32, outRas32, distorter, dstPos);
     else if (inRas64)
       ::resample<TPixel64, USHORT>(inRas64, outRas64, distorter, dstPos);
+    else if (inRasF)
+      ::resample<TPixelF, float>(inRasF, outRasF, distorter, dstPos);
     else if (inRasCM32 && outRasCM32)
       ::resample(inRasCM32, outRasCM32, distorter, dstPos);
     else
@@ -449,6 +454,9 @@ void distort(TRasterP &outRas, const TRasterP &inRas,
     else if (inRas64)
       ::resampleClosestPixel<TPixel64, USHORT>(inRas64, outRas64, distorter,
                                                dstPos);
+    else if (inRasF)
+      ::resampleClosestPixel<TPixelF, float>(inRasF, outRasF, distorter,
+                                             dstPos);
     else if (inRasCM32 && outRasCM32)
       ::resampleClosestPixel(inRasCM32, outRasCM32, distorter, dstPos);
     else
@@ -592,7 +600,7 @@ TPointD BilinearDistorter::map(const TPointD &p) const {
 
 inline int BilinearDistorter::invMap(const TPointD &p, TPointD *results) const {
   int returnCount = m_refToDest.invMap(p, results);
-  for (int i   = 0; i < returnCount; ++i)
+  for (int i = 0; i < returnCount; ++i)
     results[i] = m_refToSource.map(results[i]);
   return returnCount;
 }
@@ -1064,20 +1072,21 @@ TRectD PerspectiveDistorter::invMap(const TRectD &rect) const {
 
   // If some maxD remain, no bound on that side was found. So replace with
   // the opposite (unlimited on that side) maxD.
-  if (positiveResult.x0 == maxD) positiveResult.x0  = -maxD;
+  if (positiveResult.x0 == maxD) positiveResult.x0 = -maxD;
   if (positiveResult.x1 == -maxD) positiveResult.x1 = maxD;
-  if (positiveResult.y0 == maxD) positiveResult.y0  = -maxD;
+  if (positiveResult.y0 == maxD) positiveResult.y0 = -maxD;
   if (positiveResult.y1 == -maxD) positiveResult.y1 = maxD;
 
-  if (negativeResult.x0 == maxD) negativeResult.x0  = -maxD;
+  if (negativeResult.x0 == maxD) negativeResult.x0 = -maxD;
   if (negativeResult.x1 == -maxD) negativeResult.x1 = maxD;
-  if (negativeResult.y0 == maxD) negativeResult.y0  = -maxD;
+  if (negativeResult.y0 == maxD) negativeResult.y0 = -maxD;
   if (negativeResult.y1 == -maxD) negativeResult.y1 = maxD;
 
-  return hasPositiveResults
-             ? hasNegativeResults ? positiveResult + negativeResult
-                                  : positiveResult
-             : hasNegativeResults ? negativeResult : TConsts::infiniteRectD;
+  return hasPositiveResults   ? hasNegativeResults
+                                    ? positiveResult + negativeResult
+                                    : positiveResult
+         : hasNegativeResults ? negativeResult
+                              : TConsts::infiniteRectD;
 }
 
 //=================================================================================

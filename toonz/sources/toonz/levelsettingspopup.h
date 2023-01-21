@@ -30,20 +30,22 @@ class CheckBox;
 }  // namespace DVGui
 
 enum SelectedLevelType {
-  None        = 0x0,
-  ToonzRaster = 0x1,
-  Raster      = 0x2,
-  Mesh        = 0x4,
-  ToonzVector = 0x8,
-  Palette     = 0x10,
-  SubXsheet   = 0x20,
-  Sound       = 0x40,
-  Others      = 0x80,
+  None            = 0x0,
+  ToonzRaster     = 0x1,
+  NonLinearRaster = 0x2,
+  Mesh            = 0x4,
+  ToonzVector     = 0x8,
+  Palette         = 0x10,
+  SubXsheet       = 0x20,
+  Sound           = 0x40,
+  LinearRaster = 0x80,  // EXR files only enables the "Color Space Gamma" field
+  Others       = 0x100,
 
-  MultiSelection  = 0x100,
-  HideOnPixelMode = 0x200,
-  NoSelection     = 0x400,
+  MultiSelection  = 0x1000,
+  HideOnPixelMode = 0x2000,
+  NoSelection     = 0x4000,
 
+  Raster      = NonLinearRaster | LinearRaster,
   SimpleLevel = ToonzRaster | Raster | Mesh | ToonzVector,
   HasDPILevel = ToonzRaster | Raster | Mesh,
   AllTypes    = SimpleLevel | Palette | SubXsheet | Sound
@@ -55,7 +57,7 @@ struct LevelSettingsValues {
   TPointD dpi               = TPointD(0, 0);
   Qt::CheckState doPremulti = Qt::Unchecked, whiteTransp = Qt::Unchecked,
                  doAntialias = Qt::Unchecked, isDirty = Qt::Unchecked;
-  double width = 0.0, height = 0.0;
+  double width = 0.0, height = 0.0, colorSpaceGamma = -1.0;
 };
 
 //=============================================================================
@@ -90,6 +92,9 @@ class LevelSettingsPopup final : public DVGui::Dialog {
   QLabel *m_subsamplingLabel;
   DVGui::IntLineEdit *m_subsamplingFld;
 
+  QLabel *m_colorSpaceGammaLabel;
+  DVGui::DoubleLineEdit *m_colorSpaceGammaFld;
+
   SelectedLevelType getType(TXshLevelP);
   LevelSettingsValues getValues(TXshLevelP);
 
@@ -119,6 +124,7 @@ protected slots:
   void onDoAntialiasClicked();
   void onAntialiasSoftnessChanged();
   void onWhiteTranspClicked();
+  void onColorSpaceGammaFieldChanged();
   void onSceneChanged();
   void onPreferenceChanged(const QString &);
 };

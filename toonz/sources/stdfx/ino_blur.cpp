@@ -30,6 +30,8 @@ public:
     this->m_ref_mode->addItem(3, "Alpha");
     this->m_ref_mode->addItem(4, "Luminance");
     this->m_ref_mode->addItem(-1, "Nothing");
+
+    enableComputeInFloat(true);
   }
   //------------------------------------------------------------
   double get_render_real_radius(const double frame, const TAffine affine) {
@@ -102,54 +104,50 @@ void fx_(const TRasterP in_ras  // with margin
          ,
          const TRasterP refer_ras, const int refer_mode, const int int_radius,
          const double real_radius) {
-  TRasterGR8P out_buffer(out_ras->getLy(),
-                         out_ras->getLx() * ino::channels() *
-                             ((TRaster64P)in_ras ? sizeof(unsigned short)
-                                                 : sizeof(unsigned char)));
+  TRasterGR8P ref_gr8;
+  if ((refer_ras != nullptr) && (0 <= refer_mode)) {
+    ref_gr8 = TRasterGR8P(in_ras->getLy(), in_ras->getLx() * sizeof(float));
+    ref_gr8->lock();
+    ino::ras_to_ref_float_arr(refer_ras,
+                              reinterpret_cast<float *>(ref_gr8->getRawData()),
+                              refer_mode);
+  }
+
   const int buffer_bytes = igs::gaussian_blur_hv::buffer_bytes(
       in_ras->getLy(), in_ras->getLx(), int_radius);
   TRasterGR8P cvt_buffer(buffer_bytes, 1);
-  out_buffer->lock();
   cvt_buffer->lock();
+
+  TRasterGR8P in_gr8(in_ras->getLy(),
+                     in_ras->getLx() * ino::channels() * sizeof(float));
+  in_gr8->lock();
+  ino::ras_to_float_arr(in_ras, ino::channels(),
+                        reinterpret_cast<float *>(in_gr8->getRawData()));
+
+  TRasterGR8P out_buffer(out_ras->getLy(),
+                         out_ras->getLx() * ino::channels() * sizeof(float));
+  out_buffer->lock();
   igs::gaussian_blur_hv::convert(
-      in_ras->getRawData()  // const void *in_with_margin (BGRA)
-      ,
-      out_buffer->getRawData()  // void *out_no_margin (BGRA)
-
-      ,
-      in_ras->getLy()  // const int height_with_margin
-      ,
-      in_ras->getLx()  // const int width_with_margin
-      ,
-      ino::channels()  // const int channels
-      ,
-      ino::bits(in_ras)  // const int bits
-
-      ,
-      (((refer_ras != nullptr) && (0 <= refer_mode))
-           ? refer_ras->getRawData()
-           : nullptr)  // BGRA // const unsigned char *ref
-      ,
-      (((refer_ras != nullptr) && (0 <= refer_mode)) ? ino::bits(refer_ras)
-                                                     : 0)  // const int ref_bits
-      ,
-      refer_mode  // const int refer_mode
-
-      ,
-      cvt_buffer->getRawData()  // void *buffer
-      ,
-      buffer_bytes  // int buffer_bytes
-
-      ,
-      int_radius  // const int int_radius
-      ,
-      real_radius  // const double real_radius // , 0.25
-      );
-  ino::arr_to_ras(out_buffer->getRawData(), ino::channels(), out_ras, 0);
-  cvt_buffer->unlock();
+      reinterpret_cast<float *>(
+          in_gr8->getRawData()),  // const void *in_with_margin (BGRA)
+      reinterpret_cast<float *>(
+          out_buffer->getRawData()),  // void *out_no_margin (BGRA)
+      in_ras->getLy(),                // const int height_with_margin
+      in_ras->getLx(),                // const int width_with_margin
+      ino::channels(),                // const int channels
+      (ref_gr8) ? reinterpret_cast<float *>(ref_gr8->getRawData()) : nullptr,
+      cvt_buffer->getRawData(),  // void *buffer
+      buffer_bytes,              // int buffer_bytes
+      int_radius,                // const int int_radius
+      real_radius                // const double real_radius // , 0.25
+  );
+  in_gr8->unlock();
+  ino::float_arr_to_ras(out_buffer->getRawData(), ino::channels(), out_ras, 0);
   out_buffer->unlock();
+  cvt_buffer->unlock();
+  if (ref_gr8) ref_gr8->unlock();
 }
-}
+}  // namespace
 //------------------------------------------------------------
 void ino_blur::doCompute(TTile &tile, double frame,
                          const TRenderSettings &rend_sets) {
@@ -159,7 +157,8 @@ void ino_blur::doCompute(TTile &tile, double frame,
     return;
   }
   /*------ サポートしていないPixelタイプはエラーを投げる -----*/
-  if (!((TRaster32P)tile.getRaster()) && !((TRaster64P)tile.getRaster())) {
+  if (!((TRaster32P)tile.getRaster()) && !((TRaster64P)tile.getRaster()) &&
+      !((TRasterFP)tile.getRaster())) {
     throw TRopException("unsupported input pixel type");
   }
   /*------ ボケ足長さの実際の長さをえる ----------------------*/

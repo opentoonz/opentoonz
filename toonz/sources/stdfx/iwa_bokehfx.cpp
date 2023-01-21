@@ -50,6 +50,9 @@ Iwa_BokehFx::Iwa_BokehFx() {
   bindParam(this, "on_focus_distance", m_onFocusDistance, false);
   bindParam(this, "bokeh_amount", m_bokehAmount, false);
   bindParam(this, "hardness", m_hardness, false);
+  bindParam(this, "gamma", m_gamma, false);
+  bindParam(this, "gammaAdjust", m_gammaAdjust, false);
+  bindParam(this, "linearizeMode", m_linearizeMode, false);
 
   // Bind the layer parameters
   for (int layer = 0; layer < LAYER_NUM; layer++) {
@@ -70,7 +73,40 @@ Iwa_BokehFx::Iwa_BokehFx() {
     m_layerParams[layer].m_distance->setValueRange(0.0, 1.0);
     m_layerParams[layer].m_bokehAdjustment->setValueRange(0.0, 2.0);
   }
+
+  enableComputeInFloat(true);
+
+  // Version 1: Exposure is computed by using Hardness
+  //            E = std::pow(10.0, (value - 0.5) / hardness)
+  // Version 2: Exposure can also be computed by using Gamma, for easier
+  // combination with the linear color space
+  //            E = std::pow(value, gamma)
+  // this must be called after binding the parameters (see onFxVersionSet())
+  // Version 3: Gamma is computed by rs.m_colorSpaceGamma + gammaAdjust
+  setFxVersion(3);
 }
+
+//--------------------------------------------
+
+void Iwa_BokehFx::onFxVersionSet() {
+  bool useGamma = getFxVersion() == 2;
+  if (getFxVersion() == 1) {
+    m_linearizeMode->setValue(Hardness);
+    setFxVersion(3);
+  } else if (getFxVersion() == 2) {
+    // Automatically update version
+    if (m_linearizeMode->getValue() == Hardness ||
+        (m_gamma->getKeyframeCount() == 0 &&
+         areAlmostEqual(m_gamma->getDefaultValue(), 2.2))) {
+      useGamma = false;
+      setFxVersion(3);
+    }
+  }
+  getParams()->getParamVar("gamma")->setIsHidden(!useGamma);
+  getParams()->getParamVar("gammaAdjust")->setIsHidden(useGamma);
+}
+
+//--------------------------------------------
 
 void Iwa_BokehFx::doCompute(TTile& tile, double frame,
                             const TRenderSettings& settings) {
@@ -136,12 +172,11 @@ void Iwa_BokehFx::doCompute(TTile& tile, double frame,
   //----------------------------
   // Compute the input tiles first
   QMap<int, TTile*> sourceTiles;
-  TRenderSettings infoOnInput(settings);
-  infoOnInput.m_bpp = 64;
   for (auto index : sourceIndices) {
     TTile* layerTile = new TTile();
     m_layerParams[index].m_source->allocateAndCompute(
-        *layerTile, _rectOut.getP00(), dimOut, 0, frame, infoOnInput);
+        *layerTile, _rectOut.getP00(), dimOut, tile.getRaster(), frame,
+        settings);
     sourceTiles[index] = layerTile;
   }
 
@@ -156,19 +191,29 @@ void Iwa_BokehFx::doCompute(TTile& tile, double frame,
                  static_cast<int>(irisBBox.getLy() + 0.5)),
       tile.getRaster(), frame, settings);
 
-  double masterHardness = m_hardness->getValue(frame);
+  double masterGamma;
+  if (m_linearizeMode->getValue() == Hardness)
+    masterGamma = m_hardness->getValue(frame);
+  else {  // Gamma
+    if (getFxVersion() == 2)
+      masterGamma = m_gamma->getValue(frame);
+    else
+      masterGamma = std::max(
+          1., settings.m_colorSpaceGamma + m_gammaAdjust->getValue(frame));
+    if (tile.getRaster()->isLinear()) masterGamma /= settings.m_colorSpaceGamma;
+  }
 
   QMap<int, unsigned char*> ctrls;
 
   QList<LayerValue> layerValues;
   for (auto index : sourceIndices) {
     LayerValue layerValue;
-    layerValue.sourceTile    = sourceTiles[index];
-    layerValue.premultiply   = m_layerParams[index].m_premultiply->getValue();
-    layerValue.layerHardness = masterHardness;
-    layerValue.depth_ref     = 0;
-    layerValue.irisSize      = irisSizes.value(index);
-    layerValue.distance      = m_layerParams[index].m_distance->getValue(frame);
+    layerValue.sourceTile  = sourceTiles[index];
+    layerValue.premultiply = m_layerParams[index].m_premultiply->getValue();
+    layerValue.layerGamma  = masterGamma;
+    layerValue.depth_ref   = 0;
+    layerValue.irisSize    = irisSizes.value(index);
+    layerValue.distance    = m_layerParams[index].m_distance->getValue(frame);
     layerValue.bokehAdjustment =
         m_layerParams[index].m_bokehAdjustment->getValue(frame);
     layerValues.append(layerValue);

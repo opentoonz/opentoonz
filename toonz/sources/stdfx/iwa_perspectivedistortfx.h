@@ -14,7 +14,15 @@
 #include "tparamset.h"
 
 struct float4 {
-  float x, y, z, w;
+#if defined(TNZ_MACHINE_CHANNEL_ORDER_BGRM)
+  float z, y, x, w;
+#elif defined(TNZ_MACHINE_CHANNEL_ORDER_MBGR)
+  float w, x, y, x;
+#elif defined(TNZ_MACHINE_CHANNEL_ORDER_RGBM)
+  float x, y, x, w;
+#elif defined(TNZ_MACHINE_CHANNEL_ORDER_MRGB)
+  float w, x, y, z;
+#endif
 };
 
 class Iwa_PerspectiveDistortFx final : public TStandardRasterFx {
@@ -55,6 +63,9 @@ public:
                      const double offs);
 
   void getParamUIs(TParamUIConcept *&concepts, int &length) override;
+
+  bool toBeComputedInLinearColorSpace(bool settingsIsLinear,
+                                      bool tileIsLinear) const override;
 };
 
 #endif

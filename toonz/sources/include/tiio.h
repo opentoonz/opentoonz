@@ -52,8 +52,10 @@ public:
 
   void readLine(char *buffer) { readLine(buffer, 0, m_info.m_lx - 1, 1); }
   void readLine(short *buffer) { readLine(buffer, 0, m_info.m_lx - 1, 1); }
+  void readLine(float *buffer) { readLine(buffer, 0, m_info.m_lx - 1, 1); }
   virtual void readLine(char *buffer, int x0, int x1, int shrink) = 0;
   virtual void readLine(short *, int, int, int) { assert(false); }
+  virtual void readLine(float *, int, int, int) { assert(false); }
   // Returns skipped lines number.
   // If not implemented returns 0;
   virtual int skipLines(int lineCount) = 0;
@@ -71,6 +73,10 @@ public:
       std::map<int, std::pair<std::string, std::string>> &pltColorNames) const {
     assert(false);
   }
+
+  // gamma value to be used for converting linear-based image file to nonlinear
+  // raster. Curretly only used in EXR images.
+  virtual void setColorSpaceGamma(const double) {}
 
 private:
   // not implemented
@@ -101,12 +107,15 @@ public:
 
   virtual void writeLine(char *buffer) = 0;
   virtual void writeLine(short *) { assert(false); }
+  virtual void writeLine(float *) { assert(false); }
 
   virtual void flush() {}
 
   virtual RowOrder getRowOrder() const { return BOTTOM2TOP; }
   virtual bool write64bitSupported() const { return false; }
   virtual bool writeAlphaSupported() const { return true; }
+  // only true in EXR format
+  virtual bool writeInLinearColorSpace() const { return false; }
 
   void setProperties(TPropertyGroup *properties);
 
@@ -178,6 +187,6 @@ DVAPI void updateFileWritersPropertiesTranslation();
 
 //-------------------------------------------------------------------
 
-}  // namespace
+}  // namespace Tiio
 
 #endif

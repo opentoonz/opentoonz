@@ -117,6 +117,9 @@ public:
               //! data
   //!  must be accompanied by a tile of the suitable type. \sa
   //!  TRasterFx::compute().
+
+  bool m_linearColorSpace;  // compute in linear color space (gamma 2.2)
+
   int m_maxTileSize;  //!< Maximum size (in MegaBytes) of a tile cachable during
                       //! a render process.
   //!  Used by the predictive cache manager to subdivide an fx calculation into
@@ -161,6 +164,8 @@ public:
   // for offscreen rendering to be done in non-GUI thread.
   // For now it is used only in the plasticDeformerFx.
   std::shared_ptr<QOffscreenSurface> m_offScreenSurface;
+
+  double m_colorSpaceGamma;
 
 public:
   TRenderSettings();
@@ -273,6 +278,13 @@ public:
   void enableCache(bool on);
   bool isCacheEnabled() const;
 
+  void enableComputeInFloat(bool on);
+  bool canComputeInFloat() const;
+  virtual bool toBeComputedInLinearColorSpace(bool settingsIsLinear,
+                                              bool tileIsLinear) const {
+    return false;
+  }
+
   // resituisce una stringa che identifica univocamente il sottoalbero
   // avente come radice l'effetto
   std::string getAlias(double frame,
@@ -355,6 +367,9 @@ public:
   void transform(double frame, int port, const TRectD &rectOnOutput,
                  const TRenderSettings &infoOnOutput, TRectD &rectOnInput,
                  TRenderSettings &infoOnInput) override;
+
+  bool toBeComputedInLinearColorSpace(bool settingsIsLinear,
+                                      bool tileIsLinear) const override;
 };
 
 //-------------------------------------------------------------------

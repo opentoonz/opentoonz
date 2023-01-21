@@ -8,13 +8,26 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: Remove symlinks
+      run: |
+        # remove existing symlinks before installing python@3.10 and 3.11
+        rm /usr/local/bin/2to3
+        rm /usr/local/bin/idle3
+        rm /usr/local/bin/pydoc3
+        rm /usr/local/bin/python3
+        rm /usr/local/bin/python3-config
+        rm /usr/local/bin/2to3-3.11
+        rm /usr/local/bin/idle3.11
+        rm /usr/local/bin/pydoc3.11
+        rm /usr/local/bin/python3.11
+        rm /usr/local/bin/python3.11-config
+
     - name: Install libraries
       run: |
         checkPkgAndInstall()
         {
           while [ $# -ne 0 ]
           do
-            rm -f '/usr/local/bin/2to3'
             if brew ls --versions $1 ; then
               brew upgrade $1
             else
@@ -22,7 +35,7 @@ jobs:
             fi
             shift
           done
-        }
+        }        
         brew update
         checkPkgAndInstall pkg-config glew lz4 libjpeg libpng lzo qt@5 boost libusb libmypaint ccache jpeg-turbo ninja
         checkPkgAndInstall opencv

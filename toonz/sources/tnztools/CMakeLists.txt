@@ -9,6 +9,8 @@ set(MOC_HEADERS
     tooloptionscontrols.h
     toonzrasterbrushtool.h
     viewtools.h
+    selectiontool.h
+    edittool.h
     controlpointeditortool.h
     ../include/tools/imagegrouping.h
     ../include/tools/screenpicker.h
@@ -25,7 +27,6 @@ set(HEADERS
     rasterselectiontool.h
     rgbpickertool.h
     rulertool.h
-    selectiontool.h
     setsaveboxtool.h
     shifttracetool.h
     stylepickertool.h

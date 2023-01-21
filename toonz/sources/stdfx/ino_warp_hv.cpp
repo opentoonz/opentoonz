@@ -4,6 +4,7 @@
 
 #include "ino_common.h"
 #include "igs_warp.h"
+#include "trop.h"
 //------------------------------------------------------------
 class ino_warp_hv final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(ino_warp_hv)
@@ -51,6 +52,8 @@ public:
     this->m_v_ref_mode->addItem(1, "Green");
     this->m_v_ref_mode->addItem(0, "Blue");
     this->m_v_ref_mode->addItem(3, "Alpha");
+
+    enableComputeInFloat(true);
   }
   void get_render_real_hv(const double frame, const TAffine affine,
                           double &h_maxlen, double &v_maxlen) {
@@ -114,7 +117,7 @@ template <class T>
 void data_set_template_(const TRasterPT<T> in_ras  // with margin
                         ,
                         const int margin, TRasterPT<T> out_ras  // no margin
-                        ) {
+) {
   for (int yy = 0; yy < out_ras->getLy(); ++yy) {
     const T *in_ras_sl = in_ras->pixels(yy + margin);
     T *out_ras_sl      = out_ras->pixels(yy);
@@ -138,60 +141,87 @@ void fx_(TRasterP in_ras  // with margin
          const double h_maxlen, const double v_maxlen, const int h_ref_mode,
          const int v_ref_mode, const bool alpha_rendering_sw,
          const bool anti_aliasing_sw) {
-  if (0 != hori_ras) {
-    const int bits = ino::bits(hori_ras);
-    igs::warp::hori_change(in_ras->getRawData()  // BGRA
-                           ,
-                           in_ras->getLy(), in_ras->getLx(), ino::channels(),
-                           ino::bits(in_ras)
+  if (in_ras->getPixelSize() == 4 || in_ras->getPixelSize() == 8) {
+    TRasterGR8P in_gr8(in_ras->getLy(),
+                       in_ras->getLx() * ino::channels() * sizeof(float));
+    in_gr8->lock();
+    ino::ras_to_float_arr(in_ras, ino::channels(),
+                          reinterpret_cast<float *>(in_gr8->getRawData()));
 
-                               ,
-                           hori_ras->getRawData()  // BGRA
-                           ,
-                           ino::channels()
-                           //, 2 // order is "bgra", then r is 2.
-                           ,
-                           h_ref_mode, bits
+    if (0 != hori_ras) {
+      TRasterGR8P hori_gr8(hori_ras->getLy(),
+                           hori_ras->getLx() * ino::channels() * sizeof(float));
+      hori_gr8->lock();
+      ino::ras_to_float_arr(hori_ras, ino::channels(),
+                            reinterpret_cast<float *>(hori_gr8->getRawData()));
 
-                           ,
-                           (double)(1 << (bits - 1)) / ((1 << bits) - 1)
-                           // , h_maxlen
-                           ,
-                           -h_maxlen /* 移動方向と参照方向は逆 */
-                               * (double)((1 << bits) - 1) / (1 << (bits - 1)),
-                           alpha_rendering_sw, anti_aliasing_sw);
+      igs::warp::hori_change(
+          reinterpret_cast<float *>(in_gr8->getRawData()),  // BGRA
+          in_ras->getLy(), in_ras->getLx(), ino::channels(),
+          reinterpret_cast<float *>(hori_gr8->getRawData()),  // BGRA
+          ino::channels(), h_ref_mode,
+          -h_maxlen /* 移動方向と参照方向は逆 */
+              * 2.0,
+          alpha_rendering_sw, anti_aliasing_sw);
+      hori_gr8->unlock();
+    }
+    if (0 != vert_ras) {
+      TRasterGR8P vert_gr8(vert_ras->getLy(),
+                           vert_ras->getLx() * ino::channels() * sizeof(float));
+      vert_gr8->lock();
+      ino::ras_to_float_arr(vert_ras, ino::channels(),
+                            reinterpret_cast<float *>(vert_gr8->getRawData()));
+
+      igs::warp::vert_change(
+          reinterpret_cast<float *>(in_gr8->getRawData()),  // BGRA
+          in_ras->getLy(), in_ras->getLx(), ino::channels(),
+          reinterpret_cast<float *>(vert_gr8->getRawData()),  // BGRA
+          ino::channels(), v_ref_mode,
+          -v_maxlen /* 移動方向と参照方向は逆 */
+              * 2.0,
+          alpha_rendering_sw, anti_aliasing_sw);
+      vert_gr8->unlock();
+    }
+
+    in_gr8->unlock();
+    ino::float_arr_to_ras(in_gr8->getRawData(), ino::channels(), out_ras,
+                          margin);
+  } else if (in_ras->getPixelSize() == 16) {
+    if (0 != hori_ras) {
+      igs::warp::hori_change(
+          reinterpret_cast<float *>(in_ras->getRawData()),  // BGRA
+          in_ras->getLy(), in_ras->getLx(), ino::channels(),
+          reinterpret_cast<float *>(hori_ras->getRawData()),  // BGRA
+          ino::channels(), h_ref_mode,
+          -h_maxlen /* 移動方向と参照方向は逆 */
+              * 2.0,
+          alpha_rendering_sw, anti_aliasing_sw);
+    }
+    if (0 != vert_ras) {
+      igs::warp::vert_change(
+          reinterpret_cast<float *>(in_ras->getRawData()),  // BGRA
+          in_ras->getLy(), in_ras->getLx(), ino::channels(),
+          reinterpret_cast<float *>(vert_ras->getRawData()),  // BGRA
+          ino::channels(), v_ref_mode,
+          -v_maxlen /* 移動方向と参照方向は逆 */
+              * 2.0,
+          alpha_rendering_sw, anti_aliasing_sw);
+    }
+    data_set_template_<TPixelF>(in_ras, margin, out_ras);
+  } else {
+    throw TRopException("unsupported input pixel type");
   }
-  if (0 != vert_ras) {
-    const int bits = ino::bits(vert_ras);
-    igs::warp::vert_change(in_ras->getRawData()  // BGRA
-                           ,
-                           in_ras->getLy(), in_ras->getLx(), ino::channels(),
-                           ino::bits(in_ras)
 
-                               ,
-                           vert_ras->getRawData()  // BGRA
-                           ,
-                           ino::channels()
-                           //, 2 // order is "bgra", then r is 2.
-                           ,
-                           v_ref_mode, bits
-
-                           ,
-                           (double)(1 << (bits - 1)) / ((1 << bits) - 1)
-                           // , v_maxlen
-                           ,
-                           -v_maxlen /* 移動方向と参照方向は逆 */
-                               * (double)((1 << bits) - 1) / (1 << (bits - 1)),
-                           alpha_rendering_sw, anti_aliasing_sw);
-  }
-
+  /*
   if ((TRaster32P)in_ras) {
     data_set_template_<TPixel32>(in_ras, margin, out_ras);
   } else if ((TRaster64P)in_ras) {
     data_set_template_<TPixel64>(in_ras, margin, out_ras);
-  }
+  } else if ((TRasterFP)in_ras) {
+    data_set_template_<TPixelF>(in_ras, margin, out_ras);
+  }*/
 }
-}
+}  // namespace
 //------------------------------------------------------------
 void ino_warp_hv::doCompute(TTile &tile, double frame,
                             const TRenderSettings &rend_sets) {
@@ -202,7 +232,8 @@ void ino_warp_hv::doCompute(TTile &tile, double frame,
   }
 
   /*------ サポートしていないPixelタイプはエラーを投げる -----*/
-  if (!((TRaster32P)tile.getRaster()) && !((TRaster64P)tile.getRaster())) {
+  if (!((TRaster32P)tile.getRaster()) && !((TRaster64P)tile.getRaster()) &&
+      !((TRasterFP)tile.getRaster())) {
     throw TRopException("unsupported input pixel type");
   }
 
@@ -237,6 +268,7 @@ void ino_warp_hv::doCompute(TTile &tile, double frame,
   TTile vert_tile;
   const bool hori_cn_is = this->m_hori.isConnected();
   const bool vert_cn_is = this->m_vert.isConnected();
+
   if (hori_cn_is) {
     this->m_hori->allocateAndCompute(
         hori_tile, bBox.getP00(),

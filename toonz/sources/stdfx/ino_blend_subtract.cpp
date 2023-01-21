@@ -16,9 +16,9 @@ public:
                    const double upr, double upg, double upb, double upa,
                    const double up_opacity,
                    const bool alpha_rendering_sw = true,
-                   const bool is_xyz             = false) override {
+                   const bool do_clamp           = true) override {
     igs::color::subtract(dnr, dng, dnb, dna, upr, upg, upb, upa, up_opacity,
-                         alpha_rendering_sw, !is_xyz);
+                         alpha_rendering_sw, do_clamp);
   }
 };
 FX_PLUGIN_IDENTIFIER(ino_blend_subtract, "inoSubtractFx");

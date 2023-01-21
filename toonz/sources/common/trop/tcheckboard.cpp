@@ -82,14 +82,15 @@ void TRop::checkBoard(TRasterP rout, const TPixel32 &pix1, const TPixel32 &pix2,
   // assert(offset.x<=dim.lx && offset.y<=dim.ly);
 
   TRaster32P rout32 = rout;
+  TRaster64P rout64 = rout;
+  TRasterFP routF   = rout;
   if (rout32)
     do_checkBoard<TPixel32>(rout32, pix1, pix2, dim, offset);
-  else {
-    TRaster64P rout64 = rout;
-    if (rout64)
-      do_checkBoard<TPixel64>(rout64, toPixel64(pix1), toPixel64(pix2), dim,
-                              offset);
-    else
-      throw TRopException("unsupported pixel type");
-  }
+  else if (rout64)
+    do_checkBoard<TPixel64>(rout64, toPixel64(pix1), toPixel64(pix2), dim,
+                            offset);
+  else if (routF)
+    do_checkBoard<TPixelF>(routF, toPixelF(pix1), toPixelF(pix2), dim, offset);
+  else
+    throw TRopException("unsupported pixel type");
 }

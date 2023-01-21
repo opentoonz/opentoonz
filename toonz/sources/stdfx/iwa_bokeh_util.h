@@ -26,6 +26,56 @@ struct int2 {
   int x, y;
 };
 
+class ExposureConverter {
+protected:
+  double m_gamma;  // used as hardness in HardnessBasedConverter
+
+public:
+  ExposureConverter(double gamma) : m_gamma(gamma) {}
+  virtual double valueToExposure(double value) const    = 0;
+  virtual double exposureToValue(double exposure) const = 0;
+  virtual bool isGammaBased() { return true; }
+};
+
+class HardnessBasedConverter : public ExposureConverter {
+  bool m_fromLinear;
+  double m_colorSpaceGamma;
+
+public:
+  HardnessBasedConverter(double gamma, double colorSpaceGamma,
+                         bool fromLinear = false)
+      : ExposureConverter(gamma)
+      , m_fromLinear(fromLinear)
+      , m_colorSpaceGamma(colorSpaceGamma) {}
+  double valueToExposure(double value) const final override {
+    // conversion is assumed to be applied to non-linear value
+    if (m_fromLinear && value > 0.)
+      value = std::pow(value, 1. / m_colorSpaceGamma);
+    double logVal = (value - 0.5) / m_gamma;
+    return std::pow(10.0, logVal);
+  }
+  double exposureToValue(double exposure) const final override {
+    double ret = std::log10(exposure) * m_gamma + 0.5;
+    if (m_fromLinear && ret > 0.) ret = std::pow(ret, m_colorSpaceGamma);
+    return ret;
+  }
+  bool isGammaBased() final override { return false; }
+};
+
+class GammaBasedConverter : public ExposureConverter {
+public:
+  GammaBasedConverter(double gamma) : ExposureConverter(gamma) {}
+  double valueToExposure(double value) const final override {
+    if (value < 0. || m_gamma == 1.) return value;
+    return std::pow(value, m_gamma);
+  }
+  double exposureToValue(double exposure) const final override {
+    assert(m_gamma > 0.);
+    if (exposure < 0. || m_gamma == 1.) return exposure;
+    return std::pow(exposure, 1. / m_gamma);
+  }
+};
+
 namespace BokehUtils {
 
 //------------------------------------
@@ -45,8 +95,8 @@ private:
 
   kiss_fft_cpx* m_kissfft_comp_iris;
 
-  double m_layerHardness;
-  double m_masterHardness;
+  double m_layerGamma;
+  double m_masterGamma;
 
   TRasterGR8P m_kissfft_comp_in_ras, m_kissfft_comp_out_ras;
   kiss_fft_cpx *m_kissfft_comp_in, *m_kissfft_comp_out;
@@ -54,14 +104,12 @@ private:
 
   bool m_isTerminated;
 
-  // not used for now
-  bool m_doLightenComp;
+  std::shared_ptr<ExposureConverter> m_conv;
 
 public:
   MyThread(Channel channel, TRasterP layerTileRas, double4* result,
            double* alpha_bokeh, kiss_fft_cpx* kissfft_comp_iris,
-           double layerHardness, double masterHardness = 0.0,
-           bool doLightenComp = false);  // not used for now
+           double layerGamma, double masterGamma = 0.0);
 
   // Convert the pixels from RGB values to exposures and multiply it by alpha
   // channel value.
@@ -74,12 +122,15 @@ public:
 
   bool isFinished() { return m_finished; }
 
-  //ÉÅÉÇÉäämï€
+  // ÉÅÉÇÉäämï€
   bool init();
 
   void terminateThread() { m_isTerminated = true; }
 
   bool checkTerminationAndCleanupThread();
+
+  void setConverter(std::shared_ptr<ExposureConverter> conv) { m_conv = conv; }
+  bool isGammaBased() { return m_conv->isGammaBased(); }
 };
 
 //------------------------------------
@@ -135,11 +186,11 @@ void defineSegemntDepth(
 
 // convert source image value rgb -> exposure
 void convertRGBToExposure(const double4* source_buff, int size,
-                          double filmGamma);
+                          const ExposureConverter& conv);
 
 // convert result image value exposure -> rgb
 void convertExposureToRGB(const double4* result_buff, int size,
-                          double filmGamma);
+                          const ExposureConverter& conv);
 
 // obtain iris size from the depth value
 double calcIrisSize(const double depth, const double bokehPixelAmount,
@@ -195,7 +246,7 @@ void interpolateExposureAndConvertToRGB(
 
 //"Over" composite the layer to the output exposure.
 void compositLayerAsIs(TTile& layerTile, double4* result, TDimensionI& dimOut,
-                       double filmGamma);
+                       const ExposureConverter& conv);
 
 // Do FFT the alpha channel.
 // Forward FFT -> Multiply by the iris data -> Backward FFT
@@ -214,13 +265,20 @@ double getBokehPixelAmount(const double bokehAmount, const TAffine affine);
 //-----------------------------------------------------
 
 class Iwa_BokehCommonFx : public TStandardRasterFx {
+public:
+  enum LinearizeMode { Gamma, Hardness };
+
 protected:
   TRasterFxPort m_iris;
   TDoubleParamP m_onFocusDistance;  // Focus Distance (0-1)
   TDoubleParamP m_bokehAmount;  // The maximum bokeh size. The size of bokeh at
                                 // the layer separated by 1.0 from the focal
                                 // position
-  TDoubleParamP m_hardness;     // Film gamma
+  TDoubleParamP m_hardness;     // Film gamma (Version 1)
+  TDoubleParamP m_gamma;        // Film gamma (Version 2)
+  TDoubleParamP m_gammaAdjust;  // Gamma offset from the current color space
+                                // gamma (Version 3)
+  TIntEnumParamP m_linearizeMode;
 
   struct LayerValue {
     TTile* sourceTile;
@@ -228,7 +286,8 @@ protected:
     // this parameter is now always false (assuming input images are always
     // premultiplied). the value is left to keep backward compatibility
     bool premultiply;
-    double layerHardness;
+    double layerGamma;  // hardness based in fx version 1, gamma based in fx
+                        // version
     int depth_ref;
 
     double irisSize;
@@ -250,7 +309,7 @@ protected:
                   const TRenderSettings& settings, double bokehPixelAmount,
                   int margin, TDimensionI& dimOut, TRectD& irisBBox,
                   TTile& irisTile, kiss_fft_cpx* kissfft_comp_iris,
-                  LayerValue layer, unsigned char* ctrl);
+                  LayerValue layer, unsigned char* ctrl, const bool isLinear);
 
 public:
   Iwa_BokehCommonFx();

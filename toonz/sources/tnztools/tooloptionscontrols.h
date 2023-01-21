@@ -519,6 +519,7 @@ public:
   ~SelectionRotationField() {}
 
   void updateStatus();
+  bool applyChange(bool addToUndo = true);
 
 protected slots:
   // add to undo is only false if mouse dragging to change the value

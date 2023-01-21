@@ -35,6 +35,7 @@ bool Iwa_MotionBlurCompFx::setSourceRaster(const RASTER srcRas, float4 *dstMem,
 
       /* If there are pixels whose RGB values ​​are larger than the alpha
        * channel, determine the source is not premutiplied */
+      // CAUTION: this condition won't work properly ith HDR image pixels!
       if (type == AUTO && isPremultiplied &&
           (((*chann_p).x > (*chann_p).w && (*chann_p).x > threshold) ||
            ((*chann_p).y > (*chann_p).w && (*chann_p).y > threshold) ||
@@ -93,6 +94,25 @@ void Iwa_MotionBlurCompFx::setOutputRaster(float4 *srcMem, const RASTER dstRas,
   }
 }
 
+template <>
+void Iwa_MotionBlurCompFx::setOutputRaster<TRasterFP, TPixelF>(
+    float4 *srcMem, const TRasterFP dstRas, TDimensionI dim, int2 margin) {
+  int out_j = 0;
+  for (int j = margin.y; j < dstRas->getLy() + margin.y; j++, out_j++) {
+    TPixelF *pix   = dstRas->pixels(out_j);
+    float4 *chan_p = srcMem;
+    chan_p += j * dim.lx + margin.x;
+    for (int i = 0; i < dstRas->getLx(); i++) {
+      pix->r = (*chan_p).x;
+      pix->g = (*chan_p).y;
+      pix->b = (*chan_p).z;
+      pix->m = (*chan_p).w;
+      pix++;
+      chan_p++;
+    }
+  }
+}
+
 /*------------------------------------------------------------
  Create and normalize filters
 ------------------------------------------------------------*/
@@ -133,8 +153,8 @@ void Iwa_MotionBlurCompFx::makeMotionBlurFilter_CPU(
         /* Calculate the inner product of 'p0'->sampling point and 'p0'->'p1' */
         float2 vec_p0_sample = {static_cast<float>(pos.x - p0.x),
                                 static_cast<float>(pos.y - p0.y)};
-        float2 vec_p0_p1 = {static_cast<float>(p1.x - p0.x),
-                            static_cast<float>(p1.y - p0.y)};
+        float2 vec_p0_p1     = {static_cast<float>(p1.x - p0.x),
+                                static_cast<float>(p1.y - p0.y)};
         float dot =
             vec_p0_sample.x * vec_p0_p1.x + vec_p0_sample.y * vec_p0_p1.y;
         /* Calculate the square of distance */
@@ -330,7 +350,7 @@ void Iwa_MotionBlurCompFx::makeZanzoFilter_CPU(
         float curveValue;
         float frameOffset = p0.w;
         /* If the frame is exactly at the frame origin,
-        * or there is no attenuation value, set curveValue to 1 */
+         * or there is no attenuation value, set curveValue to 1 */
         if (frameOffset == 0.0f || (frameOffset < 0.0f && startValue == 1.0f) ||
             (frameOffset > 0.0f && endValue == 1.0f))
           curveValue = 1.0f;
@@ -374,7 +394,7 @@ void Iwa_MotionBlurCompFx::makeZanzoFilter_CPU(
 ------------------------------------------------------------*/
 
 void Iwa_MotionBlurCompFx::convertRGBtoExposure_CPU(
-    float4 *in_tile_p, TDimensionI &dim, float hardness,
+    float4 *in_tile_p, TDimensionI &dim, const ExposureConverter &conv,
     bool sourceIsPremultiplied) {
   float4 *cur_tile_p = in_tile_p;
   for (int i = 0; i < dim.lx * dim.ly; i++, cur_tile_p++) {
@@ -398,9 +418,9 @@ void Iwa_MotionBlurCompFx::convertRGBtoExposure_CPU(
     }
 
     /* convert RGB to Exposure */
-    cur_tile_p->x = powf(10, (cur_tile_p->x - 0.5f) * hardness);
-    cur_tile_p->y = powf(10, (cur_tile_p->y - 0.5f) * hardness);
-    cur_tile_p->z = powf(10, (cur_tile_p->z - 0.5f) * hardness);
+    cur_tile_p->x = conv.valueToExposure(cur_tile_p->x);
+    cur_tile_p->y = conv.valueToExposure(cur_tile_p->y);
+    cur_tile_p->z = conv.valueToExposure(cur_tile_p->z);
 
     /* Then multiply with the alpha channel */
     cur_tile_p->x *= cur_tile_p->w;
@@ -464,9 +484,8 @@ void Iwa_MotionBlurCompFx::applyBlurFilter_CPU(
  -> premultiply
 ------------------------------------------------------------*/
 
-void Iwa_MotionBlurCompFx::convertExposureToRGB_CPU(float4 *out_tile_p,
-                                                    TDimensionI &dim,
-                                                    float hardness) {
+void Iwa_MotionBlurCompFx::convertExposureToRGB_CPU(
+    float4 *out_tile_p, TDimensionI &dim, const ExposureConverter &conv) {
   float4 *cur_tile_p = out_tile_p;
   for (int i = 0; i < dim.lx * dim.ly; i++, cur_tile_p++) {
     /* if alpha is 0 return */
@@ -483,25 +502,14 @@ void Iwa_MotionBlurCompFx::convertExposureToRGB_CPU(float4 *out_tile_p,
     cur_tile_p->z /= cur_tile_p->w;
 
     /* Convert Exposure to RGB value */
-    cur_tile_p->x = log10f(cur_tile_p->x) / hardness + 0.5f;
-    cur_tile_p->y = log10f(cur_tile_p->y) / hardness + 0.5f;
-    cur_tile_p->z = log10f(cur_tile_p->z) / hardness + 0.5f;
+    cur_tile_p->x = conv.exposureToValue(cur_tile_p->x);
+    cur_tile_p->y = conv.exposureToValue(cur_tile_p->y);
+    cur_tile_p->z = conv.exposureToValue(cur_tile_p->z);
 
     // multiply
     cur_tile_p->x *= cur_tile_p->w;
     cur_tile_p->y *= cur_tile_p->w;
     cur_tile_p->z *= cur_tile_p->w;
-
-    /* Clamp */
-    cur_tile_p->x = (cur_tile_p->x > 1.0f)
-                        ? 1.0f
-                        : ((cur_tile_p->x < 0.0f) ? 0.0f : cur_tile_p->x);
-    cur_tile_p->y = (cur_tile_p->y > 1.0f)
-                        ? 1.0f
-                        : ((cur_tile_p->y < 0.0f) ? 0.0f : cur_tile_p->y);
-    cur_tile_p->z = (cur_tile_p->z > 1.0f)
-                        ? 1.0f
-                        : ((cur_tile_p->z < 0.0f) ? 0.0f : cur_tile_p->z);
   }
 }
 
@@ -528,7 +536,8 @@ void Iwa_MotionBlurCompFx::composeWithNoMotion(
 ------------------------------------------------------------*/
 void Iwa_MotionBlurCompFx::composeBackgroundExposure_CPU(
     float4 *out_tile_p, TDimensionI &enlargedDimIn, int marginRight,
-    int marginTop, TTile &back_tile, TDimensionI &dimOut, float hardness) {
+    int marginTop, TTile &back_tile, TDimensionI &dimOut,
+    const ExposureConverter &conv) {
   /* Memory allocation of host */
   TRasterGR8P background_host_ras(sizeof(float4) * dimOut.lx, dimOut.ly);
   background_host_ras->lock();
@@ -540,12 +549,16 @@ void Iwa_MotionBlurCompFx::composeBackgroundExposure_CPU(
    */
   TRaster32P backRas32 = (TRaster32P)back_tile.getRaster();
   TRaster64P backRas64 = (TRaster64P)back_tile.getRaster();
+  TRasterFP backRasF   = (TRasterFP)back_tile.getRaster();
   if (backRas32)
     bgIsPremultiplied = setSourceRaster<TRaster32P, TPixel32>(
         backRas32, background_host, dimOut);
   else if (backRas64)
     bgIsPremultiplied = setSourceRaster<TRaster64P, TPixel64>(
         backRas64, background_host, dimOut);
+  else if (backRasF)
+    bgIsPremultiplied =
+        setSourceRaster<TRasterFP, TPixelF>(backRasF, background_host, dimOut);
 
   float4 *bg_p = background_host;
   float4 *out_p;
@@ -565,7 +578,7 @@ void Iwa_MotionBlurCompFx::composeBackgroundExposure_CPU(
        * It is not done for 'digital overlay' (image with alpha mask added by
        * using Photoshop, as known as 'DigiBook' in Japanese animation industry)
        * etc.
-      */
+       */
       if (bgIsPremultiplied) {
         // Unpremultiply
         bgExposure.x /= (*bg_p).w;
@@ -573,10 +586,10 @@ void Iwa_MotionBlurCompFx::composeBackgroundExposure_CPU(
         bgExposure.z /= (*bg_p).w;
       }
 
-      /* Set Exposure to RGB value */
-      bgExposure.x = powf(10, (bgExposure.x - 0.5f) * hardness);
-      bgExposure.y = powf(10, (bgExposure.y - 0.5f) * hardness);
-      bgExposure.z = powf(10, (bgExposure.z - 0.5f) * hardness);
+      /* Set RGB value to Exposure*/
+      bgExposure.x = conv.valueToExposure(bgExposure.x);
+      bgExposure.y = conv.valueToExposure(bgExposure.y);
+      bgExposure.z = conv.valueToExposure(bgExposure.z);
 
       // multiply
       bgExposure.x *= (*bg_p).w;
@@ -598,6 +611,8 @@ void Iwa_MotionBlurCompFx::composeBackgroundExposure_CPU(
 
 Iwa_MotionBlurCompFx::Iwa_MotionBlurCompFx()
     : m_hardness(0.3)
+    , m_gamma(2.2)
+    , m_gammaAdjust(0.)
     /* Parameters for blurring left and right */
     , m_startValue(1.0)
     , m_startCurve(1.0)
@@ -610,6 +625,8 @@ Iwa_MotionBlurCompFx::Iwa_MotionBlurCompFx()
   addInputPort("Back", m_background);
 
   bindParam(this, "hardness", m_hardness);
+  bindParam(this, "gamma", m_gamma);
+  bindParam(this, "gammaAdjust", m_gammaAdjust);
   bindParam(this, "shutterStart", m_shutterStart);
   bindParam(this, "shutterEnd", m_shutterEnd);
   bindParam(this, "traceResolution", m_traceResolution);
@@ -627,6 +644,8 @@ Iwa_MotionBlurCompFx::Iwa_MotionBlurCompFx()
 
   /* Common parameter range setting */
   m_hardness->setValueRange(0.05, 10.0);
+  m_gamma->setValueRange(1.0, 10.0);
+  m_gammaAdjust->setValueRange(-5., 5.);
   m_startValue->setValueRange(0.0, 1.0);
   m_startCurve->setValueRange(0.1, 10.0);
   m_endValue->setValueRange(0.0, 1.0);
@@ -637,6 +656,40 @@ Iwa_MotionBlurCompFx::Iwa_MotionBlurCompFx()
                           "Source is NOT premultiplied");
 
   getAttributes()->setIsSpeedAware(true);
+  enableComputeInFloat(true);
+
+  // Version 1: Exposure is computed by using Hardness
+  //            E = std::pow(10.0, (value - 0.5) / hardness)
+  // Version 2: Exposure is computed by using Gamma, for easier combination with
+  // the linear color space
+  //            E = std::pow(value, gamma)
+  // Version 3: Gamma is computed by rs.m_colorSpaceGamma + gammaAdjust
+  // this must be called after binding the parameters (see onFxVersionSet())
+  setFxVersion(3);
+}
+
+//--------------------------------------------
+
+void Iwa_MotionBlurCompFx::onFxVersionSet() {
+  if (getFxVersion() == 1) {  // use hardness
+    getParams()->getParamVar("hardness")->setIsHidden(false);
+    getParams()->getParamVar("gamma")->setIsHidden(true);
+    getParams()->getParamVar("gammaAdjust")->setIsHidden(true);
+    return;
+  }
+  getParams()->getParamVar("hardness")->setIsHidden(true);
+
+  bool useGamma = getFxVersion() == 2;
+  if (useGamma) {
+    // Automatically update version
+    if (m_gamma->getKeyframeCount() == 0 &&
+        areAlmostEqual(m_gamma->getDefaultValue(), 2.2)) {
+      useGamma = false;
+      setFxVersion(3);
+    }
+  }
+  getParams()->getParamVar("gamma")->setIsHidden(!useGamma);
+  getParams()->getParamVar("gammaAdjust")->setIsHidden(useGamma);
 }
 
 //------------------------------------------------------------
@@ -656,14 +709,28 @@ void Iwa_MotionBlurCompFx::doCompute(TTile &tile, double frame,
 
   /* Get parameters */
   QList<TPointD> points = getAttributes()->getMotionPoints();
-  double hardness       = m_hardness->getValue(frame);
-  double shutterStart   = m_shutterStart->getValue(frame);
-  double shutterEnd     = m_shutterEnd->getValue(frame);
-  int traceResolution   = m_traceResolution->getValue();
-  float startValue      = (float)m_startValue->getValue(frame);
-  float startCurve      = (float)m_startCurve->getValue(frame);
-  float endValue        = (float)m_endValue->getValue(frame);
-  float endCurve        = (float)m_endCurve->getValue(frame);
+  double gamma;
+  // The hardness value had been used inversely with the bokeh fxs.
+  // Now the convertion functions are shared with the bokeh fxs,
+  // so we need to change the hardness to reciprocal in order to obtain
+  // the same result as previous versions.
+  if (getFxVersion() == 1)
+    gamma = 1. / m_hardness->getValue(frame);
+  else {  // gamma
+    if (getFxVersion() == 2)
+      gamma = m_gamma->getValue(frame);
+    else
+      gamma = std::max(
+          1., settings.m_colorSpaceGamma + m_gammaAdjust->getValue(frame));
+    if (tile.getRaster()->isLinear()) gamma /= settings.m_colorSpaceGamma;
+  }
+  double shutterStart = m_shutterStart->getValue(frame);
+  double shutterEnd   = m_shutterEnd->getValue(frame);
+  int traceResolution = m_traceResolution->getValue();
+  float startValue    = (float)m_startValue->getValue(frame);
+  float startCurve    = (float)m_startCurve->getValue(frame);
+  float endValue      = (float)m_endValue->getValue(frame);
+  float endCurve      = (float)m_endCurve->getValue(frame);
 
   /* Do not process if there are no more than two trajectory data */
   if (points.size() < 2) {
@@ -697,7 +764,7 @@ void Iwa_MotionBlurCompFx::doCompute(TTile &tile, double frame,
   int marginBottom = (int)ceil(std::abs(minY));
 
   /* Return the input tile as-is if there is not movement
-  * (= filter margins are all 0). */
+   * (= filter margins are all 0). */
   if (marginLeft == 0 && marginRight == 0 && marginTop == 0 &&
       marginBottom == 0) {
     if (!m_background.isConnected()) m_input->compute(tile, frame, settings);
@@ -748,15 +815,15 @@ void Iwa_MotionBlurCompFx::doCompute(TTile &tile, double frame,
     pointsTable[p].y = (float)points.at(p).y;
     /* z stores the distance of p -> p + 1 vector */
     if (p < pointAmount - 1) {
-      float2 vec = {(float)(points.at(p + 1).x - points.at(p).x),
-                    (float)(points.at(p + 1).y - points.at(p).y)};
+      float2 vec       = {(float)(points.at(p + 1).x - points.at(p).x),
+                          (float)(points.at(p + 1).y - points.at(p).y)};
       pointsTable[p].z = sqrtf(vec.x * vec.x + vec.y * vec.y);
     }
     /* w stores shutter time offset */
     pointsTable[p].w = -(float)shutterStart + (float)p * dt;
   }
 
-  doCompute_CPU(tile, frame, settings, pointsTable, pointAmount, hardness,
+  doCompute_CPU(tile, frame, settings, pointsTable, pointAmount, gamma,
                 shutterStart, shutterEnd, traceResolution, startValue,
                 startCurve, endValue, endCurve, marginLeft, marginRight,
                 marginTop, marginBottom, enlargedDimIn, enlarge_tile, dimOut,
@@ -767,7 +834,7 @@ void Iwa_MotionBlurCompFx::doCompute(TTile &tile, double frame,
 
 void Iwa_MotionBlurCompFx::doCompute_CPU(
     TTile &tile, double frame, const TRenderSettings &settings,
-    float4 *pointsTable, int pointAmount, double hardness, double shutterStart,
+    float4 *pointsTable, int pointAmount, double gamma, double shutterStart,
     double shutterEnd, int traceResolution, float startValue, float startCurve,
     float endValue, float endCurve, int marginLeft, int marginRight,
     int marginTop, int marginBottom, TDimensionI &enlargedDimIn,
@@ -794,6 +861,7 @@ void Iwa_MotionBlurCompFx::doCompute_CPU(
   /* normalize the source image to 0 - 1 and read it into memory */
   TRaster32P ras32 = (TRaster32P)enlarge_tile.getRaster();
   TRaster64P ras64 = (TRaster64P)enlarge_tile.getRaster();
+  TRasterFP rasF   = (TRasterFP)enlarge_tile.getRaster();
   if (ras32)
     sourceIsPremultiplied = setSourceRaster<TRaster32P, TPixel32>(
         ras32, in_tile_p, enlargedDimIn,
@@ -801,6 +869,10 @@ void Iwa_MotionBlurCompFx::doCompute_CPU(
   else if (ras64)
     sourceIsPremultiplied = setSourceRaster<TRaster64P, TPixel64>(
         ras64, in_tile_p, enlargedDimIn,
+        (PremultiTypes)m_premultiType->getValue());
+  else if (rasF)
+    sourceIsPremultiplied = setSourceRaster<TRasterFP, TPixelF>(
+        rasF, in_tile_p, enlargedDimIn,
         (PremultiTypes)m_premultiType->getValue());
 
   /* When afterimage mode is off */
@@ -824,8 +896,15 @@ void Iwa_MotionBlurCompFx::doCompute_CPU(
    * -> convert it to exposure value
    * -> premultiply again
    */
-  convertRGBtoExposure_CPU(in_tile_p, enlargedDimIn, hardness,
-                           sourceIsPremultiplied);
+  if (getFxVersion() == 1)
+    convertRGBtoExposure_CPU(
+        in_tile_p, enlargedDimIn,
+        HardnessBasedConverter(gamma, settings.m_colorSpaceGamma,
+                               enlarge_tile.getRaster()->isLinear()),
+        sourceIsPremultiplied);
+  else
+    convertRGBtoExposure_CPU(in_tile_p, enlargedDimIn,
+                             GammaBasedConverter(gamma), sourceIsPremultiplied);
 
   /* Filter and blur exposure value */
   applyBlurFilter_CPU(in_tile_p, out_tile_p, enlargedDimIn, filter_p, filterDim,
@@ -836,19 +915,33 @@ void Iwa_MotionBlurCompFx::doCompute_CPU(
 
   /* If there is a background, do Exposure multiplication */
   if (m_background.isConnected()) {
-    composeBackgroundExposure_CPU(out_tile_p, enlargedDimIn, marginRight,
-                                  marginTop, back_tile, dimOut,
-                                  (float)hardness);
+    if (getFxVersion() == 1)
+      composeBackgroundExposure_CPU(
+          out_tile_p, enlargedDimIn, marginRight, marginTop, back_tile, dimOut,
+          HardnessBasedConverter(gamma, settings.m_colorSpaceGamma,
+                                 tile.getRaster()->isLinear()));
+    else
+      composeBackgroundExposure_CPU(out_tile_p, enlargedDimIn, marginRight,
+                                    marginTop, back_tile, dimOut,
+                                    GammaBasedConverter(gamma));
   }
   /* Unpremultiply the exposure value
    * -> convert back to RGB value (0 to 1)
    * -> premultiply */
-  convertExposureToRGB_CPU(out_tile_p, enlargedDimIn, hardness);
+  if (getFxVersion() == 1)
+    convertExposureToRGB_CPU(
+        out_tile_p, enlargedDimIn,
+        HardnessBasedConverter(gamma, settings.m_colorSpaceGamma,
+                               tile.getRaster()->isLinear()));
+  else
+    convertExposureToRGB_CPU(out_tile_p, enlargedDimIn,
+                             GammaBasedConverter(gamma));
 
   /* Clear raster */
   tile.getRaster()->clear();
   TRaster32P outRas32 = (TRaster32P)tile.getRaster();
   TRaster64P outRas64 = (TRaster64P)tile.getRaster();
+  TRasterFP outRasF   = (TRasterFP)tile.getRaster();
   int2 margin         = {marginRight, marginTop};
   if (outRas32)
     setOutputRaster<TRaster32P, TPixel32>(out_tile_p, outRas32, enlargedDimIn,
@@ -856,6 +949,9 @@ void Iwa_MotionBlurCompFx::doCompute_CPU(
   else if (outRas64)
     setOutputRaster<TRaster64P, TPixel64>(out_tile_p, outRas64, enlargedDimIn,
                                           margin);
+  else if (outRasF)
+    setOutputRaster<TRasterFP, TPixelF>(out_tile_p, outRasF, enlargedDimIn,
+                                        margin);
 
   /* Memory release */
   out_tile_ras->unlock();
@@ -949,6 +1045,13 @@ std::string Iwa_MotionBlurCompFx::getAlias(double frame,
   unsigned long id = getIdentifier();
   return alias + std::to_string(frame) + "," + std::to_string(id) + paramalias +
          "]";
+}
+
+//------------------------------------------------------------
+
+bool Iwa_MotionBlurCompFx::toBeComputedInLinearColorSpace(
+    bool settingsIsLinear, bool tileIsLinear) const {
+  return settingsIsLinear;
 }
 
 FX_PLUGIN_IDENTIFIER(Iwa_MotionBlurCompFx, "iwa_MotionBlurCompFx")

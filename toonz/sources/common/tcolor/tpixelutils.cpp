@@ -31,8 +31,8 @@ void hsv2rgb(TPixel32 &dstRgb, int srcHsv[3], int maxHsv) {
 
   if (hue > 360) hue -= 360;
   if (hue < 0) hue += 360;
-  if (sat < 0) sat     = 0;
-  if (sat > 1) sat     = 1;
+  if (sat < 0) sat = 0;
+  if (sat > 1) sat = 1;
   if (value < 0) value = 0;
   if (value > 1) value = 1;
   if (sat == 0) {
@@ -86,8 +86,8 @@ void HSV2RGB(double hue, double sat, double value, double *red, double *green,
   //    hue=0;
   if (hue > 360) hue -= 360;
   if (hue < 0) hue += 360;
-  if (sat < 0) sat     = 0;
-  if (sat > 1) sat     = 1;
+  if (sat < 0) sat = 0;
+  if (sat > 1) sat = 1;
   if (value < 0) value = 0;
   if (value > 1) value = 1;
   if (sat == 0) {
@@ -164,7 +164,7 @@ void RGB2HSV(double r, double g, double b, double *h, double *s, double *v) {
       *h = 2 + (b - r) / delta;
     else if (b == max)
       *h = 4 + (r - g) / delta;
-    *h   = *h * 60;
+    *h = *h * 60;
     if (*h < 0) *h += 360;
   }
 }
@@ -198,7 +198,7 @@ void rgb2hsv(int dstHsv[3], const TPixel32 &srcRgb, int maxHsv) {
       h = 2 + (b - r) / delta;
     else if (b == max)
       h = 4 + (r - g) / delta;
-    h   = h * 60;
+    h = h * 60;
     if (h < 0) h += 360;
   }
 
@@ -227,7 +227,7 @@ inline double HLSValue(double n1, double n2, double h) {
   else
     return n1;
 }
-}
+}  // namespace
 void HLS2RGB(double h, double l, double s, double *r, double *g, double *b) {
   if (s == 0) {
     *r = *g = *b = l;
@@ -240,7 +240,7 @@ void HLS2RGB(double h, double l, double s, double *r, double *g, double *b) {
     m2 = l * (1 + s);
   else
     m2 = l + s + l * s;
-  m1   = 2 * l - m2;
+  m1 = 2 * l - m2;
 
   *r = HLSValue(m1, m2, h + 120);
   *g = HLSValue(m1, m2, h);
@@ -304,6 +304,15 @@ TPixel32 toPixel32(const TPixelGR8 &src) {
 
 //-----------------------------------------------------------------------------
 
+TPixel32 toPixel32(const TPixelF &src) {
+  const double factor = 255.0f;
+  return TPixel32(
+      byteCrop(tround(src.r * factor)), byteCrop(tround(src.g * factor)),
+      byteCrop(tround(src.b * factor)), byteCrop(tround(src.m * factor)));
+}
+
+//-----------------------------------------------------------------------------
+
 TPixel64 toPixel64(const TPixel32 &src) {
   return TPixelRGBM64(ushortFromByte(src.r), ushortFromByte(src.g),
                       ushortFromByte(src.b), ushortFromByte(src.m));
@@ -323,6 +332,15 @@ TPixel64 toPixel64(const TPixelD &src) {
 TPixel64 toPixel64(const TPixelGR8 &src) {
   int v = ushortFromByte(src.value);
   return TPixel64(v, v, v);
+}
+
+//-----------------------------------------------------------------------------
+
+TPixel64 toPixel64(const TPixelF &src) {
+  const float factor = 65535.0f;
+  return TPixel64(
+      wordCrop(tround(src.r * factor)), wordCrop(tround(src.g * factor)),
+      wordCrop(tround(src.b * factor)), wordCrop(tround(src.m * factor)));
 }
 
 //-----------------------------------------------------------------------------
@@ -349,7 +367,84 @@ TPixelD toPixelD(const TPixelGR8 &src) {
 }
 
 //-----------------------------------------------------------------------------
+
+TPixelD toPixelD(const TPixelF &src) {
+  return TPixelD(src.r, src.g, src.b, src.m);
+}
+
 //-----------------------------------------------------------------------------
+
+TPixelF toPixelF(const TPixel32 &src) {
+  const float factor = 1.f / 255.f;
+  return TPixelF(factor * src.r, factor * src.g, factor * src.b,
+                 factor * src.m);
+}
+
+//-----------------------------------------------------------------------------
+
+TPixelF toPixelF(const TPixelD &src) {
+  return TPixelF(src.r, src.g, src.b, src.m);
+}
+
+//-----------------------------------------------------------------------------
+
+TPixelF toPixelF(const TPixel64 &src) {
+  const float factor = 1.f / 65535.f;
+  return TPixelF(factor * src.r, factor * src.g, factor * src.b,
+                 factor * src.m);
+}
+
+//-----------------------------------------------------------------------------
+
+TPixelF toPixelF(const TPixelGR8 &src) {
+  const float v = (float)src.value / 255.f;
+  return TPixelF(v, v, v);
+}
+
+//-----------------------------------------------------------------------------
+namespace {
+template <class T, class Q>
+Q toLin(Q val, double gamma) {
+  return (Q)((T::maxChannelValue)*std::pow(
+                 (double)val / (double)(T::maxChannelValue), gamma) +
+             0.5);
+}
+template <>
+float toLin<TPixelF, float>(float val, double gamma) {
+  return (val < 0.f) ? val : std::pow(val, (float)gamma);
+}
+template <>
+double toLin<TPixelD, double>(double val, double gamma) {
+  return std::pow(val, gamma);
+}
+}  // namespace
+
+//-----------------------------------------------------------------------------
+
+TPixel32 toLinear(const TPixel32 &pix, const double gamma) {
+  return TPixel32(toLin<TPixel32, unsigned char>(pix.r, gamma),
+                  toLin<TPixel32, unsigned char>(pix.g, gamma),
+                  toLin<TPixel32, unsigned char>(pix.b, gamma), pix.m);
+}
+TPixel64 toLinear(const TPixel64 &pix, const double gamma) {
+  return TPixel64(toLin<TPixel64, unsigned short>(pix.r, gamma),
+                  toLin<TPixel64, unsigned short>(pix.g, gamma),
+                  toLin<TPixel64, unsigned short>(pix.b, gamma), pix.m);
+}
+TPixelD toLinear(const TPixelD &pix, const double gamma) {
+  return TPixelD(toLin<TPixelD, double>(pix.r, gamma),
+                 toLin<TPixelD, double>(pix.g, gamma),
+                 toLin<TPixelD, double>(pix.b, gamma), pix.m);
+}
+TPixelF toLinear(const TPixelF &pix, const double gamma) {
+  return TPixelF(toLin<TPixelF, float>(pix.r, gamma),
+                 toLin<TPixelF, float>(pix.g, gamma),
+                 toLin<TPixelF, float>(pix.b, gamma), pix.m);
+}
+TPixelGR8 toLinear(const TPixelGR8 &pix, const double gamma) {
+  return TPixelGR8(toLin<TPixelGR8, unsigned char>(pix.value, gamma));
+}
+
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------

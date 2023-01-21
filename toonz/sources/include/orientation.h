@@ -135,7 +135,8 @@ enum class PredefinedRect {
   PANEL_EYE,
   PANEL_PREVIEW_LAYER,
   PANEL_LOCK,
-  PANEL_LAYER_NAME
+  PANEL_LAYER_NAME,
+  NAVIGATION_TAG_AREA
 };
 enum class PredefinedLine {
   LOCKED,              //! dotted vertical line when cell is locked
@@ -168,7 +169,8 @@ enum class PredefinedPath {
   VOLUME_SLIDER_TRACK,  //! slider track
   VOLUME_SLIDER_HEAD,   //! slider head
   TIME_INDICATOR_HEAD,  //! current time indicator head
-  FRAME_MARKER_DIAMOND
+  FRAME_MARKER_DIAMOND,
+  NAVIGATION_TAG
 };
 enum class PredefinedPoint {
   KEY_HIDDEN,  //! move extender handle that much if key icons are disabled

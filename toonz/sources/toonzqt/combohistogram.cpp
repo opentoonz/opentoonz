@@ -89,10 +89,18 @@ void ChannelHistoGraph::paintEvent(QPaintEvent *event) {
   int i;
 
   // draw scale marks
-  p.setPen(QColor(144, 144, 144));
-  for (i = 1; i < 10; i++) {
-    int posx = rect().width() * i / 10;
-    p.drawLine(posx, 1, posx, COMBOHIST_RESOLUTION_H);
+  if (areAlmostEqual(m_range, 1.)) {
+    p.setPen(QColor(144, 144, 144));
+    for (i = 1; i < 10; i++) {
+      int posx = rect().width() * i / 10;
+      p.drawLine(posx, 1, posx, COMBOHIST_RESOLUTION_H);
+    }
+  } else {
+    int range_i = (int)std::round(m_range);
+    for (i = 1; i < range_i; i++) {
+      int posx = rect().width() * i / range_i;
+      p.drawLine(posx, 1, posx, COMBOHIST_RESOLUTION_H);
+    }
   }
 
   QColor compColor = (m_channelIndex == 0)   ? Qt::red
@@ -242,12 +250,24 @@ void ChannelColorBar::paintEvent(QPaintEvent *event) {
     linearGrad.setColorAt(1, Qt::white);
   } else {
     linearGrad.setColorAt(0, Qt::black);
+    if (!areAlmostEqual(m_range, 1.))
+      linearGrad.setColorAt(1. / m_range, m_color);
     linearGrad.setColorAt(1, m_color);
   }
 
   p.setBrush(QBrush(linearGrad));
   p.setPen(Qt::NoPen);
   p.drawRect(rect());
+
+  if (!areAlmostEqual(m_range, 1.)) {
+    static const QPointF points[3] = {QPointF(0.0, 0.0), QPointF(3.0, 6.0),
+                                      QPointF(-3.0, 6.0)};
+
+    p.setPen(Qt::NoPen);
+    p.setBrush(Qt::black);
+    p.translate(COMBOHIST_RESOLUTION_W / m_range + 1, 0.);
+    p.drawPolygon(points, 3);
+  }
 }
 
 //=============================================================================
@@ -447,7 +467,8 @@ ComboHistogram::ComboHistogram(QWidget *parent)
     , m_raster(0)
     , m_palette(0)
     , m_showCompare(false)
-    , m_compHistoIsValid(true) {
+    , m_compHistoIsValid(true)
+    , m_rangeStep(0) {
   for (int chan = 0; chan < 4; chan++)
     m_histograms[chan] = new ChannelHisto(chan, &m_showCompare, this);
   m_histograms[4] = new ChannelHisto(4, &m_showCompare, this);
@@ -464,6 +485,13 @@ ComboHistogram::ComboHistogram(QWidget *parent)
 
   m_displayModeCombo = new QComboBox(this);
 
+  m_rangeControlContainer = new QWidget(this);
+  m_rangeUpBtn            = new QPushButton("", this);
+  m_rangeDwnBtn           = new QPushButton("", this);
+  m_rangeLabel            = new QLabel("1.0", this);
+
+  //-----
+
   m_displayModeCombo->addItem(
       tr("8bit (0-255)"), (int)ComboHistoRGBLabel::DisplayMode::Display_8bit);
   m_displayModeCombo->addItem(
@@ -471,6 +499,14 @@ ComboHistogram::ComboHistogram(QWidget *parent)
       (int)ComboHistoRGBLabel::DisplayMode::Display_16bit);
   m_displayModeCombo->addItem(
       tr("0.0-1.0"), (int)ComboHistoRGBLabel::DisplayMode::Display_0_1);
+
+  m_rangeUpBtn->setIcon(createQIcon("prevkey"));
+  m_rangeDwnBtn->setIcon(createQIcon("nextkey"));
+  m_rangeUpBtn->setFixedWidth(17);
+  m_rangeDwnBtn->setFixedWidth(17);
+  m_rangeDwnBtn->setEnabled(false);
+  m_rangeLabel->setFixedWidth(30);
+  m_rangeLabel->setAlignment(Qt::AlignCenter);
 
   // layout
   QVBoxLayout *mainLayout = new QVBoxLayout();
@@ -505,6 +541,18 @@ ComboHistogram::ComboHistogram(QWidget *parent)
       infoParamLay->addWidget(new QLabel(tr("Y:"), this), 1,
                               Qt::AlignRight | Qt::AlignVCenter);
       infoParamLay->addWidget(m_yPosLabel, 2, Qt::AlignLeft | Qt::AlignVCenter);
+
+      // range control
+      QHBoxLayout *rangeLay = new QHBoxLayout();
+      rangeLay->setMargin(0);
+      rangeLay->setSpacing(0);
+      {
+        rangeLay->addWidget(m_rangeUpBtn, 0);
+        rangeLay->addWidget(m_rangeLabel, 0);
+        rangeLay->addWidget(m_rangeDwnBtn, 0);
+      }
+      m_rangeControlContainer->setLayout(rangeLay);
+      infoParamLay->addWidget(m_rangeControlContainer, 0);
     }
     mainLayout->addLayout(infoParamLay, 0);
 
@@ -522,6 +570,8 @@ ComboHistogram::ComboHistogram(QWidget *parent)
           SLOT(onDisplayModeChanged()));
   connect(m_histograms[3], SIGNAL(showButtonToggled(bool)), this,
           SLOT(onShowAlphaButtonToggled(bool)));
+  connect(m_rangeUpBtn, SIGNAL(clicked()), this, SLOT(onRangeUp()));
+  connect(m_rangeDwnBtn, SIGNAL(clicked()), this, SLOT(onRangeDown()));
 }
 //-----------------------------------------------------------------------------
 
@@ -536,13 +586,30 @@ void ComboHistogram::setRaster(const TRasterP &raster,
                                const TPaletteP &palette) {
   if (palette.getPointer()) m_palette = palette;
   m_raster = raster;
+
+  refreshHistogram();
+
+  m_rangeControlContainer->setVisible(!!((TRasterFP)raster));
+  update();
+}
+
+//-----------------------------------------------------------------------------
+
+void ComboHistogram::refreshHistogram() {
   computeChannelsValue(&m_channelValue[0][0], sizeof(m_channelValue), m_raster);
 
-  for (int chan = 0; chan < 4; chan++)
-    m_histograms[chan]->refleshValue(&m_channelValue[chan][0]);
-  m_histograms[4]->refleshValue(&m_channelValue[0][0]);
+  float range = 1.f;
+  if (!!((TRasterFP)m_raster)) {
+    range = std::pow(2.f, (float)m_rangeStep);
+  }
 
-  update();
+  for (int chan = 0; chan < 4; chan++) {
+    m_histograms[chan]->refleshValue(&m_channelValue[chan][0]);
+    if (chan != 3)  // rgb channels
+      m_histograms[chan]->setRange(range);
+  }
+  m_histograms[4]->refleshValue(&m_channelValue[0][0]);
+  m_histograms[4]->setRange(range);
 }
 
 //-----------------------------------------------------------------------------
@@ -556,6 +623,10 @@ void ComboHistogram::computeChannelsValue(int *buf, size_t size, TRasterP ras,
 
   TRaster64P raster64 = ras;
   bool is64bit        = !!raster64;
+
+  TRasterFP rasF = ras;
+
+  float factor = 1.f / std::pow(2.f, (float)m_rangeStep);
 
   int lx = ras->getLx();
   int ly = ras->getLy();
@@ -592,6 +663,19 @@ void ComboHistogram::computeChannelsValue(int *buf, size_t size, TRasterP ras,
             ++buf[idx(2, color.b)];
           }
           ++buf[idx(3, color.m)];
+        }
+      }
+    } else if (rasF) {
+      for (j = 0; j < ly; j++) {
+        TPixelF *pixF = rasF->pixels(j);
+        for (i = 0; i < lx; i++, pixF++) {
+          int mValue = (int)byteFromFloat(pixF->m);
+          if (mValue != 0) {
+            ++buf[idx(0, (int)byteFromFloat(pixF->r * factor))];
+            ++buf[idx(1, (int)byteFromFloat(pixF->g * factor))];
+            ++buf[idx(2, (int)byteFromFloat(pixF->b * factor))];
+          }
+          ++buf[idx(3, mValue)];
         }
       }
     } else  // 8bpc raster
@@ -662,6 +746,31 @@ void ComboHistogram::updateInfo(const TPixel64 &pix, const TPointD &imagePos) {
 
 //-----------------------------------------------------------------------------
 
+void ComboHistogram::updateInfo(const TPixelF &pix, const TPointD &imagePos) {
+  if (pix == TPixelF::Transparent) {
+    m_histograms[0]->showCurrentChannelValue(-1);
+    m_histograms[1]->showCurrentChannelValue(-1);
+    m_histograms[2]->showCurrentChannelValue(-1);
+    m_histograms[3]->showCurrentChannelValue(-1);
+    m_rgbLabel->setColorAndUpdate(Qt::transparent);
+    m_xPosLabel->setText("");
+    m_yPosLabel->setText("");
+  } else {
+    float factor   = std::pow(2.f, -(float)m_rangeStep);
+    TPixel32 pix32 = toPixel32(
+        TPixelF(pix.r * factor, pix.g * factor, pix.b * factor, pix.m));
+    // show picked color's channel values
+    m_histograms[0]->showCurrentChannelValue((int)pix32.r);
+    m_histograms[1]->showCurrentChannelValue((int)pix32.g);
+    m_histograms[2]->showCurrentChannelValue((int)pix32.b);
+    m_histograms[3]->showCurrentChannelValue((int)pix32.m);
+    m_rgbLabel->setColorAndUpdate(QColor::fromRgbF(pix.r, pix.g, pix.b, pix.m));
+    m_xPosLabel->setText(QString::number(tround(imagePos.x)));
+    m_yPosLabel->setText(QString::number(tround(imagePos.y)));
+  }
+}
+//-----------------------------------------------------------------------------
+
 void ComboHistogram::updateAverageColor(const TPixel32 &pix) {
   if (pix == TPixel32::Transparent) {
     m_rectAverageRgbLabel->setColorAndUpdate(Qt::transparent);
@@ -679,6 +788,17 @@ void ComboHistogram::updateAverageColor(const TPixel64 &pix) {
   } else {
     m_rectAverageRgbLabel->setColorAndUpdate(QColor::fromRgba64(
         (ushort)pix.r, (ushort)pix.g, (ushort)pix.b, (ushort)pix.m));
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+void ComboHistogram::updateAverageColor(const TPixelF &pix) {
+  if (pix == TPixelF::Transparent) {
+    m_rectAverageRgbLabel->setColorAndUpdate(Qt::transparent);
+  } else {
+    m_rectAverageRgbLabel->setColorAndUpdate(
+        QColor::fromRgbF(pix.r, pix.g, pix.b, pix.m));
   }
 }
 
@@ -732,4 +852,36 @@ void ComboHistogram::onShowAlphaButtonToggled(bool alphaVisible) {
   m_rectAverageRgbLabel->setAlphaVisible(alphaVisible);
   m_rgbLabel->update();
   m_rectAverageRgbLabel->update();
+}
+
+//-----------------------------------------------------------------------------
+
+void ComboHistogram::onRangeUp() {
+  m_rangeStep++;
+  m_rangeDwnBtn->setEnabled(true);
+  if (m_rangeStep == 3) m_rangeUpBtn->setDisabled(true);
+
+  m_rangeLabel->setText(QString("%1.0").arg(std::pow(2, m_rangeStep)));
+
+  refreshHistogram();
+  m_compHistoIsValid = false;
+  if (m_showCompare) updateCompHistogram();
+
+  update();
+}
+
+//-----------------------------------------------------------------------------
+
+void ComboHistogram::onRangeDown() {
+  m_rangeStep--;
+  m_rangeUpBtn->setEnabled(true);
+  if (m_rangeStep == 0) m_rangeDwnBtn->setDisabled(true);
+
+  m_rangeLabel->setText(QString("%1.0").arg(std::pow(2, m_rangeStep)));
+
+  refreshHistogram();
+  m_compHistoIsValid = false;
+  if (m_showCompare) updateCompHistogram();
+
+  update();
 }

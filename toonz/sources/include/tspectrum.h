@@ -181,10 +181,12 @@ DVAPI TSpectrumT<TPixel64> convert(const TSpectrumT<TPixel32> &s);
 #ifdef _WIN32
 template class DVAPI TSpectrumT<TPixel32>;
 template class DVAPI TSpectrumT<TPixel64>;
+template class DVAPI TSpectrumT<TPixelF>;
 #endif
 
 typedef TSpectrumT<TPixel32> TSpectrum;
 typedef TSpectrumT<TPixel64> TSpectrum64;
+typedef TSpectrumT<TPixelF> TSpectrumF;
 
 #ifdef _MSC_VER
 #pragma warning(default : 4251)

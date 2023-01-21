@@ -143,12 +143,14 @@ if(PLATFORM EQUAL 64)
         ../stopmotion/stopmotionlight.h
         cameracapturelevelcontrol.h
         penciltestpopup.h
+        navtageditorpopup.h
     )
 else()
     set(MOC_HEADERS
         ${MOC_HEADERS}
         cameracapturelevelcontrol_qt.h
         penciltestpopup_qt.h
+        navtageditorpopup.h
     )
 endif()
 
@@ -399,12 +401,14 @@ if(PLATFORM EQUAL 64)
         ../stopmotion/stopmotionlight.cpp
         cameracapturelevelcontrol.cpp
         penciltestpopup.cpp
+        navtageditorpopup.cpp
     )
 else()
     set(SOURCES
         ${SOURCES}
         cameracapturelevelcontrol_qt.cpp
         penciltestpopup_qt.cpp
+        navtageditorpopup.cpp
     )
 endif()
 

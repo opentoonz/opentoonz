@@ -39,9 +39,6 @@ convert the result to channel value and store to the output raster
 ------------------------------------------------------------*/
 template <typename RASTER, typename PIXEL>
 void setOutputRaster(float4 *srcMem, const RASTER dstRas) {
-  typename PIXEL::Channel halfChan =
-      (typename PIXEL::Channel)(PIXEL::maxChannelValue / 2);
-
   dstRas->fill(PIXEL::Transparent);
 
   float4 *chan_p = srcMem;
@@ -65,6 +62,23 @@ void setOutputRaster(float4 *srcMem, const RASTER dstRas) {
       pix->m = (typename PIXEL::Channel)((val > (float)PIXEL::maxChannelValue)
                                              ? (float)PIXEL::maxChannelValue
                                              : val);
+    }
+  }
+}
+
+template <>
+void setOutputRaster<TRasterFP, TPixelF>(float4 *srcMem,
+                                         const TRasterFP dstRas) {
+  dstRas->fill(TPixelF::Transparent);
+
+  float4 *chan_p = srcMem;
+  for (int j = 0; j < dstRas->getLy(); j++) {
+    TPixelF *pix = dstRas->pixels(j);
+    for (int i = 0; i < dstRas->getLx(); i++, chan_p++, pix++) {
+      pix->r = (*chan_p).x;
+      pix->g = (*chan_p).y;
+      pix->b = (*chan_p).z;
+      pix->m = (*chan_p).w;
     }
   }
 }
@@ -97,7 +111,7 @@ float adjustExposure(float source, float distance, float amount, float gamma,
 
   return (ret > 1.0f) ? 1.0f : ((ret < 0.0f) ? 0.0f : ret);
 }
-};
+};  // namespace
 
 class Iwa_BarrelDistortFx final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(Iwa_BarrelDistortFx)
@@ -145,6 +159,8 @@ public:
     m_vignetteGamma->setValueRange(0.05, 20.0);
     m_vignetteMidpoint->setValueRange(0.0, 1.0);
     m_scale->setValueRange(0.1, 2.0);
+
+    enableComputeInFloat(true);
   }
 
   ~Iwa_BarrelDistortFx(){};
@@ -152,7 +168,7 @@ public:
   bool doGetBBox(double frame, TRectD &bBox,
                  const TRenderSettings &info) override {
     if (m_source.isConnected()) {
-      bool ret      = m_source->doGetBBox(frame, bBox, info);
+      bool ret = m_source->doGetBBox(frame, bBox, info);
       if (ret) bBox = TConsts::infiniteRectD;
       return ret;
     }
@@ -224,9 +240,9 @@ void Iwa_BarrelDistortFx::doCompute(TTile &tile, double frame,
   if (sourceBBox == TConsts::infiniteRectD) {
     TPointD tileOffset = tile.m_pos + tile.getRaster()->getCenterD();
     sourceBBox         = TRectD(TPointD(source_ri.m_cameraBox.x0 + tileOffset.x,
-                                source_ri.m_cameraBox.y0 + tileOffset.y),
-                        TDimensionD(source_ri.m_cameraBox.getLx(),
-                                    source_ri.m_cameraBox.getLy()));
+                                        source_ri.m_cameraBox.y0 + tileOffset.y),
+                                TDimensionD(source_ri.m_cameraBox.getLx(),
+                                            source_ri.m_cameraBox.getLy()));
   }
   sourceDim.lx = std::ceil(sourceBBox.getLx());
   sourceDim.ly = std::ceil(sourceBBox.getLy());
@@ -242,10 +258,13 @@ void Iwa_BarrelDistortFx::doCompute(TTile &tile, double frame,
 
   TRaster32P ras32 = (TRaster32P)sourceTile.getRaster();
   TRaster64P ras64 = (TRaster64P)sourceTile.getRaster();
+  TRasterFP rasF   = (TRasterFP)sourceTile.getRaster();
   if (ras32)
     setSourceRaster<TRaster32P, TPixel32>(ras32, source_host, sourceDim);
   else if (ras64)
     setSourceRaster<TRaster64P, TPixel64>(ras64, source_host, sourceDim);
+  else if (rasF)
+    setSourceRaster<TRasterFP, TPixelF>(rasF, source_host, sourceDim);
 
   TRasterGR8P result_host_ras(outDim.lx * sizeof(float4), outDim.ly);
 
@@ -277,10 +296,13 @@ void Iwa_BarrelDistortFx::doCompute(TTile &tile, double frame,
   // convert the result to channel value and store to the output raster
   TRaster32P outRas32 = (TRaster32P)tile.getRaster();
   TRaster64P outRas64 = (TRaster64P)tile.getRaster();
+  TRasterFP outRasF   = (TRasterFP)tile.getRaster();
   if (outRas32)
     setOutputRaster<TRaster32P, TPixel32>(result_host, outRas32);
   else if (outRas64)
     setOutputRaster<TRaster64P, TPixel64>(result_host, outRas64);
+  else if (outRasF)
+    setOutputRaster<TRasterFP, TPixelF>(result_host, outRasF);
 
   result_host_ras->unlock();
 }
@@ -355,11 +377,11 @@ void Iwa_BarrelDistortFx::doCompute_CPU(
       if (doVignette) {
         float distance = distortRatio * distortRatio * val;
         (*result_p).x  = adjustExposure((*result_p).x, distance, vignetteAmount,
-                                       vignetteGamma, vignetteMidpoint);
-        (*result_p).y = adjustExposure((*result_p).y, distance, vignetteAmount,
-                                       vignetteGamma, vignetteMidpoint);
-        (*result_p).z = adjustExposure((*result_p).z, distance, vignetteAmount,
-                                       vignetteGamma, vignetteMidpoint);
+                                        vignetteGamma, vignetteMidpoint);
+        (*result_p).y  = adjustExposure((*result_p).y, distance, vignetteAmount,
+                                        vignetteGamma, vignetteMidpoint);
+        (*result_p).z  = adjustExposure((*result_p).z, distance, vignetteAmount,
+                                        vignetteGamma, vignetteMidpoint);
       }
     }
   }
