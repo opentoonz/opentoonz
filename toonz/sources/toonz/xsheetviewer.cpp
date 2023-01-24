@@ -1899,9 +1899,6 @@ void XsheetViewer::zoomToFramesPerPage(int frames) {
 
 //----------------------------------------------------------------
 int XsheetViewer::getFrameZoomFactor() const {
-  if (orientation()->isVerticalTimeline())
-    return 50 + (m_frameZoomFactor - 20) * 5 / 8;
-
   return m_frameZoomFactor;
 }
 
