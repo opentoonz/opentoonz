@@ -95,7 +95,7 @@ void main( void )
   vec4 fg_frag = texture2D(inputImage[0], fg_texPos);
   vec4 bg_frag = texture2D(inputImage[1], bg_texPos);
 
-  // De-premultiplication
+  // De-premultiplication of textures
   vec3 fg_pix = vec3(0.0);
   if (fg_frag.a > 0.0) fg_pix = fg_frag.rgb / fg_frag.a;
   vec3 bg_pix = vec3(0.0);
@@ -107,20 +107,12 @@ void main( void )
   if (bmask) {
     gl_FragColor.a = bg_alpha;
   } else {
-    gl_FragColor.a = fg_alpha + bg_alpha * (1.0 - fg_alpha);
+    gl_FragColor.a = bg_alpha + fg_alpha * (1.0 - bg_alpha);
   }
   if (gl_FragColor.a <= 0.0) discard;
-  
-  // Perform blending
-  if (fg_alpha > 0.0 && bg_alpha > 0.0) {
-    vec3 o_pix = SetLumSat(bhue ? fg_pix : bg_pix, bsat ? fg_pix : bg_pix, blum ? fg_pix : bg_pix);
-    gl_FragColor.rgb = mix(bg_pix, o_pix, balpha);
-  } else if (fg_alpha > 0.0) {
-    gl_FragColor.rgb = fg_pix;
-  } else {
-    gl_FragColor.rgb = bg_pix;
-  }
 
-  // Premultiplication
-  gl_FragColor.rgb *= gl_FragColor.a;
+  // Perform blending
+  vec3 o_pix = SetLumSat(bhue ? fg_pix : bg_pix, bsat ? fg_pix : bg_pix, blum ? fg_pix : bg_pix);
+  vec3 b_pix = bmask ? vec3(0.0) : fg_pix;
+  gl_FragColor.rgb = bg_pix * bg_alpha * (1.0 - fg_alpha) + mix(b_pix, o_pix, bg_alpha) * fg_alpha;
 }
