@@ -428,11 +428,12 @@ void StageBuilder::addCell(PlayerSet &players, ToonzScene *scene, TXsheet *xsh,
     bool isCurrent = (subSheetColIndex >= 0)
                          ? (subSheetColIndex == m_currentColumnIndex)
                          : (col == m_currentColumnIndex);
-    player.m_isCurrentColumn     = isCurrent;
-    player.m_ancestorColumnIndex = m_ancestorColumnIndex;
-    player.m_masks               = m_masks;
-    player.m_opacity             = column->getOpacity();
-    player.m_filterColor         = column->getFilterColor();
+    player.m_isCurrentColumn      = isCurrent;
+    player.m_isCurrentXsheetLevel = subSheetColIndex < 0;
+    player.m_ancestorColumnIndex  = m_ancestorColumnIndex;
+    player.m_masks                = m_masks;
+    player.m_opacity              = column->getOpacity();
+    player.m_filterColor          = column->getFilterColor();
 
     if (m_subXSheetStack.empty()) {
       player.m_z         = columnZ;
