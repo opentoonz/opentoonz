@@ -134,7 +134,7 @@ bool checkTail(TFilePath path, TFilePath tail, TFilePath &head) {
 void makeSceneIcon(ToonzScene *scene) {
   TDimension cameraSize = scene->getCurrentCamera()->getRes();
 
-  int maxSize               = 128;
+  int maxSize               = 256;
   TDimension iconCameraSize = cameraSize;
   if (cameraSize.lx > cameraSize.ly) {
     iconCameraSize.ly = maxSize * cameraSize.ly / cameraSize.lx;
