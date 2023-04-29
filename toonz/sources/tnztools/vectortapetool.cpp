@@ -327,7 +327,7 @@ public:
     if (!vi) return;
 
     // BUTTA e rimetti (Dava problemi con la penna)
-    if (!m_draw) return;  // Questa riga potrebbe non essere messa
+    //if (!m_draw) return;  // Questa riga potrebbe non essere messa
     // m_draw=true;   //Perche'??? Non basta dargli true in onEnter??
 
     if (m_type.getValue() == RECT) return;
