@@ -211,8 +211,8 @@
     <message>
         <source>It is not possible to communicate with the codec.
  Probably the codec cannot work correctly.</source>
-        <translation>无法使用此编码进行沟通。
- 可能是此编码不能正确运行。</translation>
+        <translation>无法调用此编码器。
+ 可能是此编码器不能正确运行。</translation>
     </message>
     <message>
         <source>%1-%2</source>

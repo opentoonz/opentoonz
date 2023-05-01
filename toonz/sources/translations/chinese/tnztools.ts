@@ -419,7 +419,7 @@
     </message>
     <message>
         <source>A/R</source>
-        <translation>长宽比:</translation>
+        <translation>长宽比</translation>
     </message>
     <message>
         <source>Mass</source>

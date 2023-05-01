@@ -173,7 +173,7 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>A/R</source>
-        <translation>长宽比:</translation>
+        <translation>长宽比</translation>
     </message>
     <message>
         <source>&lt;custom&gt;</source>
@@ -1534,20 +1534,20 @@ Manually changing any keyframe will clear the warning.</source>
     <message>
         <source>Cannot Paste Insert a selection of unconnected FX nodes.
 Select FX nodes and related links before copying or cutting the selection you want to paste.</source>
-        <translation>不能粘贴 插入一个未连接的特效节点的选择。
-在复制或剪切你要粘贴的选区之前，选择特效节点和相关链接。</translation>
+        <translation>不能粘贴插入由多个未连接的特效节点构成的选择。
+在拷贝或剪切你要粘贴的选区之前，选择特效节点和相关链接。</translation>
     </message>
     <message>
         <source>Cannot Paste Add a selection of unconnected FX nodes.
 Select FX nodes and related links before copying or cutting the selection you want to paste.</source>
-        <translation>不能粘贴添加未连接的特效节点的选择。
-在复制或剪切你要粘贴的选区之前，选择特效节点和相关链接。</translation>
+        <translation>不能粘贴添加由多个未连接的特效节点构成的选择。
+在拷贝或剪切你要粘贴的选区之前，选择特效节点和相关链接。</translation>
     </message>
     <message>
         <source>Cannot Paste Replace a selection of unconnected FX nodes.
 Select FX nodes and related links before copying or cutting the selection you want to paste.</source>
-        <translation>不能粘贴替换一个未连接的特效节点的选择。
-在复制或剪切你要粘贴的选区之前，选择特效节点和相关链接。</translation>
+        <translation>不能粘贴替换由未连接的特效节点构成的选择。
+在拷贝或剪切你要粘贴的选区之前，选择特效节点和相关链接。</translation>
     </message>
 </context>
 <context>
