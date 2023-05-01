@@ -6,17 +6,17 @@
     <message>
         <location filename="../../image/ffmpeg/tiio_apng.cpp" line="225"/>
         <source>Scale</source>
-        <translation type="unfinished">缩放</translation>
+        <translation>缩放</translation>
     </message>
     <message>
         <location filename="../../image/ffmpeg/tiio_apng.cpp" line="226"/>
         <source>Looping</source>
-        <translation type="unfinished">循环</translation>
+        <translation>循环</translation>
     </message>
     <message>
         <location filename="../../image/ffmpeg/tiio_apng.cpp" line="227"/>
         <source>Write as .png</source>
-        <translation type="unfinished"></translation>
+        <translation>写成 .png</translation>
     </message>
 </context>
 <context>
@@ -52,12 +52,12 @@
     <message>
         <location filename="../../image/exr/tiio_exr.cpp" line="294"/>
         <source>96(RGB Float)</source>
-        <translation type="unfinished"></translation>
+        <translation>96(RGB 浮点)</translation>
     </message>
     <message>
         <location filename="../../image/exr/tiio_exr.cpp" line="295"/>
         <source>128(RGBA Float)</source>
-        <translation type="unfinished"></translation>
+        <translation>128(RGBA 浮点)</translation>
     </message>
     <message>
         <location filename="../../image/exr/tiio_exr.cpp" line="299"/>
@@ -72,22 +72,22 @@
     <message>
         <location filename="../../image/exr/tiio_exr.cpp" line="304"/>
         <source>Run Length Encoding (RLE)</source>
-        <translation>行程编码</translation>
+        <translation>行程编码(RLE)</translation>
     </message>
     <message>
         <location filename="../../image/exr/tiio_exr.cpp" line="307"/>
         <source>ZIP compression per Scanline (ZIPS)</source>
-        <translation></translation>
+        <translation>每个扫描线的 ZIP 压缩(ZIPS)</translation>
     </message>
     <message>
         <location filename="../../image/exr/tiio_exr.cpp" line="310"/>
         <source>ZIP compression per scanline band (ZIP)</source>
-        <translation></translation>
+        <translation>每个扫描线波段的 ZIP 压缩(ZIP)</translation>
     </message>
     <message>
         <location filename="../../image/exr/tiio_exr.cpp" line="313"/>
         <source>PIZ-based wavelet compression (PIZ)</source>
-        <translation></translation>
+        <translation>基于 PIZ 的小波压缩(PIZ)</translation>
     </message>
     <message>
         <location filename="../../image/exr/tiio_exr.cpp" line="315"/>
@@ -107,7 +107,7 @@
     <message>
         <location filename="../../image/exr/tiio_exr.cpp" line="319"/>
         <source>Color Space Gamma</source>
-        <translation type="unfinished"></translation>
+        <translation>颜色空间伽马</translation>
     </message>
 </context>
 <context>
@@ -115,12 +115,12 @@
     <message>
         <location filename="../../image/ffmpeg/tiio_ff_mov.cpp" line="234"/>
         <source>Quality</source>
-        <translation type="unfinished">质量</translation>
+        <translation>质量</translation>
     </message>
     <message>
         <location filename="../../image/ffmpeg/tiio_ff_mov.cpp" line="235"/>
         <source>Scale</source>
-        <translation type="unfinished">缩放</translation>
+        <translation>缩放</translation>
     </message>
 </context>
 <context>
@@ -241,7 +241,7 @@
     <message>
         <location filename="../../image/ffmpeg/tiio_ffmpeg.cpp" line="172"/>
         <source>FFmpeg returned error-code: %1</source>
-        <translation>FFmpeg 返回的错误编码: %1</translation>
+        <translation>FFmpeg 返回的错误编码：%1</translation>
     </message>
     <message>
         <location filename="../../image/ffmpeg/tiio_ffmpeg.cpp" line="160"/>
@@ -250,10 +250,10 @@
 Please check the file for errors.
 If the file doesn&apos;t play or is incomplete, 
 Please try raising the FFmpeg timeout in Preferences.</source>
-        <translation>FFmpeg 已超时。
-请查看文件错误。
-如果文件不能播放或者不完整，
-请在首选项调高 FFmpeg 的超时参数。</translation>
+        <translation>FFmpeg 超时
+请检查该文件是否有错误。
+如果文件不能播放或不完整，
+请尝试在首选项中提高 FFmpeg 的超时时间。</translation>
     </message>
 </context>
 <context>
@@ -483,12 +483,12 @@ Please try raising the FFmpeg timeout in Preferences.</source>
     <message>
         <location filename="../../image/tif/tiio_tif.cpp" line="737"/>
         <source>32(RGBA)</source>
-        <translation></translation>
+        <translation>32(RGBA)</translation>
     </message>
     <message>
         <location filename="../../image/tif/tiio_tif.cpp" line="738"/>
         <source>64(RGBA)</source>
-        <translation></translation>
+        <translation>64(RGBA)</translation>
     </message>
     <message>
         <location filename="../../image/tif/tiio_tif.cpp" line="739"/>

@@ -24,23 +24,23 @@
     <name>FlowLineStrokeStyle</name>
     <message>
         <source>Density</source>
-        <translation type="unfinished">密度</translation>
+        <translation>密度</translation>
     </message>
     <message>
         <source>Extension</source>
-        <translation type="unfinished"></translation>
+        <translation>扩展</translation>
     </message>
     <message>
         <source>Width Scale</source>
-        <translation type="unfinished"></translation>
+        <translation>宽度比</translation>
     </message>
     <message>
         <source>Straighten Ends</source>
-        <translation type="unfinished"></translation>
+        <translation>拉直末端</translation>
     </message>
     <message>
         <source>Flow Line</source>
-        <translation type="unfinished"></translation>
+        <translation>跟随线</translation>
     </message>
 </context>
 <context>
