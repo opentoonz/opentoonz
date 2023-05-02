@@ -1502,7 +1502,8 @@ int TCellSelection::Range::getColCount() const { return m_c1 - m_c0 + 1; }
 // TCellSelection
 //-----------------------------------------------------------------------------
 
-TCellSelection::TCellSelection() : m_timeStretchPopup(0), m_reframePopup(0) {
+TCellSelection::TCellSelection()
+    : m_timeStretchPopup(0), m_reframePopup(0), m_resizePivotRow(-1) {
   setAlternativeCommandNames();
 }
 
@@ -1650,6 +1651,10 @@ void TCellSelection::selectCells(int r0, int c0, int r1, int c1) {
   m_range.m_r1            = r1;
   m_range.m_c1            = c1;
   bool onlyOneRasterLevel = containsOnlyOneRasterLevel(r0, c0, r1, c1);
+  // set the nearest row
+  m_resizePivotRow =
+      (std::abs(r0 - m_resizePivotRow) < std::abs(r1 - m_resizePivotRow)) ? r0
+                                                                          : r1;
   CommandManager::instance()->enable(MI_CanvasSize, onlyOneRasterLevel);
 }
 
@@ -1661,13 +1666,15 @@ void TCellSelection::selectCell(int row, int col) {
   m_range.m_r1            = row;
   m_range.m_c1            = col;
   bool onlyOneRasterLevel = containsOnlyOneRasterLevel(row, col, row, col);
+  m_resizePivotRow        = row;
   CommandManager::instance()->enable(MI_CanvasSize, onlyOneRasterLevel);
 }
 
 //-----------------------------------------------------------------------------
 
 void TCellSelection::selectNone() {
-  m_range = Range();
+  m_range          = Range();
+  m_resizePivotRow = -1;
   CommandManager::instance()->enable(MI_CanvasSize, false);
 }
 

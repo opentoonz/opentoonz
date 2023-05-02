@@ -1268,7 +1268,8 @@ void XsheetViewer::keyPressEvent(QKeyEvent *event) {
     if (m_cellArea->isControlPressed()) {  // resize
 
       // resize selection of frames/rows forward or backwards
-      if (rowA < getCurrentRow())
+      assert(cellSel->getResizePivotRow() >= 0);
+      if (rowA < cellSel->getResizePivotRow())
         rowA += shift.frame();
       else
         rowB += shift.frame();
@@ -1290,10 +1291,10 @@ void XsheetViewer::keyPressEvent(QKeyEvent *event) {
 
     } else {  // shift
       CellPosition offset(shift * stride);
-      int movedRow0   = std::max(0, rowA + offset.frame());
-      int movedCol0   = std::max(firstCol, colA + offset.layer());
-      int diffRow = movedRow0 - rowA;
-      int diffCol = movedCol0 - colA;
+      int movedRow0 = std::max(0, rowA + offset.frame());
+      int movedCol0 = std::max(firstCol, colA + offset.layer());
+      int diffRow   = movedRow0 - rowA;
+      int diffCol   = movedCol0 - colA;
       cellSel->selectCells(rowA + diffRow, colA + diffCol, rowB + diffRow,
                            colB + diffCol);
       TApp::instance()->getCurrentSelection()->notifySelectionChanged();
