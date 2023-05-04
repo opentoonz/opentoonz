@@ -416,12 +416,14 @@ void DragSelectionTool::UndoChangeStrokes::restoreRegions() const {
 void DragSelectionTool::UndoChangeStrokes::undo() const {
   transform(m_oldStrokes, m_oldBBox, m_oldCenter, m_oldDeformValues);
   restoreRegions();
+  m_tool->notifyImageChanged();
 }
 
 //-----------------------------------------------------------------------------
 
 void DragSelectionTool::UndoChangeStrokes::redo() const {
   transform(m_newStrokes, m_newBBox, m_newCenter, m_newDeformValues);
+  m_tool->notifyImageChanged();
 }
 
 //-----------------------------------------------------------------------------
@@ -521,6 +523,7 @@ void UndoChangeOutlineStyle::transform(
 void UndoChangeOutlineStyle::undo() const {
   transform(m_oldOptions, m_oldBBox);
   TTool::getApplication()->getCurrentTool()->notifyToolChanged();
+  m_tool->notifyImageChanged();
 }
 
 //-----------------------------------------------------------------------------
@@ -528,6 +531,7 @@ void UndoChangeOutlineStyle::undo() const {
 void UndoChangeOutlineStyle::redo() const {
   transform(m_newOptions, m_newBBox);
   TTool::getApplication()->getCurrentTool()->notifyToolChanged();
+  m_tool->notifyImageChanged();
 }
 
 //-----------------------------------------------------------------------------
