@@ -539,6 +539,8 @@ void RowArea::drawOnionSkinSelection(QPainter &p) {
   }
   QPen frontPen, backPen;
 
+  p.setRenderHint(QPainter::Antialiasing, true);
+
   // If the onion skin is disabled, draw dash line instead.
   if (osMask.isEnabled()) {
     frontPen.setColor(frontDotOutlineColor);
