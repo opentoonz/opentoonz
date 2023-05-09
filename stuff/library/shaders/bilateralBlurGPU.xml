@@ -1,0 +1,52 @@
+<MainProgram>
+  <Name>
+    SHADER_bilateralBlurGPU
+  </Name>
+  <ProgramFile>
+    "programs/bilateralBlurGPU.frag"
+  </ProgramFile>
+</MainProgram>
+
+<InputPorts>
+  <InputPort>
+    "Source"
+  </InputPort>
+
+  <PortsProgram>
+    <Name>
+      SHADER_bilateralBlurGPU_ports
+    </Name>
+    <ProgramFile>
+      "programs/bilateralBlurGPU_ports.vert"
+    </ProgramFile>
+  </PortsProgram>
+</InputPorts>
+
+<HandledWorldTransforms>
+  isotropic
+</HandledWorldTransforms>
+  
+<Parameters>
+  <Parameter>
+    float u_sigmaD
+    <Default>
+      3
+    </Default>
+    <Range>
+      0 50
+    </Range>
+  </Parameter>
+
+  <Parameter>
+    float u_sigmaR
+    <Concept>
+      percent
+    </Concept>
+    <Default>
+      0.15
+    </Default>
+    <Range>
+      0 1
+    </Range>
+  </Parameter>
+</Parameters>

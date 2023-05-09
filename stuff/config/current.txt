@@ -520,6 +520,10 @@
   <item>"SHADER_wavy.color1"		"Color 1"	</item>
   <item>"SHADER_wavy.color2"		"Color 2"	</item>
   <item>"SHADER_wavy.time"		"Evolution"	</item>
+
+  <item>"SHADER_bilateralBlurGPU"			"GPU Bilateral Blur"	</item>
+  <item>"SHADER_bilateralBlurGPU.u_sigmaD"		"Radius"	</item>
+  <item>"SHADER_bilateralBlurGPU.u_sigmaR"		"Tolerance"	</item>
   
   <item>"SHADER_radialblurGPU"			"GPU Radial Blur"	</item>
   <item>"SHADER_radialblurGPU.center"		"Center"	</item>

@@ -1,0 +1,6 @@
+<fxlayout>
+  <page name="Bilateral Blur GPU">
+    <control>u_sigmaD</control>
+    <control>u_sigmaR</control>
+  </page>
+</fxlayout>

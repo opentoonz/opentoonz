@@ -187,6 +187,7 @@
   SHADER_starsky
   SHADER_sunflare
   SHADER_wavy
+  SHADER_bilateralBlurGPU
   SHADER_radialblurGPU
   SHADER_spinblurGPU
   SHADER_HSLBlendGPU
