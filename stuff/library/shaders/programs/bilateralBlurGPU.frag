@@ -65,14 +65,6 @@ void main( void )
   vec4 color = texture2D(inputImage[0], texCoord);
   color = bilateralFilter(inputImage[0], texCoord, resolution);
 
-  // DEBUG COLOR: Use this to test values, the color will be shown on the screen.
-  vec4 debugColor = vec4(0.0);
-  if (resolution.x < 1920.0) {
-    debugColor = vec4(1.0, 0.0, 0.0, 1.0); // Red
-  } else {
-    debugColor = vec4(0.0, 1.0, 0.0, 1.0); // Green
-  }
-
   // Output
   gl_FragColor = color;
 
