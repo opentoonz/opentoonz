@@ -68,6 +68,6 @@ void main( void )
   // Output
   gl_FragColor = color;
 
-  // Premultiply alpha (is this necessary?)
+  // Premultiply alpha
   gl_FragColor.rgb *= gl_FragColor.a;
 }
