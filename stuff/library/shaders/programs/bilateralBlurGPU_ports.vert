@@ -13,10 +13,6 @@ void main( void ) {
   worldToInput[0] = worldToOutput;
   inputRect[0] = outputRect;
 
-  // Let the input and output references be the same.
-  worldToInput[0] = worldToOutput;
-  inputRect[0]    = outputRect;
-
   // Does not link without this line
   gl_Position = vec4(0.0);
 }
