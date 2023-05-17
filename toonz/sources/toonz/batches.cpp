@@ -249,7 +249,7 @@ commandline += " -id " + task->m_id;*/
 #else
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
   process->setArguments(
-      task->getCommandLineArguments().split(" ", Qt::SkipEmptyParts));
+      QProcess::splitCommand(task->getCommandLineArguments()));
 #else
   process->setArguments(
       task->getCommandLineArguments().split(" ", QString::SkipEmptyParts));
