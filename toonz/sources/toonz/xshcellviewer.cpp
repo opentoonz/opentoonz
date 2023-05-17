@@ -1430,6 +1430,8 @@ void CellArea::drawExtenderHandles(QPainter &p) {
     selected.adjust(0, topAdj, 0, bottomAdj);
   }
 
+  p.setRenderHint(QPainter::Antialiasing, true);
+
   int x0, y0, x1, y1;
   x0 = selected.left();
   x1 = selected.right();
@@ -2840,6 +2842,8 @@ void CellArea::drawKeyframe(QPainter &p, const QRect toBeUpdated) {
   int r0, r1, c0, c1;  // range of visible rows and columns
   CellRange visible    = m_viewer->xyRectToRange(toBeUpdated);
   QColor keyFrameColor = Qt::white, outline = Qt::black;
+  p.setRenderHint(QPainter::Antialiasing, true);
+
   r0 = visible.from().frame();
   r1 = visible.to().frame();
   c0 = visible.from().layer();
