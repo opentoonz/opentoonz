@@ -257,6 +257,7 @@ commandline += " -id " + task->m_id;*/
   process->setArguments(
       task->getCommandLineArguments() + "");
 #endif
+#endif
 
 
   process->start();
