@@ -247,9 +247,17 @@ commandline += " -id " + task->m_id;*/
 #if defined(_WIN32)
   process->setNativeArguments(task->getCommandLineArguments());
 #else
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
   process->setArguments(
       QProcess::splitCommand(task->getCommandLineArguments()));
+#else //Emulate the old way of starting to process. 
+//TODO: implement it properly, the new way compiled but did not actually start
+// render tasks because the split command did not play well with the already escaped quotes 
+//delivered by "task->getCommandLineArguments()"
+  process->setArguments(
+      task->getCommandLineArguments() + "");
 #endif
+
 
   process->start();
   process->waitForFinished(-1);
