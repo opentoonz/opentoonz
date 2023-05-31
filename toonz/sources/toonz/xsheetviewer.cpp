@@ -1265,7 +1265,7 @@ void XsheetViewer::keyPressEvent(QKeyEvent *event) {
     cellSel->getSelectedCells(rowA, colA, rowB, colB);
     stride.setFrame(cellSel->getSelectedCells().getRowCount());
 
-    if (m_cellArea->isControlPressed()) {  // resize
+    if (event->modifiers() & Qt::ShiftModifier) {  // resize
 
       // resize selection of frames/rows forward or backwards
       assert(cellSel->getResizePivotRow() >= 0);
