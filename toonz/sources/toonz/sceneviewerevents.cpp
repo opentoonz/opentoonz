@@ -1357,34 +1357,55 @@ public:
 //-----------------------------------------------------------------------------
 
 bool changeFrameSkippingHolds(QKeyEvent *e) {
-  if ((e->modifiers() & Qt::ControlModifier) == 0)
-    return false;
+
   TApp *app        = TApp::instance();
   TFrameHandle *fh = app->getCurrentFrame();
   if (!fh->isEditingScene()) return false;
   int row       = fh->getFrame();
+  int old_row = row;
   int col       = app->getCurrentColumn()->getColumnIndex();
+  int old_col = col;
   TXsheet *xsh  = app->getCurrentXsheet()->getXsheet();
   TXshCell cell = xsh->getCell(row, col);
-  if (e->key() == Qt::Key_Down || e->key() == Qt::Key_Right) {
-    if (cell.isEmpty()) {
-      int r0, r1;
-      if (xsh->getCellRange(col, r0, r1)) {
-        while (row <= r1 && xsh->getCell(row, col).isEmpty()) row++;
-        if (xsh->getCell(row, col).isEmpty()) return false;
-      } else
-        return false;
-    } else {
-      while (xsh->getCell(row, col) == cell) row++;
+  int r0, r1;
+  xsh->getCellRange(col, r0, r1);
+
+  if ((e->modifiers() & Qt::ControlModifier)) {
+
+    if (e->key() == Qt::Key_Down || e->key() == Qt::Key_Right) {
+      row++;
+      if (xsh->getCell(row, col).isEmpty() ){
+        while (row <= r1 && xsh->getCell(row, col).isEmpty()) row++; //skip empty
+      } else {
+        while (row <= r1 && xsh->getCell(row+1, col).m_level == cell.m_level) row++; //last of neighbor
+      }
+      if (row > r1) row = r1;
     }
+    if (e->key() == Qt::Key_Up || e->key() == Qt::Key_Left) {
+      row--;
+      if (xsh->getCell(row, col).isEmpty()){
+        while (row >= r0 && xsh->getCell(row, col).isEmpty()) row--; //skip empty
+      } else {
+        while (row >= r0 && xsh->getCell(row-1, col).m_level == cell.m_level) row--; //first of block
+      }
+      if (row < r0) row = r0;
+    }
+
     fh->setFrame(row);
-    return true;
-  } else if (e->key() == Qt::Key_Up || e->key() == Qt::Key_Left) {
-    while (row >= 0 && xsh->getCell(row, col) == cell) row--;
-    if (row < 0) return false;
-    cell = xsh->getCell(row, col);
-    while (row > 0 && xsh->getCell(row - 1, col) == cell) row--;
-    fh->setFrame(row);
+
+            //select active cell
+    TCellSelection *cellSel = dynamic_cast<TCellSelection *>(TSelection::getCurrent());
+    if (e->modifiers() & Qt::ShiftModifier) {
+      //exapnd selection with Ctrl+Shift+Arrows
+      TCellSelection::Range range = cellSel->getSelectedCells();
+      range.m_r0 = std::min(range.m_r0, row);
+      range.m_r1 = std::max(range.m_r1, row);
+      cellSel->selectCells(range.m_r0, range.m_c0, range.m_r1, range.m_c1);
+    } else {
+      cellSel->selectCells(row,col, row,col);
+    }
+    TApp::instance()->getCurrentSelection()->notifySelectionChanged();
+
     return true;
   }
 
