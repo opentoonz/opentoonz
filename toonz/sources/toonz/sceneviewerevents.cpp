@@ -1357,8 +1357,7 @@ public:
 //-----------------------------------------------------------------------------
 
 bool changeFrameSkippingHolds(QKeyEvent *e) {
-  if ((e->modifiers() & Qt::ControlModifier) == 0 ||
-      (e->key() != Qt::Key_Down && e->key() != Qt::Key_Up))
+  if ((e->modifiers() & Qt::ControlModifier) == 0)
     return false;
   TApp *app        = TApp::instance();
   TFrameHandle *fh = app->getCurrentFrame();
@@ -1367,7 +1366,7 @@ bool changeFrameSkippingHolds(QKeyEvent *e) {
   int col       = app->getCurrentColumn()->getColumnIndex();
   TXsheet *xsh  = app->getCurrentXsheet()->getXsheet();
   TXshCell cell = xsh->getCell(row, col);
-  if (e->key() == Qt::Key_Down) {
+  if (e->key() == Qt::Key_Down || e->key() == Qt::Key_Right) {
     if (cell.isEmpty()) {
       int r0, r1;
       if (xsh->getCellRange(col, r0, r1)) {
@@ -1378,15 +1377,18 @@ bool changeFrameSkippingHolds(QKeyEvent *e) {
     } else {
       while (xsh->getCell(row, col) == cell) row++;
     }
-  } else {
-    // Key_Up
+    fh->setFrame(row);
+    return true;
+  } else if (e->key() == Qt::Key_Up || e->key() == Qt::Key_Left) {
     while (row >= 0 && xsh->getCell(row, col) == cell) row--;
     if (row < 0) return false;
     cell = xsh->getCell(row, col);
     while (row > 0 && xsh->getCell(row - 1, col) == cell) row--;
+    fh->setFrame(row);
+    return true;
   }
-  fh->setFrame(row);
-  return true;
+
+  return false;
 }
 
 //-----------------------------------------------------------------------------
