@@ -24,6 +24,8 @@ Please download and install OpenToonz from the latest installer at <https://open
 
 Older versions and unstable nightly build are also available at <https://github.com/opentoonz/opentoonz/releases>.
 
+If you cannot install because you lack sufficent permissions, read [here](./doc/how_to_extract_opentoonz.md)
+
 ## How to Build Locally
 
 - [Windows](./doc/how_to_build_win.md)
