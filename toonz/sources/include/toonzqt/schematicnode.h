@@ -66,9 +66,6 @@ protected slots:
 
 class SchematicThumbnailToggle final : public QObject, public QGraphicsItem {
   Q_OBJECT
-#ifndef MACOSX
-  Q_INTERFACES(QGraphicsItem)
-#endif
 
   bool m_isDown;
 
@@ -96,9 +93,7 @@ signals:
 
 class SchematicToggle : public QObject, public QGraphicsItem {
   Q_OBJECT
-#ifndef MACOSX
-  Q_INTERFACES(QGraphicsItem)
-#endif
+
 protected:
   QIcon m_imageOn, m_imageOn2, m_imageOff;
   QColor m_colorOn, m_colorOff;
@@ -184,9 +179,6 @@ protected:
 
 class SchematicHandleSpinBox : public QObject, public QGraphicsItem {
   Q_OBJECT
-#ifndef MACOSX
-  Q_INTERFACES(QGraphicsItem)
-#endif
 
 protected:
   Qt::MouseButton m_buttonState;
@@ -232,7 +224,6 @@ protected:
 */
 class SchematicLink : public QObject, public QGraphicsItem {
   Q_OBJECT
-  Q_INTERFACES(QGraphicsItem)
 
   SchematicPort *m_startPort, *m_endPort;
   QPainterPath m_path, m_hitPath;
@@ -321,9 +312,6 @@ protected:
 */
 class SchematicPort : public QObject, public QGraphicsItem {
   Q_OBJECT
-#ifndef MACOSX
-  Q_INTERFACES(QGraphicsItem)
-#endif
 
 protected:
   Qt::MouseButton m_buttonState;
@@ -432,9 +420,6 @@ signals:
 
 class SchematicNode : public QObject, public QGraphicsItem {
   Q_OBJECT
-#ifndef MACOSX
-  Q_INTERFACES(QGraphicsItem)
-#endif
 
 protected:
   SchematicScene *m_scene;
