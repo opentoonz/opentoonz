@@ -215,6 +215,7 @@ set(SOURCES
     history.cpp
     loadfoldercommand.cpp
     loadfolderpopup.cpp
+    entry.cpp
     main.cpp
     mainwindow.cpp
     matchline.cpp
