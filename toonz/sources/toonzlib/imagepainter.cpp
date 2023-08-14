@@ -21,10 +21,10 @@
 
 using namespace ImagePainter;
 
+namespace {
 TEnv::IntVar FlipBookWhiteBgToggle("FlipBookWhiteBgToggle", 1);
 TEnv::IntVar FlipBookBlackBgToggle("FlipBookBlackBgToggle", 0);
 TEnv::IntVar FlipBookCheckBgToggle("FlipBookCheckBgToggle", 0);
-namespace {
 
 //-----------------------------------------------------------------------------
 
