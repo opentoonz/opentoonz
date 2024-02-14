@@ -343,11 +343,6 @@ void SceneViewer::tabletEvent(QTabletEvent *e) {
 #endif
   } break;
   case QEvent::TabletMove: {
-    // for Windowsm, use tabletEvent only for the left Button
-    if (m_tabletState != StartStroke && m_tabletState != OnStroke) {
-      m_tabletEvent = false;
-      break;
-    }
 
 #ifdef MACOSX
     // for now OSX seems to fail to call enter/leaveEvent properly while
@@ -357,6 +352,18 @@ void SceneViewer::tabletEvent(QTabletEvent *e) {
     // call the fake enter event
     if (isHoveringInsideViewer) onEnter();
 #endif
+
+    // for Windowsm, use tabletEvent only for the left Button
+    if (m_tabletState != StartStroke && m_tabletState != OnStroke) {
+      m_tabletEvent = false;
+
+#ifdef MACOSX
+      // leave the fake event after the stroke is finished
+      onLeave();
+#endif
+
+      break;
+    }
 
     QPointF curPos = e->posF() * getDevPixRatio();
 #if defined(_WIN32) && QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
