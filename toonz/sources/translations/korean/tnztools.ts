@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="ko" sourcelanguage="en">
+<TS version="2.0" language="ko" sourcelanguage="en">
 <context>
     <name>ArrowToolOptionsBox</name>
     <message>
@@ -79,112 +79,128 @@
         <source>Pick:</source>
         <translation>선택:</translation>
     </message>
+    <message>
+        <source>Flip Object Horizontally</source>
+        <translation>물체를 수평으로 뒤집기</translation>
+    </message>
+    <message>
+        <source>Flip Object Vertically</source>
+        <translation>물체를 수직으로 뒤집기</translation>
+    </message>
+    <message>
+        <source>Rotate Object Left</source>
+        <translation>물체를 왼쪽으로 회전</translation>
+    </message>
+    <message>
+        <source>Rotate Object Right</source>
+        <translation>물체를 오른쪽으로 회전</translation>
+    </message>
 </context>
 <context>
     <name>BrushTool</name>
     <message>
         <source>Size</source>
-        <translation type="vanished">크기</translation>
+        <translation>크기</translation>
     </message>
     <message>
         <source>Accuracy:</source>
-        <translation type="vanished">정확도:</translation>
+        <translation>정확도:</translation>
     </message>
     <message>
         <source>Smooth:</source>
-        <translation type="vanished">부드러운:</translation>
+        <translation>부드러운:</translation>
     </message>
     <message>
         <source>Preset:</source>
-        <translation type="vanished">사전설정:</translation>
+        <translation>사전설정:</translation>
     </message>
     <message>
         <source>&lt;custom&gt;</source>
-        <translation type="vanished">&lt;사용자 정의&gt;</translation>
+        <translation>&lt;사용자 정의&gt;</translation>
     </message>
     <message>
         <source>Break</source>
-        <translation type="vanished">분리</translation>
+        <translation>분리</translation>
     </message>
     <message>
         <source>Pressure</source>
-        <translation type="vanished">압력</translation>
+        <translation>압력</translation>
     </message>
     <message>
         <source>Cap</source>
-        <translation type="vanished">캡</translation>
+        <translation>캡</translation>
     </message>
     <message>
         <source>Join</source>
-        <translation type="vanished">결합</translation>
+        <translation>결합</translation>
     </message>
     <message>
         <source>Miter:</source>
-        <translation type="vanished">마이터:</translation>
+        <translation>마이터:</translation>
     </message>
     <message>
         <source>Range:</source>
-        <translation type="vanished">범위:</translation>
+        <translation>범위:</translation>
     </message>
     <message>
         <source>Snap</source>
-        <translation type="vanished">스냅</translation>
+        <translation>스냅</translation>
     </message>
     <message>
         <source>Off</source>
-        <translation type="vanished">끄기</translation>
+        <translation>끄기</translation>
     </message>
     <message>
         <source>Linear</source>
-        <translation type="vanished">선형</translation>
+        <translation>선형</translation>
     </message>
     <message>
         <source>In</source>
-        <translation type="vanished">가속</translation>
+        <translation>가속</translation>
     </message>
     <message>
         <source>Out</source>
-        <translation type="vanished">감속</translation>
+        <translation>감속</translation>
     </message>
     <message>
         <source>In&amp;Out</source>
-        <translation type="vanished">가속&amp;감속</translation>
+        <translation>가속&amp;감속</translation>
     </message>
     <message>
         <source>Low</source>
-        <translation type="vanished">낮은</translation>
+        <translation>낮은</translation>
     </message>
     <message>
         <source>Med</source>
-        <translation type="vanished">중간</translation>
+        <translation>중간</translation>
     </message>
     <message>
         <source>High</source>
-        <translation type="vanished">높은</translation>
+        <translation>높은</translation>
     </message>
     <message>
         <source>Butt cap</source>
-        <translation type="vanished">버트 캡</translation>
+        <translation>버트 캡</translation>
     </message>
     <message>
         <source>Round cap</source>
-        <translation type="vanished">라운드 캡</translation>
+        <translation>라운드 캡</translation>
     </message>
     <message>
         <source>Projecting cap</source>
-        <translation type="vanished">돌출선 끝</translation>
+        <translation>돌출선 끝</translation>
     </message>
     <message>
         <source>Miter join</source>
-        <translation type="vanished">마이터 결합</translation>
+        <translation>마이터 결합</translation>
     </message>
     <message>
         <source>Round join</source>
-        <translation type="vanished">라운드 결합</translation>
+        <translation>라운드 결합</translation>
     </message>
     <message>
         <source>Bevel join</source>
-        <translation type="vanished">베벨 결합</translation>
+        <translation>베벨 결합</translation>
     </message>
 </context>
 <context>
@@ -531,6 +547,10 @@
         <source>Autopaint Lines</source>
         <translation>자동 색칠</translation>
     </message>
+    <message>
+        <source>Pick+Freehand</source>
+        <translation>선택+자유형</translation>
+    </message>
 </context>
 <context>
     <name>FingerTool</name>
@@ -755,7 +775,7 @@
     </message>
     <message>
         <source>Vertex Name:</source>
-        <translation>꼭지점 이름</translation>
+        <translation>꼭지점 이름:</translation>
     </message>
     <message>
         <source>Allow Stretching</source>
@@ -1087,7 +1107,7 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>The current column is locked.</source>
-        <translation>현재 열이 잠겨 있다</translation>
+        <translation>현재 열이 잠겨 있다.</translation>
     </message>
     <message>
         <source>The current column is hidden.</source>
@@ -1139,7 +1159,7 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>The current tool cannot be used on a mesh-deformed level</source>
-        <translation>현재 도구는 메쉬 변형 레벨에 사용할 수 없음.</translation>
+        <translation>현재 도구는 메쉬 변형 레벨에 사용할 수 없음</translation>
     </message>
     <message>
         <source>The current frame is locked: any editing is forbidden.</source>
@@ -1240,7 +1260,7 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>No Antialiasing</source>
-        <translation>앤티 앨리어싱 없음.</translation>
+        <translation>앤티 앨리어싱 없음</translation>
     </message>
 </context>
 <context>
@@ -1394,6 +1414,22 @@ Do you want to proceed?</source>
         <source>Thickness</source>
         <translation>굵기</translation>
     </message>
+    <message>
+        <source>Flip Selection Horizontally</source>
+        <translation>선택영역을 가로로 뒤집기</translation>
+    </message>
+    <message>
+        <source>Flip Selection Vertically</source>
+        <translation>선택영역을 수직으로 뒤집기</translation>
+    </message>
+    <message>
+        <source>Rotate Selection Left</source>
+        <translation>선택영역을 왼쪽으로 회전</translation>
+    </message>
+    <message>
+        <source>Rotate Selection Right</source>
+        <translation>선택영역을 오른쪽으로 회전</translation>
+    </message>
 </context>
 <context>
     <name>ShiftTraceToolOptionBox</name>
@@ -1449,7 +1485,7 @@ Do you want to proceed?</source>
     <name>StyleIndexLineEdit</name>
     <message>
         <source>current</source>
-        <translation type="vanished">현재</translation>
+        <translation>현재</translation>
     </message>
 </context>
 <context>

@@ -54,6 +54,10 @@ bool checkExpressionReferences(const std::set<int> &indices,
 // checkInvert is always true for collapsing in stage schematic
 bool checkExpressionReferences(const QList<TStageObjectId> &objects);
 
+// Check if any column has visibility toggles with different states and the
+// "unify visibility toggles" option is enabled
+void unifyColumnVisibilityToggles();
+
 }  // namespace ColumnCmd
 
 #endif

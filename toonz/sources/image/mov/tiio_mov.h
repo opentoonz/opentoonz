@@ -7,6 +7,11 @@
 #include "tiio_mov_proxy.h"
 #else
 
+// Toonz includes
+#include "tlevel_io.h"
+#include "tthreadmessage.h"
+#include "tcommon.h"
+
 // Windows include
 #include <windows.h>
 
@@ -39,11 +44,6 @@ namespace QuickTime {
 
 #include "tquicktime.h"
 }  // namespace QuickTime
-
-// Toonz includes
-#include "tlevel_io.h"
-#include "tthreadmessage.h"
-#include "tcommon.h"
 
 #undef DVAPI
 #undef DVVAR

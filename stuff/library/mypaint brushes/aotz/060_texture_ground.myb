@@ -176,7 +176,7 @@
             "inputs": {}
         },
         "opaque": {
-            "base_value": 0.45,
+            "base_value": 0.65,
             "inputs": {
                 "pressure": [
                     [

@@ -266,6 +266,13 @@ void SchematicScenePanel::onColumnPaste(const QList<TXshColumnP> &columns) {
 
 //-----------------------------------------------------------------------------
 
+void SchematicScenePanel::onPreferenceChanged(const QString &prefName) {
+  if (prefName == "unifyColumnVisibilityToggles")
+    m_schematicViewer->updateSchematic();
+}
+
+//-----------------------------------------------------------------------------
+
 void SchematicScenePanel::showEvent(QShowEvent *e) {
   if (m_schematicViewer->isStageSchematicViewed())
     setWindowTitle(QObject::tr("Stage Schematic"));
@@ -299,6 +306,8 @@ void SchematicScenePanel::showEvent(QShowEvent *e) {
           SLOT(updateSchematic()));
   connect(app->getCurrentScene(), SIGNAL(sceneSwitched()), m_schematicViewer,
           SLOT(onSceneSwitched()));
+  connect(app->getCurrentScene(), SIGNAL(preferenceChanged(const QString &)),
+          this, SLOT(onPreferenceChanged(const QString &)));
   connect(m_schematicViewer, SIGNAL(columnPasted(const QList<TXshColumnP> &)),
           this, SLOT(onColumnPaste(const QList<TXshColumnP> &)));
   m_schematicViewer->updateSchematic();
@@ -330,6 +339,8 @@ void SchematicScenePanel::hideEvent(QHideEvent *e) {
              m_schematicViewer, SLOT(updateSchematic()));
   disconnect(app->getCurrentScene(), SIGNAL(sceneSwitched()), m_schematicViewer,
              SLOT(onSceneSwitched()));
+  disconnect(app->getCurrentScene(), SIGNAL(preferenceChanged(const QString &)),
+             this, SLOT(onPreferenceChanged(const QString &)));
   disconnect(m_schematicViewer,
              SIGNAL(columnPasted(const QList<TXshColumnP> &)), this,
              SLOT(onColumnPaste(const QList<TXshColumnP> &)));
@@ -531,8 +542,8 @@ void PaletteViewerPanel::reset() {
 //-----------------------------------------------------------------------------
 
 void PaletteViewerPanel::initializeTitleBar() {
-  m_freezeButton = new TPanelTitleBarButton(
-      getTitleBar(), getIconThemePath("actions/20/pane_freeze.svg"));
+  m_freezeButton =
+      new TPanelTitleBarButton(getTitleBar(), getIconPath("pane_freeze"));
   m_freezeButton->setToolTip(tr("Freeze"));
   getTitleBar()->add(QPoint(-54, 0), m_freezeButton);
   m_freezeButton->setPressed(m_isFrozen);
@@ -979,7 +990,7 @@ public:
 
 //-----------------------------------------------------------------------------
 CommandBarPanel::CommandBarPanel(QWidget *parent)
-    : TPanel(parent, 0, TDockWidget::horizontal) {
+    : TPanel(parent, Qt::WindowFlags(), TDockWidget::horizontal) {
   CommandBar *xsheetToolbar = new CommandBar();
   setWidget(xsheetToolbar);
   setIsMaximizable(false);
@@ -1007,7 +1018,7 @@ OpenFloatingPanel openCommandBarCommand(MI_OpenCommandToolbar, "CommandBar",
 //---------------------------------------------------------
 
 ToolOptionPanel::ToolOptionPanel(QWidget *parent)
-    : TPanel(parent, 0, TDockWidget::horizontal) {
+    : TPanel(parent, Qt::WindowFlags(), TDockWidget::horizontal) {
   TApp *app    = TApp::instance();
   m_toolOption = new ToolOptions;
 
@@ -1111,10 +1122,10 @@ void FlipbookPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
   bool ret      = true;
   int x         = -91;
   int iconWidth = 20;
+
   // safe area button
   TPanelTitleBarButtonForSafeArea *safeAreaButton =
-      new TPanelTitleBarButtonForSafeArea(
-          titleBar, getIconThemePath("actions/20/pane_safe.svg"));
+      new TPanelTitleBarButtonForSafeArea(titleBar, getIconPath("pane_safe"));
   safeAreaButton->setToolTip(tr("Safe Area (Right Click to Select)"));
   titleBar->add(QPoint(x, 0), safeAreaButton);
   ret = ret && connect(safeAreaButton, SIGNAL(toggled(bool)),
@@ -1130,7 +1141,7 @@ void FlipbookPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
   x += 28 + iconWidth;
   // minimize button
   m_button = new TPanelTitleBarButton(
-      titleBar, getIconThemePath("actions/20/pane_minimize.svg"));
+      titleBar, getIconPath("pane_minimize"));
   m_button->setToolTip(tr("Minimize"));
   m_button->setPressed(false);
 
@@ -1201,7 +1212,7 @@ class BrowserFactory final : public TPanelFactory {
 public:
   BrowserFactory() : TPanelFactory("Browser") {}
   void initialize(TPanel *panel) override {
-    FileBrowser *browser = new FileBrowser(panel, 0, false, true);
+    FileBrowser *browser = new FileBrowser(panel, Qt::WindowFlags(), false, true);
     panel->setWidget(browser);
     panel->setWindowTitle(QObject::tr("File Browser"));
     TFilePath currentProjectFolder =
@@ -1218,7 +1229,7 @@ class PreproductionBoardFactory final : public TPanelFactory {
 public:
   PreproductionBoardFactory() : TPanelFactory("PreproductionBoard") {}
   void initialize(TPanel *panel) override {
-    SceneBrowser *browser = new SceneBrowser(panel, 0, false, true);
+    SceneBrowser *browser = new SceneBrowser(panel, Qt::WindowFlags(), false, true);
     panel->setWidget(browser);
     panel->setWindowTitle(QObject::tr("Preproduction Board"));
     TFilePath scenesFolder =

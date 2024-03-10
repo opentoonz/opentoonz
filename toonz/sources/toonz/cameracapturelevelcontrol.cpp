@@ -400,3 +400,34 @@ void CameraCaptureLevelControl::computeLut() {
     p[i] = (uchar)std::floor(value * maxChannelValueF);
   }
 }
+
+//-----------------------------------------------------------------------------
+
+void CameraCaptureLevelControl::getValues(int& black, int& white,
+                                          int& threshold, double& gamma) {
+  black     = m_histogram->black();
+  white     = m_histogram->white();
+  threshold = m_histogram->threshold();
+  gamma     = (double)m_histogram->gamma();
+}
+
+//-----------------------------------------------------------------------------
+
+void CameraCaptureLevelControl::setValues(const int black, const int white,
+                                          const int threshold,
+                                          const double gamma,
+                                          const bool color_grayscale) {
+  m_whiteFld->setRange(black + 2, 255);
+  m_blackFld->setRange(0, white - 2);
+  m_blackFld->setValue(black);
+  m_whiteFld->setValue(white);
+  m_gammaFld->setValue(gamma);
+  m_thresholdFld->setValue(threshold);
+
+  m_histogram->setValues(m_blackFld->getValue(), m_whiteFld->getValue(),
+                         m_gammaFld->getValue());
+  m_histogram->setThreshold(m_thresholdFld->getValue());
+
+  setMode(color_grayscale);
+  computeLut();
+}

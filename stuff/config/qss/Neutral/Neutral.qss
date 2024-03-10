@@ -363,10 +363,7 @@ TPanelTitleBar {
   min-height: 18;
   qproperty-TitleColor: #000;
   qproperty-ActiveTitleColor: rgba(255, 255, 255, 0.8);
-  qproperty-BorderPixmap: url('none');
-  qproperty-ActiveBorderPixmap: url('../Default/imgs/black/none');
-  qproperty-FloatBorderPixmap: url('none');
-  qproperty-FloatActiveBorderPixmap: url('../Default/imgs/black/none');
+  qproperty-OverColor: #bd5454;
 }
 TPanelTitleBarButton {
   qproperty-PressedColor: #8FA0B2;
@@ -1794,6 +1791,7 @@ SchematicViewer {
   qproperty-FxColumnColor: #928562;
   qproperty-PaletteColumnColor: #599586;
   qproperty-MeshColumnColor: #8b73a7;
+  qproperty-MetaColumnColor: #8c8c8c;
   qproperty-ReferenceColumnColor: #959595;
   qproperty-TableColor: #a4a4bf;
   qproperty-ActiveCameraColor: #6491be;
@@ -2269,6 +2267,14 @@ Ruler {
 #RenameCellField {
   padding-right: 3;
 }
+#XsheetBreadcrumbs {
+  padding: 0 5px 0 5px;
+  margin: 0;
+  border-bottom: 1 solid #5a5a5a;
+}
+#XsheetBreadcrumbs::separator:horizontal {
+  margin: 0 0 0 2;
+}
 /* xsheetColumnHeader (Context Menus)
 ----------------------------------------------------------------------------- */
 #xsheetColumnAreaMenu_Preview {
@@ -2343,6 +2349,9 @@ XsheetViewer {
   qproperty-MeshColumnColor: #8b73a7;
   qproperty-MeshColumnBorderColor: #654f7e;
   qproperty-SelectedMeshColumnColor: #a18fc3;
+  qproperty-MetaColumnColor: #8c8c8c;
+  qproperty-MetaColumnBorderColor: #666666;
+  qproperty-SelectedMetaColumnColor: #a2a6aa;
   qproperty-SoundTextColumnColor: #a7a7a7;
   qproperty-SoundTextColumnBorderColor: #818181;
   qproperty-SelectedSoundTextColumnColor: #bbbfc3;
@@ -2368,6 +2377,7 @@ XsheetViewer {
   qproperty-XsheetPreviewButtonOnImage: url('../Default/imgs/black/x_prev_eye_on.svg');
   qproperty-XsheetPreviewButtonBgOffColor: transparent;
   qproperty-XsheetPreviewButtonOffImage: url('../Default/imgs/black/x_prev_eye_off.svg');
+  qproperty-XsheetUnifiedButtonTranspImage: url('../Default/imgs/black/x_prev_eye_transp.svg');
   qproperty-XsheetCamstandButtonBgOnColor: #eb906b;
   qproperty-XsheetCamstandButtonOnImage: url('../Default/imgs/black/x_table_view_on.svg');
   qproperty-XsheetCamstandButtonTranspImage: url('../Default/imgs/black/x_table_view_transp.svg');
@@ -2384,24 +2394,19 @@ XsheetViewer {
   qproperty-TimelinePreviewButtonBgOnColor: #808080;
   qproperty-TimelinePreviewButtonOnImage: url('../Default/imgs/black/preview_small.svg');
   qproperty-TimelinePreviewButtonBgOffColor: #808080;
-  qproperty-TimelinePreviewButtonOffImage: url('none');
+  qproperty-TimelinePreviewButtonOffImage: url('../Default/imgs/black/transparent.svg');
+  qproperty-TimelineUnifiedButtonTranspImage: url('../Default/imgs/black/preview_trans_small.svg');
   qproperty-TimelineCamstandButtonBgOnColor: #808080;
   qproperty-TimelineCamstandButtonOnImage: url('../Default/imgs/black/table_small.svg');
   qproperty-TimelineCamstandButtonTranspImage: url('../Default/imgs/black/trans_small.svg');
   qproperty-TimelineCamstandButtonBgOffColor: #808080;
-  qproperty-TimelineCamstandButtonOffImage: url('none');
+  qproperty-TimelineCamstandButtonOffImage: url('../Default/imgs/black/transparent.svg');
   qproperty-TimelineLockButtonBgOnColor: #808080;
   qproperty-TimelineLockButtonOnImage: url('../Default/imgs/black/lock_on_small.svg');
   qproperty-TimelineLockButtonBgOffColor: #808080;
-  qproperty-TimelineLockButtonOffImage: url('none');
+  qproperty-TimelineLockButtonOffImage: url('../Default/imgs/black/transparent.svg');
   qproperty-TimelineConfigButtonBgColor: #808080;
   qproperty-TimelineConfigButtonImage: url('../Default/imgs/black/timeline_config.svg');
-  qproperty-LayerHeaderPreviewImage: url('../Default/imgs/black/layer_header_prev_eye.svg');
-  qproperty-LayerHeaderPreviewOverImage: url('../Default/imgs/black/layer_header_prev_eye_over.svg');
-  qproperty-LayerHeaderCamstandImage: url('../Default/imgs/black/layer_header_table_view.svg');
-  qproperty-LayerHeaderCamstandOverImage: url('../Default/imgs/black/layer_header_table_view_over.svg');
-  qproperty-LayerHeaderLockImage: url('../Default/imgs/black/layer_lock_on.svg');
-  qproperty-LayerHeaderLockOverImage: url('../Default/imgs/black/layer_lock_on_over.svg');
 }
 /* -----------------------------------------------------------------------------
    Function Editor

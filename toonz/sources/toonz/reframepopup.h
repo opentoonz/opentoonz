@@ -26,11 +26,13 @@ class ReframePopup final : public DVGui::Dialog {
   Q_OBJECT
 
   DVGui::IntLineEdit *m_step, *m_blank;
+  QWidget *m_blankFieldContainer, *m_blankCellCountContainer;
   QLabel* m_blankCellCountLbl;
 
 public:
   ReframePopup();
   void getValues(int& step, int& blank);
+  void showInsertBlankField(bool show);
 
 protected:
   void showEvent(QShowEvent* event) override;

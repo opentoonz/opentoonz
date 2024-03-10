@@ -700,47 +700,9 @@ void TXshColumn::setIsMask(bool on) {
 
 //-----------------------------------------------------------------------------
 
-void TXshColumn::initColorFilters() {
-  static bool _firstTime = true;
-  if (!_firstTime) return;
-  filterColors[TXshColumn::FilterNone] =
-      QPair<QString, TPixel32>(QObject::tr("None"), TPixel::Black);
-  filterColors[TXshColumn::FilterRed] =
-      QPair<QString, TPixel32>(QObject::tr("Red"), TPixel::Red);
-  filterColors[TXshColumn::FilterGreen] =
-      QPair<QString, TPixel32>(QObject::tr("Green"), TPixel::Green);
-  filterColors[TXshColumn::FilterBlue] =
-      QPair<QString, TPixel32>(QObject::tr("Blue"), TPixel::Blue);
-  filterColors[TXshColumn::FilterDarkYellow] =
-      QPair<QString, TPixel32>(QObject::tr("DarkYellow"), TPixel(128, 128, 0));
-  filterColors[TXshColumn::FilterDarkCyan] =
-      QPair<QString, TPixel32>(QObject::tr("DarkCyan"), TPixel(0, 128, 128));
-  filterColors[TXshColumn::FilterDarkMagenta] =
-      QPair<QString, TPixel32>(QObject::tr("DarkMagenta"), TPixel(128, 0, 128));
-  _firstTime = false;
-}
-
-//-----------------------------------------------------------------------------
-
-TPixel32 TXshColumn::getFilterColor() {
-  return TXshColumn::getFilterInfo(m_filterColorId).second;
-}
-
-//-----------------------------------------------------------------------------
-
-QPair<QString, TPixel32> TXshColumn::getFilterInfo(
-    TXshColumn::FilterColor key) {
-  TXshColumn::initColorFilters();
-  if (!filterColors.contains(key))
-    return QPair<QString, TPixel32>(QObject::tr("None"), TPixel::Black);
-  return filterColors.value(key);
-}
-
-//-----------------------------------------------------------------------------
-
 void TXshColumn::resetColumnProperties() {
   setStatusWord(0);
   setOpacity(255);
   setColorTag(0);
-  setFilterColorId(FilterNone);
+  setColorFilterId(0);  // None
 }

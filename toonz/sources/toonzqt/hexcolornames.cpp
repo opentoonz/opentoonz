@@ -390,7 +390,10 @@ void HexLineEdit::mousePressEvent(QMouseEvent *event) {
 
 void HexLineEdit::focusOutEvent(QFocusEvent *event) {
   QLineEdit::focusOutEvent(event);
-  deselect();
+  if (!m_editing) {
+    deselect();
+  }
+
   m_editing = false;
 }
 

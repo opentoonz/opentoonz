@@ -38,7 +38,7 @@ void CastSelection::getSelectedLevels(std::vector<TXshLevel *> &levels) {
   CastItems const &castItems = m_browser->getCastItems();
   for (int i = 0; i < castItems.getItemCount(); i++) {
     if (!isSelected(i)) continue;
-    TXshLevel *level  = castItems.getItem(i)->getSimpleLevel();
+    TXshLevel *level = castItems.getItem(i)->getSimpleLevel();
     if (!level) level = castItems.getItem(i)->getPaletteLevel();
     if (!level) level = castItems.getItem(i)->getSoundLevel();
     if (level) levels.push_back(level);
@@ -93,7 +93,7 @@ QPixmap LevelCastItem::getPixmap(bool isSelected) const {
   bool onDemand = false;
   if (Preferences::instance()->getColumnIconLoadingPolicy() ==
       Preferences::LoadOnDemand)
-    onDemand   = !isSelected;
+    onDemand = !isSelected;
   QPixmap icon = IconGenerator::instance()->getIcon(sl, sl->getFirstFid(),
                                                     false, onDemand);
   return scalePixmapKeepingAspectRatio(icon, m_itemPixmapSize, Qt::transparent);
@@ -138,9 +138,8 @@ int SoundCastItem::getFrameCount() const {
 //-----------------------------------------------------------------------------
 
 QPixmap SoundCastItem::getPixmap(bool isSelected) const {
-  static QPixmap loudspeaker(
-      svgToPixmap(getIconThemePath("mimetypes/60/audio_icon.svg"),
-                  m_itemPixmapSize, Qt::KeepAspectRatio));
+  static QPixmap loudspeaker(generateIconPixmap(
+      "audio_icon", qreal(1.0), m_itemPixmapSize, Qt::KeepAspectRatio));
   return loudspeaker;
 }
 

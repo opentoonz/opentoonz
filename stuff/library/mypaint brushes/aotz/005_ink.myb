@@ -1,9 +1,9 @@
 {
     "comment": "MyPaint brush file",
-    "description": "A pen to trace line",
+    "description": "A nib pen to ink",
     "group": "",
     "notes": "Brush package optimized for OpenToonz\n\nAuthor: Anderson Prado (aka AndeOn)\nLicense: CC0/Public Domain",
-    "parent_brush_name": "",
+	"parent_brush_name": "",
     "settings": {
         "anti_aliasing": {
             "base_value": 0.0,
@@ -54,11 +54,11 @@
             "inputs": {}
         },
         "dabs_per_actual_radius": {
-            "base_value": 2.0,
+            "base_value": 0.5,
             "inputs": {}
         },
         "dabs_per_basic_radius": {
-            "base_value": 2.08,
+            "base_value": 0.5,
             "inputs": {}
         },
         "dabs_per_second": {
@@ -71,18 +71,7 @@
         },
         "elliptical_dab_angle": {
             "base_value": 90.0,
-            "inputs": {
-                "direction": [
-                    [
-                        0.0,
-                        0.0
-                    ],
-                    [
-                        180.0,
-                        180.0
-                    ]
-                ]
-            }
+            "inputs": {}
         },
         "elliptical_dab_ratio": {
             "base_value": 1.0,
@@ -105,8 +94,19 @@
             "inputs": {}
         },
         "hardness": {
-            "base_value": 0.17,
-            "inputs": {}
+            "base_value": 0.4,
+            "inputs": {
+                "pressure": [
+                    [
+                        0.0,
+                        0.0
+                    ],
+                    [
+                        1.0,
+                        0.3
+                    ]
+                ]
+            }
         },
         "lock_alpha": {
             "base_value": 0.0,
@@ -165,11 +165,11 @@
             "inputs": {}
         },
         "opaque": {
-            "base_value": 1.0,
+            "base_value": 1.25,
             "inputs": {}
         },
         "opaque_linearize": {
-            "base_value": 2.0,
+            "base_value": 0.0,
             "inputs": {}
         },
         "opaque_multiply": {
@@ -178,15 +178,19 @@
                 "pressure": [
                     [
                         0.0,
-                        -1.0
+                        0.0
                     ],
                     [
-                        0.041935,
-                        1.0
+                        0.0301,
+                        0.7
+                    ],
+                    [
+                        0.375,
+                        0.7
                     ],
                     [
                         1.0,
-                        1.0
+                        0.7
                     ]
                 ]
             }
@@ -200,7 +204,7 @@
             "inputs": {}
         },
         "posterize_num": {
-            "base_value": 0.0,
+            "base_value": 0.00,
             "inputs": {}
         },
         "pressure_gain_log": {
@@ -212,16 +216,20 @@
             "inputs": {}
         },
         "radius_logarithmic": {
-            "base_value": -0.4,
+            "base_value": 0.25,
             "inputs": {
                 "pressure": [
                     [
                         0.0,
-                        -1.62
+                        0.0002731
+                    ],
+                    [
+                        0.7501,
+                        0.0201
                     ],
                     [
                         1.0,
-                        2.43
+                        0.1
                     ]
                 ]
             }
@@ -231,11 +239,11 @@
             "inputs": {}
         },
         "slow_tracking": {
-            "base_value": 5.2,
+            "base_value": 2.0,
             "inputs": {}
         },
         "slow_tracking_per_dab": {
-            "base_value": 10.0,
+            "base_value": 1.0,
             "inputs": {}
         },
         "smudge": {
@@ -267,7 +275,7 @@
             "inputs": {}
         },
         "speed1_gamma": {
-            "base_value": -6.26,
+            "base_value": 4.0,
             "inputs": {}
         },
         "speed1_slowness": {
@@ -275,7 +283,7 @@
             "inputs": {}
         },
         "speed2_gamma": {
-            "base_value": -6.44,
+            "base_value": 4.0,
             "inputs": {}
         },
         "speed2_slowness": {

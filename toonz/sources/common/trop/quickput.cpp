@@ -4135,7 +4135,9 @@ void doQuickPutCmapped(const TRaster32P &dn, const TRasterCM32P &up,
 
   if (s.m_transparencyCheck && !s.m_isOnionSkin) {
     for (int i = 0; i < palette->getStyleCount(); i++) {
-      if (i == s.m_gapCheckIndex) {
+      // if the style's autopaint flag is ON, show its original color
+      // so that users can easily find lines left unpainted.
+      if (i == s.m_gapCheckIndex || palette->getStyle(i)->getFlags() != 0) {
         paints[i] = inks[i] = applyColorScaleCMapped(
             palette->getStyle(i)->getAverageColor(), s.m_globalColorScale);
       } else {

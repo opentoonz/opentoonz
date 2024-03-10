@@ -213,7 +213,6 @@ protected slots:
   void onExplodeMacroFx();
   void onOpenMacroFx();
   void onSavePresetFx();
-  void onRemoveOutput();
   void onActivateOutput();
   void onPreview();
   void onCacheFx();

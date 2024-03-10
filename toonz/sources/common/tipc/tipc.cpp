@@ -18,7 +18,7 @@
 #elif defined(MACOSX)
 #include <sys/sysctl.h>
 #include <unistd.h>
-#elif defined(LINUX) || defined(FREEBSD)
+#elif defined(LINUX) || defined(FREEBSD) || defined(HAIKU)
 #include <sys/time.h>
 #include <unistd.h>
 #endif

@@ -331,7 +331,8 @@ void Iwa_SoapBubbleFx::doCompute(TTile& tile, double frame,
   allocatedRasList.append(bubbleColor_ras);
   float3* bubbleColor_p = (float3*)bubbleColor_ras->getRawData();
   if (m_renderMode->getValue() == RENDER_MODE_BUBBLE)
-    calcBubbleMap(bubbleColor_p, frame, tile.getRaster()->isLinear(), true);
+    calcBubbleMap(bubbleColor_p, frame, tile.getRaster()->isLinear(),
+                  settings.m_colorSpaceGamma, true);
 
   if (checkCancelAndReleaseRaster(allocatedRasList, tile, settings)) return;
 

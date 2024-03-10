@@ -9,6 +9,7 @@
 #include "tapp.h"
 #include "cleanupsettingsmodel.h"
 #include "formatsettingspopups.h"
+#include "columncommand.h"
 
 // TnzQt includes
 #include "toonzqt/tabbar.h"
@@ -503,12 +504,7 @@ void PreferencesPopup::onStyleSheetTypeChanged() {
 
 //-----------------------------------------------------------------------------
 
-void PreferencesPopup::onIconThemeChanged() {
-  // Switch between dark or light icons
-  QIcon::setThemeName(Preferences::instance()->getIconTheme() ? "dark"
-                                                              : "light");
-  // qDebug() << "Icon theme name (preference switch):" << QIcon::themeName();
-}
+void PreferencesPopup::onIconThemeChanged() {}
 
 //-----------------------------------------------------------------------------
 
@@ -576,6 +572,10 @@ void PreferencesPopup::onPixelsOnlyChanged() {
   }
   TApp::instance()->getCurrentScene()->notifyPreferenceChanged("pixelsOnly");
 }
+
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::beforeUnitChanged() { m_pref->storeOldUnits(); }
 
 //-----------------------------------------------------------------------------
 
@@ -671,6 +671,25 @@ void PreferencesPopup::onShowKeyframesOnCellAreaChanged() {
 
 void PreferencesPopup::onShowXSheetToolbarClicked() {
   TApp::instance()->getCurrentScene()->notifyPreferenceChanged("XSheetToolbar");
+}
+
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onUnifyColumnVisibilityTogglesChanged() {
+  // Check if any column has visibility toggles with different states and the
+  // "unify visibility toggles" option is enabled
+  if (Preferences::instance()->isUnifyColumnVisibilityTogglesEnabled())
+    ColumnCmd::unifyColumnVisibilityToggles();
+
+  TApp::instance()->getCurrentScene()->notifyPreferenceChanged(
+      "unifyColumnVisibilityToggles");
+}
+
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onShowXsheetBreadcrumbsClicked() {
+  TApp::instance()->getCurrentScene()->notifyPreferenceChanged(
+      "XsheetBreadcrumbs");
 }
 
 //-----------------------------------------------------------------------------
@@ -1259,6 +1278,8 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
       {xsheetStep, tr("Next/Previous Step Frames:")},
       {xsheetAutopanEnabled, tr("Xsheet Autopan during Playback")},
       {DragCellsBehaviour, tr("Cell-dragging Behaviour:")},
+      {deleteCommandBehavior, tr("Delete Command Behaviour:")},
+      {pasteCellsBehavior, tr("Paste Cells Behaviour:")},
       {ignoreAlphaonColumn1Enabled,
        tr("Ignore Alpha Channel on Levels in Column 1")},
       {showKeyframesOnXsheetCellArea, tr("Show Keyframes on Cell Area")},
@@ -1270,9 +1291,12 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
       {shortcutCommandsWhileRenamingCellEnabled,
        tr("Enable OpenToonz Commands' Shortcut Keys While Renaming Cell")},
       {showXSheetToolbar, tr("Show Toolbar in the Xsheet")},
+      {showXsheetBreadcrumbs, tr("Show Sub-Xsheet Navigation Bar")},
       {expandFunctionHeader,
-       tr("Expand Function Editor Header to Match Xsheet Toolbar Height*")},
+       tr("Expand Function Editor Header to Match Xsheet Header Height*")},
       {showColumnNumbers, tr("Show Column Numbers in Column Headers")},
+      {unifyColumnVisibilityToggles,
+       tr("Unify Preview and Camstand Visibility Toggles")},
       {parentColorsInXsheetColumn,
        tr("Show Column Parent's Color in the Xsheet")},
       {highlightLineEverySecond, tr("Highlight Line Every Second")},
@@ -1285,6 +1309,7 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
       {levelNameDisplayType, tr("Level Name Display:")},
       {showFrameNumberWithLetters,
        tr("Show \"ABC\" Appendix to the Frame Number in Xsheet Cell")},
+      {linkColumnNameWithLevel, tr("Link Column Name with Level")},
 
       // Animation
       {keyframeType, tr("Default Interpolation:")},
@@ -1426,7 +1451,15 @@ QList<ComboBoxItem> PreferencesPopup::getComboItemList(
         {tr("Display on Column Header"),
          Preferences::ShowLevelNameOnColumnHeader}}},
       {DragCellsBehaviour,
-       {{tr("Cells Only"), 0}, {tr("Cells and Column Data"), 1}}},
+       {{tr("Cells Only"), 0},
+        {tr("Cells and Column Data"), 1},
+        {tr("Disable Dragging Cells"), 2}}},
+      {deleteCommandBehavior,
+       {{tr("Clear Cell / Frame"), 0},
+        {tr("Remove and Shift Cells / Frames Up"), 1}}},
+      {pasteCellsBehavior,
+       {{tr("Insert Paste Whole Data"), 0},
+        {tr("Overwrite Paste Cell Numbers"), 1}}},
       {keyframeType,  // note that the value starts from 1, not 0
        {{tr("Constant"), 1},
         {tr("Linear"), 2},
@@ -1697,7 +1730,9 @@ QWidget* PreferencesPopup::createInterfacePage() {
                            &PreferencesPopup::onStyleSheetTypeChanged);
   m_onEditedFuncMap.insert(iconTheme, &PreferencesPopup::onIconThemeChanged);
   m_onEditedFuncMap.insert(pixelsOnly, &PreferencesPopup::onPixelsOnlyChanged);
+  m_preEditedFuncMap.insert(linearUnits, &PreferencesPopup::beforeUnitChanged);
   m_onEditedFuncMap.insert(linearUnits, &PreferencesPopup::onUnitChanged);
+  m_preEditedFuncMap.insert(cameraUnits, &PreferencesPopup::beforeUnitChanged);
   m_onEditedFuncMap.insert(cameraUnits, &PreferencesPopup::onUnitChanged);
   m_preEditedFuncMap.insert(CurrentRoomChoice,
                             &PreferencesPopup::beforeRoomChoiceChanged);
@@ -1984,9 +2019,12 @@ QWidget* PreferencesPopup::createXsheetPage() {
   insertUI(xsheetLayoutPreference, lay,
            getComboItemList(xsheetLayoutPreference));
   insertUI(levelNameDisplayType, lay, getComboItemList(levelNameDisplayType));
+  insertUI(linkColumnNameWithLevel, lay);
   insertUI(xsheetStep, lay);
   insertUI(xsheetAutopanEnabled, lay);
   insertUI(DragCellsBehaviour, lay, getComboItemList(DragCellsBehaviour));
+  insertUI(deleteCommandBehavior, lay, getComboItemList(deleteCommandBehavior));
+  insertUI(pasteCellsBehavior, lay, getComboItemList(pasteCellsBehavior));
   insertUI(ignoreAlphaonColumn1Enabled, lay);
   QGridLayout* showKeyLay =
       insertGroupBoxUI(showKeyframesOnXsheetCellArea, lay);
@@ -1994,9 +2032,14 @@ QWidget* PreferencesPopup::createXsheetPage() {
   insertUI(useArrowKeyToShiftCellSelection, lay);
   insertUI(inputCellsWithoutDoubleClickingEnabled, lay);
   insertUI(shortcutCommandsWhileRenamingCellEnabled, lay);
-  QGridLayout* xshToolbarLay = insertGroupBoxUI(showXSheetToolbar, lay);
-  { insertUI(expandFunctionHeader, xshToolbarLay); }
+  QGridLayout* xshToolbarLay = insertGroupBox(tr("Xsheet Tools"), lay);
+  {
+    insertUI(showXSheetToolbar, xshToolbarLay);
+    insertUI(showXsheetBreadcrumbs, xshToolbarLay);
+    insertUI(expandFunctionHeader, xshToolbarLay);
+  }
   insertUI(showColumnNumbers, lay);
+  insertUI(unifyColumnVisibilityToggles, lay);
   insertUI(parentColorsInXsheetColumn, lay);
   insertUI(highlightLineEverySecond, lay);
   insertUI(syncLevelRenumberWithXsheet, lay);
@@ -2012,7 +2055,21 @@ QWidget* PreferencesPopup::createXsheetPage() {
                            &PreferencesPopup::onShowKeyframesOnCellAreaChanged);
   m_onEditedFuncMap.insert(showXsheetCameraColumn,
                            &PreferencesPopup::onShowKeyframesOnCellAreaChanged);
+  m_onEditedFuncMap.insert(
+      unifyColumnVisibilityToggles,
+      &PreferencesPopup::onUnifyColumnVisibilityTogglesChanged);
+  m_onEditedFuncMap.insert(showXsheetBreadcrumbs,
+                           &PreferencesPopup::onShowXsheetBreadcrumbsClicked);
 
+  QCheckBox* linkColumnNameWithLevelCheck =
+      getUI<QCheckBox*>(linkColumnNameWithLevel);
+  linkColumnNameWithLevelCheck->setToolTip(
+      tr("This option will do the following:\n"
+         "- When setting a cell in the empty column, level name will be copied "
+         "to the column name\n"
+         "- Typing the cell without level name in the empty column will try to "
+         "use a level with the same name as the column\n"
+         "The behavior may be changed in the future development."));
   return widget;
 }
 

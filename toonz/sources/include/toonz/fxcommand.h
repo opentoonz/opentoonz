@@ -72,8 +72,6 @@ DVAPI void unlinkFx(TFx *fx, TFxHandle *fxHandle, TXsheetHandle *xshHandle);
 DVAPI void makeMacroFx(const std::vector<TFxP> &fxs, TApplication *app);
 DVAPI void explodeMacroFx(TMacroFx *macroFx, TApplication *app);
 DVAPI void createOutputFx(TXsheetHandle *xshHandle, TFx *currentFx);
-DVAPI void removeOutputFx(TFx *fx, TXsheetHandle *xshHandle,
-                          TFxHandle *fxHandle);
 DVAPI void makeOutputFxCurrent(TFx *fx, TXsheetHandle *xshHandle);
 DVAPI void disconnectNodesFromXsheet(const std::list<TFxP> &fxs,
                                      TXsheetHandle *xshHandle);

@@ -538,11 +538,16 @@ void PageViewer::drawToggleLink(QPainter &p, QRect &chipRect,
     int y      = chipRect.topRight().y();
     QRect rect(x, y, 7, 7);
 
+    p.save();
+
     p.fillRect(rect, QBrush(Qt::white));
     p.setPen(Qt::black);
     p.drawRect(rect);
 
-    if (globalName[0] == L'+') {
+    if (style->getOriginalName().empty()) {
+      p.setBrush(Qt::black);
+      p.drawRect(rect.adjusted(2, 2, -2, -2));
+    } else if (globalName[0] == L'+') {
       QPointF a(x + 2, y + 2);
       QPointF b(x + 2, y + 5);
       QPointF c(x + 5, y + 2);
@@ -551,6 +556,8 @@ void PageViewer::drawToggleLink(QPainter &p, QRect &chipRect,
       p.drawLine(a, c);
       p.drawLine(a, d);
     }
+
+    p.restore();
   }
 }
 
@@ -588,6 +595,8 @@ void PageViewer::paintEvent(QPaintEvent *e) {
   // currentStyle e palette
   TPalette *palette = (m_page) ? m_page->getPalette() : 0;
   if (!palette) return;
+
+  bool isStudioPalette = palette->getGlobalName() != L"";
 
   // [i0,i1] = visible cell range
   QRect visibleRect = e->rect();
@@ -648,7 +657,7 @@ void PageViewer::paintEvent(QPaintEvent *e) {
       }
 
       // toggle link
-      drawToggleLink(p, chipRect, m_page->getStyle(i));
+      drawToggleLink(p, chipRect, style);
     }
     if (ShowNewStyleButton && !m_page->getPalette()->isLocked()) {
       int j      = getChipCount();
@@ -1173,18 +1182,18 @@ void PageViewer::contextMenuEvent(QContextMenuEvent *event) {
   bool isLocked = m_page ? m_page->getPalette()->isLocked() : false;
 
   // remove links from studio palette
-  if (m_viewType == LEVEL_PALETTE && m_styleSelection &&
-      !m_styleSelection->isEmpty() && !isLocked &&
+  if (m_styleSelection && !m_styleSelection->isEmpty() && !isLocked &&
       m_styleSelection->hasLinkedStyle()) {
-    menu.addSeparator();
-    QAction *toggleStyleLink = cmd->getAction("MI_ToggleLinkToStudioPalette");
-    menu.addAction(toggleStyleLink);
-    QAction *removeStyleLink =
-        cmd->getAction("MI_RemoveReferenceToStudioPalette");
-    menu.addAction(removeStyleLink);
-    QAction *getBackOriginalAct =
-        cmd->getAction("MI_GetColorFromStudioPalette");
-    menu.addAction(getBackOriginalAct);
+    if (m_viewType == LEVEL_PALETTE) {
+      menu.addSeparator();
+      menu.addAction(cmd->getAction("MI_ToggleLinkToStudioPalette"));
+      menu.addAction(cmd->getAction("MI_RemoveReferenceToStudioPalette"));
+      menu.addAction(cmd->getAction("MI_GetColorFromStudioPalette"));
+    } else if (m_viewType == STUDIO_PALETTE) {
+      menu.addSeparator();
+      menu.addAction(cmd->getAction("MI_RemoveReferenceToStudioPalette"));
+      menu.addAction(cmd->getAction("MI_GetColorFromStudioPalette"));
+    }
   }
 
   if (((indexPage == 0 && index > 0) || (indexPage > 0 && index >= 0)) &&

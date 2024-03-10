@@ -265,11 +265,11 @@ public:
 class RemoveEndpointsUndo final : public TUndo {
   TXshSimpleLevelP m_level;
   TFrameId m_frameId;
-  std::vector<std::pair<int, TStroke *>> m_strokes;
+  std::vector<UndoVectorData> m_strokes;
 
 public:
   RemoveEndpointsUndo(TXshSimpleLevel *level, const TFrameId &frameId,
-                      std::vector<std::pair<int, TStroke *>> strokes)
+                      std::vector<UndoVectorData> strokes)
       : m_level(level)
       , m_frameId(frameId)
       , m_strokes(strokes)
@@ -278,16 +278,16 @@ public:
 
   ~RemoveEndpointsUndo() {
     int i;
-    for (i = 0; i < (int)m_strokes.size(); i++) delete m_strokes[i].second;
+    for (i = 0; i < (int)m_strokes.size(); i++) delete m_strokes[i].oldStroke;
   }
 
   void undo() const override {
     TVectorImageP vi = m_level->getFrame(m_frameId, true);
     int i;
     for (i = 0; i < (int)m_strokes.size(); i++) {
-      TStroke *newS = new TStroke(*(m_strokes[i].second));
-      newS->setId(m_strokes[i].second->getId());
-      vi->restoreEndpoints(m_strokes[i].first, newS);
+      TStroke *newS = new TStroke(*(m_strokes[i].oldStroke));
+      newS->setId(m_strokes[i].oldStroke->getId());
+      vi->restoreEndpoints(m_strokes[i].index, newS, m_strokes[i].offset);
     }
     StrokeSelection *selection = dynamic_cast<StrokeSelection *>(
         TTool::getApplication()->getCurrentSelection()->getSelection());
@@ -300,7 +300,7 @@ public:
     int i;
     TVectorImageP vi = m_level->getFrame(m_frameId, true);
     for (i = 0; i < (int)m_strokes.size(); i++) {
-      TStroke *s = vi->removeEndpoints(m_strokes[i].first);
+      TStroke *s = vi->removeEndpoints(m_strokes[i].index);
       delete s;
       // assert(s==m_strokes[i].second);
     }
@@ -451,12 +451,19 @@ void StrokeSelection::removeEndpoints() {
     return;
   }
 
-  std::vector<std::pair<int, TStroke *>> undoData;
+  std::vector<UndoVectorData> undoData;
 
   m_vi->findRegions();
   for (auto const &e : m_indexes) {
-    TStroke *s = m_vi->removeEndpoints(e);
-    if (s) undoData.push_back(std::pair<int, TStroke *>(e, s));
+    double offset;
+    TStroke *s = m_vi->removeEndpoints(e, &offset);
+    UndoVectorData undoStroke;
+
+    undoStroke.index   = e;
+    undoStroke.oldStroke = s;
+    undoStroke.offset    = offset;
+
+    if (s) undoData.push_back(undoStroke);
   }
   TTool *tool = TTool::getApplication()->getCurrentTool()->getTool();
   TXshSimpleLevel *level =

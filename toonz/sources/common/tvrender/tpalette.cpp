@@ -904,7 +904,7 @@ void TPalette::loadData(TIStream &is) {
  * original names.
  */
 void TPalette::assign(const TPalette *src, bool isFromStudioPalette) {
-  if (src == this) return;
+  if (!src || src == this) return;
   int i;
   m_isCleanupPalette = src->isCleanupPalette();
   // for(i=0;i<getStyleCount();i++) delete getStyle(i);

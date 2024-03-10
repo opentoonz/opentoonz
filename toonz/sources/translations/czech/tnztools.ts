@@ -4,101 +4,121 @@
 <context>
     <name>ArrowToolOptionsBox</name>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="427"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="430"/>
         <source>Z:</source>
         <translation>Z:</translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="428"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="431"/>
         <source>Position:</source>
         <translation>Poloha:</translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="429"/>
-        <location filename="../../tnztools/tooloptions.cpp" line="512"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="432"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="515"/>
         <source>X:</source>
         <translation>V/Z:</translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="430"/>
-        <location filename="../../tnztools/tooloptions.cpp" line="513"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="433"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="516"/>
         <source>Y:</source>
         <translation>S/J:</translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="445"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="448"/>
         <source>SO:</source>
         <translation>SO:</translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="450"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="453"/>
         <source>Rotation:</source>
         <translation>Otočení:</translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="466"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="469"/>
         <source>Global:</source>
         <translation>Celkové:</translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="467"/>
-        <location filename="../../tnztools/tooloptions.cpp" line="493"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="470"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="496"/>
         <source>H:</source>
         <translation>V:</translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="468"/>
-        <location filename="../../tnztools/tooloptions.cpp" line="494"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="471"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="497"/>
         <source>V:</source>
         <translation>S:</translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="570"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="576"/>
+        <source>Flip Object Horizontally</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../tnztools/tooloptions.cpp" line="577"/>
+        <source>Flip Object Vertically</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../tnztools/tooloptions.cpp" line="578"/>
+        <source>Rotate Object Left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../tnztools/tooloptions.cpp" line="579"/>
+        <source>Rotate Object Right</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../tnztools/tooloptions.cpp" line="599"/>
         <source>Pick:</source>
         <translation>Vybrat předmět:</translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="587"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="616"/>
         <source>Position</source>
         <translation>Poloha</translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="610"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="639"/>
         <source>(</source>
         <translation>(</translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="612"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="641"/>
         <source>)</source>
         <translation>)</translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="635"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="664"/>
         <source>Rotation</source>
         <translation>Otočení</translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="657"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="688"/>
         <source>Scale</source>
         <translation>Měřítko</translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="680"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="713"/>
         <source>Maintain:</source>
         <translation>Zachovat:</translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="700"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="733"/>
         <source>Shear</source>
         <translation>Stříhat</translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="732"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="765"/>
         <source>Center Position</source>
         <translation>Střední poloha</translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="935"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="978"/>
         <source>Table</source>
         <translation>Tabulka</translation>
     </message>
@@ -209,17 +229,17 @@
 <context>
     <name>BrushToolOptionsBox</name>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="1670"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="1827"/>
         <source>Preset Name</source>
         <translation>Název přednastavení</translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="1674"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="1831"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="1676"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="1833"/>
         <source>Cancel</source>
         <translation>Zrušit</translation>
     </message>
@@ -291,160 +311,160 @@
 <context>
     <name>EditTool</name>
     <message>
-        <location filename="../../tnztools/edittool.cpp" line="860"/>
+        <location filename="../../tnztools/edittool.cpp" line="733"/>
         <source>Scale Constraint:</source>
         <translation>Omezení měřítka:</translation>
     </message>
     <message>
-        <location filename="../../tnztools/edittool.cpp" line="861"/>
-        <location filename="../../tnztools/edittool.cpp" line="866"/>
+        <location filename="../../tnztools/edittool.cpp" line="734"/>
+        <location filename="../../tnztools/edittool.cpp" line="739"/>
         <source>None</source>
         <translation>Žádné</translation>
     </message>
     <message>
-        <location filename="../../tnztools/edittool.cpp" line="862"/>
+        <location filename="../../tnztools/edittool.cpp" line="735"/>
         <source>A/R</source>
         <translation>A/R</translation>
     </message>
     <message>
-        <location filename="../../tnztools/edittool.cpp" line="863"/>
+        <location filename="../../tnztools/edittool.cpp" line="736"/>
         <source>Mass</source>
         <translation>Hmota</translation>
     </message>
     <message>
-        <location filename="../../tnztools/edittool.cpp" line="865"/>
+        <location filename="../../tnztools/edittool.cpp" line="738"/>
         <source>Auto Select Column</source>
         <translation>Automaticky vybrat sloupec</translation>
     </message>
     <message>
-        <location filename="../../tnztools/edittool.cpp" line="867"/>
+        <location filename="../../tnztools/edittool.cpp" line="740"/>
         <source>Column</source>
         <translation>Sloupec</translation>
     </message>
     <message>
-        <location filename="../../tnztools/edittool.cpp" line="868"/>
+        <location filename="../../tnztools/edittool.cpp" line="741"/>
         <source>Pegbar</source>
         <translation>Pruh na kolíky</translation>
     </message>
     <message>
-        <location filename="../../tnztools/edittool.cpp" line="870"/>
+        <location filename="../../tnztools/edittool.cpp" line="743"/>
         <source>Global Key</source>
         <translation>Celkový klíč</translation>
     </message>
     <message>
-        <location filename="../../tnztools/edittool.cpp" line="871"/>
+        <location filename="../../tnztools/edittool.cpp" line="744"/>
         <source>Lock Center X</source>
         <translation>Uzmknout střed [X]</translation>
     </message>
     <message>
-        <location filename="../../tnztools/edittool.cpp" line="872"/>
+        <location filename="../../tnztools/edittool.cpp" line="745"/>
         <source>Lock Center Y</source>
         <translation>Uzmknout střed [Y]</translation>
     </message>
     <message>
-        <location filename="../../tnztools/edittool.cpp" line="873"/>
+        <location filename="../../tnztools/edittool.cpp" line="746"/>
         <source>Lock Position X</source>
         <translation>Uzmknout polohu [X]</translation>
     </message>
     <message>
-        <location filename="../../tnztools/edittool.cpp" line="874"/>
+        <location filename="../../tnztools/edittool.cpp" line="747"/>
         <source>Lock Position Y</source>
         <translation>Uzmknout polohu [Y]</translation>
     </message>
     <message>
-        <location filename="../../tnztools/edittool.cpp" line="875"/>
+        <location filename="../../tnztools/edittool.cpp" line="748"/>
         <source>Lock Rotation</source>
         <translation>Uzmknout otočení</translation>
     </message>
     <message>
-        <location filename="../../tnztools/edittool.cpp" line="876"/>
+        <location filename="../../tnztools/edittool.cpp" line="749"/>
         <source>Lock Shear H</source>
         <translation>Uzmknout střih vodorovně</translation>
     </message>
     <message>
-        <location filename="../../tnztools/edittool.cpp" line="877"/>
+        <location filename="../../tnztools/edittool.cpp" line="750"/>
         <source>Lock Shear V</source>
         <translation>Uzmknout střih svisle</translation>
     </message>
     <message>
-        <location filename="../../tnztools/edittool.cpp" line="878"/>
+        <location filename="../../tnztools/edittool.cpp" line="751"/>
         <source>Lock Scale H</source>
         <translation>Uzmknout měřítko vodorovně</translation>
     </message>
     <message>
-        <location filename="../../tnztools/edittool.cpp" line="879"/>
+        <location filename="../../tnztools/edittool.cpp" line="752"/>
         <source>Lock Scale V</source>
         <translation>Uzmknout měřítko svisle</translation>
     </message>
     <message>
-        <location filename="../../tnztools/edittool.cpp" line="880"/>
+        <location filename="../../tnztools/edittool.cpp" line="753"/>
         <source>Lock Global Scale</source>
         <translation>Uzmknout celkové měřítko</translation>
     </message>
     <message>
-        <location filename="../../tnztools/edittool.cpp" line="881"/>
+        <location filename="../../tnztools/edittool.cpp" line="754"/>
         <source>X and Y Positions</source>
         <translation>Polohy X a Y</translation>
     </message>
     <message>
-        <location filename="../../tnztools/edittool.cpp" line="882"/>
+        <location filename="../../tnztools/edittool.cpp" line="755"/>
         <source>Z Position</source>
         <translation>Poloha Z</translation>
     </message>
     <message>
-        <location filename="../../tnztools/edittool.cpp" line="883"/>
+        <location filename="../../tnztools/edittool.cpp" line="756"/>
         <source>SO</source>
         <translation>SO</translation>
     </message>
     <message>
-        <location filename="../../tnztools/edittool.cpp" line="884"/>
-        <location filename="../../tnztools/edittool.cpp" line="892"/>
+        <location filename="../../tnztools/edittool.cpp" line="757"/>
+        <location filename="../../tnztools/edittool.cpp" line="765"/>
         <source>Rotation</source>
         <translation>Otočení</translation>
     </message>
     <message>
-        <location filename="../../tnztools/edittool.cpp" line="885"/>
+        <location filename="../../tnztools/edittool.cpp" line="758"/>
         <source>Global Scale</source>
         <translation>Celkové měřítko</translation>
     </message>
     <message>
-        <location filename="../../tnztools/edittool.cpp" line="886"/>
+        <location filename="../../tnztools/edittool.cpp" line="759"/>
         <source>Horizontal and Vertical Scale</source>
         <translation>Vodorovné a svislé měřítko</translation>
     </message>
     <message>
-        <location filename="../../tnztools/edittool.cpp" line="887"/>
-        <location filename="../../tnztools/edittool.cpp" line="894"/>
+        <location filename="../../tnztools/edittool.cpp" line="760"/>
+        <location filename="../../tnztools/edittool.cpp" line="767"/>
         <source>Shear</source>
         <translation>Stříhat</translation>
     </message>
     <message>
-        <location filename="../../tnztools/edittool.cpp" line="888"/>
+        <location filename="../../tnztools/edittool.cpp" line="761"/>
         <source>Center Position</source>
         <translation>Střední poloha</translation>
     </message>
     <message>
-        <location filename="../../tnztools/edittool.cpp" line="890"/>
+        <location filename="../../tnztools/edittool.cpp" line="763"/>
         <source>Active Axis</source>
         <translation>Činná osa</translation>
     </message>
     <message>
-        <location filename="../../tnztools/edittool.cpp" line="891"/>
+        <location filename="../../tnztools/edittool.cpp" line="764"/>
         <source>Position</source>
         <translation>Poloha</translation>
     </message>
     <message>
-        <location filename="../../tnztools/edittool.cpp" line="893"/>
+        <location filename="../../tnztools/edittool.cpp" line="766"/>
         <source>Scale</source>
         <translation>Měřítko</translation>
     </message>
     <message>
-        <location filename="../../tnztools/edittool.cpp" line="895"/>
+        <location filename="../../tnztools/edittool.cpp" line="768"/>
         <source>Center</source>
         <translation>Střed</translation>
     </message>
     <message>
-        <location filename="../../tnztools/edittool.cpp" line="896"/>
+        <location filename="../../tnztools/edittool.cpp" line="769"/>
         <source>All</source>
         <translation>Vše</translation>
     </message>
@@ -564,82 +584,87 @@
 <context>
     <name>FillTool</name>
     <message>
-        <location filename="../../tnztools/filltool.cpp" line="1796"/>
+        <location filename="../../tnztools/filltool.cpp" line="1843"/>
         <source>Frame Range</source>
         <translation>Rozsah snímku</translation>
     </message>
     <message>
-        <location filename="../../tnztools/filltool.cpp" line="1798"/>
+        <location filename="../../tnztools/filltool.cpp" line="1845"/>
         <source>Type:</source>
         <translation>Typ:</translation>
     </message>
     <message>
-        <location filename="../../tnztools/filltool.cpp" line="1799"/>
+        <location filename="../../tnztools/filltool.cpp" line="1846"/>
         <source>Normal</source>
         <translation>Normální</translation>
     </message>
     <message>
-        <location filename="../../tnztools/filltool.cpp" line="1800"/>
+        <location filename="../../tnztools/filltool.cpp" line="1847"/>
         <source>Rectangular</source>
         <translation>Obdélníkový</translation>
     </message>
     <message>
-        <location filename="../../tnztools/filltool.cpp" line="1801"/>
+        <location filename="../../tnztools/filltool.cpp" line="1848"/>
         <source>Freehand</source>
         <translation>Kreslení od ruky</translation>
     </message>
     <message>
-        <location filename="../../tnztools/filltool.cpp" line="1802"/>
+        <location filename="../../tnztools/filltool.cpp" line="1849"/>
         <source>Polyline</source>
         <translation>Lomená čára</translation>
     </message>
     <message>
-        <location filename="../../tnztools/filltool.cpp" line="1804"/>
+        <location filename="../../tnztools/filltool.cpp" line="1850"/>
+        <source>Pick+Freehand</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../tnztools/filltool.cpp" line="1852"/>
         <source>Selective</source>
         <translation>Výběrový</translation>
     </message>
     <message>
-        <location filename="../../tnztools/filltool.cpp" line="1806"/>
+        <location filename="../../tnztools/filltool.cpp" line="1854"/>
         <source>Mode:</source>
         <translation>Režim:</translation>
     </message>
     <message>
-        <location filename="../../tnztools/filltool.cpp" line="1807"/>
+        <location filename="../../tnztools/filltool.cpp" line="1855"/>
         <source>Lines</source>
         <translation>Čáry</translation>
     </message>
     <message>
-        <location filename="../../tnztools/filltool.cpp" line="1808"/>
+        <location filename="../../tnztools/filltool.cpp" line="1856"/>
         <source>Areas</source>
         <translation>Plochy</translation>
     </message>
     <message>
-        <location filename="../../tnztools/filltool.cpp" line="1809"/>
+        <location filename="../../tnztools/filltool.cpp" line="1857"/>
         <source>Lines &amp; Areas</source>
         <translation>Čáry a plochy</translation>
     </message>
     <message>
-        <location filename="../../tnztools/filltool.cpp" line="1811"/>
+        <location filename="../../tnztools/filltool.cpp" line="1859"/>
         <source>Onion Skin</source>
         <translation> Cibulový vzhled </translation>
     </message>
     <message>
-        <location filename="../../tnztools/filltool.cpp" line="1812"/>
+        <location filename="../../tnztools/filltool.cpp" line="1860"/>
         <source>Fill Depth</source>
         <translation>Hloubka výplně</translation>
     </message>
     <message>
-        <location filename="../../tnztools/filltool.cpp" line="1813"/>
+        <location filename="../../tnztools/filltool.cpp" line="1861"/>
         <source>Segment</source>
         <translation>Část</translation>
     </message>
     <message>
-        <location filename="../../tnztools/filltool.cpp" line="1814"/>
+        <location filename="../../tnztools/filltool.cpp" line="1862"/>
         <source>Maximum Gap</source>
         <translation>Největší mezera</translation>
     </message>
     <message>
-        <location filename="../../tnztools/filltool.cpp" line="1815"/>
+        <location filename="../../tnztools/filltool.cpp" line="1863"/>
         <source>Autopaint Lines</source>
         <translation>Automatické malování čar</translation>
     </message>
@@ -697,7 +722,7 @@
         <translation>Zamknout alfu</translation>
     </message>
     <message>
-        <location filename="../../tnztools/fullcolorbrushtool.cpp" line="661"/>
+        <location filename="../../tnztools/fullcolorbrushtool.cpp" line="726"/>
         <source>&lt;custom&gt;</source>
         <translation>&lt;vlastní&gt;</translation>
     </message>
@@ -766,7 +791,7 @@
 <context>
     <name>HandToolOptionsBox</name>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="2622"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="2779"/>
         <source>Reset Position</source>
         <translation>Obnovit výchozí polohu</translation>
     </message>
@@ -1231,20 +1256,20 @@ Chcete pokračovat?</translation>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../../tnztools/toonzvectorbrushtool.cpp" line="846"/>
+        <location filename="../../tnztools/toonzvectorbrushtool.cpp" line="885"/>
         <location filename="../../tnztools/geometrictool.cpp" line="1432"/>
         <source>Yes</source>
         <translation>Ano</translation>
     </message>
     <message>
-        <location filename="../../tnztools/toonzvectorbrushtool.cpp" line="846"/>
+        <location filename="../../tnztools/toonzvectorbrushtool.cpp" line="885"/>
         <location filename="../../tnztools/geometrictool.cpp" line="1432"/>
         <source>No</source>
         <translation>Ne</translation>
     </message>
     <message>
         <location filename="../../tnztools/strokeselection.cpp" line="130"/>
-        <location filename="../../tnztools/rasterselection.cpp" line="1153"/>
+        <location filename="../../tnztools/rasterselection.cpp" line="1154"/>
         <source>The copied selection cannot be pasted in the current drawing.</source>
         <translation>Zkopírovaný výběr nelze vložit do nynější kresby.</translation>
     </message>
@@ -1256,31 +1281,31 @@ Chcete pokračovat?</translation>
     <message>
         <location filename="../../tnztools/strokeselection.cpp" line="507"/>
         <location filename="../../tnztools/strokeselection.cpp" line="621"/>
-        <location filename="../../tnztools/rasterselection.cpp" line="1075"/>
+        <location filename="../../tnztools/rasterselection.cpp" line="1076"/>
         <source>The selection cannot be deleted. It is not editable.</source>
         <translation>Výběr nelze smazat. Není upravitelný.</translation>
     </message>
     <message>
         <location filename="../../tnztools/strokeselection.cpp" line="560"/>
-        <location filename="../../tnztools/rasterselection.cpp" line="1194"/>
+        <location filename="../../tnztools/rasterselection.cpp" line="1196"/>
         <source>The selection cannot be pasted. It is not editable.</source>
         <translation>Výběr nelze vložit. Není upravitelný.</translation>
     </message>
     <message>
-        <location filename="../../tnztools/rasterselection.cpp" line="409"/>
-        <location filename="../../tnztools/rasterselection.cpp" line="574"/>
+        <location filename="../../tnztools/rasterselection.cpp" line="410"/>
+        <location filename="../../tnztools/rasterselection.cpp" line="575"/>
         <source>Paste</source>
         <translation>Vložit</translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="220"/>
-        <location filename="../../tnztools/tooloptions.cpp" line="232"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="221"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="233"/>
         <source>Min:</source>
         <translation>Nejméně:</translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="220"/>
-        <location filename="../../tnztools/tooloptions.cpp" line="232"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="221"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="233"/>
         <source>Max:</source>
         <translation>Nejvíce:</translation>
     </message>
@@ -1365,30 +1390,30 @@ Chcete pokračovat?</translation>
         <translation>Výběr nelze přesunout. Není upravitelný.</translation>
     </message>
     <message>
-        <location filename="../../tnztools/edittoolgadgets.cpp" line="89"/>
+        <location filename="../../tnztools/edittoolgadgets.cpp" line="287"/>
         <source>Modify Fx Gadget  </source>
         <translation>Změnit udělátko efektu</translation>
     </message>
     <message>
-        <location filename="../../tnztools/edittool.cpp" line="1823"/>
+        <location filename="../../tnztools/edittool.cpp" line="1696"/>
         <location filename="../../tnztools/tool.cpp" line="952"/>
         <source>The current column is locked.</source>
         <translation>Nynější sloupec je uzamknut.</translation>
     </message>
     <message>
-        <location filename="../../tnztools/edittool.cpp" line="1827"/>
+        <location filename="../../tnztools/edittool.cpp" line="1700"/>
         <location filename="../../tnztools/tool.cpp" line="955"/>
         <source>The current column is hidden.</source>
         <translation>Nynější sloupec je skryt.</translation>
     </message>
     <message>
-        <location filename="../../tnztools/edittool.cpp" line="1810"/>
+        <location filename="../../tnztools/edittool.cpp" line="1683"/>
         <location filename="../../tnztools/tool.cpp" line="959"/>
         <source>It is not possible to edit the audio column.</source>
         <translation>Není možné upravit sloupec zvuku.</translation>
     </message>
     <message>
-        <location filename="../../tnztools/edittool.cpp" line="1814"/>
+        <location filename="../../tnztools/edittool.cpp" line="1687"/>
         <location filename="../../tnztools/tool.cpp" line="964"/>
         <source>Note columns can only be edited in the xsheet or timeline.</source>
         <translation>Sloupce s poznámkami mohou být upravovány jen v XSheet nebo časové ose.</translation>
@@ -1404,7 +1429,7 @@ Chcete pokračovat?</translation>
         <translation>Nynější nástroj nelze použít na sloupec síť.</translation>
     </message>
     <message>
-        <location filename="../../tnztools/edittool.cpp" line="1793"/>
+        <location filename="../../tnztools/edittool.cpp" line="1666"/>
         <location filename="../../tnztools/tool.cpp" line="986"/>
         <source>The current tool cannot be used in Level Strip mode.</source>
         <translation>Nynější nástroj nelze použít ve sloupci pruh úrovně.</translation>
@@ -1416,7 +1441,7 @@ Chcete pokračovat?</translation>
     </message>
     <message>
         <location filename="../../tnztools/tool.cpp" line="1004"/>
-        <location filename="../../tnztools/tool.cpp" line="1070"/>
+        <location filename="../../tnztools/tool.cpp" line="1066"/>
         <source>The current level is not editable.</source>
         <translation>Nynější úroveň není upravitelná.</translation>
     </message>
@@ -1518,7 +1543,7 @@ Chcete pokračovat?</translation>
 <context>
     <name>RGBPickerToolOptionsBox</name>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="2296"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="2453"/>
         <source>Pick Screen</source>
         <translation>Zvolit obrazovku</translation>
     </message>
@@ -1605,7 +1630,7 @@ Chcete pokračovat?</translation>
 <context>
     <name>RotateToolOptionsBox</name>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="2595"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="2752"/>
         <source>Reset Rotation</source>
         <translation>Obnovit výchozí otočení</translation>
     </message>
@@ -1613,37 +1638,37 @@ Chcete pokračovat?</translation>
 <context>
     <name>RulerToolOptionsBox</name>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="2056"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="2213"/>
         <source>X:</source>
         <comment>ruler tool option</comment>
         <translation>X:</translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="2062"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="2219"/>
         <source>Y:</source>
         <comment>ruler tool option</comment>
         <translation>Y:</translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="2070"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="2227"/>
         <source>W:</source>
         <comment>ruler tool option</comment>
         <translation>Š:</translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="2076"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="2233"/>
         <source>H:</source>
         <comment>ruler tool option</comment>
         <translation>V:</translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="2084"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="2241"/>
         <source>A:</source>
         <comment>ruler tool option</comment>
         <translation>A:</translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="2089"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="2246"/>
         <source>L:</source>
         <comment>ruler tool option</comment>
         <translation>D:</translation>
@@ -1675,49 +1700,69 @@ Chcete pokračovat?</translation>
 <context>
     <name>SelectionToolOptionsBox</name>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="1050"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="1123"/>
         <source>H:</source>
         <translation>V:</translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="1052"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="1125"/>
         <source>V:</source>
         <translation>S:</translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="1054"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="1127"/>
         <source>Link</source>
         <translation>Stanovit poměr stran</translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="1057"/>
-        <location filename="../../tnztools/tooloptions.cpp" line="1058"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="1130"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="1131"/>
         <source>Rotation</source>
         <translation>Otočení</translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="1060"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="1133"/>
         <source>X:</source>
         <translation>X:</translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="1062"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="1135"/>
         <source>Y:</source>
         <translation>Y:</translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="1082"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="1167"/>
+        <source>Flip Selection Horizontally</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../tnztools/tooloptions.cpp" line="1168"/>
+        <source>Flip Selection Vertically</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../tnztools/tooloptions.cpp" line="1169"/>
+        <source>Rotate Selection Left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../tnztools/tooloptions.cpp" line="1170"/>
+        <source>Rotate Selection Right</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../tnztools/tooloptions.cpp" line="1186"/>
         <source>Scale</source>
         <translation>Měřítko</translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="1099"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="1207"/>
         <source>Position</source>
         <translation>Poloha</translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="1116"/>
-        <location filename="../../tnztools/tooloptions.cpp" line="1117"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="1224"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="1225"/>
         <source>Thickness</source>
         <translation>Tloušťka</translation>
     </message>
@@ -1725,22 +1770,22 @@ Chcete pokračovat?</translation>
 <context>
     <name>ShiftTraceToolOptionBox</name>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="2433"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="2590"/>
         <source>Reset Previous</source>
         <translation>Nastavit znovu předchozí</translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="2434"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="2591"/>
         <source>Reset Following</source>
         <translation>Nastavit znovu následující</translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="2436"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="2593"/>
         <source>Previous Drawing</source>
         <translation>Předchozí kresba</translation>
     </message>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="2437"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="2594"/>
         <source>Following Drawing</source>
         <translation>Následující kresba</translation>
     </message>
@@ -1834,7 +1879,7 @@ Chcete pokračovat?</translation>
 <context>
     <name>StylePickerToolOptionsBox</name>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="2382"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="2539"/>
         <source>With this option being activated, the picked style will be
 moved to the end of the first page of the palette.</source>
         <translation>Se zapnutím této volby bude zvolený styl
@@ -1844,64 +1889,64 @@ přesunut na konec první strany palety.</translation>
 <context>
     <name>ToonzRasterBrushTool</name>
     <message>
-        <location filename="../../tnztools/toonzrasterbrushtool.cpp" line="1082"/>
-        <location filename="../../tnztools/toonzrasterbrushtool.cpp" line="1089"/>
+        <location filename="../../tnztools/toonzrasterbrushtool.cpp" line="1097"/>
+        <location filename="../../tnztools/toonzrasterbrushtool.cpp" line="1104"/>
         <source>Size</source>
         <translation>Velikost</translation>
     </message>
     <message>
-        <location filename="../../tnztools/toonzrasterbrushtool.cpp" line="1083"/>
+        <location filename="../../tnztools/toonzrasterbrushtool.cpp" line="1098"/>
         <source>Hardness:</source>
         <translation>Tvrdost:</translation>
     </message>
     <message>
-        <location filename="../../tnztools/toonzrasterbrushtool.cpp" line="1084"/>
+        <location filename="../../tnztools/toonzrasterbrushtool.cpp" line="1099"/>
         <source>Smooth:</source>
         <translation>Vyhlazení:</translation>
     </message>
     <message>
-        <location filename="../../tnztools/toonzrasterbrushtool.cpp" line="1085"/>
+        <location filename="../../tnztools/toonzrasterbrushtool.cpp" line="1100"/>
         <source>Draw Order:</source>
         <translation>Pořadí kresby:</translation>
     </message>
     <message>
-        <location filename="../../tnztools/toonzrasterbrushtool.cpp" line="1086"/>
+        <location filename="../../tnztools/toonzrasterbrushtool.cpp" line="1101"/>
         <source>Over All</source>
         <translation>Nad vše</translation>
     </message>
     <message>
-        <location filename="../../tnztools/toonzrasterbrushtool.cpp" line="1087"/>
+        <location filename="../../tnztools/toonzrasterbrushtool.cpp" line="1102"/>
         <source>Under All</source>
         <translation>Pod vše</translation>
     </message>
     <message>
-        <location filename="../../tnztools/toonzrasterbrushtool.cpp" line="1088"/>
+        <location filename="../../tnztools/toonzrasterbrushtool.cpp" line="1103"/>
         <source>Palette Order</source>
         <translation>Pořadí palety</translation>
     </message>
     <message>
-        <location filename="../../tnztools/toonzrasterbrushtool.cpp" line="1092"/>
+        <location filename="../../tnztools/toonzrasterbrushtool.cpp" line="1107"/>
         <source>Preset:</source>
         <translation>Přednastavení:</translation>
     </message>
     <message>
-        <location filename="../../tnztools/toonzrasterbrushtool.cpp" line="1093"/>
-        <location filename="../../tnztools/toonzrasterbrushtool.cpp" line="2059"/>
+        <location filename="../../tnztools/toonzrasterbrushtool.cpp" line="1108"/>
+        <location filename="../../tnztools/toonzrasterbrushtool.cpp" line="2177"/>
         <source>&lt;custom&gt;</source>
         <translation>&lt;vlastní&gt;</translation>
     </message>
     <message>
-        <location filename="../../tnztools/toonzrasterbrushtool.cpp" line="1094"/>
+        <location filename="../../tnztools/toonzrasterbrushtool.cpp" line="1109"/>
         <source>Pencil</source>
         <translation>Tužka</translation>
     </message>
     <message>
-        <location filename="../../tnztools/toonzrasterbrushtool.cpp" line="1095"/>
+        <location filename="../../tnztools/toonzrasterbrushtool.cpp" line="1110"/>
         <source>Pressure</source>
         <translation>Tlak</translation>
     </message>
     <message>
-        <location filename="../../tnztools/toonzrasterbrushtool.cpp" line="1096"/>
+        <location filename="../../tnztools/toonzrasterbrushtool.cpp" line="1111"/>
         <source>Lock Alpha</source>
         <translation type="unfinished">Zamknout alfu</translation>
     </message>
@@ -1930,7 +1975,7 @@ přesunut na konec první strany palety.</translation>
     </message>
     <message>
         <location filename="../../tnztools/toonzvectorbrushtool.cpp" line="587"/>
-        <location filename="../../tnztools/toonzvectorbrushtool.cpp" line="1695"/>
+        <location filename="../../tnztools/toonzvectorbrushtool.cpp" line="1734"/>
         <source>&lt;custom&gt;</source>
         <translation>&lt;vlastní&gt;</translation>
     </message>
@@ -2250,7 +2295,7 @@ přesunut na konec první strany palety.</translation>
 <context>
     <name>ZoomToolOptionsBox</name>
     <message>
-        <location filename="../../tnztools/tooloptions.cpp" line="2568"/>
+        <location filename="../../tnztools/tooloptions.cpp" line="2725"/>
         <source>Reset Zoom</source>
         <translation>Obnovit výchozí zvětšení</translation>
     </message>

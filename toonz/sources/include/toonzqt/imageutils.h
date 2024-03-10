@@ -214,6 +214,8 @@ public:
   ShortcutZoomer(
       QWidget *viewerWidget);  //!< Constructs on the specified viewer widget.
 
+  virtual ~ShortcutZoomer() { }
+
   QWidget *getWidget() {
     return m_widget;
   }  //!< Returns the processed viewer widget.

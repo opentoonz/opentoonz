@@ -147,7 +147,7 @@ void setCurrentColor(const TPixel32 &color) {
       cs->setMainColor(color);
 
     cs->invalidateIcon();
-    ph->notifyColorStyleChanged();
+    ph->notifyColorStyleChanged(false);
 
     // per le palette animate
     int styleIndex    = ph->getStyleIndex();

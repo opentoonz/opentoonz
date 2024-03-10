@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="ko" sourcelanguage="en">
+<TS version="2.0" language="ko" sourcelanguage="en">
 <context>
     <name>BmpWriterProperties</name>
     <message>
@@ -35,11 +35,11 @@
     </message>
     <message>
         <source>Skipping frame.</source>
-        <translation>프레임 건너뛰기</translation>
+        <translation>프레임 건너뛰기.</translation>
     </message>
     <message>
         <source>Malformed frame name</source>
-        <translation type="vanished">잘못된 형식의 프레임</translation>
+        <translation>잘못된 형식의 프레임</translation>
     </message>
     <message>
         <source>Unidentified Action</source>
@@ -83,26 +83,26 @@
     <name>Tiio::BmpWriterProperties</name>
     <message>
         <source>Bits Per Pixel</source>
-        <translation type="vanished">픽셀당 비트 수</translation>
+        <translation>픽셀당 비트 수</translation>
     </message>
     <message>
         <source>24 bits</source>
-        <translation type="vanished">24비트</translation>
+        <translation>24비트</translation>
     </message>
     <message>
         <source>8 bits (Greyscale)</source>
-        <translation type="vanished">8비트</translation>
+        <translation>8비트</translation>
     </message>
 </context>
 <context>
     <name>Tiio::JpgWriterProperties</name>
     <message>
         <source>Quality</source>
-        <translation type="vanished">품질</translation>
+        <translation>품질</translation>
     </message>
     <message>
         <source>Smoothing</source>
-        <translation type="vanished">평활화</translation>
+        <translation>평활화</translation>
     </message>
 </context>
 </TS>

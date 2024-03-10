@@ -460,13 +460,13 @@ void TScannerEpson::doSettings(const TScannerParameters &params,
     unsigned char brightness = 0x00;
     float bv                 = params.m_brightness.m_value;
 
-    if (bv >= 0 && bv < 43) brightness    = 0xFD;
-    if (bv >= 43 && bv < 86) brightness   = 0xFE;
-    if (bv >= 86 && bv < 128) brightness  = 0xFF;
+    if (bv >= 0 && bv < 43) brightness = 0xFD;
+    if (bv >= 43 && bv < 86) brightness = 0xFE;
+    if (bv >= 86 && bv < 128) brightness = 0xFF;
     if (bv >= 128 && bv < 171) brightness = 0x00;
     if (bv >= 171 && bv < 214) brightness = 0x01;
     if (bv >= 214 && bv < 255) brightness = 0x02;
-    if (bv == 255) brightness             = 0x03;
+    if (bv == 255) brightness = 0x03;
 
     unsigned short dpi = (unsigned short)params.m_dpi.m_value;
 

@@ -14,6 +14,40 @@ const char auxslash = '\\';
 
 //=============================================================================
 
+TFrameId::TFrameId(const std::string &str, char s)
+    : m_frame(EMPTY_FRAME), m_letter(), m_zeroPadding(4), m_startSeqInd(s)
+{
+  if (!str.empty()) {
+    int i;
+    m_frame = 0;
+    for(i = 0; i < (int)str.size() && isdigit(str[i]); ++i)
+      m_frame = m_frame*10 + str[i] - '0';
+    if (i < (int)str.size() && isalpha(str[i]))
+      m_letter = str[i++];
+    if (m_frame == 0 || i < (int)str.size())
+      m_frame = NO_FRAME;
+  }
+}
+
+//-------------------------------------------------------------------
+
+TFrameId::TFrameId(const std::wstring &str, char s)
+    : m_frame(EMPTY_FRAME), m_letter(), m_zeroPadding(4), m_startSeqInd(s)
+{
+  if (!str.empty()) {
+    int i;
+    m_frame = 0;
+    for(i = 0; i < (int)str.size() && iswdigit(str[i]); ++i)
+      m_frame = m_frame*10 + str[i] - L'0';
+    if (i < (int)str.size() && iswalpha(str[i]))
+      m_letter = str[i++] + ('a' - L'a');
+    if (m_frame == 0 || i < (int)str.size())
+      m_frame = NO_FRAME;
+  }
+}
+
+//-------------------------------------------------------------------
+
 // TFrameId::operator string() const
 std::string TFrameId::expand(FrameFormat format) const {
   if (m_frame == EMPTY_FRAME)
@@ -348,7 +382,7 @@ TFrameId TFilePath::getFrame() const {
     number                    = number * 10 + str[k] - '0';
   char letter                 = '\0';
   if (isalpha(str[k])) letter = str[k++];
-  if (number == 0 || k < i) throw TMalformedFrameException();
+  if (number == 0 || k < i) return TFrameId(TFrameId::NO_FRAME);
   return TFrameId(number, letter);
 }
 

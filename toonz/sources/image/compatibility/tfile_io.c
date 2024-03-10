@@ -58,7 +58,7 @@ char *convertWCHAR2CHAR(const wchar_t *wc) {
 }
 #endif
 /*-----------------------------------*/
-#if defined(MACOSX) || defined(LINUX) || defined(FREEBSD)
+#if defined(MACOSX) || defined(LINUX) || defined(FREEBSD) || defined(HAIKU)
 
 FILE *_wfopen(const wchar_t *fname, const wchar_t *mode) {
   char *cfname = convertWCHAR2CHAR(fname);

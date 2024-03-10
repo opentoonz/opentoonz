@@ -102,66 +102,100 @@ public:                                                                        \
 //=========================================================
 
 template <class T>
-class TSmartPointerT {
+class TSmartHolderT {
+public:
+  typedef T Type;
+
 protected:
   T *m_pointer;
+  T& reference() const
+    { assert(m_pointer); return *m_pointer; }
 
 public:
-  TSmartPointerT() : m_pointer(0) {}
+  TSmartHolderT() : m_pointer(0) {}
+  TSmartHolderT(const TSmartHolderT &src) : m_pointer(src.m_pointer)
+    { if (m_pointer) m_pointer->addRef(); }
+  explicit TSmartHolderT(T *pointer) : m_pointer(pointer)
+    { if (m_pointer) m_pointer->addRef(); }
+  virtual ~TSmartHolderT()
+    { if (m_pointer) { m_pointer->release(); m_pointer = 0; } }
 
-  TSmartPointerT(const TSmartPointerT &src) : m_pointer(src.m_pointer) {
-    if (m_pointer) m_pointer->addRef();
-  }
+  TSmartHolderT& operator=(const TSmartHolderT &src) { set(src); return *this; }
 
-  TSmartPointerT(T *pointer) : m_pointer(pointer) {
-    if (m_pointer) m_pointer->addRef();
-  }
-
-  virtual ~TSmartPointerT() {
-    if (m_pointer) {
-      m_pointer->release();
-      m_pointer = 0;
+  void set(T *pointer) {
+    if (m_pointer != pointer) {
+      // call 'addRef' before 'release'
+      if (pointer) pointer->addRef();
+      if (m_pointer) m_pointer->release();
+      m_pointer = pointer;
     }
   }
+  void set(const TSmartHolderT &src)
+    { set(src.m_pointer); }
+  void reset()
+    { set(0); }
+  bool operator!() const
+    { return m_pointer == 0; }
+  operator bool() const
+    { return m_pointer != 0; }
 
-  TSmartPointerT &operator=(const TSmartPointerT &src) {
-    // prima addRef  e poi release per evitare brutti scherzi
-    // in caso di parentela
-    T *old    = m_pointer;
-    m_pointer = src.m_pointer;
-    if (m_pointer) m_pointer->addRef();
-    if (old) old->release();
-    return *this;
-  }
+  bool operator==(const T *p) const { return m_pointer == p; }
+  bool operator!=(const T *p) const { return m_pointer != p; }
+  bool operator< (const T *p) const { return m_pointer <  p; }
+  bool operator> (const T *p) const { return m_pointer >  p; }
+  bool operator<=(const T *p) const { return m_pointer <= p; }
+  bool operator>=(const T *p) const { return m_pointer >= p; }
 
-  T *operator->() const {
-    assert(m_pointer);
-    return m_pointer;
-  }
+  template<class TT>
+  bool equal(const TT *p) const { return m_pointer == p; }
+  template<class TT>
+  bool less(const TT *p) const { return m_pointer < p; }
+  template<class TT>
+  bool greater(const TT *p) const { return m_pointer > p; }
 
-  T &operator*() const {
-    assert(m_pointer);
-    return *m_pointer;
-  }
+  template<class TT>
+  bool operator==(const TSmartHolderT<TT> &p) const { return p.equal(m_pointer); }
+  template<class TT>
+  bool operator!=(const TSmartHolderT<TT> &p) const { return !p.equal(m_pointer); }
+  template<class TT>
+  bool operator< (const TSmartHolderT<TT> &p) const { return p.greater(m_pointer); }
+  template<class TT>
+  bool operator> (const TSmartHolderT<TT> &p) const { return p.less(m_pointer); }
+  template<class TT>
+  bool operator<=(const TSmartHolderT<TT> &p) const { return !p.less(m_pointer); }
+  template<class TT>
+  bool operator>=(const TSmartHolderT<TT> &p) const { return !p.greater(m_pointer); }
+};
 
-  T *getPointer() const { return m_pointer; }
+//=========================================================
 
-  bool operator!() const { return m_pointer == 0; }
-  operator bool() const { return m_pointer != 0; }
+template <class T>
+class TSmartPointerConstT: public TSmartHolderT<T> {
+public:
+  typedef TSmartHolderT<T> Holder;
+  TSmartPointerConstT() {}
+  TSmartPointerConstT(const TSmartPointerConstT &src): Holder(src) {}
+  explicit TSmartPointerConstT(T *pointer): Holder(pointer) {}
+  TSmartPointerConstT& operator=(const TSmartPointerConstT &src) { Holder::set(src); return *this; }
+  const T* getConstPointer() const { return Holder::m_pointer; }
+  const T* operator->() const { return &Holder::reference(); }
+  const T& operator*() const { return Holder::reference(); }
+  const T* getPointer() const { return Holder::m_pointer; }
+};
 
-  bool operator==(const TSmartPointerT &p) const {
-    return m_pointer == p.m_pointer;
-  }
-  bool operator!=(const TSmartPointerT &p) const {
-    return m_pointer != p.m_pointer;
-  }
+//=========================================================
 
-  bool operator<(const TSmartPointerT &p) const {
-    return m_pointer < p.m_pointer;
-  }
-  bool operator>(const TSmartPointerT &p) const {
-    return m_pointer > p.m_pointer;
-  }
+template <class T>
+class TSmartPointerT: public TSmartPointerConstT<T> {
+public:
+  typedef TSmartPointerConstT<T> Const;
+  TSmartPointerT() {}
+  TSmartPointerT(const TSmartPointerT &src): Const(src) {}
+  TSmartPointerT(T *pointer): Const(pointer) {}
+  TSmartPointerT& operator=(const TSmartPointerT &src) { Const::set(src); return *this; }
+  T* operator->() const { return &Const::reference(); }
+  T& operator*() const { return Const::reference(); }
+  T* getPointer() const { return Const::m_pointer; }
 };
 
 //=========================================================
@@ -171,15 +205,15 @@ class TDerivedSmartPointerT : public TSmartPointerT<DERIVED> {
 public:
   typedef TDerivedSmartPointerT<DERIVED, BASE> DerivedSmartPointer;
 
-  TDerivedSmartPointerT(){};
-  TDerivedSmartPointerT(DERIVED *pointer) : TSmartPointerT<DERIVED>(pointer) {}
-
-  TDerivedSmartPointerT(const TSmartPointerT<BASE> &p) {
-    TSmartPointerT<DERIVED>::m_pointer =
-        dynamic_cast<DERIVED *>(p.getPointer());
-    if (TSmartPointerT<DERIVED>::m_pointer)
-      TSmartPointerT<DERIVED>::m_pointer->addRef();
-  }
+  TDerivedSmartPointerT() { };
+  TDerivedSmartPointerT(DERIVED *pointer):
+    TSmartPointerT<DERIVED>(pointer) { }
+  TDerivedSmartPointerT(const TSmartPointerT<BASE> &p):
+    TSmartPointerT<DERIVED>(dynamic_cast<DERIVED*>(p.getPointer())) { }
 };
+
+//=========================================================
+
+typedef TSmartPointerT<TSmartObject> TSmartObjectP;
 
 #endif

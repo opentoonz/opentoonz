@@ -215,7 +215,8 @@ void RasterStrokeGenerator::placeOver(const TRasterCM32P &out,
           }
         }
         if (inTone <= outTone) {
-          *outPix = TPixelCM32(inPix->getInk(), outPix->getPaint(), inTone);
+          *outPix = TPixelCM32(inPix->getInk(), outPix->getPaint(),
+                               m_modifierLockAlpha ? outTone : inTone);
         }
       }
       if (m_task == ERASE) {

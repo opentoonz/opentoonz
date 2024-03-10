@@ -37,7 +37,8 @@ TSoundTrack::TSoundTrack(TUINT32 sampleRate, int bitPerSample, int channelCount,
     , m_sampleCount(sampleCount)
     , m_channelCount(channelCount)
     , m_parent(0)
-    , m_bufferOwner(true) {
+    , m_bufferOwner(true)
+    , m_sampleType(sampleType) {
   m_buffer = (UCHAR *)malloc(sampleCount * m_sampleSize);
   if (!m_buffer) return;
 
@@ -81,7 +82,7 @@ TSoundTrackP TSoundTrack::create(TUINT32 sampleRate, int bitPerSample,
                                  int channelCount, TINT32 sampleCount,
                                  int sampleType) {
   TSoundTrackP st = 0;
-  int type = bitPerSample + channelCount;
+  int type        = bitPerSample + channelCount;
   switch (type) {
   case TRK_M8:
     if (sampleType == TSound::INT)

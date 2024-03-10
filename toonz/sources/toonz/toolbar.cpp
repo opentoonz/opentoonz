@@ -44,6 +44,7 @@ struct {
                     {T_Tape, false, 0},        {T_Finger, false, 0},
                     {"Separator_3", false, 0}, {T_StylePicker, false, 0},
                     {T_RGBPicker, false, 0},   {T_Ruler, false, 0},
+                    {T_EditAssistants, false, 0},
                     {"Separator_4", false, 0}, {T_ControlPointEditor, false, 0},
                     {T_Pinch, true, 0},        {T_Pump, true, 0},
                     {T_Magnet, true, 0},       {T_Bender, true, 0},
@@ -286,8 +287,7 @@ void Toolbar::hideEvent(QHideEvent *e) {
 
 void Toolbar::onToolChanged() {
   ToolHandle *toolHandle = TApp::instance()->getCurrentTool();
-  TTool *tool            = toolHandle->getTool();
-  std::string toolName   = tool->getName();
+  std::string toolName   = toolHandle->getRequestedToolName().toStdString();
   QAction *act = CommandManager::instance()->getAction(toolName.c_str());
   if (!act || act->isChecked()) return;
   act->setChecked(true);

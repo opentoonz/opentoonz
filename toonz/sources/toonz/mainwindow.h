@@ -99,6 +99,7 @@ public:
   void onNewToonzRasterLevelButtonPressed();
   void onNewRasterLevelButtonPressed();
   void clearCacheFolder();
+  void onNewMetaLevelButtonPressed();
 
   QString getLayoutName() { return m_layoutName; }
 
@@ -189,7 +190,7 @@ private:
   QAction *createMiscAction(const char *id, const char *name,
                             const char *defaultShortcut);
   QAction *createToolOptionsAction(const char *id, const char *name,
-                                   const QString &defaultShortcut);
+                                   const QString &defaultShortcut, const char *iconSVGName = "");
   QAction *createStopMotionAction(const char *id, const char *name,
                                   const QString &defaultShortcut,
                                   const char *iconSVGName = "");

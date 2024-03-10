@@ -21,6 +21,29 @@
     </message>
 </context>
 <context>
+    <name>FlowLineStrokeStyle</name>
+    <message>
+        <source>Density</source>
+        <translation>密度</translation>
+    </message>
+    <message>
+        <source>Extension</source>
+        <translation>扩展</translation>
+    </message>
+    <message>
+        <source>Width Scale</source>
+        <translation>宽度比</translation>
+    </message>
+    <message>
+        <source>Straighten Ends</source>
+        <translation>拉直末端</translation>
+    </message>
+    <message>
+        <source>Flow Line</source>
+        <translation>跟随线</translation>
+    </message>
+</context>
+<context>
     <name>MovingSolidColor</name>
     <message>
         <source>Offset</source>

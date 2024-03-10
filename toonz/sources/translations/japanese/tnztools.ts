@@ -87,6 +87,22 @@
         <source>Table</source>
         <translation>テーブル</translation>
     </message>
+    <message>
+        <source>Flip Object Horizontally</source>
+        <translation>水平方向に反転</translation>
+    </message>
+    <message>
+        <source>Flip Object Vertically</source>
+        <translation>垂直方向に反転</translation>
+    </message>
+    <message>
+        <source>Rotate Object Left</source>
+        <translation>90°回転（反時計回り）</translation>
+    </message>
+    <message>
+        <source>Rotate Object Right</source>
+        <translation>90°回転（時計回り）</translation>
+    </message>
 </context>
 <context>
     <name>BrushTool</name>
@@ -582,6 +598,10 @@
     <message>
         <source>Maximum Gap</source>
         <translation>隙間の判定</translation>
+    </message>
+    <message>
+        <source>Pick+Freehand</source>
+        <translation>スポイト＋なげなわ</translation>
     </message>
 </context>
 <context>
@@ -1465,6 +1485,22 @@ Do you want to proceed?</source>
     <message>
         <source>Position</source>
         <translation>位置</translation>
+    </message>
+    <message>
+        <source>Flip Selection Horizontally</source>
+        <translation>選択範囲を水平方向に反転</translation>
+    </message>
+    <message>
+        <source>Flip Selection Vertically</source>
+        <translation>選択範囲を垂直方向に反転</translation>
+    </message>
+    <message>
+        <source>Rotate Selection Left</source>
+        <translation>選択範囲を90°回転（反時計回り）</translation>
+    </message>
+    <message>
+        <source>Rotate Selection Right</source>
+        <translation>選択範囲を90°回転（時計回り）</translation>
     </message>
 </context>
 <context>

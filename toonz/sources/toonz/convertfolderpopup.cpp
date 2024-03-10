@@ -62,9 +62,12 @@ void ConvertFolderPopup::Converter::run() {
   DVGui::ProgressDialog* progressDialog = m_parent->m_progressDialog;
   int levelCount                        = m_parent->m_srcFilePaths.size();
 
+  QDir targetDir(m_parent->m_convertFolderFld->getPath());
+
   for (int i = 0; !m_parent->m_notifier->abortTask() && i < levelCount; i++) {
     TFilePath sourceLevelPath = sc->decodeFilePath(m_parent->m_srcFilePaths[i]);
-    QString levelName = QString::fromStdString(sourceLevelPath.getLevelName());
+    QString levelName =
+        targetDir.relativeFilePath(sourceLevelPath.getQString());
 
     TFilePath dstFolder = sourceLevelPath.getParentDir();
     // check already existent levels

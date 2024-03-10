@@ -13,7 +13,7 @@ class TestPanel final : public TPanel {
   Q_OBJECT
 
 public:
-  TestPanel(QWidget *parent = 0, Qt::WindowFlags flags = 0);
+  TestPanel(QWidget *parent = 0, Qt::WindowFlags flags = Qt::WindowFlags());
   ~TestPanel();
 
 public slots:

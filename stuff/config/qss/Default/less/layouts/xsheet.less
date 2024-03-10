@@ -40,6 +40,15 @@
   padding-right: 3;
 }
 
+#XsheetBreadcrumbs {
+  padding: 0 5px 0 5px;
+  margin: 0;
+  border-bottom: 1 solid @accent;
+  &::separator:horizontal {
+    margin: 0 0 0 2;
+  }
+}
+
 /* xsheetColumnHeader (Context Menus)
 ----------------------------------------------------------------------------- */
 
@@ -134,6 +143,10 @@ XsheetViewer {
   qproperty-MeshColumnBorderColor: desaturate(darken(@xsheet-MeshColumn-color, @columnBorderDarkness), @columnBorderDesaturation);
   qproperty-SelectedMeshColumnColor: mix(shade(@xsheet-MeshColumn-color, @cellHighlightLightness), @cellHighlightTintColor, @cellHighlightTintAmount);
   
+  qproperty-MetaColumnColor: @xsheet-MetaColumn-color;
+  qproperty-MetaColumnBorderColor: desaturate(darken(@xsheet-MetaColumn-color, @columnBorderDarkness), @columnBorderDesaturation);
+  qproperty-SelectedMetaColumnColor: mix(shade(@xsheet-MetaColumn-color, @cellHighlightLightness), @cellHighlightTintColor, @cellHighlightTintAmount);
+
   qproperty-SoundTextColumnColor: @xsheet-SoundTextColumn-color;
   qproperty-SoundTextColumnBorderColor: desaturate(darken(@xsheet-SoundTextColumn-color, @columnBorderDarkness), @columnBorderDesaturation);
   qproperty-SelectedSoundTextColumnColor: mix(shade(@xsheet-SoundTextColumn-color, @cellHighlightLightness), @cellHighlightTintColor, @cellHighlightTintAmount);
@@ -143,7 +156,7 @@ XsheetViewer {
   qproperty-SelectedSoundColumnColor: mix(shade(@xsheet-SoundColumn-color, @cellHighlightLightness), @cellHighlightTintColor, @cellHighlightTintAmount);
   qproperty-SoundColumnHlColor: @xsheet-SoundColumnHL-color;
   qproperty-SoundColumnTrackColor: @xsheet-SoundColumnTrack-color;
-
+  
   qproperty-ActiveCameraColor: @xsheet-ActiveCamera-color;
   qproperty-SelectedActiveCameraColor: mix(shade(@xsheet-ActiveCamera-color, @cellHighlightLightness), @cellHighlightTintColor, @cellHighlightTintAmount);
   qproperty-OtherCameraColor: @xsheet-OtherCamera-color;
@@ -166,6 +179,8 @@ XsheetViewer {
   qproperty-XsheetPreviewButtonBgOffColor: transparent;
   qproperty-XsheetPreviewButtonOffImage: url('@{img-url}/x_prev_eye_off.svg');
 
+  qproperty-XsheetUnifiedButtonTranspImage: url('@{img-url}/x_prev_eye_transp.svg');
+
   qproperty-XsheetCamstandButtonBgOnColor: @xsheet-CamstandButtonBgOn-color;
   qproperty-XsheetCamstandButtonOnImage: url('@{img-url}/x_table_view_on.svg');
   qproperty-XsheetCamstandButtonTranspImage: url('@{img-url}/x_table_view_transp.svg');
@@ -187,29 +202,23 @@ XsheetViewer {
   qproperty-TimelinePreviewButtonBgOnColor: @bg;
   qproperty-TimelinePreviewButtonOnImage: url('@{img-url}/preview_small.svg');
   qproperty-TimelinePreviewButtonBgOffColor: @bg;
-  qproperty-TimelinePreviewButtonOffImage: url('none');
+  qproperty-TimelinePreviewButtonOffImage: url('@{img-url}/transparent.svg');
+  
+  qproperty-TimelineUnifiedButtonTranspImage: url('@{img-url}/preview_trans_small.svg');
 
   qproperty-TimelineCamstandButtonBgOnColor: @bg;
   qproperty-TimelineCamstandButtonOnImage: url('@{img-url}/table_small.svg');
   qproperty-TimelineCamstandButtonTranspImage: url('@{img-url}/trans_small.svg');
   qproperty-TimelineCamstandButtonBgOffColor: @bg;
-  qproperty-TimelineCamstandButtonOffImage: url('none');
+  qproperty-TimelineCamstandButtonOffImage: url('@{img-url}/transparent.svg');
 
   qproperty-TimelineLockButtonBgOnColor: @bg;
   qproperty-TimelineLockButtonOnImage: url('@{img-url}/lock_on_small.svg');
   qproperty-TimelineLockButtonBgOffColor: @bg;
-  qproperty-TimelineLockButtonOffImage: url('none');
+  qproperty-TimelineLockButtonOffImage: url('@{img-url}/transparent.svg');
 
   qproperty-TimelineConfigButtonBgColor: @bg;
   qproperty-TimelineConfigButtonImage: url('@{img-url}/timeline_config.svg');
-
-  // Header Control
-  qproperty-LayerHeaderPreviewImage: url('@{img-url}/layer_header_prev_eye.svg');
-  qproperty-LayerHeaderPreviewOverImage: url('@{img-url}/layer_header_prev_eye_over.svg');
-  qproperty-LayerHeaderCamstandImage: url('@{img-url}/layer_header_table_view.svg');
-  qproperty-LayerHeaderCamstandOverImage: url('@{img-url}/layer_header_table_view_over.svg');
-  qproperty-LayerHeaderLockImage: url('@{img-url}/layer_lock_on.svg');
-  qproperty-LayerHeaderLockOverImage: url('@{img-url}/layer_lock_on_over.svg');
 }
 
 /* -----------------------------------------------------------------------------

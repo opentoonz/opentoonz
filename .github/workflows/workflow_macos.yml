@@ -10,17 +10,22 @@ jobs:
 
     - name: Remove symlinks
       run: |
-        # remove existing symlinks before installing python@3.10 and 3.11
-        rm /usr/local/bin/2to3
-        rm /usr/local/bin/idle3
-        rm /usr/local/bin/pydoc3
-        rm /usr/local/bin/python3
-        rm /usr/local/bin/python3-config
-        rm /usr/local/bin/2to3-3.11
-        rm /usr/local/bin/idle3.11
-        rm /usr/local/bin/pydoc3.11
-        rm /usr/local/bin/python3.11
-        rm /usr/local/bin/python3.11-config
+        # remove existing symlinks before installing python@3.10, 3.11, and 3.12
+        rm -f /usr/local/bin/2to3
+        rm -f /usr/local/bin/idle3
+        rm -f /usr/local/bin/pydoc3
+        rm -f /usr/local/bin/python3
+        rm -f /usr/local/bin/python3-config
+        rm -f /usr/local/bin/2to3-3.11
+        rm -f /usr/local/bin/idle3.11
+        rm -f /usr/local/bin/pydoc3.11
+        rm -f /usr/local/bin/python3.11
+        rm -f /usr/local/bin/python3.11-config
+        rm -f /usr/local/bin/2to3-3.12
+        rm -f /usr/local/bin/idle3.12
+        rm -f /usr/local/bin/pydoc3.12
+        rm -f /usr/local/bin/python3.12
+        rm -f /usr/local/bin/python3.12-config
 
     - name: Install libraries
       run: |
@@ -37,8 +42,12 @@ jobs:
           done
         }        
         brew update
-        checkPkgAndInstall pkg-config glew lz4 libjpeg libpng lzo qt@5 boost libusb libmypaint ccache jpeg-turbo ninja
+        brew cleanup
+        checkPkgAndInstall pkg-config glew lz4 libjpeg libpng lzo boost libusb libmypaint ccache jpeg-turbo ninja
         checkPkgAndInstall opencv
+        # opencv depends on vtk and vtk depends on qt6
+        brew unlink qt
+        checkPkgAndInstall qt@5
         
     - uses: actions/cache@v1
       with:

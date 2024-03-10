@@ -21,6 +21,8 @@
 @dock-bg-color: darken(@bg, 30);
 @label-title: rgb(0, 0, 0);
 
+@lock-color: #bd5454;
+
 // -----------------------------------------------------------------------------
 // Tabs
 // -----------------------------------------------------------------------------
@@ -115,8 +117,7 @@
 @toolbutton-border-color-checked-hover: @toolbutton-border-color-checked;
 
 // Lock
-@toolbutton-lock-bg-color-checked: #bd5454;
-@toolbutton-lock-border-color-checked: darken(@toolbutton-lock-bg-color-checked, 20);
+@toolbutton-lock-border-color-checked: darken(@lock-color, 20);
 @toolbutton-lock-border-color-checked-hover: @toolbutton-lock-border-color-checked;
 
 // -----------------------------------------------------------------------------
@@ -230,6 +231,7 @@
 @xsheet-ReferenceColumn-color:              #959595;
 @xsheet-PaletteColumn-color:                #599586;
 @xsheet-MeshColumn-color:                   #8b73a7;
+@xsheet-MetaColumnColor:                    #8c8c8c;
 @xsheet-SoundColumn-color:                  #749e9e;
 @xsheet-SoundColumnHL-color:                #f5ffe6;
 @xsheet-SoundColumnTrack-color:             rgba(0,0,0,0.8);

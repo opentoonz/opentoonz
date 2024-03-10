@@ -13,9 +13,14 @@
 #include "tmachine.h"
 #include "tsystem.h"
 
-#include "movsettings.h"
+// movesettings deps, must be included before QuickTime includes
+#include "texception.h"
+#include "tpropertytype.h"
+#include "tproperty.h"
 
+// following includes may include QuickTime
 #include "tiio_movM.h"
+#include "movsettings.h"
 
 /* QuickDraw は 10.7 以降なくなった */
 //#define HAS_QUICKDRAW

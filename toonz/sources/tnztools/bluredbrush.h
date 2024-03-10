@@ -34,7 +34,7 @@ public:
               bool doDynamicOpacity);
   ~BluredBrush();
 
-  void addPoint(const TThickPoint &p, double opacity);
+  void addPoint(const TThickPoint &p, double opacity, bool keepDistance = false);
   void addArc(const TThickPoint &pa, const TThickPoint &pb,
               const TThickPoint &pc, double opacityA, double opacityC);
   TRect getBoundFromPoints(const std::vector<TThickPoint> &points) const;

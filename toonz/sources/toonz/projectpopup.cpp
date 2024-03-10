@@ -50,10 +50,8 @@ enum { Rule_Standard = 0, Rule_Custom };
 //-----------------------------------------------------------------------------
 
 QPixmap ProjectDvDirModelProjectNode::getPixmap(bool isOpen) const {
-  static QPixmap openProjectPixmap(
-      svgToPixmap(getIconThemePath("actions/18/folder_project_on.svg")));
-  static QPixmap closeProjectPixmap(
-      svgToPixmap(getIconThemePath("actions/18/folder_project.svg")));
+  static QPixmap openProjectPixmap(generateIconPixmap("folder_project_on"));
+  static QPixmap closeProjectPixmap(generateIconPixmap("folder_project"));
   return isOpen ? openProjectPixmap : closeProjectPixmap;
 }
 
@@ -106,8 +104,7 @@ void ProjectDvDirModelRootNode::refreshChildren() {
       ProjectDvDirModelSpecialFileFolderNode *projectRootNode =
           new ProjectDvDirModelSpecialFileFolderNode(
               this, L"Project root (" + rootDir + L")", projectRoot);
-      projectRootNode->setPixmap(
-          svgToPixmap(getIconThemePath("actions/18/folder_project_root.svg")));
+      projectRootNode->setPixmap(generateIconPixmap("folder_project_root"));
       addChild(projectRootNode);
     }
 

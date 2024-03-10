@@ -383,12 +383,16 @@ int UndoDeleteSelection::m_id = 0;
 // UndoPasteSelection
 //-----------------------------------------------------------------------------
 
-class UndoPasteSelection final : public TUndo {
+class UndoPasteSelection final : public ToolUtils::TToolUndo {
   RasterSelection *m_currentSelection, m_newSelection;
 
 public:
-  UndoPasteSelection(RasterSelection *currentSelection)
-      : TUndo()
+  UndoPasteSelection(RasterSelection *currentSelection, TXshSimpleLevel *sl,
+                     const TPaletteP &oldPalette)
+      : TToolUndo(sl, currentSelection->getFrameId(),
+                  currentSelection->wasFrameCreated(),
+                  currentSelection->wasLevelCreated(), oldPalette,
+                  currentSelection->wasLevelRenumbered())
       , m_currentSelection(currentSelection)
       , m_newSelection(*currentSelection) {}
 
@@ -398,9 +402,17 @@ public:
     m_currentSelection->setFloatingSeletion(TRasterP());
     m_currentSelection->selectNone();
     m_currentSelection->notify();
+    removeLevelAndFrameIfNeeded();
+    if (m_createdFrame)
+      TTool::getApplication()->getCurrentXsheet()->notifyXsheetChanged();
+    notifyImageChanged();
   }
 
   void redo() const override {
+    insertLevelAndFrameIfNeeded();
+    if (m_createdFrame)
+      TTool::getApplication()->getCurrentXsheet()->notifyXsheetChanged();
+    notifyImageChanged();
     *m_currentSelection = m_newSelection;
     m_currentSelection->notify();
   }
@@ -414,7 +426,7 @@ public:
 // UndoPasteFloatingSelection
 //-----------------------------------------------------------------------------
 
-class UndoPasteFloatingSelection final : public TUndo {
+class UndoPasteFloatingSelection final : public ToolUtils::TToolUndo {
   static int m_id;
 
   TXshCell m_imageCell;  //!< Level/frame pair to the pasted-to image
@@ -433,8 +445,12 @@ class UndoPasteFloatingSelection final : public TUndo {
 
 public:
   UndoPasteFloatingSelection(RasterSelection *currentSelection,
-                             TPalette *oldPalette, bool noAntialiasing)
-      : TUndo()
+                             TXshSimpleLevel *sl, TPalette *oldPalette,
+                             bool noAntialiasing)
+      : TToolUndo(sl, currentSelection->getFrameId(),
+                  currentSelection->wasFrameCreated(),
+                  currentSelection->wasLevelCreated(), oldPalette,
+                  currentSelection->wasLevelRenumbered())
       , m_imageCell(currentSelection->getCurrentImageCell())
       , m_oldPalette(oldPalette ? oldPalette->clone() : 0)
       , m_strokes(currentSelection->getOriginalStrokes())
@@ -537,6 +553,10 @@ public:
     app->getPaletteController()
         ->getCurrentLevelPalette()
         ->notifyPaletteChanged();
+
+    removeLevelAndFrameIfNeeded();
+    if (m_createdFrame) app->getCurrentXsheet()->notifyXsheetChanged();
+
     if (!m_tool) return;
     m_tool->notifyImageChanged(m_frameId);
     m_tool->invalidate();
@@ -547,6 +567,11 @@ public:
     TImageP floatingImage =
         TImageCache::instance()->get(m_floatingImageId, false);
     if (!floatingImage || !image) return;
+
+    TTool::Application *app = TTool::getApplication();
+    insertLevelAndFrameIfNeeded();
+    if (m_createdFrame) app->getCurrentXsheet()->notifyXsheetChanged();
+
     TRasterP floatingRas = getRaster(floatingImage);
 
     TXshSimpleLevelP sl(m_imageCell.getSimpleLevel());
@@ -561,7 +586,6 @@ public:
     ToolUtils::updateSaveBox(sl, fid);
 
     if (m_newPalette) image->getPalette()->assign(m_newPalette->clone());
-    TTool::Application *app = TTool::getApplication();
     app->getPaletteController()
         ->getCurrentLevelPalette()
         ->notifyPaletteChanged();
@@ -880,7 +904,10 @@ RasterSelection::RasterSelection()
     , m_fid()
     , m_transformationCount(0)
     , m_isPastedSelection(false)
-    , m_noAntialiasing(false) {
+    , m_noAntialiasing(false)
+    , m_createdFrame(false)
+    , m_createdLevel(false)
+    , m_renumberedLevel(false) {
   m_strokes.clear();
   m_originalStrokes.clear();
 }
@@ -900,6 +927,9 @@ RasterSelection::RasterSelection(const RasterSelection &src)
     , m_transformationCount(src.m_transformationCount)
     , m_isPastedSelection(src.m_isPastedSelection)
     , m_noAntialiasing(src.m_noAntialiasing)
+    , m_createdFrame(src.m_createdFrame)
+    , m_createdLevel(src.m_createdLevel)
+    , m_renumberedLevel(src.m_renumberedLevel)
 
 {
   setView(src.getView());
@@ -949,6 +979,9 @@ void RasterSelection::selectNone() {
   m_transformationCount       = 0;
   m_isPastedSelection         = false;
   m_oldPalette                = 0;
+  m_createdFrame              = false;
+  m_createdLevel              = false;
+  m_renumberedLevel           = false;
   notify();
 }
 
@@ -1047,7 +1080,8 @@ void RasterSelection::pasteFloatingSelection() {
 
   if (m_transformationCount > 0 || m_isPastedSelection)
     TUndoManager::manager()->add(new UndoPasteFloatingSelection(
-        this, m_oldPalette.getPointer(), m_noAntialiasing));
+        this, m_currentImageCell.getSimpleLevel(), m_oldPalette.getPointer(),
+        m_noAntialiasing));
   else if (m_transformationCount == 0)
     TUndoManager::manager()->popUndo(-1, true);
 
@@ -1214,6 +1248,10 @@ void RasterSelection::pasteSelection() {
   if (isFloating()) pasteFloatingSelection();
   selectNone();
   m_isPastedSelection = true;
+  m_createdFrame      = tool->m_isFrameCreated;
+  m_createdLevel      = tool->m_isLevelCreated;
+  m_renumberedLevel   = tool->m_isLevelRenumbererd;
+
   if (!m_currentImageCell.getSimpleLevel()) {
     const TXshCell &imageCell = TTool::getImageCell();
 
@@ -1293,7 +1331,8 @@ void RasterSelection::pasteSelection() {
 
   app->getPaletteController()->getCurrentLevelPalette()->notifyPaletteChanged();
   notify();
-  TUndoManager::manager()->add(new UndoPasteSelection(this));
+  if (m_createdFrame) tool->notifyImageChanged(m_fid);
+  TUndoManager::manager()->add(new UndoPasteSelection(this, sl, m_oldPalette));
 }
 
 //-----------------------------------------------------------------------------

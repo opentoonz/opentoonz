@@ -39,6 +39,11 @@ const QColor grey225(225, 225, 225);
 const QColor grey190(190, 190, 190);
 const QColor grey150(150, 150, 150);
 
+struct SvgRenderParams {
+  QSize size;
+  QRectF rect;
+};
+
 }  // namespace
 
 class QPainter;
@@ -95,10 +100,23 @@ QPixmap DVAPI scalePixmapKeepingAspectRatio(QPixmap p, QSize size,
 
 //-----------------------------------------------------------------------------
 
+SvgRenderParams calculateSvgRenderParams(const QSize &desiredSize,
+                                         QSize &imageSize,
+                                         Qt::AspectRatioMode aspectRatioMode);
+
+//-----------------------------------------------------------------------------
+
 QPixmap DVAPI
-svgToPixmap(const QString &svgFilePath, const QSize &size = QSize(),
+svgToPixmap(const QString &svgFilePath, QSize size = QSize(),
             Qt::AspectRatioMode aspectRatioMode = Qt::IgnoreAspectRatio,
             QColor bgColor                      = Qt::transparent);
+
+//-----------------------------------------------------------------------------
+
+QImage DVAPI
+svgToImage(const QString &svgFilePath, QSize size = QSize(),
+           Qt::AspectRatioMode aspectRatioMode = Qt::IgnoreAspectRatio,
+           QColor bgColor                      = Qt::transparent);
 
 //-----------------------------------------------------------------------------
 // returns device-pixel ratio. It is 1 for normal monitors and 2 (or higher
@@ -108,18 +126,52 @@ int DVAPI getDevicePixelRatio(const QWidget *widget = nullptr);
 
 //-----------------------------------------------------------------------------
 
-QPixmap DVAPI compositePixmap(QPixmap pixmap, const qreal &opacity = 0.8,
-                              const QSize &size = QSize(),
-                              const int leftAdj = 0, const int topAdj = 0,
-                              QColor bgColor = Qt::transparent);
-QPixmap DVAPI recolorPixmap(
-    QPixmap pixmap, QColor color = Preferences::instance()->getIconTheme()
-                                       ? Qt::black
-                                       : Qt::white);
-QIcon DVAPI createQIcon(const char *iconSVGName, bool useFullOpacity = false,
-                        bool isForMenuItem = false);
+QImage DVAPI adjustImageOpacity(const QImage &input, qreal opacity = 1.0);
+
+//-----------------------------------------------------------------------------
+
+QImage DVAPI compositeImage(const QImage &input, QSize newSize = QSize(),
+                            bool scaleInput = false,
+                            QColor bgColor  = Qt::transparent);
+
+//-----------------------------------------------------------------------------
+
+QPixmap DVAPI convertImageToPixmap(const QImage &image);
+
+//-----------------------------------------------------------------------------
+
+QImage DVAPI
+generateIconImage(const QString &iconSVGName, qreal opacity = qreal(1.0),
+                  QSize newSize                       = QSize(),
+                  Qt::AspectRatioMode aspectRatioMode = Qt::IgnoreAspectRatio);
+
+//-----------------------------------------------------------------------------
+
+QPixmap DVAPI
+generateIconPixmap(const QString &iconSVGName, qreal opacity = qreal(1.0),
+                   QSize newSize                       = QSize(),
+                   Qt::AspectRatioMode aspectRatioMode = Qt::IgnoreAspectRatio);
+
+//-----------------------------------------------------------------------------
+
+void DVAPI addImagesToIcon(QIcon &icon, const QImage &baseImg,
+                           const QImage &overImg = QImage(),
+                           const QImage &onImg   = QImage(),
+                           bool useFullOpacity   = false);
+
+//-----------------------------------------------------------------------------
+
 void DVAPI addSpecifiedSizedImageToIcon(QIcon &icon, const char *iconSVGName,
-                                        QSize newSize);
+                                        QSize newSize = QSize());
+
+//-----------------------------------------------------------------------------
+
+void DVAPI addPixmapToAllModesAndStates(QIcon &icon, const QPixmap &pixmap);
+
+//-----------------------------------------------------------------------------
+
+QIcon DVAPI createQIcon(const QString &iconSVGName, bool useFullOpacity = false,
+                        bool isForMenuItem = false, QSize newSize = QSize());
 QIcon DVAPI createQIconPNG(const char *iconPNGName);
 QIcon DVAPI createQIconOnOffPNG(const char *iconPNGName, bool withOver = true);
 QIcon DVAPI createTemporaryIconFromName(const char *commandName);
@@ -218,5 +270,40 @@ protected:
 };
 
 QString DVAPI operator+(const QString &a, const TFilePath &fp);
+
+//-----------------------------------------------------------------------------
+// Theme Manager
+// For managing icon themes
+
+class DVAPI ThemeManager {  // singleton
+public:
+  static ThemeManager &getInstance();
+
+  void buildIconPathsMap(const QString &path);
+  bool hasIcon(const QString &iconName) const;
+  QString getIconPath(const QString &iconName) const;
+
+  qreal getOnOpacity() const;
+  qreal getOffOpacity() const;
+  qreal getDisabledOpacity() const;
+
+  QImage recolorBlackPixels(const QImage &image, QColor color = QColor());
+  QPixmap recolorBlackPixels(const QPixmap &input, QColor color = QColor());
+
+  // Debug
+  void printiconPathsMap();
+
+  ThemeManager(ThemeManager const &)   = delete;
+  void operator=(ThemeManager const &) = delete;
+  ~ThemeManager();
+
+private:
+  ThemeManager();
+
+  class ThemeManagerImpl;                  // forward declaration
+  std::unique_ptr<ThemeManagerImpl> impl;  // opaque pointer
+};
+
+QString DVAPI getIconPath(const QString &path);
 
 #endif  // GUTIL_H

@@ -20,6 +20,8 @@
 @hl-text-color:         #000;
 @hl-bg-color-secondary: darken(@bg, 15);
 
+@lock-color: #e0625c;
+
 // -----------------------------------------------------------------------------
 // Tabs
 // -----------------------------------------------------------------------------
@@ -52,7 +54,7 @@
 // Title pane icon colors
 @title-button-pressed-color:   darken(@hl-bg-color, 8);
 @title-button-rollover-color:  darken(@title-bg-color, 20);
-@title-button-freeze-color:    #e0625c;
+@title-button-freeze-color:    @lock-color;
 @title-button-preview-color:   #2cb856;
 
 // -----------------------------------------------------------------------------
@@ -75,7 +77,7 @@
 
 @toolbutton-border-color-checked:      darken(@toolbutton-bg-color-checked, 10);
 @toolbutton-bg-color-hover:            darken(@bg, 15);
-@toolbutton-lock-bg-color-checked:     @title-button-freeze-color;
+@toolbutton-lock-bg-color-checked:     @lock-color;
 @toolbutton-lock-border-color-checked: darken(@toolbutton-lock-bg-color-checked, 20);
 
 // -----------------------------------------------------------------------------
@@ -206,6 +208,7 @@
 @xsheet-ReferenceColumn-color:              #c2c2c2;
 @xsheet-PaletteColumn-color:                #a9d4ca;
 @xsheet-MeshColumn-color:                   #b8a2cf;
+@xsheet-MetaColumn-color:                   #a8a8a8;
 @xsheet-SoundColumn-color:                  #aad6d6;
 @xsheet-SoundTextColumn-color:              #c2c2c2;
 @xsheet-ActiveCamera-color:                 #b7dbfc;

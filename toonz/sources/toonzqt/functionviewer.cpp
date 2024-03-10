@@ -220,12 +220,17 @@ FunctionViewer::FunctionViewer(QWidget *parent, Qt::WindowFlags flags)
     bool toolBarVisible =
         Preferences::instance()->isShowXSheetToolbarEnabled() &&
         Preferences::instance()->isExpandFunctionHeaderEnabled();
+    bool breadcrumbsVisible =
+        Preferences::instance()->isShowXsheetBreadcrumbsEnabled() &&
+        Preferences::instance()->isExpandFunctionHeaderEnabled();
     if (QSpacerItem *spacer = m_leftLayout->itemAt(0)->spacerItem()) {
-      spacer->changeSize(1, m_spacing + ((toolBarVisible) ? 10 : 0),
+      spacer->changeSize(1, m_spacing + ((toolBarVisible) ? 10 : 0) +
+                                ((breadcrumbsVisible) ? 10 : 0),
                          QSizePolicy::Fixed, QSizePolicy::Fixed);
       spacer->invalidate();
     } else
-      m_leftLayout->setSpacing(m_spacing + ((toolBarVisible) ? 30 : 0));
+      m_leftLayout->setSpacing(m_spacing + ((toolBarVisible) ? 30 : 0) +
+                               ((breadcrumbsVisible) ? 10 : 0));
     if (m_toggleStart ==
         Preferences::FunctionEditorToggle::ShowGraphEditorInPopup) {
       m_functionGraph->hide();
@@ -508,14 +513,19 @@ void FunctionViewer::toggleMode() {
       bool toolBarVisible =
           Preferences::instance()->isShowXSheetToolbarEnabled() &&
           Preferences::instance()->isExpandFunctionHeaderEnabled();
+      bool breadcrumbsVisible =
+          Preferences::instance()->isShowXsheetBreadcrumbsEnabled() &&
+          Preferences::instance()->isExpandFunctionHeaderEnabled();
       if (QSpacerItem *spacer = m_leftLayout->itemAt(0)->spacerItem()) {
-        spacer->changeSize(1, m_spacing + ((toolBarVisible) ? 10 : 0),
+        spacer->changeSize(1, m_spacing + ((toolBarVisible) ? 10 : 0) +
+                                  ((breadcrumbsVisible) ? 10 : 0),
                            QSizePolicy::Fixed, QSizePolicy::Fixed);
         spacer->invalidate();
         m_numericalColumns->updateHeaderHeight();
         m_leftLayout->setSpacing(0);
       } else
-        m_leftLayout->setSpacing(m_spacing + ((toolBarVisible) ? 30 : 0));
+        m_leftLayout->setSpacing(m_spacing + ((toolBarVisible) ? 30 : 0) +
+                                 ((breadcrumbsVisible) ? 10 : 0));
       updateGeometry();
       m_toggleStatus = 0;
     } else {
@@ -660,7 +670,9 @@ void FunctionViewer::doSwitchCurrentObject(TStageObject *obj) {
 //-----------------------------------------------------------------------------
 
 void FunctionViewer::onPreferenceChanged(const QString &prefName) {
-  if (prefName != "XSheetToolbar" && !prefName.isEmpty()) return;
+  if (prefName != "XSheetToolbar" && prefName != "XsheetBreadcrumbs" &&
+      !prefName.isEmpty())
+    return;
   if (!Preferences::instance()->isExpandFunctionHeaderEnabled()) return;
   if (m_toggleStart ==
       Preferences::FunctionEditorToggle::ShowFunctionSpreadsheetInPopup)
@@ -683,16 +695,21 @@ void FunctionViewer::onPreferenceChanged(const QString &prefName) {
   bool toolBarVisible =
       Preferences::instance()->isShowXSheetToolbarEnabled() &&
       Preferences::instance()->isExpandFunctionHeaderEnabled();
+  bool breadcrumbsVisible =
+      Preferences::instance()->isShowXsheetBreadcrumbsEnabled() &&
+      Preferences::instance()->isExpandFunctionHeaderEnabled();
   m_functionGraph->hide();
   m_numericalColumns->show();
   if (QSpacerItem *spacer = m_leftLayout->itemAt(0)->spacerItem()) {
-    spacer->changeSize(1, m_spacing + ((toolBarVisible) ? 10 : 0),
+    spacer->changeSize(1, m_spacing + ((toolBarVisible) ? 10 : 0) +
+                              ((breadcrumbsVisible) ? 10 : 0),
                        QSizePolicy::Fixed, QSizePolicy::Fixed);
     spacer->invalidate();
     m_numericalColumns->updateHeaderHeight();
     m_leftLayout->setSpacing(0);
   } else
-    m_leftLayout->setSpacing(m_spacing + ((toolBarVisible) ? 30 : 0));
+    m_leftLayout->setSpacing(m_spacing + ((toolBarVisible) ? 30 : 0) +
+                             ((breadcrumbsVisible) ? 30 : 0));
   updateGeometry();
 }
 

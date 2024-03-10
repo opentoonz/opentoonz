@@ -549,7 +549,9 @@ void RasterPainter::flushRasterImages() {
     } else {
       if (m_nodes[i].m_filterColor != TPixel32::Black) {
         colorscale   = m_nodes[i].m_filterColor;
-        colorscale.m = m_nodes[i].m_alpha;
+        colorscale.m = (typename TPixel32::Channel)((int)colorscale.m *
+                                                    (int)m_nodes[i].m_alpha /
+                                                    TPixel32::maxChannelValue);
       }
       inksOnly = tc & ToonzCheck::eInksOnly;
     }
@@ -843,9 +845,9 @@ void RasterPainter::onVectorImage(TVectorImage *vi,
   TPalette *vPalette = vi->getPalette();
   TPixel32 bgColor   = TPixel32::White;
 
-  int tc = (m_checkFlags && player.m_isCurrentColumn)
-               ? ToonzCheck::instance()->getChecks()
-               : 0;
+  int tc        = (m_checkFlags && player.m_isCurrentColumn)
+                      ? ToonzCheck::instance()->getChecks()
+                      : 0;
   bool inksOnly = tc & ToonzCheck::eInksOnly;
 
   int oldFrame = vPalette->getFrame();
@@ -1017,7 +1019,7 @@ void RasterPainter::onRasterImage(TRasterImage *ri,
                               ? 0.9
                               : (1.0 - OnionSkinMask::getOnionSkinFade(
                                            player.m_onionSkinDistance));
-    alpha = tcrop(tround(onionSkiFade * 255.0), 0, 255);
+    alpha               = tcrop(tround(onionSkiFade * 255.0), 0, 255);
     if (player.m_isShiftAndTraceEnabled &&
         !Preferences::instance()->areOnionColorsUsedForShiftAndTraceGhosts())
       onionMode = Node::eOnionSkinNone;
@@ -1080,7 +1082,7 @@ void RasterPainter::onToonzImage(TToonzImage *ti, const Stage::Player &player) {
                               ? 0.9
                               : (1.0 - OnionSkinMask::getOnionSkinFade(
                                            player.m_onionSkinDistance));
-    alpha = tcrop(tround(onionSkiFade * 255.0), 0, 255);
+    alpha               = tcrop(tround(onionSkiFade * 255.0), 0, 255);
 
     if (player.m_isShiftAndTraceEnabled &&
         !Preferences::instance()->areOnionColorsUsedForShiftAndTraceGhosts())
@@ -1369,9 +1371,9 @@ void onMeshImage(TMeshImage *mi, const Stage::Player &player,
   assert(mi);
 
   static const double soMinColor[4]  = {0.0, 0.0, 0.0,
-                                       0.6};  // Translucent black
+                                        0.6};  // Translucent black
   static const double soMaxColor[4]  = {1.0, 1.0, 1.0,
-                                       0.6};  // Translucent white
+                                        0.6};  // Translucent white
   static const double rigMinColor[4] = {0.0, 1.0, 0.0,
                                         0.6};  // Translucent green
   static const double rigMaxColor[4] = {1.0, 0.0, 0.0, 0.6};  // Translucent red

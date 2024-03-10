@@ -494,6 +494,11 @@
         <source>White</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Custom Texture</source>
+        <comment>TextureStyleChooserPage</comment>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>TScriptBinding::CenterlineVectorizer</name>

@@ -44,11 +44,12 @@ public:
   ~ToolHandle();
 
   TTool *getTool() const;
-  void setTool(TTool *tool);
-
   void setTool(QString name);
   void setTargetType(int targetType);
 
+  const QString& getRequestedToolName() const
+    { return m_toolName; }
+  
   // used to change tool for a short while (e.g. while keeping pressed a
   // short-key)
   void storeTool();
@@ -63,7 +64,7 @@ public:
 
   /*! Notify tool parameters change (out of toolOption bar).*/
   void notifyToolChanged() { emit toolChanged(); }
-
+  void notifyToolOptionsBoxChanged() { emit toolOptionsBoxChanged(); }
   void notifyToolCursorTypeChanged() { emit toolCursorTypeChanged(); }
 
   void notifyToolComboBoxListChanged(std::string id) {
@@ -74,6 +75,7 @@ signals:
   void toolComboBoxListChanged(std::string);
   void toolSwitched();
   void toolChanged();
+  void toolOptionsBoxChanged();
   void toolEditingFinished();
   // used for changing the tool cursor when the options changed with short cut
   // keys assigned for tool options.

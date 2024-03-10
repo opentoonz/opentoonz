@@ -21,7 +21,7 @@ class ComboViewerPanel final : public BaseViewerPanel {
   Ruler *m_hRuler;
 
 public:
-  ComboViewerPanel(QWidget *parent = 0, Qt::WindowFlags flags = 0);
+  ComboViewerPanel(QWidget *parent = 0, Qt::WindowFlags flags = Qt::WindowFlags());
   ~ComboViewerPanel() {}
 
   ToolOptions *getToolOptions() { return m_toolOptions; }

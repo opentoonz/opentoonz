@@ -2,10 +2,10 @@
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg width="100%" height="100%" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
     <g id="new_note_level">
-        <rect id="bg" x="0.001" y="-0.04" width="16" height="16" style="fill:#878787;fill-opacity:0;"/>
+        <rect id="bg" x="0.001" y="-0.04" width="16" height="16" style="fill:rgb(135,135,135);fill-opacity:0;"/>
         <rect x="4.501" y="4.235" width="5" height="1.45"/>
         <rect x="4.501" y="7.235" width="7" height="1.45"/>
         <rect x="4.501" y="10.235" width="6" height="1.45"/>
-        <path d="M15,5l0.019,10l-14.019,0l0,-14l10.001,0l3.999,4Zm-1,9l0,-9l-3,0l0,-3l-9,0l0,12l12,0Z"/>
+        <path d="M14.694,4.694C14.89,4.89 15,5.156 15.001,5.432C15.004,6.91 15.013,11.788 15.017,13.951C15.018,14.229 14.907,14.496 14.711,14.693C14.515,14.889 14.248,15 13.97,15C11.369,15 4.646,15 2.047,15C1.769,15 1.503,14.89 1.307,14.693C1.11,14.497 1,14.231 1,13.953C1,11.356 1,4.644 1,2.047C1,1.769 1.11,1.503 1.307,1.307C1.503,1.11 1.769,1 2.047,1C4.209,1 9.087,1 10.567,1C10.845,1 11.111,1.11 11.308,1.307C12.053,2.052 13.95,3.95 14.694,4.694ZM14,14L14,5L11,5L11,2L2,2L2,14L14,14Z"/>
     </g>
 </svg>

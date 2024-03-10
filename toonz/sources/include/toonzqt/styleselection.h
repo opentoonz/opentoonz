@@ -98,7 +98,9 @@ public:
   void removeLink();
   // get back the style from the studio palette (if linked)
   void getBackOriginalStyle();
-  // return true if there is at least one linked style in the selection
+
+  // return true if there is at least one linked style in the selection.
+  // link parent styles are not counted
   bool hasLinkedStyle();
 };
 

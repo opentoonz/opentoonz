@@ -1173,6 +1173,52 @@ public:
   int getHistoryType() override { return HistoryType::FilmStrip; }
 };
 
+//-----------------------------------------------------------------------------
+
+class RemoveFramesUndo final : public TUndo {
+  TXshSimpleLevel *m_sl;
+  std::set<TFrameId> m_framesRemoved;
+  DrawingData *m_oldData;
+
+public:
+  RemoveFramesUndo(TXshSimpleLevel *sl, std::set<TFrameId> &framesRemoved,
+                   DrawingData *oldData)
+      : m_sl(sl), m_framesRemoved(framesRemoved), m_oldData(oldData) {}
+
+  ~RemoveFramesUndo() {
+    if (m_oldData) m_oldData->releaseData();
+  }
+
+  void undo() const override {
+    std::set<TFrameId> frames = m_framesRemoved;
+    bool dummy                = true;
+    pasteFramesWithoutUndo(m_oldData, m_sl, frames, DrawingData::OVER_SELECTION,
+                           true, dummy);
+    TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+  }
+
+  void redo() const override {
+    std::set<TFrameId> frames = m_framesRemoved;
+    removeFramesWithoutUndo(m_sl, frames);
+  }
+
+  int getSize() const override { return sizeof(*this); }
+
+  QString getHistoryString() override {
+    QString str = QObject::tr("Remove Frames  : Level %1 : Frame ")
+                      .arg(QString::fromStdWString(m_sl->getName()));
+
+    std::set<TFrameId>::const_iterator it;
+    for (it = m_framesRemoved.begin(); it != m_framesRemoved.end(); it++) {
+      if (it != m_framesRemoved.begin()) str += QString(", ");
+      str += QString::number((*it).getNumber());
+    }
+
+    return str;
+  }
+  int getHistoryType() override { return HistoryType::FilmStrip; }
+};
+
 }  // namespace
 
 //=============================================================================
@@ -1714,8 +1760,8 @@ void FilmstripCmd::pasteInto(TXshSimpleLevel *sl, std::set<TFrameId> &frames) {
 
     bool keepOriginalPalette = true;
     bool isPaste             = pasteFramesWithoutUndo(drawingData, sl, frames,
-                                          DrawingData::OVER_SELECTION, true,
-                                          keepOriginalPalette);
+                                                      DrawingData::OVER_SELECTION, true,
+                                                      keepOriginalPalette);
     if (!isPaste) return;
 
     TUndoManager::manager()->add(new PasteFramesUndo(
@@ -1768,6 +1814,31 @@ void FilmstripCmd::clear(TXshSimpleLevel *sl, std::set<TFrameId> &frames) {
   frames.clear();
   TUndoManager::manager()->add(
       new DeleteFramesUndo(sl, oldFrames, oldData, newData));
+}
+
+//=============================================================================
+// clear
+//-----------------------------------------------------------------------------
+
+void FilmstripCmd::remove(TXshSimpleLevel *sl, std::set<TFrameId> &frames) {
+  if (!sl || frames.empty() || sl->isSubsequence() || sl->isReadOnly()) return;
+
+  std::map<TFrameId, QString> imageSet;
+  std::set<TFrameId>::const_iterator it;
+  int i = 0;
+  for (it = frames.begin(); it != frames.end(); ++it, i++) {
+    TFrameId frameId = *it;
+    QString id       = "removeFrames" + QString::number((uintptr_t)sl) + "-" +
+                 QString::number(it->getNumber());
+    TImageCache::instance()->add(id, sl->getFrame(frameId, false));
+    imageSet[frameId] = id;
+  }
+  HookSet *levelHooks  = sl->getHookSet();
+  DrawingData *oldData = new DrawingData();
+  oldData->setFrames(imageSet, sl, *levelHooks);
+
+  removeFramesWithoutUndo(sl, frames);
+  TUndoManager::manager()->add(new RemoveFramesUndo(sl, frames, oldData));
 }
 
 //-----------------------------------------------------------------------------

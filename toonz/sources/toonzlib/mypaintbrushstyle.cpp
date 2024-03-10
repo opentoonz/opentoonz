@@ -11,11 +11,83 @@
 #include "tpixelutils.h"
 #include "toonz/toonzscene.h"
 
+#include "tstrokeprop.h"
+#include "tvectorrenderdata.h"
+#include "tgl.h"
+#include "tmathutil.h"
+
 #include "toonz/mypaintbrushstyle.h"
 
 #include <QDebug>
 
 #include <sstream>
+
+//=============================================================================
+MyPaintBrushStrokeProp::MyPaintBrushStrokeProp(const TStroke *stroke,
+                                               TMyPaintBrushStyle *style)
+    : TStrokeProp(stroke)
+    , m_colorStyle(style)
+    , m_outline()
+    , m_outlinePixelSize(0) {
+  m_styleVersionNumber = m_colorStyle->getVersionNumber();
+  m_altStyle.setMainColor(style->getMainColor());
+}
+
+//-----------------------------------------------------------------------------
+
+TStrokeProp *MyPaintBrushStrokeProp::clone(const TStroke *stroke) const {
+  MyPaintBrushStrokeProp *prop =
+      new MyPaintBrushStrokeProp(stroke, m_colorStyle);
+  prop->m_strokeChanged    = m_strokeChanged;
+  prop->m_outline          = m_outline;
+  prop->m_outlinePixelSize = m_outlinePixelSize;
+  return prop;
+}
+
+//-----------------------------------------------------------------------------
+
+const TColorStyle *MyPaintBrushStrokeProp::getColorStyle() const {
+  return m_colorStyle;
+}
+
+//-----------------------------------------------------------------------------
+
+void MyPaintBrushStrokeProp::draw(const TVectorRenderData &rd) {
+  if (rd.m_clippingRect != TRect() && !rd.m_is3dView &&
+      !convert(rd.m_aff * m_stroke->getBBox()).overlaps(rd.m_clippingRect))
+    return;
+
+  glPushMatrix();
+  tglMultMatrix(rd.m_aff);
+
+  double pixelSize = sqrt(tglGetPixelSize2());
+
+  if (m_stroke->isCenterLine()) {
+    TCenterLineStrokeStyle *appStyle =
+        new TCenterLineStrokeStyle(m_colorStyle->getAverageColor(), 0, 0);
+    appStyle->drawStroke(rd.m_cf, m_stroke);
+    delete appStyle;
+  } else {
+    if (!isAlmostZero(pixelSize - m_outlinePixelSize, 1e-5) ||
+        m_strokeChanged ||
+        m_styleVersionNumber != m_colorStyle->getVersionNumber()) {
+      m_strokeChanged    = false;
+      m_outlinePixelSize = pixelSize;
+      TOutlineUtil::OutlineParameter param;
+
+      m_outline.getArray().clear();
+      m_altStyle.computeOutline(m_stroke, m_outline, param);
+      m_styleVersionNumber = m_colorStyle->getVersionNumber();
+    }
+
+    if (rd.m_antiAliasing)
+      m_altStyle.drawStroke(rd.m_cf, &m_outline, m_stroke);
+    else
+      m_altStyle.drawAliasedStroke(rd.m_cf, &m_outline, m_stroke);
+  }
+
+  glPopMatrix();
+}
 
 //*************************************************************************************
 //    TMyPaintBrushStyle  implementation
@@ -171,7 +243,7 @@ static std::string mybToVersion3(std::string origStr) {
         settingInfo      = line.substr(startPos, pipe - startPos);
         int firstCharPos = settingInfo.find_first_not_of(" ");
         setting          = settingInfo.substr(firstCharPos,
-                                     settingInfo.find(" ", firstCharPos) - 1);
+                                              settingInfo.find(" ", firstCharPos) - 1);
         outStr += "                \"" + setting + "\": [\n";
         firstCharPos = settingInfo.find_first_not_of(" ", setting.length() + 1);
         baseValue    = settingInfo.substr(firstCharPos, pipe - startPos);
@@ -289,13 +361,17 @@ void TMyPaintBrushStyle::makeIcon(const TDimension &d) {
     double sx    = (double)d.lx / (double)m_preview->getLx();
     double sy    = (double)d.ly / (double)m_preview->getLy();
     double scale = std::min(sx, sy);
-    TRop::quickPut(m_icon, m_preview, TScale(scale));
+    TRaster32P resamplePreview(m_preview->getLx(), m_preview->getLy());
+    TRop::resample(resamplePreview, m_preview, TScale(scale),
+                   TRop::ResampleFilterType::Hamming3);
+    TRop::over(m_icon, resamplePreview);
   }
 
   // paint color marker
-  if (d.lx > 0 && d.ly > 0) {
+  // Only show color marker when the icon size is 22x22
+  if (d.lx == d.ly && d.lx <= 22) {
     int size       = std::min(1 + std::min(d.lx, d.ly) * 2 / 3,
-                        1 + std::max(d.lx, d.ly) / 2);
+                              1 + std::max(d.lx, d.ly) / 2);
     TPixel32 color = getMainColor();
     color.m        = 255;  // show full opac color
     for (int y = 0; y < size; ++y) {

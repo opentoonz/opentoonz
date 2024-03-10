@@ -5,11 +5,11 @@ For licenses of third party libraries exploited in this software, please see the
 OpenToonz
 
 All contributions by DWANGO:
-Copyright (c) 2016 - 2021, DWANGO Co., Ltd.
+Copyright (c) 2016 - 2023, DWANGO Co., Ltd.
 All rights reserved.
 
 All other contributions:
-Copyright (c) 2016 - 2021, the respective contributors.
+Copyright (c) 2016 - 2023, the respective contributors.
 All rights reserved.
 
 Each contributor holds copyright over their respective contributions.

@@ -20,6 +20,7 @@
 
 // forward declaration
 class QSlider;
+class QPushButton;
 class QIntValidator;
 
 //=============================================================================
@@ -166,12 +167,17 @@ class DVAPI IntField : public QWidget {
   RollerField *m_roller;
   IntLineEdit *m_lineEdit;
   QSlider *m_slider;
+  QPushButton *m_inc;
+  QPushButton *m_dec;
+
   bool m_isMaxRangeLimited;
   bool m_isLinearSlider;
 
 public:
-  IntField(QWidget *parent = 0, bool isMaxRangeLimited = true,
-           bool isRollerHide = true);
+  IntField(QWidget *parent = 0,
+           bool isMaxRangeLimited = true,
+           bool isRollerHide = true,
+           bool isSpinnerHide = true );
   ~IntField() {}
 
   /*! Set to \b minValue and \b maxValue slider and text field range.
@@ -204,6 +210,10 @@ public:
   void enableRoller(bool enable);
   bool rollerIsEnabled();
 
+  /*! If \b enable is false set spinner disable and hide it. */
+  void enableSpinner(bool enable);
+  bool spinnerIsEnabled();
+
   void setLineEditBackgroundColor(QColor color);
 
 protected:
@@ -219,6 +229,9 @@ protected slots:
                   emit signal valueChanged(). */
   void onSliderChanged(int value);
   void onSliderReleased() { emit valueChanged(false); }
+
+  void onIncClicked();
+  void onDecClicked();
 
   /*! Set slider and roller value to current value in text field.
   \n	This protected slot is called when text editing is finished.

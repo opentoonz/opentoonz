@@ -273,6 +273,11 @@ class DVAPI SchematicViewer final : public QWidget {
   Q_PROPERTY(
       QColor MeshColumnColor READ getMeshColumnColor WRITE setMeshColumnColor)
 
+  // Meta column
+  QColor m_metaColumnColor;
+  Q_PROPERTY(
+      QColor MetaColumnColor READ getMetaColumnColor WRITE setMetaColumnColor)
+
   // Reference column
   QColor m_referenceColumnColor;
   Q_PROPERTY(QColor ReferenceColumnColor MEMBER m_referenceColumnColor)
@@ -454,6 +459,10 @@ public:
   // Mesh column
   void setMeshColumnColor(const QColor &color) { m_meshColumnColor = color; }
   QColor getMeshColumnColor() const { return m_meshColumnColor; }
+
+  // Meta column
+  void setMetaColumnColor(const QColor &color) { m_metaColumnColor = color; }
+  QColor getMetaColumnColor() const { return m_metaColumnColor; }
 
   // Reference column
   QColor getReferenceColumnColor() const { return m_referenceColumnColor; }

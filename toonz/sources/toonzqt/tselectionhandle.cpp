@@ -23,18 +23,35 @@ TSelection *TSelectionHandle::getSelection() const {
 
 void TSelectionHandle::setSelection(TSelection *selection) {
   if (getSelection() == selection) return;
-  TSelection *oldSelection = getSelection();
+  TSelection *oldSelection       = getSelection();
+  CommandManager *commandManager = CommandManager::instance();
   if (oldSelection) {
     oldSelection->selectNone();
     // disable selection related commands
-    CommandManager *commandManager = CommandManager::instance();
     int i;
     for (i = 0; i < (int)m_enabledCommandIds.size(); i++)
       commandManager->setHandler(m_enabledCommandIds[i].c_str(), 0);
     m_enabledCommandIds.clear();
+
+    // revert alternative command names to original ones kept in the icon texts
+    for (auto commandId : oldSelection->alternativeCommandNames().keys()) {
+      QAction *action = commandManager->getAction(commandId);
+      action->setText(action->iconText());
+    }
   }
   m_selectionStack.back() = selection;
-  if (selection) selection->enableCommands();
+  if (selection) {
+    selection->enableCommands();
+
+    // set alternative command names
+    QMap<CommandId, QString>::const_iterator i =
+        selection->alternativeCommandNames().constBegin();
+    while (i != selection->alternativeCommandNames().constEnd()) {
+      QAction *action = commandManager->getAction(i.key());
+      action->setText(i.value());
+      ++i;
+    }
+  }
   emit selectionSwitched(oldSelection, selection);
 }
 

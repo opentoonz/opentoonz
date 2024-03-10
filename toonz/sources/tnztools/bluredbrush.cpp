@@ -51,10 +51,12 @@ void putOnRasterCM(const TRasterCM32P &out, const TRaster32P &in, int styleId,
           continue;
         }
         bool sameStyleId = styleId == outPix->getInk();
+        // line with lock alpha : use original pixel's tone
         // line with the same style : multiply tones
         // line with different style : pick darker tone
-        int tone = sameStyleId ? outPix->getTone() * (255 - inPix->m) / 255
-                               : std::min(255 - inPix->m, outPix->getTone());
+        int tone = lockAlpha     ? outPix->getTone()
+                   : sameStyleId ? outPix->getTone() * (255 - inPix->m) / 255
+                                 : std::min(255 - inPix->m, outPix->getTone());
         int ink  = !sameStyleId && outPix->getTone() < 255 - inPix->m
                        ? outPix->getInk()
                        : styleId;
@@ -195,7 +197,14 @@ BluredBrush::~BluredBrush() {}
 
 //----------------------------------------------------------------------------------
 
-void BluredBrush::addPoint(const TThickPoint &p, double opacity) {
+void BluredBrush::addPoint(const TThickPoint &p, double opacity, bool keepDistance) {
+  if (keepDistance) {
+    double dist = norm2(p - m_lastPoint);
+    double d = 0.12 * m_lastPoint.thick;
+    if (dist < d*d)
+      return;
+  }
+  
   double radius      = p.thick * 0.5;
   double brushRadius = m_size * 0.5;
   double scaleFactor = radius / brushRadius;

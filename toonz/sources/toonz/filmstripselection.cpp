@@ -55,9 +55,11 @@ void TFilmstripSelection::enableCommands() {
   int type       = sl->getType();
   TFilePath path = sl->getPath();
 
-  bool doEnable =
-      (type == PLI_XSHLEVEL || type == TZP_XSHLEVEL || type == MESH_XSHLEVEL ||
-       (type == OVL_XSHLEVEL && !path.isUneditable()));
+  bool doEnable = ( type == PLI_XSHLEVEL
+                 || type == TZP_XSHLEVEL
+                 || type == MESH_XSHLEVEL
+                 || type == META_XSHLEVEL
+                 || (type == OVL_XSHLEVEL && !path.isUneditable()) );
 
   TRasterImageP ri = (TRasterImageP)sl->getSimpleLevel()->getFrame(
       sl->getSimpleLevel()->getFirstFid(), false);
@@ -237,7 +239,7 @@ void TFilmstripSelection::cutFrames() {
   TXshSimpleLevel *sl = TApp::instance()->getCurrentLevel()->getSimpleLevel();
   if (sl) {
     int firstSelectedIndex = sl->fid2index(*m_selectedFrames.begin());
-    if(firstSelectedIndex < 0 || firstSelectedIndex > sl->getFrameCount()) {
+    if (firstSelectedIndex < 0 || firstSelectedIndex > sl->getFrameCount()) {
       selectNone();
       return;
     }
@@ -285,7 +287,12 @@ void TFilmstripSelection::pasteInto() {
 
 void TFilmstripSelection::deleteFrames() {
   TXshSimpleLevel *sl = TApp::instance()->getCurrentLevel()->getSimpleLevel();
-  if (sl) FilmstripCmd::clear(sl, m_selectedFrames);
+  if (sl) {
+    if (Preferences::instance()->getDeleteCommandBehaviour() == 0)  // Clear
+      FilmstripCmd::clear(sl, m_selectedFrames);
+    else  // Remove and Shift
+      FilmstripCmd::remove(sl, m_selectedFrames);
+  }
   updateInbetweenRange();
 }
 

@@ -11,6 +11,12 @@
 #include "toonz/tcolumnfx.h"
 #include "toonz/fxdag.h"
 #include "toonz/txshlevelcolumn.h"
+#include "toonz/preferences.h"
+#include "toonz/tstageobject.h"
+#include "tapp.h"
+#include "toonz/tscenehandle.h"
+#include "toonz/toonzscene.h"
+#include "toonz/levelset.h"
 
 //-----------------------------------------------------------------------------
 
@@ -106,15 +112,35 @@ bool TCellData::getCells(TXsheet *xsh, int r0, int c0, int &r1, int &c1,
 
 bool TCellData::getNumbers(TXsheet *xsh, int r0, int c0, int &r1,
                            int &c1) const {
-  r1                  = r0 + m_rowCount - 1;
-  bool oneToMulti     = m_colCount == 1 && c0 < c1;
+  r1              = r0 + m_rowCount - 1;
+  bool oneToMulti = m_colCount == 1 && c0 < c1;
   if (!oneToMulti) c1 = c0 + m_colCount - 1;
 
   bool cellSet = false;
 
   for (int c = c0; c <= c1; c++) {
-    TXshColumn *column = xsh->getColumn(c);
-    if (!column || column->isEmpty()) continue;
+    TXshColumn *column       = xsh->getColumn(c);
+    TXshLevel *reservedLevel = nullptr;
+    if (!column) continue;
+    if (column->isEmpty()) {
+      if (Preferences::instance()->isLinkColumnNameWithLevelEnabled() &&
+          xsh->getStageObject(TStageObjectId::ColumnId(c))
+              ->hasSpecifiedName()) {
+        std::string columnName =
+            xsh->getStageObject(TStageObjectId::ColumnId(c))->getName();
+        ToonzScene *scene   = TApp::instance()->getCurrentScene()->getScene();
+        TLevelSet *levelSet = scene->getLevelSet();
+        reservedLevel       = levelSet->getLevel(to_wstring(columnName));
+        if (!reservedLevel) continue;
+        // connect to xsheet
+        if (!column->getPaletteColumn()) {
+          TFx *fx = column->getFx();
+          if (fx) xsh->getFxDag()->addToXsheet(fx);
+        }
+
+      } else
+        continue;
+    }
     TXshLevelColumn *levelColumn = column->getLevelColumn();
     if (!levelColumn) continue;
 
@@ -125,8 +151,8 @@ bool TCellData::getNumbers(TXsheet *xsh, int r0, int c0, int &r1,
 
     if (!canChange(column, sourceColIndex)) continue;
 
-    bool isSet = levelColumn->setNumbers(r0, m_rowCount,
-                                         &cells[sourceColIndex * m_rowCount]);
+    bool isSet = levelColumn->setNumbers(
+        r0, m_rowCount, &cells[sourceColIndex * m_rowCount], reservedLevel);
 
     cellSet = cellSet || isSet;
   }
@@ -194,7 +220,7 @@ void TCellData::cloneZeraryFx(int index, std::vector<TXshCell> &cells) const {
     newFxLevel->setColumn(newFxColumn);
     // replace the zerary fx cells by the new fx
     int r;
-    for (r     = firstNotEmptyIndex; r < (index + 1) * m_rowCount; r++)
+    for (r = firstNotEmptyIndex; r < (index + 1) * m_rowCount; r++)
       cells[r] = TXshCell(newFxLevel, m_cells[r].getFrameId());
   }
 }

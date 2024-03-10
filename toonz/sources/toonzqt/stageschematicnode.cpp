@@ -1753,7 +1753,8 @@ StageSchematicColumnNode::StageSchematicColumnNode(StageSchematicScene *scene,
   if (levelType == PLT_XSHLEVEL) {
     m_resizeItem->hide();
     m_cameraStandToggle->hide();
-  }
+  } else if (Preferences::instance()->isUnifyColumnVisibilityTogglesEnabled())
+    m_cameraStandToggle->hide();
 }
 
 //--------------------------------------------------------
@@ -1961,6 +1962,8 @@ void StageSchematicColumnNode::onRenderToggleClicked(bool isActive) {
       stageScene->getXsheet()->getColumn(m_stageObject->getId().getIndex());
   if (column) {
     column->setPreviewVisible(isActive);
+    if (Preferences::instance()->isUnifyColumnVisibilityTogglesEnabled())
+      column->setCamstandVisible(isActive);
     emit sceneChanged();
     emit xsheetChanged();
   }

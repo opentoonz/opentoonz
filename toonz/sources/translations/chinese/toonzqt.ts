@@ -145,7 +145,7 @@
     </message>
     <message>
         <source>The preset name must not use &apos;,&apos;(comma).</source>
-        <translation>不能在预设名称中使用 &quot;,&quot; (逗号)。</translation>
+        <translation>不能在预设名称中使用&quot;,&quot;(逗号)。</translation>
     </message>
     <message>
         <source>DPI</source>
@@ -157,7 +157,7 @@
     </message>
     <message>
         <source>x</source>
-        <translation>x</translation>
+        <translation>左右</translation>
     </message>
     <message>
         <source>&apos;%1&apos; doesn&apos;t seem a well formed camera preset.
@@ -168,12 +168,12 @@ Possibly the preset file has been corrupted</source>
     <message>
         <source>&apos;%1&apos; doesn&apos;t seem a well formed camera preset. 
 Possibly the preset file has been corrupted</source>
-        <translation>%1&apos; 不是格式完好的摄影机预设。
-可能预设文件已经被损坏了</translation>
+        <translation>&apos;%1&apos; 不是正确格式的摄影机预设。
+可能此预设已经被损坏</translation>
     </message>
     <message>
         <source>A/R</source>
-        <translation>A/R</translation>
+        <translation>长宽比</translation>
     </message>
     <message>
         <source>&lt;custom&gt;</source>
@@ -295,6 +295,14 @@ Possibly the preset file has been corrupted</source>
         <source>R:%1 G:%2 B:%3</source>
         <translation>R:%1 G:%2 B:%3</translation>
     </message>
+    <message>
+        <source> A:%1</source>
+        <translation> A: %1</translation>
+    </message>
+    <message>
+        <source>A:%1</source>
+        <translation>A: %1</translation>
+    </message>
 </context>
 <context>
     <name>ComboHistogram</name>
@@ -308,19 +316,19 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>X:</source>
-        <translation>X:</translation>
+        <translation>左右:</translation>
     </message>
     <message>
         <source>Y:</source>
-        <translation>Y:</translation>
+        <translation>上下:</translation>
     </message>
     <message>
         <source>8bit (0-255)</source>
-        <translation>8位 (0-255)</translation>
+        <translation>8位(0-255)</translation>
     </message>
     <message>
         <source>16bit (0-65535)</source>
-        <translation>16位 (0-65535)</translation>
+        <translation>16位(0-65535)</translation>
     </message>
     <message>
         <source>0.0-1.0</source>
@@ -389,7 +397,7 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>A:</source>
-        <translation>A:</translation>
+        <translation>角度:</translation>
     </message>
     <message>
         <source>Paste Color</source>
@@ -494,7 +502,7 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>Text or XML (*.txt *.xml);;Text files (*.txt);;XML files (*.xml)</source>
-        <translation>文本或者  XML (*.txt *.xml);;文本文件 (*.txt);;XML 文件 (*.xml)</translation>
+        <translation>文本或者 XML (*.txt *.xml);;文本文件 (*.txt);;XML 文件 (*.xml)</translation>
     </message>
     <message>
         <source>Hex Color Names Import</source>
@@ -798,7 +806,7 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>&amp;Soundtrack </source>
-        <translation>声轨(&amp;S)</translation>
+        <translation>声轨(&amp;S) </translation>
     </message>
     <message>
         <source>&amp;Histogram</source>
@@ -883,6 +891,28 @@ Possibly the preset file has been corrupted</source>
     <message>
         <source>&amp;Next Frame</source>
         <translation>下一帧(&amp;N)</translation>
+    </message>
+    <message>
+        <source>Gain Controls</source>
+        <translation>增益(摄影机)控制</translation>
+    </message>
+    <message>
+        <source>&amp;Reduce gain 1/2 stop (divide by sqrt(2))</source>
+        <translation>减少1/2档增益(除以 sqrt(2))(&amp;R)</translation>
+    </message>
+    <message>
+        <source>Toggle gain between 1 and the previous setting.
+Gain is shown as an f-stop and the &quot;neutral&quot; or 1.0 gain f-stop is f/8.</source>
+        <translation>打开/关闭1和前一设定之间的增益。
+增益显示为光圈和&quot;中性&quot;或者 1.0 增益光圈是 f/8。</translation>
+    </message>
+    <message>
+        <source>&amp;Increase gain 1/2 stop (multiply by sqrt(2))</source>
+        <translation>增加1/2档增益(乘以 sqrt(2))(&amp;I)</translation>
+    </message>
+    <message>
+        <source> (gain %1)</source>
+        <translation> 增益%1</translation>
     </message>
 </context>
 <context>
@@ -1253,8 +1283,8 @@ Possibly the preset file has been corrupted</source>
     <message>
         <source>Some key(s) in this parameter loses original reference in expression.
 Manually changing any keyframe will clear the warning.</source>
-        <translation>在表达式中此参数的某些关键帧丢失原引用。
-手工更改任意的关键帧将清理该警告。</translation>
+        <translation>这个参数中的某些键在表达式中失去了原有的引用。
+手动改变任何一个关键帧都会清除警告。</translation>
     </message>
 </context>
 <context>
@@ -1289,8 +1319,8 @@ Manually changing any keyframe will clear the warning.</source>
     <message>
         <source>Some key(s) in this parameter loses original reference in expression.
 Manually changing any keyframe will clear the warning.</source>
-        <translation>在表达式中此参数的某些关键帧丢失原引用。
-手工更改任意的关键帧将清理该警告。</translation>
+        <translation>这个参数中的某些键在表达式中失去了原有的引用。
+手动改变任何一个关键帧都会清除警告。</translation>
     </message>
 </context>
 <context>
@@ -1504,20 +1534,20 @@ Manually changing any keyframe will clear the warning.</source>
     <message>
         <source>Cannot Paste Insert a selection of unconnected FX nodes.
 Select FX nodes and related links before copying or cutting the selection you want to paste.</source>
-        <translation>无法“粘贴插入”多个未连接的特效节点。
-请在拷贝或剪切选区之前，选择特效节点和它的关联链接。</translation>
+        <translation>不能粘贴插入由多个未连接的特效节点构成的选择。
+在拷贝或剪切你要粘贴的选区之前，选择特效节点和相关链接。</translation>
     </message>
     <message>
         <source>Cannot Paste Add a selection of unconnected FX nodes.
 Select FX nodes and related links before copying or cutting the selection you want to paste.</source>
-        <translation>无法“粘贴添加”多个未连接的特效节点。
-请在拷贝或剪切选区之前，选择特效节点和它的关联链接。</translation>
+        <translation>不能粘贴添加由多个未连接的特效节点构成的选择。
+在拷贝或剪切你要粘贴的选区之前，选择特效节点和相关链接。</translation>
     </message>
     <message>
         <source>Cannot Paste Replace a selection of unconnected FX nodes.
 Select FX nodes and related links before copying or cutting the selection you want to paste.</source>
-        <translation>无法“粘贴替换”多个未连接的特效节点。
-请在拷贝或剪切选区之前，选择特效节点和它的关联链接。</translation>
+        <translation>不能粘贴替换由未连接的特效节点构成的选择。
+在拷贝或剪切你要粘贴的选区之前，选择特效节点和相关链接。</translation>
     </message>
 </context>
 <context>
@@ -1835,6 +1865,30 @@ Select FX nodes and related links before copying or cutting the selection you wa
         <source>Set Toolbar Above Styles</source>
         <translation>使工具条在样式上方</translation>
     </message>
+    <message>
+        <source>Auto Adjust Panel Width</source>
+        <translation>自动调整面板宽度</translation>
+    </message>
+    <message>
+        <source>Visible Toolbar Buttons</source>
+        <translation>可见的工具条按钮</translation>
+    </message>
+    <message>
+        <source>KeyFrame</source>
+        <translation>关键帧</translation>
+    </message>
+    <message>
+        <source>New Style/Page</source>
+        <translation>新建样式/页</translation>
+    </message>
+    <message>
+        <source>Palette Gizmo</source>
+        <translation>调色板装置</translation>
+    </message>
+    <message>
+        <source>Name Editor</source>
+        <translation>名称编辑器</translation>
+    </message>
 </context>
 <context>
     <name>PaletteViewerGUI::PageViewer</name>
@@ -1860,7 +1914,7 @@ Select FX nodes and related links before copying or cutting the selection you wa
     </message>
     <message>
         <source> + </source>
-        <translation></translation>
+        <translation> + </translation>
     </message>
 </context>
 <context>
@@ -1902,6 +1956,14 @@ Select FX nodes and related links before copying or cutting the selection you wa
     <message>
         <source>View help page</source>
         <translation>查看帮助页</translation>
+    </message>
+    <message>
+        <source>This Fx does not support rendering in floating point channel width (32bit).
+The output pixel values from this fx will be clamped to 0.0 - 1.0
+and tone may be slightly discretized.</source>
+        <translation>此特效不支持渲染到浮点通道位宽(32位)。
+这个特效的输出像素值将被钳制为0.0 - 1.0
+并且色调可能略有差异。</translation>
     </message>
 </context>
 <context>
@@ -1945,11 +2007,11 @@ Select FX nodes and related links before copying or cutting the selection you wa
     <name>PointParamField</name>
     <message>
         <source>Y:</source>
-        <translation>Y:</translation>
+        <translation>上下:</translation>
     </message>
     <message>
         <source>X:</source>
-        <translation>X:</translation>
+        <translation>左右:</translation>
     </message>
 </context>
 <context>
@@ -2069,7 +2131,7 @@ Select FX nodes and related links before copying or cutting the selection you wa
     </message>
     <message>
         <source>There are more cut/copied styles than selected. Paste anyway (adding styles)?</source>
-        <translation>剪切/拷贝的样式数量多于所选项。还要继续粘贴(添加样式)吗？</translation>
+        <translation>剪切/复制的样式比选定的多。无论如何都要粘贴（添加样式）？</translation>
     </message>
     <message>
         <source>Paste</source>
@@ -2265,8 +2327,7 @@ Select FX nodes and related links before copying or cutting the selection you wa
     </message>
     <message>
         <source>The file name cannot be empty or contain any of the following characters: (new line) \ / : * ? &quot; |</source>
-        <translation>文件名不能为空也不能包含如下的任一字符:
-\ / : * ? &quot; |</translation>
+        <translation>文件名不能为空，也不能包含以下任何字符: (new line) \ / : * ?&quot; |</translation>
     </message>
     <message>
         <source>The source image seems not suitable for this kind of conversion</source>
@@ -2275,7 +2336,7 @@ Select FX nodes and related links before copying or cutting the selection you wa
     <message>
         <source>Deleting &quot;%1&quot;.
 Are you sure?</source>
-        <translation>删除 &quot;%1。
+        <translation>删除 &quot;%1&quot;.
 你确定吗？</translation>
     </message>
     <message>
@@ -2332,7 +2393,7 @@ Are you sure?</source>
     </message>
     <message>
         <source>Paste Object  </source>
-        <translation>粘贴物体</translation>
+        <translation>粘贴物体  </translation>
     </message>
     <message>
         <source>Copy Keyframe</source>
@@ -2368,7 +2429,7 @@ Are you sure?</source>
     </message>
     <message>
         <source>Modify Fx Param : </source>
-        <translation>修改特效参数:</translation>
+        <translation>修改特效参数: </translation>
     </message>
     <message>
         <source>ON : %1</source>
@@ -2417,7 +2478,7 @@ Are you sure?</source>
     <message>
         <source>Deletion of Lines and Areas from raster-based levels is not undoable.
 Are you sure?</source>
-        <translation>从光栅层级删除线和区域，该操作将无法撤销。
+        <translation>从光栅层级中删除适配线和区域是不可撤销的。
 你确定吗？</translation>
     </message>
     <message>
@@ -2483,13 +2544,13 @@ Are you sure?</source>
         <source>Failed to Load 3DLUT File.
 It should start with &quot;3DMESH&quot; keyword.</source>
         <translation>加载 3DLUT 文件失败。
-它应该是 3DMESH 关键字开头的。</translation>
+应该以关键字 &quot;3DMESH&quot; 开头</translation>
     </message>
     <message>
         <source>Failed to Load 3DLUT File.
 The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;</source>
         <translation>加载 3DLUT 文件失败。
-第二行应该是 &quot;Mesh [Input bit depth] [Output bit depth]&quot;</translation>
+第二行应该是 &quot;Mesh [输入位深] [输出位深]&quot;</translation>
     </message>
     <message>
         <source>Failed to Load 3DLUT File.</source>
@@ -2502,7 +2563,7 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     <message>
         <source>Custom Texture</source>
         <comment>TextureStyleChooserPage</comment>
-        <translation>定制纹理</translation>
+        <translation type="vanished">定制纹理</translation>
     </message>
     <message>
         <source>Current Frame: </source>
@@ -2514,7 +2575,7 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     </message>
     <message>
         <source>OpenToonz 1.3</source>
-        <translation type="obsolete">OpenToonz 1.3</translation>
+        <translation type="vanished">OpenToonz 1.3</translation>
     </message>
     <message>
         <source>Plain color</source>
@@ -2551,7 +2612,7 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
         <source>Erasing unused styles with following indices. Are you sure?
 
 %1</source>
-        <translation>擦除未使用的样式时有如下问题。你确认吗？
+        <translation>擦除未使用的样式，其索引如下。你确定吗？
 
 %1</translation>
     </message>
@@ -2562,6 +2623,15 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     <message>
         <source>Click &amp; Drag Palette into Studio Palette</source>
         <translation>点击 &amp; 拖放调色板到工作室调色板</translation>
+    </message>
+    <message>
+        <source>Plain color</source>
+        <comment>TextureStyleChooserPage</comment>
+        <translation>纯色</translation>
+    </message>
+    <message>
+        <source>Sample Type: </source>
+        <translation>采样类型: </translation>
     </message>
 </context>
 <context>
@@ -2597,23 +2667,23 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     <name>SchematicName</name>
     <message>
         <source>Cu&amp;t</source>
-        <translation type="unfinished"></translation>
+        <translation>剪切(&amp;T)</translation>
     </message>
     <message>
         <source>&amp;Copy</source>
-        <translation type="unfinished"></translation>
+        <translation>拷贝(&amp;C)</translation>
     </message>
     <message>
         <source>&amp;Paste</source>
-        <translation type="unfinished"></translation>
+        <translation>粘贴(&amp;P)</translation>
     </message>
     <message>
         <source>&amp;Delete</source>
-        <translation type="unfinished">删除(&amp;D)</translation>
+        <translation>删除(&amp;D)</translation>
     </message>
     <message>
         <source>Select &amp;All</source>
-        <translation type="unfinished"></translation>
+        <translation>选择全部(&amp;A)</translation>
     </message>
 </context>
 <context>
@@ -2688,6 +2758,33 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     <message>
         <source>&amp;Close Editor</source>
         <translation>关闭编辑器(&amp;C)</translation>
+    </message>
+</context>
+<context>
+    <name>SeeThroughWindowPopup</name>
+    <message>
+        <source>See Through Mode (Main Window)</source>
+        <translation>穿透模式(主窗口)</translation>
+    </message>
+    <message>
+        <source>Opacity</source>
+        <translation>不透明度</translation>
+    </message>
+    <message>
+        <source>Quickly toggle main window semi-transparency and full opacity.</source>
+        <translation>快速打开/关闭主窗口的半透明和不透明。</translation>
+    </message>
+    <message>
+        <source>Hold ALT while clicking to use full transparency instead.</source>
+        <translation>当点击时按下 ALT 使用全透明模式。 </translation>
+    </message>
+    <message>
+        <source>When slider is at 100% it acts as ALT is held.</source>
+        <translation>当滑杆在100%，其类似于 ALT 被按下的模式。</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation>关闭</translation>
     </message>
 </context>
 <context>
@@ -2799,7 +2896,7 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     <name>StudioPaletteTreeViewer</name>
     <message>
         <source>This folder is not empty. Delete anyway?</source>
-        <translation>此文件夹不是空的。一定要删除吗？</translation>
+        <translation>该文件夹不为空。无论如何都要删除？</translation>
     </message>
     <message>
         <source>New Palette</source>
@@ -2855,7 +2952,7 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     </message>
     <message>
         <source>Move %1 to &quot;%2&quot;. Are you sure ?</source>
-        <translation>移动  %1 到 &quot;%2&quot;。你确定吗？</translation>
+        <translation>移动 %1 到 &quot;%2&quot;. 你确定吗？</translation>
     </message>
     <message>
         <source>Move</source>
@@ -2869,7 +2966,7 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
         <source>The current palette %1
 in the studio palette has been modified. Do you want to save your changes?</source>
         <translation>当前调色板 %1
-在工作室调色板中已经被修改了。你要保存所做的改动吗？</translation>
+在工作室调色板中被修改过。你要保存改动吗？</translation>
     </message>
     <message>
         <source>Save</source>
@@ -2882,28 +2979,28 @@ in the studio palette has been modified. Do you want to save your changes?</sour
     <message>
         <source>Convert %1 to Studio Palette and Overwrite. 
 Are you sure ?</source>
-        <translation>转换 %1 到工作室调色板并覆盖。
-你确定要这样做吗？</translation>
+        <translation>转换 %1 为工作室调色板并覆盖。
+你确定吗？</translation>
     </message>
     <message>
         <source>Yes</source>
-        <translation type="obsolete">是</translation>
+        <translation type="vanished">是</translation>
     </message>
     <message>
         <source>No</source>
-        <translation type="obsolete">否</translation>
+        <translation type="vanished">否</translation>
     </message>
     <message>
         <source>Replacing all selected palettes with the palette &quot;%1&quot;. 
 Are you sure ?</source>
-        <translation>用调色板 &quot;%1&quot; 替换所有被选中的调色版。
-你确定要这样做吗？</translation>
+        <translation>用调色板&quot;%1 &quot;替换所有选中的调色板。
+你确定吗？</translation>
     </message>
     <message>
         <source>Replacing the palette &quot;%1&quot; with the palette &quot;%2&quot;. 
 Are you sure ?</source>
-        <translation>用调色板 &quot;%2&quot; 替换调色板 &quot;%1&quot;。
-你确定要这样做吗？</translation>
+        <translation>用调色板&quot;%1&quot;替换调色板&quot;%2&quot;。
+你确定吗？</translation>
     </message>
     <message>
         <source>Replace</source>
@@ -3115,36 +3212,44 @@ Apply</source>
         <source>Hex Color Names...</source>
         <translation>16进制颜色名...</translation>
     </message>
+    <message>
+        <source>Search</source>
+        <translation>搜索</translation>
+    </message>
+    <message>
+        <source>Clear Search</source>
+        <translation>清理搜索</translation>
+    </message>
 </context>
 <context>
     <name>StyleEditorGUI::ColorChannelControl</name>
     <message>
         <source>R</source>
-        <translation></translation>
+        <translation>R</translation>
     </message>
     <message>
         <source>G</source>
-        <translation></translation>
+        <translation>G</translation>
     </message>
     <message>
         <source>B</source>
-        <translation></translation>
+        <translation>B</translation>
     </message>
     <message>
         <source>A</source>
-        <translation></translation>
+        <translation>A</translation>
     </message>
     <message>
         <source>H</source>
-        <translation></translation>
+        <translation>H</translation>
     </message>
     <message>
         <source>S</source>
-        <translation></translation>
+        <translation>S</translation>
     </message>
     <message>
         <source>V</source>
-        <translation></translation>
+        <translation>V</translation>
     </message>
 </context>
 <context>
@@ -3179,6 +3284,21 @@ Apply</source>
     <message>
         <source>Reset to default</source>
         <translation>重新初始化</translation>
+    </message>
+</context>
+<context>
+    <name>StyleEditorGUI::StyleChooserPage</name>
+    <message>
+        <source>Pin To Top</source>
+        <translation>固定到顶部</translation>
+    </message>
+    <message>
+        <source>Set Pins To Top</source>
+        <translation>固定到顶部</translation>
+    </message>
+    <message>
+        <source>Clear Pins To Top</source>
+        <translation>清除固定到顶部</translation>
     </message>
 </context>
 <context>

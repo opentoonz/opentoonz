@@ -400,7 +400,7 @@ void FxCommandUndo::attach(TXsheet *xsh, const TFxCommand::Link &link,
 //------------------------------------------------------
 
 void FxCommandUndo::attachOutputs(TXsheet *xsh, TFx *insertedFx, TFx *inputFx) {
-  TCG_ASSERT(inputFx, return );
+  TCG_ASSERT(inputFx, return);
 
   FxDag *fxDag = xsh->getFxDag();
 
@@ -2350,23 +2350,6 @@ static void deleteFxs(const std::list<TFxP> &fxs, TXsheetHandle *xshHandle,
 }
 
 //**********************************************************************
-//    Remove Output Fx  command
-//**********************************************************************
-
-void TFxCommand::removeOutputFx(TFx *fx, TXsheetHandle *xshHandle,
-                                TFxHandle *fxHandle) {
-  TOutputFx *outputFx = dynamic_cast<TOutputFx *>(fx);
-  if (!outputFx) return;
-
-  std::unique_ptr<FxCommandUndo> undo(
-      new DeleteFxOrColumnUndo(fx, xshHandle, fxHandle));
-  if (undo->isConsistent()) {
-    undo->redo();
-    TUndoManager::manager()->add(undo.release());
-  }
-}
-
-//**********************************************************************
 //    Delete Columns  command
 //**********************************************************************
 
@@ -3302,7 +3285,7 @@ void UndoConnectFxs::GroupData::restore() const {
 void UndoConnectFxs::initialize() {
   if (!UndoDisconnectFxs::isConsistent()) return;
 
-  TCG_ASSERT(m_link.m_inputFx && m_link.m_outputFx, m_fxs.clear(); return );
+  TCG_ASSERT(m_link.m_inputFx && m_link.m_outputFx, m_fxs.clear(); return);
 
   // Store sensible original data for the undo
   m_undoGroupDatas.reserve(m_fxs.size());

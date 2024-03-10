@@ -50,7 +50,7 @@ class MotionPathMenu final : public QWidget {
   QPoint m_pos;
 
 public:
-  MotionPathMenu(QWidget *parent = 0, Qt::WindowFlags flags = 0);
+  MotionPathMenu(QWidget *parent = 0, Qt::WindowFlags flags = Qt::WindowFlags());
   ~MotionPathMenu();
 
 protected:
@@ -236,7 +236,7 @@ protected slots:
   void onSliderValueChanged(int);
   void onValueChanged(const QString &);
 
-  void onFilterColorChanged(int id);
+  void onFilterColorChanged();
   void onLockButtonClicked(bool on);
 };
 
@@ -321,6 +321,7 @@ class ColumnArea final : public QWidget {
     bool isEmpty, isCurrent;
     TXshColumn *column;
     QPoint orig;
+    TXshLevel *reservedLevel;
 
   public:
     DrawHeader(ColumnArea *area, QPainter &p, int col);
@@ -334,6 +335,7 @@ class ColumnArea final : public QWidget {
     void drawBaseFill(const QColor &columnColor, const QColor &dragColor) const;
     void drawEye() const;
     void drawPreviewToggle(int opacity) const;
+    void drawUnifiedViewToggle(int opacity) const;
     void drawLock() const;
     void drawConfig() const;
     void drawColumnNumber() const;

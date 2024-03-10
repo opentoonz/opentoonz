@@ -51,8 +51,8 @@ bool isNumbers(std::wstring str, int fromSeg, int toSeg) {
   // Let's check if it follows the format ####A (i.e 00001 or 00001a)
   int numDigits = 0, numLetters = 0;
   for (int pos = fromSeg + 1; pos < toSeg; pos++) {
-    if ((str[pos] >= 'A' && str[pos] <= 'Z') ||
-        (str[pos] >= 'a' && str[pos] <= 'z')) {
+    if ((str[pos] >= L'A' && str[pos] <= L'Z') ||
+        (str[pos] >= L'a' && str[pos] <= L'z')) {
       // Not the right format if we ran into a letter without first finding a
       // number
       if (!numDigits) return false;
@@ -60,7 +60,7 @@ bool isNumbers(std::wstring str, int fromSeg, int toSeg) {
       // We'll keep track of the number of letters we find.
       // NOTE: From here on out we should only see letters
       numLetters++;
-    } else if (str[pos] >= '0' && str[pos] <= '9') {
+    } else if (str[pos] >= L'0' && str[pos] <= L'9') {
       // Not the right format if we ran into a number that followed a letter.
       // This format is not something we expect currently
       if (numLetters) return false;  // not right format
@@ -86,7 +86,45 @@ bool checkForSeqNum(QString type) {
   else
     return false;
 }
+
+bool parseFrame(const std::wstring &str, int &frame, QString &letter, int &padding) {
+  if (str.empty())
+    return false;
+
+  int i = 0, number = 0;
+  while(i < (int)str.size() && str[i] >= L'0' && str[i] <= L'9')
+    number = number * 10 + str[i++] - L'0';
+  int digits = i;
+  wchar_t l = str[i] >= L'a' && str[i] <= L'z' ? str[i++]
+            : str[i] >= L'A' && str[i] <= L'Z' ? str[i++]
+            : L'\0';
+  if (digits <= 0 || i < (int)str.size())
+    return false;
+
+  frame = number;
+  letter = l ? QString(1, QChar(l)) : QString();
+  padding = str[0] == L'0' ? digits : 0;
+  return true;
+}
+
 };  // namespace
+
+
+TFrameId::TFrameId(const std::string &str, char s)
+    : m_frame(EMPTY_FRAME), m_letter(), m_zeroPadding(4), m_startSeqInd(s)
+{
+  if (str.empty()) return;
+  if (!parseFrame(to_wstring(str), m_frame, m_letter, m_zeroPadding))
+    m_frame = NO_FRAME;
+}
+
+TFrameId::TFrameId(const std::wstring &str, char s)
+    : m_frame(EMPTY_FRAME), m_letter(), m_zeroPadding(4), m_startSeqInd(s)
+{
+  if (str.empty()) return;
+  if (!parseFrame(str, m_frame, m_letter, m_zeroPadding))
+    m_frame = NO_FRAME;
+}
 
 // TFrameId::operator string() const
 std::string TFrameId::expand(FrameFormat format) const {
@@ -713,8 +751,8 @@ TFilePath TFilePath::getParentDir() const  // noSlash!
   int i = getLastSlash(m_path);  // cerco l'ultimo slash
   if (i < 0) {
     if (m_path.length() >= 2 &&
-        (('a' <= m_path[0] && m_path[0] <= 'z') ||
-         ('A' <= m_path[0] && m_path[0] <= 'Z')) &&
+        ((L'a' <= m_path[0] && m_path[0] <= L'z') ||
+         (L'A' <= m_path[0] && m_path[0] <= L'Z')) &&
         m_path[1] == ':')
       return TFilePath(m_path.substr(0, 2));
     else
@@ -770,23 +808,7 @@ TFrameId TFilePath::getFrame() const {
   if (!checkForSeqNum(type) || !isNumbers(str, j, i))
     return TFrameId(TFrameId::NO_FRAME);
 
-  int k, number = 0, digits = 0;
-  for (k = j + 1; k < i && iswdigit(str[k]); k++) {
-    digits++;
-    number = number * 10 + str[k] - L'0';
-  }
-  char letter = '\0';
-  if (iswalpha(str[k])) letter = str[k++] + ('a' - L'a');
-
-  //  if (number == 0 || k < i)  // || letter!='\0')
-  //    throw TMalformedFrameException(
-  //        *this,
-  //        str + L": " + QObject::tr("Malformed frame name").toStdWString());
-  int padding = 0;
-
-  if (str[j + 1] == '0') padding = digits;
-
-  return TFrameId(number, letter, padding, str[j]);
+  return TFrameId(str.substr(j+1, i-j-1), str[j]);
 }
 
 //-----------------------------------------------------------------------------

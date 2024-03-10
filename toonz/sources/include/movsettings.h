@@ -13,9 +13,13 @@
 #define DVVAR DV_IMPORT_VAR
 #endif
 
-#if !defined(x64) && !defined(__LP64__) && !(defined(LINUX) || defined(FREEBSD)) && !(defined(__GNUC__) && defined(_WIN32))
+#if !defined(x64) && !defined(__LP64__) && !(defined(LINUX) || defined(FREEBSD) || defined(HAIKU)) && !(defined(__GNUC__) && defined(_WIN32))
 
 #ifdef _WIN32
+
+#include "texception.h"
+#include "tpropertytype.h"
+#include "tproperty.h"
 
 #define list QuickTime_list
 #define map QuickTime_map
@@ -43,12 +47,6 @@
 #undef int_fast8_t
 #undef int_fast16_t
 #undef uint_fast16_t
-
-#include "texception.h"
-#include "tpropertytype.h"
-//#include "timageinfo.h"
-//#include "tlevel_io.h"
-#include "tproperty.h"
 
 #else  // _WIN32
 

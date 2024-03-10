@@ -1,9 +1,5 @@
 <RCC>
 	<qresource prefix="/">
-		<!-- Themes =============================================== -->
-		<file>icons/dark/index.theme</file>
-		<file>icons/light/index.theme</file>
-
 		<!-- Tools -->
 		<file>icons/dark/tools/20/animate.svg</file>
 		<file>icons/dark/tools/20/brush.svg</file>
@@ -35,6 +31,7 @@
 		<file>icons/dark/tools/20/hand.svg</file>
 		<file>icons/dark/tools/20/rotate.svg</file>
 		<file>icons/dark/tools/20/zoom.svg</file>
+		<file>icons/dark/tools/20/assistant.svg</file>
 
 		<file>icons/dark/tools/18/edit_center.svg</file>
 		<file>icons/dark/tools/18/edit_all.svg</file>
@@ -58,8 +55,8 @@
 		<file>icons/dark/actions/16/export.svg</file>
 		<file>icons/dark/actions/16/import.svg</file>
 		<file>icons/dark/actions/16/load.svg</file>
-		<file>icons/dark/actions/18/lock.svg</file>
-		<file>icons/dark/actions/18/lock_on.svg</file>
+		<file>icons/dark/actions/16/lock.svg</file>
+		<file>icons/dark/actions/16/lock_on.svg</file>
 		<file>icons/dark/actions/16/file_copy.svg</file>
 		<file>icons/dark/actions/16/content_copy.svg</file>
 		<file>icons/dark/actions/16/cut.svg</file>
@@ -75,7 +72,8 @@
 		<file>icons/dark/actions/16/save.svg</file>
 		<file>icons/dark/actions/16/saveas.svg</file>
 		<file>icons/dark/actions/16/saveall.svg</file>
-		<file>icons/dark/actions/16/gear.svg</file>
+    <file>icons/dark/actions/16/gear.svg</file>
+    <file>icons/dark/actions/16/gear_check.svg</file>
 		<file>icons/dark/actions/16/settings_reset.svg</file>
 		<file>icons/dark/actions/16/clear.svg</file>
 		<file>icons/dark/actions/16/undo.svg</file>
@@ -159,19 +157,19 @@
 		<file>icons/dark/actions/35/task_render_failed.svg</file>
 
 		<!-- Mimetypes -->
-		<file>icons/dark/mimetypes/60/tasklist_icon.svg</file>
-		<file>icons/dark/mimetypes/60/xdts_icon.svg</file>
-		<file>icons/dark/mimetypes/60/missing_icon.svg</file>
-		<file>icons/dark/mimetypes/60/motionpath_icon.svg</file>
-		<file>icons/dark/mimetypes/60/curve_icon.svg</file>
-		<file>icons/dark/mimetypes/60/unknown_icon.svg</file>
-		<file>icons/dark/mimetypes/60/cleanup_icon.svg</file>
-		<file>icons/dark/mimetypes/60/psd_icon.svg</file>
-		<file>icons/dark/mimetypes/60/svg_icon.svg</file>
-		<file>icons/dark/mimetypes/60/audio_icon.svg</file>
-		<file>icons/dark/mimetypes/60/script_icon.svg</file>
-		<file>icons/dark/mimetypes/60/broken_icon.svg</file>
-		<file>icons/dark/mimetypes/60/json_icon.svg</file>
+		<file>icons/dark/mimetypes/tasklist_icon.svg</file>
+		<file>icons/dark/mimetypes/xdts_icon.svg</file>
+		<file>icons/dark/mimetypes/missing_icon.svg</file>
+		<file>icons/dark/mimetypes/motionpath_icon.svg</file>
+		<file>icons/dark/mimetypes/curve_icon.svg</file>
+		<file>icons/dark/mimetypes/unknown_icon.svg</file>
+		<file>icons/dark/mimetypes/cleanup_icon.svg</file>
+		<file>icons/dark/mimetypes/psd_icon.svg</file>
+		<file>icons/dark/mimetypes/svg_icon.svg</file>
+		<file>icons/dark/mimetypes/audio_icon.svg</file>
+		<file>icons/dark/mimetypes/script_icon.svg</file>
+		<file>icons/dark/mimetypes/broken_icon.svg</file>
+		<file>icons/dark/mimetypes/json_icon.svg</file>
 
 		<!-- Render -->
 		<file>icons/dark/actions/16/render.svg</file>
@@ -384,6 +382,8 @@
     <file>icons/dark/actions/16/next_nav_tag.svg</file>
     <file>icons/dark/actions/16/prev_nav_tag.svg</file>
 
+    <file>icons/dark/actions/16/toggle_sub_nav.svg</file>
+
     <!-- Modes, Types, Options -->
 		<file>icons/dark/actions/16/ink_check.svg</file>
 		<file>icons/dark/actions/16/inks_only.svg</file>
@@ -557,7 +557,7 @@
 		<file>icons/dark/actions/48/colorchiporder_leftup.svg</file>
 		<file>icons/dark/actions/48/colorchiporder_lowleft.svg</file>
 		<file>icons/dark/actions/48/colorchiporder_upleft.svg</file>
-		<file>icons/dark/misc/startup.png</file>
+		<file>icons/dark/misc/opentoonz_logo.svg</file>
 		<file>icons/dark/actions/20/touch.svg</file>
 		<file>icons/dark/actions/16/quit.svg</file>
 		<file>icons/dark/actions/16/clear_cache.svg</file>
@@ -577,6 +577,10 @@
 		<file>icons/dark/actions/16/project_settings.svg</file>
 		<file>icons/dark/actions/16/save_default_settings.svg</file>
 		<file>icons/dark/actions/16/zero_thick_lines.svg</file>
+		<file>icons/dark/actions/16/table.svg</file>
+
+		<file>icons/dark/actions/16/export_oca.svg</file>
+		<file>icons/dark/actions/16/import_oca.svg</file>
 
 		<!-- Keyframe -->
 		<file>icons/dark/actions/20/key_off.svg</file>
@@ -586,8 +590,6 @@
 
 		<!-- ===================================================== -->
 		<!-- Light =============================================== -->
-
-		<file>icons/light/misc/startup.png</file>
 		
 		<!-- ===================================================== -->
 		<!-- Legacy resources ==================================== -->
@@ -664,6 +666,8 @@
 		<file>Resources/tape.png</file>
 		<file>Resources/type_in.png</file>
 		<file>Resources/type_out.png</file>
+		<file>Resources/tzpicon.png</file>
+		<file>Resources/tzuicon.png</file>
 		<file>Resources/work.png</file>
 		<file>Resources/zoom.png</file>
 		<file>Resources/browser_scene_open.svg</file>

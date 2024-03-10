@@ -25,6 +25,9 @@ namespace {
 
 inline bool supportsRandomAccess(const TFilePath &fp) {
   const std::string &type = fp.getType();
+
+  if (type == "pli") return false;
+
   return type == "tlv" ||  // TLVs do support random access
                            // type == "pli" || // PLIs... I thought they would -
                            // but no :( type == "mov" || // MOVs are 'on the

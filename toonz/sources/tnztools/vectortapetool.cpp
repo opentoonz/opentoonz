@@ -23,7 +23,6 @@
 #include "tenv.h"
 // For Qt translation support
 #include <QCoreApplication>
-#include <QApplication>
 
 using namespace ToolUtils;
 
@@ -177,8 +176,6 @@ public:
 class VectorTapeTool final : public TTool {
   Q_DECLARE_TR_FUNCTIONS(VectorTapeTool)
 
-  bool m_draw;
-
   bool m_secondPoint;
   int m_strokeIndex1, m_strokeIndex2;
   double m_w1, m_w2, m_pixelSize;
@@ -203,7 +200,6 @@ public:
       , m_w1(-1.0)
       , m_w2(-1.0)
       , m_pixelSize(1)
-      , m_draw(false)
       , m_smooth("Smooth", false)  // W_ToolOptions_Smooth
       , m_joinStrokes("JoinStrokes", false)
       , m_mode("Mode")
@@ -277,7 +273,6 @@ public:
 
   void draw() override {
     TVectorImageP vi(getImage(false));
-    if (!m_draw) return;
     if (!vi) return;
 
     // TAffine viewMatrix = getViewer()->getViewMatrix();
@@ -325,10 +320,6 @@ public:
   void mouseMove(const TPointD &pos, const TMouseEvent &) override {
     TVectorImageP vi(getImage(false));
     if (!vi) return;
-
-    // BUTTA e rimetti (Dava problemi con la penna)
-    if (!m_draw) return;  // Questa riga potrebbe non essere messa
-    // m_draw=true;   //Perche'??? Non basta dargli true in onEnter??
 
     if (m_type.getValue() == RECT) return;
 
@@ -737,23 +728,11 @@ public:
 
   void onEnter() override {
     //      getApplication()->editImage();
-    m_draw          = true;
     m_selectionRect = TRectD();
     m_startRect     = TPointD();
   }
 
-  void onLeave() override {
-    m_draw = false;
-    // m_strokeIndex1=-1;
-  }
-
   void onActivate() override {
-    // enable drawing if we are in a scene viewer
-    QWidget *focusWidget = QApplication::focusWidget();
-    if (focusWidget &&
-        QString(focusWidget->metaObject()->className()) == "SceneViewer")
-      m_draw = true;
-
     if (!m_firstTime) return;
 
     std::wstring s = ::to_wstring(TapeMode.getValue());

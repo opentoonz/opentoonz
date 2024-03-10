@@ -1462,12 +1462,6 @@ void FxSchematicScene::onSavePresetFx() {
 
 //------------------------------------------------------------------
 
-void FxSchematicScene::onRemoveOutput() {
-  TFxCommand::removeOutputFx(m_fxHandle->getFx(), m_xshHandle, m_fxHandle);
-}
-
-//------------------------------------------------------------------
-
 void FxSchematicScene::onActivateOutput() {
   TFxCommand::makeOutputFxCurrent(m_fxHandle->getFx(), m_xshHandle);
 }

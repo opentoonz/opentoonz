@@ -58,6 +58,14 @@ public:
     }
   };
 
+  struct ColorFilter {
+    QString name;
+    TPixel32 color;
+    bool operator==(const ColorFilter &cf) {
+      return name == cf.name && color == cf.color;
+    }
+  };
+
 private:
   Guides m_hGuides, m_vGuides;
 
@@ -85,6 +93,9 @@ private:
 
   // Cell Mark colors and names
   QList<CellMark> m_cellMarks;
+
+  // Color Filter colors and names
+  QList<ColorFilter> m_colorFilters;
 
   bool m_columnColorFilterOnRender;
   TFilePath m_camCapSaveInPath;
@@ -296,6 +307,13 @@ and height.
   void setCellMark(const CellMark &mark, int index);
   bool hasDefaultCellMarks()
       const;  // check if the cell mark settings are modified
+
+  QList<ColorFilter> getColorFilters() const;
+  ColorFilter getColorFilter(int index) const;
+  TPixel32 getColorFilterColor(int index) const;
+  void setColorFilter(const ColorFilter &filter, int index);
+  bool hasDefaultColorFilters()
+      const;  // check if the color filter settings are modified
 
   // templateFId in preview settings is used for "input" file format
   // such as new raster level, captured images by camera capture feature, etc.

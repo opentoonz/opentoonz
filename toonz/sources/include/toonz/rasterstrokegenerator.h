@@ -70,7 +70,7 @@ public:
   void generateStroke(bool isPencil, bool isStraight = false) const;
 
   // Ritorna m_points
-  std::vector<TThickPoint> getPointsSequence() { return m_points; }
+  const std::vector<TThickPoint>& getPointsSequence() { return m_points; }
   void setPointsSequence(const std::vector<TThickPoint> &points) {
     m_points = points;
   }

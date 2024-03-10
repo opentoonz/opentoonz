@@ -1331,7 +1331,7 @@ void RowArea::mouseMoveEvent(QMouseEvent *event) {
 //-----------------------------------------------------------------------------
 
 void RowArea::mouseReleaseEvent(QMouseEvent *event) {
-  m_viewer->setQtModifiers(0);
+  m_viewer->setQtModifiers(Qt::KeyboardModifiers());
   m_viewer->stopAutoPan();
   m_isPanning = false;
   m_viewer->dragToolRelease(event);

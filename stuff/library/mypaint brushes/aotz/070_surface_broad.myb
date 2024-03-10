@@ -180,7 +180,7 @@
             "inputs": {}
         },
         "opaque": {
-            "base_value": 1.10,
+            "base_value": 1.70,
             "inputs": {
                 "pressure": [
                     [
@@ -238,7 +238,7 @@
             "inputs": {}
         },
         "radius_logarithmic": {
-            "base_value": 4.25,
+            "base_value": 3.75,
             "inputs": {}
         },
         "restore_color": {

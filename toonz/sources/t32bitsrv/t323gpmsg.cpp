@@ -1,6 +1,6 @@
 
 
-#if (!(defined(x64) || defined(__LP64__) || defined(LINUX) || defined(FREEBSD)))
+#if (!(defined(x64) || defined(__LP64__) || defined(LINUX) || defined(FREEBSD) || defined(HAIKU)))
 
 // Toonz stuff
 #include "tiio.h"
@@ -9,15 +9,30 @@
 #include "trasterimage.h"
 #include "traster.h"
 #include "tstream.h"
-#include "movsettings.h"
 #include "tproperty.h"
 #include "tsound.h"
 
+// movesettings deps, must be included before QuickTime includes
+#include "texception.h"
+#include "tpropertytype.h"
+#include "tproperty.h"
+
+// tipc includes
+#include "tipc.h"
+#include "tipcmsg.h"
+#include "tipcsrv.h"
+#include "t32bitsrv_wrap.h"
+
+#include "t323gpmsg.h"
+
+// following includes may include QuickTime
 #if defined(_WIN32)
 #include "../image/3gp/tiio_3gp.h"
 #elif defined(MACOSX)
 #include "../image/3gp/tiio_3gpM.h"
 #endif
+#include "movsettings.h"
+
 
 // Qt stuff
 #include <QString>
@@ -27,14 +42,6 @@
 
 #include <QLocalSocket>
 #include <QDataStream>
-
-// tipc includes
-#include "tipc.h"
-#include "tipcmsg.h"
-#include "tipcsrv.h"
-#include "t32bitsrv_wrap.h"
-
-#include "t323gpmsg.h"
 
 //---------------------------------------------------
 

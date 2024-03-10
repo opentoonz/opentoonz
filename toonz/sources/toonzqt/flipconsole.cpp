@@ -21,8 +21,6 @@
 #include "timagecache.h"
 #include "trop.h"
 
-#include "../toonz/tapp.h"
-
 #include <time.h>
 
 // Qt includes

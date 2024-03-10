@@ -124,6 +124,7 @@ TEnv::IntVar CamCapDoCalibration("CamCapDoCalibration", 0);
 TEnv::RectVar CamCapSubCameraRect("CamCapSubCameraRect", TRect());
 TEnv::IntVar CamCapDoAutoDpi("CamCapDoAutoDpi", 1);
 TEnv::DoubleVar CamCapCustomDpi("CamCapDpiForNewLevel", 120.0);
+TEnv::StringVar CamCapFileType("CamCapFileType", "jpg");
 
 namespace {
 
@@ -432,6 +433,38 @@ protected:
     p.drawPixmap(QRect(0, 2, 18, 18), m_icon.pixmap(18, 18));
   }
 };
+
+// https://stackoverflow.com/a/50848100/6622587
+cv::Mat QImageToMat(const QImage& image) {
+  cv::Mat out;
+  switch (image.format()) {
+  case QImage::Format_Invalid: {
+    cv::Mat empty;
+    empty.copyTo(out);
+    break;
+  }
+  case QImage::Format_RGB32: {
+    cv::Mat view(image.height(), image.width(), CV_8UC4,
+                 (void*)image.constBits(), image.bytesPerLine());
+    view.copyTo(out);
+    break;
+  }
+  case QImage::Format_RGB888: {
+    cv::Mat view(image.height(), image.width(), CV_8UC3,
+                 (void*)image.constBits(), image.bytesPerLine());
+    cv::cvtColor(view, out, cv::COLOR_RGB2BGR);
+    break;
+  }
+  default: {
+    QImage conv = image.convertToFormat(QImage::Format_ARGB32);
+    cv::Mat view(conv.height(), conv.width(), CV_8UC4, (void*)conv.constBits(),
+                 conv.bytesPerLine());
+    view.copyTo(out);
+    break;
+  }
+  }
+  return out;
+}
 
 }  // namespace
 
@@ -1556,8 +1589,9 @@ PencilTestPopup::PencilTestPopup()
   m_saveOnCaptureCB =
       new QCheckBox(tr("Save images as they are captured"), this);
 
-  QGroupBox* imageFrame = new QGroupBox(tr("Image adjust"), this);
-  m_colorTypeCombo      = new QComboBox(this);
+  QGroupBox* imageFrame        = new QGroupBox(tr("Image adjust"), this);
+  m_colorTypeCombo             = new QComboBox(this);
+  m_saveImgAdjustDefaultButton = new QPushButton(this);
 
   m_camCapLevelControl = new CameraCaptureLevelControl(this);
   m_upsideDownCB       = new QCheckBox(tr("Upside down"), this);
@@ -1610,7 +1644,7 @@ PencilTestPopup::PencilTestPopup()
 
   m_resolutionCombo->setMaximumWidth(fontMetrics().width("0000 x 0000") + 25);
   m_fileTypeCombo->addItems({"jpg", "png", "tga", "tif"});
-  m_fileTypeCombo->setCurrentIndex(0);
+  m_fileTypeCombo->setCurrentText(QString::fromStdString(CamCapFileType));
 
   fileFrame->setObjectName("CleanupSettingsFrame");
   m_frameNumberEdit->setObjectName("LargeSizedText");
@@ -1627,6 +1661,11 @@ PencilTestPopup::PencilTestPopup()
   m_colorTypeCombo->addItems(
       {tr("Color"), tr("Grayscale"), tr("Black & White")});
   m_colorTypeCombo->setCurrentIndex(0);
+  m_saveImgAdjustDefaultButton->setFixedSize(24, 24);
+  m_saveImgAdjustDefaultButton->setIconSize(QSize(16, 16));
+  m_saveImgAdjustDefaultButton->setIcon(createQIcon("gear_check"));
+  m_saveImgAdjustDefaultButton->setToolTip(
+      tr("Save Current Image Adjust Parameters As Default"));
   m_upsideDownCB->setChecked(false);
 
   m_bgReductionFld->setRange(0, 100);
@@ -1824,6 +1863,8 @@ PencilTestPopup::PencilTestPopup()
           imageLay->addWidget(new QLabel(tr("Color type:"), this), 0, 0,
                               Qt::AlignRight);
           imageLay->addWidget(m_colorTypeCombo, 0, 1);
+          imageLay->addWidget(m_saveImgAdjustDefaultButton, 0, 2,
+                              Qt::AlignRight);
 
           imageLay->addWidget(m_camCapLevelControl, 1, 0, 1, 3);
 
@@ -1918,6 +1959,8 @@ PencilTestPopup::PencilTestPopup()
                        SLOT(onPreviousName()));
   ret = ret && connect(m_colorTypeCombo, SIGNAL(currentIndexChanged(int)), this,
                        SLOT(onColorTypeComboChanged(int)));
+  ret = ret && connect(m_saveImgAdjustDefaultButton, SIGNAL(pressed()), this,
+                       SLOT(saveImageAdjustDefault()));
   ret = ret && connect(m_captureWhiteBGButton, SIGNAL(pressed()), this,
                        SLOT(onCaptureWhiteBGButtonPressed()));
   ret = ret && connect(m_onionSkinGBox, SIGNAL(toggled(bool)), this,
@@ -1942,8 +1985,12 @@ PencilTestPopup::PencilTestPopup()
                        SLOT(openSaveInFolderPopup()));
   ret = ret && connect(m_saveInFileFld, SIGNAL(pathChanged()), this,
                        SLOT(onSaveInPathEdited()));
-  ret = ret && connect(m_fileTypeCombo, SIGNAL(activated(int)), this,
-                       SLOT(refreshFrameInfo()));
+  ret = ret &&
+        connect(m_fileTypeCombo, QOverload<int>::of(&QComboBox::activated),
+                [&](int index) {
+                  CamCapFileType = m_fileTypeCombo->currentText().toStdString();
+                  refreshFrameInfo();
+                });
   ret = ret && connect(m_frameNumberEdit, SIGNAL(editingFinished()), this,
                        SLOT(refreshFrameInfo()));
 
@@ -2040,6 +2087,9 @@ PencilTestPopup::PencilTestPopup()
         m_videoWidget->setImage(dummyImg);
         m_subcameraButton->setChecked(true);
       }
+
+      // try loading the default parameter
+      loadImageAdjustDefault();
     }
   }
 
@@ -2750,12 +2800,12 @@ void PencilTestPopup::processImage(cv::Mat& image) {
               cv::INTER_LINEAR);
   }
 
-  //  void PencilTestPopup::processImage(QImage& image) {
-  if (m_upsideDownCB->isChecked())
-    cv::flip(image, image, -1);  // flip in both directions
   // white bg reduction
   if (!m_whiteBGImg.empty() && m_bgReductionFld->getValue() != 0)
     bgReduction(image, m_whiteBGImg, m_bgReductionFld->getValue());
+  //  void PencilTestPopup::processImage(QImage& image) {
+  if (m_upsideDownCB->isChecked())
+    cv::flip(image, image, -1);  // flip in both directions
 
   // obtain histogram AFTER bg reduction
   m_camCapLevelControl->updateHistogram(image);
@@ -3466,6 +3516,13 @@ void PencilTestPopup::onSaveInPathEdited() {
 
 //-----------------------------------------------------------------------------
 
+void PencilTestPopup::onFileTypeChanged() {
+  CamCapFileType = m_fileTypeCombo->currentText().toStdString();
+  refreshFrameInfo();
+}
+
+//-----------------------------------------------------------------------------
+
 void PencilTestPopup::onSceneSwitched() {
   m_saveInFolderPopup->updateParentFolder();
   m_saveInFileFld->setPath(m_saveInFolderPopup->getParentPath());
@@ -3616,14 +3673,33 @@ void PencilTestPopup::resetCalibSettingsFromFile() {
 
 //-----------------------------------------------------------------------------
 
-QString PencilTestPopup::getCurrentCalibFilePath() {
+QString PencilTestPopup::getCameraConfigurationPath(const QString& folderName,
+                                                    const QString& ext) {
   QString cameraName = m_cameraListCombo->currentText();
   if (cameraName.isEmpty()) return QString();
   QString resolution   = m_resolutionCombo->currentText();
   QString hostName     = QHostInfo::localHostName();
-  TFilePath folderPath = ToonzFolder::getLibraryFolder() + "camera calibration";
-  return folderPath.getQString() + "\\" + hostName + "_" + cameraName + "_" +
-         resolution + ".xml";
+  TFilePath folderPath = ToonzFolder::getLibraryFolder();
+  return folderPath.getQString() + "\\" + folderName + "\\" + hostName + "_" +
+         cameraName + "_" + resolution + "." + ext;
+}
+
+//-----------------------------------------------------------------------------
+
+QString PencilTestPopup::getCurrentCalibFilePath() {
+  return getCameraConfigurationPath("camera calibration", "xml");
+}
+
+//-----------------------------------------------------------------------------
+
+QString PencilTestPopup::getImageAdjustSettingsPath() {
+  return getCameraConfigurationPath("camera image adjust", "ini");
+}
+
+//-----------------------------------------------------------------------------
+
+QString PencilTestPopup::getImageAdjustBgImgPath() {
+  return getCameraConfigurationPath("camera image adjust", "jpg");
 }
 
 //-----------------------------------------------------------------------------
@@ -3786,6 +3862,80 @@ void PencilTestPopup::onPreferenceChanged(const QString& prefName) {
   if (prefName != "pixelsOnly") return;
 
   m_dpiBtn->setHidden(Preferences::instance()->getPixelsOnly());
+}
+
+//-----------------------------------------------------------------------------
+// called in ctor
+void PencilTestPopup::loadImageAdjustDefault() {
+  // find the configuration file
+  QString settingsPath = getImageAdjustSettingsPath();
+  if (!TFileStatus(TFilePath(settingsPath)).doesExist()) return;
+
+  QSettings imgAdjSettings(settingsPath, QSettings::IniFormat);
+  int colorType   = imgAdjSettings.value("ColorType", 0).toInt();
+  int black       = imgAdjSettings.value("BlackLevel", 0).toInt();
+  int white       = imgAdjSettings.value("WhiteLevel", 255).toInt();
+  double gamma    = imgAdjSettings.value("Gamma", 1.0).toDouble();
+  int threshold   = imgAdjSettings.value("Threshold", 128).toInt();
+  bool upsideDown = imgAdjSettings.value("UpsideDown", false).toBool();
+  int bgReduction = imgAdjSettings.value("BgReduction", 0).toInt();
+
+  m_colorTypeCombo->setCurrentIndex(colorType);
+  m_camCapLevelControl->setValues(black, white, threshold, gamma,
+                                  colorType != 2);
+  m_upsideDownCB->setChecked(upsideDown);
+  m_bgReductionFld->setValue(bgReduction);
+
+  QString bgPath = getImageAdjustBgImgPath();
+  if (!TFileStatus(TFilePath(bgPath)).doesExist()) {
+    if (bgReduction > 0)
+      warning(
+          tr("BG Reduction is set but the White BG image is missing. Please "
+             "capture the White BG again."));
+
+    m_whiteBGImg = cv::Mat();
+    m_bgReductionFld->setDisabled(true);
+    return;
+  }
+
+  QImage bgImg(bgPath);
+  if (bgImg.isNull()) {
+    m_whiteBGImg = cv::Mat();
+    m_bgReductionFld->setDisabled(true);
+    return;
+  }
+  cv::Mat tmpMat = QImageToMat(bgImg);
+  cv::cvtColor(tmpMat, m_whiteBGImg, cv::COLOR_RGBA2RGB);
+  m_bgReductionFld->setEnabled(true);
+}
+
+//-----------------------------------------------------------------------------
+
+void PencilTestPopup::saveImageAdjustDefault() {
+  QString question =
+      tr("Do you want to save the current parameters as the default values?");
+  int ret = DVGui::MsgBox(question, QObject::tr("Save"), QObject::tr("Cancel"));
+  if (ret == 0 || ret == 2) return;
+
+  QString settingsPath = getImageAdjustSettingsPath();
+  QSettings imgAdjSettings(settingsPath, QSettings::IniFormat);
+
+  imgAdjSettings.setValue("ColorType", m_colorTypeCombo->currentIndex());
+  int black, white, threshold;
+  double gamma;
+  m_camCapLevelControl->getValues(black, white, threshold, gamma);
+  imgAdjSettings.setValue("BlackLevel", black);
+  imgAdjSettings.setValue("WhiteLevel", white);
+  imgAdjSettings.setValue("Gamma", gamma);
+  imgAdjSettings.setValue("Threshold", threshold);
+  imgAdjSettings.setValue("UpsideDown", m_upsideDownCB->isChecked());
+  imgAdjSettings.setValue("BgReduction", m_bgReductionFld->getValue());
+
+  if (!m_whiteBGImg.empty()) {
+    QImage qimg(m_whiteBGImg.data, m_whiteBGImg.cols, m_whiteBGImg.rows,
+                QImage::Format_RGB888);
+    qimg.save(getImageAdjustBgImgPath());
+  }
 }
 
 //-----------------------------------------------------------------------------

@@ -19,7 +19,7 @@
 
 #include "tthread.h"
 
-#elif defined(MACOSX)
+#elif defined(MACOSX) || defined(HAIKU)
 
 #include "qtofflinegl.h"
 
@@ -500,7 +500,7 @@ static std::shared_ptr<TOfflineGL::Imp> defaultOfflineGLGenerator(
   return std::make_shared<QtOfflineGL>(dim, shared);
 }
 
-#elif defined(MACOSX)
+#elif defined(MACOSX) || defined(HAIKU)
 
 std::shared_ptr<TOfflineGL::Imp> defaultOfflineGLGenerator(
     const TDimension &dim, std::shared_ptr<TOfflineGL::Imp> shared) {

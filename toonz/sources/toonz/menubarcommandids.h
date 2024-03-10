@@ -29,6 +29,7 @@
 #define MI_NewVectorLevel "MI_NewVectorLevel"
 #define MI_NewToonzRasterLevel "MI_NewToonzRasterLevel"
 #define MI_NewRasterLevel "MI_NewRasterLevel"
+#define MI_NewMetaLevel "MI_NewMetaLevel"
 #define MI_LoadLevel "MI_LoadLevel"
 #define MI_LoadFolder "MI_LoadFolder"
 #define MI_SaveLevel "MI_SaveLevel"
@@ -312,6 +313,7 @@
 #define MI_UnlockAllColumns "MI_UnlockAllColumns"
 #define MI_ToggleColumnLocks "MI_ToggleColumnLocks"
 #define MI_ToggleXSheetToolbar "MI_ToggleXSheetToolbar"
+#define MI_ToggleXsheetBreadcrumbs "MI_ToggleXsheetBreadcrumbs"
 #define MI_FoldColumns "MI_FoldColumns"
 #define MI_ToggleXsheetCameraColumn "MI_ToggleXsheetCameraColumn"
 #define MI_ToggleCurrentTimeIndicator "MI_ToggleCurrentTimeIndicator"
@@ -468,6 +470,7 @@
 
 #define MI_ExportXDTS "MI_ExportXDTS"
 #define MI_ExportOCA "MI_ExportOCA"
+#define MI_ImportOCA "MI_ImportOCA"
 #define MI_ExportTvpJson "MI_ExportTvpJson"
 #define MI_ExportXsheetPDF "MI_ExportXsheetPDF"
 #define MI_ExportCameraTrack "MI_ExportCameraTrack"

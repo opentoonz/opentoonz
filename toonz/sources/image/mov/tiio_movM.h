@@ -7,17 +7,17 @@
 #include "tiio_mov_proxy.h"
 #else
 
+#include "tlevel_io.h"
+#include "tthread.h"
+#include "tthreadmessage.h"
+#include "tquicktime.h"
+
 //#include <Carbon/Carbon.h>
 //#include <Movies.h>
 //#include <ImageCompression.h>
 //#include "QuickTimeComponents.h"
 
 #include <QuickTime/QuickTime.h>
-
-#include "tquicktime.h"
-#include "tlevel_io.h"
-#include "tthread.h"
-#include "tthreadmessage.h"
 
 bool IsQuickTimeInstalled();
 

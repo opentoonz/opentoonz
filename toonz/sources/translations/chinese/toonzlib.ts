@@ -179,11 +179,11 @@
     </message>
     <message>
         <source>Adobe Photoshop</source>
-        <translation></translation>
+        <translation>Adobe Photoshop</translation>
     </message>
     <message>
         <source>PNG</source>
-        <translation></translation>
+        <translation>PNG</translation>
     </message>
 </context>
 <context>
@@ -211,8 +211,8 @@
     <message>
         <source>It is not possible to communicate with the codec.
  Probably the codec cannot work correctly.</source>
-        <translation>无法调用编码器。
-可能该编码器不能正常工作。</translation>
+        <translation>无法调用此编码器。
+ 可能是此编码器不能正确运行。</translation>
     </message>
     <message>
         <source>%1-%2</source>
@@ -656,6 +656,11 @@
         <source>White</source>
         <translation>白色</translation>
     </message>
+    <message>
+        <source>Custom Texture</source>
+        <comment>TextureStyleChooserPage</comment>
+        <translation>定制纹理</translation>
+    </message>
 </context>
 <context>
     <name>Rasterizer</name>
@@ -773,7 +778,7 @@
     </message>
     <message>
         <source>Unrecognized file type :</source>
-        <translation>无法识别的文件类型: </translation>
+        <translation>无法识别的文件类型:</translation>
     </message>
     <message>
         <source>Can&apos;t save a %1 image to this file type : %2</source>
@@ -811,7 +816,7 @@
     </message>
     <message>
         <source>Bad argument (%1). It should be FilePath or string</source>
-        <translation>不正确的参数(%1): 应当是文件路径或者字符串</translation>
+        <translation>不正确的参数(%1)。应该是文件路径或者字符串</translation>
     </message>
     <message>
         <source>Exception loading level (%1)</source>
@@ -839,7 +844,7 @@
     </message>
     <message>
         <source>Can&apos;t save a %1 level to this file type : %2</source>
-        <translation>不能保存层级 %1 为此文件类型：%2</translation>
+        <translation>不能保存层级 %1 为此文件类型: %2</translation>
     </message>
     <message>
         <source>Exception writing %1</source>

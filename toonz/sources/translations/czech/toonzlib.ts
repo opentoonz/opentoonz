@@ -4,17 +4,17 @@
 <context>
     <name>Preferences</name>
     <message>
-        <location filename="../../toonzlib/preferences.cpp" line="100"/>
+        <location filename="../../toonzlib/preferences.cpp" line="101"/>
         <source>Retas Level Format</source>
         <translation>Formát úrovně RETAS</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/preferences.cpp" line="106"/>
+        <location filename="../../toonzlib/preferences.cpp" line="107"/>
         <source>Adobe Photoshop</source>
         <translation>Adobe Photoshop</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/preferences.cpp" line="203"/>
+        <location filename="../../toonzlib/preferences.cpp" line="207"/>
         <source>PNG</source>
         <translation>PNG</translation>
     </message>
@@ -320,12 +320,12 @@ Pravděpodobně kodek nemůže pracovat řádně.</translation>
         <translation>Nastavit klíčový snímek</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/doubleparamcmd.cpp" line="816"/>
+        <location filename="../../toonzlib/doubleparamcmd.cpp" line="817"/>
         <source>Remove Keyframe</source>
         <translation>Odstranit klíčový snímek</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/doubleparamcmd.cpp" line="856"/>
+        <location filename="../../toonzlib/doubleparamcmd.cpp" line="857"/>
         <source>Cycle</source>
         <translation>Koloběh</translation>
     </message>
@@ -335,41 +335,40 @@ Pravděpodobně kodek nemůže pracovat řádně.</translation>
         <translation>Přepnout volbu pro automatické malování  Paleta: %1  Styl #%2</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/txshcolumn.cpp" line="689"/>
-        <location filename="../../toonzlib/txshcolumn.cpp" line="717"/>
+        <location filename="../../toonzlib/sceneproperties.cpp" line="46"/>
         <source>None</source>
         <translation>Žádný</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/txshcolumn.cpp" line="691"/>
         <location filename="../../toonzlib/sceneproperties.cpp" line="30"/>
+        <location filename="../../toonzlib/sceneproperties.cpp" line="47"/>
         <source>Red</source>
         <translation>Červená</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/txshcolumn.cpp" line="693"/>
         <location filename="../../toonzlib/sceneproperties.cpp" line="34"/>
+        <location filename="../../toonzlib/sceneproperties.cpp" line="48"/>
         <source>Green</source>
         <translation>Zelená</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/txshcolumn.cpp" line="695"/>
         <location filename="../../toonzlib/sceneproperties.cpp" line="36"/>
+        <location filename="../../toonzlib/sceneproperties.cpp" line="49"/>
         <source>Blue</source>
         <translation>Modrá</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/txshcolumn.cpp" line="697"/>
+        <location filename="../../toonzlib/sceneproperties.cpp" line="50"/>
         <source>DarkYellow</source>
         <translation>Tmavá žlutá</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/txshcolumn.cpp" line="699"/>
+        <location filename="../../toonzlib/sceneproperties.cpp" line="51"/>
         <source>DarkCyan</source>
         <translation>Tmavá modrozelená</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/txshcolumn.cpp" line="701"/>
+        <location filename="../../toonzlib/sceneproperties.cpp" line="52"/>
         <source>DarkMagenta</source>
         <translation>Tmavá červenorudá</translation>
     </message>
@@ -461,7 +460,7 @@ Pravděpodobně kodek nemůže pracovat řádně.</translation>
         <translation>Vektorizace selhala</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding_level.cpp" line="235"/>
+        <location filename="../../toonzlib/scriptbinding_level.cpp" line="231"/>
         <source>Argument &apos;%1&apos; does not look like a FrameId</source>
         <translation>Argument &apos;%1&apos; nevypadá jako ID snímku</translation>
     </message>
@@ -513,12 +512,12 @@ Pravděpodobně kodek nemůže pracovat řádně.</translation>
 </translation>
     </message>
     <message>
-        <location filename="../../toonzlib/orientation.cpp" line="81"/>
+        <location filename="../../toonzlib/orientation.cpp" line="83"/>
         <source>Xsheet</source>
         <translation>Xsheet</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/orientation.cpp" line="148"/>
+        <location filename="../../toonzlib/orientation.cpp" line="150"/>
         <source>Timeline</source>
         <translation>Časová osa</translation>
     </message>
@@ -610,6 +609,12 @@ Pravděpodobně kodek nemůže pracovat řádně.</translation>
     <message>
         <location filename="../../toonzlib/sceneproperties.cpp" line="41"/>
         <source>White</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../toonzlib/stylemanager.cpp" line="510"/>
+        <source>Custom Texture</source>
+        <comment>TextureStyleChooserPage</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -769,27 +774,27 @@ Pravděpodobně kodek nemůže pracovat řádně.</translation>
         <translation>Výjimka při zápisu %1</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding_level.cpp" line="268"/>
+        <location filename="../../toonzlib/scriptbinding_level.cpp" line="264"/>
         <source>frame index (%1) must be a number</source>
         <translation>Číslo snímku (%1) musí být číslo</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding_level.cpp" line="272"/>
+        <location filename="../../toonzlib/scriptbinding_level.cpp" line="268"/>
         <source>frame index (%1) is out of range (0-%2)</source>
         <translation>Číslo snímku (%1) je mimo rozsah (0-%2)</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding_level.cpp" line="295"/>
+        <location filename="../../toonzlib/scriptbinding_level.cpp" line="291"/>
         <source>second argument (%1) is not an image</source>
         <translation>druhýý argument (%1) není obrázkem</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding_level.cpp" line="308"/>
+        <location filename="../../toonzlib/scriptbinding_level.cpp" line="304"/>
         <source>can not insert a %1 image into a level</source>
         <translation>nelze vložit %1 obrázek do úrovně</translation>
     </message>
     <message>
-        <location filename="../../toonzlib/scriptbinding_level.cpp" line="329"/>
+        <location filename="../../toonzlib/scriptbinding_level.cpp" line="325"/>
         <source>can not insert a %1 image to a %2 level</source>
         <translation>nelze vložit %1 obrázek do %2 úrovně</translation>
     </message>

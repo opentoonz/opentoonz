@@ -26,6 +26,7 @@ set(HEADERS
     mesh/tiio_mesh.h
     exr/tinyexr_otmod.h
     exr/tiio_exr.h
+    tzm/tiio_tzm.h
 )
 
 set(SOURCES
@@ -56,6 +57,7 @@ set(SOURCES
     sprite/tiio_sprite.cpp
     mesh/tiio_mesh.cpp
     exr/tiio_exr.cpp
+    tzm/tiio_tzm.cpp
 )
 
 

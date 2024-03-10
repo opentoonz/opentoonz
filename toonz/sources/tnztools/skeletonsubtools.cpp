@@ -254,7 +254,7 @@ void DragRotationTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &) {
 //
 //------------------------------------------------------------
 
-ParentChangeTool::ParentChangeTool(SkeletonTool *tool, TTool::Viewer *viewer)
+ParentChangeTool::ParentChangeTool(SkeletonTool *tool, TToolViewer *viewer)
     : DragTool(tool)
     , m_viewer(viewer)
     , m_index(-1)
@@ -730,7 +730,7 @@ public:
 //
 //------------------------------------------------------------
 
-IKTool::IKTool(SkeletonTool *tool, TTool::Viewer *viewer, Skeleton *skeleton,
+IKTool::IKTool(SkeletonTool *tool, TToolViewer *viewer, Skeleton *skeleton,
                int columnIndex)
     : DragTool(tool)
     , m_viewer(viewer)

@@ -738,6 +738,114 @@ int rootFinding(const std::vector<double> &in_poly, std::vector<double> &sol) {
 
 //-----------------------------------------------------------------------------
 
+int solveEquation2(std::complex<double> *roots, double a, double b, double c) {
+  if (isAlmostZero(a)) {
+    if (isAlmostZero(b)) return 0;
+    roots[0] = -c/b;
+    return 1;
+  }
+
+  double D = b*b - a*c*4;
+  double k = 0.5/a;
+  std::complex<double> d = D < 0
+                         ? std::complex<double>(0, sqrt(-D))
+                         : std::complex<double>(sqrt(D));
+  roots[0] = (-b - d)*k;
+  roots[1] = (-b + d)*k;
+  return 2;
+}
+
+//-----------------------------------------------------------------------------
+
+int solveEquation3(std::complex<double> *roots, double a, double b, double c, double d) {
+  if (isAlmostZero(a))
+    return solveEquation2(roots, b, c, d);
+
+  // x = y - b/(3*a)
+  // y*y*y + p*y + q = 0
+  double p = (3*a*c - b*b)/(3*a*a);
+  double q = (27*a*a*d - 9*a*b*c + 2*b*b*b)/(27*a*a*a);
+
+  double Q = p*p*p/27 + q*q/4;
+  std::complex<double> Qs = Q < 0
+                          ? std::complex<double>(0, sqrt(-Q))
+                          : std::complex<double>(sqrt(Q));
+  std::complex<double> A = pow(-q/2 + Qs, 1.0/3);
+  std::complex<double> B = pow(-q/2 - Qs, 1.0/3);
+
+  // choose complimentary B for A (A*B must be equal -p/3)
+  std::complex<double> rot(-0.5, sqrt(3.0)/2);
+  if (!isAlmostZero(A*B + p/3)) B *= rot;
+  if (!isAlmostZero(A*B + p/3)) B *= rot;
+
+  std::complex<double> Y = (A - B)*std::complex<double>(0, sqrt(3.0));
+  std::complex<double> y0 = A + B;
+  std::complex<double> y1 = (-y0 - Y)/2.0;
+  std::complex<double> y2 = (-y0 + Y)/2.0;
+
+  double dd = b/(3*a);
+  roots[0] = y0 - dd;
+  roots[1] = y1 - dd;
+  roots[2] = y2 - dd;
+  return 3;
+}
+
+//-----------------------------------------------------------------------------
+
+int solveEquation4(std::complex<double> *roots, double a, double b, double c, double d, double e) {
+  if (isAlmostZero(a))
+    return solveEquation3(roots, b, c, d, e);
+
+  // x = y - b/(4*a)
+  // y^4 + p*y^2 + q*y + r = 0
+  double dd = b/(4*a);
+  double p = (8*a*c - 3*b*b)/(8*a*a);
+  double q = (8*a*a*d - 4*a*b*c + b*b*b)/(8*a*a*a);
+  double r = (256*a*a*a*e - 64*a*a*b*d + 16*a*b*b*c - 3*b*b*b*b)/(256*a*a*a*a);
+
+  if (isAlmostZero(q)) {
+    // biquadratic equation
+    // y^4 + p*y^2 + r = 0
+    // handling this special case will give us more accurate results
+    std::complex<double> y[2];
+    solveEquation2(y, 1, p, r);
+    y[0] = sqrt(y[0]);
+    y[1] = sqrt(y[1]);
+    roots[0] = -y[0] - dd;
+    roots[1] =  y[0] - dd;
+    roots[2] = -y[1] - dd;
+    roots[3] =  y[1] - dd;
+    return 4;
+  }
+
+  // solve cubic equation
+  // z*z*z + (p/2)*z*z + ((p*p - 4*r)/16)*z - q*q/64 = 0
+  double pp = p/2;
+  double qq = (p*p - 4*r)/16;
+  double rr = -q*q/64;
+  std::complex<double> z[3];
+  solveEquation3(z, 1, pp, qq, rr);
+
+  z[0] = sqrt(z[0]);
+  z[1] = sqrt(z[1]);
+  z[2] = sqrt(z[2]);
+
+  // we need to find signs combination where following is valid:
+  // (+-z0)*(+-z1)*(+-z2) = -q/8
+  // magnitudes are always equals, we need to check signs only
+  std::complex<double> zzz = z[0]*z[1]*z[2];
+  if ((zzz.real() > 0) == (q > 0))
+    z[0] = -z[0];
+
+  roots[0] =  z[0] - z[1] - z[2] - dd;
+  roots[1] = -z[0] + z[1] - z[2] - dd;
+  roots[2] = -z[0] - z[1] + z[2] - dd;
+  roots[3] =  z[0] + z[1] + z[2] - dd;
+  return 4;
+}
+
+//-----------------------------------------------------------------------------
+
 /*
 */
 int numberOfRootsInInterval(int order, const double *polyH, double min,

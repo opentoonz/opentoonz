@@ -171,7 +171,8 @@ protected:
 public:
   TToolUndo(TXshSimpleLevel *level, const TFrameId &frameId,
             bool createdFrame = false, bool createdLevel = false,
-            const TPaletteP &oldPalette = 0);
+            const TPaletteP &oldPalette = 0,
+            bool renumberedLevel        = TTool::m_isLevelRenumbererd);
   ~TToolUndo();
 
   virtual QString getToolName() { return QString("Tool"); }

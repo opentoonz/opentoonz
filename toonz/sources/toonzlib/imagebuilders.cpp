@@ -98,7 +98,7 @@ TImageP ImageLoader::build(int imFlags, void *extData) {
     lr->doReadPalette(false);
 
     if ((m_path.getType() == "pli") || (m_path.getType() == "svg") ||
-        (m_path.getType() == "psd"))
+        (m_path.getType() == "psd") || (m_path.getType() == "tzm"))
       lr->loadInfo();
 
     bool isTlvIcon = data->m_icon && m_path.getType() == "tlv";

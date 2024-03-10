@@ -71,8 +71,6 @@
 #include "tcg/boost/range_utility.h"
 
 // boost includes
-#include <boost/bind.hpp>
-#include <boost/bind/make_adaptable.hpp>
 #include <boost/range/adaptor/filtered.hpp>
 #include <boost/range/adaptor/transformed.hpp>
 
@@ -431,8 +429,7 @@ public:
       : GlobalKeyframeUndo(frame) {
     tcg::substitute(
         m_columns,
-        columns | ba::filtered(std::not1(boost::make_adaptable<bool, int>(
-                      boost::bind(isKeyframe, frame, _1)))));
+        columns | ba::filtered([frame](int c){ return !isKeyframe(frame, c); }));
   }
 
   void redo() const override {
@@ -506,11 +503,10 @@ public:
     };  // locals
 
     tcg::substitute(m_columns,
-                    columns | ba::filtered(boost::bind(isKeyframe, frame, _1)));
+                    columns | ba::filtered([frame](int c){ return isKeyframe(frame, c); }));
 
     tcg::substitute(m_keyframes,
-                    m_columns | ba::transformed(boost::bind(locals::getKeyframe,
-                                                            frame, _1)));
+                    m_columns | ba::transformed([frame](int c){ return locals::getKeyframe(frame, c); }));
   }
 
   void redo() const override {

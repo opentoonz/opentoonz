@@ -13,7 +13,6 @@
 #include "menubarcommandids.h"
 #include "onionskinmaskgui.h"
 #include "ruler.h"
-#include "viewerpane.h"
 #include "locatorpopup.h"
 #include "cellselection.h"
 #include "styleshortcutswitchablepanel.h"
@@ -358,6 +357,7 @@ void SceneViewer::tabletEvent(QTabletEvent *e) {
       break;
     }
 #endif
+
     QPointF curPos = e->posF() * getDevPixRatio();
 #if defined(_WIN32) && QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
     // Use the application attribute Qt::AA_CompressTabletEvents instead of the
@@ -408,7 +408,6 @@ void SceneViewer::tabletEvent(QTabletEvent *e) {
   default:
     break;
   }
-  e->accept();
 }
 
 //-----------------------------------------------------------------------------
@@ -490,6 +489,10 @@ void SceneViewer::mouseMoveEvent(QMouseEvent *event) {
   if (m_gestureActive && m_touchDevice == QTouchDevice::TouchScreen) {
     return;
   }
+  // Strangely, mouseMoveEvent seems to be called once just after releasing
+  // tablet. This condition avoids to proceed further in such case.
+  if (event->buttons() != Qt::NoButton && m_mouseButton == Qt::NoButton) return;
+
   // there are three cases to come here :
   // 1. on mouse is moved (no tablet is used)
   // 2. on tablet is moved, with middle or right button is pressed
@@ -523,8 +526,12 @@ void SceneViewer::onMove(const TMouseEvent &event) {
   m_lastMousePos  = curPos;
 
   if (m_editPreviewSubCamera) {
-    if (!PreviewSubCameraManager::instance()->mouseMoveEvent(this, event))
+    if (!PreviewSubCameraManager::instance()->mouseMoveEvent(this, event)) {
+      if (m_tabletEvent && m_tabletState == StartStroke && m_tabletMove) {
+        m_tabletState = OnStroke;
+      }
       return;
+    }
   }
 
   // if the "compare with snapshot" mode is activated, change the mouse cursor
@@ -617,7 +624,7 @@ void SceneViewer::onMove(const TMouseEvent &event) {
     }
 
     TObjectHandle *objHandle = TApp::instance()->getCurrentObject();
-    if (tool->getToolType() & TTool::LevelTool && !objHandle->isSpline()) {
+    if ((tool->getToolType() & TTool::LevelTool) && !objHandle->isSpline()) {
       pos.x /= m_dpiScale.x;
       pos.y /= m_dpiScale.y;
     }
@@ -648,6 +655,18 @@ void SceneViewer::onMove(const TMouseEvent &event) {
     }
     if (!cursorSet) setToolCursor(this, tool->getCursorId());
 
+    if ( m_toolHasAssistants
+      && (tool->getToolHints() & TTool::HintAssistantsGuidelines)
+      && !areAlmostEqual(m_toolPos, pos) )
+        invalidateAll();
+    
+    if ( m_toolReplicatedPoints.size() > 1
+      && (tool->getToolHints() & TTool::HintReplicatorsPoints)
+      && !areAlmostEqual(m_toolPos, pos) )
+        invalidateAll();
+
+    m_toolPos = pos;
+    
 #ifdef WITH_CANON
     if (StopMotion::instance()->m_canon->m_pickLiveViewZoom)
       setToolCursor(this, ToolCursor::ZoomCursor);
@@ -740,8 +759,11 @@ void SceneViewer::onPress(const TMouseEvent &event) {
       m_mouseButton == Qt::LeftButton)
     return;
   else if (m_mouseButton == Qt::LeftButton && m_editPreviewSubCamera) {
-    if (!PreviewSubCameraManager::instance()->mousePressEvent(this, event))
+    if (!PreviewSubCameraManager::instance()->mousePressEvent(this, event)) {
+      if (m_tabletEvent && m_tabletState == Touched)
+        m_tabletState = StartStroke;
       return;
+    }
   } else if (m_mouseButton == Qt::LeftButton && m_visualSettings.m_doCompare) {
     if (std::abs(m_pos.x() - width() * m_compareSettings.m_compareX) < 20) {
       m_compareSettings.m_dragCompareX = true;
@@ -789,7 +811,7 @@ void SceneViewer::onPress(const TMouseEvent &event) {
   TPointD pos = tool->getMatrix().inv() * winToWorld(m_pos);
 
   TObjectHandle *objHandle = TApp::instance()->getCurrentObject();
-  if (tool->getToolType() & TTool::LevelTool && !objHandle->isSpline()) {
+  if ((tool->getToolType() & TTool::LevelTool) && !objHandle->isSpline()) {
     pos.x /= m_dpiScale.x;
     pos.y /= m_dpiScale.y;
   }
@@ -805,11 +827,13 @@ void SceneViewer::onPress(const TMouseEvent &event) {
   // separate tablet and mouse events
   if (m_tabletEvent && m_tabletState == Touched) {
     TApp::instance()->getCurrentTool()->setToolBusy(true);
+    tool->setCanUndo(false);
     m_tabletState = StartStroke;
     tool->leftButtonDown(pos, event);
   } else if (m_mouseButton == Qt::LeftButton) {
     m_mouseState = StartStroke;
     TApp::instance()->getCurrentTool()->setToolBusy(true);
+    tool->setCanUndo(false);
     tool->leftButtonDown(pos, event);
   }
   if (m_mouseButton == Qt::RightButton) tool->rightButtonDown(pos, event);
@@ -894,7 +918,7 @@ void SceneViewer::onRelease(const TMouseEvent &event) {
                   winToWorld(event.mousePos() * getDevPixRatio());
 
     TObjectHandle *objHandle = TApp::instance()->getCurrentObject();
-    if (tool->getToolType() & TTool::LevelTool && !objHandle->isSpline()) {
+    if ((tool->getToolType() & TTool::LevelTool) && !objHandle->isSpline()) {
       pos.x /= m_dpiScale.x;
       pos.y /= m_dpiScale.y;
     }
@@ -902,6 +926,7 @@ void SceneViewer::onRelease(const TMouseEvent &event) {
     if (m_mouseButton == Qt::LeftButton || m_tabletState == Released) {
       if (!m_toolSwitched) tool->leftButtonUp(pos, event);
       TApp::instance()->getCurrentTool()->setToolBusy(false);
+      tool->setCanUndo(true);
     }
   }
 
@@ -1490,7 +1515,7 @@ void SceneViewer::keyPressEvent(QKeyEvent *event) {
       TPointD pos = tool->getMatrix().inv() * winToWorld(m_lastMousePos);
 
       TObjectHandle *objHandle = TApp::instance()->getCurrentObject();
-      if (tool->getToolType() & TTool::LevelTool && !objHandle->isSpline()) {
+      if ((tool->getToolType() & TTool::LevelTool) && !objHandle->isSpline()) {
         pos.x /= m_dpiScale.x;
         pos.y /= m_dpiScale.y;
       }
@@ -1577,7 +1602,7 @@ void SceneViewer::keyReleaseEvent(QKeyEvent *event) {
     TPointD pos = tool->getMatrix().inv() * winToWorld(m_lastMousePos);
 
     TObjectHandle *objHandle = TApp::instance()->getCurrentObject();
-    if (tool->getToolType() & TTool::LevelTool && !objHandle->isSpline()) {
+    if ((tool->getToolType() & TTool::LevelTool) && !objHandle->isSpline()) {
       pos.x /= m_dpiScale.x;
       pos.y /= m_dpiScale.y;
     }
@@ -1621,7 +1646,7 @@ void SceneViewer::mouseDoubleClickEvent(QMouseEvent *event) {
   TPointD pos =
       tool->getMatrix().inv() * winToWorld(event->pos() * getDevPixRatio());
   TObjectHandle *objHandle = TApp::instance()->getCurrentObject();
-  if (tool->getToolType() & TTool::LevelTool && !objHandle->isSpline()) {
+  if ((tool->getToolType() & TTool::LevelTool) && !objHandle->isSpline()) {
     pos.x /= m_dpiScale.x;
     pos.y /= m_dpiScale.y;
   }
