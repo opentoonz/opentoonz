@@ -486,6 +486,11 @@
         <source>White</source>
         <translation>白</translation>
     </message>
+    <message>
+        <source>Custom Texture</source>
+        <comment>TextureStyleChooserPage</comment>
+        <translation>カスタムテクスチャ</translation>
+    </message>
 </context>
 <context>
     <name>TScriptBinding::CenterlineVectorizer</name>

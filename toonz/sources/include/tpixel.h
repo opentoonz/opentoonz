@@ -140,6 +140,7 @@ dithering
   static const TPixelRGBM32 Yellow;
   static const TPixelRGBM32 Cyan;
   static const TPixelRGBM32 Magenta;
+  static const TPixelRGBM32 Gray;
   static const TPixelRGBM32 White;
   static const TPixelRGBM32 Black;
   static const TPixelRGBM32 Transparent;
@@ -177,7 +178,7 @@ undefined machine order !!!!
   TPixelRGBM64(int rr, int gg, int bb, int mm = maxChannelValue)
       : r(rr), g(gg), b(bb), m(mm){};
 #else
-#if defined(LINUX) || defined(FREEBSD) || defined(MACOSX)
+#if defined(LINUX) || defined(FREEBSD) || defined(MACOSX) || defined(HAIKU)
 
 #ifdef powerpc
 
@@ -239,6 +240,7 @@ static inline TPixelRGBM64 from(const TPixelD &pix);
   static const TPixelRGBM64 Yellow;
   static const TPixelRGBM64 Cyan;
   static const TPixelRGBM64 Magenta;
+  static const TPixelRGBM64 Gray;
   static const TPixelRGBM64 White;
   static const TPixelRGBM64 Black;
   static const TPixelRGBM64 Transparent;
@@ -312,6 +314,7 @@ static inline TPixelD from(const TPixelD &pix) {return pix;};
   static const TPixelD Yellow;
   static const TPixelD Cyan;
   static const TPixelD Magenta;
+  static const TPixelD Gray;
   static const TPixelD White;
   static const TPixelD Black;
   static const TPixelD Transparent;

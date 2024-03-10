@@ -1,5 +1,5 @@
 
-
+#include "geometrictool.h"
 #include "toonz/tpalettehandle.h"
 #include "tools/toolhandle.h"
 #include "tools/toolcommandids.h"
@@ -30,6 +30,11 @@
 #include "toonz/preferences.h"
 #include "historytypes.h"
 #include "toonzvectorbrushtool.h"
+#include "tcurveutil.h"
+
+#include "tpixelutils.h"
+#include "toonz/mypaintbrushstyle.h"
+#include "toonz/ttilesaver.h"
 
 // For Qt translation support
 #include <QCoreApplication>
@@ -73,6 +78,100 @@ TEnv::IntVar GeometricSnapSensitivity("InknpaintGeometricSnapSensitivity", 0);
 const double SNAPPING_LOW    = 5.0;
 const double SNAPPING_MEDIUM = 25.0;
 const double SNAPPING_HIGH   = 100.0;
+
+//----------------------------------------------------------------------------------
+
+namespace {
+
+//-----------------------------------------------------------------------------
+class FullColorMyPaintGeometryUndo final
+    : public ToolUtils::TFullColorRasterUndo {
+  TPoint m_offset;
+  QString m_id;
+
+public:
+  FullColorMyPaintGeometryUndo(TTileSetFullColor *tileSet,
+                               TXshSimpleLevel *level, const TFrameId &frameId,
+                               bool isFrameCreated, const TRasterP &ras,
+                               const TPoint &offset)
+      : ToolUtils::TFullColorRasterUndo(tileSet, level, frameId, isFrameCreated,
+                                        false, 0)
+      , m_offset(offset) {
+    static int counter = 0;
+
+    m_id = QString("FullColorMyPaintGeometryUndo") + QString::number(counter++);
+    TImageCache::instance()->add(m_id.toStdString(), TRasterImageP(ras));
+  }
+
+  ~FullColorMyPaintGeometryUndo() { TImageCache::instance()->remove(m_id); }
+
+  void redo() const override {
+    insertLevelAndFrameIfNeeded();
+
+    TRasterImageP image = getImage();
+    TRasterP ras        = image->getRaster();
+
+    TRasterImageP srcImg =
+        TImageCache::instance()->get(m_id.toStdString(), false);
+    ras->copy(srcImg->getRaster(), m_offset);
+
+    TTool::getApplication()->getCurrentXsheet()->notifyXsheetChanged();
+    notifyImageChanged();
+  }
+
+  int getSize() const override {
+    return sizeof(*this) + ToolUtils::TFullColorRasterUndo::getSize();
+  }
+
+  QString getToolName() override { return QString("Geometric Tool"); }
+  int getHistoryType() override { return HistoryType::GeometricTool; }
+};
+
+//-----------------------------------------------------------------------------
+class CMappedMyPaintGeometryUndo final : public TRasterUndo {
+  TPoint m_offset;
+  QString m_id;
+
+public:
+  CMappedMyPaintGeometryUndo(TTileSetCM32 *tileSet, TXshSimpleLevel *level,
+                             const TFrameId &frameId, bool isFrameCreated,
+                             bool isLevelCreated, const TRasterCM32P &ras,
+                             const TPoint &offset)
+      : TRasterUndo(tileSet, level, frameId, isFrameCreated, isLevelCreated, 0)
+      , m_offset(offset) {
+    static int counter = 0;
+    m_id = QString("CMappedMyPaintGeometryUndo") + QString::number(counter++);
+    TImageCache::instance()->add(m_id.toStdString(),
+                                 TToonzImageP(ras, TRect(ras->getSize())));
+  }
+
+  ~CMappedMyPaintGeometryUndo() { TImageCache::instance()->remove(m_id); }
+
+  void redo() const override {
+    insertLevelAndFrameIfNeeded();
+
+    TToonzImageP image = getImage();
+    TRasterCM32P ras   = image->getRaster();
+
+    TImageP srcImg =
+        TImageCache::instance()->get(m_id.toStdString(), false)->cloneImage();
+    TToonzImageP tSrcImg = srcImg;
+    assert(tSrcImg);
+    ras->copy(tSrcImg->getRaster(), m_offset);
+    ToolUtils::updateSaveBox();
+    TTool::getApplication()->getCurrentXsheet()->notifyXsheetChanged();
+    notifyImageChanged();
+  }
+
+  int getSize() const override {
+    return sizeof(*this) + TRasterUndo::getSize();
+  }
+
+  QString getToolName() override { return QString("Geometric Tool"); }
+  int getHistoryType() override { return HistoryType::GeometricTool; }
+};
+//-----------------------------------------------------------------------------
+}  // namespace
 
 //=============================================================================
 // Utility Functions
@@ -367,154 +466,130 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class PrimitiveParam {
-  Q_DECLARE_TR_FUNCTIONS(PrimitiveParam)
-
-public:
-  TDoubleProperty m_toolSize;
-  TIntProperty m_rasterToolSize;
-  TDoubleProperty m_opacity;
-  TDoubleProperty m_hardness;
-  TEnumProperty m_type;
-  TIntProperty m_edgeCount;
-  TBoolProperty m_rotate;
-  TBoolProperty m_autogroup;
-  TBoolProperty m_autofill;
-  TBoolProperty m_smooth;
-  TBoolProperty m_selective;
-  TBoolProperty m_pencil;
-  TEnumProperty m_capStyle;
-  TEnumProperty m_joinStyle;
-  TIntProperty m_miterJoinLimit;
-  TBoolProperty m_snap;
-  TEnumProperty m_snapSensitivity;
-  TPropertyGroup m_prop[2];
-
-  int m_targetType;
-
-  // for snapping
-  int m_strokeIndex1;
-  double m_w1, m_pixelSize, m_currThickness, m_minDistance2;
-  bool m_foundSnap = false;
-  TPointD m_snapPoint;
-
-  PrimitiveParam(int targetType)
-      : m_type("Shape:")  // "W_ToolOptions_ShapeType")
-      , m_toolSize("Size:", 0, 100,
-                   1)  // "W_ToolOptions_ShapeThickness", 0,30,1)
-      , m_rasterToolSize("Size:", 1, 100, 1)
-      , m_opacity("Opacity:", 0, 100, 100)
-      , m_hardness("Hardness:", 0, 100, 100)
-      , m_edgeCount("Polygon Sides:", 3, 15, 3)
-      , m_rotate("rotate", false)
-      , m_autogroup("Auto Group", false)
-      , m_autofill("Auto Fill", false)
-      , m_smooth("Smooth", false)
-      , m_selective("Selective", false)
-      , m_pencil("Pencil Mode", false)
-      , m_capStyle("Cap")
-      , m_joinStyle("Join")
-      , m_miterJoinLimit("Miter:", 0, 100, 4)
-      , m_snap("Snap", false)
-      , m_snapSensitivity("Sensitivity:")
-      , m_targetType(targetType) {
-    if (targetType & TTool::Vectors) m_prop[0].bind(m_toolSize);
-    if (targetType & TTool::ToonzImage || targetType & TTool::RasterImage) {
-      m_prop[0].bind(m_rasterToolSize);
-      m_prop[0].bind(m_hardness);
-    }
-    if (targetType & TTool::RasterImage) m_prop[0].bind(m_opacity);
-    m_prop[0].bind(m_type);
-
-    m_prop[0].bind(m_edgeCount);
-    m_prop[0].bind(m_rotate);
-    if (targetType & TTool::Vectors) {
-      m_prop[0].bind(m_autogroup);
-      m_prop[0].bind(m_autofill);
-      m_prop[0].bind(m_snap);
-      m_snap.setId("Snap");
-      m_prop[0].bind(m_snapSensitivity);
-      m_snapSensitivity.addValue(LOW_WSTR);
-      m_snapSensitivity.addValue(MEDIUM_WSTR);
-      m_snapSensitivity.addValue(HIGH_WSTR);
-      m_snapSensitivity.setId("SnapSensitivity");
-    }
-    if (targetType & TTool::ToonzImage) {
-      m_prop[0].bind(m_selective);
-      m_prop[0].bind(m_pencil);
-      m_pencil.setId("PencilMode");
-    }
-    m_prop[0].bind(m_smooth);
-
-    m_capStyle.addValue(BUTT_WSTR, QString::fromStdWString(BUTT_WSTR));
-    m_capStyle.addValue(ROUNDC_WSTR, QString::fromStdWString(ROUNDC_WSTR));
-    m_capStyle.addValue(PROJECTING_WSTR,
-                        QString::fromStdWString(PROJECTING_WSTR));
-    m_capStyle.setId("Cap");
-
-    m_joinStyle.addValue(MITER_WSTR, QString::fromStdWString(MITER_WSTR));
-    m_joinStyle.addValue(ROUNDJ_WSTR, QString::fromStdWString(ROUNDJ_WSTR));
-    m_joinStyle.addValue(BEVEL_WSTR, QString::fromStdWString(BEVEL_WSTR));
-    m_joinStyle.setId("Join");
-
-    m_miterJoinLimit.setId("Miter");
-
-    m_prop[1].bind(m_capStyle);
-    m_prop[1].bind(m_joinStyle);
-    m_prop[1].bind(m_miterJoinLimit);
-
-    m_selective.setId("Selective");
-    m_rotate.setId("Rotate");
-    m_autogroup.setId("AutoGroup");
-    m_autofill.setId("Autofill");
-    m_smooth.setId("Smooth");
-    m_type.setId("GeometricShape");
-    m_edgeCount.setId("GeometricEdge");
+PrimitiveParam::PrimitiveParam(int targetType)
+    : m_type("Shape:")  // "W_ToolOptions_ShapeType")
+    , m_toolSize("Size:", 0, 100,
+                 1)  // "W_ToolOptions_ShapeThickness", 0,30,1)
+    , m_rasterToolSize("Size:", 1, 100, 1)
+    , m_opacity("Opacity:", 0, 100, 100)
+    , m_hardness("Hardness:", 0, 100, 100)
+    , m_edgeCount("Polygon Sides:", 3, 15, 3)
+    , m_rotate("rotate", false)
+    , m_autogroup("Auto Group", false)
+    , m_autofill("Auto Fill", false)
+    , m_smooth("Smooth", false)
+    , m_selective("Selective", false)
+    , m_pencil("Pencil Mode", false)
+    , m_capStyle("Cap")
+    , m_joinStyle("Join")
+    , m_miterJoinLimit("Miter:", 0, 100, 4)
+    , m_snap("Snap", false)
+    , m_snapSensitivity("Sensitivity:")
+    , m_modifierSize("ModifierSize", -3, 3, 0, true)
+    , m_modifierOpacity("ModifierOpacity", 0, 100, 100, true)
+    , m_targetType(targetType) {
+  if (targetType & TTool::Vectors) m_prop[0].bind(m_toolSize);
+  if (targetType & TTool::ToonzImage || targetType & TTool::RasterImage) {
+    m_prop[0].bind(m_rasterToolSize);
+    m_prop[0].bind(m_hardness);
+    m_prop[0].bind(m_modifierSize);
   }
-
-  void updateTranslation() {
-    m_type.setQStringName(tr("Shape:"));
-    m_type.setItemUIName(L"Rectangle", tr("Rectangle"));
-    m_type.setItemUIName(L"Circle", tr("Circle"));
-    m_type.setItemUIName(L"Ellipse", tr("Ellipse"));
-    m_type.setItemUIName(L"Line", tr("Line"));
-    m_type.setItemUIName(L"Polyline", tr("Polyline"));
-    m_type.setItemUIName(L"Arc", tr("Arc"));
-    m_type.setItemUIName(L"MultiArc", tr("MultiArc"));
-    m_type.setItemUIName(L"Polygon", tr("Polygon"));
-
-    m_toolSize.setQStringName(tr("Size:"));
-    m_rasterToolSize.setQStringName(tr("Thickness:"));
-    m_opacity.setQStringName(tr("Opacity:"));
-    m_hardness.setQStringName(tr("Hardness:"));
-    m_edgeCount.setQStringName(tr("Polygon Sides:"));
-    m_rotate.setQStringName(tr("Rotate"));
-    m_autogroup.setQStringName(tr("Auto Group"));
-    m_autofill.setQStringName(tr("Auto Fill"));
-    m_smooth.setQStringName(tr("Smooth"));
-    m_selective.setQStringName(tr("Selective"));
-    m_pencil.setQStringName(tr("Pencil Mode"));
-
-    m_capStyle.setQStringName(tr("Cap"));
-    m_capStyle.setItemUIName(BUTT_WSTR, tr("Butt cap"));
-    m_capStyle.setItemUIName(ROUNDC_WSTR, tr("Round cap"));
-    m_capStyle.setItemUIName(PROJECTING_WSTR, tr("Projecting cap"));
-
-    m_joinStyle.setQStringName(tr("Join"));
-    m_joinStyle.setItemUIName(MITER_WSTR, tr("Miter join"));
-    m_joinStyle.setItemUIName(ROUNDJ_WSTR, tr("Round join"));
-    m_joinStyle.setItemUIName(BEVEL_WSTR, tr("Bevel join"));
-
-    m_miterJoinLimit.setQStringName(tr("Miter:"));
-    m_snap.setQStringName(tr("Snap"));
-    m_snapSensitivity.setQStringName(tr(""));
-    if (m_targetType & TTool::Vectors) {
-      m_snapSensitivity.setItemUIName(LOW_WSTR, tr("Low"));
-      m_snapSensitivity.setItemUIName(MEDIUM_WSTR, tr("Med"));
-      m_snapSensitivity.setItemUIName(HIGH_WSTR, tr("High"));
-    }
+  if (targetType & TTool::RasterImage) {
+    m_prop[0].bind(m_opacity);
+    m_prop[0].bind(m_modifierOpacity);
   }
-};
+  m_prop[0].bind(m_type);
+
+  m_prop[0].bind(m_edgeCount);
+  m_prop[0].bind(m_rotate);
+  if (targetType & TTool::Vectors) {
+    m_prop[0].bind(m_autogroup);
+    m_prop[0].bind(m_autofill);
+    m_prop[0].bind(m_snap);
+    m_snap.setId("Snap");
+    m_prop[0].bind(m_snapSensitivity);
+    m_snapSensitivity.addValue(LOW_WSTR);
+    m_snapSensitivity.addValue(MEDIUM_WSTR);
+    m_snapSensitivity.addValue(HIGH_WSTR);
+    m_snapSensitivity.setId("SnapSensitivity");
+  }
+  if (targetType & TTool::ToonzImage) {
+    m_prop[0].bind(m_selective);
+    m_prop[0].bind(m_pencil);
+    m_pencil.setId("PencilMode");
+  }
+  m_prop[0].bind(m_smooth);
+
+  m_capStyle.addValue(BUTT_WSTR, QString::fromStdWString(BUTT_WSTR));
+  m_capStyle.addValue(ROUNDC_WSTR, QString::fromStdWString(ROUNDC_WSTR));
+  m_capStyle.addValue(PROJECTING_WSTR,
+                      QString::fromStdWString(PROJECTING_WSTR));
+  m_capStyle.setId("Cap");
+
+  m_joinStyle.addValue(MITER_WSTR, QString::fromStdWString(MITER_WSTR));
+  m_joinStyle.addValue(ROUNDJ_WSTR, QString::fromStdWString(ROUNDJ_WSTR));
+  m_joinStyle.addValue(BEVEL_WSTR, QString::fromStdWString(BEVEL_WSTR));
+  m_joinStyle.setId("Join");
+
+  m_miterJoinLimit.setId("Miter");
+
+  m_prop[1].bind(m_capStyle);
+  m_prop[1].bind(m_joinStyle);
+  m_prop[1].bind(m_miterJoinLimit);
+
+  m_selective.setId("Selective");
+  m_rotate.setId("Rotate");
+  m_autogroup.setId("AutoGroup");
+  m_autofill.setId("Autofill");
+  m_smooth.setId("Smooth");
+  m_type.setId("GeometricShape");
+  m_edgeCount.setId("GeometricEdge");
+}
+
+void PrimitiveParam::updateTranslation() {
+  m_type.setQStringName(tr("Shape:"));
+  m_type.setItemUIName(L"Rectangle", tr("Rectangle"));
+  m_type.setItemUIName(L"Circle", tr("Circle"));
+  m_type.setItemUIName(L"Ellipse", tr("Ellipse"));
+  m_type.setItemUIName(L"Line", tr("Line"));
+  m_type.setItemUIName(L"Polyline", tr("Polyline"));
+  m_type.setItemUIName(L"Arc", tr("Arc"));
+  m_type.setItemUIName(L"MultiArc", tr("MultiArc"));
+  m_type.setItemUIName(L"Polygon", tr("Polygon"));
+
+  m_toolSize.setQStringName(tr("Size:"));
+  m_rasterToolSize.setQStringName(tr("Thickness:"));
+  m_opacity.setQStringName(tr("Opacity:"));
+  m_hardness.setQStringName(tr("Hardness:"));
+  m_edgeCount.setQStringName(tr("Polygon Sides:"));
+  m_rotate.setQStringName(tr("Rotate"));
+  m_autogroup.setQStringName(tr("Auto Group"));
+  m_autofill.setQStringName(tr("Auto Fill"));
+  m_smooth.setQStringName(tr("Smooth"));
+  m_selective.setQStringName(tr("Selective"));
+  m_pencil.setQStringName(tr("Pencil Mode"));
+  m_modifierSize.setQStringName(tr("Size"));
+  m_modifierOpacity.setQStringName(tr("Opacity"));
+
+  m_capStyle.setQStringName(tr("Cap"));
+  m_capStyle.setItemUIName(BUTT_WSTR, tr("Butt cap"));
+  m_capStyle.setItemUIName(ROUNDC_WSTR, tr("Round cap"));
+  m_capStyle.setItemUIName(PROJECTING_WSTR, tr("Projecting cap"));
+
+  m_joinStyle.setQStringName(tr("Join"));
+  m_joinStyle.setItemUIName(MITER_WSTR, tr("Miter join"));
+  m_joinStyle.setItemUIName(ROUNDJ_WSTR, tr("Round join"));
+  m_joinStyle.setItemUIName(BEVEL_WSTR, tr("Bevel join"));
+
+  m_miterJoinLimit.setQStringName(tr("Miter:"));
+  m_snap.setQStringName(tr("Snap"));
+  m_snapSensitivity.setQStringName(tr(""));
+  if (m_targetType & TTool::Vectors) {
+    m_snapSensitivity.setItemUIName(LOW_WSTR, tr("Low"));
+    m_snapSensitivity.setItemUIName(MEDIUM_WSTR, tr("Med"));
+    m_snapSensitivity.setItemUIName(HIGH_WSTR, tr("High"));
+  }
+}
 
 //=============================================================================
 // Abstract Class Primitive
@@ -967,366 +1042,243 @@ public:
 //=============================================================================
 // Geometric Tool
 //-----------------------------------------------------------------------------
+GeometricTool::GeometricTool(int targetType)
+    : TTool("T_Geometric")
+    , m_primitive(0)
+    , m_param(targetType)
+    , m_active(false)
+    , m_isRotatingOrMoving(false)
+    , m_rotatedStroke(0)
+    , m_firstTime(true)
+    , m_notifier(nullptr)
+    , m_tileSaver(nullptr)
+    , m_tileSaverCM(nullptr) {
+  bind(targetType);
+  if ((targetType & TTool::RasterImage) || (targetType & TTool::ToonzImage)) {
+    addPrimitive(new RectanglePrimitive(&m_param, this, true));
+    addPrimitive(new CirclePrimitive(&m_param, this, true));
+    addPrimitive(new EllipsePrimitive(&m_param, this, true));
+    addPrimitive(new LinePrimitive(&m_param, this, true));
+    addPrimitive(new MultiLinePrimitive(&m_param, this, true));
+    addPrimitive(new ArcPrimitive(&m_param, this, true));
+    addPrimitive(new MultiArcPrimitive(&m_param, this, true));
+    addPrimitive(new PolygonPrimitive(&m_param, this, true));
+  } else  // targetType == 1
+  {
+    // vector
+    addPrimitive(m_primitive = new RectanglePrimitive(&m_param, this, false));
+    addPrimitive(new CirclePrimitive(&m_param, this, false));
+    addPrimitive(new EllipsePrimitive(&m_param, this, false));
+    addPrimitive(new LinePrimitive(&m_param, this, false));
+    addPrimitive(new MultiLinePrimitive(&m_param, this, false));
+    addPrimitive(new ArcPrimitive(&m_param, this, false));
+    addPrimitive(new MultiArcPrimitive(&m_param, this, false));
+    addPrimitive(new PolygonPrimitive(&m_param, this, false));
+  }
+}
 
-class GeometricTool final : public TTool {
-protected:
-  Primitive *m_primitive;
-  std::map<std::wstring, Primitive *> m_primitiveTable;
-  PrimitiveParam m_param;
-  std::wstring m_typeCode;
-  bool m_active;
-  bool m_firstTime;
+//--------------------------------------------------------------------------------------------------
+GeometricTool::~GeometricTool() {
+  delete m_rotatedStroke;
+  std::map<std::wstring, Primitive *>::iterator it;
+  for (it = m_primitiveTable.begin(); it != m_primitiveTable.end(); ++it)
+    delete it->second;
+}
 
-  // for both rotation and move
-  bool m_isRotatingOrMoving;
-  bool m_wasCtrlPressed;
-  TStroke *m_rotatedStroke;
-  TPointD m_originalCursorPos;
-  TPointD m_currentCursorPos;
-  TPixel32 m_color;
+//--------------------------------------------------------------------------------------------------
+void GeometricTool::updateTranslation() { m_param.updateTranslation(); }
 
-  // for rotation
-  double m_lastRotateAngle;
-  TPointD m_rotateCenter;
+//--------------------------------------------------------------------------------------------------
+void GeometricTool::addPrimitive(Primitive *p) {
+  // TODO: aggiungere il controllo per evitare nomi ripetuti
+  std::wstring name = ::to_wstring(p->getName());
+  // wstring name = TStringTable::translate(p->getName());
 
-  // for move
-  TPointD m_lastMoveStrokePos;
+  m_primitiveTable[name] = p;
+  m_param.m_type.addValue(name);
+}
 
-public:
-  GeometricTool(int targetType)
-      : TTool("T_Geometric")
-      , m_primitive(0)
-      , m_param(targetType)
-      , m_active(false)
-      , m_isRotatingOrMoving(false)
-      , m_rotatedStroke(0)
-      , m_firstTime(true) {
-    bind(targetType);
-    if ((targetType & TTool::RasterImage) || (targetType & TTool::ToonzImage)) {
-      addPrimitive(new RectanglePrimitive(&m_param, this, true));
-      addPrimitive(new CirclePrimitive(&m_param, this, true));
-      addPrimitive(new EllipsePrimitive(&m_param, this, true));
-      addPrimitive(new LinePrimitive(&m_param, this, true));
-      addPrimitive(new MultiLinePrimitive(&m_param, this, true));
-      addPrimitive(new ArcPrimitive(&m_param, this, true));
-      addPrimitive(new MultiArcPrimitive(&m_param, this, true));
-      addPrimitive(new PolygonPrimitive(&m_param, this, true));
-    } else  // targetType == 1
-    {
-      // vector
-      addPrimitive(m_primitive = new RectanglePrimitive(&m_param, this, false));
-      addPrimitive(new CirclePrimitive(&m_param, this, false));
-      addPrimitive(new EllipsePrimitive(&m_param, this, false));
-      addPrimitive(new LinePrimitive(&m_param, this, false));
-      addPrimitive(new MultiLinePrimitive(&m_param, this, false));
-      addPrimitive(new ArcPrimitive(&m_param, this, false));
-      addPrimitive(new MultiArcPrimitive(&m_param, this, false));
-      addPrimitive(new PolygonPrimitive(&m_param, this, false));
-    }
+//--------------------------------------------------------------------------------------------------
+void GeometricTool::changeType(std::wstring name) {
+  std::map<std::wstring, Primitive *>::iterator it =
+      m_primitiveTable.find(name);
+  if (it != m_primitiveTable.end()) {
+    if (m_primitive) m_primitive->onDeactivate();
+    m_primitive = it->second;
+  }
+}
+
+//--------------------------------------------------------------------------------------------------
+bool GeometricTool::preLeftButtonDown() {
+  if (getViewer() && getViewer()->getGuidedStrokePickerMode()) return false;
+  if (getApplication()->getCurrentObject()->isSpline()) return true;
+
+  // in the halfway through the drawing of Polyline / MultiArc primitive, OT
+  // should not call touchImage or the m_frameCreated / m_levelCreated flags
+  // will be reset.
+  if (m_primitive && !m_primitive->canTouchImageOnPreLeftClick()) return true;
+  // NEEDS to be done even if(m_active), due
+  // to the HORRIBLE m_frameCreated / m_levelCreated
+  // mechanism. touchImage() is the ONLY function
+  // resetting them to false...                       >_<
+  m_active = !!touchImage();
+  return true;
+}
+
+//--------------------------------------------------------------------------------------------------
+void GeometricTool::leftButtonDown(const TPointD &p, const TMouseEvent &e) {
+  if (getViewer() && getViewer()->getGuidedStrokePickerMode()) {
+    getViewer()->doPickGuideStroke(p);
+    return;
   }
 
-  ~GeometricTool() {
-    delete m_rotatedStroke;
-    std::map<std::wstring, Primitive *>::iterator it;
-    for (it = m_primitiveTable.begin(); it != m_primitiveTable.end(); ++it)
-      delete it->second;
+  if (m_isRotatingOrMoving) {
+    addStroke();
+    return;
   }
 
-  ToolType getToolType() const override { return TTool::LevelWriteTool; }
+  if (m_primitive) m_primitive->leftButtonDown(p, e);
+  invalidate();
+}
+//--------------------------------------------------------------------------------------------------
+void GeometricTool::leftButtonDrag(const TPointD &p, const TMouseEvent &e) {
+  if (!m_active) return;
+  if (m_primitive) m_primitive->leftButtonDrag(p, e);
+  invalidate();
+}
+//--------------------------------------------------------------------------------------------------
+void GeometricTool::leftButtonUp(const TPointD &p, const TMouseEvent &e) {
+  if (!m_active) return;
+  if (m_primitive) m_primitive->leftButtonUp(p, e);
+  invalidate();
+}
+//--------------------------------------------------------------------------------------------------
+void GeometricTool::leftButtonDoubleClick(const TPointD &p,
+                                          const TMouseEvent &e) {
+  if (!m_active) return;
+  if (m_primitive) m_primitive->leftButtonDoubleClick(p, e);
+  invalidate();
+}
+//--------------------------------------------------------------------------------------------------
 
-  void updateTranslation() override { m_param.updateTranslation(); }
+bool GeometricTool::keyDown(QKeyEvent *event) {
+  return m_primitive->keyDown(event);
+}
 
-  void addPrimitive(Primitive *p) {
-    // TODO: aggiungere il controllo per evitare nomi ripetuti
-    std::wstring name = ::to_wstring(p->getName());
-    // wstring name = TStringTable::translate(p->getName());
+//--------------------------------------------------------------------------------------------------
+void GeometricTool::onImageChanged() {
+  if (m_primitive) m_primitive->onImageChanged();
 
-    m_primitiveTable[name] = p;
-    m_param.m_type.addValue(name);
-  }
+  m_isRotatingOrMoving = false;
+  delete m_rotatedStroke;
+  m_rotatedStroke = 0;
 
-  void changeType(std::wstring name) {
-    std::map<std::wstring, Primitive *>::iterator it =
-        m_primitiveTable.find(name);
-    if (it != m_primitiveTable.end()) {
-      if (m_primitive) m_primitive->onDeactivate();
-      m_primitive = it->second;
-    }
-  }
+  invalidate();
+}
 
-  bool preLeftButtonDown() override {
-    if (getViewer() && getViewer()->getGuidedStrokePickerMode()) return false;
-    if (getApplication()->getCurrentObject()->isSpline()) return true;
+//--------------------------------------------------------------------------------------------------
+void GeometricTool::onColorStyleChanged() {
+  if (m_param.m_targetType & TTool::ToonzImage ||
+      m_param.m_targetType & TTool::RasterImage)
+    getApplication()->getCurrentTool()->notifyToolChanged();
+}
 
-    // in the halfway through the drawing of Polyline / MultiArc primitive, OT
-    // should not call touchImage or the m_frameCreated / m_levelCreated flags
-    // will be reset.
-    if (m_primitive && !m_primitive->canTouchImageOnPreLeftClick()) return true;
-    // NEEDS to be done even if(m_active), due
-    // to the HORRIBLE m_frameCreated / m_levelCreated
-    // mechanism. touchImage() is the ONLY function
-    // resetting them to false...                       >_<
-    m_active = !!touchImage();
-    return true;
-  }
+//--------------------------------------------------------------------------------------------------
+void GeometricTool::rightButtonDown(const TPointD &p, const TMouseEvent &e) {
+  if (m_primitive) m_primitive->rightButtonDown(p, e);
+  invalidate();
+}
 
-  void leftButtonDown(const TPointD &p, const TMouseEvent &e) override {
-    if (getViewer() && getViewer()->getGuidedStrokePickerMode()) {
-      getViewer()->doPickGuideStroke(p);
-      return;
-    }
+//--------------------------------------------------------------------------------------------------
+void GeometricTool::mouseMove(const TPointD &p, const TMouseEvent &e) {
+  m_currentCursorPos = p;
+  if (m_isRotatingOrMoving) {
+    // move
+    if (e.isCtrlPressed()) {
+      // if ctrl wasn't pressed, it means the user has switched from
+      // rotation to move. Thus, re-initiate move-relevant variables
+      if (!m_wasCtrlPressed) {
+        m_wasCtrlPressed = true;
 
-    if (m_isRotatingOrMoving) {
-      addStroke();
-      return;
-    }
-
-    if (m_primitive) m_primitive->leftButtonDown(p, e);
-    invalidate();
-  }
-  void leftButtonDrag(const TPointD &p, const TMouseEvent &e) override {
-    if (!m_active) return;
-    if (m_primitive) m_primitive->leftButtonDrag(p, e);
-    invalidate();
-  }
-  void leftButtonUp(const TPointD &p, const TMouseEvent &e) override {
-    if (!m_active) return;
-    if (m_primitive) m_primitive->leftButtonUp(p, e);
-    invalidate();
-  }
-  void leftButtonDoubleClick(const TPointD &p, const TMouseEvent &e) override {
-    if (!m_active) return;
-    if (m_primitive) m_primitive->leftButtonDoubleClick(p, e);
-    invalidate();
-  }
-
-  bool keyDown(QKeyEvent *event) override {
-    return m_primitive->keyDown(event);
-  }
-
-  void onImageChanged() override {
-    if (m_primitive) m_primitive->onImageChanged();
-
-    m_isRotatingOrMoving = false;
-    delete m_rotatedStroke;
-    m_rotatedStroke = 0;
-
-    invalidate();
-  }
-
-  void rightButtonDown(const TPointD &p, const TMouseEvent &e) override {
-    if (m_primitive) m_primitive->rightButtonDown(p, e);
-    invalidate();
-  }
-
-  void mouseMove(const TPointD &p, const TMouseEvent &e) override {
-    m_currentCursorPos = p;
-    if (m_isRotatingOrMoving) {
-      // move
-      if (e.isCtrlPressed()) {
-        // if ctrl wasn't pressed, it means the user has switched from
-        // rotation to move. Thus, re-initiate move-relevant variables
-        if (!m_wasCtrlPressed) {
-          m_wasCtrlPressed = true;
-
-          m_originalCursorPos = m_currentCursorPos;
-          m_lastMoveStrokePos = TPointD(0, 0);
-        }
-
-        // move the stroke to the original location
-        double x = -m_lastMoveStrokePos.x;
-        double y = -m_lastMoveStrokePos.y;
-        m_rotatedStroke->transform(TTranslation(x, y));
-
-        // move the stroke according to current mouse position
-        double dx           = m_currentCursorPos.x - m_originalCursorPos.x;
-        double dy           = m_currentCursorPos.y - m_originalCursorPos.y;
-        m_lastMoveStrokePos = TPointD(dx, dy);
-        m_rotatedStroke->transform(TTranslation(dx, dy));
-        invalidate();
-        return;
-      }
-
-      // if ctrl was pressed, it means the user has switched from
-      // move to rotation. Thus, re-initiate rotation-relevant variables
-      if (m_wasCtrlPressed) {
-        m_wasCtrlPressed = false;
-
-        m_lastRotateAngle   = 0;
         m_originalCursorPos = m_currentCursorPos;
-        TRectD bbox         = m_rotatedStroke->getBBox();
-        m_rotateCenter      = 0.5 * (bbox.getP11() + bbox.getP00());
+        m_lastMoveStrokePos = TPointD(0, 0);
       }
 
-      // rotate
-      // first, rotate the stroke back to original
-      m_rotatedStroke->transform(TRotation(m_rotateCenter, -m_lastRotateAngle));
+      // move the stroke to the original location
+      double x = -m_lastMoveStrokePos.x;
+      double y = -m_lastMoveStrokePos.y;
+      m_rotatedStroke->transform(TTranslation(x, y));
 
-      // then, rotate it according to mouse position
-      // this formula is from: https://stackoverflow.com/a/31334882
-      TPointD center = m_rotateCenter;
-      TPointD org    = m_originalCursorPos;
-      TPointD cur    = m_currentCursorPos;
-      double angle1  = atan2(cur.y - center.y, cur.x - center.x);
-      double angle2  = atan2(org.y - center.y, org.x - center.x);
-      double angle   = (angle1 - angle2) * 180 / 3.14;
-      if (e.isShiftPressed()) {
-        angle = ((int)angle / 45) * 45;
-      }
-      m_rotatedStroke->transform(TRotation(m_rotateCenter, angle));
-      m_lastRotateAngle = angle;
+      // move the stroke according to current mouse position
+      double dx           = m_currentCursorPos.x - m_originalCursorPos.x;
+      double dy           = m_currentCursorPos.y - m_originalCursorPos.y;
+      m_lastMoveStrokePos = TPointD(dx, dy);
+      m_rotatedStroke->transform(TTranslation(dx, dy));
       invalidate();
       return;
     }
 
-    if (m_primitive) m_primitive->mouseMove(p, e);
-  }
+    // if ctrl was pressed, it means the user has switched from
+    // move to rotation. Thus, re-initiate rotation-relevant variables
+    if (m_wasCtrlPressed) {
+      m_wasCtrlPressed = false;
 
-  void onActivate() override {
-    if (m_firstTime) {
-      m_param.m_toolSize.setValue(GeometricSize);
-      m_param.m_rasterToolSize.setValue(GeometricRasterSize);
-      m_param.m_opacity.setValue(GeometricOpacity);
-      m_param.m_hardness.setValue(GeometricBrushHardness);
-      m_param.m_selective.setValue(GeometricSelective ? 1 : 0);
-      m_param.m_rotate.setValue(GeometricRotate ? 1 : 0);
-      m_param.m_autogroup.setValue(GeometricGroupIt ? 1 : 0);
-      m_param.m_smooth.setValue(GeometricSmooth ? 1 : 0);
-      m_param.m_autofill.setValue(GeometricAutofill ? 1 : 0);
-      std::wstring typeCode = ::to_wstring(GeometricType.getValue());
-      m_param.m_type.setValue(typeCode);
-      GeometricType = ::to_string(typeCode);
-      m_typeCode    = typeCode;
-      changeType(typeCode);
-      m_param.m_edgeCount.setValue(GeometricEdgeCount);
-      m_param.m_pencil.setValue(GeometricPencil ? 1 : 0);
-      m_param.m_capStyle.setIndex(GeometricCapStyle);
-      m_param.m_joinStyle.setIndex(GeometricJoinStyle);
-      m_param.m_miterJoinLimit.setValue(GeometricMiterValue);
-      m_firstTime = false;
-      m_param.m_snap.setValue(GeometricSnap);
-      if (m_targetType & TTool::Vectors) {
-        m_param.m_snapSensitivity.setIndex(GeometricSnapSensitivity);
-        switch (GeometricSnapSensitivity) {
-        case 0:
-          m_param.m_minDistance2 = SNAPPING_LOW;
-          break;
-        case 1:
-          m_param.m_minDistance2 = SNAPPING_MEDIUM;
-          break;
-        case 2:
-          m_param.m_minDistance2 = SNAPPING_HIGH;
-          break;
-        }
-      }
+      m_lastRotateAngle   = 0;
+      m_originalCursorPos = m_currentCursorPos;
+      TRectD bbox         = m_rotatedStroke->getBBox();
+      m_rotateCenter      = 0.5 * (bbox.getP11() + bbox.getP00());
     }
-    m_primitive->resetSnap();
-    /*--
-       ショートカットでいきなりスタート（＝onEnterを通らない場合）のとき、
-            LineToolが反応しないことがある対策 --*/
-    m_active = (getImage(false) != 0 ||
-                Preferences::instance()->isAutoCreateEnabled());
 
-    if (m_primitive) m_primitive->onActivate();
-  }
+    // rotate
+    // first, rotate the stroke back to original
+    m_rotatedStroke->transform(TRotation(m_rotateCenter, -m_lastRotateAngle));
 
-  void onDeactivate() override {
-    if (m_primitive) m_primitive->onDeactivate();
-    m_isRotatingOrMoving = false;
-    delete m_rotatedStroke;
-    m_rotatedStroke = 0;
-  }
-
-  void onEnter() override {
-    m_active = getImage(false) != 0;
-    if (m_active && m_primitive) m_primitive->onEnter();
-  }
-
-  void draw() override {
-    if (m_isRotatingOrMoving) {
-      tglColor(m_color);
-      drawStrokeCenterline(*m_rotatedStroke, sqrt(tglGetPixelSize2()));
-      return;
+    // then, rotate it according to mouse position
+    // this formula is from: https://stackoverflow.com/a/31334882
+    TPointD center = m_rotateCenter;
+    TPointD org    = m_originalCursorPos;
+    TPointD cur    = m_currentCursorPos;
+    double angle1  = atan2(cur.y - center.y, cur.x - center.x);
+    double angle2  = atan2(org.y - center.y, org.x - center.x);
+    double angle   = (angle1 - angle2) * 180 / 3.14;
+    if (e.isShiftPressed()) {
+      angle = ((int)angle / 45) * 45;
     }
-    if (m_primitive) m_primitive->draw();
+    m_rotatedStroke->transform(TRotation(m_rotateCenter, angle));
+    m_lastRotateAngle = angle;
+    invalidate();
+    return;
   }
 
-  int getCursorId() const override {
-    if (m_viewer && m_viewer->getGuidedStrokePickerMode())
-      return m_viewer->getGuidedStrokePickerCursor();
-    return ToolCursor::PenCursor;
-  }
+  if (m_primitive) m_primitive->mouseMove(p, e);
+}
 
-  int getColorClass() const { return 1; }
-
-  TPropertyGroup *getProperties(int idx) override {
-    return &m_param.m_prop[idx];
-  }
-
-  bool onPropertyChanged(std::string propertyName) override {
-    /*---	変更されたPropertyごとに処理を分ける。
-            注意：m_toolSizeとm_rasterToolSizeは同じName(="Size:")なので、
-            扱っている画像がラスタかどうかで区別する ---*/
-    if (propertyName == m_param.m_toolSize.getName()) {
-      TImageP img = getImage(false);
-      TToonzImageP ri(img); /*-- ラスタかどうかの判定 --*/
-      if (ri)
-        GeometricRasterSize = m_param.m_rasterToolSize.getValue();
-      else
-        GeometricSize = m_param.m_toolSize.getValue();
-    } else if (propertyName == m_param.m_type.getName()) {
-      std::wstring typeCode = m_param.m_type.getValue();
-      GeometricType         = ::to_string(typeCode);
-      if (typeCode != m_typeCode) {
-        m_typeCode = typeCode;
-        changeType(typeCode);
-      }
-    } else if (propertyName == m_param.m_edgeCount.getName())
-      GeometricEdgeCount = m_param.m_edgeCount.getValue();
-    else if (propertyName == m_param.m_rotate.getName())
-      GeometricRotate = m_param.m_rotate.getValue();
-    else if (propertyName == m_param.m_autogroup.getName()) {
-      if (!m_param.m_autogroup.getValue()) {
-        m_param.m_autofill.setValue(false);
-        // this is ugly: it's needed to refresh the GUI of the toolbar after
-        // having set to false the autofill...
-        TTool::getApplication()->getCurrentTool()->setTool(
-            "");  // necessary, otherwise next setTool is ignored...
-        TTool::getApplication()->getCurrentTool()->setTool(
-            QString::fromStdString(getName()));
-      }
-      GeometricGroupIt = m_param.m_autogroup.getValue();
-    } else if (propertyName == m_param.m_autofill.getName()) {
-      if (m_param.m_autofill.getValue()) {
-        m_param.m_autogroup.setValue(true);
-        // this is ugly: it's needed to refresh the GUI of the toolbar after
-        // having set to false the autofill...
-        TTool::getApplication()->getCurrentTool()->setTool(
-            "");  // necessary, otherwise next setTool is ignored...
-        TTool::getApplication()->getCurrentTool()->setTool(
-            QString::fromStdString(getName()));
-      }
-      GeometricGroupIt = m_param.m_autofill.getValue();
-    } else if (propertyName == m_param.m_smooth.getName()) {
-      GeometricSmooth = m_param.m_smooth.getValue();
-    } else if (propertyName == m_param.m_selective.getName())
-      GeometricSelective = m_param.m_selective.getValue();
-    else if (propertyName == m_param.m_pencil.getName())
-      GeometricPencil = m_param.m_pencil.getValue();
-    else if (propertyName == m_param.m_hardness.getName())
-      GeometricBrushHardness = m_param.m_hardness.getValue();
-    else if (propertyName == m_param.m_opacity.getName())
-      GeometricOpacity = m_param.m_opacity.getValue();
-    else if (propertyName == m_param.m_capStyle.getName())
-      GeometricCapStyle = m_param.m_capStyle.getIndex();
-    else if (propertyName == m_param.m_joinStyle.getName())
-      GeometricJoinStyle = m_param.m_joinStyle.getIndex();
-    else if (propertyName == m_param.m_miterJoinLimit.getName())
-      GeometricMiterValue = m_param.m_miterJoinLimit.getValue();
-    else if (propertyName == m_param.m_snap.getName())
-      GeometricSnap = m_param.m_snap.getValue();
-    else if (propertyName == m_param.m_snapSensitivity.getName()) {
-      GeometricSnapSensitivity = m_param.m_snapSensitivity.getIndex();
+//--------------------------------------------------------------------------------------------------
+void GeometricTool::onActivate() {
+  if (m_firstTime) {
+    m_param.m_toolSize.setValue(GeometricSize);
+    m_param.m_rasterToolSize.setValue(GeometricRasterSize);
+    m_param.m_opacity.setValue(GeometricOpacity);
+    m_param.m_hardness.setValue(GeometricBrushHardness);
+    m_param.m_selective.setValue(GeometricSelective ? 1 : 0);
+    m_param.m_rotate.setValue(GeometricRotate ? 1 : 0);
+    m_param.m_autogroup.setValue(GeometricGroupIt ? 1 : 0);
+    m_param.m_smooth.setValue(GeometricSmooth ? 1 : 0);
+    m_param.m_autofill.setValue(GeometricAutofill ? 1 : 0);
+    std::wstring typeCode = ::to_wstring(GeometricType.getValue());
+    m_param.m_type.setValue(typeCode);
+    GeometricType = ::to_string(typeCode);
+    m_typeCode    = typeCode;
+    changeType(typeCode);
+    m_param.m_edgeCount.setValue(GeometricEdgeCount);
+    m_param.m_pencil.setValue(GeometricPencil ? 1 : 0);
+    m_param.m_capStyle.setIndex(GeometricCapStyle);
+    m_param.m_joinStyle.setIndex(GeometricJoinStyle);
+    m_param.m_miterJoinLimit.setValue(GeometricMiterValue);
+    m_firstTime = false;
+    m_param.m_snap.setValue(GeometricSnap);
+    if (m_targetType & TTool::Vectors) {
+      m_param.m_snapSensitivity.setIndex(GeometricSnapSensitivity);
       switch (GeometricSnapSensitivity) {
       case 0:
         m_param.m_minDistance2 = SNAPPING_LOW;
@@ -1340,69 +1292,335 @@ public:
       }
     }
 
-    return false;
+    if (m_param.m_targetType & TTool::ToonzImage ||
+        m_param.m_targetType & TTool::RasterImage)
+      m_notifier = new FullColorGeometricToolNotifier(this);
+  }
+  m_primitive->resetSnap();
+  /*--
+     ショートカットでいきなりスタート（＝onEnterを通らない場合）のとき、
+          LineToolが反応しないことがある対策 --*/
+  m_active =
+      (getImage(false) != 0 || Preferences::instance()->isAutoCreateEnabled());
+
+  if (m_primitive) m_primitive->onActivate();
+  onColorStyleChanged();
+}
+
+//--------------------------------------------------------------------------------------------------
+void GeometricTool::onDeactivate() {
+  if (m_primitive) m_primitive->onDeactivate();
+  m_isRotatingOrMoving = false;
+  delete m_rotatedStroke;
+  m_rotatedStroke = 0;
+}
+
+//--------------------------------------------------------------------------------------------------
+void GeometricTool::onEnter() {
+  m_active = getImage(false) != 0;
+  if (m_active && m_primitive) m_primitive->onEnter();
+}
+
+//--------------------------------------------------------------------------------------------------
+void GeometricTool::draw() {
+  if (m_isRotatingOrMoving) {
+    tglColor(m_color);
+    drawStrokeCenterline(*m_rotatedStroke, sqrt(tglGetPixelSize2()));
+    return;
+  }
+  if (m_primitive) m_primitive->draw();
+}
+
+//--------------------------------------------------------------------------------------------------
+int GeometricTool::getCursorId() const {
+  if (m_viewer && m_viewer->getGuidedStrokePickerMode())
+    return m_viewer->getGuidedStrokePickerCursor();
+  return ToolCursor::PenCursor;
+}
+
+//--------------------------------------------------------------------------------------------------
+TPropertyGroup *GeometricTool::getProperties(int idx) {
+  return &m_param.m_prop[idx];
+}
+
+//--------------------------------------------------------------------------------------------------
+bool GeometricTool::onPropertyChanged(std::string propertyName) {
+  /*---	変更されたPropertyごとに処理を分ける。
+          注意：m_toolSizeとm_rasterToolSizeは同じName(="Size:")なので、
+          扱っている画像がラスタかどうかで区別する ---*/
+  if (propertyName == m_param.m_toolSize.getName()) {
+    TImageP img = getImage(false);
+    TToonzImageP ri(img); /*-- ラスタかどうかの判定 --*/
+    if (ri)
+      GeometricRasterSize = m_param.m_rasterToolSize.getValue();
+    else
+      GeometricSize = m_param.m_toolSize.getValue();
+  } else if (propertyName == m_param.m_type.getName()) {
+    std::wstring typeCode = m_param.m_type.getValue();
+    GeometricType         = ::to_string(typeCode);
+    if (typeCode != m_typeCode) {
+      m_typeCode = typeCode;
+      changeType(typeCode);
+    }
+  } else if (propertyName == m_param.m_edgeCount.getName())
+    GeometricEdgeCount = m_param.m_edgeCount.getValue();
+  else if (propertyName == m_param.m_rotate.getName())
+    GeometricRotate = m_param.m_rotate.getValue();
+  else if (propertyName == m_param.m_autogroup.getName()) {
+    if (!m_param.m_autogroup.getValue()) {
+      m_param.m_autofill.setValue(false);
+      // this is ugly: it's needed to refresh the GUI of the toolbar after
+      // having set to false the autofill...
+      TTool::getApplication()->getCurrentTool()->setTool(
+          "");  // necessary, otherwise next setTool is ignored...
+      TTool::getApplication()->getCurrentTool()->setTool(
+          QString::fromStdString(getName()));
+    }
+    GeometricGroupIt = m_param.m_autogroup.getValue();
+  } else if (propertyName == m_param.m_autofill.getName()) {
+    if (m_param.m_autofill.getValue()) {
+      m_param.m_autogroup.setValue(true);
+      // this is ugly: it's needed to refresh the GUI of the toolbar after
+      // having set to false the autofill...
+      TTool::getApplication()->getCurrentTool()->setTool(
+          "");  // necessary, otherwise next setTool is ignored...
+      TTool::getApplication()->getCurrentTool()->setTool(
+          QString::fromStdString(getName()));
+    }
+    GeometricGroupIt = m_param.m_autofill.getValue();
+  } else if (propertyName == m_param.m_smooth.getName()) {
+    GeometricSmooth = m_param.m_smooth.getValue();
+  } else if (propertyName == m_param.m_selective.getName())
+    GeometricSelective = m_param.m_selective.getValue();
+  else if (propertyName == m_param.m_pencil.getName())
+    GeometricPencil = m_param.m_pencil.getValue();
+  else if (propertyName == m_param.m_hardness.getName())
+    GeometricBrushHardness = m_param.m_hardness.getValue();
+  else if (propertyName == m_param.m_opacity.getName())
+    GeometricOpacity = m_param.m_opacity.getValue();
+  else if (propertyName == m_param.m_capStyle.getName())
+    GeometricCapStyle = m_param.m_capStyle.getIndex();
+  else if (propertyName == m_param.m_joinStyle.getName())
+    GeometricJoinStyle = m_param.m_joinStyle.getIndex();
+  else if (propertyName == m_param.m_miterJoinLimit.getName())
+    GeometricMiterValue = m_param.m_miterJoinLimit.getValue();
+  else if (propertyName == m_param.m_snap.getName())
+    GeometricSnap = m_param.m_snap.getValue();
+  else if (propertyName == m_param.m_snapSensitivity.getName()) {
+    GeometricSnapSensitivity = m_param.m_snapSensitivity.getIndex();
+    switch (GeometricSnapSensitivity) {
+    case 0:
+      m_param.m_minDistance2 = SNAPPING_LOW;
+      break;
+    case 1:
+      m_param.m_minDistance2 = SNAPPING_MEDIUM;
+      break;
+    case 2:
+      m_param.m_minDistance2 = SNAPPING_HIGH;
+      break;
+    }
   }
 
-  void addStroke() {
-    if (!m_primitive) return;
+  return false;
+}
 
-    TStroke *stroke = 0;
-    if (!m_isRotatingOrMoving) {
-      stroke = m_primitive->makeStroke();
-      if (!stroke) return;
+//--------------------------------------------------------------------------------------------------
+void GeometricTool::addRasterMyPaintStroke(const TToonzImageP &ti,
+                                           TStroke *stroke, TXshSimpleLevel *sl,
+                                           const TFrameId &id) {
+  TRasterP ras = ti->getRaster();
 
-      if (m_param.m_rotate.getValue()) {
-        m_isRotatingOrMoving = true;
-        m_rotatedStroke      = stroke;
-        TRectD bbox          = stroke->getBBox();
-        m_rotateCenter       = 0.5 * (bbox.getP11() + bbox.getP00());
-        m_originalCursorPos  = m_currentCursorPos;
-        m_lastRotateAngle    = 0;
-        m_lastMoveStrokePos  = TPointD(0, 0);
-        m_wasCtrlPressed     = false;
+  TTileSetCM32 *tileSet = new TTileSetCM32(ras->getSize());
+  m_tileSaverCM         = new TTileSaverCM32(ras, tileSet);
 
-        const TTool::Application *app = TTool::getApplication();
-        if (!app) {
-          m_color = TPixel32::Red;
-          return;
-        }
+  TPointD rasCenter = ras->getCenterD();
+  stroke->transform(TTranslation(rasCenter.x, rasCenter.y));
+  TDimension dim = ras->getSize();
 
-        const TColorStyle *style = app->getCurrentLevelStyle();
-        if (!style) {
-          m_color = TPixel32::Red;
-          return;
-        }
+  mypaint::Brush mypaintBrush;
 
-        m_color = style->getAverageColor();
+  double modifierSize    = m_param.m_modifierSize.getValue() * log(2.0);
+  double modifierOpacity = 0.01 * m_param.m_modifierOpacity.getValue();
+  TPixelD color          = PixelConverter<TPixelD>::from(
+      getApplication()->getCurrentLevelStyle()->getMainColor());
+  double colorH = 0.0;
+  double colorS = 0.0;
+  double colorV = 0.0;
+  RGB2HSV(color.r, color.g, color.b, &colorH, &colorS, &colorV);
+  TMyPaintBrushStyle *mypaintStyle = dynamic_cast<TMyPaintBrushStyle *>(
+      getApplication()->getCurrentLevelStyle());
+  mypaintBrush.fromBrush(mypaintStyle->getBrush());
+  float baseSize =
+      mypaintBrush.getBaseValue(MYPAINT_BRUSH_SETTING_RADIUS_LOGARITHMIC);
+  mypaintBrush.setBaseValue(MYPAINT_BRUSH_SETTING_RADIUS_LOGARITHMIC,
+                            baseSize + modifierSize);
+  mypaintBrush.setBaseValue(MYPAINT_BRUSH_SETTING_COLOR_H, colorH / 360.0);
+  mypaintBrush.setBaseValue(MYPAINT_BRUSH_SETTING_COLOR_S, colorS);
+  mypaintBrush.setBaseValue(MYPAINT_BRUSH_SETTING_COLOR_V, colorV);
 
+  m_workRaster = TRaster32P(dim);
+  m_workRaster->lock();
+  MyPaintToonzBrush toonz_brush(m_workRaster, *this, mypaintBrush, true);
+  m_lastRect.empty();
+  m_strokeRect.empty();
+  toonz_brush.beginStroke();
+  const TThickQuadratic *q = 0;
+  for (int i = 0; i < stroke->getChunkCount(); i++) {
+    q           = stroke->getChunk(i);
+    double step = computeStep(*q, getPixelSize());
+    for (double t = 0; t < 1; t += step)
+      toonz_brush.strokeTo(q->getPoint(t), 0.5, TPointD(), 1.0);
+    toonz_brush.strokeTo(q->getP2(), 0.5, TPointD(), 1.0);
+  }
+  toonz_brush.endStroke();
+  if (!m_strokeRect.isEmpty()) {
+    TRasterCM32P bkupRas(dim);
+    bkupRas->extract(m_strokeRect)->copy(ras->extract(m_strokeRect));
+    toonz_brush.updateDrawing(ras, bkupRas, m_strokeRect, stroke->getStyle(),
+                              false);
+  }
+
+  m_workRaster->unlock();
+
+  delete m_tileSaverCM;
+  m_tileSaverCM       = nullptr;
+  TRasterCM32P subras = ras->extract(m_strokeRect)->clone();
+  TUndoManager::manager()->add(new CMappedMyPaintGeometryUndo(
+      tileSet, sl, id, m_isFrameCreated, m_isLevelCreated, subras,
+      m_strokeRect.getP00()));
+}
+
+//--------------------------------------------------------------------------------------------------
+void GeometricTool::addFullColorMyPaintStroke(const TRasterImageP &ri,
+                                              TStroke *stroke,
+                                              TXshSimpleLevel *sl,
+                                              const TFrameId &id) {
+  TRasterP ras = ri->getRaster();
+
+  TTileSetFullColor *tileSet = new TTileSetFullColor(ras->getSize());
+  m_tileSaver                = new TTileSaverFullColor(ras, tileSet);
+
+  TPointD rasCenter = ras->getCenterD();
+  stroke->transform(TTranslation(rasCenter.x, rasCenter.y));
+  TDimension dim = ras->getSize();
+
+  mypaint::Brush mypaintBrush;
+
+  double modifierSize    = m_param.m_modifierSize.getValue() * log(2.0);
+  double modifierOpacity = 0.01 * m_param.m_modifierOpacity.getValue();
+  TPixelD color          = PixelConverter<TPixelD>::from(
+      getApplication()->getCurrentLevelStyle()->getMainColor());
+  double colorH = 0.0;
+  double colorS = 0.0;
+  double colorV = 0.0;
+  RGB2HSV(color.r, color.g, color.b, &colorH, &colorS, &colorV);
+  TMyPaintBrushStyle *mypaintStyle = dynamic_cast<TMyPaintBrushStyle *>(
+      getApplication()->getCurrentLevelStyle());
+  mypaintBrush.fromBrush(mypaintStyle->getBrush());
+  float baseSize =
+      mypaintBrush.getBaseValue(MYPAINT_BRUSH_SETTING_RADIUS_LOGARITHMIC);
+  float baseOpacity = mypaintBrush.getBaseValue(MYPAINT_BRUSH_SETTING_OPAQUE);
+
+  mypaintBrush.setBaseValue(MYPAINT_BRUSH_SETTING_RADIUS_LOGARITHMIC,
+                            baseSize + modifierSize);
+  mypaintBrush.setBaseValue(MYPAINT_BRUSH_SETTING_OPAQUE,
+                            baseOpacity * modifierOpacity);
+  mypaintBrush.setBaseValue(MYPAINT_BRUSH_SETTING_COLOR_H, colorH / 360.0);
+  mypaintBrush.setBaseValue(MYPAINT_BRUSH_SETTING_COLOR_S, colorS);
+  mypaintBrush.setBaseValue(MYPAINT_BRUSH_SETTING_COLOR_V, colorV);
+
+  m_workRaster = TRaster32P(dim);
+  m_workRaster->lock();
+  MyPaintToonzBrush toonz_brush(m_workRaster, *this, mypaintBrush, true);
+  m_lastRect.empty();
+  m_strokeRect.empty();
+  toonz_brush.beginStroke();
+  const TThickQuadratic *q = 0;
+  for (int i = 0; i < stroke->getChunkCount(); i++) {
+    q           = stroke->getChunk(i);
+    double step = computeStep(*q, getPixelSize());
+    for (double t = 0; t < 1; t += step)
+      toonz_brush.strokeTo(q->getPoint(t), 0.5, TPointD(), 1.0);
+    toonz_brush.strokeTo(q->getP2(), 0.5, TPointD(), 1.0);
+  }
+  toonz_brush.endStroke();
+  if (!m_strokeRect.isEmpty())
+    ras->extract(m_strokeRect)->copy(m_workRaster->extract(m_strokeRect));
+
+  m_workRaster->unlock();
+
+  delete m_tileSaver;
+  m_tileSaver     = nullptr;
+  TRasterP subras = ras->extract(m_strokeRect)->clone();
+  TUndoManager::manager()->add(new FullColorMyPaintGeometryUndo(
+      tileSet, sl, id, m_isFrameCreated, subras, m_strokeRect.getP00()));
+}
+
+//--------------------------------------------------------------------------------------------------
+void GeometricTool::addStroke() {
+  if (!m_primitive) return;
+
+  TStroke *stroke = 0;
+  if (!m_isRotatingOrMoving) {
+    stroke = m_primitive->makeStroke();
+    if (!stroke) return;
+
+    if (m_param.m_rotate.getValue()) {
+      m_isRotatingOrMoving = true;
+      m_rotatedStroke      = stroke;
+      TRectD bbox          = stroke->getBBox();
+      m_rotateCenter       = 0.5 * (bbox.getP11() + bbox.getP00());
+      m_originalCursorPos  = m_currentCursorPos;
+      m_lastRotateAngle    = 0;
+      m_lastMoveStrokePos  = TPointD(0, 0);
+      m_wasCtrlPressed     = false;
+
+      const TTool::Application *app = TTool::getApplication();
+      if (!app) {
+        m_color = TPixel32::Red;
         return;
       }
-    } else {
-      stroke               = m_rotatedStroke;
-      m_isRotatingOrMoving = false;
-      m_rotatedStroke      = 0;
+
+      const TColorStyle *style = app->getCurrentLevelStyle();
+      if (!style) {
+        m_color = TPixel32::Red;
+        return;
+      }
+
+      m_color = style->getAverageColor();
+
+      return;
     }
+  } else {
+    stroke               = m_rotatedStroke;
+    m_isRotatingOrMoving = false;
+    m_rotatedStroke      = 0;
+  }
 
-    TStroke::OutlineOptions &options = stroke->outlineOptions();
-    options.m_capStyle               = m_param.m_capStyle.getIndex();
-    options.m_joinStyle              = m_param.m_joinStyle.getIndex();
-    options.m_miterUpper             = m_param.m_miterJoinLimit.getValue();
+  TStroke::OutlineOptions &options = stroke->outlineOptions();
+  options.m_capStyle               = m_param.m_capStyle.getIndex();
+  options.m_joinStyle              = m_param.m_joinStyle.getIndex();
+  options.m_miterUpper             = m_param.m_miterJoinLimit.getValue();
 
-    TImage *image = getImage(true);
-    TToonzImageP ti(image);
-    TVectorImageP vi(image);
-    TRasterImageP ri(image);
-    TXshSimpleLevel *sl =
-        TTool::getApplication()->getCurrentLevel()->getSimpleLevel();
-    TFrameId id = getCurrentFid();
-    /*-- ToonzImageの場合 --*/
-    if (ti) {
-      int styleId    = TTool::getApplication()->getCurrentLevelStyleIndex();
-      bool selective = m_param.m_selective.getValue();
+  TImage *image = getImage(true);
+  TToonzImageP ti(image);
+  TVectorImageP vi(image);
+  TRasterImageP ri(image);
+  TXshSimpleLevel *sl =
+      TTool::getApplication()->getCurrentLevel()->getSimpleLevel();
+  TFrameId id = getCurrentFid();
+  /*-- ToonzImageの場合 --*/
+  if (ti) {
+    int styleId    = TTool::getApplication()->getCurrentLevelStyleIndex();
+    bool selective = m_param.m_selective.getValue();
 
-      bool filled = false;
+    bool filled = false;
 
-      stroke->setStyle(styleId);
+    stroke->setStyle(styleId);
+    // mypaint brush case
+    if (getApplication()->getCurrentLevelStyle()->getTagId() == 4001) {
+      addRasterMyPaintStroke(ti, stroke, sl, id);
+    } else {
       double hardness = m_param.m_hardness.getValue() * 0.01;
       TRect savebox;
       if (hardness == 1 || m_param.m_pencil.getValue()) {
@@ -1419,76 +1637,81 @@ public:
             m_isFrameCreated, m_isLevelCreated, m_primitive->getName()));
         savebox = drawBluredBrush(ti, stroke, thickness, hardness, selective);
       }
-      ToolUtils::updateSaveBox();
-      delete stroke;
     }
-    /*-- VectorImageの場合 --*/
-    else if (vi) {
-      if (TTool::getApplication()->getCurrentObject()->isSpline()) {
-        if (!ToolUtils::isJustCreatedSpline(vi.getPointer())) {
-          m_primitive->setIsPrompting(true);
-          QString question("Are you sure you want to replace the motion path?");
-          int ret =
-              DVGui::MsgBox(question, QObject::tr("Yes"), QObject::tr("No"), 0);
-          m_primitive->setIsPrompting(false);
-          if (ret == 2 || ret == 0) return;
-        }
-        QMutexLocker lock(vi->getMutex());
-        TUndo *undo = new UndoPath(
-            getXsheet()->getStageObject(getObjectId())->getSpline());
-        while (vi->getStrokeCount() > 0) vi->deleteStroke(0);
-        vi->addStroke(stroke, false);
-        TUndoManager::manager()->add(undo);
-      } else {
-        int styleId = TTool::getApplication()->getCurrentLevelStyleIndex();
-        if (styleId >= 0) stroke->setStyle(styleId);
-        QMutexLocker lock(vi->getMutex());
-        std::vector<TFilledRegionInf> *fillInformation =
-            new std::vector<TFilledRegionInf>;
-        ImageUtils::getFillingInformationOverlappingArea(vi, *fillInformation,
-                                                         stroke->getBBox());
-
-        vi->addStroke(stroke);
-
-        TUndoManager::manager()->add(new UndoPencil(
-            vi->getStroke(vi->getStrokeCount() - 1), fillInformation, sl, id,
-            m_isFrameCreated, m_isLevelCreated, m_param.m_autogroup.getValue(),
-            m_param.m_autofill.getValue()));
-
-        if ((Preferences::instance()->getGuidedDrawingType() == 1 ||
-             Preferences::instance()->getGuidedDrawingType() == 2) &&
-            Preferences::instance()->getGuidedAutoInbetween()) {
-          TTool *tool =
-              TTool::getTool(T_Brush, TTool::ToolTargetType::VectorImage);
-          ToonzVectorBrushTool *vbTool = (ToonzVectorBrushTool *)tool;
-          if (vbTool) {
-            vbTool->setViewer(m_viewer);
-            vbTool->doGuidedAutoInbetween(id, vi, stroke, false,
-                                          m_param.m_autogroup.getValue(),
-                                          m_param.m_autofill.getValue(), false);
-          }
-        }
+    ToolUtils::updateSaveBox();
+    delete stroke;
+  }
+  /*-- VectorImageの場合 --*/
+  else if (vi) {
+    if (TTool::getApplication()->getCurrentObject()->isSpline()) {
+      if (!ToolUtils::isJustCreatedSpline(vi.getPointer())) {
+        m_primitive->setIsPrompting(true);
+        QString question("Are you sure you want to replace the motion path?");
+        int ret =
+            DVGui::MsgBox(question, QObject::tr("Yes"), QObject::tr("No"), 0);
+        m_primitive->setIsPrompting(false);
+        if (ret == 2 || ret == 0) return;
       }
-      if (m_param.m_autogroup.getValue() && stroke->isSelfLoop()) {
-        int index = vi->getStrokeCount() - 1;
-        vi->group(index, 1);
-        if (m_param.m_autofill.getValue()) {
-          // to avoid filling other strokes, I enter into the new stroke group
-          int currentGroup = vi->exitGroup();
-          vi->enterGroup(index);
-          vi->selectFill(stroke->getBBox().enlarge(1, 1), 0, stroke->getStyle(),
-                         false, true, false);
-          if (currentGroup != -1)
-            vi->enterGroup(currentGroup);
-          else
-            vi->exitGroup();
-        }
-      }
-    }
-    /*-- RasterImageの場合 --*/
-    else if (ri) {
+      QMutexLocker lock(vi->getMutex());
+      TUndo *undo =
+          new UndoPath(getXsheet()->getStageObject(getObjectId())->getSpline());
+      while (vi->getStrokeCount() > 0) vi->deleteStroke(0);
+      vi->addStroke(stroke, false);
+      TUndoManager::manager()->add(undo);
+    } else {
       int styleId = TTool::getApplication()->getCurrentLevelStyleIndex();
-      stroke->setStyle(styleId);
+      if (styleId >= 0) stroke->setStyle(styleId);
+      QMutexLocker lock(vi->getMutex());
+      std::vector<TFilledRegionInf> *fillInformation =
+          new std::vector<TFilledRegionInf>;
+      ImageUtils::getFillingInformationOverlappingArea(vi, *fillInformation,
+                                                       stroke->getBBox());
+
+      vi->addStroke(stroke);
+
+      TUndoManager::manager()->add(new UndoPencil(
+          vi->getStroke(vi->getStrokeCount() - 1), fillInformation, sl, id,
+          m_isFrameCreated, m_isLevelCreated, m_param.m_autogroup.getValue(),
+          m_param.m_autofill.getValue()));
+
+      if ((Preferences::instance()->getGuidedDrawingType() == 1 ||
+           Preferences::instance()->getGuidedDrawingType() == 2) &&
+          Preferences::instance()->getGuidedAutoInbetween()) {
+        TTool *tool =
+            TTool::getTool(T_Brush, TTool::ToolTargetType::VectorImage);
+        ToonzVectorBrushTool *vbTool = (ToonzVectorBrushTool *)tool;
+        if (vbTool) {
+          vbTool->setViewer(m_viewer);
+          vbTool->doGuidedAutoInbetween(id, vi, stroke, false,
+                                        m_param.m_autogroup.getValue(),
+                                        m_param.m_autofill.getValue(), false);
+        }
+      }
+    }
+    if (m_param.m_autogroup.getValue() && stroke->isSelfLoop()) {
+      int index = vi->getStrokeCount() - 1;
+      vi->group(index, 1);
+      if (m_param.m_autofill.getValue()) {
+        // to avoid filling other strokes, I enter into the new stroke group
+        int currentGroup = vi->exitGroup();
+        vi->enterGroup(index);
+        vi->selectFill(stroke->getBBox().enlarge(1, 1), 0, stroke->getStyle(),
+                       false, true, false);
+        if (currentGroup != -1)
+          vi->enterGroup(currentGroup);
+        else
+          vi->exitGroup();
+      }
+    }
+  }
+  /*-- RasterImageの場合 --*/
+  else if (ri) {
+    int styleId = TTool::getApplication()->getCurrentLevelStyleIndex();
+    stroke->setStyle(styleId);
+    // mypaint brush case
+    if (getApplication()->getCurrentLevelStyle()->getTagId() == 4001) {
+      addFullColorMyPaintStroke(ri, stroke, sl, id);
+    } else {
       double opacity  = m_param.m_opacity.getValue() * 0.01;
       double hardness = m_param.m_hardness.getValue() * 0.01;
       TRect savebox;
@@ -1503,19 +1726,79 @@ public:
             m_isFrameCreated, m_isLevelCreated));
         savebox = drawBluredBrush(ri, stroke, thickness, hardness, opacity);
       }
-      ToolUtils::updateSaveBox();
-      delete stroke;
     }
-    notifyImageChanged();
-    m_active = false;
+    ToolUtils::updateSaveBox();
+    delete stroke;
   }
-};
+  notifyImageChanged();
+  m_active = false;
+}
 
+//--------------------------------------------------------------------------------------------------
+
+void GeometricTool::updateWorkRaster(const TRect &rect) {
+  if (rect.isEmpty()) return;
+
+  TRasterImageP ri = TImageP(getImage(false, 1));
+  if (!ri) return;
+
+  TRasterP ras = ri->getRaster();
+
+  const int denominator = 8;
+  TRect enlargedRect    = rect + m_lastRect;
+  int dx                = (enlargedRect.getLx() - 1) / denominator + 1;
+  int dy                = (enlargedRect.getLy() - 1) / denominator + 1;
+
+  if (m_lastRect.isEmpty()) {
+    enlargedRect.x0 -= dx;
+    enlargedRect.y0 -= dy;
+    enlargedRect.x1 += dx;
+    enlargedRect.y1 += dy;
+
+    TRect _rect = enlargedRect * ras->getBounds();
+    if (_rect.isEmpty()) return;
+
+    m_workRaster->extract(_rect)->copy(ras->extract(_rect));
+  } else {
+    if (enlargedRect.x0 < m_lastRect.x0) enlargedRect.x0 -= dx;
+    if (enlargedRect.y0 < m_lastRect.y0) enlargedRect.y0 -= dy;
+    if (enlargedRect.x1 > m_lastRect.x1) enlargedRect.x1 += dx;
+    if (enlargedRect.y1 > m_lastRect.y1) enlargedRect.y1 += dy;
+
+    TRect _rect = enlargedRect * ras->getBounds();
+    if (_rect.isEmpty()) return;
+
+    TRect _lastRect    = m_lastRect * ras->getBounds();
+    QList<TRect> rects = ToolUtils::splitRect(_rect, _lastRect);
+    for (int i = 0; i < rects.size(); i++) {
+      m_workRaster->extract(rects[i])->copy(ras->extract(rects[i]));
+    }
+  }
+
+  m_lastRect = enlargedRect;
+}
+
+//--------------------------------------------------------------------------------------------------
+bool GeometricTool::askRead(const TRect &rect) { return askWrite(rect); }
+
+//--------------------------------------------------------------------------------------------------
+bool GeometricTool::askWrite(const TRect &rect) {
+  if (rect.isEmpty()) return true;
+  m_strokeRect += rect;
+  updateWorkRaster(rect);
+  if (m_tileSaver) m_tileSaver->save(rect);
+  if (m_tileSaverCM) m_tileSaverCM->save(rect);
+  return true;
+}
+
+//====================================================================================================
 GeometricTool GeometricVectorTool(TTool::Vectors | TTool::EmptyTarget);
 GeometricTool GeometricRasterTool(TTool::ToonzImage | TTool::EmptyTarget);
 GeometricTool GeometricRasterFullColorTool(TTool::RasterImage |
                                            TTool::EmptyTarget);
 
+//====================================================================================================
+//
 //-------------------------------------------------------------------------------------------------------------
 
 void Primitive::drawSnap() {
@@ -1541,8 +1824,8 @@ TPointD Primitive::checkGuideSnapping(TPointD pos) {
   }
   if ((m_param->m_targetType & TTool::Vectors) && m_param->m_snap.getValue()) {
     int vGuideCount = 0, hGuideCount = 0;
-    double guideDistance  = sqrt(m_param->m_minDistance2);
-    TTool::Viewer *viewer = m_tool->getViewer();
+    double guideDistance = sqrt(m_param->m_minDistance2);
+    TToolViewer *viewer  = m_tool->getViewer();
     if (viewer) {
       vGuideCount = viewer->getVGuideCount();
       hGuideCount = viewer->getHGuideCount();
@@ -2866,4 +3149,22 @@ void PolygonPrimitive::mouseMove(const TPointD &pos, const TMouseEvent &e) {
   TPointD newPos = calculateSnap(pos);
   newPos         = checkGuideSnapping(pos);
   m_tool->invalidate();
+}
+
+//==========================================================================================================
+
+FullColorGeometricToolNotifier::FullColorGeometricToolNotifier(
+    GeometricTool *tool)
+    : m_tool(tool) {
+  if (TTool::Application *app = m_tool->getApplication()) {
+    if (TPaletteHandle *paletteHandle = app->getCurrentPalette()) {
+      bool ret;
+      ret = connect(paletteHandle, SIGNAL(colorStyleChanged(bool)), this,
+                    SLOT(onColorStyleChanged()));
+      assert(ret);
+      ret = connect(paletteHandle, SIGNAL(colorStyleSwitched()), this,
+                    SLOT(onColorStyleChanged()));
+      assert(ret);
+    }
+  }
 }

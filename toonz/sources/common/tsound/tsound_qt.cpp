@@ -160,10 +160,13 @@ public:
     switch (st->getSampleType()) {
     case TSound::INT:
       format.setSampleType(QAudioFormat::SignedInt);
+      break;
     case TSound::UINT:
       format.setSampleType(QAudioFormat::UnSignedInt);
+      break;
     case TSound::FLOAT:
       format.setSampleType(QAudioFormat::Float);
+      break;
     }
     format.setSampleRate(st->getSampleRate());
 

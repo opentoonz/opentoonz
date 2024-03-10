@@ -93,6 +93,9 @@ enum class PredefinedRect {
   PREVIEW_LAYER_AREA,  //! clickable area larger than preview icon, containing
                        //! it
   PREVIEW_LAYER,
+  UNIFIEDVIEW_LAYER_AREA,  //! used when unifying the preview and the camstand
+                           //! toggles
+  UNIFIEDVIEW_LAYER,
   LOCK_AREA,          //! clickable area larger than lock icon, containing it
   LOCK,               //! the lock icon itself
   CAMERA_LOCK_AREA,   //! lock area for the camera column

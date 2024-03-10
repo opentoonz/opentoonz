@@ -40,6 +40,21 @@ const QList<TSceneProperties::CellMark> getDefaultCellMarks() {
       {QObject::tr("Dark Pink"), TPixel32(111, 29, 108)},
       {QObject::tr("White"), TPixel32(255, 255, 255)}};
 }
+
+const QList<TSceneProperties::ColorFilter> getDefaultColorFilters() {
+  return QList<TSceneProperties::ColorFilter>{
+      {QObject::tr("None"), TPixel::Black},  // not editable
+      {QObject::tr("Red"), TPixel::Red},
+      {QObject::tr("Green"), TPixel::Green},
+      {QObject::tr("Blue"), TPixel::Blue},
+      {QObject::tr("DarkYellow"), TPixel(128, 128, 0)},
+      {QObject::tr("DarkCyan"), TPixel32(0, 128, 128)},
+      {QObject::tr("DarkMagenta"), TPixel32(128, 0, 128)},
+      {"", TPixel::Black},
+      {"", TPixel::Black},
+      {"", TPixel::Black},
+      {"", TPixel::Black}};
+}
 }  // namespace
 
 //=============================================================================
@@ -71,6 +86,8 @@ TSceneProperties::TSceneProperties()
 
   // Default Cell Marks
   m_cellMarks = getDefaultCellMarks();
+  // Default Color Filters
+  m_colorFilters = getDefaultColorFilters();
 }
 
 //-----------------------------------------------------------------------------
@@ -117,6 +134,10 @@ void TSceneProperties::assign(const TSceneProperties *sprop) {
   int i;
   for (i = 0; i < m_notesColor.size(); i++)
     m_notesColor.replace(i, sprop->getNoteColor(i));
+  for (i = 0; i < m_cellMarks.size(); i++)
+    m_cellMarks.replace(i, sprop->getCellMark(i));
+  for (i = 0; i < m_colorFilters.size(); i++)
+    m_colorFilters.replace(i, sprop->getColorFilter(i));
 }
 
 //-----------------------------------------------------------------------------
@@ -381,6 +402,12 @@ void TSceneProperties::saveData(TOStream &os) const {
   if (!hasDefaultCellMarks()) {
     os.openChild("cellMarks");
     for (auto mark : m_cellMarks) os << mark.name.toStdString() << mark.color;
+    os.closeChild();
+  }
+  if (!hasDefaultColorFilters()) {
+    os.openChild("colorFilters");
+    for (auto filter : m_colorFilters)
+      os << filter.name.toStdString() << filter.color;
     os.closeChild();
   }
 }
@@ -809,6 +836,15 @@ void TSceneProperties::loadData(TIStream &is, bool isLoadingProject) {
         m_cellMarks.replace(i, {QString::fromStdString(name), color});
         i++;
       }
+    } else if (tagName == "colorFilters") {
+      int i = 0;
+      while (!is.eos()) {
+        TPixel32 color;
+        std::string name;
+        is >> name >> color;
+        m_colorFilters.replace(i, {QString::fromStdString(name), color});
+        i++;
+      }
     } else {
       throw TException("unexpected property tag: " + tagName);
     }
@@ -914,6 +950,41 @@ void TSceneProperties::setCellMark(const TSceneProperties::CellMark &mark,
 bool TSceneProperties::hasDefaultCellMarks() const {
   if (m_cellMarks.size() != 12) return false;
   return m_cellMarks == getDefaultCellMarks();
+}
+
+//-----------------------------------------------------------------------------
+
+QList<TSceneProperties::ColorFilter> TSceneProperties::getColorFilters() const {
+  return m_colorFilters;
+}
+
+//-----------------------------------------------------------------------------
+
+TSceneProperties::ColorFilter TSceneProperties::getColorFilter(
+    int index) const {
+  return m_colorFilters[index];
+}
+
+//-----------------------------------------------------------------------------
+
+TPixel32 TSceneProperties::getColorFilterColor(int index) const {
+  return m_colorFilters[index].color;
+}
+
+//-----------------------------------------------------------------------------
+
+void TSceneProperties::setColorFilter(
+    const TSceneProperties::ColorFilter &filter, int index) {
+  assert(index != 0);  // the first item (None) is not editable
+  if (index == 0) return;
+  m_colorFilters[index] = filter;
+}
+
+//-----------------------------------------------------------------------------
+// check if the cell mark settings are modified
+bool TSceneProperties::hasDefaultColorFilters() const {
+  if (m_colorFilters.size() != 11) return false;
+  return m_colorFilters == getDefaultColorFilters();
 }
 
 //-----------------------------------------------------------------------------

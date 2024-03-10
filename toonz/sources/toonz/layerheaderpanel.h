@@ -4,6 +4,7 @@
 #define LAYER_HEADER_PANEL_INCLUDED
 
 #include <QWidget>
+#include <QToolButton>
 #include <boost/optional.hpp>
 
 #include "orientation.h"
@@ -18,38 +19,27 @@ class LayerHeaderPanel final : public QWidget {
 
   enum { ToggleAllTransparency = 1, ToggleAllPreviewVisible, ToggleAllLock };
 
-  enum { NoButton, PreviewButton, CamstandButton, LockButton };
+public:
+  void toggleColumnVisibility(int visibilityFlag);
 
-  int m_doOnRelease;
-  QString m_tooltip;
-  QPoint m_pos;
-  int m_buttonHighlighted;
+  QToolButton *m_previewButton;
+  QToolButton *m_camstandButton;
+  QToolButton *m_lockButton;
 
 private:
   XsheetViewer *m_viewer;
 
 public:
-  LayerHeaderPanel(XsheetViewer *viewer, QWidget *parent = 0,
-                   Qt::WindowFlags flags = 0);
+  LayerHeaderPanel(XsheetViewer *viewer, QWidget *parent = nullptr,
+                   Qt::WindowFlags flags = Qt::WindowFlags());
   ~LayerHeaderPanel();
 
   void showOrHide(const Orientation *o);
 
-protected:
-  void paintEvent(QPaintEvent *event) override;
-
-  void mousePressEvent(QMouseEvent *event) override;
-  void mouseMoveEvent(QMouseEvent *event) override;
-  void mouseReleaseEvent(QMouseEvent *event) override;
-  void enterEvent(QEvent *) override;
-  void leaveEvent(QEvent *) override;
-  bool event(QEvent *event) override;
-
-private:
-  void drawIcon(QPainter &p, PredefinedRect rect, optional<QColor> fill,
-                const QImage &image) const;
-  void drawLines(QPainter &p, const QRect &numberRect,
-                 const QRect &nameRect) const;
+public slots:
+  void onPreviewClicked();
+  void onCamstandClicked();
+  void onLockClicked();
 };
 
 #endif

@@ -1,6 +1,5 @@
 name: Bug report
 description: File a bug report to help us improve
-labels: 'bug'
 body:
   - type: markdown
     attributes:
@@ -39,9 +38,8 @@ body:
       description: You can find version information from the main menu bar [Help > About] within the software.
       multiple: false
       options:
+        - 1.7
         - 1.6
-        - 1.5
-        - 1.4
         - Nightly (Specify below)
         - Other (Specify below)
     validations:

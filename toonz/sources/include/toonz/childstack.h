@@ -5,6 +5,8 @@
 
 #include "tcommon.h"
 
+#include "toonz/txshchildlevel.h"
+
 #undef DVAPI
 #undef DVVAR
 #ifdef TOONZLIB_EXPORTS
@@ -36,11 +38,29 @@ class TXshChildLevel;
    properties, getAncestor(), getAncestorCount(), getAncestorAffine(),
    getTopXsheet().
 */
+
 //=============================================================================
+//! The Node class is a container of element necessary to define a sub-xsheet.
+/*!
+   The class contain a pointer to \b TXsheet \b m_xsheet, two integer to
+   identify column
+   \b m_col and row \b m_row, a \b TXshChildLevelP \b m_cl and a bool \b
+   m_justCreated.
+*/
+
+class AncestorNode {
+public:
+  TXsheet *m_xsheet;
+  int m_row, m_col;
+  std::map<int, int> m_rowTable;
+  TXshChildLevelP m_cl;
+  bool m_justCreated;
+  AncestorNode()
+      : m_xsheet(0), m_row(0), m_col(0), m_rowTable(), m_justCreated(false) {}
+};
 
 class DVAPI ChildStack {
-  class Node;
-  std::vector<Node *> m_stack;
+  std::vector<AncestorNode *> m_stack;
   TXsheet *m_xsheet;
   ToonzScene *m_scene;
 
@@ -113,6 +133,8 @@ Set aff to ancestor affine in \b row. Return true if all ancestors are
 visible in \b row.
 */
   bool getAncestorAffine(TAffine &aff, int row) const;
+
+  AncestorNode *getAncestorInfo(int ancestorDepth);
 
 private:
   // not implemented

@@ -20,10 +20,10 @@
 // TnzCore includes
 #include "tlevel_io.h"
 #include "tproperty.h"
-#include "movsettings.h"
 #include "timageinfo.h"
 #include "tfiletype.h"
 #include "tiio.h"
+#include "movsettings.h"
 
 // Qt includes
 #include <QComboBox>

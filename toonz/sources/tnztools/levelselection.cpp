@@ -14,7 +14,6 @@
 
 // Boost includes
 #include <boost/iterator/counting_iterator.hpp>
-#include <boost/bind.hpp>
 
 //*******************************************************************************
 //    Local namespace  stuff
@@ -108,7 +107,7 @@ void getBoundaries(TVectorImage &vi, std::vector<int> &strokes) {
   std::copy_if(boost::make_counting_iterator(0u),
                boost::make_counting_iterator(vi.getStrokeCount()),
                std::back_inserter(strokes),
-               boost::bind(locals::isBoundary, sData, _1));
+               [&](UINT e) { return locals::isBoundary(sData, e); });
 }
 
 }  // namespace

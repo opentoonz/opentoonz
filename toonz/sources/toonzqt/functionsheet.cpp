@@ -196,8 +196,7 @@ FunctionSheetButtonArea::FunctionSheetButtonArea(QWidget *parent)
   m_syncSizeBtn = new QPushButton("", this);
   m_syncSizeBtn->setCheckable(true);
   m_syncSizeBtn->setFixedSize(20, 20);
-  static QPixmap syncScaleImg =
-      recolorPixmap(svgToPixmap(getIconThemePath("actions/17/syncscale.svg")));
+  static QPixmap syncScaleImg = generateIconPixmap("syncscale");
   QPixmap offPm(17, 17);
   offPm.fill(Qt::transparent);
   {

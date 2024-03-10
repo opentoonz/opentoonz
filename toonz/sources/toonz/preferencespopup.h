@@ -127,6 +127,7 @@ private:
   void onStyleSheetTypeChanged();
   void onIconThemeChanged();
   void onPixelsOnlyChanged();
+  void beforeUnitChanged();
   void onUnitChanged();
   void beforeRoomChoiceChanged();
   void onColorCalibrationChanged();
@@ -138,6 +139,8 @@ private:
   // Xsheet
   void onShowKeyframesOnCellAreaChanged();
   void onShowXSheetToolbarClicked();
+  void onUnifyColumnVisibilityTogglesChanged();
+  void onShowXsheetBreadcrumbsClicked();
   // Animation
   void onModifyExpressionOnMovingReferencesChanged();
   // Preview

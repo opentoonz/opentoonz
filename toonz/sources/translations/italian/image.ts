@@ -2,6 +2,24 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="it" sourcelanguage="en">
 <context>
+    <name>APngWriterProperties</name>
+    <message>
+        <location filename="../../image/ffmpeg/tiio_apng.cpp" line="225"/>
+        <source>Scale</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../image/ffmpeg/tiio_apng.cpp" line="226"/>
+        <source>Looping</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../image/ffmpeg/tiio_apng.cpp" line="227"/>
+        <source>Write as .png</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>AviWriterProperties</name>
     <message>
         <location filename="../../image/avi/tiio_avi.cpp" line="1182"/>
@@ -17,63 +35,91 @@
 <context>
     <name>ExrWriterProperties</name>
     <message>
-        <location filename="../../image/exr/tiio_exr.cpp" line="227"/>
+        <location filename="../../image/exr/tiio_exr.cpp" line="290"/>
         <source>Bits Per Pixel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../image/exr/tiio_exr.cpp" line="228"/>
+        <location filename="../../image/exr/tiio_exr.cpp" line="292"/>
         <source>48(RGB Half Float)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../image/exr/tiio_exr.cpp" line="229"/>
+        <location filename="../../image/exr/tiio_exr.cpp" line="293"/>
         <source>64(RGBA Half Float)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../image/exr/tiio_exr.cpp" line="231"/>
+        <location filename="../../image/exr/tiio_exr.cpp" line="294"/>
+        <source>96(RGB Float)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../image/exr/tiio_exr.cpp" line="295"/>
+        <source>128(RGBA Float)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../image/exr/tiio_exr.cpp" line="299"/>
         <source>Compression Type</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../image/exr/tiio_exr.cpp" line="233"/>
+        <location filename="../../image/exr/tiio_exr.cpp" line="301"/>
         <source>No compression</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../image/exr/tiio_exr.cpp" line="236"/>
+        <location filename="../../image/exr/tiio_exr.cpp" line="304"/>
         <source>Run Length Encoding (RLE)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../image/exr/tiio_exr.cpp" line="239"/>
+        <location filename="../../image/exr/tiio_exr.cpp" line="307"/>
         <source>ZIP compression per Scanline (ZIPS)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../image/exr/tiio_exr.cpp" line="242"/>
+        <location filename="../../image/exr/tiio_exr.cpp" line="310"/>
         <source>ZIP compression per scanline band (ZIP)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../image/exr/tiio_exr.cpp" line="245"/>
+        <location filename="../../image/exr/tiio_exr.cpp" line="313"/>
         <source>PIZ-based wavelet compression (PIZ)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../image/exr/tiio_exr.cpp" line="247"/>
+        <location filename="../../image/exr/tiio_exr.cpp" line="315"/>
         <source>Storage Type</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../image/exr/tiio_exr.cpp" line="248"/>
+        <location filename="../../image/exr/tiio_exr.cpp" line="316"/>
         <source>Scan-line based</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../image/exr/tiio_exr.cpp" line="249"/>
+        <location filename="../../image/exr/tiio_exr.cpp" line="317"/>
         <source>Tile based</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../image/exr/tiio_exr.cpp" line="319"/>
+        <source>Color Space Gamma</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>FFMovWriterProperties</name>
+    <message>
+        <location filename="../../image/ffmpeg/tiio_ff_mov.cpp" line="234"/>
+        <source>Quality</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../image/ffmpeg/tiio_ff_mov.cpp" line="235"/>
+        <source>Scale</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -189,12 +235,13 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../../image/ffmpeg/tiio_ffmpeg.cpp" line="213"/>
+        <location filename="../../image/ffmpeg/tiio_ffmpeg.cpp" line="172"/>
         <source>FFmpeg returned error-code: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../image/ffmpeg/tiio_ffmpeg.cpp" line="217"/>
+        <location filename="../../image/ffmpeg/tiio_ffmpeg.cpp" line="160"/>
+        <location filename="../../image/ffmpeg/tiio_ffmpeg.cpp" line="176"/>
         <source>FFmpeg timed out.
 Please check the file for errors.
 If the file doesn&apos;t play or is incomplete, 

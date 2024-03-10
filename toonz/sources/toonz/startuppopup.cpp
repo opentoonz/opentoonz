@@ -169,8 +169,7 @@ StartupPopup::StartupPopup()
   m_removePresetBtn->setStyleSheet(
       "QPushButton { padding-left: 4px; padding-right: 4px;}");
   QLabel *label = new QLabel();
-  label->setPixmap(
-      QPixmap(QString(":icons/") + QIcon::themeName() + "/misc/startup.png"));
+  label->setPixmap(QPixmap(generateIconPixmap("opentoonz_logo")));
   m_projectBox->setObjectName("SolidLineFrame");
   m_scenesTab->setObjectName("SolidLineFrame");
   m_recentBox->setObjectName("SolidLineFrame");
@@ -195,7 +194,7 @@ StartupPopup::StartupPopup()
     guiLay->setVerticalSpacing(10);
     guiLay->setHorizontalSpacing(10);
 
-    guiLay->addWidget(label, 0, 0, 1, 2, Qt::AlignLeft);
+    guiLay->addWidget(label, 0, 0, 1, 2, Qt::AlignCenter);
 
     //--- Project
     projectLay->setSpacing(8);
@@ -297,19 +296,19 @@ StartupPopup::StartupPopup()
   //---- signal-slot connections
   bool ret = true;
   ret      = ret && connect(sceneHandle, SIGNAL(sceneChanged()), this,
-                       SLOT(onSceneChanged()));
+                            SLOT(onSceneChanged()));
   ret      = ret && connect(sceneHandle, SIGNAL(sceneSwitched()), this,
-                       SLOT(onSceneChanged()));
+                            SLOT(onSceneChanged()));
   ret      = ret && connect(newProjectButton, SIGNAL(clicked()), this,
-                       SLOT(onNewProjectButtonPressed()));
+                            SLOT(onNewProjectButtonPressed()));
   ret      = ret && connect(openProjectButton, SIGNAL(clicked()), this,
-                       SLOT(onOpenProjectButtonPressed()));
+                            SLOT(onOpenProjectButtonPressed()));
   ret      = ret && connect(exploreProjectButton, SIGNAL(clicked()), this,
-                       SLOT(onExploreProjectButtonPressed()));
+                            SLOT(onExploreProjectButtonPressed()));
   ret      = ret && connect(loadOtherSceneButton, SIGNAL(clicked()), this,
-                       SLOT(onLoadSceneButtonPressed()));
+                            SLOT(onLoadSceneButtonPressed()));
   ret      = ret && connect(m_projectsCB, SIGNAL(currentIndexChanged(int)),
-                       SLOT(onProjectChanged(int)));
+                            SLOT(onProjectChanged(int)));
   ret      = ret &&
         connect(createButton, SIGNAL(clicked()), this, SLOT(onCreateButton()));
   ret = ret && connect(m_showAtStartCB, SIGNAL(stateChanged(int)), this,
@@ -974,7 +973,7 @@ void StartupPopup::onOpenProjectButtonPressed() {
 
 void StartupPopup::onExploreProjectButtonPressed() {
   TProjectManager *pm = TProjectManager::instance();
-  TFilePath cfp = pm->getCurrentProject()->getProjectFolder();
+  TFilePath cfp       = pm->getCurrentProject()->getProjectFolder();
 
   QDesktopServices::openUrl(QUrl("file:///" + cfp.getQString()));
 }
@@ -1038,11 +1037,11 @@ void StartupPopup::onRecentSceneClicked(int index) {
     IoCmd::loadScene(TFilePath(path.toStdWString()), false, true);
     QString origProjectName = RecentFiles::instance()->getFileProject(index);
     QString projectName     = QString::fromStdString(TApp::instance()
-                                                     ->getCurrentScene()
-                                                     ->getScene()
-                                                     ->getProject()
-                                                     ->getName()
-                                                     .getName());
+                                                         ->getCurrentScene()
+                                                         ->getScene()
+                                                         ->getProject()
+                                                         ->getName()
+                                                         .getName());
     if (origProjectName == "-" || origProjectName != projectName) {
       QString fileName =
           RecentFiles::instance()->getFilePath(index, RecentFiles::Scene);
@@ -1222,8 +1221,7 @@ QPixmap StartupScenesList::createScenePreview(const QString &name,
       painter.setPen(pen);
       painter.drawRect((m_iconSize.width() - scaledPixmap.width()) / 2,
                        (m_iconSize.height() - scaledPixmap.height()) / 2,
-                       scaledPixmap.width() - 1,
-                       scaledPixmap.height() - 1);
+                       scaledPixmap.width() - 1, scaledPixmap.height() - 1);
       return pixmap;
     }
   }
@@ -1232,15 +1230,13 @@ QPixmap StartupScenesList::createScenePreview(const QString &name,
   return pixmap;
 }
 
-void StartupScenesList::clearScenes() {
-    clear();
-}
+void StartupScenesList::clearScenes() { clear(); }
 
 void StartupScenesList::addScene(const QString &name, const QString &path) {
   QPixmap pixmap;
   if (path == ":")
-    pixmap =
-        svgToPixmap(getIconThemePath("actions/16/new_scene.svg"), m_iconSize, Qt::KeepAspectRatio);
+    pixmap = generateIconPixmap("new_scene", qreal(1.0), m_iconSize,
+                                Qt::KeepAspectRatio);
   else
     pixmap = createScenePreview(name, TFilePath(path));
   QIcon icon(pixmap);

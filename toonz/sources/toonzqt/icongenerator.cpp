@@ -499,6 +499,26 @@ IconRenderer::~IconRenderer() {}
 //=============================================================================
 
 //======================================
+//    NoImageIconRenderer class
+//--------------------------------------
+
+class NoImageIconRenderer final : public IconRenderer {
+public:
+  NoImageIconRenderer(const std::string &id, const TDimension &iconSize)
+      : IconRenderer(id, iconSize) {}
+  void run() override {
+    try {
+      TRaster32P ras(getIconSize());
+      ras->fill(TPixel32::Gray);
+      setIcon(ras);
+    } catch (...) {
+    }
+  }
+};
+
+//=============================================================================
+
+//======================================
 //    VectorImageIconRenderer class
 //--------------------------------------
 
@@ -1086,9 +1106,9 @@ Qt::transparent)
 
     bbox = (bbox * icon->getBounds())
                .enlarge(-1);  // Add a 1 pixel transparent margin - this
-    //if (bbox.getLx() > 0 &&
-    //    bbox.getLy() > 0)  // way the actual content doesn't look trimmed.
-    //  ::makeChessBackground(icon->extract(bbox));
+    // if (bbox.getLx() > 0 &&
+    //     bbox.getLy() > 0)  // way the actual content doesn't look trimmed.
+    //   ::makeChessBackground(icon->extract(bbox));
   } else
     icon->fill(TPixel32(255, 0, 0));
 
@@ -1169,30 +1189,30 @@ void FileIconRenderer::run() {
       setIcon(rasterFromQImage(palette));
       return;
     } else if (type == "svg") {
-      QPixmap svg(svgToPixmap(getIconThemePath("mimetypes/60/svg_icon.svg"),
-                              QSize(iconSize.lx, iconSize.ly),
-                              Qt::KeepAspectRatio));
-      setIcon(rasterFromQPixmap(svg));
+      QImage svg(generateIconImage("svg_icon", qreal(1.0),
+                                   QSize(iconSize.lx, iconSize.ly),
+                                   Qt::KeepAspectRatio));
+      setIcon(rasterFromQImage(svg));
       return;
     } else if (type == "tzu") {
       QImage palette(":Resources/tzuicon.png");
       setIcon(rasterFromQImage(palette));
       return;
     } else if (TFileType::getInfo(m_path) == TFileType::AUDIO_LEVEL) {
-      QPixmap loudspeaker(
-          svgToPixmap(getIconThemePath("mimetypes/60/audio_icon.svg"),
-                      QSize(iconSize.lx, iconSize.ly), Qt::KeepAspectRatio));
-      setIcon(rasterFromQPixmap(loudspeaker));
+      QImage loudspeaker(generateIconImage("audio_icon", qreal(1.0),
+                                           QSize(iconSize.lx, iconSize.ly),
+                                           Qt::KeepAspectRatio));
+      setIcon(rasterFromQImage(loudspeaker));
       return;
     } else if (type == "scr") {
       QImage screensaver(":Resources/savescreen.png");
       setIcon(rasterFromQImage(screensaver));
       return;
     } else if (type == "psd") {
-      QPixmap psdPath(svgToPixmap(getIconThemePath("mimetypes/60/psd_icon.svg"),
-                                  QSize(iconSize.lx, iconSize.ly),
-                                  Qt::KeepAspectRatio));
-      setIcon(rasterFromQPixmap(psdPath));
+      QImage psdPath(generateIconImage("psd_icon", qreal(1.0),
+                                       QSize(iconSize.lx, iconSize.ly),
+                                       Qt::KeepAspectRatio));
+      setIcon(rasterFromQImage(psdPath));
       return;
     } else if (type == "mesh")
       iconRaster = IconGenerator::generateMeshFileIcon(m_path, iconSize, m_fid);
@@ -1200,80 +1220,80 @@ void FileIconRenderer::run() {
       iconRaster =
           IconGenerator::generateRasterFileIcon(m_path, iconSize, m_fid);
     else if (type == "mpath") {
-      QPixmap motionPath(
-          svgToPixmap(getIconThemePath("mimetypes/60/motionpath_icon.svg"),
-                      QSize(iconSize.lx, iconSize.ly), Qt::KeepAspectRatio));
-      setIcon(rasterFromQPixmap(motionPath));
+      QImage motionPath(generateIconImage("motionpath_icon", qreal(1.0),
+                                          QSize(iconSize.lx, iconSize.ly),
+                                          Qt::KeepAspectRatio));
+      setIcon(rasterFromQImage(motionPath));
       return;
     } else if (type == "curve") {
-      QPixmap curve(svgToPixmap(getIconThemePath("mimetypes/60/curve_icon.svg"),
-                                QSize(iconSize.lx, iconSize.ly),
-                                Qt::KeepAspectRatio));
-      setIcon(rasterFromQPixmap(curve));
+      QImage curve(generateIconImage("curve_icon", qreal(1.0),
+                                     QSize(iconSize.lx, iconSize.ly),
+                                     Qt::KeepAspectRatio));
+      setIcon(rasterFromQImage(curve));
       return;
     } else if (type == "cln") {
-      QPixmap cln(svgToPixmap(getIconThemePath("mimetypes/60/cleanup_icon.svg"),
-                              QSize(iconSize.lx, iconSize.ly),
-                              Qt::KeepAspectRatio));
-      setIcon(rasterFromQPixmap(cln));
+      QImage cln(generateIconImage("cleanup_icon", qreal(1.0),
+                                   QSize(iconSize.lx, iconSize.ly),
+                                   Qt::KeepAspectRatio));
+      setIcon(rasterFromQImage(cln));
       return;
     } else if (type == "tnzbat") {
-      QPixmap tnzBat(
-          svgToPixmap(getIconThemePath("mimetypes/60/tasklist_icon.svg"),
-                      QSize(iconSize.lx, iconSize.ly), Qt::KeepAspectRatio));
-      setIcon(rasterFromQPixmap(tnzBat));
+      QImage tnzBat(generateIconImage("tasklist_icon", qreal(1.0),
+                                      QSize(iconSize.lx, iconSize.ly),
+                                      Qt::KeepAspectRatio));
+      setIcon(rasterFromQImage(tnzBat));
       return;
     } else if (type == "tls") {
-      QPixmap tls(svgToPixmap(":Resources/magpie.svg",
-                              QSize(iconSize.lx, iconSize.ly),
-                              Qt::KeepAspectRatio));
-      setIcon(rasterFromQPixmap(tls));
+      QImage tls(svgToImage(":Resources/magpie.svg",
+                            QSize(iconSize.lx, iconSize.ly),
+                            Qt::KeepAspectRatio));
+      setIcon(rasterFromQImage(tls));
       return;
     } else if (type == "xdts") {
-      QPixmap xdts(svgToPixmap(getIconThemePath("mimetypes/60/xdts_icon.svg"),
-                               QSize(iconSize.lx, iconSize.ly),
-                               Qt::KeepAspectRatio));
-      setIcon(rasterFromQPixmap(xdts));
+      QImage xdts(generateIconImage("xdts_icon", qreal(1.0),
+                                    QSize(iconSize.lx, iconSize.ly),
+                                    Qt::KeepAspectRatio));
+      setIcon(rasterFromQImage(xdts));
       return;
     } else if (type == "js") {
-      QPixmap script(
-          svgToPixmap(getIconThemePath("mimetypes/60/script_icon.svg"),
-                      QSize(iconSize.lx, iconSize.ly), Qt::KeepAspectRatio));
-      setIcon(rasterFromQPixmap(script));
+      QImage script(generateIconImage("script_icon", qreal(1.0),
+                                      QSize(iconSize.lx, iconSize.ly),
+                                      Qt::KeepAspectRatio));
+      setIcon(rasterFromQImage(script));
       return;
     } else if (type == "json") {
-      QPixmap json(svgToPixmap(getIconThemePath("mimetypes/60/json_icon.svg"),
-                               QSize(iconSize.lx, iconSize.ly),
-                               Qt::KeepAspectRatio));
-      setIcon(rasterFromQPixmap(json));
+      QImage json(generateIconImage("json_icon", qreal(1.0),
+                                    QSize(iconSize.lx, iconSize.ly),
+                                    Qt::KeepAspectRatio));
+      setIcon(rasterFromQImage(json));
       return;
     }
 
     else {
-      QPixmap unknown(
-          svgToPixmap(getIconThemePath("mimetypes/60/unknown_icon.svg"),
-                      QSize(iconSize.lx, iconSize.ly), Qt::KeepAspectRatio));
-      setIcon(rasterFromQPixmap(unknown));
+      QImage unknown(generateIconImage("unknown_icon", qreal(1.0),
+                                       QSize(iconSize.lx, iconSize.ly),
+                                       Qt::KeepAspectRatio));
+      setIcon(rasterFromQImage(unknown));
       return;
     }
     if (!iconRaster) {
-      QPixmap broken(
-          svgToPixmap(getIconThemePath("mimetypes/60/broken_icon.svg"),
-                      QSize(iconSize.lx, iconSize.ly), Qt::KeepAspectRatio));
-      setIcon(rasterFromQPixmap(broken));
+      QImage broken(generateIconImage("broken_icon", qreal(1.0),
+                                      QSize(iconSize.lx, iconSize.ly),
+                                      Qt::KeepAspectRatio));
+      setIcon(rasterFromQImage(broken));
       return;
     }
     setIcon(iconRaster);
   } catch (const TImageVersionException &) {
-    QPixmap unknown(
-        svgToPixmap(getIconThemePath("mimetypes/60/unknown_icon.svg"),
-                    QSize(iconSize.lx, iconSize.ly), Qt::KeepAspectRatio));
-    setIcon(rasterFromQPixmap(unknown));
+    QImage unknown(generateIconImage("unknown_icon", qreal(1.0),
+                                     QSize(iconSize.lx, iconSize.ly),
+                                     Qt::KeepAspectRatio));
+    setIcon(rasterFromQImage(unknown));
   } catch (...) {
-    QPixmap broken(svgToPixmap(getIconThemePath("mimetypes/60/broken_icon.svg"),
-                               QSize(iconSize.lx, iconSize.ly),
-                               Qt::KeepAspectRatio));
-    setIcon(rasterFromQPixmap(broken));
+    QImage broken(generateIconImage("broken_icon", qreal(1.0),
+                                    QSize(iconSize.lx, iconSize.ly),
+                                    Qt::KeepAspectRatio));
+    setIcon(rasterFromQImage(broken));
   }
 }
 
@@ -1442,7 +1462,7 @@ QPixmap IconGenerator::getIcon(TXshLevel *xl, const TFrameId &fid,
       addTask(id, new MeshImageIconRenderer(id, iconSize, sl, fid, m_settings));
       break;
     default:
-      assert(false);
+      addTask(id, new NoImageIconRenderer(id, iconSize));
       break;
     }
 
@@ -1573,7 +1593,7 @@ void IconGenerator::invalidate(TXshLevel *xl, const TFrameId &fid,
                                             m_settings));
       break;
     default:
-      assert(false);
+      addTask(id, new NoImageIconRenderer(id, getIconSize()));
       break;
     }
 
@@ -1611,7 +1631,7 @@ void IconGenerator::invalidate(TXshLevel *xl, const TFrameId &fid,
                                             m_settings));
       break;
     default:
-      assert(false);
+      addTask(id, new NoImageIconRenderer(id, TDimension(80, 60)));
       break;
     }
 

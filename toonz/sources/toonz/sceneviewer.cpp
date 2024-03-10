@@ -1,5 +1,5 @@
 
-#if defined(LINUX) || defined(FREEBSD)
+#if defined(LINUX) || defined(FREEBSD) || defined(HAIKU)
 #define GL_GLEXT_PROTOTYPES
 #endif
 
@@ -23,6 +23,8 @@
 #include "tools/toolhandle.h"
 #include "tools/toolcommandids.h"
 #include "tools/toolutils.h"
+#include "tools/assistant.h"
+#include "tools/replicator.h"
 
 // TnzQt includes
 #include "toonzqt/icongenerator.h"
@@ -755,7 +757,7 @@ public:
 
 SceneViewer::SceneViewer(ImageUtils::FullScreenWidget *parent)
     : GLWidgetForHighDpi(parent)
-    , TTool::Viewer(this)
+    , TToolViewer(this)
     , m_pressure(0)
     , m_lastMousePos(0, 0)
     , m_mouseButton(Qt::NoButton)
@@ -948,9 +950,12 @@ void SceneViewer::enablePreview(int previewMode) {
     emit freezeStateChanged(false);
   }
 
-  if (m_previewMode != NO_PREVIEW)
+  if (m_previewMode != NO_PREVIEW) {
     Previewer::instance(m_previewMode == SUBCAMERA_PREVIEW)
         ->removeListener(this);
+    Previewer::instance(m_previewMode == SUBCAMERA_PREVIEW)
+        ->clearAllUnfinishedFrames();
+  }
 
   m_previewMode = previewMode;
 
@@ -1828,7 +1833,51 @@ void SceneViewer::drawOverlay() {
         !app->getCurrentObject()->isSpline())
       glScaled(m_dpiScale.x, m_dpiScale.y, 1);
     m_pixelSize = sqrt(tglGetPixelSize2()) * getDevPixRatio();
+    
+    unsigned int hints = tool->getToolHints();
+
+    // draw assistans and guidelines
+    m_toolHasAssistants = false;
+    if (hints & TTool::HintAssistantsAll) {
+      bool markEnabled    = hints & TTool::HintAssistantsEnabled;
+      bool drawGuidelines = hints & TTool::HintAssistantsGuidelines;
+      
+      m_toolHasAssistants = TAssistant::scanAssistants(
+        tool,           // tool
+        &m_toolPos, 1,  // pointer positions
+        nullptr,        // out guidelines
+        true,           // draw
+        false,          // enabled only
+        markEnabled,    // mark enabled
+        drawGuidelines, // draw guidelines
+        nullptr );      // skip image
+    }
+    
+    // draw replicators
+    m_toolReplicatedPoints.clear();
+    if (hints & TTool::HintReplicatorsAll) {
+      bool drawPoints  = hints & TTool::HintReplicatorsPoints;
+      bool markEnabled = hints & TTool::HintReplicatorsEnabled;
+      TReplicator::PointList *points = nullptr;
+      if (drawPoints) {
+        m_toolReplicatedPoints.push_back(m_toolPos);
+        points = &m_toolReplicatedPoints;
+      }
+      
+      TReplicator::scanReplicators(
+        tool,           // tool
+        points,         // in/out points
+        nullptr,        // out modifiers
+        true,           // draw
+        false,          // enabled only
+        markEnabled,    // mark enabled
+        drawPoints,     // draw points
+        nullptr );      // skip image
+    }
+    
+    // draw tool
     tool->draw();
+    
     glPopMatrix();
     // Used (only in the T_RGBPicker tool) to notify and set the currentColor
     // outside the draw() methods:
@@ -2244,12 +2293,42 @@ TRect SceneViewer::getActualClipRect(const TAffine &aff) {
   else if (m_clipRect.isEmpty())
     clipRect -= TPointD(viewerSize.lx / 2, viewerSize.ly / 2);
   else {
-    TRectD app = aff * (m_clipRect.enlarge(3));
-    clipRect =
-        TRectD(tceil(app.x0), tceil(app.y0), tfloor(app.x1), tfloor(app.y1));
+    clipRect = aff * (m_clipRect.enlarge(3));
   }
 
+  clipRect *= TRectD(viewerSize) - TPointD(viewerSize.lx/2, viewerSize.ly/2);
   return convert(clipRect);
+}
+
+//-----------------------------------------------------------------------------
+
+TAffine4 SceneViewer::get3dViewMatrix() const {
+  if (is3DView()) {
+    TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
+    TStageObjectId cameraId = xsh->getStageObjectTree()->getCurrentCameraId();
+    double z = xsh->getStageObject(cameraId)->getZ(
+                  TApp::instance()->getCurrentFrame()->getFrame());
+
+    TAffine4 affine;
+    affine *= TAffine4::translation(m_pan3D.x, m_pan3D.y, z);
+    affine *= TAffine4::scale(m_zoomScale3D, m_zoomScale3D, m_zoomScale3D);
+    affine *= TAffine4::rotationX(M_PI_180*m_theta3D);
+    affine *= TAffine4::rotationY(M_PI_180*m_phi3D);
+    return affine;
+  }
+
+  int viewMode = TApp::instance()->getCurrentFrame()->isEditingLevel()
+                     ? LEVEL_VIEWMODE
+                     : SCENE_VIEWMODE;
+
+  if (m_referenceMode == CAMERA_REFERENCE) {
+    int frame    = TApp::instance()->getCurrentFrame()->getFrame();
+    TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
+    TAffine aff  = xsh->getCameraAff(frame);
+    return TAffine4(m_viewAff[viewMode] * aff.inv());
+  }
+
+  return TAffine4(m_viewAff[viewMode]);
 }
 
 //-----------------------------------------------------------------------------
@@ -3274,6 +3353,7 @@ TAffine SceneViewer::getNormalZoomScale() {
 //-----------------------------------------------------------------------------
 
 void SceneViewer::invalidateToolStatus() {
+  m_toolHasAssistants = false;
   TTool *tool = TApp::instance()->getCurrentTool()->getTool();
   if (tool) {
     m_toolDisableReason = tool->updateEnabled();

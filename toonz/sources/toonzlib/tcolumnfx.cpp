@@ -993,6 +993,7 @@ void TLevelColumnFx::doCompute(TTile &tile, double frame,
 
   TXshSimpleLevel *sl = cell.m_level->getSimpleLevel();
   if (!sl) return;
+  if (sl->getType() == META_XSHLEVEL) return;
 
   TFrameId fid = cell.m_frameId;
 

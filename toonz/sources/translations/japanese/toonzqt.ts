@@ -289,6 +289,14 @@ Possibly the preset file has been corrupted</source>
         <source>R:%1 G:%2 B:%3</source>
         <translation></translation>
     </message>
+    <message>
+        <source> A:%1</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>A:%1</source>
+        <translation></translation>
+    </message>
 </context>
 <context>
     <name>ComboHistogram</name>
@@ -877,6 +885,28 @@ Possibly the preset file has been corrupted</source>
     <message>
         <source>&amp;Next Frame</source>
         <translation>次のフレーム (&amp;N)</translation>
+    </message>
+    <message>
+        <source>Gain Controls</source>
+        <translation>ゲイン</translation>
+    </message>
+    <message>
+        <source>&amp;Reduce gain 1/2 stop (divide by sqrt(2))</source>
+        <translation>Fストップ値を1/2減らす（sqrt(2)で除算） (&amp;R)</translation>
+    </message>
+    <message>
+        <source>Toggle gain between 1 and the previous setting.
+Gain is shown as an f-stop and the &quot;neutral&quot; or 1.0 gain f-stop is f/8.</source>
+        <translation>ゲインの値を1.0と直前の値とで切り替えます。
+ゲインはFストップで表示され、「標準」あるいはゲイン1.0のFストップはf/8です。</translation>
+    </message>
+    <message>
+        <source>&amp;Increase gain 1/2 stop (multiply by sqrt(2))</source>
+        <translation>Fストップ値を1/2増やす（sqrt(2)で乗算） (&amp;I)</translation>
+    </message>
+    <message>
+        <source> (gain %1)</source>
+        <translation> (ゲイン %1)</translation>
     </message>
 </context>
 <context>
@@ -1821,6 +1851,30 @@ Select FX nodes and related links before copying or cutting the selection you wa
         <source>Set Toolbar Above Styles</source>
         <translation>ツールバーを上に配置</translation>
     </message>
+    <message>
+        <source>Auto Adjust Panel Width</source>
+        <translation>パネル幅を自動で調整</translation>
+    </message>
+    <message>
+        <source>Visible Toolbar Buttons</source>
+        <translation>ツールバーボタンの表示</translation>
+    </message>
+    <message>
+        <source>KeyFrame</source>
+        <translation>キーフレーム</translation>
+    </message>
+    <message>
+        <source>New Style/Page</source>
+        <translation>新規スタイル／ページ</translation>
+    </message>
+    <message>
+        <source>Palette Gizmo</source>
+        <translation>スタイルをまとめて色調整</translation>
+    </message>
+    <message>
+        <source>Name Editor</source>
+        <translation>スタイル名エディタ</translation>
+    </message>
 </context>
 <context>
     <name>PaletteViewerGUI::PageViewer</name>
@@ -1888,6 +1942,13 @@ Select FX nodes and related links before copying or cutting the selection you wa
     <message>
         <source>View help page</source>
         <translation>ヘルプの表示</translation>
+    </message>
+    <message>
+        <source>This Fx does not support rendering in floating point channel width (32bit).
+The output pixel values from this fx will be clamped to 0.0 - 1.0
+and tone may be slightly discretized.</source>
+        <translation>このエフェクトは浮動小数（32bit）のチャンネル幅でのレンダリングをサポートしていません。
+このエフェクトから出力されるピクセル値は0.0-1.0にクランプされ、諧調がわずかに離散化されます。</translation>
     </message>
 </context>
 <context>
@@ -2458,7 +2519,7 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     <message>
         <source>Custom Texture</source>
         <comment>TextureStyleChooserPage</comment>
-        <translation>カスタムテクスチャ</translation>
+        <translation type="vanished">カスタムテクスチャ</translation>
     </message>
     <message>
         <source>Current Frame: </source>
@@ -2514,6 +2575,15 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     <message>
         <source>Click &amp; Drag Palette into Studio Palette</source>
         <translation>[スタジオパレットにドラッグ] このパレットをスタジオパレットに登録する</translation>
+    </message>
+    <message>
+        <source>Plain color</source>
+        <comment>TextureStyleChooserPage</comment>
+        <translation>単色</translation>
+    </message>
+    <message>
+        <source>Sample Type: </source>
+        <translation>サンプル形式： </translation>
     </message>
 </context>
 <context>
@@ -2636,6 +2706,33 @@ The second line should be &quot;Mesh [Input bit depth] [Output bit depth]&quot;<
     <message>
         <source>&amp;Close Editor</source>
         <translation>エディタを閉じる (&amp;C)</translation>
+    </message>
+</context>
+<context>
+    <name>SeeThroughWindowPopup</name>
+    <message>
+        <source>See Through Mode (Main Window)</source>
+        <translation>透過モード （メインウィンドウ）</translation>
+    </message>
+    <message>
+        <source>Opacity</source>
+        <translation>不透明度</translation>
+    </message>
+    <message>
+        <source>Quickly toggle main window semi-transparency and full opacity.</source>
+        <translation>メインウィンドウの半透明表示と不透明表示を切り替えます。</translation>
+    </message>
+    <message>
+        <source>Hold ALT while clicking to use full transparency instead.</source>
+        <translation>Altキーを押しながらクリックすると、完全に透明になります。</translation>
+    </message>
+    <message>
+        <source>When slider is at 100% it acts as ALT is held.</source>
+        <translation>スライダが100％の状態でも、Altキーを押しているのと同じ動作をします。</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation>閉じる</translation>
     </message>
 </context>
 <context>
@@ -3050,6 +3147,14 @@ Apply</source>
         <source>Hex Color Names...</source>
         <translation>16進数カラー名エディタ...</translation>
     </message>
+    <message>
+        <source>Search</source>
+        <translation>検索</translation>
+    </message>
+    <message>
+        <source>Clear Search</source>
+        <translation>検索をクリア</translation>
+    </message>
 </context>
 <context>
     <name>StyleEditorGUI::ColorChannelControl</name>
@@ -3114,6 +3219,21 @@ Apply</source>
     <message>
         <source>Reset to default</source>
         <translation>リセット</translation>
+    </message>
+</context>
+<context>
+    <name>StyleEditorGUI::StyleChooserPage</name>
+    <message>
+        <source>Pin To Top</source>
+        <translation>トップに固定</translation>
+    </message>
+    <message>
+        <source>Set Pins To Top</source>
+        <translation>トップに固定する</translation>
+    </message>
+    <message>
+        <source>Clear Pins To Top</source>
+        <translation>トップに固定を解除</translation>
     </message>
 </context>
 <context>

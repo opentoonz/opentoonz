@@ -236,7 +236,7 @@ class Filmstrip final : public QWidget, public SaveLoadQSettings {
   bool m_showComboBox  = true;
 
 public:
-  Filmstrip(QWidget *parent = 0, Qt::WindowFlags flags = 0);
+  Filmstrip(QWidget *parent = 0, Qt::WindowFlags flags = Qt::WindowFlags());
   ~Filmstrip();
 
   // SaveLoadQSettings

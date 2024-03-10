@@ -168,15 +168,16 @@ void ColorModel::rgb2hsv() {
   QColor converter(m_channels[0], m_channels[1], m_channels[2]);
   m_channels[4] =
       std::max(converter.hue(), 0);  // hue() ritorna -1 per colori acromatici
-  m_channels[5] = converter.saturation() * 100 / 255;
-  m_channels[6] = converter.value() * 100 / 255;
+  m_channels[5] = (int)std::round(converter.saturationF() * 100.);
+  m_channels[6] = (int)std::round(converter.valueF() * 100.);
 }
 
 //-----------------------------------------------------------------------------
 
 void ColorModel::hsv2rgb() {
-  QColor converter = QColor::fromHsv(m_channels[4], m_channels[5] * 255 / 100,
-                                     m_channels[6] * 255 / 100);
+  QColor converter =
+      QColor::fromHsvF((qreal)m_channels[4] / 360., (qreal)m_channels[5] / 100.,
+                       (qreal)m_channels[6] / 100.);
 
   m_channels[0] = converter.red();
   m_channels[1] = converter.green();
@@ -193,8 +194,8 @@ void ColorModel::setTPixel(const TPixel32 &pix) {
   m_channels[3] = color.alpha();
   m_channels[4] =
       std::max(color.hue(), 0);  // hue() ritorna -1 per colori acromatici
-  m_channels[5] = color.saturation() * 100 / 255;
-  m_channels[6] = color.value() * 100 / 255;
+  m_channels[5] = (int)std::round(color.saturationF() * 100.);
+  m_channels[6] = (int)std::round(color.valueF() * 100.);
 }
 
 //-----------------------------------------------------------------------------
@@ -1604,8 +1605,8 @@ PlainColorPage::PlainColorPage(QWidget *parent)
   m_slidersContainer = new QFrame(this);
   m_vSplitter        = new QSplitter(this);
 
-  //プロパティの設定
-  // channelButtonGroup->setExclusive(true);
+  // プロパティの設定
+  //  channelButtonGroup->setExclusive(true);
 
   m_wheelFrame->setObjectName("PlainColorPageParts");
   m_hsvFrame->setObjectName("PlainColorPageParts");
@@ -1919,7 +1920,6 @@ void StyleChooserPage::paintEvent(QPaintEvent *) {
   // Get current selected style
   TColorStyleP selectedStyle = nullptr;
   if (m_styleEditor) selectedStyle = m_styleEditor->getEditedStyle();
-
 
   QPainter p(this);
   // p.setRenderHint(QPainter::SmoothPixmapTransform);
@@ -2960,7 +2960,7 @@ StyleEditor::StyleEditor(PaletteController *paletteController, QWidget *parent)
 
   bool ret = true;
   ret      = ret && connect(m_styleBar, SIGNAL(currentChanged(int)), this,
-                       SLOT(setPage(int)));
+                            SLOT(setPage(int)));
   ret = ret && connect(m_colorParameterSelector, SIGNAL(colorParamChanged()),
                        this, SLOT(onColorParamChanged()));
   ret = ret &&
@@ -3150,9 +3150,9 @@ QFrame *StyleEditor::createBottomWidget() {
   /* ------ signal-slot connections ------ */
   bool ret = true;
   ret      = ret && connect(m_applyButton, SIGNAL(clicked()), this,
-                       SLOT(applyButtonClicked()));
+                            SLOT(applyButtonClicked()));
   ret      = ret && connect(m_autoButton, SIGNAL(toggled(bool)), this,
-                       SLOT(autoCheckChanged(bool)));
+                            SLOT(autoCheckChanged(bool)));
   ret      = ret &&
         connect(m_oldColor, SIGNAL(clicked()), this, SLOT(onOldStyleClicked()));
   ret = ret &&
@@ -3312,11 +3312,11 @@ QFrame *StyleEditor::createVectorPage() {
   /* ------ signal-slot connections ------ */
   bool ret = true;
   ret      = ret && connect(specialButton, SIGNAL(toggled(bool)), this,
-                       SLOT(onSpecialButtonToggled(bool)));
+                            SLOT(onSpecialButtonToggled(bool)));
   ret      = ret && connect(customButton, SIGNAL(toggled(bool)), this,
-                       SLOT(onCustomButtonToggled(bool)));
+                            SLOT(onCustomButtonToggled(bool)));
   ret      = ret && connect(vectorBrushButton, SIGNAL(toggled(bool)), this,
-                       SLOT(onVectorBrushButtonToggled(bool)));
+                            SLOT(onVectorBrushButtonToggled(bool)));
   ret =
       ret && connect(m_vectorsSearchText, SIGNAL(textChanged(const QString &)),
                      this, SLOT(onVectorsSearch(const QString &)));
@@ -3462,11 +3462,11 @@ void StyleEditor::showEvent(QShowEvent *) {
   onStyleSwitched();
   bool ret = true;
   ret      = ret && connect(m_paletteHandle, SIGNAL(colorStyleSwitched()),
-                       SLOT(onStyleSwitched()));
+                            SLOT(onStyleSwitched()));
   ret      = ret && connect(m_paletteHandle, SIGNAL(colorStyleChanged(bool)),
-                       SLOT(onStyleChanged(bool)));
+                            SLOT(onStyleChanged(bool)));
   ret      = ret && connect(m_paletteHandle, SIGNAL(paletteSwitched()), this,
-                       SLOT(onStyleSwitched()));
+                            SLOT(onStyleSwitched()));
   ret = ret && connect(m_paletteController, SIGNAL(checkPaletteLock()), this,
                        SLOT(checkPaletteLock()));
   if (m_cleanupPaletteHandle)

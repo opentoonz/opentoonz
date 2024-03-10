@@ -190,11 +190,9 @@ TPanelTitleBar {
   min-height: 18;
   qproperty-TitleColor: @title-text-color;
   qproperty-ActiveTitleColor: @title-text-color-active;
-  // QSS only works when pixmaps are set to 'none'
-  qproperty-BorderPixmap: url('none');
-  qproperty-ActiveBorderPixmap: url('@{img-url}/@{title-active-border-pixmap}');
-  qproperty-FloatBorderPixmap: url('none');
-  qproperty-FloatActiveBorderPixmap: url('@{img-url}/@{title-active-border-pixmap}');
+
+  // Close button rollover color
+  qproperty-OverColor: @title-close-over-color;
 }
 
 TPanelTitleBarButton {

@@ -363,7 +363,7 @@ public:
   void rightButtonDown(const TPointD &pos, const TMouseEvent &) override;
   bool keyDown(QKeyEvent *event) override;
 
-  void onInputText(std::wstring preedit, std::wstring commit,
+  void onInputText(const std::wstring &preedit, const std::wstring &commit,
                    int replacementStart, int replacementLen) override;
 
   // cancella gli StrokeChar fra from e to-1 e inserisce nuovi StrokeChar
@@ -1665,7 +1665,7 @@ bool TypeTool::keyDown(QKeyEvent *event) {
 
 //-----------------------------------------------------------------------------
 
-void TypeTool::onInputText(std::wstring preedit, std::wstring commit,
+void TypeTool::onInputText(const std::wstring &preedit, const std::wstring &commit,
                            int replacementStart, int replacementLen) {
   // butto la vecchia preedit string
   m_preeditRange.first  = std::max(0, m_preeditRange.first);

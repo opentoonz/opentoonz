@@ -282,6 +282,8 @@ QString InfoViewerImp::getTypeString() {
     return "Audio File";
   else if (ext == "mesh")
     return "Toonz Mesh Level";
+  else if (ext == "tzm")
+    return "Toonz Meta Level";
   else if (ext == "pic")
     return "Pic File";
   else if (Tiio::makeReader(ext.toStdString()))

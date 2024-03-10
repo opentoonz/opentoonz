@@ -133,6 +133,10 @@ DoubleValueField::DoubleValueField(QWidget *parent,
   layout->addWidget(m_spaceWidget, 1, Qt::AlignLeft);
 
   setRange(-100.0, 100.0);
+  
+  double value = getValue();
+  m_roller->setValue(value);
+  m_slider->setValue(value2pos(value));
 }
 
 //-----------------------------------------------------------------------------

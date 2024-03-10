@@ -9,6 +9,7 @@
 
 // TnzQt includes
 #include "toonzqt/menubarcommand.h"
+#include "toonzqt/gutil.h"
 
 // TnzLib includes
 #include "toonz/txsheet.h"
@@ -81,6 +82,46 @@ public:
 
   QString getHistoryString() override {
     return QObject::tr("Edit Cell Mark #%1").arg(QString::number(m_id));
+  }
+};
+
+//-----------------------------------------------------------------------------
+
+class EditColorFilterUndo final : public TUndo {
+  int m_id;
+  TSceneProperties::ColorFilter m_filterBefore, m_filterAfter;
+  ColorFiltersPopup *m_popup;
+
+public:
+  EditColorFilterUndo(int id, TPixel32 color, QString name,
+                      ColorFiltersPopup *popup)
+      : m_id(id), m_popup(popup) {
+    m_filterBefore = TApp::instance()
+                         ->getCurrentScene()
+                         ->getScene()
+                         ->getProperties()
+                         ->getColorFilter(id);
+    m_filterAfter = {name, color};
+  }
+
+  void set(const TSceneProperties::ColorFilter &filter) const {
+    TApp::instance()
+        ->getCurrentScene()
+        ->getScene()
+        ->getProperties()
+        ->setColorFilter(filter, m_id);
+    m_popup->updateContents();
+    TApp::instance()->getCurrentScene()->notifySceneChanged();
+  }
+
+  void undo() const override { set(m_filterBefore); }
+
+  void redo() const override { set(m_filterAfter); }
+
+  int getSize() const override { return sizeof *this; }
+
+  QString getHistoryString() override {
+    return QObject::tr("Edit Color Filter #%1").arg(QString::number(m_id));
   }
 };
 
@@ -236,11 +277,189 @@ void CellMarksPopup::onNameChanged() {
 }
 
 //=============================================================================
+// ColorFiltersPopup
+//-----------------------------------------------------------------------------
+
+ColorFiltersPopup::ColorFiltersPopup(QWidget *parent) : QDialog(parent) {
+  setWindowTitle(tr("Color Filters Settings"));
+
+  QList<TSceneProperties::ColorFilter> filters = TApp::instance()
+                                                     ->getCurrentScene()
+                                                     ->getScene()
+                                                     ->getProperties()
+                                                     ->getColorFilters();
+
+  QGridLayout *layout = new QGridLayout();
+  layout->setMargin(10);
+  layout->setHorizontalSpacing(5);
+  layout->setVerticalSpacing(10);
+  {
+    int id = 0;
+    for (auto filter : filters) {
+      // skip filter#0 (None)
+      if (id == 0) {
+        id++;
+        continue;
+      }
+      ColorField *colorF = new ColorField(this, false, filter.color, 20);
+      colorF->hideChannelsFields(true);
+      QLineEdit *nameF      = new QLineEdit(filter.name, this);
+      QPushButton *clearBtn = new QPushButton(this);
+      clearBtn->setFixedSize(20, 20);
+      clearBtn->setToolTip(tr("Clear"));
+      clearBtn->setIcon(createQIcon("delete"));
+      clearBtn->setFocusPolicy(Qt::NoFocus);
+      clearBtn->setDisabled(filter.name.isEmpty());
+
+      m_fields.insert(id, {colorF, nameF, clearBtn});
+
+      int row = layout->rowCount();
+
+      layout->addWidget(colorF, row, 0);
+      layout->addWidget(nameF, row, 1);
+      layout->addWidget(clearBtn, row, 2);
+
+      connect(colorF, SIGNAL(colorChanged(const TPixel32 &, bool)), this,
+              SLOT(onColorChanged(const TPixel32 &, bool)));
+      connect(nameF, SIGNAL(editingFinished()), this, SLOT(onNameChanged()));
+      connect(clearBtn, SIGNAL(clicked()), this, SLOT(onClearButtonClicked()));
+      id++;
+    }
+  }
+  layout->setColumnStretch(1, 1);
+  setLayout(layout);
+}
+
+void ColorFiltersPopup::updateContents() {
+  QList<TSceneProperties::ColorFilter> filters = TApp::instance()
+                                                     ->getCurrentScene()
+                                                     ->getScene()
+                                                     ->getProperties()
+                                                     ->getColorFilters();
+  assert(filters.count() == m_fields.count() + 1);
+  int id = 0;
+  for (const auto &filter : filters) {
+    // skip filter#0 (None)
+    if (id == 0) {
+      id++;
+      continue;
+    }
+    assert(m_fields.contains(id));
+    m_fields[id].colorField->setColor(filter.color);
+    m_fields[id].nameField->setText(filter.name);
+    m_fields[id].clearBtn->setDisabled(filter.name.isEmpty());
+    id++;
+  }
+}
+
+void ColorFiltersPopup::onColorChanged(const TPixel32 &color, bool isDragging) {
+  if (isDragging) return;
+  // obtain id
+  int id             = -1;
+  ColorField *colorF = qobject_cast<ColorField *>(sender());
+  for (const int keyId : m_fields.keys()) {
+    if (m_fields[keyId].colorField == colorF) {
+      id = keyId;
+      break;
+    }
+  }
+  if (id <= 0) return;
+
+  // return if the value is unchanged
+  TSceneProperties::ColorFilter oldCF = TApp::instance()
+                                            ->getCurrentScene()
+                                            ->getScene()
+                                            ->getProperties()
+                                            ->getColorFilter(id);
+  if (color == oldCF.color) return;
+
+  QString name = oldCF.name;
+  if (name.isEmpty()) {
+    name = tr("Color Filter %1").arg(id);
+    m_fields[id].nameField->setText(name);
+    m_fields[id].clearBtn->setEnabled(true);
+  }
+
+  EditColorFilterUndo *undo = new EditColorFilterUndo(id, color, name, this);
+  undo->redo();
+  TUndoManager::manager()->add(undo);
+}
+
+void ColorFiltersPopup::onNameChanged() {
+  // obtain id
+  int id           = -1;
+  QLineEdit *nameF = qobject_cast<QLineEdit *>(sender());
+  for (const int keyId : m_fields.keys()) {
+    if (m_fields[keyId].nameField == nameF) {
+      id = keyId;
+      break;
+    }
+  }
+  if (id <= 0) return;
+
+  // return if the value is unchanged
+  TSceneProperties::ColorFilter oldCF = TApp::instance()
+                                            ->getCurrentScene()
+                                            ->getScene()
+                                            ->getProperties()
+                                            ->getColorFilter(id);
+  if (nameF->text() == oldCF.name) return;
+  // reject empty string
+  if (nameF->text().isEmpty()) {
+    nameF->setText(oldCF.name);
+    return;
+  }
+
+  TPixel32 color = oldCF.color;
+  if (oldCF.name.isEmpty()) {
+    color = TPixel::Red;
+    m_fields[id].colorField->setColor(color);
+    m_fields[id].clearBtn->setEnabled(true);
+  }
+
+  EditColorFilterUndo *undo =
+      new EditColorFilterUndo(id, color, nameF->text(), this);
+  undo->redo();
+  TUndoManager::manager()->add(undo);
+}
+
+void ColorFiltersPopup::onClearButtonClicked() {
+  // obtain id
+  int id                = -1;
+  QPushButton *clearBtn = qobject_cast<QPushButton *>(sender());
+  for (const int keyId : m_fields.keys()) {
+    if (m_fields[keyId].clearBtn == clearBtn) {
+      id = keyId;
+      break;
+    }
+  }
+  if (id <= 0) return;
+
+  // return if the value is unchanged
+  TSceneProperties::ColorFilter oldCF = TApp::instance()
+                                            ->getCurrentScene()
+                                            ->getScene()
+                                            ->getProperties()
+                                            ->getColorFilter(id);
+  if (oldCF.name.isEmpty()) return;
+
+  m_fields[id].colorField->setColor(TPixel::Black);
+  m_fields[id].nameField->setText("");
+  m_fields[id].clearBtn->setEnabled(false);
+
+  EditColorFilterUndo *undo =
+      new EditColorFilterUndo(id, TPixel::Black, "", this);
+  undo->redo();
+  TUndoManager::manager()->add(undo);
+}
+//=============================================================================
 // SceneSettingsPopup
 //-----------------------------------------------------------------------------
 
 SceneSettingsPopup::SceneSettingsPopup()
-    : QDialog(TApp::instance()->getMainWindow()), m_cellMarksPopup(nullptr) {
+    : QDialog(TApp::instance()->getMainWindow())
+    , m_cellMarksPopup(nullptr)
+    , m_colorFiltersPopup(nullptr) {
   setWindowTitle(tr("Scene Settings"));
   setObjectName("SceneSettings");
   TSceneProperties *sprop = getProperties();
@@ -285,6 +504,9 @@ SceneSettingsPopup::SceneSettingsPopup()
   QPushButton *editCellMarksButton =
       new QPushButton(tr("Edit Cell Marks"), this);
 
+  QPushButton *editColorFiltersButton =
+      new QPushButton(tr("Edit Column Color Filters"), this);
+
   // layout
   QGridLayout *mainLayout = new QGridLayout();
   mainLayout->setMargin(10);
@@ -327,6 +549,8 @@ SceneSettingsPopup::SceneSettingsPopup()
 
     // Use Color Filter and Transparency for Rendering
     mainLayout->addWidget(m_colorFilterOnRenderCB, 6, 0, 1, 4);
+    mainLayout->addWidget(editColorFiltersButton, 6, 4,
+                          Qt::AlignRight | Qt::AlignVCenter);
 
     // cell marks
     mainLayout->addWidget(new QLabel(tr("Cell Marks:"), this), 7, 0,
@@ -371,6 +595,9 @@ SceneSettingsPopup::SceneSettingsPopup()
   // Use Color Filter and Transparency for Rendering
   ret = ret && connect(m_colorFilterOnRenderCB, SIGNAL(stateChanged(int)), this,
                        SLOT(onColorFilterOnRenderChanged()));
+  ret = ret && connect(editColorFiltersButton, SIGNAL(clicked()), this,
+                       SLOT(onEditColorFiltersButtonClicked()));
+
   // Cell Marks
   ret = ret && connect(editCellMarksButton, SIGNAL(clicked()), this,
                        SLOT(onEditCellMarksButtonClicked()));
@@ -429,6 +656,7 @@ void SceneSettingsPopup::update() {
       sprop->isColumnColorFilterOnRenderEnabled());
 
   if (m_cellMarksPopup) m_cellMarksPopup->update();
+  if (m_colorFiltersPopup) m_colorFiltersPopup->updateContents();
 }
 
 //-----------------------------------------------------------------------------
@@ -528,6 +756,13 @@ void SceneSettingsPopup::onColorFilterOnRenderChanged() {
   TApp::instance()->getCurrentScene()->notifySceneChanged();
 }
 
+//-----------------------------------------------------------------------------
+
+void SceneSettingsPopup::onEditColorFiltersButtonClicked() {
+  if (!m_colorFiltersPopup) m_colorFiltersPopup = new ColorFiltersPopup(this);
+  m_colorFiltersPopup->show();
+  m_colorFiltersPopup->raise();
+}
 //-----------------------------------------------------------------------------
 
 void SceneSettingsPopup::onEditCellMarksButtonClicked() {

@@ -447,7 +447,7 @@ bool TXshSoundColumn::setCell(int row, const TXshCell &cell,
   if (isBeforeLevelInSequence) {
     int oldEndOffset = lBefore->getEndOffset();
     int endOffset    = (lBefore->getVisibleEndFrame() != row) ? oldEndOffset - 1
-                                                           : oldEndOffset;
+                                                              : oldEndOffset;
     if (isNextLevelInSequence) {
       endOffset = lNext->getEndOffset();
       // Se precedente e successivo sono diversi elimino il successivo (caso in
@@ -468,8 +468,8 @@ bool TXshSoundColumn::setCell(int row, const TXshCell &cell,
   if (isNextLevelInSequence) {
     int oldStartOffset = lNext->getStartOffset();
     int startOffset    = (lNext->getVisibleStartFrame() != row)
-                          ? oldStartOffset - 1
-                          : oldStartOffset;
+                             ? oldStartOffset - 1
+                             : oldStartOffset;
     if (l && l != lNext) {
       if (l->getVisibleFrameCount() == 1)
         removeColumnLevel(l);
@@ -977,7 +977,7 @@ TSoundTrackP TXshSoundColumn::getOverallSoundTrack(int fromFrame, int toFrame,
   }
 
 #ifdef _WIN32
-  if (format.m_sampleRate > 44100) format.m_sampleRate = 44100;
+  if (format.m_sampleRate > 48000) format.m_sampleRate = 48000;
 #else
   QAudioDeviceInfo info(QAudioDeviceInfo::defaultOutputDevice());
   if (info.deviceName().length() == 0)
@@ -990,10 +990,15 @@ TSoundTrackP TXshSoundColumn::getOverallSoundTrack(int fromFrame, int toFrame,
   switch (format.m_sampleType) {
   case TSound::INT:
     qFormat.setSampleType(QAudioFormat::SignedInt);
+    break;
   case TSound::UINT:
     qFormat.setSampleType(QAudioFormat::UnSignedInt);
+    break;
   case TSound::FLOAT:
     qFormat.setSampleType(QAudioFormat::Float);
+    break;
+  default:
+    break;
   }
   qFormat.setSampleSize(format.m_bitPerSample);
   qFormat.setCodec("audio/pcm");
@@ -1007,10 +1012,15 @@ TSoundTrackP TXshSoundColumn::getOverallSoundTrack(int fromFrame, int toFrame,
     switch (qFormat.sampleType()) {
     case QAudioFormat::SignedInt:
       format.m_sampleType = TSound::INT;
+      break;
     case QAudioFormat::UnSignedInt:
       format.m_sampleType = TSound::UINT;
+      break;
     case QAudioFormat::Float:
       format.m_sampleType = TSound::FLOAT;
+      break;
+    default:
+      break;
     }
   }
 #endif
@@ -1069,15 +1079,10 @@ TSoundTrackP TXshSoundColumn::getOverallSoundTrack(int fromFrame, int toFrame,
 
     if (s1 > 0 && s1 >= s0) {
       soundTrack = soundTrack->extract(s0, s1);
-
-      // Copy the sound track
       overallSoundTrack->copy(
-          soundTrack,
-          int((levelStartFrame - fromFrame) *
-              samplePerFrame));  // The int cast is IMPORTANT, since
-    }                            // there are 2 overloads (int & double)
-  }                              // with DIFFERENT SCALES. We mean the
-                                 // SAMPLES-BASED one.
+          soundTrack, int((levelStartFrame - fromFrame) * samplePerFrame));
+    }
+  }
   return overallSoundTrack;
 }
 

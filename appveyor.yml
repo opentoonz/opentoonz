@@ -1,4 +1,4 @@
-version: 1.6.0.{build}
+version: 1.7.1.{build}
 pull_requests:
   do_not_increment_build_number: true
 skip_tags: true
@@ -25,7 +25,7 @@ install:
 
     mkdir %PLATFORM% && cd %PLATFORM%
 
-    cmake ..\sources -G "Visual Studio 16 2019" -Ax64 -DQT_PATH="C:\Qt\5.15.2\msvc2019_64" -DBOOST_ROOT="C:\Libraries\boost_1_73_0" -DOpenCV_DIR="C:\Tools\opencv\build"
+    cmake ..\sources -G "Visual Studio 16 2019" -Ax64 -DQT_PATH="C:\Qt\5.15.2\msvc2019_64" -DBOOST_ROOT="C:\Libraries\boost_1_77_0" -DOpenCV_DIR="C:\Tools\opencv\build"
 build:
   project: $(APPVEYOR_BUILD_FOLDER)\toonz\$(PLATFORM)\ALL_BUILD.vcxproj
   parallel: true
@@ -50,7 +50,7 @@ after_build:
     
     copy /Y ..\..\thirdparty\libmypaint\dist\64\libmypaint-1-4-0.dll %CONFIGURATION%\OpenToonz
 
-    copy /Y "C:\Tools\opencv\build\x64\vc15\bin\opencv_world460.dll" %CONFIGURATION%\OpenToonz
+    copy /Y "C:\Tools\opencv\build\x64\vc16\bin\opencv_world490.dll" %CONFIGURATION%\OpenToonz
 
     mkdir "%CONFIGURATION%\OpenToonz stuff"
 

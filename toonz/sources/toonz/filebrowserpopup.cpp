@@ -86,7 +86,7 @@ FileBrowserPopup::FileBrowserPopup(const QString &title, Options options,
   setWindowTitle(title);
   setModal(false);
 
-  m_browser        = new FileBrowser(this, 0, false, m_multiSelectionEnabled);
+  m_browser        = new FileBrowser(this, Qt::WindowFlags(), false, m_multiSelectionEnabled);
   m_nameFieldLabel = new QLabel(tr("File name:"));
   m_nameField      = new DVGui::LineEdit(this);
   m_okButton       = new QPushButton(tr("OK"), this);

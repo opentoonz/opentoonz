@@ -121,7 +121,7 @@ void HooksData::restoreHookPositions() const {
   if (m_hookPositions.empty()) return;
   TTool::Application *app = TTool::getApplication();
   TXshLevelP level        = app->getCurrentLevel()->getLevel();
-  assert(level = m_level);
+  assert(level == m_level);
   if (level != m_level || !m_level || m_level->getSimpleLevel()->isReadOnly())
     return;
   HookSet *hookSet = m_level->getHookSet();

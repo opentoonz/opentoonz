@@ -60,7 +60,7 @@ class FileBrowser final : public QFrame, public DvItemListModel {
   Q_OBJECT
 
 public:
-  FileBrowser(QWidget *parent, Qt::WindowFlags flags = 0,
+  FileBrowser(QWidget *parent, Qt::WindowFlags flags = Qt::WindowFlags(),
               bool noContextMenu = false, bool multiSelectionEnabled = false);
   ~FileBrowser();
 

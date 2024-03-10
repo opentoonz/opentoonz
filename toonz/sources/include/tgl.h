@@ -21,7 +21,7 @@
 #define GLUT_NO_WARNING_DISABLE
 #endif
 
-#if defined(LINUX) || defined(FREEBSD)
+#if defined(LINUX) || defined(FREEBSD) || defined(HAIKU)
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <GL/glut.h>
@@ -112,6 +112,9 @@ inline void tglColor(const TPixelD &p) { glColor4d(p.r, p.g, p.b, p.m); }
 //! retrieve the square of pixel size from current GL_MODELVIEW matrix
 DVAPI double tglGetPixelSize2();
 
+//! retrieve the current viewport bounds in world coordinates
+DVAPI TRectD tglGetBounds();
+
 //! Draw text in string s at position p.
 
 DVAPI void tglDrawText(const TPointD &p, const std::string &s,
@@ -179,6 +182,10 @@ inline void tglMultMatrix(const TAffine &aff) {
   GLdouble m[] = {aff.a11, aff.a21, 0, 0, aff.a12, aff.a22, 0, 0,
                   0,       0,       1, 0, aff.a13, aff.a23, 0, 1};
   glMultMatrixd(m);
+}
+
+inline void tglMultMatrix(const TAffine4 &aff) {
+  glMultMatrixd(aff.a);
 }
 
 //=============================================================================

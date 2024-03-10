@@ -288,7 +288,7 @@ static bool sh(std::string &out, const char *cmd) {
 
 static bool addr2line(std::string &out, const char *exepath, const char *addr) {
   char cmd[512];
-#ifdef OSX
+#ifdef MACOSX
   sprintf(cmd, "atos -o \"%.400s\" %s 2>&1", exepath, addr);
 #else
   sprintf(cmd, "addr2line -f -p -e \"%.400s\" %s 2>&1", exepath, addr);

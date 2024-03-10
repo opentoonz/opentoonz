@@ -13,6 +13,7 @@
 class Room;
 class QXmlStreamReader;
 class QXmlStreamWriter;
+class CommandListTree;
 
 //=============================================================================
 // MenuBarTree
@@ -43,23 +44,6 @@ protected slots:
 };
 
 //=============================================================================
-// CommandListTree
-//-----------------------------------------------------------------------------
-
-class CommandListTree final : public QTreeWidget {
-  Q_OBJECT
-
-  void addFolder(const QString& title, int commandType,
-                 QTreeWidgetItem* parentFolder = 0);
-
-public:
-  CommandListTree(QWidget* parent = 0);
-
-protected:
-  void mousePressEvent(QMouseEvent*) override;
-};
-
-//=============================================================================
 // MenuBarPopup
 //-----------------------------------------------------------------------------
 
@@ -72,6 +56,7 @@ public:
   MenuBarPopup(Room* room);
 protected slots:
   void onOkPressed();
+  void onSearchTextChanged(const QString& text);
 };
 
 #endif

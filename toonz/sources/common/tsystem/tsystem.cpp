@@ -464,6 +464,13 @@ void TSystem::readDirectory_DirItems(QStringList &dst, const TFilePath &path) {
   QDir dir(toQString(path));
 
 #ifdef _WIN32
+  QString pathStr = toQString(path);
+  if (pathStr.startsWith("\\\\") || pathStr.startsWith("//")) {
+    dst = dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot | QDir::Readable,
+                        QDir::Name | QDir::LocaleAware);
+    return;
+  }
+
   // equivalent to sorting with QDir::LocaleAware
   auto const strCompare = [](const QString &s1, const QString &s2) {
     return QString::localeAwareCompare(s1, s2) < 0;

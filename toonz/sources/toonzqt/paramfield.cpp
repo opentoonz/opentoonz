@@ -9,6 +9,7 @@
 #include "toonzqt/doublepairfield.h"
 #include "toonzqt/tonecurvefield.h"
 #include "toonzqt/checkbox.h"
+#include "toonzqt/menubarcommand.h"
 
 #include "tdoubleparam.h"
 #include "tnotanimatableparam.h"
@@ -1563,6 +1564,9 @@ void IntParamField::update(int frame) {
 
 namespace component {
 
+MyTextEdit::MyTextEdit(const QString &text, QWidget *parent)
+    : QTextEdit(text, parent) {}
+
 void MyTextEdit::keyPressEvent(QKeyEvent *event) {
   QTextEdit::keyPressEvent(event);
   if (event->key() == Qt::Key_Return) emit edited();
@@ -1572,6 +1576,7 @@ void MyTextEdit::focusOutEvent(QFocusEvent *event) {
   QTextEdit::focusOutEvent(event);
   emit edited();
 }
+
 };  // namespace component
 
 StringParamField::StringParamField(QWidget *parent, QString name,

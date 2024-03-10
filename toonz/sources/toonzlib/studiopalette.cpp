@@ -180,18 +180,9 @@ StudioPalette::StudioPalette() {
     }
   }
 
-  // load [global id] - [path] table file
-  TFilePath rootFps[2] = {m_root, getProjectPalettesRoot()};
-  for (auto rootFp : rootFps) {
-    if (rootFp.isEmpty()) continue;
-    TFilePath tablePath = rootFp + pathTableFileName;
-    if (!TFileStatus(tablePath).doesExist()) continue;
-    QSettings tableSettings(QString::fromStdWString(tablePath.getWideString()),
-                            QSettings::IniFormat);
-    for (auto key : tableSettings.allKeys())
-      table_cached[key.toStdWString()] =
-          rootFp + TFilePath(tableSettings.value(key, "").toString());
-  }
+  TProjectManager *pm = TProjectManager::instance();
+  pm->addListener(this);
+  onProjectSwitched();
 }
 
 //-------------------------------------------------------------------
@@ -740,3 +731,23 @@ void StudioPalette::addEntry(const std::wstring paletteId,
     tableSettings.setValue(QString::fromStdWString(paletteId), pathValue);
   }
 }
+
+//-------------------------------------------------------------------
+
+void StudioPalette::onProjectSwitched() {
+  table_cached.clear();
+  // load [global id] - [path] table file
+  TFilePath rootFps[2] = {m_root, getProjectPalettesRoot()};
+  for (auto rootFp : rootFps) {
+    if (rootFp.isEmpty()) continue;
+    TFilePath tablePath = rootFp + pathTableFileName;
+    if (!TFileStatus(tablePath).doesExist()) continue;
+    QSettings tableSettings(QString::fromStdWString(tablePath.getWideString()),
+                            QSettings::IniFormat);
+    for (auto key : tableSettings.allKeys())
+      table_cached[key.toStdWString()] =
+          rootFp + TFilePath(tableSettings.value(key, "").toString());
+  }
+}
+
+void StudioPalette::onProjectChanged() { onProjectSwitched(); }

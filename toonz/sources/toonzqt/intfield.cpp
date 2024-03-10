@@ -10,6 +10,7 @@
 #include <QAction>
 #include <QFocusEvent>
 #include <QPainter>
+#include <QPushButton>
 
 namespace {
 const int NonLinearSliderPrecision = 2;
@@ -263,11 +264,14 @@ void IntLineEdit::mouseReleaseEvent(QMouseEvent *e) {
 // IntField
 //-----------------------------------------------------------------------------
 
-IntField::IntField(QWidget *parent, bool isMaxRangeLimited, bool isRollerHide)
+IntField::IntField(QWidget *parent, bool isMaxRangeLimited, bool isRollerHide,
+                   bool isSpinnerHide)
     : QWidget(parent)
+    , m_roller(0)
     , m_lineEdit(0)
     , m_slider(0)
-    , m_roller(0)
+    , m_inc(0)
+    , m_dec(0)
     , m_isMaxRangeLimited(isMaxRangeLimited)
     , m_isLinearSlider(true) {
   setObjectName("IntField");
@@ -295,6 +299,24 @@ IntField::IntField(QWidget *parent, bool isMaxRangeLimited, bool isRollerHide)
 
   layout->addWidget(field);
 
+  m_inc = new QPushButton(QString("+"));
+  m_dec = new QPushButton(QString("-"));
+  m_inc->setFixedSize(QSize(20, 20));
+  m_dec->setFixedSize(QSize(20, 20));
+  ret = ret
+     && connect(m_inc, SIGNAL(clicked()), this, SLOT(onIncClicked()))
+     && connect(m_dec, SIGNAL(clicked()), this, SLOT(onDecClicked()));
+   
+  if (isSpinnerHide) enableSpinner(false);
+  
+  // TODO:
+  // Commonly in OpenToonz spin-buttons has been placed in that order: [+][-]
+  // This seems unusual behavior.
+  // And in this particular case buttons has been placed in another order: [-][+]
+  // We need to know what is better
+  layout->addWidget(m_dec);
+  layout->addWidget(m_inc);
+  
   m_slider = new QSlider(Qt::Horizontal, this);
   ret      = ret && connect(m_slider, SIGNAL(valueChanged(int)), this,
                        SLOT(onSliderChanged(int)));
@@ -386,6 +408,24 @@ bool IntField::rollerIsEnabled() { return m_roller->isEnabled(); }
 
 //-----------------------------------------------------------------------------
 
+void IntField::enableSpinner(bool enable) {
+  m_inc->setEnabled(enable);
+  m_dec->setEnabled(enable);
+  if (enable) {
+    m_inc->show();
+    m_dec->show();
+  } else {
+    m_inc->hide();
+    m_dec->hide();
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+bool IntField::spinnerIsEnabled() { return m_inc->isEnabled(); }
+
+//-----------------------------------------------------------------------------
+
 void IntField::setLineEditBackgroundColor(QColor color) {
   m_lineEdit->setLineEditBackgroundColor(color);
 }
@@ -448,6 +488,28 @@ void IntField::onSliderChanged(int sliderPos) {
   // le ultime e non le prime (dovrebbero essere quelle dopo la virgola).
   m_lineEdit->setCursorPosition(0);
   emit valueChanged(true);
+}
+
+//-----------------------------------------------------------------------------
+
+void IntField::onIncClicked() {
+  int value = m_lineEdit->getValue() + 1;
+  m_lineEdit->setValue(value);
+  m_slider->setValue(value2pos(value));
+  m_roller->setValue((double)value);
+  m_lineEdit->setCursorPosition(0);
+  emit valueChanged(false);
+}
+
+//-----------------------------------------------------------------------------
+
+void IntField::onDecClicked() {
+  int value = m_lineEdit->getValue() - 1;
+  m_lineEdit->setValue(value);
+  m_slider->setValue(value2pos(value));
+  m_roller->setValue((double)value);
+  m_lineEdit->setCursorPosition(0);
+  emit valueChanged(false);
 }
 
 //-----------------------------------------------------------------------------

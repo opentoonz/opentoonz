@@ -368,8 +368,8 @@ static QString getExeName(bool isComposer) {
   return name + ".exe ";
 #elif defined(MACOSX)
   TVER::ToonzVersion tver;
-  return "\"./" + QString::fromStdString(tver.getAppName()) +
-         ".app/Contents/MacOS/" + name + "\" ";
+  return QString::fromStdString(tver.getAppName()) + ".app/Contents/MacOS/" +
+         name;
 #else
   return name;
 #endif
@@ -539,6 +539,59 @@ QString TFarmTask::getCommandLineArguments() const {
   QString appname = QSettings().applicationName();
 
   return cmdline;
+}
+
+QStringList TFarmTask::getCommandLineArgumentsList() const {
+  QStringList ret;
+
+  if (!m_taskFilePath.isEmpty())
+    ret << QString::fromStdWString(
+        TSystem::toUNC(m_taskFilePath).getWideString());
+
+  if (m_callerMachineName != "") {
+    struct hostent *he = gethostbyname(m_callerMachineName.toLatin1());
+    if (he) {
+      char *ipAddress = inet_ntoa(*(struct in_addr *)*(he->h_addr_list));
+      ret << "-tmsg" << QString::fromUtf8(ipAddress);
+    }
+  }
+
+  if (!m_isComposerTask) {
+    if (m_overwrite == Overwrite_All)
+      ret << "-overwriteAll";
+    else if (m_overwrite == Overwrite_NoPaint)
+      ret << "-overwriteNoPaint";
+    if (m_onlyVisible) ret << "-onlyvisible";
+    return ret;
+  }
+
+  if (!m_outputPath.isEmpty()) {
+    TFilePath outputPath;
+    try {
+      outputPath = TSystem::toUNC(m_outputPath);
+    } catch (TException &) {
+    }
+
+    ret << "-o" << QString::fromStdWString(outputPath.getWideString());
+  }
+
+  ret << "-range" << QString::number(m_from) << QString::number(m_to);
+  ret << "-step" << QString::number(m_step);
+  ret << "-shrink" << QString::number(m_shrink);
+  ret << "-multimedia" << QString::number(m_multimedia);
+
+  const QString threadCounts[3] = {"single", "half", "all"};
+  ret << "-nthreads" << threadCounts[m_threadsIndex];
+
+  const QString maxTileSizes[4] = {
+      "none", QString::number(TOutputProperties::LargeVal),
+      QString::number(TOutputProperties::MediumVal),
+      QString::number(TOutputProperties::SmallVal)};
+  ret << "-maxtilesize" << maxTileSizes[m_maxTileSizeIndex];
+
+  QString appname = QSettings().applicationName();
+
+  return ret;
 }
 
 QString TFarmTask::getCommandLine(bool) const {

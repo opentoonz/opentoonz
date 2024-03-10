@@ -2,6 +2,24 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="zh_CN" sourcelanguage="en_US">
 <context>
+    <name>APngWriterProperties</name>
+    <message>
+        <location filename="../../image/ffmpeg/tiio_apng.cpp" line="225"/>
+        <source>Scale</source>
+        <translation>缩放</translation>
+    </message>
+    <message>
+        <location filename="../../image/ffmpeg/tiio_apng.cpp" line="226"/>
+        <source>Looping</source>
+        <translation>循环</translation>
+    </message>
+    <message>
+        <location filename="../../image/ffmpeg/tiio_apng.cpp" line="227"/>
+        <source>Write as .png</source>
+        <translation>写成 .png</translation>
+    </message>
+</context>
+<context>
     <name>AviWriterProperties</name>
     <message>
         <location filename="../../image/avi/tiio_avi.cpp" line="1182"/>
@@ -17,64 +35,92 @@
 <context>
     <name>ExrWriterProperties</name>
     <message>
-        <location filename="../../image/exr/tiio_exr.cpp" line="227"/>
+        <location filename="../../image/exr/tiio_exr.cpp" line="290"/>
         <source>Bits Per Pixel</source>
         <translation>像素位数</translation>
     </message>
     <message>
-        <location filename="../../image/exr/tiio_exr.cpp" line="228"/>
+        <location filename="../../image/exr/tiio_exr.cpp" line="292"/>
         <source>48(RGB Half Float)</source>
         <translation>48(RGB 半浮点)</translation>
     </message>
     <message>
-        <location filename="../../image/exr/tiio_exr.cpp" line="229"/>
+        <location filename="../../image/exr/tiio_exr.cpp" line="293"/>
         <source>64(RGBA Half Float)</source>
         <translation>64(RGBA 半浮点)</translation>
     </message>
     <message>
-        <location filename="../../image/exr/tiio_exr.cpp" line="231"/>
+        <location filename="../../image/exr/tiio_exr.cpp" line="294"/>
+        <source>96(RGB Float)</source>
+        <translation>96(RGB 浮点)</translation>
+    </message>
+    <message>
+        <location filename="../../image/exr/tiio_exr.cpp" line="295"/>
+        <source>128(RGBA Float)</source>
+        <translation>128(RGBA 浮点)</translation>
+    </message>
+    <message>
+        <location filename="../../image/exr/tiio_exr.cpp" line="299"/>
         <source>Compression Type</source>
         <translation>压缩方式</translation>
     </message>
     <message>
-        <location filename="../../image/exr/tiio_exr.cpp" line="233"/>
+        <location filename="../../image/exr/tiio_exr.cpp" line="301"/>
         <source>No compression</source>
         <translation>不压缩</translation>
     </message>
     <message>
-        <location filename="../../image/exr/tiio_exr.cpp" line="236"/>
+        <location filename="../../image/exr/tiio_exr.cpp" line="304"/>
         <source>Run Length Encoding (RLE)</source>
-        <translation>行程编码</translation>
+        <translation>行程编码(RLE)</translation>
     </message>
     <message>
-        <location filename="../../image/exr/tiio_exr.cpp" line="239"/>
+        <location filename="../../image/exr/tiio_exr.cpp" line="307"/>
         <source>ZIP compression per Scanline (ZIPS)</source>
-        <translation></translation>
+        <translation>每个扫描线的 ZIP 压缩(ZIPS)</translation>
     </message>
     <message>
-        <location filename="../../image/exr/tiio_exr.cpp" line="242"/>
+        <location filename="../../image/exr/tiio_exr.cpp" line="310"/>
         <source>ZIP compression per scanline band (ZIP)</source>
-        <translation></translation>
+        <translation>每个扫描线波段的 ZIP 压缩(ZIP)</translation>
     </message>
     <message>
-        <location filename="../../image/exr/tiio_exr.cpp" line="245"/>
+        <location filename="../../image/exr/tiio_exr.cpp" line="313"/>
         <source>PIZ-based wavelet compression (PIZ)</source>
-        <translation></translation>
+        <translation>基于 PIZ 的小波压缩(PIZ)</translation>
     </message>
     <message>
-        <location filename="../../image/exr/tiio_exr.cpp" line="247"/>
+        <location filename="../../image/exr/tiio_exr.cpp" line="315"/>
         <source>Storage Type</source>
         <translation>存储类型</translation>
     </message>
     <message>
-        <location filename="../../image/exr/tiio_exr.cpp" line="248"/>
+        <location filename="../../image/exr/tiio_exr.cpp" line="316"/>
         <source>Scan-line based</source>
         <translation>基于扫描线</translation>
     </message>
     <message>
-        <location filename="../../image/exr/tiio_exr.cpp" line="249"/>
+        <location filename="../../image/exr/tiio_exr.cpp" line="317"/>
         <source>Tile based</source>
         <translation>基于块</translation>
+    </message>
+    <message>
+        <location filename="../../image/exr/tiio_exr.cpp" line="319"/>
+        <source>Color Space Gamma</source>
+        <translation>颜色空间伽马</translation>
+    </message>
+</context>
+<context>
+    <name>FFMovWriterProperties</name>
+    <message>
+        <location filename="../../image/ffmpeg/tiio_ff_mov.cpp" line="234"/>
+        <source>Quality</source>
+        <translation>质量</translation>
+    </message>
+    <message>
+        <location filename="../../image/ffmpeg/tiio_ff_mov.cpp" line="235"/>
+        <source>Scale</source>
+        <translation>缩放</translation>
     </message>
 </context>
 <context>
@@ -193,20 +239,21 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../../image/ffmpeg/tiio_ffmpeg.cpp" line="213"/>
+        <location filename="../../image/ffmpeg/tiio_ffmpeg.cpp" line="172"/>
         <source>FFmpeg returned error-code: %1</source>
-        <translation>FFmpeg 返回的错误编码: %1</translation>
+        <translation>FFmpeg 返回的错误编码：%1</translation>
     </message>
     <message>
-        <location filename="../../image/ffmpeg/tiio_ffmpeg.cpp" line="217"/>
+        <location filename="../../image/ffmpeg/tiio_ffmpeg.cpp" line="160"/>
+        <location filename="../../image/ffmpeg/tiio_ffmpeg.cpp" line="176"/>
         <source>FFmpeg timed out.
 Please check the file for errors.
 If the file doesn&apos;t play or is incomplete, 
 Please try raising the FFmpeg timeout in Preferences.</source>
-        <translation>FFmpeg 已超时。
-请查看文件错误。
-如果文件不能播放或者不完整，
-请在首选项调高 FFmpeg 的超时参数。</translation>
+        <translation>FFmpeg 超时
+请检查该文件是否有错误。
+如果文件不能播放或不完整，
+请尝试在首选项中提高 FFmpeg 的超时时间。</translation>
     </message>
 </context>
 <context>
@@ -436,12 +483,12 @@ Please try raising the FFmpeg timeout in Preferences.</source>
     <message>
         <location filename="../../image/tif/tiio_tif.cpp" line="737"/>
         <source>32(RGBA)</source>
-        <translation></translation>
+        <translation>32(RGBA)</translation>
     </message>
     <message>
         <location filename="../../image/tif/tiio_tif.cpp" line="738"/>
         <source>64(RGBA)</source>
-        <translation></translation>
+        <translation>64(RGBA)</translation>
     </message>
     <message>
         <location filename="../../image/tif/tiio_tif.cpp" line="739"/>

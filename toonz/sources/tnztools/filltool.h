@@ -124,7 +124,7 @@ public:
   void leftButtonDoubleClick(const TPointD &pos, const TMouseEvent &e) override;
   void resetMulti();
 
-  bool onPropertyChanged(std::string propertyName) override;
+  bool onPropertyChanged(std::string propertyName, bool addToUndo) override;
   void onImageChanged() override;
   void draw() override;
 

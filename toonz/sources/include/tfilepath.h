@@ -57,6 +57,8 @@ public:
   }
   TFrameId(int f, QString str, int p = 4, char s = '.')
       : m_frame(f), m_letter(str), m_zeroPadding(p), m_startSeqInd(s) {}
+  explicit TFrameId(const std::string &str, char s = '.');
+  explicit TFrameId(const std::wstring &wstr, char s = '.');
 
   inline bool operator==(const TFrameId &f) const {
     return f.m_frame == m_frame && f.m_letter == m_letter;
@@ -314,18 +316,6 @@ type is a string that indicate the filename extension(ex:. bmp or .bmp)*/
   TFilePathInfo analyzePath() const;
 
   QChar getSepChar() const;
-};
-
-//-----------------------------------------------------------------------------
-
-class TMalformedFrameException final : public TException {
-public:
-  TMalformedFrameException(const TFilePath &fp,
-                           const std::wstring &msg = std::wstring())
-      : TException(fp.getWideName() + L":" + msg) {}
-
-private:
-  TMalformedFrameException();
 };
 
 //-----------------------------------------------------------------------------

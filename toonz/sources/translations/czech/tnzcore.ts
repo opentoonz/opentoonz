@@ -35,7 +35,7 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../../common/tvrender/tpalette.cpp" line="250"/>
+        <location filename="../../common/tvrender/tpalette.cpp" line="258"/>
         <source>colors</source>
         <translation>barvy</translation>
     </message>
@@ -57,12 +57,12 @@
 <context>
     <name>TCenterLineStrokeStyle</name>
     <message>
-        <location filename="../../common/tvrender/tsimplecolorstyles.cpp" line="886"/>
+        <location filename="../../common/tvrender/tsimplecolorstyles.cpp" line="899"/>
         <source>Constant</source>
         <translation>Stálý</translation>
     </message>
     <message>
-        <location filename="../../common/tvrender/tsimplecolorstyles.cpp" line="919"/>
+        <location filename="../../common/tvrender/tsimplecolorstyles.cpp" line="938"/>
         <source>Thickness</source>
         <translation>Tloušťka</translation>
     </message>
@@ -70,12 +70,12 @@
 <context>
     <name>TRasterImagePatternStrokeStyle</name>
     <message>
-        <location filename="../../common/tvrender/tsimplecolorstyles.cpp" line="1024"/>
+        <location filename="../../common/tvrender/tsimplecolorstyles.cpp" line="1066"/>
         <source>Distance</source>
         <translation>Odstup</translation>
     </message>
     <message>
-        <location filename="../../common/tvrender/tsimplecolorstyles.cpp" line="1026"/>
+        <location filename="../../common/tvrender/tsimplecolorstyles.cpp" line="1068"/>
         <source>Rotation</source>
         <translation>Otočení</translation>
     </message>
@@ -83,12 +83,12 @@
 <context>
     <name>TVectorImagePatternStrokeStyle</name>
     <message>
-        <location filename="../../common/tvrender/tsimplecolorstyles.cpp" line="1434"/>
+        <location filename="../../common/tvrender/tsimplecolorstyles.cpp" line="1507"/>
         <source>Distance</source>
         <translation>Odstup</translation>
     </message>
     <message>
-        <location filename="../../common/tvrender/tsimplecolorstyles.cpp" line="1436"/>
+        <location filename="../../common/tvrender/tsimplecolorstyles.cpp" line="1509"/>
         <source>Rotation</source>
         <translation>Otočení</translation>
     </message>

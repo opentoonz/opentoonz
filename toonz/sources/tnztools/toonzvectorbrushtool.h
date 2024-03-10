@@ -3,17 +3,26 @@
 #ifndef TOONZVECTORBRUSHTOOL_H
 #define TOONZVECTORBRUSHTOOL_H
 
-#include "tgeometry.h"
-#include "tproperty.h"
-#include "trasterimage.h"
-#include "ttoonzimage.h"
-#include "tstroke.h"
-#include "toonz/strokegenerator.h"
+#include <tgeometry.h>
+#include <tproperty.h>
+#include <trasterimage.h>
+#include <ttoonzimage.h>
+#include <tstroke.h>
+#include <toonz/strokegenerator.h>
 
-#include "tools/tool.h"
-#include "tools/cursors.h"
+#include <tools/tool.h>
+#include <tools/cursors.h>
 
-#include "toonzrasterbrushtool.h"
+#include <tools/inputmanager.h>
+#include <tools/modifiers/modifierline.h>
+#include <tools/modifiers/modifiertangents.h>
+#include <tools/modifiers/modifierassistants.h>
+#include <tools/modifiers/modifiersegmentation.h>
+#include <tools/modifiers/modifiersimplify.h>
+#include <tools/modifiers/modifiersmooth.h>
+#ifndef NDEBUG
+#include <tools/modifiers/modifiertest.h>
+#endif
 
 #include <QCoreApplication>
 #include <QRadialGradient>
@@ -80,13 +89,17 @@ public:
 //    Brush Tool declaration
 //************************************************************************
 
-class ToonzVectorBrushTool final : public TTool {
+class ToonzVectorBrushTool final : public TTool,
+                                   public TInputHandler
+{
   Q_DECLARE_TR_FUNCTIONS(ToonzVectorBrushTool)
 
 public:
   ToonzVectorBrushTool(std::string name, int targetType);
 
-  ToolType getToolType() const override { return TTool::LevelWriteTool; }
+  ToolType getToolType() const override
+    { return TTool::LevelWriteTool; }
+  unsigned int getToolHints() const override;
 
   ToolOptionsBox *createOptionsBox() override;
 
@@ -101,6 +114,13 @@ public:
   void leftButtonUp(const TPointD &pos, const TMouseEvent &e) override;
   void mouseMove(const TPointD &pos, const TMouseEvent &e) override;
   bool keyDown(QKeyEvent *event) override;
+
+  void inputMouseMove(const TPointD &position,
+                      const TInputState &state) override;
+  void inputSetBusy(bool busy) override;
+  void inputPaintTracks(const TTrackList &tracks) override;
+  void inputInvalidateRect(const TRectD &bounds) override { invalidate(bounds); }
+  TTool *inputGetTool() override { return this; };
 
   void draw() override;
 
@@ -128,20 +148,30 @@ public:
   // Tools.
   bool isPencilModeActive() override;
 
-  void addTrackPoint(const TThickPoint &point, double pixelSize2);
-  void flushTrackPoint();
   bool doFrameRangeStrokes(TFrameId firstFrameId, TStroke *firstStroke,
                            TFrameId lastFrameId, TStroke *lastStroke,
                            int interpolationType, bool breakAngles,
                            bool autoGroup = false, bool autoFill = false,
                            bool drawFirstStroke = true,
                            bool drawLastStroke = true, bool withUndo = true);
-  void checkGuideSnapping(bool beforeMousePress, bool invertCheck);
-  void checkStrokeSnapping(bool beforeMousePress, bool invertCheck);
   bool doGuidedAutoInbetween(TFrameId cFid, const TVectorImageP &cvi,
                              TStroke *cStroke, bool breakAngles,
                              bool autoGroup = false, bool autoFill = false,
                              bool drawStroke = true);
+
+protected:
+  typedef std::vector<StrokeGenerator> TrackList;
+  typedef std::vector<TStroke*> StrokeList;
+  void deleteStrokes(StrokeList &strokes);
+  void copyStrokes(StrokeList &dst, const StrokeList &src);
+
+  void snap(const TPointD &pos, bool snapEnabled, bool withSelfSnap = false);
+
+  void updateModifiers();
+  
+  enum MouseEventType { ME_DOWN, ME_DRAG, ME_UP, ME_MOVE };
+  void handleMouseEvent(MouseEventType type, const TPointD &pos,
+                        const TMouseEvent &e);
 
 protected:
   TPropertyGroup m_prop[2];
@@ -158,58 +188,49 @@ protected:
   TEnumProperty m_capStyle;
   TEnumProperty m_joinStyle;
   TIntProperty m_miterJoinLimit;
+  TBoolProperty m_assistants;
 
-  StrokeGenerator m_track;
-  StrokeGenerator m_rangeTrack;
-  RasterStrokeGenerator *m_rasterTrack;
-  TStroke *m_firstStroke;
-  TTileSetCM32 *m_tileSet;
-  TTileSaverCM32 *m_tileSaver;
+  TInputManager m_inputmanager;
+  TSmartPointerT<TModifierLine> m_modifierLine;
+  TSmartPointerT<TModifierTangents> m_modifierTangents;
+  TSmartPointerT<TModifierAssistants> m_modifierAssistants;
+  TSmartPointerT<TModifierSegmentation> m_modifierSegmentation;
+  TSmartPointerT<TModifierSegmentation> m_modifierSmoothSegmentation;
+  TSmartPointerT<TModifierSmooth> m_modifierSmooth[3];
+  TSmartPointerT<TModifierSimplify> m_modifierSimplify;
+#ifndef NDEBUG
+  TSmartPointerT<TModifierTest> m_modifierTest;
+#endif
+  TInputModifier::List m_modifierReplicate;
+  
+  TrackList m_tracks;
+  TrackList m_rangeTracks;
+  StrokeList m_firstStrokes;
   TFrameId m_firstFrameId, m_veryFirstFrameId;
   TPixel32 m_currentColor;
   int m_styleId;
   double m_minThick, m_maxThick;
 
   // for snapping and framerange
-  int m_strokeIndex1, m_strokeIndex2, m_col, m_firstFrame, m_veryFirstFrame,
+  int m_col, m_firstFrame, m_veryFirstFrame,
       m_veryFirstCol, m_targetType;
-  double m_w1, m_w2, m_pixelSize, m_currThickness, m_minDistance2;
-  bool m_foundFirstSnap = false, m_foundLastSnap = false, m_dragDraw = true,
-       m_altPressed = false, m_snapSelf = false;
-  TRectD m_modifiedRegion;
-  TPointD m_dpiScale,
-      m_mousePos,  //!< Current mouse position, in world coordinates.
-      m_brushPos,  //!< World position the brush will be painted at.
-      m_firstSnapPoint, m_lastSnapPoint;
-
-  BluredBrush *m_bluredBrush;
-  QRadialGradient m_brushPad;
-
-  TRasterCM32P m_backupRas;
-  TRaster32P m_workRas;
-
-  std::vector<TThickPoint> m_points;
-  TRect m_strokeRect, m_lastRect;
-
-  SmoothStroke m_smoothStroke;
+  double m_pixelSize, m_minDistance2;
+  
+  bool m_snapped;
+  bool m_snappedSelf;
+  TPointD m_snapPoint;
+  TPointD m_snapPointSelf;
+  
+  TPointD m_mousePos;  //!< Current mouse position, in world coordinates.
+  TPointD m_brushPos;  //!< World position the brush will be painted at.
 
   VectorBrushPresetManager
       m_presetsManager;  //!< Manager for presets of this tool instance
 
-  bool m_active, m_enabled,
-      m_isPrompting,  //!< Whether the tool is prompting for spline
-                      //! substitution.
-      m_firstTime, m_isPath, m_presetsLoaded, m_firstFrameRange;
+  bool m_active, m_firstTime, m_isPath,
+       m_presetsLoaded, m_firstFrameRange;
 
-  /*---
-  作業中のFrameIdをクリック時に保存し、マウスリリース時（Undoの登録時）に別のフレームに
-  移動していたときの不具合を修正する。---*/
-  TFrameId m_workingFrameId;
-
-  TPointD m_lastDragPos;        //!< Position where mouse was last dragged.
-  TMouseEvent m_lastDragEvent;  //!< Previous mouse-drag event.
-
-  bool m_propertyUpdating = false;
+  bool m_propertyUpdating;
 };
 
 #endif  // TOONZVECTORBRUSHTOOL_H

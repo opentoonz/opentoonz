@@ -26,29 +26,58 @@ bool StrokeGenerator::isEmpty() const { return m_points.empty(); }
 
 //-------------------------------------------------------------------
 
-void StrokeGenerator::add(const TThickPoint &point, double pixelSize2) {
+bool StrokeGenerator::add(const TThickPoint &point, double pixelSize2) {
   if (m_points.empty()) {
     double x = point.x, y = point.y, d = point.thick + 3;
     m_points.push_back(point);
     TRectD rect(x - d, y - d, x + d, y + d);
-    m_modifiedRegion     = rect;
-    m_lastPointRect      = rect;
-    m_lastModifiedRegion = rect;
+    m_modifiedRegion     += rect;
+    m_lastPointRect      += rect;
+    m_lastModifiedRegion += rect;
     m_p0 = m_p1 = point;
-  } else {
-    TThickPoint lastPoint = m_points.back();
-    if (tdistance2(lastPoint, point) >= 4 * pixelSize2) {
-      m_points.push_back(point);
+    return true;
+  }
+
+  TThickPoint lastPoint = m_points.back();
+  if (tdistance2(lastPoint, point) >= 4 * pixelSize2) {
+    m_points.push_back(point);
+    double d = std::max(point.thick, lastPoint.thick) + 3;
+    TRectD rect(TRectD(lastPoint, point).enlarge(d));
+    m_modifiedRegion += rect;
+    m_lastModifiedRegion += rect;
+    m_lastPointRect = rect;
+    return true;
+  }
+  
+  m_points.back().thick = std::max(m_points.back().thick, point.thick);
+  return false;
+}
+
+//-------------------------------------------------------------------
+
+void StrokeGenerator::pop() {
+  if (!m_points.empty()) {
+    TRectD rect;
+    TThickPoint point = m_points.back();
+    m_points.pop_back();
+    if (!m_points.empty()) {
+      const TThickPoint &lastPoint = m_points.back();
       double d = std::max(point.thick, lastPoint.thick) + 3;
-      TRectD rect(TRectD(lastPoint, point).enlarge(d));
-      m_modifiedRegion += rect;
-      m_lastModifiedRegion += rect;
-      m_lastPointRect = rect;
+      rect = TRectD(lastPoint, point).enlarge(d);
     } else {
-      m_points.back().thick = std::max(m_points.back().thick, point.thick);
+      double x = point.x, y = point.y, d = point.thick + 3;
+      rect = TRectD(x - d, y - d, x + d, y + d);
     }
+    m_modifiedRegion += rect;
+    m_lastModifiedRegion += rect;
+    m_lastPointRect = rect;
   }
 }
+
+//-------------------------------------------------------------------
+
+void StrokeGenerator::setLoop(bool loop)
+  { m_loop = loop; }
 
 //-------------------------------------------------------------------
 
@@ -130,10 +159,10 @@ void StrokeGenerator::drawFragments(int first, int last) {
       if (b.thick == 0) b.thick = 0.1;
     }
     // m_p0 = m_p1 = b;
-    v          = a.thick * normalize(rotate90(b - a));
+    v          = a.thick * normalizeOrZero(rotate90(b - a));
     m_p0       = a + v;
     m_p1       = a - v;
-    v          = b.thick * normalize(rotate90(b - a));
+    v          = b.thick * normalizeOrZero(rotate90(b - a));
     TPointD p0 = b + v;
     TPointD p1 = b - v;
     glBegin(GL_POLYGON);
@@ -161,11 +190,11 @@ void StrokeGenerator::drawFragments(int first, int last) {
       if (c.thick == 0) c.thick = 0.1;
     }
     if (i - 1 == 0) {
-      v    = a.thick * normalize(rotate90(b - a));
+      v    = a.thick * normalizeOrZero(rotate90(b - a));
       m_p0 = a + v;
       m_p1 = a - v;
     }
-    v          = b.thick * normalize(rotate90(c - a));
+    v          = b.thick * normalizeOrZero(rotate90(c - a));
     TPointD p0 = b + v;
     TPointD p1 = b - v;
     glBegin(GL_POLYGON);
@@ -185,7 +214,7 @@ void StrokeGenerator::drawFragments(int first, int last) {
   }
   if (last < 2) return;
   v = m_points[last].thick *
-      normalize(rotate90(m_points[last] - m_points[last - 1]));
+      normalizeOrZero(rotate90(m_points[last] - m_points[last - 1]));
   TPointD p0 = m_points[last] + v;
   TPointD p1 = m_points[last] - v;
   glBegin(GL_POLYGON);
@@ -274,7 +303,7 @@ TPointD StrokeGenerator::getFirstPoint() { return m_points[0]; }
 
 //-------------------------------------------------------------------
 
-TStroke *StrokeGenerator::makeStroke(double error, UINT onlyLastPoints) const {
+TStroke *StrokeGenerator::makeStroke(double error, UINT onlyLastPoints, bool useLoop) const {
   if (onlyLastPoints == 0 || onlyLastPoints > m_points.size())
     return TStroke::interpolate(m_points, error);
 
@@ -283,7 +312,9 @@ TStroke *StrokeGenerator::makeStroke(double error, UINT onlyLastPoints) const {
       m_points.begin() + (m_points.size() - onlyLastPoints);
   copy(first, m_points.end(), lastPoints.begin());
 
-  return TStroke::interpolate(lastPoints, error);
+  TStroke *stroke = TStroke::interpolate(lastPoints, error);
+  if (useLoop) stroke->setSelfLoop(m_loop);
+  return stroke;
 }
 
 //-------------------------------------------------------------------

@@ -86,6 +86,7 @@ class TApp final : public QObject,
 
   int m_autosavePeriod;  // minutes
   bool m_autosaveSuspended;
+  bool m_saveInProgress;
   QTimer *m_autosaveTimer;
 
   TApp();
@@ -204,6 +205,9 @@ public:
   void setCurrentXsheetViewer(XsheetViewer *viewer) { m_xsheetViewer = viewer; }
 
   XsheetViewer *getCurrentXsheetViewer() const { return m_xsheetViewer; }
+
+  bool isSaveInProgress() { return m_saveInProgress; }
+  void setSaveInProgress(bool inProgress) { m_saveInProgress = inProgress; }
 
 protected:
   bool eventFilter(QObject *obj, QEvent *event) override;

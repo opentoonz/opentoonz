@@ -25,7 +25,7 @@ protected:
   bool m_isCollapsible;
 
 public:
-  CommandBar(QWidget *parent = 0, Qt::WindowFlags flags = 0,
+  CommandBar(QWidget *parent = 0, Qt::WindowFlags flags = Qt::WindowFlags(),
              bool isCollapsible = false, bool isXsheetToolbar = false);
 
 signals:

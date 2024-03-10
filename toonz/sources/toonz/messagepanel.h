@@ -54,7 +54,7 @@ class LogPanel final : public TPanel, public TLogger::Listener {
   int m_poolIndex;
 
 public:
-  LogPanel(QWidget *parent = 0, Qt::WindowFlags flags = 0);
+  LogPanel(QWidget *parent = 0, Qt::WindowFlags flags = Qt::WindowFlags());
   ~LogPanel();
 
   void onLogChanged() override;

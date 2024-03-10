@@ -58,7 +58,7 @@
             "inputs": {}
         },
         "dabs_per_basic_radius": {
-            "base_value": 5.0,
+            "base_value": 0.0,
             "inputs": {}
         },
         "dabs_per_second": {
@@ -85,7 +85,7 @@
             }
         },
         "elliptical_dab_ratio": {
-            "base_value": 10.0,
+            "base_value": 7.5,
             "inputs": {}
         },
         "eraser": {
@@ -105,7 +105,7 @@
             "inputs": {}
         },
         "hardness": {
-            "base_value": 0.38,
+            "base_value": 0.87,
             "inputs": {}
         },
         "lock_alpha": {
@@ -165,7 +165,7 @@
             "inputs": {}
         },
         "opaque": {
-            "base_value": 1.37,
+            "base_value": 1.07,
             "inputs": {}
         },
         "opaque_linearize": {

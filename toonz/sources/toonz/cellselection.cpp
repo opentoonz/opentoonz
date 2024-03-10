@@ -58,6 +58,7 @@
 #include "tools/strokeselection.h"
 #include "toonz/sceneproperties.h"
 #include "toutputproperties.h"
+#include "toonz/tstageobjectcmd.h"
 
 // TnzCore includes
 #include "timagecache.h"
@@ -110,7 +111,8 @@ bool pasteCellsWithoutUndo(const TCellData *cellData, int &r0, int &c0, int &r1,
   if (!cellData) return false;
   if (r0 < 0 || c0 < 0) return false;
 
-  bool ret = cellData->getCells(xsh, r0, c0, r1, c1, insert, doZeraryClone);
+  bool ret =
+      cellData->getCells(xsh, r0, c0, r1, c1, insert, doZeraryClone, false);
   if (!ret) return false;
 
   return true;
@@ -118,13 +120,17 @@ bool pasteCellsWithoutUndo(const TCellData *cellData, int &r0, int &c0, int &r1,
 
 //-----------------------------------------------------------------------------
 
-void deleteCellsWithoutUndo(int &r0, int &c0, int &r1, int &c1) {
+void deleteCellsWithoutUndo(int &r0, int &c0, int &r1, int &c1, bool doShift) {
   try {
     TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
     int c;
     for (c = c0; c <= c1; c++) {
       if (xsh->isColumnEmpty(c)) continue;
-      xsh->clearCells(r0, c, r1 - r0 + 1);
+
+      if (doShift)
+        xsh->removeCells(r0, c, r1 - r0 + 1);
+      else
+        xsh->clearCells(r0, c, r1 - r0 + 1);
       // when the column becomes empty after deletion,
       // ColumnCmd::DeleteColumn() will take care of column related operations
       // like disconnecting from fx nodes etc.
@@ -211,11 +217,18 @@ class PasteCellsUndo final : public TUndo {
   TCellSelection *m_newSelection;
   TCellData *m_data;
   std::vector<bool> m_areOldColumnsEmpty;
+  bool m_containsSoundColumn;
+  std::map<int, std::string> m_oldEmptyColumnNames;
 
 public:
   PasteCellsUndo(int r0, int c0, int r1, int c1, int oldR0, int oldC0,
-                 int oldR1, int oldC1, const std::vector<bool> &areColumnsEmpty)
-      : m_areOldColumnsEmpty(areColumnsEmpty) {
+                 int oldR1, int oldC1, const std::vector<bool> &areColumnsEmpty,
+                 bool containsSoundColumn,
+                 const std::map<int, std::string> &oldEmptyColumnNames =
+                     std::map<int, std::string>())
+      : m_areOldColumnsEmpty(areColumnsEmpty)
+      , m_containsSoundColumn(containsSoundColumn)
+      , m_oldEmptyColumnNames(oldEmptyColumnNames) {
     m_data       = new TCellData();
     TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
     m_data->setCells(xsh, r0, c0, r1, c1);
@@ -238,13 +251,18 @@ public:
     int oldR0, oldC0, oldR1, oldC1;
     m_oldSelection->getSelectedCells(oldR0, oldC0, oldR1, oldC1);
 
+    TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
+    for (const auto &item : m_oldEmptyColumnNames) {
+      xsh->getStageObject(TStageObjectId::ColumnId(item.first))
+          ->setName(item.second);
+    }
+
     int c0BeforeCut = c0;
     int c1BeforeCut = c1;
     // Cut delle celle che sono in newSelection
     cutCellsWithoutUndo(r0, c0, r1, c1);
     // Se le colonne erano vuote le resetto (e' necessario farlo per le colonne
     // particolari, colonne sount o palette)
-    TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
     assert(c1BeforeCut - c0BeforeCut + 1 == (int)m_areOldColumnsEmpty.size());
     int c;
     for (c = c0BeforeCut; c <= c1BeforeCut; c++) {
@@ -253,6 +271,8 @@ public:
     }
 
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+    if (m_containsSoundColumn)
+      TApp::instance()->getCurrentXsheet()->notifyXsheetSoundChanged();
   }
 
   void redo() const override {
@@ -261,6 +281,8 @@ public:
     // Cut delle celle che sono in newSelection
     pasteCellsWithoutUndo(m_data, r0, c0, c1, r1, true, false);
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+    if (m_containsSoundColumn)
+      TApp::instance()->getCurrentXsheet()->notifyXsheetSoundChanged();
   }
 
   int getSize() const override { return sizeof(*this); }
@@ -279,15 +301,28 @@ public:
 
 class DeleteCellsUndo final : public TUndo {
   TCellSelection *m_selection;
-  QMimeData *m_data;
+  TCellData *m_data;
+
+  bool m_doShift;  // whether clear cell or remove and shift cells up
+  bool m_containsSoundColumn;
 
 public:
-  DeleteCellsUndo(TCellSelection *selection, QMimeData *data) : m_data(data) {
+  DeleteCellsUndo(TCellSelection *selection, TCellData *data, bool doShift)
+      : m_data(data), m_doShift(doShift), m_containsSoundColumn(false) {
     int r0, c0, r1, c1;
     selection->getSelectedCells(r0, c0, r1, c1);
     if (c0 < 0) c0 = 0;  // Ignore camera column
     m_selection = new TCellSelection();
     m_selection->selectCells(r0, c0, r1, c1);
+
+    TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
+    for (int c = c0; c <= c1; c++) {
+      TXshColumn *column = xsh->getColumn(c);
+      if (column && column->getSoundColumn()) {
+        m_containsSoundColumn = true;
+        break;
+      }
+    }
   }
 
   ~DeleteCellsUndo() { delete m_selection; }
@@ -298,22 +333,27 @@ public:
     int r0, c0, r1, c1;
     m_selection->getSelectedCells(r0, c0, r1, c1);
 
-    const TCellData *cellData = dynamic_cast<const TCellData *>(m_data);
-    pasteCellsWithoutUndo(cellData, r0, c0, r1, c1, false, false);
+    // insert cells if the delete operation had shifted cells up
+    pasteCellsWithoutUndo(m_data, r0, c0, r1, c1, m_doShift, false);
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+    if (m_containsSoundColumn)
+      TApp::instance()->getCurrentXsheet()->notifyXsheetSoundChanged();
   }
 
   void redo() const override {
     int r0, c0, r1, c1;
     m_selection->getSelectedCells(r0, c0, r1, c1);
-    deleteCellsWithoutUndo(r0, c0, r1, c1);
+    deleteCellsWithoutUndo(r0, c0, r1, c1, m_doShift);
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+    if (m_containsSoundColumn)
+      TApp::instance()->getCurrentXsheet()->notifyXsheetSoundChanged();
   }
 
   int getSize() const override { return sizeof(*this); }
 
   QString getHistoryString() override { return QObject::tr("Delete Cells"); }
   int getHistoryType() override { return HistoryType::Xsheet; }
+  bool containsSoundColumn() { return m_containsSoundColumn; }
 };
 
 //=============================================================================
@@ -327,8 +367,11 @@ class CutCellsUndo final : public TUndo {
   TCellSelection *m_selection;
   TCellData *m_data;
 
+  bool m_containsSoundColumn;
+
 public:
-  CutCellsUndo(TCellSelection *selection) : m_data() {
+  CutCellsUndo(TCellSelection *selection)
+      : m_data(), m_containsSoundColumn(false) {
     int r0, c0, r1, c1;
     selection->getSelectedCells(r0, c0, r1, c1);
     if (c0 < 0) c0 = 0;  // Ignore camera column
@@ -340,6 +383,14 @@ public:
     m_data       = new TCellData();
     TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
     m_data->setCells(xsh, r0, c0, r1, c1);
+
+    for (int c = c0; c <= c1; c++) {
+      TXshColumn *column = xsh->getColumn(c);
+      if (column && column->getSoundColumn()) {
+        m_containsSoundColumn = true;
+        break;
+      }
+    }
   }
 
   ~CutCellsUndo() {
@@ -353,6 +404,8 @@ public:
 
     pasteCellsWithoutUndo(m_data, r0, c0, r1, c1, true);
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+    if (m_containsSoundColumn)
+      TApp::instance()->getCurrentXsheet()->notifyXsheetSoundChanged();
   }
 
   void redo() const override {
@@ -365,12 +418,16 @@ public:
 
     clipboard->setMimeData(currentData, QClipboard::Clipboard);
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+    if (m_containsSoundColumn)
+      TApp::instance()->getCurrentXsheet()->notifyXsheetSoundChanged();
   }
 
   int getSize() const override { return sizeof(*this); }
 
   QString getHistoryString() override { return QObject::tr("Cut Cells"); }
   int getHistoryType() override { return HistoryType::Xsheet; }
+
+  bool containsSoundColumn() { return m_containsSoundColumn; }
 };
 
 //=============================================================================
@@ -379,9 +436,19 @@ public:
 
 class InsertUndo final : public TUndo {
   TCellSelection::Range m_range;
+  bool m_containsSoundColumn;
 
 public:
-  InsertUndo(const TCellSelection::Range &range) : m_range(range) {}
+  InsertUndo(const TCellSelection::Range &range) : m_range(range) {
+    TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
+    for (int c = m_range.m_c0; c <= m_range.m_c1; c++) {
+      TXshColumn *column = xsh->getColumn(c);
+      if (column && column->getSoundColumn()) {
+        m_containsSoundColumn = true;
+        break;
+      }
+    }
+  }
 
   void undo() const override {
     TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
@@ -390,6 +457,8 @@ public:
     for (c = m_range.m_c0; c <= m_range.m_c1; c++)
       xsh->removeCells(m_range.m_r0, c, rowCount);
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+    if (m_containsSoundColumn)
+      TApp::instance()->getCurrentXsheet()->notifyXsheetSoundChanged();
   }
   void redo() const override {
     TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
@@ -398,6 +467,8 @@ public:
     for (c = m_range.m_c0; c <= m_range.m_c1; c++)
       xsh->insertCells(m_range.m_r0, c, rowCount);
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+    if (m_containsSoundColumn)
+      TApp::instance()->getCurrentXsheet()->notifyXsheetSoundChanged();
   }
   int getSize() const override { return sizeof(*this); }
   QString getHistoryString() override { return QObject::tr("Insert Cells"); }
@@ -917,13 +988,15 @@ class OverwritePasteCellsUndo final : public TUndo {
   std::vector<bool> m_areOldColumnsEmpty;
 
   QMimeData *m_beforeData;
+  bool m_containsSoundColumn;
 
 public:
   OverwritePasteCellsUndo(int r0, int c0, int r1, int c1, int oldR0, int oldC0,
                           int oldR1, int oldC1,
                           const std::vector<bool> &areColumnsEmpty,
-                          TCellData *beforeData)
-      : m_areOldColumnsEmpty(areColumnsEmpty) {
+                          TCellData *beforeData, bool containsSoundColumn)
+      : m_areOldColumnsEmpty(areColumnsEmpty)
+      , m_containsSoundColumn(containsSoundColumn) {
     QClipboard *clipboard = QApplication::clipboard();
     /*-- ペーストされたセルをdataに保持しておく --*/
     TCellData *data = new TCellData();
@@ -988,6 +1061,8 @@ public:
       cellSelection->selectCells(oldR0, oldC0, oldR1, oldC1);
 
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+    if (m_containsSoundColumn)
+      TApp::instance()->getCurrentXsheet()->notifyXsheetSoundChanged();
   }
 
   void redo() const override {
@@ -998,6 +1073,8 @@ public:
     // Cut delle celle che sono in newSelection
     pasteCellsWithoutUndo(r0, c0, c1, r1, false, false);
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+    if (m_containsSoundColumn)
+      TApp::instance()->getCurrentXsheet()->notifyXsheetSoundChanged();
   }
 
   int getSize() const override { return sizeof(*this); }
@@ -1435,7 +1512,10 @@ int TCellSelection::Range::getColCount() const { return m_c1 - m_c0 + 1; }
 // TCellSelection
 //-----------------------------------------------------------------------------
 
-TCellSelection::TCellSelection() : m_timeStretchPopup(0), m_reframePopup(0) {}
+TCellSelection::TCellSelection()
+    : m_timeStretchPopup(0), m_reframePopup(0), m_resizePivotRow(-1) {
+  setAlternativeCommandNames();
+}
 
 //-----------------------------------------------------------------------------
 
@@ -1473,7 +1553,9 @@ void TCellSelection::enableCommands() {
   enableCommand(this, MI_ShiftKeyframesUp, &TCellSelection::shiftKeyframesUp);
 
   enableCommand(this, MI_Copy, &TCellSelection::copyCells);
-  enableCommand(this, MI_Paste, &TCellSelection::pasteCells);
+  enableCommand(this, MI_Paste,
+                &TCellSelection::doPaste);  // choose pasting behavior by
+                                            // preference option
 
   if (dynamic_cast<const TKeyframeData *>(
           QApplication::clipboard()->mimeData()))
@@ -1498,11 +1580,25 @@ void TCellSelection::enableCommands() {
                 &TCellSelection::reframeWithEmptyInbetweens);
 
   enableCommand(this, MI_PasteNumbers, &TCellSelection::overwritePasteNumbers);
+  enableCommand(this, MI_PasteCellContent, &TCellSelection::pasteCells);
   enableCommand(this, MI_CreateBlankDrawing,
                 &TCellSelection::createBlankDrawings);
   enableCommand(this, MI_Duplicate, &TCellSelection::duplicateFrames);
   enableCommand(this, MI_PasteDuplicate, &TCellSelection::pasteDuplicateCells);
 }
+
+//-----------------------------------------------------------------------------
+
+void TCellSelection::setAlternativeCommandNames() {
+  m_alternativeCommandNames = {
+      {MI_Copy, QObject::tr("Copy Cells", "TCellSelection")},
+      {MI_Paste, QObject::tr("Paste Cells", "TCellSelection")},
+      {MI_PasteInto, QObject::tr("Overwrite Paste Cells", "TCellSelection")},
+      {MI_Cut, QObject::tr("Cut Cells", "TCellSelection")},
+      {MI_Clear, QObject::tr("Delete Cells", "TCellSelection")},
+      {MI_Insert, QObject::tr("Insert Cells", "TCellSelection")}};
+}
+
 //-----------------------------------------------------------------------------
 // Used in RenameCellField::eventFilter()
 
@@ -1543,6 +1639,7 @@ bool TCellSelection::isEnabledCommand(
                                         MI_Undo,
                                         MI_Redo,
                                         MI_PasteNumbers,
+                                        MI_PasteCellContent,
                                         MI_ConvertToToonzRaster,
                                         MI_ConvertVectorToVector,
                                         MI_CreateBlankDrawing,
@@ -1564,6 +1661,10 @@ void TCellSelection::selectCells(int r0, int c0, int r1, int c1) {
   m_range.m_r1            = r1;
   m_range.m_c1            = c1;
   bool onlyOneRasterLevel = containsOnlyOneRasterLevel(r0, c0, r1, c1);
+  // set the nearest row
+  m_resizePivotRow =
+      (std::abs(r0 - m_resizePivotRow) < std::abs(r1 - m_resizePivotRow)) ? r0
+                                                                          : r1;
   CommandManager::instance()->enable(MI_CanvasSize, onlyOneRasterLevel);
 }
 
@@ -1575,13 +1676,15 @@ void TCellSelection::selectCell(int row, int col) {
   m_range.m_r1            = row;
   m_range.m_c1            = col;
   bool onlyOneRasterLevel = containsOnlyOneRasterLevel(row, col, row, col);
+  m_resizePivotRow        = row;
   CommandManager::instance()->enable(MI_CanvasSize, onlyOneRasterLevel);
 }
 
 //-----------------------------------------------------------------------------
 
 void TCellSelection::selectNone() {
-  m_range = Range();
+  m_range          = Range();
+  m_resizePivotRow = -1;
   CommandManager::instance()->enable(MI_CanvasSize, false);
 }
 
@@ -1718,6 +1821,16 @@ static void pasteRasterImageInCell(int row, int col,
 }
 
 //-----------------------------------------------------------------------------
+// choose pasting behavior by preference option
+void TCellSelection::doPaste() {
+  if (Preferences::instance()->getPasteCellsBehavior() ==
+      0)  // insert paste whole contents of copied cells
+    pasteCells();
+  else  // overwrite paste numbers, consistent with QuickChecker
+    overwritePasteNumbers();
+}
+
+//-----------------------------------------------------------------------------
 
 void TCellSelection::pasteCells() {
   int r0, c0, r1, c1;
@@ -1765,6 +1878,23 @@ void TCellSelection::pasteCells() {
       return;
     }
 
+    // pasting cells may change empty column names. So keep old column names for
+    // undo
+    std::map<int, std::string> emptyColumnNames;
+    if (Preferences::instance()->isLinkColumnNameWithLevelEnabled()) {
+      for (int c = c0; c < c0 + cellData->getColCount(); c++) {
+        TXshColumn *column = xsh->getColumn(c);
+        if (!column || column->isEmpty()) {
+          if (!xsh->getStageObject(TStageObjectId::ColumnId(c))
+                   ->hasSpecifiedName())
+            emptyColumnNames[c] = "";
+          else
+            emptyColumnNames[c] =
+                xsh->getStageObject(TStageObjectId::ColumnId(c))->getName();
+        }
+      }
+    }
+
     bool isPaste = pasteCellsWithoutUndo(cellData, r0, c0, r1, c1);
 
     // Se la selezione corrente e' TCellSelection selezione le celle copiate
@@ -1776,6 +1906,7 @@ void TCellSelection::pasteCells() {
     // n.b. devo farlo dopo il paste perche' prima non ho il range delle colonne
     // incollate corrette.
     std::vector<bool> areColumnsEmpty;
+    bool containsSoundColumn = false;
     int c;
     for (c = c0; c <= c1; c++) {
       TXshColumn *column = xsh->getColumn(c);
@@ -1783,6 +1914,8 @@ void TCellSelection::pasteCells() {
         areColumnsEmpty.push_back(false);
         continue;
       }
+      if (!containsSoundColumn && column->getSoundColumn())
+        containsSoundColumn = true;
       int newCr0, newCr1;
       column->getRange(newCr0, newCr1);
       areColumnsEmpty.push_back(!column || column->isEmpty() ||
@@ -1800,8 +1933,11 @@ void TCellSelection::pasteCells() {
     LevelCmd::addMissingLevelsToCast(pastedLevels);
 
     TUndoManager::manager()->add(new PasteCellsUndo(
-        r0, c0, r1, c1, oldR0, oldC0, oldR1, oldC1, areColumnsEmpty));
+        r0, c0, r1, c1, oldR0, oldC0, oldR1, oldC1, areColumnsEmpty,
+        containsSoundColumn, emptyColumnNames));
     TApp::instance()->getCurrentScene()->setDirtyFlag(true);
+    if (containsSoundColumn)
+      TApp::instance()->getCurrentXsheet()->notifyXsheetSoundChanged();
   }
 
   const TKeyframeData *keyframeData =
@@ -2036,6 +2172,8 @@ void TCellSelection::pasteCells() {
             toolHandle->getTool()->onDeactivate();
             toolHandle->getTool()->onActivate();
             rs->pasteSelection();
+            assert(initUndo);
+            TUndoManager::manager()->endBlock();
             return;
           }
         }
@@ -2289,6 +2427,7 @@ void TCellSelection::pasteDuplicateCells() {
     if (cellSelection) cellSelection->selectCells(r0, c0, r1, c1);
 
     std::vector<bool> areColumnsEmpty;
+    bool containsSoundColumn = false;
     int c;
     for (c = c0; c <= c1; c++) {
       TXshColumn *column = xsh->getColumn(c);
@@ -2296,6 +2435,8 @@ void TCellSelection::pasteDuplicateCells() {
         areColumnsEmpty.push_back(false);
         continue;
       }
+      if (!containsSoundColumn && column->getSoundColumn())
+        containsSoundColumn = true;
       int newCr0, newCr1;
       column->getRange(newCr0, newCr1);
       areColumnsEmpty.push_back(!column || column->isEmpty() ||
@@ -2317,8 +2458,9 @@ void TCellSelection::pasteDuplicateCells() {
     getLevelSetFromData(newCellData, pastedLevels);
     LevelCmd::addMissingLevelsToCast(pastedLevels);
 
-    TUndoManager::manager()->add(new PasteCellsUndo(
-        r0, c0, r1, c1, oldR0, oldC0, oldR1, oldC1, areColumnsEmpty));
+    TUndoManager::manager()->add(
+        new PasteCellsUndo(r0, c0, r1, c1, oldR0, oldC0, oldR1, oldC1,
+                           areColumnsEmpty, containsSoundColumn));
     TApp::instance()->getCurrentScene()->setDirtyFlag(true);
   }
 
@@ -2383,13 +2525,26 @@ void TCellSelection::pasteDuplicateCells() {
 //-----------------------------------------------------------------------------
 
 void TCellSelection::deleteCells() {
+  // choose clear or remove+shift behavior
+  // 0: Clear Cell / Frame
+  // 1: Remove and Shift Cells / Frames Up
+  bool withShift = Preferences::instance()->getDeleteCommandBehaviour() == 1;
+  deleteCells(withShift);
+}
+
+//-----------------------------------------------------------------------------
+
+void TCellSelection::deleteCells(bool withShift) {
   if (isEmpty()) return;
   int r0, c0, r1, c1;
   getSelectedCells(r0, c0, r1, c1);
   if (c0 < 0) c0 = 0;  // Ignore camera column
   TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
-  // if all the selected cells are already empty, then do nothing
-  if (xsh->isRectEmpty(CellPosition(r0, c0), CellPosition(r1, c1))) return;
+  // if with "Clear Cell" behavior and all the selected cells are already empty,
+  // then do nothing
+  if (!withShift &&
+      xsh->isRectEmpty(CellPosition(r0, c0), CellPosition(r1, c1)))
+    return;
 
   std::set<int> removedColIds;
   // check if the operation may remove expression reference as column becomes
@@ -2404,15 +2559,27 @@ void TCellSelection::deleteCells() {
     TUndoManager::manager()->beginBlock();
     // remove, then insert empty column
     for (auto colId : removedColIds) {
+      // keep column name if specified
+      std::string columnName = "";
+      if (Preferences::instance()->isLinkColumnNameWithLevelEnabled() &&
+          xsh->getStageObject(TStageObjectId::ColumnId(colId))
+              ->hasSpecifiedName())
+        columnName =
+            xsh->getStageObject(TStageObjectId::ColumnId(colId))->getName();
+
       ColumnCmd::deleteColumn(colId, true);
       ColumnCmd::insertEmptyColumn(colId);
+
+      if (!columnName.empty())
+        TStageObjectCmd::rename(TStageObjectId::ColumnId(colId), columnName,
+                                TApp::instance()->getCurrentXsheet());
     }
   }
 
   DeleteCellsUndo *undo =
-      new DeleteCellsUndo(new TCellSelection(m_range), data);
+      new DeleteCellsUndo(new TCellSelection(m_range), data, withShift);
 
-  deleteCellsWithoutUndo(r0, c0, r1, c1);
+  deleteCellsWithoutUndo(r0, c0, r1, c1, withShift);
 
   TUndoManager::manager()->add(undo);
 
@@ -2429,6 +2596,8 @@ void TCellSelection::deleteCells() {
 
   TApp::instance()->getCurrentScene()->setDirtyFlag(true);
   TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+  if (undo->containsSoundColumn())
+    TApp::instance()->getCurrentXsheet()->notifyXsheetSoundChanged();
 }
 
 //-----------------------------------------------------------------------------
@@ -2449,7 +2618,10 @@ void TCellSelection::cutCells(bool withoutCopy) {
   std::set<int> removedColIds;
   // check if the operation may remove expression reference as column becomes
   // empty and deleted after the operation.
-  if (!checkColumnRemoval(r0, c0, r1, c1, removedColIds)) return;
+  if (!checkColumnRemoval(r0, c0, r1, c1, removedColIds)) {
+    delete undo;
+    return;
+  }
 
   undo->setCurrentData(r0, c0, r1, c1);
   if (!withoutCopy) copyCellsWithoutUndo(r0, c0, r1, c1);
@@ -2480,6 +2652,9 @@ void TCellSelection::cutCells(bool withoutCopy) {
     selectNone();
 
   TApp::instance()->getCurrentScene()->setDirtyFlag(true);
+  TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+  if (undo->containsSoundColumn())
+    TApp::instance()->getCurrentXsheet()->notifyXsheetSoundChanged();
 }
 
 //-----------------------------------------------------------------------------
@@ -3195,6 +3370,7 @@ void TCellSelection::overWritePasteCells() {
 
     /*-- 各カラムについて、ペースト前にカラムが空だったならtrue --*/
     std::vector<bool> areColumnsEmpty;
+    bool containsSoundColumn = false;
     int c;
     /*-- ペースト後の各カラムについて --*/
     for (c = c0; c <= c1; c++) {
@@ -3203,6 +3379,8 @@ void TCellSelection::overWritePasteCells() {
         areColumnsEmpty.push_back(false);
         continue;
       }
+      if (!containsSoundColumn && column->getSoundColumn())
+        containsSoundColumn = true;
       int newCr0, newCr1;
       /*-- 新たなカラムに何かペーストされているかどうか --*/
       column->getRange(newCr0, newCr1);
@@ -3218,11 +3396,13 @@ void TCellSelection::overWritePasteCells() {
     LevelCmd::addMissingLevelsToCast(pastedLevels);
 
     /*-- r0,c0,r1,c1はペーストされた範囲　old付きはペースト前の選択範囲 --*/
-    TUndoManager::manager()->add(
-        new OverwritePasteCellsUndo(r0, c0, r1, c1, oldR0, oldC0, oldR1, oldC1,
-                                    areColumnsEmpty, beforeData));
+    TUndoManager::manager()->add(new OverwritePasteCellsUndo(
+        r0, c0, r1, c1, oldR0, oldC0, oldR1, oldC1, areColumnsEmpty, beforeData,
+        containsSoundColumn));
     TUndoManager::manager()->endBlock();
     TApp::instance()->getCurrentScene()->setDirtyFlag(true);
+    if (containsSoundColumn)
+      TApp::instance()->getCurrentXsheet()->notifyXsheetSoundChanged();
 
     delete beforeData;
   } else

@@ -16,7 +16,7 @@
 #include "toonzvectorbrushtool.h"
 #include "tooloptionscontrols.h"
 
-//#include "rgbpickertool.h"
+// #include "rgbpickertool.h"
 #include "rulertool.h"
 #include "shifttracetool.h"
 
@@ -424,7 +424,7 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
       new PegbarChannelField(m_tool, TStageObject::T_Y, "field", frameHandle,
                              objHandle, xshHandle, this);
   m_zField        = new PegbarChannelField(m_tool, TStageObject::T_Z, "field",
-                                    frameHandle, objHandle, xshHandle, this);
+                                           frameHandle, objHandle, xshHandle, this);
   m_noScaleZField = new NoScaleField(m_tool, "field");
 
   m_zLabel             = new ClickableLabel(tr("Z:"), this);
@@ -975,8 +975,8 @@ void ArrowToolOptionsBox::updateStageObjectComboItems() {
 
     TStageObject *pegbar = xsh->getStageObject(id);
     QString itemName     = (id.isTable())
-                           ? tr("Table")
-                           : QString::fromStdString(pegbar->getName());
+                               ? tr("Table")
+                               : QString::fromStdString(pegbar->getName());
     // store the item with ObjectId data
     m_currentStageObjectCombo->addItem(itemName, (int)id.getCode());
   }
@@ -1259,7 +1259,7 @@ SelectionToolOptionsBox::SelectionToolOptionsBox(QWidget *parent, TTool *tool,
   bool ret = connect(m_scaleXField, SIGNAL(valueChange(bool)),
                      SLOT(onScaleXValueChanged(bool)));
   ret      = ret && connect(m_scaleYField, SIGNAL(valueChange(bool)),
-                       SLOT(onScaleYValueChanged(bool)));
+                            SLOT(onScaleYValueChanged(bool)));
   if (m_setSaveboxCheckbox)
     ret = ret && connect(m_setSaveboxCheckbox, SIGNAL(toggled(bool)),
                          SLOT(onSetSaveboxCheckboxChanged(bool)));
@@ -1296,8 +1296,7 @@ SelectionToolOptionsBox::SelectionToolOptionsBox(QWidget *parent, TTool *tool,
   connect(m_hFlipButton, SIGNAL(clicked()), SLOT(onFlipHorizontal()));
   connect(m_vFlipButton, SIGNAL(clicked()), SLOT(onFlipVertical()));
   connect(m_leftRotateButton, SIGNAL(clicked()), SLOT(onRotateLeft()));
-  connect(m_rightRotateButton, SIGNAL(clicked()),
-          SLOT(onRotateRight()));
+  connect(m_rightRotateButton, SIGNAL(clicked()), SLOT(onRotateRight()));
 
   connect(selectionTool, SIGNAL(clickFlipHorizontal()),
           SLOT(onFlipHorizontal()));
@@ -1521,11 +1520,49 @@ GeometricToolOptionsBox::GeometricToolOptionsBox(QWidget *parent, TTool *tool,
           SLOT(onJoinStyleChanged(int)));
 
   assert(ret);
+
+  filterControls();
+}
+
+//-----------------------------------------------------------------------------
+
+void GeometricToolOptionsBox::filterControls() {
+  // show or hide widgets which modify imported brush (mypaint)
+
+  bool showModifiers = false;
+  if (m_tool->getTargetType() & TTool::RasterImage ||
+      m_tool->getTargetType() & TTool::ToonzImage) {
+    TTool::Application *app = TTool::getApplication();
+    TMyPaintBrushStyle *mpbs =
+        dynamic_cast<TMyPaintBrushStyle *>(app->getCurrentLevelStyle());
+    showModifiers = (mpbs) ? true : false;
+  }
+
+  for (QMap<std::string, QLabel *>::iterator it = m_labels.begin();
+       it != m_labels.end(); it++) {
+    bool isMyPaintOnly = (it.key().substr(0, 8) == "Modifier");
+    bool isNormalOnly  = (it.key() == "Size:" || it.key() == "Hardness:" ||
+                         it.key() == "Opacity:" || it.key() == "Pencil Mode");
+    if (isMyPaintOnly || isNormalOnly)
+      it.value()->setVisible(showModifiers == isMyPaintOnly);
+  }
+
+  for (QMap<std::string, ToolOptionControl *>::iterator it = m_controls.begin();
+       it != m_controls.end(); it++) {
+    bool isMyPaintOnly = (it.key().substr(0, 8) == "Modifier");
+    bool isNormalOnly  = (it.key() == "Size:" || it.key() == "Hardness:" ||
+                         it.key() == "Opacity:" || it.key() == "Pencil Mode");
+    if (isMyPaintOnly || isNormalOnly) {
+      if (QWidget *widget = dynamic_cast<QWidget *>(it.value()))
+        widget->setVisible(showModifiers == isMyPaintOnly);
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 
 void GeometricToolOptionsBox::updateStatus() {
+  filterControls();
   QMap<std::string, ToolOptionControl *>::iterator it;
   for (it = m_controls.begin(); it != m_controls.end(); it++)
     it.value()->updateStatus();
@@ -1586,14 +1623,14 @@ TypeToolOptionsBox::TypeToolOptionsBox(QWidget *parent, TTool *tool,
   ret &&connect(fontField, SIGNAL(currentIndexChanged(int)), this,
                 SLOT(onFieldChanged()));
 
-  //#ifndef MACOSX
+  // #ifndef MACOSX
   ToolOptionCombo *styleField =
       dynamic_cast<ToolOptionCombo *>(m_controls.value("Style:"));
   ret &&connect(styleField, SIGNAL(currentIndexChanged(int)), this,
                 SLOT(onFieldChanged()));
   ret &&connect(toolHandle, SIGNAL(toolComboBoxListChanged(std::string)),
                 styleField, SLOT(reloadComboBoxList(std::string)));
-  //#endif
+  // #endif
 
   ToolOptionCombo *sizeField =
       dynamic_cast<ToolOptionCombo *>(m_controls.value("Size:"));
@@ -1734,11 +1771,11 @@ FillToolOptionsBox::FillToolOptionsBox(QWidget *parent, TTool *tool,
   bool ret = connect(m_colorMode, SIGNAL(currentIndexChanged(int)), this,
                      SLOT(onColorModeChanged(int)));
   ret      = ret && connect(m_toolType, SIGNAL(currentIndexChanged(int)), this,
-                       SLOT(onToolTypeChanged(int)));
+                            SLOT(onToolTypeChanged(int)));
   ret      = ret && connect(m_onionMode, SIGNAL(toggled(bool)), this,
-                       SLOT(onOnionModeToggled(bool)));
+                            SLOT(onOnionModeToggled(bool)));
   ret      = ret && connect(m_multiFrameMode, SIGNAL(toggled(bool)), this,
-                       SLOT(onMultiFrameModeToggled(bool)));
+                            SLOT(onMultiFrameModeToggled(bool)));
   assert(ret);
   if (m_colorMode->getProperty()->getValue() == L"Lines") {
     m_selectiveMode->setEnabled(false);
@@ -1942,8 +1979,8 @@ void BrushToolOptionsBox::filterControls() {
        it != m_labels.end(); it++) {
     bool isModifier = (it.key().substr(0, 8) == "Modifier");
     bool isCommon   = (it.key() == "Lock Alpha" || it.key() == "Pressure" ||
-                     it.key() == "Preset:");
-    bool visible = isCommon || (isModifier == showModifiers);
+                     it.key() == "Assistants" || it.key() == "Preset:");
+    bool visible    = isCommon || (isModifier == showModifiers);
     it.value()->setVisible(visible);
   }
 
@@ -1951,8 +1988,8 @@ void BrushToolOptionsBox::filterControls() {
        it != m_controls.end(); it++) {
     bool isModifier = (it.key().substr(0, 8) == "Modifier");
     bool isCommon   = (it.key() == "Lock Alpha" || it.key() == "Pressure" ||
-                     it.key() == "Preset:");
-    bool visible = isCommon || (isModifier == showModifiers);
+                     it.key() == "Assistants" || it.key() == "Preset:");
+    bool visible    = isCommon || (isModifier == showModifiers);
     if (QWidget *widget = dynamic_cast<QWidget *>(it.value()))
       widget->setVisible(visible);
   }
@@ -2340,9 +2377,9 @@ TapeToolOptionsBox::TapeToolOptionsBox(QWidget *parent, TTool *tool,
   bool ret = connect(m_typeMode, SIGNAL(currentIndexChanged(int)), this,
                      SLOT(onToolTypeChanged(int)));
   ret      = ret && connect(m_toolMode, SIGNAL(currentIndexChanged(int)), this,
-                       SLOT(onToolModeChanged(int)));
+                            SLOT(onToolModeChanged(int)));
   ret      = ret && connect(m_joinStrokesMode, SIGNAL(toggled(bool)), this,
-                       SLOT(onJoinStrokesModeChanged()));
+                            SLOT(onJoinStrokesModeChanged()));
   assert(ret);
 }
 
@@ -2808,26 +2845,27 @@ ToolOptions::~ToolOptions() {}
 
 void ToolOptions::showEvent(QShowEvent *) {
   TTool::Application *app = TTool::getApplication();
-  ToolHandle *currTool    = app->getCurrentTool();
-  if (currTool) {
+
+  if (ToolHandle *currTool = app->getCurrentTool()) {
+    currTool->disconnect(this);
     onToolSwitched();
     connect(currTool, SIGNAL(toolSwitched()), SLOT(onToolSwitched()));
+    connect(currTool, SIGNAL(toolOptionsBoxChanged()),
+            SLOT(onToolOptionsBoxChanged()));
     connect(currTool, SIGNAL(toolChanged()), SLOT(onToolChanged()));
   }
 
-  TObjectHandle *currObject = app->getCurrentObject();
-  if (currObject) {
+  if (TObjectHandle *currObject = app->getCurrentObject()) {
     onStageObjectChange();
     connect(currObject, SIGNAL(objectSwitched()), SLOT(onStageObjectChange()));
     connect(currObject, SIGNAL(objectChanged(bool)),
             SLOT(onStageObjectChange()));
   }
 
-  TXshLevelHandle *currLevel = app->getCurrentLevel();
-
-  if (currLevel)
+  if (TXshLevelHandle *currLevel = app->getCurrentLevel()) {
     connect(currLevel, SIGNAL(xshLevelSwitched(TXshLevel *)), this,
             SLOT(onStageObjectChange()));
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -2842,6 +2880,19 @@ void ToolOptions::hideEvent(QShowEvent *) {
 
   TXshLevelHandle *currLevel = app->getCurrentLevel();
   if (currLevel) currLevel->disconnect(this);
+}
+
+//-----------------------------------------------------------------------------
+// used for altering assistant tool options
+void ToolOptions::onToolOptionsBoxChanged() {
+  TTool *tool = TTool::getApplication()->getCurrentTool()->getTool();
+  std::map<TTool *, ToolOptionsBox *>::iterator it = m_panels.find(tool);
+  if (it != m_panels.end()) {
+    ToolOptionsBox *panel = it->second;
+    m_panels.erase(it);
+    layout()->removeWidget(panel);
+  }
+  onToolSwitched();
 }
 
 //-----------------------------------------------------------------------------

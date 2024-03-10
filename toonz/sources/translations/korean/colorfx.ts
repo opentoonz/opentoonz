@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="ko" sourcelanguage="en">
+<TS version="2.0" language="ko" sourcelanguage="en">
 <context>
     <name>ArtisticSolidColor</name>
     <message>
@@ -18,6 +18,29 @@
     <message>
         <source>Irregular</source>
         <translation>불규칙</translation>
+    </message>
+</context>
+<context>
+    <name>FlowLineStrokeStyle</name>
+    <message>
+        <source>Density</source>
+        <translation>밀도</translation>
+    </message>
+    <message>
+        <source>Extension</source>
+        <translation>확장</translation>
+    </message>
+    <message>
+        <source>Width Scale</source>
+        <translation>폭 척도</translation>
+    </message>
+    <message>
+        <source>Straighten Ends</source>
+        <translation>끝을 똑바로</translation>
+    </message>
+    <message>
+        <source>Flow Line</source>
+        <translation>흐름라인</translation>
     </message>
 </context>
 <context>

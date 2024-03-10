@@ -43,7 +43,7 @@ class DVAPI TMainWindow : public QWidget {
   QWidget *m_menu;
 
 public:
-  TMainWindow(QWidget *parent = 0, Qt::WindowFlags flags = 0);
+  TMainWindow(QWidget *parent = 0, Qt::WindowFlags flags = Qt::WindowFlags());
   virtual ~TMainWindow();
 
   void addDockWidget(TDockWidget *item);
@@ -85,8 +85,8 @@ class DVAPI TDockWidget : public DockWidget {
 
 public:
   TDockWidget(const QString &title, QWidget *parent = 0,
-              Qt::WindowFlags flags = 0);
-  TDockWidget(QWidget *parent = 0, Qt::WindowFlags flags = 0);
+              Qt::WindowFlags flags = Qt::WindowFlags());
+  TDockWidget(QWidget *parent = 0, Qt::WindowFlags flags = Qt::WindowFlags());
   ~TDockWidget() {}
 
   void setTitleBarWidget(QWidget *titlebar);

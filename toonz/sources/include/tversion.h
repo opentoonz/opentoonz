@@ -18,8 +18,8 @@ public:
 
 private:
   const char *applicationName     = "OpenToonz";
-  const float applicationVersion  = 1.6f;
-  const float applicationRevision = 0;
+  const float applicationVersion  = 1.7f;
+  const float applicationRevision = 1;
   const char *applicationNote     = "";
 };
 

@@ -5,6 +5,7 @@
 #include "mainwindow.h"
 #include "menubar.h"
 #include "shortcutpopup.h"
+#include "commandbarpopup.h"
 
 // TnzQt includes
 #include "toonzqt/gutil.h"
@@ -32,39 +33,6 @@
 #include <QPainter>
 #include <QApplication>
 #include <QLabel>
-
-//=============================================================================
-// MenuBarCommandItem
-//-----------------------------------------------------------------------------
-
-class MenuBarCommandItem final : public QTreeWidgetItem {
-  QAction* m_action;
-
-public:
-  MenuBarCommandItem(QTreeWidgetItem* parent, QAction* action)
-      : QTreeWidgetItem(parent, UserType), m_action(action) {
-    setFlags(Qt::ItemIsSelectable | Qt::ItemIsDragEnabled | Qt::ItemIsEnabled |
-             Qt::ItemNeverHasChildren);
-    setText(0, m_action->text().remove("&"));
-    setToolTip(0, QObject::tr("[Drag] to move position"));
-  }
-  QAction* getAction() const { return m_action; }
-};
-
-//=============================================================================
-// MenuBarSeparatorItem
-//-----------------------------------------------------------------------------
-
-class MenuBarSeparatorItem final : public QTreeWidgetItem {
-public:
-  MenuBarSeparatorItem(QTreeWidgetItem* parent)
-      : QTreeWidgetItem(parent, UserType) {
-    setFlags(Qt::ItemIsSelectable | Qt::ItemIsDragEnabled | Qt::ItemIsEnabled |
-             Qt::ItemNeverHasChildren);
-    setText(0, QObject::tr("----Separator----"));
-    setToolTip(0, QObject::tr("[Drag] to move position"));
-  }
-};
 
 //=============================================================================
 // MenuBarSubmenuItem
@@ -151,7 +119,7 @@ void MenuBarTree::loadMenuTree(const TFilePath& fp) {
           QAction* action = CommandManager::instance()->getAction(
               cmdName.toStdString().c_str());
           if (action) {
-            MenuBarCommandItem* item = new MenuBarCommandItem(0, action);
+            CommandItem* item = new CommandItem(0, action);
             addTopLevelItem(item);
           }
         } else
@@ -179,20 +147,18 @@ void MenuBarTree::loadMenuRecursive(QXmlStreamReader& reader,
       QString cmdName = reader.readElementText();
       QAction* action =
           CommandManager::instance()->getAction(cmdName.toStdString().c_str());
-      if (action)
-        MenuBarCommandItem* item = new MenuBarCommandItem(parentItem, action);
+      if (action) CommandItem* item = new CommandItem(parentItem, action);
     } else if (reader.name() == "command_debug") {
 #ifndef NDEBUG
       QString cmdName = reader.readElementText();
       QAction* action =
           CommandManager::instance()->getAction(cmdName.toStdString().c_str());
-      if (action)
-        MenuBarCommandItem* item = new MenuBarCommandItem(parentItem, action);
+      if (action) CommandItem* item = new CommandItem(parentItem, action);
 #else
       reader.skipCurrentElement();
 #endif
     } else if (reader.name() == "separator") {
-      MenuBarSeparatorItem* sep = new MenuBarSeparatorItem(parentItem);
+      SeparatorItem* sep = new SeparatorItem(parentItem);
       reader.skipCurrentElement();
     } else
       reader.skipCurrentElement();
@@ -224,10 +190,8 @@ void MenuBarTree::saveMenuTree() {
 void MenuBarTree::saveMenuRecursive(QXmlStreamWriter& writer,
                                     QTreeWidgetItem* parentItem) {
   for (int c = 0; c < parentItem->childCount(); c++) {
-    MenuBarCommandItem* command =
-        dynamic_cast<MenuBarCommandItem*>(parentItem->child(c));
-    MenuBarSeparatorItem* sep =
-        dynamic_cast<MenuBarSeparatorItem*>(parentItem->child(c));
+    CommandItem* command = dynamic_cast<CommandItem*>(parentItem->child(c));
+    SeparatorItem* sep   = dynamic_cast<SeparatorItem*>(parentItem->child(c));
     MenuBarSubmenuItem* subMenu =
         dynamic_cast<MenuBarSubmenuItem*>(parentItem->child(c));
     if (command)
@@ -258,12 +222,12 @@ bool MenuBarTree::dropMimeData(QTreeWidgetItem* parent, int index,
     QString txt = data->text();
     QTreeWidgetItem* item;
     if (txt == "separator")
-      item = new MenuBarSeparatorItem(0);
+      item = new SeparatorItem(0);
     else {
       QAction* act =
           CommandManager::instance()->getAction(txt.toStdString().c_str());
       if (!act) return false;
-      item = new MenuBarCommandItem(0, act);
+      item = new CommandItem(0, act);
     }
 
     if (parent)
@@ -345,118 +309,6 @@ void MenuBarTree::onItemChanged(QTreeWidgetItem* item, int column) {
 }
 
 //=============================================================================
-// CommandListTree
-//-----------------------------------------------------------------------------
-
-CommandListTree::CommandListTree(QWidget* parent) : QTreeWidget(parent) {
-  setObjectName("SolidLineFrame");
-  setAlternatingRowColors(true);
-  setDragEnabled(true);
-  setDragDropMode(QAbstractItemView::DragOnly);
-  setColumnCount(1);
-  setIconSize(QSize(21, 18));
-  header()->close();
-
-  QIcon menuFolderIcon(createQIcon("folder_project", true));
-  invisibleRootItem()->setIcon(0, menuFolderIcon);
-
-  QTreeWidgetItem* menuCommandFolder = new QTreeWidgetItem(this);
-  menuCommandFolder->setFlags(Qt::ItemIsEnabled);
-  menuCommandFolder->setText(0, ShortcutTree::tr("Menu Commands"));
-  menuCommandFolder->setExpanded(true);
-  menuCommandFolder->setIcon(0, invisibleRootItem()->icon(0));
-
-  addFolder(ShortcutTree::tr("File"), MenuFileCommandType, menuCommandFolder);
-  addFolder(ShortcutTree::tr("Edit"), MenuEditCommandType, menuCommandFolder);
-  addFolder(ShortcutTree::tr("Scan & Cleanup"), MenuScanCleanupCommandType,
-            menuCommandFolder);
-  addFolder(ShortcutTree::tr("Level"), MenuLevelCommandType, menuCommandFolder);
-  addFolder(ShortcutTree::tr("Xsheet"), MenuXsheetCommandType,
-            menuCommandFolder);
-  addFolder(ShortcutTree::tr("Cells"), MenuCellsCommandType, menuCommandFolder);
-  addFolder(ShortcutTree::tr("Play"), MenuPlayCommandType, menuCommandFolder);
-  addFolder(ShortcutTree::tr("Render"), MenuRenderCommandType,
-            menuCommandFolder);
-  addFolder(ShortcutTree::tr("View"), MenuViewCommandType, menuCommandFolder);
-  addFolder(ShortcutTree::tr("Windows"), MenuWindowsCommandType,
-            menuCommandFolder);
-  addFolder(ShortcutTree::tr("Help"), MenuHelpCommandType, menuCommandFolder);
-  addFolder(ShortcutTree::tr("SubMenu Commands"), MenuCommandType,
-            menuCommandFolder);
-
-  addFolder(ShortcutTree::tr("Tools"), ToolCommandType);
-
-  sortItems(0, Qt::AscendingOrder);
-
-  MenuBarSeparatorItem* sep = new MenuBarSeparatorItem(0);
-  sep->setToolTip(0, QObject::tr("[Drag&Drop] to copy separator to menu bar"));
-  addTopLevelItem(sep);
-}
-
-//-----------------------------------------------------------------------------
-
-void CommandListTree::addFolder(const QString& title, int commandType,
-                                QTreeWidgetItem* parentFolder) {
-  QTreeWidgetItem* folder;
-  if (!parentFolder)
-    folder = new QTreeWidgetItem(this);
-  else
-    folder = new QTreeWidgetItem(parentFolder);
-  assert(folder);
-  folder->setText(0, title);
-  folder->setIcon(0, invisibleRootItem()->icon(0));
-
-  std::vector<QAction*> actions;
-  CommandManager::instance()->getActions((CommandType)commandType, actions);
-  for (int i = 0; i < (int)actions.size(); i++) {
-    MenuBarCommandItem* item = new MenuBarCommandItem(folder, actions[i]);
-    item->setToolTip(0, QObject::tr("[Drag&Drop] to copy command to menu bar"));
-  }
-}
-
-//-----------------------------------------------------------------------------
-
-void CommandListTree::mousePressEvent(QMouseEvent* event) {
-  setCurrentItem(itemAt(event->pos()));
-  MenuBarCommandItem* commandItem =
-      dynamic_cast<MenuBarCommandItem*>(itemAt(event->pos()));
-  MenuBarSeparatorItem* separatorItem =
-      dynamic_cast<MenuBarSeparatorItem*>(itemAt(event->pos()));
-
-  if (commandItem || separatorItem) {
-    std::string dragStr;
-    QString dragPixmapTxt;
-    if (commandItem) {
-      dragStr =
-          CommandManager::instance()->getIdFromAction(commandItem->getAction());
-      dragPixmapTxt = commandItem->getAction()->text();
-      dragPixmapTxt.remove("&");
-    } else {
-      dragStr       = "separator";
-      dragPixmapTxt = tr("----Separator----");
-    }
-
-    QMimeData* mimeData = new QMimeData;
-    mimeData->setText(QString::fromStdString(dragStr));
-
-    QFontMetrics fm(QApplication::font());
-    QPixmap pix(fm.boundingRect(dragPixmapTxt).adjusted(-2, -2, 2, 2).size());
-    QPainter painter(&pix);
-    painter.fillRect(pix.rect(), Qt::white);
-    painter.setPen(Qt::black);
-    painter.drawText(pix.rect(), Qt::AlignCenter, dragPixmapTxt);
-
-    QDrag* drag = new QDrag(this);
-    drag->setMimeData(mimeData);
-    drag->setPixmap(pix);
-
-    drag->exec(Qt::CopyAction);
-  }
-
-  QTreeWidget::mousePressEvent(event);
-}
-
-//=============================================================================
 // MenuBarPopup
 //-----------------------------------------------------------------------------
 
@@ -469,7 +321,11 @@ MenuBarPopup::MenuBarPopup(Room* room)
   std::string mbFileName = room->getPath().getName() + "_menubar.xml";
   TFilePath mbPath       = ToonzFolder::getMyRoomsDir() + mbFileName;
 
-  m_commandListTree = new CommandListTree(this);
+  QLabel* menuBarLabel =
+      new QLabel(tr("%1 Menu Bar").arg(room->getName()), this);
+  QLabel* menuItemListLabel = new QLabel(tr("Menu Items"), this);
+
+  m_commandListTree = new CommandListTree(menuBarLabel->text(), this);
   m_menuBarTree     = new MenuBarTree(mbPath, this);
 
   QPushButton* okBtn     = new QPushButton(tr("OK"), this);
@@ -478,13 +334,11 @@ MenuBarPopup::MenuBarPopup(Room* room)
   okBtn->setFocusPolicy(Qt::NoFocus);
   cancelBtn->setFocusPolicy(Qt::NoFocus);
 
-  QLabel* menuBarLabel =
-      new QLabel(tr("%1 Menu Bar").arg(room->getName()), this);
-  QLabel* menuItemListLabel = new QLabel(tr("Menu Items"), this);
-
   QFont f("Arial", 15, QFont::Bold);
   menuBarLabel->setFont(f);
   menuItemListLabel->setFont(f);
+
+  QLineEdit* searchEdit = new QLineEdit(this);
 
   QLabel* noticeLabel = new QLabel(
       tr("N.B. If you put unique title to submenu, it may not be translated to "
@@ -507,10 +361,19 @@ MenuBarPopup::MenuBarPopup(Room* room)
     {
       mainUILay->addWidget(menuBarLabel, 0, 0);
       mainUILay->addWidget(menuItemListLabel, 0, 1);
-      mainUILay->addWidget(m_menuBarTree, 1, 0);
-      mainUILay->addWidget(m_commandListTree, 1, 1);
+      mainUILay->addWidget(m_menuBarTree, 1, 0, 2, 1);
 
-      mainUILay->addWidget(noticeLabel, 2, 0, 1, 2);
+      QHBoxLayout* searchLay = new QHBoxLayout();
+      searchLay->setMargin(0);
+      searchLay->setSpacing(5);
+      {
+        searchLay->addWidget(new QLabel(tr("Search:"), this), 0);
+        searchLay->addWidget(searchEdit);
+      }
+      mainUILay->addLayout(searchLay, 1, 1);
+      mainUILay->addWidget(m_commandListTree, 2, 1);
+
+      mainUILay->addWidget(noticeLabel, 3, 0, 1, 2);
     }
     mainUILay->setRowStretch(0, 0);
     mainUILay->setRowStretch(1, 1);
@@ -534,6 +397,8 @@ MenuBarPopup::MenuBarPopup(Room* room)
 
   bool ret = connect(okBtn, SIGNAL(clicked()), this, SLOT(onOkPressed()));
   ret      = ret && connect(cancelBtn, SIGNAL(clicked()), this, SLOT(reject()));
+  ret = ret && connect(searchEdit, SIGNAL(textChanged(const QString&)), this,
+                       SLOT(onSearchTextChanged(const QString&)));
   assert(ret);
 }
 
@@ -543,4 +408,14 @@ void MenuBarPopup::onOkPressed() {
   m_menuBarTree->saveMenuTree();
 
   accept();
+}
+
+//-----------------------------------------------------------------------------
+
+void MenuBarPopup::onSearchTextChanged(const QString& text) {
+  static bool busy = false;
+  if (busy) return;
+  busy = true;
+  m_commandListTree->searchItems(text);
+  busy = false;
 }

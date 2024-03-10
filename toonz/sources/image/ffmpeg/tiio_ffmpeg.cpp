@@ -1,5 +1,7 @@
+#include "toonz/preferences.h"
+#include "toonz/toonzfolders.h"
+
 #include "tiio_ffmpeg.h"
-#include "../toonz/tapp.h"
 #include "tsystem.h"
 #include "tsound.h"
 #include "timageinfo.h"
@@ -11,8 +13,6 @@
 #include <QDir>
 #include <QtGui/QImage>
 #include <QRegExp>
-#include "toonz/preferences.h"
-#include "toonz/toonzfolders.h"
 #include "tmsgcore.h"
 #include "thirdparty.h"
 
@@ -24,15 +24,18 @@ Ffmpeg::Ffmpeg() {
 Ffmpeg::~Ffmpeg() {}
 
 bool Ffmpeg::checkFormat(std::string format) {
-  QStringList args;
-  args << "-formats";
-  QProcess ffmpeg;
-  ThirdParty::runFFmpeg(ffmpeg, args);
-  ffmpeg.waitForFinished();
-  QString results = ffmpeg.readAllStandardError();
-  results += ffmpeg.readAllStandardOutput();
-  ffmpeg.close();
-  std::string strResults = results.toStdString();
+  static std::string strResults = "";
+  if (strResults.empty()) {
+    QStringList args;
+    args << "-formats";
+    QProcess ffmpeg;
+    ThirdParty::runFFmpeg(ffmpeg, args);
+    ffmpeg.waitForFinished();
+    QString results = ffmpeg.readAllStandardError();
+    results += ffmpeg.readAllStandardOutput();
+    ffmpeg.close();
+    strResults = results.toStdString();
+  }
   std::string::size_type n;
   n = strResults.find(format);
   if (n != std::string::npos)
@@ -191,7 +194,8 @@ void Ffmpeg::saveSoundTrack(TSoundTrack *st) {
 
   m_audioPath = getFfmpegCache().getQString() + "//" +
                 QString::fromStdString(m_path.getName()) + "tempOut.raw";
-  m_audioFormat = "s" + QString::number(m_bitsPerSample);
+  m_audioFormat = ((st->getSampleType() == TSound::FLOAT) ? "f" : "s") +
+                  QString::number(m_bitsPerSample);
   if (m_bitsPerSample > 8) m_audioFormat = m_audioFormat + "le";
   std::string strPath = m_audioPath.toStdString();
 

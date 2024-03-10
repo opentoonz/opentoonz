@@ -186,8 +186,8 @@ public:
                    const std::vector<DoublePair> &sortedWRanges);
   void moveStrokes(int fromIndex, int count, int moveBefore, bool regroup);
 
-  TStroke *removeEndpoints(int strokeIndex);
-  void restoreEndpoints(int index, TStroke *oldStroke);
+  TStroke *removeEndpoints(int strokeIndex, double *offset);
+  void restoreEndpoints(int index, TStroke *oldStroke, double offset);
 
   int areDifferentGroup(UINT index1, bool isRegion1, UINT index2,
                         bool isRegion2) const;

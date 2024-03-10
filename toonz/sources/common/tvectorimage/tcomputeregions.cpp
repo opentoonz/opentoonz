@@ -3371,7 +3371,7 @@ void TVectorImage::Imp::checkIntersections() {
 #endif
 //-----------------------------------------------------------------------------
 
-TStroke *TVectorImage::Imp::removeEndpoints(int strokeIndex) {
+TStroke *TVectorImage::Imp::removeEndpoints(int strokeIndex, double *offset=NULL) {
 #ifdef _DEBUG
   checkIntersections();
 #endif
@@ -3398,6 +3398,10 @@ TStroke *TVectorImage::Imp::removeEndpoints(int strokeIndex) {
   TStroke *s = new TStroke(*(vs->m_s));
 
   double offs = s->getLength(minW);
+
+  if (offset) {
+    *offset = offs;
+  }
 
   TStroke s0, s1, final;
 
@@ -3446,7 +3450,7 @@ TStroke *TVectorImage::Imp::removeEndpoints(int strokeIndex) {
 
 //-----------------------------------------------------------------------------
 
-void TVectorImage::Imp::restoreEndpoints(int index, TStroke *oldStroke) {
+void TVectorImage::Imp::restoreEndpoints(int index, TStroke *oldStroke, double offs) {
 #ifdef _DEBUG
   checkIntersections();
 #endif
@@ -3454,9 +3458,6 @@ void TVectorImage::Imp::restoreEndpoints(int index, TStroke *oldStroke) {
   VIStroke *vs = m_strokes[index];
 
   TStroke *s = vs->m_s;
-  TPointD p  = s->getPoint(0.0);
-
-  double offs = oldStroke->getLength(oldStroke->getW(p));
 
   vs->m_s = oldStroke;
 

@@ -135,7 +135,7 @@ class NoteArea final : public QFrame {
   QLayout *m_currentLayout;
 
 public:
-  NoteArea(XsheetViewer *parent = 0, Qt::WindowFlags flags = 0);
+  NoteArea(XsheetViewer *parent = 0, Qt::WindowFlags flags = Qt::WindowFlags());
 
   void updatePopup() { m_newNotePopup->update(); }
   void updateButtons();

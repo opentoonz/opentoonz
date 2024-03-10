@@ -122,10 +122,8 @@ ExportSceneDvDirModelFileFolderNode::createExposeSceneNode(
 // ExportSceneDvDirModelProjectNode
 
 QPixmap ExportSceneDvDirModelProjectNode::getPixmap(bool isOpen) const {
-  static QPixmap openProjectPixmap(recolorPixmap(
-      svgToPixmap(getIconThemePath("actions/18/folder_project_on.svg"))));
-  static QPixmap closeProjectPixmap(recolorPixmap(
-      svgToPixmap(getIconThemePath("actions/18/folder_project.svg"))));
+  static QPixmap openProjectPixmap(generateIconPixmap("folder_project_on"));
+  static QPixmap closeProjectPixmap(generateIconPixmap("folder_project"));
   return isOpen ? openProjectPixmap : closeProjectPixmap;
 }
 
@@ -189,11 +187,12 @@ void ExportSceneDvDirModelRootNode::refreshChildren() {
   int i;
   for (i = 0; i < (int)projectRoots.size(); i++) {
     TFilePath projectRoot = projectRoots[i];
+    std::wstring rootDir  = projectRoot.getWideString();
     ExportSceneDvDirModelSpecialFileFolderNode *projectRootNode =
-        new ExportSceneDvDirModelSpecialFileFolderNode(this, L"Project root",
-                                                       projectRoot);
-    projectRootNode->setPixmap(QPixmap(recolorPixmap(
-        svgToPixmap(getIconThemePath("actions/18/folder_project_root.svg")))));
+        new ExportSceneDvDirModelSpecialFileFolderNode(
+            this, L"Project root (" + rootDir + L")", projectRoot);
+    projectRootNode->setPixmap(
+        QPixmap(generateIconPixmap("folder_project_root")));
     m_projectRootNodes.push_back(projectRootNode);
     addChild(projectRootNode);
   }
@@ -272,7 +271,7 @@ DvDirModelNode *ExportSceneDvDirModel::getNode(const QModelIndex &index) const {
 QModelIndex ExportSceneDvDirModel::index(int row, int column,
                                          const QModelIndex &parent) const {
   if (column != 0) return QModelIndex();
-  DvDirModelNode *parentNode       = m_root;
+  DvDirModelNode *parentNode = m_root;
   if (parent.isValid()) parentNode = getNode(parent);
   if (row < 0 || row >= parentNode->getChildCount()) return QModelIndex();
   DvDirModelNode *node = parentNode->getChild(row);
@@ -462,10 +461,10 @@ ExportSceneTreeView::ExportSceneTreeView(QWidget *parent)
   // bottom horizontal scrollbar to resize contents...
   bool ret = connect(this, SIGNAL(expanded(const QModelIndex &)), this,
                      SLOT(resizeToConts()));
-  ret = ret && connect(this, SIGNAL(collapsed(const QModelIndex &)), this,
-                       SLOT(resizeToConts()));
-  ret = ret && connect(this->model(), SIGNAL(layoutChanged()), this,
-                       SLOT(resizeToConts()));
+  ret      = ret && connect(this, SIGNAL(collapsed(const QModelIndex &)), this,
+                            SLOT(resizeToConts()));
+  ret      = ret && connect(this->model(), SIGNAL(layoutChanged()), this,
+                            SLOT(resizeToConts()));
 
   assert(ret);
   setAcceptDrops(true);
@@ -556,7 +555,7 @@ ExportScenePopup::ExportScenePopup(std::vector<TFilePath> scenes)
 
   m_newProjectName = new LineEdit(newProjectWidget);
   ret              = ret && connect(m_newProjectName, SIGNAL(focusIn()), this,
-                       SLOT(onProjectNameFocusIn()));
+                                    SLOT(onProjectNameFocusIn()));
   newProjectLayout->setColumnStretch(1, 5);
   newProjectLayout->addWidget(m_newProjectName, 1, 1, 1, 1, Qt::AlignLeft);
 

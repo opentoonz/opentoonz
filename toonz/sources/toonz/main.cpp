@@ -256,6 +256,9 @@ int main(int argc, char *argv[]) {
   }
 #endif
 
+  // Build icon map
+  ThemeManager::getInstance().buildIconPathsMap(":/icons");
+
   // Install signal handlers to catch crashes
   CrashHandler::install();
 
@@ -410,6 +413,7 @@ int main(int argc, char *argv[]) {
 #endif
 
 #ifdef _WIN32
+  // BUG_WORKAROUND: #20230627
   // This attribute is set to make menubar icon to be always (16 x devPixRatio).
   // Without this attribute the menu bar icon size becomes the same as tool bar
   // when Windows scale is in 125%. Currently hiding the menu bar icon is done
@@ -434,11 +438,6 @@ int main(int argc, char *argv[]) {
     assert(ret);
   }
 #endif
-
-  // Set icon theme search paths
-  QStringList themeSearchPathsList = {":/icons"};
-  QIcon::setThemeSearchPaths(themeSearchPathsList);
-  // qDebug() << "All icon theme search paths:" << QIcon::themeSearchPaths();
 
   // Set show icons in menus flag (use iconVisibleInMenu to disable selectively)
   QApplication::instance()->setAttribute(Qt::AA_DontShowIconsInMenus, false);
@@ -479,7 +478,9 @@ int main(int argc, char *argv[]) {
   fmt.setStencil(true);
   QGLFormat::setDefaultFormat(fmt);
 
+#ifndef __HAIKU__
   glutInit(&argc, argv);
+#endif
 
   splash.showMessage(offsetStr + "Initializing Toonz environment ...",
                      Qt::AlignCenter, Qt::white);
@@ -618,11 +619,6 @@ int main(int argc, char *argv[]) {
   splash.showMessage(offsetStr + "Loading styles ...", Qt::AlignCenter,
                      Qt::white);
   a.processEvents();
-
-  // Set default start icon theme
-  QIcon::setThemeName(Preferences::instance()->getIconTheme() ? "dark"
-                                                              : "light");
-  // qDebug() << "Icon theme name:" << QIcon::themeName();
 
   // stile
   QApplication::setStyle("windows");

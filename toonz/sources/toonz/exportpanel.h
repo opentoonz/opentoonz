@@ -90,7 +90,7 @@ class ExportPanel final : public TPanel {
   QCheckBox *m_useMarker;
 
 public:
-  ExportPanel(QWidget *parent = 0, Qt::WindowFlags flags = 0);
+  ExportPanel(QWidget *parent = 0, Qt::WindowFlags flags = Qt::WindowFlags());
   ~ExportPanel();
   void loadExportSettings();
   void saveExportSettings();

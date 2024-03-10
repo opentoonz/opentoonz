@@ -923,8 +923,8 @@ StopMotionController::StopMotionController(QWidget *parent) : QWidget(parent) {
       }
       m_tabBarContainer->setLayout(hLayout);
 
-      mainLayout->addWidget(m_tabBarContainer, 0, 0);
-      mainLayout->addWidget(m_stackedChooser, 1, 0);
+      mainLayout->addWidget(m_tabBarContainer, 0);
+      mainLayout->addWidget(m_stackedChooser, 1);
       mainLayout->addWidget(opacityFrame, 0);
       mainLayout->addWidget(controlButtonFrame, 0);
       setLayout(mainLayout);

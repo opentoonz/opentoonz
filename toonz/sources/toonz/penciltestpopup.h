@@ -271,7 +271,7 @@ class PencilTestPopup : public DVGui::Dialog {
   QCheckBox *m_upsideDownCB, *m_saveOnCaptureCB;
   QGroupBox *m_onionSkinGBox, *m_timerGBox;
   QPushButton *m_fileFormatOptionButton, *m_captureWhiteBGButton,
-      *m_captureButton, *m_loadImageButton;
+      *m_captureButton, *m_loadImageButton, *m_saveImgAdjustDefaultButton;
   DVGui::FileField* m_saveInFileFld;
   FrameNumberLineEdit* m_frameNumberEdit;
   DVGui::IntField *m_bgReductionFld, *m_onionOpacityFld, *m_timerIntervalFld;
@@ -341,8 +341,13 @@ class PencilTestPopup : public DVGui::Dialog {
   QMenu* createOptionsMenu();
 
   int translateIndex(int camIndex);
+  void loadImageAdjustDefault();
 
   QString getCurrentCalibFilePath();
+  QString getImageAdjustSettingsPath();
+  QString getImageAdjustBgImgPath();
+  QString getCameraConfigurationPath(const QString& folderName,
+                                     const QString& ext);
 
   QWidget* createDpiMenuWidget();
 
@@ -381,6 +386,7 @@ protected slots:
   void refreshFrameInfo();
 
   void onSaveInPathEdited();
+  void onFileTypeChanged();
   void onSceneSwitched();
 
   void onSubCameraToggled(bool);
@@ -397,6 +403,8 @@ protected slots:
   void onCalibExportBtnClicked();
   void onCalibReadme();
   void onPreferenceChanged(const QString&);
+
+  void saveImageAdjustDefault();
 
 public slots:
   void openSaveInFolderPopup();

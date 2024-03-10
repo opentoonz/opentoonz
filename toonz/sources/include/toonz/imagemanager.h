@@ -314,10 +314,7 @@ private:
   ImageBuilder(const ImageBuilder &);
   const ImageBuilder &operator=(const ImageBuilder &);
 
-  void setImageCachedAndModified() {
-    m_cached   = true;
-    m_modified = true;
-  }
+  void setImageCached() { m_cached = true; }
 };
 
 //-----------------------------------------------------------------------------

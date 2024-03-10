@@ -807,7 +807,7 @@ MessageAndCheckboxDialog::MessageAndCheckboxDialog(
 
 //=============================================================================
 
-void MessageAndCheckboxDialog::onButtonPressed(int id) { done(id); }
+void MessageAndCheckboxDialog::onButtonClicked(int id) { done(id); }
 
 //=============================================================================
 
@@ -849,9 +849,9 @@ RadioButtonDialog::RadioButtonDialog(const QString &labelText,
   endVLayout();
 
   QPushButton *applyButton = new QPushButton(QObject::tr("Apply"));
-  ret = ret && connect(applyButton, SIGNAL(pressed()), this, SLOT(onApply()));
+  ret = ret && connect(applyButton, SIGNAL(clicked()), this, SLOT(onApply()));
   QPushButton *cancelButton = new QPushButton(QObject::tr("Cancel"));
-  ret = ret && connect(cancelButton, SIGNAL(pressed()), this, SLOT(onCancel()));
+  ret = ret && connect(cancelButton, SIGNAL(clicked()), this, SLOT(onCancel()));
 
   addButtonBarWidget(applyButton, cancelButton);
 
@@ -922,9 +922,9 @@ void ProgressDialog::setLabelText(const QString &text) {
 
 void ProgressDialog::setCancelButton(QPushButton *cancelButton) {
   m_cancelButton = cancelButton;
-  bool ret = connect(cancelButton, SIGNAL(pressed()), this, SLOT(onCancel()));
+  bool ret = connect(cancelButton, SIGNAL(clicked()), this, SLOT(onCancel()));
   ret =
-      ret && connect(cancelButton, SIGNAL(pressed()), this, SIGNAL(canceled()));
+      ret && connect(cancelButton, SIGNAL(clicked()), this, SIGNAL(canceled()));
   assert(ret);
   addButtonBarWidget(m_cancelButton);
 }
@@ -1014,7 +1014,7 @@ int DVGui::MsgBox(MsgType type, const QString &text,
     buttonGroup->addButton(button, i + 1);
   }
 
-  QObject::connect(buttonGroup, SIGNAL(buttonPressed(int)), &dialog,
+  QObject::connect(buttonGroup, SIGNAL(idClicked(int)), &dialog,
                    SLOT(done(int)));
 
   dialog.raise();
@@ -1064,7 +1064,7 @@ void DVGui::MsgBoxInPopup(MsgType type, const QString &text) {
   button->setDefault(true);
   dialog.addButtonBarWidget(button);
   buttonGroup->addButton(button, 1);
-  QObject::connect(buttonGroup, SIGNAL(buttonPressed(int)), &dialog,
+  QObject::connect(buttonGroup, SIGNAL(idClicked(int)), &dialog,
                    SLOT(done(int)));
 
   while (!messageQueue.empty()) {
@@ -1138,7 +1138,7 @@ int DVGui::MsgBox(const QString &text, const QString &button1Text,
   dialog.addButtonBarWidget(button3);
   buttonGroup->addButton(button3, 3);
 
-  QObject::connect(buttonGroup, SIGNAL(buttonPressed(int)), &dialog,
+  QObject::connect(buttonGroup, SIGNAL(idClicked(int)), &dialog,
                    SLOT(done(int)));
   dialog.raise();
   return dialog.exec();
@@ -1197,7 +1197,7 @@ int DVGui::MsgBox(const QString &text, const QString &button1Text,
   dialog.addButtonBarWidget(button4);
   buttonGroup->addButton(button4, 4);
 
-  QObject::connect(buttonGroup, SIGNAL(buttonPressed(int)), &dialog,
+  QObject::connect(buttonGroup, SIGNAL(idClicked(int)), &dialog,
                    SLOT(done(int)));
   dialog.raise();
   return dialog.exec();
@@ -1258,7 +1258,7 @@ Dialog *DVGui::createMsgBox(MsgType type, const QString &text,
     buttonGroup->addButton(button, i + 1);
   }
 
-  QObject::connect(buttonGroup, SIGNAL(buttonPressed(int)), dialog,
+  QObject::connect(buttonGroup, SIGNAL(idClicked(int)), dialog,
                    SLOT(done(int)));
 
   return dialog;
@@ -1317,8 +1317,8 @@ MessageAndCheckboxDialog *DVGui::createMsgandCheckbox(
 
   QObject::connect(dialogCheckBox, SIGNAL(stateChanged(int)), dialog,
                    SLOT(onCheckboxChanged(int)));
-  QObject::connect(buttonGroup, SIGNAL(buttonPressed(int)), dialog,
-                   SLOT(onButtonPressed(int)));
+  QObject::connect(buttonGroup, SIGNAL(idClicked(int)), dialog,
+                   SLOT(onButtonClicked(int)));
 
   return dialog;
 }

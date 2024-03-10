@@ -289,6 +289,14 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
         <source>R:%1 G:%2 B:%3</source>
         <translation>R:%1 V:%2 A:%3</translation>
     </message>
+    <message>
+        <source> A:%1</source>
+        <translation> α:%1</translation>
+    </message>
+    <message>
+        <source>A:%1</source>
+        <translation>α:%1</translation>
+    </message>
 </context>
 <context>
     <name>ComboHistogram</name>
@@ -318,7 +326,7 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>0.0-1.0</source>
-        <translation></translation>
+        <translation>0.0-1.0</translation>
     </message>
 </context>
 <context>
@@ -878,6 +886,28 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
         <source>&amp;Next Frame</source>
         <translation>Fotograma &amp;siguiente</translation>
     </message>
+    <message>
+        <source>Gain Controls</source>
+        <translation>Controles de ganancia</translation>
+    </message>
+    <message>
+        <source>&amp;Reduce gain 1/2 stop (divide by sqrt(2))</source>
+        <translation>&amp;Reducir ganancia en 1/2 parada (divide por raíz cuadrada de 2)</translation>
+    </message>
+    <message>
+        <source>Toggle gain between 1 and the previous setting.
+Gain is shown as an f-stop and the &quot;neutral&quot; or 1.0 gain f-stop is f/8.</source>
+        <translation>Alterna la ganancia entre 1 y el valor anterior.
+La ganancia se mostrará en forma de f-stops donde el valor &quot;neutral&quot;, con una ganancia de 1.0, será f/8.</translation>
+    </message>
+    <message>
+        <source>&amp;Increase gain 1/2 stop (multiply by sqrt(2))</source>
+        <translation>&amp;Aumentar ganancia en 1/2 parada (multiplica por raíz cuadrada de 2)</translation>
+    </message>
+    <message>
+        <source> (gain %1)</source>
+        <translation> (ganancia %1)</translation>
+    </message>
 </context>
 <context>
     <name>FontParamField</name>
@@ -992,19 +1022,19 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>Step 1</source>
-        <translation>Exposición x1</translation>
+        <translation>Exposición de interpolación x1</translation>
     </message>
     <message>
         <source>Step 2</source>
-        <translation>Exposición x2</translation>
+        <translation>Exposición de interpolación x2</translation>
     </message>
     <message>
         <source>Step 3</source>
-        <translation>Exposición x3</translation>
+        <translation>Exposición de interpolación x3</translation>
     </message>
     <message>
         <source>Step 4</source>
-        <translation>Exposición x4</translation>
+        <translation>Exposición de interpolación x4</translation>
     </message>
     <message>
         <source>Function Curves</source>
@@ -1235,7 +1265,7 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>Change Step</source>
-        <translation>Cambiar exposición</translation>
+        <translation>Exposición de interpolación</translation>
     </message>
     <message>
         <source>Similar Shape Interpolation</source>
@@ -1821,6 +1851,30 @@ Seleccionar los nodos de efecto y sus vínculos relacionados antes de copiar o c
         <source>Set Toolbar Above Styles</source>
         <translation>Botones arriba</translation>
     </message>
+    <message>
+        <source>Auto Adjust Panel Width</source>
+        <translation>Auto ajustar ancho del panel</translation>
+    </message>
+    <message>
+        <source>Visible Toolbar Buttons</source>
+        <translation>Botones barra de herramientas</translation>
+    </message>
+    <message>
+        <source>KeyFrame</source>
+        <translation>Marcar clave</translation>
+    </message>
+    <message>
+        <source>New Style/Page</source>
+        <translation>Nuevo estilo y página</translation>
+    </message>
+    <message>
+        <source>Palette Gizmo</source>
+        <translation>Asistente de paleta</translation>
+    </message>
+    <message>
+        <source>Name Editor</source>
+        <translation>Editor de nombres</translation>
+    </message>
 </context>
 <context>
     <name>PaletteViewerGUI::PageViewer</name>
@@ -1888,6 +1942,14 @@ Seleccionar los nodos de efecto y sus vínculos relacionados antes de copiar o c
     <message>
         <source>View help page</source>
         <translation>Ver ayuda</translation>
+    </message>
+    <message>
+        <source>This Fx does not support rendering in floating point channel width (32bit).
+The output pixel values from this fx will be clamped to 0.0 - 1.0
+and tone may be slightly discretized.</source>
+        <translation>Este efecto no soporta procesamiento en canales decimales de 32 bits.
+Los valores de los píxeles de dalida de este efecto se encontrarán en el rango 0.0 - 1.0
+y su tono puede notarse ligeramente discretizado.</translation>
     </message>
 </context>
 <context>
@@ -2463,7 +2525,7 @@ La segunda línea debería tener la forma &quot;Mesh [profundidad de bits de ent
     <message>
         <source>Custom Texture</source>
         <comment>TextureStyleChooserPage</comment>
-        <translation>Textura personalizada</translation>
+        <translation type="vanished">Textura personalizada</translation>
     </message>
     <message>
         <source>Current Frame: </source>
@@ -2523,6 +2585,15 @@ La segunda línea debería tener la forma &quot;Mesh [profundidad de bits de ent
     <message>
         <source>Click &amp; Drag Palette into Studio Palette</source>
         <translation>Arrastrar la paleta a la Paleta de estudio</translation>
+    </message>
+    <message>
+        <source>Plain color</source>
+        <comment>TextureStyleChooserPage</comment>
+        <translation>Color pleno</translation>
+    </message>
+    <message>
+        <source>Sample Type: </source>
+        <translation>Tipo de muestra: </translation>
     </message>
 </context>
 <context>
@@ -2645,6 +2716,33 @@ La segunda línea debería tener la forma &quot;Mesh [profundidad de bits de ent
     <message>
         <source>&amp;Close Editor</source>
         <translation>&amp;Cerrar editor</translation>
+    </message>
+</context>
+<context>
+    <name>SeeThroughWindowPopup</name>
+    <message>
+        <source>See Through Mode (Main Window)</source>
+        <translation>Modo semi transparente (ventana principal)</translation>
+    </message>
+    <message>
+        <source>Opacity</source>
+        <translation>Opacidad</translation>
+    </message>
+    <message>
+        <source>Quickly toggle main window semi-transparency and full opacity.</source>
+        <translation>Alterna el modo de la ventana principal entre semi transparente y opaco.</translation>
+    </message>
+    <message>
+        <source>Hold ALT while clicking to use full transparency instead.</source>
+        <translation>Mantener ALT mientras se hace clic para lograr una transparencia completa.</translation>
+    </message>
+    <message>
+        <source>When slider is at 100% it acts as ALT is held.</source>
+        <translation>Cuando el deslizador se encuentre en 100% actuará como cuando la tecla ALT se encuentra presionada</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation>Cerrar</translation>
     </message>
 </context>
 <context>
@@ -3059,6 +3157,14 @@ Autom</translation>
         <source>Hex Color Names...</source>
         <translation>Nombres de colores hex...</translation>
     </message>
+    <message>
+        <source>Search</source>
+        <translation>Búsqueda</translation>
+    </message>
+    <message>
+        <source>Clear Search</source>
+        <translation>Limpiar búsqueda</translation>
+    </message>
 </context>
 <context>
     <name>StyleEditorGUI::ColorChannelControl</name>
@@ -3123,6 +3229,21 @@ Autom</translation>
     <message>
         <source>Reset to default</source>
         <translation>Restablecer a predefinido</translation>
+    </message>
+</context>
+<context>
+    <name>StyleEditorGUI::StyleChooserPage</name>
+    <message>
+        <source>Pin To Top</source>
+        <translation>Fijar al inicio</translation>
+    </message>
+    <message>
+        <source>Set Pins To Top</source>
+        <translation>Fija al inicio de la lista</translation>
+    </message>
+    <message>
+        <source>Clear Pins To Top</source>
+        <translation>Elimina la fijación al inicio de la lista</translation>
     </message>
 </context>
 <context>

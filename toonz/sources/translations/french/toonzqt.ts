@@ -9,30 +9,30 @@
     </message>
     <message>
         <source>Add FX</source>
-        <translation>Ajouter FX</translation>
+        <translation>Ajouter un Effet Spécial</translation>
     </message>
     <message>
         <source>Replace FX</source>
         <translation>Remplacer un Effet Spécial</translation>
     </message>
     <message>
-        <source>Insert </source>
-        <translation type="unfinished"></translation>
+        <source>Insert</source>
+        <translation>Insérer</translation>
     </message>
     <message>
-        <source>Add </source>
-        <translation type="unfinished"></translation>
+        <source>Add</source>
+        <translation>Ajouter</translation>
     </message>
     <message>
-        <source>Replace </source>
-        <translation type="unfinished"></translation>
+        <source>Replace</source>
+        <translation>Remplacer</translation>
     </message>
 </context>
 <context>
     <name>AddWordButton</name>
     <message>
         <source>Character</source>
-        <translation type="unfinished"></translation>
+        <translation>Caractère</translation>
     </message>
     <message>
         <source>Part</source>
@@ -40,11 +40,11 @@
     </message>
     <message>
         <source>Suffix</source>
-        <translation type="unfinished"></translation>
+        <translation>Suffixe</translation>
     </message>
     <message>
         <source>New</source>
-        <translation type="unfinished"></translation>
+        <translation>Nouveau</translation>
     </message>
     <message>
         <source>Add New Word for %1</source>

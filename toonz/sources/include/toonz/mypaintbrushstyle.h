@@ -7,6 +7,7 @@
 
 // TnzCore includes
 #include "imagestyles.h"
+#include "tstrokeprop.h"
 
 #undef DVAPI
 #undef DVVAR
@@ -19,9 +20,29 @@
 #define DVVAR DV_IMPORT_VAR
 #endif
 
+class TMyPaintBrushStyle;
+
 //**********************************************************************************
 //    TMyPaintBrushStyle declaration
 //**********************************************************************************
+
+class DVAPI MyPaintBrushStrokeProp final : public TStrokeProp {
+protected:
+  TMyPaintBrushStyle *m_colorStyle;
+  TStrokeOutline m_outline;
+  double m_outlinePixelSize;
+  TSolidColorStyle m_altStyle;
+
+public:
+  MyPaintBrushStrokeProp(const TStroke *stroke, TMyPaintBrushStyle *style);
+
+  const TColorStyle *getColorStyle() const override;
+
+  TStrokeProp *clone(const TStroke *stroke) const override;
+  void draw(const TVectorRenderData &rd) override;
+};
+
+//=============================================================================
 
 class DVAPI TMyPaintBrushStyle final : public TColorStyle, TImageStyle {
 private:
@@ -55,8 +76,8 @@ public:
   const mypaint::Brush &getBrush() const { return m_brushModified; }
   const TRasterP &getPreview() const { return m_preview; }
 
-  TStrokeProp *makeStrokeProp(const TStroke * /* stroke */) override {
-    return 0;
+  TStrokeProp *makeStrokeProp(const TStroke *stroke) override {
+    return new MyPaintBrushStrokeProp(stroke, this);
   }
   TRegionProp *makeRegionProp(const TRegion * /* region */) override {
     return 0;
