@@ -180,12 +180,9 @@ bool OCAData::buildGroup(QJsonObject &json, const QList<int> &rows,
 
   // Build a list of child rows
   QList<int> crows;
-  for (int i = m_startTime; i <= m_endTime; i++) {
-    TXshCell cell = column->getCell(i);
-    if (cell.isEmpty())
-      crows.append(-1);
-    else
-      crows.append(cell.getFrameId().getNumber() - 1);
+  int crow = xsheet->getFrameCount() - 1;
+  for (int i = 0; i <= crow; i++) {
+      crows.append(i);
   }
 
   // Build all columns from sub-xsheet
@@ -632,16 +629,6 @@ bool OCAIo::OCAInputData::read(QString path, QJsonObject &json) {
 
 void OCAIo::OCAInputData::getSceneData() {
   m_framerate = m_oprop->getFrameRate();
-  int from, to, step;
-  if (m_scene->getTopXsheet() == m_xsheet &&
-      m_oprop->getRange(from, to, step)) {
-    m_startTime = from;
-    m_endTime   = to;
-  } else {
-    m_startTime = 0;
-    m_endTime   = m_xsheet->getFrameCount() - 1;
-  }
-  if (m_endTime < 0) m_endTime = 0;
 
   m_width  = m_scene->getCurrentCamera()->getRes().lx;
   m_height = m_scene->getCurrentCamera()->getRes().ly;
@@ -686,8 +673,7 @@ void OCAIo::OCAInputData::setSceneData() {
   m_scene->getCurrentCamera()->setRes(resolution);
 
   m_xsheet->updateFrameCount();
-  m_oprop->setRange(m_startTime, m_endTime, 1);
-
+ 
   // If background is all 0s, use our default Bg color
   if (m_bgRed || m_bgGreen || m_bgBlue || m_bgAlpha) {
     TPixel32 color = TPixel32(m_bgRed * 255.0, m_bgGreen * 255.0,
