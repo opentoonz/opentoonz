@@ -2152,7 +2152,9 @@ TImageP TImageReaderSvg::load() {
                          paintIndex, true, true, false);
       vimage->exitGroup();
     }
-
+    vimage->findRegions();
+  } 
+	
     /* vapp->findRegions();
 if (paintIndex!=-1)
 for (int i=0; i<(int)vapp->getRegionCount(); i++)
