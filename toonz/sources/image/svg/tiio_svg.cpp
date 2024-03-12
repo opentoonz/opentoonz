@@ -2150,8 +2150,8 @@ TImageP TImageReaderSvg::load() {
       vimage->enterGroup(startStrokeIndex);
       vimage->selectFill(TRectD(-9999999, -9999999, 9999999, 9999999), 0,
                          paintIndex, true, true, false);
-      vimage->exitGroup();
-    }
+    vimage->exitGroup();
+  }
 
     /* vapp->findRegions();
 if (paintIndex!=-1)
