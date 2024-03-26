@@ -237,7 +237,7 @@ Please try raising the FFmpeg timeout in Preferences.</source>
         <translation>8비트</translation>
     </message>
     <message>
-        <source>Endianess</source>
+        <source>Endianness</source>
         <translation>엔디안</translation>
     </message>
     <message>

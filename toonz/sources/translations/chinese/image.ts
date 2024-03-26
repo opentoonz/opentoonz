@@ -290,7 +290,7 @@ Please try raising the FFmpeg timeout in Preferences.</source>
     </message>
     <message>
         <location filename="../../image/sgi/filesgi.cpp" line="1235"/>
-        <source>Endianess</source>
+        <source>Endianness</source>
         <translation>字节序</translation>
     </message>
     <message>

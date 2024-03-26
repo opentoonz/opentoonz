@@ -18,7 +18,7 @@ class SgiWriterProperties final : public TPropertyGroup {
 public:
   TEnumProperty m_pixelSize;
   TBoolProperty m_compressed;
-  TEnumProperty m_endianess;
+  TEnumProperty m_endianness;
   SgiWriterProperties();
   void updateTranslation() override;
 };

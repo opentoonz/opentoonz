@@ -875,7 +875,7 @@ void SgiReader::open(FILE *file) {
   m_info.m_samplePerPixel         = m_header->zsize;
   Tiio::SgiWriterProperties *prop = new Tiio::SgiWriterProperties();
   m_info.m_properties             = prop;
-  prop->m_endianess.setValue(m_header->dorev == 1 ? L"Big Endian"
+  prop->m_endianness.setValue(m_header->dorev == 1 ? L"Big Endian"
                                                   : L"Little Endian");
   prop->m_compressed.setValue(ISRLE(m_header->type) ? true : false);
   wstring pixelSize;
@@ -1136,7 +1136,7 @@ void SgiWriter::open(FILE *file, const TImageInfo &info) {
       (TBoolProperty *)(m_properties->getProperty("RLE-Compressed"));
   assert(bp);
   bool compressed = bp->getValue();
-  p               = (TEnumProperty *)(m_properties->getProperty("Endianess"));
+  p               = (TEnumProperty *)(m_properties->getProperty("Endianness"));
   assert(p);
   str            = ::to_string(p->getValue());
   bool bigEndian = (str == "Big Endian");
@@ -1210,7 +1210,7 @@ void SgiWriter::writeLine(short *buffer) {
 
 Tiio::SgiWriterProperties::SgiWriterProperties()
     : m_pixelSize("Bits Per Pixel")
-    , m_endianess("Endianess")
+    , m_endianness("Endianness")
     , m_compressed("RLE-Compressed", false) {
   m_pixelSize.addValue(L"24 bits");
   m_pixelSize.addValue(L"32 bits");
@@ -1220,9 +1220,9 @@ Tiio::SgiWriterProperties::SgiWriterProperties()
   m_pixelSize.setValue(L"32 bits");
   bind(m_pixelSize);
   bind(m_compressed);
-  m_endianess.addValue(L"Big Endian");
-  m_endianess.addValue(L"Little Endian");
-  bind(m_endianess);
+  m_endianness.addValue(L"Big Endian");
+  m_endianness.addValue(L"Little Endian");
+  bind(m_endianness);
 }
 
 void Tiio::SgiWriterProperties::updateTranslation() {
@@ -1232,8 +1232,8 @@ void Tiio::SgiWriterProperties::updateTranslation() {
   m_pixelSize.setItemUIName(L"48 bits", tr("48 bits"));
   m_pixelSize.setItemUIName(L"64 bits", tr("64 bits"));
   m_pixelSize.setItemUIName(L"8 bits (Greyscale)", tr("8 bits (Greyscale)"));
-  m_endianess.setQStringName(tr("Endianess"));
-  m_endianess.setItemUIName(L"Big Endian", tr("Big Endian"));
-  m_endianess.setItemUIName(L"Little Endian", tr("Little Endian"));
+  m_endianness.setQStringName(tr("Endianness"));
+  m_endianness.setItemUIName(L"Big Endian", tr("Big Endian"));
+  m_endianness.setItemUIName(L"Little Endian", tr("Little Endian"));
   m_compressed.setQStringName(tr("RLE-Compressed"));
 }

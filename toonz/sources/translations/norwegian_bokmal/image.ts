@@ -98,7 +98,7 @@ Please try raising the FFmpeg timeout in Preferences.</source>
     </message>
     <message>
         <location filename="../../image/sgi/filesgi.cpp" line="1237"/>
-        <source>Endianess</source>
+        <source>Endianness</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

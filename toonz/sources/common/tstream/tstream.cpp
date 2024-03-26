@@ -833,7 +833,7 @@ TIStream::TIStream(const TFilePath &fp) : m_imp(new Imp) {
 
   if (m_imp->m_is->peek() == 'T')  // non comincia con '<' dev'essere compresso
   {
-    bool swapForEndianess = false;
+    bool swapForEndianness = false;
 
     unique_ptr<std::istream> is(m_imp->m_is);
     m_imp->m_is = 0;
@@ -853,18 +853,18 @@ TIStream::TIStream(const TFilePath &fp) : m_imp(new Imp) {
       printf("magic = %08X\n", v);
 
       if (v == 0x0A0B0C0D)
-        swapForEndianess = false;
+        swapForEndianness = false;
       else if (v == 0x0D0C0B0A)
-        swapForEndianess = true;
+        swapForEndianness = true;
       else {
-        swapForEndianess = true;
+        swapForEndianness = true;
         printf("UH OH!\n");
       }
 
       is->read((char *)&v, sizeof v);
-      out_len = swapForEndianess ? swapTINT32(v) : v;
+      out_len = swapForEndianness ? swapTINT32(v) : v;
       is->read((char *)&v, sizeof v);
-      in_len = swapForEndianess ? swapTINT32(v) : v;
+      in_len = swapForEndianness ? swapTINT32(v) : v;
     } else
       throw TException("Bad magic number");
 

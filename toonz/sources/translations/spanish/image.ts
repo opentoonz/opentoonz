@@ -291,7 +291,7 @@ intentar aumentar el tiempo de espera en las Preferencias.</translation>
     </message>
     <message>
         <location filename="../../image/sgi/filesgi.cpp" line="1235"/>
-        <source>Endianess</source>
+        <source>Endianness</source>
         <translation>Orden</translation>
     </message>
     <message>

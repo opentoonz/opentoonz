@@ -2225,7 +2225,7 @@ and tone may be slightly discretized.</source>
         <translation>出力パス：</translation>
     </message>
     <message>
-        <source>Endianess:      </source>
+        <source>Endianness:      </source>
         <translation>エンディアン：</translation>
     </message>
     <message>

@@ -61,7 +61,7 @@ public:
     eFrameCount,
     eLevelCount,
     eOutputPath,
-    eEndianess,
+    eEndianness,
 
     // sound info
     eLength,
@@ -216,7 +216,7 @@ InfoViewerImp::InfoViewerImp()
   create(eFrameCount, QObject::tr("Number of Frames: "));
   create(eLevelCount, QObject::tr("Number of Levels: "));
   create(eOutputPath, QObject::tr("Output Path:      "));
-  create(eEndianess, QObject::tr("Endianess:      "));
+  create(eEndianness, QObject::tr("Endianness:      "));
 
   // sound info
   create(eLength, QObject::tr("Length:       "));
@@ -369,7 +369,7 @@ void InfoViewerImp::setImageInfo() {
       setLabel(pg, eCodec, "Codec");
       setLabel(pg, eAlphaChannel, "Alpha Channel");
       setLabel(pg, eByteOrdering, "Byte Ordering");
-      setLabel(pg, eEndianess, "Endianess");
+      setLabel(pg, eEndianness, "Endianness");
     }
   } else
     m_separator1.hide();

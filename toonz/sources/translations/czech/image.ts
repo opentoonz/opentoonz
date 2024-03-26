@@ -290,7 +290,7 @@ zkuste, prosím, zvednout dobu pro vypršení pro FFmpeg v Nastavení.</translat
     </message>
     <message>
         <location filename="../../image/sgi/filesgi.cpp" line="1235"/>
-        <source>Endianess</source>
+        <source>Endianness</source>
         <translation>Endian</translation>
     </message>
     <message>

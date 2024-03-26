@@ -2262,7 +2262,7 @@ and tone may be slightly discretized.</source>
         <translation>输出路径:      </translation>
     </message>
     <message>
-        <source>Endianess:      </source>
+        <source>Endianness:      </source>
         <translation>字节次序:      </translation>
     </message>
     <message>

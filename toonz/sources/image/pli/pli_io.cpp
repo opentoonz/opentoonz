@@ -158,7 +158,7 @@ public:
   ~MyIfstream() {
     if (m_fp) fclose(m_fp);
   }
-  void setEndianess(bool isIrixEndian) { m_isIrixEndian = isIrixEndian; }
+  void setEndianness(bool isIrixEndian) { m_isIrixEndian = isIrixEndian; }
   MyIfstream &operator>>(TUINT32 &un);
   MyIfstream &operator>>(string &un);
   MyIfstream &operator>>(USHORT &un);
@@ -557,14 +557,14 @@ ParsedPliImp::ParsedPliImp(const TFilePath &filename, bool readInfo)
 #else
     m_isIrixEndian = true;
 #endif
-    m_iChan.setEndianess(false);
+    m_iChan.setEndianness(false);
   } else if (magic == c_magicIrix) {
 #if TNZ_LITTLE_ENDIAN
     m_isIrixEndian = true;
 #else
     m_isIrixEndian = false;
 #endif
-    m_iChan.setEndianess(true);
+    m_iChan.setEndianness(true);
   } else {
     m_lastError = BAD_MAGIC;
     throw TImageException(filename, "Error on reading magic number");

@@ -2191,8 +2191,8 @@ and tone may be slightly discretized.</source>
         <translation>Percorso di Uscita:</translation>
     </message>
     <message>
-        <source>Endianess:      </source>
-        <translation>Endianess:</translation>
+        <source>Endianness:      </source>
+        <translation>Endianness:</translation>
     </message>
     <message>
         <source>It is not possible to delete the style #</source>

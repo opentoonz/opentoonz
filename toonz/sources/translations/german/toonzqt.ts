@@ -2229,7 +2229,7 @@ Für mehr Informationen besuchen Sie die Seite %1:</translation>
         <translation>Output-Pfad:</translation>
     </message>
     <message>
-        <source>Endianess:      </source>
+        <source>Endianness:      </source>
         <translation>Endian:</translation>
     </message>
     <message>
