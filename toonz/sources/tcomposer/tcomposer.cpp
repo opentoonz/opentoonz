@@ -811,10 +811,9 @@ int main(int argc, char *argv[]) {
     msg = "Loading " + srcFilePath.getName();
     cout << endl << msg << endl;
     m_userLog->info(msg);
-    TProjectManager *pm = TProjectManager::instance();
     // pm->enableTabMode(true);
 
-    TProjectP project = pm->loadSceneProject(srcFilePath);
+    auto project = TProjectManager::instance()->loadSceneProject(srcFilePath);
     if (!project) {
       msg = "Couldn't find the project";  //+ project->getName().getName();
       cerr << msg << endl;

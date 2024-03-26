@@ -706,7 +706,7 @@ void DvDirVersionControlProjectNode::refreshChildren() {
   DvDirModelFileFolderNode::refreshChildren();
   int i;
   TProjectManager *pm = TProjectManager::instance();
-  TProject *project   = new TProject();
+  auto project = std::make_shared<TProject>();
   project->load(getProjectPath());
   for (i = 0; i < getChildCount(); i++) {
     DvDirModelFileFolderNode *node =
@@ -716,7 +716,6 @@ void DvDirVersionControlProjectNode::refreshChildren() {
       node->setIsProjectFolder(k >= 0);
     }
   }
-  delete project;
 }
 
 //-----------------------------------------------------------------------------
@@ -725,7 +724,7 @@ void DvDirVersionControlProjectNode::getChildrenNames(
     std::vector<std::wstring> &names) const {
   DvDirVersionControlNode::getChildrenNames(names);
   TProjectManager *pm = TProjectManager::instance();
-  TProject *project   = new TProject();
+  auto project = std::make_shared<TProject>();
   project->load(getProjectPath());
   int i;
   for (i = 0; i < project->getFolderCount(); i++) {
@@ -736,7 +735,6 @@ void DvDirVersionControlProjectNode::getChildrenNames(
       names.push_back(L"+" + ::to_wstring(folderName));
     }
   }
-  delete project;
 }
 
 //=============================================================================
@@ -789,7 +787,7 @@ void DvDirModelProjectNode::refreshChildren() {
   DvDirModelFileFolderNode::refreshChildren();
   int i;
   TProjectManager *pm = TProjectManager::instance();
-  TProject *project   = new TProject();
+  auto project = std::make_shared<TProject>();
   project->load(getProjectPath());
   for (i = 0; i < getChildCount(); i++) {
     DvDirModelFileFolderNode *node =
@@ -799,7 +797,6 @@ void DvDirModelProjectNode::refreshChildren() {
       node->setIsProjectFolder(k >= 0);
     }
   }
-  delete project;
 }
 
 //-----------------------------------------------------------------------------
@@ -808,7 +805,7 @@ void DvDirModelProjectNode::getChildrenNames(
     std::vector<std::wstring> &names) const {
   DvDirModelFileFolderNode::getChildrenNames(names);
   TProjectManager *pm = TProjectManager::instance();
-  TProject *project   = new TProject();
+  auto project = std::make_shared<TProject>();
   project->load(getProjectPath());
   int i;
   for (i = 0; i < project->getFolderCount(); i++) {
@@ -819,7 +816,6 @@ void DvDirModelProjectNode::getChildrenNames(
       names.push_back(L"+" + ::to_wstring(folderName));
     }
   }
-  delete project;
 }
 
 //-----------------------------------------------------------------------------
@@ -827,12 +823,11 @@ void DvDirModelProjectNode::getChildrenNames(
 DvDirModelNode *DvDirModelProjectNode::makeChild(std::wstring name) {
   if (name != L"" && name[0] == L'+') {
     TProjectManager *pm = TProjectManager::instance();
-    TProject *project   = new TProject();
+    auto project = std::make_shared<TProject>();
     project->load(getProjectPath());
     std::string folderName = ::to_string(name.substr(1));
     TFilePath folderPath   = project->getFolder(folderName);
     DvDirModelNode *node = new DvDirModelFileFolderNode(this, name, folderPath);
-    delete project;
     return node;
   } else
     return DvDirModelFileFolderNode::makeChild(name);

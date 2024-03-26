@@ -59,8 +59,7 @@ public:
     if (!folderPath.isEmpty())
       folderPath = folderPath.getParentDir();
     else {
-      TProject *currentProject =
-          TProjectManager::instance()->getCurrentProject().getPointer();
+      auto currentProject = TProjectManager::instance()->getCurrentProject();
       if (currentProject)
         folderPath =
             currentProject->decode(currentProject->getFolder(TProject::Inputs));

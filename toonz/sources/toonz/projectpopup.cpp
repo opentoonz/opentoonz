@@ -452,7 +452,7 @@ void ProjectPopup::updateChooseProjectCombo() {
     }
   }
   // Add in project of current project if outside known Project root folders
-  TProjectP currentProject   = pm->getCurrentProject();
+  auto currentProject = pm->getCurrentProject();
   TFilePath currentProjectFP = currentProject->getProjectPath();
   if (m_projectPaths.indexOf(currentProjectFP) == -1) {
     m_projectPaths.push_back(currentProjectFP);
@@ -469,7 +469,7 @@ void ProjectPopup::updateChooseProjectCombo() {
 
 //-----------------------------------------------------------------------------
 
-void ProjectPopup::updateFieldsFromProject(TProject *project) {
+void ProjectPopup::updateFieldsFromProject(std::shared_ptr<TProject> project) {
   m_nameFld->setText(toQString(project->getName()));
   int i;
   for (i = 0; i < m_folderFlds.size(); i++) {
@@ -501,7 +501,7 @@ void ProjectPopup::updateFieldsFromProject(TProject *project) {
 
 //-----------------------------------------------------------------------------
 
-void ProjectPopup::updateProjectFromFields(TProject *project) {
+void ProjectPopup::updateProjectFromFields(std::shared_ptr<TProject> project) {
   int i;
   for (i = 0; i < m_folderFlds.size(); i++) {
     std::string folderName = m_folderFlds[i].first;
@@ -534,8 +534,8 @@ void ProjectPopup::updateProjectFromFields(TProject *project) {
 //-----------------------------------------------------------------------------
 
 void ProjectPopup::onProjectSwitched() {
-  TProjectP currentProject = TProjectManager::instance()->getCurrentProject();
-  updateFieldsFromProject(currentProject.getPointer());
+  auto currentProject = TProjectManager::instance()->getCurrentProject();
+  updateFieldsFromProject(currentProject);
 }
 
 //-----------------------------------------------------------------------------
@@ -545,8 +545,8 @@ void ProjectPopup::showEvent(QShowEvent *) {
   DvDirModelNode *rootNode = m_model->getNode(QModelIndex());
   QModelIndex index        = m_model->getIndexByNode(rootNode);
   m_model->refreshFolderChild(index);
-  TProjectP currentProject = TProjectManager::instance()->getCurrentProject();
-  updateFieldsFromProject(currentProject.getPointer());
+  auto currentProject = TProjectManager::instance()->getCurrentProject();
+  updateFieldsFromProject(currentProject);
   updateChooseProjectCombo();
 }
 
@@ -605,16 +605,15 @@ void ProjectSettingsPopup::onChooseProjectChanged(int index) {
   TProjectManager *pm = TProjectManager::instance();
   pm->setCurrentProjectPath(projectFp);
 
-  TProject *projectP =
-      TProjectManager::instance()->getCurrentProject().getPointer();
+  auto project = TProjectManager::instance()->getCurrentProject();
 
   // In case the project file was upgraded to current version, save it now
-  if (projectP->getProjectPath() != projectFp) {
-    m_projectPaths[index] = projectP->getProjectPath();
-    projectP->save();
+  if (project->getProjectPath() != projectFp) {
+    m_projectPaths[index] = project->getProjectPath();
+    project->save();
   }
 
-  updateFieldsFromProject(projectP);
+  updateFieldsFromProject(project);
   IoCmd::saveSceneIfNeeded("Change project");
   IoCmd::newScene();
 }
@@ -622,8 +621,8 @@ void ProjectSettingsPopup::onChooseProjectChanged(int index) {
 //-----------------------------------------------------------------------------
 
 void ProjectSettingsPopup::onSomethingChanged() {
-  TProjectP project = TProjectManager::instance()->getCurrentProject();
-  updateProjectFromFields(project.getPointer());
+  auto project = TProjectManager::instance()->getCurrentProject();
+  updateProjectFromFields(project);
   try {
     project->save();
   } catch (TSystemException se) {
@@ -716,9 +715,9 @@ void ProjectCreatePopup::createProject() {
 
   TFilePath projectFolder = currentProjectRoot + projectName;
   TFilePath projectPath   = pm->projectFolderToProjectPath(projectFolder);
-  TProject *project       = new TProject();
+  auto project            = std::shared_ptr<TProject>();
   updateProjectFromFields(project);
-  TProjectP currentProject = pm->getCurrentProject();
+  auto currentProject = pm->getCurrentProject();
   project->setSceneProperties(currentProject->getSceneProperties());
   try {
     bool isSaved = project->save(projectPath);

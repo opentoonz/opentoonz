@@ -3,6 +3,8 @@
 #ifndef TOONZSCENE_H
 #define TOONZSCENE_H
 
+#include <memory>
+
 // TnzCore includes
 #include "tfilepath.h"
 #include "traster.h"
@@ -51,9 +53,8 @@ public:
             scene referring to the project. I would expect a
             \a project to own its scenes, not the other way around...         */
 
-  TProject *getProject()
-      const;  //!< Returns a pointer to the project holding a scene instance.
-  void setProject(TProject *);  //!< Associates a scene to a project.
+  std::shared_ptr<TProject> getProject() const;  //!< Returns a pointer to the project holding a scene instance.
+  void setProject(std::shared_ptr<TProject>);  //!< Associates a scene to a project.
 
   void setScenePath(const TFilePath &p);  //!< Sets the scene's file path.
   TFilePath getScenePath() const {
@@ -268,7 +269,7 @@ private:
   ChildStack *m_childStack;  //!< Xsheet hierarchy.
   TSceneProperties *m_properties;
   TLevelSet *m_levelSet;
-  TProject *m_project;
+  std::shared_ptr<TProject> m_project;
   TContentHistory *m_contentHistory;
   bool m_isUntitled;              //!< Whether the scene is untitled.
                                   //!  \sa  The setUntitled() member function.

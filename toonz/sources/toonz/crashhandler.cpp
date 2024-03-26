@@ -576,13 +576,10 @@ bool CrashHandler::trigger(const QString reason, bool showDialog) {
   }
   try {
     if (s_reportProjInfo) {
-      TProjectManager *pm = TProjectManager::instance();
-      TApp *app           = TApp::instance();
-
-      TProjectP currentProject = pm->getCurrentProject();
+      auto currentProject = TProjectManager::instance()->getCurrentProject();
       TFilePath projectPath    = currentProject->getProjectPath();
 
-      ToonzScene *currentScene = app->getCurrentScene()->getScene();
+      ToonzScene *currentScene = TApp::instance()->getCurrentScene()->getScene();
       std::wstring sceneName   = currentScene->getSceneName();
 
       out.append("\nApplication Dir: ");

@@ -146,7 +146,7 @@ ExportSceneDvDirModelProjectNode::createExposeSceneNode(DvDirModelNode *parent,
     node = new ExportSceneDvDirModelFileFolderNode(parent, path);
     if (path.getName().find("_files") == std::string::npos)
       node->enableRename(true);
-    TProject *project = new TProject();
+    auto project = std::make_shared<TProject>();
     project->load(
         TProjectManager::instance()->projectFolderToProjectPath(getPath()));
     int k = project->getFolderIndexFromPath(node->getPath());
@@ -699,9 +699,9 @@ TFilePath ExportScenePopup::createNewProject() {
     return TFilePath();
   }
 
-  TProject *project = new TProject();
+  auto project = std::make_shared<TProject>();
 
-  TProjectP currentProject = pm->getCurrentProject();
+  auto currentProject = pm->getCurrentProject();
   assert(currentProject);
   int i;
   for (i = 0; i < (int)currentProject->getFolderCount(); i++)

@@ -629,7 +629,7 @@ void StartupPopup::updateProjectCB() {
     }
   }
   // Add in project of current project if outside known Project root folders
-  TProjectP currentProject   = pm->getCurrentProject();
+  auto currentProject = pm->getCurrentProject();
   TFilePath currentProjectFP = currentProject->getProjectPath();
   if (m_projectPaths.indexOf(currentProjectFP) == -1) {
     m_projectPaths.push_back(currentProjectFP);
@@ -663,7 +663,7 @@ void StartupPopup::onProjectChanged(int index) {
   TProjectManager *pm = TProjectManager::instance();
   pm->setCurrentProjectPath(projectFp);
 
-  TProjectP currentProject = pm->getCurrentProject();
+  auto currentProject = pm->getCurrentProject();
 
   // In case the project file was upgraded to current version, save it now
   if (currentProject->getProjectPath() != projectFp) {
@@ -677,8 +677,7 @@ void StartupPopup::onProjectChanged(int index) {
 //-----------------------------------------------------------------------------
 
 void StartupPopup::setupProjectChange() {
-  TProjectManager *pm      = TProjectManager::instance();
-  TProjectP currentProject = pm->getCurrentProject();
+  auto currentProject = TProjectManager::instance()->getCurrentProject();
 
   IoCmd::newScene();
   m_pathFld->setPath(TApp::instance()

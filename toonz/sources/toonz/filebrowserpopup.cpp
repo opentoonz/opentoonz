@@ -540,7 +540,7 @@ void LoadScenePopup::initFolder() { setInitialFolderByCurrentRoom(); }
 
 void LoadScenePopup::setInitialFolderByCurrentRoom() {
   QString roomName  = TApp::instance()->getCurrentRoomName();
-  TProjectP project = TProjectManager::instance()->getCurrentProject();
+  auto project = TProjectManager::instance()->getCurrentProject();
   TFilePath scenePath;
   if (roomName == "Cleanup" || roomName == "InknPaint")
     scenePath = project->getFolder(TProject::Drawings, true);
@@ -1291,8 +1291,7 @@ bool LoadLevelPopup::execute() {
 void LoadLevelPopup::initFolder() {
   TFilePath fp;
 
-  TProject *project =
-      TProjectManager::instance()->getCurrentProject().getPointer();
+  auto project = TProjectManager::instance()->getCurrentProject();
   ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
 
   if (scene) fp = scene->decodeFilePath(project->getProjectFolder());
@@ -1673,8 +1672,8 @@ bool SaveLevelAsPopup::execute() {
 }
 
 void SaveLevelAsPopup::initFolder() {
-  TProject *project =
-      TProjectManager::instance()->getCurrentProject().getPointer();
+  auto project =
+      TProjectManager::instance()->getCurrentProject();
   ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
   TFilePath fp;
   if (scene) fp = scene->decodeFilePath(project->getFolder(TProject::Drawings));
@@ -2191,8 +2190,7 @@ bool ImportMagpieFilePopup::execute() {
 }
 
 void ImportMagpieFilePopup::initFolder() {
-  TProject *project =
-      TProjectManager::instance()->getCurrentProject().getPointer();
+  auto project = TProjectManager::instance()->getCurrentProject();
   ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
   TFilePath fp;
   if (scene) fp = scene->decodeFilePath(project->getFolder(TProject::Drawings));
@@ -2231,8 +2229,7 @@ bool BrowserPopup::execute() {
 void BrowserPopup::initFolder(TFilePath path) {
   // if the path is empty
   if (path.isEmpty()) {
-    TProject *project =
-        TProjectManager::instance()->getCurrentProject().getPointer();
+    auto project = TProjectManager::instance()->getCurrentProject();
     ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
     if (scene)
       setFolder(scene->decodeFilePath(project->getFolder(TProject::Drawings)));
