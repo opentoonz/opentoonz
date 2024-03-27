@@ -242,6 +242,7 @@ set(SOURCES
     ../common/tipc/t32bitsrv_wrap.cpp
     ../common/tsystem/tsystempd.cpp
     ../common/tapptools/tenv.cpp
+    ../common/tapptools/tversion.cpp
     ../common/tmeshimage/tmeshimage.cpp
     ../common/tmsgcore.cpp
     ../common/tvrender/tfont_qt.cpp

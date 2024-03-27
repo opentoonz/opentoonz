@@ -1,0 +1,20 @@
+[package]
+name = "app"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+# autocxx = "0.26.0"
+cxx = { version = "1.0.103", features = ["c++17"] }
+cxx-qt = { version = "0.5.3", default-features = false,features = [] }
+cxx-qt-lib = { version = "0.5.3", default-features = false,features = ["qt_gui"] }
+
+[build-dependencies]
+# cxx-build = "1.0.104"
+cc = { version = "1.0", features = ["parallel"] }
+# autocxx-build = "0.26.0"
+# miette = { version="5", features = [ "fancy" ] }
+cxx-qt-build = { version = "0.5.3", default-features = false, features = ["qt_gui"] }
+qt-build-utils = "0.5.3"
