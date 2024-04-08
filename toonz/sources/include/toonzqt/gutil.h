@@ -82,6 +82,11 @@ TRaster32P DVAPI rasterFromQPixmap(QPixmap pixmap, bool premultiply = true,
 
 //-----------------------------------------------------------------------------
 
+void DVAPI drawTextAndDropShadow(QPainter &p, const QRect &r, int flags,
+                                 const QString &text, QRect *br = nullptr);
+
+//-----------------------------------------------------------------------------
+
 void DVAPI drawPolygon(QPainter &p, const std::vector<QPointF> &points,
                        bool fill = false, const QColor colorFill = Qt::white,
                        const QColor colorLine = Qt::black);

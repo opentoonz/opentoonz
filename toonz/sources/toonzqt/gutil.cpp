@@ -139,6 +139,25 @@ TRaster32P rasterFromQPixmap(
 
 //-----------------------------------------------------------------------------
 
+void drawTextAndDropShadow(QPainter &p, const QRect &r, int flags,
+                           const QString &text, QRect *br) {
+  static const QColor shadowColor(0, 0, 0, 128);
+  QColor textColor = p.pen().color();
+
+  // draw shadow, but only if textColor is bright enough
+  if (textColor.value() > 128) {
+    p.setPen(shadowColor);
+    QRect shadowRect = r.translated(1, 1);
+    p.drawText(shadowRect, flags, text, br);
+  }
+
+  // draw main text
+  p.setPen(textColor);
+  p.drawText(r, flags, text, br);
+}
+
+//-----------------------------------------------------------------------------
+
 void drawPolygon(QPainter &p, const std::vector<QPointF> &points, bool fill,
                  const QColor colorFill, const QColor colorLine) {
   if (points.size() == 0) return;

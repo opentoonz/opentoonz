@@ -402,7 +402,8 @@ void FunctionSheetColumnHeadViewer::paintEvent(QPaintEvent *e) {
     int d        = 8;
     int flags    = Qt::AlignLeft | Qt::AlignVCenter;
     if (!m_sheet->isSmallHeader()) flags |= Qt::TextWrapAnywhere;
-    painter.drawText(x0 + d, y1, width - d, y3 - y1 + 1, flags, text);
+    drawTextAndDropShadow(painter, QRect(x0 + d, y1, width - d, y3 - y1 + 1),
+                          flags, text);
 
     // warning of losing expression reference
     TXsheet *xsh = m_sheet->getViewer()->getXsheetHandle()->getXsheet();
@@ -419,8 +420,9 @@ void FunctionSheetColumnHeadViewer::paintEvent(QPaintEvent *e) {
       if (group == currentGroup)
         painter.setPen(m_sheet->getViewer()->getCurrentTextColor());
       text = group->getShortName();
-      painter.drawText(x0 + d, y0, tmpwidth - d, y1 - y0 + 1,
-                       Qt::AlignLeft | Qt::AlignVCenter, text);
+      drawTextAndDropShadow(painter,
+                            QRect(x0 + d, y0, tmpwidth - d, y1 - y0 + 1),
+                            Qt::AlignLeft | Qt::AlignVCenter, text);
     }
   }
 }
@@ -869,8 +871,7 @@ void FunctionSheetCellViewer::drawCells(QPainter &painter, int r0, int c0,
         font.setBold(drawValue == Key);
         font.setPixelSize(12);
         painter.setFont(font);
-        painter.drawText(cellRect.adjusted(10, 0, 0, 0),
-                         Qt::AlignVCenter | Qt::AlignLeft, text);
+        drawTextAndDropShadow(painter, cellRect.adjusted(10, 0, 0, 0), Qt::AlignVCenter | Qt::AlignLeft, text);
       }
     }
 
