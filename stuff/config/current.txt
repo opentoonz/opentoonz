@@ -1456,7 +1456,7 @@
   <item>"STD_iwa_TextFx"	"Text Iwa"</item>
   <item>"STD_iwa_TextFx.targetType" "Source"</item>
   <item>"STD_iwa_TextFx.columnIndex" "Column Index"</item>
-  <item>"STD_iwa_TextFx.hAlign" "Holizontal Align"</item>
+  <item>"STD_iwa_TextFx.hAlign" "Horizontal Align"</item>
   <item>"STD_iwa_TextFx.text" "Text"</item>
   <item>"STD_iwa_TextFx.center" "Center"</item>
   <item>"STD_iwa_TextFx.width" "Width"</item>
