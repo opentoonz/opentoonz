@@ -81,7 +81,8 @@ jobs:
         mkdir build
         cd build
         cmake ../sources -G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DQT_PATH='/usr/local/opt/qt@5/lib' -DWITH_TRANSLATION=OFF
-        ninja -w dupbuild=warn
+        # ninja -w dupbuild=warn
+        ninja
     
     - name: Introduce Libraries and Stuff
       run: |
