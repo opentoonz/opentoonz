@@ -84,7 +84,7 @@ jobs:
         cd toonz
         mkdir build
         cd build
-        cmake ../sources -G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DQT_PATH=${{github.workspace}}/qt -DWITH_TRANSLATION=OFF -DCMAKE_PREFIX_PATH=${{github.workspace}}/qt/Qt/5.15.2/clang_64/lib/cmake"
+        cmake ../sources -G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DQT_PATH=${{github.workspace}}/qt -DWITH_TRANSLATION=OFF -DCMAKE_PREFIX_PATH=${{github.workspace}}/qt/Qt/5.15.2/clang_64/lib/cmake
         # ninja -w dupbuild=warn
         ninja
     
