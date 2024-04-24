@@ -176,7 +176,9 @@ elseif(BUILD_ENV_APPLE)
         -D__MACOS__
     )
     if(PLATFORM EQUAL 64)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m64 -std=c++11 -stdlib=libc++ -fno-implicit-templates")
+        # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m64 -std=c++11 -stdlib=libc++ -fno-implicit-templates")
+        # attempt to fix errors such as qtypeinfo.h:101:24: error: no template named 'is_copy_constructible_v' in namespace 'std'; did you mean 'is_copy_constructible'?
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m64 -std=c++17 -stdlib=libc++ -fno-implicit-templates")
         set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m64")
     elseif(PLATFORM EQUAL 32)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32 -std=c++11 -stdlib=libc++ -fno-implicit-templates -D HAS_QUICKDRAW")
@@ -203,12 +205,7 @@ elseif(BUILD_ENV_UNIXLIKE)
         message(WARNING "Support for generic Unix (Not Apple or Linux) isn't yet working!")
     endif()
 
-if(BUILD_ENV_APPLE)
-    # attempt to fix errors such as qtypeinfo.h:101:24: error: no template named 'is_copy_constructible_v' in namespace 'std'; did you mean 'is_copy_constructible'?
-    set(CMAKE_CXX_STANDARD 17)
-else()
     set(CMAKE_CXX_STANDARD 11)
-endif()
 
     find_package(Qt5Widgets)
 
