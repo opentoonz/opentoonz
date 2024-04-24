@@ -57,6 +57,7 @@ jobs:
         host: 'mac'
         target: 'desktop'
         arch: 'clang_64'
+        modules: 'qtscript'
         dir: ${{ runner.temp }}
         set-env: 'true'
         
