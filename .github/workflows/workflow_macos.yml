@@ -79,12 +79,12 @@ jobs:
         CMAKE_PREFIX_PATH: ${{env.Qt5_Dir}}
       run: |
         echo 'github.workspace/qt: ${{github.workspace}}/qt ls'
-        ls ${{github.workspace}}/qt
+        echo 'env.Qt5_Dir: ${{env.Qt5_Dir}}'
         export PKG_CONFIG_PATH="/usr/local/opt/jpeg-turbo/lib/pkgconfig:$PKG_CONFIG_PATH"
         cd toonz
         mkdir build
         cd build
-        cmake ../sources -G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DQT_PATH=${{github.workspace}}/qt -DWITH_TRANSLATION=OFF -DCMAKE_PREFIX_PATH=${{github.workspace}}/qt/lib/cmake"
+        cmake ../sources -G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DQT_PATH=${{github.workspace}}/qt -DWITH_TRANSLATION=OFF -DCMAKE_PREFIX_PATH=${{github.workspace}}/qt/Qt/5.15.2/clang_64/lib/cmake"
         # ninja -w dupbuild=warn
         ninja
     
