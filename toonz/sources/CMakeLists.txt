@@ -146,6 +146,21 @@ elseif(BUILD_ENV_MSVC OR BUILD_ENV_UNIXLIKE)
     set(THIRDPARTY_LIBS_HINTS ${SDKROOT})
 endif()
 
+if(BUILD_ENV_MSVC)
+    # configure the third party libs (only once) to avoid manual copies
+    message(STATUS "configure the third party libs")
+    if(NOT "${SDKROOT}/libpng-1.6.21")
+        file(COPY "${SDKROOT}/libpng-1.6.21/scripts/pnglibconf.h.prebuilt" DESTINATION "${SDKROOT}/libpng-1.6.21")
+        file(RENAME "${SDKROOT}/libpng-1.6.21/pnglibconf.h.prebuilt" "${SDKROOT}/libpng-1.6.21/pnglibconf.h")
+    endif()
+    if(NOT "${SDKROOT}/tiff-4.0.3/libtiff/tif_config.h")
+        file(RENAME "${SDKROOT}/tiff-4.0.3/libtiff/tif_config.vc.h" "${SDKROOT}/tiff-4.0.3/libtiff/tif_config.h")
+    endif()
+    if(NOT "${SDKROOT}/tiff-4.0.3/libtiff/tiffconf.h")
+        file(RENAME "${SDKROOT}/tiff-4.0.3/libtiff/tiffconf.vc.h" "${SDKROOT}/tiff-4.0.3/libtiff/tiffconf.h")
+    endif()
+endif()
+
 message(STATUS "Thirdpary Library Search path:" ${THIRDPARTY_LIBS_HINTS})
 
 if(BUILD_ENV_MSVC)
