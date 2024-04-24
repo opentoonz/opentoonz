@@ -2196,6 +2196,24 @@ void PencilTestPopup::onCameraListComboActivated(int comboIndex) {
   // refresh resolution
   m_resolutionCombo->clear();
   QList<QSize> sizes = m_currentCamera->supportedViewfinderResolutions();
+  // simple workaround because Qt fails to auto-detect the camera resolutions
+  // https://forum.qt.io/topic/68904/how-to-get-the-supported-resolution-of-a-qcamera/5
+  if (sizes.size() == 0) {
+    sizes.push_back(QSize(640, 360));
+    sizes.push_back(QSize(640, 480));
+    sizes.push_back(QSize(800, 448));
+    sizes.push_back(QSize(800, 600));
+    sizes.push_back(QSize(848, 480));
+    sizes.push_back(QSize(864, 480));
+    sizes.push_back(QSize(960, 540));
+    sizes.push_back(QSize(960, 720));
+    sizes.push_back(QSize(1024, 576));
+    sizes.push_back(QSize(1280, 720));
+    sizes.push_back(QSize(1600, 896));
+    sizes.push_back(QSize(1600, 900));
+    sizes.push_back(QSize(1920, 1080));
+    sizes.push_back(QSize(3840, 2160));
+  }
 
   m_currentCamera->unload();
   for (const QSize size : sizes) {
