@@ -203,7 +203,12 @@ elseif(BUILD_ENV_UNIXLIKE)
         message(WARNING "Support for generic Unix (Not Apple or Linux) isn't yet working!")
     endif()
 
+if(BUILD_ENV_APPLE)
+    # attempt to fix errors such as qtypeinfo.h:101:24: error: no template named 'is_copy_constructible_v' in namespace 'std'; did you mean 'is_copy_constructible'?
+    set(CMAKE_CXX_STANDARD 17)
+else()
     set(CMAKE_CXX_STANDARD 11)
+endif()
 
     find_package(Qt5Widgets)
 
