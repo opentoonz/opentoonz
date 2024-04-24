@@ -27,6 +27,18 @@ jobs:
         rm -f /usr/local/bin/python3.12
         rm -f /usr/local/bin/python3.12-config
 
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v3
+      with:
+        aqtversion: '==3.1.*'
+        version: '5.15.2'
+        host: 'mac'
+        target: 'desktop'
+        arch: 'clang_64'
+        modules: 'qtscript'
+        dir: "${{github.workspace}}/qt"
+        set-env: 'true'
+        
     - name: Install libraries
       run: |
         checkPkgAndInstall()
@@ -49,18 +61,6 @@ jobs:
         # brew unlink qt
         # checkPkgAndInstall qt@5
         
-    - name: Install Qt
-      uses: jurplel/install-qt-action@v3
-      with:
-        aqtversion: '==3.1.*'
-        version: '5.15.2'
-        host: 'mac'
-        target: 'desktop'
-        arch: 'clang_64'
-        modules: 'qtscript'
-        dir: ${{ runner.temp }}
-        set-env: 'true'
-        
     - uses: actions/cache@v1
       with:
         path: /Users/runner/.ccache
@@ -75,12 +75,15 @@ jobs:
         make -j $(nproc)
 
     - name: Build
+      env:
+        CMAKE_PREFIX_PATH: ${{env.Qt5_Dir}}
       run: |
+        echo 'github.workspace/qt: ${{github.workspace}}/qt'
         export PKG_CONFIG_PATH="/usr/local/opt/jpeg-turbo/lib/pkgconfig:$PKG_CONFIG_PATH"
         cd toonz
         mkdir build
         cd build
-        cmake ../sources -G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DQT_PATH='/usr/local/opt/qt@5/lib' -DWITH_TRANSLATION=OFF
+        cmake ../sources -G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DQT_PATH=${{github.workspace}}/qt -DWITH_TRANSLATION=OFF
         # ninja -w dupbuild=warn
         ninja
     
