@@ -13,6 +13,15 @@ using namespace ToonzExt;
 //-----------------------------------------------------------------------------
 
 namespace {
+#ifdef __APPLE__
+// error: no template named 'unary_function' in namespace 'std'; did you mean
+// '__binary_function'? note: '__unary_function' declared here using
+// using __unary_function = __unary_function_keep_layout_base<_Arg, _Result>;
+#ifndef unary_function
+#define unary_function __unary_function
+#endif  // unary_function
+#endif  // __APPLE__
+
 typedef unary_function<double, double> unary_functionDD;
 
 //---------------------------------------------------------------------------
