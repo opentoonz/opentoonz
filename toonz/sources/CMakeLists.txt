@@ -378,6 +378,9 @@ elseif(BUILD_ENV_APPLE)
     set(PNG_LIB ${PNG_LIBRARY})
     find_package(GLEW)
 
+    # force the github workflow to use the brew superlu instead to make it compatible with arm64
+    # (as the provided lib .a in ${SDKROOT}/superlu is x86_64...)
+    CMAKE_IGNORE_PATH(${SDKROOT}/superlu)
     find_package(SuperLU REQUIRED)
     set(SUPERLU_INCLUDE_DIR ${SUPERLU_INCLUDE_DIR}/superlu)
     set(SUPERLU_LIB ${SUPERLU_LIBRARY})
