@@ -86,7 +86,7 @@ jobs:
         cd build
         # cmake ../sources -G Ninja -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DQT_PATH=${{github.workspace}}/qt -DWITH_TRANSLATION=OFF -DCMAKE_PREFIX_PATH=${{github.workspace}}/qt/Qt/5.15.2/clang_64/lib/cmake
         # cmake ../sources -G Ninja -DQT_PATH=${{github.workspace}}/qt -DWITH_TRANSLATION=OFF -DCMAKE_PREFIX_PATH=${{github.workspace}}/qt/Qt/5.15.2/clang_64/lib/cmake
-        cmake ../sources -G Ninja -DQT_PATH=$(brew --prefix qt)/lib -DWITH_TRANSLATION=OFF -DCMAKE_PREFIX_PATH=$(brew --prefix qt)/lib/cmake/Qt5 -DQt5_DIR=$(brew --prefix qt)/lib/cmake/Qt5
+        cmake ../sources -G Ninja -DQT_PATH=$(brew --prefix qt@5)/lib -DWITH_TRANSLATION=OFF -DCMAKE_PREFIX_PATH=$(brew --prefix qt@5)/lib/cmake/Qt5 -DQt5_DIR=$(brew --prefix qt@5)/lib/cmake/Qt5
         # ninja -w dupbuild=warn
         ninja
     
