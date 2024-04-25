@@ -61,11 +61,11 @@ jobs:
         brew unlink qt
         checkPkgAndInstall qt@5
         
-    - uses: actions/cache@v1
-      with:
-        path: /Users/runner/.ccache
-        key: ${{ runner.os }}-${{ github.sha }}
-        restore-keys: ${{ runner.os }}-
+    # - uses: actions/cache@v1
+      # with:
+        # path: /Users/runner/.ccache
+        # key: ${{ runner.os }}-${{ github.sha }}
+        # restore-keys: ${{ runner.os }}-
 
     - name: Build libtiff
       run: |
