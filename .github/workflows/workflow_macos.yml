@@ -55,8 +55,11 @@ jobs:
         }        
         brew update
         brew cleanup
-        checkPkgAndInstall qt@5 pkg-config glew lz4 libjpeg libpng lzo boost libusb libmypaint ccache jpeg-turbo ninja
+        checkPkgAndInstall pkg-config glew lz4 libjpeg libpng lzo boost libusb libmypaint ccache jpeg-turbo ninja
         checkPkgAndInstall opencv
+        # error: definition of type 'QStringList' conflicts with type alias of the same name https://forum.freecad.org/viewtopic.php?t=63253
+        brew uninstall qt
+        checkPkgAndInstall qt@5 
         # opencv depends on vtk and vtk depends on qt6
         # brew unlink qt
         # checkPkgAndInstall qt@5
