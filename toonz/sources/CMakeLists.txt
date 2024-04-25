@@ -180,9 +180,10 @@ elseif(BUILD_ENV_APPLE)
         # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m64 -std=c++11 -stdlib=libc++ -fno-implicit-templates")
         # attempt to fix errors such as qtypeinfo.h:101:24: error: no template named 'is_copy_constructible_v' in namespace 'std'; did you mean 'is_copy_constructible'?
         # but at the same time, std::binary_function is deprecated in C++11 and removed in C++17. !...
-        set(CMAKE_CXX_STANDARD 14)
+        # error: "Qt requires a C++17 compiler" (when using brew install qt@5)
+        set(CMAKE_CXX_STANDARD 17)
         set(CMAKE_CXX_STANDARD_REQUIRED ON)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m64 -std=c++14 -stdlib=libc++  -fno-implicit-templates")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m64 -std=c++17 -stdlib=libc++  -fno-implicit-templates")
         # set(CMAKE_OSX_ARCHITECTURES "x86_64" CACHE INTERNAL "" FORCE)
         set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m64")
     elseif(PLATFORM EQUAL 32)
