@@ -855,6 +855,11 @@ int TOfflineGL::getLy() const { return m_imp->getLy(); }
 
 namespace {
 
+#ifdef __APPLE__
+#ifndef binary_function
+#define binary_function __binary_function
+#endif  // binary_function
+#endif  // __APPLE__
 struct DimensionLess final
     : public std::binary_function<TDimension, TDimension, bool> {
   bool operator()(const TDimension &d1, const TDimension &d2) const {

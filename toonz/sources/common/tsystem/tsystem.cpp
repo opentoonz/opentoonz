@@ -411,7 +411,13 @@ void TSystem::hideFile(const TFilePath &fp) {
 }
 
 //------------------------------------------------------------
-
+#ifdef __APPLE__
+// error: no template named 'binary_function' in namespace 'std'; did you mean '__binary_function'? 
+// note: '__binary_function' declared here using __binary_function = __binary_function_keep_layout_base<_Arg1, _Arg2, _Result>;
+#ifndef binary_function
+#define binary_function __binary_function
+#endif  // binary_function
+#endif  // __APPLE__
 class CaselessFilepathLess final
     : public std::binary_function<TFilePath, TFilePath, bool> {
 public:

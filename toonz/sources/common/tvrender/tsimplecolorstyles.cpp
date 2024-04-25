@@ -384,6 +384,11 @@ public:
     }
   };
   //----------------------------------------------
+#ifdef __APPLE__
+#ifndef binary_function
+#define binary_function __binary_function
+#endif  // binary_function
+#endif // __APPLE__
 
   struct KeyLess final : public std::binary_function<Key, Key, bool> {
     bool operator()(const Key &d1, const Key &d2) const {
