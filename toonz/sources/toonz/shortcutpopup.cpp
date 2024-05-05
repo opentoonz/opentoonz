@@ -73,7 +73,7 @@ public:
 //-----------------------------------------------------------------------------
 
 ShortcutViewer::ShortcutViewer(QWidget *parent)
-    : QKeySequenceEdit(parent), m_action(0) {
+    : QKeySequenceEdit(parent), m_action(0), m_keysPressed(0) {
   setObjectName("ShortcutViewer");
   setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
   connect(this, SIGNAL(editingFinished()), this, SLOT(onEditingFinished()));
@@ -102,49 +102,76 @@ void ShortcutViewer::setAction(QAction *action) {
 void ShortcutViewer::keyPressEvent(QKeyEvent *event) {
   int key                         = event->key();
   Qt::KeyboardModifiers modifiers = event->modifiers();
-  if (key == Qt::Key_Home || key == Qt::Key_End || key == Qt::Key_PageDown ||
-      key == Qt::Key_PageUp || key == Qt::Key_Escape || key == Qt::Key_Print ||
-      key == Qt::Key_Pause || key == Qt::Key_ScrollLock) {
-    event->ignore();
-    return;
+
+  if (m_keysPressed == 0) {
+    if (key == Qt::Key_Home || key == Qt::Key_End || key == Qt::Key_PageDown ||
+        key == Qt::Key_PageUp || key == Qt::Key_Escape ||
+        key == Qt::Key_Print || key == Qt::Key_Pause ||
+        key == Qt::Key_ScrollLock) {
+      event->ignore();
+      return;
+    }
+
+    // If "Use Numpad and Tab keys for Switching Styles" option is activated,
+    // then prevent to assign such keys
+    if (Preferences::instance()->isUseNumpadForSwitchingStylesEnabled() &&
+        modifiers == 0 && (key >= Qt::Key_0 && key <= Qt::Key_9)) {
+      event->ignore();
+      return;
+    }
   }
-  // If "Use Numpad and Tab keys for Switching Styles" option is activated,
-  // then prevent to assign such keys
-  if (Preferences::instance()->isUseNumpadForSwitchingStylesEnabled() &&
-      modifiers == 0 && (key >= Qt::Key_0 && key <= Qt::Key_9)) {
-    event->ignore();
-    return;
-  }
+
+  m_keysPressed++;
+
   QKeySequenceEdit::keyPressEvent(event);
 }
 
 //-----------------------------------------------------------------------------
 
 void ShortcutViewer::onEditingFinished() {
-  // limit to one shortcut key input
-  QKeySequence keys = (keySequence().isEmpty())
-                          ? QKeySequence()
-                          : QKeySequence(keySequence()[0]);
+  m_keysPressed = 0;
+
+  int seqCount = keySequence().count();
+  int k1       = seqCount >= 1 ? keySequence()[0] : 0;
+  int k2       = seqCount >= 2 ? keySequence()[1] : 0;
+  int k3       = seqCount >= 3 ? keySequence()[2] : 0;
+  int k4       = seqCount >= 4 ? keySequence()[3] : 0;
+
+  QKeySequence keys(k1, k2, k3, k4);
 
   if (m_action) {
-    CommandManager *cm         = CommandManager::instance();
-    std::string shortcutString = keys.toString().toStdString();
-    QAction *oldAction =
-        cm->getActionFromShortcut(keys.toString().toStdString());
-    if (oldAction == m_action) return;
-    if (oldAction) {
-      QString msg = tr("%1 is already assigned to '%2'\nAssign to '%3'?")
-                        .arg(keys.toString())
-                        .arg(oldAction->iconText())
-                        .arg(m_action->iconText());
-      int ret = DVGui::MsgBox(msg, tr("Yes"), tr("No"), 1);
-      activateWindow();
-      if (ret == 2 || ret == 0) {
-        setKeySequence(m_action->shortcut());
-        setFocus();
-        return;
+    CommandManager *cm = CommandManager::instance();
+    // Check partial sequences (k1, k1+k2, k1+k2+k3, k1+k2+k3+k4) for matches to
+    // existing shortcuts
+    for (int i = 0; i < seqCount; i++) {
+      QKeySequence tmpKeys = QKeySequence(k1, (i >= 1 ? k2 : 0),
+                                          (i >= 2 ? k3 : 0), (i >= 3 ? k4 : 0));
+      QAction *oldAction =
+          cm->getActionFromShortcut(tmpKeys.toString().toStdString());
+      if (oldAction == m_action) return;
+      if (oldAction) {
+        QString msg;
+        if (seqCount == (i + 1)) {
+          msg = tr("'%1' is already assigned to '%2'\nAssign to '%3'?")
+                    .arg(tmpKeys.toString())
+                    .arg(oldAction->iconText())
+                    .arg(m_action->iconText());
+        } else {
+          msg = tr("Initial sequence '%1' is assigned to '%2' which takes "
+                   "priority.\nAssign shortcut sequence anyway?")
+                    .arg(tmpKeys.toString())
+                    .arg(oldAction->iconText());
+        }
+        int ret = DVGui::MsgBox(msg, tr("Yes"), tr("No"), 1);
+        activateWindow();
+        if (ret == 2 || ret == 0) {
+          setKeySequence(m_action->shortcut());
+          setFocus();
+          return;
+        }
       }
     }
+    std::string shortcutString = keys.toString().toStdString();
     CommandManager::instance()->setShortcut(m_action, shortcutString);
     emit shortcutChanged();
   }
@@ -183,6 +210,9 @@ ShortcutTree::ShortcutTree(QWidget *parent) : QTreeWidget(parent) {
 
   setColumnCount(2);
   header()->close();
+  header()->setSectionResizeMode(0, QHeaderView::ResizeMode::Fixed);
+  header()->setSectionResizeMode(1, QHeaderView::ResizeMode::ResizeToContents);
+  header()->setDefaultSectionSize(300);
   // setStyleSheet("border-bottom:1px solid rgb(120,120,120); border-left:1px
   // solid rgb(120,120,120); border-top:1px solid rgb(120,120,120)");
 
@@ -314,14 +344,6 @@ void ShortcutTree::searchItems(const QString &searchWord) {
   show();
   emit searched(true);
   update();
-}
-
-//-----------------------------------------------------------------------------
-
-void ShortcutTree::resizeEvent(QResizeEvent *event) {
-  header()->resizeSection(0, width() - 120);
-  header()->resizeSection(1, 120);
-  QTreeView::resizeEvent(event);
 }
 
 //-----------------------------------------------------------------------------

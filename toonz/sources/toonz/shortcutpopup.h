@@ -27,6 +27,8 @@ class ShortcutViewer final : public QKeySequenceEdit {
   Q_OBJECT
   QAction *m_action;
 
+  int m_keysPressed;
+
 public:
   ShortcutViewer(QWidget *parent);
   ~ShortcutViewer();
@@ -68,8 +70,6 @@ protected:
   // CommandType::MenubarCommandType
   void addFolder(const QString &title, int commandType,
                  QTreeWidgetItem *folder = 0);
-
-  void resizeEvent(QResizeEvent *event);
 
 public slots:
   void onCurrentItemChanged(QTreeWidgetItem *current,
