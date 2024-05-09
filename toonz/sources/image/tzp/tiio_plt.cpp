@@ -222,7 +222,8 @@ void PltReader::open(FILE *file) {
   if (TIFFGetField(m_tiff, TIFFTAG_TOONZCOLORNAMES, &count, &data))
     colorNames = data;
 
-  TREE *names = cdb_decode_all(data, Tcm_24_default_info);
+  // TREE *names = cdb_decode_all(data, Tcm_24_default_info);
+  TREE *names = nullptr;
 
   CDB_TREE_ITEM *item;
 
@@ -233,7 +234,7 @@ void PltReader::open(FILE *file) {
   m_infoRow.resize(maxCount, TPixel32(0, 0, 0, 0));
 
   for (i = 0; i < maxCount; i++) {
-    item = (CDB_TREE_ITEM *)avl_locate(names, i);
+    // item = (CDB_TREE_ITEM *)avl_locate(names, i);
     if (!item) continue;
     decode_group_name(item->group, &pageName, &key, &sisterIndex);
 

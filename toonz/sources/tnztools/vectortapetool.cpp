@@ -32,12 +32,12 @@ using namespace ToolUtils;
 #define NORMAL L"Normal"
 #define RECT L"Rectangular"
 
+namespace {
 TEnv::StringVar TapeMode("InknpaintTapeMode1", "Endpoint to Endpoint");
 TEnv::IntVar TapeSmooth("InknpaintTapeSmooth", 0);
 TEnv::IntVar TapeJoinStrokes("InknpaintTapeJoinStrokes", 0);
 TEnv::StringVar TapeType("InknpaintTapeType1", "Normal");
 TEnv::DoubleVar AutocloseFactor("InknpaintAutocloseFactor", 4.0);
-namespace {
 
 class UndoAutoclose final : public ToolUtils::TToolUndo {
   int m_oldStrokeId1;

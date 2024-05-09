@@ -33,6 +33,7 @@
 
 using namespace ToolUtils;
 
+namespace {
 TEnv::StringVar AutocloseVectorType("InknpaintAutocloseVectorType", "Normal");
 TEnv::DoubleVar AutocloseDistance("InknpaintAutocloseDistance", 10.0);
 TEnv::DoubleVar AutocloseAngle("InknpaintAutocloseAngle", 60.0);
@@ -42,8 +43,6 @@ TEnv::IntVar AutocloseOpacity("InknpaintAutocloseOpacity", 1);
 #define RECT_CLOSE L"Rectangular"
 #define FREEHAND_CLOSE L"Freehand"
 #define POLYLINE_CLOSE L"Polyline"
-
-namespace {
 
 //============================================================
 

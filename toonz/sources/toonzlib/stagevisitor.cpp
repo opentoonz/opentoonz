@@ -87,6 +87,11 @@ using namespace Stage;
 //    Local namespace
 //**********************************************************************************************
 
+TEnv::DoubleVar AutocloseDistance("InknpaintAutocloseDistance", 10.0);
+TEnv::DoubleVar AutocloseAngle("InknpaintAutocloseAngle", 60.0);
+TEnv::IntVar AutocloseInk("InknpaintAutocloseInk", 1);
+TEnv::IntVar AutocloseOpacity("InknpaintAutocloseOpacity", 255);
+TEnv::DoubleVar AutocloseFactor("InknpaintAutocloseFactor", 4.0);
 namespace {
 
 QImage rasterToQImage(const TRaster32P &ras) {
@@ -396,15 +401,6 @@ void RasterPainter::disableMask() {
                         // uscire ora
   TStencilControl::instance()->disableMask();
 }
-
-//-----------------------------------------------------------------------------
-
-//-----------------------------------------------------------------------------
-
-TEnv::DoubleVar AutocloseDistance("InknpaintAutocloseDistance", 10.0);
-TEnv::DoubleVar AutocloseAngle("InknpaintAutocloseAngle", 60.0);
-TEnv::IntVar AutocloseInk("InknpaintAutocloseInk", 1);
-TEnv::IntVar AutocloseOpacity("InknpaintAutocloseOpacity", 255);
 
 //-----------------------------------------------------------------------------
 
@@ -748,8 +744,6 @@ static void buildAutocloseImage(
     vaux->addStroke(auxStroke);
   }
 }
-
-TEnv::DoubleVar AutocloseFactor("InknpaintAutocloseFactor", 4.0);
 
 static void drawAutocloses(TVectorImage *vi, TVectorRenderData &rd) {
   static TPalette *plt = 0;
