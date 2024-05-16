@@ -664,8 +664,8 @@ int main(int argc, char *argv[]) {
     // load script
     if (TFileStatus(loadFilePath).doesExist()) {
       // find project for this script file
-      TProjectManager *pm    = TProjectManager::instance();
-      TProjectP sceneProject = pm->loadSceneProject(loadFilePath);
+      TProjectManager *pm = TProjectManager::instance();
+      auto sceneProject = pm->loadSceneProject(loadFilePath);
       TFilePath oldProjectPath;
       if (!sceneProject) {
         std::cerr << QObject::tr(

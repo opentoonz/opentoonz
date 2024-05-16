@@ -686,8 +686,7 @@ bool ExportLevelPopup::execute() {
 void ExportLevelPopup::initFolder() {
   TFilePath fp;
 
-  TProject *project =
-      TProjectManager::instance()->getCurrentProject().getPointer();
+  auto project = TProjectManager::instance()->getCurrentProject();
   ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
 
   if (scene) fp = scene->decodeFilePath(TFilePath("+drawings"));

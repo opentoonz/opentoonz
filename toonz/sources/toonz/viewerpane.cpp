@@ -608,7 +608,7 @@ void BaseViewerPanel::changeWindowTitle() {  // �v�m�F
 
   // if the frame type is "scene editing"
   if (app->getCurrentFrame()->isEditingScene()) {
-    TProject *project = scene->getProject();
+    auto project = scene->getProject();
     QString sceneName = QString::fromStdWString(scene->getSceneName());
     if (sceneName.isEmpty()) sceneName = tr("Untitled");
     if (app->getCurrentScene()->getDirtyFlag()) sceneName += QString("*");

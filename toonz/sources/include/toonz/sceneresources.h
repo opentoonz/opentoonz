@@ -5,6 +5,7 @@
 
 #include "tfilepath.h"
 #include <map>
+#include <memory>
 
 #undef DVAPI
 #undef DVVAR
@@ -329,7 +330,7 @@ private:
 
 class DVAPI ResourceImporter final : public ResourceProcessor {
 public:
-  ResourceImporter(ToonzScene *scene, TProject *dstProject,
+  ResourceImporter(ToonzScene *scene, std::shared_ptr<TProject> dstProject,
                    ResourceImportStrategy &strategy);
   ~ResourceImporter();
 
@@ -354,7 +355,7 @@ public:
 
 private:
   ToonzScene *m_scene;
-  TProject *m_dstProject;
+  std::shared_ptr<TProject> m_dstProject;
   ToonzScene *m_dstScene;
   ResourceImportStrategy &m_importStrategy;
 };

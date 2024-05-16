@@ -488,7 +488,7 @@ void MainWindow::changeWindowTitle() {
   ToonzScene *scene = app->getCurrentScene()->getScene();
   if (!scene) return;
 
-  TProject *project   = scene->getProject();
+  auto project = scene->getProject();
   QString projectName = QString::fromStdString(project->getName().getName());
 
   QString sceneName = QString::fromStdWString(scene->getSceneName());

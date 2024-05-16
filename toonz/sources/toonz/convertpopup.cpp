@@ -711,8 +711,7 @@ void ConvertPopup::onAntialiasSelected(int index) {
 void ConvertPopup::onFileInChanged() {
   assert(m_convertFileFld);
   std::vector<TFilePath> fps;
-  TProject *project =
-      TProjectManager::instance()->getCurrentProject().getPointer();
+  auto project = TProjectManager::instance()->getCurrentProject();
   ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
   fps.push_back(scene->decodeFilePath(
       TFilePath(m_convertFileFld->getPath().toStdString())));

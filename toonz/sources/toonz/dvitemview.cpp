@@ -1415,8 +1415,7 @@ void DvItemViewerPanel::setThumbnailsView() {
 //-----------------------------------------------------------------------------
 
 void DvItemViewerPanel::exportFileList() {
-  TProject *project =
-      TProjectManager::instance()->getCurrentProject().getPointer();
+  auto project = TProjectManager::instance()->getCurrentProject();
   ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
   TFilePath fp;
   if (scene) fp = scene->decodeFilePath(project->getFolder(TProject::Extras));

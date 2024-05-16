@@ -565,7 +565,7 @@ void SceneResources::getDirtyResources(QStringList &dirtyResources) {
 //
 //-----------------------------------------------------------------------------
 
-ResourceImporter::ResourceImporter(ToonzScene *scene, TProject *dstProject,
+ResourceImporter::ResourceImporter(ToonzScene *scene, std::shared_ptr<TProject> dstProject,
                                    ResourceImportStrategy &importStrategy)
     : m_scene(scene)
     , m_dstProject(dstProject)
