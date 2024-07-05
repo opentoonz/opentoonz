@@ -1,6 +1,12 @@
 name: Windows Build
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - main  # Specify branches where the workflow should run
+  pull_request:
+    branches:
+      - main  # Specify branches where the workflow should run
 
 jobs:
   Windows:
