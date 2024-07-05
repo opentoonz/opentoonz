@@ -3,10 +3,10 @@ name: Windows Build
 on:
   push:
     branches:
-      - main  # Specify branches where the workflow should run
+      - master  # Specify branches where the workflow should run
   pull_request:
     branches:
-      - main  # Specify branches where the workflow should run
+      - master  # Specify branches where the workflow should run
 
 jobs:
   Windows:
