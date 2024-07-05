@@ -5,8 +5,6 @@ on:
     branches:
       - master  # Specify branches where the workflow should run
   pull_request:
-    branches:
-      - master  # Specify branches where the workflow should run
 
 jobs:
   Windows:
