@@ -12,7 +12,7 @@ jobs:
     env:
       vcpkg_ref: cd5e746ec203c8c3c61647e0886a8df8c1e78e41
       BOOST_ROOT: ${{github.workspace}}/3rdparty/boost
-      BOOST_URL: https://sourceforge.net/projects/boost/files/boost/1.72.0/boost_1_72_0.tar.bz2/download
+      BOOST_URL: https://sourceforge.net/projects/boost/files/boost/1.85.0/boost_1_85_0.tar.bz2/download
       QT_ROOT: ${{github.workspace}}/3rdparty/qt
       QT_URL: https://github.com/shun-iwasawa/qt5/releases/download/v5.15.2_wintab/Qt5.15.2_wintab.zip
       LTIFF: ${{github.workspace}}/thirdparty/tiff-4.0.3/lib/LibTIFF-4.0.3_2015_64.lib
