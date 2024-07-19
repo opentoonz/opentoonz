@@ -183,19 +183,19 @@ void ColumnPainter::paint(QPainter *painter,
     // if this is current object
     if (stageScene->getCurrentObject() == m_parent->getStageObject()->getId())
       painter->setPen(viewer->getSelectedNodeTextColor());
-    QRectF columnNameRect(18, 2, 54, 14);
+    QRect columnNameRect(18, 2, 54, 14);
     QString elidedName =
         elideText(m_name, painter->font(), columnNameRect.width());
-    painter->drawText(columnNameRect, Qt::AlignLeft | Qt::AlignVCenter,
-                      elidedName);
+    drawTextAndDropShadow(*painter, columnNameRect,
+                          Qt::AlignLeft | Qt::AlignVCenter, elidedName);
   }
 
   // level names
-  QRectF levelNameRect(18, 16, 54, 14);
+  QRect levelNameRect(18, 16, 54, 14);
   QString elidedName =
       elideText(levelName, painter->font(), levelNameRect.width());
-  painter->drawText(levelNameRect, Qt::AlignLeft | Qt::AlignVCenter,
-                    elidedName);
+  drawTextAndDropShadow(*painter, levelNameRect,
+                        Qt::AlignLeft | Qt::AlignVCenter, elidedName);
 }
 
 //--------------------------------------------------------
@@ -330,9 +330,10 @@ void GroupPainter::paint(QPainter *painter,
     else
       painter->setPen(viewer->getTextColor());
 
-    QRectF rect(18, 0, 54, 18);
+    QRect rect(18, 0, 54, 18);
     QString elidedName = elideText(m_name, painter->font(), rect.width());
-    painter->drawText(rect, Qt::AlignLeft | Qt::AlignVCenter, elidedName);
+    drawTextAndDropShadow(*painter, rect, Qt::AlignLeft | Qt::AlignVCenter,
+                          elidedName);
   }
 }
 
@@ -400,9 +401,10 @@ void PegbarPainter::paint(QPainter *painter,
     else
       painter->setPen(viewer->getTextColor());
     // Draw the name
-    QRectF rect(18, 0, 54, 18);
+    QRect rect(18, 0, 54, 18);
     QString elidedName = elideText(m_name, painter->font(), rect.width());
-    painter->drawText(rect, Qt::AlignLeft | Qt::AlignVCenter, elidedName);
+    drawTextAndDropShadow(*painter, rect, Qt::AlignLeft | Qt::AlignVCenter,
+                          elidedName);
   }
 }
 
@@ -487,9 +489,10 @@ void CameraPainter::paint(QPainter *painter,
     else
       painter->setPen(viewer->getTextColor());
     // Draw the name
-    QRectF rect(18, 0, 54, 18);
+    QRect rect(18, 0, 54, 18);
     QString elidedName = elideText(m_name, painter->font(), rect.width());
-    painter->drawText(rect, Qt::AlignLeft | Qt::AlignVCenter, elidedName);
+    drawTextAndDropShadow(*painter, rect, Qt::AlignLeft | Qt::AlignVCenter,
+                          elidedName);
   }
 }
 
@@ -581,9 +584,9 @@ void TablePainter::paint(QPainter *painter,
     painter->setPen(viewer->getTextColor());
 
   // Draw the name
-  QRectF rect(30, 0, 42, 18);
-  painter->drawText(rect, Qt::AlignLeft | Qt::AlignVCenter,
-                    QString(tr("Table")));
+  QRect rect(30, 0, 42, 18);
+  drawTextAndDropShadow(*painter, rect, Qt::AlignLeft | Qt::AlignVCenter,
+                        QString(tr("Table")));
 }
 
 //--------------------------------------------------------
@@ -664,9 +667,10 @@ void SplinePainter::paint(QPainter *painter,
         else
     */
     painter->setPen(viewer->getTextColor());
-    QRectF rect(18, 0, 72, 18);
+    QRect rect(18, 0, 72, 18);
     QString elidedName = elideText(m_name, painter->font(), rect.width());
-    painter->drawText(rect, Qt::AlignLeft | Qt::AlignVCenter, elidedName);
+    drawTextAndDropShadow(*painter, rect, Qt::AlignLeft | Qt::AlignVCenter,
+                          elidedName);
   }
 }
 
