@@ -204,14 +204,14 @@ void FxColumnPainter::paint(QPainter *painter,
   painter->setPen(viewer->getTextColor());
   painter->setBrush(Qt::NoBrush);
 
-  QRectF columnNameRect;
-  QRectF levelNameRect;
+  QRect columnNameRect;
+  QRect levelNameRect;
   if (m_parent->isNormalIconView()) {
     columnNameRect = QRect(18, 2, 54, 14);
-    levelNameRect  = QRectF(18, 16, 54, 14);
+    levelNameRect  = QRect(18, 16, 54, 14);
   } else {
     columnNameRect = QRect(4, 2, 78, 22);
-    levelNameRect  = QRectF(4, 26, 78, 22);
+    levelNameRect  = QRect(4, 26, 78, 22);
 
     QFont fnt = painter->font();
     fnt.setPixelSize(fnt.pixelSize() * 2);
@@ -225,15 +225,15 @@ void FxColumnPainter::paint(QPainter *painter,
       painter->setPen(viewer->getSelectedNodeTextColor());
     QString elidedName =
         elideText(m_name, painter->font(), columnNameRect.width());
-    painter->drawText(columnNameRect, Qt::AlignLeft | Qt::AlignVCenter,
-                      elidedName);
+    drawTextAndDropShadow(*painter, columnNameRect,
+                          Qt::AlignLeft | Qt::AlignVCenter, elidedName);
   }
 
   // level name
   QString elidedName =
       elideText(levelName, painter->font(), levelNameRect.width());
-  painter->drawText(levelNameRect, Qt::AlignLeft | Qt::AlignVCenter,
-                    elidedName);
+  drawTextAndDropShadow(*painter, levelNameRect,
+                        Qt::AlignLeft | Qt::AlignVCenter, elidedName);
 }
 
 //-----------------------------------------------------
@@ -432,16 +432,16 @@ void FxPalettePainter::paint(QPainter *painter,
 
   // draw icon
   QRect paletteRect;
-  QRectF idRect;
-  QRectF palNameRect;
+  QRect idRect;
+  QRect palNameRect;
   if (m_parent->isNormalIconView()) {
     paletteRect = QRect(-3, -1, 20, 16);
-    idRect      = QRectF(18, 2, 54, 14);
-    palNameRect = QRectF(18, 16, 54, 14);
+    idRect      = QRect(18, 2, 54, 14);
+    palNameRect = QRect(18, 16, 54, 14);
   } else {
     paletteRect = QRect(4, -6, 35, 28);
-    idRect      = QRectF(25, 2, 49, 22);
-    palNameRect = QRectF(4, 26, 78, 22);
+    idRect      = QRect(25, 2, 49, 22);
+    palNameRect = QRect(4, 26, 78, 22);
 
     QFont fnt = painter->font();
     fnt.setPixelSize(fnt.pixelSize() * 2);
@@ -461,17 +461,19 @@ void FxPalettePainter::paint(QPainter *painter,
 
     if (m_parent->isNormalIconView()) {
       QString elidedName = elideText(m_name, painter->font(), w);
-      painter->drawText(idRect, Qt::AlignLeft | Qt::AlignVCenter, elidedName);
+      drawTextAndDropShadow(*painter, idRect, Qt::AlignLeft | Qt::AlignVCenter,
+                            elidedName);
     } else
-      painter->drawText(idRect, Qt::AlignRight | Qt::AlignVCenter,
-                        QString::number(m_parent->getColumnIndex() + 1));
+      drawTextAndDropShadow(*painter, idRect, Qt::AlignRight | Qt::AlignVCenter,
+                            QString::number(m_parent->getColumnIndex() + 1));
   }
 
   // level name
   QString paletteName = m_parent->getPaletteName();
   QString elidedName =
       elideText(paletteName, painter->font(), palNameRect.width());
-  painter->drawText(palNameRect, Qt::AlignLeft | Qt::AlignVCenter, elidedName);
+  drawTextAndDropShadow(*painter, palNameRect, Qt::AlignLeft | Qt::AlignVCenter,
+                        elidedName);
 }
 
 //-----------------------------------------------------
@@ -638,8 +640,8 @@ void FxPainter::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
 
   if (label != m_name) {
     label = elideText(label, painter->font(), m_width - 21);
-    painter->drawText(QRectF(3, 16, m_width - 21, 14),
-                      Qt::AlignLeft | Qt::AlignVCenter, label);
+    drawTextAndDropShadow(*painter, QRect(3, 15, m_width - 21, 14),
+                          Qt::AlignLeft | Qt::AlignVCenter, label);
   }
 
   // draw user-defined fx name in the upper part
@@ -649,14 +651,14 @@ void FxPainter::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
     if (!sceneFx) return;
     if (sceneFx->getCurrentFx() == m_parent->getFx())
       painter->setPen(viewer->getSelectedNodeTextColor());
-    QRectF rect(3, 2, m_width - 21, 14);
+    QRect rect(3, 2, m_width - 21, 14);
     int w = rect.width();
     if (label == m_name) {
       rect.adjust(0, 0, 0, 14);
       w *= 2;
     }
     QString elidedName = elideText(m_name, painter->font(), w);
-    painter->drawText(rect, Qt::TextWrapAnywhere, elidedName);
+    drawTextAndDropShadow(*painter, rect, Qt::TextWrapAnywhere, elidedName);
   }
 }
 
@@ -864,19 +866,20 @@ void FxPainter::paint_small(QPainter *painter) {
     QFont fnt = painter->font();
     fnt.setPixelSize(fnt.pixelSize() * 2);
     painter->setFont(fnt);
-    painter->setPen(viewer->getTextColor());
+    painter->setPen(viewer->getTextColor()); //#todo
     FxSchematicScene *sceneFx = dynamic_cast<FxSchematicScene *>(scene());
     if (!sceneFx) return;
     if (sceneFx->getCurrentFx() == m_parent->getFx())
-      painter->setPen(viewer->getSelectedNodeTextColor());
+      painter->setPen(viewer->getSelectedNodeTextColor()); //#todo
   }
 
   if (m_type == eGroupedFx) {
     if (!m_parent->isNameEditing()) {
-      QRectF rect(14, 2, 68, 22);
+      QRect rect(14, 2, 68, 22);
       int w              = rect.width();
       QString elidedName = elideText(m_name, painter->font(), w);
-      painter->drawText(rect, elidedName);
+      drawTextAndDropShadow(*painter, rect, Qt::AlignLeft | Qt::AlignVCenter,
+                            elidedName);
     }
   } else {
     painter->drawPixmap(16, 6, 38, 38,
@@ -889,8 +892,8 @@ void FxPainter::paint_small(QPainter *painter) {
         dynamic_cast<FxSchematicZeraryNode *>(m_parent);
     if (zeraryNode) {
       QRect idRect(30, 10, 46, 38);
-      painter->drawText(idRect, Qt::AlignRight | Qt::AlignBottom,
-                        QString::number(zeraryNode->getColumnIndex() + 1));
+      drawTextAndDropShadow(*painter, idRect, Qt::AlignRight | Qt::AlignBottom,
+                            QString::number(zeraryNode->getColumnIndex() + 1));
     }
   }
 
@@ -957,17 +960,18 @@ void FxXSheetPainter::paint(QPainter *painter,
     painter->setPen(viewer->getTextColor());
   if (m_parent->isNormalIconView()) {
     // Draw the name
-    QRectF rect(18, 0, 54, 18);
-    painter->drawText(rect, Qt::AlignLeft | Qt::AlignVCenter,
-                      QString(tr("XSheet")));
+    QRect rect(18, 0, 54, 18);
+    drawTextAndDropShadow(*painter, rect, Qt::AlignLeft | Qt::AlignVCenter,
+                          QString(tr("XSheet")));
   }
   // small scaled
   else {
-    QRectF rect(28, 4, 32, 32);
+    QRect rect(28, 4, 32, 32);
     QFont fnt = painter->font();
     fnt.setPixelSize(fnt.pixelSize() * 2);
     painter->setFont(fnt);
-    painter->drawText(rect, Qt::AlignLeft | Qt::AlignVCenter, QString("X"));
+    drawTextAndDropShadow(*painter, rect, Qt::AlignLeft | Qt::AlignVCenter,
+                          QString("X"));
   }
 }
 
@@ -1061,17 +1065,18 @@ void FxOutputPainter::paint(QPainter *painter,
     painter->setPen(viewer->getTextColor());
   if (m_parent->isNormalIconView()) {
     // Draw the name
-    QRectF rect(18, 0, 72, 18);
-    painter->drawText(rect, Qt::AlignLeft | Qt::AlignVCenter,
-                      QString(tr("Output")));
+    QRect rect(18, 0, 72, 18);
+        drawTextAndDropShadow(*painter, rect, Qt::AlignLeft | Qt::AlignVCenter,
+                          QString(tr("Output")));
   }
   // small view
   else {
-    QRectF rect(16, 0, 50, 36);
+    QRect rect(16, 0, 50, 36);
     QFont fnt = painter->font();
     fnt.setPixelSize(fnt.pixelSize() * 2);
     painter->setFont(fnt);
-    painter->drawText(rect, Qt::AlignLeft | Qt::AlignVCenter, QString("Out"));
+        drawTextAndDropShadow(*painter, rect, Qt::AlignLeft | Qt::AlignVCenter,
+                          QString(tr("Out")));
   }
 }
 
@@ -3804,7 +3809,7 @@ void FxPassThroughPainter::paint(QPainter *painter,
 
   QFont fnt = painter->font();
   int width = QFontMetrics(fnt).width(m_name) + 1;
-  QRectF nameArea(0, 0, width, 14);
+  QRect nameArea(0, 0, width, 14);
 
   if (m_parent->isNormalIconView()) {
     nameArea.adjust(-(width / 2) + 6, -51, 0, 0);
@@ -3821,7 +3826,8 @@ void FxPassThroughPainter::paint(QPainter *painter,
     // if this is a current object
     if (sceneFx->getCurrentFx() == m_parent->getFx())
       painter->setPen(viewer->getSelectedNodeTextColor());
-    painter->drawText(nameArea, Qt::AlignLeft | Qt::AlignVCenter, m_name);
+    drawTextAndDropShadow(*painter, nameArea, Qt::AlignLeft | Qt::AlignVCenter,
+                          m_name);
   }
 }
 

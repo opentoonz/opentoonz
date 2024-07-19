@@ -144,8 +144,13 @@ void drawTextAndDropShadow(QPainter &p, const QRect &r, int flags,
   static const QColor shadowColor(0, 0, 0, 128);
   QColor textColor = p.pen().color();
 
-  // draw shadow, but only if textColor is bright enough
-  if (textColor.value() > 128) {
+  // Calculate luminance of the text color
+  double luminance = 0.299 * textColor.redF() +
+                     0.587 * textColor.greenF() +
+                     0.114 * textColor.blueF();
+
+  // Draw shadow if the text color is bright enough
+  if (luminance > 0.5) {
     p.setPen(shadowColor);
     QRect shadowRect = r.translated(1, 1);
     p.drawText(shadowRect, flags, text, br);
