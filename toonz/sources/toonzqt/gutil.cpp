@@ -151,13 +151,14 @@ void drawTextAndDropShadow(QPainter &p, const QRect &r, int flags,
 
   // Draw shadow if the text color is bright enough
   if (luminance > 0.5) {
+    p.save();
     p.setPen(shadowColor);
     QRect shadowRect = r.translated(1, 1);
     p.drawText(shadowRect, flags, text, br);
+    p.restore();
   }
 
-  // draw main text
-  p.setPen(textColor);
+  // Draw main text
   p.drawText(r, flags, text, br);
 }
 
