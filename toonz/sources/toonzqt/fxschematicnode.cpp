@@ -866,11 +866,11 @@ void FxPainter::paint_small(QPainter *painter) {
     QFont fnt = painter->font();
     fnt.setPixelSize(fnt.pixelSize() * 2);
     painter->setFont(fnt);
-    painter->setPen(viewer->getTextColor()); //#todo
+    painter->setPen(viewer->getTextColor());
     FxSchematicScene *sceneFx = dynamic_cast<FxSchematicScene *>(scene());
     if (!sceneFx) return;
     if (sceneFx->getCurrentFx() == m_parent->getFx())
-      painter->setPen(viewer->getSelectedNodeTextColor()); //#todo
+      painter->setPen(viewer->getSelectedNodeTextColor());
   }
 
   if (m_type == eGroupedFx) {
