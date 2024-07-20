@@ -2841,14 +2841,16 @@ void CellArea::drawPaletteCell(QPainter &p, int row, int col,
       // Ex.  12 -> 1B    21 -> 2A   30 -> 3
       if (Preferences::instance()->isShowFrameNumberWithLettersEnabled()) {
         numberStr = m_viewer->getFrameNumberWithLetters(fid.getNumber());
-        p.drawText(nameRect, Qt::AlignRight | Qt::AlignBottom, numberStr);
+        drawTextAndDropShadow(p, nameRect, Qt::AlignRight | Qt::AlignBottom,
+                              numberStr);
       } else {
         QString frameNumber("");
         // set number
         if (fid.getNumber() > 0) frameNumber = QString::number(fid.getNumber());
         // add letter
         if (!fid.getLetter().isEmpty()) frameNumber += fid.getLetter();
-        p.drawText(nameRect, Qt::AlignRight | Qt::AlignBottom, frameNumber);
+        drawTextAndDropShadow(p, nameRect, Qt::AlignRight | Qt::AlignBottom,
+                              frameNumber);
       }
     }
 
@@ -2858,7 +2860,8 @@ void CellArea::drawPaletteCell(QPainter &p, int row, int col,
         QString("~"));
 
     if (!sameLevel || isAfterMarkers)
-      p.drawText(nameRect, Qt::AlignLeft | Qt::AlignBottom, elidaName);
+      drawTextAndDropShadow(p, nameRect, Qt::AlignLeft | Qt::AlignBottom,
+                            elidaName);
   }
 
   // cell mark
