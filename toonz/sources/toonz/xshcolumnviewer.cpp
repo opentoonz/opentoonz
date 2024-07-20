@@ -512,7 +512,7 @@ void ChangeObjectParent::refresh() {
   for (i = 0; i < pegbarListID.size(); i++)
     addText(pegbarListID.at(i), pegbarListTr.at(i), pegbarListColor.at(i));
 
-  m_width = fontMetrics().width(theLongestTxt) + 32;
+  m_width = fontMetrics().horizontalAdvance(theLongestTxt) + 32;
   selectCurrent(currentId);
 }
 
@@ -1144,8 +1144,8 @@ void ColumnArea::DrawHeader::drawColumnNumber() const {
 
   int valign = o->isVerticalTimeline() ? Qt::AlignVCenter : Qt::AlignBottom;
 
-  p.drawText(pos, Qt::AlignHCenter | valign | Qt::TextSingleLine,
-             QString::number(col + 1));
+  drawTextAndDropShadow(p, pos, Qt::AlignHCenter | valign | Qt::TextSingleLine,
+                        QString::number(col + 1));
 }
 
 void ColumnArea::DrawHeader::drawColumnName() const {
@@ -1222,17 +1222,18 @@ void ColumnArea::DrawHeader::drawColumnName() const {
     p.save();
     p.translate(columnName.topRight());
     p.rotate(90);
-    p.drawText(columnName.translated(-columnName.topLeft())
-                   .transposed()
-                   .adjusted(5, 0, 0, 0),
-               Qt::AlignLeft | valign, cameraName);
+    drawTextAndDropShadow(p,
+                          columnName.translated(-columnName.topLeft())
+                              .transposed()
+                              .adjusted(5, 0, 0, 0),
+                          Qt::AlignLeft | valign, cameraName);
     p.restore();
     return;
   }
 
-  p.drawText(columnName.adjusted(leftadj, 0, rightadj, 0),
-             Qt::AlignLeft | valign | Qt::TextSingleLine,
-             QString(name.c_str()));
+  drawTextAndDropShadow(p, columnName.adjusted(leftadj, 0, rightadj, 0),
+                        Qt::AlignLeft | valign | Qt::TextSingleLine,
+                        QString(name.c_str()));
 }
 
 void ColumnArea::DrawHeader::drawThumbnail(QPixmap &iconPixmap) const {
@@ -1338,11 +1339,11 @@ void ColumnArea::DrawHeader::drawPegbarName() const {
   std::string handle = xsh->getStageObject(columnId)->getParentHandle();
   if (handle == "B") handleWidth = 0;  // Default handle
 
-  int width = QFontMetrics(font).width(name);
+  int width = QFontMetrics(font).horizontalAdvance(name);
 
   while (width > o->rect(PredefinedRect::PEGBAR_NAME).width() - handleWidth) {
     name.remove(-1, 1000);
-    width = QFontMetrics(font).width(name);
+    width = QFontMetrics(font).horizontalAdvance(name);
   }
 
   // pegbar name
@@ -1378,8 +1379,9 @@ void ColumnArea::DrawHeader::drawPegbarName() const {
 
   p.setPen(m_viewer->getTextColor());
 
-  p.drawText(pegbarnamerect.adjusted(3, 0, 0, 0),
-             Qt::AlignLeft | Qt::AlignVCenter | Qt::TextSingleLine, name);
+  drawTextAndDropShadow(p, pegbarnamerect.adjusted(3, 0, 0, 0),
+                        Qt::AlignLeft | Qt::AlignVCenter | Qt::TextSingleLine,
+                        name);
 }
 
 void ColumnArea::DrawHeader::drawParentHandleName() const {
@@ -1412,9 +1414,10 @@ void ColumnArea::DrawHeader::drawParentHandleName() const {
   p.drawRect(parenthandleRect.adjusted(2, 0, 0, 0));
 
   p.setPen(m_viewer->getTextColor());
-  p.drawText(parenthandleRect,
-             Qt::AlignHCenter | Qt::AlignVCenter | Qt::TextSingleLine,
-             QString::fromStdString(handle));
+  drawTextAndDropShadow(
+      p, parenthandleRect,
+      Qt::AlignHCenter | Qt::AlignVCenter | Qt::TextSingleLine,
+      QString::fromStdString(handle));
 }
 
 void ColumnArea::DrawHeader::drawFilterColor() const {
@@ -2343,7 +2346,7 @@ void ColumnArea::mousePressEvent(QMouseEvent *event) {
       TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
       return;
     }
-    
+
     TXshColumn *column = xsh->getColumn(m_col);
     bool isEmpty       = !column || column->isEmpty();
     TApp::instance()->getCurrentObject()->setIsSpline(false);
@@ -2355,7 +2358,7 @@ void ColumnArea::mousePressEvent(QMouseEvent *event) {
     // int y = event->pos().y();
     // QPoint mouseInCell(x, y);
     int x = mouseInCell.x(), y = mouseInCell.y();
-    
+
     // don't make column current when click on some of its toggle buttons
     bool needMakeColumnCurrent = true;
     if ( o->rect(PredefinedRect::LOCK_AREA).contains(mouseInCell)
