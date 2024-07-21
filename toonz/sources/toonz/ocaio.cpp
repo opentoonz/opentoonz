@@ -451,20 +451,32 @@ void ExportOCACommand::execute() {
   progressDialog->show();
   QCoreApplication::processEvents();
 
-  QString ocafile = fp.getQString();
-  QString ocafolder(ocafile);
-  ocafolder.replace(".", "_");
+  // Filename is also the directory name it needs to be created in
+  fp = fp + fp.withoutParentDir();
 
-  QFile saveFile(ocafile);
+  QString ocafolder(fp.getParentDir().getQString());
   QDir saveDir(ocafolder);
+  if (!saveDir.exists()) {
+    if (!saveDir.mkpath(".")) {
+      progressDialog->close();
+      DVGui::error(QObject::tr("Unable to create OCA folder."));
+      return;
+    }
+  }
 
+  QString ocafile = fp.getQString();
+  QFile saveFile(ocafile);
   if (!saveFile.open(QIODevice::WriteOnly)) {
     progressDialog->close();
     DVGui::error(QObject::tr("Unable to open OCA file for saving."));
     return;
   }
-  if (!saveDir.exists()) {
-    if (!saveDir.mkpath(".")) {
+
+  TFilePath imageDir = fp.getParentDir() + TFilePath(fp.getName() + "_files");
+  QString ocaImageDir(imageDir.getQString());
+  QDir saveImageDir(ocaImageDir);
+  if (!saveImageDir.exists()) {
+    if (!saveImageDir.mkpath(".")) {
       progressDialog->close();
       DVGui::error(QObject::tr("Unable to create folder for saving layers."));
       return;
@@ -473,8 +485,8 @@ void ExportOCACommand::execute() {
 
   OCAData ocaData;
   ocaData.setProgressDialog(progressDialog);
-  ocaData.build(scene, xsheet, QString::fromStdString(fp.getName()), ocafolder,
-                exrImageFmt, !rasterVecs, exportRefs);
+  ocaData.build(scene, xsheet, QString::fromStdString(fp.getName()),
+                ocaImageDir, exrImageFmt, !rasterVecs, exportRefs);
   if (ocaData.isEmpty()) {
     progressDialog->close();
     DVGui::error(QObject::tr("No columns can be exported."));
@@ -555,6 +567,9 @@ void ImportOCACommand::execute() {
 
     importEnabled = (ret == 1);
   }
+
+  // Check if this is a directory or the actual file
+  if (TFileStatus(fp).isDirectory()) fp = fp + fp.withoutParentDir();
 
   QString ocafile           = fp.getQString();
   OCAInputData ocaInputData = OCAInputData(0, false, false);
