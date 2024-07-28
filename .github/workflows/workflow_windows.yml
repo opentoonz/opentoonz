@@ -9,180 +9,138 @@ on:
 jobs:
   Windows:
     runs-on: windows-2019
-    env:
-      vcpkg_ref: cd5e746ec203c8c3c61647e0886a8df8c1e78e41
-      BOOST_ROOT: ${{github.workspace}}/3rdparty/boost
-      BOOST_URL: https://sourceforge.net/projects/boost/files/boost/1.85.0/boost_1_85_0.tar.bz2/download
-      QT_ROOT: ${{github.workspace}}/3rdparty/qt
-      QT_URL: https://github.com/shun-iwasawa/qt5/releases/download/v5.15.2_wintab/Qt5.15.2_wintab.zip
-      LTIFF: ${{github.workspace}}/thirdparty/tiff-4.0.3/lib/LibTIFF-4.0.3_2015_64.lib
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+      - name: Install and Configure ccache
+        run: |
+          @echo on
+          choco install ccache
+          copy C:\ProgramData\chocolatey\lib\ccache\tools\ccache*\ccache.exe C:\ProgramData\chocolatey\bin\cl.exe
+          mkdir %LOCALAPPDATA%\ccache
+        shell: cmd
 
-    - name: Checkout mypaint/libmypaint
-      uses: actions/checkout@v4
-      with:
-        repository: 'mypaint/libmypaint'
-        ref: '70f7686db792fa4953dc60f28a322bf2cd388ed7'
-        path: 'libmypaint'
+      - name: Set Path ccache
+        uses: actions/cache@v4
+        with:
+          path: C:/Users/runneradmin/AppData/Local/ccache
+          key: ${{ runner.os }}-${{ github.sha }}
+          restore-keys: ${{ runner.os }}-
 
-    - name: Checkout xiaoyeli/superlu
-      uses: actions/checkout@v4
-      with:
-        repository: 'xiaoyeli/superlu'
-        ref: 'a3d5233770f0caad4bc4578b46d3b26af99e9c19'
-        path: 'superlu'
+      - name: Install OpenCV and Boost
+        run: |
+          @echo on
+          REM  install opencv
+          choco install opencv --version=4.5.1
+          REM install boost
+          choco install boost-msvc-14.2
+        shell: cmd
 
-    - name: Install vcpkg
-      run: |
-        rm -r -fo C:/vcpkg
-        cd C:/
-        git clone https://github.com/Microsoft/vcpkg
-        cd vcpkg
-        git checkout "$env:vcpkg_ref"
-        ./bootstrap-vcpkg.bat
+      - name: Install custom Qt 5.15.2 with WinTab support
+        run: |
+          @echo on
+          mkdir thirdparty\qt
+          curl -fsSL -o Qt5.15.2_wintab.zip https://github.com/shun-iwasawa/qt5/releases/download/v5.15.2_wintab/Qt5.15.2_wintab.zip
+          7z x Qt5.15.2_wintab.zip
+          move Qt5.15.2_wintab\5.15.2_wintab thirdparty\qt
+        shell: cmd
 
-    - uses: actions/cache@v4
-      with:
-       path: C:/vcpkg/installed
-       key: ${{ runner.os }}-vcpkg-${{ env.vcpkg_ref }}-${{ github.sha }}
-       restore-keys: ${{ runner.os }}-vcpkg-${{ env.vcpkg_ref }}-
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v2
 
-    - name: Install libraries
-      run: |
-        vcpkg install --clean-after-build --triplet x64-windows icu
-        vcpkg install --clean-after-build --triplet x64-windows-static json-c libjpeg-turbo libpng lz4 lzo openblas zlib
-        vcpkg install --clean-after-build --triplet x64-windows freeglut glew
-        vcpkg install --clean-after-build --triplet x64-windows --recurse opencv[world]
-        ls -Recurse C:/vcpkg/installed -Filter *.pdb | rm
+      - name: Build Opentoonz
+        run: |
+          @echo on
+          cd thirdparty
+          REM Copy headers
+          copy /Y tiff-4.0.3\libtiff\tif_config.vc.h tiff-4.0.3\libtiff\tif_config.h
+          copy /Y tiff-4.0.3\libtiff\tiffconf.vc.h tiff-4.0.3\libtiff\tiffconf.h
+          copy /Y libpng-1.6.21\scripts\pnglibconf.h.prebuilt libpng-1.6.21\pnglibconf.h
 
-    - name: Cache Qt
-      id: cache-qt
-      uses: actions/cache@v2
-      with:
-        path: ${{env.QT_ROOT}}
-        key: ${{ runner.os }}-QtCache
+          cd ../toonz
 
-    - name: Install Qt
-      run: |
-        # fix up paths to be forward slashes consistently
-        QT_ROOT=$(echo $QT_ROOT | sed 's/\\/\//g')
-        mkdir -p $QT_ROOT
-        curl --progress-bar -L -o $QT_ROOT/Qt.zip $QT_URL
-        7z -o$QT_ROOT x $QT_ROOT/Qt.zip -y -bd
-        rm -f $QT_ROOT/Qt.zip
-      shell: bash
+          IF NOT EXIST build mkdir build
+          cd build
 
-    - name: Restore Boost cache
-      uses: actions/cache@v4
-      id: cache-boost
-      with:
-        path: ${{env.BOOST_ROOT}}
-        key: boost
+          REM Setup for local builds
+          set MSVCVERSION="Visual Studio 16 2019"
+          set BOOST_ROOT=C:\boost\boost_1_74_0
+          set OPENCV_DIR=C:\opencv\451\build
+          set QT_PATH=C:\Qt\5.15.2_wintab\msvc2019_64
 
-    - name: Install Boost
-      if: steps.cache-boost.outputs.cache-hit != 'true'
-      run: |
-        # fix up paths to be forward slashes consistently
-        BOOST_ROOT=$(echo $BOOST_ROOT | sed 's/\\/\//g')
-        mkdir -p $BOOST_ROOT
-        curl --progress-bar --location --output $BOOST_ROOT/download.tar.bz2 $BOOST_URL
-        7z -o$BOOST_ROOT x $BOOST_ROOT/download.tar.bz2 -y -bd
-        7z -o$BOOST_ROOT x $BOOST_ROOT/download.tar -y -bd
-        cd $BOOST_ROOT && cp -r boost_*/* .
-        rm -rf boost_*/* download.tar.bz2 download.tar
-      shell: bash
-      
-    - name: Setup Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.9.1'
+          REM These are effective when running from Actions
+          IF EXIST C:\local\boost_1_74_0 set BOOST_ROOT=C:\local\boost_1_74_0
+          IF EXIST C:\tools\opencv set OPENCV_DIR=C:\tools\opencv\build
 
-    - name: Build libtiff
-      run: |
-        cd thirdparty/tiff-4.0.3
-        cp libtiff/tif_config.vc.h libtiff/tif_config.h
-        cp libtiff/tiffconf.vc.h libtiff/tiffconf.h
-        cd prj/LibTIFF
-        $env:Path += ';C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/MSBuild/Current/Bin'
-        msbuild LibTIFF.vcxproj /p:PlatformToolset=v142 /p:Platform=x64 /p:Configuration=Release -maxcpucount:3
+          set WITH_WINTAB=Y
+          IF EXIST D:\a\opentoonz\opentoonz\thirdparty\qt\5.15.2_wintab\msvc2019_64 (
+              set QT_PATH=D:\a\opentoonz\opentoonz\thirdparty\qt\5.15.2_wintab\msvc2019_64
+          )
 
-    - name: Build mypaint/libmypaint
-      run: |
-        cd libmypaint
-        cp ../.github/workflows/CMakeLists.txt .
-        echo '#define MYPAINT_CONFIG_USE_GLIB 0' > config.h
-        python generate.py mypaint-brush-settings-gen.h brushsettings-gen.h
-        mkdir build | Out-Null
-        cd build
-        cmake ../ -G 'Visual Studio 16 2019' -Ax64 -Djson-c_DIR='C:/vcpkg/installed/x64-windows-static/share/json-c/' -DJSON-C_INCLUDE_DIR='C:/vcpkg/installed/x64-windows-static/include/json-c/'
-        cmake --build . --config Release
-        cp C:/vcpkg/installed/x64-windows-static/lib/json-c.lib .
-        $env:Path += ';C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64'
-        lib /OUT:libmypaint.lib Release/libmypaint.lib json-c.lib
-        cp libmypaint.lib Release/libmypaint.lib
+          cmake ..\sources -G %MSVCVERSION% -Ax64 -DQT_PATH=%QT_PATH% -DBOOST_ROOT=%BOOST_ROOT% -DOpenCV_DIR=%OPENCV_DIR% -DWITH_WINTAB=%WITH_WINTAB%
 
-    - name: Build xiaoyeli/superlu
-      run: |
-        cd superlu
-        mkdir build | Out-Null
-        cd build
-        cmake ../ -G 'Visual Studio 16 2019' -Ax64 -DXSDK_ENABLE_Fortran=OFF -Denable_tests=OFF
-        cmake --build . --config Release
+          IF EXIST C:\ProgramData\chocolatey\bin\cl.exe (
+              msbuild /p:CLToolPath=C:\ProgramData\chocolatey\bin /p:UseMultiToolTask=true /p:Configuration=RelWithDebInfo /m /verbosity:minimal ALL_BUILD.vcxproj
+          ) ELSE (
+              msbuild /p:Configuration=RelWithDebInfo /m /verbosity:minimal ALL_BUILD.vcxproj
+          )
 
-    - name: Workaround
-      run: |
-        cd thirdparty
-        cp C:/vcpkg/installed/x64-windows-static/lib/libpng16.lib libpng-1.6.21/lib/libpng16_2015_64.lib
-        cp C:/vcpkg/installed/x64-windows-static/lib/lz4.lib Lz4/Lz4_131/lz4_64.lib
-        cp C:/vcpkg/installed/x64-windows-static/lib/lzo2.lib lzo/2.03/LZO_lib/lzo2_64.lib
-        cp C:/vcpkg/installed/x64-windows-static/lib/openblas.lib openblas/libopenblas_64.lib
-        cp C:/vcpkg/installed/x64-windows-static/lib/zlib.lib zlib-1.2.8/lib/zlib-1.2.8_2015_64.lib
-        cp C:/vcpkg/installed/x64-windows/lib/freeglut.lib glut/3.7.6/lib/glut64.lib
-        cp C:/vcpkg/installed/x64-windows/lib/glew32.lib glew/glew-1.9.0/lib/glew64.lib
-        cp D:/a/opentoonz/opentoonz/libmypaint/build/Release/libmypaint.lib libmypaint/dist/64/libmypaint.lib
-        cp D:/a/opentoonz/opentoonz/superlu/build/SRC/Release/superlu.lib superlu/SuperLU_2015_64.lib
-        cp D:/a/opentoonz/opentoonz/thirdparty/tiff-4.0.3/prj/LibTIFF/x64/Release/LibTIFF.lib tiff-4.0.3/lib/LibTIFF-4.0.3_2015_64.lib
-        cp C:/vcpkg/installed/x64-windows-static/lib/turbojpeg.lib libjpeg-turbo/lib/turbojpeg-static_2015_64.lib
-        cp C:/vcpkg/installed/x64-windows-static/lib/jpeg.lib libjpeg-turbo/lib/jpeg-static_2015_64.lib
+          cd ../..
+        shell: cmd
 
-    - name: Copy headers
-      run: |
-        cd thirdparty
-        cp libpng-1.6.21/scripts/pnglibconf.h.prebuilt libpng-1.6.21/pnglibconf.h
+      - name: Create Package
+        run: |
+          @echo on
+          cd toonz\build
 
-    - name: Build
-      run: |
-        cd toonz
-        mkdir build | Out-Null
-        cd build
-        $env:BOOST_ROOT = '${{ env.BOOST_ROOT }}'
-        $env:QT_PATH = '${{ env.QT_ROOT }}/Qt5.15.2_wintab/5.15.2_wintab/msvc2019_64'
-        cmake ../sources -G 'Visual Studio 16 2019' -Ax64 -DCMAKE_TOOLCHAIN_FILE='C:/vcpkg/scripts/buildsystems/vcpkg.cmake' -DProtobuf_DIR='C:/vcpkg/installed/x64-windows/share/protobuf/' -Dquirc_DIR='C:/vcpkg/installed/x64-windows/share/quirc/' -DTIFF_LIBRARY="$env:LTIFF"  -DQT_PATH="$env:QT_PATH" -DOpenCV_DIR='C:/vcpkg/installed/x64-windows/share/opencv' -DBOOST_ROOT="$env:BOOST_ROOT" -DWITH_WINTAB=ON 
-        cmake --build . --config Release
+          IF EXIST Opentoonz rmdir /S /Q Opentoonz
+          mkdir Opentoonz
 
-    - name: Create Artifact
-      env:
-        VCINSTALLDIR: 'C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC'
-      run: |
-        mkdir artifact | Out-Null
-        cd artifact
-        cp -Recurse ../stuff portablestuff
-        cp ../toonz/build/Release/* .
-        ${{ env.QT_ROOT }}/Qt5.15.2_wintab/5.15.2_wintab/msvc2019_64/bin/windeployqt.exe OpenToonz.exe
-        cp C:/vcpkg/installed/x64-windows/bin/freeglut.dll .
-        cp C:/vcpkg/installed/x64-windows/bin/glew32.dll .
-        cp C:/vcpkg/installed/x64-windows/bin/opencv_world4.dll .
-        cp C:/vcpkg/installed/x64-windows/bin/zlib1.dll .
-        cp C:/vcpkg/installed/x64-windows/bin/libwebp.dll .
-        cp C:/vcpkg/installed/x64-windows/bin/libpng16.dll .
-        cp C:/vcpkg/installed/x64-windows/bin/jpeg62.dll .
-        cp C:/vcpkg/installed/x64-windows/bin/tiff.dll .
-        cp C:/vcpkg/installed/x64-windows/bin/liblzma.dll .
-        cp C:/vcpkg/installed/x64-windows/bin/libprotobuf.dll .
-        cp C:/vcpkg/installed/x64-windows/bin/libwebpdecoder.dll .
+          Rem Copy and configure Opentoonz installation
+          copy /y RelWithDebInfo\*.* Opentoonz
 
-    - uses: actions/upload-artifact@v4
-      with:
-        name: Opentoonz-${{ runner.os }}-${{ github.sha }}
-        path: artifact
+          copy /Y ..\..\thirdparty\glut\3.7.6\lib\glut64.dll Opentoonz
+          copy /Y ..\..\thirdparty\glew\glew-1.9.0\bin\64bit\glew32.dll Opentoonz
+          copy /Y ..\..\thirdparty\libmypaint\dist\64\libiconv-2.dll Opentoonz
+          copy /Y ..\..\thirdparty\libmypaint\dist\64\libintl-8.dll Opentoonz
+          copy /Y ..\..\thirdparty\libmypaint\dist\64\libjson-c-2.dll Opentoonz
+          copy /Y ..\..\thirdparty\libmypaint\dist\64\libmypaint-1-4-0.dll Opentoonz
+
+          IF EXIST C:\tools\opencv (
+             copy /Y "C:\tools\opencv\build\x64\vc14\bin\opencv_world451.dll" Opentoonz
+          ) ELSE (
+             copy /Y "C:\opencv\451\build\x64\vc14\bin\opencv_world451.dll" Opentoonz
+          )
+
+          REM Remove PDB files
+          del Opentoonz\*.pdb
+
+          REM Configuring Opentoonz.exe for deployment
+          set QT_PATH=C:\Qt\5.15.2_wintab\msvc2019_64
+          IF EXIST D:\a\opentoonz\opentoonz\thirdparty\qt\5.15.2_wintab\msvc2019_64 set QT_PATH=D:\a\opentoonz\opentoonz\thirdparty\qt\5.15.2_wintab\msvc2019_64
+
+          set VCINSTALLDIR="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC"
+          IF EXIST "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC" set VCINSTALLDIR="C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC"
+
+          %QT_PATH%\bin\windeployqt.exe Opentoonz\Opentoonz.exe --opengl
+
+          REM Creating Opentoonz Windows Portable package
+
+          IF EXIST Opentoonz\portablestuff rmdir /S /Q Opentoonz\portablestuff
+          REM Copy stuff files directly to portablestuff
+          xcopy /Y /E /I ..\..\stuff Opentoonz\portablestuff
+
+          cd ..\..
+        shell: cmd
+
+      - name: Create Artifact
+        run: |
+          mkdir artifact
+          cp -r toonz\build\Opentoonz artifact
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Opentoonz-${{ runner.os }}-${{ github.sha }}
+          path: artifact
