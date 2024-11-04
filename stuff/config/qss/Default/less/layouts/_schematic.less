@@ -1,0 +1,199 @@
+/* -----------------------------------------------------------------------------
+   Schematic Viewer
+----------------------------------------------------------------------------- */
+
+SchematicViewer {
+  qproperty-TextColor: @node-text-color;
+  qproperty-SelectedBorderColor: @node-selected-border-color;
+  qproperty-VerticalLineColor: @xsh-vertical-column-line-color; // unused?
+
+  qproperty-LevelColumnColor: saturate(lighten(@xsh-toonzraster-color, @node-lighten-amount), @node-sat-amount);
+  qproperty-FullcolorColumnColor: saturate(lighten(@xsh-raster-color, @node-lighten-amount), @node-sat-amount);
+  qproperty-VectorColumnColor: saturate(lighten(@xsh-vector-color, @node-lighten-amount), @node-sat-amount);
+  qproperty-MetaColumnColor: saturate(lighten(@xsh-assistants-color, @node-lighten-amount), @node-sat-amount);
+  qproperty-ChildColumnColor: saturate(lighten(@xsh-sub-color, @node-lighten-amount), @node-sat-amount);
+  qproperty-FxColumnColor: saturate(lighten(@xsh-fx-color, @node-lighten-amount), @node-sat-amount);
+  qproperty-PaletteColumnColor: saturate(lighten(@xsh-palette-color, @node-lighten-amount), @node-sat-amount);
+  qproperty-MeshColumnColor: saturate(lighten(@xsh-mesh-color, @node-lighten-amount), @node-sat-amount);
+  qproperty-ReferenceColumnColor: lighten(@xsh-reference-color, @node-lighten-amount);
+  
+  qproperty-ActiveCameraColor: saturate(lighten(@xsh-camera-active-color, @node-lighten-amount), @node-sat-amount);
+  qproperty-OtherCameraColor: saturate(lighten(@xsh-camera-other-color, @node-lighten-amount), @node-sat-amount);
+  qproperty-ActiveOutputColor: saturate(lighten(@xsh-camera-active-color, @node-lighten-amount), @node-sat-amount);
+  qproperty-OtherOutputColor: saturate(lighten(@xsh-camera-other-color, @node-lighten-amount), @node-sat-amount);
+  
+  qproperty-XsheetColor: saturate(lighten(@xsh-xsheet-color, @node-lighten-amount), @node-sat-amount);
+  qproperty-TableColor: saturate(lighten(@node-table-color, @node-lighten-amount), @node-sat-amount);
+  qproperty-PegColor: saturate(lighten(@xsh-peg-color, @node-lighten-amount), @node-sat-amount);  
+
+  qproperty-PassThroughColor: if(lightness(@node-viewer-bg-color) >= 50%, hsl(0, 0%, 25%), hsl(0, 0%, 75%));
+  qproperty-PassThroughTextColor: if(lightness(@node-viewer-bg-color) >= 50%, black, white);
+
+  qproperty-GroupColor: saturate(lighten(@node-group-color, @node-lighten-amount), @node-sat-amount);
+  qproperty-SplineColor: saturate(lighten(@node-spline-color, @node-lighten-amount), @node-sat-amount);
+  qproperty-NormalFxColor: saturate(lighten(@node-normal-fx-color, @node-lighten-amount), @node-sat-amount);
+  qproperty-MacroFxColor: saturate(lighten(@node-macro-fx-color, @node-lighten-amount), @node-sat-amount);
+  qproperty-ImageAdjustFxColor: saturate(lighten(@node-image-adjust-fx-color, @node-lighten-amount), @node-sat-amount);
+  qproperty-LayerBlendingFxColor: saturate(lighten(@node-layer-blending-fx-color, @node-lighten-amount), @node-sat-amount);
+  qproperty-MatteFxColor: saturate(lighten(@node-matte-fx-color, @node-lighten-amount), @node-sat-amount);
+
+  qproperty-SchematicPreviewButtonBgOnColor: @xsh-button-preview-bg-on-color;
+  qproperty-SchematicPreviewButtonOnImage: url('@{img-url}/schematic/schematic_preview_on.svg');
+  qproperty-SchematicPreviewButtonBgOffColor: @xsh-reference-color;
+  qproperty-SchematicPreviewButtonOffImage: url('@{img-url}/schematic/schematic_preview_off.svg');
+
+  qproperty-SchematicCamstandButtonBgOnColor: @xsh-button-camstand-bg-on-color;
+  qproperty-SchematicCamstandButtonOnImage: url('@{img-url}/schematic/schematic_table_on.svg');
+  qproperty-SchematicCamstandButtonTranspImage: url('@{img-url}/schematic/schematic_table_transp.svg');
+  qproperty-SchematicCamstandButtonBgOffColor: @xsh-reference-color;
+  qproperty-SchematicCamstandButtonOffImage: url('@{img-url}/schematic/schematic_table_off.svg');
+
+  qproperty-LinkColor: @node-link-color;
+  qproperty-SelectedLinkColor: @node-selected-link-color;
+  qproperty-MotionPathLinkColor: @node-motion-path-link-color;
+  qproperty-MotionPathSelectedLinkColor: @node-motion-path-selected-link-color;
+}
+
+/* -----------------------------------------------------------------------------
+   Schematic Node Viewer
+----------------------------------------------------------------------------- */
+
+#SchematicBottomFrame {
+  background-color: @bg-color;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  padding-left: 1;
+
+  & QToolBar {
+    &::separator:horizontal {
+      margin: 0;
+      margin-right: 1;
+    }
+
+    & QToolButton {
+      padding: -2;
+      margin-right: 2;
+      margin-top: 2;
+      margin-bottom: 2;
+    }
+  }
+}
+
+#SchematicSceneViewer {
+  background-color: @node-viewer-bg-color;
+  border-bottom: 1 solid @border-color;
+}
+
+// Schematic toolbars
+QToolBar#MediumPaddingToolBar {
+  & QToolButton {
+    padding-left: 2;
+    padding-right: 1;
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   FX Settings
+----------------------------------------------------------------------------- */
+
+//#FxSettingsTabBar {} // unused?
+
+FxSettings {
+  & QSlider {
+    &::sub-page {
+      background-color: @slider-groove-color;
+    }
+  }
+  
+  // There's multiple ToolBar's, the keyframe and frame navigator ToolBars are
+  // encapsulated by the viewer controls ToolBar
+  & QToolBar { // viewer ToolBar
+    background-color: transparent;
+    border: 1 solid @border-color;
+
+    & when(@titlebar-gradient-effect = true) {
+      .gradient-effect-vertical();
+    }
+
+    & #keyFrameNavigator { // keyframe bar
+      background-color: transparent;
+
+      & #KeyNo,
+      #KeyPartial,
+      #KeyTotal {
+        border-top: 0;
+        border-bottom: 0;
+      }
+    }
+
+    & QToolBar { // frame navigator ToolBar
+      border: 0;
+
+      & QToolButton {
+        border-top: 0;
+        border-bottom: 0;
+        border-radius: 0;
+      }
+    }
+
+    & QToolButton {
+      border-top: 0;
+      border-bottom: 0;
+      border-radius: 0;
+      padding-top: 1;
+      padding-bottom: 1;
+    }
+  }
+}
+
+#FxSettingsLabel {
+  color: @fx-settings-label-color;
+
+  & when(@bold-fxlabel-text = true) {
+    font-weight: bold;
+  }
+}
+
+#FxSettingsHelpButton {
+  margin: 0 1 1 1;
+  padding: 5;
+  min-width: 30;
+  icon-size: 16px;
+  qproperty-iconSize: 16px;
+}
+
+ChannelBar {
+  qproperty-TextColor: @text-color;
+}
+
+#TitleTxtLabel {
+  color: @normal-label-color;
+
+  & when(@bold-label-text = true) {
+    font-weight: bold;
+  }
+}
+
+/* Keyframe Button Colors
+----------------------------------------------------------------------------- */
+
+ParamFieldKeyToggle {
+  @bg-lightness: lightness(@bg-color);
+
+  // No key set
+  qproperty-KeyOffColor: @toolbutton-bg-color;
+  qproperty-KeyBorderOffColor: @toolbutton-border-color;
+  // Modified (unsaved)
+  qproperty-KeyModifiedColor: @keyframe-modified-color;
+  qproperty-KeyBorderModifiedColor: @keyframe-modified-border-color;
+  // Key set / On
+  qproperty-KeyOnColor: @keyframe-total-color;
+  qproperty-KeyBorderOnColor: @keyframe-total-border-color;
+  // Inbetween
+  qproperty-KeyInbetweenColor: @keyframe-inbetween-color;
+  qproperty-KeyBorderInbetweenColor: @keyframe-inbetween-border-color;
+  // Highlight
+  qproperty-KeyHighlightColor: @keyframe-highlight-color;
+  qproperty-KeyBorderHighlightColor: @keyframe-highlight-border-color;
+}

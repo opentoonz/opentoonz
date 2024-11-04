@@ -1,0 +1,73 @@
+/* -----------------------------------------------------------------------------
+   Keyframe Navigator
+----------------------------------------------------------------------------- */
+
+#keyFrameNavigator {
+  background: transparent;
+  margin: 0;
+  padding: 0;
+
+  #PreviousKey,
+  #NextKey,
+  #KeyNo,
+  #KeyPartial,
+  #KeyTotal {
+    margin: 0 2px;
+    padding-right: -1px;
+    width: 20px;
+    height: 20px;
+  }
+
+  #KeyNo {
+    background-color: @toolbutton-bg-color;
+    border: 1px solid @toolbutton-border-color;
+
+    &:hover {
+      background-color: @toolbutton-bg-color-hover;
+      border-color: @toolbutton-border-color-hover;
+    }
+
+    &:pressed {
+      background-color: @toolbutton-bg-color-pressed;
+      border-color: @toolbutton-border-color-pressed;
+    }
+  }
+
+  #KeyPartial {
+    background-color: @keyframe-total-color;
+    border: 1px solid @keyframe-total-border-color;
+
+    &::hover {
+      background-color: @keyframe-total-color-hover;
+      border-color: @keyframe-total-border-color;
+    }
+
+    &:pressed {
+      background-color: darken(@keyframe-total-color, 8% * @pressed-adjust-amount);
+      border-color: @keyframe-total-border-color;
+    }
+  }
+
+  #KeyTotal {
+    background-color: @keyframe-total-color;
+    border: 1px solid @keyframe-total-border-color;
+
+    &:hover {
+      background-color: @keyframe-total-color-hover;
+      border-color: @keyframe-total-border-color-hover;
+    }
+
+    &:pressed {
+      background-color: darken(@keyframe-total-color, 8% * @pressed-adjust-amount);
+      border-color: @keyframe-total-border-color;
+  
+    }
+  }
+
+  & QToolButton#qt_toolbar_ext_button {
+    // Very squished and glitchy, the best we can do is extend the height a bit
+    // as seen in the Function Editor panel (top)
+    padding-bottom: 3;
+    border-radius: 2;
+  }
+}

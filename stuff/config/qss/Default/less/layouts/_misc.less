@@ -1,0 +1,91 @@
+/* -----------------------------------------------------------------------------
+   Misc 
+----------------------------------------------------------------------------- */
+
+PencilTestPopup {
+  min-height: 730; /* Allow for using a 768 screen */
+  min-width: 512;  /* Some clipping will still occur on width, but this
+                      allows for filling half of a 1024 screen */
+}
+
+// #HistoryPanel {}
+
+#MatchLineButton {
+  background-color: lighten(@bg-color, 15);
+
+  &:checked {
+    background-color: lighten(@bg-color, 30);
+    border: 2 solid @hl-color;
+    border-radius: 2;
+  }
+}
+
+#LargeSizedText {
+  font-size: 17px;
+}
+
+/* -----------------------------------------------------------------------------
+   Stop Motion Controller
+----------------------------------------------------------------------------- */
+
+#StopMotionController {
+  & QScrollArea {
+    margin: 8;
+  }
+
+  & QPushButton {
+    // Add spacing to buttons
+    margin: 2 1;
+    padding: 0;
+  }
+
+  & #TabBarContainer {
+    margin-left: -4; // might not work
+  }
+
+  & #bottomWidget {
+    border-top: 1 solid @border-color;
+    padding: 3 2 8 3;
+
+    & QPushButton {
+      // Override above margin reset
+      padding: 3 5;
+    }
+  }
+}
+
+// #StopMotionTabBar {}
+
+/* -----------------------------------------------------------------------------
+   Unknowns + Legacy
+----------------------------------------------------------------------------- */
+
+//! Classes that are unknown and considered redundant, they need investigation
+//  before being removed.
+
+// Classes from [v1.1.2]
+
+#StartupLabel {
+    padding: 3;
+    
+    &:hover {
+      background: lighten(@bg-color, 10);
+    }
+}
+
+QStatusBar {
+  background-color: rgb(192,192,192);
+
+  &::item {
+    border: 0;
+  }
+
+  & QLabel {
+    background-color: rgb(192,192,192);
+  }
+
+  & #StatusBarLabel {
+    background-color: rgb(255,255,255);
+    padding: 1 3;
+  }
+}

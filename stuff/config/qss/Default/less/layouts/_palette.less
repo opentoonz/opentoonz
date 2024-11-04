@@ -1,0 +1,95 @@
+/* -----------------------------------------------------------------------------
+   Palette Viewer / Studio Palette
+----------------------------------------------------------------------------- */
+
+PaletteViewer {
+  & DvScrollWidget {
+    & QPushButton { // scroll buttons
+      margin-bottom: 0;
+      max-width: 15;
+      min-width: 15;
+    }
+  }
+
+  & QToolBar {
+    background: transparent;
+
+    &::separator:horizontal {
+      margin: 0; // very compact space, so no need for margin
+    }
+
+    & QToolButton {
+      .flat-tool-button-style();
+      padding: 0;
+      padding-right: -2;
+      padding-left: -1;
+    }
+
+    & #keyFrameNavigator {
+      & #NextKey,
+      #PreviousKey,
+      #KeyNo,
+      #KeyPartial,
+      #KeyTotal {
+        max-width: 20;
+        max-height: 20;
+        padding: 1;
+        border: 0;
+        margin: 0;
+      }
+    }
+  }
+}
+
+#StudioPalette {
+  & QTreeView {
+    // Override QTreeView and use bg-color instead
+    background-color: @bg-color;
+    alternate-background-color: @bg-color;
+  }
+}
+
+#PageViewer {
+  qproperty-TextColor: @text-color;
+  qproperty-SelectedBorderColor: @palette-SelectedBorderColor;
+  qproperty-NumpadShortcutBgColor: @palette-NumpadShortcutBgColor;
+  qproperty-NumpadShortcutBorderColor: @palette-NumpadShortcutBorderColor;
+
+  qproperty-SeparatorColor: @palette-SeparatorColor;
+  qproperty-CurrentCellColor: @palette-CurrentCellColor;
+  qproperty-SelectedCellColor: @palette-SelectedCellColor;
+  qproperty-ListNumpadShortcutBorderColor: @palette-ListNumpadShortcutBorderColor;
+}
+
+#PaletteLockButton {
+  border-radius: 0;
+
+  &:checked {
+    background-color: @lockbutton-bg-color-checked;
+    border-color: @lockbutton-border-color-checked;
+
+    &:hover {
+      background-color: @lockbutton-bg-color-checked-hover;
+      border-color: @lockbutton-bg-color-checked-hover;
+    }
+  }
+}
+
+#PltPageViewerScrollArea {
+  border-bottom: 1 solid @border-color;
+}
+
+/* -----------------------------------------------------------------------------
+   Quick Renamer
+----------------------------------------------------------------------------- */
+
+#WordButton {
+  .main-button-style();
+  // Remove horizontal padding otherwise the text gets cropped out
+  padding-right: 0;
+  padding-left: 0;
+}
+
+#SolidLineFrame {
+  .main-frame-style();
+}

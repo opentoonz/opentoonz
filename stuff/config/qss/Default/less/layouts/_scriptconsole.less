@@ -1,0 +1,20 @@
+/* -----------------------------------------------------------------------------
+   Script Console
+----------------------------------------------------------------------------- */
+
+//! Most properties are hard-coded so these may not work.
+
+#ScriptConsole {
+  .font-style-monospace();
+  border: 0;
+  color: #000;
+  padding: 3;
+
+  & QFrame {
+    background-color: rgb(220, 220, 220);
+  }
+
+  & TPanelTitleBar {
+    background-color: @titlebar-bg-color;
+  }
+}

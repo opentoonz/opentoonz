@@ -1,0 +1,110 @@
+/* -----------------------------------------------------------------------------
+   File Browser
+----------------------------------------------------------------------------- */
+
+// Left pane
+#DirTreeView {
+  background-color: @tree-bg-color;
+  alternate-background-color: @tree-bg-color;
+  border: 1 solid @border-color;
+  border-right: 0; // sits against QSplitter here, no need for border
+
+  &::branch {
+    .treeview-branch-style();
+  }
+}
+
+// Right pane
+#FileBrowser { // outer area
+  background-color: @browser-window-bg-color;
+  
+  & #buttonBar {
+    background-color: @browser-window-bg-color;
+    & QToolButton {
+      .tool-button-style(2, 2, 2, 2);
+    }
+  }
+
+  & #castFrame {
+    border: 1 solid @border-color;
+    border-left: 0; // sits against QSplitter here, no need for border
+    margin: 0;
+  }
+
+  & QSplitter::handle:horizontal {
+    border-top: 1 solid @border-color;
+    border-bottom: 1 solid @border-color;
+  }
+}
+
+DvItemViewerPanel { // contents
+  background-color: @browser-right-pane-bg-color;
+  qproperty-TextColor: @browser-text-color;
+  qproperty-AlternateBackground: @tree-bg-color-alt-row;
+  qproperty-SelectedTextColor: @hl-text-color;
+  qproperty-FolderTextColor: @browser-folder-text-color;
+  qproperty-SelectedItemBackground: @browser-selected-item-bg-color;
+}
+
+DvItemViewerTitleBar { // column headers
+  qproperty-ColColor: @browser-itemview-col-color;
+  qproperty-ColSortedColor: @browser-itemview-col-color-sorted;
+  qproperty-ColTextColor: @browser-itemview-col-text-color;
+  qproperty-ColBorderColor: @browser-itemview-col-border-color;
+}
+
+// An unknown legacy class, C++ needs to be checked before removing
+// #DvItemViewerButtonBar {}
+
+#LoadLevelFrame {
+  .main-frame-style();
+}
+
+#PsdSettingsGroupBox {
+  .main-frame-style();
+}
+
+StyledTreeView {
+  qproperty-TextColor: @browser-text-color;
+  qproperty-SelectedTextColor: @hl-text-color;
+  qproperty-SelectedItemBackground: @hl-color;
+  qproperty-FolderTextColor: @browser-folder-text-color;
+  qproperty-SelectedFolderTextColor: @browser-folder-text-color-selected;
+  alternate-background-color: @tree-bg-color-alt-row;
+  background-color: @tree-bg-color;
+  border: 1 solid @border-color;
+}
+
+#FileDoesNotExistLabel {
+    color: @error-label-color;
+}
+
+/* -----------------------------------------------------------------------------
+   Scene Cast
+----------------------------------------------------------------------------- */
+
+#SceneCast {
+  & QToolBar {
+    border-top: 1 solid @border-color;
+
+    &::separator {
+      &:horizontal {
+        margin: 1 0 0 2; // 1 top margin prevents overlapping Toolbar border
+      }
+    }
+  }
+
+  & QToolButton {
+    margin: 3 0 2 2;
+    padding: 1;
+  }
+}
+
+#CastBrowser {
+  border: 0;
+  margin: 0;
+}
+
+#CastBrowserFolderName {
+  border-bottom: 1 solid @border-color;
+}

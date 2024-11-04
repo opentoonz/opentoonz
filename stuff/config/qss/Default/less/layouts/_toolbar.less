@@ -1,0 +1,105 @@
+/* -----------------------------------------------------------------------------
+   Tools Window
+----------------------------------------------------------------------------- */
+
+#ToolBar {
+  & QToolBar {
+    padding-left: 3;
+  }
+  
+  & QToolButton {
+    padding: 1 0 0 1;
+    margin-top: 1;
+    margin-bottom: 1;
+  }
+
+  & QToolButton#qt_toolbar_ext_button {
+    background-image: url('@{img-url}/misc/toolbar_extension_vertical.png');
+  }
+}
+
+// The big arrow expand button to shrink/expand the toolbar
+#expandButton {
+  &:checked {
+    background-color: transparent;
+    border-color: transparent;
+    color: @text-color;
+
+    &:hover {
+      background-color: @toolbutton-bg-color-hover;
+      border-color: @toolbutton-border-color-hover;
+    }
+
+    &:pressed {
+      background-color: @toolbutton-bg-color-pressed;
+      border-color: @toolbutton-border-color-pressed;
+    }
+  }
+}
+
+/* XSheet Toolbar & Command Bar
+----------------------------------------------------------------------------- */
+
+#XSheetToolbar {
+  padding: 0;
+  margin: 0;
+  border-bottom: 1 solid @border-color;
+
+  & QToolButton#qt_toolbar_ext_button {
+    margin: 0;
+    padding-top: 7; // increase height a bit
+  }
+
+  & QToolButton {
+    padding: 0;
+    padding-right: -1;
+    padding-bottom: -1;
+    min-height: 20;
+    margin-left: 2;
+    margin-right: 0;
+  }
+
+  &::separator:horizontal {
+    margin: 0 0 1 2;
+  }
+}
+
+#CommandBar {
+  margin: 0;
+  padding: 0;
+  border: 0;
+
+  &::separator:horizontal {
+    margin-right: 0;
+    margin-left: 2;
+  }
+
+  & QToolButton {
+    margin: 0 0 0 2;
+    padding: 0;
+    padding-top: -1;
+    padding-left: -0;
+    padding-right: -1;
+    padding-bottom: -0;
+    min-height: 20;
+    icon-size: 10px;
+  }
+
+  & QToolButton#qt_toolbar_ext_button {
+    margin: 0;
+    padding-top: 4; // increase height a bit
+  }
+
+  & TPanelTitleBar {
+    border-right: 1 solid @border-color;
+    border-bottom: 0;
+    border-radius: 0;
+    border-top-left-radius: @titlebar-border-radius;
+    border-bottom-left-radius: @titlebar-border-radius;
+    max-width: 18;
+
+    & when (@titlebar-gradient-effect = true) {
+      .gradient-effect-horizontal();
+    }
+  }
+}

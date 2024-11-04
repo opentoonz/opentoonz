@@ -1,0 +1,242 @@
+/* -----------------------------------------------------------------------------
+   ComboViewer / Viewer / FlipBook
+----------------------------------------------------------------------------- */
+
+#ComboViewerPanel {
+  & Toolbar {
+    border-bottom: 1 solid @border-color; // line against viewport
+
+    &::separator:horizontal {
+      margin: 0 0 1 2; // 1 bottom margin prevents overlapping Toolbar border
+      padding: 0;
+    }
+
+    & QToolButton {
+      margin: 2 0 3 2; // 1px extra bottom-margin to allow border to show that
+                       // separates toolbar and viewer
+      padding: 1 0 0 1;
+    }
+
+    & QToolButton#qt_toolbar_ext_button {
+      margin: 0;
+      margin-bottom: 1; // so that the toolbar border shows
+      padding-top: 4;
+      background-image: url('@{img-url}/misc/toolbar_extension_horizontal.png');
+    }
+  }
+}
+
+#ComboViewerToolOptions {
+  border-bottom: 1 solid @border-color; // border viewport
+
+  & #ScrollLeftButton,
+  & #ScrollRightButton {
+    .scroll-button-style();
+    margin-top: -1;
+    margin-bottom: -1;
+  }
+
+  & #ScrollRightButton {
+    .scroll-right-button-style();
+  }
+
+  & #ScrollLeftButton {
+    .scroll-left-button-style();
+  }
+}
+
+#ComboViewer,
+#ViewerPanel,
+FlipBook {
+  & #ToolBarContainer {
+    background-color: transparent;
+    border-top: 1 solid @border-color; // border between viewport
+    border-bottom: 1 solid @border-color;
+
+    & #ScrollRightButton {
+      margin-right: 0; /* #ScrollRightButton has a border and the right side is
+                          hidden with margin-right -1 by default. We want the
+                          border to show here so we'll reset it. */
+    }
+  }
+}
+
+// Options menu
+#flipCustomize {
+  .tool-button-style();
+  margin-left: 3;
+
+  &::menu-button {
+    background-color: transparent;
+    width: 35;
+  }
+
+  &::menu-arrow {
+    image: none;
+  }
+}
+
+QToolBar#FlipConsolePlayToolBar {
+  &::separator:horizontal {
+    border-color: @toolbar-separator-color;
+    margin: 0 1 0 1;
+  }
+
+  & QToolButton {
+    margin: 2 1 2 1;
+    padding-left: 2;
+    padding-right: 1; // one 1px less because Qt adds 1px extra by default here
+  }
+
+  & #KeyNo,
+  & #KeyPartial,
+  & #KeyTotal,
+  & #PreviousKey,
+  & #NextKey {
+    padding-right: 1;
+    padding-left: 1;
+    max-width: 20;
+    max-height: 20;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+  
+  & #PreviousKey,
+  & #NextKey {
+    margin: 0 2;
+  }
+}
+
+#ViewerFpsSlider {
+  // This is a customized QScrollBar!
+  background-color: transparent;
+  background-image: url('@{img-url}/@{slider-groove-img}');
+  background-repeat: repeat-x;
+  background-position: center center;
+  height: 21;
+  margin: 0 3 0 37;
+  max-width: 500;
+  min-width: 0;
+
+  &::sub-line:horizontal {
+    subcontrol-origin: absolute;
+    background-color: @button-bg-color;
+    border: 1 solid @border-color;
+    border-top-left-radius: 2;
+    border-bottom-left-radius: 2;
+    height: 19;
+    left: -33;
+    width: 14;
+  }
+
+  &::add-line:horizontal {
+    subcontrol-position: left;
+    background-color: @button-bg-color;
+    border: 1 solid @border-color;
+    border-top-right-radius: 2;
+    border-bottom-right-radius: 2;
+    left: 18;
+    height: 19;
+    image-position: center center;
+    width: 13;
+  }
+
+  &::sub-line:horizontal,
+  &::add-line:horizontal {
+    & when (@gradient-effect = true) {
+      .gradient-effect-vertical();
+    }
+
+    &:hover {
+      background-color: @button-bg-color-hover;
+      border-color: @border-color;
+      color: @button-text-color-hover;
+    }
+
+    &:pressed {
+      background-color: @button-bg-color-pressed;
+    }
+
+    &:disabled {
+      background-color: @button-bg-color-disabled;
+      border-color: @button-border-color-disabled;
+      color: @text-color-disabled;
+    }
+  }
+
+  &::handle {
+    &::horizontal {
+      @size: 9;
+      background-color: @slider-handle-bg-color;
+      border: 1 solid @slider-handle-border-color;
+      border-radius: 2;
+      margin: 2 0 3 0;
+      min-width: @size;
+      width: @size;
+      max-width: @size;
+
+      &:hover {
+        background-color: lighten(@slider-handle-bg-color, 8% * @hover-adjust-amount);
+      }
+
+      &:pressed {
+        background-color: darken(@slider-handle-bg-color, 8% * @pressed-adjust-amount);
+      }
+    }
+  }
+}
+
+FlipConsole {
+  qproperty-FpsFieldColor: @input-bg-color;
+}
+
+FlipSlider {
+  qproperty-PBHeight: 20;
+
+  // Slider
+  qproperty-PBOverlay: url('@{img-url}/@{flipslider-img}');
+  qproperty-PBColorMarginLeft: 1;
+  qproperty-PBColorMarginTop: 3;
+  qproperty-PBColorMarginRight: 1;
+  qproperty-PBColorMarginBottom: 3;
+  
+  // Marker
+  qproperty-PBMarker: url('@{img-url}/@{flipmarker-img}');
+  qproperty-PBMarkerMarginLeft: 4;
+  qproperty-PBMarkerMarginRight: 4;
+  qproperty-notStartedColor: @flipslider-notstarted-color;
+  qproperty-startedColor: @flipslider-started-color;
+  qproperty-baseColor: @flipslider-base-color;
+  qproperty-finishedColor: @flipslider-finished-color;
+}
+
+Ruler {
+  qproperty-ParentBGColor: @viewer-ruler-bg-color;
+  qproperty-ScaleColor: @viewer-ruler-scale-color;
+  qproperty-HandleColor: @viewer-ruler-handle-color;
+  qproperty-HandleDragColor: @viewer-ruler-handle-drag-color;
+  qproperty-BorderColor: @viewer-ruler-border-color;
+}
+
+#RulerToolOptionValues {
+  color: @viewer-ruler-tool-options-text-color;
+}
+
+#enableBlankFrameButton {
+  .main-button-style();
+  background-color: transparent;
+  border-color: transparent;
+  color: @text-color-disabled;
+  padding: 0;
+  font-weight: bold;
+  margin: 0;
+
+  &:checked {
+    border-width: 2;
+    border-color: @border-color;
+
+    &:hover {
+      border-color: @border-color;
+    }
+  }
+}

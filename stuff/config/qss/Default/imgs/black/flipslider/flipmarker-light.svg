@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="18px" height="18px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <path d="M18,2l0,14c0,1.104 -0.896,2 -2,2l-14,0c-1.104,0 -2,-0.896 -2,-2l0,-14c0,-1.104 0.896,-2 2,-2l14,0c1.104,0 2,0.896 2,2Zm-15,1l0,12l12,0l0,-12l-12,0Z" style="fill:#1f1f1f;"/>
+    <path d="M17,3l0,12c0,1.104 -0.896,2 -2,2l-12,0c-1.104,0 -2,-0.896 -2,-2l0,-12c0,-1.104 0.896,-2 2,-2l12,0c1.104,0 2,0.896 2,2Zm-13,1l0,10l10,0l0,-10l-10,0Z" style="fill:#1f1f1f;"/>
+    <rect x="4" y="4" width="10" height="10" style="fill:url(#_Linear1);"/>
+    <rect id="rect2" x="4" y="4" width="10" height="10" style="fill:#fff;fill-opacity:0.25;"/>
+    <path id="rect21" serif:id="rect2" d="M17,2l0,14c0,0.552 -0.448,1 -1,1l-14,0c-0.552,0 -1,-0.448 -1,-1l0,-14c0,-0.552 0.448,-1 1,-1l14,0c0.552,0 1,0.448 1,1Zm-14,1l0,12l12,0l0,-12l-12,0Z" style="fill:#afafaf;"/>
+    <defs>
+        <linearGradient id="_Linear1" x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(1.10218e-15,18,-18,1.10218e-15,9,0)"><stop offset="0" style="stop-color:#fff;stop-opacity:0.13"/><stop offset="1" style="stop-color:#191919;stop-opacity:0.13"/></linearGradient>
+    </defs>
+</svg>

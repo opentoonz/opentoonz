@@ -1,0 +1,614 @@
+/* -----------------------------------------------------------------------------
+   Buttons
+----------------------------------------------------------------------------- */
+
+QPushButton {
+  .main-button-style();
+}
+
+#PushButton_NoPadding {
+  padding: 3;
+}
+
+#CustomPanelButton {
+  .main-button-style();
+  padding: 0;
+}
+
+/* -----------------------------------------------------------------------------
+   ComboBox
+----------------------------------------------------------------------------- */
+
+QComboBox {
+  // We style QComboBox to look the same as QPushButton, but be aware we cannot
+  // include the .main-button-style() due to differences in pseudo-classes.
+  background-color: @button-bg-color;
+  border-color: @button-border-color;
+  border-width: 1;
+  border-style: solid;
+  border-radius: @button-border-radius;
+  color: @button-text-color;
+  margin: 0;
+  padding: 1 0 1 4;
+
+  & when (@gradient-effect = true) {
+    .gradient-effect-vertical();
+  }
+
+  &:hover {
+    background-color: @button-bg-color-hover;
+    color: @button-text-color-hover;
+    border-color: @button-border-color-hover;
+  }
+
+  &:checked {
+    border-color: @combobox-border-color-focus;
+  }
+
+  &:pressed {
+    background-color: @button-bg-color;
+    border-color: @combobox-border-color-focus;
+    color: @button-text-color-pressed;
+
+    &:focus {
+      background-color: @button-bg-color;
+      border-color: @combobox-border-color-focus;
+    }
+  }
+
+  &:disabled {
+    background-color: @button-bg-color-disabled;
+    border-color: @button-border-color-disabled;
+    color: @text-color-disabled;
+  }
+
+  &:focus {
+    background-color: @button-bg-color;
+    border-color: @combobox-border-color-focus;
+
+    &:hover {
+      background-color: @button-bg-color-hover;
+    }
+  }
+
+  &:editable {
+    color: @input-text-color;
+    background: none; // reset gradient-effect if used
+    background-color: @input-bg-color;
+    border-color: @input-border-color;
+    selection-background-color: @input-selection-bg-color;
+    selection-color: @input-selection-text-color;
+    padding: 1 0 1 3;
+    
+    &:hover {
+      background-color: @input-bg-color-hover;
+      border-color: @input-border-color-hover;
+    }
+
+    &:checked {
+      border-color: @input-border-color-focus;
+    }
+
+    &:focus {
+      border-color: @input-border-color-focus;
+    }
+  }
+
+  &::drop-down {
+    border: 0 solid transparent; // make invisible
+    image: url('@{img-url}/combobox/combo_downarrow.svg');
+    image-position: center center;
+    width: 16;
+
+    &:disabled {
+      image: url('@{img-url}/combobox/combo_downarrow_disabled.svg');
+
+      &:editable {
+        background-color: @button-bg-color-disabled;
+      }
+    }
+
+    &:editable {
+      background-color: @button-bg-color;
+      border-left: 1 solid @border-color;
+      border-top-right-radius: min(0, @button-border-radius - 1);
+      border-bottom-right-radius: min(0, @button-border-radius - 1);
+
+      & when (@gradient-effect = true) {
+        .gradient-effect-vertical();
+      }
+  
+      &:hover {
+        background-color: @button-bg-color-hover;
+      }
+    }
+  }
+
+  // Menu item style
+  & QAbstractItemView {
+    background-color: @menu-bg-color;
+    selection-background-color: @menu-item-bg-color-selected;
+    selection-color: @menu-item-text-color-selected;
+    border: 1 solid @menu-border-color;
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   Textfields
+----------------------------------------------------------------------------- */
+
+QPlainTextEdit,
+QLineEdit,
+QTextEdit[readOnly="false"] {
+  .textfield-style();
+}
+
+// Reset all styles for read-only QTextEdit
+QTextEdit[readOnly="true"] {
+  background-color: @bg-color;
+  color: @text-color;
+  border: 0;
+
+  &:focus,
+  &:disabled {
+    background-color: @bg-color;
+    color: @text-color;
+    border: 0;
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   Options
+----------------------------------------------------------------------------- */
+
+QCheckBox {
+  color: @text-color;
+  padding: 0 2 0 0;
+  border-radius: 2;
+
+  &:hover {
+    background-color: @checkbox-text-bg-color-hover;
+    color: @checkbox-text-color-hover;
+  }
+
+  &:disabled {
+    color: @text-color-disabled;
+  }
+
+  &::indicator {
+    .checkbox-indicator-style();
+  }
+}
+
+QRadioButton {
+  color: @text-color;
+
+  &:hover {
+    color: @checkbox-text-color-hover;
+  }
+
+  &:checked {
+    color: @text-color;
+  }
+
+  &:disabled {
+    color: @text-color-disabled;
+  }
+
+  &::indicator {
+    .radio-button-style();
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   GroupBox
+----------------------------------------------------------------------------- */
+
+QGroupBox {
+  .main-frame-style();
+  margin: 6 0 0 0;
+  padding: 5 5;
+
+  &::title {
+    subcontrol-origin: margin;
+    color: @text-color;
+    left: 15;
+    margin: -2 0 0 0;
+    padding: 0 3;
+    border-radius: 2;
+
+    &:hover {
+      color: @checkbox-text-color-hover;
+      background-color: @checkbox-text-bg-color-hover;
+    }
+
+    &:disabled {
+      color: @text-color-disabled;
+    }
+  }
+
+  &::indicator {
+    .checkbox-indicator-style();
+    subcontrol-origin: margin;
+    margin-top: 2;
+  }
+
+  &:disabled {
+    color: @text-color-disabled;
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   Sliders
+----------------------------------------------------------------------------- */
+
+QSlider {
+  background-color: transparent;
+
+  &::sub-page {
+    background-color: @slider-groove-value-color;
+    border: 1 solid @slider-groove-border-color;
+    border-radius: 2;
+    
+    &:disabled {
+      background-color: desaturate(mix(@slider-groove-value-color, @bg-color, @disabled-amount), 100%);
+      border-color: mix(@slider-groove-border-color, @bg-color, @disabled-amount);
+    }
+    
+    &:horizontal {
+      margin: @slider-v-margin 0 @slider-v-margin 0;
+    }
+    &:vertical {
+      margin: 1 @slider-v-margin 1 @slider-v-margin;
+    }
+  }
+
+  &::add-page {
+    background-color: @slider-groove-color;
+    border: 1 solid @slider-groove-border-color;
+    border-radius: 2;
+    
+    &:disabled {
+      background-color: mix(@slider-groove-color, @bg-color, @disabled-amount);
+      border-color: mix(@slider-groove-border-color, @bg-color, @disabled-amount);
+    }
+    
+    &:horizontal {
+      margin: @slider-v-margin 0 @slider-v-margin 0;
+    }
+    &:vertical {
+      margin: 0 @slider-v-margin 0 @slider-v-margin;
+    }
+  }
+
+  &::groove {
+    // Logical area
+    background-color: transparent;
+    margin: 0;
+
+    &:horizontal {
+      height: 20;
+      min-height: 20;
+    }
+
+    &:vertical {
+      width: 20;
+      min-width: 20;
+    }
+
+    // &:disabled {}
+  }
+
+  &::handle {
+    &:horizontal {
+      margin-left: @slider-handle-margin;
+      margin-right: @slider-handle-margin;
+      width: @slider-handle-size; // should be image width
+      image: url('@{img-url}/@{slider-handle-img}');
+
+      &:disabled {
+        image: url('@{img-url}/@{slider-handle-img-disabled}');
+      }
+    }
+
+    &:vertical {
+      margin-top: @slider-handle-margin;
+      margin-bottom: @slider-handle-margin;
+      height: @slider-handle-size;
+      image: url('@{img-url}/@{slider-v-handle-img}');
+
+      &:disabled {
+        image: url('@{img-url}/@{slider-v-handle-img-disabled}');
+      }
+    }
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   Double Sliders
+----------------------------------------------------------------------------- */
+
+#IntPairField, 
+#DoublePairField {
+	qproperty-LightLineColor: @slider-groove-color;
+  qproperty-LightLineEdgeColor: @slider-groove-color;
+	qproperty-DarkLineColor: @slider-groove-color;
+  qproperty-MiddleLineColor: @slider-groove-color;
+
+	qproperty-HandleLeftPixmap: url("@{img-url}/@{slider-handle-img}");
+	qproperty-HandleRightPixmap: url("@{img-url}/@{slider-handle-img}");
+
+	qproperty-HandleLeftGrayPixmap: url("@{img-url}/@{slider-handle-img-disabled}");
+  qproperty-HandleRightGrayPixmap: url("@{img-url}/@{slider-handle-img-disabled}");
+}
+
+/* -----------------------------------------------------------------------------
+   Labels
+----------------------------------------------------------------------------- */
+
+QLabel {
+  background-color: transparent;
+  color: @text-color;
+
+  &:disabled {
+    color: @text-color-disabled;
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   Tool Buttons
+----------------------------------------------------------------------------- */
+
+QToolButton {
+  .tool-button-style();
+  margin-left: 1;
+  margin-right: 1;
+
+  &::menu-indicator {
+    image: none;
+  }
+
+  &::menu-button {
+    border-image: none;
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   QToolBar (and misc Toolbars)
+----------------------------------------------------------------------------- */
+// The following is for QToolBar Qt widget and not ToolBar panel. But note, the
+// panel incorporates a QToolBar so the styles below will appear in the panel.
+
+QToolBar {
+  padding: 0;
+  icon-size: 20px;
+  qproperty-iconSize: 20px;
+
+  &::separator {
+    &:horizontal {
+      border-left: 1 solid @toolbar-separator-color;
+      margin: 0 1;
+      width: 0;
+    }
+
+    &:vertical {
+      border-top: 1 solid @toolbar-separator-color;
+      height: 0;
+      margin: 1 0;
+    }
+  }
+
+  & QLabel {
+    margin-top: 1;
+  }
+
+  & QToolBar {
+    border: 0;
+  }
+}
+
+QToolBarExtension {
+  margin: 0;
+  padding: 0;
+  qproperty-icon: none; // hide default Qt icon
+  background-image: url('@{img-url}/misc/toolbar_extension_horizontal.png');
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+
+// Is the following unused?
+// DvScrollWidget ToolBar
+// DvScrollWidget {}
+
+#ScrollLeftButton,
+#ScrollRightButton,
+#ScrollUpButton,
+#ScrollDownButton {
+  .scroll-button-style();
+  min-width: 20; // fixes 'viewer console' left scroll button size
+}
+
+#ScrollLeftButton {
+  .scroll-left-button-style();
+}
+
+#ScrollRightButton {
+  .scroll-right-button-style();
+}
+
+#ScrollUpButton {
+  .scroll-up-button-style();
+}
+
+#ScrollDownButton {
+  .scroll-down-button-style();
+}
+
+/* -----------------------------------------------------------------------------
+   Frame Navigator Widget
+----------------------------------------------------------------------------- */
+
+QToolBar#WidePaddingToolBar {
+  margin: 0;
+  padding: 0;
+
+  & QToolButton {
+    padding-left: 2;
+    padding-right: 1;
+    min-width: 30;
+    min-height: 20;
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   Treeviews
+----------------------------------------------------------------------------- */
+
+QTreeWidget {
+  .treeview-item-style(true);
+  
+  &::branch {
+    .treeview-branch-style();
+  }
+}
+
+QTreeView { // Menu editor
+  .treeview-item-style(true);
+
+  &::branch {
+    .treeview-branch-style();
+  }
+}
+
+QListView {
+  outline: 0; // hide focus border
+  background-color: @tree-bg-color;
+  alternate-background-color: @tree-bg-color-alt-row;
+}
+
+/* -----------------------------------------------------------------------------
+   Treeview Column Headers
+----------------------------------------------------------------------------- */
+
+QHeaderView::section {
+  background-color: @browser-itemview-col-color;
+  border: 1 solid @browser-itemview-col-border-color;
+  padding-left: 4;
+  margin-left: -1;
+  margin-top: -1;
+}
+
+/* -----------------------------------------------------------------------------
+   Tabs
+----------------------------------------------------------------------------- */
+
+// Round style, seen in Startup Popup, etc.
+QTabWidget::pane {
+  background-color: transparent;
+  top: -1; // move border under tabs
+  border: 1 solid @groupbox-border-color;
+}
+
+QTabBar {
+  background-color: transparent;
+
+  &::tab {
+    @h-padding: 7;
+    background-color: @tab-bg-color;
+    border: 1 solid @groupbox-border-color;
+    color: @tab-text-color;
+    margin-top: 4;
+    margin-right: -1; // pull next tab in by 1px to overlap their borders
+    margin-bottom: 0;
+    margin-left: 0;
+    padding: 2 @h-padding 1 @h-padding;
+  
+    & when (@gradient-effect = true) {
+      .gradient-effect-vertical();
+    }
+
+    &:hover {
+      background-color: @tab-bg-color-hover;
+      color: @tab-text-color-hover;
+    }
+
+    &:selected {
+      background-color: @tab-bg-color-selected;
+      border-top-right-radius: 2;
+      border-top-left-radius: 2;
+      border-bottom-color: @tab-bg-color-selected;
+      color: @tab-text-color-selected;
+      margin-top: 1;
+      margin-right: -1;
+      margin-bottom: -2;
+      margin-left: 0;
+      padding: 2 @h-padding 2 @h-padding;
+    }
+
+    &:only-one {
+      margin: 1 0 0 0;
+      padding: 3 @h-padding 3 @h-padding;
+    }
+
+    &:first {
+      border-top-left-radius: 2;
+    }
+
+    &:last {
+      margin-right: 0;
+      border-top-right-radius: 2;
+    }
+  }
+
+  & QToolButton {
+    // Scroll buttons
+    .scroll-button-style(@width: 16, @radius: 0);
+    @margin-top: -1;
+    margin-top: @margin-top;
+    padding: (3 + abs(@margin-top)) 2 2 2;
+  }
+}
+
+// Square flat style: Palette, Style Editor, Fx Editor, etc.
+#TabBarContainer {
+  background-color: @tabbar-bg-color;
+  qproperty-BottomAboveLineColor: @tabbar-bg-color;
+  qproperty-BottomBelowLineColor: @border-color;
+
+  & when (@gradient-effect = true) {
+    .gradient-effect-vertical();
+  }
+  
+  & QTabBar {
+    &::tab {
+      @h-padding: 4;
+      @v-padding: 3;
+    
+      background-color: @tab-bg-color;
+      border: 1 solid @tab-border-color;
+      border-top-width: 0;
+      border-left-width: 0;
+      border-radius: 0;
+      color: @tab-text-color;
+      padding: @v-padding @h-padding;
+      margin: 0;
+
+      & when (@gradient-effect = true) {
+        .gradient-effect-vertical();
+      }
+    
+      &:hover {
+        background-color: @tab-bg-color-hover;
+        color: @tab-text-color-hover;
+      }
+    
+      &:selected {
+        background-color: @tab-bg-color-selected;
+        color: @tab-text-color-selected;
+        border-color: @tab-border-color;
+        border-top-color: transparent;
+        border-bottom-color: @tab-bg-color-selected;
+      }
+    }
+  }
+}

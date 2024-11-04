@@ -1,0 +1,89 @@
+// out: "../../../../Synthwave/Synthwave.qss"
+
+//! The above line is for EasyLESS (VSCode extension) compile output location
+
+// -----------------------------------------------------------------------------
+// SYNTHWAVE THEME
+// -----------------------------------------------------------------------------
+
+// Theme to inherit/override
+@import '../others/dark-theme.less';
+
+// Image path relative to where this *.qss is output
+@img-url: '../Default/imgs/white';
+
+// SETTINGS --------------------------------------------------------------------
+
+// >>> Inherit other settings from Dark.less
+
+@ui-contrast: 1.0; // multiplier
+@border-contrast: 1.2; // multiplier
+
+// COLORS ----------------------------------------------------------------------
+
+@bg-color: #2b313a;
+
+// Text
+@text-color-active: rgb(228, 228, 16);
+
+// Highlight
+@hl-color: #aa4ca2;
+@hl-text-color: rgb(255, 255, 255);
+
+// Label
+@normal-label-color: #75dedf;
+@preview-color: #61bfbd;
+
+// -----------------------------------------------------------------------------
+// Room Tabs
+// -----------------------------------------------------------------------------
+@rooms-tab-bg-color-selected: rgb(28, 198, 198);
+@rooms-tab-text-color-selected: black;
+
+// -----------------------------------------------------------------------------
+// Context Menu
+// -----------------------------------------------------------------------------
+@menu-item-text-color-checked: yellow;
+
+// -----------------------------------------------------------------------------
+// Button
+// -----------------------------------------------------------------------------
+@button-border-color-checked: rgb(16, 129, 131);
+@button-border-color-pressed: @button-border-color-checked;
+
+// -----------------------------------------------------------------------------
+// Checkbox
+// -----------------------------------------------------------------------------
+@checkbox-bg-color-checked: rgb(216, 216, 15);
+
+@checkbox-img-checked: 'checkmark/checkmark_black.svg';
+@checkbox-img-disabled: 'checkmark/checkmark_disabled_black.svg';
+@checkbox-img-partially: 'checkmark/checkpartially_black.svg';
+@checkbox-img-partially-disabled: 'checkmark/checkpartially_disabled_black.svg';
+
+// -----------------------------------------------------------------------------
+// Viewer
+// -----------------------------------------------------------------------------
+@flipmarker-img: 'flipslider/flipmarker-blue.svg';
+@flipslider-notstarted-color: hsl(294, 24%, 33%);
+@flipslider-started-color: hsl(185, 41%, 52%);
+
+// -----------------------------------------------------------------------------
+// Xsheet
+// -----------------------------------------------------------------------------
+@xsh-button-preview-bg-on-color: @preview-color;
+@xsh-button-camstand-bg-on-color: hsl(301, saturation(@preview-color), lightness(@preview-color));
+
+@xsh-current-cell-border-color: rgb(24, 255, 232);
+@xsh-current-time-indicator-color: hsl(52, 100%, 64%);
+
+// Timeline icons
+@timeline-preview-icon: 'timeline/preview_small-color-cyberpunk.svg';
+@timeline-table-icon: 'timeline/table_small-color-cyberpunk.svg';
+@timeline-table-trans-icon: 'timeline/trans_small-color-cyberpunk.svg';
+@timeline-preview-trans-icon: 'timeline/preview_trans_small-color-cyberpunk.svg';
+
+// -----------------------------------------------------------------------------
+// Function Editor
+// -----------------------------------------------------------------------------
+@fe-panel-curve-color-hover: #00ffff; // when mouse over a curve

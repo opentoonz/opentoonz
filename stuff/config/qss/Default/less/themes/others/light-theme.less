@@ -1,0 +1,275 @@
+// out: "../../../../Light/Light.qss"
+
+//! The above line is for EasyLESS (VSCode extension) compile output location
+
+// -----------------------------------------------------------------------------
+// LIGHT THEME
+// -----------------------------------------------------------------------------
+
+// Theme to inherit/override
+@import '../default/default-theme.less';
+
+// Image path relative to where this *.qss is output
+@img-url: '../Default/imgs/black';
+
+// SETTINGS --------------------------------------------------------------------
+
+@ui-contrast: 1.4; // multiplier
+@border-contrast: 1.8; // multiplier
+
+@hover-adjust-amount: -1.4; // multiplier
+@pressed-adjust-amount: 3.8; // multiplier
+@disabled-amount: 40%; // percentage range: 0-100%
+@titlebar-border-radius: 0; // int
+
+@gradient-effect: false; // bool: show gradients on buttons
+@titlebar-gradient-effect: false; // bool: show gradients on titlebars
+@bold-titlebar-text: true; // bool
+@bold-label-text: true; // bool
+@bold-fxlabel-text: true; // bool
+
+// COLORS ----------------------------------------------------------------------
+
+@bg-color: #DBDBDB;
+
+// Text
+@text-color: black;
+@text-color-active: black;
+
+// Border
+@dock-color: darken(@bg-color, 55%);
+
+// Highlight
+@hl-color: #A0C1DD;
+@hl-text-color: black;
+@lock-color: #f07676;
+@preview-color: #FCFF53;
+
+// Label
+@normal-label-color: #341f88;
+@error-label-color: rgba(255, 0, 0, 0.7);
+@fx-settings-label-color: @normal-label-color;
+
+// -----------------------------------------------------------------------------
+// Tabs
+// -----------------------------------------------------------------------------
+@tab-text-color: @text-color;
+
+// -----------------------------------------------------------------------------
+// Menu
+// -----------------------------------------------------------------------------
+@menu-bg-color: @bg-color;
+@menu-item-text-color-checked: @normal-label-color;
+@menu-icon-checked-bg-color: lime;
+@menu-checkbox-border-color-hover: @border-color;
+
+// -----------------------------------------------------------------------------
+// Button
+// -----------------------------------------------------------------------------
+@button-bg-color: darken(@bg-color, 6%);
+@button-bg-color-checked: @toolbutton-bg-color-checked;
+
+@button-border-color: darken(@bg-color, 30%);
+@button-border-color-hover: @button-border-color;
+@button-border-color-pressed: darken(@button-border-color, 12%);
+@button-border-color-checked: darken(@button-border-color, 12%);
+@button-border-color-focus: darken(@button-bg-color-focus, 40%);
+@button-border-color-focus-hover: @button-border-color-focus;
+@button-border-color-disabled: mix(@button-border-color, @bg-color, @disabled-amount);
+
+// Dialog Popup
+@popup-dialog-button-frame-bg-color: @bg-color;
+
+// -----------------------------------------------------------------------------
+// Tool Button
+// -----------------------------------------------------------------------------
+@toolbutton-border-color-checked: darken(@toolbutton-bg-color-checked, 40%);
+@toolbutton-border-color-checked-hover: @toolbutton-border-color-checked;
+@toolbutton-border-color-checked-disabled: darken(@bg-color, 8%);
+
+// -----------------------------------------------------------------------------
+// Lockbutton
+// -----------------------------------------------------------------------------
+@lockbutton-border-color-checked: darken(@lockbutton-bg-color-checked, 40%);
+@lockbutton-border-color-checked-hover: @lockbutton-border-color-checked;
+
+// -----------------------------------------------------------------------------
+// ComboBox
+// -----------------------------------------------------------------------------
+@combobox-border-color-focus: black;
+
+// -----------------------------------------------------------------------------
+// Textfield
+// -----------------------------------------------------------------------------
+@input-bg-color: lighten(@bg-color, 28%);
+@input-border-color: @border-color;
+@input-border-color-focus: black;
+@input-text-color-focus: black;
+
+// Text Selection
+@input-selection-text-color: black;
+@input-selection-bg-color: fade(@hl-color, 80%);
+
+// -----------------------------------------------------------------------------
+// Checkbox
+// -----------------------------------------------------------------------------
+@checkbox-bg-color-checked: black;
+@checkbox-border-color-checked: @checkbox-bg-color-checked;
+@checkbox-border-color-checked-hover: @checkbox-bg-color-checked;
+
+@checkbox-text-color-hover: @text-color;
+@checkbox-bg-color-checked-hover: #4e4e4e;
+
+// -----------------------------------------------------------------------------
+// Scrollbar
+// -----------------------------------------------------------------------------
+@sb-bg-color: darken(@bg-color, 0%);
+@sb-handle-bg-color: darken(@sb-bg-color, 24%);
+@sb-handle-bg-color-hover: darken(@sb-handle-bg-color, 8% * abs(@hover-adjust-amount));
+@sb-handle-bg-color-pressed: darken(@sb-handle-bg-color-hover, 2% * @pressed-adjust-amount);
+
+// -----------------------------------------------------------------------------
+// File Browser / Trees / Lists
+// -----------------------------------------------------------------------------
+@tree-bg-color-alt-row: rgba(0, 0, 0, 0.05);
+@tree-item-bg-color-hover: rgba(0, 0, 0, 0.12);
+
+// -----------------------------------------------------------------------------
+// Sliders
+// -----------------------------------------------------------------------------
+@slider-groove-color: darken(@bg-color, 40%);
+@slider-handle-margin: 0;
+
+// Only for #ViewerFpsSlider (should mimic the slider-handle images)
+@slider-handle-bg-color: darken(@bg-color, 17%);
+@slider-handle-border-color: darken(@slider-handle-bg-color, 28%);
+
+// -----------------------------------------------------------------------------
+// Titlebars
+// -----------------------------------------------------------------------------
+// Icon Colors
+@titlebar-button-pressed-color: white;
+
+// -----------------------------------------------------------------------------
+// Flip Slider/Marker
+// -----------------------------------------------------------------------------
+@flipmarker-img: 'flipslider/flipmarker-light.svg';
+@flipslider-img: 'flipslider/flipslider-light.svg';
+@flipslider-base-color: darken(@bg-color, 5% * @ui-contrast);
+@flipslider-notstarted-color: hsl(0, 46%, 64%);
+@flipslider-started-color: hsl(117, 43%, 50%);
+
+// -----------------------------------------------------------------------------
+// Custom Panels
+// -----------------------------------------------------------------------------
+@custompanel-scroller-bg-color: rgb(155, 155, 155);
+@custompanel-scroller-border-color: rgb(93, 93, 93);
+
+// -----------------------------------------------------------------------------
+// Xsheet
+// -----------------------------------------------------------------------------
+
+// SETTINGS --------------------------------------------------------------------
+
+@xsh-color: darken(@bg-color, 3%);
+
+@xsh-mono-icons: true; // bool
+@xsh-contrast: 1.3; // multiplier
+@xsh-border-contrast: 0.45; // multiplier
+
+// Cell
+@xsh-cell-lighten-amount: 38%;
+@xsh-cell-sat-amount: 15%;
+
+@xsh-border-darken-amount: -16%;
+@xsh-border-sat-amount: 0%;
+
+@xsh-hl-mix-color: hsl(hue(@hl-color), 50%, 50%);
+@xsh-hl-mix-amount: 90%;
+@xsh-hl-lighten-amount: 28%;
+
+// -----------------------------------------------------------------------------
+// Level Colors
+@xsh-notes-color: #ebebeb;
+@xsh-notes-border-color: darken(@xsh-notes-color, 22%);
+@xsh-notes-hl-color: mix(darken(@xsh-notes-color, @xsh-hl-lighten-amount * 0.2), @xsh-hl-mix-color, @xsh-hl-mix-amount);
+
+// -----------------------------------------------------------------------------
+// Marker Lines
+@xsh-marker-line-color: rgba(95, 22, 231, 0.5);
+@xsh-selected-marker-line-color: rgba(0, 0, 0, 0.5);
+@xsh-sec-marker-line-color: rgba(73, 0, 141, 0.743);
+
+// -----------------------------------------------------------------------------
+// Spreadsheet Cells
+@xsh-cell-text-color: @text-color;
+@xsh-empty-cell-color-selected: fade(mix(darken(@xsh-empty-column-range-color, 20%), @xsh-hl-mix-color, @xsh-hl-mix-amount), 50%);
+
+@xsh-current-cell-border-color: rgb(109, 0, 210);
+
+// Framenumber Area
+@xsh-framenumber-column-text-color: fade(@xsh-cell-text-color, 50%);
+@xsh-framenumber-column-range-text-color: rgb(0, 13, 158);
+@xsh-framenumber-column-range-bg-color: rgba(255, 255, 255, 0.4);
+@xsh-framenumber-current-text-color: rgb(0, 0, 0);
+@xsh-framenumber-current-bg-color: rgba(255, 117, 117, 0.747);
+
+// Column Header Colors
+@xsh-column-header-border-color: rgb(130, 130, 130);
+@xsh-column-header-selected-color: fade(shade(@xsh-hl-mix-color, 50%), 30%);
+
+@xsh-button-preview-bg-on-color: #f0f098;
+@xsh-button-camstand-bg-on-color: #ffb99d;
+
+// -----------------------------------------------------------------------------
+
+// Icons
+@timeline-column-header-border-color: rgba(0, 0, 0, 0.15);
+
+@timeline-preview-button-bg-on-color: @xsh-button-preview-bg-on-color;
+@timeline-table-button-bg-on-color: @xsh-button-camstand-bg-on-color;
+@timeline-lock-button-bg-on-color: @xsh-button-lock-bg-on-color;
+
+// -----------------------------------------------------------------------------
+// Nodes
+// -----------------------------------------------------------------------------
+
+@node-viewer-bg-color: rgb(128, 128, 128);
+
+// Splines
+@node-link-color: rgb(235, 235, 235);
+
+// -----------------------------------------------------------------------------
+// Function Editor
+// -----------------------------------------------------------------------------
+
+// SETTINGS --------------------------------------------------------------------
+
+@fe-text-color: black;
+
+@fe-kf-border-darken-amount: 35%;
+@fe-kf-border-sat-amount: 25%;
+@fe-kf-hl-lighten-amount: -50%;
+@fe-kf-hl-mix-amount: 40%;
+@fe-kf-hl-mix-color: @hl-color;
+
+@fe-ib-border-darken-amount: 37%;
+@fe-ib-border-sat-amount: 0%;
+@fe-ib-hl-lighten-amount: -42%;
+@fe-ib-hl-mix-amount: 80%;
+@fe-ib-hl-mix-color: @hl-color;
+
+// Cell Colors
+@fe-keyframe-color: #EDAA64;
+@fe-ignored-keyframe-color: #cc5b69;
+@fe-inbetween-color: #E2DBCC;
+@fe-ignored-inbetween-color: #b99083;
+
+// Curves Viewer
+@fe-panel-line-color: black; // grid line color
+@fe-panel-line-tone: 12%; // strength of grid line color (0 = invisible)
+
+@fe-panel-text-color: @text-color;
+@fe-panel-bg-color: @node-viewer-bg-color;
+@fe-panel-ruler-bg-color: darken(@bg-color, 10% * @ui-contrast);
+@fe-panel-curve-color-hover: #ffde24; // when mouse over a curve

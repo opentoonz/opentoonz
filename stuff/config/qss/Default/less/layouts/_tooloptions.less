@@ -1,0 +1,82 @@
+/* -----------------------------------------------------------------------------
+   Tool Options - Override DvScroll Widget
+----------------------------------------------------------------------------- */
+
+#toolOptionsPanel {
+  QPushButton {
+    .main-button-style();
+    margin: 0;
+    padding: 0;
+  }
+}
+
+#ToolOptions {
+  & TPanelTitleBar {
+    border-bottom: 0;
+    border-radius: 0;
+    border-top-left-radius: @titlebar-border-radius;
+    border-bottom-left-radius: @titlebar-border-radius;
+    border-right: 1 solid @border-color;
+    max-width: 18;
+
+    & when (@titlebar-gradient-effect = true) {
+      .gradient-effect-horizontal();
+    }
+  }
+
+  & #ScrollLeftButton,
+  & #ScrollRightButton {
+    .scroll-button-style();
+  }
+}
+
+#EditToolLockButton {
+  // This also applies to the room tabs lock icon (layouts/mainwindow)
+  spacing: 0;
+
+  &:hover {
+    background: none;
+  }
+
+  &::indicator {
+    .tool-button-style();
+    .lock-icon-style(); // adds lock icon image
+  }
+}
+
+PopupButton {
+  &::menu-indicator {
+    border-left: 0;
+    height: 17;
+    image: url('@{img-url}/combobox/combo_downarrow.svg');
+    width: 10;
+
+    &:hover {
+      image: url('@{img-url}/combobox/combo_downarrow.svg');
+    }
+
+    &:disabled {
+      image: url('@{img-url}/combobox/combo_downarrow_disabled.svg');
+    }
+  }
+}
+
+#Cap,
+#Join {
+  @size: 32;
+  padding: 0 4 0 -8;
+  max-width: @size;
+  min-width: @size;
+
+  & QMenu {
+    @size: 28;
+    max-width: @size;
+    min-width: @size;
+
+    &::item {
+      max-width: @size;
+      min-width: @size;
+      padding: 0;
+    }
+  }
+}

@@ -1,0 +1,160 @@
+/* -----------------------------------------------------------------------------
+   Popup Windows
+----------------------------------------------------------------------------- */
+
+QDialog {
+  background-color: @bg-color;
+  
+  & #dialogButtonFrame {
+    background-color: @popup-dialog-button-frame-bg-color;
+    border-top: 1 solid @groupbox-border-color;
+
+    & when(@titlebar-gradient-effect = true) {
+      .gradient-effect-vertical-inverted();
+    }
+
+    & QPushButton {
+      outline: 0;
+
+      &:focus {
+        background-color: @button-bg-color-focus;
+        border-color: @button-border-color-focus;
+        color: @button-text-color-focus;
+
+        &:hover {
+          background-color: @button-bg-color-focus-hover;
+          border-color: @button-border-color-focus-hover;
+        }
+
+        &:pressed {
+          background-color: @button-bg-color-pressed;
+          border-color: @button-border-color-pressed;
+          color: @button-text-color-pressed;
+        }
+      }
+    }
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   Scene Settings
+----------------------------------------------------------------------------- */
+
+#SceneSettings {
+  & QLabel {
+    color: @normal-label-color;
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   Preferences
+----------------------------------------------------------------------------- */
+
+#PreferencesPopup, #OutputSettingsPopup {
+  & QListWidget {
+    background-color: @list-bg-color;
+    alternate-background-color: @list-bg-color;
+    border: 1 solid @groupbox-border-color;
+    font-size: 13px;
+
+    &::item {
+      border: 0; // remove indent on hover
+      padding: 3;
+
+      &:hover {
+        background-color: lighten(@tree-bg-color, 8% * @hover-adjust-amount);
+        color: @hl-text-color;
+      }
+
+      &:selected {
+        background-color: @menubar-item-bg-color-selected;
+        color: @menu-item-text-color-selected;
+      }
+    }
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   Keyboard Shortcuts
+----------------------------------------------------------------------------- */
+
+#ShortcutTree {
+  &::item {
+    padding: 1 0;
+  }
+
+  border: 1 solid @border-color;
+
+  & QScrollBar {
+    &:vertical {
+      width: 16;
+      margin-right: -1;
+    }
+  }
+}
+
+#ShortcutViewer {
+  font-size: 17;
+
+  & QLineEdit {
+    color:black;
+    border-color: rgb(184, 188, 127);
+    background-color: white;
+
+    &:focus {
+      background-color: rgb(171, 206, 255);
+    } 
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   New Project / Configure Project Window
+----------------------------------------------------------------------------- */
+
+ProjectPopup {
+    & QLabel {
+      color: @normal-label-color;
+    }
+}
+
+/* -----------------------------------------------------------------------------
+   PencilTestPopup / CameraCapture Window
+----------------------------------------------------------------------------- */
+
+//PencilTestPopup {}
+
+#GearButton {
+  &::menu-indicator {
+    image: none;
+  }
+}
+
+#LiveViewButton {
+  qproperty-icon: url('@{img-url}/misc/liveview.svg');
+  
+  &::menu-indicator {
+    image: none;
+  }
+}
+
+#SubfolderButton {
+  padding-left: 5;
+  padding-right: 5;
+}
+
+#SubcameraButton {
+  padding-left: 5;
+  padding-right: 5;
+}
+
+/* -----------------------------------------------------------------------------
+   Frame format settings box in FormatSettingsPopup 
+----------------------------------------------------------------------------- */
+
+#FrameFormatBoxInput {
+  border-color: mix(@border-color, rgba(255, 0, 0, 0.7), 40%);
+}
+
+#FrameFormatBoxOutput {
+  border-color: mix(@border-color, rgba(0, 0, 255, 0.7), 40%);
+}

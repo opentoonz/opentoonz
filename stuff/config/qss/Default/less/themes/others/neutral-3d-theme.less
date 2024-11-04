@@ -1,0 +1,46 @@
+// out: "../../../../Neutral-3D/Neutral-3D.qss"
+
+//! The above line is for EasyLESS (VSCode extension) compile output location
+
+// -----------------------------------------------------------------------------
+// NEUTRAL THEME (3D)
+// Adds a subtle gradient to buttons, scrollbars, titlebars, tabs.
+// -----------------------------------------------------------------------------
+
+// Theme to inherit/override
+@import '../others/neutral-theme.less';
+
+// Image path relative to where this *.qss is output
+@img-url: '../Default/imgs/black';
+
+// SETTINGS --------------------------------------------------------------------
+
+// >>> Inherit other settings from Neutral.less
+
+@gradient-effect: true; // bool: show gradients on buttons
+@titlebar-gradient-effect: true; // bool: show gradients on titlebars
+
+// COLORS ----------------------------------------------------------------------
+
+// >>> Inherit all colors from Neutral.less
+
+// -----------------------------------------------------------------------------
+// Tabs
+// -----------------------------------------------------------------------------
+@tabbar-bg-color: darken(@bg-color, 11%);
+
+// -----------------------------------------------------------------------------
+// Button
+// -----------------------------------------------------------------------------
+@button-bg-color: lighten(@bg-color, 7.5%);
+
+// -----------------------------------------------------------------------------
+// Scrollbar
+// -----------------------------------------------------------------------------
+@sb-handle-bg-color: darken(@bg-color, 18%);
+@sb-handle-border-color: darken(@sb-handle-bg-color, 10%);
+
+// -----------------------------------------------------------------------------
+// Titlebar
+// -----------------------------------------------------------------------------
+@titlebar-border-radius: 4px;

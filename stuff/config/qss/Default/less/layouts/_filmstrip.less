@@ -1,0 +1,21 @@
+/* -----------------------------------------------------------------------------
+   Level Strip
+----------------------------------------------------------------------------- */
+
+#filmLevelCombo {
+  margin: -1;
+}
+
+#FilmStrip {
+  qproperty-BGColor: @bg-color;
+  margin: 0;
+  padding: 0;
+
+  & QComboBox {
+    border-radius: 0;
+    
+    & QAbstractItemView {
+      background-color: @menu-bg-color;
+    }
+  }
+}

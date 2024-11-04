@@ -1,0 +1,94 @@
+/* -----------------------------------------------------------------------------
+   Style Editor
+----------------------------------------------------------------------------- */
+
+#StyleEditor {
+  & #bottomWidget {
+    border-top: 1 solid @border-color;
+    padding: 3 2 8 3;
+    
+    & QPushButton {
+      padding: 13 5;
+    }
+  }
+}
+
+//#StyleEditorTabBar {}
+
+#HexagonalColorWheel {
+  qproperty-BGColor: @bg-color;
+}
+
+#StyleChooserPage {
+  qproperty-CommonChipBoxColor: @palette-CommonChipBoxColor;
+  qproperty-PinnedChipBoxColor: @palette-PinnedChipBoxColor;
+  qproperty-SolidChipBoxColor: @palette-SolidChipBoxColor;
+  qproperty-SelectedChipBoxColor: @palette-SelectedChipBoxColor;
+  qproperty-SelectedChipBox2Color: @palette-SelectedChipBox2Color;
+}
+
+/* -------------------------------------------------------------------------- */
+
+// Horizontal QSlider
+#colorSlider {
+  &::groove:horizontal {
+    height: 1;
+    border-image: none;
+  }
+
+  &::handle:horizontal {
+    width: 8;
+    margin: -8 -4;
+  }
+}
+
+#colorSliderAddButton, 
+#colorSliderSubButton {
+  background: none;
+  border-color: transparent;
+  image-position: center center;
+  min-height: 16;
+  padding: 0;
+  min-width: 10;
+
+  &:hover {
+    background-color: @toolbutton-bg-color-hover;
+    border-color: @toolbutton-border-color-hover;
+    color: @toolbutton-text-color-hover;
+  }
+
+  &:pressed {
+    background-color: @toolbutton-bg-color-pressed;
+    border-color: @toolbutton-border-color-pressed;
+    color: @toolbutton-text-color-pressed;
+  }
+}
+
+#colorSliderAddButton {
+  image: url('@{img-url}/scrollbar/scroll-right.svg');
+
+  &:hover {
+    image: url('@{img-url}/scrollbar/scroll-right-hover.svg');
+  }
+}
+
+#colorSliderSubButton {
+  image: url('@{img-url}/scrollbar/scroll-left.svg');
+
+  &:hover {
+    image: url('@{img-url}/scrollbar/scroll-left-hover.svg');
+  }
+}
+
+#PlainColorPageParts {
+  border-bottom: 1 solid @border-color;
+
+  & QLineEdit {
+    max-width: 35;
+    height: 100%; /* Expand text field height on window resize */
+  }
+}
+
+// The following unused?
+//#colorSliderLabel, 
+//#colorSliderField {}

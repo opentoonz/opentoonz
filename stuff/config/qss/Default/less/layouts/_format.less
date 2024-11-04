@@ -1,0 +1,97 @@
+/* -----------------------------------------------------------------------------
+   Cleanup Settings
+----------------------------------------------------------------------------- */
+
+#CleanupSettings {
+  & QPushButton {
+    margin: 0 1;
+  }
+
+  & #CleanupSettingsFrame {
+    // Space out boxes vertically
+    .main-frame-style();
+    margin-top: 2;
+    margin-bottom: 4;
+  }
+
+  & QGroupBox {
+    margin-bottom: 3;
+  }
+
+  & QScrollArea {
+    .main-frame-style();
+  }
+}
+
+ParamsPage {
+  qproperty-TextColor: @text-color;
+}
+
+/* -----------------------------------------------------------------------------
+   Camera Settings
+----------------------------------------------------------------------------- */
+
+#CameraSettingsButton {
+  padding: 2;
+}
+
+#CameraSettingsRadioButton {
+  &:hover {
+    background: none;
+  }
+
+  &::indicator {
+    .checkbox-indicator-style();
+    background-color: @toolbutton-bg-color;
+    border-color: @toolbutton-border-color;
+    .lock-icon-style();
+
+    &:hover {
+      background-color: @toolbutton-bg-color-hover;
+      border-color: @toolbutton-border-color-hover;
+    }
+  }
+}
+
+#CameraSettingsDPI {
+  color: @normal-label-color;
+}
+
+#CameraSettingsRadioButton_Small {
+  padding: 0;
+  
+  &::indicator {
+    .radio-button-style();
+    background-color: transparent;
+    border: 0;
+    margin: 0;
+  }
+}
+
+#ForceSquaredPixelButton {
+  .tool-button-style();
+  margin: 0;
+  height: 16;
+  width: 16;
+  padding: 2;
+}
+
+/* -----------------------------------------------------------------------------
+   Output Settings
+----------------------------------------------------------------------------- */
+
+#OutputSettingsLabel {
+  color: @normal-label-color;
+
+  & when(@bold-label-text = true) {
+    font-weight: bold;
+  }
+}
+
+#OutputSettingsBox {
+  .main-frame-style();
+}
+
+#OutputSettingsCameraBox {
+  .main-frame-style();
+}

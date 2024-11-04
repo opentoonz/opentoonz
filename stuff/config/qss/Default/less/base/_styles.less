@@ -1,0 +1,565 @@
+// -----------------------------------------------------------------------------
+// 3D Effect
+// -----------------------------------------------------------------------------
+
+// The images are a white gradient, don't bother using these over light colors
+.gradient-effect-vertical() {
+  background-image: url('@{img-url}/misc/gradient-vertical.svg');
+  background-position: top left;
+  background-repeat: repeat-x;
+}
+
+.gradient-effect-vertical-inverted() {
+  background-image: url('@{img-url}/misc/gradient-vertical-inverted.svg');
+  background-position: bottom left;
+  background-repeat: repeat-x;
+}
+
+.gradient-effect-vertical-small() { // useful on scrollbars
+  background-image: url('@{img-url}/misc/gradient-vertical_small.svg');
+  background-position: top left;
+  background-repeat: repeat-x;
+}
+
+.gradient-effect-horizontal() {
+  background-image: url('@{img-url}/misc/gradient-horizontal.svg');
+  background-position: top left;
+  background-repeat: repeat-y;
+}
+
+.gradient-effect-horizontal-small() { // useful on scrollbars
+  background-image: url('@{img-url}/misc/gradient-horizontal_small.svg');
+  background-position: top left;
+  background-repeat: repeat-y;
+}
+
+// -----------------------------------------------------------------------------
+// Main Button
+// -----------------------------------------------------------------------------
+
+.main-button-style() {
+  background-color: @button-bg-color;
+  border-color: @button-border-color;
+  border-width: 1;
+  border-style: solid;
+  border-radius: @button-border-radius;
+  color: @button-text-color;
+  margin: 0;
+  padding: @button-v-padding @button-h-padding;
+
+  & when (@gradient-effect = true) {
+    .gradient-effect-vertical();
+  }
+
+  &:hover {
+    background-color: @button-bg-color-hover;
+    border-color: @button-border-color-hover;
+    color: @button-text-color-hover;
+  }
+
+  &:pressed {
+    background-color: @button-bg-color-pressed;
+    border-color: @button-border-color-pressed;
+    color: @button-text-color-pressed;
+
+    & when (@gradient-effect = true) {
+      .gradient-effect-vertical-inverted();
+    }
+  }
+
+  &:checked {
+    background-color: @button-bg-color-checked;
+    border-color: @button-border-color-checked;
+    color: @button-text-color-checked;
+
+    & when (@gradient-effect = true) {
+      .gradient-effect-vertical-inverted();
+    }
+
+    &:hover {
+      background-color: @button-bg-color-checked-hover;
+      border-color: @button-border-color-checked;
+    }
+
+    &:pressed {
+      background-color: @button-bg-color-pressed;
+    }
+  }
+
+  &:disabled {
+    background-color: @button-bg-color-disabled;
+    border-color: @button-border-color-disabled;
+    color: @text-color-disabled;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Tool Buttons
+// -----------------------------------------------------------------------------
+
+.tool-button-style(
+    @padding-top: 0,
+    @padding-right: 0,
+    @padding-bottom: 0,
+    @padding-left: 0
+  ) {
+  // Qt (at least as of 5.15.2) has a default padding for QToolButtons, we need
+  // to reset it to get a pixel perfect style (-1 -1 -2 0)
+  background-color: @toolbutton-bg-color;
+  border: 1 solid @toolbutton-border-color;
+  border-radius: @button-border-radius;
+  color: @toolbutton-text-color;
+  padding-top: @padding-top - 1;
+  padding-right: @padding-right - 1;
+  padding-bottom: @padding-bottom - 2;
+  padding-left: @padding-left;
+
+  &:hover {
+    background-color: @toolbutton-bg-color-hover;
+    border-color: @toolbutton-border-color-hover;
+    color: @toolbutton-text-color-hover;
+
+    & when(@gradient-effect = true) {
+      .gradient-effect-vertical();
+    }
+  }
+
+  &:pressed {
+    background-color: @toolbutton-bg-color-pressed;
+    border-color: @toolbutton-border-color-pressed;
+    color: @toolbutton-text-color-pressed;
+
+    & when(@gradient-effect = true) {
+      .gradient-effect-vertical-inverted();
+    }
+  }
+  
+  &:checked {
+    background-color: @toolbutton-bg-color-checked;
+    border-color: @toolbutton-border-color-checked;
+    color: @toolbutton-text-color-checked;
+
+    & when(@gradient-effect = true) {
+      .gradient-effect-vertical();
+    }
+
+    &:hover {
+      background-color: @toolbutton-bg-color-checked-hover;
+      border-color: @toolbutton-border-color-checked-hover;
+    }
+
+    &:pressed {
+      background-color: @toolbutton-bg-color-checked-pressed;
+    }
+  }
+
+  &:disabled {
+    color: @text-color-disabled;
+    background-color: @toolbutton-bg-color-disabled;
+    
+    &:checked {
+      background-color: @toolbutton-bg-color-checked-disabled;
+      border-color: @toolbutton-border-color-checked-disabled;
+
+      & when(@gradient-effect = true) {
+        .gradient-effect-vertical();
+      }
+    }
+  }
+}
+
+// Flat ToolBar Button
+// -----------------------------------------------------------------------------
+// No margin/border/radius, for use in constricted areas like Palette tool bar
+
+.flat-tool-button-style() {
+  background-color: none;
+  border: 0;
+  border-radius: 0;
+  margin: 0;
+  &:hover {
+    background-color: @toolbutton-bg-color-hover;
+  }
+  &:pressed {
+    background-color: @toolbutton-bg-color-pressed;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Scroll Buttons (QTab, QToolBar, DvScrollWidget, etc.)
+// -----------------------------------------------------------------------------
+
+.scroll-button-style(
+    @width: 20,
+    @height: 20,
+    @radius: @button-border-radius
+  ) {
+  background-color: @button-bg-color;
+  border-width: 1;
+  border-style: solid;
+  border-color: @scroll-button-border-color; // always show border for these
+  border-radius: 0;
+  padding: 0;
+  margin: 0;
+  width: @width;
+  max-width: @width;
+  height: @height;
+  max-height: @height;
+
+  & when(@gradient-effect = true) {
+    .gradient-effect-vertical();
+  }
+
+  &:hover {
+    background-color: @button-bg-color-hover;
+    border-color: @scroll-button-border-color-hover;
+  }
+
+  &:pressed {
+    background-color: @button-bg-color-pressed;
+    border-color: @scroll-button-border-color-pressed;
+  }
+
+  &:disabled {
+    background-color: @button-bg-color-disabled;
+    border-color: @scroll-button-border-color-disabled;
+    color: @text-color-disabled;
+  }
+}
+
+.scroll-left-button-style() {
+  image: url('@{img-url}/scrollbar/scroll-left.svg');
+  margin-top: -1;
+  margin-bottom: -1;
+  margin-left: -1;
+
+  &:hover {
+    image: url('@{img-url}/scrollbar/scroll-left-hover.svg');
+  }
+}
+
+.scroll-right-button-style() {
+  image: url('@{img-url}/scrollbar/scroll-right.svg');
+  margin-top: -1;
+  margin-bottom: -1;
+  margin-right: -1;
+
+  &:hover {
+    image: url('@{img-url}/scrollbar/scroll-right-hover.svg');
+  }
+}
+
+.scroll-up-button-style() {
+  image: url('@{img-url}/scrollbar/scroll-up.svg');
+
+  &:hover {
+    image: url('@{img-url}/scrollbar/scroll-up-hover.svg');
+  }
+}
+
+.scroll-down-button-style() {
+  image: url('@{img-url}/scrollbar/scroll-down.svg');
+
+  &:hover {
+    image: url('@{img-url}/scrollbar/scroll-down-hover.svg');
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Textfields
+// -----------------------------------------------------------------------------
+
+.textfield-style() {
+  background-color: @input-bg-color;
+  border-style: solid;
+  border-width: 1;
+  border-color: @input-border-color;
+  border-radius: @input-border-radius;
+  color: @input-text-color;
+  selection-background-color: @input-selection-bg-color;
+  selection-color: @input-selection-text-color;
+  padding: 1 0 1 1;
+
+  &:hover {
+    background-color: @input-bg-color-hover;
+    color: @input-text-color-hover;
+    border-color: @input-border-color-hover;
+  }
+
+  &:focus {
+    background-color: @input-bg-color-focus;
+    border-color: @input-border-color-focus;
+    color: @input-text-color-focus;
+  }
+
+  &:disabled {
+    background: none; // override gradient image if any
+    color: @input-text-color-disabled;
+    background-color: @input-bg-color-disabled;
+    border-color: @input-border-color-disabled;
+  }
+}
+
+.spreadsheet-textfield-style() {
+  // This is for the textfield when inputting values into spreadsheets
+    margin-top: 1; // make it align with cell-selection box (xsh)
+
+    &:focus {
+      // Double-clicking cells always brings field into focus, and since we
+      // always want maximum contrast we'll hard-code the colors
+      border-radius: 0;
+      border-width: 1;
+      color: #000;
+      border-color: #fff;
+      background-color: #fff;
+      selection-background-color: #bebebe;
+      selection-color: #000;
+    }
+  }
+
+// -----------------------------------------------------------------------------
+// Checkboxes
+// -----------------------------------------------------------------------------
+
+.checkbox-indicator-style() {
+  // This is for the ::indicator checkboxes
+  background-color: @checkbox-bg-color;
+  border: 1 solid @checkbox-border-color;
+  border-radius: @checkbox-border-radius;
+  padding: 1;
+  width: 10px; // fixes in QMenu
+  height: 10px; // fixes in QGroupBox
+
+  &:hover {
+    background-color: @checkbox-bg-color-hover;
+    border-color: @checkbox-border-color-hover;
+  }
+
+  &:checked {
+    background-color: @checkbox-bg-color-checked;
+    border-color: @checkbox-border-color-checked;
+    image: url('@{img-url}/@{checkbox-img-checked}');
+
+    & when(@gradient-effect = true) {
+      .gradient-effect-vertical();
+    }
+
+    &:hover {
+      background-color: @checkbox-bg-color-checked-hover;
+      border-color: @checkbox-border-color-checked-hover;
+    }
+
+    &:disabled {
+      background-color: @checkbox-bg-color-checked-disabled;
+      border-color: @checkbox-border-color-checked-disabled;
+      image: url('@{img-url}/@{checkbox-img-disabled}');
+    }
+  }
+
+  &:indeterminate {
+    background-color: @checkbox-bg-color-checked;
+    border-color: @checkbox-border-color-checked;
+    image: url('@{img-url}/@{checkbox-img-partially}');
+
+    &:hover {
+      background-color: @checkbox-bg-color-hover;
+      border-color: @checkbox-border-color-hover;
+    }
+
+    &:disabled {
+      background-color:
+        mix(@checkbox-bg-color-checked, @bg-color, @disabled-amount);
+      border-color:
+        mix(@checkbox-border-color-checked, @bg-color, @disabled-amount);
+      image: url('@{img-url}/@{checkbox-img-partially-disabled}');
+    }
+  }
+
+  &:disabled {
+    background-color: mix(@checkbox-bg-color, @bg-color, @disabled-amount);
+    border-color: mix(@checkbox-border-color, @bg-color, @disabled-amount);
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Radio Buttons
+// -----------------------------------------------------------------------------
+
+.radio-button-style() {
+  // For ::indicator
+  @size: 13;
+  width: @size;
+  height: @size;
+  background-color: transparent;
+  border: 0;
+  image-position: center center;
+
+  &:unchecked {
+    image: url('@{img-url}/radiobutton/radiobutton_unchecked.svg');
+
+    &:hover {
+      image: url('@{img-url}/radiobutton/radiobutton_unchecked_hover.svg');
+    }
+  }
+
+  &:checked {
+    image: url('@{img-url}/radiobutton/radiobutton_checked.svg');
+
+    &:disabled {
+      background-color: transparent;
+      image: url('@{img-url}/radiobutton/radiobutton_checked_disabled.svg');
+    }
+  }
+
+  &:disabled {
+    image: url('@{img-url}/radiobutton/radiobutton_unchecked_disabled.svg');
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Treeviews
+// -----------------------------------------------------------------------------
+
+.treeview-item-style(@show-alt-row: false) {
+  background-color: @tree-bg-color;
+  alternate-background-color: if(@show-alt-row, @tree-bg-color-alt-row, transparent);
+  border: 0;
+  margin: 0;
+  outline: 0;
+  
+  &::item {
+    &:selected {
+      background-color: @hl-color;
+      color: @hl-text-color;
+
+      &:hover {
+        background-color: lighten(@hl-color, 8% * @hover-adjust-amount);
+        color: @hl-text-color;
+      }
+    }
+
+    &:hover {
+      background-color: @tree-item-bg-color-hover;
+    }
+  }
+}
+
+.treeview-branch-style() {
+  // For ::branch
+  @blank_img: '@{img-url}/misc/transparent_16x16.png';
+
+  background-color: transparent; // allow item bg color through branch area
+
+  &:adjoins-item {
+    border-image: url('@{blank_img}');
+  }
+
+  &:has-siblings {
+    border-image: url('@{blank_img}');
+
+    &:adjoins-item {
+      border-image: url('@{blank_img}');
+    }
+  }
+
+  &:has-children {
+    &:closed {
+      background: url('@{img-url}/tree/treebranch-closed.svg') no-repeat;
+      background-position: center center;
+      border-image: none;
+      image: none;
+    }
+
+    &:open {
+      background: url('@{img-url}/tree/treebranch-open.svg') no-repeat;
+      background-position: center center;
+      image: none;
+    }
+
+    &:has-siblings {
+      &:closed {
+        background: url('@{img-url}/tree/treebranch-closed.svg') no-repeat;
+        background-position: center center;
+        border-image: none;
+        image: none;
+      }
+      
+      &:open {
+        background: url('@{img-url}/tree/treebranch-open.svg') no-repeat;
+        background-position: center center;
+        border-image: none;
+        image: none;
+      }
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Frame Borders (GroupBox Style, etc.)
+// -----------------------------------------------------------------------------
+
+.main-frame-style(@border-color: @border-color) {
+  background-color: transparent;
+  border-width: 1;
+  border-style: solid;
+  border-radius: @groupbox-border-radius;
+  border-color: @groupbox-border-color;
+}
+
+// -----------------------------------------------------------------------------
+// Fonts
+// -----------------------------------------------------------------------------
+
+.font-style-monospace() {
+  font-family: 'Courier New', Courier, monospace;
+}
+
+// -----------------------------------------------------------------------------
+// Icons
+// -----------------------------------------------------------------------------
+
+.lock-icon-style() {
+  .tool-button-style();
+  height: 18;
+  width: 19;
+  padding: 0 -1 0 1;
+  margin-left: 1;
+
+  &:unchecked {
+    image: url('@{img-url}/lock/lock.svg');
+
+    &:hover {
+      image: url('@{img-url}/lock/lock_over.svg');
+    }
+
+    &:pressed {
+      background-color: @toolbutton-bg-color-pressed;
+      border-color: @toolbutton-border-color-pressed;
+    }
+  }
+
+  &:checked {
+    background-color: @lockbutton-bg-color-checked;
+    border-color: @lockbutton-border-color-checked;
+    image: url('@{img-url}/lock/lock_on.svg');
+
+    & when (@gradient-effect = true) {
+      .gradient-effect-vertical();
+    }
+    
+    &:hover {
+      background-color: @lockbutton-bg-color-checked-hover;
+      border-color: @lockbutton-border-color-checked-hover;
+
+      &:pressed {
+        background-color: @lockbutton-bg-color-checked-pressed;
+        border-color: @lockbutton-border-color-checked;
+      }
+    }
+
+    &:pressed {
+      background-color: @lockbutton-bg-color-checked-pressed;
+      border-color: @lockbutton-border-color-checked;
+    }
+  }
+}

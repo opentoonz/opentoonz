@@ -1,0 +1,481 @@
+// Reset
+* { // reset all
+  padding: 0;
+  margin: 0;
+  outline: 0;
+  border: 0;
+  border-style: none;
+  border-image: none;
+}
+
+QToolBar * {
+  padding: 0;
+  margin: 0;
+}
+
+QWidget {
+  background-color: @bg-color; // main interface background color
+  color: @text-color; // main interface text color
+
+  &:disabled {
+    color: @text-color-disabled;
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   MainWindow & Floating Panels
+----------------------------------------------------------------------------- */
+
+QFrame {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+QToolTip,
+#helpToolTip {
+  background-color: @tooltip-bg-color;
+  border: 1 solid @tooltip-border-color;
+  color: @tooltip-text-color;
+  padding: @tooltip-padding;
+}
+
+#DockSeparator,
+QMainWindow::separator,
+QSplitter::handle {
+  background-color: @dock-color;
+  height: 4;
+  width: 4;
+}
+
+#TDockPlaceholder {
+  background-color: @dock-placeholder-color;
+}
+
+TPanel {
+  background-color: @dock-color;
+}
+
+/* -----------------------------------------------------------------------------
+   Topbar
+----------------------------------------------------------------------------- */
+
+#TopBar {
+  background-color: @topbar-bg-color;
+  border: 0; // reset
+  // requires 1px margin-bottom in #TopBarTabContainer to see border
+  border-bottom: 1 solid @border-color;
+  margin: 0;
+
+  & #EditToolLockButton {
+    background-color: @topbar-bg-color;
+    spacing: 0;
+
+    &::indicator {
+      // inherits from #ToolOptions window
+      background: none;
+      border: none;
+      padding-left: 0;
+      padding-right: 0;
+    }
+  }
+}
+
+#TopBarTabContainer {
+  background-color: @topbar-bg-color;
+  margin-bottom: 1; // required for #TopBar border-bottom to show
+}
+
+#StackedMenuBar {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+QMenuBar {
+  background-color: @topbar-bg-color;
+  border: 0;
+
+  &::item {
+    background-color: @topbar-bg-color;
+    border-left: 1 solid @topbar-bg-color; // align item with QMenu
+    padding: 3 5;
+
+    &:selected { //! hover
+      background-color: @menubar-item-bg-color-hover;
+      color: @hl-text-color;
+    }
+
+    &:pressed {
+      background-color: @menubar-item-bg-color-selected;
+      color: @menu-item-text-color-selected;
+    }
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   Rooms Workspaces
+----------------------------------------------------------------------------- */
+
+#TopBarTab {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background-color: transparent;
+  
+  &::tab {
+    @h-spacing: 0;
+    @v-spacing: 0;
+
+    background-color: @rooms-tab-bg-color;
+    padding: 2 8 3 8;
+    margin: 0 -1 0 0; // pull in right by 1px to overlap tab borders
+    border-color: @tab-border-color;
+    border-radius: 0;
+    border-bottom-width: 0;
+
+    &:hover {
+      background-color: @rooms-tab-bg-color-hover;
+    }
+
+    &:selected {
+      background-color: @rooms-tab-bg-color-selected;
+      border-color: @tab-border-color;
+      color: @rooms-tab-text-color-selected;
+
+      &:hover {
+        background-color: @rooms-tab-bg-color-selected-hover;
+      }
+    }
+
+    &:first {
+      border-left-width: 1; // flat-tab-syle has no left-border, add it back
+      border-top-left-radius: 2;
+    }
+
+    &:last {
+      margin-right: 0; // reset
+      border-top-right-radius: 2;
+    }
+
+    &:only-one {
+      border-left-width: 1; // flat-tab-syle has no left-border, add it back
+    }
+  }
+
+  & QToolButton { // scroll buttons
+    border-left: 2 solid @border-color;
+    border-top: 1 solid @border-color;
+    border-right: 1 solid @border-color;
+    border-bottom: 0;
+    margin-left: -1;
+    margin-top: 0;
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   Context Menu
+----------------------------------------------------------------------------- */
+
+QMenu {
+  background-color: @menu-bg-color;
+  border: 1 solid @menu-border-color;
+  color: @menu-text-color;
+  padding: 2 0;
+
+  &::item {
+    border: 0;
+    padding: 3 28 3 14;
+
+    &:selected {
+      background-color: @menu-item-bg-color-selected;
+      color: @menu-item-text-color-selected;
+    }
+
+    &:checked {
+      color: @menu-item-text-color-checked;
+      background-color: @menu-item-bg-color-checked;
+
+      &:selected {
+        background-color: @menu-item-bg-color-selected;
+        color: @menu-item-text-color-selected;
+      }
+    }
+
+    &:disabled {
+      background: none;
+      color: @text-color-disabled;
+
+      &:selected {
+        color: @text-color-disabled; // for disabled indicator
+      }
+    }
+  }
+
+  &::separator {
+    border-top: 1 solid @menu-separator-color;
+    height: 0;
+    margin: 2 0;
+  }
+
+  &::icon {
+    border-radius: 2;
+    position: absolute;
+    left: 7;
+    padding: 0;
+    margin: 0;
+    qproperty-icon: url('@{img-url}/misc/transparent_16x16.png'); // was this a workaround? possibly for multi-monitor/scaling when hiding icons?
+
+    &:checked {
+      background-color: @menu-icon-checked-bg-color;
+      border: 1 solid @menu-icon-checked-border-color;
+    }
+  }
+
+  &::indicator {
+    margin-left: 8;
+
+    &:non-exclusive {
+      .checkbox-indicator-style();
+      border-color: @menu-checkbox-border-color;
+
+      &:selected {
+        border-color: @menu-checkbox-border-color-hover;
+      }
+
+      &:checked {
+        border-color: @menu-checkbox-border-color-checked;
+        &:selected {
+          border-color: @menu-checkbox-border-color-checked-selected;
+        }
+      }
+    }
+
+    &:exclusive {
+      .radio-button-style();
+    }
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   Titlebars
+----------------------------------------------------------------------------- */
+
+TPanelTitleBar {
+  background-color: @titlebar-bg-color;
+  border-bottom: 1 solid @border-color;
+  border-top-left-radius: @titlebar-border-radius;
+  border-top-right-radius: @titlebar-border-radius;
+  height: 18;
+  min-height: 18;
+  qproperty-TitleColor: @titlebar-text-color;
+  qproperty-ActiveTitleColor: @titlebar-text-color-active;
+  qproperty-OverColor: @lock-color; // close button only
+
+  & when(@titlebar-gradient-effect = true) {
+    .gradient-effect-vertical();
+  }
+
+  & when(@bold-titlebar-text = true) {
+    font-weight: bold;
+  }
+
+  &:hover {
+    background-color: @titlebar-bg-color-hover;
+  }
+}
+
+TPanelTitleBarButton {
+  qproperty-PressedColor: @titlebar-button-pressed-color;
+  qproperty-FreezeColor: @titlebar-button-freeze-color;
+  qproperty-PreviewColor: @titlebar-button-preview-color;
+  qproperty-OverColor: @titlebar-button-rollover-color;
+}
+
+/* -----------------------------------------------------------------------------
+   Scrollbars
+----------------------------------------------------------------------------- */
+
+QAbstractScrollArea::corner {
+  background-color: @sb-bg-color;
+}
+
+QScrollBar {
+  background-color: @sb-bg-color;
+  border: 0;
+
+  &:horizontal {
+    height: 15;
+    margin: 0;
+  }
+
+  &:vertical {
+    margin: 0;
+    width: 15;
+  }
+
+  &::handle {
+    background-color: @sb-handle-bg-color;
+    border-style: solid;
+    border-width: 1;
+    border-color: @sb-handle-border-color;
+    border-radius: @sb-handle-radius;
+
+    &:horizontal,
+    &:vertical {
+      &:hover {
+        background-color: @sb-handle-bg-color-hover;
+        border-color: @sb-handle-border-color-hover;
+      }
+
+      &:pressed {
+        background-color: @sb-handle-bg-color-pressed;
+        border-color: @sb-handle-border-color-pressed;
+      }
+    }
+
+    &:horizontal {
+      margin: @sb-handle-margin 16;
+      min-width: 20;
+
+      & when (@gradient-effect = true) {
+        .gradient-effect-vertical-small();
+      }
+    }
+
+    &:vertical {
+      margin: 16 @sb-handle-margin;
+      min-height: 20;
+    
+      & when (@gradient-effect = true) {
+        .gradient-effect-horizontal-small();
+      }
+    }
+  }
+
+  &::add-line {
+    subcontrol-origin: margin;
+    border: 0;
+
+    &:horizontal { // right
+      subcontrol-position: right;
+      background-color: @sb-bg-color;
+      margin: 0;
+      width: 16;
+    }
+
+    &:vertical { // down
+      subcontrol-position: bottom;
+      background-color: @sb-bg-color;
+      margin: 0;
+      height: 16;
+    }
+  }
+
+  &::sub-line {
+    border: 0;
+    subcontrol-origin: margin;
+
+    &:horizontal { // left
+      subcontrol-position: left;
+      background-color: @sb-bg-color;
+      margin: 0;
+      width: 16;
+    }
+
+    &:vertical { // up
+      subcontrol-position: top;
+      background-color: @sb-bg-color;
+      margin: 0;
+      height: 16;
+    }
+  }
+
+  @arrow-pressed: 1 0 0 0; // simulate a indent effect when pressed
+
+  &::up-arrow:vertical {
+    image: url('@{img-url}/scrollbar/scroll-up.svg');
+    image-position: center center;
+
+    &:hover {
+      image: url('@{img-url}/scrollbar/scroll-up-hover.svg');
+    }
+
+    &:pressed {
+      margin: @arrow-pressed;
+      image: url('@{img-url}/scrollbar/scroll-up-hover.svg');
+    }
+  }
+
+  &::down-arrow:vertical {
+    image: url('@{img-url}/scrollbar/scroll-down.svg');
+    image-position: center center;
+
+    &:hover {
+      image: url('@{img-url}/scrollbar/scroll-down-hover.svg');
+    }
+
+    &:pressed {
+      margin: @arrow-pressed;
+      image: url('@{img-url}/scrollbar/scroll-down-hover.svg');
+    }
+  }
+
+  &::left-arrow:horizontal {
+    image: url('@{img-url}/scrollbar/scroll-left.svg');
+    image-position: center center;
+
+    &:hover {
+      image: url('@{img-url}/scrollbar/scroll-left-hover.svg');
+    }
+
+    &:pressed {
+      margin: @arrow-pressed;
+      image: url('@{img-url}/scrollbar/scroll-left-hover.svg');
+    }
+  }
+
+  &::right-arrow:horizontal {
+    image: url('@{img-url}/scrollbar/scroll-right.svg');
+    image-position: center center;
+
+    &:hover {
+      image: url('@{img-url}/scrollbar/scroll-right-hover.svg');
+    }
+
+    &:pressed {
+      margin: @arrow-pressed;
+      image: url('@{img-url}/scrollbar/scroll-right.svg');
+    }
+  }
+
+  &::sub-page,
+  &::add-page {
+    &:horizontal,
+    &:vertical {
+      background: none;
+    }
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   Progress Bar
+----------------------------------------------------------------------------- */
+
+QProgressBar {
+  @chunk-radius: 2;
+  @bar-radius: @chunk-radius + 1;
+
+  text-align: center;
+  background-color: @progressbar-bg-color;
+  border: 1 solid @progressbar-border-color;
+  border-radius: @bar-radius;
+  padding: 0;
+  
+  &::chunk {
+    margin: -1; // hide border of chunk except for right side
+    background-color: @progressbar-chunk-bg-color;
+    border: 1 solid @progressbar-chunk-border-color;
+    border-radius: @chunk-radius;
+  }
+}
