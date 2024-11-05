@@ -4,6 +4,7 @@
 #define PLASTICSKELETONDEFORMATION_H
 
 #include <memory>
+#include <functional>
 
 // TnzCore includes
 #include "tsmartpointer.h"
@@ -14,11 +15,14 @@
 #include "ext/plastichandle.h"
 #include "ext/plasticskeleton.h"
 
-// tcg includes
-#include "tcg/tcg_any_iterator.h"
-
 // Qt includes
 #include <QString>
+
+#include <boost/bimap.hpp>
+#include <boost/multi_index_container.hpp>
+#include <boost/multi_index/ordered_index.hpp>
+#include <boost/multi_index/member.hpp>
+#include <boost/iterator/transform_iterator.hpp>
 
 #undef DVAPI
 #undef DVVAR
@@ -78,6 +82,31 @@ public:
   void loadData(TIStream &is) override;
 
 } SkVD;
+
+struct VDKey {
+  QString m_name;
+  int m_hookNumber;
+
+  //!< Skeleton index to Vertex index map
+  mutable std::map<int, int> m_vIndices;
+  mutable SkVD m_vd;
+};
+
+using SkVDSet = boost::multi_index_container<
+  VDKey,
+  boost::multi_index::indexed_by<
+    boost::multi_index::ordered_unique<
+      boost::multi_index::tag<QString>,
+      boost::multi_index::member<VDKey, QString, &VDKey::m_name>
+    >,
+    boost::multi_index::ordered_unique<
+      boost::multi_index::tag<int>,
+      boost::multi_index::member<VDKey, int, &VDKey::m_hookNumber>
+    >
+  >
+>;
+
+using SkVDByHookNumber = SkVDSet::index<int>::type;
 
 //**************************************************************************************
 //    PlasticSkeletonDeformationKeyframe  declaration
@@ -164,12 +193,19 @@ private:
   std::unique_ptr<Imp> m_imp;
 
 public:
-  typedef tcg::any_it<int, int, void *>::bidirectional skelId_iterator;
-  typedef tcg::any_it<std::pair<const QString *, SkVD *>,
-                      std::pair<const QString *, SkVD *>, void *>::bidirectional
-      vd_iterator;
-  typedef tcg::any_it<std::pair<int, int>, std::pair<int, int>,
-                      void *>::bidirectional vx_iterator;
+  using SkeletonSet = boost::bimap<int, PlasticSkeletonP>;
+  using skelId_iterator = boost::iterators::transform_iterator<
+    std::function<int (const SkeletonSet::left_map::value_type &)>,
+    SkeletonSet::left_map::iterator
+  >;
+  using vd_iterator = boost::iterators::transform_iterator<
+    std::function<std::pair<const QString *, SkVD *> (const VDKey &)>,
+    SkVDSet::iterator
+  >;
+  using vx_iterator = boost::iterators::transform_iterator<
+    std::function<std::pair<int, int> (const std::pair<int, int> &)>,
+    std::map<int, int>::iterator
+  >;
 
 public:
   PlasticSkeletonDeformation();  //!< Constructs an empty deformation
