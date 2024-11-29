@@ -501,6 +501,9 @@ endif()
 
 if(BUILD_ENV_MSVC)
     set(EXTRA_LIBS)
+    if(CMAKE_CXX_FLAGS_DEBUG)
+    target_compile_options(OpenToonz PRIVATE /EHsc) #Enable C++ Exceptions in Debug Mode
+    endif()
     if(PLATFORM EQUAL 64)
         set(EXTRA_LIBS ${EXTRA_LIBS} Qt5::SerialPort ${TURBOJPEG_LIB} ${OpenCV_LIBS})
         if(WITH_CANON)

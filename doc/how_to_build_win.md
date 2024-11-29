@@ -1,4 +1,3 @@
-
 # Building on Windows
 
 This software can be built using Visual Studio 2019 and Qt 5.x
@@ -90,34 +89,54 @@ To run the program with Canon DSLR camera support, you will need to copy the .dl
 2. Open a Command Prompt and navigate to `QT_DIR/msvc2015_64/bin`. Run the Qt program `windeployqt.exe` with the path for `OpenToonz.exe` as an argument. (Another way to do this is navigate to the exe that was created in your Release folder and drag and drop the Opentoonz.exe on top of the windeployqt.exe This will automatically generate the QT files and folders you will need.)
  - The necessary Qt library files should be in the same folder as `OpenToonz.exe`
   - These include:
+    - `D3Dcompiler_**.dll`
     - `Qt5Core.dll`
     - `Qt5Gui.dll`
+    - `Qt5Multimedia.dll`
     - `Qt5Network.dll`
     - `Qt5OpenGL.dll`
     - `Qt5PrintSupport.dll`
     - `Qt5Script.dll`
+    - `Qt5SerialPort.dll`
     - `Qt5Svg.dll`
     - `Qt5Widgets.dll`
-    - `Qt5Multimedia.dll`
+    - `Qt5Xml.dll`
   - These files should be in the corresponding folders in the same folder `OpenToonz.exe`
-    - `/bearer/qgenericbearer.dll`
-    - `/bearer/qnativewifibearer.dll`
-    - `/iconengines/qsvgicon.dll`
-    - `/imageformats/qdds.dll`
-    - `/imageformats/qgif.dll`
-    - `/imageformats/qicns.dll`
-    - `/imageformats/qico.dll`
-    - `/imageformats/qjpeg.dll`
-    - `/imageformats/qsvg.dll`
-    - `/imageformats/qtga.dll`
-    - `/imageformats/qtiff.dll`
-    - `/imageformats/qwbmp.dll`
-    - `/imageformats/qwebp.dll`
-    - `/platforms/qwindows.dll`
+.
+├── audio
+│   ├── qtaudio_wasapid.dll
+│   └── qtaudio_windowsd.dll
+├── bearer
+│   └── qgenericbearerd.dll
+├── iconengines
+│   └── qsvgicond.dll
+├── imageformats
+│   ├── qgifd.dll
+│   ├── qicnsd.dll
+│   ├── qicod.dll
+│   ├── qjpegd.dll
+│   ├── qsvgd.dll
+│   ├── qtgad.dll
+│   ├── qtiffd.dll
+│   ├── qwbmpd.dll
+│   └── qwebpd.dll
+├── mediaservice
+│   ├── dsengined.dll
+│   ├── qtmedia_audioengined.dll
+│   └── wmfengined.dll
+├── platforms
+│   └── qwindowsd.dll
+├── playlistformats
+│   └── qtmultimedia_m3ud.dll
+├── printsupport
+│   └── windowsprintersupportd.dll
+├── styles
+│   └── qwindowsvistastyled.dll
 
 3. Copy the following files to the same folder as `OpenToonz.exe`
   - `$opentoonz/thirdparty/glut/3.7.6/lib/glut64.dll`
   - `$opentoonz/thirdparty/glew/glew-1.9.0/bin/64bit/glew32.dll`
+  - `$opentoonzthirdparty/libmypaint/dist/64/*.dll`
   - `turbojpeg.dll` from libjpeg-turbo package
   - `opencv_world***.dll` from OpenCV package
 
