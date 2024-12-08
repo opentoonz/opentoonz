@@ -395,8 +395,8 @@ void RowPanel::drawRows(QPainter &p, int r0, int r1) {
                                : getViewer()->getFrameTextColor());
 
     QString number = QString::number(r + 1);
-    p.drawText(QRect(x0, y + 1, width() - 4, next_y - y - 1),
-               Qt::AlignVCenter | Qt::AlignRight, number);
+    drawTextAndDropShadow(p, QRect(x0, y + 1, width() - 4, next_y - y - 1),
+                          Qt::AlignVCenter | Qt::AlignRight, number);
     y = next_y;
   }
 }
