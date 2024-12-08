@@ -12,6 +12,11 @@
 // Tnz6 includes
 #include "filebrowserpopup.h"
 #include "exportlevelcommand.h"
+#include "convertfolderpopup.h"
+#include "toonzqt/imageutils.h"
+
+// TnzQt includes
+#include "toonzqt/planeviewer.h"
 
 // STD includes
 #include <map>
@@ -26,6 +31,7 @@
 
 class TPropertyGroup;
 class TCamera;
+class ShortcutZoomer;
 
 namespace DVGui {
 class CheckBox;
@@ -55,8 +61,9 @@ class QHideEvent;
 /*!
   \brief    The popup dealing with level exports in Toonz.
 */
-class ExportLevelPopup final : public FileBrowserPopup {
+class ExportLevelPopup : public FileBrowserPopup {
   Q_OBJECT
+  friend class ExportAllLevelsPopup;
 
 public:
   ExportLevelPopup();
@@ -64,6 +71,7 @@ public:
 
   bool execute() override;
 
+  virtual void GetSelectedSimpLevels();
   TPropertyGroup *getFormatProperties(const std::string &ext);
   IoCmd::ExportLevelOptions getOptions(const std::string &ext);
 
@@ -77,16 +85,18 @@ private:
 
 private:
   // Widgets
-
+  
   DVGui::CheckBox *m_retas;
   QComboBox *m_format;
   QPushButton *m_formatOptions;
 
   ExportOptions *m_exportOptions;
   Swatch *m_swatch;
+  std::wstring folderName;
 
   // Others
-
+  std::vector<TXshSimpleLevel *> outputLevels;
+  bool allPlis;
   std::map<std::string, TPropertyGroup *> m_formatProperties;
 
   TFrameHandle m_levelFrameIndexHandle;  //!< Autonomous current level's frame
@@ -94,44 +104,46 @@ private:
 
 private slots:
 
+  virtual void updateOnSelection();
   void onOptionsClicked();
   void onRetas(int);
   void initFolder() override;
-  void updateOnSelection();
   void onformatChanged(const QString &);
   void checkAlpha();
   void updatePreview();
 };
 
-//-----------------------------------------------------------------------------
+//********************************************************************************
+//    ExportOptions  definition
+//********************************************************************************
 
 class ExportLevelPopup::ExportOptions final : public QFrame {
   Q_OBJECT
 
 public:
   ExportOptions(QWidget *parent = 0);
-
+  bool pliOtionsVisable;  // be used when updateonselection,ExportOptions show,
   IoCmd::ExportLevelOptions getOptions() const;
-
-  void updateOnSelection();
 
 signals:
 
   void optionsChanged();
 
 protected:
-  void showEvent(QShowEvent *se) override;
-
+  virtual void showEvent(QShowEvent *se) override;
+  
   void updateCameraDefault();
   void updateDpi();
 
 private:
   friend class ExportLevelPopup;
-
+  friend class ExportAllLevelsPopup;
+  
   QWidget *m_pliOptions;
-
+  
   DVGui::ColorField *m_bgColorField;
   QCheckBox *m_noAntialias;
+  QCheckBox *m_createlevelfolder;
 
   DVGui::MeasuredDoubleLineEdit *m_widthFld;
   DVGui::MeasuredDoubleLineEdit *m_heightFld;
@@ -154,8 +166,44 @@ private slots:
   void updateXRes();
   void updateYRes();
   void scaleRes();
-
+  
   void onThicknessTransformModeChanged();
 };
 
+//********************************************************************************
+//    Swatch  definition
+//********************************************************************************
+
+class ExportLevelPopup::Swatch final : public PlaneViewer {
+public:
+  Swatch(QWidget *parent = 0) : PlaneViewer(parent) {}
+
+  TImageP image() const { return m_img; }
+  TImageP &image() { return m_img; }
+
+protected:
+  void showEvent(QShowEvent *se) override;
+  void keyPressEvent(QKeyEvent *ke) override;
+  void keyPressEvent(QShowEvent *se);
+  void paintGL() override;
+
+  void setActualPixelSize();
+
+private:
+  struct ShortcutZoomer final : public ImageUtils::ShortcutZoomer {
+    ShortcutZoomer(Swatch *swatch) : ImageUtils::ShortcutZoomer(swatch) {}
+
+  private:
+    bool zoom(bool zoomin, bool resetZoom) override {
+      return false;
+    }  // Already covered by PlaneViewer
+    bool setActualPixelSize() override {
+      static_cast<Swatch *>(getWidget())->setActualPixelSize();
+      return true;
+    }
+  };
+
+private:
+  TImageP m_img;  //!< Image shown in the swatch.
+};
 #endif  // EXPORTLEVELPOPUP_H
