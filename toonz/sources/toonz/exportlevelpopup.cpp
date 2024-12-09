@@ -53,6 +53,7 @@
 #include <QStackedWidget>
 #include <QSplitter>
 #include <QToolBar>
+#include <QMessageBox>
 
 //********************************************************************************
 //    Export callbacks  definition
@@ -111,50 +112,13 @@ public:
 
 }  // namespace
 
-//********************************************************************************
-//    Swatch  definition
-//********************************************************************************
-
-class ExportLevelPopup::Swatch final : public PlaneViewer {
-public:
-  Swatch(QWidget *parent = 0) : PlaneViewer(parent) {}
-
-  TImageP image() const { return m_img; }
-  TImageP &image() { return m_img; }
-
-protected:
-  void showEvent(QShowEvent *se) override;
-  void keyPressEvent(QKeyEvent *ke) override;
-  void keyPressEvent(QShowEvent *se);
-  void paintGL() override;
-
-  void setActualPixelSize();
-
-private:
-  struct ShortcutZoomer final : public ImageUtils::ShortcutZoomer {
-    ShortcutZoomer(Swatch *swatch) : ImageUtils::ShortcutZoomer(swatch) {}
-
-  private:
-    bool zoom(bool zoomin, bool resetZoom) override {
-      return false;
-    }  // Already covered by PlaneViewer
-    bool setActualPixelSize() override {
-      static_cast<Swatch *>(getWidget())->setActualPixelSize();
-      return true;
-    }
-  };
-
-private:
-  TImageP m_img;  //!< Image shown in the swatch.
-};
-
 //========================================================================
 
 void ExportLevelPopup::Swatch::showEvent(QShowEvent *se) {
   // Set current scene's chessboard color
   TPixel32 pix1, pix2;
   Preferences::instance()->getChessboardColors(pix1, pix2);
-
+  
   setBgColor(pix1, pix2);
 }
 
@@ -208,15 +172,14 @@ void ExportLevelPopup::Swatch::setActualPixelSize() {
 //********************************************************************************
 //    ExportLevelPopup  implementation
 //********************************************************************************
-
-ExportLevelPopup::ExportLevelPopup()
-    : FileBrowserPopup(tr("Export Level"), Options(CUSTOM_LAYOUT)) {
+ExportLevelPopup::ExportLevelPopup() : FileBrowserPopup(tr("Export Level"), Options(CUSTOM_LAYOUT)) {
   setOkText(tr("Export"));
 
   TabBarContainter *tabBarContainer = new TabBarContainter;
   QTabBar *tabBar                   = new QTabBar;
   QStackedWidget *stackedWidget     = new QStackedWidget;
   QFrame *exportOptionsPage         = new QFrame;
+
   // Options / Swatch splitter
   QSplitter *splitter     = new QSplitter(Qt::Vertical);
   QScrollArea *scrollArea = new QScrollArea(splitter);
@@ -249,7 +212,7 @@ ExportLevelPopup::ExportLevelPopup()
   scrollArea->setWidgetResizable(true);
   scrollArea->setMinimumWidth(450);
 
-  m_swatch->setMinimumHeight(150);
+  m_swatch->setMinimumHeight(245);
   m_swatch->setFocusPolicy(Qt::WheelFocus);
 
   static const int toolbarHeight = 22;
@@ -264,12 +227,12 @@ ExportLevelPopup::ExportLevelPopup()
   m_format->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Maximum);
 
   QStringList formats;
-  formats << "tga"
-          << "tif"
-          << "png"
+  formats << "png"
           << "jpg"
-          << "bmp";
-  formats.sort();
+          << "bmp"
+          << "tif"
+          << "tga";
+  //formats.sort();
   m_format->addItems(formats);
 
   m_retas->setMinimumHeight(DVGui::WidgetHeight);
@@ -357,23 +320,22 @@ ExportLevelPopup::ExportLevelPopup()
   }
   setLayout(mainLayout);
 
-  // Establish connections
-  bool ret = true;
-  ret      = connect(tabBar, SIGNAL(currentChanged(int)), stackedWidget,
-                SLOT(setCurrentIndex(int)));
-  ret      = connect(m_format, SIGNAL(currentIndexChanged(const QString &)),
-                SLOT(onformatChanged(const QString &))) &&
+    bool ret = true;
+    ret      = connect(tabBar, SIGNAL(currentChanged(int)), stackedWidget,
+                  SLOT(setCurrentIndex(int)));
+    ret      = connect(m_format, SIGNAL(currentIndexChanged(const QString &)),
+                  SLOT(onformatChanged(const QString &))) &&
+          ret;
+    ret = connect(m_retas, SIGNAL(stateChanged(int)), SLOT(onRetas(int))) && ret;
+    ret = connect(m_formatOptions, SIGNAL(clicked()), SLOT(onOptionsClicked())) &&
         ret;
-  ret = connect(m_retas, SIGNAL(stateChanged(int)), SLOT(onRetas(int))) && ret;
-  ret = connect(m_formatOptions, SIGNAL(clicked()), SLOT(onOptionsClicked())) &&
-        ret;
-  ret = connect(&m_levelFrameIndexHandle, SIGNAL(frameSwitched()),
-                SLOT(updatePreview())) &&
-        ret;
-  ret = connect(m_exportOptions, SIGNAL(optionsChanged()),
-                SLOT(updatePreview())) &&
-        ret;
-  assert(ret);
+    ret = connect(&m_levelFrameIndexHandle, SIGNAL(frameSwitched()),
+                  SLOT(updatePreview())) &&
+          ret;
+    ret = connect(m_exportOptions, SIGNAL(optionsChanged()),
+                  SLOT(updatePreview())) &&
+          ret;
+    assert(ret);
 }
 
 //-----------------------------------------------------------------------------
@@ -387,6 +349,36 @@ ExportLevelPopup::~ExportLevelPopup() {
   QWidget().setLayout(layout());  // Reparents all layout-managed child widgets
 }  // (i.e. all) to a temporary
 
+void ExportLevelPopup::GetSelectedSimpLevels() {
+  outputLevels.clear();
+  TApp *app = TApp::instance();
+
+  TSelection *selection          = app->getCurrentSelection()->getSelection();
+  TColumnSelection *colSelection = dynamic_cast<TColumnSelection *>(selection);
+
+  if (colSelection && colSelection->getIndices().size() > 1) {
+    bool enabled = false;
+
+    TXsheet *xsh                    = app->getCurrentXsheet()->getXsheet();
+    const std::set<int> &colIndices = colSelection->getIndices();
+
+    std::set<int>::const_iterator it, end = colIndices.end();
+    for (it = colIndices.begin(); it != end; ++it) {
+      int r0, r1, c = *it;
+      xsh->getCellRange(c, r0, r1);
+
+      if (r0 <= r1)  // There exists a not-empty cell
+      {
+        TXshSimpleLevel *sl = xsh->getCell(r0, c).getSimpleLevel();
+        outputLevels.push_back(sl);
+        assert(sl);
+      }
+    }
+  } else {
+    TXshSimpleLevel *sl = app->getCurrentLevel()->getSimpleLevel();
+    outputLevels.push_back(sl);
+  }
+}
 //-----------------------------------------------------------------------------
 
 void ExportLevelPopup::showEvent(QShowEvent *se) {
@@ -418,7 +410,6 @@ void ExportLevelPopup::showEvent(QShowEvent *se) {
   //          filebrowserpopup.cpp...
 
   updateOnSelection();  // Here the selection is used
-  updatePreview();
 
   // Establish connections
   TApp *app = TApp::instance();
@@ -556,53 +547,36 @@ void ExportLevelPopup::onRetas(int) {
 
 void ExportLevelPopup::updateOnSelection() {
   // Disable name field in case of multiple selection
-  TSelection *sel = TApp::instance()->getCurrentSelection()->getSelection();
-  TColumnSelection *colSelection = dynamic_cast<TColumnSelection *>(sel);
-  m_nameField->setEnabled(!colSelection ||
-                          colSelection->getIndices().size() <= 1);
+  GetSelectedSimpLevels();
+  m_nameField->setEnabled(outputLevels.size() == 1);
 
-  // Enable tlv output in case all inputs are pli
-  TApp *app = TApp::instance();
-
-  bool allPlis;
-  if (colSelection && colSelection->getIndices().size() >= 1) {
-    TXsheet *xsh                    = app->getCurrentXsheet()->getXsheet();
-    const std::set<int> &colIndices = colSelection->getIndices();
-
-    std::set<int>::const_iterator it, end = colIndices.end();
-    for (it = colIndices.begin(); it != end; ++it) {
-      int r0, r1, c = *it;
-      xsh->getCellRange(c, r0, r1);
-
-      if (r0 <= r1) {
-        TXshSimpleLevel *sl = xsh->getCell(r0, c).getSimpleLevel();
-        assert(sl);
-
-        if (!sl || (sl->getType() != PLI_XSHLEVEL)) break;
-      }
-    }
-
-    allPlis = (it == end);
-  } else {
-    TXshSimpleLevel *sl = app->getCurrentLevel()->getSimpleLevel();
-    allPlis             = sl && (sl->getType() == PLI_XSHLEVEL);
-  }
-
+  // Enable tlv output in case all inputs are pli or tlv
   int tlvIdx = m_format->findText("tlv");
-  if (allPlis) {
+  bool allPliTlvs = true;
+  for (auto sl : outputLevels) {
+    allPliTlvs = (sl && (sl->getType() == PLI_XSHLEVEL ||
+                         sl->getType() == TZP_XSHLEVEL)) &&
+                 allPliTlvs;
+  }
+  if (allPliTlvs) {
     if (tlvIdx < 0) m_format->addItem("tlv");
   } else {
     if (tlvIdx > 0) m_format->removeItem(tlvIdx);
   }
 
-  m_exportOptions->updateOnSelection();
+  // whether be abel to set PliOptions
+  bool isPli = (outputLevels.back()->getType() == PLI_XSHLEVEL);
+  m_exportOptions->pliOtionsVisable = isPli;//used when exportOptions be shown
+  m_exportOptions->m_pliOptions->setEnabled(isPli);
+  updatePreview();
+  return;
 }
 
 //--------------------------------------------------------------
 
 void ExportLevelPopup::updatePreview() {
   // Build export preview arguments
-  TXshSimpleLevel *sl = TApp::instance()->getCurrentLevel()->getSimpleLevel();
+  TXshSimpleLevel *sl = outputLevels.back();
   int frameIdx        = m_levelFrameIndexHandle.getFrame();
 
   const std::string &ext                = m_format->currentText().toStdString();
@@ -619,8 +593,10 @@ void ExportLevelPopup::updatePreview() {
 //--------------------------------------------------------------
 
 bool ExportLevelPopup::execute() {
-  if (m_selectedPaths.empty()) return false;
-
+  if (m_selectedPaths.empty()) {
+    DVGui::error(tr("Please input the File name and select a folder!"));
+    return false;
+  }
   TFilePath fp(*m_selectedPaths.begin());
 
   // Build export options
@@ -661,7 +637,8 @@ bool ExportLevelPopup::execute() {
         assert(sl);
 
         ret = ret && IoCmd::exportLevel(fp.withName(sl->getName()), sl, opts,
-                                        &overwriteCB, &progressCB);
+                                        &overwriteCB, &progressCB,
+        (m_exportOptions->m_createlevelfolder->isChecked() ? m_nameField->text().toStdWString() : std::wstring()));
       }
     }
 
@@ -677,7 +654,9 @@ bool ExportLevelPopup::execute() {
     if (isReservedFileName_message(QString::fromStdString(fp.getName())))
       return false;
 
-    return IoCmd::exportLevel(fp.withType(ext).withFrame(tmplFId), 0, opts);
+    return IoCmd::exportLevel(fp.withType(ext).withFrame(tmplFId), 0, opts,
+        0,0,
+        (m_exportOptions->m_createlevelfolder->isChecked() ? m_nameField->text().toStdWString() : std::wstring()));
   }
 }
 
@@ -733,6 +712,9 @@ ExportLevelPopup::ExportOptions::ExportOptions(QWidget *parent)
     m_noAntialias = new QCheckBox(tr("No Antialias"));
     layout->addWidget(m_noAntialias, row++, 2, Qt::AlignLeft);
 
+    m_createlevelfolder = new QCheckBox(tr("Create Folder(equal file name)"));
+    layout->addWidget(m_createlevelfolder, row++, 2, Qt::AlignLeft);
+    
     //-------------- Vector Options ---------------------
 
     m_pliOptions = new QWidget;
@@ -931,7 +913,7 @@ ExportLevelPopup::ExportOptions::ExportOptions(QWidget *parent)
 
 void ExportLevelPopup::ExportOptions::showEvent(QShowEvent *se) {
   updateCameraDefault();
-  updateOnSelection();
+  m_pliOptions->setEnabled(pliOtionsVisable);
 }
 
 //-----------------------------------------------------------------------------
@@ -974,43 +956,6 @@ IoCmd::ExportLevelOptions ExportLevelPopup::ExportOptions::getOptions() const {
   }
 
   return opts;
-}
-
-//-----------------------------------------------------------------------------
-
-void ExportLevelPopup::ExportOptions::updateOnSelection() {
-  TApp *app = TApp::instance();
-
-  TSelection *selection          = app->getCurrentSelection()->getSelection();
-  TColumnSelection *colSelection = dynamic_cast<TColumnSelection *>(selection);
-
-  if (colSelection && colSelection->getIndices().size() > 1) {
-    bool enabled = false;
-
-    TXsheet *xsh                    = app->getCurrentXsheet()->getXsheet();
-    const std::set<int> &colIndices = colSelection->getIndices();
-
-    std::set<int>::const_iterator it, end = colIndices.end();
-    for (it = colIndices.begin(); it != end; ++it) {
-      int r0, r1, c = *it;
-      xsh->getCellRange(c, r0, r1);
-
-      if (r0 <= r1)  // There exists a not-empty cell
-      {
-        TXshSimpleLevel *sl = xsh->getCell(r0, c).getSimpleLevel();
-        assert(sl);
-
-        enabled = enabled || (sl && (sl->getType() == PLI_XSHLEVEL));
-      }
-    }
-
-    m_pliOptions->setEnabled(enabled);
-    return;
-  }
-
-  TXshSimpleLevel *sl = TApp::instance()->getCurrentLevel()->getSimpleLevel();
-  m_pliOptions->setEnabled(
-      sl && (sl->getType() != TZP_XSHLEVEL && sl->getType() != OVL_XSHLEVEL));
 }
 
 //-----------------------------------------------------------------------------
@@ -1086,6 +1031,7 @@ void ExportLevelPopup::ExportOptions::onThicknessTransformModeChanged() {
   m_fromThicknessDisplacement->setVisible(!scaleMode);
   m_toThicknessDisplacement->setVisible(!scaleMode);
 }
+
 
 //********************************************************************************
 //    Export Level Command  instantiation

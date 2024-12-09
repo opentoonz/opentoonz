@@ -10,6 +10,7 @@
 #include "tofflinegl.h"
 #include "tvectorrenderdata.h"
 #include "tstroke.h"
+#include "tfilepath.h"
 
 // ToonzLib includes
 #include "toonz/txshsimplelevel.h"
@@ -43,7 +44,7 @@
 
 // Qt includes
 #include <QApplication>
-
+#include <QString>
 #include "exportlevelcommand.h"
 
 using namespace DVGui;
@@ -413,7 +414,8 @@ TImageP IoCmd::exportedImage(const std::string &ext, const TXshSimpleLevel &sl,
 bool IoCmd::exportLevel(const TFilePath &path, TXshSimpleLevel *sl,
                         ExportLevelOptions opts,
                         OverwriteCallbacks *overwriteCB,
-                        ProgressCallbacks *progressCB) {
+                        ProgressCallbacks *progressCB,
+                        std::wstring foldername) {
   struct Locals {
     const TFilePath &m_path;
     TXshSimpleLevel *m_sl;
@@ -518,7 +520,7 @@ bool IoCmd::exportLevel(const TFilePath &path, TXshSimpleLevel *sl,
   };  // Locals
 
   // Use default values in case some were not specified by input
-
+  
   // Level
   if (!sl) {
     sl = TApp::instance()->getCurrentLevel()->getSimpleLevel();
@@ -542,6 +544,22 @@ bool IoCmd::exportLevel(const TFilePath &path, TXshSimpleLevel *sl,
   // Camera (todo)
   assert(opts.m_camera.getRes().lx > 0 && opts.m_camera.getRes().ly > 0);
 
+  // if Need to Create Folder
+  TFilePath fp;
+  if (!foldername.empty()) {
+    fp = TFilePath(path.getParentDir().getWideString() +
+                              to_wstring("\\") +
+                     foldername +  to_wstring("\\") +
+                     path.withoutParentDir().getWideString());
+    TFilePath fp2 = fp.getParentDir();
+    bool exist = TFileStatus(fp2).isDirectory();
+    if (!TFileStatus(fp.getParentDir()).isDirectory()) {
+      TSystem::mkDir(fp.getParentDir());
+    } 
+  } else {
+    fp = path;
+  }
+
   // Callbacks
   std::unique_ptr<OverwriteCallbacks> overwriteDefault(
       overwriteCB ? 0 : (overwriteCB = new ExportOverwriteCB()));
@@ -549,9 +567,9 @@ bool IoCmd::exportLevel(const TFilePath &path, TXshSimpleLevel *sl,
       progressCB ? 0 : (progressCB = new ExportProgressCB()));
 
   // Initialize variables
-  Locals locals = {path, sl, opts, overwriteCB, progressCB};
-
-  progressCB->setProcessedName(QString::fromStdWString(path.getWideString()));
+  Locals locals = {fp, sl, opts, overwriteCB, progressCB};
+  
+  progressCB->setProcessedName(QString::fromStdWString(fp.getWideString()));
   progressCB->setRange(0, sl->getFrameCount());
 
   // Export level
