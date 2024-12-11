@@ -114,6 +114,7 @@
         <command>MI_SaveAllLevels</command>
         <command>MI_OpenRecentLevel</command>
         <command>MI_ExportLevel</command>
+        <command>MI_ExportAllLevels</command>
         <separator/>
         <command>MI_AddFrames</command>
         <command>MI_Renumber</command>

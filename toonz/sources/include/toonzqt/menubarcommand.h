@@ -236,7 +236,8 @@ public:
   virtual void execute() = 0;
 };
 
-template <class T>
+//Set second parameter to enabel Modal
+template <class T, bool setToModal = false>
 class OpenPopupCommandHandler final : public MenuItemHandler {
   T *m_popup;
   CommandId m_id;
