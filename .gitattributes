@@ -1,6 +1,5 @@
 *.lib filter=lfs diff=lfs merge=lfs -text
 *.dll filter=lfs diff=lfs merge=lfs -text
 
-# For all bat files to use CRLF
-# 为所有批处理文件（.bat）强制使用 CRLF 换行符
+# Ensure .bat files use CRLF line endings
 *.bat text eol=crlf
