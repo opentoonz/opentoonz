@@ -35,6 +35,7 @@ set(MOC_HEADERS
     dvitemview.h
     dvwidgets.h
     exportlevelpopup.h
+    exportalllevelspopup.h
     exportpanel.h
     exportscenepopup.h
     filebrowser.h
@@ -234,6 +235,7 @@ set(SOURCES
     batchserversviewer.cpp
     castviewer.cpp
     exportlevelpopup.cpp
+    exportalllevelspopup.cpp
     exportscenepopup.cpp
     colormodelviewer.cpp
     exportpanel.cpp
