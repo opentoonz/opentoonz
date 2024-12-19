@@ -973,7 +973,7 @@ void TProjectManager::getFolderNames(std::vector<std::string> &names) {
 void TProjectManager::setCurrentProjectPath(const TFilePath &fp) {
   assert(TProject::isAProjectPath(fp));
   currentProjectPath = ::to_string(fp.getWideString());
-  currentProject     = std::make_shared<TProject>();
+  currentProject     = nullptr;// init this pointer in getCurrentProject()
   notifyListeners();
 }
 
