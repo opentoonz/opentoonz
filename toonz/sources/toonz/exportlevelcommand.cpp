@@ -43,7 +43,6 @@
 
 // Qt includes
 #include <QApplication>
-
 #include "exportlevelcommand.h"
 
 using namespace DVGui;
@@ -550,7 +549,7 @@ bool IoCmd::exportLevel(const TFilePath &path, TXshSimpleLevel *sl,
 
   // Initialize variables
   Locals locals = {path, sl, opts, overwriteCB, progressCB};
-
+  
   progressCB->setProcessedName(QString::fromStdWString(path.getWideString()));
   progressCB->setRange(0, sl->getFrameCount());
 
