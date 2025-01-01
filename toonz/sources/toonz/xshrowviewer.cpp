@@ -222,7 +222,7 @@ void RowArea::drawRows(QPainter &p, int r0, int r1) {
         str = QString("%1\"").arg(QString::number(koma).rightJustified(2, '0'));
       }
 
-      p.drawText(labelRect, align, str);
+      drawTextAndDropShadow(p, labelRect, align, str);
 
       break;
     }
@@ -230,7 +230,7 @@ void RowArea::drawRows(QPainter &p, int r0, int r1) {
     case XsheetViewer::Frame: {
       if (simpleView && r > 0 && (r + 1) % (distance > 0 ? distance : 5)) break;
       QString number = QString::number(r + 1);
-      p.drawText(labelRect, align, number);
+      drawTextAndDropShadow(p, labelRect, align, number);
       break;
     }
 
@@ -261,7 +261,7 @@ void RowArea::drawRows(QPainter &p, int r0, int r1) {
         if (koma == 0) koma = frameRate * 6;
         str = QString("%1").arg(QString::number(koma).rightJustified(3, '0'));
       }
-      p.drawText(labelRect, align, str);
+      drawTextAndDropShadow(p, labelRect, align, str);
       break;
     }
     // 3 second sheet (72frames per page)
@@ -291,7 +291,7 @@ void RowArea::drawRows(QPainter &p, int r0, int r1) {
         if (koma == 0) koma = frameRate * 3;
         str = QString("%1").arg(QString::number(koma).rightJustified(2, '0'));
       }
-      p.drawText(labelRect, align, str);
+      drawTextAndDropShadow(p, labelRect, align, str);
       break;
     }
     }
