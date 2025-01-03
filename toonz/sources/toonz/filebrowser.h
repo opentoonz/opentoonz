@@ -101,6 +101,8 @@ types to be displayed in the file browser.
 
   void setHistoryDay(std::string dayDateString);
 
+  void createFolder(TFilePath folderPath);  // create a folder and do fresh
+
   TFilePath getFolder() const { return m_folder; }
   std::string getDayDateString() const { return m_dayDateString; }
 
