@@ -753,6 +753,11 @@ that the last operation is the icon refresh...
                                            m_currentLevelHandle,
                                            apd.getTolerance());
 
+  m_currentLevelHandle->getSimpleLevel()->setDirtyFlag(true);
+
+  //TApp::instance()->getCurrentLevel()->notifyLevelChange();
+  //Not necessaryto notice user
+
   TUndoManager::manager()->add(new InvalidateIconsUndo(m_currentLevelHandle));
 
   TUndoManager::manager()->endBlock();
