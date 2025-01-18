@@ -64,95 +64,81 @@ TLevelWriterGif::TLevelWriterGif(const TFilePath &path, TPropertyGroup *winfo)
 TLevelWriterGif::~TLevelWriterGif() {
   QStringList preIArgs;
   QStringList postIArgs;
-  QStringList palettePreIArgs;
-  QStringList palettePostIArgs;
-
-  int outLx = m_lx;
-  int outLy = m_ly;
-
-  // set scaling
-  outLx = m_lx * m_scale / 100;
-  outLy = m_ly * m_scale / 100;
-  /*
-  // ffmpeg doesn't like resolutions that aren't divisible by 2.
-  if (outLx % 2 != 0) outLx++;
-  if (outLy % 2 != 0) outLy++;
-  */
-
+  
+  int outLx = m_lx * m_scale / 100;
+  int outLy = m_ly * m_scale / 100;
+  
   double framerate = (m_frameRate < 1.0 ? 1.0 : m_frameRate);
 
+  // Initialize filters with fps, scale, and format
   QString filters = "fps=" + QString::number(framerate) +
                     ",scale=" + QString::number(outLx) + ":" +
-                    QString::number(outLy) + ":flags=lanczos";
+                    QString::number(outLy) + ":flags=lanczos" +
+                    ",format=rgba";
 
-  // 1 = "dither=sierra2_4a" is default
-  const char *ditherConsts[4] = {"none", "sierra2_4a", "bayer:bayer_scale=2",
-                                 "bayer:bayer_scale=1"};
+  // Dithering options
+  const char *ditherConsts[4] = {"none", "sierra2_4a", "bayer:bayer_scale=2", "bayer:bayer_scale=1"};
 
-  // Please be careful when moving items, logic AND 3 requires alignment
+  // Build the filter chain based on m_mode
   switch (m_mode) {
-  case 0:
-  case 1:
-  case 2:
-  case 3:
-    filters += ",split[o1][o2];[o1]palettegen";  // "stats_mode=full" is default
-    if (m_maxcolors != 256) {
-      filters += "=max_colors=" + QString::number(m_maxcolors);
-    }
-    filters += "[p];[o2]fifo[o3];[o3][p]paletteuse";
-    if ((m_mode & 3) != 1) {
-      filters += "=dither=" + QString(ditherConsts[m_mode & 3]);
-    }
-    break;
-  case 4:
-  case 5:
-  case 6:
-  case 7:
-    filters += ",split[o1][o2];[o1]palettegen=stats_mode=diff";
-    if (m_maxcolors != 256) {
-      filters += ":max_colors=" + QString::number(m_maxcolors);
-    }
-    filters += "[p];[o2]fifo[o3];[o3][p]paletteuse";
-    if ((m_mode & 3) != 1) {
-      filters += "=dither=" + QString(ditherConsts[m_mode & 3]);
-    }
-    break;
-  case 8:
-  case 9:
-  case 10:
-  case 11:
-    filters += ",split[o1][o2];[o1]palettegen=stats_mode=single";
-    if (m_maxcolors != 256) {
-      filters += ":max_colors=" + QString::number(m_maxcolors);
-    }
-    filters += "[p];[o2]fifo[o3];[o3][p]paletteuse=new=1";
-    if ((m_mode & 3) != 1) {
-      filters += ":dither=" + QString(ditherConsts[m_mode & 3]);
-    }
-    break;
-  default:
-    break;
+    case 0:
+    case 1:
+    case 2:
+    case 3:
+      filters += ",split [o1][o2];[o1] palettegen=reserve_transparent=on";
+      if (m_maxcolors != 256) {
+        filters += ":max_colors=" + QString::number(m_maxcolors);
+      }
+      filters += " [p];[o2][p] paletteuse";
+      if ((m_mode & 3) != 1) {
+        filters += ":dither=" + QString(ditherConsts[m_mode & 3]);
+      }
+      break;
+    case 4:
+    case 5:
+    case 6:
+    case 7:
+      filters += ",split [o1][o2];[o1] palettegen=stats_mode=diff:reserve_transparent=on";
+      if (m_maxcolors != 256) {
+        filters += ":max_colors=" + QString::number(m_maxcolors);
+      }
+      filters += " [p];[o2][p] paletteuse";
+      if ((m_mode & 3) != 1) {
+        filters += ":dither=" + QString(ditherConsts[m_mode & 3]);
+      }
+      break;
+    case 8:
+    case 9:
+    case 10:
+    case 11:
+      filters += ",split [o1][o2];[o1] palettegen=stats_mode=single:reserve_transparent=on";
+      if (m_maxcolors != 256) {
+        filters += ":max_colors=" + QString::number(m_maxcolors);
+      }
+      filters += " [p];[o2][p] paletteuse=new=1";
+      if ((m_mode & 3) != 1) {
+        filters += ":dither=" + QString(ditherConsts[m_mode & 3]);
+      }
+      break;
+    default:
+      break;
   }
 
-  preIArgs << "-r";
-  preIArgs << QString::number(framerate);
-  preIArgs << "-v";
-  preIArgs << "warning";
-  postIArgs << "-vf";
-  postIArgs << filters;
-  postIArgs << "-gifflags";
-  postIArgs << "0";
+  // Prepare FFmpeg arguments
+  preIArgs << "-r" << QString::number(framerate) << "-v" << "warning";
+  postIArgs << "-vf" << filters << "-gifflags" << "0";
 
   if (!m_looping) {
-    postIArgs << "-loop";
-    postIArgs << "-1";
+    postIArgs << "-loop" << "-1";
   }
 
   std::string outPath = m_path.getQString().toStdString();
 
+  // Run FFmpeg with the prepared arguments
   ffmpegWriter->runFfmpeg(preIArgs, postIArgs, false, false, true);
   ffmpegWriter->cleanUpFiles();
 }
+
 
 //-----------------------------------------------------------
 
