@@ -2170,6 +2170,22 @@ void FileBrowser::folderUp() {
 
 //-----------------------------------------------------------------------------
 
+void FileBrowser::createFolder(TFilePath folderPath) {
+  try {
+    TSystem::mkDir(folderPath);
+
+  } catch (...) {
+    DVGui::error(tr("It is not possible to create the %1 folder.")
+                     .arg(toQString(folderPath)));
+    return;
+  }
+
+  DvDirModel *model = DvDirModel::instance();
+  QModelIndex parentFolderIndex = m_folderTreeView->currentIndex();
+  model->refresh(parentFolderIndex);  // TODO: be able to refresh a empty folder
+  m_folderTreeView->expand(parentFolderIndex);
+}
+
 void FileBrowser::newFolder() {
   TFilePath parentFolder = getFolder();
   if (parentFolder == TFilePath() || !TFileStatus(parentFolder).isDirectory())
@@ -2181,20 +2197,10 @@ void FileBrowser::newFolder() {
   while (TFileStatus(folderPath).doesExist())
     folderPath = parentFolder + (folderName + L" " + std::to_wstring(++i));
 
-  try {
-    TSystem::mkDir(folderPath);
-
-  } catch (...) {
-    DVGui::error(tr("It is not possible to create the %1 folder.")
-                     .arg(toQString(folderPath)));
-    return;
-  }
+  createFolder(folderPath);
 
   DvDirModel *model = DvDirModel::instance();
-
   QModelIndex parentFolderIndex = m_folderTreeView->currentIndex();
-  model->refresh(parentFolderIndex);
-  m_folderTreeView->expand(parentFolderIndex);
 
   std::wstring newFolderName = folderPath.getWideName();
   QModelIndex newFolderIndex =
