@@ -1209,17 +1209,20 @@ DvDirModelNode *DvDirModelRootNode::getNodeByPath(const TFilePath &path) {
 
   // it could be a network folder
   if (m_networkNode) {
-    for (i = 0; i < m_networkNode->getChildCount(); i++) {
-      DvDirModelNode *node = m_networkNode->getChild(i)->getNodeByPath(path);
-      if (node) return node;
-    }
-
-    // try to find in the network
     QString pathStr = path.getQString();
-    if ((pathStr.startsWith("\\\\") || pathStr.startsWith("//")) &&
-        QDir(pathStr).exists()) {
-      DvDirModelNode *node = m_networkNode->createNetworkFolderNode(path);
-      if (node) return node;
+    if (pathStr.startsWith("\\\\") || pathStr.startsWith("//")) {
+
+      for (i = 0; i < m_networkNode->getChildCount(); i++) {
+        DvDirModelNode *node = m_networkNode->getChild(i)->getNodeByPath(path);
+        if (node) return node;
+      }
+
+      // try to find in the network
+      if (QDir(pathStr).exists()) {
+        DvDirModelNode *node = m_networkNode->createNetworkFolderNode(path);
+        if (node) return node;
+      }
+
     }
   }
 
