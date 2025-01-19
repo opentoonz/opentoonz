@@ -1295,11 +1295,30 @@ void DvDirModel::onFolderChanged(const TFilePath &path) { refreshFolder(path); }
 void DvDirModel::refresh(const QModelIndex &index) {
   if (!index.isValid()) return;
   DvDirModelNode *node = getNode(index);
-  if (!node || node->getChildCount() < 1) return;
+  if (!node) return;
+  
   emit layoutAboutToBeChanged();
-  emit beginRemoveRows(index, 0, node->getChildCount() - 1);
-  node->refreshChildren();
-  emit endRemoveRows();
+
+  int oldChildren = node->getChildCount();
+  if (oldChildren > 0) {
+    emit beginRemoveRows(index, 0, oldChildren - 1);
+    node->refreshChildren();
+    emit endRemoveRows();
+  }
+  else if (oldChildren == 0) {
+    node->refreshChildren();
+  }
+  else {
+    emit layoutChanged();
+    return;
+  }
+
+  int newChildren = node->getChildCount();
+  if(newChildren > 0){
+    emit beginInsertRows(index, 0, newChildren - 1);
+    emit endInsertRows();
+  }
+  
   emit layoutChanged();
 }
 
