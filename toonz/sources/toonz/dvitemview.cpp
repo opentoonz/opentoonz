@@ -353,8 +353,12 @@ void DvItemSelection::selectNone() {
 
 void DvItemSelection::selectAll() {
   m_selectedIndices.clear();
-  int i = 0;
-  for (i = 0; i < m_model->getItemCount(); i++) m_selectedIndices.insert(i);
+  
+  // exclude the parent folder
+  int i =
+      m_model->getItemData(0, DvItemListModel::Name).toString() == ".." ? 1 : 0;
+  for (; i < m_model->getItemCount(); i++)
+      m_selectedIndices.insert(i);
   emit itemSelectionChanged();
 }
 
