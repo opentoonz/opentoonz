@@ -1185,6 +1185,7 @@ void DvItemViewerPanel::mousePressEvent(QMouseEvent *event) {
   updateViewParameters(width());
   int index       = pos2index(event->pos());
   bool isSelected = m_selection->isSelected(index);
+  m_currentIndex  = index;
   if (event->button() == Qt::RightButton) {
     // when a folder item is right-clicked, do nothing
     if (getModel()->getItemData(index, DvItemListModel::IsFolder).toBool())
@@ -1253,7 +1254,6 @@ void DvItemViewerPanel::mousePressEvent(QMouseEvent *event) {
     }
   }
   if (m_globalSelectionEnabled) m_selection->makeCurrent();
-  m_currentIndex = index;
   // if (m_viewer ) m_viewer->notifyClick(index);
   m_startDragPosition = event->pos();
   update();
