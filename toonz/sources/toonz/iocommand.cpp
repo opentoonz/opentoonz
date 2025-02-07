@@ -153,6 +153,7 @@ public:
       QString checkBoxLabel =
           QObject::tr("Always do this action.")
               .arg(QString::fromStdWString(path.getWideString()));
+      QString addSeparatorLabel = QObject::tr("Add separator for Frames");
       QStringList buttons;
       buttons << QObject::tr("Import") << QObject::tr("Load")
               << QObject::tr("Cancel");
@@ -2447,6 +2448,86 @@ int IoCmd::loadResources(LoadResourceArguments &args, bool updateRecentFile,
 
   std::vector<TFilePath> paths;
   int all = 0;
+
+  // TODO: Make Import before renaming
+  // remove duplicate frames -------------------------------------
+  bool addSeparator;
+  bool SepaPolicy = true;
+  // TODO: Check the Preference
+  if (SepaPolicy) {
+    QString label = QObject::tr(
+        "Add separator for Frames?\n"
+        "(This would edit orinal files)");
+    QString checkBoxLabel = QObject::tr("Always do this action.");
+    QStringList buttons;
+    buttons << QObject::tr("Yes") << QObject::tr("No");
+    DVGui::MessageAndCheckboxDialog *renameDialog = DVGui::createMsgandCheckbox(
+        DVGui::QUESTION, label, checkBoxLabel, buttons, 1, Qt::Unchecked);
+    int ret = renameDialog->exec();
+    int checked = renameDialog->getChecked();
+    addSeparator = ret;
+    if (checked)//TODO: Change the Preference
+      ;
+  }
+
+  if (addSeparator) {
+    QRegularExpression pattern(
+        R"(
+  ^                           # Match the start of the string
+  .*?                         # Optional prefix
+  \d+  # allow aFilePrefix<number>.ext,ignore if less than 10 and no padding
+  \.                          # Match a dot (.)
+  (png|jpg|jpeg|bmp|tga|tiff) # Image extensions
+  $                           # Match the end of the string
+)",
+        QRegularExpression::CaseInsensitiveOption |
+            QRegularExpression::ExtendedPatternSyntaxOption);
+    TFilePath *path;
+    std::wstring basename;
+
+    auto resourceDatas = std::move(args.resourceDatas);
+    bool ret=true;
+    for (int r = 0; r < rCount; ++r) {
+      path = &resourceDatas[r].m_path;
+      if (pattern
+              .match(QString::fromStdString(
+                  path->getLevelName()))
+              .hasMatch()) {
+        ret = ret && TSystem::renameImageSequence_throw(*path);
+        args.resourceDatas.push_back(std::move(resourceDatas[r]));
+        basename = path->withoutParentDir().getWideName();//path changed
+        if (basename == QDir(path->getParentDir().getQString()).dirName().toStdWString()) {
+          while (r + 1 < rCount) {
+            bool allDigit=true;
+            for (char ch : resourceDatas[r + 1].m_path.getName()) {
+              if (!std::isdigit(static_cast<unsigned char>(ch))) {
+                allDigit = false;
+                break;
+              }
+              ++r;
+            }
+            if(!allDigit) break;
+          }
+        }
+        else while (r +1 < rCount) {
+            if (resourceDatas[r + 1].m_path.getWideName().find(basename) !=
+                std::string::npos)
+              ++r;
+            else
+              break;
+        }
+      }else
+        args.resourceDatas.push_back(std::move(resourceDatas[r]));
+    }
+    if (ret) {
+      rCount = args.resourceDatas.size();
+      resourceDatas.clear();
+      QCoreApplication::processEvents();
+    } else
+      return false;
+  }
+  // duplicate frames removed -------------------------------------
+
 
   // Loop for all the resources to load
   for (int r = 0; r != rCount; ++r) {

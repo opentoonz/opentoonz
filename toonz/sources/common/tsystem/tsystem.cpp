@@ -7,6 +7,9 @@ using namespace std;
 #include <set>
 #include "tfilepath_io.h"
 #include "tconvert.h"
+#ifdef __cpp_filesystem
+#include <filesystem>
+#endif
 
 #ifndef TNZCORE_LIGHT
 
@@ -857,6 +860,67 @@ void TSystem::copyFileOrLevel_throw(const TFilePath &dst,
 }
 
 //--------------------------------------------------------------
+
+bool TSystem::renameImageSequence_throw(TFilePath &path) {
+  QString levelBaseName = QString::fromStdString(path.getName());
+
+  int i                 = levelBaseName.size();
+  uint8_t padding       = 0;
+  while (i > 0 && levelBaseName[i - 1].isDigit()) {
+    --i;
+    ++padding;
+  }
+  levelBaseName         = levelBaseName.left(i);
+  QDir parentFolder    = QDir(path.getParentDir().getQString());  // No Slash
+  QString suffix       = QString::fromStdString(path.getType());
+
+  QStringList fileNames = parentFolder.entryList(QStringList(levelBaseName + "*." + suffix),
+                                     QDir::Files, QDir::Name);
+
+  bool isLevelBaseNameEmpty = levelBaseName.isEmpty();
+  if (isLevelBaseNameEmpty) {
+    levelBaseName = parentFolder.dirName();
+  } else if (fileNames.size() < 10 && padding == 1) {
+      // TODO: Is this a level?
+
+    }
+  
+
+  char separator  = '.';
+  padding = 4;
+  QString FrameID;
+  QString newFileName;
+  for (const QString &fileName : fileNames) {
+    if (isLevelBaseNameEmpty)
+      FrameID = fileName.mid(0,fileName.lastIndexOf('.'));
+      else
+        FrameID = fileName.mid(levelBaseName.size(),
+                                 fileName.lastIndexOf('.') - levelBaseName.size());
+    if (FrameID.isEmpty()) continue;
+      newFileName = levelBaseName + separator +
+                          FrameID.rightJustified(padding, '0') + '.' + suffix;
+#ifdef __cpp_filesystem
+    std::filesystem::path oldPath =
+        parentFolder.absoluteFilePath(fileName).toStdString();
+    std::filesystem::path newPath =
+        parentFolder.absoluteFilePath(newFileName).toStdString();
+    try {
+      std::filesystem::rename(oldPath, newPath);
+    } catch (...) {
+      throw TSystemException(path, "can't rename file!");
+      return false;
+    }
+#else
+    if (!parentFolder.rename(fileName, newFileName)) {
+      throw TSystemException(path, "can't rename file!");
+      return false;
+    }
+#endif
+  }
+  path = TFilePath(
+      parentFolder.absoluteFilePath(levelBaseName + separator + '.' + suffix));
+  return true;
+}
 
 void TSystem::renameFileOrLevel_throw(const TFilePath &dst,
                                       const TFilePath &src,
