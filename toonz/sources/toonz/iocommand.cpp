@@ -83,6 +83,7 @@
 #include <QLabel>
 #include <QApplication>
 #include <QClipboard>
+#include <QDirIterator>
 
 // boost includes
 #include <boost/optional.hpp>
@@ -2400,6 +2401,7 @@ int IoCmd::loadResources(LoadResourceArguments &args, bool updateRecentFile,
       return QFileInfo(rd.m_path.getQString()).isDir();
     }
 
+    // call when loading levels, change rCount and arg.resourceDatas
     static bool matchSequencePattern(const TFilePath &path) {
       QRegularExpression pattern(
           R"(
@@ -2416,20 +2418,16 @@ int IoCmd::loadResources(LoadResourceArguments &args, bool updateRecentFile,
           .hasMatch();
     };
 
-    static bool renamePolicy(bool r = false) {
-      static bool rename = false;
-      if (r) {
-        rename = r;
-        return r;
-      }
-      if (rename) return true;
+    static bool renamePolicy(const TFilePath &path) {
       // TODO: Check the Preference Policy
       QString label = QObject::tr(
-          "Add separator for Frames?\n"
-          "(This would edit orinal files)");
+      "OpenToonz uses an underscore (_) or dot (.) as a frame separator.\n"
+      "Would you like to add a separator to the image sequence?\n"
+      "\n%1 (and similar files)")
+          .arg(path.getQString());
       QString checkBoxLabel = QObject::tr("Always do this action.");
       QStringList buttons;
-      buttons << QObject::tr("Yes") << QObject::tr("No");
+      buttons << QObject::tr("Yes") << QObject::tr("No, treat as single frame.");
       DVGui::MessageAndCheckboxDialog *renameDialog =
           DVGui::createMsgandCheckbox(DVGui::QUESTION, label, checkBoxLabel,
                                       buttons, 1, Qt::Unchecked);
@@ -2438,7 +2436,6 @@ int IoCmd::loadResources(LoadResourceArguments &args, bool updateRecentFile,
       if (checked)  // TODO: Change the Preference
         ;
       if (ret == 1) {
-        rename = true;
         return true;
       }
       else
@@ -2466,10 +2463,29 @@ int IoCmd::loadResources(LoadResourceArguments &args, bool updateRecentFile,
       }
       levelBaseName = levelBaseName.substr(0, i);
 
-      if (levelBaseName.size()) levelBaseName = path.getParentDir().getWideName();
+      if (!levelBaseName.size()) levelBaseName = path.getParentDir().getWideName();
       return path.withName(levelBaseName).withFrame();
 
     }
+
+   static bool hasLevelExist(const TFilePath &path) {
+      QDirIterator it(path.getParentDir().getQString(), QDir::Files);
+
+   QString pattern = QString("^%1\\.[^.]+\\.%2$")
+                            .arg(QRegularExpression::escape(
+                                path.getQString()))
+                            .arg(QRegularExpression::escape(
+                                QString::fromStdString(path.getType())));
+      QRegularExpression regex(pattern);
+      while (it.hasNext()) {
+        QString fileName = QFileInfo(it.next()).fileName();
+        if (regex.match(fileName).hasMatch()) {
+          return true;
+        }
+      }
+      return false;
+    }
+
   };  // locals
 
   if (args.resourceDatas.empty()) return 0;
@@ -2520,8 +2536,6 @@ int IoCmd::loadResources(LoadResourceArguments &args, bool updateRecentFile,
 
   std::vector<TFilePath> paths;
   int all = 0;//Turn on to allow all duplicate
-  // remove duplicate frames lambdas 
-  // call when loading levels, change rCount and arg.resourceDatas
 
   // Loop for all the resources to load
   for (int r = 0; r < rCount; ++r) {
@@ -2626,7 +2640,7 @@ int IoCmd::loadResources(LoadResourceArguments &args, bool updateRecentFile,
     else if (path.getSepChar().isNull()) {
       bool mapSequenceParam = locals::matchSequencePattern(path);
       //for single frame
-      if (!mapSequenceParam) {
+      if (!mapSequenceParam || rCount == 1) {
         try {
           path = importDialog.process(scene, 0, path);
         } catch (std::string msg) {
@@ -2635,14 +2649,34 @@ int IoCmd::loadResources(LoadResourceArguments &args, bool updateRecentFile,
         }
       }
       //for sequence
-      else if (args.importPolicy == LoadResourceArguments::IMPORT ||
-           locals::renamePolicy()) {
-        TFilePath backup;
+      else if (locals::renamePolicy(path)) {
+        TFilePath backup = path;
         TFilePath levelPath = locals::getLevelPath(path);
         progressDialog->setLabelText(
-            DVGui::ProgressDialog::tr("Loading \"%1\"...")
+            QString("Loading \"%1\"...")
                 .arg(levelPath.withFrame().getQString()));
-        //Firstly, Load or Import the files
+        //Check for Existing Level
+        bool isOverWrite = false;
+        bool isSkip      = false;
+        if (locals::hasLevelExist(levelPath)) {
+          QString question =
+              QString("Level %1 already exist.").arg(levelPath.getQString());
+          QString overwrite("Overwrite");
+          QString skip("Keep Existing");
+          isOverWrite = DVGui::MsgBox(question, overwrite, skip, 0) == 1;
+          isSkip      = !isOverWrite;
+        }
+        if (isSkip) {
+          while (r < rCount) {
+            path = args.resourceDatas[r].m_path;
+            if (backup.getParentDir() != path.getParentDir()) break; 
+            if (!locals::isSharingSameParam(backup, path)) break;
+            ++r;
+          }
+          --r;
+          continue;
+        }
+        //Load or Import the files
         while (r < rCount) {
           path = args.resourceDatas[r].m_path;
           progressDialog->setValue(r);
@@ -2653,7 +2687,6 @@ int IoCmd::loadResources(LoadResourceArguments &args, bool updateRecentFile,
             continue;
           }
           if (importDialog.aborted()) break;
-          if (backup.isEmpty()) backup = path;
           // and Same parent folder
           if (backup.getParentDir() != path.getParentDir()) break;
           if (!locals::isSharingSameParam(backup, path)) break;
@@ -2663,9 +2696,11 @@ int IoCmd::loadResources(LoadResourceArguments &args, bool updateRecentFile,
         if (importDialog.aborted()) break;
         //rename
         if (!backup.isEmpty()) {
-          TSystem::renameImageSequence_throw(backup);
-          path = backup;
-          QCoreApplication::processEvents();
+          if (!isSkip) {
+            TSystem::renameImageSequence_throw(backup, isOverWrite); 
+            QCoreApplication::processEvents();
+          }
+          path = levelPath;
         }
       }
     }

@@ -25,6 +25,7 @@ using namespace std;
 #include <QUrl>
 #include <QCoreApplication>
 #include <QUuid>
+#include <QRegularExpression>
 
 #include <QDesktopServices>
 #include <QHostInfo>
@@ -861,7 +862,7 @@ void TSystem::copyFileOrLevel_throw(const TFilePath &dst,
 
 //--------------------------------------------------------------
 
-bool TSystem::renameImageSequence_throw(TFilePath &path) {
+void TSystem::renameImageSequence_throw(TFilePath &path,bool overwrite) {
   QString levelBaseName = QString::fromStdString(path.getName());
 
   int i                 = levelBaseName.size();
@@ -874,13 +875,27 @@ bool TSystem::renameImageSequence_throw(TFilePath &path) {
   QDir parentFolder = QDir(path.getParentDir().getQString());  // No Slash
   QString suffix       = QString::fromStdString(path.getType());
 
-  QStringList fileNames = parentFolder.entryList(QStringList(levelBaseName + "*." + suffix),
-                                     QDir::Files, QDir::Name);
-
   bool isLevelBaseNameEmpty = levelBaseName.isEmpty();
+  
+  QStringList fileNames;
   if (isLevelBaseNameEmpty) {
+    fileNames = parentFolder.entryList(
+        QStringList("*." + suffix), QDir::Files, QDir::Name);
     levelBaseName = parentFolder.dirName();
-  } else if (fileNames.size() < 10 && padding == 1) {
+    QRegularExpression regex(QString(R"(^\d+\.)") + suffix + "$");
+    fileNames = fileNames.filter(regex);
+  } else {
+    fileNames = parentFolder.entryList(
+        QStringList(levelBaseName + "*." + suffix), QDir::Files, QDir::Name);
+    QRegularExpression regex("^" + QRegularExpression::escape(levelBaseName)
+        +QString(R"([\da-zA-Z]+\.)") + suffix + "$");
+    fileNames = fileNames.filter(regex);
+  }
+
+  path = path.withName(levelBaseName.toStdWString()).withFrame();
+  if (overwrite) TSystem::removeFileOrLevel(path);
+
+  if (fileNames.size() < 10 && padding == 1) {
       // TODO: Is this a level?
 
     }
@@ -908,17 +923,17 @@ bool TSystem::renameImageSequence_throw(TFilePath &path) {
       std::filesystem::rename(oldPath, newPath);
     } catch (...) {
       throw TSystemException(path, "can't rename file!");
-      return false;
+      return ;
     }
 #else
     if (!parentFolder.rename(fileName, newFileName)) {
       throw TSystemException(path, "can't rename file!");
-      return false;
+      return;
     }
 #endif
   }
-  path = path.withName(levelBaseName.toStdWString()).withFrame();
-  return true;
+
+  return;
 }
 
 void TSystem::renameFileOrLevel_throw(const TFilePath &dst,
