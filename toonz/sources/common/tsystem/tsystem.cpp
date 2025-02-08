@@ -871,7 +871,7 @@ bool TSystem::renameImageSequence_throw(TFilePath &path) {
     ++padding;
   }
   levelBaseName         = levelBaseName.left(i);
-  QDir parentFolder    = QDir(path.getParentDir().getQString());  // No Slash
+  QDir parentFolder = QDir(path.getParentDir().getQString());  // No Slash
   QString suffix       = QString::fromStdString(path.getType());
 
   QStringList fileNames = parentFolder.entryList(QStringList(levelBaseName + "*." + suffix),
@@ -885,7 +885,6 @@ bool TSystem::renameImageSequence_throw(TFilePath &path) {
 
     }
   
-
   char separator  = '.';
   padding = 4;
   QString FrameID;
@@ -899,6 +898,7 @@ bool TSystem::renameImageSequence_throw(TFilePath &path) {
     if (FrameID.isEmpty()) continue;
       newFileName = levelBaseName + separator +
                           FrameID.rightJustified(padding, '0') + '.' + suffix;
+
 #ifdef __cpp_filesystem
     std::filesystem::path oldPath =
         parentFolder.absoluteFilePath(fileName).toStdString();
@@ -917,8 +917,7 @@ bool TSystem::renameImageSequence_throw(TFilePath &path) {
     }
 #endif
   }
-  path = TFilePath(
-      parentFolder.absoluteFilePath(levelBaseName + separator + '.' + suffix));
+  path = path.withName(levelBaseName.toStdWString()).withFrame();
   return true;
 }
 
