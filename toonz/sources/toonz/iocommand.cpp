@@ -1739,6 +1739,18 @@ bool IoCmd::saveLevel(TXshSimpleLevel *sl) {
 bool IoCmd::saveAll(int flags) {
   // try to save as much as possible
   // if anything is wrong, return false
+
+  QMainWindow *parent = TApp::instance()->getMainWindow();
+  QLabel *Label = new QLabel("Saving...", parent);
+  Label->setStyleSheet(
+      "font-size: 20px;"
+      "background-color: black; color: white; "
+      "font-weight: bold; padding: 5px;");
+  Label->adjustSize();
+  QPoint pos = parent->rect().bottomRight();
+  Label->move(pos.x() - Label->width() - 40, pos.y() - Label->height() - 30);
+  Label->show();
+
   // NOTE: saveScene already check saveInProgress
   bool result = saveScene(flags);
 
@@ -1759,6 +1771,23 @@ bool IoCmd::saveAll(int flags) {
   app->getCurrentLevel()->notifyLevelTitleChange();
   app->getCurrentPalette()->notifyPaletteTitleChanged();
   if (untitled) scene->setUntitled();
+
+  //End Label Notice
+  if (result) {
+    Label->setText("Saved All");
+    Label->setStyleSheet(
+        "font-size: 20px;"
+        "background-color: black; color: green; "
+        "font-weight: bold; padding: 5px;");
+  } else {
+    Label->setText("Save Failed");
+    Label->setStyleSheet(
+        "font-size: 20px;"
+        "background-color: black; color: green; "
+        "font-weight: bold; padding: 5px;");
+  }
+  
+  QTimer::singleShot(2500, Label, &QLabel::deleteLater);
   return result;
 }
 

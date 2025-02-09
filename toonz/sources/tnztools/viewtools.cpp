@@ -15,13 +15,13 @@ namespace {
 //-----------------------------------------------------------------------------
 
 class ZoomTool final : public TTool {
-  int m_oldY;
+  int m_oldX;
   TPointD m_center;
   bool m_dragging;
   double m_factor;
 
 public:
-  ZoomTool() : TTool("T_Zoom"), m_dragging(false), m_oldY(0), m_factor(1) {
+  ZoomTool() : TTool("T_Zoom"), m_dragging(false), m_oldX(0), m_factor(1) {
     bind(TTool::AllTargets);
   }
 
@@ -34,15 +34,15 @@ public:
     m_dragging              = true;
     int v                   = 1;
     if (e.isAltPressed()) v = -1;
-    m_oldY                  = e.m_pos.y;
+    m_oldX                  = e.m_pos.x;
     // m_center = getViewer()->winToWorld(e.m_pos);
     m_center = TPointD(e.m_pos.x, e.m_pos.y);
     m_factor = 1;
     invalidate();
   }
   void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) override {
-    int d    = m_oldY - e.m_pos.y;
-    m_oldY   = e.m_pos.y;
+    int d    = m_oldX - e.m_pos.x;
+    m_oldX   = e.m_pos.x;
     double f = exp(-d * 0.01);
     m_factor = f;
     m_viewer->zoom(m_center, f);

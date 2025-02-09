@@ -173,22 +173,23 @@ void BoardItem::drawItem(QPainter &p, QSize imgSize, int shrink,
     isInRect = true;
   else
     isInRect = false;
-  while (1) {
-    fontSize += (isInRect) ? 1 : -1;
-    if (fontSize <= 0)  // cannot draw
-      return;
-    tmpFont.setPixelSize(fontSize);
-    tmpFm = QFontMetricsF(tmpFont);
-    tmpBounding =
-        tmpFm.boundingRect(itemRect, Qt::AlignLeft | Qt::AlignTop, contentText);
+  if (fontSize < m_maximumFontSize)
+    while (1) {
+      fontSize += (isInRect) ? 1 : -1;
+      if (fontSize <= 0)  // cannot draw
+        return;
+      tmpFont.setPixelSize(fontSize);
+      tmpFm       = QFontMetricsF(tmpFont);
+      tmpBounding = tmpFm.boundingRect(itemRect, Qt::AlignLeft | Qt::AlignTop,
+                                       contentText);
 
-    bool newIsInRect = (itemRect.width() >= tmpBounding.width() &&
-                        itemRect.height() >= tmpBounding.height());
-    if (isInRect != newIsInRect) {
-      if (isInRect) fontSize--;
-      break;
+      bool newIsInRect = (itemRect.width() >= tmpBounding.width() &&
+                          itemRect.height() >= tmpBounding.height());
+      if (isInRect != newIsInRect) {
+        if (isInRect) fontSize--;
+        break;
+      }
     }
-  }
 
   //----
   fontSize = std::min(fontSize, m_maximumFontSize / shrink);

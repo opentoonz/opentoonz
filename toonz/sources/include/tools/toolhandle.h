@@ -39,17 +39,31 @@ class DVAPI ToolHandle final : public QObject {
   QString m_oldToolName;
   bool m_toolIsBusy;
 
+  // State tracking for intuitive viewer navigation
+  QString m_originalTool;  // Store tool before navigation mode
+  bool m_inNavigationMode = false;
+  bool m_spacePressed     = false;
+  bool m_shiftPressed     = false;
+  bool m_ctrlPressed      = false;
+
 public:
   ToolHandle();
   ~ToolHandle();
 
   TTool *getTool() const;
   void setTool(QString name);
-  void setTargetType(int targetType);
+  void setTargetType(int targetType);  // TODO: unused, remove?
 
-  const QString& getRequestedToolName() const
-    { return m_toolName; }
-  
+  const QString &getRequestedToolName() const { return m_toolName; }
+
+  // used to handle viewer navigation state
+  void setSpacePressed(bool pressed);
+  void setShiftPressed(bool pressed);
+  void setCtrlPressed(bool pressed);
+  bool isSpacePressed() const { return m_spacePressed; }
+  bool isShiftPressed() const { return m_shiftPressed; }
+  bool isCtrlPressed() const { return m_ctrlPressed; }
+
   // used to change tool for a short while (e.g. while keeping pressed a
   // short-key)
   void storeTool();
@@ -70,6 +84,9 @@ public:
   void notifyToolComboBoxListChanged(std::string id) {
     emit toolComboBoxListChanged(id);
   }
+
+private:
+  void updateNavigationState();
 
 signals:
   void toolComboBoxListChanged(std::string);

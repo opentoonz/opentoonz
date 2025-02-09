@@ -129,53 +129,99 @@ void ShortcutViewer::keyPressEvent(QKeyEvent *event) {
 //-----------------------------------------------------------------------------
 
 void ShortcutViewer::onEditingFinished() {
+  // Get the current key sequence and its string representation
+  QKeySequence keySeq = keySequence();
+  QString keyStr      = keySeq.toString();
+
+  // Check for reserved key combinations involving the Space key
+  if (keyStr.contains("Space", Qt::CaseInsensitive)) {
+    // Check for Space + Shift combination
+    if (keyStr.contains("Shift", Qt::CaseInsensitive)) {
+      setKeySequence(m_action->shortcut());  // Reset to the original shortcut
+      DVGui::warning(
+          tr("The Space + Shift combination is reserved for viewer rotation."));
+      return;
+    }
+
+    // Check for Space + Ctrl combination
+    if (keyStr.contains("Ctrl", Qt::CaseInsensitive)) {
+      setKeySequence(m_action->shortcut());  // Reset to the original shortcut
+      DVGui::warning(
+          tr("The Space + Ctrl combination is reserved for viewer zoom."));
+      return;
+    }
+
+    // Check for Space key alone
+    setKeySequence(m_action->shortcut());  // Reset to the original shortcut
+    DVGui::warning(tr("The Space key is reserved for viewer navigation."));
+    return;
+  }
+
+  // Reset the keys pressed counter (used for tracking multi-key sequences)
   m_keysPressed = 0;
 
-  int seqCount = keySequence().count();
-  int k1       = seqCount >= 1 ? keySequence()[0] : 0;
-  int k2       = seqCount >= 2 ? keySequence()[1] : 0;
-  int k3       = seqCount >= 3 ? keySequence()[2] : 0;
-  int k4       = seqCount >= 4 ? keySequence()[3] : 0;
+  // Extract individual keys from the key sequence
+  QVector<int> keys;
+  for (int i = 0; i < keySeq.count(); i++) {
+    keys.append(keySeq[i]);
+  }
 
-  QKeySequence keys(k1, k2, k3, k4);
-
+  // Check for conflicts with existing shortcuts
   if (m_action) {
     CommandManager *cm = CommandManager::instance();
-    // Check partial sequences (k1, k1+k2, k1+k2+k3, k1+k2+k3+k4) for matches to
-    // existing shortcuts
-    for (int i = 0; i < seqCount; i++) {
-      QKeySequence tmpKeys = QKeySequence(k1, (i >= 1 ? k2 : 0),
-                                          (i >= 2 ? k3 : 0), (i >= 3 ? k4 : 0));
-      QAction *oldAction =
-          cm->getActionFromShortcut(tmpKeys.toString().toStdString());
-      if (oldAction == m_action) return;
-      if (oldAction) {
+
+    // Iterate through the key sequence to check for partial conflicts
+    for (int i = 0; i < keys.size(); i++) {
+      // Create a partial key sequence (e.g., k1, k1+k2, k1+k2+k3, etc.)
+      QKeySequence partialSeq(keys[0], (i >= 1 ? keys[1] : 0),
+                              (i >= 2 ? keys[2] : 0), (i >= 3 ? keys[3] : 0));
+
+      // Check if the partial sequence conflicts with an existing shortcut
+      QAction *conflictingAction =
+          cm->getActionFromShortcut(partialSeq.toString().toStdString());
+
+      if (conflictingAction == m_action) return;
+
+      // If a conflict is found with another action
+      if (conflictingAction) {
         QString msg;
-        if (seqCount == (i + 1)) {
+        // Check if the conflict is with the full sequence or a partial sequence
+        if (keys.size() == (i + 1)) {
+          // Conflict with the full sequence
           msg = tr("'%1' is already assigned to '%2'\nAssign to '%3'?")
-                    .arg(tmpKeys.toString())
-                    .arg(oldAction->iconText())
+                    .arg(partialSeq.toString())
+                    .arg(conflictingAction->iconText())
                     .arg(m_action->iconText());
         } else {
+          // Conflict with a partial sequence
           msg = tr("Initial sequence '%1' is assigned to '%2' which takes "
                    "priority.\nAssign shortcut sequence anyway?")
-                    .arg(tmpKeys.toString())
-                    .arg(oldAction->iconText());
+                    .arg(partialSeq.toString())
+                    .arg(conflictingAction->iconText());
         }
+
+        // Show a warning message box to the user
         int ret = DVGui::MsgBox(msg, tr("Yes"), tr("No"), 1);
         activateWindow();
-        if (ret == 2 || ret == 0) {
-          setKeySequence(m_action->shortcut());
-          setFocus();
+
+        // If the user chooses "No" or closes the dialog, reset the shortcut and
+        // exit
+        if (ret != 1) {  // 1 corresponds to "Yes"
+          setKeySequence(
+              m_action->shortcut());  // Reset to the original shortcut
+          setFocus();                 // Set focus back to the widget
           return;
         }
       }
     }
-    std::string shortcutString = keys.toString().toStdString();
-    CommandManager::instance()->setShortcut(m_action, shortcutString);
+
+    // If no conflicts are found, assign the new shortcut
+    std::string shortcutString = keySeq.toString().toStdString();
+    cm->setShortcut(m_action, shortcutString);
     emit shortcutChanged();
   }
-  setKeySequence(keys);
+
+  setKeySequence(keySeq);  // Update the displayed key sequence in the UI
 }
 
 //-----------------------------------------------------------------------------

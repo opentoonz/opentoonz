@@ -429,6 +429,15 @@ void SceneViewer::onLeave() {
   if (CommandManager::instance()->getAction(MI_ShiftTrace)->isChecked())
     TTool::getTool("T_ShiftTrace", TTool::ToonzImage)->onLeave();
 
+  // Reset navigation key states when mouse leaves viewer
+  // This prevents stuck states when keys are released while mouse is outside
+  ToolHandle *toolHandle = TApp::instance()->getCurrentTool();
+  if (toolHandle) {
+    toolHandle->setSpacePressed(false);
+    toolHandle->setCtrlPressed(false);
+    toolHandle->setShiftPressed(false);
+  }
+
   update();
 }
 
@@ -655,18 +664,18 @@ void SceneViewer::onMove(const TMouseEvent &event) {
     }
     if (!cursorSet) setToolCursor(this, tool->getCursorId());
 
-    if ( m_toolHasAssistants
-      && (tool->getToolHints() & TTool::HintAssistantsGuidelines)
-      && !areAlmostEqual(m_toolPos, pos) )
-        invalidateAll();
-    
-    if ( m_toolReplicatedPoints.size() > 1
-      && (tool->getToolHints() & TTool::HintReplicatorsPoints)
-      && !areAlmostEqual(m_toolPos, pos) )
-        invalidateAll();
+    if (m_toolHasAssistants &&
+        (tool->getToolHints() & TTool::HintAssistantsGuidelines) &&
+        !areAlmostEqual(m_toolPos, pos))
+      invalidateAll();
+
+    if (m_toolReplicatedPoints.size() > 1 &&
+        (tool->getToolHints() & TTool::HintReplicatorsPoints) &&
+        !areAlmostEqual(m_toolPos, pos))
+      invalidateAll();
 
     m_toolPos = pos;
-    
+
 #ifdef WITH_CANON
     if (StopMotion::instance()->m_canon->m_pickLiveViewZoom)
       setToolCursor(this, ToolCursor::ZoomCursor);
@@ -1410,12 +1419,33 @@ void SceneViewer::keyPressEvent(QKeyEvent *event) {
   if (m_freezedStatus != NO_FREEZED) return;
   int key = event->key();
 
+  // Handle navigation keys first
+  if (!event->isAutoRepeat()) {
+    if (event->key() == Qt::Key_Space) {
+      TApp::instance()->getCurrentTool()->setSpacePressed(true);
+      event->accept();
+      return;
+    }
+    if (event->key() == Qt::Key_Control) {
+      TApp::instance()->getCurrentTool()->setCtrlPressed(true);
+      event->accept();
+      return;
+    }
+    if (event->key() == Qt::Key_Shift) {
+      TApp::instance()->getCurrentTool()->setShiftPressed(true);
+      event->accept();
+      return;
+    }
+  }
+
+  // Handle Canon camera controls if enabled
 #ifdef WITH_CANON
   if ((m_stopMotion->m_canon->m_pickLiveViewZoom ||
        m_stopMotion->m_canon->m_zooming) &&
       (key == Qt::Key_Left || key == Qt::Key_Right || key == Qt::Key_Up ||
        key == Qt::Key_Down || key == Qt::Key_2 || key == Qt::Key_4 ||
        key == Qt::Key_6 || key == Qt::Key_8)) {
+    // Handle camera zoom point adjustment
     if (m_stopMotion->m_canon->m_liveViewZoomReadyToPick == true) {
       if (key == Qt::Key_Left || key == Qt::Key_4) {
         m_stopMotion->m_canon->m_liveViewZoomPickPoint.x -= 10;
@@ -1444,6 +1474,8 @@ void SceneViewer::keyPressEvent(QKeyEvent *event) {
     return;
   } else
 #endif
+
+  // Handle stop motion capture
 #if defined(x64)
       if (m_stopMotion->m_liveViewStatus == 2 &&
           (key == Qt::Key_Enter || key == Qt::Key_Return)) {
@@ -1453,19 +1485,19 @@ void SceneViewer::keyPressEvent(QKeyEvent *event) {
   }
 #endif
 
-  // resolving priority and tool-specific key events in this lambda
+  // Handle tool-specific key events and viewer shortcuts
   auto ret = [&]() -> bool {
     TTool *tool = TApp::instance()->getCurrentTool()->getTool();
     if (!tool) return false;
 
     bool isTextToolActive = tool->getName() == T_Type && tool->isActive();
 
+    // Handle non-text tool shortcuts
     if (!isTextToolActive) {
       if (ViewerZoomer(this).exec(event)) return true;
       if (SceneViewerShortcutReceiver(this).exec(event)) return true;
-      // If this object is child of Viewer or ComboViewer
-      // (m_isStyleShortcutSelective = true),
-      // then consider about shortcut for the current style selection.
+
+      // Handle style switching shortcuts when appropriate
       if (m_isStyleShortcutSwitchable &&
           Preferences::instance()->isUseNumpadForSwitchingStylesEnabled() &&
           (event->modifiers() == Qt::NoModifier ||
@@ -1473,9 +1505,7 @@ void SceneViewer::keyPressEvent(QKeyEvent *event) {
            event->modifiers() == Qt::KeypadModifier) &&
           ((Qt::Key_0 <= key && key <= Qt::Key_9) || key == Qt::Key_Tab ||
            key == Qt::Key_Backtab)) {
-        // When the viewer is in full screen mode, directly call the style
-        // shortcut function since the viewer is retrieved from the parent
-        // panel.
+        // Handle fullscreen style shortcuts
         if (parentWidget() &&
             parentWidget()->windowState() & Qt::WindowFullScreen) {
           StyleShortcutSwitchablePanel::onKeyPress(event);
@@ -1485,7 +1515,8 @@ void SceneViewer::keyPressEvent(QKeyEvent *event) {
         event->ignore();
         return true;
       }
-      // pressing F1, F2 or F3 key will flip between corresponding ghost
+
+      // Handle onion skin ghost flip keys
       if (CommandManager::instance()->getAction(MI_ShiftTrace)->isChecked() &&
           (Qt::Key_F1 <= key && key <= Qt::Key_F3)) {
         OnionSkinMask osm =
@@ -1503,10 +1534,9 @@ void SceneViewer::keyPressEvent(QKeyEvent *event) {
 
     tool->setViewer(this);
 
+    // Handle modifier keys that require immediate cursor updates
     if (key == Qt::Key_Shift || key == Qt::Key_Control || key == Qt::Key_Alt ||
         key == Qt::Key_AltGr) {
-      // quando l'utente preme shift/ctrl ecc. alcuni tool (es. pinch) devono
-      // cambiare subito la forma del cursore, senza aspettare il prossimo move
       TMouseEvent toonzEvent;
       initToonzEvent(toonzEvent, event);
       toonzEvent.m_pos = TPointD(m_lastMousePos.x(),
@@ -1529,17 +1559,18 @@ void SceneViewer::keyPressEvent(QKeyEvent *event) {
     return tool->keyDown(event);
   }();
 
+  // Handle frame navigation if no tool handled the key
   if (!ret) {
     if (changeFrameSkippingHolds(event)) return;
 
     TFrameHandle *fh = TApp::instance()->getCurrentFrame();
     int origFrame    = fh->getFrame();
 
+    // Handle frame navigation keys
     if (key == Qt::Key_Up || key == Qt::Key_Left)
       fh->prevFrame();
     else if (key == Qt::Key_Down || key == Qt::Key_Right) {
-      // If on a level frame pass the frame id after the last frame to allow
-      // creating a new frame with the down arrow key
+      // Allow creating new frames with down arrow in level mode
       TFrameId newId = 0;
       if (Preferences::instance()->getDownArrowLevelStripNewFrame() &&
           fh->getFrameType() == TFrameHandle::LevelFrame) {
@@ -1560,7 +1591,7 @@ void SceneViewer::keyPressEvent(QKeyEvent *event) {
     else if (key == Qt::Key_End)
       fh->lastFrame();
 
-    // Use arrow keys to shift the cell selection.
+    // Handle cell selection movement with arrow keys
     if (Preferences::instance()->isUseArrowKeyToShiftCellSelectionEnabled() &&
         fh->getFrameType() != TFrameHandle::LevelFrame) {
       TCellSelection *cellSel =
@@ -1575,13 +1606,14 @@ void SceneViewer::keyPressEvent(QKeyEvent *event) {
       }
     }
   }
+
   update();
-  // TODO: devo accettare l'evento?
 }
 
 //-----------------------------------------------------------------------------
 
 void SceneViewer::keyReleaseEvent(QKeyEvent *event) {
+  // Skip if viewer is in frozen state
   if (m_freezedStatus != NO_FREEZED) return;
 
   TTool *tool = TApp::instance()->getCurrentTool()->getTool();
@@ -1590,10 +1622,28 @@ void SceneViewer::keyReleaseEvent(QKeyEvent *event) {
 
   int key = event->key();
 
+  // Handle navigation keys first
+  if (!event->isAutoRepeat()) {
+    if (event->key() == Qt::Key_Space) {
+      TApp::instance()->getCurrentTool()->setSpacePressed(false);
+      event->accept();
+      return;
+    }
+    if (event->key() == Qt::Key_Control) {
+      TApp::instance()->getCurrentTool()->setCtrlPressed(false);
+      event->accept();
+    }
+    if (event->key() == Qt::Key_Shift) {
+      TApp::instance()->getCurrentTool()->setShiftPressed(false);
+      event->accept();
+      return;
+    }
+  }
+
+  // For modifier keys (shift/ctrl/etc), some tools (e.g. pinch) need to
+  // update their cursor immediately without waiting for the next mouse move
   if (key == Qt::Key_Shift || key == Qt::Key_Control || key == Qt::Key_Alt ||
       key == Qt::Key_AltGr) {
-    // quando l'utente preme shift/ctrl ecc. alcuni tool (es. pinch) devono
-    // cambiare subito la forma del cursore, senza aspettare il prossimo move
     TMouseEvent toonzEvent;
     initToonzEvent(toonzEvent, event);
     toonzEvent.m_pos = TPointD(m_lastMousePos.x(),
@@ -1611,6 +1661,7 @@ void SceneViewer::keyReleaseEvent(QKeyEvent *event) {
     setToolCursor(this, tool->getCursorId());
   }
 
+  // Handle shift trace ghost flip keys
   if (CommandManager::instance()->getAction(MI_ShiftTrace)->isChecked() &&
       (Qt::Key_F1 <= key && key <= Qt::Key_F3)) {
     OnionSkinMask osm =
@@ -1620,6 +1671,7 @@ void SceneViewer::keyReleaseEvent(QKeyEvent *event) {
     TApp::instance()->getCurrentOnionSkin()->notifyOnionSkinMaskChanged();
   }
 
+  // Accept key events only for text tool, ignore for others
   if (tool->getName() == T_Type)
     event->accept();
   else

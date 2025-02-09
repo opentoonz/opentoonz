@@ -2898,27 +2898,34 @@ void ToolOptions::onToolOptionsBoxChanged() {
 //-----------------------------------------------------------------------------
 
 void ToolOptions::onToolSwitched() {
+  TTool::Application *app = TTool::getApplication();
+  ToolHandle *currTool    = app->getCurrentTool();
+  TTool *tool             = currTool->getTool();
+
+    // Skip panel updates if we're in navigation mode
+  if (currTool && currTool->isSpacePressed()) {
+    return;
+  }
+
+  // Hide current panel if it exists
   if (m_panel) m_panel->hide();
   m_panel = 0;
 
-  TTool::Application *app = TTool::getApplication();
-
-  // Quando i seguenti non serviranno piu', rimuovere gli header corrispondenti
-  // in cima, thx
+  // Get current context handles
+  // TODO: When these are no longer needed, remove corresponding headers
   TFrameHandle *currFrame   = app->getCurrentFrame();
   TObjectHandle *currObject = app->getCurrentObject();
   TXsheetHandle *currXsheet = app->getCurrentXsheet();
   TPaletteHandle *currPalette =
       app->getPaletteController()->getCurrentLevelPalette();
-  ToolHandle *currTool = app->getCurrentTool();
 
-  TTool *tool = app->getCurrentTool()->getTool();
   if (tool) {
-    // c'e' un tool corrente
+    // Check if we have a current tool
     ToolOptionsBox *panel                            = 0;
     std::map<TTool *, ToolOptionsBox *>::iterator it = m_panels.find(tool);
+
     if (it == m_panels.end()) {
-      // ... senza panel associato
+      // Create new panel if one doesn't exist for this tool
       if (tool->getName() == T_Edit) {
         TPropertyGroup *pg = tool->getProperties(0);
         panel = new ArrowToolOptionsBox(0, tool, pg, currFrame, currObject,
@@ -2961,29 +2968,19 @@ void ToolOptions::onToolSwitched() {
       else if (tool->getName() == T_Hand)
         panel = new HandToolOptionsBox(0, tool, currPalette, currTool);
       else
-        panel = tool->createOptionsBox();  // Only this line should remain out
-                                           // of that if/else monstrosity
-
-      /* DANIELE: Regola per il futuro - NON FARE PIU' COME SOPRA.
-Bisogna cominciare a collegare il metodo virtuale
-createOptionsBox() di ogni tool.
-
-Chi ha tempo si adoperi un pochino per normalizzare
-la situazione anche per i tool sopra, plz - basta spostare
-un po' di codice... */
+        panel = tool->createOptionsBox();  // Future: Use this virtual method
+                                           // for all tools
 
       m_panels[tool] = panel;
       layout()->addWidget(panel);
       emit newPanelCreated();
     } else {
-      // il panel c'e' gia'.
+      // Use existing panel
       panel = it->second;
       panel->updateStatus();
     }
     m_panel = panel;
     m_panel->show();
-  } else {
-    // niente tool
   }
 }
 

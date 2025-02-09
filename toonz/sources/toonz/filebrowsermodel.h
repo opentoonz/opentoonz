@@ -383,6 +383,12 @@ public:
   }
   void notifyEndInsertRows() { emit endInsertRows(); }
 
+  void notifyBeginMoveRows(const QModelIndex &srcParent, int first, int last,
+                           const QModelIndex &dstParent, int dstChild) {
+    emit beginMoveRows(srcParent, first, last, dstParent, dstChild);
+  }
+  void notifyEndMoveRows() { emit endMoveRows(); }
+
 protected slots:
   // when the scene switched, update the path of the scene location node
   void onSceneSwitched();

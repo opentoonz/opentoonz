@@ -1695,6 +1695,11 @@ QAction *MainWindow::createToolAction(const char *id, const char *iconName,
 void MainWindow::defineActions() {
   QAction *menuAct;
 
+  // Reserved Navigation Keys (DO NOT USE: Will conflict!):
+  // 1. SPACE         = T_Hand
+  // 2. SHIFT + SPACE = T_Rotate
+  // 3. CTRL  + SPACE = T_Zoom
+
   // Menu - File
 
   createMenuFileAction(MI_NewScene, QT_TR_NOOP("&New Scene"), "Ctrl+N",
@@ -1817,13 +1822,13 @@ void MainWindow::defineActions() {
                        "enter_group");
   createMenuEditAction(MI_ExitGroup, QT_TR_NOOP("&Exit Group"), "",
                        "leave_group");
-  createMenuEditAction(MI_SendBack, QT_TR_NOOP("&Move to Back"), "Ctrl+[",
+  createMenuEditAction(MI_SendBack, QT_TR_NOOP("&Move to Back"), "",
                        "move_to_back");
-  createMenuEditAction(MI_SendBackward, QT_TR_NOOP("&Move Back One"), "[",
+  createMenuEditAction(MI_SendBackward, QT_TR_NOOP("&Move Back One"), "",
                        "move_back_one");
-  createMenuEditAction(MI_BringForward, QT_TR_NOOP("&Move Forward One"), "]",
+  createMenuEditAction(MI_BringForward, QT_TR_NOOP("&Move Forward One"), "",
                        "move_forward_one");
-  createMenuEditAction(MI_BringToFront, QT_TR_NOOP("&Move to Front"), "Ctrl+]",
+  createMenuEditAction(MI_BringToFront, QT_TR_NOOP("&Move to Front"), "",
                        "move_to_front");
 
   // Menu - Scan & Cleanup
@@ -2330,7 +2335,7 @@ void MainWindow::defineActions() {
                              "toggle_sub_nav");
   createRightClickMenuAction(MI_ToggleXsheetCameraColumn,
                              QT_TR_NOOP("Show/Hide Xsheet Camera Column"), "");
-  createRightClickMenuAction(MI_SetKeyframes, QT_TR_NOOP("&Set Key"), "Z",
+  createRightClickMenuAction(MI_SetKeyframes, QT_TR_NOOP("&Set Key"), "F6",
                              "set_key");
   createRightClickMenuAction(MI_ShiftKeyframesDown,
                              QT_TR_NOOP("&Shift Keys Down"), "",
@@ -2483,9 +2488,9 @@ void MainWindow::defineActions() {
   createToolAction(T_Eraser, "eraser", QT_TR_NOOP("Eraser Tool"), "E");
   createToolAction(T_Tape, "tape", QT_TR_NOOP("Tape Tool"), "T");
   createToolAction(T_StylePicker, "stylepicker",
-                   QT_TR_NOOP("Style Picker Tool"), "K");
+                   QT_TR_NOOP("Style Picker Tool"), "I");
   createToolAction(T_RGBPicker, "rgbpicker", QT_TR_NOOP("RGB Picker Tool"),
-                   "R");
+                   "Shift+I");
   createToolAction(T_ControlPointEditor, "controlpointeditor",
                    QT_TR_NOOP("Control Point Editor Tool"), "C");
   createToolAction(T_Pinch, "pinch", QT_TR_NOOP("Pinch Tool"), "M");
@@ -2498,9 +2503,9 @@ void MainWindow::defineActions() {
   createToolAction(T_Skeleton, "skeleton", QT_TR_NOOP("Skeleton Tool"), "V");
   createToolAction(T_Tracker, "radar", QT_TR_NOOP("Tracker Tool"), "");
   createToolAction(T_Hook, "hook", QT_TR_NOOP("Hook Tool"), "O");
-  createToolAction(T_Zoom, "zoom", QT_TR_NOOP("Zoom Tool"), "Shift+Space");
-  createToolAction(T_Rotate, "rotate", QT_TR_NOOP("Rotate Tool"), "Ctrl+Space");
-  createToolAction(T_Hand, "hand", QT_TR_NOOP("Hand Tool"), "Space");
+  createToolAction(T_Zoom, "zoom", QT_TR_NOOP("Zoom Tool"), "Z");
+  createToolAction(T_Rotate, "rotate", QT_TR_NOOP("Rotate Tool"), "R");
+  createToolAction(T_Hand, "hand", QT_TR_NOOP("Hand Tool"), "H");
   createToolAction(T_Plastic, "plastic", QT_TR_NOOP("Plastic Tool"), "X");
   createToolAction(T_Ruler, "ruler", QT_TR_NOOP("Ruler Tool"), "");
   createToolAction(T_Finger, "finger", QT_TR_NOOP("Finger Tool"), "");
@@ -2709,17 +2714,17 @@ void MainWindow::defineActions() {
                           "");
 
   createToolOptionsAction("A_IncreaseMaxBrushThickness",
-                          QT_TR_NOOP("Brush size - Increase max"), "I");
+                          QT_TR_NOOP("Brush size - Increase max"), "]");
   createToolOptionsAction("A_DecreaseMaxBrushThickness",
-                          QT_TR_NOOP("Brush size - Decrease max"), "U");
+                          QT_TR_NOOP("Brush size - Decrease max"), "[");
   createToolOptionsAction("A_IncreaseMinBrushThickness",
-                          QT_TR_NOOP("Brush size - Increase min"), "J");
+                          QT_TR_NOOP("Brush size - Increase min"), "Shift+]");
   createToolOptionsAction("A_DecreaseMinBrushThickness",
-                          QT_TR_NOOP("Brush size - Decrease min"), "H");
+                          QT_TR_NOOP("Brush size - Decrease min"), "Shift+[");
   createToolOptionsAction("A_IncreaseBrushHardness",
-                          QT_TR_NOOP("Brush hardness - Increase"), "");
+                          QT_TR_NOOP("Brush hardness - Increase"), "Ctrl+]");
   createToolOptionsAction("A_DecreaseBrushHardness",
-                          QT_TR_NOOP("Brush hardness - Decrease"), "");
+                          QT_TR_NOOP("Brush hardness - Decrease"), "Ctrl+[");
   createToolOptionsAction("A_ToolOption_SnapSensitivity",
                           QT_TR_NOOP("Snap Sensitivity"), "");
   createToolOptionsAction("A_ToolOption_AutoGroup", QT_TR_NOOP("Auto Group"),

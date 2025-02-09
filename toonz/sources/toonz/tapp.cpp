@@ -55,6 +55,7 @@
 
 // Qt includes
 #include <QTimer>
+#include <QLabel>
 #include <QDebug>
 #include <QEvent>
 #include <QCoreApplication>
@@ -710,9 +711,9 @@ void TApp::autosave() {
 
   if (m_saveInProgress) return;
 
-  DVGui::ProgressDialog pb(
-      "Autosaving scene..." + toQString(scene->getScenePath()), 0, 0, 1);
-  pb.show();
+  //DVGui::ProgressDialog pb(
+  //    "Autosaving scene..." + toQString(scene->getScenePath()), 0, 0, 1);
+
   Preferences *pref = Preferences::instance();
   if (pref->isAutosaveSceneEnabled() && pref->isAutosaveOtherFilesEnabled()) {
     IoCmd::saveAll(IoCmd::AUTO_SAVE);
@@ -722,7 +723,6 @@ void TApp::autosave() {
     IoCmd::saveNonSceneFiles();
   }
 
-  pb.setValue(1);
 }
 
 //-----------------------------------------------------------------------------

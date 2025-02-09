@@ -5,7 +5,7 @@
 #include "tools/tool.h"
 #include "tools/toolcommandids.h"
 #include "timage.h"
-//#include "tapp.h"
+// #include "tapp.h"
 #include "toonzqt/menubarcommand.h"
 #include "toonz/preferences.h"
 #include <QAction>
@@ -34,6 +34,12 @@ TTool *ToolHandle::getTool() const { return m_tool; }
 //-----------------------------------------------------------------------------
 
 void ToolHandle::setTool(QString name) {
+  // If we're in navigation mode, only allow navigation-related tool changes
+  if (m_inNavigationMode && name != "T_Hand" && name != "T_Rotate" &&
+      name != "T_Zoom") {
+    return;
+  }
+
   m_oldToolName = m_toolName = name;
 
   TTool *tool = TTool::getTool(m_toolName.toStdString(),
@@ -63,6 +69,60 @@ void ToolHandle::setTool(QString name) {
 
 //-----------------------------------------------------------------------------
 
+void ToolHandle::setSpacePressed(bool pressed) {
+  if (m_spacePressed == pressed) return;
+
+  m_spacePressed = pressed;
+  if (pressed) {
+    // Store current tool when entering navigation mode
+    m_originalTool     = m_toolName;
+    m_inNavigationMode = true;
+    setTool("T_Hand");
+  } else {
+    // Restore original tool when exiting navigation mode
+    m_inNavigationMode = false;
+    // Reset all modifier states when exiting navigation mode
+    m_ctrlPressed  = false;
+    m_shiftPressed = false;
+    if (!m_originalTool.isEmpty()) {
+      setTool(m_originalTool);
+      m_originalTool.clear();
+    }
+  }
+  updateNavigationState();
+}
+
+void ToolHandle::setShiftPressed(bool pressed) {
+  if (m_shiftPressed == pressed) return;
+
+  m_shiftPressed = pressed;
+  updateNavigationState();
+}
+
+void ToolHandle::setCtrlPressed(bool pressed) {
+  if (m_ctrlPressed == pressed) return;
+
+  m_ctrlPressed = pressed;
+  updateNavigationState();
+}
+
+void ToolHandle::updateNavigationState() {
+  // Only handle state changes when in navigation mode
+  if (!m_inNavigationMode) return;
+
+  if (m_spacePressed) {
+    if (m_ctrlPressed) {
+      setTool("T_Zoom");
+    } else if (m_shiftPressed) {
+      setTool("T_Rotate");
+    } else {
+      setTool("T_Hand");
+    }
+  }
+}
+
+//-----------------------------------------------------------------------------
+
 void ToolHandle::storeTool() {
   m_storedToolName = m_toolName;
   m_storedToolTime.start();
@@ -71,11 +131,16 @@ void ToolHandle::storeTool() {
 //-----------------------------------------------------------------------------
 
 void ToolHandle::restoreTool() {
-  // qDebug() << m_storedToolTime.elapsed();
-  if (m_storedToolName != m_toolName && m_storedToolName != "" &&
-      m_storedToolTime.elapsed() >
-          Preferences::instance()->getTempToolSwitchTimer()) {
-    setTool(m_storedToolName);
+  if (m_storedToolName != m_toolName && m_storedToolName != "") {
+    // Only bypass timer when in navigation mode
+    if (m_inNavigationMode) {
+      setTool(m_storedToolName);
+    }
+    // For all other cases, use the timer check
+    else if (m_storedToolTime.elapsed() >
+             Preferences::instance()->getTempToolSwitchTimer()) {
+      setTool(m_storedToolName);
+    }
   }
 }
 

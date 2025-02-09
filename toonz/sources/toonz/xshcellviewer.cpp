@@ -694,10 +694,19 @@ void RenameCellField::showInRowCol(int row, int col, bool multiColumnSelected) {
       if (cell.m_level->getType() == TXshLevelType::SND_TXT_XSHLEVEL) {
         TXshSoundTextLevelP textLevel = cell.m_level->getSoundTextLevel();
         if (textLevel) {
-          std::string frameText =
-              textLevel->getFrameText(fid.getNumber() - 1).toStdString();
           setText(textLevel->getFrameText(fid.getNumber() - 1));
         }
+        setAlignment(Qt::AlignLeft | Qt::AlignBottom);
+        QFontMetrics fm(this->font());
+        if (o->cellWidth() - 15 < fm.horizontalAdvance(text()))
+            setFixedWidth(fm.horizontalAdvance(text()) + 10);
+        else
+            setFixedSize(o->cellWidth(), o->cellHeight() + 2);
+        connect(this, &QLineEdit::textChanged, this,
+                [this,o,fm](const QString &text) {
+                  if (o->cellWidth()-15 < fm.horizontalAdvance(text))
+                    setFixedWidth(fm.horizontalAdvance(text)+10);
+                });
       }
       // other level types
       else {
