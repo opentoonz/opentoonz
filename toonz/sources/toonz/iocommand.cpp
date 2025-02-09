@@ -2418,8 +2418,16 @@ int IoCmd::loadResources(LoadResourceArguments &args, bool updateRecentFile,
           .hasMatch();
     };
 
-    static bool renamePolicy(const TFilePath &path) {
+    static bool checkRenamePolicy(const TFilePath &path) {
       // TODO: Check the Preference Policy
+      switch (Preferences::instance()->getIntValue(renamePolicy)) {
+      case 0:
+        break;
+      case 1:
+        return true;
+      case 2:
+        return false;
+      }
       QString label =
           QObject::tr(
               "OpenToonz uses an underscore (_) or dot (.) as a frame "
@@ -2436,12 +2444,11 @@ int IoCmd::loadResources(LoadResourceArguments &args, bool updateRecentFile,
                                       buttons, 1, Qt::Unchecked);
       int ret     = renameDialog->exec();
       int checked = renameDialog->getChecked();
-      if (checked)  // TODO: Change the Preference
-        ;
-      if (ret == 1) {
-        return true;
-      } else
-        return false;
+      if (checked) {
+        Preferences::instance()->setValue(renamePolicy, ret);
+        TApp::instance()->getCurrentScene()->notifyImportPolicyChanged(ret);
+      }
+      return ret == 1;
     };
 
     static bool isSharingSameParam(const TFilePath &path1,
@@ -2634,7 +2641,7 @@ int IoCmd::loadResources(LoadResourceArguments &args, bool updateRecentFile,
       }
       // for sequence
       else if (locals::matchSequencePattern(path) &&
-               locals::renamePolicy(path)) {
+               locals::checkRenamePolicy(path)) {
         TFilePathSet files;
         TFilePath backup    = path;
         TFilePath levelPath = locals::getLevelPath(path);

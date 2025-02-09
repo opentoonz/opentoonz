@@ -876,7 +876,6 @@ void TSystem::renameImageSequence(const TFilePathSet &files,
     else
       wstr.clear();
     dst = file.withName(levelBaseName).withFrame(TFrameId(TFrameId(wstr).expand()));
-    qDebug() << dst.getQString() << file.getQString();
     TSystem::renameFile(dst, file);
   }
 }
