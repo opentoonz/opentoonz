@@ -7,9 +7,6 @@ using namespace std;
 #include <set>
 #include "tfilepath_io.h"
 #include "tconvert.h"
-#ifdef __cpp_filesystem
-#include <filesystem>
-#endif
 
 #ifndef TNZCORE_LIGHT
 
@@ -862,78 +859,26 @@ void TSystem::copyFileOrLevel_throw(const TFilePath &dst,
 
 //--------------------------------------------------------------
 
-void TSystem::renameImageSequence_throw(TFilePath &path,bool overwrite) {
-  QString levelBaseName = QString::fromStdString(path.getName());
+void TSystem::renameImageSequence(const TFilePathSet &files,
+                                        const TFilePath &levelPath,
+                                        int prefixLength) {
+  std::string levelBaseName = levelPath.withoutParentDir().getName();
 
-  int i                 = levelBaseName.size();
-  uint8_t padding       = 0;
-  while (i > 0 && levelBaseName[i - 1].isDigit()) {
-    --i;
-    ++padding;
+  //TSystem::readDirectory(levelPath.getParentDir(), false);
+
+  std::wstring wstr;
+  TFilePath dst;
+
+  for (const TFilePath &file : files) {
+    wstr = file.getWideName();
+    if (wstr.size() > prefixLength)
+      wstr = wstr.substr(prefixLength);
+    else
+      wstr.clear();
+    dst = file.withName(levelBaseName).withFrame(TFrameId(TFrameId(wstr).expand()));
+    qDebug() << dst.getQString() << file.getQString();
+    TSystem::renameFile(dst, file);
   }
-  levelBaseName         = levelBaseName.left(i);
-  QDir parentFolder = QDir(path.getParentDir().getQString());  // No Slash
-  QString suffix       = QString::fromStdString(path.getType());
-
-  bool isLevelBaseNameEmpty = levelBaseName.isEmpty();
-  
-  QStringList fileNames;
-  if (isLevelBaseNameEmpty) {
-    fileNames = parentFolder.entryList(
-        QStringList("*." + suffix), QDir::Files, QDir::Name);
-    levelBaseName = parentFolder.dirName();
-    QRegularExpression regex(QString(R"(^\d+\.)") + suffix + "$");
-    fileNames = fileNames.filter(regex);
-  } else {
-    fileNames = parentFolder.entryList(
-        QStringList(levelBaseName + "*." + suffix), QDir::Files, QDir::Name);
-    QRegularExpression regex("^" + QRegularExpression::escape(levelBaseName)
-        +QString(R"([\da-zA-Z]+\.)") + suffix + "$");
-    fileNames = fileNames.filter(regex);
-  }
-
-  path = path.withName(levelBaseName.toStdWString()).withFrame();
-  if (overwrite) TSystem::removeFileOrLevel(path);
-
-  if (fileNames.size() < 10 && padding == 1) {
-      // TODO: Is this a level?
-
-    }
-  
-  char separator  = '.';
-  padding = 4;
-  QString FrameID;
-  QString newFileName;
-  for (const QString &fileName : fileNames) {
-    if (isLevelBaseNameEmpty)
-      FrameID = fileName.mid(0,fileName.lastIndexOf('.'));
-      else
-        FrameID = fileName.mid(levelBaseName.size(),
-                                 fileName.lastIndexOf('.') - levelBaseName.size());
-    if (FrameID.isEmpty()) continue;
-      newFileName = levelBaseName + separator +
-                          FrameID.rightJustified(padding, '0') + '.' + suffix;
-
-#ifdef __cpp_filesystem
-    std::filesystem::path oldPath =
-        parentFolder.absoluteFilePath(fileName).toStdString();
-    std::filesystem::path newPath =
-        parentFolder.absoluteFilePath(newFileName).toStdString();
-    try {
-      std::filesystem::rename(oldPath, newPath);
-    } catch (...) {
-      throw TSystemException(path, "can't rename file!");
-      return ;
-    }
-#else
-    if (!parentFolder.rename(fileName, newFileName)) {
-      throw TSystemException(path, "can't rename file!");
-      return;
-    }
-#endif
-  }
-
-  return;
 }
 
 void TSystem::renameFileOrLevel_throw(const TFilePath &dst,
