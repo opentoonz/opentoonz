@@ -410,6 +410,7 @@ public:
     if (std::string(m_cmdId) == MI_ShiftTrace) {
       cm->enable(MI_EditShift, checked);
       cm->enable(MI_NoShift, checked);
+      cm->enable(MI_ShowShiftOrigin, checked);
       if (checked) {
         OnioniSkinMaskGUI::resetShiftTraceFrameOffset();
         // activate edit shift
@@ -455,6 +456,7 @@ public:
     OnionSkinMask osm =
         TApp::instance()->getCurrentOnionSkin()->getOnionSkinMask();
     osm.setShiftTraceStatus(status);
+    osm.setShowShiftOrigin(isChecked(MI_ShowShiftOrigin));
     osm.clearGhostFlipKey();
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
     TApp::instance()->getCurrentOnionSkin()->setOnionSkinMask(osm);
@@ -462,7 +464,8 @@ public:
 };
 
 TShiftTraceToggleCommand shiftTraceToggleCommand(MI_ShiftTrace),
-    editShiftToggleCommand(MI_EditShift), noShiftToggleCommand(MI_NoShift);
+    editShiftToggleCommand(MI_EditShift), noShiftToggleCommand(MI_NoShift),
+    showShiftOriginCommand(MI_ShowShiftOrigin);
 
 class TResetShiftTraceCommand final : public MenuItemHandler {
 public:

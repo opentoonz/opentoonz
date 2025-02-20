@@ -82,6 +82,7 @@ TEnv::IntVar LinkToggleAction("LinkToggleAction", 0);
 TEnv::IntVar DockingCheckToggleAction("DockingCheckToggleAction", 0);
 TEnv::IntVar ShiftTraceToggleAction("ShiftTraceToggleAction", 0);
 TEnv::IntVar EditShiftToggleAction("EditShiftToggleAction", 0);
+TEnv::IntVar ShowShiftOriginToggleAction("ShowShiftOriginToggleAction", 0);
 TEnv::IntVar NoShiftToggleAction("NoShiftToggleAction", 0);
 TEnv::IntVar TouchGestureControl("TouchGestureControl", 0);
 
@@ -966,6 +967,7 @@ void MainWindow::onNewScene() {
   cm->setChecked(MI_ShiftTrace, false);
   cm->setChecked(MI_EditShift, false);
   cm->setChecked(MI_NoShift, false);
+  cm->setChecked(MI_ShowShiftOrigin, false);
   cm->setChecked(MI_VectorGuidedDrawing, false);
 }
 
@@ -1269,6 +1271,8 @@ void MainWindow::onMenuCheckboxChanged() {
     EditShiftToggleAction = isChecked;
   else if (cm->getAction(MI_NoShift) == action)
     NoShiftToggleAction = isChecked;
+  else if (cm->getAction(MI_ShowShiftOrigin) == action)
+    ShowShiftOriginToggleAction = isChecked;
   else if (cm->getAction(MI_TouchGestureControl) == action)
     TouchGestureControl = isChecked;
 }
@@ -2182,8 +2186,11 @@ void MainWindow::defineActions() {
                MenuViewCommandType, "shift_and_trace_edit");
   createToggle(MI_NoShift, QT_TR_NOOP("No Shift"), "", false,
                MenuViewCommandType, "shift_and_trace_no_shift");
+  createToggle(MI_ShowShiftOrigin, QT_TR_NOOP("Show Shift Origin"), "", false,
+               MenuViewCommandType, "");
   CommandManager::instance()->enable(MI_EditShift, false);
   CommandManager::instance()->enable(MI_NoShift, false);
+  CommandManager::instance()->enable(MI_ShowShiftOrigin, false);
   createAction(MI_ResetShift, QT_TR_NOOP("Reset Shift"), "",
                MenuViewCommandType, "shift_and_trace_reset");
   createToggle(MI_VectorGuidedDrawing, QT_TR_NOOP("Vector Guided Drawing"), "",

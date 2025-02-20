@@ -257,10 +257,9 @@ void ShiftTraceTool::drawControlRect() {  // TODO
     glEnd();
   }
 
-  color = m_highlightedGadget == TranslateGadget
-              ? TPixel32(200, 100, 100)
-              : m_highlightedGadget == RotateGadget ? TPixel32(100, 200, 100)
-                                                    : TPixel32(120, 120, 120);
+  color = m_highlightedGadget == TranslateGadget ? TPixel32(200, 100, 100)
+          : m_highlightedGadget == RotateGadget  ? TPixel32(100, 200, 100)
+                                                 : TPixel32(120, 120, 120);
   tglColor(color);
   glBegin(GL_LINE_STRIP);
   glVertex2d(box.x0, box.y0);
@@ -269,8 +268,8 @@ void ShiftTraceTool::drawControlRect() {  // TODO
   glVertex2d(box.x0, box.y1);
   glVertex2d(box.x0, box.y0);
   glEnd();
-  color = m_highlightedGadget == ScaleGadget ? TPixel32(200, 100, 100)
-                                             : TPixel32::White;
+  color    = m_highlightedGadget == ScaleGadget ? TPixel32(200, 100, 100)
+                                                : TPixel32::White;
   double r = 4 * sqrt(tglGetPixelSize2());
   drawDot(box.getP00(), r, color);
   drawDot(box.getP01(), r, color);
@@ -354,6 +353,15 @@ void ShiftTraceTool::onDeactivate() {
   if (!shiftTrace->isChecked()) return;
   QAction *action = CommandManager::instance()->getAction("MI_EditShift");
   action->setChecked(false);
+  action = CommandManager::instance()->getAction("MI_NoShift");
+  action->setEnabled(true);
+
+  TApplication *app = TTool::getApplication();
+  OnionSkinMask osm = app->getCurrentOnionSkin()->getOnionSkinMask();
+  if (osm.isEditingShift()) {
+    osm.setShiftTraceStatus(OnionSkinMask::ENABLED);
+    TTool::getApplication()->getCurrentOnionSkin()->setOnionSkinMask(osm);
+  }
 }
 
 ShiftTraceTool::GadgetId ShiftTraceTool::getGadget(const TPointD &p) {

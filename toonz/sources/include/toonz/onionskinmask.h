@@ -104,7 +104,12 @@ since underlying onion-skinned drawings must be visible.
     m_shiftTraceStatus = status;
   }
 
+  bool isShowShiftOrigin() const { return m_showShiftOrigin; }
+  void setShowShiftOrigin(bool showShiftOrigin) {
+    m_showShiftOrigin = showShiftOrigin;
+  }
   bool isShiftTraceEnabled() const { return m_shiftTraceStatus != DISABLED; }
+  bool isEditingShift() const { return m_shiftTraceStatus == EDITING_GHOST; }
 
   const TAffine getShiftTraceGhostAff(int index) const {
     return m_ghostAff[index];
@@ -139,6 +144,7 @@ private:
   bool m_wholeScene;              //!< Whether the OS works on the entire scene
 
   ShiftTraceStatus m_shiftTraceStatus;
+  bool m_showShiftOrigin;
   TAffine m_ghostAff[2];
   TPointD m_ghostCenter[2];
   int m_ghostFrame[2];         // relative frame position of the ghosts
