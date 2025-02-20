@@ -1,4 +1,5 @@
 #include <memory>
+#include <cwctype>
 
 #include "iocommand.h"
 
@@ -82,6 +83,7 @@
 #include <QLabel>
 #include <QApplication>
 #include <QClipboard>
+#include <QDirIterator>
 
 // boost includes
 #include <boost/optional.hpp>
@@ -153,6 +155,7 @@ public:
       QString checkBoxLabel =
           QObject::tr("Always do this action.")
               .arg(QString::fromStdWString(path.getWideString()));
+      QString addSeparatorLabel = QObject::tr("Add separator for Frames");
       QStringList buttons;
       buttons << QObject::tr("Import") << QObject::tr("Load")
               << QObject::tr("Cancel");
@@ -2426,6 +2429,84 @@ int IoCmd::loadResources(LoadResourceArguments &args, bool updateRecentFile,
     static bool isDir(const LoadResourceArguments::ResourceData &rd) {
       return QFileInfo(rd.m_path.getQString()).isDir();
     }
+
+    // call when loading levels
+    static bool matchSequencePattern(const TFilePath &path) {
+      QRegularExpression pattern(
+          R"(
+  ^                           # Match the start of the string
+  .*?                         # Optional prefix
+  \d+  # allow aFilePrefix<number>.ext,ignore if less than 10 and no padding
+  \.                          # Match a dot (.)
+  (png|jpg|jpeg|bmp|tga|tiff) # Image extensions
+  $                           # Match the end of the string
+)",
+          QRegularExpression::CaseInsensitiveOption |
+              QRegularExpression::ExtendedPatternSyntaxOption);
+      return pattern.match(QString::fromStdString(path.getLevelName()))
+          .hasMatch();
+    };
+
+    static bool checkRenamePolicy(const TFilePath &path) {
+      // TODO: Check the Preference Policy
+      switch (Preferences::instance()->getIntValue(renamePolicy)) {
+      case 0:
+        break;
+      case 1:
+        return true;
+      case 2:
+        return false;
+      }
+      QString label =
+          QObject::tr(
+              "OpenToonz uses an underscore (_) or dot (.) as a frame "
+              "separator.\n"
+              "Would you like to add a separator to the image sequence?\n"
+              "\n%1 (and similar files)")
+              .arg(path.getQString());
+      QString checkBoxLabel = QObject::tr("Always do this action.");
+      QStringList buttons;
+      buttons << QObject::tr("Yes")
+              << QObject::tr("No, treat as single frame.");
+      DVGui::MessageAndCheckboxDialog *renameDialog =
+          DVGui::createMsgandCheckbox(DVGui::QUESTION, label, checkBoxLabel,
+                                      buttons, 1, Qt::Unchecked);
+      int ret     = renameDialog->exec();
+      int checked = renameDialog->getChecked();
+      if (checked) {
+        Preferences::instance()->setValue(renamePolicy, ret);
+        TApp::instance()->getCurrentScene()->notifyImportPolicyChanged(ret);
+      }
+      return ret == 1;
+    };
+
+    static bool isSharingSameParam(const TFilePath &path1,
+                                   const TFilePath &path2) {
+      std::wstring str1 = path1.getWideName();  // base name
+      std::wstring str2 = path2.getWideName();
+
+      str1.erase(std::remove_if(str1.begin(), str1.end(), ::iswdigit),
+                 str1.end());
+      str2.erase(std::remove_if(str2.begin(), str2.end(), ::iswdigit),
+                 str2.end());
+
+      return str1 == str2;
+    }
+
+    static TFilePath getLevelPath(TFilePath path) {
+      std::wstring levelBaseName = path.getWideName();
+
+      int i = levelBaseName.size();
+      while (i > 0 && std::iswdigit(levelBaseName[i - 1])) {
+        --i;
+      }
+      levelBaseName = levelBaseName.substr(0, i);
+
+      if (!levelBaseName.size())
+        levelBaseName = path.getParentDir().getWideName();
+      return path.withName(levelBaseName).withFrame();
+    }
+
   };  // locals
 
   if (args.resourceDatas.empty()) return 0;
@@ -2475,10 +2556,10 @@ int IoCmd::loadResources(LoadResourceArguments &args, bool updateRecentFile,
   }
 
   std::vector<TFilePath> paths;
-  int all = 0;
+  int all = 0;  // Turn on to allow all duplicate
 
   // Loop for all the resources to load
-  for (int r = 0; r != rCount; ++r) {
+  for (int r = 0; r < rCount; ++r) {
     if (importDialog.aborted()) break;
 
     QString origName =
@@ -2576,6 +2657,78 @@ int IoCmd::loadResources(LoadResourceArguments &args, bool updateRecentFile,
 
       continue;
     }
+    // for single level files
+    else if (path.getSepChar().isNull()) {
+      // for single frame
+      if (rCount == 1) {
+        try {
+          path = importDialog.process(scene, 0, path);
+        } catch (std::string msg) {
+          error(QString::fromStdString(msg));
+          continue;
+        }
+      }
+      // for sequence
+      else if (locals::matchSequencePattern(path) &&
+               locals::checkRenamePolicy(path)) {
+        TFilePathSet files;
+        TFilePath backup    = path;
+        TFilePath levelPath = locals::getLevelPath(path);
+        progressDialog->setLabelText(
+            QString("Loading \"%1\"...")
+                .arg(levelPath.withFrame().getQString()));
+        // Check for Existing Level
+        if (TSystem::doesExistFileOrLevel(levelPath)) {
+          OverwriteDialog dialog;
+          levelPath.withName(dialog.execute(scene, levelPath, false));
+
+          switch (dialog.getChoice()) {
+          case OverwriteDialog::KEEP_OLD:
+            while (r < rCount) {
+              path = args.resourceDatas[r].m_path;
+              if (backup.getParentDir() != path.getParentDir()) break;
+              if (!locals::isSharingSameParam(backup, path)) break;
+              ++r;
+            }
+            --r;
+            continue;
+
+          case OverwriteDialog::OVERWRITE :
+            TSystem::removeFileOrLevel(levelPath);
+          default :
+            break;
+          }
+        }
+        // Load or Import the files
+        while (r < rCount) {
+          path = args.resourceDatas[r].m_path;
+          progressDialog->setValue(r);
+          try {
+            path = importDialog.process(scene, 0, path);
+          } catch (std::string msg) {
+            error(QString::fromStdString(msg));
+            continue;
+          }
+          if (importDialog.aborted()) break;
+          // and Same parent folder
+          if ((backup.getParentDir() != path.getParentDir()) ||
+              (!locals::isSharingSameParam(backup, path))) {
+            --r;
+            break;
+          }
+          files.push_back(path);
+          ++r;
+        }
+        if (importDialog.aborted()) break;
+        TSystem::renameImageSequence(
+            files, levelPath,
+            backup.getWideName().substr(0,
+                backup.getWideName().find_last_not_of(L"0123456789") + 1)
+                .size());
+        QCoreApplication::processEvents();
+        path = levelPath;
+      }
+    }
     // for other level files
     else {
       try {
@@ -2588,6 +2741,7 @@ int IoCmd::loadResources(LoadResourceArguments &args, bool updateRecentFile,
 
       if (importDialog.aborted()) break;
     }
+
     if (path.getType() == "psd") {
       static PsdSettingsPopup *popup = 0;
       if (!popup) {
