@@ -100,7 +100,7 @@ private slots:
   void onPreviewDataChanged();
   void postProcess();
   void onClnLoaded();
-  void onRestoreSceneSettings();
+  void onRestoreSettings();
   void onGenericSettingsChange();
   void onPathChange();
   void onSharpnessChange(bool dragging);

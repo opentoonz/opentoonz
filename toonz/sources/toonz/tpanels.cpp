@@ -843,8 +843,7 @@ CleanupColorFieldEditorController::CleanupColorFieldEditorController()
     : m_currentColorField(0)
     , m_colorFieldHandle(new TPaletteHandle)
     , m_palette(new TPalette) {
-  std::wstring name = L"EmptyColorFieldPalette";
-  m_palette->setPaletteName(name);
+  m_palette->setIsCleanupPalette(true);
   m_colorFieldHandle->setPalette(m_palette.getPointer(), 1);
   DVGui::CleanupColorField::setEditorController(this);
 }
