@@ -8,7 +8,10 @@ configuration:
 - Release
 platform: x64
 clone_depth: 1
-cache: c:\tools\vcpkg\installed
+cache:
+  - c:\Tools\vcpkg\installed
+  - c:\Libraries\boost_1_85_0
+  - c:\Tools\opencv\build
 install:
 - cmd: >-
     choco install opencv --version=4.10.0
@@ -28,7 +31,7 @@ install:
     cmake ..\sources -G "Visual Studio 16 2019" -Ax64 -DQT_PATH="C:\Qt\5.15.2\msvc2019_64" -DBOOST_ROOT="C:\Libraries\boost_1_85_0" -DOpenCV_DIR="C:\Tools\opencv\build"
 build:
   project: $(APPVEYOR_BUILD_FOLDER)\toonz\$(PLATFORM)\ALL_BUILD.vcxproj
-  parallel: true
+  parallel: false
   verbosity: minimal
 after_build:
 - cmd: >-
