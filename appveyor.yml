@@ -12,35 +12,49 @@ cache:
   - c:\Tools\vcpkg\installed
   - c:\Libraries\boost_1_85_0
   - c:\Tools\opencv\build
-
 install:
-  - cmd: >-
+  - cmd: |
       choco install opencv --version=4.10.0
+
       cd thirdparty
+
       copy /Y tiff-4.0.3\libtiff\tif_config.vc.h tiff-4.0.3\libtiff\tif_config.h
+
       copy /Y tiff-4.0.3\libtiff\tiffconf.vc.h tiff-4.0.3\libtiff\tiffconf.h
+
       copy /Y libpng-1.6.21\scripts\pnglibconf.h.prebuilt libpng-1.6.21\pnglibconf.h
+
       cd ../toonz
+
       mkdir %PLATFORM% && cd %PLATFORM%
+
       cmake ..\sources -G "Visual Studio 16 2019" -Ax64 -DQT_PATH="C:\Qt\5.15.2\msvc2019_64" -DBOOST_ROOT="C:\Libraries\boost_1_85_0" -DOpenCV_DIR="C:\Tools\opencv\build"
-
 build_script:
-  - cmd: echo Building project at: $(APPVEYOR_BUILD_FOLDER)\toonz\$(PLATFORM)\ALL_BUILD.vcxproj
-  - cmd: msbuild $(APPVEYOR_BUILD_FOLDER)\toonz\$(PLATFORM)\ALL_BUILD.vcxproj /p:Configuration=Release /p:Platform=x64 /m
-
+  - cmd: |
+      echo Building project at: $(APPVEYOR_BUILD_FOLDER)\toonz\$(PLATFORM)\ALL_BUILD.vcxproj
+  - cmd: |
+      msbuild $(APPVEYOR_BUILD_FOLDER)\toonz\$(PLATFORM)\ALL_BUILD.vcxproj /p:Configuration=Release /p:Platform=x64 /m
 after_build:
-  - cmd: >-
+  - cmd: |
       C:\Qt\5.15.2\msvc2019_64\bin\windeployqt.exe %CONFIGURATION%\OpenToonz.exe
-      copy /Y ..\..\thirdparty\glut\3.7.6\lib\glut64.dll %CONFIGURATION%
-      copy /Y ..\..\thirdparty\glew\glew-1.9.0\bin\64bit\glew32.dll %CONFIGURATION%
-      copy /Y ..\..\thirdparty\libmypaint\dist\64\libiconv-2.dll %CONFIGURATION%
-      copy /Y ..\..\thirdparty\libmypaint\dist\64\libintl-8.dll %CONFIGURATION%
-      copy /Y ..\..\thirdparty\libmypaint\dist\64\libjson-c-2.dll %CONFIGURATION%
-      copy /Y ..\..\thirdparty\libmypaint\dist\64\libmypaint-1-4-0.dll %CONFIGURATION%
-      copy /Y "C:\Tools\opencv\build\x64\vc16\bin\opencv_world4100.dll" %CONFIGURATION%
-      mkdir "%CONFIGURATION%\portablestuff"
-      xcopy /Y /E ..\..\stuff "%CONFIGURATION%\portablestuff"
 
+      copy /Y ..\..\thirdparty\glut\3.7.6\lib\glut64.dll %CONFIGURATION%
+
+      copy /Y ..\..\thirdparty\glew\glew-1.9.0\bin\64bit\glew32.dll %CONFIGURATION%
+
+      copy /Y ..\..\thirdparty\libmypaint\dist\64\libiconv-2.dll %CONFIGURATION%
+
+      copy /Y ..\..\thirdparty\libmypaint\dist\64\libintl-8.dll %CONFIGURATION%
+
+      copy /Y ..\..\thirdparty\libmypaint\dist\64\libjson-c-2.dll %CONFIGURATION%
+
+      copy /Y ..\..\thirdparty\libmypaint\dist\64\libmypaint-1-4-0.dll %CONFIGURATION%
+
+      copy /Y "C:\Tools\opencv\build\x64\vc16\bin\opencv_world4100.dll" %CONFIGURATION%
+
+      mkdir "%CONFIGURATION%\portablestuff"
+
+      xcopy /Y /E ..\..\stuff "%CONFIGURATION%\portablestuff"
 artifacts:
   - path: toonz\$(PLATFORM)\$(CONFIGURATION)
     name: OpenToonz
