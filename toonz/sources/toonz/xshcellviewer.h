@@ -40,6 +40,7 @@ class RenameCellField final : public QLineEdit {
 
   int m_row;
   int m_col;
+  bool escapePressed = false;
   XsheetViewer *m_viewer;
 
 public:
@@ -144,6 +145,9 @@ public:
   // display upper-directional smart tab only when pressing ctrl key
   void onControlPressed(bool pressed);
   const bool isControlPressed();
+
+  // edit current cell's ID
+  void onNumberPressed(int number);
 
   //	void keyUpDownPressed(int newRow);
 

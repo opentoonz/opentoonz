@@ -993,7 +993,12 @@ void RenameCellField::onReturnPressed() {
 
 void RenameCellField::focusOutEvent(QFocusEvent *e) {
   hide();
-
+  
+  if (escapePressed) {
+    escapePressed = false;
+  } else {
+    renameCell();
+  }
   QLineEdit::focusOutEvent(e);
 }
 
@@ -1036,6 +1041,7 @@ bool RenameCellField::eventFilter(QObject *obj, QEvent *e) {
 
 void RenameCellField::keyPressEvent(QKeyEvent *event) {
   if (event->key() == Qt::Key_Escape) {
+    escapePressed = true;
     clearFocus();
     return;
   }
@@ -3352,7 +3358,9 @@ void CellArea::mousePressEvent(QMouseEvent *event) {
     } else if ((!xsh->getCell(row, col).isEmpty()) &&
                o->rect(PredefinedRect::DRAG_AREA)
                    .adjusted(0, 0, -frameAdj.x(), -frameAdj.y())
-                   .contains(mouseInCell)) {
+                   .contains(mouseInCell) ||
+               // Or Control Pressed
+               event->modifiers() & Qt::ControlModifier) {
       TXshColumn *column = xsh->getColumn(col);
       if (column && !m_viewer->getCellSelection()->isCellSelected(row, col)) {
         int r0, r1;
@@ -3758,6 +3766,20 @@ void CellArea::onControlPressed(bool pressed) {
 const bool CellArea::isControlPressed() { return isCtrlPressed; }
 
 //-----------------------------------------------------------------------------
+
+void CellArea::onNumberPressed(int number) {
+  TCellSelection *cellSelection = m_viewer->getCellSelection();
+  if (cellSelection->isEmpty()) return;
+  int r0, c0, r1, c1;
+  cellSelection->getSelectedCells(r0, c0, r1, c1);
+  TXsheet *xsh       = TApp::instance()->getCurrentXsheet()->getXsheet();
+  TXshColumnP column = xsh->getColumn(r0);
+  m_renameCell->showInRowCol(r0, c0);
+  m_renameCell->setText(QString::number(number));
+}
+
+//-----------------------------------------------------------------------------
+
 void CellArea::createCellMenu(QMenu &menu, bool isCellSelected, TXshCell cell,
                               int row, int col) {
   CommandManager *cmdManager = CommandManager::instance();
