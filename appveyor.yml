@@ -33,6 +33,8 @@ build:
   project: $(APPVEYOR_BUILD_FOLDER)\toonz\$(PLATFORM)\ALL_BUILD.vcxproj
   parallel: false
   verbosity: minimal
+  cmd: >-
+    msbuild $(APPVEYOR_BUILD_FOLDER)\toonz\$(PLATFORM)\ALL_BUILD.vcxproj /p:Configuration=Release /p:Platform=x64 /MP
 after_build:
 - cmd: >-
     
