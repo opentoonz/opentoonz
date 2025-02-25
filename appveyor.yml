@@ -29,11 +29,8 @@ install:
     mkdir %PLATFORM% && cd %PLATFORM%
 
     cmake ..\sources -G "Visual Studio 16 2019" -Ax64 -DQT_PATH="C:\Qt\5.15.2\msvc2019_64" -DBOOST_ROOT="C:\Libraries\boost_1_85_0" -DOpenCV_DIR="C:\Tools\opencv\build"
-build:
-  project: $(APPVEYOR_BUILD_FOLDER)\toonz\$(PLATFORM)\ALL_BUILD.vcxproj
-  parallel: false
-  verbosity: minimal
-  cmd: >-
+build_script:
+- cmd: >-
     msbuild $(APPVEYOR_BUILD_FOLDER)\toonz\$(PLATFORM)\ALL_BUILD.vcxproj /p:Configuration=Release /p:Platform=x64 /MP
 after_build:
 - cmd: >-
@@ -61,4 +58,3 @@ after_build:
 artifacts:
 - path: toonz\$(PLATFORM)\$(CONFIGURATION)
   name: OpenToonz
-  
