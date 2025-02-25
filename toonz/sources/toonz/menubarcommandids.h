@@ -194,6 +194,7 @@
 #define MI_EditShift "MI_EditShift"
 #define MI_NoShift "MI_NoShift"
 #define MI_ResetShift "MI_ResetShift"
+#define MI_ShowShiftOrigin "MI_ShowShiftOrigin"
 #define MI_Histogram "MI_Histogram"
 #define MI_ViewerHistogram "MI_ViewerHistogram"
 #define MI_FxParamEditor "MI_FxParamEditor"
