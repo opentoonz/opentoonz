@@ -723,12 +723,16 @@ bool CleanupPopup::analyzeCleanupList() {
           lev->setPath(scannedPath, true);
           lev->clearFrames();
           lev->setType(OVL_XSHLEVEL);  // OVL_XSHLEVEL
-          lev->setPalette(0);
+
+          // change of CurrentLevelPalette would trigger the update of column icon
+          // (would use level's Palette)
+          // So we should reset currentLevelPalette first here(do disconnect), to avoid nullptr
           if (lev == TApp::instance()->getCurrentLevel()->getLevel())
             TApp::instance()
                 ->getPaletteController()
                 ->getCurrentLevelPalette()
                 ->setPalette(0);
+          lev->setPalette(0);
 
           lev->load();
           int i, frameCount = lev->getFrameCount();

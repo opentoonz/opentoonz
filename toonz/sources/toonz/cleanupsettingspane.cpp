@@ -313,7 +313,7 @@ CleanupSettingsPane::CleanupSettingsPane(QWidget *parent)
 
   ret = ret && connect(loadBtn, SIGNAL(pressed()), model, SLOT(promptLoad()));
   ret = ret && connect(resetBtn, SIGNAL(pressed()), this,
-                       SLOT(onRestoreSceneSettings()));
+                       SLOT(onRestoreSettings()));
 
   assert(ret);
 }
@@ -516,11 +516,15 @@ void CleanupSettingsPane::onClnLoaded() {
 
 //-----------------------------------------------------------------------------
 
-void CleanupSettingsPane::onRestoreSceneSettings() {
+void CleanupSettingsPane::onRestoreSettings() {
   CleanupSettingsModel *model = CleanupSettingsModel::instance();
 
-  model->saveSettingsIfNeeded();
-  model->restoreGlobalSettings();
+  if (model->clnPath().isEmpty()) {
+    model->saveSettingsIfNeeded();
+    model->restoreGlobalSettings();
+  } else {
+    model->loadSettings(model->clnPath());
+  }
 }
 
 //-----------------------------------------------------------------------------
