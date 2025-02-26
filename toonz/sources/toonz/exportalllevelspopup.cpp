@@ -139,15 +139,10 @@ ExportAllLevelsPopup::ExportAllLevelsPopup(){
   m_skipButton->setDisabled(true);
 
   // Layout
-  QLayout *fileFormatLayout =
-      layout()
-          ->itemAt(2)
-          ->layout()
-          ->itemAt(2)
-          ->widget()
-          ->layout();
-  fileFormatLayout->addWidget(m_exportAll);
-  fileFormatLayout->addWidget(m_skipButton);
+  QHBoxLayout *bottomLay = layout()->findChild<QHBoxLayout *>("bottomLay");
+  int count              = bottomLay->count();
+  bottomLay->insertWidget(count - 1, m_exportAll);
+  bottomLay->insertWidget(count, m_skipButton);
 
   // Establish connections
   bool ret = true;
@@ -332,10 +327,10 @@ void ExportAllLevelsPopup::collectSelectedSimpleLevels() {
   for (int index = 0; index < col_count; ++index) {
     TXshColumn *col = xsh->getColumn(index);//start from a not camera column
     assert(col);
-    if (col->isEmpty() || !col->isCamstandVisible()) continue;// Not empty and visible
+    if (col->isEmpty() || !col->isPreviewVisible()) continue;// Not empty and visible
     if (col->getColumnType()) continue;
     if (col->getRange(r0, r1)) sl = xsh->getCell(r0, index).getSimpleLevel();
-    assert(sl);
+    if (!sl) continue;
     int type = sl->getType();
     if
       (!(type == PLI_XSHLEVEL ||  // ToonzVector

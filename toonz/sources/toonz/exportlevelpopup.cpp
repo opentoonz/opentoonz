@@ -299,6 +299,7 @@ ExportLevelPopup::ExportLevelPopup()
 
     //-------------- Buttons Toolbar ---------------------
     QHBoxLayout *bottomLay = new QHBoxLayout();
+    bottomLay->setObjectName("bottomLay");
     bottomLay->setMargin(5);
     bottomLay->setSpacing(3);
     {
@@ -377,6 +378,13 @@ void ExportLevelPopup::collectSelectedSimpleLevels() {
       if (r0 <= r1)  // There exists a not-empty cell
       {
         TXshSimpleLevel *sl = xsh->getCell(r0, c).getSimpleLevel();
+        if (!sl) continue;
+        int type = sl->getType();
+        if (!(type == PLI_XSHLEVEL ||  // ToonzVector
+              type == TZP_XSHLEVEL ||  // ToonzRaster
+              type == OVL_XSHLEVEL))   // Raster
+          continue;
+
         outputLevels.push_back(sl);
         assert(sl);
       }
