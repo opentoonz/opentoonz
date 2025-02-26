@@ -998,10 +998,11 @@ void RasterPainter::onRasterImage(TRasterImage *ri,
 
   TAffine aff;
   aff = m_viewAff * player.m_placement * player.m_dpiAff;
+  
   aff = TTranslation(m_dim.lx * 0.5, m_dim.ly * 0.5) * aff *
         TTranslation(-r->getCenterD() +
                      convert(ri->getOffset()));  // this offset is !=0 only if
-                                                 // in cleanup camera test mode
+                                                 // in cleanup camera test mode 
 
   TRectD bbox = TRectD(0, 0, m_dim.lx, m_dim.ly);
   bbox *= convert(m_clipRect);

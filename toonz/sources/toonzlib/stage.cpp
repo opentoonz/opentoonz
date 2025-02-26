@@ -38,6 +38,7 @@
 #include "imagebuilders.h"
 #include "toonz/toonzscene.h"
 #include "toonz/sceneproperties.h"
+#include "toonz/tcamera.h"
 
 // Qt includes
 #include <QImage>
@@ -424,7 +425,18 @@ void StageBuilder::addCell(PlayerSet &players, ToonzScene *scene, TXsheet *xsh,
     player.m_isGuidedDrawingEnabled = m_isGuidedDrawingEnabled;
     player.m_guidedFrontStroke      = m_guidedFrontStroke;
     player.m_guidedBackStroke       = m_guidedBackStroke;
+    if (xsh) {
+      TPointD cameraDpi =//use cameraDpi for rasterized vector image
+          xsh->getStageObjectTree()->getCurrentCamera()->getDpi();
+        player.m_dpiAff =
+          sl ? ((sl->getType() == PLI_XSHLEVEL && sl->m_rasterizePli)
+                    ? TScale(Stage::inch / cameraDpi.x,
+                             Stage::inch / cameraDpi.y)
+                    : getDpiAffine(sl, cell.m_frameId))
+             : TAffine();
+    } else  
     player.m_dpiAff = sl ? getDpiAffine(sl, cell.m_frameId) : TAffine();
+
     player.m_onionSkinDistance = m_onionSkinDistance;
     // when visiting the subxsheet, valuate the subxsheet column index
     bool isCurrent               = (subSheetColIndex >= 0)

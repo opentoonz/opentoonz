@@ -45,6 +45,7 @@ enum PreferencesItemId {
   // Visualization
   show0ThickLines,
   regionAntialias,
+  rasterizeAntialias,
 
   //----------
   // Loading

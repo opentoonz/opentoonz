@@ -1205,6 +1205,7 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
       // Visualization
       {show0ThickLines, tr("Show Lines with Thickness 0")},
       {regionAntialias, tr("Antialiased Region Boundaries")},
+      {rasterizeAntialias, tr("Rasterize Vector with Anti Aliasing")},
 
       // Loading
       {importPolicy, tr("Default File Import Behavior:")},
@@ -1751,6 +1752,7 @@ QWidget* PreferencesPopup::createVisualizationPage() {
 
   insertUI(show0ThickLines, lay);
   insertUI(regionAntialias, lay);
+  insertUI(rasterizeAntialias, lay);
 
   lay->setRowStretch(lay->rowCount(), 1);
   widget->setLayout(lay);

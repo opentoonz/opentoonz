@@ -239,6 +239,7 @@ public:
   // Visualization  tab
   bool getShow0ThickLines() const { return getBoolValue(show0ThickLines); }
   bool getRegionAntialias() const { return getBoolValue(regionAntialias); }
+  bool getRasterizeAntialias() const { return getBoolValue(rasterizeAntialias); }
 
   // Loading  tab
   int getDefaultImportPolicy() { return getIntValue(importPolicy); }
