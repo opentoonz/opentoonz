@@ -18,23 +18,33 @@ class TLevelWriterWebm : public TLevelWriter {
 public:
   TLevelWriterWebm(const TFilePath &path, TPropertyGroup *winfo);
   ~TLevelWriterWebm();
+
+  // Framerate control
   void setFrameRate(double fps) override;
 
+  // Image and frame handling
   TImageWriterP getFrameWriter(TFrameId fid) override;
   void save(const TImageP &image, int frameIndex);
 
+  // Soundtrack handling
   void saveSoundTrack(TSoundTrack *st) override;
 
+  // Factory method for creating instances
   static TLevelWriter *create(const TFilePath &path, TPropertyGroup *winfo) {
     return new TLevelWriterWebm(path, winfo);
   }
 
 private:
+  // FFmpeg writer instance
   Ffmpeg *ffmpegWriter;
-  int m_lx, m_ly;
-  int m_scale;
-  int m_vidQuality;
-  // void *m_buffer;
+
+  // Video properties
+  int m_lx, m_ly;        // Frame width and height
+  int m_scale;           // Scaling factor
+  QString m_speed;       // Encoding speed preset
+  int m_kfSetting;       // Keyframe interval
+  bool m_preserveAlpha;  // Preserve alpha channel
+  bool m_lossless;       // Lossless quality
 };
 
 //===========================================================
@@ -74,10 +84,12 @@ namespace Tiio {
 class WebmWriterProperties : public TPropertyGroup {
   Q_DECLARE_TR_FUNCTIONS(WebmWriterProperties)
 public:
-  // TEnumProperty m_pixelSize;
-  // TBoolProperty m_matte;
-  TIntProperty m_vidQuality;
   TIntProperty m_scale;
+  TEnumProperty m_speed;
+  TEnumProperty m_kf;
+  TBoolProperty m_preserveAlpha;
+  TBoolProperty m_lossless;
+
   WebmWriterProperties();
   void updateTranslation() override;
 };

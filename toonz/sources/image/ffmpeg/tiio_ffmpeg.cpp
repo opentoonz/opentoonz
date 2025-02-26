@@ -429,13 +429,29 @@ void Ffmpeg::getFramesFromMovie(int frame) {
     // frameArgs << "-accurate_seek";
     // frameArgs << "-ss";
     // frameArgs << "0" + QString::number(frameIndex / m_info->m_frameRate);
-    if (m_path.getType() == "webm") {
-      // To load in webm transparency
-      preIFrameArgs << "-vcodec";
-      preIFrameArgs << "libvpx";
+
+    // Detect codec from the input file
+    QStringList probeArgs;
+    probeArgs << "-v" << "error"
+              << "-select_streams" << "v:0"
+              << "-show_entries" << "stream=codec_name"
+              << "-of" << "default=noprint_wrappers=1:nokey=1"
+              << m_path.getQString();
+
+    QString codecName = runFfprobe(probeArgs).trimmed();
+
+    // Set decoder based on detected codec
+    if (codecName.contains("vp9", Qt::CaseInsensitive)) {
+      preIFrameArgs << "-vcodec" << "libvpx-vp9";
+    } else if (codecName.contains("vp8", Qt::CaseInsensitive)) {
+      preIFrameArgs << "-vcodec" << "libvpx";
+    } else if (codecName.contains("av1", Qt::CaseInsensitive)) {
+      preIFrameArgs << "-vcodec" << "libaom-av1";
     }
-    preIFrameArgs << "-i";
-    preIFrameArgs << m_path.getQString();
+
+    // Common args
+    preIFrameArgs << "-threads" << "auto";
+    preIFrameArgs << "-i" << m_path.getQString();
     postIFrameArgs << "-y";
     postIFrameArgs << "-f";
     postIFrameArgs << "image2";
@@ -444,10 +460,11 @@ void Ffmpeg::getFramesFromMovie(int frame) {
 
     runFfmpeg(preIFrameArgs, postIFrameArgs, true, true, true, false);
 
+    QString addToDelete;
+    QString tempBase = tempPath + "In";
     for (int i = 1; i <= m_frameCount; i++) {
-      QString number      = QString("%1").arg(i, 4, 10, QChar('0'));
-      addToDelete         = tempBase + number + "." + m_intermediateFormat;
-      std::string delPath = addToDelete.toStdString();
+      QString number = QString("%1").arg(i, 4, 10, QChar('0'));
+      addToDelete    = tempBase + number + "." + m_intermediateFormat;
       // addToCleanUp(addToDelete);
     }
   }
