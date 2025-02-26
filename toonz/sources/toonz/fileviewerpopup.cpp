@@ -33,11 +33,7 @@ using namespace TwConsts;*/
 // FileViewer
 //-----------------------------------------------------------------------------
 
-#if QT_VERSION >= 0x050500
 FileViewer::FileViewer(QWidget *parent, Qt::WindowFlags flags)
-#else
-FileViewer::FileViewer(QWidget *parent, Qt::WFlags flags)
-#endif
     : QWidget(parent), m_fileSize(0), m_player(0), m_snd(0), m_soundOn(false) {
   setAcceptDrops(true);
 }
@@ -689,11 +685,7 @@ public:
 // FileViewerPopup
 //-----------------------------------------------------------------------------
 
-#if QT_VERSION >= 0x050500
 FileViewerPopup::FileViewerPopup(QWidget *parent, Qt::WindowFlags flags)
-#else
-FileViewerPopup::FileViewerPopup(QWidget *parent, Qt::WFlags flags)
-#endif
     : QWidget(parent) {
   setWindowTitle(tr("Viewer"));
   QHBoxLayout *layout    = new QHBoxLayout(this);

@@ -398,19 +398,11 @@ void DockWidget::maximizeDock() {
 void DockWidget::wheelEvent(QWheelEvent *we) {
   if (m_dragging) {
     if (m_selectedPlace) {
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
       DockPlaceholder *newSelected =
           (we->angleDelta().y() > 0)
               ? m_selectedPlace->parentPlaceholder()
               : m_selectedPlace->childPlaceholder(parentWidget()->mapFromGlobal(
                     we->globalPosition().toPoint()));
-#else
-      DockPlaceholder *newSelected =
-          (we->angleDelta().y() > 0)
-              ? m_selectedPlace->parentPlaceholder()
-              : m_selectedPlace->childPlaceholder(
-                    parentWidget()->mapFromGlobal(we->globalPos()));
-#endif
       if (newSelected != m_selectedPlace) {
         m_selectedPlace->hide();
         newSelected->show();

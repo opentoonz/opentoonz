@@ -389,15 +389,11 @@ void Preferences::definePreferenceItems() {
   define(CurrentStyleSheetName, "CurrentStyleSheetName", QMetaType::QString,
          "Default");
 
-  // Qt has a bug in recent versions that Menu item Does not show correctly
-  // (QTBUG-90242) Since the current OT is made to handle such issue, so we need
-  // to apply an extra adjustment when it is run on the older versions (5.9.x)
-  // of Qt
-  // Update: confirmed that the bug does not appear at least in Qt 5.12.8
+// Qt has a bug in recent versions that Menu item does not show correctly
+// (QTBUG-90242). The current OT handles this issue by applying an extra adjustment
+// for Qt versions 5.9.x.
+// Update: Issue confirmed fixed in Qt 5.12.8 and above, no longer affecting Qt 5.15 and later.
   QString defaultAditionalSheet = "";
-#if QT_VERSION < QT_VERSION_CHECK(5, 12, 9)
-  defaultAditionalSheet = "QMenu::Item{ padding: 3 28 3 28; }";
-#endif
 
   define(additionalStyleSheet, "additionalStyleSheet", QMetaType::QString,
          defaultAditionalSheet);

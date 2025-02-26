@@ -334,11 +334,7 @@ void BoardSettings::removeItem(int index) {
   m_items.removeAt(index);
 }
 
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 13, 0))
 void BoardSettings::swapItems(int i, int j) { m_items.swapItemsAt(i, j); }
-#else
-void BoardSettings::swapItems(int i, int j) { m_items.swap(i, j); }
-#endif
 
 void BoardSettings::saveData(TOStream &os, bool forPreset) {
   if (!forPreset) os.child("active") << (int)((m_active) ? 1 : 0);

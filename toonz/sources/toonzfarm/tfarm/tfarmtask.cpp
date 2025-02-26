@@ -404,11 +404,7 @@ static TFilePath getFilePath(const QStringList &l, int &i) {
 //------------------------------------------------------------------------------
 
 void TFarmTask::parseCommandLine(QString commandLine) {
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
   QStringList l = commandLine.split(" ", Qt::SkipEmptyParts);
-#else
-  QStringList l = commandLine.split(" ", QString::SkipEmptyParts);
-#endif
   assert(l.size() >= 2);
 
   // serve per skippare il path dell'eseguibile su mac che contiene spazi

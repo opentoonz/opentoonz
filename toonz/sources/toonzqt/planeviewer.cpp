@@ -269,13 +269,8 @@ void PlaneViewer::wheelEvent(QWheelEvent *event) {
     if ((m_gestureActive == true &&
          m_touchDevice == QTouchDevice::TouchScreen) ||
         m_gestureActive == false) {
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
       TPointD pos(event->position().x() * getDevPixRatio(),
                   height() - event->position().y() * getDevPixRatio());
-#else
-      TPointD pos(event->pos().x() * getDevPixRatio(),
-                  height() - event->pos().y() * getDevPixRatio());
-#endif
       double zoom_par = 1 + event->angleDelta().y() * 0.001;
 
       zoomView(pos.x, pos.y, zoom_par);

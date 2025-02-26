@@ -83,16 +83,10 @@ QRgb pickScreenRGB(const QRect &rect) {
 
 #endif
 
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
   QImage img(widget->screen()
                  ->grabWindow(widget->winId(), theRect.x(), theRect.y(),
                               theRect.width(), theRect.height())
                  .toImage());
-#else
-  QImage img(QPixmap::grabWindow(widget->winId(), theRect.x(), theRect.y(),
-                                 theRect.width(), theRect.height())
-                 .toImage());
-#endif
   return meanColor(
       img, QRect(rect.left() - theRect.left(), rect.top() - theRect.top(),
                  rect.width(), rect.height()));

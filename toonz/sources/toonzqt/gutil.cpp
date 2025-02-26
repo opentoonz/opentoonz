@@ -189,13 +189,7 @@ QPixmap scalePixmapKeepingAspectRatio(QPixmap pixmap, QSize size,
 
 int getDevicePixelRatio(const QWidget *widget) {
   if (hasScreensWithDifferentDevPixRatio() && widget) {
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
     return widget->screen()->devicePixelRatio();
-#else
-    if (!widget->windowHandle()) widget->winId();
-    if (widget->windowHandle())
-      return widget->windowHandle()->devicePixelRatio();
-#endif
   }
   static int devPixRatio = QApplication::desktop()->devicePixelRatio();
   return devPixRatio;

@@ -405,7 +405,7 @@ int main(int argc, char *argv[]) {
 
   // Enable to render smooth icons on high dpi monitors
   a.setAttribute(Qt::AA_UseHighDpiPixmaps);
-#if defined(_WIN32) && QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
+#if defined(_WIN32)
   // Compress tablet events with application attributes instead of implementing
   // the delay-timer by ourselves
   a.setAttribute(Qt::AA_CompressHighFrequencyEvents);

@@ -893,13 +893,8 @@ void ExportCameraTrackPopup::getInfoFromUI(ExportCameraTrackInfo& info) {
   // camera rect settings
   info.cameraRectOnKeys = m_cameraRectOnKeysCB->isChecked();
   info.cameraRectOnTags = m_cameraRectOnTagsCB->isChecked();
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
   QStringList framesStrList =
       m_cameraRectFramesEdit->text().split(",", Qt::SkipEmptyParts);
-#else
-  QStringList framesStrList =
-      m_cameraRectFramesEdit->text().split(",", QString::SkipEmptyParts);
-#endif
   for (auto fStr : framesStrList) {
     bool ok;
     int f = fStr.toInt(&ok);

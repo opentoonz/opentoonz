@@ -264,15 +264,9 @@ void ParamsPage::setPageField(TIStream &is, const TFxP &fx, bool isVertical) {
           tmpWidget->setVisible(shrink == 1);
         } else {  // modeSensitiveStr != ""
           QList<int> modes;
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
           QStringList modeListStr =
               QString::fromStdString(is.getTagAttribute("mode"))
                   .split(',', Qt::SkipEmptyParts);
-#else
-          QStringList modeListStr =
-              QString::fromStdString(is.getTagAttribute("mode"))
-                  .split(',', QString::SkipEmptyParts);
-#endif
           for (QString modeNum : modeListStr) modes.push_back(modeNum.toInt());
           // find the mode combobox
           ModeChangerParamField *modeChanger = nullptr;

@@ -464,11 +464,7 @@ bool TXshCellColumn::loadCellMarks(std::string tagName, TIStream &is) {
       QString frameStr;
       if (is.getTagParam("id", id)) {
         is >> frameStr;
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
         QStringList frameStrList = frameStr.split(" ", Qt::SkipEmptyParts);
-#else
-        QStringList frameStrList = frameStr.split(" ", QString::SkipEmptyParts);
-#endif
         for (auto fStr : frameStrList) m_cellMarkIds.insert(fStr.toInt(), id);
       }
     }

@@ -1338,11 +1338,9 @@ void PencilTestSaveInFolderPopup::updateParentFolder() {
 namespace {
 
 bool strToSubCamera(const QString& str, QRect& subCamera, double& dpi) {
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+
   QStringList values = str.split(',', Qt::SkipEmptyParts);
-#else
-  QStringList values         = str.split(',', QString::SkipEmptyParts);
-#endif
+
   if (values.count() != 4 && values.count() != 5) return false;
   subCamera = QRect(values[0].toInt(), values[1].toInt(), values[2].toInt(),
                     values[3].toInt());

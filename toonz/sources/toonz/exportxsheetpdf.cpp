@@ -1552,8 +1552,8 @@ void XSheetPDFTemplate::initializePage(QPdfWriter& writer) {
   QPageLayout pageLayout;
   pageLayout.setUnits(QPageLayout::Millimeter);
   pageLayout.setPageSize(
-      QPageSize(m_p.documentPageSize));  // •’Ê‚ÌB4‚ÍISO B4(250x353mm)
-                                         // “ú–{‚ÌB4‚ÍJIS B4(257x364mm)
+      QPageSize(m_p.documentPageSize));  // ISO B4(250x353mm)
+                                         // JIS B4(257x364mm)
   pageLayout.setOrientation(QPageLayout::Portrait);
   pageLayout.setMargins(m_p.documentMargin);
   writer.setPageLayout(pageLayout);
@@ -1688,11 +1688,9 @@ XSheetPDFTemplate_Custom::XSheetPDFTemplate_Custom(
     m_p.documentPageSize = str2PageSizeId(pageStr);
 
     QString marginStr = s.value("Margin").toString();
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+
     QStringList m = marginStr.split(QLatin1Char(','), Qt::SkipEmptyParts);
-#else
-    QStringList m = marginStr.split(QLatin1Char(','), QString::SkipEmptyParts);
-#endif
+
     assert(m.size() == 4);
     if (m.size() == 4)
       m_p.documentMargin = QMarginsF(m[0].toDouble(), m[1].toDouble(),
@@ -1734,12 +1732,7 @@ XSheetPDFTemplate_Custom::XSheetPDFTemplate_Custom(
     {
       for (auto key : s.childKeys()) {
         QString rectStr = s.value(key).toString();
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
         QStringList r = rectStr.split(QLatin1Char(','), Qt::SkipEmptyParts);
-#else
-        QStringList r =
-            rectStr.split(QLatin1Char(','), QString::SkipEmptyParts);
-#endif
         assert(r.size() == 4);
         if (r.size() == 4)
           m_dataRects[dataStr2Type(key)] =
@@ -2792,7 +2785,7 @@ void ExportXsheetPdfPopup::onExportCSV() {
       //add cell number
       if (cell.m_level)
           csvCol.append(QString::number(cell.m_frameId.getNumber()));
-      else//    add ¡Á
+      else// TODO: Fix corrupted encoding (unknown characters)
           csvCol.append(QString::fromUtf8("\u00D7"));
       
       prevCell = cell;

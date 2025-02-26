@@ -478,11 +478,7 @@ void Task::run() {
 #if defined(_WIN32)
   process.setNativeArguments(argsStr);
 #else
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
   process.setArguments(argsStr.split(" ", Qt::SkipEmptyParts));
-#else
-  process.setArguments(argsStr.split(" ", QString::SkipEmptyParts));
-#endif
 #endif
   process.start();
   process.waitForFinished(-1);

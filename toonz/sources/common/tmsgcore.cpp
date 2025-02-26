@@ -133,11 +133,7 @@ void TMsgCore::readFromSocket(QTcpSocket *socket)  // server side
     message.chop(lastbegin);
   }
 
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
   QStringList messages = message.split("#TMSG", Qt::SkipEmptyParts);
-#else
-  QStringList messages = message.split("#TMSG", QString::SkipEmptyParts);
-#endif
 
   for (int i = 0; i < messages.size(); i++) {
     QString str = messages.at(i).simplified();

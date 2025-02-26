@@ -495,11 +495,7 @@ void SchematicSceneViewer::wheelEvent(QWheelEvent *me) {
          m_touchDevice == QTouchDevice::TouchScreen) ||
         m_gestureActive == false) {
       double factor = exp(delta * 0.001);
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
       changeScale(me->position().toPoint(), factor);
-#else
-      changeScale(me->pos(), factor);
-#endif
       m_panning = false;
     }
   }

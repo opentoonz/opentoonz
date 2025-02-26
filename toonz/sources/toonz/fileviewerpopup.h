@@ -35,11 +35,7 @@ class FileViewer : public QWidget {
   bool m_soundOn;
 
 public:
-#if QT_VERSION >= 0x050500
   FileViewer(QWidget *parent = 0, Qt::WindowFlags flags = Qt::Tool);
-#else
-  FileViewer(QWidget *parent = 0, Qt::WFlags flags = Qt::Tool);
-#endif
 
   void setPath(const TFilePath &fp, int from = 0, int to = 0, int step = 0,
                TSoundTrack *snd = 0);
@@ -154,11 +150,7 @@ class FileViewerPopup : public QWidget {
   FileViewer *m_viewer;
 
 public:
-#if QT_VERSION >= 0x050500
   FileViewerPopup(QWidget *parent = 0, Qt::WindowFlags flags = Qt::Tool);
-#else
-  FileViewerPopup(QWidget *parent = 0, Qt::WFlags flags = Qt::Tool);
-#endif
 };
 
 /*

@@ -1467,11 +1467,7 @@ void FunctionPanel::leaveEvent(QEvent *) {
 
 void FunctionPanel::wheelEvent(QWheelEvent *e) {
   double factor = exp(0.002 * (double)e->angleDelta().y());
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
   zoom(factor, factor, e->position().toPoint());
-#else
-  zoom(factor, factor, e->pos());
-#endif
 }
 
 //-----------------------------------------------------------------------------

@@ -602,11 +602,7 @@ void TLevelWriterMov::save(const TImageP &img, int frameIndex) {
     frame.right  = lx;
     frame.bottom = ly;
 
-#if QT_VERSION >= 0x050000
     if ((err = QTNewGWorld(&(m_gworld), pixSize * 8, &frame, 0, 0, 0)) != noErr)
-#else
-    if ((err = NewGWorld(&(m_gworld), pixSize * 8, &frame, 0, 0, 0)) != noErr)
-#endif
       throw TImageException(getFilePath(), "can't create movie buffer");
 
     //#ifdef WIN32

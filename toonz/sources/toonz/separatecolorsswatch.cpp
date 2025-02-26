@@ -249,11 +249,7 @@ void SeparateSwatchArea::wheelEvent(QWheelEvent *event) {
   if ((factor < 1 && sqrt(scale) < minZoom) || (factor > 1 && scale > 1200.0))
     return;
 
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
   TPointD delta(event->position().x(), height() - event->position().y());
-#else
-  TPointD delta(event->pos().x(), height() - event->pos().y());
-#endif
   m_sw->m_viewAff =
       (TTranslation(delta) * TScale(factor) * TTranslation(-delta)) *
       m_sw->m_viewAff;
@@ -415,7 +411,7 @@ void SeparateSwatch::setRaster(TRasterP orgRas, TRasterP mainRas,
 void SeparateSwatch::setRaster(TRasterP orgRas, TRasterP mainRas,
                                TRasterP sub1Ras, TRasterP sub2Ras,
                                TRasterP sub3Ras) {
-  // o‚·
+  // TODO: Fix corrupted encoding (unknown characters)
   m_sub3Swatch->setVisible(true);
   m_sub3Label->setVisible(true);
 

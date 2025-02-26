@@ -199,11 +199,7 @@ void CleanupSwatch::CleanupSwatchArea::wheelEvent(QWheelEvent *event) {
   if ((factor < 1 && sqrt(scale) < minZoom) || (factor > 1 && scale > 1200.0))
     return;
 
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
   TPointD delta(event->position().x(), height() - event->position().y());
-#else
-  TPointD delta(event->pos().x(), height() - event->pos().y());
-#endif
   m_sw->m_viewAff =
       (TTranslation(delta) * TScale(factor) * TTranslation(-delta)) *
       m_sw->m_viewAff;
