@@ -221,7 +221,10 @@ void initImageIo(bool lightVersion) {
       TFileType::declare("apng", TFileType::RASTER_LEVEL);
       Tiio::defineWriterProperties("apng", new Tiio::APngWriterProperties());
     }
-    if (!IsQuickTimeInstalled()) {
+    //if (!IsQuickTimeInstalled()) {
+    // TODO: Remove or Repair QuickTime format supported by srv folder
+    // Abel 2025/02/26
+    if (true) {
       if (Ffmpeg::checkFormat("mov")) {
         TLevelWriter::define("mov", TLevelWriterFFMov::create, true);
         TLevelReader::define("mov", TLevelReaderFFMov::create);
@@ -251,7 +254,10 @@ void initImageIo(bool lightVersion) {
 
 #endif  // _WIN32
 
-    if (IsQuickTimeInstalled()) {
+    //if (IsQuickTimeInstalled()) {
+    // TODO: Remove or Repair QuickTime format supported by srv folder
+    // Abel 2025/02/26
+    if (false){
       Tiio::useQuicktime(true);
 
       TLevelWriter::define("mov", TLevelWriterMov::create, true);
