@@ -83,6 +83,8 @@ private:
 private:
   void rebuildFormatsList();
   QList<ComboBoxItem> buildFontStyleList() const;
+  QList<ComboBoxItem> buildSvnUserList() const;
+  QList<ComboBoxItem> buildSvnRepList() const;
 
   QWidget* createUI(
       PreferencesItemId id,

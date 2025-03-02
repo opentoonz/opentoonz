@@ -1,5 +1,4 @@
 
-
 #include "permissionsmanager.h"
 
 // TnzBase includes

@@ -115,6 +115,7 @@ set(MOC_HEADERS
     vectorizerpopup.h
     vectorizerswatch.h
     versioncontrol.h
+    versioncontrolxmlwriter.h
     versioncontroltimeline.h
     versioncontrolwidget.h
     viewerpane.h
@@ -311,6 +312,7 @@ set(SOURCES
     versioncontrol.cpp
     versioncontroltimeline.cpp
     versioncontrolxmlreader.cpp
+    versioncontrolxmlwriter.cpp
     versioncontrolwidget.cpp
     viewerpopup.cpp
     cellselectioncommand.cpp

@@ -344,7 +344,8 @@ void FileBrowserPopup::onFilePathsSelected(
     if (!m_isDirectoryOnly)
       text = QString::fromStdWString(fp.getLevelNameW());
     else
-      text = QString::fromStdWString(m_browser->getFolder().getWideString());
+      text = fp.getDots().empty() ? fp.getQString()
+                                  : fp.getParentDir().getQString();
 
     m_nameField->setText(text);
   } else
