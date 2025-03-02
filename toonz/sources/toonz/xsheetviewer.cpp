@@ -1397,9 +1397,15 @@ void XsheetViewer::keyPressEvent(QKeyEvent *event) {
         locals.scrollHorizTo(x, visibleRect);
       }
       break;
+    default:
+      if ((key >= Qt::Key_1 && key <= Qt::Key_9)) {
+        int number = key - Qt::Key_1 + 1;
+        m_cellArea->onNumberPressed(number);
+      }
+      break;
     }
-    break;
-  }
+      break;
+    }
   }
 }
 

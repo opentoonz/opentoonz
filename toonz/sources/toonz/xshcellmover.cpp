@@ -552,7 +552,7 @@ void LevelMoverTool::onClick(const QMouseEvent *e) {
   m_qualifiers = 0;
   if (Preferences::instance()->getDragCellsBehaviour() == 1)
     m_qualifiers |= CellsMover::eMoveColumns;
-  if (e->modifiers() & Qt::ControlModifier)
+  if ((e->modifiers() == (Qt::ControlModifier | Qt::AltModifier)))
     m_qualifiers |= CellsMover::eCopyCells;
   if (e->modifiers() & Qt::ShiftModifier)
     m_qualifiers |= CellsMover::eInsertCells;
