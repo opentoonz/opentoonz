@@ -455,6 +455,7 @@ void Preferences::definePreferenceItems() {
 
   // Loading
   define(importPolicy, "importPolicy", QMetaType::Int, 0);  // Always ask
+  define(renamePolicy, "renamePolicy", QMetaType::Int, 0); // Always ask
   define(autoExposeEnabled, "autoExposeEnabled", QMetaType::Bool, true);
   define(subsceneFolderEnabled, "subsceneFolderEnabled", QMetaType::Bool, true);
   define(removeSceneNumberFromLoadedLevelName,

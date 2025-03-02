@@ -60,6 +60,9 @@ public:
   void notifyImportPolicyChanged(int policy) {
     emit importPolicyChanged(policy);
   }
+  void notifyRenamePolicyChanged(int policy) {
+    emit renamePolicyChanged(policy);
+  }
 
   void setDirtyFlag(bool dirtyFlag) {
     if (m_dirtyFlag == dirtyFlag) return;
@@ -84,6 +87,7 @@ signals:
   void preferenceChanged(const QString &prefName);
   void pixelUnitSelected(bool on);
   void importPolicyChanged(int policy);
+  void renamePolicyChanged(int policy);
 };
 
 #endif  // TSCENEHANDLE_H

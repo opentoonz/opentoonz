@@ -22,6 +22,7 @@ using namespace std;
 #include <QUrl>
 #include <QCoreApplication>
 #include <QUuid>
+#include <QRegularExpression>
 
 #include <QDesktopServices>
 #include <QHostInfo>
@@ -853,6 +854,27 @@ void TSystem::copyFileOrLevel_throw(const TFilePath &dst,
 }
 
 //--------------------------------------------------------------
+
+void TSystem::renameImageSequence(const TFilePathSet &files,
+                                        const TFilePath &levelPath,
+                                        int prefixLength) {
+  std::string levelBaseName = levelPath.withoutParentDir().getName();
+
+  //TSystem::readDirectory(levelPath.getParentDir(), false);
+
+  std::wstring wstr;
+  TFilePath dst;
+
+  for (const TFilePath &file : files) {
+    wstr = file.getWideName();
+    if (wstr.size() > prefixLength)
+      wstr = wstr.substr(prefixLength);
+    else
+      wstr.clear();
+    dst = file.withName(levelBaseName).withFrame(TFrameId(TFrameId(wstr).expand()));
+    TSystem::renameFile(dst, file);
+  }
+}
 
 void TSystem::renameFileOrLevel_throw(const TFilePath &dst,
                                       const TFilePath &src,
