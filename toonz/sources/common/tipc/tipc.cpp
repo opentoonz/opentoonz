@@ -267,16 +267,17 @@ bool tipc::startBackgroundProcess(QString cmdlineProgram,
   QProcess *proc = new QProcess;
 
   proc->start(cmdlineProgram, cmdlineArguments);
-  if (proc->waitForStarted() && proc->error() != QProcess::FailedToStart) {
-    delete proc;
-    return false;
-  }
 
   QObject::connect(proc, SIGNAL(finished(int, QProcess::ExitStatus)), proc,
                    SLOT(deleteLater()));
   QObject::connect(proc, SIGNAL(error(QProcess::ProcessError)), proc,
                    SLOT(deleteLater()));
   
+  if (proc->waitForStarted() && proc->error() != QProcess::FailedToStart) {
+    delete proc;
+    return false;
+  }
+
   return true;
 #else
   return QProcess::startDetached(cmdlineProgram, cmdlineArguments);
