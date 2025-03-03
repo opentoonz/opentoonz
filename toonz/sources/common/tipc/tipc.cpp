@@ -263,21 +263,18 @@ QString tipc::applicationSpecificServerName(QString srvName) {
 bool tipc::startBackgroundProcess(QString cmdlineProgram,
                                   QStringList cmdlineArguments) {
 #ifdef _WIN32
-  SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX);
 
   QProcess *proc = new QProcess;
 
   proc->start(cmdlineProgram, cmdlineArguments);
-  
+  if (proc->waitForStarted() && proc->error() != QProcess::FailedToStart) {
+    return false;
+  }
+
   QObject::connect(proc, SIGNAL(finished(int, QProcess::ExitStatus)), proc,
                    SLOT(deleteLater()));
   QObject::connect(proc, SIGNAL(error(QProcess::ProcessError)), proc,
                    SLOT(deleteLater()));
-
-if (proc->waitForFinished(150)) {
-    delete proc;
-    return false;
-  }
   
   return true;
 #else
