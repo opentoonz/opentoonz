@@ -268,6 +268,7 @@ bool tipc::startBackgroundProcess(QString cmdlineProgram,
 
   proc->start(cmdlineProgram, cmdlineArguments);
   if (proc->waitForStarted() && proc->error() != QProcess::FailedToStart) {
+    delete proc;
     return false;
   }
 
