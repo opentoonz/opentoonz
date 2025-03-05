@@ -953,6 +953,13 @@ void PreferencesPopup::onImportPolicyExternallyChanged(int policy) {
 
 //-----------------------------------------------------------------------------
 
+void PreferencesPopup::onRenamePolicyExternallyChanged(int policy) {
+  QComboBox* renamePolicyCombo = getUI<QComboBox*>(renamePolicy);
+  // update preferences data accordingly
+  renamePolicyCombo->setCurrentIndex(policy);
+}
+//-----------------------------------------------------------------------------
+
 QWidget* PreferencesPopup::createUI(PreferencesItemId id,
                                     const QList<ComboBoxItem>& comboItems) {
   PreferencesItem item = m_pref->getItem(id);
@@ -1239,6 +1246,7 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
 
       // Loading
       {importPolicy, tr("Default File Import Behavior:")},
+      {renamePolicy, tr("Normalize Imported Image Sequences:")},
       {autoExposeEnabled, tr("Expose Loaded Levels in Xsheet")},
       {autoRemoveUnusedLevels,
        tr("Automatically Remove Unused Levels From Scene Cast")},
@@ -1431,6 +1439,10 @@ QList<ComboBoxItem> PreferencesPopup::getComboItemList(
        {{tr("Always ask before loading or importing"), 0},
         {tr("Always import the file to the current project"), 1},
         {tr("Always load the file from the current location"), 2}}},
+      {renamePolicy,
+       {{tr("Always ask before renaming"), 0},
+        {tr("Normalize sequence names automatically"), 1},
+        {tr("Keep original filenames"), 2}}},
       {rasterLevelCachingBehavior,
        {{tr("On Demand"), 0},
         {tr("All Icons"), 1},
@@ -1807,6 +1819,7 @@ QWidget* PreferencesPopup::createLoadingPage() {
   setupLayout(lay);
 
   insertUI(importPolicy, lay, getComboItemList(importPolicy));
+  insertUI(renamePolicy, lay, getComboItemList(renamePolicy));
   QGridLayout* autoExposeLay = insertGroupBoxUI(autoExposeEnabled, lay);
   { insertUI(autoRemoveUnusedLevels, autoExposeLay); }
   insertUI(subsceneFolderEnabled, lay);
@@ -1846,6 +1859,9 @@ QWidget* PreferencesPopup::createLoadingPage() {
   ret = ret && connect(TApp::instance()->getCurrentScene(),
                        SIGNAL(importPolicyChanged(int)), this,
                        SLOT(onImportPolicyExternallyChanged(int)));
+  ret = ret && connect(TApp::instance()->getCurrentScene(),
+                       SIGNAL(renamePolicyChanged(int)), this,
+                       SLOT(onRenamePolicyExternallyChanged(int)));
   assert(ret);
 
   return widget;
