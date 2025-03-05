@@ -2399,11 +2399,12 @@ void ColumnArea::mousePressEvent(QMouseEvent *event) {
     else if (!isEmpty) {
       // grabbing the left side of the column enables column move
       if (o->rect(PredefinedRect::DRAG_LAYER).contains(mouseInCell) ||
-          (!o->flag(PredefinedFlag::DRAG_LAYER_VISIBLE)  // If dragbar hidden,
+          /*(!o->flag(PredefinedFlag::DRAG_LAYER_VISIBLE)  // If dragbar hidden,
                                                          // layer name/number
                                                          // becomes dragbar
-           && (o->rect(PredefinedRect::LAYER_NUMBER).contains(mouseInCell) ||
-               o->rect(PredefinedRect::LAYER_NAME).contains(mouseInCell)))) {
+           && */  // also consider layer name/number as dragbar
+          (o->rect(PredefinedRect::LAYER_NUMBER).contains(mouseInCell) ||
+               o->rect(PredefinedRect::LAYER_NAME).contains(mouseInCell))) {
         setDragTool(XsheetGUI::DragTool::makeColumnMoveTool(m_viewer));
       }
       // lock button
