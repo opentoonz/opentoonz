@@ -390,7 +390,7 @@ void DragSelectionTool::UndoChangeStrokes::transform(
   } else
     m_tool->computeBBox();
 
-  m_tool->notifyImageChanged(m_frameId);
+  m_tool->notifyImageChanged();
   m_tool->m_deformValues = deformValues;
   TTool::getApplication()->getCurrentXsheet()->notifyXsheetChanged();
   TTool::getApplication()->getCurrentTool()->notifyToolChanged();
@@ -510,7 +510,7 @@ void UndoChangeOutlineStyle::transform(
     m_tool->setBBox(bbox);
   else
     m_tool->computeBBox();
-  m_tool->notifyImageChanged(m_frameId);
+  m_tool->notifyImageChanged();
   TTool::getApplication()->getCurrentXsheet()->notifyXsheetChanged();
   TTool::getApplication()->getCurrentTool()->notifyToolChanged();
 }
@@ -1017,7 +1017,7 @@ void DragSelectionTool::VectorChangeThicknessTool::changeImageThickness(
 
   VectorSelectionTool *vsTool = static_cast<VectorSelectionTool *>(getTool());
   const LevelSelection &levelSelection = vsTool->levelSelection();
-
+  
   if (levelSelection.isEmpty()) {
     StrokeSelection *strokeSelection =
         static_cast<StrokeSelection *>(m_tool->getSelection());
@@ -1881,6 +1881,31 @@ void VectorSelectionTool::computeBBox() {
   }
 
   ++m_selectionCount;
+}
+
+void VectorSelectionTool::notifyImageChanged() {
+  TXshSimpleLevel* level;
+  std::set<TFrameId> frames;
+
+  switch (m_levelSelection.framesMode()) {
+  case LevelSelection::FramesMode::FRAMES_NONE:
+  case LevelSelection::FramesMode::FRAMES_CURRENT:
+    TTool::notifyImageChanged(getCurrentFid());
+    break;
+  case LevelSelection::FramesMode::FRAMES_SELECTED:
+    frames = getSelectedFrames();
+    for (TFrameId fid : frames) {
+      TTool::notifyImageChanged(fid);
+    }
+    break;
+  case LevelSelection::FramesMode::FRAMES_ALL:
+    level     = TTool::getApplication()->getCurrentLevel()->getSimpleLevel();
+    int count = level->getFrameCount();
+    for (int i=0; i < count;i++) {
+      TTool::notifyImageChanged(level->getFrameId(i));
+    }
+    break;
+  }
 }
 
 //-----------------------------------------------------------------------------

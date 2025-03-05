@@ -476,8 +476,9 @@ return true if the method execution can have changed the current tool
   TStageObjectId getObjectId()
       const;  //!< Returns a pointer to the actual stage object.
 
-  void notifyImageChanged();  //!< Notifies changes on the actual image; used to
+  virtual void notifyImageChanged();  //!< Notifies changes on the actual image; used to
                               //! update
+                              //! override by vector selection tool
   //!  images on the level view.
   void notifyImageChanged(const TFrameId &fid);  //!< Notifies changes on the
   //! frame \p fid; used to update

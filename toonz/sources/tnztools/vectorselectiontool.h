@@ -304,6 +304,7 @@ public:
   bool isSelectionEmpty() override;
 
   void computeBBox() override;
+  void notifyImageChanged() override;
 
   TPropertyGroup *getProperties(int targetType) override;
 

@@ -757,6 +757,9 @@ void TTool::notifyImageChanged(const TFrameId &fid) {
     if (sl) {
       IconGenerator::instance()->invalidate(sl, fid);
       IconGenerator::instance()->invalidateSceneIcon();
+      //In case of Rasterize Vector is on
+      if (sl->m_rasterizePli)
+        sl->touchFrame(fid);
       sl->setDirtyFlag(true);
     }
   }
