@@ -1976,14 +1976,14 @@ void TXshSimpleLevel::initializePalette() {
   switch (type) {
   case TZP_XSHLEVEL:
     fullPath =
-        scene->decodeFilePath(TFilePath("+palettes\\Toonz Raster Palette.tpl"));
+        scene->decodeFilePath(TFilePath("+palettes\\Toonz_Raster_Palette.tpl"));
     if (TSystem::doesExistFileOrLevel(fullPath)) {
       TIStream is(fullPath);
       is >> palette;
     } else {
       TFilePath globalPath(
           ToonzFolder::getStudioPaletteFolder().getQString().append(
-              "\\Global Palettes\\Default Palettes\\Toonz Raster Palette.tpl"));
+              "\\Global Palettes\\Default Palettes\\Toonz_Raster_Palette.tpl"));
       if (TSystem::doesExistFileOrLevel(globalPath)) {
         TIStream is(globalPath);
         is >> palette;
