@@ -2643,7 +2643,7 @@ int IoCmd::loadResources(LoadResourceArguments &args, bool updateRecentFile,
       else if (locals::matchSequencePattern(path) &&
                locals::checkRenamePolicy(path)) {
         TFilePathSet files;
-        TFilePath backup    = path;
+        TFilePath backup    = scene->codeFilePath(path);
         TFilePath levelPath = locals::getLevelPath(path);
         progressDialog->setLabelText(
             QString("Loading \"%1\"...")
