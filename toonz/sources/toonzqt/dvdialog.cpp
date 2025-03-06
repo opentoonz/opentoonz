@@ -880,7 +880,7 @@ int DVGui::RadioButtonMsgBox(MsgType type, const QString &labelText,
                              QWidget *parent) {
   RadioButtonDialog *dialog =
       new RadioButtonDialog(labelText, radioButtonList, parent);
-  QString msgBoxTitle = getMsgBoxTitle(DVGui::WARNING);
+  QString msgBoxTitle = getMsgBoxTitle(type);
   dialog->setWindowTitle(msgBoxTitle);
   return dialog->exec();
 }
