@@ -136,6 +136,7 @@ public slots:
   /*! Open a \b PalettesScanPopup. */
   void searchForPalette();
   /*! Recall \b StudioPaletteCmd::loadIntoCurrentPalette. */
+  void onRefreshClicked() { refresh(); };
   void loadInCurrentPalette();
   void loadInCurrentPaletteAndAdaptLevel();
   /*! Recall \b StudioPaletteCmd::replaceWithCurrentPalette. */

@@ -936,6 +936,7 @@ void StudioPaletteTreeViewer::contextMenuEvent(QContextMenuEvent *event) {
       menu.addSeparator();
       createMenuAction(menu, "", tr("Search for Palettes"),
                        "searchForPalette()");
+      createMenuAction(menu, "", tr("Refresh"), "onRefreshClicked()");
     }
     menu.exec(event->globalPos());
     return;
