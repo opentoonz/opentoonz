@@ -192,7 +192,7 @@ Cleanup後にデフォルトPaletteの内容を追加する仕様、Preferences�
 void addCleanupDefaultPalette(TXshSimpleLevelP sl) {
   /*--- CleanupデフォルトパレットはStudioPaletteフォルダ内に入れる ---*/
   TFilePath palettePath =
-      ToonzFolder::getStudioPaletteFolder() + "cleanup_default.tpl";
+      ToonzFolder::getStudioPaletteFolder() + "Global Palettes\\Default Palettes\\Cleanup_Palette.tpl";
   TFileStatus pfs(palettePath);
 
   if (!pfs.doesExist() || !pfs.isReadable()) {

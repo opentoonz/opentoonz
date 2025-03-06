@@ -309,7 +309,8 @@ static void searchLevelsToCleanup(
 static void addCleanupDefaultPalette(TXshSimpleLevel *sl) {
   /*- 元となるパレットはStudioPaletteフォルダに置く -*/
   TFilePath palettePath =
-      ToonzFolder::getStudioPaletteFolder() + "cleanup_default.tpl";
+      ToonzFolder::getStudioPaletteFolder() +
+      "Global Palettes\\Default Palettes\\Cleanup_Palette.tpl ";
   TFileStatus pfs(palettePath);
 
   if (!pfs.doesExist() || !pfs.isReadable()) {
