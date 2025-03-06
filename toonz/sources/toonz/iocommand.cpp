@@ -2691,13 +2691,19 @@ int IoCmd::loadResources(LoadResourceArguments &args, bool updateRecentFile,
           ++r;
         }
         if (importDialog.aborted()) break;
-        TSystem::renameImageSequence(
+        if(TSystem::renameImageSequence(
             files, levelPath,
             backup.getWideName().substr(0,
                 backup.getWideName().find_last_not_of(L"0123456789") + 1)
-                .size());
-        QCoreApplication::processEvents();
-        path = levelPath;
+                    .size())) {
+          QCoreApplication::processEvents();
+          path = levelPath;
+        } else {
+          // Failed to rename Files
+          DVGui::warning(QString("Failed to rename files!"));
+          break;
+        }
+        
       }
     }
     // for other level files

@@ -859,7 +859,7 @@ void TSystem::copyFileOrLevel_throw(const TFilePath &dst,
 
 //--------------------------------------------------------------
 
-void TSystem::renameImageSequence(const TFilePathSet &files,
+bool TSystem::renameImageSequence(const TFilePathSet &files,
                                         const TFilePath &levelPath,
                                         int prefixLength) {
   std::string levelBaseName = levelPath.withoutParentDir().getName();
@@ -876,7 +876,11 @@ void TSystem::renameImageSequence(const TFilePathSet &files,
     else
       wstr.clear();
     dst = file.withName(levelBaseName).withFrame(TFrameId(TFrameId(wstr).expand()));
-    TSystem::renameFile(dst, file);
+    try {
+      TSystem::renameFile(dst, file);
+    } catch (...){
+      return false;
+    }
   }
 }
 
