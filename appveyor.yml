@@ -47,7 +47,7 @@ after_build:
     
     copy /Y ..\..\thirdparty\libmypaint\dist\64\libmypaint-1-4-0.dll %CONFIGURATION%
     
-    copy /Y "C:\Tools\opencv\build\x64\vc16\bin\opencv_world*.dll" %CONFIGURATION%
+    copy /Y "C:\Tools\opencv\build\x64\vc16\bin\opencv_world4100.dll" %CONFIGURATION%
 
     mkdir "%CONFIGURATION%\portablestuff"
 
