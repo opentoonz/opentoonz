@@ -105,7 +105,7 @@ jobs:
           copy /Y ..\..\thirdparty\libmypaint\dist\64\libmypaint-1-4-0.dll Opentoonz
 
           IF EXIST C:\tools\opencv (
-             copy /Y "C:\tools\opencv\build\x64\vc14\bin\opencv_world4100.dll" Opentoonz
+             copy /Y "C:\tools\opencv\build\x64\vc16\bin\opencv_world4100.dll" Opentoonz
           )
 
           REM Configuring Opentoonz.exe for deployment
