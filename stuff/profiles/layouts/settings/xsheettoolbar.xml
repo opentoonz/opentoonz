@@ -25,4 +25,10 @@
     <command>MI_Reverse</command>
     <command>MI_Swing</command>
     <command>MI_Random</command>
+    <separator/>
+    <command>MI_ShiftTrace</command>
+    <command>MI_EditShift</command>
+    <command>MI_ResetShift</command>
+    <command>MI_NoShift</command>
+    <command>MI_ShowShiftOrigin</command>
 </commandbar>
