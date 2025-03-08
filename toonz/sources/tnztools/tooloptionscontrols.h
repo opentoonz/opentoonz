@@ -333,6 +333,7 @@ class DVAPI MeasuredValueField : public DVGui::LineEdit {
   bool m_labelClicked = false;
   double m_originalValue;
   bool m_isTyping = false;
+  bool m_reset    = false;
 
 protected:
   bool m_isGlobalKeyframe;
@@ -372,6 +373,8 @@ protected slots:
   void receiveMouseMove(QMouseEvent *event);
   void receiveMousePress(QMouseEvent *event);
   void receiveMouseRelease(QMouseEvent *event);
+
+  void setReset(bool reset) { m_reset = reset; };
 
 signals:
 
@@ -561,6 +564,9 @@ public:
   ~ThickChangeField() {}
 
   void updateStatus();
+
+public slots:
+  void fixedThick(bool fixed) { MeasuredValueField::setReset(fixed); };
 
 protected slots:
   void onChange(TMeasuredValue *fld, bool addToUndo = true);

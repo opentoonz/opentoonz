@@ -1231,9 +1231,15 @@ SelectionToolOptionsBox::SelectionToolOptionsBox(QWidget *parent, TTool *tool,
     connect(thicknessIconView, SIGNAL(onMouseRelease(QMouseEvent *)),
             m_thickChangeField, SLOT(receiveMouseRelease(QMouseEvent *)));
 
+    // fixed Thick, off as default
+    m_fixedThick = new DVGui::CheckBox(tr("Fixed"), this);
+    connect(m_fixedThick, &DVGui::CheckBox::toggled, m_thickChangeField,
+            &ThickChangeField::fixedThick);
+
     addSeparator();
     hLayout()->addWidget(thicknessIconView, 0);
     hLayout()->addWidget(m_thickChangeField, 10);
+    hLayout()->addWidget(m_fixedThick, 0);
     // Outline options
     ToolOptionControlBuilder builder(this, tool, pltHandle, toolHandle);
     builder.setEnumWidgetType(ToolOptionControlBuilder::POPUPBUTTON);
