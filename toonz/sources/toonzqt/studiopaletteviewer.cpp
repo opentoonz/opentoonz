@@ -27,6 +27,7 @@
 #include "tconvert.h"
 #include "tundo.h"
 #include "tsystem.h"
+#include "tcolorstyles.h"
 
 #include "../toonz/menubarcommandids.h"
 
@@ -668,6 +669,78 @@ void StudioPaletteTreeViewer::searchForPalette() {
   if (ret == QDialog::Accepted) refresh();
 }
 
+void StudioPaletteTreeViewer::setAsDefault() {
+  TFilePath srcPath = getCurrentItemPath();
+  if (srcPath.isEmpty()) return;
+  StudioPalette *studioPalette = StudioPalette::instance();
+  
+  std::string fileName;
+  TFilePath folderPath;
+  TFilePath dstPath;
+
+  QString label =
+      QObject::tr("Set As...");
+  QStringList radioButtons;
+  radioButtons.append(QString("Default Toonz Raster Palette"));
+  radioButtons.append(QString("Default Toonz Vector Palette"));
+  radioButtons.append(QString("Default Raster Drawing Palette"));
+  radioButtons.append(QString("Default Cleanup Palette"));
+  
+  int type = DVGui::RadioButtonMsgBox(DVGui::QUESTION,label, radioButtons, this);
+
+  switch (type) { 
+  case 1:
+    fileName = "Toonz_Raster_Palette.tpl";
+    break;
+  case 2:
+    fileName = "Toonz_Vector_Palette.tpl";
+    break;
+  case 3:
+    fileName = "Raster_Drawing_Palette.tpl";
+    break;
+  case 4:
+    fileName = "Cleanup_Palette.tpl";
+    folderPath = studioPalette->getLevelPalettesRoot() + "Default Palettes";
+    TSystem::copyFile(folderPath + fileName, srcPath, true);
+    return;
+  default :
+    return;
+  }
+
+  TPalette *srcPalette = studioPalette->getPalette(srcPath);
+  if (!srcPalette) return;
+  
+  // Remove all Link
+  for (int i = 0; i < srcPalette->getPageCount(); ++i) {
+    TPalette::Page *page = srcPalette->getPage(i);
+    for (int j = 0; j < page->getStyleCount(); ++j) {
+      TColorStyle *cs = page->getStyle(j);
+      cs->setGlobalName(L"");
+    }
+  }
+
+  // Save Palette
+  folderPath = studioPalette->getProjectPalettesRoot();
+  dstPath = folderPath + fileName;
+  if (TSystem::doesExistFileOrLevel(dstPath))
+    TSystem::removeFileOrLevel(dstPath);
+  TOStream os(dstPath);
+  if(srcPalette)
+      os << srcPalette;
+
+  int policy = DVGui::MsgBox(QString("Apply to Global?"), QString("Yes"),
+                             QString("No"), 0, this);
+  if (policy == 1) {
+    folderPath = studioPalette->getLevelPalettesRoot() + "Default Palettes";
+    dstPath    = folderPath + fileName;
+    TOStream os(dstPath);
+    if (srcPalette) os << srcPalette;
+  }
+
+  delete srcPalette;
+  refresh();
+}
+
 //-----------------------------------------------------------------------------
 
 class InvalidateIconsUndo final : public TUndo {
@@ -906,6 +979,8 @@ void StudioPaletteTreeViewer::contextMenuEvent(QContextMenuEvent *event) {
       createMenuAction(menu, "", tr("Delete Folder"), "deleteItems()");
     } else if (studioPalette->isPalette(path)) {
       if (m_studioPaletteHandle->getPalette()) {
+        createMenuAction(menu, "", tr("Set As..."), "setAsDefault()");
+        menu.addSeparator();
         createMenuAction(menu, "MI_LoadIntoCurrentPalette",
                          tr("Load into Current Palette"),
                          "loadInCurrentPalette()");
@@ -936,6 +1011,7 @@ void StudioPaletteTreeViewer::contextMenuEvent(QContextMenuEvent *event) {
       menu.addSeparator();
       createMenuAction(menu, "", tr("Search for Palettes"),
                        "searchForPalette()");
+      createMenuAction(menu, "", tr("Refresh"), "onRefreshClicked()");
     }
     menu.exec(event->globalPos());
     return;

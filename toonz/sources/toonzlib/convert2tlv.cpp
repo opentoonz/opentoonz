@@ -587,7 +587,8 @@ TPalette *Convert2Tlv::buildPalette() {
   /*-- Adding styles in the default palette to the result palette, starts here
    * --*/
   TFilePath palettePath =
-      ToonzFolder::getStudioPaletteFolder() + "cleanup_default.tpl";
+      ToonzFolder::getStudioPaletteFolder() +
+      "Global Palettes\\Default Palettes\\Cleanup_Palette.tpl";
   TFileStatus pfs(palettePath);
 
   if (!pfs.doesExist() || !pfs.isReadable()) return m_palette;

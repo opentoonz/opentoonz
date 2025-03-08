@@ -135,6 +135,8 @@ public slots:
   void deleteItems();
   /*! Open a \b PalettesScanPopup. */
   void searchForPalette();
+  /*! Open a popup. */
+  void setAsDefault();
   /*! Recall \b StudioPaletteCmd::loadIntoCurrentPalette. */
   void loadInCurrentPalette();
   void loadInCurrentPaletteAndAdaptLevel();

@@ -3,6 +3,7 @@
 #include "toonz/fullcolorpalette.h"
 #include "toonz/tscenehandle.h"
 #include "toonz/toonzscene.h"
+#include "toonz/toonzfolders.h"
 #include "tsystem.h"
 #include "tstream.h"
 #include "tpalette.h"
@@ -48,13 +49,17 @@ TPalette *FullColorPalette::getPalette(ToonzScene *scene) {
     TFilePath app("+palettes\\fullcolorPalette.tpl");
     fullPath = scene->decodeFilePath(app);
   }
+  if (!TSystem::doesExistFileOrLevel(fullPath)) {
+    fullPath = ToonzFolder::getStudioPaletteFolder() +
+               "Global Palettes\\Default Palettes\\Raster_Drawing_Palette.tpl";
+  }
   if (TSystem::doesExistFileOrLevel(fullPath)) {
     TPalette *app = new TPalette();
     TIStream is(fullPath);
     is >> app;
     m_palette->assign(app);
     delete app;
-  }
+  } 
   m_palette->setPaletteName(L"Raster Drawing Palette");
 
   return m_palette;

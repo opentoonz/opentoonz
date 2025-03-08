@@ -44,6 +44,7 @@
 #include <QtCore>
 
 #include "../common/psdlib/psd.h"
+#include "toonz/toonzfolders.h"
 
 //******************************************************************************************
 //    Global stuff
@@ -1966,16 +1967,60 @@ void TXshSimpleLevel::invalidateFrame(const TFrameId &fid) {
 //-----------------------------------------------------------------------------
 // note that the palette will always be replaced by the new one.
 void TXshSimpleLevel::initializePalette() {
-  assert(getScene());
+  ToonzScene *scene = getScene();
+  assert(scene);
+
+  TFilePath fullPath;
+  TPalette *palette = new TPalette();
   int type = getType();
-  if (type == TZP_XSHLEVEL || type == PLI_XSHLEVEL) setPalette(new TPalette());
-  if (type == OVL_XSHLEVEL)
-    setPalette(FullColorPalette::instance()->getPalette(getScene()));
-  TPalette *palette = getPalette();
+  switch (type) {
+  case TZP_XSHLEVEL:
+    fullPath =
+        scene->decodeFilePath(TFilePath("+palettes\\Toonz_Raster_Palette.tpl"));
+    if (TSystem::doesExistFileOrLevel(fullPath)) {
+      TIStream is(fullPath);
+      is >> palette;
+    } else {
+      TFilePath globalPath(
+          ToonzFolder::getStudioPaletteFolder().getQString().append(
+              "\\Global Palettes\\Default Palettes\\Toonz_Raster_Palette.tpl"));
+      if (TSystem::doesExistFileOrLevel(globalPath)) {
+        TIStream is(globalPath);
+        is >> palette;
+        TSystem::copyFile(fullPath, globalPath);
+      }
+    }
+    break;
+  case PLI_XSHLEVEL:
+    fullPath =
+        scene->decodeFilePath(TFilePath("+palettes\\Toonz_Vector_Palette.tpl"));
+    if (TSystem::doesExistFileOrLevel(fullPath)) {
+      TIStream is(fullPath);
+      is >> palette;
+    } else {
+      TFilePath globalPath(
+          ToonzFolder::getStudioPaletteFolder().getQString().append(
+              "\\Global Palettes\\Default Palettes\\Toonz_Vector_Palette.tpl"));
+      if (TSystem::doesExistFileOrLevel(globalPath)) {
+        TIStream is(globalPath);
+        is >> palette;
+        TSystem::copyFile(fullPath, globalPath);
+      }
+    }
+    break;
+  case OVL_XSHLEVEL:
+    palette = FullColorPalette::instance()->getPalette(getScene());
+  default:
+    break;
+  }
+
+  
   if (palette && type != OVL_XSHLEVEL) {
     palette->setPaletteName(getName());
-    palette->setDirtyFlag(true);
   }
+  
+  palette->setDirtyFlag(true);
+  setPalette(palette);
 }
 
 //-----------------------------------------------------------------------------
