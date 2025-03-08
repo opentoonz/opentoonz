@@ -32,7 +32,7 @@ jobs:
         run: |
           @echo on
           REM  install opencv
-          choco install opencv --version=4.5.1
+          choco install opencv --version=4.10.0
           REM install boost
           choco install boost-msvc-14.2 --version=1.74.0
         shell: cmd
@@ -62,14 +62,8 @@ jobs:
 
           IF NOT EXIST build mkdir build
           cd build
-
-          REM Setup for local builds
+          
           set MSVCVERSION="Visual Studio 16 2019"
-          set BOOST_ROOT=C:\boost\boost_1_74_0
-          set OPENCV_DIR=C:\opencv\451\build
-          set QT_PATH=C:\Qt\5.15.2_wintab\msvc2019_64
-
-          REM These are effective when running from Actions
           IF EXIST C:\local\boost_1_74_0 set BOOST_ROOT=C:\local\boost_1_74_0
           IF EXIST C:\tools\opencv set OPENCV_DIR=C:\tools\opencv\build
 
@@ -111,9 +105,7 @@ jobs:
           copy /Y ..\..\thirdparty\libmypaint\dist\64\libmypaint-1-4-0.dll Opentoonz
 
           IF EXIST C:\tools\opencv (
-             copy /Y "C:\tools\opencv\build\x64\vc14\bin\opencv_world451.dll" Opentoonz
-          ) ELSE (
-             copy /Y "C:\opencv\451\build\x64\vc14\bin\opencv_world451.dll" Opentoonz
+             copy /Y "C:\tools\opencv\build\x64\vc16\bin\opencv_world4100.dll" Opentoonz
           )
 
           REM Configuring Opentoonz.exe for deployment
