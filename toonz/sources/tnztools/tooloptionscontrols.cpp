@@ -775,13 +775,6 @@ void MeasuredValueField::commit() {
 
   if (!isSet && !isReturnPressed()) return;
 
-  if (m_reset) {
-    double backup          = getValue();
-    m_value->setValue(TMeasuredValue::MainUnit, 0.0);
-    emit measuredValueChanged(m_value);
-    m_value->setValue(TMeasuredValue::MainUnit, backup);
-  }
-
   setText(QString::fromStdWString(m_value->toWideString(m_precision)));
   m_modified = false;
   emit measuredValueChanged(m_value);
@@ -1490,7 +1483,10 @@ void ThickChangeField::onChange(TMeasuredValue *fld, bool addToUndo) {
   double newThickness = p - m_tool->m_deformValues.m_maxSelectionThickness;
 
   changeThickTool->setThicknessChange(newThickness);
-  changeThickTool->changeImageThickness(*vi, newThickness);
+  if (m_fixed)
+    changeThickTool->setImageThickness(*vi, p);
+  else
+    changeThickTool->changeImageThickness(*vi, newThickness);
 
   // DragSelectionTool::DeformValues deformValues = m_tool->m_deformValues;
   // // Like when I found it - it's a noop.

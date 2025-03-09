@@ -1233,8 +1233,8 @@ SelectionToolOptionsBox::SelectionToolOptionsBox(QWidget *parent, TTool *tool,
 
     // fixed Thick, off as default
     m_fixedThick = new DVGui::CheckBox(tr("Fixed"), this);
-    connect(m_fixedThick, &DVGui::CheckBox::toggled, m_thickChangeField,
-            &ThickChangeField::fixedThick);
+    connect(m_fixedThick, &QCheckBox::toggled, m_thickChangeField,
+            &ThickChangeField::setFixedThick);
 
     addSeparator();
     hLayout()->addWidget(thicknessIconView, 0);

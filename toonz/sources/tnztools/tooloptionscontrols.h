@@ -333,7 +333,6 @@ class DVAPI MeasuredValueField : public DVGui::LineEdit {
   bool m_labelClicked = false;
   double m_originalValue;
   bool m_isTyping = false;
-  bool m_reset    = false;
 
 protected:
   bool m_isGlobalKeyframe;
@@ -373,8 +372,6 @@ protected slots:
   void receiveMouseMove(QMouseEvent *event);
   void receiveMousePress(QMouseEvent *event);
   void receiveMouseRelease(QMouseEvent *event);
-
-  void setReset(bool reset) { m_reset = reset; };
 
 signals:
 
@@ -557,6 +554,7 @@ class ThickChangeField final : public MeasuredValueField {
   Q_OBJECT
 
   SelectionTool *m_tool;
+  bool m_fixed;
 
 public:
   ThickChangeField(SelectionTool *tool, QString name);
@@ -566,7 +564,7 @@ public:
   void updateStatus();
 
 public slots:
-  void fixedThick(bool fixed) { MeasuredValueField::setReset(fixed); };
+  void setFixedThick(bool fixed) { m_fixed = fixed; };
 
 protected slots:
   void onChange(TMeasuredValue *fld, bool addToUndo = true);
