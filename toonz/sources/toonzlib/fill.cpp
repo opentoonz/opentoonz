@@ -222,11 +222,8 @@ void fillShortInkLineRow(const TRasterCM32P &r, const TPoint &p, int &xc,
 
   //DO Paint
   for (pix = r->pixels(p.y) + xa; pix <= r->pixels(p.y) + xb; ++pix) {
-    pix->setPaint(paint+1);
+    pix->setPaint(paint);
   }
-  pix--;
-  pix->setPaint(paint + 2);
-
 
   if (saver) saver->save(TRect(xa, p.y, xb, p.y));
 }
