@@ -1,4 +1,4 @@
-
+#include <Qdebug>
 
 #include "trastercm.h"
 #include "toonz/fill.h"
@@ -487,18 +487,24 @@ bool fill(const TRasterCM32P &r, const FillParameters &params,
 
   std::stack<FillSeed> seeds;
   
-  // Also do fillInk for autoPaint
+  // Also do fillInk for autoPaint style Ink
   fillRow(r, p, xa, xb, paint, params.m_palette, saver, params.m_prevailing);
-  
+
   seeds.push(FillSeed(xa, xb, y, 1));
   seeds.push(FillSeed(xa, xb, y, -1));
-  oldLeft  = r->pixels(y) + xa;
-  oldRight = r->pixels(y) + xb;
-  while (!(oldLeft + 1)->isPurePaint()) oldLeft++;
-  while (!(oldRight - 1)->isPurePaint()) oldRight--;
-  fillRight = oldLeft->getInk() == paint && oldRight->getInk() != paint;
-  fillLeft  = oldRight->getInk() == paint && oldLeft->getInk() != paint;
-  assert(fillLeft != fillRight || (fillLeft == false && fillRight == false));
+  
+  bool autoPaintGap = true;
+  if(params.m_palette->getStyle(paint)->getFlags() != 0)
+      autoPaintGap = false;
+  if (autoPaintGap) {
+    oldLeft  = r->pixels(y) + xa;
+    oldRight = r->pixels(y) + xb;
+    while (!(oldLeft + 1)->isPurePaint()) oldLeft++;
+    while (!(oldRight - 1)->isPurePaint()) oldRight--;
+    fillRight = oldLeft->getInk() == paint && oldRight->getInk() != paint;
+    fillLeft  = oldRight->getInk() == paint && oldLeft->getInk() != paint;
+    assert(fillLeft != fillRight || (fillLeft == false && fillRight == false));
+  }
 
   while (!seeds.empty()) {
     FillSeed fs = seeds.top();
@@ -526,14 +532,16 @@ bool fill(const TRasterCM32P &r, const FillParameters &params,
            pix->getPaint() == paintAtClickedPos)) {
         fillRow(r, TPoint(x, y), xc, xd, paint, params.m_palette, saver,
                 params.m_prevailing);
-        oldLeft  = r->pixels(y) + xc;
-        oldRight = r->pixels(y) + xd;
-        while (!(oldLeft + 1)->isPurePaint()) oldLeft++;
-        while (!(oldRight - 1)->isPurePaint()) oldRight--;
-        fillRight = oldLeft->getInk() == paint && oldRight->getInk() != paint;
-        fillLeft  = oldRight->getInk() == paint && oldLeft->getInk() != paint;
-        assert(fillLeft != fillRight ||
-               (fillLeft == false && fillRight == false));
+        if (autoPaintGap) {
+          oldLeft  = r->pixels(y) + xc;
+          oldRight = r->pixels(y) + xd;
+          while (!(oldLeft + 1)->isPurePaint()) oldLeft++;
+          while (!(oldRight - 1)->isPurePaint()) oldRight--;
+          fillRight = oldLeft->getInk() == paint && oldRight->getInk() != paint;
+          fillLeft  = oldRight->getInk() == paint && oldLeft->getInk() != paint;
+          assert(fillLeft != fillRight ||
+                 (fillLeft == false && fillRight == false));
+        }
 
         if (xc < xa) seeds.push(FillSeed(xc, xa - 1, y, -dy));
         if (xd > xb) seeds.push(FillSeed(xb + 1, xd, y, -dy)); 
@@ -547,9 +555,13 @@ bool fill(const TRasterCM32P &r, const FillParameters &params,
         pix += xd - x + 1;
         oldpix += xd - x + 1;
         x += xd - x + 1;
-      } else if (((pix + 1)->getInk() != paint || (pix+1) == limit) &&
+      } else if (autoPaintGap &&
+          ((pix + 1)->getInk() != paint ||
+                              (pix + 1) == limit) &&
                  pix->getPaint() == paintAtClickedPos &&
-                 pix->getInk() == paint && oldRight-oldLeft <= 8) {
+                 pix->getInk() == paint && oldRight-oldLeft <= 8 &&
+          oldLeft->getInk() && oldRight->getInk()) {
+        qDebug() << oldLeft->getInk() << oldRight->getInk();
         int xx = x;
         int yy = y;
 
