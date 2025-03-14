@@ -1,4 +1,4 @@
-#include <Qdebug>
+
 
 #include "trastercm.h"
 #include "toonz/fill.h"
@@ -169,58 +169,73 @@ void fillRow(const TRasterCM32P &r, const TPoint &p, int &xa, int &xb,
 
 //-----------------------------------------------------------------------------
 
-void fillShortInkLineRow(const TRasterCM32P &r, const TPoint &p, int &xc,
-                         int &xd, bool right, int paint,
-                  TTileSaverCM32 *saver, bool prevailing = true) {
-  xc              = p.x;
-  xd              = p.x;
 
-  TPixelCM32 *pix       = r->pixels(p.y) + p.x;
-  int dx                = right ? 1 : -1;
-  assert(pix->isPureInk());
+// This function fills with a given direction 
+// and starts from a autoPaintInk point(But don't do check), 
+// ends with another Ink point.
+// Fill depth is supported.
+// Prevailing is on for default
+void fillShortInkLineRow(const TRasterCM32P &r, const TPoint &p, int &xc,
+                         int &xd, bool right, int paint,int &length,
+                  TTileSaverCM32 *saver) {
+  int dx = right ? 1 : -1;
+  
+  TPixelCM32 *pix0       = r->pixels(p.y) + p.x;
+  if (!pix0->isPureInk()) return;
 
   // Calculate in autoPaint Style area
-  pix = r->pixels(p.y) + p.x - dx;
+  xc = xd = p.x;
+  TPixelCM32 *pix;
+  pix = pix0 - dx;
   while ((pix)->getInk() == paint) {
     xc -= dx;
     pix -= dx;
   }
   assert(pix->getInk() != paint);
-  pix = r->pixels(p.y) + p.x + dx;
+
+  pix = pix0 + dx;
   while ((pix)->getInk() == paint) {
     xd += dx;
     pix += dx;
   }
   assert(pix->getInk() != paint);
+
   if (xc > xd) std::swap(xc, xd);
 
   // Out of autoPaint Style area
-  int x = right ? xd : xc;
-  int xa               = xc;
-  int xb               = xd;
-  const int max         = 900;
-  pix                   = r->pixels(p.y) + x;
-  TPixelCM32 *limit     = pix + max * dx;
+  int xa = xc, xb = xd;
+  pix                   = r->pixels(p.y) + (right ? xd : xc);
+  TPixelCM32 *tmp_limit = (right ? r->pixels(p.y) + r->getBounds().x1 - 1
+                                 : r->pixels(p.y) + r->getBounds().x0);
 
   //int paintAtClickedPos = pix->getPaint();
-  bool outOfPaint       = false;
-  bool outOfInk         = false;
+  bool outOfPaint = false, outOfInk = false;
 
-  while (pix != limit) {
-    if (pix->isPureInk() && pix->getInk() != paint) outOfPaint = true;
-    if ((pix + dx)->isPurePaint() && outOfPaint) outOfInk = true;
+  int i=0;
+  while (pix != tmp_limit) {
+    if (pix->isPureInk() && pix->getInk() != paint) 
+        outOfPaint = true;
+    if ((pix + dx)->isPurePaint() && outOfPaint) 
+        outOfInk = true;
     if (outOfInk) break;
-    x += dx;
+    if (i > length) {
+      length -= 2;
+      return;
+    }
     pix += dx;
+    if (!outOfPaint) ++i;
   }
-  if (pix == limit) return;
+  if (pix == tmp_limit) return;
+
+  length += (i <= length) ? 2 : -2;
+
   assert((pix + dx)->isPurePaint());
-  if (right)
-    xb = x;
-  else
-    xa = x;
+
+  
+  (right ? xb : xa) = pix - r->pixels(p.y);
 
   //DO Paint
+  paint++;
   for (pix = r->pixels(p.y) + xa; pix <= r->pixels(p.y) + xb; ++pix) {
     pix->setPaint(paint);
   }
@@ -228,7 +243,34 @@ void fillShortInkLineRow(const TRasterCM32P &r, const TPoint &p, int &xc,
   if (saver) saver->save(TRect(xa, p.y, xb, p.y));
 }
 
-    
+
+void fillAutoPaintFlow(const TRasterCM32P &r, const TPoint &p,bool right, int dy, int paint,
+                         TTileSaverCM32 *saver) {
+  int xx = p.x;
+  int yy = p.y;
+  int xc, xd;
+  bool forward = right ? true : false;
+  int length    = 8;// +2 / -2
+  
+  do {
+    fillShortInkLineRow(r, TPoint(xx, yy), xc, xd, forward, paint, length, saver);
+    yy += dy;
+    if (forward) {
+      for (--xc, ++xd; xc != xd; xd--) {
+        if ((r->pixels(yy) + xd)->getInk() == paint) break;
+      }
+      xx = xd;
+    } else {
+      for (--xc, ++xd; xc != xd; xc++) {
+        if ((r->pixels(yy) + xc)->getInk() == paint) break;
+      }
+      xx = xc;
+    }
+
+  } while ((r->pixels(yy) + xx)->getInk() == paint && length > 0);
+
+}
+
 //-----------------------------------------------------------------------------
 
 void findSegment(const TRaster32P &r, const TPoint &p, int &xa, int &xb,
@@ -496,16 +538,10 @@ bool fill(const TRasterCM32P &r, const FillParameters &params,
   bool autoPaintGap = true;
   if(params.m_palette->getStyle(paint)->getFlags() != 0)
       autoPaintGap = false;
-  if (autoPaintGap) {
-    oldLeft  = r->pixels(y) + xa;
-    oldRight = r->pixels(y) + xb;
-    while (!(oldLeft + 1)->isPurePaint()) oldLeft++;
-    while (!(oldRight - 1)->isPurePaint()) oldRight--;
-    fillRight = oldLeft->getInk() == paint && oldRight->getInk() != paint;
-    fillLeft  = oldRight->getInk() == paint && oldLeft->getInk() != paint;
-    assert(fillLeft != fillRight || (fillLeft == false && fillRight == false));
-  }
+  xc = xa;
+  xd = xb;
 
+  bool filled = false;
   while (!seeds.empty()) {
     FillSeed fs = seeds.top();
     seeds.pop();
@@ -522,6 +558,7 @@ bool fill(const TRasterCM32P &r, const FillParameters &params,
     x          = xa;
     oldxd      = (std::numeric_limits<int>::min)();
     oldxc      = (std::numeric_limits<int>::max)();
+
     while (pix <= limit) {
       oldtone = threshTone(*oldpix, fillDepth);
       tone    = threshTone(*pix, fillDepth);
@@ -532,17 +569,7 @@ bool fill(const TRasterCM32P &r, const FillParameters &params,
            pix->getPaint() == paintAtClickedPos)) {
         fillRow(r, TPoint(x, y), xc, xd, paint, params.m_palette, saver,
                 params.m_prevailing);
-        if (autoPaintGap) {
-          oldLeft  = r->pixels(y) + xc;
-          oldRight = r->pixels(y) + xd;
-          while (!(oldLeft + 1)->isPurePaint()) oldLeft++;
-          while (!(oldRight - 1)->isPurePaint()) oldRight--;
-          fillRight = oldLeft->getInk() == paint && oldRight->getInk() != paint;
-          fillLeft  = oldRight->getInk() == paint && oldLeft->getInk() != paint;
-          assert(fillLeft != fillRight ||
-                 (fillLeft == false && fillRight == false));
-        }
-
+        filled = true;
         if (xc < xa) seeds.push(FillSeed(xc, xa - 1, y, -dy));
         if (xd > xb) seeds.push(FillSeed(xb + 1, xd, y, -dy)); 
         if (oldxd >= xc - 1)
@@ -555,67 +582,32 @@ bool fill(const TRasterCM32P &r, const FillParameters &params,
         pix += xd - x + 1;
         oldpix += xd - x + 1;
         x += xd - x + 1;
-      } else if (autoPaintGap &&
-          ((pix + 1)->getInk() != paint ||
-                              (pix + 1) == limit) &&
+      } else if (autoPaintGap && pix->isPureInk() &&
+                 ((pix + 1)->getInk() != paint || (pix + 1) == limit) &&
                  pix->getPaint() == paintAtClickedPos &&
-                 pix->getInk() == paint && oldRight-oldLeft <= 8 &&
-          oldLeft->getInk() && oldRight->getInk()) {
-        qDebug() << oldLeft->getInk() << oldRight->getInk();
-        int xx = x;
-        int yy = y;
+                 pix->getInk() == paint) {
+        // In most situation this should only be called for twice
+          oldLeft  = r->pixels(y) + xc;
+          oldRight = r->pixels(y) + xd;
+          while (!(oldLeft + 1)->isPurePaint()) oldLeft++;
+          while (!(oldRight - 1)->isPurePaint()) oldRight--;
+          if (oldRight - oldLeft <= 8) {
+            fillRight =
+                oldLeft->getInk() == paint && oldRight->getInk() != paint;
+            fillLeft =
+                oldRight->getInk() == paint && oldLeft->getInk() != paint;
+            assert(fillLeft != fillRight ||
+                   (fillLeft == false && fillRight == false));
 
-        // Fill right
-        if (fillRight) {
-          fillShortInkLineRow(r, TPoint(xx, yy), xc, xd, true, paint, saver,
-                              true);
-          yy += dy;
-          for (--xc, ++xd; xc != xd; xd--) {
-            if ((r->pixels(yy) + xd)->getInk() == paint) break;
-          }
-          xx = xd;
-          if ((r->pixels(yy) + xx)->getInk() == paint) {
-            auto pixel = (r->pixels(yy) + xx);
-            while (pixel->getInk() == paint || (pixel + 1)->getInk() == paint) {
-              fillShortInkLineRow(
-                  r, TPoint(pixel->getInk() == paint ? xx : xx + 1, yy), xc, xd,
-                  true, paint, saver, true);
-              yy += dy;
-              for (--xc, ++xd; xc != xd; xd--) {
-                if ((r->pixels(yy) + xd)->getInk() == paint) break;
-              }
-              xx = xd;
-              if ((r->pixels(yy) + xx)->getInk() != paint) break;
-              pixel = (r->pixels(yy) + xx);
+            // Fill right
+            if (fillRight) {
+              fillAutoPaintFlow(r, TPoint(x, y), true, dy, paint, saver);
+            }
+            // Fill left
+            if (fillLeft) {
+              fillAutoPaintFlow(r, TPoint(x, y), false, dy, paint, saver);
             }
           }
-        }
-        // Fill left
-        if (fillLeft) {
-          fillShortInkLineRow(r, TPoint(xx, yy), xc, xd, false, paint, saver,
-                              true);
-          yy += dy;
-          for (--xc,++xd; xc != xd; xc++) {
-            if((r->pixels(yy) + xc)->getInk() == paint) break;
-          }
-          xx = xc;
-          if ((r->pixels(yy) + xx)->getInk() == paint) {
-            auto pixel = (r->pixels(yy) + xx);
-            while (pixel->getInk() == paint || (pixel - 1)->getInk() == paint) {
-              fillShortInkLineRow(
-                  r, TPoint(pixel->getInk() == paint ? xx : xx - 1, yy), xc, xd,
-                  false, paint, saver, true);
-              yy += dy;
-              for (--xc, ++xd; xc != xd; xc++) {
-                if ((r->pixels(yy) + xc)->getInk() == paint) break;
-              } 
-              xx = xc;
-              if ((r->pixels(yy) + xx)->getInk() != paint) break;
-              pixel = (r->pixels(yy) + xx);
-            }
-          }
-        }
-        
         pix++;
         oldpix++, x++;
       } else {
