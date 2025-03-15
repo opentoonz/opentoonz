@@ -382,6 +382,7 @@ class SelectionToolOptionsBox final : public ToolOptionsBox,
   QLabel *m_moveYLabel;
   SelectionMoveField *m_moveYField;
   ThickChangeField *m_thickChangeField;
+  DVGui::CheckBox *m_fixedThick;
 
   ToolOptionPopupButton *m_capStyle;
   ToolOptionPopupButton *m_joinStyle;

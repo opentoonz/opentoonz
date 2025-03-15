@@ -251,6 +251,8 @@ public:
   void setThicknessChange(double value) { m_thicknessChange = value; }
 
   void changeImageThickness(TVectorImage &vi, double newThickness);
+  void setImageThickness(TVectorImage &vi, double newThickness);
+
   void addUndo();
 
   void leftButtonDown(const TPointD &pos, const TMouseEvent &e) override;
