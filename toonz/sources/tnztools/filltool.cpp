@@ -1774,7 +1774,8 @@ FillTool::FillTool(int targetType)
     , m_currCell(-1, -1)
     , m_maxGapDistance("Maximum Gap", 0.01, 10.0, 1.15)
     , m_firstTime(true)
-    , m_autopaintLines("Autopaint Lines", true) {
+    , m_autopaintLines("Autopaint Lines", true)
+    , m_fillAutopaintGaps("Fill Autopaint Gaps", true) {
   m_rectFill           = new AreaFillTool(this);
   m_normalLineFillTool = new NormalLineFillTool(this);
 
@@ -1802,7 +1803,10 @@ FillTool::FillTool(int targetType)
     m_prop.bind(m_maxGapDistance);
     m_maxGapDistance.setId("MaxGapDistance");
   }
-  if (targetType == TTool::ToonzImage) m_prop.bind(m_autopaintLines);
+  if (targetType == TTool::ToonzImage) {
+    m_prop.bind(m_autopaintLines);
+    m_prop.bind(m_fillAutopaintGaps);
+  }
   m_selective.setId("Selective");
   m_onion.setId("OnionSkin");
   m_frameRange.setId("FrameRange");
@@ -1810,6 +1814,7 @@ FillTool::FillTool(int targetType)
   m_fillType.setId("Type");
   m_colorType.setId("Mode");
   m_autopaintLines.setId("AutopaintLines");
+  m_fillAutopaintGaps.setId("FillAutopaintGaps");
 }
 //-----------------------------------------------------------------------------
 
@@ -1861,6 +1866,7 @@ void FillTool::updateTranslation() {
   m_segment.setQStringName(tr("Segment"));
   m_maxGapDistance.setQStringName(tr("Maximum Gap"));
   m_autopaintLines.setQStringName(tr("Autopaint Lines"));
+  m_fillAutopaintGaps.setQStringName(tr("Fill Autopaint Gaps"));
 }
 
 //-----------------------------------------------------------------------------
@@ -1875,6 +1881,7 @@ FillParameters FillTool::getFillParameters() const {
   params.m_segment      = m_segment.getValue();
   params.m_minFillDepth = (int)m_fillDepth.getValue().first;
   params.m_maxFillDepth = (int)m_fillDepth.getValue().second;
+  params.m_fillAutopaintGaps = m_fillAutopaintGaps.getValue();
   return params;
 }
 

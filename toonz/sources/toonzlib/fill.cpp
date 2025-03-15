@@ -151,7 +151,7 @@ void fillRow(const TRasterCM32P &r, const TPoint &p, int &xa, int &xb,
     pix = line + xa;
     int n;
     for (n = 0; n < xb - xa + 1; n++, pix++) {
-      if (palette && pix->isPurePaint()) {
+      if (palette && pix->isPurePaint()) {//If palette exist, fill autoPaint Inks
         TPoint pInk = nearestInkNotDiagonal(r, TPoint(xa + n, p.y));
         if (pInk != TPoint(-1, -1)) {
           TPixelCM32 *pixInk =
@@ -227,12 +227,11 @@ void fillShortInkLineRow(const TRasterCM32P &r, const TPoint &p, int &xc,
   }
   if (pix == tmp_limit) return;
 
-  length += (i <= length) ? 2 : -2;
-
   assert((pix + dx)->isPurePaint());
 
-  
   (right ? xb : xa) = pix - r->pixels(p.y);
+
+  length = xb - xa;
 
   //DO Paint
   paint++;
@@ -250,7 +249,7 @@ void fillAutoPaintFlow(const TRasterCM32P &r, const TPoint &p,bool right, int dy
   int yy = p.y;
   int xc, xd;
   bool forward = right ? true : false;
-  int length    = 8;// +2 / -2
+  int length    = 6;// +2 / -2
   do {
     fillShortInkLineRow(r, TPoint(xx, yy), xc, xd, forward, paint, length, saver);
     yy += dy;
@@ -529,9 +528,13 @@ bool fill(const TRasterCM32P &r, const FillParameters &params,
   seeds.push(FillSeed(xa, xb, y, 1));
   seeds.push(FillSeed(xa, xb, y, -1));
   
-  bool autoPaintGap = true;
-  if(params.m_palette->getStyle(paint)->getFlags() != 0)
+  bool autoPaintGap = params.m_fillAutopaintGaps;
+  if (params.m_palette) {
+    if (params.m_palette->getStyle(paint)->getFlags() != 0)
       autoPaintGap = false;
+  } else {
+    autoPaintGap = false;
+  }
 
   bool filled;
   while (!seeds.empty()) {
