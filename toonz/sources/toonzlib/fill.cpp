@@ -251,7 +251,6 @@ void fillAutoPaintFlow(const TRasterCM32P &r, const TPoint &p,bool right, int dy
   int xc, xd;
   bool forward = right ? true : false;
   int length    = 8;// +2 / -2
-  
   do {
     fillShortInkLineRow(r, TPoint(xx, yy), xc, xd, forward, paint, length, saver);
     yy += dy;
@@ -522,11 +521,6 @@ bool fill(const TRasterCM32P &r, const FillParameters &params,
   borderPix[3]   = pix;
   borderIndex[3] = *pix;
 
-  TPixelCM32 *oldLeft;
-  TPixelCM32 *oldRight;
-
-  bool fillLeft, fillRight;
-
   std::stack<FillSeed> seeds;
   
   // Also do fillInk for autoPaint style Ink
@@ -538,13 +532,12 @@ bool fill(const TRasterCM32P &r, const FillParameters &params,
   bool autoPaintGap = true;
   if(params.m_palette->getStyle(paint)->getFlags() != 0)
       autoPaintGap = false;
-  xc = xa;
-  xd = xb;
 
-  bool filled = false;
+  bool filled;
   while (!seeds.empty()) {
     FillSeed fs = seeds.top();
     seeds.pop();
+    filled = false;
 
     xa   = fs.m_xa;
     xb   = fs.m_xb;
@@ -582,40 +575,53 @@ bool fill(const TRasterCM32P &r, const FillParameters &params,
         pix += xd - x + 1;
         oldpix += xd - x + 1;
         x += xd - x + 1;
-      } else if (autoPaintGap && pix->isPureInk() &&
-                 ((pix + 1)->getInk() != paint || (pix + 1) == limit) &&
-                 pix->getPaint() == paintAtClickedPos &&
-                 pix->getInk() == paint) {
-        // In most situation this should only be called for twice
-          oldLeft  = r->pixels(y) + xc;
-          oldRight = r->pixels(y) + xd;
-          while (!(oldLeft + 1)->isPurePaint()) oldLeft++;
-          while (!(oldRight - 1)->isPurePaint()) oldRight--;
-          if (oldRight - oldLeft <= 8) {
-            fillRight =
-                oldLeft->getInk() == paint && oldRight->getInk() != paint;
-            fillLeft =
-                oldRight->getInk() == paint && oldLeft->getInk() != paint;
-            assert(fillLeft != fillRight ||
-                   (fillLeft == false && fillRight == false));
-
-            // Fill right
-            if (fillRight) {
-              fillAutoPaintFlow(r, TPoint(x, y), true, dy, paint, saver);
-            }
-            // Fill left
-            if (fillLeft) {
-              fillAutoPaintFlow(r, TPoint(x, y), false, dy, paint, saver);
-            }
-          }
-        pix++;
-        oldpix++, x++;
       } else {
         pix++;
         oldpix++, x++;
       }
     }
+
     if (oldxd > 0) seeds.push(FillSeed(oldxc, oldxd, y, dy));
+    if (autoPaintGap && !filled) {
+      // pix0->getInk() == paint
+      //  In most situation this should only be called for twice
+      bool fillLeft, fillRight;
+      TPixelCM32 *leftPix, *rightPix;
+      leftPix  = pix0;
+      rightPix = limit;
+      int xe = xa, xf = xb;
+      while (leftPix!=limit && (leftPix->getInk() == (leftPix+1)->getInk() ||
+              leftPix->getInk() == 0)) {
+        leftPix++;
+        xe++;
+      }
+      while (rightPix != pix0 && (rightPix->getInk() == (rightPix-1)->getInk() ||
+              rightPix->getInk() == 0)) {
+        rightPix--;
+        xf--;
+      }
+      TPixelCM32 *pixel = leftPix;
+      if (rightPix - leftPix > 0) {
+        do {
+          pixel++;
+        } while (pixel != rightPix && pixel->isPurePaint());
+      }
+      if (pixel == rightPix) {
+        fillRight = leftPix->getInk() == paint && rightPix->getInk() != paint;
+        fillLeft  = rightPix->getInk() == paint && leftPix->getInk() != paint;
+        assert(fillLeft != fillRight ||
+               (fillLeft == false && fillRight == false));
+
+        // Fill right
+        if (fillRight) {
+          fillAutoPaintFlow(r, TPoint(xe, y), true, dy, paint, saver);
+        }
+        // Fill left
+        if (fillLeft) {
+          fillAutoPaintFlow(r, TPoint(xf, y), false, dy, paint, saver);
+        }
+      }
+    }
   }
 
   bool saveBoxChanged = false;
