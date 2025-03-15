@@ -610,8 +610,16 @@ public:
       , m_isPrompting(false) {}
 
   double getThickness() const {
-    if (m_rasterTool)
-      return m_param->m_rasterToolSize.getValue() * 0.5;
+    if (m_rasterTool) {
+      double thick = m_param->m_rasterToolSize.getValue() * 0.5;
+      /*---
+       Pencilの場合は、線幅を減らす。Thickness1の線を1ピクセルにするため。
+       （thick = 0 になる）
+       TODO: unify the unit of GeometricTool and RasterBrushTool
+       ---*/
+      if (m_param->m_pencil.getValue()) thick -= 1.0;
+      return  thick;
+    }
     else
       return m_param->m_toolSize.getValue() * 0.5;
   }
@@ -2439,11 +2447,6 @@ bool MultiLinePrimitive::keyDown(QKeyEvent *event) {
 
 TStroke *MultiLinePrimitive::makeStroke() const {
   double thick = getThickness();
-
-  /*---
-   * Pencilの場合は、線幅を減らす。Thickness1の線を1ピクセルにするため。（thick
-   * = 0 になる）---*/
-  if (m_param->m_pencil.getValue()) thick -= 1.0;
 
   UINT size = m_vertex.size();
   if (size <= 1) return 0;
