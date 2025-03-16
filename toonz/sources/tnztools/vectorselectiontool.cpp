@@ -1028,7 +1028,7 @@ void DragSelectionTool::VectorChangeThicknessTool::changeImageThickness(
   } else {
     std::vector<int> strokeIdxs = getSelectedStrokes(vi, levelSelection);
 
-    std::for_each(strokeIdxs.begin(), strokeIdxs.end(), 
+    std::for_each(strokeIdxs.begin(), strokeIdxs.end(),
       [&data](int s) { locals::changeThickness(data, s); });
   }
 }
@@ -1061,7 +1061,6 @@ void DragSelectionTool::VectorChangeThicknessTool::setImageThickness(
                   }
                 });
 }
-
 
 //-----------------------------------------------------------------------------
 

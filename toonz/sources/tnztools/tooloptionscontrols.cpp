@@ -1478,7 +1478,7 @@ void ThickChangeField::onChange(TMeasuredValue *fld, bool addToUndo) {
           (VectorSelectionTool *)m_tool);
 
   TVectorImageP vi = (TVectorImageP)m_tool->getImage(true);
- 
+
   double p            = 0.5 * getValue();
   double newThickness = p - m_tool->m_deformValues.m_maxSelectionThickness;
 
