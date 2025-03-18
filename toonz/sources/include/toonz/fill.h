@@ -42,8 +42,8 @@ public:
       , m_shiftFill(false)
       , m_palette(0)
       , m_prevailing(true)
-      , m_fillAutopaintGaps(true)
-      , m_fillNormalGaps(true) {}
+      , m_fillAutopaintGaps(false)
+      , m_fillNormalGaps(false) {}
   FillParameters(const FillParameters &params)
       : m_styleId(params.m_styleId)
       , m_fillType(params.m_fillType)
