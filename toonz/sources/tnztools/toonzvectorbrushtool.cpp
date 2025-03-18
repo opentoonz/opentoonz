@@ -709,9 +709,14 @@ void ToonzVectorBrushTool::inputMouseMove(
       TDoublePairProperty::Value value = prop.getValue();
       value.first += min;
       value.second += max;
-      if (value.first > value.second) value.first = value.second;
-      value.first  = tcrop(value.first, range.first, range.second);
-      value.second = tcrop(value.second, range.first, range.second);
+      if (value.first > value.second)
+        value.second = value.first;
+      else if (value.first < 1)
+        value.second = prop.getValue().second;
+
+      if (value.first < range.first || value.second > range.second) return;
+      value.first  = tcrop(value.first, range.first+1, range.second);
+      value.second = tcrop(value.second, range.first+1, range.second);
 
       setValue(prop, value);
     }
@@ -725,15 +730,23 @@ void ToonzVectorBrushTool::inputMouseMove(
   bool shift   = state.isKeyPressed(TInputState::Key::shift);
   bool control = state.isKeyPressed(TInputState::Key::control);
   
-  if ( alt && control && !shift
+  if ( alt || control && !shift
     && Preferences::instance()->useCtrlAltToResizeBrushEnabled() )
   {
-    // Resize the brush if CTRL+ALT is pressed and the preference is enabled.
+    // Resize the brush if ALT or CTRL+ALT is pressed and the preference is enabled.
     const TPointD &diff = position - m_mousePos;
-    double max          = diff.x / 2;
-    double min          = diff.y / 2;
+    double add          = (fabs(diff.x) > fabs(diff.y)) ? diff.x*0.5 : diff.y*0.5;
+    double min, max;
 
-    locals.addMinMax(m_thickness, min, max);
+    if (alt) {
+      min = control ? 0 : add;
+      // Keep the ratio
+      max = m_thickness.getValue().first ? add *
+            (m_thickness.getValue().second / m_thickness.getValue().first) : add;
+
+      locals.addMinMax(m_thickness, min, max);
+    }
+    m_mousePos = position;
 
     double radius = m_thickness.getValue().second * 0.5;
     halfThick = TPointD(radius, radius);

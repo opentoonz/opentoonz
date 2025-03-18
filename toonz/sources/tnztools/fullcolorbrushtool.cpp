@@ -449,10 +449,11 @@ void FullColorBrushTool::inputMouseMove(const TPointD &position,
       TIntPairProperty::Value value = prop.getValue();
       value.first += min;
       value.second += max;
-      if (value.first > value.second) value.first = value.second;
-      value.first = tcrop<double>(value.first, range.first, range.second);
+      if (value.first > value.second) value.second = value.first;
 
-      value.second = tcrop<double>(value.second, range.first, range.second);
+      if (value.first < range.first || value.second > range.second) return;
+      value.first  = tcrop(value.first, range.first + 1, range.second);
+      value.second = tcrop(value.second, range.first + 1, range.second);
       prop.setValue(value);
 
       notify(prop);
@@ -470,12 +471,25 @@ void FullColorBrushTool::inputMouseMove(const TPointD &position,
     }
   } locals = {this};
 
-  if (state.isKeyPressed(TKey::control) && state.isKeyPressed(TKey::alt)) {
+  if (Preferences::instance()->useCtrlAltToResizeBrushEnabled()
+           && state.isKeyPressed(TKey::control) ||
+      state.isKeyPressed(TKey::alt)) {
     const TPointD &diff = position - m_mousePos;
     if (getBrushStyle()) {
       locals.add(m_modifierSize, 0.01 * diff.x);
     } else {
-      locals.addMinMaxSeparate(m_thickness, int(diff.x / 2), int(diff.y / 2));
+      double add = (fabs(diff.x) > fabs(diff.y)) ? diff.x * 0.5 : diff.y * 0.5;
+      double min, max;
+      if (state.isKeyPressed(TKey::alt)) {
+        min = state.isKeyPressed(TKey::control) ? 0 : add;
+        // Keep the ratio
+        max = m_thickness.getValue().first
+                  ? add * (m_thickness.getValue().second /
+                           m_thickness.getValue().first)
+                  : add;
+        
+        locals.addMinMaxSeparate(m_thickness, (int)min, (int)max);
+      }
     }
   } else {
     m_brushPos = position;

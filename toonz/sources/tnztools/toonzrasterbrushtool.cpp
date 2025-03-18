@@ -1445,16 +1445,19 @@ void ToonzRasterBrushTool::inputMouseMove(const TPointD &position, const TInputS
       TTool::getApplication()->getCurrentTool()->notifyToolChanged();
     }
 
-    void addMinMax(TDoublePairProperty &prop, double min, double max) {
+   void addMinMax(TDoublePairProperty &prop, double min, double max) {
       if (min == 0.0 && max == 0.0) return;
       const TDoublePairProperty::Range &range = prop.getRange();
 
       TDoublePairProperty::Value value = prop.getValue();
       value.first += min;
       value.second += max;
-      if (value.first > value.second) value.first = value.second;
-      value.first  = tcrop(value.first, range.first, range.second);
-      value.second = tcrop(value.second, range.first, range.second);
+      if (value.first > value.second)
+        value.second = value.first;
+
+      if (value.first < range.first || value.second > range.second) return;
+      value.first  = tcrop(value.first, range.first + 1, range.second);
+      value.second = tcrop(value.second, range.first + 1, range.second);
 
       setValue(prop, value);
     }
@@ -1467,15 +1470,26 @@ void ToonzRasterBrushTool::inputMouseMove(const TPointD &position, const TInputS
 
   if ( Preferences::instance()->useCtrlAltToResizeBrushEnabled()
     && state.isKeyPressed(TKey::control)
-    && state.isKeyPressed(TKey::alt)
+    || state.isKeyPressed(TKey::alt)
     && !state.isKeyPressed(TKey::shift) )
   {
-    // Resize the brush if CTRL+ALT is pressed and the preference is enabled.
+    // Resize the brush if ALT or CTRL+ALT is pressed and the preference is
+    // enabled.
     const TPointD &diff = position - m_mousePos;
-    double max          = diff.x / 2;
-    double min          = diff.y / 2;
+    double add = (fabs(diff.x) > fabs(diff.y)) ? diff.x * 0.5 : diff.y * 0.5;
+    double min, max;
 
-    locals.addMinMax(m_rasThickness, min, max);
+    if (state.isKeyPressed(TKey::alt)) {
+      min = state.isKeyPressed(TKey::control) ? 0 : add;
+      // Keep the ratio
+      max = m_rasThickness.getValue().first
+                ? add * (m_rasThickness.getValue().second /
+                         m_rasThickness.getValue().first)
+                : add;
+
+      locals.addMinMax(m_rasThickness, min, max);
+    }
+    m_mousePos = position;
 
     double radius = m_rasThickness.getValue().second * 0.5;
     invalidateRect += TRectD(m_brushPos - TPointD(radius, radius),

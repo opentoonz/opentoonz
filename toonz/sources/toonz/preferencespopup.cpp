@@ -1179,11 +1179,15 @@ void PreferencesPopup::insertFootNote(QGridLayout* layout) {
 //-----------------------------------------------------------------------------
 
 QString PreferencesPopup::getUIString(PreferencesItemId id) {
-  auto CtrlAltStr = []() {
-    QString str =
+  auto CtrlAltOrAltStr = []() {
+    QString ctrlAltStr =
         QKeySequence(Qt::CTRL + Qt::ALT).toString(QKeySequence::NativeText);
-    if (str.endsWith("+")) str.chop(1);
-    return str;
+    QString altStr = QKeySequence(Qt::ALT).toString(QKeySequence::NativeText);
+
+    if (ctrlAltStr.endsWith("+")) ctrlAltStr.chop(1);
+    if (altStr.endsWith("+")) altStr.chop(1);
+
+    return ctrlAltStr + " / " + altStr;
   };
 
   const static QMap<PreferencesItemId, QString> uiStringTable = {
@@ -1308,7 +1312,8 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
       {cursorBrushStyle, tr("Cursor Style:")},
       {cursorOutlineEnabled, tr("Show Cursor Size Outlines")},
       {levelBasedToolsDisplay, tr("Toolbar Display Behaviour:")},
-      {useCtrlAltToResizeBrush, tr("Use %1 to Resize Brush").arg(CtrlAltStr())},
+      {useCtrlAltToResizeBrush,
+       tr("Use %1 to Resize Brush").arg(CtrlAltOrAltStr())},
       {tempToolSwitchTimer,
        tr("Switch Tool Temporarily Keypress Length (ms):")},
 
