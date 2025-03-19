@@ -9,6 +9,17 @@
 
 //-----------------------------------------------------------------------------
 namespace {  // Utility Function
+
+//-----------------------------------------------------------------------------
+
+inline int threshTone(const TPixelCM32 &pix, int fillDepth) {
+  if (fillDepth == TPixelCM32::getMaxTone())
+    return pix.getTone();
+  else
+    return ((pix.getTone()) > fillDepth) ? TPixelCM32::getMaxTone()
+                                         : pix.getTone();
+}
+
 //-----------------------------------------------------------------------------
 
 inline TPoint nearestInkNotDiagonal(const TRasterCM32P &r, const TPoint &p) {
@@ -38,7 +49,7 @@ inline TPoint nearestInkNotDiagonal(const TRasterCM32P &r, const TPoint &p) {
 // in order to make the paint to protlude behind the line.
 
 void fillRow(const TRasterCM32P &r, const TPoint &p, int &xa, int &xb,
-             int paint, TPalette *palette, TTileSaverCM32 *saver,
+             int paint, TPalette *palette, TTileSaverCM32 *saver,int fillDepth,
              bool prevailing = true) {
   int tone, oldtone;
   TPixelCM32 *pix, *pix0, *limit, *tmp_limit;
@@ -49,11 +60,11 @@ void fillRow(const TRasterCM32P &r, const TPoint &p, int &xa, int &xb,
   pix0    = line + p.x;
   pix     = pix0;
   limit   = line + r->getBounds().x1;
-  oldtone = pix->getTone();
+  oldtone = threshTone(*pix,fillDepth);
   tone    = oldtone;
   for (; pix <= limit; pix++) {
     if (pix->getPaint() == paint) break;
-    tone = pix->getTone();
+    tone = threshTone(*pix, fillDepth);
     if (tone == 0) break;
     // prevent fill area from protruding behind the colored line
     if (tone > oldtone) {
@@ -66,14 +77,14 @@ void fillRow(const TRasterCM32P &r, const TPoint &p, int &xa, int &xb,
         pix--;
         // make the one-pixel-width semi-transparent line to be painted
         if (prevailing && pix->getInk() != pix->getPaint()) break;
-        if (pix->getTone() > oldtone) {
+        if (threshTone(*pix, fillDepth) > oldtone) {
           // check if the current pixel is NOT with the lowest tone among the
           // vertical neighbors as well
           if (p.y > 0 && p.y < r->getLy() - 1) {
             TPixelCM32 *upPix   = pix - r->getWrap();
             TPixelCM32 *downPix = pix + r->getWrap();
-            if (upPix->getTone() > pix->getTone() &&
-                downPix->getTone() > pix->getTone())
+            if (threshTone(*upPix, fillDepth) > threshTone(*pix, fillDepth) &&
+                threshTone(*downPix, fillDepth) > threshTone(*pix, fillDepth))
               continue;
           }
           break;
@@ -89,7 +100,7 @@ void fillRow(const TRasterCM32P &r, const TPoint &p, int &xa, int &xb,
     if (limit > tmp_limit) limit = tmp_limit;
     for (; pix <= limit; pix++) {
       if (pix->getPaint() == paint) break;
-      if (pix->getTone() != 0) break;
+      if (threshTone(*pix, fillDepth) != 0) break;
     }
   }
 
@@ -99,11 +110,11 @@ void fillRow(const TRasterCM32P &r, const TPoint &p, int &xa, int &xb,
 
   pix     = pix0;
   limit   = line + r->getBounds().x0;
-  oldtone = pix->getTone();
+  oldtone = threshTone(*pix, fillDepth);
   tone    = oldtone;
   for (pix--; pix >= limit; pix--) {
     if (pix->getPaint() == paint) break;
-    tone = pix->getTone();
+    tone = threshTone(*pix, fillDepth);
     if (tone == 0) break;
     // prevent fill area from protruding behind the colored line
     if (tone > oldtone) {
@@ -116,14 +127,14 @@ void fillRow(const TRasterCM32P &r, const TPoint &p, int &xa, int &xb,
         pix++;
         // make the one-pixel-width semi-transparent line to be painted
         if (prevailing && pix->getInk() != pix->getPaint()) break;
-        if (pix->getTone() > oldtone) {
+        if (threshTone(*pix, fillDepth) > oldtone) {
           // check if the current pixel is NOT with the lowest tone among the
           // vertical neighbors as well
           if (p.y > 0 && p.y < r->getLy() - 1) {
             TPixelCM32 *upPix   = pix - r->getWrap();
             TPixelCM32 *downPix = pix + r->getWrap();
-            if (upPix->getTone() > pix->getTone() &&
-                downPix->getTone() > pix->getTone())
+            if (threshTone(*upPix, fillDepth) > threshTone(*pix, fillDepth) &&
+                threshTone(*downPix, fillDepth) > threshTone(*pix, fillDepth))
               continue;
           }
           break;
@@ -139,7 +150,7 @@ void fillRow(const TRasterCM32P &r, const TPoint &p, int &xa, int &xb,
     if (limit < tmp_limit) limit = tmp_limit;
     for (; pix >= limit; pix--) {
       if (pix->getPaint() == paint) break;
-      if (pix->getTone() != 0) break;
+      if (threshTone(*pix, fillDepth) != 0) break;
     }
   }
 
@@ -469,16 +480,6 @@ public:
 
 //-----------------------------------------------------------------------------
 
-inline int threshTone(const TPixelCM32 &pix, int fillDepth) {
-  if (fillDepth == TPixelCM32::getMaxTone())
-    return pix.getTone();
-  else
-    return ((pix.getTone()) > fillDepth) ? TPixelCM32::getMaxTone()
-                                         : pix.getTone();
-}
-
-//-----------------------------------------------------------------------------
-
 inline int threshMatte(int matte, int fillDepth) {
   if (fillDepth == 255)
     return matte;
@@ -630,7 +631,7 @@ bool fill(const TRasterCM32P &r, const FillParameters &params,
       if (pix->getPaint() != paint && tone <= oldtone && tone != 0 && 
           (pix->getPaint() != pix->getInk() ||
            pix->getPaint() == paintAtClickedPos)) {
-        fillRow(r, TPoint(x, y), xc, xd, paint, params.m_palette, saver,
+        fillRow(r, TPoint(x, y), xc, xd, paint, params.m_palette, saver,fillDepth,
                 params.m_prevailing);
         filled = true;
         if (xc < xa) seeds.push(FillSeed(xc, xa - 1, y, -dy));
