@@ -171,7 +171,7 @@ void fillRow(const TRasterCM32P &r, const TPoint &p, int &xa, int &xb,
 
 
 // This function fills with a given direction 
-// and starts from a autoPainted pixel(But don't do check), 
+// and starts from a autoPainted pixel, 
 // ends with another Ink pixel.
 // Fill depth is supported.
 // Prevailing is on for default
@@ -180,59 +180,79 @@ void fillAutoInkRow(const TRasterCM32P &r, const TPoint &p, int &xc,
                          int &xd, bool right, int paint,int &length,
                   TTileSaverCM32 *saver) {
   int dx = right ? 1 : -1;
+  const int max = 10;
   
   TPixelCM32 *pix0       = r->pixels(p.y) + p.x;
-  if (!pix0->isPureInk()) return;
+  assert(pix0->getInk() == paint);
+  if (pix0->getInk() != paint) return;
+  int tone, oldTone;
 
   // Calculate in autoPaint Style area
-  xc = xd = p.x;
   TPixelCM32 *pix;
-  pix = pix0 - dx;
-  while ((pix)->getInk() == paint) {
-    xc -= dx;
-    pix -= dx;
-  }
-  assert(pix->getInk() != paint);
+  TPixelCM32 *tmp_limit;
 
-  pix = pix0 + dx;
+  pix = pix0;
+  tmp_limit = (right ? r->pixels(p.y) + r->getBounds().x0
+                     : r->pixels(p.y) + r->getBounds().x1 - 1);
+  oldTone = 0;
+  int j = 0;
   while ((pix)->getInk() == paint) {
-    xd += dx;
+    tone = pix->getTone();
+    if (tone > oldTone) break;
+    if (j > max) break;
+    pix -= dx;
+    oldTone = tone;
+    ++j;
+  }
+  xc = pix - r->pixels(p.y) + dx;
+
+  pix = pix0;
+  tmp_limit = (right ? r->pixels(p.y) + r->getBounds().x1 - 1
+                     : r->pixels(p.y) + r->getBounds().x0);
+  while ((pix)->getInk() == paint && pix != tmp_limit) {
     pix += dx;
   }
-  assert(pix->getInk() != paint);
+  xd = pix - r->pixels(p.y) - dx;
 
   if (xc > xd) std::swap(xc, xd);
 
   // Out of autoPaint Style area
-  int xa = xc, xb = xd;
-  pix                   = r->pixels(p.y) + (right ? xd : xc);
-  TPixelCM32 *tmp_limit = (right ? r->pixels(p.y) + r->getBounds().x1 - 1
-                                 : r->pixels(p.y) + r->getBounds().x0);
+  pix                   = r->pixels(p.y) + (right ? xd : xc) + dx;
+  tmp_limit = (right ? r->pixels(p.y) + r->getBounds().x1 - 1
+                     : r->pixels(p.y) + r->getBounds().x0);
 
   //int paintAtClickedPos = pix->getPaint();
   bool outOfPaint = false, outOfInk = false;
 
-  int i = 0;
+  int i   = 0;
+  j       = 0;
+  oldTone = pix->getTone();
   while (pix != tmp_limit) {
-    if (pix->isPureInk() && pix->getInk() != paint) 
+    tone = pix->getTone();
+    if (!pix->isPurePaint()) 
         outOfPaint = true;
-    if ((pix + dx)->isPurePaint() && outOfPaint) 
+    if (outOfPaint && tone > oldTone)
         outOfInk = true;
     if (outOfInk) break;
+    pix += dx;
+    oldTone = tone;
+    if (!outOfPaint)
+      ++i;
+    else
+      ++j;
     if (i > length) {
       length -= 2;
       return;
     }
-    pix += dx;
-    if (!outOfPaint) ++i;
+    if (j > max) break; 
   }
   if (pix == tmp_limit) return;
 
-  assert((pix + dx)->isPurePaint());
-
+  pix-=dx;
+  int xa = xc, xb = xd;
   (right ? xb : xa) = pix - r->pixels(p.y);
 
-  length = xb - xa;
+  length = (int)((xb - xa)/2)+2;
 
   if (saver) saver->save(TRect(xa, p.y, xb, p.y));
 
@@ -247,19 +267,22 @@ void fillAutoPaintFlow(const TRasterCM32P &r, const TPoint &p,bool right, int dy
                          TTileSaverCM32 *saver) {
   int xx = p.x;
   int yy = p.y;
-  int xc, xd;
+  int xc = xx, xd = yy;
   int length    = 6;// +2 / -2
+  TPixelCM32 *pix;
   do {
     fillAutoInkRow(r, TPoint(xx, yy), xc, xd, right, paint, length, saver);
     yy += dy;
     if (right) {
       for (--xc, ++xd; xc != xd; xd--) {
-        if ((r->pixels(yy) + xd)->getInk() == paint) break;
+        pix = r->pixels(yy) + xd;
+        if (pix->getInk() == paint && pix->isPureInk()) break;
       }
       xx = xd;
     } else {
       for (--xc, ++xd; xc != xd; xc++) {
-        if ((r->pixels(yy) + xc)->getInk() == paint) break;
+        pix = r->pixels(yy) + xc;
+        if (pix->getInk() == paint && pix->isPureInk()) break;
       }
       xx = xc;
     }
@@ -270,10 +293,10 @@ void fillAutoPaintFlow(const TRasterCM32P &r, const TPoint &p,bool right, int dy
 
 //-----------------------------------------------------------------------------
 // Prevailing is off for default
-void fillShortRawFlow(const TRasterCM32P &r, TPoint p ,bool right, int dy, int paint, int max,
+void fillShortRawFlow(const TRasterCM32P &r, TPoint p ,bool right, int dy, int paint,
                 TTileSaverCM32 *saver) {
   int pixelCount = 0;
-
+  const int max  = 8;
   int x, y;
   int dx = right ? 1 : -1;
   std::vector<TPoint> points;
@@ -307,7 +330,7 @@ void fillShortRawFlow(const TRasterCM32P &r, TPoint p ,bool right, int dy, int p
   TPoint lastPoint = points.back();
   lastPoint        = TPoint(lastPoint.x + dx, lastPoint.y + dy);
   if ((r->pixels(lastPoint.y) + lastPoint.x)->isPurePaint())
-    fillShortRawFlow(r, lastPoint, right, dy, paint, max, saver);
+    fillShortRawFlow(r, lastPoint, right, dy, paint, saver);
 }
 
 //-----------------------------------------------------------------------------
@@ -647,7 +670,7 @@ bool fill(const TRasterCM32P &r, const FillParameters &params,
         rightPix--;
         xf--;
       }
-      TPixelCM32 *pixel = leftPix;
+        TPixelCM32 *pixel = leftPix;
       if (fillGaps && xf - xe > 0) {
         do {
           pixel++;
@@ -678,7 +701,7 @@ bool fill(const TRasterCM32P &r, const FillParameters &params,
             bool fillMiddle = leftPix->getInk() == rightPix->getInk();
             if (fillMiddle) {
               bool right = (xc + xd) < (xf + xe);
-              fillShortRawFlow(r, TPoint(right ? xe+1 : xf-1,y), right, dy, paint, 6, saver);
+              fillShortRawFlow(r, TPoint(right ? xe+1 : xf-1,y), right, dy, paint, saver);
             }
           }
         }// pixel == rightPix
