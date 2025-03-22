@@ -1682,6 +1682,7 @@ void VectorSelectionTool::leftButtonUp(const TPointD &pos,
 
 void VectorSelectionTool::addContextMenuItems(QMenu *menu) {
   menu->addAction(CommandManager::instance()->getAction(MI_RemoveEndpoints));
+  menu->addAction(CommandManager::instance()->getAction(MI_SortWithPaletteOrder));
   menu->addSeparator();
 
   m_strokeSelection.getGroupCommand()->addMenuItems(menu);
