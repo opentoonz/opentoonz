@@ -1081,9 +1081,12 @@ QMenuBar *StackedMenuBar::createFullMenuBar() {
   QMenuBar *fullMenuBar = new QMenuBar(this);
   // Menu' FILE
   QMenu *fileMenu = addMenu(tr("File"), fullMenuBar);
+  addMenuItem(fileMenu, MI_NewProject);
+  addMenuItem(fileMenu, MI_ProjectSettings);
+  addMenuItem(fileMenu, MI_SaveAll);
+  fileMenu->addSeparator();
   addMenuItem(fileMenu, MI_NewScene);
   addMenuItem(fileMenu, MI_LoadScene);
-  addMenuItem(fileMenu, MI_SaveAll);
   addMenuItem(fileMenu, MI_OpenRecentScene);
   addMenuItem(fileMenu, MI_SaveScene);
   addMenuItem(fileMenu, MI_SaveSceneAs);
@@ -1095,14 +1098,6 @@ QMenuBar *StackedMenuBar::createFullMenuBar() {
   addMenuItem(fileMenu, MI_ConvertFileWithInput);
   fileMenu->addSeparator();
   addMenuItem(fileMenu, MI_LoadColorModel);
-  fileMenu->addSeparator();
-  QMenu *projectManagementMenu = fileMenu->addMenu(tr("Project Management"));
-  {
-    addMenuItem(projectManagementMenu, MI_NewProject);
-    addMenuItem(projectManagementMenu, MI_ProjectSettings);
-    projectManagementMenu->addSeparator();
-    addMenuItem(projectManagementMenu, MI_SaveDefaultSettings);
-  }
   fileMenu->addSeparator();
   QMenu *importMenu = fileMenu->addMenu(tr("Import"));
   { 
