@@ -1082,6 +1082,8 @@ QMenuBar *StackedMenuBar::createFullMenuBar() {
   // Menu' FILE
   QMenu *fileMenu = addMenu(tr("File"), fullMenuBar);
   addMenuItem(fileMenu, MI_NewProject);
+  addMenuItem(fileMenu, MI_LoadProject);
+  addMenuItem(fileMenu, MI_OpenRecentProject);
   addMenuItem(fileMenu, MI_ProjectSettings);
   addMenuItem(fileMenu, MI_SaveAll);
   fileMenu->addSeparator();
