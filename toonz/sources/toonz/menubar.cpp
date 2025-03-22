@@ -1093,6 +1093,7 @@ QMenuBar *StackedMenuBar::createFullMenuBar() {
   addMenuItem(fileMenu, MI_SaveScene);
   addMenuItem(fileMenu, MI_SaveSceneAs);
   addMenuItem(fileMenu, MI_RevertScene);
+  addMenuItem(fileMenu, MI_SaveDefaultSettings);
   fileMenu->addSeparator();
   addMenuItem(fileMenu, MI_LoadFolder);
   addMenuItem(fileMenu, MI_LoadSubSceneFile);
