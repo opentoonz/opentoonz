@@ -8,10 +8,11 @@ configuration:
 - Release
 platform: x64
 clone_depth: 1
-cache: c:\tools\vcpkg\installed
+cache:
+  - C:\Tools\opencv
 install:
 - cmd: >-
-    choco install opencv --version=4.10.0
+    if exist "C:\Tools\opencv\build" (echo OpenCV cached, skipping install) else (choco install opencv --version=4.10.0 --no-progress --yes --force)
 
     cd thirdparty
 
@@ -32,22 +33,16 @@ build:
   verbosity: minimal
 after_build:
 - cmd: >-
-    
+
     C:\Qt\5.15.2\msvc2019_64\bin\windeployqt.exe %CONFIGURATION%\OpenToonz.exe
 
     copy /Y ..\..\thirdparty\glut\3.7.6\lib\glut64.dll %CONFIGURATION%
-    
+
     copy /Y ..\..\thirdparty\glew\glew-1.9.0\bin\64bit\glew32.dll %CONFIGURATION%
 
-    copy /Y ..\..\thirdparty\libmypaint\dist\64\libiconv-2.dll %CONFIGURATION%
-
-    copy /Y ..\..\thirdparty\libmypaint\dist\64\libintl-8.dll %CONFIGURATION%
-
-    copy /Y ..\..\thirdparty\libmypaint\dist\64\libjson-c-2.dll %CONFIGURATION%
-    
-    copy /Y ..\..\thirdparty\libmypaint\dist\64\libmypaint-1-4-0.dll %CONFIGURATION%
-    
     copy /Y "C:\Tools\opencv\build\x64\vc16\bin\opencv_world4100.dll" %CONFIGURATION%
+
+    xcopy /Y /E ..\..\thirdparty\libmypaint\dist\64\*.dll %CONFIGURATION%
 
     mkdir "%CONFIGURATION%\portablestuff"
 
@@ -56,4 +51,3 @@ after_build:
 artifacts:
 - path: toonz\$(PLATFORM)\$(CONFIGURATION)
   name: OpenToonz
-  
