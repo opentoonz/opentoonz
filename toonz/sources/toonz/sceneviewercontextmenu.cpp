@@ -222,6 +222,8 @@ SceneViewerContextMenu::SceneViewerContextMenu(SceneViewer *parent)
   // Brush size outline
   CursorOutlineToggleGui::addCursorOutlineCommand(this);
 
+  ViewerIndicatorToggleGui::addViewerIndicatorCommand(this);
+
   // preview
   if (parent->isPreviewEnabled()) {
     addSeparator();
@@ -538,4 +540,42 @@ void CursorOutlineToggleGui::CursorOutlineToggleHandler::activate() {
 
 void CursorOutlineToggleGui::CursorOutlineToggleHandler::deactivate() {
   CursorOutlineToggle::enableCursorOutline(false);
+}
+
+class ViewerIndicatorToggle : public MenuItemHandler {
+public:
+  ViewerIndicatorToggle() : MenuItemHandler(MI_ViewerIndicator) {}
+  void execute() {
+    QAction *action = CommandManager::instance()->getAction(MI_ViewerIndicator);
+    if (!action) return;
+    bool checked = action->isChecked();
+    enableViewerIndicator(checked);
+  }
+
+  static void enableViewerIndicator(bool enable = true) {
+    Preferences::instance()->setValue(viewerIndicatorEnabled, enable);
+  }
+} ViewerIndicatorToggle;
+
+void ViewerIndicatorToggleGui::addViewerIndicatorCommand(QMenu *menu) {
+  static ViewerIndicatorToggleHandler switcher;
+  if (Preferences::instance()->isViewerIndicatorEnabled()) {
+    QAction *hideViewerIndicator =
+        menu->addAction(QString(QObject::tr("Hide Viewer Indicators")));
+    menu->connect(hideViewerIndicator, SIGNAL(triggered()), &switcher,
+                  SLOT(deactivate()));
+  } else {
+    QAction *showViewerIndicator =
+        menu->addAction(QString(QObject::tr("Show Viewer Indicators")));
+    menu->connect(showViewerIndicator, SIGNAL(triggered()), &switcher,
+                  SLOT(activate()));
+  }
+}
+
+void ViewerIndicatorToggleGui::ViewerIndicatorToggleHandler::activate() {
+  ViewerIndicatorToggle::enableViewerIndicator(true);
+}
+
+void ViewerIndicatorToggleGui::ViewerIndicatorToggleHandler::deactivate() {
+  ViewerIndicatorToggle::enableViewerIndicator(false);
 }

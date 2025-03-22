@@ -2487,6 +2487,9 @@ void MainWindow::defineActions() {
   createRightClickMenuAction(MI_SeparateColors,
                              QT_TR_NOOP("Separate Colors..."), "",
                              "separate_colors");
+  createToggle(MI_ViewerIndicator, QT_TR_NOOP("Toggle Viewer Indicators"), "",
+               Preferences::instance()->isViewerIndicatorEnabled(),
+               RightClickMenuCommandType);
 
   // Tools
 

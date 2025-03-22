@@ -1244,6 +1244,7 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
            .arg(LutManager::instance()->getMonitorName())},
       {displayIn30bit, tr("30bit Display*")},
       {showIconsInMenu, tr("Show Icons In Menu*")},
+      {viewerIndicatorEnabled, tr("Show Viewer Indicators")},
 
       // Visualization
       {show0ThickLines, tr("Show Lines with Thickness 0")},
@@ -1738,6 +1739,7 @@ QWidget* PreferencesPopup::createInterfacePage() {
   insertUI(functionEditorToggle, lay, getComboItemList(functionEditorToggle));
   insertUI(moveCurrentFrameByClickCellArea, lay);
   insertUI(actualPixelViewOnSceneEditingMode, lay);
+  insertUI(viewerIndicatorEnabled, lay);
   insertUI(showRasterImagesDarkenBlendedInViewer, lay);
   insertUI(iconSize, lay);
   insertDualUIs(viewShrink, viewStep, lay);

@@ -1754,10 +1754,6 @@ void SceneViewer::drawOverlay() {
     else
       m_FPS = 0;
 
-    if (m_freezedStatus != NO_FREEZED) {
-      tglColor(TPixel32::Red);
-      tglDrawText(TPointD(0, 0), "FROZEN");
-    }
     assert(glGetError() == GL_NO_ERROR);
 
   }  //! cameraTest
@@ -1898,6 +1894,57 @@ void SceneViewer::drawOverlay() {
 
 //-----------------------------------------------------------------------------
 
+void SceneViewer::drawViewerIndicators() {
+  if (!Preferences::instance()->isViewerIndicatorEnabled()) return;
+
+  QStringList checkTexts;
+
+  // Frozen Viewer Indicator
+  if (m_freezedStatus) checkTexts.append(tr("FROZEN"));
+
+  // Motion Path Indicator
+  TApp *app            = TApp::instance();
+  TStageObjectId objId = app->getCurrentObject()->getObjectId();
+  TXsheet *xsh         = app->getCurrentXsheet()->getXsheet();
+  if (app->getCurrentObject()->isSpline())
+    checkTexts.append(tr("Motion Path Selected"));
+
+  // Check Indicators (disabled in Preview mode)
+  ToonzCheck *tc = ToonzCheck::instance();
+  int mask       = tc->getChecks();
+  if (!m_previewMode && mask) {
+    if (mask & ToonzCheck::eTransparency)
+      checkTexts.append(tr("Transparency Check"));
+    if (mask & ToonzCheck::eInk) checkTexts.append(tr("Ink Check"));
+    if (mask & ToonzCheck::eInk1) checkTexts.append(tr("Ink#1 Check"));
+    if (mask & ToonzCheck::ePaint) checkTexts.append(tr("Paint Check"));
+    if (mask & ToonzCheck::eInksOnly) checkTexts.append(tr("Inks Only Check"));
+    if (mask & ToonzCheck::eBlackBg) checkTexts.append(tr("Black BG Check"));
+    if (mask & ToonzCheck::eGap) checkTexts.append(tr("Fill Check"));
+    if (mask & ToonzCheck::eAutoclose) checkTexts.append(tr("Gap Check"));
+  }
+
+  if (!checkTexts.size()) return;
+
+  int devPixRatio = getDevPixRatio();
+
+  int x0, x1, y0, y1;
+  rect().getCoords(&x0, &y0, &x1, &y1);
+  x0 = (-(x1 / (2 * devPixRatio))) + 15;
+  y0 = ((y1 / (2 * devPixRatio))) - 25;
+
+  glPushMatrix();
+  glScaled(2 * devPixRatio, 2 * devPixRatio, 2 * devPixRatio);
+  glColor3d(1.0, 0.0, 0.0);
+  for (int i = 0; i < checkTexts.size(); i++) {
+    int y = (y0 / 2) - (i * 10);
+    tglDrawText(TPointD((x0 / 2), y), checkTexts[i].toStdString());
+  }
+  glPopMatrix();
+}
+
+//-----------------------------------------------------------------------------
+
 static void drawFpsGraph(int t0, int t1) {
   glDisable(GL_BLEND);
   static std::deque<std::pair<int, int>> times;
@@ -2001,6 +2048,8 @@ void SceneViewer::paintGL() {
     if (!m_isPicking && m_lutCalibrator && m_lutCalibrator->isValid())
       m_lutCalibrator->onEndDraw(m_fbo);
 
+    drawViewerIndicators();
+
     return;
   }
 
@@ -2021,6 +2070,8 @@ void SceneViewer::paintGL() {
   drawOverlay();
 
   drawDisableScissor();
+
+  drawViewerIndicators();
 
   // Il freezed e' attivo ed e' in stato "update": faccio il grab del viewer.
   if (m_freezedStatus == UPDATE_FREEZED) {
