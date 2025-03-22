@@ -478,12 +478,12 @@ void getAboveStyleIdSet(int styleId, TPaletteP palette,
 double computeThickness(double pressure, const TDoublePairProperty &property,
                         bool enablePressure, bool isPath ) {
   if (isPath) return 0.0;
-  if (!enablePressure) return property.getValue().second*0.5;
+  if (!enablePressure) return property.getValue().second * 0.2;
   double t      = pressure * pressure * pressure;
   double thick0 = property.getValue().first;
   double thick1 = property.getValue().second;
   if (thick1 < 0.0001) thick0 = thick1 = 0.0;
-  return (thick0 + (thick1 - thick0) * t) * 0.5;
+  return (thick0 + (thick1 - thick0) * t) * 0.2;  
 }
 
 }  // namespace

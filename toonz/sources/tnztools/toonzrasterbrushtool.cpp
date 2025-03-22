@@ -616,7 +616,7 @@ double computeThickness(double pressure, const TDoublePairProperty &property) {
   double thick1 = property.getValue().second;
 
   if (thick1 < 0.0001) thick0 = thick1 = 0.0;
-  return (thick0 + (thick1 - thick0) * t) * 0.5;
+  return (thick0 + (thick1 - thick0) * t);
 }
 
 }  // namespace
@@ -1335,7 +1335,7 @@ void ToonzRasterBrushTool::inputPaintTrackPoint(const TTrackPoint &point, const 
     // pencil case
     
     // Pencilモードでなく、Hardness=100 の場合のブラシサイズを1段階下げる
-    double thickness = computeThickness(pressure, m_rasThickness)*2;
+    double thickness = computeThickness(pressure, m_rasThickness);
     //if (!m_painting.pencil.realPencil && !m_modifierLine->getManager())
     //  thickness -= 1.0;
     TThickPoint thickPoint(fixedPosition + rasCenter, thickness);
@@ -1396,8 +1396,8 @@ void ToonzRasterBrushTool::inputPaintTrackPoint(const TTrackPoint &point, const 
     if (!handler) return;
 
     // paint stroke
-    double radius = computeThickness(pressure, m_rasThickness);
-    TThickPoint thickPoint(fixedPosition + rasCenter, radius*2);
+    double thickness = computeThickness(pressure, m_rasThickness);
+    TThickPoint thickPoint(fixedPosition + rasCenter, thickness);
     TRect strokeRect( tfloor(thickPoint.x - maxThick - 0.999),
                       tfloor(thickPoint.y - maxThick - 0.999),
                       tceil(thickPoint.x + maxThick + 0.999),
