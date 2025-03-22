@@ -1094,9 +1094,6 @@ QMenuBar *StackedMenuBar::createFullMenuBar() {
   fileMenu->addSeparator();
   addMenuItem(fileMenu, MI_LoadFolder);
   addMenuItem(fileMenu, MI_LoadSubSceneFile);
-  fileMenu->addSeparator();
-  addMenuItem(fileMenu, MI_ConvertFileWithInput);
-  fileMenu->addSeparator();
   addMenuItem(fileMenu, MI_LoadColorModel);
   fileMenu->addSeparator();
   QMenu *importMenu = fileMenu->addMenu(tr("Import"));
@@ -1117,6 +1114,8 @@ QMenuBar *StackedMenuBar::createFullMenuBar() {
     addMenuItem(exportMenu, MI_ExportTvpJson);
     addMenuItem(exportMenu, MI_ExportCameraTrack);
   }
+  fileMenu->addSeparator();
+  addMenuItem(fileMenu, MI_ConvertFileWithInput);
   fileMenu->addSeparator();
   addMenuItem(fileMenu, MI_PrintXsheet);
   addMenuItem(fileMenu, MI_Print);
