@@ -883,9 +883,9 @@ void ShaderFx::getInputData(const TRectD &rect, double frame,
 #else
     std::vector<const GLchar *> varyingNames(
         boost::make_transform_iterator(varyingStrings.begin(),
-                                       std::mem_fun_ref(&std::string::c_str)),
+                                       std::mem_fn(&std::string::c_str)),
         boost::make_transform_iterator(varyingStrings.end(),
-                                       std::mem_fun_ref(&std::string::c_str)));
+                                       std::mem_fn(&std::string::c_str)));
 #endif
     prog = touchShaderProgram(sd, context, int(varyingNames.size()),
                               &varyingNames[0]);

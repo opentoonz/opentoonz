@@ -4,7 +4,6 @@
 #define TPROPERTYTYPE_H
 
 #include <vector>
-using namespace std;
 
 template <typename T>
 class TEnumerationT {
@@ -13,12 +12,12 @@ public:
 
   TEnumerationT() {}
 
-  void addItem(const string &id, T item) {
+  void addItem(const std::string &id, T item) {
     m_items.push_back(std::make_pair(id, item));
   }
 
   int getItemCount() const { return m_items.size(); }
-  void getItem(unsigned int i, string &idstring, T &value) const {
+  void getItem(unsigned int i, std::string &idstring, T &value) const {
     assert(i < m_items.size());
     ItemData vp = m_items[i];
     idstring    = vp.first;
@@ -32,14 +31,14 @@ public:
   }
 
   bool isValid(T item) const {
-    typename vector<ItemData>::const_iterator it =
+    typename std::vector<ItemData>::const_iterator it =
         find_if(m_items.begin(), m_items.end(), MatchesItem(item));
     return it != m_items.end();
   }
 
 private:
-  typedef pair<string, T> ItemData;
-  vector<ItemData> m_items;
+  typedef std::pair<std::string, T> ItemData;
+  std::vector<ItemData> m_items;
 
   class MatchesItem {
   public:
