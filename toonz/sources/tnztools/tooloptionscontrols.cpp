@@ -1483,7 +1483,10 @@ void ThickChangeField::onChange(TMeasuredValue *fld, bool addToUndo) {
   double newThickness = p - m_tool->m_deformValues.m_maxSelectionThickness;
 
   changeThickTool->setThicknessChange(newThickness);
-  changeThickTool->changeImageThickness(*vi, newThickness);
+  if (m_fixed)
+    changeThickTool->setImageThickness(*vi, p);
+  else
+    changeThickTool->changeImageThickness(*vi, newThickness);
 
   // DragSelectionTool::DeformValues deformValues = m_tool->m_deformValues;
   // // Like when I found it - it's a noop.
