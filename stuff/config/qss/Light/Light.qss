@@ -12,16 +12,18 @@ QToolBar * {
 }
 :TOONZCOLORS {
   -bg-color: #DBDBDB;
+  -icon-base-opacity: 0.8;
+  -icon-disabled-opacity: 0.3;
   -icon-base-color: black;
-  -icon-active-color: #000000;
-  -icon-selected-color: #000000;
-  -icon-on-color: #000000;
-  -icon-close-color: #000000;
+  -icon-active-color: black;
+  -icon-selected-color: black;
+  -icon-on-color: black;
+  -icon-close-color: black;
   -icon-preview-color: black;
-  -icon-vcheck-color: #000000;
-  -icon-lock-color: #000000;
-  -icon-keyframe-color: #000000;
-  -icon-keyframe-modified-color: #000000;
+  -icon-vcheck-color: black;
+  -icon-lock-color: black;
+  -icon-keyframe-color: black;
+  -icon-keyframe-modified-color: black;
 }
 QWidget {
   background-color: #DBDBDB;

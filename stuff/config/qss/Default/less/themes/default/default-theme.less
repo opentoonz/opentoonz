@@ -61,13 +61,15 @@
 @tooltip-padding: 2px;
 
 // Icon Theme Colors
+@icon-base-opacity: 0.8;
+@icon-disabled-opacity: 0.3;
 @icon-base-color: @text-color;
 @icon-active-color: white;
 @icon-selected-color: @icon-active-color;
 @icon-on-color: @icon-active-color;
 
 // Individual Icon Colors
-@icon-preview-color: black;
+@icon-preview-color: if(lightness(@preview-color) > 50%, black, white);
 @icon-view-check-color: @icon-on-color;
 @icon-lock-color: @icon-active-color;
 @icon-keyframe-color: @icon-active-color;

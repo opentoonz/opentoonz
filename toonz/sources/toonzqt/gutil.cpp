@@ -760,25 +760,29 @@ void ThemeManager::initialize() { preloadIconMetadata(":/icons"); }
 
 //-----------------------------------------------------------------------------
 
-void ThemeManager::updateThemeColor() {
+void ThemeManager::updateThemeProperties() {
+  // Icon opacities
+  setIconBaseOpacity(getCustomPropertyDouble("icon-base-opacity", 0.8));
+  setIconDisabledOpacity(getCustomPropertyDouble("icon-disabled-opacity", 0.2));
+
   // Base icon colors
-  setIconBaseColor(QColor(getCustomProperty("icon-base-color")));
-  setIconActiveColor(QColor(getCustomProperty("icon-active-color")));
-  setIconOnColor(QColor(getCustomProperty("icon-on-color")));
-  setIconSelectedColor(QColor(getCustomProperty("icon-selected-color")));
+  setIconBaseColor(getCustomPropertyColor("icon-base-color"));
+  setIconActiveColor(getCustomPropertyColor("icon-active-color"));
+  setIconOnColor(getCustomPropertyColor("icon-on-color"));
+  setIconSelectedColor(getCustomPropertyColor("icon-selected-color"));
 
   // Individual icon colors
-  setIconCloseColor(QColor(getCustomProperty("icon-close-color")));
-  setIconPreviewColor(QColor(getCustomProperty("icon-preview-color")));
-  setIconLockColor(QColor(getCustomProperty("icon-lock-color")));
+  setIconCloseColor(getCustomPropertyColor("icon-close-color"));
+  setIconPreviewColor(getCustomPropertyColor("icon-preview-color"));
+  setIconLockColor(getCustomPropertyColor("icon-lock-color"));
 
   // Keyframe icon colors
-  setIconKeyframeColor(QColor(getCustomProperty("icon-keyframe-color")));
+  setIconKeyframeColor(getCustomPropertyColor("icon-keyframe-color"));
   setIconKeyframeModifiedColor(
-      QColor(getCustomProperty("icon-keyframe-modified-color")));
+      getCustomPropertyColor("icon-keyframe-modified-color"));
 
   // Viewer check icon colors
-  setIconVCheckColor(QColor(getCustomProperty("icon-vcheck-color")));
+  setIconVCheckColor(getCustomPropertyColor("icon-vcheck-color"));
 
   // Invalidate cache to force re-rendering of icons
   clearQPixmapCache();
@@ -922,7 +926,7 @@ void ThemeManager::parseCustomPropertiesFromStylesheet(
     }
   }
 
-  updateThemeColor();
+  updateThemeProperties();
 }
 
 //-----------------------------------------------------------------------------
@@ -934,8 +938,32 @@ void ThemeManager::setCustomProperty(const QString &name,
 
 //-----------------------------------------------------------------------------
 
-QString ThemeManager::getCustomProperty(const QString &name) const {
+QString ThemeManager::getCustomProperty(const QString &name,
+                                        const QString &defaultValue) const {
   return m_customProperties.value(name, QString());
+}
+
+//-----------------------------------------------------------------------------
+
+double ThemeManager::getCustomPropertyDouble(const QString &name,
+                                             double defaultValue) const {
+  QString value = getCustomProperty(name);
+  bool ok       = false;
+  double result = value.toDouble(&ok);
+  qDebug() << "result" << value << result;
+  return ok ? result : defaultValue;
+}
+
+//-----------------------------------------------------------------------------
+
+QColor ThemeManager::getCustomPropertyColor(const QString &name,
+                                            const QColor &defaultValue) const {
+  QString value = getCustomProperty(name);
+  if (value.isEmpty()) return defaultValue;
+
+  // Try to parse the color from the string
+  QColor color(value);
+  return color.isValid() ? color : defaultValue;
 }
 
 //-----------------------------------------------------------------------------
@@ -1094,13 +1122,19 @@ void SvgIconEngine::paint(QPainter *painter, const QRect &rect,
 
 qreal SvgIconEngine::getOpacityForModeState(QIcon::Mode mode,
                                             QIcon::State state) {
+  auto &tm = ThemeManager::getInstance();
+
+  const double baseOpacity     = tm.getIconBaseOpacity();
+  const double disabledOpacity = tm.getIconDisabledOpacity();
+  const double activeOpacity   = 1.0;
+
   qreal opacity;
   if (m_isColored) {
-    opacity = (mode == QIcon::Disabled) ? 0.4 : 1.0;
+    opacity = (mode == QIcon::Disabled) ? disabledOpacity : activeOpacity;
   } else {
-    opacity = (mode == QIcon::Disabled)                        ? 0.4
-              : (mode == QIcon::Normal && state == QIcon::Off) ? 0.8
-                                                               : 1.0;
+    opacity = (mode == QIcon::Disabled)                        ? disabledOpacity
+              : (mode == QIcon::Normal && state == QIcon::Off) ? baseOpacity
+                                                               : activeOpacity;
   }
 
   return opacity;

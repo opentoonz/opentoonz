@@ -249,7 +249,7 @@ public:
 
   // Icon Management
   void preloadIconMetadata(const QString &path);
-  void updateThemeColor();
+  void updateThemeProperties();
   QString getIconPath(const QString &iconName, QIcon::Mode mode = QIcon::Normal,
                       QIcon::State state = QIcon::Off) const;
   QSize getIconSize(const QString &iconName) const;
@@ -258,6 +258,16 @@ public:
   bool isColoredIcon(const QString &iconName) const;
 
   // Icon Color Management
+  void setIconBaseOpacity(const double &val) { m_iconBaseOpacity = val; }
+  double getIconBaseOpacity() const { return m_iconBaseOpacity; }
+  void setIconDisabledOpacity(const double &val) {
+    m_iconDisabledOpacity = val;
+  }
+  double getIconDisabledOpacity() const { return m_iconDisabledOpacity; }
+
+  void setInterfaceColor(const QColor &color) { m_interfaceColor = color; }
+  QColor getInterfaceColor() const { return m_interfaceColor; }
+
   void setIconBaseColor(const QColor &color) { m_iconBaseColor = color; }
   QColor getIconBaseColor() const { return m_iconBaseColor; }
 
@@ -299,7 +309,14 @@ public:
   // Stylesheet Parsing
   void parseCustomPropertiesFromStylesheet(const QString &styleSheet);
   void setCustomProperty(const QString &name, const QString &value);
-  QString getCustomProperty(const QString &name) const;
+  QString getCustomProperty(const QString &name,
+                            const QString &defaultValue = QString()) const;
+
+  double getCustomPropertyDouble(const QString &name,
+                                 double defaultValue = 1.0) const;
+
+  QColor getCustomPropertyColor(const QString &name,
+                                const QColor &defaultValue = QColor()) const;
 
 private:
   // Constructor & Restriction
@@ -318,6 +335,11 @@ private:
   QHash<QString, QString> m_customProperties;
 
   // Theme Colors
+  double m_iconBaseOpacity;
+  double m_iconDisabledOpacity;
+
+  QColor m_interfaceColor;
+
   QColor m_iconBaseColor;
   QColor m_iconActiveColor;
   QColor m_iconOnColor;
