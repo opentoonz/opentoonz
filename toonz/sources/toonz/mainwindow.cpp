@@ -1715,9 +1715,9 @@ void MainWindow::defineActions() {
                        "new_scene");
   createMenuFileAction(MI_LoadScene, QT_TR_NOOP("&Load Scene..."), "Ctrl+L",
                        "load_scene");
-  createMenuFileAction(MI_SaveAll, QT_TR_NOOP("&Save All"), "Ctrl+S",
+  createMenuFileAction(MI_SaveAll, QT_TR_NOOP("&Save Project"), "Ctrl+S",
                        "saveall");
-  createMenuFileAction(MI_SaveScene, QT_TR_NOOP("&Save Scene Only"),
+  createMenuFileAction(MI_SaveScene, QT_TR_NOOP("&Save Scene"),
                        "Ctrl+Shift+S", "save_scene");
   createMenuFileAction(MI_SaveSceneAs, QT_TR_NOOP("&Save Scene As..."), "",
                        "save_scene_as");
