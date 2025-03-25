@@ -254,7 +254,6 @@ throw TException("Scan area too large, select a correct paper size");
       rasBuffer = TRasterGR8P(dimlx, dimly);
       buffer    = rasBuffer->getRawData();
       break;
-      break;
 #else
       ras       = TRasterGR8P(dimlx, dimly);
       bytes     = tceil(dimlx / 8) * dimly;
@@ -868,7 +867,6 @@ bool TScannerEpson::ESCI_doADF(bool on) {
   bool status1        = expectACK();
   return status1;
 
-  return 1;
   if (!ESCI_command_1b('e', 0x01, true)) {
     if (on)
       throw TException("Scanner error loading paper");
