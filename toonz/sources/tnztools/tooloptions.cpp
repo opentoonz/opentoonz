@@ -1767,6 +1767,10 @@ FillToolOptionsBox::FillToolOptionsBox(QWidget *parent, TTool *tool,
       dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Frame Range"));
   m_autopaintMode =
       dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Autopaint Lines"));
+  m_fillAutopaintGapsMode =
+      dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Fill Autopaint Gaps"));
+  m_fillNormalGapsMode = 
+      dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Fill Normal Gaps"));
 
   bool ret = connect(m_colorMode, SIGNAL(currentIndexChanged(int)), this,
                      SLOT(onColorModeChanged(int)));
@@ -1823,6 +1827,9 @@ void FillToolOptionsBox::onColorModeChanged(int index) {
   }
   enabled = range[index] != L"Lines" && !m_multiFrameMode->isChecked();
   m_onionMode->setEnabled(enabled);
+  enabled = range[index] == L"Area";
+  m_fillAutopaintGapsMode->setEnabled(enabled);
+  m_fillNormalGapsMode->setEnabled(enabled);
 }
 
 //-----------------------------------------------------------------------------
