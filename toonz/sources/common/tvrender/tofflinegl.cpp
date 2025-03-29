@@ -855,8 +855,7 @@ int TOfflineGL::getLy() const { return m_imp->getLy(); }
 
 namespace {
 
-struct DimensionLess final
-    : public std::binary_function<TDimension, TDimension, bool> {
+struct DimensionLess final {
   bool operator()(const TDimension &d1, const TDimension &d2) const {
     return d1.lx < d2.lx || (d1.lx == d2.lx && d1.ly < d2.ly);
   }
