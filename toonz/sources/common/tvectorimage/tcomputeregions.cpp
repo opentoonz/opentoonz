@@ -20,6 +20,7 @@
 #include "tcurveutil.h"
 
 #include <algorithm>
+#include <unordered_map>
 
 #if !defined(TNZ_LITTLE_ENDIAN)
 TNZ_LITTLE_ENDIAN undefined !!
@@ -3070,6 +3071,41 @@ void TVectorImage::replaceStroke(int index, TStroke *newStroke) {
 }
 
 //-----------------------------------------------------------------------------
+void TVectorImage::reOrderStrokes(const std::vector<int> &oldIndexes,
+                                  const std::vector<int> &newIndexes) {
+  assert(oldIndexes.size() == newIndexes.size());
+
+  int n = oldIndexes.size();
+  if (n == 0) return;
+
+  std::unordered_map<int, int> indexMap;
+  for (int i = 0; i < n; i++) {
+    indexMap[oldIndexes[i]] = newIndexes[i];
+  }
+
+  std::vector<VIStroke *> reorderedStrokes = m_imp->m_strokes;
+  for (int i = 0; i < n; i++) {
+    reorderedStrokes[newIndexes[i]] = m_imp->m_strokes[oldIndexes[i]];
+  }
+
+  m_imp->m_strokes = std::move(reorderedStrokes);
+
+  for (Intersection *p1 = m_imp->m_intersectionData->m_intList.first(); p1;
+       p1               = p1->next()) {
+    for (IntersectedStroke *p2 = p1->m_strokeList.first(); p2;
+         p2                    = p2->next()) {
+      auto it = indexMap.find(p2->m_edge.m_index);
+      if (it != indexMap.end()) {
+        p2->m_edge.m_index = it->second;
+      }
+    }
+  }
+
+#ifdef _DEBUG
+  checkIntersections();
+#endif
+}
+
 
 //-----------------------------------------------------------------------------
 
