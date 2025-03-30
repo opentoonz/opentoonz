@@ -554,6 +554,7 @@ class ThickChangeField final : public MeasuredValueField {
   Q_OBJECT
 
   SelectionTool *m_tool;
+  bool m_fixed;
 
 public:
   ThickChangeField(SelectionTool *tool, QString name);
@@ -561,6 +562,9 @@ public:
   ~ThickChangeField() {}
 
   void updateStatus();
+
+public slots:
+  void setFixedThick(bool fixed) { m_fixed = fixed; };
 
 protected slots:
   void onChange(TMeasuredValue *fld, bool addToUndo = true);
