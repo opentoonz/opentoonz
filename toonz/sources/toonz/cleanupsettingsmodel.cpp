@@ -458,7 +458,21 @@ void CleanupSettingsModel::onSceneSwitched() {
   TCleanupper::instance()->setParameters(params);
 
   // Finally, send notifications, deal with backups, etc.
-  restoreGlobalSettings();
+
+  // Make sure that the current cleanup palette is set to currentParams' palette
+  // This might refresh the StyleEditor
+  TApp::instance()
+      ->getPaletteController()
+      ->getCurrentCleanupPalette()
+      ->setPalette(params->m_cleanupPalette.getPointer());
+
+  m_clnPath = TFilePath();  // This Path won't be stored in scene or project
+  m_backupParams.assign(params, false);
+
+  if (m_previewersCount > 0 || m_cameraTestsCount > 0) rebuildPreview();
+
+  emit modelChanged(false);
+  emit clnLoaded();
 }
 
 //-----------------------------------------------------------------------
