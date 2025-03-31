@@ -547,24 +547,31 @@ void Naa2TlvConverter::findThinInks() {
   if (!m_regionRas || !m_borderRas || m_regions.empty()) return;
   for (int i = 0; i < m_regions.count(); i++) {
     RegionInfo &region = m_regions[i];
-    if (region.type != RegionInfo::Unknown) continue;
+    if (region.type != RegionInfo::Unknown) continue; // Skip already classified regions
+
     QList<int> &bs = region.boundaries;
-    if (bs.count() == 2)
+
+    if (bs.count() == 2) {
+      // If there are exactly 2 boundaries, classify as ThinInk
       region.type = RegionInfo::ThinInk;
-    else if (bs.count() == 3) {
-      continue;
-      if (bs[2] * 5 < bs[1]) region.type = RegionInfo::ThinInk;
+    } else if (bs.count() == 3) {
+      // If there are exactly 3 boundaries, classify as ThinInk if bs[2] is small compared to bs[1]
+      if (bs[2] * 5 < bs[1]) {
+        region.type = RegionInfo::ThinInk;
+      }
     } else {
-      continue;
+      // For other cases, calculate a threshold and classify as ThinInk if conditions are met
       int k = 1;
       int s = 0;
-      while (k < bs.count() && s * 100 < region.pixelCount * 90) s += bs[k++];
-      if (region.pixelCount > 100 && k <= 3)
-        region.type = RegionInfo::ThinInk;  // era Ink per qualche ragione
+      while (k < bs.count() && s * 100 < region.pixelCount * 90) {
+        s += bs[k++];
+      }
+      if (region.pixelCount > 100 && k <= 3) {
+        region.type = RegionInfo::ThinInk; // was Ink for some reason
+      }
     }
   }
 }
-
 //-----------------------------------------------------------------------------
 
 void Naa2TlvConverter::findPaints() {
