@@ -1,5 +1,3 @@
-
-
 #include "tfilepath_io.h"
 #include "tconvert.h"
 
@@ -10,20 +8,19 @@
 #include <fstream>
 #include <iostream>
 
-using namespace std;
 #ifdef _MSC_VER
 
 #include <io.h>
 #include <windows.h>
 
-/*!Return a pointer to a \b FILE, if exist. The file is opened using _wfopen_s,
+/*!Returns a pointer to a \b FILE, if it exists. The file is opened using _wfopen_s,
    documentation \b
    http://msdn2.microsoft.com/en-us/library/z5hh6ee9(VS.80).aspx.
-         \b fp is file path, \b mode is the way open, read ("r"), write ("w"),
+         \b fp is the file path, \b mode is the opening mode, read ("r"), write ("w"),
    ... , to
-         know mode view _wfopen_s documentation.
+         understand the mode, refer to _wfopen_s documentation.
 */
-FILE *fopen(const TFilePath &fp, string mode) {
+FILE *fopen(const TFilePath &fp, std::string mode) {
   FILE *pFile;
   errno_t err =
       _wfopen_s(&pFile, fp.getWideString().c_str(), ::to_wstring(mode).c_str());
@@ -31,10 +28,10 @@ FILE *fopen(const TFilePath &fp, string mode) {
   return pFile;
 }
 
-Tifstream::Tifstream(const TFilePath &fp) : ifstream(m_file = fopen(fp, "rb")) {
-  // manually set the fail bit here, since constructor ifstream::ifstream(FILE*)
-  // does not so even if the argument is null pointer.
-  // the state will be referred in "TIStream::operator bool()" ( in tstream.cpp )
+Tifstream::Tifstream(const TFilePath &fp) : std::ifstream(m_file = fopen(fp, "rb")) {
+  // Manually set the fail bit here, since the constructor ifstream::ifstream(FILE*)
+  // does not do so, even if the argument is a null pointer.
+  // The state will be checked in "TIStream::operator bool()" (in tstream.cpp)
   if (!m_file) setstate(failbit);
 }
 
@@ -51,10 +48,10 @@ void Tifstream::close() {
 }
 
 Tofstream::Tofstream(const TFilePath &fp, bool append_existing)
-    : ofstream(m_file = fopen(fp, append_existing ? "ab" : "wb")) {
-  // manually set the fail bit here, since constructor ofstream::ofstream(FILE*)
-  // does not so even if the argument is null pointer.
-  // the state will be referred in "TOStream::operator bool()" ( in tstream.cpp )
+    : std::ofstream(m_file = fopen(fp, append_existing ? "ab" : "wb")) {
+  // Manually set the fail bit here, since the constructor ofstream::ofstream(FILE*)
+  // does not do so, even if the argument is a null pointer.
+  // The state will be checked in "TOStream::operator bool()" (in tstream.cpp)
   if (!m_file) setstate(failbit);
 }
 
@@ -79,31 +76,30 @@ bool Tofstream::isOpen() const { return m_file != 0; }
 
 //======================
 //
-// Versione non windows
+// Non-Windows Version
 //
 //======================
 
-FILE *fopen(const TFilePath &fp, string mode) {
+FILE *fopen(const TFilePath &fp, std::string mode) {
   return fopen(QString::fromStdWString(fp.getWideString()).toUtf8().data(),
                mode.c_str());
 }
 
 Tifstream::Tifstream(const TFilePath &fp)
-    : ifstream(QString::fromStdWString(fp.getWideString()).toUtf8().data(),
-               ios::binary)
+    : std::ifstream(QString::fromStdWString(fp.getWideString()).toUtf8().data(),
+               std::ios::binary)
 /*: ifstream(openFileForReading(fp), ios::binary)
-NO! Questo costruttore non e' standard, anche se e' presente
-in molte versioni. Nel MAC non c'e e fa un cast a char*
-sperando che sia il nome del file => compila ma non funziona
+NO! This constructor is non-standard, although it is present in many versions. 
+In MAC, it doesn't exist and casts to char* expecting it to be the file name => compiles but doesn't work
 */
 {}
 
 Tifstream::~Tifstream() {}
 
 Tofstream::Tofstream(const TFilePath &fp, bool append_existing)
-    : ofstream(
+    : std::ofstream(
           QString::fromStdWString(fp.getWideString()).toUtf8().data(),
-          ios::binary | (append_existing ? ios_base::app : ios_base::trunc)) {}
+          std::ios::binary | (append_existing ? std::ios_base::app : std::ios_base::trunc)) {}
 
 Tofstream::~Tofstream() {}
 
