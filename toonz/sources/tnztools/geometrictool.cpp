@@ -2839,12 +2839,12 @@ void MultiArcPrimitive::leftButtonDrag(const TPointD &pos,
                                        const TMouseEvent &e) {
   switch (m_clickNumber) {
   case 0:
-    if ((tdistance2(m_startPoint, pos) < sq(7.0 * m_tool->getPixelSize())))
+    if ((tdistance2(m_startPoint, pos) < sq(10.0 * m_tool->getPixelSize())))
       return;
     break;
   case 1:
     if (m_undoCount != 1 &&
-        (tdistance2(m_endPoint, pos) < sq(7.0 * m_tool->getPixelSize())))
+        (tdistance2(m_endPoint, pos) < sq(10.0 * m_tool->getPixelSize())))
       return;
     break;
   }
