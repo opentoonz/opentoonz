@@ -9,6 +9,8 @@
 
 #define RGBA_ORDER_OF_TOONZ6
 
+#include <cassert>
+
 namespace igs {
 namespace image {
 #if defined RGBA_ORDER_OF_TOONZ6
@@ -32,8 +34,7 @@ namespace rgb {
 enum num { red = 0, gre, blu, siz };
 }
 #else
-Must be define / DRGBA_ORDER_OF_TOONZ6 or
-    / DRGBA_ORDER_OF_OPENGL
+Must be define /DRGBA_ORDER_OF_TOONZ6 or /DRGBA_ORDER_OF_OPENGL
 #endif
 
 // Direct 3D, Apple Packed Pixel order
@@ -56,61 +57,52 @@ void copy_except_margin(const T *in, const int margin, T *out, const int hh,
   }
 }
 }  // namespace image
+
 namespace color {
 template <class T>
-double ref_value(const T *ref, const int cc, const int ref_max,
-                 const int ref_mode) {
+double ref_value(const T *ref, const int cc, const int ref_max, const int ref_mode) {
+  // Prevent divide-by-zero by checking ref_max
+  assert(ref_max != 0 && "ref_max must be non-zero to avoid division by zero");
+  if (ref_max == 0) {
+    return 0.0; // Safe fallback value
+  }
+
   if (igs::image::rgba::siz == cc) {
     using namespace igs::image::rgba;
     switch (ref_mode) {
     case 0:
       return static_cast<double>(ref[red]) / static_cast<double>(ref_max);
-      break;
     case 1:
       return static_cast<double>(ref[gre]) / static_cast<double>(ref_max);
-      break;
     case 2:
       return static_cast<double>(ref[blu]) / static_cast<double>(ref_max);
-      break;
     case 3:
       return static_cast<double>(ref[alp]) / static_cast<double>(ref_max);
-      break;
     case 4:
-      return /* 輝度(Luminance)(CCIR Rec.601) */
-          0.298912 * static_cast<double>(ref[red]) /
-              static_cast<double>(ref_max) +
-          0.586611 * static_cast<double>(ref[gre]) /
-              static_cast<double>(ref_max) +
-          0.114478 * static_cast<double>(ref[blu]) /
-              static_cast<double>(ref_max);
-      break;
+      // Luminance (CCIR Rec.601)
+      return 0.298912 * static_cast<double>(ref[red]) / static_cast<double>(ref_max) +
+             0.586611 * static_cast<double>(ref[gre]) / static_cast<double>(ref_max) +
+             0.114478 * static_cast<double>(ref[blu]) / static_cast<double>(ref_max);
     }
   } else if (igs::image::rgb::siz == cc) {
     using namespace igs::image::rgb;
     switch (ref_mode) {
     case 0:
       return static_cast<double>(ref[red]) / static_cast<double>(ref_max);
-      break;
     case 1:
       return static_cast<double>(ref[gre]) / static_cast<double>(ref_max);
-      break;
     case 2:
       return static_cast<double>(ref[blu]) / static_cast<double>(ref_max);
-      break;
     case 3:
-      return /* 輝度(Luminance)(CCIR Rec.601) */
-          0.298912 * static_cast<double>(ref[red]) /
-              static_cast<double>(ref_max) +
-          0.586611 * static_cast<double>(ref[gre]) /
-              static_cast<double>(ref_max) +
-          0.114478 * static_cast<double>(ref[blu]) /
-              static_cast<double>(ref_max);
-      break;
+      // Luminance (CCIR Rec.601)
+      return 0.298912 * static_cast<double>(ref[red]) / static_cast<double>(ref_max) +
+             0.586611 * static_cast<double>(ref[gre]) / static_cast<double>(ref_max) +
+             0.114478 * static_cast<double>(ref[blu]) / static_cast<double>(ref_max);
     }
   } else if (1 == cc) {
     return static_cast<double>(ref[0]) / static_cast<double>(ref_max);
   }
-  return 1.0;
+  return 1.0; // Default return if no conditions match
 }
 }  // namespace color
 }  // namespace igs

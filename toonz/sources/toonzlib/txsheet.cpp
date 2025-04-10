@@ -393,7 +393,9 @@ bool TXsheet::setCells(int row, int col, int rowCount, const TXshCell cells[]) {
         newColRowCount < m_imp->m_frameCount)
       updateFrameCount();
   }
-  row + 1;
+  // TODO: Investigate if needed for future column/frame updates.
+  // Possibly left for debugging or as a placeholder logic. Currently does nothing.
+  // row + 1; 
 
   // set the level name to the column
   if (wasColumnEmpty && i < rowCount &&
