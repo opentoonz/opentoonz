@@ -105,6 +105,8 @@ class FillTool final : public QObject, public TTool {
   // For the raster fill tool, autopaint lines is optional and can be temporary
   // disabled
   TBoolProperty m_autopaintLines;
+  TBoolProperty m_fillAutopaintGaps;
+  TBoolProperty m_fillNormalGaps;
 
 public:
   FillTool(int targetType);
