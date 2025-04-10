@@ -1003,7 +1003,7 @@ void DragSelectionTool::VectorChangeThicknessTool::changeImageThickness(
       for (int cp = 0; cp < (int)stroke.getControlPointCount(); ++cp) {
         double thickness =
             tcrop(data.m_tool.m_strokesThickness[s][cp] + data.m_newThickness,
-                  0.0, 255.0);
+                0.0, 255.0);
 
         TThickPoint point(TPointD(stroke.getControlPoint(cp)), thickness);
 
@@ -1031,6 +1031,35 @@ void DragSelectionTool::VectorChangeThicknessTool::changeImageThickness(
     std::for_each(strokeIdxs.begin(), strokeIdxs.end(),
       [&data](int s) { locals::changeThickness(data, s); });
   }
+}
+
+void DragSelectionTool::VectorChangeThicknessTool::setImageThickness(
+    TVectorImage &vi, double newFixedThickness) {
+  newFixedThickness = tcrop(newFixedThickness, 0.0, 255.0);
+
+  VectorSelectionTool *vsTool = static_cast<VectorSelectionTool *>(getTool());
+  const LevelSelection &levelSelection = vsTool->levelSelection();
+
+  std::vector<int> strokeIdxs;
+
+  if (levelSelection.isEmpty()) {
+    StrokeSelection *strokeSelection =
+        static_cast<StrokeSelection *>(m_tool->getSelection());
+    const std::set<int> &selectedStrokeIdxs = strokeSelection->getSelection();
+    strokeIdxs.assign(selectedStrokeIdxs.begin(), selectedStrokeIdxs.end());
+  } else {
+    strokeIdxs = getSelectedStrokes(vi, levelSelection);
+  }
+
+  std::for_each(strokeIdxs.begin(), strokeIdxs.end(),
+                [&newFixedThickness, &vi](int s) {
+                  TStroke &stroke = *vi.getStroke(s);
+                  for (int cp = 0; cp < stroke.getControlPointCount(); ++cp) {
+                    stroke.setControlPoint(
+                        cp, TThickPoint(TPointD(stroke.getControlPoint(cp)),
+                                        newFixedThickness));
+                  }
+                });
 }
 
 //-----------------------------------------------------------------------------
