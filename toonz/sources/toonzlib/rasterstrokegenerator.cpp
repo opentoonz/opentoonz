@@ -258,7 +258,8 @@ void RasterStrokeGenerator::placeOver(const TRasterCM32P &out,
                 std::max(outPix->getTone(), 255 - inPix->getTone()));
           }
         }
-      } else if (m_task == PAINTBRUSH) {
+      } 
+      else if (m_task == PAINTBRUSH) {
         if (!inPix->isPureInk()) continue;
         int paintIdx     = outPix->getPaint();
         bool changePaint = (!m_selective && !m_modifierLockAlpha) ||
@@ -300,8 +301,9 @@ void RasterStrokeGenerator::placeOver(const TRasterCM32P &out,
           int minTone = tone;
           for (int p = 0; p < 4; p++) {
             /*-- Count up the items that have darker lines (lower Tone) than the
-             * current pixel. --*/
-            if (neighbourPixels[p]->getTone() < tone) {
+             * current pixel, or same paint as current pixel. --*/
+            if (neighbourPixels[p]->getTone() < tone ||
+                (m_colorType == PAINT && neighbourPixels[p]->getPaint() != 0)) {
               count++;
               if (neighbourPixels[p]->getTone() < minTone)
                 minTone = neighbourPixels[p]->getTone();
@@ -311,7 +313,11 @@ void RasterStrokeGenerator::placeOver(const TRasterCM32P &out,
           /*--- If 3 or more surrounding pixels are darker, replace with the
            * minimum Tone ---*/
           if (count <= 2) continue;
+
+          if (m_colorType == INK)
           *outPix = TPixelCM32(inkId, outPix->getPaint(), minTone);
+          if (m_colorType == PAINT)
+            *outPix = TPixelCM32(inkId, inPix->getInk(), minTone);
         }
         /*--- When Invert is ON: Operation to trim protrusion ---*/
         else {
@@ -337,8 +343,8 @@ void RasterStrokeGenerator::placeOver(const TRasterCM32P &out,
           /*---  If 3 or more surrounding pixels are thinner, replace with the
            * maximum Tone ---*/
           if (count <= 2) continue;
-          *outPix = TPixelCM32((maxTone == 255) ? 0 : inkId, outPix->getPaint(),
-                               maxTone);
+            *outPix = TPixelCM32((maxTone == 255) ? 0 : inkId,
+                                 outPix->getPaint(), maxTone);
         }
       }
     }
