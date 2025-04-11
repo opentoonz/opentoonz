@@ -54,6 +54,7 @@ TEnv::IntVar V_VectorJoinStyle("InknpaintVectorJoinStyle", 1);
 TEnv::IntVar V_VectorMiterValue("InknpaintVectorMiterValue", 4);
 TEnv::DoubleVar V_BrushAccuracy("InknpaintBrushAccuracy", 20);
 TEnv::DoubleVar V_BrushSmooth("InknpaintBrushSmooth", 0);
+TEnv::IntVar V_BrushDrawOrder("InknpaintVectorDrawOrder", 2);
 TEnv::IntVar V_BrushBreakSharpAngles("InknpaintBrushBreakSharpAngles", 0);
 TEnv::IntVar V_BrushPressureSensitivity("InknpaintBrushPressureSensitivity", 1);
 TEnv::IntVar V_VectorBrushFrameRange("VectorBrushFrameRange", 0);
@@ -337,8 +338,26 @@ static void findMaxCurvPoints(TStroke *stroke, const float &angoloLim,
   }
 }
 
+namespace {
+
+enum DrawOrder { OverAll = 0, UnderAll, PaletteOrder };
+
+void getAboveStyleIdSet(int styleId, TPaletteP palette,
+                        QSet<int> &aboveStyles) {
+  if (!palette) return;
+  for (int p = 0; p < palette->getPageCount(); p++) {
+    TPalette::Page *page = palette->getPage(p);
+    for (int s = 0; s < page->getStyleCount(); s++) {
+      int tmpId = page->getStyleId(s);
+      if (tmpId == styleId) return;
+      if (tmpId != 0) aboveStyles.insert(tmpId);
+    }
+  }
+}
+}  // namespace
+
 static void addStroke(TTool::Application *application, const TVectorImageP &vi,
-                      TStroke *stroke, bool breakAngles, bool autoGroup,
+                      TStroke *stroke, DrawOrder drawOrder, bool breakAngles, bool autoGroup,
                       bool autoFill, bool frameCreated, bool levelCreated,
                       TXshSimpleLevel *sLevel = NULL,
                       TFrameId fid            = TFrameId::NO_FRAME) {
@@ -382,7 +401,20 @@ static void addStroke(TTool::Application *application, const TVectorImageP &vi,
       ImageUtils::getFillingInformationOverlappingArea(vi, *fillInformation,
                                                        stroke->getBBox());
       TStroke *str = new TStroke(*strokes[i]);
-      vi->addStroke(str);
+      switch (drawOrder) { 
+      default:
+      case OverAll:
+        vi->addStroke(str, true, false);
+        break;
+      case UnderAll:
+        vi->addStroke(str, true, false);
+        break;
+      case PaletteOrder:
+        QSet<int> aboveStyles;
+        getAboveStyleIdSet(str->getStyle(), vi->getPalette(), aboveStyles);
+        vi->addStrokeBelow(str, aboveStyles);
+        break;
+      }
       TUndoManager::manager()->add(new UndoPencil(str, fillInformation, sl, id,
                                                   frameCreated, levelCreated,
                                                   autoGroup, autoFill));
@@ -394,7 +426,21 @@ static void addStroke(TTool::Application *application, const TVectorImageP &vi,
     ImageUtils::getFillingInformationOverlappingArea(vi, *fillInformation,
                                                      stroke->getBBox());
     TStroke *str = new TStroke(*stroke);
-    vi->addStroke(str);
+    switch (drawOrder) {
+    default:
+    case OverAll:
+      vi->addStroke(str, true, false);
+      break;
+    case UnderAll:
+      vi->addStroke(str, true, true);
+      break;
+    case PaletteOrder:
+      QSet<int> aboveStyles;
+      getAboveStyleIdSet(str->getStyle(), vi->getPalette(), aboveStyles);
+      vi->addStrokeBelow(str, aboveStyles);
+      break;
+    }
+
     TUndoManager::manager()->add(new UndoPencil(str, fillInformation, sl, id,
                                                 frameCreated, levelCreated,
                                                 autoGroup, autoFill));
@@ -445,32 +491,15 @@ namespace {
 //-------------------------------------------------------------------
 
 void addStrokeToImage(TTool::Application *application, const TVectorImageP &vi,
-                      TStroke *stroke, bool breakAngles, bool autoGroup,
-                      bool autoFill, bool frameCreated, bool levelCreated,
-                      TXshSimpleLevel *sLevel = NULL,
-                      TFrameId id             = TFrameId::NO_FRAME) {
+                      TStroke *stroke, DrawOrder drawOrder, bool breakAngles,
+                      bool autoGroup, bool autoFill, bool frameCreated,
+                      bool levelCreated, TXshSimpleLevel *sLevel = NULL,
+                      TFrameId id = TFrameId::NO_FRAME) {
   QMutexLocker lock(vi->getMutex());
-  addStroke(application, vi.getPointer(), stroke, breakAngles, autoGroup,
-            autoFill, frameCreated, levelCreated, sLevel, id);
+  addStroke(application, vi.getPointer(), stroke, drawOrder, breakAngles,
+            autoGroup, autoFill, frameCreated, levelCreated, sLevel, id);
   // la notifica viene gia fatta da addStroke!
   // getApplication()->getCurrentTool()->getTool()->notifyImageChanged();
-}
-
-//---------------------------------------------------------------------------------------------------------
-
-enum DrawOrder { OverAll = 0, UnderAll, PaletteOrder };
-
-void getAboveStyleIdSet(int styleId, TPaletteP palette,
-                        QSet<int> &aboveStyles) {
-  if (!palette) return;
-  for (int p = 0; p < palette->getPageCount(); p++) {
-    TPalette::Page *page = palette->getPage(p);
-    for (int s = 0; s < page->getStyleCount(); s++) {
-      int tmpId = page->getStyleId(s);
-      if (tmpId == styleId) return;
-      if (tmpId != 0) aboveStyles.insert(tmpId);
-    }
-  }
 }
 
 //=========================================================================================================
@@ -499,6 +528,7 @@ ToonzVectorBrushTool::ToonzVectorBrushTool(std::string name, int targetType)
     , m_thickness("Size", 0, 1000, 0, 5)
     , m_accuracy("Accuracy:", 1, 100, 20)
     , m_smooth("Smooth:", 0, 50, 0)
+    , m_drawOrder("Draw Order")
     , m_preset("Preset:")
     , m_breakAngles("Break", true)
     , m_pressure("Pressure", true)
@@ -535,8 +565,13 @@ ToonzVectorBrushTool::ToonzVectorBrushTool(std::string name, int targetType)
   m_prop[0].bind(m_thickness);
   m_prop[0].bind(m_accuracy);
   m_prop[0].bind(m_smooth);
+  m_prop[0].bind(m_drawOrder);
   m_prop[0].bind(m_breakAngles);
   m_prop[0].bind(m_pressure);
+
+  m_drawOrder.addValue(L"Over All");
+  m_drawOrder.addValue(L"Under All");
+  m_drawOrder.addValue(L"Palette Order");
 
   m_prop[0].bind(m_frameRange);
   m_frameRange.addValue(L"Off");
@@ -569,7 +604,8 @@ ToonzVectorBrushTool::ToonzVectorBrushTool(std::string name, int targetType)
   m_joinStyle.addValue(BEVEL_WSTR, QString::fromStdWString(BEVEL_WSTR));
 
   m_prop[1].bind(m_miterJoinLimit);
-
+  
+  m_drawOrder.setId("DrawOrder");
   m_breakAngles.setId("BreakSharpAngles");
   m_frameRange.setId("FrameRange");
   m_snap.setId("Snap");
@@ -625,6 +661,10 @@ void ToonzVectorBrushTool::updateTranslation() {
   m_thickness.setQStringName(tr("Size"));
   m_accuracy.setQStringName(tr("Accuracy:"));
   m_smooth.setQStringName(tr("Smooth:"));
+  m_drawOrder.setQStringName(tr("Draw Order:"));
+  m_drawOrder.setItemUIName(L"Over All", tr("Over All"));
+  m_drawOrder.setItemUIName(L"Under All", tr("Under All"));
+  m_drawOrder.setItemUIName(L"Palette Order", tr("Palette Order"));
   m_preset.setQStringName(tr("Preset:"));
   m_preset.setItemUIName(CUSTOM_WSTR, tr("<custom>"));
   m_breakAngles.setQStringName(tr("Break"));
@@ -984,7 +1024,8 @@ void ToonzVectorBrushTool::inputSetBusy(bool busy) {
     TUndoManager::manager()->beginBlock();
     for(StrokeList::iterator i = strokes.begin(); i != strokes.end(); ++i) {
       TStroke *stroke = *i;
-      addStrokeToImage(app, vi, stroke, m_breakAngles.getValue(),
+      addStrokeToImage(app, vi, stroke, (DrawOrder)m_drawOrder.getIndex(),
+                       m_breakAngles.getValue(),
                       false, false, m_isFrameCreated, m_isLevelCreated);
 
       if ((Preferences::instance()->getGuidedDrawingType() == 1 ||
@@ -1260,12 +1301,14 @@ bool ToonzVectorBrushTool::doFrameRangeStrokes(
       if (!swapped && !drawFirstStroke) {
       } else
         addStrokeToImage(getApplication(), img, firstImage->getStroke(0),
+                         (DrawOrder)m_drawOrder.getIndex(),
                          breakAngles, autoGroup, autoFill, m_isFrameCreated,
                          m_isLevelCreated, sl, fid);
     } else if (t == 1) {
       if (swapped && !drawFirstStroke) {
       } else if (drawLastStroke)
         addStrokeToImage(getApplication(), img, lastImage->getStroke(0),
+                         (DrawOrder)m_drawOrder.getIndex(),
                          breakAngles, autoGroup, autoFill, m_isFrameCreated,
                          m_isLevelCreated, sl, fid);
     } else {
@@ -1273,7 +1316,8 @@ bool ToonzVectorBrushTool::doFrameRangeStrokes(
       assert(lastImage->getStrokeCount() == 1);
       TVectorImageP vi = TInbetween(firstImage, lastImage).tween(s);
       assert(vi->getStrokeCount() == 1);
-      addStrokeToImage(getApplication(), img, vi->getStroke(0), breakAngles,
+      addStrokeToImage(getApplication(), img, vi->getStroke(0),
+                       (DrawOrder)m_drawOrder.getIndex(), breakAngles,
                        autoGroup, autoFill, m_isFrameCreated, m_isLevelCreated,
                        sl, fid);
     }
@@ -1603,6 +1647,7 @@ bool ToonzVectorBrushTool::onPropertyChanged(std::string propertyName) {
       (propertyName == m_thickness.getName() ||
        propertyName == m_accuracy.getName() ||
        propertyName == m_smooth.getName() ||
+       propertyName == m_drawOrder.getName() ||
        propertyName == m_breakAngles.getName() ||
        propertyName == m_pressure.getName() ||
        propertyName == m_capStyle.getName() ||
@@ -1619,6 +1664,7 @@ bool ToonzVectorBrushTool::onPropertyChanged(std::string propertyName) {
     V_VectorBrushMaxSize       = m_thickness.getValue().second;
     V_BrushAccuracy            = m_accuracy.getValue();
     V_BrushSmooth              = m_smooth.getValue();
+    V_BrushDrawOrder           = m_drawOrder.getIndex();
     V_BrushBreakSharpAngles    = m_breakAngles.getValue();
     V_BrushPressureSensitivity = m_pressure.getValue();
     V_VectorCapStyle           = m_capStyle.getIndex();
@@ -1700,6 +1746,7 @@ void ToonzVectorBrushTool::loadPreset() {
         TDoublePairProperty::Value(preset.m_min, preset.m_max));
     m_accuracy.setValue(preset.m_acc, true);
     m_smooth.setValue(preset.m_smooth, true);
+    m_drawOrder.setIndex(preset.m_drawOrder);
     m_breakAngles.setValue(preset.m_breakAngles);
     m_pressure.setValue(preset.m_pressure);
     m_capStyle.setIndex(preset.m_cap);
@@ -1724,6 +1771,7 @@ void ToonzVectorBrushTool::addPreset(QString name) {
 
   preset.m_acc         = m_accuracy.getValue();
   preset.m_smooth      = m_smooth.getValue();
+  preset.m_drawOrder   = m_drawOrder.getIndex();
   preset.m_breakAngles = m_breakAngles.getValue();
   preset.m_pressure    = m_pressure.getValue();
   preset.m_cap         = m_capStyle.getIndex();
@@ -1768,6 +1816,7 @@ void ToonzVectorBrushTool::loadLastBrush() {
   m_accuracy.setValue(V_BrushAccuracy);
   m_pressure.setValue(V_BrushPressureSensitivity ? 1 : 0);
   m_smooth.setValue(V_BrushSmooth);
+  m_drawOrder.setIndex(V_BrushDrawOrder);
 
   // Properties not tracked with preset
   m_frameRange.setIndex(V_VectorBrushFrameRange);
@@ -1814,6 +1863,7 @@ VectorBrushData::VectorBrushData()
     , m_max(0.0)
     , m_acc(0.0)
     , m_smooth(0.0)
+    , m_drawOrder(PaletteOrder)
     , m_breakAngles(false)
     , m_pressure(false)
     , m_cap(0)
@@ -1828,6 +1878,7 @@ VectorBrushData::VectorBrushData(const std::wstring &name)
     , m_max(0.0)
     , m_acc(0.0)
     , m_smooth(0.0)
+    , m_drawOrder(PaletteOrder)
     , m_breakAngles(false)
     , m_pressure(false)
     , m_cap(0)
@@ -1848,6 +1899,9 @@ void VectorBrushData::saveData(TOStream &os) {
   os.closeChild();
   os.openChild("Smooth");
   os << m_smooth;
+  os.closeChild();
+  os.openChild("Draw_Order");
+  os << m_drawOrder;
   os.closeChild();
   os.openChild("Break_Sharp_Angles");
   os << (int)m_breakAngles;
@@ -1881,6 +1935,8 @@ void VectorBrushData::loadData(TIStream &is) {
       is >> m_acc, is.matchEndTag();
     else if (tagName == "Smooth")
       is >> m_smooth, is.matchEndTag();
+    else if (tagName == "Draw_Order")
+      is >> m_drawOrder, is.matchEndTag();
     else if (tagName == "Break_Sharp_Angles")
       is >> val, m_breakAngles = val, is.matchEndTag();
     else if (tagName == "Pressure_Sensitivity")
@@ -1942,7 +1998,7 @@ void VectorBrushPresetManager::save() {
   TOStream os(m_fp);
 
   os.openChild("version");
-  os << 1 << 20;
+  os << 1 << 21;
   os.closeChild();
 
   os.openChild("brushes");
