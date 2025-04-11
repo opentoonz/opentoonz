@@ -897,7 +897,23 @@ static void drawingSubstituion(int dir) {
   }
   int row = TTool::getApplication()->getCurrentFrame()->getFrame();
   int col = TTool::getApplication()->getCurrentColumn()->getColumnIndex();
-
+  if (col == -1) col = 0;
+  if (range.m_c0 == -1) range.m_c0 = 0;
+  if (!selected || 
+      (range.getColCount() == range.getRowCount() &&
+       range.getRowCount() == 1 )) {
+    auto xsh = TTool::getApplication()->getCurrentXsheet()->getXsheet();
+    int r1 = row;
+    if (!xsh->getCell(r1, col).isEmpty())
+      for (; xsh->getCell(r1, col) == xsh->getCell(r1 + 1, col); r1++);
+    if (r1 > row) {
+        selected = true;
+        range.m_c0 = range.m_c1 = col;
+        range.m_r0              = row;
+        range.m_r1              = r1;
+    }
+  }
+  
   DrawingSubtitutionUndo *undo =
       new DrawingSubtitutionUndo(dir, range, row, col, selected);
   TUndoManager::manager()->add(undo);

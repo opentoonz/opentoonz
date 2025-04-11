@@ -158,7 +158,8 @@ public:
                                                                         r1, c1);
         else
           getViewer()->getCellSelection()->selectCells(r0, c0, r1, c1);
-      } else {
+      } // Shift
+      else {
         if (m_modifier & Qt::ControlModifier)
           getViewer()->getCellKeyframeSelection()->selectCellsKeyframes(
               row, col, row, col);
@@ -2119,9 +2120,9 @@ public:
     if (e->keyboardModifiers() & Qt::ShiftModifier)
       m_type = INSERT_CELLS;
     else if (e->keyboardModifiers() & Qt::AltModifier)
-      m_type = OVERWRITE_CELLS;
-    else
       m_valid = canChange(row, col);
+    else
+      m_type = OVERWRITE_CELLS;
     m_curPos = pos;
     refreshCellsArea();
   }
@@ -2148,12 +2149,25 @@ public:
       IoCmd::loadResources(args);
     } else if (!m_data->m_levels.empty()) {
       int i;
-      for (i = 0; i < (int)m_data->m_levels.size(); i++) {
-        TXshSimpleLevel *sl        = m_data->m_levels[i].first.getPointer();
-        std::vector<TFrameId> fids = m_data->m_levels[i].second;
-        if (!sl || fids.empty()) continue;
+      // Change hold cells when there are only one frame
+      if (overWrite && m_data->m_levels.size() == 1 &&
+          m_data->m_levels[0].second.size() == 1) {
+        TXshSimpleLevel *sl        = m_data->m_levels[0].first.getPointer();
+        std::vector<TFrameId> fids = m_data->m_levels[0].second;
+        if (!sl || fids.empty()) return;
+        auto xsh = TTool::getApplication()->getCurrentXsheet()->getXsheet();
+        int r1 = row;
+        if (!xsh->getCell(r1, col).isEmpty())
+          for (; xsh->getCell(r1, col) == xsh->getCell(r1 + 1, col);
+               fids.push_back(fids.front()), r1++);
         IoCmd::exposeLevel(sl, row, col, fids, insert, overWrite);
-      }
+      } else
+        for (i = 0; i < (int)m_data->m_levels.size(); i++) {
+          TXshSimpleLevel *sl        = m_data->m_levels[i].first.getPointer();
+          std::vector<TFrameId> fids = m_data->m_levels[i].second;
+          if (!sl || fids.empty()) continue;
+          IoCmd::exposeLevel(sl, row, col, fids, insert, overWrite);
+        }
     }
     refreshCellsArea();
   }
