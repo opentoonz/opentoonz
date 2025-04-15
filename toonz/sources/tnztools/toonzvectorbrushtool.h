@@ -50,6 +50,7 @@ struct VectorBrushData final : public TPersist {
 
   std::wstring m_name;
   double m_min, m_max, m_acc, m_smooth;
+  int m_drawOrder;
   bool m_breakAngles, m_pressure;
   int m_cap, m_join, m_miter;
 
@@ -179,6 +180,7 @@ protected:
   TDoublePairProperty m_thickness;
   TDoubleProperty m_accuracy;
   TDoubleProperty m_smooth;
+  TEnumProperty m_drawOrder;
   TEnumProperty m_preset;
   TBoolProperty m_breakAngles;
   TBoolProperty m_pressure;
