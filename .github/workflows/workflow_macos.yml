@@ -23,7 +23,7 @@ jobs:
     timeout-minutes: 90
     # runs-on: macos-latest
     # avoid the headache of arm64 builds?
-    runs-on: macos-13
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
 
