@@ -574,6 +574,9 @@ void RasterPainter::flushRasterImages() {
         srcCm      = srcCm->clone();
         plt        = m_nodes[i].m_palette->clone();
         gapCheckIndex = plt->addStyle(TPixel::Magenta);
+        if (tc & ToonzCheck::eGap)
+          AreaFiller(srcCm).rectFill(m_nodes[i].m_savebox, 1, true, true,
+                                     false);
         if (tc & ToonzCheck::eAutoclose) {
           TAutocloser ac(srcCm, AutocloseDistance, AutocloseAngle,
                          gapCheckIndex, AutocloseOpacity);
@@ -582,12 +585,12 @@ void RasterPainter::flushRasterImages() {
           else
             ac.exec(m_currentImageId);
           if (tc & ToonzCheck::eGap) {
-            AreaFiller(srcCm).rectFill(m_nodes[i].m_savebox, gapCheckIndex,
+            int gapFillIndex =
+                plt->addStyle(TPixelRGBM32(244, 186, 148, 0xff));  // orange
+            plt->getStyle(gapFillIndex)->setFlags(1);
+            AreaFiller(srcCm).rectFill(m_nodes[i].m_savebox, gapFillIndex,
                                        true, true, false);
           }
-          if (tc & ToonzCheck::eGap)
-            AreaFiller(srcCm).rectFill(m_nodes[i].m_savebox, 1, true, true,
-                                       false);
         }
       } else
         plt = m_nodes[i].m_palette;
