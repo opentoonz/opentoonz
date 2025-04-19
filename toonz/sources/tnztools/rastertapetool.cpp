@@ -206,8 +206,8 @@ public:
 
   //------------------------------------------------------------
   /*--  AutoClose Returns true if executed, false otherwise --*/
-  bool applyAutoclose(const TToonzImageP &ti, const TRectD &selRect = TRectD(),
-                      TStroke *stroke = 0) {
+  bool applyAutoclose(const TToonzImageP &ti, const TFrameId fid,
+                      const TRectD &selRect = TRectD(), TStroke *stroke = 0) {
     if (!ti) return false;
     // inizializzo gli AutocloseParameters
     AutocloseParameters params;
@@ -221,42 +221,64 @@ public:
     if (isInt(inkString)) inkIndex = std::stoi(inkString);
     params.m_inkIndex = inkIndex;
 
-    TPoint delta;
+    TPoint delta(0, 0);
     TRasterCM32P ras, raux = ti->getRaster();
-    if (m_closeType.getValue() == RECT_CLOSE && raux && !selRect.isEmpty()) {
-      TRectD selArea = selRect;
-      if (selRect.x0 > selRect.x1) {
-        selArea.x1 = selRect.x0;
-        selArea.x0 = selRect.x1;
-      }
-      if (selRect.y0 > selRect.y1) {
-        selArea.y1 = selRect.y0;
-        selArea.y0 = selRect.y1;
-      }
-      TRect myRect(ToonzImageUtils::convertWorldToRaster(selArea, ti));
-      ras   = raux->extract(myRect);
-      delta = myRect.getP00();
-    } else if ((m_closeType.getValue() == FREEHAND_CLOSE ||
-                m_closeType.getValue() == POLYLINE_CLOSE) &&
-               stroke) {
-      TRectD selArea = stroke->getBBox();
-      TRect myRect(ToonzImageUtils::convertWorldToRaster(selArea, ti));
-      ras   = raux->extract(myRect);
-      delta = myRect.getP00();
-    } else
+    TRectD selArea;
+    TRect myRect;
+
+    TXshSimpleLevel *sl =
+        TTool::getApplication()->getCurrentLevel()->getSimpleLevel();
+
+    std::vector<TAutocloser::Segment> segments;
+
+    bool useCache = TAutocloser::hasSegmentCache(sl->getImageId(fid));
+    if (useCache) segments = TAutocloser::getSegmentCache(sl->getImageId(fid));
+    std::wstring closeType = m_closeType.getValue();
+
+    if (useCache) {
       ras = raux;
+    } else {
+      bool hasRect = (closeType == RECT_CLOSE && raux && !selRect.isEmpty());
+      bool hasStroke =
+          ((closeType == FREEHAND_CLOSE || closeType == POLYLINE_CLOSE) &&
+           stroke);
+
+      if (hasRect || hasStroke) {
+        if (hasRect) {
+          selArea = TRectD(std::min(selRect.x0, selRect.x1),
+                           std::min(selRect.y0, selRect.y1),
+                           std::max(selRect.x0, selRect.x1),
+                           std::max(selRect.y0, selRect.y1));
+        } else {
+          selArea = stroke->getBBox();
+        }
+
+        myRect = ToonzImageUtils::convertWorldToRaster(selArea, ti);
+        TRect enlargedRect = myRect.enlarge(params.m_closingDistance);
+        ras                = raux->extract(enlargedRect);
+        delta              = enlargedRect.getP00();
+      } else {
+        ras = raux;
+      }
+    }
+
     if (!ras) return false;
 
     TAutocloser ac(ras, params.m_closingDistance, params.m_spotAngle,
                    params.m_inkIndex, params.m_opacity);
 
-    std::vector<TAutocloser::Segment> segments;
-    ac.compute(segments);
+    if (!useCache) ac.compute(segments);
 
-    if ((m_closeType.getValue() == FREEHAND_CLOSE ||
-         m_closeType.getValue() == POLYLINE_CLOSE) &&
-        stroke)
+    if (closeType == RECT_CLOSE && useCache) {
+      TRectD selAreaOrdered(
+          std::min(selRect.x0, selRect.x1), std::min(selRect.y0, selRect.y1),
+          std::max(selRect.x0, selRect.x1), std::max(selRect.y0, selRect.y1));
+      TRect rect = ToonzImageUtils::convertWorldToRaster(selAreaOrdered, ti);
+      checkSegments(segments, convert(rect), delta);
+    } else if ((closeType == FREEHAND_CLOSE || closeType == POLYLINE_CLOSE) &&
+               stroke) {
       checkSegments(segments, stroke, raux, delta);
+    };//Normal
 
     std::vector<TAutocloser::Segment> segments2(segments);
 
@@ -277,11 +299,8 @@ public:
       tileSet->add(raux, bbox);
     }
 
-    TXshSimpleLevel *sl =
-        TTool::getApplication()->getCurrentLevel()->getSimpleLevel();
-    TFrameId id = getCurrentFid();
     TUndoManager::manager()->add(
-        new RasterAutocloseUndo(tileSet, params, segments2, sl, id));
+        new RasterAutocloseUndo(tileSet, params, segments2, sl, fid));
     ac.draw(segments);
     ToolUtils::updateSaveBox();
     return true;
@@ -295,7 +314,7 @@ public:
   }
 
   //============================================================
-
+  
   void multiApplyAutoclose(TFrameId firstFid, TFrameId lastFid,
                            TRectD firstRect, TRectD lastRect,
                            TStroke *firstStroke = 0, TStroke *lastStroke = 0) {
@@ -338,11 +357,11 @@ public:
       if (!img) continue;
       double t = m > 1 ? (double)i / (double)(m - 1) : 0.5;
       if (m_closeType.getValue() == RECT_CLOSE)
-        applyAutoclose(img, interpolateRect(firstRect, lastRect, t));
+        applyAutoclose(img, fid, interpolateRect(firstRect, lastRect, t));
       else if ((m_closeType.getValue() == FREEHAND_CLOSE ||
                 m_closeType.getValue() == POLYLINE_CLOSE) &&
                firstStroke && lastStroke)
-        doClose(t, img, firstImage, lastImage);
+        doClose(t, fid, img, firstImage, lastImage);
       m_level->getProperties()->setDirtyFlag(true);
     }
     TUndoManager::manager()->endBlock();
@@ -354,22 +373,29 @@ public:
   }
 
   //----------------------------------------------------------------------
-
+  // Normal Mode
   void multiApplyAutoclose(TFrameId firstFrameId, TFrameId lastFrameId) {
-    int r0 = firstFrameId.getNumber();
-    int r1 = lastFrameId.getNumber();
-
-    if (r0 > r1) {
-      std::swap(r0, r1);
+    if (firstFrameId > lastFrameId) {
       std::swap(firstFrameId, lastFrameId);
     }
-    if ((r1 - r0) < 2) return;
+    if(firstFrameId > lastFrameId) return;
+
+    std::vector<TFrameId> allFids;
+    m_level->getFids(allFids);
+
+    std::vector<TFrameId>::iterator i0 = allFids.begin();
+    while (i0 != allFids.end() && *i0 < firstFrameId) i0++;
+    if (i0 == allFids.end()) return;
+    std::vector<TFrameId>::iterator i1 = i0;
+    while (i1 != allFids.end() && *i1 <= lastFrameId) i1++;
+    assert(i0 < i1);
+    std::vector<TFrameId> fids(i0, i1);
+    int m = fids.size();
 
     TUndoManager::manager()->beginBlock();
-    for (int i = r0; i <= r1; ++i) {
-      TFrameId fid(i);
+    for (auto fid : fids) {
       TImageP img = m_level->getFrame(fid, true);
-      applyAutoclose(img);
+      applyAutoclose(img, fid);
     }
     TUndoManager::manager()->endBlock();
 
@@ -421,7 +447,7 @@ public:
       }
 
       /*-- AutoCloseが実行されたか判定する --*/
-      if (!applyAutoclose(ti, m_selectingRect)) {
+      if (!applyAutoclose(ti, getCurrentFid(), m_selectingRect)) {
         if (m_stroke) {
           delete m_stroke;
           m_stroke = 0;
@@ -437,7 +463,7 @@ public:
       if (m_multi.getValue())
         multiAutocloseRegion(m_stroke, e);
       else
-        applyAutoclose(ti, TRectD(), m_stroke);
+        applyAutoclose(ti, getCurrentFid(), TRectD(), m_stroke);
       m_track.clear();
       invalidate();
     }
@@ -608,7 +634,7 @@ public:
       }
 
       m_selecting = false;
-      applyAutoclose(ti);
+      applyAutoclose(ti, getCurrentFid());
       invalidate();
       notifyImageChanged();
     }
@@ -635,7 +661,7 @@ public:
       if (m_multi.getValue())
         multiAutocloseRegion(m_stroke, e);
       else
-        applyAutoclose(ti, TRectD(), m_stroke);
+        applyAutoclose(ti, getCurrentFid(), TRectD(), m_stroke);
       invalidate();
     }
     if (m_stroke) {
@@ -767,9 +793,7 @@ public:
     vi.addStroke(app);
     vi.findRegions();
     std::vector<TAutocloser::Segment>::iterator it = segments.begin();
-    for (; it < segments.end(); it++) {
-      if (it == segments.end()) break;
-
+    while(it != segments.end()) {
       int i;
       bool isContained = false;
       for (i = 0; i < (int)vi.getRegionCount(); i++) {
@@ -777,19 +801,30 @@ public:
         if (reg->contains(convert(it->first + delta)) &&
             reg->contains(convert(it->second + delta))) {
           isContained = true;
-          break;
         }
       }
-      if (!isContained) {
+      if (!isContained)
         it = segments.erase(it);
-        if (it != segments.end() && it != segments.begin())
-          it--;
-        else if (it == segments.end())
-          break;
-      }
+      else ++it;
     }
   }
 
+  void checkSegments(std::vector<TAutocloser::Segment> &segments, TRectD rect,
+                     const TPoint &delta) {
+    std::vector<TAutocloser::Segment>::iterator it = segments.begin();
+    while (it != segments.end()) {
+      int i;
+      bool isContained = false;
+      if (rect.contains(convert(it->first + delta)) &&
+          rect.contains(convert(it->second+ delta))) {
+        isContained = true;
+      }
+      if (!isContained)
+        it = segments.erase(it);
+      else
+        ++it;
+    }
+  }
   //-------------------------------------------------------------------
 
   void multiAutocloseRegion(TStroke *stroke, const TMouseEvent &e) {
@@ -821,18 +856,19 @@ public:
 
   //------------------------------------------------------------------------
 
-  void doClose(double t, const TImageP &img, const TVectorImageP &firstImage,
+  void doClose(double t, const TFrameId id, const TImageP &img,
+               const TVectorImageP &firstImage,
                const TVectorImageP &lastImage) {
     if (t == 0)
-      applyAutoclose(img, TRectD(), firstImage->getStroke(0));
+      applyAutoclose(img, id, TRectD(), firstImage->getStroke(0));
     else if (t == 1)
-      applyAutoclose(img, TRectD(), lastImage->getStroke(0));
+      applyAutoclose(img, id, TRectD(), lastImage->getStroke(0));
     else {
       assert(firstImage->getStrokeCount() == 1);
       assert(lastImage->getStrokeCount() == 1);
       TVectorImageP vi = TInbetween(firstImage, lastImage).tween(t);
       assert(vi->getStrokeCount() == 1);
-      applyAutoclose(img, TRectD(), vi->getStroke(0));
+      applyAutoclose(img, id, TRectD(), vi->getStroke(0));
     }
   }
 
