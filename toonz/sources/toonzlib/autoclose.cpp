@@ -1127,6 +1127,10 @@ return 0;
 
 /*=============================================================================*/
 
+std::unordered_map<std::string, std::vector<TAutocloser::Segment>>
+    TAutocloser::m_cache;
+std::mutex TAutocloser::m_mutex;
+
 TAutocloser::TAutocloser(const TRasterP &r, int distance, double angle,
                          int index, int opacity)
     : m_imp(new Imp(r, distance, angle, index, opacity)) {}
@@ -1137,6 +1141,13 @@ void TAutocloser::exec() {
   std::vector<TAutocloser::Segment> segments;
   compute(segments);
   draw(segments);
+}
+
+void TAutocloser::exec(std::string id) {
+  std::vector<TAutocloser::Segment> segments;
+  compute(segments);
+  draw(segments);
+  setSegmentCache(id, std::move(segments));
 }
 
 //...............................

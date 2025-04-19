@@ -568,19 +568,27 @@ void RasterPainter::flushRasterImages() {
       m_nodes[i].m_palette->setFrame(m_nodes[i].m_frame);
 
       TPaletteP plt;
-      int styleIndex = -1;
+      int gapCheckIndex = -1;
       if ((tc & ToonzCheck::eGap || tc & ToonzCheck::eAutoclose) &&
           m_nodes[i].m_isCurrentColumn) {
         srcCm      = srcCm->clone();
         plt        = m_nodes[i].m_palette->clone();
-        styleIndex = plt->addStyle(TPixel::Magenta);
-        if (tc & ToonzCheck::eAutoclose)
-          TAutocloser(srcCm, AutocloseDistance, AutocloseAngle, styleIndex,
-                      AutocloseOpacity)
-              .exec();
-        if (tc & ToonzCheck::eGap)
-          AreaFiller(srcCm).rectFill(m_nodes[i].m_savebox, 1, true, true,
-                                     false);
+        gapCheckIndex = plt->addStyle(TPixel::Magenta);
+        if (tc & ToonzCheck::eAutoclose) {
+          TAutocloser ac(srcCm, AutocloseDistance, AutocloseAngle,
+                         gapCheckIndex, AutocloseOpacity);
+          if (ac.hasSegmentCache(m_currentImageId))
+            ac.draw(ac.getSegmentCache(m_currentImageId));
+          else
+            ac.exec(m_currentImageId);
+          if (tc & ToonzCheck::eGap) {
+            AreaFiller(srcCm).rectFill(m_nodes[i].m_savebox, gapCheckIndex,
+                                       true, true, false);
+          }
+          if (tc & ToonzCheck::eGap)
+            AreaFiller(srcCm).rectFill(m_nodes[i].m_savebox, 1, true, true,
+                                       false);
+        }
       } else
         plt = m_nodes[i].m_palette;
 
@@ -610,7 +618,7 @@ void RasterPainter::flushRasterImages() {
             settings.m_transpCheckPaint);
 
         settings.m_isOnionSkin = m_nodes[i].m_onionMode != Node::eOnionSkinNone;
-        settings.m_gapCheckIndex = styleIndex;
+        settings.m_gapCheckIndex = gapCheckIndex;
 
         TRop::quickPut(viewedRaster, srcCm, plt, aff, settings);
       }

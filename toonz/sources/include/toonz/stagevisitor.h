@@ -7,6 +7,7 @@
 #include "timage.h"
 #include "trastercm.h"
 #include "tgl.h"
+#include <string>
 
 // TnzExt includes
 #include "ext/plasticvisualsettings.h"
@@ -260,6 +261,7 @@ private:
   int m_maskLevel;
   bool m_singleColumnEnabled;
   bool m_checkFlags;
+  std::string m_currentImageId; // Used to update the autoClose cache
 
   // darken blended view mode for viewing the non-cleanuped and stacked drawings
   bool m_doRasterDarkenBlendedView;
@@ -293,7 +295,7 @@ public:
   bool isSingleColumnEnabled() const { return m_singleColumnEnabled; }
 
   void setRasterDarkenBlendedView(bool on) { m_doRasterDarkenBlendedView = on; }
-
+  void setCurrentImageId(std::string id) { m_currentImageId = id; }
   std::vector<TStroke *> &getGuidedStrokes() { return m_guidedStrokes; }
 };
 

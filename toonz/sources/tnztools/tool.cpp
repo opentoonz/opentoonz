@@ -34,6 +34,7 @@
 #include "toonz/dpiscale.h"
 #include "toonz/palettecontroller.h"
 #include "toonz/tonionskinmaskhandle.h"
+#include "toonz/autoclose.h"
 #include "toutputproperties.h"
 
 // TnzCore includes
@@ -682,7 +683,7 @@ TTool::Application *TTool::getApplication() {
 
 //-----------------------------------------------------------------------------
 
-/*! Notify change of current image: update icon and notify level change.
+/*! Notify change of current image: update icon & Closer and notify level change.
     If current object is a spline commit spline changed.
     If current mode is EditingLevel touch current frame.
 */
@@ -699,6 +700,8 @@ void TTool::notifyImageChanged() {
     if (!sl) return;
     TFrameId fid = m_application->getCurrentFrame()->getFid();
     sl->touchFrame(fid);
+    if (sl->getType() & TXshLevelType::RASTER_TYPE)
+      TAutocloser::invalidateSegmentCache(sl->getImageId(fid));
     // sl->setDirtyFlag(true);
     IconGenerator::instance()->invalidate(sl, fid);
     IconGenerator::instance()->invalidateSceneIcon();
@@ -721,6 +724,9 @@ void TTool::notifyImageChanged() {
       if (sl) {
         IconGenerator::instance()->invalidate(sl, cell.m_frameId);
         sl->touchFrame(cell.m_frameId);
+        if (sl->getType() & TXshLevelType::RASTER_TYPE)
+          TAutocloser::invalidateSegmentCache(
+              sl->getImageId(cell.m_frameId, 0));
         IconGenerator::instance()->invalidateSceneIcon();
       }
     }
@@ -730,7 +736,7 @@ void TTool::notifyImageChanged() {
 
 //-----------------------------------------------------------------------------
 
-/*! Notify change of image in \b fid: update icon and notify level change.
+/*! Notify change of image in \b fid: update Icon & Closer and notify level change.
  */
 void TTool::notifyImageChanged(const TFrameId &fid) {
   onImageChanged();
@@ -746,6 +752,8 @@ void TTool::notifyImageChanged(const TFrameId &fid) {
     sl->setDirtyFlag(true);
     IconGenerator::instance()->invalidate(sl, fid);
     IconGenerator::instance()->invalidateSceneIcon();
+    if (sl->getType() & TXshLevelType::RASTER_TYPE)
+      TAutocloser::invalidateSegmentCache(sl->getImageId(fid, 0));
   } else {
     int row = m_application->getCurrentFrame()->getFrame();
     int col = m_application->getCurrentColumn()->getColumnIndex();
@@ -761,6 +769,8 @@ void TTool::notifyImageChanged(const TFrameId &fid) {
       if (sl->m_rasterizePli)
         sl->touchFrame(fid);
       sl->setDirtyFlag(true);
+      if (sl->getType() & TXshLevelType::RASTER_TYPE)
+        TAutocloser::invalidateSegmentCache(sl->getImageId(fid, 0));
     }
   }
   m_application->getCurrentLevel()->notifyLevelChange();
