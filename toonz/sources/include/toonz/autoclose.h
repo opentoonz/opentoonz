@@ -9,6 +9,7 @@
 
 #include "tgeometry.h"
 #include "traster.h"
+#include <set>
 
 #undef DVAPI
 #undef DVVAR
@@ -25,7 +26,7 @@ public:
   typedef std::pair<TPoint, TPoint> Segment;
 
   TAutocloser(const TRasterP &r, int distance, double angle, int index,
-              int opacity);
+              int opacity,std::set<UINT> autoPaintStyles = std::set<UINT>());
   ~TAutocloser();
 
   // calcola i segmenti e li disegna sul raster
@@ -75,6 +76,7 @@ private:
   static std::unordered_map<std::string, std::vector<TAutocloser::Segment>>
       m_cache;
   static std::mutex m_mutex;
+  std::set<UINT> m_autoPaintStyles;
 
   // not implemented
   TAutocloser();

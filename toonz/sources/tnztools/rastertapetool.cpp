@@ -38,6 +38,7 @@ TEnv::DoubleVar AutocloseDistance("InknpaintAutocloseDistance", 10.0);
 TEnv::DoubleVar AutocloseAngle("InknpaintAutocloseAngle", 60.0);
 TEnv::IntVar AutocloseRange("InknpaintAutocloseRange", 0);
 TEnv::IntVar AutocloseOpacity("InknpaintAutocloseOpacity", 1);
+TEnv::IntVar AutocloseIgnoreAutoPaint("AutocloseIgnoreAutoPaint", 1);
 #define NORMAL_CLOSE L"Normal"
 #define RECT_CLOSE L"Rectangular"
 #define FREEHAND_CLOSE L"Freehand"
@@ -117,6 +118,7 @@ class RasterTapeTool final : public TTool {
   TStyleIndexProperty m_inkIndex;
   TIntProperty m_opacity;
   TPropertyGroup m_prop;
+  TBoolProperty m_ignoreAP;
   TBoolProperty m_multi;
   TFrameId m_firstFrameId, m_veryFirstFrameId;
   bool m_isXsheetCell;
@@ -141,6 +143,7 @@ public:
       , m_inkIndex("Style Index:", L"current")  // W_ToolOptions_InkIndex
       , m_opacity("Opacity:", 1, 255, 255)
       , m_multi("Frame Range", false)  // W_ToolOptions_FrameRange
+      , m_ignoreAP("Ignore AutoPaint Inks", true)
       , m_selecting(false)
       , m_selectingRect()
       , m_firstRect()
@@ -165,7 +168,9 @@ public:
     m_prop.bind(m_angle);
     m_prop.bind(m_inkIndex);
     m_prop.bind(m_opacity);
+    m_prop.bind(m_ignoreAP);
     m_multi.setId("FrameRange");
+    m_ignoreAP.setId("IgnoreautoPaintInks");
     m_closeType.setId("Type");
   }
 
@@ -187,6 +192,7 @@ public:
     m_inkIndex.setValue(tr("current").toStdWString());
     m_opacity.setQStringName(tr("Opacity:"));
     m_multi.setQStringName(tr("Frame Range"));
+    m_ignoreAP.setQStringName(tr("Ignore AutoPaint Inks"));
     m_angle.setQStringName(tr("Angle:"));
   }
 
@@ -515,6 +521,25 @@ public:
       m_track.drawAllFragments();
     } else if (m_multi.getValue() && m_firstFrameSelected)
       drawCross(m_firstPoint, 5);
+
+    //if (ToonzCheck::instance()->getChecks() & ToonzCheck::eAutoclose) {
+    //  auto fid = getCurrentFid();
+    //    auto Id =
+    //      getApplication()->getCurrentLevel()->getSimpleLevel()->getImageId(
+    //          fid, 0);
+    //  if (TAutocloser::hasSegmentCache(Id)) {
+    //    auto ti        = (TToonzImageP)m_level->getFrame(fid, false);
+    //    if (!ti) return;
+    //    TPointD center = ti->getRaster()->getCenterD();
+    //      tglColor(TPixel32::Red);
+    //    for (auto seg : TAutocloser::getSegmentCache(Id)) {
+    //      TPointD centerPos = convert((seg.first + seg.second) / 2) - center;
+    //      double radius     = std::sqrt(norm2(seg.first - seg.second)) / 2.0;
+    //      tglDrawCircle(centerPos, radius);
+    //    }
+    //  }
+    //}
+
   }
 
   //------------------------------------------------------------
@@ -540,6 +565,10 @@ public:
     else if (propertyName == m_multi.getName()) {
       AutocloseRange = (int)((m_multi.getValue()));
       resetMulti();
+    }
+
+    else if (propertyName == m_ignoreAP.getName()) {
+      AutocloseIgnoreAutoPaint = (int)(m_ignoreAP.getValue());
     }
 
     if (ToonzCheck::instance()->getChecks() & ToonzCheck::eAutoclose)

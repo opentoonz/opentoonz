@@ -405,6 +405,7 @@ TEnv::DoubleVar AutocloseDistance("InknpaintAutocloseDistance", 10.0);
 TEnv::DoubleVar AutocloseAngle("InknpaintAutocloseAngle", 60.0);
 TEnv::IntVar AutocloseInk("InknpaintAutocloseInk", 1);
 TEnv::IntVar AutocloseOpacity("InknpaintAutocloseOpacity", 255);
+TEnv::IntVar AutocloseIgnoreAutoPaint("AutocloseIgnoreAutoPaint", 1);
 
 //-----------------------------------------------------------------------------
 
@@ -578,8 +579,14 @@ void RasterPainter::flushRasterImages() {
           AreaFiller(srcCm).rectFill(m_nodes[i].m_savebox, 1, true, true,
                                      false);
         if (tc & ToonzCheck::eAutoclose) {
+          std::set<UINT> autoPaints;
+          if (AutocloseIgnoreAutoPaint) {
+            for (int i = 0; i < plt->getStyleCount(); i++)
+              if (plt->getStyle(i)->getFlags() != 0) autoPaints.insert(i);
+          }
           TAutocloser ac(srcCm, AutocloseDistance, AutocloseAngle,
-                         gapCheckIndex, AutocloseOpacity);
+                         gapCheckIndex, AutocloseOpacity,
+                         std::move(autoPaints));
           if (ac.hasSegmentCache(m_currentImageId))
             ac.draw(ac.getSegmentCache(m_currentImageId));
           else
