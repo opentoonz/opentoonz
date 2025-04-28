@@ -1246,9 +1246,9 @@ void AreaFillTool::draw() {
     glEnd();
     glPopMatrix();
   } else if ((m_type == FREEHAND || m_type == FREEPICK) && !m_track.isEmpty()) {
-    tglColor(TPixel::Red);
+    tglColor(TPixelRGBM32(128, 128, 255, 76));
     glPushMatrix();
-    m_track.drawAllFragments();
+    m_track.drawFilledStroke();
     glPopMatrix();
   }
 }
