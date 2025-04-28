@@ -21,12 +21,30 @@
 #define DVVAR DV_IMPORT_VAR
 #endif
 
+struct AutocloseSettings {
+  int m_closingDistance = 10;
+  double m_spotAngle    = 60.0;
+  int m_opacity         = 255;
+  bool m_ignoreAPInks        = true;
+
+  AutocloseSettings() = default;
+
+  AutocloseSettings(int distance, double angle, int opacity, bool ignoreAPInks)
+      : m_closingDistance(distance)
+      , m_spotAngle(angle)
+      , m_opacity(opacity)
+      , m_ignoreAPInks(ignoreAPInks) {}
+};
+
 class DVAPI TAutocloser {
 public:
   typedef std::pair<TPoint, TPoint> Segment;
 
   TAutocloser(const TRasterP &r, int distance, double angle, int index,
-              int opacity,std::set<UINT> autoPaintStyles = std::set<UINT>());
+              int opacity, std::set<int> autoPaintStyles = std::set<int>());
+
+  TAutocloser(const TRasterP &r, int ink, AutocloseSettings settings,
+              std::set<int> autoPaintStyles = std::set<int>());
   ~TAutocloser();
 
   // calcola i segmenti e li disegna sul raster
@@ -76,7 +94,7 @@ private:
   static std::unordered_map<std::string, std::vector<TAutocloser::Segment>>
       m_cache;
   static std::mutex m_mutex;
-  std::set<UINT> m_autoPaintStyles;
+  std::set<int> m_autoPaintStyles;
 
   // not implemented
   TAutocloser();

@@ -397,18 +397,6 @@ void RasterPainter::disableMask() {
   TStencilControl::instance()->disableMask();
 }
 
-//-----------------------------------------------------------------------------
-
-//-----------------------------------------------------------------------------
-
-TEnv::DoubleVar AutocloseDistance("InknpaintAutocloseDistance", 10.0);
-TEnv::DoubleVar AutocloseAngle("InknpaintAutocloseAngle", 60.0);
-TEnv::IntVar AutocloseInk("InknpaintAutocloseInk", 1);
-TEnv::IntVar AutocloseOpacity("InknpaintAutocloseOpacity", 255);
-TEnv::IntVar AutocloseIgnoreAutoPaint("AutocloseIgnoreAutoPaint", 1);
-
-//-----------------------------------------------------------------------------
-
 int RasterPainter::getNodesCount() { return m_nodes.size(); }
 
 //-----------------------------------------------------------------------------
@@ -579,14 +567,14 @@ void RasterPainter::flushRasterImages() {
           AreaFiller(srcCm).rectFill(m_nodes[i].m_savebox, 1, true, true,
                                      false);
         if (tc & ToonzCheck::eAutoclose) {
-          std::set<UINT> autoPaints;
-          if (AutocloseIgnoreAutoPaint) {
+          auto settings = ToonzCheck::instance()->getAutocloseSettings();
+          std::set<int> autoPaints;
+          if (settings.m_ignoreAPInks) {
             for (int i = 0; i < plt->getStyleCount(); i++)
-              if (plt->getStyle(i)->getFlags() != 0) autoPaints.insert(i);
+              if (plt->getStyle(i)->getFlags() != 0)
+                  autoPaints.insert(i);
           }
-          TAutocloser ac(srcCm, AutocloseDistance, AutocloseAngle,
-                         gapCheckIndex, AutocloseOpacity,
-                         std::move(autoPaints));
+          TAutocloser ac(srcCm, gapCheckIndex,settings, std::move(autoPaints));
           if (ac.hasSegmentCache(m_currentImageId))
             ac.draw(ac.getSegmentCache(m_currentImageId));
           else

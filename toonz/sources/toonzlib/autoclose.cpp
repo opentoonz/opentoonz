@@ -1132,11 +1132,15 @@ std::unordered_map<std::string, std::vector<TAutocloser::Segment>>
     TAutocloser::m_cache;
 std::mutex TAutocloser::m_mutex;
 
-TAutocloser::TAutocloser(const TRasterP &r, int distance, double angle,
-                         int index, int opacity, std::set<UINT> autoPaints)
-    : m_imp(new Imp(r, distance, angle, index, opacity))
+TAutocloser::TAutocloser(const TRasterP &r, int distance, double angle, int ink,
+                         int opacity, std::set<int> autoPaints)
+    : m_imp(new Imp(r, distance, angle, ink, opacity))
     , m_autoPaintStyles(autoPaints) {}
 
+TAutocloser::TAutocloser(const TRasterP &r, int ink, const AutocloseSettings st,
+                         std::set<int> autoPaints)
+    : m_imp(new Imp(r, st.m_closingDistance, st.m_spotAngle, ink, st.m_opacity))
+    , m_autoPaintStyles(autoPaints) {}
 //...............................
 
 void TAutocloser::exec() {
@@ -1148,24 +1152,6 @@ void TAutocloser::exec() {
 void TAutocloser::exec(std::string id) {
   std::vector<TAutocloser::Segment> segments;
   compute(segments);
-  if (TRasterCM32P raux = (TRasterCM32P)m_imp->m_raster) {
-    if (!m_autoPaintStyles.empty()) {
-      segments.erase(
-          std::remove_if(segments.begin(), segments.end(),
-                         [&](const std::pair<TPoint, TPoint> &seg) {
-                           TPixelCM32 *pix1 =
-                               raux->pixels(seg.first.y) + seg.first.x;
-                           TPixelCM32 *pix2 =
-                               raux->pixels(seg.second.y) + seg.second.x;
-
-                           return m_autoPaintStyles.find(pix1->getInk()) !=
-                                      m_autoPaintStyles.end() ||
-                                  m_autoPaintStyles.find(pix2->getInk()) !=
-                                      m_autoPaintStyles.end();
-                         }),
-          segments.end());
-    }
-  }
   draw(segments);
   setSegmentCache(id, std::move(segments));
 }
@@ -1178,6 +1164,24 @@ TAutocloser::~TAutocloser() {}
 
 void TAutocloser::compute(std::vector<Segment> &closingSegmentArray) {
   m_imp->compute(closingSegmentArray);
+  if (TRasterCM32P raux = (TRasterCM32P)m_imp->m_raster) {
+    if (!m_autoPaintStyles.empty()) {
+      closingSegmentArray.erase(
+          std::remove_if(closingSegmentArray.begin(), closingSegmentArray.end(),
+                         [&](const std::pair<TPoint, TPoint> &seg) {
+                           TPixelCM32 *pix1 =
+                               raux->pixels(seg.first.y) + seg.first.x;
+                           TPixelCM32 *pix2 =
+                               raux->pixels(seg.second.y) + seg.second.x;
+
+                           return m_autoPaintStyles.find(pix1->getInk()) !=
+                                      m_autoPaintStyles.end() ||
+                                  m_autoPaintStyles.find(pix2->getInk()) !=
+                                      m_autoPaintStyles.end();
+                         }),
+          closingSegmentArray.end());
+    }
+  }
 }
 //-------------------------------------------------
 

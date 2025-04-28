@@ -37,8 +37,9 @@ TEnv::StringVar AutocloseVectorType("InknpaintAutocloseVectorType", "Normal");
 TEnv::DoubleVar AutocloseDistance("InknpaintAutocloseDistance", 10.0);
 TEnv::DoubleVar AutocloseAngle("InknpaintAutocloseAngle", 60.0);
 TEnv::IntVar AutocloseRange("InknpaintAutocloseRange", 0);
-TEnv::IntVar AutocloseOpacity("InknpaintAutocloseOpacity", 1);
+TEnv::IntVar AutocloseOpacity("InknpaintAutocloseOpacity", 255);
 TEnv::IntVar AutocloseIgnoreAutoPaint("AutocloseIgnoreAutoPaint", 1);
+
 #define NORMAL_CLOSE L"Normal"
 #define RECT_CLOSE L"Rectangular"
 #define FREEHAND_CLOSE L"Freehand"
@@ -172,6 +173,9 @@ public:
     m_multi.setId("FrameRange");
     m_ignoreAP.setId("IgnoreautoPaintInks");
     m_closeType.setId("Type");
+    ToonzCheck::instance()->setAutocloseSettings(
+        AutocloseDistance, AutocloseAngle, AutocloseOpacity,
+        AutocloseIgnoreAutoPaint);
   }
 
   //------------------------------------------------------------
@@ -570,6 +574,10 @@ public:
     else if (propertyName == m_ignoreAP.getName()) {
       AutocloseIgnoreAutoPaint = (int)(m_ignoreAP.getValue());
     }
+
+    ToonzCheck::instance()->setAutocloseSettings(
+        AutocloseDistance, AutocloseAngle, AutocloseOpacity,
+        AutocloseIgnoreAutoPaint);
 
     if (ToonzCheck::instance()->getChecks() & ToonzCheck::eAutoclose)
       notifyImageChanged();
