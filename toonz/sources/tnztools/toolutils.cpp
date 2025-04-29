@@ -230,7 +230,15 @@ void ToolUtils::drawCross(const TPointD &q, double pixelSize) {
   glEnd();
 }
 
+
 //-----------------------------------------------------------------------------
+void ToolUtils::drawLine(const TPointD &p0, const TPointD p1) {
+  glBegin(GL_LINE_STRIP);
+  glVertex2d(p0.x, p0.y);
+  glVertex2d(p1.x, p1.y);
+  glEnd();
+}
+    //-----------------------------------------------------------------------------
 
 void ToolUtils::drawArrow(const TSegment &s, double pixelSize) {
   TPointD v, vn;

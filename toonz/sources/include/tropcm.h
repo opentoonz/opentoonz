@@ -94,6 +94,10 @@ DVAPI void makeIcon(TRasterCM32P &rout, const TRasterCM32P &rin);
 
 DVAPI void expandPaint(const TRasterCM32P &rasCM);
 
+DVAPI void putRefImage(const TRasterCM32P &Up, const TRaster32P &Ref,
+                       int style = -1);
+
+DVAPI void eraseRefInks(const TRasterCM32P &r);
 }  // namespace TRop
 
 #endif

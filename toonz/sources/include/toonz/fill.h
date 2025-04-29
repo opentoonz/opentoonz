@@ -3,8 +3,6 @@
 #ifndef T_FILL_INCLUDED
 #define T_FILL_INCLUDED
 
-class TPalette;
-
 #undef DVAPI
 #undef DVVAR
 #ifdef TOONZLIB_EXPORTS
@@ -16,6 +14,10 @@ class TPalette;
 #endif
 
 #include <set>
+#include "ttilesaver.h"
+#include "timage.h"
+
+class TPalette;
 
 class FillParameters {
 public:
@@ -63,7 +65,8 @@ class TTileSaverFullColor;
 
 // returns true if the savebox is changed typically, if you fill the bg)
 DVAPI bool fill(const TRasterCM32P &r, const FillParameters &params,
-                TTileSaverCM32 *saver = 0);
+                TTileSaverCM32 *saver  = 0,
+                const TRaster32P &ref = TRaster32P());
 
 DVAPI void fill(const TRaster32P &ras, const TRaster32P &ref,
                 const FillParameters &params, TTileSaverFullColor *saver = 0);
@@ -95,13 +98,15 @@ void DVAPI fullColorFill(const TRaster32P &ras, const FillParameters &params,
 class DVAPI AreaFiller {
   typedef TPixelCM32 Pixel;
   TRasterCM32P m_ras;
+  TRaster32P m_refRas;
+  TImageP m_ref;
   TRect m_bounds;
   Pixel *m_pixels;
   int m_wrap;
   int m_color;
-
+  
 public:
-  AreaFiller(const TRasterCM32P &ras);
+  AreaFiller(const TRasterCM32P &ras, const TImageP &ref = TImageP());
   ~AreaFiller();
   /*!
 Fill \b rect in raster with \b color.
@@ -119,7 +124,7 @@ else if \b fillInks is false fill only paint delimited by ink;
 else fill ink and paint in region contained in spline.
 */
   void strokeFill(TStroke *s, int color, bool onlyUnfilled, bool fillPaints,
-                  bool fillInks);
+                  bool fillInks, TPalette *plt);
 };
 
 class DVAPI FullColorAreaFiller {

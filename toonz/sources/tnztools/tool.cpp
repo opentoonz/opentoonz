@@ -738,16 +738,19 @@ void TTool::notifyImageChanged() {
 
 /*! Notify change of image in \b fid: update Icon & Closer and notify level change.
  */
-void TTool::notifyImageChanged(const TFrameId &fid) {
+void TTool::notifyImageChanged(const TFrameId &fid,
+                               TXshSimpleLevel *sl) {
   onImageChanged();
 
   if (!m_application) return;
 
   m_application->getCurrentScene()->setDirtyFlag(true);
   if (m_application->getCurrentFrame()->isEditingLevel()) {
-    TXshLevel *xl = m_application->getCurrentLevel()->getLevel();
-    if (!xl) return;
-    TXshSimpleLevel *sl = xl->getSimpleLevel();
+    if (!sl) {
+      TXshLevel *xl = m_application->getCurrentLevel()->getLevel();
+      if (!xl) return;
+      sl = xl->getSimpleLevel();
+    }
     if (!sl) return;
     sl->setDirtyFlag(true);
     IconGenerator::instance()->invalidate(sl, fid);
@@ -761,7 +764,7 @@ void TTool::notifyImageChanged(const TFrameId &fid) {
     TXsheet *xsh = m_application->getCurrentXsheet()->getXsheet();
     if (!xsh) return;
     TXshCell cell       = xsh->getCell(row, col);
-    TXshSimpleLevel *sl = cell.getSimpleLevel();
+    if(!sl) sl = cell.getSimpleLevel();
     if (sl) {
       IconGenerator::instance()->invalidate(sl, fid);
       IconGenerator::instance()->invalidateSceneIcon();

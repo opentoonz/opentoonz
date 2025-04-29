@@ -10,6 +10,7 @@
 #include "toonz/toonzimageutils.h"
 #include "skeletonlut.h"
 #include "tpixelutils.h"
+#include "tropcm.h"
 
 #include <stack>
 
@@ -38,7 +39,7 @@ void computeSeeds(const TRasterCM32P &r, TStroke *stroke,
 //-----------------------------------------------------------------------------
 
 void fillArea(const TRasterCM32P &ras, TRegion *r, int colorId,
-              bool onlyUnfilled, bool fillPaints, bool fillInks) {
+              bool onlyUnfilled, bool fillPaints, bool fillInks, TPalette *plt) {
   TRect bbox = convert(r->getBBox());
   bbox *= ras->getBounds();
   ras->lock();
@@ -55,6 +56,8 @@ void fillArea(const TRasterCM32P &ras, TRegion *r, int colorId,
       int to          = std::min(tceil(intersections[j + 1]), bbox.x1);
       TPixelCM32 *pix = line + from;
       for (int k = from; k < to; k++, pix++) {
+        if (plt && plt->getStyle(pix->getInk())->getFlags() != 0)
+          pix->setInk(colorId);
         if (fillPaints && (!onlyUnfilled || pix->getPaint() == 0))
           pix->setPaint(colorId);
         if (fillInks) pix->setInk(colorId);
@@ -117,12 +120,17 @@ bool areRectPixelsTransparent(TPixel32 *pixels, TRect rect, int wrap) {
 //=============================================================================
 // AreaFiller
 
-AreaFiller::AreaFiller(const TRasterCM32P &ras)
+AreaFiller::AreaFiller(const TRasterCM32P &ras, const TImageP &ref)
     : m_ras(ras)
     , m_bounds(ras->getBounds())
     , m_pixels(ras->pixels())
     , m_wrap(ras->getWrap())
-    , m_color(0) {
+    , m_color(0)
+    , m_refRas() {
+  ;
+  if (TRasterImageP ri = ref)
+    if (TRaster32P r = ri->getRaster())
+      m_refRas = r;
   m_ras->lock();
 }
 
@@ -165,10 +173,12 @@ bool AreaFiller::rectFill(const TRect &rect, int color, bool onlyUnfilled,
   if (!fillPaints) {
     assert(fillInks);
     assert(m_ras->getBounds().contains(rect));
+    if (m_refRas) TRop::putRefImage(m_ras, m_refRas);
     for (int y = rect.y0; y <= rect.y1; y++) {
       TPixelCM32 *pix = m_ras->pixels(y) + rect.x0;
       for (int x = rect.x0; x <= rect.x1; x++, pix++) pix->setInk(color);
     }
+    if (m_refRas) TRop::eraseRefInks(m_ras);
     return true;
   }
 
@@ -191,6 +201,8 @@ bool AreaFiller::rectFill(const TRect &rect, int color, bool onlyUnfilled,
   // contenuti nel rettangolo sono pure paint non deve fare nulla!
   if (!rect.contains(m_bounds) && areRectPixelsPurePaint(m_pixels, r, m_wrap))
     return false;
+
+  if (m_refRas) TRop::putRefImage(m_ras, m_refRas);
 
   // Viene riempito frameSeed con tutti i paint delle varie aree del rettangolo
   // di contorno.
@@ -269,15 +281,18 @@ bool AreaFiller::rectFill(const TRect &rect, int color, bool onlyUnfilled,
       params.m_styleId = frameSeed[count1++];
       fill(m_ras, params);
     }
+
+  if (m_refRas) TRop::eraseRefInks(m_ras);
   return true;
 }
 
 //-----------------------------------------------------------------------------
 
 void AreaFiller::strokeFill(TStroke *stroke, int colorId, bool onlyUnfilled,
-                            bool fillPaints, bool fillInks) {
+                            bool fillPaints, bool fillInks, TPalette *plt) {
   stroke->transform(TTranslation(convert(m_ras->getCenter())));
   m_ras->lock();
+  if (m_refRas) TRop::putRefImage(m_ras, m_refRas);
 
   std::vector<std::pair<TPoint, int>> seeds;
   computeSeeds(m_ras, stroke, seeds);
@@ -287,11 +302,12 @@ void AreaFiller::strokeFill(TStroke *stroke, int colorId, bool onlyUnfilled,
   app.findRegions();
   for (UINT i = 0; i < app.getRegionCount(); i++)
     fillArea(m_ras, app.getRegion(i), colorId, onlyUnfilled, fillPaints,
-             fillInks);
+             fillInks, plt);
   app.removeStroke(0);
 
   stroke->transform(TTranslation(convert(-m_ras->getCenter())));
   restoreColors(m_ras, seeds);
+  if (m_refRas) TRop::eraseRefInks(m_ras);
   m_ras->unlock();
 }
 

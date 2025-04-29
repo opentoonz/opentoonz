@@ -6,12 +6,12 @@
 #include "tpalette.h"
 #include "tpixelutils.h"
 #include <stack>
+#include "tropcm.h"
 
 //-----------------------------------------------------------------------------
 namespace {  // Utility Function
-//-----------------------------------------------------------------------------
 
-inline TPoint nearestInkNotDiagonal(const TRasterCM32P &r, const TPoint &p) {
+    inline TPoint nearestInkNotDiagonal(const TRasterCM32P &r, const TPoint &p) {
   TPixelCM32 *buf = (TPixelCM32 *)r->pixels(p.y) + p.x;
 
   if (p.x < r->getLx() - 1 && (!(buf + 1)->isPurePaint()))
@@ -39,7 +39,7 @@ inline TPoint nearestInkNotDiagonal(const TRasterCM32P &r, const TPoint &p) {
 
 void fillRow(const TRasterCM32P &r, const TPoint &p, int &xa, int &xb,
              int paint, TPalette *palette, TTileSaverCM32 *saver,
-             bool prevailing = true) {
+             bool prevailing = true, bool refImagePut = false) {
   int tone, oldtone;
   TPixelCM32 *pix, *pix0, *limit, *tmp_limit;
 
@@ -156,12 +156,13 @@ void fillRow(const TRasterCM32P &r, const TPoint &p, int &xa, int &xb,
         if (pInk != TPoint(-1, -1)) {
           TPixelCM32 *pixInk =
               (TPixelCM32 *)r->getRawData() + (pInk.y * r->getWrap() + pInk.x);
-          if (pixInk->getInk() != paint &&
+          if (palette && pixInk->getInk() != paint &&
               palette->getStyle(pixInk->getInk())->getFlags() != 0)
             inkFill(r, pInk, paint, 0, saver);
         }
       }
-
+      if (refImagePut && pix->getInk() == TPixelCM32::getMaxInk())
+        pix->setInk(paint);
       pix->setPaint(paint);
     }
   }
@@ -364,7 +365,7 @@ bool floodCheck(const TPixel32 &clickColor, const TPixel32 *targetPix,
 //-----------------------------------------------------------------------------
 /*-- The return value is whether the saveBox has been updated or not. --*/
 bool fill(const TRasterCM32P &r, const FillParameters &params,
-          TTileSaverCM32 *saver) {
+          TTileSaverCM32 *saver, const TRaster32P &Ref) {
   TPixelCM32 *pix, *limit, *pix0, *oldpix;
   int oldy, xa, xb, xc, xd, dy;
   int oldxc, oldxd;
@@ -381,14 +382,24 @@ bool fill(const TRasterCM32P &r, const FillParameters &params,
   /*- Return if clicked outside the screen -*/
   if (!bbbox.contains(p)) return false;
   /*- If the same color has already been painted, return -*/
-  int paintAtClickedPos = (r->pixels(p.y) + p.x)->getPaint();
+  pix0                  = r->pixels(p.y) + p.x;
+  int paintAtClickedPos = pix0->getPaint();
   if (paintAtClickedPos == paint) return false;
   /*- If the "paint only transparent areas" option is enabled and the area is
    * already colored, return
    * -*/
-  if (params.m_emptyOnly && (r->pixels(p.y) + p.x)->getPaint() != 0)
+  if (params.m_emptyOnly && pix0->getPaint() != 0)
     return false;
 
+  bool refImagePut = Ref.getPointer();
+  if (refImagePut) {
+    if(saver) saver->save(Ref->getBounds());
+    TRop::putRefImage(r, Ref);
+  }
+  if (pix0->isPureInk()) {
+    if (refImagePut) TRop::eraseRefInks(r);
+    return false;
+  }
   assert(fillDepth >= 0 && fillDepth < 16);
 
   switch (TPixelCM32::getMaxTone()) {
@@ -420,7 +431,8 @@ bool fill(const TRasterCM32P &r, const FillParameters &params,
 
   std::stack<FillSeed> seeds;
 
-  fillRow(r, p, xa, xb, paint, params.m_palette, saver, params.m_prevailing);
+  fillRow(r, p, xa, xb, paint, params.m_palette, saver, params.m_prevailing,
+          refImagePut);
   seeds.push(FillSeed(xa, xb, y, 1));
   seeds.push(FillSeed(xa, xb, y, -1));
 
@@ -449,7 +461,7 @@ bool fill(const TRasterCM32P &r, const FillParameters &params,
           (pix->getPaint() != pix->getInk() ||
            pix->getPaint() == paintAtClickedPos)) {
         fillRow(r, TPoint(x, y), xc, xd, paint, params.m_palette, saver,
-                params.m_prevailing);
+                params.m_prevailing, refImagePut);
         if (xc < xa) seeds.push(FillSeed(xc, xa - 1, y, -dy));
         if (xd > xb) seeds.push(FillSeed(xb + 1, xd, y, -dy));
         if (oldxd >= xc - 1)
@@ -469,6 +481,8 @@ bool fill(const TRasterCM32P &r, const FillParameters &params,
     }
     if (oldxd > 0) seeds.push(FillSeed(oldxc, oldxd, y, dy));
   }
+
+  if (refImagePut) TRop::eraseRefInks(r);
 
   bool saveBoxChanged = false;
   for (int i = 0; i < 4; i++) {

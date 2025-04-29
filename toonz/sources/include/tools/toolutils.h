@@ -89,6 +89,10 @@ void drawCross(const TPointD &q, double pixelSize);
 
 //-----------------------------------------------------------------------------
 
+void drawLine(const TPointD &p0, const TPointD p1);
+
+//-----------------------------------------------------------------------------
+
 void drawArrow(const TSegment &s, double pixelSize);
 
 //-----------------------------------------------------------------------------
