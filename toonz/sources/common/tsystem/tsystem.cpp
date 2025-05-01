@@ -1,12 +1,10 @@
-
-
 #include "tsystem.h"
-
-using namespace std;
 
 #include <set>
 #include "tfilepath_io.h"
 #include "tconvert.h"
+
+#include <cwctype>  // Include the header for towlower
 
 #ifndef TNZCORE_LIGHT
 
@@ -154,7 +152,7 @@ TFilePath TSystem::getTempDir() {
 
 //------------------------------------------------------------
 
-TFilePath TSystem::getTestDir(string name) {
+TFilePath TSystem::getTestDir(std::string name) {
   return TFilePath("C:") + TFilePath(name);
 }
 
@@ -321,7 +319,7 @@ else
 /*
 #ifdef _WIN32
 
-wstring getFormattedMessage(DWORD lastError)
+std::wstring getFormattedMessage(DWORD lastError)
 {
 LPVOID lpMsgBuf;
 FormatMessage(
@@ -338,12 +336,12 @@ FormatMessage(
 
 int wSize = MultiByteToWideChar(0,0,(char*)lpMsgBuf,-1,0,0);
 if(!wSize)
-  return wstring();
+  return std::wstring();
 
 wchar_t* wBuffer = new wchar_t [wSize+1];
 MultiByteToWideChar(0,0,(char*)lpMsgBuf,-1,wBuffer,wSize);
 wBuffer[wSize]='\0';
-wstring wmsg(wBuffer);
+std::wstring wmsg(wBuffer);
 
 delete []wBuffer;
 LocalFree(lpMsgBuf);
@@ -409,13 +407,12 @@ void TSystem::hideFile(const TFilePath &fp) {
 
 //------------------------------------------------------------
 
-class CaselessFilepathLess final
-    : public std::binary_function<TFilePath, TFilePath, bool> {
+class CaselessFilepathLess final {
 public:
   bool operator()(const TFilePath &a, const TFilePath &b) const {
     // Perform case sensitive compare, fallback to case insensitive.
-    const wstring a_str = a.getWideString();
-    const wstring b_str = b.getWideString();
+    const std::wstring a_str = a.getWideString();
+    const std::wstring b_str = b.getWideString();
 
     unsigned int i   = 0;
     int case_compare = -1;
@@ -878,6 +875,7 @@ bool TSystem::renameImageSequence(const TFilePathSet &files,
       return false;
     }
   }
+  return true;
 }
 
 void TSystem::renameFileOrLevel_throw(const TFilePath &dst,
@@ -1045,10 +1043,10 @@ bool TSystem::showDocument(const TFilePath &path) {
   }
   return true;
 #else
-  string cmd = "open ";
-  string thePath(::to_string(path));
+  std::string cmd = "open ";
+  std::string thePath(::to_string(path));
   UINT pos = 0, count = 0;
-  // string newPath;
+  // std::string newPath;
   char newPath[2048];
 
   while (pos < thePath.size()) {
@@ -1060,10 +1058,23 @@ bool TSystem::showDocument(const TFilePath &path) {
   }
   newPath[count] = 0;
 
-  cmd = cmd + string(newPath);
+  cmd = cmd + std::string(newPath);
   system(cmd.c_str());
   return true;
 #endif
+}
+
+bool TSystem::isDLLBlackListed(QString dllFile) {
+  QStringList dllBlackList = {"lvcod64.dll", "ff_vfw.dll", "tsccvid64.dll",
+                              "hapcodec.dll"};
+
+  for (int x = 0; x < dllBlackList.count(); x++) {
+    if (dllFile.contains(dllBlackList.at(x), Qt::CaseInsensitive)) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 #else
@@ -1099,7 +1110,7 @@ TSystemException::TSystemException(const TFilePath &fname,
     : m_fname(fname), m_err(-1), m_msg(::to_wstring(msg)) {}
 //--------------------------------------------------------------
 
-TSystemException::TSystemException(const TFilePath &fname, const wstring &msg)
+TSystemException::TSystemException(const TFilePath &fname, const std::wstring &msg)
     : m_fname(fname), m_err(-1), m_msg(msg) {}
 
 //--------------------------------------------------------------
@@ -1108,5 +1119,5 @@ TSystemException::TSystemException(const std::string &msg)
     : m_fname(""), m_err(-1), m_msg(::to_wstring(msg)) {}
 //--------------------------------------------------------------
 
-TSystemException::TSystemException(const wstring &msg)
+TSystemException::TSystemException(const std::wstring &msg)
     : m_fname(""), m_err(-1), m_msg(msg) {}

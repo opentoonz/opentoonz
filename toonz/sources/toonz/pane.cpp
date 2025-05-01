@@ -36,6 +36,7 @@
 #include <QLineEdit>
 #include <QTextEdit>
 #include <QScreen>
+#include <QDebug>
 
 extern TEnv::StringVar EnvSafeAreaName;
 extern TEnv::IntVar EnvViewerPreviewBehavior;
@@ -244,23 +245,16 @@ TPanelTitleBarButton::TPanelTitleBarButton(QWidget *parent,
     , m_pressed(false)
     , m_buttonSet(0)
     , m_id(0) {
-  updatePixmaps();
-  setFixedSize(m_onPixmap.size() / m_onPixmap.devicePixelRatio());
-}
+  setMouseTracking(true);
 
-//-----------------------------------------------------------------------------
+  // Determine button size
+  m_baseSize = QSize(20, 18);
+  if (m_standardPixmapName.contains("preview", Qt::CaseInsensitive)) {
+    m_baseSize = QSize(30, 18);
+  }
 
-TPanelTitleBarButton::TPanelTitleBarButton(QWidget *parent,
-                                           const QPixmap &standardPixmap)
-    : QWidget(parent)
-    , m_onPixmap(standardPixmap)
-    , m_offPixmap(standardPixmap)
-    , m_overPixmap(standardPixmap)
-    , m_rollover(false)
-    , m_pressed(false)
-    , m_buttonSet(0)
-    , m_id(0) {
-  setFixedSize(m_onPixmap.size() / m_onPixmap.devicePixelRatio());
+  // Set initial size
+  setFixedSize(m_baseSize);
 }
 
 //-----------------------------------------------------------------------------
@@ -283,10 +277,19 @@ void TPanelTitleBarButton::setPressed(bool pressed) {
 
 //-----------------------------------------------------------------------------
 
+void TPanelTitleBarButton::setOffColor(const QColor &color) {
+  if (m_offColor != color) {
+    m_offColor = color;
+  }
+}
+
+QColor TPanelTitleBarButton::getOffColor() const { return m_offColor; }
+
+//-----------------------------------------------------------------------------
+
 void TPanelTitleBarButton::setOverColor(const QColor &color) {
   if (m_overColor != color) {
     m_overColor = color;
-    updatePixmaps();
   }
 }
 
@@ -297,7 +300,6 @@ QColor TPanelTitleBarButton::getOverColor() const { return m_overColor; }
 void TPanelTitleBarButton::setPressedColor(const QColor &color) {
   if (m_pressedColor != color) {
     m_pressedColor = color;
-    updatePixmaps();
   }
 }
 
@@ -308,7 +310,6 @@ QColor TPanelTitleBarButton::getPressedColor() const { return m_pressedColor; }
 void TPanelTitleBarButton::setFreezeColor(const QColor &color) {
   if (m_freezeColor != color) {
     m_freezeColor = color;
-    updatePixmaps();
   }
 }
 
@@ -319,7 +320,6 @@ QColor TPanelTitleBarButton::getFreezeColor() const { return m_freezeColor; }
 void TPanelTitleBarButton::setPreviewColor(const QColor &color) {
   if (m_previewColor != color) {
     m_previewColor = color;
-    updatePixmaps();
   }
 }
 
@@ -327,41 +327,59 @@ QColor TPanelTitleBarButton::getPreviewColor() const { return m_previewColor; }
 
 //-----------------------------------------------------------------------------
 
-void TPanelTitleBarButton::updatePixmaps() {
-  // Get background color used by some icons and states
-  QColor bgColor;
-  if (m_standardPixmapName.contains("freeze", Qt::CaseInsensitive)) {
-    bgColor = getFreezeColor();
-  } else if (m_standardPixmapName.contains("preview", Qt::CaseInsensitive)) {
-    bgColor = getPreviewColor();
-  } else {
-    bgColor = getPressedColor();
+void TPanelTitleBarButton::paintEvent(QPaintEvent *event) {
+  if (m_standardPixmapName.isEmpty()) return;
+
+  QPainter p(this);
+
+  // Determine icon state
+  QIcon::Mode mode   = m_rollover ? QIcon::Active : QIcon::Normal;
+  QIcon::State state = m_pressed ? QIcon::On : QIcon::Off;
+
+  // Get DPR and sizes
+  qreal dpr    = getDevicePixelRatio(this);
+  auto &tm     = ThemeManager::getInstance();
+  QSize iconSz = tm.getIconSize(m_standardPixmapName);
+  QSize physSz = iconSz * dpr;
+  QSize btnSz  = size() * dpr;
+
+  // Cache key with DPR
+  QString cacheKey =
+      generateCacheKey(m_standardPixmapName, btnSz, mode, state) +
+      QString::number(dpr);
+
+  // Try cache first
+  QPixmap finalPm = getFromPixmapCache(cacheKey);
+  if (finalPm.isNull()) {
+    QPixmap pm = SvgIconEngine(m_standardPixmapName, false, dpr, iconSz)
+                     .pixmap(iconSz, mode, state);
+    pm.scaled(iconSz, Qt::KeepAspectRatio);
+
+    if (!pm.isNull()) {
+      QColor bgColor = getOffColor();
+      if (m_pressed) {
+        if (m_standardPixmapName.contains("freeze")) {
+          bgColor = getFreezeColor();
+        } else if (m_standardPixmapName.contains("preview")) {
+          bgColor = getPreviewColor();
+        } else {
+          bgColor = getPressedColor();
+        }
+      } else if (m_rollover) {
+        bgColor = getOverColor();
+      }
+
+      pm.setDevicePixelRatio(dpr);
+      finalPm = expandPixmap(pm, btnSz, bgColor);
+      finalPm.setDevicePixelRatio(dpr);
+
+      addToPixmapCache(cacheKey, finalPm);
+    } else
+      return;
   }
 
-  ThemeManager &themeManager = ThemeManager::getInstance();
-  const qreal offOpacity     = themeManager.getOffOpacity();
-
-  // Compute icon
-  QImage baseImg = svgToImage(m_standardPixmapName);
-  baseImg        = themeManager.recolorBlackPixels(baseImg);
-  QImage onImg   = compositeImage(baseImg, QSize(), false, bgColor);
-  QImage offImg  = adjustImageOpacity(baseImg, offOpacity);
-  QImage overImg = compositeImage(baseImg, QSize(), false, getOverColor());
-
-  // Store in member variables
-  m_onPixmap   = convertImageToPixmap(onImg);
-  m_offPixmap  = convertImageToPixmap(offImg);
-  m_overPixmap = convertImageToPixmap(overImg);
-}
-
-//-----------------------------------------------------------------------------
-
-void TPanelTitleBarButton::paintEvent(QPaintEvent *event) {
-  QPainter painter(this);
-  painter.drawPixmap(0, 0,
-                     m_pressed    ? m_onPixmap
-                     : m_rollover ? m_overPixmap
-                                  : m_offPixmap);
+  p.setRenderHint(QPainter::SmoothPixmapTransform);
+  p.drawPixmap(0, 0, finalPm);
 }
 
 //-----------------------------------------------------------------------------
@@ -554,7 +572,6 @@ TPanelTitleBar::TPanelTitleBar(QWidget *parent,
     : QFrame(parent), m_closeButtonHighlighted(false) {
   setMouseTracking(true);
   setFocusPolicy(Qt::NoFocus);
-  generateCloseButtonPixmaps();
 }
 
 //-----------------------------------------------------------------------------
@@ -563,42 +580,17 @@ QSize TPanelTitleBar::minimumSizeHint() const { return QSize(20, 18); }
 
 //-----------------------------------------------------------------------------
 
-void TPanelTitleBar::generateCloseButtonPixmaps() {
-  // Icon theme vars
-  ThemeManager &themeManager = ThemeManager::getInstance();
-  const qreal offOpacity     = themeManager.getOffOpacity();
-
-  // Use overColor from stylesheet for bgColor of rollover
-  QColor overColor = getOverColor();
-
-  // Generate base icon image
-  QImage baseImg = generateIconImage("pane_close");
-  baseImg        = compositeImage(baseImg, QSize(20, 18));
-
-  // Off icon image
-  QImage offImg = adjustImageOpacity(baseImg, offOpacity);
-
-  // Over icon image
-  QImage overImg = compositeImage(baseImg, QSize(), false, overColor);
-
-  m_closeButtonPixmap     = convertImageToPixmap(offImg);
-  m_closeButtonOverPixmap = convertImageToPixmap(overImg);
-}
-
-//-----------------------------------------------------------------------------
-
 void TPanelTitleBar::paintEvent(QPaintEvent *) {
   QPainter painter(this);
   QRect rect = this->rect();
 
   bool isPanelActive;
-
   TPanel *dw = qobject_cast<TPanel *>(parentWidget());
   Q_ASSERT(dw != 0);
 
   if (!dw->isFloating()) {  // docked panel
     isPanelActive = dw->widgetInThisPanelIsFocused();
-  } else {                  // floating panel
+  } else {  // floating panel
     isPanelActive = isActiveWindow();
   }
 
@@ -612,25 +604,52 @@ void TPanelTitleBar::paintEvent(QPaintEvent *) {
   }
 
   if (dw->isFloating()) {
-    QPoint closeButtonPos(rect.right() - 19, rect.top());
+    QPoint btnPos(rect.right() - 19, rect.top());
+    qreal dpr    = getDevicePixelRatio(this);
+    QSize btnSz  = minimumSizeHint() * dpr;
+    QSize iconSz = QSize(16, 16);
 
-    if (m_closeButtonHighlighted)
-      painter.drawPixmap(closeButtonPos, m_closeButtonOverPixmap);
-    else
-      painter.drawPixmap(closeButtonPos, m_closeButtonPixmap);
+    // Icon mode and background color
+    bool highlighted = m_closeButtonHighlighted;
+    QIcon::Mode mode = highlighted ? QIcon::Active : QIcon::Normal;
+    QColor bgColor   = highlighted ? getCloseOverColor() : Qt::transparent;
+
+    // Cache key
+    QString cacheKey =
+        generateCacheKey("closewindow", btnSz, mode, QIcon::Off) +
+        QString::number(dpr);
+
+    // Check cache first
+    QPixmap finalPm = getFromPixmapCache(cacheKey);
+    if (!finalPm.isNull()) {
+      painter.drawPixmap(btnPos, finalPm);
+      return;
+    }
+
+    // Load icon at logical size
+    QPixmap pm = SvgIconEngine("closewindow", false, dpr, iconSz)
+                     .pixmap(iconSz, mode, QIcon::Off);
+    if (pm.isNull()) return;
+
+    pm.setDevicePixelRatio(dpr);
+    finalPm = expandPixmap(pm, btnSz, bgColor);
+    finalPm.setDevicePixelRatio(dpr);
+
+    // Cache and draw
+    addToPixmapCache(cacheKey, finalPm);
+    painter.drawPixmap(btnPos, finalPm);
   }
 }
 
 //-----------------------------------------------------------------------------
 
-void TPanelTitleBar::setOverColor(const QColor &color) {
-  if (m_overColor != color) {
-    m_overColor = color;
-    generateCloseButtonPixmaps();
+void TPanelTitleBar::setCloseOverColor(const QColor &color) {
+  if (m_closeOverColor != color) {
+    m_closeOverColor = color;
   }
 }
 
-QColor TPanelTitleBar::getOverColor() const { return m_overColor; }
+QColor TPanelTitleBar::getCloseOverColor() const { return m_closeOverColor; }
 
 //-----------------------------------------------------------------------------
 

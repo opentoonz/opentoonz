@@ -50,8 +50,12 @@ enum { Rule_Standard = 0, Rule_Custom };
 //-----------------------------------------------------------------------------
 
 QPixmap ProjectDvDirModelProjectNode::getPixmap(bool isOpen) const {
-  static QPixmap openProjectPixmap(generateIconPixmap("folder_project_on"));
-  static QPixmap closeProjectPixmap(generateIconPixmap("folder_project"));
+  static QPixmap openProjectPixmap =
+      createQIcon("folder_project")
+          .pixmap(QSize(18, 18), QIcon::Normal, QIcon::On);
+  static QPixmap closeProjectPixmap =
+      createQIcon("folder_project")
+          .pixmap(QSize(18, 18), QIcon::Normal, QIcon::Off);
   return isOpen ? openProjectPixmap : closeProjectPixmap;
 }
 
@@ -104,7 +108,9 @@ void ProjectDvDirModelRootNode::refreshChildren() {
       ProjectDvDirModelSpecialFileFolderNode *projectRootNode =
           new ProjectDvDirModelSpecialFileFolderNode(
               this, L"Project root (" + rootDir + L")", projectRoot);
-      projectRootNode->setPixmap(generateIconPixmap("folder_project_root"));
+      projectRootNode->setPixmap(
+          createQIcon("folder_project_root")
+              .pixmap(QSize(18, 18), QIcon::Normal, QIcon::Off));
       addChild(projectRootNode);
     }
 
@@ -452,7 +458,7 @@ void ProjectPopup::updateChooseProjectCombo() {
     }
   }
   // Add in project of current project if outside known Project root folders
-  auto currentProject = pm->getCurrentProject();
+  auto currentProject        = pm->getCurrentProject();
   TFilePath currentProjectFP = currentProject->getProjectPath();
   if (m_projectPaths.indexOf(currentProjectFP) == -1) {
     m_projectPaths.push_back(currentProjectFP);

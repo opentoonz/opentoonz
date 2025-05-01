@@ -50,7 +50,7 @@ bool isCuspPoint(const TPointD &p0, const TPointD &p1, const TPointD &p2) {
   p2_p1 = p2_p1 * (1.0 / n2);
 
   return (p0_p1 * p2_p1 > 0) ||
-         (fabs(cross(p0_p1, p2_p1)) > 0.09);  // more than 5‹ is yes
+         (fabs(cross(p0_p1, p2_p1)) > 0.09);  // more than 5Â° is yes
 
   // Distance-based check. Unscalable...
   // return
@@ -66,9 +66,9 @@ void insertPoint(TStroke *stroke, int indexA, int indexB) {
   int chunkCount = indexB - indexA;
   if (chunkCount % 2 == 0) return;
   double length = 0;
-  double firstW, lastW;
+  double firstW = 0.0, lastW = 0.0;
   for (j = indexA; j < indexB; j++) {
-    // cerco il chunk piu' lungo
+    // search for the longest chunk
     double w0 = stroke->getW(stroke->getChunk(j)->getP0());
     double w1;
     if (j == stroke->getChunkCount() - 1)
@@ -83,6 +83,7 @@ void insertPoint(TStroke *stroke, int indexA, int indexB) {
       length = length1 - length0;
     }
   }
+  // Insert a control point at the midpoint of the longest chunk
   stroke->insertControlPoints((firstW + lastW) * 0.5);
 }
 };  // namespace
@@ -219,7 +220,7 @@ void FlowLineStrokeStyle::drawStroke(const TColorFunction *cf,
 
   // Length and position of the stroke is in "actual size" (i.e. not in pixels).
   // 1unit = 1/53.3333inches
-  // Stroke‚Ì’·‚³‚âÀ•W‚ÍŽÀ¡i‚P’PˆÊ1/53.3333ƒCƒ“ƒ`j
+  // Strokeã®é•·ã•ã‚„åº§æ¨™ã¯å®Ÿå¯¸ï¼ˆï¼‘å˜ä½ï¼1/53.3333ã‚¤ãƒ³ãƒï¼‰
   double length = stroke->getLength();
   if (length <= 0) return;
 
@@ -270,7 +271,7 @@ void FlowLineStrokeStyle::drawStroke(const TColorFunction *cf,
   }
   insertPoint(tmpStroke, 0, secondChunk);
 
-  // thin lines amount ×ü‚Ì–{”
+  // thin lines amount ç´°ç·šã®æœ¬æ•°
   int count = 2 * (int)std::ceil(maxThickness * m_density) - 1;
 
   TPixel32 color;
@@ -316,15 +317,15 @@ void FlowLineStrokeStyle::drawStroke(const TColorFunction *cf,
     float2 *vp = vertBuf;
 
     for (int j = 0; j <= divAmount; j++, vp++) {
-      // current position ratio  ¡‚ÌÀ•W‚ÌŠ„‡ˆÊ’u
+      // current position ratio  ä»Šã®åº§æ¨™ã®å‰²åˆä½ç½®
       double t = double(j) / double(divAmount);
 
-      // position ratio on the stroke ƒXƒgƒ[ƒNã‚ÌratioˆÊ’u
+      // position ratio on the stroke ã‚¹ãƒˆãƒ­ãƒ¼ã‚¯ä¸Šã®ratioä½ç½®
       double w = t;
-      // unit vector perpendicular to the stroke ‰”’¼•ûŒü‚Ì’PˆÊƒxƒNƒgƒ‹
+      // unit vector perpendicular to the stroke é‰›ç›´æ–¹å‘ã®å˜ä½ãƒ™ã‚¯ãƒˆãƒ«
       TPointD v = rotate90(normalize(tmpStroke->getSpeed(w)));
       assert(0 <= w && w <= 1);
-      // position on the stroke ƒXƒgƒ[ƒNã‚ÌˆÊ’u
+      // position on the stroke ã‚¹ãƒˆãƒ­ãƒ¼ã‚¯ä¸Šã®ä½ç½®
       TPointD p = tmpStroke->getPoint(w);
 
       TPointD pos = p + v * maxThickness * widthRatio;

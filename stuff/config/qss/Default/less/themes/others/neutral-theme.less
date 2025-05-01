@@ -14,15 +14,13 @@
 
 // SETTINGS --------------------------------------------------------------------
 
-@ui-contrast: 1.1; // multiplier
+@ui-contrast: 1.4; // multiplier
 @border-contrast: 1.2; // multiplier
 
 @hover-adjust-amount: 1.2; // multiplier
 @pressed-adjust-amount: 1.2; // multiplier
 @disabled-amount: 40%; // percentage range: 0-100%
 
-@gradient-effect: false; // bool: show gradients on buttons
-@titlebar-gradient-effect: false; // bool: show gradients on titlebars
 @bold-titlebar-text: true; // bool
 @bold-label-text: true; // bool
 @bold-fxlabel-text: false; // bool
@@ -39,15 +37,19 @@
 @text-color-active: #e9e9e9;
 
 // Highlight
-@hl-color: #91c0ac;
-@hl-text-color: black;
-@lock-color: #ed7373;
+@hl-color: #ced7d8;
+@hl-text-color: rgb(0, 0, 0);
+@lock-color: #f16a6a;
 @preview-color: #d2cb67;
 
 // Label
 @normal-label-color: rgb(15, 15, 134);
 @error-label-color: rgba(255, 0, 0, 0.7);
-@fx-settings-label-color: rgb(0, 0, 0); // darkgreen would be too low contrast
+@fx-settings-label-color: rgb(0, 0, 0);
+
+// Icon Theme Colors
+@icon-base-color: @text-color;
+@icon-active-color: black;
 
 // -----------------------------------------------------------------------------
 // Tabs
@@ -59,17 +61,15 @@
 // -----------------------------------------------------------------------------
 // Menu
 // -----------------------------------------------------------------------------
-@menu-bg-color: lighten(@bg-color, 20%);
+@menu-bg-color: lighten(@bg-color, 10%);
 @menu-checkbox-border-color-hover: @checkbox-border-color;
 @menu-item-text-color-checked: @normal-label-color;
-@menu-item-bg-color-selected: lighten(@menu-bg-color, 15%);
-@menu-icon-checked-bg-color: lime;
 
 // -----------------------------------------------------------------------------
 // Button
 // -----------------------------------------------------------------------------
 @button-text-color: @text-color;
-@button-bg-color: lighten(@bg-color, 14%);
+@button-bg-color: lighten(@bg-color, 10%);
 @button-text-color-checked: @text-color-active;
 
 @button-border-color: darken(@bg-color, 14%);
@@ -86,6 +86,11 @@
 @toolbutton-border-color-checked: darken(@toolbutton-bg-color-checked, 40%);
 @toolbutton-border-color-checked-hover: @toolbutton-border-color-checked;
 @toolbutton-border-color-checked-disabled: darken(@bg-color, 8%);
+
+// Hover
+@toolbutton-text-color-hover: @hl-text-color;
+@toolbutton-bg-color-hover: mix(darken(@bg-color, 5%), @hl-color, 50%);
+@toolbutton-border-color-hover: @button-border-color-hover;
 
 // -----------------------------------------------------------------------------
 // Lockbutton
@@ -105,6 +110,7 @@
 @checkbox-bg-color-checked: black;
 @checkbox-border-color-checked: black;
 @checkbox-bg-color-checked-hover: lighten(@checkbox-bg-color-checked, 20% * @hover-adjust-amount);
+@checkbox-border-color-hover: @checkbox-border-color;
 
 // -----------------------------------------------------------------------------
 // Textfield

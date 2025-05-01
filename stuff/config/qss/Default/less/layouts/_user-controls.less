@@ -31,10 +31,6 @@ QComboBox {
   margin: 0;
   padding: 1 0 1 4;
 
-  & when (@gradient-effect = true) {
-    .gradient-effect-vertical();
-  }
-
   &:hover {
     background-color: @button-bg-color-hover;
     color: @button-text-color-hover;
@@ -113,10 +109,6 @@ QComboBox {
       border-left: 1 solid @border-color;
       border-top-right-radius: min(0, @button-border-radius - 1);
       border-bottom-right-radius: min(0, @button-border-radius - 1);
-
-      & when (@gradient-effect = true) {
-        .gradient-effect-vertical();
-      }
   
       &:hover {
         background-color: @button-bg-color-hover;
@@ -522,10 +514,6 @@ QTabBar {
     margin-bottom: 0;
     margin-left: 0;
     padding: 2 @h-padding 1 @h-padding;
-  
-    & when (@gradient-effect = true) {
-      .gradient-effect-vertical();
-    }
 
     &:hover {
       background-color: @tab-bg-color-hover;
@@ -572,12 +560,7 @@ QTabBar {
 // Square flat style: Palette, Style Editor, Fx Editor, etc.
 #TabBarContainer {
   background-color: @tabbar-bg-color;
-  qproperty-BottomAboveLineColor: @tabbar-bg-color;
   qproperty-BottomBelowLineColor: @border-color;
-
-  & when (@gradient-effect = true) {
-    .gradient-effect-vertical();
-  }
   
   & QTabBar {
     &::tab {
@@ -592,10 +575,6 @@ QTabBar {
       color: @tab-text-color;
       padding: @v-padding @h-padding;
       margin: 0;
-
-      & when (@gradient-effect = true) {
-        .gradient-effect-vertical();
-      }
     
       &:hover {
         background-color: @tab-bg-color-hover;

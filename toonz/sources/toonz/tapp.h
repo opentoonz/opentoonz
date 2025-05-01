@@ -27,6 +27,7 @@ class TMainWindow;
 class ComboViewerPanel;
 class SceneViewer;
 class XsheetViewer;
+class LocatorPopup;
 
 //=============================================================================
 // TXsheeHandle
@@ -83,6 +84,7 @@ class TApp final : public QObject,
 
   SceneViewer *m_activeViewer;
   XsheetViewer *m_xsheetViewer;
+  LocatorPopup *m_activeLocator;
 
   int m_autosavePeriod;  // minutes
   bool m_autosaveSuspended;
@@ -209,6 +211,14 @@ public:
   bool isSaveInProgress() { return m_saveInProgress; }
   void setSaveInProgress(bool inProgress) { m_saveInProgress = inProgress; }
 
+  void setActiveLocator(LocatorPopup *locator) {
+    if (m_activeLocator == locator) return;
+    m_activeLocator = locator;
+    emit activeLocatorChanged();
+  }
+
+  LocatorPopup *getActiveLocator() const { return m_activeLocator; }
+
 protected:
   bool eventFilter(QObject *obj, QEvent *event) override;
 
@@ -253,6 +263,7 @@ signals:
 
   void
   activeViewerChanged();  // TODO: put widgets-related stuffs in some new handle
+  void activeLocatorChanged();
 };
 
 #endif  // TAPP_H

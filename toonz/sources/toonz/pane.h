@@ -18,22 +18,21 @@ class TPanelTitleBarButton : public QWidget {
   // Filepath
   QString m_standardPixmapName;
 
-  // Pixmaps
-  QPixmap m_standardPixmap;
-  QPixmap m_onPixmap;
-  QPixmap m_offPixmap;
-  QPixmap m_overPixmap;
-
   // Colors
+  QColor m_offColor;
   QColor m_overColor;
   QColor m_pressedColor;
   QColor m_freezeColor;
   QColor m_previewColor;
 
+  QSize m_baseSize;
+  QColor m_bgColor;
+
   // Methods
   void updatePixmaps();
 
   // Stylesheet
+  Q_PROPERTY(QColor OffColor READ getOffColor WRITE setOffColor);
   Q_PROPERTY(QColor OverColor READ getOverColor WRITE setOverColor);
   Q_PROPERTY(QColor PressedColor READ getPressedColor WRITE setPressedColor);
   Q_PROPERTY(QColor FreezeColor READ getFreezeColor WRITE setFreezeColor);
@@ -48,13 +47,15 @@ protected:
 
 public:
   TPanelTitleBarButton(QWidget *parent, const QString &standardPixmapName);
-  TPanelTitleBarButton(QWidget *parent, const QPixmap &standardPixmap);
 
   //! call this method to make a radio button. id is the button identifier
   void setButtonSet(TPanelTitleBarButtonSet *buttonSet, int id);
   int getId() const { return m_id; }
 
   // Stylesheet
+  void setOffColor(const QColor &color);
+  QColor getOffColor() const;
+
   void setOverColor(const QColor &color);
   QColor getOverColor() const;
 
@@ -152,8 +153,7 @@ class TPanelTitleBar final : public QFrame {
   bool m_closeButtonHighlighted;
   std::vector<std::pair<QPoint, QWidget *>> m_buttons;
 
-  QColor m_titleColor, m_activeTitleColor, m_overColor;
-  QPixmap m_closeButtonPixmap, m_closeButtonOverPixmap;
+  QColor m_titleColor, m_activeTitleColor, m_closeOverColor;
 
 public:
   TPanelTitleBar(QWidget *parent                      = 0,
@@ -162,18 +162,16 @@ public:
   QSize sizeHint() const override { return minimumSizeHint(); }
   QSize minimumSizeHint() const override;
 
-  void generateCloseButtonPixmaps();
-
   // pos = widget position. n.b. if pos.x()<0 then origin is topright corner
   void add(const QPoint &pos, QWidget *widget);
-  
+
   QColor getTitleColor() const { return m_titleColor; }
   void setTitleColor(const QColor &color) { m_titleColor = color; }
   QColor getActiveTitleColor() const { return m_activeTitleColor; }
   void setActiveTitleColor(const QColor &color) { m_activeTitleColor = color; }
 
-  QColor getOverColor() const;
-  void setOverColor(const QColor &color);
+  QColor getCloseOverColor() const;
+  void setCloseOverColor(const QColor &color);
 
 protected:
   void resizeEvent(QResizeEvent *e) override;
@@ -190,7 +188,8 @@ protected:
   Q_PROPERTY(QColor TitleColor READ getTitleColor WRITE setTitleColor);
   Q_PROPERTY(QColor ActiveTitleColor READ getActiveTitleColor WRITE
                  setActiveTitleColor);
-  Q_PROPERTY(QColor OverColor READ getOverColor WRITE setOverColor);
+  Q_PROPERTY(
+      QColor CloseOverColor READ getCloseOverColor WRITE setCloseOverColor);
 
 signals:
 
@@ -249,10 +248,10 @@ public:
 
   TPanelTitleBar *getTitleBar() const { return m_panelTitleBar; }
 
-  virtual void reset(){};
+  virtual void reset() {};
 
   virtual int getViewType() { return -1; };
-  virtual void setViewType(int viewType){};
+  virtual void setViewType(int viewType) {};
 
   virtual bool widgetInThisPanelIsFocused() {
     // by default, check if the panel content itself has focus

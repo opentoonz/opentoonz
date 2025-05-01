@@ -169,7 +169,8 @@ StartupPopup::StartupPopup()
   m_removePresetBtn->setStyleSheet(
       "QPushButton { padding-left: 4px; padding-right: 4px;}");
   QLabel *label = new QLabel();
-  label->setPixmap(QPixmap(generateIconPixmap("opentoonz_logo")));
+  label->setPixmap(createQIcon("opentoonz_logo")
+                       .pixmap(QSize(315, 77), QIcon::Normal, QIcon::Off));
   m_projectBox->setObjectName("SolidLineFrame");
   m_scenesTab->setObjectName("SolidLineFrame");
   m_recentBox->setObjectName("SolidLineFrame");
@@ -629,7 +630,7 @@ void StartupPopup::updateProjectCB() {
     }
   }
   // Add in project of current project if outside known Project root folders
-  auto currentProject = pm->getCurrentProject();
+  auto currentProject        = pm->getCurrentProject();
   TFilePath currentProjectFP = currentProject->getProjectPath();
   if (m_projectPaths.indexOf(currentProjectFP) == -1) {
     m_projectPaths.push_back(currentProjectFP);
@@ -1234,8 +1235,8 @@ void StartupScenesList::clearScenes() { clear(); }
 void StartupScenesList::addScene(const QString &name, const QString &path) {
   QPixmap pixmap;
   if (path == ":")
-    pixmap = generateIconPixmap("new_scene", qreal(1.0), m_iconSize,
-                                Qt::KeepAspectRatio);
+    pixmap = createQIcon("new_scene", false)
+                 .pixmap(m_iconSize, QIcon::Normal, QIcon::Off);
   else
     pixmap = createScenePreview(name, TFilePath(path));
   QIcon icon(pixmap);

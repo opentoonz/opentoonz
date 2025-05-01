@@ -8,6 +8,9 @@
 #include "toonz/imagemanager.h"
 #include "toonz/tcamera.h"
 
+// ToonzLib includes
+#include "toonz/stage.h"
+
 //======================================================
 
 //  Forward declarations
@@ -41,12 +44,16 @@ public:
     //!< m_sl's subsampling property otherwise)
     bool m_icon;  //!< Whether the icon (if any) should be loaded instead
     
-    TCamera *currentCamera;//for Rasterizer
+    TPointD m_cameraDPI;  // for Rasterizer
 
   public:
     BuildExtData(const TXshSimpleLevel *sl, const TFrameId &fid, int subs = 0,
                  bool icon = false)
-        : m_sl(sl), m_fid(fid), m_subs(subs), m_icon(icon), currentCamera(nullptr) {}
+        : m_sl(sl)
+        , m_fid(fid)
+        , m_subs(subs)
+        , m_icon(icon)
+        , m_cameraDPI(Stage::inch, Stage::inch) {}
   };
 
 public:

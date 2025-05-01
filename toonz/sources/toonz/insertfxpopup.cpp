@@ -232,7 +232,7 @@ InsertFxPopup::InsertFxPopup()
           SLOT(onSearchTextChanged(const QString &)));
 
   m_fxTree = new FxTree();
-  m_fxTree->setIconSize(QSize(21, 18));
+  m_fxTree->setIconSize(QSize(18, 18));
   m_fxTree->setColumnCount(1);
   m_fxTree->header()->close();
 

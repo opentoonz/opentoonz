@@ -1,6 +1,8 @@
 
 
 #include "toonzqt/flipconsole.h"
+// Include shared flipbook settings (e.g., FlipBookWhiteBgToggle) from toonz/
+#include "toonz/flipbooksettings.h"
 
 // TnzQt includes
 #include "toonzqt/menubarcommand.h"
@@ -50,9 +52,6 @@ using namespace DVGui;
 //==========================================================================================
 //    Preliminary stuff - local namespace
 //==========================================================================================
-TEnv::IntVar FlipBookWhiteBgToggle("FlipBookWhiteBgToggle", 1);
-TEnv::IntVar FlipBookBlackBgToggle("FlipBookBlackBgToggle", 0);
-TEnv::IntVar FlipBookCheckBgToggle("FlipBookCheckBgToggle", 0);
 namespace {
 // Please refer to the "qss/standard/standard.qss" file for explanations of the
 // following properties.

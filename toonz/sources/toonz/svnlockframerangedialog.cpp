@@ -260,44 +260,31 @@ void SVNLockFrameRangeDialog::onCancelButtonClicked() {
 //-----------------------------------------------------------------------------
 
 void SVNLockFrameRangeDialog::onFromLineEditTextChanged() {
-  int value = m_fromLineEdit->getValue();
-
-  // Check if from is inside one range
-  int count = m_lockInfos.size();
-
-  m_fromIsValid = true;
-  for (int i = 0; i < count; i++) {
-    SVNPartialLockInfo lockInfo = m_lockInfos.at(i);
-    if (value >= lockInfo.m_from && value <= lockInfo.m_to) {
-      m_fromIsValid = false;
-      break;
+    unsigned int value = static_cast<unsigned int>(m_fromLineEdit->getValue());
+    m_fromIsValid = true;
+    for (const SVNPartialLockInfo& lockInfo : m_lockInfos) {
+        if (value >= lockInfo.m_from && value <= lockInfo.m_to) {
+            m_fromIsValid = false;
+            break;
+        }
     }
-  }
-
-  m_fromLineEdit->setStyleSheet(
-      m_fromIsValid ? "" : "color: red; background-color: red;");
-  m_lockButton->setEnabled(m_fromIsValid && m_toIsValid);
+    m_fromLineEdit->setStyleSheet(m_fromIsValid ? "" : "color: red; background-color: red;");
+    m_lockButton->setEnabled(m_fromIsValid && m_toIsValid);
 }
 
 //-----------------------------------------------------------------------------
 
 void SVNLockFrameRangeDialog::onToLineEditTextChanged() {
-  int value = m_toLineEdit->getValue();
-
-  // Check if from is inside one range
-  int count   = m_lockInfos.size();
-  m_toIsValid = true;
-  for (int i = 0; i < count; i++) {
-    SVNPartialLockInfo lockInfo = m_lockInfos.at(i);
-    if (value >= lockInfo.m_from && value <= lockInfo.m_to) {
-      m_toIsValid = false;
-      break;
+    unsigned int value = static_cast<unsigned int>(m_toLineEdit->getValue());
+    m_toIsValid = true;
+    for (const SVNPartialLockInfo& lockInfo : m_lockInfos) {
+        if (value >= lockInfo.m_from && value <= lockInfo.m_to) {
+            m_toIsValid = false;
+            break;
+        }
     }
-  }
-
-  m_toLineEdit->setStyleSheet(
-      m_toIsValid ? "" : "color: red; background-color: red;");
-  m_lockButton->setEnabled(m_fromIsValid && m_toIsValid);
+    m_toLineEdit->setStyleSheet(m_toIsValid ? "" : "color: red; background-color: red;");
+    m_lockButton->setEnabled(m_fromIsValid && m_toIsValid);
 }
 
 //-----------------------------------------------------------------------------
@@ -560,44 +547,31 @@ void SVNLockMultiFrameRangeDialog::onStatusRetrieved(
 //-----------------------------------------------------------------------------
 
 void SVNLockMultiFrameRangeDialog::onFromLineEditTextChanged() {
-  int value = m_fromLineEdit->getValue();
-
-  // Check if from is inside one range
-  int count = m_lockInfos.size();
-
-  m_fromIsValid = true;
-  for (int i = 0; i < count; i++) {
-    SVNPartialLockInfo lockInfo = m_lockInfos.at(i);
-    if (value >= lockInfo.m_from && value <= lockInfo.m_to) {
-      m_fromIsValid = false;
-      break;
+    unsigned int value = static_cast<unsigned int>(m_fromLineEdit->getValue());
+    m_fromIsValid = true;
+    for (const SVNPartialLockInfo& lockInfo : m_lockInfos) {
+        if (value >= lockInfo.m_from && value <= lockInfo.m_to) {
+            m_fromIsValid = false;
+            break;
+        }
     }
-  }
-
-  m_fromLineEdit->setStyleSheet(
-      m_fromIsValid ? "" : "color: red; background-color: red;");
-  m_lockButton->setEnabled(m_fromIsValid && m_toIsValid);
+    m_fromLineEdit->setStyleSheet(m_fromIsValid ? "" : "color: red; background-color: red;");
+    m_lockButton->setEnabled(m_fromIsValid && m_toIsValid);
 }
 
 //-----------------------------------------------------------------------------
 
 void SVNLockMultiFrameRangeDialog::onToLineEditTextChanged() {
-  int value = m_toLineEdit->getValue();
-
-  // Check if from is inside one range
-  int count   = m_lockInfos.size();
-  m_toIsValid = true;
-  for (int i = 0; i < count; i++) {
-    SVNPartialLockInfo lockInfo = m_lockInfos.at(i);
-    if (value >= lockInfo.m_from && value <= lockInfo.m_to) {
-      m_toIsValid = false;
-      break;
+    unsigned int value = static_cast<unsigned int>(m_toLineEdit->getValue());
+    m_toIsValid = true;
+    for (const SVNPartialLockInfo& lockInfo : m_lockInfos) {
+        if (value >= lockInfo.m_from && value <= lockInfo.m_to) {
+            m_toIsValid = false;
+            break;
+        }
     }
-  }
-
-  m_toLineEdit->setStyleSheet(
-      m_toIsValid ? "" : "color: red; background-color: red;");
-  m_lockButton->setEnabled(m_fromIsValid && m_toIsValid);
+    m_toLineEdit->setStyleSheet(m_toIsValid ? "" : "color: red; background-color: red;");
+    m_lockButton->setEnabled(m_fromIsValid && m_toIsValid);
 }
 
 //-----------------------------------------------------------------------------

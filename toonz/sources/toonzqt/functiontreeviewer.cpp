@@ -151,20 +151,20 @@ QVariant FunctionTreeModel::ChannelGroup::data(int role) const {
     bool ignored  = (animated) ? isIgnored() : false;
 
     if (active) {
-      static QIcon folderAnimOpen(createQIcon("folder_anim_on", true));
-      static QIcon folderAnimClose(createQIcon("folder_anim", true));
-      static QIcon folderOpen(createQIcon("folder_on", true));
-      static QIcon folderClose(createQIcon("folder", true));
+      static QIcon folderAnimOpen(createQIcon("folder_anim_on"));
+      static QIcon folderAnimClose(createQIcon("folder_anim"));
+      static QIcon folderOpen(createQIcon("folder_on"));
+      static QIcon folderClose(createQIcon("folder"));
       static QIcon ignoredOn(":Resources/paramignored_on.svg");
 
       return animated ? (isOpen() ? folderAnimOpen
                                   : (ignored ? ignoredOn : folderAnimClose))
                       : (isOpen() ? folderOpen : folderClose);
     } else {
-      static QIcon folderAnimOpen(createQIcon("folder_anim_inactive_on", true));
-      static QIcon folderAnimClose(createQIcon("folder_anim_inactive", true));
-      static QIcon folderOpen(createQIcon("folder_inactive_on", true));
-      static QIcon folderClose(createQIcon("folder_inactive", true));
+      static QIcon folderAnimOpen(createQIcon("folder_anim_inactive_on"));
+      static QIcon folderAnimClose(createQIcon("folder_anim_inactive"));
+      static QIcon folderOpen(createQIcon("folder_inactive_on"));
+      static QIcon folderClose(createQIcon("folder_inactive"));
       static QIcon ignoredOff(":Resources/paramignored_off.svg");
 
       return animated ? (isOpen() ? folderAnimOpen
@@ -359,20 +359,20 @@ QVariant FxChannelGroup::data(int role) const {
     }
     bool ignored = (isAnimated) ? isIgnored() : false;
     if (isOneChildActive) {
-      static QIcon folderAnimOpen(createQIcon("folder_anim_on", true));
-      static QIcon folderAnimClose(createQIcon("folder_anim", true));
-      static QIcon folderOpen(createQIcon("folder_on", true));
-      static QIcon folderClose(createQIcon("folder", true));
+      static QIcon folderAnimOpen(createQIcon("folder_anim_on"));
+      static QIcon folderAnimClose(createQIcon("folder_anim"));
+      static QIcon folderOpen(createQIcon("folder_on"));
+      static QIcon folderClose(createQIcon("folder"));
       static QIcon ignoredOn(":Resources/paramignored_on.svg");
 
       return isAnimated ? (isOpen() ? folderAnimOpen
                                     : (ignored ? ignoredOn : folderAnimClose))
                         : (isOpen() ? folderOpen : folderClose);
     } else {
-      static QIcon folderAnimOpen(createQIcon("folder_anim_inactive_on", true));
-      static QIcon folderAnimClose(createQIcon("folder_anim_inactive", true));
-      static QIcon folderOpen(createQIcon("folder_inactive_on", true));
-      static QIcon folderClose(createQIcon("folder_inactive", true));
+      static QIcon folderAnimOpen(createQIcon("folder_anim_inactive_on"));
+      static QIcon folderAnimClose(createQIcon("folder_anim_inactive"));
+      static QIcon folderOpen(createQIcon("folder_inactive_on"));
+      static QIcon folderClose(createQIcon("folder_inactive"));
       static QIcon ignoredOff(":Resources/paramignored_off.svg");
 
       return isAnimated ? (isOpen() ? folderAnimOpen

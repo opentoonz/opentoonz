@@ -272,6 +272,14 @@ void TLevelWriterAvi::searchForCodec() {
     for (int bpp = 32; (bpp >= 24) && !found; bpp -= 8) {
       inFmt.bmiHeader.biBitCount = bpp;
       for (int i = 0; ICInfo(fccType, i, &icinfo); i++) {
+        // Skip blacklisted DLLs
+        char driver[2048];
+        WideChar2Char(icinfo.szDriver, driver, sizeof(driver));
+        if (TSystem::isDLLBlackListed(
+                QString::fromStdString(std::string(driver)))) {
+          continue;
+        }
+
         hic = ICOpen(icinfo.fccType, icinfo.fccHandler, ICMODE_COMPRESS);
 
         ICGetInfo(hic, &icinfo,
@@ -720,7 +728,11 @@ TLevelReaderAvi::TLevelReaderAvi(const TFilePath &path)
     ICINFO icinfo;
     memset(&icinfo, 0, sizeof(ICINFO));
     ICInfo(ICTYPE_VIDEO, si.fccHandler, &icinfo);
-    m_hic = ICOpen(icinfo.fccType, icinfo.fccHandler, ICMODE_DECOMPRESS);
+
+    char driver[2048];
+    WideChar2Char(icinfo.szDriver, driver, sizeof(driver));
+    if (!TSystem::isDLLBlackListed(driver))
+      m_hic = ICOpen(icinfo.fccType, icinfo.fccHandler, ICMODE_DECOMPRESS);
     if (!m_hic) {
       m_hic = findCandidateDecompressor();
       if (!m_hic)
@@ -785,6 +797,14 @@ HIC TLevelReaderAvi::findCandidateDecompressor() {
   for (DWORD id = 0; ICInfo(ICTYPE_VIDEO, id, &info); ++id) {
     info.dwSize = sizeof(
         ICINFO);  // I don't think this is necessary, but just in case....
+
+    // Skip blacklisted DLLs
+    char driver[2048];
+    WideChar2Char(info.szDriver, driver, sizeof(driver));
+    if (TSystem::isDLLBlackListed(
+            QString::fromStdString(std::string(driver)))) {
+      continue;
+    }
 
     HIC hic = ICOpen(info.fccType, info.fccHandler, ICMODE_DECOMPRESS);
 
@@ -1112,7 +1132,7 @@ LRESULT safe_ICCompressQuery(hic_t const &hic, BITMAPINFO *lpbiInput,
 
 Tiio::AviWriterProperties::AviWriterProperties() : m_codec("Codec") {
   if (m_defaultCodec.getRange().empty()) {
-    char descr[2048], name[2048], driver[2048];
+    char descr[2048], name[2048];
     DWORD fccType = 0;
     ICINFO icinfo;
     BITMAPINFO inFmt;
@@ -1125,12 +1145,6 @@ Tiio::AviWriterProperties::AviWriterProperties() : m_codec("Codec") {
     inFmt.bmiHeader.biHeight      = 100;
     inFmt.bmiHeader.biPlanes      = 1;
     inFmt.bmiHeader.biCompression = BI_RGB;
-
-    // List of known problematic DLLs that should be skipped
-    const std::vector<std::string> blockedDlls = {"msvfw32.dll", "lvcod64.dll",
-                                                  "ff_vfw.dll", "tsccvid64.dll",
-                                                  "hapcodec.dll"};
-
     for (int bpp = 32; bpp >= 24; bpp -= 8) {
       inFmt.bmiHeader.biBitCount = bpp;
       for (int i = 0;; i++) {
@@ -1139,56 +1153,41 @@ Tiio::AviWriterProperties::AviWriterProperties() : m_codec("Codec") {
           break;
         }
 
-        WideChar2Char(icinfo.szDriver, driver, sizeof(driver));
-
-        // Convert driver name to lowercase for case-insensitive comparison
-        std::string driverStr(driver);
-        std::transform(driverStr.begin(), driverStr.end(), driverStr.begin(),
-                       ::tolower);
-
         // Skip blacklisted DLLs
-        bool isBlocked =
-            std::any_of(blockedDlls.begin(), blockedDlls.end(),
-                        [&](const std::string &blocked) {
-                          return driverStr.find(blocked) != std::string::npos;
-                        });
-
-        if (isBlocked) {
-          continue;  // Skip this codec
+        char driver[2048];
+        WideChar2Char(icinfo.szDriver, driver, sizeof(driver));
+        if (TSystem::isDLLBlackListed(
+                QString::fromStdString(std::string(driver)))) {
+          continue;
         }
 
         auto const hic =
             safe_ICOpen(icinfo.fccType, icinfo.fccHandler, ICMODE_QUERY);
         if (!hic) {
-          continue;
+          break;
         }
 
         // Find out the compressor name
         if (safe_ICGetInfo(hic, &icinfo, sizeof(ICINFO)) == 0) {
-          continue;
+          break;
         }
 
         WideChar2Char(icinfo.szDescription, descr, sizeof(descr));
         WideChar2Char(icinfo.szName, name, sizeof(name));
-
-        // Skip certain codecs that are known to cause issues
-        if (strstr(name, "IYUV") != nullptr ||
-            (strstr(name, "IR32") != nullptr && bpp == 24)) {
+        if ((strstr(name, "IYUV") != 0) ||
+            ((strstr(name, "IR32") != 0) && (bpp == 24))) {
           continue;
         }
-
         // Give up to load codecs once the blackmagic codec is found -
         // as it seems to cause crash for unknown reasons (issue #138)
-        if (strstr(descr, "Blackmagic") != nullptr) {
-          break;
-        }
+        if (strstr(descr, "Blackmagic") != 0) break;
 
-        std::string compressorName = std::string(name) + " '" +
-                                     std::to_string(bpp) + "' " +
-                                     std::string(descr);
+        std::string compressorName;
+        compressorName = std::string(name) + " '" + std::to_string(bpp) + "' " +
+                         std::string(descr);
 
-        // Skip Indeo codecs, as they are obsolete and unreliable
-        if (compressorName.find("Indeo") != std::string::npos) {
+        // per il momento togliamo i codec indeo
+        if (std::string(compressorName).find("Indeo") != -1) {
           continue;
         }
 
@@ -1197,13 +1196,12 @@ Tiio::AviWriterProperties::AviWriterProperties() : m_codec("Codec") {
         }
 
         m_defaultCodec.addValue(::to_wstring(compressorName));
-        if (compressorName.find("inepak") != std::string::npos) {
+        if (compressorName.find("inepak") != -1) {
           m_defaultCodec.setValue(::to_wstring(compressorName));
         }
       }
     }
   }
-
   m_codec = m_defaultCodec;
   bind(m_codec);
 }

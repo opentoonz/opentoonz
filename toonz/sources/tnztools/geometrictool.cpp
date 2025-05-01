@@ -925,6 +925,7 @@ public:
   TStroke *makeStroke() const override;
   void draw() override;
   void leftButtonDown(const TPointD &pos, const TMouseEvent &) override;
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &) override;
   void leftButtonUp(const TPointD &pos, const TMouseEvent &) override;
   void mouseMove(const TPointD &pos, const TMouseEvent &e) override;
   void leftButtonDoubleClick(const TPointD &, const TMouseEvent &e) override;
@@ -2810,10 +2811,126 @@ TStroke *MultiArcPrimitive::makeStroke() const {
 
 void MultiArcPrimitive::leftButtonDown(const TPointD &pos,
                                        const TMouseEvent &) {
-  if (m_clickNumber == 0) {
-    TPointD newPos = calculateSnap(pos);
-    newPos         = checkGuideSnapping(pos);
+  TPointD newPos = calculateSnap(pos);
+  newPos         = checkGuideSnapping(pos);
+  TTool::Application *app = TTool::getApplication();
+
+  if(m_clickNumber == 0) {
     m_startPoint   = newPos;
+
+    if (!app) return;
+    if (app->getCurrentObject()->isSpline()) {
+      m_isEditing = true;
+      m_color     = TPixel32::Red;
+    } else {
+      const TColorStyle *style = app->getCurrentLevelStyle();
+      if (style) {
+        m_isEditing = style->isStrokeStyle();
+        m_color     = style->getAverageColor();
+      } else {
+        m_isEditing = false;
+        m_color     = TPixel32::Black;
+      }
+    }
+  }
+}
+
+void MultiArcPrimitive::leftButtonDrag(const TPointD &pos,
+                                       const TMouseEvent &e) {
+  switch (m_clickNumber) {
+  case 0:
+    if ((tdistance2(m_startPoint, pos) < sq(7.0 * m_tool->getPixelSize())))
+      return;
+    break;
+  case 1:
+    if (m_undoCount != 1 &&
+        (tdistance2(m_endPoint, pos) < sq(7.0 * m_tool->getPixelSize())))
+      return;
+    break;
+  }
+  
+  TPointD newPos = calculateSnap(pos);
+  newPos         = checkGuideSnapping(pos);
+  double dist    = joinDistance * joinDistance;
+  static MultiArcPrimitiveUndo *undo;
+
+  if (m_clickNumber == 0) {
+    undo = new MultiArcPrimitiveUndo(this, m_stroke, m_strokeTemp, m_startPoint,
+                                     m_endPoint, m_centralPoint, m_clickNumber);
+  }
+
+  switch (m_clickNumber) {
+  case 0:
+    m_endPoint = newPos;
+
+    if (!m_isEditing) return;
+    m_clickNumber++;
+    break;
+
+  case 1:
+    if (m_undoCount == 1) {
+    if (e.isShiftPressed())
+      m_endPoint = rectify(m_startPoint, pos);
+    else
+      m_endPoint = newPos;
+
+    if (m_stroke) {
+      TPointD firstPoint = m_stroke->getControlPoint(0);
+      if (tdistance2(m_endPoint, firstPoint) < dist * m_tool->getPixelSize())
+        m_endPoint = firstPoint;
+    }
+    m_tool->invalidate();
+  }
+    else {
+      m_centralPoint = getSnap(pos);
+      std::vector<TThickPoint> points(9);
+      double thick = getThickness();
+      points[0]    = TThickPoint(m_startPoint, thick);
+      points[8]    = TThickPoint(m_endPoint, thick);
+      points[4]    = TThickPoint(0.5 * (points[0] + points[8]), thick);
+      points[2]    = TThickPoint(0.5 * (points[0] + points[4]), thick);
+      points[6]    = TThickPoint(0.5 * (points[4] + points[8]), thick);
+
+      points[1]    = TThickPoint(0.5 * (points[0] + points[2]), thick);
+      points[3]    = TThickPoint(0.5 * (points[2] + points[4]), thick);
+      points[5]    = TThickPoint(0.5 * (points[4] + points[6]), thick);
+      points[7]    = TThickPoint(0.5 * (points[6] + points[8]), thick);
+      m_strokeTemp = new TStroke(points);
+      m_clickNumber++;
+    }
+    break;
+  case 2:
+    if (!m_isSingleArc) {
+    m_centralPoint = newPos;
+    TThickQuadratic q(m_startPoint, TThickPoint(m_centralPoint, getThickness()),
+                      m_endPoint);
+    TThickQuadratic q0, q1, q00, q01, q10, q11;
+
+    q.split(0.5, q0, q1);
+    q0.split(0.5, q00, q01);
+    q1.split(0.5, q10, q11);
+
+    assert(q00.getP2() == q01.getP0());
+    assert(q01.getP2() == q10.getP0());
+    assert(q10.getP2() == q11.getP0());
+
+    m_strokeTemp->setControlPoint(1, q00.getP1());
+    m_strokeTemp->setControlPoint(2, q00.getP2());
+    m_strokeTemp->setControlPoint(3, q01.getP1());
+    m_strokeTemp->setControlPoint(4, q01.getP2());
+    m_strokeTemp->setControlPoint(5, q10.getP1());
+    m_strokeTemp->setControlPoint(6, q10.getP2());
+    m_strokeTemp->setControlPoint(7, q11.getP1());
+    m_tool->invalidate();
+    }
+    break;
+  }
+
+  if (m_undoCount == 0) {
+    undo->setRedoData(m_stroke, m_strokeTemp, m_startPoint, m_endPoint,
+                      m_centralPoint, m_clickNumber);
+    TUndoManager::manager()->add(undo);
+    ++m_undoCount;
   }
 }
 
@@ -2833,20 +2950,6 @@ void MultiArcPrimitive::leftButtonUp(const TPointD &pos, const TMouseEvent &) {
   MultiArcPrimitiveUndo *undo =
       new MultiArcPrimitiveUndo(this, m_stroke, m_strokeTemp, m_startPoint,
                                 m_endPoint, m_centralPoint, m_clickNumber);
-
-  if (app->getCurrentObject()->isSpline()) {
-    m_isEditing = true;
-    m_color     = TPixel32::Red;
-  } else {
-    const TColorStyle *style = app->getCurrentLevelStyle();
-    if (style) {
-      m_isEditing = style->isStrokeStyle();
-      m_color     = style->getAverageColor();
-    } else {
-      m_isEditing = false;
-      m_color     = TPixel32::Black;
-    }
-  }
 
   switch (m_clickNumber) {
   case 0:

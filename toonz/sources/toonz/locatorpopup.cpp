@@ -12,8 +12,8 @@
 
 #include <QVBoxLayout>
 
-LocatorPopup::LocatorPopup(QWidget *parent)
-    : QDialog(parent), m_initialZoom(true) {
+LocatorPopup::LocatorPopup(QWidget *parent, Qt::WindowFlags flags)
+    : QFrame(parent), m_initialZoom(true) {
   m_viewer = new SceneViewer(NULL);
   m_viewer->setParent(parent);
   m_viewer->setIsLocator();
@@ -65,6 +65,8 @@ void LocatorPopup::showEvent(QShowEvent *) {
                        SLOT(changeWindowTitle()));
   assert(ret);
 
+  app->setActiveLocator(this);
+
   changeWindowTitle();
 }
 
@@ -74,6 +76,7 @@ void LocatorPopup::hideEvent(QHideEvent *) {
   TApp *app = TApp::instance();
   disconnect(app->getCurrentLevel());
   disconnect(app->getCurrentFrame());
+  if (app->getActiveLocator() == this) app->setActiveLocator(0);
 }
 
 //-----------------------------------------------------------------------------

@@ -72,7 +72,7 @@ void TGLDisplayListsManager::releaseContext(TGlContext context) {
       static_cast<Observer *>(*ot)->onDisplayListDestroyed(dlSpaceId);
 
     // Then, destroy stuff
-    delete m_proxies[dlSpaceId].m_proxy;
+    if (!m_proxies[dlSpaceId].m_proxy) delete m_proxies[dlSpaceId].m_proxy;
     m_proxies.erase(dlSpaceId);
   }
 

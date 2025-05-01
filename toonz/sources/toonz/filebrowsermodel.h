@@ -126,13 +126,16 @@ public:
 //-----------------------------------------------------------------------------
 
 class DvDirModelSpecialFileFolderNode : public DvDirModelFileFolderNode {
-  QPixmap m_pixmap;
+private:
+  QString m_iconName;
+  QSize m_iconSize;
 
 public:
   DvDirModelSpecialFileFolderNode(DvDirModelNode *parent, std::wstring name,
                                   const TFilePath &localPath);
   QPixmap getPixmap(bool isOpen) const override;
-  void setPixmap(const QPixmap &pixmap);
+  void setIconName(const QString &iconName) { m_iconName = iconName; }
+  void setIconSize(const QSize &size) { m_iconSize = size; }
 };
 
 //-----------------------------------------------------------------------------

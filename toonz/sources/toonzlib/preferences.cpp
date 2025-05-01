@@ -1,5 +1,4 @@
 
-
 #include "toonz/preferences.h"
 
 // TnzLib includes
@@ -448,6 +447,9 @@ void Preferences::definePreferenceItems() {
   setCallBack(pixelsOnly, &Preferences::setPixelsOnly);
   setCallBack(linearUnits, &Preferences::setUnits);
   setCallBack(cameraUnits, &Preferences::setCameraUnits);
+
+  define(viewerIndicatorEnabled, "viewerIndicatorEnabled", QMetaType::Bool,
+         true);
 
   // Visualization
   define(show0ThickLines, "show0ThickLines", QMetaType::Bool, true);
@@ -1021,30 +1023,28 @@ QString Preferences::getCurrentLanguage() const {
 QString Preferences::getCurrentStyleSheet() const {
   QString currentStyleSheetName = getStringValue(CurrentStyleSheetName);
   if (currentStyleSheetName.isEmpty()) return QString();
+
   TFilePath path(TEnv::getConfigDir() + "qss");
   QString string = currentStyleSheetName + QString("/") +
                    currentStyleSheetName + QString(".qss");
   QString styleSheetPath = path.getQString() + "/" + string;
 
-  QString additionalSheetStr = getStringValue(additionalStyleSheet);
-  // if there is no additional style sheet, return the path and let
-  // Qt to load and parse it
-  if (additionalSheetStr.isEmpty()) return QString("file:///" + styleSheetPath);
-
-  // if there is any additional style sheet, load the style sheet
-  // from the file and combine with it
   QString styleSheetStr;
+
+  // Always read the main stylesheet from the file
   QFile f(styleSheetPath);
   if (f.open(QFile::ReadOnly | QFile::Text)) {
     QTextStream ts(&f);
     styleSheetStr = ts.readAll();
   }
-  styleSheetStr += additionalSheetStr;
 
-  // here we will convert all relative paths to absolute paths
-  // or Qt will look for images relative to the current working directory
-  // since it has no idea where the style sheet comes from.
+  // Append additional stylesheet if provided
+  QString additionalSheetStr = getStringValue(additionalStyleSheet);
+  if (!additionalSheetStr.isEmpty()) {
+    styleSheetStr += additionalSheetStr;
+  }
 
+  // Fix relative paths in stylesheets
   QString currentStyleFolderPath =
       path.getQString().replace("\\", "/") + "/" + currentStyleSheetName;
 

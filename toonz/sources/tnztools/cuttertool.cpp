@@ -461,8 +461,8 @@ public:
     TVectorImageP vi = TImageP(getImage(false));
     if (!vi) return false;
 
-    if (m_lockedStrokeIndex >= vi->getStrokeCount()) {
-      m_lockedStrokeIndex = -1;
+    if (m_lockedStrokeIndex >= static_cast<int>(vi->getStrokeCount())) {
+        m_lockedStrokeIndex = -1;
     }
 
     if (lock && m_lockedStrokeIndex >= 0) {

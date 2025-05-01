@@ -127,7 +127,6 @@ private:
   void onPathAliasPriorityChanged();
   // Interface
   void onStyleSheetTypeChanged();
-  void onIconThemeChanged();
   void onPixelsOnlyChanged();
   void beforeUnitChanged();
   void onUnitChanged();

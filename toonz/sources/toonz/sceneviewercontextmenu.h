@@ -65,4 +65,17 @@ public slots:
 
 }  // Namespace CursorOutlineToggleGui
 
+namespace ViewerIndicatorToggleGui {
+void addViewerIndicatorCommand(QMenu *menu);
+
+class ViewerIndicatorToggleHandler : public QObject {
+  Q_OBJECT
+
+public slots:
+  void activate();
+  void deactivate();
+};
+
+}  // Namespace ViewerIndicatorToggleGui
+
 #endif

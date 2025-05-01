@@ -1365,7 +1365,6 @@ void IoCmd::newScene() {
                           ->m_cleanupPalette.getPointer();
   PaletteController *paletteController = app->getPaletteController();
   paletteController->getCurrentCleanupPalette()->setPalette(palette, -1);
-  paletteController->editLevelPalette();
 
   TFilePath scenePath = scene->getScenePath();
   DvDirModel::instance()->refreshFolder(scenePath.getParentDir());
@@ -2028,10 +2027,7 @@ bool IoCmd::loadScene(const TFilePath &path, bool updateRecentFile,
   app->getCurrentScene()->notifyNameSceneChange();
   app->getCurrentFrame()->setFrame(0);
   app->getCurrentColumn()->setColumnIndex(0);
-  TPalette *palette = 0;
-  if (app->getCurrentLevel() && app->getCurrentLevel()->getSimpleLevel())
-    palette = app->getCurrentLevel()->getSimpleLevel()->getPalette();
-  app->getCurrentPalette()->setPalette(palette);
+  
   app->getCurrentXsheet()->notifyXsheetSoundChanged();
   app->getCurrentObject()->setIsSpline(false);
 
@@ -2153,7 +2149,8 @@ bool IoCmd::loadScene(const TFilePath &path, bool updateRecentFile,
 
   printf("%s:%s loadScene() completed :\n", __FILE__, __FUNCTION__);
   
-  TApp::instance()->getPaletteController()->editLevelPalette();
+  // Load current Level's palette
+  app->getPaletteController()->editLevelPalette();
   return true;
 }
 

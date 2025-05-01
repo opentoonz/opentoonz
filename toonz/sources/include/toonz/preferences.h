@@ -192,7 +192,6 @@ public:
 
   // Interface  tab
   QStringList getStyleSheetList() const { return m_styleSheetList; }
-  bool getIconTheme() const { return getBoolValue(iconTheme); }
   void storeOldUnits();
   void resetOldUnits();
   QStringList getLanguageList() const { return m_languageList; }
@@ -236,6 +235,11 @@ public:
   void setColorCalibrationLutPath(QString monitorName, QString path);
   QString getColorCalibrationLutPath(QString &monitorName) const;
   bool is30bitDisplayEnabled() const { return getBoolValue(displayIn30bit); }
+
+  bool isViewerIndicatorEnabled() const {
+    return getBoolValue(viewerIndicatorEnabled);
+  }
+
   // Visualization  tab
   bool getShow0ThickLines() const { return getBoolValue(show0ThickLines); }
   bool getRegionAntialias() const { return getBoolValue(regionAntialias); }

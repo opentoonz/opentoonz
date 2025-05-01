@@ -283,7 +283,8 @@ bool ImageRasterizer::getInfo(TImageInfo &info, int imFlags, void *extData) {
 
 bool ImageRasterizer::isImageCompatible(int imFlags, void* extData) { 
   ImageLoader::BuildExtData *data = (ImageLoader::BuildExtData *)extData;
-  if (m_cameraDPI == data->currentCamera->getDpi())
+  
+  if (m_cameraDPI == data->m_cameraDPI)
     if (m_antiAliasing == Preferences::instance()->getRasterizeAntialias())
         return true;
   return false;
@@ -306,7 +307,7 @@ TImageP ImageRasterizer::build(int imFlags, void *extData) {
     TVectorImageP vi = img;
     if (vi) {
       TRectD bbox = vi->getBBox();
-      m_cameraDPI       = data->currentCamera->getDpi();
+      m_cameraDPI       = data->m_cameraDPI;
 
       double sx, sy;
       sx           = m_cameraDPI.x / Stage::inch;

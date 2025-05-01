@@ -803,11 +803,14 @@ void ColumnArea::DrawHeader::prepare() const {
 
 //-----------------------------------------------------------------------------
 const QPixmap &ColumnArea::Pixmaps::sound() {
-  static QPixmap sound = generateIconPixmap("sound_header");
+  static QPixmap sound = createQIcon("sound_header")
+                             .pixmap(QSize(40, 30), QIcon::Normal, QIcon::Off);
   return sound;
 }
 const QPixmap &ColumnArea::Pixmaps::soundPlaying() {
-  static QPixmap soundPlaying = generateIconPixmap("sound_header_on");
+  static QPixmap soundPlaying =
+      createQIcon("sound_header")
+          .pixmap(QSize(40, 30), QIcon::Normal, QIcon::On);
   return soundPlaying;
 }
 
@@ -938,7 +941,7 @@ void ColumnArea::DrawHeader::drawEye() const {
   QRect eyeRect      = o->rect(PredefinedRect::EYE).translated(orig);
   // preview visible toggle
   if (o->isVerticalTimeline())
-    p.setPen(m_viewer->getColumnIconLineColor());    // Preview border color
+    p.setPen(m_viewer->getColumnIconLineColor());  // Preview border color
   else
     p.setPen(m_viewer->getTimelineIconLineColor());  // Preview border color
 
@@ -981,7 +984,7 @@ void ColumnArea::DrawHeader::drawPreviewToggle(int opacity) const {
       o->rect(PredefinedRect::PREVIEW_LAYER).translated(orig);
 
   if (o->isVerticalTimeline())
-    p.setPen(m_viewer->getColumnIconLineColor());    // Camstand border color
+    p.setPen(m_viewer->getColumnIconLineColor());  // Camstand border color
   else
     p.setPen(m_viewer->getTimelineIconLineColor());  // Camstand border color
 
@@ -1028,7 +1031,7 @@ void ColumnArea::DrawHeader::drawUnifiedViewToggle(int opacity) const {
       o->rect(PredefinedRect::UNIFIEDVIEW_LAYER).translated(orig);
 
   if (o->isVerticalTimeline())
-    p.setPen(m_viewer->getColumnIconLineColor());    // border color
+    p.setPen(m_viewer->getColumnIconLineColor());  // border color
   else
     p.setPen(m_viewer->getTimelineIconLineColor());  // border color
 
@@ -1070,7 +1073,7 @@ void ColumnArea::DrawHeader::drawLock() const {
 
   // lock button
   if (o->isVerticalTimeline())
-    p.setPen(m_viewer->getColumnIconLineColor());    // Lock border color
+    p.setPen(m_viewer->getColumnIconLineColor());  // Lock border color
   else
     p.setPen(m_viewer->getTimelineIconLineColor());  // Lock border color
 
@@ -1787,7 +1790,7 @@ void ColumnArea::drawSoundTextColumnHead(QPainter &p, int col) {  // AREA
   drawHeader.drawConfig();
   drawHeader.drawColumnName();
   drawHeader.drawColumnNumber();
-  static QPixmap iconPixmap(generateIconPixmap("notelevel"));
+  static QPixmap iconPixmap(svgToPixmap(getIconPath("notelevel")));
   drawHeader.drawThumbnail(iconPixmap);
   drawHeader.drawPegbarName();
   drawHeader.drawParentHandleName();
@@ -2343,7 +2346,7 @@ void ColumnArea::mousePressEvent(QMouseEvent *event) {
       TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
       return;
     }
-    
+
     TXshColumn *column = xsh->getColumn(m_col);
     bool isEmpty       = !column || column->isEmpty();
     TApp::instance()->getCurrentObject()->setIsSpline(false);
@@ -2355,24 +2358,23 @@ void ColumnArea::mousePressEvent(QMouseEvent *event) {
     // int y = event->pos().y();
     // QPoint mouseInCell(x, y);
     int x = mouseInCell.x(), y = mouseInCell.y();
-    
+
     // don't make column current when click on some of its toggle buttons
     bool needMakeColumnCurrent = true;
-    if ( o->rect(PredefinedRect::LOCK_AREA).contains(mouseInCell)
-      || o->rect(PredefinedRect::CONFIG_AREA).contains(mouseInCell) )
+    if (o->rect(PredefinedRect::LOCK_AREA).contains(mouseInCell) ||
+        o->rect(PredefinedRect::CONFIG_AREA).contains(mouseInCell))
       needMakeColumnCurrent = false;
-    if ( Preferences::instance()->isUnifyColumnVisibilityTogglesEnabled() ) {
-      if ( o->rect(PredefinedRect::UNIFIEDVIEW_LAYER_AREA).contains(mouseInCell) )
+    if (Preferences::instance()->isUnifyColumnVisibilityTogglesEnabled()) {
+      if (o->rect(PredefinedRect::UNIFIEDVIEW_LAYER_AREA).contains(mouseInCell))
         needMakeColumnCurrent = false;
     } else {
-      if ( o->rect(PredefinedRect::EYE_AREA).contains(mouseInCell)
-        || o->rect(PredefinedRect::PREVIEW_LAYER_AREA).contains(mouseInCell) )
+      if (o->rect(PredefinedRect::EYE_AREA).contains(mouseInCell) ||
+          o->rect(PredefinedRect::PREVIEW_LAYER_AREA).contains(mouseInCell))
         needMakeColumnCurrent = false;
     }
-      
+
     // set the clicked column to current
-    if (needMakeColumnCurrent)
-      m_viewer->setCurrentColumn(m_col);
+    if (needMakeColumnCurrent) m_viewer->setCurrentColumn(m_col);
 
     // clicking on the camera column
     if (m_col < 0) {

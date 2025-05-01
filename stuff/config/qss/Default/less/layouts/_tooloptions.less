@@ -8,6 +8,13 @@
     margin: 0;
     padding: 0;
   }
+
+  QLineEdit {
+    color: @tooloptions-input-text-color;
+    &:disabled {
+      color: @tooloptions-input-text-color-disabled;
+    }
+  }
 }
 
 #ToolOptions {
@@ -18,10 +25,6 @@
     border-bottom-left-radius: @titlebar-border-radius;
     border-right: 1 solid @border-color;
     max-width: 18;
-
-    & when (@titlebar-gradient-effect = true) {
-      .gradient-effect-horizontal();
-    }
   }
 
   & #ScrollLeftButton,

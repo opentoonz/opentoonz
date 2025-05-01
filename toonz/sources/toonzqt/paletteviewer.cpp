@@ -596,7 +596,7 @@ void PaletteViewer::createPaletteToolBar() {
   m_toolbarParts.clear();
 
   QAction *openStyleNameEditorAct = new QAction(tr("Name Editor"));
-  openStyleNameEditorAct->setIcon(createQIcon("rename", false, true));
+  openStyleNameEditorAct->setIcon(createQIcon("rename", true));
   connect(openStyleNameEditorAct, &QAction::triggered, [&]() {
     if (!m_styleNameEditor) {
       m_styleNameEditor = new StyleNameEditor(this);

@@ -2,15 +2,14 @@
 
 #include "avicodecrestrictions.h"
 #include "tconvert.h"
+#include "tsystem.h"
 #include <windows.h>
 #include <vfw.h>
 
 namespace {
 
 void WideChar2Char(LPCWSTR wideCharStr, char *str, int strBuffSize) {
-  if (!wideCharStr || !str) return;
-  WideCharToMultiByte(CP_ACP, 0, wideCharStr, -1, str, strBuffSize, nullptr,
-                      nullptr);
+  WideCharToMultiByte(CP_ACP, 0, wideCharStr, -1, str, strBuffSize, 0, 0);
 }
 
 HIC getCodec(const std::wstring &codecName, int &bpp) {
@@ -33,6 +32,14 @@ HIC getCodec(const std::wstring &codecName, int &bpp) {
     // find the codec.
     inFmt.bmiHeader.biBitCount = bpp;
     for (int i = 0; ICInfo(fccType, i, &icinfo); i++) {
+      // Skip blacklisted DLLs
+      char driver[2048];
+      WideChar2Char(icinfo.szDriver, driver, sizeof(driver));
+      if (TSystem::isDLLBlackListed(
+              QString::fromStdString(std::string(driver)))) {
+        continue;
+      }
+
       hic = ICOpen(icinfo.fccType, icinfo.fccHandler, ICMODE_COMPRESS);
 
       ICGetInfo(hic, &icinfo, sizeof(ICINFO));  // Find out the compressor name
@@ -211,7 +218,7 @@ QMap<std::wstring, bool> AviCodecRestrictions::getUsableCodecs(
   ICINFO icinfo;
   memset(&icinfo, 0, sizeof(ICINFO));
 
-  char descr[2048], name[2048], driver[2048];
+  char descr[2048], name[2048];
   DWORD fccType = 0;
 
   BITMAPINFO inFmt;
@@ -221,63 +228,44 @@ QMap<std::wstring, bool> AviCodecRestrictions::getUsableCodecs(
   inFmt.bmiHeader.biWidth = inFmt.bmiHeader.biHeight = 100;
   inFmt.bmiHeader.biPlanes                           = 1;
   inFmt.bmiHeader.biCompression                      = BI_RGB;
-
-  // List of known DLLs that may cause crashes
-  const std::vector<std::string> blockedDlls = {"msvfw32.dll", "lvcod64.dll",
-                                                "ff_vfw.dll", "tsccvid64.dll",
-                                                "hapcodec.dll"};
-
   int bpp;
-  for (bpp = 32; bpp >= 24; bpp -= 8) {
+  for (bpp = 32; (bpp >= 24); bpp -= 8) {
+    // find the codec.
     inFmt.bmiHeader.biBitCount = bpp;
-
     for (int i = 0; ICInfo(fccType, i, &icinfo); i++) {
+      // Skip blacklisted DLLs
+      char driver[2048];
       WideChar2Char(icinfo.szDriver, driver, sizeof(driver));
-
-      // Convert driver name to lowercase for case-insensitive comparison
-      std::string driverStr =
-          QString::fromStdString(std::string(driver)).toLower().toStdString();
-
-      // Skip blacklisted DLLs before even trying to open the codec
-      bool isBlocked =
-          std::any_of(blockedDlls.begin(), blockedDlls.end(),
-                      [&](const std::string &blocked) {
-                        return driverStr.find(blocked) != std::string::npos;
-                      });
-
-      if (isBlocked) {
+      if (TSystem::isDLLBlackListed(
+              QString::fromStdString(std::string(driver)))) {
         continue;
       }
 
       hic = ICOpen(icinfo.fccType, icinfo.fccHandler, ICMODE_COMPRESS);
-      if (!hic) {
-        continue;
-      }
 
-      ICGetInfo(hic, &icinfo, sizeof(ICINFO));
-
+      ICGetInfo(hic, &icinfo, sizeof(ICINFO));  // Find out the compressor name
       WideCharToMultiByte(CP_ACP, 0, icinfo.szDescription, -1, descr,
                           sizeof(descr), 0, 0);
       WideCharToMultiByte(CP_ACP, 0, icinfo.szName, -1, name, sizeof(name), 0,
                           0);
+      // Give up to load codecs once the blackmagic codec is found -
+      // as it seems to cause crash for unknown reasons (issue #138)
+      if (strstr(descr, "Blackmagic") != 0) break;
 
-      // Blackmagic codec can cause crashes, so stop processing if found
-      if (strstr(descr, "Blackmagic") != nullptr) {
-        ICClose(hic);
-        break;
-      }
-
-      std::wstring compressorName =
+      std::wstring compressorName;
+      compressorName =
           ::to_wstring(std::string(name) + " '" + std::to_string(bpp) + "' " +
                        std::string(descr));
 
-      if (ICCompressQuery(hic, &inFmt, NULL) == ICERR_OK) {
+      if (hic) {
+        if (ICCompressQuery(hic, &inFmt, NULL) != ICERR_OK) {
+          ICClose(hic);
+          continue;  // Skip this compressor if it can't handle the format.
+        }
         codecs[compressorName] = canWork(hic, resolution, bpp);
+        ICClose(hic);
       }
-
-      ICClose(hic);
     }
   }
-
   return codecs;
 }

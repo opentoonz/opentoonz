@@ -14,16 +14,25 @@
 
 // SETTINGS --------------------------------------------------------------------
 
-// >>> Inherit other settings from Default.less
+// >>> Inherit other settings from default-theme.less
 
-@ui-contrast: 1.2; // multiplier
-@border-contrast: 1.4; // multiplier
+@ui-contrast: 0.8; // multiplier
 
 // COLORS ----------------------------------------------------------------------
 
 @bg-color: #303030;
-@text-color: #dcdcdc; 
-@hl-color: #4570b8;
+@text-color: #d3d3d3; 
+@hl-color: #456aa9;
+
+// Icon Colors
+@icon-base-color: darken(@text-color, 2%);
+
+// -----------------------------------------------------------------------------
+// Textfield
+// -----------------------------------------------------------------------------
+@input-bg-color: darken(@bg-color, 14% * @ui-contrast);
+@input-border-color: lighten(@bg-color, 10% * @border-contrast);
+@input-border-radius: 2px;
 
 // -----------------------------------------------------------------------------
 // Treeview
@@ -34,8 +43,8 @@
 // Viewer
 // -----------------------------------------------------------------------------
 @flipmarker-img: 'flipslider/flipmarker-dark.svg';
-@flipslider-img: 'flipslider/flipslider-dark.svg';
-@flipslider-base-color: darken(@bg-color, 15% * @ui-contrast);
+@flipslider-img: 'flipslider/flipslider-dark-hc.svg';
+@flipslider-base-color: darken(@bg-color, 10% * @ui-contrast);
 
 // -----------------------------------------------------------------------------
 // Sliders
@@ -53,8 +62,11 @@
 
 @xsh-border-contrast: 1.2;
 
-@xsh-cell-lighten-amount: -2%;
-@xsh-cell-sat-amount: -2%;
+@xsh-cell-lighten-amount: -8%;
+@xsh-cell-sat-amount: 4%;
+
+@xsh-border-darken-amount: 18%;
+@xsh-border-sat-amount: 0%;
 
 // -----------------------------------------------------------------------------
 // Function Editor

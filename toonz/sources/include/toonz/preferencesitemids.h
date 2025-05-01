@@ -40,6 +40,7 @@ enum PreferencesItemId {
   colorCalibrationLutPaths,
   showIconsInMenu,
   displayIn30bit,
+  viewerIndicatorEnabled,
 
   //----------
   // Visualization

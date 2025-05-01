@@ -2,6 +2,8 @@
 #include <GL/glew.h>
 
 #include "toonz/imagepainter.h"
+// Include shared flipbook background toggle settings (e.g., for m_bg) from toonz/
+#include "toonz/flipbooksettings.h"
 #include "toonz/glrasterpainter.h"
 #include "trastercm.h"
 #include "tropcm.h"
@@ -21,9 +23,6 @@
 
 using namespace ImagePainter;
 
-TEnv::IntVar FlipBookWhiteBgToggle("FlipBookWhiteBgToggle", 1);
-TEnv::IntVar FlipBookBlackBgToggle("FlipBookBlackBgToggle", 0);
-TEnv::IntVar FlipBookCheckBgToggle("FlipBookCheckBgToggle", 0);
 namespace {
 
 //-----------------------------------------------------------------------------

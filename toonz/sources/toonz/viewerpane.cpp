@@ -377,13 +377,13 @@ void BaseViewerPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
 
   TPanelTitleBarButtonSet *viewModeButtonSet;
   m_referenceModeBs = viewModeButtonSet = new TPanelTitleBarButtonSet();
-  int x                                 = -232;
+  int x                                 = -244;
   int iconWidth                         = 20;
   TPanelTitleBarButton *button;
 
   // buttons for show / hide toggle for the field guide and the safe area
   TPanelTitleBarButtonForSafeArea *safeAreaButton =
-      new TPanelTitleBarButtonForSafeArea(titleBar, getIconPath("pane_safe"));
+      new TPanelTitleBarButtonForSafeArea(titleBar, "safearea");
   safeAreaButton->setToolTip(tr("Safe Area (Right Click to Select)"));
   titleBar->add(QPoint(x, 0), safeAreaButton);
   ret = ret && connect(safeAreaButton, SIGNAL(toggled(bool)),
@@ -396,7 +396,7 @@ void BaseViewerPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
   safeAreaButton->setPressed(
       CommandManager::instance()->getAction(MI_SafeArea)->isChecked());
 
-  button = new TPanelTitleBarButton(titleBar, getIconPath("pane_grid"));
+  button = new TPanelTitleBarButton(titleBar, "fieldguide");
   button->setToolTip(tr("Field Guide"));
   x += 1 + iconWidth;
   titleBar->add(QPoint(x, 0), button);
@@ -410,20 +410,20 @@ void BaseViewerPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
       CommandManager::instance()->getAction(MI_FieldGuide)->isChecked());
 
   // view mode toggles
-  button = new TPanelTitleBarButton(titleBar, getIconPath("pane_table"));
+  button = new TPanelTitleBarButton(titleBar, "table");
   button->setToolTip(tr("Camera Stand View"));
   x += 10 + iconWidth;
   titleBar->add(QPoint(x, 0), button);
   button->setButtonSet(viewModeButtonSet, SceneViewer::NORMAL_REFERENCE);
   button->setPressed(true);
 
-  button = new TPanelTitleBarButton(titleBar, getIconPath("pane_3d"));
+  button = new TPanelTitleBarButton(titleBar, "3dview");
   button->setToolTip(tr("3D View"));
   x += 1 + iconWidth;
   titleBar->add(QPoint(x, 0), button);
   button->setButtonSet(viewModeButtonSet, SceneViewer::CAMERA3D_REFERENCE);
 
-  button = new TPanelTitleBarButton(titleBar, getIconPath("pane_cam"));
+  button = new TPanelTitleBarButton(titleBar, "camera");
   button->setToolTip(tr("Camera View"));
   x += 1 + iconWidth;
   titleBar->add(QPoint(x, 0), button);
@@ -432,7 +432,7 @@ void BaseViewerPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
                        SLOT(setReferenceMode(int)));
 
   // freeze button
-  button = new TPanelTitleBarButton(titleBar, getIconPath("pane_freeze"));
+  button = new TPanelTitleBarButton(titleBar, "freeze");
   x += 10 + iconWidth;
 
   button->setToolTip(tr("Freeze"));
@@ -442,7 +442,7 @@ void BaseViewerPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
 
   // preview toggles
   m_previewButton =
-      new TPanelTitleBarButtonForPreview(titleBar, getIconPath("pane_preview"));
+      new TPanelTitleBarButtonForPreview(titleBar, "preview");
   x += 10 + iconWidth;
   titleBar->add(QPoint(x, 0), m_previewButton);
   m_previewButton->setToolTip(tr("Preview"));
@@ -451,8 +451,8 @@ void BaseViewerPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
   //                      SLOT(enableFullPreview(bool)));
 
   m_subcameraPreviewButton = new TPanelTitleBarButtonForPreview(
-      titleBar, getIconPath("pane_subpreview"));
-  x += 1 + 24;
+      titleBar, "subpreview");
+  x += 1 + 30;
 
   titleBar->add(QPoint(x, 0), m_subcameraPreviewButton);
   m_subcameraPreviewButton->setToolTip(tr("Sub-camera Preview"));

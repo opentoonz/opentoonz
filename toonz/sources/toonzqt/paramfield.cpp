@@ -709,7 +709,7 @@ void ParamFieldKeyToggle::paintEvent(QPaintEvent *e) {
     pen = QColor(getKeyBorderOffColor());
     p.setPen(pen);
     p.fillPath(path, getKeyOffColor());
-    m_pixmap = QPixmap(createQIcon("key_off").pixmap(
+    m_pixmap = QPixmap(createQIcon("keyframe").pixmap(
         iconSize, iconSize, QIcon::Normal, QIcon::Off));
     icon.addPixmap(m_pixmap);
     icon.paint(&p, QRect(0, 0, iconSize, iconSize));
@@ -719,8 +719,8 @@ void ParamFieldKeyToggle::paintEvent(QPaintEvent *e) {
     p.setPen(pen);
     p.fillPath(path, getKeyOnColor());
     m_pixmap =
-        QPixmap(createQIcon("key_on", true)
-                    .pixmap(iconSize, iconSize, QIcon::Normal, QIcon::Off));
+        QPixmap(createQIcon("keyframe")
+                    .pixmap(iconSize, iconSize, QIcon::Normal, QIcon::On));
     icon.addPixmap(m_pixmap);
     icon.paint(&p, QRect(0, 0, iconSize, iconSize));
     break;
@@ -729,8 +729,8 @@ void ParamFieldKeyToggle::paintEvent(QPaintEvent *e) {
     p.setPen(pen);
     p.fillPath(path, getKeyModifiedColor());
     m_pixmap =
-        QPixmap(createQIcon("key_modified", true)
-                    .pixmap(iconSize, iconSize, QIcon::Normal, QIcon::Off));
+        QPixmap(createQIcon("keyframe_modified")
+                    .pixmap(iconSize, iconSize, QIcon::Normal, QIcon::On));
     icon.addPixmap(m_pixmap);
     icon.paint(&p, QRect(0, 0, iconSize, iconSize));
     break;
@@ -739,8 +739,8 @@ void ParamFieldKeyToggle::paintEvent(QPaintEvent *e) {
     p.setPen(pen);
     p.fillPath(path, getKeyInbetweenColor());
     m_pixmap =
-        QPixmap(createQIcon("key_on", true)
-                    .pixmap(iconSize, iconSize, QIcon::Normal, QIcon::Off));
+        QPixmap(createQIcon("keyframe")
+                    .pixmap(iconSize, iconSize, QIcon::Normal, QIcon::On));
     icon.addPixmap(m_pixmap);
     icon.paint(&p, QRect(0, 0, iconSize, iconSize));
     break;

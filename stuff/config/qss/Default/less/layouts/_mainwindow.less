@@ -12,9 +12,32 @@ QToolBar * {
   padding: 0;
   margin: 0;
 }
+// END
+
+:TOONZCOLORS {
+  -bg-color: @bg-color;
+
+  // Opacity
+  -icon-base-opacity: @icon-base-opacity;
+  -icon-disabled-opacity: @icon-disabled-opacity;
+
+  // General
+  -icon-base-color: @icon-base-color;
+  -icon-active-color: @icon-active-color;
+  -icon-selected-color: @icon-selected-color;
+  -icon-on-color: @icon-on-color;
+
+  // Individual on states
+  -icon-close-color: @icon-close-color;
+  -icon-preview-color: @icon-preview-color;
+  -icon-vcheck-color: @icon-view-check-color;
+  -icon-lock-color: @icon-lock-color;
+  -icon-keyframe-color: @icon-keyframe-color;
+  -icon-keyframe-modified-color: @icon-keyframe-modified-color;
+}
 
 QWidget {
-  background-color: @bg-color; // main interface background color
+  background-color: @bg-color; // main interface bg-color for stylesheet
   color: @text-color; // main interface text color
 
   &:disabled {
@@ -195,6 +218,7 @@ QMenu {
     &:checked {
       color: @menu-item-text-color-checked;
       background-color: @menu-item-bg-color-checked;
+      font-weight: bold;
 
       &:selected {
         background-color: @menu-item-bg-color-selected;
@@ -270,11 +294,7 @@ TPanelTitleBar {
   min-height: 18;
   qproperty-TitleColor: @titlebar-text-color;
   qproperty-ActiveTitleColor: @titlebar-text-color-active;
-  qproperty-OverColor: @lock-color; // close button only
-
-  & when(@titlebar-gradient-effect = true) {
-    .gradient-effect-vertical();
-  }
+  qproperty-CloseOverColor: @titlebar-close-bg-color; // close button only
 
   & when(@bold-titlebar-text = true) {
     font-weight: bold;
@@ -286,10 +306,11 @@ TPanelTitleBar {
 }
 
 TPanelTitleBarButton {
-  qproperty-PressedColor: @titlebar-button-pressed-color;
-  qproperty-FreezeColor: @titlebar-button-freeze-color;
-  qproperty-PreviewColor: @titlebar-button-preview-color;
-  qproperty-OverColor: @titlebar-button-rollover-color;
+  qproperty-OffColor: @titlebar-button-off-bg-color;
+  qproperty-OverColor: @titlebar-button-rollover-bg-color;
+  qproperty-PressedColor: @titlebar-button-pressed-bg-color;
+  qproperty-FreezeColor: @titlebar-button-freeze-bg-color;
+  qproperty-PreviewColor: @titlebar-button-preview-bg-color;
 }
 
 /* -----------------------------------------------------------------------------
@@ -337,19 +358,11 @@ QScrollBar {
     &:horizontal {
       margin: @sb-handle-margin 16;
       min-width: 20;
-
-      & when (@gradient-effect = true) {
-        .gradient-effect-vertical-small();
-      }
     }
 
     &:vertical {
       margin: 16 @sb-handle-margin;
       min-height: 20;
-    
-      & when (@gradient-effect = true) {
-        .gradient-effect-horizontal-small();
-      }
     }
   }
 

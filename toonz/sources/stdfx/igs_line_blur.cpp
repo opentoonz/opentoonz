@@ -1248,6 +1248,7 @@ int pixel_point_root::save(const char *cp_fname) {
   /* データ数保存 */
   if (fprintf(fp, "# count %d\n", this->get_i32_count()) < 0) {
     pri_funct_err_bttvr("Error : fprintf(count) returns minus.");
+    fclose(fp);
     return NG;
   }
 
@@ -1258,6 +1259,7 @@ int pixel_point_root::save(const char *cp_fname) {
     if (fprintf(fp, "%d %d\n", clp_pp_node->get_i32_xp(),
                 clp_pp_node->get_i32_yp()) < 0) {
       pri_funct_err_bttvr("Error : fprintf(count xp yp) returns minus.");
+      fclose(fp);  
       return NG;
     }
   }
@@ -1836,6 +1838,7 @@ int pixel_line_node::save_line(FILE *fp) {
         0) {
       pri_funct_err_bttvr("Error : point %d : fprintf(%d %d) returns minus", ii,
                           clp_crnt->get_i32_xp(), clp_crnt->get_i32_yp());
+      fclose(fp);
       return NG;
     }
   }

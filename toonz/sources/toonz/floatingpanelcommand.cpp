@@ -110,11 +110,13 @@ TPanel *OpenFloatingPanel::getOrOpenFloatingPanel(
     TPanel *panel = list.at(i);
 
     // we want floating panel (possibly hidden) with the correct name
-    if (panel->getPanelType() == panelType && panel->isFloating()) {
+    // Locator panels can only exist 1x per room
+    if (panel->getPanelType() == panelType &&
+        (panel->isFloating() || panelType == "Locator")) {
       // if there is already a floating panel and MultipleInstances are
       // not allowed we must use it
       if (!panel->areMultipleInstancesAllowed() && !panel->isHidden()) {
-        activateWidget(panel);
+        if (panel->isFloating()) activateWidget(panel);
         return panel;
       }
 

@@ -72,7 +72,6 @@ value_type increased(const value_type &val, const value_type &start,
                      diff_type length, diff_type add) {
   return start + numeric_ops::mod(val - start + add, length);
 }
-
 //-------------------------------------------------------------------------------------------
 
 template <typename value_type, typename diff_type>
@@ -102,17 +101,18 @@ class cyclic_iterator;
 //------------------------------------------------------------------------------------------
 
 template <typename It>
-class cyclic_iterator<It, std::forward_iterator_tag>
-    : public std::iterator<std::forward_iterator_tag,
-                           typename std::iterator_traits<It>::value_type,
-                           typename std::iterator_traits<It>::difference_type,
-                           typename std::iterator_traits<It>::pointer,
-                           typename std::iterator_traits<It>::reference> {
+class cyclic_iterator<It, std::forward_iterator_tag> {
 protected:
   It m_it, m_begin, m_end;
   int m_lap;
 
 public:
+  typedef std::forward_iterator_tag iterator_category;
+  typedef typename std::iterator_traits<It>::value_type value_type;
+  typedef typename std::iterator_traits<It>::difference_type difference_type;
+  typedef typename std::iterator_traits<It>::pointer pointer;
+  typedef typename std::iterator_traits<It>::reference reference;
+
   cyclic_iterator() : m_lap(0) {}
   cyclic_iterator(const It &it, const It &begin, const It &end, int lap = 0)
       : m_it(it), m_begin(begin), m_end(end), m_lap(lap) {}
@@ -128,29 +128,29 @@ public:
     return it;
   }
 
-  typename cyclic_iterator::reference operator*() { return *m_it; }
-  typename cyclic_iterator::pointer operator->() { return m_it.operator->(); }
+  reference operator*() { return *m_it; }
+  pointer operator->() { return m_it.operator->(); }
 
   bool operator==(const cyclic_iterator &it) const {
     return m_it == it.m_it && m_lap == it.m_lap;
   }
   bool operator!=(const cyclic_iterator &it) const { return !operator==(it); }
 };
-
 //------------------------------------------------------------------------------------------
 
 template <typename It>
-class cyclic_iterator<It, std::bidirectional_iterator_tag>
-    : public std::iterator<std::bidirectional_iterator_tag,
-                           typename std::iterator_traits<It>::value_type,
-                           typename std::iterator_traits<It>::difference_type,
-                           typename std::iterator_traits<It>::pointer,
-                           typename std::iterator_traits<It>::reference> {
+class cyclic_iterator<It, std::bidirectional_iterator_tag> {
 protected:
   It m_it, m_begin, m_end;
   int m_lap;
 
 public:
+  typedef std::bidirectional_iterator_tag iterator_category;
+  typedef typename std::iterator_traits<It>::value_type value_type;
+  typedef typename std::iterator_traits<It>::difference_type difference_type;
+  typedef typename std::iterator_traits<It>::pointer pointer;
+  typedef typename std::iterator_traits<It>::reference reference;
+
   cyclic_iterator() : m_lap(0) {}
   cyclic_iterator(const It &it, const It &begin, const It &end, int lap = 0)
       : m_it(it), m_begin(begin), m_end(end), m_lap(lap) {}
@@ -178,30 +178,30 @@ public:
     return it;
   }
 
-  typename cyclic_iterator::reference operator*() { return *m_it; }
-  typename cyclic_iterator::pointer operator->() { return m_it.operator->(); }
+  reference operator*() { return *m_it; }
+  pointer operator->() { return m_it.operator->(); }
 
   bool operator==(const cyclic_iterator &it) const {
     return m_it == it.m_it && m_lap == it.m_lap;
   }
   bool operator!=(const cyclic_iterator &it) const { return !operator==(it); }
 };
-
 //------------------------------------------------------------------------------------------
 
 template <typename It>
-class cyclic_iterator<It, std::random_access_iterator_tag>
-    : public std::iterator<std::random_access_iterator_tag,
-                           typename std::iterator_traits<It>::value_type,
-                           typename std::iterator_traits<It>::difference_type,
-                           typename std::iterator_traits<It>::pointer,
-                           typename std::iterator_traits<It>::reference> {
+class cyclic_iterator<It, std::random_access_iterator_tag> {
 protected:
   It m_it, m_begin, m_end;
   int m_lap;
-  typename cyclic_iterator::difference_type m_count;
+  typename std::iterator_traits<It>::difference_type m_count;
 
 public:
+  typedef std::random_access_iterator_tag iterator_category;
+  typedef typename std::iterator_traits<It>::value_type value_type;
+  typedef typename std::iterator_traits<It>::difference_type difference_type;
+  typedef typename std::iterator_traits<It>::pointer pointer;
+  typedef typename std::iterator_traits<It>::reference reference;
+
   cyclic_iterator() : m_lap(0), m_count(0) {}
   cyclic_iterator(const It &it, const It &begin, const It &end, int lap = 0)
       : m_it(it)
@@ -233,45 +233,37 @@ public:
     return it;
   }
 
-  cyclic_iterator &operator+=(
-      const typename cyclic_iterator::difference_type &val) {
+  cyclic_iterator &operator+=(difference_type val) {
     m_lap += (val + (m_it - m_begin)) / m_count;
     m_it = cyclic_ops::increased(m_it, m_begin, m_count, val);
     return *this;
   }
 
-  cyclic_iterator &operator-=(
-      const typename cyclic_iterator::difference_type &val) {
+  cyclic_iterator &operator-=(difference_type val) {
     m_lap -= (val + (m_end - m_it)) / m_count;
     m_it = cyclic_ops::decreased(m_it, m_begin, m_count, val);
     return *this;
   }
 
-  typename cyclic_iterator::difference_type operator-(
-      const cyclic_iterator &it) const {
+  difference_type operator-(const cyclic_iterator &it) const {
     assert(m_begin == it.m_begin && m_end == it.m_end);
     return m_it - it.m_it + m_lap * m_count - it.m_lap * it.m_count;
   }
 
-  cyclic_iterator operator+(
-      const typename cyclic_iterator::difference_type &val) const {
+  cyclic_iterator operator+(difference_type val) const {
     cyclic_iterator it(*this);
     it += val;
     return it;
   }
 
-  cyclic_iterator operator-(
-      const typename cyclic_iterator::difference_type &val) const {
+  cyclic_iterator operator-(difference_type val) const {
     cyclic_iterator it(*this);
     it -= val;
     return it;
   }
 
-  typename cyclic_iterator::reference operator*() const { return *m_it; }
-  typename cyclic_iterator::pointer operator->() const {
-    return m_it.operator->();
-  }
-
+  reference operator*() const { return *m_it; }
+  pointer operator->() const { return m_it.operator->(); }
   bool operator==(const cyclic_iterator &it) const {
     return m_it == it.m_it && m_lap == it.m_lap;
   }

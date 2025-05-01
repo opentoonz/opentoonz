@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 10.0, SVG Export Plug-In . SVG Version: 3.0.0 Build 76)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN"    "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd" [
+	<!ENTITY ns_flows "http://ns.adobe.com/Flows/1.0/">
+	<!ENTITY ns_extend "http://ns.adobe.com/Extensibility/1.0/">
+	<!ENTITY ns_ai "http://ns.adobe.com/AdobeIllustrator/10.0/">
+	<!ENTITY ns_graphs "http://ns.adobe.com/Graphs/1.0/">
+	<!ENTITY ns_vars "http://ns.adobe.com/Variables/1.0/">
+	<!ENTITY ns_imrep "http://ns.adobe.com/ImageReplacement/1.0/">
+	<!ENTITY ns_sfw "http://ns.adobe.com/SaveForWeb/1.0/">
+	<!ENTITY ns_custom "http://ns.adobe.com/GenericCustomNamespace/1.0/">
+	<!ENTITY ns_adobe_xpath "http://ns.adobe.com/XPath/1.0/">
+	<!ENTITY ns_svg "http://www.w3.org/2000/svg">
+	<!ENTITY ns_xlink "http://www.w3.org/1999/xlink">
+]>
+<svg 
+	 xmlns:x="&ns_extend;" xmlns:i="&ns_ai;" xmlns:graph="&ns_graphs;" i:viewOrigin="382.083 307.4688" i:rulerOrigin="0 0" i:pageBounds="0 600 800 0"
+	 xmlns="&ns_svg;" xmlns:xlink="&ns_xlink;" xmlns:a="http://ns.adobe.com/AdobeSVGViewerExtensions/3.0/" width="37" height="17"
+	 viewBox="0 0 37 17" overflow="visible" enable-background="new 0 0 37 17" xml:space="preserve">
+	<metadata>
+		<variableSets  xmlns="&ns_vars;">
+			<variableSet  varSetName="binding1" locked="none">
+				<variables></variables>
+				<v:sampleDataSets  xmlns="&ns_custom;" xmlns:v="&ns_vars;"></v:sampleDataSets>
+			</variableSet>
+		</variableSets>
+		<sfw  xmlns="&ns_sfw;">
+			<slices></slices>
+			<sliceSourceBounds  y="290.469" x="382.083" width="37" height="17" bottomLeftOrigin="true"></sliceSourceBounds>
+		</sfw>
+	</metadata>
+	<g id="Layer_1" i:layer="yes" i:dimmedPercent="50" i:rgbTrio="#4F008000FFFF">
+		<path i:knockout="Off" fill="none" d="M37,17H0V0h37V17z"/>
+		<g>
+			<path i:knockout="Off" fill="#A4A4A4" stroke="#000000" stroke-width="0.4707" stroke-linejoin="round" d="M17.388,8.701
+				c-0.894,0.396-3.57,1.534-3.57,1.534l0.605,1.497c0,0,2.398-0.906,3.68-1.349"/>
+			<path i:knockout="Off" fill="#EBEBEB" stroke="#000000" stroke-width="0.4707" d="M13.817,10.235l-2.396,1.266l0.425,1.038
+				l2.576-0.807"/>
+			<path i:knockout="Off" fill="#E6E6E6" d="M9.47,11.309c-0.796,0.291-1.314,0.698-1.797,0.926
+				c1.265-0.089,0.297,0.606-0.302,0.955c-0.226,0.131-1.143,0.605-2.322,0.387c0,0,2.589,1.221,4.576,0.704
+				c1.241-0.323,2.286-1.286,2.01-2.271C11.354,11.025,10.265,11.015,9.47,11.309z"/>
+			<path i:knockout="Off" fill="#7D7D7D" d="M8.959,12.312c-0.349-0.069,0.56-1.024,0.511-1.003
+				c-0.796,0.291-1.314,0.698-1.797,0.926c1.265-0.089,0.297,0.606-0.302,0.955c-0.226,0.131-1.143,0.605-2.322,0.387
+				c0,0,2.589,1.221,4.576,0.704c0.283-0.073,0.56-0.181,0.81-0.316c0.156-0.922-1.281-0.352-1.477-0.556
+				c-0.32-0.335,1.269-0.723,1.122-1.023C10.017,12.252,9.38,12.394,8.959,12.312z"/>
+			<path i:knockout="Off" fill="none" stroke="#000000" stroke-width="0.4707" stroke-linecap="round" stroke-linejoin="round" d="
+				M9.47,11.309c-0.796,0.291-1.314,0.698-1.797,0.926c1.265-0.089,0.297,0.606-0.302,0.955c-0.226,0.131-1.143,0.605-2.322,0.387
+				c0,0,2.589,1.221,4.576,0.704c1.241-0.323,2.286-1.286,2.01-2.271C11.354,11.025,10.265,11.015,9.47,11.309z"/>
+		</g>
+		<g>
+			
+				<linearGradient id="XMLID_1_" gradientUnits="userSpaceOnUse" x1="-34.5854" y1="18.9219" x2="-36.6049" y2="9.6408" gradientTransform="matrix(0.983 0.1836 -0.1836 0.983 58.965 0.5769)">
+				<stop  offset="0" style="stop-color:#9B9B9B"/>
+				<stop  offset="0.0682" style="stop-color:#ABABAB"/>
+				<stop  offset="0.2252" style="stop-color:#C9C9C9"/>
+				<stop  offset="0.3907" style="stop-color:#E1E1E1"/>
+				<stop  offset="0.5662" style="stop-color:#F2F2F2"/>
+				<stop  offset="0.7586" style="stop-color:#FCFCFC"/>
+				<stop  offset="1" style="stop-color:#FFFFFF"/>
+				<a:midPointStop  offset="0" style="stop-color:#9B9B9B"/>
+				<a:midPointStop  offset="0.2486" style="stop-color:#9B9B9B"/>
+				<a:midPointStop  offset="1" style="stop-color:#FFFFFF"/>
+			</linearGradient>
+			<path i:knockout="Off" fill="url(#XMLID_1_)" d="M19.938,5.725c-0.888-0.066-2.037-0.018-2.797,0.379
+				c-0.697,0.364-1.556,0.785-2.067,1.364c-0.642,0.723-0.974,0.97-1.147,1.903c-0.176,0.939,0.055,2.047,1.165,1.576
+				c0.814-0.346,0.889-1.081,1.272-1.635c0.409-0.59,1.188-0.8,1.57-0.957c1.248-0.506,3.406-0.089,2.785,1.519
+				c-0.57,1.473-2.974,0.746-4.191,0.767c-1.652,0.026-1.145,1.898-0.062,2.164c1.329,0.321,2.769,0.165,4.366,0.043
+				c0.545-0.041,1.452-0.04,1.971-0.205c0.521-0.165,2.209-0.646,2.759-0.694c0,0,0.36,0.34,0.555,0.443
+				c0.34,0.177,0.913,0.31,1.29,0.114c0.971-0.5,1.326-2.289,1.444-3.258c0.138-1.148-0.081-2.82-0.909-3.052
+				c-0.504-0.14-1.784,0.122-1.784,0.122c-0.723-0.524-1.769-1.197-2.501-1.713c-1.674-1.178-3.114-1.561-3.96-1.443
+				c-0.801,0.111-2.817,0.586-3.405,1.33c-0.351,0.442-1.098,1.521-0.777,2.143"/>
+			<path i:knockout="Off" fill="none" stroke="#000000" stroke-width="0.8" stroke-linecap="round" d="M19.938,5.725
+				c-0.888-0.066-2.037-0.018-2.797,0.379c-0.697,0.364-1.556,0.785-2.067,1.364c-0.642,0.723-0.974,0.97-1.147,1.903
+				c-0.176,0.939,0.055,2.047,1.165,1.576c0.814-0.346,0.889-1.081,1.272-1.635c0.409-0.59,1.188-0.8,1.57-0.957
+				c1.248-0.506,3.406-0.089,2.785,1.519c-0.57,1.473-2.974,0.746-4.191,0.767c-1.652,0.026-1.145,1.898-0.062,2.164
+				c1.329,0.321,2.769,0.165,4.366,0.043c0.545-0.041,1.452-0.04,1.971-0.205c0.521-0.165,2.209-0.646,2.759-0.694
+				c0,0,0.36,0.34,0.555,0.443c0.34,0.177,0.913,0.31,1.29,0.114c0.971-0.5,1.326-2.289,1.444-3.258
+				c0.138-1.148-0.081-2.82-0.909-3.052c-0.504-0.14-1.784,0.122-1.784,0.122c-0.723-0.524-1.769-1.197-2.501-1.713
+				c-1.674-1.178-3.114-1.561-3.96-1.443c-0.801,0.111-2.817,0.586-3.405,1.33c-0.351,0.442-1.098,1.521-0.777,2.143"/>
+			<path i:knockout="Off" fill="none" stroke="#000000" stroke-width="0.7355" stroke-linecap="round" d="M19.914,4.463
+				c-0.979-0.183-3.7,0.431-4.306,2.001"/>
+			<path i:knockout="Off" fill="none" stroke="#000000" stroke-width="0.8" stroke-linecap="round" d="M26.158,6.318
+				c0.581,0.389,0.581,1.33,0.449,2.586c-0.083,0.802-0.224,2.038-1.045,3.044"/>
+		</g>
+		<path i:knockout="Off" fill="#A4A4A4" stroke="#000000" stroke-width="0.4707" stroke-linejoin="round" d="M18.103,10.384
+			l11.719-5.327l-0.336-0.791L17.388,8.701"/>
+	</g>
+</svg>

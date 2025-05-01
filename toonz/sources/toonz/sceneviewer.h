@@ -145,6 +145,7 @@ class SceneViewer final : public GLWidgetForHighDpi,
   TRectD m_clipRect;
 
   bool m_isPicking;
+  bool m_showViewerIndicators = true;
 
   TRaster32P m_3DSideL;
   TRaster32P m_3DSideR;
@@ -172,7 +173,6 @@ class SceneViewer final : public GLWidgetForHighDpi,
     TOP_3D,
   } m_current3DDevice;
 
-  LocatorPopup *m_locator;
   bool m_isLocator;
   bool m_isStyleShortcutSwitchable;
 
@@ -322,6 +322,7 @@ protected:
   void drawCameraStand();
   void drawPreview();
   void drawOverlay();
+  void drawViewerIndicators();
 
   void drawScene();
   void drawToolGadgets();

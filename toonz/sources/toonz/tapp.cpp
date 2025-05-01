@@ -434,13 +434,6 @@ void TApp::onSceneSwitched() {
   // update XSheet
   m_currentXsheet->setXsheet(m_currentScene->getScene()->getXsheet());
 
-  TPalette *palette = m_currentScene->getScene()
-                          ->getProperties()
-                          ->getCleanupParameters()
-                          ->m_cleanupPalette.getPointer();
-  m_paletteController->getCurrentCleanupPalette()->setPalette(palette, -1);
-  m_paletteController->editLevelPalette();
-
   // reset current frame
   m_currentFrame->setFrame(0);
 

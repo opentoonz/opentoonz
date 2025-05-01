@@ -27,6 +27,7 @@ PaletteController::PaletteController()
   m_currentCleanupPalette = new TPaletteHandle;
   m_currentPalette        = new TPaletteHandle;
 
+  // Would be called twice when setting current CleanUpPalette
   QObject::connect(m_currentCleanupPalette, SIGNAL(paletteSwitched()), this,
                    SLOT(editCleanupPalette()));
   QObject::connect(m_currentCleanupPalette, SIGNAL(colorStyleSwitched()), this,
@@ -89,7 +90,7 @@ void PaletteController::setCurrentPalette(TPaletteHandle *paletteHandle) {
 //-----------------------------------------------------------------------------
 
 void PaletteController::editLevelPalette() {
-  setCurrentPalette(m_currentLevelPalette);
+    setCurrentPalette(m_currentLevelPalette);
   emit(checkPaletteLock());
 }
 

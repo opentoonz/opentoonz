@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <commandbar>
+    <command>MI_StartupPopup</command>
+    <command>MI_OpenOnlineManual</command>
+    <separator/>
     <command>MI_Undo</command>
     <command>MI_Redo</command>
     <separator/>
@@ -10,21 +13,37 @@
     <command>MI_Paste</command>
     <command>MI_Clear</command>
     <separator/>
-    <command>MI_AddFrames</command>
-    <command>MI_PrevDrawing</command>
-    <command>MI_NextDrawing</command>
+    <command>MI_PencilTest</command>
+    <separator/>
+    <command>MI_SendBack</command>
+    <command>MI_SendBackward</command>
+    <command>MI_BringForward</command>
+    <command>MI_BringToFront</command>
+    <separator/>
+    <command>MI_Group</command>
+    <command>MI_Ungroup</command>
+    <command>MI_EnterGroup</command>
+    <command>MI_ExitGroup</command>
+    <separator/>
+    <command>MI_GeometricLine</command>
+    <command>MI_GeometricArc</command>
+    <command>MI_GeometricMultiArc</command>
+    <command>MI_GeometricPolyline</command>
+    <command>MI_GeometricRectangle</command>
+    <command>MI_GeometricCircle</command>
+    <command>MI_GeometricEllipse</command>
+    <command>MI_GeometricPolygon</command>
     <separator/>
     <command>MI_ShiftTrace</command>
     <command>MI_EditShift</command>
     <command>MI_NoShift</command>
     <command>MI_ResetShift</command>
     <separator/>
-    <command>MI_SendBack</command>
-    <command>MI_SendBackward</command>
-    <command>MI_BringForward</command>
-    <command>MI_BringToFront</command>
-    <command>MI_Group</command>
-    <command>MI_Ungroup</command>
-    <command>MI_EnterGroup</command>
-    <command>MI_ExitGroup</command>
+    <command>MI_ACheck</command>
+    <command>MI_TCheck</command>
+    <command>MI_GCheck</command>
+    <command>MI_IOnly</command>
+    <separator/>
+    <command>MI_ICheck</command>
+    <command>MI_PCheck</command>
 </commandbar>

@@ -18,7 +18,7 @@ This software can be built using Visual Studio 2019 and Qt 5.x
 - Install Qt 5.15 (64-bit version, tested up to 5.15.2) with the [Qt Online Installer for Windows](http://download.qt.io/official_releases/online_installers/qt-unified-windows-x86-online.exe).
 
 #### Customized Qt v5.15.2 with WinTab support
-- Qt have started to support Windows Ink from 5.12. Unlike WinTab API used in Qt 5.15 the tablet behaviors are different and are (at least, for OT) problematic.
+- Qt have started to support Windows Ink from 5.12. Unlike WinTab API used until Qt 5.9 , the tablet behaviors are different and are (at least, for OT) problematic.
 - The customized Qt5.15.2 are made with cherry-picking the WinTab feature to be officially introduced from 6.0.
 - You can build OT with WinTab support by using the prebuilt package of the customized version of Qt for MSVC2019-x64 provided [here](https://github.com/shun-iwasawa/qt5/releases/tag/v5.15.2_wintab) and checking the `WITH_WINTAB` checkbox in CMake to build.
 

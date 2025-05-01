@@ -215,12 +215,11 @@ void SceneViewer::onButtonPressed(FlipConsole::EGadget button) {
     break;
 
   // open locator. Create one for the first time
-  case FlipConsole::eLocator:
-    if (!m_locator) m_locator = new LocatorPopup(this);
-    m_locator->show();
-    m_locator->raise();
-    m_locator->activateWindow();
+  case FlipConsole::eLocator: {
+    QAction *action = CommandManager::instance()->getAction(MI_OpenLocator);
+    action->trigger();
     break;
+  }
 
   case FlipConsole::eZoomIn:
     zoomIn();
@@ -623,13 +622,13 @@ void SceneViewer::onMove(const TMouseEvent &event) {
     // grab screen picking for stop motion live view zoom
     if ((event.buttons() & Qt::LeftButton) &&
         StopMotion::instance()->m_canon->m_pickLiveViewZoom) {
-      StopMotion::instance()->m_canon->makeZoomPoint(pos);
-      return;
+        StopMotion::instance()->m_canon->makeZoomPoint(pos);
+        return;
     }
 #endif
-
-    if (m_locator) {
-      m_locator->onChangeViewAff(worldPos);
+    LocatorPopup *locator = TApp::instance()->getActiveLocator();
+    if (!m_isLocator && locator) {
+      locator->onChangeViewAff(worldPos);
     }
 
     TObjectHandle *objHandle = TApp::instance()->getCurrentObject();
@@ -1012,7 +1011,7 @@ void SceneViewer::wheelEvent(QWheelEvent *event) {
 
   }  // end switch
 
-  if (abs(delta) > 0) {
+  if (abs(delta) > 0 || m_touchDevice == QTouchDevice::TouchPad) {
     // scrub with mouse wheel
     if ((event->modifiers() & Qt::AltModifier) &&
         (event->modifiers() & Qt::ShiftModifier) &&
@@ -1036,6 +1035,10 @@ void SceneViewer::wheelEvent(QWheelEvent *event) {
       } else if (delta > 0) {
         CommandManager::instance()->execute("MI_PrevDrawing");
       }
+    } else if (m_touchDevice == QTouchDevice::TouchPad) {
+        QPointF centerDelta = QPointF(event->angleDelta().x(), event->angleDelta().y());
+        panQt(centerDelta.toPoint());
+        m_panning = true;
     }
     // Mouse wheel zoom interfered with touchpad panning (touch enabled)
     // Now if touch is enabled, touchpads ignore the mouse wheel zoom
@@ -1144,10 +1147,8 @@ void SceneViewer::touchEvent(QTouchEvent *e, int type) {
     // touchpads must have 2 finger panning for tools and navigation to be
     // functional
     // on other devices, 1 finger panning is preferred
-    if ((e->touchPoints().count() == 2 &&
-         m_touchDevice == QTouchDevice::TouchPad) ||
-        (e->touchPoints().count() == 1 &&
-         m_touchDevice == QTouchDevice::TouchScreen)) {
+    if (e->touchPoints().count() == 1 &&
+         m_touchDevice == QTouchDevice::TouchScreen) {
       QTouchEvent::TouchPoint panPoint = e->touchPoints().at(0);
       if (!m_panning) {
         QPointF deltaPoint = panPoint.pos() - m_firstPanPoint;

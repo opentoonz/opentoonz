@@ -14,7 +14,7 @@
 
 // SETTINGS --------------------------------------------------------------------
 
-@ui-contrast: 1.4; // multiplier
+@ui-contrast: 2.0; // multiplier
 @border-contrast: 1.8; // multiplier
 
 @hover-adjust-amount: -1.4; // multiplier
@@ -22,8 +22,6 @@
 @disabled-amount: 40%; // percentage range: 0-100%
 @titlebar-border-radius: 0; // int
 
-@gradient-effect: false; // bool: show gradients on buttons
-@titlebar-gradient-effect: false; // bool: show gradients on titlebars
 @bold-titlebar-text: true; // bool
 @bold-label-text: true; // bool
 @bold-fxlabel-text: true; // bool
@@ -49,6 +47,10 @@
 @normal-label-color: #341f88;
 @error-label-color: rgba(255, 0, 0, 0.7);
 @fx-settings-label-color: @normal-label-color;
+
+// Icon Theme Colors
+@icon-base-color: @text-color;
+@icon-active-color: black;
 
 // -----------------------------------------------------------------------------
 // Tabs
@@ -148,7 +150,7 @@
 // Titlebars
 // -----------------------------------------------------------------------------
 // Icon Colors
-@titlebar-button-pressed-color: white;
+@titlebar-button-pressed-bg-color: white;
 
 // -----------------------------------------------------------------------------
 // Flip Slider/Marker
@@ -238,6 +240,9 @@
 
 // Splines
 @node-link-color: rgb(235, 235, 235);
+
+// Keyframe Buttons
+@keyframe-total-border-color: darken(@keyframe-total-color, 20%);
 
 // -----------------------------------------------------------------------------
 // Function Editor

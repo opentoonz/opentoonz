@@ -1,39 +1,4 @@
 // -----------------------------------------------------------------------------
-// 3D Effect
-// -----------------------------------------------------------------------------
-
-// The images are a white gradient, don't bother using these over light colors
-.gradient-effect-vertical() {
-  background-image: url('@{img-url}/misc/gradient-vertical.svg');
-  background-position: top left;
-  background-repeat: repeat-x;
-}
-
-.gradient-effect-vertical-inverted() {
-  background-image: url('@{img-url}/misc/gradient-vertical-inverted.svg');
-  background-position: bottom left;
-  background-repeat: repeat-x;
-}
-
-.gradient-effect-vertical-small() { // useful on scrollbars
-  background-image: url('@{img-url}/misc/gradient-vertical_small.svg');
-  background-position: top left;
-  background-repeat: repeat-x;
-}
-
-.gradient-effect-horizontal() {
-  background-image: url('@{img-url}/misc/gradient-horizontal.svg');
-  background-position: top left;
-  background-repeat: repeat-y;
-}
-
-.gradient-effect-horizontal-small() { // useful on scrollbars
-  background-image: url('@{img-url}/misc/gradient-horizontal_small.svg');
-  background-position: top left;
-  background-repeat: repeat-y;
-}
-
-// -----------------------------------------------------------------------------
 // Main Button
 // -----------------------------------------------------------------------------
 
@@ -47,10 +12,6 @@
   margin: 0;
   padding: @button-v-padding @button-h-padding;
 
-  & when (@gradient-effect = true) {
-    .gradient-effect-vertical();
-  }
-
   &:hover {
     background-color: @button-bg-color-hover;
     border-color: @button-border-color-hover;
@@ -61,20 +22,12 @@
     background-color: @button-bg-color-pressed;
     border-color: @button-border-color-pressed;
     color: @button-text-color-pressed;
-
-    & when (@gradient-effect = true) {
-      .gradient-effect-vertical-inverted();
-    }
   }
 
   &:checked {
     background-color: @button-bg-color-checked;
     border-color: @button-border-color-checked;
     color: @button-text-color-checked;
-
-    & when (@gradient-effect = true) {
-      .gradient-effect-vertical-inverted();
-    }
 
     &:hover {
       background-color: @button-bg-color-checked-hover;
@@ -118,30 +71,18 @@
     background-color: @toolbutton-bg-color-hover;
     border-color: @toolbutton-border-color-hover;
     color: @toolbutton-text-color-hover;
-
-    & when(@gradient-effect = true) {
-      .gradient-effect-vertical();
-    }
   }
 
   &:pressed {
     background-color: @toolbutton-bg-color-pressed;
     border-color: @toolbutton-border-color-pressed;
     color: @toolbutton-text-color-pressed;
-
-    & when(@gradient-effect = true) {
-      .gradient-effect-vertical-inverted();
-    }
   }
   
   &:checked {
     background-color: @toolbutton-bg-color-checked;
     border-color: @toolbutton-border-color-checked;
     color: @toolbutton-text-color-checked;
-
-    & when(@gradient-effect = true) {
-      .gradient-effect-vertical();
-    }
 
     &:hover {
       background-color: @toolbutton-bg-color-checked-hover;
@@ -160,10 +101,6 @@
     &:checked {
       background-color: @toolbutton-bg-color-checked-disabled;
       border-color: @toolbutton-border-color-checked-disabled;
-
-      & when(@gradient-effect = true) {
-        .gradient-effect-vertical();
-      }
     }
   }
 }
@@ -205,10 +142,6 @@
   max-width: @width;
   height: @height;
   max-height: @height;
-
-  & when(@gradient-effect = true) {
-    .gradient-effect-vertical();
-  }
 
   &:hover {
     background-color: @button-bg-color-hover;
@@ -293,7 +226,7 @@
   }
 
   &:disabled {
-    background: none; // override gradient image if any
+    background: none;
     color: @input-text-color-disabled;
     background-color: @input-bg-color-disabled;
     border-color: @input-border-color-disabled;
@@ -339,10 +272,6 @@
     background-color: @checkbox-bg-color-checked;
     border-color: @checkbox-border-color-checked;
     image: url('@{img-url}/@{checkbox-img-checked}');
-
-    & when(@gradient-effect = true) {
-      .gradient-effect-vertical();
-    }
 
     &:hover {
       background-color: @checkbox-bg-color-checked-hover;
@@ -541,11 +470,7 @@
   &:checked {
     background-color: @lockbutton-bg-color-checked;
     border-color: @lockbutton-border-color-checked;
-    image: url('@{img-url}/lock/lock_on.svg');
-
-    & when (@gradient-effect = true) {
-      .gradient-effect-vertical();
-    }
+    image: url('@{img-url}/lock/@{lock-img-on}');
     
     &:hover {
       background-color: @lockbutton-bg-color-checked-hover;

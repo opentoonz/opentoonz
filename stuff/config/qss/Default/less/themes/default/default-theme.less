@@ -23,8 +23,6 @@
 @pressed-adjust-amount: 1.0; // multiplier
 @disabled-amount: 40%; // percentage range: 0-100%
 
-@gradient-effect: false; // bool: show gradients on buttons
-@titlebar-gradient-effect: false; // bool: show gradients on titlebars
 @bold-titlebar-text: true; // bool
 @bold-label-text: true; // bool
 @bold-fxlabel-text: false; // bool
@@ -39,7 +37,7 @@
 @dock-placeholder-color: #1aff00;
 
 // Text
-@text-color: #e8e8e8;
+@text-color: #dfdfdf;
 @text-color-active: rgb(239, 239, 239);
 @text-color-inactive: fade(@text-color, 60%);
 @text-color-disabled: fade(@text-color, @disabled-amount);
@@ -48,7 +46,7 @@
 @hl-color: #4f7bc7;
 @hl-text-color: white;
 @lock-color: #d44a4a;
-@preview-color: #b9b000;
+@preview-color: #C8C864;
 
 // Label
 @normal-label-color: #7fdbfc;
@@ -61,6 +59,22 @@
 @tooltip-border-color: rgb(130, 130, 130);
 @tooltip-text-color: rgb(210, 210, 210);
 @tooltip-padding: 2px;
+
+// Icon Theme Colors
+@icon-base-opacity: 0.8;
+@icon-disabled-opacity: 0.3;
+@icon-base-color: @text-color;
+@icon-active-color: white;
+@icon-selected-color: @icon-active-color;
+@icon-on-color: @icon-active-color;
+
+// Individual Icon Colors
+@icon-preview-color: if(lightness(@preview-color) > 50%, black, white);
+@icon-view-check-color: @icon-on-color;
+@icon-lock-color: @icon-active-color;
+@icon-keyframe-color: @icon-active-color;
+@icon-keyframe-modified-color: @icon-active-color;
+@icon-close-color: @icon-active-color;
 
 // -----------------------------------------------------------------------------
 // Tabs
@@ -120,7 +134,7 @@
 
 // Checked
 @menu-item-bg-color-checked: @menu-bg-color;
-@menu-item-text-color-checked: lime;
+@menu-item-text-color-checked: @normal-label-color;
 @menu-checkbox-border-color-checked: @checkbox-border-color-checked;
 @menu-checkbox-text-color-selected: @text-color;
 
@@ -144,7 +158,7 @@
 @button-v-padding: 2px;
 
 @button-text-color: @text-color;
-@button-bg-color: lighten(@bg-color, 12%);
+@button-bg-color: lighten(@bg-color, 10%);
 
 @button-border-color: @button-bg-color;
 @button-border-radius: 2px;
@@ -244,10 +258,13 @@
 // Hover Pressed
 @lockbutton-bg-color-checked-pressed: darken(@lockbutton-bg-color-checked, 8% * @hover-adjust-amount);
 
+// Img
+@lock-img-on: 'lock_on.svg';
+
 // -----------------------------------------------------------------------------
 // Scrollbars [sb]
 // -----------------------------------------------------------------------------
-@sb-bg-color: darken(@bg-color, 10% * @ui-contrast);
+@sb-bg-color: darken(@bg-color, 8% * @ui-contrast);
 
 // Handle
 @sb-handle-radius: 5px;
@@ -264,7 +281,7 @@
 // Textfield
 // -----------------------------------------------------------------------------
 @input-text-color: @text-color;
-@input-bg-color: darken(@bg-color, 18%);
+@input-bg-color: darken(@bg-color, 15%);
 @input-border-color: @input-bg-color;
 @input-border-radius: 2px;
 
@@ -287,6 +304,10 @@
 @input-selection-text-color: @input-text-color-focus;
 @input-selection-bg-color: fade(@hl-color, 80%);
 
+// Tooloptions
+@tooloptions-input-text-color: @input-text-color;
+@tooloptions-input-text-color-disabled: fade(@tooloptions-input-text-color, @disabled-amount);
+
 // -----------------------------------------------------------------------------
 // CheckBox
 // -----------------------------------------------------------------------------
@@ -300,7 +321,7 @@
 
 // Hover
 @checkbox-bg-color-hover: lighten(@checkbox-bg-color, 8% * @hover-adjust-amount);
-@checkbox-border-color-hover: @checkbox-border-color;
+@checkbox-border-color-hover: @checkbox-bg-color-hover;
 
 // Checked
 @checkbox-img-checked: 'checkmark/checkmark.svg';
@@ -355,11 +376,15 @@
 @titlebar-text-color: @text-color-inactive;
 @titlebar-text-color-active: @text-color-active;
 
-// Icon Colors
-@titlebar-button-rollover-color: lighten(@titlebar-bg-color, 18% * @hover-adjust-amount);
-@titlebar-button-pressed-color: @hl-color;
-@titlebar-button-freeze-color: @lock-color;
-@titlebar-button-preview-color: @preview-color;
+// Icon BG Colors
+@titlebar-button-off-bg-color: @titlebar-bg-color;
+@titlebar-button-rollover-bg-color: lighten(@titlebar-bg-color, 15% * @hover-adjust-amount);
+@titlebar-button-pressed-bg-color: @hl-color;
+@titlebar-button-freeze-bg-color: @lock-color;
+@titlebar-button-preview-bg-color: @preview-color;
+
+// Close Button BG Color
+@titlebar-close-bg-color: @lock-color;
 
 // -----------------------------------------------------------------------------
 // Palette Window
@@ -398,10 +423,11 @@
 @list-bg-color: @tree-bg-color;
 
 // All Panes
+@browser-selected-item-bg-color: @hl-color;
+@browser-selected-text-color: @hl-text-color;
 @browser-text-color: @text-color;
 @browser-folder-text-color: @normal-label-color;
 @browser-folder-text-color-selected: @hl-text-color;
-@browser-selected-item-bg-color: @hl-color;
 
 // Right Pane Column Bar
 @browser-itemview-col-color: @tree-bg-color;
@@ -428,7 +454,7 @@
 @viewer-ruler-tool-options-text-color: #000;
 @viewer-ruler-border-color: @border-color;
 @viewer-ruler-handle-color: rgb(255, 132, 255);
-@viewer-ruler-handle-drag-color: lime;
+@viewer-ruler-handle-drag-color: cyan;
 
 // -----------------------------------------------------------------------------
 // Progress Bar
@@ -539,7 +565,7 @@
 @xsh-framenumber-column-range-bg-color: lighten(@xsh-framenumber-column-bg-color, 5% * @xsh-contrast);
 
 @xsh-framenumber-current-text-color: rgb(255, 255, 255);
-@xsh-framenumber-current-bg-color: @hl-color;
+@xsh-framenumber-current-bg-color: fade(@hl-color, 60%);
 
 // Column Header Colors
 @xsh-column-header-empty-color: @bg-color;

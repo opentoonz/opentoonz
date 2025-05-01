@@ -1163,7 +1163,7 @@ void PageViewer::contextMenuEvent(QContextMenuEvent *event) {
   QAction *openStyleControlAct = cmd->getAction("MI_OpenStyleControl");
   menu.addAction(openStyleControlAct);
   QAction *openStyleNameEditorAct = menu.addAction(tr("Name Editor"));
-  openStyleNameEditorAct->setIcon(createQIcon("rename", false, true));
+  openStyleNameEditorAct->setIcon(createQIcon("rename"));
   connect(openStyleNameEditorAct, &QAction::triggered, [&]() {
     if (!m_styleNameEditor) {
       m_styleNameEditor = new StyleNameEditor(this);
@@ -1217,10 +1217,10 @@ void PageViewer::contextMenuEvent(QContextMenuEvent *event) {
 
   if (m_page) {
     menu.addSeparator();
-    QIcon newStyleIco = createQIcon("newstyle", false, true);
+    QIcon newStyleIco = createQIcon("newstyle");
     QAction *newStyle = menu.addAction(newStyleIco, tr("New Style"));
     connect(newStyle, SIGNAL(triggered()), SLOT(addNewColor()));
-    QIcon newPageIco = createQIcon("newpage", false, true);
+    QIcon newPageIco = createQIcon("newpage");
     QAction *newPage = menu.addAction(newPageIco, tr("New Page"));
     connect(newPage, SIGNAL(triggered()), SLOT(addNewPage()));
   }
@@ -1692,17 +1692,17 @@ PaletteIconWidget::~PaletteIconWidget() {}
 
 void PaletteIconWidget::paintEvent(QPaintEvent *) {
   QPainter p(this);
-  // generate icon and extract the pixmaps
-  QIcon dragPaletteIcon = createQIcon("dragpalette");
-  if (m_isOver) {
-    static QPixmap dragPaletteIconPixmapOver(
-        dragPaletteIcon.pixmap(20, QIcon::Active));
-    p.drawPixmap(5, 1, dragPaletteIconPixmapOver);
-  } else {
-    static QPixmap dragPaletteIconPixmap(
-        dragPaletteIcon.pixmap(20, QIcon::Normal, QIcon::Off));
-    p.drawPixmap(5, 1, dragPaletteIconPixmap);
-  }
+  
+  // The icon engine already handles caching
+  QIcon icon = createQIcon("dragpalette");
+  
+  // Get the appropriate pixmap based on hover state
+  QPixmap pixmap = icon.pixmap(QSize(20, 20), 
+                              m_isOver ? QIcon::Active : QIcon::Normal, 
+                              QIcon::Off);
+  
+  // Draw the pixmap
+  p.drawPixmap(5, 1, pixmap);
 }
 
 //-----------------------------------------------------------------------------

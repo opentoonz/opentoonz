@@ -39,18 +39,20 @@ struct iterator_traits<T *> : public std::iterator_traits<T *> {
 */
 
 template <typename RanIt>
-class step_iterator : public std::iterator<
-                          std::random_access_iterator_tag,
-                          typename std::iterator_traits<RanIt>::value_type,
-                          typename std::iterator_traits<RanIt>::difference_type,
-                          typename std::iterator_traits<RanIt>::pointer,
-                          typename std::iterator_traits<RanIt>::reference> {
+class step_iterator {
+protected:
   RanIt m_it;
-  typename step_iterator::difference_type m_step;
+  typename std::iterator_traits<RanIt>::difference_type m_step;
 
 public:
+  typedef std::random_access_iterator_tag iterator_category;
+  typedef typename std::iterator_traits<RanIt>::value_type value_type;
+  typedef typename std::iterator_traits<RanIt>::difference_type difference_type;
+  typedef typename std::iterator_traits<RanIt>::pointer pointer;
+  typedef typename std::iterator_traits<RanIt>::reference reference;
+
   step_iterator() {}
-  step_iterator(const RanIt &it, typename step_iterator::difference_type step)
+  step_iterator(const RanIt &it, difference_type step)
       : m_it(it), m_step(step) {}
 
   step_iterator &operator++() {
@@ -75,41 +77,34 @@ public:
     return it;
   }
 
-  step_iterator &operator+=(
-      const typename step_iterator::difference_type &val) {
+  step_iterator &operator+=(difference_type val) {
     m_it += val * m_step;
     return *this;
   }
 
-  step_iterator &operator-=(
-      const typename step_iterator::difference_type &val) {
+  step_iterator &operator-=(difference_type val) {
     m_it -= val * m_step;
     return *this;
   }
 
-  typename step_iterator::difference_type operator-(
-      const step_iterator &it) const {
+  difference_type operator-(const step_iterator &it) const {
     return (m_it - it.m_it) / m_step;
   }
 
-  step_iterator operator+(
-      const typename step_iterator::difference_type &val) const {
+  step_iterator operator+(difference_type val) const {
     step_iterator it(*this);
     it += val;
     return it;
   }
 
-  step_iterator operator-(
-      const typename step_iterator::difference_type &val) const {
+  step_iterator operator-(difference_type val) const {
     step_iterator it(*this);
     it -= val;
     return it;
   }
 
-  typename step_iterator::reference operator*() const { return *m_it; }
-  typename step_iterator::pointer operator->() const {
-    return m_it.operator->();
-  }
+  reference operator*() const { return *m_it; }
+  pointer operator->() const { return m_it.operator->(); }
 
   const RanIt &it() const { return m_it; }
   int step() const { return m_step; }

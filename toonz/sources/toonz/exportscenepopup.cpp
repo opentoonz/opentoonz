@@ -122,8 +122,13 @@ ExportSceneDvDirModelFileFolderNode::createExposeSceneNode(
 // ExportSceneDvDirModelProjectNode
 
 QPixmap ExportSceneDvDirModelProjectNode::getPixmap(bool isOpen) const {
-  static QPixmap openProjectPixmap(generateIconPixmap("folder_project_on"));
-  static QPixmap closeProjectPixmap(generateIconPixmap("folder_project"));
+  QPixmap openProjectPixmap =
+      createQIcon("folder_project")
+          .pixmap(QSize(18, 18), QIcon::Normal, QIcon::On);
+  QPixmap closeProjectPixmap =
+      createQIcon("folder_project")
+          .pixmap(QSize(18, 18), QIcon::Normal, QIcon::Off);
+
   return isOpen ? openProjectPixmap : closeProjectPixmap;
 }
 
@@ -192,7 +197,8 @@ void ExportSceneDvDirModelRootNode::refreshChildren() {
         new ExportSceneDvDirModelSpecialFileFolderNode(
             this, L"Project root (" + rootDir + L")", projectRoot);
     projectRootNode->setPixmap(
-        QPixmap(generateIconPixmap("folder_project_root")));
+        createQIcon("folder_project_root")
+            .pixmap(QSize(18, 18), QIcon::Normal, QIcon::Off));
     m_projectRootNodes.push_back(projectRootNode);
     addChild(projectRootNode);
   }
@@ -410,7 +416,7 @@ void ExportSceneTreeViewDelegate::paint(QPainter *painter,
   QPixmap px = node->getPixmap(m_treeView->isExpanded(index));
   if (!px.isNull()) {
     int x = rect.left();
-    int y = rect.top() + (rect.height() - px.height()) / 2;
+    int y = rect.center().y() - ((rect.height() / 2) - 2);
     painter->drawPixmap(QPoint(x, y), px);
   }
   rect.adjust(pnode ? 31 : 22, 0, 0, 0);
@@ -531,7 +537,6 @@ ExportScenePopup::ExportScenePopup(std::vector<TFilePath> scenes)
   chooseProjectLayout->addWidget(m_chooseProjectButton);
 
   m_projectTreeView = new ExportSceneTreeView(chooseProjectWidget);
-  m_projectTreeView->setMinimumWidth(200);
   m_projectTreeView->setMinimumWidth(400);
   ret = ret && connect(m_projectTreeView, SIGNAL(focusIn()), this,
                        SLOT(onProjectTreeViweFocusIn()));
@@ -569,7 +574,7 @@ ExportScenePopup::ExportScenePopup(std::vector<TFilePath> scenes)
                               Qt::AlignRight | Qt::AlignVCenter);
   newProjectLayout->addWidget(m_projectLocationFld, 2, 1);
 
-  newProjectWidget->setLayout(chooseProjectLayout);
+  newProjectWidget->setLayout(newProjectLayout);
   layout->addWidget(newProjectWidget);
 
   ret = ret &&

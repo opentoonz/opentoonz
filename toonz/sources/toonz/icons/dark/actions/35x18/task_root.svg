@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 35 18" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g id="tasks" transform="matrix(1,0,0,1,9,0.999993)">
+        <g transform="matrix(2.1875,9.50142e-07,0,1.125,-9,-1.00001)">
+            <rect x="0" y="0" width="16" height="16" style="fill:#878787;fill-opacity:0;"/>
+        </g>
+        <path id="tick" d="M10.477,14.788L15.148,10.143C15.344,9.947 15.662,9.948 15.857,10.145C16.053,10.341 16.052,10.659 15.855,10.854L10.829,15.854C10.734,15.948 10.606,16.001 10.473,16C10.34,15.999 10.212,15.946 10.119,15.851L7.145,12.851C6.951,12.655 6.951,12.337 7.149,12.142C7.345,11.947 7.663,11.948 7.858,12.145L10.477,14.788Z"/>
+        <path d="M7.867,15L2,15L2,1L14,1L14,9.874L13,10.869L13,2L3,2L3,14L6.876,14L7.867,15Z"/>
+        <path d="M7,3L7,6L4,6L4,3L7,3ZM6,4L5,4L5,5L6,5L6,4Z"/>
+        <path d="M7,7L7,10L4,10L4,7L7,7ZM6,8L5,8L5,9L6,9L6,8Z"/>
+        <rect x="8" y="4" width="4" height="1"/>
+        <rect x="8" y="8" width="4" height="1"/>
+    </g>
+</svg>

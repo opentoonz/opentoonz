@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 10.0, SVG Export Plug-In . SVG Version: 3.0.0 Build 76)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN"    "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd" [
+	<!ENTITY ns_flows "http://ns.adobe.com/Flows/1.0/">
+	<!ENTITY ns_extend "http://ns.adobe.com/Extensibility/1.0/">
+	<!ENTITY ns_ai "http://ns.adobe.com/AdobeIllustrator/10.0/">
+	<!ENTITY ns_graphs "http://ns.adobe.com/Graphs/1.0/">
+	<!ENTITY ns_vars "http://ns.adobe.com/Variables/1.0/">
+	<!ENTITY ns_imrep "http://ns.adobe.com/ImageReplacement/1.0/">
+	<!ENTITY ns_sfw "http://ns.adobe.com/SaveForWeb/1.0/">
+	<!ENTITY ns_custom "http://ns.adobe.com/GenericCustomNamespace/1.0/">
+	<!ENTITY ns_adobe_xpath "http://ns.adobe.com/XPath/1.0/">
+	<!ENTITY ns_svg "http://www.w3.org/2000/svg">
+	<!ENTITY ns_xlink "http://www.w3.org/1999/xlink">
+]>
+<svg 
+	 xmlns:x="&ns_extend;" xmlns:i="&ns_ai;" xmlns:graph="&ns_graphs;" i:viewOrigin="382.083 307.4688" i:rulerOrigin="0 0" i:pageBounds="0 600 800 0"
+	 xmlns="&ns_svg;" xmlns:xlink="&ns_xlink;" xmlns:a="http://ns.adobe.com/AdobeSVGViewerExtensions/3.0/" width="37" height="17"
+	 viewBox="0 0 37 17" overflow="visible" enable-background="new 0 0 37 17" xml:space="preserve">
+	<metadata>
+		<variableSets  xmlns="&ns_vars;">
+			<variableSet  varSetName="binding1" locked="none">
+				<variables></variables>
+				<v:sampleDataSets  xmlns="&ns_custom;" xmlns:v="&ns_vars;"></v:sampleDataSets>
+			</variableSet>
+		</variableSets>
+		<sfw  xmlns="&ns_sfw;">
+			<slices></slices>
+			<sliceSourceBounds  y="290.469" x="382.083" width="37" height="17" bottomLeftOrigin="true"></sliceSourceBounds>
+		</sfw>
+	</metadata>
+	<g id="Layer_1" i:layer="yes" i:dimmedPercent="50" i:rgbTrio="#4F008000FFFF">
+		<path i:knockout="Off" fill="none" d="M37,17H0V0h37V17z"/>
+		<g i:knockout="Off">
+			<path i:knockout="Off" fill="none" stroke="#000000" stroke-width="0.8" stroke-linecap="round" d="M9.356,6.269h18.291"/>
+		</g>
+		<g i:knockout="Off">
+			<path i:knockout="Off" fill="none" stroke="#000000" stroke-width="0.8" stroke-linecap="round" d="M9.356,11.068h18.291"/>
+		</g>
+		<radialGradient id="XMLID_1_" cx="22.8154" cy="6.4336" r="1.9113" fx="22.2647" fy="6.1797" gradientUnits="userSpaceOnUse">
+			<stop  offset="0" style="stop-color:#FFFFFF"/>
+			<stop  offset="0.0305" style="stop-color:#FBFBFB"/>
+			<stop  offset="0.318" style="stop-color:#D5D5D5"/>
+			<stop  offset="0.5846" style="stop-color:#BABABA"/>
+			<stop  offset="0.8202" style="stop-color:#AAAAAA"/>
+			<stop  offset="1" style="stop-color:#A4A4A4"/>
+			<a:midPointStop  offset="0" style="stop-color:#FFFFFF"/>
+			<a:midPointStop  offset="0.3503" style="stop-color:#FFFFFF"/>
+			<a:midPointStop  offset="1" style="stop-color:#A4A4A4"/>
+		</radialGradient>
+		
+			<path i:knockout="Off" fill="url(#XMLID_1_)" stroke="#000000" stroke-width="0.56" stroke-linecap="round" stroke-linejoin="round" d="
+			M22.567,8.465h2.031v-2.27l-1.793-1.793h0.018l-1.792,1.793v2.27h2.03H22.567z"/>
+		<radialGradient id="XMLID_2_" cx="14.6582" cy="11.1855" r="1.9113" fx="14.1306" fy="10.8448" gradientUnits="userSpaceOnUse">
+			<stop  offset="0" style="stop-color:#FFFFFF"/>
+			<stop  offset="0.0305" style="stop-color:#FBFBFB"/>
+			<stop  offset="0.318" style="stop-color:#D5D5D5"/>
+			<stop  offset="0.5846" style="stop-color:#BABABA"/>
+			<stop  offset="0.8202" style="stop-color:#AAAAAA"/>
+			<stop  offset="1" style="stop-color:#A4A4A4"/>
+			<a:midPointStop  offset="0" style="stop-color:#FFFFFF"/>
+			<a:midPointStop  offset="0.3503" style="stop-color:#FFFFFF"/>
+			<a:midPointStop  offset="1" style="stop-color:#A4A4A4"/>
+		</radialGradient>
+		
+			<path i:knockout="Off" fill="url(#XMLID_2_)" stroke="#000000" stroke-width="0.56" stroke-linecap="round" stroke-linejoin="round" d="
+			M14.411,13.217h2.03v-2.27l-1.792-1.792h0.017l-1.791,1.792v2.27h2.029H14.411z"/>
+	</g>
+</svg>

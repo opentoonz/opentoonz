@@ -11,11 +11,11 @@
 #include <cstddef>  // size_t
 #include <new>      // placement new
 #include <vector>
+#include <iterator> // For std::bidirectional_iterator_tag, std::ptrdiff_t
 
 #include "assert.h"
 
-// Discriminate rvalues support - either use Boost's config.hpp for automatic
-// lookup,
+// Discriminate rvalues support - either use Boost's config.hpp for automatic lookup,
 // or deal with it manually
 
 #ifndef TCG_RVALUES_SUPPORT
@@ -191,21 +191,22 @@ protected:
   size_t m_clearedHead;
 
 public:
-  struct const_iterator
-      : public std::iterator<std::bidirectional_iterator_tag, const T> {
-    const list_base *m_list;
+  struct const_iterator {
+    // Required iterator typedefs (replacing std::iterator)
+    typedef std::bidirectional_iterator_tag iterator_category;
+    typedef const T value_type;
+    typedef std::ptrdiff_t difference_type;
+    typedef const T* pointer;
+    typedef const T& reference;
+
+    const list_base* m_list;
     size_t m_idx;
 
-    TCG_DEBUG(const list_node *m_node;)  // Provided for debuggers' convenience
-
-  public:
-    typedef const T value_type;
-    typedef const T *pointer;
-    typedef const T &reference;
+    TCG_DEBUG(const list_node* m_node;)  // Provided for debuggers' convenience
 
   public:
     const_iterator() {}
-    const_iterator(const list_base *list, size_t idx)
+    const_iterator(const list_base* list, size_t idx)
         : m_list(list), m_idx(idx) {
       TCG_DEBUG(m_node = (m_idx == _neg) ? 0 : &m_list->m_vector[m_idx]);
     }
@@ -220,7 +221,7 @@ public:
       operator++();
       return temp;
     }
-    const_iterator &operator++() {
+    const_iterator& operator++() {
       m_idx = m_list->m_vector[m_idx].m_next;
       TCG_DEBUG(m_node = (m_idx == _neg) ? 0 : &m_list->m_vector[m_idx]);
       return *this;
@@ -231,44 +232,52 @@ public:
       operator--();
       return temp;
     }
-    const_iterator &operator--() {
+    const_iterator& operator--() {
       m_idx = m_list->m_vector[m_idx].m_prev;
       TCG_DEBUG(m_node = (m_idx == _neg) ? 0 : &m_list->m_vector[m_idx]);
       return *this;
     }
 
-    bool operator==(const const_iterator &it) const {
+    bool operator==(const const_iterator& it) const {
       return (m_idx == it.m_idx);
     }
-    bool operator!=(const const_iterator &it) const {
+    bool operator!=(const const_iterator& it) const {
       return (m_idx != it.m_idx);
     }
   };
 
-  struct iterator : public const_iterator {
-  public:
+  struct iterator {
+    // Required iterator typedefs (replacing std::iterator)
+    typedef std::bidirectional_iterator_tag iterator_category;
     typedef T value_type;
-    typedef T *pointer;
-    typedef T &reference;
+    typedef std::ptrdiff_t difference_type;
+    typedef T* pointer;
+    typedef T& reference;
+
+    const list_base* m_list;  // Kept const to match original design
+    size_t m_idx;
+
+    TCG_DEBUG(const list_node* m_node;)  // Provided for debuggers' convenience
 
   public:
     iterator() {}
-    iterator(list_base *list, size_t idx) : const_iterator(list, idx) {}
+    iterator(list_base* list, size_t idx) : m_list(list), m_idx(idx) {
+      TCG_DEBUG(m_node = (m_idx == _neg) ? 0 : &m_list->m_vector[m_idx]);
+    }
 
-    reference operator*() const {
-      return const_cast<reference>(const_iterator::operator*());
-    }
-    pointer operator->() const {
-      return const_cast<pointer>(const_iterator::operator->());
-    }
+    size_t index() const { return m_idx; }
+
+    reference operator*() const { return const_cast<reference>((*m_list)[m_idx]); }
+    pointer operator->() const { return const_cast<pointer>(&(*m_list)[m_idx]); }
 
     iterator operator++(int) {
       iterator temp(*this);
       operator++();
       return temp;
     }
-    iterator &operator++() {
-      const_iterator::operator++();
+    iterator& operator++() {
+      m_idx = m_list->m_vector[m_idx].m_next;
+      TCG_DEBUG(m_node = (m_idx == _neg) ? 0 : &m_list->m_vector[m_idx]);
       return *this;
     }
 
@@ -277,9 +286,17 @@ public:
       operator--();
       return temp;
     }
-    iterator &operator--() {
-      const_iterator::operator--();
+    iterator& operator--() {
+      m_idx = m_list->m_vector[m_idx].m_prev;
+      TCG_DEBUG(m_node = (m_idx == _neg) ? 0 : &m_list->m_vector[m_idx]);
       return *this;
+    }
+
+    bool operator==(const iterator& it) const {
+      return (m_idx == it.m_idx);
+    }
+    bool operator!=(const iterator& it) const {
+      return (m_idx != it.m_idx);
     }
   };
 

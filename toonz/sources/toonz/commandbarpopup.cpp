@@ -76,7 +76,7 @@ CommandListTree::CommandListTree(const QString& dropTargetString,
   setIconSize(QSize(21, 18));
   header()->close();
 
-  QIcon menuFolderIcon(createQIcon("folder_project", true));
+  QIcon menuFolderIcon(createQIcon("folder_project"));
   invisibleRootItem()->setIcon(0, menuFolderIcon);
 
   QTreeWidgetItem* menuCommandFolder = new QTreeWidgetItem(this);

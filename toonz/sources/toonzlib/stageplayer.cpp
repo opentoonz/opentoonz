@@ -59,7 +59,7 @@ TImageP Stage::Player::image() const {
   if (slType == PLI_XSHLEVEL && TXshSimpleLevel::m_rasterizePli) {
     if (!(m_isCurrentColumn && m_isCurrentXsheetLevel)) id = id + "_rasterized";
     if(m_xsh)
-      extData.currentCamera = m_xsh->getStageObjectTree()->getCurrentCamera();
+      extData.m_cameraDPI = m_xsh->getStageObjectTree()->getCurrentCamera()->getDpi();
   }  // use cameraDpi to rasterize vector
         
 

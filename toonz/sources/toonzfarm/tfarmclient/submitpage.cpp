@@ -263,7 +263,7 @@ void SubmitPage::Data::configureNotify(const TDimension &size) {
 void SubmitPage::Data::browseCasmFiles() {
   static FileBrowserPopup *puCasm   = 0L;
   static FileBrowserPopup *puScript = 0L;
-  FileBrowserPopup *popup;
+  FileBrowserPopup *popup = 0L;
 
   if (m_taskType->getText() == "Casm") {
     if (!puCasm) {

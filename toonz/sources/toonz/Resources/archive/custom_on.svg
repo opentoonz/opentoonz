@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 10.0, SVG Export Plug-In . SVG Version: 3.0.0 Build 76)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN"    "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd" [
+	<!ENTITY ns_flows "http://ns.adobe.com/Flows/1.0/">
+	<!ENTITY ns_extend "http://ns.adobe.com/Extensibility/1.0/">
+	<!ENTITY ns_ai "http://ns.adobe.com/AdobeIllustrator/10.0/">
+	<!ENTITY ns_graphs "http://ns.adobe.com/Graphs/1.0/">
+	<!ENTITY ns_vars "http://ns.adobe.com/Variables/1.0/">
+	<!ENTITY ns_imrep "http://ns.adobe.com/ImageReplacement/1.0/">
+	<!ENTITY ns_sfw "http://ns.adobe.com/SaveForWeb/1.0/">
+	<!ENTITY ns_custom "http://ns.adobe.com/GenericCustomNamespace/1.0/">
+	<!ENTITY ns_adobe_xpath "http://ns.adobe.com/XPath/1.0/">
+	<!ENTITY ns_svg "http://www.w3.org/2000/svg">
+	<!ENTITY ns_xlink "http://www.w3.org/1999/xlink">
+]>
+<svg 
+	 xmlns:x="&ns_extend;" xmlns:i="&ns_ai;" xmlns:graph="&ns_graphs;" i:viewOrigin="382.5684 308.4688" i:rulerOrigin="0 0" i:pageBounds="0 600 800 0"
+	 xmlns="&ns_svg;" xmlns:xlink="&ns_xlink;" xmlns:a="http://ns.adobe.com/AdobeSVGViewerExtensions/3.0/" width="37" height="19"
+	 viewBox="0 0 37 19" overflow="visible" enable-background="new 0 0 37 19" xml:space="preserve">
+	<metadata>
+		<variableSets  xmlns="&ns_vars;">
+			<variableSet  varSetName="binding1" locked="none">
+				<variables></variables>
+				<v:sampleDataSets  xmlns="&ns_custom;" xmlns:v="&ns_vars;"></v:sampleDataSets>
+			</variableSet>
+		</variableSets>
+		<sfw  xmlns="&ns_sfw;">
+			<slices></slices>
+			<sliceSourceBounds  y="289.469" x="382.568" width="37" height="19" bottomLeftOrigin="true"></sliceSourceBounds>
+		</sfw>
+	</metadata>
+	<g id="Layer_1" i:layer="yes" i:dimmedPercent="50" i:rgbTrio="#4F008000FFFF">
+		<path i:knockout="Off" fill="none" d="M37,19H0V0h37V19z"/>
+		<g>
+			<path i:knockout="Off" fill="#E1A400" stroke="#000000" stroke-width="0.5884" stroke-linejoin="round" d="M18.23,10.103
+				c-1.117,0.495-4.464,1.918-4.464,1.918l0.757,1.872c0,0,2.999-1.133,4.6-1.687"/>
+			<path i:knockout="Off" fill="#DCE6FF" stroke="#000000" stroke-width="0.5884" d="M13.767,12.021l-2.994,1.582l0.531,1.298
+				l3.22-1.008"/>
+			<path i:knockout="Off" fill="#F7E6B8" d="M8.332,13.362c-0.994,0.364-1.643,0.873-2.245,1.157
+				c1.58-0.111,0.371,0.758-0.378,1.194c-0.281,0.163-1.428,0.756-2.902,0.483c0,0,3.236,1.525,5.72,0.88
+				c1.552-0.404,2.858-1.608,2.513-2.839C10.688,13.008,9.326,12.995,8.332,13.362z"/>
+			<path i:knockout="Off" fill="#62A200" d="M7.694,14.616c-0.437-0.087,0.699-1.28,0.638-1.254
+				c-0.994,0.364-1.643,0.873-2.245,1.157c1.58-0.111,0.371,0.758-0.378,1.194c-0.281,0.163-1.428,0.756-2.902,0.483
+				c0,0,3.236,1.525,5.72,0.88c0.354-0.092,0.699-0.227,1.013-0.396c0.195-1.152-1.602-0.439-1.846-0.694
+				c-0.401-0.419,1.585-0.904,1.402-1.279C9.016,14.542,8.22,14.719,7.694,14.616z"/>
+			<path i:knockout="Off" fill="none" stroke="#000000" stroke-width="0.5884" stroke-linecap="round" stroke-linejoin="round" d="
+				M8.332,13.362c-0.994,0.364-1.643,0.873-2.245,1.157c1.58-0.111,0.371,0.758-0.378,1.194c-0.281,0.163-1.428,0.756-2.902,0.483
+				c0,0,3.236,1.525,5.72,0.88c1.552-0.404,2.858-1.608,2.513-2.839C10.688,13.008,9.326,12.995,8.332,13.362z"/>
+		</g>
+		<g>
+			
+				<linearGradient id="XMLID_1_" gradientUnits="userSpaceOnUse" x1="-32.4932" y1="20.8994" x2="-35.0175" y2="9.2981" gradientTransform="matrix(0.983 0.1836 -0.1836 0.983 59.1403 0.683)">
+				<stop  offset="0" style="stop-color:#EB9000"/>
+				<stop  offset="0.1576" style="stop-color:#F2AC00"/>
+				<stop  offset="0.3366" style="stop-color:#F8C300"/>
+				<stop  offset="0.5277" style="stop-color:#FCD400"/>
+				<stop  offset="0.7372" style="stop-color:#FEDE00"/>
+				<stop  offset="1" style="stop-color:#FFE100"/>
+				<a:midPointStop  offset="0" style="stop-color:#EB9000"/>
+				<a:midPointStop  offset="0.2486" style="stop-color:#EB9000"/>
+				<a:midPointStop  offset="1" style="stop-color:#FFE100"/>
+			</linearGradient>
+			<path i:knockout="Off" fill="url(#XMLID_1_)" d="M21.419,6.382c-1.11-0.083-2.547-0.021-3.496,0.474
+				c-0.872,0.456-1.945,0.982-2.585,1.706c-0.802,0.903-1.217,1.212-1.435,2.379c-0.219,1.175,0.069,2.559,1.457,1.971
+				c1.018-0.433,1.11-1.352,1.591-2.044c0.511-0.737,1.483-1,1.963-1.196c1.56-0.633,4.257-0.111,3.48,1.898
+				c-0.712,1.841-3.717,0.933-5.238,0.958c-2.066,0.033-1.431,2.373-0.077,2.705c1.661,0.401,3.46,0.206,5.457,0.054
+				c0.682-0.052,1.815-0.05,2.464-0.256c0.652-0.207,2.761-0.809,3.448-0.868c0,0,0.45,0.425,0.693,0.554
+				c0.425,0.221,1.142,0.387,1.613,0.144c1.213-0.626,1.657-2.862,1.805-4.072c0.173-1.437-0.101-3.526-1.137-3.815
+				c-0.63-0.174-2.229,0.152-2.229,0.152c-0.903-0.655-2.211-1.496-3.127-2.141c-2.092-1.473-3.893-1.95-4.949-1.805
+				c-1.001,0.14-3.521,0.733-4.257,1.663c-0.438,0.553-1.372,1.9-0.972,2.678"/>
+			<path i:knockout="Off" fill="none" stroke="#000000" stroke-linecap="round" d="M21.419,6.382
+				c-1.11-0.083-2.547-0.021-3.496,0.474c-0.872,0.456-1.945,0.982-2.585,1.706c-0.802,0.903-1.217,1.212-1.435,2.379
+				c-0.219,1.175,0.069,2.559,1.457,1.971c1.018-0.433,1.11-1.352,1.591-2.044c0.511-0.737,1.483-1,1.963-1.196
+				c1.56-0.633,4.257-0.111,3.48,1.898c-0.712,1.841-3.717,0.933-5.238,0.958c-2.066,0.033-1.431,2.373-0.077,2.705
+				c1.661,0.401,3.46,0.206,5.457,0.054c0.682-0.052,1.815-0.05,2.464-0.256c0.652-0.207,2.761-0.809,3.448-0.868
+				c0,0,0.45,0.425,0.693,0.554c0.425,0.221,1.142,0.387,1.613,0.144c1.213-0.626,1.657-2.862,1.805-4.072
+				c0.173-1.437-0.101-3.526-1.137-3.815c-0.63-0.174-2.229,0.152-2.229,0.152c-0.903-0.655-2.211-1.496-3.127-2.141
+				c-2.092-1.473-3.893-1.95-4.949-1.805c-1.001,0.14-3.521,0.733-4.257,1.663c-0.438,0.553-1.372,1.9-0.972,2.678"/>
+			<path i:knockout="Off" fill="none" stroke="#000000" stroke-width="0.9194" stroke-linecap="round" d="M21.388,4.806
+				c-1.225-0.229-4.625,0.538-5.382,2.501"/>
+			<path i:knockout="Off" fill="none" stroke="#000000" stroke-linecap="round" d="M29.193,7.124
+				c0.726,0.486,0.727,1.663,0.562,3.233c-0.104,1.002-0.28,2.547-1.307,3.805"/>
+		</g>
+		<path i:knockout="Off" fill="#E1A400" stroke="#000000" stroke-width="0.5884" stroke-linejoin="round" d="M19.123,12.206
+			l14.649-6.658l-0.421-0.989L18.23,10.103"/>
+	</g>
+</svg>

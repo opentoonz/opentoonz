@@ -95,11 +95,11 @@ ColorModelBehaviorPopup::ColorModelBehaviorPopup(
     m_colorChipOrder         = new QButtonGroup(this);
 
     QPushButton* upperLeftOrderBtn =
-        new QPushButton(createQIcon("colorchiporder_upleft", true), "", this);
+        new QPushButton(createQIcon("colorchiporder_upleft"), "", this);
     QPushButton* lowerLeftOrderBtn =
-        new QPushButton(createQIcon("colorchiporder_lowleft", true), "", this);
+        new QPushButton(createQIcon("colorchiporder_lowleft"), "", this);
     QPushButton* leftUpperOrderBtn =
-        new QPushButton(createQIcon("colorchiporder_leftup", true), "", this);
+        new QPushButton(createQIcon("colorchiporder_leftup"), "", this);
 
     QStringList paletteTypes;
     paletteTypes << tr("Pick Every Colors as Different Styles")

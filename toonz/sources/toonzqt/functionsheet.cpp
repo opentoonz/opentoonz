@@ -196,18 +196,11 @@ FunctionSheetButtonArea::FunctionSheetButtonArea(QWidget *parent)
   m_syncSizeBtn = new QPushButton("", this);
   m_syncSizeBtn->setCheckable(true);
   m_syncSizeBtn->setFixedSize(20, 20);
-  static QPixmap syncScaleImg = generateIconPixmap("syncscale");
-  QPixmap offPm(17, 17);
-  offPm.fill(Qt::transparent);
-  {
-    QPainter p(&offPm);
-    p.setOpacity(0.7);
-    p.drawPixmap(0, 0, syncScaleImg);
-  }
-  QIcon icon;
-  icon.addPixmap(offPm);
-  icon.addPixmap(syncScaleImg, QIcon::Normal, QIcon::On);
+
+  // Create icon
+  QIcon icon(createQIcon("syncscale"));
   m_syncSizeBtn->setIcon(icon);
+  m_syncSizeBtn->setIconSize(QSize(16, 16));
 
   m_syncSizeBtn->setToolTip(tr("Toggle synchronizing zoom with xsheet"));
 

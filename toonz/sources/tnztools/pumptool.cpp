@@ -775,7 +775,7 @@ bool PumpTool::getNearestStrokeWithLock(const TPointD &p, double &outW,
   TVectorImageP vi = TImageP(getImage(false));
   if (!vi) return false;
 
-  if (m_lockedStrokeIndex >= vi->getStrokeCount()) {
+  if (m_lockedStrokeIndex >= static_cast<int>(vi->getStrokeCount())) {
     m_lockedStrokeIndex = -1;
   }
 
