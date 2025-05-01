@@ -4,16 +4,30 @@ on:
   push:
     branches:
       - master  # Specify branches where the workflow should run
-  pull_request:  # Here no specific branches are listed to allow all pull requests to generate a workflow run
+    paths:
+      - '**/*'                   # Include all files in the repository
+      - '!appveyor.yml'          # Ignore changes in AppVeyor
+      - '!README.md'             # Exclude README
+      - '!doc/**'                # Exclude documentation
+      - '!**/.github/**'         # Exclude everything in .github folder
+      - '.github/workflows/workflow_windows.yml'  # Include Windows workflow file
+  pull_request:
+    paths:
+      - '**/*'
+      - '!appveyor.yml'
+      - '!README.md'
+      - '!doc/**'
+      - '!**/.github/**'
+      - '.github/workflows/workflow_windows.yml'
 
 jobs:
   Windows:
-    runs-on: windows-2019
+    runs-on: windows-2025
     env:
       QT_PATH: ${{ github.workspace }}\thirdparty\qt\5.15.2_wintab\msvc2019_64  # Path to custom Qt.
-      VCINSTALLDIR: 'C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC'  # Path to MSVC.
-      MSVCVERSION: "Visual Studio 16 2019"  # Visual Studio version.
-      BOOST_ROOT: C:\local\boost_1_74_0  # Boost library root.
+      VCINSTALLDIR: 'C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC'  # Path to MSVC.
+      MSVCVERSION: "Visual Studio 17 2022"  # Visual Studio version.
+      BOOST_ROOT: C:\local\boost_1_87_0  # Boost library root.
       OpenCV_DIR: C:\tools\opencv\build  # Path to OpenCV.
 
     steps:
@@ -38,8 +52,8 @@ jobs:
       - name: Install OpenCV and Boost
         run: |
           @echo on
-          choco install opencv --version=4.10.0 -y
-          choco install boost-msvc-14.2 --version=1.74.0 -y
+          choco install opencv --version=4.11.0 -y
+          choco install boost-msvc-14.3 --version=1.87.0 -y
         shell: cmd
 
       - name: Install custom Qt 5.15.2 with WinTab support
@@ -94,7 +108,7 @@ jobs:
           copy /Y ..\..\thirdparty\libmypaint\dist\64\libmypaint-1-4-0.dll Opentoonz
           
           REM Copy OpenCV DLL (IMPORTANT: Update path/filename when upgrading OpenCV version)
-          copy /Y "C:\tools\opencv\build\x64\vc16\bin\opencv_world4100.dll" Opentoonz
+          copy /Y "C:\tools\opencv\build\x64\vc16\bin\opencv_world4110.dll" Opentoonz
           
           REM Deploy Qt dependencies
           "%QT_PATH%\bin\windeployqt.exe" Opentoonz\Opentoonz.exe --opengl

@@ -1,10 +1,26 @@
 name: Linux Build
 
-on: [push, pull_request]
+on:
+  push:
+    paths:
+      - '**/*'                   # Include all files in the repository
+      - '!appveyor.yml'          # Ignore changes in AppVeyor
+      - '!README.md'             # Exclude README
+      - '!doc/**'                # Exclude documentation
+      - '!**/.github/**'         # Exclude everything in .github folder
+      - '.github/workflows/workflow_linux.yml'  # Include Linux workflow file
+  pull_request:
+    paths:
+      - '**/*'
+      - '!appveyor.yml'
+      - '!README.md'
+      - '!doc/**'
+      - '!**/.github/**'
+      - '.github/workflows/workflow_linux.yml'
 
 jobs:
   Ubuntu:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
         compiler: [gcc, clang]
