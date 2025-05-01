@@ -39,7 +39,8 @@ namespace {  // Utility Function
 
 void fillRow(const TRasterCM32P &r, const TPoint &p, int &xa, int &xb,
              int paint, TPalette *palette, TTileSaverCM32 *saver,
-             bool prevailing = true, bool refImagePut = false) {
+             bool prevailing = true, bool refImagePut = false,
+             int paintAtClickPos = 0) {
   int tone, oldtone;
   TPixelCM32 *pix, *pix0, *limit, *tmp_limit;
 
@@ -162,6 +163,8 @@ void fillRow(const TRasterCM32P &r, const TPoint &p, int &xa, int &xb,
         }
       }
       if (refImagePut && pix->getInk() == TPixelCM32::getMaxInk())
+        pix->setInk(paint);
+      if ((palette || refImagePut) && pix->getInk() == paintAtClickPos)
         pix->setInk(paint);
       pix->setPaint(paint);
     }
@@ -432,7 +435,7 @@ bool fill(const TRasterCM32P &r, const FillParameters &params,
   std::stack<FillSeed> seeds;
 
   fillRow(r, p, xa, xb, paint, params.m_palette, saver, params.m_prevailing,
-          refImagePut);
+          refImagePut, paintAtClickedPos);
   seeds.push(FillSeed(xa, xb, y, 1));
   seeds.push(FillSeed(xa, xb, y, -1));
 
@@ -461,7 +464,7 @@ bool fill(const TRasterCM32P &r, const FillParameters &params,
           (pix->getPaint() != pix->getInk() ||
            pix->getPaint() == paintAtClickedPos)) {
         fillRow(r, TPoint(x, y), xc, xd, paint, params.m_palette, saver,
-                params.m_prevailing, refImagePut);
+                params.m_prevailing, refImagePut, paintAtClickedPos);
         if (xc < xa) seeds.push(FillSeed(xc, xa - 1, y, -dy));
         if (xd > xb) seeds.push(FillSeed(xb + 1, xd, y, -dy));
         if (oldxd >= xc - 1)

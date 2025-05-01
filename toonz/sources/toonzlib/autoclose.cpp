@@ -173,7 +173,7 @@ TRasterGR8P fillByteRaster(const TRasterCM32P &r, TRasterGR8P &bRaster) {
     *(br++)         = 131;
     TPixelCM32 *pix = r->pixels(i);
     for (j = 0; j < lx; j++, pix++) {
-      if (pix->getTone() != pix->getMaxTone() || pix->getPaint())
+      if (pix->getTone() != pix->getMaxTone())
         *(br++) = 3;
       else
         *(br++) = 0;

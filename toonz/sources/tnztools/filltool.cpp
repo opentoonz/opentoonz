@@ -1027,7 +1027,6 @@ void doRefFill(const TImageP &img, const TImageP &refImg, const TPointD &pos,
 
       params.m_p += ti->getRaster()->getCenter();
       params.m_p -= offs;
-      params.m_shiftFill = isShiftFill;
 
       TRect rasRect(ras->getSize());
       if (!rasRect.contains(params.m_p)) {
@@ -1045,11 +1044,6 @@ void doRefFill(const TImageP &img, const TImageP &refImg, const TPointD &pos,
             TRasterP r = ri->getRaster();
             if (r) refRas = r;
           }
-        }
-        if (isShiftFill) {
-          FillParameters aux(params);
-          aux.m_styleId    = (params.m_styleId == 0) ? 1 : 0;
-          recomputeSavebox = fill(ras, aux, &tileSaver, refRas);
         }
         recomputeSavebox = fill(ras, params, &tileSaver, refRas);
       }
@@ -1819,7 +1813,7 @@ public:
         if (!ras->getBounds().contains(ipos)) continue;
         TPixelCM32 pix = ras->pixels(ipos.y)[ipos.x];
         if (pix.getInk() == styleId || pix.isPurePaint()) continue;
-        ::doFill(img, tmpPos, params, e.isShiftPressed(), sl,
+        doFill(img, tmpPos, params, e.isShiftPressed(), sl,
                m_parent->getCurrentFid(), true);
       }
     } else /*-- 縦長の線分の場合 --*/
@@ -1844,7 +1838,7 @@ public:
         if (!ras->getBounds().contains(ipos)) continue;
         TPixelCM32 pix = ras->pixels(ipos.y)[ipos.x];
         if (pix.getInk() == styleId || pix.isPurePaint()) continue;
-        ::doFill(img, tmpPos, params, e.isShiftPressed(), sl,
+        doFill(img, tmpPos, params, e.isShiftPressed(), sl,
                m_parent->getCurrentFid(), true);
       }
     }
@@ -2172,8 +2166,10 @@ void FillTool::leftButtonDoubleClick(const TPointD &pos, const TMouseEvent &e) {
 
 void FillTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
   if ((m_fillType.getValue() != NORMALFILL && !m_onion.getValue()) ||
-      (m_colorType.getValue() == AREAS && m_onion.getValue()))
+      (m_colorType.getValue() == AREAS && m_onion.getValue())) {
     m_areaFillTool->leftButtonDrag(pos, e);
+    return;
+  }
   else if (m_colorType.getValue() == LINES &&
            m_targetType == TTool::ToonzImage) {
     m_normalLineFillTool->leftButtonDrag(pos, e);
@@ -2187,6 +2183,8 @@ void FillTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
     if (TVectorImageP vi = img) {
       TRegion *r = vi->getRegion(pos);
       if (r && r->getStyle() == styleId) return;
+      doFill(img, pos, params, e.isShiftPressed(), m_level.getPointer(),
+             getCurrentFid(), m_autopaintLines.getValue());
     }
     if (TToonzImageP ti = img) {
       TRasterCM32P ras = ti->getRaster();
@@ -2199,6 +2197,12 @@ void FillTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
         invalidate();
         return;
       }
+      std::string imgId =
+          m_application ? m_level.getPointer()->getImageId(getCurrentFid(), 0)
+                        : "";
+      doRefFill(img, m_refImgTable[imgId], pos, params, e.isShiftPressed(),
+             m_level.getPointer(), getCurrentFid(),
+             m_autopaintLines.getValue());
       TSystem::outputDebug("ok. pix=" + std::to_string(pix.getTone()) + "," +
                            std::to_string(pix.getPaint()) + "\n");
     }
