@@ -152,19 +152,21 @@ void fillRow(const TRasterCM32P &r, const TPoint &p, int &xa, int &xb,
     pix = line + xa;
     int n;
     for (n = 0; n < xb - xa + 1; n++, pix++) {
-      if (palette && pix->isPurePaint()) {
-        TPoint pInk = nearestInkNotDiagonal(r, TPoint(xa + n, p.y));
-        if (pInk != TPoint(-1, -1)) {
-          TPixelCM32 *pixInk =
-              (TPixelCM32 *)r->getRawData() + (pInk.y * r->getWrap() + pInk.x);
-          if (palette && pixInk->getInk() != paint &&
-              palette->getStyle(pixInk->getInk())->getFlags() != 0)
-            inkFill(r, pInk, paint, 0, saver);
+      if (palette || refImagePut) {
+        if (pix->isPurePaint()) {
+          TPoint pInk = nearestInkNotDiagonal(r, TPoint(xa + n, p.y));
+          if (pInk != TPoint(-1, -1)) {
+            TPixelCM32 *pixInk = (TPixelCM32 *)r->getRawData() +
+                                 (pInk.y * r->getWrap() + pInk.x);
+            if (palette && pixInk->getInk() != paint &&
+                palette->getStyle(pixInk->getInk())->getFlags() != 0)
+              inkFill(r, pInk, paint, 0, saver);
+            else if (pixInk->getInk() == paintAtClickPos)
+              inkFill(r, pInk, paint, 0, saver);
+          }
         }
       }
       if (refImagePut && pix->getInk() == TPixelCM32::getMaxInk())
-        pix->setInk(paint);
-      if ((palette || refImagePut) && pix->getInk() == paintAtClickPos)
         pix->setInk(paint);
       pix->setPaint(paint);
     }

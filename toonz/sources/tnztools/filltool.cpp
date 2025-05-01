@@ -1350,6 +1350,8 @@ void AreaFillTool::draw() {
     tglColor(TPixelRGBM32(128, 128, 255, 76));
     glPushMatrix();
     m_track.drawFilledStroke();
+    tglColor(TPixel::Red);
+    m_track.drawAllFragments();
     glPopMatrix();
   }
 }
