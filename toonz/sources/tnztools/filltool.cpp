@@ -960,12 +960,7 @@ void drawReferImage(TRaster32P &ras, TXsheet *xsh, int col, int row) {
       aff = TTranslation(ras->getCenterD()) * cAff.inv() * aff *
             TTranslation(-ras->getCenterD());
       assert(r32->getSize() == ras->getSize());
-      if (TRasterCM32P srcCm = r32)
-        TRop::quickPut(ras, srcCm, sl->getPalette(), aff);
-      else if (TRaster32P src32 = r32)
-        TRop::quickPut(ras, src32, aff);
-      else if (TRasterGR8P srcGr8 = r32)
-        TRop::quickPut(ras, srcGr8, aff);
+      TRop::quickPut(ras, r32, aff);
     } else if (sl->getType() == PLI_XSHLEVEL) {
         //TODO: ToonzVector?
     }
@@ -1257,7 +1252,7 @@ public:
       , m_lastPoint(lastPoint)
       , m_params(params)
       , m_autopaintLines(autopaintLines) {}
-  MultiFiller(RefImgTable refImgTable, const TPointD &firstPoint,
+  MultiFiller(const RefImgTable &refImgTable, const TPointD &firstPoint,
               const TPointD &lastPoint, const FillParameters &params,
               bool autopaintLines)
       : m_refImgTable(refImgTable)
@@ -1469,8 +1464,8 @@ void AreaFillTool::leftButtonDoubleClick(const TPointD &pos,
                                          const TMouseEvent &e) {
   TStroke *stroke;
   FillTool *fillTool = (FillTool*)m_parent;
-  auto refImgTable        = std::move(fillTool->m_refImgTable);
-  auto slFidsPairs        = std::move(fillTool->m_slFidsPairs);
+  auto refImgTable        = fillTool->getRefImgTable();
+  auto slFidsPairs        = fillTool->getSlFidsPairs();
   TTool::Application *app = TTool::getApplication();
   if (!app) return;
 
@@ -1568,10 +1563,9 @@ void AreaFillTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
   if (!m_isLeftButtonPressed) return;
   m_isLeftButtonPressed = false;
   FillTool *fillTool = dynamic_cast<FillTool*>(m_parent);
-  bool move             = !m_frameRange || m_firstFrameSelected;
-  auto refImgTable = move ? std::move(fillTool->m_refImgTable)
-                                : RefImgTable();
-  auto slFidsPairs         = move ? std::move(fillTool->m_slFidsPairs) : SlFidsPairs();
+  bool get               = !m_frameRange || m_firstFrameSelected;
+  auto refImgTable        = get ? fillTool->getRefImgTable() : RefImgTable();
+  auto slFidsPairs        = get ? fillTool->getSlFidsPairs() : SlFidsPairs();
   TTool::Application *app = TTool::getApplication();
   if (!app) return;
 
@@ -1970,7 +1964,7 @@ void FillTool::buildFillInfo(const FillParameters &params) {
     m_firstFrameId = m_veryFirstFrameId = getCurrentFid();
     m_firstPoint                        = m_mousePos;
     invalidate();
-    return;
+    if (m_frameRange.getValue()) return;
   }
 
   m_slFidsPairs.clear();
@@ -2017,6 +2011,7 @@ void FillTool::buildFillInfo(const FillParameters &params) {
 
 void FillTool::computeRefImgsIfNeeded(const FillParameters &params) { 
   assert(!m_slFidsPairs.empty());
+  m_refImgTable.clear();
   if (params.m_fillType == LINES) return;
   auto app = getApplication();
   bool referFill =
@@ -2024,7 +2019,6 @@ void FillTool::computeRefImgsIfNeeded(const FillParameters &params) {
   bool closeGap  = m_closeGap.getValue();
   if (!closeGap && !referFill) return;
   
-  m_refImgTable.clear();
   auto xsh = app->getCurrentXsheet()->getXsheet();
 
   // Build map if need to generate refer Image from xsh
@@ -2144,7 +2138,7 @@ void FillTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
     // consume the mouse press event in advance.
     qApp->processEvents();
     // SECONDO CLICK
-    MultiFiller filler(std::move(m_refImgTable), m_firstPoint, pos, params,
+    MultiFiller filler(m_refImgTable, m_firstPoint, pos, params,
                        m_autopaintLines.getValue());
     filler.processSequence(m_slFidsPairs);
 

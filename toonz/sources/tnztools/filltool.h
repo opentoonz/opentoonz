@@ -23,10 +23,10 @@
 #define ALL L"Lines & Areas"
 
 class NormalLineFillTool;
-namespace {
-
 typedef std::vector<std::pair<TXshSimpleLevel *, TFrameId>> SlFidsPairs;
 typedef std::map<std::string, TImageP> RefImgTable;
+
+namespace {
 
 class AreaFillTool {
 public:
@@ -83,7 +83,6 @@ public:
 class FillTool final : public QObject, public TTool {
   // Q_DECLARE_TR_FUNCTIONS(FillTool)
   Q_OBJECT
-  friend class AreaFillTool;
   bool m_firstTime;
   TPointD m_firstPoint, m_clickPoint, m_mousePos;
   bool m_firstFrameSelected;
@@ -110,7 +109,6 @@ class FillTool final : public QObject, public TTool {
     int col, row;
   } m_beginCell;
 
-  SlFidsPairs m_slFidsPairs;
   std::vector<TFilledRegionInf> m_oldFillInformation;
 #ifdef _DEBUG
   std::vector<TRect> m_rects;
@@ -120,6 +118,7 @@ class FillTool final : public QObject, public TTool {
   // disabled
   TBoolProperty m_autopaintLines;
 
+  SlFidsPairs m_slFidsPairs;
   RefImgTable m_refImgTable;// imageId
 
 public:
@@ -159,6 +158,10 @@ public:
 
   void buildFillInfo(const FillParameters &params);
   void computeRefImgsIfNeeded(const FillParameters &params);
+
+  const SlFidsPairs &getSlFidsPairs() const { return m_slFidsPairs; }
+  const RefImgTable &getRefImgTable() const { return m_refImgTable; }
+
 public slots:
   void onFrameSwitched() override;
 };
