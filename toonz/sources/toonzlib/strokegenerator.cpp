@@ -278,6 +278,63 @@ glEnd();
 
 //-------------------------------------------------------------------
 
+void StrokeGenerator::drawFilledStroke() {
+  if (m_points.size() < 3) {
+    drawAllFragments();
+    return;
+  }
+
+  // Enable stencil buffer for overlap handling
+  glEnable(GL_STENCIL_TEST);
+  glStencilOp(GL_KEEP, GL_KEEP, GL_INVERT);
+  glStencilFunc(GL_ALWAYS, 0, 0xFF);
+
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+  // First pass: fill the stencil buffer
+  glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+  glStencilMask(0xFF);
+  glClear(GL_STENCIL_BUFFER_BIT);
+
+  glBegin(GL_TRIANGLE_FAN);
+  TThickPoint first = m_points.front();
+  glVertex2d(first.x, first.y);
+  for (const TThickPoint &p : m_points) {
+    glVertex2d(p.x, p.y);
+  }
+  glVertex2d(first.x, first.y);
+  glEnd();
+
+  // Second pass: draw with stencil test
+  glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+  glStencilFunc(GL_NOTEQUAL, 0, 0xFF);
+  glStencilMask(0x00);
+
+  glBegin(GL_TRIANGLE_FAN);
+  glVertex2d(first.x, first.y);
+  for (const TThickPoint &p : m_points) {
+    glVertex2d(p.x, p.y);
+  }
+  glVertex2d(first.x, first.y);
+  glEnd();
+
+  glDisable(GL_STENCIL_TEST);
+  glDisable(GL_BLEND);
+
+  // Draw endpoints if needed
+  if (first.thick > 0.01) {
+    tglDrawDisk(first, first.thick);
+  }
+  TThickPoint last = m_points.back();
+  if (last.thick > 0.01 &&
+      last != first) {  // Avoid double-drawing if first == last
+    tglDrawDisk(last, last.thick);
+  }
+}
+
+//-------------------------------------------------------------------
+
 TRectD StrokeGenerator::getModifiedRegion() const { return m_modifiedRegion; }
 
 //-------------------------------------------------------------------
