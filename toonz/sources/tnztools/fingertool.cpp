@@ -48,6 +48,8 @@ using namespace ToolUtils;
 
 TEnv::IntVar FingerInvert("InknpaintFingerInvert", 0);
 TEnv::DoubleVar FingerSize("InknpaintFingerSize", 10);
+TEnv::IntVar FingerMode("InknpaintFingerMode", 0);  
+TEnv::IntVar FingerPick("InknpaintFingerPick", 1);
 
 //-----------------------------------------------------------------------------
 
@@ -60,6 +62,7 @@ namespace {
 class FingerUndo final : public TRasterUndo {
   std::vector<TThickPoint> m_points;
   int m_styleId;
+  ColorType m_colorType = PAINT;
   bool m_invert;
 
 public:
@@ -74,7 +77,7 @@ public:
   void redo() const override {
     TToonzImageP image = m_level->getFrame(m_frameId, true);
     TRasterCM32P ras   = image->getRaster();
-    RasterStrokeGenerator m_rasterTrack(ras, FINGER, INK, m_styleId,
+    RasterStrokeGenerator m_rasterTrack(ras, FINGER, m_colorType, m_styleId,
                                         m_points[0], m_invert, 0, false, false);
     m_rasterTrack.setPointsSequence(m_points);
     m_rasterTrack.generateStroke(true);
@@ -254,10 +257,13 @@ class FingerTool final : public TTool {
   bool m_selecting;
   TTileSaverCM32 *m_tileSaver;
 
-  TPointD m_mousePos;
+  TPointD m_brushPos;
 
   TIntProperty m_toolSize;
+  TEnumProperty m_mode;
+  TBoolProperty m_pick;
   TBoolProperty m_invert;
+
   TPropertyGroup m_prop;
   int m_cursor;
 
@@ -314,14 +320,20 @@ FingerTool::FingerTool()
     , m_tileSaver(0)
     , m_cursor(ToolCursor::EraserCursor)
     , m_toolSize("Size:", 1, 1000, 10, false)
+    , m_mode("Mode:")
+    , m_pick("Pick", true)
     , m_invert("Invert", false)
     , m_firstTime(true)
     , m_workingFrameId(TFrameId()) {
   bind(TTool::ToonzImage);
 
   m_toolSize.setNonLinearSlider();
-
+  //ColorType
+  m_mode.addValue(L"Line");
+  m_mode.addValue(L"Area");
   m_prop.bind(m_toolSize);
+  m_prop.bind(m_mode);
+  m_prop.bind(m_pick);
   m_prop.bind(m_invert);
 
   m_invert.setId("Invert");
@@ -331,6 +343,8 @@ FingerTool::FingerTool()
 
 void FingerTool::updateTranslation() {
   m_toolSize.setQStringName(tr("Size:"));
+  m_mode.setQStringName(tr("Mode:"));
+  m_pick.setQStringName(tr("Pick"));
   m_invert.setQStringName(tr("Invert", NULL));
 }
 
@@ -356,7 +370,7 @@ void FingerTool::draw() {
   else
     glColor3d(1.0, 0.0, 0.0);
 
-  drawEmptyCircle(m_toolSize.getValue(), m_mousePos, true, lx % 2 == 0,
+  drawEmptyCircle(m_toolSize.getValue(), m_brushPos, true, lx % 2 == 0,
                   ly % 2 == 0);
 }
 
@@ -382,9 +396,22 @@ bool FingerTool::onPropertyChanged(std::string propertyName) {
         (x - minRange) / (maxRange - minRange) * (maxSize - minSize) + minSize;
     invalidate();
   }
+  
+  // Mode
+  else if (propertyName == m_mode.getName()) {
+    FingerMode = (ColorType)(m_mode.getIndex());
+    if (FingerMode == PAINT)
+      m_invert.setValue(false);
+  }
+
+  // Pick
+  else if (propertyName == m_pick.getName()) {
+    FingerPick = (int)(m_pick.getValue());
+  }
 
   // Invert
   else if (propertyName == m_invert.getName()) {
+    if (FingerMode == PAINT) m_invert.setValue(false);
     FingerInvert = (int)(m_invert.getValue());
   }
 
@@ -394,7 +421,8 @@ bool FingerTool::onPropertyChanged(std::string propertyName) {
 //-----------------------------------------------------------------------------
 
 void FingerTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
-  pick(pos);
+  if(FingerPick)
+      pick(pos);
 
   m_selecting = true;
   TImageP image(getImage(true));
@@ -407,7 +435,7 @@ void FingerTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
       TTileSetCM32 *tileSet = new TTileSetCM32(ras->getSize());
       m_tileSaver           = new TTileSaverCM32(ras, tileSet);
       m_rasterTrack         = new RasterStrokeGenerator(
-          ras, FINGER, INK, styleId,
+          ras, FINGER, (ColorType)m_mode.getIndex(), styleId,
           TThickPoint(pos + convert(ras->getCenter()), thickness),
           m_invert.getValue(), 0, false, false);
 
@@ -426,15 +454,16 @@ void FingerTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
 void FingerTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
   if (!m_selecting) return;
 
-  m_mousePos = pos;
+  m_brushPos = TPointD(tround(pos.x - 0.5), tround(pos.y - 0.5));
+
   if (TToonzImageP ri = TImageP(getImage(true))) {
     /*---	マウスを動かしながらショートカットで切り替わった場合、
                     いきなりleftButtonDragから呼ばれることがあり、
                     m_rasterTrackが無くて落ちることがある。 ---*/
     if (m_rasterTrack) {
       int thickness = m_toolSize.getValue();
-      m_rasterTrack->add(
-          TThickPoint(pos + convert(ri->getRaster()->getCenter()), thickness));
+      m_rasterTrack->add(TThickPoint(
+          m_brushPos + convert(ri->getRaster()->getCenter()), thickness));
       m_tileSaver->save(m_rasterTrack->getLastRect());
       TRect modifiedBbox = m_rasterTrack->generateLastPieceOfStroke(true);
       invalidate();
@@ -447,7 +476,7 @@ void FingerTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
 void FingerTool::leftButtonUp(const TPointD &pos, const TMouseEvent &) {
   if (!m_selecting) return;
 
-  m_mousePos = pos;
+  m_brushPos = TPointD(tround(pos.x - 0.5), tround(pos.y - 0.5));
 
   finishBrush();
 }
@@ -455,9 +484,7 @@ void FingerTool::leftButtonUp(const TPointD &pos, const TMouseEvent &) {
 //-----------------------------------------------------------------------------
 
 void FingerTool::mouseMove(const TPointD &pos, const TMouseEvent &e) {
-  m_mousePos = pos;
-  TPointD pp(tround(pos.x), tround(pos.y));
-  m_mousePos = pp;
+  m_brushPos = TPointD(tround(pos.x - 0.5), tround(pos.y - 0.5));
   invalidate();
 }
 
@@ -466,7 +493,10 @@ void FingerTool::mouseMove(const TPointD &pos, const TMouseEvent &e) {
 void FingerTool::onEnter() {
   if (m_firstTime) {
     m_invert.setValue(FingerInvert ? 1 : 0);
+    if (FingerMode == PAINT) m_invert.setValue(false);
     m_toolSize.setValue(FingerSize);
+    m_mode.setIndex(FingerMode);
+    m_pick.setValue(FingerPick ? 1 : 0);
     m_firstTime = false;
   }
   double x = m_toolSize.getValue();
@@ -512,7 +542,7 @@ void FingerTool::finishBrush() {
     if (m_rasterTrack) {
       int thickness = m_toolSize.getValue();
       m_rasterTrack->add(TThickPoint(
-          m_mousePos + convert(ti->getRaster()->getCenter()), thickness));
+          m_brushPos + convert(ti->getRaster()->getCenter()), thickness));
       m_tileSaver->save(m_rasterTrack->getLastRect());
       TRect modifiedBbox = m_rasterTrack->generateLastPieceOfStroke(true, true);
 
@@ -547,7 +577,11 @@ void FingerTool::finishBrush() {
 }
 
 void FingerTool::pick(const TPointD &pos) {
-  int modeValue = 2;  // LINES
+  int modeValue;
+  if (m_mode.getIndex() == INK)
+    modeValue = 1;//LINES
+  else
+    modeValue = 0;//AREAS
 
   TImageP image    = getImage(false);
   TToonzImageP ti  = image;
@@ -566,13 +600,12 @@ void FingerTool::pick(const TPointD &pos) {
   int styleId =
       picker.pickStyleId(TScale(1.0 / subsampling) * pos + TPointD(-0.5, -0.5),
                          getPixelSize() * getPixelSize(), 1.0, modeValue);
-
+  
   if (styleId < 0) return;
 
-  if (modeValue == 2)  // LINES
+  if (modeValue == 0)  // LINES
   {
-    /*--- pickLineモードのとき、取得Styleが0の場合はカレントStyleを変えない。
-     * ---*/
+    // pickLineモードのとき、取得Styleが0の場合はカレントStyleを変えない。
     if (styleId == 0) return;
 
     /*---
