@@ -965,6 +965,15 @@ void PreferencesPopup::onRenamePolicyExternallyChanged(int policy) {
   // update preferences data accordingly
   renamePolicyCombo->setCurrentIndex(policy);
 }
+
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onConvertPolicyExternallyChanged(int policy) {
+    QComboBox* convertPolicyCombo = getUI<QComboBox*>(importPolicy);
+    // update preferences data accordingly
+    convertPolicyCombo->setCurrentIndex(policy);
+}
+
 //-----------------------------------------------------------------------------
 
 QWidget* PreferencesPopup::createUI(PreferencesItemId id,
@@ -1254,6 +1263,7 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
       // Loading
       {importPolicy, tr("Default File Import Behavior:")},
       {renamePolicy, tr("Normalize Imported Image Sequences:")},
+      {convertPolicy, tr("Convert Imported Image Sequences to TLV:")},
       {autoExposeEnabled, tr("Expose Loaded Levels in Xsheet")},
       {autoRemoveUnusedLevels,
        tr("Automatically Remove Unused Levels From Scene Cast")},
@@ -1457,6 +1467,10 @@ QList<ComboBoxItem> PreferencesPopup::getComboItemList(
        {{tr("Always ask before renaming"), 0},
         {tr("Normalize sequence names automatically"), 1},
         {tr("Keep original filenames"), 2}}},
+        {convertPolicy,
+        {{tr("Always ask before converting"), 0},
+        {tr("Convert raster level automatically"), 1},
+        {tr("Do not convert"), 2}}},
       {rasterLevelCachingBehavior,
        {{tr("On Demand"), 0},
         {tr("All Icons"), 1},
@@ -1830,6 +1844,7 @@ QWidget* PreferencesPopup::createLoadingPage() {
 
   insertUI(importPolicy, lay, getComboItemList(importPolicy));
   insertUI(renamePolicy, lay, getComboItemList(renamePolicy));
+  insertUI(convertPolicy, lay, getComboItemList(convertPolicy));
   QGridLayout* autoExposeLay = insertGroupBoxUI(autoExposeEnabled, lay);
   { insertUI(autoRemoveUnusedLevels, autoExposeLay); }
   insertUI(subsceneFolderEnabled, lay);
@@ -1869,6 +1884,9 @@ QWidget* PreferencesPopup::createLoadingPage() {
   ret = ret && connect(TApp::instance()->getCurrentScene(),
                        SIGNAL(importPolicyChanged(int)), this,
                        SLOT(onImportPolicyExternallyChanged(int)));
+  ret = ret && connect(TApp::instance()->getCurrentScene(),
+                       SIGNAL(convertPolicyChanged(int)), this,
+                       SLOT(onConvertPolicyExternallyChanged(int)));
   ret = ret && connect(TApp::instance()->getCurrentScene(),
                        SIGNAL(renamePolicyChanged(int)), this,
                        SLOT(onRenamePolicyExternallyChanged(int)));
