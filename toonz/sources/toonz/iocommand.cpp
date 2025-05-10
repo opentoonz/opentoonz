@@ -2989,7 +2989,7 @@ void IoCmd::tryConvertRaster2TLV(std::vector<LoadResourceArguments::ResourceData
             if (!path.isAbsolute()) path = scene->decodeFilePath(path);
             TFilePath dstPath = scene->getDefaultLevelPath(TZP_XSHLEVEL, path.getWideName());
             dstPath = scene->decodeFilePath(dstPath);
-
+            
             if (!locals::checkConvertPolicy(path))continue;
             
             if (TSystem::doesExistFileOrLevel(dstPath)) {
@@ -3019,10 +3019,21 @@ void IoCmd::tryConvertRaster2TLV(std::vector<LoadResourceArguments::ResourceData
 >>>>>>> 286a81638 (To Set Color)
             std::string e;
             converter.init(e);
-            if (!e.empty()) continue;
-            for (int i = 0; i < converter.getFramesToConvertCount(); ++i)converter.convertNext(e);
-            if (TSystem::doesExistFileOrLevel(dstPath))
-                path = scene->codeFilePath(dstPath);
+            if (!e.empty()) {
+                DVGui::warning(QString("Failed to Convert\n%1").arg(path.getQString()));
+                continue;
+            }
+            int count = converter.getFramesToConvertCount();
+            if (count) {
+                IoCmd::ConvertingPopup convertingPopup(
+                    TApp::instance()->getMainWindow(),
+                    path.getQString());
+                convertingPopup.show();
+                for (int i = 0; i < count; ++i)converter.convertNext(e);
+                convertingPopup.hide();
+                if (TSystem::doesExistFileOrLevel(dstPath))
+                    path = scene->codeFilePath(dstPath);
+            }
         }
     }
 }
