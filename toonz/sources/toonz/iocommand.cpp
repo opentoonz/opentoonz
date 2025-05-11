@@ -1209,26 +1209,6 @@ inline TPaletteP dirtyWhite(const TPaletteP &plt) {
 }
 
 }  // namespace
-//---------------------------------------------------------------------------
-
-// Per ora e' usato solo per i formato "tzp" e "tzu".
-IoCmd::ConvertingPopup::ConvertingPopup(QWidget *parent, QString fileName)
-    : QDialog(parent) {
-  setModal(true);
-  setWindowFlags(Qt::Dialog | Qt::WindowTitleHint);
-  setMinimumSize(70, 50);
-  QVBoxLayout *mainLayout = new QVBoxLayout;
-  mainLayout->setMargin(5);
-  mainLayout->setSpacing(0);
-
-  QLabel *label = new QLabel(QString(
-      QObject::tr("Converting %1 images to tlv format...").arg(fileName)));
-  mainLayout->addWidget(label);
-
-  setLayout(mainLayout);
-}
-
-IoCmd::ConvertingPopup::~ConvertingPopup() {}
 
 //===========================================================================
 // IoCmd::saveSceneIfNeeded(message)
@@ -2599,12 +2579,14 @@ int IoCmd::loadResources(LoadResourceArguments &args, bool updateRecentFile,
   }
 
   if(args.renamePolicy != LoadResourceArguments::RenamePolicy::NEVER)
-      tryRenameResouces(rds);
+      renameResources(rds);
   if(args.convertPolicy != LoadResourceArguments::ConvertPolicy::NEVER)
-      tryConvertRaster2TLV(rds);
+      convertRaster2TLV(rds);
 
-  if (progressDialog)
+  if (progressDialog){
+      progressDialog->reset();
       progressDialog->setMaximum(rds.size());
+  }
   // LOAD IMPORTED FILE
   for (int i = 0; i < rds.size(); ++i) {
       TXshLevel* xl = 0;
@@ -2800,7 +2782,7 @@ bool IoCmd::importLipSync(TFilePath levelPath, QList<TFrameId> frameList,
   return true;
 }
 
-void IoCmd::tryRenameResouces(std::vector<LoadResourceArguments::ResourceData>& rds) {
+void IoCmd::renameResources(std::vector<LoadResourceArguments::ResourceData>& rds, bool askUser) {
     struct locals {
         // call when loading levels
         static bool matchSequencePattern(const TFilePath& path) {
@@ -2820,7 +2802,6 @@ QRegularExpression::ExtendedPatternSyntaxOption);
         };
 
         static bool checkRenamePolicy(const TFilePath& path) {
-            // TODO: Check the Preference Policy
             switch (Preferences::instance()->getIntValue(renamePolicy)) {
             case 0:
                 break;
@@ -2884,7 +2865,8 @@ QRegularExpression::ExtendedPatternSyntaxOption);
     ToonzScene* scene = app->getCurrentScene()->getScene();
     for (auto rd = rds.begin(); rd != rds.end();++rd) {
         TFilePath& path = rd->m_path;
-        if (!locals::matchSequencePattern(path) ||
+        if (!locals::matchSequencePattern(path))continue;
+        if (askUser &&
             !locals::checkRenamePolicy(path)) continue;
         TFilePath levelPath = locals::getLevelPath(path);
         if (TSystem::doesExistFileOrLevel(levelPath)) {
@@ -2922,10 +2904,9 @@ QRegularExpression::ExtendedPatternSyntaxOption);
     }
 }
 
-void IoCmd::tryConvertRaster2TLV(std::vector<LoadResourceArguments::ResourceData>& rds) {
+void IoCmd::convertRaster2TLV(std::vector<LoadResourceArguments::ResourceData>& rds, bool askUser) {
     struct locals {
         static bool checkConvertPolicy(const TFilePath& path) {
-            // TODO: Check the Preference Policy for conversion
             switch (Preferences::instance()->getIntValue(convertPolicy)) {
             case 0:
                 break;  // Ask every time
@@ -2977,6 +2958,10 @@ void IoCmd::tryConvertRaster2TLV(std::vector<LoadResourceArguments::ResourceData
             }
             return false;
         }
+
+        static bool isNAAImage(const TFilePath& path) {
+
+        }
     };//Locals
 
     static const QStringList rasterExts = {
@@ -2987,10 +2972,9 @@ void IoCmd::tryConvertRaster2TLV(std::vector<LoadResourceArguments::ResourceData
         TFilePath& path = rd.m_path;
         if (path.getDots() == ".." && rasterExts.contains(QString::fromStdString(path.getType()).toLower())) {
             if (!path.isAbsolute()) path = scene->decodeFilePath(path);
-            TFilePath dstPath = scene->getDefaultLevelPath(TZP_XSHLEVEL, path.getWideName());
-            dstPath = scene->decodeFilePath(dstPath);
+            TFilePath dstPath = path.getParentDir() + TFilePath(path.getName()).withType("tlv");
             
-            if (!locals::checkConvertPolicy(path))continue;
+            if (askUser && !locals::checkConvertPolicy(path))continue;
             
             if (TSystem::doesExistFileOrLevel(dstPath)) {
                 OverwriteDialog dialog;
@@ -2998,6 +2982,7 @@ void IoCmd::tryConvertRaster2TLV(std::vector<LoadResourceArguments::ResourceData
 
                 switch (dialog.getChoice()) {
                 case OverwriteDialog::RENAME:
+                    break;
                 case OverwriteDialog::KEEP_OLD:
                     continue;
                 case OverwriteDialog::OVERWRITE:
@@ -3012,11 +2997,16 @@ void IoCmd::tryConvertRaster2TLV(std::vector<LoadResourceArguments::ResourceData
             if(!locals::getRange(path, from, to)) continue;
             Convert2Tlv converter(path, TFilePath(), dstPath.getParentDir(), QString::fromStdWString(dstPath.getWideName())
 <<<<<<< HEAD
+<<<<<<< HEAD
                 , from, to, false, TFilePath(), 20, 0, 50, false, true, scene->getCurrentCamera()->getDpi().x);
 =======
                 , from, to, false, TFilePath(), 0, 0, 50, false, true, 
                 Preferences::instance()->isIgnoreImageDpiEnabled() ? scene->getCurrentCamera()->getDpi().x : 0);
 >>>>>>> 286a81638 (To Set Color)
+=======
+                , from, to, false, TFilePath(), 20, 0, 50, false, true, 
+                Preferences::instance()->isIgnoreImageDpiEnabled() ? scene->getCurrentCamera()->getDpi().x : 0);
+>>>>>>> 0ea585f70 (Add AutoRename and Auto Convert Opetions when importing from .xdts)
             std::string e;
             converter.init(e);
             if (!e.empty()) {
@@ -3027,9 +3017,17 @@ void IoCmd::tryConvertRaster2TLV(std::vector<LoadResourceArguments::ResourceData
             if (count) {
                 IoCmd::ConvertingPopup convertingPopup(
                     TApp::instance()->getMainWindow(),
-                    path.getQString());
+                    path.withoutParentDir().getQString());
+                convertingPopup.setMaximum(count);
                 convertingPopup.show();
-                for (int i = 0; i < count; ++i)converter.convertNext(e);
+                for (int i = 0; i < count; ++i){
+                    converter.convertNext(e);
+                    convertingPopup.setValue(i+1);
+                    if (convertingPopup.wasCanceled()) {
+                        converter.abort();
+                        break;
+                    }
+                }
                 convertingPopup.hide();
                 if (TSystem::doesExistFileOrLevel(dstPath))
                     path = scene->codeFilePath(dstPath);
