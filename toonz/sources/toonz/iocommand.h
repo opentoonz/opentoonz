@@ -15,6 +15,9 @@
 // Qt includes
 #include <QDialog>
 
+// TnzQt includes
+#include "toonzqt/dvdialog.h"
+
 // boost includes
 #include <boost/optional.hpp>
 
@@ -185,10 +188,15 @@ public:
 
 //------------------------------------------------------------------------
 
-class ConvertingPopup final : public QDialog {
+class ConvertingPopup final : public DVGui::ProgressDialog {
 public:
-  ConvertingPopup(QWidget *parent, QString fileName);
-  ~ConvertingPopup();
+    IoCmd::ConvertingPopup::ConvertingPopup(QWidget* parent, QString fileName) :ProgressDialog(QString(
+        QObject::tr("Converting %1 to tlv format...").arg(fileName)), "Cancel", 0, 1, parent) {
+    };
+    ~ConvertingPopup() {};
+    void setName(QString fileName) {
+        ProgressDialog::setLabelText(QObject::tr("Converting %1 to tlv format...")
+            .arg(fileName)); };
 };
 
 //------------------------------------------------------------------------
@@ -252,7 +260,12 @@ int loadResourceFolders(
         0  //!< Load block. May be nonzero in order to extend block data
            //!  access and finalization.
 );         //!< Loads the specified folders in current xsheet.
-           //!  \return  The actually loaded levels count.
+           //!  \return  The actually loaded levels count.           
+
+void renameResources(std::vector<LoadResourceArguments::ResourceData>& rds, bool askUser = true);
+
+void convertRaster2TLV(std::vector<LoadResourceArguments::ResourceData>& rds, bool askUser = true);
+
 bool exposeLevel(TXshSimpleLevel *sl, int row, int col, bool insert = false,
                  bool overWrite = false);
 bool exposeLevel(TXshSimpleLevel *sl, int row, int col,
@@ -271,10 +284,6 @@ bool exposeComment(int row, int &col, QList<QString> commentList,
 
 bool importLipSync(TFilePath levelPath, QList<TFrameId> frameList,
                    QList<QString> commentList, QString fileName);
-
-void tryRenameResouces(std::vector<LoadResourceArguments::ResourceData>& rds);
-
-void tryConvertRaster2TLV(std::vector<LoadResourceArguments::ResourceData>& rds);
 // If the scene will be saved in the different folder, check out the scene
 // cast.
 // if the cast contains the level specified with $scenefolder alias,

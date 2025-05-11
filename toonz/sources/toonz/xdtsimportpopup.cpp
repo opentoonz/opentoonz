@@ -2,6 +2,7 @@
 
 #include "tapp.h"
 #include "tsystem.h"
+#include "iocommand.h"
 #include "toonzqt/filefield.h"
 #include "toonz/toonzscene.h"
 #include "toonz/tscenehandle.h"
@@ -24,6 +25,59 @@ QIcon getColorChipIcon(TPixel32 color) {
   pm.fill(QColor(color.r, color.g, color.b));
   return QIcon(pm);
 }
+
+bool matchSequencePattern(const TFilePath& path) {
+    QRegularExpression pattern(
+        R"(
+  ^                           # Match the start of the string
+  .*?                         # Optional prefix
+  \d+                         # allow aFilePrefix<number>.ext
+  \.                          # Match a dot (.)
+  (png|jpg|jpeg|bmp|tga|tiff) # Image extensions
+  $                           # Match the end of the string
+)",
+QRegularExpression::CaseInsensitiveOption |
+QRegularExpression::ExtendedPatternSyntaxOption);
+    return pattern.match(QString::fromStdString(path.getLevelName()))
+        .hasMatch();
+};
+
+bool isSharingSameParam(QString name1,
+    QString name2) {
+    std::wstring str1 = name1.toStdWString();
+    std::wstring str2 = name2.toStdWString();
+
+    str1.erase(std::remove_if(str1.begin(), str1.end(), ::iswdigit),
+        str1.end());
+    str2.erase(std::remove_if(str2.begin(), str2.end(), ::iswdigit),
+        str2.end());
+
+    return str1 == str2;
+}
+
+void fetchSequence(std::vector<IoCmd::LoadResourceArguments::ResourceData>& rds) {
+    for (size_t i = 0; i < rds.size(); ++i) {
+        TFilePath currentPath = rds[i].m_path;
+        if (!matchSequencePattern(currentPath))continue;
+
+        TFilePath thisFolder = currentPath.getParentDir();
+        QDir dir(thisFolder.getQString());
+
+        QString searchPattern = "*" + QString::fromStdString(currentPath.getDottedType());
+        QStringList foundFiles = dir.entryList(QStringList(searchPattern), QDir::Files);
+        if (foundFiles.isEmpty()) continue;
+        QString thisFile = currentPath.withoutParentDir().getQString();
+        for (const QString& foundFile : foundFiles) {
+            if (thisFile == foundFile) continue;
+
+            if (isSharingSameParam(thisFile, foundFile)) {
+                IoCmd::LoadResourceArguments::ResourceData newData;
+                newData.m_path = thisFolder + foundFile.toStdWString();
+                rds.insert(rds.begin() + (++i), newData);
+            }
+        }
+    }
+}
 }  // namespace
 
 //=============================================================================
@@ -42,6 +96,11 @@ XDTSImportPopup::XDTSImportPopup(QStringList levelNames, ToonzScene* scene,
   m_tick1Combo             = new QComboBox(this);
   m_tick2Combo             = new QComboBox(this);
   QList<QComboBox*> combos = {m_tick1Combo, m_tick2Combo};
+
+  m_renameCheckBox = new QCheckBox("Rename All Image Sequence", this);
+  m_renameCheckBox->setChecked(true);
+  m_convertCheckBox = new QCheckBox("Convert All Raster Level to Toonz Raster", this);
+  m_convertCheckBox->setChecked(true);
 
   if (m_isUext) {
     m_keyFrameCombo       = new QComboBox(this);
@@ -108,7 +167,7 @@ XDTSImportPopup::XDTSImportPopup(QStringList levelNames, ToonzScene* scene,
   fieldsArea->setWidget(fieldsWidget);
   m_topLayout->addWidget(fieldsArea, 1);
 
-  // 棃廡 尨夋乛拞妱嶲峫偺僐儅儅乕僋偺儗僀傾僂僩偐傜両
+  // 来週 原画／中割参考のコママークのレイアウトから！
 
   // cell mark area
   QGroupBox* cellMarkGroupBox =
@@ -139,11 +198,16 @@ XDTSImportPopup::XDTSImportPopup(QStringList levelNames, ToonzScene* scene,
 
   m_topLayout->addWidget(cellMarkGroupBox, 0, Qt::AlignRight);
 
+  QHBoxLayout* checkBoxLayout = new QHBoxLayout;
+  checkBoxLayout->addStretch();
+  checkBoxLayout->addWidget(m_renameCheckBox);
+  checkBoxLayout->addWidget(m_convertCheckBox);
+  m_topLayout->addLayout(checkBoxLayout);
   connect(loadButton, SIGNAL(clicked()), this, SLOT(accept()));
   connect(cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 
   addButtonBarWidget(loadButton, cancelButton);
-
+  this->adjustSize();
   updateSuggestions(scenePath.getQString());
 }
 
@@ -175,6 +239,7 @@ void XDTSImportPopup::updateSuggestions(const QString samplePath) {
   QStringList filters;
   filters << "*.bmp"
           << "*.jpg"
+          << "*.jpeg"
           << "*.nol"
           << "*.pic"
           << "*.pict"
@@ -242,6 +307,12 @@ void XDTSImportPopup::updateSuggestions(const QString samplePath) {
     ++fieldsItr;
   }
 
+  // fallBack search
+  if (m_pathSuggestedLevels.empty()) {
+      updateSuggestions(fp);
+      return;
+  }
+
   // repaint fields
   fieldsItr = m_fields.begin();
   while (fieldsItr != m_fields.end()) {
@@ -254,6 +325,80 @@ void XDTSImportPopup::updateSuggestions(const QString samplePath) {
     ++fieldsItr;
   }
 }
+
+//-----------------------------------------------------------------------------
+// FALL BACK
+void XDTSImportPopup::updateSuggestions(const TFilePath &path) {
+    QMap<QString, FileField*>::iterator fieldsItr = m_fields.begin();
+    QStringList filters;
+    filters << "*.bmp"
+        << "*.jpg"
+        << "*.jpeg"
+        << "*.nol"
+        << "*.pic"
+        << "*.pict"
+        << "*.pct"
+        << "*.png"
+        << "*.rgb"
+        << "*.sgi"
+        << "*.tga"
+        << "*.tif"
+        << "*.tiff";
+    bool suggestFolderFound = false;
+    QDir suggestFolder(path.getQString());
+    auto assignMatchingFiles = [&](QStringList& files) {
+        QMap<QString, FileField*>::iterator it = m_fields.begin();
+        while (it != m_fields.end()) {
+            QString levelName = it.key();
+            if (m_pathSuggestedLevels.contains(levelName)) {
+                ++it;
+                continue;
+            }
+            FileField* fileField = it.value();
+            QString filePattern = ".*" + levelName + ".*" + ".{3,4}$";
+            int index = files.indexOf(QRegExp(filePattern));
+            if (index != -1) {
+                suggestFolderFound = true;
+                fileField->setPath(suggestFolder.filePath(files[index]));
+                files.removeAt(index);
+                m_pathSuggestedLevels.append(levelName);
+            }
+            ++it;
+        }
+        };
+    
+    // Relative Paths
+    QStringList relPaths = suggestFolder.entryList(filters, QDir::Files | QDir::Readable | QDir::NoDotAndDotDot);
+    assignMatchingFiles(relPaths);
+
+    if (!suggestFolderFound) {
+        relPaths.clear();
+        QStringList subDirs = suggestFolder.entryList(QDir::Dirs | QDir::Readable | QDir::NoDotAndDotDot);
+        for (const QString& subDirName : subDirs) {
+            QDir subDir = suggestFolder;
+            if (!subDir.cd(subDirName)) continue;
+
+            QStringList filesInSubDir = subDir.entryList(filters, QDir::Files | QDir::Readable | QDir::NoDotAndDotDot);
+            for (const QString& file : filesInSubDir) {
+                relPaths.append(subDirName + "/" + file);
+            }
+        }
+        assignMatchingFiles(relPaths);
+    }
+
+    // repaint fields
+    fieldsItr = m_fields.begin();
+    while (fieldsItr != m_fields.end()) {
+        if (m_pathSuggestedLevels.contains(fieldsItr.key()))
+            fieldsItr.value()->setStyleSheet(
+                QString("#SuggestiveFileField "
+                    "QLineEdit{border-color:#2255aa;border-width:2px;}"));
+        else
+            fieldsItr.value()->setStyleSheet(QString(""));
+        ++fieldsItr;
+    }
+}
+
 
 //-----------------------------------------------------------------------------
 
@@ -276,4 +421,24 @@ void XDTSImportPopup::getMarkerIds(int& tick1Id, int& tick2Id, int& keyFrameId,
     keyFrameId       = -1;
     referenceFrameId = -1;
   }
+}
+
+void XDTSImportPopup::accept(){
+    std::vector<IoCmd::LoadResourceArguments::ResourceData> rds;
+    for (auto it = m_fields.constBegin(); it != m_fields.constEnd(); ++it) {
+        auto name = it.key();
+        auto field = it.value();
+    }
+    IoCmd::LoadResourceArguments::ResourceData d;
+    for (auto field : m_fields) rds.push_back(TFilePath(field->getPath()));
+    fetchSequence(rds);
+    IoCmd::renameResources(rds, !m_renameCheckBox->isChecked());
+    IoCmd::convertRaster2TLV(rds, !m_convertCheckBox->isChecked());// Only Generate Inks 
+    //TODO: Only convert NAA Images
+    if(rds.size() != m_fields.size())// User Cancel or ERROR
+        QDialog::accept();
+
+    int i = 0;
+    for (auto field : m_fields) field->setPath(rds[i++].m_path.getQString());
+    QDialog::accept();
 }
