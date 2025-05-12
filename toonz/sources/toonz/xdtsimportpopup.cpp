@@ -439,7 +439,6 @@ void XDTSImportPopup::accept(){
         IoCmd::renameResources(rds, false);
     if(m_convertCheckBox->isChecked())
         IoCmd::convertNAARaster2TLV(rds, false);// Only Generate Inks 
-    //TODO: Only convert NAA Images
     if(rds.size() != m_fields.size())// User Cancel or ERROR
         QDialog::accept();
 

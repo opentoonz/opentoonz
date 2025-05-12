@@ -190,7 +190,7 @@ public:
 
 class ConvertingPopup final : public DVGui::ProgressDialog {
 public:
-    IoCmd::ConvertingPopup::ConvertingPopup(QWidget* parent, QString fileName) 
+    ConvertingPopup(QWidget* parent, QString fileName) 
         : ProgressDialog(QString(
         QObject::tr("Converting %1 to tlv format...").arg(fileName)), 
             "Cancel", 0, 1, parent) {
