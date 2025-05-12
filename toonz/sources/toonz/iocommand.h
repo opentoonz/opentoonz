@@ -190,8 +190,10 @@ public:
 
 class ConvertingPopup final : public DVGui::ProgressDialog {
 public:
-    IoCmd::ConvertingPopup::ConvertingPopup(QWidget* parent, QString fileName) :ProgressDialog(QString(
-        QObject::tr("Converting %1 to tlv format...").arg(fileName)), "Cancel", 0, 1, parent) {
+    IoCmd::ConvertingPopup::ConvertingPopup(QWidget* parent, QString fileName) 
+        : ProgressDialog(QString(
+        QObject::tr("Converting %1 to tlv format...").arg(fileName)), 
+            "Cancel", 0, 1, parent) {
     };
     ~ConvertingPopup() {};
     void setName(QString fileName) {
@@ -262,9 +264,11 @@ int loadResourceFolders(
 );         //!< Loads the specified folders in current xsheet.
            //!  \return  The actually loaded levels count.           
 
-void renameResources(std::vector<LoadResourceArguments::ResourceData>& rds, bool askUser = true);
+void renameResources(std::vector<LoadResourceArguments::ResourceData>& rds, 
+    bool askUser = true);
 
-void convertRaster2TLV(std::vector<LoadResourceArguments::ResourceData>& rds, bool askUser = true);
+void convertNAARaster2TLV(std::vector<LoadResourceArguments::ResourceData>& rds, 
+    bool askUser = true);
 
 bool exposeLevel(TXshSimpleLevel *sl, int row, int col, bool insert = false,
                  bool overWrite = false);

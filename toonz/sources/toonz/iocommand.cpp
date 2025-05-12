@@ -34,6 +34,7 @@
 #include "toonzqt/swatchviewer.h"
 #include "toonzqt/tselectionhandle.h"
 #include "toonzqt/dvdialog.h"
+#include "toonzqt/imageutils.h"
 
 // ToonzLib includes
 #include "toonz/palettecontroller.h"
@@ -2582,7 +2583,7 @@ int IoCmd::loadResources(LoadResourceArguments &args, bool updateRecentFile,
   if(args.renamePolicy != LoadResourceArguments::RenamePolicy::NEVER)
       renameResources(rds);
   if(args.convertPolicy != LoadResourceArguments::ConvertPolicy::NEVER)
-      convertRaster2TLV(rds);
+      convertNAARaster2TLV(rds);
 
   if (progressDialog){
       progressDialog->reset();
@@ -2905,7 +2906,7 @@ QRegularExpression::ExtendedPatternSyntaxOption);
     }
 }
 
-void IoCmd::convertRaster2TLV(std::vector<LoadResourceArguments::ResourceData>& rds, bool askUser) {
+void IoCmd::convertNAARaster2TLV(std::vector<LoadResourceArguments::ResourceData>& rds, bool askUser) {
     struct locals {
         static bool checkConvertPolicy(const TFilePath& path) {
             switch (Preferences::instance()->getIntValue(convertPolicy)) {
@@ -2941,7 +2942,7 @@ void IoCmd::convertRaster2TLV(std::vector<LoadResourceArguments::ResourceData>& 
             return ret == 1;
         }
 
-        static bool getRange(const TFilePath& path, int& from, int& to) {
+        static bool getRange(const TFilePath& path, int& from, int& to, TFilePath &first) {
             TLevelP levelTmp;
             TLevelReaderP lrTmp = TLevelReaderP(path);
             if (lrTmp) {
@@ -2953,6 +2954,7 @@ void IoCmd::convertRaster2TLV(std::vector<LoadResourceArguments::ResourceData>& 
                     if (start.getNumber() >= 0 && end.getNumber() >= 0) {
                         from = start.getNumber();
                         to = end.getNumber();
+                        first = lrTmp->getFrameReader(start)->getFilePath();
                         return true;
                     }
                 }
@@ -2960,9 +2962,6 @@ void IoCmd::convertRaster2TLV(std::vector<LoadResourceArguments::ResourceData>& 
             return false;
         }
 
-        static bool isNAAImage(const TFilePath& path) {
-
-        }
     };//Locals
 
     static const QStringList rasterExts = {
@@ -2976,7 +2975,10 @@ void IoCmd::convertRaster2TLV(std::vector<LoadResourceArguments::ResourceData>& 
             TFilePath dstPath = path.getParentDir() + TFilePath(path.getName()).withType("tlv");
             
             if (askUser && !locals::checkConvertPolicy(path))continue;
-            
+            int from, to;
+            TFilePath first;
+            if (!locals::getRange(path, from, to, first)) continue;
+            if (ImageUtils::isAAImage(first))continue;
             if (TSystem::doesExistFileOrLevel(dstPath)) {
                 OverwriteDialog dialog;
                 dstPath = dstPath.withName(dialog.execute(scene, dstPath, false));
@@ -2994,8 +2996,6 @@ void IoCmd::convertRaster2TLV(std::vector<LoadResourceArguments::ResourceData>& 
                     continue;
                 }
             }
-            int from, to;
-            if(!locals::getRange(path, from, to)) continue;
             Convert2Tlv converter(path, TFilePath(), dstPath.getParentDir(), QString::fromStdWString(dstPath.getWideName())
 <<<<<<< HEAD
 <<<<<<< HEAD

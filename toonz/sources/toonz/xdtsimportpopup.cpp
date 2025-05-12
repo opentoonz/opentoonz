@@ -97,9 +97,9 @@ XDTSImportPopup::XDTSImportPopup(QStringList levelNames, ToonzScene* scene,
   m_tick2Combo             = new QComboBox(this);
   QList<QComboBox*> combos = {m_tick1Combo, m_tick2Combo};
 
-  m_renameCheckBox = new QCheckBox("Rename All Image Sequence", this);
+  m_renameCheckBox = new QCheckBox("Rename Image Sequence", this);
   m_renameCheckBox->setChecked(true);
-  m_convertCheckBox = new QCheckBox("Convert All Raster Level to Toonz Raster", this);
+  m_convertCheckBox = new QCheckBox("Convert NAA Raster to Toonz Raster", this);
   m_convertCheckBox->setChecked(true);
 
   if (m_isUext) {
@@ -432,8 +432,10 @@ void XDTSImportPopup::accept(){
     IoCmd::LoadResourceArguments::ResourceData d;
     for (auto field : m_fields) rds.push_back(TFilePath(field->getPath()));
     fetchSequence(rds);
-    IoCmd::renameResources(rds, !m_renameCheckBox->isChecked());
-    IoCmd::convertRaster2TLV(rds, !m_convertCheckBox->isChecked());// Only Generate Inks 
+    if(m_renameCheckBox->isChecked())
+        IoCmd::renameResources(rds, false);
+    if(m_convertCheckBox->isChecked())
+        IoCmd::convertNAARaster2TLV(rds, false);// Only Generate Inks 
     //TODO: Only convert NAA Images
     if(rds.size() != m_fields.size())// User Cancel or ERROR
         QDialog::accept();
