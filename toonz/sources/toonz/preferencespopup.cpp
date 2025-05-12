@@ -1263,7 +1263,7 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
       // Loading
       {importPolicy, tr("Default File Import Behavior:")},
       {renamePolicy, tr("Normalize Imported Image Sequences:")},
-      {convertPolicy, tr("Convert Imported Image Sequences to TLV:")},
+      {convertPolicy, tr("Convert Imported NAA Image Sequences to TLV:")},
       {autoExposeEnabled, tr("Expose Loaded Levels in Xsheet")},
       {autoRemoveUnusedLevels,
        tr("Automatically Remove Unused Levels From Scene Cast")},
