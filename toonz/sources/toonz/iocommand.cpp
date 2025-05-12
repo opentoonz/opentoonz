@@ -2951,6 +2951,7 @@ void IoCmd::convertNAARaster2TLV(std::vector<LoadResourceArguments::ResourceData
       "png", "jpg", "jpeg", "bmp", "tga" };
     TApp* app = TApp::instance();
     ToonzScene* scene = app->getCurrentScene()->getScene();
+    IoCmd::ConvertingPopup convertingPopup(TApp::instance()->getMainWindow(),0);
     for (auto &rd : rds) {
         TFilePath& path = rd.m_path;
         if (path.getDots() == ".." && rasterExts.contains(QString::fromStdString(path.getType()).toLower())) {
@@ -2999,10 +3000,9 @@ void IoCmd::convertNAARaster2TLV(std::vector<LoadResourceArguments::ResourceData
             }
             int count = converter.getFramesToConvertCount();
             if (count) {
-                IoCmd::ConvertingPopup convertingPopup(
-                    TApp::instance()->getMainWindow(),
-                    path.withoutParentDir().getQString());
+                convertingPopup.reset();
                 convertingPopup.setMaximum(count);
+                convertingPopup.setName(path.withoutParentDir().getQString());
                 convertingPopup.show();
                 for (int i = 0; i < count; ++i){
                     converter.convertNext(e);
@@ -3012,7 +3012,7 @@ void IoCmd::convertNAARaster2TLV(std::vector<LoadResourceArguments::ResourceData
                         break;
                     }
                 }
-                convertingPopup.hide();
+                //convertingPopup.hide();
                 if (TSystem::doesExistFileOrLevel(dstPath))
                     path = scene->codeFilePath(dstPath);
             }
