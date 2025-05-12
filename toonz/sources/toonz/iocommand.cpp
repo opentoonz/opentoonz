@@ -2957,12 +2957,11 @@ void IoCmd::convertNAARaster2TLV(std::vector<LoadResourceArguments::ResourceData
         if (path.getDots() == ".." && rasterExts.contains(QString::fromStdString(path.getType()).toLower())) {
             if (!path.isAbsolute()) path = scene->decodeFilePath(path);
             TFilePath dstPath = path.getParentDir() + TFilePath(path.getName()).withType("tlv");
-            
-            if (askUser && !locals::checkConvertPolicy(path))continue;
             int from, to;
             TFilePath first;
             if (!locals::getRange(path, from, to, first)) continue;
             if (ImageUtils::isAAImage(first))continue;
+            if (askUser && !locals::checkConvertPolicy(path))continue;
             if (TSystem::doesExistFileOrLevel(dstPath)) {
                 OverwriteDialog dialog;
                 dstPath = dstPath.withName(dialog.execute(scene, dstPath, false));
@@ -2981,17 +2980,8 @@ void IoCmd::convertNAARaster2TLV(std::vector<LoadResourceArguments::ResourceData
                 }
             }
             Convert2Tlv converter(path, TFilePath(), dstPath.getParentDir(), QString::fromStdWString(dstPath.getWideName())
-<<<<<<< HEAD
-<<<<<<< HEAD
-                , from, to, false, TFilePath(), 20, 0, 50, false, true, scene->getCurrentCamera()->getDpi().x);
-=======
                 , from, to, false, TFilePath(), 0, 0, 50, false, true, 
                 Preferences::instance()->isIgnoreImageDpiEnabled() ? scene->getCurrentCamera()->getDpi().x : 0);
->>>>>>> 286a81638 (To Set Color)
-=======
-                , from, to, false, TFilePath(), 20, 0, 50, false, true, 
-                Preferences::instance()->isIgnoreImageDpiEnabled() ? scene->getCurrentCamera()->getDpi().x : 0);
->>>>>>> 0ea585f70 (Add AutoRename and Auto Convert Opetions when importing from .xdts)
             std::string e;
             converter.init(e);
             if (!e.empty()) {
