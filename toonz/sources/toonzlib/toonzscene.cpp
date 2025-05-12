@@ -1366,7 +1366,6 @@ TFilePath ToonzScene::codeFilePath(const TFilePath &path) const {
 
 //-----------------------------------------------------------------------------
 // if the path is codable with $scenefolder alias, replace it and return true
-
 bool ToonzScene::codeFilePathWithSceneFolder(TFilePath &path) const {
   // if the scene is untitled, then do nothing and return false
   if (isUntitled()) return false;
@@ -1376,6 +1375,11 @@ bool ToonzScene::codeFilePathWithSceneFolder(TFilePath &path) const {
     return true;
   }
   return false;
+}
+
+bool ToonzScene::isLonelyScene() const {
+    TFilePath sceneFolderPath = getProject()->getFolder("scenes", true);
+    return !sceneFolderPath.isAncestorOf(m_scenePath);
 }
 
 //-----------------------------------------------------------------------------
@@ -1406,11 +1410,15 @@ TFilePath ToonzScene::getDefaultLevelPath(int levelType,
     levelPath = TFilePath(levelName + L"..png");
   }
 
-  if (!isUntitled() && Preferences::instance()->getPathAliasPriority() ==
-                           Preferences::SceneFolderAlias)
-    return TFilePath("$scenefolder") + levelPath;
+  // In case scene is loaded from outside
+  if (!isUntitled() &&
+      Preferences::instance()->getPathAliasPriority() == Preferences::SceneFolderAlias)
+          return TFilePath("$scenefolder") + levelPath;
 
   std::string folderName = getFolderName(levelType);
+  if (!isUntitled() && isLonelyScene())
+      return TFilePath("$scenefolder") + TFilePath(folderName) + levelPath;
+
   if (project->getUseScenePath(folderName))
     return TFilePath("+" + folderName) + getSavePath() + levelPath;
   else
