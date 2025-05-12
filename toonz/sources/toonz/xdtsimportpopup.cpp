@@ -217,7 +217,7 @@ void XDTSImportPopup::onPathChanged() {
   FileField* fileField = dynamic_cast<FileField*>(sender());
   if (!fileField) return;
   QString levelName = m_fields.key(fileField);
-  // make the field non-suggestive
+  // make the fields non-suggestive
   m_pathSuggestedLevels.removeAll(levelName);
 
   // if the path is specified under the sub-folder with the same name as the
@@ -263,6 +263,7 @@ void XDTSImportPopup::updateSuggestions(const QString samplePath) {
   }
 
   QMap<QString, FileField*>::iterator fieldsItr = m_fields.begin();
+  bool suggested = false;
   while (fieldsItr != m_fields.end()) {
     QString levelName    = fieldsItr.key();
     FileField* fileField = fieldsItr.value();
@@ -303,12 +304,13 @@ void XDTSImportPopup::updateSuggestions(const QString samplePath) {
         // back to parent folder
         suggestFolder.cdUp();
       }
+      if (found) suggested = true;
     }
     ++fieldsItr;
   }
 
   // fallBack search
-  if (m_pathSuggestedLevels.empty()) {
+  if (!suggested) {
       updateSuggestions(fp);
       return;
   }
@@ -350,18 +352,19 @@ void XDTSImportPopup::updateSuggestions(const TFilePath &path) {
         QMap<QString, FileField*>::iterator it = m_fields.begin();
         while (it != m_fields.end()) {
             QString levelName = it.key();
-            if (m_pathSuggestedLevels.contains(levelName)) {
-                ++it;
-                continue;
-            }
             FileField* fileField = it.value();
-            QString filePattern = ".*" + levelName + ".*" + ".{3,4}$";
-            int index = files.indexOf(QRegExp(filePattern));
-            if (index != -1) {
-                suggestFolderFound = true;
-                fileField->setPath(suggestFolder.filePath(files[index]));
-                files.removeAt(index);
-                m_pathSuggestedLevels.append(levelName);
+            if (fileField->getPath().isEmpty() ||
+                m_pathSuggestedLevels.contains(levelName)) {
+                QString filePattern = ".*" + levelName + ".*" + ".{3,4}$";
+                int index = files.indexOf(QRegExp(filePattern));
+                if (index != -1) {
+                    suggestFolderFound = true;
+                    TFilePath foundPath(suggestFolder.filePath(files[index]));
+                    TFilePath codedPath = m_scene->codeFilePath(foundPath);
+                    fileField->setPath(codedPath.getQString());
+                    files.removeAt(index);
+                    m_pathSuggestedLevels.append(levelName);
+                }
             }
             ++it;
         }
