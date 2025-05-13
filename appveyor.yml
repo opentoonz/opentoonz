@@ -19,6 +19,7 @@ cache:
 clone_script:
   - cmd: >-
       git lfs install --skip-smudge
+
       git clone -q --depth=1 https://github.com/opentoonz/opentoonz.git %APPVEYOR_BUILD_FOLDER%
 
 install:
