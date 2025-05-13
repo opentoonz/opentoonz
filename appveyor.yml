@@ -14,8 +14,16 @@ clone_depth: 1
 
 cache:
 - C:\Tools\opencv
+
+# Clone the repository with LFS smudge skipped
+clone_script:
+  - cmd: >-
+      git lfs install --skip-smudge
+      git clone -q --depth=1 https://github.com/opentoonz/opentoonz.git %APPVEYOR_BUILD_FOLDER%
+
 install:
 - cmd: >-
+
     if exist "C:\Tools\opencv\build\x64\vc16\bin\opencv_world4110.dll" (echo OpenCV cached, skipping install) else (choco install opencv --version=4.11.0 --no-progress --yes --force)
 
     cd thirdparty
