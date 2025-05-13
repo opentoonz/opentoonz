@@ -20,9 +20,7 @@ on:
 
 jobs:
   macOS:
-    timeout-minutes: 90
-    # runs-on: macos-latest
-    # avoid the headache of arm64 builds?
+    timeout-minutes: 90 # Stop job if it exceeds expected build time
     runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
@@ -48,16 +46,14 @@ jobs:
               fi
             done
           }
-          
           brew update
           brew cleanup
-
-          checkPkgAndInstall pkg-config glew lz4 libjpeg libpng lzo boost libusb libmypaint ccache jpeg-turbo ninja opencv qt@5
+          checkPkgAndInstall pkg-config glew lz4 libjpeg libpng lzo boost libusb libmypaint ccache jpeg-turbo ninja opencv superlu qt@5
           brew unlink qt
 
       - name: Set up cache
         run: |
-          export PATH="/usr/local/opt/ccache/libexec:$PATH"
+          export PATH="/opt/homebrew/opt/ccache/libexec:$PATH"
           mkdir -p /Users/runner/.ccache
 
       - uses: actions/cache@v4
@@ -74,7 +70,7 @@ jobs:
 
       - name: Build
         run: |
-          export PKG_CONFIG_PATH="/usr/local/opt/jpeg-turbo/lib/pkgconfig:$PKG_CONFIG_PATH"
+          export PKG_CONFIG_PATH="$(brew --prefix jpeg-turbo)/lib/pkgconfig:$PKG_CONFIG_PATH"
           cd toonz
           mkdir -p build
           cd build
@@ -83,6 +79,7 @@ jobs:
             -DQT_PATH=$(brew --prefix qt@5)/lib \
             -DQt5_DIR=$(brew --prefix qt@5)/lib/cmake/Qt5 \
             -DCMAKE_PREFIX_PATH=$(brew --prefix qt@5)/lib/cmake/Qt5 \
+            -DWITH_SYSTEM_SUPERLU=ON \
             -DWITH_TRANSLATION=OFF
           ninja -j $(sysctl -n hw.ncpu)
 
@@ -90,7 +87,9 @@ jobs:
         run: |
           cd toonz/build/toonz
           cp -pr ../../../stuff OpenToonz.app/portablestuff
-          /usr/local/opt/qt@5/bin/macdeployqt OpenToonz.app -verbose=0 -always-overwrite \
+          QT_DEPLOY=$(brew --prefix qt@5)/bin/macdeployqt
+          echo "Using macdeployqt from: $QT_DEPLOY"
+          $QT_DEPLOY OpenToonz.app -verbose=0 -always-overwrite \
             -executable=OpenToonz.app/Contents/MacOS/lzocompress \
             -executable=OpenToonz.app/Contents/MacOS/lzodecompress \
             -executable=OpenToonz.app/Contents/MacOS/tcleanup \
@@ -116,20 +115,18 @@ jobs:
           cd toonz/build/toonz
           echo "Creating DMG..."
 
+          QT_DEPLOY=$(brew --prefix qt@5)/bin/macdeployqt
           ATTEMPT=1
-          until /usr/local/opt/qt@5/bin/macdeployqt OpenToonz.app -dmg -verbose=0 && [ -f OpenToonz.dmg ]; do
+          until $QT_DEPLOY OpenToonz.app -dmg -verbose=0 && [ -f OpenToonz.dmg ]; do
             echo "Attempt $ATTEMPT failed to build DMG."
-
             if [ $ATTEMPT -eq 10 ]; then
               echo ">>> DMG file creation failed after 10 attempts. Aborting!"
               exit 1
             fi
-
             ATTEMPT=$((ATTEMPT + 1))
-            echo "Retrying in 5 seconds..."
-            sleep 5
+            echo "Retrying in 10 seconds..."
+            sleep 10
           done
-
           echo "DMG created successfully."
 
       - uses: actions/upload-artifact@v4
