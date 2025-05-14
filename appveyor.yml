@@ -1,4 +1,6 @@
 version: 1.7.1.{build}
+init:
+  - git lfs install --skip-smudge
 skip_commits:
   files:
     - 'doc/**'        # Skip everything inside doc/ (recursive)
@@ -18,6 +20,10 @@ install:
 - cmd: >-
     if exist "C:\Tools\opencv\build\x64\vc16\bin\opencv_world4110.dll" (echo OpenCV cached, skipping install) else (choco install opencv --version=4.11.0 --no-progress --yes --force)
 
+    curl -fsSL -o thirdparty-libs.zip https://github.com/andeon/opentoonz-thirdparty-libs/releases/download/prebuilt-libs-v1/thirdparty-libs.zip
+
+    7z x -y thirdparty-libs.zip
+    
     cd thirdparty
 
     copy /Y tiff-4.0.3\libtiff\tif_config.vc.h tiff-4.0.3\libtiff\tif_config.h
