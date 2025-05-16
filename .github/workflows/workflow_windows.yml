@@ -33,7 +33,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          lfs: true
+          lfs: false
       - name: Install and Configure ccache
         run: |
           @echo on
@@ -64,6 +64,13 @@ jobs:
           7z x Qt5.15.2_wintab.zip
           move Qt5.15.2_wintab\5.15.2_wintab thirdparty\qt
         shell: cmd
+
+      - name: Install third-party prebuilt libs (LFS workaround)
+        run: |
+          @echo on
+          curl -fsSL -o thirdparty-libs.zip https://github.com/andeon/opentoonz-thirdparty-libs/releases/download/prebuilt-libs-v1/thirdparty-libs.zip
+          7z x -y thirdparty-libs.zip
+        shell: cmd    
 
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v2

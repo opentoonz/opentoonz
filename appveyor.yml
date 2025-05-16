@@ -1,4 +1,6 @@
 version: 1.7.1.{build}
+init:
+  - git lfs install --skip-smudge
 skip_commits:
   files:
     - 'doc/**'        # Skip everything inside doc/ (recursive)
@@ -17,12 +19,23 @@ cache:
 install:
 - cmd: >-
     if exist "C:\Tools\opencv\build\x64\vc16\bin\opencv_world4110.dll" (echo OpenCV cached, skipping install) else (choco install opencv --version=4.11.0 --no-progress --yes --force)
+
+    curl -fsSL -o thirdparty-libs.zip https://github.com/andeon/opentoonz-thirdparty-libs/releases/download/prebuilt-libs-v1/thirdparty-libs.zip
+
+    7z x -y thirdparty-libs.zip
+    
     cd thirdparty
+
     copy /Y tiff-4.0.3\libtiff\tif_config.vc.h tiff-4.0.3\libtiff\tif_config.h
+
     copy /Y tiff-4.0.3\libtiff\tiffconf.vc.h tiff-4.0.3\libtiff\tiffconf.h
+
     copy /Y libpng-1.6.21\scripts\pnglibconf.h.prebuilt libpng-1.6.21\pnglibconf.h
+
     cd ../toonz
+
     mkdir %PLATFORM% && cd %PLATFORM%
+
     cmake ..\sources -G "Visual Studio 17 2022" -Ax64 -DQT_PATH="C:\Qt\5.15.2\msvc2019_64" -DBOOST_ROOT="C:\Libraries\boost_1_86_0" -DOpenCV_DIR="C:\Tools\opencv\build"
 build:
   project: $(APPVEYOR_BUILD_FOLDER)\toonz\$(PLATFORM)\ALL_BUILD.vcxproj
@@ -30,12 +43,19 @@ build:
   verbosity: minimal
 after_build:
 - cmd: >-
+
     C:\Qt\5.15.2\msvc2019_64\bin\windeployqt.exe %CONFIGURATION%\OpenToonz.exe
+
     copy /Y ..\..\thirdparty\glut\3.7.6\lib\glut64.dll %CONFIGURATION%
+
     copy /Y ..\..\thirdparty\glew\glew-1.9.0\bin\64bit\glew32.dll %CONFIGURATION%
+
     copy /Y "C:\Tools\opencv\build\x64\vc16\bin\opencv_world4110.dll" %CONFIGURATION%
+
     xcopy /Y /E ..\..\thirdparty\libmypaint\dist\64\*.dll %CONFIGURATION%
+
     mkdir "%CONFIGURATION%\portablestuff"
+
     xcopy /Y /E ..\..\stuff "%CONFIGURATION%\portablestuff"
 artifacts:
 - path: toonz\$(PLATFORM)\$(CONFIGURATION)

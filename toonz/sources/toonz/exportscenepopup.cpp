@@ -369,18 +369,21 @@ bool ExportSceneDvDirModel::hasChildren(const QModelIndex &parent) const {
 
 //-----------------------------------------------------------------------------
 
-void ExportSceneDvDirModel::refresh(const QModelIndex &index) {
-  DvDirModelNode *node;
-  if (!index.isValid())
-    node = m_root;
-  else
-    node = getNode(index);
-  if (!node) return;
-  emit layoutAboutToBeChanged();
-  emit beginRemoveRows(index, 0, node->getChildCount());
-  node->refreshChildren();
-  emit endRemoveRows();
-  emit layoutChanged();
+void ExportSceneDvDirModel::refresh(const QModelIndex& index) {
+    DvDirModelNode* node = index.isValid() ? getNode(index) : m_root;
+    if (!node) return;
+    int oldCount = node->getChildCount();
+    if (oldCount > 0) {
+        emit beginRemoveRows(index, 0, oldCount - 1);
+        node->removeChildren(0, oldCount);
+        emit endRemoveRows();
+    }
+    node->refreshChildren();
+    int newCount = node->getChildCount();
+    if (newCount > 0) {
+        emit beginInsertRows(index, 0, newCount - 1);
+        emit endInsertRows();
+    }
 }
 
 //=============================================================================
