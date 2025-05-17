@@ -158,7 +158,8 @@ public:
                                                                         r1, c1);
         else
           getViewer()->getCellSelection()->selectCells(r0, c0, r1, c1);
-      } else {
+      } // Shift
+      else {
         if (m_modifier & Qt::ControlModifier)
           getViewer()->getCellKeyframeSelection()->selectCellsKeyframes(
               row, col, row, col);
@@ -673,7 +674,16 @@ public:
     m_colCount = c1 - c0 + 1;
     m_rowCount = r1 - r0 + 1;
     if (m_colCount <= 0 || m_rowCount <= 0) return;
-
+    // Allow the negative drag
+    if (m_colCount == m_rowCount == 1) {
+      TXsheet *xsh = getViewer()->getXsheet();
+      if (!xsh->getCell(m_r0, m_c0).isEmpty())
+        for (; xsh->getCell(m_r0 - 1, m_c0) == xsh->getCell(m_r0, m_c0);
+             ++m_rowCount, --m_r0, --r0);
+      getViewer()->setCurrentRow(m_r0);
+      getViewer()->getCellSelection()->selectCells(m_r0, m_c0, m_r1,
+                                                   m_c0 + m_colCount - 1);
+    }
     // if m_insert is false but there are no empty rows under the tab,
     // then switch m_insert to true so that the operation works anyway
     if (!m_insert && !m_invert) {
@@ -2119,9 +2129,9 @@ public:
     if (e->keyboardModifiers() & Qt::ShiftModifier)
       m_type = INSERT_CELLS;
     else if (e->keyboardModifiers() & Qt::AltModifier)
-      m_type = OVERWRITE_CELLS;
-    else
       m_valid = canChange(row, col);
+    else
+      m_type = OVERWRITE_CELLS;
     m_curPos = pos;
     refreshCellsArea();
   }
@@ -2148,12 +2158,25 @@ public:
       IoCmd::loadResources(args);
     } else if (!m_data->m_levels.empty()) {
       int i;
-      for (i = 0; i < (int)m_data->m_levels.size(); i++) {
-        TXshSimpleLevel *sl        = m_data->m_levels[i].first.getPointer();
-        std::vector<TFrameId> fids = m_data->m_levels[i].second;
-        if (!sl || fids.empty()) continue;
+      // Change hold cells when there are only one frame
+      if (overWrite && m_data->m_levels.size() == 1 &&
+          m_data->m_levels[0].second.size() == 1) {
+        TXshSimpleLevel *sl        = m_data->m_levels[0].first.getPointer();
+        std::vector<TFrameId> fids = m_data->m_levels[0].second;
+        if (!sl || fids.empty()) return;
+        auto xsh = TTool::getApplication()->getCurrentXsheet()->getXsheet();
+        int r1 = row;
+        if (!xsh->getCell(r1, col).isEmpty())
+          for (; xsh->getCell(r1, col) == xsh->getCell(r1 + 1, col);
+               fids.push_back(fids.front()), r1++);
         IoCmd::exposeLevel(sl, row, col, fids, insert, overWrite);
-      }
+      } else
+        for (i = 0; i < (int)m_data->m_levels.size(); i++) {
+          TXshSimpleLevel *sl        = m_data->m_levels[i].first.getPointer();
+          std::vector<TFrameId> fids = m_data->m_levels[i].second;
+          if (!sl || fids.empty()) continue;
+          IoCmd::exposeLevel(sl, row, col, fids, insert, overWrite);
+        }
     }
     refreshCellsArea();
   }

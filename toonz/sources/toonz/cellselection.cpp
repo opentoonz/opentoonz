@@ -126,7 +126,7 @@ void deleteCellsWithoutUndo(int &r0, int &c0, int &r1, int &c1, bool doShift) {
     int c;
     for (c = c0; c <= c1; c++) {
       if (xsh->isColumnEmpty(c)) continue;
-
+      
       if (doShift)
         xsh->removeCells(r0, c, r1 - r0 + 1);
       else
@@ -2550,6 +2550,12 @@ void TCellSelection::deleteCells(bool withShift) {
   // check if the operation may remove expression reference as column becomes
   // empty and deleted after the operation.
   if (!checkColumnRemoval(r0, c0, r1, c1, removedColIds)) return;
+
+  // Remove implicate cells for the last Frame
+  if(c0==c1 && 
+      xsh->getCell(r1,c0).getFrameId()!=TFrameId::EMPTY_FRAME &&
+      xsh->getCell(r1-1,c0)!=xsh->getCell(r1,c0))
+      for(;xsh->getCell(r1,c0)==xsh->getCell(r1+1,c0);++r1);
 
   TCellData *data = new TCellData();
   data->setCells(xsh, r0, c0, r1, c1);

@@ -1143,10 +1143,10 @@ LeftToRightOrientation::LeftToRightOrientation() {
   addRect(PredefinedRect::CELL_NAME, nameRect);
   addRect(PredefinedRect::CELL_NAME_WITH_KEYFRAME, nameRect);
   addRect(PredefinedRect::END_EXTENDER,
-          QRect(0, -EXTENDER_HEIGHT - 14, EXTENDER_WIDTH, EXTENDER_HEIGHT));
+          QRect(0, -EXTENDER_HEIGHT, EXTENDER_WIDTH + 1, EXTENDER_HEIGHT + 5));
   addRect(PredefinedRect::BEGIN_EXTENDER,
-          QRect(-EXTENDER_WIDTH, -EXTENDER_HEIGHT - 14, EXTENDER_WIDTH,
-                EXTENDER_HEIGHT));
+          QRect(-EXTENDER_WIDTH, -EXTENDER_HEIGHT, EXTENDER_WIDTH + 1,
+                EXTENDER_HEIGHT + 5));
   addRect(PredefinedRect::KEYFRAME_AREA, keyRect);
   addRect(PredefinedRect::DRAG_AREA, QRect(0, 0, CELL_WIDTH, CELL_DRAG_HEIGHT));
   int markSize = CELL_HEIGHT / 2;  // 50% size (12px)
