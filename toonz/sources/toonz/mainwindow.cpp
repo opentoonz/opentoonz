@@ -1946,7 +1946,7 @@ void MainWindow::defineActions() {
   createMenuLevelAction(MI_ConvertToVectors,
                         QT_TR_NOOP("Convert to Vectors..."), "", "convert");
   createMenuLevelAction(MI_ConvertToToonzRaster,
-                        QT_TR_NOOP("Vectors to Toonz Raster"), "");
+                        QT_TR_NOOP("Convert to Toonz Raster..."), "");
   createMenuLevelAction(
       MI_ConvertVectorToVector,
       QT_TRANSLATE_NOOP("MainWindow",
