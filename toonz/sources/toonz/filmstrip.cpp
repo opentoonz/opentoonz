@@ -151,6 +151,17 @@ TXshSimpleLevel *FilmstripFrames::getLevel() const {
 
 //-----------------------------------------------------------------------------
 
+bool FilmstripFrames::isOutOfBounds(int n) const {
+  const int width = getIconSize().width() + fs_frameSpacing + fs_iconMarginLR +
+                    fs_leftMargin + fs_rightMargin;
+  const int hight = getIconSize().height() + fs_frameSpacing +
+                    fs_iconMarginTop + fs_iconMarginBottom;
+  int limit = m_isVertical ? width : hight;
+  return n < 0 || n >= limit;
+}
+
+//-----------------------------------------------------------------------------
+
 int FilmstripFrames::y2index(int y) const {
   const int dy = getIconSize().height() + fs_frameSpacing + fs_iconMarginTop +
                  fs_iconMarginBottom;
@@ -1015,8 +1026,15 @@ void FilmstripFrames::mouseReleaseEvent(QMouseEvent *e) {
 
 void FilmstripFrames::mouseMoveEvent(QMouseEvent *e) {
   QPoint pos = e->pos();
-  int index  = y2index(e->pos().y());
-  if (!m_isVertical) index = x2index(e->pos().x());
+  //m_dragDropArmed
+  int index;
+  if (m_isVertical) {
+    index = y2index(e->pos().y());
+    if (isOutOfBounds(e->pos().x())) m_dragDropArmed = true;
+  } else {
+    index = x2index(e->pos().x());
+    if (isOutOfBounds(e->pos().y())) m_dragDropArmed = true;
+  }
   if (e->buttons() & Qt::LeftButton || e->buttons() & Qt::MiddleButton) {
     // navigator pan
     if (m_showNavigator && m_isNavigatorPanning) {
