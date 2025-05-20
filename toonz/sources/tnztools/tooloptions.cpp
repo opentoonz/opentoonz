@@ -1767,7 +1767,10 @@ FillToolOptionsBox::FillToolOptionsBox(QWidget *parent, TTool *tool,
       dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Frame Range"));
   m_autopaintMode =
       dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Autopaint Lines"));
-
+  m_closeGap =
+      dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Close Gap"));
+  m_referFill =
+      dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Refer Fill"));
   bool ret = connect(m_colorMode, SIGNAL(currentIndexChanged(int)), this,
                      SLOT(onColorModeChanged(int)));
   ret      = ret && connect(m_toolType, SIGNAL(currentIndexChanged(int)), this,
@@ -1777,24 +1780,9 @@ FillToolOptionsBox::FillToolOptionsBox(QWidget *parent, TTool *tool,
   ret      = ret && connect(m_multiFrameMode, SIGNAL(toggled(bool)), this,
                             SLOT(onMultiFrameModeToggled(bool)));
   assert(ret);
-  if (m_colorMode->getProperty()->getValue() == L"Lines") {
-    m_selectiveMode->setEnabled(false);
-    if (m_fillDepthLabel && m_fillDepthField) {
-      m_fillDepthLabel->setEnabled(false);
-      m_fillDepthField->setEnabled(false);
-    }
-    if (m_toolType->getProperty()->getValue() == L"Normal" ||
-        m_multiFrameMode->isChecked())
-      m_onionMode->setEnabled(false);
-    if (m_autopaintMode) m_autopaintMode->setEnabled(false);
-  }
-  if (m_toolType->getProperty()->getValue() != L"Normal") {
-    if (m_segmentMode) m_segmentMode->setEnabled(false);
-    if (m_colorMode->getProperty()->getValue() == L"Lines" ||
-        m_multiFrameMode->isChecked())
-      m_onionMode->setEnabled(false);
-  }
-  if (m_onionMode->isChecked()) m_multiFrameMode->setEnabled(false);
+  onColorModeChanged(m_colorMode->getProperty()->getIndex());
+  onToolTypeChanged(m_toolType->getProperty()->getIndex());
+  onOnionModeToggled(m_onionMode->isChecked());
 }
 
 //-----------------------------------------------------------------------------
@@ -1810,6 +1798,7 @@ void FillToolOptionsBox::updateStatus() {
 void FillToolOptionsBox::onColorModeChanged(int index) {
   const TEnumProperty::Range &range = m_colorMode->getProperty()->getRange();
   bool enabled                      = range[index] != L"Lines";
+  m_multiFrameMode->setEnabled(enabled);
   m_selectiveMode->setEnabled(enabled);
   if (m_autopaintMode) m_autopaintMode->setEnabled(enabled);
   if (m_fillDepthLabel && m_fillDepthField) {
@@ -1823,6 +1812,8 @@ void FillToolOptionsBox::onColorModeChanged(int index) {
   }
   enabled = range[index] != L"Lines" && !m_multiFrameMode->isChecked();
   m_onionMode->setEnabled(enabled);
+  if(m_referFill) m_referFill->setEnabled(enabled);
+  if(m_closeGap) m_closeGap->setEnabled(enabled);
 }
 
 //-----------------------------------------------------------------------------
@@ -1836,6 +1827,9 @@ void FillToolOptionsBox::onToolTypeChanged(int index) {
   enabled = enabled || (m_colorMode->getProperty()->getValue() != L"Lines" &&
                         !m_multiFrameMode->isChecked());
   m_onionMode->setEnabled(enabled);
+  enabled = range[index] != L"Polyline";
+  if (m_referFill) m_referFill->setEnabled(enabled);
+  if (m_closeGap) m_closeGap->setEnabled(enabled);
 }
 
 //-----------------------------------------------------------------------------
