@@ -17,6 +17,9 @@
 #include "tsystem.h"
 #include "tstream.h"
 #include "tsimplecolorstyles.h"
+
+#include "toonz/preferences.h"
+
 //-------------------------------------------------------------------
 
 namespace {
@@ -115,7 +118,8 @@ TRect rasterizeRegion(TOfflineGL *&gl, TRect rasBounds, TRegion *region,
 
     TPalette *palette = new TPalette();
     TTranslation affine(-convert(rect.getP00()));
-    TVectorRenderData rd(affine, gl->getBounds(), palette, 0, true, true);
+    TVectorRenderData rd(affine, gl->getBounds(), palette, 0, true,
+        Preferences::instance()->getRasterizeAntialias());
 
     int oldStyle = region->getStyle();
     region->setStyle(1);
@@ -461,7 +465,8 @@ TToonzImageP ToonzImageUtils::vectorToToonzImage(
       }
       if (visible)
         fastAddInkStroke(ti, stroke, std::min(maxStyleId, stroke->getStyle()),
-                         false, false, clip, true, colors);
+                         false, false, clip, 
+            Preferences::instance()->getRasterizeAntialias(), colors);
     }
     i = k;
   }

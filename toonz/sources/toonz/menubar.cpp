@@ -899,6 +899,7 @@ QMenuBar *StackedMenuBar::createXsheetMenuBar() {
   addMenuItem(levelsMenu, MI_Renumber);
   addMenuItem(levelsMenu, MI_RevertToCleanedUp);
   addMenuItem(levelsMenu, MI_ConvertToVectors);
+  addMenuItem(levelsMenu, MI_ConvertToToonzRaster);
   addMenuItem(levelsMenu, MI_ConvertFileWithInput);
   addMenuItem(levelsMenu, MI_Tracking);
   addMenuItem(levelsMenu, MI_ExposeResource);
