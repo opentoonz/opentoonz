@@ -1931,8 +1931,9 @@ bool IoCmd::loadScene(const TFilePath &path, bool updateRecentFile,
     QString msg;
     msg = QObject::tr(
               "It is not possible to load the scene %1 because it does not "
-              "belong to any project.")
-              .arg(QString::fromStdWString(scenePath.getWideString()));
+              "belong to any project.\n"
+        "Please delete scenes.xml if this scene dones't belong to any project.")
+        .arg(QString::fromStdWString(scenePath.getWideString()));
     DVGui::warning(msg);
   }
   if (sceneProject && !sceneProject->isCurrent()) {
