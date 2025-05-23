@@ -259,6 +259,9 @@ If \b scene is in +scenes/name.tnz return name,
 
   // if the path is codable with $scenefolder alias, replace it and return true
   bool codeFilePathWithSceneFolder(TFilePath &path) const;
+  
+  // return false if the scene doesn't belong to any project
+  bool isLonelyScene() const;
 
   bool isLoading() { return m_isLoading; }
   void setIsLoading(bool isLoading) { m_isLoading = isLoading; }
