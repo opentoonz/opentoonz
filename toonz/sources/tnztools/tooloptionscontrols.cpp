@@ -751,7 +751,6 @@ void MeasuredValueField::setMeasure(std::string name) {
 //-----------------------------------------------------------------------------
 
 void MeasuredValueField::commit() {
-  if (!m_modified && !isReturnPressed()) return;
   // commit is called when the field comes out of focus.
   // mouse drag will call this - return if coming from mouse drag.
   // else undo is set twice
@@ -759,6 +758,8 @@ void MeasuredValueField::commit() {
     m_mouseEdit = false;
     return;
   }
+  if (!m_modified && !isReturnPressed()) return;
+  
   int err    = 1;
   bool isSet = m_value->setValue(text().toStdWString(), &err);
   m_modified = false;
@@ -856,7 +857,7 @@ void MeasuredValueField::mouseMoveEvent(QMouseEvent *e) {
 
 void MeasuredValueField::mouseReleaseEvent(QMouseEvent *e) {
   if (!isEnabled()) return;
-  // m_mouseEdit will be set false in commit
+  // m_mouseEdit will be set false in commit and at HERE
   if (m_mouseEdit) {
     // This seems redundant, but this is necessary for undo to work
     double valueToRestore = m_value->getValue(TMeasuredValue::CurrentUnit);
@@ -868,6 +869,7 @@ void MeasuredValueField::mouseReleaseEvent(QMouseEvent *e) {
     setText(QString::fromStdWString(m_value->toWideString(m_precision)));
     emit measuredValueChanged(m_value, true);
     clearFocus();
+    m_mouseEdit= false;
   } else
     QLineEdit::mouseReleaseEvent(e);
 }
@@ -886,7 +888,9 @@ void MeasuredValueField::receiveMousePress(QMouseEvent *e) {
   mousePressEvent(e);
 }
 
-void MeasuredValueField::receiveMouseMove(QMouseEvent *e) { mouseMoveEvent(e); }
+void MeasuredValueField::receiveMouseMove(QMouseEvent *e) {
+  mouseMoveEvent(e);
+}
 
 void MeasuredValueField::receiveMouseRelease(QMouseEvent *e) {
   mouseReleaseEvent(e);
@@ -1472,18 +1476,20 @@ ThickChangeField::ThickChangeField(SelectionTool *tool, QString name)
 
 void ThickChangeField::onChange(TMeasuredValue *fld, bool addToUndo) {
   if (!m_tool || (m_tool->isSelectionEmpty() && !m_tool->isLevelType())) return;
-
-  DragSelectionTool::VectorChangeThicknessTool *changeThickTool =
-      new DragSelectionTool::VectorChangeThicknessTool(
-          (VectorSelectionTool *)m_tool);
+  if (!m_changeThickTool)
+    m_changeThickTool.reset(new DragSelectionTool::VectorChangeThicknessTool(
+          (VectorSelectionTool *)m_tool));
 
   TVectorImageP vi = (TVectorImageP)m_tool->getImage(true);
-
   double p            = 0.5 * getValue();
-  double newThickness = p - m_tool->m_deformValues.m_maxSelectionThickness;
-
-  changeThickTool->setThicknessChange(newThickness);
-  changeThickTool->changeImageThickness(*vi, newThickness);
+  
+  if (isLabelClicked()) {
+    m_changeThickTool->setStrokesThickness(*vi);
+    double newThickness = p - m_tool->m_deformValues.m_maxSelectionThickness;
+    m_changeThickTool->setThicknessChange(newThickness);
+    m_changeThickTool->changeImageThickness(*vi, newThickness);
+  } else
+  m_changeThickTool->setImageThickness(*vi, p);
 
   // DragSelectionTool::DeformValues deformValues = m_tool->m_deformValues;
   // // Like when I found it - it's a noop.
@@ -1491,7 +1497,8 @@ void ThickChangeField::onChange(TMeasuredValue *fld, bool addToUndo) {
   // // Seems that the actual update is performed inside
   // the above change..() instruction...   >_<
   if (addToUndo) {
-    changeThickTool->addUndo();
+    m_changeThickTool->addUndo();
+    m_changeThickTool.release();
   }
   m_tool->computeBBox();
   m_tool->invalidate();
