@@ -233,6 +233,7 @@ protected:
        m_presetsLoaded, m_firstFrameRange;
 
   bool m_propertyUpdating;
+  double m_cameraDpi;
 };
 
 #endif  // TOONZVECTORBRUSHTOOL_H
