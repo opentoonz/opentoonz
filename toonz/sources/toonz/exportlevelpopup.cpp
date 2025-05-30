@@ -10,6 +10,7 @@
 #include "iocommand.h"
 #include "exportlevelcommand.h"
 #include "formatsettingspopups.h"
+#include "selectionutils.h"
 
 // TnzQt includes
 #include "toonzqt/checkbox.h"
@@ -56,6 +57,8 @@
 #include <QToolBar>
 #include <QMessageBox>
 #include <QDesktopServices>
+
+using namespace SelectionUtils;
 
 //********************************************************************************
 //    Export callbacks  definition
@@ -359,63 +362,42 @@ ExportLevelPopup::~ExportLevelPopup() {
 
 void ExportLevelPopup::collectSelectedSimpleLevels() {
   outputLevels.clear();
-  TApp *app = TApp::instance();
 
-  TSelection *selection          = app->getCurrentSelection()->getSelection();
-  TColumnSelection *colSelection = dynamic_cast<TColumnSelection *>(selection);
-
-  if (colSelection && colSelection->getIndices().size() > 0) {
-    bool enabled = false;
-
-    TXsheet *xsh                    = app->getCurrentXsheet()->getXsheet();
-    const std::set<int> &colIndices = colSelection->getIndices();
-
-    std::set<int>::const_iterator it, end = colIndices.end();
-    for (it = colIndices.begin(); it != end; ++it) {
-      int r0, r1, c = *it;
-      xsh->getCellRange(c, r0, r1);
-
-      if (r0 <= r1)  // There exists a not-empty cell
-      {
-        TXshSimpleLevel *sl = xsh->getCell(r0, c).getSimpleLevel();
-        if (!sl) continue;
-        int type = sl->getType();
-        if (!(type == PLI_XSHLEVEL ||  // ToonzVector
-              type == TZP_XSHLEVEL ||  // ToonzRaster
-              type == OVL_XSHLEVEL))   // Raster
-          continue;
-
-        outputLevels.push_back(sl);
-        assert(sl);
-      }
-    }
+  std::set<TXshLevel*> levels;
+  getSelectedLevels(levels);
+  for (TXshLevel* level : levels) {
+      TXshSimpleLevel* sl = level->getSimpleLevel();
+      if (!sl)continue;
+      int type = sl->getType();
+      if (type == PLI_XSHLEVEL ||  // ToonzVector
+          type == TZP_XSHLEVEL ||  // ToonzRaster
+          type == OVL_XSHLEVEL)   // Raster
+          outputLevels.push_back(sl);
   }
 }
 //-----------------------------------------------------------------------------
 
 void ExportLevelPopup::showEvent(QShowEvent *se) {
-  // Save current selection - will be restored in the hideEvent()
-  {
-    TSelectionHandle *selectionHandle = TApp::instance()->getCurrentSelection();
-    TSelection *selection             = selectionHandle->getSelection();
     if (Preferences::instance()->getPixelsOnly()) {
-      m_exportOptions->m_widthFld->hide();
-      m_exportOptions->m_heightFld->hide();
-      m_exportOptions->m_widthLabel->hide();
-      m_exportOptions->m_heightLabel->hide();
-      m_exportOptions->m_dpiLabel->hide();
-    } else {
-      m_exportOptions->m_widthFld->show();
-      m_exportOptions->m_heightFld->show();
-      m_exportOptions->m_widthLabel->show();
-      m_exportOptions->m_heightLabel->show();
-      m_exportOptions->m_dpiLabel->show();
+        m_exportOptions->m_widthFld->hide();
+        m_exportOptions->m_heightFld->hide();
+        m_exportOptions->m_widthLabel->hide();
+        m_exportOptions->m_heightLabel->hide();
+        m_exportOptions->m_dpiLabel->hide();
     }
-    selectionHandle->pushSelection();
-    selectionHandle->setSelection(selection);
-  }
+    else {
+        m_exportOptions->m_widthFld->show();
+        m_exportOptions->m_heightFld->show();
+        m_exportOptions->m_widthLabel->show();
+        m_exportOptions->m_heightLabel->show();
+        m_exportOptions->m_dpiLabel->show();
+    }
 
   // WARNING: What happens it the restored selection is NO MORE VALID ?
+  // 
+  // This Problem is caused because the global selection of dvitemview
+  // is on for default browserpopup , which whould cause the global 
+  // selection to be cleared
   //          Consider that this popup is NOT MODAL !!
   //
   //          The same applies to all the other popups in
@@ -455,9 +437,6 @@ void ExportLevelPopup::hideEvent(QHideEvent *he) {
   m_levelExportedCount=0; 
   app->getCurrentSelection()->disconnect(this);
   app->getCurrentLevel()->disconnect(this);
-
-  // Restore original selection
-  TApp::instance()->getCurrentSelection()->popSelection();
 
   // Reset popup state
   m_swatch->image() = TImageP();
@@ -564,13 +543,18 @@ void ExportLevelPopup::updateOnSelection() {
 
   switch (outputLevels.size()) {
   case 0:
+    setWindowTitle(tr("Export Level: No Level Selected"));
+    m_nameField->clear();
     return;
   case 1:
+    setWindowTitle(tr("Export Level: %1 Level Selected").arg("1"));
     m_nameField->setEnabled(true);
     m_nameField->setText(
         QString::fromStdWString(outputLevels.back()->getName()));
     break;
   default:
+    setWindowTitle(tr("Export Level: %1 Level Selected")
+        .arg(outputLevels.size()));
     m_nameField->clear();
     m_nameField->setEnabled(false);
   }
