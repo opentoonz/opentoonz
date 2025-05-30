@@ -2208,7 +2208,8 @@ void ImportMagpieFilePopup::showEvent(QShowEvent *e) {
 
 BrowserPopup::BrowserPopup() : FileBrowserPopup("") {
   setOkText(tr("Choose"));
-  m_browser->enableGlobalSelection(false);
+  //DIRTY FIX!!!! this should never cause crash
+  m_browser->enableGlobalSelection(true);
 }
 
 bool BrowserPopup::execute() {
