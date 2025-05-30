@@ -14,6 +14,9 @@
 #include "tstroke.h"
 #include "tregion.h"
 
+// TnzQt includes
+#include "toonzqt/selectioncommandids.h"
+
 // Qt includes
 #include <QSet>
 
@@ -349,11 +352,17 @@ private:
   public:
     AttachedLevelSelection(StrokeSelection &strokeSelection)
         : m_strokeSelection(strokeSelection) {}
-
+    
+    // Commands
     void selectNone() override {
       LevelSelection::selectNone(), m_strokeSelection.selectNone();
     }
-    void enableCommands() override { m_strokeSelection.enableCommands(); }
+    void enableCommands() override {
+      m_strokeSelection.enableCommands();
+      enableCommand(this, MI_SortWithPaletteOrder,
+                    &AttachedLevelSelection::sortWithPaletteOrder);
+    };
+    void sortWithPaletteOrder();
   };
 
 private:
