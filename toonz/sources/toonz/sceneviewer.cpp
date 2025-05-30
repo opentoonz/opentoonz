@@ -2273,6 +2273,13 @@ void SceneViewer::drawScene() {
     }
 
     assert(glGetError() == 0);
+    if (ToonzCheck::instance()->getChecks() & ToonzCheck::eAutoclose) {
+      TXshSimpleLevel *sl = app->getCurrentLevel()->getSimpleLevel();
+      if (sl && sl->getType() & TXshLevelType::RASTER_TYPE)
+        painter.setCurrentImageId(sl->getImageId(
+            app->getCurrentTool()->getTool()->getCurrentFid(),
+                                               0));
+    }
     painter.flushRasterImages();
 
     TXshSimpleLevel::m_fillFullColorRaster = fillFullColorRaster;
