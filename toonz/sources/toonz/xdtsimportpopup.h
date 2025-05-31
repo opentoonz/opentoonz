@@ -6,6 +6,8 @@
 #include "tfilepath.h"
 
 #include <QMap>
+#include <QCheckBox>
+
 namespace DVGui {
 class FileField;
 }
@@ -20,11 +22,15 @@ class XDTSImportPopup : public DVGui::Dialog {
 
   QComboBox *m_tick1Combo, *m_tick2Combo, *m_keyFrameCombo,
       *m_referenceFrameCombo;
+  QCheckBox *m_renameCheckBox,*m_convertCheckBox;
 
   bool m_isUext;  // whether if the loading xdts is unofficial extension (UEXT)
                   // version
 
   void updateSuggestions(const QString samplePath);
+
+  // Fallback Search
+  void updateSuggestions(const TFilePath &path);
 
 public:
   XDTSImportPopup(QStringList levelNames, ToonzScene* scene,
@@ -34,6 +40,9 @@ public:
                     int& referenceFrameId);
 protected slots:
   void onPathChanged();
+
+protected:
+    void accept() override;
 };
 
 #endif
