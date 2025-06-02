@@ -391,11 +391,6 @@ public:
     } else
       r = image->getRaster();
     if (m_params.m_fillType == ALL || m_params.m_fillType == AREAS) {
-      if (m_params.m_shiftFill) {
-        FillParameters aux(m_params);
-        aux.m_styleId    = (m_params.m_styleId == 0) ? 1 : 0;
-        recomputeSavebox = fill(r, aux, 0, m_refImg);
-      }
       recomputeSavebox = fill(r, m_params, 0, m_refImg);
     }
     if (m_params.m_fillType == ALL || m_params.m_fillType == LINES) {
@@ -1027,6 +1022,7 @@ void doRefFill(const TImageP &img, const TImageP &refImg, const TPointD &pos,
 
       params.m_p += ti->getRaster()->getCenter();
       params.m_p -= offs;
+      params.m_shiftFill = isShiftFill;
 
       TRect rasRect(ras->getSize());
       if (!rasRect.contains(params.m_p)) {
