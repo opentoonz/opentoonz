@@ -704,7 +704,9 @@ void convertNaa2Tlv(const TFilePath &source, const TFilePath &dest,
                     const TFrameId &from, const TFrameId &to,
                     FrameTaskNotifier *frameNotifier, TPalette *palette,
                     bool removeUnusedStyles, double dpi) {
-  std::string dstExt = dest.getType(), srcExt = source.getType();
+  //std::string dstExt = dest.getType(), srcExt = source.getType();
+  if(TSystem::doesExistFileOrLevel(dest.withType("tpl")))
+      TSystem::deleteFile(dest.withType("tpl"));
 
   // Load source level structure
   TLevelReaderP lr(source);
@@ -765,7 +767,7 @@ void convertNaa2Tlv(const TFilePath &source, const TFilePath &dest,
 
     frameNotifier->notifyFrameCompleted(100 * (f + 1) / frames.size());
   }
-
+  
   if (removeUnusedStyles) converter.removeUnusedStyles(usedStyleIds);
 }
 
