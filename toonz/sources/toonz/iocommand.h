@@ -268,7 +268,7 @@ void renameResources(std::vector<LoadResourceArguments::ResourceData>& rds,
     bool askUser = true);
 
 void convertNAARaster2TLV(std::vector<LoadResourceArguments::ResourceData>& rds, 
-    bool askUser = true);
+   bool askUser = true, double dpi = 0, bool appendPalette = true);
 
 bool exposeLevel(TXshSimpleLevel *sl, int row, int col, bool insert = false,
                  bool overWrite = false);

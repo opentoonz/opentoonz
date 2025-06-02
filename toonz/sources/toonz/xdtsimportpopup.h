@@ -3,6 +3,7 @@
 #define XDTSIMPORTPOPUP_H
 
 #include "toonzqt/dvdialog.h"
+#include "toonzqt/doublefield.h"
 #include "tfilepath.h"
 
 #include <QMap>
@@ -22,7 +23,13 @@ class XDTSImportPopup : public DVGui::Dialog {
 
   QComboBox *m_tick1Combo, *m_tick2Combo, *m_keyFrameCombo,
       *m_referenceFrameCombo;
-  QCheckBox *m_renameCheckBox,*m_convertCheckBox;
+  QCheckBox* m_renameCheckBox;
+  QComboBox* m_convertCombo;
+
+  // Only works for 3rd Convert Option: NAA Unpainted
+  QCheckBox* m_paletteCheckBox;
+  QComboBox* m_dpiMode;
+  DVGui::DoubleLineEdit* m_dpiFld;
 
   bool m_isUext;  // whether if the loading xdts is unofficial extension (UEXT)
                   // version

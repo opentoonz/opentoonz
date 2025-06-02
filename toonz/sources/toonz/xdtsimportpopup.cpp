@@ -7,6 +7,9 @@
 #include "toonz/toonzscene.h"
 #include "toonz/tscenehandle.h"
 #include "toonz/sceneproperties.h"
+#include "toonz/tcamera.h"
+#include "convertpopup.h"
+#include "tfiletype.h"
 
 #include <QMainWindow>
 #include <QTableView>
@@ -16,6 +19,7 @@
 #include <QLabel>
 #include <QComboBox>
 #include <QGroupBox>
+#include <QCoreApplication>
 
 using namespace DVGui;
 
@@ -99,8 +103,45 @@ XDTSImportPopup::XDTSImportPopup(QStringList levelNames, ToonzScene* scene,
 
   m_renameCheckBox = new QCheckBox("Rename Image Sequence", this);
   m_renameCheckBox->setChecked(true);
-  m_convertCheckBox = new QCheckBox("Convert NAA Raster to Toonz Raster", this);
-  m_convertCheckBox->setChecked(true);
+  m_convertCombo = new QComboBox(this);
+  QStringList convertOptions = {tr("Do not Convert"),
+      tr("Convert Every Level with Settings Popup"),
+    tr("Convert Unpainted Aliasing Raster(Inks Only)")};
+  m_convertCombo->addItems(convertOptions);
+  m_convertCombo->setCurrentIndex(0);
+
+  // Only works for 3rd Convert Option: NAA Unpainted
+  QWidget* convertNAAWidget = new QWidget(this);
+  convertNAAWidget->setVisible(false);
+  QHBoxLayout* convertNAALayout = new QHBoxLayout;
+  m_paletteCheckBox = new QCheckBox("Append Default Palette", this);
+  m_paletteCheckBox->setChecked(true);
+  m_paletteCheckBox->setToolTip(
+      tr("When activated, styles of the default "
+          "palette\n($TOONZSTUDIOPALETTE\\Global Palettes\\Default Palettes\\Cleanup_Palette.tpl) will \nbe "
+          "appended to the palette after conversion"));
+  QStringList dpiModes;
+  dpiModes << tr("Image DPI") << tr("Current Camera DPI") << tr("Custom DPI");
+  m_dpiMode = new QComboBox(this);
+  m_dpiMode->addItems(dpiModes);
+  m_dpiFld = new DVGui::DoubleLineEdit(this);
+  m_dpiFld->setValue(120);
+  m_dpiFld->setDisabled(true);
+  connect(m_dpiMode, QOverload<int>::of(&QComboBox::currentIndexChanged),
+      this, [=](int index) {
+          m_dpiFld->setEnabled(index == 2); // Custom DPI
+      });
+
+  convertNAALayout->addWidget(m_paletteCheckBox);
+  convertNAALayout->addStretch();
+  convertNAALayout->addWidget(new QLabel(tr("DPI:")));
+  convertNAALayout->addWidget(m_dpiMode);
+  convertNAALayout->addWidget(m_dpiFld);
+  convertNAAWidget->setLayout(convertNAALayout);
+  connect(m_convertCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
+      this, [=](int index) {
+          convertNAAWidget->setVisible(index == 2);
+          this->adjustSize(); });
 
   if (m_isUext) {
     m_keyFrameCombo       = new QComboBox(this);
@@ -199,10 +240,13 @@ XDTSImportPopup::XDTSImportPopup(QStringList levelNames, ToonzScene* scene,
   m_topLayout->addWidget(cellMarkGroupBox, 0, Qt::AlignRight);
 
   QHBoxLayout* checkBoxLayout = new QHBoxLayout;
+  checkBoxLayout->addWidget(new QLabel(QObject::tr("Convert Raster to TLV : ")));
+  checkBoxLayout->addWidget(m_convertCombo);
   checkBoxLayout->addStretch();
   checkBoxLayout->addWidget(m_renameCheckBox);
-  checkBoxLayout->addWidget(m_convertCheckBox);
+
   m_topLayout->addLayout(checkBoxLayout);
+  m_topLayout->addWidget(convertNAAWidget);
   connect(loadButton, SIGNAL(clicked()), this, SLOT(accept()));
   connect(cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 
@@ -427,6 +471,7 @@ void XDTSImportPopup::getMarkerIds(int& tick1Id, int& tick2Id, int& keyFrameId,
 }
 
 void XDTSImportPopup::accept(){
+    QDialog::accept();
     std::vector<IoCmd::LoadResourceArguments::ResourceData> rds;
     for (auto it = m_fields.constBegin(); it != m_fields.constEnd(); ++it) {
         auto name = it.key();
@@ -437,12 +482,39 @@ void XDTSImportPopup::accept(){
     fetchSequence(rds);
     if(m_renameCheckBox->isChecked())
         IoCmd::renameResources(rds, false);
-    if(m_convertCheckBox->isChecked())
-        IoCmd::convertNAARaster2TLV(rds, false);// Only Generate Inks 
-    if(rds.size() != m_fields.size())// User Cancel or ERROR
-        QDialog::accept();
-
+    if (int ret = m_convertCombo->currentIndex()) {
+        if (ret == 1) {
+            // Convert One by One
+            ConvertPopup popup;
+            for (auto &rd : rds) {
+                popup.setWindowModality(Qt::ApplicationModal);
+                TFileType::Type type = TFileType::getInfo(rd.m_path);
+                if (!TFileType::isFullColor(type)) continue;
+                popup.setFiles({ rd.m_path });
+                popup.show();
+                popup.setFormat("tlv");
+                popup.adjustSize();
+                while (popup.isVisible() || popup.isConverting())
+                    QCoreApplication::processEvents(QEventLoop::AllEvents |
+                        QEventLoop::WaitForMoreEvents);
+                TFilePath convertedPath = popup.getConvertedPath(rd.m_path);
+                if (!convertedPath.isEmpty())
+                    rd.m_path = convertedPath;
+            }
+        } else {
+            // Convert NAA Unpainted
+            int index = m_dpiMode->currentIndex();
+            double dpi = 0;
+            if (index == 1) {
+                TCamera* camera = TApp::instance()->getCurrentScene()
+                    ->getScene()->getCurrentCamera();
+                if (camera) dpi = camera->getDpi().x;
+            }
+            else if (index == 2)
+                dpi = m_dpiFld->getValue();
+            IoCmd::convertNAARaster2TLV(rds, false, dpi, m_paletteCheckBox->isChecked());// Only Generate Inks
+        }
+    }
     int i = 0;
     for (auto field : m_fields) field->setPath(rds[i++].m_path.getQString());
-    QDialog::accept();
 }
