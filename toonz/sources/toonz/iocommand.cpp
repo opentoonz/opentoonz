@@ -2889,7 +2889,10 @@ QRegularExpression::ExtendedPatternSyntaxOption);
     }
 }
 
-void IoCmd::convertNAARaster2TLV(std::vector<LoadResourceArguments::ResourceData>& rds, bool askUser) {
+// Use double value DPI as policy
+// 0:Image DPI , -1:CameraDPI , other:value of dpi
+void IoCmd::convertNAARaster2TLV(std::vector<LoadResourceArguments::ResourceData>& rds, 
+    bool askUser, double dpi, bool appendPalette) {
     struct locals {
         static bool checkConvertPolicy(const TFilePath& path) {
             switch (Preferences::instance()->getIntValue(convertPolicy)) {
@@ -2946,7 +2949,7 @@ void IoCmd::convertNAARaster2TLV(std::vector<LoadResourceArguments::ResourceData
         }
 
     };//Locals
-
+    
     static const QStringList rasterExts = {
       "png", "jpg", "jpeg", "bmp", "tga" };
     TApp* app = TApp::instance();
@@ -2980,8 +2983,7 @@ void IoCmd::convertNAARaster2TLV(std::vector<LoadResourceArguments::ResourceData
                 }
             }
             Convert2Tlv converter(path, TFilePath(), dstPath.getParentDir(), QString::fromStdWString(dstPath.getWideName())
-                , from, to, false, TFilePath(), 0, 0, 50, false, true, 
-                Preferences::instance()->isIgnoreImageDpiEnabled() ? scene->getCurrentCamera()->getDpi().x : 0);
+                , from, to, false, TFilePath(), 0, 0, 50, false, appendPalette, dpi);
             std::string e;
             converter.init(e);
             if (!e.empty()) {
