@@ -358,47 +358,51 @@ void extendInk2InkFill(const TRasterCM32P &r, const TPoint &p, bool right, int d
 
 //-----------------------------------------------------------------------------
 // Prevailing is off for default
-void expendNormalFill(const TRasterCM32P &r, const TPoint &p, bool right, int dy,
-                    int paint, int paintAtClickedPos, TTileSaverCM32 *saver,
-                    int maxCount = 8) {
-  TPixelCM32 *pixel = r->pixels(p.y);
-  if (pixel->isPureInk()) return;
-  int pixelCount = 0;
-  int x, y;
-  int dx = right ? 1 : -1;
-  std::vector<TPoint> points;
-  std::vector<TPoint> seeds;
-  seeds.push_back(p);
-  bool seedAdded;
-  while (!seeds.empty()) {
-    seedAdded    = false;
-    TPoint point = seeds.back();
-    x            = point.x;
-    y            = point.y;
-    seeds.pop_back();
-    pixel = r->pixels(y) + x;
-    while (!pixel->isPureInk() && pixel->getPaint() == paintAtClickedPos) {
-      points.push_back(TPoint(x, y));
-      ++pixelCount;
-      if (pixelCount > maxCount) return;
-      if (!seedAdded && !(r->pixels(y+dy) + x)->isPureInk()) {
-        seeds.push_back(TPoint(x, y+dy));
-        seedAdded = true;
-      }
-      if (x < 0 || x > r->getLx() - 1) break;
-      pixel += dx;
-      x += dx;
+void expendNormalFill(const TRasterCM32P& r, const TPoint& p, bool right, int dy,
+    int paint, int paintAtClickedPos, TTileSaverCM32* saver,
+    int maxCount = 8) {
+    TPixelCM32* pixel = r->pixels(p.y);
+    if (pixel->isPureInk()) return;
+    int pixelCount = 0;
+    int x, y;
+    int dx = right ? 1 : -1;
+    std::vector<TPoint> points;
+    std::vector<TPoint> seeds;
+    seeds.push_back(p);
+    bool seedAdded;
+    TRect bounds = r->getBounds();
+    while (!seeds.empty()) {
+        seedAdded = false;
+        TPoint point = seeds.back();
+        x = point.x;
+        y = point.y;
+        seeds.pop_back();
+        if(!bounds.contains(TPoint(x,y))) continue;
+        pixel = r->pixels(y) + x;
+        while (!pixel->isPureInk() && pixel->getPaint() == paintAtClickedPos) {
+            points.push_back(TPoint(x, y));
+            ++pixelCount;
+            if (pixelCount > maxCount) return;
+            if (!seedAdded && bounds.contains(TPoint(x, y + dy))
+                && !(r->pixels(y + dy) + x)->isPureInk()) {
+                seeds.push_back(TPoint(x, y + dy));
+                seedAdded = true;
+            }
+            if (x < 0 || x > r->getLx() - 1) break;
+            pixel += dx;
+            x += dx;
+        }
     }
-  }
-  if (points.empty()) return;
-  for (TPoint point : points) {
-    if (saver) saver->save(point);
-    (r->pixels(point.y) + point.x)->setPaint(paint);
-  }
-  TPoint lastPoint = points.back();
-  lastPoint        = TPoint(lastPoint.x + dx, lastPoint.y + dy);
-  if ((r->pixels(lastPoint.y) + lastPoint.x)->isPurePaint())
-    expendNormalFill(r, lastPoint, right, dy, paint, paintAtClickedPos, saver, maxCount);
+    if (points.empty()) return;
+    for (TPoint point : points) {
+        if (saver) saver->save(point);
+        (r->pixels(point.y) + point.x)->setPaint(paint);
+    }
+    TPoint lastPoint = points.back();
+    lastPoint = TPoint(lastPoint.x + dx, lastPoint.y + dy);
+    if (!bounds.contains(lastPoint)) return;
+    if ((r->pixels(lastPoint.y) + lastPoint.x)->isPurePaint())
+        expendNormalFill(r, lastPoint, right, dy, paint, paintAtClickedPos, saver, maxCount);
 }
 
 //-----------------------------------------------------------------------------
