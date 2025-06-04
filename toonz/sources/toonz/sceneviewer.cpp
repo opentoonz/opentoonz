@@ -2275,10 +2275,10 @@ void SceneViewer::drawScene() {
     assert(glGetError() == 0);
     if (ToonzCheck::instance()->getChecks() & ToonzCheck::eAutoclose) {
       TXshSimpleLevel *sl = app->getCurrentLevel()->getSimpleLevel();
-      if (sl && sl->getType() & TXshLevelType::RASTER_TYPE)
-        painter.setCurrentImageId(sl->getImageId(
-            app->getCurrentTool()->getTool()->getCurrentFid(),
-                                               0));
+      if (sl && sl->getType() & TXshLevelType::RASTER_TYPE) {
+          TFrameId fid = app->getCurrentTool()->getTool()->getCurrentFid();
+          painter.setCurrentImageId(sl->getImageId(fid, 0));
+      }
     }
     painter.flushRasterImages();
 

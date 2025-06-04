@@ -566,7 +566,7 @@ void RasterPainter::flushRasterImages() {
         if (tc & ToonzCheck::eGap)
           AreaFiller(srcCm).rectFill(m_nodes[i].m_savebox, 1, true, true,
                                      false);
-        if (tc & ToonzCheck::eAutoclose) {
+        if (tc & ToonzCheck::eAutoclose && m_nodes[i].m_onionMode == Node::eOnionSkinNone) {
           auto settings = ToonzCheck::instance()->getAutocloseSettings();
           std::set<int> autoPaints;
           if (settings.m_ignoreAPInks) {
