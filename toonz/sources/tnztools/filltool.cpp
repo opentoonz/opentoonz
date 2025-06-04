@@ -360,6 +360,7 @@ public:
 class RasterFillUndo final : public TRasterUndo {
   FillParameters m_params;
   bool m_saveboxOnly;
+  TRect m_savebox;
   TRaster32P m_refImg;
 
 public:
@@ -378,7 +379,22 @@ public:
       : TRasterUndo(tileSet, sl, fid, false, false, 0)
       , m_params(params)
       , m_saveboxOnly(saveboxOnly)
-      , m_refImg(ref){}
+      , m_refImg(ref){
+      if (saveboxOnly) {
+          m_savebox = TRect();
+          TToonzImageP image = getImage();
+          if (!image) 
+              m_savebox = sl->getProperties()->getImageRes();
+          else
+          m_savebox = convert(getImage()->getBBox());
+      }
+  }
+  void undo() const override {
+      TRasterUndo::undo();
+      TToonzImageP image = getImage();
+      if (!image) return;
+      image->setSavebox(m_savebox);
+  }
   void redo() const override {
     TToonzImageP image = getImage();
     if (!image) return;
@@ -2121,6 +2137,7 @@ void FillTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
   if (m_onion.getValue()) {
     m_onionStyleId = pickOnionColor(pos);
     if (m_onionStyleId > 0) app->setCurrentLevelStyleIndex(m_onionStyleId);
+    return;
   }
   buildFillInfo(params);
   if (!m_frameRange.getValue()) {
@@ -2173,17 +2190,16 @@ void FillTool::leftButtonDoubleClick(const TPointD &pos, const TMouseEvent &e) {
 //-----------------------------------------------------------------------------
 
 void FillTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
-  if ((m_fillType.getValue() != NORMALFILL && !m_onion.getValue()) ||
-      (m_colorType.getValue() == AREAS && m_onion.getValue())) {
-    m_areaFillTool->leftButtonDrag(pos, e);
-    return;
-  }
-  else if (m_colorType.getValue() == LINES &&
-           m_targetType == TTool::ToonzImage) {
-    m_normalLineFillTool->leftButtonDrag(pos, e);
-    return;
-  }
-  if (!m_onion.getValue() && !m_frameRange.getValue()) {
+    if (m_colorType.getValue() == LINES &&
+        m_targetType == TTool::ToonzImage) {
+        m_normalLineFillTool->leftButtonDrag(pos, e);
+        return;
+    }
+    if (m_fillType.getValue() != NORMALFILL) {
+        m_areaFillTool->leftButtonDrag(pos, e);
+        return;
+    }
+    if (!m_onion.getValue() && !m_frameRange.getValue()) {
     FillParameters params = getFillParameters();
     if (m_clickPoint == pos) return;
     TImageP img = getImage(true);
