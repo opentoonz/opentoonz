@@ -152,7 +152,7 @@ void fillRow(const TRasterCM32P &r, const TPoint &p, int &xa, int &xb,
     pix = line + xa;
     int n;
     for (n = 0; n < xb - xa + 1; n++, pix++) {
-      if (palette || refImagePut) {
+      if (palette) {
         if (pix->isPurePaint()) {
           TPoint pInk = nearestInkNotDiagonal(r, TPoint(xa + n, p.y));
           if (pInk != TPoint(-1, -1)) {
