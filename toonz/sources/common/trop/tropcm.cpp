@@ -1484,6 +1484,7 @@ void TRop::makeIcon(TRasterCM32P &_rout, const TRasterCM32P &rin) {
 void TRop::putRefImage(const TRasterCM32P &Up, const TRaster32P &Ref,
                        int style) {
   if (style < 0) style = TPixelCM32::getMaxInk();
+  assert(Up->getSize() == Ref->getSize());
   if (Up->getSize() != Ref->getSize()) return;
   int lx = Up->getLx(), ly = Up->getLy();
   for (int y = 0; y < ly; ++y) {

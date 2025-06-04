@@ -905,8 +905,9 @@ void fillAreaWithUndo(const TImageP &img, const TImageP &ref, const TRectD &area
   }
 }
 
-void drawReferImage(TRaster32P &ras, TXsheet *xsh, int col, int row) {
-  assert(col >= 0);
+void drawReferImage(TRaster32P& ras, TXsheet* xsh, int col, int row,
+    TPointD saveboxoffset) {
+    assert(col >= 0);
   TXshColumn *column = xsh->getColumn(col);
   TStageObject *pegbar =
       xsh->getStageObject(TStageObjectId::ColumnId(col));
@@ -944,7 +945,7 @@ void drawReferImage(TRaster32P &ras, TXsheet *xsh, int col, int row) {
       else if (ri)
         r = ri->getRaster();
       if (!r.getPointer()) continue;
-      TPointD offset = ras->getCenterD() - r->getCenterD();
+      TPointD offset = ras->getCenterD() - r->getCenterD() + saveboxoffset;
       r32->clear();
       if (ri) TRop::quickPut(r32, r, TTranslation(offset));
       if (ti) {
@@ -2025,23 +2026,31 @@ void FillTool::computeRefImgsIfNeeded(const FillParameters &params) {
   }
 
   // Caculate every refImg
+  bool fillOnlySavebox = Preferences::instance()->getFillOnlySavebox();
   for (auto [sl, fid] : m_slFidsPairs) {
     if (sl->getType() != TXshLevelType::TZP_XSHLEVEL) continue;
-    TDimension res = sl->getProperties()->getImageRes();
-
+    
     auto img        = sl->getFrame(fid, false);
     TToonzImageP ti = (TToonzImageP)img;
     if (!ti) continue;
 
-    TRaster32P ras(res);
-    ras->clear();
     auto raux  = ti->getRaster();
     auto imgId = sl->getImageId(fid, 0);
+    TPointD saveboxOffset = TPointD(0,0);
+    if (fillOnlySavebox) {
+        TRectD bbox = ti->getBBox();
+        TRect ibbox = convert(bbox);
+        TDimension res = ti->getSize();
+        saveboxOffset = TPointD(res.lx / 2, res.ly / 2)-bbox.getP11()/2-bbox.getP00()/2;
+        raux = ti->getRaster()->extract(ibbox);
+    }
+    TRaster32P ras(raux->getSize());
+    ras->clear();
 
     m_refImgTable[imgId].set(TRasterImageP(ras));
 
     if (referFill)
-      drawReferImage(ras, xsh, m_beginCell.col, slFidToRow[{sl, fid}]);
+        drawReferImage(ras, xsh, m_beginCell.col, slFidToRow[{sl, fid}], saveboxOffset);
     if (closeGap) gapClose(ras, raux, sl, referFill);
   }
 }
