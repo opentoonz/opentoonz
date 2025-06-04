@@ -158,7 +158,7 @@ void fillRow(const TRasterCM32P &r, const TPoint &p, int &xa, int &xb,
           if (pInk != TPoint(-1, -1)) {
             TPixelCM32 *pixInk = (TPixelCM32 *)r->getRawData() +
                                  (pInk.y * r->getWrap() + pInk.x);
-            if (palette && pixInk->getInk() != paint &&
+            if (pixInk->getInk() != paint &&
                 palette->getStyle(pixInk->getInk())->getFlags() != 0)
               inkFill(r, pInk, paint, 0, saver);
             else if (pixInk->getInk() == paintAtClickPos)
@@ -169,6 +169,21 @@ void fillRow(const TRasterCM32P &r, const TPoint &p, int &xa, int &xb,
       if (refImagePut && pix->getInk() == TPixelCM32::getMaxInk())
         pix->setInk(paint);
       pix->setPaint(paint);
+    }
+
+    //Make sure the up and down ref Ink Pixels can be painted
+    if (refImagePut) {
+        pix = line + xa;
+        for (n = 0; n < xb - xa + 1; n++, pix++) {
+            if (pix->isPurePaint()) {
+                TPixelCM32* upPix = pix - r->getWrap();
+                TPixelCM32* downPix = pix + r->getWrap();
+                if (upPix->getInk() == TPixelCM32::getMaxInk())
+                    upPix->setInk(paint);
+                if (downPix->getInk() == TPixelCM32::getMaxInk())
+                    downPix->setInk(paint);
+            }
+        }
     }
   }
 }
