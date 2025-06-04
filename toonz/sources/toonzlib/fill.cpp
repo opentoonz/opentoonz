@@ -396,15 +396,17 @@ bool fill(const TRasterCM32P &r, const FillParameters &params,
   if (params.m_emptyOnly && pix0->getPaint() != 0)
     return false;
 
+  if (pix0->isPureInk())
+      return false;
+
   bool refImagePut = Ref.getPointer();
   if (refImagePut) {
-    if(saver) saver->save(Ref->getBounds());
+    if (*(Ref->pixels(p.y) + p.x) != TPixel32(0, 0, 0, 0))
+          return false;
+    if (saver) saver->save(Ref->getBounds());
     TRop::putRefImage(r, Ref);
   }
-  if (pix0->isPureInk()) {
-    if (refImagePut) TRop::eraseRefInks(r);
-    return false;
-  }
+
   assert(fillDepth >= 0 && fillDepth < 16);
 
   switch (TPixelCM32::getMaxTone()) {

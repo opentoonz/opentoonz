@@ -1035,14 +1035,15 @@ void doRefFill(const TImageP &img, const TImageP &refImg, const TPointD &pos,
       if (plt && hasAutoInks(plt) && autopaintLines) params.m_palette = plt;
       TRaster32P refRas;
       if (params.m_fillType == ALL || params.m_fillType == AREAS) {
-        if (refImg) {
-          TRasterImageP ri = (TRasterImageP)refImg;
-          if (ri) {
-            TRasterP r = ri->getRaster();
-            if (r) refRas = r;
+          //Get refImg
+          if (refImg) {
+              TRasterImageP ri = (TRasterImageP)refImg;
+              if (ri) {
+                  TRasterP r = ri->getRaster();
+                  if (r) refRas = r;
+              }
           }
-        }
-        recomputeSavebox = fill(ras, params, &tileSaver, refRas);
+          recomputeSavebox = fill(ras, params, &tileSaver, refRas);
       }
       if (params.m_fillType == ALL || params.m_fillType == LINES) {
           if (params.m_segment)
