@@ -83,7 +83,7 @@
 // Qt includes
 #include <QMenu>
 #include <QApplication>
-#include <QDesktopWidget>
+#include <QScreen>
 #include <QInputMethod>
 #include <QGLContext>
 #include <QOpenGLFramebufferObject>
@@ -2658,7 +2658,7 @@ double SceneViewer::getZoomScaleFittingWithScreen() {
   // add small margin on the edge of the image
   int margin = 20;
   // get the desktop resolution
-  QRect rec = QApplication::desktop()->screenGeometry();
+  QRect rec = QApplication::primaryScreen()->geometry();
 
   // fit to either direction
   int moni_x = rec.width() - (margin * 2);

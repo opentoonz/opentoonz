@@ -28,42 +28,6 @@
 #include "ttoonzimage.h"
 #include "tundo.h"
 
-namespace {
-// obtain level set contained in the column specified by indices
-// it is used for checking and updating the scene cast when pasting
-// based on TXsheet::getUsedLevels
-void getLevelSetFromColumnIndices(const std::set<int>& indices,
-                                  std::set<TXshLevel*>& levelSet) {
-  TXsheet* xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
-  for (auto c : indices) {
-    TXshColumnP column = const_cast<TXsheet*>(xsh)->getColumn(c);
-    if (!column) continue;
-
-    TXshCellColumn* cellColumn = column->getCellColumn();
-    if (!cellColumn) continue;
-
-    int r0, r1;
-    if (!cellColumn->getRange(r0, r1)) continue;
-
-    TXshLevel* level = 0;
-    for (int r = r0; r <= r1; r++) {
-      TXshCell cell = cellColumn->getCell(r);
-      if (cell.isEmpty() || !cell.m_level) continue;
-
-      if (level != cell.m_level.getPointer()) {
-        level = cell.m_level.getPointer();
-        levelSet.insert(level);
-        if (level->getChildLevel()) {
-          TXsheet* childXsh = level->getChildLevel()->getXsheet();
-          childXsh->getUsedLevels(levelSet);
-        }
-      }
-    }
-  }
-}
-
-}  // namespace
-
 //=============================================================================
 // TColumnSelection
 //-----------------------------------------------------------------------------
@@ -356,4 +320,37 @@ void TColumnSelection::hideColumns() {
   // colonne)
   //  TApp::instance()->->notify(TColumnHeadChange());
   app->getCurrentScene()->setDirtyFlag(true);
+}
+
+// obtain level set contained in the column specified by indices
+// it is used for checking and updating the scene cast when pasting
+// based on TXsheet::getUsedLevels
+void TColumnSelection::getLevelSetFromColumnIndices(const std::set<int>& indices,
+    std::set<TXshLevel*>& levelSet) {
+    TXsheet* xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
+    for (auto c : indices) {
+        TXshColumnP column = const_cast<TXsheet*>(xsh)->getColumn(c);
+        if (!column) continue;
+
+        TXshCellColumn* cellColumn = column->getCellColumn();
+        if (!cellColumn) continue;
+
+        int r0, r1;
+        if (!cellColumn->getRange(r0, r1)) continue;
+
+        TXshLevel* level = 0;
+        for (int r = r0; r <= r1; r++) {
+            TXshCell cell = cellColumn->getCell(r);
+            if (cell.isEmpty() || !cell.m_level) continue;
+
+            if (level != cell.m_level.getPointer()) {
+                level = cell.m_level.getPointer();
+                levelSet.insert(level);
+                if (level->getChildLevel()) {
+                    TXsheet* childXsh = level->getChildLevel()->getXsheet();
+                    childXsh->getUsedLevels(levelSet);
+                }
+            }
+        }
+    }
 }

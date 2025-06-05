@@ -1257,6 +1257,10 @@ void ToonzRasterBrushTool::inputSetBusy(bool busy) {
     }
     m_painting.tileSet = nullptr;
 
+    // Restore gap/autoclose Fill Check
+    int tc = ToonzCheck::instance()->getChecks();
+    if (tc & ToonzCheck::eGap || tc & ToonzCheck::eAutoclose) invalidate();    
+
     /*-- 作業中のフレームをリセット --*/
     m_painting.frameId = TFrameId();
 

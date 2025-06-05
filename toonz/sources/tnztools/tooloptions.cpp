@@ -2488,7 +2488,7 @@ RGBPickerToolOptionsBox::RGBPickerToolOptionsBox(
       CommandManager::instance()->getAction("A_ToolOption_PickScreen");
 
   QPushButton *button = new QPushButton(tr("Pick Screen"));
-  int buttonWidth     = fontMetrics().width(button->text()) + 10;
+  int buttonWidth     = fontMetrics().horizontalAdvance(button->text()) + 10;
   button->setFixedWidth(buttonWidth);
   button->setFixedHeight(20);
   button->addAction(pickScreenAction);
@@ -2632,9 +2632,9 @@ ShiftTraceToolOptionBox::ShiftTraceToolOptionBox(QWidget *parent, TTool *tool)
 
   m_prevFrame->setFixedSize(10, 21);
   m_afterFrame->setFixedSize(10, 21);
-  int buttonWidth = fontMetrics().width(m_resetPrevGhostBtn->text()) + 10;
+  int buttonWidth = fontMetrics().horizontalAdvance(m_resetPrevGhostBtn->text()) + 10;
   m_resetPrevGhostBtn->setFixedWidth(buttonWidth);
-  buttonWidth = fontMetrics().width(m_resetAfterGhostBtn->text()) + 10;
+  buttonWidth = fontMetrics().horizontalAdvance(m_resetAfterGhostBtn->text()) + 10;
   m_resetAfterGhostBtn->setFixedWidth(buttonWidth);
 
   m_layout->addWidget(m_prevFrame, 0);
@@ -2760,7 +2760,7 @@ ZoomToolOptionsBox::ZoomToolOptionsBox(QWidget *parent, TTool *tool,
       CommandManager::instance()->getAction(VB_ZoomReset);
 
   QPushButton *button = new QPushButton(tr("Reset Zoom"));
-  int buttonWidth     = fontMetrics().width(button->text()) + 10;
+  int buttonWidth     = fontMetrics().horizontalAdvance(button->text()) + 10;
   button->setFixedWidth(buttonWidth);
   button->setFixedHeight(20);
   button->addAction(resetZoomAction);
@@ -2787,7 +2787,7 @@ RotateToolOptionsBox::RotateToolOptionsBox(QWidget *parent, TTool *tool,
       CommandManager::instance()->getAction(VB_RotateReset);
 
   QPushButton *button = new QPushButton(tr("Reset Rotation"));
-  int buttonWidth     = fontMetrics().width(button->text()) + 10;
+  int buttonWidth     = fontMetrics().horizontalAdvance(button->text()) + 10;
   button->setFixedWidth(buttonWidth);
   button->setFixedHeight(20);
   button->addAction(resetRotationAction);
@@ -2814,7 +2814,7 @@ HandToolOptionsBox::HandToolOptionsBox(QWidget *parent, TTool *tool,
       CommandManager::instance()->getAction(VB_PositionReset);
 
   QPushButton *button = new QPushButton(tr("Reset Position"));
-  int buttonWidth     = fontMetrics().width(button->text()) + 10;
+  int buttonWidth     = fontMetrics().horizontalAdvance(button->text()) + 10;
   button->setFixedWidth(buttonWidth);
   button->setFixedHeight(20);
   button->addAction(resetPositionAction);

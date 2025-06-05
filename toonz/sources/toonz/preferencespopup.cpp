@@ -1144,7 +1144,7 @@ void PreferencesPopup::insertUI(PreferencesItemId id, QGridLayout* layout,
     else {
       bool isWideComboBox = false;
       for (auto cbItem : comboItems) {
-        if (widget->fontMetrics().width(cbItem.first) > 100) {
+        if (widget->fontMetrics().horizontalAdvance(cbItem.first) > 100) {
           isWideComboBox = true;
           break;
         }

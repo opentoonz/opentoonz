@@ -454,7 +454,7 @@ void Preferences::definePreferenceItems() {
   // Visualization
   define(show0ThickLines, "show0ThickLines", QMetaType::Bool, true);
   define(regionAntialias, "regionAntialias", QMetaType::Bool, false);
-  define(rasterizeAntialias, "rasterizeAntialias", QMetaType::Bool, true);
+  define(rasterizeAntialias, "rasterizeAntialias", QMetaType::Bool, false);
 
   // Loading
   define(importPolicy, "importPolicy", QMetaType::Int, 0);  // Always ask

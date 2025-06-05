@@ -56,7 +56,7 @@
 #include <QPainter>
 #include <QPolygon>
 #include <QThreadStorage>
-#include <QMatrix>
+#include <QTransform>
 #include <QThread>
 #include <QGuiApplication>
 
@@ -416,7 +416,7 @@ void RasterPainter::clearNodes() { m_nodes.clear(); }
 
 //-----------------------------------------------------------------------------
 
-TRasterP RasterPainter::getRaster(int index, QMatrix &matrix) {
+TRasterP RasterPainter::getRaster(int index, QTransform &matrix) {
   if ((int)m_nodes.size() <= index) return TRasterP();
 
   if (m_nodes[index].m_onionMode != Node::eOnionSkinNone) return TRasterP();
@@ -435,7 +435,7 @@ TRasterP RasterPainter::getRaster(int index, QMatrix &matrix) {
   rect = rect * TRect(0, 0, m_dim.lx - 1, m_dim.ly - 1);
 
   TAffine aff = TTranslation(-rect.x0, -rect.y0) * m_nodes[index].m_aff;
-  matrix      = QMatrix(aff.a11, aff.a21, aff.a12, aff.a22, aff.a13, aff.a23);
+  matrix      = QTransform(aff.a11, aff.a21, aff.a12, aff.a22, aff.a13, aff.a23);
 
   return m_nodes[index].m_raster;
 }
@@ -718,10 +718,10 @@ void RasterPainter::drawRasterImages(QPainter &p, QPolygon cameraPol) {
     p.resetTransform();
     TRasterP ras = m_nodes[i].m_raster;
     TAffine aff  = TTranslation(-rect.x0, -rect.y0) * flipY * m_nodes[i].m_aff;
-    QMatrix matrix(aff.a11, aff.a21, aff.a12, aff.a22, aff.a13, aff.a23);
+    QTransform matrix(aff.a11, aff.a12, aff.a21, aff.a22, aff.a13, aff.a23); // Updated line
     QImage image = rasterToQImage(ras);
     if (image.isNull()) continue;
-    p.setMatrix(matrix);
+    p.setWorldTransform(matrix);
     p.drawImage(rect.getP00().x, rect.getP00().y, image);
   }
 

@@ -1640,7 +1640,7 @@ PencilTestPopup::PencilTestPopup()
   m_dpiMenuWidget = createDpiMenuWidget();
   //----
 
-  m_resolutionCombo->setMaximumWidth(fontMetrics().width("0000 x 0000") + 25);
+  m_resolutionCombo->setMaximumWidth(fontMetrics().horizontalAdvance("0000 x 0000") + 25);
   m_fileTypeCombo->addItems({"jpg", "png", "tga", "tif"});
   m_fileTypeCombo->setCurrentText(QString::fromStdString(CamCapFileType));
 
@@ -1725,7 +1725,7 @@ PencilTestPopup::PencilTestPopup()
   m_calibration.label->hide();
   m_calibration.exportBtn->setEnabled(false);
 
-  int subCameraFieldWidth = fontMetrics().width("00000") + 5;
+  int subCameraFieldWidth = fontMetrics().horizontalAdvance("00000") + 5;
   m_subWidthFld->setFixedWidth(subCameraFieldWidth);
   m_subHeightFld->setFixedWidth(subCameraFieldWidth);
   m_subXPosFld->setFixedWidth(subCameraFieldWidth);
@@ -2155,7 +2155,7 @@ void PencilTestPopup::refreshCameraList() {
   for (int c = 0; c < cameras.size(); c++) {
     QString camDesc = cameras.at(c).description();
     m_cameraListCombo->addItem(camDesc);
-    maxTextLength = std::max(maxTextLength, fontMetrics().width(camDesc));
+    maxTextLength = std::max(maxTextLength, fontMetrics().horizontalAdvance(camDesc));
   }
   m_cameraListCombo->setMaximumWidth(maxTextLength + 25);
   m_cameraListCombo->setEnabled(true);
@@ -2494,7 +2494,7 @@ int PencilTestPopup::translateIndex(int camIndex) {
     // Get the human-friendly name of the device
     UINT32 cchName;
 
-    for (int i = 0; i < count; i++) {
+    for (UINT32 i = 0; i < count; i++) {
       hr = devices[i]->GetAllocatedString(MF_DEVSOURCE_ATTRIBUTE_FRIENDLY_NAME,
                                           &nameString, &cchName);
       if (nameString == desc) {

@@ -28,8 +28,9 @@
 #include <QPainter>
 #include <QRadioButton>
 #include <QThread>
-#include <QDesktopWidget>
 #include <QCheckBox>
+#include <QScreen>
+#include <QGuiApplication>
 
 #include <algorithm>
 
@@ -125,7 +126,7 @@ void Separator::paintEvent(QPaintEvent *) {
 
   QRect contents(contentsRect());
 
-  int textWidth = p.fontMetrics().width(m_name);
+  int textWidth = p.fontMetrics().horizontalAdvance(m_name);
 
   p.drawText(contents.left(), 10, m_name);
 
@@ -302,9 +303,10 @@ Dialog::Dialog(QWidget *parent, bool hasButton, bool hasFixedSize,
 
     // try and get active screen
     if (parent != NULL) {
-      m_currentScreen = QApplication::desktop()->screenNumber(parent);
+      QScreen *screen = QGuiApplication::screenAt(parent->pos());
+      m_currentScreen = screen ? QGuiApplication::screens().indexOf(screen) : 0;
     }
-    QRect screen = QApplication::desktop()->availableGeometry(m_currentScreen);
+    QRect screen = QGuiApplication::screens().at(m_currentScreen)->availableGeometry();
     int x        = values.at(0).toInt();
     int y        = values.at(1).toInt();
 
@@ -360,18 +362,18 @@ void Dialog::hideEvent(QHideEvent *event) {
   int x = pos().rx();
   int y = pos().ry();
   // make sure the dialog is actually visible on a screen
-  int screenCount = QApplication::desktop()->screenCount();
-  int currentScreen;
-  for (int i = 0; i < screenCount; i++) {
-    if (QApplication::desktop()->screenGeometry(i).contains(pos())) {
-      currentScreen = i;
-      break;
+  auto screens = QGuiApplication::screens();
+  int currentScreen = 0;
+  for (int i = 0; i < screens.count(); i++) {
+    if (screens[i]->geometry().contains(pos())) {
+        currentScreen = i;
+        break;
     } else {
       // if not - put it back on the main window
       currentScreen = m_currentScreen;
     }
   }
-  QRect screen = QApplication::desktop()->availableGeometry(currentScreen);
+  QRect screen = QGuiApplication::screens().at(currentScreen)->availableGeometry();
 
   if (x > screen.right() - 50) x = screen.right() - 50;
   if (x < screen.left()) x = screen.left();
@@ -1364,7 +1366,7 @@ bool isStyleIdInPalette(int styleId, const TPalette *palette) {
   int i;
   for (i = 0; i < palette->getPageCount(); i++) {
     const TPalette::Page *page = palette->getPage(i);
-    if (!page) return false;  // La pagina dovrebbe esserci sempre
+    if (!page) return false;  // The page should always be present
     int j;
     for (j = 0; j < page->getStyleCount(); j++)
       if (page->getStyleId(j) == styleId) return true;
@@ -1378,12 +1380,12 @@ bool isStyleIdInPalette(int styleId, const TPalette *palette) {
 int DVGui::eraseStylesInDemand(TPalette *palette,
                                const TXsheetHandle *xsheetHandle,
                                TPalette *newPalette) {
-  // Verifico se gli stili della paletta sono usati : eraseStylesInDemand()
+  // Check if the palette styles are in use: eraseStylesInDemand()
   std::vector<int> styleIds;
   int h;
   for (h = 0; h < palette->getPageCount(); h++) {
     TPalette::Page *page = palette->getPage(h);
-    if (!page) continue;  // La pagina dovrebbe esserci sempre
+    if (!page) continue;  // The page should always be present
     int k;
     for (k = 0; k < page->getStyleCount(); k++) {
       int styleId = page->getStyleId(k);

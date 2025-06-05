@@ -92,7 +92,7 @@ enum QTLibError {
   QTUnableToSetMovieBox,
 };
 
-string buildQTErrorString(int ec) {
+std::string buildQTErrorString(int ec) {
   switch (ec) {
   case QTNotInstalled:
     return "Can't create; ensure that quicktime is correctly installed on your "
@@ -188,8 +188,8 @@ TFilePath getLegalName(const TFilePath &name) {
 
 //-------------------------------------------------------------------------------
 
-string long2fourchar(TINT32 fcc) {
-  string s;
+std::string long2fourchar(TINT32 fcc) {
+  std::string s;
   s += (char((fcc & 0xff000000) >> 24));
   s += (char((fcc & 0x00ff0000) >> 16));
   s += (char((fcc & 0x0000ff00) >> 8));
@@ -618,7 +618,9 @@ TLevelWriterMov::TLevelWriterMov(const TFilePath &path, TPropertyGroup *winfo)
 #define FailWithAction(cond, action, handler)                                  \
   if (cond) {                                                                  \
     DebugStr((ConstStr255Param) #cond " goto " #handler);                      \
-    { action; }                                                                \
+    {                                                                          \
+      action;                                                                  \
+    }                                                                          \
     goto handler;                                                              \
   } else                                                                       \
     0
@@ -948,7 +950,7 @@ TLevelReaderMov::TLevelReaderMov(const TFilePath &path)
   // Retrieve the timecode media handler
   {
     Track tcTrack     = GetMovieIndTrackType(m_movie, 1, TimeCodeMediaType,
-                                         movieTrackMediaType);
+                                             movieTrackMediaType);
     Media tcMedia     = GetTrackMedia(tcTrack);
     m_timecodeHandler = GetMediaHandler(tcMedia);
   }

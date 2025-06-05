@@ -876,7 +876,7 @@ void HexagonalColorWheel::mouseReleaseEvent(QMouseEvent *event) {
 void HexagonalColorWheel::clickLeftWheel(const QPoint &pos) {
   QLineF p(m_wp[0] + m_wheelPosition, QPointF(pos));
   QLineF horizontal(0, 0, 1, 0);
-  float theta = (p.dy() < 0) ? p.angle(horizontal) : 360 - p.angle(horizontal);
+  float theta = (p.dy() < 0) ? p.angleTo(horizontal) : 360 - p.angleTo(horizontal);
   float phi   = theta;
   while (phi >= 60.0f) phi -= 60.0f;
   phi -= 30.0f;
@@ -1342,7 +1342,7 @@ ColorChannelControl::ColorChannelControl(ColorChannel channel, QWidget *parent)
   m_label->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
 
   m_field->setObjectName("colorSliderField");
-  m_field->setFixedWidth(fontMetrics().width('0') * 4);
+  m_field->setFixedWidth(fontMetrics().horizontalAdvance('0') * 4);
   m_field->setMinimumHeight(7);
 
   addButton->setObjectName("colorSliderAddButton");

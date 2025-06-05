@@ -6,6 +6,7 @@
 #include "toonzqt/selection.h"
 #include "tgeometry.h"
 #include <set>
+#include "toonz/txshlevel.h"
 
 class ReframePopup;
 
@@ -54,6 +55,8 @@ public:
   void reframe4Cells() { reframeCells(4); }
 
   void reframeWithEmptyInbetweens();
+  static void getLevelSetFromColumnIndices(const std::set<int>& indices,
+      std::set<TXshLevel*>& levelSet);
 };
 
 #endif  // TCELLSELECTION_H

@@ -21,9 +21,9 @@ namespace {
   TApp::instance()->getCurrentScene()->getScene()->getFrameCount();
   }*/
 
-/*void getCurrentScenePlayRange(int &r0, int &r1, int &step)
+/* void getCurrentScenePlayRange(int &r0, int &r1, int &step)
   {
-    /*
+
     ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
     scene->getProperties()->getPreviewProperties()->getRange(r0, r1, step);
     if(r0>r1)
@@ -31,8 +31,8 @@ namespace {
       r0 = 0;
       r1 = scene->getFrameCount()-1;
     }
-    */
-/*   r0 = 0;
+
+  r0 = 0;
     r1 = getCurrentSceneFrameCount()-1;
   }*/
 #endif
@@ -132,8 +132,8 @@ void TFrameHandle::nextFrame(TFrameId id) {
     std::vector<TFrameId>::iterator it;
     it = std::upper_bound(m_fids.begin(), m_fids.end(), m_fid);
     if (it == m_fids.end()) {
-      // non c'e' nessun frame del livello oltre m_fid. Non vado oltre al primo
-      // frame dopo l'ultimo.
+      // There is no frame of the level beyond m_fid. Do not go past the first
+      // frame after the last one.
       // TXshSimpleLevel *sl =
       // TApp::instance()->getCurrentLevel()->getSimpleLevel();
       if (id != 0) {
@@ -157,12 +157,12 @@ void TFrameHandle::prevFrame() {
     if (m_fids.size() <= 0) return;
     std::vector<TFrameId>::iterator it;
     it = std::lower_bound(m_fids.begin(), m_fids.end(), m_fid);
-    // tornando indietro non vado prima del primo frame del livello
+    // when going backward, do not go before the first frame of the level
     if (it != m_fids.end() && it != m_fids.begin()) {
       --it;
       setFid(*it);
     } else {
-      // se sono dopo l'ultimo, vado all'ultimo
+      // if it after the last one, go to the last frame
       if (!m_fids.empty() && m_fid > m_fids.back()) setFid(m_fids.back());
     }
   } else {
@@ -241,14 +241,15 @@ void TFrameHandle::setTimer(int frameRate) {
 void TFrameHandle::timerEvent(QTimerEvent *event) {
   assert(isScrubbing());
 
-  int elapsedTime = m_clock.elapsed();
-  int frame       = m_scrubRange.first + elapsedTime * m_fps / 1000;
-  int lastFrame   = m_scrubRange.second;
+  qint64 elapsedTime = m_clock.elapsed();
+  int frame = m_scrubRange.first + elapsedTime * m_fps / 1000;
+  int lastFrame = m_scrubRange.second;
   if (frame >= lastFrame) {
     if (m_frame != lastFrame) setFrame(lastFrame);
     stopScrubbing();
-  } else
+  } else {
     setFrame(frame);
+  }
 }
 
 //-----------------------------------------------------------------------------

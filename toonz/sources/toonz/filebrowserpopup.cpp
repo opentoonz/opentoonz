@@ -797,7 +797,7 @@ LoadLevelPopup::LoadLevelPopup()
     QHBoxLayout *subsequenceHeadLay = createHBoxLayout(0, 5);
     {
       QFontMetrics metrics(font());
-      subsequenceHeadLay->addSpacing(metrics.width("File name:") + 3);
+      subsequenceHeadLay->addSpacing(metrics.horizontalAdvance("File name:") + 3);
       subsequenceHeadLay->addWidget(m_notExistLabel, 0);
       subsequenceHeadLay->addStretch(1);
 
