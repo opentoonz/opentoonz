@@ -36,6 +36,11 @@
 #include "toonz/mypaintbrushstyle.h"
 #include "toonz/ttilesaver.h"
 
+#include "toonz/tscenehandle.h"
+#include "toonz/toonzscene.h"
+#include "toonz/tcamera.h"
+#include "toonz/stage.h"
+
 // For Qt translation support
 #include <QCoreApplication>
 
@@ -610,10 +615,18 @@ public:
       , m_isPrompting(false) {}
 
   double getThickness() const {
-    if (m_rasterTool)
-      return m_param->m_rasterToolSize.getValue() * 0.5;
+    if (m_rasterTool) {
+      double thick = m_param->m_rasterToolSize.getValue() * 0.5;
+      /*---
+       Pencilの場合は、線幅を減らす。Thickness1の線を1ピクセルにするため。
+       （thick = 0 になる）
+       ---*/
+      if (m_param->m_pencil.getValue()) thick -= 0.5;
+      return  thick;
+    }
     else
-      return m_param->m_toolSize.getValue() * 0.5;
+      return m_param->m_toolSize.getValue() * 0.5 * Stage::inch / 
+        m_tool->getApplication()->getCurrentScene()->getScene()->getCurrentCamera()->getDpi().x;
   }
 
   void setIsPrompting(bool value) { m_isPrompting = value; }
@@ -2440,11 +2453,6 @@ bool MultiLinePrimitive::keyDown(QKeyEvent *event) {
 
 TStroke *MultiLinePrimitive::makeStroke() const {
   double thick = getThickness();
-
-  /*---
-   * Pencilの場合は、線幅を減らす。Thickness1の線を1ピクセルにするため。（thick
-   * = 0 になる）---*/
-  if (m_param->m_pencil.getValue()) thick -= 1.0;
 
   UINT size = m_vertex.size();
   if (size <= 1) return 0;
