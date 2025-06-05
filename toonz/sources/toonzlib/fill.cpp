@@ -404,7 +404,14 @@ bool fill(const TRasterCM32P &r, const FillParameters &params,
   /*- If the same color has already been painted, return -*/
   pix0                  = r->pixels(p.y) + p.x;
   int paintAtClickedPos = pix0->getPaint();
-  if (paintAtClickedPos == paint && !params.m_shiftFill) return false;
+  if (paintAtClickedPos == paint)
+      if (params.m_shiftFill){
+          FillParameters tmp = FillParameters(params);
+          tmp.m_styleId = 0;
+          fill(r, tmp, saver, Ref);
+          paintAtClickedPos = pix0->getPaint();
+      }
+      else return false;
   /*- If the "paint only transparent areas" option is enabled and the area is
    * already colored, return
    * -*/
