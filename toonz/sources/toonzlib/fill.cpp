@@ -358,16 +358,52 @@ void extendInk2InkFill(const TRasterCM32P &r, const TPoint &p, bool right, int d
 
 //-----------------------------------------------------------------------------
 // Prevailing is off for default
-void expendNormalFill(const TRasterCM32P& r, const TPoint& p, bool right, int dy,
+// Return false if the area is too big to fill
+bool expendNormalFill(const TRasterCM32P& r, const TPoint& p, bool right, int dy,
     int paint, int paintAtClickedPos, TTileSaverCM32* saver,
     int maxCount = 8) {
-    TPixelCM32* pixel = r->pixels(p.y);
-    if (pixel->isPureInk()) return;
+    struct locals {
+        static bool hasValidNeighbors(const TRasterCM32P& r, int x, int y) {
+            int fourCount = 0;
+            int eightCount = 0;
+            TRect bounds = r->getBounds();
+
+            const int dx4[] = { 0, -1, 1, 0 };
+            const int dy4[] = { -1, 0, 0, 1 };
+
+            const int dx8[] = { -1, -1, 1, 1 };
+            const int dy8[] = { -1, 1, -1, 1 };
+
+            for (int i = 0; i < 4; ++i) {
+                int nx = x + dx4[i], ny = y + dy4[i];
+                if (bounds.contains(TPoint(nx, ny))) {
+                    TPixelCM32* neighbor = r->pixels(ny) + nx;
+                    if (neighbor->isPureInk())
+                        ++fourCount;
+                }
+            }
+            for (int i = 0; i < 4; ++i) {
+                int nx = x + dx8[i], ny = y + dy8[i];
+                if (bounds.contains(TPoint(nx, ny))) {
+                    TPixelCM32* neighbor = r->pixels(ny) + nx;
+                    if (neighbor->isPureInk())
+                        ++eightCount;
+                }
+            }
+            return (fourCount >= 3) ||
+                (fourCount == 2 && eightCount >= 3);
+        }
+    };
+    TPixelCM32* pixel = r->pixels(p.y) + p.x;
+    if (pixel->isPureInk()) return true;
     int pixelCount = 0;
     int x, y;
     int dx = right ? 1 : -1;
     std::vector<TPoint> points;
     std::vector<TPoint> seeds;
+
+    points.reserve(maxCount);
+
     seeds.push_back(p);
     bool seedAdded;
     TRect bounds = r->getBounds();
@@ -378,11 +414,15 @@ void expendNormalFill(const TRasterCM32P& r, const TPoint& p, bool right, int dy
         y = point.y;
         seeds.pop_back();
         if(!bounds.contains(TPoint(x,y))) continue;
+        if(bounds.contains(TPoint(x-dx, y))){
+            pixel = r->pixels(y) + x - dx;
+            if (!pixel->isPureInk()) return false;
+        }
         pixel = r->pixels(y) + x;
         while (!pixel->isPureInk() && pixel->getPaint() == paintAtClickedPos) {
             points.push_back(TPoint(x, y));
             ++pixelCount;
-            if (pixelCount > maxCount) return;
+            if (pixelCount > maxCount) return false;
             if (!seedAdded && bounds.contains(TPoint(x, y + dy))
                 && !(r->pixels(y + dy) + x)->isPureInk()) {
                 seeds.push_back(TPoint(x, y + dy));
@@ -393,16 +433,21 @@ void expendNormalFill(const TRasterCM32P& r, const TPoint& p, bool right, int dy
             x += dx;
         }
     }
-    if (points.empty()) return;
-    for (TPoint point : points) {
+    if (points.empty()) return true;
+    TPoint lastPoint = points.back();
+    lastPoint = TPoint(lastPoint.x + dx, lastPoint.y + dy);
+    if (!bounds.contains(lastPoint)) return true;
+    bool doPaint =  true;
+    if ((r->pixels(lastPoint.y) + lastPoint.x)->isPurePaint())
+        doPaint = doPaint && expendNormalFill(r, lastPoint, right, dy, paint, paintAtClickedPos, saver, maxCount);
+    if (!doPaint) return false;
+    for(const TPoint& point : points)
+        if (!locals::hasValidNeighbors(r, point.x, point.y)) return false;
+    for (const TPoint& point : points){
         if (saver) saver->save(point);
         (r->pixels(point.y) + point.x)->setPaint(paint);
     }
-    TPoint lastPoint = points.back();
-    lastPoint = TPoint(lastPoint.x + dx, lastPoint.y + dy);
-    if (!bounds.contains(lastPoint)) return;
-    if ((r->pixels(lastPoint.y) + lastPoint.x)->isPurePaint())
-        expendNormalFill(r, lastPoint, right, dy, paint, paintAtClickedPos, saver, maxCount);
+    return true;
 }
 
 //-----------------------------------------------------------------------------
