@@ -35,10 +35,10 @@ using namespace ToolUtils;
 
 TEnv::StringVar AutocloseVectorType("InknpaintAutocloseVectorType", "Normal");
 TEnv::DoubleVar AutocloseDistance("InknpaintAutocloseDistance", 10.0);
-TEnv::DoubleVar AutocloseAngle("InknpaintAutocloseAngle", 60.0);
+TEnv::DoubleVar AutocloseAngle("InknpaintAutocloseAngle", 1.0);
 TEnv::IntVar AutocloseRange("InknpaintAutocloseRange", 0);
 TEnv::IntVar AutocloseOpacity("InknpaintAutocloseOpacity", 255);
-TEnv::IntVar AutocloseIgnoreAutoPaint("AutocloseIgnoreAutoPaint", 1);
+TEnv::IntVar AutocloseIgnoreAutoPaint("AutocloseIgnoreAutoPaint", 0);
 
 #define NORMAL_CLOSE L"Normal"
 #define RECT_CLOSE L"Rectangular"
@@ -144,7 +144,7 @@ public:
       , m_inkIndex("Style Index:", L"current")  // W_ToolOptions_InkIndex
       , m_opacity("Opacity:", 1, 255, 255)
       , m_multi("Frame Range", false)  // W_ToolOptions_FrameRange
-      , m_ignoreAP("Ignore AutoPaint Inks", true)
+      , m_ignoreAP("Ignore AutoPaint Inks", false)
       , m_selecting(false)
       , m_selectingRect()
       , m_firstRect()
@@ -735,6 +735,7 @@ public:
       m_angle.setValue(AutocloseAngle);
       m_opacity.setValue(AutocloseOpacity);
       m_multi.setValue(AutocloseRange ? 1 : 0);
+      m_ignoreAP.setValue(AutocloseIgnoreAutoPaint ? 1 : 0);
       m_firstTime = false;
     }
     //			getApplication()->editImage();
