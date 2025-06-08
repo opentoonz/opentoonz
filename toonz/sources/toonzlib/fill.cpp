@@ -1,17 +1,18 @@
 
 
-#include "trastercm.h"
+#include <stack>
+
 #include "toonz/fill.h"
 #include "toonz/ttilesaver.h"
 #include "tpalette.h"
 #include "tpixelutils.h"
-#include <stack>
+#include "trastercm.h"
 #include "tropcm.h"
 
 //-----------------------------------------------------------------------------
 namespace {  // Utility Function
 
-    inline TPoint nearestInkNotDiagonal(const TRasterCM32P &r, const TPoint &p) {
+inline TPoint nearestInkNotDiagonal(const TRasterCM32P &r, const TPoint &p) {
   TPixelCM32 *buf = (TPixelCM32 *)r->pixels(p.y) + p.x;
 
   if (p.x < r->getLx() - 1 && (!(buf + 1)->isPurePaint()))
@@ -47,11 +48,11 @@ void fillRow(const TRasterCM32P &r, const TPoint &p, int &xa, int &xb,
   /* vai a destra */
   TPixelCM32 *line = r->pixels(p.y);
 
-  pix0    = line + p.x;
-  pix     = pix0;
-  limit   = line + r->getBounds().x1;
+  pix0 = line + p.x;
+  pix = pix0;
+  limit = line + r->getBounds().x1;
   oldtone = pix->getTone();
-  tone    = oldtone;
+  tone = oldtone;
   for (; pix <= limit; pix++) {
     if (pix->getPaint() == paint) break;
     tone = pix->getTone();
@@ -71,7 +72,7 @@ void fillRow(const TRasterCM32P &r, const TPoint &p, int &xa, int &xb,
           // check if the current pixel is NOT with the lowest tone among the
           // vertical neighbors as well
           if (p.y > 0 && p.y < r->getLy() - 1) {
-            TPixelCM32 *upPix   = pix - r->getWrap();
+            TPixelCM32 *upPix = pix - r->getWrap();
             TPixelCM32 *downPix = pix + r->getWrap();
             if (upPix->getTone() > pix->getTone() &&
                 downPix->getTone() > pix->getTone())
@@ -98,10 +99,10 @@ void fillRow(const TRasterCM32P &r, const TPoint &p, int &xa, int &xb,
 
   /* vai a sinistra */
 
-  pix     = pix0;
-  limit   = line + r->getBounds().x0;
+  pix = pix0;
+  limit = line + r->getBounds().x0;
   oldtone = pix->getTone();
-  tone    = oldtone;
+  tone = oldtone;
   for (pix--; pix >= limit; pix--) {
     if (pix->getPaint() == paint) break;
     tone = pix->getTone();
@@ -121,7 +122,7 @@ void fillRow(const TRasterCM32P &r, const TPoint &p, int &xa, int &xb,
           // check if the current pixel is NOT with the lowest tone among the
           // vertical neighbors as well
           if (p.y > 0 && p.y < r->getLy() - 1) {
-            TPixelCM32 *upPix   = pix - r->getWrap();
+            TPixelCM32 *upPix = pix - r->getWrap();
             TPixelCM32 *downPix = pix + r->getWrap();
             if (upPix->getTone() > pix->getTone() &&
                 downPix->getTone() > pix->getTone())
@@ -171,19 +172,141 @@ void fillRow(const TRasterCM32P &r, const TPoint &p, int &xa, int &xb,
       pix->setPaint(paint);
     }
 
-    //Make sure the up and down ref Ink Pixels can be painted
-    if (refImagePut) {
-        pix = line + xa;
-        for (n = 0; n < xb - xa + 1; n++, pix++) {
-            if (pix->isPurePaint()) {
-                TPixelCM32* upPix = pix - r->getWrap();
-                TPixelCM32* downPix = pix + r->getWrap();
-                if (upPix->getInk() == TPixelCM32::getMaxInk())
-                    upPix->setInk(paint);
-                if (downPix->getInk() == TPixelCM32::getMaxInk())
-                    downPix->setInk(paint);
-            }
+    // Make sure the up and down ref Ink Pixels can be painted
+    if (refImagePut && p.y > 0 && p.y < r->getLy() - 1) {
+      pix = line + xa;
+      for (n = 0; n < xb - xa + 1; n++, pix++) {
+        if (pix->isPurePaint()) {
+          TPixelCM32 *upPix = pix - r->getWrap();
+          TPixelCM32 *downPix = pix + r->getWrap();
+          if (upPix->getInk() == TPixelCM32::getMaxInk()) upPix->setInk(paint);
+          if (downPix->getInk() == TPixelCM32::getMaxInk())
+            downPix->setInk(paint);
         }
+      }
+    }
+  }
+}
+
+//-----------------------
+// This function fills with a given direction
+// and starts from a autoPainted pixel,
+// ends with another Ink pixel.
+// Prevailing is on for default
+// Called by extendInk2InkFill
+void fillRowInk2Ink(const TRasterCM32P &r, const TPoint &p, int &xc, int &xd,
+                    bool right, int paint, int &length, TTileSaverCM32 *saver) {
+  int dx = right ? 1 : -1;
+  const int max = 10;
+
+  TPixelCM32 *pix0 = r->pixels(p.y) + p.x;
+  assert(pix0->getInk() == paint);
+  if (pix0->getInk() != paint) return;
+  int tone, oldTone;
+
+  // Calculate in autoPaint Style area
+  TPixelCM32 *pix;
+  TPixelCM32 *tmp_limit;
+
+  pix = pix0;
+  tmp_limit = (right ? r->pixels(p.y) + r->getBounds().x0
+                     : r->pixels(p.y) + r->getBounds().x1 - 1);
+  oldTone = 0;
+  int j = 0;
+  while ((pix)->getInk() == paint) {
+    tone = pix->getTone();
+    if (tone > oldTone) break;
+    if (j > max) break;
+    pix -= dx;
+    oldTone = tone;
+    ++j;
+  }
+  xc = pix - r->pixels(p.y) + dx;
+
+  pix = pix0;
+  tmp_limit = (right ? r->pixels(p.y) + r->getBounds().x1 - 1
+                     : r->pixels(p.y) + r->getBounds().x0);
+  while ((pix)->getInk() == paint && pix != tmp_limit) {
+    pix += dx;
+  }
+  xd = pix - r->pixels(p.y) - dx;
+
+  if (xc > xd) std::swap(xc, xd);
+
+  // Out of autoPaint Ink Style area
+  pix = r->pixels(p.y) + (right ? xd : xc) + dx;
+  tmp_limit = (right ? r->pixels(p.y) + r->getBounds().x1 - 1
+                     : r->pixels(p.y) + r->getBounds().x0);
+
+  // int paintAtClickedPos = pix->getPaint();
+  bool outOfPaint = false, outOfInk = false;
+
+  int i = 0;
+  j = 0;
+  oldTone = pix->getTone();
+  while (pix != tmp_limit) {
+    tone = pix->getTone();
+    if (!pix->isPurePaint()) outOfPaint = true;
+    if (outOfPaint && tone > oldTone) outOfInk = true;
+    if (outOfInk) break;
+    pix += dx;
+    oldTone = tone;
+    if (!outOfPaint)
+      ++i;
+    else
+      ++j;
+    if (i > length) {
+      length -= 2;
+      return;
+    }
+    if (j > max) break;
+  }
+
+  pix -= dx;
+  int xa = xc, xb = xd;
+  (right ? xb : xa) = pix - r->pixels(p.y);
+
+  length = (int)((xb - xa) / 2) + 2;
+
+  if (saver) saver->save(TRect(xa, p.y, xb, p.y));
+
+  // DO Paint
+  for (pix = r->pixels(p.y) + xa; pix <= r->pixels(p.y) + xb; ++pix) {
+    pix->setPaint(paint);
+  }
+}
+
+//-----------------------------------------------------------------------------
+void extendInk2InkFill(const TRasterCM32P &r, const TPoint &p, bool right,
+                       int dy, int paint, TTileSaverCM32 *saver,
+                       int maxLength = 6) {
+  int xx = p.x;
+  int yy = p.y;
+  int xc = xx, xd = yy;
+  TPixelCM32 *pix;
+
+  while (maxLength > 0) {
+    if (xc < 0 || xd >= r->getLx()) break;
+    if (xx < 0 || xx >= r->getLx()) break;
+    if ((r->pixels(yy) + xx)->getInk() != paint) break;
+
+    fillRowInk2Ink(r, TPoint(xx, yy), xc, xd, right, paint, maxLength, saver);
+
+    yy += dy;
+    if (yy < 0 || yy >= r->getLy()) break;
+
+    if (right) {
+      for (--xc, ++xd; xc < xd; xd--) {
+        pix = r->pixels(yy) + xd;
+        if (pix->getInk() == paint && pix->isPureInk()) break;
+      }
+      xx = xd;
+    } else {
+      for (--xc, ++xd; xc < xd; xc++) {
+        pix = r->pixels(yy) + xc;
+        if (pix->getInk() == paint && pix->isPureInk()) break;
+      }
+      xx = xc;
     }
   }
 }
@@ -198,11 +321,11 @@ void findSegment(const TRaster32P &r, const TPoint &p, int &xa, int &xb,
   /* vai a destra */
   TPixel32 *line = r->pixels(p.y);
 
-  pix0     = line + p.x;
-  pix      = pix0;
-  limit    = line + r->getBounds().x1;
+  pix0 = line + p.x;
+  pix = pix0;
+  limit = line + r->getBounds().x1;
   oldmatte = pix->m;
-  matte    = oldmatte;
+  matte = oldmatte;
   for (; pix <= limit; pix++) {
     if (*pix == color) break;
     matte = pix->m;
@@ -220,10 +343,10 @@ void findSegment(const TRaster32P &r, const TPoint &p, int &xa, int &xb,
   xb = p.x + pix - pix0 - 1;
 
   /* vai a sinistra */
-  pix      = pix0;
-  limit    = line + r->getBounds().x0;
+  pix = pix0;
+  limit = line + r->getBounds().x0;
   oldmatte = pix->m;
-  matte    = oldmatte;
+  matte = oldmatte;
   for (; pix >= limit; pix--) {
     if (*pix == color) break;
     matte = pix->m;
@@ -273,8 +396,8 @@ void fullColorFindSegment(const TRaster32P &r, const TPoint &p, int &xa,
   // check to the right
   TPixel32 *line = r->pixels(p.y);
 
-  pix0  = line + p.x;  // seed pixel
-  pix   = pix0;
+  pix0 = line + p.x;  // seed pixel
+  pix = pix0;
   limit = line + r->getBounds().x1;  // right end
 
   TPixel32 oldPix = *pix;
@@ -295,8 +418,8 @@ void fullColorFindSegment(const TRaster32P &r, const TPoint &p, int &xa,
   xb = p.x + pix - pix0 - 1;
 
   // check to the left
-  pix    = pix0;                      // seed pixel
-  limit  = line + r->getBounds().x0;  // left end
+  pix = pix0;                        // seed pixel
+  limit = line + r->getBounds().x0;  // left end
   oldPix = *pix;
   for (; pix >= limit; pix--) {
     // break if the target pixel is with the same as filling color
@@ -315,7 +438,7 @@ void fullColorFindSegment(const TRaster32P &r, const TPoint &p, int &xa,
 //-----------------------------------------------------------------------------
 
 class FillSeed {
-public:
+ public:
   int m_xa, m_xb;
   int m_y, m_dy;
   FillSeed(int xa, int xb, int y, int dy)
@@ -373,7 +496,7 @@ bool floodCheck(const TPixel32 &clickColor, const TPixel32 *targetPix,
 
   if (clickColor.m == 0) {
     int oldMatte = fullColorThreshMatte(oldPix->m, fillDepth);
-    int matte    = fullColorThreshMatte(targetPix->m, fillDepth);
+    int matte = fullColorThreshMatte(targetPix->m, fillDepth);
     return matte >= oldMatte && matte != 255;
   }
   int fillDepth2 = fillDepth * fillDepth;
@@ -402,29 +525,26 @@ bool fill(const TRasterCM32P &r, const FillParameters &params,
   /*- Return if clicked outside the screen -*/
   if (!bbbox.contains(p)) return false;
   /*- If the same color has already been painted, return -*/
-  pix0                  = r->pixels(p.y) + p.x;
+  pix0 = r->pixels(p.y) + p.x;
   int paintAtClickedPos = pix0->getPaint();
   if (paintAtClickedPos == paint)
-      if (params.m_shiftFill){
-          FillParameters tmp = FillParameters(params);
-          tmp.m_styleId = 0;
-          fill(r, tmp, saver, Ref);
-          paintAtClickedPos = pix0->getPaint();
-      }
-      else return false;
+    if (params.m_shiftFill) {
+      FillParameters tmp = FillParameters(params);
+      tmp.m_styleId = 0;
+      fill(r, tmp, saver, Ref);
+      paintAtClickedPos = pix0->getPaint();
+    } else
+      return false;
   /*- If the "paint only transparent areas" option is enabled and the area is
    * already colored, return
    * -*/
-  if (params.m_emptyOnly && pix0->getPaint() != 0)
-    return false;
+  if (params.m_emptyOnly && pix0->getPaint() != 0) return false;
 
-  if (pix0->isPureInk())
-      return false;
+  if (pix0->isPureInk()) return false;
 
   bool refImagePut = Ref.getPointer();
   if (refImagePut) {
-    if (*(Ref->pixels(p.y) + p.x) != TPixel32(0, 0, 0, 0))
-          return false;
+    if (*(Ref->pixels(p.y) + p.x) != TPixel32(0, 0, 0, 0)) return false;
     if (saver) saver->save(Ref->getBounds());
     TRop::putRefImage(r, Ref);
   }
@@ -432,30 +552,30 @@ bool fill(const TRasterCM32P &r, const FillParameters &params,
   assert(fillDepth >= 0 && fillDepth < 16);
 
   switch (TPixelCM32::getMaxTone()) {
-  case 15:
-    fillDepth = (15 - fillDepth);
-    break;
-  case 255:
-    fillDepth = ((15 - fillDepth) << 4) | (15 - fillDepth);
-    break;
-  default:
-    assert(false);
+    case 15:
+      fillDepth = (15 - fillDepth);
+      break;
+    case 255:
+      fillDepth = ((15 - fillDepth) << 4) | (15 - fillDepth);
+      break;
+    default:
+      assert(false);
   }
   /*--Look at the colors in the four corners and update the saveBox if any of
    * the colors change. --*/
   TPixelCM32 borderIndex[4];
   TPixelCM32 *borderPix[4];
-  pix            = r->pixels(0);
-  borderPix[0]   = pix;
+  pix = r->pixels(0);
+  borderPix[0] = pix;
   borderIndex[0] = *pix;
   pix += r->getLx() - 1;
-  borderPix[1]   = pix;
+  borderPix[1] = pix;
   borderIndex[1] = *pix;
-  pix            = r->pixels(r->getLy() - 1);
-  borderPix[2]   = pix;
+  pix = r->pixels(r->getLy() - 1);
+  borderPix[2] = pix;
   borderIndex[2] = *pix;
   pix += r->getLx() - 1;
-  borderPix[3]   = pix;
+  borderPix[3] = pix;
   borderIndex[3] = *pix;
 
   std::stack<FillSeed> seeds;
@@ -469,21 +589,21 @@ bool fill(const TRasterCM32P &r, const FillParameters &params,
     FillSeed fs = seeds.top();
     seeds.pop();
 
-    xa   = fs.m_xa;
-    xb   = fs.m_xb;
+    xa = fs.m_xa;
+    xb = fs.m_xb;
     oldy = fs.m_y;
-    dy   = fs.m_dy;
-    y    = oldy + dy;
+    dy = fs.m_dy;
+    y = oldy + dy;
     if (y > bbbox.y1 || y < bbbox.y0) continue;
     pix = pix0 = r->pixels(y) + xa;
-    limit      = r->pixels(y) + xb;
-    oldpix     = r->pixels(oldy) + xa;
-    x          = xa;
-    oldxd      = (std::numeric_limits<int>::min)();
-    oldxc      = (std::numeric_limits<int>::max)();
+    limit = r->pixels(y) + xb;
+    oldpix = r->pixels(oldy) + xa;
+    x = xa;
+    oldxd = (std::numeric_limits<int>::min)();
+    oldxc = (std::numeric_limits<int>::max)();
     while (pix <= limit) {
       oldtone = threshTone(*oldpix, fillDepth);
-      tone    = threshTone(*pix, fillDepth);
+      tone = threshTone(*pix, fillDepth);
       // the last condition is added in order to prevent fill area from
       // protruding behind the colored line
       if (pix->getPaint() != paint && tone <= oldtone && tone != 0 &&
@@ -538,7 +658,7 @@ void fill(const TRaster32P &ras, const TRaster32P &ref,
 
   if (!bbbox.contains(params.m_p)) return;
 
-  TPaletteP plt  = params.m_palette;
+  TPaletteP plt = params.m_palette;
   TPixel32 color = plt->getStyle(params.m_styleId)->getMainColor();
   int fillDepth =
       params.m_shiftFill ? params.m_maxFillDepth : params.m_minFillDepth;
@@ -551,12 +671,12 @@ void fill(const TRaster32P &ras, const TRaster32P &ref,
   // it means that I filled the bg and the savebox needs to be recomputed!
   TPixel32 borderIndex;
   TPixel32 *borderPix = 0;
-  pix                 = workRas->pixels(0);
+  pix = workRas->pixels(0);
   int i;
   for (i = 0; i < workRas->getLx(); i++, pix++)  // border down
     if (pix->m == 0) {
       borderIndex = *pix;
-      borderPix   = pix;
+      borderPix = pix;
       break;
     }
   if (borderPix == 0)  // not found in border down...try border up (avoid left
@@ -566,7 +686,7 @@ void fill(const TRaster32P &ras, const TRaster32P &ref,
     for (i = 0; i < workRas->getLx(); i++, pix++)  // border up
       if (pix->m == 0) {
         borderIndex = *pix;
-        borderPix   = pix;
+        borderPix = pix;
         break;
       }
   }
@@ -584,21 +704,21 @@ void fill(const TRaster32P &ras, const TRaster32P &ref,
     FillSeed fs = seeds.top();
     seeds.pop();
 
-    xa   = fs.m_xa;
-    xb   = fs.m_xb;
+    xa = fs.m_xa;
+    xb = fs.m_xb;
     oldy = fs.m_y;
-    dy   = fs.m_dy;
-    y    = oldy + dy;
+    dy = fs.m_dy;
+    y = oldy + dy;
     if (y > bbbox.y1 || y < bbbox.y0) continue;
     pix = pix0 = workRas->pixels(y) + xa;
-    limit      = workRas->pixels(y) + xb;
-    oldpix     = workRas->pixels(oldy) + xa;
-    x          = xa;
-    oldxd      = (std::numeric_limits<int>::min)();
-    oldxc      = (std::numeric_limits<int>::max)();
+    limit = workRas->pixels(y) + xb;
+    oldpix = workRas->pixels(oldy) + xa;
+    x = xa;
+    oldxd = (std::numeric_limits<int>::min)();
+    oldxc = (std::numeric_limits<int>::max)();
     while (pix <= limit) {
-      oldMatte  = threshMatte(oldpix->m, fillDepth);
-      matte     = threshMatte(pix->m, fillDepth);
+      oldMatte = threshMatte(oldpix->m, fillDepth);
+      matte = threshMatte(pix->m, fillDepth);
       bool test = false;
       if (segments.find(y) != segments.end())
         test = isPixelInSegment(segments[y], x);
@@ -628,7 +748,7 @@ void fill(const TRaster32P &ras, const TRaster32P &ref,
 
   std::map<int, std::vector<std::pair<int, int>>>::iterator it;
   for (it = segments.begin(); it != segments.end(); it++) {
-    TPixel32 *line    = ras->pixels(it->first);
+    TPixel32 *line = ras->pixels(it->first);
     TPixel32 *refLine = 0;
     TPixel32 *refPix;
     if (ref) refLine = ref->pixels(it->first);
@@ -735,7 +855,7 @@ void fullColorFill(const TRaster32P &ras, const FillParameters &params,
 
   TPixel32 clickedPosColor = *(ras->pixels(y) + x);
 
-  TPaletteP plt  = params.m_palette;
+  TPaletteP plt = params.m_palette;
   TPixel32 color = plt->getStyle(params.m_styleId)->getMainColor();
 
   if (clickedPosColor == color) return;
@@ -763,11 +883,11 @@ void fullColorFill(const TRaster32P &ras, const FillParameters &params,
     FillSeed fs = seeds.top();
     seeds.pop();
 
-    xa   = fs.m_xa;
-    xb   = fs.m_xb;
+    xa = fs.m_xa;
+    xb = fs.m_xb;
     oldy = fs.m_y;
-    dy   = fs.m_dy;
-    y    = oldy + dy;
+    dy = fs.m_dy;
+    y = oldy + dy;
     // continue if the fill runs over image bounding
     if (y > bbbox.y1 || y < bbbox.y0) continue;
     // left end of the pixels to be filled
@@ -777,7 +897,7 @@ void fullColorFill(const TRaster32P &ras, const FillParameters &params,
     // left end of the fill seed pixels
     oldpix = ras->pixels(oldy) + xa;
 
-    x     = xa;
+    x = xa;
     oldxd = (std::numeric_limits<int>::min)();
     oldxc = (std::numeric_limits<int>::max)();
 
@@ -823,8 +943,8 @@ void fullColorFill(const TRaster32P &ras, const FillParameters &params,
 
   std::map<int, std::vector<std::pair<int, int>>>::iterator it;
   for (it = segments.begin(); it != segments.end(); it++) {
-    TPixel32 *line                                 = ras->pixels(it->first);
-    TPixel32 *refLine                              = 0;
+    TPixel32 *line = ras->pixels(it->first);
+    TPixel32 *refLine = 0;
     std::vector<std::pair<int, int>> segmentVector = it->second;
     for (int i = 0; i < (int)segmentVector.size(); i++) {
       std::pair<int, int> segment = segmentVector[i];
