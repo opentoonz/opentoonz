@@ -73,8 +73,8 @@ inline T overPixT(const T &bot, const T &top) {
   UINT max = T::maxChannelValue;
 
   if (top.m == max) return top;
-
   if (top.m == 0) return bot;
+  if (bot.m == 0) return top;
 
   TUINT32 r = top.r + bot.r * (max - top.m) / max;
   TUINT32 g = top.g + bot.g * (max - top.m) / max;
@@ -88,8 +88,8 @@ template <>
 inline TPixelF overPixT<TPixelF, float>(const TPixelF &bot,
                                         const TPixelF &top) {
   if (top.m >= 1.f) return top;
-
   if (top.m <= 0.f) return bot;
+  if (bot.m <= 0.f) return top;
 
   float r = top.r + bot.r * (1.f - top.m);
   float g = top.g + bot.g * (1.f - top.m);
