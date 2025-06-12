@@ -8,7 +8,7 @@
 #include "skeletonlut.h"
 #include <set>
 
-#define AUT_SPOT_SAMPLES 40
+//#define AUT_SPOT_SAMPLES 40
 using namespace SkeletonLut;
 
 class TAutocloser::Imp {
@@ -18,6 +18,7 @@ public:
     UCHAR m_preseed;
     Seed(UCHAR *ptr, UCHAR preseed) : m_ptr(ptr), m_preseed(preseed) {}
   };
+  UINT m_aut_spot_samples;
 
   int m_closingDistance;
   double m_spotAngle;
@@ -537,11 +538,14 @@ void TAutocloser::Imp::findMeetingPoints(
     std::vector<TPoint> &endpoints, std::vector<Segment> &closingSegments) {
   int i;
   double alfa;
-  alfa  = m_spotAngle / AUT_SPOT_SAMPLES;
-  m_csp = cos(m_spotAngle / 5);
-  m_snp = sin(m_spotAngle / 5);
-  m_csm = cos(-m_spotAngle / 5);
-  m_snm = sin(-m_spotAngle / 5);
+  m_aut_spot_samples = (UINT)m_spotAngle;
+
+  m_spotAngle *= (M_PI / 180.0);
+  alfa  = m_spotAngle / m_aut_spot_samples;
+  m_csp = cos(m_spotAngle);
+  m_snp = sin(m_spotAngle);
+  m_csm = cos(-m_spotAngle);
+  m_snm = sin(-m_spotAngle);
   m_csa = cos(alfa);
   m_sna = sin(alfa);
   m_csb = cos(-alfa);
@@ -751,8 +755,7 @@ bool TAutocloser::Imp::exploreSpot(const Segment &s, TPoint &p) {
 
   x2a = x2b = (double)x2;
   y2a = y2b = (double)y2;
-
-  for (i = 0; i < AUT_SPOT_SAMPLES; i++) {
+  for (i = 0; i < m_aut_spot_samples; i++) {
     xnewa = x1 + (x2a - x1) * m_csa - (y2a - y1) * m_sna;
     ynewa = y1 + (y2a - y1) * m_csa + (x2a - x1) * m_sna;
     x3    = tround(xnewa);
