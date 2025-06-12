@@ -1,13 +1,14 @@
 
 
+//#define AUTOCLOSE_DEBUG
+
 #include "texception.h"
 #include "toonz/autoclose.h"
 #include "trastercm.h"
 #include "skeletonlut.h"
 #include <set>
 
-#define AUT_SPOT_SAMPLES 10
-
+#define AUT_SPOT_SAMPLES 40
 using namespace SkeletonLut;
 
 class TAutocloser::Imp {
@@ -33,6 +34,9 @@ public:
   int m_visited;
 
   double m_csp, m_snp, m_csm, m_snm, m_csa, m_sna, m_csb, m_snb;
+
+  // For Debug
+  std::vector<Segment> *m_currentClosingSegments;
 
   Imp(const TRasterP &r, int distance = 10, double angle = M_PI_2,
       int index = 0, int opacity = 0)
@@ -482,7 +486,6 @@ int TAutocloser::Imp::notInsidePath(const TPoint &p, const TPoint &q) {
 }
 
 /*------------------------------------------------------------------------*/
-
 int TAutocloser::Imp::exploreTwoSpots(const TAutocloser::Segment &s0,
                                       const TAutocloser::Segment &s1) {
   int x1a, y1a, x2a, y2a, x3a, y3a, x1b, y1b, x2b, y2b, x3b, y3b;
@@ -494,7 +497,10 @@ int TAutocloser::Imp::exploreTwoSpots(const TAutocloser::Segment &s0,
 
   TPoint p0aux = s0.second;
   TPoint p1aux = s1.second;
-
+#ifdef AUTOCLOSE_DEBUG
+  m_currentClosingSegments->push_back(s0);
+  m_currentClosingSegments->push_back(s1);
+#endif
   if (x1a == p0aux.x && y1a == p0aux.y) return 0;
   if (x1b == p1aux.x && y1b == p1aux.y) return 0;
 
@@ -507,6 +513,13 @@ int TAutocloser::Imp::exploreTwoSpots(const TAutocloser::Segment &s0,
   y2b = tround(y1b + (p1aux.x - x1b) * m_snp + (p1aux.y - y1b) * m_csp);
   x3b = tround(x1b + (p1aux.x - x1b) * m_csm - (p1aux.y - y1b) * m_snm);
   y3b = tround(y1b + (p1aux.x - x1b) * m_snm + (p1aux.y - y1b) * m_csm);
+
+#ifdef AUTOCLOSE_DEBUG
+  m_currentClosingSegments->push_back(Segment(s0.first, TPoint(x2a, y2a)));
+  m_currentClosingSegments->push_back(Segment(s0.first, TPoint(x3a, y3a)));
+  m_currentClosingSegments->push_back(Segment(s1.first, TPoint(x2b, y2b)));
+  m_currentClosingSegments->push_back(Segment(s1.first, TPoint(x3b, y3b)));
+#endif
 
   return (intersect_triangle(x1a, y1a, p0aux.x, p0aux.y, x2a, y2a, x1b, y1b,
                              p1aux.x, p1aux.y, x2b, y2b) ||
@@ -539,13 +552,15 @@ void TAutocloser::Imp::findMeetingPoints(
     orientedEndpoints[i].first = endpoints[i];
 
   int size = -1;
-
+#ifdef AUTOCLOSE_DEBUG
+  m_currentClosingSegments = &closingSegments;
+#endif
   while ((int)closingSegments.size() > size && !orientedEndpoints.empty()) {
     size = closingSegments.size();
     do
       calculateWeightAndDirection(orientedEndpoints);
     while (spotResearchTwoPoints(orientedEndpoints, closingSegments));
-    
+
     do
       calculateWeightAndDirection(orientedEndpoints);
     while (spotResearchOnePoint(orientedEndpoints, closingSegments));
@@ -742,13 +757,17 @@ bool TAutocloser::Imp::exploreSpot(const Segment &s, TPoint &p) {
     ynewa = y1 + (y2a - y1) * m_csa + (x2a - x1) * m_sna;
     x3    = tround(xnewa);
     y3    = tround(ynewa);
+#ifdef AUTOCLOSE_DEBUG
+    m_currentClosingSegments->push_back(
+        Segment(s.first, TPoint(tround(xnewa), tround(ynewa))));
+#else
     if ((x3 != tround(x2a) || y3 != tround(y2a)) && x3 > 0 && x3 < lx &&
         y3 > 0 && y3 < ly &&
         exploreRay(
             getPtr(x1, y1),
             Segment(TPoint(x1, y1), TPoint(tround(xnewa), tround(ynewa))), p))
       return true;
-
+#endif
     x2a = xnewa;
     y2a = ynewa;
 
@@ -756,17 +775,25 @@ bool TAutocloser::Imp::exploreSpot(const Segment &s, TPoint &p) {
     ynewb = y1 + (y2b - y1) * m_csb + (x2b - x1) * m_snb;
     x3    = tround(xnewb);
     y3    = tround(ynewb);
+#ifdef AUTOCLOSE_DEBUG
+    m_currentClosingSegments->push_back(
+        Segment(s.first, TPoint(tround(xnewb), tround(ynewb))));
+#else
     if ((x3 != tround(x2b) || y3 != tround(y2b)) && x3 > 0 && x3 < lx &&
         y3 > 0 && y3 < ly &&
         exploreRay(
             getPtr(x1, y1),
             Segment(TPoint(x1, y1), TPoint(tround(xnewb), tround(ynewb))), p))
       return true;
-
+#endif
     x2b = xnewb;
     y2b = ynewb;
   }
+#ifdef AUTOCLOSE_DEBUG
+  return true;
+#else
   return false;
+#endif
 }
 
 /*------------------------------------------------------------------------*/
