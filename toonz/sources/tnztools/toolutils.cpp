@@ -33,6 +33,8 @@
 #include "toonz/preferences.h"
 #include "toonz/palettecontroller.h"
 #include "toonz/txshchildlevel.h"
+#include "toonz/stage2.h"
+#include "toonz/autoclose.h"
 
 #include "toonzqt/tselectionhandle.h"
 #include "toonzqt/icongenerator.h"
@@ -228,7 +230,15 @@ void ToolUtils::drawCross(const TPointD &q, double pixelSize) {
   glEnd();
 }
 
+
 //-----------------------------------------------------------------------------
+void ToolUtils::drawLine(const TPointD &p0, const TPointD p1) {
+  glBegin(GL_LINE_STRIP);
+  glVertex2d(p0.x, p0.y);
+  glVertex2d(p1.x, p1.y);
+  glEnd();
+}
+    //-----------------------------------------------------------------------------
 
 void ToolUtils::drawArrow(const TSegment &s, double pixelSize) {
   TPointD v, vn;
@@ -606,6 +616,8 @@ void ToolUtils::TToolUndo::notifyImageChanged() const {
     std::string id = m_level->getImageId(m_frameId) + "_rasterized";
     ImageManager::instance()->invalidate(id);
   }
+  if(ToonzCheck::instance()->getChecks() & ToonzCheck::eAutoclose)
+    TAutocloser::invalidateSegmentCache(m_level->getImageId(m_frameId));
 }
 
 //------------------------------------------------------------------------------------------

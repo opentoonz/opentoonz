@@ -5,6 +5,7 @@
 
 // TnzLib includes
 #include "toonz/stage.h"
+#include "toonz/autoclose.h"
 
 #undef DVAPI
 #undef DVVAR
@@ -49,6 +50,7 @@ public:
     eInksOnly     = 0x40,  //!< Inks only (transparent paints).
     eInk1         = 0x80   //!< Ink#1 check (show style#1 on inks).
   };
+  AutocloseSettings autoCloseSettings;
 
 public:
   static ToonzCheck *instance();
@@ -72,8 +74,17 @@ public:
     return true;
   }
 
-private:
-  int m_mask;
+  AutocloseSettings getAutocloseSettings() {
+    return autoCloseSettings;
+  };
+
+  void setAutocloseSettings(int distance, double angle, int opacity,
+                            bool ignoreAP) {
+    autoCloseSettings =
+        AutocloseSettings(distance, angle, opacity, ignoreAP);
+  }
+
+  private : int m_mask;
   int m_colorIndex;
 
 private:
