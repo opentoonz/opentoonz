@@ -35,7 +35,7 @@ using namespace ToolUtils;
 
 TEnv::StringVar AutocloseVectorType("InknpaintAutocloseVectorType", "Normal");
 TEnv::DoubleVar AutocloseDistance("InknpaintAutocloseDistance", 10.0);
-TEnv::DoubleVar AutocloseAngle("InknpaintAutocloseAngle", 1.0);
+TEnv::DoubleVar AutocloseAngle("InknpaintAutocloseAngle", 60);
 TEnv::IntVar AutocloseRange("InknpaintAutocloseRange", 0);
 TEnv::IntVar AutocloseOpacity("InknpaintAutocloseOpacity", 255);
 TEnv::IntVar AutocloseIgnoreAutoPaint("AutocloseIgnoreAutoPaint", 0);
