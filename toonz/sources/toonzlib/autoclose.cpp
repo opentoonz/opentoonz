@@ -21,7 +21,7 @@ public:
   UINT m_aut_spot_samples;
 
   int m_closingDistance;
-  double m_spotAngle;
+  double m_spotAngle;  // Half Value
   int m_inkIndex;
   int m_opacity;
   TRasterP m_raster;
@@ -45,7 +45,7 @@ public:
       , m_spotAngle(angle)
       , m_closingDistance(distance)
       , m_inkIndex(index)
-      , m_opacity(opacity){}
+      , m_opacity(opacity) {}
 
   ~Imp() {}
 
@@ -552,7 +552,7 @@ void TAutocloser::Imp::findMeetingPoints(
   m_snb = sin(-alfa);
 
   std::vector<Segment> orientedEndpoints(endpoints.size());
-  for (i                       = 0; i < (int)endpoints.size(); i++)
+  for (i = 0; i < (int)endpoints.size(); i++)
     orientedEndpoints[i].first = endpoints[i];
 
   int size = -1;
@@ -593,7 +593,7 @@ bool TAutocloser::Imp::spotResearchTwoPoints(
   while (current < (int)endpoints.size() - 1) {
     found = 0;
     for (i = current + 1; i < (int)marks.size(); i++) marks[i] = false;
-    distance                                                   = 0;
+    distance = 0;
 
     while (!found && (distance <= sqrDistance) && !allMarked(marks, current)) {
       closerIndex = closerPoint(endpoints, marks, current);
@@ -717,7 +717,8 @@ bool TAutocloser::Imp::spotResearchOnePoint(
       Segment segment(endpoints[count].first, p);
       std::vector<Segment>::iterator it =
           std::find(closingSegments.begin(), closingSegments.end(), segment);
-      if (it == closingSegments.end() && notInsidePath(endpoints[count].first, p)) {
+      if (it == closingSegments.end() &&
+          notInsidePath(endpoints[count].first, p)) {
         ret = true;
         drawInByteRaster(endpoints[count].first, p);
         closingSegments.push_back(Segment(endpoints[count].first, p));
@@ -1164,12 +1165,13 @@ std::mutex TAutocloser::m_mutex;
 
 TAutocloser::TAutocloser(const TRasterP &r, int distance, double angle, int ink,
                          int opacity, std::set<int> autoPaints)
-    : m_imp(new Imp(r, distance, angle, ink, opacity))
+    : m_imp(new Imp(r, distance, angle / 2, ink, opacity))
     , m_autoPaintStyles(autoPaints) {}
 
 TAutocloser::TAutocloser(const TRasterP &r, int ink, const AutocloseSettings st,
                          std::set<int> autoPaints)
-    : m_imp(new Imp(r, st.m_closingDistance, st.m_spotAngle, ink, st.m_opacity))
+    : m_imp(new Imp(r, st.m_closingDistance, st.m_spotAngle / 2, ink,
+                    st.m_opacity))
     , m_autoPaintStyles(autoPaints) {}
 //...............................
 

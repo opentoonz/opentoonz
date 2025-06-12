@@ -140,7 +140,7 @@ public:
       : TTool("T_Tape")
       , m_closeType("Type:")                    // W_ToolOptions_CloseType
       , m_distance("Distance:", 1, 100, 10)     // W_ToolOptions_Distance
-      , m_angle("Angle:", 1, 180, 60)           // W_ToolOptions_Angle
+      , m_angle("Angle:", 1, 360, 60)           // W_ToolOptions_Angle
       , m_inkIndex("Style Index:", L"current")  // W_ToolOptions_InkIndex
       , m_opacity("Opacity:", 1, 255, 255)
       , m_multi("Frame Range", false)  // W_ToolOptions_FrameRange
