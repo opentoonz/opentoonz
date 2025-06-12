@@ -540,7 +540,8 @@ bool fill(const TRasterCM32P &r, const FillParameters &params,
   /*- If the "paint only transparent areas" option is enabled and the area is
    * already colored, return
    * -*/
-  if (params.m_emptyOnly && pix0->getPaint() != 0) return false;
+  if (params.m_emptyOnly && pix0->getPaint() != 0 && !params.m_shiftFill)
+    return false;
 
   if (pix0->isPureInk()) return false;
 
