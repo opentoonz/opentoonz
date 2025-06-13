@@ -9,7 +9,7 @@
 #include <ttoonzimage.h>
 #include <tstroke.h>
 #include <toonz/strokegenerator.h>
-
+#include "toonz/preferences.h"
 #include <tools/tool.h>
 #include <tools/cursors.h>
 
@@ -90,16 +90,13 @@ public:
 //    Brush Tool declaration
 //************************************************************************
 
-class ToonzVectorBrushTool final : public TTool,
-                                   public TInputHandler
-{
+class ToonzVectorBrushTool final : public TTool, public TInputHandler {
   Q_DECLARE_TR_FUNCTIONS(ToonzVectorBrushTool)
 
 public:
   ToonzVectorBrushTool(std::string name, int targetType);
 
-  ToolType getToolType() const override
-    { return TTool::LevelWriteTool; }
+  ToolType getToolType() const override { return TTool::LevelWriteTool; }
   unsigned int getToolHints() const override;
 
   ToolOptionsBox *createOptionsBox() override;
@@ -120,7 +117,9 @@ public:
                       const TInputState &state) override;
   void inputSetBusy(bool busy) override;
   void inputPaintTracks(const TTrackList &tracks) override;
-  void inputInvalidateRect(const TRectD &bounds) override { invalidate(bounds); }
+  void inputInvalidateRect(const TRectD &bounds) override {
+    invalidate(bounds);
+  }
   TTool *inputGetTool() override { return this; };
 
   void draw() override;
@@ -131,7 +130,9 @@ public:
   int getCursorId() const override {
     if (m_viewer && m_viewer->getGuidedStrokePickerMode())
       return m_viewer->getGuidedStrokePickerCursor();
-    return ToolCursor::PenCursor;
+    return Preferences::instance()->isUseStrokeEndCursor()
+                 ? ToolCursor::CURSOR_NONE
+                 : ToolCursor::PenCursor;
   }
 
   TPropertyGroup *getProperties(int targetType) override;
@@ -162,14 +163,14 @@ public:
 
 protected:
   typedef std::vector<StrokeGenerator> TrackList;
-  typedef std::vector<TStroke*> StrokeList;
+  typedef std::vector<TStroke *> StrokeList;
   void deleteStrokes(StrokeList &strokes);
   void copyStrokes(StrokeList &dst, const StrokeList &src);
 
   void snap(const TPointD &pos, bool snapEnabled, bool withSelfSnap = false);
 
   void updateModifiers();
-  
+
   enum MouseEventType { ME_DOWN, ME_DRAG, ME_UP, ME_MOVE };
   void handleMouseEvent(MouseEventType type, const TPointD &pos,
                         const TMouseEvent &e);
@@ -204,7 +205,7 @@ protected:
   TSmartPointerT<TModifierTest> m_modifierTest;
 #endif
   TInputModifier::List m_modifierReplicate;
-  
+
   TrackList m_tracks;
   TrackList m_rangeTracks;
   StrokeList m_firstStrokes;
@@ -214,23 +215,21 @@ protected:
   double m_minThick, m_maxThick;
 
   // for snapping and framerange
-  int m_col, m_firstFrame, m_veryFirstFrame,
-      m_veryFirstCol, m_targetType;
+  int m_col, m_firstFrame, m_veryFirstFrame, m_veryFirstCol, m_targetType;
   double m_pixelSize, m_minDistance2;
-  
+
   bool m_snapped;
   bool m_snappedSelf;
   TPointD m_snapPoint;
   TPointD m_snapPointSelf;
-  
+
   TPointD m_mousePos;  //!< Current mouse position, in world coordinates.
   TPointD m_brushPos;  //!< World position the brush will be painted at.
 
   VectorBrushPresetManager
       m_presetsManager;  //!< Manager for presets of this tool instance
 
-  bool m_active, m_firstTime, m_isPath,
-       m_presetsLoaded, m_firstFrameRange;
+  bool m_active, m_firstTime, m_isPath, m_presetsLoaded, m_firstFrameRange;
 
   bool m_propertyUpdating;
 };
