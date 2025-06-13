@@ -5,6 +5,10 @@
 #include "toonz/rasterbrush.h"
 #include "trop.h"
 
+#include <stack>
+#include <memory>
+#include <algorithm>
+
 RasterStrokeGenerator::RasterStrokeGenerator(const TRasterCM32P &raster,
                                              Tasks task, ColorType colorType,
                                              int styleId, const TThickPoint &p,
@@ -188,6 +192,91 @@ void RasterStrokeGenerator::placeOver(const TRasterCM32P &out,
   TRasterCM32P rOut = out->extract(box);
   TRect box2        = box - p;
   TRasterCM32P rIn  = in->extract(box2);
+  TRect box3        = rOut->getBounds();
+  if (m_task == PAINTBRUSH && m_colorType == PAINT) {
+    TPoint center = in->getCenter() - p;
+    if (!box3.contains(center)) center = rIn->getCenter();
+    int lx = rOut->getLx();
+    int ly = rOut->getLy();
+    std::stack<TPoint> stack;
+    stack.push(center);
+    std::unique_ptr<bool[]> visited(new bool[ly * lx]());
+    auto isBoundary = [&](int x, int y) {
+      if (!box3.contains(TPoint(x, y))) return true;
+
+      int toPaint = (rIn->pixels(y) + x)->getInk();
+      if (!m_selective && !toPaint) return true;
+
+      TPixelCM32 *pix  = rOut->pixels(y) + x;
+      int paintIdx     = pix->getPaint();
+      bool changePaint = (!m_selective && !m_modifierLockAlpha) ||
+                         (m_selective && toPaint != 0) ||
+                         (m_modifierLockAlpha && paintIdx != 0);
+      return !changePaint;
+    };
+
+    while (!stack.empty()) {
+      bool visitedLine = false;
+      TPoint p         = stack.top();
+      stack.pop();
+      int x = p.x, y = p.y;
+      TPixelCM32 *x0 = rOut->pixels(y);
+      int tone;
+      int left = x, right = x;
+      int oldTone = (x0 + left)->getTone();
+      while (left >= 0 && !isBoundary(left, y) && !visited[y * lx + left]) {
+        tone = (x0 + left)->getTone();
+        if (tone > oldTone) break;
+        --left;
+        oldTone = tone;
+      }
+      ++left;
+
+      oldTone = (x0 + right)->getTone();
+      while (right < lx && !isBoundary(right, y) && !visited[y * lx + right]) {
+        tone = (x0 + right)->getTone();
+        if (tone > oldTone) break;
+        ++right;
+        oldTone = tone;
+      }
+      --right;
+
+      for (int i = left; i <= right; ++i) {
+        if (visited[y * lx + i]) continue;
+        visited[y * lx + i] = true;
+
+        TPixelCM32 *inPix  = rIn->pixels(y) + i;
+        TPixelCM32 *outPix = rOut->pixels(y) + i;
+
+        if (!inPix->isPureInk()) continue;
+
+        int paintIdx     = outPix->getPaint();
+        bool changePaint = (!m_selective && !m_modifierLockAlpha) ||
+                           (m_selective && paintIdx == 0) ||
+                           (m_modifierLockAlpha && paintIdx != 0);
+
+        if (changePaint)
+          *outPix =
+              TPixelCM32(outPix->getInk(), inPix->getInk(), outPix->getTone());
+      }
+
+      for (int dy = -1; dy <= 1; dy += 2) {
+        int ny = y + dy;
+        if (ny < 0 || ny >= ly) continue;
+
+        for (int i = left; i <= right; ++i) {
+          TPixelCM32 *outPix = rOut->pixels(ny) + i;
+          TPixelCM32 *oldPix = rOut->pixels(y) + i;
+          tone               = outPix->getTone();
+          oldTone            = oldPix->getTone();
+
+          if (tone <= oldTone && !visited[ny * lx + i])
+            stack.push(TPoint(i, ny));
+        }
+      }
+    }
+  }
+
   for (int y = 0; y < rOut->getLy(); y++) {
     /*--Finger Tool Boundary Conditions --*/
     if (m_task == FINGER && (y == 0 || y == rOut->getLy() - 1)) continue;
@@ -268,17 +357,16 @@ void RasterStrokeGenerator::placeOver(const TRasterCM32P &out,
         if (m_colorType == INK)
           *outPix = TPixelCM32(inPix->getInk(), outPix->getPaint(),
                                outPix->getTone());
-        if (m_colorType == PAINT)
+        /*if (m_colorType == PAINT)
           if (changePaint)
             *outPix = TPixelCM32(outPix->getInk(), inPix->getInk(),
-                                 outPix->getTone());
+                                 outPix->getTone());*/
         if (m_colorType == INKNPAINT)
           *outPix =
               TPixelCM32(inPix->getInk(),
                          changePaint ? inPix->getInk() : outPix->getPaint(),
                          outPix->getTone());
       }
-
       /*-- Finger tool --*/
       else if (m_task == FINGER) {
         /*-- Boundary Conditions --*/
