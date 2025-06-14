@@ -191,8 +191,9 @@ void RasterStrokeGenerator::placeOver(const TRasterCM32P &out,
   TRasterCM32P rOut = out->extract(box);
   TRect box2        = box - p;
   TRasterCM32P rIn  = in->extract(box2);
+  TRect box3        = rOut->getBounds();
   if (m_task == PAINTBRUSH && m_colorType == PAINT) {
-    TPoint center = in->getCenter();
+    TPoint center = rOut->getCenter();
     int lx        = rOut->getLx();
     int ly        = rOut->getLy();
     std::stack<TPoint> stack;
@@ -204,7 +205,7 @@ void RasterStrokeGenerator::placeOver(const TRasterCM32P &out,
       int tone = 255, oldTone = 255;
       for (int dx = 0;; dx++) {
         int px = x + dx;
-        if (!box2.contains(TPoint(px, y))) break;
+        if (!box3.contains(TPoint(px, y))) break;
         TPixelCM32 *pix = rOut->pixels(y) + px;
         tone            = pix->getTone();
         if (tone < oldTone) {
@@ -218,7 +219,7 @@ void RasterStrokeGenerator::placeOver(const TRasterCM32P &out,
       oldTone = 255;
       for (int dx = -1;; dx--) {
         int px = x + dx;
-        if (!box2.contains(TPoint(px, y))) break;
+        if (!box3.contains(TPoint(px, y))) break;
         TPixelCM32 *pix = rOut->pixels(y) + px;
         tone            = pix->getTone();
         if (tone <= oldTone) {
@@ -231,11 +232,11 @@ void RasterStrokeGenerator::placeOver(const TRasterCM32P &out,
     }
     minTone         = (minTone + maxTone) / 2 * 0.8;
     auto isBoundary = [&](int x, int y) {
-      if (!box2.contains(TPoint(x, y))) return true;
+      if (!box3.contains(TPoint(x, y))) return true;
       TPixelCM32 *pix  = rOut->pixels(y) + x;
       int tone         = pix->getTone();
       int paintIdx     = pix->getPaint();
-      int toPaint      = (in->pixels(y) + x)->getInk();
+      int toPaint      = (rIn->pixels(y) + x)->getInk();
       bool changePaint = (!m_selective && !m_modifierLockAlpha) ||
                          (m_selective && toPaint != 0) ||
                          (m_modifierLockAlpha && paintIdx != 0);
@@ -246,7 +247,7 @@ void RasterStrokeGenerator::placeOver(const TRasterCM32P &out,
       TPoint p = stack.top();
       stack.pop();
       int x = p.x, y = p.y;
-      if (!box2.contains(TPoint(x, y))) continue;
+      if (!box3.contains(TPoint(x, y))) continue;
       minTone  = minTone > 50 ? minTone - 5 : 50;
       int left = x;
       while (left >= 0 && !isBoundary(left, y) && !visited[y][left]) {
