@@ -54,6 +54,7 @@ void fillRow(const TRasterCM32P &r, const TPoint &p, int &xa, int &xb,
   oldtone = pix->getTone();
   tone = oldtone;
   for (; pix <= limit; pix++) {
+    if (DEF_REGION_WITH_PAINT && pix->getPaint() != paintAtClickPos) break;
     if (pix->getPaint() == paint) break;
     tone = pix->getTone();
     if (tone == 0) break;
@@ -90,6 +91,7 @@ void fillRow(const TRasterCM32P &r, const TPoint &p, int &xa, int &xb,
     tmp_limit = pix + 10;  // edge stop fill == 10 per default
     if (limit > tmp_limit) limit = tmp_limit;
     for (; pix <= limit; pix++) {
+      if (DEF_REGION_WITH_PAINT && pix->getPaint() != paintAtClickPos) break;
       if (pix->getPaint() == paint) break;
       if (pix->getTone() != 0) break;
     }
@@ -104,6 +106,7 @@ void fillRow(const TRasterCM32P &r, const TPoint &p, int &xa, int &xb,
   oldtone = pix->getTone();
   tone = oldtone;
   for (pix--; pix >= limit; pix--) {
+    if (DEF_REGION_WITH_PAINT && pix->getPaint() != paintAtClickPos) break;
     if (pix->getPaint() == paint) break;
     tone = pix->getTone();
     if (tone == 0) break;
@@ -140,6 +143,7 @@ void fillRow(const TRasterCM32P &r, const TPoint &p, int &xa, int &xb,
     tmp_limit = pix - 10;
     if (limit < tmp_limit) limit = tmp_limit;
     for (; pix >= limit; pix--) {
+      if (DEF_REGION_WITH_PAINT && pix->getPaint() != paintAtClickPos) break;
       if (pix->getPaint() == paint) break;
       if (pix->getTone() != 0) break;
     }
@@ -167,20 +171,25 @@ void fillRow(const TRasterCM32P &r, const TPoint &p, int &xa, int &xb,
           }
         }
       }
-      if (refImagePut && pix->getInk() == TPixelCM32::getMaxInk())
+      if (refImagePut && pix->getInk() == TPixelCM32::getMaxInk() &&
+          !DEF_REGION_WITH_PAINT)
         pix->setInk(paint);
       pix->setPaint(paint);
     }
 
-    // Make sure the up and down ref Ink Pixels can be painted
-    if (refImagePut && p.y > 0 && p.y < r->getLy() - 1) {
+    // Make sure the Surround ref Ink Pixels can be painted
+    if (refImagePut && !DEF_REGION_WITH_PAINT && p.y > 0 &&
+        p.y < r->getLy() - 1) {
       pix = line + xa;
       for (n = 0; n < xb - xa + 1; n++, pix++) {
         if (pix->isPurePaint()) {
           TPixelCM32 *upPix = pix - r->getWrap();
           TPixelCM32 *downPix = pix + r->getWrap();
-          if (upPix->getInk() == TPixelCM32::getMaxInk()) upPix->setInk(paint);
-          if (downPix->getInk() == TPixelCM32::getMaxInk())
+          if (upPix->getInk() == TPixelCM32::getMaxInk() &&
+              !DEF_REGION_WITH_PAINT)
+            upPix->setInk(paint);
+          if (downPix->getInk() == TPixelCM32::getMaxInk() &&
+              !DEF_REGION_WITH_PAINT)
             downPix->setInk(paint);
         }
       }
@@ -611,7 +620,8 @@ bool fill(const TRasterCM32P &r, const FillParameters &params,
       // protruding behind the colored line
       if (pix->getPaint() != paint && tone <= oldtone && tone != 0 &&
           (pix->getPaint() != pix->getInk() ||
-           pix->getPaint() == paintAtClickedPos)) {
+           pix->getPaint() == paintAtClickedPos) &&
+          (!DEF_REGION_WITH_PAINT || pix->getPaint() == paintAtClickedPos)) {
         fillRow(r, TPoint(x, y), xc, xd, paint, params.m_palette, saver,
                 params.m_prevailing, refImagePut, paintAtClickedPos);
         if (xc < xa) seeds.push(FillSeed(xc, xa - 1, y, -dy));
