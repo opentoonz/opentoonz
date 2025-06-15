@@ -86,7 +86,7 @@ void fillRow(const TRasterCM32P &r, const TPoint &p, int &xa, int &xb,
     }
     oldtone = tone;
   }
-  if (tone == 0) {
+  if (prevailing && tone == 0) {
     tmp_limit = pix + 10;  // edge stop fill == 10 per default
     if (limit > tmp_limit) limit = tmp_limit;
     for (; pix <= limit; pix++) {
@@ -136,7 +136,7 @@ void fillRow(const TRasterCM32P &r, const TPoint &p, int &xa, int &xb,
     }
     oldtone = tone;
   }
-  if (tone == 0) {
+  if (prevailing && tone == 0) {
     tmp_limit = pix - 10;
     if (limit < tmp_limit) limit = tmp_limit;
     for (; pix >= limit; pix--) {
