@@ -24,7 +24,7 @@
 
 class NormalLineFillTool;
 typedef std::vector<std::pair<TXshSimpleLevel *, TFrameId>> SlFidsPairs;
-typedef std::map<std::string, TImageP> RefImgTable;
+typedef std::map<std::string, TRaster32P> RefImgTable;
 
 namespace {
 

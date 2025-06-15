@@ -99,14 +99,14 @@ class DVAPI AreaFiller {
   typedef TPixelCM32 Pixel;
   TRasterCM32P m_ras;
   TRaster32P m_refRas;
-  TImageP m_ref;
   TRect m_bounds;
   Pixel *m_pixels;
+  TPalette* m_palette;
   int m_wrap;
   int m_color;
   
 public:
-  AreaFiller(const TRasterCM32P &ras, const TImageP &ref = TImageP());
+  AreaFiller(const TRasterCM32P &ras, const TRaster32P& ref = TRaster32P(), TPalette *palette = nullptr);
   ~AreaFiller();
   /*!
 Fill \b rect in raster with \b color.
@@ -124,7 +124,7 @@ else if \b fillInks is false fill only paint delimited by ink;
 else fill ink and paint in region contained in spline.
 */
   void strokeFill(TStroke *s, int color, bool onlyUnfilled, bool fillPaints,
-                  bool fillInks, TPalette *plt);
+                  bool fillInks);
 };
 
 class DVAPI FullColorAreaFiller {

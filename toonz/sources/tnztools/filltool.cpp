@@ -446,6 +446,7 @@ class RasterRectFillUndo final : public TRasterUndo {
   std::wstring m_colorType;
   TStroke *m_s;
   bool m_onlyUnfilled;
+  TRaster32P m_refImg;
   TPalette *m_palette;
 
 public:
@@ -456,12 +457,13 @@ public:
   RasterRectFillUndo(TTileSetCM32 *tileSet, TStroke *s, TRect fillArea,
                      int paintId, TXshSimpleLevel *level,
                      std::wstring colorType, bool onlyUnfilled,
-                     const TFrameId &fid, TPalette *palette)
+                     const TFrameId &fid, TRaster32P refImg, TPalette *palette)
       : TRasterUndo(tileSet, level, fid, false, false, 0)
       , m_fillArea(fillArea)
       , m_paintId(paintId)
       , m_colorType(colorType)
       , m_onlyUnfilled(onlyUnfilled)
+      , m_refImg(refImg)
       , m_palette(palette) {
     m_s = s ? new TStroke(*s) : 0;
   }
@@ -470,13 +472,13 @@ public:
     TToonzImageP image = getImage();
     if (!image) return;
     TRasterCM32P ras = image->getRaster();
-    AreaFiller filler(ras);
+    AreaFiller filler(ras, m_refImg, m_palette);
     if (!m_s)
       filler.rectFill(m_fillArea, m_paintId, m_onlyUnfilled,
                       m_colorType != LINES, m_colorType != AREAS);
     else
       filler.strokeFill(m_s, m_paintId, m_onlyUnfilled, m_colorType != LINES,
-                        m_colorType != AREAS, m_palette);
+                        m_colorType != AREAS);
 
     if (m_palette) {
       TRect rect   = m_fillArea;
@@ -830,20 +832,19 @@ bool inline hasAutoInks(const TPalette *plt) {
 
 //-----------------------------------------------------------------------------
 
-void fillAreaWithUndo(const TImageP &img, const TImageP &ref,
+void fillAreaWithUndo(const TImageP &img, const TRaster32P &ref,
                       const TRectD &area, TStroke *stroke, bool onlyUnfilled,
                       std::wstring colorType, TXshSimpleLevel *sl,
                       const TFrameId &fid, int cs, bool autopaintLines) {
-  TRectD selArea = stroke ? stroke->getBBox() : area;
+  TRectD selArea = stroke ? stroke->getBBox().enlarge(1) : area;
   if (TToonzImageP ti = img) {
     // allargo di 1 la savebox, perche cosi' il rectfill di tutta l'immagine fa
     // una sola fillata
-    TRasterImageP ri      = ref;
-    TRect refSavebox      = ri ? ri->getSavebox() : TRect();
+    TRect refSavebox      = ref ? ref->getBounds() : TRect();
     TRect enlargedSavebox = (ti->getSavebox().enlarge(1) + refSavebox) *
                             TRect(TPoint(0, 0), ti->getSize());
-    TRect rasterFillArea =
-        ToonzImageUtils::convertWorldToRaster(selArea, ti) * enlargedSavebox;
+    TRect strokeBox      = ToonzImageUtils::convertWorldToRaster(selArea, ti);
+    TRect rasterFillArea = strokeBox * enlargedSavebox;
     if (rasterFillArea.isEmpty()) return;
 
     TRasterCM32P ras = ti->getRaster();
@@ -857,7 +858,13 @@ void fillAreaWithUndo(const TImageP &img, const TImageP &ref,
     // !autopaintLines will temporary disable autopaint line feature
     if ((plt && !hasAutoInks(plt)) || !autopaintLines) plt = 0;
 
-    AreaFiller filler(ti->getRaster(), ref);
+    TRasterCM32P raux = ras;
+
+    if (ref && ti->getSize() != ref->getSize()) {
+      TRect saveBox = ti->getSavebox();
+      raux          = raux->extract(saveBox);
+    }
+    AreaFiller filler(raux, ref, plt);
     if (!stroke) {
       bool ret = filler.rectFill(rasterFillArea, cs, onlyUnfilled,
                                  colorType != LINES, colorType != AREAS);
@@ -877,15 +884,19 @@ void fillAreaWithUndo(const TImageP &img, const TImageP &ref,
           fillautoInks(ras, rect, rbefore, plt);
         }
       }
-    } else
+    } else {
+      if (stroke) stroke->transform(TTranslation(convert(ras->getCenter())));
+      if (ref)
+        stroke->transform(TTranslation(-convert(ti->getSavebox().getP00())));
       filler.strokeFill(stroke, cs, onlyUnfilled, colorType != LINES,
-                        colorType != AREAS, plt);
+                        colorType != AREAS);
+    }
 
     ToolUtils::updateSaveBox(sl, fid);
 
     TUndoManager::manager()->add(
         new RasterRectFillUndo(tileSet, stroke, rasterFillArea, cs, sl,
-                               colorType, onlyUnfilled, fid, plt));
+                               colorType, onlyUnfilled, fid, ref, plt));
   } else if (TVectorImageP vi = img) {
     TPalette *palette = vi->getPalette();
     assert(palette);
@@ -1003,7 +1014,7 @@ void gapClose(TRaster32P &ras, TRasterCM32P &raux, TXshSimpleLevel *sl,
 // doFill
 //-----------------------------------------------------------------------------
 
-void doRefFill(const TImageP &img, const TImageP &refImg, const TPointD &pos,
+void doRefFill(const TImageP &img, const TRaster32P &refImg, const TPointD &pos,
                FillParameters &params, bool isShiftFill, TXshSimpleLevel *sl,
                const TFrameId &fid, bool autopaintLines) {
   TTool::Application *app = TTool::getApplication();
@@ -1049,15 +1060,7 @@ void doRefFill(const TImageP &img, const TImageP &refImg, const TPointD &pos,
     if (plt && hasAutoInks(plt) && autopaintLines) params.m_palette = plt;
     TRaster32P refRas;
     if (params.m_fillType == ALL || params.m_fillType == AREAS) {
-      // Get refImg
-      if (refImg) {
-        TRasterImageP ri = (TRasterImageP)refImg;
-        if (ri) {
-          TRasterP r = ri->getRaster();
-          if (r) refRas = r;
-        }
-      }
-      recomputeSavebox = fill(ras, params, &tileSaver, refRas);
+      recomputeSavebox = fill(ras, params, &tileSaver, refImg);
     }
     if (params.m_fillType == ALL || params.m_fillType == LINES) {
       if (params.m_segment)
@@ -1110,7 +1113,8 @@ vi->computeRegion(pos, params.m_styleId);*/
 void doFill(const TImageP &img, const TPointD &pos, FillParameters &params,
             bool isShiftFill, TXshSimpleLevel *sl, const TFrameId &fid,
             bool autopaintLines) {
-  doRefFill(img, TImageP(), pos, params, isShiftFill, sl, fid, autopaintLines);
+  doRefFill(img, TRaster32P(), pos, params, isShiftFill, sl, fid,
+            autopaintLines);
 }
 //=============================================================================
 // SequencePainter
@@ -2057,7 +2061,7 @@ void FillTool::computeRefImgsIfNeeded(const FillParameters &params) {
     TRaster32P ras(raux->getSize());
     ras->clear();
 
-    m_refImgTable[imgId].set(TRasterImageP(ras));
+    m_refImgTable[imgId] = ras;
 
     if (referFill)
       drawReferImage(ras, xsh, m_beginCell.col, slFidToRow[{sl, fid}],
@@ -2132,15 +2136,15 @@ void FillTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
   if (m_onion.getValue() &&
       app->getCurrentOnionSkin()->getOnionSkinMask().isEnabled() &&
       !app->getCurrentOnionSkin()->getOnionSkinMask().isEmpty()) {
-      m_onionStyleId = pickOnionColor(pos);
-      if (m_onionStyleId > 0) app->setCurrentLevelStyleIndex(m_onionStyleId);
-      return;
+    m_onionStyleId = pickOnionColor(pos);
+    if (m_onionStyleId > 0) app->setCurrentLevelStyleIndex(m_onionStyleId);
+    return;
   }
   buildFillInfo(params);
   if (!m_frameRange.getValue()) {
     auto fid = getCurrentFid();
-    TImageP Ref =
-        m_level ? m_refImgTable[m_level->getImageId(fid, 0)] : TImageP();
+    TRaster32P Ref =
+        m_level ? m_refImgTable[m_level->getImageId(fid, 0)] : TRaster32P();
     doRefFill(getImage(true), Ref, pos, params, e.isShiftPressed(),
               m_level.getPointer(), fid, m_autopaintLines.getValue());
     invalidate();

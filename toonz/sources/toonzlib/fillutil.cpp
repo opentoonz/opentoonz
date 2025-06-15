@@ -120,17 +120,15 @@ bool areRectPixelsTransparent(TPixel32 *pixels, TRect rect, int wrap) {
 //=============================================================================
 // AreaFiller
 
-AreaFiller::AreaFiller(const TRasterCM32P &ras, const TImageP &ref)
+AreaFiller::AreaFiller(const TRasterCM32P &ras, const TRaster32P &ref,
+                       TPalette *palette)
     : m_ras(ras)
     , m_bounds(ras->getBounds())
     , m_pixels(ras->pixels())
     , m_wrap(ras->getWrap())
     , m_color(0)
-    , m_refRas() {
-  ;
-  if (TRasterImageP ri = ref)
-    if (TRaster32P r = ri->getRaster())
-      m_refRas = r;
+    , m_palette(palette)
+    , m_refRas(ref) {
   m_ras->lock();
 }
 
@@ -288,9 +286,8 @@ bool AreaFiller::rectFill(const TRect &rect, int color, bool onlyUnfilled,
 
 //-----------------------------------------------------------------------------
 
-void AreaFiller::strokeFill(TStroke *stroke, int colorId, bool onlyUnfilled,
-                            bool fillPaints, bool fillInks, TPalette *plt) {
-  stroke->transform(TTranslation(convert(m_ras->getCenter())));
+void AreaFiller::strokeFill(TStroke *stroke, int color, bool onlyUnfilled,
+                            bool fillPaints, bool fillInks) {
   m_ras->lock();
   if (m_refRas) TRop::putRefImage(m_ras, m_refRas);
 
@@ -302,7 +299,7 @@ void AreaFiller::strokeFill(TStroke *stroke, int colorId, bool onlyUnfilled,
   app.findRegions();
   for (UINT i = 0; i < app.getRegionCount(); i++)
     fillArea(m_ras, app.getRegion(i), colorId, onlyUnfilled, fillPaints,
-             fillInks, plt);
+          fillInks, m_palette);
   app.removeStroke(0);
 
   stroke->transform(TTranslation(convert(-m_ras->getCenter())));
