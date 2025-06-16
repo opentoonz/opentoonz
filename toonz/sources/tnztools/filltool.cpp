@@ -2255,6 +2255,7 @@ void FillTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
 
   // Normal Fill
   if (m_onion.getValue() && m_onionStyleId > 0) {
+    buildFillInfo(params);  // Frame range, refFill and so on
     doRefFill(getImage(true),
               m_refImgTable[m_level->getImageId(getCurrentFid(), false)], pos,
               params, e.isShiftPressed(), m_level.getPointer(), getCurrentFid(),
