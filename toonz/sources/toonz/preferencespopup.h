@@ -179,6 +179,7 @@ private slots:
   void onLevelFormatEdited();
   void onImportPolicyExternallyChanged(int policy);
   void onRenamePolicyExternallyChanged(int policy);
+  void onConvertPolicyExternallyChanged(int policy);
 };
 
 //**********************************************************************************
