@@ -197,15 +197,22 @@ void fillRow(const TRasterCM32P &r, const TPoint &p, int &xa, int &xb,
   }
 }
 
+struct extendSeed {
+  UINT xa;
+  UINT xb;
+  UINT xc;
+  UINT xd;
+  UINT y;
+};
 //-----------------------
-// This function fills with a given direction
+// This function getLine with a given direction
 // and starts from a autoPainted pixel,
 // ends with another Ink pixel.
 // Prevailing is on for default
 // Called by extendInk2InkFill
-void fillRowInk2Ink(const TRasterCM32P &r, const TPoint &p, int &xc, int &xd,
-                    bool right, int paint, int &length, TTileSaverCM32 *saver) {
-  int dx = right ? 1 : -1;
+void getRowInk2Ink(const TRasterCM32P &r, const TPoint &p, extendSeed &seed,
+                   bool right, int paint, int &length, TTileSaverCM32 *saver) {
+  int dx        = right ? 1 : -1;
   const int max = 10;
 
   TPixelCM32 *pix0 = r->pixels(p.y) + p.x;
@@ -230,7 +237,7 @@ void fillRowInk2Ink(const TRasterCM32P &r, const TPoint &p, int &xc, int &xd,
     oldTone = tone;
     ++j;
   }
-  xc = pix - r->pixels(p.y) + dx;
+  seed.xc = pix - r->pixels(p.y) + dx;
 
   pix = pix0;
   tmp_limit = (right ? r->pixels(p.y) + r->getBounds().x1 - 1
@@ -238,12 +245,12 @@ void fillRowInk2Ink(const TRasterCM32P &r, const TPoint &p, int &xc, int &xd,
   while ((pix)->getInk() == paint && pix != tmp_limit) {
     pix += dx;
   }
-  xd = pix - r->pixels(p.y) - dx;
+  seed.xd = pix - r->pixels(p.y) - dx;
 
-  if (xc > xd) std::swap(xc, xd);
+  if (seed.xc > seed.xd) std::swap(seed.xc, seed.xd);
 
   // Out of autoPaint Ink Style area
-  pix = r->pixels(p.y) + (right ? xd : xc) + dx;
+  pix       = r->pixels(p.y) + (right ? seed.xd : seed.xc) + dx;
   tmp_limit = (right ? r->pixels(p.y) + r->getBounds().x1 - 1
                      : r->pixels(p.y) + r->getBounds().x0);
 
@@ -266,23 +273,16 @@ void fillRowInk2Ink(const TRasterCM32P &r, const TPoint &p, int &xc, int &xd,
       ++j;
     if (i > length) {
       length -= 2;
-      return;
+      break;
     }
     if (j > max) break;
   }
 
   pix -= dx;
-  int xa = xc, xb = xd;
-  (right ? xb : xa) = pix - r->pixels(p.y);
+  seed.xa = seed.xc, seed.xb = seed.xd;
+  (right ? seed.xb : seed.xa) = pix - r->pixels(p.y);
 
-  length = (int)((xb - xa) / 2) + 2;
-
-  if (saver) saver->save(TRect(xa, p.y, xb, p.y));
-
-  // DO Paint
-  for (pix = r->pixels(p.y) + xa; pix <= r->pixels(p.y) + xb; ++pix) {
-    pix->setPaint(paint);
-  }
+  length = (int)((seed.xb - seed.xa) / 2) + 2;
 }
 
 //-----------------------------------------------------------------------------
@@ -293,27 +293,54 @@ void extendInk2InkFill(const TRasterCM32P &r, const TPoint &p, bool right,
   int yy = p.y;
   int xc = xx, xd = yy;
   TPixelCM32 *pix;
+  std::vector<extendSeed> seeds;
+  auto extendAndFill = [&](const extendSeed &seed) {
+    if (saver) saver->save(TRect(seed.xa, seed.y, seed.xb, seed.y));
 
+    TPixelCM32 *pix = r->pixels(seed.y) + seed.xa;
+    TPixelCM32 *end = r->pixels(seed.y) + seed.xb;
+    for (; pix <= end; ++pix) {
+      pix->setPaint(paint);
+    }
+  };
+  auto isLineClosed = [&](const extendSeed &seed) -> bool {
+    TPixelCM32 *pix = r->pixels(seed.y) + seed.xa;
+    TPixelCM32 *end = r->pixels(seed.y) + seed.xb;
+    for (; pix <= end; ++pix) {
+      if (pix->isPurePaint() && pix->getPaint()!=paint) return false;
+    }
+    return true;
+  };
+
+  bool areaClosed = false;
   while (maxLength > 0) {
     if (xc < 0 || xd >= r->getLx()) break;
     if (xx < 0 || xx >= r->getLx()) break;
     if ((r->pixels(yy) + xx)->getInk() != paint) break;
-
-    fillRowInk2Ink(r, TPoint(xx, yy), xc, xd, right, paint, maxLength, saver);
-
+    extendSeed seed;
+    seed.y = yy;
+    getRowInk2Ink(r, TPoint(xx, yy), seed, right, paint, maxLength, saver);
+    seeds.push_back(seed);
+    if (isLineClosed(seed))
+        areaClosed = true;
+    if (areaClosed) {
+        for (const extendSeed& s : seeds) extendAndFill(s);
+        seeds.clear();
+        areaClosed = false;
+    }
     yy += dy;
     if (yy < 0 || yy >= r->getLy()) break;
-
+    int xc = seed.xc, xd = seed.xd;
     if (right) {
       for (--xc, ++xd; xc < xd; xd--) {
         pix = r->pixels(yy) + xd;
-        if (pix->getInk() == paint && pix->isPureInk()) break;
+        if (pix->getInk() == paint && !pix->isPurePaint()) break;
       }
       xx = xd;
     } else {
       for (--xc, ++xd; xc < xd; xc++) {
         pix = r->pixels(yy) + xc;
-        if (pix->getInk() == paint && pix->isPureInk()) break;
+        if (pix->getInk() == paint && !pix->isPurePaint()) break;
       }
       xx = xc;
     }
