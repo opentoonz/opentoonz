@@ -788,7 +788,7 @@ void ToonzVectorBrushTool::inputMouseMove(
     m_maxThick = m_thickness.getValue().second;
   }
 
-  invalidate(invalidateRect.enlarge(2));
+  invalidate(invalidateRect.enlarge(10));
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1091,7 +1091,7 @@ void ToonzVectorBrushTool::inputPaintTracks(const TTrackList &tracks) {
     if (m_isPath) {
       if (getViewer()) getViewer()->GLInvalidateRect(invalidateRect);
     } else {
-      invalidate(invalidateRect.enlarge(2));
+      invalidate(invalidateRect.enlarge(10));
     }
   }
 }
@@ -1570,8 +1570,13 @@ void ToonzVectorBrushTool::draw() {
 
   if (getApplication()->getCurrentObject()->isSpline()) return;
 
+  bool useEndCursor = Preferences::instance()->isUseStrokeEndCursor();
+  if (useEndCursor &&
+      (m_maxThick < 8 || !Preferences::instance()->isCursorOutlineEnabled()))
+      tglDrawInvertCursor(m_brushPos + TPointD(0.5, 0.5), 4, 6);
   // If toggled off, don't draw brush outline
-  if (!Preferences::instance()->isCursorOutlineEnabled()) return;
+  if (!Preferences::instance()->isCursorOutlineEnabled())
+      return;
 
   // Don't draw brush outline if picking guiding stroke
   if (getViewer()->getGuidedStrokePickerMode()) return;

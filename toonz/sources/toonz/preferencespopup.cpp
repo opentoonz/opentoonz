@@ -1317,6 +1317,7 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
       {cursorOutlineEnabled, tr("Show Cursor Size Outlines")},
       {levelBasedToolsDisplay, tr("Toolbar Display Behaviour:")},
       {useCtrlAltToResizeBrush, tr("Use %1 to Resize Brush").arg(CtrlAltStr())},
+      {useStrokeEndCursor ,tr("Use Inverted Cursor at Stroke End")},
       {tempToolSwitchTimer,
        tr("Switch Tool Temporarily Keypress Length (ms):")},
 
@@ -2047,6 +2048,7 @@ QWidget* PreferencesPopup::createToolsPage() {
     insertUI(cursorBrushStyle, cursorOptionsLay,
              getComboItemList(cursorBrushStyle));
     insertUI(cursorOutlineEnabled, cursorOptionsLay);
+    insertUI(useStrokeEndCursor, cursorOptionsLay);
   }
   insertUI(levelBasedToolsDisplay, lay,
            getComboItemList(levelBasedToolsDisplay));
