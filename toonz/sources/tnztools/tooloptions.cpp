@@ -1767,6 +1767,8 @@ FillToolOptionsBox::FillToolOptionsBox(QWidget *parent, TTool *tool,
       dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Frame Range"));
   m_autopaintMode =
       dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Autopaint Lines"));
+  m_extendFill =
+      dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Extend Fill"));
 
   bool ret = connect(m_colorMode, SIGNAL(currentIndexChanged(int)), this,
                      SLOT(onColorModeChanged(int)));
@@ -1823,6 +1825,9 @@ void FillToolOptionsBox::onColorModeChanged(int index) {
   }
   enabled = range[index] != L"Lines" && !m_multiFrameMode->isChecked();
   m_onionMode->setEnabled(enabled);
+  enabled = range[index] != L"Lines" &&
+            m_toolType->getProperty()->getValue() == L"Normal";
+  if (m_extendFill) m_extendFill->setEnabled(enabled);
 }
 
 //-----------------------------------------------------------------------------
@@ -1836,6 +1841,8 @@ void FillToolOptionsBox::onToolTypeChanged(int index) {
   enabled = enabled || (m_colorMode->getProperty()->getValue() != L"Lines" &&
                         !m_multiFrameMode->isChecked());
   m_onionMode->setEnabled(enabled);
+  enabled = range[index] == L"Normal";
+  if (m_extendFill) m_extendFill->setEnabled(enabled);
 }
 
 //-----------------------------------------------------------------------------
