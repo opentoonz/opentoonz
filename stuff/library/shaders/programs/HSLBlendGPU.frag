@@ -2,117 +2,140 @@
 precision mediump float;
 #endif
 
-
-uniform mat3      worldToOutput;
-
+uniform mat3 worldToOutput;
 uniform sampler2D inputImage[2];
-uniform mat3      outputToInput[2];
+uniform mat3 outputToInput[2];
 
-uniform bool bhue;    // Blend HUE?
-uniform bool bsat;    // Blend Saturation?
-uniform bool blum;    // Blend Luminosity?
-uniform float balpha; // Blending Alpha
-uniform bool bmask;   // Base mask?
+uniform bool bhue;    // Blend hue component
+uniform bool bsat;    // Blend saturation component  
+uniform bool blum;    // Blend luminosity component
+uniform float balpha; // Blend opacity
+uniform bool bmask;   // Use base as mask
 
 // ---------------------------
 // Blending calculations from:
 // https://www.khronos.org/registry/OpenGL/extensions/KHR/KHR_blend_equation_advanced.txt
 
-float minv3(vec3 c)
-{
-  return min(min(c.r, c.g), c.b);
+float getMinChannel(vec3 color) {
+    return min(min(color.r, color.g), color.b);
 }
 
-float maxv3(vec3 c)
-{
-  return max(max(c.r, c.g), c.b);
+float getMaxChannel(vec3 color) {
+    return max(max(color.r, color.g), color.b);
 }
 
-float lumv3(vec3 c)
-{
-  return dot(c, vec3(0.30, 0.59, 0.11));
+float getLuminance(vec3 color) {
+    return dot(color, vec3(0.30, 0.59, 0.11));
 }
 
-float satv3(vec3 c)
-{
-  return maxv3(c) - minv3(c);
+float getSaturation(vec3 color) {
+    return getMaxChannel(color) - getMinChannel(color);
 }
 
-// If any color components are outside [0,1], adjust the color to get the components in range.
-vec3 ClipColor(vec3 color)
-{
-  float lum = lumv3(color);
-  float mincol = minv3(color);
-  float maxcol = maxv3(color);
-  if (mincol < 0.0) {
-    color = lum + ((color-lum) * lum) / (lum-mincol);
-  }
-  if (maxcol > 1.0) {
-    color = lum + ((color-lum) * (1.0 -lum)) / (maxcol-lum);
-  }
-  return color;
+vec3 clipColor(vec3 color) {
+    float lum = getLuminance(color);
+    float minChannel = getMinChannel(color);
+    float maxChannel = getMaxChannel(color);
+    
+    if (minChannel < 0.0) {
+        color = lum + ((color - lum) * lum) / (lum - minChannel);
+    }
+    if (maxChannel > 1.0) {
+        color = lum + ((color - lum) * (1.0 - lum)) / (maxChannel - lum);
+    }
+    return color;
 }
 
-// Take the base RGB color <cbase> and override its luminosity
-// with that of the RGB color <clum>.
-vec3 SetLum(vec3 cbase, vec3 clum)
-{
-  float lbase = lumv3(cbase);
-  float llum = lumv3(clum);
-  float ldiff = llum - lbase;
-  vec3 color = cbase + vec3(ldiff);
-  return ClipColor(color);
+vec3 setLuminance(vec3 baseColor, vec3 lumSource) {
+    float baseLum = getLuminance(baseColor);
+    float targetLum = getLuminance(lumSource);
+    vec3 result = baseColor + vec3(targetLum - baseLum);
+    return clipColor(result);
 }
 
-// Take the base RGB color <cbase> and override its saturation with
-// that of the RGB color <csat>.  The override the luminosity of the
-// result with that of the RGB color <clum>.
-vec3 SetLumSat(vec3 cbase, vec3 csat, vec3 clum)
-{
-  float minbase = minv3(cbase);
-  float sbase = satv3(cbase);
-  float ssat = satv3(csat);
-  vec3 color;
-  if (sbase > 0.0) {
-    // Equivalent (modulo rounding errors) to setting the
-    // smallest (R,G,B) component to 0, the largest to <ssat>,
-    // and interpolating the "middle" component based on its
-    // original value relative to the smallest/largest.
-    color = (cbase - minbase) * ssat / sbase;
-  } else {
-    color = vec3(0.0);
-  }
-  return SetLum(color, clum);
+vec3 setLuminanceAndSaturation(vec3 baseColor, vec3 satSource, vec3 lumSource) {
+    float baseMin = getMinChannel(baseColor);
+    float baseSat = getSaturation(baseColor);
+    float targetSat = getSaturation(satSource);
+    
+    vec3 result;
+    if (baseSat > 0.0) {
+        result = (baseColor - baseMin) * targetSat / baseSat;
+    } else {
+        result = vec3(0.0);
+    }
+    return setLuminance(result, lumSource);
 }
 
-// ---------------------------
+// Detects OpenToonz empty frame artifacts: black RGB with non-zero alpha
+// Returns true when content is effectively empty (RGB channels below threshold)
+bool isEffectivelyEmpty(vec4 color) {
+    float maxChannel = max(max(color.r, color.g), color.b);
+    return maxChannel < 0.001;
+}
 
-void main( void )
-{
-  // Read sources
-  vec2 fg_texPos = (outputToInput[0] * vec3(gl_FragCoord.xy, 1.0)).xy;
-  vec2 bg_texPos = (outputToInput[1] * vec3(gl_FragCoord.xy, 1.0)).xy;
-  vec4 fg_frag = texture2D(inputImage[0], fg_texPos);
-  vec4 bg_frag = texture2D(inputImage[1], bg_texPos);
+vec3 depremultiply(vec4 color) {
+    return color.a > 0.0 ? color.rgb / color.a : vec3(0.0);
+}
 
-  // De-premultiplication of textures
-  vec3 fg_pix = vec3(0.0);
-  if (fg_frag.a > 0.0) fg_pix = fg_frag.rgb / fg_frag.a;
-  vec3 bg_pix = vec3(0.0);
-  if (bg_frag.a > 0.0) bg_pix = bg_frag.rgb / bg_frag.a;
-
-  // Figure out output alpha
-  float fg_alpha = fg_frag.a * balpha;
-  float bg_alpha = bg_frag.a;
-  if (bmask) {
-    gl_FragColor.a = bg_alpha;
-  } else {
-    gl_FragColor.a = bg_alpha + fg_alpha * (1.0 - bg_alpha);
-  }
-  if (gl_FragColor.a <= 0.0) discard;
-
-  // Perform blending
-  vec3 o_pix = SetLumSat(bhue ? fg_pix : bg_pix, bsat ? fg_pix : bg_pix, blum ? fg_pix : bg_pix);
-  vec3 b_pix = bmask ? vec3(0.0) : fg_pix;
-  gl_FragColor.rgb = bg_pix * bg_alpha * (1.0 - fg_alpha) + mix(b_pix, o_pix, bg_alpha) * fg_alpha;
+void main(void) {
+    vec2 fgTexPos = (outputToInput[0] * vec3(gl_FragCoord.xy, 1.0)).xy;
+    vec2 bgTexPos = (outputToInput[1] * vec3(gl_FragCoord.xy, 1.0)).xy;
+    vec4 fgColor = texture2D(inputImage[0], fgTexPos);
+    vec4 bgColor = texture2D(inputImage[1], bgTexPos);
+    
+    // Check for empty content using RGB analysis
+    bool fgIsEmpty = isEffectivelyEmpty(fgColor);
+    bool bgIsEmpty = isEffectivelyEmpty(bgColor);
+    
+    if (fgIsEmpty && bgIsEmpty) {
+        gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);
+        return;
+    }
+    
+    // Filter out empty content
+    vec4 effectiveFg = fgIsEmpty ? vec4(0.0, 0.0, 0.0, 0.0) : fgColor;
+    vec4 effectiveBg = bgIsEmpty ? vec4(0.0, 0.0, 0.0, 0.0) : bgColor;
+    
+    float fgAlpha = effectiveFg.a * balpha;
+    float bgAlpha = effectiveBg.a;
+    
+    // Handle pure transparency cases
+    if (fgAlpha <= 0.0 && bgAlpha <= 0.0) {
+        gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);
+        return;
+    }
+    
+    if (bgAlpha <= 0.0) {
+        if (bmask) {
+            gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);
+        } else {
+            gl_FragColor = vec4(effectiveFg.rgb * balpha, fgAlpha);
+        }
+        return;
+    }
+    
+    if (fgAlpha <= 0.0) {
+        gl_FragColor = effectiveBg;
+        return;
+    }
+    
+    // Depremultiply colors for blending
+    vec3 fgRGB = depremultiply(effectiveFg);
+    vec3 bgRGB = depremultiply(effectiveBg);
+    
+    // Calculate output alpha
+    float outputAlpha = bmask ? bgAlpha : bgAlpha + fgAlpha * (1.0 - bgAlpha);
+    
+    // Perform HSL blending
+    vec3 blendedRGB = setLuminanceAndSaturation(
+        bhue ? fgRGB : bgRGB,    // Hue source
+        bsat ? fgRGB : bgRGB,    // Saturation source
+        blum ? fgRGB : bgRGB     // Luminance source
+    );
+    
+    vec3 maskRGB = bmask ? vec3(0.0) : fgRGB;
+    vec3 finalRGB = bgRGB * bgAlpha * (1.0 - fgAlpha) + 
+                    mix(maskRGB, blendedRGB, bgAlpha) * fgAlpha;
+    gl_FragColor = vec4(finalRGB * outputAlpha, outputAlpha);
 }
