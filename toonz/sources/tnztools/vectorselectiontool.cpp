@@ -1234,6 +1234,76 @@ public:
   int getSize() const override { return sizeof(*this); }
 };
 
+//=============================================================================
+// UndoReOrderStrokes
+//-----------------------------------------------------------------------------
+
+struct ReorderData {
+  TFrameId frameId;
+  std::vector<int> oldIndexes;
+  std::vector<int> newIndexes;
+};
+typedef std::vector<ReorderData> ReorderDatas;
+
+class UndoReorderStrokes final : public TUndo {
+protected:
+  TXshSimpleLevelP m_level;
+  ReorderDatas m_reOrderDatas;
+
+public:
+  UndoReorderStrokes(TXshSimpleLevelP level, ReorderDatas reOrderDatas)
+      : m_level(level), m_reOrderDatas(reOrderDatas) {}
+
+  ~UndoReorderStrokes() {}
+
+  QString getHistoryString() {
+    return QObject::tr(
+               "Sort Vector Strokes With Palette Order Level : %1")
+        .arg(QString::fromStdWString(m_level->getName()));
+  }
+
+  void undo() const override {
+    for (const ReorderData& data : m_reOrderDatas) {
+      TVectorImageP vi = m_level->getFrame(data.frameId, true);
+      if (!vi) continue;
+      vi->reOrderStrokes(data.newIndexes, data.oldIndexes);
+    }
+    TTool::getApplication()->getCurrentTool()->getTool()->notifyImageChanged();
+  }
+
+  void redo() const override {
+    for (const ReorderData &data : m_reOrderDatas) {
+      TVectorImageP vi = m_level->getFrame(data.frameId, true);
+      if (!vi) continue;
+      vi->reOrderStrokes(data.oldIndexes, data.newIndexes);
+      TTool::getApplication()
+          ->getCurrentTool()
+          ->getTool()
+          ->notifyImageChanged();
+    }
+  }
+
+  int getSize() const override { return sizeof(*this); }
+};
+
+// With palette Order
+void sortStylesIds(QVector<int> &styles, TPaletteP palette) {
+  if (!palette) return;
+  QVector<int> tmpStyles = styles;
+  styles.clear();
+  for (int p = 0; p < palette->getPageCount(); p++) {
+    TPalette::Page *page = palette->getPage(p);
+    for (int s = 0; s < page->getStyleCount(); s++) {
+      int tmpId = page->getStyleId(s);
+      if (tmpStyles.indexOf(tmpId, 0) != -1) {
+        styles.append(tmpId);
+      }
+      if (tmpStyles.count() == styles.count()) return;
+    }
+  }
+  assert(false);
+}
+
 }  // namespace
 
 //=============================================================================
@@ -1721,6 +1791,7 @@ void VectorSelectionTool::leftButtonUp(const TPointD &pos,
 
 void VectorSelectionTool::addContextMenuItems(QMenu *menu) {
   menu->addAction(CommandManager::instance()->getAction(MI_RemoveEndpoints));
+  menu->addAction(CommandManager::instance()->getAction(MI_SortWithPaletteOrder));
   menu->addSeparator();
 
   m_strokeSelection.getGroupCommand()->addMenuItems(menu);
@@ -2308,4 +2379,110 @@ void VectorSelectionTool::onSelectedFramesChanged() {
   if (isSelectedFramesType())  // False also in case m_levelSelection is not
                                // current
     finalizeSelection();
+}
+
+//=============================================================================
+//
+// sortWithPaletteOrder
+//
+//-----------------------------------------------------------------------------
+
+void VectorSelectionTool::AttachedLevelSelection::sortWithPaletteOrder() {
+  TXshSimpleLevel *level =
+      TTool::getApplication()->getCurrentLevel()->getSimpleLevel();
+  SelectionTool *tool = dynamic_cast<SelectionTool *>(TTool::getApplication()->getCurrentTool()->getTool());
+  if (!tool) return;
+  if (framesMode() == FRAMES_NONE) return;
+  if (!m_strokeSelection.isEditable()) return;
+  ReorderDatas reOrderDatas;
+
+  if (framesMode() == FRAMES_CURRENT) {
+    TVectorImageP vi =
+        m_strokeSelection.getImage();
+    std::vector<int> indexVector;
+    for (auto index : m_strokeSelection.getSelection()) {
+      if (vi->isStrokeGrouped(index)) continue; 
+      indexVector.push_back(index);
+    }
+    if (!indexVector.empty()) {
+      ReorderData data = {tool->getCurrentFid(), std::move(indexVector), {}};
+      reOrderDatas.push_back(data);
+    }
+  } else {
+    std::set<TFrameId> fids;
+    if (framesMode() == FRAMES_ALL)
+      for (int i = 0; i < level->getFrameCount(); ++i)
+        fids.insert(level->getFrameId(i));
+    else// FRAMES_SELECTED
+      fids = getSelectedFrames();
+    for (auto id : fids) {
+      TVectorImageP vi = level->getFrame(id, true);
+      if (!vi) continue;
+      std::vector<int> indexVector;
+      for (int i = 0; i < vi->getStrokeCount(); ++i) {
+        if (vi->isStrokeGrouped(i)) continue;
+        if (filter() == SELECTED_STYLES &&
+            this->styles().find(vi->getStroke(i)->getStyle()) ==
+                this->styles().end())
+          continue;
+        indexVector.push_back(i);
+      }
+      if (!indexVector.empty())
+        reOrderDatas.push_back({id, std::move(indexVector), {}});
+    }
+  };
+
+  if (reOrderDatas.empty()) return;
+  for (ReorderData &data : reOrderDatas) {
+    TPalette *palette = m_strokeSelection.getImage()->getPalette();
+    TVectorImageP vi = level->getFrame(data.frameId, true);
+    if (!vi) continue;
+
+    QHash<int, int> originalIndexToStyle;
+    std::set<int> styles;
+    for (auto index : data.oldIndexes) {
+      TStroke *stroke = vi->getStroke(index);
+      int styleId     = stroke->getStyle();
+      styles.insert(stroke->getStyle());
+      originalIndexToStyle.insert(index, styleId);
+    }
+    // Sort Styles
+    QVector<int> styleOrder = QVector<int>(styles.begin(), styles.end());
+    sortStylesIds(styleOrder, palette);
+    // Build map from style to it's order
+    QHash<int, int> styleIndexMap;
+    for (int i = 0; i < styleOrder.size(); ++i) {
+      styleIndexMap[styleOrder[i]] = i;
+    }
+    // Sort indexes by palette order
+    std::vector<int> newOrder, oldOrder;
+    newOrder = oldOrder = data.oldIndexes;
+    std::stable_sort(newOrder.begin(), newOrder.end(), [&](int a, int b) {
+      return styleIndexMap.value(originalIndexToStyle[a], -1) >
+             styleIndexMap.value(originalIndexToStyle[b], -1);
+    });
+    // Remove don't need indexes
+    data.oldIndexes.clear();
+    data.newIndexes.clear();
+    for (int i = 0; i < oldOrder.size(); i++) {
+      if (oldOrder[i] != newOrder[i]) {
+        data.oldIndexes.push_back(newOrder[i]);
+        data.newIndexes.push_back(oldOrder[i]);
+      }
+    }
+    // Do reorder
+    if (data.oldIndexes.empty()) continue;
+    vi->reOrderStrokes(data.oldIndexes, data.newIndexes);
+  }
+
+  reOrderDatas.erase(std::remove_if(reOrderDatas.begin(), reOrderDatas.end(),
+                                    [](const ReorderData &data) {
+                                      return data.oldIndexes.empty();
+                                    }),
+                     reOrderDatas.end());
+
+  if (reOrderDatas.empty()) return;
+  TUndoManager::manager()->add(new UndoReorderStrokes(level, reOrderDatas));
+  
+  tool->notifyImageChanged();
 }

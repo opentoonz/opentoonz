@@ -230,15 +230,18 @@ get the stroke nearest at point
   int addStrokeToGroup(TStroke *stroke, int strokeIndex);
   //! Replace the stroke at index \b index with \b newStroke
   void replaceStroke(int index, TStroke *newStroke);
+  void reOrderStrokes(const std::vector<int> &oldIndexes,
+               const std::vector<int> &newIndexes);
 
   //! Insert a \b VIStroke \b vs at index \b strokeIndex
   void insertStrokeAt(VIStroke *vs, int strokeIndex,
-                      bool recomputeRegions = true);  //! Move \b count strokes
-                                                      //! starting from \b
-                                                      //! fromIndex before the
-                                                      //! stroke identified by
-                                                      //! the \b moveBefore
-                                                      //! index.
+                      bool recomputeRegions = true);  
+  //! Move \b count strokes
+  //! starting from \b
+  //! fromIndex before the
+  //! stroke identified by
+  //! the \b moveBefore
+  //! index.
   void moveStrokes(int fromIndex, int count, int moveBefore);
   //! Find regions of a \b TVectorImage
   void findRegions();
