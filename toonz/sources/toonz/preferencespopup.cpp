@@ -1325,6 +1325,7 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
       {xsheetLayoutPreference, tr("Column Header Layout*:")},
       {xsheetStep, tr("Next/Previous Step Frames:")},
       {xsheetAutopanEnabled, tr("Xsheet Autopan during Playback")},
+      {alwaysDragFrameCell, tr("Always Drag Frame Cell")},
       {DragCellsBehaviour, tr("Cell-dragging Behaviour:")},
       {deleteCommandBehavior, tr("Delete Command Behaviour:")},
       {pasteCellsBehavior, tr("Paste Cells Behaviour:")},
@@ -2079,6 +2080,7 @@ QWidget* PreferencesPopup::createXsheetPage() {
   insertUI(linkColumnNameWithLevel, lay);
   insertUI(xsheetStep, lay);
   insertUI(xsheetAutopanEnabled, lay);
+  insertUI(alwaysDragFrameCell, lay);
   insertUI(DragCellsBehaviour, lay, getComboItemList(DragCellsBehaviour));
   insertUI(deleteCommandBehavior, lay, getComboItemList(deleteCommandBehavior));
   insertUI(pasteCellsBehavior, lay, getComboItemList(pasteCellsBehavior));
