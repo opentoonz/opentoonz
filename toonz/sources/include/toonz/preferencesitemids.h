@@ -124,6 +124,7 @@ enum PreferencesItemId {
   xsheetLayoutPreference,
   xsheetStep,
   xsheetAutopanEnabled,
+  alwaysDragFrameCell,
   DragCellsBehaviour,
   deleteCommandBehavior,
   pasteCellsBehavior,
