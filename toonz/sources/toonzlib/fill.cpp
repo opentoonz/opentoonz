@@ -359,6 +359,103 @@ bool floodCheck(const TPixel32 &clickColor, const TPixel32 *targetPix,
   return !doesStemFill(clickColor, targetPix, fillDepth2);
 }
 
+bool scanTransparentRegion(TRasterCM32P ras, int x, int y,
+                           std::vector<TPoint> &points, bool *visited,
+                           const int maxSize) {
+  if (!ras) return false;
+  int lx = ras->getLx(), ly = ras->getLy();
+  if (x < 0 || y < 0 || x >= lx || y >= ly) return true;
+  if (visited[y * lx + x]) return true;
+
+  TPixelCM32 *pix = ras->pixels(y) + x;
+  if (pix->getPaint() != 0 || pix->isPureInk()) return true;
+  if (points.size() + 1 > maxSize) return false;
+
+  visited[y * lx + x] = true;
+  points.push_back(TPoint(x, y));
+
+  bool ret = scanTransparentRegion(ras, x + 1, y, points, visited, maxSize) &&
+             scanTransparentRegion(ras, x - 1, y, points, visited, maxSize) &&
+             scanTransparentRegion(ras, x, y + 1, points, visited, maxSize) &&
+             scanTransparentRegion(ras, x, y - 1, points, visited, maxSize);
+  ret = ret && points.size() <= maxSize;
+  return ret;
+}
+
+int getMostFrequentNeighborStyleId(TRasterCM32P ras,
+                                   const std::vector<TPoint> &points,
+                                   const bool *visited, bool &fillInk) {
+  if (!ras) return 0;
+
+  int lx = ras->getLx();
+  int ly = ras->getLy();
+
+  std::map<int, int> styleCount;
+  int maxStyleId = 0;
+  int maxCount   = 0;
+
+  const std::vector<TPoint> diagonal = {TPoint(1, -1), TPoint(1, 1),
+                                        TPoint(-1, 1), TPoint(1, 1)};
+
+  for (const TPoint &p : points) {
+    for (const TPoint &d : diagonal) {
+      int nx = p.x + d.x;
+      int ny = p.y + d.y;
+      if (nx < 0 || ny < 0 || nx >= lx || ny >= ly) continue;
+      if (visited[ny * lx + nx]) continue;
+
+      TPixelCM32 *pix = ras->pixels(ny) + nx;
+      if (pix->isPureInk()) continue;
+      int styleId = pix->getPaint();
+      if (styleId) {
+        styleCount[styleId] += 256;  // Diagonal Paint weights 256
+        fillInk = false;
+      }
+    }
+  }
+
+  for (const auto &entry : styleCount) {
+    if (entry.second > maxCount) {
+      maxCount   = entry.second;
+      maxStyleId = entry.first;
+    }
+  }
+
+  // Some corner Pixels woule be count in for 2/3 times, as the weight of
+  // Diagonal is large enough ignore them
+  const std::vector<TPoint> horizontal = {TPoint(0, -1), TPoint(0, 1),
+                                          TPoint(-1, 0), TPoint(1, 0)};
+
+  for (const TPoint &p : points) {
+    for (const TPoint &d : horizontal) {
+      int nx = p.x + d.x;
+      int ny = p.y + d.y;
+      if (nx < 0 || ny < 0 || nx >= lx || ny >= ly) continue;
+      if (visited[ny * lx + nx]) continue;
+
+      TPixelCM32 *pix = ras->pixels(ny) + nx;
+      if (!pix->isPureInk()) continue;
+      int styleId = pix->getInk();
+      styleCount[styleId]++;  // Horizontal Ink weights 1
+      styleId = pix->getPaint();
+      if (styleId) {
+        styleCount[styleId] += 1;  // Horizontal Paint weights 1
+        fillInk = false;
+      }
+    }
+  }
+
+  for (const auto &entry : styleCount) {
+    if (entry.second > maxCount) {
+      maxCount   = entry.second;
+      maxStyleId = entry.first;
+    }
+  }
+
+  assert(maxStyleId);
+  return maxStyleId;
+}
+
 //-----------------------------------------------------------------------------
 }  // namespace
 //-----------------------------------------------------------------------------
@@ -803,4 +900,48 @@ void fullColorFill(const TRaster32P &ras, const FillParameters &params,
       }
     }
   }
+}
+
+void fillHoles(const TRasterCM32P &ras, const int maxSize,
+               TTileSaverCM32 *saver) {
+  int lx        = ras->getLx();
+  int ly        = ras->getLy();
+  bool *visited = new bool[lx * ly]{false};
+
+  auto isEmpty = [&](int x, int y) -> bool {
+    TPixelCM32 *pix = ras->pixels(y) + x;
+    return !pix->getPaint() && !pix->isPureInk() && !visited[y * lx + x];
+  };
+
+  for (int y = 0; y < ly; y++) {
+    int emptyCount = 0;
+    for (int x = 0; x < lx; x++) {
+      if (isEmpty(x, y)) {
+        emptyCount++;
+        continue;
+      } else if (emptyCount && emptyCount <= maxSize) {
+        std::vector<TPoint> points;
+        int startX = x - emptyCount;
+        if (scanTransparentRegion(ras, startX, y, points, visited, maxSize)) {
+          bool fillInk = false;
+          int style =
+              getMostFrequentNeighborStyleId(ras, points, visited, fillInk);
+          for (const TPoint &p : points) {
+            if (saver) saver->save(p);
+            if (fillInk) {
+              ras->pixels(p.y)[p.x].setInk(style);
+              ras->pixels(p.y)[p.x].setTone(0);
+            } else
+              ras->pixels(p.y)[p.x].setPaint(style);
+          }
+        } else
+          for (const TPoint &p : points) {
+            visited[p.y * lx + p.x] = false;
+          }
+      }
+      emptyCount = 0;
+    }
+  }
+
+  delete[] visited;
 }
