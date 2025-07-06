@@ -2329,11 +2329,11 @@ bool FillTool::onPropertyChanged(std::string propertyName, bool addToUndo) {
   }
   // Close Gap
   else if (propertyName == m_closeGap.getName()) {
-    if (m_closeGap.getValue()) FillCloseGap = (int)(m_closeGap.getValue());
+    FillCloseGap = (int)(m_closeGap.getValue());
   }
   // Refer Fill
   else if (propertyName == m_referFill.getName()) {
-    if (m_referFill.getValue()) FillReferFill = (int)(m_referFill.getValue());
+    FillReferFill = (int)(m_referFill.getValue());
   }
   // Autopaint
   else if (propertyName == m_autopaintLines.getName()) {
