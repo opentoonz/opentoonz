@@ -196,13 +196,13 @@ public:
 class DVAPI TRasterUndo : public TToolUndo {
 protected:
   TTileSetCM32 *m_tiles;
-
+  bool m_updateSaveBox;
   TToonzImageP getImage() const;
 
 public:
   TRasterUndo(TTileSetCM32 *tiles, TXshSimpleLevel *level,
               const TFrameId &frameId, bool createdFrame, bool createdLevel,
-              const TPaletteP &oldPalette);  // get tiles ownership
+              const TPaletteP &oldPalette, bool updateSaveBox = true);  // get tiles ownership
   ~TRasterUndo();
 
   int getSize() const override;

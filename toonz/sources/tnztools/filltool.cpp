@@ -458,7 +458,7 @@ public:
                      int paintId, TXshSimpleLevel *level,
                      std::wstring colorType, bool onlyUnfilled,
                      const TFrameId &fid, TRaster32P refImg, TPalette *palette)
-      : TRasterUndo(tileSet, level, fid, false, false, 0)
+      : TRasterUndo(tileSet, level, fid, false, false, 0, false)
       , m_fillArea(fillArea)
       , m_paintId(paintId)
       , m_colorType(colorType)
@@ -474,10 +474,10 @@ public:
     TRasterCM32P ras = image->getRaster();
     AreaFiller filler(ras, m_refImg, m_palette);
     if (!m_s)
-      filler.rectFill(m_fillArea, m_paintId, m_onlyUnfilled,
+      filler.rectFill(m_fillArea, image->getSavebox(), m_paintId, m_onlyUnfilled,
                       m_colorType != LINES, m_colorType != AREAS);
     else
-      filler.strokeFill(m_s, m_paintId, m_onlyUnfilled, m_colorType != LINES,
+      filler.strokeFill(m_fillArea, m_s, m_paintId, m_onlyUnfilled, m_colorType != LINES,
                         m_colorType != AREAS);
 
     if (m_palette) {
@@ -840,14 +840,14 @@ void fillAreaWithUndo(const TImageP &img, const TRaster32P &ref,
   if (TToonzImageP ti = img) {
     // allargo di 1 la savebox, perche cosi' il rectfill di tutta l'immagine fa
     // una sola fillata
+    TRasterCM32P ras = ti->getRaster();
     TRect refSavebox      = ref ? ref->getBounds() : TRect();
-    TRect enlargedSavebox = (ti->getSavebox().enlarge(1) + refSavebox) *
-                            TRect(TPoint(0, 0), ti->getSize());
+    //TRect enlargedSavebox = (ti->getSavebox().enlarge(1) + refSavebox) * ras->getBounds();
     TRect strokeBox      = ToonzImageUtils::convertWorldToRaster(selArea, ti);
-    TRect rasterFillArea = strokeBox * enlargedSavebox;
+    TRect savebox = ti->getSavebox();
+    TRect rasterFillArea = strokeBox * savebox;
     if (rasterFillArea.isEmpty()) return;
 
-    TRasterCM32P ras = ti->getRaster();
     /*-- tileSetでFill範囲のRectをUndoに格納しておく --*/
     TTileSetCM32 *tileSet = new TTileSetCM32(ras->getSize());
     tileSet->add(ras, rasterFillArea);
@@ -866,7 +866,7 @@ void fillAreaWithUndo(const TImageP &img, const TRaster32P &ref,
     }
     AreaFiller filler(raux, ref, plt);
     if (!stroke) {
-      bool ret = filler.rectFill(rasterFillArea, cs, onlyUnfilled,
+      bool ret = filler.rectFill(rasterFillArea, ti->getSavebox(), cs, onlyUnfilled,
                                  colorType != LINES, colorType != AREAS);
       if (!ret) {
         delete tileSet;
@@ -888,11 +888,11 @@ void fillAreaWithUndo(const TImageP &img, const TRaster32P &ref,
       if (stroke) stroke->transform(TTranslation(convert(ras->getCenter())));
       if (ref)
         stroke->transform(TTranslation(-convert(ti->getSavebox().getP00())));
-      filler.strokeFill(stroke, cs, onlyUnfilled, colorType != LINES,
+      filler.strokeFill(rasterFillArea, stroke, cs, onlyUnfilled, colorType != LINES,
                         colorType != AREAS);
     }
 
-    ToolUtils::updateSaveBox(sl, fid);
+    //ToolUtils::updateSaveBox(sl, fid);
 
     TUndoManager::manager()->add(
         new RasterRectFillUndo(tileSet, stroke, rasterFillArea, cs, sl,

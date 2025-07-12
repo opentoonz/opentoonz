@@ -640,9 +640,11 @@ int ToolUtils::TToolUndo::m_idCount = 0;
 ToolUtils::TRasterUndo::TRasterUndo(TTileSetCM32 *tiles, TXshSimpleLevel *level,
                                     const TFrameId &frameId, bool createdFrame,
                                     bool createdLevel,
-                                    const TPaletteP &oldPalette)
+                                    const TPaletteP &oldPalette,
+                                    bool updateSavebox)
     : TToolUndo(level, frameId, createdFrame, createdLevel, oldPalette)
-    , m_tiles(tiles) {}
+    , m_tiles(tiles)
+    , m_updateSaveBox(updateSavebox){}
 
 //------------------------------------------------------------------------------------------
 
@@ -678,7 +680,8 @@ void ToolUtils::TRasterUndo::undo() const {
     if (!image) return;
 
     ToonzImageUtils::paste(image, m_tiles);
-    ToolUtils::updateSaveBox(m_level, m_frameId);
+    if(m_updateSaveBox)
+        ToolUtils::updateSaveBox(m_level, m_frameId);
   }
 
   removeLevelAndFrameIfNeeded();

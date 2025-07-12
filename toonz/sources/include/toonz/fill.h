@@ -119,7 +119,7 @@ Fill \b rect in raster with \b color.
 else if \b fillInks is false fill only paint delimited by ink;
 else fill ink and paint in rect.
 */
-  bool rectFill(const TRect &rect, int color, bool onlyUnfilled,
+  bool rectFill(const TRect &rect, const TRect &saveBox, int color, bool onlyUnfilled,
                 bool fillPaints, bool fillInks);
 
   /*!
@@ -128,7 +128,7 @@ Fill the raster region contained in spline \b s with \b color.
 else if \b fillInks is false fill only paint delimited by ink;
 else fill ink and paint in region contained in spline.
 */
-  void strokeFill(TStroke *s, int color, bool onlyUnfilled, bool fillPaints,
+  void strokeFill(const TRect& rect, TStroke *s, int color, bool onlyUnfilled, bool fillPaints,
                   bool fillInks);
 };
 

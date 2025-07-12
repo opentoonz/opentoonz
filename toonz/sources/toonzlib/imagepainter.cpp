@@ -77,7 +77,7 @@ inline void quickput(const TRasterP &rout, const TRasterP &rin,
 
       if (tc & ToonzCheck::eGap) {
         srcCM32 = srcCM32->clone();
-        AreaFiller(srcCM32).rectFill(srcCM32->getBounds(), 1, true, true,
+        AreaFiller(srcCM32).rectFill(srcCM32->getBounds(), TRect(), 1, true, true,
                                      false);
       }
 
