@@ -462,10 +462,14 @@ bool PaintBrushTool::onPropertyChanged(std::string propertyName) {
   // Selective
   else if (propertyName == m_selective.getName()) {
     PaintBrushSelective = (int)(m_selective.getValue());
-    if (m_selective.getValue() && m_modifierLockAlpha.getValue())
+    if (m_selective.getValue() && m_modifierLockAlpha.getValue()) {
       m_modifierLockAlpha.setValue(false);
-    if (m_selective.getValue() && m_pick.getValue()) 
-        m_pick.setValue(false);
+      PaintBrushModifierLockAlpha = 0;
+    }
+    if (m_selective.getValue() && m_pick.getValue()) {
+      m_pick.setValue(false);
+      PaintBrushPick = 0;
+    }
   }
 
   // Areas, Lines etc.
@@ -478,15 +482,21 @@ bool PaintBrushTool::onPropertyChanged(std::string propertyName) {
   // Lock Alpha
   else if (propertyName == m_modifierLockAlpha.getName()) {
     PaintBrushModifierLockAlpha = (int)(m_modifierLockAlpha.getValue());
-    if (m_modifierLockAlpha.getValue() && m_selective.getValue())
+    if (m_modifierLockAlpha.getValue() && m_selective.getValue()) {
       m_selective.setValue(false);
-  } 
-  
-  //Pick
+      PaintBrushSelective = 0;
+    }
+  }
+
+  // Pick
   else if (propertyName == m_pick.getName()) {
     PaintBrushPick = (int)m_pick.getValue();
-    if (m_pick.getValue() && m_selective.getValue()) m_selective.setValue(false);
+    if (m_pick.getValue() && m_selective.getValue()) {
+      m_selective.setValue(false);
+      PaintBrushSelective = 0;
+    }
   }
+
   // Filling Mode
   else if (propertyName == m_fillingMode.getName()) {
     PaintBrushFill = (int)(m_fillingMode.getValue());
