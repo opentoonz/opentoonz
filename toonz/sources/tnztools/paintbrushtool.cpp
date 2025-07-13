@@ -476,6 +476,10 @@ bool PaintBrushTool::onPropertyChanged(std::string propertyName) {
     PaintBrushPick = (int)(m_pick.getValue());
   }
 
+  else if (propertyName == m_pick.getName()) {
+    PaintBrushPick = (int)m_pick.getValue();
+  }
+  }
   return true;
 }
 
@@ -570,6 +574,7 @@ void PaintBrushTool::onEnter() {
     m_colorType.setValue(::to_wstring(PaintBrushColorType.getValue()));
     m_toolSize.setValue(PaintBrushSize);
     m_modifierLockAlpha.setValue(PaintBrushModifierLockAlpha ? 1 : 0);
+    m_pick.setValue(PaintBrushPick ? 1 : 0);
     m_firstTime = false;
   }
   double x = m_toolSize.getValue();
