@@ -252,7 +252,7 @@ void RasterStrokeGenerator::placeOver(const TRasterCM32P &out,
 
         int paintIdx     = outPix->getPaint();
         bool changePaint = (!m_selective && !m_modifierLockAlpha) ||
-                           (m_selective && paintIdx == 0) ||
+                           (m_selective && paintIdx == m_selectedStyle) ||
                            (m_modifierLockAlpha && paintIdx != 0);
 
         if (changePaint)
@@ -275,8 +275,7 @@ void RasterStrokeGenerator::placeOver(const TRasterCM32P &out,
         }
       }
     }
-  }
-
+  } else
   for (int y = 0; y < rOut->getLy(); y++) {
     /*--Finger Tool Boundary Conditions --*/
     if (m_task == FINGER && (y == 0 || y == rOut->getLy() - 1)) continue;
@@ -298,8 +297,10 @@ void RasterStrokeGenerator::placeOver(const TRasterCM32P &out,
           continue;
         }
         if (outPix->isPureInk() && m_selective) {
-          if (!m_isPaletteOrder || m_aboveStyleIds.contains(outPix->getInk())) {
-            *outPix = TPixelCM32(outPix->getInk(), outPix->getPaint(), outTone);
+            if (!m_isPaletteOrder ||
+                m_aboveStyleIds.contains(outPix->getInk())) {
+              *outPix =
+                  TPixelCM32(outPix->getInk(), outPix->getPaint(), outTone);
             continue;
           }
         }
@@ -307,8 +308,7 @@ void RasterStrokeGenerator::placeOver(const TRasterCM32P &out,
           *outPix = TPixelCM32(inPix->getInk(), outPix->getPaint(),
                                m_modifierLockAlpha ? outTone : inTone);
         }
-      }
-      if (m_task == ERASE) {
+        } else if (m_task == ERASE) {
         if (m_colorType == INK) {
           if (!m_keepAntiAlias) {
             if (inPix->getTone() == 0 &&
@@ -352,15 +352,15 @@ void RasterStrokeGenerator::placeOver(const TRasterCM32P &out,
         if (!inPix->isPureInk()) continue;
         int paintIdx     = outPix->getPaint();
         bool changePaint = (!m_selective && !m_modifierLockAlpha) ||
-                           (m_selective && paintIdx == 0) ||
+                             (m_selective && paintIdx == m_selectedStyle) ||
                            (m_modifierLockAlpha && paintIdx != 0);
         if (m_colorType == INK)
           *outPix = TPixelCM32(inPix->getInk(), outPix->getPaint(),
                                outPix->getTone());
-        /*if (m_colorType == PAINT)
+          if (m_colorType == PAINT)
           if (changePaint)
             *outPix = TPixelCM32(outPix->getInk(), inPix->getInk(),
-                                 outPix->getTone());*/
+                                   outPix->getTone());
         if (m_colorType == INKNPAINT)
           *outPix =
               TPixelCM32(inPix->getInk(),
@@ -417,8 +417,8 @@ void RasterStrokeGenerator::placeOver(const TRasterCM32P &out,
           int maxTone = tone;
           for (int p = 0; p < 4; p++) {
             /*--
-             * Count up items whose Ink# is not Current or whose line is thinner
-             * than your Pixel (Tone is higher).
+               * Count up items whose Ink# is not Current or whose line is
+               * thinner than your Pixel (Tone is higher).
              * --*/
             if (neighbourPixels[p]->getInk() != inStyle) {
               count++;

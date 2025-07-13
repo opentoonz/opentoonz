@@ -263,7 +263,7 @@ class PaintBrushTool final : public TTool {
   TPointD m_mousePos;
 
   TIntProperty m_toolSize;
-  TBoolProperty m_onlyEmptyAreas;
+  TBoolProperty m_selective;
   TEnumProperty m_colorType;
   TBoolProperty m_pick;
   TPropertyGroup m_prop;
@@ -335,7 +335,7 @@ PaintBrushTool::PaintBrushTool()
     // sostituire i nomi con quelli del current, tipo W_ToolOptions...
     , m_toolSize("Size:", 1, 1000, 10, false)  // W_ToolOptions_BrushToolSize
     , m_colorType("Mode:")                     // W_ToolOptions_InkOrPaint
-    , m_onlyEmptyAreas("Selective", false)     // W_ToolOptions_Selective
+    , m_selective("Selective", false)          // W_ToolOptions_Selective
     , m_firstTime(true)
     , m_workingFrameId(TFrameId())
     , m_modifierLockAlpha("Lock Alpha", false)
@@ -350,11 +350,11 @@ PaintBrushTool::PaintBrushTool()
 
   m_prop.bind(m_toolSize);
   m_prop.bind(m_colorType);
-  m_prop.bind(m_onlyEmptyAreas);
+  m_prop.bind(m_selective);
   m_prop.bind(m_modifierLockAlpha);
   m_prop.bind(m_pick);
 
-  m_onlyEmptyAreas.setId("Selective");
+  m_selective.setId("Selective");
   m_colorType.setId("Mode");
   m_modifierLockAlpha.setId("LockAlpha");
   m_pick.setId("Pick");
@@ -370,7 +370,7 @@ void PaintBrushTool::updateTranslation() {
   m_colorType.setItemUIName(AREAS, tr("Areas"));
   m_colorType.setItemUIName(ALL, tr("Lines & Areas"));
 
-  m_onlyEmptyAreas.setQStringName(tr("Selective", NULL));
+  m_selective.setQStringName(tr("Selective", NULL));
   m_modifierLockAlpha.setQStringName(tr("Lock Alpha"));
   m_pick.setQStringName(tr("Pick"));
 }
@@ -454,10 +454,11 @@ bool PaintBrushTool::onPropertyChanged(std::string propertyName) {
   }
 
   // Selective
-  else if (propertyName == m_onlyEmptyAreas.getName()) {
-    PaintBrushSelective = (int)(m_onlyEmptyAreas.getValue());
-    if (m_onlyEmptyAreas.getValue() && m_modifierLockAlpha.getValue())
+  else if (propertyName == m_selective.getName()) {
+    PaintBrushSelective = (int)(m_selective.getValue());
+    if (m_selective.getValue() && m_modifierLockAlpha.getValue())
       m_modifierLockAlpha.setValue(false);
+    if (m_selective.getValue() && m_pick.getValue()) m_pick.setValue(false);
   }
 
   // Areas, Lines etc.
@@ -470,14 +471,14 @@ bool PaintBrushTool::onPropertyChanged(std::string propertyName) {
   // Lock Alpha
   else if (propertyName == m_modifierLockAlpha.getName()) {
     PaintBrushModifierLockAlpha = (int)(m_modifierLockAlpha.getValue());
-    if (m_modifierLockAlpha.getValue() && m_onlyEmptyAreas.getValue())
-      m_onlyEmptyAreas.setValue(false);
-  } else if (propertyName == m_pick.getName()) {
-    PaintBrushPick = (int)(m_pick.getValue());
-  }
-
+    if (m_modifierLockAlpha.getValue() && m_selective.getValue())
+      m_selective.setValue(false);
+  } 
+  
+  //Pick
   else if (propertyName == m_pick.getName()) {
     PaintBrushPick = (int)m_pick.getValue();
+    if (m_pick.getValue() && m_selective.getValue()) m_selective.setValue(false);
   }
   }
   return true;
@@ -496,14 +497,17 @@ void PaintBrushTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
   if (TToonzImageP ti = image) {
     TRasterCM32P ras = ti->getRaster();
     if (ras) {
-      if (m_pick.getValue()) {
+      int pickedStyle = 0;
+      if (m_pick.getValue() || m_selective.getValue()) {
         TApplication *app = getApplication();
-        int pickedStyle   = pick(ti, pos,
-                               app->getCurrentFrame()->isEditingLevel()
-                                     ? -1
-                                     : app->getCurrentFrame()->getFrame());
-        m_orignalStyle    = app->getCurrentLevelStyleIndex();
+        pickedStyle       = pick(ti, pos,
+             app->getCurrentFrame()->isEditingLevel()
+                 ? -1
+                 : app->getCurrentFrame()->getFrame());
+        if (m_pick.getValue()) {
+        m_orignalStyle = app->getCurrentLevelStyleIndex();
         app->setCurrentLevelStyleIndex(pickedStyle);
+      }
       }
       int thickness = m_toolSize.getValue();
       int styleId   = TTool::getApplication()->getCurrentLevelStyleIndex();
@@ -512,7 +516,7 @@ void PaintBrushTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
       m_rasterTrack         = new RasterStrokeGenerator(
           ras, PAINTBRUSH, m_colorTypeBrush, styleId,
           TThickPoint(m_mousePos + convert(ras->getCenter()), thickness),
-          m_onlyEmptyAreas.getValue(), 0, m_modifierLockAlpha.getValue(),
+          m_selective.getValue(), pickedStyle, m_modifierLockAlpha.getValue(), false);
           false);
       /*-- 現在のFidを記憶 --*/
       m_workingFrameId = getFrameId();
@@ -570,7 +574,7 @@ void PaintBrushTool::mouseMove(const TPointD &pos, const TMouseEvent &e) {
 
 void PaintBrushTool::onEnter() {
   if (m_firstTime) {
-    m_onlyEmptyAreas.setValue(PaintBrushSelective ? 1 : 0);
+    m_selective.setValue(PaintBrushSelective ? 1 : 0);
     m_colorType.setValue(::to_wstring(PaintBrushColorType.getValue()));
     m_toolSize.setValue(PaintBrushSize);
     m_modifierLockAlpha.setValue(PaintBrushModifierLockAlpha ? 1 : 0);
