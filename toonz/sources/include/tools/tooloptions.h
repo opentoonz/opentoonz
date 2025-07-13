@@ -477,6 +477,7 @@ class PaintbrushToolOptionsBox final : public ToolOptionsBox {
   ToolOptionCombo *m_colorMode;
   ToolOptionCheckbox *m_selectiveMode;
   ToolOptionCheckbox *m_lockAlphaMode;
+  ToolOptionCheckbox *m_FillingMode;
 
 public:
   PaintbrushToolOptionsBox(QWidget *parent, TTool *tool,

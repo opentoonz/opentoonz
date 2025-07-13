@@ -51,6 +51,7 @@ TEnv::IntVar PaintBrushSelective("InknpaintPaintBrushSelective", 0);
 TEnv::DoubleVar PaintBrushSize("InknpaintPaintBrushSize", 10);
 TEnv::IntVar PaintBrushModifierLockAlpha("PaintBrushModifierLockAlpha", 0);
 TEnv::IntVar PaintBrushPick("PaintBrushPick", 0);
+TEnv::IntVar PaintBrushFill("PaintBrushFill", 1);
 
 //-----------------------------------------------------------------------------
 
@@ -266,6 +267,7 @@ class PaintBrushTool final : public TTool {
   TBoolProperty m_selective;
   TEnumProperty m_colorType;
   TBoolProperty m_pick;
+  TBoolProperty m_fillingMode;
   TPropertyGroup m_prop;
   int m_cursor;
   ColorType m_colorTypeBrush;
@@ -339,7 +341,8 @@ PaintBrushTool::PaintBrushTool()
     , m_firstTime(true)
     , m_workingFrameId(TFrameId())
     , m_modifierLockAlpha("Lock Alpha", false)
-    , m_pick("Pick", false) {
+    , m_pick("Pick", false)
+    , m_fillingMode("Paint by Filling", true) {
   m_toolSize.setNonLinearSlider();
 
   m_colorType.addValue(LINES);
@@ -353,11 +356,13 @@ PaintBrushTool::PaintBrushTool()
   m_prop.bind(m_selective);
   m_prop.bind(m_modifierLockAlpha);
   m_prop.bind(m_pick);
+  m_prop.bind(m_fillingMode);
 
   m_selective.setId("Selective");
   m_colorType.setId("Mode");
   m_modifierLockAlpha.setId("LockAlpha");
   m_pick.setId("Pick");
+  m_fillingMode.setId("FillingMode");
 }
 
 //-----------------------------------------------------------------------------
@@ -373,6 +378,7 @@ void PaintBrushTool::updateTranslation() {
   m_selective.setQStringName(tr("Selective", NULL));
   m_modifierLockAlpha.setQStringName(tr("Lock Alpha"));
   m_pick.setQStringName(tr("Pick"));
+  m_fillingMode.setQStringName(tr("Paint by Filling"));
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -458,7 +464,8 @@ bool PaintBrushTool::onPropertyChanged(std::string propertyName) {
     PaintBrushSelective = (int)(m_selective.getValue());
     if (m_selective.getValue() && m_modifierLockAlpha.getValue())
       m_modifierLockAlpha.setValue(false);
-    if (m_selective.getValue() && m_pick.getValue()) m_pick.setValue(false);
+    if (m_selective.getValue() && m_pick.getValue()) 
+        m_pick.setValue(false);
   }
 
   // Areas, Lines etc.
@@ -480,6 +487,9 @@ bool PaintBrushTool::onPropertyChanged(std::string propertyName) {
     PaintBrushPick = (int)m_pick.getValue();
     if (m_pick.getValue() && m_selective.getValue()) m_selective.setValue(false);
   }
+  // Filling Mode
+  else if (propertyName == m_fillingMode.getName()) {
+    PaintBrushFill = (int)(m_fillingMode.getValue());
   }
   return true;
 }
@@ -501,13 +511,13 @@ void PaintBrushTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
       if (m_pick.getValue() || m_selective.getValue()) {
         TApplication *app = getApplication();
         pickedStyle       = pick(ti, pos,
-             app->getCurrentFrame()->isEditingLevel()
-                 ? -1
-                 : app->getCurrentFrame()->getFrame());
+                           app->getCurrentFrame()->isEditingLevel()
+                                     ? -1
+                                     : app->getCurrentFrame()->getFrame());
         if (m_pick.getValue()) {
-        m_orignalStyle = app->getCurrentLevelStyleIndex();
-        app->setCurrentLevelStyleIndex(pickedStyle);
-      }
+          m_orignalStyle = app->getCurrentLevelStyleIndex();
+          app->setCurrentLevelStyleIndex(pickedStyle);
+        }
       }
       int thickness = m_toolSize.getValue();
       int styleId   = TTool::getApplication()->getCurrentLevelStyleIndex();
@@ -516,8 +526,8 @@ void PaintBrushTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
       m_rasterTrack         = new RasterStrokeGenerator(
           ras, PAINTBRUSH, m_colorTypeBrush, styleId,
           TThickPoint(m_mousePos + convert(ras->getCenter()), thickness),
-          m_selective.getValue(), pickedStyle, m_modifierLockAlpha.getValue(), false);
-          false);
+          m_selective.getValue(), pickedStyle, m_modifierLockAlpha.getValue(),
+          m_fillingMode.getValue());
       /*-- 現在のFidを記憶 --*/
       m_workingFrameId = getFrameId();
       m_tileSaver->save(m_rasterTrack->getLastRect());
@@ -579,6 +589,7 @@ void PaintBrushTool::onEnter() {
     m_toolSize.setValue(PaintBrushSize);
     m_modifierLockAlpha.setValue(PaintBrushModifierLockAlpha ? 1 : 0);
     m_pick.setValue(PaintBrushPick ? 1 : 0);
+    m_fillingMode.setValue(PaintBrushFill ? 1 : 0);
     m_firstTime = false;
   }
   double x = m_toolSize.getValue();

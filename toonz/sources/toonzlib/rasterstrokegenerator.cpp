@@ -193,7 +193,8 @@ void RasterStrokeGenerator::placeOver(const TRasterCM32P &out,
   TRect box2        = box - p;
   TRasterCM32P rIn  = in->extract(box2);
   TRect box3        = rOut->getBounds();
-  if (m_task == PAINTBRUSH && m_colorType == PAINT) {
+  // Paint By Filling
+  if (m_task == PAINTBRUSH && m_colorType == PAINT && m_keepAntiAlias) {
     TPoint center = in->getCenter() - p;
     if (!box3.contains(center)) center = rIn->getCenter();
     int lx = rOut->getLx();
@@ -207,12 +208,10 @@ void RasterStrokeGenerator::placeOver(const TRasterCM32P &out,
       int toPaint = (rIn->pixels(y) + x)->getInk();
       if (!m_selective && !toPaint) return true;
 
-      TPixelCM32 *pix  = rOut->pixels(y) + x;
-      int paintIdx     = pix->getPaint();
-      bool changePaint = (!m_selective && !m_modifierLockAlpha) ||
-                         (m_selective && toPaint != 0) ||
-                         (m_modifierLockAlpha && paintIdx != 0);
-      return !changePaint;
+      TPixelCM32 *pix = rOut->pixels(y) + x;
+      int paintIdx    = pix->getPaint();
+      return (m_selective && toPaint != m_selectedStyle && toPaint != m_styleId) ||
+             (m_modifierLockAlpha && toPaint == 0);
     };
 
     while (!stack.empty()) {
@@ -276,90 +275,89 @@ void RasterStrokeGenerator::placeOver(const TRasterCM32P &out,
       }
     }
   } else
-  for (int y = 0; y < rOut->getLy(); y++) {
-    /*--Finger Tool Boundary Conditions --*/
-    if (m_task == FINGER && (y == 0 || y == rOut->getLy() - 1)) continue;
+    for (int y = 0; y < rOut->getLy(); y++) {
+      /*--Finger Tool Boundary Conditions --*/
+      if (m_task == FINGER && (y == 0 || y == rOut->getLy() - 1)) continue;
 
-    TPixelCM32 *inPix  = rIn->pixels(y);
-    TPixelCM32 *outPix = rOut->pixels(y);
-    TPixelCM32 *outEnd = outPix + rOut->getLx();
-    for (; outPix < outEnd; ++inPix, ++outPix) {
-      if (m_task == BRUSH) {
-        int inTone  = inPix->getTone();
-        int outTone = outPix->getTone();
-        if (inPix->isPureInk() && !m_selective && !m_modifierLockAlpha) {
-          *outPix = TPixelCM32(inPix->getInk(), outPix->getPaint(), inTone);
-          continue;
-        }
-        if (m_modifierLockAlpha && !outPix->isPureInk() &&
-            outPix->getPaint() == 0 && outPix->getTone() == 255) {
-          *outPix = TPixelCM32(outPix->getInk(), outPix->getPaint(), outTone);
-          continue;
-        }
-        if (outPix->isPureInk() && m_selective) {
+      TPixelCM32 *inPix  = rIn->pixels(y);
+      TPixelCM32 *outPix = rOut->pixels(y);
+      TPixelCM32 *outEnd = outPix + rOut->getLx();
+      for (; outPix < outEnd; ++inPix, ++outPix) {
+        if (m_task == BRUSH) {
+          int inTone  = inPix->getTone();
+          int outTone = outPix->getTone();
+          if (inPix->isPureInk() && !m_selective && !m_modifierLockAlpha) {
+            *outPix = TPixelCM32(inPix->getInk(), outPix->getPaint(), inTone);
+            continue;
+          }
+          if (m_modifierLockAlpha && !outPix->isPureInk() &&
+              outPix->getPaint() == 0 && outPix->getTone() == 255) {
+            *outPix = TPixelCM32(outPix->getInk(), outPix->getPaint(), outTone);
+            continue;
+          }
+          if (outPix->isPureInk() && m_selective) {
             if (!m_isPaletteOrder ||
                 m_aboveStyleIds.contains(outPix->getInk())) {
               *outPix =
                   TPixelCM32(outPix->getInk(), outPix->getPaint(), outTone);
-            continue;
+              continue;
+            }
           }
-        }
-        if (inTone <= outTone) {
-          *outPix = TPixelCM32(inPix->getInk(), outPix->getPaint(),
-                               m_modifierLockAlpha ? outTone : inTone);
-        }
+          if (inTone <= outTone) {
+            *outPix = TPixelCM32(inPix->getInk(), outPix->getPaint(),
+                                 m_modifierLockAlpha ? outTone : inTone);
+          }
         } else if (m_task == ERASE) {
-        if (m_colorType == INK) {
-          if (!m_keepAntiAlias) {
+          if (m_colorType == INK) {
+            if (!m_keepAntiAlias) {
+              if (inPix->getTone() == 0 &&
+                  (!m_selective ||
+                   (m_selective && outPix->getInk() == m_selectedStyle))) {
+                outPix->setTone(255);
+              }
+            } else if (inPix->getTone() < 255 &&
+                       (!m_selective ||
+                        (m_selective && outPix->getInk() == m_selectedStyle))) {
+              outPix->setTone(
+                  std::max(outPix->getTone(), 255 - inPix->getTone()));
+            }
+          }
+          if (m_colorType == PAINT) {
             if (inPix->getTone() == 0 &&
                 (!m_selective ||
-                 (m_selective && outPix->getInk() == m_selectedStyle))) {
-              outPix->setTone(255);
-            }
-          } else if (inPix->getTone() < 255 &&
-                     (!m_selective ||
-                      (m_selective && outPix->getInk() == m_selectedStyle))) {
-            outPix->setTone(
-                std::max(outPix->getTone(), 255 - inPix->getTone()));
+                 (m_selective && outPix->getPaint() == m_selectedStyle)))
+              outPix->setPaint(0);
           }
-        }
-        if (m_colorType == PAINT) {
-          if (inPix->getTone() == 0 &&
-              (!m_selective ||
-               (m_selective && outPix->getPaint() == m_selectedStyle)))
-            outPix->setPaint(0);
-        }
-        if (m_colorType == INKNPAINT) {
-          if (inPix->getTone() < 255 &&
-              (!m_selective ||
-               (m_selective && outPix->getPaint() == m_selectedStyle)))
-            outPix->setPaint(0);
-          if (!m_keepAntiAlias) {
-            if (inPix->getTone() == 0 &&
+          if (m_colorType == INKNPAINT) {
+            if (inPix->getTone() < 255 &&
                 (!m_selective ||
-                 (m_selective && outPix->getInk() == m_selectedStyle))) {
-              outPix->setTone(255);
+                 (m_selective && outPix->getPaint() == m_selectedStyle)))
+              outPix->setPaint(0);
+            if (!m_keepAntiAlias) {
+              if (inPix->getTone() == 0 &&
+                  (!m_selective ||
+                   (m_selective && outPix->getInk() == m_selectedStyle))) {
+                outPix->setTone(255);
+              }
+            } else if (inPix->getTone() < 255 &&
+                       (!m_selective ||
+                        (m_selective && outPix->getInk() == m_selectedStyle))) {
+              outPix->setTone(
+                  std::max(outPix->getTone(), 255 - inPix->getTone()));
             }
-          } else if (inPix->getTone() < 255 &&
-                     (!m_selective ||
-                      (m_selective && outPix->getInk() == m_selectedStyle))) {
-            outPix->setTone(
-                std::max(outPix->getTone(), 255 - inPix->getTone()));
           }
-        }
-      } 
-      else if (m_task == PAINTBRUSH) {
-        if (!inPix->isPureInk()) continue;
-        int paintIdx     = outPix->getPaint();
-        bool changePaint = (!m_selective && !m_modifierLockAlpha) ||
+        } else if (m_task == PAINTBRUSH) {
+          if (!inPix->isPureInk()) continue;
+          int paintIdx     = outPix->getPaint();
+          bool changePaint = (!m_selective && !m_modifierLockAlpha) ||
                              (m_selective && paintIdx == m_selectedStyle) ||
-                           (m_modifierLockAlpha && paintIdx != 0);
-        if (m_colorType == INK)
-          *outPix = TPixelCM32(inPix->getInk(), outPix->getPaint(),
-                               outPix->getTone());
+                             (m_modifierLockAlpha && paintIdx != 0);
+          if (m_colorType == INK)
+            *outPix = TPixelCM32(inPix->getInk(), outPix->getPaint(),
+                                 outPix->getTone());
           if (m_colorType == PAINT)
-          if (changePaint)
-            *outPix = TPixelCM32(outPix->getInk(), inPix->getInk(),
+            if (changePaint)
+              *outPix = TPixelCM32(outPix->getInk(), inPix->getInk(),
                                    outPix->getTone());
         if (m_colorType == INKNPAINT)
           *outPix =
@@ -413,10 +411,10 @@ void RasterStrokeGenerator::placeOver(const TRasterCM32P &out,
         else {
           if (outPix->isPurePaint() || outPix->getInk() != inStyle) continue;
 
-          /*-- For 4 neighborhood pixels --*/
-          int maxTone = tone;
-          for (int p = 0; p < 4; p++) {
-            /*--
+            /*-- For 4 neighborhood pixels --*/
+            int maxTone = tone;
+            for (int p = 0; p < 4; p++) {
+              /*--
                * Count up items whose Ink# is not Current or whose line is
                * thinner than your Pixel (Tone is higher).
              * --*/

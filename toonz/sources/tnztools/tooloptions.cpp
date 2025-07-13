@@ -1682,10 +1682,13 @@ PaintbrushToolOptionsBox::PaintbrushToolOptionsBox(QWidget *parent, TTool *tool,
       dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Selective"));
   m_lockAlphaMode =
       dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Lock Alpha"));
+  m_FillingMode =
+      dynamic_cast<ToolOptionCheckbox*>(m_controls.value("Paint by Filling"));
 
   if (m_colorMode->getProperty()->getValue() == L"Lines") {
     m_selectiveMode->setVisible(false);
     m_lockAlphaMode->setVisible(false);
+    m_FillingMode->setVisible(false);
   }
 
   bool ret = connect(m_colorMode, SIGNAL(currentIndexChanged(int)), this,
@@ -1708,6 +1711,7 @@ void PaintbrushToolOptionsBox::onColorModeChanged(int index) {
   bool enabled                      = range[index] != L"Lines";
   m_selectiveMode->setVisible(enabled);
   m_lockAlphaMode->setVisible(enabled);
+  m_FillingMode->setVisible(enabled);
 }
 
 //=============================================================================
