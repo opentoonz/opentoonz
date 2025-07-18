@@ -326,9 +326,9 @@ std::shared_ptr<TProject> ToonzScene::getProject() const { return m_project; }
 
 //-----------------------------------------------------------------------------
 
-void ToonzScene::setScenePath(const TFilePath &fp) {
+void ToonzScene::setScenePath(const TFilePath &fp, bool changeToTitled) {
   m_scenePath = fp;
-  // m_isUntitled = false;
+  if(changeToTitled)m_isUntitled = false;
 }
 
 //-----------------------------------------------------------------------------

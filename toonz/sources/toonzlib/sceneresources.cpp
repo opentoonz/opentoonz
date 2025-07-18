@@ -513,7 +513,9 @@ void SceneResources::getResources() {
 
 void SceneResources::save(const TFilePath newScenePath) {
   TFilePath oldScenePath = m_scene->getScenePath();
-  m_scene->setScenePath(newScenePath);
+  // TODO: The save path of resources should not be decided by changing scene's property,
+  // refactor and remove setScenePath
+  m_scene->setScenePath(newScenePath, false);
   bool failedSave = false;
   for (int i = 0; i < (int)m_resources.size(); i++) {
     m_resources[i]->save();
@@ -533,7 +535,7 @@ void SceneResources::save(const TFilePath newScenePath) {
     DVGui::warning(QObject::tr("Failed to save the following resources:\n") +
                    "  " + failedList.join("\n  "));
   }
-  m_scene->setScenePath(oldScenePath);
+  m_scene->setScenePath(oldScenePath, false);
 }
 
 //-----------------------------------------------------------------------------
