@@ -3,6 +3,8 @@
 #ifndef FILLTOOL_H
 #define FILLTOOL_H
 
+#include <string>
+
 // TnzCore includes
 #include "tproperty.h"
 #include "toonz/txshlevelhandle.h"
@@ -21,7 +23,11 @@
 #define ALL L"Lines & Areas"
 
 class NormalLineFillTool;
+typedef std::vector<std::pair<TXshSimpleLevel *, TFrameId>> SlFidsPairs;
+typedef std::map<std::string, TRaster32P> RefImgTable;
+
 namespace {
+
 class AreaFillTool {
 public:
   enum Type { RECT, FREEHAND, POLYLINE, FREEPICK };
@@ -73,12 +79,13 @@ public:
   void onEnter();
 };
 }  // namespace
+
 class FillTool final : public QObject, public TTool {
   // Q_DECLARE_TR_FUNCTIONS(FillTool)
   Q_OBJECT
   bool m_firstTime;
-  TPointD m_firstPoint, m_clickPoint;
-  bool m_firstClick;
+  TPointD m_firstPoint, m_clickPoint, m_mousePos;
+  bool m_firstFrameSelected;
   bool m_frameSwitched             = false;
   double m_changedGapOriginalValue = -1.0;
   TXshSimpleLevelP m_level;
@@ -91,12 +98,17 @@ class FillTool final : public QObject, public TTool {
   TBoolProperty m_selective;
   TDoublePairProperty m_fillDepth;
   TBoolProperty m_segment;
+  TBoolProperty m_closeGap;
+  TBoolProperty m_referFill;
   TDoubleProperty m_maxGapDistance;
-  AreaFillTool *m_rectFill;
+  AreaFillTool *m_areaFillTool;
   NormalLineFillTool *m_normalLineFillTool;
 
   TPropertyGroup m_prop;
-  std::pair<int, int> m_currCell;
+  struct cellPos {
+    int col, row;
+  } m_beginCell;
+
   std::vector<TFilledRegionInf> m_oldFillInformation;
 #ifdef _DEBUG
   std::vector<TRect> m_rects;
@@ -105,6 +117,9 @@ class FillTool final : public QObject, public TTool {
   // For the raster fill tool, autopaint lines is optional and can be temporary
   // disabled
   TBoolProperty m_autopaintLines;
+
+  SlFidsPairs m_slFidsPairs;
+  RefImgTable m_refImgTable;// imageId
 
 public:
   FillTool(int targetType);
@@ -140,6 +155,13 @@ public:
   int getCursorId() const override;
 
   int getColorClass() const { return 2; }
+
+  void buildFillInfo(const FillParameters &params);
+  void computeRefImgsIfNeeded(const FillParameters &params);
+
+  const SlFidsPairs &getSlFidsPairs() const { return m_slFidsPairs; }
+  const RefImgTable &getRefImgTable() const { return m_refImgTable; }
+
 public slots:
   void onFrameSwitched() override;
 };
