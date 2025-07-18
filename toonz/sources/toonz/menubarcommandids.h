@@ -107,6 +107,7 @@
 #define MI_AdjustLevels "MI_AdjustLevels"
 #define MI_AdjustThickness "MI_AdjustThickness"
 #define MI_Binarize "MI_Binarize"
+#define MI_FillHoles "MI_FillHoles"
 #define MI_LinesFade "MI_LinesFade"
 #define MI_OpenXshView "MI_OpenXshView"
 #define MI_OpenTimelineView "MI_OpenTimelineView"
