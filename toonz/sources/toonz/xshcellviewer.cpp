@@ -965,10 +965,23 @@ void RenameCellField::renameCell() {
     cellSelection->deleteCells(false);
     // revert cell selection
     cellSelection->selectCells(range.m_r0, range.m_c0, range.m_r1, range.m_c1);
-  } else if (cells.size() == 1)
+  }
+  else if (cells.size() == 1) {
+    TCellSelection::Range range = cellSelection->getSelectedCells();
+    if (range.m_r0 == range.m_r1 &&
+        xsheet->getCell(range.m_r0, range.m_c0).getFrameId() != TFrameId::EMPTY_FRAME) {
+        for(;
+            xsheet->getCell(range.m_r1,range.m_c0)==
+            xsheet->getCell(range.m_r1+1,range.m_c0);
+            ++range.m_r1);
+    cellSelection->selectCells(range.m_r0, range.m_c0, range.m_r1, range.m_c1);
+    }
     cellSelection->renameCells(cells[0]);
+  }
   else
     cellSelection->renameMultiCells(cells);
+  
+  cellSelection->fillEmptyCell();
 }
 
 //-----------------------------------------------------------------------------
@@ -3355,24 +3368,35 @@ void CellArea::mousePressEvent(QMouseEvent *event) {
       m_viewer->getKeyframeSelection()->selectNone();
       setDragTool(
           XsheetGUI::DragTool::makeLevelExtenderTool(m_viewer, false, true));
-    } else if ((!xsh->getCell(row, col).isEmpty()) &&
+    }
+    // Drag Event
+    else if ((!xsh->getCell(row, col).isEmpty()) &&
                o->rect(PredefinedRect::DRAG_AREA)
                    .adjusted(0, 0, -frameAdj.x(), -frameAdj.y())
                    .contains(mouseInCell) ||
                // Or Control Pressed
-               event->modifiers() & Qt::ControlModifier) {
+               event->modifiers() & Qt::ControlModifier ||
+             // Or Frame Cell Selected and no modifiers
+        (event->modifiers() == Qt::NoModifier && Preferences::instance()->isAlwaysDragFrameCell() &&
+            (!xsh->getCell(row, col).isEmpty()) && xsh->getCell(row, col) != xsh->getCell(row - 1, col))) {
       TXshColumn *column = xsh->getColumn(col);
       if (column && !m_viewer->getCellSelection()->isCellSelected(row, col)) {
-        int r0, r1;
-        column->getLevelRange(row, r0, r1);
-        if (event->modifiers() & Qt::ControlModifier) {
-          m_viewer->getCellKeyframeSelection()->makeCurrent();
-          m_viewer->getCellKeyframeSelection()->selectCellsKeyframes(r0, col,
-                                                                     r1, col);
-        } else {
-          m_viewer->getKeyframeSelection()->selectNone();
-          m_viewer->getCellSelection()->makeCurrent();
-          m_viewer->getCellSelection()->selectCells(r0, col, r1, col);
+        if(xsh->getCell(row,col) == xsh->getCell(row - 1, col)) {
+          int r0, r1;
+          column->getLevelRange(row, r0, r1);
+          if (event->modifiers() & Qt::ControlModifier) {
+            m_viewer->getCellKeyframeSelection()->makeCurrent();
+            m_viewer->getCellKeyframeSelection()->selectCellsKeyframes(r0, col,
+                                                                       r1, col);
+          } else {
+            m_viewer->getKeyframeSelection()->selectNone();
+            m_viewer->getCellSelection()->makeCurrent();
+            m_viewer->getCellSelection()->selectCells(r0, col, r1, col);
+          }
+        } else { // switch to that FrameCell
+            m_viewer->setCurrentRow(row);
+            m_viewer->setCurrentColumn(col);
+            m_viewer->getCellSelection()->selectCell(row, col);
         }
         TApp::instance()->getCurrentSelection()->notifySelectionChanged();
       }
