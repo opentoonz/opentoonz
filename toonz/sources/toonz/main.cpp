@@ -731,7 +731,8 @@ int main(int argc, char *argv[]) {
   // Parse inital stylesheet in ThemeManager
   themeManager.parseCustomPropertiesFromStylesheet(currentStyle);
 
-  w.setWindowTitle(QString::fromStdString(TEnv::getApplicationFullName()));
+  //w.setWindowTitle(QString::fromStdString(TEnv::getApplicationFullName()));
+  w.changeWindowTitle();
   if (TEnv::getIsPortable()) {
     splash.showMessage(offsetStr + "Starting OpenToonz Portable ...",
                        Qt::AlignCenter, Qt::white);

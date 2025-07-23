@@ -56,7 +56,8 @@ public:
   std::shared_ptr<TProject> getProject() const;  //!< Returns a pointer to the project holding a scene instance.
   void setProject(std::shared_ptr<TProject>);  //!< Associates a scene to a project.
 
-  void setScenePath(const TFilePath &p);  //!< Sets the scene's file path.
+  void setScenePath(const TFilePath &p, 
+      bool changeToTitled = true);  //!< Sets the scene's file path.
   TFilePath getScenePath() const {
     return m_scenePath;
   }  //!< Returns the scene's file path.
@@ -72,6 +73,7 @@ public:
             once a proper path is specified by the user.                      */
 
   void setUntitled();  //!< Marks the scene as explicitly untitled.
+  void setTitled(); //Marks scene as titled after being saved
   bool isUntitled()
       const;  //!< Returns whether the scene path is empty, or the scene
               //!  is explicitly untitled.  \sa  Member function setUntitled().

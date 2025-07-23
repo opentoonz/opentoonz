@@ -117,6 +117,7 @@ enum PreferencesItemId {
   levelBasedToolsDisplay,
   useCtrlAltToResizeBrush,
   useStrokeEndCursor,
+  clickTwiceToCreateArcs,
   tempToolSwitchTimer,
 
   //----------
@@ -124,6 +125,7 @@ enum PreferencesItemId {
   xsheetLayoutPreference,
   xsheetStep,
   xsheetAutopanEnabled,
+  alwaysDragFrameCell,
   DragCellsBehaviour,
   deleteCommandBehavior,
   pasteCellsBehavior,

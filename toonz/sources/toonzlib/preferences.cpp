@@ -554,6 +554,7 @@ void Preferences::definePreferenceItems() {
          0);  // Default
   define(useCtrlAltToResizeBrush, "useCtrlAltToResizeBrush", QMetaType::Bool,
          true);
+  define(clickTwiceToCreateArcs, "clickTwiceToCreateArcs", QMetaType::Bool, true);
   define(tempToolSwitchTimer, "tempToolSwitchTimer", QMetaType::Int, 500, 1,
          std::numeric_limits<int>::max());
 
@@ -563,6 +564,8 @@ void Preferences::definePreferenceItems() {
   define(xsheetStep, "xsheetStep", QMetaType::Int, 10, 0,
          std::numeric_limits<int>::max());
   define(xsheetAutopanEnabled, "xsheetAutopanEnabled", QMetaType::Bool, true);
+  define(alwaysDragFrameCell, "alwaysDragFrameCell", QMetaType::Bool,
+         true);
   define(DragCellsBehaviour, "DragCellsBehaviour", QMetaType::Int,
          1);  // Cells and Column Data
   define(deleteCommandBehavior, "deleteCommandBehavior", QMetaType::Int,
