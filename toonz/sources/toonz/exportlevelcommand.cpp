@@ -332,10 +332,11 @@ TToonzImageP ImageExporter::exportedToonzImage(TVectorImageP vi) {
   const TDimensionD &size = camera.getSize();
   const TDimension &res   = camera.getRes();
 
-  const TPointD pos(-0.5 * size.lx, -0.5 * size.ly);
+  //const TPointD pos(-0.5 * size.lx, -0.5 * size.ly);
 
-  // Render to toonz image
-  TToonzImageP ti = ToonzImageUtils::vectorToToonzImage(vi, aff, plt, pos, res);
+  // Render to toonz image keep the same with the converter in drawingdata.cpp
+  TToonzImageP ti = ToonzImageUtils::vectorToToonzImage(vi, aff, plt, 
+      TPointD(), res, 0 ,true);
   ti->setPalette(plt);
 
   if (m_opts.m_noAntialias) {

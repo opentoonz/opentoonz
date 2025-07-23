@@ -308,6 +308,7 @@ set(SOURCES
     trackerpopup.cpp
     vectorguideddrawingpane.cpp
     vectorizerpopup.cpp
+    rasterizecommand.cpp
     vectorizerswatch.cpp
     versioncontrol.cpp
     versioncontroltimeline.cpp

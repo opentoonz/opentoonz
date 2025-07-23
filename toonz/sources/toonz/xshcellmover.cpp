@@ -190,6 +190,7 @@ void CellsMover::moveCells(const TPoint &pos) const {
   setCells(m_cells, r, c);
 
   // Act like implicit hold when dragging cells with pressing Shift key
+  // or dragging Frame cell
   // ( and WITHOUT Alt key ) and dragging within the same column.
   if (m_qualifiers & eInsertCells && !(m_qualifiers & eOverwriteCells)) {
     int startCol =
@@ -549,12 +550,19 @@ void LevelMoverTool::onClick(const QMouseEvent *e) {
   int row                   = cellPosition.frame();
   int col                   = cellPosition.layer();
 
+  int r0, c0, r1, c1;
+  getViewer()->getCellSelection()->getSelectedCells(r0, c0, r1, c1);
+
   m_qualifiers = 0;
   if (Preferences::instance()->getDragCellsBehaviour() == 1)
     m_qualifiers |= CellsMover::eMoveColumns;
   if ((e->modifiers() == (Qt::ControlModifier | Qt::AltModifier)))
     m_qualifiers |= CellsMover::eCopyCells;
-  if (e->modifiers() & Qt::ShiftModifier)
+  if (e->modifiers() & Qt::ShiftModifier ||
+      // Or Dragging Frame Cell
+      (r0 == r1 && c0 == c1) &&
+      getViewer()->getXsheet()->getCell(cellPosition)
+      != getViewer()->getXsheet()->getCell(row - 1, col))
     m_qualifiers |= CellsMover::eInsertCells;
   if (e->modifiers() & Qt::AltModifier)
     m_qualifiers |= CellsMover::eOverwriteCells;
@@ -563,9 +571,6 @@ void LevelMoverTool::onClick(const QMouseEvent *e) {
   if (m_qualifiers & CellsMover::eCopyCells)
     cursorType = ToolCursor::SplineEditorCursorAdd;
   setToolCursor(getViewer(), cursorType);
-
-  int r0, c0, r1, c1;
-  getViewer()->getCellSelection()->getSelectedCells(r0, c0, r1, c1);
 
   m_validPos             = true;
   m_undo                 = new LevelMoverUndo();

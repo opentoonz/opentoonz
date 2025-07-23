@@ -719,6 +719,7 @@ QMenu *CastBrowser::getContextMenu(QWidget *parent, int index) {
   bool paletteSelected     = false;
   bool vectorLevelSelected = false;
   bool meshLevelSelected   = false;
+  bool toonzRasterLevelSelected = false;
   bool otherFileSelected   = false;
   int levelSelectedCount   = 0;
   for (it = indices.begin(); it != indices.end(); ++it) {
@@ -735,9 +736,11 @@ QMenu *CastBrowser::getContextMenu(QWidget *parent, int index) {
     }
     levelSelectedCount++;
     if (sl->getType() == PLI_XSHLEVEL)
-      vectorLevelSelected = true;
+        vectorLevelSelected = true;
     else if (sl->getType() == MESH_XSHLEVEL)
-      meshLevelSelected = true;
+        meshLevelSelected = true;
+    else if (sl->getType() == TZP_XSHLEVEL)
+        toonzRasterLevelSelected = true;
     else
       otherFileSelected = true;
   }
@@ -761,6 +764,8 @@ QMenu *CastBrowser::getContextMenu(QWidget *parent, int index) {
   // MI_ConvertToVectors if only non-vector layers were selected
   if (!audioSelected && !paletteSelected && !vectorLevelSelected)
     menu->addAction(cm->getAction(MI_ConvertToVectors));
+  if (!audioSelected && !paletteSelected && !toonzRasterLevelSelected)
+      menu->addAction(cm->getAction(MI_ConvertToToonzRaster));
   menu->addSeparator();
   menu->addAction(cm->getAction(MI_RemoveLevel));
   menu->addAction(cm->getAction(MI_RemoveUnused));

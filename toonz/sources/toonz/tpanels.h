@@ -69,7 +69,7 @@ protected slots:
   void onPaletteSwitched();
   void onFreezeButtonToggled(bool isFrozen);
   void onSceneSwitched();
-  void onPreferenceChanged(const QString &prefName);
+  void onPreferenceChanged(const QString &prefName) override;
 };
 
 //=========================================================

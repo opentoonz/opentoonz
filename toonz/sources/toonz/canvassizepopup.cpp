@@ -224,8 +224,7 @@ void PeggingWidget::createButton(QPushButton **button,
   QPixmap pix(1, 1);
   switch (position) {
   case e00:
-    pix = m_topRightPix.transformed(QMatrix().rotate(-90),
-                                    Qt::SmoothTransformation);
+    pix = m_topRightPix.transformed(QTransform().rotate(-90), Qt::SmoothTransformation);
     break;
   case e01:
     pix = m_topPix;
@@ -234,21 +233,19 @@ void PeggingWidget::createButton(QPushButton **button,
     pix = m_topRightPix;
     break;
   case e10:
-    pix = m_topPix.transformed(QMatrix().rotate(-90), Qt::SmoothTransformation);
+    pix = m_topPix.transformed(QTransform().rotate(-90), Qt::SmoothTransformation);
     break;
   case e12:
-    pix = m_topPix.transformed(QMatrix().rotate(90), Qt::SmoothTransformation);
+    pix = m_topPix.transformed(QTransform().rotate(90), Qt::SmoothTransformation);
     break;
   case e20:
-    pix = m_topRightPix.transformed(QMatrix().rotate(180),
-                                    Qt::SmoothTransformation);
+    pix = m_topRightPix.transformed(QTransform().rotate(180), Qt::SmoothTransformation);
     break;
   case e21:
-    pix = m_topPix.transformed(QMatrix().rotate(180), Qt::SmoothTransformation);
+    pix = m_topPix.transformed(QTransform().rotate(180), Qt::SmoothTransformation);
     break;
   case e22:
-    pix = m_topRightPix.transformed(QMatrix().rotate(90),
-                                    Qt::SmoothTransformation);
+    pix = m_topRightPix.transformed(QTransform().rotate(90), Qt::SmoothTransformation);
     break;
   default:
     break;
@@ -263,12 +260,12 @@ void PeggingWidget::on00() {
   QPixmap pix(30, 30);
   pix.fill(Qt::transparent);
   m_00->setIcon(pix);
-  m_01->setIcon(m_topPix.transformed(QMatrix().rotate(m_cutLx ? -90 : 90),
+  m_01->setIcon(m_topPix.transformed(QTransform().rotate(m_cutLx ? -90 : 90),
                                      Qt::SmoothTransformation));
   m_11->setIcon(
-      m_topRightPix.transformed(QMatrix().rotate(m_cutLx || m_cutLy ? -90 : 90),
+      m_topRightPix.transformed(QTransform().rotate(m_cutLx || m_cutLy ? -90 : 90),
                                 Qt::SmoothTransformation));
-  m_10->setIcon(m_topPix.transformed(QMatrix().rotate(m_cutLy ? 0 : 180),
+  m_10->setIcon(m_topPix.transformed(QTransform().rotate(m_cutLy ? 0 : 180),
                                      Qt::SmoothTransformation));
 
   m_02->setIcon(pix);
@@ -285,17 +282,17 @@ void PeggingWidget::on01() {
   QPixmap pix(30, 30);
   pix.fill(Qt::transparent);
   m_01->setIcon(pix);
-  m_00->setIcon(m_topPix.transformed(QMatrix().rotate(m_cutLx ? 90 : -90),
+  m_00->setIcon(m_topPix.transformed(QTransform().rotate(m_cutLx ? 90 : -90),
                                      Qt::SmoothTransformation));
   m_10->setIcon(
-      m_topRightPix.transformed(QMatrix().rotate(m_cutLx || m_cutLy ? 0 : 180),
+      m_topRightPix.transformed(QTransform().rotate(m_cutLx || m_cutLy ? 0 : 180),
                                 Qt::SmoothTransformation));
-  m_11->setIcon(m_topPix.transformed(QMatrix().rotate(m_cutLy ? 0 : 180),
+  m_11->setIcon(m_topPix.transformed(QTransform().rotate(m_cutLy ? 0 : 180),
                                      Qt::SmoothTransformation));
   m_12->setIcon(
-      m_topRightPix.transformed(QMatrix().rotate(m_cutLx || m_cutLy ? -90 : 90),
+      m_topRightPix.transformed(QTransform().rotate(m_cutLx || m_cutLy ? -90 : 90),
                                 Qt::SmoothTransformation));
-  m_02->setIcon(m_topPix.transformed(QMatrix().rotate(m_cutLx ? -90 : 90),
+  m_02->setIcon(m_topPix.transformed(QTransform().rotate(m_cutLx ? -90 : 90),
                                      Qt::SmoothTransformation));
 
   m_20->setIcon(pix);
@@ -310,12 +307,12 @@ void PeggingWidget::on02() {
   QPixmap pix(30, 30);
   pix.fill(Qt::transparent);
   m_02->setIcon(pix);
-  m_01->setIcon(m_topPix.transformed(QMatrix().rotate(m_cutLx ? 90 : -90),
+  m_01->setIcon(m_topPix.transformed(QTransform().rotate(m_cutLx ? 90 : -90),
                                      Qt::SmoothTransformation));
   m_11->setIcon(
-      m_topRightPix.transformed(QMatrix().rotate(m_cutLx || m_cutLy ? 0 : 180),
+      m_topRightPix.transformed(QTransform().rotate(m_cutLx || m_cutLy ? 0 : 180),
                                 Qt::SmoothTransformation));
-  m_12->setIcon(m_topPix.transformed(QMatrix().rotate(m_cutLy ? 0 : 180),
+  m_12->setIcon(m_topPix.transformed(QTransform().rotate(m_cutLy ? 0 : 180),
                                      Qt::SmoothTransformation));
 
   m_00->setIcon(pix);
@@ -332,17 +329,17 @@ void PeggingWidget::on10() {
   QPixmap pix(30, 30);
   pix.fill(Qt::transparent);
   m_10->setIcon(pix);
-  m_00->setIcon(m_topPix.transformed(QMatrix().rotate(m_cutLy ? 180 : 0),
+  m_00->setIcon(m_topPix.transformed(QTransform().rotate(m_cutLy ? 180 : 0),
                                      Qt::SmoothTransformation));
   m_01->setIcon(
-      m_topRightPix.transformed(QMatrix().rotate(m_cutLx || m_cutLy ? 180 : 0),
+      m_topRightPix.transformed(QTransform().rotate(m_cutLx || m_cutLy ? 180 : 0),
                                 Qt::SmoothTransformation));
-  m_11->setIcon(m_topPix.transformed(QMatrix().rotate(m_cutLx ? -90 : 90),
+  m_11->setIcon(m_topPix.transformed(QTransform().rotate(m_cutLx ? -90 : 90),
                                      Qt::SmoothTransformation));
   m_21->setIcon(
-      m_topRightPix.transformed(QMatrix().rotate(m_cutLx || m_cutLy ? -90 : 90),
+      m_topRightPix.transformed(QTransform().rotate(m_cutLx || m_cutLy ? -90 : 90),
                                 Qt::SmoothTransformation));
-  m_20->setIcon(m_topPix.transformed(QMatrix().rotate(m_cutLy ? 0 : 180),
+  m_20->setIcon(m_topPix.transformed(QTransform().rotate(m_cutLy ? 0 : 180),
                                      Qt::SmoothTransformation));
 
   m_02->setIcon(pix);
@@ -358,24 +355,24 @@ void PeggingWidget::on11() {
   pix.fill(Qt::transparent);
   m_11->setIcon(pix);
   m_00->setIcon(
-      m_topRightPix.transformed(QMatrix().rotate(m_cutLx || m_cutLy ? 90 : -90),
+      m_topRightPix.transformed(QTransform().rotate(m_cutLx || m_cutLy ? 90 : -90),
                                 Qt::SmoothTransformation));
-  m_01->setIcon(m_topPix.transformed(QMatrix().rotate(m_cutLy ? 180 : 0),
+  m_01->setIcon(m_topPix.transformed(QTransform().rotate(m_cutLy ? 180 : 0),
                                      Qt::SmoothTransformation));
   m_02->setIcon(
-      m_topRightPix.transformed(QMatrix().rotate(m_cutLx || m_cutLy ? 180 : 0),
+      m_topRightPix.transformed(QTransform().rotate(m_cutLx || m_cutLy ? 180 : 0),
                                 Qt::SmoothTransformation));
-  m_10->setIcon(m_topPix.transformed(QMatrix().rotate(m_cutLx ? 90 : -90),
+  m_10->setIcon(m_topPix.transformed(QTransform().rotate(m_cutLx ? 90 : -90),
                                      Qt::SmoothTransformation));
-  m_12->setIcon(m_topPix.transformed(QMatrix().rotate(m_cutLx ? -90 : 90),
+  m_12->setIcon(m_topPix.transformed(QTransform().rotate(m_cutLx ? -90 : 90),
                                      Qt::SmoothTransformation));
   m_20->setIcon(
-      m_topRightPix.transformed(QMatrix().rotate(m_cutLx || m_cutLy ? 0 : 180),
+      m_topRightPix.transformed(QTransform().rotate(m_cutLx || m_cutLy ? 0 : 180),
                                 Qt::SmoothTransformation));
-  m_21->setIcon(m_topPix.transformed(QMatrix().rotate(m_cutLy ? 0 : 180),
+  m_21->setIcon(m_topPix.transformed(QTransform().rotate(m_cutLy ? 0 : 180),
                                      Qt::SmoothTransformation));
   m_22->setIcon(
-      m_topRightPix.transformed(QMatrix().rotate(m_cutLx || m_cutLy ? -90 : 90),
+      m_topRightPix.transformed(QTransform().rotate(m_cutLx || m_cutLy ? -90 : 90),
                                 Qt::SmoothTransformation));
 }
 
@@ -386,17 +383,17 @@ void PeggingWidget::on12() {
   QPixmap pix(30, 30);
   pix.fill(Qt::transparent);
   m_12->setIcon(pix);
-  m_02->setIcon(m_topPix.transformed(QMatrix().rotate(m_cutLy ? 180 : 0),
+  m_02->setIcon(m_topPix.transformed(QTransform().rotate(m_cutLy ? 180 : 0),
                                      Qt::SmoothTransformation));
   m_01->setIcon(
-      m_topRightPix.transformed(QMatrix().rotate(m_cutLx || m_cutLy ? 90 : -90),
+      m_topRightPix.transformed(QTransform().rotate(m_cutLx || m_cutLy ? 90 : -90),
                                 Qt::SmoothTransformation));
-  m_11->setIcon(m_topPix.transformed(QMatrix().rotate(m_cutLx ? 90 : -90),
+  m_11->setIcon(m_topPix.transformed(QTransform().rotate(m_cutLx ? 90 : -90),
                                      Qt::SmoothTransformation));
   m_21->setIcon(
-      m_topRightPix.transformed(QMatrix().rotate(m_cutLx || m_cutLy ? 0 : 180),
+      m_topRightPix.transformed(QTransform().rotate(m_cutLx || m_cutLy ? 0 : 180),
                                 Qt::SmoothTransformation));
-  m_22->setIcon(m_topPix.transformed(QMatrix().rotate(m_cutLy ? 0 : 180),
+  m_22->setIcon(m_topPix.transformed(QTransform().rotate(m_cutLy ? 0 : 180),
                                      Qt::SmoothTransformation));
 
   m_00->setIcon(pix);
@@ -411,12 +408,12 @@ void PeggingWidget::on20() {
   QPixmap pix(30, 30);
   pix.fill(Qt::transparent);
   m_20->setIcon(pix);
-  m_10->setIcon(m_topPix.transformed(QMatrix().rotate(m_cutLy ? 180 : 0),
+  m_10->setIcon(m_topPix.transformed(QTransform().rotate(m_cutLy ? 180 : 0),
                                      Qt::SmoothTransformation));
   m_11->setIcon(
-      m_topRightPix.transformed(QMatrix().rotate(m_cutLx || m_cutLy ? 180 : 0),
+      m_topRightPix.transformed(QTransform().rotate(m_cutLx || m_cutLy ? 180 : 0),
                                 Qt::SmoothTransformation));
-  m_21->setIcon(m_topPix.transformed(QMatrix().rotate(m_cutLx ? -90 : 90),
+  m_21->setIcon(m_topPix.transformed(QTransform().rotate(m_cutLx ? -90 : 90),
                                      Qt::SmoothTransformation));
 
   m_00->setIcon(pix);
@@ -433,17 +430,17 @@ void PeggingWidget::on21() {
   QPixmap pix(30, 30);
   pix.fill(Qt::transparent);
   m_21->setIcon(pix);
-  m_20->setIcon(m_topPix.transformed(QMatrix().rotate(m_cutLx ? 90 : -90),
+  m_20->setIcon(m_topPix.transformed(QTransform().rotate(m_cutLx ? 90 : -90),
                                      Qt::SmoothTransformation));
   m_10->setIcon(
-      m_topRightPix.transformed(QMatrix().rotate(m_cutLx || m_cutLy ? 90 : -90),
+      m_topRightPix.transformed(QTransform().rotate(m_cutLx || m_cutLy ? 90 : -90),
                                 Qt::SmoothTransformation));
-  m_11->setIcon(m_topPix.transformed(QMatrix().rotate(m_cutLy ? 180 : 0),
+  m_11->setIcon(m_topPix.transformed(QTransform().rotate(m_cutLy ? 180 : 0),
                                      Qt::SmoothTransformation));
   m_12->setIcon(
-      m_topRightPix.transformed(QMatrix().rotate(m_cutLx || m_cutLy ? 180 : 0),
+      m_topRightPix.transformed(QTransform().rotate(m_cutLx || m_cutLy ? 180 : 0),
                                 Qt::SmoothTransformation));
-  m_22->setIcon(m_topPix.transformed(QMatrix().rotate(m_cutLx ? -90 : 90),
+  m_22->setIcon(m_topPix.transformed(QTransform().rotate(m_cutLx ? -90 : 90),
                                      Qt::SmoothTransformation));
 
   m_00->setIcon(pix);
@@ -458,12 +455,12 @@ void PeggingWidget::on22() {
   QPixmap pix(30, 30);
   pix.fill(Qt::transparent);
   m_22->setIcon(pix);
-  m_12->setIcon(m_topPix.transformed(QMatrix().rotate(m_cutLy ? 180 : 0),
+  m_12->setIcon(m_topPix.transformed(QTransform().rotate(m_cutLy ? 180 : 0),
                                      Qt::SmoothTransformation));
   m_11->setIcon(
-      m_topRightPix.transformed(QMatrix().rotate(m_cutLx || m_cutLy ? 90 : -90),
+      m_topRightPix.transformed(QTransform().rotate(m_cutLx || m_cutLy ? 90 : -90),
                                 Qt::SmoothTransformation));
-  m_21->setIcon(m_topPix.transformed(QMatrix().rotate(m_cutLx ? 90 : -90),
+  m_21->setIcon(m_topPix.transformed(QTransform().rotate(m_cutLx ? 90 : -90),
                                      Qt::SmoothTransformation));
 
   m_00->setIcon(pix);

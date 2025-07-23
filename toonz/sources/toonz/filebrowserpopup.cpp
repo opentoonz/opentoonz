@@ -797,7 +797,7 @@ LoadLevelPopup::LoadLevelPopup()
     QHBoxLayout *subsequenceHeadLay = createHBoxLayout(0, 5);
     {
       QFontMetrics metrics(font());
-      subsequenceHeadLay->addSpacing(metrics.width("File name:") + 3);
+      subsequenceHeadLay->addSpacing(metrics.horizontalAdvance("File name:") + 3);
       subsequenceHeadLay->addWidget(m_notExistLabel, 0);
       subsequenceHeadLay->addStretch(1);
 
@@ -2208,7 +2208,8 @@ void ImportMagpieFilePopup::showEvent(QShowEvent *e) {
 
 BrowserPopup::BrowserPopup() : FileBrowserPopup("") {
   setOkText(tr("Choose"));
-  m_browser->enableGlobalSelection(false);
+  //DIRTY FIX!!!! this should never cause crash
+  m_browser->enableGlobalSelection(true);
 }
 
 bool BrowserPopup::execute() {

@@ -423,35 +423,13 @@ void ExportAllLevelsPopup::updateOnSelection() {
 
 std::wstring ExportAllLevelsPopup::backFolderName(std::string colname,
                                                   std::wstring levelname) {
-  if (levelname == to_wstring(colname) || colname.substr(0, 3) == "Col")
-    return levelname;
-  else {
-    std::wstring foldername;
-    colname.erase(std::remove(colname.begin(), colname.end(), L'#'),
+  if (!colname.empty() && colname[0] == '#'){
+    colname.erase(std::remove(colname.begin(), colname.end(), '#'),
                   colname.end());
-
-    int pos = colname.find(L'_');  //  '_'
-    if (pos != std::wstring::npos) {
-      foldername += to_wstring(colname.substr(0, pos));
-    } else {
-      foldername += to_wstring(colname);
-      return foldername;
-    }
-
-    pos = colname.find(L'1');
-    if (pos != std::wstring::npos) {
-      foldername += to_wstring("_1gen");
-      colname.erase(pos);
-    } else {
-      pos = colname.find(L'2');
-      if (!pos == std::wstring::npos) {
-        foldername += to_wstring("_2gen");
-        colname.erase(pos);
-      }
-    }
-    
-    return foldername;
+    if (colname.find('_') != std::string::npos)//  '_'
+        return to_wstring(colname);
   }
+  return levelname;
 }
 
 bool ExportAllLevelsPopup::isAllLevelsExported() {

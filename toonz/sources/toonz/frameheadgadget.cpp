@@ -255,7 +255,7 @@ bool FrameHeadGadget::eventFilter(QObject *obj, QEvent *e) {
         return false;
       }
       viewer->update();
-    } else if (mouseEvent->buttons() & Qt::MidButton)
+    } else if (mouseEvent->buttons() & Qt::MiddleButton)
       return false;
   } else
     return false;
@@ -833,7 +833,7 @@ bool FilmstripFrameHeadGadget::eventFilter(QObject *obj, QEvent *e) {
         return false;
       }
       viewer->update();
-    } else if (mouseEvent->buttons() & Qt::MidButton)
+    } else if (mouseEvent->buttons() & Qt::MiddleButton)
       return false;
   } else
     return false;

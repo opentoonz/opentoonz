@@ -164,10 +164,15 @@ class ExportScenePopup final : public DVGui::Dialog {
   QRadioButton *m_newProjectButton;
   QRadioButton *m_chooseProjectButton;
 
-  QLabel *m_pathFieldLabel;
+  QLabel *m_newProPathFieldLabel;
   DVGui::FileField *m_projectLocationFld;
+  
+  // 0,1,2
+  UINT m_mode;
 
-  bool m_createNewProject;
+  QRadioButton *m_lonelyModeButton;
+  QLabel *m_lonelyModePathLabel;
+  DVGui::FileField *m_lonelyModePathFld;
 
 public:
   ExportScenePopup(std::vector<TFilePath> scenes);
@@ -181,6 +186,7 @@ protected slots:
   void switchMode(int id);
   void onProjectTreeViweFocusIn();
   void onProjectNameFocusIn();
+  void onLonelyModeFocusIn();
   void onExport();
 
 protected:

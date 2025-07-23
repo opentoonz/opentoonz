@@ -7,10 +7,12 @@
 #include "fileselection.h"
 #include "castselection.h"
 #include "cellselection.h"
+#include "columnselection.h"
 #include "overwritepopup.h"
 #include "vectorizerswatch.h"
 #include "filebrowserpopup.h"
 #include "menubarcommandids.h"
+#include "selectionutils.h"
 
 // TnzQt includes
 #include "toonzqt/menubarcommand.h"
@@ -65,6 +67,7 @@
 #include <QToolButton>
 
 using namespace DVGui;
+using namespace SelectionUtils;
 
 //********************************************************************************
 //    Local namespace  classes
@@ -108,43 +111,6 @@ VectorizerParameters *getCurrentVectorizerParameters() {
       ->getScene()
       ->getProperties()
       ->getVectorizerParameters();
-}
-
-//-----------------------------------------------------------------------------
-
-bool getSelectedLevels(std::set<TXshLevel *> &levels, int &r0, int &c0, int &r1,
-                       int &c1) {
-  TXsheet *xsheet = TApp::instance()->getCurrentXsheet()->getXsheet();
-
-  CastSelection *castSelection =
-      dynamic_cast<CastSelection *>(TSelection::getCurrent());
-  TCellSelection *cellSelection =
-      dynamic_cast<TCellSelection *>(TSelection::getCurrent());
-
-  if (castSelection) {
-    std::vector<TXshLevel *> selectedLevels;
-    castSelection->getSelectedLevels(selectedLevels);
-
-    for (int i = 0; i < (int)selectedLevels.size(); ++i)
-      levels.insert(selectedLevels[i]);
-
-    return false;
-  } else if (cellSelection) {
-    cellSelection->getSelectedCells(r0, c0, r1, c1);
-
-    for (int c = c0; c <= c1; ++c) {
-      for (int r = r0; r <= r1; ++r) {
-        TXshCell cell = xsheet->getCell(r, c);
-
-        if (TXshLevel *level = cell.isEmpty() ? 0 : cell.getSimpleLevel())
-          levels.insert(level);
-      }
-    }
-
-    return true;
-  }
-
-  return false;
 }
 
 //-----------------------------------------------------------------------------
@@ -343,7 +309,7 @@ int Vectorizer::doVectorize() {
 
   TXshSimpleLevel *sl = m_level.getPointer();
   if (!sl) return 0;
-
+  
   int rowCount = sl->getFrameCount();
   if (rowCount <= 0 || sl->isEmpty()) return 0;
 
@@ -908,7 +874,7 @@ bool VectorizerPopup::isLevelToConvert(TXshSimpleLevel *sl) {
 //-----------------------------------------------------------------------------
 
 bool VectorizerPopup::apply() {
-  std::set<TXshLevel *> levels;
+  std::vector<TXshLevel *> levels;
 
   ToonzScene *scene = m_sceneHandle->getScene();
   if (!scene) {

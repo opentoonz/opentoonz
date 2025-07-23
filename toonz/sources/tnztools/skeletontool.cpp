@@ -1013,7 +1013,7 @@ void SkeletonTool::drawHooks() {
   // glColor3d(0,1,1);
   // tglDrawRect(0,100,Stage::inch,110);
 
-  QTime time;
+  QElapsedTimer time;
   time.start();
 
   m_magicLinks.clear();

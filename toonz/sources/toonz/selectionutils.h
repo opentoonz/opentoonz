@@ -6,9 +6,20 @@
 // TnzCore includes
 #include "tfilepath.h"
 
+#include "toonz/txshlevel.h"
+
 // STL includes
 #include <set>
 #include <map>
+
+namespace SelectionUtils {
+    bool getSelectedLevels(std::set<TXshLevel*>& levels, int& r0, int& c0, int& r1,
+        int& c1);
+    bool getSelectedLevels(std::set<TXshLevel*>& levels);
+    bool getSelectedLevels(std::vector<TXshLevel*>& levels, int& r0, int& c0, int& r1,
+        int& c1);
+
+}
 
 //==============================================================
 

@@ -492,8 +492,7 @@ void FullColorBrushTool::inputSetBusy(bool busy) {
   if (busy) {
     // begin paint
     TRasterImageP ri = (TRasterImageP)getImage(true);
-    if (!ri) ri = (TRasterImageP)touchImage();
-    if (!ri) return;
+    if (!ri) return;// ri = (TRasterImageP)touchImage(); touch in preLeftButtonDown
     TRasterP ras = ri->getRaster();
 
     if (!(m_workRaster && m_backUpRas)) setWorkAndBackupImages();

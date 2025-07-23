@@ -897,7 +897,9 @@ static void drawingSubstituion(int dir) {
   }
   int row = TTool::getApplication()->getCurrentFrame()->getFrame();
   int col = TTool::getApplication()->getCurrentColumn()->getColumnIndex();
-
+  if (col == -1) col = 0;
+  if (range.m_c0 == -1) range.m_c0 = 0;
+  
   DrawingSubtitutionUndo *undo =
       new DrawingSubtitutionUndo(dir, range, row, col, selected);
   TUndoManager::manager()->add(undo);

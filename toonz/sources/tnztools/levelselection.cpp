@@ -145,7 +145,7 @@ std::vector<int> getBoundaryStrokes(TVectorImage &vi) {
 }
 
 //------------------------------------------------------------------------
-
+//Only get current Frame's strokes
 std::vector<int> getSelectedStrokes(TVectorImage &vi,
                                     const LevelSelection &levelSelection) {
   struct locals {

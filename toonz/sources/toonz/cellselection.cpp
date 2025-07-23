@@ -126,7 +126,7 @@ void deleteCellsWithoutUndo(int &r0, int &c0, int &r1, int &c1, bool doShift) {
     int c;
     for (c = c0; c <= c1; c++) {
       if (xsh->isColumnEmpty(c)) continue;
-
+      
       if (doShift)
         xsh->removeCells(r0, c, r1 - r0 + 1);
       else
@@ -1572,8 +1572,6 @@ void TCellSelection::enableCommands() {
   enableCommand(this, MI_Reframe2, &TCellSelection::reframe2Cells);
   enableCommand(this, MI_Reframe3, &TCellSelection::reframe3Cells);
   enableCommand(this, MI_Reframe4, &TCellSelection::reframe4Cells);
-  enableCommand(this, MI_ConvertToToonzRaster,
-                &TCellSelection::convertToToonzRaster);
   enableCommand(this, MI_ConvertVectorToVector,
                 &TCellSelection::convertVectortoVector);
   enableCommand(this, MI_ReframeWithEmptyInbetweens,
@@ -1640,7 +1638,6 @@ bool TCellSelection::isEnabledCommand(
                                         MI_Redo,
                                         MI_PasteNumbers,
                                         MI_PasteCellContent,
-                                        MI_ConvertToToonzRaster,
                                         MI_ConvertVectorToVector,
                                         MI_CreateBlankDrawing,
                                         MI_FillEmptyCell};
@@ -2550,6 +2547,12 @@ void TCellSelection::deleteCells(bool withShift) {
   // check if the operation may remove expression reference as column becomes
   // empty and deleted after the operation.
   if (!checkColumnRemoval(r0, c0, r1, c1, removedColIds)) return;
+
+  // Remove implicate cells for the last Frame
+  if(c0==c1 && 
+      xsh->getCell(r1,c0).getFrameId()!=TFrameId::EMPTY_FRAME &&
+      xsh->getCell(r1-1,c0)!=xsh->getCell(r1,c0))
+      for(;xsh->getCell(r1,c0)==xsh->getCell(r1+1,c0);++r1);
 
   TCellData *data = new TCellData();
   data->setCells(xsh, r0, c0, r1, c1);
@@ -3536,94 +3539,6 @@ void TCellSelection::renameMultiCells(QList<TXshCell> &cells) {
   TUndoManager::manager()->endBlock();
 }
 
-//=============================================================================
-// CreateLevelUndo
-//-----------------------------------------------------------------------------
-
-class CreateLevelUndo final : public TUndo {
-  int m_rowIndex;
-  int m_columnIndex;
-  int m_frameCount;
-  int m_oldLevelCount;
-  int m_step;
-  TXshSimpleLevelP m_sl;
-  bool m_areColumnsShifted;
-  bool m_keepLevel;
-
-public:
-  CreateLevelUndo(int row, int column, int frameCount, int step,
-                  bool areColumnsShifted, bool keepLevel = false)
-      : m_rowIndex(row)
-      , m_columnIndex(column)
-      , m_frameCount(frameCount)
-      , m_step(step)
-      , m_sl(0)
-      , m_keepLevel(keepLevel)
-      , m_areColumnsShifted(areColumnsShifted) {
-    TApp *app         = TApp::instance();
-    ToonzScene *scene = app->getCurrentScene()->getScene();
-    m_oldLevelCount   = scene->getLevelSet()->getLevelCount();
-  }
-  ~CreateLevelUndo() { m_sl = 0; }
-
-  void onAdd(TXshSimpleLevelP sl) { m_sl = sl; }
-
-  void undo() const override {
-    TApp *app         = TApp::instance();
-    ToonzScene *scene = app->getCurrentScene()->getScene();
-    TXsheet *xsh      = scene->getXsheet();
-    if (m_areColumnsShifted)
-      xsh->removeColumn(m_columnIndex);
-    else if (m_frameCount > 0)
-      xsh->removeCells(m_rowIndex, m_columnIndex, m_frameCount);
-    if (!m_keepLevel) {
-      TLevelSet *levelSet = scene->getLevelSet();
-      if (levelSet) {
-        int m = levelSet->getLevelCount();
-        while (m > 0 && m > m_oldLevelCount) {
-          --m;
-          TXshLevel *level = levelSet->getLevel(m);
-          if (level) levelSet->removeLevel(level);
-        }
-      }
-    }
-    app->getCurrentScene()->notifySceneChanged();
-    app->getCurrentScene()->notifyCastChange();
-    app->getCurrentXsheet()->notifyXsheetChanged();
-  }
-
-  void redo() const override {
-    if (!m_sl.getPointer()) return;
-    TApp *app         = TApp::instance();
-    ToonzScene *scene = app->getCurrentScene()->getScene();
-    scene->getLevelSet()->insertLevel(m_sl.getPointer());
-    TXsheet *xsh = scene->getXsheet();
-    if (m_areColumnsShifted) xsh->insertColumn(m_columnIndex);
-    std::vector<TFrameId> fids;
-    m_sl->getFids(fids);
-    int i = m_rowIndex;
-    int f = 0;
-    while (i < m_frameCount + m_rowIndex) {
-      TFrameId fid = (fids.size() != 0) ? fids[f] : i;
-      TXshCell cell(m_sl.getPointer(), fid);
-      f++;
-      xsh->setCell(i, m_columnIndex, cell);
-      int appo = i++;
-      while (i < m_step + appo) xsh->setCell(i++, m_columnIndex, cell);
-    }
-    app->getCurrentScene()->notifySceneChanged();
-    app->getCurrentScene()->notifyCastChange();
-    app->getCurrentXsheet()->notifyXsheetChanged();
-  }
-
-  int getSize() const override { return sizeof *this; }
-  QString getHistoryString() override {
-    return QObject::tr("Create Level %1  at Column %2")
-        .arg(QString::fromStdWString(m_sl->getName()))
-        .arg(QString::number(m_columnIndex + 1));
-  }
-};
-
 //-----------------------------------------------------------------------------
 // Convert selected vector cells to ToonzRaster
 
@@ -3639,7 +3554,7 @@ bool TCellSelection::areOnlyVectorCellsSelected() {
   if (firstCell.isEmpty()) {
     DVGui::error(QObject::tr("This command only works on vector cells."));
     return false;
-  }
+    }
 
   TXshSimpleLevel *sourceSl = firstCell.getSimpleLevel();
   if (!sourceSl || sourceSl->getType() != PLI_XSHLEVEL) {
@@ -3754,128 +3669,13 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-// Convert selected vector cells to ToonzRaster
-
-void TCellSelection::convertToToonzRaster() {
-  // set up basics
-  int r0, c0, r1, c1;
-  getSelectedCells(r0, c0, r1, c1);
-
-  TApp *app = TApp::instance();
-  int row   = app->getCurrentFrame()->getFrame();
-  int col   = app->getCurrentColumn()->getColumnIndex();
-  int i;
-
-  ToonzScene *scene = app->getCurrentScene()->getScene();
-  TXsheet *xsh      = scene->getXsheet();
-
-  TXshCell firstCell        = xsh->getCell(r0, c0);
-  TXshSimpleLevel *sourceSl = firstCell.getSimpleLevel();
-
-  if (!areOnlyVectorCellsSelected()) return;
-
-  // set up new level
-  TXshSimpleLevel *sl = getNewToonzRasterLevel(sourceSl);
-
-  // get camera settings
-  TCamera *camera = app->getCurrentScene()->getScene()->getCurrentCamera();
-  double dpi      = camera->getDpi().x;
-  int xres        = camera->getRes().lx;
-  int yres        = camera->getRes().ly;
-
-  assert(sl);
-
-  sl->getProperties()->setDpiPolicy(LevelProperties::DP_ImageDpi);
-  sl->getProperties()->setDpi(dpi);
-  sl->getProperties()->setImageDpi(TPointD(dpi, dpi));
-  sl->getProperties()->setImageRes(TDimension(xres, yres));
-
-  TFrameId frameId = firstCell.getFrameId();
-  std::set<TFrameId> frameIdsSet;
-  std::vector<TFrameId> frameIds;
-  frameIds.push_back(frameId);
-  for (i = r0 + 1; i <= r1; i++) {
-    TXshCell newCell    = xsh->getCell(i, c0);
-    TFrameId newFrameId = xsh->getCell(i, c0).getFrameId();
-    if (newCell.getSimpleLevel() == sourceSl) {
-      if (std::find(frameIds.begin(), frameIds.end(), newCell.getFrameId()) ==
-          frameIds.end()) {
-        frameIds.push_back(newFrameId);
-      }
-    }
-  }
-
-  int totalImages = frameIds.size();
-  for (i = 0; i < totalImages; i++) {
-    frameIdsSet.insert(frameIds[i]);
-  }
-
-  DrawingData *data = new DrawingData();
-  data->setLevelFrames(sourceSl, frameIdsSet);
-
-  // This is where the copying actually happens
-  std::set<TFrameId> newFrameIds;
-  for (i = 0; i < totalImages; i++) {
-    TRasterCM32P raster(xres, yres);
-    raster->fill(TPixelCM32());
-    TToonzImageP firstImage(raster, TRect());
-    firstImage->setDpi(dpi, dpi);
-    TFrameId newFrameId = TFrameId(i + 1);
-    sl->setFrame(newFrameId, firstImage);
-    newFrameIds.insert(newFrameId);
-    firstImage->setSavebox(TRect(0, 0, xres - 1, yres - 1));
-  }
-
-  bool keepOriginalPalette;
-  bool success = data->getLevelFrames(
-      sl, newFrameIds, DrawingData::OVER_SELECTION, true, keepOriginalPalette,
-      true);  // setting is redo = true skips the
-              // question about the palette
-  std::vector<TFrameId> newFids;
-  sl->getFids(newFids);
-
-  // make a new column
-  col += 1;
-  TApp::instance()->getCurrentColumn()->setColumnIndex(col);
-  xsh->insertColumn(col);
-
-  CreateLevelUndo *undo = new CreateLevelUndo(row, col, totalImages, 1, true);
-  TUndoManager::manager()->add(undo);
-
-  // expose the new frames in the column
-  for (i = 0; i < totalImages; i++) {
-    for (int k = r0; k <= r1; k++) {
-      TXshCell oldCell = xsh->getCell(k, c0);
-      TXshCell newCell(sl, newFids[i]);
-      if (oldCell.getFrameId() == frameIds[i]) {
-        xsh->setCell(k, col, newCell);
-      }
-    }
-  }
-
-  invalidateIcons(sl, newFrameIds);
-  sl->save(sl->getPath(), TFilePath(), true);
-
-  DvDirModel::instance()->refreshFolder(sl->getPath().getParentDir());
-
-  undo->onAdd(sl);
-
-  app->getCurrentScene()->notifySceneChanged();
-  app->getCurrentScene()->notifyCastChange();
-  app->getCurrentXsheet()->notifyXsheetChanged();
-
-  app->getCurrentTool()->onImageChanged(
-      (TImage::Type)app->getCurrentImageType());
-}
-
-//-----------------------------------------------------------------------------
 // Convert selected vector cells to ToonzRaster and back to vecor
 
 void TCellSelection::convertVectortoVector() {
   // set up basics
   int r0, c0, r1, c1;
   getSelectedCells(r0, c0, r1, c1);
-
+  
   TApp *app = TApp::instance();
   int row   = app->getCurrentFrame()->getFrame();
   int col   = app->getCurrentColumn()->getColumnIndex();
@@ -3888,9 +3688,9 @@ void TCellSelection::convertVectortoVector() {
   TXshSimpleLevel *sourceSl = firstCell.getSimpleLevel();
   if (!areOnlyVectorCellsSelected()) return;
 
-  // set up new level name
-  TXshSimpleLevel *sl = getNewToonzRasterLevel(sourceSl);
-  assert(sl);
+      // set up new level name
+      TXshSimpleLevel *sl = getNewToonzRasterLevel(sourceSl);
+      assert(sl);
 
   // get camera settings
   TCamera *camera = app->getCurrentScene()->getScene()->getCurrentCamera();
@@ -3898,22 +3698,22 @@ void TCellSelection::convertVectortoVector() {
   int xres        = camera->getRes().lx;
   int yres        = camera->getRes().ly;
 
-  if (Preferences::instance()->getUseHigherDpiOnVectorSimplify()) {
-    dpi *= 2;
-    xres *= 2;
-    yres *= 2;
-  }
+      if (Preferences::instance()->getUseHigherDpiOnVectorSimplify()) {
+          dpi *= 2;
+          xres *= 2;
+          yres *= 2;
+      }
 
-  sl->getProperties()->setDpiPolicy(LevelProperties::DP_ImageDpi);
-  sl->getProperties()->setDpi(dpi);
-  sl->getProperties()->setImageDpi(TPointD(dpi, dpi));
-  sl->getProperties()->setImageRes(TDimension(xres, yres));
+      sl->getProperties()->setDpiPolicy(LevelProperties::DP_ImageDpi);
+      sl->getProperties()->setDpi(dpi);
+      sl->getProperties()->setImageDpi(TPointD(dpi, dpi));
+      sl->getProperties()->setImageRes(TDimension(xres, yres));
 
-  // Get the used FrameIds and images
-  // The cloned images are used in the undo.
+      // Get the used FrameIds and images
+      // The cloned images are used in the undo.
   TFrameId frameId = firstCell.getFrameId();
   std::set<TFrameId> frameIdsSet;
-  std::vector<TFrameId> frameIds;
+      std::vector<TFrameId> frameIds;
   std::vector<TImageP> oldImages;
   frameIds.push_back(frameId);
   oldImages.push_back(firstCell.getImage(false).getPointer()->cloneImage());
@@ -3936,67 +3736,67 @@ void TCellSelection::convertVectortoVector() {
   }
 
   DrawingData *data = new DrawingData();
-  data->setLevelFrames(sourceSl, frameIdsSet);
+      data->setLevelFrames(sourceSl, frameIdsSet);
 
-  // Make empty frames for the new data
-  std::set<TFrameId> newFrameIds;
-  for (i = 0; i < totalImages; i++) {
-    TRasterCM32P raster(xres, yres);
-    raster->fill(TPixelCM32());
-    TToonzImageP firstImage(raster, TRect());
-    firstImage->setDpi(dpi, dpi);
-    TFrameId newFrameId = TFrameId(i + 1);
-    sl->setFrame(newFrameId, firstImage);
-    newFrameIds.insert(newFrameId);
-    firstImage->setSavebox(TRect(0, 0, xres - 1, yres - 1));
-  }
+      // Make empty frames for the new data
+      std::set<TFrameId> newFrameIds;
+      for (i = 0; i < totalImages; i++) {
+          TRasterCM32P raster(xres, yres);
+          raster->fill(TPixelCM32());
+          TToonzImageP firstImage(raster, TRect());
+          firstImage->setDpi(dpi, dpi);
+          TFrameId newFrameId = TFrameId(i + 1);
+          sl->setFrame(newFrameId, firstImage);
+          newFrameIds.insert(newFrameId);
+          firstImage->setSavebox(TRect(0, 0, xres - 1, yres - 1));
+      }
 
-  // This is where the copying actually happens
-  // copy old frames to Toonz Raster
-  bool keepOriginalPalette;
-  bool success = data->getLevelFrames(
-      sl, newFrameIds, DrawingData::OVER_SELECTION, true, keepOriginalPalette,
-      true);  // setting is redo = true skips the
-              // question about the palette
-              // get the new FrameIds
-  std::vector<TFrameId> newFids;
-  sl->getFids(newFids);
+      // This is where the copying actually happens
+      // copy old frames to Toonz Raster
+      bool keepOriginalPalette;
+      bool success = data->getLevelFrames(
+          sl, newFrameIds, DrawingData::OVER_SELECTION, true, keepOriginalPalette,
+          true);  // setting is redo = true skips the
+      // question about the palette
+      // get the new FrameIds
+      std::vector<TFrameId> newFids;
+      sl->getFids(newFids);
 
-  // copy the Toonz Raster frames onto the old level
-  data->clear();
-  data->setLevelFrames(sl, newFrameIds);
-  if (Preferences::instance()->getKeepFillOnVectorSimplify())
-    data->setKeepVectorFills(true);
-  success = data->getLevelFrames(
-      sourceSl, frameIdsSet, DrawingData::OVER_SELECTION, true,
+      // copy the Toonz Raster frames onto the old level
+      data->clear();
+      data->setLevelFrames(sl, newFrameIds);
+      if (Preferences::instance()->getKeepFillOnVectorSimplify())
+          data->setKeepVectorFills(true);
+      success = data->getLevelFrames(
+          sourceSl, frameIdsSet, DrawingData::OVER_SELECTION, true,
       keepOriginalPalette, true);  // setting is redo = true skips the
-                                   // question about the palette
+      // question about the palette
 
-  // get clones of the new images for undo
-  std::vector<TImageP> newImages;
-  for (i = 0; i < totalImages; i++) {
-    newImages.push_back(sourceSl->getFrame(frameIds[i], false)->cloneImage());
-  }
+      // get clones of the new images for undo
+      std::vector<TImageP> newImages;
+      for (i = 0; i < totalImages; i++) {
+          newImages.push_back(sourceSl->getFrame(frameIds[i], false)->cloneImage());
+      }
 
   HookSet *oldLevelHooks = new HookSet();
   *oldLevelHooks         = *sourceSl->getHookSet();
 
-  TUndoManager::manager()->add(new VectorToVectorUndo(
-      sourceSl, frameIds, oldImages, newImages, oldLevelHooks));
+      TUndoManager::manager()->add(new VectorToVectorUndo(
+          sourceSl, frameIds, oldImages, newImages, oldLevelHooks));
 
-  invalidateIcons(sourceSl, frameIdsSet);
+      invalidateIcons(sourceSl, frameIdsSet);
 
-  // remove the toonz raster level
-  sl->clearFrames();
-  app->getCurrentScene()->getScene()->getLevelSet()->removeLevel(sl, true);
+      // remove the toonz raster level
+      sl->clearFrames();
+      app->getCurrentScene()->getScene()->getLevelSet()->removeLevel(sl, true);
 
-  app->getCurrentScene()->notifySceneChanged();
-  app->getCurrentScene()->notifyCastChange();
-  app->getCurrentXsheet()->notifyXsheetChanged();
+      app->getCurrentScene()->notifySceneChanged();
+      app->getCurrentScene()->notifyCastChange();
+      app->getCurrentXsheet()->notifyXsheetChanged();
 
-  app->getCurrentTool()->onImageChanged(
-      (TImage::Type)app->getCurrentImageType());
-}
+      app->getCurrentTool()->onImageChanged(
+          (TImage::Type)app->getCurrentImageType());
+  }
 
 void TCellSelection::fillEmptyCell() {
   if (isEmpty()) return;

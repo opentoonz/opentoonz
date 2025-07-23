@@ -98,7 +98,7 @@ class LeftToRightOrientation : public Orientation {
   const int CELL_HEIGHT          = 24;
   const int CELL_DRAG_HEIGHT     = 7;
   const int EXTENDER_WIDTH       = 8;
-  const int EXTENDER_HEIGHT      = 12;
+  const int EXTENDER_HEIGHT      = 14;
   const int SOUND_PREVIEW_HEIGHT = 6;
   const int FRAME_HEADER_HEIGHT  = 50;
   const int ONION_X = 0, ONION_Y = 0;
@@ -1143,10 +1143,11 @@ LeftToRightOrientation::LeftToRightOrientation() {
   addRect(PredefinedRect::CELL_NAME, nameRect);
   addRect(PredefinedRect::CELL_NAME_WITH_KEYFRAME, nameRect);
   addRect(PredefinedRect::END_EXTENDER,
-          QRect(0, -EXTENDER_HEIGHT - 14, EXTENDER_WIDTH, EXTENDER_HEIGHT));
+      QRect(0, -EXTENDER_HEIGHT - 4,
+          EXTENDER_WIDTH, EXTENDER_HEIGHT));
   addRect(PredefinedRect::BEGIN_EXTENDER,
-          QRect(-EXTENDER_WIDTH, -EXTENDER_HEIGHT - 14, EXTENDER_WIDTH,
-                EXTENDER_HEIGHT));
+      QRect(-EXTENDER_WIDTH, -EXTENDER_HEIGHT - 4,
+          EXTENDER_WIDTH, EXTENDER_HEIGHT));
   addRect(PredefinedRect::KEYFRAME_AREA, keyRect);
   addRect(PredefinedRect::DRAG_AREA, QRect(0, 0, CELL_WIDTH, CELL_DRAG_HEIGHT));
   int markSize = CELL_HEIGHT / 2;  // 50% size (12px)

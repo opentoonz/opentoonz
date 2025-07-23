@@ -320,7 +320,7 @@ private:
   TXshSimpleLevelP m_level;  //!< Input level to vectorize (only one level at a
                              //! time is dealt here).
   VectorizerParameters m_params;  //!< Vectorizer options to be applied
-
+  
   TXshSimpleLevelP m_vLevel;     //!< Output vectorized level
   std::vector<TFrameId> m_fids;  //!< Frame ids of the input \b m_level
 

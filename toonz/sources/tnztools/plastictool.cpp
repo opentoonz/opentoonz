@@ -416,7 +416,7 @@ PlasticToolOptionsBox::PlasticToolOptionsBox(QWidget *parent, TTool *tool,
         new GenericToolOptionsBox(0, tool, pltHandle, m, 0, false);
 
   meshifyButton->setFixedHeight(20);
-  int buttonWidth = fontMetrics().width(meshifyButton->text()) + 20;
+  int buttonWidth = fontMetrics().horizontalAdvance(meshifyButton->text()) + 20;
   meshifyButton->setFixedWidth(buttonWidth);
   QAction *meshifyAction =
       CommandManager::instance()->getAction("A_ToolOption_Meshify");

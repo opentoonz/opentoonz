@@ -5,7 +5,8 @@
 
 #include <QDialog>
 #include <QApplication>
-#include <QDesktopWidget>
+#include <QGuiApplication>
+#include <QScreen>  
 #include <QWindow>
 
 TEnv::IntVar StopMotionBlackCapture("StopMotionBlackCapture", 0);
@@ -19,7 +20,7 @@ StopMotionLight::StopMotionLight() {
   m_fullScreen1 = new QDialog();
   m_fullScreen1->setModal(false);
   m_fullScreen1->setStyleSheet("background-color:black;");
-  m_screenCount = QApplication::desktop()->screenCount();
+  m_screenCount = QGuiApplication::screens().size();
   if (m_screenCount > 1) {
     m_fullScreen2 = new QDialog();
     m_fullScreen2->setModal(false);
@@ -119,19 +120,19 @@ void StopMotionLight::showOverlays() {
   bool isTimeLapse = StopMotion::instance()->m_isTimeLapse;
   if ((getBlackCapture() || m_useScreen1Overlay) && !isTimeLapse) {
     m_fullScreen1->showFullScreen();
-    m_fullScreen1->setGeometry(QApplication::desktop()->screenGeometry(0));
+    m_fullScreen1->setGeometry(QGuiApplication::screens()[0]->geometry());
     shown = true;
   }
   if (m_screenCount > 1 && (getBlackCapture() || m_useScreen2Overlay) &&
       !isTimeLapse) {
     m_fullScreen2->showFullScreen();
-    m_fullScreen2->setGeometry(QApplication::desktop()->screenGeometry(1));
+    m_fullScreen2->setGeometry(QGuiApplication::screens()[1]->geometry());
     shown = true;
   }
   if (m_screenCount > 2 && (getBlackCapture() || m_useScreen3Overlay) &&
       !isTimeLapse) {
     m_fullScreen3->showFullScreen();
-    m_fullScreen3->setGeometry(QApplication::desktop()->screenGeometry(2));
+    m_fullScreen3->setGeometry(QGuiApplication::screens()[2]->geometry());
     shown = true;
   }
 

@@ -17,6 +17,7 @@
 #include "tcomputeregions.h"
 
 #include <memory>
+#include <QSet>
 
 //=============================================================================
 typedef TVectorImage::IntersectionBranch IntersectionBranch;
@@ -147,7 +148,7 @@ int TVectorImage::addStrokeToGroup(TStroke *stroke, int strokeIndex) {
 
 //-----------------------------------------------------------------------------
 
-int TVectorImage::addStroke(TStroke *stroke, bool discardPoints) {
+int TVectorImage::addStroke(TStroke *stroke, bool discardPoints, bool underAll) {
   if (discardPoints) {
     TRectD bBox = stroke->getBBox();
     if (bBox.x0 == bBox.x1 && bBox.y0 == bBox.y1)  // empty stroke: discard
@@ -158,9 +159,19 @@ int TVectorImage::addStroke(TStroke *stroke, bool discardPoints) {
     int i;
     for (i = m_imp->m_strokes.size() - 1; i >= 0; i--)
       if (m_imp->m_insideGroup.isParentOf(m_imp->m_strokes[i]->m_groupId)) {
-        m_imp->insertStrokeAt(
-            new VIStroke(stroke, m_imp->m_strokes[i]->m_groupId), i + 1);
-        return i + 1;
+        if (underAll) {
+          int j = 0;
+          for (j = i - 1; j >= 0 && m_imp->m_insideGroup.isParentOf(
+                                        m_imp->m_strokes[j]->m_groupId);
+               j--);
+          m_imp->insertStrokeAt(
+              new VIStroke(stroke, m_imp->m_strokes[j + 1]->m_groupId), j + 1);
+          return j + 1;
+        } else {
+          m_imp->insertStrokeAt(
+              new VIStroke(stroke, m_imp->m_strokes[i]->m_groupId), i + 1);
+          return i + 1;
+        }
       }
   }
 
@@ -170,10 +181,59 @@ int TVectorImage::addStroke(TStroke *stroke, bool discardPoints) {
     gid = TGroupId(this, true);
   else
     gid = m_imp->m_strokes.back()->m_groupId;
+  
+  if (underAll) {
+    m_imp->insertStrokeAt(new VIStroke(stroke, gid), 0);
+    m_imp->m_areValidRegions = false;
+    return 0;
+  } else {
+    m_imp->m_areValidRegions = false;
+    m_imp->m_strokes.push_back(new VIStroke(stroke, gid));
+    return m_imp->m_strokes.size() - 1;
+  }
+}
 
-  m_imp->m_strokes.push_back(new VIStroke(stroke, gid));
+int TVectorImage::addStrokeBelow(TStroke *stroke, const QSet<int> &aboveStyles,
+                                 bool discardPoints) {
+  if (aboveStyles.isEmpty())
+    return addStroke(stroke, discardPoints);
+  if (discardPoints) {
+    TRectD bBox = stroke->getBBox();
+    if (bBox.x0 == bBox.x1 && bBox.y0 == bBox.y1)  // empty stroke: discard
+      return -1;
+  }
+
+  if (m_imp->m_insideGroup != TGroupId()) {
+    int i;
+    for (i = m_imp->m_strokes.size() - 1; i >= 0; i--)
+      if (m_imp->m_insideGroup.isParentOf(m_imp->m_strokes[i]->m_groupId)) {
+        int j = 0;
+        for (j = i - 1;
+             j >= 0 &&
+             m_imp->m_insideGroup.isParentOf(m_imp->m_strokes[j]->m_groupId) &&
+             aboveStyles.contains(m_imp->m_strokes[j]->m_s->getStyle());
+             j--);
+        m_imp->insertStrokeAt(
+            new VIStroke(stroke, m_imp->m_strokes[j + 1]->m_groupId), j + 1);
+        return j + 1;
+      }
+  }
+
+  TGroupId gid;
+  if (m_imp->m_strokes.empty() ||
+      m_imp->m_strokes.back()->m_groupId.isGrouped() != 0)
+    gid = TGroupId(this, true);
+  else
+      gid = m_imp->m_strokes.back()->m_groupId;
+
+  int i;
+  for (i = m_imp->m_strokes.size() - 1;
+       i >= 0 && !isStrokeGrouped(i) &&
+       aboveStyles.contains(m_imp->m_strokes[i]->m_s->getStyle());
+       i--);
+  m_imp->insertStrokeAt(new VIStroke(stroke, gid), i + 1);
   m_imp->m_areValidRegions = false;
-  return m_imp->m_strokes.size() - 1;
+  return i + 1;
 }
 
 //-----------------------------------------------------------------------------

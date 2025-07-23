@@ -4,7 +4,7 @@
 #define TFRAMEHANDLE_H
 
 #include <QObject>
-#include <QTime>
+#include <QElapsedTimer>
 #include "tfilepath.h"
 #include "toonz/txshsoundcolumn.h"
 
@@ -51,7 +51,7 @@ private:
   TXsheet *m_xsheet;
   std::pair<int, int> m_scrubRange;
   double m_fps;
-  QTime m_clock;
+  QElapsedTimer m_clock;
 
   // void startPlaying(bool looping);
   // void stopPlaying();
@@ -87,7 +87,7 @@ public:
   bool isEditingLevel() const { return getFrameType() == LevelFrame; }
   bool isEditingScene() const { return getFrameType() == SceneFrame; }
 
-  // i  metodi seguenti funzionano sia con LevelFrame sia con SceneFrame
+  // The following methods work with both LevelFrame and SceneFrame
   int getMaxFrameIndex() const;
   int getFrameIndex() const;
   QString getFrameIndexName(int index) const;

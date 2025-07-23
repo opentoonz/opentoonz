@@ -2981,6 +2981,9 @@ QStatusBar #StatusBarLabel {
   background-color: #ffffff;
   padding: 1 3;
 }
+DVGui--Separator {
+  alternate-background-color: #dfdfdf;
+}
 /* -----------------------------------------------------------------------------
    XSheet Viewer
 ----------------------------------------------------------------------------- */

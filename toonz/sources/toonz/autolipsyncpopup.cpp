@@ -726,7 +726,7 @@ void AutoLipSyncPopup::onOutputReady() {
                .replace("\\\"", "")
                .replace("\"", "");
   QStringList outputList =
-      output.mid(2, (output.size() - 4)).split(", ", QString::SkipEmptyParts);
+      output.mid(2, (output.size() - 4)).split(", ", Qt::SkipEmptyParts);
   if (outputList.size()) {
     QStringList outputType = outputList.at(0).split(": ");
     if (outputType.at(1) == "progress") {

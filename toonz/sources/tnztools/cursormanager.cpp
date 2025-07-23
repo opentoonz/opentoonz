@@ -287,6 +287,9 @@ public:
 if (cursorType == ToolCursor::CURSOR_ARROW)
   cursor = Qt::ArrowCursor;
 else */
+    if (cursorType == ToolCursor::CURSOR_NONE)
+        return Qt::BlankCursor;
+    else
     if (cursorType == ToolCursor::ForbiddenCursor)
       cursor = Qt::ForbiddenCursor;
     else {

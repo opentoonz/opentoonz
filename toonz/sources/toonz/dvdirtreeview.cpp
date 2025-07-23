@@ -274,7 +274,7 @@ void DvDirTreeViewDelegate::setModelData(QWidget *editor,
                                          const QModelIndex &index) const {
   if (index.data().canConvert(QMetaType::QString)) {
     NodeEditor *nodeEditor = qobject_cast<NodeEditor *>(editor);
-    model->setData(index, qVariantFromValue(
+    model->setData(index, QVariant::fromValue(
                               nodeEditor->getText()));  // starEditor->text()));
   } else
     QAbstractItemDelegate::setModelData(editor, model, index);

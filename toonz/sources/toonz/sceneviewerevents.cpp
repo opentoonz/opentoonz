@@ -600,7 +600,7 @@ void SceneViewer::onMove(const TMouseEvent &event) {
     }
 
     // if the middle mouse button is pressed while dragging, then do panning
-    if (event.buttons() & Qt::MidButton) {
+    if (event.buttons() & Qt::MiddleButton) {
       // panning
       QPointF p = curPos - m_pos;
       if (m_pos == QPointF() && p.manhattanLength() > 300) return;
@@ -682,8 +682,8 @@ void SceneViewer::onMove(const TMouseEvent &event) {
     m_pos          = curPos;
     m_tabletMove   = false;
     m_toolSwitched = false;
-  } else if (m_mouseButton == Qt::MidButton) {
-    if ((event.buttons() & Qt::MidButton) == 0) m_mouseButton = Qt::NoButton;
+  } else if (m_mouseButton == Qt::MiddleButton) {
+    if ((event.buttons() & Qt::MiddleButton) == 0) m_mouseButton = Qt::NoButton;
     // scrub with shift and middle click
     else if (event.isShiftPressed() && event.isCtrlPressed()) {
       if (curPos.x() > m_pos.x()) {
@@ -758,7 +758,7 @@ void SceneViewer::onPress(const TMouseEvent &event) {
 
   // when using tablet, avoid unexpected drawing behavior occurs when
   // middle-click
-  if (m_tabletEvent && m_mouseButton == Qt::MidButton &&
+  if (m_tabletEvent && m_mouseButton == Qt::MiddleButton &&
       event.isLeftButtonPressed()) {
     return;
   }
@@ -1045,7 +1045,7 @@ void SceneViewer::wheelEvent(QWheelEvent *event) {
     else if ((m_gestureActive == true &&
               m_touchDevice == QTouchDevice::TouchScreen) ||
              m_gestureActive == false) {
-      zoomQt(event->pos() * getDevPixRatio(), exp(0.001 * delta));
+      zoomQt(event->position().toPoint() * getDevPixRatio(), exp(0.001 * delta));
       m_panning = false;
     }
   }
@@ -1305,7 +1305,7 @@ bool SceneViewer::event(QEvent *e) {
   }
 
   // discard too frequent move events
-  static QTime clock;
+  static QElapsedTimer clock;
   if (e->type() == QEvent::MouseButtonPress)
     clock.start();
   else if (e->type() == QEvent::MouseMove) {

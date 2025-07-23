@@ -233,6 +233,7 @@ void ConvertPopup::Converter::convertLevel(
   }
 
   popup->m_notifier->notifyLevelCompleted(dstFileFullPath);
+  popup->m_convertedFileMap[sourceFileFullPath] = dstFileFullPath;
 }
 
 // to use legacy code
@@ -833,7 +834,8 @@ void ConvertPopup::setFiles(const std::vector<TFilePath> &fps) {
   m_imageDpi = 0.0;
 
   if (m_srcFilePaths.size() == 1) {
-    setWindowTitle(tr("Convert 1 Level"));
+    setWindowTitle(tr("Convert 1 Level : %1")
+        .arg(QString::fromStdString(fps[0].getName())));
     m_fileNameFld->setEnabled(true);
 
     m_fromFld->setEnabled(false);
@@ -883,6 +885,11 @@ void ConvertPopup::setFiles(const std::vector<TFilePath> &fps) {
   // update the image dpi field
   onDpiModeSelected(m_dpiMode->currentIndex());
   // m_fileFormat->setCurrentIndex(areFullcolor?0:m_fileFormat->findText("tif"));
+}
+
+void ConvertPopup::setFormat(QString format){
+    m_fileFormat->setDisabled(true);
+    m_fileFormat->setCurrentIndex(m_fileFormat->findText(format));
 }
 
 //-------------------------------------------------------------------
@@ -1259,6 +1266,7 @@ QString::number(m_srcFilePaths.size()-skipped)).arg(QString::number(m_srcFilePat
 
 void ConvertPopup::onLevelConverted(const TFilePath &fullPath) {
   IconGenerator::instance()->invalidate(fullPath);
+  
 }
 
 //-------------------------------------------------------------------

@@ -10,7 +10,7 @@
 #include <tstroke.h>
 #include <toonz/strokegenerator.h>
 #include <toonz/rasterstrokegenerator.h>
-
+#include "toonz/preferences.h"
 #include <tools/tool.h>
 #include <tools/cursors.h>
 
@@ -106,10 +106,9 @@ class ToonzRasterBrushTool final : public TTool,
 public:
   ToonzRasterBrushTool(std::string name, int targetType);
 
-  ToolType getToolType() const override
-    { return TTool::LevelWriteTool; }
+  ToolType getToolType() const override { return TTool::LevelWriteTool; }
   unsigned int getToolHints() const override;
-  
+
   ToolOptionsBox *createOptionsBox() override;
 
   void updateTranslation() override;
@@ -128,7 +127,9 @@ public:
   void inputSetBusy(bool busy) override;
   void inputPaintTrackPoint(const TTrackPoint &point, const TTrack &track,
                             bool firstTrack, bool preview) override;
-  void inputInvalidateRect(const TRectD &bounds) override { invalidate(bounds); }
+  void inputInvalidateRect(const TRectD &bounds) override {
+    invalidate(bounds);
+  }
   TTool *inputGetTool() override { return this; };
 
   void draw() override;
@@ -136,7 +137,11 @@ public:
   void onEnter() override;
   void onLeave() override;
 
-  int getCursorId() const override { return ToolCursor::PenCursor; }
+  int getCursorId() const override {
+      return Preferences::instance()->isUseStrokeEndCursor()
+          ? ToolCursor::CURSOR_NONE
+          : ToolCursor::PenCursor;
+  }
 
   TPropertyGroup *getProperties(int targetType) override;
   bool onPropertyChanged(std::string propertyName) override;
@@ -180,73 +185,67 @@ protected:
 #endif
   TInputModifier::List m_modifierReplicate;
 
-  class MyPaintStroke: public TTrackHandler {
+  class MyPaintStroke : public TTrackHandler {
   public:
     MyPaintToonzBrush brush;
-    
-    inline MyPaintStroke(
-      const TRaster32P &ras,
-      RasterController &controller,
-      const mypaint::Brush &brush,
-      bool interpolation = false
-    ): 
-      brush(ras, controller, brush, interpolation)
-    { }
-  };
-  
-  class PencilStroke: public TTrackHandler {
-  public:
-    RasterStrokeGenerator brush;
-    
-    inline PencilStroke( const TRasterCM32P &raster, Tasks task,
-                         ColorType colorType, int styleId, const TThickPoint &p,
-                         bool selective, int selectedStyle, bool lockAlpha,
-                         bool keepAntialias, bool isPaletteOrder = false
-    ):
-      brush(raster, task, colorType, styleId, p, selective, selectedStyle, lockAlpha, keepAntialias, isPaletteOrder)
-    { }
+
+    inline MyPaintStroke(const TRaster32P &ras, RasterController &controller,
+                         const mypaint::Brush &brush,
+                         bool interpolation = false)
+        : brush(ras, controller, brush, interpolation) {}
   };
 
-  class BluredStroke: public TTrackHandler {
+  class PencilStroke : public TTrackHandler {
+  public:
+    RasterStrokeGenerator brush;
+
+    inline PencilStroke(const TRasterCM32P &raster, Tasks task,
+                        ColorType colorType, int styleId, const TThickPoint &p,
+                        bool selective, int selectedStyle, bool lockAlpha,
+                        bool keepAntialias, bool isPaletteOrder = false)
+        : brush(raster, task, colorType, styleId, p, selective, selectedStyle,
+                lockAlpha, keepAntialias, isPaletteOrder) {}
+  };
+
+  class BluredStroke : public TTrackHandler {
   public:
     BluredBrush brush;
-    
-    inline BluredStroke( const TRaster32P &ras, int size,
-                         const QRadialGradient &gradient, bool doDynamicOpacity
-    ):
-      brush(ras, size, gradient, doDynamicOpacity)
-    { }
+
+    inline BluredStroke(const TRaster32P &ras, int size,
+                        const QRadialGradient &gradient, bool doDynamicOpacity)
+        : brush(ras, size, gradient, doDynamicOpacity) {}
   };
-  
+
   struct Painting {
     // initial painting input
     bool active = false;
     int styleId = 0;
     bool smooth = false;
-    // 作業中のFrameIdをクリック時に保存し、マウスリリース時（Undoの登録時）に別のフレームに 移動していたときの不具合を修正する。
+    // 作業中のFrameIdをクリック時に保存し、マウスリリース時（Undoの登録時）に別のフレームに
+    // 移動していたときの不具合を修正する。
     TFrameId frameId;
-    
+
     // common variables
-    TTileSetCM32 *tileSet = nullptr;
+    TTileSetCM32 *tileSet     = nullptr;
     TTileSaverCM32 *tileSaver = nullptr;
     TRect affectedRect;
-    
+
     struct Pencil {
-      bool isActive = false;
+      bool isActive   = false;
       bool realPencil = false;
     } pencil;
-    
+
     struct Blured {
       bool isActive = false;
     } blured;
-    
+
     struct MyPaint {
       bool isActive = false;
       mypaint::Brush baseBrush;
       TRect strokeSegmentRect;
     } myPaint;
   } m_painting;
-  
+
   TPropertyGroup m_prop[2];
 
   TDoublePairProperty m_rasThickness;
@@ -282,7 +281,7 @@ protected:
       m_firstTime, m_presetsLoaded;
 
   ToonzRasterBrushToolNotifier *m_notifier;
-  bool m_isMyPaintStyleSelected    = false;
+  bool m_isMyPaintStyleSelected = false;
   QElapsedTimer m_brushTimer;
   int m_minCursorThick, m_maxCursorThick;
 

@@ -512,7 +512,7 @@ void ChangeObjectParent::refresh() {
   for (i = 0; i < pegbarListID.size(); i++)
     addText(pegbarListID.at(i), pegbarListTr.at(i), pegbarListColor.at(i));
 
-  m_width = fontMetrics().width(theLongestTxt) + 32;
+  m_width = fontMetrics().horizontalAdvance(theLongestTxt) + 32;
   selectCurrent(currentId);
 }
 
@@ -1341,11 +1341,11 @@ void ColumnArea::DrawHeader::drawPegbarName() const {
   std::string handle = xsh->getStageObject(columnId)->getParentHandle();
   if (handle == "B") handleWidth = 0;  // Default handle
 
-  int width = QFontMetrics(font).width(name);
+  int width = QFontMetrics(font).horizontalAdvance(name);
 
   while (width > o->rect(PredefinedRect::PEGBAR_NAME).width() - handleWidth) {
     name.remove(-1, 1000);
-    width = QFontMetrics(font).width(name);
+    width = QFontMetrics(font).horizontalAdvance(name);
   }
 
   // pegbar name
@@ -2566,7 +2566,7 @@ void ColumnArea::mousePressEvent(QMouseEvent *event) {
     m_viewer->dragToolClick(event);
     update();
 
-  } else if (event->button() == Qt::MidButton) {
+  } else if (event->button() == Qt::MiddleButton) {
     m_pos       = event->pos();
     m_isPanning = true;
   }

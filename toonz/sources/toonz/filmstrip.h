@@ -63,6 +63,8 @@ public:
   QSize getIconSize() const { return m_iconSize; }
   int getFrameLabelWidth() const { return m_frameLabelWidth; }
 
+  bool isOutOfBounds(int n) const;
+
   // convert mouse coordinate y to a frame index and vice versa
   int y2index(int y) const;
   int index2y(int index) const;

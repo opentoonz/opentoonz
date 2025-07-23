@@ -659,10 +659,10 @@ std::vector<int> string2Indexes(const QString &values) {
   std::vector<int> ret;
   int i, j;
   bool ok;
-  QStringList vals = values.split(',', QString::SkipEmptyParts);
+  QStringList vals = values.split(',', Qt::SkipEmptyParts);
   for (i = 0; i < vals.size(); i++) {
     if (vals.at(i).contains('-')) {
-      QStringList vals1 = vals.at(i).split('-', QString::SkipEmptyParts);
+      QStringList vals1 = vals.at(i).split('-', Qt::SkipEmptyParts);
       if (vals1.size() != 2) return std::vector<int>();
       int from = vals1.at(0).toInt(&ok);
       if (!ok) return std::vector<int>();

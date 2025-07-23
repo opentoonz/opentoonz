@@ -614,18 +614,22 @@ void FileBrowser::refreshCurrentFolderItems() {
         // とりあえず残すが、FileInfoの取得に時間がかかるようならオプション化も検討
         // 2015/12/28 shun_iwasawa
         QFileInfo fileInfo(QString::fromStdWString(it->getWideString()));
+        // Get creation time safely across platforms
+        QDateTime creationTime = fileInfo.birthTime();
+        if (!creationTime.isValid())
+          creationTime = fileInfo.metadataChangeTime();  // or fileInfo.lastModified()
+
         // Update level infos
-        if (levelItem.m_creationDate.isNull() ||
-            (fileInfo.created() < levelItem.m_creationDate))
-          levelItem.m_creationDate = fileInfo.created();
-        if (levelItem.m_modifiedDate.isNull() ||
-            (fileInfo.lastModified() > levelItem.m_modifiedDate))
+        if (levelItem.m_creationDate.isNull() || creationTime < levelItem.m_creationDate)
+          levelItem.m_creationDate = creationTime;
+
+        if (levelItem.m_modifiedDate.isNull() || fileInfo.lastModified() > levelItem.m_modifiedDate)
           levelItem.m_modifiedDate = fileInfo.lastModified();
+
         levelItem.m_fileSize += fileInfo.size();
 
-        // store frameId
+        // Store frame ID
         levelItem.m_frameIds.push_back(tFrameId);
-
         levelItem.m_frameCount++;
       }
     }
@@ -821,8 +825,12 @@ void FileBrowser::readInfo(Item &item) {
   TFilePath fp = item.m_path;
   QFileInfo info(toQString(fp));
   if (info.exists()) {
-    item.m_creationDate = info.created();
-    item.m_modifiedDate = info.lastModified();
+    // Use birthTime(), fall back to metadataChangeTime() if unavailable
+    item.m_creationDate = info.birthTime();
+    if (!item.m_creationDate.isValid()) {
+        item.m_creationDate = info.metadataChangeTime();
+    }
+    item.m_modifiedDate = info.lastModified(); 
     item.m_fileType     = info.suffix();
     item.m_fileSize     = info.size();
     if (fp.getType() == "tnz") {

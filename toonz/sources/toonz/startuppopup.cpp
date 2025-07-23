@@ -39,6 +39,7 @@
 #include <QPushButton>
 #include <QMainWindow>
 #include <QApplication>
+#include <QScreen>
 #include <QDesktopWidget>
 #include <QMessageBox>
 #include <QTextStream>
@@ -49,7 +50,6 @@
 #include <QMouseEvent>
 #include <QDesktopServices>
 
-using namespace std;
 using namespace DVGui;
 
 namespace {
@@ -416,11 +416,12 @@ void StartupPopup::showEvent(QShowEvent *) {
   refreshRecentScenes();
   refreshExistingScenes();
   // center window
-  int currentScreen =
-      QApplication::desktop()->screenNumber(TApp::instance()->getMainWindow());
-  QPoint activeMonitorCenter =
-      QApplication::desktop()->availableGeometry(currentScreen).center();
-  QPoint thisPopupCenter         = this->rect().center();
+  QScreen *screen = QGuiApplication::screenAt(TApp::instance()->getMainWindow()->pos());
+  if (!screen) {
+    screen = QGuiApplication::primaryScreen();
+  }
+  QPoint activeMonitorCenter = screen->availableGeometry().center();
+  QPoint thisPopupCenter = this->rect().center();
   QPoint centeredOnActiveMonitor = activeMonitorCenter - thisPopupCenter;
   this->move(centeredOnActiveMonitor);
 }
@@ -850,7 +851,7 @@ bool StartupPopup::parsePresetString(const QString &str, QString &name,
   in order to keep compatibility with default (Harlequin's) reslist.txt
   */
 
-  QStringList tokens = str.split(",", QString::SkipEmptyParts);
+  QStringList tokens = str.split(",", Qt::SkipEmptyParts);
 
   if (!(tokens.count() == 3 ||
         (!forCleanup && tokens.count() == 4) || /*- with "fx x fy" token -*/

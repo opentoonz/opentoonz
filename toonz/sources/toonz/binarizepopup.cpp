@@ -7,6 +7,7 @@
 #include "menubarcommandids.h"
 #include "cellselection.h"
 #include "filmstripselection.h"
+#include "selectionutils.h"
 
 // TnzQt includes
 #include "toonzqt/intfield.h"
@@ -346,6 +347,19 @@ int BinarizePopup::getSelectedFrames() {
       }
     }
   } else {
+      std::set<TXshLevel*> levels;
+      SelectionUtils::getSelectedLevels(levels);
+      for (auto level : levels){
+          if (!level)continue;
+          auto sl = level->getSimpleLevel();
+          std::vector<TFrameId> ids;
+          sl->getFids(ids);
+          for (auto id : ids) {
+              m_frames.push_back(std::make_pair(sl, id));
+              count++;
+          }
+
+      }
   }
   m_frameIndex = 0;
   return count;
