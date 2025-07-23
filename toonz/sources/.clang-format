@@ -1,5 +1,5 @@
 BasedOnStyle: Google
-Standard: C++17
+Standard: c++17
 UseTab: Never
 AccessModifierOffset: -2
 AlignAfterOpenBracket: true

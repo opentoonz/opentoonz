@@ -200,7 +200,7 @@ StopMotionController::StopMotionController(QWidget *parent) : QWidget(parent) {
   m_saveInFolderPopup = new PencilTestSaveInFolderPopup(this);
   m_cameraListCombo   = new QComboBox(this);
   m_resolutionCombo   = new QComboBox(this);
-  m_resolutionCombo->setFixedWidth(fontMetrics().width("0000 x 0000") + 25);
+  m_resolutionCombo->setFixedWidth(fontMetrics().horizontalAdvance("0000 x 0000") + 25);
   m_resolutionLabel                 = new QLabel(tr("Resolution: "), this);
   m_cameraStatusLabel               = new QLabel(tr("Camera Status"), this);
   QPushButton *refreshCamListButton = new QPushButton(tr("Refresh"), this);
@@ -496,7 +496,7 @@ StopMotionController::StopMotionController(QWidget *parent) : QWidget(parent) {
     m_pictureStyleCombo   = new QComboBox(this);
     m_cameraSettingsLabel = new QLabel(tr("Camera Model"), this);
     m_cameraModeLabel     = new QLabel(tr("Camera Mode"), this);
-    m_exposureCombo->setFixedWidth(fontMetrics().width("000000") + 25);
+    m_exposureCombo->setFixedWidth(fontMetrics().horizontalAdvance("000000") + 25);
     QVBoxLayout *settingsLayout = new QVBoxLayout;
     settingsLayout->setSpacing(0);
     settingsLayout->setMargin(5);
@@ -1619,7 +1619,7 @@ void StopMotionController::refreshCameraList(QString activeCamera) {
         std::string name = webcams.at(c).deviceName().toStdString();
         QString camDesc  = webcams.at(c).description();
         m_cameraListCombo->addItem(camDesc);
-        maxTextLength = std::max(maxTextLength, fontMetrics().width(camDesc));
+        maxTextLength = std::max(maxTextLength, fontMetrics().horizontalAdvance(camDesc));
       }
     }
 #ifdef WITH_CANON

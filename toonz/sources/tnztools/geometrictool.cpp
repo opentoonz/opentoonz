@@ -36,6 +36,11 @@
 #include "toonz/mypaintbrushstyle.h"
 #include "toonz/ttilesaver.h"
 
+#include "toonz/tscenehandle.h"
+#include "toonz/toonzscene.h"
+#include "toonz/tcamera.h"
+#include "toonz/stage.h"
+
 // For Qt translation support
 #include <QCoreApplication>
 
@@ -610,10 +615,22 @@ public:
       , m_isPrompting(false) {}
 
   double getThickness() const {
-    if (m_rasterTool)
-      return m_param->m_rasterToolSize.getValue() * 0.5;
-    else
-      return m_param->m_toolSize.getValue() * 0.5;
+    if (m_rasterTool) {
+      double thick = m_param->m_rasterToolSize.getValue() * 0.5;
+      /*---
+       Pencilの場合は、線幅を減らす。Thickness1の線を1ピクセルにするため。
+       （thick = 0 になる）
+       ---*/
+      if (m_param->m_pencil.getValue()) thick -= 0.5;
+      return thick;
+    } else
+      return m_param->m_toolSize.getValue() * 0.5 * Stage::inch /
+             m_tool->getApplication()
+                 ->getCurrentScene()
+                 ->getScene()
+                 ->getCurrentCamera()
+                 ->getDpi()
+                 .x;
   }
 
   void setIsPrompting(bool value) { m_isPrompting = value; }
@@ -622,18 +639,18 @@ public:
 
   virtual ~Primitive() {}
 
-  virtual void leftButtonDown(const TPointD &p, const TMouseEvent &e){};
-  virtual void leftButtonDrag(const TPointD &p, const TMouseEvent &e){};
-  virtual void leftButtonUp(const TPointD &p, const TMouseEvent &e){};
-  virtual void leftButtonDoubleClick(const TPointD &, const TMouseEvent &e){};
-  virtual void rightButtonDown(const TPointD &p, const TMouseEvent &e){};
-  virtual void mouseMove(const TPointD &p, const TMouseEvent &e){};
+  virtual void leftButtonDown(const TPointD &p, const TMouseEvent &e) {};
+  virtual void leftButtonDrag(const TPointD &p, const TMouseEvent &e) {};
+  virtual void leftButtonUp(const TPointD &p, const TMouseEvent &e) {};
+  virtual void leftButtonDoubleClick(const TPointD &, const TMouseEvent &e) {};
+  virtual void rightButtonDown(const TPointD &p, const TMouseEvent &e) {};
+  virtual void mouseMove(const TPointD &p, const TMouseEvent &e) {};
   virtual bool keyDown(QKeyEvent *event) { return false; }
-  virtual void onEnter(){};
-  virtual void draw(){};
-  virtual void onActivate(){};
-  virtual void onDeactivate(){};
-  virtual void onImageChanged(){};
+  virtual void onEnter() {};
+  virtual void draw() {};
+  virtual void onActivate() {};
+  virtual void onDeactivate() {};
+  virtual void onImageChanged() {};
   TPointD calculateSnap(TPointD pos);
   void drawSnap();
   TPointD getSnap(TPointD pos);
@@ -2441,11 +2458,6 @@ bool MultiLinePrimitive::keyDown(QKeyEvent *event) {
 TStroke *MultiLinePrimitive::makeStroke() const {
   double thick = getThickness();
 
-  /*---
-   * Pencilの場合は、線幅を減らす。Thickness1の線を1ピクセルにするため。（thick
-   * = 0 になる）---*/
-  if (m_param->m_pencil.getValue()) thick -= 1.0;
-
   UINT size = m_vertex.size();
   if (size <= 1) return 0;
 
@@ -2811,12 +2823,12 @@ TStroke *MultiArcPrimitive::makeStroke() const {
 
 void MultiArcPrimitive::leftButtonDown(const TPointD &pos,
                                        const TMouseEvent &) {
-  TPointD newPos = calculateSnap(pos);
-  newPos         = checkGuideSnapping(pos);
+  TPointD newPos          = calculateSnap(pos);
+  newPos                  = checkGuideSnapping(pos);
   TTool::Application *app = TTool::getApplication();
 
-  if(m_clickNumber == 0) {
-    m_startPoint   = newPos;
+  if (m_clickNumber == 0) {
+    m_startPoint = newPos;
 
     if (!app) return;
     if (app->getCurrentObject()->isSpline()) {
@@ -2837,18 +2849,9 @@ void MultiArcPrimitive::leftButtonDown(const TPointD &pos,
 
 void MultiArcPrimitive::leftButtonDrag(const TPointD &pos,
                                        const TMouseEvent &e) {
-  switch (m_clickNumber) {
-  case 0:
-    if ((tdistance2(m_startPoint, pos) < sq(7.0 * m_tool->getPixelSize())))
-      return;
-    break;
-  case 1:
-    if (m_undoCount != 1 &&
-        (tdistance2(m_endPoint, pos) < sq(7.0 * m_tool->getPixelSize())))
-      return;
-    break;
-  }
-  
+  if (m_clickNumber <= 1 && !Preferences::instance()->isClickTwiceToCreateArcs())
+    return;
+
   TPointD newPos = calculateSnap(pos);
   newPos         = checkGuideSnapping(pos);
   double dist    = joinDistance * joinDistance;
@@ -2869,19 +2872,18 @@ void MultiArcPrimitive::leftButtonDrag(const TPointD &pos,
 
   case 1:
     if (m_undoCount == 1) {
-    if (e.isShiftPressed())
-      m_endPoint = rectify(m_startPoint, pos);
-    else
-      m_endPoint = newPos;
+      if (e.isShiftPressed())
+        m_endPoint = rectify(m_startPoint, pos);
+      else
+        m_endPoint = newPos;
 
-    if (m_stroke) {
-      TPointD firstPoint = m_stroke->getControlPoint(0);
-      if (tdistance2(m_endPoint, firstPoint) < dist * m_tool->getPixelSize())
-        m_endPoint = firstPoint;
-    }
-    m_tool->invalidate();
-  }
-    else {
+      if (m_stroke) {
+        TPointD firstPoint = m_stroke->getControlPoint(0);
+        if (tdistance2(m_endPoint, firstPoint) < dist * m_tool->getPixelSize())
+          m_endPoint = firstPoint;
+      }
+      m_tool->invalidate();
+    } else {
       m_centralPoint = getSnap(pos);
       std::vector<TThickPoint> points(9);
       double thick = getThickness();
@@ -2901,27 +2903,28 @@ void MultiArcPrimitive::leftButtonDrag(const TPointD &pos,
     break;
   case 2:
     if (!m_isSingleArc) {
-    m_centralPoint = newPos;
-    TThickQuadratic q(m_startPoint, TThickPoint(m_centralPoint, getThickness()),
-                      m_endPoint);
-    TThickQuadratic q0, q1, q00, q01, q10, q11;
+      m_centralPoint = newPos;
+      TThickQuadratic q(m_startPoint,
+                        TThickPoint(m_centralPoint, getThickness()),
+                        m_endPoint);
+      TThickQuadratic q0, q1, q00, q01, q10, q11;
 
-    q.split(0.5, q0, q1);
-    q0.split(0.5, q00, q01);
-    q1.split(0.5, q10, q11);
+      q.split(0.5, q0, q1);
+      q0.split(0.5, q00, q01);
+      q1.split(0.5, q10, q11);
 
-    assert(q00.getP2() == q01.getP0());
-    assert(q01.getP2() == q10.getP0());
-    assert(q10.getP2() == q11.getP0());
+      assert(q00.getP2() == q01.getP0());
+      assert(q01.getP2() == q10.getP0());
+      assert(q10.getP2() == q11.getP0());
 
-    m_strokeTemp->setControlPoint(1, q00.getP1());
-    m_strokeTemp->setControlPoint(2, q00.getP2());
-    m_strokeTemp->setControlPoint(3, q01.getP1());
-    m_strokeTemp->setControlPoint(4, q01.getP2());
-    m_strokeTemp->setControlPoint(5, q10.getP1());
-    m_strokeTemp->setControlPoint(6, q10.getP2());
-    m_strokeTemp->setControlPoint(7, q11.getP1());
-    m_tool->invalidate();
+      m_strokeTemp->setControlPoint(1, q00.getP1());
+      m_strokeTemp->setControlPoint(2, q00.getP2());
+      m_strokeTemp->setControlPoint(3, q01.getP1());
+      m_strokeTemp->setControlPoint(4, q01.getP2());
+      m_strokeTemp->setControlPoint(5, q10.getP1());
+      m_strokeTemp->setControlPoint(6, q10.getP2());
+      m_strokeTemp->setControlPoint(7, q11.getP1());
+      m_tool->invalidate();
     }
     break;
   }

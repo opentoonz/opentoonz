@@ -40,6 +40,10 @@ Can't develop but still want to help? Help us test individual Pull Requests befo
 - To share tips or to troubleshoot, join the [Google OpenToonz Users forum](https://groups.google.com/forum/#!forum/opentoonz_en)
 - If you found a bug with the software after troubleshooting, or are a developer, search the [Github issues](https://github.com/opentoonz/opentoonz/issues) and post there.
 
+## Documentation
+
+- For general documentation, please [look here](https://github.com/opentoonz/opentoonz_docs).
+
 ## Licensing
 
 - Files outside of the `thirdparty` and `stuff/library/mypaint brushes` directories are based on the Modified BSD License.

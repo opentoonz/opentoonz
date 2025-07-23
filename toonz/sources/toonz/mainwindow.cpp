@@ -85,6 +85,7 @@ TEnv::IntVar EditShiftToggleAction("EditShiftToggleAction", 0);
 TEnv::IntVar ShowShiftOriginToggleAction("ShowShiftOriginToggleAction", 0);
 TEnv::IntVar NoShiftToggleAction("NoShiftToggleAction", 0);
 TEnv::IntVar TouchGestureControl("TouchGestureControl", 0);
+TEnv::IntVar ShowBuildDateInTitle("ShowBuildDateInTitle", 1);
 
 //=============================================================================
 namespace {
@@ -489,7 +490,7 @@ void MainWindow::changeWindowTitle() {
   ToonzScene *scene = app->getCurrentScene()->getScene();
   if (!scene) return;
 
-  auto project = scene->getProject();
+  auto project        = scene->getProject();
   QString projectName = QString::fromStdString(project->getName().getName());
 
   QString sceneName = QString::fromStdWString(scene->getSceneName());
@@ -503,6 +504,9 @@ void MainWindow::changeWindowTitle() {
   QString name = sceneName + " [" + projectName + "] : " +
                  QString::fromStdString(TEnv::getApplicationFullName());
 
+  if (ShowBuildDateInTitle) {
+      name += " (built " __DATE__ " " __TIME__ ")";
+  }
   setWindowTitle(name);
 }
 
@@ -936,8 +940,7 @@ Room *MainWindow::getCurrentRoom() const {
 
 void MainWindow::onUndo() {
   // Must wait for current save to finish, just in case
-  while (TApp::instance()->isSaveInProgress())
-    ;
+  while (TApp::instance()->isSaveInProgress());
 
   ToolHandle *toolH = TApp::instance()->getCurrentTool();
 
@@ -952,8 +955,7 @@ void MainWindow::onUndo() {
 
 void MainWindow::onRedo() {
   // Must wait for current save to finish, just in case
-  while (TApp::instance()->isSaveInProgress())
-    ;
+  while (TApp::instance()->isSaveInProgress());
 
   bool ret = TUndoManager::manager()->redo();
   if (!ret) DVGui::error(QObject::tr("No more Redo operations available."));
@@ -994,16 +996,28 @@ void MainWindow::onAbout() {
   dialog->setWindowTitle(tr("About OpenToonz"));
   dialog->setTopMargin(0);
   dialog->addWidget(label);
+  QHBoxLayout *hLay = new QHBoxLayout();
+  {
+    QString name = QString::fromStdString(TEnv::getApplicationFullName());
+    name += " (built " __DATE__ " " __TIME__ ")";
+    hLay->addWidget(new QLabel(name, dialog));
 
-  QString name = QString::fromStdString(TEnv::getApplicationFullName());
-  name += " (built " __DATE__ " " __TIME__ ")";
-  dialog->addWidget(new QLabel(name));
+    QCheckBox *showDateCheckBox =
+        new QCheckBox(tr("Show build date in title"), dialog);
+    showDateCheckBox->setChecked(ShowBuildDateInTitle);
+    connect(showDateCheckBox, &QCheckBox::stateChanged, [=](int state) {
+      bool show            = (state == Qt::Checked);
+      ShowBuildDateInTitle = show;
+      changeWindowTitle();
+    });
+    hLay->addWidget(showDateCheckBox);
+  }
+  dialog->addLayout(hLay);
 
   QPushButton *button = new QPushButton(tr("Close"), dialog);
   button->setDefault(true);
   dialog->addButtonBarWidget(button);
   connect(button, SIGNAL(clicked()), dialog, SLOT(accept()));
-
   dialog->exec();
 }
 
@@ -1897,7 +1911,7 @@ void MainWindow::defineActions() {
   createMenuLevelAction(MI_ExportLevel, QT_TR_NOOP("&Export Level..."), "",
                         "export_level");
   createMenuLevelAction(MI_ExportAllLevels,
-                        QT_TR_NOOP("&Export All Levels... "), "", 
+                        QT_TR_NOOP("&Export All Levels... "), "",
                         "export_all_levels");
   createMenuLevelAction(MI_RemoveEndpoints,
                         QT_TR_NOOP("&Remove Vector Overflow"), "",
@@ -1946,7 +1960,7 @@ void MainWindow::defineActions() {
   createMenuLevelAction(MI_ConvertToVectors,
                         QT_TR_NOOP("Convert to Vectors..."), "", "convert");
   createMenuLevelAction(MI_ConvertToToonzRaster,
-                        QT_TR_NOOP("Vectors to Toonz Raster"), "");
+                        QT_TR_NOOP("Convert to Toonz Raster..."), "");
   createMenuLevelAction(
       MI_ConvertVectorToVector,
       QT_TRANSLATE_NOOP("MainWindow",
@@ -2213,7 +2227,8 @@ void MainWindow::defineActions() {
   createMenuWindowsAction(MI_OpenFileBrowser, QT_TR_NOOP("&File Browser"), "",
                           "filebrowser");
   createMenuWindowsAction(MI_OpenPreproductionBoard,
-                          QT_TR_NOOP("&Preproduction Board"), "", "preproductionboard");
+                          QT_TR_NOOP("&Preproduction Board"), "",
+                          "preproductionboard");
   createMenuWindowsAction(MI_OpenFileViewer, QT_TR_NOOP("&Flipbook"), "",
                           "flipbook");
   createMenuWindowsAction(MI_OpenFunctionEditor, QT_TR_NOOP("&Function Editor"),
@@ -2283,7 +2298,8 @@ void MainWindow::defineActions() {
                    false);
   createMenuWindowsAction(MI_CustomPanelEditor,
                           QT_TR_NOOP("&Custom Panel Editor..."), "", "");
-  createMenuWindowsAction(MI_OpenLocator, QT_TR_NOOP("&Locator"), "", "locator");
+  createMenuWindowsAction(MI_OpenLocator, QT_TR_NOOP("&Locator"), "",
+                          "locator");
 
   menuAct =
       createToggle(MI_DockingCheck, QT_TR_NOOP("&Lock Room Panes"), "",

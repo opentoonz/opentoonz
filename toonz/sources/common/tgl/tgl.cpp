@@ -160,6 +160,32 @@ void tglDrawCircle(const TPointD &center, double radius) {
   glPopMatrix();
 }
 
+void tglDrawInvertCursor(const TPointD& center,int gap, int len) {
+    TPointD up1 = center + TPointD(0.0, gap);
+    TPointD up2 = center + TPointD(0.0, gap + len);
+    TPointD down1 = center + TPointD(0.0, -gap);
+    TPointD down2 = center + TPointD(0.0, -gap - len);
+    TPointD left1 = center + TPointD(-gap, 0.0);
+    TPointD left2 = center + TPointD(-gap - len, 0.0);
+    TPointD right1 = center + TPointD(gap, 0.0);
+    TPointD right2 = center + TPointD(gap + len, 0.0);
+
+    glEnable(GL_COLOR_LOGIC_OP);
+    glLogicOp(GL_XOR);
+    tglColor(TPixel32::White); // 任意非黑色都行，关键是与背景异或
+
+    glLineWidth(1.2);
+    glBegin(GL_LINES);
+    tglVertex(up1);    tglVertex(up2);
+    tglVertex(down1);  tglVertex(down2);
+    tglVertex(left1);  tglVertex(left2);
+    tglVertex(right1); tglVertex(right2);
+    glEnd();
+    glLineWidth(1.0);
+
+    glDisable(GL_COLOR_LOGIC_OP);
+}
+
 //-----------------------------------------------------------------------------
 
 void tglDrawDisk(const TPointD &c, double r) {

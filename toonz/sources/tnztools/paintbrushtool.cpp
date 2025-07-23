@@ -38,6 +38,7 @@
 // For Qt translation support
 #include <QCoreApplication>
 
+
 using namespace ToolUtils;
 
 #define LINES L"Lines"

@@ -1073,7 +1073,7 @@ static TFilePath getLevelPathAndSetNameWithPsdLevelName(
     retfp = TFilePath(
         QString::fromStdWString(retfp.getWideString()).replace("##", "#"));
   }
-  QStringList list = name.split("#", QString::SkipEmptyParts);
+  QStringList list = name.split("#", Qt::SkipEmptyParts);
 
   if (list.size() >= 2 && list.at(1) != "frames") {
     bool hasLayerId;

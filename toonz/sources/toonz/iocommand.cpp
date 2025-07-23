@@ -1586,6 +1586,7 @@ bool IoCmd::saveScene(int flags) {
     int ret = popup->exec();
     if (ret == QDialog::Accepted) {
       TApp::instance()->getCurrentScene()->setDirtyFlag(false);
+      scene->setTitled();
       return true;
     } else {
       TApp::instance()->getCurrentSelection()->setSelection(oldSelection);
@@ -1757,24 +1758,8 @@ bool IoCmd::saveAll(int flags) {
 
   // NOTE: saveScene already check saveInProgress
   bool result = saveScene(flags);
-
-  TApp *app         = TApp::instance();
-  ToonzScene *scene = app->getCurrentScene()->getScene();
-  bool untitled     = scene->isUntitled();
-  SceneResources resources(scene, 0);
-  // Must wait for current save to finish, just in case
-  while (TApp::instance()->isSaveInProgress())
-    ;
-
-  TApp::instance()->setSaveInProgress(true);
-  resources.save(scene->getScenePath());
-  TApp::instance()->setSaveInProgress(false);
-  resources.updatePaths();
-
-  // for update title bar
-  app->getCurrentLevel()->notifyLevelTitleChange();
-  app->getCurrentPalette()->notifyPaletteTitleChanged();
-  if (untitled) scene->setUntitled();
+  
+  saveNonSceneFiles();
 
   //End Label Notice
   if (result) {
@@ -1784,7 +1769,7 @@ bool IoCmd::saveAll(int flags) {
         "background-color: black; color: green; "
         "font-weight: bold; padding: 5px;");
   } else {
-    Label->setText("Save Failed");
+    Label->setText("Save All Failed");
     Label->setStyleSheet(
         "font-size: 20px;"
         "background-color: black; color: red; "
@@ -1799,13 +1784,12 @@ bool IoCmd::saveAll(int flags) {
 //===========================================================================
 // IoCmd::saveNonSceneFiles()
 //---------------------------------------------------------------------------
-
+// This command should not change any content in scene!
 void IoCmd::saveNonSceneFiles() {
   // try to save non scene files
 
   TApp *app         = TApp::instance();
   ToonzScene *scene = app->getCurrentScene()->getScene();
-  bool untitled     = scene->isUntitled();
   SceneResources resources(scene, 0);
   // Must wait for current save to finish, just in case
   while (TApp::instance()->isSaveInProgress())
@@ -1814,7 +1798,6 @@ void IoCmd::saveNonSceneFiles() {
   TApp::instance()->setSaveInProgress(true);
   resources.save(scene->getScenePath());
   TApp::instance()->setSaveInProgress(false);
-  if (untitled) scene->setUntitled();
   resources.updatePaths();
 
   // for update title bar
@@ -1931,8 +1914,9 @@ bool IoCmd::loadScene(const TFilePath &path, bool updateRecentFile,
     QString msg;
     msg = QObject::tr(
               "It is not possible to load the scene %1 because it does not "
-              "belong to any project.")
-              .arg(QString::fromStdWString(scenePath.getWideString()));
+              "belong to any project.\n"
+        "Please delete scenes.xml if this scene dones't belong to any project.")
+        .arg(QString::fromStdWString(scenePath.getWideString()));
     DVGui::warning(msg);
   }
   if (sceneProject && !sceneProject->isCurrent()) {
@@ -3110,14 +3094,12 @@ public:
       DVGui::warning(QObject::tr("No Current Scene"));
       return;  // non dovrebbe succedere mai
     }
-    TFilePath levelPath = sl->getPath();
-    levelPath           = scene->decodeFilePath(levelPath);
-    QString str         = QString::fromStdWString(levelPath.getWideString());
-    if (!(sl->getPath().isAbsolute() || !scene->isUntitled() ||
-          (!sl->getPath().isAbsolute() && !str.contains("untitled")))) {
-      error(QObject::tr("Save the scene first"));
-      return;
-    }
+    //TFilePath levelPath = sl->getPath();
+    //levelPath           = scene->decodeFilePath(levelPath);
+    //if (!levelPath.isAbsolute() && (scene->isUntitled() || scene->getSceneName().empty())) {
+    //  error(QObject::tr("Save the scene first") + levelPath.getQString());
+    //  return;
+    //}
 
     // reset the undo before save level
     if (Preferences::instance()->getBoolValue(resetUndoOnSavingLevel))

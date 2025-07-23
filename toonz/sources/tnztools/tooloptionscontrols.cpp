@@ -53,8 +53,9 @@ ToolOptionControl::ToolOptionControl(TTool *tool, std::string propertyName,
 
 //-----------------------------------------------------------------------------
 
-void ToolOptionControl::notifyTool(bool addToUndo)
-  { m_tool->onPropertyChanged(m_propertyName, addToUndo); }
+void ToolOptionControl::notifyTool(bool addToUndo) {
+  m_tool->onPropertyChanged(m_propertyName, addToUndo);
+}
 
 //-----------------------------------------------------------------------------
 /*! return true if the control is belonging to the visible combo viewer. very
@@ -137,7 +138,7 @@ ToolOptionSlider::ToolOptionSlider(TTool *tool, TDoubleProperty *property,
   // set the maximum width of the widget according to the text length (with 5
   // pixels margin)
   txt.fill('0', textMaxLength);
-  int widgetWidth = fontMetrics().width(txt) + 5;
+  int widgetWidth = fontMetrics().horizontalAdvance(txt) + 5;
   m_lineEdit->parentWidget()->setMaximumWidth(widgetWidth);
   // set the maximum width of the slider to 250 pixels
   setMaximumWidth(250 + widgetWidth);
@@ -191,7 +192,7 @@ ToolOptionPairSlider::ToolOptionPairSlider(TTool *tool,
   // set the maximum width of the widget according to the text length (with 5
   // pixels margin)
   txt.fill('0', textMaxLength);
-  int widgetWidth = fontMetrics().width(txt) + 5;
+  int widgetWidth = fontMetrics().horizontalAdvance(txt) + 5;
   m_leftLineEdit->setFixedWidth(widgetWidth);
   m_rightLineEdit->setFixedWidth(widgetWidth);
   m_leftMargin  = widgetWidth + 12;
@@ -267,8 +268,7 @@ ToolOptionIntSlider::ToolOptionIntSlider(TTool *tool, TIntProperty *property,
                                          ToolHandle *toolHandle)
     : IntField(0, property->isMaxRangeLimited())
     , ToolOptionControl(tool, property->getName(), toolHandle)
-    , m_property(property)
-{
+    , m_property(property) {
   setLinearSlider(property->isLinearSlider());
   m_property->addListener(this);
   TIntProperty::Range range = property->getRange();
@@ -361,7 +361,7 @@ void ToolOptionCombo::loadEntries() {
                       }");
       }
     }
-    int tmpWidth = fontMetrics().width(items[i].UIName);
+    int tmpWidth = fontMetrics().horizontalAdvance(items[i].UIName);
     if (tmpWidth > maxWidth) maxWidth = tmpWidth;
   }
 
@@ -751,7 +751,6 @@ void MeasuredValueField::setMeasure(std::string name) {
 //-----------------------------------------------------------------------------
 
 void MeasuredValueField::commit() {
-  if (!m_modified && !isReturnPressed()) return;
   // commit is called when the field comes out of focus.
   // mouse drag will call this - return if coming from mouse drag.
   // else undo is set twice
@@ -759,6 +758,8 @@ void MeasuredValueField::commit() {
     m_mouseEdit = false;
     return;
   }
+  if (!m_modified && !isReturnPressed()) return;
+
   int err    = 1;
   bool isSet = m_value->setValue(text().toStdWString(), &err);
   m_modified = false;
@@ -856,7 +857,7 @@ void MeasuredValueField::mouseMoveEvent(QMouseEvent *e) {
 
 void MeasuredValueField::mouseReleaseEvent(QMouseEvent *e) {
   if (!isEnabled()) return;
-  // m_mouseEdit will be set false in commit
+  // m_mouseEdit will be set false in commit and at HERE
   if (m_mouseEdit) {
     // This seems redundant, but this is necessary for undo to work
     double valueToRestore = m_value->getValue(TMeasuredValue::CurrentUnit);
@@ -868,6 +869,7 @@ void MeasuredValueField::mouseReleaseEvent(QMouseEvent *e) {
     setText(QString::fromStdWString(m_value->toWideString(m_precision)));
     emit measuredValueChanged(m_value, true);
     clearFocus();
+    m_mouseEdit = false;
   } else
     QLineEdit::mouseReleaseEvent(e);
 }
@@ -898,7 +900,8 @@ void MeasuredValueField::receiveMouseRelease(QMouseEvent *e) {
 namespace {
 // calculate maximum field size (once) with 10 pixels margin
 int getMaximumWidthForEditToolField(QWidget *widget) {
-  static int fieldMaxWidth = widget->fontMetrics().width("-0000.00 field") + 10;
+  static int fieldMaxWidth =
+      widget->fontMetrics().horizontalAdvance("-0000.00 field") + 10;
   return fieldMaxWidth;
 }
 }  // namespace
@@ -1235,7 +1238,8 @@ void PropertyMenuButton::onActionTriggered(QAction *action) {
 namespace {
 // calculate maximum field size (once) with 10 pixels margin
 int getMaximumWidthForSelectionToolField(QWidget *widget) {
-  static int fieldMaxWidth = widget->fontMetrics().width("-000.00 %") + 10;
+  static int fieldMaxWidth =
+      widget->fontMetrics().horizontalAdvance("-000.00 %") + 10;
   return fieldMaxWidth;
 }
 }  // namespace
@@ -1472,18 +1476,23 @@ ThickChangeField::ThickChangeField(SelectionTool *tool, QString name)
 
 void ThickChangeField::onChange(TMeasuredValue *fld, bool addToUndo) {
   if (!m_tool || (m_tool->isSelectionEmpty() && !m_tool->isLevelType())) return;
-
-  DragSelectionTool::VectorChangeThicknessTool *changeThickTool =
-      new DragSelectionTool::VectorChangeThicknessTool(
-          (VectorSelectionTool *)m_tool);
+  if (!m_changeThickTool)
+    m_changeThickTool.reset(new DragSelectionTool::VectorChangeThicknessTool(
+        (VectorSelectionTool *)m_tool));
 
   TVectorImageP vi = (TVectorImageP)m_tool->getImage(true);
+  double p         = 0.5 * getValue();
 
-  double p            = 0.5 * getValue();
-  double newThickness = p - m_tool->m_deformValues.m_maxSelectionThickness;
-
-  changeThickTool->setThicknessChange(newThickness);
-  changeThickTool->changeImageThickness(*vi, newThickness);
+  // The chageThickTool would deal the rest frames when adding undo
+  if (isLabelClicked()) {
+    m_changeThickTool->setStrokesThickness(*vi);
+    double newThickness = p - m_tool->m_deformValues.m_maxSelectionThickness;
+    m_changeThickTool->setThicknessChange(newThickness);
+    m_changeThickTool->changeImageThickness(*vi, newThickness);
+  } else {
+    m_changeThickTool->setThicknessChange(p);
+    m_changeThickTool->setImageThickness(*vi, p);
+  }
 
   // DragSelectionTool::DeformValues deformValues = m_tool->m_deformValues;
   // // Like when I found it - it's a noop.
@@ -1491,11 +1500,12 @@ void ThickChangeField::onChange(TMeasuredValue *fld, bool addToUndo) {
   // // Seems that the actual update is performed inside
   // the above change..() instruction...   >_<
   if (addToUndo) {
-    changeThickTool->addUndo();
+    m_changeThickTool->addUndo();
+    m_changeThickTool.release();
   }
   m_tool->computeBBox();
   m_tool->invalidate();
-  m_tool->notifyImageChanged();//overided version of VectorSelectionTool
+  m_tool->notifyImageChanged();  // overided version of VectorSelectionTool
 }
 
 //-----------------------------------------------------------------------------

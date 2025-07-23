@@ -346,6 +346,12 @@ public:
   bool isCursorOutlineEnabled() const {
     return getBoolValue(cursorOutlineEnabled);
   }
+  bool isUseStrokeEndCursor() const {
+      return getBoolValue(useStrokeEndCursor);
+  }
+  bool isClickTwiceToCreateArcs() {
+      return getBoolValue(clickTwiceToCreateArcs);
+  }
   int getLevelBasedToolsDisplay() const {
     return getIntValue(levelBasedToolsDisplay);
   }
@@ -369,6 +375,7 @@ public:
   bool isXsheetAutopanEnabled() const {
     return getBoolValue(xsheetAutopanEnabled);
   }  //!< Returns whether xsheet pans during playback.
+  int isAlwaysDragFrameCell() const { return getBoolValue(alwaysDragFrameCell); }
   int getDragCellsBehaviour() const { return getIntValue(DragCellsBehaviour); }
   int getDeleteCommandBehaviour() const {
     return getIntValue(deleteCommandBehavior);

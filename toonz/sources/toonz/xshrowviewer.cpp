@@ -1149,7 +1149,7 @@ void RowArea::mousePressEvent(QMouseEvent *event) {
     event->accept();
   }  // left-click
      // pan by middle-drag
-  else if (event->button() == Qt::MidButton) {
+  else if (event->button() == Qt::MiddleButton) {
     m_pos       = event->pos();
     m_isPanning = true;
   }

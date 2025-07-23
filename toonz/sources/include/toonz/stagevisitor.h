@@ -43,7 +43,7 @@ class TToonzImage;
 class TMeshImage;
 class QPainter;
 class QPolygon;
-class QMatrix;
+class QTransform;
 
 namespace Stage {
 class Player;
@@ -284,7 +284,7 @@ public:
   int getNodesCount();
   void clearNodes();
 
-  TRasterP getRaster(int index, QMatrix &matrix);
+  TRasterP getRaster(int index, QTransform &matrix);
 
   void flushRasterImages();
   void drawRasterImages(QPainter &p, QPolygon cameraRect);
@@ -355,7 +355,7 @@ public:
 
   void onImage(const Stage::Player &data) override;
   void onVectorImage(TVectorImage *vi, const Stage::Player &data);
-  void onRasterImage(TRasterImage *ri, const Stage::Player &data);
+  void onRasterImage(TRasterImage *ri, const Stage::Player &data) override;
   void onToonzImage(TToonzImage *ti, const Stage::Player &data);
 
   void beginMask() override;

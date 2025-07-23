@@ -225,7 +225,8 @@ get the stroke nearest at point
 
   //! Add a stroke at the end of the vector; returns position of the stroke (or
   //! -1 if not added)
-  int addStroke(TStroke *, bool discardPoints = true);
+  int addStroke(TStroke *, bool discardPoints = true, bool underAll = false);
+  int addStrokeBelow(TStroke *, const QSet<int> &aboveStyles, bool discardPoints = true);
   int addStrokeToGroup(TStroke *stroke, int strokeIndex);
   //! Replace the stroke at index \b index with \b newStroke
   void replaceStroke(int index, TStroke *newStroke);

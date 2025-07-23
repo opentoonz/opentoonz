@@ -454,7 +454,7 @@ void Preferences::definePreferenceItems() {
   // Visualization
   define(show0ThickLines, "show0ThickLines", QMetaType::Bool, true);
   define(regionAntialias, "regionAntialias", QMetaType::Bool, false);
-  define(rasterizeAntialias, "rasterizeAntialias", QMetaType::Bool, true);
+  define(rasterizeAntialias, "rasterizeAntialias", QMetaType::Bool, false);
 
   // Loading
   define(importPolicy, "importPolicy", QMetaType::Int, 0);  // Always ask
@@ -549,10 +549,12 @@ void Preferences::definePreferenceItems() {
   define(cursorBrushType, "cursorBrushType", QMetaType::QString, "Small");
   define(cursorBrushStyle, "cursorBrushStyle", QMetaType::QString, "Default");
   define(cursorOutlineEnabled, "cursorOutlineEnabled", QMetaType::Bool, true);
+  define(useStrokeEndCursor, "useStrokeEndCursor", QMetaType::Bool, true);
   define(levelBasedToolsDisplay, "levelBasedToolsDisplay", QMetaType::Int,
          0);  // Default
   define(useCtrlAltToResizeBrush, "useCtrlAltToResizeBrush", QMetaType::Bool,
          true);
+  define(clickTwiceToCreateArcs, "clickTwiceToCreateArcs", QMetaType::Bool, true);
   define(tempToolSwitchTimer, "tempToolSwitchTimer", QMetaType::Int, 500, 1,
          std::numeric_limits<int>::max());
 
@@ -562,6 +564,8 @@ void Preferences::definePreferenceItems() {
   define(xsheetStep, "xsheetStep", QMetaType::Int, 10, 0,
          std::numeric_limits<int>::max());
   define(xsheetAutopanEnabled, "xsheetAutopanEnabled", QMetaType::Bool, true);
+  define(alwaysDragFrameCell, "alwaysDragFrameCell", QMetaType::Bool,
+         true);
   define(DragCellsBehaviour, "DragCellsBehaviour", QMetaType::Int,
          1);  // Cells and Column Data
   define(deleteCommandBehavior, "deleteCommandBehavior", QMetaType::Int,

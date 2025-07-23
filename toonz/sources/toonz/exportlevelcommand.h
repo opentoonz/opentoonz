@@ -63,6 +63,7 @@ struct ExportLevelOptions {
   const TPropertyGroup *m_props;  //!< File Format Properties for the export.
 
   TPixel32 m_bgColor;  //!< Background color to be applied under the image.
+  // Need to be premultiplied before set as background color
   TCamera m_camera;  //!< Stores field and resolution settings for PLI exports.
 
   //! \remark   In single frame exports, the transform applied to the frame is

@@ -106,7 +106,7 @@ void setupUI(void) {
   SetFrontProcess(&psn);
 #ifndef HAVE_DOCK_TILE
 /* We end up with the ugly console dock icon; let's override it */
-/*char *iconfile = "/tmp/image.png";
+/* char *iconfile = "/tmp/image.png";
   CFURLRef url = CFURLCreateFromFileSystemRepresentation (kCFAllocatorDefault,
                                                           (UInt8 *)iconfile,
                                                           strlen (iconfile),
@@ -115,8 +115,8 @@ void setupUI(void) {
   CGDataProviderRef png = CGDataProviderCreateWithURL (url);
   CGImageRef icon = CGImageCreateWithPNGDataProvider (png, NULL, TRUE,
                                              kCGRenderingIntentDefault);
-
-  /* Voodoo magic fix inspired by java_swt launcher */
+*/
+/* Voodoo magic fix inspired by java_swt launcher */
 /* Without this the icon setting doesn't work about half the time. */
 // CGrafPtr p = BeginQDContextForApplicationDockTile();
 // EndQDContextForApplicationDockTile(p);

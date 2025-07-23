@@ -327,6 +327,7 @@ TImageP ImageRasterizer::build(int imFlags, void *extData) {
                                TScale(sx,sy),
               TRect(), vi->getPalette());
           rd.m_antiAliasing = m_antiAliasing;
+          rd.m_show0ThickStrokes = Preferences::instance()->getShow0ThickLines();
 
           //Is this too slow?
           {
@@ -400,7 +401,7 @@ TImageP ImageRasterizer::build(int imFlags, void *extData) {
       }
     }
   }
-  
+  return TRasterImageP();
   // Error case: return a dummy image (is it really required?)
 
   TRaster32P ras(10,10);
