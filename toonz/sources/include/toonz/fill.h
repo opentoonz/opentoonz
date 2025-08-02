@@ -16,6 +16,14 @@ class TPalette;
 #endif
 
 #include <set>
+#include "ttilesaver.h"
+#include "timage.h"
+#include "tpalette.h"
+#include "tgeometry.h"
+#include "tpixelcm.h"
+#include "traster.h"
+#include "trastercm.h"
+#include "tpalette.h"
 
 class FillParameters {
 public:
@@ -83,6 +91,9 @@ void DVAPI fillautoInks(TRasterCM32P &r, TRect &rect,
 
 void DVAPI fullColorFill(const TRaster32P &ras, const FillParameters &params,
                          TTileSaverFullColor *saver = 0);
+
+void DVAPI fillHoles(const TRasterCM32P &ras, const int size,
+                     TTileSaverCM32 *saver = nullptr);
 
 //=============================================================================
 //! The class AreaFiller allows to fill a raster area, delimited by rect or
