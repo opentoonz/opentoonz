@@ -91,6 +91,7 @@ set(HEADERS
     iwa_flowblurfx.h
     iwa_flowpaintbrushfx.h
     iwa_motionflowfx.h
+    naru_graph.h
 )
 
 if(OpenCV_FOUND)
@@ -291,6 +292,8 @@ set(SOURCES
     iwa_flowpaintbrushfx.cpp
     iwa_motionflowfx.cpp
     iwa_smootherfx.cpp
+    naru_lazybrush.cpp
+    naru_maxflow.cpp
 )
 
 if(OpenCV_FOUND)

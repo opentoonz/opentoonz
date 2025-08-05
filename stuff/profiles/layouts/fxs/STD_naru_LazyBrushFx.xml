@@ -1,0 +1,21 @@
+<fxlayout>
+  <page name="LazyBrush Config">
+    <control>mode</control>
+    <control>mask_color</control>
+    <control>undef_is_sink</control>
+    <control>auto_scribble</control>
+    <control>line_weight</control>
+    <control>sink_pos</control>
+
+   	<vbox shrink="0" label="Advanced">
+      <control>scr_type</control>
+      <control>min_lightness</control>
+      <control>log_scale</control>
+      <control>sigma</control>
+      <control>alpha</control>
+      <control>lambda</control>
+      <control>auto_scribble_length</control>
+      <control>auto_scribble_threshold</control>
+    </vbox>
+  </page>
+</fxlayout>
