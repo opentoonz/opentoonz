@@ -5,7 +5,7 @@
     <control>undef_is_sink</control>
     <control>lambda</control>
     
-   	<vbox shrink="0" label="Set Scribble">
+    <vbox shrink="0" label="Set Scribble">
       <control>auto_scribble</control>
       <hbox>
         <control>up_wall_is_sink</control>
