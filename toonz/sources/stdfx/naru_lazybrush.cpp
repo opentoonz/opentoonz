@@ -105,46 +105,29 @@ public:
   bool canHandle(const TRenderSettings& info, double frame) override {
     return false;
   }
-  
+
+private:
   const float gauKernel[3][3] = {
-    {1, 2, 1},
-    {2, 4, 2},
-    {1, 2, 1},
+      {1, 2, 1},
+      {2, 4, 2},
+      {1, 2, 1},
   };
   const float weightSum       = 16.f;
   const float lapKernel[3][3] = {
-    {0, 1, 0},
-    {1, -4, 1},
-    {0, 1, 0},
+      {0, 1, 0},
+      {1, -4, 1},
+      {0, 1, 0},
   };
 
   int mode = 0;  // 0:Mask, 1:Mask+Line, 2:LoG Filter, 3:Scribble Map
   TPixelF maskColor =
       TPixelF(200.f / 255.f, 200.f / 255.f, 200.f / 255.f, 1.f);  // マスクの色
-  int scribbleType = 0;  // スクリブルタイプ 0:Soft, 1:Hard
 
-  float minLightness         = 0.02f;  // 最小濃さ
   const float LoG_draw_scale = 20.0f;  // LoGフィルタの描画スケール
   float LoG_s                = 0.05f;  // LoGフィルタのスケール
-  float sigma                = 1.5f;   // 強度/容量 変換係数
-  float lambda               = 0.6f;   // ソフトスクリブル係数
-  float alpha                = 100.f;  // 容量スケーリング係数
-
-  // float circleSize = 0.4f; // 自動スクリブルサイズ
-
-  float autoScribbleLength    = 4.f;   // オートスクリブル マージン距離
-  float autoScribbleThreshold = 0.1f;  // オートスクリブル 感度閾値
-
-  bool fillHole     = false;  // 未定義領域を背景とするか？
-  bool sinkU        = true;
-  bool sinkD        = true;
-  bool sinkL        = true;
-  bool sinkR        = true;
-  bool autoScribble = true;
 
   int idx(int x, int y, int w) { return y * w + x; }
 
-  
   //-------------------------------------------------------------------
 
   template <typename PIXEL>
@@ -152,26 +135,26 @@ public:
               std::vector<float>& g, std::vector<float>& b,
               std::vector<float>& a);
   template <typename PIXEL>
-  void doGrayScale(TRasterPT<PIXEL> ras, std::vector<float>& temp);
+  void doGrayScale(TRasterPT<PIXEL> ras, double frame,
+                   std::vector<float>& temp);
   template <typename PIXEL>
-  void doLoG(TRasterPT<PIXEL> ras, std::vector<float>& gray,
+  void doLoG(TRasterPT<PIXEL> ras, double frame, std::vector<float>& gray,
              std::vector<float>& lap);
   template <typename PIXEL>
-  void doGraph(TRasterPT<PIXEL> ras, TRasterPT<PIXEL> refRas, bool refer_sw,
-               std::vector<float>& lap, Graph& g);
+  void doGraph(TRasterPT<PIXEL> ras, double frame, TRasterPT<PIXEL> refRas,
+               bool refer_sw, std::vector<float>& lap, Graph& g);
   template <typename PIXEL>
-  void doColorize(TRasterPT<PIXEL> ras, Graph& g, std::vector<float>& gray);
+  void doColorize(TRasterPT<PIXEL> ras, double frame, Graph& g,
+                  std::vector<float>& gray);
   template <typename PIXEL>
-  void process(TRasterPT<PIXEL> ras, TRasterPT<PIXEL> refRas, bool refer_sw);
-
+  void process(TRasterPT<PIXEL> ras, double frame, TRasterPT<PIXEL> refRas,
+               bool refer_sw);
 };
-
-
 
 template <typename PIXEL>
 void naru_lazybrush::doDraw(TRasterPT<PIXEL> ras, std::vector<float>& r,
-                            std::vector<float>& g,
-            std::vector<float>& b, std::vector<float>& a) {
+                            std::vector<float>& g, std::vector<float>& b,
+                            std::vector<float>& a) {
   int width  = ras->getLx();
   int height = ras->getLy();
 
@@ -198,10 +181,12 @@ void naru_lazybrush::doDraw(TRasterPT<PIXEL> ras, std::vector<float>& r,
 }
 
 template <typename PIXEL>
-void naru_lazybrush::doGrayScale(TRasterPT<PIXEL> ras,
+void naru_lazybrush::doGrayScale(TRasterPT<PIXEL> ras, double frame,
                                  std::vector<float>& temp) {
   int width  = ras->getLx();
   int height = ras->getLy();
+
+  float minLightness = m_minlightness->getValue(frame);
 
   ras->lock();
   for (int y = 0; y < height; ++y) {
@@ -223,8 +208,8 @@ void naru_lazybrush::doGrayScale(TRasterPT<PIXEL> ras,
 }
 
 template <typename PIXEL>
-void naru_lazybrush::doLoG(TRasterPT<PIXEL> ras, std::vector<float>& gray,
-           std::vector<float>& lap) {
+void naru_lazybrush::doLoG(TRasterPT<PIXEL> ras, double frame,
+                           std::vector<float>& gray, std::vector<float>& lap) {
   int width  = ras->getLx();
   int height = ras->getLy();
 
@@ -277,9 +262,9 @@ void naru_lazybrush::doLoG(TRasterPT<PIXEL> ras, std::vector<float>& gray,
 }
 
 template <typename PIXEL>
-void naru_lazybrush::doGraph(TRasterPT<PIXEL> ras, TRasterPT<PIXEL> refRas,
-                             bool refer_sw,
-             std::vector<float>& lap, Graph& g) {
+void naru_lazybrush::doGraph(TRasterPT<PIXEL> ras, double frame,
+                             TRasterPT<PIXEL> refRas, bool refer_sw,
+                             std::vector<float>& lap, Graph& g) {
   int width   = ras->getLx();
   int height  = ras->getLy();
   int rasSize = width * height;
@@ -298,6 +283,8 @@ void naru_lazybrush::doGraph(TRasterPT<PIXEL> ras, TRasterPT<PIXEL> refRas,
   // set capasity
   std::vector<float> weights(rasSize, 0.0f);
   std::vector<float> capacity(rasSize, 0.0f);
+  float alpha        = m_alpha->getValue(frame);
+  float sigma        = m_sigma->getValue(frame);
   float inv_sigmaSq2 = 1.0 / (2 * sigma * sigma);
   for (int y = 0; y < height; ++y) {
     for (int x = 0; x < width; ++x) {
@@ -325,9 +312,11 @@ void naru_lazybrush::doGraph(TRasterPT<PIXEL> ras, TRasterPT<PIXEL> refRas,
   std::vector<float> refB(rasSize, 0.0f);
   std::vector<float> scribbleR(rasSize, 0.0f);
   std::vector<float> scribbleB(rasSize, 0.0f);
+  float lambda       = m_lambda->getValue(frame);
   float softCapacity = floorf(lambda * alpha);
-  int tLinkCap       = scribbleType == 0 ? softCapacity : K;
-  int sLinkCap       = scribbleType == 0 ? alpha - softCapacity : 0;
+  int scribbleType = m_scrtype->getValue();  // スクリブルタイプ 0:Soft, 1:Hard
+  int tLinkCap     = scribbleType == 0 ? softCapacity : K;
+  int sLinkCap     = scribbleType == 0 ? alpha - softCapacity : 0;
   // Exist Reference
   if (refer_sw) {
     refRas->lock();
@@ -356,6 +345,13 @@ void naru_lazybrush::doGraph(TRasterPT<PIXEL> ras, TRasterPT<PIXEL> refRas,
     }
   }
 
+  float autoScribbleLength    = m_autoscrlen->getValue(frame);
+  float autoScribbleThreshold = m_autoscrthresh->getValue(frame);
+  bool sinkU                  = m_sinkU->getValue();
+  bool sinkD                  = m_sinkD->getValue();
+  bool sinkL                  = m_sinkL->getValue();
+  bool sinkR                  = m_sinkR->getValue();
+  bool autoScribble           = m_autoScribble->getValue();
   if (autoScribble) {
     // Auto Scribble
     for (int i = 0; i < width + height; ++i) {
@@ -463,10 +459,12 @@ void naru_lazybrush::doGraph(TRasterPT<PIXEL> ras, TRasterPT<PIXEL> refRas,
 }
 
 template <typename PIXEL>
-void naru_lazybrush::doColorize(TRasterPT<PIXEL> ras, Graph& g, std::vector<float>& gray) {
+void naru_lazybrush::doColorize(TRasterPT<PIXEL> ras, double frame, Graph& g,
+                                std::vector<float>& gray) {
   int width  = ras->getLx();
   int height = ras->getLy();
 
+  bool fillHole = m_fillHole->getValue();
   g.mincut();
   if (mode == 1) {  // Draw Mask
     ras->lock();
@@ -538,21 +536,27 @@ void naru_lazybrush::doColorize(TRasterPT<PIXEL> ras, Graph& g, std::vector<floa
 //------------------------------------------------------------------------------
 
 template <typename PIXEL>
-void naru_lazybrush::process(TRasterPT<PIXEL> ras, TRasterPT<PIXEL> refRas, bool refer_sw) {
+void naru_lazybrush::process(TRasterPT<PIXEL> ras, double frame,
+                             TRasterPT<PIXEL> refRas, bool refer_sw) {
   int width   = ras->getLx();
   int height  = ras->getLy();
   int rasSize = width * height;
   std::vector<float> gray(rasSize);
   std::vector<float> lap(rasSize);
 
+  // params
+  mode      = m_mode->getValue();
+  maskColor = toPixelF(m_maskcolor->getValueD(frame));
+  LoG_s     = m_logs->getValue(frame);
+
   // create graph
   Graph g = Graph(rasSize);
 
-  doGrayScale<PIXEL>(ras, gray);
-  doLoG<PIXEL>(ras, gray, lap);
-  doGraph<PIXEL>(ras, refRas, refer_sw, lap, g);
+  doGrayScale<PIXEL>(ras, frame, gray);
+  doLoG<PIXEL>(ras, frame, gray, lap);
+  doGraph<PIXEL>(ras, frame, refRas, refer_sw, lap, g);
   if (mode == 0 || mode == 1) {
-    doColorize<PIXEL>(ras, g, gray);
+    doColorize<PIXEL>(ras, frame, g, gray);
   }
 }
 
@@ -575,31 +579,12 @@ void naru_lazybrush::doCompute(TTile& tile, double frame,
     refRas = refer_tile.getRaster();
   }
 
-  // params
-  mode                  = m_mode->getValue();
-  maskColor             = toPixelF(m_maskcolor->getValueD(frame));
-  scribbleType          = m_scrtype->getValue();
-  minLightness          = m_minlightness->getValue(frame);
-  LoG_s                 = m_logs->getValue(frame);
-  sigma                 = m_sigma->getValue(frame);
-  lambda                = m_lambda->getValue(frame);
-  alpha                 = m_alpha->getValue(frame);
-  autoScribbleLength    = m_autoscrlen->getValue(frame);
-  autoScribbleThreshold = m_autoscrthresh->getValue(frame);
-  fillHole              = m_fillHole->getValue();
-  sinkU                 = m_sinkU->getValue();
-  sinkD                 = m_sinkD->getValue();
-  sinkL                 = m_sinkL->getValue();
-  sinkR                 = m_sinkR->getValue();
-  autoScribble          = m_autoScribble->getValue();
-  scribbleType          = m_scrtype->getValue();
-
   if (TRaster32P ras32 = inRas)
-    process<TPixel32>(ras32, refRas, refer_sw);
+    process<TPixel32>(ras32, frame, refRas, refer_sw);
   else if (TRaster64P ras64 = inRas)
-    process<TPixel64>(ras64, refRas, refer_sw);
+    process<TPixel64>(ras64, frame, refRas, refer_sw);
   else if (TRasterFP rasF = inRas)
-    process<TPixelF>(rasF, refRas, refer_sw);
+    process<TPixelF>(rasF, frame, refRas, refer_sw);
   else
     throw TException("naru_LazyBrushFx: unsupported Pixel Type");
 }
