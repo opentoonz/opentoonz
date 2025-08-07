@@ -163,11 +163,15 @@ void doGrayScale(TRasterPT<PIXEL> ras, std::vector<float>& temp) {
   for (int y = 0; y < height; ++y) {
     PIXEL* pix = ras->pixels(y);
     for (int x = 0; x < width; ++x) {
-      float r = pix->r / 255.0f;
-      float g = pix->g / 255.0f;
-      float b = pix->b / 255.0f;
-      temp[y * width + x] =
-          fmax(0.299f * r + 0.587f * g + 0.114f * b, minLightness);
+      float a = (float)pix->m / (float)PIXEL::maxChannelValue;
+      if (a != 0) {
+        float r = (float)pix->r / (a * (float)PIXEL::maxChannelValue);
+        float g = (float)pix->g / (a * (float)PIXEL::maxChannelValue);
+        float b = (float)pix->b / (a * (float)PIXEL::maxChannelValue);
+        temp[y * width + x] =
+            fmax(0.299f * r + 0.587f * g + 0.114f * b, minLightness);
+      } else
+        temp[y * width + x] = 1.0f;
       pix++;
     }
   }
@@ -281,7 +285,7 @@ void doGraph(TRasterPT<PIXEL> ras, TRasterPT<PIXEL> refRas, bool refer_sw,
         g.addEdge(p, q, weight, weight);
       }
       weights[p]  = intensity[p] / (K * LoG_s);
-      capacity[p] = alpha * exp(-intensity[p] * inv_sigmaSq2);
+      capacity[p] = exp(-intensity[p] * inv_sigmaSq2);
     }
   }
 
@@ -289,7 +293,8 @@ void doGraph(TRasterPT<PIXEL> ras, TRasterPT<PIXEL> refRas, bool refer_sw,
   std::vector<float> refR(rasSize, 0.0f);
   std::vector<float> refG(rasSize, 0.0f);
   std::vector<float> refB(rasSize, 0.0f);
-  std::vector<float> scribble(rasSize, 0.0f);
+  std::vector<float> scribbleR(rasSize, 0.0f);
+  std::vector<float> scribbleB(rasSize, 0.0f);
   float softCapacity = floorf(lambda * alpha);
   int tLinkCap       = scribbleType == 0 ? softCapacity : K;
   int sLinkCap       = scribbleType == 0 ? alpha - softCapacity : 0;
@@ -312,8 +317,10 @@ void doGraph(TRasterPT<PIXEL> ras, TRasterPT<PIXEL> refRas, bool refer_sw,
         int p = idx(x, y, width);
         if (refR[p] > 0.5f && refG[p] < 0.5f && refB[p] < 0.5f) {
           g.addTerminal(p, tLinkCap - sLinkCap);
+          scribbleR[p] = 1.f;
         } else if (refR[p] < 0.5f && refG[p] < 0.5f && refB[p] > 0.5f) {
           g.addTerminal(p, sLinkCap - tLinkCap);
+          scribbleB[p] = 1.f;
         }
       }
     }
@@ -333,7 +340,7 @@ void doGraph(TRasterPT<PIXEL> ras, TRasterPT<PIXEL> refRas, bool refer_sw,
         if (dx * dx + dy * dy < 1.f) {
           int p = idx(x, y, width);
           g.addTerminal(p, tLinkCap, 0);
-          scribble[p] = 1.0f;
+          scribbleR[p] = 1.0f;
         }
       }
     }
@@ -355,7 +362,7 @@ void doGraph(TRasterPT<PIXEL> ras, TRasterPT<PIXEL> refRas, bool refer_sw,
         int cp = idx(cx, cy, width);
         if (weights[cp] > autoScribbleThreshold) {
           g.addTerminal(p, tLinkCap, 0);
-          scribble[p] = 1.0f;
+          scribbleR[p] = 1.0f;
         }
       }
     }
@@ -379,20 +386,20 @@ void doGraph(TRasterPT<PIXEL> ras, TRasterPT<PIXEL> refRas, bool refer_sw,
         bool pOnLine = false;
         fcx -= nx * autoScribbleLength;
         fcy -= ny * autoScribbleLength;
-        for (int i = 0; rDst > 1.1f && i < 10000; ++i) {
+        for (int i = 0; i < 10000; ++i) {
           fcx -= nx;
           fcy -= ny;
-          rDst -= 1.f;
           int cx = fcx;
           int cy = fcy;
           int cp = idx(cx, cy, width);
+          if (fcx < 0 || fcx >= width || fcy < 0 || fcy >= height) break;
           if (weights[cp] > autoScribbleThreshold)
             onLine = true;
           else
             onLine = false;
           if (!onLine && pOnLine) {
             g.addTerminal(cp, tLinkCap - sLinkCap);
-            scribble[cp] = 1.0f;
+            scribbleR[cp] = 1.f;
             break;
           }
           pOnLine = onLine;
@@ -405,15 +412,18 @@ void doGraph(TRasterPT<PIXEL> ras, TRasterPT<PIXEL> refRas, bool refer_sw,
   for (int i = 0; i < rasSize; ++i) {
     if (is_boundary[i]) {
       g.addTerminal(i, -K);
+      scribbleB[i] = 1.f;
     }
   }
 
+  std::vector<float> drawZero(rasSize, 0.0f);
+  std::vector<float> drawOne(rasSize, 1.0f);
   if (mode == 2) {  // Draw LoG Filter
-    doDraw(ras, lap, lap, lap, lap);
+    doDraw(ras, lap, lap, lap, drawOne);
   } else if (mode == 3) {  // Draw Capacity Map
-    doDraw(ras, capacity, capacity, capacity, capacity);
+    doDraw(ras, capacity, capacity, capacity, drawOne);
   } else if (mode == 4) {  // Draw Scribble Map
-    doDraw(ras, scribble, scribble, scribble, scribble);
+    doDraw(ras, scribbleR, drawZero, scribbleB, drawOne);
   }
 }
 
