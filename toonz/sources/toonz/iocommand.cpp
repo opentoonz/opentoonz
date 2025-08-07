@@ -1508,9 +1508,8 @@ bool IoCmd::saveScene(const TFilePath &path, int flags) {
   }
 
   // Must wait for current save to finish, just in case
-  while (TApp::instance()->isSaveInProgress())
-    ;
-  
+  while (TApp::instance()->isSaveInProgress());
+
   TApp::instance()->setSaveInProgress(true);
   try {
     scene->save(scenePath, xsheet);
@@ -1776,8 +1775,7 @@ void IoCmd::saveNonSceneFiles() {
   ToonzScene *scene = app->getCurrentScene()->getScene();
   SceneResources resources(scene, 0);
   // Must wait for current save to finish, just in case
-  while (TApp::instance()->isSaveInProgress())
-    ;
+  while (TApp::instance()->isSaveInProgress());
 
   TApp::instance()->setSaveInProgress(true);
   resources.save(scene->getScenePath());
@@ -1893,7 +1891,7 @@ bool IoCmd::loadScene(const TFilePath &path, bool updateRecentFile,
   }
 
   TProjectManager *pm = TProjectManager::instance();
-  auto sceneProject = pm->loadSceneProject(scenePath);
+  auto sceneProject   = pm->loadSceneProject(scenePath);
   if (!sceneProject) {
     QString msg;
     msg = QObject::tr(
@@ -2063,7 +2061,7 @@ bool IoCmd::loadScene(const TFilePath &path, bool updateRecentFile,
       int ret =
           DVGui::MsgBox(question, turnOffPixelAnswer, resizeSceneAnswer, 0);
       if (ret == 0) {
-      }                     // do nothing
+      }  // do nothing
       else if (ret == 1) {  // Turn off pixels only mode
         Preferences::instance()->setValue(pixelsOnly, false);
         app->getCurrentScene()->notifyPixelUnitSelected(false);
@@ -2797,15 +2795,20 @@ QRegularExpression::ExtendedPatternSyntaxOption);
             }
             QString label =
                 QObject::tr(
-                    "OpenToonz uses an underscore (_) or dot (.) as a frame "
-                    "separator.\n"
-                    "Would you like to add a separator to the image sequence?\n"
+                    "Image sequence detected, but the filenames are missing a separator: "
+                    "OpenToonz requires a separator (such as an underscore (_) or dot (.) "
+                    "between the name and the frame number to recognize sequences properly.\n"
+                    "Example: A0001.png → A.0001.png\n"
+                    "\nWould you like OpenToonz to automatically add a dot to fix the sequence format?\n"
                     "\n%1 (and similar files)")
                 .arg(path.getQString());
+
             QString checkBoxLabel = QObject::tr("Always do this action.");
+
             QStringList buttons;
-            buttons << QObject::tr("Yes")
-                << QObject::tr("No, treat as single frame.");
+            buttons << QObject::tr("Yes, add dot")
+                << QObject::tr("No, treat as single frame");
+
             DVGui::MessageAndCheckboxDialog* renameDialog =
                 DVGui::createMsgandCheckbox(DVGui::QUESTION, label, checkBoxLabel,
                     buttons, 1, Qt::Unchecked);
