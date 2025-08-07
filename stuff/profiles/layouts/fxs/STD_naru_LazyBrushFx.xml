@@ -4,6 +4,16 @@
     <control>mask_color</control>
     <control>undef_is_sink</control>
     <control>lambda</control>
+    
+   	<vbox shrink="0" label="Set Scribble">
+      <control>auto_scribble</control>
+      <hbox>
+        <control>up_wall_is_sink</control>
+        <control>down_wall_is_sink</control>
+        <control>left_wall_is_sink</control>
+        <control>right_wall_is_sink</control>
+      </hbox>
+    </vbox>
 
    	<vbox shrink="0" label="Advanced">
       <control>scr_type</control>

@@ -1726,6 +1726,11 @@
   <item>"STD_naru_LazyBrushFx.mode" 		"Mode" 			</item>
   <item>"STD_naru_LazyBrushFx.mask_color" 		"Mask Color" 		</item>
   <item>"STD_naru_LazyBrushFx.undef_is_sink" 	"Fill Hole"	</item>
+  <item>"STD_naru_LazyBrushFx.auto_scribble" 	"Enable Auto Scribble"	</item>
+  <item>"STD_naru_LazyBrushFx.up_wall_is_sink" 	"Upper Wall is Sink"	</item>
+  <item>"STD_naru_LazyBrushFx.down_wall_is_sink" 	"Bottom Wall is Sink"	</item>
+  <item>"STD_naru_LazyBrushFx.left_wall_is_sink" 	"Left Wall is Sink"	</item>
+  <item>"STD_naru_LazyBrushFx.right_wall_is_sink" 	"Right Wall is Sink"	</item>
   <item>"STD_naru_LazyBrushFx.lambda"	 	"Scribble Strength"		</item>
   <item>"STD_naru_LazyBrushFx.scr_type" 	"Scribble Type"		</item>
   <item>"STD_naru_LazyBrushFx.min_lightness" 	"Outline Cutoff"	</item>

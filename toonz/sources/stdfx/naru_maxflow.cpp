@@ -73,7 +73,7 @@ void Graph::augment(arc* midArc) {
 void Graph::adopt() {
   arc *arc, *arc2;
   node *n, *nn;
-  while (n = nextOrphan()) {
+  for (n = nextOrphan(); n; n = nextOrphan()) {
     // find a parent for the orphan node n
     bool found = false;
     if (!n->isSink) {
@@ -141,7 +141,8 @@ void Graph::mincut() {
     }
   }
 
-  while (node* currentNode = nextActive()) {
+  for (node* currentNode = nextActive(); currentNode;
+       currentNode       = nextActive()) {
     // grow phase
     node *n, *nn;
     n = currentNode;

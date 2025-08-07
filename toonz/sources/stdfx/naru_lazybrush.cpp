@@ -27,6 +27,11 @@ class naru_lazybrush final : public GlobalControllableFx {
   TDoubleParamP m_autoscrlen;
   TDoubleParamP m_autoscrthresh;
   TBoolParamP m_fillHole;
+  TBoolParamP m_sinkU;
+  TBoolParamP m_sinkD;
+  TBoolParamP m_sinkL;
+  TBoolParamP m_sinkR;
+  TBoolParamP m_autoScribble;
 
 public:
   naru_lazybrush()
@@ -35,12 +40,17 @@ public:
       , m_scrtype(new TIntEnumParam(0, "Soft"))
       , m_minlightness(0.02f)
       , m_logs(0.05f)
-      , m_sigma(1.0f)
-      , m_lambda(0.9f)
+      , m_sigma(1.5f)
+      , m_lambda(0.6f)
       , m_alpha(100.f)
       , m_autoscrlen(4.f)
       , m_autoscrthresh(0.1f)
-      , m_fillHole(true) {
+      , m_fillHole(true)
+      , m_sinkU(true)
+      , m_sinkD(true)
+      , m_sinkL(true)
+      , m_sinkR(true)
+      , m_autoScribble(true) {
     bindParam(this, "mode", m_mode);
     bindParam(this, "mask_color", m_maskcolor);
     bindParam(this, "scr_type", m_scrtype);
@@ -53,6 +63,11 @@ public:
     bindParam(this, "auto_scribble_length", m_autoscrlen);
     bindParam(this, "auto_scribble_threshold", m_autoscrthresh);
     bindParam(this, "undef_is_sink", m_fillHole);
+    bindParam(this, "up_wall_is_sink", m_sinkU);
+    bindParam(this, "down_wall_is_sink", m_sinkD);
+    bindParam(this, "left_wall_is_sink", m_sinkL);
+    bindParam(this, "right_wall_is_sink", m_sinkR);
+    bindParam(this, "auto_scribble", m_autoScribble);
 
     this->m_mode->addItem(1, "Mask");
     this->m_mode->addItem(2, "LoG Filter");
@@ -114,8 +129,8 @@ int scribbleType = 0;  // スクリブルタイプ 0:Soft, 1:Hard
 float minLightness         = 0.02f;  // 最小濃さ
 const float LoG_draw_scale = 20.0f;  // LoGフィルタの描画スケール
 float LoG_s                = 0.05f;  // LoGフィルタのスケール
-float sigma                = 1.0f;   // 強度/容量 変換係数
-float lambda               = 0.9f;   // ソフトスクリブル係数
+float sigma                = 1.5f;   // 強度/容量 変換係数
+float lambda               = 0.6f;   // ソフトスクリブル係数
 float alpha                = 100.f;  // 容量スケーリング係数
 
 // float circleSize = 0.4f; // 自動スクリブルサイズ
@@ -123,7 +138,12 @@ float alpha                = 100.f;  // 容量スケーリング係数
 float autoScribbleLength    = 4.f;   // オートスクリブル マージン距離
 float autoScribbleThreshold = 0.1f;  // オートスクリブル 感度閾値
 
-bool fillHole = false;  // 未定義領域を背景とするか？
+bool fillHole     = false;  // 未定義領域を背景とするか？
+bool sinkU        = true;
+bool sinkD        = true;
+bool sinkL        = true;
+bool sinkR        = true;
+bool autoScribble = true;
 
 int idx(int x, int y, int w) { return y * w + x; }
 
@@ -137,17 +157,18 @@ void doDraw(TRasterPT<PIXEL> ras, std::vector<float>& r, std::vector<float>& g,
   for (int y = 0; y < height; ++y) {
     PIXEL* pix = ras->pixels(y);
     for (int x = 0; x < width; ++x) {
-      pix->r = (PIXEL::Channel)(maskColor.m * maskColor.r *
-                                fmin(r[y * width + x], 1.f) *
-                                (float)PIXEL::maxChannelValue);
-      pix->g = (PIXEL::Channel)(maskColor.m * maskColor.g *
-                                fmin(g[y * width + x], 1.f) *
-                                (float)PIXEL::maxChannelValue);
-      pix->b = (PIXEL::Channel)(maskColor.m * maskColor.b *
-                                fmin(b[y * width + x], 1.f) *
-                                (float)PIXEL::maxChannelValue);
-      pix->m = (PIXEL::Channel)(maskColor.m * fmin(a[y * width + x], 1.f) *
-                                (float)PIXEL::maxChannelValue);
+      pix->r = (typename PIXEL::Channel)(maskColor.m * maskColor.r *
+                                         fmin(r[y * width + x], 1.f) *
+                                         (float)PIXEL::maxChannelValue);
+      pix->g = (typename PIXEL::Channel)(maskColor.m * maskColor.g *
+                                         fmin(g[y * width + x], 1.f) *
+                                         (float)PIXEL::maxChannelValue);
+      pix->b = (typename PIXEL::Channel)(maskColor.m * maskColor.b *
+                                         fmin(b[y * width + x], 1.f) *
+                                         (float)PIXEL::maxChannelValue);
+      pix->m =
+          (typename PIXEL::Channel)(maskColor.m * fmin(a[y * width + x], 1.f) *
+                                    (float)PIXEL::maxChannelValue);
       pix++;
     }
   }
@@ -239,29 +260,14 @@ void doGraph(TRasterPT<PIXEL> ras, TRasterPT<PIXEL> refRas, bool refer_sw,
   int height  = ras->getLy();
   int rasSize = width * height;
 
-  // 境界用フラグを計算
-  std::vector<bool> is_boundary(rasSize, false);
-  for (int x = 0; x < width; ++x) {
-    is_boundary[idx(x, 0, width)]          = true;
-    is_boundary[idx(x, height - 1, width)] = true;
-  }
-  for (int y = 0; y < height; ++y) {
-    is_boundary[idx(0, y, width)]         = true;
-    is_boundary[idx(width - 1, y, width)] = true;
-  }
-
   // LoG to intensity
   std::vector<float> intensity(rasSize, 0.0f);
   float K = 2.f * (width + height);
   for (int y = 0; y < height; ++y) {
     for (int x = 0; x < width; ++x) {
-      int p = idx(x, y, width);
-      if (is_boundary[p]) {
-        intensity[p] = 1.f;
-      } else {
-        intensity[p] = K * lap[p] + 1.f;
-        lap[p]       = lap[p] * LoG_draw_scale;
-      }
+      int p        = idx(x, y, width);
+      intensity[p] = K * lap[p] + 1.f;
+      lap[p]       = lap[p] * LoG_draw_scale;
     }
   }
 
@@ -298,7 +304,7 @@ void doGraph(TRasterPT<PIXEL> ras, TRasterPT<PIXEL> refRas, bool refer_sw,
   float softCapacity = floorf(lambda * alpha);
   int tLinkCap       = scribbleType == 0 ? softCapacity : K;
   int sLinkCap       = scribbleType == 0 ? alpha - softCapacity : 0;
-  // リファレンスあり
+  // Exist Reference
   if (refer_sw) {
     refRas->lock();
     for (int y = 0; y < height; ++y) {
@@ -325,94 +331,99 @@ void doGraph(TRasterPT<PIXEL> ras, TRasterPT<PIXEL> refRas, bool refer_sw,
       }
     }
   }
-  // リファレンスなし
-  else {
-    // オートスクリブル 楕円
-    /*
-    float cX = width * 0.5f;
-    float cY = height * 0.5f;
-    float aspx = 1.f / (cX * circleSize);
-    float aspy = 1.f / (cY * circleSize);
-    for (int y = 0; y < height; ++y) {
-      for (int x = 0; x < width; ++x) {
-        float dx = (x - cX) * aspx;
-        float dy = (y - cY) * aspy;
-        if (dx * dx + dy * dy < 1.f) {
-          int p = idx(x, y, width);
-          g.addTerminal(p, tLinkCap, 0);
-          scribbleR[p] = 1.0f;
-        }
-      }
-    }
-    */
 
-    // オートスクリブル 輪郭線シフト
-    /*
-    float cX = width * 0.5f;
-    float cY = height * 0.5f;
-    for (int y = 0; y < height; ++y) {
-      for (int x = 0; x < width; ++x) {
-        float rx = x - cX;
-        float ry = y - cY;
-        float rDst = sqrt(rx * rx + ry * ry);
-        int cx = x + rx / rDst * autoScribbleLength;
-        int cy = y + ry / rDst * autoScribbleLength;
-        if (cx < 0 || cx >= width || cy < 0 || cy >= height) continue;
-        int p = idx(x, y, width);
+  if (autoScribble) {
+    // Auto Scribble
+    for (int i = 0; i < width + height; ++i) {
+      float fcx0, fcx1, fcy0, fcy1, dx, dy;
+      if (i < width) {
+        fcx0 = i;
+        fcy0 = 0;
+        fcx1 = i;
+        fcy1 = height - 1;
+        dx   = 0;
+        dy   = 1;
+      } else {
+        fcx0 = 0;
+        fcy0 = i - width;
+        fcx1 = width - 1;
+        fcy1 = i - width;
+        dx   = 1;
+        dy   = 0;
+      }
+      bool onLine, pOnLine;
+      onLine  = false;
+      pOnLine = false;
+      fcx0 += dx * autoScribbleLength;
+      fcy0 += dy * autoScribbleLength;
+      for (int i = 0; i < 10000; ++i) {
+        fcx0 += dx;
+        fcy0 += dy;
+        int cx = fcx0;
+        int cy = fcy0;
+        if (cx < 0 || cx >= width || cy < 0 || cy >= height) break;
         int cp = idx(cx, cy, width);
-        if (weights[cp] > autoScribbleThreshold) {
-          g.addTerminal(p, tLinkCap, 0);
-          scribbleR[p] = 1.0f;
+        if (weights[cp] > autoScribbleThreshold)
+          onLine = true;
+        else
+          onLine = false;
+        if (!onLine && pOnLine) {
+          g.addTerminal(cp, tLinkCap - sLinkCap);
+          scribbleR[cp] = 1.f;
+          break;
         }
+        pOnLine = onLine;
       }
-    }
-    */
 
-    // オートスクリブル 最外輪郭線シフト
-    float cX = width * 0.5f;
-    float cY = height * 0.5f;
-    for (int y = 0; y < height; ++y) {
-      for (int x = 0; x < width; ++x) {
-        int p = idx(x, y, width);
-        if (!is_boundary[p]) continue;
-        float fcx    = x;
-        float fcy    = y;
-        float rx     = fcx - cX;
-        float ry     = fcy - cY;
-        float rDst   = sqrt(rx * rx + ry * ry);
-        float nx     = rx / rDst;
-        float ny     = ry / rDst;
-        bool onLine  = false;
-        bool pOnLine = false;
-        fcx -= nx * autoScribbleLength;
-        fcy -= ny * autoScribbleLength;
-        for (int i = 0; i < 10000; ++i) {
-          fcx -= nx;
-          fcy -= ny;
-          int cx = fcx;
-          int cy = fcy;
-          int cp = idx(cx, cy, width);
-          if (fcx < 0 || fcx >= width || fcy < 0 || fcy >= height) break;
-          if (weights[cp] > autoScribbleThreshold)
-            onLine = true;
-          else
-            onLine = false;
-          if (!onLine && pOnLine) {
-            g.addTerminal(cp, tLinkCap - sLinkCap);
-            scribbleR[cp] = 1.f;
-            break;
-          }
-          pOnLine = onLine;
+      onLine  = false;
+      pOnLine = false;
+      fcx1 -= dx * autoScribbleLength;
+      fcy1 -= dy * autoScribbleLength;
+      for (int i = 0; i < 10000; ++i) {
+        fcx1 -= dx;
+        fcy1 -= dy;
+        int cx = fcx1;
+        int cy = fcy1;
+        if (cx < 0 || cx >= width || cy < 0 || cy >= height) break;
+        int cp = idx(cx, cy, width);
+        if (weights[cp] > autoScribbleThreshold)
+          onLine = true;
+        else
+          onLine = false;
+        if (!onLine && pOnLine) {
+          g.addTerminal(cp, tLinkCap - sLinkCap);
+          scribbleR[cp] = 1.f;
+          break;
         }
+        pOnLine = onLine;
       }
     }
   }
 
   // 境界値を設定
-  for (int i = 0; i < rasSize; ++i) {
-    if (is_boundary[i]) {
-      g.addTerminal(i, -K);
-      scribbleB[i] = 1.f;
+  for (int i = 0; i < width + height - 2; ++i) {
+    if (i < width) {
+      if (sinkD) {
+        int pu = idx(i, 0, width);
+        g.addTerminal(pu, -K);
+        scribbleB[pu] = 1.f;
+      }
+      if (sinkU) {
+        int pd = idx(i, height - 1, width);
+        g.addTerminal(pd, -K);
+        scribbleB[pd] = 1.f;
+      }
+    } else {
+      if (sinkL) {
+        int pl = idx(0, i - width + 1, width);
+        g.addTerminal(pl, -K);
+        scribbleB[pl] = 1.f;
+      }
+      if (sinkR) {
+        int pr = idx(width - 1, i - width + 1, width);
+        g.addTerminal(pr, -K);
+        scribbleB[pr] = 1.f;
+      }
     }
   }
 
@@ -552,6 +563,11 @@ void naru_lazybrush::doCompute(TTile& tile, double frame,
   autoScribbleLength    = m_autoscrlen->getValue(frame);
   autoScribbleThreshold = m_autoscrthresh->getValue(frame);
   fillHole              = m_fillHole->getValue();
+  sinkU                 = m_sinkU->getValue();
+  sinkD                 = m_sinkD->getValue();
+  sinkL                 = m_sinkL->getValue();
+  sinkR                 = m_sinkR->getValue();
+  autoScribble          = m_autoScribble->getValue();
   scribbleType          = m_scrtype->getValue();
 
   if (TRaster32P ras32 = inRas)
