@@ -1524,9 +1524,8 @@ bool IoCmd::saveScene(const TFilePath &path, int flags) {
   }
 
   // Must wait for current save to finish, just in case
-  while (TApp::instance()->isSaveInProgress())
-    ;
-  
+  while (TApp::instance()->isSaveInProgress());
+
   TApp::instance()->setSaveInProgress(true);
   try {
     scene->save(scenePath, xsheet);
@@ -1792,8 +1791,7 @@ void IoCmd::saveNonSceneFiles() {
   ToonzScene *scene = app->getCurrentScene()->getScene();
   SceneResources resources(scene, 0);
   // Must wait for current save to finish, just in case
-  while (TApp::instance()->isSaveInProgress())
-    ;
+  while (TApp::instance()->isSaveInProgress());
 
   TApp::instance()->setSaveInProgress(true);
   resources.save(scene->getScenePath());
@@ -1909,7 +1907,7 @@ bool IoCmd::loadScene(const TFilePath &path, bool updateRecentFile,
   }
 
   TProjectManager *pm = TProjectManager::instance();
-  auto sceneProject = pm->loadSceneProject(scenePath);
+  auto sceneProject   = pm->loadSceneProject(scenePath);
   if (!sceneProject) {
     QString msg;
     msg = QObject::tr(
@@ -2079,7 +2077,7 @@ bool IoCmd::loadScene(const TFilePath &path, bool updateRecentFile,
       int ret =
           DVGui::MsgBox(question, turnOffPixelAnswer, resizeSceneAnswer, 0);
       if (ret == 0) {
-      }                     // do nothing
+      }  // do nothing
       else if (ret == 1) {  // Turn off pixels only mode
         Preferences::instance()->setValue(pixelsOnly, false);
         app->getCurrentScene()->notifyPixelUnitSelected(false);
@@ -2654,61 +2652,83 @@ int IoCmd::loadResources(LoadResourceArguments &args, bool updateRecentFile,
         }
       }
       // for sequence
+      /*
+      Note:
+      initPath: Marker or reference path for the sequence
+      path: Current file path to import/load
+      newPath: Destination path for pasting
+      files: List of sequence files to rename
+      levelPath: Final level path after renaming
+      */
       else if (locals::matchSequencePattern(path) &&
                locals::checkRenamePolicy(path)) {
+        TFilePath newPath;
+        TFilePath initPath  = scene->codeFilePath(path);
         TFilePathSet files;
-        TFilePath backup    = scene->codeFilePath(path);
-        TFilePath levelPath = locals::getLevelPath(path);
         progressDialog->setLabelText(
             QString("Loading \"%1\"...")
-                .arg(levelPath.withFrame().getQString()));
-        // Check for Existing Level
-        if (TSystem::doesExistFileOrLevel(levelPath)) {
-          OverwriteDialog dialog;
-          levelPath.withName(dialog.execute(scene, levelPath, false));
+                .arg(locals::getLevelPath(initPath).withFrame().getQString()));
 
-          switch (dialog.getChoice()) {
-          case OverwriteDialog::KEEP_OLD:
-            while (r < rCount) {
-              path = args.resourceDatas[r].m_path;
-              if (backup.getParentDir() != path.getParentDir()) break;
-              if (!locals::isSharingSameParam(backup, path)) break;
-              ++r;
-            }
-            --r;
-            continue;
-
-          case OverwriteDialog::OVERWRITE :
-            TSystem::removeFileOrLevel(levelPath);
-          default :
-            break;
-          }
-        }
-        // Load or Import the files
-        while (r < rCount) {
+        // Load or Import ALL The Sequence Files
+        do {
           path = args.resourceDatas[r].m_path;
           progressDialog->setValue(r);
           try {
-            path = importDialog.process(scene, 0, path);
+            newPath = importDialog.process(scene, 0, path);
           } catch (std::string msg) {
             error(QString::fromStdString(msg));
             continue;
           }
           if (importDialog.aborted()) break;
-          // and Same parent folder
-          if ((backup.getParentDir() != path.getParentDir()) ||
-              (!locals::isSharingSameParam(backup, path))) {
+          if ((initPath.getParentDir() == path.getParentDir()) &&
+              locals::isSharingSameParam(initPath, path)) {
+            files.push_back(scene->decodeFilePath(newPath));
+            ++r;
+          } else {
             --r;
             break;
           }
-          files.push_back(path);
-          ++r;
+        } while (r < rCount);
+
+        // Check for Existing Level
+        TFilePath levelPath;
+        if (!files.empty())
+            levelPath = locals::getLevelPath(*files.begin());
+        else break;
+        if (TSystem::doesExistFileOrLevel(levelPath)) {
+            OverwriteDialog dialog;
+            levelPath =
+                levelPath.withName(dialog.execute(scene, levelPath, false));
+
+            switch (dialog.getChoice()) {
+            case OverwriteDialog::KEEP_OLD:
+                // Skip current sequence
+                while (r < rCount) {
+                    path = args.resourceDatas[r].m_path;
+                    if (initPath.getParentDir() == path.getParentDir() &&
+                        locals::isSharingSameParam(initPath, path))
+                        ++r;
+                    else {
+                        --r;
+                        break;
+                    }
+                }
+                continue;
+
+            case OverwriteDialog::OVERWRITE:
+                TSystem::removeFileOrLevel(levelPath);
+            default:
+                break;
+            }
         }
-        if (importDialog.aborted()) break;
-        if(TSystem::renameImageSequence(
-            files, levelPath,
-            backup.getWideName().substr(0,
-                backup.getWideName().find_last_not_of(L"0123456789") + 1)
+
+        // Do Sequence Renaming
+        if (TSystem::renameImageSequence(
+                files, levelPath,
+                initPath.getWideName()
+                    .substr(0, initPath.getWideName().find_last_not_of(
+                                   L"0123456789") +
+                                   1)
                     .size())) {
           QCoreApplication::processEvents();
           path = levelPath;
@@ -2717,7 +2737,6 @@ int IoCmd::loadResources(LoadResourceArguments &args, bool updateRecentFile,
           DVGui::warning(QString("Failed to rename files!"));
           break;
         }
-        
       }
     }
     // for other level files
@@ -2751,7 +2770,7 @@ int IoCmd::loadResources(LoadResourceArguments &args, bool updateRecentFile,
     } else {
       // reuse TFrameIds retrieved by FileBrowser
       std::vector<TFrameId> fIds;
-      if ((int)args.frameIdsSet.size() > r)  // if there is fIds to be reused
+      if ((int)args.frameIdsSet.size() > r)  // if there is Fids to be reused
       {
         fIds = args.frameIdsSet[r];
       }
