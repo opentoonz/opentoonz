@@ -101,37 +101,41 @@ To run the program with Canon DSLR camera support, you will need to copy the .dl
     - `Qt5Svg.dll`
     - `Qt5Widgets.dll`
     - `Qt5Xml.dll`
-  - These files should be in the corresponding folders in the same folder `OpenToonz.exe`
+  - These files should be placed in the corresponding folders in the same directory as `OpenToonz.exe`:
+
+```
 .
+├── OpenToonz.exe
 ├── audio
-│   ├── qtaudio_wasapid.dll
-│   └── qtaudio_windowsd.dll
+│   ├── qtaudio_wasapid.dll
+│   └── qtaudio_windowsd.dll
 ├── bearer
-│   └── qgenericbearerd.dll
+│   └── qgenericbearerd.dll
 ├── iconengines
-│   └── qsvgicond.dll
+│   └── qsvgicond.dll
 ├── imageformats
-│   ├── qgifd.dll
-│   ├── qicnsd.dll
-│   ├── qicod.dll
-│   ├── qjpegd.dll
-│   ├── qsvgd.dll
-│   ├── qtgad.dll
-│   ├── qtiffd.dll
-│   ├── qwbmpd.dll
-│   └── qwebpd.dll
+│   ├── qgifd.dll
+│   ├── qicnsd.dll
+│   ├── qicod.dll
+│   ├── qjpegd.dll
+│   ├── qsvgd.dll
+│   ├── qtgad.dll
+│   ├── qtiffd.dll
+│   ├── qwbmpd.dll
+│   └── qwebpd.dll
 ├── mediaservice
-│   ├── dsengined.dll
-│   ├── qtmedia_audioengined.dll
-│   └── wmfengined.dll
+│   ├── dsengined.dll
+│   ├── qtmedia_audioengined.dll
+│   └── wmfengined.dll
 ├── platforms
-│   └── qwindowsd.dll
+│   └── qwindowsd.dll
 ├── playlistformats
-│   └── qtmultimedia_m3ud.dll
+│   └── qtmultimedia_m3ud.dll
 ├── printsupport
-│   └── windowsprintersupportd.dll
-├── styles
-│   └── qwindowsvistastyled.dll
+│   └── windowsprintersupportd.dll
+└── styles
+    └── qwindowsvistastyled.dll
+```
 
 3. Copy the following files to the same folder as `OpenToonz.exe`
   - `$opentoonz/thirdparty/glut/3.7.6/lib/glut64.dll`
