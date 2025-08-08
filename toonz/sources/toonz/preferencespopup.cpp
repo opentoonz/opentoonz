@@ -458,17 +458,17 @@ QList<ComboBoxItem> PreferencesPopup::buildFontStyleList() const {
 
 //-----------------------------------------------------------------------------
 
-QList<ComboBoxItem> PreferencesPopup::buildSvnUserList() const { 
-    PermissionsManager* instance        = PermissionsManager::instance();
-    QList<ComboBoxItem> userList;
-    std::string username;
-    username = instance->getSVNUserName(0);
-    for (int i = 1; !username.empty(); i++) {
-      userList.append(ComboBoxItem(QString::fromStdString(username),
-                                    QString::fromStdString(username)));
-      username = instance->getSVNUserName(i);
-    }
-    return userList;
+QList<ComboBoxItem> PreferencesPopup::buildSvnUserList() const {
+  PermissionsManager* instance = PermissionsManager::instance();
+  QList<ComboBoxItem> userList;
+  std::string username;
+  username = instance->getSVNUserName(0);
+  for (int i = 1; !username.empty(); i++) {
+    userList.append(ComboBoxItem(QString::fromStdString(username),
+                                 QString::fromStdString(username)));
+    username = instance->getSVNUserName(i);
+  }
+  return userList;
 }
 
 QList<ComboBoxItem> PreferencesPopup::buildSvnRepList() const {
@@ -477,11 +477,9 @@ QList<ComboBoxItem> PreferencesPopup::buildSvnRepList() const {
   QList<SVNRepository> repositories = instance->getRepositories();
   for (int i = 0; i < repositories.size(); i++) {
     SVNRepository r = repositories.at(i);
-    repList.append(ComboBoxItem(r.m_name,
-                                  r.m_name));
+    repList.append(ComboBoxItem(r.m_name, r.m_name));
   }
   return repList;
-
 }
 
 //-----------------------------------------------------------------------------
@@ -1310,6 +1308,8 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
       // {dropdownShortcutsCycleOptions, tr("Dropdown Shortcuts:")}, //
       // removed
       {FillOnlysavebox, tr("Use the TLV Savebox to Limit Filling Operations")},
+      {DefRegionWithPaint,
+       tr("Define filling region with both PAINT and INK")},
       {multiLayerStylePickerEnabled,
        tr("Multi Layer Style Picker: Switch Levels by Picking")},
       {cursorBrushType, tr("Basic Cursor Type:")},
@@ -1754,7 +1754,9 @@ QWidget* PreferencesPopup::createInterfacePage() {
       ->setSizeAdjustPolicy(QComboBox::AdjustToContents);
 
   QGridLayout* colorCalibLay = insertGroupBoxUI(colorCalibrationEnabled, lay);
-  { insertUI(colorCalibrationLutPaths, colorCalibLay); }
+  {
+    insertUI(colorCalibrationLutPaths, colorCalibLay);
+  }
   insertUI(displayIn30bit, lay);
   row = lay->rowCount();
   lay->addWidget(check30bitBtn, row - 1, 2, Qt::AlignRight);
@@ -1831,7 +1833,9 @@ QWidget* PreferencesPopup::createLoadingPage() {
   insertUI(importPolicy, lay, getComboItemList(importPolicy));
   insertUI(renamePolicy, lay, getComboItemList(renamePolicy));
   QGridLayout* autoExposeLay = insertGroupBoxUI(autoExposeEnabled, lay);
-  { insertUI(autoRemoveUnusedLevels, autoExposeLay); }
+  {
+    insertUI(autoRemoveUnusedLevels, autoExposeLay);
+  }
   insertUI(subsceneFolderEnabled, lay);
   insertUI(removeSceneNumberFromLoadedLevelName, lay);
   insertUI(IgnoreImageDpi, lay);
@@ -1891,7 +1895,9 @@ QWidget* PreferencesPopup::createSavingPage() {
   }
   insertUI(replaceAfterSaveLevelAs, lay);
   QGridLayout* backupLay = insertGroupBoxUI(backupEnabled, lay);
-  { insertUI(backupKeepCount, backupLay); }
+  {
+    insertUI(backupKeepCount, backupLay);
+  }
   QLabel* matteColorLabel =
       new QLabel(tr("Matte color is used for background when overwriting "
                     "raster levels with transparent pixels\nin non "
@@ -2041,6 +2047,7 @@ QWidget* PreferencesPopup::createToolsPage() {
 
   // insertUI(dropdownShortcutsCycleOptions, lay,
   //         getComboItemList(dropdownShortcutsCycleOptions));
+  insertUI(PreferencesItemId::DefRegionWithPaint, lay);
   insertUI(FillOnlysavebox, lay);
   insertUI(multiLayerStylePickerEnabled, lay);
   QGridLayout* cursorOptionsLay = insertGroupBox(tr("Cursor Options"), lay);
@@ -2089,7 +2096,9 @@ QWidget* PreferencesPopup::createXsheetPage() {
   insertUI(ignoreAlphaonColumn1Enabled, lay);
   QGridLayout* showKeyLay =
       insertGroupBoxUI(showKeyframesOnXsheetCellArea, lay);
-  { insertUI(showXsheetCameraColumn, showKeyLay); }
+  {
+    insertUI(showXsheetCameraColumn, showKeyLay);
+  }
   insertUI(useArrowKeyToShiftCellSelection, lay);
   insertUI(inputCellsWithoutDoubleClickingEnabled, lay);
   insertUI(shortcutCommandsWhileRenamingCellEnabled, lay);
@@ -2262,12 +2271,11 @@ QWidget* PreferencesPopup::createColorsPage() {
 //-----------------------------------------------------------------------------
 
 QWidget* PreferencesPopup::createVersionControlPage() {
-
   SVNConfigWriter* writer = new SVNConfigWriter();
-  QWidget* widget  = new QWidget(this);
-  QGridLayout* lay = new QGridLayout();
+  QWidget* widget         = new QWidget(this);
+  QGridLayout* lay        = new QGridLayout();
   QHBoxLayout* svnUserLay = new QHBoxLayout();
-  QHBoxLayout* svnRepLay = new QHBoxLayout();
+  QHBoxLayout* svnRepLay  = new QHBoxLayout();
 
   QLabel* repLabel = new QLabel(QString("Repositories*: "));
   svnRepLay->addWidget(repLabel);
@@ -2275,7 +2283,7 @@ QWidget* PreferencesPopup::createVersionControlPage() {
   QList<ComboBoxItem> repositoryList = PreferencesPopup::buildSvnRepList();
   for (const ComboBoxItem& item : repositoryList)
     repoCombo->addItem(item.first, item.second);
-  QPushButton* addRep        = new QPushButton("+");
+  QPushButton* addRep = new QPushButton("+");
   addRep->setFixedSize(20, 20);
   QPushButton* removeRep = new QPushButton("-");
   removeRep->setFixedSize(20, 20);
@@ -2283,7 +2291,7 @@ QWidget* PreferencesPopup::createVersionControlPage() {
 
   QLabel* userLabel = new QLabel(QString("Users*: "));
   svnUserLay->addWidget(userLabel);
-  QComboBox* userCombo    = new QComboBox();
+  QComboBox* userCombo         = new QComboBox();
   QList<ComboBoxItem> userList = PreferencesPopup::buildSvnUserList();
   for (const ComboBoxItem& item : userList)
     userCombo->addItem(item.first, item.second);
@@ -2298,7 +2306,7 @@ QWidget* PreferencesPopup::createVersionControlPage() {
   svnRepLay->addWidget(addRep);
   svnRepLay->addWidget(removeRep);
   svnRepLay->addWidget(editRep);
-  
+
   svnUserLay->setSpacing(5);
   svnUserLay->addWidget(userCombo);
   svnUserLay->addWidget(addUser);
@@ -2313,13 +2321,13 @@ QWidget* PreferencesPopup::createVersionControlPage() {
   lay->addLayout(svnRepLay, 4, 0);
   insertUI(automaticSVNFolderRefreshEnabled, lay);
   insertUI(latestVersionCheckEnabled, lay);
-  
+
   lay->setRowStretch(lay->rowCount(), 1);
   insertFootNote(lay);
   widget->setLayout(lay);
 
   m_onEditedFuncMap.insert(SVNEnabled, &PreferencesPopup::onSVNEnabledChanged);
-  
+
   connect(addRep, &QPushButton::clicked, this, [repoCombo, writer]() {
     QString addedRepo = writer->writeRepository("");
     if (repoCombo->findText(addedRepo) == -1 && !addedRepo.isEmpty()) {
@@ -2328,8 +2336,8 @@ QWidget* PreferencesPopup::createVersionControlPage() {
     }
   });
   connect(removeRep, &QPushButton::clicked, this, [repoCombo, writer]() {
-    writer->writeRepository(repoCombo->currentText(), QString(),
-                            QString(), true);
+    writer->writeRepository(repoCombo->currentText(), QString(), QString(),
+                            true);
     repoCombo->removeItem(repoCombo->currentIndex());
   });
   connect(editRep, &QPushButton::clicked, this, [repoCombo, writer]() {
@@ -2337,7 +2345,7 @@ QWidget* PreferencesPopup::createVersionControlPage() {
     writer->writeRepository(repoCombo->currentText());
   });
 
-  connect(addUser, &QPushButton::clicked, this, [userCombo, writer]() { 
+  connect(addUser, &QPushButton::clicked, this, [userCombo, writer]() {
     QString addedUser = writer->writeSvnUser("");
     if (userCombo->findText(addedUser) == -1 && !addedUser.isEmpty()) {
       userCombo->addItem(addedUser);
@@ -2350,7 +2358,7 @@ QWidget* PreferencesPopup::createVersionControlPage() {
   });
   connect(editUser, &QPushButton::clicked, this, [userCombo, writer]() {
     if (userCombo->currentText().isEmpty()) return;
-      writer->writeSvnUser(userCombo->currentText());
+    writer->writeSvnUser(userCombo->currentText());
   });
 
   return widget;

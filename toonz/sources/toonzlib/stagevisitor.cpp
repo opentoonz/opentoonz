@@ -397,17 +397,6 @@ void RasterPainter::disableMask() {
   TStencilControl::instance()->disableMask();
 }
 
-//-----------------------------------------------------------------------------
-
-//-----------------------------------------------------------------------------
-
-TEnv::DoubleVar AutocloseDistance("InknpaintAutocloseDistance", 10.0);
-TEnv::DoubleVar AutocloseAngle("InknpaintAutocloseAngle", 60.0);
-TEnv::IntVar AutocloseInk("InknpaintAutocloseInk", 1);
-TEnv::IntVar AutocloseOpacity("InknpaintAutocloseOpacity", 255);
-
-//-----------------------------------------------------------------------------
-
 int RasterPainter::getNodesCount() { return m_nodes.size(); }
 
 //-----------------------------------------------------------------------------
@@ -568,19 +557,36 @@ void RasterPainter::flushRasterImages() {
       m_nodes[i].m_palette->setFrame(m_nodes[i].m_frame);
 
       TPaletteP plt;
-      int styleIndex = -1;
+      int gapCheckIndex = -1;
       if ((tc & ToonzCheck::eGap || tc & ToonzCheck::eAutoclose) &&
           m_nodes[i].m_isCurrentColumn) {
         srcCm      = srcCm->clone();
         plt        = m_nodes[i].m_palette->clone();
-        styleIndex = plt->addStyle(TPixel::Magenta);
-        if (tc & ToonzCheck::eAutoclose)
-          TAutocloser(srcCm, AutocloseDistance, AutocloseAngle, styleIndex,
-                      AutocloseOpacity)
-              .exec();
+        gapCheckIndex = plt->addStyle(TPixel::Magenta);
         if (tc & ToonzCheck::eGap)
-          AreaFiller(srcCm).rectFill(m_nodes[i].m_savebox, 1, true, true,
+          AreaFiller(srcCm).rectFill(m_nodes[i].m_savebox,TRect(), 1, true, true,
                                      false);
+        if (tc & ToonzCheck::eAutoclose && m_nodes[i].m_onionMode == Node::eOnionSkinNone) {
+          auto settings = ToonzCheck::instance()->getAutocloseSettings();
+          std::set<int> autoPaints;
+          if (settings.m_ignoreAPInks) {
+            for (int i = 0; i < plt->getStyleCount(); i++)
+              if (plt->getStyle(i)->getFlags() != 0)
+                  autoPaints.insert(i);
+          }
+          TAutocloser ac(srcCm, gapCheckIndex,settings, std::move(autoPaints));
+          if (ac.hasSegmentCache(m_currentImageId))
+            ac.draw(ac.getSegmentCache(m_currentImageId));
+          else
+            ac.exec(m_currentImageId);
+          if (tc & ToonzCheck::eGap) {
+            int gapFillIndex =
+                plt->addStyle(TPixelRGBM32(244, 186, 148, 0xff));  // orange
+            plt->getStyle(gapFillIndex)->setFlags(1);
+            AreaFiller(srcCm).rectFill(m_nodes[i].m_savebox,TRect(), gapFillIndex,
+                                       true, true, false);
+          }
+        }
       } else
         plt = m_nodes[i].m_palette;
 
@@ -610,7 +616,7 @@ void RasterPainter::flushRasterImages() {
             settings.m_transpCheckPaint);
 
         settings.m_isOnionSkin = m_nodes[i].m_onionMode != Node::eOnionSkinNone;
-        settings.m_gapCheckIndex = styleIndex;
+        settings.m_gapCheckIndex = gapCheckIndex;
 
         TRop::quickPut(viewedRaster, srcCm, plt, aff, settings);
       }
