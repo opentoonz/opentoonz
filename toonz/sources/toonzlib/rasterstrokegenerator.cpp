@@ -258,7 +258,8 @@ void RasterStrokeGenerator::placeOver(const TRasterCM32P &out,
                 std::max(outPix->getTone(), 255 - inPix->getTone()));
           }
         }
-      } else if (m_task == PAINTBRUSH) {
+      } 
+      else if (m_task == PAINTBRUSH) {
         if (!inPix->isPureInk()) continue;
         int paintIdx     = outPix->getPaint();
         bool changePaint = (!m_selective && !m_modifierLockAlpha) ||
@@ -282,9 +283,11 @@ void RasterStrokeGenerator::placeOver(const TRasterCM32P &out,
       else if (m_task == FINGER) {
         /*-- Boundary Conditions --*/
         if (outPix == rOut->pixels(y) || outPix == outEnd - 1) continue;
-
-        int inkId = inPix->getInk();
-        if (inkId == 0) continue;
+        if (m_selective) {
+            if (outPix->getPaint() != 0) continue;
+        }
+        int inStyle = inPix->getInk();
+        if (inStyle == 0) continue;
 
         TPixelCM32 *neighbourPixels[4];
         neighbourPixels[0] = outPix - 1;               /* left */
@@ -295,15 +298,16 @@ void RasterStrokeGenerator::placeOver(const TRasterCM32P &out,
         int tone           = outPix->getTone();
 
         /*--- When Invert is off: Fill hole operation ---*/
-        if (!m_selective) {
+        if (!m_selectedStyle) {
           /*-- For 4 neighborhood pixels --*/
           int minTone = tone;
           for (int p = 0; p < 4; p++) {
             /*-- Count up the items that have darker lines (lower Tone) than the
-             * current pixel. --*/
-            if (neighbourPixels[p]->getTone() < tone) {
+             * current pixel, or same paint as current pixel. --*/
+            if (neighbourPixels[p]->getTone() < tone ||
+                (m_colorType == PAINT && neighbourPixels[p]->getPaint() == inStyle)) {
               count++;
-              if (neighbourPixels[p]->getTone() < minTone)
+              if (m_colorType == INK && neighbourPixels[p]->getTone() < minTone)
                 minTone = neighbourPixels[p]->getTone();
             }
           }
@@ -311,11 +315,15 @@ void RasterStrokeGenerator::placeOver(const TRasterCM32P &out,
           /*--- If 3 or more surrounding pixels are darker, replace with the
            * minimum Tone ---*/
           if (count <= 2) continue;
-          *outPix = TPixelCM32(inkId, outPix->getPaint(), minTone);
+
+          if (m_colorType == INK)
+          *outPix = TPixelCM32(inStyle, outPix->getPaint(), minTone);
+          else if (m_colorType == PAINT)
+            *outPix = TPixelCM32(outPix->getInk(), inStyle, outPix->getTone());
         }
         /*--- When Invert is ON: Operation to trim protrusion ---*/
         else {
-          if (outPix->isPurePaint() || outPix->getInk() != inkId) continue;
+          if (outPix->isPurePaint() || outPix->getInk() != inStyle) continue;
 
           /*-- For 4 neighborhood pixels --*/
           int maxTone = tone;
@@ -324,7 +332,7 @@ void RasterStrokeGenerator::placeOver(const TRasterCM32P &out,
              * Count up items whose Ink# is not Current or whose line is thinner
              * than your Pixel (Tone is higher).
              * --*/
-            if (neighbourPixels[p]->getInk() != inkId) {
+            if (neighbourPixels[p]->getInk() != inStyle) {
               count++;
               maxTone = 255;
             } else if (neighbourPixels[p]->getTone() > tone) {
@@ -337,8 +345,8 @@ void RasterStrokeGenerator::placeOver(const TRasterCM32P &out,
           /*---  If 3 or more surrounding pixels are thinner, replace with the
            * maximum Tone ---*/
           if (count <= 2) continue;
-          *outPix = TPixelCM32((maxTone == 255) ? 0 : inkId, outPix->getPaint(),
-                               maxTone);
+            *outPix = TPixelCM32((maxTone == 255) ? 0 : inStyle,
+                                 outPix->getPaint(), maxTone);
         }
       }
     }
