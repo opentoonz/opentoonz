@@ -6,7 +6,7 @@
     <control>lambda</control>
     <control>auto_scribble</control>
     
-    <separator label="Boundary Sink"/>
+    <separator label="Boundary Transparent Scribble"/>
     <hbox>
       <control>up_wall_is_sink</control>
       <control>down_wall_is_sink</control>

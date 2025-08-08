@@ -119,12 +119,11 @@ private:
       {0, 1, 0},
   };
 
-  int mode = 0;  // 0:Mask, 1:Mask+Line, 2:LoG Filter, 3:Scribble Map
-  TPixelF maskColor =
-      TPixelF(200.f / 255.f, 200.f / 255.f, 200.f / 255.f, 1.f);  // マスクの色
+  int mode;  // 0:Mask, 1:Mask+Line, 2:LoG Filter, 3:Scribble Map
+  TPixelF maskColor;  // マスクの色
 
-  const float LoG_draw_scale = 20.0f;  // LoGフィルタの描画スケール
-  float LoG_s                = 0.05f;  // LoGフィルタのスケール
+  const float LoG_draw_scale = 20.f;  // LoGフィルタの描画スケール
+  float LoG_s;  // LoGフィルタのスケール
 
   int idx(int x, int y, int w) { return y * w + x; }
 
@@ -182,7 +181,7 @@ void naru_lazybrush::doDraw(TRasterPT<PIXEL> ras, std::vector<float>& r,
 
 template <typename PIXEL>
 void naru_lazybrush::doGrayScale(TRasterPT<PIXEL> ras, double frame,
-                                 std::vector<float>& temp) {
+                                 std::vector<float>& gray) {
   int width  = ras->getLx();
   int height = ras->getLy();
 
@@ -192,15 +191,15 @@ void naru_lazybrush::doGrayScale(TRasterPT<PIXEL> ras, double frame,
   for (int y = 0; y < height; ++y) {
     PIXEL* pix = ras->pixels(y);
     for (int x = 0; x < width; ++x) {
-      float a = (float)pix->m / (float)PIXEL::maxChannelValue;
-      if (a != 0) {
-        float r = (float)pix->r / (a * (float)PIXEL::maxChannelValue);
-        float g = (float)pix->g / (a * (float)PIXEL::maxChannelValue);
-        float b = (float)pix->b / (a * (float)PIXEL::maxChannelValue);
-        temp[y * width + x] =
+      float m = (float)pix->m / (float)PIXEL::maxChannelValue;
+      if (m != 0) {
+        float r = (float)pix->r / (m * (float)PIXEL::maxChannelValue);
+        float g = (float)pix->g / (m * (float)PIXEL::maxChannelValue);
+        float b = (float)pix->b / (m * (float)PIXEL::maxChannelValue);
+        gray[y * width + x] =
             fmax(0.299f * r + 0.587f * g + 0.114f * b, minLightness);
       } else
-        temp[y * width + x] = 1.0f;
+        gray[y * width + x] = 1.0f;
       pix++;
     }
   }
@@ -466,68 +465,69 @@ void naru_lazybrush::doColorize(TRasterPT<PIXEL> ras, double frame, Graph& g,
 
   bool fillHole = m_fillHole->getValue();
   g.mincut();
-  if (mode == 1) {  // Draw Mask
-    ras->lock();
-    for (int y = 0; y < height; ++y) {
-      PIXEL* pix = ras->pixels(y);
-      for (int x = 0; x < width; ++x) {
-        int p = idx(x, y, width);
-        if (!g.getSegment(p, fillHole ? g.SOURCE : g.SINK)) {  // SOURCE
-          pix->r = maskColor.m * maskColor.r * PIXEL::maxChannelValue;
-          pix->g = maskColor.m * maskColor.g * PIXEL::maxChannelValue;
-          pix->b = maskColor.m * maskColor.b * PIXEL::maxChannelValue;
-          pix->m = maskColor.m * PIXEL::maxChannelValue;
-        } else {  // SINK
-          pix->r = 0.0f;
-          pix->g = 0.0f;
-          pix->b = 0.0f;
-          pix->m = 0.0f;
-        }
-        pix++;
+  std::vector<float> maskR(width * height, 0.0f);
+  std::vector<float> maskG(width * height, 0.0f);
+  std::vector<float> maskB(width * height, 0.0f);
+  std::vector<float> maskM(width * height, 0.0f);
+  // Mask
+  for (int y = 0; y < height; ++y) {
+    for (int x = 0; x < width; ++x) {
+      int p = idx(x, y, width);
+      if (!g.getSegment(p, fillHole ? g.SOURCE : g.SINK)) {  // SOURCE
+        maskR[p] = maskColor.m * maskColor.r;
+        maskG[p] = maskColor.m * maskColor.g;
+        maskB[p] = maskColor.m * maskColor.b;
+        maskM[p] = maskColor.m;
       }
     }
-    ras->unlock();
-  } else if (mode == 0) {  // Draw Mask + Line
-    std::vector<float> lineR(width * height, 0.0f);
-    std::vector<float> lineG(width * height, 0.0f);
-    std::vector<float> lineB(width * height, 0.0f);
-    std::vector<float> lineM(width * height, 0.0f);
+  }
+
+  std::vector<float> lineR(width * height, 0.0f);
+  std::vector<float> lineG(width * height, 0.0f);
+  std::vector<float> lineB(width * height, 0.0f);
+  std::vector<float> lineM(width * height, 0.0f);
+  // Line
+  if (mode == 0) {
     // line => (r, g, b, 1.), noLine => (r, g, b, 0.)
     ras->lock();
     for (int y = 1; y < height - 1; ++y) {
       PIXEL* pix = ras->pixels(y);
       for (int x = 1; x < width - 1; ++x) {
         int p    = idx(x, y, width);
-        lineR[p] = (float)pix->r / (float)PIXEL::maxChannelValue;
-        lineG[p] = (float)pix->g / (float)PIXEL::maxChannelValue;
-        lineB[p] = (float)pix->b / (float)PIXEL::maxChannelValue;
-        lineM[p] = 1.f - (float)fmin(fmin(pix->r, pix->g), pix->b) /
-                             (float)PIXEL::maxChannelValue;
-        pix++;
-      }
-    }
-    // result => line * mask
-    for (int y = 0; y < height; ++y) {
-      PIXEL* pix = ras->pixels(y);
-      for (int x = 0; x < width; ++x) {
-        int p = idx(x, y, width);
-        if (!g.getSegment(p, fillHole ? g.SOURCE : g.SINK)) {  // SOURCE
-          pix->r =
-              maskColor.m * lineR[p] * maskColor.r * PIXEL::maxChannelValue;
-          pix->g =
-              maskColor.m * lineG[p] * maskColor.g * PIXEL::maxChannelValue;
-          pix->b =
-              maskColor.m * lineB[p] * maskColor.b * PIXEL::maxChannelValue;
-          pix->m = (maskColor.m + (1 - maskColor.m) * lineM[p]) *
-                   PIXEL::maxChannelValue;
-        } else {  // SINK
-          pix->r = 0.0f;
-          pix->g = 0.0f;
-          pix->b = 0.0f;
-          pix->m = lineM[p] * PIXEL::maxChannelValue;
+        float m  = (float)pix->m / (float)PIXEL::maxChannelValue;
+        if (m != 0) {
+          float r  = (float)pix->r / (float)PIXEL::maxChannelValue;
+          float g  = (float)pix->g / (float)PIXEL::maxChannelValue;
+          float b  = (float)pix->b / (float)PIXEL::maxChannelValue;
+          lineM[p] = (1.f - fmin(fmin(r, g), b)) * m;
+          lineR[p] = 0.f;
+          lineG[p] = 0.f;
+          lineB[p] = 0.f;
         }
         pix++;
       }
+    }
+    ras->unlock();
+  }
+  ras->lock();
+
+  // result => line + mask
+  for (int y = 0; y < height; ++y) {
+    PIXEL* pix = ras->pixels(y);
+    for (int x = 0; x < width; ++x) {
+      int p  = idx(x, y, width);
+      pix->r = (typename PIXEL::Channel)(
+          (maskR[p] * (1.f - lineM[p]) + lineM[p] * lineR[p]) *
+          (float)PIXEL::maxChannelValue);
+      pix->g = (typename PIXEL::Channel)(
+          (maskG[p] * (1.f - lineM[p]) + lineM[p] * lineG[p]) *
+          (float)PIXEL::maxChannelValue);
+      pix->b = (typename PIXEL::Channel)(
+          (maskB[p] * (1.f - lineM[p]) + lineM[p] * lineB[p]) *
+          (float)PIXEL::maxChannelValue);
+      pix->m = (typename PIXEL::Channel)(fmax(maskM[p], lineM[p]) *
+                                         (float)PIXEL::maxChannelValue);
+      pix++;
     }
     ras->unlock();
   }
