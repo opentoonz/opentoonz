@@ -2490,8 +2490,6 @@ int IoCmd::loadResources(LoadResourceArguments &args, bool updateRecentFile,
               continue;
       }
 
-      rds.push_back(rd);
-
       if (progressDialog) {
           if (progressDialog->wasCanceled())
               break;
@@ -2559,6 +2557,9 @@ int IoCmd::loadResources(LoadResourceArguments &args, bool updateRecentFile,
           }
           if (importDialog.aborted()) break;
       }
+
+      rd.m_path = path;
+      rds.push_back(rd);
   }
 
   if(args.renamePolicy != LoadResourceArguments::RenamePolicy::NEVER)
@@ -2795,8 +2796,8 @@ QRegularExpression::ExtendedPatternSyntaxOption);
             }
             QString label =
                 QObject::tr(
-                    "Image sequence detected, but the filenames are missing a separator: "
-                    "OpenToonz requires a separator (such as an underscore (_) or dot (.) "
+                    "Image sequence detected, but the filenames are missing a separator: \n"
+                    "OpenToonz requires a separator (such as an underscore (_) or dot (.) \n"
                     "between the name and the frame number to recognize sequences properly.\n"
                     "Example: A0001.png → A.0001.png\n"
                     "\nWould you like OpenToonz to automatically add a dot to fix the sequence format?\n"
@@ -2856,25 +2857,31 @@ QRegularExpression::ExtendedPatternSyntaxOption);
         if (!locals::matchSequencePattern(path))continue;
         if (askUser &&
             !locals::checkRenamePolicy(path)) continue;
-        TFilePath levelPath = locals::getLevelPath(path);
+        TFilePath levelPath = scene->decodeFilePath(locals::getLevelPath(path));
+        bool keepOld = false;
         if (TSystem::doesExistFileOrLevel(levelPath)) {
             OverwriteDialog dialog;
             levelPath = levelPath.withName(dialog.execute(scene, levelPath, false));
             if (dialog.getChoice() == OverwriteDialog::OVERWRITE)
                 TSystem::removeFileOrLevel(levelPath);
+            else if (dialog.getChoice() == OverwriteDialog::KEEP_OLD)
+                keepOld = true;
         }
         TFilePath &currentPath = rd->m_path;
         TFilePathSet files;
-        files.push_back(currentPath);
+        files.push_back(scene->decodeFilePath(currentPath));
         auto nextRd = rd;
         nextRd++;
         for (; nextRd != rds.end();) {
             if ((currentPath.getParentDir() == nextRd->m_path.getParentDir()) &&
                 (locals::isSharingSameParam(currentPath, nextRd->m_path))) {
-                files.push_back(nextRd->m_path);
+                if(!keepOld)files.push_back(scene->decodeFilePath(nextRd->m_path));
                 nextRd = rds.erase(nextRd);
             }
             else break;
+        }
+        if (keepOld) {
+            currentPath = levelPath; continue;
         }
         if (files.empty())continue;
         if (TSystem::renameImageSequence(
