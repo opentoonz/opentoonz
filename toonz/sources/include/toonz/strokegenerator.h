@@ -98,6 +98,8 @@ In caso affermativo li cancella.
   //! Visualizza tutti i frammenti
   void drawAllFragments();
 
+  void drawFilledStroke();
+
   // Only keep first and last points. Used for straight lines
   void removeMiddlePoints();
 

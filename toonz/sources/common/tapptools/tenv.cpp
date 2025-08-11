@@ -179,7 +179,10 @@ public:
       m_applicationFullName += " " + m_version.getAppNote();
 
     m_moduleName  = m_version.getAppName();
-    m_rootVarName = toUpper(m_version.getAppName()) + "ROOT";
+    // m_rootVarName value is usually inited by SetRootVarName(), but sometimes
+    // init would be called before SetRootVarName(), so init it here one time
+    m_rootVarName = "TOONZROOT";
+    //m_rootVarName = toUpper(m_version.getAppName()) + "ROOT";
 #ifdef _WIN32
     // from v1.3, registry root is moved to SOFTWARE\\OpenToonz\\OpenToonz
     m_registryRoot =
