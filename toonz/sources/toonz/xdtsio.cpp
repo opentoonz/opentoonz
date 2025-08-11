@@ -583,10 +583,11 @@ bool XdtsIo::loadXdtsScene(ToonzScene *scene, const TFilePath &scenePath) {
   try {
     for (QString name : levelNames) {
       QString levelPath = popup.getLevelPath(name);
+      TFilePath path = TFilePath(levelPath);
       TXshLevel *level  = nullptr;
-      if (!levelPath.isEmpty())
-        level = scene->loadLevel(scene->decodeFilePath(TFilePath(levelPath)),
-                                 nullptr, name.toStdWString());
+      if (!levelPath.isEmpty()&& path.getSepChar() != "")
+              level = scene->loadLevel(scene->decodeFilePath(path),
+              nullptr, name.toStdWString());
       if (!level) {
         int levelType = Preferences::instance()->getDefLevelType();
         level         = scene->createNewLevel(levelType, name.toStdWString());

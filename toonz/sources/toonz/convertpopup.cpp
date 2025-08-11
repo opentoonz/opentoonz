@@ -888,8 +888,8 @@ void ConvertPopup::setFiles(const std::vector<TFilePath> &fps) {
 }
 
 void ConvertPopup::setFormat(QString format){
-    m_fileFormat->setDisabled(true);
     m_fileFormat->setCurrentIndex(m_fileFormat->findText(format));
+    //m_fileFormat->setDisabled(true);
 }
 
 //-------------------------------------------------------------------
