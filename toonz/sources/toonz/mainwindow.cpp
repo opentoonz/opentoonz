@@ -1916,6 +1916,9 @@ void MainWindow::defineActions() {
   createMenuLevelAction(MI_RemoveEndpoints,
                         QT_TR_NOOP("&Remove Vector Overflow"), "",
                         "remove_vector_overflow");
+  createMenuLevelAction(MI_SortWithPaletteOrder,
+                        QT_TR_NOOP("&Sort Strokes with Palette Order"), "",
+                        "sort_with_palette_order");
   createMenuLevelAction(MI_AddFrames, QT_TR_NOOP("&Add Frames..."), "",
                         "add_cells");
   createMenuLevelAction(MI_Renumber, QT_TR_NOOP("&Renumber..."), "",
