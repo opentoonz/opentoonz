@@ -181,6 +181,8 @@ public:
 
   // returns board duration in frame
   int addBoard();
+  // save clapperboard frame (for non-movie formats)
+  void saveBoardFrame();
 };
 
 //---------------------------------------------------------
@@ -339,8 +341,8 @@ void MovieRenderer::Imp::addSoundtrack(int r0, int r1, double fps,
     // No soundtrack
     m_whiteSample = (r1 - r0 + 1) * 918;  // 918?? wtf... I don't think it has
     return;  // any arcane meaning - but i'm not touching it.
-  }          // My impression would be that... no sound implies
-             // no access to m_whiteSample, no?
+  }  // My impression would be that... no sound implies
+     // no access to m_whiteSample, no?
 
   double samplePerFrame = snd->getSampleRate() / fps;
 
@@ -539,27 +541,31 @@ void MovieRenderer::Imp::doRenderRasterCompleted(const RenderData &renderData) {
 
   // Build soundtrack at the first time a frame is completed - and the filetype
   // is that of a movie.
-  if (m_firstCompletedRaster && m_movieType && !m_st) {
-    int boardDuration = addBoard();
+  if (m_firstCompletedRaster) {
+    if (m_movieType && !m_st) {
+      int boardDuration = addBoard();
 
-    int from, to;
-    getRange(m_scene, false, from, to);
+      int from, to;
+      getRange(m_scene, false, from, to);
 
-    TLevelP oldLevel(m_levelUpdaterA->getInputLevel());
-    if (oldLevel) {
-      from = std::min(from, oldLevel->begin()->first.getNumber() - 1);
-      to   = std::max(to, (--oldLevel->end())->first.getNumber() - 1);
-    }
+      TLevelP oldLevel(m_levelUpdaterA->getInputLevel());
+      if (oldLevel) {
+        from = std::min(from, oldLevel->begin()->first.getNumber() - 1);
+        to   = std::max(to, (--oldLevel->end())->first.getNumber() - 1);
+      }
 
-    addSoundtrack(
-        from, to,
-        m_scene->getProperties()->getOutputProperties()->getFrameRate(),
-        boardDuration);
+      addSoundtrack(
+          from, to,
+          m_scene->getProperties()->getOutputProperties()->getFrameRate(),
+          boardDuration);
 
-    if (m_st) {
-      m_levelUpdaterA->getLevelWriter()->saveSoundTrack(m_st.getPointer());
-      if (m_levelUpdaterB.get())
-        m_levelUpdaterB->getLevelWriter()->saveSoundTrack(m_st.getPointer());
+      if (m_st) {
+        m_levelUpdaterA->getLevelWriter()->saveSoundTrack(m_st.getPointer());
+        if (m_levelUpdaterB.get())
+          m_levelUpdaterB->getLevelWriter()->saveSoundTrack(m_st.getPointer());
+      }
+    } else {  // !m_movieType
+      saveBoardFrame();
     }
   }
 
@@ -864,6 +870,55 @@ int MovieRenderer::Imp::addBoard() {
     }
   }
   return duration;
+}
+
+//---------------------------------------------------------
+// save clapperboard frame (for non-movie formats)
+
+void MovieRenderer::Imp::saveBoardFrame() {
+  BoardSettings *boardSettings =
+      m_scene->getProperties()->getOutputProperties()->getBoardSettings();
+  if (!boardSettings->isActive()) return;
+  int duration = boardSettings->getDuration();
+  if (duration == 0) return;
+
+  // Get the image size
+  int shrinkX = m_renderSettings.m_shrinkX,
+      shrinkY = m_renderSettings.m_shrinkY;
+  TDimensionD cameraRes(double(m_frameSize.lx) / shrinkX,
+                        double(m_frameSize.ly) / shrinkY);
+  TDimension cameraResI(cameraRes.lx, cameraRes.ly);
+
+  TRaster32P boardRas =
+      boardSettings->getBoardRaster(cameraResI, shrinkX, m_scene);
+
+  if (m_levelUpdaterA.get()) {
+    // Flush images
+    try {
+      TRasterImageP img(boardRas);
+
+      TFilePath rendPath = m_levelUpdaterA->getLevelWriter()->getFilePath();
+      QString baseName   = QString::fromStdString(rendPath.getName());
+      QString levelName  = QString::fromStdString(rendPath.getLevelName());
+      int dotPos         = levelName.lastIndexOf('.');
+      QString fileName   = baseName + rendPath.getSepChar() +
+                         boardSettings->fileNameSuffix() +
+                         levelName.right(levelName.size() - dotPos);
+      TFilePath boardPath = rendPath.getParentDir() + TFilePath(fileName);
+
+      TImageWriterP imgWriter =
+          m_levelUpdaterA->getLevelWriter()->getFrameWriter(0);
+      imgWriter->setFilePath(boardPath);
+      imgWriter->save(img);
+
+      // do nothing for stereoscopic render
+      // if (m_levelUpdaterB.get()) {}
+    } catch (...) {
+      // Nothing. The images could not be saved for whatever reason.
+      // Failure is reported.
+    }
+  }
+  return;
 }
 
 //======================================================================================

@@ -19,6 +19,12 @@
 #include "toonz/boardsettings.h"
 #include "toonz/toonzfolders.h"
 
+// Image
+#include "tiio.h"
+
+// File-related includes
+#include "filebrowsermodel.h"
+
 // TnzBase includes
 #include "trasterfx.h"
 
@@ -70,6 +76,24 @@ void editListWidgetItem(QListWidgetItem* listItem, BoardItem* item) {
     iconPm.fill(item->getColor());
     listItem->setIcon(QIcon(iconPm));
   }
+}
+
+void convertImageToRaster(TRaster32P dstRas, const QImage& srcImg) {
+  dstRas->lock();
+  int lx = dstRas->getLx();
+  int ly = dstRas->getLy();
+  assert(lx == srcImg.width() && ly == srcImg.height());
+  for (int j = 0; j < ly; j++) {
+    TPixel32* dstPix = dstRas->pixels(j);
+    for (int i = 0; i < lx; i++, dstPix++) {
+      QRgb srcPix = srcImg.pixel(lx - 1 - i, j);
+      dstPix->r   = qRed(srcPix);
+      dstPix->g   = qGreen(srcPix);
+      dstPix->b   = qBlue(srcPix);
+      dstPix->m   = TPixel32::maxChannelValue;
+    }
+  }
+  dstRas->unlock();
 }
 }  // namespace
 
@@ -148,8 +172,8 @@ void BoardView::resizeEvent(QResizeEvent* event) {
     boardRes = QSize(frameSize.lx / shrinkX, frameSize.ly / shrinkY);
   }
 
-  float ratio = std::min((float)width() / (float)boardRes.width(),
-                         (float)height() / (float)boardRes.height());
+  float ratio    = std::min((float)width() / (float)boardRes.width(),
+                            (float)height() / (float)boardRes.height());
   QSizeF imgSize = QSizeF(boardRes) * ratio;
   QPointF imgTopLeft(((float)width() - imgSize.width()) * 0.5,
                      ((float)height() - imgSize.height()) * 0.5);
@@ -308,7 +332,7 @@ void BoardView::mousePressEvent(QMouseEvent* event) {
   m_dragStartItemRect = currentBoardItem()->getRatioRect();
   QPointF posOnImg    = QPointF(event->pos()) - m_boardImgRect.topLeft();
   m_dragStartPos      = QPointF(posOnImg.x() / m_boardImgRect.width(),
-                           posOnImg.y() / m_boardImgRect.height());
+                                posOnImg.y() / m_boardImgRect.height());
 }
 
 void BoardView::mouseReleaseEvent(QMouseEvent* event) {
@@ -442,15 +466,15 @@ ItemInfoView::ItemInfoView(QWidget* parent) : QStackedWidget(parent) {
 
   bool ret = true;
   ret      = ret && connect(m_nameEdit, SIGNAL(editingFinished()), this,
-                       SLOT(onNameEdited()));
-  ret = ret && connect(m_maxFontSizeEdit, SIGNAL(editingFinished()), this,
-                       SLOT(onMaxFontSizeEdited()));
-  ret = ret && connect(m_typeCombo, SIGNAL(activated(int)), this,
-                       SLOT(onTypeComboActivated(int)));
-  ret = ret && connect(m_textEdit, SIGNAL(textChanged()), this,
-                       SLOT(onFreeTextChanged()));
-  ret = ret && connect(m_imgPathField, SIGNAL(pathChanged()), this,
-                       SLOT(onImgPathChanged()));
+                            SLOT(onNameEdited()));
+  ret      = ret && connect(m_maxFontSizeEdit, SIGNAL(editingFinished()), this,
+                            SLOT(onMaxFontSizeEdited()));
+  ret      = ret && connect(m_typeCombo, SIGNAL(activated(int)), this,
+                            SLOT(onTypeComboActivated(int)));
+  ret      = ret && connect(m_textEdit, SIGNAL(textChanged()), this,
+                            SLOT(onFreeTextChanged()));
+  ret      = ret && connect(m_imgPathField, SIGNAL(pathChanged()), this,
+                            SLOT(onImgPathChanged()));
   ret = ret && connect(m_fontCombo, SIGNAL(currentFontChanged(const QFont&)),
                        this, SLOT(onFontComboChanged(const QFont&)));
   ret = ret && connect(m_boldButton, SIGNAL(clicked(bool)), this,
@@ -698,15 +722,15 @@ ItemListView::ItemListView(QWidget* parent) : QWidget(parent) {
 
   bool ret = true;
   ret      = ret && connect(m_list, SIGNAL(currentRowChanged(int)), this,
-                       SLOT(onCurrentItemSwitched(int)));
-  ret = ret && connect(newItemBtn, SIGNAL(clicked(bool)), this,
-                       SLOT(onNewItemButtonClicked()));
-  ret = ret && connect(m_deleteItemBtn, SIGNAL(clicked(bool)), this,
-                       SLOT(onDeleteItemButtonClicked()));
-  ret = ret && connect(m_moveUpBtn, SIGNAL(clicked(bool)), this,
-                       SLOT(onMoveUpButtonClicked()));
-  ret = ret && connect(m_moveDownBtn, SIGNAL(clicked(bool)), this,
-                       SLOT(onMoveDownButtonClicked()));
+                            SLOT(onCurrentItemSwitched(int)));
+  ret      = ret && connect(newItemBtn, SIGNAL(clicked(bool)), this,
+                            SLOT(onNewItemButtonClicked()));
+  ret      = ret && connect(m_deleteItemBtn, SIGNAL(clicked(bool)), this,
+                            SLOT(onDeleteItemButtonClicked()));
+  ret      = ret && connect(m_moveUpBtn, SIGNAL(clicked(bool)), this,
+                            SLOT(onMoveUpButtonClicked()));
+  ret      = ret && connect(m_moveDownBtn, SIGNAL(clicked(bool)), this,
+                            SLOT(onMoveDownButtonClicked()));
   assert(ret);
 }
 
@@ -851,12 +875,15 @@ BoardSettingsPopup::BoardSettingsPopup(QWidget* parent)
   m_itemInfoView = new ItemInfoView(this);
   m_itemListView = new ItemListView(this);
 
-  m_durationEdit = new DVGui::IntLineEdit(this, 1, 0);
+  m_durationEdit      = new DVGui::IntLineEdit(this, 1, 0);
+  m_fileNameSuffixFld = new DVGui::LineEdit(this);
 
   QPushButton* loadPresetBtn =
       new QPushButton(createQIcon("load"), tr("Load Preset"), this);
   QPushButton* savePresetBtn =
       new QPushButton(createQIcon("saveas"), tr("Save as Preset"), this);
+  m_exportBoardBtn = new QPushButton(createQIcon("export_scene"),
+                                     tr("Export Board Image"), this);
 
   QPushButton* closeButton = new QPushButton(tr("Close"), this);
 
@@ -879,8 +906,14 @@ BoardSettingsPopup::BoardSettingsPopup(QWidget* parent)
 
         leftTopLay->addSpacing(10);
 
+        leftTopLay->addWidget(new QLabel(tr("File Name Suffix:"), this), 0);
+        leftTopLay->addWidget(m_fileNameSuffixFld, 0);
+
+        leftTopLay->addSpacing(10);
+
         leftTopLay->addWidget(loadPresetBtn, 0);
         leftTopLay->addWidget(savePresetBtn, 0);
+        leftTopLay->addWidget(m_exportBoardBtn, 0);
 
         leftTopLay->addStretch(1);
       }
@@ -912,11 +945,15 @@ BoardSettingsPopup::BoardSettingsPopup(QWidget* parent)
                        SLOT(onItemPropertyChanged(bool)));
   ret = ret && connect(m_durationEdit, SIGNAL(editingFinished()), this,
                        SLOT(onDurationEdited()));
+  ret = ret && connect(m_fileNameSuffixFld, SIGNAL(editingFinished()), this,
+                       SLOT(onFileNameSuffixEdited()));
   ret = ret && connect(closeButton, SIGNAL(pressed()), this, SLOT(close()));
   ret = ret &&
         connect(loadPresetBtn, SIGNAL(pressed()), this, SLOT(onLoadPreset()));
   ret = ret &&
         connect(savePresetBtn, SIGNAL(pressed()), this, SLOT(onSavePreset()));
+  ret = ret && connect(m_exportBoardBtn, SIGNAL(pressed()), this,
+                       SLOT(onExportBoardImage()));
 
   assert(ret);
 }
@@ -928,6 +965,11 @@ void BoardSettingsPopup::initialize() {
   BoardSettings* boardSettings = outProp->getBoardSettings();
 
   m_durationEdit->setValue(boardSettings->getDuration());
+  m_fileNameSuffixFld->setText(boardSettings->fileNameSuffix());
+  if (isMovieType(outProp->getPath().getType())) {
+    m_fileNameSuffixFld->setDisabled(true);
+    m_exportBoardBtn->setDisabled(true);
+  }
 
   m_itemListView->initialize();
 
@@ -990,6 +1032,25 @@ void BoardSettingsPopup::onDurationEdited() {
   BoardSettings* boardSettings = outProp->getBoardSettings();
 
   boardSettings->setDuration(m_durationEdit->getValue());
+
+  m_boardView->update();
+}
+
+void BoardSettingsPopup::onFileNameSuffixEdited() {
+  ToonzScene* scene = TApp::instance()->getCurrentScene()->getScene();
+  if (!scene) return;
+  TOutputProperties* outProp   = scene->getProperties()->getOutputProperties();
+  BoardSettings* boardSettings = outProp->getBoardSettings();
+
+  if (m_fileNameSuffixFld->text().isEmpty()) {
+    DVGui::warning(tr("File name suffix can't be empty."));
+    m_fileNameSuffixFld->setText(boardSettings->fileNameSuffix());
+    m_fileNameSuffixFld->setFocus();
+    m_fileNameSuffixFld->selectAll();
+    return;
+  }
+
+  boardSettings->setFileNameSuffix(m_fileNameSuffixFld->text());
 
   m_boardView->update();
 }
@@ -1059,6 +1120,114 @@ void BoardSettingsPopup::onSavePreset() {
   }
 }
 
+void BoardSettingsPopup::onExportBoardImage() {
+  QImage boardImg = m_boardView->boardImage();
+  if (boardImg.isNull()) {
+    DVGui::warning(tr("There is no board image to export."));
+    return;
+  }
+
+  SaveBoardImagePopup popup;
+
+  // initialize the default path every time
+  TOutputProperties* op = TApp::instance()
+                              ->getCurrentScene()
+                              ->getScene()
+                              ->getProperties()
+                              ->getOutputProperties();
+  BoardSettings* boardSettings = op->getBoardSettings();
+  popup.setFolder(TApp::instance()
+                      ->getCurrentScene()
+                      ->getScene()
+                      ->decodeFilePath(op->getPath())
+                      .getParentDir());
+
+  TFilePath rendPath = op->getPath();
+  QString baseName   = QString::fromStdString(rendPath.getName());
+  if (baseName.isEmpty())
+    baseName = QString::fromStdString(TApp::instance()
+                                          ->getCurrentScene()
+                                          ->getScene()
+                                          ->getScenePath()
+                                          .getName());
+
+  QString levelName = QString::fromStdString(rendPath.getLevelName());
+  int dotPos        = levelName.lastIndexOf('.');
+
+  QString fileName = baseName + rendPath.getSepChar() +
+                     boardSettings->fileNameSuffix() +
+                     levelName.right(levelName.size() - dotPos);
+
+  popup.setFilename(TFilePath(fileName));
+
+  TFilePath fp = popup.getPath();
+
+  QStringList formats;
+  TLevelWriter::getSupportedFormats(formats, true);
+  Tiio::Writer::getSupportedFormats(formats, true);
+
+  ToonzScene* scene = TApp::instance()->getCurrentScene()->getScene();
+  TOutputProperties* outputSettings =
+      scene->getProperties()->getOutputProperties();
+
+  std::string ext = fp.getType();
+
+  if (ext == "") {
+    ext = outputSettings->getPath().getType();
+    fp  = fp.withType(ext);
+  }
+  if (fp.getName() == "") {
+    return;
+  }
+
+  if (!formats.contains(QString::fromStdString(ext))) {
+    DVGui::warning(
+        tr("It is not possible to save because the selected file format is not "
+           "supported."));
+    return;
+  }
+
+  fp          = scene->decodeFilePath(fp);
+  bool exists = TFileStatus(fp.getParentDir()).doesExist();
+  if (!exists) {
+    try {
+      TFilePath parent = fp.getParentDir();
+      TSystem::mkDir(parent);
+      DvDirModel::instance()->refreshFolder(parent.getParentDir());
+    } catch (TException& e) {
+      DVGui::error("Cannot create " + toQString(fp.getParentDir()) + " : " +
+                   QString(::to_string(e.getMessage()).c_str()));
+      return;
+    } catch (...) {
+      DVGui::error("Cannot create " + toQString(fp.getParentDir()));
+      return;
+    }
+  }
+
+  if (TSystem::doesExistFileOrLevel(fp)) {
+    QString question(tr("File %1 already exists.\nDo you want to overwrite it?")
+                         .arg(toQString(fp)));
+    int ret = DVGui::MsgBox(question, QObject::tr("Overwrite"),
+                            QObject::tr("Cancel"));
+    if (ret == 2) return;
+  }
+
+  try {
+    TImageWriterP iw(fp);
+    iw->setProperties(outputSettings->getFileFormatProperties(fp.getType()));
+
+    TRaster32P raster(boardImg.width(), boardImg.height());
+    convertImageToRaster(raster, boardImg.mirrored(true, true));
+
+    TRasterImageP ri(raster);
+
+    iw->save(ri);
+  } catch (...) {
+    DVGui::error("It is not possible to export Clapperboard image.");
+    return;
+  }
+}
+
 //=============================================================================
 
 SaveBoardPresetFilePopup::SaveBoardPresetFilePopup()
@@ -1083,4 +1252,14 @@ LoadBoardPresetFilePopup::LoadBoardPresetFilePopup()
 void LoadBoardPresetFilePopup::showEvent(QShowEvent* e) {
   FileBrowserPopup::showEvent(e);
   setFolder(ToonzFolder::getLibraryFolder() + "clapperboards");
+}
+
+//=============================================================================
+
+SaveBoardImagePopup::SaveBoardImagePopup()
+    : GenericSaveFilePopup(tr("Export Board Image")) {
+  m_browser->enableGlobalSelection(false);
+  QStringList formats;
+  Tiio::Writer::getSupportedFormats(formats, true);
+  setFilterTypes(formats);
 }
