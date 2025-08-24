@@ -82,14 +82,8 @@ public:
 
 #else
 
-class DVAPI Mutex final : public QMutex {
-public:
-  Mutex() : QMutex(QMutex::Recursive) {}
+class DVAPI Mutex final : public QRecursiveMutex {
 
-private:
-  // not implemented
-  Mutex(const Mutex &);
-  Mutex &operator=(const Mutex &);
 };
 
 typedef QMutexLocker MutexLocker;

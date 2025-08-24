@@ -40,7 +40,7 @@ private:
 
 namespace {
 
-QMutex l_mutex(QMutex::Recursive);  // A mutex is needed to synchronize access
+QRecursiveMutex l_mutex;  // A mutex is needed to synchronize access
                                     // to the following objects
 
 std::map<int, TexturesContainer *>

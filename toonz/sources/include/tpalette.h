@@ -200,7 +200,7 @@ private:
   std::vector<TFrameId> m_refLevelFids;
 
   bool m_dirtyFlag;  //!< Whether the palette changed and needs to be refreshed.
-  QMutex m_mutex;    //!< Synchronization mutex for multithreading purposes.
+  QRecursiveMutex m_mutex;    //!< Synchronization mutex for multithreading purposes.
 
   bool m_isLocked;          //!< Whether the palette is locked.
   bool m_askOverwriteFlag;  //!< This variable is quite unique. This flag is to
@@ -415,7 +415,7 @@ between RGBA color components.
     return m_paletteName;
   }  //!< Returns the name of the palette.
 
-  QMutex *mutex() { return &m_mutex; }  //!< Returns the palette's mutex
+  QRecursiveMutex *mutex() { return &m_mutex; }  //!< Returns the palette's mutex
 
   bool isLocked() const {
     return m_isLocked;
