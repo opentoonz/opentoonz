@@ -56,7 +56,7 @@ void clear();*/
   class ResourcesContainer;
 
 private:
-  QMutex m_mutex;
+  QRecursiveMutex m_mutex;
 
   std::vector<FxData> m_fxDataVector;
   std::set<std::string> m_invalidatedLevels;
