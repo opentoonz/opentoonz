@@ -88,6 +88,7 @@ public:
   void paste();
 
   void removeEndpoints();
+  void sortWithPaletteOrder();
 
   void enableCommands() override;
 
