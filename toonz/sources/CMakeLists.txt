@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.11)
+cmake_minimum_required(VERSION 2.8.11...4.0)
 
 set(CMAKE_BUILD_TYPE_INIT Release)
 
@@ -8,7 +8,11 @@ project(OpenToonz)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 message(STATUS "C++ standard: ${CMAKE_CXX_STANDARD}")
-
+# Set C to 99 or sources/image/tzp/avl.c will not compile anymore for newer
+# compilers and libraries
+set(CMAKE_C_STANDARD 99)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+message(STATUS "C standard: ${CMAKE_C_STANDARD}")
 #-----------------------------------------------------------------------------
 # Platform Specific Defaults
 
@@ -206,7 +210,7 @@ elseif(BUILD_ENV_APPLE)
     endif()
 elseif(BUILD_ENV_UNIXLIKE)
     # Needed for correct Qt detection
-    cmake_minimum_required(VERSION 2.8.12)
+    cmake_minimum_required(VERSION 2.8.12...4.0)
     set(PRELOAD_VARIABLE "LD_LIBRARY_PATH")
     if(CMAKE_SYSTEM_NAME MATCHES "Linux")
         add_definitions(-DLINUX)
