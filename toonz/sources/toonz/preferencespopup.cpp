@@ -1434,7 +1434,9 @@ QList<ComboBoxItem> PreferencesPopup::getComboItemList(
         {tr("Scene Folder Alias ($scenefolder)"),
          Preferences::SceneFolderAlias},
         {tr("Use Project Folder Aliases Only"),
-         Preferences::ProjectFolderOnly}}},
+         Preferences::ProjectFolderOnly},
+        {tr("Automatic by Scene"),
+         Preferences::AutoByScene}}},
       {linearUnits,  // cameraUnits shares items with linearUnits
        {{tr("cm"), "cm"},
         {tr("mm"), "mm"},
@@ -1669,6 +1671,12 @@ QWidget* PreferencesPopup::createGeneralPage() {
          "$scenefolder as well.");
   pathAliasPriorityCB->setItemData(1, scenefolderTooltip, Qt::ToolTipRole);
   pathAliasPriorityCB->setItemData(2, QString(" "), Qt::ToolTipRole);
+  QString autoBySceneToolTip =
+      tr("Automatically sets folder based on scene type:\n"
+          "Standalone -> $scenefolder\n"
+          "Project -> project folder aliases (+drawing...)");
+  pathAliasPriorityCB->setItemData(3, autoBySceneToolTip, Qt::ToolTipRole);
+
 
   m_onEditedFuncMap.insert(autosaveEnabled,
                            &PreferencesPopup::onAutoSaveChanged);

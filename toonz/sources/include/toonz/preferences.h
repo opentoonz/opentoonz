@@ -103,7 +103,8 @@ public:
   enum PathAliasPriority {
     ProjectFolderAliases = 0,
     SceneFolderAlias,
-    ProjectFolderOnly
+    ProjectFolderOnly,
+    AutoByScene
   };
 
   enum FunctionEditorToggle {
