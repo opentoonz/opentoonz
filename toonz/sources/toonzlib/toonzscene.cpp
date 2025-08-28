@@ -1353,7 +1353,8 @@ TFilePath ToonzScene::codeFilePath(const TFilePath &path) const {
 
   Preferences::PathAliasPriority priority =
       Preferences::instance()->getPathAliasPriority();
-  if (priority == Preferences::SceneFolderAlias &&
+  if ((priority == Preferences::SceneFolderAlias ||
+       (m_standAlone && priority == Preferences::AutoByScene)) &&
       codeFilePathWithSceneFolder(fp)) {
     return fp;
   }
@@ -1415,8 +1416,10 @@ TFilePath ToonzScene::getDefaultLevelPath(int levelType,
     levelPath = TFilePath(levelName + L"..png");
   }
 
-  if (!isUntitled() && Preferences::instance()->getPathAliasPriority() ==
-                           Preferences::SceneFolderAlias)
+  Preferences::PathAliasPriority priority =
+      Preferences::instance()->getPathAliasPriority();
+  if (!isUntitled() && (priority == Preferences::SceneFolderAlias ||
+                        (m_standAlone && priority == Preferences::AutoByScene)))
     return TFilePath("$scenefolder") + levelPath;
 
   std::string folderName = getFolderName(levelType);
