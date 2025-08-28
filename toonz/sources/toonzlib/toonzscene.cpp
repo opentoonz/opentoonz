@@ -1275,7 +1275,6 @@ TFilePath ToonzScene::decodeFilePath(const TFilePath &path) const {
       if (project) {
         h           = ::to_string(head.substr(1));
         TFilePath f = project->getFolder(h);
-        if (isLonelyScene()) return m_scenePath.getParentDir() + f + tail;
         if (f != TFilePath()) s = f.getWideString();
       }
     }
@@ -1380,11 +1379,6 @@ bool ToonzScene::codeFilePathWithSceneFolder(TFilePath &path) const {
   return false;
 }
 
-bool ToonzScene::isLonelyScene() const {
-  TFilePath sceneFolderPath = getProject()->getFolder("scenes", true);
-  return !sceneFolderPath.isAncestorOf(m_scenePath) && !isUntitled();
-}
-
 //-----------------------------------------------------------------------------
 
 TFilePath ToonzScene::getDefaultLevelPath(int levelType,
@@ -1413,14 +1407,11 @@ TFilePath ToonzScene::getDefaultLevelPath(int levelType,
     levelPath = TFilePath(levelName + L"..png");
   }
 
-  // In case scene is loaded from outside
   if (!isUntitled() && Preferences::instance()->getPathAliasPriority() ==
                            Preferences::SceneFolderAlias)
     return TFilePath("$scenefolder") + levelPath;
 
   std::string folderName = getFolderName(levelType);
-  if (!isUntitled() && isLonelyScene())
-    return TFilePath("$scenefolder") + TFilePath(folderName) + levelPath;
 
   if (project->getUseScenePath(folderName))
     return TFilePath("+" + folderName) + getSavePath() + levelPath;
