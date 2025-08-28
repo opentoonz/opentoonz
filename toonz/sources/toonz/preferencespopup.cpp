@@ -1680,6 +1680,10 @@ QWidget* PreferencesPopup::createGeneralPage() {
                            &PreferencesPopup::onWatchFileSystemClicked);
 
   bool ret = true;
+
+  ret = ret && connect(pathAliasPriorityCB, SIGNAL(currentIndexChanged(int)),
+      this, SLOT(onPathAliasPriorityChanged()));
+
   ret      = ret && connect(m_pref, SIGNAL(stopAutoSave()), this,
                             SLOT(onAutoSaveExternallyChanged()));
   ret      = ret && connect(m_pref, SIGNAL(startAutoSave()), this,

@@ -124,7 +124,6 @@ private:
   void onAutoSaveChanged();
   void onAutoSaveOptionsChanged();
   void onWatchFileSystemClicked();
-  void onPathAliasPriorityChanged();
   // Interface
   void onStyleSheetTypeChanged();
   void onPixelsOnlyChanged();
@@ -161,6 +160,7 @@ private:
 private slots:
   void onChange();
   void onColorFieldChanged(const TPixel32&, bool);
+  void onPathAliasPriorityChanged();
 
   void onAutoSaveExternallyChanged();
   void onAutoSavePeriodExternallyChanged();
