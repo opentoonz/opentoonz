@@ -318,6 +318,14 @@ void ToonzScene::clear() {
 void ToonzScene::setProject(std::shared_ptr<TProject> project) {
   assert(project);
   m_project = project;
+  m_standAlone = true;
+  for (int i = 0; i < project->getFolderCount(); i++) {
+    if (project->getFolder(project->getFolderName(i), true)
+            .isAncestorOf(m_scenePath)) {
+      m_standAlone = false;
+      break;
+    };
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -328,7 +336,7 @@ std::shared_ptr<TProject> ToonzScene::getProject() const { return m_project; }
 
 void ToonzScene::setScenePath(const TFilePath &fp, bool changeToTitled) {
   m_scenePath = fp;
-  if(changeToTitled)m_isUntitled = false;
+  if (changeToTitled) m_isUntitled = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -389,10 +397,10 @@ void ToonzScene::loadNoResources(const TFilePath &fp) {
   auto sceneProject   = pm->loadSceneProject(fp);
   if (!sceneProject) return;
 
-  setProject(sceneProject);
-
   loadTnzFile(fp);
   getXsheet()->updateFrameCount();
+
+  setProject(sceneProject);
 }
 
 //-----------------------------------------------------------------------------

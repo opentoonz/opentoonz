@@ -77,7 +77,7 @@ public:
   bool isUntitled()
       const;  //!< Returns whether the scene path is empty, or the scene
               //!  is explicitly untitled.  \sa  Member function setUntitled().
-
+  
   TXsheet *getXsheet()
       const;  //!< Returns a pointer to the scene's \a current xsheet.
   TXsheet *getTopXsheet() const;  //!< Returns the \a topmost xsheet in the
@@ -275,6 +275,9 @@ private:
   TContentHistory *m_contentHistory;
   bool m_isUntitled;              //!< Whether the scene is untitled.
                                   //!  \sa  The setUntitled() member function.
+  bool m_standAlone;			  //!< Whether the scene is stand-alone 
+                                  //(not in a project folder with scenes.xml inside).
+
   VersionNumber m_versionNumber;  // last saved scene file version. Note that
                                   // currently it is not match with OT version.
                                   // TODO: Revise VersionNumber with OT version
