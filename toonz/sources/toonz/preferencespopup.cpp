@@ -1686,11 +1686,10 @@ QWidget* PreferencesPopup::createGeneralPage() {
                            &PreferencesPopup::onAutoSaveOptionsChanged);
   m_onEditedFuncMap.insert(watchFileSystemEnabled,
                            &PreferencesPopup::onWatchFileSystemClicked);
+  m_onEditedFuncMap.insert(pathAliasPriority, 
+                           &PreferencesPopup::onPathAliasPriorityChanged);
 
   bool ret = true;
-
-  ret = ret && connect(pathAliasPriorityCB, SIGNAL(currentIndexChanged(int)),
-      this, SLOT(onPathAliasPriorityChanged()));
 
   ret      = ret && connect(m_pref, SIGNAL(stopAutoSave()), this,
                             SLOT(onAutoSaveExternallyChanged()));
