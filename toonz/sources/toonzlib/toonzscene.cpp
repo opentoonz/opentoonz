@@ -318,14 +318,6 @@ void ToonzScene::clear() {
 void ToonzScene::setProject(std::shared_ptr<TProject> project) {
   assert(project);
   m_project = project;
-  m_standAlone = true;
-  for (int i = 0; i < project->getFolderCount(); i++) {
-    if (project->getFolder(project->getFolderName(i), true)
-            .isAncestorOf(m_scenePath)) {
-      m_standAlone = false;
-      break;
-    };
-  }
 }
 
 //-----------------------------------------------------------------------------
@@ -393,9 +385,11 @@ int ToonzScene::loadFrameCount(const TFilePath &fp) {
 void ToonzScene::loadNoResources(const TFilePath &fp) {
   clear();
 
-  TProjectManager *pm = TProjectManager::instance();
-  auto sceneProject   = pm->loadSceneProject(fp);
+  TProjectManager *pm = TProjectManager::instance(); 
+  bool sceneStandAlone = false;
+  auto sceneProject   = pm->loadSceneProject(fp, &sceneStandAlone);
   if (!sceneProject) return;
+  if (sceneStandAlone) m_standAlone = true;
 
   loadTnzFile(fp);
   getXsheet()->updateFrameCount();
