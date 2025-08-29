@@ -1872,12 +1872,14 @@ bool IoCmd::loadScene(ToonzScene &scene, const TFilePath &scenePath,
 bool IoCmd::loadScene(const TFilePath &path, bool updateRecentFile,
                       bool checkSaveOldScene) {
   RenderingSuspender suspender;
-
+  
+  // - Check if old Scene saved
   if (checkSaveOldScene)
     if (!saveSceneIfNeeded(QApplication::tr("Load Scene"))) return false;
+
+  // - Check if the scenePath is valid
   assert(!path.isEmpty());
   TFilePath scenePath = path;
-  bool importScene    = false;
   bool isXdts         = scenePath.getType() == "xdts";
   if (scenePath.getType() == "") scenePath = scenePath.withType("tnz");
   if (scenePath.getType() != "tnz" && !isXdts) {
@@ -1889,6 +1891,7 @@ bool IoCmd::loadScene(const TFilePath &path, bool updateRecentFile,
   }
   if (!TSystem::doesExistFileOrLevel(scenePath)) return false;
 
+  // - Check if a .tmp file exists
   TFilePath scenePathTemp(scenePath.getWideString() +
                           QString(".tmp").toStdWString());
   if (TSystem::doesExistFileOrLevel(scenePathTemp)) {
@@ -1908,6 +1911,9 @@ bool IoCmd::loadScene(const TFilePath &path, bool updateRecentFile,
       TSystem::removeFileOrLevel(scenePathTemp);
   }
 
+  // - Try find the project of the scene if scenes.xml exist
+  // if the .xml doesn't exist, load scene as standalone scene
+  // belongs to sandbox project
   TProjectManager *pm = TProjectManager::instance();
   auto sceneProject = pm->loadSceneProject(scenePath);
   if (!sceneProject) {
@@ -1920,15 +1926,9 @@ bool IoCmd::loadScene(const TFilePath &path, bool updateRecentFile,
     DVGui::warning(msg);
   }
   if (sceneProject && !sceneProject->isCurrent()) {
-    QString currentProjectName = QString::fromStdWString(
-        pm->getCurrentProject()->getName().getWideString());
     QString sceneProjectName =
         QString::fromStdWString(sceneProject->getName().getWideString());
 
-    /*QString question = "The Scene '"
-            + QString::fromStdWString(scenePath.getWideString())
-+ "' belongs to project '" + sceneProjectName + "'.\n"
-+ "What do you want to do?";*/
     QString question =
         QObject::tr(
             "The Scene '%1' belongs to project '%2'.\nWhat do you want to do?")
@@ -1945,9 +1945,11 @@ bool IoCmd::loadScene(const TFilePath &path, bool updateRecentFile,
     }
     if (ret == 2)
       pm->setCurrentProjectPath(sceneProject->getProjectPath());
-    else
-      importScene = true;
+    // else importScene = true;
+    // Import Scene Later because of difference of currentProject and sceneProject
   }
+  
+  // - Start to load scene
   QApplication::setOverrideCursor(Qt::WaitCursor);
 
   TApp *app = TApp::instance();
