@@ -1581,7 +1581,7 @@ void GeometricTool::addStroke() {
   TStroke *stroke = 0;
   if (!m_isRotatingOrMoving) {
     stroke = m_primitive->makeStroke();
-    if (!stroke) return;
+    if (!stroke) return; // Exit if stroke is null
 
     if (m_param.m_rotate.getValue()) {
       m_isRotatingOrMoving = true;
@@ -1614,6 +1614,8 @@ void GeometricTool::addStroke() {
     m_isRotatingOrMoving = false;
     m_rotatedStroke      = 0;
   }
+
+  if (!stroke) return; // Add null check here
 
   TStroke::OutlineOptions &options = stroke->outlineOptions();
   options.m_capStyle               = m_param.m_capStyle.getIndex();
@@ -2623,8 +2625,15 @@ void LinePrimitive::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
   else
     m_vertex.push_back(newPos);
 
-  endLine();
+  // Check if vertices are valid and distinct before calling endLine
+  if (m_vertex.size() < 2 || m_vertex[0] == m_vertex[1]) {
+    m_vertex.clear();
+    m_isEditing = false;
+    resetSnap();
+    return;
+  }
 
+  endLine();
   resetSnap();
 }
 //-----------------------------------------------------------------------------

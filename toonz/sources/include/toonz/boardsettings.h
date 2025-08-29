@@ -111,6 +111,7 @@ public:
 class DVAPI BoardSettings {
   bool m_active  = false;
   int m_duration = 0;
+  QString m_fileNameSuffix;
   QList<BoardItem> m_items;
 
 public:
@@ -129,6 +130,9 @@ public:
   BoardItem& getItem(int index) { return m_items[index]; }
 
   void setDuration(int f) { m_duration = f; }
+
+  const QString fileNameSuffix() { return m_fileNameSuffix; }
+  void setFileNameSuffix(const QString val) { m_fileNameSuffix = val; }
 
   void addNewItem(int insertAt = 0);
   void removeItem(int index);

@@ -1,62 +1,67 @@
 name: Bug report
-description: File a bug report to help us improve
+description: Help us improve by reporting a bug.
 body:
   - type: markdown
     attributes:
       value: |
-        Please search existing issues before posting to avoid creating duplicates.
-        As issues are resolved they are incorporated into the latest nightly release.
-        We urge use of the latest nightly build with current bug fixes before making a report. 
-        You can find the latest build [here](https://github.com/opentoonz/opentoonz_nightlies/releases).
+        ⚠️ **Before you start:**
+        - Check for [existing issues](https://github.com/opentoonz/opentoonz/issues?q=is%3Aopen+is%3Aissue) to avoid duplicates.
+        - Try the latest [nightly build](https://github.com/opentoonz/opentoonz_nightlies/releases) — many bugs are fixed there.
+        - Update your GPU and tablet drivers if you're seeing visual or input issues.
 
-        A good source to review will be reports labeled as 'known issue':  [Link](https://github.com/opentoonz/opentoonz/issues?q=is%3Aopen+is%3Aissue+label%3A%22known+issue%22).
-
-        Note that while all bug reports are appreciated failing to supply basic information on what was being done at the time will generally lead to closure
-        of the report due to lack of actionable information sufficient to troubleshoot the problem.
-        A useful report will contain more than automated bug reporting data compiled by the program.
+        Reports missing key details may be closed if we can't reproduce the problem. Help us help you!
         
-                
   - type: textarea
     attributes:
-      label: Description
-      placeholder: Please write a clear and concise description of what the bug is.
+      label: What's the bug?
+      placeholder: Briefly describe what went wrong.
     validations:
       required: true
+
   - type: textarea
     attributes:
       label: Steps to Reproduce
-      description: We are much more likely to fix your problem if you can provide clear steps for us to reproduce it.
+      description: Tell us how to make the bug happen. Numbered steps are ideal!
       value: |
         1. 
         2. 
+        3.
+    validations:
+      required: false
+
   - type: textarea
     attributes:
-      label: Expected Behavior
-      placeholder: A clear and concise description of what you expected to happen.
+      label: What did you expect to happen?
+      placeholder: Describe what you thought should have happened instead.
+
   - type: textarea
     attributes:
-      label: Screenshots, Video & Crash Logs
-      placeholder: Include any screenshots, video or crash logs that helps illustrate your problem here.
+      label: Screenshots, Videos or Crash Logs
+      placeholder: Paste links or drag files here.
+
   - type: markdown
     attributes:
       value: |
-        ## System Information
+        ## System Info
+
   - type: dropdown
     attributes:
       label: OpenToonz Version
-      description: You can find version information from the main menu bar [Help > About] within the software.
+      description: Found in Help > About.
       multiple: false
       options:
         - 1.7
         - 1.6
-        - Nightly (Specify below)
-        - Other (Specify below)
+        - Nightly (specify below)
+        - Other (specify below)
     validations:
       required: true
+
   - type: input
     attributes:
-      label: OpenToonz Version Information
-      placeholder: Ex. built Mar 25 2016
+      label: Exact Version Info (optional)
+      placeholder: e.g. built Mar 25 2016, commit hash, etc.
+
   - type: dropdown
     attributes:
       label: Operating System
@@ -68,10 +73,11 @@ body:
         - Other
     validations:
       required: true
+
   - type: dropdown
     attributes:
-      label: GPU
-      description: Please check that your graphics drivers are up to date before posting.
+      label: GPU Brand
+      description: Check that your graphics drivers are up to date.
       multiple: false
       options:
         - NVIDIA
@@ -80,10 +86,11 @@ body:
         - Other
     validations:
       required: true
+
   - type: dropdown
     attributes:
       label: Graphics Tablet
-      description: If your problem relates to pen input please check that your graphics tablet drivers are up to date before posting.
+      description: If you're reporting a pen/tablet issue, choose your brand.
       multiple: false
       options:
         - Wacom
@@ -95,8 +102,4 @@ body:
         - Monoprice
         - Parblo
         - Other
-  - type: markdown
-    attributes:
-      value: |
-        ---
-        Thank you for taking the time to fill out this bug report!
+        - Not using one
