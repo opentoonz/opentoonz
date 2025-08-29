@@ -57,8 +57,10 @@ public:
   void setRaster(const TRasterCM32P &ras) { m_raster = ras; }
   void setStyle(int styleId) { m_styleId = styleId; }
   int getStyleId() const { return m_styleId; }
+  int getSelectedStyleId() const { return m_selectedStyle; };
   bool isSelective() { return m_selective; }
   bool isAlphaLocked() { return m_modifierLockAlpha; }
+  bool isKeepAntiAlias() { return m_keepAntiAlias; }
 
   bool isPaletteOrder() { return m_isPaletteOrder; }
   void setAboveStyleIds(QSet<int> &ids) { m_aboveStyleIds = ids; }

@@ -48,6 +48,7 @@ using namespace ToolUtils;
 
 TEnv::StringVar PaintBrushColorType("InknpaintPaintBrushColorType", "Areas");
 TEnv::IntVar PaintBrushSelective("InknpaintPaintBrushSelective", 0);
+TEnv::IntVar PaintBrushEmptyOnly("InknpaintPaintBrushEmptyOnly", 0);
 TEnv::DoubleVar PaintBrushSize("InknpaintPaintBrushSize", 10);
 TEnv::IntVar PaintBrushModifierLockAlpha("PaintBrushModifierLockAlpha", 0);
 TEnv::IntVar PaintBrushPick("PaintBrushPick", 0);
@@ -64,27 +65,33 @@ namespace {
 class BrushUndo final : public TRasterUndo {
   std::vector<TThickPoint> m_points;
   int m_styleId;
-  bool m_selective;
+  int m_pickStyleId;
+  bool m_emptyOnly;
   ColorType m_colorType;
   bool m_modifierLockAlpha;
+  bool m_selective;
+  bool m_fillMode;
 
 public:
   BrushUndo(TTileSetCM32 *tileSet, const std::vector<TThickPoint> &points,
-            ColorType colorType, int styleId, bool selective,
-            TXshSimpleLevel *level, const TFrameId &frameId, bool lockAlpha)
+            ColorType colorType, int styleId, int pickStyleId, bool selective, bool emptyOnly,
+            TXshSimpleLevel *level, const TFrameId &frameId, bool lockAlpha, bool fillMode)
       : TRasterUndo(tileSet, level, frameId, false, false, 0)
       , m_points(points)
       , m_styleId(styleId)
+      , m_pickStyleId(pickStyleId)
       , m_selective(selective)
+      , m_emptyOnly(emptyOnly)
       , m_colorType(colorType)
-      , m_modifierLockAlpha(lockAlpha) {}
+      , m_modifierLockAlpha(lockAlpha),
+      m_fillMode(fillMode){}
 
   void redo() const override {
     TToonzImageP image = m_level->getFrame(m_frameId, true);
     TRasterCM32P ras   = image->getRaster();
     RasterStrokeGenerator m_rasterTrack(ras, PAINTBRUSH, m_colorType, m_styleId,
-                                        m_points[0], m_selective, 0,
-                                        m_modifierLockAlpha, false);
+                                        m_points[0], m_selective, m_pickStyleId,
+                                        m_modifierLockAlpha, m_fillMode, m_emptyOnly);
     m_rasterTrack.setPointsSequence(m_points);
     m_rasterTrack.generateStroke(true);
     image->setSavebox(image->getSavebox() +
@@ -264,10 +271,12 @@ class PaintBrushTool final : public TTool {
   TPointD m_mousePos;
 
   TIntProperty m_toolSize;
-  TBoolProperty m_selective;
+  TBoolProperty m_emptyOnly;
   TEnumProperty m_colorType;
   TBoolProperty m_pick;
   TBoolProperty m_fillingMode;
+  TBoolProperty m_selective;
+
   TPropertyGroup m_prop;
   int m_cursor;
   ColorType m_colorTypeBrush;
@@ -338,6 +347,7 @@ PaintBrushTool::PaintBrushTool()
     , m_toolSize("Size:", 1, 1000, 10, false)  // W_ToolOptions_BrushToolSize
     , m_colorType("Mode:")                     // W_ToolOptions_InkOrPaint
     , m_selective("Selective", false)          // W_ToolOptions_Selective
+    , m_emptyOnly("Empty Only", false)
     , m_firstTime(true)
     , m_workingFrameId(TFrameId())
     , m_modifierLockAlpha("Lock Alpha", false)
@@ -353,16 +363,18 @@ PaintBrushTool::PaintBrushTool()
 
   m_prop.bind(m_toolSize);
   m_prop.bind(m_colorType);
-  m_prop.bind(m_selective);
+  m_prop.bind(m_emptyOnly);
   m_prop.bind(m_modifierLockAlpha);
   m_prop.bind(m_pick);
   m_prop.bind(m_fillingMode);
+  m_prop.bind(m_selective);
 
-  m_selective.setId("Selective");
+  m_emptyOnly.setId("EmptyOnly");
   m_colorType.setId("Mode");
   m_modifierLockAlpha.setId("LockAlpha");
   m_pick.setId("Pick");
   m_fillingMode.setId("FillingMode");
+  m_selective.setId("Selective");
 }
 
 //-----------------------------------------------------------------------------
@@ -376,6 +388,7 @@ void PaintBrushTool::updateTranslation() {
   m_colorType.setItemUIName(ALL, tr("Lines & Areas"));
 
   m_selective.setQStringName(tr("Selective", NULL));
+  m_emptyOnly.setQStringName(tr("Empty Only", NULL));
   m_modifierLockAlpha.setQStringName(tr("Lock Alpha"));
   m_pick.setQStringName(tr("Pick"));
   m_fillingMode.setQStringName(tr("Paint by Filling"));
@@ -470,6 +483,23 @@ bool PaintBrushTool::onPropertyChanged(std::string propertyName) {
       m_pick.setValue(false);
       PaintBrushPick = 0;
     }
+    if (m_selective.getValue() && m_emptyOnly.getValue()) {
+        m_emptyOnly.setValue(false);
+        PaintBrushEmptyOnly = 0;
+    }
+  }
+
+  // EmptyOnly
+  else if (propertyName == m_emptyOnly.getName()) {
+      PaintBrushEmptyOnly = (int)(m_emptyOnly.getValue());
+      if (m_emptyOnly.getValue() && m_modifierLockAlpha.getValue()) {
+          m_modifierLockAlpha.setValue(false);
+          PaintBrushModifierLockAlpha = 0;
+      }
+      if (m_emptyOnly.getValue() && m_selective.getValue()) {
+          m_selective.setValue(false);
+          PaintBrushSelective = 0;
+      }
   }
 
   // Areas, Lines etc.
@@ -485,6 +515,10 @@ bool PaintBrushTool::onPropertyChanged(std::string propertyName) {
     if (m_modifierLockAlpha.getValue() && m_selective.getValue()) {
       m_selective.setValue(false);
       PaintBrushSelective = 0;
+    }
+    if (m_modifierLockAlpha.getValue() && m_emptyOnly.getValue()) {
+        m_emptyOnly.setValue(false);
+        PaintBrushEmptyOnly = 0;
     }
   }
 
@@ -537,7 +571,7 @@ void PaintBrushTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
           ras, PAINTBRUSH, m_colorTypeBrush, styleId,
           TThickPoint(m_mousePos + convert(ras->getCenter()), thickness),
           m_selective.getValue(), pickedStyle, m_modifierLockAlpha.getValue(),
-          m_fillingMode.getValue());
+          m_fillingMode.getValue(), m_emptyOnly.getValue());
       /*-- 現在のFidを記憶 --*/
       m_workingFrameId = getFrameId();
       m_tileSaver->save(m_rasterTrack->getLastRect());
@@ -594,6 +628,7 @@ void PaintBrushTool::mouseMove(const TPointD &pos, const TMouseEvent &e) {
 
 void PaintBrushTool::onEnter() {
   if (m_firstTime) {
+    m_emptyOnly.setValue(PaintBrushEmptyOnly ? 1 : 0);
     m_selective.setValue(PaintBrushSelective ? 1 : 0);
     m_colorType.setValue(::to_wstring(PaintBrushColorType.getValue()));
     m_toolSize.setValue(PaintBrushSize);
@@ -658,9 +693,10 @@ void PaintBrushTool::finishBrush() {
 
       TUndoManager::manager()->add(new BrushUndo(
           m_tileSaver->getTileSet(), m_rasterTrack->getPointsSequence(),
-          m_colorTypeBrush, m_rasterTrack->getStyleId(),
-          m_rasterTrack->isSelective(), simLevel.getPointer(), frameId,
-          m_rasterTrack->isAlphaLocked()));
+          m_colorTypeBrush, m_rasterTrack->getStyleId(), m_rasterTrack->getSelectedStyleId(),
+          m_rasterTrack->isSelective(), m_rasterTrack->isPaletteOrder(),
+          simLevel.getPointer(), frameId,
+          m_rasterTrack->isAlphaLocked(),m_rasterTrack->isKeepAntiAlias()));
       ToolUtils::updateSaveBox();
 
       /*--- FIdを指定して、描画中にフレームが変わっても、

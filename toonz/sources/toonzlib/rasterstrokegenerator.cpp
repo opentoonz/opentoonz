@@ -205,13 +205,16 @@ void RasterStrokeGenerator::placeOver(const TRasterCM32P &out,
     auto isBoundary = [&](int x, int y) {
       if (!box3.contains(TPoint(x, y))) return true;
 
-      int toPaint = (rIn->pixels(y) + x)->getInk();
-      if (!m_selective && !toPaint) return true;
+      int toInk = (rIn->pixels(y) + x)->getInk();
+      if (!toInk) return true;
 
       TPixelCM32 *pix = rOut->pixels(y) + x;
       int paintIdx    = pix->getPaint();
-      return (m_selective && toPaint != m_selectedStyle && toPaint != m_styleId) ||
-             (m_modifierLockAlpha && toPaint == 0);
+      return paintIdx != m_styleId &&(
+          (m_selective && paintIdx != m_selectedStyle) ||
+          (m_modifierLockAlpha && paintIdx == 0) ||
+          (m_isPaletteOrder && paintIdx != 0) //EmptyOnly
+          );
     };
 
     while (!stack.empty()) {
@@ -250,9 +253,10 @@ void RasterStrokeGenerator::placeOver(const TRasterCM32P &out,
         if (!inPix->isPureInk()) continue;
 
         int paintIdx     = outPix->getPaint();
-        bool changePaint = (!m_selective && !m_modifierLockAlpha) ||
-                           (m_selective && paintIdx == m_selectedStyle) ||
-                           (m_modifierLockAlpha && paintIdx != 0);
+        bool changePaint = (!m_selective && !m_modifierLockAlpha && !m_isPaletteOrder) ||
+            (m_selective && paintIdx == m_selectedStyle) || // Selective
+            (m_modifierLockAlpha && paintIdx != 0) || // Lock Alpha
+            (m_isPaletteOrder && paintIdx == 0);// Empty Only
 
         if (changePaint)
           *outPix =
@@ -349,9 +353,10 @@ void RasterStrokeGenerator::placeOver(const TRasterCM32P &out,
         } else if (m_task == PAINTBRUSH) {
           if (!inPix->isPureInk()) continue;
           int paintIdx     = outPix->getPaint();
-          bool changePaint = (!m_selective && !m_modifierLockAlpha) ||
-                             (m_selective && paintIdx == m_selectedStyle) ||
-                             (m_modifierLockAlpha && paintIdx != 0);
+          bool changePaint = (!m_selective && !m_modifierLockAlpha && !m_isPaletteOrder) ||
+                             (m_selective && paintIdx == m_selectedStyle) || // Selective
+                             (m_modifierLockAlpha && paintIdx != 0) || // Lock Alpha
+                             (m_isPaletteOrder && paintIdx == 0);// Empty Only
           if (m_colorType == INK)
             *outPix = TPixelCM32(inPix->getInk(), outPix->getPaint(),
                                  outPix->getTone());
