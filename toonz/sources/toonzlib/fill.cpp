@@ -230,11 +230,11 @@ void fillRow(const TRasterCM32P &r, const TPoint &p, int &xa, int &xb,
 }
 
 struct extendSeed {
-  UINT xa;
+  UINT xa;  // Left Pixel of Normal Style
   UINT xb;
-  UINT xc;
+  UINT xc;  // Left Pixel of Auto-Paint Style
   UINT xd;
-  UINT y;
+  UINT y;  // Row highth
 };
 //-----------------------
 // This function getLine with a given direction
@@ -323,6 +323,8 @@ void extendInk2InkFill(const TRasterCM32P &r, const TPoint &p, bool right,
   int xx = p.x;
   int yy = p.y;
   int xc = xx, xd = yy;
+  assert((r->pixels(yy) + xx)->getInk() == paint);
+
   TPixelCM32 *pix;
   std::vector<extendSeed> seeds;
   auto extendAndFill = [&](const extendSeed &seed) {
@@ -342,12 +344,39 @@ void extendInk2InkFill(const TRasterCM32P &r, const TPoint &p, bool right,
     }
     return true;
   };
+  auto checkIfClosed = [&](const extendSeed &seed) -> bool {
+    // Check if leak
+    int tone, oldTone;
+    if (right) {
+      tone = (r->pixels(yy - dy) + seed.xb)->getTone();
+      if (tone == TPixelCM32::getMaxTone()) return false;
+      for (int x = seed.xb; x > seed.xd; x--) {
+        oldTone = tone;
+        tone    = (r->pixels(yy - dy) + x)->getTone();
+        if (tone <= oldTone) continue;
+        if (tone < (r->pixels(yy) + x)->getTone()) {
+          return false;
+        }
+      }
+    } else {
+      tone = (r->pixels(yy - dy) + seed.xa)->getTone();
+      if (tone == TPixelCM32::getMaxTone()) return false;
+      for (int x = seed.xa; x > seed.xc; x++) {
+        oldTone = tone;
+        tone    = (r->pixels(yy - dy) + x)->getTone();
+        if (tone <= oldTone) continue;
+        if (tone < (r->pixels(yy) + x)->getTone()) {
+          return false;
+        }
+      }
+    }
+    return true;
+  };
 
   bool areaClosed = false;
   while (maxLength > 0) {
-    if (xc < 0 || xd >= r->getLx()) break;
-    if (xx < 0 || xx >= r->getLx()) break;
-    if ((r->pixels(yy) + xx)->getInk() != paint) break;
+    if (xc < 0 || xd > r->getLx()) break;
+    if (xx < 0 || xx > r->getLx()) break;
     extendSeed seed;
     seed.y = yy;
     getRowInk2Ink(r, TPoint(xx, yy), seed, right, paint, maxLength, saver);
@@ -374,6 +403,14 @@ void extendInk2InkFill(const TRasterCM32P &r, const TPoint &p, bool right,
         if (pix->getInk() == paint && !pix->isPurePaint()) break;
       }
       xx = xc;
+    }
+
+    if ((r->pixels(yy) + xx)->getInk() != paint) {
+      if (checkIfClosed(seed)) {
+        for (const extendSeed &s : seeds) extendAndFill(s);
+        seeds.clear();
+      }
+      return;
     }
   }
 }
@@ -543,34 +580,34 @@ void extendFill(int paint, int paintAtClickedPos, int xc, int xd, int y, int dy,
         int yR = y + stepY, yL = y + stepY;
 
         const int maxSteps = 32;
-        int step = 0;
+        int step           = 0;
 
         while (yR >= 0 && yR < h && yL >= 0 && yL < h && step < maxSteps) {
-            bool rPainted = (r->pixels(yR)[xR].getPaint() == paint);
-            bool lPainted = (r->pixels(yL)[xL].getPaint() == paint);
+          bool rPainted = (r->pixels(yR)[xR].getPaint() == paint);
+          bool lPainted = (r->pixels(yL)[xL].getPaint() == paint);
 #ifdef _DEBUG
-            if (rPainted) {
-                r->pixels(yR)[xR].setInk(6);
-                r->pixels(yR)[xR].setPaint(6);
-            }
-            if (lPainted) {
-                r->pixels(yL)[xL].setInk(6);
-                r->pixels(yL)[xL].setPaint(6);
-            }
+          if (rPainted) {
+            r->pixels(yR)[xR].setInk(6);
+            r->pixels(yR)[xR].setPaint(6);
+          }
+          if (lPainted) {
+            r->pixels(yL)[xL].setInk(6);
+            r->pixels(yL)[xL].setPaint(6);
+          }
 #endif
-            if (rPainted) {
-                ++countR;
-                yR += stepY;
-            }
+          if (rPainted) {
+            ++countR;
+            yR += stepY;
+          }
 
-            if (lPainted) {
-                ++countL;
-                yL += stepY;
-            }
+          if (lPainted) {
+            ++countL;
+            yL += stepY;
+          }
 
-            if (countR != countL || rPainted != lPainted) break;
+          if (countR != countL || rPainted != lPainted) break;
 
-            ++step;
+          ++step;
         }
 
         return countR < countL;
