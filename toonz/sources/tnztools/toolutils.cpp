@@ -41,6 +41,8 @@
 #include "toonzqt/selection.h"
 #include "toonzqt/gutil.h"
 
+#include "tools/cursormanager.h"
+#include "tools/cursors.h"
 #include "tools/strokeselection.h"
 
 #include <QPainter>
@@ -350,6 +352,34 @@ QRadialGradient ToolUtils::getBrushPad(int size, double hardness) {
 }
 
 //-----------------------------------------------------------------------------
+
+void ToolUtils::drawCursor(TToolViewer* viewer, TTool* tool,
+    TPointD pos, int toolCursorId)
+{
+    if (!viewer || !tool) return;
+    
+    QCursor cursor = getToolCursor(toolCursorId);
+    QPixmap cursorPixmap = cursor.pixmap();
+    if (cursorPixmap.isNull()) return;
+
+    QWidget* w = viewer->viewerWidget();
+    
+    TPointD dpiScale = viewer->getDpiScale();
+    TPointD scPos(pos.x * dpiScale.x, pos.y * dpiScale.y);
+
+    TPointD brushWinD = viewer->worldToPos(tool->getMatrix() * scPos) / viewer->getDevPixRatio();
+    QPointF brushWin(brushWinD.x, w->height() - brushWinD.y);
+    
+    QPoint hot = cursor.hotSpot();
+
+    QPainter painter(w);
+    static QPointF oldBrushWin;
+    QRect dirtyRect = QRect((oldBrushWin - QPointF(hot)).toPoint(), cursorPixmap.size());
+    w->update(dirtyRect);
+    oldBrushWin = brushWin;
+
+    painter.drawPixmap((brushWin - QPointF(hot)).toPoint(), cursorPixmap);
+}
 
 QList<TRect> ToolUtils::splitRect(const TRect &first, const TRect &second) {
   TRect intersection = first * second;

@@ -19,6 +19,9 @@
 #include <QString>
 #include <QPoint>
 
+#include "toonzqt/glwidget_for_highdpi.h"
+#include "toonzqt/imageutils.h"
+
 #undef DVAPI
 #undef DVVAR
 #ifdef TNZTOOLS_EXPORTS
@@ -624,7 +627,7 @@ public:
   OpenGL).
 */
 
-class TToolViewer {
+class TToolViewer : public GLWidgetForHighDpi {
 protected:
   ImagePainter::VisualSettings
       m_visualSettings;  //!< Settings used by the Viewer to draw scene contents
@@ -635,7 +638,8 @@ protected:
   QWidget *m_viewerWidget  = nullptr;
 
 public:
-  TToolViewer(QWidget *widget) : m_viewerWidget(widget) {}
+  TToolViewer(QWidget *widget, ImageUtils::FullScreenWidget* parent = nullptr) : 
+      m_viewerWidget(widget), GLWidgetForHighDpi(parent) {}
   virtual ~TToolViewer() {}
 
   const ImagePainter::VisualSettings &visualSettings() const {

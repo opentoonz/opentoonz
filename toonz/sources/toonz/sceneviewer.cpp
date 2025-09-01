@@ -759,8 +759,7 @@ public:
 //-----------------------------------------------------------------------------
 
 SceneViewer::SceneViewer(ImageUtils::FullScreenWidget *parent)
-    : GLWidgetForHighDpi(parent)
-    , TToolViewer(this)
+    : TToolViewer(this,parent)
     , m_pressure(0)
     , m_lastMousePos(0, 0)
     , m_mouseButton(Qt::NoButton)

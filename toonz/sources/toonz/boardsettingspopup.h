@@ -52,6 +52,7 @@ class BoardView : public QWidget {
 public:
   BoardView(QWidget* parent = nullptr);
   void invalidate() { m_valid = false; }
+  const QImage& boardImage() { return m_boardImg; }
 
 protected:
   void paintEvent(QPaintEvent* event) override;
@@ -132,6 +133,8 @@ class BoardSettingsPopup : public DVGui::Dialog {
   ItemListView* m_itemListView;
 
   DVGui::IntLineEdit* m_durationEdit;
+  DVGui::LineEdit* m_fileNameSuffixFld;
+  QPushButton* m_exportBoardBtn;
 
   void initialize();
   void initializeItemTypeString();  // call once on the first launch
@@ -148,8 +151,10 @@ protected slots:
   void onItemAddedOrDeleted();
   void onItemPropertyChanged(bool updateListView);
   void onDurationEdited();
+  void onFileNameSuffixEdited();
   void onLoadPreset();
   void onSavePreset();
+  void onExportBoardImage();
 };
 
 //=============================================================================
@@ -174,4 +179,12 @@ protected:
   void showEvent(QShowEvent*) override;
 };
 
+//=============================================================================
+
+class SaveBoardImagePopup final : public GenericSaveFilePopup {
+  Q_OBJECT
+
+public:
+  SaveBoardImagePopup();
+};
 #endif

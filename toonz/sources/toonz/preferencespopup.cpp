@@ -1317,7 +1317,7 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
       {cursorOutlineEnabled, tr("Show Cursor Size Outlines")},
       {levelBasedToolsDisplay, tr("Toolbar Display Behaviour:")},
       {useCtrlAltToResizeBrush, tr("Use %1 to Resize Brush").arg(CtrlAltStr())},
-      {useStrokeEndCursor, tr("Use Inverted Cursor at Stroke End")},
+      {useStrokeEndCursor, tr("Draw Cursor at End of Stroke")},
       {clickTwiceToCreateArcs, tr("Click Twice to Create Arcs") },
       {tempToolSwitchTimer,
        tr("Switch Tool Temporarily Keypress Length (ms):")},
@@ -1434,7 +1434,9 @@ QList<ComboBoxItem> PreferencesPopup::getComboItemList(
         {tr("Scene Folder Alias ($scenefolder)"),
          Preferences::SceneFolderAlias},
         {tr("Use Project Folder Aliases Only"),
-         Preferences::ProjectFolderOnly}}},
+         Preferences::ProjectFolderOnly},
+        {tr("Automatic by Scene"),
+         Preferences::AutoByScene}}},
       {linearUnits,  // cameraUnits shares items with linearUnits
        {{tr("cm"), "cm"},
         {tr("mm"), "mm"},
@@ -1669,6 +1671,12 @@ QWidget* PreferencesPopup::createGeneralPage() {
          "$scenefolder as well.");
   pathAliasPriorityCB->setItemData(1, scenefolderTooltip, Qt::ToolTipRole);
   pathAliasPriorityCB->setItemData(2, QString(" "), Qt::ToolTipRole);
+  QString autoBySceneToolTip =
+      tr("Automatically sets folder based on scene type:\n"
+          "Standalone -> $scenefolder\n"
+          "Project -> project folder aliases (+drawing...)");
+  pathAliasPriorityCB->setItemData(3, autoBySceneToolTip, Qt::ToolTipRole);
+
 
   m_onEditedFuncMap.insert(autosaveEnabled,
                            &PreferencesPopup::onAutoSaveChanged);
@@ -1678,8 +1686,11 @@ QWidget* PreferencesPopup::createGeneralPage() {
                            &PreferencesPopup::onAutoSaveOptionsChanged);
   m_onEditedFuncMap.insert(watchFileSystemEnabled,
                            &PreferencesPopup::onWatchFileSystemClicked);
+  m_onEditedFuncMap.insert(pathAliasPriority, 
+                           &PreferencesPopup::onPathAliasPriorityChanged);
 
   bool ret = true;
+
   ret      = ret && connect(m_pref, SIGNAL(stopAutoSave()), this,
                             SLOT(onAutoSaveExternallyChanged()));
   ret      = ret && connect(m_pref, SIGNAL(startAutoSave()), this,

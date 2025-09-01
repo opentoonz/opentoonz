@@ -109,6 +109,10 @@ QRadialGradient getBrushPad(int size, double hardness);
 
 //-----------------------------------------------------------------------------
 
+
+void drawCursor(TToolViewer* viewer, TTool* tool,
+    TPointD pos, int toolCursorId);
+
 //! Divide il primo rettangolo in piu' sottorettsngoli, in base all'intersezione
 //! con il secondo
 QList<TRect> splitRect(const TRect &first, const TRect &second);

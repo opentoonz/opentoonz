@@ -13,7 +13,6 @@
 // TnzQt includes
 #include "toonzqt/menubarcommand.h"
 #include "toonzqt/flipconsole.h"
-#include "toonzqt/glwidget_for_highdpi.h"
 
 // TnzTools includes
 #include "tools/tool.h"
@@ -63,8 +62,7 @@ public:
 // SceneViewer
 //-----------------------------------------------------------------------------
 
-class SceneViewer final : public GLWidgetForHighDpi,
-                          public TToolViewer,
+class SceneViewer final : public TToolViewer,
                           public Previewer::Listener {
   Q_OBJECT
 
@@ -216,7 +214,7 @@ public:
   void onRenderStarted(int frame) override;
   void onRenderCompleted(int frame) override;
   void onPreviewUpdate() override;
-
+  
   bool isPreviewEnabled() const { return m_previewMode != NO_PREVIEW; }
   int getPreviewMode() const { return m_previewMode; }
 

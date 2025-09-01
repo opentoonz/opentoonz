@@ -283,7 +283,7 @@ void BoardItem::loadData(TIStream &is) {
 
 //======================================================================================
 
-BoardSettings::BoardSettings() {
+BoardSettings::BoardSettings() : m_fileNameSuffix("board") {
   // add one item as an example
   m_items.push_back(BoardItem());
 }

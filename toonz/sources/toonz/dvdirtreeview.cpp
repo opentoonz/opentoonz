@@ -286,9 +286,16 @@ void DvDirTreeViewDelegate::commitAndCloseEditor() {
   NodeEditor *editor = qobject_cast<NodeEditor *>(sender());
   emit commitData(editor);
   emit closeEditor(editor);
-  FileBrowser *fileBrowser =
-      dynamic_cast<FileBrowser *>(m_treeView->parentWidget());
+  QWidget* w = m_treeView;
+  FileBrowser* fileBrowser = nullptr;
+  while (w) {
+      fileBrowser = qobject_cast<FileBrowser*>(w);
+      if (fileBrowser) break;
+      w = w->parentWidget();
+  }
+
   if (fileBrowser) fileBrowser->onTreeFolderChanged();
+
 }
 //-----------------------------------------------------------------------------
 

@@ -133,8 +133,6 @@ DVAPI double tglGetTextWidth(const std::string &s,
  */
 DVAPI void tglDrawCircle(const TPointD &c, double r);
 
-DVAPI void tglDrawInvertCursor(const TPointD &center, int gap, int len);
-
 /*!
  Draw circle of radius r with center c.
  Remark: it is possible set number of slices

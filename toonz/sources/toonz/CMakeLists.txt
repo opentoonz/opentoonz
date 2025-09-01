@@ -10,6 +10,7 @@ set(MOC_HEADERS
     batches.h
     batchserversviewer.h
     binarizepopup.h
+    fillholespopup.h
     boardsettingspopup.h
     brightnessandcontrastpopup.h
     cachefxcommand.h
@@ -360,6 +361,7 @@ set(SOURCES
     adjustlevelspopup.cpp
     adjustthicknesspopup.cpp
     binarizepopup.cpp
+    fillholespopup.cpp
     brightnessandcontrastpopup.cpp
     linesfadepopup.cpp
     rendercommand.cpp

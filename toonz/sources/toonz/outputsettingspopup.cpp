@@ -409,7 +409,9 @@ QFrame *OutputSettingsPopup::createCameraSettingsBox(bool isPreview) {
       QVBoxLayout *camParamLay = new QVBoxLayout();
       camParamLay->setMargin(5);
       camParamLay->setSpacing(0);
-      { camParamLay->addWidget(m_cameraSettings); }
+      {
+        camParamLay->addWidget(m_cameraSettings);
+      }
       cameraParametersBox->setLayout(camParamLay);
 
       lay->addWidget(cameraParametersBox);
@@ -1074,14 +1076,7 @@ void OutputSettingsPopup::updateField() {
   // clapperboard
   BoardSettings *boardSettings = prop->getBoardSettings();
   m_addBoard->setChecked(boardSettings->isActive());
-  // clapperboard is only available with movie formats
-  if (isMovieType(m_fileFormat->currentText().toStdString())) {
-    m_addBoard->setEnabled(true);
-    m_boardSettingsBtn->setEnabled(m_addBoard->isChecked());
-  } else {
-    m_addBoard->setEnabled(false);
-    m_boardSettingsBtn->setEnabled(false);
-  }
+  m_boardSettingsBtn->setEnabled(m_addBoard->isChecked());
 }
 
 //-----------------------------------------------------------------------------
@@ -1202,14 +1197,7 @@ void OutputSettingsPopup::onFormatChanged(const QString &str) {
     if (wasMultiRenderInvalid) m_threadsComboOm->setCurrentIndex(2);
   }
 
-  // clapperboard is only available with movie formats
-  if (isMovieType(str.toStdString())) {
-    m_addBoard->setEnabled(true);
-    m_boardSettingsBtn->setEnabled(m_addBoard->isChecked());
-  } else {
-    m_addBoard->setEnabled(false);
-    m_boardSettingsBtn->setEnabled(false);
-  }
+  m_boardSettingsBtn->setEnabled(m_addBoard->isChecked());
 }
 
 //-----------------------------------------------------------------------------

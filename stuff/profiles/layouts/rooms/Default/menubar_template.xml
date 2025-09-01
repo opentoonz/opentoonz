@@ -132,6 +132,7 @@
             <command>MI_LinesFade</command>
         </menu>
         <menu title="Optimize">
+            <command>MI_FillHoles</command>
             <command>MI_RemoveEndpoints</command>
             <command>MI_ConvertVectorToVector</command>
         </menu>

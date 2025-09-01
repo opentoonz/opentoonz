@@ -7,6 +7,7 @@
 #include "tools/toolutils.h"
 #include "tools/tooloptions.h"
 #include "tools/replicator.h"
+#include "tools/cursors.h"
 
 // TnzQt includes
 #include "toonzqt/dvdialog.h"
@@ -1521,10 +1522,9 @@ void ToonzRasterBrushTool::draw() {
   TImageP img = getImage(false, 1);
 
   if (getApplication()->getCurrentObject()->isSpline()) return;
-  bool useEndCursor = Preferences::instance()->isUseStrokeEndCursor();
-  if (useEndCursor &&
-      (m_maxThick < 8 || !Preferences::instance()->isCursorOutlineEnabled()))
-    tglDrawInvertCursor(m_brushPos + TPointD(0.5, 0.5), 8, 12);
+  if (Preferences::instance()->isUseStrokeEndCursor())
+      ToolUtils::drawCursor(m_viewer, this, m_brushPos, ToolCursor::PenCursor);
+
   // If toggled off, don't draw brush outline
   if (!Preferences::instance()->isCursorOutlineEnabled())
     return;
