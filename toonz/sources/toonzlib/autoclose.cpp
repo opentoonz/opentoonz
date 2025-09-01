@@ -541,11 +541,17 @@ void TAutocloser::Imp::findMeetingPoints(
   m_aut_spot_samples = (UINT)m_spotAngle;
 
   m_spotAngle *= (M_PI / 180.0);
-  alfa  = m_spotAngle / m_aut_spot_samples;
-  m_csp = cos(m_spotAngle);
-  m_snp = sin(m_spotAngle);
-  m_csm = cos(-m_spotAngle);
-  m_snm = sin(-m_spotAngle);
+  
+  // spotResearchTwoPoints
+  // Angle Range: 0бу~36бу
+  double limitedAngle = m_spotAngle / 10;
+  m_csp = cos(limitedAngle);
+  m_snp = sin(limitedAngle);
+  m_csm = cos(-limitedAngle);
+  m_snm = sin(-limitedAngle);
+
+  // spotResearchOnePoints
+  alfa = m_spotAngle / m_aut_spot_samples;
   m_csa = cos(alfa);
   m_sna = sin(alfa);
   m_csb = cos(-alfa);
