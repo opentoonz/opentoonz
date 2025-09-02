@@ -699,13 +699,13 @@ void RenameCellField::showInRowCol(int row, int col, bool multiColumnSelected) {
         setAlignment(Qt::AlignLeft | Qt::AlignBottom);
         QFontMetrics fm(this->font());
         if (o->cellWidth() - 15 < fm.horizontalAdvance(text()))
-            setFixedWidth(fm.horizontalAdvance(text()) + 10);
+          setFixedWidth(fm.horizontalAdvance(text()) + 10);
         else
-            setFixedSize(o->cellWidth(), o->cellHeight() + 2);
+          setFixedSize(o->cellWidth(), o->cellHeight() + 2);
         connect(this, &QLineEdit::textChanged, this,
-                [this,o,fm](const QString &text) {
-                  if (o->cellWidth()-15 < fm.horizontalAdvance(text))
-                    setFixedWidth(fm.horizontalAdvance(text)+10);
+                [this, o, fm](const QString &text) {
+                  if (o->cellWidth() - 15 < fm.horizontalAdvance(text))
+                    setFixedWidth(fm.horizontalAdvance(text) + 10);
                 });
       }
       // other level types
@@ -965,22 +965,21 @@ void RenameCellField::renameCell() {
     cellSelection->deleteCells(false);
     // revert cell selection
     cellSelection->selectCells(range.m_r0, range.m_c0, range.m_r1, range.m_c1);
-  }
-  else if (cells.size() == 1) {
+  } else if (cells.size() == 1) {
     TCellSelection::Range range = cellSelection->getSelectedCells();
     if (range.m_r0 == range.m_r1 &&
-        xsheet->getCell(range.m_r0, range.m_c0).getFrameId() != TFrameId::EMPTY_FRAME) {
-        for(;
-            xsheet->getCell(range.m_r1,range.m_c0)==
-            xsheet->getCell(range.m_r1+1,range.m_c0);
-            ++range.m_r1);
-    cellSelection->selectCells(range.m_r0, range.m_c0, range.m_r1, range.m_c1);
+        xsheet->getCell(range.m_r0, range.m_c0).getFrameId() !=
+            TFrameId::EMPTY_FRAME) {
+      for (; xsheet->getCell(range.m_r1, range.m_c0) ==
+             xsheet->getCell(range.m_r1 + 1, range.m_c0);
+           ++range.m_r1);
+      cellSelection->selectCells(range.m_r0, range.m_c0, range.m_r1,
+                                 range.m_c1);
     }
     cellSelection->renameCells(cells[0]);
-  }
-  else
+  } else
     cellSelection->renameMultiCells(cells);
-  
+
   cellSelection->fillEmptyCell();
 }
 
@@ -1006,7 +1005,7 @@ void RenameCellField::onReturnPressed() {
 
 void RenameCellField::focusOutEvent(QFocusEvent *e) {
   hide();
-  
+
   if (escapePressed) {
     escapePressed = false;
   } else {
@@ -1514,7 +1513,7 @@ void CellArea::drawExtenderHandles(QPainter &p) {
           .translated(selected.bottomRight() + smartTabPosOffset);
   p.setPen(Qt::black);
   p.setBrush(SmartTabColor);
-   p.drawRoundedRect(m_levelExtenderRect, xyRadius.x(), xyRadius.y());
+  p.drawRoundedRect(m_levelExtenderRect, xyRadius.x(), xyRadius.y());
   QColor color = (distance > 0 && ((selRow1 + 1 - offset) % distance) != 0)
                      ? m_viewer->getLightLineColor()
                      : m_viewer->getMarkerLineColor();
@@ -2192,8 +2191,8 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference,
     std::wstring levelName = cell.m_level->getName();
     QString text           = QString::fromStdWString(levelName);
     QFontMetrics fm(font);
-    QString elidaName =
-        elideText(text, fm, nameRect.width() - fm.horizontalAdvance(fnum), QString("~"));
+    QString elidaName = elideText(
+        text, fm, nameRect.width() - fm.horizontalAdvance(fnum), QString("~"));
     p.drawText(nameRect, Qt::AlignLeft | Qt::AlignBottom, elidaName);
   }
 }
@@ -2879,7 +2878,8 @@ void CellArea::drawPaletteCell(QPainter &p, int row, int col,
 
     QString text      = QString::fromStdWString(levelName);
     QString elidaName = elideText(
-        text, fm, nameRect.width() - fm.horizontalAdvance(numberStr) - 2, QString("~"));
+        text, fm, nameRect.width() - fm.horizontalAdvance(numberStr) - 2,
+        QString("~"));
 
     if (!sameLevel || isAfterMarkers)
       p.drawText(nameRect, Qt::AlignLeft | Qt::AlignBottom, elidaName);
@@ -3369,34 +3369,52 @@ void CellArea::mousePressEvent(QMouseEvent *event) {
       setDragTool(
           XsheetGUI::DragTool::makeLevelExtenderTool(m_viewer, false, true));
     }
-    // Drag Event
-    else if ((!xsh->getCell(row, col).isEmpty()) &&
-               o->rect(PredefinedRect::DRAG_AREA)
-                   .adjusted(0, 0, -frameAdj.x(), -frameAdj.y())
-                   .contains(mouseInCell) ||
-               // Or Control Pressed
-               event->modifiers() & Qt::ControlModifier ||
-             // Or Frame Cell Selected and no modifiers
-        (event->modifiers() == Qt::NoModifier && Preferences::instance()->isAlwaysDragFrameCell() &&
-            (!xsh->getCell(row, col).isEmpty()) && xsh->getCell(row, col) != xsh->getCell(row - 1, col))) {
+
+    // Drag Cells #1 : When "Always Drag Frame Cell" Selected and no modifiers
+    else if (Preferences::instance()->isAlwaysDragFrameCell() &&
+             event->modifiers() == Qt::NoModifier &&
+             (!xsh->getCell(row, col).isEmpty()) &&
+             xsh->getCell(row, col) != xsh->getCell(row - 1, col)) {
       TXshColumn *column = xsh->getColumn(col);
+
       if (column && !m_viewer->getCellSelection()->isCellSelected(row, col)) {
-        if(xsh->getCell(row,col) == xsh->getCell(row - 1, col)) {
-          int r0, r1;
-          column->getLevelRange(row, r0, r1);
-          if (event->modifiers() & Qt::ControlModifier) {
-            m_viewer->getCellKeyframeSelection()->makeCurrent();
-            m_viewer->getCellKeyframeSelection()->selectCellsKeyframes(r0, col,
-                                                                       r1, col);
-          } else {
-            m_viewer->getKeyframeSelection()->selectNone();
-            m_viewer->getCellSelection()->makeCurrent();
-            m_viewer->getCellSelection()->selectCells(r0, col, r1, col);
-          }
-        } else { // switch to that FrameCell
-            m_viewer->setCurrentRow(row);
-            m_viewer->setCurrentColumn(col);
-            m_viewer->getCellSelection()->selectCell(row, col);
+        // switch to that FrameCell
+        m_viewer->setCurrentRow(row);
+        m_viewer->setCurrentColumn(col);
+        m_viewer->getCellSelection()->selectCell(row, col);
+
+        TApp::instance()->getCurrentSelection()->notifySelectionChanged();
+      }
+
+      TSelection *selection =
+          TApp::instance()->getCurrentSelection()->getSelection();
+      if (TCellKeyframeSelection *cellKeyframeSelection =
+              dynamic_cast<TCellKeyframeSelection *>(selection))
+        setDragTool(XsheetGUI::DragTool::makeCellKeyframeMoverTool(m_viewer));
+      else if (Preferences::instance()->getDragCellsBehaviour() != 2)
+        setDragTool(XsheetGUI::DragTool::makeLevelMoverTool(m_viewer));
+    }
+
+    // Drag Cells #2 : When clicked the drag area (side bar)
+    else if ((!xsh->getCell(row, col).isEmpty()) &&
+                 o->rect(PredefinedRect::DRAG_AREA)
+                     .adjusted(0, 0, -frameAdj.x(), -frameAdj.y())
+                     .contains(mouseInCell) ||
+             // Or Control Pressed
+             event->modifiers() & Qt::ControlModifier) {
+      TXshColumn *column = xsh->getColumn(col);
+
+      if (column && !m_viewer->getCellSelection()->isCellSelected(row, col)) {
+        int r0, r1;
+        column->getLevelRange(row, r0, r1);
+        if (event->modifiers() & Qt::ControlModifier) {
+          m_viewer->getCellKeyframeSelection()->makeCurrent();
+          m_viewer->getCellKeyframeSelection()->selectCellsKeyframes(r0, col,
+                                                                     r1, col);
+        } else {
+          m_viewer->getKeyframeSelection()->selectNone();
+          m_viewer->getCellSelection()->makeCurrent();
+          m_viewer->getCellSelection()->selectCells(r0, col, r1, col);
         }
         TApp::instance()->getCurrentSelection()->notifySelectionChanged();
       }
@@ -3407,7 +3425,9 @@ void CellArea::mousePressEvent(QMouseEvent *event) {
         setDragTool(XsheetGUI::DragTool::makeCellKeyframeMoverTool(m_viewer));
       else if (Preferences::instance()->getDragCellsBehaviour() != 2)
         setDragTool(XsheetGUI::DragTool::makeLevelMoverTool(m_viewer));
-    } else {
+    }
+
+    else {
       m_viewer->getKeyframeSelection()->selectNone();
       if (isSoundColumn && o->rect(PredefinedRect::PREVIEW_TRACK)
                                .adjusted(0, 0, -frameAdj.x(), -frameAdj.y())
