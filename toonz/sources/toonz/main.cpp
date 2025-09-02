@@ -782,7 +782,6 @@ int main(int argc, char *argv[]) {
     splash.showMessage(
         QString("Loading file '") + loadFilePath.getQString() + "'...",
         Qt::AlignCenter, Qt::white);
-    loadFilePath = loadFilePath.withType("tnz");
     if (TFileStatus(loadFilePath).doesExist()) IoCmd::loadScene(loadFilePath);
   }
 
