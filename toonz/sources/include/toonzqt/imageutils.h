@@ -104,6 +104,8 @@ void DVAPI convert(
     const TFrameId &tmplFId = TFrameId()  //!< frame format template
 );  //!< Converts a saved level to fullcolor, and saves the result.
 
+bool DVAPI isAAImage(TFilePath path);
+
 void DVAPI convertNaa2Tlv(
     const TFilePath &source,  //!< Level path to convert from.
     const TFilePath &dest,    //!< Level path to convert to.

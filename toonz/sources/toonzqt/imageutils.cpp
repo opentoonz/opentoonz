@@ -639,11 +639,74 @@ void convert(const TFilePath &source, const TFilePath &dest,
 
 //=============================================================================
 
+bool isAAImage(TFilePath path){
+    QImage img(path.getQString());
+    if (img.isNull())return false;
+
+    uint16_t width = img.width();
+    uint16_t height = img.height();
+    uint32_t lonelyPixelCount = 0;
+    uint32_t totalPixels = width * height;
+
+    std::unordered_map<uint32_t, uint32_t> colorCount;
+
+    const QRgb* imgData = reinterpret_cast<const QRgb*>(img.bits());
+
+    for (int y = 0; y < height; ++y) {
+        for (int x = 0; x < width; ++x) {
+            QRgb color = imgData[y * width + x];
+            colorCount[color]++;
+        }
+    }
+
+    uint32_t maxCount = 0;
+    QRgb mostCommonColor = 0;
+    for (const auto& pair : colorCount) {
+        if (pair.second > maxCount) {
+            maxCount = pair.second;
+            mostCommonColor = pair.first;
+        }
+    }
+
+    for (int y = 1; y < height - 1; ++y) {
+        int xcount = 0;
+        for (int x = 1; x < width - 1; ++x) {
+            QRgb centerColor = imgData[y * width + x];
+
+            if (centerColor == mostCommonColor) {
+                ++xcount;
+                continue;
+            }
+
+            int diffCount = 0;
+
+            if (imgData[y * width + (x - 1)] != centerColor) ++diffCount;
+            if (imgData[y * width + (x + 1)] != centerColor) ++diffCount;
+            if (imgData[(y - 1) * width + x] != centerColor) ++diffCount;
+            if (imgData[(y + 1) * width + x] != centerColor) ++diffCount;
+
+            if (diffCount == 4) {
+                lonelyPixelCount++;
+            }
+        }
+        if (xcount == width - 2)
+            totalPixels -= width;
+    }
+
+
+    double ratio = double(lonelyPixelCount) / (totalPixels + 1);
+    
+    const double value = 0.05 / 100;
+    return ratio > value;
+}
+
 void convertNaa2Tlv(const TFilePath &source, const TFilePath &dest,
                     const TFrameId &from, const TFrameId &to,
                     FrameTaskNotifier *frameNotifier, TPalette *palette,
                     bool removeUnusedStyles, double dpi) {
-  std::string dstExt = dest.getType(), srcExt = source.getType();
+  //std::string dstExt = dest.getType(), srcExt = source.getType();
+  if(TSystem::doesExistFileOrLevel(dest.withType("tpl")))
+      TSystem::deleteFile(dest.withType("tpl"));
 
   // Load source level structure
   TLevelReaderP lr(source);
@@ -704,7 +767,7 @@ void convertNaa2Tlv(const TFilePath &source, const TFilePath &dest,
 
     frameNotifier->notifyFrameCompleted(100 * (f + 1) / frames.size());
   }
-
+  
   if (removeUnusedStyles) converter.removeUnusedStyles(usedStyleIds);
 }
 

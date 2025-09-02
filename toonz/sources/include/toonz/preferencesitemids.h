@@ -52,6 +52,7 @@ enum PreferencesItemId {
   // Loading
   importPolicy,
   renamePolicy,
+  convertPolicy,
   autoExposeEnabled,
   subsceneFolderEnabled,
   removeSceneNumberFromLoadedLevelName,

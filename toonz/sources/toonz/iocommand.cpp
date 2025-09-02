@@ -34,6 +34,7 @@
 #include "toonzqt/swatchviewer.h"
 #include "toonzqt/tselectionhandle.h"
 #include "toonzqt/dvdialog.h"
+#include "toonzqt/imageutils.h"
 
 // ToonzLib includes
 #include "toonz/palettecontroller.h"
@@ -67,6 +68,7 @@
 #include "toonz/imagestyles.h"
 #include "toutputproperties.h"
 #include "toonz/studiopalette.h"
+#include "convert2tlv.h"
 
 // TnzCore includes
 #include "tofflinegl.h"
@@ -1206,26 +1208,6 @@ inline TPaletteP dirtyWhite(const TPaletteP &plt) {
 }
 
 }  // namespace
-//---------------------------------------------------------------------------
-
-// Per ora e' usato solo per i formato "tzp" e "tzu".
-IoCmd::ConvertingPopup::ConvertingPopup(QWidget *parent, QString fileName)
-    : QDialog(parent) {
-  setModal(true);
-  setWindowFlags(Qt::Dialog | Qt::WindowTitleHint);
-  setMinimumSize(70, 50);
-  QVBoxLayout *mainLayout = new QVBoxLayout;
-  mainLayout->setMargin(5);
-  mainLayout->setSpacing(0);
-
-  QLabel *label = new QLabel(QString(
-      QObject::tr("Converting %1 images to tlv format...").arg(fileName)));
-  mainLayout->addWidget(label);
-
-  setLayout(mainLayout);
-}
-
-IoCmd::ConvertingPopup::~ConvertingPopup() {}
 
 //===========================================================================
 // IoCmd::saveSceneIfNeeded(message)
@@ -1525,7 +1507,7 @@ bool IoCmd::saveScene(const TFilePath &path, int flags) {
 
   // Must wait for current save to finish, just in case
   while (TApp::instance()->isSaveInProgress());
-  
+
   TApp::instance()->setSaveInProgress(true);
   try {
     scene->save(scenePath, xsheet);
@@ -2462,129 +2444,130 @@ int IoCmd::loadResources(LoadResourceArguments &args, bool updateRecentFile,
                                   LoadResourceArguments::IMPORT);
   }
 
-  std::vector<TFilePath> paths;
   int all = 0;  // Turn on to allow all duplicate
   std::vector<LoadResourceArguments::ResourceData> rds;//Resources to be loaded
 
   // Loop for all the resources to import (Include subScene)
   for (int r = 0; r < rCount; ++r) {
-    if (importDialog.aborted()) break;
+      if (importDialog.aborted()) break;
 
-    LoadResourceArguments::ResourceData rd(args.resourceDatas[r]);
+      LoadResourceArguments::ResourceData rd(args.resourceDatas[r]);
       TFilePath& path = rd.m_path;
       QString origName = path.withoutParentDir().getQString();
 
       if (!path.isLevelName())
-      path = TFilePath(path.getLevelNameW()).withParentDir(path.getParentDir());
+          path = TFilePath(path.getLevelNameW()).withParentDir(path.getParentDir());
 
       // duplicate check
       auto isDuplicate = [&rd](const IoCmd::LoadResourceArguments::ResourceData& existingRd) {
           return existingRd.m_path == rd.m_path;
           };
       if (std::find_if(rds.begin(), rds.end(), isDuplicate) != rds.end()) {
-      if (!all) {
-        QString question =
-            QObject::tr(
-                "File '%1' will reload level '%2' as a duplicate column in the "
-                "xsheet.\n\nAllow duplicate?")
-                .arg(origName)
-                .arg(QString::fromStdString(path.getName()));
+          if (!all) {
+              QString question =
+                  QObject::tr(
+                      "File '%1' will reload level '%2' as a duplicate column in the "
+                      "xsheet.\n\nAllow duplicate?")
+                  .arg(origName)
+                  .arg(QString::fromStdString(path.getName()));
               QString Yes = QObject::tr("Allow");
-        QString YesAll = QObject::tr("Allow All Dups");
+              QString YesAll = QObject::tr("Allow All Dups");
               QString No = QObject::tr("No");
               QString NoAll = QObject::tr("No to All Dups");
               int ret = DVGui::MsgBox(question, Yes, YesAll, No, NoAll, 0);
-        switch (ret) {
-        case 2:
-          all = 1;  // YesAll
-        case 1:
-          break;  // Yes
-        case 4:
-          all = 2;  // NoAll
-        case 3:
-          continue;
-        }
+              switch (ret) {
+              case 2:
+                  all = 1;  // YesAll
+              case 1:
+                  break;  // Yes
+              case 4:
+                  all = 2;  // NoAll
+              case 3:
+                  continue;
+              }
           }
           else if (all == 2)
-        continue;
-    }
-
-    if (progressDialog) {
-      if (progressDialog->wasCanceled())
-        break;
-      else {
-        progressDialog->setLabelText(
-                  DVGui::ProgressDialog::tr("Importing \"%1\"...")
-                .arg(path.getQString()));
-        progressDialog->setValue(r);
-
-        QCoreApplication::processEvents();
+              continue;
       }
-    }
 
-    bool isLastResource = (r == rCount - 1);
-    importDialog.setIsLastResource(isLastResource);
+      if (progressDialog) {
+          if (progressDialog->wasCanceled())
+              break;
+          else {
+              progressDialog->setLabelText(
+                  DVGui::ProgressDialog::tr("Importing \"%1\"...")
+                  .arg(path.getQString()));
+              progressDialog->setValue(r);
 
-    bool isScene = (TFileType::getInfo(path) == TFileType::TOONZSCENE);
+              QCoreApplication::processEvents();
+          }
+      }
 
-    if (scene->isExternPath(path) || isScene) {
-      // extern resource: import or link?
-      int ret = importDialog.askImportQuestion(path);
-      if (ret == ResourceImportDialog::A_CANCEL) break;
-    }
+      bool isLastResource = (r == rCount - 1);
+      importDialog.setIsLastResource(isLastResource);
+
+      bool isScene = (TFileType::getInfo(path) == TFileType::TOONZSCENE);
+
+      if (scene->isExternPath(path) || isScene) {
+          // extern resource: import or link?
+          int ret = importDialog.askImportQuestion(path);
+          if (ret == ResourceImportDialog::A_CANCEL) break;
+      }
 
       // SCENE FILE
-    if (isScene) {
-      TFilePath oldDstFolder = importDialog.getDstFolder();
-      TFilePath dstFolder = (Preferences::instance()->isSubsceneFolderEnabled())
-                                ? TFilePath(path.getName())
-                                : TFilePath();
+      if (isScene) {
+          TFilePath oldDstFolder = importDialog.getDstFolder();
+          TFilePath dstFolder = (Preferences::instance()->isSubsceneFolderEnabled())
+              ? TFilePath(path.getName())
+              : TFilePath();
 
-      importDialog.setDstFolder(dstFolder);
-      importDialog.setIsLastResource(false);
+          importDialog.setDstFolder(dstFolder);
+          importDialog.setIsLastResource(false);
 
-      // load the scene as subXsheet
-      try {
+          // load the scene as subXsheet
+          try {
               auto xl = loadChildLevel(scene, path, row0, col0, importDialog);
-        if (dstFolder != TFilePath())
-          app->getCurrentScene()->notifyCastFolderAdded(
-              scene->getLevelSet()->getDefaultFolder() + dstFolder);
-        // increment the number of resources actually loaded
-        ++loadedCount;
-        // move the column to the right
-        ++col0;
-        // register the loaded level to args
-        args.loadedLevels.push_back(xl);
-        app->getCurrentXsheet()->notifyXsheetSoundChanged();
+              if (dstFolder != TFilePath())
+                  app->getCurrentScene()->notifyCastFolderAdded(
+                      scene->getLevelSet()->getDefaultFolder() + dstFolder);
+              // increment the number of resources actually loaded
+              ++loadedCount;
+              // move the column to the right
+              ++col0;
+              // register the loaded level to args
+              args.loadedLevels.push_back(xl);
+              app->getCurrentXsheet()->notifyXsheetSoundChanged();
           } catch (...){}
 
-      importDialog.setIsLastResource(isLastResource);
-      importDialog.setDstFolder(oldDstFolder);
+          importDialog.setIsLastResource(isLastResource);
+          importDialog.setDstFolder(oldDstFolder);
 
-      app->getCurrentColumn()->setColumnIndex(col0);
+          app->getCurrentColumn()->setColumnIndex(col0);
 
-      continue;
-    }
+          continue;
+      }
       // LEVEL FILE
       else {
-        try {
-          path = importDialog.process(scene, 0, path);
-        }
+          try {
+              path = importDialog.process(scene, 0, path);
+          }
           catch (std::string msg) {
-            error(QString::fromStdString(msg));
-            continue;
+              error(QString::fromStdString(msg));
+              continue;
           }
           if (importDialog.aborted()) break;
         }
         
       rd.m_path = path;
       rds.push_back(rd);
-      }
+  }
 
   if(args.renamePolicy != LoadResourceArguments::RenamePolicy::NEVER)
       renameResources(rds);
+  if (args.convertPolicy != LoadResourceArguments::ConvertPolicy::NEVER)
+      convertNAARaster2TLV(rds);
   
-        
+
   if (progressDialog)
       progressDialog->setMaximum(rds.size());
   // LOAD IMPORTED FILE
@@ -2595,7 +2578,7 @@ int IoCmd::loadResources(LoadResourceArguments &args, bool updateRecentFile,
       if (progressDialog) {
           if (progressDialog->wasCanceled())
               break;
-    else {
+          else {
               progressDialog->setLabelText(
                   DVGui::ProgressDialog::tr("Loading \"%1\"...")
                   .arg(path.getQString()));
@@ -2603,61 +2586,61 @@ int IoCmd::loadResources(LoadResourceArguments &args, bool updateRecentFile,
 
               QCoreApplication::processEvents();
           }
-    }
-      // LOAD PSD FILE
-    if (path.getType() == "psd") {
-          static PsdSettingsPopup* popup = 0;
-      if (!popup) {
-        popup = new PsdSettingsPopup();
       }
-      popup->setPath(path);
+      // LOAD PSD FILE
+      if (path.getType() == "psd") {
+          static PsdSettingsPopup* popup = 0;
+          if (!popup) {
+              popup = new PsdSettingsPopup();
+          }
+          popup->setPath(path);
 
-      int ret = popup->exec();
-      if (ret == 0) continue;
+          int ret = popup->exec();
+          if (ret == 0) continue;
 
-      loadedCount += loadPSDResource(args, updateRecentFile, popup);
+          loadedCount += loadPSDResource(args, updateRecentFile, popup);
 
-      if (updateRecentFile)
-        RecentFiles::instance()->addFilePath(
-            toQString(scene->decodeFilePath(path)), RecentFiles::Level);
+          if (updateRecentFile)
+              RecentFiles::instance()->addFilePath(
+                  toQString(scene->decodeFilePath(path)), RecentFiles::Level);
           continue;
       }
       // LOAD OTHER FILE
       try {
           // reuse TFrameIds retrieved by FileBrowser, m_frameIdSet
-        xl = ::loadResource(
+          xl = ::loadResource(
               scene, rds[i], args.castFolder, row0, col0, row1, col1, args.expose,
               rds[i].m_frameIdSet,
-            args.xFrom, args.xTo, args.levelName, args.step, args.inc,
-            args.frameCount, args.doesFileActuallyExist);
-        if (updateRecentFile) {
-          RecentFiles::instance()->addFilePath(
-              toQString(scene->decodeFilePath(path)), RecentFiles::Level);
-        }
+              args.xFrom, args.xTo, args.levelName, args.step, args.inc,
+              args.frameCount, args.doesFileActuallyExist);
+          if (updateRecentFile) {
+              RecentFiles::instance()->addFilePath(
+                  toQString(scene->decodeFilePath(path)), RecentFiles::Level);
+          }
       } catch (TException& e) {
-        error(QString::fromStdWString(e.getMessage()));
+          error(QString::fromStdWString(e.getMessage()));
       }
 
       // if load success
       if (!xl)continue;
-        isSoundLevel = isSoundLevel || xl->getType() == SND_XSHLEVEL;
-        // register the loaded level to args
-        args.loadedLevels.push_back(xl);
-        // increment the number of loaded resources
-        ++loadedCount;
+      isSoundLevel = isSoundLevel || xl->getType() == SND_XSHLEVEL;
+      // register the loaded level to args
+      args.loadedLevels.push_back(xl);
+      // increment the number of loaded resources
+      ++loadedCount;
 
-        // load the image data of all frames to cache at the beginning
-        if (args.cachingBehavior != LoadResourceArguments::ON_DEMAND) {
+      // load the image data of all frames to cache at the beginning
+      if (args.cachingBehavior != LoadResourceArguments::ON_DEMAND) {
           TXshSimpleLevel* simpleLevel = xl->getSimpleLevel();
           if (simpleLevel && (simpleLevel->getType() == TZP_XSHLEVEL ||
-                              simpleLevel->getType() == OVL_XSHLEVEL)) {
-            bool cacheImagesAsWell =
-                (args.cachingBehavior ==
-                 LoadResourceArguments::ALL_ICONS_AND_IMAGES);
-            simpleLevel->loadAllIconsAndPutInCache(cacheImagesAsWell);
+              simpleLevel->getType() == OVL_XSHLEVEL)) {
+              bool cacheImagesAsWell =
+                  (args.cachingBehavior ==
+                      LoadResourceArguments::ALL_ICONS_AND_IMAGES);
+              simpleLevel->loadAllIconsAndPutInCache(cacheImagesAsWell);
           }
-        }
       }
+  }
 
   if (loadedCount) app->getCurrentFrame()->setFrameIndex(row0);
 
@@ -2666,7 +2649,7 @@ int IoCmd::loadResources(LoadResourceArguments &args, bool updateRecentFile,
 
   // revert the cursor
   if (args.cachingBehavior == LoadResourceArguments::ALL_ICONS_AND_IMAGES)
-    QApplication::restoreOverrideCursor();
+      QApplication::restoreOverrideCursor();
 
   return loadedCount;
 }
@@ -2809,7 +2792,7 @@ QRegularExpression::ExtendedPatternSyntaxOption);
                 return true;
             case 2:
                 return false;
-  }
+            }
             QString label =
                 QObject::tr(
                     "Image sequence detected, but the filenames are missing a separator: \n"

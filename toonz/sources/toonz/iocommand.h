@@ -15,6 +15,9 @@
 // Qt includes
 #include <QDialog>
 
+// TnzQt includes
+#include "toonzqt/dvdialog.h"
+
 // boost includes
 #include <boost/optional.hpp>
 
@@ -109,12 +112,16 @@ struct LoadResourceArguments {
       RENAME,
       NEVER,
   };
+  
+  enum class ConvertPolicy {
+      ASK_USER,
+      CONVERT,
+      NEVER,
+  };
+
 public:
   std::vector<ResourceData>
       resourceDatas;  //!< [\p In/Out]  Data identifying a single resource.
-
-  // reuse TFrameIds retrieved by FileBrowser
-  std::vector<std::vector<TFrameId>> frameIdsSet;
 
   TFilePath castFolder;  //!< [\p In]      Cast panel folder where the resources
                          //! will be inserted.
@@ -131,6 +138,8 @@ public:
   ImportPolicy importPolicy;  //!< [\p In]      Policy adopted for resources
                               //! external to current scene.
   RenamePolicy renamePolicy;  
+  ConvertPolicy convertPolicy; // Convert Raster to TLV
+
   bool expose;  //!< [\p In]      Whether resources must be exposed in the
                 //! xsheet.
 
@@ -162,6 +171,8 @@ public:
             Preferences::instance()->getDefaultImportPolicy()))
       , renamePolicy(static_cast<RenamePolicy>(
             Preferences::instance()->getDefaultRenamePolicy()))
+      , convertPolicy(static_cast<ConvertPolicy>(
+            Preferences::instance()->getDefaultConvertPolicy()))
       , expose(Preferences::instance()->isAutoExposeEnabled())
       , xFrom(-1)
       , xTo(-1)
@@ -177,10 +188,17 @@ public:
 
 //------------------------------------------------------------------------
 
-class ConvertingPopup final : public QDialog {
+class ConvertingPopup final : public DVGui::ProgressDialog {
 public:
-  ConvertingPopup(QWidget *parent, QString fileName);
-  ~ConvertingPopup();
+    ConvertingPopup(QWidget* parent, QString fileName) 
+        : ProgressDialog(QString(
+        QObject::tr("Converting %1 to tlv format...").arg(fileName)), 
+            "Cancel", 0, 1, parent) {
+    };
+    ~ConvertingPopup() {};
+    void setName(QString fileName) {
+        ProgressDialog::setLabelText(QObject::tr("Converting %1 to tlv format...")
+            .arg(fileName)); };
 };
 
 //------------------------------------------------------------------------
@@ -244,10 +262,14 @@ int loadResourceFolders(
         0  //!< Load block. May be nonzero in order to extend block data
            //!  access and finalization.
 );         //!< Loads the specified folders in current xsheet.
-           //!  \return  The actually loaded levels count.
+           //!  \return  The actually loaded levels count.           
 
 void renameResources(std::vector<LoadResourceArguments::ResourceData>& rds, 
     bool askUser = true);
+
+void convertNAARaster2TLV(std::vector<LoadResourceArguments::ResourceData>& rds, 
+   bool askUser = true, double dpi = 0, bool appendPalette = true);
+
 bool exposeLevel(TXshSimpleLevel *sl, int row, int col, bool insert = false,
                  bool overWrite = false);
 bool exposeLevel(TXshSimpleLevel *sl, int row, int col,
