@@ -215,7 +215,7 @@ namespace {
         while (popup.isVisible() || popup.isConverting())
             QCoreApplication::processEvents(QEventLoop::AllEvents |
                 QEventLoop::WaitForMoreEvents);
-        path = popup.getConvetedPath(path);
+        path = popup.getConvertedPath(path);
         if (path.isEmpty()) return false;
         out->setPath(path);
         out->load();

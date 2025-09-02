@@ -853,11 +853,11 @@ void TSystem::copyFileOrLevel_throw(const TFilePath &dst,
 //--------------------------------------------------------------
 
 bool TSystem::renameImageSequence(const TFilePathSet &files,
-                                        const TFilePath &levelPath,
-                                        int prefixLength) {
+                                  const TFilePath &levelPath,
+                                  int prefixLength) {
   std::string levelBaseName = levelPath.withoutParentDir().getName();
-
-  //TSystem::readDirectory(levelPath.getParentDir(), false);
+  assert(files.begin()->isAbsolute() && levelPath.isAbsolute());
+  // TSystem::readDirectory(levelPath.getParentDir(), false);
 
   std::wstring wstr;
   TFilePath dst;
@@ -868,10 +868,12 @@ bool TSystem::renameImageSequence(const TFilePathSet &files,
       wstr = wstr.substr(prefixLength);
     else
       wstr.clear();
-    dst = file.withName(levelBaseName).withFrame(TFrameId(TFrameId(wstr).expand()));
+
+    dst = file.getParentDir() +(levelBaseName + "." + TFrameId(wstr).expand()
+          + file.getDottedType());
     try {
       TSystem::renameFile(dst, file);
-    } catch (...){
+    } catch (...) {
       return false;
     }
   }
