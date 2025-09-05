@@ -1,5 +1,5 @@
 if(BUILD_ENV_APPLE)
-    cmake_minimum_required(VERSION 2.8.11)
+    cmake_minimum_required(VERSION 2.8.11...4.0)
     project(MouseDragFilter)
 
     include_directories(.)
