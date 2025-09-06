@@ -1212,9 +1212,11 @@ bool LoadLevelPopup::execute() {
     args.row0 = m_posFrom->text().toInt() - 1;
 
     args.frameCount = m_posTo->text().toInt() - m_posFrom->text().toInt() + 1;
-
-    if ((int)getCurrentFIdsSet().size() != 0)
-      args.frameIdsSet.push_back(*getCurrentFIdsSet().begin());
+    
+    std::list<std::vector<TFrameId>> fidsSet = getCurrentFIdsSet();
+    if (!fidsSet.empty()) {
+        args.resourceDatas[0].m_frameIdSet = std::move(fidsSet.front());
+    }
 
     else if (m_notExistLabel->isVisible()) {
       TFrameId firstLoadingFId = m_fromFrame->getValue();
@@ -1231,7 +1233,7 @@ bool LoadLevelPopup::execute() {
       }
       if (!lastLoadingFId.getLetter().isEmpty())
         tmp_fids.push_back(lastLoadingFId);
-      args.frameIdsSet.push_back(tmp_fids);
+      args.resourceDatas[0].m_frameIdSet = std::move(tmp_fids);
     }
 
     TFrameId xFrom = m_xFrom->getValue();
@@ -1267,12 +1269,13 @@ bool LoadLevelPopup::execute() {
       args.resourceDatas.push_back(*it);
 
     std::list<std::vector<TFrameId>> fIdsSet = getCurrentFIdsSet();
-    if (fIdsSet.size() > 0) {
-      std::list<std::vector<TFrameId>>::const_iterator fIdIt;
-      for (fIdIt = fIdsSet.begin(); fIdIt != fIdsSet.end(); ++fIdIt)
-        args.frameIdsSet.insert(args.frameIdsSet.begin(), *fIdIt);
+    auto fIdIt = fIdsSet.begin();
+    auto rdIt = args.resourceDatas.begin();
+    while (fIdIt != fIdsSet.end() && rdIt != args.resourceDatas.end()) {
+        rdIt->m_frameIdSet = std::move(*fIdIt);
+        ++fIdIt;
+        ++rdIt;
     }
-
     args.cachingBehavior = IoCmd::LoadResourceArguments::CacheRasterBehavior(
         m_rasterCacheBehaviorComboBox->currentData().toInt());
 
