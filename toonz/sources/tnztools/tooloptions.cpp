@@ -1979,7 +1979,8 @@ void BrushToolOptionsBox::filterControls() {
        it != m_labels.end(); it++) {
     bool isModifier = (it.key().substr(0, 8) == "Modifier");
     bool isCommon   = (it.key() == "Lock Alpha" || it.key() == "Pressure" ||
-                     it.key() == "Assistants" || it.key() == "Preset:");
+                     it.key() == "Assistants" || it.key() == "Preset:" ||
+                     it.key() == "Smooth:");
     bool visible    = isCommon || (isModifier == showModifiers);
     it.value()->setVisible(visible);
   }
@@ -1988,7 +1989,8 @@ void BrushToolOptionsBox::filterControls() {
        it != m_controls.end(); it++) {
     bool isModifier = (it.key().substr(0, 8) == "Modifier");
     bool isCommon   = (it.key() == "Lock Alpha" || it.key() == "Pressure" ||
-                     it.key() == "Assistants" || it.key() == "Preset:");
+                     it.key() == "Assistants" || it.key() == "Preset:" ||
+                     it.key() == "Smooth:");
     bool visible    = isCommon || (isModifier == showModifiers);
     if (QWidget *widget = dynamic_cast<QWidget *>(it.value()))
       widget->setVisible(visible);
@@ -2178,34 +2180,37 @@ void EraserToolOptionsBox::onColorModeChanged(int index) {
 //
 //=============================================================================
 
-FingerToolOptionsBox::FingerToolOptionsBox(QWidget* parent, TTool* tool, TPaletteHandle* pltHandle, ToolHandle* toolHandle)
-: ToolOptionsBox(parent), m_colorMode(0), m_invertMode(0){
-    TPropertyGroup* props = tool->getProperties(0);
-    assert(props->getPropertyCount() > 0);
+FingerToolOptionsBox::FingerToolOptionsBox(QWidget *parent, TTool *tool,
+                                           TPaletteHandle *pltHandle,
+                                           ToolHandle *toolHandle)
+    : ToolOptionsBox(parent), m_colorMode(0), m_invertMode(0) {
+  TPropertyGroup *props = tool->getProperties(0);
+  assert(props->getPropertyCount() > 0);
 
-    ToolOptionControlBuilder builder(this, tool, pltHandle, toolHandle);
-    if (tool && tool->getProperties(0)) tool->getProperties(0)->accept(builder);
+  ToolOptionControlBuilder builder(this, tool, pltHandle, toolHandle);
+  if (tool && tool->getProperties(0)) tool->getProperties(0)->accept(builder);
 
-    hLayout()->addStretch(1);
+  hLayout()->addStretch(1);
 
-    m_colorMode = dynamic_cast<ToolOptionCombo*>(m_controls.value("Mode:"));
-    m_invertMode = dynamic_cast<ToolOptionCheckbox*>(m_controls.value("Invert"));
-    m_selectiveMode = dynamic_cast<ToolOptionCheckbox*>(m_controls.value("Selective"));
+  m_colorMode  = dynamic_cast<ToolOptionCombo *>(m_controls.value("Mode:"));
+  m_invertMode = dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Invert"));
+  m_selectiveMode =
+      dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Selective"));
 
-    bool ret = true;
-    if (m_colorMode) {
-        ret = ret && connect(m_colorMode, SIGNAL(currentIndexChanged(int)), this,
-            SLOT(onColorModeChanged(int)));
-        if (m_invertMode)
-            m_invertMode->setEnabled(m_colorMode->currentIndex() == 0);//INK
-        if (m_selectiveMode)
-            m_selectiveMode->setEnabled(m_colorMode->currentIndex() == 1);//PAINT
-    }
+  bool ret = true;
+  if (m_colorMode) {
+    ret = ret && connect(m_colorMode, SIGNAL(currentIndexChanged(int)), this,
+                         SLOT(onColorModeChanged(int)));
+    if (m_invertMode)
+      m_invertMode->setEnabled(m_colorMode->currentIndex() == 0);  // INK
+    if (m_selectiveMode)
+      m_selectiveMode->setEnabled(m_colorMode->currentIndex() == 1);  // PAINT
+  }
 }
 
 void FingerToolOptionsBox::onColorModeChanged(int i) {
-    if (m_invertMode) m_invertMode->setEnabled(i == 0);
-    if (m_selectiveMode) m_selectiveMode->setEnabled(i == 1);
+  if (m_invertMode) m_invertMode->setEnabled(i == 0);
+  if (m_selectiveMode) m_selectiveMode->setEnabled(i == 1);
 }
 //=============================================================================
 //
@@ -2668,9 +2673,11 @@ ShiftTraceToolOptionBox::ShiftTraceToolOptionBox(QWidget *parent, TTool *tool)
 
   m_prevFrame->setFixedSize(10, 21);
   m_afterFrame->setFixedSize(10, 21);
-  int buttonWidth = fontMetrics().horizontalAdvance(m_resetPrevGhostBtn->text()) + 10;
+  int buttonWidth =
+      fontMetrics().horizontalAdvance(m_resetPrevGhostBtn->text()) + 10;
   m_resetPrevGhostBtn->setFixedWidth(buttonWidth);
-  buttonWidth = fontMetrics().horizontalAdvance(m_resetAfterGhostBtn->text()) + 10;
+  buttonWidth =
+      fontMetrics().horizontalAdvance(m_resetAfterGhostBtn->text()) + 10;
   m_resetAfterGhostBtn->setFixedWidth(buttonWidth);
 
   m_layout->addWidget(m_prevFrame, 0);
@@ -2938,7 +2945,7 @@ void ToolOptions::onToolSwitched() {
   ToolHandle *currTool    = app->getCurrentTool();
   TTool *tool             = currTool->getTool();
 
-    // Skip panel updates if we're in navigation mode
+  // Skip panel updates if we're in navigation mode
   if (currTool && currTool->isSpacePressed()) {
     return;
   }
@@ -2962,55 +2969,52 @@ void ToolOptions::onToolSwitched() {
 
     if (it == m_panels.end()) {
       // Create new panel if one doesn't exist for this tool
-        if (tool->getName() == T_Edit) {
-            TPropertyGroup* pg = tool->getProperties(0);
-            panel = new ArrowToolOptionsBox(0, tool, pg, currFrame, currObject,
-                currXsheet, currTool);
-        }
-        else if (tool->getName() == T_Selection)
-            panel = new SelectionToolOptionsBox(0, tool, currPalette, currTool);
-        else if (tool->getName() == T_Geometric)
-            panel = new GeometricToolOptionsBox(0, tool, currPalette, currTool);
-        else if (tool->getName() == T_Type)
-            panel = new TypeToolOptionsBox(0, tool, currPalette, currTool);
-        else if (tool->getName() == T_PaintBrush)
-            panel = new PaintbrushToolOptionsBox(0, tool, currPalette, currTool);
-        else if (tool->getName() == T_Fill) {
-            if (tool->getTargetType() & TTool::RasterImage)
-                panel =
-                new FullColorFillToolOptionsBox(0, tool, currPalette, currTool);
-            else
-                panel = new FillToolOptionsBox(0, tool, currPalette, currTool);
-        }
-        else if (tool->getName() == T_Eraser)
-            panel = new EraserToolOptionsBox(0, tool, currPalette, currTool);
-        else if (tool->getName() == T_Tape)
-            panel = new TapeToolOptionsBox(0, tool, currPalette, currTool);
-        else if (tool->getName() == T_RGBPicker)
-            panel = new RGBPickerToolOptionsBox(0, tool, currPalette, currTool,
-                app->getPaletteController());
-        else if (tool->getName() == T_Ruler) {
-            RulerToolOptionsBox* p = new RulerToolOptionsBox(0, tool);
-            panel = p;
-            RulerTool* rt = dynamic_cast<RulerTool*>(tool);
-            if (rt) rt->setToolOptionsBox(p);
-        }
-        else if (tool->getName() == T_StylePicker)
-            panel = new StylePickerToolOptionsBox(0, tool, currPalette, currTool,
-                app->getPaletteController());
-        else if (tool->getName() == "T_ShiftTrace")
-            panel = new ShiftTraceToolOptionBox(this, tool);
-        else if (tool->getName() == T_Zoom)
-            panel = new ZoomToolOptionsBox(0, tool, currPalette, currTool);
-        else if (tool->getName() == T_Rotate)
-            panel = new RotateToolOptionsBox(0, tool, currPalette, currTool);
-        else if (tool->getName() == T_Hand)
-            panel = new HandToolOptionsBox(0, tool, currPalette, currTool);
-        else if (tool->getName() == "T_Finger")
-            panel = new FingerToolOptionsBox(0, tool, currPalette, currTool);
+      if (tool->getName() == T_Edit) {
+        TPropertyGroup *pg = tool->getProperties(0);
+        panel = new ArrowToolOptionsBox(0, tool, pg, currFrame, currObject,
+                                        currXsheet, currTool);
+      } else if (tool->getName() == T_Selection)
+        panel = new SelectionToolOptionsBox(0, tool, currPalette, currTool);
+      else if (tool->getName() == T_Geometric)
+        panel = new GeometricToolOptionsBox(0, tool, currPalette, currTool);
+      else if (tool->getName() == T_Type)
+        panel = new TypeToolOptionsBox(0, tool, currPalette, currTool);
+      else if (tool->getName() == T_PaintBrush)
+        panel = new PaintbrushToolOptionsBox(0, tool, currPalette, currTool);
+      else if (tool->getName() == T_Fill) {
+        if (tool->getTargetType() & TTool::RasterImage)
+          panel =
+              new FullColorFillToolOptionsBox(0, tool, currPalette, currTool);
         else
-            panel = tool->createOptionsBox();  // Future: Use this virtual method
-        // for all tools
+          panel = new FillToolOptionsBox(0, tool, currPalette, currTool);
+      } else if (tool->getName() == T_Eraser)
+        panel = new EraserToolOptionsBox(0, tool, currPalette, currTool);
+      else if (tool->getName() == T_Tape)
+        panel = new TapeToolOptionsBox(0, tool, currPalette, currTool);
+      else if (tool->getName() == T_RGBPicker)
+        panel = new RGBPickerToolOptionsBox(0, tool, currPalette, currTool,
+                                            app->getPaletteController());
+      else if (tool->getName() == T_Ruler) {
+        RulerToolOptionsBox *p = new RulerToolOptionsBox(0, tool);
+        panel                  = p;
+        RulerTool *rt          = dynamic_cast<RulerTool *>(tool);
+        if (rt) rt->setToolOptionsBox(p);
+      } else if (tool->getName() == T_StylePicker)
+        panel = new StylePickerToolOptionsBox(0, tool, currPalette, currTool,
+                                              app->getPaletteController());
+      else if (tool->getName() == "T_ShiftTrace")
+        panel = new ShiftTraceToolOptionBox(this, tool);
+      else if (tool->getName() == T_Zoom)
+        panel = new ZoomToolOptionsBox(0, tool, currPalette, currTool);
+      else if (tool->getName() == T_Rotate)
+        panel = new RotateToolOptionsBox(0, tool, currPalette, currTool);
+      else if (tool->getName() == T_Hand)
+        panel = new HandToolOptionsBox(0, tool, currPalette, currTool);
+      else if (tool->getName() == "T_Finger")
+        panel = new FingerToolOptionsBox(0, tool, currPalette, currTool);
+      else
+        panel = tool->createOptionsBox();  // Future: Use this virtual method
+      // for all tools
 
       m_panels[tool] = panel;
       layout()->addWidget(panel);
