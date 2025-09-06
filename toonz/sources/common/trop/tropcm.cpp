@@ -1481,4 +1481,28 @@ void TRop::makeIcon(TRasterCM32P &_rout, const TRasterCM32P &rin) {
   rin->unlock();
 }
 
+void TRop::putRefImage(const TRasterCM32P &Up, const TRaster32P &Ref,
+                       int style) {
+  if (style < 0) style = TPixelCM32::getMaxInk();
+  assert(Up->getSize() == Ref->getSize());
+  if (Up->getSize() != Ref->getSize()) return;
+  int lx = Up->getLx(), ly = Up->getLy();
+  for (int y = 0; y < ly; ++y) {
+    TPixelCM32 *dstRow = Up->pixels(y);
+    TPixel32 *refRow   = Ref->pixels(y);
+    for (int x = 0; x < lx; ++x) {
+      if (refRow[x] != TPixel32(0, 0, 0, 0))
+        if (dstRow[x].getTone() == TPixelCM32::getMaxTone()) {
+          dstRow[x].setInk(style);
+          dstRow[x].setTone(TPixelCM32::getMaxTone() - refRow[x].m);
+        }
+    }
+  }
+}
+
+void TRop::eraseRefInks(const TRasterCM32P &r) {
+  auto id = new std::vector<int>{TPixelCM32::getMaxInk()};
+  TRop::eraseColors(r, id, true, false);
+  delete id;
+}
 /*-----------------------------------------------------------------------------*/

@@ -483,7 +483,8 @@ return true if the method execution can have changed the current tool
                               //! update
                               //! override by vector selection tool
   //!  images on the level view.
-  void notifyImageChanged(const TFrameId &fid);  //!< Notifies changes on the
+  void notifyImageChanged(const TFrameId &fid,
+                          TXshSimpleLevel *sl= nullptr);  //!< Notifies changes on the
   //! frame \p fid; used to update
   //!  images on the level view.
 

@@ -3,8 +3,6 @@
 #ifndef T_FILL_INCLUDED
 #define T_FILL_INCLUDED
 
-class TPalette;
-
 #undef DVAPI
 #undef DVVAR
 #ifdef TOONZLIB_EXPORTS
@@ -15,6 +13,7 @@ class TPalette;
 #define DVVAR DV_IMPORT_VAR
 #endif
 
+
 #include <set>
 #include "ttilesaver.h"
 #include "timage.h"
@@ -23,7 +22,12 @@ class TPalette;
 #include "tpixelcm.h"
 #include "traster.h"
 #include "trastercm.h"
-#include "tpalette.h"
+
+#include "preferences.h"
+#define DEF_REGION_WITH_PAINT                                                  \
+  Preferences::instance()->getBoolValue(PreferencesItemId::DefRegionWithPaint)
+
+class TPalette;
 
 class FillParameters {
 public:
@@ -71,7 +75,8 @@ class TTileSaverFullColor;
 
 // returns true if the savebox is changed typically, if you fill the bg)
 DVAPI bool fill(const TRasterCM32P &r, const FillParameters &params,
-                TTileSaverCM32 *saver = 0);
+                TTileSaverCM32 *saver  = 0,
+                const TRaster32P &ref = TRaster32P());
 
 DVAPI void fill(const TRaster32P &ras, const TRaster32P &ref,
                 const FillParameters &params, TTileSaverFullColor *saver = 0);
@@ -106,13 +111,15 @@ void DVAPI fillHoles(const TRasterCM32P &ras, const int size,
 class DVAPI AreaFiller {
   typedef TPixelCM32 Pixel;
   TRasterCM32P m_ras;
+  TRaster32P m_refRas;
   TRect m_bounds;
   Pixel *m_pixels;
+  TPalette* m_palette;
   int m_wrap;
   int m_color;
-
+  
 public:
-  AreaFiller(const TRasterCM32P &ras);
+  AreaFiller(const TRasterCM32P &ras, const TRaster32P& ref = TRaster32P(), TPalette *palette = nullptr);
   ~AreaFiller();
   /*!
 Fill \b rect in raster with \b color.
@@ -120,7 +127,7 @@ Fill \b rect in raster with \b color.
 else if \b fillInks is false fill only paint delimited by ink;
 else fill ink and paint in rect.
 */
-  bool rectFill(const TRect &rect, int color, bool onlyUnfilled,
+  bool rectFill(const TRect &rect, const TRect &saveBox, int color, bool onlyUnfilled,
                 bool fillPaints, bool fillInks);
 
   /*!
@@ -129,7 +136,7 @@ Fill the raster region contained in spline \b s with \b color.
 else if \b fillInks is false fill only paint delimited by ink;
 else fill ink and paint in region contained in spline.
 */
-  void strokeFill(TStroke *s, int color, bool onlyUnfilled, bool fillPaints,
+  void strokeFill(const TRect& rect, TStroke *s, int color, bool onlyUnfilled, bool fillPaints,
                   bool fillInks);
 };
 

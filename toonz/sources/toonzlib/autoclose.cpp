@@ -4,6 +4,7 @@
 #include "toonz/autoclose.h"
 #include "trastercm.h"
 #include "skeletonlut.h"
+#include <set>
 
 #define AUT_SPOT_SAMPLES 10
 
@@ -39,7 +40,7 @@ public:
       , m_spotAngle(angle)
       , m_closingDistance(distance)
       , m_inkIndex(index)
-      , m_opacity(opacity) {}
+      , m_opacity(opacity){}
 
   ~Imp() {}
 
@@ -544,7 +545,7 @@ void TAutocloser::Imp::findMeetingPoints(
     do
       calculateWeightAndDirection(orientedEndpoints);
     while (spotResearchTwoPoints(orientedEndpoints, closingSegments));
-
+    
     do
       calculateWeightAndDirection(orientedEndpoints);
     while (spotResearchOnePoint(orientedEndpoints, closingSegments));
@@ -697,7 +698,7 @@ bool TAutocloser::Imp::spotResearchOnePoint(
       Segment segment(endpoints[count].first, p);
       std::vector<Segment>::iterator it =
           std::find(closingSegments.begin(), closingSegments.end(), segment);
-      if (it == closingSegments.end()) {
+      if (it == closingSegments.end() && notInsidePath(endpoints[count].first, p)) {
         ret = true;
         drawInByteRaster(endpoints[count].first, p);
         closingSegments.push_back(Segment(endpoints[count].first, p));
@@ -1127,16 +1128,32 @@ return 0;
 
 /*=============================================================================*/
 
-TAutocloser::TAutocloser(const TRasterP &r, int distance, double angle,
-                         int index, int opacity)
-    : m_imp(new Imp(r, distance, angle, index, opacity)) {}
+std::unordered_map<std::string, std::vector<TAutocloser::Segment>>
+    TAutocloser::m_cache;
+std::mutex TAutocloser::m_mutex;
 
+TAutocloser::TAutocloser(const TRasterP &r, int distance, double angle, int ink,
+                         int opacity, std::set<int> autoPaints)
+    : m_imp(new Imp(r, distance, angle, ink, opacity))
+    , m_autoPaintStyles(autoPaints) {}
+
+TAutocloser::TAutocloser(const TRasterP &r, int ink, const AutocloseSettings st,
+                         std::set<int> autoPaints)
+    : m_imp(new Imp(r, st.m_closingDistance, st.m_spotAngle, ink, st.m_opacity))
+    , m_autoPaintStyles(autoPaints) {}
 //...............................
 
 void TAutocloser::exec() {
   std::vector<TAutocloser::Segment> segments;
   compute(segments);
   draw(segments);
+}
+
+void TAutocloser::exec(std::string id) {
+  std::vector<TAutocloser::Segment> segments;
+  compute(segments);
+  draw(segments);
+  setSegmentCache(id, std::move(segments));
 }
 
 //...............................
@@ -1147,6 +1164,24 @@ TAutocloser::~TAutocloser() {}
 
 void TAutocloser::compute(std::vector<Segment> &closingSegmentArray) {
   m_imp->compute(closingSegmentArray);
+  if (TRasterCM32P raux = (TRasterCM32P)m_imp->m_raster) {
+    if (!m_autoPaintStyles.empty()) {
+      closingSegmentArray.erase(
+          std::remove_if(closingSegmentArray.begin(), closingSegmentArray.end(),
+                         [&](const std::pair<TPoint, TPoint> &seg) {
+                           TPixelCM32 *pix1 =
+                               raux->pixels(seg.first.y) + seg.first.x;
+                           TPixelCM32 *pix2 =
+                               raux->pixels(seg.second.y) + seg.second.x;
+
+                           return m_autoPaintStyles.find(pix1->getInk()) !=
+                                      m_autoPaintStyles.end() ||
+                                  m_autoPaintStyles.find(pix2->getInk()) !=
+                                      m_autoPaintStyles.end();
+                         }),
+          closingSegmentArray.end());
+    }
+  }
 }
 //-------------------------------------------------
 
