@@ -2760,6 +2760,8 @@ bool IoCmd::importLipSync(TFilePath levelPath, QList<TFrameId> frameList,
                      .arg(toQString(levelPath)));
     return false;
   }
+  
+  return true;
 }
 
 // Use double value DPI as policy
