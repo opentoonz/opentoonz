@@ -676,7 +676,8 @@ bool XdtsIo::loadXdtsScene(ToonzScene *scene, const TFilePath &scenePath) {
 
   // emit signal here for updating the frame slider range of flip console
   TApp::instance()->getCurrentScene()->notifySceneChanged();
-
+  // update xsheet viewer
+  TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
   return true;
 }
 
