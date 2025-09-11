@@ -355,20 +355,27 @@ void XDTSImportPopup::updateSuggestions(const QString samplePath) {
   }
 
   // fallBack search
-  if (!suggested) {
-      updateSuggestions(fp);
-      return;
-  }
+  if (!suggested) updateSuggestions(fp);
 
-  // repaint fields
+  // Repaint fields:
+  //   - Suggested fields: highlight with a blue border
+  //   - Non-suggested fields:
+  //       if empty, set their internal path to the scene's parent directory,
+  //       but clear the text so the user does not see it
   fieldsItr = m_fields.begin();
   while (fieldsItr != m_fields.end()) {
     if (m_pathSuggestedLevels.contains(fieldsItr.key()))
       fieldsItr.value()->setStyleSheet(
           QString("#SuggestiveFileField "
                   "QLineEdit{border-color:#2255aa;border-width:2px;}"));
-    else
+    else {
       fieldsItr.value()->setStyleSheet(QString(""));
+      if (fieldsItr.value()->getPath().isEmpty()) {
+        fieldsItr.value()->setPath(
+            m_scene->getScenePath().getParentDir().getQString());
+        fieldsItr.value()->getField()->clear();
+      }
+    }
     ++fieldsItr;
   }
 }
@@ -432,18 +439,6 @@ void XDTSImportPopup::updateSuggestions(const TFilePath &path) {
             }
         }
         assignMatchingFiles(relPaths);
-    }
-
-    // repaint fields
-    fieldsItr = m_fields.begin();
-    while (fieldsItr != m_fields.end()) {
-        if (m_pathSuggestedLevels.contains(fieldsItr.key()))
-            fieldsItr.value()->setStyleSheet(
-                QString("#SuggestiveFileField "
-                    "QLineEdit{border-color:#2255aa;border-width:2px;}"));
-        else
-            fieldsItr.value()->setStyleSheet(QString(""));
-        ++fieldsItr;
     }
 }
 
