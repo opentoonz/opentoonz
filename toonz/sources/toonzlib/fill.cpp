@@ -54,7 +54,6 @@ void fillRow(const TRasterCM32P &r, const TPoint &p, int &xa, int &xb,
   oldtone = pix->getTone();
   tone    = oldtone;
   for (; pix <= limit; pix++) {
-    if (DEF_REGION_WITH_PAINT && pix->getPaint() != paintAtClickPos) break;
     if (pix->getPaint() == paint) break;
     tone = pix->getTone();
     if (tone == 0) break;
@@ -93,11 +92,6 @@ void fillRow(const TRasterCM32P &r, const TPoint &p, int &xa, int &xb,
     int preVailingInk,
         oldPrevailingInk = 0;  // avoid prevailing different Ink styles
     for (; pix <= limit; pix++) {
-      if (refImagePut && !USE_PREVAILING_REFER_FILL &&
-          pix->getInk() == TPixelCM32::getMaxInk() &&
-          limit - pix <= (DEF_REGION_WITH_PAINT ? 10 : 9))
-        break;
-      if (DEF_REGION_WITH_PAINT && pix->getPaint() != paintAtClickPos) break;
       if (pix->getPaint() == paint) break;
       if (pix->getTone() != 0) break;
       if (prevailing) {
@@ -117,7 +111,6 @@ void fillRow(const TRasterCM32P &r, const TPoint &p, int &xa, int &xb,
   oldtone = pix->getTone();
   tone    = oldtone;
   for (pix--; pix >= limit; pix--) {
-    if (DEF_REGION_WITH_PAINT && pix->getPaint() != paintAtClickPos) break;
     if (pix->getPaint() == paint) break;
     tone = pix->getTone();
     if (tone == 0) break;
@@ -155,11 +148,6 @@ void fillRow(const TRasterCM32P &r, const TPoint &p, int &xa, int &xb,
     if (limit < tmp_limit) limit = tmp_limit;
     int preVailingInk, oldPrevailingInk = 0;
     for (; pix >= limit; pix--) {
-      if (refImagePut && !USE_PREVAILING_REFER_FILL &&
-          pix->getInk() == TPixelCM32::getMaxInk() &&
-          pix - limit <= (DEF_REGION_WITH_PAINT ? 10 : 9))
-        break;
-      if (DEF_REGION_WITH_PAINT && pix->getPaint() != paintAtClickPos) break;
       if (pix->getPaint() == paint) break;
       if (pix->getTone() != 0) break;
       if (prevailing) {
@@ -178,6 +166,10 @@ void fillRow(const TRasterCM32P &r, const TPoint &p, int &xa, int &xb,
     pix = line + xa;
     int n;
     for (n = 0; n < xb - xa + 1; n++, pix++) {
+      if (refImagePut && !USE_PREVAILING_REFER_FILL &&
+          pix->getInk() == TPixelCM32::getMaxInk() && pix->getTone() == 0)
+        continue;
+      if (DEF_REGION_WITH_PAINT && pix->getPaint() != paintAtClickPos) continue;
       if (palette && pix->isPurePaint()) {
           TPoint pInk = nearestInkNotDiagonal(r, TPoint(xa + n, p.y));
           if (pInk != TPoint(-1, -1)) {
