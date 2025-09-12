@@ -129,7 +129,7 @@ Fill \b rect in raster with \b color.
 else if \b fillInks is false fill only paint delimited by ink;
 else fill ink and paint in rect.
 */
-  bool rectFill(const TRect &rect, const TRect &saveBox, int color, bool onlyUnfilled,
+  bool rectFill(const TRect &rect, int color, bool onlyUnfilled,
                 bool fillPaints, bool fillInks);
 
   /*!
