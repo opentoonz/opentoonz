@@ -281,6 +281,7 @@ bool AreaFiller::rectFill(const TRect &rect, int color, bool onlyUnfilled,
 
   m_ras->unlock();
 
+  m_ras->unlock();
   return true;
 }
 
