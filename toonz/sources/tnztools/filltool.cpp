@@ -2442,8 +2442,7 @@ void FillTool::draw() {
     if (ti) {
       TRectD bbox =
           ToonzImageUtils::convertRasterToWorld(convert(ti->getBBox()), ti);
-      drawRect(bbox.enlarge(0.5) * ti->getSubsampling(), TPixel32::Black,
-               0x5555, true);
+      drawRect(bbox * ti->getSubsampling(), TPixel32::Black, 0x5555, true);
     }
   }
   if (m_fillType.getValue() != NORMALFILL) {
