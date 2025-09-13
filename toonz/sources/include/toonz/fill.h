@@ -22,6 +22,7 @@
 #include "tpixelcm.h"
 #include "traster.h"
 #include "trastercm.h"
+#include "tropcm.h"
 
 #include "preferences.h"
 #define DEF_REGION_WITH_PAINT                                                  \
@@ -129,7 +130,7 @@ Fill \b rect in raster with \b color.
 else if \b fillInks is false fill only paint delimited by ink;
 else fill ink and paint in rect.
 */
-  bool rectFill(const TRect &rect, const TRect &saveBox, int color, bool onlyUnfilled,
+  bool rectFill(const TRect &rect, int color, bool onlyUnfilled,
                 bool fillPaints, bool fillInks);
 
   /*!
@@ -161,5 +162,23 @@ else fill ink and paint in rect.
   void rectFill(const TRect &rect, const FillParameters &params,
                 bool onlyUnfilled);
 };
+
+class RefImageGuard {
+    const TRasterCM32P& m_r;
+    bool m_refPlaced;
+
+public:
+    RefImageGuard(const TRasterCM32P& raster, const TRaster32P& Ref)
+        : m_r(raster), m_refPlaced(Ref.getPointer() != nullptr) {
+        m_r->lock();
+        if (m_refPlaced) TRop::putRefImage(const_cast<TRasterCM32P&>(m_r), Ref);
+    }
+
+    ~RefImageGuard() {
+        m_r->unlock();
+        if (m_refPlaced) TRop::eraseRefInks(const_cast<TRasterCM32P&>(m_r));
+    }
+};
+
 
 #endif
