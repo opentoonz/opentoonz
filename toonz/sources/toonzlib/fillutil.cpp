@@ -190,8 +190,6 @@ bool AreaFiller::rectFill(const TRect &rect, int color, bool onlyUnfilled,
   m_ras->lock();
   TRect r = m_bounds * rect;
 
-  if (m_refRas) TRop::putRefImage(m_ras, m_refRas);
-
   int dx  = r.x1 - r.x0;
   int dy  = (r.y1 - r.y0) * m_wrap;
   if (dx < 2 || dy < 2)  // rect degenere(area contenuta nulla), skippo.
@@ -204,6 +202,9 @@ bool AreaFiller::rectFill(const TRect &rect, int color, bool onlyUnfilled,
 
   TRasterCM32P ras       = m_ras->extract(rect.x0, rect.y0, rect.x1, rect.y1);
   TRasterCM32P backupRas = ras->clone();
+
+  // Put reference image, will be automatically removed by RAII
+  RefImageGuard refGuard(m_ras, m_refRas);
 
   // fill borders with maxPaint
   FillParameters params;
@@ -278,9 +279,8 @@ bool AreaFiller::rectFill(const TRect &rect, int color, bool onlyUnfilled,
       processPixel(*pix, *bak, true, color, onlyUnfilled, fillPaints, fillInks);
   }
 
-  if (m_refRas) TRop::eraseRefInks(m_ras);
-
   m_ras->unlock();
+
   return true;
 }
 
@@ -288,8 +288,6 @@ bool AreaFiller::rectFill(const TRect &rect, int color, bool onlyUnfilled,
 
 void AreaFiller::strokeFill(const TRect &rect, TStroke *stroke, int color,
                             bool onlyUnfilled, bool fillPaints, bool fillInks) {
-  m_ras->lock();
-  if (m_refRas) TRop::putRefImage(m_ras, m_refRas);
   TRect box  = rect;
   TRect bbox = m_ras->getBounds();
   box *= bbox;
@@ -297,6 +295,9 @@ void AreaFiller::strokeFill(const TRect &rect, TStroke *stroke, int color,
   assert(!box.isEmpty());
   TRasterCM32P ras       = m_ras->extract(box);
   TRasterCM32P backupRas = ras->clone();
+
+  // Put reference image, will be automatically removed by RAII
+  RefImageGuard refGuard(m_ras, m_refRas);
 
   // std::vector<std::pair<TPoint, int>> seeds;
   // computeSeeds(m_ras, stroke, seeds);
@@ -318,7 +319,6 @@ void AreaFiller::strokeFill(const TRect &rect, TStroke *stroke, int color,
       processPixel(*pix, *bak, false, color, onlyUnfilled, fillPaints,
                    fillInks);
   }
-  if (m_refRas) TRop::eraseRefInks(m_ras);
   m_ras->unlock();
 }
 
