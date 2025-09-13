@@ -188,23 +188,21 @@ void fillautoInks(TRasterCM32P &rin, TRect &rect, const TRasterCM32P &rbefore,
 
 bool AreaFiller::rectFill(const TRect &rect, int color, bool onlyUnfilled,
                           bool fillPaints, bool fillInks) {
+  // Put reference image, will be automatically removed by RAII
+  RefImageGuard refGuard(m_ras, m_refRas);
+
   // Viene trattato il caso fillInks
   /*- In case of FillInk only -*/
   m_ras->lock();
   TRect r = m_bounds * rect;
 
   if (fillInks) {
-    if (m_refRas) TRop::putRefImage(m_ras, m_refRas);
     for (int y = r.y0; y <= r.y1; y++) {
       TPixelCM32 *pix = m_ras->pixels(y) + r.x0;
       for (int x = r.x0; x <= r.x1; x++, pix++) { pix->setInk(color); }
     }
-    if (m_refRas) TRop::eraseRefInks(m_ras);
   }
   if (!fillPaints) return true;
-
-  if (m_refRas) TRop::putRefImage(m_ras, m_refRas);
-
   int dx  = r.x1 - r.x0;
   int dy  = (r.y1 - r.y0) * m_wrap;
   if (dx < 2 || dy < 2)  // rect degenere(area contenuta nulla), skippo.
@@ -303,9 +301,8 @@ bool AreaFiller::rectFill(const TRect &rect, int color, bool onlyUnfilled,
     }
   }
 
-  if (m_refRas) TRop::eraseRefInks(m_ras);
-
   m_ras->unlock();
+
   return true;
 }
 
@@ -313,8 +310,10 @@ bool AreaFiller::rectFill(const TRect &rect, int color, bool onlyUnfilled,
 
 void AreaFiller::strokeFill(const TRect &rect, TStroke *stroke, int color,
                             bool onlyUnfilled, bool fillPaints, bool fillInks) {
-  m_ras->lock();
-  if (m_refRas) TRop::putRefImage(m_ras, m_refRas);
+
+  // Put reference image, will be automatically removed by RAII
+  RefImageGuard refGuard(m_ras, m_refRas);
+
   TRect box  = rect;
   TRect bbox = m_ras->getBounds();
   box *= bbox;
@@ -362,8 +361,6 @@ void AreaFiller::strokeFill(const TRect &rect, TStroke *stroke, int color,
         pix->setPaint(bak->getPaint());
     }
   }
-
-  if (m_refRas) TRop::eraseRefInks(m_ras);
   m_ras->unlock();
 }
 
