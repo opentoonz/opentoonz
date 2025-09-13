@@ -53,7 +53,7 @@ jobs:
           
           brew update
           brew cleanup
-          checkPkgAndInstall pkg-config glew lz4 libjpeg libpng lzo boost libusb libmypaint ccache jpeg-turbo ninja opencv qt@5
+          checkPkgAndInstall pkg-config glew lz4 libjpeg libpng lzo boost libusb libmypaint ccache jpeg-turbo ninja opencv openjph openexr qt@5
           brew unlink qt
       - name: Set up cache
         run: |
@@ -70,10 +70,12 @@ jobs:
           cd thirdparty/tiff-4.0.3
           CFLAGS='-fPIC' CXXFLAGS='-fPIC' ./configure --disable-lzma
           make -j $(sysctl -n hw.ncpu)
+          make install  # Ensures CMake finds the installed lib (avoid linking issues)
       - name: Build
         run: |
           export PKG_CONFIG_PATH="/usr/local/opt/jpeg-turbo/lib/pkgconfig:$PKG_CONFIG_PATH"
           cd toonz
+          rm -rf build  
           mkdir -p build
           cd build
           cmake ../sources -G Ninja \

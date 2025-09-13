@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.11)
+cmake_minimum_required(VERSION 3.5)
 
 set(CMAKE_BUILD_TYPE_INIT Release)
 
@@ -168,10 +168,11 @@ endif()
 message(STATUS "Thirdpary Library Search path:" ${THIRDPARTY_LIBS_HINTS})
 
 if(BUILD_ENV_MSVC)
-    set(QT_PATH "C:/Qt/5.15.2/msvc2019${PLATFORM2}" CACHE PATH "Qt installation directory")
-    if(NOT EXISTS ${QT_PATH})
-        message("Specify QT_PATH properly")
-        return()
+    if(NOT DEFINED QT_PATH OR NOT EXISTS ${QT_PATH})
+        set(QT_PATH "C:/Qt/5.15.2/msvc2019${PLATFORM2}" CACHE PATH "Qt installation directory")
+        if(NOT EXISTS ${QT_PATH})
+            message(FATAL_ERROR "QT_PATH not found: ${QT_PATH}. Specify QT_PATH properly.")
+        endif()
     endif()
     set(QT_LIB_PATH ${QT_PATH})
     set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH};${QT_PATH}/lib/cmake/")
@@ -183,19 +184,35 @@ if(BUILD_ENV_MSVC)
         -D_USE_MATH_DEFINES
     )
 elseif(BUILD_ENV_APPLE)
-    set(QT_PATH "~/Qt5.9.2/5.9.2/clang_${PLATFORM}/lib" CACHE PATH "Qt installation directory")
-    set(QT_LIB_PATH "${QT_PATH}/")
-    set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH};${QT_LIB_PATH}cmake/")
+    # Try to find Qt from Homebrew if not explicitly set
+    if(NOT DEFINED QT_PATH)
+        execute_process(
+            COMMAND brew --prefix qt@5
+            OUTPUT_VARIABLE HOMEBREW_QT_PREFIX
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+            RESULT_VARIABLE BREW_RESULT
+        )
+        if(NOT BREW_RESULT EQUAL 0)
+            message(FATAL_ERROR "Homebrew 'qt@5' not found. Install with 'brew install qt@5' or set QT_PATH manually.")
+        endif()
+        set(QT_PATH "${HOMEBREW_QT_PREFIX}/lib" CACHE PATH "Qt installation directory (from Homebrew)")
+        message(STATUS "Auto-detected Qt path: ${QT_PATH}")
+    endif()
+
+    set(QT_LIB_PATH "${QT_PATH}")
+    list(APPEND CMAKE_PREFIX_PATH "${HOMEBREW_QT_PREFIX}/lib/cmake/Qt5")  # More precise for find_package(Qt5)
+
     foreach(path ${CMAKE_PREFIX_PATH})
-        message("CMAKE_PREFIX_PATH: " ${path})
-    endforeach(path)
+        message(STATUS "CMAKE_PREFIX_PATH: ${path}")
+    endforeach()
+
     add_definitions(
         -DMACOSX
         -Di386
         -D__MACOS__
     )
     if(PLATFORM EQUAL 64)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m64 -std=c++17 -stdlib=libc++ -fno-implicit-templates")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m64 -stdlib=libc++ -fno-implicit-templates")
         set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m64")
     elseif(PLATFORM EQUAL 32)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32 -std=c++17 -stdlib=libc++ -fno-implicit-templates -D HAS_QUICKDRAW")
@@ -205,8 +222,8 @@ elseif(BUILD_ENV_APPLE)
         message(FATAL_ERROR "Invalid PLATFORM:" ${PLATFORM} ". 'PLATFORM' must be 32 or 64.")
     endif()
 elseif(BUILD_ENV_UNIXLIKE)
-    # Needed for correct Qt detection
-    cmake_minimum_required(VERSION 2.8.12)
+    # Needed for correct Qt detection (handled by top-level 3.5+)
+    # cmake_minimum_required(VERSION 2.8.12)  # Redundant and triggers <3.5 error
     set(PRELOAD_VARIABLE "LD_LIBRARY_PATH")
     if(CMAKE_SYSTEM_NAME MATCHES "Linux")
         add_definitions(-DLINUX)
@@ -226,7 +243,7 @@ elseif(BUILD_ENV_UNIXLIKE)
 
     find_package(Qt5Widgets)
 
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
     if (NOT (CMAKE_CXX_COMPILER_ID STREQUAL "Clang"))
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lstdc++")
     endif()
@@ -276,6 +293,11 @@ find_package(Qt5 REQUIRED
     SerialPort
     UiTools
 )
+
+if(NOT Qt5Core_FOUND)
+  message(FATAL_ERROR "Qt5Core not found—check paths")
+endif()
+message(STATUS "Qt5 Modules: ${Qt5Core_VERSION}")
 
 set(QT_MINIMUM_VERSION 5.5.0)
 if(Qt5Core_VERSION VERSION_LESS QT_MINIMUM_VERSION)
@@ -430,7 +452,7 @@ elseif(BUILD_ENV_APPLE)
     pkg_check_modules(MYPAINT_LIB REQUIRED libmypaint)
 
     if(PLATFORM EQUAL 64)
-    	pkg_check_modules(TURBOJPEG REQUIRED libturbojpeg)
+        pkg_check_modules(TURBOJPEG REQUIRED libturbojpeg)
         find_library(TURBOJPEG_LIB turbojpeg ${TURBOJPEG_LIBRARY_DIRS})
         message("**************** turbojpeg lib:" ${TURBOJPEG_LIB})
 
@@ -546,24 +568,30 @@ include_directories(
 )
 
 if(BUILD_ENV_MSVC OR BUILD_ENV_APPLE)
+    # Handle CMake 3.30+/4.x: Force legacy module for prebuilt Boost (no config files)
     if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.30)
-        set(BOOST_DIR ${BOOST_ROOT})
-        find_package(Boost 1.55 REQUIRED)
-    else() # CMake version below 3.30
-        find_path(
-            BOOST_ROOT
-                include/boost
-                boost
-            HINTS
-                ${THIRDPARTY_LIBS_HINTS}
-            PATH_SUFFIXES
-                boost/boost_1_75_0/
-                boost/boost_1_74_0/
-                boost/boost_1_73_0/
-                boost/boost_1_72_0/
-        )
-        find_package(Boost 1.55 REQUIRED)
+        cmake_policy(SET CMP0167 OLD)  # Use FindBoost module, not config
     endif()
+    # Set hints/ROOT for both branches
+    set(Boost_NO_BOOST_CMAKE ON)  # Explicitly disable config search
+    find_path(
+        BOOST_ROOT
+            include/boost
+            boost
+        HINTS
+            ${BOOST_ROOT}  # From -D or env
+            ${THIRDPARTY_LIBS_HINTS}
+        PATH_SUFFIXES
+            boost/boost_1_89_0/  # Added recent versions (e.g., Homebrew 1.89)
+            boost/boost_1_87_0/
+            boost/boost_1_86_0/
+            boost/boost_1_85_0/
+            boost/boost_1_75_0/
+            boost/boost_1_74_0/
+            boost/boost_1_73_0/
+            boost/boost_1_72_0/
+    )
+    find_package(Boost 1.55 REQUIRED)
 else()
     find_package(Boost)
 endif()
@@ -663,16 +691,6 @@ endif()
 
 if((PLATFORM EQUAL 32) AND ((BUILD_TARGET_WIN AND BUILD_ENV_MSVC) OR BUILD_TARGET_APPLE))
     add_subdirectory(t32bitsrv)
-endif()
-
-if(BUILD_ENV_APPLE)
-    add_custom_command(TARGET executable
-        POST_BUILD COMMAND
-        ${CMAKE_INSTALL_NAME_TOOL} -add_rpath ${CMAKE_INSTALL_RPATH}
-        $<TARGET_FILE:executable>
-    )
-    # add capability for retina displays
-    set_target_properties(OpenToonz PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/../cmake/BundleInfo.plist.in)
 endif()
 
 if(BUILD_ENV_UNIXLIKE AND NOT BUILD_TARGET_WIN)

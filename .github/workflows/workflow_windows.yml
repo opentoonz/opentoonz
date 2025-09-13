@@ -5,11 +5,11 @@ on:
     branches:
       - master  # Specify branches where the workflow should run
     paths:
-      - '**/*'                   # Include all files in the repository
-      - '!appveyor.yml'          # Ignore changes in AppVeyor
-      - '!README.md'             # Exclude README
-      - '!doc/**'                # Exclude documentation
-      - '!**/.github/**'         # Exclude everything in .github folder
+      - '**/*'                                    # Include all files in the repository
+      - '!appveyor.yml'                           # Ignore changes in AppVeyor
+      - '!README.md'                              # Exclude README
+      - '!doc/**'                                 # Exclude documentation
+      - '!**/.github/**'                          # Exclude everything in .github folder
       - '.github/workflows/workflow_windows.yml'  # Include Windows workflow file
   pull_request:
     paths:
@@ -24,38 +24,48 @@ jobs:
   Windows:
     runs-on: windows-2025
     env:
-      QT_PATH: ${{ github.workspace }}\thirdparty\qt\5.15.2_wintab\msvc2019_64  # Path to custom Qt.
-      VCINSTALLDIR: 'C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC'  # Path to MSVC.
-      MSVCVERSION: "Visual Studio 17 2022"  # Visual Studio version.
-      BOOST_ROOT: C:\local\boost_1_87_0  # Boost library root.
-      OpenCV_DIR: C:\tools\opencv\build  # Path to OpenCV.
+      # QT related variable
+      QT_PATH: ${{ github.workspace }}\thirdparty\qt\5.15.2_wintab\msvc2019_64  # Path to custom Qt
+
+      # Visual Studio related variables
+      MSVCVERSION: "Visual Studio 17 2022"  # Visual Studio version
+      
+      # Boost-related variables      
+      BOOST_TOOLSET: "14.3"                 # Boost MSVC Toolset version
+      BOOST_VERSION: "1.87.0"               # Boost version
+      BOOST_ROOT: C:\local\boost_1_87_0     # Path to Boost library root
+      
+      # OpenCV-related variables      
+      OPENCV_VERSION: "4.11.0"              # OpenCV version
+      OpenCV_DIR: C:\tools\opencv\build     # Path to OpenCV
 
     steps:
       - uses: actions/checkout@v5
         with:
           lfs: false
-      - name: Install and Configure ccache
-        run: |
-          @echo on
-          choco install ccache
-          copy C:\ProgramData\chocolatey\lib\ccache\tools\ccache*\ccache.exe C:\ProgramData\chocolatey\bin\cl.exe
-          mkdir %LOCALAPPDATA%\ccache
-        shell: cmd
 
-      - name: Set Path ccache
+      # Cache OpenCV and Boost libraries
+      - name: Cache OpenCV and Boost
+        id: cache-deps
         uses: actions/cache@v4
         with:
-          path: C:/Users/runneradmin/AppData/Local/ccache
-          key: ${{ runner.os }}-${{ github.sha }}
-          restore-keys: ${{ runner.os }}-
+          path: |
+            C:\tools\opencv
+            ${{ env.BOOST_ROOT }}
+          key: ${{ runner.os }}-opencv-boost-${{ env.OPENCV_VERSION }}-boost-${{ env.BOOST_VERSION }}
+          restore-keys: |
+            ${{ runner.os }}-opencv-boost-${{ env.OPENCV_VERSION }}-boost-
 
-      - name: Install OpenCV and Boost
+      # Install OpenCV and Boost if the cache is missing
+      - name: Install OpenCV and Boost if cache is missing
+        if: steps.cache-deps.outputs.cache-hit != 'true'
         run: |
           @echo on
-          choco install opencv --version=4.11.0 -y
-          choco install boost-msvc-14.3 --version=1.87.0 -y
+          choco install opencv --version=${{ env.OPENCV_VERSION }} -y
+          choco install boost-msvc-${{ env.BOOST_TOOLSET }} --version=${{ env.BOOST_VERSION }} -y
         shell: cmd
 
+      # Install custom Qt 5.15.2 with WinTab support
       - name: Install custom Qt 5.15.2 with WinTab support
         run: |
           @echo on
@@ -72,9 +82,11 @@ jobs:
           7z x -y thirdparty-libs.zip
         shell: cmd    
 
+      # Add msbuild to PATH for build process
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v2
 
+      # CMake configuration step
       - name: CMake configuration
         run: |
           @echo on
@@ -84,12 +96,14 @@ jobs:
           copy /Y libpng-1.6.21\scripts\pnglibconf.h.prebuilt libpng-1.6.21\pnglibconf.h
 
           cd ../toonz
+          rmdir /S /Q build
           mkdir build
           cd build
 
           cmake ..\sources -G "%MSVCVERSION%" -Ax64 -DQT_PATH="%QT_PATH%" -DBOOST_ROOT="%BOOST_ROOT%" -DOpenCV_DIR="%OpenCV_DIR%" -DWITH_WINTAB=Y
         shell: cmd
 
+      # Build Opentoonz using MSBuild
       - name: Build Opentoonz
         run: |
           @echo on
@@ -97,6 +111,7 @@ jobs:
           msbuild /p:Configuration=RelWithDebInfo /m /verbosity:minimal ALL_BUILD.vcxproj
         shell: cmd
 
+      # Create the package
       - name: Create Package
         run: |
           @echo on
@@ -105,7 +120,6 @@ jobs:
           REM Create Opentoonz directory and copy files from RelWithDebInfo
           mkdir Opentoonz
           copy /Y RelWithDebInfo\*.* Opentoonz\
-
           REM Copy required DLLs for proper functionality
           copy /Y ..\..\thirdparty\glut\3.7.6\lib\glut64.dll Opentoonz
           copy /Y ..\..\thirdparty\glew\glew-1.9.0\bin\64bit\glew32.dll Opentoonz
@@ -128,12 +142,14 @@ jobs:
           xcopy /Y /E /I ..\..\stuff .\Opentoonz\portablestuff
         shell: cmd
 
+      # Create artifact from the build
       - name: Create Artifact
         run: |
           mkdir artifact
           xcopy toonz\build\Opentoonz artifact\ /E /H /Y
         shell: cmd
 
+      # Upload the generated artifact
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
