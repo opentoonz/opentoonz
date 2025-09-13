@@ -491,6 +491,39 @@ int getMostFrequentNeighborStyleId(TRasterCM32P ras,
 }
 
 //-----------------------------------------------------------------------------
+
+static TPixelCM32* nearestNonPureInk(const TRasterCM32P& r, TPoint& p,
+    int distance) {
+    if (!r) return nullptr;
+
+    int lx = r->getLx();
+    int ly = r->getLy();
+    int wrap = r->getWrap();
+    TPixelCM32* buf = (TPixelCM32*)r->getRawData();
+
+    for (int d = 0; d <= distance; ++d) {
+        for (int dy = -d; dy <= d; ++dy) {
+            int y = p.y + dy;
+            if (y < 0 || y >= ly) continue;
+
+            int dxLimit = d - abs(dy);
+            for (int dx = -dxLimit; dx <= dxLimit; ++dx) {
+                int x = p.x + dx;
+                if (x < 0 || x >= lx) continue;
+
+                TPixelCM32* pix = buf + y * wrap + x;
+                if (!pix->isPureInk()) {
+                    p.x = x;
+                    p.y = y;
+                    return pix;
+                }
+            }
+        }
+    }
+    return nullptr;
+    }
+
+//-----------------------------------------------------------------------------
 }  // namespace
 //-----------------------------------------------------------------------------
 /*-- The return value is whether the saveBox has been updated or not. --*/
@@ -511,8 +544,19 @@ bool fill(const TRasterCM32P &r, const FillParameters &params,
 
   /*- Return if clicked outside the screen -*/
   if (!bbbox.contains(p)) return false;
+
+  pix0 = r->pixels(p.y) + p.x;
+  if (pix0->isPureInk()) {
+    if (!params.m_prevailing) return false;
+    // if clicked on pure ink, try to find the nearest fillable pixel
+    TPixelCM32 *newPix = nearestNonPureInk(r, p, 1);
+    if (!newPix) return false;
+    pix0 = newPix;
+    x    = p.x;
+    y    = p.y;
+  }
+
   /*- If the same color has already been painted, return -*/
-  pix0                  = r->pixels(p.y) + p.x;
   int paintAtClickedPos = pix0->getPaint();
   if (paintAtClickedPos == paint)
     if (params.m_shiftFill) {
