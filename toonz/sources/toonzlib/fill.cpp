@@ -12,6 +12,37 @@
 //-----------------------------------------------------------------------------
 namespace {  // Utility Function
 
+//-----------------------------------------------------------------------------
+
+inline int threshTone(const TPixelCM32 &pix, int fillDepth) {
+  if (fillDepth == TPixelCM32::getMaxTone())
+    return pix.getTone();
+  else
+    return ((pix.getTone()) > fillDepth) ? TPixelCM32::getMaxTone()
+                                         : pix.getTone();
+}
+
+inline int adjustFillDepth(int fillDepth) {
+  assert(fillDepth >= 0 && fillDepth < 16);
+
+  switch (TPixelCM32::getMaxTone()) {
+  case 15:
+    return 15 - fillDepth;
+  case 255:
+    return ((15 - fillDepth) << 4) | (15 - fillDepth);
+  default:
+    assert(false);
+    return -1;
+  }
+}
+
+inline int threshMatte(int matte, int fillDepth) {
+    if (fillDepth == 255)
+        return matte;
+    else
+        return (matte < fillDepth) ? 255 : matte;
+}
+
 inline TPoint nearestInkNotDiagonal(const TRasterCM32P &r, const TPoint &p) {
   TPixelCM32 *buf = (TPixelCM32 *)r->pixels(p.y) + p.x;
 
@@ -340,22 +371,6 @@ public:
 
 //-----------------------------------------------------------------------------
 
-inline int threshTone(const TPixelCM32 &pix, int fillDepth) {
-  if (fillDepth == TPixelCM32::getMaxTone())
-    return pix.getTone();
-  else
-    return ((pix.getTone()) > fillDepth) ? TPixelCM32::getMaxTone()
-                                         : pix.getTone();
-}
-
-//-----------------------------------------------------------------------------
-
-inline int threshMatte(int matte, int fillDepth) {
-  if (fillDepth == 255)
-    return matte;
-  else
-    return (matte < fillDepth) ? 255 : matte;
-}
 
 //-----------------------------------------------------------------------------
 
@@ -542,18 +557,6 @@ bool fill(const TRasterCM32P &r, const FillParameters &params,
     TRop::putRefImage(r, Ref);
   }
 
-  assert(fillDepth >= 0 && fillDepth < 16);
-
-  switch (TPixelCM32::getMaxTone()) {
-  case 15:
-    fillDepth = (15 - fillDepth);
-    break;
-  case 255:
-    fillDepth = ((15 - fillDepth) << 4) | (15 - fillDepth);
-    break;
-  default:
-    assert(false);
-  }
   /*--Look at the colors in the four corners and update the saveBox if any of
    * the colors change. --*/
   TPixelCM32 borderIndex[4];
