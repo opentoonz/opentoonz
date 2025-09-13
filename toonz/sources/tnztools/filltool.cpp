@@ -79,6 +79,7 @@ TEnv::IntVar FillSegment("InknpaintFillSegment", 0);
 TEnv::IntVar FillCloseGap("InknpaintFillCloseGap", 0);
 TEnv::IntVar FillReferFill("InknpaintFillReferFill", 0);
 TEnv::IntVar FillRange("InknpaintFillRange", 0);
+TEnv::IntVar FillExtend("InknpaintFillExtend", 1);
 
 //-----------------------------------------------------------------------------
 
@@ -1900,8 +1901,9 @@ FillTool::FillTool(int targetType)
     , m_maxGapDistance("Maximum Gap", 0.01, 10.0, 1.15)
     , m_firstTime(true)
     , m_autopaintLines("Autopaint Lines", true)
-    , m_referFill("Refer Fill", false) {
-  m_areaFillTool       = new AreaFillTool(this);
+    , m_referFill("Refer Fill", false)
+    , m_extendFill("Extend Fill", true) {
+  m_areaFillTool = new AreaFillTool(this);
   m_normalLineFillTool = new NormalLineFillTool(this);
 
   bind(targetType);
@@ -1930,7 +1932,10 @@ FillTool::FillTool(int targetType)
     m_prop.bind(m_maxGapDistance);
     m_maxGapDistance.setId("MaxGapDistance");
   }
-  if (targetType == TTool::ToonzImage) m_prop.bind(m_autopaintLines);
+  if (targetType == TTool::ToonzImage) {
+    m_prop.bind(m_autopaintLines);
+    m_prop.bind(m_extendFill);
+  }
   m_selective.setId("Selective");
   m_onion.setId("OnionSkin");
   m_frameRange.setId("FrameRange");
@@ -1940,6 +1945,7 @@ FillTool::FillTool(int targetType)
   m_fillType.setId("Type");
   m_colorType.setId("Mode");
   m_autopaintLines.setId("AutopaintLines");
+  m_extendFill.setId("ExtendFill");
 }
 //-----------------------------------------------------------------------------
 
@@ -2107,6 +2113,7 @@ void FillTool::updateTranslation() {
   m_referFill.setQStringName(tr("Refer Fill"));
   m_maxGapDistance.setQStringName(tr("Maximum Gap"));
   m_autopaintLines.setQStringName(tr("Autopaint Lines"));
+  m_extendFill.setQStringName(tr("Extend Fill"));
 }
 
 //-----------------------------------------------------------------------------
@@ -2122,6 +2129,7 @@ FillParameters FillTool::getFillParameters() const {
   // RefFill is not controlled params
   params.m_minFillDepth = (int)m_fillDepth.getValue().first;
   params.m_maxFillDepth = (int)m_fillDepth.getValue().second;
+  params.m_extendFill = m_extendFill.getValue();
   return params;
 }
 
@@ -2351,7 +2359,13 @@ bool FillTool::onPropertyChanged(std::string propertyName, bool addToUndo) {
     rectPropChangedflag = true;
   }
 
-  else if (!m_frameSwitched && (propertyName == m_maxGapDistance.getName())) {
+  // Extend Fill
+  else if (propertyName == m_extendFill.getName()) {
+    FillExtend = (int)(m_extendFill.getValue());
+  }
+
+  else if (!m_frameSwitched &&
+           (propertyName == m_maxGapDistance.getName())) {
     TXshLevel *xl = TTool::getApplication()->getCurrentLevel()->getLevel();
     m_level       = xl ? xl->getSimpleLevel() : 0;
     if (TVectorImageP vi = getImage(true)) {
@@ -2593,6 +2607,7 @@ void FillTool::onActivate() {
     m_closeGap.setValue(FillCloseGap ? 1 : 0);
     m_referFill.setValue(FillReferFill ? 1 : 0);
     m_frameRange.setValue(FillRange ? 1 : 0);
+    m_extendFill.setValue(FillExtend ? 1 : 0);
     m_firstTime = false;
 
     if (m_fillType.getValue() != NORMALFILL) {

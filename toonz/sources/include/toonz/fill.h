@@ -41,8 +41,9 @@ public:
   int m_maxFillDepth;
   bool m_shiftFill;
   TPoint m_p;
-  TPalette *m_palette;
+  TPalette *m_palette;//Whether to fill autoPaint Ink
   bool m_prevailing;
+  bool m_extendFill;
 
   FillParameters()
       : m_styleId(0)
@@ -54,7 +55,8 @@ public:
       , m_p()
       , m_shiftFill(false)
       , m_palette(0)
-      , m_prevailing(true) {}
+      , m_prevailing(true)
+      , m_extendFill(false) {}
   FillParameters(const FillParameters &params)
       : m_styleId(params.m_styleId)
       , m_fillType(params.m_fillType)
@@ -65,7 +67,8 @@ public:
       , m_p(params.m_p)
       , m_shiftFill(params.m_shiftFill)
       , m_palette(params.m_palette)
-      , m_prevailing(params.m_prevailing) {}
+      , m_prevailing(params.m_prevailing)
+      , m_extendFill(params.m_extendFill){}
 };
 
 //=============================================================================
