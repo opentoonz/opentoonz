@@ -2760,6 +2760,8 @@ bool IoCmd::importLipSync(TFilePath levelPath, QList<TFrameId> frameList,
                      .arg(toQString(levelPath)));
     return false;
   }
+  
+  return true;
 }
 
 // Use double value DPI as policy
@@ -2864,8 +2866,8 @@ void IoCmd::convertNAARaster2TLV(
       = convertingPopup.getResultPath();*/
       Convert2Tlv converter(path, TFilePath(), dstPath.getParentDir(),
                             QString::fromStdWString(dstPath.getWideName()),
-                            from, to, false, TFilePath(), 20, 0, 50, false,
-                            true, dpi);
+                            from, to, false, TFilePath(), 0, 0, 50, true, true,
+                            dpi);
 
       std::string e;
       converter.init(e);
