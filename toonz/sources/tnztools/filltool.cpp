@@ -480,7 +480,10 @@ public:
     if (!ti) return;
     TRasterCM32P ras;
     TRect r = m_saveBox;
-    ras = ti->getRaster()->extract(r);
+    if (r.isEmpty())
+      ras = ti->getRaster();
+    else
+      ras = ti->getRaster()->extract(r);
     AreaFiller filler(ras, m_refImg, m_palette);
     if (!m_s)
       filler.rectFill(m_fillArea, m_paintId, m_onlyUnfilled,
@@ -2064,7 +2067,7 @@ void FillTool::computeRefImgsIfNeeded(const FillParameters &params) {
     TToonzImageP ti = (TToonzImageP)img;
     if (!ti) continue;
 
-    auto raux             = ti->getRaster();
+    auto raux = ti->getRaster();
     raux->lock();
     auto imgId            = sl->getImageId(fid, 0);
     TPointD saveboxOffset = TPointD(0, 0);
@@ -2085,7 +2088,7 @@ void FillTool::computeRefImgsIfNeeded(const FillParameters &params) {
       drawReferImage(ras, xsh, m_beginCell.col, slFidToRow[{sl, fid}],
                      saveboxOffset);
     if (closeGap) gapClose(ras, raux, sl, referFill);
-    
+
     raux->unlock();
   }
 }
