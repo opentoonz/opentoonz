@@ -16,9 +16,6 @@
 
 #include "toonz/preferences.h"
 
-#define DEF_REGION_WITH_PAINT                                                  \
-  Preferences::instance()->getBoolValue(PreferencesItemId::DefRegionWithPaint)
-
 using namespace SkeletonLut;
 
 //-----------------------------------------------------------------------------
