@@ -426,7 +426,12 @@ public:
   }
 
   int getSize() const override {
-    return sizeof(*this) + TRasterUndo::getSize();
+    int refImgSize =
+        m_refImg.getPointer()
+            ? m_refImg->getWrap() * m_refImg->getLy() * m_refImg->getPixelSize()
+            : 0;
+    return sizeof(*this) + TRasterUndo::getSize() + refImgSize;
+    ;
   }
 
   QString getToolName() override {
@@ -474,11 +479,12 @@ public:
     TRasterCM32P ras = image->getRaster();
     AreaFiller filler(ras, m_refImg, m_palette);
     if (!m_s)
-      filler.rectFill(m_fillArea, image->getSavebox(), m_paintId, m_onlyUnfilled,
-                      m_colorType != LINES, m_colorType != AREAS);
+      filler.rectFill(m_fillArea, image->getSavebox(), m_paintId,
+                      m_onlyUnfilled, m_colorType != LINES,
+                      m_colorType != AREAS);
     else
-      filler.strokeFill(m_fillArea, m_s, m_paintId, m_onlyUnfilled, m_colorType != LINES,
-                        m_colorType != AREAS);
+      filler.strokeFill(m_fillArea, m_s, m_paintId, m_onlyUnfilled,
+                        m_colorType != LINES, m_colorType != AREAS);
 
     if (m_palette) {
       TRect rect   = m_fillArea;
@@ -500,9 +506,13 @@ public:
   }
 
   int getSize() const override {
-    int size =
+    int strokeSize =
         m_s ? m_s->getControlPointCount() * sizeof(TThickPoint) + 100 : 0;
-    return sizeof(*this) + TRasterUndo::getSize() + size;
+    int refImgSize =
+        m_refImg.getPointer()
+            ? m_refImg->getWrap() * m_refImg->getLy() * m_refImg->getPixelSize()
+            : 0;
+    return sizeof(*this) + TRasterUndo::getSize() + strokeSize + refImgSize;
   }
 
   QString getToolName() override {
@@ -841,10 +851,11 @@ void fillAreaWithUndo(const TImageP &img, const TRaster32P &ref,
     // allargo di 1 la savebox, perche cosi' il rectfill di tutta l'immagine fa
     // una sola fillata
     TRasterCM32P ras = ti->getRaster();
-    TRect refSavebox      = ref ? ref->getBounds() : TRect();
-    //TRect enlargedSavebox = (ti->getSavebox().enlarge(1) + refSavebox) * ras->getBounds();
+    TRect refSavebox = ref ? ref->getBounds() : TRect();
+    // TRect enlargedSavebox = (ti->getSavebox().enlarge(1) + refSavebox) *
+    // ras->getBounds();
     TRect strokeBox      = ToonzImageUtils::convertWorldToRaster(selArea, ti);
-    TRect savebox = ti->getSavebox();
+    TRect savebox        = ti->getSavebox();
     TRect rasterFillArea = strokeBox * savebox;
     if (rasterFillArea.isEmpty()) return;
 
@@ -866,8 +877,9 @@ void fillAreaWithUndo(const TImageP &img, const TRaster32P &ref,
     }
     AreaFiller filler(raux, ref, plt);
     if (!stroke) {
-      bool ret = filler.rectFill(rasterFillArea, ti->getSavebox(), cs, onlyUnfilled,
-                                 colorType != LINES, colorType != AREAS);
+      bool ret =
+          filler.rectFill(rasterFillArea, ti->getSavebox(), cs, onlyUnfilled,
+                          colorType != LINES, colorType != AREAS);
       if (!ret) {
         delete tileSet;
         return;
@@ -888,11 +900,11 @@ void fillAreaWithUndo(const TImageP &img, const TRaster32P &ref,
       if (stroke) stroke->transform(TTranslation(convert(ras->getCenter())));
       if (ref)
         stroke->transform(TTranslation(-convert(ti->getSavebox().getP00())));
-      filler.strokeFill(rasterFillArea, stroke, cs, onlyUnfilled, colorType != LINES,
-                        colorType != AREAS);
+      filler.strokeFill(rasterFillArea, stroke, cs, onlyUnfilled,
+                        colorType != LINES, colorType != AREAS);
     }
 
-    //ToolUtils::updateSaveBox(sl, fid);
+    // ToolUtils::updateSaveBox(sl, fid);
 
     TUndoManager::manager()->add(
         new RasterRectFillUndo(tileSet, stroke, rasterFillArea, cs, sl,
@@ -1889,7 +1901,7 @@ FillTool::FillTool(int targetType)
     , m_firstTime(true)
     , m_autopaintLines("Autopaint Lines", true)
     , m_referFill("Refer Fill", false) {
-  m_areaFillTool           = new AreaFillTool(this);
+  m_areaFillTool       = new AreaFillTool(this);
   m_normalLineFillTool = new NormalLineFillTool(this);
 
   bind(targetType);
@@ -2337,8 +2349,7 @@ bool FillTool::onPropertyChanged(std::string propertyName, bool addToUndo) {
     rectPropChangedflag = true;
   }
 
-  else if (!m_frameSwitched &&
-           (propertyName == m_maxGapDistance.getName())) {
+  else if (!m_frameSwitched && (propertyName == m_maxGapDistance.getName())) {
     TXshLevel *xl = TTool::getApplication()->getCurrentLevel()->getLevel();
     m_level       = xl ? xl->getSimpleLevel() : 0;
     if (TVectorImageP vi = getImage(true)) {
