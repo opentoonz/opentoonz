@@ -3,11 +3,11 @@ name: MacOS Build
 on:
   push:
     paths:
-      - '**/*'                   # Include all files in the repository
-      - '!appveyor.yml'          # Ignore changes in AppVeyor
-      - '!README.md'             # Exclude README
-      - '!doc/**'                # Exclude documentation
-      - '!**/.github/**'         # Exclude everything in .github folder
+      - '**/*'                                  # Include all files in the repository
+      - '!appveyor.yml'                         # Ignore changes in AppVeyor
+      - '!README.md'                            # Exclude README
+      - '!doc/**'                               # Exclude documentation
+      - '!**/.github/**'                        # Exclude everything in .github folder
       - '.github/workflows/workflow_macos.yml'  # Include MacOs workflow file
   pull_request:
     paths:
@@ -20,41 +20,48 @@ on:
 
 jobs:
   macOS:
-    timeout-minutes: 90 # Stop job if it exceeds expected build time
+    timeout-minutes: 120 # Stop job if it exceeds expected build time
     # Stick with macOS 13 to avoid arm64 headaches on macOS 15
     runs-on: macos-13
     steps:
       - uses: actions/checkout@v5
 
-      - name: Clean Python symlinks
+      - name: Fix Homebrew issues
         run: |
-          # Remove potentially conflicting Python symlinks
-          find /usr/local/bin -type l \( -name "python*" -o -name "pip*" -o -name "2to3*" -o -name "idle*" -o -name "pydoc*" \) \
-            -exec sh -c 'file -b {} | grep -q "symbolic link to .*Python.framework" && echo "Removing {}" && rm {}' \;
-          # Ensure Homebrew Python is properly linked
-          for py_version in python@3.11 python@3.12 python@3.13; do
-            if brew list --versions $py_version >/dev/null; then
-              brew unlink $py_version || true
-            fi
-          done
-          brew link --overwrite --force python@3.13 || true
-          
+          # Remove unnecessary taps
+          brew untap homebrew/cask || true
+          brew untap homebrew/core || true
+          # Run Homebrew maintenance
+          brew doctor --quiet || true
+          brew update --force
+          brew cleanup
       - name: Install libraries
         run: |
+          # Install meson explicitly (dependency for gobject-introspection)
+          brew install meson
+          # Install gobject-introspection from source
+          echo "Installing gobject-introspection from source..."
+          brew install --build-from-source gobject-introspection || {
+            echo "Failed to install gobject-introspection"
+            exit 1
+          }
+          # Function to install or upgrade remaining packages
           checkPkgAndInstall() {
             for pkg in "$@"; do
-              if brew ls --versions $pkg; then
-                brew upgrade $pkg
+              if brew list -1 | grep -q "^${pkg}$"; then
+                echo "$pkg already installed. Upgrading..."
+                brew upgrade $pkg || true
               else
-                brew install $pkg
+                echo "Installing $pkg..."
+                brew install $pkg || {
+                  echo "Failed to install $pkg"
+                  exit 1
+                }
               fi
             done
           }
-          
-          brew update
-          brew cleanup
           checkPkgAndInstall pkg-config glew lz4 libjpeg libpng lzo boost libusb libmypaint ccache jpeg-turbo ninja opencv openjph openexr qt@5
-          brew unlink qt
+          brew unlink qt || true
       - name: Set up cache
         run: |
           export PATH="/usr/local/opt/ccache/libexec:$PATH"
@@ -70,12 +77,10 @@ jobs:
           cd thirdparty/tiff-4.0.3
           CFLAGS='-fPIC' CXXFLAGS='-fPIC' ./configure --disable-lzma
           make -j $(sysctl -n hw.ncpu)
-          make install  # Ensures CMake finds the installed lib (avoid linking issues)
       - name: Build
         run: |
           export PKG_CONFIG_PATH="/usr/local/opt/jpeg-turbo/lib/pkgconfig:$PKG_CONFIG_PATH"
           cd toonz
-          rm -rf build  
           mkdir -p build
           cd build
           cmake ../sources -G Ninja \
