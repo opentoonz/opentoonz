@@ -165,18 +165,18 @@ void naru_lazybrush::doDraw(TRasterPT<PIXEL> ras, std::vector<float>& r,
   for (int y = 0; y < height; ++y) {
     PIXEL* pix = ras->pixels(y);
     for (int x = 0; x < width; ++x) {
+      int p  = idx(x, y, width);
       pix->r = (typename PIXEL::Channel)(maskColor.m * maskColor.r *
-                                         fmin(r[y * width + x], 1.f) *
+                                         fmin(r[p], 1.f) *
                                          (float)PIXEL::maxChannelValue);
       pix->g = (typename PIXEL::Channel)(maskColor.m * maskColor.g *
-                                         fmin(g[y * width + x], 1.f) *
+                                         fmin(g[p], 1.f) *
                                          (float)PIXEL::maxChannelValue);
       pix->b = (typename PIXEL::Channel)(maskColor.m * maskColor.b *
-                                         fmin(b[y * width + x], 1.f) *
+                                         fmin(b[p], 1.f) *
                                          (float)PIXEL::maxChannelValue);
-      pix->m =
-          (typename PIXEL::Channel)(maskColor.m * fmin(a[y * width + x], 1.f) *
-                                    (float)PIXEL::maxChannelValue);
+      pix->m = (typename PIXEL::Channel)(maskColor.m * fmin(a[p], 1.f) *
+                                         (float)PIXEL::maxChannelValue);
       pix++;
     }
   }
@@ -200,10 +200,11 @@ void naru_lazybrush::doGrayScale(TRasterPT<PIXEL> ras, double frame,
         float r = (float)pix->r / (m * (float)PIXEL::maxChannelValue);
         float g = (float)pix->g / (m * (float)PIXEL::maxChannelValue);
         float b = (float)pix->b / (m * (float)PIXEL::maxChannelValue);
-        gray[y * width + x] =
+        gray[idx(x, y, width)] =
             fmax(0.299f * r + 0.587f * g + 0.114f * b, minLightness);
-      } else
-        gray[y * width + x] = 1.0f;
+      } else {
+        gray[idx(x, y, width)] = 1.0f;
+      }
       pix++;
     }
   }
@@ -366,9 +367,9 @@ void naru_lazybrush::doGraph(TRasterPT<PIXEL> ras, double frame,
         dy   = 1;
       } else {
         fcx0 = 0;
-        fcy0 = i - width;
+        fcy0 = i - width + 1;
         fcx1 = width - 1;
-        fcy1 = i - width;
+        fcy1 = i - width + 1;
         dx   = 1;
         dy   = 0;
       }
@@ -382,7 +383,7 @@ void naru_lazybrush::doGraph(TRasterPT<PIXEL> ras, double frame,
         fcy0 += dy;
         int cx = fcx0;
         int cy = fcy0;
-        if (cx < 0 || cx >= width || cy < 0 || cy >= height) break;
+        if (cx < 0 || cx >= width - 1 || cy < 0 || cy >= height - 1) break;
         int cp = idx(cx, cy, width);
         if (weights[cp] > autoScribbleThreshold) {
           fcx0 += dx * lineWeight;
@@ -407,7 +408,7 @@ void naru_lazybrush::doGraph(TRasterPT<PIXEL> ras, double frame,
         fcy1 -= dy;
         int cx = fcx1;
         int cy = fcy1;
-        if (cx < 0 || cx >= width || cy < 0 || cy >= height) break;
+        if (cx < 0 || cx >= width - 1 || cy < 0 || cy >= height - 1) break;
         int cp = idx(cx, cy, width);
         if (weights[cp] > autoScribbleThreshold) {
           fcx1 -= dx * lineWeight;
@@ -529,9 +530,9 @@ void naru_lazybrush::doColorize(TRasterPT<PIXEL> ras, double frame, Graph& g,
   if (mode == 0) {
     // line => (r, g, b, 1.), noLine => (r, g, b, 0.)
     ras->lock();
-    for (int y = 1; y < height - 1; ++y) {
+    for (int y = 0; y < height; ++y) {
       PIXEL* pix = ras->pixels(y);
-      for (int x = 1; x < width - 1; ++x) {
+      for (int x = 0; x < width; ++x) {
         int p   = idx(x, y, width);
         float m = (float)pix->m / (float)PIXEL::maxChannelValue;
         if (m != 0) {
@@ -539,9 +540,9 @@ void naru_lazybrush::doColorize(TRasterPT<PIXEL> ras, double frame, Graph& g,
           float g  = (float)pix->g / (float)PIXEL::maxChannelValue;
           float b  = (float)pix->b / (float)PIXEL::maxChannelValue;
           lineM[p] = (1.f - fmin(fmin(r, g), b)) * m;
-          lineR[p] = 0.f;
-          lineG[p] = 0.f;
-          lineB[p] = 0.f;
+          lineR[p] = r;
+          lineG[p] = g;
+          lineB[p] = b;
         }
         pix++;
       }
