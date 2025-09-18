@@ -26,11 +26,9 @@ class naru_lazybrush final : public TStandardRasterFx {
   TDoubleParamP m_alpha;
   TDoubleParamP m_autoscrlen;
   TDoubleParamP m_autoscrthresh;
+  TDoubleParamP m_lineweight;
   TBoolParamP m_fillHole;
-  TBoolParamP m_sinkU;
-  TBoolParamP m_sinkD;
-  TBoolParamP m_sinkL;
-  TBoolParamP m_sinkR;
+  TIntEnumParamP m_sinkpos;
   TBoolParamP m_autoScribble;
 
 public:
@@ -45,11 +43,9 @@ public:
       , m_alpha(100.f)
       , m_autoscrlen(4.f)
       , m_autoscrthresh(0.1f)
+      , m_lineweight(4.f)
       , m_fillHole(true)
-      , m_sinkU(true)
-      , m_sinkD(true)
-      , m_sinkL(true)
-      , m_sinkR(true)
+      , m_sinkpos(new TIntEnumParam(0, "All"))
       , m_autoScribble(true) {
     bindParam(this, "mode", m_mode);
     bindParam(this, "mask_color", m_maskcolor);
@@ -62,11 +58,9 @@ public:
     bindParam(this, "alpha", m_alpha);
     bindParam(this, "auto_scribble_length", m_autoscrlen);
     bindParam(this, "auto_scribble_threshold", m_autoscrthresh);
+    bindParam(this, "line_weight", m_lineweight);
     bindParam(this, "undef_is_sink", m_fillHole);
-    bindParam(this, "up_wall_is_sink", m_sinkU);
-    bindParam(this, "down_wall_is_sink", m_sinkD);
-    bindParam(this, "left_wall_is_sink", m_sinkL);
-    bindParam(this, "right_wall_is_sink", m_sinkR);
+    bindParam(this, "sink_pos", m_sinkpos);
     bindParam(this, "auto_scribble", m_autoScribble);
 
     this->m_mode->addItem(1, "Mask");
@@ -74,6 +68,15 @@ public:
     this->m_mode->addItem(3, "Capacity Map");
     this->m_mode->addItem(4, "Scribble Map");
     this->m_scrtype->addItem(1, "Hard");
+
+    this->m_sinkpos->addItem(1, "Bottom-Left");
+    this->m_sinkpos->addItem(2, "Bottom-Center");
+    this->m_sinkpos->addItem(3, "Bottom-Right");
+    this->m_sinkpos->addItem(4, "Center-Right");
+    this->m_sinkpos->addItem(5, "Top-Right");
+    this->m_sinkpos->addItem(6, "Top-Center");
+    this->m_sinkpos->addItem(7, "Top-Left");
+    this->m_sinkpos->addItem(8, "Center-Left");
 
     this->m_minlightness->setValueRange(0.f, 1.f);
     this->m_logs->setValueRange(0.f, 5.f);
@@ -93,11 +96,12 @@ public:
   bool doGetBBox(double frame, TRectD& bBox,
                  const TRenderSettings& info) override {
     if (m_input.isConnected()) {
-      m_input->doGetBBox(frame, bBox, info);
+      bBox = TConsts::infiniteRectD;
       return true;
+    } else {
+      bBox = TRectD();
+      return false;
     }
-
-    return false;
   };
 
   void doCompute(TTile& tile, double frame, const TRenderSettings&) override;
@@ -119,11 +123,11 @@ private:
       {0, 1, 0},
   };
 
-  int mode;  // 0:Mask, 1:Mask+Line, 2:LoG Filter, 3:Scribble Map
+  int mode = 0;       // 0:Mask+Line, 1:Mask, 2:LoG Filter, 3:Scribble Map
   TPixelF maskColor;  // マスクの色
 
-  const float LoG_draw_scale = 20.f;  // LoGフィルタの描画スケール
-  float LoG_s;  // LoGフィルタのスケール
+  const float LoG_draw_scale = 20.f;   // LoGフィルタの描画スケール
+  float LoG_s                = 0.05f;  // LoGフィルタのスケール
 
   int idx(int x, int y, int w) { return y * w + x; }
 
@@ -346,10 +350,8 @@ void naru_lazybrush::doGraph(TRasterPT<PIXEL> ras, double frame,
 
   float autoScribbleLength    = m_autoscrlen->getValue(frame);
   float autoScribbleThreshold = m_autoscrthresh->getValue(frame);
-  bool sinkU                  = m_sinkU->getValue();
-  bool sinkD                  = m_sinkD->getValue();
-  bool sinkL                  = m_sinkL->getValue();
-  bool sinkR                  = m_sinkR->getValue();
+  float lineWeight            = m_lineweight->getValue(frame);
+  int sinkPos                 = m_sinkpos->getValue();
   bool autoScribble           = m_autoScribble->getValue();
   if (autoScribble) {
     // Auto Scribble
@@ -382,9 +384,11 @@ void naru_lazybrush::doGraph(TRasterPT<PIXEL> ras, double frame,
         int cy = fcy0;
         if (cx < 0 || cx >= width || cy < 0 || cy >= height) break;
         int cp = idx(cx, cy, width);
-        if (weights[cp] > autoScribbleThreshold)
+        if (weights[cp] > autoScribbleThreshold) {
+          fcx0 += dx * lineWeight;
+          fcy0 += dy * lineWeight;
           onLine = true;
-        else
+        } else
           onLine = false;
         if (!onLine && pOnLine) {
           g.addTerminal(cp, tLinkCap - sLinkCap);
@@ -405,9 +409,11 @@ void naru_lazybrush::doGraph(TRasterPT<PIXEL> ras, double frame,
         int cy = fcy1;
         if (cx < 0 || cx >= width || cy < 0 || cy >= height) break;
         int cp = idx(cx, cy, width);
-        if (weights[cp] > autoScribbleThreshold)
+        if (weights[cp] > autoScribbleThreshold) {
+          fcx1 -= dx * lineWeight;
+          fcy1 -= dy * lineWeight;
           onLine = true;
-        else
+        } else
           onLine = false;
         if (!onLine && pOnLine) {
           g.addTerminal(cp, tLinkCap - sLinkCap);
@@ -420,28 +426,61 @@ void naru_lazybrush::doGraph(TRasterPT<PIXEL> ras, double frame,
   }
 
   // 境界値を設定
-  for (int i = 0; i < width + height - 2; ++i) {
-    if (i < width) {
-      if (sinkD) {
-        int pu = idx(i, 0, width);
-        g.addTerminal(pu, -K);
-        scribbleB[pu] = 1.f;
+  int bdSize     = 2 * (width + height - 2);
+  int initInds[] = {0,
+                    width * .5f,
+                    width,
+                    width + height * .5f,
+                    width + height,
+                    width * 1.5f + height,
+                    width * 2.f + height,
+                    width * 2.f + height * 1.5f};
+  std::vector<int> bdIdx(bdSize, false);
+  // 1 "Bottom-Left"
+  // 2 "Bottom-Center"
+  // 3 "Bottom-Right"
+  // 4 "Center-Right"
+  // 5 "Top-Right"
+  // 6 "Top-Center"
+  // 7 "Top-Left"
+  // 8 "Center-Left"
+  for (int i = 0; i < bdSize; ++i) {
+    int p;
+    if (i < width - 1)
+      p = idx(i, 0, width);
+    else if (i < width + height - 2)
+      p = idx(width - 1, i - width + 1, width);
+    else if (i < 2 * width + height - 3)
+      p = idx(width - 1 - (i - width - height + 2), height - 1, width);
+    else
+      p = idx(0, height - 1 - (i - 2 * width - height + 3), width);
+    bdIdx[i] = p;
+  }
+
+  if (sinkPos == 0) {
+    for (int i = 0; i < bdSize; ++i) {
+      int p = bdIdx[i];
+      g.addTerminal(p, -K);
+      scribbleB[p] = 1.f;
+    }
+  } else {
+    int initIdx = initInds[(sinkPos - 1)];
+    bool inside = false;
+    for (int i = 0; i < bdSize; ++i) {
+      int p = bdIdx[(initIdx + i + bdSize) % bdSize];
+      if (scribbleR[p] == 1.f) {
+        inside = true;
+        break;
       }
-      if (sinkU) {
-        int pd = idx(i, height - 1, width);
-        g.addTerminal(pd, -K);
-        scribbleB[pd] = 1.f;
-      }
-    } else {
-      if (sinkL) {
-        int pl = idx(0, i - width + 1, width);
-        g.addTerminal(pl, -K);
-        scribbleB[pl] = 1.f;
-      }
-      if (sinkR) {
-        int pr = idx(width - 1, i - width + 1, width);
-        g.addTerminal(pr, -K);
-        scribbleB[pr] = 1.f;
+      g.addTerminal(p, -K);
+      scribbleB[p] = 1.f;
+    }
+    if (inside) {
+      for (int i = 0; i < bdSize; ++i) {
+        int p = bdIdx[(initIdx - i + bdSize) % bdSize];
+        if (scribbleR[p] == 1.f) break;
+        g.addTerminal(p, -K);
+        scribbleB[p] = 1.f;
       }
     }
   }
@@ -493,8 +532,8 @@ void naru_lazybrush::doColorize(TRasterPT<PIXEL> ras, double frame, Graph& g,
     for (int y = 1; y < height - 1; ++y) {
       PIXEL* pix = ras->pixels(y);
       for (int x = 1; x < width - 1; ++x) {
-        int p    = idx(x, y, width);
-        float m  = (float)pix->m / (float)PIXEL::maxChannelValue;
+        int p   = idx(x, y, width);
+        float m = (float)pix->m / (float)PIXEL::maxChannelValue;
         if (m != 0) {
           float r  = (float)pix->r / (float)PIXEL::maxChannelValue;
           float g  = (float)pix->g / (float)PIXEL::maxChannelValue;
@@ -564,29 +603,43 @@ void naru_lazybrush::doCompute(TTile& tile, double frame,
                                const TRenderSettings& ri) {
   if (!m_input.isConnected()) return;
 
-  m_input->compute(tile, frame, ri);
+  // 1. 元画像全域のBBoxを取得
+  TRectD fullBBox;
+  m_input->getBBox(frame, fullBBox, ri);
 
-  TTile refer_tile;
-  TRasterP inRas, refRas;
-  inRas = tile.getRaster();
+  // 2. 元画像全体ラスタを確保
+  TDimension size(0, 0);
+  size.lx = tceil(fullBBox.getLx());
+  size.ly = tceil(fullBBox.getLy());
+  TTile fullTile;
+  m_input->allocateAndCompute(fullTile, fullBBox.getP00(), size,
+                              tile.getRaster(), frame, ri);
+  TRasterP fullRas = fullTile.getRaster();
 
+  // 3. グラフ処理をフルラスタで実行
+  TRasterP refRas;
   bool refer_sw = false;
-  if (this->m_ref.isConnected()) {
+  if (m_ref.isConnected()) {
     refer_sw = true;
-    this->m_ref->allocateAndCompute(refer_tile, tile.m_pos,
-                                    tile.getRaster()->getSize(),
-                                    tile.getRaster(), frame, ri);
-    refRas = refer_tile.getRaster();
+    TTile refTile;
+    m_ref->allocateAndCompute(refTile, fullBBox.getP00(), size, fullRas, frame,
+                              ri);
+    refRas = refTile.getRaster();
   }
 
-  if (TRaster32P ras32 = inRas)
+  if (TRaster32P ras32 = fullRas)
     process<TPixel32>(ras32, frame, refRas, refer_sw);
-  else if (TRaster64P ras64 = inRas)
+  else if (TRaster64P ras64 = fullRas)
     process<TPixel64>(ras64, frame, refRas, refer_sw);
-  else if (TRasterFP rasF = inRas)
+  else if (TRasterFP rasF = fullRas)
     process<TPixelF>(rasF, frame, refRas, refer_sw);
   else
-    throw TException("naru_LazyBrushFx: unsupported Pixel Type");
+    throw TException("unsupported Pixel Type");
+
+  // 4. tile に結果をコピー
+  TRasterP tileRas      = tile.getRaster();
+  TPoint startTilingPos = convert(fullTile.m_pos - tile.m_pos);
+  tileRas->copy(fullRas, startTilingPos);
 }
 
 //------------------------------------------------------------------
