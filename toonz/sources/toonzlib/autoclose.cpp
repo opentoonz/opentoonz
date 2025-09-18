@@ -6,6 +6,7 @@
 #include "toonz/autoclose.h"
 #include "trastercm.h"
 #include "skeletonlut.h"
+#include "toonz/fill.h"
 #include <set>
 
 //#define AUT_SPOT_SAMPLES 40
@@ -199,9 +200,86 @@ TRasterGR8P fillByteRaster(const TRasterCM32P &r, TRasterGR8P &bRaster) {
 #define SET_INK                                                                \
   if (buf->getTone() == buf->getMaxTone())                                     \
     *buf = TPixelCM32(inkIndex, 0, 255 - opacity);
+// Check if a segment needs to be closed
+// Return true ¡ú needs closure; false ¡ú no closure needed
+bool needCloseSegment(const TRasterCM32P &r, const TAutocloser::Segment &s) {
+  int x1 = s.first.x, y1 = s.first.y;
+  int x2 = s.second.x, y2 = s.second.y;
+
+  int dx  = std::abs(x2 - x1);
+  int dy  = std::abs(y2 - y1);
+  int sx  = (x2 > x1) ? 1 : -1;
+  int sy  = (y2 > y1) ? 1 : -1;
+  int err = dx - dy;
+
+  int x = x1;
+  int y = y1;
+
+  int side1_count   = 0;
+  int side2_count   = 0;
+  int total_checked = 0;
+
+  while (true) {
+    // Only check side pixels if current line pixel is purePaint
+    if (r->pixels(y)[x].isPurePaint()) {
+      total_checked++;
+
+      // Calculate perpendicular offsets for this pixel
+      int nx = (dy <= dx) ? 0 : 1;  // mostly horizontal ¡ú vertical neighbors
+      int ny = (dy <= dx) ? 1 : 0;  // mostly vertical ¡ú horizontal neighbors
+
+      // Side 1 (+offset)
+      int sx1 = x + nx;
+      int sy1 = y + ny;
+      if (sx1 >= 0 && sy1 >= 0 && sx1 < r->getLx() && sy1 < r->getLy()) {
+        if (r->pixels(sy1)[sx1].getPaint()) side1_count++;
+      }
+
+      // Side 2 (-offset)
+      int sx2 = x - nx;
+      int sy2 = y - ny;
+      if (sx2 >= 0 && sy2 >= 0 && sx2 < r->getLx() && sy2 < r->getLy()) {
+        if (r->pixels(sy2)[sx2].getPaint()) side2_count++;
+      }
+    }
+
+    if (x == x2 && y == y2) break;
+
+    int e2 = 2 * err;
+    if (e2 > -dy) {
+      err -= dy;
+      x += sx;
+    }
+    if (e2 < dx) {
+      err += dx;
+      y += sy;
+    }
+  }
+
+  if (total_checked == 0) {
+    return false;
+  }
+
+  double side1_ratio = static_cast<double>(side1_count) / total_checked;
+  double side2_ratio = static_cast<double>(side2_count) / total_checked;
+
+  const double THRESHOLD = 0.8;
+  bool side1_ok          = (side1_ratio >= THRESHOLD);
+  bool side2_ok          = (side2_ratio >= THRESHOLD);
+
+  // Only one side with sufficient paint coverage is enough to skip closure
+  if (side1_ok || side2_ok) {
+    return false;
+  }
+
+  return true;  // both sides not sufficiently painted ¡ú needs closure
+}
 
 void drawSegment(TRasterCM32P &r, const TAutocloser::Segment &s,
                  USHORT inkIndex, USHORT opacity) {
+  // Check if this segment actually needs closing
+  if (!USE_PREVAILING_REFER_FILL && !needCloseSegment(r, s)) return;
+
   int wrap        = r->getWrap();
   TPixelCM32 *buf = r->pixels();
   /*
@@ -541,7 +619,7 @@ void TAutocloser::Imp::findMeetingPoints(
   m_aut_spot_samples = (UINT)m_spotAngle;
 
   m_spotAngle *= (M_PI / 180.0);
-  
+
   // spotResearchTwoPoints
   // Angle Range: 0¡ã~36¡ã
   double limitedAngle = m_spotAngle / 10;
@@ -570,7 +648,7 @@ void TAutocloser::Imp::findMeetingPoints(
     do
       calculateWeightAndDirection(orientedEndpoints);
     while (spotResearchTwoPoints(orientedEndpoints, closingSegments));
-    
+
     do
       calculateWeightAndDirection(orientedEndpoints);
     while (spotResearchOnePoint(orientedEndpoints, closingSegments));
