@@ -22,7 +22,7 @@ jobs:
   macOS:
     timeout-minutes: 90 # Stop job if it exceeds expected build time
     # Stick with macOS 13 to avoid arm64 headaches on macOS 15
-    runs-on: macos-13
+    runs-on: macos-26
     steps:
       - uses: actions/checkout@v5
 
