@@ -28,7 +28,7 @@ jobs:
       QT_PATH: ${{ github.workspace }}\thirdparty\qt\5.15.2_wintab\msvc2019_64  # Path to custom Qt
 
       # Visual Studio related variables
-      MSVCVERSION: "Visual Studio 17 2022"  # Visual Studio version
+      MSVCVERSION: "Visual Studio 16 2019"  # Visual Studio version
       
       # Boost-related variables      
       BOOST_TOOLSET: "14.3"                 # Boost MSVC Toolset version
@@ -82,6 +82,19 @@ jobs:
           7z x -y thirdparty-libs.zip
         shell: cmd    
 
+      # Install Visual Studio 2019 Build Tools (Minimal)
+      - name: Install Visual Studio 2019 Build Tools (Fallback)
+        run: |
+          @echo on
+          choco install visualstudio2019buildtools --package-parameters "--add Microsoft.VisualStudio.Workload.VCTools --includeRecommended --installPath \"C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\"" -y
+          if %ERRORLEVEL% NEQ 0 (
+            echo Installation failed with error code %ERRORLEVEL%
+            type "C:\ProgramData\chocolatey\logs\chocolatey.log"
+            type "C:\Users\runneradmin\AppData\Local\Temp\chocolatey\dd_installer_*.log"
+            exit /b %ERRORLEVEL%
+          )
+        shell: cmd
+
       # Add msbuild to PATH for build process
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v2
@@ -94,12 +107,10 @@ jobs:
           copy /Y tiff-4.0.3\libtiff\tif_config.vc.h tiff-4.0.3\libtiff\tif_config.h
           copy /Y tiff-4.0.3\libtiff\tiffconf.vc.h tiff-4.0.3\libtiff\tiffconf.h
           copy /Y libpng-1.6.21\scripts\pnglibconf.h.prebuilt libpng-1.6.21\pnglibconf.h
-
           cd ../toonz
           rmdir /S /Q build
           mkdir build
           cd build
-
           cmake ..\sources -G "%MSVCVERSION%" -Ax64 -DQT_PATH="%QT_PATH%" -DBOOST_ROOT="%BOOST_ROOT%" -DOpenCV_DIR="%OpenCV_DIR%" -DWITH_WINTAB=Y
         shell: cmd
 
@@ -116,7 +127,7 @@ jobs:
         run: |
           @echo on
           cd toonz\build
-          
+
           REM Create Opentoonz directory and copy files from RelWithDebInfo
           mkdir Opentoonz
           copy /Y RelWithDebInfo\*.* Opentoonz\
@@ -127,16 +138,16 @@ jobs:
           copy /Y ..\..\thirdparty\libmypaint\dist\64\libintl-8.dll Opentoonz
           copy /Y ..\..\thirdparty\libmypaint\dist\64\libjson-c-2.dll Opentoonz
           copy /Y ..\..\thirdparty\libmypaint\dist\64\libmypaint-1-4-0.dll Opentoonz
-          
+
           REM Copy OpenCV DLL (IMPORTANT: Update path/filename when upgrading OpenCV version)
           copy /Y "C:\tools\opencv\build\x64\vc16\bin\opencv_world4110.dll" Opentoonz
-          
+
           REM Deploy Qt dependencies
           "%QT_PATH%\bin\windeployqt.exe" Opentoonz\Opentoonz.exe --opengl
-          
+
           del /Q Opentoonz\*.pdb  REM Remove .pdb files
           del /Q Opentoonz\vc_redist.x64.exe REM Remove vc_redist.x64.exe file
-          
+
           REM Create portablestuff directory and copy stuff folder
           mkdir Opentoonz\portablestuff
           xcopy /Y /E /I ..\..\stuff .\Opentoonz\portablestuff
