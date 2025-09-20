@@ -4457,8 +4457,8 @@ void doQuickPutCmapped(const TRaster32P &dn, const TRasterCM32P &up,
   int count = std::max({palette->getStyleCount(), TPixelCM32::getMaxInk(),
                         TPixelCM32::getMaxPaint()});
 
-  std::vector<TPixel32> paints(count, TPixel32::Red);
-  std::vector<TPixel32> inks(count, TPixel32::Red);
+  std::vector<TPixel32> paints(count+1, TPixel32::Red);
+  std::vector<TPixel32> inks(count+1, TPixel32::Red);
   if (globalColorScale != TPixel::Black)
     for (int i = 0; i < palette->getStyleCount(); i++)
       paints[i] = inks[i] = applyColorScaleCMapped(
@@ -4467,7 +4467,7 @@ void doQuickPutCmapped(const TRaster32P &dn, const TRasterCM32P &up,
     for (int i = 0; i < palette->getStyleCount(); i++)
       paints[i] = inks[i] =
           ::premultiply(palette->getStyle(i)->getAverageColor());
-
+  
   dn->lock();
   up->lock();
   TPixelCM32 *upBasePix = up->pixels();
