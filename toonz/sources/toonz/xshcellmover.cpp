@@ -561,8 +561,9 @@ void LevelMoverTool::onClick(const QMouseEvent *e) {
   if (e->modifiers() & Qt::ShiftModifier ||
       // Or Dragging Frame Cell
       (r0 == r1 && c0 == c1) &&
-      getViewer()->getXsheet()->getCell(cellPosition)
-      != getViewer()->getXsheet()->getCell(row - 1, col))
+          getViewer()->getXsheet()->getCell(cellPosition) !=
+              getViewer()->getXsheet()->getCell(row - 1, col) &&
+          !getViewer()->getXsheet()->getCell(row + 1, col).isEmpty())
     m_qualifiers |= CellsMover::eInsertCells;
   if (e->modifiers() & Qt::AltModifier)
     m_qualifiers |= CellsMover::eOverwriteCells;

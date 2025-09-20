@@ -3372,12 +3372,15 @@ void CellArea::mousePressEvent(QMouseEvent *event) {
 
     // Drag Cells #1 : When "Always Drag Frame Cell" Selected and no modifiers
     else if (Preferences::instance()->isAlwaysDragFrameCell() &&
+             o->rect(PredefinedRect::CELL_NAME)
+                 .adjusted(0, 0, -frameAdj.x(), -frameAdj.y())
+                 .contains(mouseInCell) &&
              event->modifiers() == Qt::NoModifier &&
              (!xsh->getCell(row, col).isEmpty()) &&
              xsh->getCell(row, col) != xsh->getCell(row - 1, col)) {
       TXshColumn *column = xsh->getColumn(col);
 
-      if (column && !m_viewer->getCellSelection()->isCellSelected(row, col)) {
+      if (column) {
         // switch to that FrameCell
         m_viewer->setCurrentRow(row);
         m_viewer->setCurrentColumn(col);
