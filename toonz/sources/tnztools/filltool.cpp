@@ -1356,6 +1356,7 @@ void AreaFillTool::draw() {
     tglColor(TPixelRGBM32(128, 128, 255, 76));
     glPushMatrix();
     m_track.drawFilledStroke();
+    m_track.drawAllFragments();
     glPopMatrix();
   }
 }
@@ -2442,8 +2443,7 @@ void FillTool::draw() {
     if (ti) {
       TRectD bbox =
           ToonzImageUtils::convertRasterToWorld(convert(ti->getBBox()), ti);
-      drawRect(bbox.enlarge(0.5) * ti->getSubsampling(), TPixel32::Black,
-               0x5555, true);
+      drawRect(bbox * ti->getSubsampling(), TPixel32::Black, 0x5555, true);
     }
   }
   if (m_fillType.getValue() != NORMALFILL) {
