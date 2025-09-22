@@ -48,11 +48,11 @@ using namespace ToolUtils;
 
 TEnv::StringVar PaintBrushColorType("InknpaintPaintBrushColorType", "Areas");
 TEnv::IntVar PaintBrushSelective("InknpaintPaintBrushSelective", 0);
-TEnv::IntVar PaintBrushEmptyOnly("InknpaintPaintBrushEmptyOnly", 0);
+TEnv::IntVar PaintBrushEmptyOnly("InknpaintPaintBrushEmptyOnly", 1);
 TEnv::DoubleVar PaintBrushSize("InknpaintPaintBrushSize", 10);
 TEnv::IntVar PaintBrushModifierLockAlpha("PaintBrushModifierLockAlpha", 0);
 TEnv::IntVar PaintBrushPick("PaintBrushPick", 0);
-TEnv::IntVar PaintBrushFill("PaintBrushFill", 1);
+TEnv::IntVar PaintBrushFill("PaintBrushFill", 0);
 
 //-----------------------------------------------------------------------------
 
