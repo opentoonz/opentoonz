@@ -1027,9 +1027,9 @@ std::shared_ptr<TProject> TProjectManager::getCurrentProject() {
    folder of a project root.
         \note \b scenePath must be an absolute path.\n
         Creates a new TProject. The caller gets ownership.
-        Sets *sceneStandAlone to true if scenes.xml not found */
+        Sets *notFound to true if scenes.xml not found */
 std::shared_ptr<TProject> TProjectManager::loadSceneProject(const TFilePath &scenePath, 
-    bool* sceneStandAlone) {
+    bool* notFound) {
   // cerca il file scenes.xml nella stessa directory della scena
   // oppure in una
   // directory superiore
@@ -1046,6 +1046,7 @@ std::shared_ptr<TProject> TProjectManager::loadSceneProject(const TFilePath &sce
     }
     folder = folder.getParentDir();
   }
+  if (notFound) *notFound = !found;
 
   // legge il path (o il nome) del progetto
   TFilePath projectPath;
@@ -1071,10 +1072,8 @@ std::shared_ptr<TProject> TProjectManager::loadSceneProject(const TFilePath &sce
     }
     if (projectPath == TFilePath()) return 0;
   }
-  else {
-    if (sceneStandAlone) *sceneStandAlone = true;
+  else 
     projectPath = getSandboxProjectPath();
-  }
 
   if (!TProject::isAProjectPath(projectPath)) {
     // in Toonz 5.1 e precedenti era un project name
