@@ -429,13 +429,13 @@ void naru_lazybrush::doGraph(TRasterPT<PIXEL> ras, double frame,
   // ã´äEílÇê›íË
   int bdSize     = 2 * (width + height - 2);
   int initInds[] = {0,
-                    width * .5f,
+                    width / 2,
                     width,
-                    width + height * .5f,
+                    width + height / 2,
                     width + height,
-                    width * 1.5f + height,
-                    width * 2.f + height,
-                    width * 2.f + height * 1.5f};
+                    width * 3 / 2 + height,
+                    width * 2 + height,
+                    width * 2 + height * 3 / 2};
   std::vector<int> bdIdx(bdSize, false);
   // 1 "Bottom-Left"
   // 2 "Bottom-Center"
