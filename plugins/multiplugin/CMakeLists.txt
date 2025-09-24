@@ -1,3 +1,4 @@
+cmake_minimum_required(VERSION 3.5)
 project(multi_plugin)
 set(PLUGINSDK_ROOT ../../toonz/sources/toonzqt)
 set(PLUGINSDK_UTILS_PATH ../)
