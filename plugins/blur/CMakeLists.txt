@@ -1,3 +1,4 @@
+cmake_minimum_required(VERSION 3.5)
 project(blur_plugin C CXX)
 set(PLUGINSDK_ROOT ../../toonz/sources/toonzqt)
 set(PLUGINSDK_UTILS_PATH ../)

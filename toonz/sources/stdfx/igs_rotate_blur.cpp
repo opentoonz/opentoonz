@@ -230,7 +230,7 @@ private:
   // disable
   Rotator();
   Rotator(const Rotator&);
-  Rotator& operator=(const Rotator&) {}
+  Rotator& operator=(const Rotator&) {return *this;}
 };
 //------------------------------------------------------------------
 
