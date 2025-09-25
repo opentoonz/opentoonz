@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.10)
 project(geom_plugin)
 
 set(PLUGINSDK_ROOT ../../toonz/sources/toonzqt)
