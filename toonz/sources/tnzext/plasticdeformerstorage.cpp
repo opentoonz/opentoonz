@@ -410,12 +410,12 @@ PlasticDeformerDataGroup::~PlasticDeformerDataGroup() {}
 
 class PlasticDeformerStorage::Imp {
 public:
-  QMutex m_mutex;            //!< Access mutex - needed for thread-safety
+  QRecursiveMutex m_mutex;            //!< Access mutex - needed for thread-safety
   DeformersSet m_deformers;  //!< Set of deformers, ordered by mesh image,
                              //! deformation, and affine.
 
 public:
-  Imp() : m_mutex(QMutex::Recursive) {}
+  Imp() : m_mutex() {}
 };
 
 //***********************************************************************************************

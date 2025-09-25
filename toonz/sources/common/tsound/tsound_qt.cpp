@@ -22,7 +22,7 @@ using namespace std;
 
 class TSoundOutputDeviceImp: public std::enable_shared_from_this<TSoundOutputDeviceImp> {
 private:
-  QMutex m_mutex;
+  QRecursiveMutex m_mutex;
 
   double m_volume;
   bool m_looping;
@@ -38,7 +38,7 @@ public:
   std::set<TSoundOutputDeviceListener *> m_listeners;
 
   TSoundOutputDeviceImp():
-    m_mutex(QMutex::Recursive),
+    m_mutex(),
     m_volume(0.5),
     m_looping(false),
     m_bytesSent(0),
