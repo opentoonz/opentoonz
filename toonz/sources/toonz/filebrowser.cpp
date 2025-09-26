@@ -617,13 +617,16 @@ void FileBrowser::refreshCurrentFolderItems() {
         // Get creation time safely across platforms
         QDateTime creationTime = fileInfo.birthTime();
         if (!creationTime.isValid())
-          creationTime = fileInfo.metadataChangeTime();  // or fileInfo.lastModified()
+          creationTime =
+              fileInfo.metadataChangeTime();  // or fileInfo.lastModified()
 
         // Update level infos
-        if (levelItem.m_creationDate.isNull() || creationTime < levelItem.m_creationDate)
+        if (levelItem.m_creationDate.isNull() ||
+            creationTime < levelItem.m_creationDate)
           levelItem.m_creationDate = creationTime;
 
-        if (levelItem.m_modifiedDate.isNull() || fileInfo.lastModified() > levelItem.m_modifiedDate)
+        if (levelItem.m_modifiedDate.isNull() ||
+            fileInfo.lastModified() > levelItem.m_modifiedDate)
           levelItem.m_modifiedDate = fileInfo.lastModified();
 
         levelItem.m_fileSize += fileInfo.size();
@@ -828,9 +831,9 @@ void FileBrowser::readInfo(Item &item) {
     // Use birthTime(), fall back to metadataChangeTime() if unavailable
     item.m_creationDate = info.birthTime();
     if (!item.m_creationDate.isValid()) {
-        item.m_creationDate = info.metadataChangeTime();
+      item.m_creationDate = info.metadataChangeTime();
     }
-    item.m_modifiedDate = info.lastModified(); 
+    item.m_modifiedDate = info.lastModified();
     item.m_fileType     = info.suffix();
     item.m_fileSize     = info.size();
     if (fp.getType() == "tnz") {
@@ -1110,6 +1113,24 @@ QMenu *FileBrowser::getContextMenu(QWidget *parent, int index) {
 
   QMenu *menu        = new QMenu(parent);
   CommandManager *cm = CommandManager::instance();
+
+  // when folder item is right-clicked
+  if (0 <= index && index < (int)m_items.size() && m_items[index].m_isFolder) {
+    DvDirModel *model    = DvDirModel::instance();
+    DvDirModelNode *node = model->getNode(model->getIndexByPath(files[0]));
+    if (!node || !node->isRenameEnabled()) return nullptr;
+    DvDirModelFileFolderNode *fnode =
+        dynamic_cast<DvDirModelFileFolderNode *>(node);
+    if (!fnode || fnode->isProjectFolder()) return nullptr;
+
+    menu->addAction(cm->getAction(MI_Clear));
+    QAction *action =
+        new QAction(QIcon(createQIcon("rename")), tr("Rename"), menu);
+    ret =
+        ret && connect(action, SIGNAL(triggered()), this, SLOT(renameFolder()));
+    menu->addAction(action);
+    return menu;
+  }
 
   if (files.empty()) {
     menu->addAction(cm->getAction(MI_ShowFolderContents));
@@ -1627,16 +1648,20 @@ void RenameAsToonzPopup::onOk() {
   accept();
 }
 
-RenameAsToonzPopup::RenameAsToonzPopup(const QString name, int frames)
+RenameAsToonzPopup::RenameAsToonzPopup(const QString name, int frames,
+                                       bool isFolder)
     : Dialog(TApp::instance()->getMainWindow(), true, true, "RenameAsToonz") {
   setWindowTitle(QString(tr("Rename")));
 
   beginHLayout();
 
   QLabel *lbl;
-  if (frames == -1)
-    lbl = new QLabel(QString(tr("Renaming File ")) + name);
-  else
+  if (frames == -1) {
+    if (isFolder)
+      lbl = new QLabel(QString(tr("Renaming Folder ")) + name);
+    else
+      lbl = new QLabel(QString(tr("Renaming File ")) + name);
+  } else
     lbl = new QLabel(
         QString(tr("Creating an animation level of %1 frames").arg(frames)));
   lbl->setFixedHeight(20);
@@ -1649,7 +1674,7 @@ RenameAsToonzPopup::RenameAsToonzPopup(const QString name, int frames)
 
   m_overwrite = new QCheckBox(tr("Delete Original Files"));
   m_overwrite->setFixedHeight(20);
-  //addWidget(m_overwrite, false);
+  // addWidget(m_overwrite, false);
 
   QFormLayout *formLayout = new QFormLayout;
 
@@ -1659,8 +1684,10 @@ RenameAsToonzPopup::RenameAsToonzPopup(const QString name, int frames)
   labelLayout->addStretch();
 
   formLayout->addRow(labelLayout);
-  formLayout->addRow(tr("Level Name:"), m_name);
-  formLayout->addRow(m_overwrite);
+  formLayout->addRow((isFolder) ? tr("Folder Name:") : tr("Level Name:"),
+                     m_name);
+
+  if (!isFolder) formLayout->addRow(m_overwrite);
 
   addLayout(formLayout);
 
@@ -1784,8 +1811,8 @@ void renameSingleFileOrToonzLevel(const QString &fullpath) {
           QObject::tr("The specified name is already assigned to the %1 file.")
               .arg(fpin.withName(name).getQString())));
       return;
-    }
-    else TSystem::copyFileOrLevel(fpin.withName(name), fpin); 
+    } else
+      TSystem::copyFileOrLevel(fpin.withName(name), fpin);
   }
 }
 
@@ -1867,6 +1894,40 @@ void FileBrowser::renameAsToonzLevel() {
   QApplication::restoreOverrideCursor();
 
   FileBrowser::refreshFolder(filePaths[0].getParentDir());
+}
+
+//-------------------------------------------------------------------------------
+
+void FileBrowser::renameFolder() {
+  std::vector<TFilePath> filePaths;
+  FileSelection *fs =
+      dynamic_cast<FileSelection *>(m_itemViewer->getPanel()->getSelection());
+  if (!fs) return;
+  fs->getSelectedFiles(filePaths);
+  if (filePaths.size() != 1) return;
+
+  TFilePath srcPath = filePaths[0];
+
+  RenameAsToonzPopup popup(srcPath.withoutParentDir().getQString(), -1, true);
+  if (popup.exec() != QDialog::Accepted) return;
+  std::string name = popup.getName().toStdString();
+  if (name == srcPath.getName()) {
+    DVGui::error(QString(
+        QObject::tr("The specified name is already assigned to the folder.")));
+    return;
+  }
+
+  TFilePath dstPath = srcPath.getParentDir() + TFilePath(popup.getName());
+
+  try {
+    TSystem::renameFile(dstPath, srcPath);
+  } catch (...) {
+    return;
+  }
+
+  QApplication::restoreOverrideCursor();
+
+  refreshFolder(srcPath.getParentDir());
 }
 
 #ifdef LEVO
@@ -2072,9 +2133,9 @@ void FileBrowser::onSelectedItems(const std::set<int> &indexes) {
 
 void FileBrowser::onClickedItem(int index) {
   if (0 <= index && index < (int)m_items.size()) {
-    // if the parent folder is clicked, then move the current folder
+    // if the folder is clicked, then move the current folder
     TFilePath fp = m_items[index].m_path;
-    if (index == 0 && m_items[index].m_isFolder) {
+    if (m_items[index].m_isFolder) {
       setFolder(fp, true);
       QModelIndex index = m_folderTreeView->currentIndex();
       if (index.isValid()) m_folderTreeView->scrollTo(index);
@@ -2087,7 +2148,7 @@ void FileBrowser::onClickedItem(int index) {
 
 void FileBrowser::onDoubleClickedItem(int index) {
   // TODO: Avoid duplicate code with onClickedItem().
-  if (0 < index && index < (int)m_items.size()) {
+  if (0 <= index && index < (int)m_items.size()) {
     // if the folder is doubleClicked, then move the current folder
     TFilePath fp = m_items[index].m_path;
     if (m_items[index].m_isFolder) {

@@ -1349,8 +1349,8 @@ void ToonzRasterBrushTool::inputPaintTrackPoint(const TTrackPoint &point,
 
     // Pencilモードでなく、Hardness=100 の場合のブラシサイズを1段階下げる
     double thickness = computeThickness(pressure, m_rasThickness);
-    //if (!m_painting.pencil.realPencil && !m_modifierLine->getManager())
-    //  thickness -= 1.0;
+    // if (!m_painting.pencil.realPencil && !m_modifierLine->getManager())
+    //   thickness -= 1.0;
     TThickPoint thickPoint(fixedPosition + rasCenter, thickness);
 
     // init brush
@@ -1410,10 +1410,10 @@ void ToonzRasterBrushTool::inputPaintTrackPoint(const TTrackPoint &point,
     // paint stroke
     double thickness = computeThickness(pressure, m_rasThickness);
     TThickPoint thickPoint(fixedPosition + rasCenter, thickness);
-    TRect strokeRect( tfloor(thickPoint.x - maxThick - 0.999),
-                      tfloor(thickPoint.y - maxThick - 0.999),
-                      tceil(thickPoint.x + maxThick + 0.999),
-                      tceil(thickPoint.y + maxThick + 0.999) );
+    TRect strokeRect(tfloor(thickPoint.x - maxThick - 0.999),
+                     tfloor(thickPoint.y - maxThick - 0.999),
+                     tceil(thickPoint.x + maxThick + 0.999),
+                     tceil(thickPoint.y + maxThick + 0.999));
     strokeRect *= ras->getBounds();
     m_painting.affectedRect += strokeRect;
     updateWorkAndBackupRasters(m_painting.affectedRect);
@@ -1523,11 +1523,11 @@ void ToonzRasterBrushTool::draw() {
 
   if (getApplication()->getCurrentObject()->isSpline()) return;
   if (Preferences::instance()->isUseStrokeEndCursor())
-      ToolUtils::drawCursor(m_viewer, this, m_brushPos, ToolCursor::PenCursor);
+    ToolUtils::drawCursor(m_viewer, this, m_brushPos, ToolCursor::PenCursor,
+                          true);
 
   // If toggled off, don't draw brush outline
-  if (!Preferences::instance()->isCursorOutlineEnabled())
-    return;
+  if (!Preferences::instance()->isCursorOutlineEnabled()) return;
 
   // Draw the brush outline - change color when the Ink / Paint check is
   // activated

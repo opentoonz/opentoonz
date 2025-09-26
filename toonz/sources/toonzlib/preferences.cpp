@@ -552,7 +552,7 @@ void Preferences::definePreferenceItems() {
   define(cursorBrushType, "cursorBrushType", QMetaType::QString, "Small");
   define(cursorBrushStyle, "cursorBrushStyle", QMetaType::QString, "Default");
   define(cursorOutlineEnabled, "cursorOutlineEnabled", QMetaType::Bool, true);
-  define(useStrokeEndCursor, "useStrokeEndCursor", QMetaType::Bool, true);
+  define(useStrokeEndCursor, "useStrokeEndCursor", QMetaType::Bool, false);
   define(levelBasedToolsDisplay, "levelBasedToolsDisplay", QMetaType::Int,
          0);  // Default
   define(useCtrlAltToResizeBrush, "useCtrlAltToResizeBrush", QMetaType::Bool,

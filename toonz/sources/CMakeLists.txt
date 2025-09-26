@@ -197,10 +197,14 @@ elseif(BUILD_ENV_APPLE)
         endif()
         set(QT_PATH "${HOMEBREW_QT_PREFIX}/lib" CACHE PATH "Qt installation directory (from Homebrew)")
         message(STATUS "Auto-detected Qt path: ${QT_PATH}")
+        set(QT_LIB_PATH "${QT_PATH}")
+        list(APPEND CMAKE_PREFIX_PATH "${HOMEBREW_QT_PREFIX}/lib/cmake/Qt5")  # More precise for find_package(Qt5)
+    # Conventional usage: if the QT_PATH is explicitly set
+    else()
+        set(QT_LIB_PATH "${QT_PATH}/")
+        list(APPEND CMAKE_PREFIX_PATH "${QT_LIB_PATH}cmake/")
     endif()
 
-    set(QT_LIB_PATH "${QT_PATH}")
-    list(APPEND CMAKE_PREFIX_PATH "${HOMEBREW_QT_PREFIX}/lib/cmake/Qt5")  # More precise for find_package(Qt5)
 
     foreach(path ${CMAKE_PREFIX_PATH})
         message(STATUS "CMAKE_PREFIX_PATH: ${path}")

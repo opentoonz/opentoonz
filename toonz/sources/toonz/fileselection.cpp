@@ -269,8 +269,15 @@ void FileSelection::deleteFiles() {
 
   QString question;
   if (files.size() == 1) {
-    QString fn = QString::fromStdWString(files[0].getWideString());
-    question   = QObject::tr("Deleting %1. Are you sure?").arg(fn);
+    TFileStatus fs(files[0]);
+    if (fs.isDirectory()) {
+      if (!fs.isWritable()) return;
+      question = QObject::tr("Deleting folder %1. Are you sure?")
+                     .arg(files[0].getQString());
+    } else {
+      QString fn = QString::fromStdWString(files[0].getWideString());
+      question   = QObject::tr("Deleting %1. Are you sure?").arg(fn);
+    }
   } else {
     question =
         QObject::tr("Deleting %n files. Are you sure?", "", (int)files.size());
@@ -281,9 +288,16 @@ void FileSelection::deleteFiles() {
 
   int i;
   for (i = 0; i < (int)files.size(); i++) {
-    TSystem::moveFileOrLevelToRecycleBin(files[i]);
-    IconGenerator::instance()->remove(files[i]);
-    // TODO: cancellare anche xxxx_files se files[i] == xxxx.tnz
+    // folder case
+    if (TFileStatus(files[i]).isDirectory()) {
+      QFile(files[i].getQString()).moveToTrash();
+    }
+    // file
+    else {
+      TSystem::moveFileOrLevelToRecycleBin(files[i]);
+      IconGenerator::instance()->remove(files[i]);
+      // TODO: cancellare anche xxxx_files se files[i] == xxxx.tnz
+    }
   }
   selectNone();
   FileBrowser::refreshFolder(files[0].getParentDir());

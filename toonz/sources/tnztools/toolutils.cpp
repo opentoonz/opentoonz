@@ -354,10 +354,13 @@ QRadialGradient ToolUtils::getBrushPad(int size, double hardness) {
 //-----------------------------------------------------------------------------
 
 void ToolUtils::drawCursor(TToolViewer* viewer, TTool* tool,
-    TPointD pos, int toolCursorId)
+    TPointD pos, int toolCursorId, bool addOffSet)
 {
     if (!viewer || !tool) return;
-    
+    if(addOffSet){
+        pos.x += 0.5;
+        pos.y += 0.5;
+    }
     QCursor cursor = getToolCursor(toolCursorId);
     QPixmap cursorPixmap = cursor.pixmap();
     if (cursorPixmap.isNull()) return;
