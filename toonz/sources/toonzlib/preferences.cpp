@@ -388,10 +388,10 @@ void Preferences::definePreferenceItems() {
   define(CurrentStyleSheetName, "CurrentStyleSheetName", QMetaType::QString,
          "Default");
 
-// Qt has a bug in recent versions that Menu item does not show correctly
-// (QTBUG-90242). The current OT handles this issue by applying an extra adjustment
-// for Qt versions 5.9.x.
-// Update: Issue confirmed fixed in Qt 5.12.8 and above, no longer affecting Qt 5.15 and later.
+  // Qt has a bug in recent versions that Menu item does not show correctly
+  // (QTBUG-90242). The current OT handles this issue by applying an extra
+  // adjustment for Qt versions 5.9.x. Update: Issue confirmed fixed in
+  // Qt 5.12.8 and above, no longer affecting Qt 5.15 and later.
   QString defaultAditionalSheet = "";
 
   define(additionalStyleSheet, "additionalStyleSheet", QMetaType::QString,
@@ -459,6 +459,7 @@ void Preferences::definePreferenceItems() {
   // Loading
   define(importPolicy, "importPolicy", QMetaType::Int, 0);  // Always ask
   define(renamePolicy, "renamePolicy", QMetaType::Int, 0); // Always ask
+  define(convertPolicy, "convertPolicy", QMetaType::Int, 0); // Always ask
   define(autoExposeEnabled, "autoExposeEnabled", QMetaType::Bool, true);
   define(subsceneFolderEnabled, "subsceneFolderEnabled", QMetaType::Bool, true);
   define(removeSceneNumberFromLoadedLevelName,
@@ -544,17 +545,20 @@ void Preferences::definePreferenceItems() {
   //       1);  // Cycle through the available options (changed from bool to
   //       int)
   define(FillOnlysavebox, "FillOnlysavebox", QMetaType::Bool, false);
+  define(DefRegionWithPaint, "FillDefRegionWithPaint", QMetaType::Bool, true);
+  define(ReferFillPrevailing, "ReferFillPrevailing", QMetaType::Bool, false);
   define(multiLayerStylePickerEnabled, "multiLayerStylePickerEnabled",
          QMetaType::Bool, false);
   define(cursorBrushType, "cursorBrushType", QMetaType::QString, "Small");
   define(cursorBrushStyle, "cursorBrushStyle", QMetaType::QString, "Default");
   define(cursorOutlineEnabled, "cursorOutlineEnabled", QMetaType::Bool, true);
-  define(useStrokeEndCursor, "useStrokeEndCursor", QMetaType::Bool, true);
+  define(useStrokeEndCursor, "useStrokeEndCursor", QMetaType::Bool, false);
   define(levelBasedToolsDisplay, "levelBasedToolsDisplay", QMetaType::Int,
          0);  // Default
   define(useCtrlAltToResizeBrush, "useCtrlAltToResizeBrush", QMetaType::Bool,
          true);
-  define(clickTwiceToCreateArcs, "clickTwiceToCreateArcs", QMetaType::Bool, true);
+  define(clickTwiceToCreateArcs, "clickTwiceToCreateArcs", QMetaType::Bool,
+         true);
   define(tempToolSwitchTimer, "tempToolSwitchTimer", QMetaType::Int, 500, 1,
          std::numeric_limits<int>::max());
 
@@ -564,8 +568,7 @@ void Preferences::definePreferenceItems() {
   define(xsheetStep, "xsheetStep", QMetaType::Int, 10, 0,
          std::numeric_limits<int>::max());
   define(xsheetAutopanEnabled, "xsheetAutopanEnabled", QMetaType::Bool, true);
-  define(alwaysDragFrameCell, "alwaysDragFrameCell", QMetaType::Bool,
-         true);
+  define(alwaysDragFrameCell, "alwaysDragFrameCell", QMetaType::Bool, false);
   define(DragCellsBehaviour, "DragCellsBehaviour", QMetaType::Int,
          1);  // Cells and Column Data
   define(deleteCommandBehavior, "deleteCommandBehavior", QMetaType::Int,
@@ -1105,9 +1108,9 @@ int Preferences::levelFormatsCount() const {
 //-----------------------------------------------------------------
 
 int Preferences::matchLevelFormat(const TFilePath &fp) const {
-  LevelFormatVector::const_iterator lft =
-      std::find_if(m_levelFormats.begin(), m_levelFormats.end(),
-                   [&fp](const LevelFormat &format) { return format.matches(fp); });
+  LevelFormatVector::const_iterator lft = std::find_if(
+      m_levelFormats.begin(), m_levelFormats.end(),
+      [&fp](const LevelFormat &format) { return format.matches(fp); });
 
   return (lft != m_levelFormats.end()) ? lft - m_levelFormats.begin() : -1;
 }

@@ -228,9 +228,9 @@ public:
 
 private:
   // disable
-  Rotator();
-  Rotator(const Rotator&);
-  Rotator& operator=(const Rotator&) {}
+  Rotator() = delete;
+  Rotator(const Rotator&) = delete;
+  Rotator& operator=(const Rotator&) = delete;
 };
 //------------------------------------------------------------------
 

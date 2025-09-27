@@ -759,8 +759,7 @@ public:
 //-----------------------------------------------------------------------------
 
 SceneViewer::SceneViewer(ImageUtils::FullScreenWidget *parent)
-    : GLWidgetForHighDpi(parent)
-    , TToolViewer(this)
+    : TToolViewer(this,parent)
     , m_pressure(0)
     , m_lastMousePos(0, 0)
     , m_mouseButton(Qt::NoButton)
@@ -2273,6 +2272,13 @@ void SceneViewer::drawScene() {
     }
 
     assert(glGetError() == 0);
+    if (ToonzCheck::instance()->getChecks() & ToonzCheck::eAutoclose) {
+      TXshSimpleLevel *sl = app->getCurrentLevel()->getSimpleLevel();
+      if (sl && sl->getType() & TXshLevelType::RASTER_TYPE) {
+          TFrameId fid = app->getCurrentTool()->getTool()->getCurrentFid();
+          painter.setCurrentImageId(sl->getImageId(fid, 0));
+      }
+    }
     painter.flushRasterImages();
 
     TXshSimpleLevel::m_fillFullColorRaster = fillFullColorRaster;

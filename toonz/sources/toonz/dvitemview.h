@@ -76,7 +76,7 @@ public:
   // n.b. refreshData viene chiamato PRIMA di getItemCount() e getItemData()
   // vanno messe dentro refreshData() le operazioni "costose" di getItemData() e
   // getItemCount()
-  virtual void refreshData(){};
+  virtual void refreshData() {};
   virtual int getItemCount() const = 0;
   virtual int compareData(DataType dataType, int firstIndex, int secondIndex);
   virtual void sortByDataModel(DataType dataType, bool isDiscendent) {}
@@ -255,7 +255,7 @@ public:
   }
   QColor getSelectedItemBackground() const { return m_selectedItemBackground; }
 
-  //exposed view parameters
+  // exposed view parameters
   void setIconSize(QSize size) { m_iconSize = size; }
 
 private:
@@ -411,8 +411,8 @@ public:
   DvItemViewerPanel *getPanel() { return m_panel; }
 
   virtual void draw(QPainter &p) {}
-  void notifyClick(int index) {
-    emit clickedItem(index);
+  void notifyClick(int index, bool isLeftClick) {
+    if (isLeftClick) emit clickedItem(index);
     emit selectedItems(m_panel->getSelectedIndices());
   }
   void notifyDoubleClick(int index) {

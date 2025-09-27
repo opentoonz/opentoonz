@@ -1154,9 +1154,12 @@ void BoardSettingsPopup::onExportBoardImage() {
   QString levelName = QString::fromStdString(rendPath.getLevelName());
   int dotPos        = levelName.lastIndexOf('.');
 
-  QString fileName = baseName + rendPath.getSepChar() +
-                     boardSettings->fileNameSuffix() +
-                     levelName.right(levelName.size() - dotPos);
+  QString suffix = boardSettings->fileNameSuffix();
+  // if the suffix starts with "." or "_", then replace the sepchar
+  if (!suffix.startsWith('.') && !suffix.startsWith('_'))
+    suffix.prepend(rendPath.getSepChar());
+  QString fileName =
+      baseName + suffix + levelName.right(levelName.size() - dotPos);
 
   popup.setFilename(TFilePath(fileName));
 

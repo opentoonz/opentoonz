@@ -1181,7 +1181,6 @@ void ColumnArea::DrawHeader::drawColumnName() const {
   bool nameBacklit = false;
   int rightadj     = -2;
   int leftadj      = 3;
-  int valign = o->isVerticalTimeline() ? Qt::AlignVCenter : Qt::AlignBottom;
 
   if (!isEmpty) {
     if (o->isVerticalTimeline() &&
@@ -1228,13 +1227,13 @@ void ColumnArea::DrawHeader::drawColumnName() const {
     p.drawText(columnName.translated(-columnName.topLeft())
                    .transposed()
                    .adjusted(5, 0, 0, 0),
-               Qt::AlignLeft | valign, cameraName);
+               Qt::AlignLeft | Qt::AlignVCenter, cameraName);
     p.restore();
     return;
   }
 
   p.drawText(columnName.adjusted(leftadj, 0, rightadj, 0),
-             Qt::AlignLeft | valign | Qt::TextSingleLine,
+             Qt::AlignLeft | Qt::AlignVCenter | Qt::TextSingleLine,
              QString(name.c_str()));
 }
 
@@ -2324,6 +2323,8 @@ void ColumnArea::mousePressEvent(QMouseEvent *event) {
   const Orientation *o = m_viewer->orientation();
 
   m_doOnRelease = 0;
+  m_doOnMove    = 0;
+
   m_viewer->setQtModifiers(event->modifiers());
   assert(getDragTool() == 0);
 
@@ -2381,7 +2382,12 @@ void ColumnArea::mousePressEvent(QMouseEvent *event) {
       // lock button
       if (o->rect(PredefinedRect::CAMERA_LOCK_AREA).contains(mouseInCell)) {
         if (event->button() != Qt::LeftButton) return;
-        m_doOnRelease = isCtrlPressed ? ToggleAllLock : ToggleLock;
+        if (isCtrlPressed)
+          m_doOnRelease = ToggleAllLock;
+        else {
+          m_doOnRelease = isCtrlPressed ? ToggleAllLock : 0;
+          column->lock(!column->isLocked());
+        }
       }
       // config button
       else if (o->rect(PredefinedRect::CAMERA_CONFIG_AREA)
@@ -2401,18 +2407,22 @@ void ColumnArea::mousePressEvent(QMouseEvent *event) {
     else if (!isEmpty) {
       // grabbing the left side of the column enables column move
       if (o->rect(PredefinedRect::DRAG_LAYER).contains(mouseInCell) ||
-          /*(!o->flag(PredefinedFlag::DRAG_LAYER_VISIBLE)  // If dragbar hidden,
+          (!o->flag(PredefinedFlag::DRAG_LAYER_VISIBLE)  // If dragbar hidden,
                                                          // layer name/number
                                                          // becomes dragbar
-           && */  // also consider layer name/number as dragbar
-          (o->rect(PredefinedRect::LAYER_NUMBER).contains(mouseInCell) ||
-               o->rect(PredefinedRect::LAYER_NAME).contains(mouseInCell))) {
+           && (o->rect(PredefinedRect::LAYER_NUMBER).contains(mouseInCell) ||
+               o->rect(PredefinedRect::LAYER_NAME).contains(mouseInCell)))) {
         setDragTool(XsheetGUI::DragTool::makeColumnMoveTool(m_viewer));
       }
       // lock button
       else if (o->rect(PredefinedRect::LOCK_AREA).contains(mouseInCell)) {
         if (event->button() != Qt::LeftButton) return;
-        m_doOnRelease = isCtrlPressed ? ToggleAllLock : ToggleLock;
+        if (isCtrlPressed)
+          m_doOnRelease = ToggleAllLock;
+        else {
+          m_doOnMove = column->isLocked() ? ToggleOffLock : ToggleOnLock;
+          column->lock(!column->isLocked());
+        }
       }
       // unified view button
       else if (Preferences::instance()
@@ -2424,8 +2434,13 @@ void ColumnArea::mousePressEvent(QMouseEvent *event) {
           // do nothing
         } else {
           // sync eye button on release
-          m_doOnRelease =
-              isCtrlPressed ? ToggleAllTransparency : ToggleTransparency;
+          if (isCtrlPressed)
+            m_doOnRelease = isCtrlPressed ? ToggleAllTransparency : 0;
+          else {
+            m_doOnMove = column->isCamstandVisible() ? ToggleOffTransparency
+                                                     : ToggleOnTransparency;
+            column->setCamstandVisible(!column->isCamstandVisible());
+          }
           if (!o->flag(PredefinedFlag::CONFIG_AREA_VISIBLE) &&
               !column->getSoundColumn())
             startTransparencyPopupTimer(event);
@@ -2439,8 +2454,13 @@ void ColumnArea::mousePressEvent(QMouseEvent *event) {
         if (column->getSoundTextColumn()) {
           // do nothing
         } else {
-          m_doOnRelease =
-              isCtrlPressed ? ToggleAllPreviewVisible : TogglePreviewVisible;
+          if (isCtrlPressed)
+            m_doOnRelease = ToggleAllPreviewVisible;
+          else {
+            m_doOnMove = column->isPreviewVisible() ? ToggleOffPreviewVisible
+                                                    : ToggleOnPreviewVisible;
+            column->setPreviewVisible(!column->isPreviewVisible());
+          }
           if (column->getSoundColumn())
             TApp::instance()->getCurrentXsheet()->notifyXsheetSoundChanged();
         }
@@ -2454,8 +2474,13 @@ void ColumnArea::mousePressEvent(QMouseEvent *event) {
         if (column->getPaletteColumn() || column->getSoundTextColumn()) {
           // do nothing
         } else {
-          m_doOnRelease =
-              isCtrlPressed ? ToggleAllTransparency : ToggleTransparency;
+          if (isCtrlPressed)
+            m_doOnRelease = ToggleAllTransparency;
+          else {
+            m_doOnMove = column->isCamstandVisible() ? ToggleOffTransparency
+                                                     : ToggleOnTransparency;
+            column->setCamstandVisible(!column->isCamstandVisible());
+          }
           if (!o->flag(PredefinedFlag::CONFIG_AREA_VISIBLE) &&
               !column->getSoundColumn())
             startTransparencyPopupTimer(event);
@@ -2597,6 +2622,35 @@ void ColumnArea::mouseMoveEvent(QMouseEvent *event) {
   QPoint mouseInCell = pos - m_viewer->positionToXY(CellPosition(0, col));
   int x = mouseInCell.x(), y = mouseInCell.y();
 
+  if ((event->buttons() & Qt::LeftButton) != 0 && m_doOnMove != 0 && column) {
+    switch (m_doOnMove) {
+    case ToggleOnTransparency:
+      column->setCamstandVisible(true);
+      // sync eye button
+      if (Preferences::instance()->isUnifyColumnVisibilityTogglesEnabled())
+        column->setPreviewVisible(true);
+      break;
+    case ToggleOffTransparency:
+      column->setCamstandVisible(false);
+      // sync eye button
+      if (Preferences::instance()->isUnifyColumnVisibilityTogglesEnabled())
+        column->setPreviewVisible(false);
+      break;
+    case ToggleOnPreviewVisible:
+      column->setPreviewVisible(true);
+      break;
+    case ToggleOffPreviewVisible:
+      column->setPreviewVisible(false);
+      break;
+    case ToggleOnLock:
+      column->lock(true);
+      break;
+    case ToggleOffLock:
+      column->lock(false);
+      break;
+    }
+  }
+
 #ifdef LINETEST
   // Ensure that the menu of the motion path is hidden
   if ((x - m_mtypeBox.left() > 20 || y < m_mtypeBox.y() ||
@@ -2699,19 +2753,7 @@ void ColumnArea::mouseReleaseEvent(QMouseEvent *event) {
   int col, totcols = xsh->getColumnCount();
   if (m_doOnRelease != 0) {
     TXshColumn *column = xsh->getColumn(m_col);
-    if (m_doOnRelease == ToggleTransparency) {
-      column->setCamstandVisible(!column->isCamstandVisible());
-      // sync eye button
-      if (Preferences::instance()->isUnifyColumnVisibilityTogglesEnabled())
-        column->setPreviewVisible(column->isCamstandVisible());
-
-      if (column->getSoundColumn())
-        app->getCurrentXsheet()->notifyXsheetSoundChanged();
-    } else if (m_doOnRelease == TogglePreviewVisible)
-      column->setPreviewVisible(!column->isPreviewVisible());
-    else if (m_doOnRelease == ToggleLock)
-      column->lock(!column->isLocked());
-    else if (m_doOnRelease == OpenSettings) {
+    if (m_doOnRelease == OpenSettings) {
       QPoint pos = event->pos();
       int col    = m_viewer->xyToPosition(pos).layer();
       // Align popup to be below to CONFIG button
@@ -2800,7 +2842,8 @@ void ColumnArea::mouseReleaseEvent(QMouseEvent *event) {
       }
     } else
       assert(false);
-
+  }
+  if (m_doOnRelease != 0 || m_doOnMove != 0) {
     app->getCurrentScene()->notifySceneChanged();
     // signal XsheetChanged will invoke PreviewFxManager to all rendered frames,
     // if necessary. it causes slowness when opening preview flipbook of large
@@ -2812,18 +2855,22 @@ void ColumnArea::mouseReleaseEvent(QMouseEvent *event) {
             ->getProperties()
             ->isColumnColorFilterOnRenderEnabled() ||
         Preferences::instance()->isUnifyColumnVisibilityTogglesEnabled();
-    bool isStateChanged = m_doOnRelease == TogglePreviewVisible ||
+    bool isStateChanged = m_doOnMove == ToggleOnPreviewVisible ||
+                          m_doOnMove == ToggleOffPreviewVisible ||
                           m_doOnRelease == ToggleAllPreviewVisible ||
-                          m_doOnRelease == ToggleLock ||
+                          m_doOnMove == ToggleOnLock ||
+                          m_doOnMove == ToggleOffLock ||
                           m_doOnRelease == ToggleAllLock;
     if (isStateChanged ||
-        (isTransparencyRendered && (m_doOnRelease == ToggleTransparency ||
+        (isTransparencyRendered && (m_doOnMove == ToggleOnTransparency ||
+                                    m_doOnMove == ToggleOffTransparency ||
                                     m_doOnRelease == ToggleAllTransparency ||
                                     m_doOnRelease == OpenSettings))) {
       app->getCurrentXsheet()->notifyXsheetChanged();
     }
     update();
     m_doOnRelease = 0;
+    m_doOnMove    = 0;
   }
 
   if (m_transparencyPopupTimer) m_transparencyPopupTimer->stop();

@@ -65,7 +65,7 @@ public:
   bool isConverting() const { return m_isConverting; }
 
   void convertToTlv(bool toPainted);
-  TFilePath getConvetedPath(TFilePath path) 
+  TFilePath getConvertedPath(TFilePath path) 
   {return m_convertedFileMap[path];};
   QString getDestinationType() const;
   QString getTlvMode() const;

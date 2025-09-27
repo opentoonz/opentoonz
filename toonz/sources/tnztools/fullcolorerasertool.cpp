@@ -274,9 +274,7 @@ void eraseStroke(const TRasterImageP &ri, TStroke *stroke,
   eraseImage(ri, image, pos, invert);
 }
 
-
 class MultiArcPrimitive {
-
   TStroke *m_stroke;
   TStroke *m_strokeTemp;
   TPointD m_startPoint, m_endPoint, m_centralPoint;
@@ -345,7 +343,6 @@ public:
   // Only execute touchImage when clicking the first point of the multi arc
   // bool canTouchImageOnPreLeftClick() override { return m_clickNumber == 0; }
 };
-
 
 //=============================================================================
 // Arc Primitive Class Implementation
@@ -614,7 +611,7 @@ public:
   void multiUpdate(const TRectD firstRect, const TRectD lastRect);
 
   void multiAreaEraser(TFrameId &firstFid, TFrameId &lastFid,
-                       TStroke *firstStroke, TStroke *lastStroke);
+                       const TStroke &firstStroke, const TStroke &lastStroke);
 
   void doMultiEraser(const TImageP &img, double t, const TFrameId &fid,
                      const TVectorImageP &firstImage,
@@ -779,7 +776,7 @@ void FullColorEraserTool::leftButtonDown(const TPointD &pos,
 
     int maxThick      = m_size.getValue();
     TPointD rasCenter = ras->getCenterD();
-    TThickPoint point(pos + rasCenter, maxThick);//???
+    TThickPoint point(pos + rasCenter, maxThick);  //???
     TPointD halfThick(maxThick * 0.5, maxThick * 0.5);
     invalidateRect = TRectD(pos - halfThick, pos + halfThick);
 
@@ -1051,7 +1048,7 @@ void FullColorEraserTool::leftButtonUp(const TPointD &pos,
       if (m_firstFrameSelected) {
         TFrameId tmp = getCurrentFid();
         if (m_firstStroke && stroke)
-          multiAreaEraser(m_firstFrameId, tmp, m_firstStroke, stroke);
+          multiAreaEraser(m_firstFrameId, tmp, *m_firstStroke, *stroke);
         notifyImageChanged();
         if (e.isShiftPressed()) {
           TRectD invalidateRect = m_firstStroke->getBBox();
@@ -1100,7 +1097,7 @@ void FullColorEraserTool::leftButtonUp(const TPointD &pos,
         if (m_firstFrameSelected) {
           TFrameId tmp = getFrameId();
           if (m_firstStroke && stroke)
-            multiAreaEraser(m_firstFrameId, tmp, m_firstStroke, stroke);
+            multiAreaEraser(m_firstFrameId, tmp, *m_firstStroke, *stroke);
           if (e.isShiftPressed()) {
             TRectD invalidateRect = m_firstStroke->getBBox();
             delete m_firstStroke;
@@ -1149,7 +1146,9 @@ void FullColorEraserTool::leftButtonUp(const TPointD &pos,
 
 void FullColorEraserTool::leftButtonDoubleClick(const TPointD &pos,
                                                 const TMouseEvent &e) {
-  if (m_eraseType.getValue() == RECTERASE) return;
+  std::wstring type = m_eraseType.getValue();
+  if (type == NORMALERASE || type == RECTERASE || type == FREEHANDERASE) return;
+
   TRasterImageP ri(getImage(true));
   if (!ri) return;
   TStroke *stroke;
@@ -1172,17 +1171,19 @@ void FullColorEraserTool::leftButtonDoubleClick(const TPointD &pos,
     m_polyline.clear();
     stroke = new TStroke(strokePoints);
     assert(stroke->getPoint(0) == stroke->getPoint(1));
-  }else if (m_eraseType.getValue() == MULTIARCERASE) {
+  } else if (m_eraseType.getValue() == MULTIARCERASE) {
     m_multiArcPrimitive.leftButtonDoubleClick(pos, e);
-    if (stroke = m_multiArcPrimitive.getEraseStroke());
-    else return;
+    if (stroke = m_multiArcPrimitive.getEraseStroke())
+      ;
+    else
+      return;
   }
   if (m_multi.getValue())  // stroke multi
   {
     if (m_firstFrameSelected) {
       TFrameId tmp = getFrameId();
       if (m_firstStroke && stroke)
-        multiAreaEraser(m_firstFrameId, tmp, m_firstStroke, stroke);
+        multiAreaEraser(m_firstFrameId, tmp, *m_firstStroke, *stroke);
       if (e.isShiftPressed()) {
         TRectD invalidateRect = m_firstStroke->getBBox();
         delete m_firstStroke;
@@ -1361,8 +1362,8 @@ void FullColorEraserTool::update(const TRasterImageP &ri, TRectD selArea,
   TUndo *undo;
 
   undo       = new RectFullColorUndo(tileSet, selArea, TStroke(),
-                               m_eraseType.getValue(), level.getPointer(),
-                               m_invertOption.getValue(), frameId);
+                                     m_eraseType.getValue(), level.getPointer(),
+                                     m_invertOption.getValue(), frameId);
   TRect rect = TRasterImageUtils::eraseRect(ri, selArea);
 
   TUndoManager::manager()->add(undo);
@@ -1377,8 +1378,8 @@ void FullColorEraserTool::resetMulti() {
   m_selectingRect.empty();
   TTool::Application *app = TTool::getApplication();
   m_level                 = app->getCurrentLevel()->getLevel()
-                ? app->getCurrentLevel()->getSimpleLevel()
-                : 0;
+                                ? app->getCurrentLevel()->getSimpleLevel()
+                                : 0;
   m_firstFrameId = m_veryFirstFrameId = getCurrentFid();
   if (m_firstStroke) {
     delete m_firstStroke;
@@ -1473,19 +1474,19 @@ void FullColorEraserTool::onEnter() {
 
   TTool::Application *app = TTool::getApplication();
   m_level                 = app->getCurrentLevel()->getLevel()
-                ? app->getCurrentLevel()->getSimpleLevel()
-                : 0;
+                                ? app->getCurrentLevel()->getSimpleLevel()
+                                : 0;
 }
 
 //----------------------------------------------------------------------------------------------------------
 
 void FullColorEraserTool::multiAreaEraser(TFrameId &firstFid, TFrameId &lastFid,
-                                          TStroke *firstStroke,
-                                          TStroke *lastStroke) {
+                                          const TStroke &firstStroke,
+                                          const TStroke &lastStroke) {
   TStroke *first           = new TStroke();
   TStroke *last            = new TStroke();
-  *first                   = *firstStroke;
-  *last                    = *lastStroke;
+  *first                   = firstStroke;
+  *last                    = lastStroke;
   TVectorImageP firstImage = new TVectorImage();
   TVectorImageP lastImage  = new TVectorImage();
   firstImage->addStroke(first);

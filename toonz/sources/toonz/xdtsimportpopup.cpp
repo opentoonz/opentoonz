@@ -24,6 +24,36 @@ QIcon getColorChipIcon(TPixel32 color) {
   pm.fill(QColor(color.r, color.g, color.b));
   return QIcon(pm);
 }
+
+bool matchSequencePattern(const TFilePath& path) {
+    QRegularExpression pattern(
+        R"(
+  ^                           # Match the start of the string
+  .*?                         # Optional prefix
+  \d+                         # allow aFilePrefix<number>.ext
+  \.                          # Match a dot (.)
+  (png|jpg|jpeg|bmp|tga|tiff) # Image extensions
+  $                           # Match the end of the string
+)",
+QRegularExpression::CaseInsensitiveOption |
+QRegularExpression::ExtendedPatternSyntaxOption);
+    return pattern.match(QString::fromStdString(path.getLevelName()))
+        .hasMatch();
+};
+
+bool isSharingSameParam(QString name1,
+    QString name2) {
+    std::wstring str1 = name1.toStdWString();
+    std::wstring str2 = name2.toStdWString();
+
+    str1.erase(std::remove_if(str1.begin(), str1.end(), ::iswdigit),
+        str1.end());
+    str2.erase(std::remove_if(str2.begin(), str2.end(), ::iswdigit),
+        str2.end());
+
+    return str1 == str2;
+}
+
 }  // namespace
 
 //=============================================================================
@@ -153,7 +183,7 @@ void XDTSImportPopup::onPathChanged() {
   FileField* fileField = dynamic_cast<FileField*>(sender());
   if (!fileField) return;
   QString levelName = m_fields.key(fileField);
-  // make the field non-suggestive
+  // make the fields non-suggestive
   m_pathSuggestedLevels.removeAll(levelName);
 
   // if the path is specified under the sub-folder with the same name as the
@@ -175,6 +205,7 @@ void XDTSImportPopup::updateSuggestions(const QString samplePath) {
   QStringList filters;
   filters << "*.bmp"
           << "*.jpg"
+          << "*.jpeg"
           << "*.nol"
           << "*.pic"
           << "*.pict"
@@ -198,6 +229,7 @@ void XDTSImportPopup::updateSuggestions(const QString samplePath) {
   }
 
   QMap<QString, FileField*>::iterator fieldsItr = m_fields.begin();
+  bool suggested = false;
   while (fieldsItr != m_fields.end()) {
     QString levelName    = fieldsItr.key();
     FileField* fileField = fieldsItr.value();
@@ -228,6 +260,7 @@ void XDTSImportPopup::updateSuggestions(const QString samplePath) {
         }
         for (TFilePath path : subPathSet) {
           if (path.getName() == levelName.toStdString()) {
+            suggested = true;
             TFilePath codedPath = m_scene->codeFilePath(path);
             fileField->setPath(codedPath.getQString());
             if (!m_pathSuggestedLevels.contains(levelName))
@@ -238,9 +271,90 @@ void XDTSImportPopup::updateSuggestions(const QString samplePath) {
         // back to parent folder
         suggestFolder.cdUp();
       }
+      if (found) suggested = true;
     }
     ++fieldsItr;
   }
+
+  // fallBack search
+  if (!suggested) {
+      updateSuggestions(fp);
+      return;
+  }
+
+  // repaint fields
+  fieldsItr = m_fields.begin();
+  while (fieldsItr != m_fields.end()) {
+    if (m_pathSuggestedLevels.contains(fieldsItr.key()))
+      fieldsItr.value()->setStyleSheet(
+          QString("#SuggestiveFileField "
+                  "QLineEdit{border-color:#2255aa;border-width:2px;}"));
+    else
+      fieldsItr.value()->setStyleSheet(QString(""));
+    ++fieldsItr;
+  }
+}
+
+//-----------------------------------------------------------------------------
+// FALL BACK
+void XDTSImportPopup::updateSuggestions(const TFilePath &path) {
+    QMap<QString, FileField*>::iterator fieldsItr = m_fields.begin();
+    QStringList filters;
+    filters << "*.bmp"
+        << "*.jpg"
+        << "*.jpeg"
+        << "*.nol"
+        << "*.pic"
+        << "*.pict"
+        << "*.pct"
+        << "*.png"
+        << "*.rgb"
+        << "*.sgi"
+        << "*.tga"
+        << "*.tif"
+        << "*.tiff";
+    bool suggestFolderFound = false;
+    QDir suggestFolder(path.getQString());
+    auto assignMatchingFiles = [&](QStringList& files) {
+        QMap<QString, FileField*>::iterator it = m_fields.begin();
+        while (it != m_fields.end()) {
+            QString levelName = it.key();
+            FileField* fileField = it.value();
+            if (fileField->getPath().isEmpty() ||
+                m_pathSuggestedLevels.contains(levelName)) {
+                QString filePattern = ".*" + levelName + ".*" + ".{3,4}$";
+                int index = files.indexOf(QRegExp(filePattern));
+                if (index != -1) {
+                    suggestFolderFound = true;
+                    TFilePath foundPath(suggestFolder.filePath(files[index]));
+                    TFilePath codedPath = m_scene->codeFilePath(foundPath);
+                    fileField->setPath(codedPath.getQString());
+                    files.removeAt(index);
+                    m_pathSuggestedLevels.append(levelName);
+                }
+            }
+            ++it;
+        }
+        };
+    
+    // Relative Paths
+    QStringList relPaths = suggestFolder.entryList(filters, QDir::Files | QDir::Readable | QDir::NoDotAndDotDot);
+    assignMatchingFiles(relPaths);
+
+    if (!suggestFolderFound) {
+        relPaths.clear();
+        QStringList subDirs = suggestFolder.entryList(QDir::Dirs | QDir::Readable | QDir::NoDotAndDotDot);
+        for (const QString& subDirName : subDirs) {
+            QDir subDir = suggestFolder;
+            if (!subDir.cd(subDirName)) continue;
+
+            QStringList filesInSubDir = subDir.entryList(filters, QDir::Files | QDir::Readable | QDir::NoDotAndDotDot);
+            for (const QString& file : filesInSubDir) {
+                relPaths.append(subDirName + "/" + file);
+            }
+        }
+        assignMatchingFiles(relPaths);
+    }
 
   // repaint fields
   fieldsItr = m_fields.begin();

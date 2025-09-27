@@ -65,6 +65,7 @@
 #include <QDebug>
 #include <QMimeData>
 #include <QGestureEvent>
+#include <QPainter>
 
 // definito - per ora - in tapp.cpp
 extern QString updateToolEnableStatus(TTool *tool);
@@ -527,7 +528,7 @@ void SceneViewer::onMove(const TMouseEvent &event) {
     preEvent.m_button    = m_mouseButton;
     onRelease(preEvent);
   }
-
+  
   int devPixRatio = getDevPixRatio();
   QPointF curPos  = event.mousePos() * devPixRatio;
   bool cursorSet  = false;
@@ -636,7 +637,7 @@ void SceneViewer::onMove(const TMouseEvent &event) {
       pos.x /= m_dpiScale.x;
       pos.y /= m_dpiScale.y;
     }
-
+    
     // qDebug() << "mouseMoveEvent. "  << (m_tabletEvent?"tablet":"mouse")
     //         << " pressure=" << m_pressure << " mouseButton=" << m_mouseButton
     //         << " buttonClicked=" << m_buttonClicked;
@@ -661,6 +662,8 @@ void SceneViewer::onMove(const TMouseEvent &event) {
     } else if (m_pressure == 0.0) {
       tool->mouseMove(pos, event);
     }
+    // Set the cursor of the current tool, 
+    // when tool don't draw its own cursor (setToolCursor to None)
     if (!cursorSet) setToolCursor(this, tool->getCursorId());
 
     if (m_toolHasAssistants &&

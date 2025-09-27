@@ -172,6 +172,7 @@ protected slots:
   void clearHistory();
 
   void renameAsToonzLevel();
+  void renameFolder();
   void updateAndEditVersionControl();
   void editVersionControl();
   void unlockVersionControl();
@@ -277,7 +278,8 @@ class RenameAsToonzPopup final : public DVGui::Dialog {
   QCheckBox *m_overwrite;
 
 public:
-  RenameAsToonzPopup(const QString name = "", int frames = -1);
+  RenameAsToonzPopup(const QString name = "", int frames = -1,
+                     bool isFolder = false);
 
   bool doOverwrite() { return m_overwrite->isChecked(); }
   QString getName() { return m_name->text(); }

@@ -977,7 +977,7 @@ void Stage::visit(Visitor &visitor, const VisitArgs &args) {
   Player::m_isShiftAndTraceEnabled = osm->isShiftTraceEnabled();
   sb.addFrame(sb.m_players, scene, xsh, row, 0, args.m_onlyVisible,
               args.m_checkPreviewVisibility);
-
+  
   updateOnionSkinSize(sb.m_players);
 
   sb.visit(sb.m_players, visitor, isPlaying);

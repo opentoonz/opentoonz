@@ -511,6 +511,7 @@ void eraseStylesInLevels(const std::set<TXshSimpleLevel *> &levels,
       else if (ti)
         TRop::eraseStyleIds(ti.getPointer(), styleIds);
     }
+    level->setDirtyFlag(true);
   }
 }
 

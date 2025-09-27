@@ -266,20 +266,30 @@ protected slots:
 class ColumnArea final : public QWidget {
   Q_OBJECT
 
-  enum {
-    ToggleTransparency = 1,
-    ToggleAllTransparency,
-    TogglePreviewVisible,
+  enum ReleaseAction {
+    //ToggleTransparency = 1,
+    ToggleAllTransparency = 1,
+    //TogglePreviewVisible,
     ToggleAllPreviewVisible,
-    ToggleLock,
+    // ToggleLock,
     ToggleAllLock,
     OpenSettings
+  };
+
+  enum MoveAction {
+      ToggleOnTransparency = 1,
+      ToggleOffTransparency,
+      ToggleOnPreviewVisible,
+      ToggleOffPreviewVisible,
+      ToggleOnLock,
+      ToggleOffLock
   };
 
   ColumnTransparencyPopup *m_columnTransparencyPopup;
   SoundColumnPopup *m_soundColumnPopup;
   QTimer *m_transparencyPopupTimer;
   int m_doOnRelease;
+  int m_doOnMove;
   XsheetViewer *m_viewer;
   int m_col;
   QRect m_indexBox;

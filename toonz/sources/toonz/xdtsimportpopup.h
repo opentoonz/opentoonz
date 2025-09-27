@@ -26,6 +26,9 @@ class XDTSImportPopup : public DVGui::Dialog {
 
   void updateSuggestions(const QString samplePath);
 
+  // Fallback Search
+  void updateSuggestions(const TFilePath &path);
+
 public:
   XDTSImportPopup(QStringList levelNames, ToonzScene* scene,
                   TFilePath scenePath, bool isUextVersion);

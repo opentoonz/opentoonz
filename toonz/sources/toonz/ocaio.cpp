@@ -330,11 +330,12 @@ void OCAData::build(ToonzScene *scene, TXsheet *xsheet, QString name,
 
   TOutputProperties *oprop = scene->getProperties()->getOutputProperties();
   m_startTime = 0;
-  m_endTime   = xsheet->getFrameCount() - 1;
+  m_endTime   = xsheet->getFrameCount();
+  // See https://oca.rxlab.guide/specs/root.html
 
   // Build a list of rows
   QList<int> rows;
-  for (int i = m_startTime; i <= m_endTime; i++) {
+  for (int i = m_startTime; i < m_endTime; i++) {
     rows.append(i);
   }
 

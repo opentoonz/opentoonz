@@ -1,7 +1,4 @@
 if(BUILD_ENV_APPLE)
-    cmake_minimum_required(VERSION 2.8.11)
-    project(MouseDragFilter)
-
     include_directories(.)
     find_library(FOUNDATION_LIBRARY NAMES Foundation)
     find_library(CG_LIBRARY NAMES CoreGraphics)

@@ -32,7 +32,7 @@ jobs:
             cc: clang
             cxx: clang++
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
 
     - name: Install libraries
       run: |

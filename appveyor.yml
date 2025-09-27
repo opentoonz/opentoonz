@@ -3,13 +3,13 @@ init:
   - git lfs install --skip-smudge
 skip_commits:
   files:
-    - 'doc/**'        # Skip everything inside doc/ (recursive)
-    - '.github/**'    # Skip everything inside .github/ (recursive)
-    - 'README.md'     # Skip changes only to README.md
+    - 'doc/**/*'               # Skip everything inside doc/ (recursive)
+    - '.github/**/*'           # Skip everything inside .github/ (recursive)
+    - 'README.md'              # Skip changes only to README.md
 pull_requests:
   do_not_increment_build_number: true
 skip_tags: true
-image: Visual Studio 2022
+image: Previous Visual Studio 2019
 configuration: Release
 platform: x64
 clone_depth: 1
@@ -36,7 +36,7 @@ install:
 
     mkdir %PLATFORM% && cd %PLATFORM%
 
-    cmake ..\sources -G "Visual Studio 17 2022" -Ax64 -DQT_PATH="C:\Qt\5.15.2\msvc2019_64" -DBOOST_ROOT="C:\Libraries\boost_1_86_0" -DOpenCV_DIR="C:\Tools\opencv\build"
+    cmake ..\sources -G "Visual Studio 16 2019" -Ax64 -DQT_PATH="C:\Qt\5.15.2\msvc2019_64" -DBOOST_ROOT="C:\Libraries\boost_1_86_0" -DOpenCV_DIR="C:\Tools\opencv\build"
 build:
   project: $(APPVEYOR_BUILD_FOLDER)\toonz\$(PLATFORM)\ALL_BUILD.vcxproj
   parallel: true

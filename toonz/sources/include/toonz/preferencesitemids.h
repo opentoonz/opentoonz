@@ -52,6 +52,7 @@ enum PreferencesItemId {
   // Loading
   importPolicy,
   renamePolicy,
+  convertPolicy,
   autoExposeEnabled,
   subsceneFolderEnabled,
   removeSceneNumberFromLoadedLevelName,
@@ -110,6 +111,8 @@ enum PreferencesItemId {
   // Tools
   // dropdownShortcutsCycleOptions, // removed
   FillOnlysavebox,
+  DefRegionWithPaint,
+  ReferFillPrevailing,
   multiLayerStylePickerEnabled,
   cursorBrushType,
   cursorBrushStyle,

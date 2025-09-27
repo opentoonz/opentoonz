@@ -1575,10 +1575,9 @@ void ToonzVectorBrushTool::draw() {
 
   if (getApplication()->getCurrentObject()->isSpline()) return;
 
-  bool useEndCursor = Preferences::instance()->isUseStrokeEndCursor();
-  if (useEndCursor &&
-      (m_maxThick < 8 || !Preferences::instance()->isCursorOutlineEnabled()))
-      tglDrawInvertCursor(m_brushPos + TPointD(0.5, 0.5), 4, 6);
+  if (Preferences::instance()->isUseStrokeEndCursor())
+    ToolUtils::drawCursor(m_viewer ,this, m_brushPos, ToolCursor::PenCursor);
+
   // If toggled off, don't draw brush outline
   if (!Preferences::instance()->isCursorOutlineEnabled())
       return;

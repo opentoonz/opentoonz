@@ -33,12 +33,16 @@
 #include "toonz/preferences.h"
 #include "toonz/palettecontroller.h"
 #include "toonz/txshchildlevel.h"
+#include "toonz/stage2.h"
+#include "toonz/autoclose.h"
 
 #include "toonzqt/tselectionhandle.h"
 #include "toonzqt/icongenerator.h"
 #include "toonzqt/selection.h"
 #include "toonzqt/gutil.h"
 
+#include "tools/cursormanager.h"
+#include "tools/cursors.h"
 #include "tools/strokeselection.h"
 
 #include <QPainter>
@@ -228,7 +232,15 @@ void ToolUtils::drawCross(const TPointD &q, double pixelSize) {
   glEnd();
 }
 
+
 //-----------------------------------------------------------------------------
+void ToolUtils::drawLine(const TPointD &p0, const TPointD p1) {
+  glBegin(GL_LINE_STRIP);
+  glVertex2d(p0.x, p0.y);
+  glVertex2d(p1.x, p1.y);
+  glEnd();
+}
+    //-----------------------------------------------------------------------------
 
 void ToolUtils::drawArrow(const TSegment &s, double pixelSize) {
   TPointD v, vn;
@@ -340,6 +352,37 @@ QRadialGradient ToolUtils::getBrushPad(int size, double hardness) {
 }
 
 //-----------------------------------------------------------------------------
+
+void ToolUtils::drawCursor(TToolViewer* viewer, TTool* tool,
+    TPointD pos, int toolCursorId, bool addOffSet)
+{
+    if (!viewer || !tool) return;
+    if(addOffSet){
+        pos.x += 0.5;
+        pos.y += 0.5;
+    }
+    QCursor cursor = getToolCursor(toolCursorId);
+    QPixmap cursorPixmap = cursor.pixmap();
+    if (cursorPixmap.isNull()) return;
+
+    QWidget* w = viewer->viewerWidget();
+    
+    TPointD dpiScale = viewer->getDpiScale();
+    TPointD scPos(pos.x * dpiScale.x, pos.y * dpiScale.y);
+
+    TPointD brushWinD = viewer->worldToPos(tool->getMatrix() * scPos) / viewer->getDevPixRatio();
+    QPointF brushWin(brushWinD.x, w->height() - brushWinD.y);
+    
+    QPoint hot = cursor.hotSpot();
+
+    QPainter painter(w);
+    static QPointF oldBrushWin;
+    QRect dirtyRect = QRect((oldBrushWin - QPointF(hot)).toPoint(), cursorPixmap.size());
+    w->update(dirtyRect);
+    oldBrushWin = brushWin;
+
+    painter.drawPixmap((brushWin - QPointF(hot)).toPoint(), cursorPixmap);
+}
 
 QList<TRect> ToolUtils::splitRect(const TRect &first, const TRect &second) {
   TRect intersection = first * second;
@@ -606,6 +649,8 @@ void ToolUtils::TToolUndo::notifyImageChanged() const {
     std::string id = m_level->getImageId(m_frameId) + "_rasterized";
     ImageManager::instance()->invalidate(id);
   }
+  if(ToonzCheck::instance()->getChecks() & ToonzCheck::eAutoclose)
+    TAutocloser::invalidateSegmentCache(m_level->getImageId(m_frameId));
 }
 
 //------------------------------------------------------------------------------------------
@@ -628,9 +673,11 @@ int ToolUtils::TToolUndo::m_idCount = 0;
 ToolUtils::TRasterUndo::TRasterUndo(TTileSetCM32 *tiles, TXshSimpleLevel *level,
                                     const TFrameId &frameId, bool createdFrame,
                                     bool createdLevel,
-                                    const TPaletteP &oldPalette)
+                                    const TPaletteP &oldPalette,
+                                    bool updateSavebox)
     : TToolUndo(level, frameId, createdFrame, createdLevel, oldPalette)
-    , m_tiles(tiles) {}
+    , m_tiles(tiles)
+    , m_updateSaveBox(updateSavebox){}
 
 //------------------------------------------------------------------------------------------
 
@@ -666,7 +713,8 @@ void ToolUtils::TRasterUndo::undo() const {
     if (!image) return;
 
     ToonzImageUtils::paste(image, m_tiles);
-    ToolUtils::updateSaveBox(m_level, m_frameId);
+    if(m_updateSaveBox)
+        ToolUtils::updateSaveBox(m_level, m_frameId);
   }
 
   removeLevelAndFrameIfNeeded();

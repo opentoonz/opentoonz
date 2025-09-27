@@ -107,12 +107,16 @@ QString BoardItem::getContentText(ToonzScene *scene) {
     return scene->decodeFilePath(scene->getScenePath()).getQString();
     break;
   case MoviePath_Aliased: {
-    TOutputProperties *oprop = scene->getProperties()->getOutputProperties();
-    return scene->codeFilePath(oprop->getPath()).getQString();
+    TFilePath fp = scene->getProperties()->getOutputProperties()->getPath();
+    if (fp.getWideName() == L"")
+      fp = fp.withName(scene->getScenePath().getName());
+    return scene->codeFilePath(fp).getQString();
   } break;
   case MoviePath_Full: {
-    TOutputProperties *oprop = scene->getProperties()->getOutputProperties();
-    return scene->decodeFilePath(oprop->getPath()).getQString();
+    TFilePath fp = scene->getProperties()->getOutputProperties()->getPath();
+    if (fp.getWideName() == L"")
+      fp = fp.withName(scene->getScenePath().getName());
+    return scene->decodeFilePath(fp).getQString();
   } break;
   default:
     break;
@@ -339,6 +343,7 @@ void BoardSettings::swapItems(int i, int j) { m_items.swapItemsAt(i, j); }
 void BoardSettings::saveData(TOStream &os, bool forPreset) {
   if (!forPreset) os.child("active") << (int)((m_active) ? 1 : 0);
   os.child("duration") << m_duration;
+  os.child("fileNameSuffix") << m_fileNameSuffix;
   if (!m_items.isEmpty()) {
     os.openChild("boardItems");
     for (int i = 0; i < getItemCount(); i++) {
@@ -359,6 +364,8 @@ void BoardSettings::loadData(TIStream &is) {
       setActive(val == 1);
     } else if (tagName == "duration") {
       is >> m_duration;
+    } else if (tagName == "fileNameSuffix") {
+      is >> m_fileNameSuffix;
     } else if (tagName == "boardItems") {
       m_items.clear();
       while (is.matchTag(tagName)) {
