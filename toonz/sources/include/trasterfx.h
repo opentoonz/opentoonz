@@ -432,6 +432,9 @@ public:
   bool isDpiAffine() const { return m_isDpiAffine; }
   std::string getPluginId() const override { return std::string(); }
 
+  void doDryCompute(TRectD &rect, double frame,
+                    const TRenderSettings &info) override;
+
 protected:
   TRasterFxPort m_port;
 
@@ -442,6 +445,25 @@ private:
   // not implemented
   NaAffineFx(const NaAffineFx &);
   NaAffineFx &operator=(const NaAffineFx &);
+};
+
+//**********************************************************************************************
+//    LevelColumnAffineFxRenderData  declaration
+//   this data will keep the level column dpi affine for an fx which need to be
+//   applied to the full sampled image (see Iwa_SmootherFx)
+//**********************************************************************************************
+
+class DVAPI LevelColumnAffineFxRenderData final : public TRasterFxRenderData {
+public:
+  TAffine m_aff;
+  bool m_isSet;
+
+public:
+  LevelColumnAffineFxRenderData() : m_isSet(false) {}
+
+  bool operator==(const TRasterFxRenderData &data) const override;
+  std::string toString() const override { return ""; }
+  float typeIndex() const override { return 1.f; }
 };
 
 //******************************************************************************

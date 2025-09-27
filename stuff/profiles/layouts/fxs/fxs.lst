@@ -75,6 +75,7 @@
     STD_rgbmFadeFx 
     STD_rgbmScaleFx
     STD_sharpenFx 
+    STD_iwa_SmootherFx 
   </Image_Adjust>
   <Layer_Blending>
     addFx 

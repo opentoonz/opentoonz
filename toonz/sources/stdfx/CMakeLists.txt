@@ -290,6 +290,7 @@ set(SOURCES
     iwa_flowblurfx.cpp
     iwa_flowpaintbrushfx.cpp
     iwa_motionflowfx.cpp
+    iwa_smootherfx.cpp
 )
 
 if(OpenCV_FOUND)

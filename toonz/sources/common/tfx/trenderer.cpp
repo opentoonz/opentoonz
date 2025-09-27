@@ -1155,7 +1155,7 @@ void RenderTask::onFinished(TThread::RunnableP) {
 
     rendererImp->m_rasterPool
         .clear();  // Isn't this misplaced? Should be in the block
-  }                // below...
+  }  // below...
 
   // If no rendering task (of this or other render instances) is found...
   if (rendererImp->m_undoneTasks == 0) {
@@ -1394,6 +1394,8 @@ void TRendererImp::startRendering(
   std::vector<TRenderer::RenderData>::const_iterator it;
   std::map<std::string, RenderTask *>::iterator jt;
 
+  bool forcePreComputation = false;
+
   for (it = renderDatas.begin(); it != renderDatas.end(); ++it) {
     // Check for user cancels
     if (hasToDie(renderId)) return;
@@ -1427,6 +1429,11 @@ void TRendererImp::startRendering(
       rs.m_offScreenSurface->setFormat(QSurfaceFormat::defaultFormat());
       rs.m_offScreenSurface->create();
     }
+    // (dirty fix) If the render contains smootherFx, then force precomputation
+    // even when the viewer preview, so that the level column affine can be
+    // retrieved in NaAffineFx::doDryCompute
+    if (alias.find("iwa_SmootherFx") != std::string::npos)
+      forcePreComputation = true;
 
     // Search the alias among stored clusters - and store the frame
     jt = clusters.find(alias);
@@ -1460,7 +1467,7 @@ void TRendererImp::startRendering(
     //    Precomputing
     //----------------------------------------------------------------------
 
-    if (m_precomputingEnabled) {
+    if (m_precomputingEnabled || forcePreComputation) {
       // Set current maxTileSize for cache manager precomputation
       const TRenderSettings &rs = renderDatas[0].m_info;
       TPredictiveCacheManager::instance()->setMaxTileSize(rs.m_maxTileSize);

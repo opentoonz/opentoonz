@@ -1628,6 +1628,10 @@
   <item>"STD_iwa_MotionFlowFx.normalizeType" "Normalize"	</item>
   <item>"STD_iwa_MotionFlowFx.normalizeRange" "Maximum Length"	</item>
 
+  <item>"STD_iwa_SmootherFx"	"Smoother Iwa"	</item>
+  <item>"STD_iwa_SmootherFx.threshold"	"Threshold"	</item>
+  <item>"STD_iwa_SmootherFx.softness"	"Softness"	</item>
+  
  <!------------------------------ Tiled Particles Iwa ------------------------------------------->
 
   <item>STD_iwa_TiledParticlesFx "Tiled Particles Iwa" </item>
