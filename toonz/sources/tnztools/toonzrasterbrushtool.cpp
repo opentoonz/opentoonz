@@ -752,10 +752,11 @@ ToonzRasterBrushTool::ToonzRasterBrushTool(std::string name, int targetType)
   m_smooth.setNonLinearSlider();
 
   m_prop[0].bind(m_rasThickness);
+  m_prop[0].bind(m_modifierSize);
+
   m_prop[0].bind(m_hardness);
   m_prop[0].bind(m_smooth);
   m_prop[0].bind(m_drawOrder);
-  m_prop[0].bind(m_modifierSize);
   m_prop[0].bind(m_modifierLockAlpha);
   m_prop[0].bind(m_pencil);
   m_prop[0].bind(m_assistants);
@@ -773,6 +774,7 @@ ToonzRasterBrushTool::ToonzRasterBrushTool(std::string name, int targetType)
   m_preset.addValue(CUSTOM_WSTR);
   m_pressure.setId("PressureSensitivity");
   m_modifierLockAlpha.setId("LockAlpha");
+  m_smooth.setId("Smooth");
 
   m_inputmanager.setHandler(this);
   m_modifierLine               = new TModifierLine();
@@ -1521,7 +1523,10 @@ void ToonzRasterBrushTool::draw() {
 
   TImageP img = getImage(false, 1);
 
+  // If is Spline Object, no need to draw
   if (getApplication()->getCurrentObject()->isSpline()) return;
+
+  // Whether to draw cursor at stroke end
   if (Preferences::instance()->isUseStrokeEndCursor())
     ToolUtils::drawCursor(m_viewer, this, m_brushPos, ToolCursor::PenCursor,
                           true);
@@ -1529,15 +1534,14 @@ void ToonzRasterBrushTool::draw() {
   // If toggled off, don't draw brush outline
   if (!Preferences::instance()->isCursorOutlineEnabled()) return;
 
-  // Draw the brush outline - change color when the Ink / Paint check is
-  // activated
-  if ((ToonzCheck::instance()->getChecks() & ToonzCheck::eInk) ||
-      (ToonzCheck::instance()->getChecks() & ToonzCheck::ePaint) ||
-      (ToonzCheck::instance()->getChecks() & ToonzCheck::eInk1))
-    glColor3d(0.5, 0.8, 0.8);
-  // normally draw in red
-  else
-    glColor3d(1.0, 0.0, 0.0);
+  // If in Ink / Paint mode, draw in cyan
+  int checks = ToonzCheck::instance()->getChecks();
+  if ((checks & ToonzCheck::eInk) || (checks & ToonzCheck::ePaint) ||
+      (checks & ToonzCheck::eInk1)) {
+    glColor3d(0.5, 0.8, 0.8);  // Cyan
+  } else {
+    glColor3d(1.0, 0.0, 0.0);  // Red
+  }
 
   if (m_isMyPaintStyleSelected) {
     tglDrawCircle(m_brushPos, (m_minCursorThick + 1) * 0.5);
