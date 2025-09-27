@@ -38,10 +38,10 @@ inline int adjustFillDepth(const int &fillDepth) {
 }
 
 inline int threshMatte(int matte, int fillDepth) {
-    if (fillDepth == 255)
-        return matte;
-    else
-        return (matte < fillDepth) ? 255 : matte;
+  if (fillDepth == 255)
+    return matte;
+  else
+    return (matte < fillDepth) ? 255 : matte;
 }
 
 inline TPoint nearestInkNotDiagonal(const TRasterCM32P &r, const TPoint &p) {
@@ -72,8 +72,7 @@ inline TPoint nearestInkNotDiagonal(const TRasterCM32P &r, const TPoint &p) {
 
 void fillRow(const TRasterCM32P &r, const TPoint &p, int &xa, int &xb,
              int paint, TPalette *palette, TTileSaverCM32 *saver,
-             bool prevailing = true, bool refImagePut = false,
-             int paintAtClickPos = 0) {
+             bool prevailing = true, int paintAtClickPos = 0) {
   int tone, oldtone;
   TPixelCM32 *pix, *pix0, *limit, *tmp_limit;
 
@@ -132,8 +131,8 @@ void fillRow(const TRasterCM32P &r, const TPoint &p, int &xa, int &xb,
         preVailingInk = pix->getInk();
         if (oldPrevailingInk > 0 && preVailingInk != oldPrevailingInk) break;
         oldPrevailingInk = preVailingInk;
+      }
     }
-  }
   }
 
   xb = p.x + pix - pix0 - 1;
@@ -190,8 +189,8 @@ void fillRow(const TRasterCM32P &r, const TPoint &p, int &xa, int &xb,
         preVailingInk = pix->getInk();
         if (oldPrevailingInk > 0 && preVailingInk != oldPrevailingInk) break;
         oldPrevailingInk = preVailingInk;
+      }
     }
-  }
   }
 
   xa = p.x + pix - pix0 + 1;
@@ -400,9 +399,6 @@ public:
 
 //-----------------------------------------------------------------------------
 
-
-//-----------------------------------------------------------------------------
-
 bool isPixelInSegment(const std::vector<std::pair<int, int>> &segments, int x) {
   for (int i = 0; i < (int)segments.size(); i++) {
     std::pair<int, int> segment = segments[i];
@@ -572,27 +568,28 @@ bool fill(const TRasterCM32P &r, const FillParameters &params,
       paintAtClickedPos = pix0->getPaint();
     } else
       return false;
+
+  /*- If clicked at pure ink pixel, return -*/
+  if (pix0->isPureInk()) return false;
+  if (Ref.getPointer() != nullptr && Ref->pixels(y)[x].m == 255) return false;
+
   /*- If the "paint only transparent areas" option is enabled and the area is
    * already colored, return
    * -*/
   if (params.m_emptyOnly && pix0->getPaint() != 0 && !params.m_shiftFill)
     return false;
 
-  if (pix0->isPureInk()) return false;
-
-  bool refImagePut = Ref.getPointer();
-  if (refImagePut) {
-    if (*(Ref->pixels(p.y) + p.x) != TPixel32(0, 0, 0, 0)) return false;
-    if (saver) saver->save(Ref->getBounds());
-    TRop::putRefImage(r, Ref);
-  }
+  // Put reference image, will be automatically removed by RAII
+  /* To Save Undo Memory, saved refer pixel would be cleared */ 
+  RefImageGuard refGuard(r, Ref);
 
   fillDepth = adjustFillDepth(fillDepth);
   
   std::stack<FillSeed> seeds;
 
+  // Also do fillInk for autoPaint style Ink
   fillRow(r, p, xa, xb, paint, params.m_palette, saver, params.m_prevailing,
-          refImagePut, paintAtClickedPos);
+          paintAtClickedPos);
   seeds.push(FillSeed(xa, xb, y, 1));
   seeds.push(FillSeed(xa, xb, y, -1));
 
@@ -606,12 +603,12 @@ bool fill(const TRasterCM32P &r, const FillParameters &params,
     dy   = fs.m_dy;
     y    = oldy + dy;
     if (y > bbbox.y1 || y < bbbox.y0) continue;
-    pix = pix0 = r->pixels(y) + xa;
-    limit      = r->pixels(y) + xb;
-    oldpix     = r->pixels(oldy) + xa;
-    x          = xa;
-    oldxd      = (std::numeric_limits<int>::min)();
-    oldxc      = (std::numeric_limits<int>::max)();
+    pix = pix0     = r->pixels(y) + xa;
+    limit          = r->pixels(y) + xb;
+    oldpix         = r->pixels(oldy) + xa;
+    x              = xa;
+    oldxd          = (std::numeric_limits<int>::min)();
+    oldxc          = (std::numeric_limits<int>::max)();
     while (pix <= limit) {
       oldtone = threshTone(*oldpix, fillDepth);
       tone    = threshTone(*pix, fillDepth);
@@ -622,7 +619,7 @@ bool fill(const TRasterCM32P &r, const FillParameters &params,
           (pix->getPaint() != pix->getInk() ||
            pix->getPaint() == paintAtClickedPos)) {
         fillRow(r, TPoint(x, y), xc, xd, paint, params.m_palette, saver,
-                params.m_prevailing, refImagePut, paintAtClickedPos);
+                params.m_prevailing, paintAtClickedPos);
         if (xc < xa) seeds.push(FillSeed(xc, xa - 1, y, -dy));
         if (xd > xb) seeds.push(FillSeed(xb + 1, xd, y, -dy));
         if (oldxd >= xc - 1)
@@ -642,8 +639,6 @@ bool fill(const TRasterCM32P &r, const FillParameters &params,
     }
     if (oldxd > 0) seeds.push(FillSeed(oldxc, oldxd, y, dy));
   }
-
-  if (refImagePut) TRop::eraseRefInks(r);
 
   return true;
 }

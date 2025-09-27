@@ -13,7 +13,6 @@
 #define DVVAR DV_IMPORT_VAR
 #endif
 
-
 #include <set>
 #include "ttilesaver.h"
 #include "timage.h"
@@ -22,11 +21,12 @@
 #include "tpixelcm.h"
 #include "traster.h"
 #include "trastercm.h"
+#include "tropcm.h"
 
 #include "preferences.h"
 #define DEF_REGION_WITH_PAINT                                                  \
   Preferences::instance()->getBoolValue(PreferencesItemId::DefRegionWithPaint)
-#define USE_PREVAILING_REFER_FILL                                               \
+#define USE_PREVAILING_REFER_FILL                                              \
   Preferences::instance()->getBoolValue(PreferencesItemId::ReferFillPrevailing)
 
 class TPalette;
@@ -40,7 +40,7 @@ public:
   int m_maxFillDepth;
   bool m_shiftFill;
   TPoint m_p;
-  TPalette *m_palette;
+  TPalette *m_palette;  // Whether to fill autoPaint Ink
   bool m_prevailing;
 
   FillParameters()
@@ -77,7 +77,7 @@ class TTileSaverFullColor;
 
 // returns true if the savebox is changed typically, if you fill the bg)
 DVAPI bool fill(const TRasterCM32P &r, const FillParameters &params,
-                TTileSaverCM32 *saver  = 0,
+                TTileSaverCM32 *saver = 0,
                 const TRaster32P &ref = TRaster32P());
 
 DVAPI void fill(const TRaster32P &ras, const TRaster32P &ref,
@@ -116,12 +116,13 @@ class DVAPI AreaFiller {
   TRaster32P m_refRas;
   TRect m_bounds;
   Pixel *m_pixels;
-  TPalette* m_palette;
+  TPalette *m_palette;
   int m_wrap;
   int m_color;
-  
+
 public:
-  AreaFiller(const TRasterCM32P &ras, const TRaster32P& ref = TRaster32P(), TPalette *palette = nullptr);
+  AreaFiller(const TRasterCM32P &ras, const TRaster32P &ref = TRaster32P(),
+             TPalette *palette = nullptr);
   ~AreaFiller();
   /*!
 Fill \b rect in raster with \b color.
@@ -129,8 +130,11 @@ Fill \b rect in raster with \b color.
 else if \b fillInks is false fill only paint delimited by ink;
 else fill ink and paint in rect.
 */
-  bool rectFill(const TRect &rect, const TRect &saveBox, int color, bool onlyUnfilled,
+  bool rectFill(const TRect &rect, int color, bool onlyUnfilled,
                 bool fillPaints, bool fillInks);
+
+  // Only for Fill Check
+  bool rectFastFill(const TRect& rect, int color);
 
   /*!
 Fill the raster region contained in spline \b s with \b color.
@@ -138,8 +142,13 @@ Fill the raster region contained in spline \b s with \b color.
 else if \b fillInks is false fill only paint delimited by ink;
 else fill ink and paint in region contained in spline.
 */
-  void strokeFill(const TRect& rect, TStroke *s, int color, bool onlyUnfilled, bool fillPaints,
-                  bool fillInks);
+  void strokeFill(const TRect &rect, TStroke *s, int color, bool onlyUnfilled,
+                  bool fillPaints, bool fillInks);
+
+private:
+  const void processPixel(TPixelCM32 &pix, const TPixelCM32 &bak, bool invert,
+                          int color, bool onlyUnfilled, bool fillPaints,
+                          bool fillInks);
 };
 
 class DVAPI FullColorAreaFiller {
@@ -161,5 +170,23 @@ else fill ink and paint in rect.
   void rectFill(const TRect &rect, const FillParameters &params,
                 bool onlyUnfilled);
 };
+
+class RefImageGuard {
+    const TRasterCM32P& m_r;
+    bool m_refPlaced;
+
+public:
+    RefImageGuard(const TRasterCM32P& raster, const TRaster32P& Ref)
+        : m_r(raster), m_refPlaced(Ref.getPointer() != nullptr) {
+        m_r->lock();
+        if (m_refPlaced) TRop::putRefImage(const_cast<TRasterCM32P&>(m_r), Ref);
+    }
+
+    ~RefImageGuard() {
+        m_r->unlock();
+        if (m_refPlaced) TRop::eraseRefInks(const_cast<TRasterCM32P&>(m_r));
+    }
+};
+
 
 #endif
