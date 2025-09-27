@@ -385,11 +385,9 @@ int ToonzScene::loadFrameCount(const TFilePath &fp) {
 void ToonzScene::loadNoResources(const TFilePath &fp) {
   clear();
 
-  TProjectManager *pm = TProjectManager::instance(); 
-  bool sceneStandAlone = false;
-  auto sceneProject   = pm->loadSceneProject(fp, &sceneStandAlone);
+  TProjectManager *pm  = TProjectManager::instance();
+  auto sceneProject    = pm->loadSceneProject(fp, &m_standAlone);
   if (!sceneProject) return;
-  if (sceneStandAlone) m_standAlone = true;
 
   loadTnzFile(fp);
   getXsheet()->updateFrameCount();
@@ -585,6 +583,9 @@ public:
 void ToonzScene::save(const TFilePath &fp, TXsheet *subxsh) {
   TFilePath oldScenePath = getScenePath();
   TFilePath newScenePath = fp;
+
+  if (newScenePath != oldScenePath)
+    TProjectManager::instance()->loadSceneProject(fp, &m_standAlone);
 
   CameraRedirection redir(this, subxsh);
 
