@@ -967,7 +967,9 @@ bool TTextureStyle::doCompute(const Params &params) const {
     if (m_params.m_type == TTextureParams::AUTOMATIC) {
       TRect bBox;
       TRop::computeBBox(r, bBox);
-
+      
+      // Just in case of empty raster
+      if (bBox.isEmpty()) bBox = TRect(0,0,1,1);
       r = r->extract(bBox);
       p += r->getCenter() - computeCentroid(r);
     }
