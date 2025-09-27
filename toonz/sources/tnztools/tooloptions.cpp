@@ -1771,6 +1771,9 @@ FillToolOptionsBox::FillToolOptionsBox(QWidget *parent, TTool *tool,
       dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Close Gap"));
   m_referFill =
       dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Refer Fill"));
+  m_extendFill =
+      dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Extend Fill"));
+
   bool ret = connect(m_colorMode, SIGNAL(currentIndexChanged(int)), this,
                      SLOT(onColorModeChanged(int)));
   ret      = ret && connect(m_toolType, SIGNAL(currentIndexChanged(int)), this,
@@ -1812,8 +1815,6 @@ void FillToolOptionsBox::onColorModeChanged(int index) {
   }
   enabled = range[index] != L"Lines" && !m_multiFrameMode->isChecked();
   m_onionMode->setEnabled(enabled);
-  if(m_referFill) m_referFill->setEnabled(enabled);
-  if(m_closeGap) m_closeGap->setEnabled(enabled);
 }
 
 //-----------------------------------------------------------------------------
@@ -1827,15 +1828,14 @@ void FillToolOptionsBox::onToolTypeChanged(int index) {
   enabled = enabled || (m_colorMode->getProperty()->getValue() != L"Lines" &&
                         !m_multiFrameMode->isChecked());
   m_onionMode->setEnabled(enabled);
-  enabled = range[index] != L"Polyline";
-  if (m_referFill) m_referFill->setEnabled(enabled);
-  if (m_closeGap) m_closeGap->setEnabled(enabled);
 }
 
 //-----------------------------------------------------------------------------
 
 void FillToolOptionsBox::onOnionModeToggled(bool value) {
   m_multiFrameMode->setEnabled(!value);
+  if (m_referFill) m_referFill->setEnabled(!value);
+  if (m_closeGap) m_closeGap->setEnabled(!value);
 }
 
 //-----------------------------------------------------------------------------

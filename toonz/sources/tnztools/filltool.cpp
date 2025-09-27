@@ -79,6 +79,7 @@ TEnv::IntVar FillSegment("InknpaintFillSegment", 0);
 TEnv::IntVar FillCloseGap("InknpaintFillCloseGap", 0);
 TEnv::IntVar FillReferFill("InknpaintFillReferFill", 0);
 TEnv::IntVar FillRange("InknpaintFillRange", 0);
+TEnv::IntVar FillExtend("InknpaintFillExtend", 0);
 
 //-----------------------------------------------------------------------------
 
@@ -399,6 +400,7 @@ public:
   void undo() const override {
     TRasterUndo::undo();
     TToonzImageP image = getImage();
+    if(m_refGapFill) TRop::eraseRefInks(image->getRaster());
     if (!image) return;
     if (m_saveboxOnly && !m_savebox.isEmpty()) image->setSavebox(m_savebox);
   }
@@ -458,6 +460,7 @@ public:
 //-----------------------------------------------------------------------------
 
 class RasterRectFillUndo final : public TRasterUndo {
+  TRect m_saveBox;
   TRect m_fillArea;
   int m_paintId;
   std::wstring m_colorType;
@@ -471,11 +474,12 @@ public:
     if (m_s) delete m_s;
   }
 
-  RasterRectFillUndo(TTileSetCM32 *tileSet, TStroke *s, TRect fillArea,
-                     int paintId, TXshSimpleLevel *level,
+  RasterRectFillUndo(TTileSetCM32 *tileSet, TStroke *s, TRect oldSaveBox,
+                     TRect fillArea, int paintId, TXshSimpleLevel *level,
                      std::wstring colorType, bool onlyUnfilled,
                      const TFrameId &fid, TRaster32P refImg, TPalette *palette)
       : TRasterUndo(tileSet, level, fid, false, false, 0, false)
+      , m_saveBox(oldSaveBox)
       , m_fillArea(fillArea)
       , m_paintId(paintId)
       , m_colorType(colorType)
@@ -486,20 +490,24 @@ public:
   }
 
   void redo() const override {
-    TToonzImageP image = getImage();
-    if (!image) return;
-    TRasterCM32P ras = image->getRaster();
+    TToonzImageP ti = getImage();
+    if (!ti) return;
+    TRasterCM32P ras;
+    TRect r = m_saveBox;
+    if (r.isEmpty())
+      ras = ti->getRaster();
+    else
+      ras = ti->getRaster()->extract(r);
     AreaFiller filler(ras, m_refImg, m_palette);
     if (!m_s)
-      filler.rectFill(m_fillArea, image->getSavebox(), m_paintId,
-                      m_onlyUnfilled, m_colorType != LINES,
-                      m_colorType != AREAS);
+      filler.rectFill(m_fillArea, m_paintId, m_onlyUnfilled,
+                      m_colorType != LINES, m_colorType != AREAS);
     else
       filler.strokeFill(m_fillArea, m_s, m_paintId, m_onlyUnfilled,
                         m_colorType != LINES, m_colorType != AREAS);
 
     if (m_palette) {
-      TRect rect   = m_fillArea;
+      TRect rect   = m_saveBox;
       TRect bounds = ras->getBounds();
       if (bounds.overlaps(rect)) {
         rect *= bounds;
@@ -862,18 +870,16 @@ void fillAreaWithUndo(const TImageP &img, const TRaster32P &ref,
   if (TToonzImageP ti = img) {
     // allargo di 1 la savebox, perche cosi' il rectfill di tutta l'immagine fa
     // una sola fillata
-    TRasterCM32P ras = ti->getRaster();
-    TRect refSavebox = ref ? ref->getBounds() : TRect();
-    // TRect enlargedSavebox = (ti->getSavebox().enlarge(1) + refSavebox) *
-    // ras->getBounds();
-    TRect strokeBox      = ToonzImageUtils::convertWorldToRaster(selArea, ti);
-    TRect savebox        = ti->getSavebox();
-    TRect rasterFillArea = strokeBox * savebox;
-    if (rasterFillArea.isEmpty()) return;
+    TRasterCM32P ras;
+    ras = ti->getRaster();
+
+    TRect rasBounds    = ras->getBounds();
+    TRect rasStrokeBox = ToonzImageUtils::convertWorldToRaster(selArea, ti);
+    TRect rasFillArea  = rasStrokeBox * rasBounds;
 
     /*-- tileSetでFill範囲のRectをUndoに格納しておく --*/
-    TTileSetCM32 *tileSet = new TTileSetCM32(ras->getSize());
-    tileSet->add(ras, rasterFillArea);
+    TTileSetCM32 *rasTileSet = new TTileSetCM32(ras->getSize());
+    rasTileSet->add(ras, rasFillArea);
 
     // Don't use ti to get palette
     TPalette *plt = sl->getPalette();
@@ -881,46 +887,57 @@ void fillAreaWithUndo(const TImageP &img, const TRaster32P &ref,
     // !autopaintLines will temporary disable autopaint line feature
     if ((plt && !hasAutoInks(plt)) || !autopaintLines) plt = 0;
 
-    TRasterCM32P raux = ras;
+    TPoint offs(0, 0);
+    TRect rasSaveBox;
+    TRasterCM32P raux;
+    if (Preferences::instance()->getFillOnlySavebox()) {
+      TRectD bbox = ti->getBBox();
+      rasSaveBox  = convert(bbox);
+      offs        = rasSaveBox.getP00();
+      raux        = ti->getRaster()->extract(rasSaveBox);
+    } else
+      raux = ti->getRaster();
 
-    if (ref && ti->getSize() != ref->getSize()) {
-      TRect saveBox = ti->getSavebox();
-      raux          = raux->extract(saveBox);
-    }
+    TRect auxStrokeBox = rasStrokeBox - offs;
+    TRect auxBounds    = ras->getBounds();
+    TRect auxFillArea  = auxStrokeBox * auxBounds;
+    if (auxBounds.isEmpty() || rasFillArea.isEmpty()) return;
+
     AreaFiller filler(raux, ref, plt);
     if (!stroke) {
-      bool ret =
-          filler.rectFill(rasterFillArea, ti->getSavebox(), cs, onlyUnfilled,
-                          colorType != LINES, colorType != AREAS);
+      bool ret = filler.rectFill(auxFillArea, cs, onlyUnfilled,
+                                 colorType != LINES, colorType != AREAS);
       if (!ret) {
-        delete tileSet;
+        delete rasTileSet;
         return;
       }
       if (plt) {
-        TRect rect   = rasterFillArea;
-        TRect bounds = ras->getBounds();
+        TRect rect   = auxFillArea;
+        TRect bounds = raux->getBounds();
         if (bounds.overlaps(rect)) {
           rect *= bounds;
           const TTileSetCM32::Tile *tile =
-              tileSet->getTile(tileSet->getTileCount() - 1);
+              rasTileSet->getTile(rasTileSet->getTileCount() - 1);
           TRasterCM32P rbefore;
           tile->getRaster(rbefore);
-          fillautoInks(ras, rect, rbefore, plt);
+          fillautoInks(raux, rect, rbefore, plt);
         }
       }
     } else {
-      if (stroke) stroke->transform(TTranslation(convert(ras->getCenter())));
-      if (ref)
-        stroke->transform(TTranslation(-convert(ti->getSavebox().getP00())));
-      filler.strokeFill(rasterFillArea, stroke, cs, onlyUnfilled,
+      TPointD total = convert(ras->getCenter()) - convert(offs) -
+                      TPointD(auxFillArea.x0, auxFillArea.y0);
+      stroke->transform(TTranslation(total));
+      filler.strokeFill(auxFillArea, stroke, cs, onlyUnfilled,
                         colorType != LINES, colorType != AREAS);
+      // Restore original position because the stroke might be used
+      // for calculating inbetween frames
+      stroke->transform(TTranslation(-total));
     }
 
     // ToolUtils::updateSaveBox(sl, fid);
-
     TUndoManager::manager()->add(
-        new RasterRectFillUndo(tileSet, stroke, rasterFillArea, cs, sl,
-                               colorType, onlyUnfilled, fid, ref, plt));
+        new RasterRectFillUndo(rasTileSet, stroke, rasSaveBox, auxFillArea, cs,
+                               sl, colorType, onlyUnfilled, fid, ref, plt));
   } else if (TVectorImageP vi = img) {
     TPalette *palette = vi->getPalette();
     assert(palette);
@@ -1914,8 +1931,9 @@ FillTool::FillTool(int targetType)
     , m_maxGapDistance("Maximum Gap", 0.01, 10.0, 1.15)
     , m_firstTime(true)
     , m_autopaintLines("Autopaint Lines", true)
-    , m_referFill("Refer Fill", false) {
-  m_areaFillTool       = new AreaFillTool(this);
+    , m_referFill("Refer Fill", false)
+    , m_extendFill("Extend Fill", true) {
+  m_areaFillTool = new AreaFillTool(this);
   m_normalLineFillTool = new NormalLineFillTool(this);
 
   bind(targetType);
@@ -1944,7 +1962,10 @@ FillTool::FillTool(int targetType)
     m_prop.bind(m_maxGapDistance);
     m_maxGapDistance.setId("MaxGapDistance");
   }
-  if (targetType == TTool::ToonzImage) m_prop.bind(m_autopaintLines);
+  if (targetType == TTool::ToonzImage) {
+    m_prop.bind(m_autopaintLines);
+    m_prop.bind(m_extendFill);
+  }
   m_selective.setId("Selective");
   m_onion.setId("OnionSkin");
   m_frameRange.setId("FrameRange");
@@ -1954,6 +1975,7 @@ FillTool::FillTool(int targetType)
   m_fillType.setId("Type");
   m_colorType.setId("Mode");
   m_autopaintLines.setId("AutopaintLines");
+  m_extendFill.setId("ExtendFill");
 }
 //-----------------------------------------------------------------------------
 
@@ -2041,7 +2063,6 @@ void FillTool::buildFillInfo(const FillParameters &params) {
 void FillTool::computeRefImgsIfNeeded(const FillParameters &params) {
   assert(!m_slFidsPairs.empty());
   m_refImgTable.clear();
-  if (params.m_fillType == LINES) return;
   auto app = getApplication();
   bool referFill =
       m_referFill.getValue() && app->getCurrentFrame()->isEditingScene();
@@ -2070,7 +2091,8 @@ void FillTool::computeRefImgsIfNeeded(const FillParameters &params) {
     TToonzImageP ti = (TToonzImageP)img;
     if (!ti) continue;
 
-    auto raux             = ti->getRaster();
+    auto raux = ti->getRaster();
+    raux->lock();
     auto imgId            = sl->getImageId(fid, 0);
     TPointD saveboxOffset = TPointD(0, 0);
     if (fillOnlySavebox) {
@@ -2090,6 +2112,8 @@ void FillTool::computeRefImgsIfNeeded(const FillParameters &params) {
       drawReferImage(ras, xsh, m_beginCell.col, slFidToRow[{sl, fid}],
                      saveboxOffset);
     if (closeGap) gapClose(ras, raux, sl, referFill);
+
+    raux->unlock();
   }
 }
 
@@ -2119,6 +2143,7 @@ void FillTool::updateTranslation() {
   m_referFill.setQStringName(tr("Refer Fill"));
   m_maxGapDistance.setQStringName(tr("Maximum Gap"));
   m_autopaintLines.setQStringName(tr("Autopaint Lines"));
+  m_extendFill.setQStringName(tr("Extend Fill"));
 }
 
 //-----------------------------------------------------------------------------
@@ -2134,6 +2159,7 @@ FillParameters FillTool::getFillParameters() const {
   // RefFill is not controlled params
   params.m_minFillDepth = (int)m_fillDepth.getValue().first;
   params.m_maxFillDepth = (int)m_fillDepth.getValue().second;
+  params.m_extendFill = m_extendFill.getValue();
   return params;
 }
 
@@ -2363,7 +2389,13 @@ bool FillTool::onPropertyChanged(std::string propertyName, bool addToUndo) {
     rectPropChangedflag = true;
   }
 
-  else if (!m_frameSwitched && (propertyName == m_maxGapDistance.getName())) {
+  // Extend Fill
+  else if (propertyName == m_extendFill.getName()) {
+    FillExtend = (int)(m_extendFill.getValue());
+  }
+
+  else if (!m_frameSwitched &&
+           (propertyName == m_maxGapDistance.getName())) {
     TXshLevel *xl = TTool::getApplication()->getCurrentLevel()->getLevel();
     m_level       = xl ? xl->getSimpleLevel() : 0;
     if (TVectorImageP vi = getImage(true)) {
@@ -2605,6 +2637,7 @@ void FillTool::onActivate() {
     m_closeGap.setValue(FillCloseGap ? 1 : 0);
     m_referFill.setValue(FillReferFill ? 1 : 0);
     m_frameRange.setValue(FillRange ? 1 : 0);
+    m_extendFill.setValue(FillExtend ? 1 : 0);
     m_firstTime = false;
 
     if (m_fillType.getValue() != NORMALFILL) {
