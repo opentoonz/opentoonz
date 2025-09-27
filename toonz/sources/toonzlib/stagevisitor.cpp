@@ -690,7 +690,8 @@ void RasterPainter::flushRasterImages() {
     glLoadIdentity();
     tglColor(TPixel(200, 200, 200));
     tglMultMatrix(m_nodes[current].m_aff);
-    tglDrawRect(m_nodes[current].m_raster->getBounds());
+    tglDrawRect(TRect(0, 0, m_nodes[current].m_raster->getLx(),
+                      m_nodes[current].m_raster->getLy()));
     glPopMatrix();
   }
 
