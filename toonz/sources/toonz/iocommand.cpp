@@ -1836,7 +1836,7 @@ bool IoCmd::loadScene(ToonzScene &scene, const TFilePath &scenePath,
   if (scene.getProject()->getProjectPath() !=
       currentProject->getProjectPath()) {
     ResourceImportDialog resourceLoader;
-    // resourceLoader.setImportEnabled(true);
+    resourceLoader.setImportEnabled(import);
     ResourceImporter importer(&scene, currentProject, resourceLoader);
     SceneResources resources(&scene, scene.getXsheet());
     resources.accept(&importer);
@@ -1916,7 +1916,7 @@ bool IoCmd::loadScene(const TFilePath &path, bool updateRecentFile,
             "The Scene '%1' belongs to project '%2'.\nWhat do you want to do?")
             .arg(QString::fromStdWString(scenePath.getWideString()))
             .arg(sceneProjectName);
-    QString importAnswer        = QObject::tr("Import Scene");
+    QString importAnswer        = QObject::tr("Import Scene"); 
     QString switchProjectAnswer = QObject::tr("Change Project");
     QString cancelAnswer        = QObject::tr("Cancel");
     int ret = DVGui::MsgBox(question, importAnswer, switchProjectAnswer,
@@ -1967,7 +1967,15 @@ bool IoCmd::loadScene(const TFilePath &path, bool updateRecentFile,
     if (!scene->getProject() || scene->getProject()->getProjectPath() !=
                                     currentProject->getProjectPath()) {
       ResourceImportDialog resourceLoader;
-      // resourceLoader.setImportEnabled(true);
+      QString question =
+          QObject::tr(
+              "What do you want to do to the assets of the imported scene?")
+              .arg(QString::fromStdWString(scenePath.getWideString()));
+      QString importAnswer      = QObject::tr("Import All Assets to the project");
+      QString useAbsoluteAnswer = QObject::tr("Use Absolute Path");
+      int ret = DVGui::MsgBox(question, importAnswer, useAbsoluteAnswer, 0);
+
+      resourceLoader.setImportEnabled(ret == 1);
       ResourceImporter importer(scene, currentProject, resourceLoader);
       SceneResources resources(scene, scene->getXsheet());
       resources.accept(&importer);
@@ -2760,7 +2768,7 @@ bool IoCmd::importLipSync(TFilePath levelPath, QList<TFrameId> frameList,
                      .arg(toQString(levelPath)));
     return false;
   }
-  return true; 
+  return true;
 }
 
 // Use double value DPI as policy
