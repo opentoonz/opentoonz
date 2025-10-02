@@ -199,7 +199,7 @@ TRasterGR8P fillByteRaster(const TRasterCM32P &r, TRasterGR8P &bRaster) {
 
 #define SET_INK                                                                \
   if (buf->getTone() == buf->getMaxTone())                                     \
-    *buf = TPixelCM32(inkIndex, 0, 255 - opacity);
+    *buf = TPixelCM32(inkIndex, buf->getPaint(), 255 - opacity);
 // Check if a segment needs to be closed
 // Return true ¡ú needs closure; false ¡ú no closure needed
 bool needCloseSegment(const TRasterCM32P &r, const TAutocloser::Segment &s) {
