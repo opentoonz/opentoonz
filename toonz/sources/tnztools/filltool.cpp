@@ -2297,6 +2297,7 @@ void FillTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
         invalidate();
         return;
       }
+      computeRefImgsIfNeeded(params);
       std::string imgId =
           m_application ? m_level.getPointer()->getImageId(getCurrentFid(), 0)
                         : "";
