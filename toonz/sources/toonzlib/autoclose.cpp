@@ -8,6 +8,7 @@
 #include "skeletonlut.h"
 #include "toonz/fill.h"
 #include <set>
+#include <queue>
 
 // #define AUT_SPOT_SAMPLES 40
 using namespace SkeletonLut;
@@ -200,91 +201,191 @@ TRasterGR8P fillByteRaster(const TRasterCM32P &r, TRasterGR8P &bRaster) {
 #define SET_INK                                                                \
   if (buf->getTone() == buf->getMaxTone())                                     \
     *buf = TPixelCM32(inkIndex, buf->getPaint(), 255 - opacity);
-// Check if a segment needs to be closed
-// Return true ¡ú needs closure; false ¡ú no closure needed
-bool needCloseSegment(const TRasterCM32P &r, const TAutocloser::Segment &s) {
+
+const bool isSmallEnclosedRegion(TRasterCM32P ras, int x, int y, int maxSize) {
+  if (!ras || x < 0 || y < 0 || x >= ras->getLx() || y >= ras->getLy())
+    return false;
+
+  int lx = ras->getLx(), ly = ras->getLy();
+
+  if (!ras->pixels(y)[x].isPurePaint()) return false;
+  int paint = ras->pixels(y)[x].getPaint();
+  std::vector<bool> visited(lx * ly, false);
+  std::queue<TPoint> queue;
+  int regionSize = 0;
+
+  queue.push(TPoint(x, y));
+  visited[y * lx + x] = true;
+
+  while (!queue.empty()) {
+    TPoint p = queue.front();
+    queue.pop();
+
+    if (++regionSize > maxSize) {
+      return false;
+    }
+
+    int dx[4] = {1, -1, 0, 0};
+    int dy[4] = {0, 0, 1, -1};
+
+    for (int i = 0; i < 4; i++) {
+      int nx = p.x + dx[i];
+      int ny = p.y + dy[i];
+
+      if (nx < 0 || ny < 0 || nx >= lx || ny >= ly) {
+        return false;
+      }
+
+      if (!visited[ny * lx + nx]) {
+        if (ras->pixels(ny)[nx].getPaint() == paint &&
+            ras->pixels(ny)[nx].isPurePaint()) {
+          visited[ny * lx + nx] = true;
+          queue.push(TPoint(nx, ny));
+        }
+      }
+    }
+  }
+
+  return true;
+}
+
+// For Paint defined Region
+void closeSegment(const TRasterCM32P &r, const TAutocloser::Segment &s,
+                  const USHORT ink, const USHORT opacity) {
   int x1 = s.first.x, y1 = s.first.y;
   int x2 = s.second.x, y2 = s.second.y;
 
-  int dx  = std::abs(x2 - x1);
-  int dy  = std::abs(y2 - y1);
-  int sx  = (x2 > x1) ? 1 : -1;
-  int sy  = (y2 > y1) ? 1 : -1;
-  int err = dx - dy;
+  if (x1 > x2) {
+    std::swap(x1, x2);
+    std::swap(y1, y2);
+  }
+
+  int dx = x2 - x1;
+  int dy = y2 - y1;
+
+  int nx = 0, ny = 0;
+
+  if (dy >= 0) {
+    if (dy <= dx) {
+      nx = 0;
+      ny = 1;
+    } else {
+      nx = 1;
+      ny = 0;
+    }
+  } else {
+    int abs_dy = -dy;
+    if (abs_dy <= dx) {
+      nx = 0;
+      ny = -1;
+    } else {
+      nx = 1;
+      ny = 0;
+    }
+  }
+
+  int abs_dx = std::abs(dx);
+  int abs_dy = std::abs(dy);
+  int sx     = (dx > 0) ? 1 : -1;
+  int sy     = (dy > 0) ? 1 : -1;
+  int err    = abs_dx - abs_dy;
 
   int x = x1;
   int y = y1;
-
-  int side1_count   = 0;
-  int side2_count   = 0;
-  int line_count    = 0;
-  int total_checked = 0;
+  std::vector<TPoint> points;
 
   while (true) {
     // Only check side pixels if current line pixel is purePaint
     if (r->pixels(y)[x].isPurePaint()) {
-      total_checked++;
+      r->pixels(y)[x].setInk(ink);
+      r->pixels(y)[x].setTone(255 - opacity);
+      bool shouldKeep = true;
+      int linePaint   = r->pixels(y)[x].getPaint();
 
-      // Calculate perpendicular offsets for this pixel
-      int nx = (dy <= dx) ? 0 : 1;  // mostly horizontal ¡ú vertical neighbors
-      int ny = (dy <= dx) ? 1 : 0;  // mostly vertical ¡ú horizontal neighbors
-
-      // Line
-      if (r->pixels(y)[x].getPaint()) line_count++;
-
-      // Side 1 (+offset)
-      int sx1 = x + nx;
-      int sy1 = y + ny;
-      if (sx1 >= 0 && sy1 >= 0 && sx1 < r->getLx() && sy1 < r->getLy()) {
-        if (r->pixels(sy1)[sx1].getPaint()) side1_count++;
+      int sx1        = x + nx;
+      int sy1        = y + ny;
+      int side1Paint = -1;
+      if (sx1 >= 0 && sx1 < r->getLx() && sy1 >= 0 && sy1 < r->getLy()) {
+        side1Paint = r->pixels(sy1)[sx1].getPaint();
       }
 
-      // Side 2 (-offset)
-      int sx2 = x - nx;
-      int sy2 = y - ny;
-      if (sx2 >= 0 && sy2 >= 0 && sx2 < r->getLx() && sy2 < r->getLy()) {
-        if (r->pixels(sy2)[sx2].getPaint()) side2_count++;
+      int sx2        = x - nx;
+      int sy2        = y - ny;
+      int side2Paint = -1;
+      if (sx2 >= 0 && sx2 < r->getLx() && sy2 >= 0 && sy2 < r->getLy()) {
+        side2Paint = r->pixels(sy2)[sx2].getPaint();
       }
+      bool notEdge = (side1Paint == side2Paint && linePaint == side1Paint);
+      if (notEdge) {
+        bool side1Small = isSmallEnclosedRegion(r, sx1, sy1, 4);
+        bool side2Small = isSmallEnclosedRegion(r, sx2, sy2, 4);
+        if (side1Small || side2Small) {
+          r->pixels(y)[x].setTone(TPixelCM32::getMaxTone());
+          r->pixels(y)[x].setInk(0);
+          shouldKeep = false;
+        }
+      } else if (!((x == x1 && y == y1) || (x == x2 && y == y2))) {
+        r->pixels(y)[x].setTone(TPixelCM32::getMaxTone());
+        r->pixels(y)[x].setInk(0);
+        shouldKeep = false;
+      }
+      if (shouldKeep) points.push_back(TPoint(x, y));
     }
 
     if (x == x2 && y == y2) break;
 
     int e2 = 2 * err;
-    if (e2 > -dy) {
-      err -= dy;
+    if (e2 > -abs_dy) {
+      err -= abs_dy;
       x += sx;
     }
-    if (e2 < dx) {
-      err += dx;
+    if (e2 < abs_dx) {
+      err += abs_dx;
       y += sy;
     }
   }
 
-  if (total_checked == 0) {
-    return false;
+  // Clear lonely pixels (Intersection Point)
+  // Mostly an endpoint of one gap
+  // It's also one point on the other gap close line
+  if (points.size() == 1 && points.front() != s.first &&
+      points.front() != s.second)
+    return;
+  for (auto [x, y] : points) {
+    bool lonely     = true;
+    int paint       = r->pixels(y)[x].getPaint();
+    const int dx[8] = {-1, 0, 1, -1, 1, -1, 0, 1};
+    const int dy[8] = {-1, -1, -1, 0, 0, 1, 1, 1};
+
+    for (int i = 0; i < 8; ++i) {
+      int nx = x + dx[i];
+      int ny = y + dy[i];
+
+      if (nx >= 0 && nx < r->getLx() && ny >= 0 && ny < r->getLy()) {
+        if (r->pixels(ny)[nx].getInk() == ink &&
+            r->pixels(ny)[nx].getPaint() == paint) {
+          lonely = false;
+          break;
+        }
+      }
+    }
+
+    if (lonely) {
+      r->pixels(y)[x].setTone(TPixelCM32::getMaxTone());
+      r->pixels(y)[x].setInk(0);
+    }
   }
 
-  double line_ratio  = static_cast<double>(line_count) / total_checked;
-  double side1_ratio = static_cast<double>(side1_count) / total_checked;
-  double side2_ratio = static_cast<double>(side2_count) / total_checked;
-
-  const double THRESHOLD = 0.8;
-  bool line_ok       = (line_ratio >= THRESHOLD);
-  bool side1_ok          = (side1_ratio >= THRESHOLD);
-  bool side2_ok          = (side2_ratio >= THRESHOLD);
-
-  // Only one side with sufficient paint coverage is enough to skip closure
-  if (side1_ok || side2_ok || line_ok) {
-    return false;
-  }
-
-  return true;  // both sides not sufficiently painted ¡ú needs closure
+  return;
 }
 
 void drawSegment(TRasterCM32P &r, const TAutocloser::Segment &s,
                  USHORT inkIndex, USHORT opacity) {
   // Check if this segment actually needs closing
-  if (DEF_REGION_WITH_PAINT && !needCloseSegment(r, s)) return;
+  if (DEF_REGION_WITH_PAINT) {
+    closeSegment(r, s, inkIndex, opacity);
+    return;
+  }
 
   int wrap        = r->getWrap();
   TPixelCM32 *buf = r->pixels();
@@ -317,6 +418,7 @@ return;
   dy = y2 - y1;
 
   x = y = 0;
+  SET_INK;
 
   if (dy >= 0) {
     if (dy <= dx)
@@ -330,6 +432,8 @@ return;
     else
       DRAW_SEGMENT(y, x, dy, dx, (buf -= wrap), (buf -= (wrap - 1)), SET_INK)
   }
+
+  SET_INK;
 }
 
 /*------------------------------------------------------------------------*/

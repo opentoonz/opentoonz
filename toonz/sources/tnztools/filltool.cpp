@@ -1043,7 +1043,7 @@ void drawReferImage(TRaster32P &ras, TXsheet *xsh, int col, int row,
       // Combine all transformations
       TAffine finalAff = TTranslation(saveboxoffset) *
                          TTranslation(ras->getCenterD()) * curAff.inv() * aff *
-                             TTranslation(-ras->getCenterD()) * centerAlignment;
+                         TTranslation(-ras->getCenterD()) * centerAlignment;
 
       // Put refer Image
       if (ti) {
@@ -1072,7 +1072,7 @@ void gapClose(TRaster32P &ras, TRasterCM32P &raux, TXshSimpleLevel *sl,
     }
   }
 
-  TAutocloser ac(tnzRas, 1, closeStting, autoPaintInks);
+  TAutocloser ac(tnzRas, TPixelCM32::getMaxInk(), closeStting, autoPaintInks);
   ac.exec();
   TRop::CmappedQuickputSettings putSetting;
   putSetting.m_inksOnly = true;
