@@ -79,7 +79,9 @@ void fillOutsideOfStroke(const TRasterCM32P &r, TStroke *stroke, int color) {
   params.m_prevailing = false;
   for (int i = 0; i < length; i++) {
     TPoint p = convert(stroke->getPointAtLength(i));
-    if (p == oldP || !bbox.contains(p)) continue;
+    if (p == oldP || !bbox.contains(p) ||
+        r->pixels(p.y)[p.x].getPaint() == color)
+      continue;
     params.m_p = p;
     fill(r, params);
     oldP = p;
@@ -190,8 +192,8 @@ bool AreaFiller::rectFill(const TRect &rect, int color, bool onlyUnfilled,
   m_ras->lock();
   TRect r = m_bounds * rect;
 
-  int dx  = r.x1 - r.x0;
-  int dy  = (r.y1 - r.y0) * m_wrap;
+  int dx = r.x1 - r.x0;
+  int dy = (r.y1 - r.y0) * m_wrap;
   if (dx < 2 || dy < 2)  // rect degenere(area contenuta nulla), skippo.
     return false;
   // Se il rettangolo non contiene il bordo del raster e se tutti i pixels
@@ -366,6 +368,8 @@ void AreaFiller::strokeFill(const TRect &rect, TStroke *stroke, int color,
   // std::vector<std::pair<TPoint, int>> seeds;
   // computeSeeds(m_ras, stroke, seeds);
   fillOutsideOfStroke(ras, stroke, TPixelCM32::getMaxPaint() - 1);
+  // Some pixels might be painted to in fillRow(),
+  // with PAINT Bounds off and refer/gap on
 
   TVectorImage app;
   app.addStroke(stroke);
@@ -397,6 +401,8 @@ const void AreaFiller::processPixel(
     /*--- Process refer/auto-paint Lines  ---*/
     else {
       // paint refer lines
+      if (!invert && pix.getInk() == TPixelCM32::getMaxInk() - 1)  // !!!!
+        pix.setInk(TPixelCM32::getMaxInk());
       if (pix.getInk() == TPixelCM32::getMaxInk() && !DEF_REGION_WITH_PAINT)
         pix.setInk(color);
       // paint auto-paint lines
@@ -422,7 +428,7 @@ const void AreaFiller::processPixel(
   }
   /*--- Restore Area should not be filled */
   else
-    pix.setPaint(bak.getPaint());
+    pix.setPaint(bak.getPaint()), pix.setInk(bak.getInk());
 }
 
 //=============================================================================
