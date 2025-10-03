@@ -2,10 +2,14 @@
 
 #include "tapp.h"
 #include "tsystem.h"
+#include "iocommand.h"
 #include "toonzqt/filefield.h"
 #include "toonz/toonzscene.h"
 #include "toonz/tscenehandle.h"
 #include "toonz/sceneproperties.h"
+#include "toonz/tcamera.h"
+#include "convertpopup.h"
+#include "tfiletype.h"
 
 #include <QMainWindow>
 #include <QTableView>
@@ -15,6 +19,7 @@
 #include <QLabel>
 #include <QComboBox>
 #include <QGroupBox>
+#include <QCoreApplication>
 
 using namespace DVGui;
 
@@ -54,6 +59,29 @@ bool isSharingSameParam(QString name1,
     return str1 == str2;
 }
 
+void fetchSequence(std::vector<IoCmd::LoadResourceArguments::ResourceData>& rds) {
+    for (size_t i = 0; i < rds.size(); ++i) {
+        TFilePath currentPath = rds[i].m_path;
+        if (!matchSequencePattern(currentPath))continue;
+
+        TFilePath thisFolder = currentPath.getParentDir();
+        QDir dir(thisFolder.getQString());
+
+        QString searchPattern = "*" + QString::fromStdString(currentPath.getDottedType());
+        QStringList foundFiles = dir.entryList(QStringList(searchPattern), QDir::Files);
+        if (foundFiles.isEmpty()) continue;
+        QString thisFile = currentPath.withoutParentDir().getQString();
+        for (const QString& foundFile : foundFiles) {
+            if (thisFile == foundFile) continue;
+
+            if (isSharingSameParam(thisFile, foundFile)) {
+                IoCmd::LoadResourceArguments::ResourceData newData;
+                newData.m_path = thisFolder + foundFile.toStdWString();
+                rds.insert(rds.begin() + (++i), newData);
+            }
+        }
+    }
+}
 }  // namespace
 
 //=============================================================================
@@ -72,6 +100,48 @@ XDTSImportPopup::XDTSImportPopup(QStringList levelNames, ToonzScene* scene,
   m_tick1Combo             = new QComboBox(this);
   m_tick2Combo             = new QComboBox(this);
   QList<QComboBox*> combos = {m_tick1Combo, m_tick2Combo};
+
+  m_renameCheckBox = new QCheckBox("Rename Image Sequence", this);
+  m_renameCheckBox->setChecked(true);
+  m_convertCombo = new QComboBox(this);
+  QStringList convertOptions = {tr("Do not Convert"),
+      tr("Convert Every Level with Settings Popup"),
+    tr("Convert Unpainted Aliasing Raster(Inks Only)")};
+  m_convertCombo->addItems(convertOptions);
+  m_convertCombo->setCurrentIndex(0);
+
+  // Only works for 3rd Convert Option: NAA Unpainted
+  QWidget* convertNAAWidget = new QWidget(this);
+  convertNAAWidget->setVisible(false);
+  QHBoxLayout* convertNAALayout = new QHBoxLayout;
+  m_paletteCheckBox = new QCheckBox("Append Default Palette", this);
+  m_paletteCheckBox->setChecked(true);
+  m_paletteCheckBox->setToolTip(
+      tr("When activated, styles of the default "
+          "palette\n($TOONZSTUDIOPALETTE\\Global Palettes\\Default Palettes\\Cleanup_Palette.tpl) will \nbe "
+          "appended to the palette after conversion"));
+  QStringList dpiModes;
+  dpiModes << tr("Image DPI") << tr("Current Camera DPI") << tr("Custom DPI");
+  m_dpiMode = new QComboBox(this);
+  m_dpiMode->addItems(dpiModes);
+  m_dpiFld = new DVGui::DoubleLineEdit(this);
+  m_dpiFld->setValue(120);
+  m_dpiFld->setDisabled(true);
+  connect(m_dpiMode, QOverload<int>::of(&QComboBox::currentIndexChanged),
+      this, [=](int index) {
+          m_dpiFld->setEnabled(index == 2); // Custom DPI
+      });
+
+  convertNAALayout->addWidget(m_paletteCheckBox);
+  convertNAALayout->addStretch();
+  convertNAALayout->addWidget(new QLabel(tr("DPI:")));
+  convertNAALayout->addWidget(m_dpiMode);
+  convertNAALayout->addWidget(m_dpiFld);
+  convertNAAWidget->setLayout(convertNAALayout);
+  connect(m_convertCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
+      this, [=](int index) {
+          convertNAAWidget->setVisible(index == 2);
+          this->adjustSize(); });
 
   if (m_isUext) {
     m_keyFrameCombo       = new QComboBox(this);
@@ -169,11 +239,19 @@ XDTSImportPopup::XDTSImportPopup(QStringList levelNames, ToonzScene* scene,
 
   m_topLayout->addWidget(cellMarkGroupBox, 0, Qt::AlignRight);
 
+  QHBoxLayout* checkBoxLayout = new QHBoxLayout;
+  checkBoxLayout->addWidget(new QLabel(QObject::tr("Convert Raster to TLV : ")));
+  checkBoxLayout->addWidget(m_convertCombo);
+  checkBoxLayout->addStretch();
+  checkBoxLayout->addWidget(m_renameCheckBox);
+
+  m_topLayout->addLayout(checkBoxLayout);
+  m_topLayout->addWidget(convertNAAWidget);
   connect(loadButton, SIGNAL(clicked()), this, SLOT(accept()));
   connect(cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 
   addButtonBarWidget(loadButton, cancelButton);
-
+  this->adjustSize();
   updateSuggestions(scenePath.getQString());
 }
 
@@ -277,20 +355,27 @@ void XDTSImportPopup::updateSuggestions(const QString samplePath) {
   }
 
   // fallBack search
-  if (!suggested) {
-      updateSuggestions(fp);
-      return;
-  }
+  if (!suggested) updateSuggestions(fp);
 
-  // repaint fields
+  // Repaint fields:
+  //   - Suggested fields: highlight with a blue border
+  //   - Non-suggested fields:
+  //       if empty, set their internal path to the scene's parent directory,
+  //       but clear the text so the user does not see it
   fieldsItr = m_fields.begin();
   while (fieldsItr != m_fields.end()) {
     if (m_pathSuggestedLevels.contains(fieldsItr.key()))
       fieldsItr.value()->setStyleSheet(
           QString("#SuggestiveFileField "
                   "QLineEdit{border-color:#2255aa;border-width:2px;}"));
-    else
+    else {
       fieldsItr.value()->setStyleSheet(QString(""));
+      if (fieldsItr.value()->getPath().isEmpty()) {
+        fieldsItr.value()->setPath(
+            m_scene->getScenePath().getParentDir().getQString());
+        fieldsItr.value()->getField()->clear();
+      }
+    }
     ++fieldsItr;
   }
 }
@@ -355,18 +440,6 @@ void XDTSImportPopup::updateSuggestions(const TFilePath &path) {
         }
         assignMatchingFiles(relPaths);
     }
-
-  // repaint fields
-  fieldsItr = m_fields.begin();
-  while (fieldsItr != m_fields.end()) {
-    if (m_pathSuggestedLevels.contains(fieldsItr.key()))
-      fieldsItr.value()->setStyleSheet(
-          QString("#SuggestiveFileField "
-                  "QLineEdit{border-color:#2255aa;border-width:2px;}"));
-    else
-      fieldsItr.value()->setStyleSheet(QString(""));
-    ++fieldsItr;
-  }
 }
 
 //-----------------------------------------------------------------------------
@@ -390,4 +463,54 @@ void XDTSImportPopup::getMarkerIds(int& tick1Id, int& tick2Id, int& keyFrameId,
     keyFrameId       = -1;
     referenceFrameId = -1;
   }
+}
+
+void XDTSImportPopup::accept() {
+    QDialog::accept();
+    std::vector<IoCmd::LoadResourceArguments::ResourceData> rds;
+    for (auto it = m_fields.constBegin(); it != m_fields.constEnd(); ++it) {
+        auto name = it.key();
+        auto field = it.value();
+    }
+    IoCmd::LoadResourceArguments::ResourceData d;
+    for (auto field : m_fields) rds.push_back(TFilePath(field->getPath()));
+    fetchSequence(rds);
+    if (m_renameCheckBox->isChecked())
+        IoCmd::renameResources(rds, false);
+    if (int ret = m_convertCombo->currentIndex()) {
+        if (ret == 1) {
+            // Convert One by One
+            ConvertPopup popup;
+            for (auto& rd : rds) {
+                popup.setWindowModality(Qt::ApplicationModal);
+                TFileType::Type type = TFileType::getInfo(rd.m_path);
+                if (!TFileType::isFullColor(type)) continue;
+                popup.setFiles({ rd.m_path });
+                popup.show();
+                popup.setFormat("tlv");
+                popup.adjustSize();
+                while (popup.isVisible() || popup.isConverting())
+                    QCoreApplication::processEvents(QEventLoop::AllEvents |
+                        QEventLoop::WaitForMoreEvents);
+                TFilePath convertedPath = popup.getConvertedPath(rd.m_path);
+                if (!convertedPath.isEmpty())
+                    rd.m_path = convertedPath;
+            }
+        }
+        else {
+            // Convert NAA Unpainted
+            int index = m_dpiMode->currentIndex();
+            double dpi = 0;
+            if (index == 1) {
+                TCamera* camera = TApp::instance()->getCurrentScene()
+                    ->getScene()->getCurrentCamera();
+                if (camera) dpi = camera->getDpi().x;
+            }
+            else if (index == 2)
+                dpi = m_dpiFld->getValue();
+            IoCmd::convertNAARaster2TLV(rds, false, dpi, m_paletteCheckBox->isChecked());// Only Generate Inks
+        }
+    }
+    int i = 0;
+    for (auto field : m_fields) field->setPath(rds[i++].m_path.getQString());
 }
