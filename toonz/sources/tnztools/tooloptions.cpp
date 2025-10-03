@@ -1771,6 +1771,9 @@ FillToolOptionsBox::FillToolOptionsBox(QWidget *parent, TTool *tool,
       dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Close Gap"));
   m_referFill =
       dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Refer Fill"));
+  m_extendFill =
+      dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Extend Fill"));
+
   bool ret = connect(m_colorMode, SIGNAL(currentIndexChanged(int)), this,
                      SLOT(onColorModeChanged(int)));
   ret      = ret && connect(m_toolType, SIGNAL(currentIndexChanged(int)), this,
