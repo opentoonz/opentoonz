@@ -1159,8 +1159,7 @@ void doRefFill(const TImageP &img, const TRaster32P &refImg, const TPointD &pos,
 
     TXshSimpleLevel *sl = xl->getSimpleLevel();
     sl->getProperties()->setDirtyFlag(true);
-    if (recomputeSavebox &&
-        Preferences::instance()->isMinimizeSaveboxAfterEditing())
+    if (recomputeSavebox)
       ToolUtils::updateSaveBox(sl, fid);
 
     ras->unlock();
