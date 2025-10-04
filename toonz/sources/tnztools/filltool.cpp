@@ -1072,7 +1072,7 @@ void gapClose(TRaster32P &ras, TRasterCM32P &raux, TXshSimpleLevel *sl,
     }
   }
 
-  TAutocloser ac(tnzRas, 1, closeStting, autoPaintInks);
+  TAutocloser ac(tnzRas, TPixelCM32::getMaxInk(), closeStting, autoPaintInks);
   ac.exec();
   TRop::CmappedQuickputSettings putSetting;
   putSetting.m_inksOnly = true;
@@ -1159,8 +1159,7 @@ void doRefFill(const TImageP &img, const TRaster32P &refImg, const TPointD &pos,
 
     TXshSimpleLevel *sl = xl->getSimpleLevel();
     sl->getProperties()->setDirtyFlag(true);
-    if (recomputeSavebox &&
-        Preferences::instance()->isMinimizeSaveboxAfterEditing())
+    if (recomputeSavebox)
       ToolUtils::updateSaveBox(sl, fid);
 
     ras->unlock();
@@ -2302,6 +2301,7 @@ void FillTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
         invalidate();
         return;
       }
+      computeRefImgsIfNeeded(params);
       std::string imgId =
           m_application ? m_level.getPointer()->getImageId(getCurrentFid(), 0)
                         : "";

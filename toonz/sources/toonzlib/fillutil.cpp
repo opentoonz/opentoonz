@@ -21,6 +21,22 @@ using namespace SkeletonLut;
 //-----------------------------------------------------------------------------
 namespace {  // Utility Function
 //-----------------------------------------------------------------------------
+inline TPoint nearestInkNotDiagonal(const TRasterCM32P &r, const TPoint &p) {
+  TPixelCM32 *buf = (TPixelCM32 *)r->pixels(p.y) + p.x;
+
+  if (p.x < r->getLx() - 1 && (!(buf + 1)->isPurePaint()))
+    return TPoint(p.x + 1, p.y);
+
+  if (p.x > 0 && (!(buf - 1)->isPurePaint())) return TPoint(p.x - 1, p.y);
+
+  if (p.y < r->getLy() - 1 && (!(buf + r->getWrap())->isPurePaint()))
+    return TPoint(p.x, p.y + 1);
+
+  if (p.y > 0 && (!(buf - r->getWrap())->isPurePaint()))
+    return TPoint(p.x, p.y - 1);
+
+  return TPoint(-1, -1);
+}
 
 void computeSeeds(const TRasterCM32P &r, TStroke *stroke,
                   std::vector<std::pair<TPoint, int>> &seeds) {
@@ -41,7 +57,7 @@ void computeSeeds(const TRasterCM32P &r, TStroke *stroke,
 //-----------------------------------------------------------------------------
 
 void fillRegionExcept(const TRasterCM32P &ras, TRegion *r, int positive,
-                      int negative) {
+                      int negative, TPalette *plt, int color, bool fillInks) {
   TRect bbox = convert(r->getBBox());
   bbox *= ras->getBounds();
   ras->lock();
@@ -58,6 +74,11 @@ void fillRegionExcept(const TRasterCM32P &ras, TRegion *r, int positive,
       int to          = std::min(tceil(intersections[j + 1]), bbox.x1);
       TPixelCM32 *pix = line + from;
       for (int k = from; k < to; k++, pix++) {
+        if (fillInks && !pix->isPurePaint())
+          pix->setInk(color);  // Paint all inks
+        // paint auto-paint lines
+        else if (plt && plt->getStyle(pix->getInk())->getFlags() != 0)
+          pix->setInk(color);
         if (pix->getPaint() != positive) pix->setPaint(negative);
       }
     }
@@ -79,7 +100,9 @@ void fillOutsideOfStroke(const TRasterCM32P &r, TStroke *stroke, int color) {
   params.m_prevailing = false;
   for (int i = 0; i < length; i++) {
     TPoint p = convert(stroke->getPointAtLength(i));
-    if (p == oldP || !bbox.contains(p)) continue;
+    if (p == oldP || !bbox.contains(p) ||
+        r->pixels(p.y)[p.x].getPaint() == color)
+      continue;
     params.m_p = p;
     fill(r, params);
     oldP = p;
@@ -190,8 +213,8 @@ bool AreaFiller::rectFill(const TRect &rect, int color, bool onlyUnfilled,
   m_ras->lock();
   TRect r = m_bounds * rect;
 
-  int dx  = r.x1 - r.x0;
-  int dy  = (r.y1 - r.y0) * m_wrap;
+  int dx = r.x1 - r.x0;
+  int dy = (r.y1 - r.y0) * m_wrap;
   if (dx < 2 || dy < 2)  // rect degenere(area contenuta nulla), skippo.
     return false;
   // Se il rettangolo non contiene il bordo del raster e se tutti i pixels
@@ -275,8 +298,14 @@ bool AreaFiller::rectFill(const TRect &rect, int color, bool onlyUnfilled,
   for (int y = 0; y < ly; ++y) {
     TPixelCM32 *pix = ras->pixels(y);
     TPixelCM32 *bak = backupRas->pixels(y);
-    for (int x = 0; x < lx; ++x, ++pix, ++bak)
+    for (int x = 0; x < lx; ++x, ++pix, ++bak) {
+      // paint auto-paint lines
+      if (fillInks && !pix->isPurePaint())
+        pix->setInk(color);  // Paint all inks
+      else if (m_palette && m_palette->getStyle(pix->getInk())->getFlags() != 0)
+        inkFill(ras, TPoint(x, y), color, 0);
       processPixel(*pix, *bak, true, color, onlyUnfilled, fillPaints, fillInks);
+    }
   }
 
   m_ras->unlock();
@@ -366,22 +395,26 @@ void AreaFiller::strokeFill(const TRect &rect, TStroke *stroke, int color,
   // std::vector<std::pair<TPoint, int>> seeds;
   // computeSeeds(m_ras, stroke, seeds);
   fillOutsideOfStroke(ras, stroke, TPixelCM32::getMaxPaint() - 1);
+  // Some pixels might be painted to in fillRow(),
+  // with PAINT Bounds off and refer/gap on
 
   TVectorImage app;
   app.addStroke(stroke);
   app.findRegions();
+  // fillRegionsExcept() also process lines
   for (UINT i = 0; i < app.getRegionCount(); i++)
     fillRegionExcept(ras, app.getRegion(i), TPixelCM32::getMaxPaint() - 1,
-                     TPixelCM32::getMaxPaint());
+                     TPixelCM32::getMaxPaint(), m_palette, color, fillInks);
   app.removeStroke(0);
 
   int lx = box.getLx(), ly = box.getLy();
   for (int y = 0; y < ly; ++y) {
     TPixelCM32 *pix = ras->pixels(y);
     TPixelCM32 *bak = backupRas->pixels(y);
-    for (int x = 0; x < lx; ++x, ++pix, ++bak)
+    for (int x = 0; x < lx; ++x, ++pix, ++bak) {
       processPixel(*pix, *bak, false, color, onlyUnfilled, fillPaints,
                    fillInks);
+    }
   }
   m_ras->unlock();
 }
@@ -392,17 +425,13 @@ const void AreaFiller::processPixel(
     bool fillInks) { /*--- Process Area need to be painted */
   if (invert ? pix.getPaint() != TPixelCM32::getMaxPaint()
              : pix.getPaint() == TPixelCM32::getMaxPaint()) {
-    /*--- Process ALL Lines  ---*/
-    if (fillInks && !pix.isPurePaint()) pix.setInk(color);  // Paint all inks
-    /*--- Process refer/auto-paint Lines  ---*/
-    else {
-      // paint refer lines
-      if (pix.getInk() == TPixelCM32::getMaxInk() && !DEF_REGION_WITH_PAINT)
-        pix.setInk(color);
-      // paint auto-paint lines
-      if (m_palette && m_palette->getStyle(pix.getInk())->getFlags() != 0)
-        pix.setInk(color);
-    }
+    /*--- Process refer Lines  ---*/
+    // paint refer lines
+    if (!invert && pix.getInk() == TPixelCM32::getMaxInk() - 1)  // !!!!
+      pix.setInk(TPixelCM32::getMaxInk());
+    if (pix.getInk() == TPixelCM32::getMaxInk() && !DEF_REGION_WITH_PAINT)
+      pix.setInk(color);
+
     /*--- Process ALL PAINT  ---*/
     if (fillPaints) {
       // do not paint if not empty pixel

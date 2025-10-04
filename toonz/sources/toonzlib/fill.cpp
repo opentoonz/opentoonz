@@ -230,7 +230,8 @@ void fillRow(const TRasterCM32P &r, const TPoint &p, int &xa, int &xb,
           if (pixInk->getInk() != paint &&
               palette->getStyle(pixInk->getInk())->getFlags() != 0)
             inkFill(r, pInk, paint, 0, saver);
-          else if (pixInk->getInk() == paintAtClickPos)
+          else if (pixInk->getInk() == paintAtClickPos &&
+                   paintAtClickPos != 1 && paint != 0)
             inkFill(r, pInk, paint, 0, saver);
         }
       }
@@ -580,11 +581,11 @@ bool fill(const TRasterCM32P &r, const FillParameters &params,
     return false;
 
   // Put reference image, will be automatically removed by RAII
-  /* To Save Undo Memory, saved refer pixel would be cleared */ 
+  /* To Save Undo Memory, saved refer pixel would be cleared */
   RefImageGuard refGuard(r, Ref);
 
   fillDepth = adjustFillDepth(fillDepth);
-  
+
   std::stack<FillSeed> seeds;
 
   // Also do fillInk for autoPaint style Ink
@@ -603,12 +604,12 @@ bool fill(const TRasterCM32P &r, const FillParameters &params,
     dy   = fs.m_dy;
     y    = oldy + dy;
     if (y > bbbox.y1 || y < bbbox.y0) continue;
-    pix = pix0     = r->pixels(y) + xa;
-    limit          = r->pixels(y) + xb;
-    oldpix         = r->pixels(oldy) + xa;
-    x              = xa;
-    oldxd          = (std::numeric_limits<int>::min)();
-    oldxc          = (std::numeric_limits<int>::max)();
+    pix = pix0 = r->pixels(y) + xa;
+    limit      = r->pixels(y) + xb;
+    oldpix     = r->pixels(oldy) + xa;
+    x          = xa;
+    oldxd      = (std::numeric_limits<int>::min)();
+    oldxc      = (std::numeric_limits<int>::max)();
     while (pix <= limit) {
       oldtone = threshTone(*oldpix, fillDepth);
       tone    = threshTone(*pix, fillDepth);
