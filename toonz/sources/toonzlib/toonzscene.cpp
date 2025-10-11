@@ -1057,7 +1057,7 @@ TFilePath ToonzScene::getImportedLevelPath(const TFilePath path) const {
 
 //-----------------------------------------------------------------------------
 
-/* tzp,tzu->tlv */
+/* tzp,tzu->tlv, svg->pli */
 bool ToonzScene::convertLevelIfNeeded(TFilePath &levelPath) {
   LevelType ltype = getLevelType(levelPath);
   TFilePath fp    = levelPath;

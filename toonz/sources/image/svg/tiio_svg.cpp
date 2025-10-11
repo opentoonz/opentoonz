@@ -1793,7 +1793,15 @@ struct NSVGimage *nsvgParseFromFile(const char *filename) {
   char *data              = NULL;
   struct NSVGimage *image = NULL;
 
+#if defined(_WIN32)
+  wchar_t wfilename[1024];
+  if (MultiByteToWideChar(CP_UTF8, 0, filename, -1, wfilename, 1024) > 0) {
+      fp = _wfopen(wfilename, L"rb");
+  }
+#else
   fp = fopen(filename, "rb");
+#endif
+  
   if (!fp) goto error;
   fseek(fp, 0, SEEK_END);
   size = ftell(fp);
