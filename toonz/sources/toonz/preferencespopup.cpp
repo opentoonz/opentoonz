@@ -1318,8 +1318,8 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
       // removed
       {FillOnlysavebox, tr("Use the TLV Savebox to Limit Filling Operations")},
       {DefRegionWithPaint,
-       tr("Define filling region with both PAINT and INK")},
-      { ReferFillPrevailing, tr("Paint under/over INK in refer fill") },
+       tr("Define Filling Region Using both Lines and Areas")},
+      { ReferFillPrevailing, tr("Paint Under Lines in Refer Fill and Gap Close") },
       {multiLayerStylePickerEnabled,
        tr("Multi Layer Style Picker: Switch Levels by Picking")},
       {cursorBrushType, tr("Basic Cursor Type:")},

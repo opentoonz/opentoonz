@@ -144,7 +144,7 @@ public:
       , m_inkIndex("Style Index:", L"current")  // W_ToolOptions_InkIndex
       , m_opacity("Opacity:", 1, 255, 255)
       , m_multi("Frame Range", false)  // W_ToolOptions_FrameRange
-      , m_ignoreAP("Ignore AutoPaint Inks", false)
+      , m_ignoreAP("Ignore AutoPaint Lines", false)
       , m_selecting(false)
       , m_selectingRect()
       , m_firstRect()
