@@ -446,7 +446,7 @@ bool scanTransparentRegion(TRasterCM32P ras, int x, int y,
   if (visited[y * lx + x]) return true;
 
   TPixelCM32 *pix = ras->pixels(y) + x;
-  if (pix->getPaint() != 0 || pix->isPureInk()) return true;
+  if (pix->getPaint() != 0 || pix->getTone() < 64) return true;
   if (points.size() + 1 > maxSize) return false;
 
   visited[y * lx + x] = true;
@@ -473,7 +473,32 @@ int getMostFrequentNeighborStyleId(TRasterCM32P ras,
   int maxCount   = 0;
 
   const std::vector<TPoint> diagonal = {TPoint(1, -1), TPoint(1, 1),
-                                        TPoint(-1, 1), TPoint(1, 1)};
+                                        TPoint(-1, 1), TPoint(-1, -1)};
+
+  const std::vector<TPoint> cardinal = {TPoint(0, -1), TPoint(0, 1),
+                                        TPoint(-1, 0), TPoint(1, 0)};
+
+  for (const TPoint &p : points) {
+    for (const TPoint &d : cardinal) {
+      int nx = p.x + d.x;
+      int ny = p.y + d.y;
+      if (nx < 0 || ny < 0 || nx >= lx || ny >= ly) continue;
+      if (visited[ny * lx + nx]) continue;
+
+      TPixelCM32 *pix = ras->pixels(ny) + nx;
+
+      int styleId = pix->getInk();
+      if (styleId)
+        styleCount[styleId] +=
+            pix->getTone() + 1;  // cardinal Ink weights tone+1
+      styleId = pix->getPaint();
+      if (styleId) {
+        styleCount[styleId] +=
+            pix->getTone() + 2;  // cardinal Paint weights tone+2
+        fillInk = false;
+      }
+    }
+  }
 
   for (const TPoint &p : points) {
     for (const TPoint &d : diagonal) {
@@ -486,43 +511,14 @@ int getMostFrequentNeighborStyleId(TRasterCM32P ras,
       if (pix->isPureInk()) continue;
       int styleId = pix->getPaint();
       if (styleId) {
-        styleCount[styleId] += 256;  // Diagonal Paint weights 256
+        styleCount[styleId] +=
+            pix->getTone() + 3;  // Diagonal not pureInk Paint weights tone+3
         fillInk = false;
       }
     }
   }
 
-  for (const auto &entry : styleCount) {
-    if (entry.second > maxCount) {
-      maxCount   = entry.second;
-      maxStyleId = entry.first;
-    }
-  }
-
-  // Some corner Pixels woule be count in for 2/3 times, as the weight of
-  // Diagonal is large enough ignore them
-  const std::vector<TPoint> horizontal = {TPoint(0, -1), TPoint(0, 1),
-                                          TPoint(-1, 0), TPoint(1, 0)};
-
-  for (const TPoint &p : points) {
-    for (const TPoint &d : horizontal) {
-      int nx = p.x + d.x;
-      int ny = p.y + d.y;
-      if (nx < 0 || ny < 0 || nx >= lx || ny >= ly) continue;
-      if (visited[ny * lx + nx]) continue;
-
-      TPixelCM32 *pix = ras->pixels(ny) + nx;
-      if (!pix->isPureInk()) continue;
-      int styleId = pix->getInk();
-      styleCount[styleId]++;  // Horizontal Ink weights 1
-      styleId = pix->getPaint();
-      if (styleId) {
-        styleCount[styleId] += 1;  // Horizontal Paint weights 1
-        fillInk = false;
-      }
-    }
-  }
-
+  // Pick most heavy one
   for (const auto &entry : styleCount) {
     if (entry.second > maxCount) {
       maxCount   = entry.second;
@@ -984,7 +980,7 @@ void fillHoles(const TRasterCM32P &ras, const int maxSize,
 
   auto isEmpty = [&](int x, int y) -> bool {
     TPixelCM32 *pix = ras->pixels(y) + x;
-    return !pix->getPaint() && !pix->isPureInk() && !visited[y * lx + x];
+    return !pix->getPaint() && pix->getTone() > 64 && !visited[y * lx + x];
   };
 
   for (int y = 0; y < ly; y++) {
