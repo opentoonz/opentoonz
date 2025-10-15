@@ -110,6 +110,7 @@ public:
   int exploreTwoSpots(const TAutocloser::Segment &s0,
                       const TAutocloser::Segment &s1);
   int notInsidePath(const TPoint &p, const TPoint &q);
+  bool hasInkBetween(const TPoint &p1, const TPoint &p2);
   void drawInByteRaster(const TPoint &p0, const TPoint &p1);
   TPoint visitEndpoint(UCHAR *br);
   bool exploreSpot(const Segment &s, TPoint &p);
@@ -769,6 +770,58 @@ int TAutocloser::Imp::notInsidePath(const TPoint &p, const TPoint &q) {
   return 0;
 }
 
+bool TAutocloser::Imp::hasInkBetween(const TPoint &p1, const TPoint &p2) {
+  int tmp, x, y, dx, dy, d, incr_1, incr_2;
+  int x1, y1, x2, y2;
+  int inkCount = 0;
+
+  x1 = p1.x;
+  y1 = p1.y;
+  x2 = p2.x;
+  y2 = p2.y;
+
+  if (x1 > x2) {
+    tmp = x1, x1 = x2, x2 = tmp;
+    tmp = y1, y1 = y2, y2 = tmp;
+  }
+  UCHAR *br = getPtr(x1, y1);
+
+  dx = x2 - x1;
+  dy = y2 - y1;
+  x = y = 0;
+
+  if (dy >= 0) {
+    if (dy <= dx)
+      DRAW_SEGMENT(
+          x, y, dx, dy, (br++), (br += m_bWrap + 1), if (*br != 0) {
+            inkCount++;
+            if (inkCount > 2) return true;
+          })
+    else
+      DRAW_SEGMENT(
+          y, x, dy, dx, (br += m_bWrap), (br += m_bWrap + 1), if (*br != 0) {
+            inkCount++;
+            if (inkCount > 2) return true;
+          })
+  } else {
+    dy = -dy;
+    if (dy <= dx)
+      DRAW_SEGMENT(
+          x, y, dx, dy, (br++), (br -= m_bWrap - 1), if (*br != 0) {
+            inkCount++;
+            if (inkCount > 2) return true;
+          })
+    else
+      DRAW_SEGMENT(
+          y, x, dy, dx, (br -= m_bWrap), (br -= m_bWrap - 1), if (*br != 0) {
+            inkCount++;
+            if (inkCount > 2) return true;
+          })
+  }
+
+  return inkCount != 2;
+}
+
 /*------------------------------------------------------------------------*/
 int TAutocloser::Imp::exploreTwoSpots(const TAutocloser::Segment &s0,
                                       const TAutocloser::Segment &s1) {
@@ -886,6 +939,8 @@ bool TAutocloser::Imp::spotResearchTwoPoints(
       closerIndex = closerPoint(endpoints, marks, current);
       if (exploreTwoSpots(endpoints[current], endpoints[closerIndex]) &&
           notInsidePath(endpoints[current].first,
+                        endpoints[closerIndex].first) &&
+          !hasInkBetween(endpoints[current].first,
                         endpoints[closerIndex].first)) {
         drawInByteRaster(endpoints[current].first,
                          endpoints[closerIndex].first);
