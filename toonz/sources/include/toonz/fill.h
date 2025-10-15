@@ -159,7 +159,6 @@ private:
                           int color, bool onlyUnfilled, bool fillPaints,
                           bool fillInks, bool defRegionWithPaint,
                           bool usePrevailingReferFill);
-  const void removeUnneedReferLines(const TRasterCM32P &ras);
 };
 
 class DVAPI FullColorAreaFiller {
@@ -189,13 +188,17 @@ class RefImageGuard {
 public:
   RefImageGuard(const TRasterCM32P &raster, const TRaster32P &Ref)
       : m_r(raster), m_refPlaced(Ref.getPointer() != nullptr) {
+    if (m_refPlaced) {
     m_r->lock();
-    if (m_refPlaced) TRop::putRefImage(const_cast<TRasterCM32P &>(m_r), Ref);
+      TRop::putRefImage(const_cast<TRasterCM32P &>(m_r), Ref);
+  }
   }
 
   ~RefImageGuard() {
+    if (m_refPlaced) {
+      TRop::eraseRefInks(const_cast<TRasterCM32P &>(m_r));
     m_r->unlock();
-    if (m_refPlaced) TRop::eraseRefInks(const_cast<TRasterCM32P &>(m_r));
+    }
   }
 };
 

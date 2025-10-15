@@ -328,7 +328,6 @@ bool AreaFiller::rectFill(const TRect &rect, int color, bool onlyUnfilled,
       }
     }
   }
-  removeUnneedReferLines(ras);
 
   bool defRegionWithPaint     = params.m_defRegionWithPaint;
   bool usePrevailingReferFill = params.m_usePrevailingReferFill;
@@ -500,21 +499,12 @@ void AreaFiller::strokeFill(const TRect &rect, TStroke *stroke, int color,
   app.findRegions();
   // fillRegionsExcept() also process lines
 
-  // Before the refer lines be painted, remove unnecessary lines
-  if (refFill && fillInks) {
-    for (UINT i = 0; i < app.getRegionCount(); i++)
-      fillRegionExcept(ras, app.getRegion(i), TPixelCM32::getMaxPaint() - 1,
-                       TPixelCM32::getMaxPaint(), 0, color, false, false);
-    removeUnneedReferLines(ras);
-  }
   // Paint Lines and Areas
   for (UINT i = 0; i < app.getRegionCount(); i++)
     fillRegionExcept(ras, app.getRegion(i), TPixelCM32::getMaxPaint() - 1,
                      TPixelCM32::getMaxPaint(), m_palette, color, fillInks,
                      fillAllautoPaintLines);
   app.removeStroke(0);
-
-  if (!fillInks && refFill) removeUnneedReferLines(ras);
 
   for (int y = 0; y < ly; ++y) {
     TPixelCM32 *pix = ras->pixels(y);
@@ -575,116 +565,6 @@ const void AreaFiller::processPixel(TPixelCM32 &pix, const TPixelCM32 &bak,
   /*--- Restore Area should not be filled */
   else
     pix.setPaint(bak.getPaint());
-}
-
-// Mainly two kinds of lines:
-// 1. Lines inside the closed region
-// 2. Lines outside the closed region
-const void AreaFiller::removeUnneedReferLines(const TRasterCM32P &ras) {
-  const int maxInk  = TPixelCM32::getMaxInk();
-  const int maxTone = TPixelCM32::getMaxTone();
-  const int wrap    = m_wrap;
-  int lx            = ras->getLx();
-  int ly            = ras->getLy();
-  if (lx < 3 || ly < 3) return;
-  TPixelCM32 *pix = ras->pixels(0);
-
-  for (int y = 1; y < ly - 1; y++) {
-    TPixelCM32 *pix    = ras->pixels(y) + 1;
-    TPixelCM32 *rowEnd = pix + (lx - 2);
-    while (pix < rowEnd) {
-      if (pix->getInk() != maxInk) {
-        pix++;
-        continue;
-      }
-
-      TPixelCM32 *left  = pix - 1;
-      TPixelCM32 *right = pix + 1;
-      TPixelCM32 *up    = pix + wrap;
-      TPixelCM32 *down  = pix - wrap;
-
-      int leftPaint  = left->getPaint();
-      int rightPaint = right->getPaint();
-      int upPaint    = up->getPaint();
-      int downPaint  = down->getPaint();
-
-      int leftInk  = left->getInk();
-      int rightInk = right->getInk();
-      int upInk    = up->getInk();
-      int downInk  = down->getInk();
-
-      bool leftIsMax  = (left->getInk() == maxInk);
-      bool rightIsMax = (right->getInk() == maxInk);
-      bool upIsMax    = (up->getInk() == maxInk);
-      bool downIsMax  = (down->getInk() == maxInk);
-
-      unsigned char mask =
-          (leftIsMax << 3) | (rightIsMax << 2) | (upIsMax << 1) | downIsMax;
-
-      switch (mask) {
-        // 2 Inks and some 3 Inks
-      case 0b0001:
-      case 0b0010:
-      case 0b0011:
-        if (leftPaint == rightPaint) {
-          *pix = TPixelCM32(0, leftPaint, maxTone);
-        }
-        break;
-
-      case 0b0100:
-      case 0b1000:
-      case 0b1100:
-        if (upPaint == downPaint) {
-          *pix = TPixelCM32(0, upPaint, maxTone);
-        }
-        break;
-
-        // 1 INK
-      case 0b0000:
-        if (leftPaint == rightPaint) {
-          *pix = TPixelCM32(0, leftPaint, maxTone);
-        } else if (upPaint == downPaint) {
-          *pix = TPixelCM32(0, upPaint, maxTone);
-        }
-        break;
-
-        // 3 INKs
-      case 0b1001:
-        *pix = TPixelCM32(0, leftPaint, maxTone);
-        break;
-      case 0b0101:
-        *pix = TPixelCM32(0, upPaint, maxTone);
-        break;
-      case 0b1010:
-        *pix = TPixelCM32(0, leftPaint, maxTone);
-        break;
-      case 0b0110:
-        *pix = TPixelCM32(0, upPaint, maxTone);
-        break;
-
-        // 4 INKs
-      case 0b0111:
-        *pix = TPixelCM32(0, leftPaint, maxTone);
-        break;
-      case 0b1011:
-        *pix = TPixelCM32(0, rightPaint, maxTone);
-        break;
-      case 0b1101:
-        *pix = TPixelCM32(0, upPaint, maxTone);
-        break;
-      case 0b1110:
-        *pix = TPixelCM32(0, downPaint, maxTone);
-        break;
-
-      default:
-        assert(false);
-        continue;
-      }
-
-      pix++;
-    }
-  }
-  return;
 }
 
 //=============================================================================
