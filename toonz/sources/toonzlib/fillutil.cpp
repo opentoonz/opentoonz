@@ -529,7 +529,9 @@ const void AreaFiller::removeUnneedReferLines(const TRasterCM32P &ras) {
     TPixelCM32 *pix    = ras->pixels(y) + 1;
     TPixelCM32 *rowEnd = pix + (lx - 2);
     while (pix < rowEnd) {
-      if (pix->getInk() != maxInk) {
+      int tone = pix->getTone();
+      int ink  = pix->getInk();
+      if (tone || ink != maxInk) {
         pix++;
         continue;
       }
@@ -538,6 +540,8 @@ const void AreaFiller::removeUnneedReferLines(const TRasterCM32P &ras) {
       TPixelCM32 *right = pix + 1;
       TPixelCM32 *up    = pix + wrap;
       TPixelCM32 *down  = pix - wrap;
+
+      pix++;
 
       int leftPaint  = left->getPaint();
       int rightPaint = right->getPaint();
@@ -613,11 +617,8 @@ const void AreaFiller::removeUnneedReferLines(const TRasterCM32P &ras) {
         break;
 
       default:
-        assert(false);
-        continue;
+        break;
       }
-
-      pix++;
     }
   }
   return;
