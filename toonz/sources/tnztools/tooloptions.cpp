@@ -2826,6 +2826,12 @@ RotateToolOptionsBox::RotateToolOptionsBox(QWidget *parent, TTool *tool,
   setFrameStyle(QFrame::StyledPanel);
   setFixedHeight(26);
 
+  TPropertyGroup* props = tool->getProperties(0);
+  assert(props->getPropertyCount() > 0);
+
+  ToolOptionControlBuilder builder(this, tool, pltHandle, toolHandle);
+  if (tool && tool->getProperties(0)) tool->getProperties(0)->accept(builder);
+
   QAction *resetRotationAction =
       CommandManager::instance()->getAction(VB_RotateReset);
 

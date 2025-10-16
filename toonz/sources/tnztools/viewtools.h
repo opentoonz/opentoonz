@@ -22,6 +22,7 @@ class RotateTool final : public QObject, public TTool {
   TPointD m_oldMousePos;
   TBoolProperty m_cameraCentered;
   TPropertyGroup m_prop;
+  bool m_firstTime = true;
 
 public:
   RotateTool(std::string name);
@@ -36,6 +37,9 @@ public:
   void draw() override;
 
   int getCursorId() const override;
+
+  void onActivate() override;
+  bool onPropertyChanged(std::string propertyName, bool addToUndo) override;
 
   void updateTranslation() override {
     m_cameraCentered.setQStringName(tr("Rotate On Camera Center"));

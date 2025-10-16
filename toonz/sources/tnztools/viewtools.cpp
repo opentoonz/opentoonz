@@ -3,10 +3,13 @@
 
 #include "tools/cursors.h"
 #include "tgeometry.h"
+#include "tenv.h"
 
 #include <math.h>
 
 #include "tgl.h"
+
+TEnv::IntVar RotateOnCameraCenter("RotateOnCameraCenter", 0);
 
 namespace {
 
@@ -137,6 +140,7 @@ RotateTool::RotateTool(std::string name)
     , m_cameraCentered("Rotate On Camera Center", false)
     , m_angle(0) {
   bind(TTool::AllTargets);
+  m_cameraCentered.setId("RotateOnCamCenter");
   m_prop.bind(m_cameraCentered);
 }
 
@@ -204,5 +208,18 @@ void RotateTool::draw() {
 }
 
 int RotateTool::getCursorId() const { return ToolCursor::RotateCursor; }
+
+void RotateTool::onActivate() {
+  if (m_firstTime) {
+    m_cameraCentered.setValue(RotateOnCameraCenter != 0);
+    m_firstTime = false;
+  }
+}
+
+bool RotateTool::onPropertyChanged(std::string propertyName, bool addToUndo) {
+  if (propertyName == "Rotate On Camera Center")
+    RotateOnCameraCenter = m_cameraCentered.getValue() ? 1 : 0;
+  return true;
+}
 
 RotateTool rotateTool("T_Rotate"), rotateViewTool("T_RotateView");
