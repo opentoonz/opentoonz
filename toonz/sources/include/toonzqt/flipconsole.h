@@ -223,6 +223,8 @@ public:
     eZoomOut,
     eFlipHorizontal,
     eFlipVertical,
+    eRotateLeft,
+    eRotateRight,
     eResetView,
     eBlankFrames,
     eDecreaseGain,

@@ -79,6 +79,7 @@
 #include "trasterimage.h"
 #include "tstroke.h"
 #include "ttoonzimage.h"
+#include "tenv.h"
 
 // Qt includes
 #include <QMenu>
@@ -90,6 +91,8 @@
 #include <QMainWindow>
 
 #include "sceneviewer.h"
+
+TEnv::IntVar RotateOnCameraCenter("RotateOnCameraCenter", 0);
 
 void drawSpline(const TAffine &viewMatrix, const TRect &clipRect, bool camera3d,
                 double pixelSize);
@@ -543,6 +546,28 @@ public:
   }
 } flipViewerYCommand;
 
+class TRotateViewerLeftCommand final : public MenuItemHandler {
+public:
+  TRotateViewerLeftCommand() : MenuItemHandler(VB_RotateLeft) {}
+  void execute() override {
+    SceneViewer *viewer = TApp::instance()->getActiveViewer();
+    if (viewer) {
+      viewer->rotateLeft();
+    }
+  }
+} rotateViewerLeftCommand;
+
+class TRotateViewerRightCommand final : public MenuItemHandler {
+public:
+  TRotateViewerRightCommand() : MenuItemHandler(VB_RotateRight) {}
+  void execute() override {
+    SceneViewer *viewer = TApp::instance()->getActiveViewer();
+    if (viewer) {
+      viewer->rotateRight();
+    }
+  }
+} rotateViewerRightCommand;
+
 class TRotateResetCommand final : public MenuItemHandler {
 public:
   TRotateResetCommand() : MenuItemHandler(VB_RotateReset) {}
@@ -759,7 +784,7 @@ public:
 //-----------------------------------------------------------------------------
 
 SceneViewer::SceneViewer(ImageUtils::FullScreenWidget *parent)
-    : TToolViewer(this,parent)
+    : TToolViewer(this, parent)
     , m_pressure(0)
     , m_lastMousePos(0, 0)
     , m_mouseButton(Qt::NoButton)
@@ -1194,7 +1219,7 @@ void SceneViewer::hideEvent(QHideEvent *) {
     disconnect(m_stopMotion, SIGNAL(liveViewStopped()), this,
                SLOT(onStopMotionLiveViewStopped()));
   }
-  #endif
+#endif
 }
 
 int SceneViewer::getVGuideCount() {
@@ -1827,7 +1852,7 @@ void SceneViewer::drawOverlay() {
         !app->getCurrentObject()->isSpline())
       glScaled(m_dpiScale.x, m_dpiScale.y, 1);
     m_pixelSize = sqrt(tglGetPixelSize2()) * getDevPixRatio();
-    
+
     unsigned int hints = tool->getToolHints();
 
     // draw assistans and guidelines
@@ -1835,43 +1860,42 @@ void SceneViewer::drawOverlay() {
     if (hints & TTool::HintAssistantsAll) {
       bool markEnabled    = hints & TTool::HintAssistantsEnabled;
       bool drawGuidelines = hints & TTool::HintAssistantsGuidelines;
-      
-      m_toolHasAssistants = TAssistant::scanAssistants(
-        tool,           // tool
-        &m_toolPos, 1,  // pointer positions
-        nullptr,        // out guidelines
-        true,           // draw
-        false,          // enabled only
-        markEnabled,    // mark enabled
-        drawGuidelines, // draw guidelines
-        nullptr );      // skip image
+
+      m_toolHasAssistants =
+          TAssistant::scanAssistants(tool,            // tool
+                                     &m_toolPos, 1,   // pointer positions
+                                     nullptr,         // out guidelines
+                                     true,            // draw
+                                     false,           // enabled only
+                                     markEnabled,     // mark enabled
+                                     drawGuidelines,  // draw guidelines
+                                     nullptr);        // skip image
     }
-    
+
     // draw replicators
     m_toolReplicatedPoints.clear();
     if (hints & TTool::HintReplicatorsAll) {
-      bool drawPoints  = hints & TTool::HintReplicatorsPoints;
-      bool markEnabled = hints & TTool::HintReplicatorsEnabled;
+      bool drawPoints                = hints & TTool::HintReplicatorsPoints;
+      bool markEnabled               = hints & TTool::HintReplicatorsEnabled;
       TReplicator::PointList *points = nullptr;
       if (drawPoints) {
         m_toolReplicatedPoints.push_back(m_toolPos);
         points = &m_toolReplicatedPoints;
       }
-      
-      TReplicator::scanReplicators(
-        tool,           // tool
-        points,         // in/out points
-        nullptr,        // out modifiers
-        true,           // draw
-        false,          // enabled only
-        markEnabled,    // mark enabled
-        drawPoints,     // draw points
-        nullptr );      // skip image
+
+      TReplicator::scanReplicators(tool,         // tool
+                                   points,       // in/out points
+                                   nullptr,      // out modifiers
+                                   true,         // draw
+                                   false,        // enabled only
+                                   markEnabled,  // mark enabled
+                                   drawPoints,   // draw points
+                                   nullptr);     // skip image
     }
-    
+
     // draw tool
     tool->draw();
-    
+
     glPopMatrix();
     // Used (only in the T_RGBPicker tool) to notify and set the currentColor
     // outside the draw() methods:
@@ -2275,8 +2299,8 @@ void SceneViewer::drawScene() {
     if (ToonzCheck::instance()->getChecks() & ToonzCheck::eAutoclose) {
       TXshSimpleLevel *sl = app->getCurrentLevel()->getSimpleLevel();
       if (sl && sl->getType() & TXshLevelType::RASTER_TYPE) {
-          TFrameId fid = app->getCurrentTool()->getTool()->getCurrentFid();
-          painter.setCurrentImageId(sl->getImageId(fid, 0));
+        TFrameId fid = app->getCurrentTool()->getTool()->getCurrentFid();
+        painter.setCurrentImageId(sl->getImageId(fid, 0));
       }
     }
     painter.flushRasterImages();
@@ -2355,7 +2379,8 @@ TRect SceneViewer::getActualClipRect(const TAffine &aff) {
     clipRect = aff * (m_clipRect.enlarge(3));
   }
 
-  clipRect *= TRectD(viewerSize) - TPointD(viewerSize.lx/2, viewerSize.ly/2);
+  clipRect *=
+      TRectD(viewerSize) - TPointD(viewerSize.lx / 2, viewerSize.ly / 2);
   return convert(clipRect);
 }
 
@@ -2363,16 +2388,16 @@ TRect SceneViewer::getActualClipRect(const TAffine &aff) {
 
 TAffine4 SceneViewer::get3dViewMatrix() const {
   if (is3DView()) {
-    TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
+    TXsheet *xsh            = TApp::instance()->getCurrentXsheet()->getXsheet();
     TStageObjectId cameraId = xsh->getStageObjectTree()->getCurrentCameraId();
-    double z = xsh->getStageObject(cameraId)->getZ(
-                  TApp::instance()->getCurrentFrame()->getFrame());
+    double z                = xsh->getStageObject(cameraId)->getZ(
+        TApp::instance()->getCurrentFrame()->getFrame());
 
     TAffine4 affine;
     affine *= TAffine4::translation(m_pan3D.x, m_pan3D.y, z);
     affine *= TAffine4::scale(m_zoomScale3D, m_zoomScale3D, m_zoomScale3D);
-    affine *= TAffine4::rotationX(M_PI_180*m_theta3D);
-    affine *= TAffine4::rotationY(M_PI_180*m_phi3D);
+    affine *= TAffine4::rotationX(M_PI_180 * m_theta3D);
+    affine *= TAffine4::rotationY(M_PI_180 * m_phi3D);
     return affine;
   }
 
@@ -2758,6 +2783,34 @@ void SceneViewer::flipY() {
   emit onFlipVChanged(m_isFlippedY);
 }
 
+void SceneViewer::rotateLeft() {
+  double rotationAngle = 90.0;
+  if (m_isFlippedX != m_isFlippedY) rotationAngle *= -1;
+
+  TPointD center;
+
+  if (RotateOnCameraCenter)
+    center = TPointD(0, 0);
+  else
+    center = m_viewAff[m_viewMode].inv() * TPointD(0, 0);
+
+  rotate(center, rotationAngle);
+}
+
+void SceneViewer::rotateRight() {
+  double rotationAngle = -90.0;
+  if (m_isFlippedX != m_isFlippedY) rotationAngle *= -1;
+
+  TPointD center;
+
+  if (RotateOnCameraCenter)
+    center = TPointD(0, 0);
+  else
+    center = m_viewAff[m_viewMode].inv() * TPointD(0, 0);
+
+  rotate(center, rotationAngle);
+}
+
 //-----------------------------------------------------------------------------
 
 void SceneViewer::zoomIn() {
@@ -2956,13 +3009,14 @@ void SceneViewer::resetRotation() {
   double reverseRotatation = m_rotationAngle[m_viewMode] * -1;
   if (m_isFlippedX) reverseRotatation *= -1;
   if (m_isFlippedY) reverseRotatation *= -1;
-  TTool *tool    = TApp::instance()->getCurrentTool()->getTool();
-  TPointD center = m_viewAff[m_viewMode].inv() * TPointD(0, 0);
-  if (tool->getName() == "T_Rotate" &&
-      tool->getProperties(0)
-              ->getProperty("Rotate On Camera Center")
-              ->getValueAsString() == "1")
+  
+  TPointD center;
+
+  if (RotateOnCameraCenter)
     center = TPointD(0, 0);
+  else
+    center = m_viewAff[m_viewMode].inv() * TPointD(0, 0);
+
   rotate(center, reverseRotatation);
 }
 
@@ -3413,7 +3467,7 @@ TAffine SceneViewer::getNormalZoomScale() {
 
 void SceneViewer::invalidateToolStatus() {
   m_toolHasAssistants = false;
-  TTool *tool = TApp::instance()->getCurrentTool()->getTool();
+  TTool *tool         = TApp::instance()->getCurrentTool()->getTool();
   if (tool) {
     m_toolDisableReason = tool->updateEnabled();
     if (tool->isEnabled()) {

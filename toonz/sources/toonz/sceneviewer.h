@@ -417,6 +417,8 @@ public slots:
   void setActualPixelSize();
   void flipX();
   void flipY();
+  void rotateLeft();
+  void rotateRight();
   void zoomIn();
   void zoomOut();
   void onXsheetChanged();
