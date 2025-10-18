@@ -871,8 +871,8 @@ namespace {
 
 void getViewerShortcuts(int &zoomIn, int &zoomOut, int &viewReset, int &zoomFit,
                         int &showHideFullScreen, int &actualPixelSize,
-                        int &flipX, int &flipY, int &zoomReset,
-                        int &rotateReset, int &positionReset) {
+                        int &flipX, int &flipY, int &rotateL, int &rotateR,
+                        int &zoomReset, int &rotateReset, int &positionReset) {
   CommandManager *cManager = CommandManager::instance();
 
   zoomIn = cManager->getKeyFromShortcut(cManager->getShortcutFromId(V_ZoomIn));
@@ -888,6 +888,10 @@ void getViewerShortcuts(int &zoomIn, int &zoomOut, int &viewReset, int &zoomFit,
       cManager->getShortcutFromId(V_ActualPixelSize));
   flipX = cManager->getKeyFromShortcut(cManager->getShortcutFromId(V_FlipX));
   flipY = cManager->getKeyFromShortcut(cManager->getShortcutFromId(V_FlipY));
+  rotateL =
+      cManager->getKeyFromShortcut(cManager->getShortcutFromId(V_RotateLeft));
+  rotateR =
+      cManager->getKeyFromShortcut(cManager->getShortcutFromId(V_RotateRight));
   zoomReset =
       cManager->getKeyFromShortcut(cManager->getShortcutFromId(V_ZoomReset));
   rotateReset =
@@ -909,10 +913,11 @@ ShortcutZoomer::ShortcutZoomer(QWidget *zoomingWidget)
 
 bool ShortcutZoomer::exec(QKeyEvent *event) {
   int zoomInKey, zoomOutKey, viewResetKey, zoomFitKey, showHideFullScreenKey,
-      actualPixelSize, flipX, flipY, zoomReset, rotateReset, positionReset;
+      actualPixelSize, flipX, flipY, rotateL, rotateR, zoomReset, rotateReset,
+      positionReset;
   getViewerShortcuts(zoomInKey, zoomOutKey, viewResetKey, zoomFitKey,
                      showHideFullScreenKey, actualPixelSize, flipX, flipY,
-                     zoomReset, rotateReset, positionReset);
+                     rotateL, rotateR, zoomReset, rotateReset, positionReset);
 
   int key = event->key();
   if (key == Qt::Key_Control || key == Qt::Key_Shift || key == Qt::Key_Alt)
@@ -929,6 +934,8 @@ bool ShortcutZoomer::exec(QKeyEvent *event) {
              ? zoom(key == zoomInKey, key == viewResetKey)
          : (key == flipX)         ? setFlipX()
          : (key == flipY)         ? setFlipY()
+         : (key == rotateL)       ? rotateLeft()
+         : (key == rotateR)       ? rotateRight()
          : (key == zoomReset)     ? resetZoom()
          : (key == rotateReset)   ? resetRotation()
          : (key == positionReset) ? resetPosition()

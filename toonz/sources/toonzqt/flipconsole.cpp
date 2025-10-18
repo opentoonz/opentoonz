@@ -1364,9 +1364,13 @@ void FlipConsole::createPlayToolBar(QWidget *customWidget) {
     if (hasButton(m_gadgetsMask, eZoomOut))
       createButton(eZoomOut, "zoomout", tr("&Zoom Out"), false);
     if (hasButton(m_gadgetsMask, eFlipHorizontal))
-      createButton(eFlipHorizontal, "fliphoriz", tr("&Flip Horizontally"), 0);
+      createButton(eFlipHorizontal, "fliphoriz", tr("&Flip Horizontally"), true);
     if (hasButton(m_gadgetsMask, eFlipVertical))
-      createButton(eFlipVertical, "flipvert", tr("&Flip Vertically"), 0);
+      createButton(eFlipVertical, "flipvert", tr("&Flip Vertically"), true);
+    if (hasButton(m_gadgetsMask, eRotateLeft))
+        createButton(eRotateLeft, "rotateleft", tr("&Rotate Left"), false);
+    if (hasButton(m_gadgetsMask, eRotateRight))
+        createButton(eRotateRight, "rotateright", tr("&Rotate Right"), false);
     if (hasButton(m_gadgetsMask, eResetView))
       createButton(eResetView, "reset", tr("&Reset View"), false);
     m_viewerSep = m_playToolBar->addSeparator();
@@ -1782,6 +1786,8 @@ void FlipConsole::doButtonPressed(UINT button) {
 
   case eFlipHorizontal:
   case eFlipVertical:
+  case eRotateLeft:
+  case eRotateRight:
   case eZoomIn:
   case eZoomOut:
   case eResetView:
