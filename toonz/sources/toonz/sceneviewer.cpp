@@ -93,6 +93,7 @@
 #include "sceneviewer.h"
 
 TEnv::IntVar RotateOnCameraCenter("RotateOnCameraCenter", 0);
+TEnv::DoubleVar RotateAngle("RotateAngle", 90);
 
 void drawSpline(const TAffine &viewMatrix, const TRect &clipRect, bool camera3d,
                 double pixelSize);
@@ -2784,7 +2785,7 @@ void SceneViewer::flipY() {
 }
 
 void SceneViewer::rotateLeft() {
-  double rotationAngle = 90.0;
+  double rotationAngle = (double)RotateAngle > 0 ? RotateAngle : 90.0;
   if (m_isFlippedX != m_isFlippedY) rotationAngle *= -1;
 
   TPointD center;
@@ -2798,7 +2799,7 @@ void SceneViewer::rotateLeft() {
 }
 
 void SceneViewer::rotateRight() {
-  double rotationAngle = -90.0;
+  double rotationAngle = (double)RotateAngle > 0 ? -RotateAngle : -90.0;
   if (m_isFlippedX != m_isFlippedY) rotationAngle *= -1;
 
   TPointD center;
@@ -3009,7 +3010,7 @@ void SceneViewer::resetRotation() {
   double reverseRotatation = m_rotationAngle[m_viewMode] * -1;
   if (m_isFlippedX) reverseRotatation *= -1;
   if (m_isFlippedY) reverseRotatation *= -1;
-  
+
   TPointD center;
 
   if (RotateOnCameraCenter)

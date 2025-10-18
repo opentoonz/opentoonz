@@ -10,6 +10,7 @@
 #include "tgl.h"
 
 TEnv::IntVar RotateOnCameraCenter("RotateOnCameraCenter", 0);
+TEnv::DoubleVar RotateAngle("RotateAngle", 0);
 
 namespace {
 
@@ -138,19 +139,25 @@ RotateTool::RotateTool(std::string name)
     : TTool(name)
     , m_dragging(false)
     , m_cameraCentered("Rotate On Camera Center", false)
+    , m_rotateAngle("Rotate Angle:", 0, 360, 0, true)
     , m_angle(0) {
   bind(TTool::AllTargets);
   m_cameraCentered.setId("RotateOnCamCenter");
+  m_rotateAngle.setId("Rotate Angle");
+
   m_prop.bind(m_cameraCentered);
+  m_prop.bind(m_rotateAngle);
 }
 
 void RotateTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
   if (!m_viewer) return;
 
-  m_angle       = 0.0;
-  m_dragging    = true;
-  m_oldPos      = pos;
-  m_oldMousePos = e.m_pos;
+  m_isCtrlPressed = e.isCtrlPressed();
+  m_isAltPressed  = e.isAltPressed();
+  m_angle         = 0.0;
+  m_dragging      = true;
+  m_oldPos        = pos;
+  m_oldMousePos   = e.m_pos;
   // m_center = TPointD(0,0);
   m_sw.start(true);
   invalidate();
@@ -165,6 +172,7 @@ void RotateTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
   if (m_sw.getTotalTime() < 50) return;
   m_sw.stop();
   m_sw.start(true);
+
   TPointD p = pos;
   if (m_viewer->is3DView()) {
     TPointD d     = e.m_pos - m_oldMousePos;
@@ -175,9 +183,19 @@ void RotateTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
     TPointD a = p - m_center;
     TPointD b = m_oldPos - m_center;
     if (norm2(a) > 0 && norm2(b) > 0) {
-      double ang = asin(cross(b, a) / (norm(a) * norm(b))) * M_180_PI;
-      m_angle    = m_angle + ang;
-      m_viewer->rotate(m_center, m_angle);
+      double ang        = asin(cross(b, a) / (norm(a) * norm(b))) * M_180_PI;
+      m_angle           = m_angle + ang;
+      double finalAngle = m_angle;
+      double step       = m_rotateAngle.getValue();
+
+      if (m_isAltPressed && step > 0) {
+        finalAngle = std::round(m_angle / 15) * 15;
+
+        if (e.m_pos != m_oldMousePos) {
+          m_viewer->rotate(m_center, finalAngle);
+        }
+      } else
+        m_viewer->rotate(m_center, finalAngle);
     }
   }
   m_oldPos = p;
@@ -212,6 +230,7 @@ int RotateTool::getCursorId() const { return ToolCursor::RotateCursor; }
 void RotateTool::onActivate() {
   if (m_firstTime) {
     m_cameraCentered.setValue(RotateOnCameraCenter != 0);
+    m_rotateAngle.setValue((double)RotateAngle);
     m_firstTime = false;
   }
 }
@@ -219,6 +238,8 @@ void RotateTool::onActivate() {
 bool RotateTool::onPropertyChanged(std::string propertyName, bool addToUndo) {
   if (propertyName == "Rotate On Camera Center")
     RotateOnCameraCenter = m_cameraCentered.getValue() ? 1 : 0;
+  else if (propertyName == "Rotate Angle:")
+    RotateAngle = m_rotateAngle.getValue();
   return true;
 }
 

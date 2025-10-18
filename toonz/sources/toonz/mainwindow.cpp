@@ -2950,8 +2950,8 @@ void MainWindow::defineActions() {
   createViewerAction(V_ActualPixelSize, QT_TR_NOOP("Actual Pixel Size"), "N");
   createViewerAction(V_FlipX, QT_TR_NOOP("Flip Viewer Horizontally"), "");
   createViewerAction(V_FlipY, QT_TR_NOOP("Flip Viewer Vertically"), "");
-  createViewerAction(V_RotateLeft, QT_TR_NOOP("Rotate Viewer 90° Left"), "");
-  createViewerAction(V_RotateRight, QT_TR_NOOP("Rotate Viewer 90° Right"), "");
+  createViewerAction(V_RotateLeft, QT_TR_NOOP("Rotate Viewer Left"), "");
+  createViewerAction(V_RotateRight, QT_TR_NOOP("Rotate Viewer Right"), "");
   createViewerAction(V_ShowHideFullScreen, QT_TR_NOOP("Show//Hide Full Screen"),
                      "Alt+F");
   CommandManager::instance()->setToggleTexts(V_ShowHideFullScreen,
@@ -2989,9 +2989,9 @@ void MainWindow::defineActions() {
   createVisualizationButtonAction(
       VB_FlipY, QT_TR_NOOP("Flip Viewer Vertically"), "flipvert");
   createVisualizationButtonAction(
-      VB_RotateLeft, QT_TR_NOOP("Rotate Viewer 90° Left"), "rotateleft");
+      VB_RotateLeft, QT_TR_NOOP("Rotate View Left"), "rotateleft");
   createVisualizationButtonAction(
-      VB_RotateRight, QT_TR_NOOP("Rotate Viewer 90° Right"), "rotateright");
+      VB_RotateRight, QT_TR_NOOP("Rotate View Right"), "rotateright");
 
   // Misc
 
