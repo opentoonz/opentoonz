@@ -2826,7 +2826,7 @@ RotateToolOptionsBox::RotateToolOptionsBox(QWidget *parent, TTool *tool,
   setFrameStyle(QFrame::StyledPanel);
   setFixedHeight(26);
 
-  TPropertyGroup* props = tool->getProperties(0);
+  TPropertyGroup *props = tool->getProperties(0);
   assert(props->getPropertyCount() > 0);
 
   ToolOptionControlBuilder builder(this, tool, pltHandle, toolHandle);
@@ -2842,7 +2842,7 @@ RotateToolOptionsBox::RotateToolOptionsBox(QWidget *parent, TTool *tool,
   button->addAction(resetRotationAction);
 
   connect(button, SIGNAL(clicked()), resetRotationAction, SLOT(trigger()));
-
+  
   m_layout->addStretch(1);
   m_layout->addWidget(button, 0);
   m_layout->addSpacing(5);

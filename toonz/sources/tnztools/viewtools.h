@@ -23,7 +23,9 @@ class RotateTool final : public QObject, public TTool {
   bool m_isAltPressed;
   TPointD m_oldMousePos;
   TBoolProperty m_cameraCentered;
-  TDoubleProperty m_rotateAngle;
+  TBoolProperty m_rotateByStep;
+  TDoubleProperty m_rotateStepAngle;
+  TDoubleProperty m_rotateCommandAngle;
   TPropertyGroup m_prop;
   bool m_firstTime = true;
 
@@ -46,7 +48,9 @@ public:
 
   void updateTranslation() override {
     m_cameraCentered.setQStringName(tr("Rotate On Camera Center"));
-    m_rotateAngle.setQStringName(tr("Rotate Angle:"));
+    m_rotateByStep.setQStringName(tr("Rotate by Step"));
+    m_rotateStepAngle.setQStringName(tr("Step Angle:"));
+    m_rotateCommandAngle.setQStringName(tr("Rotate Left/Right Angle:"));
   }
 };
 
