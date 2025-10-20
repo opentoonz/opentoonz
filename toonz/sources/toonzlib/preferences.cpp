@@ -457,9 +457,9 @@ void Preferences::definePreferenceItems() {
   define(rasterizeAntialias, "rasterizeAntialias", QMetaType::Bool, false);
 
   // Loading
-  define(importPolicy, "importPolicy", QMetaType::Int, 0);  // Always ask
-  define(renamePolicy, "renamePolicy", QMetaType::Int, 0); // Always ask
-  define(convertPolicy, "convertPolicy", QMetaType::Int, 0); // Always ask
+  define(importPolicy, "importPolicy", QMetaType::Int, 0);    // Always ask
+  define(renamePolicy, "renamePolicy", QMetaType::Int, 0);    // Always ask
+  define(convertPolicy, "convertPolicy", QMetaType::Int, 0);  // Always ask
   define(autoExposeEnabled, "autoExposeEnabled", QMetaType::Bool, true);
   define(subsceneFolderEnabled, "subsceneFolderEnabled", QMetaType::Bool, true);
   define(removeSceneNumberFromLoadedLevelName,
@@ -583,8 +583,9 @@ void Preferences::definePreferenceItems() {
          true);
   define(useArrowKeyToShiftCellSelection, "useArrowKeyToShiftCellSelection",
          QMetaType::Bool, true);
-  define(inputCellsWithoutDoubleClickingEnabled,
-         "inputCellsWithoutDoubleClickingEnabled", QMetaType::Bool, false);
+  define(
+      cellInputMethod, "cellInputMethod", QMetaType::Int,
+      1);  // Input by Double click only; Input by numpad; Input by Single Click
   define(shortcutCommandsWhileRenamingCellEnabled,
          "shortcutCommandsWhileRenamingCellEnabled", QMetaType::Bool, false);
   define(showXSheetToolbar, "showXSheetToolbar", QMetaType::Bool, true);

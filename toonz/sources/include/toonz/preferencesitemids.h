@@ -136,7 +136,7 @@ enum PreferencesItemId {
   showKeyframesOnXsheetCellArea,
   showXsheetCameraColumn,
   useArrowKeyToShiftCellSelection,
-  inputCellsWithoutDoubleClickingEnabled,
+  cellInputMethod,
   shortcutCommandsWhileRenamingCellEnabled,
   showXSheetToolbar,
   showXsheetBreadcrumbs,

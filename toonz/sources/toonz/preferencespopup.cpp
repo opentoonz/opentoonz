@@ -966,9 +966,9 @@ void PreferencesPopup::onRenamePolicyExternallyChanged(int policy) {
 //-----------------------------------------------------------------------------
 
 void PreferencesPopup::onConvertPolicyExternallyChanged(int policy) {
-    QComboBox* convertPolicyCombo = getUI<QComboBox*>(importPolicy);
-    // update preferences data accordingly
-    convertPolicyCombo->setCurrentIndex(policy);
+  QComboBox* convertPolicyCombo = getUI<QComboBox*>(importPolicy);
+  // update preferences data accordingly
+  convertPolicyCombo->setCurrentIndex(policy);
 }
 
 //-----------------------------------------------------------------------------
@@ -1319,7 +1319,8 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
       {FillOnlysavebox, tr("Use the TLV Savebox to Limit Filling Operations")},
       {DefRegionWithPaint,
        tr("Define Filling Region Using both Lines and Areas")},
-      { ReferFillPrevailing, tr("Paint Under Lines in Refer Fill and Gap Close") },
+      {ReferFillPrevailing,
+       tr("Paint Under Lines in Refer Fill and Gap Close")},
       {multiLayerStylePickerEnabled,
        tr("Multi Layer Style Picker: Switch Levels by Picking")},
       {cursorBrushType, tr("Basic Cursor Type:")},
@@ -1328,7 +1329,7 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
       {levelBasedToolsDisplay, tr("Toolbar Display Behaviour:")},
       {useCtrlAltToResizeBrush, tr("Use %1 to Resize Brush").arg(CtrlAltStr())},
       {useStrokeEndCursor, tr("Draw Cursor at End of Stroke")},
-      {clickTwiceToCreateArcs, tr("Click Twice to Create Arcs") },
+      {clickTwiceToCreateArcs, tr("Click Twice to Create Arcs")},
       {tempToolSwitchTimer,
        tr("Switch Tool Temporarily Keypress Length (ms):")},
 
@@ -1346,8 +1347,7 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
       {showXsheetCameraColumn, tr("Show Camera Column")},
       {useArrowKeyToShiftCellSelection,
        tr("Use Arrow Key to Shift Cell Selection")},
-      {inputCellsWithoutDoubleClickingEnabled,
-       tr("Enable to Input Cells without Double Clicking")},
+      {cellInputMethod, tr("Cell Input Method:")},
       {shortcutCommandsWhileRenamingCellEnabled,
        tr("Enable OpenToonz Commands' Shortcut Keys While Renaming Cell")},
       {showXSheetToolbar, tr("Show Toolbar in the Xsheet")},
@@ -1443,10 +1443,8 @@ QList<ComboBoxItem> PreferencesPopup::getComboItemList(
          Preferences::ProjectFolderAliases},
         {tr("Scene Folder Alias ($scenefolder)"),
          Preferences::SceneFolderAlias},
-        {tr("Use Project Folder Aliases Only"),
-         Preferences::ProjectFolderOnly},
-        {tr("Automatic by Scene"),
-         Preferences::AutoByScene}}},
+        {tr("Use Project Folder Aliases Only"), Preferences::ProjectFolderOnly},
+        {tr("Automatic by Scene"), Preferences::AutoByScene}}},
       {linearUnits,  // cameraUnits shares items with linearUnits
        {{tr("cm"), "cm"},
         {tr("mm"), "mm"},
@@ -1469,8 +1467,8 @@ QList<ComboBoxItem> PreferencesPopup::getComboItemList(
        {{tr("Always ask before renaming"), 0},
         {tr("Normalize sequence names automatically"), 1},
         {tr("Keep original filenames"), 2}}},
-        {convertPolicy,
-        {{tr("Always ask before converting"), 0},
+      {convertPolicy,
+       {{tr("Always ask before converting"), 0},
         {tr("Convert raster level automatically"), 1},
         {tr("Do not convert"), 2}}},
       {rasterLevelCachingBehavior,
@@ -1533,6 +1531,10 @@ QList<ComboBoxItem> PreferencesPopup::getComboItemList(
       {pasteCellsBehavior,
        {{tr("Insert Paste Whole Data"), 0},
         {tr("Overwrite Paste Cell Numbers"), 1}}},
+      {cellInputMethod,
+       {{tr("Input by Double Click Only"), 0},
+        {tr("Input by Numpad"), 1},
+        {tr("Input by Single Click"), 2}}},
       {keyframeType,  // note that the value starts from 1, not 0
        {{tr("Constant"), 1},
         {tr("Linear"), 2},
@@ -1691,10 +1693,9 @@ QWidget* PreferencesPopup::createGeneralPage() {
   pathAliasPriorityCB->setItemData(2, QString(" "), Qt::ToolTipRole);
   QString autoBySceneToolTip =
       tr("Automatically sets folder based on scene type:\n"
-          "Standalone -> $scenefolder\n"
-          "Project -> project folder aliases (+drawing...)");
+         "Standalone -> $scenefolder\n"
+         "Project -> project folder aliases (+drawing...)");
   pathAliasPriorityCB->setItemData(3, autoBySceneToolTip, Qt::ToolTipRole);
-
 
   m_onEditedFuncMap.insert(autosaveEnabled,
                            &PreferencesPopup::onAutoSaveChanged);
@@ -1704,17 +1705,17 @@ QWidget* PreferencesPopup::createGeneralPage() {
                            &PreferencesPopup::onAutoSaveOptionsChanged);
   m_onEditedFuncMap.insert(watchFileSystemEnabled,
                            &PreferencesPopup::onWatchFileSystemClicked);
-  m_onEditedFuncMap.insert(pathAliasPriority, 
+  m_onEditedFuncMap.insert(pathAliasPriority,
                            &PreferencesPopup::onPathAliasPriorityChanged);
 
   bool ret = true;
 
-  ret      = ret && connect(m_pref, SIGNAL(stopAutoSave()), this,
-                            SLOT(onAutoSaveExternallyChanged()));
-  ret      = ret && connect(m_pref, SIGNAL(startAutoSave()), this,
-                            SLOT(onAutoSaveExternallyChanged()));
-  ret      = ret && connect(m_pref, SIGNAL(autoSavePeriodChanged()), this,
-                            SLOT(onAutoSavePeriodExternallyChanged()));
+  ret = ret && connect(m_pref, SIGNAL(stopAutoSave()), this,
+                       SLOT(onAutoSaveExternallyChanged()));
+  ret = ret && connect(m_pref, SIGNAL(startAutoSave()), this,
+                       SLOT(onAutoSaveExternallyChanged()));
+  ret = ret && connect(m_pref, SIGNAL(autoSavePeriodChanged()), this,
+                       SLOT(onAutoSavePeriodExternallyChanged()));
 
   ret = ret && connect(m_projectRootDocuments, SIGNAL(stateChanged(int)),
                        SLOT(onProjectRootChanged()));
@@ -2127,6 +2128,7 @@ QWidget* PreferencesPopup::createXsheetPage() {
   insertUI(DragCellsBehaviour, lay, getComboItemList(DragCellsBehaviour));
   insertUI(deleteCommandBehavior, lay, getComboItemList(deleteCommandBehavior));
   insertUI(pasteCellsBehavior, lay, getComboItemList(pasteCellsBehavior));
+  insertUI(cellInputMethod, lay, getComboItemList(cellInputMethod));
   insertUI(ignoreAlphaonColumn1Enabled, lay);
   QGridLayout* showKeyLay =
       insertGroupBoxUI(showKeyframesOnXsheetCellArea, lay);
@@ -2134,7 +2136,6 @@ QWidget* PreferencesPopup::createXsheetPage() {
     insertUI(showXsheetCameraColumn, showKeyLay);
   }
   insertUI(useArrowKeyToShiftCellSelection, lay);
-  insertUI(inputCellsWithoutDoubleClickingEnabled, lay);
   insertUI(shortcutCommandsWhileRenamingCellEnabled, lay);
   QGridLayout* xshToolbarLay = insertGroupBox(tr("Xsheet Tools"), lay);
   {
