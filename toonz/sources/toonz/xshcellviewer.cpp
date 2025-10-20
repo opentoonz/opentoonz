@@ -979,19 +979,18 @@ void RenameCellField::renameCell() {
     cellSelection->renameCells(cells[0]);
   } else
     cellSelection->renameMultiCells(cells);
-
-  cellSelection->fillEmptyCell();
 }
 
 //-----------------------------------------------------------------------------
 
 void RenameCellField::onReturnPressed() {
   renameCell();
-
   // move the cell selection
   TCellSelection *cellSelection = dynamic_cast<TCellSelection *>(
       TApp::instance()->getCurrentSelection()->getSelection());
   if (!cellSelection) return;
+  if (m_isCtrlPrssed) cellSelection->fillEmptyCell();
+
   TCellSelection::Range range = cellSelection->getSelectedCells();
   int offset                  = range.m_r1 - range.m_r0 + 1;
   cellSelection->selectCells(range.m_r0 + offset, range.m_c0,
@@ -1007,7 +1006,12 @@ void RenameCellField::focusOutEvent(QFocusEvent *e) {
   hide();
 
   // Lost focus because of Mouse movement, rename the cell
-  if (e->reason() == Qt::MouseFocusReason && !text().isEmpty()) renameCell();
+  if (e->reason() == Qt::MouseFocusReason && !text().isEmpty()) {
+    renameCell();
+    TCellSelection *cellSelection = dynamic_cast<TCellSelection *>(
+        TApp::instance()->getCurrentSelection()->getSelection());
+    if (cellSelection) cellSelection->fillEmptyCell();
+  }
 
   QLineEdit::focusOutEvent(e);
 }
@@ -1055,6 +1059,7 @@ void RenameCellField::keyPressEvent(QKeyEvent *event) {
     return;
   }
 
+  m_isCtrlPrssed = (event->modifiers() & Qt::ControlModifier);
   // move the cell selection
   TCellSelection *cellSelection = dynamic_cast<TCellSelection *>(
       TApp::instance()->getCurrentSelection()->getSelection());
