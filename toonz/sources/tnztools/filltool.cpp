@@ -449,26 +449,33 @@ class RasterRectFillUndo final : public TRasterUndo {
   std::wstring m_colorType;
   TStroke *m_s;
   bool m_onlyUnfilled;
-  TRaster32P m_refImg;
+  bool m_refGapFill;
   TPalette *m_palette;
+  TTileSetCM32 *m_tileSet = nullptr;
 
 public:
   ~RasterRectFillUndo() {
     if (m_s) delete m_s;
+    if (m_tileSet) delete m_tileSet;
   }
 
   RasterRectFillUndo(TTileSetCM32 *tileSet, TStroke *s, TRect oldSaveBox,
                      TRect fillArea, int paintId, TXshSimpleLevel *level,
                      std::wstring colorType, bool onlyUnfilled,
-                     const TFrameId &fid, TRaster32P refImg, TPalette *palette)
+                     const TFrameId &fid, bool refImgPut, TPalette *palette)
       : TRasterUndo(tileSet, level, fid, false, false, 0, false)
       , m_saveBox(oldSaveBox)
       , m_fillArea(fillArea)
       , m_paintId(paintId)
       , m_colorType(colorType)
       , m_onlyUnfilled(onlyUnfilled)
-      , m_refImg(refImg)
       , m_palette(palette) {
+    TToonzImageP image = getImage();
+
+    if (refImgPut) {
+      m_tileSet = new TTileSetCM32(image->getRaster()->getSize());
+      m_tileSet->add(image->getRaster(), TRasterUndo::m_tiles->getBBox());
+    }
     m_s = s ? new TStroke(*s) : 0;
   }
 
@@ -481,24 +488,27 @@ public:
       ras = ti->getRaster();
     else
       ras = ti->getRaster()->extract(r);
-    AreaFiller filler(ras, m_refImg, m_palette);
-    if (!m_s)
-      filler.rectFill(m_fillArea, m_paintId, m_onlyUnfilled,
-                      m_colorType != LINES, m_colorType != AREAS);
-    else
-      filler.strokeFill(m_fillArea, m_s, m_paintId, m_onlyUnfilled,
+    if (m_tileSet) {
+      ToonzImageUtils::paste(ti, m_tileSet);
+    } else {
+      AreaFiller filler(ras, TRaster32P(), m_palette);
+      if (!m_s)
+        filler.rectFill(m_fillArea, m_paintId, m_onlyUnfilled,
                         m_colorType != LINES, m_colorType != AREAS);
-
-    if (m_palette) {
-      TRect rect   = m_saveBox;
-      TRect bounds = ras->getBounds();
-      if (bounds.overlaps(rect)) {
-        rect *= bounds;
-        const TTileSetCM32::Tile *tile =
-            m_tiles->getTile(m_tiles->getTileCount() - 1);
-        TRasterCM32P rbefore;
-        tile->getRaster(rbefore);
-        fillautoInks(ras, rect, rbefore, m_palette);
+      else
+        filler.strokeFill(m_fillArea, m_s, m_paintId, m_onlyUnfilled,
+                          m_colorType != LINES, m_colorType != AREAS);
+      if (m_palette) {
+        TRect rect   = m_saveBox;
+        TRect bounds = ras->getBounds();
+        if (bounds.overlaps(rect)) {
+          rect *= bounds;
+          const TTileSetCM32::Tile *tile =
+              m_tiles->getTile(m_tiles->getTileCount() - 1);
+          TRasterCM32P rbefore;
+          tile->getRaster(rbefore);
+          fillautoInks(ras, rect, rbefore, m_palette);
+        }
       }
     }
     TTool::Application *app = TTool::getApplication();
@@ -511,11 +521,8 @@ public:
   int getSize() const override {
     int strokeSize =
         m_s ? m_s->getControlPointCount() * sizeof(TThickPoint) + 100 : 0;
-    int refImgSize =
-        m_refImg.getPointer()
-            ? m_refImg->getWrap() * m_refImg->getLy() * m_refImg->getPixelSize()
-            : 0;
-    return sizeof(*this) + TRasterUndo::getSize() + strokeSize + refImgSize;
+    int tileSize = m_tileSet ? m_tileSet->getMemorySize() : 0;
+    return sizeof(*this) + TRasterUndo::getSize() + strokeSize + tileSize;
   }
 
   QString getToolName() override {
@@ -918,9 +925,9 @@ void fillAreaWithUndo(const TImageP &img, const TRaster32P &ref,
     }
 
     // ToolUtils::updateSaveBox(sl, fid);
-    TUndoManager::manager()->add(
-        new RasterRectFillUndo(rasTileSet, stroke, rasSaveBox, auxFillArea, cs,
-                               sl, colorType, onlyUnfilled, fid, ref, plt));
+    TUndoManager::manager()->add(new RasterRectFillUndo(
+        rasTileSet, stroke, rasSaveBox, auxFillArea, cs, sl, colorType,
+        onlyUnfilled, fid, ref.getPointer(), plt));
   } else if (TVectorImageP vi = img) {
     TPalette *palette = vi->getPalette();
     assert(palette);
@@ -1053,7 +1060,8 @@ void gapClose(TRaster32P &ras, TRasterCM32P &raux, TXshSimpleLevel *sl,
       if (plt->getStyle(i)->getFlags() != 0) autoPaintInks.insert(i);
     }
   }
-
+  if (DEF_REGION_WITH_PAINT)
+    closeStting.m_opacity = TPixelCM32::getMaxTone() - 2;
   TAutocloser ac(tnzRas, TPixelCM32::getMaxInk(), closeStting, autoPaintInks);
   ac.exec();
   TRop::CmappedQuickputSettings putSetting;
@@ -2394,7 +2402,7 @@ bool FillTool::keyDown(QKeyEvent *e) {
     // accepted
     return true;
   }
-  //Not accepted
+  // Not accepted
   return false;
 }
 
