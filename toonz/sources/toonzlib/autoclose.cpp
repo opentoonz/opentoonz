@@ -233,7 +233,8 @@ unsigned char buildPaintnInkNeighborPattern(int x, int y, TRasterCM32P r,
       }
       // qDebug() << "Pattern:"
       //          << QString::number(pattern, 2).rightJustified(8, '0');
-    }
+    } else
+      pattern |= (1 << 7 - i);
   }
   // qDebug() << "Final pattern: decimal =" << (int)pattern << "| binary = 0b"
   //          << QString::number(pattern, 2).rightJustified(8, '0');
@@ -928,10 +929,10 @@ continue;
     if (p1.y < 0) {
       p1.x = tround(p0.x - (float)((p0.x - p1.x) * p0.y) / (p0.y - p1.y));
       p1.y = 0;
-    } else if (p1.y > ly) {
+    } else if (p1.y >= ly) {
       p1.x =
           tround(p0.x - (float)((p0.x - p1.x) * (p0.y - ly)) / (p0.y - p1.y));
-      p1.y = ly;
+      p1.y = ly - 1;
     }
     it++;
   }
@@ -983,7 +984,11 @@ bool TAutocloser::Imp::exploreSpot(const Segment &s, TPoint &p) {
   y1 = s.first.y;
   x2 = s.second.x;
   y2 = s.second.y;
-
+  if (x2 == 0 || x2 == lx || y2 == 0 || y2 == ly - 1) {
+    p.x = x2;
+    p.y = y2;
+    return true;
+  }
   if (x1 == x2 && y1 == y2) return 0;
 
   if (exploreRay(getPtr(x1, y1), s, p)) return true;

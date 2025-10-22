@@ -424,7 +424,7 @@ TRasterP RasterPainter::getRaster(int index, QTransform &matrix) {
   rect = rect * TRect(0, 0, m_dim.lx - 1, m_dim.ly - 1);
 
   TAffine aff = TTranslation(-rect.x0, -rect.y0) * m_nodes[index].m_aff;
-  matrix      = QTransform(aff.a11, aff.a21, aff.a12, aff.a22, aff.a13, aff.a23);
+  matrix = QTransform(aff.a11, aff.a21, aff.a12, aff.a22, aff.a13, aff.a23);
 
   return m_nodes[index].m_raster;
 }
@@ -560,20 +560,23 @@ void RasterPainter::flushRasterImages() {
       int gapCheckIndex = -1;
       if ((tc & ToonzCheck::eGap || tc & ToonzCheck::eAutoclose) &&
           m_nodes[i].m_isCurrentColumn) {
-        srcCm      = srcCm->clone();
-        plt        = m_nodes[i].m_palette->clone();
-        gapCheckIndex = plt->addStyle(TPixel::Magenta);
+        TRasterCM32P aux = srcCm->clone();
+        srcCm            = Preferences::instance()->getFillOnlySavebox()
+                               ? (TRasterCM32P)aux->extract(m_nodes[i].m_savebox)
+                               : aux;
+        plt              = m_nodes[i].m_palette->clone();
+        gapCheckIndex    = plt->addStyle(TPixel::Magenta);
         if (tc & ToonzCheck::eGap)
           AreaFiller(srcCm).rectFastFill(m_nodes[i].m_savebox, 1);
-        if (tc & ToonzCheck::eAutoclose && m_nodes[i].m_onionMode == Node::eOnionSkinNone) {
+        if (tc & ToonzCheck::eAutoclose &&
+            m_nodes[i].m_onionMode == Node::eOnionSkinNone) {
           auto settings = ToonzCheck::instance()->getAutocloseSettings();
           std::set<int> autoPaints;
           if (settings.m_ignoreAPInks) {
             for (int i = 0; i < plt->getStyleCount(); i++)
-              if (plt->getStyle(i)->getFlags() != 0)
-                  autoPaints.insert(i);
+              if (plt->getStyle(i)->getFlags() != 0) autoPaints.insert(i);
           }
-          TAutocloser ac(srcCm, gapCheckIndex,settings, std::move(autoPaints));
+          TAutocloser ac(srcCm, gapCheckIndex, settings, std::move(autoPaints));
           if (ac.hasSegmentCache(m_currentImageId))
             ac.draw(ac.getSegmentCache(m_currentImageId));
           else
@@ -585,6 +588,7 @@ void RasterPainter::flushRasterImages() {
             AreaFiller(srcCm).rectFastFill(m_nodes[i].m_savebox, gapFillIndex);
           }
         }
+        srcCm = aux;
       } else
         plt = m_nodes[i].m_palette;
 
@@ -723,7 +727,8 @@ void RasterPainter::drawRasterImages(QPainter &p, QPolygon cameraPol) {
     p.resetTransform();
     TRasterP ras = m_nodes[i].m_raster;
     TAffine aff  = TTranslation(-rect.x0, -rect.y0) * flipY * m_nodes[i].m_aff;
-    QTransform matrix(aff.a11, aff.a12, aff.a21, aff.a22, aff.a13, aff.a23); // Updated line
+    QTransform matrix(aff.a11, aff.a12, aff.a21, aff.a22, aff.a13,
+                      aff.a23);  // Updated line
     QImage image = rasterToQImage(ras);
     if (image.isNull()) continue;
     p.setWorldTransform(matrix);
@@ -1003,11 +1008,11 @@ void RasterPainter::onRasterImage(TRasterImage *ri,
 
   TAffine aff;
   aff = m_viewAff * player.m_placement * player.m_dpiAff;
-  
+
   aff = TTranslation(m_dim.lx * 0.5, m_dim.ly * 0.5) * aff *
         TTranslation(-r->getCenterD() +
                      convert(ri->getOffset()));  // this offset is !=0 only if
-                                                 // in cleanup camera test mode 
+                                                 // in cleanup camera test mode
 
   TRectD bbox = TRectD(0, 0, m_dim.lx, m_dim.ly);
   bbox *= convert(m_clipRect);
