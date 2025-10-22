@@ -829,6 +829,16 @@ void Preferences::resolveCompatibility() {
     setValue(rasterLevelCachingBehavior,
              m_settings->value("initialLoadTlvCachingBehavior").toInt());
   }
+  // "inputCellsWithoutDoubleClicking" is changed to "cellInputMethod", adding a
+  // new default option "Input by Numpad". If the conventional option is
+  // activated, set the new option to "Input by Single Click" to keep
+  // compatibility.
+  if (m_settings->contains("inputCellsWithoutDoubleClickingEnabled") &&
+      !m_settings->contains("cellInputMethod")) {
+    if (m_settings->value("inputCellsWithoutDoubleClickingEnabled").toBool() ==
+        true)
+      setValue(cellInputMethod, 2);
+  }
 }
 
 //-----------------------------------------------------------------
