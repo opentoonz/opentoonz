@@ -1781,6 +1781,9 @@ FillToolOptionsBox::FillToolOptionsBox(QWidget *parent, TTool *tool,
       dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Close Gap"));
   m_referFill =
       dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Refer Fill"));
+  m_gapCloseDistance = dynamic_cast<ToolOptionIntSlider *>(
+      m_controls.value("Gap Close Distance:"));
+
   bool ret = connect(m_colorMode, SIGNAL(currentIndexChanged(int)), this,
                      SLOT(onColorModeChanged(int)));
   ret      = ret && connect(m_toolType, SIGNAL(currentIndexChanged(int)), this,
@@ -1789,6 +1792,9 @@ FillToolOptionsBox::FillToolOptionsBox(QWidget *parent, TTool *tool,
                             SLOT(onOnionModeToggled(bool)));
   ret      = ret && connect(m_multiFrameMode, SIGNAL(toggled(bool)), this,
                             SLOT(onMultiFrameModeToggled(bool)));
+  ret      = ret && connect(m_closeGap, &ToolOptionCheckbox::toggled,
+                            m_gapCloseDistance, &QWidget::setEnabled);
+
   assert(ret);
   onColorModeChanged(m_colorMode->getProperty()->getIndex());
   onToolTypeChanged(m_toolType->getProperty()->getIndex());
