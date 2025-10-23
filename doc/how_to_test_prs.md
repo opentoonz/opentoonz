@@ -1,6 +1,6 @@
 # Testing Pull Requests (PRs)
 
-When a PR is submitted, it is compiled automatically by AppVeyor and Travis CI. The AppVeyor build creates an artifact which contains the OpenToonz executable and supporting DLLs needed to run.  You can easily download this artifact and run it to test out the PR before it is merged.
+When a PR is submitted, it is compiled automatically by AppVeyor CI. The AppVeyor build creates an artifact which contains the OpenToonz executable and supporting DLLs needed to run.  You can easily download this artifact and run it to test out the PR before it is merged.
 
 ## Pre-Testing Notes
 - You need to have OpenToonz already installed.  Do not uninstall.
