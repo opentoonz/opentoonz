@@ -59,6 +59,7 @@ private:
   TPointD m_mousePosition;
   bool m_onion;
   bool m_isLeftButtonPressed;
+  bool m_paintAllAPs;
   bool m_autopaintLines;
 
   int m_bckStyleId;

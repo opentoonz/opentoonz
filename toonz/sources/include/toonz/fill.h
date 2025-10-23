@@ -140,7 +140,7 @@ else if \b fillInks is false fill only paint delimited by ink;
 else fill ink and paint in rect.
 */
   bool rectFill(const TRect &rect, int color, bool onlyUnfilled,
-                bool fillPaints, bool fillInks);
+                bool fillPaints, bool fillInks, bool fillAllautoPaintLines = false);
 
   // Only for Fill Check
   bool rectFastFill(const TRect &rect, int color);
@@ -152,7 +152,7 @@ else if \b fillInks is false fill only paint delimited by ink;
 else fill ink and paint in region contained in spline.
 */
   void strokeFill(const TRect &rect, TStroke *s, int color, bool onlyUnfilled,
-                  bool fillPaints, bool fillInks);
+                  bool fillPaints, bool fillInks, bool fillAllautoPaintLines);
 
 private:
   const void processPixel(TPixelCM32 &pix, const TPixelCM32 &bak, bool invert,
