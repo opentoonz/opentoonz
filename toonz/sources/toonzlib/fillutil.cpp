@@ -21,21 +21,58 @@ using namespace SkeletonLut;
 //-----------------------------------------------------------------------------
 namespace {  // Utility Function
 //-----------------------------------------------------------------------------
-inline TPoint nearestInkNotDiagonal(const TRasterCM32P &r, const TPoint &p) {
+
+inline std::vector<TPoint> getNeighborInks(const TRasterCM32P &r,
+                                           const TPoint &p) {
   TPixelCM32 *buf = (TPixelCM32 *)r->pixels(p.y) + p.x;
+  std::vector<TPoint> points;
+  std::set<int> inks;
+  TPixelCM32 *pix;
+  int ink;
 
-  if (p.x < r->getLx() - 1 && (!(buf + 1)->isPurePaint()))
-    return TPoint(p.x + 1, p.y);
+  if (p.x < r->getLx() - 1) {
+    pix = buf + 1;
+    if (!pix->isPurePaint()) {
+      ink = pix->getInk();
+      points.push_back(TPoint(p.x + 1, p.y));
+      inks.insert(ink);
+    }
+  }
 
-  if (p.x > 0 && (!(buf - 1)->isPurePaint())) return TPoint(p.x - 1, p.y);
+  if (p.x > 0) {
+    pix = buf - 1;
+    if (!pix->isPurePaint()) {
+      ink = pix->getInk();
+      if (inks.find(ink) == inks.end()) {
+        points.push_back(TPoint(p.x - 1, p.y));
+        inks.insert(ink);
+      }
+    }
+  }
 
-  if (p.y < r->getLy() - 1 && (!(buf + r->getWrap())->isPurePaint()))
-    return TPoint(p.x, p.y + 1);
+  if (p.y < r->getLy() - 1) {
+    pix = buf + r->getWrap();
+    if (!pix->isPurePaint()) {
+      ink = pix->getInk();
+      if (inks.find(ink) == inks.end()) {
+        points.push_back(TPoint(p.x, p.y + 1));
+        inks.insert(ink);
+      }
+    }
+  }
 
-  if (p.y > 0 && (!(buf - r->getWrap())->isPurePaint()))
-    return TPoint(p.x, p.y - 1);
+  if (p.y > 0) {
+    pix = buf - r->getWrap();
+    if (!pix->isPurePaint()) {
+      ink = pix->getInk();
+      if (inks.find(ink) == inks.end()) {
+        points.push_back(TPoint(p.x, p.y - 1));
+        inks.insert(ink);
+      }
+    }
+  }
 
-  return TPoint(-1, -1);
+  return points;
 }
 
 void computeSeeds(const TRasterCM32P &r, TStroke *stroke,
@@ -82,11 +119,13 @@ void fillRegionExcept(const TRasterCM32P &ras, TRegion *r, int positive,
               plt->getStyle(pix->getInk())->getFlags() != 0)
             pix->setInk(color);
           else if (pix->getPaint() == negative && pix->getTone()) {
-            TPoint pInk        = nearestInkNotDiagonal(ras, TPoint(k, i));
-            TPixelCM32 *inkPix = ras->pixels(pInk.y) + pInk.x;
-            int ink            = inkPix->getInk();
-            if (pInk != TPoint(-1, -1) && plt->getStyle(ink)->getFlags() != 0)
-              inkFill(ras, pInk, color, 0);
+            auto inks = getNeighborInks(ras, TPoint(k, i));
+            for (TPoint pInk : inks) {
+              TPixelCM32 *inkPix = ras->pixels(pInk.y) + pInk.x;
+              int ink            = inkPix->getInk();
+              if (plt->getStyle(ink)->getFlags() != 0)
+                inkFill(ras, pInk, color, 0);
+            }
           }
         }
       }
@@ -322,12 +361,13 @@ bool AreaFiller::rectFill(const TRect &rect, int color, bool onlyUnfilled,
             m_palette->getStyle(pix->getInk())->getFlags() != 0)
           inkSegment(ras, TPoint(x, y), color, 2.5, true);
         else if (pix->getPaint() == color && pix->getTone()) {
-          TPoint pInk        = nearestInkNotDiagonal(ras, TPoint(x, y));
-          TPixelCM32 *inkPix = ras->pixels(pInk.y) + pInk.x;
-          int ink            = inkPix->getInk();
-          if (pInk != TPoint(-1, -1) &&
-              m_palette->getStyle(ink)->getFlags() != 0)
-            inkFill(ras, pInk, color, 0);
+          auto inks = getNeighborInks(ras, TPoint(x, y));
+          for (TPoint pInk : inks) {
+            TPixelCM32 *inkPix = ras->pixels(pInk.y) + pInk.x;
+            int ink            = inkPix->getInk();
+            if (m_palette->getStyle(ink)->getFlags() != 0)
+              inkFill(ras, pInk, color, 0);
+          }
         }
       }
     }
