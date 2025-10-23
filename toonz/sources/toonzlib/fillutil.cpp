@@ -294,12 +294,10 @@ bool AreaFiller::rectFill(const TRect &rect, int color, bool onlyUnfilled,
   bool rightSame    = r.x1 == m_bounds.x1;
 
   int sameCount =
-      Preferences::instance()->getFillOnlySavebox()
-          ? (int)topSame + (int)bottomSame + (int)leftSame + (int)rightSame
-          : 0;
+      (int)topSame + (int)bottomSame + (int)leftSame + (int)rightSame;
 
   // --- Top Edge ---
-  if (!(sameCount != 4 && topSame)) {
+  if (sameCount == 4 ? false : !topSame) {
     TPixelCM32 *upPix = ras->pixels(0);
     for (int x = 1; x < lx - 1; ++x) {
       if (upPix->getPaint() != TPixelCM32::getMaxPaint()) {
@@ -311,7 +309,7 @@ bool AreaFiller::rectFill(const TRect &rect, int color, bool onlyUnfilled,
   }
 
   // --- Bottom Edge ---
-  if (!(sameCount != 4 && bottomSame)) {
+  if (sameCount == 4 ? false : !bottomSame) {
     TPixelCM32 *dnPix = backupRas->pixels(ly - 1);
     for (int x = 1; x < lx - 1; ++x) {
       if (dnPix->getPaint() != TPixelCM32::getMaxPaint()) {
@@ -323,7 +321,7 @@ bool AreaFiller::rectFill(const TRect &rect, int color, bool onlyUnfilled,
   }
 
   // --- Left Edge ---
-  if (!(sameCount != 4 && leftSame)) {
+  if (sameCount == 4 ? false : !leftSame) {
     for (int y = 0; y < ly; ++y) {
       TPixelCM32 *pix = ras->pixels(y);
       if (pix->getPaint() != TPixelCM32::getMaxPaint()) {
@@ -334,7 +332,7 @@ bool AreaFiller::rectFill(const TRect &rect, int color, bool onlyUnfilled,
   }
 
   // --- Right Edge ---
-  if (!(sameCount != 4 && rightSame)) {
+  if (sameCount == 4 ? false : !rightSame) {
     for (int y = 0; y < ly; ++y) {
       TPixelCM32 *pix = ras->pixels(y) + (lx - 1);
       if (pix->getPaint() != TPixelCM32::getMaxPaint()) {
