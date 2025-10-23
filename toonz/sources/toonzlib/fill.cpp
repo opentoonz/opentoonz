@@ -61,6 +61,59 @@ inline TPoint nearestInkNotDiagonal(const TRasterCM32P &r, const TPoint &p) {
   return TPoint(-1, -1);
 }
 
+inline std::vector<TPoint> getNeighborInks(const TRasterCM32P &r,
+                                           const TPoint &p) {
+  TPixelCM32 *buf = (TPixelCM32 *)r->pixels(p.y) + p.x;
+  std::vector<TPoint> points;
+  std::set<int> inks;
+  TPixelCM32 *pix;
+  int ink;
+
+  if (p.x < r->getLx() - 1) {
+    pix = buf + 1;
+    if (!pix->isPurePaint()) {
+      ink = pix->getInk();
+      points.push_back(TPoint(p.x + 1, p.y));
+      inks.insert(ink);
+    }
+  }
+
+  if (p.x > 0) {
+    pix = buf - 1;
+    if (!pix->isPurePaint()) {
+      ink = pix->getInk();
+      if (inks.find(ink) == inks.end()) {
+        points.push_back(TPoint(p.x - 1, p.y));
+        inks.insert(ink);
+      }
+    }
+  }
+
+  if (p.y < r->getLy() - 1) {
+    pix = buf + r->getWrap();
+    if (!pix->isPurePaint()) {
+      ink = pix->getInk();
+      if (inks.find(ink) == inks.end()) {
+        points.push_back(TPoint(p.x, p.y + 1));
+        inks.insert(ink);
+      }
+    }
+  }
+
+  if (p.y > 0) {
+    pix = buf - r->getWrap();
+    if (!pix->isPurePaint()) {
+      ink = pix->getInk();
+      if (inks.find(ink) == inks.end()) {
+        points.push_back(TPoint(p.x, p.y - 1));
+        inks.insert(ink);
+      }
+    }
+  }
+
+  return points;
+}
+
 // dal punto x,y si espande a destra e a sinistra.
 // la riga ridisegnata va da *xa a *xb compresi
 // x1 <= *xa <= *xb <= x2
@@ -223,8 +276,8 @@ void fillRow(const TRasterCM32P &r, const TPoint &p, int &xa, int &xb,
 
       /*--- Paint auto-paint lines   ---*/
       if (palette && pix->isPurePaint()) {
-        TPoint pInk = nearestInkNotDiagonal(r, TPoint(xa + n, p.y));
-        if (pInk != TPoint(-1, -1)) {
+        auto inks = getNeighborInks(r, TPoint(xa + n, p.y));
+        for (TPoint pInk : inks) {
           TPixelCM32 *pixInk =
               (TPixelCM32 *)r->getRawData() + (pInk.y * r->getWrap() + pInk.x);
           if (pixInk->getInk() != paint &&
