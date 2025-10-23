@@ -483,7 +483,7 @@ PrimitiveParam::PrimitiveParam(int targetType)
     , m_autogroup("Auto Group", false)
     , m_autofill("Auto Fill", false)
     , m_smooth("Smooth", false)
-    , m_selective("Selective", false)
+    , m_emptyOnly("Empty Only", false)
     , m_pencil("Pencil Mode", false)
     , m_capStyle("Cap")
     , m_joinStyle("Join")
@@ -519,7 +519,7 @@ PrimitiveParam::PrimitiveParam(int targetType)
     m_snapSensitivity.setId("SnapSensitivity");
   }
   if (targetType & TTool::ToonzImage) {
-    m_prop[0].bind(m_selective);
+    m_prop[0].bind(m_emptyOnly);
     m_prop[0].bind(m_pencil);
     m_pencil.setId("PencilMode");
   }
@@ -542,7 +542,7 @@ PrimitiveParam::PrimitiveParam(int targetType)
   m_prop[1].bind(m_joinStyle);
   m_prop[1].bind(m_miterJoinLimit);
 
-  m_selective.setId("Selective");
+  m_emptyOnly.setId("EmptyOnly");
   m_rotate.setId("Rotate");
   m_autogroup.setId("AutoGroup");
   m_autofill.setId("Autofill");
@@ -571,7 +571,7 @@ void PrimitiveParam::updateTranslation() {
   m_autogroup.setQStringName(tr("Auto Group"));
   m_autofill.setQStringName(tr("Auto Fill"));
   m_smooth.setQStringName(tr("Smooth"));
-  m_selective.setQStringName(tr("Selective"));
+  m_emptyOnly.setQStringName(tr("Empty Only"));
   m_pencil.setQStringName(tr("Pencil Mode"));
   m_modifierSize.setQStringName(tr("Size"));
   m_modifierOpacity.setQStringName(tr("Opacity"));
@@ -1278,7 +1278,7 @@ void GeometricTool::onActivate() {
     m_param.m_rasterToolSize.setValue(GeometricRasterSize);
     m_param.m_opacity.setValue(GeometricOpacity);
     m_param.m_hardness.setValue(GeometricBrushHardness);
-    m_param.m_selective.setValue(GeometricSelective ? 1 : 0);
+    m_param.m_emptyOnly.setValue(GeometricSelective ? 1 : 0);
     m_param.m_rotate.setValue(GeometricRotate ? 1 : 0);
     m_param.m_autogroup.setValue(GeometricGroupIt ? 1 : 0);
     m_param.m_smooth.setValue(GeometricSmooth ? 1 : 0);
@@ -1408,8 +1408,8 @@ bool GeometricTool::onPropertyChanged(std::string propertyName) {
     GeometricGroupIt = m_param.m_autofill.getValue();
   } else if (propertyName == m_param.m_smooth.getName()) {
     GeometricSmooth = m_param.m_smooth.getValue();
-  } else if (propertyName == m_param.m_selective.getName())
-    GeometricSelective = m_param.m_selective.getValue();
+  } else if (propertyName == m_param.m_emptyOnly.getName())
+    GeometricSelective = m_param.m_emptyOnly.getValue();
   else if (propertyName == m_param.m_pencil.getName())
     GeometricPencil = m_param.m_pencil.getValue();
   else if (propertyName == m_param.m_hardness.getName())
@@ -1632,7 +1632,7 @@ void GeometricTool::addStroke() {
   /*-- ToonzImageの場合 --*/
   if (ti) {
     int styleId    = TTool::getApplication()->getCurrentLevelStyleIndex();
-    bool selective = m_param.m_selective.getValue();
+    bool selective = m_param.m_emptyOnly.getValue();
 
     bool filled = false;
 
