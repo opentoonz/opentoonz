@@ -113,21 +113,8 @@ void fillRegionExcept(const TRasterCM32P &ras, TRegion *r, int positive,
       TPixelCM32 *pix = line + from;
       for (int k = from; k < to; k++, pix++) {
         if (fillInks && !pix->isPurePaint()) pix->setInk(color);
+        int oldPaint = pix->getPaint();
         if (pix->getPaint() != positive) pix->setPaint(negative);
-        if (!fillInks && plt) {
-          if (fillAllautoPaintLines &&
-              plt->getStyle(pix->getInk())->getFlags() != 0)
-            pix->setInk(color);
-          else if (pix->getPaint() == negative && pix->getTone()) {
-            auto inks = getNeighborInks(ras, TPoint(k, i));
-            for (TPoint pInk : inks) {
-              TPixelCM32 *inkPix = ras->pixels(pInk.y) + pInk.x;
-              int ink            = inkPix->getInk();
-              if (plt->getStyle(ink)->getFlags() != 0)
-                inkFill(ras, pInk, color, 0);
-            }
-          }
-        }
       }
     }
   }
@@ -363,7 +350,8 @@ bool AreaFiller::rectFill(const TRect &rect, int color, bool onlyUnfilled,
           for (TPoint pInk : inks) {
             TPixelCM32 *inkPix = ras->pixels(pInk.y) + pInk.x;
             int ink            = inkPix->getInk();
-            if (m_palette->getStyle(ink)->getFlags() != 0)
+            if (m_palette->getStyle(ink)->getFlags() != 0 ||
+                bak->getPaint() == ink)
               inkFill(ras, pInk, color, 0);
           }
         }
@@ -534,6 +522,21 @@ void AreaFiller::strokeFill(const TRect &rect, TStroke *stroke, int color,
     for (int x = 0; x < lx; ++x, ++pix, ++bak) {
       processPixel(*pix, *bak, false, color, onlyUnfilled, fillPaints, fillInks,
                    defRegionWithPaint, usePrevailingReferFill);
+      if (!fillInks && m_palette) {
+        if (fillAllautoPaintLines &&
+            m_palette->getStyle(pix->getInk())->getFlags() != 0)
+          inkSegment(ras, TPoint(x, y), color, 2.5, true);
+        else if (pix->getPaint() == color && pix->getTone()) {
+          auto inks = getNeighborInks(ras, TPoint(x, y));
+          for (TPoint pInk : inks) {
+            TPixelCM32 *inkPix = ras->pixels(pInk.y) + pInk.x;
+            int ink            = inkPix->getInk();
+            if (m_palette->getStyle(ink)->getFlags() != 0 ||
+                bak->getPaint() == ink)
+              inkFill(ras, pInk, color, 0);
+          }
+        }
+      }
     }
   }
   m_ras->unlock();
