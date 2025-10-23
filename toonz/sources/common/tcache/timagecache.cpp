@@ -22,6 +22,7 @@
 #ifndef TNZCORE_LIGHT
 #include "tvectorimage.h"
 #include "trastercm.h"
+#include "tmeshimage.h"
 #include "tropcm.h"
 #endif
 
@@ -33,7 +34,7 @@
 #include "traster.h"
 #include "tpalette.h"
 
-//#include "tstopwatch.h"
+// #include "tstopwatch.h"
 #include "tbigmemorymanager.h"
 
 #include "tstream.h"
@@ -147,7 +148,7 @@ public:
 class ImageBuilder {
 public:
   virtual ~ImageBuilder() {}
-  virtual ImageBuilder *clone() = 0;
+  virtual ImageBuilder *clone()            = 0;
   virtual TImageP build(ImageInfo *info, const TRasterP &ras,
                         TPalette *palette) = 0;
 };
@@ -414,7 +415,7 @@ CompressedOnMemoryCacheItem::CompressedOnMemoryCacheItem(const TImageP &img)
     TINT32 buffSize = 0;
     m_compressedRas =
         TheCodec::instance()->compress(ri->getRaster(), 1, buffSize);
-    m_palette       = img->getPalette();
+    m_palette = img->getPalette();
   }
 #ifndef TNZCORE_LIGHT
   else {
@@ -452,7 +453,7 @@ CompressedOnMemoryCacheItem::~CompressedOnMemoryCacheItem() {
 //------------------------------------------------------------------------------
 
 TUINT32 CompressedOnMemoryCacheItem::getSize() const {
-  if (m_compressedRas)
+  if (m_compressedRas && m_compressedRas.getPointer())
     return m_compressedRas->getLx();
   else
     return 0;
@@ -798,7 +799,7 @@ inline TINT32 hasExternalReferences(const TImageP &img) {
 
   return std::max(refCount, img->getRefCount()) > 1;
 }
-}
+}  // namespace
 //------------------------------------------------------------------------------
 
 void TImageCache::Imp::doCompress() {
@@ -845,7 +846,7 @@ void TImageCache::Imp::doCompress() {
       item->m_cantCompress = true;
       CacheItemP newItem   = new CompressedOnMemoryCacheItem(
           item->getImage());  // WARNING the codec buffer allocation can CHANGE
-                              // the cache.
+                                // the cache.
       item->m_cantCompress = false;
       if (newItem->getSize() ==
           0)  /// non c'era memoria sufficiente per il buffer compresso....
@@ -937,7 +938,7 @@ void TImageCache::Imp::doCompress(std::string id) {
   item->m_cantCompress = true;  // ??
   CacheItemP newItem   = new CompressedOnMemoryCacheItem(
       item->getImage());  // WARNING the codec buffer  allocation can CHANGE the
-                          // cache.
+                            // cache.
   item->m_cantCompress = false;  // ??
   if (newItem->getSize() ==
       0)  /// non c'era memoria sufficiente per il buffer compresso....
@@ -1081,7 +1082,7 @@ namespace {
 
 int check       = 0;
 const int magic = 123456;
-}
+}  // namespace
 
 static TImageCache *CacheInstance = 0;
 
@@ -1262,7 +1263,8 @@ void TImageCache::Imp::add(const std::string &id, const TImageP &img,
 #ifdef TNZCORE_LIGHT
   item->m_cantCompress = false;
 #else
-  item->m_cantCompress = (TVectorImageP(img) ? true : false);
+  item->m_cantCompress =
+      (TVectorImageP(img) || TMeshImageP(img) ? true : false);
 #endif
   item->m_id                             = id;
   m_uncompressedItems[id]                = item;
@@ -1384,7 +1386,7 @@ void TImageCache::remapIcons(const std::string &dstId,
   int j              = (int)prefix.length();
   for (it = m_imp->m_uncompressedItems.begin();
        it != m_imp->m_uncompressedItems.end(); ++it) {
-    std::string id                      = it->first;
+    std::string id = it->first;
     if (id.find(prefix) == 0) table[id] = dstId + ":" + id.substr(j);
   }
   for (std::map<std::string, std::string>::iterator it2 = table.begin();
@@ -1772,7 +1774,7 @@ TImageP TImageCache::Imp::get(const std::string &id, bool toBeModified) {
 
   uncompressed->m_cantCompress = false;
 
-//#define DO_MEMCHECK
+// #define DO_MEMCHECK
 #ifdef DO_MEMCHECK
   assert(_CrtCheckMemory());
 #endif
@@ -1790,7 +1792,7 @@ public:
     return oldValue + item.second->getSize();
   }
 };
-}
+}  // namespace
 
 UINT TImageCache::getMemUsage() const {
   TThread::MutexLocker sl(&m_imp->m_mutex);
@@ -1868,8 +1870,8 @@ void TImageCache::outputMap(UINT chunkRequested, std::string filename) {
 
 void TImageCache::Imp::outputMap(UINT chunkRequested, std::string filename) {
   TThread::MutexLocker sl(&m_mutex);
-  //#ifdef _DEBUG
-  // static int Count = 0;
+  // #ifdef _DEBUG
+  //  static int Count = 0;
 
   std::string st = filename /*+toString(Count++)*/ + ".txt";
   TFilePath fp(st);
@@ -1961,7 +1963,7 @@ void TImageCache::Imp::outputMap(UINT chunkRequested, std::string filename) {
 
   // TBigMemoryManager::instance()->printMap();
 
-  //#endif
+  // #endif
 }
 
 //------------------------------------------------------------------------------
