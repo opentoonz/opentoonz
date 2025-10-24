@@ -222,7 +222,7 @@ void fillRow(const TRasterCM32P &r, const TPoint &p, int &xa, int &xb,
       }
 
       /*--- Paint auto-paint lines   ---*/
-      if (palette && pix->isPurePaint()) {
+      if (palette && pix->isPurePaint() && paint != 0) {
         TPoint pInk = nearestInkNotDiagonal(r, TPoint(xa + n, p.y));
         if (pInk != TPoint(-1, -1)) {
           TPixelCM32 *pixInk =
@@ -575,7 +575,8 @@ bool fill(const TRasterCM32P &r, const FillParameters &params,
   /*- If the "paint only transparent areas" option is enabled and the area is
    * already colored, return
    * -*/
-  if (params.m_emptyOnly && pix0->getPaint() != 0 && !params.m_shiftFill)
+  if (params.m_emptyOnly && pix0->getPaint() != 0 && paint != 0 &&
+      !params.m_shiftFill)
     return false;
 
   // Put reference image, will be automatically removed by RAII
