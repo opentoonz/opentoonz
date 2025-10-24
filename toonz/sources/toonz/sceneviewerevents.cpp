@@ -234,6 +234,12 @@ void SceneViewer::onButtonPressed(FlipConsole::EGadget button) {
   case FlipConsole::eFlipVertical:
     flipY();
     break;
+  case FlipConsole::eRotateLeft:
+    rotateLeft();
+    break;
+  case FlipConsole::eRotateRight:
+    rotateRight();
+    break;
   case FlipConsole::eResetView:
     resetSceneViewer();
     break;
@@ -1347,6 +1353,16 @@ public:
 
   bool setFlipY() override {
     static_cast<SceneViewer *>(getWidget())->flipY();
+    return true;
+  }
+
+  bool rotateLeft() override {
+    static_cast<SceneViewer *>(getWidget())->rotateLeft();
+    return true;
+  }
+
+  bool rotateRight() override {
+    static_cast<SceneViewer *>(getWidget())->rotateRight();
     return true;
   }
 
