@@ -104,9 +104,10 @@ DVAPI void renamePalettePage(TPaletteHandle *paletteHandle, int pageIndex,
 DVAPI void renamePaletteStyle(TPaletteHandle *paletteHandle,
                               const std::wstring &newName);
 
-/* called in ColorModelViewer::pick() - move selected style to the first page */
+/* called in ColorModelViewer::pick() - move selected style after current style */
 DVAPI void organizePaletteStyle(TPaletteHandle *paletteHandle, int styleId,
-                                const TColorStyle::PickedPosition &point);
+                                const TColorStyle::PickedPosition &point,
+                                int oldStyleId);
 
 /*
 called in ColorModelViewer::repickFromColorModel().
@@ -115,6 +116,6 @@ Pick color from the img for all styles with "picked position" value.
 DVAPI void pickColorByUsingPickedPosition(TPaletteHandle *paletteHandle,
                                           TImageP img, int frame);
 
-}  // namespace
+}  // namespace PaletteCmd
 
 #endif
