@@ -45,8 +45,7 @@ StylePickerTool::StylePickerTool()
     , m_currentStyleId(0)
     , m_colorType("Mode:")
     , m_passivePick("Passive Pick", false)
-    , m_organizePalette("Organize Palette", false)
-    , m_paletteToBeOrganized(NULL) {
+    , m_organizePalette("Organize Palette", false) {
   m_prop.bind(m_colorType);
   m_colorType.addValue(AREAS);
   m_colorType.addValue(LINES);
@@ -59,6 +58,20 @@ StylePickerTool::StylePickerTool()
 
   m_prop.bind(m_organizePalette);
   m_organizePalette.setId("OrganizePalette");
+}
+
+void StylePickerTool::onActivate() {
+  TPaletteHandle *ph = getApplication()->getCurrentPalette();
+  if (ph) {
+    bool ret = connect(ph, &TPaletteHandle::paletteSwitched, this,
+                       &StylePickerTool::onPaletteSwitched);
+    assert(ret);
+  }
+}
+
+void StylePickerTool::onDeactivate() {
+  QObject::disconnect(nullptr, &TPaletteHandle::paletteSwitched, this,
+                      &StylePickerTool::onPaletteSwitched);
 }
 
 void StylePickerTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
@@ -259,9 +272,9 @@ bool StylePickerTool::onPropertyChanged(std::string propertyName) {
       }
     } else {
       std::cout << "End Organize Palette" << std::endl;
-      m_paletteToBeOrganized = NULL;
     }
   }
+
   return true;
 }
 
@@ -289,8 +302,6 @@ bool StylePickerTool::startOrganizePalette() {
     return false;
   }
 
-  m_paletteToBeOrganized = pal;
-
   std::cout << "Start Organize Palette" << std::endl;
 
   return true;
@@ -300,28 +311,11 @@ bool StylePickerTool::startOrganizePalette() {
   If the working palette is changed, then deactivate the "organize palette"
   toggle.
 */
-void StylePickerTool::onImageChanged() {
-  std::cout << "StylePickerTool::onImageChanged" << std::endl;
-  if (!m_organizePalette.getValue() || !m_paletteToBeOrganized) return;
-
-  TXshLevel *level = getApplication()->getCurrentLevel()->getLevel();
-  if (!level) {
+void StylePickerTool::onPaletteSwitched() {
     m_organizePalette.setValue(false);
     getApplication()->getCurrentTool()->notifyToolChanged();
     return;
   }
-  TPalette *pal = NULL;
-  if (level->getType() == PLT_XSHLEVEL)
-    pal = level->getPaletteLevel()->getPalette();
-  else if (level->getSimpleLevel()) {
-    pal = level->getSimpleLevel()->getPalette();
-  }
-  if (!pal || pal != m_paletteToBeOrganized) {
-    m_organizePalette.setValue(false);
-    getApplication()->getCurrentTool()->notifyToolChanged();
-    return;
-  }
-}
 
 //-------------------------------------------------------------------------------------------------------
 

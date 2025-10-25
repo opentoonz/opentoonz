@@ -19,7 +19,6 @@ class StylePickerTool final : public TTool, public QObject {
   TBoolProperty m_passivePick;
 
   TBoolProperty m_organizePalette;
-  TPalette *m_paletteToBeOrganized;
 
   bool startOrganizePalette();
 
@@ -27,6 +26,9 @@ public:
   TPropertyGroup *getProperties(int targetType) override { return &m_prop; }
 
   StylePickerTool();
+
+  void onActivate() override;
+  void onDeactivate() override;
 
   ToolType getToolType() const override { return TTool::LevelReadTool; }
 
@@ -46,15 +48,15 @@ public:
 
   bool isOrganizePaletteActive() { return m_organizePalette.getValue(); }
 
+  void updateTranslation() override;
+
+public slots:
   /*
-     This function is called when either frame/column/level/scene is switched or
-     either scene/level/object is changed (see tapp.cpp).
+  This function is called when working paltte is switched
      If the working palette is changed, then deactivate the "organize palette"
      toggle.
   */
-  void onImageChanged() override;
-
-  void updateTranslation() override;
+  void onPaletteSwitched();
 };
 
 #endif
