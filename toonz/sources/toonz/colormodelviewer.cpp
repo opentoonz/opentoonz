@@ -95,20 +95,19 @@ ColorModelViewer::ColorModelViewer(QWidget *parent)
                     FlipConsole::eFlipVertical, FlipConsole::eResetView}),
                eDontKeepFilesOpened, true)
     , m_mode(0)
-    , m_currentRefImgPath(TFilePath())
-    , m_alwaysPickLineStyle(false) {
+    , m_currentRefImgPath(TFilePath()) {
   setObjectName("colormodel");
 
-  pickLineStyles = new QToolButton(this);
+  m_pickLineStylesBtn = new QToolButton(this);
   QString tip("Pick Line Styles");
   QIcon icon = createQIcon("stylepicker_lines");
-  pickLineStyles->setIcon(icon);
-  pickLineStyles->setToolTip(tip);
-  pickLineStyles->setCheckable(true);
+  m_pickLineStylesBtn->setIcon(icon);
+  m_pickLineStylesBtn->setToolTip(tip);
+  m_pickLineStylesBtn->setCheckable(true);
 
   QToolBar *toolBar = this->findChild<QToolBar *>("FlipConsolePlayToolBar");
   if (toolBar) {
-    toolBar->addWidget(pickLineStyles);
+    toolBar->addWidget(m_pickLineStylesBtn);
   }
 
   setToolCursor(m_imageViewer, ToolCursor::PickerCursor);
@@ -119,11 +118,6 @@ ColorModelViewer::ColorModelViewer(QWidget *parent)
 
   bool ret = connect(this, SIGNAL(refImageNotFound()), this,
                      SLOT(onRefImageNotFound()), Qt::QueuedConnection);
-  ret      = ret && connect(pickLineStyles, &QToolButton::clicked, this,
-                            [this](bool clicked) {
-                         m_alwaysPickLineStyle = clicked;
-                         changePickType();
-                       });
 
   assert(ret);
 
@@ -445,8 +439,8 @@ void ColorModelViewer::changePickType() {
   if (!propGroup) {
     m_mode = 2;
     setToolCursor(m_imageViewer, ToolCursor::PickerCursor);
-    pickLineStyles->setDisabled(true);
-    pickLineStyles->setChecked(true);
+    m_pickLineStylesBtn->setDisabled(true);
+    m_pickLineStylesBtn->setChecked(true);
     return;
   }
 
@@ -455,8 +449,8 @@ void ColorModelViewer::changePickType() {
   if (!modeProp) {
     m_mode = 2;
     setToolCursor(m_imageViewer, ToolCursor::PickerCursor);
-    pickLineStyles->setDisabled(true);
-    pickLineStyles->setChecked(true);
+    m_pickLineStylesBtn->setDisabled(true);
+    m_pickLineStylesBtn->setChecked(true);
     return;
   }
 
@@ -466,7 +460,7 @@ void ColorModelViewer::changePickType() {
       m_mode = 1;
       setToolCursor(m_imageViewer, ToolCursor::PickerCursorLine);
     } else if (var == AREAS) {
-      if (m_alwaysPickLineStyle)
+      if (m_pickLineStylesBtn->isChecked())
         m_mode = 2;  // Areas & Line
       else
         m_mode = 0;
@@ -476,8 +470,8 @@ void ColorModelViewer::changePickType() {
       m_mode = 2;
       setToolCursor(m_imageViewer, ToolCursor::PickerCursor);
     }
-    pickLineStyles->setEnabled(var == AREAS);
-    pickLineStyles->setChecked(m_mode != 0);
+    m_pickLineStylesBtn->setEnabled(var == AREAS);
+    m_pickLineStylesBtn->setChecked(m_mode != 0);
   }
 }
 
