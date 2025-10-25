@@ -2609,10 +2609,17 @@ StylePickerToolOptionsBox::StylePickerToolOptionsBox(
   // into rightmost of the tool option bar
   ToolOptionCheckbox *organizePaletteCB =
       dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Organize Palette"));
+  ToolOptionCheckbox *replaceStyleCB =
+      dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Replace Style"));
   m_layout->removeWidget(organizePaletteCB);
+  m_layout->removeWidget(replaceStyleCB);
   // m_layout->addWidget(new ToolOptionsBarSeparator(this), 0);
+  m_layout->addWidget(replaceStyleCB);
   m_layout->addWidget(organizePaletteCB);
   m_layout->addSpacing(5);
+  replaceStyleCB->setToolTip(
+      tr("With this option being activated, the picked style will replace\n"
+         "the current style in current level."));
   organizePaletteCB->setToolTip(
       tr("With this option being activated, the picked style will be\nmoved to "
          "the end of the first page of the palette."));
@@ -2842,7 +2849,7 @@ RotateToolOptionsBox::RotateToolOptionsBox(QWidget *parent, TTool *tool,
   button->addAction(resetRotationAction);
 
   connect(button, SIGNAL(clicked()), resetRotationAction, SLOT(trigger()));
-  
+
   m_layout->addStretch(1);
   m_layout->addWidget(button, 0);
   m_layout->addSpacing(5);
