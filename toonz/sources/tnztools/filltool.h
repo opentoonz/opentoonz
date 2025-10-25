@@ -102,6 +102,7 @@ class FillTool final : public QObject, public TTool {
   TBoolProperty m_closeGap;
   TBoolProperty m_referFill;
   TDoubleProperty m_maxGapDistance;
+  TIntProperty m_gapCloseDistance;
   AreaFillTool *m_areaFillTool;
   NormalLineFillTool *m_normalLineFillTool;
 

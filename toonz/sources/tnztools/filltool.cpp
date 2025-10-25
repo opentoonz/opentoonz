@@ -1985,6 +1985,7 @@ FillTool::FillTool(int targetType)
     , m_onionStyleId(0)
     , m_beginCell{-1, -1}
     , m_maxGapDistance("Maximum Gap", 0.01, 10.0, 1.15)
+    , m_gapCloseDistance("Gap Close Distance:", 0, 100, 30)
     , m_firstTime(true)
     , m_autopaintLines("Autopaint Lines", true)
     , m_referFill("Refer Fill", false) {
@@ -2027,6 +2028,9 @@ FillTool::FillTool(int targetType)
   m_fillType.setId("Type");
   m_colorType.setId("Mode");
   m_autopaintLines.setId("AutopaintLines");
+  m_gapCloseDistance.setId("GapCloseDistance");
+
+  if (targetType == TTool::ToonzImage) m_prop.bind(m_gapCloseDistance);
 }
 //-----------------------------------------------------------------------------
 
@@ -2196,6 +2200,7 @@ void FillTool::updateTranslation() {
   m_referFill.setQStringName(tr("Refer Fill"));
   m_maxGapDistance.setQStringName(tr("Maximum Gap"));
   m_autopaintLines.setQStringName(tr("Autopaint Lines"));
+  m_gapCloseDistance.setQStringName(tr("Gap Close Distance:"));
 }
 
 //-----------------------------------------------------------------------------
@@ -2466,7 +2471,17 @@ bool FillTool::onPropertyChanged(std::string propertyName, bool addToUndo) {
   else if (propertyName == m_autopaintLines.getName()) {
     rectPropChangedflag = true;
   }
-
+  // Gap Close Distance
+  else if (propertyName == m_gapCloseDistance.getName()) {
+    AutocloseDistance = m_gapCloseDistance.getValue();
+    auto st           = ToonzCheck::instance()->getAutocloseSettings();
+    ToonzCheck::instance()->setAutocloseSettings(
+        AutocloseDistance, AutocloseAngle, AutocloseOpacity,
+        AutocloseIgnoreAutoPaint);
+    if (ToonzCheck::instance()->getChecks() & ToonzCheck::eAutoclose)
+      notifyImageChanged();
+  }
+  //
   else if (!m_frameSwitched && (propertyName == m_maxGapDistance.getName())) {
     TXshLevel *xl = TTool::getApplication()->getCurrentLevel()->getLevel();
     m_level       = xl ? xl->getSimpleLevel() : 0;
@@ -2709,6 +2724,12 @@ void FillTool::onActivate() {
     m_closeGap.setValue(FillCloseGap ? 1 : 0);
     m_referFill.setValue(FillReferFill ? 1 : 0);
     m_frameRange.setValue(FillRange ? 1 : 0);
+    m_gapCloseDistance.setValue(AutocloseDistance);
+    auto st              = ToonzCheck::instance()->getAutocloseSettings();
+    st.m_closingDistance = AutocloseDistance;
+    ToonzCheck::instance()->setAutocloseSettings(
+        AutocloseDistance, AutocloseAngle, AutocloseOpacity,
+        AutocloseIgnoreAutoPaint);
     m_firstTime = false;
 
     if (m_fillType.getValue() != NORMALFILL) {

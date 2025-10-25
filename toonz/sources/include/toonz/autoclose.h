@@ -10,6 +10,7 @@
 #include "tgeometry.h"
 #include "traster.h"
 #include <set>
+#include "tenv.h"
 
 #undef DVAPI
 #undef DVVAR
@@ -21,11 +22,18 @@
 #define DVVAR DV_IMPORT_VAR
 #endif
 
+extern TEnv::StringVar AutocloseVectorType;
+extern TEnv::IntVar AutocloseDistance;
+extern TEnv::DoubleVar AutocloseAngle;
+extern TEnv::IntVar AutocloseRange;
+extern TEnv::IntVar AutocloseOpacity;
+extern TEnv::IntVar AutocloseIgnoreAutoPaint;
+
 struct AutocloseSettings {
-  int m_closingDistance = 10;
+  int m_closingDistance = 30;
   double m_spotAngle    = 60.0;
   int m_opacity         = 255;
-  bool m_ignoreAPInks        = true;
+  bool m_ignoreAPInks        = false;
 
   AutocloseSettings() = default;
 

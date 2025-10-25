@@ -34,7 +34,7 @@
 using namespace ToolUtils;
 
 TEnv::StringVar AutocloseVectorType("InknpaintAutocloseVectorType", "Normal");
-TEnv::DoubleVar AutocloseDistance("InknpaintAutocloseDistance", 10.0);
+TEnv::IntVar AutocloseDistance("InknpaintAutocloseDistance", 30);
 TEnv::DoubleVar AutocloseAngle("InknpaintAutocloseAngle", 60.0);
 TEnv::IntVar AutocloseRange("InknpaintAutocloseRange", 0);
 TEnv::IntVar AutocloseOpacity("InknpaintAutocloseOpacity", 255);
@@ -114,7 +114,7 @@ class RasterTapeTool final : public TTool {
 
   // TBoolProperty  m_isRect;
   TEnumProperty m_closeType;
-  TDoubleProperty m_distance;
+  TIntProperty m_distance;
   TDoubleProperty m_angle;
   TStyleIndexProperty m_inkIndex;
   TIntProperty m_opacity;
@@ -737,6 +737,7 @@ public:
           AutocloseIgnoreAutoPaint);
       m_firstTime = false;
     }
+
     //			getApplication()->editImage();
     resetMulti();
   }
