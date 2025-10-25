@@ -95,8 +95,8 @@ ColorModelViewer::ColorModelViewer(QWidget *parent)
                     FlipConsole::eFlipVertical, FlipConsole::eResetView}),
                eDontKeepFilesOpened, true)
     , m_mode(0)
-    , m_currentRefImgPath(TFilePath()),
-    m_alwaysPickLineStyle(false) {
+    , m_currentRefImgPath(TFilePath())
+    , m_alwaysPickLineStyle(false) {
   setObjectName("colormodel");
 
   pickLineStyles = new QToolButton(this);
@@ -119,7 +119,7 @@ ColorModelViewer::ColorModelViewer(QWidget *parent)
 
   bool ret = connect(this, SIGNAL(refImageNotFound()), this,
                      SLOT(onRefImageNotFound()), Qt::QueuedConnection);
-  ret = ret && connect(pickLineStyles, &QToolButton::clicked, this,
+  ret      = ret && connect(pickLineStyles, &QToolButton::clicked, this,
                             [this](bool clicked) {
                          m_alwaysPickLineStyle = clicked;
                          changePickType();
@@ -313,6 +313,8 @@ void ColorModelViewer::pick(const QPoint &p) {
   TPaletteHandle *ph =
       TApp::instance()->getPaletteController()->getCurrentLevelPalette();
   TPalette *currentPalette = ph->getPalette();
+  TXshLevelHandle *lh      = TApp::instance()->getCurrentLevel();
+  TXshSimpleLevel *level   = lh->getSimpleLevel();
   if (!currentPalette) return;
 
   /*- 画面外ではPickできない -*/
@@ -362,12 +364,20 @@ void ColorModelViewer::pick(const QPoint &p) {
   TTool *tool = TApp::instance()->getCurrentTool()->getTool();
   if (tool->getName() == "T_StylePicker") {
     StylePickerTool *spTool = dynamic_cast<StylePickerTool *>(tool);
-    if (spTool && spTool->isOrganizePaletteActive()) {
-      TPoint point = picker.getRasterPoint(pos);
-      int frame    = m_flipConsole->getCurrentFrame() - 1;
-      PaletteCmd::organizePaletteStyle(
-          ph, styleIndex, TColorStyle::PickedPosition(point, frame));
-    }
+    if (spTool)
+      if (spTool->isOrganizePaletteActive()) {
+        TPoint point = picker.getRasterPoint(pos);
+        int frame    = m_flipConsole->getCurrentFrame() - 1;
+        PaletteCmd::organizePaletteStyle(
+            ph, styleIndex, TColorStyle::PickedPosition(point, frame));
+        return;
+      } else if (spTool->isReplaceStyleActive() && level &&
+                 level->getPalette() == currentPalette) {
+        TPoint point = picker.getRasterPoint(pos);
+        int frame    = m_flipConsole->getCurrentFrame() - 1;
+        replaceLevelStyle(lh, ph, styleIndex, ph->getStyleIndex());
+        return;
+      }
   }
 
   ph->setStyleIndex(styleIndex);
@@ -402,7 +412,7 @@ void ColorModelViewer::showEvent(QShowEvent *e) {
   bool ret = connect(paletteHandle, SIGNAL(paletteSwitched()), this,
                      SLOT(showCurrentImage()));
   ret      = ret && connect(paletteHandle, SIGNAL(paletteChanged()), this,
-                       SLOT(showCurrentImage()));
+                            SLOT(showCurrentImage()));
   ret = ret && connect(paletteHandle, SIGNAL(colorStyleChanged(bool)), this,
                        SLOT(showCurrentImage()));
   /*- ツールのTypeに合わせてPickのタイプも変え、カーソルも切り替える -*/
@@ -456,8 +466,8 @@ void ColorModelViewer::changePickType() {
       setToolCursor(m_imageViewer, ToolCursor::PickerCursorLine);
     } else if (var == AREAS) {
       if (m_alwaysPickLineStyle)
-        m_mode = 2;// Areas & Line
-      else 
+        m_mode = 2;  // Areas & Line
+      else
         m_mode = 0;
       setToolCursor(m_imageViewer, ToolCursor::PickerCursorArea);
     } else  // Line & Areas
@@ -468,7 +478,6 @@ void ColorModelViewer::changePickType() {
     pickLineStyles->setEnabled(var == AREAS);
     pickLineStyles->setChecked(m_mode != 0);
   }
-
 }
 
 //-----------------------------------------------------------------------------
