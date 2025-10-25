@@ -937,8 +937,6 @@ void ToonzRasterBrushTool::drawEmptyCircle(TPointD pos, int thick,
   if (!isPencil)
     tglDrawCircle(pos, (thick + 1) * 0.5);
   else {
-    pos.x = floor(pos.x) + 0.5;
-    pos.y = floor(pos.y) + 0.5;
     int x = 0, y = tround((thick * 0.5) - 0.5);
     int d           = 3 - 2 * (int)(thick * 0.5);
     bool horizontal = true, isDecimal = thick % 2 != 0;
@@ -1104,11 +1102,15 @@ bool ToonzRasterBrushTool::preLeftButtonDown() {
 void ToonzRasterBrushTool::handleMouseEvent(MouseEventType type,
                                             const TPointD &pos,
                                             const TMouseEvent &e) {
-  TTimerTicks t = TToolTimer::ticks();
-  bool alt      = e.getModifiersMask() & TMouseEvent::ALT_KEY;
-  bool shift    = e.getModifiersMask() & TMouseEvent::SHIFT_KEY;
-  bool control  = e.getModifiersMask() & TMouseEvent::CTRL_KEY;
-
+  TTimerTicks t    = TToolTimer::ticks();
+  bool alt         = e.getModifiersMask() & TMouseEvent::ALT_KEY;
+  bool shift       = e.getModifiersMask() & TMouseEvent::SHIFT_KEY;
+  bool control     = e.getModifiersMask() & TMouseEvent::CTRL_KEY;
+  TPointD fixedPos = pos;
+  if (m_pencil.getValue()) {
+    fixedPos = getCenteredCursorPos(pos);
+    fixedPos = TPointD(tround(fixedPos.x), tround(fixedPos.y));
+  }
   if (shift && type == ME_DOWN && e.button() == Qt::LeftButton &&
       !m_painting.active) {
     m_modifierAssistants->magnetism = 0;
@@ -1130,7 +1132,7 @@ void ToonzRasterBrushTool::handleMouseEvent(MouseEventType type,
     m_inputmanager.keyEvent(control, TKey::control, t, nullptr);
 
   if (type == ME_MOVE) {
-    THoverList hovers(1, pos);
+    THoverList hovers(1, fixedPos);
     m_inputmanager.hoverEvent(hovers);
   } else {
     int deviceId       = e.isTablet() ? 1 : 0;
@@ -1138,7 +1140,7 @@ void ToonzRasterBrushTool::handleMouseEvent(MouseEventType type,
     bool hasPressure   = e.isTablet();
     double pressure    = hasPressure ? e.m_pressure : defPressure;
     bool final         = type == ME_UP;
-    m_inputmanager.trackEvent(deviceId, 0, pos, pressure, TPointD(),
+    m_inputmanager.trackEvent(deviceId, 0, fixedPos, pressure, TPointD(),
                               hasPressure, false, final, t);
     m_inputmanager.processTracks();
   }
@@ -1301,7 +1303,7 @@ void ToonzRasterBrushTool::inputPaintTrackPoint(const TTrackPoint &point,
   TToonzImageP ri(img);
   TRasterCM32P ras = ri->getRaster();
   if (!ras) return;
-  TPointD rasCenter     = ras->getCenterD();
+  TPointD rasCenter     = convert(ras->getCenter());
   TPointD fixedPosition = getCenteredCursorPos(point.position);
 
   TRectD invalidateRect;
@@ -1439,8 +1441,7 @@ void ToonzRasterBrushTool::inputPaintTrackPoint(const TTrackPoint &point,
         TRectD(m_brushPos - thickOffset, m_brushPos + thickOffset);
     invalidateRect +=
         TRectD(fixedPosition - thickOffset, fixedPosition + thickOffset);
-    m_mousePos = point.position;
-    m_brushPos = fixedPosition;
+    m_brushPos = m_mousePos = point.position;
   }
 
   if (!invalidateRect.isEmpty()) invalidate(invalidateRect.enlarge(20));
@@ -1497,8 +1498,7 @@ void ToonzRasterBrushTool::inputMouseMove(const TPointD &position,
                              m_brushPos + TPointD(radius, radius));
 
   } else {
-    m_mousePos = position;
-    m_brushPos = getCenteredCursorPos(position);
+    m_brushPos = m_mousePos = position;
 
     invalidateRect += TRectD(position - halfThick, position + halfThick);
   }
