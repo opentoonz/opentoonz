@@ -434,7 +434,7 @@ void XsheetViewer::positionSections() {
 
   if (Preferences::instance()->isShowXsheetBreadcrumbsEnabled()) {
     m_breadcrumbArea->showBreadcrumbs(true);
-    int w = visibleRegion().boundingRect().width();
+    int w = geometry().width();
     if (o->isVerticalTimeline())
       m_breadcrumbScrollArea->setGeometry(0, headerFrame.from(), w,
                                           XsheetGUI::BREADCRUMB_HEIGHT);
