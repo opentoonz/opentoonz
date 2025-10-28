@@ -1585,19 +1585,21 @@ void SceneViewer::drawCameraStand() {
         imgRectColor = Preferences::instance()->getLevelEditorBoxColor();
       ToolUtils::fillRect(bbox * ti->getSubsampling(), imgRectColor);
     } else if (ri) {
-      TRectD bbox = ri->getBBox();
-      bbox.x0 -= ri->getBBox().getLx() * 0.5;
-      bbox.x1 -= ri->getBBox().getLx() * 0.5;
-      bbox.y0 -= ri->getBBox().getLy() * 0.5;
-      bbox.y1 -= ri->getBBox().getLy() * 0.5;
+      TRasterP ras = ri->getRaster();
+      if (ras) {
+        // Use excludsive bbox to draw bound rectangle
+        TDimension size = ras->getSize();
+        TRectD imgRect(0, 0, size.lx, size.ly);
+        imgRect -= ras->getCenterD();
 
-      TPixel32 imgRectColor;
-      // draw black rectangle instead, if the BlackBG check is ON
-      if (ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg)
-        imgRectColor = TPixel::Black;
-      else
-        imgRectColor = Preferences::instance()->getLevelEditorBoxColor();
-      ToolUtils::fillRect(bbox * ri->getSubsampling(), imgRectColor);
+        TPixel32 imgRectColor;
+        // draw black rectangle instead, if the BlackBG check is ON
+        if (ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg)
+          imgRectColor = TPixel::Black;
+        else
+          imgRectColor = Preferences::instance()->getLevelEditorBoxColor();
+        ToolUtils::fillRect(imgRect * ri->getSubsampling(), imgRectColor);
+      }
     }
     glPopMatrix();
   }
