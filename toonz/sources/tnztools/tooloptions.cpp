@@ -2622,7 +2622,7 @@ StylePickerToolOptionsBox::StylePickerToolOptionsBox(
          "the current style in current level."));
   organizePaletteCB->setToolTip(
       tr("With this option being activated, the picked style will be\nmoved to "
-         "the end of the first page of the palette."));
+         "the end of the current style's page of the palette."));
 
   if (m_realTimePickMode) {
     connect(m_realTimePickMode, SIGNAL(toggled(bool)), m_currentStyleLabel,
