@@ -12,6 +12,7 @@
 #include <toonz/dpiscale.h>
 #include <toonz/toonzscene.h>
 #include <toonz/sceneproperties.h>
+#include <toonz/txshsimplelevel.h>
 
 #include <tgl.h>
 #include <tproperty.h>
@@ -862,7 +863,9 @@ TAssistant::scanAssistants(
     for(int i = 0; i < count; ++i) {
       if (TXshColumn *column = Xsheet->getColumn(i))
       if (column->isCamstandVisible())
-      if (column->isPreviewVisible())
+      //if (column->isPreviewVisible())
+      if (TXshSimpleLevel *sl = Xsheet->getCell(frame,i).getSimpleLevel())
+      if (sl->getType() == META_XSHLEVEL)
       if (TImageP image = Xsheet->getCell(frame, i).getImage(false))
       if (image != skipImage)
       if (image->getType() == TImage::META)
