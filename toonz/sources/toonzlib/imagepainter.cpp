@@ -2,7 +2,8 @@
 #include <GL/glew.h>
 
 #include "toonz/imagepainter.h"
-// Include shared flipbook background toggle settings (e.g., for m_bg) from toonz/
+// Include shared flipbook background toggle settings (e.g., for m_bg) from
+// toonz/
 #include "toonz/flipbooksettings.h"
 #include "toonz/glrasterpainter.h"
 #include "trastercm.h"
@@ -378,9 +379,9 @@ void Painter::doFlushRasterImages(const TRasterP &rin, int bg,
   if (m_vSettings.m_useTexture)
     bbox = m_bbox;
   else {
-    // double delta = sqrt(fabs(m_finalAff.det()));
-    // bbox = m_bbox.enlarge(delta) * viewRect;
-    bbox = m_bbox * viewRect;
+    double delta = sqrt(fabs(m_finalAff.det()));
+    bbox         = m_bbox.enlarge(delta / 2) * viewRect;
+    // bbox = m_bbox * viewRect;
   }
 
   UCHAR chan = m_vSettings.m_colorMask;
@@ -431,10 +432,7 @@ void Painter::doFlushRasterImages(const TRasterP &rin, int bg,
     ras     = backgroundRas->extract(r);
     */
     aff = TTranslation(-rect.x0, -rect.y0) * m_finalAff;
-    aff *= TTranslation(TPointD(0.5, 0.5));  // very quick and very dirty fix:
-                                             // in camerastand the images seems
-                                             // shifted of an half pixel...it's
-                                             // a quickput approximation?
+
     if (bg == 0x100000)
       quickput(ras, buildCheckboard(bg, _rin->getSize(), ras), m_palette, aff,
                false);
@@ -560,11 +558,12 @@ void Painter::onRasterImage(TRasterImage *ri) {
   TDimension imageSize =
       (m_imageSize.lx == 0 ? ri->getRaster()->getSize() : m_imageSize);
 
-  m_finalAff =
-      m_vSettings.m_useTexture
-          ? m_aff
-          : TTranslation(m_dim.lx * 0.5, m_dim.ly * 0.5) * m_aff *
-                TTranslation(-TPointD(0.5 * imageSize.lx, 0.5 * imageSize.ly));
+  m_finalAff = m_vSettings.m_useTexture
+                   ? m_aff
+                   : TTranslation(m_dim.lx * 0.5, m_dim.ly * 0.5) * m_aff *
+                         // Shift to image Center
+                         TTranslation(-TPointD(0.5 * (imageSize.lx - 1),
+                                               0.5 * (imageSize.ly - 1)));
 
   TRectD bbox = TRectD(0, 0, imageSize.lx - 1, imageSize.ly - 1);
   m_bbox      = m_vSettings.m_useTexture ? bbox : m_finalAff * bbox;
@@ -579,11 +578,12 @@ void Painter::onToonzImage(TToonzImage *ti) {
   TDimension imageSize =
       (m_imageSize.lx == 0 ? ti->getRaster()->getSize() : m_imageSize);
 
-  m_finalAff =
-      m_vSettings.m_useTexture
-          ? m_aff
-          : TTranslation(m_dim.lx * 0.5, m_dim.ly * 0.5) * m_aff *
-                TTranslation(-TPointD(0.5 * imageSize.lx, 0.5 * imageSize.ly));
+  m_finalAff = m_vSettings.m_useTexture
+                   ? m_aff
+                   : TTranslation(m_dim.lx * 0.5, m_dim.ly * 0.5) * m_aff *
+                         // Shift to image Center
+                         TTranslation(-TPointD(0.5 * (imageSize.lx - 1),
+                                               0.5 * (imageSize.ly - 1)));
 
   TRectD bbox = TRectD(0, 0, imageSize.lx - 1, imageSize.ly - 1);
   m_bbox      = m_vSettings.m_useTexture ? bbox : m_finalAff * bbox;
