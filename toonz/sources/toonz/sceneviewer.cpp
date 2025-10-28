@@ -281,7 +281,7 @@ void ToggleCommandHandler::execute() {
 ToggleCommandHandler viewTableToggle(MI_ViewTable, false);
 ToggleCommandHandler editInPlaceToggle(MI_ToggleEditInPlace, false);
 ToggleCommandHandler fieldGuideToggle(MI_FieldGuide, false);
-ToggleCommandHandler safeAreaToggle(MI_SafeArea, false);
+ToggleCommandHandler framesToggle(MI_Frames, false);
 ToggleCommandHandler rasterizePliToggle(MI_RasterizePli, false);
 
 ToggleCommandHandler viewClcToggle("MI_ViewColorcard", false);
@@ -1764,12 +1764,11 @@ void SceneViewer::drawOverlay() {
 
 #endif
 
-    // safe area
-    if (safeAreaToggle.getStatus() && m_drawEditingLevel == false &&
-        !is3DView()) {
+    // Frames
+    if (framesToggle.getStatus() && !is3DView()) {
       glPushMatrix();
-      tglMultMatrix(m_drawCameraAff);
-      ViewerDraw::drawSafeArea();
+      if(!m_drawEditingLevel)tglMultMatrix(m_drawCameraAff);
+      ViewerDraw::drawFrames(this, m_drawEditingLevel);
       glPopMatrix();
     }
 

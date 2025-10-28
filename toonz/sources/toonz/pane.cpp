@@ -8,16 +8,20 @@
 #include "tenv.h"
 #include "saveloadqsettings.h"
 #include "custompanelmanager.h"
-
+#include "viewerdraw.h"
 #include "toonzqt/gutil.h"
 
 // TnzLib includes
 #include "toonz/preferences.h"
 #include "toonz/toonzfolders.h"
 #include "toonz/tscenehandle.h"
+#include "toonz/toonzscene.h"
+#include "toonz/sceneproperties.h"
+#include "framesPresetsEditorPopup.h"
 
 // TnzCore includes
 #include "tsystem.h"
+#include "tmsgcore.h"
 
 // Qt includes
 #include <QPainter>
@@ -37,8 +41,11 @@
 #include <QTextEdit>
 #include <QScreen>
 #include <QDebug>
+#include <QDesktopServices>
+#include <QUrl>
+#include <QFileInfo>
+#include <QMessageBox>
 
-extern TEnv::StringVar EnvSafeAreaName;
 extern TEnv::IntVar EnvViewerPreviewBehavior;
 
 //=============================================================================
@@ -418,26 +425,16 @@ void TPanelTitleBarButton::mousePressEvent(QMouseEvent *e) {
 }
 
 //=============================================================================
-// TPanelTitleBarButtonForSafeArea
+// TPanelTitleBarButtonForframesPreset
 //-----------------------------------------------------------------------------
 
-void TPanelTitleBarButtonForSafeArea::getSafeAreaNameList(
-    QList<QString> &nameList) {
-  TFilePath fp                = TEnv::getConfigDir();
-  QString currentSafeAreaName = QString::fromStdString(EnvSafeAreaName);
-
-  std::string safeAreaFileName = "safearea.ini";
-
-  while (!TFileStatus(fp + safeAreaFileName).doesExist() && !fp.isRoot() &&
-         fp.getParentDir() != TFilePath())
-    fp = fp.getParentDir();
-
-  fp = fp + safeAreaFileName;
+void TPanelTitleBarButtonForFrames::getFramesPresets(QList<QString> &nameList) {
+  TFilePath fp = ViewerDraw::getFramesIniPath();
 
   if (TFileStatus(fp).doesExist()) {
     QSettings settings(toQString(fp), QSettings::IniFormat);
 
-    // find the current safearea name from the list
+    // find the current framesPreset name from the list
     QStringList groups = settings.childGroups();
     for (int g = 0; g < groups.size(); g++) {
       settings.beginGroup(groups.at(g));
@@ -449,7 +446,7 @@ void TPanelTitleBarButtonForSafeArea::getSafeAreaNameList(
 
 //-----------------------------------------------------------------------------
 
-void TPanelTitleBarButtonForSafeArea::mousePressEvent(QMouseEvent *e) {
+void TPanelTitleBarButtonForFrames::mousePressEvent(QMouseEvent *e) {
   if (e->button() != Qt::RightButton) {
     m_pressed = !m_pressed;
     emit toggled(m_pressed);
@@ -457,39 +454,163 @@ void TPanelTitleBarButtonForSafeArea::mousePressEvent(QMouseEvent *e) {
   }
 }
 
+void TPanelTitleBarButtonForFrames::onEditFrames() {
+  QWidget *parent = TApp::instance()->getMainWindow();
+
+  FramesPresetsEditorPopup *popup = FramesPresetsEditorPopup::instance(parent);
+
+  QPoint globalMousePos = QCursor::pos();
+
+  popup->showAndPosition(globalMousePos);
+
+  return;
+  /*TFilePath fp = ViewerDraw::getFramesIniPath();
+
+  if (!TFileStatus(fp).doesExist()) {
+    DVGui::warning(tr("Frame Presets configuration file does not exist: %1")
+                       .arg(fp.getQString()));
+    return;
+  }
+  QFileInfo fileInfo(fp.getQString());
+  QUrl fileUrl = QUrl::fromLocalFile(fileInfo.absoluteFilePath());
+
+  if (!QDesktopServices::openUrl(fileUrl)) {
+    DVGui::warning(
+        tr("Cannot open Frame Presets file. Please check if there is a default "
+           "text editor associated with .ini files."));
+  }*/
+}
+
 //-----------------------------------------------------------------------------
 
-void TPanelTitleBarButtonForSafeArea::contextMenuEvent(QContextMenuEvent *e) {
+void TPanelTitleBarButtonForFrames::contextMenuEvent(QContextMenuEvent *e) {
   QMenu menu(this);
 
-  QList<QString> safeAreaNameList;
-  getSafeAreaNameList(safeAreaNameList);
-  for (int i = 0; i < safeAreaNameList.size(); i++) {
-    QAction *action = new QAction(safeAreaNameList.at(i), this);
-    action->setData(safeAreaNameList.at(i));
-    connect(action, SIGNAL(triggered()), this, SLOT(onSetSafeArea()));
-    if (safeAreaNameList.at(i) == QString::fromStdString(EnvSafeAreaName)) {
-      action->setCheckable(true);
+  QString currentFramesPresetName = TApp::instance()
+                                        ->getCurrentScene()
+                                        ->getScene()
+                                        ->getProperties()
+                                        ->getFramesPresetName();
+  QList<QString> framesPresetNameList;
+  getFramesPresets(framesPresetNameList);
+  QActionGroup *behaviorGroup = new QActionGroup(this);
+
+  m_originalFramesPresetName = currentFramesPresetName;
+
+  bool framesPresetFound = false;
+
+  for (int i = 0; i < framesPresetNameList.size(); i++) {
+    QAction *action = new QAction(framesPresetNameList.at(i), this);
+    action->setData(framesPresetNameList.at(i));
+    connect(action, SIGNAL(triggered()), this, SLOT(onSetFrames()));
+    action->setCheckable(true);
+    behaviorGroup->addAction(action);
+    menu.addAction(action);
+    if (framesPresetNameList.at(i) == currentFramesPresetName) {
+      framesPresetFound = true;
       action->setChecked(true);
     }
-    menu.addAction(action);
   }
+
+  if (!framesPresetFound && !currentFramesPresetName.isEmpty()) {
+    QString framesPresetMissingTemplate = tr("%1 (Missing)");
+    QString invalidActionText =
+        framesPresetMissingTemplate.arg(currentFramesPresetName);
+    QAction *invalidAction = new QAction(invalidActionText, this);
+
+    QPixmap redDot(16, 16);
+    redDot.fill(Qt::transparent);
+    QPainter p(&redDot);
+    p.setRenderHint(QPainter::Antialiasing);
+    p.setBrush(QBrush(Qt::red));
+    p.setPen(Qt::NoPen);
+    p.drawEllipse(2, 2, 12, 12);
+    p.end();
+    invalidAction->setIcon(redDot);
+
+    invalidAction->setEnabled(true);
+
+    connect(invalidAction, &QAction::triggered, this,
+            &TPanelTitleBarButtonForFrames::onEditFrames);
+
+    invalidAction->setChecked(true);
+    behaviorGroup->addAction(invalidAction);
+    menu.addAction(invalidAction);
+  }
+
+  menu.addSeparator();
+  QAction *editAction = new QAction(tr("Edit Frames Presets..."), this);
+  connect(editAction, SIGNAL(triggered()), this, SLOT(onEditFrames()));
+  menu.addAction(editAction);
+
+  connect(&menu, SIGNAL(hovered(QAction *)), this,
+          SLOT(onMenuActionHovered(QAction *)));
+  connect(&menu, SIGNAL(aboutToHide()), this, SLOT(onMenuAboutToHide()));
 
   menu.exec(e->globalPos());
 }
 
 //-----------------------------------------------------------------------------
 
-void TPanelTitleBarButtonForSafeArea::onSetSafeArea() {
-  QString safeAreaName = qobject_cast<QAction *>(sender())->data().toString();
-  // change safearea if the different one is selected
-  if (QString::fromStdString(EnvSafeAreaName) != safeAreaName) {
-    EnvSafeAreaName = safeAreaName.toStdString();
-    // emit sceneChanged without setting dirty flag
-    TApp::instance()->getCurrentScene()->notifySceneChanged(false);
+void TPanelTitleBarButtonForFrames::onSetFrames() {
+  TApp::instance()->getCurrentScene()->notifySceneChanged(true);
+
+  QString framesPresetName =
+      qobject_cast<QAction *>(sender())->data().toString();
+  // change framesPreset if the different one is selected
+  QString currentframesPresetName = TApp::instance()
+                                        ->getCurrentScene()
+                                        ->getScene()
+                                        ->getProperties()
+                                        ->getFramesPresetName();
+  if (currentframesPresetName != framesPresetName) {
+    TApp::instance()
+        ->getCurrentScene()
+        ->getScene()
+        ->getProperties()
+        ->setFramesPresetName(framesPresetName);
+    // emit sceneChanged
+    TApp::instance()->getCurrentScene()->notifySceneChanged(true);
   }
 }
 
+void TPanelTitleBarButtonForFrames::onMenuActionHovered(QAction *action) {
+  if (!action || action->data().isNull() ||
+      action->text() == tr("Edit Frames Presets...")) {
+    if (m_isPreviewing) {
+      TApp::instance()
+          ->getCurrentScene()
+          ->getScene()
+          ->getProperties()
+          ->setFramesPresetName(m_originalFramesPresetName);
+      TApp::instance()->getCurrentScene()->notifySceneChanged(false);
+      m_isPreviewing = false;
+    }
+    return;
+  }
+
+  QString framesPresetName = action->data().toString();
+
+  TApp::instance()
+      ->getCurrentScene()
+      ->getScene()
+      ->getProperties()
+      ->setFramesPresetName(framesPresetName);
+  TApp::instance()->getCurrentScene()->notifySceneChanged(false);
+  m_isPreviewing = true;
+}
+
+void TPanelTitleBarButtonForFrames::onMenuAboutToHide() {
+  if (m_isPreviewing) {
+    TApp::instance()
+        ->getCurrentScene()
+        ->getScene()
+        ->getProperties()
+        ->setFramesPresetName(m_originalFramesPresetName);
+    TApp::instance()->getCurrentScene()->notifySceneChanged(false);
+    m_isPreviewing = false;
+  }
+}
 //-----------------------------------------------------------------------------
 
 //=============================================================================
@@ -534,7 +655,7 @@ void TPanelTitleBarButtonForPreview::contextMenuEvent(QContextMenuEvent *e) {
 
 void TPanelTitleBarButtonForPreview::onSetPreviewBehavior() {
   int behaviorId = qobject_cast<QAction *>(sender())->data().toInt();
-  // change safearea if the different one is selected
+  // change framesPreset if the different one is selected
   if (EnvViewerPreviewBehavior != behaviorId) {
     EnvViewerPreviewBehavior = behaviorId;
     // emit sceneChanged without setting dirty flag

@@ -7,6 +7,8 @@
 
 // #include <QDockWidget>
 #include "../toonzqt/tdockwindows.h"
+#include "toonz/tscenehandle.h"
+#include <toonzqt/dvdialog.h>
 
 class TPanelTitleBarButtonSet;
 class Room;
@@ -90,19 +92,27 @@ signals:
  * context menu
  */
 
-class TPanelTitleBarButtonForSafeArea final : public TPanelTitleBarButton {
+class TPanelTitleBarButtonForFrames final : public TPanelTitleBarButton {
   Q_OBJECT
+
+  QString m_originalFramesPresetName;
+  bool m_isPreviewing = false;
+
 public:
-  TPanelTitleBarButtonForSafeArea(QWidget *parent,
-                                  const QString &standardPixmapName)
+  TPanelTitleBarButtonForFrames(QWidget *parent,
+                                const QString &standardPixmapName)
       : TPanelTitleBarButton(parent, standardPixmapName) {}
-  void getSafeAreaNameList(QList<QString> &nameList);
+  void getFramesPresets(QList<QString> &nameList);
 
 protected:
   void contextMenuEvent(QContextMenuEvent *event) override;
   void mousePressEvent(QMouseEvent *event) override;
+
 protected slots:
-  void onSetSafeArea();
+  void onSetFrames();
+  void onEditFrames();
+  void onMenuActionHovered(QAction *action);
+  void onMenuAboutToHide();
 };
 
 //-----------------------------------------------------------------------------

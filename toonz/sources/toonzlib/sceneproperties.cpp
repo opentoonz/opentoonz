@@ -74,7 +74,8 @@ TSceneProperties::TSceneProperties()
     , m_fieldGuideSize(16)
     , m_fieldGuideAspectRatio(1.77778)
     , m_columnColorFilterOnRender(false)
-    , m_camCapSaveInPath() {
+    , m_camCapSaveInPath()
+    , m_framesPresetName("") {
   // Default color
   m_notesColor.push_back(TPixel32(255, 235, 140));
   m_notesColor.push_back(TPixel32(255, 160, 120));
@@ -364,6 +365,7 @@ void TSceneProperties::saveData(TOStream &os) const {
       out.getBoardSettings()->saveData(os);
       os.closeChild();
     }
+    if (out.isPutLayoutImage()) os.child("putLayoutImage") << 1;
 
     if (out.formatTemplateFId().getZeroPadding() !=
             TFrameId().getZeroPadding() ||
@@ -391,6 +393,9 @@ void TSceneProperties::saveData(TOStream &os) const {
   os.child("markers") << m_markerDistance << m_markerOffset;
   os.child("subsampling") << m_fullcolorSubsampling << m_tlvSubsampling;
   os.child("fieldguide") << m_fieldGuideSize << m_fieldGuideAspectRatio;
+  if (!m_framesPresetName.isEmpty() &&
+      m_framesPresetName != QString("@@RELOAD_FORCE"))
+    os.child("framesPresetName") << m_framesPresetName;
   if (m_columnColorFilterOnRender) os.child("columnColorFilterOnRender") << 1;
   if (!m_camCapSaveInPath.isEmpty())
     os.child("cameraCaputureSaveInPath") << m_camCapSaveInPath;
@@ -450,6 +455,8 @@ void TSceneProperties::loadData(TIStream &is, bool isLoadingProject) {
       is >> m_markerDistance >> m_markerOffset;
     } else if (tagName == "subsampling") {
       is >> m_fullcolorSubsampling >> m_tlvSubsampling;
+    } else if (tagName == "framesPresetName") {
+      is >> m_framesPresetName;
     } else if (tagName == "fieldguide") {
       is >> m_fieldGuideSize >> m_fieldGuideAspectRatio;
     } else if (tagName == "columnColorFilterOnRender") {
@@ -463,7 +470,7 @@ void TSceneProperties::loadData(TIStream &is, bool isLoadingProject) {
     else if (tagName == "columnIconLoadingPolicy") {
       int dummy;
       is >> dummy;
-    }                                 // back compatibility
+    }  // back compatibility
     else if (tagName == "playrange")  // back compatibility
     {
       std::string dummy;
@@ -528,7 +535,7 @@ void TSceneProperties::loadData(TIStream &is, bool isLoadingProject) {
             if (tagName == "camera") {
               int dummy;
               is >> dummy;
-            }                                    // per compatibilita'
+            }  // per compatibilita'
             else if (tagName == "cameraData") {  // per compatibilita'
               while (is.matchTag(tagName)) {
                 if (tagName == "size") {
@@ -770,6 +777,10 @@ void TSceneProperties::loadData(TIStream &is, bool isLoadingProject) {
             } else if (tagName == "clapperboardSettings") {
               assert(out.getBoardSettings());
               out.getBoardSettings()->loadData(is);
+            } else if (tagName == "putLayoutImage") {
+              int value;
+              is >> value;
+              out.setPutLayoutImage(value == 0);
             } else if (tagName == "frameFormat") {
               while (is.matchTag(tagName)) {
                 if (tagName == "padding") {
