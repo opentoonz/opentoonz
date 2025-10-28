@@ -1573,6 +1573,7 @@ void SceneViewer::drawCameraStand() {
 
     TToonzImageP ti  = image;
     TRasterImageP ri = image;
+    TVectorImageP vi = image;
     if (ti) {
       TRect imgRect(0, 0, ti->getSize().lx - 1, ti->getSize().ly - 1);
       TRectD bbox = ToonzImageUtils::convertRasterToWorld(imgRect, ti);
@@ -1600,6 +1601,16 @@ void SceneViewer::drawCameraStand() {
           imgRectColor = Preferences::instance()->getLevelEditorBoxColor();
         ToolUtils::fillRect(imgRect * ri->getSubsampling(), imgRectColor);
       }
+    } else if (vi) {
+      TRectD bbox = vi->getBBox();
+
+      TPixel32 imgRectColor;
+      // draw black rectangle instead, if the BlackBG check is ON
+      if (ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg)
+        imgRectColor = TPixel::Black;
+      else
+        imgRectColor = Preferences::instance()->getLevelEditorBoxColor();
+      ToolUtils::fillRect(bbox, imgRectColor);
     }
     glPopMatrix();
   }
