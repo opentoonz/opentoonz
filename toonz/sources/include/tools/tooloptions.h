@@ -521,6 +521,7 @@ class FillToolOptionsBox final : public ToolOptionsBox {
   ToolOptionCheckbox *m_selectiveMode, *m_segmentMode, *m_onionMode,
       *m_multiFrameMode, *m_autopaintMode, *m_closeGap, *m_referFill;
   ToolOptionPairSlider *m_fillDepthField;
+  ToolOptionIntSlider* m_gapCloseDistance;
 
 public:
   FillToolOptionsBox(QWidget *parent, TTool *tool, TPaletteHandle *pltHandle,
