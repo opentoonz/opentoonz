@@ -488,11 +488,11 @@ int main(int argc, char *argv[]) {
   TBigMemoryManager::instance()->setRunOutOfContiguousMemoryHandler(
       &toonzRunOutOfContMemHandler);
 
-  // Toonz environment
-  initToonzEnv(argumentPathValues);
-
   // Setup third party
   ThirdParty::initialize();
+
+  // Toonz environment
+  initToonzEnv(argumentPathValues);
 
   // prepare for 30bit display
   if (Preferences::instance()->is30bitDisplayEnabled()) {
