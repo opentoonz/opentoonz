@@ -263,10 +263,18 @@ QString tipc::applicationSpecificServerName(QString srvName) {
 bool tipc::startBackgroundProcess(QString cmdlineProgram,
                                   QStringList cmdlineArguments) {
 #ifdef _WIN32
+  if (s_processPtr) {
+    qWarning(
+        "tipc::startBackgroundProcess: A process is already running. "
+        "Terminating old one.");
+    tipc::terminateCurrentBackgroundProcess();
+  }
   QProcess *proc = new QProcess;
+  s_processPtr   = proc;
 
   proc->start(cmdlineProgram, cmdlineArguments);
   if (proc->state() == QProcess::NotRunning) {
+    s_processPtr = nullptr;
     delete proc;
     return false;
   }
@@ -281,7 +289,20 @@ bool tipc::startBackgroundProcess(QString cmdlineProgram,
   ;
 #endif
 }
+#ifdef _WIN32
+DVAPI void tipc::terminateCurrentBackgroundProcess() {
+  if (s_processPtr) {
+    QProcess *proc = s_processPtr.data();
 
+    if (proc->state() != QProcess::NotRunning) {
+      proc->terminate();
+      if (!proc->waitForFinished(1000)) {
+        proc->kill();
+      }
+    }
+  }
+}
+#endif
 //-------------------------------------------------------------
 
 /*!

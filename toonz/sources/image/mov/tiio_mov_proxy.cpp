@@ -50,7 +50,12 @@ bool IsQuickTimeInstalled() {
 
   stream << (msg << QString("$isQTInstalled"));
 
-  if (tipc::readMessage(stream, msg) != "yes") return false;
+  if (tipc::readMessage(stream, msg) != "yes") {
+#ifdef _WIN32
+    tipc::terminateCurrentBackgroundProcess();
+#endif  // _WIN32
+    return false;
+  }
   return true;
 #else
   return false;
