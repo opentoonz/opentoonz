@@ -8,6 +8,7 @@
 #include <QByteArray>
 #include <QLocalSocket>
 #include <QEventLoop>
+#include <QPointer>
 
 // STL includes
 #include <limits>
@@ -191,6 +192,10 @@ inline Message &reset(Message &msg) {
 namespace tipc {
 
 //---------------------- Connection-message utilities ----------------------
+#ifdef _WIN32
+static QPointer<QProcess> s_processPtr;
+DVAPI void terminateCurrentBackgroundProcess();
+#endif
 
 DVAPI bool startBackgroundProcess(QString cmdlineProgram,
                                   QStringList cmdlineArguments);

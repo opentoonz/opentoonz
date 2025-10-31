@@ -221,18 +221,6 @@ void initImageIo(bool lightVersion) {
       TFileType::declare("apng", TFileType::RASTER_LEVEL);
       Tiio::defineWriterProperties("apng", new Tiio::APngWriterProperties());
     }
-    if (!IsQuickTimeInstalled()) {
-      if (Ffmpeg::checkFormat("mov")) {
-        TLevelWriter::define("mov", TLevelWriterFFMov::create, true);
-        TLevelReader::define("mov", TLevelReaderFFMov::create);
-        TFileType::declare("mov", TFileType::RASTER_LEVEL);
-        Tiio::defineWriterProperties("mov", new Tiio::FFMovWriterProperties());
-      }
-      if (Ffmpeg::checkFormat("3gp")) {
-        TLevelReader::define("3gp", TLevelReaderFFmpeg::create);
-        TFileType::declare("3gp", TFileType::RASTER_LEVEL);
-      }
-    }
     TLevelReader::define("webp", TLevelReaderFFmpeg::create);
     TFileType::declare("webp", TFileType::RASTER_LEVEL);
     TLevelReader::define("ffvideo", TLevelReaderFFmpeg::create);
@@ -264,7 +252,20 @@ void initImageIo(bool lightVersion) {
       TFileType::declare("3gp", TFileType::RASTER_LEVEL);
       Tiio::defineWriterProperties("3gp", new Tiio::MovWriterProperties());
     }
-
+#if !defined(_WIN32) || defined(x64) || (defined(_WIN32) && defined(__GNUC__))
+    else if (ThirdParty::checkFFmpeg()) {
+      if (Ffmpeg::checkFormat("mov")) {
+        TLevelWriter::define("mov", TLevelWriterFFMov::create, true);
+        TLevelReader::define("mov", TLevelReaderFFMov::create);
+        TFileType::declare("mov", TFileType::RASTER_LEVEL);
+        Tiio::defineWriterProperties("mov", new Tiio::FFMovWriterProperties());
+      }
+      if (Ffmpeg::checkFormat("3gp")) {
+        TLevelReader::define("3gp", TLevelReaderFFmpeg::create);
+        TFileType::declare("3gp", TFileType::RASTER_LEVEL);
+      }
+    }
+#endif
     /*
 #if (defined(_WIN32) && !defined(x64))
 
