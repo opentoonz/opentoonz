@@ -383,6 +383,7 @@ void Preferences::definePreferenceItems() {
          (int)ProjectFolderOnly);
 
   setCallBack(undoMemorySize, &Preferences::setUndoMemorySize);
+  define(lazyLoadRooms, "lazyLoadRooms", QMetaType::Bool, true);
 
   // Interface
   define(CurrentStyleSheetName, "CurrentStyleSheetName", QMetaType::QString,

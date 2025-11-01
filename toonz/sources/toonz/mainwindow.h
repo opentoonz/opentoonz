@@ -10,8 +10,11 @@
 #include <map>
 #include <QAction>
 #include <QString>
+#include <QSettings>
 
 #include "../toonzqt/tdockwindows.h"
+
+#include <memory>
 
 class QStackedWidget;
 class TPanel;
@@ -25,12 +28,25 @@ class Room final : public TMainWindow {
 
   TFilePath m_path;
   QString m_name;
+  std::unique_ptr<QSettings> m_settings;
+
+  // For lazy loading
+  bool m_initialized;
 
 public:
   Room(QWidget *parent = 0, Qt::WindowFlags flags = Qt::WindowFlags())
-      : TMainWindow(parent, flags) {}
+      : TMainWindow(parent, flags)
+      , m_path()
+      , m_name()
+      , m_settings(nullptr)
+      , m_initialized(false) {}
 
   ~Room() {}
+
+  struct RoomLoadParams {
+    QString activeRoomName;
+    bool forceBuildGui = false;
+  };
 
   TFilePath getPath() const { return m_path; }
   void setPath(TFilePath path) { m_path = path; }
@@ -39,7 +55,14 @@ public:
   void setName(QString name) { m_name = name; }
 
   void save();
-  void load(const TFilePath &fp);
+  void load(const TFilePath &fp, RoomLoadParams &params);
+
+  bool notInitialized() const { return !m_initialized; }
+  void initialize() {
+    RoomLoadParams params;
+    params.forceBuildGui = true;
+    load(m_path, params);
+  }
 };
 
 //-----------------------------------------------------------------------------
@@ -190,7 +213,8 @@ private:
   QAction *createMiscAction(const char *id, const char *name,
                             const char *defaultShortcut);
   QAction *createToolOptionsAction(const char *id, const char *name,
-                                   const QString &defaultShortcut, const char *iconSVGName = "");
+                                   const QString &defaultShortcut,
+                                   const char *iconSVGName = "");
   QAction *createStopMotionAction(const char *id, const char *name,
                                   const QString &defaultShortcut,
                                   const char *iconSVGName = "");

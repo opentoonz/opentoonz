@@ -52,7 +52,7 @@ public:
 //-----------------------------------------------------------------------------
 
 TPaletteHandle::TPaletteHandle()
-    : m_palette(0), m_styleIndex(-1), m_styleParamIndex(-1) {
+    : m_palette(nullptr), m_styleIndex(-1), m_styleParamIndex(-1) {
   connectBroadcasts(this);
 }
 

@@ -59,6 +59,7 @@
 #ifdef _WIN32
 #include <QtPlatformHeaders/QWindowsWindowFunctions>
 #endif
+#include <docklayout.h>
 
 TEnv::IntVar ViewCameraToggleAction("ViewCameraToggleAction", 1);
 TEnv::IntVar ViewTableToggleAction("ViewTableToggleAction", 1);
@@ -241,8 +242,48 @@ int get_version_code_from(std::string ver) {
 //=============================================================================
 // Room
 //-----------------------------------------------------------------------------
+void copyQSettings(QSettings &source, QSettings &destination,
+                   bool commit = true) {
+  // 1. Get all keys in the current group
+  QStringList keys = source.allKeys();
+
+  // 2. Iterate and copy all simple key-value pairs
+  for (const QString &key : keys) {
+    destination.setValue(key, source.value(key));
+  }
+
+  // 3. Get all sub-groups
+  QStringList groups = source.childGroups();
+
+  // 4. Recursively process all groups (sections)
+  for (const QString &group : groups) {
+    // Move into the source group
+    source.beginGroup(group);
+    // Move into the destination group
+    destination.beginGroup(group);
+
+    // Recursively call the copy function for the subgroup
+    copyQSettings(source, destination, false);  // Don't sync yet
+
+    // Go back up for both
+    destination.endGroup();
+    source.endGroup();
+  }
+
+  // 5. Save the changes if commit is requested
+  if (commit) {
+    destination.sync();
+  }
+}
 
 void Room::save() {
+  if (!m_initialized && m_settings) {
+    QSettings *newSettings =
+        new QSettings(getPath().getQString(), QSettings::Format::IniFormat);
+    copyQSettings(*m_settings, *newSettings, true);
+    m_settings.reset(newSettings);
+    return;
+  }
   DockLayout *layout = dockLayout();
 
   // Now save layout state
@@ -282,16 +323,26 @@ void Room::save() {
 }
 
 //-----------------------------------------------------------------------------
-
-void Room::load(const TFilePath &fp) {
-  QSettings settings(toQString(fp), QSettings::IniFormat);
+void Room::load(const TFilePath &fp, RoomLoadParams &params) {
+  if (!m_initialized || !m_settings) {
+    m_settings.reset(new QSettings(toQString(fp), QSettings::IniFormat));
+  }
 
   setPath(fp);
-
   DockLayout *layout = dockLayout();
 
-  settings.beginGroup("room");
-  QStringList itemsList = settings.childGroups();
+  m_settings->beginGroup("room");
+  QStringList itemsList = m_settings->childGroups();
+
+  QString roomName = m_settings->value("name").toString();
+  setName(roomName);
+
+  if (params.activeRoomName.isEmpty()) params.activeRoomName = roomName;
+
+  if (!params.forceBuildGui && params.activeRoomName != roomName) {
+    m_settings->endGroup();
+    return;
+  }
 
   std::vector<QRect> geometries;
   unsigned int i;
@@ -300,13 +351,13 @@ void Room::load(const TFilePath &fp) {
     // NOTE: Panels have to be retrieved in the precise order they were saved.
     // settings.beginGroup(itemsList[i]);  //NO! itemsList has lexicographical
     // ordering!!
-    settings.beginGroup("pane_" + QString::number(i));
+    m_settings->beginGroup("pane_" + QString::number(i));
 
     TPanel *pane = 0;
     QString paneObjectName;
 
     // Retrieve panel name
-    QVariant name = settings.value("name");
+    QVariant name = m_settings->value("name");
     if (name.canConvert(QVariant::String)) {
       // Allocate panel
       paneObjectName          = name.toString();
@@ -314,7 +365,7 @@ void Room::load(const TFilePath &fp) {
       pane = TPanelFactory::createPanel(this, paneObjectName);
       if (SaveLoadQSettings *persistent =
               dynamic_cast<SaveLoadQSettings *>(pane->widget()))
-        persistent->load(settings);
+        persistent->load(*m_settings);
     }
 
     if (!pane) {
@@ -335,29 +386,30 @@ void Room::load(const TFilePath &fp) {
     addDockWidget(pane);
 
     // Store its geometry
-    geometries.push_back(settings.value("geometry").toRect());
+    geometries.push_back(m_settings->value("geometry").toRect());
 
     // Restore view type if present
-    if (settings.contains("viewtype"))
-      pane->setViewType(settings.value("viewtype").toInt());
+    if (m_settings->contains("viewtype"))
+      pane->setViewType(m_settings->value("viewtype").toInt());
 
     // Restore flipbook pool indices
     if (paneObjectName == "FlipBook") {
-      int index = settings.value("index").toInt();
+      int index = m_settings->value("index").toInt();
       dynamic_cast<FlipBook *>(pane->widget())->setPoolIndex(index);
     }
 
-    settings.endGroup();
+    m_settings->endGroup();
   }
 
   // resolve resize events here to avoid unwanted minimize of floating viewer
   qApp->processEvents();
 
-  DockLayout::State state(geometries, settings.value("hierarchy").toString());
+  DockLayout::State state(geometries,
+                          m_settings->value("hierarchy").toString());
 
   layout->restoreState(state);
 
-  setName(settings.value("name").toString());
+  m_initialized = true;
 }
 
 //=============================================================================
@@ -416,8 +468,12 @@ centralWidget->setLayout(centralWidgetLayout);*/
   QTabBar *roomTabWidget = m_topBar->getRoomTabWidget();
   connect(m_stackedWidget, SIGNAL(currentChanged(int)),
           SLOT(onCurrentRoomChanged(int)));
-  connect(roomTabWidget, SIGNAL(currentChanged(int)), m_stackedWidget,
-          SLOT(setCurrentIndex(int)));
+
+  QObject::connect(roomTabWidget, &QTabBar::currentChanged, [this](int index) {
+    Room *dstRoom = getRoom(index);
+    if (dstRoom->notInitialized()) dstRoom->initialize();
+    this->m_stackedWidget->setCurrentIndex(index);
+  });
 
   /*-- タイトルバーにScene名を表示する --*/
   connect(TApp::instance()->getCurrentScene(), SIGNAL(nameSceneChanged()), this,
@@ -579,12 +635,22 @@ void MainWindow::readSettings(const QString &argumentLayoutFileName) {
     }
   }
 
-  int i;
-  for (i = 0; i < (int)roomPaths.size(); i++) {
+  // Get Current Room
+  TFilePath fp = ToonzFolder::getRoomsFile(currentRoomFileName);
+  Tifstream is(fp);
+  std::string name;
+  is >> name;
+
+  QString currentRoomName = QString::fromUtf8(name.c_str());
+  Room::RoomLoadParams params;
+  params.activeRoomName = currentRoomName;
+  params.forceBuildGui = !Preferences::instance()->isLazyLoadRoomsEnabled();
+
+  for (int i = 0; i < (int)roomPaths.size(); i++) {
     TFilePath roomPath = roomPaths[i];
     if (TFileStatus(roomPath).doesExist()) {
       Room *room = new Room(this);
-      room->load(roomPath);
+      room->load(roomPath, params);
       m_stackedWidget->addWidget(room);
       roomTabWidget->addTab(room->getName());
 
@@ -649,16 +715,12 @@ void MainWindow::readSettings(const QString &argumentLayoutFileName) {
   makePrivate(rooms);
   writeRoomList(rooms);
 
-  // Imposto la stanza corrente
-  TFilePath fp = ToonzFolder::getRoomsFile(currentRoomFileName);
-  Tifstream is(fp);
-  std::string currentRoomName;
-  is >> currentRoomName;
+  // Set Current Room
   if (currentRoomName != "") {
     int count = m_stackedWidget->count();
     int index;
     for (index = 0; index < count; index++)
-      if (getRoom(index)->getName().toStdString() == currentRoomName) break;
+      if (getRoom(index)->getName() == currentRoomName) break;
     if (index < count) {
       m_oldRoomIndex = index;
       roomTabWidget->setCurrentIndex(index);
@@ -1148,8 +1210,9 @@ void MainWindow::seeThroughWindow() {
 //-----------------------------------------------------------------------------
 
 void MainWindow::onCurrentRoomChanged(int newRoomIndex) {
-  Room *oldRoom            = getRoom(m_oldRoomIndex);
-  Room *newRoom            = getRoom(newRoomIndex);
+  Room *oldRoom = getRoom(m_oldRoomIndex);
+  Room *newRoom = getRoom(newRoomIndex);
+
   QList<TPanel *> paneList = oldRoom->findChildren<TPanel *>();
 
   // Change the parent of all the floating dockWidgets
@@ -2988,8 +3051,8 @@ void MainWindow::defineActions() {
       VB_FlipX, QT_TR_NOOP("Flip Viewer Horizontally"), "fliphoriz");
   createVisualizationButtonAction(
       VB_FlipY, QT_TR_NOOP("Flip Viewer Vertically"), "flipvert");
-  createVisualizationButtonAction(
-      VB_RotateLeft, QT_TR_NOOP("Rotate View Left"), "rotateleft");
+  createVisualizationButtonAction(VB_RotateLeft, QT_TR_NOOP("Rotate View Left"),
+                                  "rotateleft");
   createVisualizationButtonAction(
       VB_RotateRight, QT_TR_NOOP("Rotate View Right"), "rotateright");
 
