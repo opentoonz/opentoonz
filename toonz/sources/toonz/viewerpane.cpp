@@ -220,7 +220,7 @@ void BaseViewerPanel::addShowHideContextMenu(QMenu *menu) {
   showHideMenu->addAction(CommandManager::instance()->getAction(MI_ViewCamera));
   showHideMenu->addAction(CommandManager::instance()->getAction(MI_ViewTable));
   showHideMenu->addAction(CommandManager::instance()->getAction(MI_FieldGuide));
-  showHideMenu->addAction(CommandManager::instance()->getAction(MI_SafeArea));
+  showHideMenu->addAction(CommandManager::instance()->getAction(MI_Frames));
   showHideMenu->addAction(CommandManager::instance()->getAction(MI_ViewBBox));
   showHideMenu->addAction(
       CommandManager::instance()->getAction(MI_ViewColorcard));
@@ -382,19 +382,19 @@ void BaseViewerPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
   TPanelTitleBarButton *button;
 
   // buttons for show / hide toggle for the field guide and the safe area
-  TPanelTitleBarButtonForSafeArea *safeAreaButton =
-      new TPanelTitleBarButtonForSafeArea(titleBar, "safearea");
-  safeAreaButton->setToolTip(tr("Safe Area (Right Click to Select)"));
+  TPanelTitleBarButtonForFrames *safeAreaButton =
+      new TPanelTitleBarButtonForFrames(titleBar, "frames");
+  safeAreaButton->setToolTip(tr("Frames (Right Click to Select)"));
   titleBar->add(QPoint(x, 0), safeAreaButton);
   ret = ret && connect(safeAreaButton, SIGNAL(toggled(bool)),
-                       CommandManager::instance()->getAction(MI_SafeArea),
+                       CommandManager::instance()->getAction(MI_Frames),
                        SLOT(trigger()));
-  ret = ret && connect(CommandManager::instance()->getAction(MI_SafeArea),
+  ret = ret && connect(CommandManager::instance()->getAction(MI_Frames),
                        SIGNAL(triggered(bool)), safeAreaButton,
                        SLOT(setPressed(bool)));
   // initialize state
   safeAreaButton->setPressed(
-      CommandManager::instance()->getAction(MI_SafeArea)->isChecked());
+      CommandManager::instance()->getAction(MI_Frames)->isChecked());
 
   button = new TPanelTitleBarButton(titleBar, "fieldguide");
   button->setToolTip(tr("Field Guide"));

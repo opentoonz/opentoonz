@@ -1,5 +1,3 @@
-
-
 #include "viewerdraw.h"
 #include "tapp.h"
 #include "toonz/txsheethandle.h"
@@ -30,53 +28,105 @@
 #include "tsystem.h"
 #include "tfilepath_io.h"
 #include "tstream.h"
+#include "tfiletype.h"
+#include "toonz/txshsimplelevel.h"
+#include "toonz/stagevisitor.h"
+#include "toonz/imagepainter.h"
+#include "tgeometry.h"
 
 #include "subcameramanager.h"
 
 #include <QSettings>
-
-TEnv::StringVar EnvSafeAreaName("SafeAreaName", "PR_safe");
-
-/* TODO, move to include */
-void getSafeAreaSizeList(QList<QList<double>> &_sizeList);
+#include <QList>
+#include "timage.h"
 
 //=============================================================================
 //=============================================================================
-// SafeAreaData
+// FramesPresetData
 //-----------------------------------------------------------------------------
 
-void getSafeAreaSizeList(QList<QList<double>> &_sizeList) {
+ViewerDraw::FramesPreset ViewerDraw::previewFramesPreset;
+
+void ViewerDraw::getFramesPreset(QList<QList<double>> &_sizeList,
+                                 TXshSimpleLevel **_slP, TPointD *_offsetP) {
   static QList<QList<double>> sizeList;
 
-  static TFilePath projectPath;
-  static QString safeAreaName;
+  static TFilePath iniPath;
+  static QString framesName;
+  static std::unique_ptr<TXshSimpleLevel> sl = nullptr;
+  static ToonzScene *oldScene                = nullptr;
+  static TPointD offset                      = TPointD();
 
-  TFilePath fp                = TEnv::getConfigDir();
-  QString currentSafeAreaName = QString::fromStdString(EnvSafeAreaName);
+  ToonzScene *currentScene = TApp::instance()->getCurrentScene()->getScene();
 
-  if (fp != projectPath || currentSafeAreaName != safeAreaName) {
+  if (!previewFramesPreset.m_name.isEmpty()) {
+    static QString framesName;
+    static QList<QList<double>> sizeList;
+    static std::unique_ptr<TXshSimpleLevel> sl = nullptr;
+    static TPointD offset                      = TPointD();
+    if (previewFramesPreset.m_name != framesName || currentScene != oldScene) {
+      framesName = previewFramesPreset.m_name;
+      sizeList.clear();
+      for (const FramesDef &def : previewFramesPreset.m_areas) {
+        QList<double> doubleList;
+        for (const QVariant &var : def.toVariantList())
+          doubleList.append(var.toDouble());
+        sizeList.append(doubleList);
+      }
+      offset                   = TPointD(previewFramesPreset.m_layoutOffsetX,
+                                         previewFramesPreset.m_layoutOffsetY);
+      oldScene                 = currentScene;
+      TXshSimpleLevel *pointer = nullptr;
+      if (!previewFramesPreset.m_layoutPath.isEmpty()) {
+        TFilePath imgPath    = TFilePath(previewFramesPreset.m_layoutPath);
+        TFileType::Type type = TFileType::getInfo(imgPath);
+        if (type & TFileType::Type::VIEWABLE) {
+          pointer = new TXshSimpleLevel(L"layout");
+          pointer->setType(type);
+          pointer->setScene(currentScene);
+          pointer->setPath(imgPath);
+          pointer->load();
+          pointer->setIsReadOnly(true);
+          if (!pointer->getFrameCount()) {
+            delete pointer;
+            pointer = nullptr;
+          }
+        }
+      }
+
+      sl.reset(pointer);
+    }
+
+    _sizeList = sizeList;
+    *_slP     = sl.get();
+    *_offsetP = offset;
+
+    return;
+  }
+
+  TFilePath fp = ViewerDraw::getFramesIniPath();
+  QString currentFramesPresetName =
+      currentScene->getProperties()->getFramesPresetName();
+  if (currentFramesPresetName != framesName || currentScene != oldScene ||
+      fp != iniPath) {
     sizeList.clear();
 
-    projectPath  = fp;
-    safeAreaName = currentSafeAreaName;
-
-    std::string safeAreaFileName = "safearea.ini";
-
-    while (!TFileStatus(fp + safeAreaFileName).doesExist() && !fp.isRoot() &&
-           fp.getParentDir() != TFilePath())
-      fp = fp.getParentDir();
-
-    fp = fp + safeAreaFileName;
+    iniPath    = fp;
+    framesName = currentFramesPresetName;
+    oldScene   = currentScene;
+    sl.reset();
 
     if (TFileStatus(fp).doesExist()) {
       QSettings settings(toQString(fp), QSettings::IniFormat);
 
-      // find the current safearea name from the list
+      // find the current FramesPreset name from the list
       QStringList groups = settings.childGroups();
-      for (int g = 0; g < groups.size(); g++) {
-        settings.beginGroup(groups.at(g));
+      for (const QString &group : groups) {
+        if (!group.startsWith("Frames") && !group.startsWith("FramesPreset"))
+          continue;
+        settings.beginGroup(group);
         // If found, get the safe area setting values
-        if (safeAreaName == settings.value("name", "").toString()) {
+        if (framesName == settings.value("name", "").toString()) {
           // enter area group
           settings.beginGroup("area");
 
@@ -92,23 +142,64 @@ void getSafeAreaSizeList(QList<QList<double>> &_sizeList) {
 
           // close area group
           settings.endGroup();
+          if (_slP) {
+            QString fileValue        = settings.value("layout", "").toString();
+            TXshSimpleLevel *pointer = nullptr;
+            offset                   = TPointD();
+            if (!fileValue.isEmpty()) {
+              TFilePath imgPath    = TFilePath(fileValue);
+              TFileType::Type type = TFileType::getInfo(imgPath);
+              if (type & TFileType::Type::VIEWABLE) {
+                pointer = new TXshSimpleLevel(L"layout");
+                pointer->setType(type);
+                pointer->setScene(currentScene);
+                pointer->setPath(imgPath);
+                pointer->load();
+                pointer->setIsReadOnly(true);
+                if (!pointer->getFrameCount()) {
+                  delete pointer;
+                  pointer = nullptr;
+                }
+              }
+            }
 
-          settings.endGroup();
+            if (pointer) {
+              QList<QVariant> offsetValues =
+                  settings.value("layoutOffset", "").toList();
+              if (offsetValues.size() >= 2) {
+                offset.x = offsetValues[0].toDouble();
+                offset.y = offsetValues[1].toDouble();
+              }
+              sl.reset(pointer);
+            }
+          }
+
+          settings.endGroup();  // close FramesPreset group
           break;
         }
-        settings.endGroup();
-      }
-      // If not found, then put some temporal values..
-      if (sizeList.isEmpty()) {
-        QList<double> tmpList0, tmpList1;
-        tmpList0 << 80.0 << 80.0;
-        tmpList1 << 90.0 << 90.0;
-        sizeList << tmpList0 << tmpList1;
+
+        settings.endGroup();  // close FramesPreset group (only once per loop)
       }
     }
   }
 
   _sizeList = sizeList;
+  *_slP     = sl.get();
+  *_offsetP = offset;
+
+  if (sizeList.isEmpty() && !sl) {
+    // [0]: Width (80.0%)
+    // [1]: Height (80.0%)
+    // [2]: R (255)
+    // [3]: G (0)
+    // [4]: B (0)
+    QList<double> defaultSize1;
+    defaultSize1 << 80.0 << 80.0;
+    QList<double> defaultSize2;
+    defaultSize2 << 90.0 << 90.0;
+    sizeList.append(defaultSize1);
+    sizeList.append(defaultSize2);
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -186,7 +277,7 @@ void getCameraSection(T3DPointD points[4], int row, double z)
 
 //-----------------------------------------------------------------------------
 /*! when camera view mode, draw the mask plane outside of the camera box
-*/
+ */
 void ViewerDraw::drawCameraMask(SceneViewer *viewer) {
   TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
 
@@ -258,8 +349,8 @@ void ViewerDraw::drawCameraMask(SceneViewer *viewer) {
 
 void ViewerDraw::drawGridAndGuides(SceneViewer *viewer, double sc, Ruler *vr,
                                    Ruler *hr, bool gridEnabled) {
-  int vGuideCount     = 0;
-  int hGuideCount     = 0;
+  int vGuideCount = 0;
+  int hGuideCount = 0;
   if (vr) vGuideCount = vr->getGuideCount();
   if (hr) hGuideCount = hr->getGuideCount();
 
@@ -374,8 +465,8 @@ void ViewerDraw::drawColorcard(UCHAR channel) {
                      ? TPixel::Black
                      : scene->getProperties()->getBgColor();
   if (channel == 0)
-    color.m = 255;  // fondamentale: senno' non si vedono i fill con le texture
-                    // in camera stand!
+    color.m = 255;  // fondamentale: senno' non si vedono i fill con le
+                    // texture in camera stand!
   else {
     if (channel == TRop::MChan) {
       switch (channel) {
@@ -408,7 +499,7 @@ void ViewerDraw::drawColorcard(UCHAR channel) {
 
 void ViewerDraw::draw3DCamera(unsigned long flags, double zmin, double phi) {
   bool cameraRef = 0 != (flags & ViewerDraw::CAMERA_REFERENCE);
-  bool safeArea  = 0 != (flags & ViewerDraw::SAFE_AREA);
+  bool frames    = 0 != (flags & ViewerDraw::SAFE_AREA);
 
   TApp *app               = TApp::instance();
   int frame               = app->getCurrentFrame()->getFrame();
@@ -423,7 +514,7 @@ void ViewerDraw::draw3DCamera(unsigned long flags, double zmin, double phi) {
 
   TPointD cameraCorners[4] = {camAff * rect.getP00(), camAff * rect.getP10(),
                               camAff * rect.getP11(), camAff * rect.getP01()};
-  TPointD cameraCenter = 0.5 * (cameraCorners[0] + cameraCorners[2]);
+  TPointD cameraCenter     = 0.5 * (cameraCorners[0] + cameraCorners[2]);
 
   T3DPointD cage[4][4];
   std::vector<double> cageZ;
@@ -458,8 +549,8 @@ void ViewerDraw::draw3DCamera(unsigned long flags, double zmin, double phi) {
   }
   glEnable(GL_LINE_STIPPLE);
 
-  double yBigBox       = -Stage::bigBoxSize[1];
-  double xBigBox       = Stage::bigBoxSize[0];
+  double yBigBox = -Stage::bigBoxSize[1];
+  double xBigBox = Stage::bigBoxSize[0];
   if (phi < 0) xBigBox = -xBigBox;
 
   for (int i = 0; i < m; i++) {
@@ -539,16 +630,98 @@ TRectD ViewerDraw::getCameraRect() {
         ->getStageRect();
 }
 
+namespace {
+TPointD getCameraDpi() {
+  if (CleanupPreviewCheck::instance()->isEnabled() ||
+      CameraTestCheck::instance()->isEnabled())
+    return TApp::instance()
+        ->getCurrentScene()
+        ->getScene()
+        ->getProperties()
+        ->getCleanupParameters()
+        ->m_camera.getDpi();
+  else
+    return TApp::instance()
+        ->getCurrentScene()
+        ->getScene()
+        ->getCurrentCamera()
+        ->getDpi();
+}
+
+TDimension getCemeraRes() {
+  if (CleanupPreviewCheck::instance()->isEnabled() ||
+      CameraTestCheck::instance()->isEnabled())
+    return TApp::instance()
+        ->getCurrentScene()
+        ->getScene()
+        ->getProperties()
+        ->getCleanupParameters()
+        ->m_camera.getRes();
+  else
+    return TApp::instance()
+        ->getCurrentScene()
+        ->getScene()
+        ->getCurrentCamera()
+        ->getRes();
+}
+}  // namespace
+
 //-----------------------------------------------------------------------------
 
-void ViewerDraw::drawSafeArea() {
-  TRectD rect = getCameraRect();
+void ViewerDraw::drawFrames(SceneViewer *viewer, bool levelEditing) {
+  TXshSimpleLevel *sl = nullptr;
+  QList<QList<double>> sizeList;
+  TPointD offset;
+  getFramesPreset(sizeList, &sl, &offset);
+
+  if (sl) {
+    ImagePainter::VisualSettings vs = viewer->visualSettings();
+
+    TDimension viewerSize(viewer->width(), viewer->height());
+
+    TRect clipRect(0, 0, viewer->width(), viewer->height());
+    int currentFrame = TApp::instance()->getCurrentFrame()->getFrame();
+    TPointD camDpi   = getCameraDpi();
+
+    TAffine cameraAff =
+        levelEditing
+            ? TAffine()
+            : TApp::instance()->getCurrentXsheet()->getXsheet()->getCameraAff(
+                  currentFrame);
+
+    TAffine offsetAff = TTranslation(offset.x / camDpi.x * Stage::inch,
+                                     offset.y / camDpi.y * Stage::inch);
+    TAffine viewerAff = viewer->getViewMatrix();
+
+    TAffine finalAff = viewerAff * cameraAff * offsetAff;
+
+    Stage::RasterPainter painter(viewerSize, finalAff, clipRect, vs, false);
+
+    Stage::Player player;
+    player.m_sl  = sl;
+    player.m_fid = sl->getFirstFid();
+
+    player.m_dpiAff = TScale(Stage::inch / camDpi.x, Stage::inch / camDpi.y);
+
+    painter.onImage(player);
+    painter.flushRasterImages();
+  }
+
+  if (sizeList.isEmpty()) return;
+
+  TRectD rect           = getCameraRect();
+  bool glMatrixModified = false;
+
+  if (levelEditing) {
+    glPushMatrix();
+    TAffine aff = viewer->getViewMatrix();
+    tglMultMatrix(aff);
+    glMatrixModified = true;
+  }
+
   glColor3d(1.0, 0.0, 0.0);
   glLineStipple(1, 0xCCCC);
   glEnable(GL_LINE_STIPPLE);
-
-  QList<QList<double>> sizeList;
-  getSafeAreaSizeList(sizeList);
 
   double ux = 0.5 * rect.getLx();
   double uy = 0.5 * rect.getLy();
@@ -568,6 +741,8 @@ void ViewerDraw::drawSafeArea() {
   }
 
   glDisable(GL_LINE_STIPPLE);
+
+  if (glMatrixModified) glPopMatrix();
 }
 
 //-----------------------------------------------------------------------------
@@ -700,11 +875,11 @@ void ViewerDraw::drawFieldGuide() {
   TSceneProperties *sprop =
       TApp::instance()->getCurrentScene()->getScene()->getProperties();
 
-  int n        = sprop->getFieldGuideSize();
+  int n = sprop->getFieldGuideSize();
   if (n < 4) n = 4;
-  double ar    = sprop->getFieldGuideAspectRatio();
-  double lx    = 0.5 * n / f * Stage::inch;  // 320;
-  double ly    = lx / ar;
+  double ar = sprop->getFieldGuideAspectRatio();
+  double lx = 0.5 * n / f * Stage::inch;  // 320;
+  double ly = lx / ar;
   glPushMatrix();
   glScaled(f, f, 1);
   double ux = lx / n;
