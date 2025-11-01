@@ -110,6 +110,7 @@ public:
   int exploreTwoSpots(const TAutocloser::Segment &s0,
                       const TAutocloser::Segment &s1);
   int notInsidePath(const TPoint &p, const TPoint &q);
+  bool hasInkBetween(const TPoint &p1, const TPoint &p2);
   void drawInByteRaster(const TPoint &p0, const TPoint &p1);
   TPoint visitEndpoint(UCHAR *br);
   bool exploreSpot(const Segment &s, TPoint &p);
@@ -203,80 +204,68 @@ TRasterGR8P fillByteRaster(const TRasterCM32P &r, TRasterGR8P &bRaster) {
   if (buf->getTone() == buf->getMaxTone())                                     \
     *buf = TPixelCM32(inkIndex, buf->getPaint(), 255 - opacity);
 
-const bool isSmallEnclosedRegion(const TRasterCM32P &ras, int x, int y,
-                                 int maxSize) {
-  if (!ras || x < 0 || y < 0 || x >= ras->getLx() || y >= ras->getLy())
-    return false;
+unsigned char buildPaintnInkNeighborPattern(int x, int y, TRasterCM32P r,
+                                            int centerPaint) {
+  const int dx[8] = {-1, 0, 1, 1, 1, 0, -1, -1};
+  const int dy[8] = {-1, -1, -1, 0, 1, 1, 1, 0};
 
-  TPixelCM32 *startRow = ras->pixels(y);
-  if (!startRow[x].isPurePaint()) return false;
+  unsigned char pattern = 0;
+  // qDebug() << "Initial pattern:" << (int)pattern;
 
-  int paint = startRow[x].getPaint();
+  for (int i = 0; i < 8; ++i) {
+    int nx = x + dx[i];
+    int ny = y + dy[i];
 
-  static std::queue<TPoint> queue;
-  static std::unordered_set<int> visited;
-
-  queue = std::queue<TPoint>();
-  visited.clear();
-  visited.reserve(maxSize + 1);
-  visited.insert(y * ras->getLx() + x);
-  queue.push(TPoint(x, y));
-
-  while (!queue.empty() && visited.size() <= maxSize) {
-    TPoint p = queue.front();
-    queue.pop();
-
-    const int directions[4][2] = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
-
-    for (int i = 0; i < 4; i++) {
-      int nx = p.x + directions[i][0];
-      int ny = p.y + directions[i][1];
-
-      if (nx < 0 || ny < 0 || nx >= ras->getLx() || ny >= ras->getLy()) {
-        return false;
+    if (nx >= 0 && nx < r->getLx() && ny >= 0 && ny < r->getLy()) {
+      TPixelCM32 *neighborPix = r->pixels(ny) + nx;
+      int tone                = neighborPix->getTone();
+      int paint               = neighborPix->getPaint();
+      bool isLine = tone != TPixelCM32::getMaxTone() || paint != centerPaint;
+      /*qDebug() << QString("NO.%6: (%1,%2):%3,%4 %5")
+                      .arg(nx)
+                      .arg(ny)
+                      .arg(tone)
+                      .arg(paint)
+                      .arg(isLine ? 1 : 0)
+                      .arg(i);*/
+      if (isLine) {
+        pattern |= (1 << 7 - i);
       }
-
-      int key = ny * ras->getLx() + nx;
-      if (visited.find(key) != visited.end()) continue;
-
-      TPixelCM32 *row = ras->pixels(ny);
-      if (row[nx].getPaint() == paint && row[nx].isPurePaint()) {
-        visited.insert(key);
-        queue.push(TPoint(nx, ny));
-        if (visited.size() > maxSize) return false;
-      }
-    }
+      // qDebug() << "Pattern:"
+      //          << QString::number(pattern, 2).rightJustified(8, '0');
+    } else
+      pattern |= (1 << 7 - i);
   }
-
-  return visited.size() <= maxSize;
+  // qDebug() << "Final pattern: decimal =" << (int)pattern << "| binary = 0b"
+  //          << QString::number(pattern, 2).rightJustified(8, '0');
+  return pattern;
 }
 
-bool doSegmentsIntersect(int x1, int y1, int x2, int y2, int x3, int y3, int x4,
-                         int y4) {
-  auto cross = [](int x1, int y1, int x2, int y2) -> int {
-    return x1 * y2 - y1 * x2;
-  };
-
-  int dx1 = x2 - x1;
-  int dy1 = y2 - y1;
-  int dx2 = x4 - x3;
-  int dy2 = y4 - y3;
-
-  int d1 = cross(dx2, dy2, x1 - x3, y1 - y3);
-  int d2 = cross(dx2, dy2, x2 - x3, y2 - y3);
-  int d3 = cross(dx1, dy1, x3 - x1, y3 - y1);
-  int d4 = cross(dx1, dy1, x4 - x1, y4 - y1);
-
-  if (d1 == 0 || d2 == 0 || d3 == 0 || d4 == 0) return false;
-
-  return (d1 * d2 < 0) && (d3 * d4 < 0);
-}
-
-// For Paint defined Region
+// 8-neighbor connection lookup table for surrounding 8 pixels
+const unsigned char connectivity_lut[256] = {
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1,  // 0
+    1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1,  // 16
+    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  // 32
+    1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1,  // 48
+    1, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1,  // 64
+    1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1,  // 80
+    1, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1,  // 96
+    1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1,  // 112
+    1, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1,  // 128
+    0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1,  // 144
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  // 160
+    0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1,  // 176
+    1, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1,  // 192
+    1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1,  // 208
+    1, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1,  // 224
+    1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1,  // 240
+};
+// For Paint&Ink defined Region
 void closeSegment(const TRasterCM32P &r, const TAutocloser::Segment &s,
                   const USHORT ink, const USHORT opacity) {
   int x1 = s.first.x, y1 = s.first.y;
   int x2 = s.second.x, y2 = s.second.y;
+  typedef std::vector<std::pair<int, int>> Points;
 
   if (x1 > x2) {
     std::swap(x1, x2);
@@ -315,122 +304,19 @@ void closeSegment(const TRasterCM32P &r, const TAutocloser::Segment &s,
 
   int x = x1;
   int y = y1;
-  std::vector<TPoint> points;
-  int lastX = x, lastY = y;
+  Points paintedPoints;
+  int crossLineTimes = 0;
+  TPixelCM32 *pix    = r->pixels(y) + x;
   while (true) {
-    TPixelCM32 *pix = r->pixels(y) + x;
     // Only check side pixels if current line pixel is purePaint
+    pix = r->pixels(y) + x;
     if (pix->isPurePaint()) {
       pix->setInk(ink);
       pix->setTone(255 - opacity);
-      bool shouldKeep = true;
-      int linePaint   = pix->getPaint();
-
-      int sx1        = x + nx;
-      int sy1        = y + ny;
-      int side1Paint = -1;
-      int side1Tone  = -1;
-      if (sx1 >= 0 && sx1 < r->getLx() && sy1 >= 0 && sy1 < r->getLy()) {
-        side1Paint = r->pixels(sy1)[sx1].getPaint();
-        side1Tone  = r->pixels(sy1)[sx1].getTone();
-      }
-
-      int sx2        = x - nx;
-      int sy2        = y - ny;
-      int side2Paint = -1;
-      int side2Tone  = -1;
-      if (sx2 >= 0 && sx2 < r->getLx() && sy2 >= 0 && sy2 < r->getLy()) {
-        side2Tone  = r->pixels(sy2)[sx2].getTone();
-        side2Paint = r->pixels(sy2)[sx2].getPaint();
-      }
-      bool connected = false;
-      if (side1Tone == side2Tone && side1Tone == TPixelCM32::getMaxTone() &&
-          side1Paint == side2Paint && linePaint == side1Paint) {
-        // Check if Direct Connected
-        connected = true;
-      } else if (side1Tone != side2Tone &&
-                 (side1Tone == TPixelCM32::getMaxTone() ||
-                  side2Tone == TPixelCM32::getMaxTone())) {
-        // Check if Cornor Connected
-        int side3Tone  = -1;
-        int side4Tone  = -1;
-        int side3Paint = -1;
-        int side4Paint = -1;
-
-        int sx3 = x + ny;
-        int sy3 = y + nx;
-        if (sx3 >= 0 && sx3 < r->getLx() && sy3 >= 0 && sy3 < r->getLy()) {
-          side3Tone  = r->pixels(sy3)[sx3].getTone();
-          side3Paint = r->pixels(sy3)[sx3].getPaint();
-        }
-
-        int sx4 = x - ny;
-        int sy4 = y - nx;
-        if (sx4 >= 0 && sx4 < r->getLx() && sy4 >= 0 && sy4 < r->getLy()) {
-          side4Tone  = r->pixels(sy4)[sx4].getTone();
-          side4Paint = r->pixels(sy4)[sx4].getPaint();
-        }
-
-        const int MAX_TONE = TPixelCM32::getMaxTone();
-
-        int nextX = x, nextY = y;
-        int nextErr = err;
-        int next_e2 = 2 * nextErr;
-
-        bool moveX = (next_e2 > -abs_dy);
-        bool moveY = (next_e2 < abs_dx);
-
-        if (moveX) {
-          nextErr -= abs_dy;
-          nextX += sx;
-        }
-        if (moveY) {
-          nextErr += abs_dx;
-          nextY += sy;
-        }
-
-        if (side1Tone > side2Tone) {
-          bool intersect3 = doSegmentsIntersect(lastX, lastY, nextX, nextY, sx1,
-                                                sy1, sx3, sy3);
-
-          connected |= (side1Paint == linePaint && side3Tone == MAX_TONE &&
-                        side3Paint == linePaint && intersect3);
-
-          bool intersect4 = doSegmentsIntersect(lastX, lastY, nextX, nextY, sx1,
-                                                sy1, sx4, sy4);
-          connected |= (side1Paint == linePaint && side4Tone == MAX_TONE &&
-                        side4Paint == linePaint && intersect4);
-        } else {
-          bool intersect3 = doSegmentsIntersect(lastX, lastY, nextX, nextY, sx2,
-                                                sy2, sx3, sy3);
-          connected |= (side2Paint == linePaint && side3Tone == MAX_TONE &&
-                        side3Paint == linePaint && intersect3);
-
-          bool intersect4 = doSegmentsIntersect(lastX, lastY, nextX, nextY, sx2,
-                                                sy2, sx4, sy4);
-          connected |= (side2Paint == linePaint && side4Tone == MAX_TONE &&
-                        side4Paint == linePaint && intersect4);
-        }
-      }
-      if (connected) {
-        bool side1Small = isSmallEnclosedRegion(r, sx1, sy1, 4);
-        bool side2Small = isSmallEnclosedRegion(r, sx2, sy2, 4);
-        if (side1Small || side2Small) {
-          pix->setTone(TPixelCM32::getMaxTone());
-          pix->setInk(0);
-          shouldKeep = false;
-        }
-      } else if (!((x == x1 && y == y1) || (x == x2 && y == y2))) {
-        pix->setTone(TPixelCM32::getMaxTone());
-        pix->setInk(0);
-        shouldKeep = false;
-      }
-      if (shouldKeep) points.push_back(TPoint(x, y));
+      paintedPoints.push_back({x, y});
     }
 
     if (x == x2 && y == y2) break;
-    lastX  = x;
-    lastY  = y;
     int e2 = 2 * err;
     if (e2 > -abs_dy) {
       err -= abs_dy;
@@ -442,37 +328,45 @@ void closeSegment(const TRasterCM32P &r, const TAutocloser::Segment &s,
     }
   }
 
-  // Clear lonely pixels (Intersection Point)
-  // Mostly an endpoint of one gap
-  // It's also one point on the other gap close line
-  if (points.size() == 1 && points.front() != s.first &&
-      points.front() != s.second)
-    return;
-  for (auto [x, y] : points) {
+  Points toRemovePoints;
+  Points restPoints;
+
+  for (auto &[x, y] : paintedPoints) {
     TPixelCM32 *pix = r->pixels(y) + x;
-    bool lonely     = true;
-    int paint       = r->pixels(y)[x].getPaint();
-    const int dx[8] = {-1, 0, 1, -1, 1, -1, 0, 1};
-    const int dy[8] = {-1, -1, -1, 0, 0, 1, 1, 1};
+    if (pix->getInk() != ink) continue;
+    int linePaint = pix->getPaint();
 
-    for (int i = 0; i < 8; ++i) {
-      int nx          = x + dx[i];
-      int ny          = y + dy[i];
-      TPixelCM32 *pix = r->pixels(ny) + nx;
-      if (nx >= 0 && nx < r->getLx() && ny >= 0 && ny < r->getLy()) {
-        if (pix->getInk() == ink && pix->getPaint() == paint) {
-          lonely = false;
-          break;
-        }
-      }
-    }
+    unsigned char pattern = buildPaintnInkNeighborPattern(x, y, r, linePaint);
 
-    if (lonely) {
-      pix->setTone(TPixelCM32::getMaxTone());
-      pix->setInk(0);
+    bool shouldRemove = connectivity_lut[pattern];
+
+    if (shouldRemove) {
+      toRemovePoints.push_back({x, y});
+    } else  // Keep it!
+    {
+      restPoints.push_back({x, y});
     }
   }
 
+  for (auto &[x, y] : toRemovePoints) {
+    TPixelCM32 *pix = r->pixels(y) + x;
+    *pix            = TPixelCM32(0, pix->getPaint(), pix->getMaxTone());
+  }
+
+  for (auto &[x, y] : restPoints) {
+    TPixelCM32 *pix = r->pixels(y) + x;
+    if (pix->getInk() != ink) continue;
+    int linePaint = pix->getPaint();
+
+    unsigned char pattern = buildPaintnInkNeighborPattern(x, y, r, linePaint);
+
+    bool shouldRemove = connectivity_lut[pattern];
+
+    if (shouldRemove) {
+      TPixelCM32 *pix = r->pixels(y) + x;
+      *pix            = TPixelCM32(0, pix->getPaint(), pix->getMaxTone());
+    }
+  }
   return;
 }
 
@@ -590,10 +484,10 @@ void TAutocloser::Imp::draw(const std::vector<Segment> &closingSegmentArray) {
   if (m_raster->getLx() == 0 || m_raster->getLy() == 0)
     throw TException("Autoclose error: bad image size");
 
-  if (DEF_REGION_WITH_PAINT)
+  if (DEF_REGION_WITH_PAINT) {
     for (int i = 0; i < (int)closingSegmentArray.size(); i++)
       closeSegment(raux, closingSegmentArray[i], m_inkIndex, m_opacity);
-  else
+  } else
     for (int i = 0; i < (int)closingSegmentArray.size(); i++)
       drawSegment(raux, closingSegmentArray[i], m_inkIndex, m_opacity);
 }
@@ -769,6 +663,58 @@ int TAutocloser::Imp::notInsidePath(const TPoint &p, const TPoint &q) {
   return 0;
 }
 
+bool TAutocloser::Imp::hasInkBetween(const TPoint &p1, const TPoint &p2) {
+  int tmp, x, y, dx, dy, d, incr_1, incr_2;
+  int x1, y1, x2, y2;
+  int inkCount = 0;
+
+  x1 = p1.x;
+  y1 = p1.y;
+  x2 = p2.x;
+  y2 = p2.y;
+
+  if (x1 > x2) {
+    tmp = x1, x1 = x2, x2 = tmp;
+    tmp = y1, y1 = y2, y2 = tmp;
+  }
+  UCHAR *br = getPtr(x1, y1);
+
+  dx = x2 - x1;
+  dy = y2 - y1;
+  x = y = 0;
+
+  if (dy >= 0) {
+    if (dy <= dx)
+      DRAW_SEGMENT(
+          x, y, dx, dy, (br++), (br += m_bWrap + 1), if (*br != 0) {
+            inkCount++;
+            if (inkCount > 2) return true;
+          })
+    else
+      DRAW_SEGMENT(
+          y, x, dy, dx, (br += m_bWrap), (br += m_bWrap + 1), if (*br != 0) {
+            inkCount++;
+            if (inkCount > 2) return true;
+          })
+  } else {
+    dy = -dy;
+    if (dy <= dx)
+      DRAW_SEGMENT(
+          x, y, dx, dy, (br++), (br -= m_bWrap - 1), if (*br != 0) {
+            inkCount++;
+            if (inkCount > 2) return true;
+          })
+    else
+      DRAW_SEGMENT(
+          y, x, dy, dx, (br -= m_bWrap), (br -= m_bWrap - 1), if (*br != 0) {
+            inkCount++;
+            if (inkCount > 2) return true;
+          })
+  }
+
+  return inkCount != 2;
+}
+
 /*------------------------------------------------------------------------*/
 int TAutocloser::Imp::exploreTwoSpots(const TAutocloser::Segment &s0,
                                       const TAutocloser::Segment &s1) {
@@ -886,7 +832,9 @@ bool TAutocloser::Imp::spotResearchTwoPoints(
       closerIndex = closerPoint(endpoints, marks, current);
       if (exploreTwoSpots(endpoints[current], endpoints[closerIndex]) &&
           notInsidePath(endpoints[current].first,
-                        endpoints[closerIndex].first)) {
+                        endpoints[closerIndex].first) &&
+          !hasInkBetween(endpoints[current].first,
+                         endpoints[closerIndex].first)) {
         drawInByteRaster(endpoints[current].first,
                          endpoints[closerIndex].first);
         closingSegments.push_back(
@@ -981,10 +929,10 @@ continue;
     if (p1.y < 0) {
       p1.x = tround(p0.x - (float)((p0.x - p1.x) * p0.y) / (p0.y - p1.y));
       p1.y = 0;
-    } else if (p1.y > ly) {
+    } else if (p1.y >= ly) {
       p1.x =
           tround(p0.x - (float)((p0.x - p1.x) * (p0.y - ly)) / (p0.y - p1.y));
-      p1.y = ly;
+      p1.y = ly - 1;
     }
     it++;
   }
@@ -1036,7 +984,11 @@ bool TAutocloser::Imp::exploreSpot(const Segment &s, TPoint &p) {
   y1 = s.first.y;
   x2 = s.second.x;
   y2 = s.second.y;
-
+  if (x2 == 0 || x2 == lx || y2 == 0 || y2 == ly - 1) {
+    p.x = x2;
+    p.y = y2;
+    return true;
+  }
   if (x1 == x2 && y1 == y2) return 0;
 
   if (exploreRay(getPtr(x1, y1), s, p)) return true;
