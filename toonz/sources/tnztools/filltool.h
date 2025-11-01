@@ -96,7 +96,7 @@ class FillTool final : public QObject, public TTool {
   TEnumProperty m_fillType;   // Rect, Polyline etc.
   TBoolProperty m_onion;
   TBoolProperty m_frameRange;
-  TBoolProperty m_selective;
+  TBoolProperty m_emptyOnly;
   TDoublePairProperty m_fillDepth;
   TBoolProperty m_segment;
   TBoolProperty m_closeGap;
@@ -124,6 +124,7 @@ class FillTool final : public QObject, public TTool {
   RefImgTable m_refImgTable;  // imageId
 
   bool m_isAltPressed = false;
+  bool m_restoreEmptyOnly;
 
 public:
   FillTool(int targetType);
