@@ -1283,6 +1283,7 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
       {fastRenderPath, tr("Fast Render Path:")},
       {ffmpegMultiThread,
        tr("Allow Multi-Thread in FFMPEG Rendering (UNSTABLE)")},
+      {quickTimeBackend, tr("Use QuickTime to code .mov and .3gp (If installed)")},
       {rhubarbPath, tr("Rhubarb Path:")},
       {rhubarbTimeout, tr("Rhubarb Timeout:")},
 
@@ -1984,6 +1985,7 @@ QWidget* PreferencesPopup::createImportExportPage() {
          "but a random crash might occur, use at your own risk."),
       lay);
   insertUI(ffmpegMultiThread, lay);
+  insertUI(quickTimeBackend, lay);
 
   lay->setRowStretch(lay->rowCount(), 1);
   insertFootNote(lay);
