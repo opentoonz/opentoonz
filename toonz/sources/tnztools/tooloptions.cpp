@@ -1783,6 +1783,8 @@ FillToolOptionsBox::FillToolOptionsBox(QWidget *parent, TTool *tool,
       dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Refer Fill"));
   m_gapCloseDistance = dynamic_cast<ToolOptionIntSlider *>(
       m_controls.value("Gap Close Distance:"));
+  m_extendFill =
+      dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Extend Fill"));
 
   bool ret = connect(m_colorMode, SIGNAL(currentIndexChanged(int)), this,
                      SLOT(onColorModeChanged(int)));
