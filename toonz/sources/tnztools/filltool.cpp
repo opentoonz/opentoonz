@@ -896,6 +896,9 @@ void fillAreaWithUndo(const TImageP &img, const TRaster32P &ref,
         delete rasTileSet;
         return;
       }
+      TUndoManager::manager()->add(new RasterRectFillUndo(
+          rasTileSet, stroke, rasSaveBox, auxFillArea, cs, sl, colorType,
+          onlyUnfilled, fid, ref.getPointer(), plt, fillAllautoPaintLines));
     } else {
       TPointD total = convert(ras->getCenter()) - convert(offs) -
                       TPointD(auxFillArea.x0, auxFillArea.y0);
@@ -903,15 +906,18 @@ void fillAreaWithUndo(const TImageP &img, const TRaster32P &ref,
       filler.strokeFill(auxFillArea, stroke, cs, onlyUnfilled,
                         colorType != LINES, colorType != AREAS,
                         fillAllautoPaintLines);
+
+      TUndoManager::manager()->add(new RasterRectFillUndo(
+          rasTileSet, stroke, rasSaveBox, auxFillArea, cs, sl, colorType,
+          onlyUnfilled, fid, ref.getPointer(), plt, fillAllautoPaintLines));
+
       // Restore original position because the stroke might be used
       // for calculating inbetween frames
       stroke->transform(TTranslation(-total));
     }
 
     // ToolUtils::updateSaveBox(sl, fid);
-    TUndoManager::manager()->add(new RasterRectFillUndo(
-        rasTileSet, stroke, rasSaveBox, auxFillArea, cs, sl, colorType,
-        onlyUnfilled, fid, ref.getPointer(), plt, fillAllautoPaintLines));
+
   } else if (TVectorImageP vi = img) {
     TPalette *palette = vi->getPalette();
     assert(palette);
