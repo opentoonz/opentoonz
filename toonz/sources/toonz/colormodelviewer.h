@@ -19,8 +19,7 @@ class ColorModelViewer final : public FlipBook {
   TFilePath m_currentRefImgPath;
 
   /*-- Set m_mode to 2 in changePickType after got m_mode if true && mode is AREA--*/
-  bool m_alwaysPickLineStyle;
-  QToolButton *pickLineStyles;
+  QToolButton *m_pickLineStylesBtn;
 
 public:
   ColorModelViewer(QWidget *parent = 0);
