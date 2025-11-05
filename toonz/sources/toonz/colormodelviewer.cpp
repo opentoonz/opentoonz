@@ -1,4 +1,5 @@
 
+
 // Tnz6 includes
 #include "colormodelviewer.h"
 #include "menubarcommandids.h"
@@ -6,7 +7,6 @@
 #include "tapp.h"
 #include "pane.h"
 #include "colormodelbehaviorpopup.h"
-
 // TnzTools includes
 #include "tools/cursormanager.h"
 #include "tools/cursors.h"
@@ -15,7 +15,6 @@
 #include "tools/tool.h"
 #include "tools/toolhandle.h"
 #include "../tnztools/stylepickertool.h"
-
 // TnzQt includes
 #include "toonzqt/menubarcommand.h"
 #include "toonzqt/viewcommandids.h"
@@ -24,7 +23,6 @@
 #include "toonzqt/gutil.h"
 #include "toonzqt/tselectionhandle.h"
 #include "toonzqt/styleselection.h"
-
 // TnzLib includes
 #include "toonz/palettecmd.h"
 #include "toonz/txshlevelhandle.h"
@@ -39,11 +37,9 @@
 #include "toonz/txshlevel.h"
 #include "toonz/txshsimplelevel.h"
 #include "toonz/txshcell.h"
-
 // TnzCore includes
 #include "tsystem.h"
 #include "ttoonzimage.h"
-
 // Qt includes
 #include <QMimeData>
 #include <QMouseEvent>
@@ -62,22 +58,17 @@ namespace {
 TPaletteHandle *getPaletteHandle() {
   return TApp::instance()->getPaletteController()->getCurrentLevelPalette();
 }
-
 }  // namespace
 
 //=============================================================================
 /*! \class ColorModelViewer
-                \brief The ColorModelViewer class is a flip book used to manage
-   color model.
-
-                Inherits \b FlipBook.
-
-                This object show the reference image linked to current level
-   palette.
-*/
-/*!	\fn void ColorModelViewer::resetImageViewer()
-                Set current level to TLevelP() and image to "0".
-*/
+ *                \brief The ColorModelViewer class is a flip book used to
+ * manage color model. Inherits \b FlipBook. This object show the reference
+ * image linked to current level palette.
+ */
+/*! \fn void ColorModelViewer::resetImageViewer()
+ *                Set current level to TLevelP() and image to "0".
+ */
 ColorModelViewer::ColorModelViewer(QWidget *parent)
     : FlipBook(parent, QString(tr("Color Model")),
                std::vector<int>(
@@ -97,46 +88,36 @@ ColorModelViewer::ColorModelViewer(QWidget *parent)
     , m_mode(0)
     , m_currentRefImgPath(TFilePath()) {
   setObjectName("colormodel");
-
   m_pickLineStylesBtn = new QToolButton(this);
   QString tip("Pick Line Styles");
   QIcon icon = createQIcon("stylepicker_lines");
   m_pickLineStylesBtn->setIcon(icon);
   m_pickLineStylesBtn->setToolTip(tip);
   m_pickLineStylesBtn->setCheckable(true);
-
   QToolBar *toolBar = this->findChild<QToolBar *>("FlipConsolePlayToolBar");
   if (toolBar) {
     toolBar->addWidget(m_pickLineStylesBtn);
   }
-
   setToolCursor(m_imageViewer, ToolCursor::PickerCursor);
-
   // Do not call the special procedure for flipbook closures...
   disconnect(parentWidget(), SIGNAL(closeButtonPressed()), this,
              SLOT(onCloseButtonPressed()));
-
   bool ret = connect(this, SIGNAL(refImageNotFound()), this,
                      SLOT(onRefImageNotFound()), Qt::QueuedConnection);
-
   assert(ret);
-
   m_imageViewer->setMouseTracking(true);
 }
 //-----------------------------------------------------------------------------
-
 ColorModelViewer::~ColorModelViewer() {}
-
 //-----------------------------------------------------------------------------
 /*! Accept event if current palette is not empty, event data has urls and each
-                urls type are different from "src" and "tpl" .
-*/
+ *                urls type are different from "src" and "tpl" .
+ */
 void ColorModelViewer::dragEnterEvent(QDragEnterEvent *event) {
   TPalette *palette = getPaletteHandle()->getPalette();
   if (!palette) return;
   const QMimeData *mimeData = event->mimeData();
   if (!acceptResourceDrop(mimeData->urls())) return;
-
   for (const QUrl &url : mimeData->urls()) {
     TFilePath fp(url.toLocalFile().toStdWString());
     std::string type = fp.getType();
@@ -147,11 +128,10 @@ void ColorModelViewer::dragEnterEvent(QDragEnterEvent *event) {
   // For files, don't accept original proposed action in case it's a move
   event->accept();
 }
-
 //-----------------------------------------------------------------------------
 /*! If event data has urls, convert each urls in path and set view and current
-    palette reference image (recall loadImage() and setLevel()).
-*/
+ *    palette reference image (recall loadImage() and setLevel()).
+ */
 void ColorModelViewer::dropEvent(QDropEvent *event) {
   const QMimeData *mimeData = event->mimeData();
   if (mimeData->hasUrls()) {
@@ -166,27 +146,21 @@ void ColorModelViewer::dropEvent(QDropEvent *event) {
     event->accept();
   }
 }
-
 //-----------------------------------------------------------------------------
 /*! Set current palette reference image to \b fp recall:
-                \b PaletteCmd::loadReferenceImage().
-*/
+ *                \b PaletteCmd::loadReferenceImage().
+ */
 // This function will be called when drag & drop the file into the color model
 // viewer
-
 void ColorModelViewer::loadImage(const TFilePath &fp) {
   if (fp.isEmpty()) return;
-
   TPaletteHandle *paletteHandle = getPaletteHandle();
   TPalette *palette             = paletteHandle->getPalette();
-
   if (!palette || palette->isCleanupPalette()) {
     DVGui::error(QObject::tr("Cannot load Color Model in current palette."));
     return;
   }
-
   PaletteCmd::ColorModelLoadingConfiguration config;
-
   // if the palette is locked, replace the color model's palette with the
   // destination
   if (palette->isLocked()) {
@@ -200,17 +174,13 @@ void ColorModelViewer::loadImage(const TFilePath &fp) {
     if (ret == QDialog::Rejected) return;
     popup.getLoadingConfiguration(config);
   }
-
   ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
-
   int isLoaded =
       PaletteCmd::loadReferenceImage(paletteHandle, config, fp, scene);
-
   if (0 != isLoaded) {
     std::cout << "loadReferenceImage Failed for some reason." << std::endl;
     return;
   }
-
   // no changes in the icon with replace (Keep the destination palette) option
   if (config.behavior != PaletteCmd::ReplaceColorModelPlt) {
     TXshLevel *level = TApp::instance()->getCurrentLevel()->getLevel();
@@ -220,12 +190,11 @@ void ColorModelViewer::loadImage(const TFilePath &fp) {
     invalidateIcons(level, fids);
   }
 }
-
 //-----------------------------------------------------------------------------
 /*! Create and open the Right-click menu color model viewer.
  */
 void ColorModelViewer::contextMenuEvent(QContextMenuEvent *event) {
-  /*-- Levelが取得できない場合はMenuを出さない --*/
+  /*-- Do not show menu if level cannot be retrieved --*/
   TApp *app     = TApp::instance();
   TXshLevel *xl = app->getCurrentLevel()->getLevel();
   if (!xl) return;
@@ -234,26 +203,20 @@ void ColorModelViewer::contextMenuEvent(QContextMenuEvent *event) {
   TPalette *currentPalette =
       app->getPaletteController()->getCurrentLevelPalette()->getPalette();
   if (!currentPalette) return;
-
   QMenu menu(this);
-
   menu.addAction(CommandManager::instance()->getAction(MI_LoadColorModel));
-
   QAction *loadCurrentFrame =
       new QAction(QString(tr("Use Current Frame")), this);
   connect(loadCurrentFrame, SIGNAL(triggered()), SLOT(loadCurrentFrame()));
   menu.addAction(loadCurrentFrame);
-
   if (!m_imageViewer->getImage()) {
     menu.exec(event->globalPos());
     return;
   }
-
   QAction *removeColorModel =
       new QAction(QString(tr("Remove Color Model")), this);
   connect(removeColorModel, SIGNAL(triggered()), SLOT(removeColorModel()));
   menu.addAction(removeColorModel);
-
   /* If there is at least one style with "picked pos" parameter, then enable
    * repick command */
   TRasterImageP ri = m_imageViewer->getImage();
@@ -265,22 +228,17 @@ void ColorModelViewer::contextMenuEvent(QContextMenuEvent *event) {
             SLOT(repickFromColorModel()));
     menu.addAction(repickFromColorModelAct);
   }
-
   menu.addSeparator();
-
   QString shortcut = QString::fromStdString(
       CommandManager::instance()->getShortcutFromId(V_ViewReset));
   QAction *reset = menu.addAction(tr("Reset View") + "\t " + shortcut);
   connect(reset, SIGNAL(triggered()), m_imageViewer, SLOT(resetView()));
-
   shortcut = QString::fromStdString(
       CommandManager::instance()->getShortcutFromId(V_ZoomFit));
   QAction *fit = menu.addAction(tr("Fit to Window") + "\t" + shortcut);
   connect(fit, SIGNAL(triggered()), m_imageViewer, SLOT(fitView()));
-
   menu.exec(event->globalPos());
 }
-
 //-----------------------------------------------------------------------------
 /*! If left button is pressed recall \b pick() in event pos.
  */
@@ -288,7 +246,6 @@ void ColorModelViewer::mousePressEvent(QMouseEvent *event) {
   if (event->button() == Qt::LeftButton)
     pick(event->pos() * getDevicePixelRatio(this));
 }
-
 //-----------------------------------------------------------------------------
 /*! If left button is moved recall \b pick() in event pos.
  */
@@ -296,53 +253,44 @@ void ColorModelViewer::mouseMoveEvent(QMouseEvent *event) {
   if (event->buttons() & Qt::LeftButton)
     pick(event->pos() * getDevicePixelRatio(this));
 }
-
 //-----------------------------------------------------------------------------
 /*! Pick color from image and set it as current style.
  */
 void ColorModelViewer::pick(const QPoint &p) {
   TImageP img = m_imageViewer->getImage();
   if (!img) return;
-
   TPaletteHandle *ph =
       TApp::instance()->getPaletteController()->getCurrentLevelPalette();
   TPalette *currentPalette = ph->getPalette();
   TXshLevelHandle *lh      = TApp::instance()->getCurrentLevel();
   TXshSimpleLevel *level   = lh->getSimpleLevel();
   if (!currentPalette) return;
-
-  /*- 画面外ではPickできない -*/
+  /*- Cannot pick outside the screen -*/
   if (!m_imageViewer->rect().contains(p)) return;
-
   StylePicker picker(this, img, currentPalette);
-
   QPoint viewP = m_imageViewer->mapFrom(this, p);
   TPointD pos  = m_imageViewer->getViewAff().inv() *
                 TPointD(viewP.x() - m_imageViewer->width() / 2,
                         -viewP.y() + m_imageViewer->height() / 2);
-
   double scale2 = m_imageViewer->getViewAff().det();
   /*---
-          カレントToolに合わせてPickモードを変更
-          0=Area, 1=Line, 2=Line&Areas(default)
-  ---*/
+   *          Change pick mode according to current tool
+   *          0=Area, 1=Line, 2=Line&Areas(default)
+   *  ---*/
   int styleIndex =
       picker.pickStyleId(pos + TPointD(-0.5, -0.5), 1, scale2, m_mode);
-
   if (styleIndex < 0) return;
-
-  /*-- pickLineモードのとき、取得Styleが0の場合 /
-   * PurePaintの部分をクリックした場合 はカレントStyleを変えない --*/
+  /*-- In pickLine mode, if the acquired style is 0 /
+   * or if clicking on a pure paint area, do not change current style --*/
   if (m_mode == 1) {
     if (styleIndex == 0) return;
     TToonzImageP ti = img;
     if (ti && picker.pickTone(pos) == 255) return;
   }
-  /*- Paletteに存在しない色が取れた場合はreturn -*/
+  /*- If a color not in the palette is picked, return -*/
   TPalette::Page *page = currentPalette->getStylePage(styleIndex);
   if (!page) return;
-
-  /*-- Styleを選択している場合は選択を解除する --*/
+  /*-- If a style is selected, deselect it --*/
   TSelection *selection =
       TApp::instance()->getCurrentSelection()->getSelection();
   if (selection) {
@@ -350,15 +298,14 @@ void ColorModelViewer::pick(const QPoint &p) {
         dynamic_cast<TStyleSelection *>(selection);
     if (styleSelection) styleSelection->selectNone();
   }
-
   /*
-    if the Style Picker tool is current and "organize palette" is activated,
-    then move the picked style to the first page of the palette.
-  */
+   *    if the Style Picker tool is current and "organize palette" is activated,
+   *    then move the picked style to the first page of the palette.
+   */
   TTool *tool = TApp::instance()->getCurrentTool()->getTool();
-  if (tool->getName() == "T_StylePicker") {
+  if (tool->getName() == T_StylePicker) {
     StylePickerTool *spTool = dynamic_cast<StylePickerTool *>(tool);
-    if (spTool)
+    if (spTool) {
       if (spTool->isOrganizePaletteActive()) {
         TPoint point = picker.getRasterPoint(pos);
         int frame    = m_flipConsole->getCurrentFrame() - 1;
@@ -373,13 +320,11 @@ void ColorModelViewer::pick(const QPoint &p) {
         replaceLevelStyle(lh, ph, styleIndex, ph->getStyleIndex());
         return;
       }
+    }
   }
-
   ph->setStyleIndex(styleIndex);
 }
-
 //-----------------------------------------------------------------------------
-
 void ColorModelViewer::hideEvent(QHideEvent *e) {
   TPaletteHandle *paletteHandle = getPaletteHandle();
   TXshLevelHandle *levelHandle  = TApp::instance()->getCurrentLevel();
@@ -390,16 +335,12 @@ void ColorModelViewer::hideEvent(QHideEvent *e) {
              SLOT(showCurrentImage()));
   disconnect(paletteHandle, SIGNAL(colorStyleChanged(bool)), this,
              SLOT(showCurrentImage()));
-
   disconnect(toolHandle, SIGNAL(toolSwitched()), this, SLOT(changePickType()));
   disconnect(toolHandle, SIGNAL(toolChanged()), this, SLOT(changePickType()));
-
   disconnect(levelHandle, SIGNAL(xshLevelViewChanged()), this,
              SLOT(updateViewer()));
 }
-
 //-----------------------------------------------------------------------------
-
 void ColorModelViewer::showEvent(QShowEvent *e) {
   TPaletteHandle *paletteHandle = getPaletteHandle();
   TXshLevelHandle *levelHandle  = TApp::instance()->getCurrentLevel();
@@ -410,7 +351,7 @@ void ColorModelViewer::showEvent(QShowEvent *e) {
                             SLOT(showCurrentImage()));
   ret = ret && connect(paletteHandle, SIGNAL(colorStyleChanged(bool)), this,
                        SLOT(showCurrentImage()));
-  /*- ツールのTypeに合わせてPickのタイプも変え、カーソルも切り替える -*/
+  /*- Change pick type and cursor according to tool type -*/
   ret = ret && connect(toolHandle, SIGNAL(toolSwitched()), this,
                        SLOT(changePickType()));
   ret = ret && connect(toolHandle, SIGNAL(toolChanged()), this,
@@ -421,9 +362,8 @@ void ColorModelViewer::showEvent(QShowEvent *e) {
   changePickType();
   showCurrentImage();
 }
-
 //-----------------------------------------------------------------------------
-/*- ツールのTypeに合わせてPickのタイプも変え、カーソルも切り替える -*/
+/*- Change pick type and cursor according to tool type -*/
 void ColorModelViewer::changePickType() {
   TTool *tool = TApp::instance()->getCurrentTool()->getTool();
   if (tool->getName() == T_StylePicker) {
@@ -433,9 +373,8 @@ void ColorModelViewer::changePickType() {
       return;
     }
   }
-
   TPropertyGroup *propGroup = tool->getProperties(0);
-  /*- Propertyの無いツールの場合 -*/
+  /*- For tools without properties -*/
   if (!propGroup) {
     m_mode = 2;
     setToolCursor(m_imageViewer, ToolCursor::PickerCursor);
@@ -443,8 +382,7 @@ void ColorModelViewer::changePickType() {
     m_pickLineStylesBtn->setChecked(true);
     return;
   }
-
-  /*- Mode: の無いツールの場合は0が返る -*/
+  /*- Tools without "Mode:" return 0 -*/
   TProperty *modeProp = propGroup->getProperty("Mode:");
   if (!modeProp) {
     m_mode = 2;
@@ -452,18 +390,17 @@ void ColorModelViewer::changePickType() {
     m_pickLineStylesBtn->setDisabled(true);
     m_pickLineStylesBtn->setChecked(true);
     return;
-  }
-
-  else {
+  } else {
     std::string var = modeProp->getValueAsString();
     if (var == LINES) {
       m_mode = 1;
       setToolCursor(m_imageViewer, ToolCursor::PickerCursorLine);
     } else if (var == AREAS) {
-      if (m_pickLineStylesBtn->isChecked())
+      if (m_pickLineStylesBtn->isChecked()) {
         m_mode = 2;  // Areas & Line
-      else
+      } else {
         m_mode = 0;
+      }
       setToolCursor(m_imageViewer, ToolCursor::PickerCursorArea);
     } else  // Line & Areas
     {
@@ -474,16 +411,12 @@ void ColorModelViewer::changePickType() {
     m_pickLineStylesBtn->setChecked(m_mode != 0);
   }
 }
-
 //-----------------------------------------------------------------------------
-/*! If current palette level exists reset image viewer and set current viewer
-    to reference image path level.
-*/
-
+/*! If current palette level exists reset image viewer and set current
+ *   viewer to reference image path level.
+ */
 void ColorModelViewer::updateViewer() { getImageViewer()->repaint(); }
-
 //------------------------------------------------------------------------------
-
 void ColorModelViewer::showCurrentImage() {
   TPalette *palette = getPaletteHandle()->getPalette();
   if (!palette) {
@@ -496,36 +429,33 @@ void ColorModelViewer::showCurrentImage() {
     resetImageViewer();
     return;
   }
-  /*-- UseCurrentFrameの場合、paletteを差し替える --*/
+  /*-- In case of UseCurrentFrame, replace the palette --*/
   if (palette->getRefImgPath() == xl->getPath()) {
     TXshSimpleLevel *sl = xl->getSimpleLevel();
     if (!sl) {
       resetImageViewer();
       return;
     }
-    /*- 同じTFrameIdだった場合、パレットを差し替える -*/
+    /*- If same TFrameId, replace the palette -*/
     if (m_currentRefImgPath == xl->getPath()) {
       TImageP refImg = m_imageViewer->getImage();
       if (!refImg) {
         resetImageViewer();
         return;
       }
-
       TImageP refImg_clone = refImg->cloneImage();
       refImg_clone->setPalette(palette);
       m_imageViewer->setImage(refImg_clone);
       return;
     }
-    /*- UseCurrentFrameのLevelに移動してきた場合、Levelを入れ直す -*/
+    /*- When moving to a UseCurrentFrame level, reload the level -*/
     else {
       reloadCurrentFrame();
       return;
     }
   }
-
-  /*- 以下、通常のColorModelが読み込まれている場合 -*/
+  /*- Below: normal case where ColorModel is loaded -*/
   resetImageViewer();
-
   ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
   TFilePath fp      = scene->decodeFilePath(palette->getRefImgPath());
   if (TSystem::doesExistFileOrLevel(fp)) {
@@ -533,7 +463,6 @@ void ColorModelViewer::showCurrentImage() {
   } else if (!fp.isEmpty())
     emit refImageNotFound();
 }
-
 //-----------------------------------------------------------------------------
 /*! Clone current image and set it in viewer.
  */
@@ -543,7 +472,7 @@ void ColorModelViewer::loadCurrentFrame() {
   if (!xl) return;
   TXshSimpleLevel *sl = xl->getSimpleLevel();
   if (!sl) return;
-  /*- カレントフレームのFIdの取得 -*/
+  /*- Get current frame's FId -*/
   TFrameId fid;
   if (app->getCurrentFrame()->isEditingLevel())
     fid = app->getCurrentFrame()->getFid();
@@ -557,23 +486,19 @@ void ColorModelViewer::loadCurrentFrame() {
     fid       = column->getCellColumn()->getCell(frame).getFrameId();
   }
   TImageP img = sl->getFrame(fid, true);
-
   TPalette *currentPalette =
       app->getPaletteController()->getCurrentLevelPalette()->getPalette();
   if (!img || !currentPalette) return;
   TImageP refImg = img->cloneImage();
   currentPalette->setRefImg(TImageP());
-  /*--onPaletteSwitchedでRefImagePathを見て、自分自身のパスを参照していたらUpdateのルーチンを切り替える--*/
+  /*-- In onPaletteSwitched, check RefImagePath and switch update routine if
+   * referencing own path --*/
   currentPalette->setRefImgPath(xl->getPath());
-
   std::vector<TFrameId> fids;
   fids.push_back(fid);
   currentPalette->setRefLevelFids(fids, false);
-
   m_currentRefImgPath = xl->getPath();
-
   m_levels.clear();
-
   m_levelNames.clear();
   m_framesCount = 1;
   m_palette     = 0;
@@ -586,14 +511,12 @@ void ColorModelViewer::loadCurrentFrame() {
   m_flipConsole->setFrameRange(1, 1, 1);
   m_title1 = m_viewerTitle +
              " :: " + m_currentRefImgPath.withoutParentDir().withFrame(fid);
-  m_title = "  ::  <Use Current Frame>";
-
+  m_title = " :: <Use Current Frame>";
   m_imageViewer->setImage(refImg);
 }
-
 //-----------------------------------------------------------------------------
 /*--
- * UseCurrentFrameのLevelに移動してきたときに、改めてCurrentFrameを格納しなおす
+ * When moving to a level using UseCurrentFrame, reload the current frame again
  * --*/
 void ColorModelViewer::reloadCurrentFrame() {
   TApp *app     = TApp::instance();
@@ -601,29 +524,20 @@ void ColorModelViewer::reloadCurrentFrame() {
   if (!xl) return;
   TXshSimpleLevel *sl = xl->getSimpleLevel();
   if (!sl) return;
-
   TPalette *currentPalette =
       app->getPaletteController()->getCurrentLevelPalette()->getPalette();
   if (!currentPalette) return;
-
   std::vector<TFrameId> fids = currentPalette->getRefLevelFids();
-  /*- CurrentFrameなので、1Frameのみのはず -*/
+  /*- Since it's CurrentFrame, should only have 1 frame -*/
   if (fids.size() != 1) return;
-
   TImageP img = sl->getFrame(fids[0], true);
   if (!img) return;
-
   TImageP refImg = img->cloneImage();
-
   currentPalette->setRefImg(TImageP());
-
   currentPalette->setRefImgPath(xl->getPath());
-
-  /*- currentRefImgPathの更新 -*/
+  /*- Update currentRefImgPath -*/
   m_currentRefImgPath = xl->getPath();
-
   m_levels.clear();
-
   m_levelNames.clear();
   m_framesCount = 1;
   m_palette     = 0;
@@ -636,42 +550,34 @@ void ColorModelViewer::reloadCurrentFrame() {
   m_flipConsole->setFrameRange(1, 1, 1);
   m_title1 = m_viewerTitle +
              " :: " + m_currentRefImgPath.withoutParentDir().withFrame(fids[0]);
-  m_title = "  ::  <Use Current Frame>";
-
+  m_title = " :: <Use Current Frame>";
   m_imageViewer->setImage(refImg);
 }
-
 //-----------------------------------------------------------------------------
 /*! Remove reference image from current palette using
-                \b PaletteCmd::removeReferenceImage() and reset image viewer.
-*/
+ *                \b PaletteCmd::removeReferenceImage() and reset image
+ *   viewer.
+ */
 void ColorModelViewer::removeColorModel() {
   PaletteCmd::removeReferenceImage(getPaletteHandle());
   resetImageViewer();
   m_currentRefImgPath = TFilePath();
 }
-
 //-----------------------------------------------------------------------------
-
 void ColorModelViewer::onRefImageNotFound() {
   DVGui::info(
       tr("It is not possible to retrieve the color model set for the current "
          "level."));
 }
-
 //-----------------------------------------------------------------------------
-
 void ColorModelViewer::repickFromColorModel() {
   TImageP img = m_imageViewer->getImage();
   if (!img) return;
   TPaletteHandle *ph =
       TApp::instance()->getPaletteController()->getCurrentLevelPalette();
-
   PaletteCmd::pickColorByUsingPickedPosition(
       ph, img, m_flipConsole->getCurrentFrame() - 1);
 }
-
 //=============================================================================
-
 OpenFloatingPanel openColorModelCommand(MI_OpenColorModel, "ColorModel",
                                         QObject::tr("Color Model"));
