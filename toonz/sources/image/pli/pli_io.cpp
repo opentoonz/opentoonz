@@ -184,6 +184,8 @@ void MyIfstream::open(const TFilePath &filename) {
     m_fp = fopen(filename, "rb");
   } catch (TException &) {
     throw TImageException(filename, "File not found");
+  } catch (...) {
+    throw TImageException(filename, "Unhandled exception encountered");
   }
 }
 
@@ -740,6 +742,14 @@ void ParsedPliImp::loadInfo(bool readPlt, TPalette *&palette,
   // palette = new TPalette();
   // for (int i=0; i<256; i++)
   //  palette->getPage(0)->addStyle(TPixel::Black);
+
+  // File is missing frames!  Load what we can.
+  // Last frame is likely an unusable image. Allow to load in case it was also
+  // the 1st frame, so we don't crash.
+  if (m_framesNumber > m_frameOffsInFile.size()) {
+    m_framesNumber = m_frameOffsInFile.size();
+    throw TException("Not all frames loaded.");
+  }
 }
 
 /*=====================================================================*/
@@ -825,7 +835,7 @@ ImageTag *ParsedPliImp::loadFrame(const TFrameId &frameNumber) {
     while ((type = readTagHeader()) != PliTag::END_CNTRL) {
       if (type == PliTag::IMAGE_BEGIN_GOBJ) {
         m_iChan >> frame;
-
+        
         if (m_majorVersionNumber >= 150) {
           TUINT32 suffixLength;
           m_iChan >> suffixLength;

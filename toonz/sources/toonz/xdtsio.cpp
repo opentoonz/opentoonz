@@ -562,6 +562,8 @@ bool XdtsIo::loadXdtsScene(ToonzScene *scene, const TFilePath &scenePath) {
   QStringList levelNames = xdtsData.getLevelNames();
   // in case multiple columns have the same name
   levelNames.removeDuplicates();
+  for (auto& name : levelNames)
+      name = name.trimmed();
 
   scene->clear();
 
@@ -610,7 +612,7 @@ bool XdtsIo::loadXdtsScene(ToonzScene *scene, const TFilePath &scenePath) {
   QList<int> columns                 = cellField.getOccupiedColumns();
   for (int column : columns) {
     QString levelName   = layerNames.at(column);
-    TXshLevel *level    = levels.value(levelName);
+    TXshLevel *level    = levels.value(levelName.trimmed());
     TXshSimpleLevel *sl = level->getSimpleLevel();
     QList<int> tick1, tick2, keyFrames, refFrames;
     QVector<TFrameId> track =
@@ -674,7 +676,8 @@ bool XdtsIo::loadXdtsScene(ToonzScene *scene, const TFilePath &scenePath) {
 
   // emit signal here for updating the frame slider range of flip console
   TApp::instance()->getCurrentScene()->notifySceneChanged();
-
+  // update xsheet viewer
+  TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
   return true;
 }
 

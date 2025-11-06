@@ -17,6 +17,7 @@
 #include "toonz/fill.h"
 
 #include <QObject>
+#include <qevent.h>
 
 #define LINES L"Lines"
 #define AREAS L"Areas"
@@ -58,6 +59,7 @@ private:
   TPointD m_mousePosition;
   bool m_onion;
   bool m_isLeftButtonPressed;
+  bool m_paintAllAPs;
   bool m_autopaintLines;
 
   int m_bckStyleId;
@@ -89,7 +91,7 @@ class FillTool final : public QObject, public TTool {
   bool m_frameSwitched             = false;
   double m_changedGapOriginalValue = -1.0;
   TXshSimpleLevelP m_level;
-  TFrameId m_firstFrameId, m_veryFirstFrameId;
+  TFrameId m_firstFrameId;
   int m_onionStyleId;
   TEnumProperty m_colorType;  // Line, Area
   TEnumProperty m_fillType;   // Rect, Polyline etc.
@@ -101,11 +103,12 @@ class FillTool final : public QObject, public TTool {
   TBoolProperty m_closeGap;
   TBoolProperty m_referFill;
   TDoubleProperty m_maxGapDistance;
+  TIntProperty m_gapCloseDistance;
   AreaFillTool *m_areaFillTool;
   NormalLineFillTool *m_normalLineFillTool;
 
   TPropertyGroup m_prop;
-  struct cellPos {
+  struct CellPos {
     int col, row;
   } m_beginCell;
 
@@ -119,7 +122,9 @@ class FillTool final : public QObject, public TTool {
   TBoolProperty m_autopaintLines;
 
   SlFidsPairs m_slFidsPairs;
-  RefImgTable m_refImgTable;// imageId
+  RefImgTable m_refImgTable;  // imageId
+
+  bool m_isAltPressed = false;
 
 public:
   FillTool(int targetType);
@@ -135,9 +140,10 @@ public:
   void leftButtonDown(const TPointD &pos, const TMouseEvent &e) override;
   void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) override;
   void leftButtonUp(const TPointD &pos, const TMouseEvent &e) override;
+  bool keyDown(QKeyEvent *e) override;
   void mouseMove(const TPointD &pos, const TMouseEvent &e) override;
   void leftButtonDoubleClick(const TPointD &pos, const TMouseEvent &e) override;
-  void resetMulti();
+  void resetMulti(bool resetAreaFiller = false);
 
   bool onPropertyChanged(std::string propertyName, bool addToUndo) override;
   void onImageChanged() override;

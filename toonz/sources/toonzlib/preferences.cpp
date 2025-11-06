@@ -457,9 +457,9 @@ void Preferences::definePreferenceItems() {
   define(rasterizeAntialias, "rasterizeAntialias", QMetaType::Bool, false);
 
   // Loading
-  define(importPolicy, "importPolicy", QMetaType::Int, 0);  // Always ask
-  define(renamePolicy, "renamePolicy", QMetaType::Int, 0); // Always ask
-  define(convertPolicy, "convertPolicy", QMetaType::Int, 0); // Always ask
+  define(importPolicy, "importPolicy", QMetaType::Int, 0);    // Always ask
+  define(renamePolicy, "renamePolicy", QMetaType::Int, 0);    // Always ask
+  define(convertPolicy, "convertPolicy", QMetaType::Int, 0);  // Always ask
   define(autoExposeEnabled, "autoExposeEnabled", QMetaType::Bool, true);
   define(subsceneFolderEnabled, "subsceneFolderEnabled", QMetaType::Bool, true);
   define(removeSceneNumberFromLoadedLevelName,
@@ -500,6 +500,7 @@ void Preferences::definePreferenceItems() {
          std::numeric_limits<int>::max());
   define(fastRenderPath, "fastRenderPath", QMetaType::QString, "desktop");
   define(ffmpegMultiThread, "ffmpegMultiThread", QMetaType::Bool, false);
+  define(quickTimeBackend, "quickTimeBacend", QMetaType::Bool, false);
   define(rhubarbPath, "rhubarbPath", QMetaType::QString, "");
   define(rhubarbTimeout, "rhubarbTimeout", QMetaType::Int, 600, 0,
          std::numeric_limits<int>::max());
@@ -552,7 +553,7 @@ void Preferences::definePreferenceItems() {
   define(cursorBrushType, "cursorBrushType", QMetaType::QString, "Small");
   define(cursorBrushStyle, "cursorBrushStyle", QMetaType::QString, "Default");
   define(cursorOutlineEnabled, "cursorOutlineEnabled", QMetaType::Bool, true);
-  define(useStrokeEndCursor, "useStrokeEndCursor", QMetaType::Bool, true);
+  define(useStrokeEndCursor, "useStrokeEndCursor", QMetaType::Bool, false);
   define(levelBasedToolsDisplay, "levelBasedToolsDisplay", QMetaType::Int,
          0);  // Default
   define(useCtrlAltToResizeBrush, "useCtrlAltToResizeBrush", QMetaType::Bool,
@@ -583,8 +584,9 @@ void Preferences::definePreferenceItems() {
          true);
   define(useArrowKeyToShiftCellSelection, "useArrowKeyToShiftCellSelection",
          QMetaType::Bool, true);
-  define(inputCellsWithoutDoubleClickingEnabled,
-         "inputCellsWithoutDoubleClickingEnabled", QMetaType::Bool, false);
+  define(
+      cellInputMethod, "cellInputMethod", QMetaType::Int,
+      1);  // Input by Double click only; Input by numpad; Input by Single Click
   define(shortcutCommandsWhileRenamingCellEnabled,
          "shortcutCommandsWhileRenamingCellEnabled", QMetaType::Bool, false);
   define(showXSheetToolbar, "showXSheetToolbar", QMetaType::Bool, true);
@@ -827,6 +829,16 @@ void Preferences::resolveCompatibility() {
       !m_settings->contains("rasterLevelCachingBehavior")) {
     setValue(rasterLevelCachingBehavior,
              m_settings->value("initialLoadTlvCachingBehavior").toInt());
+  }
+  // "inputCellsWithoutDoubleClicking" is changed to "cellInputMethod", adding a
+  // new default option "Input by Numpad". If the conventional option is
+  // activated, set the new option to "Input by Single Click" to keep
+  // compatibility.
+  if (m_settings->contains("inputCellsWithoutDoubleClickingEnabled") &&
+      !m_settings->contains("cellInputMethod")) {
+    if (m_settings->value("inputCellsWithoutDoubleClickingEnabled").toBool() ==
+        true)
+      setValue(cellInputMethod, 2);
   }
 }
 

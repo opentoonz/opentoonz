@@ -627,6 +627,12 @@ RenameCellField::RenameCellField(QWidget *parent, XsheetViewer *viewer)
 //-----------------------------------------------------------------------------
 
 void RenameCellField::showInRowCol(int row, int col, bool multiColumnSelected) {
+  // keep the initial text when showing the field
+  auto setInitialText = [this](const QString text) {
+    setText(text);
+    m_initialText = text;
+  };
+
   const Orientation *o = m_viewer->orientation();
 
   m_viewer->scrollTo(row, col);
@@ -679,12 +685,13 @@ void RenameCellField::showInRowCol(int row, int col, bool multiColumnSelected) {
     // Ex.  12 -> 1B    21 -> 2A   30 -> 3
     if (Preferences::instance()->isShowFrameNumberWithLettersEnabled() &&
         cell.m_level->getType() != TXshLevelType::SND_TXT_XSHLEVEL)
-      setText((fid.isEmptyFrame() || fid.isNoFrame())
-                  ? QString::fromStdWString(levelName)
-              : (multiColumnSelected)
-                  ? m_viewer->getFrameNumberWithLetters(fid.getNumber())
-                  : QString::fromStdWString(levelName) + QString(" ") +
-                        m_viewer->getFrameNumberWithLetters(fid.getNumber()));
+      setInitialText(
+          (fid.isEmptyFrame() || fid.isNoFrame())
+              ? QString::fromStdWString(levelName)
+          : (multiColumnSelected)
+              ? m_viewer->getFrameNumberWithLetters(fid.getNumber())
+              : QString::fromStdWString(levelName) + QString(" ") +
+                    m_viewer->getFrameNumberWithLetters(fid.getNumber()));
     else {
       QString frameNumber("");
       if (fid.getNumber() > 0) frameNumber = QString::number(fid.getNumber());
@@ -694,7 +701,7 @@ void RenameCellField::showInRowCol(int row, int col, bool multiColumnSelected) {
       if (cell.m_level->getType() == TXshLevelType::SND_TXT_XSHLEVEL) {
         TXshSoundTextLevelP textLevel = cell.m_level->getSoundTextLevel();
         if (textLevel) {
-          setText(textLevel->getFrameText(fid.getNumber() - 1));
+          setInitialText(textLevel->getFrameText(fid.getNumber() - 1));
         }
         setAlignment(Qt::AlignLeft | Qt::AlignBottom);
         QFontMetrics fm(this->font());
@@ -710,10 +717,11 @@ void RenameCellField::showInRowCol(int row, int col, bool multiColumnSelected) {
       }
       // other level types
       else {
-        setText((frameNumber.isEmpty()) ? QString::fromStdWString(levelName)
-                : (multiColumnSelected) ? frameNumber
-                                        : QString::fromStdWString(levelName) +
-                                              QString(" ") + frameNumber);
+        setInitialText(
+            (frameNumber.isEmpty()) ? QString::fromStdWString(levelName)
+            : (multiColumnSelected) ? frameNumber
+                                    : QString::fromStdWString(levelName) +
+                                          QString(" ") + frameNumber);
       }
     }
     selectAll();
@@ -723,7 +731,7 @@ void RenameCellField::showInRowCol(int row, int col, bool multiColumnSelected) {
     setFixedSize(o->cellWidth(), o->cellHeight() + 2);
     move(xy + QPoint(1, 1));
 
-    setText("");
+    setInitialText("");
   }
   show();
   raise();
@@ -979,19 +987,18 @@ void RenameCellField::renameCell() {
     cellSelection->renameCells(cells[0]);
   } else
     cellSelection->renameMultiCells(cells);
-
-  cellSelection->fillEmptyCell();
 }
 
 //-----------------------------------------------------------------------------
 
 void RenameCellField::onReturnPressed() {
   renameCell();
-
   // move the cell selection
   TCellSelection *cellSelection = dynamic_cast<TCellSelection *>(
       TApp::instance()->getCurrentSelection()->getSelection());
   if (!cellSelection) return;
+  if (m_isCtrlPrssed) cellSelection->fillEmptyCell();
+
   TCellSelection::Range range = cellSelection->getSelectedCells();
   int offset                  = range.m_r1 - range.m_r0 + 1;
   cellSelection->selectCells(range.m_r0 + offset, range.m_c0,
@@ -1006,11 +1013,15 @@ void RenameCellField::onReturnPressed() {
 void RenameCellField::focusOutEvent(QFocusEvent *e) {
   hide();
 
-  if (escapePressed) {
-    escapePressed = false;
-  } else {
+  // Lost focus because of Mouse movement and the text has changed from when it
+  // was displayed, rename the cell
+  if (e->reason() == Qt::MouseFocusReason && text() != m_initialText) {
     renameCell();
+    TCellSelection *cellSelection = dynamic_cast<TCellSelection *>(
+        TApp::instance()->getCurrentSelection()->getSelection());
+    if (cellSelection) cellSelection->fillEmptyCell();
   }
+
   QLineEdit::focusOutEvent(e);
 }
 
@@ -1053,11 +1064,11 @@ bool RenameCellField::eventFilter(QObject *obj, QEvent *e) {
 
 void RenameCellField::keyPressEvent(QKeyEvent *event) {
   if (event->key() == Qt::Key_Escape) {
-    escapePressed = true;
     clearFocus();
     return;
   }
 
+  m_isCtrlPrssed = (event->modifiers() & Qt::ControlModifier);
   // move the cell selection
   TCellSelection *cellSelection = dynamic_cast<TCellSelection *>(
       TApp::instance()->getCurrentSelection()->getSelection());
@@ -3372,12 +3383,15 @@ void CellArea::mousePressEvent(QMouseEvent *event) {
 
     // Drag Cells #1 : When "Always Drag Frame Cell" Selected and no modifiers
     else if (Preferences::instance()->isAlwaysDragFrameCell() &&
+             o->rect(PredefinedRect::CELL_NAME)
+                 .adjusted(0, 0, -frameAdj.x(), -frameAdj.y())
+                 .contains(mouseInCell) &&
              event->modifiers() == Qt::NoModifier &&
              (!xsh->getCell(row, col).isEmpty()) &&
              xsh->getCell(row, col) != xsh->getCell(row - 1, col)) {
       TXshColumn *column = xsh->getColumn(col);
 
-      if (column && !m_viewer->getCellSelection()->isCellSelected(row, col)) {
+      if (column) {
         // switch to that FrameCell
         m_viewer->setCurrentRow(row);
         m_viewer->setCurrentColumn(col);

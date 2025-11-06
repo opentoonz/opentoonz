@@ -51,7 +51,7 @@ FillHolesDialog::FillHolesDialog() : Dialog(0, true, true, "Fill Small Holes") {
   setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
 
   beginVLayout();
-  m_size = new IntField(this);
+  m_size = new IntField(this,false);
   m_size->setRange(1, 25);
   m_size->setValue(5);
   addWidget(tr("Size"), m_size);

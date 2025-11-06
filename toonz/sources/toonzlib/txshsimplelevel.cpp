@@ -97,7 +97,7 @@ QString getCreatorString() {
 
 //-----------------------------------------------------------------------------
 
-bool checkCreatorString(const QString &creator) {
+bool checkCreatorString(const QString& creator) {
   int mask = 0;
   if (creator != "") {
     QRegExp rx("CM\\([0-9A-Fa-f]*\\)");
@@ -116,7 +116,7 @@ bool checkCreatorString(const QString &creator) {
 
 //-----------------------------------------------------------------------------
 
-bool isAreadOnlyLevel(const TFilePath &path) {
+bool isAreadOnlyLevel(const TFilePath& path) {
   if (path.isEmpty() || !path.isAbsolute()) return false;
   if (path.getDots() == "." ||
       (path.getDots() == ".." &&
@@ -126,7 +126,7 @@ bool isAreadOnlyLevel(const TFilePath &path) {
     TFileStatus fs(path);
     return !fs.isWritable();
   }
-  /*- 処理が重くなるので、連番ファイルは全てfalseを返す -*/
+  /*- Since processing is heavy, all sequential files return false -*/
   /*
 else if(path.getDots() == "..")
 {
@@ -158,9 +158,9 @@ return isReadOnly;
 
 //-----------------------------------------------------------------------------
 
-void getIndexesRangefromFids(TXshSimpleLevel *level,
-                             const std::set<TFrameId> &fids, int &fromIndex,
-                             int &toIndex) {
+void getIndexesRangefromFids(TXshSimpleLevel* level,
+                             const std::set<TFrameId>& fids, int& fromIndex,
+                             int& toIndex) {
   if (fids.empty()) {
     fromIndex = toIndex = -1;
     return;
@@ -188,7 +188,7 @@ bool TXshSimpleLevel::m_fillFullColorRaster = false;
 
 //-----------------------------------------------------------------------------
 
-TXshSimpleLevel::TXshSimpleLevel(const std::wstring &name)
+TXshSimpleLevel::TXshSimpleLevel(const std::wstring& name)
     : TXshLevel(m_classCode, name)
     , m_properties(new LevelProperties)
     , m_palette(0)
@@ -211,7 +211,7 @@ TXshSimpleLevel::~TXshSimpleLevel() {
 //-----------------------------------------------------------------------------
 
 void TXshSimpleLevel::setEditableRange(unsigned int from, unsigned int to,
-                                       const std::wstring &userName) {
+                                       const std::wstring& userName) {
   assert(from <= to && to < (unsigned int)getFrameCount());
   unsigned int i;
   for (i = from; i <= to; i++) m_editableRange.insert(index2fid(i));
@@ -235,17 +235,17 @@ void TXshSimpleLevel::setEditableRange(unsigned int from, unsigned int to,
   }
 
   // Merge temporary hook file with current hookset
-  const TFilePath &hookFile = getHookPath(dstPath);
+  const TFilePath& hookFile = getHookPath(dstPath);
   mergeTemporaryHookFile(from, to, hookFile);
 }
 
 //-----------------------------------------------------------------------------
 
 void TXshSimpleLevel::mergeTemporaryHookFile(unsigned int from, unsigned int to,
-                                             const TFilePath &hookFile) {
+                                             const TFilePath& hookFile) {
   if (!TFileStatus(hookFile).doesExist()) return;
 
-  HookSet *tempHookSet = new HookSet;
+  HookSet* tempHookSet = new HookSet;
   TIStream is(hookFile);
   std::string tagName;
   try {
@@ -253,7 +253,7 @@ void TXshSimpleLevel::mergeTemporaryHookFile(unsigned int from, unsigned int to,
   } catch (...) {
   }
 
-  HookSet *hookSet  = getHookSet();
+  HookSet* hookSet  = getHookSet();
   int tempHookCount = tempHookSet->getHookCount();
 
   if (tempHookCount == 0) {
@@ -263,8 +263,8 @@ void TXshSimpleLevel::mergeTemporaryHookFile(unsigned int from, unsigned int to,
     }
   } else {
     for (int i = 0; i < tempHookCount; i++) {
-      Hook *hook    = tempHookSet->getHook(i);
-      Hook *newHook = hookSet->touchHook(hook->getId());
+      Hook* hook    = tempHookSet->getHook(i);
+      Hook* newHook = hookSet->touchHook(hook->getId());
       newHook->setTrackerObjectId(hook->getTrackerObjectId());
       newHook->setTrackerRegionHeight(hook->getTrackerRegionHeight());
       newHook->setTrackerRegionWidth(hook->getTrackerRegionWidth());
@@ -329,9 +329,9 @@ bool TXshSimpleLevel::getDirtyFlag() const {
 
 //-----------------------------------------------------------------------------
 
-void TXshSimpleLevel::touchFrame(const TFrameId &fid) {
+void TXshSimpleLevel::touchFrame(const TFrameId& fid) {
   m_properties->setDirtyFlag(true);
-  TContentHistory *ch = getContentHistory();
+  TContentHistory* ch = getContentHistory();
   if (!ch) {
     ch = new TContentHistory(true);
     setContentHistory(ch);
@@ -353,7 +353,7 @@ void TXshSimpleLevel::touchFrame(const TFrameId &fid) {
 void TXshSimpleLevel::onPaletteChanged() {
   FramesSet::iterator ft, fEnd = m_frames.end();
   for (ft = m_frames.begin(); ft != fEnd; ++ft) {
-    const TFrameId &fid = *ft;
+    const TFrameId& fid = *ft;
 
     if (getType() == PLI_XSHLEVEL) {
       std::string id = rasterized(getImageId(fid));
@@ -370,13 +370,13 @@ void TXshSimpleLevel::onPaletteChanged() {
 
 //-----------------------------------------------------------------------------
 
-void TXshSimpleLevel::setScannedPath(const TFilePath &fp) {
+void TXshSimpleLevel::setScannedPath(const TFilePath& fp) {
   m_scannedPath = fp;
 }
 
 //-----------------------------------------------------------------------------
 
-void TXshSimpleLevel::setPath(const TFilePath &fp, bool keepFrames) {
+void TXshSimpleLevel::setPath(const TFilePath& fp, bool keepFrames) {
   m_path = fp;
   if (!keepFrames) {
     clearFrames();
@@ -390,7 +390,7 @@ void TXshSimpleLevel::setPath(const TFilePath &fp, bool keepFrames) {
   if (getType() != PLI_XSHLEVEL) {
     if (!m_frames.empty()) {
       std::string imageId = getImageId(getFirstFid());
-      const TImageInfo *imageInfo =
+      const TImageInfo* imageInfo =
           ImageManager::instance()->getInfo(imageId, ImageManager::none, 0);
       if (imageInfo) {
         TDimension imageRes(0, 0);
@@ -410,7 +410,7 @@ void TXshSimpleLevel::setPath(const TFilePath &fp, bool keepFrames) {
 
 //-----------------------------------------------------------------------------
 
-void TXshSimpleLevel::clonePropertiesFrom(const TXshSimpleLevel *oldSl) {
+void TXshSimpleLevel::clonePropertiesFrom(const TXshSimpleLevel* oldSl) {
   m_properties->setImageDpi(
       oldSl->m_properties
           ->getImageDpi());  // Watch out - may change dpi policy!
@@ -423,11 +423,11 @@ void TXshSimpleLevel::clonePropertiesFrom(const TXshSimpleLevel *oldSl) {
 
 //-----------------------------------------------------------------------------
 
-TPalette *TXshSimpleLevel::getPalette() const { return m_palette; }
+TPalette* TXshSimpleLevel::getPalette() const { return m_palette; }
 
 //-----------------------------------------------------------------------------
 
-void TXshSimpleLevel::setPalette(TPalette *palette) {
+void TXshSimpleLevel::setPalette(TPalette* palette) {
   if (m_palette != palette) {
     if (m_palette) m_palette->release();
 
@@ -441,7 +441,7 @@ void TXshSimpleLevel::setPalette(TPalette *palette) {
 
 //-----------------------------------------------------------------------------
 
-void TXshSimpleLevel::getFids(std::vector<TFrameId> &fids) const {
+void TXshSimpleLevel::getFids(std::vector<TFrameId>& fids) const {
   fids.assign(m_frames.begin(), m_frames.end());
 }
 
@@ -453,13 +453,13 @@ std::vector<TFrameId> TXshSimpleLevel::getFids() const {
 
 //-----------------------------------------------------------------------------
 
-bool TXshSimpleLevel::isFid(const TFrameId &fid) const {
+bool TXshSimpleLevel::isFid(const TFrameId& fid) const {
   return m_frames.count(fid);
 }
 
 //-----------------------------------------------------------------------------
 
-const TFrameId &TXshSimpleLevel::getFrameId(int index) const {
+const TFrameId& TXshSimpleLevel::getFrameId(int index) const {
   return *(m_frames.begin() += index);
 }
 
@@ -480,7 +480,7 @@ TFrameId TXshSimpleLevel::getLastFid() const {
 int TXshSimpleLevel::guessStep() const {
   int frameCount = m_frames.size();
   if (frameCount < 2)
-    return 1;  // un livello con zero o un frame ha per def. step=1
+    return 1;  // a level with zero or one frame has step=1 by definition
 
   FramesSet::const_iterator ft = m_frames.begin();
 
@@ -492,9 +492,8 @@ int TXshSimpleLevel::guessStep() const {
   int step = secondFid.getNumber() - firstFid.getNumber();
   if (step == 1) return 1;
 
-  // controllo subito se lo step vale per l'ultimo frame
-  // (cerco di limitare il numero di volte in cui devo controllare tutta la
-  // lista)
+  // check immediately if the step applies to the last frame
+  // (try to limit the number of times I have to check the entire list)
   TFrameId lastFid = *m_frames.rbegin();
   if (!lastFid.getLetter().isEmpty()) return 1;
 
@@ -502,7 +501,7 @@ int TXshSimpleLevel::guessStep() const {
     return 1;
 
   for (int i = 2; ft != m_frames.end(); ++ft, ++i) {
-    const TFrameId &fid = *ft;
+    const TFrameId& fid = *ft;
 
     if (!fid.getLetter().isEmpty()) return 1;
 
@@ -514,7 +513,7 @@ int TXshSimpleLevel::guessStep() const {
 
 //-----------------------------------------------------------------------------
 
-int TXshSimpleLevel::fid2index(const TFrameId &fid) const {
+int TXshSimpleLevel::fid2index(const TFrameId& fid) const {
   FramesSet::const_iterator ft = m_frames.find(fid);
   return (ft != m_frames.end()) ? std::distance(m_frames.begin(), ft)
                                 :  // Note: flat_set has random access
@@ -523,12 +522,12 @@ int TXshSimpleLevel::fid2index(const TFrameId &fid) const {
 
 //-----------------------------------------------------------------------------
 
-int TXshSimpleLevel::guessIndex(const TFrameId &fid) const {
+int TXshSimpleLevel::guessIndex(const TFrameId& fid) const {
   if (m_frames.empty()) return 0;  // no frames, return 0 (by definition)
 
   FramesSet::const_iterator ft = m_frames.lower_bound(fid);
   if (ft == m_frames.end()) {
-    const TFrameId &maxFid = *m_frames.rbegin();
+    const TFrameId& maxFid = *m_frames.rbegin();
     assert(fid > maxFid);
 
     // fid not in the table, but greater than the last one.
@@ -563,14 +562,14 @@ TFrameId TXshSimpleLevel::index2fid(int index) const {
 
 //-----------------------------------------------------------------------------
 
-TImageP TXshSimpleLevel::getFrame(const TFrameId &fid, UCHAR imFlags,
+TImageP TXshSimpleLevel::getFrame(const TFrameId& fid, UCHAR imFlags,
                                   int subsampling) const {
   assert(m_type != UNKNOWN_XSHLEVEL);
 
   // If the required frame is not in range, quit
   if (m_frames.count(fid) == 0) return TImageP();
 
-  const std::string &imgId = getImageId(fid);
+  const std::string& imgId = getImageId(fid);
 
   ImageLoader::BuildExtData extData(this, fid, subsampling);
   TImageP img = ImageManager::instance()->getImage(imgId, imFlags, &extData);
@@ -586,16 +585,16 @@ TImageP TXshSimpleLevel::getFrame(const TFrameId &fid, UCHAR imFlags,
 
 //-----------------------------------------------------------------------------
 
-TImageInfo *TXshSimpleLevel::getFrameInfo(const TFrameId &fid,
+TImageInfo* TXshSimpleLevel::getFrameInfo(const TFrameId& fid,
                                           bool toBeModified) {
   assert(m_type != UNKNOWN_XSHLEVEL);
 
   // If the required frame is not in range, quit
   if (m_frames.count(fid) == 0) return 0;
 
-  const std::string &imgId = getImageId(fid);
+  const std::string& imgId = getImageId(fid);
 
-  TImageInfo *info = ImageManager::instance()->getInfo(
+  TImageInfo* info = ImageManager::instance()->getInfo(
       imgId, toBeModified ? ImageManager::toBeModified : ImageManager::none, 0);
 
   return info;
@@ -603,7 +602,7 @@ TImageInfo *TXshSimpleLevel::getFrameInfo(const TFrameId &fid,
 
 //-----------------------------------------------------------------------------
 
-TImageP TXshSimpleLevel::getFrameIcon(const TFrameId &fid) const {
+TImageP TXshSimpleLevel::getFrameIcon(const TFrameId& fid) const {
   assert(m_type != UNKNOWN_XSHLEVEL);
 
   if (m_frames.count(fid) == 0) return TImageP();
@@ -614,7 +613,7 @@ TImageP TXshSimpleLevel::getFrameIcon(const TFrameId &fid) const {
   ImageLoader::BuildExtData extData(this, fid);
   extData.m_subs = 1, extData.m_icon = true;
 
-  const std::string &imgId = getImageId(fid);
+  const std::string& imgId = getImageId(fid);
   TImageP img              = ImageManager::instance()->getImage(
       imgId, ImageManager::dontPutInCache, &extData);
 
@@ -644,7 +643,7 @@ void TXshSimpleLevel::loadAllIconsAndPutInCache(bool cacheImagesAsWell) {
 
 //-----------------------------------------------------------------------------
 
-TRasterImageP TXshSimpleLevel::getFrameToCleanup(const TFrameId &fid,
+TRasterImageP TXshSimpleLevel::getFrameToCleanup(const TFrameId& fid,
                                                  bool toBeLineProcessed) const {
   assert(m_type != UNKNOWN_XSHLEVEL);
 
@@ -675,7 +674,7 @@ TRasterImageP TXshSimpleLevel::getFrameToCleanup(const TFrameId &fid,
 
 //-----------------------------------------------------------------------------
 
-TImageP TXshSimpleLevel::getFullsampledFrame(const TFrameId &fid,
+TImageP TXshSimpleLevel::getFullsampledFrame(const TFrameId& fid,
                                              UCHAR imFlags) const {
   assert(m_type != UNKNOWN_XSHLEVEL);
 
@@ -698,15 +697,33 @@ TImageP TXshSimpleLevel::getFullsampledFrame(const TFrameId &fid,
 
 //-----------------------------------------------------------------------------
 
-std::string TXshSimpleLevel::getIconId(const TFrameId &fid,
+TRasterImageP TXshSimpleLevel::getFrameRasterized(const TFrameId& fid,
+                                                  TPointD dpi) const {
+  assert(m_type == PLI_XSHLEVEL);
+
+  FramesSet::const_iterator it = m_frames.find(fid);
+  if (it == m_frames.end()) return TRasterImageP();
+
+  std::string imageId = getImageId(fid);
+  imageId             = rasterized(imageId);
+  ImageLoader::BuildExtData extData(this, fid, 1);
+  extData.m_cameraDPI = dpi;
+  TImageP img =
+      ImageManager::instance()->getImage(imageId, ImageManager::none, &extData);
+  return img;
+}
+
+//-----------------------------------------------------------------------------
+
+std::string TXshSimpleLevel::getIconId(const TFrameId& fid,
                                        int frameStatus) const {
   return "icon:" + getImageId(fid, frameStatus);
 }
 
 //-----------------------------------------------------------------------------
 
-std::string TXshSimpleLevel::getIconId(const TFrameId &fid,
-                                       const TDimension &size) const {
+std::string TXshSimpleLevel::getIconId(const TFrameId& fid,
+                                       const TDimension& size) const {
   return getImageId(fid) + ":" + std::to_string(size.lx) + "x" +
          std::to_string(size.ly);
 }
@@ -715,7 +732,7 @@ std::string TXshSimpleLevel::getIconId(const TFrameId &fid,
 
 namespace {
 
-TAffine getAffine(const TDimension &srcSize, const TDimension &dstSize) {
+TAffine getAffine(const TDimension& srcSize, const TDimension& dstSize) {
   double scx = 1 * dstSize.lx / (double)srcSize.lx;
   double scy = 1 * dstSize.ly / (double)srcSize.ly;
   double sc  = std::min(scx, scy);
@@ -727,14 +744,14 @@ TAffine getAffine(const TDimension &srcSize, const TDimension &dstSize) {
 
 //-----------------------------------------------------------------------------
 
-/*!Costruisce l'icona di dimesione \b size dell'immagine \b img.*/
-TImageP buildIcon(const TImageP &img, const TDimension &size) {
+/*!Builds the icon of dimension \b size of the image \b img.*/
+TImageP buildIcon(const TImageP& img, const TDimension& size) {
   TRaster32P raster(size);
   if (TVectorImageP vi = img) {
-    TOfflineGL *glContext = new TOfflineGL(size);
+    TOfflineGL* glContext = new TOfflineGL(size);
     // TDimension cameraSize(768, 576);
     TDimension cameraSize(1920, 1080);
-    TPalette *vPalette = img->getPalette();
+    TPalette* vPalette = img->getPalette();
     assert(vPalette);
     const TVectorRenderData rd(getAffine(cameraSize, size), TRect(), vPalette,
                                0, false);
@@ -757,8 +774,8 @@ TImageP buildIcon(const TImageP &img, const TDimension &size) {
       TRop::resample(raster, rasCM32, ti->getPalette(), aff);
       raster->lock();
       for (int y = 0; y < raster->getLy(); y++) {
-        TPixel32 *pix    = raster->pixels(y);
-        TPixel32 *endPix = pix + raster->getLx();
+        TPixel32* pix    = raster->pixels(y);
+        TPixel32* endPix = pix + raster->getLx();
         while (pix < endPix) {
           *pix = overPix(TPixel32::White, *pix);
           pix++;
@@ -783,7 +800,7 @@ TImageP buildIcon(const TImageP &img, const TDimension &size) {
 //-----------------------------------------------------------------------------
 
 // modify frameId to be with the same frame format as existing frames
-void TXshSimpleLevel::formatFId(TFrameId &fid, TFrameId _tmplFId) {
+void TXshSimpleLevel::formatFId(TFrameId& fid, TFrameId _tmplFId) {
   if (m_type != OVL_XSHLEVEL && m_type != TZI_XSHLEVEL) return;
 
   if (!m_frames.empty()) {
@@ -803,7 +820,7 @@ void TXshSimpleLevel::formatFId(TFrameId &fid, TFrameId _tmplFId) {
 
 //-----------------------------------------------------------------------------
 
-void TXshSimpleLevel::setFrame(const TFrameId &fid, const TImageP &img) {
+void TXshSimpleLevel::setFrame(const TFrameId& fid, const TImageP& img) {
   assert(m_type != UNKNOWN_XSHLEVEL);
 
   if (img) img->setPalette(getPalette());
@@ -819,10 +836,10 @@ void TXshSimpleLevel::setFrame(const TFrameId &fid, const TImageP &img) {
 
   // Deal with the ImageManger: ensure the identifiers are bound, and the
   // associated image is either modified to img or (if !img) invalidated.
-  const std::string &imageId = getImageId(fid);
+  const std::string& imageId = getImageId(fid);
 
   if (!ImageManager::instance()->isBound(imageId)) {
-    const TFilePath &decodedPath = getScene()->decodeFilePath(path);
+    const TFilePath& decodedPath = getScene()->decodeFilePath(path);
     ImageManager::instance()->bind(imageId, new ImageLoader(decodedPath, fid));
   }
 
@@ -833,7 +850,7 @@ void TXshSimpleLevel::setFrame(const TFrameId &fid, const TImageP &img) {
     //  PLIs have nothing to share with cleanup stuff
 
     if (m_type == PLI_XSHLEVEL) {
-      const std::string &imageId2 = rasterized(imageId);
+      const std::string& imageId2 = rasterized(imageId);
       if (!ImageManager::instance()->isBound(imageId2))
         ImageManager::instance()->bind(imageId2, new ImageRasterizer);
       else
@@ -841,7 +858,7 @@ void TXshSimpleLevel::setFrame(const TFrameId &fid, const TImageP &img) {
     }
 
     if (m_type == OVL_XSHLEVEL || m_type == TZI_XSHLEVEL) {
-      const std::string &imageId2 = filled(imageId);
+      const std::string& imageId2 = filled(imageId);
       if (!ImageManager::instance()->isBound(imageId2))
         ImageManager::instance()->bind(imageId2, new ImageFiller);
       else
@@ -852,7 +869,7 @@ void TXshSimpleLevel::setFrame(const TFrameId &fid, const TImageP &img) {
 
 //-----------------------------------------------------------------------------
 
-void TXshSimpleLevel::eraseFrame(const TFrameId &fid) {
+void TXshSimpleLevel::eraseFrame(const TFrameId& fid) {
   FramesSet::iterator ft = m_frames.find(fid);
   if (ft == m_frames.end()) return;
 
@@ -868,8 +885,8 @@ void TXshSimpleLevel::eraseFrame(const TFrameId &fid) {
   m_frames.erase(ft);
   getHookSet()->eraseFrame(fid);
 
-  ImageManager *im = ImageManager::instance();
-  TImageCache *ic  = TImageCache::instance();
+  ImageManager* im = ImageManager::instance();
+  TImageCache* ic  = TImageCache::instance();
   {
     im->unbind(getImageId(fid, Normal));
     im->unbind(getImageId(fid, Scanned));
@@ -891,8 +908,8 @@ void TXshSimpleLevel::eraseFrame(const TFrameId &fid) {
 //-----------------------------------------------------------------------------
 
 void TXshSimpleLevel::clearFrames() {
-  ImageManager *im = ImageManager::instance();
-  TImageCache *ic  = TImageCache::instance();
+  ImageManager* im = ImageManager::instance();
+  TImageCache* ic  = TImageCache::instance();
   // Unbind frames
   FramesSet::iterator ft, fEnd = m_frames.end();
   for (ft = m_frames.begin(); ft != fEnd; ++ft) {
@@ -922,7 +939,7 @@ void TXshSimpleLevel::clearFrames() {
 
 //-----------------------------------------------------------------------------
 
-void TXshSimpleLevel::loadData(TIStream &is) {
+void TXshSimpleLevel::loadData(TIStream& is) {
   std::string tagName;
   bool flag = false;
 
@@ -973,7 +990,7 @@ void TXshSimpleLevel::loadData(TIStream &is) {
       } else
         throw TException("unexpected tag " + tagName);
     } else {
-      if (flag) break;  // ci puo' essere un solo nome
+      if (flag) break;  // there can be only one name
       flag = true;
       std::wstring token;
       is >> token;
@@ -982,7 +999,7 @@ void TXshSimpleLevel::loadData(TIStream &is) {
         is >> token;
       }
 
-      if (token == L"_raster")  // obsoleto (Tab2.2)
+      if (token == L"_raster")  // obsolete (Tab2.2)
       {
         double xdpi = 1, ydpi = 1;
         is >> xdpi >> ydpi >> m_name;
@@ -993,7 +1010,7 @@ void TXshSimpleLevel::loadData(TIStream &is) {
         setPath(
             TFilePath("+drawings/") + (getName() + L"." + ::to_wstring("bmp")),
             true);
-      } else if (token == L"__raster")  // obsoleto (Tab2.2)
+      } else if (token == L"__raster")  // obsolete (Tab2.2)
       {
         double xdpi = 1, ydpi = 1;
         std::string extension;
@@ -1037,8 +1054,8 @@ public:
   TFrameId m_fromFid, m_toFid;
   LoadingLevelRange() : m_fromFid(1), m_toFid(0) {}
 
-  bool match(const TFrameId &fid) const {
-    /*-- ↓SubSequent範囲内にある条件		↓全部ロードする場合 --*/
+  bool match(const TFrameId& fid) const {
+    /*-- ↓Condition for being within SubSequence range   ↓When loading all --*/
     return ((m_fromFid <= fid && fid <= m_toFid) || m_fromFid > m_toFid);
   }
   bool isEnabled() const { return m_fromFid <= m_toFid; }
@@ -1053,18 +1070,18 @@ public:
 }  // namespace
 //-----------------------------------------------------------------------------
 
-void setLoadingLevelRange(const TFrameId &fromFid, const TFrameId &toFid) {
+void setLoadingLevelRange(const TFrameId& fromFid, const TFrameId& toFid) {
   loadingLevelRange.m_fromFid = fromFid;
   loadingLevelRange.m_toFid   = toFid;
 }
 
-void getLoadingLevelRange(TFrameId &fromFid, TFrameId &toFid) {
+void getLoadingLevelRange(TFrameId& fromFid, TFrameId& toFid) {
   fromFid = loadingLevelRange.m_fromFid;
   toFid   = loadingLevelRange.m_toFid;
 }
 
 static TFilePath getLevelPathAndSetNameWithPsdLevelName(
-    TXshSimpleLevel *xshLevel) {
+    TXshSimpleLevel* xshLevel) {
   TFilePath retfp = xshLevel->getPath();
 
   QString name        = QString::fromStdWString(retfp.getWideName());
@@ -1078,7 +1095,7 @@ static TFilePath getLevelPathAndSetNameWithPsdLevelName(
   if (list.size() >= 2 && list.at(1) != "frames") {
     bool hasLayerId;
     int layid                  = list.at(1).toInt(&hasLayerId);
-    QTextCodec *layerNameCodec = QTextCodec::codecForName(
+    QTextCodec* layerNameCodec = QTextCodec::codecForName(
         Preferences::instance()->getLayerNameEncoding().c_str());
 
     if (hasLayerId) {
@@ -1094,7 +1111,7 @@ static TFilePath getLevelPathAndSetNameWithPsdLevelName(
 
       if (removeFileName) wLevelName = list[1].toStdWString();
 
-      TLevelSet *levelSet = xshLevel->getScene()->getLevelSet();
+      TLevelSet* levelSet = xshLevel->getScene()->getLevelSet();
       if (levelSet && levelSet->hasLevel(
                           wLevelName))  // levelSet should be asserted instead
         levelSet->renameLevel(xshLevel, wLevelName);
@@ -1107,8 +1124,8 @@ static TFilePath getLevelPathAndSetNameWithPsdLevelName(
 }
 //-----------------------------------------------------------------------------
 
-// Nota: load() NON fa clearFrames(). si limita ad aggiungere le informazioni
-// relative ai frames su disco
+// Note: load() does NOT clearFrames(). It only adds the information
+// relative to the frames on disk
 void TXshSimpleLevel::load() {
   getProperties()->setCreator("");
   QString creator;
@@ -1183,8 +1200,18 @@ void TXshSimpleLevel::load() {
     assert(lr);
 
     TLevelP level = lr->loadInfo();
+    if (level->isPartialLoad()) {
+      QString msg =
+          QString(
+              "File '%1' partially loaded. Not all frames were found. Possible "
+              "file corruption. Loaded what could be found.\nRecommend "
+              "replacing any bad frames in Level Strip and saving.")
+              .arg(QString::fromStdWString(m_path.getWideString()));
+      QMessageBox::warning(0, "File load warning", msg);
+      setDirtyFlag(true);
+    }
     if (level->getFrameCount() > 0) {
-      const TImageInfo *info = lr->getImageInfo(level->begin()->first);
+      const TImageInfo* info = lr->getImageInfo(level->begin()->first);
 
       if (info && info->m_samplePerPixel >= 5) {
         QString msg = QString(
@@ -1209,9 +1236,9 @@ void TXshSimpleLevel::load() {
       getProperties()->setIsForbidden(true);
     else
       for (TLevel::Iterator it = level->begin(); it != level->end(); it++) {
-        m_renumberTable[it->first] = it->first;  // Voglio che la tabella
-                                                 // contenga anche i frame che
-                                                 // non vengono caricati
+        m_renumberTable[it->first] = it->first;  // I want the table to
+                                                 // also contain the frames that
+                                                 // are not loaded
         if (!loadingLevelRange.match(it->first)) continue;
         setFrame(it->first, TImageP());
       }
@@ -1227,10 +1254,10 @@ void TXshSimpleLevel::load() {
       TDimension imageRes(0, 0);
       TPointD imageDpi;
 
-      const TFrameId &firstFid = getFirstFid();
+      const TFrameId& firstFid = getFirstFid();
       std::string imageId      = getImageId(firstFid);
 
-      const TImageInfo *imageInfo =
+      const TImageInfo* imageInfo =
           ImageManager::instance()->getInfo(imageId, ImageManager::none, 0);
       if (imageInfo) {
         imageRes.lx = imageInfo->m_lx;
@@ -1298,10 +1325,10 @@ void TXshSimpleLevel::load() {
   }
 
   // Load hooks
-  HookSet *hookSet = getHookSet();
+  HookSet* hookSet = getHookSet();
   hookSet->clearHooks();
 
-  const TFilePath &hookFile =
+  const TFilePath& hookFile =
       TXshSimpleLevel::getExistingHookFile(getScene()->decodeFilePath(m_path));
 
   if (!hookFile.isEmpty()) {
@@ -1317,7 +1344,7 @@ void TXshSimpleLevel::load() {
 
 //-----------------------------------------------------------------------------
 
-void TXshSimpleLevel::load(const std::vector<TFrameId> &fIds) {
+void TXshSimpleLevel::load(const std::vector<TFrameId>& fIds) {
   getProperties()->setCreator("");
   QString creator;
   assert(getScene());
@@ -1325,7 +1352,7 @@ void TXshSimpleLevel::load(const std::vector<TFrameId> &fIds) {
 
   m_isSubsequence = loadingLevelRange.isEnabled();
 
-  // non e' un livello scan+cleanup
+  // it is not a scan+cleanup level
   TFilePath path = getScene()->decodeFilePath(m_path);
 
   TLevelReaderP lr(path);
@@ -1340,7 +1367,7 @@ void TXshSimpleLevel::load(const std::vector<TFrameId> &fIds) {
         if (!loadingLevelRange.match(fIds[i])) continue;
         setFrame(fIds[i], TImageP());
       }
-      const TImageInfo *info = lr->getImageInfo(fIds[0]);
+      const TImageInfo* info = lr->getImageInfo(fIds[0]);
       if (info) {
         set16BitChannelLevel(info->m_bitsPerSample == 16);
         setFloatChannelLevel(info->m_bitsPerSample == 32);
@@ -1352,7 +1379,7 @@ void TXshSimpleLevel::load(const std::vector<TFrameId> &fIds) {
         if (!loadingLevelRange.match(it->first)) continue;
         setFrame(it->first, TImageP());
       }
-      const TImageInfo *info = lr->getImageInfo(level->begin()->first);
+      const TImageInfo* info = lr->getImageInfo(level->begin()->first);
       if (info) {
         set16BitChannelLevel(info->m_bitsPerSample == 16);
         setFloatChannelLevel(info->m_bitsPerSample == 32);
@@ -1375,7 +1402,7 @@ void TXshSimpleLevel::load(const std::vector<TFrameId> &fIds) {
       TDimension imageRes(0, 0);
       TPointD imageDpi;
       std::string imageId = getImageId(getFirstFid());
-      const TImageInfo *imageInfo =
+      const TImageInfo* imageInfo =
           ImageManager::instance()->getInfo(imageId, ImageManager::none, 0);
       if (imageInfo) {
         imageRes.lx = imageInfo->m_lx;
@@ -1399,7 +1426,7 @@ void TXshSimpleLevel::updateReadOnly() {
 
 //-----------------------------------------------------------------------------
 
-void TXshSimpleLevel::saveData(TOStream &os) {
+void TXshSimpleLevel::saveData(TOStream& os) {
   os << m_name;
 
   std::map<std::string, std::string> attr;
@@ -1508,7 +1535,7 @@ static void saveBackup(TFilePath path) {
 
 //-----------------------------------------------------------------------------
 
-void TXshSimpleLevel::save(const TFilePath &fp, const TFilePath &oldFp,
+void TXshSimpleLevel::save(const TFilePath& fp, const TFilePath& oldFp,
                            bool overwritePalette) {
   TFilePath dOldPath =
       (!oldFp.isEmpty()) ? oldFp : getScene()->decodeFilePath(m_path);
@@ -1549,7 +1576,7 @@ void TXshSimpleLevel::save(const TFilePath &fp, const TFilePath &oldFp,
       }
 
       // save new files
-      TXshSimpleLevel *sl = new TXshSimpleLevel;
+      TXshSimpleLevel* sl = new TXshSimpleLevel;
       sl->setScene(getScene());
       sl->setPalette(getPalette());
       sl->setPath(getScene()->codeFilePath(app));
@@ -1560,17 +1587,17 @@ void TXshSimpleLevel::save(const TFilePath &fp, const TFilePath &oldFp,
 
       std::set<TFrameId>::iterator eft, efEnd = m_editableRange.end();
       for (eft = m_editableRange.begin(); eft != efEnd; ++eft) {
-        const TFrameId &fid = *eft;
+        const TFrameId& fid = *eft;
         sl->setFrame(fid, getFrame(fid, false));
       }
 
       // Copy hooks
-      HookSet *hookSet = sl->getHookSet();
+      HookSet* hookSet = sl->getHookSet();
       *hookSet         = *getHookSet();
 
       FramesSet::iterator ft, fEnd = m_frames.end();
       for (ft = m_frames.begin(); ft != fEnd; ++ft) {
-        const TFrameId &fid = *ft;
+        const TFrameId& fid = *ft;
 
         if (m_editableRange.find(fid) == m_editableRange.end())
           hookSet->eraseFrame(fid);
@@ -1599,7 +1626,7 @@ void TXshSimpleLevel::save(const TFilePath &fp, const TFilePath &oldFp,
   }
 
   if (dOldPath != dDstPath && m_path != TFilePath()) {
-    const TFilePath &dSrcPath = dOldPath;
+    const TFilePath& dSrcPath = dOldPath;
 
     try {
       if (TSystem::doesExistFileOrLevel(dSrcPath)) {
@@ -1625,7 +1652,7 @@ void TXshSimpleLevel::save(const TFilePath &fp, const TFilePath &oldFp,
 
 //-----------------------------------------------------------------------------
 
-void TXshSimpleLevel::saveSimpleLevel(const TFilePath &decodedFp,
+void TXshSimpleLevel::saveSimpleLevel(const TFilePath& decodedFp,
                                       bool overwritePalette) {
   /* Precondition: Destination level with path decodedFp is supposed to already
              store those image frames not tagged as 'modified' in this level
@@ -1655,38 +1682,41 @@ void TXshSimpleLevel::saveSimpleLevel(const TFilePath &decodedFp,
   if (getPalette()) isPaletteModified = getPalette()->getDirtyFlag();
 
   if (isLevelModified || isPaletteModified) {
-    // gmt (8/8/08. provo a risolvere il pasticcio della scrittura dei tlv.
-    // Dobbiamo
-    // ripensarci con piu' calma. Per ora cerco di fare meno danno possibile).
+    // gmt (8/8/08. trying to solve the mess of tlv writing.
+    // We need
+    // to rethink it more calmly. For now, trying to do as little damage as
+    // possible).
     TDimension oldRes(0, 0);
-
+    bool fileOrLevelRemoved = false;
     if (TSystem::doesExistFileOrLevel(decodedFp)) {
       TLevelReaderP lr(decodedFp);
       lr->doReadPalette(false);
-      const TImageInfo *imageInfo = m_frames.empty()
-                                        ? lr->getImageInfo()
-                                        : lr->getImageInfo(*(m_frames.begin()));
-
-      if (imageInfo) {
-        oldRes.lx = imageInfo->m_lx;
-        oldRes.ly = imageInfo->m_ly;
-        lr        = TLevelReaderP();
-        if (getProperties()->getImageRes() != oldRes) {
-          // Il comando canvas size cambia le dimensioni del livello!!!
-          // Se il file già esiste, nel level writer vengono risettate le
-          // dimesnioni del file esistente
-          // e salva male
-          TSystem::removeFileOrLevel(decodedFp);
+      try {
+        const TImageInfo* imageInfo =
+            m_frames.empty() ? lr->getImageInfo()
+                             : lr->getImageInfo(*(m_frames.begin()));
+        if (getType() != MESH_XSHLEVEL && imageInfo) {
+          oldRes.lx = imageInfo->m_lx;
+          oldRes.ly = imageInfo->m_ly;
+          lr        = TLevelReaderP();
+          if (getProperties()->getImageRes() != oldRes) {
+            // The canvas size command changes the level dimensions!!!
+            // If the file already exists, in the level writer the dimensions of
+            // the existing file are reset and it saves badly
+            TSystem::removeFileOrLevel(decodedFp);
+            fileOrLevelRemoved = true;
+          }
         }
+      } catch (...) {
       }
     }
     // overwrite tlv
     if (decodedFp.getType() == "tlv" &&
         TSystem::doesExistFileOrLevel(decodedFp)) {
       if (isLevelModified) {
-        // in questo caso dovrei scrivere solo i frame modificati.
-        // certamente NON DEVO scrivere quelli che non ho (e che dovrei
-        // rileggere dallo stesso file che sto scrivendo
+        // in this case I should only write the modified frames.
+        // certainly I MUST NOT write those that I don't have (and that I
+        // should reread from the same file that I'm writing
 
         int oldSubs = getProperties()->getSubsampling();
 
@@ -1708,10 +1738,9 @@ void TXshSimpleLevel::saveSimpleLevel(const TFilePath &decodedFp,
         lw->setCreator(getCreatorString());
         lw->setPalette(getPalette());
 
-        // Filter out of the renumber table all non-tlv frames (could happen if
-        // the level
-        // is a scan-cleanup mix). This is fine even on the temporarily
-        // substituted m_path.
+        // Filter out of the renumber table all non-tlv frames (could happen
+        // if the level is a scan-cleanup mix). This is fine even on the
+        // temporarily substituted m_path.
         std::map<TFrameId, TFrameId> renumberTable;
 
         for (auto it = m_renumberTable.rbegin(); it != m_renumberTable.rend();
@@ -1734,10 +1763,13 @@ void TXshSimpleLevel::saveSimpleLevel(const TFilePath &decodedFp,
 
         ImageLoader::BuildExtData extData(this, TFrameId());
 
-        for (auto const &fid : fids) {
+        for (auto const& fid : fids) {
           std::string imageId = getImageId(
-              fid, Normal);  // Retrieve the actual level frames ("L_whatever")
-          if (!ImageManager::instance()->isModified(imageId)) continue;
+              fid,
+              Normal);  // Retrieve the actual level frames ("L_whatever")
+          if (!fileOrLevelRemoved &&
+              !ImageManager::instance()->isModified(imageId))
+            continue;
 
           extData.m_fid = fid;
           TImageP img =
@@ -1757,7 +1789,8 @@ void TXshSimpleLevel::saveSimpleLevel(const TFilePath &decodedFp,
 
           if (TToonzImageP ti = img) {
             /*-
-             * SaveBoxを塗り漏れ防止に使用している場合、実際の画像範囲とSaveBoxのサイズが異なるため、ここで更新しておく-*/
+             * When using SaveBox to prevent paint leakage, the actual image
+             * range and SaveBox size differ, so update it here-*/
             TRect saveBox;
             TRop::computeBBox(ti->getRaster(), saveBox);
             ti->setSavebox(saveBox);
@@ -1779,8 +1812,8 @@ void TXshSimpleLevel::saveSimpleLevel(const TFilePath &decodedFp,
           paletteNotSaved = true;
       }
     } else {
-      // per ora faccio quello che facevo prima, ma dobbiamo rivedere tutta la
-      // strategia
+      // for now I'm doing what I did before, but we need to review the whole
+      // strategy
       LevelUpdater updater(this);
       updater.getLevelWriter()->setCreator(getCreatorString());
       if (updater.getImageInfo())
@@ -1791,8 +1824,8 @@ void TXshSimpleLevel::saveSimpleLevel(const TFilePath &decodedFp,
         // Apply the level's renumber table, before saving other files.
         // NOTE: This is currently NOT under LevelUpdater's responsibility, as
         // renumber tables
-        // are set/manipulated heavily here. The approach should be re-designed,
-        // though...
+        // are set/manipulated heavily here. The approach should be
+        // re-designed, though...
         updater.getLevelWriter()->renumberFids(m_renumberTable);
 
         if (!m_editableRange.empty())
@@ -1801,10 +1834,13 @@ void TXshSimpleLevel::saveSimpleLevel(const TFilePath &decodedFp,
 
         ImageLoader::BuildExtData extData(this, TFrameId());
 
-        for (auto const &fid : fids) {
+        for (auto const& fid : fids) {
           std::string imageId = getImageId(
-              fid, Normal);  // Retrieve the actual level frames ("L_whatever")
-          if (!ImageManager::instance()->isModified(imageId)) continue;
+              fid,
+              Normal);  // Retrieve the actual level frames ("L_whatever")
+          if (!fileOrLevelRemoved &&
+              !ImageManager::instance()->isModified(imageId))
+            continue;
 
           extData.m_fid = fid;
           TImageP img =
@@ -1834,7 +1870,7 @@ void TXshSimpleLevel::saveSimpleLevel(const TFilePath &decodedFp,
   // Save hooks
 
   TFilePath hookFile;
-  HookSet *hookSet = 0;
+  HookSet* hookSet = 0;
 
   // Save the hookSet in a temporary hook file
   if (getType() == OVL_XSHLEVEL && !m_editableRange.empty()) {
@@ -1858,7 +1894,8 @@ void TXshSimpleLevel::saveSimpleLevel(const TFilePath &decodedFp,
   }
 
 #ifdef _WIN32
-  // Remove the hidden attribute (since TOStream's fopen fails on hidden files)
+  // Remove the hidden attribute (since TOStream's fopen fails on hidden
+  // files)
   if (getType() == OVL_XSHLEVEL && !m_editableRange.empty())
     SetFileAttributesW(hookFile.getWideString().c_str(), FILE_ATTRIBUTE_NORMAL);
 #endif
@@ -1895,7 +1932,7 @@ void TXshSimpleLevel::saveSimpleLevel(const TFilePath &decodedFp,
 
 //-----------------------------------------------------------------------------
 
-std::string TXshSimpleLevel::getImageId(const TFrameId &fid,
+std::string TXshSimpleLevel::getImageId(const TFrameId& fid,
                                         int frameStatus) const {
   if (frameStatus < 0) frameStatus = getFrameStatus(fid);
   std::string prefix = "L";
@@ -1909,21 +1946,21 @@ std::string TXshSimpleLevel::getImageId(const TFrameId &fid,
 
 //-----------------------------------------------------------------------------
 
-int TXshSimpleLevel::getFrameStatus(const TFrameId &fid) const {
+int TXshSimpleLevel::getFrameStatus(const TFrameId& fid) const {
   std::map<TFrameId, int>::const_iterator it = m_framesStatus.find(fid);
   return (it != m_framesStatus.end()) ? it->second : Normal;
 }
 
 //-----------------------------------------------------------------------------
 
-void TXshSimpleLevel::setFrameStatus(const TFrameId &fid, int status) {
+void TXshSimpleLevel::setFrameStatus(const TFrameId& fid, int status) {
   assert((status & ~(Scanned | Cleanupped | CleanupPreview)) == 0);
   m_framesStatus[fid] = status;
 }
-
 //-----------------------------------------------------------------------------
-/*- CleanupPopup::setCurrentLevel / TCleanupper で使用 -*/
-void TXshSimpleLevel::makeTlv(const TFilePath &tlvPath) {
+
+/*- Used in CleanupPopup::setCurrentLevel / TCleanupper -*/
+void TXshSimpleLevel::makeTlv(const TFilePath& tlvPath) {
   int ltype = getType();
 
   if (!(ltype & FULLCOLOR_TYPE)) {
@@ -1956,10 +1993,10 @@ void TXshSimpleLevel::invalidateFrames() {
   for (ft = m_frames.begin(); ft != fEnd; ++ft)
     ImageManager::instance()->invalidate(getImageId(*ft));
 }
-
 //-----------------------------------------------------------------------------
-/*- 指定したFIdのみInvalidateする -*/
-void TXshSimpleLevel::invalidateFrame(const TFrameId &fid) {
+
+/*- Invalidate only the specified FId -*/
+void TXshSimpleLevel::invalidateFrame(const TFrameId& fid) {
   std::string id = getImageId(fid);
   ImageManager::instance()->invalidate(id);
 }
@@ -1967,12 +2004,12 @@ void TXshSimpleLevel::invalidateFrame(const TFrameId &fid) {
 //-----------------------------------------------------------------------------
 // note that the palette will always be replaced by the new one.
 void TXshSimpleLevel::initializePalette() {
-  ToonzScene *scene = getScene();
+  ToonzScene* scene = getScene();
   assert(scene);
 
   TFilePath fullPath;
-  TPalette *palette = new TPalette();
-  int type = getType();
+  TPalette* palette = new TPalette();
+  int type          = getType();
   switch (type) {
   case TZP_XSHLEVEL:
     fullPath =
@@ -1983,7 +2020,8 @@ void TXshSimpleLevel::initializePalette() {
     } else {
       TFilePath globalPath(
           ToonzFolder::getStudioPaletteFolder().getQString().append(
-              "\\Global Palettes\\Default Palettes\\Toonz_Raster_Palette.tpl"));
+              "\\Global Palettes\\Default "
+              "Palettes\\Toonz_Raster_Palette.tpl"));
       if (TSystem::doesExistFileOrLevel(globalPath)) {
         TIStream is(globalPath);
         is >> palette;
@@ -2000,7 +2038,8 @@ void TXshSimpleLevel::initializePalette() {
     } else {
       TFilePath globalPath(
           ToonzFolder::getStudioPaletteFolder().getQString().append(
-              "\\Global Palettes\\Default Palettes\\Toonz_Vector_Palette.tpl"));
+              "\\Global Palettes\\Default "
+              "Palettes\\Toonz_Vector_Palette.tpl"));
       if (TSystem::doesExistFileOrLevel(globalPath)) {
         TIStream is(globalPath);
         is >> palette;
@@ -2014,18 +2053,17 @@ void TXshSimpleLevel::initializePalette() {
     break;
   }
 
-  
   if (palette && type != OVL_XSHLEVEL) {
     palette->setPaletteName(getName());
   }
-  
+
   palette->setDirtyFlag(true);
   setPalette(palette);
 }
 
 //-----------------------------------------------------------------------------
 
-void TXshSimpleLevel::initializeResolutionAndDpi(const TDimension &dim,
+void TXshSimpleLevel::initializeResolutionAndDpi(const TDimension& dim,
                                                  double dpi) {
   assert(getScene());
   if (getProperties()->getImageRes() != TDimension() &&
@@ -2036,7 +2074,7 @@ void TXshSimpleLevel::initializeResolutionAndDpi(const TDimension &dim,
   getProperties()->setDpiPolicy(LevelProperties::DP_ImageDpi);
   if (dim == TDimension()) {
     double w, h;
-    Preferences *pref = Preferences::instance();
+    Preferences* pref = Preferences::instance();
     if (pref->isNewLevelSizeToCameraSizeEnabled()) {
       TDimensionD camSize = getScene()->getCurrentCamera()->getSize();
       w                   = camSize.lx;
@@ -2061,12 +2099,13 @@ void TXshSimpleLevel::initializeResolutionAndDpi(const TDimension &dim,
 
 //-----------------------------------------------------------------------------
 
-// crea un frame con tipo, dimensioni, dpi, ecc. compatibili con il livello
+// creates a frame with type, dimensions, dpi, etc. compatible with the level
 TImageP TXshSimpleLevel::createEmptyFrame() {
-  // In case this is the first frame to be created in this level (i.e. the level
-  // file was missing when loading resources) initialize the level in the same
-  // manner as createNewLevel() in order to avoid crash. This can be happened if
-  // the level was not saved after creating and being placed in the xsheet.
+  // In case this is the first frame to be created in this level (i.e. the
+  // level file was missing when loading resources) initialize the level in
+  // the same manner as createNewLevel() in order to avoid crash. This can be
+  // happened if the level was not saved after creating and being placed in
+  // the xsheet.
   if (isEmpty()) {
     if (!getPalette()) initializePalette();
     initializeResolutionAndDpi();
@@ -2089,14 +2128,14 @@ TImageP TXshSimpleLevel::createEmptyFrame() {
 
   default: {
     // normally the image must have the level->getProperties()->getImageDpi().
-    // if this value is missing (for some reason - can this happen, ever?) then
-    // we use the getDpi() (that is the current dpi, e.g. cameraDpi or
+    // if this value is missing (for some reason - can this happen, ever?)
+    // then we use the getDpi() (that is the current dpi, e.g. cameraDpi or
     // customDpi).
 
     TPointD dpi = getProperties()->getImageDpi();
     /*--
-    tgaからtlvにconvertしたものをInsert Pasteしたとき、
-    ペーストしたフレームにのみDPIが付いてしまうので、この処理は省く
+    When inserting and pasting something converted from tga to tlv,
+    only the pasted frame gets DPI, so skip this processing
     --*/
     // if(dpi.x==0.0 || dpi.y==0.0)
     //  dpi = getProperties()->getDpi();
@@ -2129,8 +2168,8 @@ TImageP TXshSimpleLevel::createEmptyFrame() {
 
 //-----------------------------------------------------------------------------
 
-// ritorna la risoluzione dei frames del livello (se il livello non e'
-// vettoriale)
+// returns the resolution of the level frames (if the level is not
+// vector)
 TDimension TXshSimpleLevel::getResolution() {
   if (isEmpty() || getType() == PLI_XSHLEVEL) return TDimension();
   return m_properties->getImageRes();
@@ -2138,15 +2177,15 @@ TDimension TXshSimpleLevel::getResolution() {
 
 //-----------------------------------------------------------------------------
 
-// ritorna il dpi letto da file
-TPointD TXshSimpleLevel::getImageDpi(const TFrameId &fid, int frameStatus) {
+// returns the dpi read from file
+TPointD TXshSimpleLevel::getImageDpi(const TFrameId& fid, int frameStatus) {
   if (isEmpty() || getType() == PLI_XSHLEVEL) return TPointD();
 
-  const TFrameId &theFid =
+  const TFrameId& theFid =
       (fid == TFrameId::NO_FRAME || !isFid(fid)) ? getFirstFid() : fid;
-  const std::string &imageId = getImageId(theFid, frameStatus);
+  const std::string& imageId = getImageId(theFid, frameStatus);
 
-  const TImageInfo *imageInfo =
+  const TImageInfo* imageInfo =
       ImageManager::instance()->getInfo(imageId, ImageManager::none, 0);
 
   if (!imageInfo) return TPointD();
@@ -2156,7 +2195,7 @@ TPointD TXshSimpleLevel::getImageDpi(const TFrameId &fid, int frameStatus) {
 
 //-----------------------------------------------------------------------------
 
-int TXshSimpleLevel::getImageSubsampling(const TFrameId &fid) const {
+int TXshSimpleLevel::getImageSubsampling(const TFrameId& fid) const {
   if (isEmpty() || getType() == PLI_XSHLEVEL) return 1;
   TImageP img = TImageCache::instance()->get(getImageId(fid), false);
   if (!img) return 1;
@@ -2167,8 +2206,8 @@ int TXshSimpleLevel::getImageSubsampling(const TFrameId &fid) const {
 
 //-----------------------------------------------------------------------------
 
-// ritorna il dpi corrente del livello
-TPointD TXshSimpleLevel::getDpi(const TFrameId &fid, int frameStatus) {
+// returns the current dpi of the level
+TPointD TXshSimpleLevel::getDpi(const TFrameId& fid, int frameStatus) {
   TPointD dpi;
   if (m_properties->getDpiPolicy() == LevelProperties::DP_ImageDpi)
     dpi = getImageDpi(fid, frameStatus);
@@ -2179,7 +2218,7 @@ TPointD TXshSimpleLevel::getDpi(const TFrameId &fid, int frameStatus) {
 
 //-----------------------------------------------------------------------------
 
-void TXshSimpleLevel::renumber(const std::vector<TFrameId> &fids) {
+void TXshSimpleLevel::renumber(const std::vector<TFrameId>& fids) {
   assert(fids.size() == m_frames.size());
   int n = fids.size();
 
@@ -2193,14 +2232,14 @@ void TXshSimpleLevel::renumber(const std::vector<TFrameId> &fids) {
     TFrameId oldFrameId = *it;
     TFrameId newFrameId = fids[i++];
     table[oldFrameId]   = newFrameId;
-    for (auto const &renumber : m_renumberTable) {
+    for (auto const& renumber : m_renumberTable) {
       if (renumber.second == oldFrameId) {
         newRenumberTable[renumber.first] = newFrameId;
         break;
       }
     }
   }
-  for (auto const &renumber : newRenumberTable) {
+  for (auto const& renumber : newRenumberTable) {
     m_renumberTable[renumber.first] = renumber.second;
   }
 
@@ -2211,8 +2250,8 @@ void TXshSimpleLevel::renumber(const std::vector<TFrameId> &fids) {
     m_frames.insert(fid);
   }
 
-  ImageManager *im = ImageManager::instance();
-  TImageCache *ic  = TImageCache::instance();
+  ImageManager* im = ImageManager::instance();
+  TImageCache* ic  = TImageCache::instance();
 
   std::map<TFrameId, TFrameId>::iterator jt;
 
@@ -2236,22 +2275,22 @@ void TXshSimpleLevel::renumber(const std::vector<TFrameId> &fids) {
 
   if (getType() == PLI_XSHLEVEL) {
     for (i = 0, jt = table.begin(); jt != table.end(); ++jt, ++i) {
-      const std::string &id = rasterized(getImageId(jt->first));
+      const std::string& id = rasterized(getImageId(jt->first));
       if (im->isBound(id)) im->rebind(id, rasterized("^" + std::to_string(i)));
     }
     for (i = 0, jt = table.begin(); jt != table.end(); ++jt, ++i) {
-      const std::string &id = rasterized("^" + std::to_string(i));
+      const std::string& id = rasterized("^" + std::to_string(i));
       if (im->isBound(id)) im->rebind(id, rasterized(getImageId(jt->second)));
     }
   }
 
   if (getType() & FULLCOLOR_TYPE) {
     for (i = 0, jt = table.begin(); jt != table.end(); ++jt, ++i) {
-      const std::string &id = filled(getImageId(jt->first));
+      const std::string& id = filled(getImageId(jt->first));
       if (im->isBound(id)) im->rebind(id, filled("^" + std::to_string(i)));
     }
     for (i = 0, jt = table.begin(); jt != table.end(); ++jt, ++i) {
-      const std::string &id = filled("^" + std::to_string(i));
+      const std::string& id = filled("^" + std::to_string(i));
       if (im->isBound(id)) im->rebind(id, filled(getImageId(jt->second)));
     }
   }
@@ -2263,12 +2302,12 @@ void TXshSimpleLevel::renumber(const std::vector<TFrameId> &fids) {
 
 //-----------------------------------------------------------------------------
 
-void TXshSimpleLevel::copyFiles(const TFilePath &dst, const TFilePath &src) {
+void TXshSimpleLevel::copyFiles(const TFilePath& dst, const TFilePath& src) {
   if (dst == src) return;
   TSystem::touchParentDir(dst);
   TSystem::copyFileOrLevel_throw(dst, src);
   if (dst.getType() == "tlv") {
-    // Copio la palette del livello
+    // Copy the level palette
     TFilePath srcPltPath =
         src.getParentDir() + TFilePath(src.getWideName() + L".tpl");
     if (TFileStatus(srcPltPath).doesExist())
@@ -2277,7 +2316,7 @@ void TXshSimpleLevel::copyFiles(const TFilePath &dst, const TFilePath &src) {
           srcPltPath, true);
   }
   if (dst.getType() == "tzp" || dst.getType() == "tzu") {
-    // Copio la palette del livello
+    // Copy the level palette
     TFilePath srcPltPath =
         src.getParentDir() + TFilePath(src.getWideName() + L".plt");
     if (TFileStatus(srcPltPath).doesExist())
@@ -2286,9 +2325,9 @@ void TXshSimpleLevel::copyFiles(const TFilePath &dst, const TFilePath &src) {
           srcPltPath, true);
   }
 
-  const TFilePath &srcHookFile = TXshSimpleLevel::getExistingHookFile(src);
+  const TFilePath& srcHookFile = TXshSimpleLevel::getExistingHookFile(src);
   if (!srcHookFile.isEmpty()) {
-    const TFilePath &dstHookFile = getHookPath(dst);
+    const TFilePath& dstHookFile = getHookPath(dst);
     TSystem::copyFile(dstHookFile, srcHookFile, true);
   }
   TFilePath files = src.getParentDir() + (src.getName() + "_files");
@@ -2298,7 +2337,7 @@ void TXshSimpleLevel::copyFiles(const TFilePath &dst, const TFilePath &src) {
 
 //-----------------------------------------------------------------------------
 
-void TXshSimpleLevel::renameFiles(const TFilePath &dst, const TFilePath &src) {
+void TXshSimpleLevel::renameFiles(const TFilePath& dst, const TFilePath& src) {
   if (dst == src) return;
   TSystem::touchParentDir(dst);
   if (TSystem::doesExistFileOrLevel(dst)) TXshSimpleLevel::removeFiles(dst);
@@ -2306,9 +2345,9 @@ void TXshSimpleLevel::renameFiles(const TFilePath &dst, const TFilePath &src) {
   if (dst.getType() == "tlv")
     TSystem::renameFile(dst.withType("tpl"), src.withType("tpl"));
 
-  const TFilePath &srcHookFile = TXshSimpleLevel::getExistingHookFile(src);
+  const TFilePath& srcHookFile = TXshSimpleLevel::getExistingHookFile(src);
   if (!srcHookFile.isEmpty()) {
-    const TFilePath &dstHookFile = getHookPath(dst);
+    const TFilePath& dstHookFile = getHookPath(dst);
     TSystem::renameFile(dstHookFile, srcHookFile);
   }
 
@@ -2319,7 +2358,7 @@ void TXshSimpleLevel::renameFiles(const TFilePath &dst, const TFilePath &src) {
 
 //-----------------------------------------------------------------------------
 
-void TXshSimpleLevel::removeFiles(const TFilePath &fp) {
+void TXshSimpleLevel::removeFiles(const TFilePath& fp) {
   TSystem::moveFileOrLevelToRecycleBin(fp);
   if (fp.getType() == "tlv") {
     TFilePath tpl = fp.withType("tpl");
@@ -2327,7 +2366,7 @@ void TXshSimpleLevel::removeFiles(const TFilePath &fp) {
   }
 
   // Delete ALL hook files (ie from every Toonz version)
-  const QStringList &hookFiles = TXshSimpleLevel::getHookFiles(fp);
+  const QStringList& hookFiles = TXshSimpleLevel::getHookFiles(fp);
 
   int f, fCount = hookFiles.size();
   for (f = 0; f != fCount; ++f)
@@ -2340,7 +2379,7 @@ void TXshSimpleLevel::removeFiles(const TFilePath &fp) {
 
 //-----------------------------------------------------------------------------
 
-void TXshSimpleLevel::getFiles(const TFilePath &fp, TFilePathSet &fpset) {
+void TXshSimpleLevel::getFiles(const TFilePath& fp, TFilePathSet& fpset) {
   if (fp.getType() == "tlv") {
     TFilePath tpl = fp.withType("tpl");
     if (TFileStatus(tpl).doesExist()) fpset.push_back(tpl);
@@ -2349,7 +2388,7 @@ void TXshSimpleLevel::getFiles(const TFilePath &fp, TFilePathSet &fpset) {
   // Store the hooks file if any (NOTE: there could be more than one hooks
   // file. I'm retaining the behavior I've seen, but was this really intended?
   // Shouldn't we return ALL the hooks files?)
-  const TFilePath &hookFile = getExistingHookFile(fp);
+  const TFilePath& hookFile = getExistingHookFile(fp);
   if (!hookFile.isEmpty()) fpset.push_back(hookFile);
 
   // Needed for TAB Manga & Kids and not used in Toonz
@@ -2361,7 +2400,7 @@ void TXshSimpleLevel::getFiles(const TFilePath &fp, TFilePathSet &fpset) {
 
 //-----------------------------------------------------------------------------
 
-void TXshSimpleLevel::setContentHistory(TContentHistory *contentHistory) {
+void TXshSimpleLevel::setContentHistory(TContentHistory* contentHistory) {
   if (contentHistory != m_contentHistory.get())
     m_contentHistory.reset(contentHistory);
 }
@@ -2377,7 +2416,7 @@ void TXshSimpleLevel::setCompatibilityMasks(int writeMask, int neededMask,
 
 //-----------------------------------------------------------------------------
 
-TFilePath TXshSimpleLevel::getHookPath(const TFilePath &path) {
+TFilePath TXshSimpleLevel::getHookPath(const TFilePath& path) {
   // Translates:  levelName..ext  into  levelName_hooks..ext.xml
   //              levelName.ext   into  levelName_hooks.ext.xml
 
@@ -2392,8 +2431,8 @@ TFilePath TXshSimpleLevel::getHookPath(const TFilePath &path) {
 
 //-----------------------------------------------------------------------------
 
-QStringList TXshSimpleLevel::getHookFiles(const TFilePath &decodedLevelPath) {
-  const TFilePath &dirPath = decodedLevelPath.getParentDir();
+QStringList TXshSimpleLevel::getHookFiles(const TFilePath& decodedLevelPath) {
+  const TFilePath& dirPath = decodedLevelPath.getParentDir();
   QDir levelDir(QString::fromStdWString(dirPath.getWideString()));
 
   QStringList hookFileFilter(
@@ -2410,7 +2449,7 @@ QStringList TXshSimpleLevel::getHookFiles(const TFilePath &decodedLevelPath) {
 //-----------------------------------------------------------------------------
 
 TFilePath TXshSimpleLevel::getExistingHookFile(
-    const TFilePath &decodedLevelPath) {
+    const TFilePath& decodedLevelPath) {
   static const int pCount              = 3;
   static const QRegExp pattern[pCount] = {
       // Prioritized in this order
@@ -2420,14 +2459,14 @@ TFilePath TXshSimpleLevel::getExistingHookFile(
   };
 
   struct locals {
-    static inline int getPattern(const QString &fp) {
+    static inline int getPattern(const QString& fp) {
       for (int p = 0; p != pCount; ++p)
         if (pattern[p].exactMatch(fp)) return p;
       return -1;
     }
   };  // locals
 
-  const QStringList &hookFiles = getHookFiles(decodedLevelPath);
+  const QStringList& hookFiles = getHookFiles(decodedLevelPath);
   if (hookFiles.empty()) return TFilePath();
 
   // Return the hook file with the most recent (smallest) identified
@@ -2448,7 +2487,7 @@ TFilePath TXshSimpleLevel::getExistingHookFile(
 
 //-----------------------------------------------------------------------------
 
-TRectD TXshSimpleLevel::getBBox(const TFrameId &fid) const {
+TRectD TXshSimpleLevel::getBBox(const TFrameId& fid) const {
   TRectD bbox;
   double dpiX = Stage::inch, dpiY = dpiX;
 
@@ -2469,9 +2508,9 @@ TRectD TXshSimpleLevel::getBBox(const TFrameId &fid) const {
 
   default: {
     // Raster case: retrieve the image info from the ImageManager
-    const std::string &imageId = getImageId(fid);
+    const std::string& imageId = getImageId(fid);
 
-    const TImageInfo *info =
+    const TImageInfo* info =
         ImageManager::instance()->getInfo(imageId, ImageManager::none, 0);
     if (!info) return TRectD();
 
@@ -2486,13 +2525,13 @@ TRectD TXshSimpleLevel::getBBox(const TFrameId &fid) const {
   }
   }
 
-  // Get the frame's dpi and traduce the bbox to inch coordinates
+  // Get the frame's dpi and translate the bbox to inch coordinates
   return TScale(1.0 / dpiX, 1.0 / dpiY) * bbox;
 }
 
 bool TXshSimpleLevel::isFrameReadOnly(TFrameId fid) {
-  // For Raster and mesh files, check to see if files are marked as read-only at
-  // the OS level
+  // For Raster and mesh files, check to see if files are marked as read-only
+  // at the OS level
   if (getType() == OVL_XSHLEVEL || getType() == TZI_XSHLEVEL ||
       getType() == MESH_XSHLEVEL) {
     if (getProperties()->isStopMotionLevel()) return true;

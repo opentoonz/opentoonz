@@ -1628,6 +1628,10 @@
   <item>"STD_iwa_MotionFlowFx.normalizeType" "Normalize"	</item>
   <item>"STD_iwa_MotionFlowFx.normalizeRange" "Maximum Length"	</item>
 
+  <item>"STD_iwa_SmootherFx"	"Smoother Iwa"	</item>
+  <item>"STD_iwa_SmootherFx.threshold"	"Threshold"	</item>
+  <item>"STD_iwa_SmootherFx.softness"	"Softness"	</item>
+  
  <!------------------------------ Tiled Particles Iwa ------------------------------------------->
 
   <item>STD_iwa_TiledParticlesFx "Tiled Particles Iwa" </item>
@@ -1719,5 +1723,24 @@
   <item>"STD_iwa_TiledParticlesFx.fadeout_color_fade"		"Fade-out Intensity"		</item>
   <item>"STD_iwa_TiledParticlesFx.source_gradation"		"Use Control Image Gradation"		</item>
   <item>"STD_iwa_TiledParticlesFx.pick_color_for_every_frame"	"Pick Control Image's Color for Every Frame"	</item>
+
+  <!------------------------------ Naru FXs ------------------------------------------->
+  
+  <item>"STD_naru_LazyBrushFx" 	"LazyBrush Naru" 		</item>
+  <item>"STD_naru_LazyBrushFx.mode" 		"Mode" 			</item>
+  <item>"STD_naru_LazyBrushFx.mask_color" 	"Mask Color" 	</item>
+  <item>"STD_naru_LazyBrushFx.undef_is_sink" 	"Fill Hole"	</item>
+  <item>"STD_naru_LazyBrushFx.auto_scribble" 	"Auto Mask Scribble"	</item>
+  <item>"STD_naru_LazyBrushFx.line_weight"	 	"Line's Weights"		</item>
+  <item>"STD_naru_LazyBrushFx.sink_pos" 	"Background Direction"	</item>
+  <item>"STD_naru_LazyBrushFx.lambda"	 	"Scribble Strength"		</item>
+  <item>"STD_naru_LazyBrushFx.scr_type" 	"Scribble Type"		</item>
+  <item>"STD_naru_LazyBrushFx.min_lightness" 	"Outline Cutoff"	</item>
+  <item>"STD_naru_LazyBrushFx.log_scale" 	"LoG Filter Scale"		</item>
+  <item>"STD_naru_LazyBrushFx.sigma"	 	"Filter Smoothness"			</item>
+  <item>"STD_naru_LazyBrushFx.alpha"	 	"Difficulty Passing Through Ink"			</item>
+  <item>"STD_naru_LazyBrushFx.auto_scribble_length" 	"Auto Scribble Margin"	</item>
+  <item>"STD_naru_LazyBrushFx.auto_scribble_threshold" 	"Auto Scribble Outline Threshold"	</item>
+
 </stringtable> 
 

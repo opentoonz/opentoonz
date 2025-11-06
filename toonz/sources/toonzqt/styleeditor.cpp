@@ -15,8 +15,8 @@
 #include "toonz/cleanupcolorstyles.h"
 #include "toonz/palettecontroller.h"
 #include "toonz/imagestyles.h"
-#include "toonz/txshsimplelevel.h"  //iwsw
-#include "toonz/levelproperties.h"  //iwsw
+#include "toonz/txshsimplelevel.h"
+#include "toonz/levelproperties.h"
 #include "toonz/mypaintbrushstyle.h"
 #include "toonz/preferences.h"
 
@@ -167,7 +167,7 @@ ColorModel::ColorModel() { memset(m_channels, 0, sizeof m_channels); }
 void ColorModel::rgb2hsv() {
   QColor converter(m_channels[0], m_channels[1], m_channels[2]);
   m_channels[4] =
-      std::max(converter.hue(), 0);  // hue() ritorna -1 per colori acromatici
+      std::max(converter.hue(), 0);  // hue() returns -1 for achromatic colors
   m_channels[5] = (int)std::round(converter.saturationF() * 100.);
   m_channels[6] = (int)std::round(converter.valueF() * 100.);
 }
@@ -193,7 +193,7 @@ void ColorModel::setTPixel(const TPixel32 &pix) {
   m_channels[2] = color.blue();
   m_channels[3] = color.alpha();
   m_channels[4] =
-      std::max(color.hue(), 0);  // hue() ritorna -1 per colori acromatici
+      std::max(color.hue(), 0);  // hue() returns -1 for achromatic colors
   m_channels[5] = (int)std::round(color.saturationF() * 100.);
   m_channels[6] = (int)std::round(color.valueF() * 100.);
 }
@@ -876,8 +876,9 @@ void HexagonalColorWheel::mouseReleaseEvent(QMouseEvent *event) {
 void HexagonalColorWheel::clickLeftWheel(const QPoint &pos) {
   QLineF p(m_wp[0] + m_wheelPosition, QPointF(pos));
   QLineF horizontal(0, 0, 1, 0);
-  float theta = (p.dy() >= 0) ? horizontal.angleTo(p) : 360 - p.angleTo(horizontal);
-  float phi   = theta;
+  float theta =
+      (p.dy() >= 0) ? horizontal.angleTo(p) : 360 - p.angleTo(horizontal);
+  float phi = theta;
   while (phi >= 60.0f) phi -= 60.0f;
   phi -= 30.0f;
   // d is a length from center to edge of the wheel when saturation = 100
@@ -933,7 +934,7 @@ SquaredColorWheel::SquaredColorWheel(QWidget *parent)
 
 void SquaredColorWheel::paintEvent(QPaintEvent *) {
   QPainter p(this);
-  // calcolo lo sfondo
+  // calculate the background
   int size = width();
 
   QPixmap bgPixmap = makeSquareShading(m_color, m_channel, size);
@@ -1023,8 +1024,7 @@ ColorSlider::ColorSlider(Qt::Orientation orientation, QWidget *parent)
     s_slider_appearance = StyleEditorColorSliderAppearance;
   }
 
-  // Attenzione: necessario per poter individuare l'oggetto nel file di
-  // definizione dello stile
+  // Warning: necessary to identify the object in the style definition file
   setObjectName("colorSlider");
 }
 
@@ -1605,8 +1605,8 @@ PlainColorPage::PlainColorPage(QWidget *parent)
   m_slidersContainer = new QFrame(this);
   m_vSplitter        = new QSplitter(this);
 
-  // プロパティの設定
-  //  channelButtonGroup->setExclusive(true);
+  // Setting properties
+  // channelButtonGroup->setExclusive(true);
 
   m_wheelFrame->setObjectName("PlainColorPageParts");
   m_hsvFrame->setObjectName("PlainColorPageParts");
@@ -2141,7 +2141,7 @@ void StyleChooserPage::doPinsToTopChange() {
 }
 
 //-----------------------------------------------------------------------------
-// TOGLIERE
+// Remove
 void StyleChooserPage::setRootPath(const TFilePath &rootPath) {
   m_rootPath = rootPath;
 }
@@ -2882,7 +2882,7 @@ StyleEditor::StyleEditor(PaletteController *paletteController, QWidget *parent)
     , m_hexColorNamesEditor(0)
     , m_editedStyle(0) {
   setFocusPolicy(Qt::NoFocus);
-  // TOGLIERE
+  // Remove
   TFilePath libraryPath = ToonzFolder::getLibraryFolder();
   setRootPath(libraryPath);
 
@@ -3201,7 +3201,7 @@ QFrame *StyleEditor::createTexturePage() {
 
   /* ------ layout ------ */
   QVBoxLayout *outsideLayout = new QVBoxLayout();
-  outsideLayout->setContentsMargins(0, 0, 0, 0); 
+  outsideLayout->setContentsMargins(0, 0, 0, 0);
   outsideLayout->setSpacing(0);
   outsideLayout->setSizeConstraint(QLayout::SetNoConstraint);
   {
@@ -3586,6 +3586,10 @@ void StyleEditor::onStyleChanged(bool isDragging) {
   assert(0 <= styleIndex && styleIndex < palette->getStyleCount());
 
   setEditedStyleToStyle(palette->getStyle(styleIndex));
+
+  // ADD NULL CHECK
+  if (!m_oldStyle || !m_editedStyle) return;
+
   if (!isDragging) {
     setOldStyleToStyle(
         m_editedStyle
@@ -3612,7 +3616,7 @@ void StyleEditor::onCleanupStyleChanged(bool isDragging) {
 }
 
 //-----------------------------------------------------------------------------
-// TOGLIERE
+// Remove
 void StyleEditor::setRootPath(const TFilePath &rootPath) {
   m_textureStylePage->setRootPath(rootPath);
 }
@@ -3621,16 +3625,22 @@ void StyleEditor::setRootPath(const TFilePath &rootPath) {
 
 void StyleEditor::copyEditedStyleToPalette(bool isDragging) {
   TPalette *palette = getPalette();
-  assert(palette);
+  if (!palette) return;
 
   int styleIndex = getStyleIndex();
-  assert(0 <= styleIndex && styleIndex < palette->getStyleCount());
+  if (styleIndex < 0 || styleIndex >= palette->getStyleCount()) return;
 
+  // CRITICAL NULL CHECKS
+  if (!m_oldStyle || !m_editedStyle) {
+    return;
+  }
+
+  // Safe to proceed with comparison
   if (!(*m_oldStyle == *m_editedStyle) &&
       (!isDragging || m_paletteController->isColorAutoApplyEnabled()) &&
       m_editedStyle->getGlobalName() != L"" &&
       m_editedStyle->getOriginalName() != L"") {
-    // If the adited style is linked to the studio palette, then activate the
+    // If the edited style is linked to the studio palette, then activate the
     // edited flag
     m_editedStyle->setIsEditedFlag(true);
   }
@@ -3650,8 +3660,8 @@ void StyleEditor::copyEditedStyleToPalette(bool isDragging) {
     setOldStyleToStyle(m_editedStyle.getPointer());
 
     // In case the frame is a keyframe, update it
-    if (palette->isKeyframe(styleIndex, palette->getFrame()))  // here
-      palette->setKeyframe(styleIndex, palette->getFrame());   //
+    if (palette->isKeyframe(styleIndex, palette->getFrame()))
+      palette->setKeyframe(styleIndex, palette->getFrame());
 
     palette->setDirtyFlag(true);
   }
@@ -3690,7 +3700,7 @@ void StyleEditor::onColorChanged(const ColorModel &color, bool isDragging) {
       TSolidColorStyle *style = new TSolidColorStyle(tColor);
       style->assignNames(m_editedStyle.getPointer());
 
-      setEditedStyleToStyle(style);  // CLONES the argument
+      setEditedStyleToStyle(style);
 
       delete style;
     }
@@ -3771,11 +3781,11 @@ void StyleEditor::setPage(int index) {
     return;
   }
 
-  // Se sono nel caso first and last page enable e index == 1 la pagina che
-  // voglio settare e' l'ultima!
+  // If I'm in the case where both first and last page are enabled and index ==
+  // 1, the page I want to set is the last one!
   if (index == 1)
     index = m_styleChooser->count() -
-            2;  // 2 perche' alla fine c'e' una pagina vuota
+            2;  // 2 because at the end there is a blank page.
   m_styleChooser->setCurrentIndex(index);
 }
 
@@ -3841,8 +3851,7 @@ bool StyleEditor::setStyle(TColorStyle *currentStyle) {
     m_hexLineEdit->setStyle(*m_editedStyle, getColorParam());
     setOldStyleToStyle(currentStyle);
   }
-
-  // Va fatto anche se non c'e' lo style perche' svuota la pagina
+  // It must be done even if there is no style, because it clears the page
   m_settingsPage->setStyle(m_editedStyle);
 
   return isStyleNull;
@@ -3876,17 +3885,19 @@ void StyleEditor::selectStyle(const TColorStyle &newStyle) {
   setOldStyleToStyle(palette->getStyle(styleIndex));
   setEditedStyleToStyle(&newStyle);
 
-  m_editedStyle->assignNames(
+  // ADD NULL CHECK
+  if (!m_oldStyle || !m_editedStyle) return;
+
+ m_editedStyle->assignNames(
       m_oldStyle.getPointer());  // Copy original name stored in the palette
 
   // For convenience's sake, copy the main color from the old color, if both
   // have one
-  if (m_oldStyle && m_oldStyle->hasMainColor() && m_editedStyle &&
-      m_editedStyle->hasMainColor())
+  if (m_oldStyle->hasMainColor() && m_editedStyle->hasMainColor())
     m_editedStyle->setMainColor(m_oldStyle->getMainColor());
 
   if (m_autoButton->isChecked()) {
-    // If the adited style is linked to the studio palette, then activate the
+    // If the edited style is linked to the studio palette, then activate the
     // edited flag
     if (m_editedStyle->getGlobalName() != L"" &&
         m_editedStyle->getOriginalName() != L"")
@@ -3918,6 +3929,9 @@ void StyleEditor::onColorParamChanged() {
 
   int styleIndex = getStyleIndex();
   if (styleIndex < 0 || palette->getStyleCount() <= styleIndex) return;
+
+  // ADD NULL CHECK
+  if (!m_oldStyle || !m_editedStyle) return;
 
   if (*m_oldStyle != *m_editedStyle) applyButtonClicked();
 

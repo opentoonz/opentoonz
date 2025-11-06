@@ -476,7 +476,10 @@ class PaintbrushToolOptionsBox final : public ToolOptionsBox {
 
   ToolOptionCombo *m_colorMode;
   ToolOptionCheckbox *m_selectiveMode;
+  ToolOptionCheckbox* m_emptyOnlyMode;
+
   ToolOptionCheckbox *m_lockAlphaMode;
+  ToolOptionCheckbox *m_FillingMode;
 
 public:
   PaintbrushToolOptionsBox(QWidget *parent, TTool *tool,
@@ -518,6 +521,7 @@ class FillToolOptionsBox final : public ToolOptionsBox {
   ToolOptionCheckbox *m_selectiveMode, *m_segmentMode, *m_onionMode,
       *m_multiFrameMode, *m_autopaintMode, *m_closeGap, *m_referFill;
   ToolOptionPairSlider *m_fillDepthField;
+  ToolOptionIntSlider* m_gapCloseDistance;
 
 public:
   FillToolOptionsBox(QWidget *parent, TTool *tool, TPaletteHandle *pltHandle,

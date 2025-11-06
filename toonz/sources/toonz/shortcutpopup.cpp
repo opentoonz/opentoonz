@@ -133,30 +133,6 @@ void ShortcutViewer::onEditingFinished() {
   QKeySequence keySeq = keySequence();
   QString keyStr      = keySeq.toString();
 
-  // Check for reserved key combinations involving the Space key
-  if (keyStr.contains("Space", Qt::CaseInsensitive)) {
-    // Check for Space + Shift combination
-    if (keyStr.contains("Shift", Qt::CaseInsensitive)) {
-      setKeySequence(m_action->shortcut());  // Reset to the original shortcut
-      DVGui::warning(
-          tr("The Space + Shift combination is reserved for viewer rotation."));
-      return;
-    }
-
-    // Check for Space + Ctrl combination
-    if (keyStr.contains("Ctrl", Qt::CaseInsensitive)) {
-      setKeySequence(m_action->shortcut());  // Reset to the original shortcut
-      DVGui::warning(
-          tr("The Space + Ctrl combination is reserved for viewer zoom."));
-      return;
-    }
-
-    // Check for Space key alone
-    setKeySequence(m_action->shortcut());  // Reset to the original shortcut
-    DVGui::warning(tr("The Space key is reserved for viewer navigation."));
-    return;
-  }
-
   // Reset the keys pressed counter (used for tracking multi-key sequences)
   m_keysPressed = 0;
 

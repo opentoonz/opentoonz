@@ -8,7 +8,7 @@
 
 #include <cmath>
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 namespace {
 
@@ -54,7 +54,7 @@ bool lineIntersection(const TPointD &P, const TPointD &R, const TPointD &Q,
   }
 #endif
 
-// ---------------------------------------- --------------------------------
+//----------------------------------------------------------------------------
 
 void subCompute(TRasterFxPort &m_input, TTile &tile, double frame,
                 const TRenderSettings &ri, TPointD p00, TPointD p01,
@@ -65,7 +65,7 @@ void subCompute(TRasterFxPort &m_input, TTile &tile, double frame,
   outBBox = inBBox = TRectD(tile.m_pos, TDimensionD(tile.getRaster()->getLx(),
                                                     tile.getRaster()->getLy()));
   m_input->getBBox(frame, inBBox, ri);
-  if (inBBox == TConsts::infiniteRectD)  // e' uno zerario
+  if (inBBox == TConsts::infiniteRectD) // It's a zero-area bbox
     inBBox = outBBox;
 
   int inBBoxLx = (int)inBBox.getLx() / ri.m_shrinkX;
@@ -73,8 +73,7 @@ void subCompute(TRasterFxPort &m_input, TTile &tile, double frame,
 
   if (inBBox.isEmpty()) return;
 
-  if (p00 == p01 && p00 == p10 && p00 == p11 &&
-      !isCast)  // significa che non c'e' deformazione
+  if (p00 == p01 && p00 == p10 && p00 == p11 && !isCast) // indicates that there is no distortion
   {
     m_input->compute(tile, frame, ri);
     return;
@@ -104,12 +103,9 @@ void subCompute(TRasterFxPort &m_input, TTile &tile, double frame,
   unsigned int texHeight = 2;
 
   while (texWidth < (unsigned int)inBBoxLx) texWidth = texWidth << 1;
-
   while (texHeight < (unsigned int)inBBoxLy) texHeight = texHeight << 1;
 
-  while (texWidth > 1024 || texHeight > 1024)  // avevo usato la costante
-                                               // GL_MAX_TEXTURE_SIZE invece di
-                                               // 1024, ma non funzionava!
+  while (texWidth > 1024 || texHeight > 1024)  // Using 1024 instead of GL_MAX_TEXTURE_SIZE constant
   {
     inBBoxLx  = inBBoxLx >> 1;
     inBBoxLy  = inBBoxLy >> 1;
@@ -117,7 +113,7 @@ void subCompute(TRasterFxPort &m_input, TTile &tile, double frame,
     texHeight = texHeight >> 1;
   }
 
-  if (rasIn->getLx() != inBBoxLx || rasIn->getLy() != inBBoxLy) {
+  if (rasIn && (rasIn->getLx() != inBBoxLx || rasIn->getLy() != inBBoxLy)) {
     TRaster32P rasOut = TRaster32P(inBBoxLx, inBBoxLy);
     TRop::resample(rasOut, rasIn,
                    TScale((double)rasOut->getLx() / rasIn->getLx(),
@@ -138,24 +134,19 @@ void subCompute(TRasterFxPort &m_input, TTile &tile, double frame,
   assert(ret == TRUE);
 #else
   TOfflineGL offScreenRendering(TDimension(rasterWidth, rasterHeight));
-  //#ifdef _WIN32
   offScreenRendering.makeCurrent();
-//#else
-//#if defined(LINUX) || defined(FREEBSD) || defined(MACOSX)
-// offScreenRendering.m_offlineGL->makeCurrent();
-//#endif
 #endif
 
   checkErrorsByGL
-      // disabilito quello che non mi serve per le texture
-      glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
+  // Disable unnecessary features for textures
+  glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
   glDisable(GL_DITHER);
   glDisable(GL_DEPTH_TEST);
   glCullFace(GL_FRONT);
   glDisable(GL_STENCIL_TEST);
   glDisable(GL_LOGIC_OP);
 
-  // creo la texture in base all'immagine originale
+  // Create texture from original image
   glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
   glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
   glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -164,7 +155,7 @@ void subCompute(TRasterFxPort &m_input, TTile &tile, double frame,
 
   checkErrorsByGL
 #ifndef CREATE_GL_CONTEXT_ONE_TIME
-      TRaster32P rasaux;
+  TRaster32P rasaux;
   if (!wireframe) {
     TRaster32P texture(texWidth, texHeight);
     texture->clear();
@@ -177,21 +168,19 @@ void subCompute(TRasterFxPort &m_input, TTile &tile, double frame,
                  GL_UNSIGNED_BYTE, texture->getRawData());
   }
 #else
-
-      unsigned int texWidth = 1024;
-  unsigned int texHeight    = 1024;
-  rasaux                    = rasIn;
+  unsigned int texWidth  = 1024;
+  unsigned int texHeight = 1024;
+  rasaux                 = rasIn;
   rasaux->lock();
 
   glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, rasIn->getLx(), rasIn->getLy(),
                   GL_RGBA, GL_UNSIGNED_BYTE, rasIn->getRawData());
-
 #endif
   checkErrorsByGL
 
-      glEnable(GL_TEXTURE_2D);
+  glEnable(GL_TEXTURE_2D);
 
-  // cfr. help: OpenGL/Programming tip/OpenGL Correctness Tips
+  // Reference: OpenGL/Programming tip/OpenGL Correctness Tips
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
   glOrtho(-rasterWidth * 0.5, rasterWidth * 0.5, -rasterHeight * 0.5,
@@ -204,8 +193,7 @@ void subCompute(TRasterFxPort &m_input, TTile &tile, double frame,
   glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
   glClear(GL_COLOR_BUFFER_BIT);
 
-  // do OpenGL draw
-
+  // OpenGL draw
   double lwTex = (double)(inBBoxLx - 1) / (double)(texWidth - 1);
   double lhTex = (double)(inBBoxLy - 1) / (double)(texHeight - 1);
 
@@ -220,15 +208,14 @@ void subCompute(TRasterFxPort &m_input, TTile &tile, double frame,
     glDisable(GL_TEXTURE_2D);
   } else
     polygonStyle = GL_FILL;
-  checkErrorsByGL p00.x /= ri.m_shrinkX;
+  
+  checkErrorsByGL 
+  p00.x /= ri.m_shrinkX;
   p00.y /= ri.m_shrinkY;
-
   p10.x /= ri.m_shrinkX;
   p10.y /= ri.m_shrinkY;
-
   p11.x /= ri.m_shrinkX;
   p11.y /= ri.m_shrinkY;
-
   p01.x /= ri.m_shrinkX;
   p01.y /= ri.m_shrinkY;
 
@@ -236,7 +223,7 @@ void subCompute(TRasterFxPort &m_input, TTile &tile, double frame,
                               tile.m_pos.y + tile.getRaster()->getLy() * 0.5);
   glTranslated(-translate.x, -translate.y, 0.0);
 
-  // disegno il poligono
+  // Draw the polygon
   double dist_p00_p01                 = tdistance2(p00, p01);
   double dist_p10_p11                 = tdistance2(p10, p11);
   double dist_p01_p11                 = tdistance2(p01, p11);
@@ -244,18 +231,17 @@ void subCompute(TRasterFxPort &m_input, TTile &tile, double frame,
   bool vertical                       = (dist_p00_p01 == dist_p10_p11);
   bool horizontal                     = (dist_p00_p10 == dist_p01_p11);
   if (vertical && horizontal) details = 1;
+  
   glPolygonMode(GL_FRONT_AND_BACK, polygonStyle);
-  subdivision(p00, p10, p11, p01, tex00, tex10, tex11, tex01, clippingRect,
-              details);
+  subdivision(p00, p10, p11, p01, tex00, tex10, tex11, tex01, clippingRect, details);
 
   if (!wireframe) {
-    // abilito l'antialiasing delle linee
+    // Enable line anti-aliasing
     glEnable(GL_LINE_SMOOTH);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-
-    // disegno il bordo del poligono
+    // Draw polygon border
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     glBegin(GL_QUADS);
     glTexCoord2d(tex00.x, tex00.y);
@@ -267,22 +253,18 @@ void subCompute(TRasterFxPort &m_input, TTile &tile, double frame,
     glTexCoord2d(tex01.x, tex01.y);
     tglVertex(p01);
     glEnd();
-
-    // disabilito l'antialiasing per le linee
+    // disable antialiasing for the lines
     glDisable(GL_LINE_SMOOTH);
     glDisable(GL_BLEND);
     glDisableClientState(GL_VERTEX_ARRAY);
     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
     glDisable(GL_TEXTURE_2D);
   }
-
-  // force to finish
+  // Force to finish
   glFlush();
-
-  // rimetto il disegno dei poligoni a GL_FILL
+  // Reset polygon drawing to GL_FILL
   glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-  // metto il frame buffer nel raster del tile
+  // Put frame buffer into tile raster
   glPixelStorei(GL_UNPACK_ROW_LENGTH, rasterWidth);
   glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 
@@ -293,7 +275,7 @@ void subCompute(TRasterFxPort &m_input, TTile &tile, double frame,
   newRas->unlock();
   checkErrorsByGL
 
-      rasaux->unlock();
+  if (rasaux) rasaux->unlock();
 
   tile.getRaster()->copy(newRas);
 }
@@ -306,19 +288,14 @@ void subdivision(const TPointD &p00, const TPointD &p10, const TPointD &p11,
                  const TRectD &clippingRect, int details) {
   if (details == 1) {
     glBegin(GL_QUADS);
-
     glTexCoord2d(tex00.x, tex00.y);
     tglVertex(p00);
-
     glTexCoord2d(tex10.x, tex10.y);
     tglVertex(p10);
-
     glTexCoord2d(tex11.x, tex11.y);
     tglVertex(p11);
-
     glTexCoord2d(tex01.x, tex01.y);
     tglVertex(p01);
-
     glEnd();
   } else {
     TPointD A = p00;
@@ -326,7 +303,7 @@ void subdivision(const TPointD &p00, const TPointD &p10, const TPointD &p11,
     TPointD C = p11;
     TPointD D = p01;
 
-    /*
+/*
 *     D                L2               C
 *     +----------------+----------------+
 *     |                |                |
@@ -344,7 +321,6 @@ void subdivision(const TPointD &p00, const TPointD &p10, const TPointD &p11,
 *     A                L1               B
 *
 */
-
     TPointD M, L1, L2, H1, H2, P1, P2;
     bool intersection;
 
@@ -352,7 +328,7 @@ void subdivision(const TPointD &p00, const TPointD &p10, const TPointD &p11,
     intersection = lineIntersection(A, C, B, D, M);
     assert(intersection);
 
-    // P1 (punto di fuga)
+    // P1 (vanishing point)
     intersection = lineIntersection(D, C, A, B, P1);
     if (!intersection) {
       P1.x = 0.5 * (A.x + D.x);
@@ -366,7 +342,7 @@ void subdivision(const TPointD &p00, const TPointD &p10, const TPointD &p11,
     intersection = lineIntersection(B, C, P1, M, H2);
     assert(intersection);
 
-    // P2 (punto di fuga)
+    // P2 (vanishing point)
     intersection = lineIntersection(A, D, B, C, P2);
     if (!intersection) {
       P2.x = 0.5 * (A.x + B.x);
@@ -406,21 +382,17 @@ void subdivision(const TPointD &p00, const TPointD &p10, const TPointD &p11,
 
     if (r1.overlaps(clippingRect))
       subdivision(A, L1, M, H1, tex00, texA, texM, texD, clippingRect, details);
-
     if (r2.overlaps(clippingRect))
       subdivision(L1, B, H2, M, texA, tex10, texB, texM, clippingRect, details);
-
     if (r3.overlaps(clippingRect))
       subdivision(M, H2, C, L2, texM, texB, tex11, texC, clippingRect, details);
-
     if (r4.overlaps(clippingRect))
       subdivision(H1, M, L2, D, texD, texM, texC, tex01, clippingRect, details);
   }
 }
 
-// ------------------------------------------------------------------------
-// ------------------------------------------------------------------------
-// ------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+
 #define TINY 1.0e-20
 
 static int splitMatrix(double **a, int n, int *index) {
@@ -429,25 +401,27 @@ static int splitMatrix(double **a, int n, int *index) {
   double *vv, d;
 
   vv = new double[n];
-
   d = 1.00;
+  
   for (i = 0; i < n; i++) {
     big = 0.0;
     for (j = 0; j < n; j++)
       if ((temp = fabs(a[i][j])) > big) big = temp;
     if (big == 0.0) {
-      /*printf("aho, sta matrice e 'vota!!\n");*/
+      /* Matrix is singular! */
+      delete[] vv; // Fixed: Clean up before returning (first case)
       return 0;
-      // exit(0);
     }
     vv[i] = 1.0 / big;
   }
+  
   for (j = 0; j < n; j++) {
     for (i = 0; i < j; i++) {
       sum = a[i][j];
       for (k  = 0; k < i; k++) sum -= a[i][k] * a[k][j];
       a[i][j] = sum;
     }
+    
     big = 0.0;
     for (i = j; i < n; i++) {
       sum = a[i][j];
@@ -458,6 +432,7 @@ static int splitMatrix(double **a, int n, int *index) {
         imax = i;
       }
     }
+    
     if (j != imax) {
       for (k = 0; k < n; k++) {
         dum        = a[imax][k];
@@ -467,21 +442,24 @@ static int splitMatrix(double **a, int n, int *index) {
       d        = -d;
       vv[imax] = vv[j];
     }
+    
     index[j] = imax;
     if (std::abs(a[j][j]) <= TINY && (j != n - 1)) {
-      /*printf("Cazzo, E' singolare %f!\n", a[j][j] );*/
+      delete[] vv; // Fixed: Clean up before returning (second case)
       return imax + 1;
     }
+    
     if (j != n - 1) {
       dum = 1.0 / a[j][j];
       for (i = j + 1; i < n; i++) a[i][j] *= dum;
     }
   }
+  
   delete[] vv;
   return 0;
 }
 
-/*-----------------------------------------------------------------*/
+// ----------------------------------------------------------------------------
 
 static void buildMatrixes(const FourPoints &ss, const FourPoints &dd,
                           double **a, double *b) {
@@ -508,7 +486,7 @@ static void buildMatrixes(const FourPoints &ss, const FourPoints &dd,
   }
 }
 
-/*-----------------------------------------------------------------*/
+// ----------------------------------------------------------------------------
 
 static void computeSolutions(double **a, int *index, double *b) {
   int i, ii = 0, ip, j;
@@ -524,6 +502,7 @@ static void computeSolutions(double **a, int *index, double *b) {
       ii = i + 1;
     b[i] = sum;
   }
+  
   for (i = 7; i >= 0; i--) {
     sum = b[i];
     for (j = i + 1; j < 8; j++) sum -= a[i][j] * b[j];
@@ -531,7 +510,7 @@ static void computeSolutions(double **a, int *index, double *b) {
   }
 }
 
-/*-----------------------------------------------------------------*/
+// ----------------------------------------------------------------------------
 
 static void solveSystems(double **a, double *bx) {
   int index[255], i, count = 0, bad_line;
@@ -539,41 +518,41 @@ static void solveSystems(double **a, double *bx) {
   int n = 8;
 
   atmp = new double *[n];
-
   for (i = 0; i < n; i++) {
     atmp[i] = new double[n];
     memcpy(atmp[i], a[i], n * sizeof(double));
   }
 
   while ((bad_line = splitMatrix(atmp, n, index)) != 0 && n > 0) {
-    /*printf("la riga %d fa schifo!\n", bad_line);*/
-    /*bad_lines[count] = bad_line;*/
+    /* Line %d is problematic!\n", bad_line);*/
     for (i = bad_line - 1; i < n - 1; i++)
-      memcpy(atmp[i], a[i + 1], n * sizeof(a[i + 1]));
+      memcpy(atmp[i], atmp[i + 1], n * sizeof(double));
     n--;
     count++;
   }
 
-  if (count == 0) computeSolutions(atmp, index, bx);
-
-  for (i = 0; i < n; i++) delete atmp[i];
-
-  delete atmp;
+  if (n > 0) {
+    computeSolutions(atmp, index, bx);
+  }
+  // FIXED: Free all allocated rows (8 rows), not just n
+  for (i = 0; i < 8; i++) {
+    delete[] atmp[i];
+  }
+  delete[] atmp;
 }
 
-/*-----------------------------------------------------------------*/
+// ----------------------------------------------------------------------------
 
 static void computeTransformation(const FourPoints &s, const FourPoints &d,
                                   TAffine &aff, TPointD &perspectDen) {
-  double **a, *b;
-
+  double **a, *b; 
   int i;
+  
   a = new double *[8];
   for (i = 0; i < 8; i++) a[i] = new double[8];
   b                            = new double[8];
 
   buildMatrixes(s, d, a, b);
-
   solveSystems(a, b);
 
   aff.a11       = b[0];
@@ -585,12 +564,12 @@ static void computeTransformation(const FourPoints &s, const FourPoints &d,
   perspectDen.x = b[6];
   perspectDen.y = b[7];
 
-  for (i = 0; i < 8; i++) delete a[i];
-  delete b;
-  delete a;
+  for (i = 0; i < 8; i++) delete[] a[i];
+  delete[] b;
+  delete[] a;
 }
 
-/*-----------------------------------------------------------------*/
+// ----------------------------------------------------------------------------
 
 FourPoints computeTransformed(const FourPoints &pointsFrom,
                               const FourPoints &pointsTo,
@@ -604,16 +583,19 @@ FourPoints computeTransformed(const FourPoints &pointsFrom,
   FourPoints fp;
 
   den = perspectiveDen.x * from.m_p00.x + perspectiveDen.y * from.m_p00.y + 1;
-  assert(den != 0);
+  if (std::abs(den) < 1e-10) den = 1.0;
   fp.m_p00 = (1.0 / den) * (aff * from.m_p00);
+  
   den = perspectiveDen.x * from.m_p01.x + perspectiveDen.y * from.m_p01.y + 1;
-  assert(den != 0);
+  if (std::abs(den) < 1e-10) den = 1.0;
   fp.m_p01 = (1.0 / den) * (aff * from.m_p01);
+  
   den = perspectiveDen.x * from.m_p10.x + perspectiveDen.y * from.m_p10.y + 1;
-  assert(den != 0);
+  if (std::abs(den) < 1e-10) den = 1.0;
   fp.m_p10 = (1.0 / den) * (aff * from.m_p10);
+  
   den = perspectiveDen.x * from.m_p11.x + perspectiveDen.y * from.m_p11.y + 1;
-  assert(den != 0);
+  if (std::abs(den) < 1e-10) den = 1.0;
   fp.m_p11 = (1.0 / den) * (aff * from.m_p11);
 
   return fp;

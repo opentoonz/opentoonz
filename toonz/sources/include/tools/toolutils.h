@@ -111,7 +111,7 @@ QRadialGradient getBrushPad(int size, double hardness);
 
 
 void drawCursor(TToolViewer* viewer, TTool* tool,
-    TPointD pos, int toolCursorId);
+    TPointD pos, int toolCursorId, bool addOffSet = false);
 
 //! Divide il primo rettangolo in piu' sottorettsngoli, in base all'intersezione
 //! con il secondo

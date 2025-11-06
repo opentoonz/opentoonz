@@ -1143,11 +1143,10 @@ LeftToRightOrientation::LeftToRightOrientation() {
   addRect(PredefinedRect::CELL_NAME, nameRect);
   addRect(PredefinedRect::CELL_NAME_WITH_KEYFRAME, nameRect);
   addRect(PredefinedRect::END_EXTENDER,
-      QRect(0, -EXTENDER_HEIGHT - 4,
-          EXTENDER_WIDTH, EXTENDER_HEIGHT));
+          QRect(0, -EXTENDER_HEIGHT - 4, EXTENDER_WIDTH, EXTENDER_HEIGHT));
   addRect(PredefinedRect::BEGIN_EXTENDER,
-      QRect(-EXTENDER_WIDTH, -EXTENDER_HEIGHT - 4,
-          EXTENDER_WIDTH, EXTENDER_HEIGHT));
+          QRect(-EXTENDER_WIDTH, -EXTENDER_HEIGHT - 4, EXTENDER_WIDTH,
+                EXTENDER_HEIGHT));
   addRect(PredefinedRect::KEYFRAME_AREA, keyRect);
   addRect(PredefinedRect::DRAG_AREA, QRect(0, 0, CELL_WIDTH, CELL_DRAG_HEIGHT));
   int markSize = CELL_HEIGHT / 2;  // 50% size (12px)
@@ -1279,9 +1278,11 @@ LeftToRightOrientation::LeftToRightOrientation() {
           rect(PredefinedRect::CONFIG_AREA));
   addRect(PredefinedRect::CAMERA_CONFIG, rect(PredefinedRect::CONFIG));
   addRect(PredefinedRect::DRAG_LAYER,
-          QRect(ICONS_WIDTH + THUMBNAIL_WIDTH + 1, 0,
-                LAYER_HEADER_WIDTH - ICONS_WIDTH - THUMBNAIL_WIDTH - 3,
-                CELL_DRAG_HEIGHT));
+          QRect(0, 0, -1, -1));  // hide drag handle in Timeline view
+  // addRect(PredefinedRect::DRAG_LAYER,
+  //         QRect(ICONS_WIDTH + THUMBNAIL_WIDTH + 1, 0,
+  //               LAYER_HEADER_WIDTH - ICONS_WIDTH - THUMBNAIL_WIDTH - 3,
+  //               CELL_DRAG_HEIGHT));
   addRect(PredefinedRect::LAYER_NAME, columnName);
   addRect(PredefinedRect::CAMERA_LAYER_NAME, rect(PredefinedRect::LAYER_NAME));
   addRect(PredefinedRect::LAYER_NUMBER,
@@ -1335,7 +1336,7 @@ LeftToRightOrientation::LeftToRightOrientation() {
 
   // Flags
   addFlag(PredefinedFlag::DRAG_LAYER_BORDER, false);
-  addFlag(PredefinedFlag::DRAG_LAYER_VISIBLE, true);
+  addFlag(PredefinedFlag::DRAG_LAYER_VISIBLE, false);
   addFlag(PredefinedFlag::LAYER_NAME_BORDER, true);
   addFlag(PredefinedFlag::LAYER_NAME_VISIBLE, true);
   addFlag(PredefinedFlag::LAYER_NUMBER_BORDER, true);

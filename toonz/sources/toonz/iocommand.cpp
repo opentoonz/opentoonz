@@ -24,6 +24,7 @@
 #include "expressionreferencemanager.h"
 #include "levelcommand.h"
 #include "columncommand.h"
+#include "tstreamexception.h"
 
 // TnzTools includes
 #include "tools/toolhandle.h"
@@ -1975,6 +1976,17 @@ bool IoCmd::loadScene(const TFilePath &path, bool updateRecentFile,
       scene->setProject(currentProject);
     }
     VersionControlManager::instance()->setFrameRange(scene->getLevelSet());
+  } catch (TException &e) {
+    printf("%s:%s TException ...:\n", __FILE__, __FUNCTION__);
+
+    QString detailMsg = QString::fromStdWString(e.getMessage());
+
+    QString msg =
+        QObject::tr("There were problems loading the scene %1.\nDetails:\n\n%2")
+            .arg(QString::fromStdWString(scenePath.getWideString()))
+            .arg(detailMsg);
+
+    DVGui::warning(msg);
   } catch (...) {
     printf("%s:%s Exception ...:\n", __FILE__, __FUNCTION__);
     QString msg;
@@ -2760,6 +2772,7 @@ bool IoCmd::importLipSync(TFilePath levelPath, QList<TFrameId> frameList,
                      .arg(toQString(levelPath)));
     return false;
   }
+  return true;
 }
 
 // Use double value DPI as policy
@@ -2864,8 +2877,8 @@ void IoCmd::convertNAARaster2TLV(
       = convertingPopup.getResultPath();*/
       Convert2Tlv converter(path, TFilePath(), dstPath.getParentDir(),
                             QString::fromStdWString(dstPath.getWideName()),
-                            from, to, false, TFilePath(), 20, 0, 50, false,
-                            true, dpi);
+                            from, to, false, TFilePath(), 0, 0, 50, true, true,
+                            dpi);
 
       std::string e;
       converter.init(e);

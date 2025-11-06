@@ -9,6 +9,7 @@
 #include "ttzpimagefx.h"
 #include "toonz/tdistort.h"
 #include "texturefxP.h"
+#include "tparamuiconcept.h" 
 
 //==============================================================================
 
@@ -50,6 +51,8 @@ public:
   void safeTransform(double frame, int port, const TRectD &rectOnOutput,
                      const TRenderSettings &infoOnOutput, TRectD &rectOnInput,
                      TRenderSettings &infoOnInput, TRectD &inBBox);
+
+  void getParamUIs(TParamUIConcept *&concepts, int &length) override;
 
 private:
   TRasterFxPort m_input;
@@ -186,6 +189,7 @@ bool CornerPinFx::doGetBBox(double frame, TRectD &bBox,
                             const TRenderSettings &info) {
   if (m_input.isConnected()) {
     bool ret = m_input->doGetBBox(frame, bBox, info);
+
     return ret;
   } else {
     bBox = TRectD();
@@ -236,12 +240,10 @@ void CornerPinFx::transform(double frame, int port, const TRectD &rectOnOutput,
   TPointD p11_a = m_p11_a->getValue(frame);
 
   // NOTE 1: An appropriate scale factor is sent below in the schematic,
-  // depending
-  // on the image distortion. For example, if the distortion brings a 2 scale
-  // factor,
+  // depending on the image distortion.
+  // For example, if the distortion brings a 2 scale factor,
   // we want the same factor applied on image levels, so that their detail is
-  // appropriate
-  //(especially for vector images).
+  // appropriate (especially for vector images).
 
   double scale = 0;
   scale        = std::max(scale, norm(p10_a - p00_a) / norm(p10_b - p00_b));
@@ -417,14 +419,13 @@ void CornerPinFx::doCompute(TTile &tile, double frame,
 
   TTile invertMaskTile;
 
-  // carico il vettore items con gli indici dei colori
+  // Load the items vector with the color indices
   std::vector<std::string> items;
   std::string indexes = ::to_string(m_string->getValue());
   parseIndexes(indexes, items);
 
-  // genero il tile il cui raster contiene l'immagine in input a cui sono stati
-  // tolti i pixel
-  // colorati con gli indici contenuti nel vettore items
+  // Generate the tile whose raster contains the input image with the pixels
+  // colored with the indices contained in the items vector removed
   TRenderSettings ri2(ri);
   PaletteFilterFxRenderData *PaletteFilterData = new PaletteFilterFxRenderData;
   TRasterFxRenderDataP smartP(PaletteFilterData);
@@ -441,16 +442,15 @@ void CornerPinFx::doCompute(TTile &tile, double frame,
     return;
   }
 
-  // genero il tile il cui raster contiene l'immagine in input a cui sono stati
-  // tolti i pixel
-  // colorati con indici diversi da quelli contenuti nel vettore items
+  // Generate the tile whose raster contains the input image with the pixels
+  // colored with indices different from those contained in the items vector removed
   bool isSwatch                = ri2.m_isSwatch;
   if (isSwatch) ri2.m_isSwatch = false;
   PaletteFilterData->m_keep    = !(m_keep->getValue() == 1);
   m_input->compute(tile, frame, ri2);
   if (isSwatch) ri2.m_isSwatch = true;
 
-  // controllo se ho ottenuto quaclosa su cui si possa lavorare.
+  // Check if something workable was obtained
   TRect saveBox;
   TRop::computeBBox(tile.getRaster(), saveBox);
   if (saveBox.isEmpty()) {
@@ -651,6 +651,7 @@ int CornerPinFx::getMemoryRequirement(const TRectD &rect, double frame,
 }
 
 //-------------------------------------------------------------------------
+
 /*
 TRectD CornerPinFx::getContainingBox(const FourPoints &points)
 {
@@ -668,6 +669,42 @@ yMin=std::min(points.m_p00.y,points.m_p01.y,points.m_p10.y,points.m_p11.y);
         return TRectD(xMin,yMin,xMax, yMax);
 }
 */
+
+// Enables the cage UI
+void CornerPinFx::getParamUIs(TParamUIConcept *&concepts, int &length) {
+  concepts = new TParamUIConcept[length = 6];
+
+  concepts[0].m_type = TParamUIConcept::QUAD;
+  concepts[0].m_params.push_back(m_p01_b);
+  concepts[0].m_params.push_back(m_p11_b);
+  concepts[0].m_params.push_back(m_p10_b);
+  concepts[0].m_params.push_back(m_p00_b);
+  concepts[0].m_label = " Src";
+
+  concepts[1].m_type = TParamUIConcept::QUAD;
+  concepts[1].m_params.push_back(m_p01_a);
+  concepts[1].m_params.push_back(m_p11_a);
+  concepts[1].m_params.push_back(m_p10_a);
+  concepts[1].m_params.push_back(m_p00_a);
+  concepts[1].m_label = " Dst";
+
+  concepts[2].m_type = TParamUIConcept::VECTOR;
+  concepts[2].m_params.push_back(m_p00_b);
+  concepts[2].m_params.push_back(m_p00_a);
+
+  concepts[3].m_type = TParamUIConcept::VECTOR;
+  concepts[3].m_params.push_back(m_p10_b);
+  concepts[3].m_params.push_back(m_p10_a);
+
+  concepts[4].m_type = TParamUIConcept::VECTOR;
+  concepts[4].m_params.push_back(m_p01_b);
+  concepts[4].m_params.push_back(m_p01_a);
+
+  concepts[5].m_type = TParamUIConcept::VECTOR;
+  concepts[5].m_params.push_back(m_p11_b);
+  concepts[5].m_params.push_back(m_p11_a);
+}
+
 // ------------------------------------------------------------------------
 
 FX_PLUGIN_IDENTIFIER(CornerPinFx, "cornerPinFx");

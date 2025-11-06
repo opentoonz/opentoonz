@@ -81,6 +81,7 @@ enum PreferencesItemId {
   ffmpegTimeout,
   fastRenderPath,
   ffmpegMultiThread,
+  quickTimeBackend,
   rhubarbPath,
   rhubarbTimeout,
 
@@ -136,7 +137,7 @@ enum PreferencesItemId {
   showKeyframesOnXsheetCellArea,
   showXsheetCameraColumn,
   useArrowKeyToShiftCellSelection,
-  inputCellsWithoutDoubleClickingEnabled,
+  cellInputMethod,
   shortcutCommandsWhileRenamingCellEnabled,
   showXSheetToolbar,
   showXsheetBreadcrumbs,

@@ -1,14 +1,17 @@
+ï»¿
 
-
-//#define AUTOCLOSE_DEBUG
+// #define AUTOCLOSE_DEBUG
 
 #include "texception.h"
 #include "toonz/autoclose.h"
 #include "trastercm.h"
 #include "skeletonlut.h"
+#include "toonz/fill.h"
 #include <set>
+#include <queue>
+#include <unordered_set>
 
-//#define AUT_SPOT_SAMPLES 40
+// #define AUT_SPOT_SAMPLES 40
 using namespace SkeletonLut;
 
 class TAutocloser::Imp {
@@ -45,7 +48,7 @@ public:
       , m_spotAngle(angle)
       , m_closingDistance(distance)
       , m_inkIndex(index)
-      , m_opacity(opacity){}
+      , m_opacity(opacity) {}
 
   ~Imp() {}
 
@@ -198,7 +201,280 @@ TRasterGR8P fillByteRaster(const TRasterCM32P &r, TRasterGR8P &bRaster) {
 
 #define SET_INK                                                                \
   if (buf->getTone() == buf->getMaxTone())                                     \
-    *buf = TPixelCM32(inkIndex, 0, 255 - opacity);
+    *buf = TPixelCM32(inkIndex, buf->getPaint(), 255 - opacity);
+
+const bool isSmallEnclosedRegion(const TRasterCM32P &ras, int x, int y,
+                                 int maxSize) {
+  if (!ras || x < 0 || y < 0 || x >= ras->getLx() || y >= ras->getLy())
+    return false;
+
+  TPixelCM32 *startRow = ras->pixels(y);
+  if (!startRow[x].isPurePaint()) return false;
+
+  int paint = startRow[x].getPaint();
+
+  static std::queue<TPoint> queue;
+  static std::unordered_set<int> visited;
+
+  queue = std::queue<TPoint>();
+  visited.clear();
+  visited.reserve(maxSize + 1);
+  visited.insert(y * ras->getLx() + x);
+  queue.push(TPoint(x, y));
+
+  while (!queue.empty() && visited.size() <= maxSize) {
+    TPoint p = queue.front();
+    queue.pop();
+
+    const int directions[4][2] = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+
+    for (int i = 0; i < 4; i++) {
+      int nx = p.x + directions[i][0];
+      int ny = p.y + directions[i][1];
+
+      if (nx < 0 || ny < 0 || nx >= ras->getLx() || ny >= ras->getLy()) {
+        return false;
+      }
+
+      int key = ny * ras->getLx() + nx;
+      if (visited.find(key) != visited.end()) continue;
+
+      TPixelCM32 *row = ras->pixels(ny);
+      if (row[nx].getPaint() == paint && row[nx].isPurePaint()) {
+        visited.insert(key);
+        queue.push(TPoint(nx, ny));
+        if (visited.size() > maxSize) return false;
+      }
+    }
+  }
+
+  return visited.size() <= maxSize;
+}
+
+bool doSegmentsIntersect(int x1, int y1, int x2, int y2, int x3, int y3, int x4,
+                         int y4) {
+  auto cross = [](int x1, int y1, int x2, int y2) -> int {
+    return x1 * y2 - y1 * x2;
+  };
+
+  int dx1 = x2 - x1;
+  int dy1 = y2 - y1;
+  int dx2 = x4 - x3;
+  int dy2 = y4 - y3;
+
+  int d1 = cross(dx2, dy2, x1 - x3, y1 - y3);
+  int d2 = cross(dx2, dy2, x2 - x3, y2 - y3);
+  int d3 = cross(dx1, dy1, x3 - x1, y3 - y1);
+  int d4 = cross(dx1, dy1, x4 - x1, y4 - y1);
+
+  if (d1 == 0 || d2 == 0 || d3 == 0 || d4 == 0) return false;
+
+  return (d1 * d2 < 0) && (d3 * d4 < 0);
+}
+
+// For Paint defined Region
+void closeSegment(const TRasterCM32P &r, const TAutocloser::Segment &s,
+                  const USHORT ink, const USHORT opacity) {
+  int x1 = s.first.x, y1 = s.first.y;
+  int x2 = s.second.x, y2 = s.second.y;
+
+  if (x1 > x2) {
+    std::swap(x1, x2);
+    std::swap(y1, y2);
+  }
+
+  int dx = x2 - x1;
+  int dy = y2 - y1;
+
+  int nx = 0, ny = 0;
+
+  if (dy >= 0) {
+    if (dy <= dx) {
+      nx = 0;
+      ny = 1;
+    } else {
+      nx = 1;
+      ny = 0;
+    }
+  } else {
+    int abs_dy = -dy;
+    if (abs_dy <= dx) {
+      nx = 0;
+      ny = -1;
+    } else {
+      nx = 1;
+      ny = 0;
+    }
+  }
+
+  int abs_dx = std::abs(dx);
+  int abs_dy = std::abs(dy);
+  int sx     = (dx > 0) ? 1 : -1;
+  int sy     = (dy > 0) ? 1 : -1;
+  int err    = abs_dx - abs_dy;
+
+  int x = x1;
+  int y = y1;
+  std::vector<TPoint> points;
+  int lastX = x, lastY = y;
+  while (true) {
+    TPixelCM32 *pix = r->pixels(y) + x;
+    // Only check side pixels if current line pixel is purePaint
+    if (pix->isPurePaint()) {
+      pix->setInk(ink);
+      pix->setTone(255 - opacity);
+      bool shouldKeep = true;
+      int linePaint   = pix->getPaint();
+
+      int sx1        = x + nx;
+      int sy1        = y + ny;
+      int side1Paint = -1;
+      int side1Tone  = -1;
+      if (sx1 >= 0 && sx1 < r->getLx() && sy1 >= 0 && sy1 < r->getLy()) {
+        side1Paint = r->pixels(sy1)[sx1].getPaint();
+        side1Tone  = r->pixels(sy1)[sx1].getTone();
+      }
+
+      int sx2        = x - nx;
+      int sy2        = y - ny;
+      int side2Paint = -1;
+      int side2Tone  = -1;
+      if (sx2 >= 0 && sx2 < r->getLx() && sy2 >= 0 && sy2 < r->getLy()) {
+        side2Tone  = r->pixels(sy2)[sx2].getTone();
+        side2Paint = r->pixels(sy2)[sx2].getPaint();
+      }
+      bool connected = false;
+      if (side1Tone == side2Tone && side1Tone == TPixelCM32::getMaxTone() &&
+          side1Paint == side2Paint && linePaint == side1Paint) {
+        // Check if Direct Connected
+        connected = true;
+      } else if (side1Tone != side2Tone &&
+                 (side1Tone == TPixelCM32::getMaxTone() ||
+                  side2Tone == TPixelCM32::getMaxTone())) {
+        // Check if Cornor Connected
+        int side3Tone  = -1;
+        int side4Tone  = -1;
+        int side3Paint = -1;
+        int side4Paint = -1;
+
+        int sx3 = x + ny;
+        int sy3 = y + nx;
+        if (sx3 >= 0 && sx3 < r->getLx() && sy3 >= 0 && sy3 < r->getLy()) {
+          side3Tone  = r->pixels(sy3)[sx3].getTone();
+          side3Paint = r->pixels(sy3)[sx3].getPaint();
+        }
+
+        int sx4 = x - ny;
+        int sy4 = y - nx;
+        if (sx4 >= 0 && sx4 < r->getLx() && sy4 >= 0 && sy4 < r->getLy()) {
+          side4Tone  = r->pixels(sy4)[sx4].getTone();
+          side4Paint = r->pixels(sy4)[sx4].getPaint();
+        }
+
+        const int MAX_TONE = TPixelCM32::getMaxTone();
+
+        int nextX = x, nextY = y;
+        int nextErr = err;
+        int next_e2 = 2 * nextErr;
+
+        bool moveX = (next_e2 > -abs_dy);
+        bool moveY = (next_e2 < abs_dx);
+
+        if (moveX) {
+          nextErr -= abs_dy;
+          nextX += sx;
+        }
+        if (moveY) {
+          nextErr += abs_dx;
+          nextY += sy;
+        }
+
+        if (side1Tone > side2Tone) {
+          bool intersect3 = doSegmentsIntersect(lastX, lastY, nextX, nextY, sx1,
+                                                sy1, sx3, sy3);
+
+          connected |= (side1Paint == linePaint && side3Tone == MAX_TONE &&
+                        side3Paint == linePaint && intersect3);
+
+          bool intersect4 = doSegmentsIntersect(lastX, lastY, nextX, nextY, sx1,
+                                                sy1, sx4, sy4);
+          connected |= (side1Paint == linePaint && side4Tone == MAX_TONE &&
+                        side4Paint == linePaint && intersect4);
+        } else {
+          bool intersect3 = doSegmentsIntersect(lastX, lastY, nextX, nextY, sx2,
+                                                sy2, sx3, sy3);
+          connected |= (side2Paint == linePaint && side3Tone == MAX_TONE &&
+                        side3Paint == linePaint && intersect3);
+
+          bool intersect4 = doSegmentsIntersect(lastX, lastY, nextX, nextY, sx2,
+                                                sy2, sx4, sy4);
+          connected |= (side2Paint == linePaint && side4Tone == MAX_TONE &&
+                        side4Paint == linePaint && intersect4);
+        }
+      }
+      if (connected) {
+        bool side1Small = isSmallEnclosedRegion(r, sx1, sy1, 4);
+        bool side2Small = isSmallEnclosedRegion(r, sx2, sy2, 4);
+        if (side1Small || side2Small) {
+          pix->setTone(TPixelCM32::getMaxTone());
+          pix->setInk(0);
+          shouldKeep = false;
+        }
+      } else if (!((x == x1 && y == y1) || (x == x2 && y == y2))) {
+        pix->setTone(TPixelCM32::getMaxTone());
+        pix->setInk(0);
+        shouldKeep = false;
+      }
+      if (shouldKeep) points.push_back(TPoint(x, y));
+    }
+
+    if (x == x2 && y == y2) break;
+    lastX  = x;
+    lastY  = y;
+    int e2 = 2 * err;
+    if (e2 > -abs_dy) {
+      err -= abs_dy;
+      x += sx;
+    }
+    if (e2 < abs_dx) {
+      err += abs_dx;
+      y += sy;
+    }
+  }
+
+  // Clear lonely pixels (Intersection Point)
+  // Mostly an endpoint of one gap
+  // It's also one point on the other gap close line
+  if (points.size() == 1 && points.front() != s.first &&
+      points.front() != s.second)
+    return;
+  for (auto [x, y] : points) {
+    TPixelCM32 *pix = r->pixels(y) + x;
+    bool lonely     = true;
+    int paint       = r->pixels(y)[x].getPaint();
+    const int dx[8] = {-1, 0, 1, -1, 1, -1, 0, 1};
+    const int dy[8] = {-1, -1, -1, 0, 0, 1, 1, 1};
+
+    for (int i = 0; i < 8; ++i) {
+      int nx          = x + dx[i];
+      int ny          = y + dy[i];
+      TPixelCM32 *pix = r->pixels(ny) + nx;
+      if (nx >= 0 && nx < r->getLx() && ny >= 0 && ny < r->getLy()) {
+        if (pix->getInk() == ink && pix->getPaint() == paint) {
+          lonely = false;
+          break;
+        }
+      }
+    }
+
+    if (lonely) {
+      pix->setTone(TPixelCM32::getMaxTone());
+      pix->setInk(0);
+    }
+  }
+
+  return;
+}
 
 void drawSegment(TRasterCM32P &r, const TAutocloser::Segment &s,
                  USHORT inkIndex, USHORT opacity) {
@@ -233,6 +509,7 @@ return;
   dy = y2 - y1;
 
   x = y = 0;
+  SET_INK;
 
   if (dy >= 0) {
     if (dy <= dx)
@@ -246,6 +523,8 @@ return;
     else
       DRAW_SEGMENT(y, x, dy, dx, (buf -= wrap), (buf -= (wrap - 1)), SET_INK)
   }
+
+  SET_INK;
 }
 
 /*------------------------------------------------------------------------*/
@@ -311,8 +590,12 @@ void TAutocloser::Imp::draw(const std::vector<Segment> &closingSegmentArray) {
   if (m_raster->getLx() == 0 || m_raster->getLy() == 0)
     throw TException("Autoclose error: bad image size");
 
-  for (int i = 0; i < (int)closingSegmentArray.size(); i++)
-    drawSegment(raux, closingSegmentArray[i], m_inkIndex, m_opacity);
+  if (DEF_REGION_WITH_PAINT)
+    for (int i = 0; i < (int)closingSegmentArray.size(); i++)
+      closeSegment(raux, closingSegmentArray[i], m_inkIndex, m_opacity);
+  else
+    for (int i = 0; i < (int)closingSegmentArray.size(); i++)
+      drawSegment(raux, closingSegmentArray[i], m_inkIndex, m_opacity);
 }
 
 /*------------------------------------------------------------------------*/
@@ -541,17 +824,17 @@ void TAutocloser::Imp::findMeetingPoints(
   m_aut_spot_samples = (UINT)m_spotAngle;
 
   m_spotAngle *= (M_PI / 180.0);
-  
+
   // spotResearchTwoPoints
-  // Angle Range: 0¡ã~36¡ã
+  // Angle Range: 0Â°~36Â°
   double limitedAngle = m_spotAngle / 10;
-  m_csp = cos(limitedAngle);
-  m_snp = sin(limitedAngle);
-  m_csm = cos(-limitedAngle);
-  m_snm = sin(-limitedAngle);
+  m_csp               = cos(limitedAngle);
+  m_snp               = sin(limitedAngle);
+  m_csm               = cos(-limitedAngle);
+  m_snm               = sin(-limitedAngle);
 
   // spotResearchOnePoints
-  alfa = m_spotAngle / m_aut_spot_samples;
+  alfa  = m_spotAngle / m_aut_spot_samples;
   m_csa = cos(alfa);
   m_sna = sin(alfa);
   m_csb = cos(-alfa);
@@ -567,12 +850,10 @@ void TAutocloser::Imp::findMeetingPoints(
 #endif
   while ((int)closingSegments.size() > size && !orientedEndpoints.empty()) {
     size = closingSegments.size();
-    do
-      calculateWeightAndDirection(orientedEndpoints);
+    do calculateWeightAndDirection(orientedEndpoints);
     while (spotResearchTwoPoints(orientedEndpoints, closingSegments));
-    
-    do
-      calculateWeightAndDirection(orientedEndpoints);
+
+    do calculateWeightAndDirection(orientedEndpoints);
     while (spotResearchOnePoint(orientedEndpoints, closingSegments));
   }
 }
@@ -723,7 +1004,8 @@ bool TAutocloser::Imp::spotResearchOnePoint(
       Segment segment(endpoints[count].first, p);
       std::vector<Segment>::iterator it =
           std::find(closingSegments.begin(), closingSegments.end(), segment);
-      if (it == closingSegments.end() && notInsidePath(endpoints[count].first, p)) {
+      if (it == closingSegments.end() &&
+          notInsidePath(endpoints[count].first, p)) {
         ret = true;
         drawInByteRaster(endpoints[count].first, p);
         closingSegments.push_back(Segment(endpoints[count].first, p));

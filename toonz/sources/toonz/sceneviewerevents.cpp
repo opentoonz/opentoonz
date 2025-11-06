@@ -234,6 +234,12 @@ void SceneViewer::onButtonPressed(FlipConsole::EGadget button) {
   case FlipConsole::eFlipVertical:
     flipY();
     break;
+  case FlipConsole::eRotateLeft:
+    rotateLeft();
+    break;
+  case FlipConsole::eRotateRight:
+    rotateRight();
+    break;
   case FlipConsole::eResetView:
     resetSceneViewer();
     break;
@@ -429,15 +435,6 @@ void SceneViewer::onLeave() {
   if (CommandManager::instance()->getAction(MI_ShiftTrace)->isChecked())
     TTool::getTool("T_ShiftTrace", TTool::ToonzImage)->onLeave();
 
-  // Reset navigation key states when mouse leaves viewer
-  // This prevents stuck states when keys are released while mouse is outside
-  ToolHandle *toolHandle = TApp::instance()->getCurrentTool();
-  if (toolHandle) {
-    toolHandle->setSpacePressed(false);
-    toolHandle->setCtrlPressed(false);
-    toolHandle->setShiftPressed(false);
-  }
-
   update();
 }
 
@@ -528,7 +525,7 @@ void SceneViewer::onMove(const TMouseEvent &event) {
     preEvent.m_button    = m_mouseButton;
     onRelease(preEvent);
   }
-  
+
   int devPixRatio = getDevPixRatio();
   QPointF curPos  = event.mousePos() * devPixRatio;
   bool cursorSet  = false;
@@ -623,8 +620,8 @@ void SceneViewer::onMove(const TMouseEvent &event) {
     // grab screen picking for stop motion live view zoom
     if ((event.buttons() & Qt::LeftButton) &&
         StopMotion::instance()->m_canon->m_pickLiveViewZoom) {
-        StopMotion::instance()->m_canon->makeZoomPoint(pos);
-        return;
+      StopMotion::instance()->m_canon->makeZoomPoint(pos);
+      return;
     }
 #endif
     LocatorPopup *locator = TApp::instance()->getActiveLocator();
@@ -637,7 +634,7 @@ void SceneViewer::onMove(const TMouseEvent &event) {
       pos.x /= m_dpiScale.x;
       pos.y /= m_dpiScale.y;
     }
-    
+
     // qDebug() << "mouseMoveEvent. "  << (m_tabletEvent?"tablet":"mouse")
     //         << " pressure=" << m_pressure << " mouseButton=" << m_mouseButton
     //         << " buttonClicked=" << m_buttonClicked;
@@ -662,7 +659,7 @@ void SceneViewer::onMove(const TMouseEvent &event) {
     } else if (m_pressure == 0.0) {
       tool->mouseMove(pos, event);
     }
-    // Set the cursor of the current tool, 
+    // Set the cursor of the current tool,
     // when tool don't draw its own cursor (setToolCursor to None)
     if (!cursorSet) setToolCursor(this, tool->getCursorId());
 
@@ -1039,16 +1036,18 @@ void SceneViewer::wheelEvent(QWheelEvent *event) {
         CommandManager::instance()->execute("MI_PrevDrawing");
       }
     } else if (m_touchDevice == QTouchDevice::TouchPad) {
-        QPointF centerDelta = QPointF(event->angleDelta().x(), event->angleDelta().y());
-        panQt(centerDelta.toPoint());
-        m_panning = true;
+      QPointF centerDelta =
+          QPointF(event->angleDelta().x(), event->angleDelta().y());
+      panQt(centerDelta.toPoint());
+      m_panning = true;
     }
     // Mouse wheel zoom interfered with touchpad panning (touch enabled)
     // Now if touch is enabled, touchpads ignore the mouse wheel zoom
     else if ((m_gestureActive == true &&
               m_touchDevice == QTouchDevice::TouchScreen) ||
              m_gestureActive == false) {
-      zoomQt(event->position().toPoint() * getDevPixRatio(), exp(0.001 * delta));
+      zoomQt(event->position().toPoint() * getDevPixRatio(),
+             exp(0.001 * delta));
       m_panning = false;
     }
   }
@@ -1151,7 +1150,7 @@ void SceneViewer::touchEvent(QTouchEvent *e, int type) {
     // functional
     // on other devices, 1 finger panning is preferred
     if (e->touchPoints().count() == 1 &&
-         m_touchDevice == QTouchDevice::TouchScreen) {
+        m_touchDevice == QTouchDevice::TouchScreen) {
       QTouchEvent::TouchPoint panPoint = e->touchPoints().at(0);
       if (!m_panning) {
         QPointF deltaPoint = panPoint.pos() - m_firstPanPoint;
@@ -1292,7 +1291,7 @@ bool SceneViewer::event(QEvent *e) {
 
     // Disable keyboard shortcuts while the tool is busy with a mouse drag
     // operation.
-    if (tool->isDragging()) {
+    if (tool && tool->isDragging()) {
       e->accept();
     }
 
@@ -1354,6 +1353,16 @@ public:
 
   bool setFlipY() override {
     static_cast<SceneViewer *>(getWidget())->flipY();
+    return true;
+  }
+
+  bool rotateLeft() override {
+    static_cast<SceneViewer *>(getWidget())->rotateLeft();
+    return true;
+  }
+
+  bool rotateRight() override {
+    static_cast<SceneViewer *>(getWidget())->rotateRight();
     return true;
   }
 
@@ -1423,212 +1432,177 @@ void SceneViewer::keyPressEvent(QKeyEvent *event) {
   if (m_freezedStatus != NO_FREEZED) return;
   int key = event->key();
 
-  // Handle only initial key presses, not auto-repeat
-  if (!event->isAutoRepeat()) {
-    ToolHandle *toolHandle = TApp::instance()->getCurrentTool();
-
-    switch (event->key()) {
-    case Qt::Key_Space:
-      toolHandle->setSpacePressed(true);
-      event->accept();
-      return;
-
-    case Qt::Key_Control:
-      toolHandle->setCtrlPressed(true);
-      event->accept();
-      return;
-
-    case Qt::Key_Shift:
-      toolHandle->setShiftPressed(true);
-      event->accept();
-      return;
-    }
-  }
-
-  // Check if we're in navigation mode before handling any other keys
-  ToolHandle *toolHandle = TApp::instance()->getCurrentTool();
-  if (!toolHandle->isNavigating()) {
-    if (event->type() == QEvent::ShortcutOverride ||
-        event->type() == QEvent::KeyPress) {
-      if (!event->isAutoRepeat()) {
-        TApp::instance()->getCurrentTool()->storeTool();
-      }
-    }
-
-    // Handle Canon camera controls if enabled
+  // Handle Canon camera controls if enabled
 #ifdef WITH_CANON
-    if ((m_stopMotion->m_canon->m_pickLiveViewZoom ||
-         m_stopMotion->m_canon->m_zooming) &&
-        (key == Qt::Key_Left || key == Qt::Key_Right || key == Qt::Key_Up ||
-         key == Qt::Key_Down || key == Qt::Key_2 || key == Qt::Key_4 ||
-         key == Qt::Key_6 || key == Qt::Key_8)) {
-      // Handle camera zoom point adjustment
-      if (m_stopMotion->m_canon->m_liveViewZoomReadyToPick == true) {
-        if (key == Qt::Key_Left || key == Qt::Key_4) {
-          m_stopMotion->m_canon->m_liveViewZoomPickPoint.x -= 10;
-        }
-        if (key == Qt::Key_Right || key == Qt::Key_6) {
-          m_stopMotion->m_canon->m_liveViewZoomPickPoint.x += 10;
-        }
-        if (key == Qt::Key_Up || key == Qt::Key_8) {
-          m_stopMotion->m_canon->m_liveViewZoomPickPoint.y += 10;
-        }
-        if (key == Qt::Key_Down || key == Qt::Key_2) {
-          m_stopMotion->m_canon->m_liveViewZoomPickPoint.y -= 10;
-        }
-        if (m_stopMotion->m_canon->m_zooming) {
-          m_stopMotion->m_canon->setZoomPoint();
-        }
+  if ((m_stopMotion->m_canon->m_pickLiveViewZoom ||
+       m_stopMotion->m_canon->m_zooming) &&
+      (key == Qt::Key_Left || key == Qt::Key_Right || key == Qt::Key_Up ||
+       key == Qt::Key_Down || key == Qt::Key_2 || key == Qt::Key_4 ||
+       key == Qt::Key_6 || key == Qt::Key_8)) {
+    // Handle camera zoom point adjustment
+    if (m_stopMotion->m_canon->m_liveViewZoomReadyToPick == true) {
+      if (key == Qt::Key_Left || key == Qt::Key_4) {
+        m_stopMotion->m_canon->m_liveViewZoomPickPoint.x -= 10;
       }
-      m_stopMotion->m_canon->calculateZoomPoint();
-      event->accept();
-      return;
-    } else if (m_stopMotion->m_canon->m_pickLiveViewZoom &&
-               (key == Qt::Key_Escape || key == Qt::Key_Enter ||
-                key == Qt::Key_Return)) {
-      m_stopMotion->m_canon->toggleZoomPicking();
-      event->accept();
-      return;
-    } else
+      if (key == Qt::Key_Right || key == Qt::Key_6) {
+        m_stopMotion->m_canon->m_liveViewZoomPickPoint.x += 10;
+      }
+      if (key == Qt::Key_Up || key == Qt::Key_8) {
+        m_stopMotion->m_canon->m_liveViewZoomPickPoint.y += 10;
+      }
+      if (key == Qt::Key_Down || key == Qt::Key_2) {
+        m_stopMotion->m_canon->m_liveViewZoomPickPoint.y -= 10;
+      }
+      if (m_stopMotion->m_canon->m_zooming) {
+        m_stopMotion->m_canon->setZoomPoint();
+      }
+    }
+
+    m_stopMotion->m_canon->calculateZoomPoint();
+    event->accept();
+    return;
+  } else if (m_stopMotion->m_canon->m_pickLiveViewZoom &&
+             (key == Qt::Key_Escape || key == Qt::Key_Enter ||
+              key == Qt::Key_Return)) {
+    m_stopMotion->m_canon->toggleZoomPicking();
+    event->accept();
+    return;
+  } else
 #endif
 
-    // Handle stop motion capture
+  // Handle stop motion capture
 #if defined(x64)
-        if (m_stopMotion->m_liveViewStatus == 2 &&
-            (key == Qt::Key_Enter || key == Qt::Key_Return)) {
-      m_stopMotion->captureImage();
-      event->accept();
-      return;
-    }
+      if (m_stopMotion->m_liveViewStatus == 2 &&
+          (key == Qt::Key_Enter || key == Qt::Key_Return)) {
+    m_stopMotion->captureImage();
+    event->accept();
+    return;
+  }
 #endif
 
-    // Handle tool-specific key events and viewer shortcuts
-    auto ret = [&]() -> bool {
-      TTool *tool = TApp::instance()->getCurrentTool()->getTool();
-      if (!tool) return false;
+  // Handle tool-specific key events and viewer shortcuts
+  auto ret = [&]() -> bool {
+    TTool *tool = TApp::instance()->getCurrentTool()->getTool();
+    if (!tool) return false;
 
-      bool isTextToolActive = tool->getName() == T_Type && tool->isActive();
+    bool isTextToolActive = tool->getName() == T_Type && tool->isActive();
 
-      // Handle non-text tool shortcuts
-      if (!isTextToolActive) {
-        if (ViewerZoomer(this).exec(event)) return true;
-        if (SceneViewerShortcutReceiver(this).exec(event)) return true;
+    // Handle non-text tool shortcuts
+    if (!isTextToolActive) {
+      if (ViewerZoomer(this).exec(event)) return true;
+      if (SceneViewerShortcutReceiver(this).exec(event)) return true;
 
-        // Handle style switching shortcuts when appropriate
-        if (m_isStyleShortcutSwitchable &&
-            Preferences::instance()->isUseNumpadForSwitchingStylesEnabled() &&
-            (event->modifiers() == Qt::NoModifier ||
-             event->modifiers() == Qt::ShiftModifier ||
-             event->modifiers() == Qt::KeypadModifier) &&
-            ((Qt::Key_0 <= key && key <= Qt::Key_9) || key == Qt::Key_Tab ||
-             key == Qt::Key_Backtab)) {
-          // Handle fullscreen style shortcuts
-          if (parentWidget() &&
-              parentWidget()->windowState() & Qt::WindowFullScreen) {
-            StyleShortcutSwitchablePanel::onKeyPress(event);
-            return true;
-          }
-
-          event->ignore();
+      // Handle style switching shortcuts when appropriate
+      if (m_isStyleShortcutSwitchable &&
+          Preferences::instance()->isUseNumpadForSwitchingStylesEnabled() &&
+          (event->modifiers() == Qt::NoModifier ||
+           event->modifiers() == Qt::ShiftModifier ||
+           event->modifiers() == Qt::KeypadModifier) &&
+          ((Qt::Key_0 <= key && key <= Qt::Key_9) || key == Qt::Key_Tab ||
+           key == Qt::Key_Backtab)) {
+        // Handle fullscreen style shortcuts
+        if (parentWidget() &&
+            parentWidget()->windowState() & Qt::WindowFullScreen) {
+          StyleShortcutSwitchablePanel::onKeyPress(event);
           return true;
         }
 
-        // Handle onion skin ghost flip keys
-        if (CommandManager::instance()->getAction(MI_ShiftTrace)->isChecked() &&
-            (Qt::Key_F1 <= key && key <= Qt::Key_F3)) {
-          OnionSkinMask osm =
-              TApp::instance()->getCurrentOnionSkin()->getOnionSkinMask();
-          if (osm.getGhostFlipKey() != key) {
-            osm.appendGhostFlipKey(key);
-            TApp::instance()->getCurrentOnionSkin()->setOnionSkinMask(osm);
-            TApp::instance()
-                ->getCurrentOnionSkin()
-                ->notifyOnionSkinMaskChanged();
-          }
-          return true;
-        }
+        event->ignore();
+        return true;
       }
 
-      if (!tool->isEnabled()) return false;
-
-      tool->setViewer(this);
-
-      // Handle modifier keys that require immediate cursor updates
-      if (key == Qt::Key_Shift || key == Qt::Key_Control ||
-          key == Qt::Key_Alt || key == Qt::Key_AltGr) {
-        TMouseEvent toonzEvent;
-        initToonzEvent(toonzEvent, event);
-        toonzEvent.m_pos = TPointD(m_lastMousePos.x(),
-                                   (double)(height() - 1) - m_lastMousePos.y());
-
-        TPointD pos = tool->getMatrix().inv() * winToWorld(m_lastMousePos);
-
-        TObjectHandle *objHandle = TApp::instance()->getCurrentObject();
-        if ((tool->getToolType() & TTool::LevelTool) &&
-            !objHandle->isSpline()) {
-          pos.x /= m_dpiScale.x;
-          pos.y /= m_dpiScale.y;
+      // Handle onion skin ghost flip keys
+      if (CommandManager::instance()->getAction(MI_ShiftTrace)->isChecked() &&
+          (Qt::Key_F1 <= key && key <= Qt::Key_F3)) {
+        OnionSkinMask osm =
+            TApp::instance()->getCurrentOnionSkin()->getOnionSkinMask();
+        if (osm.getGhostFlipKey() != key) {
+          osm.appendGhostFlipKey(key);
+          TApp::instance()->getCurrentOnionSkin()->setOnionSkinMask(osm);
+          TApp::instance()->getCurrentOnionSkin()->notifyOnionSkinMaskChanged();
         }
-
-        tool->mouseMove(pos, toonzEvent);
-        setToolCursor(this, tool->getCursorId());
-      }
-
-      if (key == Qt::Key_Menu || key == Qt::Key_Meta) return false;
-
-      return tool->keyDown(event);
-    }();
-
-    // Handle frame navigation if no tool handled the key
-    if (!ret) {
-      if (changeFrameSkippingHolds(event)) return;
-
-      TFrameHandle *fh = TApp::instance()->getCurrentFrame();
-      int origFrame    = fh->getFrame();
-
-      // Handle frame navigation keys
-      if (key == Qt::Key_Up || key == Qt::Key_Left)
-        fh->prevFrame();
-      else if (key == Qt::Key_Down || key == Qt::Key_Right) {
-        // Allow creating new frames with down arrow in level mode
-        TFrameId newId = 0;
-        if (Preferences::instance()->getDownArrowLevelStripNewFrame() &&
-            fh->getFrameType() == TFrameHandle::LevelFrame) {
-          TXshSimpleLevel *level =
-              TApp::instance()->getCurrentLevel()->getLevel()->getSimpleLevel();
-          if (level) {
-            std::vector<TFrameId> fids;
-            level->getFids(fids);
-            if (!fids.empty()) {
-              int frameCount = (int)fids.size();
-              newId          = level->index2fid(frameCount);
-            }
-          }
-        }
-        fh->nextFrame(newId);
-      } else if (key == Qt::Key_Home)
-        fh->firstFrame();
-      else if (key == Qt::Key_End)
-        fh->lastFrame();
-
-      // Handle cell selection movement with arrow keys
-      if (Preferences::instance()->isUseArrowKeyToShiftCellSelectionEnabled() &&
-          fh->getFrameType() != TFrameHandle::LevelFrame) {
-        TCellSelection *cellSel =
-            dynamic_cast<TCellSelection *>(TSelection::getCurrent());
-        if (cellSel && !cellSel->isEmpty()) {
-          int r0, c0, r1, c1;
-          cellSel->getSelectedCells(r0, c0, r1, c1);
-          int shiftFrame = fh->getFrame() - origFrame;
-
-          cellSel->selectCells(r0 + shiftFrame, c0, r1 + shiftFrame, c1);
-          TApp::instance()->getCurrentSelection()->notifySelectionChanged();
-        }
+        return true;
       }
     }
 
-    update();
+    if (!tool->isEnabled()) return false;
+
+    tool->setViewer(this);
+
+    // Handle modifier keys that require immediate cursor updates
+    if (key == Qt::Key_Shift || key == Qt::Key_Control || key == Qt::Key_Alt ||
+        key == Qt::Key_AltGr) {
+      TMouseEvent toonzEvent;
+      initToonzEvent(toonzEvent, event);
+      toonzEvent.m_pos = TPointD(m_lastMousePos.x(),
+                                 (double)(height() - 1) - m_lastMousePos.y());
+
+      TPointD pos = tool->getMatrix().inv() * winToWorld(m_lastMousePos);
+
+      TObjectHandle *objHandle = TApp::instance()->getCurrentObject();
+      if ((tool->getToolType() & TTool::LevelTool) && !objHandle->isSpline()) {
+        pos.x /= m_dpiScale.x;
+        pos.y /= m_dpiScale.y;
+      }
+
+      tool->mouseMove(pos, toonzEvent);
+      setToolCursor(this, tool->getCursorId());
+    }
+
+    if (key == Qt::Key_Menu || key == Qt::Key_Meta) return false;
+
+    return tool->keyDown(event);
+  }();
+
+  // Handle frame navigation if no tool handled the key
+  if (!ret) {
+    if (changeFrameSkippingHolds(event)) return;
+
+    TFrameHandle *fh = TApp::instance()->getCurrentFrame();
+    int origFrame    = fh->getFrame();
+
+    // Handle frame navigation keys
+    if (key == Qt::Key_Up || key == Qt::Key_Left)
+      fh->prevFrame();
+    else if (key == Qt::Key_Down || key == Qt::Key_Right) {
+      // Allow creating new frames with down arrow in level mode
+      TFrameId newId = 0;
+      if (Preferences::instance()->getDownArrowLevelStripNewFrame() &&
+          fh->getFrameType() == TFrameHandle::LevelFrame) {
+        TXshSimpleLevel *level =
+            TApp::instance()->getCurrentLevel()->getLevel()->getSimpleLevel();
+        if (level) {
+          std::vector<TFrameId> fids;
+          level->getFids(fids);
+          if (!fids.empty()) {
+            int frameCount = (int)fids.size();
+            newId          = level->index2fid(frameCount);
+          }
+        }
+      }
+      fh->nextFrame(newId);
+    } else if (key == Qt::Key_Home)
+      fh->firstFrame();
+    else if (key == Qt::Key_End)
+      fh->lastFrame();
+
+    // Handle cell selection movement with arrow keys
+    if (Preferences::instance()->isUseArrowKeyToShiftCellSelectionEnabled() &&
+        fh->getFrameType() != TFrameHandle::LevelFrame) {
+      TCellSelection *cellSel =
+          dynamic_cast<TCellSelection *>(TSelection::getCurrent());
+      if (cellSel && !cellSel->isEmpty()) {
+        int r0, c0, r1, c1;
+        cellSel->getSelectedCells(r0, c0, r1, c1);
+        int shiftFrame = fh->getFrame() - origFrame;
+
+        cellSel->selectCells(r0 + shiftFrame, c0, r1 + shiftFrame, c1);
+        TApp::instance()->getCurrentSelection()->notifySelectionChanged();
+      }
+    }
   }
+
+  update();
 }
 
 //-----------------------------------------------------------------------------
@@ -1642,28 +1616,6 @@ void SceneViewer::keyReleaseEvent(QKeyEvent *event) {
   tool->setViewer(this);
 
   int key = event->key();
-
-  // Handle only real key releases, not auto-repeat
-  if (!event->isAutoRepeat()) {
-    ToolHandle *toolHandle = TApp::instance()->getCurrentTool();
-
-    switch (event->key()) {
-    case Qt::Key_Space:
-      toolHandle->setSpacePressed(false);
-      event->accept();
-      return;
-
-    case Qt::Key_Control:
-      toolHandle->setCtrlPressed(false);
-      event->accept();
-      return;
-
-    case Qt::Key_Shift:
-      toolHandle->setShiftPressed(false);
-      event->accept();
-      return;
-    }
-  }
 
   // For modifier keys (shift/ctrl/etc), some tools (e.g. pinch) need to
   // update their cursor immediately without waiting for the next mouse move

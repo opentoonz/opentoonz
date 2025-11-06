@@ -334,7 +334,7 @@ void FileBrowserPopup::onFilePathClicked(const TFilePath &fp) {
 void FileBrowserPopup::onFilePathsSelected(
     const std::set<TFilePath> &paths,
     const std::list<std::vector<TFrameId>> &fIds) {
-  if (paths.size() == 0 && m_forSaving) return;
+  if (paths.size() == 0 && (m_forSaving || m_isDirectoryOnly)) return;
 
   m_selectedPaths  = paths;
   m_currentFIdsSet = fIds;
@@ -1212,10 +1212,10 @@ bool LoadLevelPopup::execute() {
     args.row0 = m_posFrom->text().toInt() - 1;
 
     args.frameCount = m_posTo->text().toInt() - m_posFrom->text().toInt() + 1;
-    
+
     std::list<std::vector<TFrameId>> fidsSet = getCurrentFIdsSet();
     if (!fidsSet.empty()) {
-        args.resourceDatas[0].m_frameIdSet = std::move(fidsSet.front());
+      args.resourceDatas[0].m_frameIdSet = std::move(fidsSet.front());
     }
 
     else if (m_notExistLabel->isVisible()) {
@@ -1269,12 +1269,12 @@ bool LoadLevelPopup::execute() {
       args.resourceDatas.push_back(*it);
 
     std::list<std::vector<TFrameId>> fIdsSet = getCurrentFIdsSet();
-    auto fIdIt = fIdsSet.begin();
-    auto rdIt = args.resourceDatas.begin();
+    auto fIdIt                               = fIdsSet.begin();
+    auto rdIt                                = args.resourceDatas.begin();
     while (fIdIt != fIdsSet.end() && rdIt != args.resourceDatas.end()) {
-        rdIt->m_frameIdSet = std::move(*fIdIt);
-        ++fIdIt;
-        ++rdIt;
+      rdIt->m_frameIdSet = std::move(*fIdIt);
+      ++fIdIt;
+      ++rdIt;
     }
     args.cachingBehavior = IoCmd::LoadResourceArguments::CacheRasterBehavior(
         m_rasterCacheBehaviorComboBox->currentData().toInt());

@@ -5,7 +5,7 @@
 - git
 - brew
 - Xcode
-- cmake (3.2.2以降)
+- cmake (3.10以降)
 - Qt 5.x (5.15以降)
 - boost　(1.55.0以降)
 

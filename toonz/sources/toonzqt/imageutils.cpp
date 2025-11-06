@@ -53,6 +53,8 @@
 // boost includes
 #include <boost/iterator/transform_iterator.hpp>
 
+#include <unordered_map>
+
 //**********************************************************************************
 //    Local namespace  stuff
 //**********************************************************************************
@@ -150,8 +152,7 @@ TFilePath duplicate(const TFilePath &levelPath) {
   NameBuilder *nameBuilder =
       NameBuilder::getBuilder(::to_wstring(levelPath.getName()));
   std::wstring levelNameOut;
-  do
-    levelNameOut = nameBuilder->getNext();
+  do levelNameOut = nameBuilder->getNext();
   while (TSystem::doesExistFileOrLevel(levelPath.withName(levelNameOut)));
 
   TFilePath levelPathOut = levelPath.withName(levelNameOut);
@@ -639,74 +640,72 @@ void convert(const TFilePath &source, const TFilePath &dest,
 
 //=============================================================================
 
-bool isAAImage(TFilePath path){
-    QImage img(path.getQString());
-    if (img.isNull())return false;
+bool isAAImage(TFilePath path) {
+  QImage img(path.getQString());
+  if (img.isNull()) return false;
 
-    uint16_t width = img.width();
-    uint16_t height = img.height();
-    uint32_t lonelyPixelCount = 0;
-    uint32_t totalPixels = width * height;
+  uint16_t width            = img.width();
+  uint16_t height           = img.height();
+  uint32_t lonelyPixelCount = 0;
+  uint32_t totalPixels      = width * height;
 
-    std::unordered_map<uint32_t, uint32_t> colorCount;
+  std::unordered_map<uint32_t, uint32_t> colorCount;
 
-    const QRgb* imgData = reinterpret_cast<const QRgb*>(img.bits());
+  const QRgb *imgData = reinterpret_cast<const QRgb *>(img.bits());
 
-    for (int y = 0; y < height; ++y) {
-        for (int x = 0; x < width; ++x) {
-            QRgb color = imgData[y * width + x];
-            colorCount[color]++;
-        }
+  for (int y = 0; y < height; ++y) {
+    for (int x = 0; x < width; ++x) {
+      QRgb color = imgData[y * width + x];
+      colorCount[color]++;
     }
+  }
 
-    uint32_t maxCount = 0;
-    QRgb mostCommonColor = 0;
-    for (const auto& pair : colorCount) {
-        if (pair.second > maxCount) {
-            maxCount = pair.second;
-            mostCommonColor = pair.first;
-        }
+  uint32_t maxCount    = 0;
+  QRgb mostCommonColor = 0;
+  for (const auto &pair : colorCount) {
+    if (pair.second > maxCount) {
+      maxCount        = pair.second;
+      mostCommonColor = pair.first;
     }
+  }
 
-    for (int y = 1; y < height - 1; ++y) {
-        int xcount = 0;
-        for (int x = 1; x < width - 1; ++x) {
-            QRgb centerColor = imgData[y * width + x];
+  for (int y = 1; y < height - 1; ++y) {
+    int xcount = 0;
+    for (int x = 1; x < width - 1; ++x) {
+      QRgb centerColor = imgData[y * width + x];
 
-            if (centerColor == mostCommonColor) {
-                ++xcount;
-                continue;
-            }
+      if (centerColor == mostCommonColor) {
+        ++xcount;
+        continue;
+      }
 
-            int diffCount = 0;
+      int diffCount = 0;
 
-            if (imgData[y * width + (x - 1)] != centerColor) ++diffCount;
-            if (imgData[y * width + (x + 1)] != centerColor) ++diffCount;
-            if (imgData[(y - 1) * width + x] != centerColor) ++diffCount;
-            if (imgData[(y + 1) * width + x] != centerColor) ++diffCount;
+      if (imgData[y * width + (x - 1)] != centerColor) ++diffCount;
+      if (imgData[y * width + (x + 1)] != centerColor) ++diffCount;
+      if (imgData[(y - 1) * width + x] != centerColor) ++diffCount;
+      if (imgData[(y + 1) * width + x] != centerColor) ++diffCount;
 
-            if (diffCount == 4) {
-                lonelyPixelCount++;
-            }
-        }
-        if (xcount == width - 2)
-            totalPixels -= width;
+      if (diffCount == 4) {
+        lonelyPixelCount++;
+      }
     }
+    if (xcount == width - 2) totalPixels -= width;
+  }
 
+  double ratio = double(lonelyPixelCount) / (totalPixels + 1);
 
-    double ratio = double(lonelyPixelCount) / (totalPixels + 1);
-    
-    const double value = 0.05 / 100;
-    return ratio > value;
+  const double value = 0.05 / 100;
+  return ratio > value;
 }
 
 void convertNaa2Tlv(const TFilePath &source, const TFilePath &dest,
                     const TFrameId &from, const TFrameId &to,
                     FrameTaskNotifier *frameNotifier, TPalette *palette,
                     bool removeUnusedStyles, double dpi) {
-  //std::string dstExt = dest.getType(), srcExt = source.getType();
-  if(TSystem::doesExistFileOrLevel(dest.withType("tpl")))
-      TSystem::deleteFile(dest.withType("tpl"));
+  // std::string dstExt = dest.getType(), srcExt = source.getType();
+  if (TSystem::doesExistFileOrLevel(dest.withType("tpl")))
+    TSystem::deleteFile(dest.withType("tpl"));
 
   // Load source level structure
   TLevelReaderP lr(source);
@@ -767,7 +766,7 @@ void convertNaa2Tlv(const TFilePath &source, const TFilePath &dest,
 
     frameNotifier->notifyFrameCompleted(100 * (f + 1) / frames.size());
   }
-  
+
   if (removeUnusedStyles) converter.removeUnusedStyles(usedStyleIds);
 }
 
@@ -872,8 +871,8 @@ namespace {
 
 void getViewerShortcuts(int &zoomIn, int &zoomOut, int &viewReset, int &zoomFit,
                         int &showHideFullScreen, int &actualPixelSize,
-                        int &flipX, int &flipY, int &zoomReset,
-                        int &rotateReset, int &positionReset) {
+                        int &flipX, int &flipY, int &rotateL, int &rotateR,
+                        int &zoomReset, int &rotateReset, int &positionReset) {
   CommandManager *cManager = CommandManager::instance();
 
   zoomIn = cManager->getKeyFromShortcut(cManager->getShortcutFromId(V_ZoomIn));
@@ -889,6 +888,10 @@ void getViewerShortcuts(int &zoomIn, int &zoomOut, int &viewReset, int &zoomFit,
       cManager->getShortcutFromId(V_ActualPixelSize));
   flipX = cManager->getKeyFromShortcut(cManager->getShortcutFromId(V_FlipX));
   flipY = cManager->getKeyFromShortcut(cManager->getShortcutFromId(V_FlipY));
+  rotateL =
+      cManager->getKeyFromShortcut(cManager->getShortcutFromId(V_RotateLeft));
+  rotateR =
+      cManager->getKeyFromShortcut(cManager->getShortcutFromId(V_RotateRight));
   zoomReset =
       cManager->getKeyFromShortcut(cManager->getShortcutFromId(V_ZoomReset));
   rotateReset =
@@ -910,10 +913,11 @@ ShortcutZoomer::ShortcutZoomer(QWidget *zoomingWidget)
 
 bool ShortcutZoomer::exec(QKeyEvent *event) {
   int zoomInKey, zoomOutKey, viewResetKey, zoomFitKey, showHideFullScreenKey,
-      actualPixelSize, flipX, flipY, zoomReset, rotateReset, positionReset;
+      actualPixelSize, flipX, flipY, rotateL, rotateR, zoomReset, rotateReset,
+      positionReset;
   getViewerShortcuts(zoomInKey, zoomOutKey, viewResetKey, zoomFitKey,
                      showHideFullScreenKey, actualPixelSize, flipX, flipY,
-                     zoomReset, rotateReset, positionReset);
+                     rotateL, rotateR, zoomReset, rotateReset, positionReset);
 
   int key = event->key();
   if (key == Qt::Key_Control || key == Qt::Key_Shift || key == Qt::Key_Alt)
@@ -922,30 +926,20 @@ bool ShortcutZoomer::exec(QKeyEvent *event) {
   key = key | event->modifiers() &
                   (~0xf0000000);  // Ignore if the key is a numpad key
 
-  return (key == showHideFullScreenKey)
-             ? toggleFullScreen()
-             : (key == Qt::Key_Escape)
-                   ? toggleFullScreen(true)
-                   : (key == actualPixelSize)
-                         ? setActualPixelSize()
-                         : (key == zoomFitKey)
-                               ? fit()
-                               : (key == zoomInKey || key == zoomOutKey ||
-                                  key == viewResetKey)
-                                     ? zoom(key == zoomInKey,
-                                            key == viewResetKey)
-                                     : (key == flipX)
-                                           ? setFlipX()
-                                           : (key == flipY)
-                                                 ? setFlipY()
-                                                 : (key == zoomReset)
-                                                       ? resetZoom()
-                                                       : (key == rotateReset)
-                                                             ? resetRotation()
-                                                             : (key ==
-                                                                positionReset)
-                                                                   ? resetPosition()
-                                                                   : false;
+  return (key == showHideFullScreenKey) ? toggleFullScreen()
+         : (key == Qt::Key_Escape)      ? toggleFullScreen(true)
+         : (key == actualPixelSize)     ? setActualPixelSize()
+         : (key == zoomFitKey)          ? fit()
+         : (key == zoomInKey || key == zoomOutKey || key == viewResetKey)
+             ? zoom(key == zoomInKey, key == viewResetKey)
+         : (key == flipX)         ? setFlipX()
+         : (key == flipY)         ? setFlipY()
+         : (key == rotateL)       ? rotateLeft()
+         : (key == rotateR)       ? rotateRight()
+         : (key == zoomReset)     ? resetZoom()
+         : (key == rotateReset)   ? resetRotation()
+         : (key == positionReset) ? resetPosition()
+                                  : false;
   ;
 }
 

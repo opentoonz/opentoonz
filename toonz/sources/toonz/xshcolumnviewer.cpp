@@ -1181,7 +1181,6 @@ void ColumnArea::DrawHeader::drawColumnName() const {
   bool nameBacklit = false;
   int rightadj     = -2;
   int leftadj      = 3;
-  int valign = o->isVerticalTimeline() ? Qt::AlignVCenter : Qt::AlignBottom;
 
   if (!isEmpty) {
     if (o->isVerticalTimeline() &&
@@ -1228,13 +1227,13 @@ void ColumnArea::DrawHeader::drawColumnName() const {
     p.drawText(columnName.translated(-columnName.topLeft())
                    .transposed()
                    .adjusted(5, 0, 0, 0),
-               Qt::AlignLeft | valign, cameraName);
+               Qt::AlignLeft | Qt::AlignVCenter, cameraName);
     p.restore();
     return;
   }
 
   p.drawText(columnName.adjusted(leftadj, 0, rightadj, 0),
-             Qt::AlignLeft | valign | Qt::TextSingleLine,
+             Qt::AlignLeft | Qt::AlignVCenter | Qt::TextSingleLine,
              QString(name.c_str()));
 }
 
@@ -2408,12 +2407,11 @@ void ColumnArea::mousePressEvent(QMouseEvent *event) {
     else if (!isEmpty) {
       // grabbing the left side of the column enables column move
       if (o->rect(PredefinedRect::DRAG_LAYER).contains(mouseInCell) ||
-          /*(!o->flag(PredefinedFlag::DRAG_LAYER_VISIBLE)  // If dragbar hidden,
+          (!o->flag(PredefinedFlag::DRAG_LAYER_VISIBLE)  // If dragbar hidden,
                                                          // layer name/number
                                                          // becomes dragbar
-           && */  // also consider layer name/number as dragbar
-          (o->rect(PredefinedRect::LAYER_NUMBER).contains(mouseInCell) ||
-               o->rect(PredefinedRect::LAYER_NAME).contains(mouseInCell))) {
+           && (o->rect(PredefinedRect::LAYER_NUMBER).contains(mouseInCell) ||
+               o->rect(PredefinedRect::LAYER_NAME).contains(mouseInCell)))) {
         setDragTool(XsheetGUI::DragTool::makeColumnMoveTool(m_viewer));
       }
       // lock button
@@ -2422,8 +2420,7 @@ void ColumnArea::mousePressEvent(QMouseEvent *event) {
         if (isCtrlPressed)
           m_doOnRelease = ToggleAllLock;
         else {
-          m_doOnMove =
-              column->isLocked() ? ToggleOffLock : ToggleOnLock;
+          m_doOnMove = column->isLocked() ? ToggleOffLock : ToggleOnLock;
           column->lock(!column->isLocked());
         }
       }

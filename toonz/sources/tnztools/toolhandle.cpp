@@ -64,116 +64,33 @@ void ToolHandle::setTool(QString name) {
 
 //-----------------------------------------------------------------------------
 
-void ToolHandle::setSpacePressed(bool pressed) {
-  if (m_navState.spacePressed == pressed) return;
-
-  m_navState.spacePressed = pressed;
-
-  if (pressed) {
-    // Enter navigation mode
-    if (!m_navState.active) {
-      m_navState.active       = true;
-      m_navState.originalTool = m_toolName;
-    }
-
-    /**
-     * Check actual keyboard state to detect "buffered" modifier keys
-     * ______________________________________________________________
-     *
-     * Normally, we track modifier keys using 'setShiftPressed()' and
-     * 'setCtrlPressed()' when the user presses them. However, there's a case
-     * where a user [holds Shift or Ctrl before pressing Space]. In this case:
-     *
-     * - The Shift/Ctrl state might already be active 'before' space was pressed
-     * - If we don't check the keyboard state here, we'd assume Shift/Ctrl off
-     *  - This would result in the wrong tool being selected (e.g., T_Hand
-     * instead of T_Rotate)
-     *
-     * Example scenario:
-     * 1. User 'holds Shift' but 'setShiftPressed(true)' is not yet called
-     * 2. Pressed 'Space' -> navigation activates
-     * 3. If we don't check the keyboard here, we don't recognize Shift is held
-     * 4. The tool defaults to 'T_Hand' instead of 'T_Rotate' (incorrect!)
-     *
-     * This prevents that issue by explicitly checking what modifier keys are
-     * actually held.
-     */
-    m_navState.shiftPressed =
-        (QGuiApplication::queryKeyboardModifiers() & Qt::ShiftModifier) != 0;
-    m_navState.ctrlPressed =
-        (QGuiApplication::queryKeyboardModifiers() & Qt::ControlModifier) != 0;
-
-    updateNavigationTool(); // Select the correct tool based on modifiers
-  } else {
-    exitNavigation();
-  }
-}
-
-void ToolHandle::setShiftPressed(bool pressed) {
-  if (m_navState.shiftPressed == pressed) return;
-
-  m_navState.shiftPressed = pressed;
-
-  // If we're in navigation mode, update the tool selection
-  if (m_navState.active) {
-    updateNavigationTool();
-  }
-}
-
-void ToolHandle::setCtrlPressed(bool pressed) {
-  if (m_navState.ctrlPressed == pressed) return;
-
-  m_navState.ctrlPressed = pressed;
-
-  // If we're in navigation mode, update the tool selection
-  if (m_navState.active) {
-    updateNavigationTool();
-  }
-}
-
-void ToolHandle::updateNavigationTool() {
-  if (!m_navState.active) return;  // Only update if navigation mode is active
-
-  // Priority: Ctrl > Shift > Default (T_Hand)
-  if (m_navState.ctrlPressed) {
-    setTool("T_Zoom");
-  } else if (m_navState.shiftPressed) {
-    setTool("T_Rotate");
-  } else {
-    setTool("T_Hand");
-  }
-}
-
-void ToolHandle::exitNavigation() {
-  if (!m_navState.active) return;
-
-  // Restore the original tool before navigation mode was activated
-  if (!m_navState.originalTool.isEmpty()) {
-    setTool(m_navState.originalTool);
-    m_storedToolName = m_navState.originalTool;
-  }
-
-  // Reset navigation mode but PRESERVE modifier states for buffering
-  m_navState.active       = false;
-  m_navState.spacePressed = false;
-}
-
-//-----------------------------------------------------------------------------
-
 void ToolHandle::storeTool() {
-  m_storedToolName = m_toolName;
-  m_storedToolTime.start();
+  // navigation tools will not be stored
+  if (!isViewerNavigationToolSelected()) {
+    m_storedToolName = m_toolName;
+    m_storedToolTime.start();
+  }
 }
 
 //-----------------------------------------------------------------------------
 
 void ToolHandle::restoreTool() {
   // qDebug() << m_storedToolTime.elapsed();
+  // navigation tools will always return to the stored one even if the key press
+  // time is short
   if (m_storedToolName != m_toolName && m_storedToolName != "" &&
-      m_storedToolTime.elapsed() >
-          Preferences::instance()->getTempToolSwitchTimer()) {
+      (m_storedToolTime.elapsed() >
+           Preferences::instance()->getTempToolSwitchTimer() ||
+       isViewerNavigationToolSelected())) {
     setTool(m_storedToolName);
   }
+}
+
+//-----------------------------------------------------------------------------
+
+bool ToolHandle::isViewerNavigationToolSelected() {
+  return m_toolName == T_RotateView || m_toolName == T_ZoomView ||
+         m_toolName == T_HandView;
 }
 
 //-----------------------------------------------------------------------------

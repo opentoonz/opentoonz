@@ -40,8 +40,9 @@ class RenameCellField final : public QLineEdit {
 
   int m_row;
   int m_col;
-  bool escapePressed = false;
   XsheetViewer *m_viewer;
+  bool m_isCtrlPrssed = false;
+  QString m_initialText;
 
 public:
   RenameCellField(QWidget *parent, XsheetViewer *viewer);

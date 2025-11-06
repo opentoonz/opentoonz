@@ -549,7 +549,7 @@ void LevelMoverTool::onClick(const QMouseEvent *e) {
   CellPosition cellPosition = getViewer()->xyToPosition(e->pos());
   int row                   = cellPosition.frame();
   int col                   = cellPosition.layer();
-
+  TXsheet *xsh              = getViewer()->getXsheet();
   int r0, c0, r1, c1;
   getViewer()->getCellSelection()->getSelectedCells(r0, c0, r1, c1);
 
@@ -559,10 +559,12 @@ void LevelMoverTool::onClick(const QMouseEvent *e) {
   if ((e->modifiers() == (Qt::ControlModifier | Qt::AltModifier)))
     m_qualifiers |= CellsMover::eCopyCells;
   if (e->modifiers() & Qt::ShiftModifier ||
-      // Or Dragging Frame Cell
-      (r0 == r1 && c0 == c1) &&
-      getViewer()->getXsheet()->getCell(cellPosition)
-      != getViewer()->getXsheet()->getCell(row - 1, col))
+      // Or Dragging the Frame Cell
+      Preferences::instance()->isAlwaysDragFrameCell() &&
+          (r0 == r1 && c0 == c1) &&
+          xsh->getCell(row, col) != xsh->getCell(row - 1, col) &&
+          !(xsh->getCell(row + 1, col).isEmpty() &&
+            xsh->getCell(row - 1, col).isEmpty()))
     m_qualifiers |= CellsMover::eInsertCells;
   if (e->modifiers() & Qt::AltModifier)
     m_qualifiers |= CellsMover::eOverwriteCells;
@@ -598,8 +600,6 @@ void LevelMoverTool::onClick(const QMouseEvent *e) {
   m_lastPos = m_aimedPos = m_startPos;
   m_grabOffset = m_startPos - (o->isVerticalTimeline() ? TPoint(col, row)
                                                        : TPoint(row, col));
-
-  TXsheet *xsh = getViewer()->getXsheet();
 
   // move
   m_validPos                      = true;

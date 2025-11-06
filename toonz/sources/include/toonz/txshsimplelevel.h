@@ -212,6 +212,7 @@ table) it returns the proper insertion index
 
   TRasterImageP getFrameToCleanup(const TFrameId &fid,
                                   bool toBeLineProcessed) const;
+  TRasterImageP getFrameRasterized(const TFrameId& fid, TPointD dpi) const;
 
   std::string getImageId(const TFrameId &fid, int frameStatus = -1) const;
   std::string getIconId(const TFrameId &fid, int frameStatus = -1) const;

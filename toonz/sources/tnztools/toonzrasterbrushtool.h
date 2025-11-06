@@ -249,7 +249,7 @@ protected:
   TPropertyGroup m_prop[2];
 
   TDoublePairProperty m_rasThickness;
-  TDoubleProperty m_smooth;
+  TIntProperty m_smooth;
   TDoubleProperty m_hardness;
   TEnumProperty m_preset;
   TEnumProperty m_drawOrder;

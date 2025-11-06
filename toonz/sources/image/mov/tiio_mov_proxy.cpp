@@ -22,6 +22,7 @@
 #include <QDataStream>
 
 #include "tiio_mov_proxy.h"
+#include <toonz/preferences.h>
 
 /*
   For a list of supported commands through the 32-bit background server,
@@ -39,6 +40,7 @@ bool IsQuickTimeInstalled() {
   // in tnzcore lib, the other in image. The core version is currently NEVER
   // USED
   // throughout Toonz, even if it's EXPORT-defined.
+  if (!Preferences::instance()->isUseQuickTimeBackend()) return false;
   QLocalSocket socket;
   if (!tipc::startSlaveConnection(&socket, t32bitsrv::srvName(), 3000,
                                   t32bitsrv::srvCmdlinePrg(),
@@ -50,7 +52,12 @@ bool IsQuickTimeInstalled() {
 
   stream << (msg << QString("$isQTInstalled"));
 
-  if (tipc::readMessage(stream, msg) != "yes") return false;
+  if (tipc::readMessage(stream, msg) != "yes") {
+#ifdef _WIN32
+    tipc::terminateCurrentBackgroundProcess();
+#endif  // _WIN32
+    return false;
+  }
   return true;
 #else
   return false;

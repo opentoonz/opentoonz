@@ -8,10 +8,9 @@ init:
 
 skip_commits:
   files:
-    - 'doc/**/*'      # Skip everything inside doc/ (recursive)
-    - '.github/**'    # Skip everything inside .github/ (recursive)
-    - 'README.md'     # Skip changes only to README.md
-
+    - 'doc/**/*'               # Skip everything inside doc/ (recursive)
+    - '.github/**/*'           # Skip everything inside .github/ (recursive)
+    - 'README.md'              # Skip changes only to README.md
 pull_requests:
   do_not_increment_build_number: true
 skip_tags: true

@@ -11,7 +11,8 @@ TLevel::TLevel()
     : TSmartObject(m_classCode)
     , m_name("")
     , m_table(new Table())
-    , m_palette(0) {}
+    , m_palette(0)
+    , m_partialLoad(false) {}
 
 //-------------------------------------------------
 

@@ -353,12 +353,11 @@ void DvItemSelection::selectNone() {
 
 void DvItemSelection::selectAll() {
   m_selectedIndices.clear();
-  
+
   // exclude the parent folder
   int i =
       m_model->getItemData(0, DvItemListModel::Name).toString() == ".." ? 1 : 0;
-  for (; i < m_model->getItemCount(); i++)
-      m_selectedIndices.insert(i);
+  for (; i < m_model->getItemCount(); i++) m_selectedIndices.insert(i);
   emit itemSelectionChanged();
 }
 
@@ -1187,10 +1186,6 @@ void DvItemViewerPanel::mousePressEvent(QMouseEvent *event) {
   bool isSelected = m_selection->isSelected(index);
   m_currentIndex  = index;
   if (event->button() == Qt::RightButton) {
-    // when a folder item is right-clicked, do nothing
-    if (getModel()->getItemData(index, DvItemListModel::IsFolder).toBool())
-      return;
-
     if (!isSelected) {
       m_selection->selectNone();
       if (!m_isPlayDelegateDisable) m_itemViewPlayDelegate->resetPlayWidget();
@@ -1304,8 +1299,9 @@ void DvItemViewerPanel::mouseMoveEvent(QMouseEvent *event) {
 
 //-----------------------------------------------------------------------------
 
-void DvItemViewerPanel::mouseReleaseEvent(QMouseEvent *) {
-  if (m_viewer) m_viewer->notifyClick(m_currentIndex);
+void DvItemViewerPanel::mouseReleaseEvent(QMouseEvent *event) {
+  if (m_viewer)
+    m_viewer->notifyClick(m_currentIndex, event->button() == Qt::LeftButton);
 }
 
 //-----------------------------------------------------------------------------
@@ -1419,7 +1415,7 @@ void DvItemViewerPanel::setThumbnailsView() {
 //-----------------------------------------------------------------------------
 
 void DvItemViewerPanel::exportFileList() {
-  auto project = TProjectManager::instance()->getCurrentProject();
+  auto project      = TProjectManager::instance()->getCurrentProject();
   ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
   TFilePath fp;
   if (scene) fp = scene->decodeFilePath(project->getFolder(TProject::Extras));

@@ -75,6 +75,7 @@
     STD_rgbmFadeFx 
     STD_rgbmScaleFx
     STD_sharpenFx 
+    STD_iwa_SmootherFx 
   </Image_Adjust>
   <Layer_Blending>
     addFx 
@@ -169,6 +170,7 @@
     STD_solarizeFx
     STD_iwa_TangentFlowFx
     STD_iwa_MotionFlowFx
+    STD_naru_LazyBrushFx
   </Stylize>
   <Toonz_Level>
     STD_artContourFx

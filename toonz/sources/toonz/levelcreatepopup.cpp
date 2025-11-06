@@ -296,9 +296,9 @@ LevelCreatePopup::LevelCreatePopup()
   //---- signal-slot connections
   bool ret = true;
   ret      = ret && connect(m_levelTypeOm, SIGNAL(currentIndexChanged(int)),
-                       SLOT(onLevelTypeChanged(int)));
+                            SLOT(onLevelTypeChanged(int)));
   ret      = ret && connect(m_frameFormatBtn, SIGNAL(clicked()), this,
-                       SLOT(onFrameFormatButton()));
+                            SLOT(onFrameFormatButton()));
   ret      = ret && connect(okBtn, SIGNAL(clicked()), this, SLOT(onOkBtn()));
   ret      = ret && connect(cancelBtn, SIGNAL(clicked()), this, SLOT(reject()));
   ret =
@@ -642,6 +642,12 @@ bool LevelCreatePopup::apply() {
       ti->setDpi(dpi, dpi);
       sl->setFrame(fid, ti);
       ti->setSavebox(TRect(0, 0, xres - 1, yres - 1));
+
+      // This update should be called at least once, or it won't be rendered
+      // Almost every level tool will call ToolUtils::updateSavebox() to update
+      // But since fill tool tend to not update the savebox, we call it here
+      TImageInfo* info = sl->getFrameInfo(fid, true);
+      ImageBuilder::setImageInfo(*info, ti.getPointer());
     } else if (lType == OVL_XSHLEVEL) {
       TRaster32P raster(xres, yres);
       raster->clear();
