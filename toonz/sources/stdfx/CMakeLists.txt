@@ -271,8 +271,8 @@ set(SOURCES
     iwa_noise1234.cpp
     iwa_pnperspectivefx.cpp
     iwa_soapbubblefx.cpp
-    ${SDKROOT}/kiss_fft130/kiss_fft.c
-    ${SDKROOT}/kiss_fft130/tools/kiss_fftnd.c
+    ${SDKROOT}/kiss_fft/kiss_fft.c
+    ${SDKROOT}/kiss_fft/kiss_fftnd.c
     iwa_bokehfx.cpp
     iwa_timecodefx.cpp
     iwa_bokehreffx.cpp
@@ -330,7 +330,7 @@ else()
 endif()
 
 include_directories(
-    ${SDKROOT}/kiss_fft130
+    ${SDKROOT}/kiss_fft
 )
 
 _find_toonz_library(TNZLIBS "tnzcore;tnzbase;toonzlib")

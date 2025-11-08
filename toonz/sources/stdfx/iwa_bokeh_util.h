@@ -6,7 +6,7 @@
 #include "tgeometry.h"
 #include "traster.h"
 #include "kiss_fft.h"
-#include "tools/kiss_fftnd.h"
+#include "kiss_fftnd.h"
 #include "ttile.h"
 #include "stdfx.h"
 #include "tfxparam.h"
@@ -122,7 +122,7 @@ public:
 
   bool isFinished() { return m_finished; }
 
-  // ƒƒ‚ƒŠŠm•Û
+  // ???????m??
   bool init();
 
   void terminateThread() { m_isTerminated = true; }

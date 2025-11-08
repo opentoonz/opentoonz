@@ -15,7 +15,7 @@ Iwa_GlareFx
 #include <QList>
 #include <QThread>
 
-#include "tools/kiss_fftnd.h"
+#include "kiss_fftnd.h"
 
 const int LAYER_NUM = 5;
 
