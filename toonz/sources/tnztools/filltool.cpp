@@ -1103,8 +1103,9 @@ void doRefFill(const TImageP &img, const TRaster32P &refImg, const TPointD &pos,
     if (plt && hasAutoInks(plt) && autopaintLines) params.m_palette = plt;
     if (params.m_fillType == ALL || params.m_fillType == AREAS) {
       fill(ras, params, &tileSaver, refImg);
-      recomputeSavebox =
-          !ti->getSavebox().contains(tileSaver.getTileSet()->getBBox());
+      TRect tileBBox   = tileSaver.getTileSet()->getBBox();
+      TRect tiBBox     = ti->getSavebox() - offs;
+      recomputeSavebox = !tiBBox.contains(tileBBox);
     }
     if (params.m_fillType == ALL || params.m_fillType == LINES) {
       if (params.m_segment)
