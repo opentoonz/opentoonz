@@ -190,6 +190,9 @@ public:
   PathAliasPriority getPathAliasPriority() const {
     return PathAliasPriority(getIntValue(pathAliasPriority));
   }
+  bool isLazyLoadRoomsEnabled() {
+      return getBoolValue(lazyLoadRooms);
+  }
 
   // Interface  tab
   QStringList getStyleSheetList() const { return m_styleSheetList; }

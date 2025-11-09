@@ -1220,6 +1220,7 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
       //{ projectRoot,               tr("") },
       {customProjectRoot, tr("Custom Project Path(s):")},
       {pathAliasPriority, tr("Path Alias Priority:")},
+      {lazyLoadRooms, tr("Lazy Load Rooms")},
 
       // Interface
       {CurrentStyleSheetName, tr("Theme:")},
@@ -1669,6 +1670,7 @@ QWidget* PreferencesPopup::createGeneralPage() {
   }
 
   insertUI(pathAliasPriority, lay, getComboItemList(pathAliasPriority));
+  insertUI(lazyLoadRooms, lay);
 
   lay->setRowStretch(lay->rowCount(), 1);
   insertFootNote(lay);
@@ -1697,6 +1699,19 @@ QWidget* PreferencesPopup::createGeneralPage() {
          "Standalone -> $scenefolder\n"
          "Project -> project folder aliases (+drawing...)");
   pathAliasPriorityCB->setItemData(3, autoBySceneToolTip, Qt::ToolTipRole);
+
+  QCheckBox* lazyLoadRoomsCheckBox = getUI<QCheckBox*>(lazyLoadRooms);
+  connect(lazyLoadRoomsCheckBox, &QCheckBox::stateChanged,
+          [lazyLoadRoomsCheckBox](int state) {
+          QString status = Preferences::instance()->isLazyLoadRoomsEnabled()
+              ? tr("enabled") : tr("disabled");
+          QString description = Preferences::instance()->isLazyLoadRoomsEnabled()
+              ? tr("rooms will load on demand")
+              : tr("all rooms load at startup");
+          QString lazyLoadRoomsToolTip = tr("Lazy loading %1 - %2").arg(status).arg(description);
+          lazyLoadRoomsCheckBox->setToolTip(lazyLoadRoomsToolTip);
+          });
+  lazyLoadRoomsCheckBox->stateChanged(Preferences::instance()->isLazyLoadRoomsEnabled());
 
   m_onEditedFuncMap.insert(autosaveEnabled,
                            &PreferencesPopup::onAutoSaveChanged);
