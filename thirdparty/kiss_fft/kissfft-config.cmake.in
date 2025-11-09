@@ -1,0 +1,82 @@
+# kissfft-config.ccmake accept the following components:
+#
+# SHARED/STATIC:
+#     This components allows one to choose a shared/static kissfft library.
+#     The default is selected by BUILD_SHARED_LIBS.
+#     They are to be used exclusively. Using them together is an error.
+#
+#     example:
+#         find_package(kissfft CONFIG REQUIRED COMPONENTS STATIC)
+#
+# simd/int16/int32/float/double:
+#     This components allows one to choose the datatype.
+#     When using this component, the target kissfft::kissfft becomes available.
+#     When not using this component, you will have to choose the correct kissfft target.
+#
+#     example:
+#         find_package(kissfft CONFIG REQUIRED)
+#         # - kissfft::kissfft-float, kissfft::kissfft-int32_t/ ... are available (if they are installed)
+#         # - kissfft::kissfft is not available,
+#
+#         find_package(kissfft CONFIG REQUIRED COMPONENTS int32_t)
+#         # - kissfft::kissfft-float, kissfft::kissfft-int32_t/ ... are available (if they are installed)
+#         # - kissfft::kissfft is available (as an alias for kissfft::kissfft-int32_t),
+
+@PACKAGE_INIT@
+
+cmake_minimum_required(VERSION 3.10)
+
+# Set include glob of config files using SHARED/static component, BUILD_SHARED_LIBS by default
+set(_kissfft_shared_detected OFF)
+set(_kissfft_shared ${BUILD_SHARED_LIBS})
+if("SHARED" IN_LIST kissfft_FIND_COMPONENTS)
+    set(_kissfft_shared_detected ON)
+    set(_kissfft_shared ON)
+endif()
+if("STATIC" IN_LIST kissfft_FIND_COMPONENTS)
+    if(_kissfft_shared_detected)
+        message(FATAL_ERROR "SHARED and STATIC components cannot be used together")
+    endif()
+    set(_kissfft_shared_detected ON)
+    set(_kissfft_shared OFF)
+endif()
+
+if(_kissfft_shared)
+    set(_kissfft_config_glob "kissfft-*-shared-targets.cmake")
+else()
+    set(_kissfft_config_glob "kissfft-*-static-targets.cmake")
+endif()
+
+# Load information for all configured kissfft
+get_filename_component(_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+file(GLOB CONFIG_FILES "${_DIR}/${_kissfft_config_glob}")
+foreach(f ${CONFIG_FILES})
+  include(${f})
+endforeach()
+
+# If a datatype component is passed, create kissfft::kissfft
+set(_kissfft_datatype_detected)
+foreach(_kissfft_datatype simd int16 int32 float double)
+    if(_kissfft_datatype IN_LIST kissfft_FIND_COMPONENTS)
+        if(_kissfft_datatype_detected)
+            message(FATAL_ERROR "Cannot define datatype COMPONENT twice: ${_kissfft_datatype_detected} and ${_kissfft_datatype}")
+        endif()
+        set(_kissfft_datatype_detected ${_kissfft_datatype})
+    endif()
+endforeach()
+
+if(_kissfft_datatype_detected)
+    if(NOT TARGET kissfft::kissfft-${_kissfft_datatype_detected})
+        message(FATAL_ERROR "kissfft with datatype=${_kissfft_datatype_detected} is not installed")
+    endif()
+    if(TARGET kissfft::kissfft)
+        message(SEND_ERROR "kissfft::kissfft already exists. You cannot use 2 find_package's with datatype that are visible to eachother.")
+    else()
+        add_library(kissfft::kissfft INTERFACE IMPORTED)
+        set_property(TARGET kissfft::kissfft PROPERTY INTERFACE_LINK_LIBRARIES kissfft::kissfft-${_kissfft_datatype_detected})
+    endif()
+endif()
+
+set(kissfft_FOUND ON)
+set(KISSFFT_VERSION @kissfft_VERSION@)
+
