@@ -3,6 +3,7 @@
 
 #define TINYEXR_IMPLEMENTATION
 #include "tinyexr.h"
+#include <cassert>
 
 /*
  * This source is based on TinyEXR code, enabling to use file handle
@@ -473,7 +474,7 @@ int SaveEXRImageToFileHandle(const EXRImage *exr_image,
   unsigned char *mem = NULL;
   size_t mem_size    = SaveEXRImageToMemory(exr_image, exr_header, &mem, err);
   if (mem_size == 0) {
-    return TINYEXR_ERROR_SERIALZATION_FAILED;
+    return TINYEXR_ERROR_SERIALIZATION_FAILED;
   }
 
   size_t written_size = 0;
