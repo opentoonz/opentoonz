@@ -1,6 +1,11 @@
 version: 1.7.1.{build}
+
+environment:
+  QT_PATH: '%APPVEYOR_BUILD_FOLDER%\thirdparty\qt\5.15.2_wintab\msvc2019_64'
+
 init:
-  - git lfs install --skip-smudge
+  - git lfs install --skip-smudge  # Avoid issue with GitHub LFS quota
+
 skip_commits:
   files:
     - 'doc/**/*'               # Skip everything inside doc/ (recursive)
@@ -9,54 +14,129 @@ skip_commits:
 pull_requests:
   do_not_increment_build_number: true
 skip_tags: true
-image: Previous Visual Studio 2019
+image: Visual Studio 2019
 configuration: Release
 platform: x64
 clone_depth: 1
 
 cache:
-- C:\Tools\opencv
+  - C:\Tools\opencv
+
 install:
-- cmd: >-
-    if exist "C:\Tools\opencv\build\x64\vc16\bin\opencv_world4110.dll" (echo OpenCV cached, skipping install) else (choco install opencv --version=4.11.0 --no-progress --yes --force)
+  # Install OpenCV if not cached
+  - cmd: >-
+      if exist "C:\Tools\opencv\build\x64\vc16\bin\opencv_world4110.dll" (echo OpenCV cached, skipping install) else (choco install opencv --version=4.11.0 --no-progress --yes --force || exit /b 1 & echo Installed OpenCV)
 
-    curl -fsSL -o thirdparty-libs.zip https://github.com/andeon/opentoonz-thirdparty-libs/releases/download/prebuilt-libs-v1/thirdparty-libs.zip
+  # Download and extract custom Qt 5.15.2 with WinTab support
+  - cmd: >-
+      mkdir thirdparty\qt
 
-    7z x -y thirdparty-libs.zip
-    
-    cd thirdparty
+      curl -fsSL -o Qt5.15.2_wintab.zip https://github.com/shun-iwasawa/qt5/releases/download/v5.15.2_wintab/Qt5.15.2_wintab.zip || exit /b 1
 
-    copy /Y tiff-4.0.3\libtiff\tif_config.vc.h tiff-4.0.3\libtiff\tif_config.h
+      7z x Qt5.15.2_wintab.zip -o%APPVEYOR_BUILD_FOLDER% || exit /b 1
 
-    copy /Y tiff-4.0.3\libtiff\tiffconf.vc.h tiff-4.0.3\libtiff\tiffconf.h
+      echo Extracted Qt5.15.2_wintab.zip
 
-    copy /Y libpng-1.6.21\scripts\pnglibconf.h.prebuilt libpng-1.6.21\pnglibconf.h
+      move Qt5.15.2_wintab\5.15.2_wintab thirdparty\qt || exit /b 1
 
-    cd ../toonz
+      echo Moved Qt directory to thirdparty\qt
 
-    mkdir %PLATFORM% && cd %PLATFORM%
+      REM Create directories for symbolic link
 
-    cmake ..\sources -G "Visual Studio 16 2019" -Ax64 -DQT_PATH="C:\Qt\5.15.2\msvc2019_64" -DBOOST_ROOT="C:\Libraries\boost_1_86_0" -DOpenCV_DIR="C:\Tools\opencv\build"
+      mkdir C:\Qt\5.15.2
+
+      REM Create junction to point to the downloaded folder
+
+      cmd /c mklink /J C:\Qt\5.15.2\msvc2019_64 %APPVEYOR_BUILD_FOLDER%\thirdparty\qt\5.15.2_wintab\msvc2019_64
+
+      echo Created junction C:\Qt\5.15.2\msvc2019_64 pointing to %APPVEYOR_BUILD_FOLDER%\thirdparty\qt\5.15.2_wintab\msvc2019_64
+
+  # Download and extract third-party libraries (GitHub LFS quota issue)
+  - cmd: >-
+      curl -fsSL -o thirdparty-libs.zip https://github.com/andeon/opentoonz-thirdparty-libs/releases/download/prebuilt-libs-v1/thirdparty-libs.zip || exit /b 1
+
+      7z x -y thirdparty-libs.zip -o%APPVEYOR_BUILD_FOLDER% || exit /b 1
+
+      echo Extracted third-party libraries
+
+  # Configure third-party libraries
+  - cmd: >-
+      cd thirdparty
+
+      if not exist tiff-4.0.3\libtiff\tif_config.vc.h (echo tif_config.vc.h not found & exit /b 1)
+
+      copy /Y tiff-4.0.3\libtiff\tif_config.vc.h tiff-4.0.3\libtiff\tif_config.h || exit /b 1
+
+      if not exist tiff-4.0.3\libtiff\tiffconf.vc.h (echo tiffconf.vc.h not found & exit /b 1)
+
+      copy /Y tiff-4.0.3\libtiff\tiffconf.vc.h tiff-4.0.3\libtiff\tiffconf.h || exit /b 1
+
+      if not exist libpng-1.6.21\scripts\pnglibconf.h.prebuilt (echo pnglibconf.h.prebuilt not found & exit /b 1)
+
+      copy /Y libpng-1.6.21\scripts\pnglibconf.h.prebuilt libpng-1.6.21\pnglibconf.h || exit /b 1
+
+      cd ..\
+
+      echo Configured third-party libraries
+
+  # Configure CMake
+  - cmd: >-
+      if not exist "%QT_PATH%\bin\qmake.exe" (echo QT_PATH does not exist or is invalid: %QT_PATH% & exit /b 1)
+
+      if not exist "C:\Libraries\boost_1_89_0" (echo Boost not found at C:\Libraries\boost_1_89_0 & exit /b 1)
+
+      cd toonz
+
+      mkdir %PLATFORM% && cd %PLATFORM%
+
+      cmake ..\sources -G "Visual Studio 16 2019" -Ax64 -DQT_PATH="%QT_PATH%" -DBOOST_ROOT="C:\Libraries\boost_1_89_0" -DOpenCV_DIR="C:\Tools\opencv\build" -DWITH_WINTAB=ON || exit /b 1
+
+      echo CMake configuration completed
+
 build:
   project: $(APPVEYOR_BUILD_FOLDER)\toonz\$(PLATFORM)\ALL_BUILD.vcxproj
   parallel: true
   verbosity: minimal
+
 after_build:
-- cmd: >-
+  # Deploy Qt dependencies
+  - cmd: >-
+      if not exist "%CONFIGURATION%\OpenToonz.exe" (echo OpenToonz.exe not found & exit /b 1)
 
-    C:\Qt\5.15.2\msvc2019_64\bin\windeployqt.exe %CONFIGURATION%\OpenToonz.exe
+      %QT_PATH%\bin\windeployqt.exe %CONFIGURATION%\OpenToonz.exe || exit /b 1
 
-    copy /Y ..\..\thirdparty\glut\3.7.6\lib\glut64.dll %CONFIGURATION%
+      echo Deployed Qt dependencies
 
-    copy /Y ..\..\thirdparty\glew\glew-1.9.0\bin\64bit\glew32.dll %CONFIGURATION%
+  # Copy required DLLs
+  - cmd: >-
+      if not exist ..\..\thirdparty\glut\3.7.6\lib\glut64.dll (echo glut64.dll not found & exit /b 1)
 
-    copy /Y "C:\Tools\opencv\build\x64\vc16\bin\opencv_world4110.dll" %CONFIGURATION%
+      copy /Y ..\..\thirdparty\glut\3.7.6\lib\glut64.dll %CONFIGURATION% || exit /b 1
 
-    xcopy /Y /E ..\..\thirdparty\libmypaint\dist\64\*.dll %CONFIGURATION%
+      if not exist ..\..\thirdparty\glew\glew-1.9.0\bin\64bit\glew32.dll (echo glew32.dll not found & exit /b 1)
 
-    mkdir "%CONFIGURATION%\portablestuff"
+      copy /Y ..\..\thirdparty\glew\glew-1.9.0\bin\64bit\glew32.dll %CONFIGURATION% || exit /b 1
 
-    xcopy /Y /E ..\..\stuff "%CONFIGURATION%\portablestuff"
+      if not exist "C:\Tools\opencv\build\x64\vc16\bin\opencv_world4110.dll" (echo opencv_world4110.dll not found & exit /b 1)
+
+      copy /Y "C:\Tools\opencv\build\x64\vc16\bin\opencv_world4110.dll" %CONFIGURATION% || exit /b 1
+
+      if not exist ..\..\thirdparty\libmypaint\dist\64 (echo libmypaint DLLs not found & exit /b 1)
+
+      xcopy /Y /E ..\..\thirdparty\libmypaint\dist\64\*.dll %CONFIGURATION% || exit /b 1
+
+      echo Copied required DLLs
+
+  # Package portable resources
+  - cmd: >-
+      if not exist ..\..\stuff (echo stuff directory not found & exit /b 1)
+
+      mkdir "%CONFIGURATION%\portablestuff" || exit /b 1
+
+      xcopy /Y /E ..\..\stuff "%CONFIGURATION%\portablestuff" || exit /b 1
+
+      echo Packaged portable resources
+
 artifacts:
-- path: toonz\$(PLATFORM)\$(CONFIGURATION)
-  name: OpenToonz
+  - path: toonz\$(PLATFORM)\$(CONFIGURATION)
+    name: OpenToonz
