@@ -1068,9 +1068,11 @@ void doRefFill(const TImageP &img, const TRaster32P &refImg, const TPointD &pos,
 
     if (Preferences::instance()->getFillOnlySavebox()) {
       TRectD bbox = ti->getBBox();
-      TRect ibbox = convert(bbox);
-      offs        = ibbox.getP00();
-      ras         = ti->getRaster()->extract(ibbox);
+      if (!bbox.isEmpty()) {
+        TRect ibbox = convert(bbox);
+        offs        = ibbox.getP00();
+        ras         = ti->getRaster()->extract(ibbox);
+      }
     }
 
     bool recomputeSavebox = false;
