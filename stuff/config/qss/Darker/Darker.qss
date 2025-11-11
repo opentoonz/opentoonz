@@ -1381,8 +1381,8 @@ MyScroller {
   padding-left: 2;
 }
 #FileBrowser #buttonBar QToolButton:hover {
-  background-color: #2A2A2B;
-  border-color: #2A2A2B;
+  background-color: #242424;
+  border-color: #242424;
   color: #D3D3D3;
 }
 #FileBrowser #buttonBar QToolButton:pressed {
@@ -3015,7 +3015,7 @@ DVGui--Separator {
   color: #000;
   border-color: #fff;
   background-color: #fff;
-  selection-background-color: #333333;
+  selection-background-color: #6378A6;
   selection-color: #000;
 }
 #RenameCellField {
@@ -3106,7 +3106,7 @@ XsheetViewer {
   qproperty-SelectedMarkerLineColor: rgba(255, 255, 255, 0.5);
   qproperty-EmptyCellColor: #333333;
   qproperty-NotEmptyColumnColor: #242424;
-  qproperty-SelectedEmptyCellColor: #434447;
+  qproperty-SelectedEmptyCellColor: #424242;
   qproperty-LevelColumnColor: hsl(134, 29%, 25%);
   qproperty-LevelColumnBorderColor: hsl(134, 25%, 15%);
   qproperty-SelectedLevelColumnColor: #4d8c78;
