@@ -3167,7 +3167,7 @@ XsheetViewer {
   qproperty-XsheetConfigButtonBgColor: transparent;
   qproperty-XsheetConfigButtonImage: url('../Default/imgs/white/xsheet/x_config.svg');
   qproperty-TimelineIconLineColor: #7D7E85;
-  qproperty-FrameRangeMarkerLineColor: rgba(0, 0, 0, 0.5);
+  qproperty-FrameRangeMarkerLineColor: rgba(255, 255, 255, 0.5);
   qproperty-TimelinePreviewButtonBgOnColor: #242424;
   qproperty-TimelinePreviewButtonOnImage: url('../Default/imgs/white/timeline/preview_small-colorSP.svg');
   qproperty-TimelinePreviewButtonBgOffColor: #242424;
@@ -3304,7 +3304,7 @@ FunctionPanel {
   qproperty-SelectedColor: #6378A6;
 }
 SpreadsheetViewer {
-  qproperty-BGColor: #242424;
+  qproperty-BGColor: #333333;
   qproperty-TextColor: white;
   qproperty-LightLightBGColor: #404040;
   qproperty-LightLineColor: rgba(0, 0, 0, 0.36);
@@ -3317,7 +3317,7 @@ SpreadsheetViewer {
   qproperty-SecMarkerLineColor: rgba(255, 255, 255, 0.4);
   qproperty-GroupNameTextColor: #d3d3d3;
   qproperty-ChannelNameTextColor: #768FC4;
-  qproperty-ColumnHeaderBorderColor: #414245;
+  qproperty-ColumnHeaderBorderColor: #242424;
   qproperty-SelectedEmptyColor: rgba(140, 162, 177, 0.5);
   qproperty-SelectedSceneRangeEmptyColor: rgba(140, 162, 177, 0.5);
   qproperty-KeyFrameColor: #925d24;
