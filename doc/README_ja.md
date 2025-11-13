@@ -8,20 +8,20 @@
 [![Build Linux](https://github.com/opentoonz/opentoonz/actions/workflows/workflow_linux.yml/badge.svg?branch=master)](https://github.com/opentoonz/opentoonz/actions/workflows/workflow_linux.yml)
 [![Translation status](https://hosted.weblate.org/widgets/opentoonz/-/svg-badge.svg)](https://hosted.weblate.org/engage/opentoonz/)
 
-## 㝓れ㝯何？
+## これは何？
 
-2D アニメーション制作ソフトウェア㝧㝙。
-イタリア㝮 Digital Video 社㝌開発㝗〝株弝会社スタジオジブリ㝮カスタマイズを経㝦〝ジブリ作哝㝮制作㝫長年使ゝれ㝦㝝㝟ソフトウェア `Toonz` 㝌基㝫㝪㝣㝦㝄㝾㝙。
+2D アニメーション制作ソフトウェアです。
+イタリアの Digital Video 社が開発し、株式会社スタジオジブリのカスタマイズを経て、ジブリ作品の制作に長年使われてきたソフトウェア `Toonz` が基になっています。
 
 ## 動作条件
 
-<https://opentoonz.github.io/> を坂照㝗㝦㝝㝠㝕㝄。
+<https://opentoonz.github.io/> を参照してください。
 
 ## インストール
 
-<https://opentoonz.github.io/> 㝋ら最新安定版㝮インストーラーをダウンロード㝗㝦インストール㝗㝦㝝㝠㝕㝄。
+<https://opentoonz.github.io/> から最新安定版のインストーラーをダウンロードしてインストールしてください。
 
-靎去㝮ポージョン㝨丝安定㝪最新版も <https://github.com/opentoonz/opentoonz/releases> 㝋ら利用㝙る㝓㝨㝌㝧㝝㝾㝙。
+過去のバージョンと不安定な最新版も <https://github.com/opentoonz/opentoonz/releases> から利用することができます。
 
 ## ビルド方法
 
@@ -30,11 +30,11 @@
 
 ### ライセンス
 
-- thirdparty ディレクトリ以外㝮ファイル
+- thirdparty ディレクトリ以外のファイル
   - [修正 BSD ライセンス](../LICENSE.txt)
-  - ライセンス㝫基㝥㝝〝商用・非商用啝ゝ㝚〝自由㝫ソフトウェア㝮利用やソースコード㝮改変㝌㝧㝝㝾㝙
-- thirdparty ディレクトリ内㝮ファイル
-  - 坄ディレクトリ内㝮 README やソースコード㝫記載㝕れ㝟ライセンス㝫従㝣㝦㝝㝠㝕㝄
+  - ライセンスに基づき、商用・非商用問わず、自由にソフトウェアの利用やソースコードの改変ができます
+- thirdparty ディレクトリ内のファイル
+  - 各ディレクトリ内の README やソースコードに記載されたライセンスに従ってください
 
 ### Special Thanks
 This open-source program is developed from Toonz, a software originally created by Digital Video, S.p.A., Rome, Italy

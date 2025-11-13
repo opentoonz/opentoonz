@@ -10,21 +10,21 @@
 
 ## 关于OpenToonz
 
-OpenToonz 是一个由[DWANGO](http://dwango.co.jp/english/)公开坑布的二维动画软件，基于**Toonz Studio 坉坜力版本**， 最早由愝大利公坸[Digital Video, Inc.](http://www.toonz.com/)开坑，并在多年的生产中为[坉坜力工作室](http://www.ghibli.jp/) 定制。
+OpenToonz 是一个由[DWANGO](http://dwango.co.jp/english/)公开发布的二维动画软件，基于**Toonz Studio 吉卜力版本**， 最早由意大利公司[Digital Video, Inc.](http://www.toonz.com/)开发，并在多年的生产中为[吉卜力工作室](http://www.ghibli.jp/) 定制。
 
-## 系统覝求
+## 系统要求
 
-请坂考OpenToonz的官方网站：
+请参考OpenToonz的官方网站：
 
 <https://opentoonz.github.io/e/index.html>
 
 ## 安装
 
-最新的安装包坯以从这里下载：
+最新的安装包可以从这里下载：
 
 <https://opentoonz.github.io/e/index.html>.
 
-旧版本以坊夜间构建版坯以从下面的链接下载: <https://github.com/opentoonz/opentoonz/releases>
+旧版本以及夜间构建版可以从下面的链接下载: <https://github.com/opentoonz/opentoonz/releases>
 
 ## 如何在本地构建
 
@@ -33,25 +33,25 @@ OpenToonz 是一个由[DWANGO](http://dwango.co.jp/english/)公开坑布的二�
 - [Linux](./how_to_build_linux.md)
 - [BSD](./how_to_build_bsd.md)
 
-关于如何构建样弝表，请坂照[这里](./how_to_stylesheet.md).
+关于如何构建样式表，请参照[这里](./how_to_stylesheet.md).
 
-丝懂开坑但仝想帮忙？你坯以帮助我们测试拉坖请求，详情请查阅[这里](./how_to_test_prs_chs.md)。
+不懂开发但仍想帮忙？你可以帮助我们测试拉取请求，详情请查阅[这里](./how_to_test_prs_chs.md)。
 
 ## 社区
 
 - 分享使用心得或进行问题排查，请加入 [谷歌OpenToonz用户论坛](https://groups.google.com/forum/#!forum/opentoonz_en)。
-- 如果你在问题排查坎坑现了bug，或者你是个开坑者，坯以在 [Github issues](https://github.com/opentoonz/opentoonz/issues) 页杜索或坑布。
+- 如果你在问题排查后发现了bug，或者你是个开发者，可以在 [Github issues](https://github.com/opentoonz/opentoonz/issues) 页搜索或发布。
 
-## 许坯话
+## 许可证
 
-- 对于`thirdparty` 以坊`stuff/library/mypaint brushes` 文件夹以外的内容基于Modified BSD License分坑。
+- 对于`thirdparty` 以及`stuff/library/mypaint brushes` 文件夹以外的内容基于Modified BSD License分发
   - [modified BSD license](../LICENSE.txt).
-  - 基于该许坯话，该软件坯以被自由用于个人或商业目的使用或修改。
+  - 基于该许可证，该软件可以被自由用于个人或商业目的使用或修改。
 - 对于 `thirdparty` 文件夹内的内容：
-  - 请坂考对应的README或溝砝中的许坯话。
+  - 请参考对应的README或源码中的许可证。
 - 对于 `stuff/library/mypaint brushes` 文件夹下的内容：
   - 请查看 `stuff/library/mypaint brushes/Licenses.txt` 的内容。
 
 ### 特别感谢
 
-原始程庝从Toonz开坑而来，这是一个由愝大利罗马的公坸 Digital Video, S.p.A.所开坑的软件。
+原始程序从Toonz开发而来，这是一个由意大利罗马的公司 Digital Video, S.p.A.所开发的软件。
