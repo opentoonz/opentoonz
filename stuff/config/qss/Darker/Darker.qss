@@ -53,7 +53,7 @@ QToolTip,
 #DockSeparator,
 QMainWindow::separator,
 QSplitter::handle {
-  background-color: #323335;
+  background-color: #3E4042;
   height: 4;
   width: 4;
 }
@@ -728,6 +728,10 @@ QCheckBox::indicator:disabled {
   background-color: #56565a;
   border-color: #595a5e;
 }
+FxSettings  QCheckBox {
+  padding-right: 0;
+  spacing: 0;
+}
 QRadioButton {
   color: #d3d3d3;
 }
@@ -785,7 +789,7 @@ QGroupBox::title {
 }
 QGroupBox::title:hover {
   color: white;
-  background-color: #424242;
+  background-color: #333333;
 }
 QGroupBox::title:disabled {
   color: rgba(211, 211, 211, 0.4);
@@ -3319,7 +3323,7 @@ SpreadsheetViewer {
   qproperty-ChannelNameTextColor: #768FC4;
   qproperty-ColumnHeaderBorderColor: #242424;
   qproperty-SelectedEmptyColor: rgba(140, 162, 177, 0.5);
-  qproperty-SelectedSceneRangeEmptyColor: rgba(140, 162, 177, 0.5);
+  qproperty-SelectedSceneRangeEmptyColor: rgba(97, 110, 131, 0.5);
   qproperty-KeyFrameColor: #925d24;
   qproperty-KeyFrameBorderColor: #bf7a2f;
   qproperty-SelectedKeyFrameColor: #ba9975;
