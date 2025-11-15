@@ -90,19 +90,27 @@ signals:
  * context menu
  */
 
-class TPanelTitleBarButtonForSafeArea final : public TPanelTitleBarButton {
+class TPanelTitleBarButtonForLayoutGuide final : public TPanelTitleBarButton {
   Q_OBJECT
+
+  QString m_originalLayoutPresetName;
+  bool m_isPreviewing = false;
+
 public:
-  TPanelTitleBarButtonForSafeArea(QWidget *parent,
-                                  const QString &standardPixmapName)
+  TPanelTitleBarButtonForLayoutGuide(QWidget *parent,
+                                     const QString &standardPixmapName)
       : TPanelTitleBarButton(parent, standardPixmapName) {}
-  void getSafeAreaNameList(QList<QString> &nameList);
 
 protected:
   void contextMenuEvent(QContextMenuEvent *event) override;
   void mousePressEvent(QMouseEvent *event) override;
+
 protected slots:
-  void onSetSafeArea();
+  void onSetLayout();
+  void onEditLayouts();
+  void onAddToXsheet();
+  void onMenuActionHovered(QAction *action);
+  void onMenuAboutToHide();
 };
 
 //-----------------------------------------------------------------------------

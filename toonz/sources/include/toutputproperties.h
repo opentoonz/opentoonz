@@ -104,6 +104,11 @@ private:
   // for restoring bpp when setting the color space back to nonlinear
   int m_nonlinearBpp;
 
+  // if true, put the cuurent layout image onto rendered image,
+  // the image path defined in config/framespresets.ini, current frames preset
+  // stored in sceneProperties
+  bool m_putLayoutTemplate;
+
 public:
   /*!
 Constructs TOutputProperties with default value.
@@ -239,6 +244,9 @@ machine's CPU).
   void syncColorSettings(bool sync) { m_syncColorSettings = sync; }
   int getNonlinearBpp() { return m_nonlinearBpp; }
   void setNonlinearBpp(int bpp) { m_nonlinearBpp = bpp; }
+
+  bool isPutLayoutTemplate() { return m_putLayoutTemplate; }
+  void setPutLayoutTemplate(bool put) { m_putLayoutTemplate = put; }
 };
 
 //--------------------------------------------
