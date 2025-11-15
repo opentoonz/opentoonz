@@ -53,7 +53,7 @@ inline int threshMatte(int matte, int fillDepth) {
 }
 
 /*! Finds nearest non-pure-paint (ink) pixel in cardinal directions (no
-   diagonal). Returns first valid ink pixel found (right → left → down → up).
+   diagonal). Returns first valid ink pixel found (right �� left �� down �� up).
     Returns (-1,-1) if none found.
 */
 inline TPoint nearestInkNotDiagonal(const TRasterCM32P &r, const TPoint &p) {
@@ -265,8 +265,8 @@ void fillRow(const TRasterCM32P &r, const TPoint &p, int &xa, int &xb,
                    pix->getInk() == TPixelCM32::getMaxInk() && pix->isPureInk())
           continue;
       }
-      /*--- Auto-paint neighboring ink lines ---*/
-      if (palette && pix->isPurePaint()) {
+      /*--- Auto-paint neighboring auto-paint ink lines ---*/
+      if (palette && pix->isPurePaint() && paint != 0) {
         auto inks = getNeighborInks(r, TPoint(xa + n, p.y));
         for (TPoint pInk : inks) {
           TPixelCM32 *pixInk =
@@ -563,7 +563,8 @@ bool fill(const TRasterCM32P &r, const FillParameters &params,
   if (pix0->isPureInk()) return false;
   if (Ref.getPointer() != nullptr && Ref->pixels(y)[x].m == 255) return false;
   /*- Abort if "empty only" is on and area is already painted -*/
-  if (params.m_emptyOnly && pix0->getPaint() != 0 && !params.m_shiftFill)
+  if (params.m_emptyOnly && pix0->getPaint() != 0 && paint != 0 &&
+      !params.m_shiftFill)
     return false;
   // RAII guard to manage reference image
   /* To save undo memory, saved reference pixels are cleared */

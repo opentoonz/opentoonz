@@ -1986,7 +1986,7 @@ FillTool::FillTool(int targetType)
     : TTool("T_Fill")
     , m_frameRange("Frame Range", false)  // W_ToolOptions_FrameRange
     , m_fillType("Type:")
-    , m_selective("Selective", false)
+    , m_emptyOnly("Empty Only", false)
     , m_colorType("Mode:")
     , m_onion("Onion Skin", false)
     , m_fillDepth("Fill Depth", 0, 15, 0, 15)
@@ -2015,7 +2015,7 @@ FillTool::FillTool(int targetType)
   m_colorType.addValue(AREAS);
   m_colorType.addValue(ALL);
 
-  m_prop.bind(m_selective);
+  m_prop.bind(m_emptyOnly);
   if (targetType == TTool::ToonzImage) {
     m_prop.bind(m_fillDepth);
     m_prop.bind(m_segment);
@@ -2029,7 +2029,7 @@ FillTool::FillTool(int targetType)
     m_maxGapDistance.setId("MaxGapDistance");
   }
   if (targetType == TTool::ToonzImage) m_prop.bind(m_autopaintLines);
-  m_selective.setId("Selective");
+  m_emptyOnly.setId("EmptyOnly");
   m_onion.setId("OnionSkin");
   m_frameRange.setId("FrameRange");
   m_segment.setId("SegmentInk");
@@ -2196,7 +2196,7 @@ void FillTool::updateTranslation() {
   m_fillType.setItemUIName(POLYLINEFILL, tr("Polyline"));
   m_fillType.setItemUIName(FREEPICKFILL, tr("Pick+Freehand"));
 
-  m_selective.setQStringName(tr("Selective"));
+  m_emptyOnly.setQStringName(tr("Empty Only"));
 
   m_colorType.setQStringName(tr("Mode:"));
   m_colorType.setItemUIName(LINES, tr("Lines"));
@@ -2221,7 +2221,7 @@ FillParameters FillTool::getFillParameters() const {
   params.m_styleId = styleId;
   /*---紛らわしいことに、colorTypeをfillTypeに名前を変えて保存している。間違いではない。---*/
   params.m_fillType  = m_colorType.getValue();
-  params.m_emptyOnly = m_selective.getValue();
+  params.m_emptyOnly = m_emptyOnly.getValue();
   params.m_segment   = m_segment.getValue();
   // RefFill is not controlled params
   params.m_minFillDepth = (int)m_fillDepth.getValue().first;
@@ -2236,6 +2236,11 @@ void FillTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
   if (m_isAltPressed)
     Preferences::instance()->setValue(PreferencesItemId::DefRegionWithPaint,
                                       !DEF_REGION_WITH_PAINT);
+  m_restoreEmptyOnly = e.isShiftPressed() && m_emptyOnly.getValue();
+  if (m_restoreEmptyOnly) {
+      m_emptyOnly.setValue(false);
+      onPropertyChanged(m_emptyOnly.getName(), false);
+  }
 
   m_clickPoint = pos;
   // Area mode
@@ -2391,6 +2396,10 @@ void FillTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
   if (m_isAltPressed)
     Preferences::instance()->setValue(PreferencesItemId::DefRegionWithPaint,
                                       (!DEF_REGION_WITH_PAINT));
+  if (m_restoreEmptyOnly) {
+      m_emptyOnly.setValue(true);
+      onPropertyChanged(m_emptyOnly.getName(), false);
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -2455,8 +2464,9 @@ bool FillTool::onPropertyChanged(std::string propertyName, bool addToUndo) {
     resetMulti();
     rectPropChangedflag = true;
   }
-  // Selective
-  else if (propertyName == m_selective.getName()) {
+  // Empty Only
+  else if (propertyName == m_emptyOnly.getName()) {
+    FillSelective       = (int)m_emptyOnly.getValue();
     rectPropChangedflag = true;
   }
   // Fill Depth
@@ -2541,7 +2551,7 @@ bool FillTool::onPropertyChanged(std::string propertyName, bool addToUndo) {
       assert(false);
 
     m_areaFillTool->onPropertyChanged(
-        m_frameRange.getValue(), m_selective.getValue(), m_onion.getValue(),
+        m_frameRange.getValue(), m_emptyOnly.getValue(), m_onion.getValue(),
         type, m_colorType.getValue(), m_autopaintLines.getValue());
   }
 
@@ -2728,7 +2738,7 @@ void FillTool::onActivate() {
         TDoublePairProperty::Value(MinFillDepth, MaxFillDepth));
     m_fillType.setValue(::to_wstring(FillType.getValue()));
     m_colorType.setValue(::to_wstring(FillColorType.getValue()));
-    //		m_onlyEmpty.setValue(FillSelective ? 1 :0);
+    m_emptyOnly.setValue(FillSelective ? 1 : 0);
     m_onion.setValue(FillOnion ? 1 : 0);
     m_segment.setValue(FillSegment ? 1 : 0);
     m_closeGap.setValue(FillCloseGap ? 1 : 0);
@@ -2756,7 +2766,7 @@ void FillTool::onActivate() {
         assert(false);
 
       m_areaFillTool->onPropertyChanged(
-          m_frameRange.getValue(), m_selective.getValue(), m_onion.getValue(),
+          m_frameRange.getValue(), m_emptyOnly.getValue(), m_onion.getValue(),
           type, m_colorType.getValue(), m_autopaintLines.getValue());
     }
   }

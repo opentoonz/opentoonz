@@ -2854,8 +2854,10 @@ void MainWindow::defineActions() {
                           QT_TR_NOOP("Pressure Sensitivity"), "Shift+P");
   createToolOptionsAction("A_ToolOption_SegmentInk", QT_TR_NOOP("Segment Ink"),
                           "F8");
-  createToolOptionsAction("A_ToolOption_Selective", QT_TR_NOOP("Selective"),
+  createToolOptionsAction("A_ToolOption_EmptyOnly", QT_TR_NOOP("Empty Only"),
                           "F7");
+  createToolOptionsAction("A_ToolOption_Selective", QT_TR_NOOP("Selective"),
+                          "F9");
   createToolOptionsAction("A_ToolOption_DrawOrder",
                           QT_TR_NOOP("Brush Tool - Draw Order"), "");
   createToolOptionsAction("A_ToolOption_Smooth", QT_TR_NOOP("Smooth"), "");
