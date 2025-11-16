@@ -289,7 +289,7 @@ QMenu::indicator:exclusive:disabled {
    Titlebars
 ----------------------------------------------------------------------------- */
 TPanelTitleBar {
-  background: qlineargradient(x1:1, y1:0, x2:1, y2:1, stop: 0 #333333, stop: 0.1 #404040, stop: 0.9 #212121, stop: 1 #414245);
+  background: qlineargradient(x1:1, y1:0, x2:1, y2:1, stop: 0 #242424, stop: 0.1 #333333, stop: 0.9 #242424, stop: 1 #242424);
   border-bottom: 1 solid #414245;
   border-top-left-radius: 0px;
   border-top-right-radius: 0px;
@@ -1103,7 +1103,7 @@ QToolBar#WidePaddingToolBar QToolButton {
 ----------------------------------------------------------------------------- */
 QTreeWidget {
   background-color: #333333;
-  alternate-background-color: #333333;
+  alternate-background-color: #242424;
   border: 0;
   margin: 0;
   outline: 0;
@@ -3103,7 +3103,7 @@ XsheetViewer {
   qproperty-CellFocusColor: #9B4141;
   qproperty-ColumnHeadPastelizer: transparent;
   qproperty-SelectedColumnHead: rgba(130, 131, 135, 0.5);
-  qproperty-FoldedColumnBGColor: rgba(255, 255, 255, 0.45);
+  qproperty-FoldedColumnBGColor: rgba(151, 151, 157, 0.45);
   qproperty-FoldedColumnLineColor: rgba(0, 0, 0, 0.48);
   qproperty-MarkerLineColor: rgba(255, 255, 255, 0.2);
   qproperty-SecMarkerLineColor: rgba(255, 255, 255, 0.4);
@@ -3322,7 +3322,7 @@ SpreadsheetViewer {
   qproperty-GroupNameTextColor: #d3d3d3;
   qproperty-ChannelNameTextColor: #768FC4;
   qproperty-ColumnHeaderBorderColor: #242424;
-  qproperty-SelectedEmptyColor: rgba(140, 162, 177, 0.5);
+  qproperty-SelectedEmptyColor: rgba(57, 66, 84, 0.5);
   qproperty-SelectedSceneRangeEmptyColor: rgba(97, 110, 131, 0.5);
   qproperty-KeyFrameColor: #925d24;
   qproperty-KeyFrameBorderColor: #bf7a2f;
