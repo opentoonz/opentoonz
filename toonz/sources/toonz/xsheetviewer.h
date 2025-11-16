@@ -18,8 +18,10 @@
 #include "orientation.h"
 #include "xshbreadcrumbs.h"
 #include <boost/optional.hpp>
+#include "tenv.h"
 
 using boost::optional;
+extern TEnv::IntVar FrameDisplayStyleInXsheetRowArea;
 
 #define XSHEET_FONT_PX_SIZE 12
 #define H_ADJUST 2
