@@ -87,12 +87,15 @@ void fetchSequence(std::vector<IoCmd::LoadResourceArguments::ResourceData>& rds)
 //=============================================================================
 
 XDTSImportPopup::XDTSImportPopup(QStringList levelNames, ToonzScene* scene,
-                                 TFilePath scenePath, bool isUextVersion)
+                                 TFilePath scenePath, bool isUextVersion,
+                                 bool isSXF)
     : m_scene(scene)
     , m_isUext(isUextVersion)
     , DVGui::Dialog(TApp::instance()->getMainWindow(), true, false,
                     "XDTSImport") {
-  setWindowTitle(tr("Importing XDTS file %1")
+  QString type = isSXF ? "SXF" : "XDTS";
+  setWindowTitle(tr("Importing %1 file %2")
+                     .arg(type)
                      .arg(QString::fromStdString(scenePath.getLevelName())));
   QPushButton* loadButton   = new QPushButton(tr("Load"), this);
   QPushButton* cancelButton = new QPushButton(tr("Cancel"), this);
