@@ -159,6 +159,9 @@ private:
                           int color, bool onlyUnfilled, bool fillPaints,
                           bool fillInks, bool defRegionWithPaint,
                           bool usePrevailingReferFill);
+  void fillRegionExcept(const TRasterCM32P &ras, TRegion *r, int positive,
+                        int negative, int color, bool fillInks,
+                        bool fillAllautoPaintLines);
 };
 
 class DVAPI FullColorAreaFiller {
