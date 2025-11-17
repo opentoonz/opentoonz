@@ -1102,7 +1102,7 @@ QToolBar#WidePaddingToolBar QToolButton {
    Treeviews
 ----------------------------------------------------------------------------- */
 QTreeWidget {
-  background-color: #333333;
+  background-color: #242424;
   alternate-background-color: #242424;
   border: 0;
   margin: 0;
