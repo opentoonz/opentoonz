@@ -1763,8 +1763,8 @@ FillToolOptionsBox::FillToolOptionsBox(QWidget *parent, TTool *tool,
 
   m_toolType  = dynamic_cast<ToolOptionCombo *>(m_controls.value("Type:"));
   m_colorMode = dynamic_cast<ToolOptionCombo *>(m_controls.value("Mode:"));
-  m_selectiveMode =
-      dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Selective"));
+  m_emptyOnly =
+      dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Empty Only"));
   m_fillDepthField =
       dynamic_cast<ToolOptionPairSlider *>(m_controls.value("Fill Depth"));
   if (m_fillDepthField)
@@ -1814,7 +1814,7 @@ void FillToolOptionsBox::updateStatus() {
 void FillToolOptionsBox::onColorModeChanged(int index) {
   const TEnumProperty::Range &range = m_colorMode->getProperty()->getRange();
   bool enabled                      = range[index] != L"Lines";
-  m_selectiveMode->setEnabled(enabled);
+  m_emptyOnly->setEnabled(enabled);
   if (m_autopaintMode) m_autopaintMode->setEnabled(enabled);
   if (m_fillDepthLabel && m_fillDepthField) {
     m_fillDepthLabel->setEnabled(enabled);

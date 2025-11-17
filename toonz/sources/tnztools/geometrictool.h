@@ -35,7 +35,7 @@ public:
   TBoolProperty m_autogroup;
   TBoolProperty m_autofill;
   TBoolProperty m_smooth;
-  TBoolProperty m_selective;
+  TBoolProperty m_emptyOnly;
   TBoolProperty m_pencil;
   TEnumProperty m_capStyle;
   TEnumProperty m_joinStyle;
