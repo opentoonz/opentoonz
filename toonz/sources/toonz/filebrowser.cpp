@@ -611,8 +611,8 @@ void FileBrowser::refreshCurrentFolderItems() {
         Item &levelItem = m_multiFileItemMap[levelName];
 
         // TODO:
-        // とりあえず残すが、FileInfoの取得に時間がかかるようならオプション化も検討
-        // 2015/12/28 shun_iwasawa
+        // For now, leave it as is, but if obtaining FileInfo takes too much
+        // time, consider making it optional 2015/12/28 shun_iwasawa
         QFileInfo fileInfo(QString::fromStdWString(it->getWideString()));
         // Get creation time safely across platforms
         QDateTime creationTime = fileInfo.birthTime();
@@ -980,7 +980,7 @@ bool FileBrowser::isSceneItem(int index) const {
 //-----------------------------------------------------------------------------
 
 bool FileBrowser::canRenameItem(int index) const {
-  // se sto guardando la history non posso rinominare nulla
+  // if viewing history, cannot rename anything
   if (getFolder() == TFilePath()) return false;
   if (index < 0 || index >= (int)m_items.size()) return false;
   // for now, disable rename for folders
@@ -1010,7 +1010,7 @@ void FileBrowser::renameItem(int index, const QString &newName) {
     m_items[index].m_name = QString::fromStdWString(newFp.getLevelNameW());
     m_items[index].m_path = newFp;
 
-    // ho rinominato anche la palette devo aggiornarla.
+    // I have also renamed the palette, I must update it.
     if (newFp.getType() == "tlv" || newFp.getType() == "tzp" ||
         newFp.getType() == "tzu") {
       const char *type = (newFp.getType() == "tlv") ? "tpl" : "plt";
@@ -1025,8 +1025,8 @@ void FileBrowser::renameItem(int index, const QString &newName) {
     m_itemViewer->update();
 
     if (fp.getType() == "tnz") {
-      // ho cambiato il folder _files. Devo aggiornare il folder che lo contiene
-      // nel tree view
+      // I changed the _files folder. I must update the folder that contains it
+      // in the tree view
       QModelIndex index = m_folderTreeView->currentIndex();
       if (index.isValid()) {
         DvDirModel::instance()->refresh(index);
@@ -1061,7 +1061,7 @@ bool FileBrowser::renameFile(TFilePath &fp, QString newName) {
   }
   newFp = newFp.withParentDir(fp.getParentDir());
 
-  // se sono uguali non devo rinominare nulla
+  // if they are the same, I don't need to rename anything
   if (newFp == fp) return false;
 
   if (TSystem::doesExistFileOrLevel(newFp)) {
@@ -1105,7 +1105,7 @@ QMenu *FileBrowser::getContextMenu(QWidget *parent, int index) {
 
   bool ret = true;
 
-  // TODO: spostare in questa classe anche la definizione delle azioni?
+  // TODO: move the definition of actions to this class too?
   FileSelection *fs =
       dynamic_cast<FileSelection *>(m_itemViewer->getPanel()->getSelection());
   if (!fs) return 0;
@@ -1510,8 +1510,7 @@ void FileBrowser::onDataChanged(const QModelIndex &topLeft,
 //-----------------------------------------------------------------------------
 
 bool FileBrowser::acceptDrop(const QMimeData *data) const {
-  // se il browser non sta visualizzando un folder standard non posso accettare
-  // nessun drop
+  // if the browser is not displaying a standard folder, cannot accept any drop
   if (getFolder() == TFilePath()) return false;
 
   if (data->hasFormat("application/vnd.toonz.levels") ||
@@ -1526,8 +1525,7 @@ bool FileBrowser::acceptDrop(const QMimeData *data) const {
 //-----------------------------------------------------------------------------
 
 bool FileBrowser::drop(const QMimeData *mimeData) {
-  // se il browser non sta visualizzando un folder standard non posso accettare
-  // nessun drop
+  // if the browser is not displaying a standard folder, cannot accept any drop
   TFilePath folderPath = getFolder();
   if (folderPath == TFilePath()) return false;
 
@@ -2107,26 +2105,35 @@ void FileBrowser::convertToPaintedTlv() {
 #endif
 
 //-----------------------------------------------------------------------------
-
 void FileBrowser::onSelectedItems(const std::set<int> &indexes) {
   std::set<TFilePath> filePaths;
   std::set<int>::const_iterator it;
 
-  // pass the frameId list for reuse
+  // Pass the frameId lists for reuse (one vector per selected item)
   std::list<std::vector<TFrameId>> frameIDs;
 
-  if (indexes.empty()) {  // inform selection is released
+  if (indexes.empty()) {  // Inform selection is released
     emit filePathsSelected(filePaths, frameIDs);
     return;
   }
 
+  size_t itemsSize = m_items.size();  // Cache size to avoid mid-loop changes
   for (it = indexes.begin(); it != indexes.end(); ++it) {
-    filePaths.insert(m_items[*it].m_path);
-    frameIDs.insert(frameIDs.begin(), m_items[*it].m_frameIds);
+    int idx = *it;
+    if (idx < 0 || static_cast<size_t>(idx) >= itemsSize) {
+      // Skip invalid indices
+      continue;
+    }
+
+    // Collect file paths
+    filePaths.insert(m_items[idx].m_path);
+
+    // Append the frame IDs vector to the list (preserves per-item structure)
+    frameIDs.push_back(m_items[idx].m_frameIds);
   }
 
-  // reuse the list of TFrameId in order to skip loadInfo() when loading the
-  // level with sequential frames.
+  // Reuse the lists of TFrameId to skip loadInfo() when loading sequential
+  // levels
   emit filePathsSelected(filePaths, frameIDs);
 }
 
