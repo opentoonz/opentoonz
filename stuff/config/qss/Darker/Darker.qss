@@ -2053,7 +2053,7 @@ ProjectPopup QLabel {
   padding: 3;
 }
 #ScriptConsole QFrame {
-  background-color: #828389;
+  background-color: #DCDCDC;
 }
 #ScriptConsole TPanelTitleBar {
   background-color: #333333;
