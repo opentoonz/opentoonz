@@ -702,6 +702,8 @@ QFrame *OutputSettingsPopup::createMoreSettingsBox() {
   // Board
   m_addBoard         = new DVGui::CheckBox(tr("Add Clapperboard"), this);
   m_boardSettingsBtn = new QPushButton(tr("Edit Clapperboard..."), this);
+  // Put Layout Template
+  m_putLayoutImage = new DVGui::CheckBox(tr("Put Layout Template"), this);
   // Gamma
   m_gammaFld = new DVGui::DoubleLineEdit();
   // Dominant Field
@@ -749,7 +751,9 @@ QFrame *OutputSettingsPopup::createMoreSettingsBox() {
     lay->addWidget(m_addBoard, 0, 0);
     lay->addWidget(m_boardSettingsBtn, 0, 1, 1, 3,
                    Qt::AlignLeft | Qt::AlignVCenter);
-
+    // Put layout image
+    lay->addWidget(m_putLayoutImage, 0, 4, 1, 1,
+                   Qt::AlignRight | Qt::AlignVCenter);
     // Gamma
     lay->addWidget(new QLabel(tr("Gamma:"), this), 1, 0,
                    Qt::AlignRight | Qt::AlignVCenter);
@@ -797,6 +801,8 @@ QFrame *OutputSettingsPopup::createMoreSettingsBox() {
   ret = ret && connect(m_boardSettingsBtn, SIGNAL(clicked()), this,
                        SLOT(onBoardSettingsBtnClicked()));
 
+  ret = ret && connect(m_putLayoutImage, &DVGui::CheckBox::stateChanged, this,
+                       &OutputSettingsPopup::onPutLayoutImageChecked);
   ret = ret && connect(m_gammaFld, SIGNAL(editingFinished()),
                        SLOT(onGammaFldEditFinished()));
   ret = ret && connect(m_dominantFieldOm, SIGNAL(currentIndexChanged(int)),
@@ -1077,6 +1083,8 @@ void OutputSettingsPopup::updateField() {
   BoardSettings *boardSettings = prop->getBoardSettings();
   m_addBoard->setChecked(boardSettings->isActive());
   m_boardSettingsBtn->setEnabled(m_addBoard->isChecked());
+
+  m_putLayoutImage->setChecked(prop->isPutLayoutTemplate());
 }
 
 //-----------------------------------------------------------------------------
@@ -2014,6 +2022,11 @@ void OutputSettingsPopup::onBoardSettingsBtnClicked() {
   std::cout << "board settings button clicked" << std::endl;
   BoardSettingsPopup popup(this);
   popup.exec();
+}
+
+void OutputSettingsPopup::onPutLayoutImageChecked(int state) {
+  if (state == getProperties()->isPutLayoutTemplate()) return;
+  getProperties()->setPutLayoutTemplate(state);
 }
 
 //-----------------------------------------------------------------------------

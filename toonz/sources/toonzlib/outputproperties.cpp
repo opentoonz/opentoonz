@@ -43,7 +43,8 @@ TOutputProperties::TOutputProperties()
     , m_subcameraPreview(false)
     , m_boardSettings(new BoardSettings())
     , m_formatTemplateFId()
-    , m_syncColorSettings(true) {
+    , m_syncColorSettings(true)
+    , m_putLayoutTemplate(false) {
   m_renderSettings = new TRenderSettings();
   m_nonlinearBpp   = m_renderSettings->m_bpp;
 }

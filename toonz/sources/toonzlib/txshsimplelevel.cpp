@@ -15,6 +15,7 @@
 #include "toonz/textureutils.h"
 #include "toonz/levelset.h"
 #include "toonz/tcamera.h"
+#include "toonz/sceneproperties.h"
 
 // TnzBase includes
 #include "tenv.h"
@@ -2075,18 +2076,54 @@ void TXshSimpleLevel::initializeResolutionAndDpi(const TDimension& dim,
   if (dim == TDimension()) {
     double w, h;
     Preferences* pref = Preferences::instance();
-    if (pref->isNewLevelSizeToCameraSizeEnabled()) {
-      TDimensionD camSize = getScene()->getCurrentCamera()->getSize();
-      w                   = camSize.lx;
-      h                   = camSize.ly;
-      getProperties()->setDpiPolicy(LevelProperties::DP_CustomDpi);
-      dpi  = getScene()->getCurrentCamera()->getDpi().x;
-      dpiY = getScene()->getCurrentCamera()->getDpi().y;
-    } else {
-      w    = pref->getDefLevelWidth();
-      h    = pref->getDefLevelHeight();
-      dpi  = pref->getDefLevelDpi();
-      dpiY = dpi;
+    int policy        = pref->getDefLevelSizePolicy();
+    if (policy == 2) {
+      std::vector<TXshLevel*> levels;
+      getScene()->getLevelSet()->listLevels(levels, TFilePath("Layout"));
+      std::wstring layoutName =
+          getScene()->getProperties()->getLayoutPresetName().toStdWString();
+      TXshSimpleLevel* sl = nullptr;
+      for (auto it : levels) {
+        if (it->getName() == layoutName) {
+          sl = it->getSimpleLevel();
+          break;
+        }
+      }
+      if (sl) {
+        TDimensionD size;
+        if (sl->getType() == TXshLevelType::PLI_XSHLEVEL &&
+            sl->getFrameCount() > 0) {
+          TRectD rect = sl->getFrame(sl->getFirstFid(), false)->getBBox();
+          size        = TDimensionD(rect.getLx(), rect.getLy());
+          size.lx /= Stage::inch;
+          size.ly /= Stage::inch;
+        } else {
+          TDimension res = sl->getResolution();
+          size           = TDimensionD(res.lx, res.ly);
+          size.lx /= sl->getDpi().x;
+          size.ly /= sl->getDpi().y;
+        }
+        w    = size.lx;
+        h    = size.ly;
+        dpi  = sl->getProperties()->getDpi().x;
+        dpiY = sl->getProperties()->getDpi().y;
+      }
+    }
+
+    if (w == 0 || h == 0) {
+      if (policy == 1) {
+        TDimensionD camSize = getScene()->getCurrentCamera()->getSize();
+        w                   = camSize.lx;
+        h                   = camSize.ly;
+        getProperties()->setDpiPolicy(LevelProperties::DP_CustomDpi);
+        dpi  = getScene()->getCurrentCamera()->getDpi().x;
+        dpiY = getScene()->getCurrentCamera()->getDpi().y;
+      } else {
+        w    = pref->getDefLevelWidth();
+        h    = pref->getDefLevelHeight();
+        dpi  = pref->getDefLevelDpi();
+        dpiY = dpi;
+      }
     }
 
     getProperties()->setImageRes(TDimension(tround(w * dpi), tround(h * dpiY)));

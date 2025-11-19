@@ -281,7 +281,7 @@ void ToggleCommandHandler::execute() {
 ToggleCommandHandler viewTableToggle(MI_ViewTable, false);
 ToggleCommandHandler editInPlaceToggle(MI_ToggleEditInPlace, false);
 ToggleCommandHandler fieldGuideToggle(MI_FieldGuide, false);
-ToggleCommandHandler safeAreaToggle(MI_SafeArea, false);
+ToggleCommandHandler layoutGuideToggle(MI_LayoutGuide, false);
 ToggleCommandHandler rasterizePliToggle(MI_RasterizePli, false);
 
 ToggleCommandHandler viewClcToggle("MI_ViewColorcard", false);
@@ -1723,6 +1723,14 @@ void SceneViewer::drawOverlay() {
       glPopMatrix();
     }
 
+    // Layout Guide
+    if (layoutGuideToggle.getStatus() && !is3DView()) {
+        glPushMatrix();
+        if (!m_drawEditingLevel)tglMultMatrix(m_drawCameraAff);
+        ViewerDraw::drawLayoutGuide(this, m_drawEditingLevel);
+        glPopMatrix();
+    }
+
     // draw camera
     if (viewCameraToggle.getStatus() && m_drawEditingLevel == false) {
       unsigned long f = 0;
@@ -1776,15 +1784,6 @@ void SceneViewer::drawOverlay() {
     }
 
 #endif
-
-    // safe area
-    if (safeAreaToggle.getStatus() && m_drawEditingLevel == false &&
-        !is3DView()) {
-      glPushMatrix();
-      tglMultMatrix(m_drawCameraAff);
-      ViewerDraw::drawSafeArea();
-      glPopMatrix();
-    }
 
     // record fps (frame per second)
     if (app->getCurrentFrame()->isPlaying())
