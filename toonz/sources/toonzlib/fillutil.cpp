@@ -465,6 +465,7 @@ void AreaFiller::strokeFill(const TRect &rect, TStroke *stroke, int color,
   if (color == 0) m_palette = 0;
 
   assert(!box.isEmpty());
+  if (box.isEmpty()) return;
   TRasterCM32P ras       = m_ras->extract(box);
   TRasterCM32P backupRas = ras->clone();
 
