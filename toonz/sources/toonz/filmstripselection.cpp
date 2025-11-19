@@ -55,11 +55,9 @@ void TFilmstripSelection::enableCommands() {
   int type       = sl->getType();
   TFilePath path = sl->getPath();
 
-  bool doEnable = ( type == PLI_XSHLEVEL
-                 || type == TZP_XSHLEVEL
-                 || type == MESH_XSHLEVEL
-                 || type == META_XSHLEVEL
-                 || (type == OVL_XSHLEVEL && !path.isUneditable()) );
+  bool doEnable =
+      (type == PLI_XSHLEVEL || type == TZP_XSHLEVEL || type == MESH_XSHLEVEL ||
+       type == META_XSHLEVEL || (type == OVL_XSHLEVEL && !path.isUneditable()));
 
   TRasterImageP ri = (TRasterImageP)sl->getSimpleLevel()->getFrame(
       sl->getSimpleLevel()->getFirstFid(), false);
@@ -106,10 +104,11 @@ bool TFilmstripSelection::isEmpty() const { return m_selectedFrames.empty(); }
 //-----------------------------------------------------------------------------
 
 void TFilmstripSelection::updateInbetweenRange() {
-  // ibrange = (la prima) sequenza di almeno tre frame selezionati consecutivi
+  // inbetweenRange = (the first) sequence of at least three consecutively
+  // selected frames
   m_inbetweenRange = std::make_pair(TFrameId(1), TFrameId(0));
   if (m_selectedFrames.size() < 3)
-    return;  // ci vogliono almeno tre frames selezionati
+    return;  // at least three selected frames are needed
   TXshSimpleLevel *sl = TApp::instance()->getCurrentLevel()->getSimpleLevel();
   if (sl) {
     std::vector<TFrameId> fids;
@@ -263,10 +262,31 @@ void TFilmstripSelection::pasteFrames() {
   if (m_selectedFrames.empty()) {
     if (sl->isSubsequence()) return;
     fids.insert(TApp::instance()->getCurrentFrame()->getFid());
-  } else
+  } else {
     fids = m_selectedFrames;
+  }
 
   FilmstripCmd::paste(sl, fids);
+
+  // Select the newly pasted strokes and show the bounding box
+  TTool *tool = TApp::instance()->getCurrentTool()->getTool();
+  if (tool && tool->getName() == "T_Selection") {
+    if (StrokeSelection *ss =
+            dynamic_cast<StrokeSelection *>(tool->getSelection())) {
+      tool->onActivate();
+      ss->selectNone();
+
+      // select all strokes of the current frame (i.e., the newly pasted ones)
+      for (const TFrameId &fid : fids) {
+        TVectorImageP vi = sl->getFrame(fid, false);
+        if (!vi) continue;
+        for (UINT i = 0; i < vi->getStrokeCount(); ++i)
+          ss->select(static_cast<int>(i), true);
+      }
+
+      ss->notifyView();  // <-- shows the bounding box
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
