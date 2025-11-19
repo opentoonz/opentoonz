@@ -50,6 +50,7 @@ const int l_dragThreshold = 10;  //!< Distance, in pixels, the user has to
 
 namespace {
 
+// Get four points from vector image based on style IDs
 FourPoints getFourPointsFromVectorImage(const TVectorImageP &img,
                                         const std::set<int> &styleIds,
                                         double &maxThickness) {
@@ -92,6 +93,7 @@ FourPoints getFourPointsFromVectorImage(const TVectorImageP &img,
 
 //-----------------------------------------------------------------------------
 
+// Get stroke index from position
 bool getStrokeIndexFromPos(UINT &index, const TVectorImageP &vi,
                            const TPointD &pos, double pixelSize, TAffine aff) {
   if (!vi) return false;
@@ -112,6 +114,7 @@ bool getStrokeIndexFromPos(UINT &index, const TVectorImageP &vi,
 
 //-----------------------------------------------------------------------------
 
+// Check if current frame or not selected
 static bool currentOrNotSelected(const VectorSelectionTool &tool,
                                  const TFrameId &fid) {
   return (tool.getCurrentFid() == fid ||
@@ -121,6 +124,7 @@ static bool currentOrNotSelected(const VectorSelectionTool &tool,
 
 //-----------------------------------------------------------------------------
 
+// Notify selection changed
 inline void notifySelectionChanged() {
   TTool::getApplication()->getCurrentSelection()->notifySelectionChanged();
 }
@@ -864,7 +868,8 @@ TPointD DragSelectionTool::VectorScaleTool::transform(int index, TPointD newPos,
   if (bbox == startBboxs[0]) return scaleValue;
 
   bool scaleInCenter = m_scale->scaleInCenter();
-  // Se non ho scalato rispetto al centro calcolo la posizione del nuovo centro
+  // If I didn't scale relative to center, calculate the position of the new
+  // center
   if (!scaleInCenter)
     tool->setCenter(m_scale->getNewCenter(index, startBboxs[0], scaleValue));
 
@@ -1112,11 +1117,10 @@ void DragSelectionTool::VectorChangeThicknessTool::addUndo() {
         std::unique_ptr<UndoChangeStrokes> undo(
             new UndoChangeStrokes(level, fid, vtool, vtool->levelSelection()));
         if (m_isIncrementalMode) {
-            setStrokesThickness(*vi);
-            changeImageThickness(*vi, m_thicknessChange);
-        }
-        else
-            setImageThickness(*vi, m_thicknessChange);
+          setStrokesThickness(*vi);
+          changeImageThickness(*vi, m_thicknessChange);
+        } else
+          setImageThickness(*vi, m_thicknessChange);
 
         m_strokesThickness.clear();
         undo->registerStrokes();
@@ -1257,13 +1261,12 @@ public:
   ~UndoReorderStrokes() {}
 
   QString getHistoryString() {
-    return QObject::tr(
-               "Sort Vector Strokes With Palette Order Level : %1")
+    return QObject::tr("Sort Vector Strokes With Palette Order Level : %1")
         .arg(QString::fromStdWString(m_level->getName()));
   }
 
   void undo() const override {
-    for (const ReorderData& data : m_reOrderDatas) {
+    for (const ReorderData &data : m_reOrderDatas) {
       TVectorImageP vi = m_level->getFrame(data.frameId, true);
       if (!vi) continue;
       vi->reOrderStrokes(data.newIndexes, data.oldIndexes);
@@ -1791,7 +1794,8 @@ void VectorSelectionTool::leftButtonUp(const TPointD &pos,
 
 void VectorSelectionTool::addContextMenuItems(QMenu *menu) {
   menu->addAction(CommandManager::instance()->getAction(MI_RemoveEndpoints));
-  menu->addAction(CommandManager::instance()->getAction(MI_SortWithPaletteOrder));
+  menu->addAction(
+      CommandManager::instance()->getAction(MI_SortWithPaletteOrder));
   menu->addSeparator();
 
   m_strokeSelection.getGroupCommand()->addMenuItems(menu);
@@ -2101,26 +2105,26 @@ void VectorSelectionTool::onImageChanged() {
   TVectorImageP vi          = getImage(false);
   TVectorImageP selectedImg = m_strokeSelection.getImage();
 
+  // If the image changed, we reset the selection
   if (vi != selectedImg) {
     m_strokeSelection.selectNone();
     m_strokeSelection.setImage(vi);
 
-    if (!(vi && selectedImg)  // Retain the styles selection ONLY
-        || vi->getPalette() !=
-               selectedImg->getPalette())  // if palettes still match
+    // Clear style selection if there's no image or different palettes
+    if (!vi || !selectedImg || vi->getPalette() != selectedImg->getPalette())
       selectedStyles().clear();
-  } else {
-    // Remove any eventual stroke index outside the valid range
-    if (!m_strokeSelection.isEmpty()) {
-      const std::set<int> &indexes = m_strokeSelection.getSelection();
-      int strokesCount             = selectedImg->getStrokeCount();
 
-      std::set<int>::const_iterator it;
-      for (it = indexes.begin(); it != indexes.end(); ++it) {
-        int index = *it;
+    finalizeSelection();
+    return;  // nothing more to do
+  }
 
-        if (index >= strokesCount) m_strokeSelection.select(index, false);
-      }
+  // Same image: remove invalid indices
+  if (!m_strokeSelection.isEmpty()) {
+    int strokeCount = vi ? vi->getStrokeCount() : 0;
+    std::set<int> copy =
+        m_strokeSelection.getSelection();  // avoid invalid iterator
+    for (int idx : copy) {
+      if (idx < 0 || idx >= strokeCount) m_strokeSelection.select(idx, false);
     }
   }
 
@@ -2390,18 +2394,18 @@ void VectorSelectionTool::onSelectedFramesChanged() {
 void VectorSelectionTool::AttachedLevelSelection::sortWithPaletteOrder() {
   TXshSimpleLevel *level =
       TTool::getApplication()->getCurrentLevel()->getSimpleLevel();
-  SelectionTool *tool = dynamic_cast<SelectionTool *>(TTool::getApplication()->getCurrentTool()->getTool());
+  SelectionTool *tool = dynamic_cast<SelectionTool *>(
+      TTool::getApplication()->getCurrentTool()->getTool());
   if (!tool) return;
   if (framesMode() == FRAMES_NONE) return;
   if (!m_strokeSelection.isEditable()) return;
   ReorderDatas reOrderDatas;
 
   if (framesMode() == FRAMES_CURRENT) {
-    TVectorImageP vi =
-        m_strokeSelection.getImage();
+    TVectorImageP vi = m_strokeSelection.getImage();
     std::vector<int> indexVector;
     for (auto index : m_strokeSelection.getSelection()) {
-      if (vi->isStrokeGrouped(index)) continue; 
+      if (vi->isStrokeGrouped(index)) continue;
       indexVector.push_back(index);
     }
     if (!indexVector.empty()) {
@@ -2413,7 +2417,7 @@ void VectorSelectionTool::AttachedLevelSelection::sortWithPaletteOrder() {
     if (framesMode() == FRAMES_ALL)
       for (int i = 0; i < level->getFrameCount(); ++i)
         fids.insert(level->getFrameId(i));
-    else// FRAMES_SELECTED
+    else  // FRAMES_SELECTED
       fids = getSelectedFrames();
     for (auto id : fids) {
       TVectorImageP vi = level->getFrame(id, true);
@@ -2435,7 +2439,7 @@ void VectorSelectionTool::AttachedLevelSelection::sortWithPaletteOrder() {
   if (reOrderDatas.empty()) return;
   for (ReorderData &data : reOrderDatas) {
     TPalette *palette = m_strokeSelection.getImage()->getPalette();
-    TVectorImageP vi = level->getFrame(data.frameId, true);
+    TVectorImageP vi  = level->getFrame(data.frameId, true);
     if (!vi) continue;
 
     QHash<int, int> originalIndexToStyle;
@@ -2483,6 +2487,6 @@ void VectorSelectionTool::AttachedLevelSelection::sortWithPaletteOrder() {
 
   if (reOrderDatas.empty()) return;
   TUndoManager::manager()->add(new UndoReorderStrokes(level, reOrderDatas));
-  
+
   tool->notifyImageChanged();
 }
