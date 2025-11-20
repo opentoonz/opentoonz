@@ -3081,7 +3081,7 @@ XsheetViewer {
   qproperty-SelectedTextColor: #ffffff;
   qproperty-FrameTextColor: rgba(255, 255, 255, 0.85);
   qproperty-CurrentFrameTextColor: #E3E3E3;
-  qproperty-PreviewFrameTextColor: #8CAABA;
+  qproperty-PreviewFrameTextColor: #B8D9E0;
   qproperty-ColumnTextColor: #d3d3d3;
   qproperty-HighlightColumnTextColor: rgba(255, 255, 255, 0.85);
   qproperty-KeyframeLineColor: rgba(255, 255, 255, 0.85);
@@ -3096,7 +3096,7 @@ XsheetViewer {
   qproperty-VerticalLineHeadColor: #0F0F0F;
   qproperty-ColumnIconLineColor: #1c1c1e;
   qproperty-CurrentRowBgColor: #424C61;
-  qproperty-OnionSkinAreaBgColor: #333333;
+  qproperty-OnionSkinAreaBgColor: #2B2B2B;
   qproperty-PlayRangeColor: #242424;
   qproperty-CurrentTimeIndicatorColor: hsl(52, 100%, 64%);
   qproperty-EmptyColumnHeadColor: #333333;
