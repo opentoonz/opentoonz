@@ -134,7 +134,7 @@ QMenuBar::item:pressed {
   color: #ffffff;
 }
 #TopBarTab::tab:selected:hover {
-  background-color: #333333;
+  background-color: #424C61;
 }
 #TopBarTab::tab:first {
   border-left-width: 1;
