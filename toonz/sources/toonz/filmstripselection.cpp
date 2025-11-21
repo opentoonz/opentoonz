@@ -253,40 +253,52 @@ void TFilmstripSelection::cutFrames() {
 }
 
 //-----------------------------------------------------------------------------
-
 void TFilmstripSelection::pasteFrames() {
   TXshSimpleLevel *sl = TApp::instance()->getCurrentLevel()->getSimpleLevel();
   if (!sl) return;
 
-  std::set<TFrameId> fids;
-  if (m_selectedFrames.empty()) {
+  std::set<TFrameId> fids = m_selectedFrames;
+  if (fids.empty()) {
     if (sl->isSubsequence()) return;
     fids.insert(TApp::instance()->getCurrentFrame()->getFid());
-  } else {
-    fids = m_selectedFrames;
   }
 
+  // Store the number of strokes that existed before the paste
+  std::map<TFrameId, int> beforeCount;
+  for (auto &fid : fids) {
+    TVectorImageP vi = sl->getFrame(fid, false);
+    beforeCount[fid] = vi ? vi->getStrokeCount() : 0;
+  }
+
+  // Execute the paste
   FilmstripCmd::paste(sl, fids);
 
-  // Select the newly pasted strokes and show the bounding box
-  TTool *tool = TApp::instance()->getCurrentTool()->getTool();
-  if (tool && tool->getName() == "T_Selection") {
-    if (StrokeSelection *ss =
-            dynamic_cast<StrokeSelection *>(tool->getSelection())) {
-      tool->onActivate();
-      ss->selectNone();
+  // Select only the strokes of the current frame
+  TFrameId currentFid = TApp::instance()->getCurrentFrame()->getFid();
 
-      // select all strokes of the current frame (i.e., the newly pasted ones)
-      for (const TFrameId &fid : fids) {
-        TVectorImageP vi = sl->getFrame(fid, false);
-        if (!vi) continue;
-        for (UINT i = 0; i < vi->getStrokeCount(); ++i)
-          ss->select(static_cast<int>(i), true);
+  if (TTool *tool = TApp::instance()->getCurrentTool()->getTool()) {
+    if (tool->getName() == "T_Selection") {
+      if (auto ss = dynamic_cast<StrokeSelection *>(tool->getSelection())) {
+        ss->selectNone();
+
+        TVectorImageP vi = sl->getFrame(currentFid, false);
+        if (vi) {
+          int oldN = beforeCount[currentFid];
+          int newN = vi->getStrokeCount();
+          for (int i = oldN; i < newN; ++i) {
+            ss->select(i, true);
+          }
+        }
+
+        ss->notifyView();  // display bounding box
       }
-
-      ss->notifyView();  // <-- shows the bounding box
     }
   }
+
+  // Keep frame selection in the Filmstrip
+  m_selectedFrames = fids;
+  updateInbetweenRange();
+  notifyView();
 }
 
 //-----------------------------------------------------------------------------
