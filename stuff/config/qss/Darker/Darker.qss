@@ -477,11 +477,12 @@ QPushButton:pressed {
 QPushButton:checked {
   background-color: #242424;
   border-color: #495368;
-  color: #6378A6;
+  color: #D6D6D6;
 }
 QPushButton:checked:hover {
   background-color: #495368;
   border-color: #6378A6;
+  color: #D6D6D6;
 }
 QPushButton:checked:pressed {
   background-color: #424C61;
@@ -993,7 +994,7 @@ QToolBar {
   qproperty-iconSize: 20px;
 }
 QToolBar::separator:horizontal {
-  border-left: 1 solid #414245;
+  border-left: 1 solid #3E4042;
   margin: 0 1;
   width: 0;
 }
@@ -1800,7 +1801,7 @@ PaletteViewer QToolBar #keyFrameNavigator #KeyTotal {
   qproperty-SelectedBorderColor: #ffffff;
   qproperty-NumpadShortcutBgColor: rgba(0, 0, 0, 0.3);
   qproperty-NumpadShortcutBorderColor: #8d8d8d;
-  qproperty-SeparatorColor: #414245;
+  qproperty-SeparatorColor: #3E4042;
   qproperty-CurrentCellColor: rgba(140, 170, 186, 0.5);
   qproperty-SelectedCellColor: #6378A6;
   qproperty-ListNumpadShortcutBorderColor: #242424;
@@ -2694,7 +2695,7 @@ Ruler {
   image: url('../Default/imgs/white/scrollbar/scroll-left-hover.svg');
 }
 #PlainColorPageParts {
-  border-bottom: 1 solid #414245;
+  border-bottom: 1 solid #3E4042;
 }
 #PlainColorPageParts QLineEdit {
   max-width: 35;
@@ -3086,7 +3087,7 @@ XsheetViewer {
   qproperty-HighlightColumnTextColor: rgba(255, 255, 255, 0.85);
   qproperty-KeyframeLineColor: rgba(255, 255, 255, 0.85);
   qproperty-LevelEndColor: rgba(255, 255, 255, 0.85);
-  qproperty-BGColor: #333333;
+  qproperty-BGColor: #3D3D3D;
   qproperty-LightBGColor: #ffffff;
   qproperty-DarkBGColor: #ffffff;
   qproperty-LightLightBGColor: #737479;
@@ -3096,8 +3097,8 @@ XsheetViewer {
   qproperty-VerticalLineHeadColor: #0F0F0F;
   qproperty-ColumnIconLineColor: #1c1c1e;
   qproperty-CurrentRowBgColor: #424C61;
-  qproperty-OnionSkinAreaBgColor: #2B2B2B;
-  qproperty-PlayRangeColor: #242424;
+  qproperty-OnionSkinAreaBgColor: #242424;
+  qproperty-PlayRangeColor: #333333;
   qproperty-CurrentTimeIndicatorColor: hsl(52, 100%, 64%);
   qproperty-EmptyColumnHeadColor: #333333;
   qproperty-CellFocusColor: #9B4141;
