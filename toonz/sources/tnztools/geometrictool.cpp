@@ -1,4 +1,5 @@
 
+
 #include "geometrictool.h"
 #include "toonz/tpalettehandle.h"
 #include "tools/toolhandle.h"
@@ -31,18 +32,21 @@
 #include "historytypes.h"
 #include "toonzvectorbrushtool.h"
 #include "tcurveutil.h"
-
 #include "tpixelutils.h"
 #include "toonz/mypaintbrushstyle.h"
 #include "toonz/ttilesaver.h"
-
 #include "toonz/tscenehandle.h"
 #include "toonz/toonzscene.h"
 #include "toonz/tcamera.h"
 #include "toonz/stage.h"
-
+#include "toonz/tlog.h"
 // For Qt translation support
 #include <QCoreApplication>
+#include <QKeyEvent>
+#include <QMouseEvent>
+#include <QRadialGradient>
+#include <vector>
+#include <map>
 
 using namespace ToolUtils;
 
@@ -236,8 +240,8 @@ static TRect drawBluredBrush(const TRasterImageP &ri, TStroke *stroke,
     points.push_back(q->getThickP0());
     points.push_back(q->getThickP1());
     points.push_back(q->getThickP2());
-    // i punti contenuti nello stroke sembra che haano la tickness pari al
-    // raggio e non al diametro del punto!
+    // The points contained in the stroke seem to have thickness equal to
+    // the radius and not the diameter of the point!
     points[0].thick *= 2;
     points[1].thick *= 2;
     points[2].thick *= 2;
@@ -277,8 +281,8 @@ static TRect drawBluredBrush(const TToonzImageP &ti, TStroke *stroke, int thick,
     points.push_back(q->getThickP0());
     points.push_back(q->getThickP1());
     points.push_back(q->getThickP2());
-    // i punti contenuti nello stroke sembra che haano la tickness pari al
-    // raggio e non al diametro del punto!
+    // The points contained in the stroke seem to have thickness equal to
+    // the radius and not the diameter of the point!
     points[0].thick *= 2;
     points[1].thick *= 2;
     points[2].thick *= 2;
@@ -428,7 +432,7 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-/*-- Hardness<100 のときの GeometricToolのUndo --*/
+/*-- Undo for GeometricTool when Hardness<100 --*/
 class CMBluredPrimitiveUndo final : public UndoRasterPencil {
   int m_thickness;
   double m_hardness;
@@ -618,8 +622,8 @@ public:
     if (m_rasterTool) {
       double thick = m_param->m_rasterToolSize.getValue() * 0.5;
       /*---
-       Pencilの場合は、線幅を減らす。Thickness1の線を1ピクセルにするため。
-       （thick = 0 になる）
+       For Pencil mode, reduce line width. To make a thickness 1 line 1 pixel.
+       (thick = 0)
        ---*/
       if (m_param->m_pencil.getValue()) thick -= 0.5;
       return thick;
@@ -733,8 +737,8 @@ class RectanglePrimitive final : public Primitive {
 
 public:
   RectanglePrimitive(PrimitiveParam *param, GeometricTool *tool,
-                     bool reasterTool)
-      : Primitive(param, tool, reasterTool) {}
+                     bool rasterTool)
+      : Primitive(param, tool, rasterTool) {}
 
   std::string getName() const override {
     return "Rectangle";
@@ -760,8 +764,8 @@ class CirclePrimitive final : public Primitive {
   TPixel32 m_color;
 
 public:
-  CirclePrimitive(PrimitiveParam *param, GeometricTool *tool, bool reasterTool)
-      : Primitive(param, tool, reasterTool) {}
+  CirclePrimitive(PrimitiveParam *param, GeometricTool *tool, bool rasterTool)
+      : Primitive(param, tool, rasterTool) {}
 
   std::string getName() const override {
     return "Circle";
@@ -795,8 +799,8 @@ protected:
 
 public:
   MultiLinePrimitive(PrimitiveParam *param, GeometricTool *tool,
-                     bool reasterTool)
-      : Primitive(param, tool, reasterTool)
+                     bool rasterTool)
+      : Primitive(param, tool, rasterTool)
       , m_closed(false)
       , m_isSingleLine(false)
       , m_speedMoved(false)
@@ -866,8 +870,8 @@ QString MultilinePrimitiveUndo::getToolName() {
 
 class LinePrimitive final : public MultiLinePrimitive {
 public:
-  LinePrimitive(PrimitiveParam *param, GeometricTool *tool, bool reasterTool)
-      : MultiLinePrimitive(param, tool, reasterTool) {
+  LinePrimitive(PrimitiveParam *param, GeometricTool *tool, bool rasterTool)
+      : MultiLinePrimitive(param, tool, rasterTool) {
     m_isSingleLine = true;
   }
 
@@ -894,8 +898,8 @@ class EllipsePrimitive final : public Primitive {
   TPixel32 m_color;
 
 public:
-  EllipsePrimitive(PrimitiveParam *param, GeometricTool *tool, bool reasterTool)
-      : Primitive(param, tool, reasterTool) {}
+  EllipsePrimitive(PrimitiveParam *param, GeometricTool *tool, bool rasterTool)
+      : Primitive(param, tool, rasterTool) {}
 
   std::string getName() const override {
     return "Ellipse";
@@ -926,9 +930,8 @@ protected:
   bool m_isSingleArc;
 
 public:
-  MultiArcPrimitive(PrimitiveParam *param, GeometricTool *tool,
-                    bool reasterTool)
-      : Primitive(param, tool, reasterTool)
+  MultiArcPrimitive(PrimitiveParam *param, GeometricTool *tool, bool rasterTool)
+      : Primitive(param, tool, rasterTool)
       , m_stroke(0)
       , m_strokeTemp(0)
       , m_clickNumber(0)
@@ -1022,8 +1025,8 @@ QString MultiArcPrimitiveUndo::getToolName() {
 
 class ArcPrimitive final : public MultiArcPrimitive {
 public:
-  ArcPrimitive(PrimitiveParam *param, GeometricTool *tool, bool reasterTool)
-      : MultiArcPrimitive(param, tool, reasterTool) {
+  ArcPrimitive(PrimitiveParam *param, GeometricTool *tool, bool rasterTool)
+      : MultiArcPrimitive(param, tool, rasterTool) {
     m_isSingleArc = true;
   }
 
@@ -1042,8 +1045,8 @@ class PolygonPrimitive final : public Primitive {
   TPixel32 m_color;
 
 public:
-  PolygonPrimitive(PrimitiveParam *param, GeometricTool *tool, bool reasterTool)
-      : Primitive(param, tool, reasterTool) {}
+  PolygonPrimitive(PrimitiveParam *param, GeometricTool *tool, bool rasterTool)
+      : Primitive(param, tool, rasterTool) {}
 
   std::string getName() const override {
     return "Polygon";
@@ -1108,7 +1111,7 @@ void GeometricTool::updateTranslation() { m_param.updateTranslation(); }
 
 //--------------------------------------------------------------------------------------------------
 void GeometricTool::addPrimitive(Primitive *p) {
-  // TODO: aggiungere il controllo per evitare nomi ripetuti
+  // TODO: add control to avoid repeated names
   std::wstring name = ::to_wstring(p->getName());
   // wstring name = TStringTable::translate(p->getName());
 
@@ -1316,8 +1319,8 @@ void GeometricTool::onActivate() {
   }
   m_primitive->resetSnap();
   /*--
-     ショートカットでいきなりスタート（＝onEnterを通らない場合）のとき、
-          LineToolが反応しないことがある対策 --*/
+     When starting directly with a shortcut (= without going through onEnter),
+          LineTool may not respond countermeasure --*/
   m_active =
       (getImage(false) != 0 || Preferences::instance()->isAutoCreateEnabled());
 
@@ -1363,12 +1366,12 @@ TPropertyGroup *GeometricTool::getProperties(int idx) {
 
 //--------------------------------------------------------------------------------------------------
 bool GeometricTool::onPropertyChanged(std::string propertyName) {
-  /*---	変更されたPropertyごとに処理を分ける。
-          注意：m_toolSizeとm_rasterToolSizeは同じName(="Size:")なので、
-          扱っている画像がラスタかどうかで区別する ---*/
+  /*--- Process by changed Property.
+          Note: m_toolSize and m_rasterToolSize have the same Name(="Size:"), so
+          distinguish by whether the image being handled is raster or not ---*/
   if (propertyName == m_param.m_toolSize.getName()) {
     TImageP img = getImage(false);
-    TToonzImageP ri(img); /*-- ラスタかどうかの判定 --*/
+    TToonzImageP ri(img); /*-- Judgment of whether it is raster or not --*/
     if (ri)
       GeometricRasterSize = m_param.m_rasterToolSize.getValue();
     else
@@ -1446,25 +1449,38 @@ bool GeometricTool::onPropertyChanged(std::string propertyName) {
 void GeometricTool::addRasterMyPaintStroke(const TToonzImageP &ti,
                                            TStroke *stroke, TXshSimpleLevel *sl,
                                            const TFrameId &id) {
-  TRasterP ras = ti->getRaster();
+  if (!stroke || stroke->getChunkCount() == 0) {
+    return;
+  }
 
-  TTileSetCM32 *tileSet = new TTileSetCM32(ras->getSize());
-  m_tileSaverCM         = new TTileSaverCM32(ras, tileSet);
-
-  TPointD rasCenter = ras->getCenterD();
-  stroke->transform(TTranslation(rasCenter.x, rasCenter.y));
+  TRasterP ras   = ti->getRaster();
   TDimension dim = ras->getSize();
 
-  mypaint::Brush mypaintBrush;
+  // Transform stroke to center
+  TPointD rasCenter = ras->getCenterD();
+  stroke->transform(TTranslation(rasCenter.x, rasCenter.y));
 
+  // Early exit if stroke bounding box is invalid or outside canvas
+  TRectD strokeBBox = stroke->getBBox();
+  TRectD rasBBoxD(0.0, 0.0, dim.lx, dim.ly);
+  if (!strokeBBox.overlaps(rasBBoxD) || strokeBBox.x1 <= strokeBBox.x0 ||
+      strokeBBox.y1 <= strokeBBox.y0) {
+    return;
+  }
+
+  // Create tileSet and tileSaver only if we will draw
+  TTileSetCM32 *tileSet = new TTileSetCM32(dim);
+  m_tileSaverCM         = new TTileSaverCM32(ras, tileSet);
+
+  // Prepare brush
+  mypaint::Brush mypaintBrush;
   double modifierSize    = m_param.m_modifierSize.getValue() * log(2.0);
   double modifierOpacity = 0.01 * m_param.m_modifierOpacity.getValue();
   TPixelD color          = PixelConverter<TPixelD>::from(
       getApplication()->getCurrentLevelStyle()->getMainColor());
-  double colorH = 0.0;
-  double colorS = 0.0;
-  double colorV = 0.0;
+  double colorH = 0.0, colorS = 0.0, colorV = 0.0;
   RGB2HSV(color.r, color.g, color.b, &colorH, &colorS, &colorV);
+
   TMyPaintBrushStyle *mypaintStyle = dynamic_cast<TMyPaintBrushStyle *>(
       getApplication()->getCurrentLevelStyle());
   mypaintBrush.fromBrush(mypaintStyle->getBrush());
@@ -1476,21 +1492,24 @@ void GeometricTool::addRasterMyPaintStroke(const TToonzImageP &ti,
   mypaintBrush.setBaseValue(MYPAINT_BRUSH_SETTING_COLOR_S, colorS);
   mypaintBrush.setBaseValue(MYPAINT_BRUSH_SETTING_COLOR_V, colorV);
 
+  // Draw
   m_workRaster = TRaster32P(dim);
   m_workRaster->lock();
   MyPaintToonzBrush toonz_brush(m_workRaster, *this, mypaintBrush, true);
   m_lastRect.empty();
   m_strokeRect.empty();
   toonz_brush.beginStroke();
-  const TThickQuadratic *q = 0;
+
   for (int i = 0; i < stroke->getChunkCount(); i++) {
-    q           = stroke->getChunk(i);
-    double step = computeStep(*q, getPixelSize());
+    const TThickQuadratic *q = stroke->getChunk(i);
+    double step              = computeStep(*q, getPixelSize());
     for (double t = 0; t < 1; t += step)
       toonz_brush.strokeTo(q->getPoint(t), 0.5, TPointD(), 1.0);
     toonz_brush.strokeTo(q->getP2(), 0.5, TPointD(), 1.0);
   }
+
   toonz_brush.endStroke();
+
   if (!m_strokeRect.isEmpty()) {
     TRasterCM32P bkupRas(dim);
     bkupRas->extract(m_strokeRect)->copy(ras->extract(m_strokeRect));
@@ -1501,11 +1520,17 @@ void GeometricTool::addRasterMyPaintStroke(const TToonzImageP &ti,
   m_workRaster->unlock();
 
   delete m_tileSaverCM;
-  m_tileSaverCM       = nullptr;
-  TRasterCM32P subras = ras->extract(m_strokeRect)->clone();
-  TUndoManager::manager()->add(new CMappedMyPaintGeometryUndo(
-      tileSet, sl, id, m_isFrameCreated, m_isLevelCreated, subras,
-      m_strokeRect.getP00()));
+  m_tileSaverCM = nullptr;
+
+  // Only save undo if strokeRect is valid
+  if (!m_strokeRect.isEmpty()) {
+    TRasterCM32P subras = ras->extract(m_strokeRect)->clone();
+    TUndoManager::manager()->add(new CMappedMyPaintGeometryUndo(
+        tileSet, sl, id, m_isFrameCreated, m_isLevelCreated, subras,
+        m_strokeRect.getP00()));
+  } else {
+    delete tileSet;  // prevent leak
+  }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1513,25 +1538,38 @@ void GeometricTool::addFullColorMyPaintStroke(const TRasterImageP &ri,
                                               TStroke *stroke,
                                               TXshSimpleLevel *sl,
                                               const TFrameId &id) {
-  TRasterP ras = ri->getRaster();
+  if (!stroke || stroke->getChunkCount() == 0) {
+    return;
+  }
 
-  TTileSetFullColor *tileSet = new TTileSetFullColor(ras->getSize());
-  m_tileSaver                = new TTileSaverFullColor(ras, tileSet);
-
-  TPointD rasCenter = ras->getCenterD();
-  stroke->transform(TTranslation(rasCenter.x, rasCenter.y));
+  TRasterP ras   = ri->getRaster();
   TDimension dim = ras->getSize();
 
-  mypaint::Brush mypaintBrush;
+  // Transform stroke to center
+  TPointD rasCenter = ras->getCenterD();
+  stroke->transform(TTranslation(rasCenter.x, rasCenter.y));
 
+  // Early exit if stroke bounding box is invalid or outside canvas
+  TRectD strokeBBox = stroke->getBBox();
+  TRectD rasBBoxD(0.0, 0.0, dim.lx, dim.ly);
+  if (!strokeBBox.overlaps(rasBBoxD) || strokeBBox.x1 <= strokeBBox.x0 ||
+      strokeBBox.y1 <= strokeBBox.y0) {
+    return;
+  }
+
+  // Create tileSet and tileSaver only if we will draw
+  TTileSetFullColor *tileSet = new TTileSetFullColor(dim);
+  m_tileSaver                = new TTileSaverFullColor(ras, tileSet);
+
+  // Prepare brush
+  mypaint::Brush mypaintBrush;
   double modifierSize    = m_param.m_modifierSize.getValue() * log(2.0);
   double modifierOpacity = 0.01 * m_param.m_modifierOpacity.getValue();
   TPixelD color          = PixelConverter<TPixelD>::from(
       getApplication()->getCurrentLevelStyle()->getMainColor());
-  double colorH = 0.0;
-  double colorS = 0.0;
-  double colorV = 0.0;
+  double colorH = 0.0, colorS = 0.0, colorV = 0.0;
   RGB2HSV(color.r, color.g, color.b, &colorH, &colorS, &colorV);
+
   TMyPaintBrushStyle *mypaintStyle = dynamic_cast<TMyPaintBrushStyle *>(
       getApplication()->getCurrentLevelStyle());
   mypaintBrush.fromBrush(mypaintStyle->getBrush());
@@ -1547,31 +1585,41 @@ void GeometricTool::addFullColorMyPaintStroke(const TRasterImageP &ri,
   mypaintBrush.setBaseValue(MYPAINT_BRUSH_SETTING_COLOR_S, colorS);
   mypaintBrush.setBaseValue(MYPAINT_BRUSH_SETTING_COLOR_V, colorV);
 
+  // Draw
   m_workRaster = TRaster32P(dim);
   m_workRaster->lock();
   MyPaintToonzBrush toonz_brush(m_workRaster, *this, mypaintBrush, true);
   m_lastRect.empty();
   m_strokeRect.empty();
   toonz_brush.beginStroke();
-  const TThickQuadratic *q = 0;
+
   for (int i = 0; i < stroke->getChunkCount(); i++) {
-    q           = stroke->getChunk(i);
-    double step = computeStep(*q, getPixelSize());
+    const TThickQuadratic *q = stroke->getChunk(i);
+    double step              = computeStep(*q, getPixelSize());
     for (double t = 0; t < 1; t += step)
       toonz_brush.strokeTo(q->getPoint(t), 0.5, TPointD(), 1.0);
     toonz_brush.strokeTo(q->getP2(), 0.5, TPointD(), 1.0);
   }
+
   toonz_brush.endStroke();
-  if (!m_strokeRect.isEmpty())
+
+  if (!m_strokeRect.isEmpty()) {
     ras->extract(m_strokeRect)->copy(m_workRaster->extract(m_strokeRect));
+  }
 
   m_workRaster->unlock();
 
   delete m_tileSaver;
-  m_tileSaver     = nullptr;
-  TRasterP subras = ras->extract(m_strokeRect)->clone();
-  TUndoManager::manager()->add(new FullColorMyPaintGeometryUndo(
-      tileSet, sl, id, m_isFrameCreated, subras, m_strokeRect.getP00()));
+  m_tileSaver = nullptr;
+
+  // Only save undo if strokeRect is valid
+  if (!m_strokeRect.isEmpty()) {
+    TRasterP subras = ras->extract(m_strokeRect)->clone();
+    TUndoManager::manager()->add(new FullColorMyPaintGeometryUndo(
+        tileSet, sl, id, m_isFrameCreated, subras, m_strokeRect.getP00()));
+  } else {
+    delete tileSet;  // prevent leak
+  }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1581,7 +1629,7 @@ void GeometricTool::addStroke() {
   TStroke *stroke = 0;
   if (!m_isRotatingOrMoving) {
     stroke = m_primitive->makeStroke();
-    if (!stroke) return; // Exit if stroke is null
+    if (!stroke) return;  // Exit if stroke is null
 
     if (m_param.m_rotate.getValue()) {
       m_isRotatingOrMoving = true;
@@ -1615,7 +1663,7 @@ void GeometricTool::addStroke() {
     m_rotatedStroke      = 0;
   }
 
-  if (!stroke) return; // Add null check here
+  if (!stroke) return;  // Add null check here
 
   TStroke::OutlineOptions &options = stroke->outlineOptions();
   options.m_capStyle               = m_param.m_capStyle.getIndex();
@@ -1629,7 +1677,7 @@ void GeometricTool::addStroke() {
   TXshSimpleLevel *sl =
       TTool::getApplication()->getCurrentLevel()->getSimpleLevel();
   TFrameId id = getCurrentFid();
-  /*-- ToonzImageの場合 --*/
+  /*-- ToonzImage case --*/
   if (ti) {
     int styleId    = TTool::getApplication()->getCurrentLevelStyleIndex();
     bool selective = m_param.m_emptyOnly.getValue();
@@ -1661,7 +1709,7 @@ void GeometricTool::addStroke() {
     ToolUtils::updateSaveBox();
     delete stroke;
   }
-  /*-- VectorImageの場合 --*/
+  /*-- VectorImage case --*/
   else if (vi) {
     if (TTool::getApplication()->getCurrentObject()->isSpline()) {
       if (!ToolUtils::isJustCreatedSpline(vi.getPointer())) {
@@ -1724,7 +1772,7 @@ void GeometricTool::addStroke() {
       }
     }
   }
-  /*-- RasterImageの場合 --*/
+  /*-- RasterImage case --*/
   else if (ri) {
     int styleId = TTool::getApplication()->getCurrentLevelStyleIndex();
     stroke->setStyle(styleId);
@@ -2188,7 +2236,7 @@ void CirclePrimitive::onEnter() {
 
 void MultiLinePrimitive::addVertex(const TPointD &pos) {
   int count = m_vertex.size();
-  // Inserisco il primo punto
+  // Insert the first point
   if (count == 0) {
     m_vertex.push_back(pos);
     return;
@@ -2196,8 +2244,8 @@ void MultiLinePrimitive::addVertex(const TPointD &pos) {
 
   TPointD &vertex = m_vertex[count - 1];
 
-  // Caso particolare in cui inizio una curva e la chiudo subito cliccando sul
-  // punto di pertenza
+  // Special case where I start a curve and close it immediately by clicking on
+  // the starting point
   if (count == 1 && pos == vertex) {
     m_vertex.push_back(pos);
     m_vertex.push_back(pos);
@@ -2205,10 +2253,9 @@ void MultiLinePrimitive::addVertex(const TPointD &pos) {
     return;
   }
 
-  // Calcolo lo speedOut
+  // Calculate speedOut
   TPointD speedOutPoint;
-  if (!m_speedMoved)  // Se non e' stato mosso lo speedOut devo calcolarlo e
-                      // inserirlo
+  if (!m_speedMoved)  // If speedOut hasn't been moved, calculate and insert it
   {
     speedOutPoint = vertex + computeSpeed(vertex, pos, 0.01);
     m_vertex.push_back(speedOutPoint);
@@ -2219,16 +2266,16 @@ void MultiLinePrimitive::addVertex(const TPointD &pos) {
     speedOutPoint = vertex;
   }
 
-  // Calcolo lo speedIn
+  // Calculate speedIn
   TPointD speedInPoint = pos + computeSpeed(pos, speedOutPoint, 0.01);
-  // Calcolo il "punto di mezzo" e lo inserisco
+  // Calculate the "middle point" and insert it
   TPointD middlePoint = 0.5 * (speedInPoint + speedOutPoint);
 
-  // Inserisco il "punto di mezzo"
+  // Insert the "middle point"
   m_vertex.push_back(middlePoint);
-  // Inserisco lo speedIn
+  // Insert speedIn
   m_vertex.push_back(speedInPoint);
-  // Inserisco il nuovo punto
+  // Insert the new point
   m_vertex.push_back(pos);
 }
 
@@ -2300,8 +2347,7 @@ void MultiLinePrimitive::draw() {
     if (m_vertex.size() > 1) {
       tglColor(TPixel(79, 128, 255));
       int index = (count < 5) ? count - 1 : count - 5;
-      // Disegno lo speedOut precedente (che e' quello corrente solo nel caso in
-      // cui count < 5)
+      // Draw the previous speedOut (which is current only if count < 5)
       TPointD p0 = m_vertex[index];
       TPointD p1 = m_vertex[index - 1];
       if (tdistance(p0, p1) > 0.1) {
@@ -2309,7 +2355,7 @@ void MultiLinePrimitive::draw() {
         tglDrawDisk(p0, 2 * pixelSize);
         tglDrawDisk(p1, 4 * pixelSize);
       }
-      // Disegno lo speedIn/Out corrente nel caso in cui count > 5
+      // Draw current speedIn/Out if count > 5
       if (m_speedMoved && count > 5) {
         TPointD p0 = m_vertex[count - 1];
         TPointD p1 = m_vertex[count - 2];
@@ -2360,7 +2406,7 @@ void MultiLinePrimitive::leftButtonDown(const TPointD &pos,
   TPointD newPos;
   newPos = getSnap(pos);
 
-  // Se clicco nell'ultimo vertice chiudo la linea.
+  // If I click on the last vertex, close the line.
   TPointD _pos = pos;
   if (m_closed) _pos = m_vertex.front();
 
@@ -2858,7 +2904,8 @@ void MultiArcPrimitive::leftButtonDown(const TPointD &pos,
 
 void MultiArcPrimitive::leftButtonDrag(const TPointD &pos,
                                        const TMouseEvent &e) {
-  if (m_clickNumber <= 1 && !Preferences::instance()->isClickTwiceToCreateArcs())
+  if (m_clickNumber <= 1 &&
+      !Preferences::instance()->isClickTwiceToCreateArcs())
     return;
 
   TPointD newPos = calculateSnap(pos);
@@ -3210,14 +3257,14 @@ TStroke *PolygonPrimitive::makeStroke() const {
   if (m_param->m_targetType & TTool::Vectors) {
     std::vector<TThickPoint> points(4 * edgeCount + 1);
     int i;
-    // Posiziono gli angoli
+    // Position the corners
     for (i = 0; i <= (int)points.size(); i += 4) {
       points[i] = TThickPoint(
           m_centre + TPointD(cos(angle) * m_radius, sin(angle) * m_radius),
           thick);
       angle += angleDiff;
     }
-    // posiziono i punti medi e i punti per gestire la linearita'
+    // position the middle points and points to handle linearity
     for (i = 0; i < (int)points.size() - 1; i += 4) {
       TPointD vertex           = convert(points[i]);
       TPointD nextVertex       = convert(points[i + 4]);
