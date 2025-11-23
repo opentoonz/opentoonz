@@ -861,6 +861,7 @@ void fillAreaWithUndo(const TImageP &img, const TRaster32P &ref,
     TRect rasBounds    = ras->getBounds();
     TRect rasStrokeBox = ToonzImageUtils::convertWorldToRaster(selArea, ti);
     TRect rasFillArea  = rasStrokeBox * rasBounds;
+    if (rasFillArea.isEmpty()) return;
 
     /*-- tileSetでFill範囲のRectをUndoに格納しておく --*/
     TTileSetCM32 *rasTileSet = new TTileSetCM32(ras->getSize());
@@ -886,7 +887,7 @@ void fillAreaWithUndo(const TImageP &img, const TRaster32P &ref,
     TRect auxStrokeBox = rasStrokeBox - offs;
     TRect auxBounds    = ras->getBounds();
     TRect auxFillArea  = auxStrokeBox * auxBounds;
-    if (auxBounds.isEmpty() || rasFillArea.isEmpty()) return;
+    if (auxFillArea.isEmpty()) return;
 
     AreaFiller filler(raux, ref, plt);
     if (!stroke) {
