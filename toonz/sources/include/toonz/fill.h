@@ -44,6 +44,7 @@ public:
   bool m_prevailing;
   bool m_defRegionWithPaint;
   bool m_usePrevailingReferFill;
+  bool m_extendFill;
 
   FillParameters()
       : m_styleId(0)
@@ -56,6 +57,7 @@ public:
       , m_shiftFill(false)
       , m_palette(0)
       , m_prevailing(true)
+      , m_extendFill(false)
       , m_defRegionWithPaint(true)
       , m_usePrevailingReferFill(false) {
     m_defRegionWithPaint     = DEF_REGION_WITH_PAINT;
@@ -72,6 +74,7 @@ public:
       , m_shiftFill(params.m_shiftFill)
       , m_palette(params.m_palette)
       , m_prevailing(params.m_prevailing)
+      , m_extendFill(params.m_extendFill)
       , m_defRegionWithPaint(params.m_defRegionWithPaint)
       , m_usePrevailingReferFill(params.m_usePrevailingReferFill) {}
 };
