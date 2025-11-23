@@ -202,6 +202,7 @@ set(HEADERS
     ../include/orientation.h
     ../include/saveloadqsettings.h
     xdtsio.h
+    sxfio.h
     levelcommand.h
 # Tracker file
     ObjectTracker.h
@@ -383,6 +384,7 @@ set(SOURCES
     separatecolorsswatch.cpp
     separatecolorspopup.cpp
     xdtsio.cpp
+    sxfio.cpp
     ocaio.cpp
     xdtsimportpopup.cpp
     expressionreferencemanager.cpp

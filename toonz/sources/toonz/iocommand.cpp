@@ -21,6 +21,7 @@
 #include "versioncontrol.h"
 #include "cachefxcommand.h"
 #include "xdtsio.h"
+#include "sxfio.h"
 #include "expressionreferencemanager.h"
 #include "levelcommand.h"
 #include "columncommand.h"
@@ -1863,8 +1864,9 @@ bool IoCmd::loadScene(const TFilePath &path, bool updateRecentFile,
   assert(!path.isEmpty());
   TFilePath scenePath = path;
   bool isXdts         = scenePath.getType() == "xdts";
+  bool isSxf          = scenePath.getType() == "sxf";
   if (scenePath.getType() == "") scenePath = scenePath.withType("tnz");
-  if (scenePath.getType() != "tnz" && !isXdts) {
+  if (scenePath.getType() != "tnz" && !isXdts && !isSxf) {
     QString msg;
     msg = QObject::tr("File %1 doesn't look like a TOONZ Scene")
               .arg(QString::fromStdWString(scenePath.getWideString()));
@@ -1960,6 +1962,8 @@ bool IoCmd::loadScene(const TFilePath &path, bool updateRecentFile,
   try {
     if (isXdts)
       XdtsIo::loadXdtsScene(scene, scenePath);
+    else if (isSxf)
+      SxfIo::loadSxfScene(scene, scenePath);
     else
       /*-- プログレス表示を行いながらLoad --*/
       scene->load(scenePath);
