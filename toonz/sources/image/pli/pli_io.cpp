@@ -1469,9 +1469,10 @@ void ParsedPliImp::readFloatData(double &val, TUINT32 &bufOffs) {
   isNegative = readDynamicData(valInt, bufOffs);
   readDynamicData(valDec, bufOffs);
 
-  val = valInt + (double)valDec / 65536.0;  // 2^16
-
-  if (valInt == 0 && isNegative) val = -val;
+  if (isNegative)
+    val = (double)valInt - (double)valDec / 65536.0;  // 2^16
+  else
+    val = (double)valInt + (double)valDec / 65536.0;  // 2^16
 
   // m_currDynamicTypeBytesNum = currDynamicTypeBytesNumSaved;
 }
