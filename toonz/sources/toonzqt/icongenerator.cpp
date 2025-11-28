@@ -28,6 +28,7 @@
 // TnzLib includes
 #include "toonz/toonzscene.h"
 #include "toonz/sceneproperties.h"
+#include "toonz/tcamera.h"
 #include "toonz/txsheet.h"
 #include "toonz/tscenehandle.h"
 #include "toonz/txshlevel.h"
@@ -38,11 +39,14 @@
 #include "toonz/preferences.h"
 #include "toonz/sceneresources.h"
 #include "toonz/stage2.h"
+#include "trop.h"
 
 // TnzQt includes
 #include "toonzqt/gutil.h"
 
 #include "toonzqt/icongenerator.h"
+
+#include <QCoreApplication>
 
 //=============================================================================
 
@@ -898,8 +902,15 @@ public:
 TRaster32P XsheetIconRenderer::generateRaster(
     const TDimension &iconSize) const {
   ToonzScene *scene = m_xsheet->getScene();
-
-  TRaster32P ras(iconSize);
+  TDimension res    = scene->getProperties()->getCameras().front()->getRes();
+  if (res.lx > iconSize.lx || res.ly > iconSize.ly) {
+    double sx = (double)iconSize.lx / res.lx;
+    double sy = (double)iconSize.ly / res.ly;
+    double s  = std::min(sx, sy);
+    res.lx    = tround(res.lx * s);
+    res.ly    = tround(res.ly * s);
+  }
+  TRaster32P ras(res);
 
   TPixel32 bgColor = scene->getProperties()->getBgColor();
   bgColor.m        = 255;
@@ -1034,8 +1045,9 @@ TRaster32P IconGenerator::generateRasterFileIcon(const TFilePath &path,
 
       if (shrink > 1) ir->setShrink(shrink);
     }
-
-    img = (toUpper(path.getType()) == "TLV") ? ir->loadIcon() : ir->load();
+    bool isDll = QCoreApplication::applicationName() == "ToonzPreview";
+    img        = (toUpper(path.getType()) == "TLV" && !isDll) ? ir->loadIcon()
+                                                              : ir->load();
   } catch (...) {
   }
 
@@ -1060,8 +1072,9 @@ TRaster32P IconGenerator::generateRasterFileIcon(const TFilePath &path,
       TRop::convert(dstRaster, auxRaster, plt, false);
     else
       dstRaster->fill(TPixel32::Magenta);
-
-    ras32 = dstRaster;
+    ras32 = TRaster32P(dstRaster->getLx(), dstRaster->getLy());
+    ras32->fill(TPixel32::White);
+    TRop::over(ras32, dstRaster);
   }
 
   if (!ras32) return TRaster32P();
@@ -1080,16 +1093,22 @@ Qt::transparent)
 }
 */
 
-  TRaster32P icon(iconSize);
-
   double sx = double(iconSize.lx) / ras32->getLx();
   double sy = double(iconSize.ly) / ras32->getLy();
-  double sc = std::min(sx, sy);  // show all the image, possibly adding bands
+  double sc = std::min(sx, sy);
+
+  TDimension finalIconSize(tround(ras32->getLx() * sc),
+                           tround(ras32->getLy() * sc));
+
+  TRaster32P icon(finalIconSize);
 
   TAffine aff = TScale(sc).place(ras32->getCenterD(), icon->getCenterD());
 
-  icon->fill(TPixel32(255, 0, 0));  // "bands" color
-  TRop::resample(icon, ras32, aff, TRop::Triangle);
+  // Fill with transparent color (no bands/borders needed in this mode)
+  icon->fill(TPixel32::Magenta);
+
+  // Perform resampling and scaling
+  TRop::resample(icon, ras32, aff, TRop::ClosestPixel);
 
   if (icon) {
     if (::isUnpremultiplied(icon))  // APPALLING. I'm not touching this, but
@@ -1114,7 +1133,6 @@ Qt::transparent)
 
   return icon;
 }
-
 //-----------------------------------------------------------------------------
 
 TRaster32P IconGenerator::generateSplineFileIcon(const TFilePath &path,
@@ -1158,9 +1176,15 @@ TRaster32P IconGenerator::generateSceneFileIcon(const TFilePath &path,
         path.getParentDir() + "sceneIcons" + (path.getWideName() + L" .png");
     return generateRasterFileIcon(iconPath, iconSize, TFrameId::NO_FRAME);
   } else {
+    if (row < 0) row = 0;
     // obsolete
     ToonzScene scene;
-    scene.load(path);
+    try {
+      scene.load(path);
+    } catch (...) {
+      scene.clear();
+      return TRaster32P();
+    }
     XsheetIconRenderer ir("", iconSize, scene.getXsheet(), row);
     return ir.generateRaster(iconSize);
   }
@@ -1324,6 +1348,16 @@ IconGenerator::~IconGenerator() {}
 //-----------------------------------------------------------------------------
 
 IconGenerator *IconGenerator::instance() {
+  bool isShellExtension = false;
+  if (QCoreApplication::instance()) {
+    if (QCoreApplication::applicationName() == "ToonzPreview") {
+      isShellExtension = true;
+    }
+  }
+  if (isShellExtension) {
+    static IconGenerator *_instance = new IconGenerator();
+    return _instance;
+  }
   static IconGenerator _instance;
   return &_instance;
 }
@@ -1341,15 +1375,27 @@ TDimension IconGenerator::getIconSize() const { return FilmstripIconSize; }
 //-----------------------------------------------------------------------------
 
 TOfflineGL *IconGenerator::getOfflineGLContext() {
+  TOfflineGL *context = m_contexts.localData();
   // One context per rendering thread
-  if (!m_contexts.hasLocalData()) {
-    TDimension contextSize(std::max(FilmstripIconSize.lx, IconSize.lx),
-                           std::max(FilmstripIconSize.ly, IconSize.ly));
-    m_contexts.setLocalData(new TOfflineGL(contextSize));
+  if (!context) {
+    context =
+        new TOfflineGL(TDimension(std::max(FilmstripIconSize.lx, IconSize.lx),
+                                  std::max(FilmstripIconSize.ly, IconSize.ly)));
+    m_contexts.setLocalData(context);
+    return context;
   }
-  return m_contexts.localData();
-}
+  TDimension requiredSize(std::max(FilmstripIconSize.lx, IconSize.lx),
+                          std::max(FilmstripIconSize.ly, IconSize.ly));
+  TDimension actualSize = context->getSize();
 
+  if (actualSize.lx < requiredSize.lx || actualSize.ly < requiredSize.ly) {
+    context = new TOfflineGL(requiredSize);
+
+    m_contexts.setLocalData(context);
+  }
+
+  return context;
+}
 //-----------------------------------------------------------------------------
 
 void IconGenerator::addTask(const std::string &id,
