@@ -40,7 +40,7 @@ jobs:
       OpenCV_DIR: C:\tools\opencv\build     # Path to OpenCV
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           lfs: false
 
@@ -151,7 +151,7 @@ jobs:
 
       # Upload the generated artifact
       - name: Upload Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: Opentoonz-${{ runner.os }}-${{ github.sha }}
           path: artifact

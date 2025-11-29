@@ -30,7 +30,7 @@ jobs:
     # TODO: Change macOS GHA Runner Image to (Apple Silicon) based image on/prior to sunsetting of `macos-15-intel` (x86_64) runner image (August 2027)
     runs-on: macos-15-intel
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Clean Python symlinks
         run: |
@@ -129,7 +129,7 @@ jobs:
             sleep 5
           done
           echo "DMG created successfully."
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: Opentoonz-${{ runner.os }}-${{ github.sha }}
           path: toonz/build/toonz/OpenToonz.dmg
