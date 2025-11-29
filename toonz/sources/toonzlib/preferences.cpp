@@ -635,7 +635,7 @@ void Preferences::definePreferenceItems() {
   define(shortPlayFrameCount, "shortPlayFrameCount", QMetaType::Int, 8, 1, 100);
   define(previewAlwaysOpenNewFlip, "previewAlwaysOpenNewFlip", QMetaType::Bool,
          false);
-  define(fitToFlipbook, "fitToFlipbook", QMetaType::Bool, false);
+  define(fitToFlipbookWhenPreview, "fitToFlipbookWhenPreview", QMetaType::Bool, false);
   define(generatedMovieViewEnabled, "generatedMovieViewEnabled",
          QMetaType::Bool, true);
 
