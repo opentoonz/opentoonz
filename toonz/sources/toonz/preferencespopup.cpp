@@ -1201,7 +1201,6 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
 
   const static QMap<PreferencesItemId, QString> uiStringTable = {
       // General
-      {defaultViewerEnabled, tr("Use Default Viewer for Movie Formats")},
       {rasterOptimizedMemory, tr("Minimize Raster Memory Fragmentation*")},
       {autosaveEnabled, tr("Save Automatically")},
       {autosavePeriod, tr("Interval (Minutes):")},
@@ -1214,7 +1213,7 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
        tr("Replace Toonz Level after SaveLevelAs command")},
       {backupEnabled, tr("Backup Scene and Animation Levels when Saving")},
       {backupKeepCount, tr("# of backups to keep:")},
-      {sceneNumberingEnabled, tr("Show Info in Rendered Frames")},
+      {sceneNumberingEnabled, tr("Add Info water mark in Rendered Frames")},
       {watchFileSystemEnabled,
        tr("Watch File System and Update File Browser Automatically")},
       //{ projectRoot,               tr("") },
@@ -1241,7 +1240,7 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
       {iconSize, tr("Level Strip Thumbnail Size*:")},
       {viewShrink, tr("Viewer Shrink:")},
       {viewStep, tr("Step:")},
-      {viewerZoomCenter, tr("Viewer Zoom Center:")},
+      {viewerZoomCenter, tr("Zoom In/Out Center:")},
       {CurrentLanguageName, tr("Language*:")},
       {interfaceFont, tr("Font*:")},
       {interfaceFontStyle, tr("Style*:")},
@@ -1284,7 +1283,8 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
       {fastRenderPath, tr("Fast Render Path:")},
       {ffmpegMultiThread,
        tr("Allow Multi-Thread in FFMPEG Rendering (UNSTABLE)")},
-      {quickTimeBackend, tr("Use QuickTime to code .mov and .3gp (If installed)")},
+      {quickTimeBackend,
+       tr("Use QuickTime to decode/code .mov and .3gp (If Installed)")},
       {rhubarbPath, tr("Rhubarb Path:")},
       {rhubarbTimeout, tr("Rhubarb Timeout:")},
 
@@ -1305,7 +1305,8 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
       {vectorSnappingTarget, tr("Vector Snapping:")},
       {saveUnpaintedInCleanup,
        tr("Keep Original Cleaned Up Drawings As Backup")},
-      {minimizeSaveboxAfterEditing, tr("Minimize Savebox after Editing")},
+      {minimizeSaveboxAfterEditing,
+       tr("Minimize Savebox after Editing (Toonz Raster Level)")},
       {useNumpadForSwitchingStyles,
        tr("Use Numpad and Tab keys for Switching Styles")},
       {downArrowInLevelStripCreatesNewFrame,
@@ -1323,14 +1324,16 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
        tr("Define Filling Region Using both Lines and Areas")},
       { ReferFillPrevailing, tr("Paint Under Lines in Refer Fill") },
       {multiLayerStylePickerEnabled,
-       tr("Multi Layer Style Picker: Switch Levels by Picking")},
+       tr("Style Picker: Switch Current Level by Picking on Multi Layer")},
       {cursorBrushType, tr("Basic Cursor Type:")},
       {cursorBrushStyle, tr("Cursor Style:")},
       {cursorOutlineEnabled, tr("Show Cursor Size Outlines")},
       {levelBasedToolsDisplay, tr("Toolbar Display Behaviour:")},
-      {useCtrlAltToResizeBrush, tr("Use %1 to Resize Brush").arg(CtrlAltStr())},
+      {useCtrlAltToResizeBrush,
+       tr("Brush Tool: Use %1 to Resize").arg(CtrlAltStr())},
       {useStrokeEndCursor, tr("Draw Cursor at End of Stroke")},
-      {clickTwiceToCreateArcs, tr("Click Twice to Create Arcs")},
+      {clickTwiceToCreateArcs,
+       tr("Geometric Tool: Click Twice to Create Arcs")},
       {tempToolSwitchTimer,
        tr("Switch Tool Temporarily Keypress Length (ms):")},
 
@@ -1381,13 +1384,17 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
                                           "On Moving Referenced Objects")},
 
       // Preview
+      {defaultViewerEnabled,
+       tr("Preview Movie Formats in Default System Viewer")},
       {blanksCount, tr("Blank Frames:")},
       {blankColor, tr("Blank Frames Color:")},
       {rewindAfterPlayback, tr("Rewind after Playback")},
-      {shortPlayFrameCount, tr("Number of Frames to Play \nfor Short Play:")},
-      {previewAlwaysOpenNewFlip, tr("Display in a New Flipbook Window")},
-      {fitToFlipbook, tr("Fit to Flipbook")},
+      {shortPlayFrameCount,
+       tr("Number of Frames to Play \nfor Short Play Command:")},
       {generatedMovieViewEnabled, tr("Open Flipbook after Rendering")},
+      {previewAlwaysOpenNewFlip, tr("Always Open New Flipbook Window ")},
+      {fitToFlipbookWhenPreview,
+       tr("Fit to Flipbook when Flipbook Window Open")},
 
       // Onion Skin
       {onionSkinEnabled, tr("Onion Skin ON")},
@@ -1575,11 +1582,11 @@ PreferencesPopup::PreferencesPopup()
   // Category List
   QListWidget* categoryList = new QListWidget(this);
   QStringList categories;
-  categories << tr("General") << tr("Interface") << tr("Visualization")
-             << tr("Loading") << tr("Saving") << tr("Import/Export")
-             << tr("Auto Lip-Sync") << tr("Drawing") << tr("Tools")
-             << tr("Xsheet") << tr("Animation") << tr("Preview")
-             << tr("Onion Skin") << tr("Colors") << tr("Version Control")
+  categories << tr("General") << tr("Interface") << tr("Preview/Render")
+             << tr("Load/Import") << tr("Saving") << tr("Decoder/Encoder")
+             << tr("Drawing") << tr("Tools") << tr("Xsheet") << tr("Onion Skin")
+             << tr("Animation") << tr("Auto Lip-Sync") << tr("Colors")
+             << tr("Vector Visualize") << tr("Version Control")
              << tr("Touch/Tablet Settings");
   categoryList->addItems(categories);
   categoryList->setFixedWidth(160);
@@ -1589,18 +1596,18 @@ PreferencesPopup::PreferencesPopup()
   QStackedWidget* stackedWidget = new QStackedWidget(this);
   stackedWidget->addWidget(createGeneralPage());
   stackedWidget->addWidget(createInterfacePage());
-  stackedWidget->addWidget(createVisualizationPage());
+  stackedWidget->addWidget(createPreviewPage());
   stackedWidget->addWidget(createLoadingPage());
   stackedWidget->addWidget(createSavingPage());
-  stackedWidget->addWidget(createImportExportPage());
-  stackedWidget->addWidget(createAutoLipSyncPage());
+  stackedWidget->addWidget(createCodecPage());
   stackedWidget->addWidget(createDrawingPage());
   stackedWidget->addWidget(createToolsPage());
   stackedWidget->addWidget(createXsheetPage());
-  stackedWidget->addWidget(createAnimationPage());
-  stackedWidget->addWidget(createPreviewPage());
   stackedWidget->addWidget(createOnionSkinPage());
+  stackedWidget->addWidget(createAnimationPage());
+  stackedWidget->addWidget(createAutoLipSyncPage());
   stackedWidget->addWidget(createColorsPage());
+  stackedWidget->addWidget(createVisualizationPage());
   stackedWidget->addWidget(createVersionControlPage());
   stackedWidget->addWidget(createTouchTabletPage());
 
@@ -1651,13 +1658,11 @@ QWidget* PreferencesPopup::createGeneralPage() {
   QGridLayout* lay = new QGridLayout();
   setupLayout(lay);
 
-  insertUI(defaultViewerEnabled, lay);
-  insertUI(rasterOptimizedMemory, lay);
   insertUI(startupPopupEnabled, lay);
   insertUI(undoMemorySize, lay);
-  insertUI(taskchunksize, lay);
-  insertUI(sceneNumberingEnabled, lay);
+  insertUI(rasterOptimizedMemory, lay);
   insertUI(watchFileSystemEnabled, lay);
+  insertUI(lazyLoadRooms, lay);
 
   QGridLayout* projectRootLay =
       insertGroupBox(tr("Additional Project Locations"), lay);
@@ -1669,7 +1674,6 @@ QWidget* PreferencesPopup::createGeneralPage() {
   }
 
   insertUI(pathAliasPriority, lay, getComboItemList(pathAliasPriority));
-  insertUI(lazyLoadRooms, lay);
 
   lay->setRowStretch(lay->rowCount(), 1);
   insertFootNote(lay);
@@ -1771,28 +1775,23 @@ QWidget* PreferencesPopup::createInterfacePage() {
   QGridLayout* lay = new QGridLayout();
   setupLayout(lay);
 
-  insertUI(CurrentStyleSheetName, lay, styleSheetItemList);
-  int row = lay->rowCount();
-  lay->addWidget(additionalStyleSheetBtn, row - 1, 2, Qt::AlignRight);
+  insertUI(CurrentLanguageName, lay, languageItemList);
 
-  insertUI(linearUnits, lay, getComboItemList(linearUnits));
-  insertUI(cameraUnits, lay,
-           getComboItemList(linearUnits));  // share items with linearUnits
+  insertDualUIs(linearUnits, cameraUnits, lay, getComboItemList(linearUnits),
+                getComboItemList(linearUnits));
+  // cameraUnits share items with linearUnits
 
   lay->addWidget(new QLabel(tr("Pixels Only:"), this), 5, 0,
                  Qt::AlignRight | Qt::AlignVCenter);
   lay->addWidget(createUI(pixelsOnly), 5, 1, 1, 2, Qt::AlignLeft);
 
-  insertUI(CurrentRoomChoice, lay, roomItemList);
   insertUI(functionEditorToggle, lay, getComboItemList(functionEditorToggle));
-  insertUI(moveCurrentFrameByClickCellArea, lay);
-  insertUI(actualPixelViewOnSceneEditingMode, lay);
-  insertUI(viewerIndicatorEnabled, lay);
-  insertUI(showRasterImagesDarkenBlendedInViewer, lay);
   insertUI(iconSize, lay);
-  insertDualUIs(viewShrink, viewStep, lay);
-  insertUI(viewerZoomCenter, lay, getComboItemList(viewerZoomCenter));
-  insertUI(CurrentLanguageName, lay, languageItemList);
+
+  insertUI(CurrentStyleSheetName, lay, styleSheetItemList);
+  int row = lay->rowCount();
+  lay->addWidget(additionalStyleSheetBtn, row - 1, 2, Qt::AlignRight);
+  insertUI(CurrentRoomChoice, lay, roomItemList);
   insertUI(interfaceFont, lay);  // creates QFontComboBox
   insertUI(interfaceFontStyle, lay, buildFontStyleList());
   qobject_cast<QComboBox*>(m_controlIdMap.key(interfaceFontStyle))
@@ -1936,17 +1935,20 @@ QWidget* PreferencesPopup::createSavingPage() {
   QWidget* widget  = new QWidget(this);
   QGridLayout* lay = new QGridLayout();
   setupLayout(lay);
+
   QGridLayout* autoSaveLay = insertGroupBoxUI(autosaveEnabled, lay);
   {
     insertUI(autosavePeriod, autoSaveLay);
     insertUI(autosaveSceneEnabled, autoSaveLay);
     insertUI(autosaveOtherFilesEnabled, autoSaveLay);
   }
-  insertUI(replaceAfterSaveLevelAs, lay);
   QGridLayout* backupLay = insertGroupBoxUI(backupEnabled, lay);
   {
     insertUI(backupKeepCount, backupLay);
   }
+
+  insertUI(replaceAfterSaveLevelAs, lay);
+  insertUI(resetUndoOnSavingLevel, lay);
   QLabel* matteColorLabel =
       new QLabel(tr("Matte color is used for background when overwriting "
                     "raster levels with transparent pixels\nin non "
@@ -1954,7 +1956,6 @@ QWidget* PreferencesPopup::createSavingPage() {
                  this);
   lay->addWidget(matteColorLabel, lay->rowCount(), 0, 1, 3, Qt::AlignLeft);
   insertUI(rasterBackgroundColor, lay);
-  insertUI(resetUndoOnSavingLevel, lay);
 
   lay->setRowStretch(lay->rowCount(), 1);
   widget->setLayout(lay);
@@ -1963,7 +1964,7 @@ QWidget* PreferencesPopup::createSavingPage() {
 
 //-----------------------------------------------------------------------------
 
-QWidget* PreferencesPopup::createImportExportPage() {
+QWidget* PreferencesPopup::createCodecPage() {
   auto putLabel = [&](const QString& labelStr, QGridLayout* lay) {
     lay->addWidget(new QLabel(labelStr, this), lay->rowCount(), 0, 1, 3,
                    Qt::AlignLeft | Qt::AlignVCenter);
@@ -1987,11 +1988,6 @@ QWidget* PreferencesPopup::createImportExportPage() {
       tr("Note: FFmpeg begins working once all images have been processed."),
       lay);
   insertUI(ffmpegTimeout, lay);
-
-  putLabel(tr("Please indicate where you would like exports from Fast "
-              "Render (MP4) to go."),
-           lay);
-  insertUI(fastRenderPath, lay);
 
   putLabel("", lay);
   putLabel(
@@ -2047,9 +2043,14 @@ QWidget* PreferencesPopup::createDrawingPage() {
 
   insertUI(DefRasterFormat, lay, getComboItemList(DefRasterFormat));
   insertUI(DefLevelType, lay, getComboItemList(DefLevelType));
-  insertUI(newLevelSizeToCameraSizeEnabled, lay);
-  insertDualUIs(DefLevelWidth, DefLevelHeight, lay);
-  insertUI(DefLevelDpi, lay);
+  QGridLayout* defaultLevelSizeLay =
+      insertGroupBox(tr("Default Level Size"), lay);
+  {
+    insertDualUIs(DefLevelWidth, DefLevelHeight, defaultLevelSizeLay);
+    insertUI(DefLevelDpi, defaultLevelSizeLay);
+    insertUI(newLevelSizeToCameraSizeEnabled, defaultLevelSizeLay);
+  }
+
   QGridLayout* autoCreationLay = insertGroupBoxUI(EnableAutocreation, lay);
   {
     insertUI(NumberingSystem, autoCreationLay,
@@ -2058,17 +2059,10 @@ QWidget* PreferencesPopup::createDrawingPage() {
     insertUI(EnableCreationInHoldCells, autoCreationLay);
     insertUI(EnableAutoRenumber, autoCreationLay);
   }
-  insertUI(vectorSnappingTarget, lay, getComboItemList(vectorSnappingTarget));
   insertUI(saveUnpaintedInCleanup, lay);
-  insertUI(minimizeSaveboxAfterEditing, lay);
   insertUI(useNumpadForSwitchingStyles, lay);
   insertUI(downArrowInLevelStripCreatesNewFrame, lay);
-  QGridLayout* replaceVectorsLay = insertGroupBox(
-      tr("Replace Vectors with Simplified Vectors Command"), lay);
-  {
-    insertUI(keepFillOnVectorSimplify, replaceVectorsLay);
-    insertUI(useHigherDpiOnVectorSimplify, replaceVectorsLay);
-  }
+
   lay->setRowStretch(lay->rowCount(), 1);
   widget->setLayout(lay);
 
@@ -2097,11 +2091,18 @@ QWidget* PreferencesPopup::createToolsPage() {
 
   // insertUI(dropdownShortcutsCycleOptions, lay,
   //         getComboItemList(dropdownShortcutsCycleOptions));
-  insertUI(PreferencesItemId::DefRegionWithPaint, lay);
-  insertUI(PreferencesItemId::ReferFillPrevailing, lay);
-  insertUI(FillOnlysavebox, lay);
-  insertUI(multiLayerStylePickerEnabled, lay);
-  QGridLayout* cursorOptionsLay = insertGroupBox(tr("Cursor Options"), lay);
+  insertUI(levelBasedToolsDisplay, lay,
+           getComboItemList(levelBasedToolsDisplay));
+  QGridLayout* fillToolOptionsLay =
+      insertGroupBox(tr("Fill Tool Options (Toonz Raster Level)"), lay);
+  {
+    insertUI(DefRegionWithPaint, fillToolOptionsLay);
+    insertUI(ReferFillPrevailing, fillToolOptionsLay);
+    insertUI(FillOnlysavebox, fillToolOptionsLay);
+  }
+  insertUI(minimizeSaveboxAfterEditing, lay);
+  QGridLayout* cursorOptionsLay =
+      insertGroupBox(tr("Brush Cursor Options"), lay);
   {
     insertUI(cursorBrushType, cursorOptionsLay,
              getComboItemList(cursorBrushType));
@@ -2110,8 +2111,16 @@ QWidget* PreferencesPopup::createToolsPage() {
     insertUI(cursorOutlineEnabled, cursorOptionsLay);
     insertUI(useStrokeEndCursor, cursorOptionsLay);
   }
-  insertUI(levelBasedToolsDisplay, lay,
-           getComboItemList(levelBasedToolsDisplay));
+
+  insertUI(vectorSnappingTarget, lay, getComboItemList(vectorSnappingTarget));
+  QGridLayout* replaceVectorsLay = insertGroupBox(
+      tr("Replace Vectors with Simplified Vectors Command"), lay);
+  {
+    insertUI(keepFillOnVectorSimplify, replaceVectorsLay);
+    insertUI(useHigherDpiOnVectorSimplify, replaceVectorsLay);
+  }
+
+  insertUI(multiLayerStylePickerEnabled, lay);
   insertUI(useCtrlAltToResizeBrush, lay);
   insertUI(clickTwiceToCreateArcs, lay);
   insertUI(tempToolSwitchTimer, lay);
@@ -2137,36 +2146,43 @@ QWidget* PreferencesPopup::createXsheetPage() {
   insertUI(xsheetLayoutPreference, lay,
            getComboItemList(xsheetLayoutPreference));
   insertUI(levelNameDisplayType, lay, getComboItemList(levelNameDisplayType));
-  insertUI(linkColumnNameWithLevel, lay);
   insertUI(xsheetStep, lay);
-  insertUI(xsheetAutopanEnabled, lay);
+  insertUI(moveCurrentFrameByClickCellArea, lay);
   insertUI(alwaysDragFrameCell, lay);
   insertUI(DragCellsBehaviour, lay, getComboItemList(DragCellsBehaviour));
   insertUI(deleteCommandBehavior, lay, getComboItemList(deleteCommandBehavior));
   insertUI(pasteCellsBehavior, lay, getComboItemList(pasteCellsBehavior));
   insertUI(cellInputMethod, lay, getComboItemList(cellInputMethod));
-  insertUI(ignoreAlphaonColumn1Enabled, lay);
+  
+  QGridLayout* xshColHeaderLay = insertGroupBox(tr("Xsheet Column Area"), lay);
+  {
+    insertUI(linkColumnNameWithLevel, xshColHeaderLay);
+    insertUI(showColumnNumbers, xshColHeaderLay);
+    insertUI(unifyColumnVisibilityToggles, xshColHeaderLay);
+    insertUI(parentColorsInXsheetColumn, xshColHeaderLay);
+  }
+  QGridLayout* xshCellAreaLay = insertGroupBox(tr("Xsheet Cell Area"), lay);
+  {
+    insertUI(highlightLineEverySecond, xshCellAreaLay);
+    insertUI(currentTimelineEnabled, xshCellAreaLay);
+    insertUI(showFrameNumberWithLetters, xshCellAreaLay);
+  }
+
   QGridLayout* showKeyLay =
       insertGroupBoxUI(showKeyframesOnXsheetCellArea, lay);
-  {
-    insertUI(showXsheetCameraColumn, showKeyLay);
-  }
-  insertUI(useArrowKeyToShiftCellSelection, lay);
-  insertUI(shortcutCommandsWhileRenamingCellEnabled, lay);
+  insertUI(showXsheetCameraColumn, showKeyLay);
+
   QGridLayout* xshToolbarLay = insertGroupBox(tr("Xsheet Tools"), lay);
   {
     insertUI(showXSheetToolbar, xshToolbarLay);
     insertUI(showXsheetBreadcrumbs, xshToolbarLay);
     insertUI(expandFunctionHeader, xshToolbarLay);
   }
-  insertUI(showColumnNumbers, lay);
-  insertUI(unifyColumnVisibilityToggles, lay);
-  insertUI(parentColorsInXsheetColumn, lay);
-  insertUI(highlightLineEverySecond, lay);
+
+  insertUI(useArrowKeyToShiftCellSelection, lay);
+  insertUI(shortcutCommandsWhileRenamingCellEnabled, lay);
   insertUI(syncLevelRenumberWithXsheet, lay);
-  insertUI(currentTimelineEnabled, lay);
   insertUI(currentColumnColor, lay);
-  insertUI(showFrameNumberWithLetters, lay);
 
   lay->setRowStretch(lay->rowCount(), 1);
   insertFootNote(lay);
@@ -2222,13 +2238,41 @@ QWidget* PreferencesPopup::createPreviewPage() {
   QGridLayout* lay = new QGridLayout();
   setupLayout(lay);
 
-  insertUI(blanksCount, lay);
-  insertUI(blankColor, lay);
-  insertUI(rewindAfterPlayback, lay);
-  insertUI(shortPlayFrameCount, lay);
-  insertUI(previewAlwaysOpenNewFlip, lay);
-  insertUI(fitToFlipbook, lay);
-  insertUI(generatedMovieViewEnabled, lay);
+  QGridLayout* viewerLay = insertGroupBox(tr("Viewer"), lay);
+  {
+    insertDualUIs(viewShrink, viewStep, viewerLay);
+    insertUI(viewerZoomCenter, viewerLay, getComboItemList(viewerZoomCenter));
+    insertUI(ignoreAlphaonColumn1Enabled, viewerLay);
+    insertUI(actualPixelViewOnSceneEditingMode, viewerLay);
+    insertUI(showRasterImagesDarkenBlendedInViewer, viewerLay);
+    insertUI(viewerIndicatorEnabled, viewerLay);
+  }
+  QGridLayout* palyControlLay = insertGroupBox(tr("Play Control"), lay);
+  {
+    insertUI(xsheetAutopanEnabled, lay);
+    insertUI(rewindAfterPlayback, palyControlLay);
+    insertUI(blanksCount, palyControlLay);
+    insertUI(blankColor, palyControlLay);
+    insertUI(shortPlayFrameCount, palyControlLay);
+  }
+  QGridLayout* previewLay = insertGroupBox(tr("Preview"), lay);
+  {
+    insertUI(generatedMovieViewEnabled, previewLay);
+    insertUI(fitToFlipbookWhenPreview, previewLay);
+    insertUI(previewAlwaysOpenNewFlip, previewLay);
+    insertUI(defaultViewerEnabled, previewLay);
+  }
+  QGridLayout* renderLay = insertGroupBox(tr("Render"), lay);
+  {
+    insertUI(sceneNumberingEnabled, renderLay);
+    insertUI(taskchunksize, renderLay);
+    renderLay->addWidget(
+        new QLabel(tr("Please indicate where you would like exports from Fast "
+                      "Render (MP4) to go."),
+                   this),
+        renderLay->rowCount(), 0, 1, 3, Qt::AlignLeft | Qt::AlignVCenter);
+    insertUI(fastRenderPath, renderLay);
+  }
 
   lay->setRowStretch(lay->rowCount(), 1);
   widget->setLayout(lay);

@@ -472,7 +472,7 @@ public:
   bool previewAlwaysOpenNewFlipEnabled() const {
     return getBoolValue(previewAlwaysOpenNewFlip);
   }
-  bool fitToFlipbookEnabled() const { return getBoolValue(fitToFlipbook); }
+  bool fitToFlipbookEnabled() const { return getBoolValue(fitToFlipbookWhenPreview); }
   bool isGeneratedMovieViewEnabled() const {
     return getBoolValue(generatedMovieViewEnabled);
   }

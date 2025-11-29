@@ -107,7 +107,7 @@ private:
   QWidget* createVisualizationPage();
   QWidget* createLoadingPage();
   QWidget* createSavingPage();
-  QWidget* createImportExportPage();
+  QWidget* createCodecPage();
   QWidget* createAutoLipSyncPage();
   QWidget* createDrawingPage();
   QWidget* createToolsPage();
