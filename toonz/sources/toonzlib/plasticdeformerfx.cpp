@@ -171,7 +171,7 @@ void PlasticDeformerFx::buildRenderSettings(double frame,
   // As previously noted, this FX is capable of handling affine transformations.
   // Therefore, it can determine the most suitable input reference to work with.
   // The best approach is to delegate this decision to the *input FX* itself,
-  // by calling its handledAffine() method to obtain the appropriate affine reference.
+  // via handledAffine() to get the appropriate affine reference
   m_was64bit = false;
   if (info.m_bpp == 64) {
     m_was64bit = true;
@@ -184,7 +184,8 @@ void PlasticDeformerFx::buildRenderSettings(double frame,
 
 bool PlasticDeformerFx::buildTextureDataSl(double frame, TRenderSettings &info,
                                            TAffine &worldLevelToLevelAff) {
-  int row = (int)frame;
+  // Round instead of truncate for sub-xsheet compatibility
+  int row = tround(frame);
 
   // Initialize level variables
   TLevelColumnFx *lcfx       = (TLevelColumnFx *)m_port.getFx();
@@ -251,7 +252,8 @@ void PlasticDeformerFx::doCompute(TTile &tile, double frame,
     return;
   }
 
-  int row = (int)frame;
+  // Round instead of truncate for sub-xsheet compatibility
+  int row = tround(frame);
 
   // Build texture data
   TRenderSettings texInfo(info);
@@ -461,7 +463,8 @@ void PlasticDeformerFx::doDryCompute(TRectD &rect, double frame,
                                      const TRenderSettings &info) {
   if (!m_port.isConnected()) return;
 
-  int row = (int)frame;
+  // Round instead of truncate for sub-xsheet compatibility
+  int row = tround(frame);
 
   TRenderSettings texInfo(info);
   TAffine worldTexLevelToTexLevelAff;
