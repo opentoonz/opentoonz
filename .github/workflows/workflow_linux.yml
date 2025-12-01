@@ -32,7 +32,7 @@ jobs:
             cc: clang
             cxx: clang++
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
 
     - name: Install libraries
       run: |
@@ -108,7 +108,7 @@ jobs:
         mv artifact ${ARTIFACT_NAME}
         tar zcf ${ARTIFACT_NAME}.tar.gz ${ARTIFACT_NAME}
 
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v5
       with:
         name: Opentoonz-${{ runner.os }}-${{ matrix.compiler }}-${{ github.sha }}
         path: toonz/build/Opentoonz-${{ runner.os }}-${{ matrix.compiler }}-${{ github.sha }}.tar.gz
