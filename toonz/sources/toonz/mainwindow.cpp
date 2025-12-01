@@ -644,7 +644,7 @@ void MainWindow::readSettings(const QString &argumentLayoutFileName) {
   QString currentRoomName = QString::fromUtf8(name.c_str());
   Room::RoomLoadParams params;
   params.activeRoomName = currentRoomName;
-  params.forceBuildGui = !Preferences::instance()->isLazyLoadRoomsEnabled();
+  params.forceBuildGui  = !Preferences::instance()->isLazyLoadRoomsEnabled();
 
   for (int i = 0; i < (int)roomPaths.size(); i++) {
     TFilePath roomPath = roomPaths[i];
@@ -1847,6 +1847,9 @@ void MainWindow::defineActions() {
       QT_TRANSLATE_NOOP("MainWindow",
                         "Export Exchange Digital Time Sheet (XDTS)"),
       "");
+  createMenuFileAction(
+      MI_ExportSXF,
+      QT_TRANSLATE_NOOP("MainWindow", "Export Stylos Exchange Format(SXF)"), "");
   createMenuFileAction(
       MI_ExportOCA,
       QT_TRANSLATE_NOOP("MainWindow", "Export Open Cel Animation (OCA)"), "",

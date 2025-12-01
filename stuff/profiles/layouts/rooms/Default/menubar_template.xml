@@ -30,6 +30,7 @@
             <command>MI_ExportCurrentScene</command>		
             <command>MI_SoundTrack</command>
             <command>MI_ExportXDTS</command>
+            <command>MI_ExportSXF</command>
             <command>MI_ExportOCA</command>
             <command>MI_StopMotionExportImageSequence</command>
             <command>MI_ExportTvpJson</command>
