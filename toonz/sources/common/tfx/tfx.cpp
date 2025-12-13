@@ -13,6 +13,7 @@
 
 // STD includes
 #include <set>
+#include <memory>  // For std::unique_ptr
 
 #include "tfx.h"
 
@@ -145,7 +146,7 @@ public:
   std::wstring m_name;
   std::wstring m_fxId;
 
-  PortTable m_portTable;  //!< Name -> port  map
+  PortTable m_portTable;  //!< Name -> port map
   PortArray m_portArray;  //!< Ports container
 
   TParamContainer m_paramContainer;
@@ -212,7 +213,7 @@ public:
   }
 
   void add(const TFxInfo &info, TFxDeclaration *decl) {
-    // check for dups ???
+    // check for duplicates ???
     std::pair<TFxInfo, TFxDeclaration *> p(info, decl);
     m_table[info.m_name] = p;
   }
@@ -335,14 +336,21 @@ TFx *TFx::clone(TFx *fx, bool recursive) const {
       const NamePort &namedPort = m_imp->m_portArray[p];
 
       int groupIdx = namedPort.second->getGroupIndex();
-      if (groupIdx >= 0 && !fx->getInputPort(namedPort.first))
-        fx->addInputPort(namedPort.first, new TRasterFxPort, groupIdx);
+      if (groupIdx >= 0 && !fx->getInputPort(namedPort.first)) {
+        // Fix: Use unique_ptr to prevent memory leak
+        std::unique_ptr<TRasterFxPort> port(new TRasterFxPort());
+        if (fx->addInputPort(namedPort.first, port.get(), groupIdx)) {
+          // Successfully added, release ownership to fx
+          port.release();
+        }
+        // If addInputPort fails, unique_ptr will automatically delete the port
+      }
     }
 
     assert(pCount == fx->getInputPortCount());
   }
 
-  // copia ricorsiva sulle porte
+  // Recursive copy on ports
   if (recursive) {
     int p, pCount = getInputPortCount();
     for (p = 0; p != pCount; ++p) {
@@ -362,7 +370,7 @@ void TFx::linkParams(TFx *fx) {
   getParams()->link(fx->getParams());
   m_imp->m_activeTimeRegion = fx->m_imp->m_activeTimeRegion;
 
-  // aggiorno i link
+  // Update links
   assert(m_imp->checkLinks());
   assert(fx->m_imp->checkLinks());
 
@@ -376,7 +384,7 @@ void TFx::linkParams(TFx *fx) {
 //--------------------------------------------------
 
 void TFx::unlinkParams() {
-  // clone dei parametri
+  // Clone parameters
   getParams()->unlink();
 
   assert(m_imp->m_prev);
@@ -398,7 +406,7 @@ bool TFx::addInputPort(const std::string &name, TFxPort &port) {
 
   m_imp->m_portTable[name] = &port;
   m_imp->m_portArray.push_back(NamePort(name, &port));
-  port.setOwnerFx(this);  // back pointer to the owner...
+  port.setOwnerFx(this);  // Back pointer to the owner
 
   return true;
 }
@@ -416,6 +424,9 @@ bool TFx::addInputPort(const std::string &name, TFxPort *port, int groupIndex) {
     return false;
   }
 
+  // Use RAII to manage port memory in case of exceptions
+  std::unique_ptr<TFxPort> portGuard(port);
+
   if (!addInputPort(name, *port)) return false;
 
   // Assign the port to the associated group
@@ -426,6 +437,8 @@ bool TFx::addInputPort(const std::string &name, TFxPort *port, int groupIndex) {
 
   assert(name.find(group->m_portsPrefix) == 0);
 
+  // Success - release ownership from portGuard
+  portGuard.release();
   return true;
 }
 
@@ -701,12 +714,12 @@ void TFx::setNewIdentifier() { m_imp->m_id = ++m_imp->m_nextId; }
 //--------------------------------------------------
 
 void TFx::loadData(TIStream &is) {
-  // default version of fx is 1
+  // Default version of fx is 1
   setFxVersion(1);
 
   std::string tagName;
   VersionNumber tnzVersion = is.getVersion();
-  // Prevent to load "params" tag under "super" tag on saving macro fx.
+  // Prevent loading "params" tag under "super" tag when saving macro fx.
   // For now "params" tag is no longer saved under "super" tag.
   // This is for keeping compatibility with older versions.
   bool isInSuperTag = (is.getCurrentTagName() == "super");
@@ -714,7 +727,7 @@ void TFx::loadData(TIStream &is) {
   QList<std::wstring> groupNames;
   while (is.openChild(tagName)) {
     if (tagName == "params") {
-      if (isInSuperTag) {  // skip loading "params" tag under "super" tag
+      if (isInSuperTag) {  // Skip loading "params" tag under "super" tag
         is.skipCurrentTag();
         continue;
       }
@@ -726,7 +739,7 @@ void TFx::loadData(TIStream &is) {
             paramVar->getParam()->loadData(is);
             if (paramVar->isObsolete())
               onObsoleteParamLoaded(paramVar->getParam()->getName());
-          } else  // il parametro non e' presente -> skip
+          } else  // Parameter not present -> skip
             skipChild(is);
 
           is.closeChild();
@@ -755,7 +768,15 @@ void TFx::loadData(TIStream &is) {
               TFxPortDG *group = const_cast<TFxPortDG *>(dynamicPortGroup(g));
 
               if (group->contains(portName)) {
-                addInputPort(portName, port = new TRasterFxPort, g);
+                // Fix: Use unique_ptr to prevent memory leak
+                std::unique_ptr<TRasterFxPort> tempPort(new TRasterFxPort());
+                if (addInputPort(portName, tempPort.get(), g)) {
+                  // Successfully added, assign and release ownership
+                  port = tempPort.release();
+                } else {
+                  // Failed to add, set port to nullptr (will throw below)
+                  port = nullptr;
+                }
                 break;
               }
             }
@@ -791,9 +812,8 @@ void TFx::loadData(TIStream &is) {
       assert(passiveCacheId > 0);
       TPassiveCacheManager::instance()->declareCached(this, passiveCacheId);
     } else if (tagName == "name") {
-      // passo attraverso un filepath solo per evitare i problemi di blank
-      // o caratteri strani dentro il nome (sospetto che tfilepath sia gestito
-      // correttamente mentre wstring no
+      // Use TFilePath to avoid issues with blanks or strange characters in the
+      // name (suspect that TFilePath is handled correctly while wstring is not)
       TFilePath tmp;
       is >> tmp;
       setName(tmp.getWideName());
@@ -843,10 +863,10 @@ void TFx::loadData(TIStream &is) {
 //--------------------------------------------------
 
 void TFx::saveData(TOStream &os) {
-  // Prevent to save "params" tag under "super" tag on saving macro fx.
+  // Prevent saving "params" tag under "super" tag when saving macro fx.
   // Parameters for macro fx are saved in "nodes" tag and corrected upon
   // loading. Therefore, "params" tag is not needed and even causes crash if
-  // macrofx contains CurveFx (See the issue #2424)
+  // macrofx contains CurveFx (See issue #2424)
   bool isInSuperTag  = (os.getCurrentTagName() == "super");
   TFx *linkedSetRoot = this;
   if (m_imp->m_next != m_imp) {
@@ -860,12 +880,12 @@ void TFx::saveData(TOStream &os) {
     assert(linkedSetRoot);
   }
   if (linkedSetRoot == this) {
-    if (!isInSuperTag) {  // skip saving "params" tag under "super" tag
+    if (!isInSuperTag) {  // Skip saving "params" tag under "super" tag
       os.openChild("params");
       for (int i = 0; i < getParams()->getParamCount(); i++) {
         std::string paramName     = getParams()->getParamName(i);
         const TParamVar *paramVar = getParams()->getParamVar(i);
-        // skip saving for the obsolete parameters
+        // Skip saving for obsolete parameters
         if (paramVar->isObsolete()) continue;
         os.openChild(paramName);
         paramVar->getParam()->saveData(os);
@@ -933,8 +953,8 @@ void TFx::loadPreset(TIStream &is) {
           try {
             TParamP param = getParams()->getParam(paramName);
             param->loadData(is);
-          } catch (TException &) { /*skip*/
-          }                        // il parametro non e' presente
+          } catch (TException &) { /* Skip */
+          }  // Parameter not present
           is.closeChild();
         }
       }
