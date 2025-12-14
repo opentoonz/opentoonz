@@ -2785,8 +2785,8 @@ void ExportXsheetPdfPopup::onExportCSV() {
       //add cell number
       if (cell.m_level)
           csvCol.append(QString::number(cell.m_frameId.getNumber()));
-      else// TODO: Fix corrupted encoding (unknown characters)
-          csvCol.append(QString::fromUtf8("\u00D7"));
+      else
+        csvCol.append(QChar(0x00D7));// Stop Marker: Cross
       
       prevCell = cell;
       }
