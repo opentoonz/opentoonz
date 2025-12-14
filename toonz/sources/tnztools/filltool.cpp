@@ -2465,6 +2465,7 @@ bool FillTool::onPropertyChanged(std::string propertyName, bool addToUndo) {
   else if (propertyName == m_onion.getName()) {
     if (m_onion.getValue()) FillType = ::to_string(m_fillType.getValue());
     FillOnion = (int)(m_onion.getValue());
+    rectPropChangedflag = true;
   }
   // Frame Range
   else if (propertyName == m_frameRange.getName()) {
@@ -2549,7 +2550,7 @@ bool FillTool::onPropertyChanged(std::string propertyName, bool addToUndo) {
     }
   }
 
-  /*--- fillType, frameRange, selective, colorTypeが変わったとき ---*/
+  /*--- fillType, frameRange, selective, onionSkin, colorTypeが変わったとき ---*/
   if (rectPropChangedflag && m_fillType.getValue() != NORMALFILL) {
     AreaFillTool::Type type;
     if (m_fillType.getValue() == RECTFILL)
