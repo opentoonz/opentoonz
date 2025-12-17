@@ -12,8 +12,7 @@
 #include <QLabel>
 #include <QCheckBox>
 
-// forward declaration
-class QLabel;
+// Forward declarations
 class TXshSimpleLevel;
 class TXshChildLevel;
 class TFrameId;
@@ -25,6 +24,7 @@ class TFrameId;
 class LipSyncPopup final : public DVGui::Dialog {
   Q_OBJECT
 
+  // Phoneme labels
   QLabel *m_aiLabel;
   QLabel *m_oLabel;
   QLabel *m_eLabel;
@@ -36,11 +36,14 @@ class LipSyncPopup final : public DVGui::Dialog {
   QLabel *m_restLabel;
   QLabel *m_otherLabel;
 
+  // UI elements
   QLabel *m_imageLabels[10];
   QLabel *m_textLabels[10];
   QPushButton *m_navButtons[20];
   QPixmap m_pixmaps[10];
   QPushButton *m_applyButton;
+
+  // Data members
   std::vector<TFrameId> m_levelFrameIds;
   std::vector<TFrameId> m_activeFrameIds;
   DVGui::FileField *m_file;
@@ -56,10 +59,17 @@ class LipSyncPopup final : public DVGui::Dialog {
 
 public:
   LipSyncPopup();
+  ~LipSyncPopup() override;
 
 protected:
-  void showEvent(QShowEvent *) override;
-  void paintEvent(QPaintEvent *) override;
+  void showEvent(QShowEvent *event) override;
+  void hideEvent(QHideEvent *event) override;
+  void paintEvent(QPaintEvent *event) override;
+
+  // Helper functions
+  void generateThumbnails();
+  void updateThumbnail(int index);
+  void onIconGenerated();
 
 public slots:
   void onApplyButton();

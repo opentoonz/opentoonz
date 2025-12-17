@@ -16,7 +16,7 @@
 #include <QMediaPlayer>
 #include <QTimer>
 
-// forward declaration
+// Forward declarations
 class QLabel;
 class TXshSimpleLevel;
 class TXshChildLevel;
@@ -26,6 +26,10 @@ class QTextEdit;
 class QIcon;
 class QProcess;
 class QGroupBox;
+class QFrame;
+class QShowEvent;
+class QHideEvent;
+class QPaintEvent;
 
 //=============================================================================
 // AutoLipSyncPopup
@@ -73,7 +77,6 @@ class AutoLipSyncPopup final : public DVGui::Dialog {
   QLabel *m_scriptLabel;
   QLabel *m_columnLabel;
   QLabel *m_insertAtLabel;
-  QGroupBox *m_rhubarbBox;
   bool m_deleteFile = false;
   DVGui::ProgressDialog *m_progressDialog;
   QProcess *m_rhubarb;
@@ -85,14 +88,20 @@ class AutoLipSyncPopup final : public DVGui::Dialog {
 
 public:
   AutoLipSyncPopup();
+  ~AutoLipSyncPopup() override;  // Added destructor
 
 protected:
-  void showEvent(QShowEvent *) override;
-  void hideEvent(QHideEvent *) override;
-  void paintEvent(QPaintEvent *) override;
+  void showEvent(QShowEvent *event) override;
+  void hideEvent(QHideEvent *event) override;
+  void paintEvent(QPaintEvent *event) override;
   void refreshSoundLevels();
   void saveAudio();
   void runRhubarb();
+
+  // New function to generate thumbnails
+  void generateThumbnails();
+  void updateThumbnail(int index);
+  void onIconGenerated();
 
 public slots:
   void onApplyButton();
@@ -107,4 +116,4 @@ public slots:
   void onAudioTimeout();
 };
 
-#endif  // LIPSYNCPOPUP_H
+#endif  // AUTOLIPSYNCPOPUP_H
