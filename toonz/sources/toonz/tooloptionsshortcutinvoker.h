@@ -48,7 +48,9 @@ class DoubleWorker : public QObject {
 public:
   DoubleWorker(QObject* parent, TTool* tool, TDoubleProperty* property)
       : QObject(parent), m_tool(tool), m_property(property) {}
-protected slots:
+// Slots made public to allow direct Qt connections from ToolOptionsShortcutInvoker
+// (Qt meta-object system requires public visibility for slots)
+public slots:
   void increase(double step = 1.0);
   void increaseFractional();
   void decrease(double step = 1.0);
@@ -65,7 +67,8 @@ class DoublePairWorker : public QObject {
 public:
   DoublePairWorker(QObject* parent, TTool* tool, TDoublePairProperty* property)
       : QObject(parent), m_tool(tool), m_property(property) {}
-protected slots:
+
+public slots:
   void increaseMaxValue();
   void decreaseMaxValue();
   void increaseMinValue();
@@ -82,7 +85,8 @@ class IntPairWorker : public QObject {
 public:
   IntPairWorker(QObject* parent, TTool* tool, TIntPairProperty* property)
       : QObject(parent), m_tool(tool), m_property(property) {}
-protected slots:
+
+public slots:
   void increaseMaxValue();
   void decreaseMaxValue();
   void increaseMinValue();
@@ -99,7 +103,8 @@ class IntWorker : public QObject {
 public:
   IntWorker(QObject* parent, TTool* tool, TIntProperty* property)
       : QObject(parent), m_tool(tool), m_property(property) {}
-protected slots:
+
+public slots:
   void increase();
   void decrease();
 };
@@ -117,7 +122,8 @@ public:
              QAction* action)
       : QObject(parent), m_tool(tool), m_property(property), m_action(action) {}
   void syncActionState();
-protected slots:
+
+public slots:
   void doCheck(bool);
 };
 
@@ -131,7 +137,8 @@ class EnumWorker : public QObject {
 public:
   EnumWorker(QObject* parent, TTool* tool, TEnumProperty* property)
       : QObject(parent), m_tool(tool), m_property(property) {}
-protected slots:
+
+public slots:
   void cycleOptions();
   void doOnActivated(int);
 };
@@ -143,7 +150,7 @@ class ToolOptionsShortcutInvoker : public QObject  // singleton
 {
   Q_OBJECT
   QSet<TTool*> m_tools;
-  //ÉcÅ[ÉãÇ™êÿÇËë÷ÇÌÇ¡ÇΩÇÁ ActionÇÃCheckèÛë‘ÇìØä˙Ç≥ÇπÇÈ
+  // When tool is switched, synchronize Action's Check state
   QMultiMap<TTool*, ToolOptionsShortcutWorker::BoolWorker*> m_checkProps;
 
 public:
@@ -154,6 +161,7 @@ public:
 
 private:
   ToolOptionsShortcutInvoker(){};
+
 protected slots:
   void onToolSwitched();
 
