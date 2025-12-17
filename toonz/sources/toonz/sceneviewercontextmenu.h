@@ -15,6 +15,7 @@ class SceneViewerContextMenu final : public QMenu {
   SceneViewer *m_viewer;
   int m_groupIndexToBeEntered;
 
+  // Helper methods for adding menu commands
   void addShowHideCommand(QMenu *menu, TXshColumn *column);
   void addSelectCommand(QMenu *menu, const TStageObjectId &id);
 
@@ -22,23 +23,19 @@ public:
   SceneViewerContextMenu(SceneViewer *parent);
   ~SceneViewerContextMenu();
 
+  // Add commands for entering/exiting vector image groups
   void addEnterGroupCommands(const TPointD &pos);
+
+  // Add commands for level operations (show/hide, select)
   void addLevelCommands(std::vector<int> &indices);
 
 public slots:
-
-  void savePreviewedFrames();
-
+  // Vector image group operations (used by CommandManager actions)
   void enterVectorImageGroup();
   void exitVectorImageGroup();
-  void setGuidedDrawingType(QAction *);
-  void setGuidedAutoInbetween();
-  void setGuidedInterpolationState(QAction *);
-
-  void onShowHide();
-  void onSetCurrent();
 };
 
+// Helper GUI class for toggling zero thickness lines visibility
 namespace ZeroThickToggleGui {
 void addZeroThickCommand(QMenu *menu);
 
@@ -49,9 +46,9 @@ public slots:
   void activate();
   void deactivate();
 };
+}  // namespace ZeroThickToggleGui
 
-}  // Namespace ZeroThickToggleGui
-
+// Helper GUI class for toggling cursor outline visibility
 namespace CursorOutlineToggleGui {
 void addCursorOutlineCommand(QMenu *menu);
 
@@ -62,9 +59,9 @@ public slots:
   void activate();
   void deactivate();
 };
+}  // namespace CursorOutlineToggleGui
 
-}  // Namespace CursorOutlineToggleGui
-
+// Helper GUI class for toggling viewer indicators visibility
 namespace ViewerIndicatorToggleGui {
 void addViewerIndicatorCommand(QMenu *menu);
 
@@ -75,7 +72,6 @@ public slots:
   void activate();
   void deactivate();
 };
-
-}  // Namespace ViewerIndicatorToggleGui
+}  // namespace ViewerIndicatorToggleGui
 
 #endif

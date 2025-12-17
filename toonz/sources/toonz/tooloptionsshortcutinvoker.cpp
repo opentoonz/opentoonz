@@ -1,3 +1,5 @@
+
+
 #include "tooloptionsshortcutinvoker.h"
 
 #include "tapp.h"
@@ -8,8 +10,6 @@
 
 #include "toonzqt/menubarcommand.h"
 #include "menubarcommandids.h"
-
-#include <QSignalMapper>
 
 using namespace ToolOptionsShortcutWorker;
 
@@ -30,21 +30,25 @@ void ToolOptionShortcutConnector::visit(TDoubleProperty* p) {
   QAction* a;
   if (p->getName() == "Size:") {
     a = cm->getAction("A_IncreaseMaxBrushThickness");
-    QObject::connect(a, SIGNAL(triggered()), worker, SLOT(increase()));
+    QObject::connect(a, &QAction::triggered, worker,
+                     [worker]() { worker->increase(); });
     a = cm->getAction("A_DecreaseMaxBrushThickness");
-    QObject::connect(a, SIGNAL(triggered()), worker, SLOT(decrease()));
+    QObject::connect(a, &QAction::triggered, worker,
+                     [worker]() { worker->decrease(); });
   } else if (p->getName() == "ModifierSize") {
     a = cm->getAction("A_IncreaseMaxBrushThickness");
-    QObject::connect(a, SIGNAL(triggered()), worker,
-                     SLOT(increaseFractional()));
+    QObject::connect(a, &QAction::triggered, worker,
+                     [worker]() { worker->increaseFractional(); });
     a = cm->getAction("A_DecreaseMaxBrushThickness");
-    QObject::connect(a, SIGNAL(triggered()), worker,
-                     SLOT(decreaseFractional()));
+    QObject::connect(a, &QAction::triggered, worker,
+                     [worker]() { worker->decreaseFractional(); });
   } else if (p->getName() == "Hardness:") {
     a = cm->getAction("A_IncreaseBrushHardness");
-    QObject::connect(a, SIGNAL(triggered()), worker, SLOT(increase()));
+    QObject::connect(a, &QAction::triggered, worker,
+                     [worker]() { worker->increase(); });
     a = cm->getAction("A_DecreaseBrushHardness");
-    QObject::connect(a, SIGNAL(triggered()), worker, SLOT(decrease()));
+    QObject::connect(a, &QAction::triggered, worker,
+                     [worker]() { worker->decrease(); });
   }
 }
 
@@ -58,14 +62,18 @@ void ToolOptionShortcutConnector::visit(TDoublePairProperty* p) {
   CommandManager* cm       = CommandManager::instance();
   QAction* a;
   a = cm->getAction("A_IncreaseMaxBrushThickness");
-  QObject::connect(a, SIGNAL(triggered()), worker, SLOT(increaseMaxValue()));
+  QObject::connect(a, &QAction::triggered, worker,
+                   [worker]() { worker->increaseMaxValue(); });
   a = cm->getAction("A_DecreaseMaxBrushThickness");
-  QObject::connect(a, SIGNAL(triggered()), worker, SLOT(decreaseMaxValue()));
+  QObject::connect(a, &QAction::triggered, worker,
+                   [worker]() { worker->decreaseMaxValue(); });
 
   a = cm->getAction("A_IncreaseMinBrushThickness");
-  QObject::connect(a, SIGNAL(triggered()), worker, SLOT(increaseMinValue()));
+  QObject::connect(a, &QAction::triggered, worker,
+                   [worker]() { worker->increaseMinValue(); });
   a = cm->getAction("A_DecreaseMinBrushThickness");
-  QObject::connect(a, SIGNAL(triggered()), worker, SLOT(decreaseMinValue()));
+  QObject::connect(a, &QAction::triggered, worker,
+                   [worker]() { worker->decreaseMinValue(); });
 }
 
 //-----------------------------------------------------------------
@@ -80,14 +88,18 @@ void ToolOptionShortcutConnector::visit(TIntPairProperty* p) {
   CommandManager* cm                  = CommandManager::instance();
   QAction* a;
   a = cm->getAction("A_IncreaseMaxBrushThickness");
-  QObject::connect(a, SIGNAL(triggered()), worker, SLOT(increaseMaxValue()));
+  QObject::connect(a, &QAction::triggered, worker,
+                   [worker]() { worker->increaseMaxValue(); });
   a = cm->getAction("A_DecreaseMaxBrushThickness");
-  QObject::connect(a, SIGNAL(triggered()), worker, SLOT(decreaseMaxValue()));
+  QObject::connect(a, &QAction::triggered, worker,
+                   [worker]() { worker->decreaseMaxValue(); });
 
   a = cm->getAction("A_IncreaseMinBrushThickness");
-  QObject::connect(a, SIGNAL(triggered()), worker, SLOT(increaseMinValue()));
+  QObject::connect(a, &QAction::triggered, worker,
+                   [worker]() { worker->increaseMinValue(); });
   a = cm->getAction("A_DecreaseMinBrushThickness");
-  QObject::connect(a, SIGNAL(triggered()), worker, SLOT(decreaseMinValue()));
+  QObject::connect(a, &QAction::triggered, worker,
+                   [worker]() { worker->decreaseMinValue(); });
 }
 
 //-----------------------------------------------------------------
@@ -99,9 +111,11 @@ void ToolOptionShortcutConnector::visit(TIntProperty* p) {
   CommandManager* cm                  = CommandManager::instance();
   QAction* a;
   a = cm->getAction("A_IncreaseMaxBrushThickness");
-  QObject::connect(a, SIGNAL(triggered()), worker, SLOT(increase()));
+  QObject::connect(a, &QAction::triggered, worker,
+                   [worker]() { worker->increase(); });
   a = cm->getAction("A_DecreaseMaxBrushThickness");
-  QObject::connect(a, SIGNAL(triggered()), worker, SLOT(decrease()));
+  QObject::connect(a, &QAction::triggered, worker,
+                   [worker]() { worker->decrease(); });
 }
 
 //-----------------------------------------------------------------
@@ -115,7 +129,8 @@ void ToolOptionShortcutConnector::visit(TBoolProperty* p) {
   BoolWorker* worker                  = new BoolWorker(invoker, m_tool, p, a);
   a->setCheckable(true);
   a->setChecked(p->getValue());
-  QObject::connect(a, SIGNAL(triggered(bool)), worker, SLOT(doCheck(bool)));
+  QObject::connect(a, &QAction::triggered, worker,
+                   [worker, a]() { worker->doCheck(a->isChecked()); });
 
   invoker->registerCheckProperty(m_tool, worker);
 }
@@ -131,26 +146,21 @@ void ToolOptionShortcutConnector::visit(TEnumProperty* p) {
   std::string actionName              = "A_ToolOption_" + p->getId();
   QAction* a = CommandManager::instance()->getAction(actionName.c_str());
   if (a) {
-    QObject::connect(a, SIGNAL(triggered()), worker, SLOT(cycleOptions()));
+    QObject::connect(a, &QAction::triggered, worker,
+                     [worker]() { worker->cycleOptions(); });
     hasAction = true;
   }
 
   TEnumProperty::Range range = p->getRange();
   TEnumProperty::Range::iterator it;
-  QSignalMapper* signalMapper = 0;
-  int index                   = 0;
+  int index = 0;
   for (it = range.begin(); it != range.end(); ++it, ++index) {
     std::string item           = ::to_string(*it);
     std::string itemActionName = actionName + ":" + item;
     a = CommandManager::instance()->getAction(itemActionName.c_str());
     if (a) {
-      if (signalMapper == 0) {
-        signalMapper = new QSignalMapper(worker);
-        QObject::connect(signalMapper, SIGNAL(mapped(int)), worker,
-                         SLOT(doOnActivated(int)));
-      }
-      QObject::connect(a, SIGNAL(triggered()), signalMapper, SLOT(map()));
-      signalMapper->setMapping(a, index);
+      QObject::connect(a, &QAction::triggered, worker,
+                       [worker, index]() { worker->doOnActivated(index); });
       hasAction = true;
     }
   }
@@ -161,7 +171,7 @@ void ToolOptionShortcutConnector::visit(TEnumProperty* p) {
 //=============================================================================
 
 void DoubleWorker::increase(double step) {
-  // ignore if it is not the current tool
+  // Ignore if it is not the current tool
   if (TApp::instance()->getCurrentTool()->getTool() != m_tool) return;
   TDoubleProperty::Range range = m_property->getRange();
   double value                 = m_property->getValue();
@@ -179,7 +189,7 @@ void DoubleWorker::increaseFractional() { increase(0.06); }
 //-----------------------------------------------------------------
 
 void DoubleWorker::decrease(double step) {
-  // ignore if it is not the current tool
+  // Ignore if it is not the current tool
   if (TApp::instance()->getCurrentTool()->getTool() != m_tool) return;
   TDoubleProperty::Range range = m_property->getRange();
   double value                 = m_property->getValue();
@@ -197,7 +207,7 @@ void DoubleWorker::decreaseFractional() { decrease(0.06); }
 //=============================================================================
 
 void DoublePairWorker::increaseMaxValue() {
-  // ignore if it is not the current tool
+  // Ignore if it is not the current tool
   if (TApp::instance()->getCurrentTool()->getTool() != m_tool) return;
   TDoublePairProperty::Value value = m_property->getValue();
   TDoublePairProperty::Range range = m_property->getRange();
@@ -211,7 +221,7 @@ void DoublePairWorker::increaseMaxValue() {
 //-----------------------------------------------------------------
 
 void DoublePairWorker::decreaseMaxValue() {
-  // ignore if it is not the current tool
+  // Ignore if it is not the current tool
   if (TApp::instance()->getCurrentTool()->getTool() != m_tool) return;
   TDoublePairProperty::Value value = m_property->getValue();
   value.second -= 1;
@@ -224,7 +234,7 @@ void DoublePairWorker::decreaseMaxValue() {
 //-----------------------------------------------------------------
 
 void DoublePairWorker::increaseMinValue() {
-  // ignore if it is not the current tool
+  // Ignore if it is not the current tool
   if (TApp::instance()->getCurrentTool()->getTool() != m_tool) return;
   TDoublePairProperty::Value value = m_property->getValue();
   value.first += 1;
@@ -237,7 +247,7 @@ void DoublePairWorker::increaseMinValue() {
 //-----------------------------------------------------------------
 
 void DoublePairWorker::decreaseMinValue() {
-  // ignore if it is not the current tool
+  // Ignore if it is not the current tool
   if (TApp::instance()->getCurrentTool()->getTool() != m_tool) return;
   TDoublePairProperty::Value value = m_property->getValue();
   TDoublePairProperty::Range range = m_property->getRange();
@@ -251,13 +261,13 @@ void DoublePairWorker::decreaseMinValue() {
 //=============================================================================
 
 void IntPairWorker::increaseMaxValue() {
-  // ignore if it is not the current tool
+  // Ignore if it is not the current tool
   if (TApp::instance()->getCurrentTool()->getTool() != m_tool) return;
   TIntPairProperty::Value value = m_property->getValue();
   TIntPairProperty::Range range = m_property->getRange();
   value.second += 1;
 
-  // a "cross-like shape" of the brush size = 3 is hard to use. so skip it
+  // A "cross-like shape" of the brush size = 3 is hard to use. so skip it
   if (value.second == 3 && m_tool->isPencilModeActive()) value.second += 1;
 
   if (value.second > range.second) value.second = range.second;
@@ -269,12 +279,12 @@ void IntPairWorker::increaseMaxValue() {
 //-----------------------------------------------------------------
 
 void IntPairWorker::decreaseMaxValue() {
-  // ignore if it is not the current tool
+  // Ignore if it is not the current tool
   if (TApp::instance()->getCurrentTool()->getTool() != m_tool) return;
   TIntPairProperty::Value value = m_property->getValue();
   value.second -= 1;
 
-  // a "cross-like shape" of the brush size = 3 is hard to use. so skip it
+  // A "cross-like shape" of the brush size = 3 is hard to use. so skip it
   if (value.second == 3 && m_tool->isPencilModeActive()) value.second -= 1;
 
   if (value.second < value.first) value.second = value.first;
@@ -286,7 +296,7 @@ void IntPairWorker::decreaseMaxValue() {
 //-----------------------------------------------------------------
 
 void IntPairWorker::increaseMinValue() {
-  // ignore if it is not the current tool
+  // Ignore if it is not the current tool
   if (TApp::instance()->getCurrentTool()->getTool() != m_tool) return;
   TIntPairProperty::Value value = m_property->getValue();
   value.first += 1;
@@ -299,7 +309,7 @@ void IntPairWorker::increaseMinValue() {
 //-----------------------------------------------------------------
 
 void IntPairWorker::decreaseMinValue() {
-  // ignore if it is not the current tool
+  // Ignore if it is not the current tool
   if (TApp::instance()->getCurrentTool()->getTool() != m_tool) return;
   TIntPairProperty::Value value = m_property->getValue();
   TIntPairProperty::Range range = m_property->getRange();
@@ -313,13 +323,13 @@ void IntPairWorker::decreaseMinValue() {
 //=============================================================================
 
 void IntWorker::increase() {
-  // ignore if it is not the current tool
+  // Ignore if it is not the current tool
   if (TApp::instance()->getCurrentTool()->getTool() != m_tool) return;
   TIntProperty::Range range = m_property->getRange();
   int value                 = m_property->getValue();
   value += 1;
 
-  // a "cross-like shape" of the brush size = 3 is hard to use. so skip it
+  // A "cross-like shape" of the brush size = 3 is hard to use. so skip it
   if (value == 3 && m_tool->isPencilModeActive()) value += 1;
 
   if (value > range.second) value = range.second;
@@ -331,13 +341,13 @@ void IntWorker::increase() {
 //-----------------------------------------------------------------
 
 void IntWorker::decrease() {
-  // ignore if it is not the current tool
+  // Ignore if it is not the current tool
   if (TApp::instance()->getCurrentTool()->getTool() != m_tool) return;
   TIntProperty::Range range = m_property->getRange();
   double value              = m_property->getValue();
   value -= 1;
 
-  // a "cross-like shape" of the brush size = 3 is hard to use. so skip it
+  // A "cross-like shape" of the brush size = 3 is hard to use. so skip it
   if (value == 3 && m_tool->isPencilModeActive()) value -= 1;
 
   if (value < range.first) value = range.first;
@@ -349,7 +359,7 @@ void IntWorker::decrease() {
 //=============================================================================
 
 void BoolWorker::doCheck(bool checked) {
-  // ignore if it is not the current tool
+  // Ignore if it is not the current tool
   if (TApp::instance()->getCurrentTool()->getTool() != m_tool) return;
 
   if (m_property->getValue() == checked) return;
@@ -370,7 +380,7 @@ void BoolWorker::syncActionState() {
 //=============================================================================
 
 void EnumWorker::cycleOptions() {
-  // ignore if it is not the current tool
+  // Ignore if it is not the current tool
   if (TApp::instance()->getCurrentTool()->getTool() != m_tool) return;
   const TEnumProperty::Range& range = m_property->getRange();
   int theIndex                      = m_property->getIndex() + 1;
@@ -381,10 +391,10 @@ void EnumWorker::cycleOptions() {
 //-----------------------------------------------------------------
 
 void EnumWorker::doOnActivated(int index) {
-  // ignore if it is not the current tool
+  // Ignore if it is not the current tool
   if (TApp::instance()->getCurrentTool()->getTool() != m_tool) return;
 
-  // check range
+  // Check range
   const TEnumProperty::Range& range = m_property->getRange();
   if (index < 0 || index >= (int)range.size()) return;
 
@@ -399,7 +409,7 @@ void EnumWorker::doOnActivated(int index) {
   // If the first item of this combo box is "Normal", enable shortcut key toggle
   // can "back and forth" behavior.
   if (m_property->getIndex() == index) {
-    // estimating that the "Normal" option is located at the index 0
+    // Estimating that the "Normal" option is located at the index 0
     m_property->setIndex(0);
   } else {
     m_property->setIndex(index);
@@ -419,8 +429,8 @@ ToolOptionsShortcutInvoker* ToolOptionsShortcutInvoker::instance() {
 //-----------------------------------------------------------------
 
 void ToolOptionsShortcutInvoker::initialize() {
-  connect(TApp::instance()->getCurrentTool(), SIGNAL(toolSwitched()), this,
-          SLOT(onToolSwitched()));
+  connect(TApp::instance()->getCurrentTool(), &ToolHandle::toolSwitched, this,
+          &ToolOptionsShortcutInvoker::onToolSwitched);
   onToolSwitched();
 
   /*-- Animate tool + mode switching shortcuts --*/
@@ -613,7 +623,7 @@ void ToolOptionsShortcutInvoker::registerCheckProperty(TTool* tool,
 void ToolOptionsShortcutInvoker::onToolSwitched() {
   TTool* tool = TApp::instance()->getCurrentTool()->getTool();
   if (!m_tools.contains(tool)) {
-    // amount of the property groups
+    // Amount of the property groups
     int pgCount = 1;
     if (tool->getName() == T_Geometric || tool->getName() == T_Type ||
         (tool->getName() == T_Selection &&
@@ -626,14 +636,14 @@ void ToolOptionsShortcutInvoker::onToolSwitched() {
       if (!pg) continue;
 
       ToolOptionShortcutConnector connector(tool);
-      // connect each property to an associated command
+      // Connect each property to an associated command
       pg->accept(connector);
     }
     m_tools.insert(tool);
   }
-  // if the tool is already registered
+  // If the tool is already registered
   else {
-    // synchronize action's check state to the property
+    // Synchronize action's check state to the property
     for (auto boolWorker : m_checkProps.values(tool)) {
       boolWorker->syncActionState();
     }
@@ -968,7 +978,9 @@ void ToolOptionsShortcutInvoker::toggleEraserSegment() {
 void ToolOptionsShortcutInvoker::toggleEraserMultiArc() {
   CommandManager::instance()->getAction(T_Eraser)->trigger();
   CommandManager::instance()->getAction("A_ToolOption_Type:Normal")->trigger();
-  CommandManager::instance()->getAction("A_ToolOption_Type:MultiArc")->trigger();
+  CommandManager::instance()
+      ->getAction("A_ToolOption_Type:MultiArc")
+      ->trigger();
 }
 //---------------------------------------------------------------------------------------
 /*-- Tape tool + type/mode switching shortcuts --*/
