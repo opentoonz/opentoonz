@@ -87,43 +87,38 @@ bool checkForSeqNum(QString type) {
     return false;
 }
 
-bool parseFrame(const std::wstring &str, int &frame, QString &letter, int &padding) {
-  if (str.empty())
-    return false;
+bool parseFrame(const std::wstring &str, int &frame, QString &letter,
+                int &padding) {
+  if (str.empty()) return false;
 
   int i = 0, number = 0;
-  while(i < (int)str.size() && str[i] >= L'0' && str[i] <= L'9')
+  while (i < (int)str.size() && str[i] >= L'0' && str[i] <= L'9')
     number = number * 10 + str[i++] - L'0';
   int digits = i;
-  wchar_t l = str[i] >= L'a' && str[i] <= L'z' ? str[i++]
-            : str[i] >= L'A' && str[i] <= L'Z' ? str[i++]
-            : L'\0';
-  if (digits <= 0 || i < (int)str.size())
-    return false;
+  wchar_t l  = str[i] >= L'a' && str[i] <= L'z'   ? str[i++]
+               : str[i] >= L'A' && str[i] <= L'Z' ? str[i++]
+                                                  : L'\0';
+  if (digits <= 0 || i < (int)str.size()) return false;
 
-  frame = number;
-  letter = l ? QString(1, QChar(l)) : QString();
+  frame   = number;
+  letter  = l ? QString(1, QChar(l)) : QString();
   padding = str[0] == L'0' ? digits : 0;
   return true;
 }
 
 };  // namespace
 
-
 TFrameId::TFrameId(const std::string &str, char s)
-    : m_frame(EMPTY_FRAME), m_letter(), m_zeroPadding(4), m_startSeqInd(s)
-{
+    : m_frame(EMPTY_FRAME), m_letter(), m_zeroPadding(4), m_startSeqInd(s) {
   if (str.empty()) return;
   if (!parseFrame(to_wstring(str), m_frame, m_letter, m_zeroPadding))
     m_frame = NO_FRAME;
 }
 
 TFrameId::TFrameId(const std::wstring &str, char s)
-    : m_frame(EMPTY_FRAME), m_letter(), m_zeroPadding(4), m_startSeqInd(s)
-{
+    : m_frame(EMPTY_FRAME), m_letter(), m_zeroPadding(4), m_startSeqInd(s) {
   if (str.empty()) return;
-  if (!parseFrame(str, m_frame, m_letter, m_zeroPadding))
-    m_frame = NO_FRAME;
+  if (!parseFrame(str, m_frame, m_letter, m_zeroPadding)) m_frame = NO_FRAME;
 }
 
 // TFrameId::operator string() const
@@ -808,7 +803,7 @@ TFrameId TFilePath::getFrame() const {
   if (!checkForSeqNum(type) || !isNumbers(str, j, i))
     return TFrameId(TFrameId::NO_FRAME);
 
-  return TFrameId(str.substr(j+1, i-j-1), str[j]);
+  return TFrameId(str.substr(j + 1, i - j - 1), str[j]);
 }
 
 //-----------------------------------------------------------------------------
@@ -1126,22 +1121,29 @@ TFilePath::TFilePathInfo TFilePath::analyzePath() const {
   //  }
   //}
 
-  // hogehoge.0001a.jpg
-  // empty frame case : hogehoge..jpg
-  // empty level name case : ..jpg   .0001a.jpg
-  QRegExp rx("^(?:" + levelNameRegExp + ")?" + sepCharRegExp +
-             "(?:" + fIdRegExp + ")?" + "\\." + extensionRegExp + "$");
+  // hogehoge.0001a.jpg hogehoge_0001a.jpg
+  // empty frame case : hogehoge..jpg / hogehoge_.jpg
+  // empty level name case : ..jpg   .0001a.jpg / _.jpg _0001a.jpg
+  // [LevelName]? [SepChar1] [fIdRegExp]? [SepChar2] [Extension]
+  QRegExp rx("^(?:" + levelNameRegExp + ")?" + "([\\._])" + "(?:" + fIdRegExp +
+             ")?" + "([\\.])" + extensionRegExp + "$");
   if (rx.indexIn(fileName) != -1) {
-    assert(rx.captureCount() == 5);
+    assert(rx.captureCount() == 6);
+
     info.levelName = rx.cap(1);
     info.sepChar   = rx.cap(2)[0];
-    info.extension = rx.cap(5);
+
+    info.extension = rx.cap(6);
+
     // ignore frame numbers on non-sequential (i.e. movie) extension case :
     // hoge_0001.mp4
     if (!checkForSeqNum(info.extension)) {
-      info.levelName = rx.cap(1) + rx.cap(2);
-      if (!rx.cap(3).isEmpty()) info.levelName += rx.cap(3);
-      if (!rx.cap(4).isEmpty()) info.levelName += rx.cap(4);
+      info.levelName = rx.cap(1) + rx.cap(2);  // LevelName + SepChar1
+
+      if (!rx.cap(3).isEmpty()) info.levelName += rx.cap(3);  // Frame Number
+      if (!rx.cap(4).isEmpty()) info.levelName += rx.cap(4);  // Suffix
+      if (!rx.cap(5).isEmpty()) info.levelName += rx.cap(5);
+
       info.sepChar = QChar();
       info.fId = TFrameId(TFrameId::NO_FRAME, 0, 0);  // initialize with NO_PAD
     } else {

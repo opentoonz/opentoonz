@@ -1284,7 +1284,8 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
       {fastRenderPath, tr("Fast Render Path:")},
       {ffmpegMultiThread,
        tr("Allow Multi-Thread in FFMPEG Rendering (UNSTABLE)")},
-      {quickTimeBackend, tr("Use QuickTime to code .mov and .3gp (If installed)")},
+      {quickTimeBackend,
+       tr("Use QuickTime to code .mov and .3gp (If installed)")},
       {rhubarbPath, tr("Rhubarb Path:")},
       {rhubarbTimeout, tr("Rhubarb Timeout:")},
 
@@ -1321,7 +1322,7 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
       {FillOnlysavebox, tr("Use the TLV Savebox to Limit Filling Operations")},
       {DefRegionWithPaint,
        tr("Define Filling Region Using both Lines and Areas")},
-      { ReferFillPrevailing, tr("Paint Under Lines in Refer Fill") },
+      {ReferFillPrevailing, tr("Paint Under Lines in Refer Fill")},
       {multiLayerStylePickerEnabled,
        tr("Multi Layer Style Picker: Switch Levels by Picking")},
       {cursorBrushType, tr("Basic Cursor Type:")},
@@ -1581,6 +1582,9 @@ PreferencesPopup::PreferencesPopup()
              << tr("Xsheet") << tr("Animation") << tr("Preview")
              << tr("Onion Skin") << tr("Colors") << tr("Version Control")
              << tr("Touch/Tablet Settings");
+#ifdef _WIN32
+  categories << tr("Addons");
+#endif
   categoryList->addItems(categories);
   categoryList->setFixedWidth(160);
   categoryList->setCurrentRow(0);
@@ -1603,6 +1607,9 @@ PreferencesPopup::PreferencesPopup()
   stackedWidget->addWidget(createColorsPage());
   stackedWidget->addWidget(createVersionControlPage());
   stackedWidget->addWidget(createTouchTabletPage());
+#ifdef _WIN32
+  stackedWidget->addWidget(createAddonsPage());
+#endif  // WIN32
 
   QHBoxLayout* mainLayout = new QHBoxLayout();
   mainLayout->setMargin(0);
@@ -1702,15 +1709,19 @@ QWidget* PreferencesPopup::createGeneralPage() {
   QCheckBox* lazyLoadRoomsCheckBox = getUI<QCheckBox*>(lazyLoadRooms);
   connect(lazyLoadRoomsCheckBox, &QCheckBox::stateChanged,
           [lazyLoadRoomsCheckBox](int state) {
-          QString status = Preferences::instance()->isLazyLoadRoomsEnabled()
-              ? tr("enabled") : tr("disabled");
-          QString description = Preferences::instance()->isLazyLoadRoomsEnabled()
-              ? tr("rooms will load on demand")
-              : tr("all rooms load at startup");
-          QString lazyLoadRoomsToolTip = tr("Lazy loading %1 - %2").arg(status).arg(description);
-          lazyLoadRoomsCheckBox->setToolTip(lazyLoadRoomsToolTip);
+            QString status = Preferences::instance()->isLazyLoadRoomsEnabled()
+                                 ? tr("enabled")
+                                 : tr("disabled");
+            QString description =
+                Preferences::instance()->isLazyLoadRoomsEnabled()
+                    ? tr("rooms will load on demand")
+                    : tr("all rooms load at startup");
+            QString lazyLoadRoomsToolTip =
+                tr("Lazy loading %1 - %2").arg(status).arg(description);
+            lazyLoadRoomsCheckBox->setToolTip(lazyLoadRoomsToolTip);
           });
-  lazyLoadRoomsCheckBox->stateChanged(Preferences::instance()->isLazyLoadRoomsEnabled());
+  lazyLoadRoomsCheckBox->stateChanged(
+      Preferences::instance()->isLazyLoadRoomsEnabled());
 
   m_onEditedFuncMap.insert(autosaveEnabled,
                            &PreferencesPopup::onAutoSaveChanged);
@@ -2452,6 +2463,92 @@ QWidget* PreferencesPopup::createTouchTabletPage() {
 
   return widget;
 }
+
+#ifdef _WIN32
+#include <windows.h>
+QWidget* PreferencesPopup::createAddonsPage() {
+  QWidget* widget  = new QWidget(this);
+  QGridLayout* lay = new QGridLayout();
+
+  static auto CheckToonzPreview = []() -> bool {
+    HKEY h;
+    bool r = RegOpenKeyW(HKEY_CLASSES_ROOT,
+                         L"CLSID\\{A20E2270-0FE1-421D-A34E-98C26C13F9DB}",
+                         &h) == ERROR_SUCCESS;
+    if (r) RegCloseKey(h);
+    return r;
+  };
+
+  QGroupBox* groupBox =
+      new QGroupBox(tr("Windows Explorer Thumbnails (Shell Extension)"));
+  QVBoxLayout* gbLayout = new QVBoxLayout(groupBox);
+  gbLayout->setMargin(10);
+
+  QLabel* infoLabel =
+      new QLabel(tr("Enable thumbnails for OpenToonz files (.tnz, .pli, .tlv) "
+                    "in Windows Explorer. \n"
+                    "Administrator privileges are required; you may need to "
+                    "restart Explorer for changes to take effect."));
+  gbLayout->addWidget(infoLabel);
+
+  QPushButton* previewButton = new QPushButton(this);
+  previewButton->setText(CheckToonzPreview() ? tr("Uninstall") : tr("Install"));
+
+  gbLayout->addWidget(previewButton);
+
+  connect(previewButton, &QPushButton::clicked, this, [previewButton]() {
+    bool install = !CheckToonzPreview();
+    QString dllPath_raw =
+        QApplication::applicationDirPath() + "/toonzpreview.dll";
+
+    QString dllPath = dllPath_raw.replace("/", "\\");
+
+    if (install && !QFile::exists(dllPath)) {
+      DVGui::warning("toonzpreview.dll not found!");
+      return;
+    }
+
+    QString quotedDllPath = QString("\"%1\"").arg(dllPath);
+
+    QStringList args =
+        install ? QStringList{quotedDllPath} : QStringList{"/u", quotedDllPath};
+
+    QString command = "regsvr32";
+
+    QString paramStr = args.join(" ");
+
+    SHELLEXECUTEINFO sei = {sizeof(sei)};
+
+    sei.lpVerb = L"runas";
+
+    std::wstring commandW  = command.toStdWString();
+    std::wstring paramStrW = paramStr.toStdWString();
+
+    sei.hProcess     = NULL;
+    sei.lpFile       = commandW.c_str();   // regsvr32.exe
+    sei.lpParameters = paramStrW.c_str();  // param
+    sei.nShow        = SW_SHOWNORMAL;      // UAC
+    sei.fMask        = SEE_MASK_NOCLOSEPROCESS;
+
+    bool operationSuccess = false;
+    if (ShellExecuteEx(&sei)) {
+      if (sei.hProcess) {
+        WaitForSingleObject(sei.hProcess, 60000);
+      }
+    }
+
+    previewButton->setText(CheckToonzPreview() ? tr("Uninstall")
+                                               : tr("Install"));
+  });
+
+  lay->addWidget(groupBox, lay->rowCount(), 0, 2, 4, Qt::AlignLeft);
+  lay->setRowStretch(lay->rowCount(), 1);
+
+  widget->setLayout(lay);
+
+  return widget;
+}
+#endif  // _WIN32
 
 //-----------------------------------------------------------------------------
 
