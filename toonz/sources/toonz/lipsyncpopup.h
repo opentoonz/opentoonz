@@ -69,7 +69,10 @@ protected:
   // Helper functions
   void generateThumbnails();
   void updateThumbnail(int index);
-  void onIconGenerated();
+
+private slots:
+  // Internal slot for icon generation updates
+  void onIconGenerated();  // Called when IconGenerator finishes generating thumbnails
 
 public slots:
   void onApplyButton();

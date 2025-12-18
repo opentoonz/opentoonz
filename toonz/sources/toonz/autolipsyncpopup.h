@@ -10,6 +10,7 @@
 #include "toonzqt/gutil.h"
 #include "toonz/txshsoundcolumn.h"
 
+#include <QProcess>
 #include <QPushButton>
 #include <QLabel>
 #include <QCheckBox>
@@ -38,6 +39,7 @@ class QPaintEvent;
 class AutoLipSyncPopup final : public DVGui::Dialog {
   Q_OBJECT
 
+  // UI Elements
   QLabel *m_aiLabel;
   QLabel *m_oLabel;
   QLabel *m_eLabel;
@@ -58,6 +60,8 @@ class AutoLipSyncPopup final : public DVGui::Dialog {
   QPixmap m_pixmaps[10];
   QPushButton *m_applyButton;
   QPushButton *m_playButton;
+
+  // Level and frame data
   std::vector<TFrameId> m_levelFrameIds;
   std::vector<TFrameId> m_activeFrameIds;
   DVGui::FileField *m_audioFile;
@@ -71,6 +75,8 @@ class AutoLipSyncPopup final : public DVGui::Dialog {
   bool m_isEditingLevel;
   QStringList m_textLines;
   QCheckBox *m_restToEnd;
+
+  // Audio and processing
   QString m_audioPath;
   TFilePath m_datPath;
   QMediaPlayer *m_player;
@@ -86,34 +92,59 @@ class AutoLipSyncPopup final : public DVGui::Dialog {
   QTimer m_audioTimeout;
   TXshSoundColumn *m_playingSound;
 
+  // Process management
+  bool m_processRunning;  // Tracks if Rhubarb process is running
+  bool m_userCancelled;   // Tracks if user cancelled the process
+
 public:
   AutoLipSyncPopup();
   ~AutoLipSyncPopup() override;  // Added destructor
 
 protected:
+  // Event handlers
   void showEvent(QShowEvent *event) override;
   void hideEvent(QHideEvent *event) override;
   void paintEvent(QPaintEvent *event) override;
+
+  // UI helpers
   void refreshSoundLevels();
+  void generateThumbnails();
+  void updateThumbnail(int index);
+
+  // Audio processing
   void saveAudio();
   void runRhubarb();
 
-  // New function to generate thumbnails
-  void generateThumbnails();
-  void updateThumbnail(int index);
-  void onIconGenerated();
+  // Process management
+  void cleanupAfterProcess();    // Cleans up temporary files and resets state
+  void processRhubarbResults();  // Processes successful Rhubarb output
 
 public slots:
+  // Main actions
   void onApplyButton();
-  void imageNavClicked(int id);
-  void onStartValueChanged();
   void playSound();
   void stopAllSound();
   bool setAudioFile();
-  void onLevelChanged(int);
+
+  // UI interactions
+  void imageNavClicked(int id);
+  void onStartValueChanged();
+  void onLevelChanged(int index);
+
+  // Media control
   void onMediaStateChanged(QMediaPlayer::State state);
-  void onOutputReady();
   void onAudioTimeout();
+
+  // Rhubarb process handling
+  void onOutputReady();
+  void onRhubarbFinished(int exitCode, QProcess::ExitStatus exitStatus);
+  void onRhubarbError(QProcess::ProcessError error);
+  void onAnalysisCancelled();  // Called when user cancels analysis
+
+private slots:
+  // Internal slot for icon generation updates
+  void onIconGenerated();  // Called when IconGenerator finishes generating
+                           // thumbnails
 };
 
 #endif  // AUTOLIPSYNCPOPUP_H
