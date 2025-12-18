@@ -166,7 +166,7 @@ enum PreferencesItemId {
   blankColor,
   rewindAfterPlayback,
   previewAlwaysOpenNewFlip,
-  fitToFlipbook,
+  fitToFlipbookWhenPreview,
   generatedMovieViewEnabled,
   shortPlayFrameCount,
 
