@@ -430,11 +430,11 @@ ShortcutPopup::ShortcutPopup()
 
   QLineEdit *searchEdit = new QLineEdit(this);
 
-  m_topLayout->setMargin(5);
+  m_topLayout->setContentsMargins(5, 5, 5, 5);
   m_topLayout->setSpacing(8);
   {
     QHBoxLayout *searchLay = new QHBoxLayout();
-    searchLay->setMargin(0);
+    searchLay->setContentsMargins(0, 0, 0, 0);
     searchLay->setSpacing(5);
     {
       searchLay->addWidget(new QLabel(tr("Search:"), this), 0);
@@ -443,7 +443,7 @@ ShortcutPopup::ShortcutPopup()
     m_topLayout->addLayout(searchLay, 0);
 
     QVBoxLayout *listLay = new QVBoxLayout();
-    listLay->setMargin(0);
+    listLay->setContentsMargins(0, 0, 0, 0);
     listLay->setSpacing(0);
     {
       listLay->addWidget(noSearchResultLabel, 0,
@@ -453,7 +453,7 @@ ShortcutPopup::ShortcutPopup()
     m_topLayout->addLayout(listLay, 1);
 
     QHBoxLayout *bottomLayout = new QHBoxLayout();
-    bottomLayout->setMargin(0);
+    bottomLayout->setContentsMargins(0, 0, 0, 0);
     bottomLayout->setSpacing(1);
     {
       bottomLayout->addWidget(m_sViewer, 1);
@@ -462,7 +462,7 @@ ShortcutPopup::ShortcutPopup()
     m_topLayout->addLayout(bottomLayout, 0);
     m_topLayout->addSpacing(10);
     QHBoxLayout *presetLay = new QHBoxLayout();
-    presetLay->setMargin(5);
+    presetLay->setContentsMargins(5, 5, 5, 5);
     presetLay->setSpacing(5);
     {
       presetLay->addWidget(new QLabel(tr("Preset:"), this), 0);
@@ -475,7 +475,7 @@ ShortcutPopup::ShortcutPopup()
     m_topLayout->addWidget(presetBox, 0, Qt::AlignCenter);
     m_topLayout->addSpacing(10);
     QHBoxLayout *exportLay = new QHBoxLayout();
-    exportLay->setMargin(0);
+    exportLay->setContentsMargins(0, 0, 0, 0);
     exportLay->setSpacing(5);
     {
       exportLay->addWidget(m_exportButton, 0);

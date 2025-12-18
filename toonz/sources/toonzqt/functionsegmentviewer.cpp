@@ -87,7 +87,7 @@ SpeedInOutSegmentPage::SpeedInOutSegmentPage(FunctionSegmentViewer *parent)
   QGridLayout *mainLayout = new QGridLayout();
   mainLayout->setHorizontalSpacing(5);
   mainLayout->setVerticalSpacing(5);
-  mainLayout->setMargin(2);
+  mainLayout->setContentsMargins(2, 2, 2, 2);
   {
     mainLayout->addWidget(new QLabel(tr("First Speed:")), 0, 0,
                           Qt::AlignRight | Qt::AlignVCenter);
@@ -376,7 +376,7 @@ EaseInOutSegmentPage::EaseInOutSegmentPage(bool isPercentage,
 
   QGridLayout *mainLayout = new QGridLayout();
   mainLayout->setSpacing(5);
-  mainLayout->setMargin(2);
+  mainLayout->setContentsMargins(2, 2, 2, 2);
   {
     mainLayout->addWidget(new QLabel(tr("Ease Out:")), 0, 0,
                           Qt::AlignRight | Qt::AlignVCenter);
@@ -496,7 +496,7 @@ FunctionExpressionSegmentPage::FunctionExpressionSegmentPage(
   //---- layout
   QVBoxLayout *mainLayout = new QVBoxLayout();
   mainLayout->setSpacing(2);
-  mainLayout->setMargin(2);
+  mainLayout->setContentsMargins(2, 2, 2, 2);
   {
     mainLayout->addSpacing(3);
     mainLayout->addWidget(new QLabel(tr("Expression:")));
@@ -678,14 +678,14 @@ FileSegmentPage::FileSegmentPage(FunctionSegmentViewer *parent)
   //----layout
   QVBoxLayout *mainLayout = new QVBoxLayout();
   mainLayout->setSpacing(5);
-  mainLayout->setMargin(2);
+  mainLayout->setContentsMargins(2, 2, 2, 2);
   {
     mainLayout->addWidget(new QLabel(tr("File Path:")), 0);
     mainLayout->addWidget(m_fileFld);
 
     QGridLayout *bottomLay = new QGridLayout();
     bottomLay->setSpacing(5);
-    bottomLay->setMargin(0);
+    bottomLay->setContentsMargins(0, 0, 0, 0);
     {
       bottomLay->addWidget(new QLabel(tr("Column:")), 0, 0,
                            Qt::AlignRight | Qt::AlignVCenter);
@@ -785,7 +785,7 @@ SimilarShapeSegmentPage::SimilarShapeSegmentPage(FunctionSegmentViewer *parent)
   //----layout
   QVBoxLayout *mainLayout = new QVBoxLayout();
   mainLayout->setSpacing(2);
-  mainLayout->setMargin(2);
+  mainLayout->setContentsMargins(2, 2, 2, 2);
   {
     mainLayout->addSpacing(3);
     mainLayout->addWidget(new QLabel(tr("Reference Curve:")));
@@ -982,18 +982,18 @@ FunctionSegmentViewer::FunctionSegmentViewer(QWidget *parent,
 
   QVBoxLayout *mainLayout = new QVBoxLayout();
   mainLayout->setSpacing(5);
-  mainLayout->setMargin(5);
+  mainLayout->setContentsMargins(5, 5, 5, 5);
   {
     m_topbar                  = new QWidget();
     QVBoxLayout *topbarLayout = new QVBoxLayout();
     topbarLayout->setSpacing(5);
-    topbarLayout->setMargin(0);
+    topbarLayout->setContentsMargins(0, 0, 0, 0);
     {
       topbarLayout->addWidget(m_paramNameLabel);
 
       QHBoxLayout *upperLay = new QHBoxLayout();
       upperLay->setSpacing(3);
-      upperLay->setMargin(0);
+      upperLay->setContentsMargins(0, 0, 0, 0);
       {
         upperLay->addWidget(new QLabel(tr("From"), this), 0);
         upperLay->addWidget(m_fromFld, 1);
@@ -1008,7 +1008,7 @@ FunctionSegmentViewer::FunctionSegmentViewer(QWidget *parent,
 
       QHBoxLayout *bottomLay = new QHBoxLayout();
       bottomLay->setSpacing(3);
-      bottomLay->setMargin(0);
+      bottomLay->setContentsMargins(0, 0, 0, 0);
       {
         bottomLay->addWidget(typeLabel, 0);
         bottomLay->addWidget(m_typeCombo, 1);
@@ -1025,7 +1025,7 @@ FunctionSegmentViewer::FunctionSegmentViewer(QWidget *parent,
     mainLayout->addWidget(applyButton);
 
     QHBoxLayout *moveLay = new QHBoxLayout();
-    moveLay->setMargin(0);
+    moveLay->setContentsMargins(0, 0, 0, 0);
     moveLay->setSpacing(0);
     {
       moveLay->addWidget(m_prevCurveButton, 0);

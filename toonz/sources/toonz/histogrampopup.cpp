@@ -45,7 +45,7 @@ HistogramPopup::HistogramPopup(QString title)
   m_histogram = new ComboHistogram(this);
 
   QVBoxLayout *mainLay = new QVBoxLayout();
-  mainLay->setMargin(0);
+  mainLay->setContentsMargins(0, 0, 0, 0);
   mainLay->setSpacing(0);
   { mainLay->addWidget(m_histogram); }
   setLayout(mainLay);

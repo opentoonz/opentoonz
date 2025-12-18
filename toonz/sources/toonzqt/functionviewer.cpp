@@ -130,7 +130,7 @@ FunctionViewer::FunctionViewer(QWidget *parent, Qt::WindowFlags flags)
           Preferences::FunctionEditorToggle::ShowFunctionSpreadsheetInPopup;
 
   m_leftLayout = new QVBoxLayout();
-  m_leftLayout->setMargin(0);
+  m_leftLayout->setContentsMargins(0, 0, 0, 0);
   m_leftLayout->setSpacing(0);
   {
     if (!toolBarOnBottom) m_leftLayout->addWidget(m_toolbar);
@@ -157,7 +157,7 @@ FunctionViewer::FunctionViewer(QWidget *parent, Qt::WindowFlags flags)
   addWidget(leftPanel);
 
   QVBoxLayout *rightLayout = new QVBoxLayout();
-  rightLayout->setMargin(0);
+  rightLayout->setContentsMargins(0, 0, 0, 0);
   rightLayout->setSpacing(5);
   {
     rightLayout->addWidget(m_segmentViewer, 0);

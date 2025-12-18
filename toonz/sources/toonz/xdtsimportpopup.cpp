@@ -183,7 +183,7 @@ XDTSImportPopup::XDTSImportPopup(QStringList levelNames, ToonzScene* scene,
   QWidget* fieldsWidget = new QWidget(this);
 
   QGridLayout* fieldsLay = new QGridLayout();
-  fieldsLay->setMargin(0);
+  fieldsLay->setContentsMargins(0, 0, 0, 0);
   fieldsLay->setHorizontalSpacing(10);
   fieldsLay->setVerticalSpacing(10);
   fieldsLay->addWidget(new QLabel(tr("Level Name"), this), 0, 0,
@@ -214,7 +214,7 @@ XDTSImportPopup::XDTSImportPopup(QStringList levelNames, ToonzScene* scene,
   QGroupBox* cellMarkGroupBox =
       new QGroupBox(tr("Cell marks for XDTS symbols"));
   QGridLayout* markLay = new QGridLayout();
-  markLay->setMargin(10);
+  markLay->setContentsMargins(10, 10, 10, 10);
   markLay->setVerticalSpacing(10);
   markLay->setHorizontalSpacing(5);
   {

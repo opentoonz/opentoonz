@@ -501,7 +501,7 @@ FlipConsole::FlipConsole(QVBoxLayout *mainLayout, std::vector<int> gadgetsMask,
 
   if (m_gadgetsMask.size() == 0) return;
 
-  // mainLayout->setMargin(1);
+  // mainLayout->setContentsMargins(1, 1, 1, 1);
   // mainLayout->setSpacing(0);
 
   // create toolbars other than frame slider
@@ -511,7 +511,7 @@ FlipConsole::FlipConsole(QVBoxLayout *mainLayout, std::vector<int> gadgetsMask,
     m_playToolBarContainer = new ToolBarContainer();
 
     QHBoxLayout *hLayout = new QHBoxLayout;
-    hLayout->setMargin(0);
+    hLayout->setContentsMargins(0, 0, 0, 0);
     hLayout->setSpacing(0);
     hLayout->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
     {
@@ -1852,7 +1852,7 @@ QFrame *FlipConsole::createFrameSlider() {
   // layout
   QHBoxLayout *frameSliderLayout = new QHBoxLayout();
   frameSliderLayout->setSpacing(5);
-  frameSliderLayout->setMargin(2);
+  frameSliderLayout->setContentsMargins(2, 2, 2, 2);
   {
     frameSliderLayout->addWidget(m_editCurrFrame, 0);
     frameSliderLayout->addWidget(m_currFrameSlider, 1);
@@ -1892,7 +1892,7 @@ QFrame *FlipConsole::createFpsSlider() {
 
   QHBoxLayout *hLay = new QHBoxLayout();
   hLay->setSpacing(0);
-  hLay->setMargin(0);
+  hLay->setContentsMargins(0, 0, 0, 0);
   {
     hLay->addWidget(m_fpsLabel, 0);
     hLay->addWidget(m_fpsField, 0);

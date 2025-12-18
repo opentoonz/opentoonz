@@ -250,13 +250,13 @@ ExportLevelPopup::ExportLevelPopup()
 
   // layout
   QVBoxLayout *mainLayout = new QVBoxLayout();
-  mainLayout->setMargin(0);
+  mainLayout->setContentsMargins(0, 0, 0, 0);
   mainLayout->setSpacing(3);
   {
     mainLayout->addWidget(tabBarContainer, 0);
 
     QHBoxLayout *tabBarLayout = new QHBoxLayout;
-    tabBarLayout->setMargin(0);
+    tabBarLayout->setContentsMargins(0, 0, 0, 0);
     {
       tabBarLayout->addSpacing(6);
       tabBarLayout->addWidget(tabBar);
@@ -267,7 +267,7 @@ ExportLevelPopup::ExportLevelPopup()
     stackedWidget->addWidget(m_browser);
     // Export Options Page
     QVBoxLayout *eoPageLayout = new QVBoxLayout;
-    eoPageLayout->setMargin(0);
+    eoPageLayout->setContentsMargins(0, 0, 0, 0);
     eoPageLayout->setSpacing(0);
     {
       // top area - options
@@ -305,14 +305,14 @@ ExportLevelPopup::ExportLevelPopup()
     //-------------- Buttons Toolbar ---------------------
     QHBoxLayout *bottomLay = new QHBoxLayout();
     bottomLay->setObjectName("bottomLay");
-    bottomLay->setMargin(5);
+    bottomLay->setContentsMargins(5, 5, 5, 5);
     bottomLay->setSpacing(3);
     {
       bottomLay->addWidget(m_nameFieldLabel);
       bottomLay->addWidget(m_nameField, 1);
 
       QHBoxLayout *fileFormatLayout = new QHBoxLayout;
-      fileFormatLayout->setMargin(0);
+      fileFormatLayout->setContentsMargins(0, 0, 0, 0);
       fileFormatLayout->setSpacing(8);
       fileFormatLayout->setAlignment(Qt::AlignHCenter);
       {
@@ -765,7 +765,7 @@ ExportLevelPopup::ExportOptions::ExportOptions(QWidget *parent)
       QGridLayout *layout = locals::newGridLayout();
       m_pliOptions->setLayout(layout);
 
-      layout->setMargin(0);
+      layout->setContentsMargins(0, 0, 0, 0);
 
       int row = 0;
 

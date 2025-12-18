@@ -515,7 +515,7 @@ HexColorNamesEditor::HexColorNamesEditor(QWidget *parent)
                                   QSizePolicy::Preferred);
   m_importButton = new QPushButton(tr("Import"));
   m_exportButton = new QPushButton(tr("Export"));
-  bottomLay->setMargin(8);
+  bottomLay->setContentsMargins(8, 8, 8, 8);
   bottomLay->setSpacing(5);
   bottomLay->addWidget(m_autoCompleteCb);
   bottomLay->addWidget(m_importButton);

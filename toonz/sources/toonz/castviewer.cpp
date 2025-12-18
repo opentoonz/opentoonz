@@ -468,7 +468,7 @@ CastBrowser::CastBrowser(QWidget *parent, Qt::WindowFlags flags)
   QFrame *box = new QFrame(this);
   box->setFrameStyle(QFrame::StyledPanel);
   QVBoxLayout *boxLayout = new QVBoxLayout(box);
-  boxLayout->setMargin(0);
+  boxLayout->setContentsMargins(0, 0, 0, 0);
   boxLayout->setSpacing(0);
 
   m_folderName = new QLabel("", box);

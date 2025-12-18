@@ -67,13 +67,13 @@ CleanupPaletteViewer::CleanupPaletteViewer(QWidget *parent)
   //----- layout
   QVBoxLayout *mainLayout = new QVBoxLayout(this);
   mainLayout->setSpacing(5);
-  mainLayout->setMargin(5);
+  mainLayout->setContentsMargins(5, 5, 5, 5);
   {
     mainLayout->addWidget(m_scrollArea, 1);
 
     QHBoxLayout *buttonLayout = new QHBoxLayout;
     buttonLayout->setSpacing(7);
-    buttonLayout->setMargin(0);
+    buttonLayout->setContentsMargins(0, 0, 0, 0);
     {
       buttonLayout->addWidget(m_add);
       buttonLayout->addWidget(m_remove);
@@ -109,7 +109,7 @@ void CleanupPaletteViewer::buildGUI() {
   m_scrollWidget->setLayout(scrollLayout);
 
   scrollLayout->setSpacing(10);
-  scrollLayout->setMargin(0);
+  scrollLayout->setContentsMargins(0, 0, 0, 0);
 
   TPalette *palette = TApp::instance()
                           ->getPaletteController()

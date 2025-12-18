@@ -300,7 +300,7 @@ void BreadcrumbArea::updateBreadcrumbs() {
 
   // Now let's put everything in a layout
   m_breadcrumbLayout = new QHBoxLayout();
-  m_breadcrumbLayout->setMargin(0);
+  m_breadcrumbLayout->setContentsMargins(0, 0, 0, 0);
   m_breadcrumbLayout->setSpacing(0);
   {
     if (!m_viewer->orientation()->isVerticalTimeline())
@@ -319,7 +319,7 @@ void BreadcrumbArea::updateBreadcrumbs() {
   m_breadcrumbLayout->addStretch(1);
 
   QHBoxLayout *hLayout = new QHBoxLayout;
-  hLayout->setMargin(0);
+  hLayout->setContentsMargins(0, 0, 0, 0);
   hLayout->setSpacing(0);
   setLayout(hLayout);
 

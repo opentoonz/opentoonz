@@ -44,7 +44,7 @@ using namespace DVGui;
 
 TimelineWidget::TimelineWidget(QWidget *parent) : QWidget(parent) {
   QVBoxLayout *mainLayout = new QVBoxLayout;
-  mainLayout->setMargin(0);
+  mainLayout->setContentsMargins(0, 0, 0, 0);
   mainLayout->setSpacing(0);
 
   QLabel *label = new QLabel(tr("Recent Version"));
@@ -123,7 +123,7 @@ SVNTimeline::SVNTimeline(QWidget *parent, const QString &workingDir,
           this, SLOT(onSelectionChanged()));
 
   QHBoxLayout *checkBoxLayout = new QHBoxLayout;
-  checkBoxLayout->setMargin(0);
+  checkBoxLayout->setContentsMargins(0, 0, 0, 0);
   m_sceneContentsCheckBox = new QCheckBox(this);
   m_sceneContentsCheckBox->setVisible(m_fileName.endsWith(".tnz"));
   connect(m_sceneContentsCheckBox, SIGNAL(toggled(bool)), this,
@@ -135,7 +135,7 @@ SVNTimeline::SVNTimeline(QWidget *parent, const QString &workingDir,
   checkBoxLayout->addStretch();
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
-  mainLayout->setMargin(0);
+  mainLayout->setContentsMargins(0, 0, 0, 0);
   mainLayout->addLayout(hLayout);
   mainLayout->addWidget(m_timelineWidget);
   mainLayout->addSpacing(5);

@@ -159,7 +159,7 @@ PaletteViewer::PaletteViewer(QWidget *parent, PaletteViewType viewType,
   createToolBar();
 
   QHBoxLayout *toolBarLayout = new QHBoxLayout(toolBarWidget);
-  toolBarLayout->setMargin(0);
+  toolBarLayout->setContentsMargins(0, 0, 0, 0);
   toolBarLayout->setSpacing(0);
   {
     toolBarLayout->addWidget(m_savePaletteToolBar, 0, Qt::AlignLeft);
@@ -173,11 +173,11 @@ PaletteViewer::PaletteViewer(QWidget *parent, PaletteViewType viewType,
   m_tabBarContainer = new TabBarContainter(this);
 
   QVBoxLayout *mainLayout = new QVBoxLayout(this);
-  mainLayout->setMargin(0);
+  mainLayout->setContentsMargins(0, 0, 0, 0);
   mainLayout->setSpacing(0);
   {
     m_hLayout = new QHBoxLayout;
-    m_hLayout->setMargin(0);
+    m_hLayout->setContentsMargins(0, 0, 0, 0);
     {
       m_hLayout->addWidget(m_pagesBar, 0);
       m_hLayout->addStretch(1);

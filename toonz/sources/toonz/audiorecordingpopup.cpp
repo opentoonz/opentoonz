@@ -170,12 +170,12 @@ AudioRecordingPopup::AudioRecordingPopup()
   m_refreshDevicesButton->setToolTip(
       tr("Refresh list of connected audio input devices"));
 
-  m_topLayout->setMargin(5);
+  m_topLayout->setContentsMargins(5, 5, 5, 5);
   m_topLayout->setSpacing(8);
 
   QVBoxLayout *mainLay = new QVBoxLayout();
   mainLay->setSpacing(3);
-  mainLay->setMargin(3);
+  mainLay->setContentsMargins(3, 3, 3, 3);
   {
     QGridLayout *recordGridLay = new QGridLayout();
     recordGridLay->setHorizontalSpacing(2);

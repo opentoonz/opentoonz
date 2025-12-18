@@ -335,17 +335,17 @@ ExportCameraTrackPopup::ExportCameraTrackPopup()
   cancelButton->setFocusPolicy(Qt::NoFocus);
   //----------
   QHBoxLayout* mainLay = new QHBoxLayout();
-  mainLay->setMargin(0);
+  mainLay->setContentsMargins(0, 0, 0, 0);
   mainLay->setSpacing(5);
   {
     mainLay->addWidget(m_previewArea, 1);
 
     QVBoxLayout* rightLay = new QVBoxLayout();
-    rightLay->setMargin(10);
+    rightLay->setContentsMargins(10, 10, 10, 10);
     rightLay->setSpacing(10);
 
     QGridLayout* appearanceLay = new QGridLayout();
-    appearanceLay->setMargin(0);
+    appearanceLay->setContentsMargins(0, 0, 0, 0);
     appearanceLay->setHorizontalSpacing(5);
     appearanceLay->setVerticalSpacing(10);
     {
@@ -366,7 +366,7 @@ ExportCameraTrackPopup::ExportCameraTrackPopup()
 
     QGroupBox* cameraRectGB    = new QGroupBox(tr("Camera Rectangles"), this);
     QGridLayout* cameraRectLay = new QGridLayout();
-    cameraRectLay->setMargin(10);
+    cameraRectLay->setContentsMargins(10, 10, 10, 10);
     cameraRectLay->setHorizontalSpacing(5);
     cameraRectLay->setVerticalSpacing(10);
     {
@@ -383,7 +383,7 @@ ExportCameraTrackPopup::ExportCameraTrackPopup()
 
     QGroupBox* trackLineGB    = new QGroupBox(tr("Track Lines"), this);
     QGridLayout* trackLineLay = new QGridLayout();
-    trackLineLay->setMargin(10);
+    trackLineLay->setContentsMargins(10, 10, 10, 10);
     trackLineLay->setHorizontalSpacing(10);
     trackLineLay->setVerticalSpacing(10);
     {
@@ -403,7 +403,7 @@ ExportCameraTrackPopup::ExportCameraTrackPopup()
 
     QGroupBox* frameNumberGB    = new QGroupBox(tr("Frame Numbers"), this);
     QGridLayout* frameNumberLay = new QGridLayout();
-    frameNumberLay->setMargin(10);
+    frameNumberLay->setContentsMargins(10, 10, 10, 10);
     frameNumberLay->setHorizontalSpacing(5);
     frameNumberLay->setVerticalSpacing(10);
     {
@@ -428,7 +428,7 @@ ExportCameraTrackPopup::ExportCameraTrackPopup()
     rightLay->addStretch(1);
 
     QHBoxLayout* buttonsLay = new QHBoxLayout();
-    buttonsLay->setMargin(5);
+    buttonsLay->setContentsMargins(5, 5, 5, 5);
     buttonsLay->setSpacing(20);
     {
       buttonsLay->addWidget(exportButton, 0);

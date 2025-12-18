@@ -778,14 +778,14 @@ void ExportXDTSCommand::execute() {
     // errors in applications other than XDTS Viewer.
 
     QVBoxLayout *customLay = new QVBoxLayout();
-    customLay->setMargin(5);
+    customLay->setContentsMargins(5, 5, 5, 5);
     customLay->setSpacing(10);
     {
       QGroupBox *cellMarkGroupBox =
           new QGroupBox(QObject::tr("Cell marks for XDTS symbols"));
 
       QGridLayout *cellMarkLay = new QGridLayout();
-      cellMarkLay->setMargin(10);
+      cellMarkLay->setContentsMargins(10, 10, 10, 10);
       cellMarkLay->setVerticalSpacing(10);
       cellMarkLay->setHorizontalSpacing(5);
       {
@@ -812,7 +812,7 @@ void ExportXDTSCommand::execute() {
       customLay->addWidget(cellMarkGroupBox, 0, Qt::AlignRight);
 
       QHBoxLayout *bottomLay = new QHBoxLayout();
-      bottomLay->setMargin(0);
+      bottomLay->setContentsMargins(0, 0, 0, 0);
       bottomLay->setSpacing(10);
       {
         bottomLay->addWidget(new QLabel(QObject::tr("Target column")), 1,

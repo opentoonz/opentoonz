@@ -439,7 +439,7 @@ VectorizerPopup::VectorizerPopup(QWidget *parent, Qt::WindowFlags flags)
     QHBoxLayout *toolbarsLayout = new QHBoxLayout(toolbarsContainer);
     toolbarsContainer->setLayout(toolbarsLayout);
 
-    toolbarsLayout->setMargin(0);
+    toolbarsLayout->setContentsMargins(0, 0, 0, 0);
     toolbarsLayout->setSpacing(0);
 
     QToolBar *spacingToolBar = new QToolBar(

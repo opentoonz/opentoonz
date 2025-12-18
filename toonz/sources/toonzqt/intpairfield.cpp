@@ -49,7 +49,7 @@ IntPairField::IntPairField(QWidget *parent, bool isMaxRangeLimited)
 
   //----layout
   QHBoxLayout *m_mainLayout = new QHBoxLayout;
-  m_mainLayout->setMargin(0);
+  m_mainLayout->setContentsMargins(0, 0, 0, 0);
   m_mainLayout->setSpacing(5);
   {
     m_mainLayout->addWidget(m_leftLabel, 1);

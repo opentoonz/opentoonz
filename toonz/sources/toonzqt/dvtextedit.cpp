@@ -232,7 +232,7 @@ void DvTextEdit::createMiniToolBar() {
 
   QVBoxLayout *m_mainLayout = new QVBoxLayout(m_miniToolBar);
   m_mainLayout->setSizeConstraint(QLayout::SetFixedSize);
-  m_mainLayout->setMargin(2);
+  m_mainLayout->setContentsMargins(2, 2, 2, 2);
   m_mainLayout->setSpacing(2);
   m_mainLayout->addWidget(toolBarUp);
   m_mainLayout->addWidget(toolBarDown);

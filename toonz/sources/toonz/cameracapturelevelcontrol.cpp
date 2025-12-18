@@ -287,12 +287,12 @@ CameraCaptureLevelControl::CameraCaptureLevelControl(QWidget* parent)
   m_gammaFld->setToolTip(tr("Gamma Value"));
 
   QVBoxLayout* mainLay = new QVBoxLayout();
-  mainLay->setMargin(0);
+  mainLay->setContentsMargins(0, 0, 0, 0);
   mainLay->setSpacing(4);
   {
     mainLay->addWidget(m_histogram, 0, Qt::AlignHCenter);
     QHBoxLayout* fieldsLay = new QHBoxLayout();
-    fieldsLay->setMargin(1);
+    fieldsLay->setContentsMargins(1, 1, 1, 1);
     fieldsLay->setSpacing(0);
     {
       fieldsLay->addWidget(m_blackFld, 0);

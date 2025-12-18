@@ -173,7 +173,7 @@ CellMarksPopup::CellMarksPopup(QWidget *parent) : QDialog(parent) {
                                                 ->getCellMarks();
 
   QGridLayout *layout = new QGridLayout();
-  layout->setMargin(10);
+  layout->setContentsMargins(10, 10, 10, 10);
   layout->setHorizontalSpacing(5);
   layout->setVerticalSpacing(10);
   {
@@ -290,7 +290,7 @@ ColorFiltersPopup::ColorFiltersPopup(QWidget *parent) : QDialog(parent) {
                                                      ->getColorFilters();
 
   QGridLayout *layout = new QGridLayout();
-  layout->setMargin(10);
+  layout->setContentsMargins(10, 10, 10, 10);
   layout->setHorizontalSpacing(5);
   layout->setVerticalSpacing(10);
   {
@@ -509,7 +509,7 @@ SceneSettingsPopup::SceneSettingsPopup()
 
   // layout
   QGridLayout *mainLayout = new QGridLayout();
-  mainLayout->setMargin(10);
+  mainLayout->setContentsMargins(10, 10, 10, 10);
   mainLayout->setHorizontalSpacing(5);
   mainLayout->setVerticalSpacing(15);
   {

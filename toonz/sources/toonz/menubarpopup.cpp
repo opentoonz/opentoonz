@@ -351,11 +351,11 @@ MenuBarPopup::MenuBarPopup(Room* room)
 
   //--- layout
   QVBoxLayout* mainLay = new QVBoxLayout();
-  m_topLayout->setMargin(0);
+  m_topLayout->setContentsMargins(0, 0, 0, 0);
   m_topLayout->setSpacing(0);
   {
     QGridLayout* mainUILay = new QGridLayout();
-    mainUILay->setMargin(5);
+    mainUILay->setContentsMargins(5, 5, 5, 5);
     mainUILay->setHorizontalSpacing(8);
     mainUILay->setVerticalSpacing(5);
     {
@@ -364,7 +364,7 @@ MenuBarPopup::MenuBarPopup(Room* room)
       mainUILay->addWidget(m_menuBarTree, 1, 0, 2, 1);
 
       QHBoxLayout* searchLay = new QHBoxLayout();
-      searchLay->setMargin(0);
+      searchLay->setContentsMargins(0, 0, 0, 0);
       searchLay->setSpacing(5);
       {
         searchLay->addWidget(new QLabel(tr("Search:"), this), 0);
@@ -384,7 +384,7 @@ MenuBarPopup::MenuBarPopup(Room* room)
     m_topLayout->addLayout(mainUILay, 1);
   }
 
-  m_buttonLayout->setMargin(0);
+  m_buttonLayout->setContentsMargins(0, 0, 0, 0);
   m_buttonLayout->setSpacing(30);
   {
     m_buttonLayout->addStretch(1);

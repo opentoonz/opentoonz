@@ -1949,14 +1949,14 @@ m_value->setFont(font);*/
   }
 
   QGridLayout *mainLayout = new QGridLayout();
-  mainLayout->setMargin(3);
+  mainLayout->setContentsMargins(3, 3, 3, 3);
   mainLayout->setHorizontalSpacing(6);
   mainLayout->setVerticalSpacing(6);
   {
     mainLayout->addWidget(new QLabel(tr("Opacity:"), this), 0, 0,
                           Qt::AlignRight | Qt::AlignVCenter);
     QHBoxLayout *hlayout = new QHBoxLayout;
-    hlayout->setMargin(0);
+    hlayout->setContentsMargins(0, 0, 0, 0);
     hlayout->setSpacing(3);
     {
       hlayout->addWidget(m_slider);
@@ -1972,7 +1972,7 @@ m_value->setFont(font);*/
 
     if (m_lockBtn) {
       QHBoxLayout *lockLay = new QHBoxLayout();
-      lockLay->setMargin(0);
+      lockLay->setContentsMargins(0, 0, 0, 0);
       lockLay->setSpacing(3);
       {
         lockLay->addWidget(m_lockBtn, 0);
@@ -2122,12 +2122,12 @@ SoundColumnPopup::SoundColumnPopup(QWidget *parent)
   QLabel *sliderLabel = new QLabel(tr("Volume:"), this);
 
   QVBoxLayout *mainLayout = new QVBoxLayout();
-  mainLayout->setMargin(3);
+  mainLayout->setContentsMargins(3, 3, 3, 3);
   mainLayout->setSpacing(3);
   {
     QHBoxLayout *hlayout = new QHBoxLayout;
     // hlayout->setContentsMargins(0, 3, 0, 3);
-    hlayout->setMargin(0);
+    hlayout->setContentsMargins(0, 0, 0, 0);
     hlayout->setSpacing(3);
     hlayout->addWidget(sliderLabel, 0);
     hlayout->addWidget(m_slider);

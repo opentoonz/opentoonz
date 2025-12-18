@@ -17,7 +17,7 @@
 DateChooserWidget::DateChooserWidget(QWidget *parent)
     : QWidget(parent), m_selectedRadioIndex(0) {
   QVBoxLayout *mainLayout = new QVBoxLayout;
-  mainLayout->setMargin(0);
+  mainLayout->setContentsMargins(0, 0, 0, 0);
   mainLayout->setAlignment(Qt::AlignTop);
 
   // Time
@@ -178,7 +178,7 @@ QString DateChooserWidget::getRevisionString() const {
 ConflictWidget::ConflictWidget(QWidget *parent)
     : QWidget(parent), m_button1Text(tr("Mine")), m_button2Text(tr("Theirs")) {
   m_mainLayout = new QVBoxLayout;
-  m_mainLayout->setMargin(0);
+  m_mainLayout->setContentsMargins(0, 0, 0, 0);
   m_mainLayout->setAlignment(Qt::AlignTop);
   setLayout(m_mainLayout);
 }
@@ -228,7 +228,7 @@ DoubleRadioWidget::DoubleRadioWidget(const QString &button1Text,
 
 {
   QHBoxLayout *mainLayout = new QHBoxLayout;
-  mainLayout->setMargin(0);
+  mainLayout->setContentsMargins(0, 0, 0, 0);
 
   m_firstButton = new QRadioButton(button1Text);
   connect(m_firstButton, SIGNAL(clicked()), this, SIGNAL(valueChanged()));

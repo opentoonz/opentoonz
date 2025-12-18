@@ -114,13 +114,13 @@ FileBrowserPopup::FileBrowserPopup(const QString &title, Options options,
   // layout
   if (!(options & CUSTOM_LAYOUT)) {
     QVBoxLayout *mainLayout = new QVBoxLayout();
-    mainLayout->setMargin(0);
+    mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->setSpacing(3);
     {
       mainLayout->addWidget(m_browser, 1);
 
       QHBoxLayout *bottomLay = new QHBoxLayout();
-      bottomLay->setMargin(5);
+      bottomLay->setContentsMargins(5, 5, 5, 5);
       bottomLay->setSpacing(3);
       {
         bottomLay->addWidget(m_nameFieldLabel, 0);
@@ -131,7 +131,7 @@ FileBrowserPopup::FileBrowserPopup(const QString &title, Options options,
       if (m_customWidget) mainLayout->addWidget(m_customWidget);
 
       QHBoxLayout *buttonsLay = new QHBoxLayout();
-      buttonsLay->setMargin(5);
+      buttonsLay->setContentsMargins(5, 5, 5, 5);
       buttonsLay->setSpacing(15);
       {
         buttonsLay->addStretch();
@@ -772,13 +772,13 @@ LoadLevelPopup::LoadLevelPopup()
   //----layout
   auto createVBoxLayout = [](int margin, int spacing) {
     QVBoxLayout *layout = new QVBoxLayout();
-    layout->setMargin(margin);
+    layout->setContentsMargins(margin, margin, margin, margin);
     layout->setSpacing(spacing);
     return layout;
   };
   auto createHBoxLayout = [](int margin, int spacing) {
     QHBoxLayout *layout = new QHBoxLayout();
-    layout->setMargin(margin);
+    layout->setContentsMargins(margin, margin, margin, margin);
     layout->setSpacing(spacing);
     return layout;
   };
@@ -832,7 +832,7 @@ LoadLevelPopup::LoadLevelPopup()
     QHBoxLayout *bottomLay = createHBoxLayout(0, 10);
     {
       QGridLayout *levelLay = new QGridLayout();
-      levelLay->setMargin(5);
+      levelLay->setContentsMargins(5, 5, 5, 5);
       levelLay->setSpacing(5);
       {
         levelLay->addWidget(new QLabel(tr("Level Name:"), this), 0, 0,
@@ -866,7 +866,7 @@ LoadLevelPopup::LoadLevelPopup()
       bottomLay->addWidget(m_levelPropertiesFrame, 0);
 
       QGridLayout *arrLay = new QGridLayout();
-      arrLay->setMargin(5);
+      arrLay->setContentsMargins(5, 5, 5, 5);
       arrLay->setSpacing(5);
       {
         arrLay->addWidget(new QLabel(tr("From:"), this), 0, 0,
@@ -1932,7 +1932,7 @@ LoadColorModelPopup::LoadColorModelPopup()
 
   // layout
   QHBoxLayout *mainLayout = new QHBoxLayout();
-  mainLayout->setMargin(5);
+  mainLayout->setContentsMargins(5, 5, 5, 5);
   mainLayout->setSpacing(5);
   {
     mainLayout->addStretch(1);

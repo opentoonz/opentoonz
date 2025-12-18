@@ -188,13 +188,13 @@ FileBrowser::FileBrowser(QWidget *parent, Qt::WindowFlags flags,
 
   // layout
   QVBoxLayout *mainLayout = new QVBoxLayout();
-  mainLayout->setMargin(3);
+  mainLayout->setContentsMargins(3, 3, 3, 3);
   mainLayout->setSpacing(2);
   {
     mainLayout->addWidget(buttonBar);
 
     QHBoxLayout *folderLay = new QHBoxLayout();
-    folderLay->setMargin(0);
+    folderLay->setContentsMargins(0, 0, 0, 0);
     folderLay->setSpacing(0);
     {
       folderLay->addWidget(folderLabel, 0);
@@ -204,7 +204,7 @@ FileBrowser::FileBrowser(QWidget *parent, Qt::WindowFlags flags,
 
     m_mainSplitter->addWidget(m_folderTreeView);
     QVBoxLayout *boxLayout = new QVBoxLayout(box);
-    boxLayout->setMargin(0);
+    boxLayout->setContentsMargins(0, 0, 0, 0);
     boxLayout->setSpacing(0);
     {
       boxLayout->addWidget(titleBar, 0);
