@@ -20,7 +20,7 @@ on:
 
 jobs:
   macOS:
-    timeout-minutes: 120 # Stop job if it exceeds expected build time
+    timeout-minutes: 180 # Stop job if it exceeds expected build time
     # GHA are sunsetting support for macOS 13 (Intel & Apple Silicon/arm) & will be fully unsupported on (December 4th 2025),
     # See: https://github.blog/changelog/2025-09-19-github-actions-macos-13-runner-image-is-closing-down/ & https://github.com/actions/runner-images/issues/13046
     # (Septemer 19th 2025) - Replacing `macos-13` runner image with the new `macos-15-intel` runner image to maintain macOS (Intel x64) support.
@@ -49,16 +49,16 @@ jobs:
         run: |
           checkPkgAndInstall() {
             for pkg in "$@"; do
-              if brew ls --versions $pkg; then
-                brew upgrade $pkg
+              if brew ls --versions "$pkg" >/dev/null; then
+                echo "$pkg already installed"
               else
-                brew install $pkg
+                brew install "$pkg"
               fi
             done
           }
           
           brew update
-          brew cleanup
+
           checkPkgAndInstall pkg-config glew lz4 libjpeg libpng lzo boost libusb libmypaint ccache jpeg-turbo ninja opencv openjph openexr qt@5
       - name: Set up cache
         run: |
