@@ -268,15 +268,25 @@ public:
       if (m_tempBuffer && m_y == ly) {
         m_tempBuffer.reset();
       }
+      throw TException("Unable to read file");
       return;
     }
 
     int y = m_info.m_ly - 1 - m_y;
-    if (y < 0) return;
+    if (y < 0) {
+      throw TException("Unable to read file");
+      return;
+    }
     m_y++;
 
     png_bytep row_pointer = m_rowBuffer.get();
     png_read_row(m_png_ptr, row_pointer, NULL);
+
+     if (setjmp(png_jmpbuf(m_png_ptr))) {
+      // If an error is caught in the next line, execution jumps here.
+      // We'll keep going in order ot load whever we can read.
+      return;
+    }
 
     writeRow(buffer, x0, x1);
 
