@@ -1210,14 +1210,14 @@ QPixmap StartupScenesList::createScenePreview(const QString &name,
     QPixmap scenePreview(iconPath.getQString());
     if (!scenePreview.isNull()) {
       QPixmap pixmap(m_iconSize);
-      pixmap.fill(Qt::transparent);
+      pixmap.fill(Qt::white);
       QPainter painter(&pixmap);
       QPixmap scaledPixmap =
           scenePreview.scaled(m_iconSize, Qt::AspectRatioMode::KeepAspectRatio);
       painter.drawPixmap((m_iconSize.width() - scaledPixmap.width()) / 2,
                          (m_iconSize.height() - scaledPixmap.height()) / 2,
                          scaledPixmap);
-      QPen pen(Qt::black);
+      QPen pen(palette().text().color());
       pen.setStyle(Qt::DotLine);
       painter.setPen(pen);
       painter.drawRect((m_iconSize.width() - scaledPixmap.width()) / 2,
