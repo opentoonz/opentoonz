@@ -1222,8 +1222,7 @@ QPixmap StartupScenesList::createScenePreview(const QString &name,
       painter.setPen(pen);
       painter.drawRect((m_iconSize.width() - scaledPixmap.width()) / 2,
                        (m_iconSize.height() - scaledPixmap.height()) / 2,
-                       scaledPixmap.width() - 1,
-                       scaledPixmap.height() - 1);
+                       scaledPixmap.width() - 1, scaledPixmap.height() - 1);
       return pixmap;
     }
   }
@@ -1232,15 +1231,13 @@ QPixmap StartupScenesList::createScenePreview(const QString &name,
   return pixmap;
 }
 
-void StartupScenesList::clearScenes() {
-    clear();
-}
+void StartupScenesList::clearScenes() { clear(); }
 
 void StartupScenesList::addScene(const QString &name, const QString &path) {
   QPixmap pixmap;
   if (path == ":")
-    pixmap =
-        generateIconPixmap("new_scene", 1.0, m_iconSize, Qt::KeepAspectRatio);
+    pixmap = createQIcon("new_scene", false)
+                 .pixmap(m_iconSize, QIcon::Normal, QIcon::Off);
   else
     pixmap = createScenePreview(name, TFilePath(path));
   QIcon icon(pixmap);
