@@ -55,7 +55,7 @@ ComboViewerPanel::ComboViewerPanel(QWidget *parent, Qt::WindowFlags flags)
     m_mainLayout->insertWidget(1, m_toolOptions, 0);
 
     QGridLayout *viewerL = new QGridLayout();
-    viewerL->setMargin(0);
+    viewerL->setContentsMargins(0, 0, 0, 0);
     viewerL->setSpacing(0);
     {
       viewerL->addWidget(m_vRuler, 1, 0);

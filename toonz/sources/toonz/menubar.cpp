@@ -1596,11 +1596,11 @@ TopBar::TopBar(QWidget *parent) : QToolBar(parent) {
 
   QHBoxLayout *mainLayout = new QHBoxLayout();
   mainLayout->setSpacing(0);
-  mainLayout->setMargin(0);
+  mainLayout->setContentsMargins(0, 0, 0, 0);
   {
     QVBoxLayout *menuLayout = new QVBoxLayout();
     menuLayout->setSpacing(0);
-    menuLayout->setMargin(0);
+    menuLayout->setContentsMargins(0, 0, 0, 0);
     {
       menuLayout->addStretch(1);
       menuLayout->addWidget(m_stackedMenuBar, 0);

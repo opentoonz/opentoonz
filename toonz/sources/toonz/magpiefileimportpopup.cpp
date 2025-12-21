@@ -65,7 +65,7 @@ MagpieFileImportPopup::MagpieFileImportPopup()
   fromToWidget->setFixedHeight(DVGui::WidgetHeight);
   fromToWidget->setFixedSize(210, DVGui::WidgetHeight);
   QHBoxLayout *fromToLayout = new QHBoxLayout(fromToWidget);
-  fromToLayout->setMargin(0);
+  fromToLayout->setContentsMargins(0, 0, 0, 0);
   fromToLayout->setSpacing(0);
   m_fromField = new DVGui::IntLineEdit(fromToWidget, 1, 1, 1);
   fromToLayout->addWidget(m_fromField, 0, Qt::AlignLeft);
@@ -111,7 +111,7 @@ MagpieFileImportPopup::MagpieFileImportPopup()
   frame->setStyleSheet(
       "#LipSynkViewer { border: 1px solid rgb(150,150,150); }");
   QVBoxLayout *frameLayout = new QVBoxLayout(frame);
-  frameLayout->setMargin(0);
+  frameLayout->setContentsMargins(0, 0, 0, 0);
   frameLayout->setSpacing(0);
   std::vector<int> buttonMask = {FlipConsole::eRate,
                                  FlipConsole::eSound,

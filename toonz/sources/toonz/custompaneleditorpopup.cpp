@@ -325,7 +325,7 @@ void CustomPanelEditorPopup::createFields() {
     gridLay = dynamic_cast<QGridLayout*>(m_UiFieldsContainer->layout());
   else {
     gridLay = new QGridLayout();
-    gridLay->setMargin(15);
+    gridLay->setContentsMargins(15, 15, 15, 15);
     gridLay->setHorizontalSpacing(10);
     gridLay->setVerticalSpacing(15);
     gridLay->setColumnStretch(0, 0);
@@ -698,11 +698,11 @@ CustomPanelEditorPopup::CustomPanelEditorPopup()
   beginHLayout();
 
   QVBoxLayout* leftLay = new QVBoxLayout();
-  leftLay->setMargin(0);
+  leftLay->setContentsMargins(0, 0, 0, 0);
   leftLay->setSpacing(10);
   {
     QHBoxLayout* templateLay = new QHBoxLayout();
-    templateLay->setMargin(0);
+    templateLay->setContentsMargins(0, 0, 0, 0);
     templateLay->setSpacing(5);
     {
       templateLay->addWidget(new QLabel(tr("Template:"), this), 0);
@@ -715,12 +715,12 @@ CustomPanelEditorPopup::CustomPanelEditorPopup()
   addLayout(leftLay);
 
   QVBoxLayout* rightLay = new QVBoxLayout();
-  rightLay->setMargin(0);
+  rightLay->setContentsMargins(0, 0, 0, 0);
   rightLay->setSpacing(10);
   {
     rightLay->addWidget(commandItemListLabel, 0);
     QHBoxLayout* searchLay = new QHBoxLayout();
-    searchLay->setMargin(0);
+    searchLay->setContentsMargins(0, 0, 0, 0);
     searchLay->setSpacing(5);
     {
       searchLay->addWidget(new QLabel(tr("Search:"), this), 0);
@@ -735,7 +735,7 @@ CustomPanelEditorPopup::CustomPanelEditorPopup()
 
   m_buttonLayout->addStretch(1);
   QHBoxLayout* nameLay = new QHBoxLayout();
-  nameLay->setMargin(0);
+  nameLay->setContentsMargins(0, 0, 0, 0);
   nameLay->setSpacing(3);
   {
     nameLay->addWidget(new QLabel(tr("Panel name:"), this), 0);

@@ -51,7 +51,7 @@ SVNUpdateDialog::SVNUpdateDialog(QWidget *parent, const QString &workingDir,
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->setAlignment(Qt::AlignHCenter);
-  mainLayout->setMargin(0);
+  mainLayout->setContentsMargins(0, 0, 0, 0);
 
   QHBoxLayout *hLayout = new QHBoxLayout;
 
@@ -91,7 +91,7 @@ SVNUpdateDialog::SVNUpdateDialog(QWidget *parent, const QString &workingDir,
 
   if (!isFolderOnly) {
     QHBoxLayout *checkBoxLayout = new QHBoxLayout;
-    checkBoxLayout->setMargin(0);
+    checkBoxLayout->setContentsMargins(0, 0, 0, 0);
     m_updateSceneContentsCheckBox = new QCheckBox(this);
     m_updateSceneContentsCheckBox->setChecked(false);
     m_updateSceneContentsCheckBox->setText(tr("Get Scene Contents"));

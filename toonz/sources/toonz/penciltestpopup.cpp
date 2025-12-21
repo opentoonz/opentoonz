@@ -1013,11 +1013,11 @@ PencilTestSaveInFolderPopup::PencilTestSaveInFolderPopup(QWidget* parent)
   addButtonBarWidget(okBtn, cancelBtn);
 
   //---- layout
-  m_topLayout->setMargin(10);
+  m_topLayout->setContentsMargins(10, 10, 10, 10);
   m_topLayout->setSpacing(10);
   {
     QGridLayout* saveInLay = new QGridLayout();
-    saveInLay->setMargin(0);
+    saveInLay->setContentsMargins(0, 0, 0, 0);
     saveInLay->setHorizontalSpacing(3);
     saveInLay->setVerticalSpacing(0);
     {
@@ -1033,11 +1033,11 @@ PencilTestSaveInFolderPopup::PencilTestSaveInFolderPopup(QWidget* parent)
     m_topLayout->addWidget(m_subFolderCB, 0, Qt::AlignLeft);
 
     QVBoxLayout* subFolderLay = new QVBoxLayout();
-    subFolderLay->setMargin(0);
+    subFolderLay->setContentsMargins(0, 0, 0, 0);
     subFolderLay->setSpacing(10);
     {
       QGridLayout* infoLay = new QGridLayout();
-      infoLay->setMargin(10);
+      infoLay->setContentsMargins(10, 10, 10, 10);
       infoLay->setHorizontalSpacing(3);
       infoLay->setVerticalSpacing(10);
       {
@@ -1059,7 +1059,7 @@ PencilTestSaveInFolderPopup::PencilTestSaveInFolderPopup(QWidget* parent)
       subFolderLay->addWidget(infoGroupBox, 0);
 
       QGridLayout* subNameLay = new QGridLayout();
-      subNameLay->setMargin(10);
+      subNameLay->setContentsMargins(10, 10, 10, 10);
       subNameLay->setHorizontalSpacing(3);
       subNameLay->setVerticalSpacing(10);
       {
@@ -1460,7 +1460,7 @@ void SubCameraButton::onSaveSubCamera() {
     QDialogButtonBox* buttonBox =
         new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     QVBoxLayout* lay = new QVBoxLayout();
-    lay->setMargin(5);
+    lay->setContentsMargins(5, 5, 5, 5);
     lay->setSpacing(10);
     lay->addWidget(*lineEdit);
     lay->addWidget(buttonBox);
@@ -1734,11 +1734,11 @@ PencilTestPopup::PencilTestPopup()
   m_dpiBtn->setObjectName("SubcameraButton");
 
   //---- layout ----
-  m_topLayout->setMargin(10);
+  m_topLayout->setContentsMargins(10, 10, 10, 10);
   m_topLayout->setSpacing(10);
   {
     QHBoxLayout* camLay = new QHBoxLayout();
-    camLay->setMargin(0);
+    camLay->setContentsMargins(0, 0, 0, 0);
     camLay->setSpacing(3);
     {
       camLay->addWidget(new QLabel(tr("Camera:"), this), 0);
@@ -1756,7 +1756,7 @@ PencilTestPopup::PencilTestPopup()
       camLay->addSpacing(10);
       camLay->addWidget(m_subcameraButton, 0);
       QHBoxLayout* subCamLay = new QHBoxLayout();
-      subCamLay->setMargin(0);
+      subCamLay->setContentsMargins(0, 0, 0, 0);
       subCamLay->setSpacing(3);
       {
         subCamLay->addWidget(new IconView("edit_scale", tr("Size"), this), 0);
@@ -1791,28 +1791,28 @@ PencilTestPopup::PencilTestPopup()
     m_topLayout->addLayout(camLay, 0);
 
     QHBoxLayout* bottomLay = new QHBoxLayout();
-    bottomLay->setMargin(0);
+    bottomLay->setContentsMargins(0, 0, 0, 0);
     bottomLay->setSpacing(10);
     {
       bottomLay->addWidget(m_videoWidget, 1);
 
       QVBoxLayout* rightLay = new QVBoxLayout();
-      rightLay->setMargin(0);
+      rightLay->setContentsMargins(0, 0, 0, 0);
       rightLay->setSpacing(5);
       {
         QVBoxLayout* fileLay = new QVBoxLayout();
-        fileLay->setMargin(8);
+        fileLay->setContentsMargins(8, 8, 8, 8);
         fileLay->setSpacing(5);
         {
           QGridLayout* levelLay = new QGridLayout();
-          levelLay->setMargin(0);
+          levelLay->setContentsMargins(0, 0, 0, 0);
           levelLay->setHorizontalSpacing(3);
           levelLay->setVerticalSpacing(5);
           {
             levelLay->addWidget(new QLabel(tr("Name:"), this), 0, 0,
                                 Qt::AlignRight);
             QHBoxLayout* nameLay = new QHBoxLayout();
-            nameLay->setMargin(0);
+            nameLay->setContentsMargins(0, 0, 0, 0);
             nameLay->setSpacing(2);
             {
               nameLay->addWidget(m_previousLevelButton, 0);
@@ -1825,7 +1825,7 @@ PencilTestPopup::PencilTestPopup()
                                 Qt::AlignRight);
 
             QHBoxLayout* frameLay = new QHBoxLayout();
-            frameLay->setMargin(0);
+            frameLay->setContentsMargins(0, 0, 0, 0);
             frameLay->setSpacing(2);
             {
               frameLay->addWidget(m_frameNumberEdit, 1);
@@ -1838,7 +1838,7 @@ PencilTestPopup::PencilTestPopup()
           fileLay->addLayout(levelLay, 0);
 
           QHBoxLayout* fileTypeLay = new QHBoxLayout();
-          fileTypeLay->setMargin(0);
+          fileTypeLay->setContentsMargins(0, 0, 0, 0);
           fileTypeLay->setSpacing(3);
           {
             fileTypeLay->addWidget(new QLabel(tr("File Type:"), this), 0);
@@ -1854,7 +1854,7 @@ PencilTestPopup::PencilTestPopup()
         rightLay->addWidget(fileFrame, 0);
 
         QGridLayout* imageLay = new QGridLayout();
-        imageLay->setMargin(8);
+        imageLay->setContentsMargins(8, 8, 8, 8);
         imageLay->setHorizontalSpacing(3);
         imageLay->setVerticalSpacing(5);
         {
@@ -1882,7 +1882,7 @@ PencilTestPopup::PencilTestPopup()
 
         // Calibration
         QGridLayout* calibLay = new QGridLayout();
-        calibLay->setMargin(8);
+        calibLay->setContentsMargins(8, 8, 8, 8);
         calibLay->setHorizontalSpacing(3);
         calibLay->setVerticalSpacing(5);
         {
@@ -1890,7 +1890,7 @@ PencilTestPopup::PencilTestPopup()
           calibLay->addWidget(m_calibration.loadBtn, 0, 1);
           calibLay->addWidget(m_calibration.exportBtn, 0, 2);
           QHBoxLayout* lay = new QHBoxLayout();
-          lay->setMargin(0);
+          lay->setContentsMargins(0, 0, 0, 0);
           lay->setSpacing(5);
           lay->addWidget(m_calibration.capBtn, 1);
           lay->addWidget(m_calibration.label, 0);
@@ -1902,7 +1902,7 @@ PencilTestPopup::PencilTestPopup()
         rightLay->addWidget(m_calibration.groupBox, 0);
 
         QGridLayout* onionSkinLay = new QGridLayout();
-        onionSkinLay->setMargin(8);
+        onionSkinLay->setContentsMargins(8, 8, 8, 8);
         onionSkinLay->setHorizontalSpacing(3);
         onionSkinLay->setVerticalSpacing(5);
         {
@@ -1917,7 +1917,7 @@ PencilTestPopup::PencilTestPopup()
         rightLay->addWidget(m_onionSkinGBox);
 
         QHBoxLayout* timerLay = new QHBoxLayout();
-        timerLay->setMargin(8);
+        timerLay->setContentsMargins(8, 8, 8, 8);
         timerLay->setSpacing(3);
         {
           timerLay->addWidget(new QLabel(tr("Interval(sec):"), this), 0,
@@ -3825,7 +3825,7 @@ QWidget* PencilTestPopup::createDpiMenuWidget() {
   m_customDpiField->setValidator(new QDoubleValidator(1.0, 2000.0, 6));
 
   QGridLayout* layout = new QGridLayout();
-  layout->setMargin(10);
+  layout->setContentsMargins(10, 10, 10, 10);
   layout->setHorizontalSpacing(5);
   layout->setVerticalSpacing(10);
   {

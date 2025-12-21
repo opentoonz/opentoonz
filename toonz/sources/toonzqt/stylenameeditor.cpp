@@ -48,14 +48,14 @@ NewWordDialog::NewWordDialog(QWidget* parent) {
 
   // layout
   QVBoxLayout* mainLay = new QVBoxLayout();
-  mainLay->setMargin(5);
+  mainLay->setContentsMargins(5, 5, 5, 5);
   mainLay->setSpacing(5);
   {
     mainLay->addWidget(new QLabel(tr("Enter new word"), this), 0,
                        Qt::AlignLeft | Qt::AlignVCenter);
     mainLay->addWidget(m_lineEdit, 0);
     QHBoxLayout* buttonsLay = new QHBoxLayout();
-    buttonsLay->setMargin(3);
+    buttonsLay->setContentsMargins(3, 3, 3, 3);
     buttonsLay->setSpacing(20);
     {
       buttonsLay->addSpacing(1);
@@ -179,7 +179,7 @@ EasyInputArea::EasyInputArea(QWidget* parent) : QWidget(parent) {
   loadList();
 
   QHBoxLayout* mainLay = new QHBoxLayout();
-  mainLay->setMargin(0);
+  mainLay->setContentsMargins(0, 0, 0, 0);
   mainLay->setSpacing(3);
   for (int a = 0; a < WORD_COLUMN_AMOUNT; a++) {
     m_scrollArea[a] = new QScrollArea(this);
@@ -187,7 +187,7 @@ EasyInputArea::EasyInputArea(QWidget* parent) : QWidget(parent) {
 
     QFrame* wordPanel       = new QFrame(this);
     QGridLayout* buttonsLay = new QGridLayout();
-    buttonsLay->setMargin(3);
+    buttonsLay->setContentsMargins(3, 3, 3, 3);
     buttonsLay->setSpacing(3);
     {
       int row = 0;
@@ -373,11 +373,11 @@ StyleNameEditor::StyleNameEditor(QWidget* parent)
   easyInputArea->setFocusPolicy(Qt::NoFocus);
 
   // QVBoxLayout* mainLayout = new QVBoxLayout();
-  m_topLayout->setMargin(10);
+  m_topLayout->setContentsMargins(10, 10, 10, 10);
   m_topLayout->setSpacing(5);
   {
     QHBoxLayout* inputLayout = new QHBoxLayout();
-    inputLayout->setMargin(0);
+    inputLayout->setContentsMargins(0, 0, 0, 0);
     inputLayout->setSpacing(3);
     {
       inputLayout->addWidget(new QLabel(tr("Style Name"), this), 0);
@@ -386,7 +386,7 @@ StyleNameEditor::StyleNameEditor(QWidget* parent)
     m_topLayout->addLayout(inputLayout, 0);
 
     QHBoxLayout* buttonLayout = new QHBoxLayout();
-    buttonLayout->setMargin(0);
+    buttonLayout->setContentsMargins(0, 0, 0, 0);
     buttonLayout->setSpacing(3);
     {
       buttonLayout->addWidget(m_okButton);
@@ -398,7 +398,7 @@ StyleNameEditor::StyleNameEditor(QWidget* parent)
     m_topLayout->addSpacing(5);
 
     QHBoxLayout* labelLay = new QHBoxLayout();
-    labelLay->setMargin(0);
+    labelLay->setContentsMargins(0, 0, 0, 0);
     labelLay->setSpacing(3);
     {
       labelLay->addWidget(new QLabel(tr("Easy Inputs"), this), 1,

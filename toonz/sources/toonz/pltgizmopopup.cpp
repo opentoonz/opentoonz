@@ -462,7 +462,7 @@ ValueAdjuster::ValueAdjuster(QWidget *parent, Qt::WindowFlags flags)
   m_valueLineEdit->setRange(0, 1000);
   //----layout
   QHBoxLayout *layout = new QHBoxLayout(this);
-  layout->setMargin(0);
+  layout->setContentsMargins(0, 0, 0, 0);
   layout->setSpacing(1);
   {
     layout->addWidget(plusBut, 0);
@@ -511,7 +511,7 @@ ValueShifter::ValueShifter(bool isHue, QWidget *parent, Qt::WindowFlags flags)
 
   //----layout
   QHBoxLayout *layout = new QHBoxLayout(this);
-  layout->setMargin(0);
+  layout->setContentsMargins(0, 0, 0, 0);
   layout->setSpacing(1);
   {
     layout->addWidget(plusBut, 0);
@@ -548,7 +548,7 @@ void ValueShifter::onClickedMinus() {
 ColorFader::ColorFader(QString name, QWidget *parent, Qt::WindowFlags flags)
     : QWidget(parent) {
   QHBoxLayout *layout = new QHBoxLayout(this);
-  layout->setMargin(0);
+  layout->setContentsMargins(0, 0, 0, 0);
   layout->setSpacing(6);
   layout->setSizeConstraint(QLayout::SetFixedSize);
 
@@ -606,11 +606,11 @@ PltGizmoPopup::PltGizmoPopup()
   QPushButton *zeroMatteButton = new QPushButton(tr("Zero Alpha"), this);
 
   //----layout
-  m_topLayout->setMargin(5);
+  m_topLayout->setContentsMargins(5, 5, 5, 5);
   m_topLayout->setSpacing(3);
   {
     QGridLayout *upperLay = new QGridLayout();
-    upperLay->setMargin(0);
+    upperLay->setContentsMargins(0, 0, 0, 0);
     upperLay->setSpacing(3);
     {
       upperLay->addWidget(new QLabel(tr("Scale (%)"), this), 0, 1);
@@ -644,11 +644,11 @@ PltGizmoPopup::PltGizmoPopup()
 
     QGroupBox *fadeBox   = new QGroupBox(tr("Fade to Color"), this);
     QVBoxLayout *fadeLay = new QVBoxLayout();
-    fadeLay->setMargin(3);
+    fadeLay->setContentsMargins(3, 3, 3, 3);
     fadeLay->setSpacing(3);
     {
       QHBoxLayout *colorLay = new QHBoxLayout();
-      colorLay->setMargin(0);
+      colorLay->setContentsMargins(0, 0, 0, 0);
       colorLay->setSpacing(4);
       {
         colorLay->addWidget(new QLabel(tr("Color"), this), 0);

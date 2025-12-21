@@ -287,7 +287,7 @@ CameraSettingsWidget::CameraSettingsWidget(bool forCleanup)
 
   QVBoxLayout *mainLay = new QVBoxLayout();
   mainLay->setSpacing(3);
-  mainLay->setMargin(3);
+  mainLay->setContentsMargins(3, 3, 3, 3);
   {
     QGridLayout *gridLay = new QGridLayout();
     gridLay->setHorizontalSpacing(2);
@@ -328,7 +328,7 @@ CameraSettingsWidget::CameraSettingsWidget(bool forCleanup)
 
     QHBoxLayout *resListLay = new QHBoxLayout();
     resListLay->setSpacing(3);
-    resListLay->setMargin(1);
+    resListLay->setContentsMargins(1, 1, 1, 1);
     {
       resListLay->addWidget(m_presetListOm, 1);
       resListLay->addWidget(m_addPresetBtn, 0);

@@ -48,7 +48,7 @@ SVNRevertDialog::SVNRevertDialog(QWidget *parent, const QString &workingDir,
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->setAlignment(Qt::AlignHCenter);
-  mainLayout->setMargin(0);
+  mainLayout->setContentsMargins(0, 0, 0, 0);
 
   QHBoxLayout *hLayout = new QHBoxLayout;
 
@@ -78,7 +78,7 @@ SVNRevertDialog::SVNRevertDialog(QWidget *parent, const QString &workingDir,
   if (!m_folderOnly) {
     mainLayout->addSpacing(10);
     QHBoxLayout *checkBoxLayout = new QHBoxLayout;
-    checkBoxLayout->setMargin(0);
+    checkBoxLayout->setContentsMargins(0, 0, 0, 0);
     m_revertSceneContentsCheckBox = new QCheckBox(this);
     connect(m_revertSceneContentsCheckBox, SIGNAL(toggled(bool)), this,
             SLOT(onRevertSceneContentsToggled(bool)));

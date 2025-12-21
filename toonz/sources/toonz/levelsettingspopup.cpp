@@ -450,13 +450,13 @@ LevelSettingsPopup::LevelSettingsPopup()
   m_activateFlags[m_colorSpaceGammaFld]   = linearFlag;
 
   //----layout
-  m_topLayout->setMargin(5);
+  m_topLayout->setContentsMargins(5, 5, 5, 5);
   m_topLayout->setSpacing(5);
   {
     //--Name&Path
     QGroupBox *nameBox      = new QGroupBox(tr("Name && Path"), this);
     QGridLayout *nameLayout = new QGridLayout();
-    nameLayout->setMargin(5);
+    nameLayout->setContentsMargins(5, 5, 5, 5);
     nameLayout->setSpacing(5);
     {
       nameLayout->addWidget(new QLabel(tr("Name:"), this), 0, 0,
@@ -483,7 +483,7 @@ LevelSettingsPopup::LevelSettingsPopup()
     else
       dpiBox = new QGroupBox(tr("DPI && Resolution"), this);
     QGridLayout *dpiLayout = new QGridLayout();
-    dpiLayout->setMargin(5);
+    dpiLayout->setContentsMargins(5, 5, 5, 5);
     dpiLayout->setSpacing(5);
     {
       dpiLayout->addWidget(m_dpiTypeOm, 0, 1, 1, 3);
@@ -523,7 +523,7 @@ LevelSettingsPopup::LevelSettingsPopup()
 
     //---subsampling
     QGridLayout *bottomLay = new QGridLayout();
-    bottomLay->setMargin(3);
+    bottomLay->setContentsMargins(3, 3, 3, 3);
     bottomLay->setSpacing(3);
     {
       bottomLay->addWidget(m_softnessLabel, 0, 0);

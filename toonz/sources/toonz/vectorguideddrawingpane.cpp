@@ -102,7 +102,7 @@ VectorGuidedDrawingPane::VectorGuidedDrawingPane(QWidget *parent,
   connect(m_FlipPrevDirectionBtn, SIGNAL(clicked()), action, SLOT(trigger()));
 
   QGridLayout *mainlayout = new QGridLayout();
-  mainlayout->setMargin(5);
+  mainlayout->setContentsMargins(5, 5, 5, 5);
   mainlayout->setSpacing(2);
   {
     QLabel *guideFrameLabel = new QLabel(this);
@@ -114,7 +114,7 @@ VectorGuidedDrawingPane::VectorGuidedDrawingPane(QWidget *parent,
     selectGuideStrokeLabel->setText(tr("Select Guide Stroke:"));
     mainlayout->addWidget(selectGuideStrokeLabel, 1, 0, Qt::AlignRight);
     QHBoxLayout *selectBtnLayout = new QHBoxLayout();
-    selectBtnLayout->setMargin(0);
+    selectBtnLayout->setContentsMargins(0, 0, 0, 0);
     selectBtnLayout->setSpacing(2);
     {
       selectBtnLayout->addWidget(m_selectPrevGuideBtn, 0);
@@ -128,7 +128,7 @@ VectorGuidedDrawingPane::VectorGuidedDrawingPane(QWidget *parent,
     flipGuideStrokeLabel->setText(tr("Flip Guide Stroke:"));
     mainlayout->addWidget(flipGuideStrokeLabel, 2, 0, Qt::AlignRight);
     QHBoxLayout *flipBtnLayout = new QHBoxLayout();
-    flipBtnLayout->setMargin(0);
+    flipBtnLayout->setContentsMargins(0, 0, 0, 0);
     flipBtnLayout->setSpacing(2);
     {
       flipBtnLayout->addWidget(m_FlipPrevDirectionBtn, 0);

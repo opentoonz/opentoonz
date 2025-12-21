@@ -260,7 +260,7 @@ AutoInputCellNumberPopup::AutoInputCellNumberPopup()
   m_buttonFrame->setFixedHeight(45);
 
   m_buttonLayout = new QHBoxLayout;
-  m_buttonLayout->setMargin(0);
+  m_buttonLayout->setContentsMargins(0, 0, 0, 0);
   m_buttonLayout->setSpacing(20);
   m_buttonLayout->setAlignment(Qt::AlignHCenter);
   {

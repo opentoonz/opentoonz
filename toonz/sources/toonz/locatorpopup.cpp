@@ -20,7 +20,7 @@ LocatorPopup::LocatorPopup(QWidget *parent, Qt::WindowFlags flags)
 
   //---- layout
   QVBoxLayout *mainLayout = new QVBoxLayout();
-  mainLayout->setMargin(0);
+  mainLayout->setContentsMargins(0, 0, 0, 0);
   mainLayout->addWidget(m_viewer, 1);
   setLayout(mainLayout);
 

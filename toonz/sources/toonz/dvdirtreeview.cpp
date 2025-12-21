@@ -1696,7 +1696,7 @@ NodeEditor::NodeEditor(QWidget *parent, QRect rect, int leftMargin)
   setGeometry(rect);
   m_lineEdit          = new LineEdit();
   QHBoxLayout *layout = new QHBoxLayout();
-  layout->setMargin(0);
+  layout->setContentsMargins(0, 0, 0, 0);
   layout->addSpacing(leftMargin);
   layout->addWidget(m_lineEdit);
   setLayout(layout);

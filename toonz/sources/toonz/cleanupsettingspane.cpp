@@ -167,11 +167,11 @@ CleanupSettingsPane::CleanupSettingsPane(QWidget *parent)
   //----layout
   QVBoxLayout *mainLay = new QVBoxLayout();
   mainLay->setSpacing(2);
-  mainLay->setMargin(5);
+  mainLay->setContentsMargins(5, 5, 5, 5);
   {
     // Autocenter
     QGridLayout *autocenterLay = new QGridLayout();
-    autocenterLay->setMargin(5);
+    autocenterLay->setContentsMargins(5, 5, 5, 5);
     autocenterLay->setSpacing(3);
     {
       autocenterLay->addWidget(new QLabel(tr("Pegbar Holes")), 0, 0,
@@ -188,7 +188,7 @@ CleanupSettingsPane::CleanupSettingsPane(QWidget *parent)
 
     // Rotate&Flip
     QGridLayout *rotFlipLay = new QGridLayout();
-    rotFlipLay->setMargin(5);
+    rotFlipLay->setContentsMargins(5, 5, 5, 5);
     rotFlipLay->setSpacing(3);
     {
       rotFlipLay->addWidget(new QLabel(tr("Rotate")), 0, 0,
@@ -207,7 +207,7 @@ CleanupSettingsPane::CleanupSettingsPane(QWidget *parent)
 
     // Camera
     QVBoxLayout *cleanupCameraFrameLay = new QVBoxLayout();
-    cleanupCameraFrameLay->setMargin(0);
+    cleanupCameraFrameLay->setContentsMargins(0, 0, 0, 0);
     cleanupCameraFrameLay->setSpacing(0);
     { cleanupCameraFrameLay->addWidget(m_cameraWidget); }
     cameraFrame->setLayout(cleanupCameraFrameLay);
@@ -215,7 +215,7 @@ CleanupSettingsPane::CleanupSettingsPane(QWidget *parent)
 
     // Cleanup Palette
     QGridLayout *lineProcLay = new QGridLayout();
-    lineProcLay->setMargin(5);
+    lineProcLay->setContentsMargins(5, 5, 5, 5);
     lineProcLay->setSpacing(3);
     {
       lineProcLay->addWidget(new QLabel(tr("Line Processing:")), 0, 0,
@@ -251,7 +251,7 @@ CleanupSettingsPane::CleanupSettingsPane(QWidget *parent)
 
     // Bottom Parts
     QHBoxLayout *pathLay = new QHBoxLayout();
-    pathLay->setMargin(0);
+    pathLay->setContentsMargins(0, 0, 0, 0);
     pathLay->setSpacing(3);
     {
       pathLay->addWidget(new QLabel(tr("Save In")), 0);
@@ -262,7 +262,7 @@ CleanupSettingsPane::CleanupSettingsPane(QWidget *parent)
     mainLay->addSpacing(5);
 
     QHBoxLayout *saveLoadLay = new QHBoxLayout();
-    saveLoadLay->setMargin(0);
+    saveLoadLay->setContentsMargins(0, 0, 0, 0);
     saveLoadLay->setSpacing(1);
     {
       saveLoadLay->addWidget(saveBtn);

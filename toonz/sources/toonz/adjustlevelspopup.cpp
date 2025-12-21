@@ -130,7 +130,7 @@ public:
 
 EditableMarksBar::EditableMarksBar(QWidget *parent) : QFrame(parent) {
   QVBoxLayout *layout = new QVBoxLayout;
-  layout->setMargin(0);
+  layout->setContentsMargins(0, 0, 0, 0);
   layout->setSpacing(2);
   setLayout(layout);
 
@@ -157,7 +157,7 @@ EditableMarksBar::EditableMarksBar(QWidget *parent) : QFrame(parent) {
 
   // Add fields layout
   QHBoxLayout *hLayout = new QHBoxLayout;
-  hLayout->setMargin(0);
+  hLayout->setContentsMargins(0, 0, 0, 0);
   hLayout->setContentsMargins(4, 0, 5, 0);
   layout->addLayout(hLayout);
 

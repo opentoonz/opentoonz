@@ -509,7 +509,7 @@ AutocenterPopup::AutocenterPopup() : DVGui::Dialog(0, false, true) {
   QGridLayout *settingsLayout = new QGridLayout(this);
   settingsLayout->setSizeConstraint(QLayout::SetFixedSize);
   settingsLayout->setSpacing(5);
-  settingsLayout->setMargin(12);
+  settingsLayout->setContentsMargins(12, 12, 12, 12);
   int row = 0;
 
   // AutoCenter

@@ -100,11 +100,11 @@ DuplicatePopup::DuplicatePopup()
 
   //----layout
   QVBoxLayout *mainLayout = new QVBoxLayout();
-  mainLayout->setMargin(10);
+  mainLayout->setContentsMargins(10, 10, 10, 10);
   mainLayout->setSpacing(10);
   {
     QHBoxLayout *upperLay = new QHBoxLayout();
-    upperLay->setMargin(0);
+    upperLay->setContentsMargins(0, 0, 0, 0);
     upperLay->setSpacing(5);
     {
       upperLay->addWidget(new QLabel(tr("Times:"), this), 0);
@@ -116,7 +116,7 @@ DuplicatePopup::DuplicatePopup()
     mainLayout->addLayout(upperLay, 0);
 
     QHBoxLayout *bottomLay = new QHBoxLayout();
-    bottomLay->setMargin(0);
+    bottomLay->setContentsMargins(0, 0, 0, 0);
     bottomLay->setSpacing(10);
     {
       bottomLay->addWidget(m_okBtn);

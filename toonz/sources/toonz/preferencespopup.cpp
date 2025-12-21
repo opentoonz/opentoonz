@@ -67,7 +67,7 @@ namespace {
 enum DpiPolicy { DP_ImageDpi, DP_CustomDpi };
 
 inline void setupLayout(QGridLayout* lay, int margin = 15) {
-  lay->setMargin(margin);
+  lay->setContentsMargins(margin, margin, margin, margin);
   lay->setHorizontalSpacing(5);
   lay->setVerticalSpacing(10);
   lay->setColumnStretch(2, 1);
@@ -97,7 +97,7 @@ SizeField::SizeField(QSize min, QSize max, QSize value, QWidget* parent)
       new DVGui::IntLineEdit(this, value.height(), min.height(), max.height());
   QHBoxLayout* lay = new QHBoxLayout();
   lay->setSpacing(5);
-  lay->setMargin(0);
+  lay->setContentsMargins(0, 0, 0, 0);
   lay->addWidget(m_fieldX, 1);
   lay->addWidget(new QLabel("x", this), 0);
   lay->addWidget(m_fieldY, 1);
@@ -399,7 +399,7 @@ PreferencesPopup::Display30bitChecker::Display30bitChecker(
 30bit display is available in the current configuration.");
 
   QVBoxLayout* lay = new QVBoxLayout();
-  lay->setMargin(10);
+  lay->setContentsMargins(10, 10, 10, 10);
   lay->setSpacing(10);
   {
     lay->addWidget(view8bit);
@@ -1166,7 +1166,7 @@ void PreferencesPopup::insertDualUIs(
   layout->addWidget(new QLabel(getUIString(leftId), this), row, 0,
                     Qt::AlignRight | Qt::AlignVCenter);
   QHBoxLayout* innerLay = new QHBoxLayout();
-  innerLay->setMargin(0);
+  innerLay->setContentsMargins(0, 0, 0, 0);
   innerLay->setSpacing(10);
   {
     innerLay->addWidget(createUI(leftId, leftComboItems), 0);
@@ -1612,12 +1612,12 @@ PreferencesPopup::PreferencesPopup()
   stackedWidget->addWidget(createTouchTabletPage());
 
   QHBoxLayout* mainLayout = new QHBoxLayout();
-  mainLayout->setMargin(0);
+  mainLayout->setContentsMargins(0, 0, 0, 0);
   mainLayout->setSpacing(0);
   {
     // Category
     QVBoxLayout* categoryLayout = new QVBoxLayout();
-    categoryLayout->setMargin(5);
+    categoryLayout->setContentsMargins(5, 5, 5, 5);
     categoryLayout->setSpacing(10);
     categoryLayout->addWidget(categoryList, 1);
     mainLayout->addLayout(categoryLayout, 0);
@@ -1894,7 +1894,7 @@ QWidget* PreferencesPopup::createLoadingPage() {
   lay->addWidget(new QLabel(tr("Level Settings by File Format:")), row, 0,
                  Qt::AlignRight | Qt::AlignVCenter);
   QHBoxLayout* levelFormatLay = new QHBoxLayout();
-  levelFormatLay->setMargin(0);
+  levelFormatLay->setContentsMargins(0, 0, 0, 0);
   levelFormatLay->setSpacing(5);
   {
     levelFormatLay->addWidget(m_levelFormatNames);

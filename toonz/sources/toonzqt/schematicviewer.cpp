@@ -834,7 +834,7 @@ SchematicViewer::SchematicViewer(QWidget *parent)
 
   // layout
   QVBoxLayout *mainLayout = new QVBoxLayout();
-  mainLayout->setMargin(0);
+  mainLayout->setContentsMargins(0, 0, 0, 0);
   mainLayout->setSpacing(0);
   {
     mainLayout->addWidget(m_viewer, 1);
@@ -842,7 +842,7 @@ SchematicViewer::SchematicViewer(QWidget *parent)
     QFrame *bottomFrame = new QFrame(this);
     bottomFrame->setObjectName("SchematicBottomFrame");
     QHBoxLayout *horizontalLayout = new QHBoxLayout();
-    horizontalLayout->setMargin(0);
+    horizontalLayout->setContentsMargins(0, 0, 0, 0);
     horizontalLayout->setSpacing(0);
     {
       horizontalLayout->addWidget(m_commonToolbar);

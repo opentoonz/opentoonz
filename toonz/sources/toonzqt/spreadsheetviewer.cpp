@@ -585,7 +585,7 @@ SpreadsheetViewer::SpreadsheetViewer(QWidget *parent)
 
   //---- layout
   QGridLayout *layout = new QGridLayout();
-  layout->setMargin(0);
+  layout->setContentsMargins(0, 0, 0, 0);
   layout->setSpacing(0);
   {
     layout->addWidget(m_columnScrollArea, 0, 1);

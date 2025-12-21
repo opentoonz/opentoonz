@@ -201,7 +201,7 @@ HistoryPane::HistoryPane(QWidget *parent, Qt::WindowFlags flags)
 
   // layout
   QVBoxLayout *mainLayout = new QVBoxLayout();
-  mainLayout->setMargin(0);
+  mainLayout->setContentsMargins(0, 0, 0, 0);
   { mainLayout->addWidget(m_frameArea, 1); }
   setLayout(mainLayout);
 

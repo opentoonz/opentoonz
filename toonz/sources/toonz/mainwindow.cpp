@@ -455,7 +455,7 @@ MainWindow::MainWindow(const QString &argumentLayoutFileName, QWidget *parent,
 centralWidget->setFrameStyle(QFrame::StyledPanel);
 centralWidget->setObjectName("centralWidget");
 QHBoxLayout *centralWidgetLayout = new QHBoxLayout;
-centralWidgetLayout->setMargin(3);
+centralWidgetLayout->setContentsMargins(3, 3, 3, 3);
 centralWidgetLayout->addWidget(m_stackedWidget);
 centralWidget->setLayout(centralWidgetLayout);*/
 

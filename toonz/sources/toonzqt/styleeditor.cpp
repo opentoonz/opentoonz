@@ -2407,7 +2407,7 @@ SettingBox::SettingBox(QWidget *parent, int index)
 {
         QHBoxLayout* hLayout = new QHBoxLayout(this);
         hLayout->setSpacing(5);
-        hLayout->setMargin(0);
+        hLayout->setContentsMargins(0, 0, 0, 0);
         hLayout->addSpacing(10);
         m_name = new QLabel(this);
         m_name->setFixedSize(82,20);

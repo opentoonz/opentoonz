@@ -183,7 +183,7 @@ StartupPopup::StartupPopup()
   m_buttonFrame->setFixedHeight(34);
 
   //--- layout
-  m_topLayout->setMargin(0);
+  m_topLayout->setContentsMargins(0, 0, 0, 0);
   m_topLayout->setSpacing(0);
   {
     QGridLayout *guiLay      = new QGridLayout();
@@ -191,7 +191,7 @@ StartupPopup::StartupPopup()
     QGridLayout *newSceneLay = new QGridLayout();
     QWidget *newSceneWidget  = new QWidget();
     m_recentSceneLay         = new QVBoxLayout();
-    guiLay->setMargin(10);
+    guiLay->setContentsMargins(10, 10, 10, 10);
     guiLay->setVerticalSpacing(10);
     guiLay->setHorizontalSpacing(10);
 
@@ -199,7 +199,7 @@ StartupPopup::StartupPopup()
 
     //--- Project
     projectLay->setSpacing(8);
-    projectLay->setMargin(8);
+    projectLay->setContentsMargins(8, 8, 8, 8);
     {
       projectLay->addWidget(m_projectsCB, 0, 0, 1, 3);
       projectLay->addWidget(newProjectButton, 1, 0);
@@ -213,7 +213,7 @@ StartupPopup::StartupPopup()
     m_scenesTab->addTab(m_existingList, tr("Open Existing Scene"));
 
     //--- New scene
-    newSceneLay->setMargin(8);
+    newSceneLay->setContentsMargins(8, 8, 8, 8);
     newSceneLay->setVerticalSpacing(8);
     newSceneLay->setHorizontalSpacing(8);
     {
@@ -230,7 +230,7 @@ StartupPopup::StartupPopup()
                              Qt::AlignRight | Qt::AlignVCenter);
       QHBoxLayout *resListLay = new QHBoxLayout();
       resListLay->setSpacing(3);
-      resListLay->setMargin(1);
+      resListLay->setContentsMargins(1, 1, 1, 1);
       {
         resListLay->addWidget(m_presetCombo, 1);
         resListLay->addWidget(m_addPresetBtn, 0);
@@ -267,7 +267,7 @@ StartupPopup::StartupPopup()
     guiLay->addWidget(m_scenesTab, 2, 0, 4, 1, Qt::AlignTop);
 
     //--- Recent scenes
-    m_recentSceneLay->setMargin(5);
+    m_recentSceneLay->setContentsMargins(5, 5, 5, 5);
     m_recentSceneLay->setSpacing(2);
     {
       // Recent Scene List
@@ -279,7 +279,7 @@ StartupPopup::StartupPopup()
     m_topLayout->addLayout(guiLay, 0);
   }
 
-  m_buttonLayout->setMargin(0);
+  m_buttonLayout->setContentsMargins(0, 0, 0, 0);
   m_buttonLayout->setSpacing(10);
   {
     m_buttonLayout->addWidget(m_showAtStartCB, Qt::AlignLeft);

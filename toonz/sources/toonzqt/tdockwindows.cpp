@@ -37,7 +37,7 @@ TMainWindow::TMainWindow(QWidget *parent, Qt::WindowFlags flags)
 
   // Set a vertical layout to include menu bars
   QVBoxLayout *vlayout = new QVBoxLayout;
-  vlayout->setMargin(0);
+  vlayout->setContentsMargins(0, 0, 0, 0);
   vlayout->setSpacing(4);
   setLayout(vlayout);
 

@@ -219,11 +219,11 @@ LevelCreatePopup::LevelCreatePopup()
   okBtn->setDefault(true);
 
   //--- layout
-  m_topLayout->setMargin(0);
+  m_topLayout->setContentsMargins(0, 0, 0, 0);
   m_topLayout->setSpacing(0);
   {
     QGridLayout *guiLay = new QGridLayout();
-    guiLay->setMargin(10);
+    guiLay->setContentsMargins(10, 10, 10, 10);
     guiLay->setVerticalSpacing(10);
     guiLay->setHorizontalSpacing(5);
     {
@@ -283,7 +283,7 @@ LevelCreatePopup::LevelCreatePopup()
     m_topLayout->addLayout(guiLay, 1);
   }
 
-  m_buttonLayout->setMargin(0);
+  m_buttonLayout->setContentsMargins(0, 0, 0, 0);
   m_buttonLayout->setSpacing(30);
   {
     m_buttonLayout->addStretch(1);

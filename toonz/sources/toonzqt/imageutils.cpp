@@ -949,7 +949,7 @@ bool ShortcutZoomer::exec(QKeyEvent *event) {
 
 FullScreenWidget::FullScreenWidget(QWidget *parent) : QWidget(parent) {
   QHBoxLayout *layout = new QHBoxLayout(this);
-  layout->setMargin(0);
+  layout->setContentsMargins(0, 0, 0, 0);
   layout->setSpacing(0);
 
   // Attach see-through window signal so this can detect opacity changes

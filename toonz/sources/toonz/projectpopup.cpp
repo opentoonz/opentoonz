@@ -329,7 +329,7 @@ Note that this mode uses regular expression for file name validation and may slo
   m_letterCountCombo->addItem(tr("Unlimited"), 0);
 
   //----layout
-  m_topLayout->setMargin(5);
+  m_topLayout->setContentsMargins(5, 5, 5, 5);
   m_topLayout->setSpacing(10);
   {
     m_topLayout->addWidget(tabWidget, 1);
@@ -338,13 +338,13 @@ Note that this mode uses regular expression for file name validation and may slo
 
     QWidget *projectFolderPanel = new QWidget(this);
     QVBoxLayout *pfLayout       = new QVBoxLayout();
-    pfLayout->setMargin(5);
+    pfLayout->setContentsMargins(5, 5, 5, 5);
     pfLayout->setSpacing(10);
     {
       pfLayout->addWidget(m_treeView, 0);
 
       QGridLayout *upperLayout = new QGridLayout();
-      upperLayout->setMargin(5);
+      upperLayout->setContentsMargins(5, 5, 5, 5);
       upperLayout->setHorizontalSpacing(5);
       upperLayout->setVerticalSpacing(10);
       {
@@ -395,7 +395,7 @@ Note that this mode uses regular expression for file name validation and may slo
     // file path settings
     QWidget *filePathPanel = new QWidget(this);
     QVBoxLayout *fpLayout  = new QVBoxLayout();
-    fpLayout->setMargin(5);
+    fpLayout->setContentsMargins(5, 5, 5, 5);
     fpLayout->setSpacing(10);
     {
       fpLayout->addWidget(standardRB, 0);
@@ -403,7 +403,7 @@ Note that this mode uses regular expression for file name validation and may slo
 
       // add some indent
       QGridLayout *customLay = new QGridLayout();
-      customLay->setMargin(10);
+      customLay->setContentsMargins(10, 10, 10, 10);
       customLay->setHorizontalSpacing(10);
       customLay->setVerticalSpacing(10);
       {
@@ -661,7 +661,7 @@ ProjectCreatePopup::ProjectCreatePopup() : ProjectPopup(true) {
   connect(okBtn, SIGNAL(clicked()), this, SLOT(createProject()));
   connect(cancelBtn, SIGNAL(clicked()), this, SLOT(reject()));
 
-  m_buttonLayout->setMargin(0);
+  m_buttonLayout->setContentsMargins(0, 0, 0, 0);
   m_buttonLayout->setSpacing(20);
   {
     m_buttonLayout->addStretch();

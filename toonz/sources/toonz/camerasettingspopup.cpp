@@ -87,11 +87,11 @@ CameraSettingsPopup::CameraSettingsPopup()
 
   //---- layout
   QVBoxLayout *mainLay = new QVBoxLayout();
-  mainLay->setMargin(5);
+  mainLay->setContentsMargins(5, 5, 5, 5);
   mainLay->setSpacing(8);
   {
     QHBoxLayout *nameLay = new QHBoxLayout();
-    nameLay->setMargin(0);
+    nameLay->setContentsMargins(0, 0, 0, 0);
     nameLay->setSpacing(3);
     {
       nameLay->addWidget(new QLabel(tr("Name:")), 0);

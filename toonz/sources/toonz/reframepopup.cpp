@@ -33,7 +33,7 @@ ReframePopup::ReframePopup()
   m_blank->setObjectName("LargeSizedText");
   // layout
   QHBoxLayout* mainLay = new QHBoxLayout();
-  mainLay->setMargin(0);
+  mainLay->setContentsMargins(0, 0, 0, 0);
   mainLay->setSpacing(5);
   {
     mainLay->addWidget(new QLabel(tr("Number of steps:"), this));
@@ -41,7 +41,7 @@ ReframePopup::ReframePopup()
     mainLay->addWidget(new QLabel(tr("s"), this));
 
     QHBoxLayout* blankLay = new QHBoxLayout();
-    blankLay->setMargin(0);
+    blankLay->setContentsMargins(0, 0, 0, 0);
     blankLay->setSpacing(5);
     {
       blankLay->addSpacing(10);
@@ -55,7 +55,7 @@ ReframePopup::ReframePopup()
   m_topLayout->addLayout(mainLay);
 
   QHBoxLayout* textLay = new QHBoxLayout();
-  textLay->setMargin(0);
+  textLay->setContentsMargins(0, 0, 0, 0);
   {
     textLay->addStretch(1);
     textLay->addWidget(m_blankCellCountLbl);

@@ -50,7 +50,7 @@ FxParamEditorPopup::FxParamEditorPopup()
   fxSettings->setCurrentFx();
 
   QVBoxLayout *mainLayout = new QVBoxLayout();
-  mainLayout->setMargin(0);
+  mainLayout->setContentsMargins(0, 0, 0, 0);
   mainLayout->setSpacing(10);
   { mainLayout->addWidget(fxSettings); }
   setLayout(mainLayout);
