@@ -47,7 +47,7 @@ jobs:
       # Cache OpenCV and Boost libraries
       - name: Cache OpenCV and Boost
         id: cache-deps
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             C:\tools\opencv
@@ -151,7 +151,7 @@ jobs:
 
       # Upload the generated artifact
       - name: Upload Artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: Opentoonz-${{ runner.os }}-${{ github.sha }}
           path: artifact
