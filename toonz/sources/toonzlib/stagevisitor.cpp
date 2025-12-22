@@ -208,6 +208,28 @@ void onPlasticDeformedImage(TStageObject *playerObj,
                             const ImagePainter::VisualSettings &vs,
                             const TAffine &viewAff);
 
+//----------------------------------------------------------------
+// Transparency Check helper
+//----------------------------------------------------------------
+
+// High-tone empty pixels (paint = 0) blended with ink, causing dark gray.
+// Force tone = 255 so quickPut treats them as fully transparent.
+inline void forceHighToneEmptyPixels(TRasterCM32P &ras, int threshold) {
+  if (!ras) return;
+
+  ras->lock();
+  TPixelCM32 *pix    = ras->pixels();
+  TPixelCM32 *endPix = pix + ras->getLx() * ras->getLy();
+
+  for (; pix < endPix; ++pix) {
+    if (pix->getPaint() == 0 && pix->getTone() >= threshold) {
+      pix->setTone(255);
+    }
+  }
+
+  ras->unlock();
+}
+
 }  // namespace
 
 //**********************************************************************************************
@@ -373,27 +395,27 @@ RasterPainter::RasterPainter(const TDimension &dim, const TAffine &viewAff,
 
 //-----------------------------------------------------------------------------
 
-//! Utilizzato solo per TAB Pro
+//! Used only for TAB Pro
 void RasterPainter::beginMask() {
-  flushRasterImages();  // per evitare che venga fatto dopo il beginMask
+  flushRasterImages();  // to avoid doing it after beginMask
   ++m_maskLevel;
   TStencilControl::instance()->beginMask();
 }
-//! Utilizzato solo per TAB Pro
+//! Used only for TAB Pro
 void RasterPainter::endMask() {
-  flushRasterImages();  // se ci sono delle immagini raster nella maschera
-                        // devono uscire ora
+  flushRasterImages();  // if there are raster images in the mask, they must
+                        // come out now
   --m_maskLevel;
   TStencilControl::instance()->endMask();
 }
-//! Utilizzato solo per TAB Pro
+//! Used only for TAB Pro
 void RasterPainter::enableMask() {
   TStencilControl::instance()->enableMask(TStencilControl::SHOW_INSIDE);
 }
-//! Utilizzato solo per TAB Pro
+//! Used only for TAB Pro
 void RasterPainter::disableMask() {
-  flushRasterImages();  // se ci sono delle immagini raster mascherate devono
-                        // uscire ora
+  flushRasterImages();  // if there are masked raster images, they must come out
+                        // now
   TStencilControl::instance()->disableMask();
 }
 
@@ -432,7 +454,7 @@ TRasterP RasterPainter::getRaster(int index, QTransform &matrix) {
 //-----------------------------------------------------------------------------
 
 /*! Make frame visualization.
-\n	If onon-skin is active, create a new raster with dimension containing
+\n	If onion-skin is active, create a new raster with dimension containing
 all
                 frame with onion-skin; recall \b TRop::quickPut with argument
 each frame
@@ -598,17 +620,20 @@ void RasterPainter::flushRasterImages() {
       else {
         TRop::CmappedQuickputSettings settings;
 
+        // Default quickPut settings for view checks
         settings.m_globalColorScale = colorscale;
         settings.m_inksOnly         = inksOnly;
         settings.m_transparencyCheck =
             tc & (ToonzCheck::eTransparency | ToonzCheck::eGap);
         settings.m_blackBgCheck = tc & ToonzCheck::eBlackBg;
-        /*-- InkCheck, Ink#1Check, PaintCheckはカレントカラムにのみ有効 --*/
+
+        // Highlight specific ink/paint only for current column
         settings.m_inkIndex =
             m_nodes[i].m_isCurrentColumn
                 ? (tc & ToonzCheck::eInk ? index
                                          : (tc & ToonzCheck::eInk1 ? 1 : -1))
                 : -1;
+
         settings.m_paintIndex = m_nodes[i].m_isCurrentColumn
                                     ? (tc & ToonzCheck::ePaint ? index : -1)
                                     : -1;
@@ -620,7 +645,23 @@ void RasterPainter::flushRasterImages() {
         settings.m_isOnionSkin = m_nodes[i].m_onionMode != Node::eOnionSkinNone;
         settings.m_gapCheckIndex = gapCheckIndex;
 
-        TRop::quickPut(viewedRaster, srcCm, plt, aff, settings);
+        // ==============================================================
+        // Transparency Check: (see helper above)
+        // Apply high-tone empty pixel fix
+        // ==============================================================
+        TRasterCM32P rasterToUse = srcCm;  // default: original raster
+
+        if (settings.m_transparencyCheck) {
+          const int threshold = 80;  // Minimum tone for "false" high antialias
+
+          // Clone and adjust high-tone empty pixels
+          rasterToUse = srcCm->clone();
+          forceHighToneEmptyPixels(rasterToUse, threshold);
+        }
+
+        // Final render using original OpenToonz quickPut behavior
+        TRop::quickPut(viewedRaster, rasterToUse, plt, aff, settings);
+        // Temporary clone automatically destroyed when leaving scope
       }
 
       srcCm = TRasterCM32P();
@@ -703,7 +744,7 @@ void RasterPainter::flushRasterImages() {
 //-----------------------------------------------------------------------------
 /*! Make frame visualization in QPainter.
 \n	Draw in painter mode just raster image in m_nodes.
-\n  Onon-skin or channel mode are not considered.
+\n  Onion-skin or channel mode are not considered.
 */
 void RasterPainter::drawRasterImages(QPainter &p, QPolygon cameraPol) {
   if (m_nodes.empty()) return;
@@ -1021,11 +1062,10 @@ void RasterPainter::onRasterImage(TRasterImage *ri,
   int alpha                 = 255;
   Node::OnionMode onionMode = Node::eOnionSkinNone;
   if (player.m_onionSkinDistance != c_noOnionSkin) {
-    // GetOnionSkinFade va bene per il vettoriale mentre il raster funziona al
-    // contrario
-    // 1 opaco -> 0 completamente trasparente
-    // inverto quindi il risultato della funzione stando attento al caso 0
-    // (in cui era scolpito il valore 0.9)
+    // GetOnionSkinFade is good for vector while raster works the opposite way
+    // 1 opaque -> 0 completely transparent
+    // So I invert the result of the function, being careful about case 0
+    // (where the value 0.9 was carved)
     double onionSkiFade = player.m_onionSkinDistance == 0
                               ? 0.9
                               : (1.0 - OnionSkinMask::getOnionSkinFade(
