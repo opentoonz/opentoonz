@@ -223,17 +223,15 @@ class PasteCellsUndo final : public TUndo {
   TCellData *m_data;
   std::vector<bool> m_areOldColumnsEmpty;
   bool m_containsSoundColumn;
-  std::map<int, std::string> m_oldEmptyColumnNames;
+
 
 public:
   PasteCellsUndo(int r0, int c0, int r1, int c1, int oldR0, int oldC0,
                  int oldR1, int oldC1, const std::vector<bool> &areColumnsEmpty,
-                 bool containsSoundColumn,
-                 const std::map<int, std::string> &oldEmptyColumnNames =
-                     std::map<int, std::string>())
+                 bool containsSoundColumn)
       : m_areOldColumnsEmpty(areColumnsEmpty)
-      , m_containsSoundColumn(containsSoundColumn)
-      , m_oldEmptyColumnNames(oldEmptyColumnNames) {
+      , m_containsSoundColumn(containsSoundColumn) {
+    
     m_data       = new TCellData();
     TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
     m_data->setCells(xsh, r0, c0, r1, c1);
@@ -256,11 +254,6 @@ public:
     int oldR0, oldC0, oldR1, oldC1;
     m_oldSelection->getSelectedCells(oldR0, oldC0, oldR1, oldC1);
 
-    TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
-    for (const auto &item : m_oldEmptyColumnNames) {
-      xsh->getStageObject(TStageObjectId::ColumnId(item.first))
-          ->setName(item.second);
-    }
 
     int c0BeforeCut = c0;
     int c1BeforeCut = c1;
@@ -268,6 +261,7 @@ public:
     cutCellsWithoutUndo(r0, c0, r1, c1);
     // If the columns were empty, reset them (this is necessary for special
     // columns, sound columns or palette)
+    TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
     assert(c1BeforeCut - c0BeforeCut + 1 == (int)m_areOldColumnsEmpty.size());
     int c;
     for (c = c0BeforeCut; c <= c1BeforeCut; c++) {
@@ -512,7 +506,7 @@ class RenumberUndo::UndoNotifier final : public TUndo {
 
 //=============================================================================
 
-// Paste strokes in cell without undo
+
 bool pasteStrokesInCellWithoutUndo(
     int row, int col, const StrokesData *strokesData,
     std::vector<int> &indices)  // in indices the added strokes
@@ -525,12 +519,16 @@ bool pasteStrokesInCellWithoutUndo(
   TFrameId fid(1);
   if (cell.isEmpty()) {
     if (row > 0) cell = xsh->getCell(row - 1, col);
-    sl = cell.getSimpleLevel();
+    sl                = cell.getSimpleLevel();
     if (!sl || sl->getType() != PLI_XSHLEVEL) {
       ToonzScene *scene = app->getCurrentScene()->getScene();
       TXshLevel *xl     = scene->createNewLevel(PLI_XSHLEVEL);
       if (!xl) return false;
       sl = xl->getSimpleLevel();
+ TPalette *defaultPalette =
+          TApp::instance()->getPaletteController()->getDefaultPalette(
+              PLI_XSHLEVEL);
+      if (defaultPalette) sl->setPalette(defaultPalette->clone());
       assert(sl);
       app->getCurrentScene()->notifyCastChange();
     }
@@ -547,7 +545,7 @@ bool pasteStrokesInCellWithoutUndo(
   } else {
     vi = cell.getImage(true);
     sl = cell.getSimpleLevel();
-    if (sl->getType() == OVL_XSHLEVEL && sl->getPath().isUneditable())
+    if (!sl || (sl->getType() == OVL_XSHLEVEL && sl->getPath().isUneditable()))
       return false;
     fid = cell.getFrameId();
     if (!vi) {
@@ -606,7 +604,7 @@ public:
       else
         oldPalette = xsh->getCell(row - 1, col).getSimpleLevel()->getPalette();
     } else
-      oldPalette = cell.getSimpleLevel()->getPalette();
+      oldPalette                 = cell.getSimpleLevel()->getPalette();
     if (oldPalette) m_oldPalette = oldPalette->clone();
   }
 
@@ -675,7 +673,7 @@ public:
 
 //=============================================================================
 
-// Paste raster image in cell without undo
+
 bool pasteRasterImageInCellWithoutUndo(int row, int col,
                                        const RasterImageData *rasterImageData,
                                        TTileSet **tiles, bool &isLevelCreated) {
@@ -683,6 +681,13 @@ bool pasteRasterImageInCellWithoutUndo(int row, int col,
   TApp *app      = TApp::instance();
   TXsheet *xsh   = app->getCurrentXsheet()->getXsheet();
   TXshCell cell  = xsh->getCell(row, col);
+  if (col < 0 ||
+      (xsh->getColumn(col) && xsh->getColumn(col)->getFolderColumn())) {
+    DVGui::error(
+        QObject::tr("It is not possible to paste image on the current cell."));
+    return false;
+  }
+
   TImageP img;
   TXshSimpleLevel *sl = 0;
   TFrameId fid(1);
@@ -692,14 +697,14 @@ bool pasteRasterImageInCellWithoutUndo(int row, int col,
   TCamera *camera = scene->getCurrentCamera();
   if (cell.isEmpty()) {
     if (row > 0) cell = xsh->getCell(row - 1, col);
-    sl = cell.getSimpleLevel();
+    sl                = cell.getSimpleLevel();
     if (!sl || (sl->getType() == OVL_XSHLEVEL &&
                 sl->getPath().getFrame() == TFrameId::NO_FRAME)) {
       int levelType;
       if (dynamic_cast<const ToonzImageData *>(rasterImageData))
         levelType = TZP_XSHLEVEL;
       else if (dynamic_cast<const FullColorImageData *>(rasterImageData))
-        levelType = OVL_XSHLEVEL;
+        levelType   = OVL_XSHLEVEL;
       TXshLevel *xl = 0;
       if (levelType == TZP_XSHLEVEL)
         xl = scene->createNewLevel(TZP_XSHLEVEL, L"", rasterImageData->getDim(),
@@ -710,6 +715,12 @@ bool pasteRasterImageInCellWithoutUndo(int row, int col,
       if (!xl) return false;
       isLevelCreated = true;
       sl             = xl->getSimpleLevel();
+      if (levelType == TZP_XSHLEVEL) {
+        TPalette *defaultPalette =
+            TApp::instance()->getPaletteController()->getDefaultPalette(
+                levelType);
+        if (defaultPalette) sl->setPalette(defaultPalette->clone());
+      }
       assert(sl);
       app->getCurrentScene()->notifyCastChange();
 
@@ -758,6 +769,11 @@ bool pasteRasterImageInCellWithoutUndo(int row, int col,
     // Don't know why.
     cell = xsh->getCell(row, col);
     sl   = cell.getSimpleLevel();
+    if (!sl) {
+      DVGui::error(QObject::tr(
+          "It is not possible to paste image on the current cell."));
+      return false;
+    }
     fid  = cell.getFrameId();
     img  = cell.getImage(true);
     if (!img->getPalette()) {
@@ -795,11 +811,11 @@ bool pasteRasterImageInCellWithoutUndo(int row, int col,
     affine *= sc;
     int i;
     TRectD boxD;
-    if (rects.size() > 0) boxD = rects[0];
+    if (rects.size() > 0) boxD   = rects[0];
     if (strokes.size() > 0) boxD = strokes[0].getBBox();
     for (i = 0; i < rects.size(); i++) boxD += rects[i];
     for (i = 0; i < strokes.size(); i++) boxD += strokes[i].getBBox();
-    boxD = affine * boxD;
+    boxD   = affine * boxD;
     TPoint pos;
     if (sl->getType() == TZP_XSHLEVEL) {
       TRect box = ToonzImageUtils::convertWorldToRaster(boxD, img);
@@ -907,7 +923,7 @@ public:
 
 //=============================================================================
 
-// Paste drawings in cell without undo
+
 void pasteDrawingsInCellWithoutUndo(TXsheet *xsh, TXshSimpleLevel *level,
                                     const std::set<TFrameId> &frameIds, int r0,
                                     int c0) {
@@ -963,7 +979,7 @@ public:
 
 //=============================================================================
 
-// Paste cells without undo (overloaded version)
+
 bool pasteCellsWithoutUndo(int &r0, int &c0, int &r1, int &c1,
                            bool insert = true, bool doZeraryClone = true,
                            bool skipEmptyCells = true) {
@@ -990,7 +1006,7 @@ bool pasteCellsWithoutUndo(int &r0, int &c0, int &r1, int &c1,
 
 //=============================================================================
 
-// Overwrite paste cells undo class
+
 class OverwritePasteCellsUndo final : public TUndo {
   TCellSelection *m_oldSelection;
   TCellSelection *m_newSelection;
@@ -1854,7 +1870,7 @@ void TCellSelection::pasteCells() {
   const QMimeData *mimeData = clipboard->mimeData();
   TXsheet *xsh              = TApp::instance()->getCurrentXsheet()->getXsheet();
   XsheetViewer *viewer      = TApp::instance()->getCurrentXsheetViewer();
-  ToolHandle *toolHandle    = TApp::instance()->getCurrentTool();
+  
 
   bool initUndo = false;
   const TCellKeyframeData *cellKeyframeData =
@@ -1893,23 +1909,6 @@ void TCellSelection::pasteCells() {
       return;
     }
 
-    // pasting cells may change empty column names. So keep old column names for
-    // undo
-    std::map<int, std::string> emptyColumnNames;
-    if (Preferences::instance()->isLinkColumnNameWithLevelEnabled()) {
-      for (int c = c0; c < c0 + cellData->getColCount(); c++) {
-        TXshColumn *column = xsh->getColumn(c);
-        if (!column || column->isEmpty()) {
-          if (!xsh->getStageObject(TStageObjectId::ColumnId(c))
-                   ->hasSpecifiedName())
-            emptyColumnNames[c] = "";
-          else
-            emptyColumnNames[c] =
-                xsh->getStageObject(TStageObjectId::ColumnId(c))->getName();
-        }
-      }
-    }
-
     bool isPaste = pasteCellsWithoutUndo(cellData, r0, c0, r1, c1);
 
     // If the current selection is TCellSelection, select the pasted cells
@@ -1933,7 +1932,7 @@ void TCellSelection::pasteCells() {
       int newCr0, newCr1;
       column->getRange(newCr0, newCr1);
       areColumnsEmpty.push_back(!column || column->isEmpty() ||
-                                (newCr0 == r0 && newCr1 == r1));
+                                (newCr0 >= r0 && newCr1 <= r1));
     }
     if (!isPaste) return;
 
@@ -1946,12 +1945,31 @@ void TCellSelection::pasteCells() {
     getLevelSetFromData(cellData, pastedLevels);
     LevelCmd::addMissingLevelsToCast(pastedLevels);
 
-    TUndoManager::manager()->add(new PasteCellsUndo(
-        r0, c0, r1, c1, oldR0, oldC0, oldR1, oldC1, areColumnsEmpty,
-        containsSoundColumn, emptyColumnNames));
+    TUndoManager::manager()->add(
+        new PasteCellsUndo(r0, c0, r1, c1, oldR0, oldC0, oldR1, oldC1,
+                           areColumnsEmpty, containsSoundColumn));
     TApp::instance()->getCurrentScene()->setDirtyFlag(true);
     if (containsSoundColumn)
       TApp::instance()->getCurrentXsheet()->notifyXsheetSoundChanged();
+
+    // Column name renamed to level name only if was originally empty
+    int x = 0;
+    for (c = c0; c <= c1; c++, x++) {
+      if (!areColumnsEmpty[x]) continue;
+      TXshColumn *column = xsh->getColumn(c);
+      if (!column || column->isEmpty()) continue;
+      int lr0, lr1;
+      column->getRange(lr0, lr1);
+      TStageObjectId columnId = TStageObjectId::ColumnId(c);
+      std::string columnName =
+          QString::fromStdWString(column->getCellColumn()
+                                      ->getCell(lr0)
+                                      .m_level.getPointer()
+                                      ->getName())
+              .toStdString();
+      TStageObjectCmd::rename(columnId, columnName,
+                              TApp::instance()->getCurrentXsheet());
+    }
   }
 
   const TKeyframeData *keyframeData =
@@ -1965,8 +1983,9 @@ void TCellSelection::pasteCells() {
       return;
     }
     TKeyframeSelection selection;
-    if (isEmpty() && TApp::instance()->getCurrentObject()->getObjectId() ==
-                         TStageObjectId::CameraId(xsh->getCameraColumnIndex()))
+    if (isEmpty() &&
+        TApp::instance()->getCurrentObject()->getObjectId() ==
+            TStageObjectId::CameraId(xsh->getCameraColumnIndex()))
     // If the selection is empty and the objectId is that of the camera, we are
     // in the camera column so we need to select the current row and -1.
     {
@@ -2033,15 +2052,51 @@ void TCellSelection::pasteCells() {
                  xl->getPath().getFrame() != TFrameId::NO_FRAME))
         img = cell.getImage(false);
     }
-    if (!initUndo) {
-      initUndo = true;
-      TUndoManager::manager()->beginBlock();
-    }
+
     RasterImageData *rasterImageData = 0;
     if (TToonzImageP ti = img) {
+      TXshSimpleLevel *sl = xsh->getCell(r0, c0).getSimpleLevel();
+      if (!sl) sl         = xsh->getCell(r0 - 1, c0).getSimpleLevel();
+      assert(sl);
+      ToolHandle *toolHandle = TApp::instance()->getCurrentTool();
+      TXshCell currentCell   = xsh->getCell(r0, c0);
+      if (!currentCell.isEmpty() && sl &&
+          toolHandle->getTool()->getName() == "T_Selection") {
+        TSelection *ts      = toolHandle->getTool()->getSelection();
+        RasterSelection *rs = dynamic_cast<RasterSelection *>(ts);
+        if (rs) {
+          toolHandle->getTool()->onActivate();
+          rs->pasteSelection();
+          return;
+        }
+      }
+      if (!initUndo) {
+        initUndo = true;
+        TUndoManager::manager()->beginBlock();
+      }
       rasterImageData = strokesData->toToonzImageData(ti);
       pasteRasterImageInCell(r0, c0, rasterImageData);
     } else if (TRasterImageP ri = img) {
+      TXshSimpleLevel *sl = xsh->getCell(r0, c0).getSimpleLevel();
+      if (!sl) sl         = xsh->getCell(r0 - 1, c0).getSimpleLevel();
+      assert(sl);
+      ToolHandle *toolHandle = TApp::instance()->getCurrentTool();
+      TXshCell currentCell   = xsh->getCell(r0, c0);
+      if (!currentCell.isEmpty() && sl &&
+          toolHandle->getTool()->getName() == "T_Selection") {
+        TSelection *ts      = toolHandle->getTool()->getSelection();
+        RasterSelection *rs = dynamic_cast<RasterSelection *>(ts);
+        if (rs) {
+          toolHandle->getTool()->onActivate();
+          rs->pasteSelection();
+          return;
+        }
+      }
+
+      if (!initUndo) {
+        initUndo = true;
+        TUndoManager::manager()->beginBlock();
+      }
       double dpix, dpiy;
       ri->getDpi(dpix, dpiy);
       if (dpix == 0 || dpiy == 0) {
@@ -2053,31 +2108,26 @@ void TCellSelection::pasteCells() {
       rasterImageData = strokesData->toFullColorImageData(ri);
       pasteRasterImageInCell(r0, c0, rasterImageData);
     } else {
-      // === VECTOR STROKES PASTE ===
-      std::vector<int> indices;
-      PasteStrokesInCellUndo *undo =
-          new PasteStrokesInCellUndo(r0, c0, strokesData);
-
-      bool success =
-          pasteStrokesInCellWithoutUndo(r0, c0, strokesData, indices);
-      if (!success) {
-        delete undo;
-      } else {
-        undo->setIndices(indices);
-        TUndoManager::manager()->add(undo);
-
-        TTool *tool = toolHandle->getTool();
-        if (tool && tool->getName() == "T_Selection") {
-          if (StrokeSelection *ss =
-                  dynamic_cast<StrokeSelection *>(tool->getSelection())) {
-            tool->onActivate();
-            ss->selectNone();
-            for (int index : indices) ss->select(index, true);
-            ss->notifyView();
-            TApp::instance()->getCurrentFrame()->setFrame(r0);
-          }
+      TXshSimpleLevel *sl = xsh->getCell(r0, c0).getSimpleLevel();
+      if (!sl) sl         = xsh->getCell(r0 - 1, c0).getSimpleLevel();
+      assert(sl);
+      ToolHandle *toolHandle = TApp::instance()->getCurrentTool();
+      TXshCell currentCell   = xsh->getCell(r0, c0);
+      if (!currentCell.isEmpty() && sl &&
+          toolHandle->getTool()->getName() == "T_Selection") {
+        TSelection *ts      = toolHandle->getTool()->getSelection();
+        StrokeSelection *ss = dynamic_cast<StrokeSelection *>(ts);
+        if (ss) {
+          toolHandle->getTool()->onActivate();
+          ss->paste();
+          return;
         }
       }
+      if (!initUndo) {
+        initUndo = true;
+        TUndoManager::manager()->beginBlock();
+      }
+      pasteStrokesInCell(r0, c0, strokesData);
     }
   }
   // Raster Time
@@ -2112,15 +2162,28 @@ void TCellSelection::pasteCells() {
       return;
     }
     // Convert non-plain raster data to strokes data
-    if (!initUndo) {
-      initUndo = true;
-      TUndoManager::manager()->beginBlock();
-    }
     if (vi && clipImage.isNull()) {
-      // Vector stuff
       TXshSimpleLevel *sl = xsh->getCell(r0, c0).getSimpleLevel();
-      if (!sl) sl = xsh->getCell(r0 - 1, c0).getSimpleLevel();
+      if (!sl) sl         = xsh->getCell(r0 - 1, c0).getSimpleLevel();
       assert(sl);
+
+      ToolHandle *toolHandle = TApp::instance()->getCurrentTool();
+      TXshCell currentCell   = xsh->getCell(r0, c0);
+      if (!currentCell.isEmpty() && sl &&
+          toolHandle->getTool()->getName() == "T_Selection") {
+        TSelection *ts      = toolHandle->getTool()->getSelection();
+        StrokeSelection *ss = dynamic_cast<StrokeSelection *>(ts);
+        if (ss) {
+          toolHandle->getTool()->onActivate();
+          ss->paste();
+          return;
+        }
+      }
+
+      if (!initUndo) {
+        initUndo = true;
+        TUndoManager::manager()->beginBlock();
+      }
       StrokesData *strokesData = rasterImageData->toStrokesData(sl->getScene());
       pasteStrokesInCell(r0, c0, strokesData);
       // end strokes stuff
@@ -2156,7 +2219,7 @@ void TCellSelection::pasteCells() {
           }
           if (ret == 2) {
             // New level chosen
-       
+
           
             // find the next empty column
             while (!xsh->isColumnEmpty(c0)) {
