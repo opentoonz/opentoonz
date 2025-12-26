@@ -2125,53 +2125,92 @@ void TCellSelection::pasteCells() {
       pasteStrokesInCell(r0, c0, strokesData);
       // end strokes stuff
     } else {
-      TXshSimpleLevel *sl = xsh->getCell(r0, c0).getSimpleLevel();
+      TXshSimpleLevel *sl   = xsh->getCell(r0, c0).getSimpleLevel();
       if (!sl && r0 > 0) sl = xsh->getCell(r0 - 1, c0).getSimpleLevel();
-      bool newLevel = false;
+      bool newLevel         = false;
+      if (!sl &&
+          (xsh->isColumnEmpty(c0) || xsh->getColumn(c0)->getLevelColumn()))
+        newLevel = true;      
       TRasterImageP ri(img);
 
       if (clipImage.height() > 0) {
         // This stuff is only if we have a pasted image from outside OpenToonz
-        bool cancel = false;
+       
 
+        bool checkImgSize = false;
+        double w, h;
         if (sl && sl->getType() == OVL_XSHLEVEL) {
-          if (sl->getResolution().lx < clipImage.width() ||
-              sl->getResolution().ly < clipImage.height()) {
-            clipImage =
-                clipImage.scaled(sl->getResolution().lx, sl->getResolution().ly,
-                                 Qt::KeepAspectRatio);
-          }
-        } else {
-          QString question = QObject::tr(
-              "Pasting external image from clipboard.\n\nWhat do you want to "
-              "do?");
-          int ret = DVGui::MsgBox(question, QObject::tr("New raster level"),
-                                  QObject::tr("Cancel"), 0);
-          if (ret == 1) {  // New level chosen
-            newLevel = true;
-          } else {  // Cancel or close
-            cancel = true;
-          }
-        }
+          // offer to make a new level or paste in place
+          w = sl->getResolution().lx;
+          h = sl->getResolution().ly;
 
-        if (cancel) {
-          // Cancel or dialog closed
-          if (initUndo) TUndoManager::manager()->endBlock();
-          return;
-        }
-
-        if (newLevel) {
-          if (sl) {
+          QString question =
+              QObject::tr("Paste in place or create a new level?");
+          int ret = DVGui::MsgBox(question, QObject::tr("Paste in place"),
+                                  QObject::tr("Create a new level"),
+                                  QObject::tr("Cancel"), 1);
+          if (ret == 3 || ret == 0) {
+            // Cancel or dialog closed
+            if (initUndo) TUndoManager::manager()->endBlock();
+            return;
+          }
+          if (ret == 2) {
+            // New level chosen
+       
+          
             // find the next empty column
             while (!xsh->isColumnEmpty(c0)) {
               c0 += 1;
             }
+TXshColumn *col =
+                TApp::instance()->getCurrentXsheet()->getXsheet()->getColumn(
+                    c0);
+            TApp::instance()->getCurrentColumn()->setColumnIndex(c0);
+            TApp::instance()->getCurrentColumn()->setColumn(col);
+            TApp::instance()->getCurrentFrame()->setFrame(r0);
+            newLevel = true;
+          } else
+            checkImgSize = true;
+        } else if (sl) {
+          // not on a raster level
+          // find an empty column
+          while (!xsh->isColumnEmpty(c0)) {
+            c0 += 1;
           }
           TXshColumn *col =
               TApp::instance()->getCurrentXsheet()->getXsheet()->getColumn(c0);
           TApp::instance()->getCurrentColumn()->setColumnIndex(c0);
           TApp::instance()->getCurrentColumn()->setColumn(col);
           TApp::instance()->getCurrentFrame()->setFrame(r0);
+          newLevel = true;
+        }
+
+        if (newLevel) {
+          // We need to scale it to the default raster size if too big
+          double dpi, dpiY;
+          Preferences *pref = Preferences::instance();
+          if (pref->isNewLevelSizeToCameraSizeEnabled()) {
+            ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
+            TDimensionD camSize = scene->getCurrentCamera()->getSize();
+            w                   = camSize.lx;
+            h                   = camSize.ly;
+            dpi                 = scene->getCurrentCamera()->getDpi().x;
+            dpiY                = scene->getCurrentCamera()->getDpi().y;
+          } else {
+            w    = pref->getDefLevelWidth();
+            h    = pref->getDefLevelHeight();
+            dpi  = pref->getDefLevelDpi();
+            dpiY = dpi;
+          }
+
+          w            = tround(w * dpi);
+          h            = tround(h * dpiY);
+          checkImgSize = true;
+        }
+
+        // Scale down image to fit level if too big
+        if (checkImgSize && (w < clipImage.width() || h < clipImage.height())) {
+          clipImage = clipImage.scaled(w, h, Qt::KeepAspectRatio);
         }
 
         // create variables to go into the Full Color Raster Selection data
@@ -2186,7 +2225,10 @@ void TCellSelection::pasteCells() {
         FullColorImageData *qimageData = new FullColorImageData();
         TPalette *p;
         if (!ri || !ri->getPalette() || newLevel)
-          p = new TPalette();
+          p = TApp::instance()
+                  ->getPaletteController()
+                  ->getDefaultPalette(OVL_XSHLEVEL)
+                  ->clone();
         else
           p = ri->getPalette()->clone();
         TDimension dim;
