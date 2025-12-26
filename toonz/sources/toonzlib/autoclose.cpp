@@ -10,6 +10,7 @@
 #include <set>
 #include <queue>
 #include <unordered_set>
+#include <algorithm>
 
 // #define AUT_SPOT_SAMPLES 40
 using namespace SkeletonLut;
@@ -229,12 +230,12 @@ unsigned char buildPaintnInkNeighborPattern(int x, int y, TRasterCM32P r,
                       .arg(isLine ? 1 : 0)
                       .arg(i);*/
       if (isLine) {
-        pattern |= (1 << 7 - i);
+        pattern |= (1 << (7 - i));
       }
       // qDebug() << "Pattern:"
       //          << QString::number(pattern, 2).rightJustified(8, '0');
     } else
-      pattern |= (1 << 7 - i);
+      pattern |= (1 << (7 - i));
   }
   // qDebug() << "Final pattern: decimal =" << (int)pattern << "| binary = 0b"
   //          << QString::number(pattern, 2).rightJustified(8, '0');
@@ -375,15 +376,15 @@ void drawSegment(TRasterCM32P &r, const TAutocloser::Segment &s,
   int wrap        = r->getWrap();
   TPixelCM32 *buf = r->pixels();
   /*
-int i, j;
-for (i=0; i<r->getLy();i++)
-{
-  for (j=0; j<r->getLx();j++, buf++)
-*buf = (1<<4)|0xf;
-buf += wrap-r->getLx();
-  }
-return;
-*/
+  int i, j;
+  for (i=0; i<r->getLy();i++)
+  {
+    for (j=0; j<r->getLx();j++, buf++)
+  *buf = (1<<4)|0xf;
+  buf += wrap-r->getLx();
+    }
+  return;
+  */
 
   int x, y, dx, dy, d, incr_1, incr_2;
 
@@ -429,7 +430,7 @@ return;
 void TAutocloser::Imp::compute(std::vector<Segment> &closingSegmentArray) {
   std::vector<TPoint> endpoints;
   try {
-    assert(closingSegmentArray.empty());
+    // assert(closingSegmentArray.empty());
 
     TRasterCM32P raux;
 
@@ -495,7 +496,7 @@ void TAutocloser::Imp::draw(const std::vector<Segment> &closingSegmentArray) {
 /*------------------------------------------------------------------------*/
 
 void TAutocloser::Imp::copy(const TRasterGR8P &br, TRaster32P &r) {
-  assert(r->getLx() == br->getLx() && r->getLy() == br->getLy());
+  // assert(r->getLx() == br->getLx() && r->getLy() == br->getLy());
   int i, j;
 
   int lx = r->getLx();
@@ -541,7 +542,7 @@ inline int distance2(const TPoint p0, const TPoint p1) {
 
 int closerPoint(const std::vector<TAutocloser::Segment> &points,
                 std::vector<bool> &marks, int index) {
-  assert(points.size() == marks.size());
+  // assert(points.size() == marks.size());
 
   int min, curr;
   int minval = (std::numeric_limits<int>::max)();
@@ -818,51 +819,173 @@ static bool allMarked(const std::vector<bool> &marks, int index) {
 
 bool TAutocloser::Imp::spotResearchTwoPoints(
     std::vector<Segment> &endpoints, std::vector<Segment> &closingSegments) {
-  int i, distance, current = 0, closerIndex;
-  int sqrDistance = m_closingDistance * m_closingDistance;
-  bool found      = 0;
-  std::vector<bool> marks(endpoints.size());
+  if (endpoints.size() < 2) return false;
 
-  while (current < (int)endpoints.size() - 1) {
-    found = 0;
-    for (i = current + 1; i < (int)marks.size(); i++) marks[i] = false;
-    distance = 0;
+  bool found = false;
 
-    while (!found && (distance <= sqrDistance) && !allMarked(marks, current)) {
-      closerIndex = closerPoint(endpoints, marks, current);
-      if (exploreTwoSpots(endpoints[current], endpoints[closerIndex]) &&
-          notInsidePath(endpoints[current].first,
-                        endpoints[closerIndex].first) &&
-          !hasInkBetween(endpoints[current].first,
-                         endpoints[closerIndex].first)) {
-        drawInByteRaster(endpoints[current].first,
-                         endpoints[closerIndex].first);
-        closingSegments.push_back(
-            Segment(endpoints[current].first, endpoints[closerIndex].first));
+  const int sqrDistance = m_closingDistance * m_closingDistance;
+  const int lx          = m_raster->getLx();
+  const int ly          = m_raster->getLy();
 
-        if (!EndpointTable[neighboursCode(
-                getPtr(endpoints[closerIndex].first))]) {
-          std::vector<Segment>::iterator it = endpoints.begin();
-          std::advance(it, closerIndex);
-          endpoints.erase(it);
-          std::vector<bool>::iterator it1 = marks.begin();
-          std::advance(it1, closerIndex);
-          marks.erase(it1);
+  // Lambda for fallback (used in two places)
+  auto fallback = [&]() -> bool {
+    std::vector<bool> keep(endpoints.size(), true);
+
+    for (int i = 0; i < (int)endpoints.size(); ++i) {
+      if (!keep[i]) continue;
+      const TPoint &p = endpoints[i].first;
+
+      for (int j = i + 1; j < (int)endpoints.size(); ++j) {
+        if (!keep[j]) continue;
+        const TPoint &q = endpoints[j].first;
+
+        int dist = distance2(p, q);
+        if (dist > sqrDistance) continue;
+
+        if (exploreTwoSpots(endpoints[i], endpoints[j]) &&
+            notInsidePath(p, q) && !hasInkBetween(p, q)) {
+          drawInByteRaster(p, q);
+          closingSegments.push_back(Segment(p, q));
+          keep[i] = false;
+          if (!EndpointTable[neighboursCode(getPtr(q))]) {
+            keep[j] = false;
+          }
+          found = true;  // <-- uses found from main function
         }
-        found = true;
       }
     }
 
     if (found) {
-      std::vector<Segment>::iterator it = endpoints.begin();
-      std::advance(it, current);
-      endpoints.erase(it);
-      std::vector<bool>::iterator it1 = marks.begin();
-      std::advance(it1, current);
-      marks.erase(it1);
-    } else
-      current++;
+      endpoints.erase(std::remove_if(endpoints.begin(), endpoints.end(),
+                                     [&keep, idx = 0](const Segment &) mutable {
+                                       return !keep[idx++];
+                                     }),
+                      endpoints.end());
+    }
+    return found;
+  };
+
+  // Quick fallback for few endpoints
+  if (endpoints.size() < 40) {
+    return fallback();
   }
+
+  // ========== DYNAMIC CELL_SIZE CALCULATION ==========
+  int CELL_SIZE;
+
+  // Calculate endpoint density (endpoints per pixel)
+  double area    = lx * ly;
+  double density = (area > 0) ? (endpoints.size() / area) : 0;
+
+  // Heuristic: ideal CELL_SIZE based on density and distance
+  if (density > 0) {
+    // Formula: cell_size = sqrt(TARGET_ENDPOINTS_PER_CELL / density)
+    // where TARGET_ENDPOINTS_PER_CELL is the desired number of endpoints per
+    // cell
+    const double TARGET_ENDPOINTS_PER_CELL = 8.0;  // Adjustable value
+
+    double ideal_cell_size = std::sqrt(TARGET_ENDPOINTS_PER_CELL / density);
+
+    // Limit by practical constraints
+    CELL_SIZE = static_cast<int>(ideal_cell_size);
+
+    // Minimum and maximum limits
+    const int MIN_CELL_SIZE = std::max(5, m_closingDistance / 4);
+    const int MAX_CELL_SIZE =
+        std::min(50,  // Absolute limit
+                 std::max(m_closingDistance * 2, std::max(lx, ly) / 10));
+
+    CELL_SIZE = std::clamp(CELL_SIZE, MIN_CELL_SIZE, MAX_CELL_SIZE);
+
+    // Adjust based on number of endpoints
+    // For many endpoints, smaller cells may be better
+    if (endpoints.size() > 500) {
+      CELL_SIZE = std::max(MIN_CELL_SIZE, CELL_SIZE * 2 / 3);
+    }
+  } else {
+    // Zero density (shouldn't happen, but as fallback)
+    CELL_SIZE =
+        std::max(10, std::min(m_closingDistance, std::max(lx, ly) / 10));
+  }
+
+  // Ensure grid is not too large or too small
+  const int GRID_W = (lx + CELL_SIZE - 1) / CELL_SIZE;
+  const int GRID_H = (ly + CELL_SIZE - 1) / CELL_SIZE;
+
+  // If grid too small (less than 9 cells), use fallback
+  if (GRID_W * GRID_H < 9) {
+    return fallback();
+  }
+
+  // ========== OPTIMIZED SPATIAL GRID ==========
+  std::vector<std::vector<int>> grid(GRID_W * GRID_H);
+
+  // Fill grid
+  for (int i = 0; i < (int)endpoints.size(); ++i) {
+    const TPoint &p = endpoints[i].first;
+    // Use clamp for safety
+    int gx = std::clamp(p.x / CELL_SIZE, 0, GRID_W - 1);
+    int gy = std::clamp(p.y / CELL_SIZE, 0, GRID_H - 1);
+    grid[gy * GRID_W + gx].push_back(i);
+  }
+
+  std::vector<bool> keep(endpoints.size(), true);
+
+  const int cellRadius = (m_closingDistance + CELL_SIZE - 1) / CELL_SIZE;
+
+  for (int i = 0; i < (int)endpoints.size(); ++i) {
+    if (!keep[i]) continue;
+    const TPoint &p = endpoints[i].first;
+    // Adjustment: Also in lookup
+    int gx = std::clamp(p.x / CELL_SIZE, 0, GRID_W - 1);
+    int gy = std::clamp(p.y / CELL_SIZE, 0, GRID_H - 1);
+
+    bool pairFound = false;
+    for (int dy = -cellRadius; dy <= cellRadius && !pairFound; ++dy) {
+      for (int dx = -cellRadius; dx <= cellRadius && !pairFound; ++dx) {
+        int ngx = gx + dx;
+        int ngy = gy + dy;
+        if (ngx < 0 || ngx >= GRID_W || ngy < 0 || ngy >= GRID_H) continue;
+
+        const auto &cell = grid[ngy * GRID_W + ngx];
+        for (int j_idx : cell) {
+          if (j_idx <= i || !keep[j_idx]) continue;
+          const TPoint &q = endpoints[j_idx].first;
+
+          // Optimization: quick bounding box
+          int dx_abs = std::abs(p.x - q.x);
+          int dy_abs = std::abs(p.y - q.y);
+          if (dx_abs > m_closingDistance || dy_abs > m_closingDistance)
+            continue;
+
+          int dist = distance2(p, q);
+          if (dist > sqrDistance) continue;
+
+          if (exploreTwoSpots(endpoints[i], endpoints[j_idx]) &&
+              notInsidePath(p, q) && !hasInkBetween(p, q)) {
+            drawInByteRaster(p, q);
+            closingSegments.push_back(Segment(p, q));
+            keep[i] = false;
+            if (!EndpointTable[neighboursCode(getPtr(q))]) {
+              keep[j_idx] = false;
+            }
+            found     = true;
+            pairFound = true;
+            break;  // Exit inner loop
+          }
+        }
+      }
+    }
+  }
+
+  if (found) {
+    endpoints.erase(std::remove_if(endpoints.begin(), endpoints.end(),
+                                   [&keep, idx = 0](const Segment &) mutable {
+                                     return !keep[idx++];
+                                   }),
+                    endpoints.end());
+  }
+
   return found;
 }
 
@@ -915,7 +1038,7 @@ continue;
     p1 = p0 - displAverage;
 
     /*if ((point->x2<0 && point->y2<0) || (point->x2>Lx && point->y2>Ly))
-     * printf("che palle!!!!!!\n");*/
+     * printf("what a pain!!!!!!\n");*/
 
     if (p1.x < 0) {
       p1.y = tround(p0.y - (float)((p0.y - p1.y) * p0.x) / (p0.x - p1.x));
@@ -942,34 +1065,51 @@ continue;
 
 bool TAutocloser::Imp::spotResearchOnePoint(
     std::vector<Segment> &endpoints, std::vector<Segment> &closingSegments) {
-  int count = 0;
-  bool ret  = false;
+  if (endpoints.empty()) return false;
 
-  while (count < (int)endpoints.size()) {
+  bool found = false;
+  std::vector<bool> keep(endpoints.size(), true);
+
+  for (int i = 0; i < (int)endpoints.size(); ++i) {
+    if (!keep[i]) continue;
+
     TPoint p;
+    if (exploreSpot(endpoints[i], p)) {
+      Segment segment(endpoints[i].first, p);
 
-    if (exploreSpot(endpoints[count], p)) {
-      Segment segment(endpoints[count].first, p);
-      std::vector<Segment>::iterator it =
+      // Avoid duplicates
+      auto it =
           std::find(closingSegments.begin(), closingSegments.end(), segment);
-      if (it == closingSegments.end() &&
-          notInsidePath(endpoints[count].first, p)) {
-        ret = true;
-        drawInByteRaster(endpoints[count].first, p);
-        closingSegments.push_back(Segment(endpoints[count].first, p));
-        cancelFromArray(endpoints, p, count);
-        if (!EndpointTable[neighboursCode(getPtr(endpoints[count].first))]) {
-          std::vector<Segment>::iterator it = endpoints.begin();
-          std::advance(it, count);
-          endpoints.erase(it);
-          continue;
+      if (it == closingSegments.end() && notInsidePath(endpoints[i].first, p)) {
+        drawInByteRaster(endpoints[i].first, p);
+        closingSegments.push_back(segment);
+        found = true;
+
+        // Mark current endpoint for possible removal
+        if (!EndpointTable[neighboursCode(getPtr(endpoints[i].first))]) {
+          keep[i] = false;
+        }
+
+        // Mark endpoints that end at 'p' (if they exist)
+        for (int j = 0; j < (int)endpoints.size(); ++j) {
+          if (keep[j] && endpoints[j].first == p) {
+            keep[j] = false;
+          }
         }
       }
     }
-    count++;
   }
 
-  return ret;
+  // Final removal compacting the vector
+  if (found) {
+    endpoints.erase(std::remove_if(endpoints.begin(), endpoints.end(),
+                                   [&keep, index = 0](const Segment &) mutable {
+                                     return !keep[index++];
+                                   }),
+                    endpoints.end());
+  }
+
+  return found;
 }
 
 /*------------------------------------------------------------------------*/
@@ -1191,19 +1331,6 @@ void TAutocloser::Imp::cancelMarks(UCHAR *br) {
 
 /*=============================================================================*/
 
-/*=============================================================================*/
-/*=============================================================================*/
-/*=============================================================================*/
-/*=============================================================================*/
-/*=============================================================================*/
-/*=============================================================================*/
-/*=============================================================================*/
-/*=============================================================================*/
-/*=============================================================================*/
-/*=============================================================================*/
-
-/*=============================================================================*/
-
 void TAutocloser::Imp::skeletonize(std::vector<TPoint> &endpoints) {
   std::vector<Seed> seeds;
 
@@ -1226,7 +1353,7 @@ void TAutocloser::Imp::findSeeds(std::vector<Seed> &seeds,
       if (notMarkedBorderInk(br)) {
         preseed = FirstPreseedTable[neighboursCode(br)];
 
-        if (preseed != 8) /*non e' un pixel isolato*/
+        if (preseed != 8) /*not an isolated pixel*/
         {
           seeds.push_back(Seed(br, preseed));
           circuitAndMark(br, preseed);
@@ -1255,7 +1382,7 @@ void TAutocloser::Imp::circuitAndMark(UCHAR *seed, UCHAR preseed) {
   prewalker = displ ^ 0x7;
 
   while ((walker != seed) || (preseed != prewalker)) {
-    *walker |= 0x4; /* metto la marca di passaggio */
+    *walker |= 0x4; /* set the pass mark */
 
     displ = NextPointTable[(neighboursCode(walker) << 3) | prewalker];
     //  assert(displ>=0 && displ<8);
@@ -1294,7 +1421,7 @@ void TAutocloser::Imp::erase(std::vector<Seed> &seeds,
           //				assert(displ>=0 && displ<8);
           seeds.push_back(Seed(seed + m_displaceVector[displ], displ ^ 0x7));
 
-        } else /* il seed e' stato cancellato */
+        } else /* the seed has been erased */
         {
           code = NextSeedTable[neighboursCode(seed)];
           seeds.push_back(
@@ -1372,7 +1499,7 @@ void TAutocloser::Imp::cancelFromArray(std::vector<Segment> &array, TPoint p,
   for (; it != array.end(); ++it, i++)
     if (it->first == p) {
       if (!EndpointTable[neighboursCode(getPtr(p))]) {
-        assert(i != count);
+        // assert(i != count);
         if (i < count) count--;
         array.erase(it);
       }
@@ -1411,7 +1538,7 @@ TAutocloser::TAutocloser(const TRasterP &r, int ink, const AutocloseSettings st,
                          std::set<int> autoPaints)
     : m_imp(new Imp(r, st.m_closingDistance, st.m_spotAngle, ink, st.m_opacity))
     , m_autoPaintStyles(autoPaints) {}
-//...............................
+/*------------------------------------------------------------------------*/
 
 void TAutocloser::exec() {
   std::vector<TAutocloser::Segment> segments;
@@ -1423,14 +1550,30 @@ void TAutocloser::exec(std::string id) {
   std::vector<TAutocloser::Segment> segments;
   compute(segments);
   draw(segments);
-  setSegmentCache(id, std::move(segments));
+
+  // === SAVE TO CACHE WITH SIZE LIMIT ===
+  {
+    std::lock_guard<std::mutex> lock(m_mutex);
+
+    constexpr size_t MAX_CACHE_SIZE = 50;  // maximum number of images in cache
+
+    m_cache[id] = std::move(segments);  // move avoids copy
+
+    // Remove oldest entries if exceeding limit
+    if (m_cache.size() > MAX_CACHE_SIZE) {
+      // Remove the first (oldest) ones until MAX_CACHE_SIZE remains
+      auto it = m_cache.begin();
+      std::advance(it, m_cache.size() - MAX_CACHE_SIZE);
+      m_cache.erase(m_cache.begin(), it);
+    }
+  }
 }
 
-//...............................
+/*------------------------------------------------------------------------*/
 
 TAutocloser::~TAutocloser() {}
 
-//-------------------------------------------------
+/*------------------------------------------------------------------------*/
 
 void TAutocloser::compute(std::vector<Segment> &closingSegmentArray) {
   m_imp->compute(closingSegmentArray);
@@ -1453,7 +1596,7 @@ void TAutocloser::compute(std::vector<Segment> &closingSegmentArray) {
     }
   }
 }
-//-------------------------------------------------
+/*------------------------------------------------------------------------*/
 
 void TAutocloser::draw(const std::vector<Segment> &closingSegmentArray) {
   m_imp->draw(closingSegmentArray);

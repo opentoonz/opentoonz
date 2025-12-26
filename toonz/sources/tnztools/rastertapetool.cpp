@@ -83,7 +83,7 @@ public:
 
     ac.draw(m_segments);
     ToolUtils::updateSaveBox();
-    /*-- Viewerを更新させるため --*/
+    /*-- Notify to update Viewer --*/
     TTool::getApplication()->getCurrentXsheet()->notifyXsheetChanged();
     notifyImageChanged();
   }
@@ -125,7 +125,7 @@ class RasterTapeTool final : public TTool {
   bool m_isXsheetCell;
   std::pair<int, int> m_currCell;
 
-  // Aggiunte per disegnare il lazzo a la polyline
+  // Added to draw freehand and polyline
   StrokeGenerator m_track;
   TPointD m_firstPos;
   TPointD m_mousePosition;
@@ -212,103 +212,88 @@ public:
   }
 
   //------------------------------------------------------------
-  /*--  AutoClose Returns true if executed, false otherwise --*/
+  /*-- AutoClose Returns true if executed, false otherwise --*/
   bool applyAutoclose(const TToonzImageP &ti, const TFrameId fid,
                       const TRectD &selRect = TRectD(), TStroke *stroke = 0) {
-    if (!ti) return false;
-    // inizializzo gli AutocloseParameters
+    if (!ti || !ti->getRaster()) return false;
+
+    TTool::Application *app = TTool::getApplication();
+    TXshLevel *level        = app->getCurrentLevel()->getLevel();
+    if (!level) return false;
+
+    TXshSimpleLevel *sl = level->getSimpleLevel();
+    if (!sl) return false;
+
+    std::string cacheId = sl->getImageId(fid);
+    // initialize AutocloseParameters
     AutocloseParameters params;
-    params.m_closingDistance = (int)(m_distance.getValue());
-    params.m_spotAngle       = (int)(m_angle.getValue());
+    params.m_closingDistance = m_distance.getValue();
+    params.m_spotAngle       = m_angle.getValue();
     params.m_opacity         = m_opacity.getValue();
-    std::string inkString    = ::to_string(m_inkIndex.getValue());
-    int inkIndex =
-        TTool::getApplication()
-            ->getCurrentLevelStyleIndex();  // TApp::instance()->getCurrentPalette()->getStyleIndex();
+
+    std::string inkString = ::to_string(m_inkIndex.getValue());
+    int inkIndex = TTool::getApplication()->getCurrentLevelStyleIndex();
     if (isInt(inkString)) inkIndex = std::stoi(inkString);
     params.m_inkIndex = inkIndex;
 
-    TPoint delta(0, 0);
-    TRasterCM32P ras, raux = ti->getRaster();
-    TRectD selArea;
-    TRect myRect;
-
-    TXshSimpleLevel *sl =
-        TTool::getApplication()->getCurrentLevel()->getSimpleLevel();
+    std::wstring closeType = m_closeType.getValue();
+    TRasterCM32P raux      = ti->getRaster();
 
     std::vector<TAutocloser::Segment> segments;
 
-    bool useCache = TAutocloser::hasSegmentCache(sl->getImageId(fid));
-    if (useCache) segments = TAutocloser::getSegmentCache(sl->getImageId(fid));
-    std::wstring closeType = m_closeType.getValue();
-
-    if (useCache) {
-      ras = raux;
+    // Use The Cache
+    if (TAutocloser::hasSegmentCache(cacheId)) {
+      segments = TAutocloser::getSegmentCache(cacheId);
     } else {
-      bool hasRect = (closeType == RECT_CLOSE && raux && !selRect.isEmpty());
-      bool hasStroke =
-          ((closeType == FREEHAND_CLOSE || closeType == POLYLINE_CLOSE) &&
-           stroke);
+      // Calculate only once and store in cache
+      TAutocloser ac(raux, params.m_closingDistance, params.m_spotAngle,
+                     params.m_inkIndex, params.m_opacity);
+      ac.exec(cacheId);  // <-- This computes + draws + saves in cache!
+      segments = TAutocloser::getSegmentCache(cacheId);
+    }
 
-      if (hasRect || hasStroke) {
-        if (hasRect) {
-          selArea = TRectD(std::min(selRect.x0, selRect.x1),
-                           std::min(selRect.y0, selRect.y1),
-                           std::max(selRect.x0, selRect.x1),
-                           std::max(selRect.y0, selRect.y1));
-        } else {
-          selArea = stroke->getBBox();
-        }
+    if (segments.empty()) return false;
 
-        myRect             = ToonzImageUtils::convertWorldToRaster(selArea, ti);
-        TRect enlargedRect = myRect.enlarge(params.m_closingDistance);
-        ras                = raux->extract(enlargedRect);
-        delta              = enlargedRect.getP00();
-      } else {
-        ras = raux;
+    // Fiter by region (only if necessary)
+    TPoint delta(0, 0);
+    std::vector<TAutocloser::Segment> filteredSegments = segments;
+
+    if (closeType == RECT_CLOSE && !selRect.isEmpty()) {
+      TRectD orderedRect(
+          std::min(selRect.x0, selRect.x1), std::min(selRect.y0, selRect.y1),
+          std::max(selRect.x0, selRect.x1), std::max(selRect.y0, selRect.y1));
+      TRect rasterRect = ToonzImageUtils::convertWorldToRaster(orderedRect, ti);
+      checkSegments(filteredSegments, convert(rasterRect), delta);
+    } else if ((closeType == FREEHAND_CLOSE || closeType == POLYLINE_CLOSE) &&
+               stroke) {
+      checkSegments(filteredSegments, stroke, raux, delta);
+    } // Normal mode: use all segments
+    /*-- Return false if no segment is obtained --*/
+    if (filteredSegments.empty()) return false;
+
+    // Adjust coordinates if necessary
+    if (delta != TPoint(0, 0)) {
+      for (auto &seg : filteredSegments) {
+        seg.first += delta;
+        seg.second += delta;
       }
     }
 
-    if (!ras) return false;
-
-    TAutocloser ac(ras, params.m_closingDistance, params.m_spotAngle,
-                   params.m_inkIndex, params.m_opacity);
-
-    if (!useCache) ac.compute(segments);
-
-    if (closeType == RECT_CLOSE && useCache) {
-      TRectD selAreaOrdered(
-          std::min(selRect.x0, selRect.x1), std::min(selRect.y0, selRect.y1),
-          std::max(selRect.x0, selRect.x1), std::max(selRect.y0, selRect.y1));
-      TRect rect = ToonzImageUtils::convertWorldToRaster(selAreaOrdered, ti);
-      checkSegments(segments, convert(rect), delta);
-    } else if ((closeType == FREEHAND_CLOSE || closeType == POLYLINE_CLOSE) &&
-               stroke) {
-      checkSegments(segments, stroke, raux, delta);
-    };  // Normal
-
-    std::vector<TAutocloser::Segment> segments2(segments);
-
-    /*-- segmentが取得できなければfalseを返す --*/
-    if (segments2.empty()) return false;
-
-    int i;
-    if (delta != TPoint(0, 0))
-      for (i = 0; i < (int)segments2.size(); i++) {
-        segments2[i].first += delta;
-        segments2[i].second += delta;
-      }
-
+    // UNDO
     TTileSetCM32 *tileSet = new TTileSetCM32(raux->getSize());
-    for (i = 0; i < (int)segments2.size(); i++) {
-      TRect bbox(segments2[i].first, segments2[i].second);
-      bbox = bbox.enlarge(2);
-      tileSet->add(raux, bbox);
+    for (const auto &seg : filteredSegments) {
+      TRect bbox(seg.first, seg.second);
+      tileSet->add(raux, bbox.enlarge(2));
     }
 
     TUndoManager::manager()->add(
-        new RasterAutocloseUndo(tileSet, params, segments2, sl, fid));
-    ac.draw(segments);
+        new RasterAutocloseUndo(tileSet, params, filteredSegments, sl, fid));
+
+    // DRAW
+    TAutocloser ac(raux, params.m_closingDistance, params.m_spotAngle,
+                   params.m_inkIndex, params.m_opacity);
+    ac.draw(filteredSegments);
+
     ToolUtils::updateSaveBox();
     return true;
   }
@@ -418,7 +403,7 @@ public:
     TToonzImageP ti = TToonzImageP(getImage(true));
     if (!ti) return;
 
-    /*-- Rectの座標の向きを揃える --*/
+    /*-- Normalize Rect coordinates --*/
     if (m_selectingRect.x0 > m_selectingRect.x1)
       std::swap(m_selectingRect.x1, m_selectingRect.x0);
     if (m_selectingRect.y0 > m_selectingRect.y1)
@@ -427,7 +412,6 @@ public:
     TTool::Application *app = TTool::getApplication();
 
     m_selecting = false;
-    TRasterCM32P ras;
     if (m_closeType.getValue() == RECT_CLOSE) {
       if (m_multi.getValue()) {
         if (m_firstFrameSelected) {
@@ -453,7 +437,7 @@ public:
         return;
       }
 
-      /*-- AutoCloseが実行されたか判定する --*/
+      /*-- Check if AutoClose was executed --*/
       if (!applyAutoclose(ti, getCurrentFid(), m_selectingRect)) {
         if (m_stroke) {
           delete m_stroke;
@@ -612,10 +596,9 @@ public:
          !m_firstStroke))
       resetMulti();
     else if (m_firstFrameId == getFrameId())
-      m_firstFrameSelected = false;  // nel caso sono passato allo stato 1 e
-                                     // torno all'immagine iniziale, torno allo
-                                     // stato iniziale
-    else {                           // cambio stato.
+      m_firstFrameSelected = false;  // when returning to initial image,
+                                     // return to initial state
+    else {                           // change state.
       m_firstFrameSelected = true;
       if (m_closeType.getValue() == RECT_CLOSE) {
         assert(!m_selectingRect.isEmpty());
@@ -766,8 +749,8 @@ public:
 
   //----------------------------------------------------------------------
 
-  //! Viene aggiunto \b pos a \b m_track e disegnato il primo pezzetto del
-  //! lazzo. Viene inizializzato \b m_firstPos
+  //! Adds \b pos to \b m_track and draws the first piece of the freehand.
+  //! Initializes \b m_firstPos
   void startFreehand(const TPointD &pos) {
     m_track.clear();
     m_firstPos        = pos;
@@ -777,8 +760,7 @@ public:
 
   //------------------------------------------------------------------
 
-  //! Viene aggiunto \b pos a \b m_track e disegnato un altro pezzetto del
-  //! lazzo.
+  //! Adds \b pos to \b m_track and draws another piece of the freehand.
   void freehandDrag(const TPointD &pos) {
     double pixelSize2 = getPixelSize() * getPixelSize();
     m_track.add(TThickPoint(pos, m_thick), pixelSize2);
@@ -786,8 +768,8 @@ public:
 
   //------------------------------------------------------------------
 
-  //! Viene chiuso il lazzo (si aggiunge l'ultimo punto ad m_track) e viene
-  //! creato lo stroke rappresentante il lazzo.
+  //! Closes the freehand (adds the last point to m_track) and creates the
+  //! stroke representing the freehand.
   void closeFreehand(const TPointD &pos) {
     if (m_track.isEmpty()) return;
     double pixelSize2 = getPixelSize() * getPixelSize();
@@ -800,7 +782,7 @@ public:
 
   //------------------------------------------------------------------
 
-  //! Viene aggiunto un punto al vettore m_polyline.
+  //! Adds a point to the vector m_polyline.
   void addPointPolyline(const TPointD &pos) {
     m_firstPos = pos;
     m_polyline.push_back(pos);
@@ -808,8 +790,8 @@ public:
 
   //------------------------------------------------------------------
 
-  //! Agginge l'ultimo pos a \b m_polyline e chiude la spezzata (aggiunge \b
-  //! m_polyline.front() alla fine del vettore)
+  //! Adds the last pos to \b m_polyline and closes the polyline (adds \b
+  //! m_polyline.front() to the end of the vector)
   void closePolyline(const TPointD &pos) {
     if (m_polyline.size() <= 1) return;
     if (m_polyline.back() != pos) m_polyline.push_back(pos);
@@ -820,7 +802,7 @@ public:
 
   //-------------------------------------------------------------------
 
-  //! Elimina i segmenti che non sono contenuti all'interno dello stroke!!!
+  //! Deletes segments that are not contained within the stroke!!!
   void checkSegments(std::vector<TAutocloser::Segment> &segments,
                      TStroke *stroke, const TRasterCM32P &ras,
                      const TPoint &delta) {
