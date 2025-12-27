@@ -1435,6 +1435,7 @@ void DvItemViewerPanel::exportFileList() {
   if (data.open(QFile::WriteOnly)) {
     QTextStream out(&data);
 
+    out << "Name,Frames,Path\n";
     for (int index = 0; index < getItemCount(); index++) {
       if (getModel()->getItemData(index, DvItemListModel::IsFolder).toBool())
         continue;
@@ -1443,13 +1444,16 @@ void DvItemViewerPanel::exportFileList() {
         DvItemListModel::DataType dataType = m_columns[i].first;
 
         if (dataType != DvItemListModel::Name &&
-            dataType != DvItemListModel::FrameCount)
+            dataType != DvItemListModel::FrameCount &&
+            dataType != DvItemListModel::FullPath)
           continue;
 
         QString value = getModel()->getItemDataAsString(index, dataType);
 
         out << value;
-        if (dataType == DvItemListModel::Name) out << ",";
+        if (dataType == DvItemListModel::Name ||
+            dataType == DvItemListModel::FrameCount)
+          out << ",";
       }
       out << ('\n');
     }
