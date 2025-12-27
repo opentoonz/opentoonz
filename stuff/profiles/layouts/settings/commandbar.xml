@@ -25,6 +25,9 @@
     <command>MI_EnterGroup</command>
     <command>MI_ExitGroup</command>
     <separator/>
+    <command>MI_VectorGuidedDrawing</command>
+    <command>MI_OpenGuidedDrawingControls</command>
+    <separator/>
     <command>MI_GeometricLine</command>
     <command>MI_GeometricArc</command>
     <command>MI_GeometricMultiArc</command>
@@ -40,10 +43,11 @@
     <command>MI_ResetShift</command>
     <separator/>
     <command>MI_ACheck</command>
-    <command>MI_TCheck</command>
     <command>MI_GCheck</command>
+    <command>MI_TCheck</command>
+    <command>MI_BCheck</command>
     <command>MI_IOnly</command>
-    <separator/>
     <command>MI_ICheck</command>
     <command>MI_PCheck</command>
+    <separator/>
 </commandbar>
