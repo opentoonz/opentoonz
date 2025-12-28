@@ -1,3 +1,5 @@
+
+
 #include "xdtsio.h"
 
 #include "tsystem.h"
@@ -26,7 +28,7 @@
 #include <iostream>
 #include <QJsonObject>
 #include <QJsonArray>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QFile>
 #include <QJsonDocument>
 #include <QApplication>
@@ -58,18 +60,20 @@ const QString OPTION_REFERENCEFRAME = "OPTION_REFERENCEFRAME";
 }  // namespace
 //-----------------------------------------------------------------------------
 void XdtsHeader::read(const QJsonObject &json) {
-  QRegExp rx("\\d{1,4}");
+  QRegularExpression rx("^\\d{1,4}$");
   // TODO: We could check if the keys are valid
   // before attempting to read them with QJsonObject::contains(),
   // but we assume that they are.
   m_cut = json["cut"].toString();
-  if (!rx.exactMatch(m_cut))  // TODO: should handle an error
-    std::cout << "The XdtsHeader value \"cut\" does not match the pattern."
-              << std::endl;
+  if (!rx.match(m_cut).hasMatch())  // TODO: should handle an error
+    qWarning()
+        << "The XdtsHeader value 'cut' value does not match expected pattern:"
+        << m_cut;
   m_scene = json["scene"].toString();
-  if (!rx.exactMatch(m_scene))
-    std::cout << "The XdtsHeader value \"scene\" does not match the pattern."
-              << std::endl;
+  if (!rx.match(m_scene).hasMatch())
+    qWarning()
+        << "The XdtsHeader value 'scene' value does not match expected pattern:"
+        << m_scene;
 }
 
 void XdtsHeader::write(QJsonObject &json) const {
@@ -86,13 +90,14 @@ TFrameId XdtsFrameDataItem::str2Fid(const QString &str) const {
   if (ok) return TFrameId(frame);
 
   QString regExpStr = QString("^%1$").arg(TFilePath::fidRegExpStr());
-  QRegExp rx(regExpStr);
-  int pos = rx.indexIn(str);
-  if (pos < 0) return TFrameId();
-  if (rx.cap(2).isEmpty())
-    return TFrameId(rx.cap(1).toInt());
+  QRegularExpression rx(regExpStr);
+  QRegularExpressionMatch match = rx.match(str);
+  if (!match.hasMatch()) return TFrameId();
+
+  if (match.captured(2).isEmpty())
+    return TFrameId(match.captured(1).toInt());
   else
-    return TFrameId(rx.cap(1).toInt(), rx.cap(2));
+    return TFrameId(match.captured(1).toInt(), match.captured(2));
 }
 
 QString XdtsFrameDataItem::fid2Str(const TFrameId &fid) const {
@@ -110,13 +115,13 @@ QString XdtsFrameDataItem::fid2Str(const TFrameId &fid) const {
 void XdtsFrameDataItem::read(const QJsonObject &json) {
   m_id                   = DataId(qRound(json["id"].toDouble()));
   QJsonArray valuesArray = json["values"].toArray();
-  for (int vIndex = 0; vIndex < valuesArray.size(); ++vIndex) {
-    m_values.append(valuesArray[vIndex].toString());
+  for (const QJsonValue &value : valuesArray) {
+    m_values.append(value.toString());
   }
   if (json.contains("options")) {
     QJsonArray optionsArray = json["options"].toArray();
-    for (int vIndex = 0; vIndex < optionsArray.size(); ++vIndex) {
-      m_options.append(optionsArray[vIndex].toString());
+    for (const QJsonValue &option : optionsArray) {
+      m_options.append(option.toString());
     }
   }
 }
@@ -124,14 +129,14 @@ void XdtsFrameDataItem::read(const QJsonObject &json) {
 void XdtsFrameDataItem::write(QJsonObject &json) const {
   json["id"] = int(m_id);
   QJsonArray valuesArray;
-  foreach (const QString &value, m_values) {
+  for (const QString &value : m_values) {
     valuesArray.append(value);
   }
   json["values"] = valuesArray;
 
   if (!m_options.isEmpty()) {
     QJsonArray optionsArray;
-    foreach (const QString &option, m_options) {
+    for (const QString &option : m_options) {
       optionsArray.append(option);
     }
     json["options"] = optionsArray;
@@ -171,7 +176,7 @@ void XdtsTrackFrameItem::read(const QJsonObject &json) {
 
 void XdtsTrackFrameItem::write(QJsonObject &json) const {
   QJsonArray dataArray;
-  foreach (const XdtsFrameDataItem &data, m_data) {
+  for (const XdtsFrameDataItem &data : m_data) {
     QJsonObject dataObject;
     data.write(dataObject);
     dataArray.append(dataObject);
@@ -203,7 +208,7 @@ void XdtsFieldTrackItem::read(const QJsonObject &json) {
 
 void XdtsFieldTrackItem::write(QJsonObject &json) const {
   QJsonArray frameArray;
-  foreach (const XdtsTrackFrameItem &frame, m_frames) {
+  for (const XdtsTrackFrameItem &frame : m_frames) {
     QJsonObject frameObject;
     frame.write(frameObject);
     frameArray.append(frameObject);
@@ -330,7 +335,7 @@ void XdtsTimeTableFieldItem::read(const QJsonObject &json) {
 void XdtsTimeTableFieldItem::write(QJsonObject &json) const {
   json["fieldId"] = int(m_fieldId);
   QJsonArray trackArray;
-  foreach (const XdtsFieldTrackItem &track, m_tracks) {
+  for (const XdtsFieldTrackItem &track : m_tracks) {
     QJsonObject trackObject;
     track.write(trackObject);
     trackArray.append(trackObject);
@@ -393,7 +398,7 @@ void XdtsTimeTableHeaderItem::read(const QJsonObject &json) {
 void XdtsTimeTableHeaderItem::write(QJsonObject &json) const {
   json["fieldId"] = int(m_fieldId);
   QJsonArray namesArray;
-  foreach (const QString name, m_names) {
+  for (const QString &name : m_names) {
     namesArray.append(name);
   }
   json["names"] = namesArray;
@@ -431,7 +436,7 @@ void XdtsTimeTableItem::read(const QJsonObject &json) {
 void XdtsTimeTableItem::write(QJsonObject &json) const {
   if (!m_fields.isEmpty()) {
     QJsonArray fieldArray;
-    foreach (const XdtsTimeTableFieldItem &field, m_fields) {
+    for (const XdtsTimeTableFieldItem &field : m_fields) {
       QJsonObject fieldObject;
       field.write(fieldObject);
       fieldArray.append(fieldObject);
@@ -441,7 +446,7 @@ void XdtsTimeTableItem::write(QJsonObject &json) const {
   json["duration"] = m_duration;
   json["name"]     = m_name;
   QJsonArray headerArray;
-  foreach (const XdtsTimeTableHeaderItem header, m_timeTableHeaders) {
+  for (const XdtsTimeTableHeaderItem &header : m_timeTableHeaders) {
     QJsonObject headerObject;
     header.write(headerObject);
     headerArray.append(headerObject);
@@ -508,7 +513,7 @@ void XdtsData::write(QJsonObject &json) const {
     json["header"] = headerObject;
   }
   QJsonArray tableArray;
-  foreach (const XdtsTimeTableItem &table, m_timeTables) {
+  for (const XdtsTimeTableItem &table : m_timeTables) {
     QJsonObject tableObject;
     table.write(tableObject);
     tableArray.append(tableObject);
@@ -562,8 +567,7 @@ bool XdtsIo::loadXdtsScene(ToonzScene *scene, const TFilePath &scenePath) {
   QStringList levelNames = xdtsData.getLevelNames();
   // in case multiple columns have the same name
   levelNames.removeDuplicates();
-  for (auto& name : levelNames)
-      name = name.trimmed();
+  for (auto &name : levelNames) name = name.trimmed();
 
   scene->clear();
 
@@ -703,12 +707,12 @@ void ExportXDTSCommand::execute() {
     duration = xsheet->getFrameCount();
 
   {
-    _tick1Id         = -1;
-    _tick2Id         = -1;
-    _keyFrameId      = -1;
-    _tick2Id         = -1;
-    _exportAllColumn = true;
-    _isUextVersion   = false;
+    _tick1Id          = -1;
+    _tick2Id          = -1;
+    _keyFrameId       = -1;
+    _referenceFrameId = -1;
+    _exportAllColumn  = true;
+    _isUextVersion    = false;
     XdtsData pre_xdtsData;
     pre_xdtsData.build(xsheet, QString::fromStdString(fp.getName()), duration);
     if (pre_xdtsData.isEmpty()) {
@@ -747,7 +751,7 @@ void ExportXDTSCommand::execute() {
 
   if (!savePopup) {
     // create custom widget
-    QWidget *custonWidget = new QWidget();
+    QWidget *customWidget = new QWidget();
     tick1Id               = new QComboBox();
     tick2Id               = new QComboBox();
     keyFrameId            = new QComboBox();
@@ -821,10 +825,10 @@ void ExportXDTSCommand::execute() {
       }
       customLay->addLayout(bottomLay);
     }
-    custonWidget->setLayout(customLay);
+    customWidget->setLayout(customLay);
 
     savePopup = new GenericSaveFilePopup(
-        QObject::tr("Export Exchange Digital Time Sheet (XDTS)"), custonWidget);
+        QObject::tr("Export Exchange Digital Time Sheet (XDTS)"), customWidget);
     savePopup->addFilterType("xdts");
   } else {
     refreshCellMarkComboItems(tick1Id);
