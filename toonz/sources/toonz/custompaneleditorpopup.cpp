@@ -1,3 +1,5 @@
+
+
 #include "custompaneleditorpopup.h"
 
 // Tnz includes
@@ -34,6 +36,7 @@
 #include <QTextStream>
 #include <QBuffer>
 #include <QToolButton>
+#include <QRegularExpression>
 
 namespace {
 const TFilePath CustomPanelTemplateFolderName("custom panel templates");
@@ -96,7 +99,8 @@ bool CustomPanelUIField::setCommand(QString commandId) {
   m_commandId      = commandId;
   QString tempText = action->text();
   // removing accelerator key indicator
-  tempText = tempText.replace(QRegExp("&([^& ])"), "\\1");
+  QRegularExpression re("&([^& ])");
+  tempText = tempText.replace(re, "\\1");
   // removing doubled &s
   tempText = tempText.replace("&&", "&");
   setText(tempText);
@@ -237,10 +241,10 @@ void UiPreviewWidget::dragMoveEvent(QDragMoveEvent* event) {
 }
 
 void UiPreviewWidget::dropEvent(QDropEvent* event) {
-  QString commandId     = event->mimeData()->text();
-  bool isDraggdFromTree = (event->dropAction() == Qt::CopyAction);
+  QString commandId      = event->mimeData()->text();
+  bool isDraggedFromTree = (event->dropAction() == Qt::CopyAction);
 
-  emit dropped(m_highlightUiId, commandId, isDraggdFromTree);
+  emit dropped(m_highlightUiId, commandId, isDraggedFromTree);
 }
 
 //-----------------------------------------------------------------------------
@@ -263,7 +267,7 @@ void UiPreviewArea::resizeEvent(QResizeEvent* event) {
 //-----------------------------------------------------------------------------
 
 bool CustomPanelEditorPopup::loadTemplateList() {
-  // library / custom panel templatesの中をチェック
+  // Check the library / custom panel templates directory
   TFilePath customPanelTemplateFolder = customPaneTemplateFolderPath();
   if (!TSystem::doesExistFileOrLevel(customPanelTemplateFolder)) {
     DVGui::warning(tr("Template folder %1 not found.")
@@ -315,8 +319,7 @@ bool CustomPanelEditorPopup::loadTemplateList() {
 //-----------------------------------------------------------------------------
 
 void CustomPanelEditorPopup::createFields() {
-  QList<QWidget*> widgets = m_UiFieldsContainer->findChildren<QWidget*>();
-  foreach (QWidget* child, widgets) {
+  for (QWidget* child : m_UiFieldsContainer->findChildren<QWidget*>()) {
     delete child;
   }
 
@@ -353,9 +356,10 @@ void CustomPanelEditorPopup::createFields() {
     }
     if (entry.type == Button || entry.type == Scroller_Fore) row++;
 
-    connect(entry.field, SIGNAL(highlight(int)), this, SLOT(onHighlight(int)));
-    connect(entry.field, SIGNAL(commandChanged(QString, QString)), this,
-            SLOT(onCommandChanged(QString, QString)));
+    connect(entry.field, &CustomPanelUIField::highlight, this,
+            &CustomPanelEditorPopup::onHighlight);
+    connect(entry.field, &CustomPanelUIField::commandChanged, this,
+            &CustomPanelEditorPopup::onCommandChanged);
     id++;
   }
 }
@@ -389,7 +393,7 @@ void CustomPanelEditorPopup::buildEntries(QWidget* customWidget) {
     entry.objectName = widget->objectName();
     if (entry.type == Button)
       entry.rect = QRect(relativePos(widget, customWidget), widget->size());
-    else {  // Sroller_Back
+    else {  // Scroller_Back
       entry.orientation =
           (widget->width() > widget->height()) ? Qt::Horizontal : Qt::Vertical;
       if (entry.orientation == Qt::Horizontal)
@@ -467,18 +471,18 @@ void CustomPanelEditorPopup::onTemplateSwitched() {
     UiPreviewWidget* oldPreview =
         dynamic_cast<UiPreviewWidget*>(m_previewArea->widget());
     if (oldPreview) {
-      disconnect(oldPreview, SIGNAL(clicked(int)), this,
-                 SLOT(onPreviewClicked(int)));
-      disconnect(oldPreview, SIGNAL(dropped(int, QString, bool)), this,
-                 SLOT(onPreviewDropped(int, QString, bool)));
+      disconnect(oldPreview, &UiPreviewWidget::clicked, this,
+                 &CustomPanelEditorPopup::onPreviewClicked);
+      disconnect(oldPreview, &UiPreviewWidget::dropped, this,
+                 &CustomPanelEditorPopup::onPreviewDropped);
     }
     delete m_previewArea->widget();
   }
 
-  connect(previewWidget, SIGNAL(clicked(int)), this,
-          SLOT(onPreviewClicked(int)));
-  connect(previewWidget, SIGNAL(dropped(int, QString, bool)), this,
-          SLOT(onPreviewDropped(int, QString, bool)));
+  connect(previewWidget, &UiPreviewWidget::clicked, this,
+          &CustomPanelEditorPopup::onPreviewClicked);
+  connect(previewWidget, &UiPreviewWidget::dropped, this,
+          &CustomPanelEditorPopup::onPreviewDropped);
 
   m_previewArea->setWidget(previewWidget);
   previewWidget->onViewerResize(m_previewArea->size());
@@ -585,7 +589,7 @@ void CustomPanelEditorPopup::replaceObjectNames(QDomElement& element) {
   while (!n.isNull()) {
     if (n.isElement()) {
       QDomElement e = n.toElement();
-      // 自分自身をチェック
+      // check self
       if (e.tagName() == "widget" && e.hasAttribute("name")) {
         QString objName     = e.attribute("name");
         QList<int> entryIds = entryIdByObjName(objName);
@@ -746,20 +750,18 @@ CustomPanelEditorPopup::CustomPanelEditorPopup()
   m_buttonLayout->addSpacing(10);
   m_buttonLayout->addWidget(cancelButton, 0);
 
-  bool ret = true;
-  ret = ret && connect(cancelButton, SIGNAL(clicked()), this, SLOT(close()));
-  ret = ret && connect(m_templateCombo, SIGNAL(currentIndexChanged(int)), this,
-                       SLOT(onTemplateSwitched()));
-  ret = ret &&
-        connect(registerButton, SIGNAL(clicked()), this, SLOT(onRegister()));
-  ret = ret && connect(searchEdit, SIGNAL(textChanged(const QString&)), this,
-                       SLOT(onSearchTextChanged(const QString&)));
-  assert(ret);
+  connect(cancelButton, &QPushButton::clicked, this,
+          &CustomPanelEditorPopup::close);
+  connect(m_templateCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
+          this, &CustomPanelEditorPopup::onTemplateSwitched);
+  connect(registerButton, &QPushButton::clicked, this,
+          &CustomPanelEditorPopup::onRegister);
+  connect(searchEdit, &QLineEdit::textChanged, this,
+          &CustomPanelEditorPopup::onSearchTextChanged);
 
   // load template
   bool ok = loadTemplateList();
   if (!ok) {
-    // show some warning?
   }
 }
 

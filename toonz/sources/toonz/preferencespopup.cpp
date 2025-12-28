@@ -104,12 +104,10 @@ SizeField::SizeField(QSize min, QSize max, QSize value, QWidget* parent)
   lay->addStretch(1);
   setLayout(lay);
 
-  bool ret = true;
-  ret      = ret && connect(m_fieldX, SIGNAL(editingFinished()), this,
-                            SIGNAL(editingFinished()));
-  ret      = ret && connect(m_fieldY, SIGNAL(editingFinished()), this,
-                            SIGNAL(editingFinished()));
-  assert(ret);
+  connect(m_fieldX, &DVGui::IntLineEdit::editingFinished, this,
+          &SizeField::editingFinished);
+  connect(m_fieldY, &DVGui::IntLineEdit::editingFinished, this,
+          &SizeField::editingFinished);
 }
 
 QSize SizeField::getValue() const {
@@ -170,11 +168,8 @@ PreferencesPopup::FormatProperties::FormatProperties(PreferencesPopup* parent)
   gridLayout->addWidget(dpiLabel, row, 0, Qt::AlignRight);
 
   m_dpi = new DVGui::DoubleLineEdit;
-  m_dpi->setRange(1, (std::numeric_limits<double>::max)());  // Tried
-                                                             // limits::min(),
-                                                             // but input 0 was
-  gridLayout->addWidget(m_dpi, row++,
-                        1);  // then replaced with something * e^-128
+  m_dpi->setRange(1, (std::numeric_limits<double>::max)());
+  gridLayout->addWidget(m_dpi, row++, 1);
 
   m_premultiply = new DVGui::CheckBox(LevelSettingsPopup::tr("Premultiply"));
   gridLayout->addWidget(m_premultiply, row++, 1);
@@ -191,9 +186,8 @@ PreferencesPopup::FormatProperties::FormatProperties(PreferencesPopup* parent)
       new QLabel(LevelSettingsPopup::tr("Antialias Softness:"));
   gridLayout->addWidget(antialiasLabel, row, 0, Qt::AlignRight);
 
-  m_antialias = new DVGui::IntLineEdit(
-      this, 10, 0, 100);  // Tried 1, but then m_doAntialias was forcedly
-  gridLayout->addWidget(m_antialias, row++, 1);  // initialized to true
+  m_antialias = new DVGui::IntLineEdit(this, 10, 0, 100);
+  gridLayout->addWidget(m_antialias, row++, 1);
 
   QLabel* subsamplingLabel = new QLabel(LevelSettingsPopup::tr("Subsampling:"));
   gridLayout->addWidget(subsamplingLabel, row, 0, Qt::AlignRight);
@@ -213,20 +207,13 @@ PreferencesPopup::FormatProperties::FormatProperties(PreferencesPopup* parent)
   endVLayout();
 
   // Establish connections
-  bool ret = true;
-
   // enable gamma field only when the regexp field contains ".exr"
-  ret = connect(m_regExp, SIGNAL(editingFinished()),
-                SLOT(updateEnabledStatus())) &&
-        ret;
-  ret = connect(m_dpiPolicy, SIGNAL(currentIndexChanged(int)),
-                SLOT(updateEnabledStatus())) &&
-        ret;
-  ret =
-      connect(m_doAntialias, SIGNAL(clicked()), SLOT(updateEnabledStatus())) &&
-      ret;
-
-  assert(ret);
+  connect(m_regExp, &DVGui::LineEdit::editingFinished, this,
+          &FormatProperties::updateEnabledStatus);
+  connect(m_dpiPolicy, QOverload<int>::of(&QComboBox::currentIndexChanged),
+          this, &FormatProperties::updateEnabledStatus);
+  connect(m_doAntialias, &QAbstractButton::clicked, this,
+          &FormatProperties::updateEnabledStatus);
 }
 
 //-----------------------------------------------------------------------------
@@ -315,10 +302,11 @@ PreferencesPopup::AdditionalStyleEdit::AdditionalStyleEdit(
 
   addButtonBarWidget(okButton, applyButton, closeButton);
 
-  bool ret = true;
-  ret      = ret && connect(okButton, SIGNAL(pressed()), this, SLOT(onOK()));
-  ret = ret && connect(applyButton, SIGNAL(pressed()), this, SLOT(onApply()));
-  ret = ret && connect(closeButton, SIGNAL(pressed()), this, SLOT(close()));
+  connect(okButton, &QPushButton::pressed, this, &AdditionalStyleEdit::onOK);
+  connect(applyButton, &QPushButton::pressed, this,
+          &AdditionalStyleEdit::onApply);
+  connect(closeButton, &QPushButton::pressed, this,
+          &AdditionalStyleEdit::close);
 }
 
 void PreferencesPopup::AdditionalStyleEdit::showEvent(QShowEvent*) {
@@ -410,7 +398,7 @@ PreferencesPopup::Display30bitChecker::Display30bitChecker(
   setLayout(lay);
   lay->setSizeConstraint(QLayout::SetFixedSize);
 
-  connect(closeBtn, SIGNAL(clicked()), this, SLOT(accept()));
+  connect(closeBtn, &QPushButton::clicked, this, &Display30bitChecker::accept);
 }
 
 PreferencesPopup::Display30bitChecker::~Display30bitChecker() {
@@ -772,8 +760,8 @@ void PreferencesPopup::onOnionColorChanged() {
 
 //-----------------------------------------------------------------------------
 
-void invalidateIcons();  // implemented in sceneviewer.cpp; in which fucking
-                         // header  I can put this declaration?!
+void invalidateIcons();  // TODO: Find the appropriate header for this
+                         // declaration
 
 void PreferencesPopup::onTranspCheckDataChanged() { invalidateIcons(); }
 
@@ -829,9 +817,8 @@ void PreferencesPopup::onEditAdditionalStyleSheet() {
   if (!m_additionalStyleEdit) {
     m_additionalStyleEdit = new AdditionalStyleEdit(this);
 
-    bool ret = connect(m_additionalStyleEdit, SIGNAL(additionalSheetEdited()),
-                       this, SLOT(onAdditionalStyleSheetEdited()));
-    assert(ret);
+    connect(m_additionalStyleEdit, &AdditionalStyleEdit::additionalSheetEdited,
+            this, &PreferencesPopup::onAdditionalStyleSheetEdited);
   }
   m_additionalStyleEdit->show();
 }
@@ -920,9 +907,8 @@ void PreferencesPopup::onEditLevelFormat() {
   if (!m_formatProperties) {
     m_formatProperties = new FormatProperties(this);
 
-    bool ret = connect(m_formatProperties, SIGNAL(dialogClosed()),
-                       SLOT(onLevelFormatEdited()));
-    assert(ret);
+    connect(m_formatProperties, &FormatProperties::dialogClosed, this,
+            &PreferencesPopup::onLevelFormatEdited);
   }
 
   const Preferences::LevelFormat& lf =
@@ -978,13 +964,12 @@ QWidget* PreferencesPopup::createUI(PreferencesItemId id,
   PreferencesItem item = m_pref->getItem(id);
   // create widget depends on the parameter types
   QWidget* widget = nullptr;
-  bool ret        = false;
   switch (item.type) {
   case QMetaType::Bool:  // create CheckBox
   {
     CheckBox* cb = new CheckBox(getUIString(id), this);
     cb->setChecked(item.value.toBool());
-    ret    = connect(cb, SIGNAL(stateChanged(int)), this, SLOT(onChange()));
+    connect(cb, &CheckBox::stateChanged, this, &PreferencesPopup::onChange);
     widget = cb;
   } break;
 
@@ -994,14 +979,14 @@ QWidget* PreferencesPopup::createUI(PreferencesItemId id,
       for (const ComboBoxItem& item : comboItems)
         combo->addItem(item.first, item.second);
       combo->setCurrentIndex(combo->findData(item.value));
-      ret    = connect(combo, SIGNAL(currentIndexChanged(int)), this,
-                       SLOT(onChange()));
+      connect(combo, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
+              &PreferencesPopup::onChange);
       widget = combo;
     } else {  // create IntLineEdit
-      assert(item.max.toInt() != -1);
       DVGui::IntLineEdit* field = new DVGui::IntLineEdit(
           this, item.value.toInt(), item.min.toInt(), item.max.toInt());
-      ret = connect(field, SIGNAL(editingFinished()), this, SLOT(onChange()));
+      connect(field, &DVGui::IntLineEdit::editingFinished, this,
+              &PreferencesPopup::onChange);
       widget = field;
     }
     break;
@@ -1012,7 +997,8 @@ QWidget* PreferencesPopup::createUI(PreferencesItemId id,
                               // dpi field
       DoubleLineEdit* field = new DoubleLineEdit(this, item.value.toDouble());
       field->setRange(item.min.toDouble(), item.max.toDouble());
-      ret    = connect(field, SIGNAL(valueChanged()), this, SLOT(onChange()));
+      connect(field, &DoubleLineEdit::valueChanged, this,
+              &PreferencesPopup::onChange);
       widget = field;
     } else {
       MeasuredDoubleLineEdit* field = new MeasuredDoubleLineEdit(this);
@@ -1022,7 +1008,8 @@ QWidget* PreferencesPopup::createUI(PreferencesItemId id,
       else
         field->setMeasure((id == DefLevelWidth) ? "level.lx" : "level.ly");
       field->setValue(item.value.toDouble());
-      ret    = connect(field, SIGNAL(valueChanged()), this, SLOT(onChange()));
+      connect(field, &MeasuredDoubleLineEdit::valueChanged, this,
+              &PreferencesPopup::onChange);
       widget = field;
     }
     break;
@@ -1031,21 +1018,24 @@ QWidget* PreferencesPopup::createUI(PreferencesItemId id,
     if (id == interfaceFont) {  // create QFontComboBox
       QFontComboBox* combo = new QFontComboBox(this);
       combo->setCurrentText(item.value.toString());
-      ret    = connect(combo, SIGNAL(currentIndexChanged(const QString&)), this,
-                       SLOT(onInterfaceFontChanged(const QString&)));
+      // QFontComboBox uses currentFontChanged
+      connect(
+          combo, &QFontComboBox::currentFontChanged, this,
+          [this](const QFont& font) { onInterfaceFontChanged(font.family()); });
       widget = combo;
     } else if (!comboItems.isEmpty()) {  // create QComboBox
       QComboBox* combo = new QComboBox(this);
       for (const ComboBoxItem& item : comboItems)
         combo->addItem(item.first, item.second);
       combo->setCurrentIndex(combo->findData(item.value));
-      ret    = connect(combo, SIGNAL(currentIndexChanged(int)), this,
-                       SLOT(onChange()));
+      connect(combo, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
+              &PreferencesPopup::onChange);
       widget = combo;
     } else {  // create FileField
       DVGui::FileField* field =
           new DVGui::FileField(this, item.value.toString());
-      ret    = connect(field, SIGNAL(pathChanged()), this, SLOT(onChange()));
+      connect(field, &FileField::pathChanged, this,
+              &PreferencesPopup::onChange);
       widget = field;
     }
     break;
@@ -1054,7 +1044,8 @@ QWidget* PreferencesPopup::createUI(PreferencesItemId id,
   {
     SizeField* field = new SizeField(item.min.toSize(), item.max.toSize(),
                                      item.value.toSize(), this);
-    ret    = connect(field, SIGNAL(editingFinished()), this, SLOT(onChange()));
+    connect(field, &SizeField::editingFinished, this,
+            &PreferencesPopup::onChange);
     widget = field;
   } break;
 
@@ -1062,14 +1053,13 @@ QWidget* PreferencesPopup::createUI(PreferencesItemId id,
   {
     ColorField* field =
         new ColorField(this, false, colorToTPixel(item.value.value<QColor>()));
-    ret    = connect(field, SIGNAL(colorChanged(const TPixel32&, bool)), this,
-                     SLOT(onColorFieldChanged(const TPixel32&, bool)));
+    connect(field, &ColorField::colorChanged, this,
+            &PreferencesPopup::onColorFieldChanged);
     widget = field;
   } break;
 
   case QMetaType::QVariantMap:  // used in colorCalibrationLutPaths
   {
-    assert(id == colorCalibrationLutPaths);
     DVGui::FileField* field = new DVGui::FileField(
         this, QString("- Please specify 3DLUT file (.3dl) -"), false, true);
     QString lutPath = m_pref->getColorCalibrationLutPath(
@@ -1078,16 +1068,19 @@ QWidget* PreferencesPopup::createUI(PreferencesItemId id,
     field->setFileMode(QFileDialog::ExistingFile);
     QStringList lutFileTypes = {"3dl"};
     field->setFilters(lutFileTypes);
-    ret = connect(field, SIGNAL(pathChanged()), this, SLOT(onLutPathChanged()));
+    connect(field, &FileField::pathChanged, this,
+            &PreferencesPopup::onLutPathChanged);
     widget = field;
   } break;
 
   default:
-    std::cout << "unsupported value type" << std::endl;
+    qWarning() << "unsupported value type for preference item" << id;
     break;
   }
-  assert(ret);
-  m_controlIdMap[widget] = id;
+
+  if (widget) {
+    m_controlIdMap[widget] = id;
+  }
   return widget;
 }
 
@@ -1096,8 +1089,7 @@ QWidget* PreferencesPopup::createUI(PreferencesItemId id,
 QGridLayout* PreferencesPopup::insertGroupBoxUI(PreferencesItemId id,
                                                 QGridLayout* layout) {
   PreferencesItem item = m_pref->getItem(id);
-  assert(item.type == QMetaType::Bool);
-  QGroupBox* box = new QGroupBox(getUIString(id), this);
+  QGroupBox* box       = new QGroupBox(getUIString(id), this);
   box->setCheckable(true);
   box->setChecked(item.value.toBool());
 
@@ -1107,10 +1099,7 @@ QGridLayout* PreferencesPopup::insertGroupBoxUI(PreferencesItemId id,
 
   layout->addWidget(box, layout->rowCount(), 0, 1, 3);
 
-  bool ret = connect(box, SIGNAL(clicked(bool)), this, SLOT(onChange()));
-  // bool ret = connect(box, SIGNAL(clicked(bool)), this,
-  // SLOT(onGroupBoxChanged(bool)));
-  assert(ret);
+  connect(box, &QGroupBox::clicked, this, &PreferencesPopup::onChange);
   m_controlIdMap[box] = id;
   return lay;
 }
@@ -1322,7 +1311,7 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
       {FillOnlysavebox, tr("Use the TLV Savebox to Limit Filling Operations")},
       {DefRegionWithPaint,
        tr("Define Filling Region Using both Lines and Areas")},
-      { ReferFillPrevailing, tr("Paint Under Lines in Refer Fill") },
+      {ReferFillPrevailing, tr("Paint Under Lines in Refer Fill")},
       {multiLayerStylePickerEnabled,
        tr("Style Picker: Switch Current Level by Picking on Multi Layer")},
       {cursorBrushType, tr("Basic Cursor Type:")},
@@ -1425,9 +1414,7 @@ QString PreferencesPopup::getUIString(PreferencesItemId id) {
        tr("Check for the Latest Version of OpenToonz on Launch")},
 
       // Touch / Tablet Settings
-      // TounchGestureControl // Touch Gesture is a checkable command and not
-      // in
-      // preferences.ini
+      // Touch Gesture is a checkable command and not in preferences.ini
       {winInkEnabled, tr("Enable Windows Ink Support* (EXPERIMENTAL)")},
       {useQtNativeWinInk,
        tr("Use Qt's Native Windows Ink Support*\n(CAUTION: This options is "
@@ -1554,15 +1541,23 @@ QList<ComboBoxItem> PreferencesPopup::getComboItemList(
         {tr("File"), 8}}},
       {animatedGuidedDrawing,
        {{tr("Arrow Markers"), 0}, {tr("Animated Guide"), 1}}}};
-  assert(comboItemsTable.contains(id));
+
   return comboItemsTable.value(id, QList<ComboBoxItem>());
 }
 
 template <typename T>
 inline T PreferencesPopup::getUI(PreferencesItemId id) {
-  assert(m_controlIdMap.keys(id).count() == 1);
-  T ret = dynamic_cast<T>(m_controlIdMap.key(id));
-  assert(ret);
+  // Preference IDs can be missing if the UI was not fully initialized
+  QWidget* widget = m_controlIdMap.key(id);
+  if (!widget) {
+    qWarning() << "Widget not found for preference item:" << id;
+    return nullptr;
+  }
+
+  T ret = qobject_cast<T>(widget);
+  if (!ret) {
+    qWarning() << "Widget cast failed for preference item:" << id;
+  }
   return ret;
 }
 
@@ -1629,10 +1624,8 @@ PreferencesPopup::PreferencesPopup()
   setWindowFlags(Qt::Tool);
 #endif
 
-  bool ret = connect(categoryList, SIGNAL(currentRowChanged(int)),
-                     stackedWidget, SLOT(setCurrentIndex(int)));
-
-  assert(ret);
+  connect(categoryList, &QListWidget::currentRowChanged, stackedWidget,
+          &QStackedWidget::setCurrentIndex);
 }
 
 //-----------------------------------------------------------------------------
@@ -1706,15 +1699,19 @@ QWidget* PreferencesPopup::createGeneralPage() {
   QCheckBox* lazyLoadRoomsCheckBox = getUI<QCheckBox*>(lazyLoadRooms);
   connect(lazyLoadRoomsCheckBox, &QCheckBox::stateChanged,
           [lazyLoadRoomsCheckBox](int state) {
-          QString status = Preferences::instance()->isLazyLoadRoomsEnabled()
-              ? tr("enabled") : tr("disabled");
-          QString description = Preferences::instance()->isLazyLoadRoomsEnabled()
-              ? tr("rooms will load on demand")
-              : tr("all rooms load at startup");
-          QString lazyLoadRoomsToolTip = tr("Lazy loading %1 - %2").arg(status).arg(description);
-          lazyLoadRoomsCheckBox->setToolTip(lazyLoadRoomsToolTip);
+            QString status = Preferences::instance()->isLazyLoadRoomsEnabled()
+                                 ? tr("enabled")
+                                 : tr("disabled");
+            QString description =
+                Preferences::instance()->isLazyLoadRoomsEnabled()
+                    ? tr("rooms will load on demand")
+                    : tr("all rooms load at startup");
+            QString lazyLoadRoomsToolTip =
+                tr("Lazy loading %1 - %2").arg(status).arg(description);
+            lazyLoadRoomsCheckBox->setToolTip(lazyLoadRoomsToolTip);
           });
-  lazyLoadRoomsCheckBox->stateChanged(Preferences::instance()->isLazyLoadRoomsEnabled());
+  lazyLoadRoomsCheckBox->stateChanged(
+      Preferences::instance()->isLazyLoadRoomsEnabled());
 
   m_onEditedFuncMap.insert(autosaveEnabled,
                            &PreferencesPopup::onAutoSaveChanged);
@@ -1727,24 +1724,21 @@ QWidget* PreferencesPopup::createGeneralPage() {
   m_onEditedFuncMap.insert(pathAliasPriority,
                            &PreferencesPopup::onPathAliasPriorityChanged);
 
-  bool ret = true;
+  connect(m_pref, &Preferences::stopAutoSave, this,
+          &PreferencesPopup::onAutoSaveExternallyChanged);
+  connect(m_pref, &Preferences::startAutoSave, this,
+          &PreferencesPopup::onAutoSaveExternallyChanged);
+  connect(m_pref, &Preferences::autoSavePeriodChanged, this,
+          &PreferencesPopup::onAutoSavePeriodExternallyChanged);
 
-  ret = ret && connect(m_pref, SIGNAL(stopAutoSave()), this,
-                       SLOT(onAutoSaveExternallyChanged()));
-  ret = ret && connect(m_pref, SIGNAL(startAutoSave()), this,
-                       SLOT(onAutoSaveExternallyChanged()));
-  ret = ret && connect(m_pref, SIGNAL(autoSavePeriodChanged()), this,
-                       SLOT(onAutoSavePeriodExternallyChanged()));
-
-  ret = ret && connect(m_projectRootDocuments, SIGNAL(stateChanged(int)),
-                       SLOT(onProjectRootChanged()));
-  ret = ret && connect(m_projectRootDesktop, SIGNAL(stateChanged(int)),
-                       SLOT(onProjectRootChanged()));
-  ret = ret && connect(m_projectRootCustom, SIGNAL(stateChanged(int)),
-                       SLOT(onProjectRootChanged()));
-  ret = ret && connect(m_projectRootCustom, SIGNAL(clicked(bool)), customField,
-                       SLOT(setVisible(bool)));
-  assert(ret);
+  connect(m_projectRootDocuments, &QCheckBox::stateChanged, this,
+          &PreferencesPopup::onProjectRootChanged);
+  connect(m_projectRootDesktop, &QCheckBox::stateChanged, this,
+          &PreferencesPopup::onProjectRootChanged);
+  connect(m_projectRootCustom, &QCheckBox::stateChanged, this,
+          &PreferencesPopup::onProjectRootChanged);
+  connect(m_projectRootCustom, &QCheckBox::clicked, customField,
+          &QWidget::setVisible);
 
   return widget;
 }
@@ -1760,7 +1754,7 @@ QWidget* PreferencesPopup::createInterfacePage() {
   }
 
   QList<ComboBoxItem> roomItemList;
-  foreach (QString roomName, m_pref->getRoomMap())
+  for (const QString& roomName : m_pref->getRoomMap())
     roomItemList.push_back(ComboBoxItem(roomName, roomName));
 
   QList<ComboBoxItem> languageItemList;
@@ -1798,9 +1792,7 @@ QWidget* PreferencesPopup::createInterfacePage() {
       ->setSizeAdjustPolicy(QComboBox::AdjustToContents);
 
   QGridLayout* colorCalibLay = insertGroupBoxUI(colorCalibrationEnabled, lay);
-  {
-    insertUI(colorCalibrationLutPaths, colorCalibLay);
-  }
+  { insertUI(colorCalibrationLutPaths, colorCalibLay); }
   insertUI(displayIn30bit, lay);
   row = lay->rowCount();
   lay->addWidget(check30bitBtn, row - 1, 2, Qt::AlignRight);
@@ -1816,15 +1808,12 @@ QWidget* PreferencesPopup::createInterfacePage() {
   }
   // pixels unit may deactivated externally on loading scene (see
   // IoCmd::loadScene())
-  bool ret = true;
-  ret      = ret && connect(TApp::instance()->getCurrentScene(),
-                            SIGNAL(pixelUnitSelected(bool)), this,
-                            SLOT(onPixelUnitExternallySelected(bool)));
-  ret      = ret && connect(additionalStyleSheetBtn, SIGNAL(clicked()), this,
-                            SLOT(onEditAdditionalStyleSheet()));
-  ret      = ret && connect(check30bitBtn, SIGNAL(clicked()), this,
-                            SLOT(onCheck30bitDisplay()));
-  assert(ret);
+  connect(TApp::instance()->getCurrentScene(), &TSceneHandle::pixelUnitSelected,
+          this, &PreferencesPopup::onPixelUnitExternallySelected);
+  connect(additionalStyleSheetBtn, &QPushButton::clicked, this,
+          &PreferencesPopup::onEditAdditionalStyleSheet);
+  connect(check30bitBtn, &QPushButton::clicked, this,
+          &PreferencesPopup::onCheck30bitDisplay);
 
   m_onEditedFuncMap.insert(CurrentStyleSheetName,
                            &PreferencesPopup::onStyleSheetTypeChanged);
@@ -1878,9 +1867,7 @@ QWidget* PreferencesPopup::createLoadingPage() {
   insertUI(renamePolicy, lay, getComboItemList(renamePolicy));
   insertUI(convertPolicy, lay, getComboItemList(convertPolicy));
   QGridLayout* autoExposeLay = insertGroupBoxUI(autoExposeEnabled, lay);
-  {
-    insertUI(autoRemoveUnusedLevels, autoExposeLay);
-  }
+  { insertUI(autoRemoveUnusedLevels, autoExposeLay); }
   insertUI(subsceneFolderEnabled, lay);
   insertUI(removeSceneNumberFromLoadedLevelName, lay);
   insertUI(IgnoreImageDpi, lay);
@@ -1908,23 +1895,21 @@ QWidget* PreferencesPopup::createLoadingPage() {
   lay->setRowStretch(lay->rowCount(), 1);
   widget->setLayout(lay);
 
-  bool ret = true;
-  ret      = ret &&
-        connect(addLevelFormat, SIGNAL(clicked()), SLOT(onAddLevelFormat()));
-  ret = ret && connect(removeLevelFormat, SIGNAL(clicked()),
-                       SLOT(onRemoveLevelFormat()));
-  ret = ret && connect(m_editLevelFormat, SIGNAL(clicked()),
-                       SLOT(onEditLevelFormat()));
-  ret = ret && connect(TApp::instance()->getCurrentScene(),
-                       SIGNAL(importPolicyChanged(int)), this,
-                       SLOT(onImportPolicyExternallyChanged(int)));
-  ret = ret && connect(TApp::instance()->getCurrentScene(),
-                       SIGNAL(convertPolicyChanged(int)), this,
-                       SLOT(onConvertPolicyExternallyChanged(int)));
-  ret = ret && connect(TApp::instance()->getCurrentScene(),
-                       SIGNAL(renamePolicyChanged(int)), this,
-                       SLOT(onRenamePolicyExternallyChanged(int)));
-  assert(ret);
+  connect(addLevelFormat, &QPushButton::clicked, this,
+          &PreferencesPopup::onAddLevelFormat);
+  connect(removeLevelFormat, &QPushButton::clicked, this,
+          &PreferencesPopup::onRemoveLevelFormat);
+  connect(m_editLevelFormat, &QPushButton::clicked, this,
+          &PreferencesPopup::onEditLevelFormat);
+  connect(TApp::instance()->getCurrentScene(),
+          &TSceneHandle::importPolicyChanged, this,
+          &PreferencesPopup::onImportPolicyExternallyChanged);
+  connect(TApp::instance()->getCurrentScene(),
+          &TSceneHandle::convertPolicyChanged, this,
+          &PreferencesPopup::onConvertPolicyExternallyChanged);
+  connect(TApp::instance()->getCurrentScene(),
+          &TSceneHandle::renamePolicyChanged, this,
+          &PreferencesPopup::onRenamePolicyExternallyChanged);
 
   return widget;
 }
@@ -1943,9 +1928,7 @@ QWidget* PreferencesPopup::createSavingPage() {
     insertUI(autosaveOtherFilesEnabled, autoSaveLay);
   }
   QGridLayout* backupLay = insertGroupBoxUI(backupEnabled, lay);
-  {
-    insertUI(backupKeepCount, backupLay);
-  }
+  { insertUI(backupKeepCount, backupLay); }
 
   insertUI(replaceAfterSaveLevelAs, lay);
   insertUI(resetUndoOnSavingLevel, lay);
@@ -2153,7 +2136,7 @@ QWidget* PreferencesPopup::createXsheetPage() {
   insertUI(deleteCommandBehavior, lay, getComboItemList(deleteCommandBehavior));
   insertUI(pasteCellsBehavior, lay, getComboItemList(pasteCellsBehavior));
   insertUI(cellInputMethod, lay, getComboItemList(cellInputMethod));
-  
+
   QGridLayout* xshColHeaderLay = insertGroupBox(tr("Xsheet Column Area"), lay);
   {
     insertUI(linkColumnNameWithLevel, xshColHeaderLay);
@@ -2487,12 +2470,10 @@ QWidget* PreferencesPopup::createTouchTabletPage() {
   if (winInkAvailable) insertFootNote(lay);
   widget->setLayout(lay);
 
-  bool ret = true;
-  ret = ret && connect(enableTouchGestures, SIGNAL(clicked(bool)), touchAction,
-                       SLOT(setChecked(bool)));
-  ret = ret && connect(touchAction, SIGNAL(triggered(bool)),
-                       enableTouchGestures, SLOT(setChecked(bool)));
-  assert(ret);
+  connect(enableTouchGestures, &CheckBox::clicked, touchAction,
+          &QAction::setChecked);
+  connect(touchAction, &QAction::triggered, enableTouchGestures,
+          &CheckBox::setChecked);
 
   return widget;
 }
