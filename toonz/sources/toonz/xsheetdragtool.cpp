@@ -334,15 +334,19 @@ class LevelExtenderUndo final : public TUndo {
   bool m_insert;
   bool m_invert;  // upper-directional
 
+  bool m_refreshSound;
+
 public:
-  LevelExtenderUndo(bool insert = true, bool invert = false)
+  LevelExtenderUndo(bool insert = true, bool invert = false,
+                    bool refreshSound = false)
       : m_colCount(0)
       , m_rowCount(0)
       , m_col(0)
       , m_row(0)
       , m_deltaRow(0)
       , m_insert(insert)
-      , m_invert(invert) {}
+      , m_invert(invert)
+      , m_refreshSound(refreshSound) {}
 
   void setCells(TXsheet *xsh, int row, int col, int rowCount, int colCount) {
     assert(rowCount > 0 && colCount > 0);
@@ -368,9 +372,7 @@ public:
     int count    = abs(m_deltaRow);
     int r        = m_row + m_rowCount - count;
     for (int c = m_col; c < m_col + m_colCount; c++) {
-      // Se e' una colonna sound l'extender non deve fare nulla.
       TXshColumn *column = xsh->getColumn(c);
-      if (column && column->getSoundColumn()) continue;
       xsh->removeCells(r, c, count);
     }
   }
@@ -382,15 +384,17 @@ public:
     int r0       = m_row + m_rowCount - count;
     int r1       = m_row + m_rowCount - 1;
     for (int c = 0; c < m_colCount; c++) {
-      // Se e' una colonna sound l'extender non deve fare nulla.
       TXshColumn *column = xsh->getColumn(c);
-      if (column && column->getSoundColumn()) continue;
+      bool isSoundColumn = (column && column->getSoundColumn());
       int col = m_col + c;
       xsh->insertCells(r0, col, count);
       int r;
       for (r = r0; r <= r1; r++) {
         int k = (r - m_row) * m_colCount + c;
-        xsh->setCell(r, col, m_cells[k]);
+        if (isSoundColumn)
+          xsh->setCell(r, col, TXshCell());
+        else
+          xsh->setCell(r, col, m_cells[k]);
       }
     }
   }
@@ -403,7 +407,6 @@ public:
     int count    = abs(m_deltaRow);
     for (int c = m_col; c < m_col + m_colCount; c++) {
       TXshColumn *column = xsh->getColumn(c);
-      if (column && column->getSoundColumn()) continue;
       if (m_invert)
         xsh->clearCells(m_row, c, count);
       else
@@ -428,11 +431,14 @@ public:
     }
     for (int c = 0; c < m_colCount; c++) {
       TXshColumn *column = xsh->getColumn(c);
-      if (column && column->getSoundColumn()) continue;
+      bool isSoundColumn = (column && column->getSoundColumn());
       int col = m_col + c;
       for (int r = r0; r <= r1; r++) {
         int k = (r - m_row) * m_colCount + c;
-        xsh->setCell(r, col, m_cells[k]);
+        if (isSoundColumn)
+          xsh->setCell(r, col, TXshCell());
+        else
+          xsh->setCell(r, col, m_cells[k]);
       }
     }
   }
@@ -450,6 +456,8 @@ public:
         TApp::instance()->getCurrentSelection()->getSelection();
     if (selection) selection->selectNone();
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+    if (m_refreshSound)
+      TApp::instance()->getCurrentXsheet()->notifyXsheetSoundChanged();
   }
 
   void redo() const override {
@@ -465,6 +473,8 @@ public:
         TApp::instance()->getCurrentSelection()->getSelection();
     if (selection) selection->selectNone();
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+    if (m_refreshSound)
+      TApp::instance()->getCurrentXsheet()->notifyXsheetSoundChanged();
   }
 
   int getSize() const override {
@@ -649,14 +659,17 @@ class LevelExtenderTool final : public XsheetGUI::DragTool {
   bool m_invert;  // upper directional smart tab
   bool m_insert;
 
+  bool m_refreshSound;
+
 public:
   LevelExtenderTool(XsheetViewer *viewer, bool insert = true,
-                    bool invert = false)
+                    bool invert = false, bool refreshSound = false)
       : XsheetGUI::DragTool(viewer)
       , m_colCount(0)
       , m_undo(0)
       , m_insert(insert)
-      , m_invert(invert) {}
+      , m_invert(invert)
+      , m_refreshSound(refreshSound) {}
 
   // called when the smart tab is clicked
   void onClick(const CellPosition &pos) override {
@@ -679,7 +692,7 @@ public:
       TXsheet *xsh = getViewer()->getXsheet();
       for (int c = c0; c <= c1; c++) {
         TXshColumn *column = xsh->getColumn(c);
-        if (!column || column->getSoundColumn()) continue;
+        if (!column) continue;
         if (!column->isCellEmpty(r1 + 1)) {
           m_insert = true;  // switch the behavior
           break;
@@ -689,9 +702,12 @@ public:
 
     m_columns.reserve(m_colCount);
     TXsheet *xsh = getViewer()->getXsheet();
-    for (int c = c0; c <= c1; c++)
+    for (int c = c0; c <= c1; c++) {
+      TXshColumn *column = xsh->getColumn(c);
+      if (column && column->getSoundColumn()) m_refreshSound = true;
       m_columns.push_back(CellBuilder(xsh, r0, c, m_rowCount, m_invert));
-    m_undo = new LevelExtenderUndo(m_insert, m_invert);
+    }
+    m_undo = new LevelExtenderUndo(m_insert, m_invert, m_refreshSound);
     m_undo->setCells(xsh, r0, c0, m_rowCount, m_colCount);
   }
 
@@ -729,9 +745,7 @@ public:
     // shrink
     if (dr < 0) {
       for (int c = 0; c < m_colCount; c++) {
-        // Se e' una colonna sound l'extender non deve fare nulla.
         TXshColumn *column = xsh->getColumn(m_c0 + c);
-        if (column && column->getSoundColumn()) continue;
         if (m_insert)
           xsh->removeCells(row, m_c0 + c, -dr);
         else {
@@ -749,7 +763,7 @@ public:
         for (tmp_dr = 1; tmp_dr <= dr; tmp_dr++) {
           for (int c = 0; c < m_colCount; c++) {
             TXshColumn *column = xsh->getColumn(m_c0 + c);
-            if (!column || column->getSoundColumn()) continue;
+            if (!column) continue;
             if (!column->isCellEmpty(m_r1 + tmp_dr)) {
               found = true;
               break;
@@ -763,12 +777,14 @@ public:
       }
 
       for (int c = 0; c < m_colCount; c++) {
-        // Se e' una colonna sound l'extender non deve fare nulla.
         TXshColumn *column = xsh->getColumn(m_c0 + c);
-        if (column && column->getSoundColumn()) continue;
+        bool isSoundColumn = (column && column->getSoundColumn());
         if (m_insert) xsh->insertCells(m_r1 + 1, m_c0 + c, dr);
         for (int r = m_r1 + 1; r <= r1; r++)
-          xsh->setCell(r, m_c0 + c, m_columns[c].generate(r));
+          if (isSoundColumn)
+            xsh->setCell(r, m_c0 + c, TXshCell());
+          else
+            xsh->setCell(r, m_c0 + c, m_columns[c].generate(r));
       }
     }
     m_r1 = r1;
@@ -792,7 +808,7 @@ public:
       bool found = false;
       for (int c = 0; c < m_colCount; c++) {
         TXshColumn *column = xsh->getColumn(m_c0 + c);
-        if (!column || column->getSoundColumn()) continue;
+        if (!column) continue;
         if (!column->isCellEmpty(emptyRow)) {
           emptyRow += 1;
           found = true;
@@ -813,7 +829,7 @@ public:
       // clear cells
       for (int c = 0; c < m_colCount; c++) {
         TXshColumn *column = xsh->getColumn(m_c0 + c);
-        if (!column || column->getSoundColumn()) continue;
+        if (!column) continue;
         xsh->clearCells(m_r0, m_c0 + c, dr);
       }
     }
@@ -821,9 +837,12 @@ public:
     else {
       for (int c = 0; c < m_colCount; c++) {
         TXshColumn *column = xsh->getColumn(m_c0 + c);
-        if (!column || column->getSoundColumn()) continue;
+        bool isSoundColumn = (column && column->getSoundColumn());
         for (int r = r0; r <= m_r0 - 1; r++) {
-          xsh->setCell(r, m_c0 + c, m_columns[c].generate(r));
+          if (isSoundColumn)
+            xsh->setCell(r, m_c0 + c, TXshCell());
+          else
+            xsh->setCell(r, m_c0 + c, m_columns[c].generate(r));
         }
       }
     }
@@ -845,6 +864,8 @@ public:
       TUndoManager::manager()->add(m_undo);
       TApp::instance()->getCurrentScene()->setDirtyFlag(true);
       TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+      if (m_refreshSound)
+        TApp::instance()->getCurrentXsheet()->notifyXsheetSoundChanged();
     }
     m_undo = 0;
   }
