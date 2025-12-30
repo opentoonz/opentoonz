@@ -44,13 +44,11 @@
     <separator/>
     <command>MI_ACheck</command>
     <command>MI_GCheck</command>
-    <separator/>
-    <command>MI_BCheck</command>
     <command>MI_TCheck</command>
-    <separator/>
-    <command>MI_PCheck</command>
-    <separator/>
+    <command>MI_BCheck</command>
     <command>MI_IOnly</command>
+    <separator/>
     <command>MI_ICheck</command>
+    <command>MI_PCheck</command>
     <separator/>
 </commandbar>
