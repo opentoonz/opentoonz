@@ -39,7 +39,7 @@ class Calculator;
 
 //! This class manages a generic expression.
 /*!
-  An expression is a sequence of characthers and contains:
+  An expression is a sequence of characters and contains:
 
   \li a \e CalcNode that is a basic element of the expression that must be
   evaluated;

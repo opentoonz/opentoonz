@@ -99,7 +99,7 @@ public:
 
 protected slots:
   /*! Open a static file dialog popup to browse and choose directories. If a
-                  directory is seleceted and choose, set field to this
+                  directory is selected and chosen, set field to this
      directory. */
   // reimplemented in the "save in" filefield in CleanupSettings
   virtual void browseDirectory();

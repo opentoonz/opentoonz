@@ -1268,7 +1268,7 @@
   <item>"STD_iwa_MotionBlurCompFx.endCurve" "End Curve"	</item>
   <item>"STD_iwa_MotionBlurCompFx.zanzoMode" "Afterimage Mode"	</item>
   <item>"STD_iwa_MotionBlurCompFx.premultiType" "Source Premultiply Type"	</item>
-
+stuff/config/qss/Default/less/themes/default/default-theme.less
   <item>"STD_iwa_PerspectiveDistortFx"			"Perspective Distort Iwa"</item>
   <item>"STD_iwa_PerspectiveDistortFx.vanishingPoint"	"Vanishing Point"</item>
   <item>"STD_iwa_PerspectiveDistortFx.anchorPoint"	"Anchor Point"</item>
@@ -1285,7 +1285,7 @@
   <item>"STD_iwa_SpectrumFx.loopSpectrumFadeWidth"	"Loop Spectrum Fade Width"	</item>
   <item>"STD_iwa_SpectrumFx.spectrumShift"	"Spectrum Shift"	</item>
   <item>"STD_iwa_SpectrumFx.lensFactor"	"Lens Factor"	</item>
-  <item>"STD_iwa_SpectrumFx.lightThres"	"Light Threshod"</item>
+  <item>"STD_iwa_SpectrumFx.lightThres"	"Light Threshold"</item>
   <item>"STD_iwa_SpectrumFx.lightIntensity"	"Light Intensity"</item>
 
   <item>"STD_iwa_TileFx"	"Tile Iwa"</item>
