@@ -224,8 +224,7 @@ public:
     TXshSimpleLevel *sl = level->getSimpleLevel();
     if (!sl) return false;
 
-    std::string cacheId = sl->getImageId(fid);
-    // initialize AutocloseParameters
+    // Initialize AutocloseParameters
     AutocloseParameters params;
     params.m_closingDistance = m_distance.getValue();
     params.m_spotAngle       = m_angle.getValue();
@@ -241,16 +240,10 @@ public:
 
     std::vector<TAutocloser::Segment> segments;
 
-    // Use The Cache
-    if (TAutocloser::hasSegmentCache(cacheId)) {
-      segments = TAutocloser::getSegmentCache(cacheId);
-    } else {
-      // Calculate only once and store in cache
-      TAutocloser ac(raux, params.m_closingDistance, params.m_spotAngle,
-                     params.m_inkIndex, params.m_opacity);
-      ac.exec(cacheId);  // <-- This computes + draws + saves in cache!
-      segments = TAutocloser::getSegmentCache(cacheId);
-    }
+    // ==== ALWAYS RECOMPUTE – NO CACHING ====
+    TAutocloser ac(raux, params.m_closingDistance, params.m_spotAngle,
+                   params.m_inkIndex, params.m_opacity);
+    ac.compute(segments);
 
     if (segments.empty()) return false;
 
@@ -267,7 +260,7 @@ public:
     } else if ((closeType == FREEHAND_CLOSE || closeType == POLYLINE_CLOSE) &&
                stroke) {
       checkSegments(filteredSegments, stroke, raux, delta);
-    } // Normal mode: use all segments
+    }  // Normal mode: use all segments
     /*-- Return false if no segment is obtained --*/
     if (filteredSegments.empty()) return false;
 
@@ -290,11 +283,13 @@ public:
         new RasterAutocloseUndo(tileSet, params, filteredSegments, sl, fid));
 
     // DRAW
-    TAutocloser ac(raux, params.m_closingDistance, params.m_spotAngle,
-                   params.m_inkIndex, params.m_opacity);
-    ac.draw(filteredSegments);
+    TAutocloser drawAc(raux, params.m_closingDistance, params.m_spotAngle,
+                       params.m_inkIndex, params.m_opacity);
+    drawAc.draw(filteredSegments);
 
     ToolUtils::updateSaveBox();
+    notifyImageChanged();
+
     return true;
   }
 
@@ -532,26 +527,18 @@ public:
     if (propertyName == m_closeType.getName()) {
       AutocloseVectorType = ::to_string(m_closeType.getValue());
       resetMulti();
-    }
-
-    else if (propertyName == m_distance.getName())
+    } else if (propertyName == m_distance.getName()) {
       AutocloseDistance = m_distance.getValue();
-
-    else if (propertyName == m_angle.getName())
+    } else if (propertyName == m_angle.getName()) {
       AutocloseAngle = m_angle.getValue();
-
-    else if (propertyName == m_inkIndex.getName()) {
-    }
-
-    else if (propertyName == m_opacity.getName())
+    } else if (propertyName == m_inkIndex.getName()) {
+      // Nothing to do
+    } else if (propertyName == m_opacity.getName()) {
       AutocloseOpacity = m_opacity.getValue();
-
-    else if (propertyName == m_multi.getName()) {
+    } else if (propertyName == m_multi.getName()) {
       AutocloseRange = (int)((m_multi.getValue()));
       resetMulti();
-    }
-
-    else if (propertyName == m_ignoreAP.getName()) {
+    } else if (propertyName == m_ignoreAP.getName()) {
       AutocloseIgnoreAutoPaint = (int)(m_ignoreAP.getValue());
     }
 
@@ -649,10 +636,14 @@ public:
         return;
       }
 
-      m_selecting = false;
-      applyAutoclose(ti, getCurrentFid());
-      invalidate();
-      notifyImageChanged();
+      // Always apply, no cache involved
+      m_selecting  = false;
+      bool applied = applyAutoclose(ti, getCurrentFid());
+
+      if (applied) {
+        invalidate();
+        notifyImageChanged();
+      }
     }
   }
 
@@ -698,7 +689,7 @@ public:
   //----------------------------------------------------------------------
 
   void onEnter() override {
-    //      getApplication()->editImage();
+    // getApplication()->editImage();
   }
 
   //----------------------------------------------------------------------
@@ -721,7 +712,7 @@ public:
       m_firstTime = false;
     }
 
-    //			getApplication()->editImage();
+    // getApplication()->editImage();
     resetMulti();
   }
 
@@ -894,5 +885,4 @@ public:
   }
 
   //-------------------------------------------------------------------
-
 } rasterTapeTool;

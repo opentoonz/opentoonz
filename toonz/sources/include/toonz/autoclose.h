@@ -64,6 +64,8 @@ public:
 
   // draws the segments on the raster
   void draw(const std::vector<Segment> &segments);
+
+  // Cache management functions
   static bool hasSegmentCache(const std::string &id) {
     std::lock_guard<std::mutex> lock(m_mutex);
     return m_cache.find(id) != m_cache.end();
@@ -77,6 +79,22 @@ public:
     }
     static const std::vector<Segment> empty;
     return empty;
+  }
+
+  static void setSegmentCache(const std::string &id,
+                              const std::vector<Segment> &segments) {
+    std::lock_guard<std::mutex> lock(m_mutex);
+
+    constexpr size_t MAX_CACHE_SIZE = 50;  // maximum number of images in cache
+
+    m_cache[id] = segments;  // Stores or replaces
+
+    // Remove oldest entries if exceeding limit
+    if (m_cache.size() > MAX_CACHE_SIZE) {
+      auto it = m_cache.begin();
+      std::advance(it, m_cache.size() - MAX_CACHE_SIZE);
+      m_cache.erase(m_cache.begin(), it);
+    }
   }
 
   static void invalidateSegmentCache(const std::string &id) {

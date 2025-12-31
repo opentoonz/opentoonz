@@ -866,7 +866,12 @@ bool TAutocloser::Imp::spotResearchTwoPoints(
   };
 
   // Quick fallback for few endpoints
-  if (endpoints.size() < 40) {
+  // Use brute-force only when there are very few gaps (faster in simple cases)
+  // Recommended values:
+  // - 40: conservative more frames use brute-force
+  // - 60–80: best balance for typical animation (recommended)
+  // >= 100: forces grid on most frames (dense/complex drawings)
+  if (endpoints.size() < 60) {
     return fallback();
   }
 
@@ -1551,22 +1556,8 @@ void TAutocloser::exec(std::string id) {
   compute(segments);
   draw(segments);
 
-  // === SAVE TO CACHE WITH SIZE LIMIT ===
-  {
-    std::lock_guard<std::mutex> lock(m_mutex);
-
-    constexpr size_t MAX_CACHE_SIZE = 50;  // maximum number of images in cache
-
-    m_cache[id] = std::move(segments);  // move avoids copy
-
-    // Remove oldest entries if exceeding limit
-    if (m_cache.size() > MAX_CACHE_SIZE) {
-      // Remove the first (oldest) ones until MAX_CACHE_SIZE remains
-      auto it = m_cache.begin();
-      std::advance(it, m_cache.size() - MAX_CACHE_SIZE);
-      m_cache.erase(m_cache.begin(), it);
-    }
-  }
+  // Save to cache using the inline function
+  setSegmentCache(id, std::move(segments));
 }
 
 /*------------------------------------------------------------------------*/
