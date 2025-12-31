@@ -1268,7 +1268,7 @@
   <item>"STD_iwa_MotionBlurCompFx.endCurve" "End Curve"	</item>
   <item>"STD_iwa_MotionBlurCompFx.zanzoMode" "Afterimage Mode"	</item>
   <item>"STD_iwa_MotionBlurCompFx.premultiType" "Source Premultiply Type"	</item>
-stuff/config/qss/Default/less/themes/default/default-theme.less
+
   <item>"STD_iwa_PerspectiveDistortFx"			"Perspective Distort Iwa"</item>
   <item>"STD_iwa_PerspectiveDistortFx.vanishingPoint"	"Vanishing Point"</item>
   <item>"STD_iwa_PerspectiveDistortFx.anchorPoint"	"Anchor Point"</item>
