@@ -1044,7 +1044,7 @@ void ShaderFx::doCompute(TTile &tile, double frame,
     // drawing.
     // It's probably because a uniform integer variable must have already been
     // bound
-    // to prepare the associated sampler variable in the linkes program...
+    // to prepare the associated sampler variable in the linked program...
   }
 
   // Perform the actual fragment shading

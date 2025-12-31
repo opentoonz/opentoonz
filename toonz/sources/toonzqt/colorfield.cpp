@@ -85,8 +85,8 @@ void CommonChessboard::update() {
                 with a style \b TColorStyle, \b getStyle(), using setStyle().
                 You can pass to constructor square size.
 
-                StyleSample permit to manage click event, it's possile to enable
-   this
+                StyleSample permit to manage click event, it's possible to
+   enable this
                 feature setting enableClick(bool on) to true.
                 If it is enable when click in square class emit the signal
                 clicked(const TColorStyle &style).

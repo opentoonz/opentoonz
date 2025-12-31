@@ -23,7 +23,7 @@
 #include <QPainter>
 
 namespace {
-// FFT coordinate -> Normal corrdinate
+// FFT coordinate -> Normal coordinate
 inline int getCoord(int i, int j, int lx, int ly) {
   int cx = i - lx / 2;
   int cy = j - ly / 2;

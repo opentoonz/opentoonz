@@ -659,7 +659,7 @@ TAssistantBase::drawIndex(const TPointD &p, int index, bool selected, double pix
           TPointD(x + s[0]*w - k, y + s[1]*h + d),
           TPointD(x + s[2]*w - k, y + s[3]*h - d) );
       } else {
-        // horisontal
+        // horizontal
         tglColor(colorBack);
         tglDrawSegment(
           TPointD(x + s[0]*w + d, y + s[1]*h + k),

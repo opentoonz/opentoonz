@@ -431,7 +431,7 @@ bool StrokeDeformationImpl::activate_impl(const ContextStatus *status) {
     TPointD pnt = stroke2manipulate_->getPoint(w);
 
     if (tdistance2(pnt, old_w0_pos_) < sq(TConsts::epsilon)) {
-      // the this position can be modifyed during drag
+      // the this position can be modified during drag
       old_w0_ = w;
     } else
       old_w0_ = -1;
