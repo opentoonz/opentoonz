@@ -18,6 +18,8 @@
 #include "toonz/levelset.h"
 #include "toonz/toonzscene.h"
 #include "toonz/txshsimplelevel.h"
+#include "toonz/txshpalettelevel.h"
+#include "toonz/txshsoundlevel.h"
 #include "toonz/txshleveltypes.h"
 
 // TnzQt includes
@@ -481,7 +483,9 @@ CastBrowser::CastBrowser(QWidget *parent, Qt::WindowFlags flags)
   castSelection->setBrowser(this);
   viewerPanel->setSelection(castSelection);
   viewerPanel->addColumn(DvItemListModel::FrameCount, 50);
+  viewerPanel->addColumn(DvItemListModel::FullPath, 300);
   m_itemViewer->setModel(this);
+  m_itemViewer->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 
   DvItemViewerTitleBar *titleBar = new DvItemViewerTitleBar(m_itemViewer, box);
   // titleBar->hide();
@@ -627,7 +631,16 @@ QVariant CastBrowser::getItemData(int index, DataType dataType,
     return item->getToolTip();
   else if (dataType == FrameCount)
     return item->getFrameCount();
-  else if (dataType == VersionControlStatus) {
+  else if (dataType == FullPath) {
+    ToonzScene *scene   = TApp::instance()->getCurrentScene()->getScene();
+    TXshSimpleLevel *sl = item->getSimpleLevel();
+    if (sl) return scene->decodeFilePath(sl->getPath()).getQString();
+    TXshPaletteLevel *pl = item->getPaletteLevel();
+    if (pl) return scene->decodeFilePath(pl->getPath()).getQString();
+    TXshSoundLevel *ml = item->getSoundLevel();
+    if (ml) return scene->decodeFilePath(ml->getPath()).getQString();
+    return "";
+  } else if (dataType == VersionControlStatus) {
     if (!item->exists())
       return VC_Missing;
     else
