@@ -615,7 +615,7 @@ void BokehUtils::defineSegemntDepth(
     histo[h].segmentId = tmpSegId;
   }
 
-  // "sub" depth segment value list for interporation
+  // "sub" depth segment value list for interpolation
   for (int d = 0; d < segmentDepth_main.size() - 1; d++)
     segmentDepth_sub.push_back(
         (segmentDepth_main.at(d) + segmentDepth_main.at(d + 1)) / 2.0);

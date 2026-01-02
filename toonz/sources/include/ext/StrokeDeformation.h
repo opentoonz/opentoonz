@@ -49,8 +49,8 @@ class StrokeDeformationImpl;
    *        algorithms.
    *
    * StrokeDeformation is a wrapper for for StrokeDeformationImpl,
-   * its function is to verify state and parameteres before
-   * to call the implementation methods of deformation.
+   * its function is to verify state and parameters before to call
+   * the implementation methods of deformation.
    *
    * There is an internal status to verify that actions:
    * @arg @c CREATED on constructor

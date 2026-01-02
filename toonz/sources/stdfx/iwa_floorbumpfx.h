@@ -125,7 +125,7 @@ protected:
 
   // Reflection mode parameter
   TDoubleParamP m_distanceLevel;  // the distance of the reflected object
-                                  // specified by the postion on the surface
+                                  // specified by the position on the surface
 
   // convert output values (in float4) to channel value
   template <typename RASTER, typename PIXEL>

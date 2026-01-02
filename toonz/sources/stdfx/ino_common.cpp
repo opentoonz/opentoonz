@@ -411,7 +411,7 @@ TBlendForeBackRasterFx::TBlendForeBackRasterFx(bool clipping_mask,
   }
   enableComputeInFloat(true);
 
-  // version 1: Gamma had been diretory specified
+  // version 1: Gamma had been directory specified
   // version 2: Gamma is computed by rs.m_colorSpaceGamma + gammaAdjust
   setFxVersion(2);
 }

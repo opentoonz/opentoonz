@@ -39,7 +39,7 @@ class TXshSoundTextLevel;
    The class contains all features about a generic level and gives all methods
    to access to these information.
 
-   It's possible ot know level name, getName(), or identify level types
+   It's possible to know level name, getName(), or identify level types
 getType(),
    defined in \b txshleveltypes.h, and change it, setType().
    The class provides function to know scene to which level belongs, getScene(),

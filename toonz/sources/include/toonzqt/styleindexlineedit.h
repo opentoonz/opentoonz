@@ -39,6 +39,6 @@ public:
 protected:
   void paintEvent(QPaintEvent *pe) override;
 };
-}  // namspace
+}  // namespace
 
 #endif

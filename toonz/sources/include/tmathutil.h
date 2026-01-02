@@ -73,7 +73,7 @@ DVAPI void tbackSubstitution(double *A, int n, int *indx, double *b);
 /*!
   Solve the system A*x=b.
   It`s needed to insert b in res.
-  A and res are modifyed in the routine.
+  A and res are modified in the routine.
   \par A matrix
   \par n size of matrix
   \note A is square [n x n]
@@ -86,7 +86,7 @@ DVAPI void tsolveSistem(double *A, int n, double *res);
 /*!
   Solve the system A*x=b.
   It`s needed to insert b in res.
-  A and res are modifyed in the routine.
+  A and res are modified in the routine.
   \note A is square [n x n]
   \include mathutils_ex1.cpp
  */

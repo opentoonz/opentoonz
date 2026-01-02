@@ -498,7 +498,7 @@ public:
 
 
 //*****************************************************************************************
-//    TTrackInterpolator implemantation
+//    TTrackInterpolator implementation
 //*****************************************************************************************
 
 inline TTrackInterpolator::TTrackInterpolator(TTrack &track):
