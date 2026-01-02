@@ -33,7 +33,7 @@ struct AutocloseSettings {
   int m_closingDistance = 30;
   double m_spotAngle    = 60.0;
   int m_opacity         = 255;
-  bool m_ignoreAPInks        = false;
+  bool m_ignoreAPInks   = false;
 
   AutocloseSettings() = default;
 
@@ -55,15 +55,17 @@ public:
               std::set<int> autoPaintStyles = std::set<int>());
   ~TAutocloser();
 
-  // calcola i segmenti e li disegna sul raster
+  // calculates the segments and draws them on the raster
   void exec();
   void exec(std::string id);
 
-  // non modifica il raster. Si limita a calcolare i segmenti
+  // does not modify the raster. It only calculates the segments
   void compute(std::vector<Segment> &segments);
 
-  // disegna sul raster i segmenti
+  // draws the segments on the raster
   void draw(const std::vector<Segment> &segments);
+
+  // Cache management functions
   static bool hasSegmentCache(const std::string &id) {
     std::lock_guard<std::mutex> lock(m_mutex);
     return m_cache.find(id) != m_cache.end();
@@ -82,7 +84,17 @@ public:
   static void setSegmentCache(const std::string &id,
                               const std::vector<Segment> &segments) {
     std::lock_guard<std::mutex> lock(m_mutex);
-    m_cache[id] = segments;
+
+    constexpr size_t MAX_CACHE_SIZE = 50;  // maximum number of images in cache
+
+    m_cache[id] = segments;  // Stores or replaces
+
+    // Remove oldest entries if exceeding limit
+    if (m_cache.size() > MAX_CACHE_SIZE) {
+      auto it = m_cache.begin();
+      std::advance(it, m_cache.size() - MAX_CACHE_SIZE);
+      m_cache.erase(m_cache.begin(), it);
+    }
   }
 
   static void invalidateSegmentCache(const std::string &id) {
