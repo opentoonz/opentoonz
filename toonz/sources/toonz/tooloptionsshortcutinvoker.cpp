@@ -631,6 +631,7 @@ void ToolOptionsShortcutInvoker::onToolSwitched() {
         (tool->getName() == T_Brush &&
          (tool->getTargetType() & TTool::Vectors)))
       pgCount = 2;
+    if (tool->getName() == T_Plastic) pgCount = 5;
     for (int pgId = 0; pgId < pgCount; pgId++) {
       TPropertyGroup* pg = tool->getProperties(pgId);
       if (!pg) continue;
