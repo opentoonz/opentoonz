@@ -188,6 +188,7 @@ void PlasticTool::leftButtonUp_animate(const TPointD &pos,
 void PlasticTool::addContextMenuActions_animate(QMenu *menu) {
   bool ret = true;
 
+  if (m_sd.getPointer() == nullptr) return;
   if (!m_svSel.isEmpty()) {
     QAction *setKey = menu->addAction(tr("Set Key"));
     ret = ret && connect(setKey, SIGNAL(triggered()), &l_plasticTool,
