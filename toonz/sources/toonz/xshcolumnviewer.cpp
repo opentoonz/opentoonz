@@ -3080,23 +3080,25 @@ void ColumnArea::contextMenuEvent(QContextMenuEvent *event) {
     if (!xsh->isColumnEmpty(col)) {
       menu.addAction(cmdManager->getAction(MI_ReplaceLevel));
       menu.addAction(cmdManager->getAction(MI_ReplaceParentDirectory));
+    }
 
-      // if (containsVectorLevel(col)) {
-      //  menu.addSeparator();
-      //  QAction *setMask =
-      //      new QAction(tr("Temporary Mask (Not in final render)"), this);
-      //  setMask->setCheckable(true);
-      //  setMask->setChecked(xsh->getColumn(col)->isMask());
-      //  setMask->setToolTip(
-      //      tr("Only Toonz Vector levels can be used as masks. \n Masks don't
-      //      "
-      //         "show up in final renders."));
-      //  bool ret = true;
-      //  ret      = ret &&
-      //        connect(setMask, &QAction::toggled, [=]() { onSetMask(col); });
-      //  assert(ret);
-      //  menu.addAction(setMask);
-      //}
+    if (o->isVerticalTimeline()) {
+      menu.addSeparator();
+      QAction *showParentColors =
+          new QAction(tr("Show Column Parent Colors"), this);
+      showParentColors->setCheckable(true);
+      showParentColors->setChecked(
+          Preferences::instance()->isParentColorsInXsheetColumnEnabled());
+      showParentColors->setToolTip(
+          tr("Show the column parent's color in the Xsheet"));
+
+      connect(showParentColors, &QAction::toggled, [=]() {
+        Preferences::instance()->setValue(
+            parentColorsInXsheetColumn,
+            showParentColors->isChecked() ? true : false);
+      });
+      menu.addAction(showParentColors);
+   
     }
   }
 
