@@ -474,6 +474,7 @@
 #define MI_FlipPrevGuideStroke "MI_FlipPrevGuideStroke"
 
 #define MI_ExportXDTS "MI_ExportXDTS"
+#define MI_ExportSXF "MI_ExportSXF"
 #define MI_ExportOCA "MI_ExportOCA"
 #define MI_ImportOCA "MI_ImportOCA"
 #define MI_ExportTvpJson "MI_ExportTvpJson"
