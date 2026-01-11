@@ -1305,7 +1305,7 @@ bool TLevelWriterTzl::checkIconSize(const TDimension &newSize) {
     return false;
 
   m_currentIconSize = TDimension(
-      iconLx, iconLy);  // This is not performed if the above pre-emptive
+      iconLx, iconLy);  // This is not performed if the above preemptive
                         // bailout kicks in. BTW, m_currentIconSize
                         // is currently UNUSED! Should be cleaned up...
   // Compare newSize against read icon size in the file

@@ -163,7 +163,7 @@ public:
   void addSoundtrack(int r0, int r1, double fps, int boardDuration = 0);
 
   // writeInLinearColorSpace : Whether the format will save image in linear
-  // color space. (true only in EXR fromat) writingGamma : Color space gamma to
+  // color space. (true only in EXR format) writingGamma : Color space gamma to
   // be used for saving in the file ("Color Space Gamma" property in EXR format)
   // renderingGamma : Color space gamma used on rendering ( "Color Space Gamma"
   // value in the Render Settings )

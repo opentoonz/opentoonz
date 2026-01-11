@@ -284,7 +284,7 @@ public:
 
      if (setjmp(png_jmpbuf(m_png_ptr))) {
       // If an error is caught in the next line, execution jumps here.
-      // We'll keep going in order ot load whever we can read.
+      // We'll keep going in order to load whatever we can read.
       return;
     }
 

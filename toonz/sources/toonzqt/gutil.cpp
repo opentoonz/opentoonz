@@ -1197,7 +1197,7 @@ QPixmap SvgIconEngine::pixmap(const QSize &size, QIcon::Mode mode,
 
   QPixmap renderedPm;
 
-  //---------- Temmporary command icons by name abbreviation
+  //---------- Temporary command icons by name abbreviation
   if (m_isTemporaryCommandIcon && size != menuIconPhysicalSize) {
     QImage adjusted = adjustImageOpacity(colorizeBlackPixels(m_image, color),
                                          getOpacityForModeState(mode, state));

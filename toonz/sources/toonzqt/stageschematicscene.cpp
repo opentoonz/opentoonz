@@ -47,7 +47,7 @@ namespace {
 //! Define the method to sort a TreeStageNode container.
 //! The sorting follows these rules:
 //! \li TableNode < CameraNode < PegbarNode < ColumnNode
-//! \li if two nodes are of the same type, they are odered using indexes
+//! \li if two nodes are of the same type, they are ordered using indexes
 class CompareNodes {
 public:
   bool operator()(TreeStageNode *node1, TreeStageNode *node2) {

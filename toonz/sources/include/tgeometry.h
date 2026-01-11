@@ -912,7 +912,7 @@ return *this = *this * b;
 };
 */
   /*!
-          Returns the inverse tansformation as:
+          Returns the inverse transformation as:
           <p>\f$\left(\begin{array}{ccc}\bf{A}^{-1}&-\bf{A}^{-1}&\vec{b}\\\vec{0}&\vec{0}&1\end{array}\right)\f$</p>
   */
 
@@ -1028,7 +1028,7 @@ return TPointD(p.x*a11+p.y*a12+a13, p.x*a21+p.y*a22+a23);
   TPointD transformDirection(const TPointD &p) const;
 
   /*!
-          Retruns the transformed box of the bounding box.
+          Returns the transformed box of the bounding box.
   */
   TRectD operator*(const TRectD &rect) const;
 

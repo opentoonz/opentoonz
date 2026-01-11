@@ -608,7 +608,7 @@ void AddFxContextMenu::onFxPresetHandled() {
 
 //---------------------------------------------------
 /*! repeat the last fx creation command done in the schematic.
-    arrgument "command" is sum of the ids of available commands(Insert, Add,
+    argument "command" is sum of the ids of available commands(Insert, Add,
    Replace)
 */
 QAction *AddFxContextMenu::getAgainCommand(int command) {

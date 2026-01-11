@@ -141,9 +141,9 @@ void detectEdges(const std::vector<TPointD> &pointArray,
   //  runs pointArray and for each of its points tries to inscribe triangles
   //  (using left and right points) considering potential corners those with
   //  sides l such that dMin <= l <= dMax (actually at the first time that l >
-  //  dMax: breack) and with angular aperture alpha <= alphaMax.
+  //  dMax: break) and with angular aperture alpha <= alphaMax.
   // Then it looks for local maxes among the potential corners in a window of
-  // semiamplitude dMax(actually at the first time dMax : breack is exceeded)
+  // semiamplitude dMax(actually at the first time dMax : break is exceeded)
   //  default values: dMin = 7; dMax = dMin + 2; alphaMax = 2.6 (150 degrees)
 
   const double dMin     = 4;

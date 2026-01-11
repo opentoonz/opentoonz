@@ -304,14 +304,14 @@ protected:
 //========================================================
 
 /*!
-        \brief The class provides method to draw and andle a SchematicPort.
+        \brief The class provides method to draw and handle a SchematicPort.
 
         A SchematicPort is a child af a SchematicNode and is used to link a
   parent node to other nodes. It can be an input port,
-        or better , a port used to accept link coming from other node. A port
+        or better, a port used to accept link coming from other node. A port
   that isn't an input port cannot accept
         links but can begin to draw links.\n
-  A SchematicPort has got a hook thet is a position where links starts or
+  A SchematicPort has got a hook that is a position where links starts or
   ends.\n
         A SchematicPort can be linked to an arbitrary number of links.
         A SchematicPort handles a container of all links to retrieve all linked

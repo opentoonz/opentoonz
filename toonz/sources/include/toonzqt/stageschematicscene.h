@@ -59,7 +59,7 @@ public:
   //! Sort the children container.
   //! The sorting follows this rules:\n
   //! \li TableNode < CameraNode < PegbarNode < ColumnNode
-  //! \li if two nodes are of the same type, they are odered using indexes
+  //! \li if two nodes are of the same type, they are ordered using indexes
   void sortChildren(int startIndex, int lastIndex);
   void reverseChildren() { std::reverse(m_cildren.begin(), m_cildren.end()); }
 };
@@ -110,7 +110,7 @@ public:
   //! Clear all item an regenerate the Stage Schematic graph.
   void updateScene() override;
 
-  //! Reurns the current node.
+  //! Returns the current node.
   QGraphicsItem *getCurrentNode() override;
 
   //! Replace all nodes in the scene.

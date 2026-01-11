@@ -58,7 +58,7 @@ public:
 
   double m_colorSpaceGamma;  // gamma value to be used for converting
                              // linear-based image file to nonlinear raster.
-                             // Curretly only used in EXR image levels.
+                             // Currently only used in EXR image levels.
 
   static const double DefaultColorSpaceGamma;
 
@@ -164,7 +164,7 @@ public:
   }
 
   /*! \details  A level is forbidden if it has been created with a
-          uncompatible application version (e.g. it was created with
+          incompatible application version (e.g. it was created with
           Student and loaded with Toonz).                                     */
 
   void setIsForbidden(
@@ -180,7 +180,7 @@ public:
           image pixels are \a not already premultiplied.
 
 \details  Images with an alpha channel may or may not store pixels in
-          \a premultiplied form. See the Wikipedia entry on alhpa
+          \a premultiplied form. See the Wikipedia entry on alpha
           compositing for further information:
           http://en.wikipedia.org/wiki/Alpha_compositing
 

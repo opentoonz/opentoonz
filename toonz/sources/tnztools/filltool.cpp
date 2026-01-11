@@ -2153,7 +2153,7 @@ void FillTool::computeRefImgsIfNeeded(const FillParameters &params) {
     }
   }
 
-  // Caculate every refImg
+  // Calculate every refImg
   bool fillOnlySavebox = Preferences::instance()->getFillOnlySavebox();
   TPointD cameraDpi =
       app->getCurrentScene()->getScene()->getCurrentCamera()->getDpi();

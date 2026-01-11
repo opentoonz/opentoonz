@@ -11,7 +11,7 @@
 #include <set>
 #include <iterator>
 // please do not move, it is necessary to be the last
-// to work properely with DVAPI macro
+// to work properly with DVAPI macro
 #include "ext/ExtUtil.h"
 
 // just to override assert

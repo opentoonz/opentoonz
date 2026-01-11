@@ -748,7 +748,7 @@ TLevelReaderAvi::TLevelReaderAvi(const TFilePath &path)
     result = ICDecompressBegin(m_hic, m_srcBitmapInfo, m_dstBitmapInfo);
     if (result != ICERR_OK)
       throw TImageException(getFilePath(),
-                            "unable to initializate the decompressor");
+                            "unable to initialize the decompressor");
 
     char descr[2048], name[2048];
     ICGetInfo(m_hic, &icinfo, sizeof(ICINFO));  // Find out the compressor name

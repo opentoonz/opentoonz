@@ -64,7 +64,7 @@ public:
         break;  // infix
       case TSyntax::Parenthesis:
         fmt.setForeground(QColor(50, 50, 255));
-        break;  // braket
+        break;  // bracket
       case TSyntax::Function:
         fmt.setForeground(QColor(0x0, 0x50, 0x7d));
         break;  // fname

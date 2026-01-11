@@ -181,7 +181,7 @@ objects. You can manage
                 directly vertical box layout, insert widget addWidget(), or
 layout addLayout(), set
                 border and spacing, using setTopMargin() and setTopSpacing(), or
-insert a spece,
+insert a space,
                 addSpacing().
 \n	If you need an horizontal layout you can use an implemented horizontal
 box layout;
