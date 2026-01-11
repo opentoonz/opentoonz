@@ -884,6 +884,8 @@ void TRendererImp::notifyRenderFinished(bool isCanceled) {
   for (PortContainerIterator it = portsCopy.begin(); it != portsCopy.end();
        ++it)
     (*it)->onRenderFinished();
+
+  rootFx = TRasterFxP();
 }
 
 //================================================================================
