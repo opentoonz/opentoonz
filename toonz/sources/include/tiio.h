@@ -75,7 +75,7 @@ public:
   }
 
   // gamma value to be used for converting linear-based image file to nonlinear
-  // raster. Curretly only used in EXR images.
+  // raster. Currently only used in EXR images.
   virtual void setColorSpaceGamma(const double) {}
 
 private:

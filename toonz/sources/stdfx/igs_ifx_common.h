@@ -15,7 +15,7 @@ namespace igs {
 namespace image {
 #if defined RGBA_ORDER_OF_TOONZ6
 // Toonz6, or GDI, TGA order
-/*	Exsample:
+/*	Example:
         igs::image::rgba::num order = igs::image::rgba::red;
         igs::image::rgb::num order = igs::image::rgba::red;
   */

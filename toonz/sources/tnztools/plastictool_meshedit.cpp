@@ -70,7 +70,7 @@ bool testCollapseEdge(const TTextureMesh &mesh, int e) {
     const TTextureMesh::edge_type &m_ed;
 
     bool testTrianglesCount() {
-      // There must be at least one remanining triangle
+      // There must be at least one remaining triangle
       return (m_mesh.facesCount() > m_ed.facesCount());
     }
 

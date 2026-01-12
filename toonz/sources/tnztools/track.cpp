@@ -11,7 +11,7 @@ TTrack::Id TTrack::m_lastId = 0;
 
 
 //*****************************************************************************************
-//    TTrackTransform implemantation
+//    TTrackTransform implementation
 //*****************************************************************************************
 
 TAffine TTrackTransform::makeTiltTransform(const TAffine &a) {
@@ -25,7 +25,7 @@ TAffine TTrackTransform::makeTiltTransform(const TAffine &a) {
 
 
 //*****************************************************************************************
-//    TTrackIntrOrig implemantation
+//    TTrackIntrOrig implementation
 //*****************************************************************************************
 
 TTrackPoint
@@ -36,7 +36,7 @@ TTrackIntrOrig::interpolate(double index) {
 
 
 //*****************************************************************************************
-//    TTrack implemantation
+//    TTrack implementation
 //*****************************************************************************************
 
 TTrack::TTrack(

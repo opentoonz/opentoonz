@@ -225,7 +225,7 @@ void IndexTable::build(ContourFamily &family) {
   for (i = 0; i < m_columns.size(); ++i) {
     m_identifiers[i] = i;
     m_columns[i].push_back(&family[i][0]);
-    // Each node referenced in the Table is signed as 'head' of the cirular
+    // Each node referenced in the Table is signed as 'head' of the circular
     // list.
     family[i][0].setAttribute(ContourNode::HEAD);
   }
@@ -308,7 +308,7 @@ struct VectorizationContext {
   SkeletonGraph *m_output;        // Output skeleton of input region
   double m_currentHeight;         // Height of our 'roof-flooding' process
   Timeline m_timeline;            // Ordered queue of all possible events
-  unsigned int m_algoritmicTime;  // Number of events precessed up to now
+  unsigned int m_algoritmicTime;  // Number of events processed up to now
 
   // Containers
   std::vector<ContourEdge> m_edgesHeap;

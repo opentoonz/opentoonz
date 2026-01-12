@@ -711,7 +711,7 @@ void Iwa_MotionBlurCompFx::doCompute(TTile &tile, double frame,
   QList<TPointD> points = getAttributes()->getMotionPoints();
   double gamma;
   // The hardness value had been used inversely with the bokeh fxs.
-  // Now the convertion functions are shared with the bokeh fxs,
+  // Now the conversion functions are shared with the bokeh fxs,
   // so we need to change the hardness to reciprocal in order to obtain
   // the same result as previous versions.
   if (getFxVersion() == 1)

@@ -487,7 +487,7 @@ void DockWidget::selectDockPlaceholder(QMouseEvent *me) {
   // const int inf= 1000000;
   DockPlaceholder *selected = 0;
 
-  // Search placeholders cotaining muose position
+  // Search placeholders containing mouse position
   unsigned int i;
   for (i = 0; i < m_placeholders.size(); ++i) {
     if (m_placeholders[i]->geometry().contains(me->globalPos())) {

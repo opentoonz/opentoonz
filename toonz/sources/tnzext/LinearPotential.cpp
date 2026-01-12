@@ -70,7 +70,7 @@ double ToonzExt::LinearPotential::compute_value(double value2test) const {
 
   if (isAlmostZero(par_) || areAlmostEqual(par_, 1.0)) tmp_al = actionLength_;
 
-  // this is ckecked from wrapper class
+  // this is checked from wrapper class
   assert(tmp_al != 0.0);
 
   // compute correct parameter considering offset

@@ -120,8 +120,8 @@ public:
 
   bool m_linearColorSpace;  // compute in linear color space (gamma 2.2)
 
-  int m_maxTileSize;  //!< Maximum size (in MegaBytes) of a tile cachable during
-                      //! a render process.
+  int m_maxTileSize;  //!< Maximum size (in MegaBytes) of a tile cacheable
+                      //! during a render process.
   //!  Used by the predictive cache manager to subdivide an fx calculation into
   //!  tiles. \sa TRasterFx::compute().
   int m_shrinkX,  //!< Required horizontal shrink. \warning Obsolete, do not

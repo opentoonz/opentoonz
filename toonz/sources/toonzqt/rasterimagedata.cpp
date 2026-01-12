@@ -45,7 +45,7 @@ TVectorImageP vectorize(const TImageP &source, const TRectD &rect,
   return vi;
 }
 
-}  // namspace
+}  // namespace
 
 //===================================================================
 // RasterImageData

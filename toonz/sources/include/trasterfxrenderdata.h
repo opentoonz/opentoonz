@@ -29,7 +29,7 @@ public:
   virtual bool operator==(const TRasterFxRenderData &data) const = 0;
   virtual std::string toString() const                           = 0;
 
-  //! Returns a value respresenting the type of a renderData instance. The type
+  //! Returns a value representing the type of a renderData instance. The type
   //! is used to sort renderData entries for both retrieval and processing.
   //! The floating return type specification is used to allow insertions between
   //! two close-up values, if needed.

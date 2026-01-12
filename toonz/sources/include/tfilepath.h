@@ -217,7 +217,7 @@ If the path is "<alpha>:" a slash will be added*/
   std::string getDottedType() const;  // ritorna l'estensione con il PUNTO (se
                                       // non c'e' estensione ritorna "")
 
-  /*!Returns the filename extension, escluding leading period (.).
+  /*!Returns the filename extension, excluding leading period (.).
       Returns "" if there is no filename extension.*/
   std::string getUndottedType() const;  // ritorna l'estensione senza PUNTO
 
@@ -232,7 +232,7 @@ If the path is "<alpha>:" a slash will be added*/
   std::string getName() const;       // noDot! noSlash!
   std::wstring getWideName() const;  // noDot! noSlash!
 
-  /*!Returns the filename (with extension, escluding in case the frame number).
+  /*!Returns the filename (with extension, excluding in case the frame number).
       ex.: TFilePath("/pippo/pluto.0001.gif").getLevelName() == "pluto..gif"
    */
   std::string getLevelName()
@@ -242,7 +242,7 @@ If the path is "<alpha>:" a slash will be added*/
       const;  // es. TFilePath("/pippo/pluto.0001.gif").getLevelName() ==
               // "pluto..gif"
 
-  /*!Returns the parent directory escluding the eventual final slash.*/
+  /*!Returns the parent directory excluding the eventual final slash.*/
   TFilePath getParentDir() const;  // noSlash!;
 
   TFrameId getFrame() const;

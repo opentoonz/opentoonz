@@ -4044,7 +4044,7 @@ int pixel_select_curve_blur_root::save(double d_xp, double d_yp,
     assert(NULL != clp_loop->clp_near_point);
 
     /* グループ(ライン)番号保存 */
-    if (fprintf(fp, "# selct number %d : reverse sw is %s\n", ii,
+    if (fprintf(fp, "# select number %d : reverse sw is %s\n", ii,
                 (!clp_loop->i_reverse_sw ? "off" : "on")) < 0) {
       pri_funct_err_bttvr("Error : fprintf(# line number %d) returns minus",
                           ii);

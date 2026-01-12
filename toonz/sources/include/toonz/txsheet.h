@@ -438,7 +438,7 @@ frame duplication.
   */
   int exposeLevel(int row, int col, TXshLevel *xl, bool overwrite = false);
 
-  // cutomized exposseLevel used from LoadLevel command
+  // customized exposeLevel used from LoadLevel command
   int exposeLevel(int row, int col, TXshLevel *xl, std::vector<TFrameId> &fIds_,
                   TFrameId xFrom = TFrameId(), TFrameId xTo = TFrameId(),
                   int step = -1, int inc = -1, int frameCount = -1,

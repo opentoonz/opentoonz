@@ -527,7 +527,7 @@ void MatrixRmn::PostApplyGivens(double c, double s, long idx1, long idx2) {
 
 // ********************************************************************************************
 // Singular value decomposition.
-// Return othogonal matrices U and V and diagonal matrix with diagonal w such
+// Return orthogonal matrices U and V and diagonal matrix with diagonal w such
 // that
 //     (this) = U * Diag(w) * V^T     (V^T is V-transpose.)
 // Diagonal entries have all non-zero entries before all zero entries, but are

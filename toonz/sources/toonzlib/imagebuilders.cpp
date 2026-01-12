@@ -120,7 +120,7 @@ TImageP ImageLoader::build(int imFlags, void *extData) {
     double colorSpaceGamma = LevelOptions::DefaultColorSpaceGamma;
     if (m_path.getType() == "exr") {
       // gamma value to be used for converting linear-based image file to
-      // nonlinear raster. Curretly only used in EXR image levels.
+      // nonlinear raster. Currently only used in EXR image levels.
       colorSpaceGamma = data->m_sl->getProperties()->colorSpaceGamma();
       ir->setColorSpaceGamma(colorSpaceGamma);
     }

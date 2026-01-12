@@ -457,7 +457,7 @@ protected:
     struct Args {
       EditAssistantsTool *owner;
       Args(EditAssistantsTool &owner): owner(&owner) { }
-      operator bool() const //!< declare bool-convertor here to prevent convertion path: Args->Closer->bool
+      operator bool() const //!< declare bool-convertor here to prevent conversion path: Args->Closer->bool
         { return owner && (owner->m_reader || owner->m_writer); }
       void close()
         { if (owner) owner->close(); }
