@@ -1058,8 +1058,10 @@ SwatchViewer::ContentRender::ContentRender(TRasterFx *fx, int frame,
   m_info.m_cameraBox = TRectD(-0.5 * TPointD(m_size.lx, m_size.ly),
                               TDimensionD(m_size.lx, m_size.ly));
 
-  if (m_fx->getAlias(m_frame, m_info).find("plasticDeformerFx") !=
-          std::string::npos &&
+  if ((m_fx->getAlias(m_frame, m_info).find("plasticDeformerFx") !=
+           std::string::npos ||
+       m_fx->getAlias(m_frame, m_info).find("iwa_FlowPaintBrushFx") !=
+           std::string::npos) &&
       QThread::currentThread() == qGuiApp->thread()) {
     m_info.m_offScreenSurface.reset(new QOffscreenSurface());
     m_info.m_offScreenSurface->setFormat(QSurfaceFormat::defaultFormat());
