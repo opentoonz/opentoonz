@@ -512,6 +512,7 @@ LoadScenePopup::LoadScenePopup() : FileBrowserPopup(tr("Load Scene")) {
   setOkText(tr("Load"));
   addFilterType("tnz");
   addFilterType("xdts");
+  addFilterType("sxf");
 
   // set the initial current path according to the current module
   setInitialFolderByCurrentRoom();
@@ -525,7 +526,8 @@ bool LoadScenePopup::execute() {
 
   const TFilePath &fp = *m_selectedPaths.begin();
 
-  if (fp.getType() != "tnz" && fp.getType() != "xdts") {
+  if (fp.getType() != "tnz" && fp.getType() != "xdts" &&
+      fp.getType() != "sxf") {
     DVGui::error(toQString(fp) + tr(" is not a scene file."));
     return false;
   }

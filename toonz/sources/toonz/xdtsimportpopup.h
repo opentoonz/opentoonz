@@ -37,11 +37,11 @@ class XDTSImportPopup : public DVGui::Dialog {
   void updateSuggestions(const QString samplePath);
 
   // Fallback Search
-  void updateSuggestions(const TFilePath &path);
+  void updateSuggestions(const TFilePath& path);
 
 public:
   XDTSImportPopup(QStringList levelNames, ToonzScene* scene,
-                  TFilePath scenePath, bool isUextVersion);
+                  TFilePath scenePath, bool isUextVersion, bool isSXF = false);
   QString getLevelPath(QString levelName);
   void getMarkerIds(int& tick1Id, int& tick2Id, int& keyFrameId,
                     int& referenceFrameId);
@@ -49,7 +49,7 @@ protected slots:
   void onPathChanged();
 
 protected:
-    void accept() override;
+  void accept() override;
 };
 
 #endif
