@@ -1,10 +1,9 @@
-#pragma once
-
 //------------------------------------------------------------------
 // Iwa_Particle for Marnie
 // based on ParticlesFx by Digital Video
 //------------------------------------------------------------------
 
+#pragma once
 #ifndef IWA_PARTICLES_H
 #define IWA_PARTICLES_H
 
@@ -12,6 +11,7 @@
 #include "tspectrum.h"
 #include "trandom.h"
 
+#include "iwa_particlesfx.h"
 #include "iwa_particlesengine.h"
 #include <QList>
 //------------------------------------------------------------------------------
@@ -96,29 +96,30 @@ struct particles_values {
   bool pick_color_for_every_frame_val;
   bool perspective_distribution_val;
 
-  /*- 以下、このFxのために追加したパラメータ -*/
-  /*-  計算モード （背景＋粒子／粒子／背景／照明された粒子）-*/
+  /*- Parameters added specifically for this Fx -*/
+  /*-  Rendering mode (background+particles/particles/background/illuminated
+   * particles) -*/
   int iw_rendermode_val;
-  /*- 粒子に貼られる絵の素材 -*/
+  /*- Image material to be applied to particles -*/
   int base_ctrl_val;
-  /*- カールノイズ的な動きを与える -*/
+  /*- Add curl noise-like movement -*/
   double curl_val;
   int curl_ctrl_1_val;
   int curl_ctrl_2_val;
-  /*- 粒子敷き詰め。粒子を正三角形で敷き詰めたときの、
-          正三角形の一辺の長さをインチで指定する -*/
+  /*- Particle tiling. When particles are arranged in equilateral triangles,
+          specify the side length of the equilateral triangle in inches -*/
   double iw_triangleSize;
-  /*- ひらひら回転 -*/
+  /*- Fluttering rotation -*/
   int flap_ctrl_val;
   double iw_flap_velocity_val;
   double iw_flap_dir_sensitivity_val;
-  /*- ひらひら粒子に照明を当てる。normalize_values()内で Degree → Radian 化する
-   * -*/
+  /*- Illuminate fluttering particles. Convert Degree to Radian inside
+   * normalize_values() -*/
   double iw_light_theta_val;
   double iw_light_phi_val;
-  /*- 読み込みマージン -*/
+  /*- Loading margin -*/
   double margin_val;
-  /*- 重力を徐々に与えるためのフレーム長 -*/
+  /*- Frame length for gradually applying gravity -*/
   int iw_gravityBufferFrame_val;
 };
 
@@ -173,8 +174,8 @@ public:
   int smperiodx;
   int smperiody;
   int smperioda;
-  int lifetime;    /*- 現在の残り寿命 -*/
-  int genlifetime; /*- 発生時の寿命 -*/
+  int lifetime;    /*- Current remaining lifetime -*/
+  int genlifetime; /*- Lifetime at generation -*/
   int level;
   int frame;
   int signx;
@@ -198,17 +199,20 @@ public:
   float curlx;
   float curly;
   float curlz;
-  /*- ひらひら動かす回転角（Degree）-*/
+  /*- Rotation angle for fluttering movement (Degree) -*/
   float flap_theta;
   float flap_phi;
+
+  Iwa_TiledParticlesFx *m_parent;  // pointer to parent Fx
 
 public:
   Iwa_Particle(int lifetime, int seed, const std::map<int, TTile *> porttiles,
                const particles_values &values, const particles_ranges &ranges,
                int howmany, int first, int level, int last, float posx,
-               float posy,    /*- 座標を指定 -*/
-               bool isUpward, /*-  初期向き -*/
-               int initSourceFrame);
+               float posy,    /*- Specify coordinates -*/
+               bool isUpward, /*-  Initial direction -*/
+               int initSourceFrame,
+               Iwa_TiledParticlesFx *parent);  // parent parameter
   // Constructor
   ~Iwa_Particle() {}
   // Destructor
@@ -253,7 +257,7 @@ public:
   void get_image_reference(TTile *ctrl1, const particles_values &values,
                            TPixel32 &color);
 
-  /*- ベクタ長を返す -*/
+  /*- Return vector length -*/
   float get_image_gravity(TTile *ctrl1, const particles_values &values,
                           float &gx, float &gy);
 
@@ -265,11 +269,11 @@ public:
                             TRasterP texRaster, const TRectD &texBBox,
                             const TRenderSettings &ri);
 
-  /*- Control圏内ならtrueを返す -*/
+  /*- Return true if within Control range -*/
   bool get_image_curl(TTile *ctrl1, const particles_values &values, float &cx,
                       float &cy);
 
-  /*- 照明モードのとき、その明るさを色に格納 -*/
+  /*- In illumination mode, store brightness in color -*/
   void set_illuminated_colors(float illuminant, TRasterP texRaster);
 };
 

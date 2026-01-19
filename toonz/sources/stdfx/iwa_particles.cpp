@@ -1,3 +1,5 @@
+
+
 //------------------------------------------------------------------
 // Iwa_Particle for Marnie
 // based on ParticlesFx by Digital Video
@@ -18,7 +20,7 @@ void Iwa_Particle::create_Animation(const particles_values &values, int first,
   switch (values.animation_val) {
   case Iwa_TiledParticlesFx::ANIM_CYCLE:
   case Iwa_TiledParticlesFx::ANIM_S_CYCLE:
-    animswing = 0; /*frame <0 perche' c'e' il preroll dialmeno un frame*/
+    animswing = 0; /*frame <0 because there's at least one frame of preroll*/
     break;
   case Iwa_TiledParticlesFx::ANIM_SR_CYCLE:
     animswing = random.getFloat() > 0.5 ? 1 : 0;
@@ -32,8 +34,10 @@ Iwa_Particle::Iwa_Particle(
     int g_lifetime, int seed, std::map<int, TTile *> porttiles,
     const particles_values &values, const particles_ranges &ranges, int howmany,
     int first, int level, int last, float posx, float posy,
-    bool isUpward,       /*- 初期向き -*/
-    int initSourceFrame) /*- Level内の初期フレーム位置 -*/
+    bool isUpward,                 /*- Initial direction -*/
+    int initSourceFrame,           /*- Initial frame position within Level -*/
+    Iwa_TiledParticlesFx *parent)  // added pointer to parent Fx
+    : m_parent(parent)             // initialized
 {
   double random_s_a_range, random_speed;
   std::map<int, float> imagereferences;
@@ -41,7 +45,8 @@ Iwa_Particle::Iwa_Particle(
   float randomxreference = 0.0;
   float randomyreference = 0.0;
 
-  /*- ここで、出発時の素材フレームが決定するので、ParticleOriginに渡す -*/
+  /*- Here, the material frame at departure is determined, so pass to
+   * ParticleOrigin -*/
   create_Animation(values, 0, last);
   frame = initSourceFrame;
 
@@ -50,15 +55,15 @@ Iwa_Particle::Iwa_Particle(
   x = posx;
   y = posy;
 
-  /*- 粒子パラメータに参照画像が使われている場合、
-          参照画像のとる値を先にまとめて得ておく -*/
+  /*- If reference image is used in particle parameters,
+          get the values taken by the reference image in advance -*/
   for (std::map<int, TTile *>::iterator it = porttiles.begin();
        it != porttiles.end(); ++it) {
     if ((values.lifetime_ctrl_val == it->first ||
          values.speed_ctrl_val == it->first ||
          values.scale_ctrl_val == it->first ||
          values.rot_ctrl_val == it->first
-         /*- Speed Angleを明るさでコントロールする場合 -*/
+         /*- When controlling Speed Angle by brightness -*/
          || (values.speeda_ctrl_val == it->first &&
              !values.speeda_use_gradient_val)) &&
         it->second->getRaster()) {
@@ -69,7 +74,7 @@ Iwa_Particle::Iwa_Particle(
     }
   }
 
-  /*- 寿命にControlが刺さっている場合は、その値に合わせて寿命を減ずる -*/
+  /*- If Control is connected to lifetime, reduce lifespan based on value -*/
   if (values.lifetime_ctrl_val) {
     float lifetimereference = 0.0;
     lifetimereference       = imagereferences[values.lifetime_ctrl_val];
@@ -79,7 +84,7 @@ Iwa_Particle::Iwa_Particle(
 
   genlifetime = lifetime;
 
-  /*- 粒子の初期速度を得る -*/
+  /*- Get particle initial speed -*/
   if (values.speed_ctrl_val &&
       (porttiles.find(values.speed_ctrl_val) != porttiles.end())) {
     float speedreference = 0.0;
@@ -90,11 +95,11 @@ Iwa_Particle::Iwa_Particle(
     random_speed =
         values.speed_val.first + (ranges.speed_range) * random.getFloat();
 
-  /*- 粒子の初期移動方向を得る -*/
+  /*- Get particle initial movement direction -*/
   if (values.speeda_ctrl_val &&
       (porttiles.find(values.speeda_ctrl_val) != porttiles.end())) {
     if (values.speeda_use_gradient_val) {
-      /*- 参照画像のGradientを得る関数を利用して角度を得るモード -*/
+      /*- Mode for computing angle from reference image gradient -*/
       float dir_x, dir_y;
       get_image_gravity(porttiles[values.speeda_ctrl_val], values, dir_x,
                         dir_y);
@@ -108,11 +113,11 @@ Iwa_Particle::Iwa_Particle(
       random_s_a_range =
           values.speeda_val.first + (ranges.speeda_range) * speedareference;
     }
-  } else /*- Controlが無ければランダム -*/
+  } else /*- If no Control, random -*/
     random_s_a_range =
         values.speeda_val.first + (ranges.speeda_range) * random.getFloat();
 
-  /*- 移動方向から速度のX,Y成分を得る -*/
+  /*- Get X,Y components of speed from movement direction -*/
   vx = random_speed * sin(random_s_a_range);
   vy = -random_speed * cos(random_s_a_range);
 
@@ -120,17 +125,16 @@ Iwa_Particle::Iwa_Particle(
       (int)(values.trail_val.first + (ranges.trail_range) * random.getFloat());
   oldx = 0;
   oldy = 0;
-  /*- 質量を指定（動きにくさ） -*/
+  /*- Specify mass (difficulty of movement) -*/
   mass = values.mass_val.first + (ranges.mass_range) * random.getFloat();
-  /*- サイズを得る -*/
+  /*- Get size -*/
   if (values.scale_ctrl_val &&
       (porttiles.find(values.scale_ctrl_val) != porttiles.end())) {
     float scalereference = 0.0f;
     scalereference       = imagereferences[values.scale_ctrl_val];
     scale = values.scale_val.first + (ranges.scale_range) * scalereference;
   } else {
-    /*- ONのとき、かつ、ScaleにControlが無い場合、
-            粒子サイズが小さいほど(遠くにあるので)多く分布するようになる。 -*/
+    /*- When enabled, smaller particles spread more if Scale has no Control -*/
     if (values.perspective_distribution_val) {
       scale =
           (values.scale_val.first * values.scale_val.second) /
@@ -139,7 +143,7 @@ Iwa_Particle::Iwa_Particle(
       scale = values.scale_val.first + (ranges.scale_range) * random.getFloat();
   }
 
-  /*- 向きを得る -*/
+  /*- Get orientation -*/
   if (values.rot_ctrl_val &&
       (porttiles.find(values.rot_ctrl_val) != porttiles.end())) {
     float anglereference = 0.0f;
@@ -148,10 +152,10 @@ Iwa_Particle::Iwa_Particle(
   } else
     angle = -(values.rot_val.first) - (ranges.rot_range) * random.getFloat();
 
-  // 140212 初期粒子向き
+  // 140212 Initial particle orientation
   if (!isUpward) angle += 180.0f;
 
-  /*- ランダムな動きのふれはば -*/
+  /*- Amplitude of random movement fluctuation -*/
   if (values.randomx_ctrl_val)
     randomxreference = imagereferences[values.randomx_ctrl_val];
   if (values.randomy_ctrl_val)
@@ -162,10 +166,10 @@ Iwa_Particle::Iwa_Particle(
 
   if (scale < 0.001f) scale = 0;
 
-  /*- ひらひらした動き -*/
+  /*- Fluttering movement -*/
   if (values.flap_ctrl_val &&
       (porttiles.find(values.flap_ctrl_val) != porttiles.end())) {
-    //*- 参照画像のGradientを得る関数を利用して角度を得る -*/
+    //*- Get angle using function that gets Gradient of reference image -*/
     float dir_x, dir_y;
     float norm;
     norm = get_image_gravity(porttiles[values.flap_ctrl_val], values, dir_x,
@@ -249,7 +253,8 @@ void Iwa_Particle::create_Colors(const particles_values &values,
         (porttiles.find(values.gencol_ctrl_val) != porttiles.end()))
       get_image_reference(porttiles[values.gencol_ctrl_val], values, color);
     else
-      color = values.gencol_val.getPremultipliedValue(random.getFloat());
+      color = m_parent->gencol_val->getValue(frame).getPremultipliedValue(
+          random.getFloat());
     gencol.fadecol = values.genfadecol_val;
     if (values.gencol_spread_val) spread_color(color, values.gencol_spread_val);
     gencol.col = color;
@@ -264,7 +269,8 @@ void Iwa_Particle::create_Colors(const particles_values &values,
         (porttiles.find(values.fincol_ctrl_val) != porttiles.end()))
       get_image_reference(porttiles[values.fincol_ctrl_val], values, color);
     else
-      color = values.fincol_val.getPremultipliedValue(random.getFloat());
+      color = m_parent->fincol_val->getValue(frame).getPremultipliedValue(
+          random.getFloat());
     fincol.rangecol = (int)values.finrangecol_val;
     fincol.fadecol  = values.finfadecol_val;
     if (values.fincol_spread_val) spread_color(color, values.fincol_spread_val);
@@ -281,7 +287,8 @@ void Iwa_Particle::create_Colors(const particles_values &values,
         (porttiles.find(values.foutcol_ctrl_val) != porttiles.end()))
       get_image_reference(porttiles[values.foutcol_ctrl_val], values, color);
     else
-      color = values.foutcol_val.getPremultipliedValue(random.getFloat());
+      color = m_parent->foutcol_val->getValue(frame).getPremultipliedValue(
+          random.getFloat());
     ;
     foutcol.rangecol = (int)values.foutrangecol_val;
     foutcol.fadecol  = values.foutfadecol_val;
@@ -297,8 +304,8 @@ void Iwa_Particle::create_Colors(const particles_values &values,
 
 /*-----------------------------------------------------------------*/
 
-/*- modify_colors_and_opacityから呼ばれる。
-        lifetimeが粒子の現在の年齢。 gencol/fincol/foutcolから色を決める -*/
+/*- Called from modify_colors_and_opacity; lifetime is current age
+ * Determine color from gencol/fincol/foutcol -*/
 void Iwa_Particle::modify_colors(TPixel32 &color, double &intensity) {
   float percent = 0;
 
@@ -331,7 +338,7 @@ void Iwa_Particle::modify_colors(TPixel32 &color, double &intensity) {
 
 /*-----------------------------------------------------------------*/
 
-/*- do_render から呼ばれる。各粒子の描画の直前に色を決めるところ -*/
+/*- Called from do_render to compute particle colors before rendering-*/
 void Iwa_Particle::modify_colors_and_opacity(const particles_values &values,
                                              float curr_opacity, int dist_frame,
                                              TRaster32P raster32) {
@@ -560,7 +567,7 @@ void Iwa_Particle::get_image_reference(TTile *ctrl,
 }
 
 /*-----------------------------------------------------------------*/
-/*- ベクタ長を返す -*/
+/*- Return vector length -*/
 float Iwa_Particle::get_image_gravity(TTile *ctrl1,
                                       const particles_values &values, float &gx,
                                       float &gy) {
@@ -713,7 +720,7 @@ void Iwa_Particle::get_image_reference(TTile *ctrl1,
     color = TPixel32((int)pix64.r / 256, (int)pix64.g / 256, (int)pix64.b / 256,
                      (int)pix64.m / 256);
   }
-  /*- 参照画像のBBoxの外側で、粒子の色を透明にする -*/
+  /*- Make particle color transparent outside reference image's BBox -*/
   else
     color = TPixel32::Transparent;
 }
@@ -725,7 +732,7 @@ void Iwa_Particle::get_base_image_texture(TTile *ctrl1,
                                           TRasterP texRaster,
                                           const TRectD &texBBox,
                                           const TRenderSettings &ri) {
-  /*- ベースの絵を粒子の初期位置にあわせ移動させる -*/
+  /*- Move base image according to particle's initial position -*/
   TPointD pos(initial_x, initial_y);
   pos = ri.m_affine * pos;
   TRotation rotM(-initial_angle);
@@ -738,15 +745,15 @@ void Iwa_Particle::get_base_image_texture(TTile *ctrl1,
   if (baseRas32) {
     baseRas32->lock();
 
-    /*- 粒子と同サイズのラスタを用意 -*/
+    /*- Prepare raster of same size as particle -*/
     TRaster32P kirinukiBaseRas(texRaster->getSize());
     kirinukiBaseRas->lock();
     TRaster32P texRas32 = texRaster;
     texRas32->lock();
-    /*- そこにquickput -*/
+    /*- quickput there -*/
     TRop::quickPut(kirinukiBaseRas, baseRas32, M);
 
-    /*- 粒子のRGBをベース絵で置換していく -*/
+    /*- Replace particle's RGB with base image -*/
     for (int j = 0; j < texRaster->getLy(); j++) {
       TPixel32 *pix     = texRas32->pixels(j);
       TPixel32 *endPix  = pix + texRas32->getLx();
@@ -769,15 +776,15 @@ void Iwa_Particle::get_base_image_texture(TTile *ctrl1,
   } else if (baseRas64) {
     baseRas64->lock();
 
-    /*- 粒子と同サイズのラスタを用意 -*/
+    /*- Prepare raster of same size as particle -*/
     TRaster64P kirinukiBaseRas(texRaster->getSize());
     kirinukiBaseRas->lock();
     TRaster64P texRas64 = texRaster;
     texRas64->lock();
-    /*- そこにquickput -*/
+    /*- quickput there -*/
     TRop::quickPut(kirinukiBaseRas, baseRas64, M);
 
-    /*- 粒子のRGBをベース絵で置換していく -*/
+    /*- Replace particle's RGB with base image -*/
     for (int j = 0; j < texRaster->getLy(); j++) {
       TPixel64 *pix     = texRas64->pixels(j);
       TPixel64 *endPix  = pix + texRas64->getLx();
@@ -807,7 +814,7 @@ void Iwa_Particle::get_base_image_color(TTile *ctrl1,
                                         TRasterP texRaster,
                                         const TRectD &texBBox,
                                         const TRenderSettings &ri) {
-  /*- まず、色を拾う -*/
+  /*- First, pick color -*/
   TPixel32 color;
   TRaster32P baseRas32 = ctrl1->getRaster();
   TRaster64P baseRas64 = ctrl1->getRaster();
@@ -866,7 +873,7 @@ void Iwa_Particle::get_base_image_color(TTile *ctrl1,
 }
 
 /*-----------------------------------------------------------------*/
-/*- 照明モードのとき、その明るさを色に格納 -*/
+/*- In illumination mode, store brightness in color -*/
 void Iwa_Particle::set_illuminated_colors(float illuminant,
                                           TRasterP texRaster) {
   TRaster32P texRas32 = texRaster;
@@ -921,8 +928,8 @@ void Iwa_Particle::spread_color(TPixel32 &color, double range) {
 /*-----------------------------------------------------------------*/
 
 /*-----------------------------------------------
- Iwa_Particles_Engine::roll_particles から呼ばれる
- 粒子の移動
+ Called from Iwa_Particles_Engine::roll_particles
+ Particle movement
 -----------------------------------------------*/
 
 void Iwa_Particle::move(std::map<int, TTile *> porttiles,
@@ -940,9 +947,7 @@ void Iwa_Particle::move(std::map<int, TTile *> porttiles,
   float randomxreference   = 1;
   float randomyreference   = 1;
 
-  /*-
-   * 移動に用いるパラメータに参照画像が刺さっている場合は、あらかじめ取得しておく
-   * -*/
+  /*- Pre-fetch reference image if connected to movement parameters-*/
   for (std::map<int, TTile *>::iterator it = porttiles.begin();
        it != porttiles.end(); ++it) {
     if ((values.friction_ctrl_val == it->first ||
@@ -1009,7 +1014,7 @@ void Iwa_Particle::move(std::map<int, TTile *> porttiles,
     }
   }
 
-  /*- 重力を徐々に付けていく処理を入れる -*/
+  /*- Add processing to gradually apply gravity -*/
   if (genlifetime - lifetime < values.iw_gravityBufferFrame_val) {
     float ratio = (float)(genlifetime - lifetime) /
                   (float)values.iw_gravityBufferFrame_val;
@@ -1017,11 +1022,11 @@ void Iwa_Particle::move(std::map<int, TTile *> porttiles,
     ygravity *= ratio;
   }
 
-  /*- 重力の寄与 -*/
+  /*- Gravity contribution -*/
   vx += xgravity * mass;
   vy += ygravity * mass;
 
-  /*- カールノイズ的動き 奥行き持たせる -*/
+  /*- Curl noise-like movement with depth -*/
   if (values.curl_ctrl_1_val &&
       (porttiles.find(values.curl_ctrl_1_val) != porttiles.end())) {
     float tmpCurlx, tmpCurly;
@@ -1050,7 +1055,7 @@ void Iwa_Particle::move(std::map<int, TTile *> porttiles,
       tmpCurlx *= values.curl_val * mass;
       tmpCurly *= values.curl_val * mass;
 
-      /*- ローパスフィルタをかます -*/
+      /*- Apply low-pass filter -*/
       curlx = 0.5f * curlx + 0.5f * tmpCurlx;
       curly = 0.5f * curly + 0.5f * tmpCurly;
 
@@ -1059,7 +1064,7 @@ void Iwa_Particle::move(std::map<int, TTile *> porttiles,
     }
   }
 
-  /*- 現在位置に速度を足す -*/
+  /*- Add speed to current position -*/
   if (values.speedscale_val) {
     float scalecorr = scale / dpicorr;
     x += (vx + windx + dummy.x) * scalecorr;
@@ -1068,7 +1073,7 @@ void Iwa_Particle::move(std::map<int, TTile *> porttiles,
     x += vx + windx + dummy.x;
     y += vy + windy + dummy.y;
   }
-  /*- 粒子の向きを計算 -*/
+  /*- Calculate particle orientation -*/
   angle -= values.rotspeed_val + dummy.a;
 
   if (!(lifetime % values.step_val) || (frame < 0)) {
@@ -1077,10 +1082,10 @@ void Iwa_Particle::move(std::map<int, TTile *> porttiles,
 
   update_Scale(values, ranges, scalereference, scalestepreference);
 
-  /*-  ひらひら -*/
+  /*-  Fluttering -*/
   if (values.flap_ctrl_val &&
       (porttiles.find(values.flap_ctrl_val) != porttiles.end())) {
-    /*- 参照画像のGradientを得る関数を利用して角度を得る -*/
+    /*- Get angle using function that gets Gradient of reference image -*/
     float dir_x, dir_y;
     double norm;
     norm = get_image_gravity(porttiles[values.flap_ctrl_val], values, dir_x,
@@ -1089,7 +1094,8 @@ void Iwa_Particle::move(std::map<int, TTile *> porttiles,
     } else {
       float newTheta = atan2f(dir_y, dir_x) * 180.0f / 3.14159f;
 
-      /*- Thetaを補間する。右回り/左回りで近いほうを選ぶ -*/
+      /*- Interpolate Theta. Choose clockwise/counterclockwise whichever is
+       * closer -*/
       if (newTheta > flap_theta && newTheta - flap_theta > 180.0f)
         newTheta -= 360.0f;
       else if (newTheta < flap_theta && flap_theta - newTheta > 180.0f)
