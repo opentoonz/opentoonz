@@ -22,7 +22,18 @@ TModifierTangents::Interpolator::interpolate(double index) {
   const TTrackPoint &p1 = track[i1];
   TTrackTangent t0 = i0 >= 0 && i0 < (int)tangents.size() ? tangents[i0] : TTrackTangent();
   TTrackTangent t1 = i1 >= 0 && i1 < (int)tangents.size() ? tangents[i1] : TTrackTangent();
+  
+  // Calculate segment length for tangent scaling.
+  // When points are very close together (e.g., duplicate input events),
+  // use a minimum length to preserve tangent direction for smooth curves.
+  // Without this, zero-length segments produce zero tangents, causing
+  // sharp corners instead of smooth interpolation.
   double l = p1.length - p0.length;
+  if (l < TConsts::epsilon) {
+    // For near-zero length segments, use linear interpolation
+    // since spline would degenerate anyway
+    return TTrack::interpolationLinear(p0, p1, frac);
+  }
   
   t0.position.x *= l;
   t0.position.y *= l;
@@ -143,3 +154,4 @@ TModifierTangents::modifyTrack(
   
   track.resetChanges();
 }
+
