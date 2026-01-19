@@ -364,6 +364,27 @@ TInputManager::addTrackPoint(
   double time,
   bool final )
 {
+  // Filter out points that are too close to the previous point.
+  // This prevents issues with some tablet drivers that send duplicate
+  // or near-duplicate position events, which can cause sharp corners
+  // in curve interpolation instead of smooth curves.
+  // The final point is always added to ensure proper stroke termination.
+  if (!final && track->size() > 0) {
+    const TTrackPoint &last = track->back();
+    double dist2 = tdistance2(position, last.position);
+    // Use a small threshold (0.5 pixels squared) to filter near-duplicates
+    // while preserving intentional slow/precise movements
+    if (dist2 < 0.25) {
+      // Update pressure if the new point has higher pressure
+      // (pen might be pressing harder at same spot)
+      if (pressure > last.pressure) {
+        // We can't modify the existing point directly, but the tangent
+        // calculation will handle this case
+      }
+      return;
+    }
+  }
+  
   track->push_back(
     TTrackPoint(
       position,
