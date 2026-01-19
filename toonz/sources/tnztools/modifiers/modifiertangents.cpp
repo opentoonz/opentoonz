@@ -50,8 +50,32 @@ TModifierTangents::calcTangent(const TTrack &track, int index) {
   if (index <= 0 || index >= track.size() - 1)
     return TTrackTangent();
   
-  const TTrackPoint &p0 = track[index-1];
-  const TTrackPoint &p2 = track[index+1];
+  // Find points with meaningful distance for tangent calculation.
+  // When drawing quickly, consecutive points can land at the same position,
+  // producing zero-length tangents that cause sharp corners instead of
+  // smooth curves. Look further back/forward to find points with actual distance.
+  
+  const TTrackPoint &pCurrent = track[index];
+  int i0 = index - 1;
+  int i2 = index + 1;
+  
+  // Look backward for a point with meaningful distance from current
+  const double minDist2 = TConsts::epsilon * TConsts::epsilon;
+  while (i0 > 0) {
+    double d2 = tdistance2(track[i0].position, pCurrent.position);
+    if (d2 > minDist2) break;
+    --i0;
+  }
+  
+  // Look forward for a point with meaningful distance from current
+  while (i2 < track.size() - 1) {
+    double d2 = tdistance2(track[i2].position, pCurrent.position);
+    if (d2 > minDist2) break;
+    ++i2;
+  }
+  
+  const TTrackPoint &p0 = track[i0];
+  const TTrackPoint &p2 = track[i2];
 
   // calculate tangent length by time
   // for that we need know time of actual user input
@@ -119,4 +143,3 @@ TModifierTangents::modifyTrack(
   
   track.resetChanges();
 }
-
