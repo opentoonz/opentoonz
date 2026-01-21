@@ -1790,6 +1790,7 @@ void FxSchematicPort::mouseMoveEvent(QGraphicsSceneMouseEvent *me) {
     targetPort->handleSnappedLinksOnDynamicPortFx(groupedPorts, portId,
                                                   thisPortId);
     SchematicLink *link = getLink(0);
+    if (!link) return;
     assert(link);
     SchematicLink *ghostLink = targetPort->makeLink(link->getOtherPort(this));
     if (ghostLink) {
