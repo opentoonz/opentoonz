@@ -239,6 +239,10 @@ void FileSelection::enableCommands() {
 //------------------------------------------------------------------------
 
 void FileSelection::addToBatchRenderList() {
+  if (!BatchesController::instance()->getTasksTree()) {
+    QAction *taskPopup = CommandManager::instance()->getAction(MI_OpenTasks);
+    taskPopup->trigger();
+  }
   std::vector<TFilePath> files;
   getSelectedFiles(files);
   int i;
@@ -251,6 +255,11 @@ void FileSelection::addToBatchRenderList() {
 //------------------------------------------------------------------------
 
 void FileSelection::addToBatchCleanupList() {
+  if (!BatchesController::instance()->getTasksTree()) {
+    QAction *taskPopup = CommandManager::instance()->getAction(MI_OpenTasks);
+    taskPopup->trigger();
+  }
+
   std::vector<TFilePath> files;
   getSelectedFiles(files);
   int i;
