@@ -8,6 +8,8 @@
 
 // forward declarations
 class SchematicPort;
+class SchematicScene;
+class SchematicViewer;
 
 //========================================================
 //
@@ -17,6 +19,7 @@ class SchematicPort;
 
 class SchematicName final : public QGraphicsTextItem {
   Q_OBJECT
+  Q_DISABLE_COPY(SchematicName)
   double m_width;
   double m_height;
   bool m_refocus;
@@ -31,7 +34,7 @@ class SchematicName final : public QGraphicsTextItem {
 
 public:
   SchematicName(QGraphicsItem *parent, double width, double height);
-  ~SchematicName();
+  ~SchematicName() override;
 
   bool eventFilter(QObject *object, QEvent *event) override;
 
@@ -66,6 +69,7 @@ protected slots:
 
 class SchematicThumbnailToggle final : public QObject, public QGraphicsItem {
   Q_OBJECT
+  Q_DISABLE_COPY(SchematicThumbnailToggle)
 #ifndef MACOSX
   Q_INTERFACES(QGraphicsItem)
 #endif
@@ -74,7 +78,7 @@ class SchematicThumbnailToggle final : public QObject, public QGraphicsItem {
 
 public:
   SchematicThumbnailToggle(SchematicNode *parent, bool isOpened);
-  ~SchematicThumbnailToggle();
+  ~SchematicThumbnailToggle() override;
 
   QRectF boundingRect() const override;
   void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
@@ -96,6 +100,7 @@ signals:
 
 class SchematicToggle : public QObject, public QGraphicsItem {
   Q_OBJECT
+  Q_DISABLE_COPY(SchematicToggle)
 #ifndef MACOSX
   Q_INTERFACES(QGraphicsItem)
 #endif
@@ -125,7 +130,7 @@ public:
                   const QIcon &imageOn2, QColor colorOn, const QIcon &imageOff,
                   QColor colorOff, int flags, bool isNormalIconView = true);
 
-  ~SchematicToggle();
+  ~SchematicToggle() override;
 
   QRectF boundingRect() const override;
   // reimplemeted in SchematicToggle_SplineOptions
@@ -195,7 +200,7 @@ protected:
 
 public:
   SchematicHandleSpinBox(QGraphicsItem *parent);
-  ~SchematicHandleSpinBox();
+  ~SchematicHandleSpinBox() override;
 
   QRectF boundingRect() const override;
   void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
@@ -232,8 +237,10 @@ protected:
 */
 class SchematicLink : public QObject, public QGraphicsItem {
   Q_OBJECT
+  Q_DISABLE_COPY(SchematicLink)
+  #ifndef MACOSX
   Q_INTERFACES(QGraphicsItem)
-
+  #endif
   SchematicPort *m_startPort, *m_endPort;
   QPainterPath m_path, m_hitPath;
   bool m_lineShaped;
@@ -241,7 +248,7 @@ class SchematicLink : public QObject, public QGraphicsItem {
 
 public:
   SchematicLink(QGraphicsItem *parent, QGraphicsScene *scene);
-  ~SchematicLink();
+  ~SchematicLink() override;
 
   //! Reimplements the pure virtual QGraphicsItem::boundingRect() method.
   QRectF boundingRect() const override;
@@ -286,7 +293,7 @@ public:
   SchematicNode *getOtherNode(const SchematicNode *node) const;
 
   //! Returns true if the link is line shaped.
-  bool isLineShaped() { return m_lineShaped; }
+  bool isLineShaped() const { return m_lineShaped; }
   void setLineShaped(bool value) { m_lineShaped = value; }
 
   bool isHighlighted() { return m_highlighted; }
@@ -321,6 +328,7 @@ protected:
 */
 class SchematicPort : public QObject, public QGraphicsItem {
   Q_OBJECT
+  Q_DISABLE_COPY(SchematicPort)
 #ifndef MACOSX
   Q_INTERFACES(QGraphicsItem)
 #endif
@@ -337,7 +345,7 @@ protected:
 
 public:
   SchematicPort(QGraphicsItem *parent, SchematicNode *node, int type);
-  ~SchematicPort();
+  ~SchematicPort() override;
 
   SchematicNode *getNode() const { return m_node; }
 
@@ -432,6 +440,7 @@ signals:
 
 class SchematicNode : public QObject, public QGraphicsItem {
   Q_OBJECT
+  Q_DISABLE_COPY(SchematicNode)
 #ifndef MACOSX
   Q_INTERFACES(QGraphicsItem)
 #endif
@@ -444,7 +453,7 @@ protected:
 
 public:
   SchematicNode(SchematicScene *scene);
-  ~SchematicNode();
+  ~SchematicNode() override;
 
   QRectF boundingRect() const override;
   void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
